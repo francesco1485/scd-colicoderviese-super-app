@@ -1,0 +1,9 @@
+{
+  "name":"SCD ColicoDerviese Super App",
+  "short_name":"SCD App",
+  "start_url":"/",
+  "display":"standalone",
+  "background_color":"#032b5b",
+  "theme_color":"#032b5b",
+  "description":"Super App ufficiale S.D.C. ColicoDerviese"
+}
