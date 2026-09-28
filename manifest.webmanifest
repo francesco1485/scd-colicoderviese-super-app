@@ -1,10 +1,52 @@
 {
-  "name":"SCD ColicoDerviese Super App",
-  "short_name":"SCD App",
-  "start_url":"/",
-  "scope":"/",
-  "display":"standalone",
-  "background_color":"#052a67",
-  "theme_color":"#052a67",
-  "description":"Gare, risultati, eventi, community e servizi S.D.C. ColicoDerviese"
+  "name": "SCD ColicoDerviese Super App",
+  "short_name": "SCD App",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "orientation": "portrait-primary",
+  "background_color": "#052a67",
+  "theme_color": "#052a67",
+  "description": "Applicazione ufficiale S.D.C. ColicoDerviese: gare, risultati, eventi, community, servizi, profilo, avatar e area riservata.",
+  "categories": [
+    "sports",
+    "social",
+    "utilities"
+  ],
+  "icons": [
+    {
+      "src": "./assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Gare",
+      "short_name": "Gare",
+      "url": "./#gare"
+    },
+    {
+      "name": "Avatar",
+      "short_name": "Avatar",
+      "url": "./#avatar"
+    },
+    {
+      "name": "Community",
+      "short_name": "Community",
+      "url": "./#community"
+    }
+  ]
 }
