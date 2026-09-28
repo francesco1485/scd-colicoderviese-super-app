@@ -82,7 +82,7 @@ function serveStatic(req,res){
   const u=new URL(req.url,'http://localhost'); let pathname=decodeURIComponent(u.pathname);
   if(pathname==='/'||pathname==='') pathname='/index.html';
   const file=path.normalize(path.join(ROOT,pathname)); if(!file.startsWith(ROOT)) {res.writeHead(403);return res.end('Forbidden')}
-  fs.stat(file,(err,st)=>{if(err||!st.isFile()){res.writeHead(404);return res.end('Not found')}const ext=path.extname(file).toLowerCase();const cache=/\.(png|jpg|jpeg|webp|svg|css|js)$/.test(ext)?'public, max-age=3600':'no-cache';res.writeHead(200,{'content-type':mime[ext]||'application/octet-stream','cache-control':cache});fs.createReadStream(file).pipe(res)})
+  fs.stat(file,(err,st)=>{if(err||!st.isFile()){res.writeHead(404);return res.end('Not found')}const ext=path.extname(file).toLowerCase();const cache=/\.(png|jpg|jpeg|webp|svg)$/.test(ext)?'public, max-age=86400':'no-store';res.writeHead(200,{'content-type':mime[ext]||'application/octet-stream','cache-control':cache});fs.createReadStream(file).pipe(res)})
 }
 
 http.createServer(async(req,res)=>{
