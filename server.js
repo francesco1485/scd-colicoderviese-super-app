@@ -9,11 +9,27 @@ const UPSTREAM = process.env.SCD_APPS_SCRIPT_URL || 'https://script.google.com/m
 const CACHE_TTL = 10 * 60 * 1000;
 let liveCache = { at: 0, data: null };
 
+const ALLOWED_ORIGINS = new Set([
+  'https://francesco1485.github.io',
+  'https://scd-colicoderviese-official-r21.onrender.com',
+  'https://scd-colicoderviese-super-app.onrender.com',
+  'http://localhost:10000',
+  'http://127.0.0.1:10000'
+]);
+function applyCors(req,res){
+  const origin=String(req.headers.origin||'');
+  if(ALLOWED_ORIGINS.has(origin)) res.setHeader('access-control-allow-origin',origin);
+  res.setHeader('vary','Origin');
+  res.setHeader('access-control-allow-methods','GET,POST,OPTIONS');
+  res.setHeader('access-control-allow-headers','content-type,x-scd-client');
+  res.setHeader('access-control-max-age','86400');
+}
+
 const allowedActions = new Set([
   'dashboard.summary','public.feed','public.club','public.match','public.register',
   'auth.request','auth.login','auth.validate','auth.pin.change','auth.pin.set','direction.access.set',
   'public.calendar','public.initiatives','public.registration','public.partnerLead','public.communitySubmit',
-  'public.ticketSubmit','safeguarding.submit','direction.leads','direction.moderation'
+  'public.ticketSubmit','public.telemetry','safeguarding.submit','direction.leads','direction.moderation'
 ]);
 
 function json(res, status, data, headers={}) {
@@ -27,13 +43,13 @@ function decodeXml(s=''){return String(s).replace(/<!\[CDATA\[|\]\]>/g,'').repla
 async function proxyAppsScript(req,res){
   if(req.method!=='POST') return json(res,405,{ok:false,error:'Metodo non consentito'});
   try{
-    const raw = await readBody(req); const body = JSON.parse(raw||'{}'); const action=String(body.action||'');
+    const raw = await readBody(req); const body = JSON.parse(raw||'{}'); const action=String(body.action||''); const started=Date.now(); console.log('[api/scd] incoming',action,req.headers.origin||'server');
     if(!allowedActions.has(action)) return json(res,400,{ok:false,error:'Azione non consentita'});
     const upstream = await fetch(UPSTREAM,{method:'POST',redirect:'follow',headers:{'content-type':'application/json'},body:JSON.stringify({action,payload:body.payload||{},sessionToken:body.sessionToken||''})});
     const text = await upstream.text(); let parsed;
     try{parsed=JSON.parse(text)}catch{throw new Error('Risposta backend non valida')}
-    return json(res,upstream.ok?200:400,parsed);
-  }catch(e){return json(res,502,{ok:false,error:e.message||'Backend SCD non disponibile'})}
+    console.log('[api/scd] upstream',action,upstream.status,(Date.now()-started)+'ms'); return json(res,upstream.ok?200:400,parsed);
+  }catch(e){console.error('[api/scd] failed',e.message||e);return json(res,502,{ok:false,error:e.message||'Backend SCD non disponibile'})}
 }
 
 
@@ -86,6 +102,7 @@ function serveStatic(req,res){
 }
 
 http.createServer(async(req,res)=>{
+  applyCors(req,res); if(req.method==='OPTIONS'){res.writeHead(204);return res.end()}
   const u=new URL(req.url,'http://localhost');
   if(u.pathname==='/health') return json(res,200,{ok:true,service:'SCD Super App',time:new Date().toISOString()});
   if(u.pathname==='/api/scd') return proxyAppsScript(req,res);
