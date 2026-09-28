@@ -39,7 +39,53 @@ function doPost(e) {
         data = validateSession(token || payload.token);
         break;
       case 'dashboard.summary':
+      case 'private.dashboard':
         data = getAppData(token);
+        break;
+      case 'private.week':
+        data = getWeekForUser(token, Number(payload.offset || 0));
+        break;
+      case 'private.request.submit':
+        data = submitUserRequest(token, payload);
+        break;
+      case 'private.transport.request':
+        data = saveTransportRequest(token, payload);
+        break;
+      case 'private.message.send':
+        data = sendTeamMessage(token, payload);
+        break;
+      case 'private.convocation.create':
+        data = createConvocation(token, payload);
+        break;
+      case 'private.convocation.reply':
+        data = replyConvocation(token, payload.id || payload.convocationId, payload.player || payload.playerCode, payload.response);
+        break;
+      case 'private.attendance.get':
+        data = getAttendanceRegister(token, payload.teamKey || '', payload.date || '');
+        break;
+      case 'private.attendance.save':
+        data = saveAttendanceBatch(token, payload);
+        break;
+      case 'auth.pin.change':
+        data = changeMyPin(token, payload.oldPin || '', payload.newPin || '');
+        break;
+      case 'direction.diagnostics':
+        data = getSystemDiagnostics(token);
+        break;
+      case 'direction.evolution':
+        data = getEvolutionQueue(token, Number(payload.limit || 30));
+        break;
+      case 'direction.access.set':
+        data = setActorAccess(token, payload);
+        break;
+      case 'direction.pin.set':
+        data = directionSetUserPin(token, payload.email || '', payload.pin || '');
+        break;
+      case 'direction.player.approve':
+        data = approvePlayerAuthorization(token, payload.authId || payload.id || '', payload.code || '', payload.note || 'Approvato da Super App SCD');
+        break;
+      case 'direction.player.reject':
+        data = rejectPlayerAuthorization(token, payload.authId || payload.id || '', payload.note || 'Respinto da Super App SCD');
         break;
       default:
         throw new Error('Azione API non consentita: ' + action);
