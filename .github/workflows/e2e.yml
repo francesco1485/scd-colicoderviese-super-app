@@ -15,6 +15,10 @@ jobs:
         with:
           node-version: "22"
       - run: npm install
+      - name: Syntax check
+        run: |
+          node --check app.js
+          node --check server.js
       - run: npm install --no-save playwright
       - run: npx playwright install --with-deps chromium
       - name: Start SCD server
