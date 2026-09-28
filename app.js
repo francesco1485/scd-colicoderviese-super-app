@@ -1,4 +1,5 @@
 const API='/api/scd';
+const APP_VERSION='21.5.0';
 const R20_APP='https://script.google.com/macros/s/AKfycbwYQ_3yLYsp-6jX3FIgufBjpmaZb9uO1AklF9hdG-CuLII9J4ITUX1EA-EKuWXBMEc/exec';
 const FALLBACK={
   season:'2026/27',generatedAt:new Date().toLocaleString('it-IT'),
@@ -13,6 +14,27 @@ const FALLBACK={
   }
 };
 let state={summary:null,installPrompt:null,session:null};
+const LISTENING_EVENTS=new Set(['page_view','cta_click','form_start','form_complete','form_abandon','api_error','client_error','slow_load','search_use','pwa_install','share','return_visit','notification_interaction','feature_use','feedback_submit']);
+function track(type,detail={}){
+  if(!LISTENING_EVENTS.has(type))return;
+  try{
+    const key='scd:listening:v1';
+    const s=JSON.parse(localStorage.getItem(key)||'{"counts":{},"sections":{},"last":null}');
+    s.counts[type]=(s.counts[type]||0)+1;
+    if(detail.section){const sec=String(detail.section).slice(0,40);s.sections[sec]=(s.sections[sec]||0)+1}
+    s.last=new Date().toISOString();
+    localStorage.setItem(key,JSON.stringify(s));
+  }catch{}
+}
+async function flushListening(){
+  try{
+    const key='scd:listening:v1',metrics=JSON.parse(localStorage.getItem(key)||'{}');
+    if(!metrics.counts||!Object.keys(metrics.counts).length)return;
+    await api('public.telemetry',{version:APP_VERSION,metrics});
+    localStorage.removeItem(key);
+  }catch{}
+}
+
 const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
 const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 function toast(msg){const el=$('#toast');el.textContent=msg;el.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('show'),2700)}
@@ -62,6 +84,92 @@ function openProfile(){openLogin()}
 function openDirection(){openLogin()}
 
 
+const AVATAR_COLORS={
+  skin:{chiara:'#f4c69c',media:'#c98b62',scura:'#7b4d35'},
+  hair:{castani:'#4b2d22',neri:'#171b24',biondi:'#c88d2c',rossi:'#963c27'},
+  kit:{bianca:'#f7f9fc',blu:'#0758b8'}
+};
+function avatarSvgMarkup(opts={}){
+  const skin=AVATAR_COLORS.skin[opts.skin||'media'],hair=AVATAR_COLORS.hair[opts.hair||'castani'],kit=AVATAR_COLORS.kit[opts.kit||'bianca'];
+  const secondary=opts.kit==='blu'?'#ffd400':'#0758b8',number=String(opts.number||10).replace(/\D/g,'').slice(0,2)||'10';
+  const smile=(opts.mood||'sorriso')==='sorriso';
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 460" width="360" height="460">
+  <ellipse cx="180" cy="420" rx="92" ry="16" fill="#09295f" opacity=".14"/>
+  <circle cx="180" cy="115" r="70" fill="${skin}"/>
+  <path d="M116 92 Q126 30 180 36 Q232 31 246 93 Q223 69 202 70 Q184 54 161 70 Q138 66 116 92Z" fill="${hair}"/>
+  <path d="M117 90 Q132 45 160 51 Q147 75 150 91Z" fill="${hair}"/>
+  <path d="M243 91 Q226 44 201 51 Q215 72 211 92Z" fill="${hair}"/>
+  <ellipse cx="153" cy="113" rx="10" ry="13" fill="#fff"/><ellipse cx="207" cy="113" rx="10" ry="13" fill="#fff"/>
+  <circle cx="154" cy="114" r="5" fill="#15345f"/><circle cx="206" cy="114" r="5" fill="#15345f"/>
+  <path d="M171 132 Q180 139 189 132" fill="none" stroke="#8e583f" stroke-width="4" stroke-linecap="round"/>
+  ${smile?'<path d="M151 147 Q180 171 209 147 Q180 184 151 147Z" fill="#8c3540"/>':'<path d="M155 157 Q180 145 205 157" fill="none" stroke="#6f3d35" stroke-width="5" stroke-linecap="round"/>'}
+  <path d="M113 200 Q180 166 247 200 L268 302 Q180 332 92 302Z" fill="${kit}" stroke="${secondary}" stroke-width="8"/>
+  <path d="M112 205 L75 244 L98 269 L126 229Z" fill="${kit}" stroke="${secondary}" stroke-width="7"/>
+  <path d="M248 205 L285 244 L262 269 L234 229Z" fill="${kit}" stroke="${secondary}" stroke-width="7"/>
+  <path d="M125 302 L175 302 L165 367 L112 367Z" fill="${kit}" stroke="${secondary}" stroke-width="7"/>
+  <path d="M185 302 L235 302 L248 367 L195 367Z" fill="${kit}" stroke="${secondary}" stroke-width="7"/>
+  <path d="M118 365 L162 365 L161 418 L118 418Z" fill="#f7f9fc" stroke="${secondary}" stroke-width="6"/>
+  <path d="M199 365 L242 365 L244 418 L201 418Z" fill="#f7f9fc" stroke="${secondary}" stroke-width="6"/>
+  <path d="M104 410 Q142 400 169 420 L158 438 L101 438Z" fill="#0758b8"/>
+  <path d="M192 420 Q223 400 258 412 L260 438 L202 438Z" fill="#0758b8"/>
+  <path d="M163 207 L197 207 L192 242 L180 251 L168 242Z" fill="#ffd400" stroke="#0758b8" stroke-width="4"/>
+  <text x="180" y="286" text-anchor="middle" font-family="Arial,sans-serif" font-size="46" font-weight="900" fill="${secondary}">${number}</text>
+  <text x="180" y="323" text-anchor="middle" font-family="Arial,sans-serif" font-size="12" font-weight="800" fill="${secondary}">${String(opts.role||'CALCIATORE').toUpperCase()}</text>
+  <g transform="translate(272 359)"><circle cx="0" cy="0" r="39" fill="#fff" stroke="#16243a" stroke-width="4"/><path d="M0-14 14-4 9 13-9 13-14-4Z" fill="#16243a"/><path d="M0-39 0-14M37-12 14-4M23 32 9 13M-23 32-9 13M-37-12-14-4" stroke="#16243a" stroke-width="5"/></g>
+  </svg>`;
+}
+function renderAvatarPreview(){
+  const box=$('#avatarPreview');if(!box)return null;
+  const opts={role:$('#avatarRole')?.value||'Calciatore',number:$('#avatarNumber')?.value||10,skin:$('#avatarSkin')?.value||'media',hair:$('#avatarHair')?.value||'castani',mood:$('#avatarMood')?.value||'sorriso',kit:$('#avatarKit')?.value||'bianca'};
+  box.innerHTML=avatarSvgMarkup(opts);return opts;
+}
+function downloadBlob(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1200)}
+async function exportAvatarPng(){
+  const opts=renderAvatarPreview()||{},svg=avatarSvgMarkup(opts),blob=new Blob([svg],{type:'image/svg+xml'}),url=URL.createObjectURL(blob),img=new Image();
+  await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject;img.src=url});
+  const canvas=document.createElement('canvas');canvas.width=900;canvas.height=1150;const ctx=canvas.getContext('2d');ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(img,0,0,canvas.width,canvas.height);URL.revokeObjectURL(url);
+  canvas.toBlob(b=>{if(b){downloadBlob(b,'avatar-scd.png');track('feature_use',{section:'avatar_export'})}},'image/png');
+}
+function openAvatarStudio(){
+  track('page_view',{section:'avatar_studio'});
+  modal(`<span class="eyebrow">SCD AVATAR STUDIO</span><h2>Crea il tuo calciatore</h2><p>Avatar locale, gratuito e personalizzabile. Nessuna foto viene inviata a servizi esterni. L'esportazione è sempre PNG con trasparenza.</p>
+  <div class="avatar-studio-grid"><div class="avatar-preview checker" id="avatarPreview"></div><div class="avatar-controls">
+  <label>Ruolo<select id="avatarRole"><option>Calciatore</option><option>Portiere</option><option>Difensore</option><option>Centrocampista</option><option>Attaccante</option><option>Tifoso</option></select></label>
+  <label>Numero<input id="avatarNumber" type="number" min="1" max="99" value="10"></label>
+  <label>Pelle<select id="avatarSkin"><option value="chiara">Chiara</option><option value="media" selected>Media</option><option value="scura">Scura</option></select></label>
+  <label>Capelli<select id="avatarHair"><option value="castani">Castani</option><option value="neri">Neri</option><option value="biondi">Biondi</option><option value="rossi">Rossi</option></select></label>
+  <label>Espressione<select id="avatarMood"><option value="sorriso">Sorriso</option><option value="determinato">Determinato</option></select></label>
+  <label>Divisa<select id="avatarKit"><option value="bianca">Bianca SCD</option><option value="blu">Blu SCD</option></select></label>
+  </div></div>
+  <div class="notice"><b>Regola SCD Media:</b> l'avatar non ha fondo colorato né riquadro. Il file finale è PNG trasparente.</div>
+  <div class="modal-actions"><button class="outline" type="button" id="avatarPhotoBtn">USA UNA TUA FOTO</button><button class="outline" type="button" id="saveAvatarLocal">SALVA SUL DISPOSITIVO</button><button class="primary" type="button" id="exportAvatar">ESPORTA PNG</button></div>`);
+  ['avatarRole','avatarNumber','avatarSkin','avatarHair','avatarMood','avatarKit'].forEach(id=>$('#'+id)?.addEventListener('input',renderAvatarPreview));
+  renderAvatarPreview();$('#avatarPhotoBtn').onclick=openMediaStudio;$('#exportAvatar').onclick=exportAvatarPng;$('#saveAvatarLocal').onclick=()=>{const opts=renderAvatarPreview();localStorage.setItem('scd:avatar:v1',JSON.stringify(opts));track('feature_use',{section:'avatar_save'});toast('Avatar salvato sul dispositivo')};
+}
+function median(v){const a=[...v].sort((x,y)=>x-y);return a[Math.floor(a.length/2)]||255}
+function processTransparentMedia(img,mode='logo',tolerance=54){
+  const max=900,scale=Math.min(1,max/Math.max(img.naturalWidth||img.width,img.naturalHeight||img.height)),w=Math.max(1,Math.round((img.naturalWidth||img.width)*scale)),h=Math.max(1,Math.round((img.naturalHeight||img.height)*scale));
+  const canvas=$('#mediaCanvas');canvas.width=w;canvas.height=h;const ctx=canvas.getContext('2d',{willReadFrequently:true});ctx.clearRect(0,0,w,h);ctx.drawImage(img,0,0,w,h);
+  if(mode==='foto'){const tmp=document.createElement('canvas');tmp.width=w;tmp.height=h;tmp.getContext('2d').drawImage(canvas,0,0);ctx.clearRect(0,0,w,h);ctx.save();ctx.beginPath();ctx.ellipse(w/2,h/2,w*.48,h*.48,0,0,Math.PI*2);ctx.clip();ctx.drawImage(tmp,0,0);ctx.restore();return}
+  const d=ctx.getImageData(0,0,w,h),px=d.data,rs=[],gs=[],bs=[],step=Math.max(1,Math.floor(Math.min(w,h)/60));
+  for(let x=0;x<w;x+=step){let i=x*4;rs.push(px[i]);gs.push(px[i+1]);bs.push(px[i+2]);i=((h-1)*w+x)*4;rs.push(px[i]);gs.push(px[i+1]);bs.push(px[i+2])}
+  for(let y=0;y<h;y+=step){let i=(y*w)*4;rs.push(px[i]);gs.push(px[i+1]);bs.push(px[i+2]);i=(y*w+w-1)*4;rs.push(px[i]);gs.push(px[i+1]);bs.push(px[i+2])}
+  const bg=[median(rs),median(gs),median(bs)],soft=28;
+  for(let i=0;i<px.length;i+=4){const dist=Math.hypot(px[i]-bg[0],px[i+1]-bg[1],px[i+2]-bg[2]);if(dist<tolerance)px[i+3]=0;else if(dist<tolerance+soft)px[i+3]=Math.round(255*(dist-tolerance)/soft)}
+  ctx.putImageData(d,0,0);
+}
+function openMediaStudio(){
+  track('page_view',{section:'media_studio'});
+  modal(`<span class="eyebrow">SCD MEDIA INTELLIGENTE</span><h2>Foto, loghi e immagini senza riquadri</h2><p>Carica un file: viene elaborato nel browser. Foto profilo = ritaglio trasparente. Logo/immagine = rimozione automatica dello sfondo uniforme e conversione PNG.</p>
+  <div class="media-upload"><label class="upload-drop">SCEGLI FILE<input id="mediaFile" type="file" accept="image/*"></label><select id="mediaMode"><option value="foto">Foto profilo</option><option value="logo">Logo / stemma</option><option value="immagine">Immagine grafica</option></select><label class="range-label">Pulizia sfondo<input id="mediaTolerance" type="range" min="20" max="120" value="54"></label></div>
+  <div class="media-preview checker"><canvas id="mediaCanvas" width="480" height="480"></canvas><div id="mediaEmpty">Anteprima PNG trasparente</div></div>
+  <div class="notice"><b>Privacy:</b> elaborazione locale. Il file non lascia il dispositivo durante questa operazione.</div>
+  <div class="modal-actions"><button class="outline" type="button" id="openAvatarFromMedia">CREA AVATAR</button><button class="primary" type="button" id="downloadMedia" disabled>ESPORTA PNG TRASPARENTE</button></div>`);
+  let current=null;const rerender=()=>current&&processTransparentMedia(current,$('#mediaMode').value,+$('#mediaTolerance').value);
+  $('#mediaFile').onchange=e=>{const file=e.target.files?.[0];if(!file)return;track('form_start',{section:'media_upload'});const url=URL.createObjectURL(file),img=new Image();img.onload=()=>{current=img;$('#mediaEmpty').hidden=true;rerender();URL.revokeObjectURL(url);$('#downloadMedia').disabled=false};img.src=url};
+  $('#mediaMode').onchange=rerender;$('#mediaTolerance').oninput=rerender;$('#downloadMedia').onclick=()=>{$('#mediaCanvas').toBlob(b=>{if(b){downloadBlob(b,'scd-media-trasparente.png');track('form_complete',{section:'media_export'})}},'image/png')};$('#openAvatarFromMedia').onclick=openAvatarStudio;
+}
+
 const PUBLIC_CONTACTS={
   general:'sportclubcolico@gmail.com',
   secretary:'segreteria.scdcolicoderviese@gmail.com',
@@ -90,6 +198,8 @@ const ACTION_META={
 function formField(label,id,type='text',required=true,extra=''){return `<div class="field"><label>${label}</label><input id="${id}" type="${type}" ${required?'required':''} ${extra}></div>`}
 function openPublicAction(kind,seed={}){
   const m=ACTION_META[kind]||ACTION_META.contacts;
+  if(kind==='avatar')return openAvatarStudio();
+  if(kind==='media')return openMediaStudio();
   if(kind==='join')return openJoin();
   if(kind==='safeguarding')return openSafeguarding();
   if(kind==='fantasy'||kind==='fantasy-rules')return openFantasy(kind==='fantasy-rules');
@@ -115,16 +225,16 @@ function openFantasy(rulesOnly=false){const rules=`<div class="notice"><b>Princi
 function openSky(){const p=$('#skyPanel');p.classList.add('open');p.setAttribute('aria-hidden','false');setTimeout(()=>$('#skyInput').focus(),150)}function closeSky(){const p=$('#skyPanel');p.classList.remove('open');p.setAttribute('aria-hidden','true')}
 function skyAnswer(q){const p=publicData(state.summary||FALLBACK);const t=q.toLowerCase();if(/prossim|gara|partita/.test(t)){const n=p.nextMatch||{};return `Prossima gara: ${field(n,'team')||'SCD ColicoDerviese'} contro ${field(n,'opponentName','opponent')||'avversario'}, ${fmtDate(field(n,'date'))}${field(n,'time')?' alle '+field(n,'time'):''}.`}if(/event|torneo/.test(t)){const e=(p.initiatives||[])[0];return e?`In evidenza: ${field(e,'title','event')}. ${[fmtDate(field(e,'date')),field(e,'venue')].filter(Boolean).join(' · ')}.`:'Apri Eventi e Tornei: trovi iniziative, programmi e link di iscrizione.'}if(/iscriv|tesser|giocare|open day|prova/.test(t))return 'Per entrare nella SCD usa “Vuoi giocare con noi?”. La richiesta non assegna automaticamente un tesseramento: viene verificata dalla Segreteria.';if(/registr|profil/.test(t))return 'Puoi registrarti con nome, cognome, email e telefono. Il profilo nasce senza privilegi; la Direzione assegna in seguito l’accesso qualificato.';if(/access|pin|mister|staff|famiglia|atleta/.test(t))return 'Gli accessi qualificati vengono assegnati dalla Direzione SCD. Dopo l’abilitazione userai email e PIN personale.';if(/sponsor|partner|prodotto|fornitore/.test(t))return 'Apri il Commercial Hub: puoi diventare sponsor, proporre prodotti o servizi e richiedere una proposta personalizzata.';if(/campo|affitt|impianto/.test(t))return 'Puoi inviare una richiesta per affitto campo o spazi dal Club Services. La disponibilità viene confermata dalla Società.';if(/fantacalcio|fantasy/.test(t))return 'Fantasy SCD è pensato come gioco community gratuito e non monetario. Per tutela e privacy, eventuali atleti minorenni non vengono usati senza base e consenso adeguati.';if(/safeguard|segnal/.test(t))return 'Per Safeguarding usa esclusivamente il canale riservato dedicato, separato dalla community e dal CRM ordinario.';if(/bigliett|ticket/.test(t))return 'La sezione Biglietti gestisce prenotazioni e, quando sarà configurato un canale di pagamento sicuro, anche l’acquisto.';if(/card|tifoso/.test(t))return 'Le Card SCD sono predisposte per Tifoso, Famiglia, Tesserato e Partner con vantaggi e contenuti differenziati.';return 'Posso aiutarti con gare, iscrizioni, tornei, campi, sponsor, community, fantasy, card, biglietti, contatti e area riservata.'}
 function addBubble(text,user=false){const el=document.createElement('div');el.className='bubble '+(user?'user':'bot');el.textContent=text;$('#skyMessages').appendChild(el);$('#skyMessages').scrollTop=$('#skyMessages').scrollHeight}
-function bindDynamic(){$$('[data-scroll]').forEach(b=>b.onclick=()=>$(b.dataset.scroll)?.scrollIntoView({behavior:'smooth'}));$$('[data-share]').forEach(b=>b.onclick=async()=>{const text=b.dataset.share+' · SCD ColicoDerviese';if(navigator.share)try{await navigator.share({title:'SCD ColicoDerviese',text,url:location.href})}catch{}else{await navigator.clipboard.writeText(text+' '+location.href);toast('Link copiato')}});$$('[data-event-register]').forEach(b=>b.onclick=()=>openPublicAction('tournament',{eventName:b.dataset.event}));$$('[data-action]').forEach(b=>b.onclick=()=>openPublicAction(b.dataset.action))}
+function bindDynamic(){$('[data-action]').forEach(b=>b.addEventListener('click',()=>track('cta_click',{section:b.dataset.action||'unknown'})));$('[data-scroll]').forEach(b=>b.onclick=()=>$(b.dataset.scroll)?.scrollIntoView({behavior:'smooth'}));$$('[data-share]').forEach(b=>b.onclick=async()=>{const text=b.dataset.share+' · SCD ColicoDerviese';if(navigator.share)try{await navigator.share({title:'SCD ColicoDerviese',text,url:location.href});track('share',{section:'content'})}catch{}else{await navigator.clipboard.writeText(text+' '+location.href);toast('Link copiato')}});$$('[data-event-register]').forEach(b=>b.onclick=()=>openPublicAction('tournament',{eventName:b.dataset.event}));$$('[data-action]').forEach(b=>b.onclick=()=>openPublicAction(b.dataset.action))}
 function boot(){
   $('#modalClose').onclick=closeModal;$('#modalBackdrop').onclick=e=>{if(e.target===$('#modalBackdrop'))closeModal()};
   [$('#registerBtn'),$('#heroRegister'),$('#quickRegister'),$('#bottomRegister')].forEach(b=>b&&b.addEventListener('click',openRegister));$('#loginBtn').onclick=openProfile;$('#mobileProfile').onclick=openProfile;$('#heroGames').onclick=()=>$('#gare').scrollIntoView({behavior:'smooth'});$('#refreshBtn').onclick=()=>loadSummary();
   $('#skyFab').onclick=openSky;$('#mobileSky').onclick=openSky;$('#closeSky').onclick=closeSky;$$('[data-sky]').forEach(b=>b.onclick=()=>{const map={next:'Qual è la prossima gara?',join:'Come posso iscrivermi o fare una prova?',sponsor:'Come posso diventare sponsor?',rent:'Come posso affittare un campo?',fan:'Come funziona la community tifosi?'};const q=map[b.dataset.sky]||'Come posso usare la Super App?';addBubble(q,true);setTimeout(()=>addBubble(skyAnswer(q)),180)});$('#skyForm').onsubmit=e=>{e.preventDefault();const q=$('#skyInput').value.trim();if(!q)return;addBubble(q,true);$('#skyInput').value='';setTimeout(()=>addBubble(skyAnswer(q)),180)};
-  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();state.installPrompt=e;$('#installBtn').hidden=false});$('#installBtn').onclick=async()=>{if(!state.installPrompt)return toast('Dal menu del browser scegli “Installa app” o “Aggiungi alla schermata Home”.');state.installPrompt.prompt();await state.installPrompt.userChoice;state.installPrompt=null;$('#installBtn').hidden=true};
+  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();state.installPrompt=e;$('#installBtn').hidden=false});$('#installBtn').onclick=async()=>{if(!state.installPrompt)return toast('Dal menu del browser scegli “Installa app” o “Aggiungi alla schermata Home”.');state.installPrompt.prompt();await state.installPrompt.userChoice;state.installPrompt=null;$('#installBtn').hidden=true;track('pwa_install',{section:'install'})};
   if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('/sw.js?v=21.4.3',{updateViaCache:'none'})
+  navigator.serviceWorker.register('./sw.js?v=21.5.0',{updateViaCache:'none'})
     .then(reg=>reg.update())
     .catch(()=>{});
-}bindDynamic();loadSummary(true);setInterval(()=>{if(!document.hidden)loadSummary(true)},60000);
+}bindDynamic();track('page_view',{section:(location.hash||'#home').replace('#','')});window.addEventListener('hashchange',()=>track('page_view',{section:(location.hash||'#home').replace('#','')}));loadSummary(true);setInterval(()=>{if(!document.hidden)loadSummary(true)},60000);setInterval(flushListening,120000);
 }
 document.addEventListener('DOMContentLoaded',boot);
