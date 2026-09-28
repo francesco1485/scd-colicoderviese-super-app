@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">SCD ColicoDerviese</string>
+    <string name="offline_title">Connessione non disponibile</string>
+    <string name="offline_message">La Super App non riesce a raggiungere la rete. Controlla la connessione e riprova.</string>
+</resources>
