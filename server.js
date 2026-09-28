@@ -11,15 +11,21 @@ app.use(express.json({limit:"1mb"}));
 
 app.post("/api/scd",async(req,res)=>{
   try{
-    const upstream=await fetch(SCD_BACKEND,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(req.body||{}) ,redirect:"follow"});
+    const upstream=await fetch(SCD_BACKEND,{
+      method:"POST",
+      headers:{"content-type":"application/json"},
+      body:JSON.stringify(req.body||{}),
+      redirect:"follow"
+    });
     const text=await upstream.text();
     res.status(upstream.status).type(upstream.headers.get("content-type")||"application/json").send(text);
   }catch(err){
+    console.error("SCD backend proxy",err);
     res.status(502).json({ok:false,error:"Backend SCD temporaneamente non raggiungibile"});
   }
 });
 
 app.get("/api/health",(req,res)=>res.json({ok:true,service:"SCD R21.3",time:new Date().toISOString()}));
 app.use(express.static(path.join(__dirname,"dist"),{maxAge:"1h"}));
-app.get("*",(req,res)=>res.sendFile(path.join(__dirname,"dist","index.html")));
+app.use((req,res)=>res.sendFile(path.join(__dirname,"dist","index.html")));
 app.listen(PORT,()=>console.log("SCD Super App on",PORT));
