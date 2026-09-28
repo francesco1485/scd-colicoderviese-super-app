@@ -1,6 +1,6 @@
 # SCD PERMANENT COMMANDS — MASTER
 
-Questo file è vincolante per ogni sviluppo S.D.C. ColicoDerviese.
+Questo file è vincolante per OGNI sviluppo, documento, modulo, automazione, applicazione, sito, grafica, database, comunicazione digitale e progetto tecnologico collegato a S.D.C. ColicoDerviese. In caso di conflitto con istruzioni generiche successive, prevalgono le regole permanenti SCD salvo modifica esplicita della Direzione.
 
 ## 1. SCD EVOLUTION ENGINE — HUMAN CENTRIC CONTINUOUS EVOLUTION
 La Super App è un ecosistema vivo. Non aspettare che qualcuno segnali cosa manca.
@@ -43,8 +43,8 @@ La Direzione può aggiungere sullo stesso account: FAMIGLIA, ATLETA, MISTER, STA
 ## 5. AVATAR PERSONALE
 Ogni Utente Base può:
 - usare una propria foto;
-- creare un avatar calciatore SCD;
-- scegliere ruolo, numero, pelle, capelli, espressione e divisa;
+- creare un avatar calciatore SCD anche partendo da indicazioni testuali semplici della persona;
+- scegliere o descrivere ruolo, numero, pelle, capelli, espressione e divisa;
 - salvare localmente;
 - esportare PNG trasparente.
 
@@ -66,3 +66,10 @@ Fotografie hero/territorio/reportage possono usare WebP/JPEG/AVIF perché sono s
 Analisi e proposta possono essere automatiche. Produzione critica mai autonoma per: permessi, ruoli, pagamenti, dati personali, documenti, tesseramenti, presenze, safeguarding e database critici.
 
 Regola: TEST → VERIFICA → APPROVAZIONE → PRODUZIONE.
+
+
+## 8. AMBITO GLOBALE SCD
+Questi comandi non valgono soltanto per la Super App. Devono essere applicati, per quanto pertinenti, a tutto l'ecosistema SCD ColicoDerviese: backend, Drive, Sheets, Apps Script, PWA, Android futuro, sito, CRM, sponsor, community, moduli, grafiche, media, report, dashboard e nuovi strumenti.
+
+## 9. REGOLA DI COERENZA
+Ogni nuova funzione deve essere verificata rispetto a: identita SCD, esperienza app-first, account unico, privacy, media trasparente, evoluzione continua, sicurezza, costo sostenibile e Source of Truth visiva.
