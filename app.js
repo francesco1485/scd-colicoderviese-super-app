@@ -1,4 +1,4 @@
-const APP_VERSION='21.6.0';
+const APP_VERSION='21.7.0';
 const DYNAMIC_ORIGIN=(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)||location.hostname.endsWith('.onrender.com'))
   ? location.origin
   : 'https://scd-colicoderviese-official-r21.onrender.com';
@@ -6,6 +6,7 @@ const API=DYNAMIC_ORIGIN+'/api/scd';
 const LIVE_API=DYNAMIC_ORIGIN+'/api/live';
 const HEALTH_API=DYNAMIC_ORIGIN+'/health';
 const REQUESTS_KEY='scd:requests:v1';
+const SESSION_KEY='scd:session:v1';
 const R20_APP='https://script.google.com/macros/s/AKfycbwYQ_3yLYsp-6jX3FIgufBjpmaZb9uO1AklF9hdG-CuLII9J4ITUX1EA-EKuWXBMEc/exec';
 const FALLBACK={
   season:'2026/27',generatedAt:new Date().toLocaleString('it-IT'),
@@ -19,7 +20,7 @@ const FALLBACK={
     ],counts:{games:0,events:0,initiatives:0,news:1}
   }
 };
-let state={summary:null,installPrompt:null,session:null,apiStatus:'checking'};
+let state={summary:null,installPrompt:null,session:null,sessionToken:'',privateData:null,apiStatus:'checking'};
 
 function localRequests(){
   try{return JSON.parse(localStorage.getItem(REQUESTS_KEY)||'[]')}catch{return []}
@@ -139,7 +140,154 @@ function renderNews(p){const rows=(p.highlights||[]).slice(0,6);const use=rows.l
 function renderSponsors(p){const rows=(p.sponsors||[]).slice(0,12);const use=rows.length?rows:FALLBACK.public.sponsors;$('#sponsorGrid').innerHTML=use.slice(0,8).map(x=>{const name=field(x,'name','sponsor','company','title')||'Partner SCD';const logo=field(x,'logo','logoUrl','image');const url=field(x,'url','website','link');const inner=logo?`<img src="${esc(logo)}" alt="${esc(name)}" loading="lazy">`:`<span>${esc(name)}</span>`;return url?`<a class="sponsor-card" href="${esc(url)}" target="_blank" rel="noopener">${inner}</a>`:`<div class="sponsor-card">${inner}</div>`}).join('');const names=use.map(x=>field(x,'name','sponsor','company','title')||'Partner SCD');const text=(names.length?names:['SCD Partner']).join('   ◆   ');$('#sponsorTrack').innerHTML=`<span>${esc(text)}   ◆   ${esc(text)}</span>`}
 function openRegister(){modal(`<span class="eyebrow">SCD COMMUNITY</span><h2>Registrati</h2><p>Crei un solo account SCD. Entri sempre come Utente Base e continui a ricevere news, gare, eventi, community e servizi. Se fai parte della Società, la Direzione abiliterà in seguito le funzioni dedicate senza creare un secondo account.</p><form id="registerForm"><div class="form-grid"><div class="field"><label>Nome</label><input id="regName" required autocomplete="given-name"></div><div class="field"><label>Cognome</label><input id="regSurname" required autocomplete="family-name"></div><div class="field"><label>Email</label><input id="regEmail" type="email" required autocomplete="email"></div><div class="field"><label>Telefono</label><input id="regPhone" type="tel" required inputmode="tel" autocomplete="tel"></div><div class="field full"><label class="check"><input id="regPrivacy" type="checkbox" required> <span>Ho letto l’informativa privacy e autorizzo il trattamento dei dati necessari alla registrazione e alla gestione dell’accesso SCD.</span></label></div></div><div id="regStatus"></div><div class="modal-actions"><button type="button" class="outline" id="cancelReg">ANNULLA</button><button class="primary" type="submit">REGISTRATI</button></div></form>`);$('#cancelReg').onclick=closeModal;$('#registerForm').onsubmit=submitRegistration}
 async function submitRegistration(e){e.preventDefault();const btn=e.currentTarget.querySelector('[type="submit"]');btn.disabled=true;btn.textContent='REGISTRAZIONE…';const payload={name:`${$('#regName').value.trim()} ${$('#regSurname').value.trim()}`.trim(),firstName:$('#regName').value.trim(),lastName:$('#regSurname').value.trim(),email:$('#regEmail').value.trim(),phone:$('#regPhone').value.trim(),type:'UTENTE REGISTRATO',privacy:true};const localId=requestId('REG');upsertLocalRequest({id:localId,kind:'registration',topic:'Registrazione Utente Base',status:'IN INVIO',channel:'APP',createdAt:new Date().toISOString()});try{const r=await api('public.register',payload);upsertLocalRequest({id:localId,status:'INVIATA',serverId:r.id||r.requestId||'',channel:'GESTIONALE'});$('#regStatus').innerHTML=`<div class="status-box"><b>Registrazione completata.</b><br>${esc(r.message||'Profilo base registrato. Il tuo profilo resta Utente Base. La Direzione potrà aggiungere in seguito eventuali funzioni dedicate sullo stesso account.')}</div>`;btn.hidden=true;setTimeout(closeModal,2600)}catch(err){upsertLocalRequest({id:localId,status:'DA COMPLETARE',channel:'EMAIL'});const subj=encodeURIComponent('REGISTRAZIONE SUPER APP SCD');const body=encodeURIComponent(`Nome: ${payload.firstName} ${payload.lastName}\nEmail: ${payload.email}\nTelefono: ${payload.phone}\nPrivacy: SI`);$('#regStatus').innerHTML=`<div class="status-box" style="background:#fff8dd;color:#6c5200"><b>Registrazione pronta.</b><br>Il bridge diretto al gestionale è in attivazione. Invia subito la richiesta alla Segreteria.<br><br><a class="primary compact" href="mailto:${PUBLIC_CONTACTS.general}?subject=${subj}&body=${body}">INVIA ALLA SEGRETERIA</a></div>`;btn.hidden=true} }
-function openLogin(){window.open(R20_APP,'_blank','noopener,noreferrer');toast('Apro l’Area riservata SCD')}
+function storedSession(){
+  try{return JSON.parse(localStorage.getItem(SESSION_KEY)||'{}')}catch{return {}}
+}
+function saveSession(token,email){
+  state.sessionToken=token||'';
+  localStorage.setItem(SESSION_KEY,JSON.stringify({token:token||'',email:email||'',savedAt:new Date().toISOString()}));
+}
+function clearSession(){
+  state.sessionToken='';state.privateData=null;localStorage.removeItem(SESSION_KEY);
+}
+async function mgmtApi(action,payload={}){
+  if(!state.sessionToken)throw new Error('Sessione non disponibile');
+  return api(action,payload,state.sessionToken);
+}
+function privateTeams(d=state.privateData||{}){
+  const src=(d.attendance&&d.attendance.teams)||d.teams||d.visibleTeams||[];
+  const seen=new Set();
+  return src.map(t=>({key:t.key||t.teamKey||t.id||t.value||'',name:t.name||t.teamName||t.label||t.key||''}))
+    .filter(t=>t.key&&!seen.has(t.key)&&(seen.add(t.key),true));
+}
+function mgmtKpi(label,value){return '<div class="mgmt-kpi"><strong>'+esc(value??0)+'</strong><span>'+esc(label)+'</span></div>'}
+function managementRole(d){
+  const u=d.user||{};
+  return u.role||u.coreRole||u.type||((d.permissions&&d.permissions.direction)?'DIREZIONE':u.staff?'STAFF':'UTENTE BASE');
+}
+function managementName(d){
+  const u=d.user||{};
+  return u.name||u.fullName||u.email||'Profilo SCD';
+}
+async function openLogin(){
+  const saved=storedSession();
+  modal('<span class="eyebrow">AREA RISERVATA SCD</span><h2>Accedi con il tuo account</h2><p>Usa la stessa email del profilo SCD e il PIN personale assegnato o impostato dalla Direzione.</p><form id="mgmtLoginForm"><div class="form-grid"><div class="field full"><label>Email</label><input id="mgmtEmail" type="email" required autocomplete="email" value="'+esc(saved.email||'')+'"></div><div class="field full"><label>PIN personale</label><input id="mgmtPin" type="password" inputmode="numeric" minlength="6" maxlength="10" required autocomplete="current-password"></div></div><div id="mgmtLoginStatus" class="form-status"></div><div class="modal-actions"><button type="button" class="outline" id="mgmtLegacy">AREA R20 TEMPORANEA</button><button class="primary" type="submit">ACCEDI</button></div></form>');
+  $('#mgmtLegacy').onclick=()=>window.open(R20_APP,'_blank','noopener,noreferrer');
+  $('#mgmtLoginForm').onsubmit=async e=>{
+    e.preventDefault();
+    const email=$('#mgmtEmail').value.trim(),pin=$('#mgmtPin').value.trim(),status=$('#mgmtLoginStatus'),btn=e.currentTarget.querySelector('[type="submit"]');
+    btn.disabled=true;status.textContent='Verifico credenziali e permessi…';
+    try{
+      const pre=await api('auth.request',{email});
+      if(pre&&pre.pinReady===false)throw new Error(pre.message||'PIN personale non ancora disponibile.');
+      const r=await api('auth.login',{email,pin});
+      const token=r.token||r.sessionToken||'';
+      if(!token)throw new Error('Il server non ha restituito una sessione valida.');
+      saveSession(token,email);
+      state.privateData=r.data||await mgmtApi('dashboard.summary');
+      track('feature_use',{section:'private_login'});
+      openManagementHome(state.privateData);
+    }catch(err){
+      status.innerHTML='<b>Accesso non completato.</b> '+esc(err.message||'Servizio temporaneamente non disponibile.')+'<br><small>Finché il bridge R21 non è attivo puoi usare “Area R20 temporanea”.</small>';
+    }finally{btn.disabled=false}
+  };
+}
+function openManagementHome(data){
+  const d=data||state.privateData||{},u=d.user||{},p=d.permissions||{},personal=d.personal||[];
+  state.privateData=d;
+  const staff=!!u.staff,dir=!!p.direction,transport=(d.transport&&d.transport.kpis)||{};
+  const cards=[
+    '<button class="mgmt-tile" id="mgmtRequests"><span>☑</span><b>Richieste</b><small>Invii e stato</small></button>',
+    personal.length?'<button class="mgmt-tile" id="mgmtProfiles"><span>●</span><b>Atleta / Famiglia</b><small>'+personal.length+' profili collegati</small></button>':'',
+    staff?'<button class="mgmt-tile" id="mgmtAttendance"><span>✓</span><b>Presenze</b><small>Registro squadra</small></button>':'',
+    staff?'<button class="mgmt-tile" id="mgmtConvocations"><span>⚽</span><b>Convocazioni</b><small>Crea e gestisci</small></button>':'',
+    staff?'<button class="mgmt-tile" id="mgmtMessages"><span>✉</span><b>Comunicazioni</b><small>Messaggi squadra</small></button>':'',
+    staff||d.transport?'<button class="mgmt-tile" id="mgmtTransport"><span>▰</span><b>Pulmini</b><small>Richieste trasporto</small></button>':'',
+    dir?'<button class="mgmt-tile direction" id="mgmtAccess"><span>♙</span><b>Utenti & PIN</b><small>Permessi Direzione</small></button>':'',
+    dir?'<button class="mgmt-tile direction" id="mgmtEvolution"><span>↗</span><b>Evolution Queue</b><small>Miglioramenti e priorità</small></button>':'',
+    dir?'<button class="mgmt-tile direction" id="mgmtDiagnostics"><span>⌁</span><b>Diagnostica</b><small>Stato tecnico</small></button>':''
+  ].filter(Boolean).join('');
+  modal('<div class="mgmt-head"><div><span class="eyebrow">AREA RISERVATA</span><h2>'+esc(managementName(d))+'</h2><p>'+esc(managementRole(d))+(u.area?' · '+esc(u.area):'')+'</p></div><img src="./assets/logo-scd.png" alt="SCD"></div><div class="mgmt-kpis">'+mgmtKpi('Profili',personal.length)+mgmtKpi('Convocazioni',(d.convocations||[]).length)+mgmtKpi('Richieste',(d.direction&&d.direction.requests||[]).length)+mgmtKpi('Pulmini',transport.requests||0)+'</div><div class="mgmt-grid">'+cards+'</div><div class="modal-actions"><button class="outline" id="mgmtSync">SINCRONIZZA</button><button class="outline danger-soft" id="mgmtLogout">ESCI</button></div>');
+  $('#mgmtRequests').onclick=openMyRequests;
+  $('#mgmtProfiles')&&($('#mgmtProfiles').onclick=()=>openPersonalProfiles(d));
+  $('#mgmtAttendance')&&($('#mgmtAttendance').onclick=openAttendanceManager);
+  $('#mgmtConvocations')&&($('#mgmtConvocations').onclick=openConvocationManager);
+  $('#mgmtMessages')&&($('#mgmtMessages').onclick=openMessageManager);
+  $('#mgmtTransport')&&($('#mgmtTransport').onclick=openTransportManager);
+  $('#mgmtAccess')&&($('#mgmtAccess').onclick=openAccessManager);
+  $('#mgmtEvolution')&&($('#mgmtEvolution').onclick=openEvolutionManager);
+  $('#mgmtDiagnostics')&&($('#mgmtDiagnostics').onclick=openDiagnosticsManager);
+  $('#mgmtSync').onclick=async()=>{try{state.privateData=await mgmtApi('dashboard.summary');toast('Area aggiornata');openManagementHome(state.privateData)}catch(e){toast(e.message||'Sincronizzazione non riuscita')}};
+  $('#mgmtLogout').onclick=()=>{clearSession();closeModal();toast('Sessione chiusa')};
+}
+function openPersonalProfiles(d=state.privateData||{}){
+  const rows=d.personal||[];
+  modal('<span class="eyebrow">PROFILI COLLEGATI</span><h2>Atleti e famiglia</h2><div class="personal-profile-list">'+(rows.length?rows.map(p=>'<article class="personal-profile-card"><div class="profile-cutout">'+(p.photoUrl?'<img src="'+esc(p.photoUrl)+'" alt="">':'<span>'+esc(((p.firstName||'?')[0]+(p.lastName||'')[0]).toUpperCase())+'</span>')+'</div><div><b>'+esc([p.firstName,p.lastName].filter(Boolean).join(' ')||p.fullName||'Atleta')+'</b><small>'+esc(p.teamName||p.group||'')+'</small><em>'+esc(p.figcStatus||p.recordStatus||'Dato in aggiornamento')+'</em></div></article>').join(''):'<div class="empty-state">Nessun profilo collegato.</div>')+'</div><div class="modal-actions"><button class="primary" id="personalBack">TORNA ALLA DASHBOARD</button></div>');
+  $('#personalBack').onclick=()=>openManagementHome(d);
+}
+async function openAttendanceManager(){
+  const d=state.privateData||{},teams=privateTeams(d);
+  if(!teams.length)return toast('Nessuna squadra disponibile per il tuo profilo');
+  const today=new Date().toISOString().slice(0,10);
+  modal('<span class="eyebrow">STAFF</span><h2>Registro presenze</h2><div class="form-grid"><div class="field"><label>Squadra</label><select id="attTeam">'+teams.map(t=>'<option value="'+esc(t.key)+'">'+esc(t.name)+'</option>').join('')+'</select></div><div class="field"><label>Data</label><input id="attDate" type="date" value="'+today+'"></div></div><div class="modal-actions"><button class="primary" id="attLoad">CARICA ROSA</button></div><div id="attRows"></div>');
+  $('#attLoad').onclick=async()=>{
+    const mount=$('#attRows');mount.innerHTML='<div class="loading-line">Carico registro…</div>';
+    try{
+      const r=await mgmtApi('private.attendance.get',{teamKey:$('#attTeam').value,date:$('#attDate').value});
+      const statuses=r.statuses||['PRESENTE','ASSENTE','GIUSTIFICATO','INFORTUNATO','RITARDO'];
+      mount.innerHTML='<div class="attendance-list">'+(r.players||[]).map(p=>'<label class="attendance-row"><span><b>'+esc(p.name||p.fullName||p.code)+'</b><small>'+esc(p.code||'')+'</small></span><select data-att-person="'+esc(p.code||p.personId)+'">'+[''].concat(statuses).map(s=>'<option value="'+esc(s)+'" '+(s===p.status?'selected':'')+'>'+(s||'SELEZIONA')+'</option>').join('')+'</select></label>').join('')+'</div><div class="modal-actions"><button class="primary" id="attSave">SALVA PRESENZE</button></div>';
+      $('#attSave').onclick=async()=>{
+        const rows=$('[data-att-person]').filter(x=>x.value).map(x=>({personId:x.dataset.attPerson,status:x.value}));
+        if(!rows.length)return toast('Seleziona almeno una presenza');
+        try{await mgmtApi('private.attendance.save',{teamKey:$('#attTeam').value,date:$('#attDate').value,eventType:'ALLENAMENTO',rows});toast('Presenze salvate: '+rows.length)}catch(e){toast(e.message||'Salvataggio non riuscito')}
+      };
+    }catch(e){mount.innerHTML='<div class="notice error-note">'+esc(e.message||'Registro non disponibile')+'</div>'}
+  };
+}
+function openMessageManager(){
+  const teams=privateTeams();
+  modal('<span class="eyebrow">STAFF</span><h2>Messaggio alla squadra</h2><form id="msgForm"><div class="form-grid"><div class="field full"><label>Squadra</label><select id="msgTeam">'+teams.map(t=>'<option value="'+esc(t.key)+'">'+esc(t.name)+'</option>').join('')+'</select></div><div class="field full"><label>Oggetto</label><input id="msgSubject" required></div><div class="field full"><label>Messaggio</label><textarea id="msgBody" required></textarea></div></div><div class="modal-actions"><button class="primary">INVIA</button></div></form>');
+  $('#msgForm').onsubmit=async e=>{e.preventDefault();try{await mgmtApi('private.message.send',{teamKey:$('#msgTeam').value,subject:$('#msgSubject').value,message:$('#msgBody').value});toast('Messaggio registrato');openManagementHome(state.privateData)}catch(err){toast(err.message||'Invio non riuscito')}};
+}
+function openTransportManager(){
+  const teams=privateTeams(),today=new Date().toISOString().slice(0,10);
+  modal('<span class="eyebrow">TRASPORTI SCD</span><h2>Richiesta pulmino</h2><form id="transportForm"><div class="form-grid"><div class="field"><label>Data</label><input id="trDate" type="date" value="'+today+'" required></div><div class="field"><label>Ora</label><input id="trTime" type="time" required></div><div class="field"><label>Partenza</label><input id="trOrigin" required></div><div class="field"><label>Destinazione</label><input id="trDestination" required></div><div class="field"><label>Squadra</label><select id="trTeam">'+teams.map(t=>'<option value="'+esc(t.key)+'">'+esc(t.name)+'</option>').join('')+'</select></div><div class="field"><label>Persone</label><input id="trPassengers" type="number" min="1" value="1"></div><div class="field full"><label>Note</label><textarea id="trNotes"></textarea></div></div><div class="modal-actions"><button class="primary">INVIA RICHIESTA</button></div></form>');
+  $('#transportForm').onsubmit=async e=>{e.preventDefault();try{await mgmtApi('private.transport.request',{date:$('#trDate').value,time:$('#trTime').value,origin:$('#trOrigin').value,destination:$('#trDestination').value,team:$('#trTeam').value,type:'TRASFERTA',passengers:Number($('#trPassengers').value||1),notes:$('#trNotes').value});toast('Richiesta trasporto registrata');openManagementHome(state.privateData)}catch(err){toast(err.message||'Richiesta non salvata')}};
+}
+function openConvocationManager(){
+  const d=state.privateData||{},teams=privateTeams(d),today=new Date().toISOString().slice(0,10);
+  modal('<span class="eyebrow">STAFF</span><h2>Nuova convocazione</h2><form id="convForm"><div class="form-grid"><div class="field"><label>Squadra</label><select id="cvTeam">'+teams.map(t=>'<option value="'+esc(t.key)+'">'+esc(t.name)+'</option>').join('')+'</select></div><div class="field"><label>Data gara</label><input id="cvDate" type="date" value="'+today+'" required></div><div class="field"><label>Ritrovo</label><input id="cvTime" type="time" required></div><div class="field"><label>Luogo</label><input id="cvPlace" required></div><div class="field full"><label>Note</label><textarea id="cvNotes"></textarea></div></div><div id="cvPlayers"></div><div class="modal-actions"><button class="primary">CREA CONVOCAZIONE</button></div></form>');
+  const renderPlayers=()=>{
+    const key=$('#cvTeam').value,roster=(d.roster&&d.roster[key])||[];
+    $('#cvPlayers').innerHTML=roster.length?'<div class="player-check-grid">'+roster.map(p=>'<label><input type="checkbox" data-cv-player value="'+esc(p.code||p.personId||'')+'"> '+esc(p.name||[p.firstName,p.lastName].filter(Boolean).join(' '))+'</label>').join('')+'</div>':'<div class="notice">Rosa non presente nel riepilogo. La convocazione potrà essere completata dal gestionale R20.</div>';
+  };
+  $('#cvTeam').onchange=renderPlayers;renderPlayers();
+  $('#convForm').onsubmit=async e=>{e.preventDefault();const players=$('[data-cv-player]:checked').map(x=>x.value).filter(Boolean);try{await mgmtApi('private.convocation.create',{teamKey:$('#cvTeam').value,gameDate:$('#cvDate').value,meetingTime:$('#cvTime').value,meetingPlace:$('#cvPlace').value,players,notes:$('#cvNotes').value,notify:true});toast('Convocazione creata');openManagementHome(state.privateData)}catch(err){toast(err.message||'Convocazione non creata')}};
+}
+function openAccessManager(){
+  const d=state.privateData||{},roles=(d.roles||[]).map(String);
+  modal('<span class="eyebrow">DIREZIONE</span><h2>Utenti e autorizzazioni</h2><form id="accessForm"><div class="form-grid"><div class="field"><label>Nome</label><input id="acName" required></div><div class="field"><label>Email</label><input id="acEmail" type="email" required></div><div class="field"><label>Ruolo</label><select id="acRole">'+roles.map(x=>'<option>'+esc(x)+'</option>').join('')+'</select></div><div class="field"><label>Squadra / settore</label><input id="acArea"></div><div class="field"><label>PIN personale</label><input id="acPin" type="password" inputmode="numeric" maxlength="10"></div><div class="field"><label class="check"><input id="acActive" type="checkbox" checked> Accesso attivo</label></div></div><div class="modal-actions"><button class="primary">SALVA ACCESSO</button></div></form>');
+  $('#accessForm').onsubmit=async e=>{e.preventDefault();try{const email=$('#acEmail').value.trim();await mgmtApi('direction.access.set',{name:$('#acName').value,email,role:$('#acRole').value,area:$('#acArea').value,active:$('#acActive').checked});if($('#acPin').value)await mgmtApi('direction.pin.set',{email,pin:$('#acPin').value});toast('Accesso aggiornato');state.privateData=await mgmtApi('dashboard.summary');openManagementHome(state.privateData)}catch(err){toast(err.message||'Aggiornamento non riuscito')}};
+}
+async function openEvolutionManager(){
+  modal('<span class="eyebrow">DIREZIONE · EVOLUTION ENGINE</span><h2>Evolution Queue</h2><div id="evolutionRows" class="loading-line">Carico proposte…</div>');
+  try{
+    const data=await mgmtApi('direction.evolution',{limit:30}),rows=Array.isArray(data)?data:(data.rows||data.items||[]);
+    $('#evolutionRows').innerHTML=rows.length?'<div class="evolution-list">'+rows.map(x=>'<article><span>'+esc(x.status||x.STATUS||'')+'</span><b>'+esc(x.module||x.MODULE||x.problem||x.PROBLEM||'Proposta')+'</b><p>'+esc(x.problem||x.PROBLEM||x.proposedAction||x.PROPOSED_ACTION||'')+'</p></article>').join('')+'</div>':'<div class="empty-state">Nessuna proposta visibile.</div>';
+  }catch(e){$('#evolutionRows').innerHTML='<div class="notice error-note">'+esc(e.message||'Evolution Queue non disponibile')+'</div>'}
+}
+async function openDiagnosticsManager(){
+  modal('<span class="eyebrow">DIREZIONE · QA</span><h2>Diagnostica sistema</h2><div id="diagRows" class="loading-line">Analisi in corso…</div>');
+  try{
+    const x=await mgmtApi('direction.diagnostics'),m=x.metrics||{};
+    $('#diagRows').innerHTML='<div class="mgmt-kpis">'+mgmtKpi('Eventi',m.totalEvents||0)+mgmtKpi('Errori',m.errorEvents||0)+mgmtKpi('P95',String(m.p95LatencyMs||0)+' ms')+mgmtKpi('Stato',x.severity||'OK')+'</div><div class="notice"><b>'+esc(x.kernelVersion||'SCD CORE')+'</b><br>Telemetria tecnica minimizzata e controllata.</div>';
+  }catch(e){$('#diagRows').innerHTML='<div class="notice error-note">'+esc(e.message||'Diagnostica non disponibile')+'</div>'}
+}
+async function restoreManagementSession(){
+  const saved=storedSession();if(!saved.token)return;
+  state.sessionToken=saved.token;
+  try{await api('auth.validate',{token:saved.token},saved.token);state.privateData=await api('dashboard.summary',{},saved.token)}catch{clearSession()}
+}
 function openProfile(){
   const count=localRequests().length;
   modal(`<span class="eyebrow">PROFILO SCD</span><h2>La tua area</h2><p>Un unico ingresso per richieste, identità digitale e funzioni societarie autorizzate.</p><div class="profile-hub-grid"><button class="choice-tile" id="profileRequests"><b>Le mie richieste</b><small>${count} registrate su questo dispositivo</small></button><button class="choice-tile" id="profileAvatar"><b>Avatar & foto</b><small>Identità digitale SCD</small></button><button class="choice-tile" id="profileR20"><b>Area riservata SCD</b><small>Famiglia · Atleta · Staff · Direzione</small></button><button class="choice-tile" id="profileRefresh"><b>Sincronizza</b><small>Controlla servizi e aggiornamenti</small></button></div><div class="notice"><b>Account unico:</b> entri sempre come Utente Base. Gli eventuali permessi societari vengono aggiunti dalla Direzione sullo stesso account.</div>`);
@@ -340,6 +488,6 @@ function boot(){
   navigator.serviceWorker.register('./sw.js?v=21.6.0',{updateViaCache:'none'})
     .then(reg=>reg.update())
     .catch(()=>{});
-}bindDynamic();checkServiceHealth();track('page_view',{section:(location.hash||'#home').replace('#','')});window.addEventListener('hashchange',()=>track('page_view',{section:(location.hash||'#home').replace('#','')}));loadSummary(true);setInterval(()=>{if(!document.hidden)loadSummary(true)},60000);setInterval(flushListening,120000);
+}bindDynamic();checkServiceHealth();restoreManagementSession();track('page_view',{section:(location.hash||'#home').replace('#','')});window.addEventListener('hashchange',()=>track('page_view',{section:(location.hash||'#home').replace('#','')}));loadSummary(true);setInterval(()=>{if(!document.hidden)loadSummary(true)},60000);setInterval(flushListening,120000);
 }
 document.addEventListener('DOMContentLoaded',boot);
