@@ -218,3 +218,32 @@ Le tavole approvate restano la Source of Truth visiva. Ogni miglioramento deve e
 
 ### 7. Obiettivo
 Ridurre passaggi, anticipare bisogni, aumentare chiarezza, affidabilità, partecipazione e valore per il Club. L'App deve migliorare nel tempo senza diventare invasiva, opaca o dipendente da servizi a pagamento non approvati.
+
+
+## COMANDO PRIORITARIO PERMANENTE — APP MODE + AVATAR + MEDIA TRASPARENTE
+Questa regola si applica a TUTTO ciò che viene sviluppato per S.D.C. ColicoDerviese.
+
+### Applicazione, non sito
+- La Super App deve essere una PWA installabile e funzionare in modalità standalone su smartphone.
+- Interfaccia primaria da applicazione: app shell, navigazione inferiore, profilo, notifiche, installazione, cache controllata, scorciatoie e servizi personali.
+- Il sito pubblico può essere una fonte, ma non rappresenta la forma finale della Super App.
+
+### Avatar personale
+- Ogni Utente Base può caricare una propria foto oppure creare un avatar calciatore SCD personalizzato.
+- L'avatar può essere configurato con ruolo, numero, pelle, capelli, espressione e divisa.
+- Il generatore base deve funzionare localmente e a costo zero.
+- L'utente può esportare l'avatar in PNG trasparente e salvarlo sul dispositivo.
+- Le fotografie personali devono essere trattate privacy-first; per impostazione predefinita l'elaborazione avviene sul dispositivo.
+
+### Regola assoluta media
+- Loghi, stemmi, mascotte, avatar, icone e immagini grafiche usate come oggetto NON devono essere presentati dentro quadrati o rettangoli colorati non appartenenti all'asset.
+- Formato interno preferenziale/obbligatorio per questi asset: PNG con canale alpha trasparente.
+- Se un asset caricato ha fondo uniforme o bordo estraneo, la pipeline media deve tentare automaticamente la rimozione dello sfondo e convertirlo in PNG trasparente.
+- Gli asset ufficiali non devono essere ridisegnati o alterati: si può rimuovere esclusivamente lo sfondo estraneo, preservando forma, proporzioni e colori.
+- Le fotografie usate come sfondo/hero possono restare in formati fotografici ottimizzati; la regola PNG trasparente riguarda asset grafici, cutout, stemmi, profili, mascotte e oggetti sovrapposti.
+- Se la rimozione automatica non è affidabile, l'asset va segnalato per revisione invece di pubblicarlo con un brutto riquadro.
+
+### Pipeline essenziale interna
+INPUT IMAGE → CLASSIFICA FOTO/LOGO/GRAFICA → VERIFICA ALPHA → RIMOZIONE FONDO SE NECESSARIA → TRIM BORDI → PNG RGBA → CONTROLLO VISIVO → PUBBLICAZIONE.
+
+Questa policy prevale su scelte estetiche generiche e deve essere rispettata da qualunque futura funzione SCD.
