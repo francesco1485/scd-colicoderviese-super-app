@@ -130,9 +130,33 @@ async function exportAvatarPng(){
   const canvas=document.createElement('canvas');canvas.width=900;canvas.height=1150;const ctx=canvas.getContext('2d');ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(img,0,0,canvas.width,canvas.height);URL.revokeObjectURL(url);
   canvas.toBlob(b=>{if(b){downloadBlob(b,'avatar-scd.png');track('feature_use',{section:'avatar_export'})}},'image/png');
 }
+function applyAvatarDescription(){
+  const text=($('#avatarDescription')?.value||'').toLowerCase();
+  if(!text)return;
+  const set=(id,val)=>{const el=$(id);if(el){el.value=val;el.dispatchEvent(new Event('input',{bubbles:true}))}};
+  if(/portier/.test(text))set('#avatarRole','Portiere');
+  else if(/difensor/.test(text))set('#avatarRole','Difensore');
+  else if(/centrocamp/.test(text))set('#avatarRole','Centrocampista');
+  else if(/attacc/.test(text))set('#avatarRole','Attaccante');
+  else if(/tifos/.test(text))set('#avatarRole','Tifoso');
+  const n=text.match(/(?:numero|maglia|n\.?)[^0-9]{0,5}(\d{1,2})/);if(n)set('#avatarNumber',Math.max(1,Math.min(99,+n[1])));
+  if(/pelle chiara|carnagione chiara/.test(text))set('#avatarSkin','chiara');
+  if(/pelle scura|carnagione scura/.test(text))set('#avatarSkin','scura');
+  if(/pelle media|carnagione media/.test(text))set('#avatarSkin','media');
+  if(/capelli neri/.test(text))set('#avatarHair','neri');
+  if(/capelli biond/.test(text))set('#avatarHair','biondi');
+  if(/capelli ross/.test(text))set('#avatarHair','rossi');
+  if(/capelli castan/.test(text))set('#avatarHair','castani');
+  if(/serio|determinato|concentrato/.test(text))set('#avatarMood','determinato');
+  if(/sorrid|sorriso|felice/.test(text))set('#avatarMood','sorriso');
+  if(/divisa blu|maglia blu|kit blu/.test(text))set('#avatarKit','blu');
+  if(/divisa bianca|maglia bianca|kit bianco/.test(text))set('#avatarKit','bianca');
+  renderAvatarPreview();track('feature_use',{section:'avatar_description'});
+}
 function openAvatarStudio(){
   track('page_view',{section:'avatar_studio'});
   modal(`<span class="eyebrow">SCD AVATAR STUDIO</span><h2>Crea il tuo calciatore</h2><p>Avatar locale, gratuito e personalizzabile. Nessuna foto viene inviata a servizi esterni. L'esportazione è sempre PNG con trasparenza.</p>
+  <div class="field full avatar-description"><label>Descrivi il tuo avatar</label><div class="avatar-description-row"><input id="avatarDescription" placeholder="Es. Portiere, numero 1, capelli neri, divisa blu, sorriso"><button type="button" id="applyAvatarDescription">CREA DALLE INDICAZIONI</button></div></div>
   <div class="avatar-studio-grid"><div class="avatar-preview checker" id="avatarPreview"></div><div class="avatar-controls">
   <label>Ruolo<select id="avatarRole"><option>Calciatore</option><option>Portiere</option><option>Difensore</option><option>Centrocampista</option><option>Attaccante</option><option>Tifoso</option></select></label>
   <label>Numero<input id="avatarNumber" type="number" min="1" max="99" value="10"></label>
@@ -144,7 +168,7 @@ function openAvatarStudio(){
   <div class="notice"><b>Regola SCD Media:</b> l'avatar non ha fondo colorato né riquadro. Il file finale è PNG trasparente.</div>
   <div class="modal-actions"><button class="outline" type="button" id="avatarPhotoBtn">USA UNA TUA FOTO</button><button class="outline" type="button" id="saveAvatarLocal">SALVA SUL DISPOSITIVO</button><button class="primary" type="button" id="exportAvatar">ESPORTA PNG</button></div>`);
   ['avatarRole','avatarNumber','avatarSkin','avatarHair','avatarMood','avatarKit'].forEach(id=>$('#'+id)?.addEventListener('input',renderAvatarPreview));
-  renderAvatarPreview();$('#avatarPhotoBtn').onclick=openMediaStudio;$('#exportAvatar').onclick=exportAvatarPng;$('#saveAvatarLocal').onclick=()=>{const opts=renderAvatarPreview();localStorage.setItem('scd:avatar:v1',JSON.stringify(opts));track('feature_use',{section:'avatar_save'});toast('Avatar salvato sul dispositivo')};
+  renderAvatarPreview();$('#applyAvatarDescription').onclick=applyAvatarDescription;$('#avatarDescription').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();applyAvatarDescription()}});$('#avatarPhotoBtn').onclick=openMediaStudio;$('#exportAvatar').onclick=exportAvatarPng;$('#saveAvatarLocal').onclick=()=>{const opts=renderAvatarPreview();localStorage.setItem('scd:avatar:v1',JSON.stringify(opts));track('feature_use',{section:'avatar_save'});toast('Avatar salvato sul dispositivo')};
 }
 function median(v){const a=[...v].sort((x,y)=>x-y);return a[Math.floor(a.length/2)]||255}
 function processTransparentMedia(img,mode='logo',tolerance=54){
