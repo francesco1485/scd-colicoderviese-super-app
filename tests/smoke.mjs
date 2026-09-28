@@ -1,0 +1,25 @@
+import { chromium } from 'playwright';
+
+const base=process.env.SCD_TEST_URL||'http://127.0.0.1:10000';
+const browser=await chromium.launch({headless:true});
+const page=await browser.newPage({viewport:{width:390,height:844}});
+const errors=[];
+page.on('pageerror',e=>errors.push(String(e)));
+await page.goto(base,{waitUntil:'domcontentloaded',timeout:30000});
+await page.waitForSelector('#home');
+await page.click('[data-action="sponsor"]');
+await page.waitForSelector('#publicActionForm');
+await page.click('#modalClose');
+await page.click('[data-action="avatar"]');
+await page.waitForSelector('#avatarPreview');
+await page.click('#modalClose');
+await page.click('[data-action="requests"]');
+await page.waitForSelector('.request-history');
+await page.click('#modalClose');
+await page.click('#mobileProfile');
+await page.waitForSelector('.profile-hub-grid');
+const health=await page.request.get(base+'/health');
+if(!health.ok()) throw new Error('health endpoint failed '+health.status());
+if(errors.length) throw new Error('browser errors: '+errors.join(' | '));
+console.log('SCD smoke PASS', {url:page.url(),viewport:'390x844'});
+await browser.close();
