@@ -1,7 +1,13 @@
 {
-  "name":"scd-colicoderviese-super-app",
-  "version":"21.4.0",
-  "private":true,
-  "engines":{"node":">=20"},
-  "scripts":{"start":"node server.js","check":"node --check server.js && node --check app.js"}
+  "name": "scd-colicoderviese-super-app",
+  "version": "21.4.0",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "check": "node --check server.js && node --check app.js",
+    "build": "npm run check"
+  }
 }
