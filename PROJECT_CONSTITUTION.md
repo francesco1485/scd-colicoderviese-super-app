@@ -190,3 +190,31 @@ Le immagini e le schermate grafiche S.D.C. ColicoDerviese fornite dal committent
 - Gli asset ufficiali non vanno ridisegnati con IA.
 - Dopo ogni schermata effettuare verifica visiva smartphone e correggere prima della pubblicazione.
 - In caso di conflitto grafico prevale sempre la tavola approvata.
+
+
+## COMANDO PRIORITARIO — SCD EVOLUTION ENGINE
+La Super App deve operare come un sistema digitale in evoluzione continua, umanocentrico e orientato al beneficio reale di utenti, famiglie, atleti, staff, tifosi, sponsor e territorio.
+
+### 1. Ascolto continuo
+Osservare in modo privacy-first l'utilizzo dell'App per individuare attriti, funzioni inutilizzate, errori, rallentamenti, abbandoni, richieste ricorrenti e opportunità di semplificazione.
+La matrice di ascolto deve privilegiare eventi aggregati e minimizzati: page_view, cta_click, form_start, form_complete, form_abandon, api_error, slow_load, install_pwa, share, repeat_visit e feedback espliciti. Non registrare contenuti sensibili, testi di safeguarding, password/PIN o contenuti privati dei moduli. Analytics non essenziali solo con consenso.
+
+### 2. Evoluzione continua
+Ogni evidenza genera una proposta in APP EVOLUTION QUEUE con: problema, evidenza, pubblico coinvolto, valore utente, impatto operativo, impatto commerciale, rischio, costo, confidenza, priorità, test e criterio di successo.
+Le modifiche al codice seguono: OSSERVA > PROPONI > TESTA > VERIFICA > APPROVA > PRODUZIONE. Nessun cambiamento autonomo in produzione senza verifica tecnica e, quando modifica flussi/permessi/dati, autorizzazione della Direzione.
+
+### 3. Radar esterno
+Analizzare continuamente fonti pubbliche e ufficiali rilevanti per SCD: sito ufficiale, FIGC/LND/CRL, Tuttocampo, AC Monza, social ufficiali e web verificabile. Ogni contenuto deve conservare fonte, URL, data, trust score e dedup key.
+Immagini e notizie sulle persone possono essere usate solo quando pubbliche e pertinenti; vietate identificazione biometrica, inferenze sensibili o profilazione privata.
+
+### 4. Intuizione di prodotto
+Confrontare periodicamente l'App con benchmark di UX, sport-tech, community, ticketing, membership, CRM e PWA. Le idee esterne non si copiano meccanicamente: si adattano all'identità SCD, al territorio e ai processi reali.
+
+### 5. Crescita organica
+La viralità deve essere utile, non manipolativa: condivisione di gare/eventi, inviti a Open Day, card digitali, referral community, contenuti sponsor, risultati, tornei e iniziative territoriali. Vietati dark pattern, spam, notifiche aggressive o pressioni artificiali.
+
+### 6. Grafica evolutiva
+Le tavole approvate restano la Source of Truth visiva. Ogni miglioramento deve essere verificato su 360x800, 390x844, 393x852 e 430x932. Le metriche di utilizzo possono suggerire miglioramenti, ma non giustificano regressioni rispetto all'identità SCD.
+
+### 7. Obiettivo
+Ridurre passaggi, anticipare bisogni, aumentare chiarezza, affidabilità, partecipazione e valore per il Club. L'App deve migliorare nel tempo senza diventare invasiva, opaca o dipendente da servizi a pagamento non approvati.
