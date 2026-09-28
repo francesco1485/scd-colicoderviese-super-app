@@ -26,10 +26,16 @@ function applyCors(req,res){
 }
 
 const allowedActions = new Set([
-  'dashboard.summary','public.feed','public.club','public.match','public.register',
-  'auth.request','auth.login','auth.validate','auth.pin.change','auth.pin.set','direction.access.set',
-  'public.calendar','public.initiatives','public.registration','public.partnerLead','public.communitySubmit',
-  'public.ticketSubmit','public.telemetry','safeguarding.submit','direction.leads','direction.moderation'
+  'dashboard.summary','private.dashboard','private.week',
+  'private.request.submit','private.transport.request','private.message.send',
+  'private.convocation.create','private.convocation.reply',
+  'private.attendance.get','private.attendance.save',
+  'public.feed','public.club','public.match','public.register','public.calendar','public.initiatives',
+  'public.registration','public.partnerLead','public.communitySubmit','public.ticketSubmit','public.telemetry',
+  'auth.request','auth.login','auth.validate','auth.pin.change','auth.pin.set',
+  'direction.access.set','direction.pin.set','direction.player.approve','direction.player.reject',
+  'direction.diagnostics','direction.evolution','direction.leads','direction.moderation',
+  'safeguarding.submit'
 ]);
 
 function json(res, status, data, headers={}) {
