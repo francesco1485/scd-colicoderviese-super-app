@@ -39,10 +39,31 @@ function requestKindLabel(k){
   const m={registration:'Registrazione',sponsor:'Sponsor',product:'Prodotti / servizi',rent:'Affitto campo',tournament:'Torneo',tickets:'Biglietti',idea:'Idea / progetto',story:'Contenuto community',fan:'Community',cards:'Card SCD',fantasy:'Fantasy SCD'};
   return m[k]||String(k||'Richiesta').toUpperCase();
 }
-function openMyRequests(){
-  const rows=localRequests();
-  const body=rows.length?rows.map(x=>`<article class="request-history-card"><div><span class="request-kind">${esc(requestKindLabel(x.kind))}</span><b>${esc(x.topic||x.id)}</b><small>${esc(new Date(x.createdAt||x.updatedAt||Date.now()).toLocaleString('it-IT'))}</small></div><div class="request-state ${esc(String(x.status||'').toLowerCase())}">${esc(x.status||'SALVATA')}</div><code>${esc(x.serverId||x.id)}</code></article>`).join(''):'<div class="empty-state"><b>Nessuna richiesta ancora.</b><p>Quando invii una richiesta dall’app, la ritrovi qui con data e stato.</p></div>';
-  modal(`<span class="eyebrow">AREA PERSONALE</span><h2>Le mie richieste</h2><p>Registro locale sul tuo dispositivo. Quando il bridge gestionale conferma l’invio, viene mostrato anche l’ID server.</p><div class="request-history">${body}</div>`);
+function renderRequestHistory(rows,serverSynced=false){
+  const mount=$('#requestHistoryMount');if(!mount)return;
+  mount.innerHTML=rows.length?rows.map(x=>`<article class="request-history-card"><div><span class="request-kind">${esc(requestKindLabel(x.kind||x.type))}</span><b>${esc(x.topic||x.id)}</b><small>${esc(new Date(x.createdAt||x.updatedAt||Date.now()).toLocaleString('it-IT'))}</small></div><div class="request-state ${esc(String(x.status||'').toLowerCase())}">${esc(x.status||'SALVATA')}</div><code>${esc(x.serverId||x.id)}</code></article>`).join(''):'<div class="empty-state"><b>Nessuna richiesta ancora.</b><p>Quando invii una richiesta dall’app, la ritrovi qui con data e stato.</p></div>';
+  const sync=$('#requestSyncState');if(sync)sync.textContent=serverSynced?'Sincronizzato con il gestionale SCD':'Registro locale · accesso richiesto per lo stato server';
+}
+async function openMyRequests(){
+  const local=localRequests();
+  modal(`<span class="eyebrow">AREA PERSONALE</span><h2>Le mie richieste</h2><p id="requestSyncState">Registro locale · controllo sincronizzazione…</p><div class="request-history" id="requestHistoryMount"></div>`);
+  renderRequestHistory(local,false);
+  if(!state.sessionToken)return;
+  try{
+    const remote=await mgmtApi('account.requests');
+    const serverRows=Array.isArray(remote)?remote:(remote.rows||remote.items||[]);
+    const map=new Map();
+    local.forEach(x=>map.set(x.serverId||x.id,{...x}));
+    serverRows.forEach(x=>{
+      const id=x.id||x.requestId||'';
+      const old=map.get(id)||{};
+      map.set(id,{...old,...x,id:id||old.id,serverId:id||old.serverId,kind:old.kind||String(x.type||'').toLowerCase()});
+    });
+    const merged=[...map.values()].sort((a,b)=>new Date(b.createdAt||b.updatedAt||0)-new Date(a.createdAt||a.updatedAt||0));
+    renderRequestHistory(merged,true);
+  }catch(e){
+    const sync=$('#requestSyncState');if(sync)sync.textContent='Registro locale · sincronizzazione server non disponibile';
+  }
 }
 function updateApiBadge(status,label){
   state.apiStatus=status;
