@@ -259,8 +259,8 @@ function openManagementHome(data){
   $('#mgmtAccess')&&($('#mgmtAccess').onclick=openAccessManager);
   $('#mgmtEvolution')&&($('#mgmtEvolution').onclick=openEvolutionManager);
   $('#mgmtDiagnostics')&&($('#mgmtDiagnostics').onclick=openDiagnosticsManager);
-  $('[data-mgmt-reply]').forEach(b=>b.onclick=async()=>{try{await mgmtApi('private.convocation.reply',{id:b.dataset.conv,player:b.dataset.player,response:b.dataset.mgmtReply});toast('Risposta registrata: '+b.dataset.mgmtReply);state.privateData=await mgmtApi('dashboard.summary');openManagementHome(state.privateData)}catch(e){toast(e.message||'Risposta non registrata')}});
-  $('[data-auth-decision]').forEach(b=>b.onclick=async()=>{try{const action=b.dataset.authDecision==='approve'?'direction.player.approve':'direction.player.reject';await mgmtApi(action,{authId:b.dataset.authId});toast(b.dataset.authDecision==='approve'?'Autorizzazione approvata':'Autorizzazione respinta');state.privateData=await mgmtApi('dashboard.summary');openManagementHome(state.privateData)}catch(e){toast(e.message||'Operazione non riuscita')}});
+  $$('[data-mgmt-reply]').forEach(b=>b.onclick=async()=>{try{await mgmtApi('private.convocation.reply',{id:b.dataset.conv,player:b.dataset.player,response:b.dataset.mgmtReply});toast('Risposta registrata: '+b.dataset.mgmtReply);state.privateData=await mgmtApi('dashboard.summary');openManagementHome(state.privateData)}catch(e){toast(e.message||'Risposta non registrata')}});
+  $$('[data-auth-decision]').forEach(b=>b.onclick=async()=>{try{const action=b.dataset.authDecision==='approve'?'direction.player.approve':'direction.player.reject';await mgmtApi(action,{authId:b.dataset.authId});toast(b.dataset.authDecision==='approve'?'Autorizzazione approvata':'Autorizzazione respinta');state.privateData=await mgmtApi('dashboard.summary');openManagementHome(state.privateData)}catch(e){toast(e.message||'Operazione non riuscita')}});
   $('#mgmtSync').onclick=async()=>{try{state.privateData=await mgmtApi('dashboard.summary');toast('Area aggiornata');openManagementHome(state.privateData)}catch(e){toast(e.message||'Sincronizzazione non riuscita')}};
   $('#mgmtLogout').onclick=()=>{clearSession();closeModal();toast('Sessione chiusa')};
 }
@@ -281,7 +281,7 @@ async function openAttendanceManager(){
       const statuses=r.statuses||['PRESENTE','ASSENTE','GIUSTIFICATO','INFORTUNATO','RITARDO'];
       mount.innerHTML='<div class="attendance-list">'+(r.players||[]).map(p=>'<label class="attendance-row"><span><b>'+esc(p.name||p.fullName||p.code)+'</b><small>'+esc(p.code||'')+'</small></span><select data-att-person="'+esc(p.code||p.personId)+'">'+[''].concat(statuses).map(s=>'<option value="'+esc(s)+'" '+(s===p.status?'selected':'')+'>'+(s||'SELEZIONA')+'</option>').join('')+'</select></label>').join('')+'</div><div class="modal-actions"><button class="primary" id="attSave">SALVA PRESENZE</button></div>';
       $('#attSave').onclick=async()=>{
-        const rows=$('[data-att-person]').filter(x=>x.value).map(x=>({personId:x.dataset.attPerson,status:x.value}));
+        const rows=$$('[data-att-person]').filter(x=>x.value).map(x=>({personId:x.dataset.attPerson,status:x.value}));
         if(!rows.length)return toast('Seleziona almeno una presenza');
         try{await mgmtApi('private.attendance.save',{teamKey:$('#attTeam').value,date:$('#attDate').value,eventType:'ALLENAMENTO',rows});toast('Presenze salvate: '+rows.length)}catch(e){toast(e.message||'Salvataggio non riuscito')}
       };
@@ -315,7 +315,7 @@ function openConvocationManager(){
     $('#cvPlayers').innerHTML=roster.length?'<div class="player-check-grid">'+roster.map(p=>'<label><input type="checkbox" data-cv-player value="'+esc(p.code||p.personId||'')+'"> '+esc(p.name||[p.firstName,p.lastName].filter(Boolean).join(' '))+'</label>').join('')+'</div>':'<div class="notice">Rosa non presente nel riepilogo. La convocazione potrà essere completata dal gestionale R20.</div>';
   };
   $('#cvTeam').onchange=renderPlayers;renderPlayers();
-  $('#convForm').onsubmit=async e=>{e.preventDefault();const players=$('[data-cv-player]:checked').map(x=>x.value).filter(Boolean);try{await mgmtApi('private.convocation.create',{teamKey:$('#cvTeam').value,gameDate:$('#cvDate').value,meetingTime:$('#cvTime').value,meetingPlace:$('#cvPlace').value,players,notes:$('#cvNotes').value,notify:true});toast('Convocazione creata');openManagementHome(state.privateData)}catch(err){toast(err.message||'Convocazione non creata')}};
+  $('#convForm').onsubmit=async e=>{e.preventDefault();const players=$$('[data-cv-player]:checked').map(x=>x.value).filter(Boolean);try{await mgmtApi('private.convocation.create',{teamKey:$('#cvTeam').value,gameDate:$('#cvDate').value,meetingTime:$('#cvTime').value,meetingPlace:$('#cvPlace').value,players,notes:$('#cvNotes').value,notify:true});toast('Convocazione creata');openManagementHome(state.privateData)}catch(err){toast(err.message||'Convocazione non creata')}};
 }
 function openAccessManager(){
   const d=state.privateData||{},roles=(d.roles||[]).map(String);
