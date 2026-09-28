@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="it">
-<head><meta name="scd-build" content="21.5.1">
+<head><meta name="scd-build" content="21.6.0">
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#052a67" />
@@ -14,7 +14,7 @@
   <link rel="icon" href="./assets/logo-scd.png" />
   <link rel="apple-touch-icon" href="./assets/logo-scd.png" />
   <link rel="preload" href="./assets/hero-colico.webp" as="image" />
-  <link rel="stylesheet" href="./styles.css?v=21.5.1" />
+  <link rel="stylesheet" href="./styles.css?v=21.6.0" />
   <title>SCD ColicoDerviese · Super App</title>
 </head>
 <body>
@@ -72,7 +72,7 @@
     </section>
 
     <section class="signal-strip" aria-label="Aggiornamenti principali">
-      <div class="signal-title"><span class="pulse"></span> FLASH</div><div class="signal-track" id="liveTicker"><span>Caricamento aggiornamenti SCD…</span></div><div class="updated" id="updatedAt">ora</div>
+      <div class="signal-title"><span class="pulse"></span> FLASH</div><div class="signal-track" id="liveTicker"><span>Caricamento aggiornamenti SCD…</span></div><div class="api-status checking" id="apiStatus"><i></i><span>Connessione…</span></div><div class="updated" id="updatedAt">ora</div>
     </section>
 
     <section class="section action-grid" aria-label="Azioni principali">
@@ -130,6 +130,7 @@
         <button class="service-card" data-action="tickets"><span>🎟</span><b>Biglietti</b><small>Eventi e gare abilitate</small></button>
         <button class="service-card" data-action="cards"><span>💳</span><b>Card SCD</b><small>Tifoso · Famiglia · Tesserato · Partner</small></button>
         <button class="service-card" data-action="avatar"><span>◉</span><b>Avatar & Media</b><small>Foto, avatar e PNG trasparenti</small></button>
+        <button class="service-card" data-action="requests"><span>☑</span><b>Le mie richieste</b><small>Invii, ID e stato</small></button>
         <a class="service-card" href="https://colicoderviese.webnova.it/shop" target="_blank" rel="noopener"><span>🛍</span><b>Shop Ufficiale</b><small>Merchandising</small></a>
         <button class="service-card" data-action="contacts"><span>☎</span><b>Contatti</b><small>Parla con noi</small></button>
         <button class="service-card safeguarding" data-action="safeguarding"><span>🛡</span><b>Safeguarding</b><small>Canale riservato</small></button>
@@ -186,6 +187,6 @@
   <div class="modal-backdrop" id="modalBackdrop" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><button class="modal-close" id="modalClose" aria-label="Chiudi">×</button><div id="modalBody"></div></div></div>
   <div class="toast" id="toast" role="status"></div>
 </div>
-<script src="./app.js?v=21.5.1" defer></script>
+<script src="./app.js?v=21.6.0" defer></script>
 </body>
 </html>
