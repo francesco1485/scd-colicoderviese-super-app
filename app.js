@@ -1,5 +1,11 @@
-const API='/api/scd';
-const APP_VERSION='21.5.0';
+const APP_VERSION='21.6.0';
+const DYNAMIC_ORIGIN=(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)||location.hostname.endsWith('.onrender.com'))
+  ? location.origin
+  : 'https://scd-colicoderviese-official-r21.onrender.com';
+const API=DYNAMIC_ORIGIN+'/api/scd';
+const LIVE_API=DYNAMIC_ORIGIN+'/api/live';
+const HEALTH_API=DYNAMIC_ORIGIN+'/health';
+const REQUESTS_KEY='scd:requests:v1';
 const R20_APP='https://script.google.com/macros/s/AKfycbwYQ_3yLYsp-6jX3FIgufBjpmaZb9uO1AklF9hdG-CuLII9J4ITUX1EA-EKuWXBMEc/exec';
 const FALLBACK={
   season:'2026/27',generatedAt:new Date().toLocaleString('it-IT'),
@@ -13,7 +19,50 @@ const FALLBACK={
     ],counts:{games:0,events:0,initiatives:0,news:1}
   }
 };
-let state={summary:null,installPrompt:null,session:null};
+let state={summary:null,installPrompt:null,session:null,apiStatus:'checking'};
+
+function localRequests(){
+  try{return JSON.parse(localStorage.getItem(REQUESTS_KEY)||'[]')}catch{return []}
+}
+function requestId(kind='REQ'){
+  return 'SCD-'+String(kind).toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,5)+'-'+Date.now().toString(36).toUpperCase();
+}
+function upsertLocalRequest(item){
+  const rows=localRequests(),i=rows.findIndex(x=>x.id===item.id);
+  const next={...(i>=0?rows[i]:{}),...item,updatedAt:new Date().toISOString()};
+  if(i>=0)rows[i]=next;else rows.unshift(next);
+  localStorage.setItem(REQUESTS_KEY,JSON.stringify(rows.slice(0,50)));
+  return next;
+}
+function requestKindLabel(k){
+  const m={registration:'Registrazione',sponsor:'Sponsor',product:'Prodotti / servizi',rent:'Affitto campo',tournament:'Torneo',tickets:'Biglietti',idea:'Idea / progetto',story:'Contenuto community',fan:'Community',cards:'Card SCD',fantasy:'Fantasy SCD'};
+  return m[k]||String(k||'Richiesta').toUpperCase();
+}
+function openMyRequests(){
+  const rows=localRequests();
+  const body=rows.length?rows.map(x=>`<article class="request-history-card"><div><span class="request-kind">${esc(requestKindLabel(x.kind))}</span><b>${esc(x.topic||x.id)}</b><small>${esc(new Date(x.createdAt||x.updatedAt||Date.now()).toLocaleString('it-IT'))}</small></div><div class="request-state ${esc(String(x.status||'').toLowerCase())}">${esc(x.status||'SALVATA')}</div><code>${esc(x.serverId||x.id)}</code></article>`).join(''):'<div class="empty-state"><b>Nessuna richiesta ancora.</b><p>Quando invii una richiesta dall’app, la ritrovi qui con data e stato.</p></div>';
+  modal(`<span class="eyebrow">AREA PERSONALE</span><h2>Le mie richieste</h2><p>Registro locale sul tuo dispositivo. Quando il bridge gestionale conferma l’invio, viene mostrato anche l’ID server.</p><div class="request-history">${body}</div>`);
+}
+function updateApiBadge(status,label){
+  state.apiStatus=status;
+  const el=$('#apiStatus'); if(!el)return;
+  el.className='api-status '+status;
+  el.innerHTML=`<i></i><span>${esc(label)}</span>`;
+}
+async function checkServiceHealth(){
+  updateApiBadge('checking','Connessione…');
+  const ctrl=new AbortController(),t=setTimeout(()=>ctrl.abort(),7000);
+  try{
+    const r=await fetch(HEALTH_API,{cache:'no-store',signal:ctrl.signal});
+    if(!r.ok)throw new Error('health '+r.status);
+    const j=await r.json();
+    updateApiBadge('online','Servizi live');
+    return j;
+  }catch(e){
+    updateApiBadge('partial','Modalità resiliente');
+    return null;
+  }finally{clearTimeout(t)}
+}
 const LISTENING_EVENTS=new Set(['page_view','cta_click','form_start','form_complete','form_abandon','api_error','client_error','slow_load','search_use','pwa_install','share','return_visit','notification_interaction','feature_use','feedback_submit']);
 function track(type,detail={}){
   if(!LISTENING_EVENTS.has(type))return;
@@ -43,8 +92,19 @@ function closeModal(){$('#modalBackdrop').hidden=true;document.body.style.overfl
 function fmtDate(v){if(!v)return 'Data in aggiornamento';const m=String(v).match(/^(\d{4})-(\d{2})-(\d{2})$/);if(m)return new Date(+m[1],+m[2]-1,+m[3]).toLocaleDateString('it-IT',{weekday:'long',day:'2-digit',month:'long'});const d=String(v).split(/[\/-]/);if(d.length===3&&d[0].length<=2)return `${d[0]}/${d[1]}/${d[2]}`;return String(v)}
 function field(obj,...keys){for(const k of keys){if(obj&&obj[k]!=null&&String(obj[k]).trim())return obj[k]}return ''}
 async function api(action,payload={},sessionToken=''){
-  const ctrl=new AbortController();const t=setTimeout(()=>ctrl.abort(),9000);
-  try{const r=await fetch(API,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action,payload,sessionToken}),signal:ctrl.signal});const j=await r.json();if(!r.ok||j.ok===false)throw new Error(j.error||'Servizio non disponibile');return j.data??j}catch(e){throw e}finally{clearTimeout(t)}
+  const ctrl=new AbortController();const t=setTimeout(()=>ctrl.abort(),12000);
+  const started=performance.now();
+  try{
+    const r=await fetch(API,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action,payload,sessionToken}),signal:ctrl.signal});
+    const j=await r.json().catch(()=>({ok:false,error:'Risposta server non valida'}));
+    if(!r.ok||j.ok===false)throw new Error(j.error||'Servizio non disponibile');
+    track('feature_use',{section:'api_'+action});
+    return j.data??j;
+  }catch(e){
+    console.warn('[SCD API]',action,'failed',e?.message||e,'ms',Math.round(performance.now()-started));
+    track('api_error',{section:action});
+    throw e;
+  }finally{clearTimeout(t)}
 }
 function normalizePublic(raw){
   if(!raw)return JSON.parse(JSON.stringify(FALLBACK));
@@ -61,7 +121,7 @@ function normalizePublic(raw){
 async function loadSummary(silent=false){
   let base=null,radar=null;
   try{base=normalizePublic(await api('public.feed',{limit:40}))}catch(e){const cached=localStorage.getItem('scd:r21:summary');base=cached?JSON.parse(cached):JSON.parse(JSON.stringify(FALLBACK))}
-  try{const r=await fetch('/api/live',{cache:'no-store'});if(r.ok)radar=await r.json()}catch{}
+  try{const r=await fetch(LIVE_API,{cache:'no-store'});if(r.ok)radar=await r.json()}catch{}
   const data=base||JSON.parse(JSON.stringify(FALLBACK));data.public=data.public||{};
   if(radar&&Array.isArray(radar.items)&&radar.items.length){const internal=data.public.highlights||[];data.public.highlights=[...radar.items,...internal].slice(0,24);data.generatedAt=new Date(radar.generatedAt||Date.now()).toLocaleString('it-IT')}
   if(!Array.isArray(data.public.sponsors)||!data.public.sponsors.length)data.public.sponsors=FALLBACK.public.sponsors;
@@ -78,9 +138,16 @@ function renderEvents(p){const rows=(p.initiatives||[]).slice(0,5);const use=row
 function renderNews(p){const rows=(p.highlights||[]).slice(0,6);const use=rows.length?rows:FALLBACK.public.highlights;const f=use[0]||{};$('#featureNews').innerHTML=`<span class="news-source">${esc(field(f,'source','feedType')||'SCD PULSE')}</span><h3>${esc(field(f,'title','subject','event')||'Aggiornamento SCD')}</h3><p>${esc(field(f,'message','excerpt','venue')||'Informazioni societarie e territoriali in aggiornamento.')}</p>`;$('#newsList').innerHTML=use.slice(1,6).map(x=>`<div class="news-row"><span class="news-icon">${/urgent|variaz|cambio/i.test([x.status,x.feedType,x.title].join(' '))?'!':'◉'}</span><span><b>${esc(field(x,'title','subject','event')||'Aggiornamento')}</b><small>${esc(field(x,'message','venue','status')||field(x,'feedType')||'SCD')}</small></span><time>${esc(field(x,'date','time')||'')}</time></div>`).join('')}
 function renderSponsors(p){const rows=(p.sponsors||[]).slice(0,12);const use=rows.length?rows:FALLBACK.public.sponsors;$('#sponsorGrid').innerHTML=use.slice(0,8).map(x=>{const name=field(x,'name','sponsor','company','title')||'Partner SCD';const logo=field(x,'logo','logoUrl','image');const url=field(x,'url','website','link');const inner=logo?`<img src="${esc(logo)}" alt="${esc(name)}" loading="lazy">`:`<span>${esc(name)}</span>`;return url?`<a class="sponsor-card" href="${esc(url)}" target="_blank" rel="noopener">${inner}</a>`:`<div class="sponsor-card">${inner}</div>`}).join('');const names=use.map(x=>field(x,'name','sponsor','company','title')||'Partner SCD');const text=(names.length?names:['SCD Partner']).join('   ◆   ');$('#sponsorTrack').innerHTML=`<span>${esc(text)}   ◆   ${esc(text)}</span>`}
 function openRegister(){modal(`<span class="eyebrow">SCD COMMUNITY</span><h2>Registrati</h2><p>Crei un solo account SCD. Entri sempre come Utente Base e continui a ricevere news, gare, eventi, community e servizi. Se fai parte della Società, la Direzione abiliterà in seguito le funzioni dedicate senza creare un secondo account.</p><form id="registerForm"><div class="form-grid"><div class="field"><label>Nome</label><input id="regName" required autocomplete="given-name"></div><div class="field"><label>Cognome</label><input id="regSurname" required autocomplete="family-name"></div><div class="field"><label>Email</label><input id="regEmail" type="email" required autocomplete="email"></div><div class="field"><label>Telefono</label><input id="regPhone" type="tel" required inputmode="tel" autocomplete="tel"></div><div class="field full"><label class="check"><input id="regPrivacy" type="checkbox" required> <span>Ho letto l’informativa privacy e autorizzo il trattamento dei dati necessari alla registrazione e alla gestione dell’accesso SCD.</span></label></div></div><div id="regStatus"></div><div class="modal-actions"><button type="button" class="outline" id="cancelReg">ANNULLA</button><button class="primary" type="submit">REGISTRATI</button></div></form>`);$('#cancelReg').onclick=closeModal;$('#registerForm').onsubmit=submitRegistration}
-async function submitRegistration(e){e.preventDefault();const btn=e.currentTarget.querySelector('[type="submit"]');btn.disabled=true;btn.textContent='REGISTRAZIONE…';const payload={name:`${$('#regName').value.trim()} ${$('#regSurname').value.trim()}`.trim(),firstName:$('#regName').value.trim(),lastName:$('#regSurname').value.trim(),email:$('#regEmail').value.trim(),phone:$('#regPhone').value.trim(),type:'UTENTE REGISTRATO',privacy:true};try{const r=await api('public.register',payload);$('#regStatus').innerHTML=`<div class="status-box"><b>Registrazione completata.</b><br>${esc(r.message||'Profilo base registrato. Il tuo profilo resta Utente Base. La Direzione potrà aggiungere in seguito eventuali funzioni dedicate sullo stesso account.')}</div>`;btn.hidden=true;setTimeout(closeModal,2600)}catch(err){const subj=encodeURIComponent('REGISTRAZIONE SUPER APP SCD');const body=encodeURIComponent(`Nome: ${payload.firstName} ${payload.lastName}\nEmail: ${payload.email}\nTelefono: ${payload.phone}\nPrivacy: SI`);$('#regStatus').innerHTML=`<div class="status-box" style="background:#fff8dd;color:#6c5200"><b>Registrazione pronta.</b><br>Il bridge diretto al gestionale è in attivazione. Invia subito la richiesta alla Segreteria.<br><br><a class="primary compact" href="mailto:${PUBLIC_CONTACTS.general}?subject=${subj}&body=${body}">INVIA ALLA SEGRETERIA</a></div>`;btn.hidden=true} }
+async function submitRegistration(e){e.preventDefault();const btn=e.currentTarget.querySelector('[type="submit"]');btn.disabled=true;btn.textContent='REGISTRAZIONE…';const payload={name:`${$('#regName').value.trim()} ${$('#regSurname').value.trim()}`.trim(),firstName:$('#regName').value.trim(),lastName:$('#regSurname').value.trim(),email:$('#regEmail').value.trim(),phone:$('#regPhone').value.trim(),type:'UTENTE REGISTRATO',privacy:true};const localId=requestId('REG');upsertLocalRequest({id:localId,kind:'registration',topic:'Registrazione Utente Base',status:'IN INVIO',channel:'APP',createdAt:new Date().toISOString()});try{const r=await api('public.register',payload);upsertLocalRequest({id:localId,status:'INVIATA',serverId:r.id||r.requestId||'',channel:'GESTIONALE'});$('#regStatus').innerHTML=`<div class="status-box"><b>Registrazione completata.</b><br>${esc(r.message||'Profilo base registrato. Il tuo profilo resta Utente Base. La Direzione potrà aggiungere in seguito eventuali funzioni dedicate sullo stesso account.')}</div>`;btn.hidden=true;setTimeout(closeModal,2600)}catch(err){upsertLocalRequest({id:localId,status:'DA COMPLETARE',channel:'EMAIL'});const subj=encodeURIComponent('REGISTRAZIONE SUPER APP SCD');const body=encodeURIComponent(`Nome: ${payload.firstName} ${payload.lastName}\nEmail: ${payload.email}\nTelefono: ${payload.phone}\nPrivacy: SI`);$('#regStatus').innerHTML=`<div class="status-box" style="background:#fff8dd;color:#6c5200"><b>Registrazione pronta.</b><br>Il bridge diretto al gestionale è in attivazione. Invia subito la richiesta alla Segreteria.<br><br><a class="primary compact" href="mailto:${PUBLIC_CONTACTS.general}?subject=${subj}&body=${body}">INVIA ALLA SEGRETERIA</a></div>`;btn.hidden=true} }
 function openLogin(){window.open(R20_APP,'_blank','noopener,noreferrer');toast('Apro l’Area riservata SCD')}
-function openProfile(){openLogin()}
+function openProfile(){
+  const count=localRequests().length;
+  modal(`<span class="eyebrow">PROFILO SCD</span><h2>La tua area</h2><p>Un unico ingresso per richieste, identità digitale e funzioni societarie autorizzate.</p><div class="profile-hub-grid"><button class="choice-tile" id="profileRequests"><b>Le mie richieste</b><small>${count} registrate su questo dispositivo</small></button><button class="choice-tile" id="profileAvatar"><b>Avatar & foto</b><small>Identità digitale SCD</small></button><button class="choice-tile" id="profileR20"><b>Area riservata SCD</b><small>Famiglia · Atleta · Staff · Direzione</small></button><button class="choice-tile" id="profileRefresh"><b>Sincronizza</b><small>Controlla servizi e aggiornamenti</small></button></div><div class="notice"><b>Account unico:</b> entri sempre come Utente Base. Gli eventuali permessi societari vengono aggiunti dalla Direzione sullo stesso account.</div>`);
+  $('#profileRequests').onclick=openMyRequests;
+  $('#profileAvatar').onclick=openAvatarStudio;
+  $('#profileR20').onclick=openLogin;
+  $('#profileRefresh').onclick=async()=>{await checkServiceHealth();await loadSummary();};
+}
 function openDirection(){openLogin()}
 
 
@@ -222,6 +289,7 @@ const ACTION_META={
 function formField(label,id,type='text',required=true,extra=''){return `<div class="field"><label>${label}</label><input id="${id}" type="${type}" ${required?'required':''} ${extra}></div>`}
 function openPublicAction(kind,seed={}){
   const m=ACTION_META[kind]||ACTION_META.contacts;
+  if(kind==='requests')return openMyRequests();
   if(kind==='avatar')return openAvatarStudio();
   if(kind==='media')return openMediaStudio();
   if(kind==='join')return openJoin();
@@ -238,8 +306,9 @@ function openPublicAction(kind,seed={}){
 async function submitPublicAction(e,kind,m,seed={}){
   e.preventDefault();const btn=e.currentTarget.querySelector('[type="submit"]');btn.disabled=true;btn.textContent='INVIO…';
   const payload={kind,name:$('#paName')?.value.trim(),email:$('#paEmail')?.value.trim(),phone:$('#paPhone')?.value.trim(),topic:$('#paTopic')?.value.trim(),message:$('#paMessage')?.value.trim(),privacy:true,...seed};
-  try{const r=await api(m.action,payload);$('#paStatus').innerHTML=`<div class="status-box"><b>Richiesta ricevuta.</b><br>${esc(r.message||'La Società la prenderà in carico.')}</div>`;btn.hidden=true;}
-  catch(err){const subject=encodeURIComponent(`[SCD APP] ${m.title}`);const body=encodeURIComponent(`Nome: ${payload.name||''}\nEmail: ${payload.email||''}\nTelefono: ${payload.phone||''}\nOggetto: ${payload.topic||''}\n\n${payload.message||''}`);$('#paStatus').innerHTML=`<div class="status-box" style="background:#fff7e1;color:#7a5700"><b>Canale gestionale in sincronizzazione.</b><br>Per non perdere la richiesta, usa il canale email ufficiale qui sotto.</div><div class="mini-links"><a href="mailto:${esc(m.email)}?subject=${subject}&body=${body}">INVIA EMAIL UFFICIALE</a></div>`;btn.disabled=false;btn.textContent='RIPROVA';}
+  const localId=requestId(kind);upsertLocalRequest({id:localId,kind,topic:payload.topic||m.title,status:'IN INVIO',channel:'APP',createdAt:new Date().toISOString()});
+  try{const r=await api(m.action,payload);upsertLocalRequest({id:localId,status:'INVIATA',serverId:r.id||r.requestId||'',channel:'GESTIONALE'});$('#paStatus').innerHTML=`<div class="status-box"><b>Richiesta ricevuta.</b><br>${esc(r.message||'La Società la prenderà in carico.')}</div>`;btn.hidden=true;}
+  catch(err){upsertLocalRequest({id:localId,status:'DA COMPLETARE',channel:'EMAIL'});const subject=encodeURIComponent(`[SCD APP] ${m.title}`);const body=encodeURIComponent(`Nome: ${payload.name||''}\nEmail: ${payload.email||''}\nTelefono: ${payload.phone||''}\nOggetto: ${payload.topic||''}\n\n${payload.message||''}`);$('#paStatus').innerHTML=`<div class="status-box" style="background:#fff7e1;color:#7a5700"><b>Canale gestionale in sincronizzazione.</b><br>Per non perdere la richiesta, usa il canale email ufficiale qui sotto.</div><div class="mini-links"><a href="mailto:${esc(m.email)}?subject=${subject}&body=${body}">INVIA EMAIL UFFICIALE</a></div>`;btn.disabled=false;btn.textContent='RIPROVA';}
 }
 function openJoin(){modal(`<span class="eyebrow">ENTRA NELLA SCD</span><h2>Vuoi giocare con noi?</h2><p>Preiscrizione, prova e Open Day. La compilazione non assegna automaticamente il tesseramento federale: la Segreteria verifica categoria, disponibilità e documentazione.</p><div class="notice"><b>Iscrizioni 2026/27:</b> è disponibile anche il modulo societario online già pubblicato dalla SCD.</div><div class="choice-grid"><a class="choice-tile" href="${PUBLIC_CONTACTS.signupUrl}" target="_blank" rel="noopener"><b>Compila preiscrizione ufficiale</b><small>Modulo online SCD</small></a><button class="choice-tile" id="joinInfo"><b>Richiedi una prova / informazioni</b><small>Lascia i tuoi contatti</small></button></div><div class="mini-links"><a href="mailto:${PUBLIC_CONTACTS.registrations}">Email tesseramenti</a><a href="tel:+393341961321">Chiama ${PUBLIC_CONTACTS.phone}</a></div>`);$('#joinInfo').onclick=()=>openPublicAction('idea',{topic:'Richiesta prova / ingresso SCD'});}
 function openCards(){modal(`<span class="eyebrow">SCD CARD</span><h2>Una card per ogni relazione con il Club</h2><p>Architettura predisposta per vantaggi, convenzioni e contenuti dedicati. Finché non attiviamo un pagamento sicuro e sostenibile, la richiesta è una prenotazione/interesse e non un acquisto.</p><div class="choice-grid"><button class="choice-tile" data-card="TIFOSO"><b>Card Tifoso</b><small>Community, eventi, promo partner</small></button><button class="choice-tile" data-card="FAMIGLIA"><b>Card Famiglia</b><small>Servizi e convenzioni famiglie</small></button><button class="choice-tile" data-card="TESSERATO"><b>Card Tesserato</b><small>Identità digitale e servizi Club</small></button><button class="choice-tile" data-card="PARTNER"><b>Card Partner</b><small>Network e opportunità commerciali</small></button></div>`);$$('[data-card]').forEach(b=>b.onclick=()=>openPublicAction('idea',{topic:'Interesse Card '+b.dataset.card}));}
@@ -259,6 +328,6 @@ function boot(){
   navigator.serviceWorker.register('./sw.js?v=21.5.0',{updateViaCache:'none'})
     .then(reg=>reg.update())
     .catch(()=>{});
-}bindDynamic();track('page_view',{section:(location.hash||'#home').replace('#','')});window.addEventListener('hashchange',()=>track('page_view',{section:(location.hash||'#home').replace('#','')}));loadSummary(true);setInterval(()=>{if(!document.hidden)loadSummary(true)},60000);setInterval(flushListening,120000);
+}bindDynamic();checkServiceHealth();track('page_view',{section:(location.hash||'#home').replace('#','')});window.addEventListener('hashchange',()=>track('page_view',{section:(location.hash||'#home').replace('#','')}));loadSummary(true);setInterval(()=>{if(!document.hidden)loadSummary(true)},60000);setInterval(flushListening,120000);
 }
 document.addEventListener('DOMContentLoaded',boot);
