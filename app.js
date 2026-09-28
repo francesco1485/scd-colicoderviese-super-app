@@ -213,12 +213,31 @@ async function openLogin(){
     }finally{btn.disabled=false}
   };
 }
+function managementDetailHtml(d){
+  const personal=d.personal||[],conv=d.convocations||[],pending=d.pendingPlayerAuthorizations||[],dir=d.direction||{};
+  let html='';
+  if(personal.length){
+    html+='<section class="mgmt-detail"><div class="mgmt-section-title"><h3>Profili collegati</h3><span>'+personal.length+'</span></div><div class="mgmt-profile-mini">'+personal.slice(0,4).map(p=>'<article><b>'+esc([p.firstName,p.lastName].filter(Boolean).join(' ')||p.fullName||'Atleta')+'</b><small>'+esc(p.teamName||p.group||'')+'</small><div><em>'+esc(p.figcStatus||'FIGC da verificare')+'</em><em>'+esc(p.certificateStatus||p.certificateExpiry||'Certificato da verificare')+'</em></div></article>').join('')+'</div></section>';
+  }
+  if(conv.length){
+    html+='<section class="mgmt-detail"><div class="mgmt-section-title"><h3>Convocazioni</h3><span>'+conv.length+'</span></div><div class="mgmt-conv-list">'+conv.slice(0,5).map(x=>'<article><div><b>'+esc(x.team||x.teamName||x.player||'Convocazione')+'</b><small>'+esc([x.date,x.meetingTime,x.meetingPlace].filter(Boolean).join(' · '))+'</small><em>'+esc(x.response||'DA CONFERMARE')+'</em></div><div class="mgmt-reply-actions"><button data-mgmt-reply="PRESENTE" data-conv="'+esc(x.id||x.convocationId||'')+'" data-player="'+esc(x.playerCode||'')+'">PRESENTE</button><button class="no" data-mgmt-reply="ASSENTE" data-conv="'+esc(x.id||x.convocationId||'')+'" data-player="'+esc(x.playerCode||'')+'">ASSENTE</button></div></article>').join('')+'</div></section>';
+  }
+  if(pending.length){
+    html+='<section class="mgmt-detail direction-detail"><div class="mgmt-section-title"><h3>Autorizzazioni da decidere</h3><span>'+pending.length+'</span></div><div class="mgmt-auth-list">'+pending.slice(0,6).map(x=>'<article><div><b>'+esc(x.player||x.playerId||'Atleta')+'</b><small>'+esc(x.action||'Autorizzazione')+' · '+esc(x.requester||x.email||'')+'</small><p>'+esc(x.motivation||'')+'</p></div><div class="mgmt-reply-actions"><button data-auth-decision="approve" data-auth-id="'+esc(x.id||x.authId||'')+'">APPROVA</button><button class="no" data-auth-decision="reject" data-auth-id="'+esc(x.id||x.authId||'')+'">RESPINGI</button></div></article>').join('')+'</div></section>';
+  }
+  if((dir.requests||[]).length){
+    html+='<section class="mgmt-detail"><div class="mgmt-section-title"><h3>Richieste operative</h3><span>'+dir.requests.length+'</span></div><div class="mgmt-request-list">'+dir.requests.slice(0,6).map(x=>'<article><b>'+esc(x.subject||x.type||x.id||'Richiesta')+'</b><small>'+esc(x.status||'APERTA')+' · '+esc(x.team||x.area||'')+'</small></article>').join('')+'</div></section>';
+  }
+  return html;
+}
 function openManagementHome(data){
   const d=data||state.privateData||{},u=d.user||{},p=d.permissions||{},personal=d.personal||[];
   state.privateData=d;
   const staff=!!u.staff,dir=!!p.direction,transport=(d.transport&&d.transport.kpis)||{};
   const cards=[
-    '<button class="mgmt-tile" id="mgmtRequests"><span>☑</span><b>Richieste</b><small>Invii e stato</small></button>',
+    '<button class="mgmt-tile" id="mgmtRequests"><span>☑</span><b>Le mie richieste</b><small>Invii e stato</small></button>',
+    '<button class="mgmt-tile" id="mgmtNewRequest"><span>＋</span><b>Richiesta interna</b><small>Pratica al Club</small></button>',
+    '<button class="mgmt-tile" id="mgmtPin"><span>⌘</span><b>PIN personale</b><small>Cambia credenziale</small></button>',
     personal.length?'<button class="mgmt-tile" id="mgmtProfiles"><span>●</span><b>Atleta / Famiglia</b><small>'+personal.length+' profili collegati</small></button>':'',
     staff?'<button class="mgmt-tile" id="mgmtAttendance"><span>✓</span><b>Presenze</b><small>Registro squadra</small></button>':'',
     staff?'<button class="mgmt-tile" id="mgmtConvocations"><span>⚽</span><b>Convocazioni</b><small>Crea e gestisci</small></button>':'',
@@ -230,6 +249,8 @@ function openManagementHome(data){
   ].filter(Boolean).join('');
   modal('<div class="mgmt-head"><div><span class="eyebrow">AREA RISERVATA</span><h2>'+esc(managementName(d))+'</h2><p>'+esc(managementRole(d))+(u.area?' · '+esc(u.area):'')+'</p></div><img src="./assets/logo-scd.png" alt="SCD"></div><div class="mgmt-kpis">'+mgmtKpi('Profili',personal.length)+mgmtKpi('Convocazioni',(d.convocations||[]).length)+mgmtKpi('Richieste',(d.direction&&d.direction.requests||[]).length)+mgmtKpi('Pulmini',transport.requests||0)+'</div><div class="mgmt-grid">'+cards+'</div><div class="modal-actions"><button class="outline" id="mgmtSync">SINCRONIZZA</button><button class="outline danger-soft" id="mgmtLogout">ESCI</button></div>');
   $('#mgmtRequests').onclick=openMyRequests;
+  $('#mgmtNewRequest').onclick=openInternalRequestManager;
+  $('#mgmtPin').onclick=openPinManager;
   $('#mgmtProfiles')&&($('#mgmtProfiles').onclick=()=>openPersonalProfiles(d));
   $('#mgmtAttendance')&&($('#mgmtAttendance').onclick=openAttendanceManager);
   $('#mgmtConvocations')&&($('#mgmtConvocations').onclick=openConvocationManager);
@@ -238,6 +259,8 @@ function openManagementHome(data){
   $('#mgmtAccess')&&($('#mgmtAccess').onclick=openAccessManager);
   $('#mgmtEvolution')&&($('#mgmtEvolution').onclick=openEvolutionManager);
   $('#mgmtDiagnostics')&&($('#mgmtDiagnostics').onclick=openDiagnosticsManager);
+  $('[data-mgmt-reply]').forEach(b=>b.onclick=async()=>{try{await mgmtApi('private.convocation.reply',{id:b.dataset.conv,player:b.dataset.player,response:b.dataset.mgmtReply});toast('Risposta registrata: '+b.dataset.mgmtReply);state.privateData=await mgmtApi('dashboard.summary');openManagementHome(state.privateData)}catch(e){toast(e.message||'Risposta non registrata')}});
+  $('[data-auth-decision]').forEach(b=>b.onclick=async()=>{try{const action=b.dataset.authDecision==='approve'?'direction.player.approve':'direction.player.reject';await mgmtApi(action,{authId:b.dataset.authId});toast(b.dataset.authDecision==='approve'?'Autorizzazione approvata':'Autorizzazione respinta');state.privateData=await mgmtApi('dashboard.summary');openManagementHome(state.privateData)}catch(e){toast(e.message||'Operazione non riuscita')}});
   $('#mgmtSync').onclick=async()=>{try{state.privateData=await mgmtApi('dashboard.summary');toast('Area aggiornata');openManagementHome(state.privateData)}catch(e){toast(e.message||'Sincronizzazione non riuscita')}};
   $('#mgmtLogout').onclick=()=>{clearSession();closeModal();toast('Sessione chiusa')};
 }
@@ -264,6 +287,15 @@ async function openAttendanceManager(){
       };
     }catch(e){mount.innerHTML='<div class="notice error-note">'+esc(e.message||'Registro non disponibile')+'</div>'}
   };
+}
+function openInternalRequestManager(){
+  const teams=privateTeams();
+  modal('<span class="eyebrow">AREA PERSONALE</span><h2>Nuova richiesta interna</h2><form id="internalRequestForm"><div class="form-grid"><div class="field"><label>Tipo</label><select id="irType"><option>INFORMAZIONE</option><option>DOCUMENTO</option><option>TESSERAMENTO</option><option>AMMINISTRAZIONE</option><option>SPORTIVO</option><option>ALTRO</option></select></div><div class="field"><label>Squadra / area</label><select id="irTeam"><option value="">Generale</option>'+teams.map(t=>'<option value="'+esc(t.key)+'">'+esc(t.name)+'</option>').join('')+'</select></div><div class="field full"><label>Oggetto</label><input id="irSubject" required></div><div class="field full"><label>Messaggio</label><textarea id="irMessage" required></textarea></div><div class="field full"><label>Note</label><textarea id="irNotes"></textarea></div></div><div class="modal-actions"><button class="primary">INVIA AL CLUB</button></div></form>');
+  $('#internalRequestForm').onsubmit=async e=>{e.preventDefault();try{const r=await mgmtApi('private.request.submit',{type:$('#irType').value,subject:$('#irSubject').value,message:$('#irMessage').value,team:$('#irTeam').value,notes:$('#irNotes').value});toast('Richiesta interna registrata');upsertLocalRequest({id:r.id||r.requestId||requestId('INT'),serverId:r.id||r.requestId||'',kind:'internal',topic:$('#irSubject').value,status:'INVIATA',channel:'GESTIONALE',createdAt:new Date().toISOString()});state.privateData=await mgmtApi('dashboard.summary');openManagementHome(state.privateData)}catch(err){toast(err.message||'Richiesta non salvata')}};
+}
+function openPinManager(){
+  modal('<span class="eyebrow">SICUREZZA ACCOUNT</span><h2>Cambia PIN personale</h2><form id="pinForm"><div class="form-grid"><div class="field full"><label>PIN attuale</label><input id="pinOld" type="password" inputmode="numeric" maxlength="10" required></div><div class="field full"><label>Nuovo PIN</label><input id="pinNew" type="password" inputmode="numeric" minlength="6" maxlength="10" required></div></div><div class="modal-actions"><button class="primary">AGGIORNA PIN</button></div></form>');
+  $('#pinForm').onsubmit=async e=>{e.preventDefault();try{await mgmtApi('auth.pin.change',{oldPin:$('#pinOld').value,newPin:$('#pinNew').value});toast('PIN aggiornato');openManagementHome(state.privateData)}catch(err){toast(err.message||'Cambio PIN non riuscito')}};
 }
 function openMessageManager(){
   const teams=privateTeams();
