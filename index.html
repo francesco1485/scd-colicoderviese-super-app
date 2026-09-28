@@ -1,22 +1,27 @@
 <!doctype html>
 <html lang="it">
-<head><meta name="scd-build" content="21.4.5">
+<head><meta name="scd-build" content="21.5.0">
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#052a67" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="SCD App" />
+  <meta name="format-detection" content="telephone=yes" />
   <meta name="description" content="SCD ColicoDerviese Super App: gare, risultati, eventi, tesseramenti, community, sponsor, servizi e area personale." />
-  <link rel="manifest" href="/manifest.webmanifest" />
-  <link rel="icon" href="/assets/logo-scd.webp" />
-  <link rel="apple-touch-icon" href="/assets/logo-scd.webp" />
-  <link rel="preload" href="/assets/hero-colico.webp" as="image" />
-  <link rel="stylesheet" href="/styles.css?v=21.4.5" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./assets/logo-scd.png" />
+  <link rel="apple-touch-icon" href="./assets/logo-scd.png" />
+  <link rel="preload" href="./assets/hero-colico.webp" as="image" />
+  <link rel="stylesheet" href="./styles.css?v=21.5.0" />
   <title>SCD ColicoDerviese · Super App</title>
 </head>
 <body>
 <div class="app-shell">
   <header class="topbar" id="topbar">
     <a class="brand" href="#home" aria-label="SCD ColicoDerviese Home">
-      <img src="/assets/logo-scd.webp" alt="SCD ColicoDerviese" />
+      <img src="./assets/logo-scd.png" alt="SCD ColicoDerviese" />
       <span><strong>S.C.D.</strong><small>COLICODERVIESE</small></span>
     </a>
     <nav class="desktop-nav" aria-label="Navigazione principale">
@@ -35,7 +40,7 @@
       <div class="hero-content">
         <div class="hero-kicker"><span class="live-dot"></span> SCD COMMUNITY · STAGIONE <span data-season>2026/27</span></div>
         <div class="hero-brand-lockup">
-          <img class="hero-logo" src="/assets/logo-scd.webp" alt="SCD ColicoDerviese">
+          <img class="hero-logo" src="./assets/logo-scd.png" alt="SCD ColicoDerviese">
           <div><span>S.D.C.</span><strong>COLICO<span>DERVIESE</span></strong><small>PIÙ DI UNA SQUADRA. UN TERRITORIO, UNA FAMIGLIA.</small></div>
         </div>
         <h1>Questa settimana.<br><span>Il mondo ColicoDerviese, vivo.</span></h1>
@@ -50,7 +55,7 @@
       <aside class="hero-side-card" id="nextMatchCard">
         <div class="side-label">PROSSIMA GARA</div><div class="match-date" id="nextDate">Aggiornamento…</div>
         <div class="match-clubs">
-          <div class="club"><img src="/assets/logo-scd.webp" alt="SCD"><b>SCD</b></div>
+          <div class="club"><img src="./assets/logo-scd.png" alt="SCD"><b>SCD</b></div>
           <div class="versus"><span>VS</span><small id="nextTime">—</small></div>
           <div class="club opponent"><div class="fallback-badge" id="opponentBadge">?</div><b id="nextOpponent">Da definire</b></div>
         </div>
@@ -59,11 +64,11 @@
     </section>
 
     <section class="affiliation-ribbon" aria-label="Affiliazioni e riconoscimenti">
-      <img src="/assets/logo-lnd.webp" alt="Lega Nazionale Dilettanti">
+      <img src="./assets/logo-lnd.png" alt="Lega Nazionale Dilettanti">
       <span class="ribbon-divider"></span>
-      <img class="wide" src="/assets/logo-monza.webp" alt="Insieme al Monza">
+      <img class="wide" src="./assets/logo-monza.png" alt="Insieme al Monza">
       <span class="ribbon-divider"></span>
-      <img class="wide" src="/assets/logo-sgs.webp" alt="FIGC Settore Giovanile e Scolastico 3° livello">
+      <img class="wide" src="./assets/logo-sgs.png" alt="FIGC Settore Giovanile e Scolastico 3° livello">
     </section>
 
     <section class="signal-strip" aria-label="Aggiornamenti principali">
@@ -77,6 +82,7 @@
       <button class="action-card" data-action="tournament"><span>🏆</span><b>ISCRIVITI A UN TORNEO</b><small>Squadre e società</small></button>
       <button class="action-card" data-action="tickets"><span>🎟</span><b>BIGLIETTI & EVENTI</b><small>Prenota o acquista quando disponibile</small></button>
       <button class="action-card" data-action="cards"><span>★</span><b>CARD SCD</b><small>Tifoso · Famiglia · Tesserato · Partner</small></button>
+      <button class="action-card action-avatar" data-action="avatar"><span>◉</span><b>CREA IL TUO AVATAR</b><small>Foto profilo o calciatore SCD · PNG trasparente</small></button>
     </section>
 
     <section class="section" id="gare">
@@ -87,6 +93,22 @@
     <section class="section event-section" id="eventi">
       <div class="section-head inverted"><div><span class="eyebrow">VIVI IL CLUB</span><h2>Eventi, tornei e iniziative</h2><p>Locandina, programma, luogo, iscrizione e condivisione. Ogni evento deve portare a un'azione.</p></div><button class="light-btn" data-action="initiatives">Proponi un'iniziativa</button></div>
       <div class="event-grid" id="eventGrid"></div>
+    </section>
+
+
+    <section class="section avatar-hub" id="avatar">
+      <div class="avatar-hub-copy">
+        <span class="eyebrow">IDENTITÀ DIGITALE SCD</span>
+        <h2>La tua faccia. Il tuo avatar. I tuoi colori.</h2>
+        <p>Carica una foto oppure crea un avatar da calciatore SCD. Tutto viene elaborato sul dispositivo e preparato senza riquadri: output PNG con trasparenza.</p>
+        <div class="avatar-badges"><span>PNG TRASPARENTE</span><span>ZERO COSTI</span><span>PRIVACY-FIRST</span><span>NESSUN RIQUADRO</span></div>
+        <div class="hero-actions"><button class="primary large" data-action="avatar">CREA AVATAR</button><button class="outline large" data-action="media">PULISCI FOTO / LOGO</button></div>
+      </div>
+      <div class="avatar-hub-preview" aria-hidden="true">
+        <div class="avatar-orbit"></div>
+        <div class="avatar-sample"><div class="avatar-head">●</div><div class="avatar-shirt"><b>10</b></div><div class="avatar-ball">⚽</div></div>
+        <div class="avatar-tip"><b>Sky consiglia</b><span>Niente quadrati colorati attorno ai loghi.</span></div>
+      </div>
     </section>
 
     <section class="section community-zone" id="community">
@@ -107,6 +129,7 @@
         <button class="service-card" data-action="tournament"><span>🏆</span><b>Tornei</b><small>Iscrizione squadra</small></button>
         <button class="service-card" data-action="tickets"><span>🎟</span><b>Biglietti</b><small>Eventi e gare abilitate</small></button>
         <button class="service-card" data-action="cards"><span>💳</span><b>Card SCD</b><small>Tifoso · Famiglia · Tesserato · Partner</small></button>
+        <button class="service-card" data-action="avatar"><span>◉</span><b>Avatar & Media</b><small>Foto, avatar e PNG trasparenti</small></button>
         <a class="service-card" href="https://colicoderviese.webnova.it/shop" target="_blank" rel="noopener"><span>🛍</span><b>Shop Ufficiale</b><small>Merchandising</small></a>
         <button class="service-card" data-action="contacts"><span>☎</span><b>Contatti</b><small>Parla con noi</small></button>
         <button class="service-card safeguarding" data-action="safeguarding"><span>🛡</span><b>Safeguarding</b><small>Canale riservato</small></button>
@@ -154,15 +177,15 @@
   <div class="sponsor-ticker" aria-label="Sponsor SCD"><div class="sponsor-ticker-label">PARTNER SCD</div><div class="sponsor-marquee"><div id="sponsorTrack" class="sponsor-track"><span>SCD COLICODERVIESE · PARTNER DEL TERRITORIO ·</span></div></div></div>
 
   <nav class="mobile-nav" aria-label="Navigazione mobile">
-    <a href="#home"><span>⌂</span>Home</a><a href="#gare"><span>⚽</span>Gare</a><a href="#community"><span>♥</span>Community</a><button id="mobileSky"><span>✦</span>Sky</button><button id="mobileProfile"><span>◉</span>Profilo</button>
+    <a href="#home"><span>⌂</span>Home</a><a href="#gare"><span>⚽</span>Gare</a><button data-action="avatar" class="avatar-nav"><span>◉</span>Avatar</button><a href="#community"><span>♥</span>Community</a><button id="mobileProfile"><span>●</span>Profilo</button>
   </nav>
 
-  <button class="sky-fab" id="skyFab" aria-label="Apri Sky assistente SCD"><span class="sky-face"><img src="/assets/sky.webp" alt=""></span><span class="sky-copy"><b>Sky</b><small>Assistente SCD</small></span><span class="sky-ping"></span></button>
-  <div class="sky-panel" id="skyPanel" aria-hidden="true"><div class="sky-head"><div><span class="sky-avatar"><img src="/assets/sky.webp" alt=""></span><span><b>Sky</b><small>Assistente SCD</small></span></div><button id="closeSky" aria-label="Chiudi">×</button></div><div class="sky-messages" id="skyMessages"><div class="bubble bot">Ciao. Posso aiutarti con gare, iscrizioni, tornei, campi, sponsor, card, community e contatti SCD.</div></div><div class="sky-chips"><button data-sky="next">Prossima gara</button><button data-sky="join">Iscrizioni</button><button data-sky="sponsor">Sponsor</button><button data-sky="rent">Campi</button><button data-sky="fan">Community</button></div><form class="sky-input" id="skyForm"><input id="skyInput" placeholder="Chiedi a Sky…" autocomplete="off"><button>Invia</button></form></div>
+  <button class="sky-fab" id="skyFab" aria-label="Apri Sky assistente SCD"><span class="sky-face"><img src="./assets/sky.png" alt=""></span><span class="sky-copy"><b>Sky</b><small>Assistente SCD</small></span><span class="sky-ping"></span></button>
+  <div class="sky-panel" id="skyPanel" aria-hidden="true"><div class="sky-head"><div><span class="sky-avatar"><img src="./assets/sky.png" alt=""></span><span><b>Sky</b><small>Assistente SCD</small></span></div><button id="closeSky" aria-label="Chiudi">×</button></div><div class="sky-messages" id="skyMessages"><div class="bubble bot">Ciao. Posso aiutarti con gare, iscrizioni, tornei, campi, sponsor, card, community e contatti SCD.</div></div><div class="sky-chips"><button data-sky="next">Prossima gara</button><button data-sky="join">Iscrizioni</button><button data-sky="sponsor">Sponsor</button><button data-sky="rent">Campi</button><button data-sky="fan">Community</button></div><form class="sky-input" id="skyForm"><input id="skyInput" placeholder="Chiedi a Sky…" autocomplete="off"><button>Invia</button></form></div>
 
   <div class="modal-backdrop" id="modalBackdrop" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><button class="modal-close" id="modalClose" aria-label="Chiudi">×</button><div id="modalBody"></div></div></div>
   <div class="toast" id="toast" role="status"></div>
 </div>
-<script src="/app.js?v=21.4.5" defer></script>
+<script src="./app.js?v=21.5.0" defer></script>
 </body>
 </html>
