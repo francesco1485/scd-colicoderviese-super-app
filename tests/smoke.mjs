@@ -1,28 +1,96 @@
 import { chromium } from 'playwright';
 
 const base=process.env.SCD_TEST_URL||'http://127.0.0.1:10000';
+const viewports=[
+  {width:360,height:800},
+  {width:390,height:844},
+  {width:393,height:852},
+  {width:430,height:932}
+];
+
 const browser=await chromium.launch({headless:true});
-const page=await browser.newPage({viewport:{width:390,height:844}});
-const errors=[];
-page.on('pageerror',e=>errors.push(String(e)));
-await page.goto(base,{waitUntil:'domcontentloaded',timeout:30000});
-await page.waitForSelector('#home');
-await page.click('[data-action="sponsor"]');
-await page.waitForSelector('#publicActionForm');
-await page.click('#modalClose');
-await page.click('[data-action="avatar"]');
-await page.waitForSelector('#avatarPreview');
-await page.click('#modalClose');
-await page.click('[data-action="requests"]');
-await page.waitForSelector('.request-history');
-await page.click('#modalClose');
-await page.click('#mobileProfile');
-await page.waitForSelector('.profile-hub-grid');
-await page.click('#profileR20');
-await page.waitForSelector('#mgmtLoginForm');
-await page.click('#modalClose');
-const health=await page.request.get(base+'/health');
+const allErrors=[];
+
+for(const viewport of viewports){
+  const page=await browser.newPage({viewport});
+  const errors=[];
+  page.on('pageerror',e=>errors.push(String(e)));
+  page.on('console',msg=>{if(msg.type()==='error')errors.push('console: '+msg.text())});
+
+  await page.goto(base,{waitUntil:'domcontentloaded',timeout:30000});
+  await page.waitForSelector('#home');
+  await page.waitForFunction(()=>document.documentElement.scrollWidth<=window.innerWidth+3);
+
+  await page.click('[data-action="sponsor"]');
+  await page.waitForSelector('#publicActionForm');
+  await page.click('#modalClose');
+
+  await page.click('[data-action="avatar"]');
+  await page.waitForSelector('#avatarPreview');
+  await page.click('#modalClose');
+
+  await page.click('[data-action="requests"]');
+  await page.waitForSelector('#requestHistoryMount');
+  await page.click('#modalClose');
+
+  await page.click('#mobileProfile');
+  await page.waitForSelector('.profile-hub-grid');
+  await page.click('#profileR20');
+  await page.waitForSelector('#mgmtLoginForm');
+  await page.click('#modalClose');
+
+  if(viewport.width===390){
+    await page.evaluate(()=>{
+      openManagementHome({
+        user:{name:'QA SCD',email:'qa@example.test',role:'STAFF',area:'U16',staff:true},
+        permissions:{direction:true,manageAccess:true},
+        personal:[{firstName:'Atleta',lastName:'Test',teamName:'U16',figcStatus:'TESSERATO',certificateStatus:'VALIDO'}],
+        teams:[{key:'U16',name:'U16 Elite'}],
+        attendance:{teams:[{key:'U16',name:'U16 Elite'}]},
+        roster:{U16:[{code:'P001',name:'Giocatore Test'}]},
+        convocations:[{id:'CV1',team:'U16 Elite',date:'2026-10-01',meetingTime:'18:00',meetingPlace:'Colico',playerCode:'P001',response:'DA CONFERMARE'}],
+        pendingPlayerAuthorizations:[{id:'AUTH1',player:'Giocatore Test',action:'COLLEGAMENTO',requester:'famiglia@example.test',motivation:'QA'}],
+        direction:{requests:[{id:'R1',subject:'Richiesta test',status:'APERTA',team:'U16'}]},
+        transport:{kpis:{requests:2}}
+      });
+    });
+    await page.waitForSelector('.mgmt-grid');
+    await page.waitForSelector('.mgmt-detail');
+
+    await page.click('#mgmtAttendance');
+    await page.waitForSelector('#attTeam');
+    await page.click('#modalClose');
+
+    await page.evaluate(()=>openManagementHome(state.privateData));
+    await page.click('#mgmtConvocations');
+    await page.waitForSelector('#convForm');
+    await page.click('#modalClose');
+
+    await page.evaluate(()=>openManagementHome(state.privateData));
+    await page.click('#mgmtNewRequest');
+    await page.waitForSelector('#internalRequestForm');
+    await page.click('#modalClose');
+
+    await page.evaluate(()=>openManagementHome(state.privateData));
+    await page.click('#mgmtPin');
+    await page.waitForSelector('#pinForm');
+    await page.click('#modalClose');
+
+    await page.evaluate(()=>openManagementHome(state.privateData));
+    await page.click('#mgmtAccess');
+    await page.waitForSelector('#accessForm');
+    await page.click('#modalClose');
+  }
+
+  if(errors.length) allErrors.push(viewport.width+'x'+viewport.height+': '+errors.join(' | '));
+  await page.close();
+}
+
+const api=await browser.newPage();
+const health=await api.request.get(base+'/health');
 if(!health.ok()) throw new Error('health endpoint failed '+health.status());
-if(errors.length) throw new Error('browser errors: '+errors.join(' | '));
-console.log('SCD smoke PASS', {url:page.url(),viewport:'390x844'});
+await api.close();
+
+if(allErrors.length) throw new Error('browser errors: '+allErrors.join(' || '));
+console.log('SCD smoke PASS', {viewports:viewports.map(v=>v.width+'x'+v.height)});
 await browser.close();
