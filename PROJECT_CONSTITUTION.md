@@ -167,3 +167,26 @@ Ogni funzione deve dichiarare:
 - tracking;
 - fallback;
 - costo infrastrutturale.
+
+
+## Regola account unico
+- La registrazione iniziale è uguale per tutti e deve essere semplice come un account moderno: Nome, Cognome, Email, Telefono, Privacy.
+- Ogni registrato nasce e rimane UTENTE BASE con accesso continuo a news, gare, risultati, eventi, community, sponsor, iniziative, servizi e aggiornamenti pubblici.
+- L'utente non sceglie ruoli in registrazione e non crea account separati.
+- La Direzione cerca l'utente principalmente per email e può aggiungere successivamente uno o più perimetri autorizzati sullo stesso account.
+- Le funzioni Famiglia, Atleta, Mister, Staff, Dirigente, Segreteria, Tesseramenti, Tornei e Direzione compaiono automaticamente solo dopo autorizzazione.
+- Le informazioni aggiuntive vengono chieste solo quando l'utente usa uno specifico servizio (tesseramento, torneo, sponsor, campo, biglietto, card, ecc.).
+
+## COMANDO PRIORITARIO — PIXEL PERFECT SCD
+Le immagini e le schermate grafiche S.D.C. ColicoDerviese fornite dal committente costituiscono la SOURCE OF TRUTH VISIVA della Super App.
+- Non reinterpretare, semplificare o trasformare il progetto in template SaaS/minimalista/generico.
+- Usare logo ufficiale SCD e asset originali LND, FIGC SGS 3° livello, Insieme al Monza e Sky.
+- Ricreare proporzioni, spaziature, card, raggi, ombre, barre, CTA, tab, menu, card gara/evento, sponsor, affiliazioni e sfondi territoriali.
+- Home: forte presenza SCD/territorio, prossima gara, ultimo risultato, eventi, iniziative, news, Radar, sponsor, affiliazioni, community e CTA commerciali/iscrizione. Allenamenti non prioritari nel pubblico.
+- Mobile first obbligatorio: 360x800, 390x844, 393x852, 430x932.
+- Area riservata coerente con le tavole per Utente, Famiglia, Atleta, Staff e Direzione.
+- Sky è micro-assistente flottante discreto, animato e contestuale.
+- Mai inventare dati sportivi. Se manca un dato: skeleton o “Dato in aggiornamento”.
+- Gli asset ufficiali non vanno ridisegnati con IA.
+- Dopo ogni schermata effettuare verifica visiva smartphone e correggere prima della pubblicazione.
+- In caso di conflitto grafico prevale sempre la tavola approvata.
