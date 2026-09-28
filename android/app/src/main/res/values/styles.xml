@@ -1,0 +1,11 @@
+<resources>
+    <style name="Theme.SCD" parent="android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:windowActionModeOverlay">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:colorAccent">@color/scd_yellow</item>
+        <item name="android:navigationBarColor">@color/scd_blue</item>
+        <item name="android:statusBarColor">@color/scd_blue</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>
