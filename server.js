@@ -26,7 +26,7 @@ function applyCors(req,res){
 }
 
 const allowedActions = new Set([
-  'dashboard.summary','private.dashboard','private.week',
+  'dashboard.summary','private.dashboard','private.week','account.requests',
   'private.request.submit','private.transport.request','private.message.send',
   'private.convocation.create','private.convocation.reply',
   'private.attendance.get','private.attendance.save',
