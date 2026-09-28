@@ -41,16 +41,6 @@ jobs:
           sed -i "s|url('/assets/|url('./assets/|g" _site/styles.css
           sed -i 's|url("/assets/|url("./assets/|g' _site/styles.css
 
-          # Disable SW on the GitHub Pages mirror to avoid path/cache conflicts.
-          python - <<'PY'
-          from pathlib import Path
-          p=Path('_site/app.js')
-          s=p.read_text()
-          s=s.replace("if('serviceWorker' in navigator){\n  navigator.serviceWorker.register('/sw.js?v=21.4.3',{updateViaCache:'none'})\n    .then(reg=>reg.update())\n    .catch(()=>{});\n}", "")
-          s=s.replace("if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});", "")
-          p.write_text(s)
-          PY
-
           touch _site/.nojekyll
 
       - name: Setup Pages
