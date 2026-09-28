@@ -1,6 +1,6 @@
 {
   "name": "scd-colicoderviese-super-app",
-  "version": "21.4.0",
+  "version": "21.6.0",
   "private": true,
   "engines": {
     "node": ">=20"
@@ -8,6 +8,7 @@
   "scripts": {
     "start": "node server.js",
     "check": "node --check server.js && node --check app.js",
-    "build": "npm run check"
+    "build": "npm run check",
+    "test:smoke": "node tests/smoke.mjs"
   }
 }
