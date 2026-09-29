@@ -22,9 +22,15 @@ jobs:
           node <<'NODE'
           const base='https://scd-colicoderviese-official-r21.onrender.com';
           async function text(url,options={}){
-            const r=await fetch(url,{redirect:'follow',cache:'no-store',...options});
-            const body=await r.text();
-            return {status:r.status,body};
+            const ctrl=new AbortController();
+            const timer=setTimeout(()=>ctrl.abort(),20000);
+            try{
+              const r=await fetch(url,{redirect:'follow',cache:'no-store',signal:ctrl.signal,...options});
+              const body=await r.text();
+              return {status:r.status,body};
+            }catch(e){
+              return {status:0,body:JSON.stringify({ok:false,error:String(e.message||e),code:e.name||'ERROR'})};
+            }finally{clearTimeout(timer)}
           }
           const health=await text(base+'/health?diag='+Date.now());
           const caps=await text(base+'/api/capabilities?diag='+Date.now());
