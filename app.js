@@ -1,4 +1,4 @@
-const APP_VERSION='29.0.0';
+const APP_VERSION='30.0.0';
 const DYNAMIC_ORIGIN=(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)||location.hostname.endsWith('.onrender.com'))
   ? location.origin
   : 'https://scd-colicoderviese-official-r21.onrender.com';
