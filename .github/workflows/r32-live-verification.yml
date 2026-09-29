@@ -1,0 +1,58 @@
+name: SCD R32 Live Verification
+
+on:
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Verify live Pages and Render
+        run: |
+          node <<'NODE'
+          const pages='https://francesco1485.github.io/scd-colicoderviese-super-app/';
+          const render='https://scd-colicoderviese-official-r21.onrender.com';
+          const timeout=async(url,options={})=>{
+            const ctrl=new AbortController();
+            const timer=setTimeout(()=>ctrl.abort(),20000);
+            try{
+              const r=await fetch(url,{redirect:'follow',cache:'no-store',signal:ctrl.signal,...options});
+              const body=await r.text();
+              return {status:r.status,ok:r.ok,body};
+            }finally{clearTimeout(timer)}
+          };
+          const p=await timeout(pages+'?verify='+Date.now());
+          const h=await timeout(render+'/health?verify='+Date.now());
+          const c=await timeout(render+'/api/capabilities?verify='+Date.now());
+          const pj=p.body;
+          const hj=JSON.parse(h.body);
+          const cj=JSON.parse(c.body);
+          const checks={
+            pages32:p.ok && /scd-build["']\s+content=["']32\.0\.0/i.test(pj),
+            render32:h.ok && hj.ok===true && hj.version==='32.0.0',
+            capabilities32:c.ok && cj.ok===true && cj.version==='32.0.0',
+            dataFabricFlagDeclared:typeof cj.featureFlags?.dataFabricObservability==='boolean',
+            dataFabricGatedOff:cj.featureFlags?.dataFabricObservability===false,
+            contractActionDeclared:Array.isArray(cj.actions)&&cj.actions.includes('public.datafabric.contract')
+          };
+          console.log(JSON.stringify({checks,health:hj,capabilities:{
+            version:cj.version,
+            dataFabricObservability:cj.featureFlags?.dataFabricObservability,
+            contractActionDeclared:checks.contractActionDeclared
+          }},null,2));
+          const failed=Object.entries(checks).filter(([,v])=>v!==true);
+          if(failed.length){
+            console.error('LIVE VERIFICATION FAIL',failed.map(([k])=>k));
+            process.exit(1);
+          }
+          console.log('SCD R32 LIVE VERIFICATION PASS');
+          NODE
