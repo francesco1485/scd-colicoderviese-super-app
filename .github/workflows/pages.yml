@@ -27,6 +27,7 @@ jobs:
       - name: Prepare static site
         run: |
           node --check app.js
+          node --check app-r24-router.js
           node --check server.js
           npm run build:pages
 
