@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "effective_at": "2026-09-29",
     "status": "BINDING",
     "language": "it-IT",
@@ -569,14 +569,16 @@
         ]
       },
       {
-        "id": "SPONSOR_SHEET",
+        "id": "MAIL_OPERATIONS_SHEET",
         "kind": "GOOGLE_SHEET",
         "trust": "INTERNAL_VERIFIED",
         "resource_id": "1wx3ZXwmdZuAr8AM_h08GzOvephm5o5iHMvTLQpRmbJE",
         "authority_domains": [
-          "SPONSORS",
-          "PARTNERS",
-          "COMMERCIAL"
+          "EMAIL_ARCHIVE",
+          "MAIL_CLASSIFICATION",
+          "ACTION_QUEUE",
+          "MAIL_OPERATIONS",
+          "COMMERCIAL_MAIL"
         ]
       },
       {
@@ -759,6 +761,45 @@
           "OPPORTUNITIES"
         ],
         "rule": "must_store_source_url_date_timestamp"
+      },
+      {
+        "id": "SPONSOR_MASTER_SHEET",
+        "kind": "GOOGLE_SHEET",
+        "trust": "INTERNAL_VERIFIED",
+        "resource_id": "1-5-MUnrrAltflJSATe6bKkjm_3SItO0gvadi_PXPoAQ",
+        "authority_domains": [
+          "SPONSORS",
+          "PARTNERS",
+          "COMMERCIAL",
+          "ASSETS",
+          "FOLLOW_UP",
+          "SPONSOR_INTELLIGENCE"
+        ]
+      },
+      {
+        "id": "ECONOMIC_MASTER_SHEET",
+        "kind": "GOOGLE_SHEET",
+        "trust": "INTERNAL_VERIFIED",
+        "resource_id": "12nWAbNPM9HoYH_A5beGEuCgvWCqjDF5h5lln0L0Aab8",
+        "authority_domains": [
+          "ECONOMY",
+          "BUDGET",
+          "COSTS",
+          "PAYMENTS",
+          "FINANCIAL_CONTROL"
+        ]
+      },
+      {
+        "id": "TOURNAMENTS_MASTER_SHEET",
+        "kind": "GOOGLE_SHEET",
+        "trust": "INTERNAL_VERIFIED",
+        "resource_id": "1fE8SdrmlOdy97kfVh9-7U0n_8NkvQl0x-qPY89RwQm8",
+        "authority_domains": [
+          "TOURNAMENTS",
+          "INITIATIVES",
+          "EVENTS",
+          "PARTNERS"
+        ]
       }
     ],
     "conflict_resolution": [
@@ -803,7 +844,11 @@
       "NOTIFY_IF_REQUIRED"
     ],
     "dedup_by_hash": true,
-    "versioning_required": true
+    "versioning_required": true,
+    "existing_catalog_surfaces": [
+      "TESSERATI_SHEET/DRIVE AGGIORNAMENTI",
+      "TESSERATI_SHEET/REGISTRO FONTI V2"
+    ]
   },
   "gmail_intelligence": {
     "role": "OPERATIONAL_EVENT_SENSOR",
@@ -842,7 +887,13 @@
       "CREATE_REQUEST",
       "ALERT_DIRECTION"
     ],
-    "critical_updates_default": "HUMAN_CONFIRMATION_REQUIRED"
+    "critical_updates_default": "HUMAN_CONFIRMATION_REQUIRED",
+    "existing_runtime_surfaces": [
+      "MAIL_OPERATIONS_SHEET/01_EMAIL_ARCHIVE",
+      "MAIL_OPERATIONS_SHEET/17_SMART_CLASSIFIER",
+      "MAIL_OPERATIONS_SHEET/18_ACTION_QUEUE",
+      "TESSERATI_SHEET/MAIL SPORTCLUB"
+    ]
   },
   "entity_graph": {
     "required_relations": [
@@ -1335,13 +1386,13 @@
       "id": "CAP-DRIVE-CATALOG",
       "domain": "DATA_FABRIC",
       "required": true,
-      "state": "PLANNED"
+      "state": "PARTIAL"
     },
     {
       "id": "CAP-GMAIL-INGESTION",
       "domain": "DATA_FABRIC",
       "required": true,
-      "state": "PLANNED"
+      "state": "PARTIAL"
     },
     {
       "id": "CAP-ENTITY-GRAPH",
@@ -1450,8 +1501,8 @@
     {
       "id": "GAP-DATA-001",
       "severity": "HIGH",
-      "statement": "Drive e Gmail non sono ancora pienamente indicizzati come Data Fabric/catalogo continuo.",
-      "required_fix": "Implementare Drive Catalog + Gmail Ingestion con entity linking, dedup, trust e review."
+      "statement": "Drive e Gmail possiedono già cataloghi, archivio mail, classificatore e action queue reali, ma non sono ancora esposti come Data Fabric runtime continuo della Super App.",
+      "required_fix": "Collegare i cataloghi esistenti a R20/R21 con scan incrementale, dedup, entity linking, review umana, event kernel e dashboard Direzione."
     },
     {
       "id": "GAP-EVENT-001",
