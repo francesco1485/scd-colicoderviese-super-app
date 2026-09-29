@@ -26,6 +26,16 @@ for(const viewport of viewports){
   await page.goto(base,{waitUntil:'domcontentloaded',timeout:30000});
   await page.waitForSelector('#home');
   await page.waitForFunction(()=>document.documentElement.scrollWidth<=window.innerWidth+3);
+  await page.waitForSelector('#clubClock');
+  await page.waitForFunction(()=>document.querySelector('#clubClock')?.textContent?.length>8);
+
+  await page.locator('[data-action="calendar"]').first().click();
+  await page.waitForSelector('#calendarRows');
+  await page.click('#modalClose');
+
+  await page.locator('[data-action="location"]').first().click();
+  await page.waitForSelector('#locateMe');
+  await page.click('#modalClose');
 
   await page.click('[data-action="sponsor"]');
   await page.waitForSelector('#publicActionForm');
@@ -105,6 +115,14 @@ for(const viewport of viewports){
 const api=await browser.newPage();
 const health=await api.request.get(base+'/health');
 if(!health.ok()) throw new Error('health endpoint failed '+health.status());
+const time=await api.request.get(base+'/api/time');
+if(!time.ok()) throw new Error('time endpoint failed '+time.status());
+const timeJson=await time.json();
+if(timeJson.timeZone!=='Europe/Rome'||!timeJson.epochMs) throw new Error('invalid authoritative time payload');
+const robots=await api.request.get(base+'/robots.txt');
+if(!robots.ok()) throw new Error('robots.txt missing');
+const sitemap=await api.request.get(base+'/sitemap.xml');
+if(!sitemap.ok()) throw new Error('sitemap.xml missing');
 await api.close();
 
 if(allErrors.length) throw new Error('browser errors: '+allErrors.join(' || '));
