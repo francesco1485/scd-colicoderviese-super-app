@@ -161,7 +161,7 @@
         '<button data-r24-route="services"><span>◆</span><b>World</b><small>Kit, sponsor, eventi, Club</small></button>'+
         '<button data-r24-route="profile"><span>●</span><b>SCD ID</b><small>Account, ruoli, relazioni</small></button>'+
       '</div></section>'+
-      '<section class="r26-data-status"><div><span></span><b>DATA FABRIC</b><small>Drive · Gmail · R20 · Sheets · fonti verificate</small></div><div><b>'+esc(state.apiStatus==='ok'?'ONLINE':'SYNC')+'</b><small>stato rete</small></div></section>';
+      '<section class="r26-data-status"><div><span></span><b>DATA FABRIC</b><small>'+esc(role==='staff'&&featureEnabled('dataFabricObservability')?'Drive · Gmail · R20 · provenienza disponibile in Direzione':'R20 · fonti pubbliche · stato rete verificabile')+'</small></div><div><b>'+esc(state.apiStatus==='online'?'ONLINE':state.apiStatus==='partial'?'RESILIENTE':'CHECK')+'</b><small>stato rete</small></div></section>';
 
       outlet.querySelectorAll('[data-r26-event]').forEach(b=>b.onclick=()=>openCalendarEvent(b.dataset.r26Event));
       const sync=outlet.querySelector('#r26PulseSync');
@@ -346,11 +346,11 @@
       (staff?'<button id="r24Attendance"><span>✓</span><b>Presenze</b><small>Registro squadra</small></button><button id="r24Convocations"><span>⚽</span><b>Convocazioni</b><small>Crea e gestisci</small></button><button id="r24Messages"><span>✉</span><b>Comunicazioni</b><small>Messaggi operativi</small></button>':'')+
       '<button id="r24Requests"><span>☑</span><b>Richieste</b><small>Invii e stato</small></button>'+
       '<button id="r24Transport"><span>▰</span><b>Pulmini</b><small>Trasporti</small></button>'+
-      (dir?'<button id="r24Access"><span>♙</span><b>Utenti & permessi</b><small>Direzione</small></button><button id="r24Evolution"><span>↗</span><b>Evolution Queue</b><small>Miglioramenti</small></button><button id="r24Diagnostics"><span>⌁</span><b>Diagnostica</b><small>Stato tecnico</small></button>':'')+
+      (dir?'<button id="r24Access"><span>♙</span><b>Utenti & permessi</b><small>Direzione</small></button><button id="r24Evolution"><span>↗</span><b>Evolution Queue</b><small>Miglioramenti</small></button><button id="r24Diagnostics"><span>⌁</span><b>Diagnostica</b><small>Stato tecnico</small></button>'+(featureEnabled('dataFabricObservability')?'<button id="r28DataFabric"><span>◎</span><b>Data Fabric</b><small>Fonti · sync · provenienza</small></button>':''):'')+
       '</section><div class="r24-staff-actions"><button class="outline" id="r24StaffSync">SINCRONIZZA</button><button class="outline danger-soft" id="r24StaffLogout">ESCI</button></div>';
       const bind=(id,fn)=>{const el=outlet.querySelector(id);if(el)el.onclick=fn};
       bind('#r24Attendance',openAttendanceManager);bind('#r24Convocations',openConvocationManager);bind('#r24Messages',openMessageManager);
-      bind('#r24Requests',openMyRequests);bind('#r24Transport',openTransportManager);bind('#r24Access',openAccessManager);bind('#r24Evolution',openEvolutionManager);bind('#r24Diagnostics',openDiagnosticsManager);
+      bind('#r24Requests',openMyRequests);bind('#r24Transport',openTransportManager);bind('#r24Access',openAccessManager);bind('#r24Evolution',openEvolutionManager);bind('#r24Diagnostics',openDiagnosticsManager);bind('#r28DataFabric',openDataFabricManager);
       bind('#r24StaffSync',async()=>{try{state.privateData=await mgmtApi('dashboard.summary');toast('Area aggiornata');this.render('staff')}catch(e){toast(e.message||'Sincronizzazione non riuscita')}});
       bind('#r24StaffLogout',()=>{clearSession();toast('Sessione chiusa');this.go('profile')});
       this.bindCommon(outlet);
@@ -361,6 +361,7 @@
       const profile=document.querySelector('#mobileProfile');if(profile)profile.onclick=()=>this.go('profile');
       const settings=document.querySelector('#mobileSettings');if(settings)settings.onclick=()=>this.go('profile');
       window.addEventListener('hashchange',()=>this.render(this.route()));
+      window.addEventListener('scd:capabilities',()=>this.render(this.route()));
       const legacyManagement=window.openManagementHome;
       window.openManagementHome=(data)=>{
         state.privateData=data||state.privateData||{};
