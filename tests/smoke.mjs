@@ -65,11 +65,15 @@ for(const viewport of viewports){
   await page.waitForSelector('#publicActionForm');
   await page.click('#modalClose');
 
-  await page.locator('.service-grid [data-action="avatar"]').click();
+  await page.click('#mobileProfile');
+  await page.waitForSelector('.profile-app-screen');
+  await page.click('#profileAvatar');
   await page.waitForSelector('#avatarPreview');
   await page.click('#modalClose');
 
-  await page.click('[data-action="requests"]');
+  await page.click('#mobileProfile');
+  await page.waitForSelector('.profile-app-screen');
+  await page.click('#profileRequests');
   await page.waitForSelector('#requestHistoryMount');
   await page.click('#modalClose');
 
