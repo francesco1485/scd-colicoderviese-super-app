@@ -96,3 +96,34 @@
   .ai-profile{grid-template-columns:72px 1fr}
   .ai-profile img{width:72px;height:88px}
 }
+
+.network-flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:16px 18px;border-bottom:1px solid #ecebe6;background:#fbfbf8}
+.network-flow span{background:#eef4ec;border:1px solid #d8e2d3;color:#3d5539;padding:7px 9px;border-radius:9px;font-size:9px;font-weight:900}
+.network-flow b{color:#94a398;font-size:11px}
+.portfolio-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:16px}
+.portfolio-card{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff}
+.portfolio-card.central{background:linear-gradient(145deg,#eef4f7,#fff);border-color:#cbd8df}
+.portfolio-card h4{margin:3px 0 9px;color:var(--navy);font-size:13px}
+.portfolio-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:9px}
+.portfolio-metrics div{background:#f7f7f3;border-radius:9px;padding:8px}
+.portfolio-metrics strong{display:block;color:var(--navy);font-size:15px}
+.portfolio-metrics span{font-size:8px;color:var(--muted)}
+.portfolio-card p{font-size:9px;line-height:1.45;color:var(--muted);margin:5px 0}
+.portfolio-mix{display:flex;gap:5px;flex-wrap:wrap;margin-top:9px}
+.portfolio-mix span{font-size:8px;padding:4px 6px;border-radius:999px;background:#eff1ef;color:#56645d}
+.readiness-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:16px}
+.readiness-card{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff}
+.readiness-card h4{margin:4px 0;color:var(--navy);font-size:12px}
+.readiness-card p{font-size:9px;line-height:1.48;color:var(--muted);margin:4px 0}
+.readiness-top{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.readiness-status{font-size:8px;font-weight:900;text-transform:uppercase;padding:4px 7px;border-radius:999px;background:#f0f1ef;color:#5e6762}
+.readiness-status.ready,.readiness-status.verified{background:var(--green-soft);color:#45623a}
+.readiness-status.in_progress{background:var(--blue-soft);color:#3f6276}
+.readiness-status.blocked{background:#f7e8e5;color:#8b4038}
+.knowledge-list{display:grid;gap:7px;margin-top:12px}
+.knowledge-item{border:1px solid #e0e4df;border-radius:10px;padding:9px;background:#fafbf8}
+.knowledge-item strong{display:block;font-size:10px;color:var(--navy)}
+.knowledge-item small{display:block;font-size:8px;line-height:1.4;color:var(--muted);margin-top:3px}
+.knowledge-item .tag{margin-top:5px}
+@media(max-width:900px){.portfolio-grid{grid-template-columns:1fr 1fr}.readiness-grid{grid-template-columns:1fr}}
+@media(max-width:560px){.portfolio-grid{grid-template-columns:1fr}.portfolio-metrics{grid-template-columns:1fr 1fr 1fr}}
