@@ -4,7 +4,7 @@ const path = require('path');
 const { URL } = require('url');
 
 const PORT = process.env.PORT || 10000;
-const ROOT = __dirname;
+const ROOT = process.env.SCD_STATIC_DIR ? path.resolve(__dirname,process.env.SCD_STATIC_DIR) : __dirname;
 const UPSTREAM = process.env.SCD_APPS_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbwYQ_3yLYsp-6jX3FIgufBjpmaZb9uO1AklF9hdG-CuLII9J4ITUX1EA-EKuWXBMEc/exec';
 const CACHE_TTL = 10 * 60 * 1000;
 const CLUB_TIME_ZONE = 'Europe/Rome';
@@ -127,9 +127,9 @@ function serveStatic(req,res){
 http.createServer(async(req,res)=>{
   applyCors(req,res); if(req.method==='OPTIONS'){res.writeHead(204);return res.end()}
   const u=new URL(req.url,'http://localhost');
-  if(u.pathname==='/health') return json(res,200,{...clubTimePayload(),service:'SCD Super App',version:'21.14.0'});
+  if(u.pathname==='/health') return json(res,200,{...clubTimePayload(),service:'SCD Super App',version:'21.15.0'});
   if(u.pathname==='/api/time') return json(res,200,clubTimePayload());
-  if(u.pathname==='/api/capabilities') return json(res,200,{ok:true,version:'21.14.0',mode:'GITHUB_PAGES_TO_RENDER_PROXY_TO_R20',actions:[...allowedActions].sort(),isolated:['safeguarding']});
+  if(u.pathname==='/api/capabilities') return json(res,200,{ok:true,version:'21.15.0',mode:'GITHUB_PAGES_TO_RENDER_PROXY_TO_R20',actions:[...allowedActions].sort(),isolated:['safeguarding']});
   if(u.pathname==='/api/scd') return proxyAppsScript(req,res);
   if(u.pathname==='/api/public') return json(res,200,await fetchPublicFeed(),{'cache-control':'no-store'});
   if(u.pathname==='/api/live') {try{return json(res,200,await getLiveRadar(),{'cache-control':'public, max-age=120'})}catch(e){return json(res,500,{ok:false,error:e.message})}}

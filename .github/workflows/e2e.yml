@@ -25,9 +25,11 @@ jobs:
         run: npm run test:contract
       - run: npm install --no-save playwright
       - run: npx playwright install --with-deps chromium
-      - name: Start SCD server
+      - name: Build exact Pages artifact
+        run: npm run build:pages
+      - name: Start SCD server from Pages artifact
         run: |
-          npm start > /tmp/scd-server.log 2>&1 &
+          SCD_STATIC_DIR=_site npm start > /tmp/scd-server.log 2>&1 &
           echo $! > /tmp/scd-server.pid
           for i in {1..30}; do
             if curl -fsS http://127.0.0.1:10000/health >/dev/null; then exit 0; fi
@@ -44,7 +46,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: scd-r21-12-visual-qa
+          name: scd-r21-15-runtime-visual-qa
           path: test-output/*.png
           if-no-files-found: ignore
           retention-days: 14

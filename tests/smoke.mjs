@@ -7,7 +7,8 @@ const viewports=[
   {width:360,height:800},
   {width:390,height:844},
   {width:393,height:852},
-  {width:430,height:932}
+  {width:430,height:932},
+  {width:1440,height:900}
 ];
 
 const browser=await chromium.launch({headless:true});
@@ -31,6 +32,11 @@ for(const viewport of viewports){
   await page.waitForSelector('.home-kpis');
   await page.waitForSelector('.mobile-nav [data-nav="calendar"]');
   if(viewport.width===390) await page.screenshot({path:'test-output/home-390x844.png',fullPage:true});
+  if(viewport.width===1440){
+    const shellWidth=await page.locator('.app-shell').evaluate(el=>Math.round(el.getBoundingClientRect().width));
+    if(shellWidth>430) throw new Error('desktop browser escaped canonical app shell: '+shellWidth+'px');
+    await page.screenshot({path:'test-output/home-desktop-app-shell-1440x900.png',fullPage:true});
+  }
   await page.waitForFunction(()=>document.documentElement.scrollWidth<=window.innerWidth+3);
   await page.waitForSelector('#clubClock');
   await page.waitForFunction(()=>document.querySelector('#clubClock')?.textContent?.length>8);
@@ -40,6 +46,10 @@ for(const viewport of viewports){
   await page.waitForSelector('.calendar-tabs');
   await page.waitForSelector('#calendarRows');
   if(viewport.width===390) await page.screenshot({path:'test-output/calendar-390x844.png',fullPage:true});
+  await page.click('#modalClose');
+
+  await page.locator('.mobile-nav [data-action="events"]').click();
+  await page.waitForSelector('.communications-app-screen');
   await page.click('#modalClose');
 
   await page.locator('[data-action="teams"]').first().click();
@@ -55,16 +65,22 @@ for(const viewport of viewports){
   await page.waitForSelector('#publicActionForm');
   await page.click('#modalClose');
 
-  await page.locator('.service-grid [data-action="avatar"]').click();
+  await page.click('#mobileProfile');
+  await page.waitForSelector('.profile-app-screen');
+  await page.click('#profileAvatar');
   await page.waitForSelector('#avatarPreview');
   await page.click('#modalClose');
 
-  await page.click('[data-action="requests"]');
+  await page.click('#mobileProfile');
+  await page.waitForSelector('.profile-app-screen');
+  await page.click('#profileRequests');
   await page.waitForSelector('#requestHistoryMount');
   await page.click('#modalClose');
 
   const safeBefore=apiActions.length;
-  await page.locator('[data-action="safeguarding"]').first().click();
+  await page.click('#mobileProfile');
+  await page.waitForSelector('.profile-app-screen');
+  await page.click('#profileSafeguarding');
   await page.waitForSelector('#safeForm');
   await page.fill('#safeMessage','QA safeguarding local-only');
   await page.click('#safeForm button[type="submit"]');
