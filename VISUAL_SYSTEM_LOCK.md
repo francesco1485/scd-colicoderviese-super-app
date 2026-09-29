@@ -1,4 +1,4 @@
-# SCD ColicoDerviese — Visual System Lock R21.11
+> **NON NORMATIVO / STORICO.** La fonte normativa unica e machine-readable del progetto è [`SCD_SYSTEM_MANIFEST.json`](./SCD_SYSTEM_MANIFEST.json). In caso di conflitto prevale sempre il manifest. Questo file resta come memoria e specifica di supporto.\n\n# SCD ColicoDerviese — Visual System Lock R21.11
 
 Questo file è la costituzione visiva della Super App. Ogni evoluzione futura deve rispettare questi principi salvo approvazione esplicita della Direzione.
 
