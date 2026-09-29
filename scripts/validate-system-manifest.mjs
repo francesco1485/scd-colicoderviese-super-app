@@ -164,7 +164,8 @@ const requiredRepoFiles=[
   'scripts/validate-system-manifest.mjs',
   'PROJECT_CONSTITUTION.md',
   'SCD_PERMANENT_COMMANDS.md',
-  'VISUAL_SYSTEM_LOCK.md'
+  'VISUAL_SYSTEM_LOCK.md',
+  '.github/workflows/manifest-pr-policy.yml'
 ];
 for(const file of requiredRepoFiles){
   assert(fs.existsSync(path.join(root,file)),'required governance file missing: '+file);
