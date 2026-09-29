@@ -94,7 +94,7 @@ for(const viewport of viewports){
       openManagementHome({
         user:{name:'QA SCD',email:'qa@example.test',role:'STAFF',area:'U16',staff:true},
         permissions:{direction:true,manageAccess:true},
-        personal:[{firstName:'Atleta',lastName:'Test',teamName:'U16',figcStatus:'TESSERATO',certificateStatus:'VALIDO'}],
+        personal:[{code:'P001',firstName:'Luca',lastName:'Test',teamName:'U16 Elite',figcStatus:'TESSERATO',certificateStatus:'VALIDO'},{code:'P002',firstName:'Emma',lastName:'Test',teamName:'U12',figcStatus:'TESSERATA',certificateStatus:'VALIDO'}],
         teams:[{key:'U16',name:'U16 Elite'}],
         attendance:{teams:[{key:'U16',name:'U16 Elite'}]},
         roster:{U16:[{code:'P001',name:'Giocatore Test'}]},
@@ -107,6 +107,14 @@ for(const viewport of viewports){
     await page.waitForSelector('.mgmt-grid');
     await page.waitForSelector('.mgmt-detail');
     await page.screenshot({path:'test-output/staff-direction-390x844.png',fullPage:true});
+
+    await page.click('#mgmtProfiles');
+    await page.waitForSelector('.reserved-app-screen');
+    await page.waitForSelector('.athlete-hero');
+    await page.waitForSelector('.family-profile-strip');
+    await page.screenshot({path:'test-output/family-athlete-390x844.png',fullPage:true});
+    await page.click('#reservedBack');
+    await page.waitForSelector('.mgmt-grid');
 
     await page.click('#mgmtAttendance');
     await page.waitForSelector('#attTeam');

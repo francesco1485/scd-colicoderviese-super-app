@@ -44,7 +44,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: scd-r21-11-visual-qa
+          name: scd-r21-12-visual-qa
           path: test-output/*.png
           if-no-files-found: ignore
           retention-days: 14
