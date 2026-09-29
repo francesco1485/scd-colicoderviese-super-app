@@ -459,3 +459,24 @@ function r25InstallDataFabricTriggers() {
     installedAt:new Date().toISOString()
   };
 }
+
+
+/* R29 — safe public runtime contract probe.
+ * Espone soltanto schema/versione, mai contenuti Gmail/Drive o dati personali.
+ */
+function r29DataFabricContract_() {
+  return {
+    ok:true,
+    release:'R29',
+    contractVersion:'1.0.0',
+    capability:'CAP-DATAFABRIC-OBSERVABILITY',
+    featureFlag:'FF-DATAFABRIC-OBSERVABILITY',
+    sources:['SCD_GMAIL','SCD_DRIVE','R20'],
+    observabilityFields:['status','lastSync','lastSuccess','lastError','lastResult'],
+    provenanceFields:['SOURCE','TABLE','FIELD','API','FALLBACK','REFRESH'],
+    privateStatusAction:'direction.datafabric.status',
+    destructiveAutoWrite:false,
+    safeguarding:'ISOLATED',
+    checkedAt:new Date().toISOString()
+  };
+}
