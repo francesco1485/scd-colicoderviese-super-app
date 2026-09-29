@@ -1,10 +1,10 @@
 import { Queue, QueueEvents } from "bullmq";
-import type IORedis from "ioredis";
+import type { Redis } from "ioredis";
 import type { CommandJobData } from "./types.js";
 
 export const COMMAND_QUEUE = "scd-commands";
 
-export function createCommandQueue(connection: IORedis): Queue<CommandJobData> {
+export function createCommandQueue(connection: Redis): Queue<CommandJobData> {
   return new Queue<CommandJobData>(COMMAND_QUEUE, {
     connection,
     defaultJobOptions: {
@@ -16,6 +16,6 @@ export function createCommandQueue(connection: IORedis): Queue<CommandJobData> {
   });
 }
 
-export function createCommandQueueEvents(connection: IORedis): QueueEvents {
+export function createCommandQueueEvents(connection: Redis): QueueEvents {
   return new QueueEvents(COMMAND_QUEUE, { connection });
 }
