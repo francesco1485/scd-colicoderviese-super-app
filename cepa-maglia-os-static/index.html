@@ -215,7 +215,16 @@
 
       <section id="partnerDocumentsSection" class="partner-section hidden">
         <div class="section-actions"><button id="addPartnerDocumentBtn" class="primary hidden">+ Registra documento</button></div>
-        <div id="partnerDocuments" class="document-grid"></div>
+        <div class="two-col">
+          <article class="panel">
+            <div class="panel-head"><div><div class="eyebrow">DOSSIER MINIMO</div><h3>Cosa deve esserci</h3></div><span id="partnerDocCoverage" class="future-chip">-</span></div>
+            <div id="partnerDocRequirements" class="requirements-list"></div>
+          </article>
+          <article class="panel">
+            <div class="panel-head"><div><div class="eyebrow">DOCUMENTI REGISTRATI</div><h3>Archivio del rapporto</h3></div></div>
+            <div id="partnerDocuments" class="document-grid compact-docs"></div>
+          </article>
+        </div>
       </section>
 
       <section id="partnerProjectsSection" class="partner-section hidden">
