@@ -1,0 +1,72 @@
+{
+  "schema_version": "1.0.0",
+  "release": "R33",
+  "purpose": "Fondazione del nuovo Domain Core SCD PULSE su Supabase/PostgreSQL, separato da CEPA Maglia OS e attivato per migrazione progressiva senza interrompere R20.",
+  "project": {
+    "state": "PENDING_DEDICATED_PROJECT",
+    "dedicated_project_required": true,
+    "reuse_cepa_project": false,
+    "preferred_region": "eu-central-1",
+    "creation_requires_explicit_cost_confirmation": true,
+    "public_env": {
+      "url": "VITE_SCD_SUPABASE_URL",
+      "publishable_key": "VITE_SCD_SUPABASE_PUBLISHABLE_KEY"
+    },
+    "server_env": {
+      "url": "SCD_SUPABASE_URL",
+      "service_role_key": "SCD_SUPABASE_SERVICE_ROLE_KEY"
+    },
+    "secret_policy": "SERVER_SECRETS_NEVER_COMMITTED_OR_EXPOSED_TO_CLIENT"
+  },
+  "target_runtime": {
+    "database": "SUPABASE_POSTGRESQL",
+    "auth": "SUPABASE_AUTH",
+    "storage": "SUPABASE_STORAGE",
+    "realtime": "SUPABASE_REALTIME",
+    "web": "REACT_TYPESCRIPT",
+    "pwa": "SAME_WEB_PRODUCT",
+    "mobile": "REACT_NATIVE_EXPO",
+    "orchestration": "R22_COMMAND_PLATFORM_OR_EDGE_FUNCTIONS"
+  },
+  "migration_mode": "STRANGLER_DUAL_RUN",
+  "legacy_adapters": [
+    "R20",
+    "SCD_DRIVE",
+    "SCD_GMAIL",
+    "CORE_SHEET",
+    "TESSERATI_SHEET",
+    "PULMINI_SHEET"
+  ],
+  "domain_core": {
+    "migration": "supabase/migrations/20260929_r33_club_graph_foundation.sql",
+    "stable_ids": [
+      "ORGANIZATION_ID",
+      "PERSON_ID",
+      "FAMILY_ID",
+      "ATHLETE_ID",
+      "TEAM_ID",
+      "EVENT_ID",
+      "DOCUMENT_ID"
+    ],
+    "event_principle": "ONE_EVENT_ID_MULTIPLE_PROJECTIONS",
+    "provenance_required": true,
+    "rls_required": true,
+    "server_side_role_assignment": true
+  },
+  "activation": {
+    "feature_flag": "FF-SUPABASE-CORE",
+    "runtime_env": "SCD_FEATURE_SUPABASE_CORE",
+    "default_enabled": false,
+    "required_before_enable": [
+      "DEDICATED_SUPABASE_PROJECT_CREATED",
+      "MIGRATION_APPLIED",
+      "RLS_SECURITY_ADVISORS_REVIEWED",
+      "AUTH_ROLE_SCOPE_TESTS_GREEN",
+      "R20_DUAL_READ_COMPARE_GREEN",
+      "WEB_VERTICAL_SLICE_GREEN",
+      "MOBILE_VERTICAL_SLICE_GREEN",
+      "ROLLBACK_PROVEN"
+    ],
+    "rollback": "SET_SCD_FEATURE_SUPABASE_CORE_FALSE_AND_KEEP_R20_PRIMARY"
+  }
+}
