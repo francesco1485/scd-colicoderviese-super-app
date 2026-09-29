@@ -29,6 +29,16 @@ function applyCors(req,res){
   res.setHeader('access-control-max-age','86400');
 }
 
+const READ_ONLY_RETRY_ACTIONS = new Set([
+  'public.feed','public.club','public.calendar','public.datafabric.contract',
+  'dashboard.summary','private.dashboard','private.week','account.requests',
+  'private.attendance.get','auth.validate','direction.diagnostics',
+  'direction.evolution','direction.datafabric.status'
+]);
+const UPSTREAM_READ_ATTEMPTS = 2;
+const UPSTREAM_RETRY_DELAY_MS = 450;
+const wait = ms => new Promise(resolve=>setTimeout(resolve,ms));
+
 const allowedActions = new Set([
   'dashboard.summary','private.dashboard','private.week','account.requests',
   'private.request.submit','private.transport.request','private.message.send',
@@ -67,23 +77,51 @@ function readBody(req){return new Promise((resolve,reject)=>{let s='';req.on('da
 function stripHtml(s=''){return String(s).replace(/<[^>]*>/g,' ').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/&#8217;/g,"'").replace(/\s+/g,' ').trim()}
 function decodeXml(s=''){return String(s).replace(/<!\[CDATA\[|\]\]>/g,'').replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>')}
 
+async function callAppsScript(action,payload={},sessionToken=''){
+  const maxAttempts=READ_ONLY_RETRY_ACTIONS.has(action)?UPSTREAM_READ_ATTEMPTS:1;
+  let lastError;
+  for(let attempt=1;attempt<=maxAttempts;attempt++){
+    try{
+      const upstream=await fetch(UPSTREAM,{
+        method:'POST',
+        redirect:'follow',
+        headers:{'content-type':'application/json','user-agent':'SCD-ColicoDerviese-Bridge/30.0'},
+        body:JSON.stringify({action,payload,sessionToken})
+      });
+      const text=await upstream.text();
+      let parsed;
+      try{parsed=JSON.parse(text)}
+      catch{
+        const err=new Error('Risposta backend non valida');
+        err.code='UPSTREAM_INVALID_JSON';
+        err.httpStatus=upstream.status;
+        throw err;
+      }
+      return {upstream,parsed,attempt};
+    }catch(error){
+      lastError=error;
+      if(attempt>=maxAttempts) break;
+      console.warn('[api/scd] retry read-only',action,'attempt',attempt,'reason',error.code||error.message||error);
+      await wait(UPSTREAM_RETRY_DELAY_MS);
+    }
+  }
+  throw lastError||new Error('Backend SCD non disponibile');
+}
+
 async function proxyAppsScript(req,res){
   if(req.method!=='POST') return json(res,405,{ok:false,error:'Metodo non consentito'});
   try{
     const raw = await readBody(req); const body = JSON.parse(raw||'{}'); const action=String(body.action||''); const started=Date.now(); console.log('[api/scd] incoming',action,req.headers.origin||'server');
     if(!allowedActions.has(action)) return json(res,400,{ok:false,error:'Azione non consentita'});
-    const upstream = await fetch(UPSTREAM,{method:'POST',redirect:'follow',headers:{'content-type':'application/json'},body:JSON.stringify({action,payload:body.payload||{},sessionToken:body.sessionToken||''})});
-    const text = await upstream.text(); let parsed;
-    try{parsed=JSON.parse(text)}catch{throw new Error('Risposta backend non valida')}
-    console.log('[api/scd] upstream',action,upstream.status,(Date.now()-started)+'ms'); return json(res,upstream.ok?200:400,parsed);
+    const {upstream,parsed,attempt}=await callAppsScript(action,body.payload||{},body.sessionToken||'');
+    console.log('[api/scd] upstream',action,upstream.status,(Date.now()-started)+'ms','attempt',attempt); return json(res,upstream.ok?200:400,parsed);
   }catch(e){console.error('[api/scd] failed',e.message||e);return json(res,502,{ok:false,error:e.message||'Backend SCD non disponibile'})}
 }
 
 
 async function fetchPublicFeed(){
   try{
-    const upstream=await fetch(UPSTREAM,{method:'POST',redirect:'follow',headers:{'content-type':'application/json'},body:JSON.stringify({action:'public.feed',payload:{limit:40},sessionToken:''})});
-    const text=await upstream.text(); const parsed=JSON.parse(text);
+    const {parsed}=await callAppsScript('public.feed',{limit:40},'');
     return parsed;
   }catch(e){return {ok:false,error:String(e.message||e)}}
 }
@@ -131,9 +169,9 @@ function serveStatic(req,res){
 http.createServer(async(req,res)=>{
   applyCors(req,res); if(req.method==='OPTIONS'){res.writeHead(204);return res.end()}
   const u=new URL(req.url,'http://localhost');
-  if(u.pathname==='/health') return json(res,200,{...clubTimePayload(),service:'SCD Super App',version:'29.0.0'});
+  if(u.pathname==='/health') return json(res,200,{...clubTimePayload(),service:'SCD Super App',version:'30.0.0'});
   if(u.pathname==='/api/time') return json(res,200,clubTimePayload());
-  if(u.pathname==='/api/capabilities') return json(res,200,{ok:true,version:'29.0.0',mode:'GITHUB_PAGES_TO_RENDER_PROXY_TO_R20',actions:[...allowedActions].sort(),featureFlags:FEATURE_FLAGS,isolated:['safeguarding']});
+  if(u.pathname==='/api/capabilities') return json(res,200,{ok:true,version:'30.0.0',mode:'GITHUB_PAGES_TO_RENDER_PROXY_TO_R20',actions:[...allowedActions].sort(),featureFlags:FEATURE_FLAGS,isolated:['safeguarding']});
   if(u.pathname==='/api/scd') return proxyAppsScript(req,res);
   if(u.pathname==='/api/public') return json(res,200,await fetchPublicFeed(),{'cache-control':'no-store'});
   if(u.pathname==='/api/live') {try{return json(res,200,await getLiveRadar(),{'cache-control':'public, max-age=120'})}catch(e){return json(res,500,{ok:false,error:e.message})}}
