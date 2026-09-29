@@ -41,6 +41,10 @@ function doPost(e) {
         if (typeof r21RecordTelemetry_ !== 'function') return r21Json_({ok:true,data:{stored:false}});
         data = r21RecordTelemetry_(payload);
         break;
+      case 'public.datafabric.contract':
+        if (typeof r29DataFabricContract_ !== 'function') throw new Error('Modulo R29 Data Fabric contract non installato');
+        data = r29DataFabricContract_();
+        break;
       case 'safeguarding.submit':
         data = {stored:false,isolated:true,channel:'PEC',pec:'calciocolicoderviese@pec.it',message:'Safeguarding separato dai flussi ordinari.'};
         break;

@@ -16,7 +16,7 @@ if(serverOnly.length||bridgeOnly.length){
 }
 
 const required=[
-  'public.feed','public.register','public.registration','public.partnerLead','public.communitySubmit','public.ticketSubmit','public.telemetry',
+  'public.feed','public.register','public.registration','public.partnerLead','public.communitySubmit','public.ticketSubmit','public.telemetry','public.datafabric.contract',
   'auth.request','auth.login','auth.validate','auth.pin.change',
   'dashboard.summary','account.requests','private.request.submit','private.transport.request','private.message.send',
   'private.convocation.create','private.convocation.reply','private.attendance.get','private.attendance.save',

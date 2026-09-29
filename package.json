@@ -1,19 +1,20 @@
 {
   "name": "scd-colicoderviese-super-app",
-  "version": "28.0.0",
+  "version": "29.0.0",
   "private": true,
   "engines": {
     "node": ">=20"
   },
   "scripts": {
     "start": "node server.js",
-    "check": "npm run test:manifest && node --check server.js && node --check app.js && node --check app-r24-router.js",
+    "check": "npm run test:manifest && node --check server.js && node --check app.js && node --check app-r24-router.js && node --check scripts/verify-production.mjs",
     "build": "npm run check",
     "test:smoke": "node tests/smoke.mjs",
     "test:contract": "node tests/api-contract.mjs",
     "test": "npm run test:contract && npm run test:smoke",
     "build:pages": "node scripts/build-pages.mjs",
     "test:pages": "npm run build:pages && SCD_STATIC_DIR=_site npm run test:smoke",
-    "test:manifest": "node scripts/validate-system-manifest.mjs"
+    "test:manifest": "node scripts/validate-system-manifest.mjs",
+    "verify:production": "node scripts/verify-production.mjs"
   }
 }

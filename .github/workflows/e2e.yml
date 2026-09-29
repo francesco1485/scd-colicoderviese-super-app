@@ -24,6 +24,7 @@ jobs:
           node --check app.js
           node --check app-r24-router.js
           node --check server.js
+          node --check scripts/verify-production.mjs
       - name: API contract gate
         run: npm run test:contract
       - run: npm install --no-save playwright
