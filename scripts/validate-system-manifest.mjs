@@ -164,6 +164,9 @@ includesAll(stateGate.allowed_status_values||[],['VERIFIED','UNVERIFIED','NOT_AV
 includesAll(m.development_contract?.operating_cycle||[],['SCD:STATE','SCD:INVENTORY','SCD:GAP','SCD:PLAN','SCD:BUILD','SCD:DATA','SCD:QA','SCD:MERGE','SCD:DEPLOY','SCD:PROVE','SCD:ROLLBACK'],'development operating cycle');
 const releaseEvidence=m.delivery_and_quality?.release_truth?.required_evidence||[];
 includesAll(releaseEvidence,['VERSION','COMMIT','PR','CI_STATUS','SCREENSHOT_MOBILE','SCREENSHOT_DESKTOP','DATA_SOURCES','KNOWN_LIMITATIONS','ROLLBACK'],'release evidence');
+assert(m.delivery_and_quality?.production_evidence?.required===true,'production evidence must remain required');
+assert(m.delivery_and_quality?.production_evidence?.workflow==='.github/workflows/production-evidence.yml','production evidence workflow mismatch');
+assert(m.delivery_and_quality?.production_evidence?.r20_contract_action==='public.datafabric.contract','R20 public contract probe mismatch');
 const r25r26=(m.development_contract?.release_dependencies||[]).find(x=>x.predecessor==='R25'&&x.successor==='R26');
 assert(r25r26?.relation==='REQUIRED_PREDECESSOR','R25 -> R26 dependency must remain explicit');
 assert(r25r26?.status==='SATISFIED_IN_MAIN','R25 -> R26 dependency must be recorded as satisfied in main');
@@ -175,7 +178,7 @@ for(const cap of caps){
   assert(['IMPLEMENTED','INTERNAL_TEST','PARTIAL','REBUILD_REQUIRED','PLANNED','DESIGN_ONLY','ROADMAP'].includes(cap.state),'invalid capability state '+cap.id);
 }
 includesAll(caps.map(x=>x.id),[
-  'CAP-HOME','CAP-CALENDAR','CAP-ATHLETE','CAP-FAMILY','CAP-STAFF','CAP-COMMS',
+  'CAP-HOME','CAP-CALENDAR','CAP-ATHLETE','CAP-FAMILY','CAP-STAFF','CAP-COMMS','CAP-RUNTIME-EVIDENCE',
   'CAP-DRIVE-CATALOG','CAP-GMAIL-INGESTION','CAP-DATAFABRIC-OBSERVABILITY','CAP-ENTITY-GRAPH','CAP-COMPLETENESS',
   'CAP-CHAT','CAP-CONFIDENCE','CAP-ANCONFIDENCE','CAP-SAFEGUARDING','CAP-SKY','CAP-AVATAR',
   'CAP-TAMAGOTCHI','CAP-GEO','CAP-R22','CAP-PWA','CAP-ANDROID','CAP-IOS'
@@ -195,7 +198,10 @@ const requiredRepoFiles=[
   'VISUAL_SYSTEM_LOCK.md',
   '.github/workflows/manifest-pr-policy.yml',
   'docs/adr/ADR-0001-scd-state-hard-gate.md',
-  'docs/adr/ADR-0002-datafabric-observability.md'
+  'docs/adr/ADR-0002-datafabric-observability.md',
+  'docs/adr/ADR-0003-production-evidence.md',
+  'scripts/verify-production.mjs',
+  '.github/workflows/production-evidence.yml'
 ];
 for(const file of requiredRepoFiles){
   assert(fs.existsSync(path.join(root,file)),'required governance file missing: '+file);
