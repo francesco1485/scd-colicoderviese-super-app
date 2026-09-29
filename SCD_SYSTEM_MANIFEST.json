@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "1.9.0",
+    "version": "2.0.0",
     "effective_at": "2026-09-29",
     "status": "BINDING",
     "language": "it-IT",
@@ -841,7 +841,7 @@
           "DOCUMENTS",
           "AUDIT"
         ],
-        "state": "PENDING_DEDICATED_PROJECT",
+        "state": "ACTIVE_HEALTHY",
         "rules": [
           "dedicated_project_only",
           "cepa_project_must_not_be_reused",
@@ -849,7 +849,9 @@
           "server_side_role_assignment",
           "no_service_role_in_client",
           "dual_run_before_primary"
-        ]
+        ],
+        "project_id": "ndevtxxijbcnskgysdit",
+        "region": "eu-central-1"
       }
     ],
     "conflict_resolution": [
@@ -1779,8 +1781,8 @@
     {
       "id": "GAP-CORE-001",
       "severity": "HIGH",
-      "statement": "SCD PULSE non dispone ancora di un progetto Supabase dedicato; il Domain Core runtime resta R20/Google mentre lo schema Supabase è solo preparato nel repository.",
-      "required_fix": "Creare un progetto Supabase dedicato SCD con conferma costi, applicare R33 migration, verificare RLS/Auth, eseguire dual-read R20→Supabase e attivare FF-SUPABASE-CORE soltanto dopo vertical slice Web e mobile verdi.",
+      "statement": "Il progetto Supabase dedicato SCD PULSE è stato creato e la migration R33 è applicata; restano da completare hardening performance, Auth/RLS role-scope tests, dual-read R20→Supabase e vertical slice Web/mobile prima del cutover.",
+      "required_fix": "Completare R34 hardening, test Auth/RLS, dual-read, Web slice, mobile slice e rollback; solo dopo valutare FF-SUPABASE-CORE=true.",
       "safe_runtime_behavior": "R20 resta primary; SCD_SUPABASE resta dark e non viene dichiarato LIVE."
     }
   ],
@@ -1914,7 +1916,7 @@
     "supabase_transition": {
       "release": "R33",
       "mode": "STRANGLER_DUAL_RUN",
-      "project_state": "NOT_CREATED",
+      "project_state": "ACTIVE_HEALTHY",
       "project_creation_requires_user_cost_confirmation": true,
       "dedicated_project_required": true,
       "reuse_cepa_project": false,
@@ -1924,7 +1926,9 @@
       "current_primary": "R20",
       "target_primary": "SCD_SUPABASE",
       "no_big_bang": true,
-      "no_legacy_delete_before_cutover": true
+      "no_legacy_delete_before_cutover": true,
+      "project_id": "ndevtxxijbcnskgysdit",
+      "migration_state": "R33_APPLIED_R34_HARDENING_PENDING_CI"
     }
   },
   "product_direction": {
