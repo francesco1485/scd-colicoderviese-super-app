@@ -44,6 +44,9 @@ assert(m.manifest.status==='BINDING','manifest must remain BINDING');
 assert(m.manifest.timezone==='Europe/Rome','manifest timezone must be Europe/Rome');
 assert(m.manifest.change_policy?.manifest_first===true,'manifest-first governance must remain enabled');
 assert(m.manifest.change_policy?.no_silent_reinterpretation===true,'silent reinterpretation must stay forbidden');
+assert(m.manifest.change_policy?.state_first===true,'state-first governance must remain enabled');
+assert(m.manifest.change_policy?.no_write_without_verified_state===true,'NO STATE -> NO WRITE must remain enabled');
+assert(m.manifest.change_policy?.unverified_is_not_false_or_absent===true,'UNVERIFIED semantics must remain explicit');
 
 const core=m.product.core_experiences||[];
 const coreIds=core.map(x=>x.id);
@@ -148,6 +151,20 @@ assert(m.architecture.r22_role==='ORCHESTRATION_COMMAND_EVENT_PLUGIN_LAYER_NOT_S
 assert(m.architecture.extensibility.data_ui_separation===true,'data/UI separation required');
 assert(m.north_star.r20_must_not_be_replaced_without_verified_migration===true,'R20 migration guardrail missing');
 
+const stateGate=m.development_contract?.state_gate||{};
+assert(stateGate.id==='SCD:STATE','SCD:STATE hard gate missing');
+assert(stateGate.mode==='PRECONDITION_GATE','SCD:STATE must remain a precondition gate');
+assert(stateGate.failure_rule==='NO_STATE_NO_WRITE','NO STATE -> NO WRITE rule missing');
+includesAll(stateGate.required_before||[],['FILE_WRITE','COMMIT','PUSH','BRANCH_CREATE','MERGE','DEPLOY','DATA_WRITE','CONFIG_CHANGE'],'SCD:STATE write coverage');
+includesAll(stateGate.minimum_evidence||[],['REPOSITORY','CURRENT_MAIN_SHA','CURRENT_WORKING_BRANCH','CI_STATUS','PAGES_STATUS','MANIFEST_VERSION_OR_HASH','RELEASE_DEPENDENCIES','KNOWN_BLOCKERS','SAFE_NEXT_ACTION'],'SCD:STATE evidence');
+includesAll(stateGate.allowed_status_values||[],['VERIFIED','UNVERIFIED','NOT_AVAILABLE','NOT_APPLICABLE'],'SCD:STATE statuses');
+includesAll(m.development_contract?.operating_cycle||[],['SCD:STATE','SCD:INVENTORY','SCD:GAP','SCD:PLAN','SCD:BUILD','SCD:DATA','SCD:QA','SCD:MERGE','SCD:DEPLOY','SCD:PROVE','SCD:ROLLBACK'],'development operating cycle');
+const releaseEvidence=m.delivery_and_quality?.release_truth?.required_evidence||[];
+includesAll(releaseEvidence,['VERSION','COMMIT','PR','CI_STATUS','SCREENSHOT_MOBILE','SCREENSHOT_DESKTOP','DATA_SOURCES','KNOWN_LIMITATIONS','ROLLBACK'],'release evidence');
+const r25r26=(m.development_contract?.release_dependencies||[]).find(x=>x.predecessor==='R25'&&x.successor==='R26');
+assert(r25r26?.relation==='REQUIRED_PREDECESSOR','R25 -> R26 dependency must remain explicit');
+assert(r25r26?.status==='SATISFIED_IN_MAIN','R25 -> R26 dependency must be recorded as satisfied in main');
+
 const caps=m.capability_map||[];
 unique(caps.map(x=>x.id),'capability ids');
 for(const cap of caps){
@@ -173,7 +190,8 @@ const requiredRepoFiles=[
   'PROJECT_CONSTITUTION.md',
   'SCD_PERMANENT_COMMANDS.md',
   'VISUAL_SYSTEM_LOCK.md',
-  '.github/workflows/manifest-pr-policy.yml'
+  '.github/workflows/manifest-pr-policy.yml',
+  'docs/adr/ADR-0001-scd-state-hard-gate.md'
 ];
 for(const file of requiredRepoFiles){
   assert(fs.existsSync(path.join(root,file)),'required governance file missing: '+file);
