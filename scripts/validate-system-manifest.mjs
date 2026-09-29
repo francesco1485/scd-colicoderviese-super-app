@@ -91,7 +91,7 @@ const sources=m.source_registry.sources||[];
 const sourceIds=sources.map(x=>x.id);
 unique(sourceIds,'source ids');
 includesAll(sourceIds,[
-  'SCD_DRIVE','SCD_GMAIL','R20','CORE_SHEET','TESSERATI_SHEET','PULMINI_SHEET','SPONSOR_SHEET',
+  'SCD_DRIVE','SCD_GMAIL','R20','CORE_SHEET','TESSERATI_SHEET','PULMINI_SHEET','MAIL_OPERATIONS_SHEET','SPONSOR_MASTER_SHEET','ECONOMIC_MASTER_SHEET','TOURNAMENTS_MASTER_SHEET',
   'FIGC','LND','CR_LOMBARDIA','SGS','SPORT_E_SALUTE','RASD','TUTTOCAMPO',
   'SCD_OFFICIAL_SITE','SCD_FACEBOOK','SCD_INSTAGRAM','TUTTITALIA',
   'SEGRETARIO_CALCIO','TEAMSYSTEM_SPORTIVI_IN_CLOUD','SQUBY','ATHLETIS'
@@ -100,11 +100,14 @@ const sourceById=Object.fromEntries(sources.map(x=>[x.id,x]));
 assert(sourceById.SCD_DRIVE.account==='sportclubcolico@gmail.com','Drive engine account changed');
 assert(sourceById.SCD_GMAIL.account==='sportclubcolico@gmail.com','Gmail engine account changed');
 assert(sourceById.R20.must_preserve===true,'R20 preservation rule missing');
+assert(sourceById.MAIL_OPERATIONS_SHEET.resource_id==='1wx3ZXwmdZuAr8AM_h08GzOvephm5o5iHMvTLQpRmbJE','mail operations source id mismatch');
+assert(sourceById.SPONSOR_MASTER_SHEET.resource_id==='1-5-MUnrrAltflJSATe6bKkjm_3SItO0gvadi_PXPoAQ','sponsor master source id mismatch');
 assert(sourceById.TUTTOCAMPO.use==='CROSS_CHECK_AND_ENRICHMENT','Tuttocampo must remain secondary enrichment');
 assert(sourceById.TEAMSYSTEM_SPORTIVI_IN_CLOUD.trust==='BENCHMARK','TeamSystem must remain benchmark, not factual source');
 
 assert(m.drive_vault.dedup_by_hash===true,'Drive dedup by hash required');
 assert(m.drive_vault.versioning_required===true,'Drive versioning required');
+includesAll(m.drive_vault.existing_catalog_surfaces||[],['TESSERATI_SHEET/DRIVE AGGIORNAMENTI','TESSERATI_SHEET/REGISTRO FONTI V2'],'Drive existing catalog surfaces');
 includesAll(m.drive_vault.catalog_fields||[],['DOCUMENT_ID','DRIVE_FILE_ID','HASH','VERSION','PERMISSIONS'],'Drive catalog');
 
 assert(/Un solo EVENT_ID/i.test(m.calendar_event_engine.principle),'event single-source principle missing');
@@ -112,6 +115,7 @@ includesAll(m.calendar_event_engine.required_event_fields||[],[
   'EVENT_ID','SEASON_ID','TYPE','START_AT','END_AT','STATUS','SOURCE','TEAM_IDS','PERSON_IDS','VISIBILITY'
 ],'event model');
 
+includesAll(m.gmail_intelligence.existing_runtime_surfaces||[],['MAIL_OPERATIONS_SHEET/01_EMAIL_ARCHIVE','MAIL_OPERATIONS_SHEET/17_SMART_CLASSIFIER','MAIL_OPERATIONS_SHEET/18_ACTION_QUEUE'],'Gmail existing runtime surfaces');
 assert(m.completeness_engine.confidence_required===true,'Completeness Engine confidence required');
 includesAll(m.completeness_engine.search_order||[],['DOMAIN_CORE','SCD_DRIVE','SCD_GMAIL_ATTACHMENTS'],'Completeness search order');
 
