@@ -26,8 +26,8 @@ jobs:
       - name: Verify Pages, Render and R20 runtime
         run: npm run verify:production
         env:
-          SCD_EXPECTED_VERSION: "29.0.0"
-          SCD_EXPECTED_MANIFEST: "1.5.0"
+          SCD_EXPECTED_VERSION: "30.0.0"
+          SCD_EXPECTED_MANIFEST: "1.6.0"
           SCD_PROD_VERIFY_ATTEMPTS: "20"
           SCD_PROD_VERIFY_DELAY_MS: "15000"
       - name: Upload production evidence
