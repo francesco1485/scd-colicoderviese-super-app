@@ -1,8 +1,8 @@
-import type IORedis from "ioredis";
+import type { Redis } from "ioredis";
 import type { KeyValueStore } from "./KeyValueStore.js";
 
 export class RedisKeyValueStore implements KeyValueStore {
-  public constructor(private readonly redis: IORedis) {}
+  public constructor(private readonly redis: Redis) {}
 
   public async get(key: string): Promise<string | null> {
     return this.redis.get(key);
