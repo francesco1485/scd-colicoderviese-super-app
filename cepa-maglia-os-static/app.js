@@ -20,7 +20,7 @@ const viewMeta={
  recovery:['Clienti · Recovery','Campagna operativa sul patrimonio esistente']
 }
 
-let ecosystem=[],projects=[],actions=[],marketHubs=[],marketEntities=[],contacts=[],timeline=[],documents=[],blueprints=[],subjects=[],initiatives=[],products=[],productKnowledge=[],comparisons=[],collaborators=[],collaboratorTerms=[],portfolioSnapshots=[],mailTemplates=[],mailDrafts=[],cepaExpansion=[],cepaReadiness=[],recoveryRows=[],members=[]
+let ecosystem=[],projects=[],actions=[],marketHubs=[],marketEntities=[],contacts=[],timeline=[],documents=[],partnerRequirements=[],blueprints=[],subjects=[],initiatives=[],products=[],productKnowledge=[],comparisons=[],collaborators=[],collaboratorTerms=[],portfolioSnapshots=[],mailTemplates=[],mailDrafts=[],cepaExpansion=[],cepaReadiness=[],assistantMessages=[],recoveryRows=[],members=[]
 let currentPartnerId=null
 
 function msg(text,error=false){$('loginMsg').textContent=text;$('loginMsg').className='message'+(error?' error':'')}
@@ -114,6 +114,7 @@ async function loadAll(){
     supabase.from('ecosystem_contacts').select('*').eq('organization_id',window.orgId).order('is_primary',{ascending:false}).order('full_name'),
     supabase.from('ecosystem_timeline').select('*').eq('organization_id',window.orgId).order('event_date',{ascending:false}),
     supabase.from('ecosystem_documents').select('*,ecosystem_nodes(id,name,code)').eq('organization_id',window.orgId).order('created_at',{ascending:false}),
+    supabase.from('partner_document_requirements').select('*,ecosystem_nodes(id,name,code),ecosystem_documents(id,title,document_status)').eq('organization_id',window.orgId).order('ecosystem_node_id').order('requirement_code'),
     supabase.from('document_blueprints').select('*').eq('organization_id',window.orgId).eq('status','ready').order('category').order('title'),
     supabase.from('cepa_subjects').select('*').eq('organization_id',window.orgId).order('maturity',{ascending:false}),
     supabase.from('cepa_initiatives').select('*,cepa_subjects(id,title),ecosystem_nodes(id,name,code)').eq('organization_id',window.orgId).order('created_at',{ascending:false}),
@@ -126,18 +127,19 @@ async function loadAll(){
     supabase.from('ai_mail_templates').select('*').eq('organization_id',window.orgId).eq('active',true).order('title'),
     supabase.from('ai_mail_drafts').select('*,ecosystem_nodes(id,name),ai_mail_templates(id,title)').eq('organization_id',window.orgId).order('created_at',{ascending:false}).limit(100),
     supabase.from('cepa_expansion_stages').select('*').eq('organization_id',window.orgId).order('stage_no'),
-    supabase.from('cepa_readiness_items').select('*').eq('organization_id',window.orgId).order('dimension').order('title')
+    supabase.from('cepa_readiness_items').select('*').eq('organization_id',window.orgId).order('dimension').order('title'),
+    supabase.from('ai_assistant_messages').select('*').eq('organization_id',window.orgId).eq('user_id',window.userId).order('created_at').limit(30)
   ]
   const res=await Promise.all(q)
   const err=res.find(x=>x.error)?.error
   if(err){console.error(err);$('refreshBtn').textContent='!';return}
-  ;[ecosystem,projects,actions,marketHubs,marketEntities,contacts,timeline,documents,blueprints,subjects,initiatives,products,productKnowledge,comparisons,collaborators,collaboratorTerms,portfolioSnapshots,mailTemplates,mailDrafts,cepaExpansion,cepaReadiness]=res.map(x=>x.data||[])
+  ;[ecosystem,projects,actions,marketHubs,marketEntities,contacts,timeline,documents,partnerRequirements,blueprints,subjects,initiatives,products,productKnowledge,comparisons,collaborators,collaboratorTerms,portfolioSnapshots,mailTemplates,mailDrafts,cepaExpansion,cepaReadiness,assistantMessages]=res.map(x=>x.data||[])
   renderEverything()
   $('refreshBtn').textContent='↻'
 }
 
 function renderEverything(){
-  renderPartnerNav();renderHome();renderPartner();renderProducts();renderCollaborators();renderComparisons();renderMail();renderCepa();renderTerritories();renderDocuments();renderDevelopment();renderActions()
+  renderPartnerNav();renderHome();renderPartner();renderProducts();renderCollaborators();renderComparisons();renderMail();renderCepa();renderTerritories();renderDocuments();renderDevelopment();renderActions();renderAssistantHistory()
 }
 
 function renderPartnerNav(){
@@ -174,6 +176,10 @@ function renderPartner(){
   $('partnerContacts').innerHTML=cc.map(x=>'<article class="contact-card"><div class="eyebrow">'+(x.is_primary?'REFERENTE PRINCIPALE':'REFERENTE')+'</div><h4>'+esc(x.full_name)+'</h4><p>'+esc(x.role_title||'Ruolo da indicare')+'</p><p>'+esc(x.email||'')+(x.phone?'<br>'+esc(x.phone):'')+'</p><p>'+esc(x.notes||'')+'</p></article>').join('')||empty('Nessun referente ancora registrato')
   const dd=documents.filter(x=>x.ecosystem_node_id===n.id)
   $('partnerDocuments').innerHTML=dd.map(docCard).join('')||empty('Nessun contratto o documento ancora collegato')
+  const rr=partnerRequirements.filter(x=>x.ecosystem_node_id===n.id)
+  const covered=rr.filter(x=>['received','verified','not_applicable'].includes(x.status)).length
+  $('partnerDocCoverage').textContent=rr.length?covered+'/'+rr.length+' coperti':'nessun requisito'
+  $('partnerDocRequirements').innerHTML=rr.map(x=>'<div class="requirement-row"><div><strong>'+esc(x.title)+'</strong><small>'+esc(x.verification_note||'')+(x.ecosystem_documents?.title?' · Collegato: '+esc(x.ecosystem_documents.title):'')+'</small></div><span class="req-status '+esc(x.status)+'">'+esc(x.status.replaceAll('_',' '))+'</span></div>').join('')||empty('Checklist documentale non ancora impostata')
   const pp=projects.filter(x=>x.ecosystem_node_id===n.id)
   $('partnerProjects').innerHTML=pp.map(p=>listRow(p.title,p.objective||'', [projectStatus(p.status),p.priority,p.next_action||'prossima azione da definire'])).join('')||empty('Nessun progetto collegato')
   const aa=actions.filter(x=>x.ecosystem_node_id===n.id)
@@ -328,11 +334,28 @@ async function saveMailDraft(e){
   await loadAll()
 }
 
+function renderAssistantHistory(){
+  if(!$('aiMessages'))return
+  if(!assistantMessages.length){
+    $('aiMessages').innerHTML='<div class="ai-message bot">Sono collegata ai dati Maglia 360. Posso indicarti cosa è aperto, cosa manca e dove entrare. Le informazioni non verificate restano tali.</div>'
+    return
+  }
+  $('aiMessages').innerHTML=assistantMessages.map(m=>'<div class="ai-message '+(m.sender==='user'?'user':'bot')+'">'+esc(m.content)+'</div>').join('')
+  $('aiMessages').scrollTop=$('aiMessages').scrollHeight
+}
 function addAssistantMessage(text,type='bot'){
   const d=document.createElement('div');d.className='ai-message '+type;d.textContent=text;$('aiMessages').appendChild(d);$('aiMessages').scrollTop=$('aiMessages').scrollHeight
 }
+async function persistAssistantMessage(content,sender,intent=null,context={}){
+  if(!window.orgId||!window.userId)return
+  const row={organization_id:window.orgId,user_id:window.userId,sender,content,intent,context}
+  const{error}=await supabase.from('ai_assistant_messages').insert(row)
+  if(!error)assistantMessages.push({...row,created_at:new Date().toISOString()})
+}
 function askAssistant(q){
   addAssistantMessage(q,'user')
+  persistAssistantMessage(q,'user','query',{})
+
   const s=q.toLowerCase()
   let reply=''
   if(s.includes('attivit')||s.includes('scadenz')){
@@ -350,6 +373,10 @@ function askAssistant(q){
     const current=cepaExpansion.find(x=>x.status==='current')
     const ready=cepaReadiness.filter(x=>['ready','verified'].includes(x.status)).length
     reply='CEPA ha '+subjects.length+' materie censite. La fase corrente è '+(current?current.title+' su '+current.territory:'da definire')+'. Per la readiness di scala risultano '+ready+' elementi pronti/verificati su '+cepaReadiness.length+'. La roadmap futura resta un piano, non un risultato già acquisito.'
+  }else if(s.includes('document')||s.includes('contratt')||s.includes('accord')){
+    const missing=partnerRequirements.filter(x=>x.status==='missing').length
+    const verified=partnerRequirements.filter(x=>x.status==='verified').length
+    reply='Nel dossier collaborazioni risultano '+partnerRequirements.length+' requisiti documentali censiti: '+verified+' verificati e '+missing+' non ancora registrati in piattaforma. “Mancante” qui non significa che il documento non esista: significa che dobbiamo ancora acquisirlo o collegarlo al dossier.'
   }else if(s.includes('email')||s.includes('mail')){
     reply='Posso preparare e salvare una bozza personalizzata usando i modelli Maglia/CEPA. Ti porto in AI Mail & Chat. L’invio diretto resta separato finché non colleghiamo un canale email autorizzato.'
     navigate('aiMail')
@@ -357,7 +384,7 @@ function askAssistant(q){
     const names=ecosystem.map(n=>n.code).join(', ')
     reply='Posso lavorare sui dati presenti in piattaforma: compagnie e partner ('+names+'), prodotti, collaboratori, CEPA, territorio, documenti e attività. Dimmi quale area vuoi leggere o quale azione vuoi preparare.'
   }
-  setTimeout(()=>addAssistantMessage(reply,'bot'),120)
+  setTimeout(()=>{addAssistantMessage(reply,'bot');persistAssistantMessage(reply,'assistant','response',{matched:true})},120)
 }
 
 function renderDevelopment(){
