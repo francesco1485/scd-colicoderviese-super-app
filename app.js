@@ -1,4 +1,4 @@
-const APP_VERSION='21.14.0';
+const APP_VERSION='21.15.0';
 const DYNAMIC_ORIGIN=(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)||location.hostname.endsWith('.onrender.com'))
   ? location.origin
   : 'https://scd-colicoderviese-official-r21.onrender.com';
@@ -617,6 +617,14 @@ function openTeams(){
   modal('<section class="teams-app-screen"><header class="teams-app-head"><div class="teams-app-brand"><img src="./assets/logo-scd.png" alt="SCD"><div><b>Squadre</b><p>Il mondo sportivo ColicoDerviese, categoria per categoria.</p></div></div></header><div class="mgmt-grid">'+(rows.length?rows.map(([name,count])=>'<button class="mgmt-tile" data-team-name="'+esc(name)+'"><span>⚽</span><b>'+esc(name)+'</b><small>'+count+' attività nel calendario</small></button>').join(''):'<div class="empty-state">Elenco squadre in sincronizzazione con il gestionale SCD.</div>')+'</div><div class="account-rule" style="margin-top:12px"><b>Accesso qualificato:</b> allenamenti, presenze e convocazioni dettagliate restano nelle aree autorizzate di atleta, famiglia e staff.</div></section>');
   document.querySelectorAll('[data-team-name]').forEach(b=>b.onclick=()=>{const name=b.dataset.teamName;const events=(state.calendar||[]).filter(x=>displayValue(x.team,'')===name).slice(0,8);modal('<section class="teams-app-screen"><header class="teams-app-head"><div class="teams-app-brand"><img src="./assets/logo-scd.png" alt="SCD"><div><b>'+esc(name)+'</b><p>Prossime attività pubbliche disponibili.</p></div></div></header><div class="calendar-list">'+(events.length?events.map(x=>'<button class="calendar-row" data-calendar-event="'+esc(x.id)+'"><time><b>'+esc(fmtDate(x.date))+'</b><small>'+esc(x.time||'')+'</small></time><span><b>'+esc(x.title)+'</b><small>'+esc(x.venue||x.type)+'</small></span><i>›</i></button>').join(''):'<div class="empty-state">Nessuna attività pubblica disponibile.</div>')+'</div></section>');bindCalendarEvents()});
 }
+function openEventsHub(){
+  setActiveNav('events');
+  const p=publicData(state.summary||FALLBACK);
+  const rows=(p.initiatives||[]).slice(0,12);
+  modal('<section class="communications-app-screen"><header class="communications-app-head"><div class="communications-app-brand"><img src="./assets/logo-scd.png" alt="SCD"><div><b>Eventi</b><p>Tornei, Open Day, iniziative e appuntamenti del Club.</p></div></div></header><div class="calendar-list" id="eventsHubRows">'+(rows.length?rows.map((x,i)=>{const title=field(x,'title','event','name')||'Evento SCD';const date=fmtDate(field(x,'date'));const time=field(x,'time');const venue=field(x,'venue','luogo');return '<button class="calendar-row event-club" data-event-hub="'+i+'"><span class="event-marker"></span><time><b>'+esc(date||'Data')+'</b><small>'+esc(time||'')+'</small></time><span><b>'+esc(title)+'</b><small>'+esc(venue||'Dettagli in aggiornamento')+'</small></span><i>›</i></button>'}).join(''):'<div class="empty-state"><b>Eventi in aggiornamento.</b><p>La Super App mostra soltanto appuntamenti pubblicati dalle fonti SCD.</p></div>')+'</div><div class="modal-actions"><button class="outline" id="eventsRefresh">AGGIORNA</button><button class="primary" id="eventsIdea">PROPONI INIZIATIVA</button></div></section>');
+  document.querySelectorAll('[data-event-hub]').forEach(b=>b.onclick=()=>{const x=rows[Number(b.dataset.eventHub||0)];if(!x)return;const title=field(x,'title','event','name')||'Evento SCD',url=field(x,'registrationUrl','url','link');modal('<span class="eyebrow">EVENTO SCD</span><h2>'+esc(title)+'</h2><p>'+esc([fmtDate(field(x,'date')),field(x,'time'),field(x,'venue','luogo')].filter(Boolean).join(' · '))+'</p><div class="modal-actions">'+(url?'<a class="primary" target="_blank" rel="noopener" href="'+esc(url)+'">APRI DETTAGLI</a>':'')+'<button class="outline" id="eventsBack">TORNA A EVENTI</button></div>');const back=$('#eventsBack');if(back)back.onclick=openEventsHub});
+  const refresh=$('#eventsRefresh'),idea=$('#eventsIdea');if(refresh)refresh.onclick=async()=>{await loadSummary(false);openEventsHub()};if(idea)idea.onclick=()=>openPublicAction('initiatives');
+}
 function openCommunicationsHub(){
   setActiveNav('');
   const p=publicData(state.summary||FALLBACK),rows=(p.highlights||[]).slice(0,8);
@@ -798,6 +806,7 @@ function openPublicAction(kind,seed={}){
   if(kind==='calendar')return openCalendar();
   if(kind==='teams')return openTeams();
   if(kind==='communications')return openCommunicationsHub();
+  if(kind==='events')return openEventsHub();
   if(kind==='location')return openLocationHub();
   if(kind==='notifications')return requestNotificationPermission();
   const label=kind==='sponsor'?'Azienda / organizzazione':kind==='product'?'Azienda / attività':'Nome e cognome';
@@ -914,7 +923,7 @@ function boot(){
   window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();state.installPrompt=e;if(installBtn)installBtn.hidden=false});
   if(installBtn)installBtn.onclick=async()=>{if(!state.installPrompt)return toast('Dal menu del browser scegli “Installa app” o “Aggiungi alla schermata Home”.');state.installPrompt.prompt();await state.installPrompt.userChoice;state.installPrompt=null;installBtn.hidden=true;track('pwa_install',{section:'install'})};
   if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('./sw.js?v=21.14.0',{updateViaCache:'none'})
+  navigator.serviceWorker.register('./sw.js?v=21.15.0',{updateViaCache:'none'})
     .then(reg=>reg.update())
     .catch(()=>{});
 }bindDynamic();syncClubClock();checkServiceHealth();loadPublicCalendar(true);restoreManagementSession();track('page_view',{section:(location.hash||'#home').replace('#','')});window.addEventListener('hashchange',()=>{const section=(location.hash||'#home').replace('#','');track('page_view',{section});setActiveNav(section==='eventi'?'events':section==='home'?'home':'')});loadSummary(true);setInterval(()=>{if(!document.hidden)loadSummary(true)},60000);setInterval(flushListening,120000);setInterval(checkDueReminders,60000);setTimeout(checkDueReminders,4000);setInterval(()=>{if(!document.hidden)syncClubClock()},300000);setInterval(()=>{if(!document.hidden)loadPublicCalendar(true)},300000);
