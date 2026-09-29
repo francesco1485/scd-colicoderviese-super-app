@@ -76,7 +76,15 @@ for(const viewport of viewports){
   await page.click('#mobileProfile');
   await page.waitForSelector('.profile-app-screen');
   await page.waitForSelector('.profile-hub-grid');
-  if(viewport.width===390) await page.screenshot({path:'test-output/profile-390x844.png',fullPage:true});
+  if(viewport.width===390){
+    await page.screenshot({path:'test-output/profile-390x844.png',fullPage:true});
+    await page.click('#profileCommunications');
+    await page.waitForSelector('.communications-app-screen');
+    await page.screenshot({path:'test-output/communications-390x844.png',fullPage:true});
+    await page.click('#modalClose');
+    await page.click('#mobileProfile');
+    await page.waitForSelector('.profile-app-screen');
+  }
   await page.click('#profileR20');
   await page.waitForSelector('#mgmtLoginForm');
   await page.click('#modalClose');
