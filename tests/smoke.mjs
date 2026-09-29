@@ -76,6 +76,9 @@ for(const viewport of viewports){
   await page.click('#mobileProfile');
   await page.waitForSelector('.profile-app-screen');
   await page.waitForSelector('.profile-hub-grid');
+  await page.waitForSelector('#profileDeleteAccount');
+  const deleteHref=await page.locator('#profileDeleteAccount').getAttribute('href');
+  if(!deleteHref||!deleteHref.includes('delete-account.html')) throw new Error('account deletion path missing');
   await page.click('#profileLinkAthlete');
   await page.waitForSelector('#tesseratoLinkForm');
   if(viewport.width===390) await page.screenshot({path:'test-output/tesserato-onboarding-390x844.png',fullPage:true});
@@ -161,6 +164,10 @@ const robots=await api.request.get(base+'/robots.txt');
 if(!robots.ok()) throw new Error('robots.txt missing');
 const sitemap=await api.request.get(base+'/sitemap.xml');
 if(!sitemap.ok()) throw new Error('sitemap.xml missing');
+const deletePage=await api.request.get(base+'/delete-account.html');
+if(!deletePage.ok()) throw new Error('delete-account.html missing');
+const deleteHtml=await deletePage.text();
+if(!deleteHtml.includes('deleteForm')||!deleteHtml.includes('ELIMINAZIONE ACCOUNT')) throw new Error('invalid account deletion resource');
 await api.close();
 
 if(allErrors.length) throw new Error('browser errors: '+allErrors.join(' || '));
