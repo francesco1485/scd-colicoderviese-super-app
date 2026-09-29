@@ -1,10 +1,13 @@
-const APP_VERSION='21.8.0';
+const APP_VERSION='21.10.0';
 const DYNAMIC_ORIGIN=(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)||location.hostname.endsWith('.onrender.com'))
   ? location.origin
   : 'https://scd-colicoderviese-official-r21.onrender.com';
 const API=DYNAMIC_ORIGIN+'/api/scd';
 const LIVE_API=DYNAMIC_ORIGIN+'/api/live';
 const HEALTH_API=DYNAMIC_ORIGIN+'/health';
+const TIME_API=DYNAMIC_ORIGIN+'/api/time';
+const CALENDAR_KEY='scd:calendar:v1';
+const LOCATION_KEY='scd:location:consent:v1';
 const REQUESTS_KEY='scd:requests:v1';
 const SESSION_KEY='scd:session:v1';
 const R20_APP='https://script.google.com/macros/s/AKfycbwYQ_3yLYsp-6jX3FIgufBjpmaZb9uO1AklF9hdG-CuLII9J4ITUX1EA-EKuWXBMEc/exec';
@@ -20,7 +23,7 @@ const FALLBACK={
     ],counts:{games:0,events:0,initiatives:0,news:1}
   }
 };
-let state={summary:null,installPrompt:null,session:null,sessionToken:'',privateData:null,apiStatus:'checking'};
+let state={summary:null,installPrompt:null,session:null,sessionToken:'',privateData:null,apiStatus:'checking',clockOffsetMs:0,clubTimeZone:'Europe/Rome',clockSynced:false,calendar:[],location:null};
 
 function localRequests(){
   try{return JSON.parse(localStorage.getItem(REQUESTS_KEY)||'[]')}catch{return []}
@@ -70,6 +73,141 @@ function updateApiBadge(status,label){
   const el=$('#apiStatus'); if(!el)return;
   el.className='api-status '+status;
   el.innerHTML=`<i></i><span>${esc(label)}</span>`;
+}
+function clubNow(){return new Date(Date.now()+(state.clockOffsetMs||0))}
+function clubDateKey(d=clubNow()){
+  return new Intl.DateTimeFormat('en-CA',{timeZone:state.clubTimeZone,year:'numeric',month:'2-digit',day:'2-digit'}).format(d);
+}
+function formatClubDateTime(d=clubNow()){
+  return new Intl.DateTimeFormat('it-IT',{timeZone:state.clubTimeZone,weekday:'long',day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(d);
+}
+function updateClubClock(){
+  const el=$('#clubClock');if(!el)return;
+  el.textContent=formatClubDateTime();
+  el.dataset.synced=state.clockSynced?'true':'false';
+}
+async function syncClubClock(){
+  try{
+    const r=await fetch(TIME_API,{cache:'no-store'});
+    if(!r.ok)throw new Error('time '+r.status);
+    const j=await r.json();
+    if(!j.epochMs)throw new Error('time payload');
+    state.clockOffsetMs=Number(j.epochMs)-Date.now();
+    state.clubTimeZone=j.timeZone||'Europe/Rome';
+    state.clockSynced=true;
+    updateClubClock();
+    return j;
+  }catch(e){
+    state.clockOffsetMs=0;
+    state.clubTimeZone='Europe/Rome';
+    state.clockSynced=false;
+    updateClubClock();
+    return null;
+  }
+}
+function normalizeCalendarDate(v){
+  const s=String(v||'').trim();if(!s)return '';
+  let m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);if(m)return m[1]+'-'+m[2]+'-'+m[3];
+  m=s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);if(m)return m[3]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[1]).padStart(2,'0');
+  const d=new Date(s);if(Number.isFinite(d.getTime()))return d.toISOString().slice(0,10);
+  return s;
+}
+function normalizeCalendarRows(raw){
+  const rows=Array.isArray(raw)?raw:(raw?.rows||raw?.items||raw?.events||raw?.calendar||[]);
+  return rows.map((x,i)=>({
+    id:x.id||x.eventId||x.uid||('CAL-'+i),
+    title:field(x,'title','event','name','subject')||'Evento SCD',
+    date:normalizeCalendarDate(field(x,'date','data','startDate')),
+    time:field(x,'time','ora','startTime')||'',
+    endTime:field(x,'endTime','fine')||'',
+    type:field(x,'type','kind','category','eventType')||'EVENTO',
+    venue:field(x,'venue','luogo','field','location')||'',
+    team:displayValue(field(x,'team','teamName','squadra'),''),
+    source:field(x,'source','fonte')||'SCD',
+    url:field(x,'url','link','sourceUrl')||''
+  })).filter(x=>x.date||x.title);
+}
+function calendarSortKey(x){
+  const raw=(x.date||'')+'T'+(x.time||'00:00');
+  const d=new Date(raw);return Number.isFinite(d.getTime())?d.getTime():Number.MAX_SAFE_INTEGER;
+}
+async function loadPublicCalendar(silent=true){
+  try{
+    const raw=await api('public.calendar',{rangeKey:'ALL',offset:0});
+    const rows=normalizeCalendarRows(raw).sort((a,b)=>calendarSortKey(a)-calendarSortKey(b));
+    state.calendar=rows;
+    localStorage.setItem(CALENDAR_KEY,JSON.stringify({at:new Date().toISOString(),rows}));
+    renderTodayAgenda();
+    if(!silent)toast('Calendario SCD aggiornato');
+    return rows;
+  }catch(e){
+    try{state.calendar=JSON.parse(localStorage.getItem(CALENDAR_KEY)||'{}').rows||[]}catch{state.calendar=[]}
+    renderTodayAgenda();
+    return state.calendar;
+  }
+}
+function renderTodayAgenda(){
+  const mount=$('#todayAgenda');if(!mount)return;
+  const today=clubDateKey();
+  const rows=(state.calendar||[]).filter(x=>String(x.date).slice(0,10)===today).slice(0,4);
+  mount.innerHTML=rows.length?rows.map(x=>`<button class="today-event" data-calendar-event="${esc(x.id)}"><time>${esc(x.time||'--:--')}</time><span><b>${esc(x.title)}</b><small>${esc([x.team,x.venue].filter(Boolean).join(' · ')||x.type)}</small></span><i>›</i></button>`).join(''):'<div class="today-empty"><b>Nessun evento pubblico registrato per oggi.</b><small>Il calendario si aggiorna dalle fonti SCD.</small></div>';
+  bindCalendarEvents();
+}
+function bindCalendarEvents(){
+  $$('[data-calendar-event]').forEach(b=>b.onclick=()=>openCalendarEvent(b.dataset.calendarEvent));
+}
+function openCalendarEvent(id){
+  const x=(state.calendar||[]).find(e=>String(e.id)===String(id));if(!x)return;
+  const mapQ=encodeURIComponent(x.venue||'Centro Sportivo Comunale Colico Via Lido');
+  modal(`<span class="eyebrow">CALENDARIO SCD</span><h2>${esc(x.title)}</h2><p>${esc([fmtDate(x.date),x.time,x.endTime?'- '+x.endTime:'',x.team].filter(Boolean).join(' · '))}</p><div class="notice"><b>Luogo:</b> ${esc(x.venue||'Da confermare')}<br><b>Fonte:</b> ${esc(x.source||'SCD')}</div><div class="choice-grid"><a class="choice-tile" href="https://www.google.com/maps/search/?api=1&query=${mapQ}" target="_blank" rel="noopener"><b>Apri in Google Maps</b><small>Navigazione esterna</small></a><button class="choice-tile" id="eventReminder"><b>Attiva promemoria</b><small>Notifica sul dispositivo</small></button></div>`);
+  $('#eventReminder').onclick=()=>requestEventReminder(x);
+}
+async function openCalendar(){
+  modal('<span class="eyebrow">TEMPO REALE SCD</span><h2>Calendario</h2><p id="calendarClock">'+esc(formatClubDateTime())+'</p><div class="calendar-toolbar"><button class="outline" id="calendarRefresh">AGGIORNA</button><button class="outline" id="calendarNotify">NOTIFICHE</button></div><div id="calendarRows" class="calendar-list"><div class="loading-line">Sincronizzazione calendario…</div></div>');
+  const renderRows=()=>{
+    const mount=$('#calendarRows');if(!mount)return false;
+    const today=clubDateKey(),future=(state.calendar||[]).filter(x=>!x.date||String(x.date).slice(0,10)>=today).slice(0,40);
+    mount.innerHTML=future.length?future.map(x=>`<button class="calendar-row" data-calendar-event="${esc(x.id)}"><time><b>${esc(fmtDate(x.date))}</b><small>${esc(x.time||'')}</small></time><span><b>${esc(x.title)}</b><small>${esc([x.team,x.venue,x.type].filter(Boolean).join(' · '))}</small></span><i>›</i></button>`).join(''):'<div class="empty-state">Calendario pubblico in aggiornamento.</div>';
+    bindCalendarEvents();return true;
+  };
+  const refresh=$('#calendarRefresh'),notify=$('#calendarNotify');
+  if(refresh)refresh.onclick=async()=>{await syncClubClock();await loadPublicCalendar(false);if(!renderRows())return;const clock=$('#calendarClock');if(clock)clock.textContent=formatClubDateTime()};
+  if(notify)notify.onclick=requestNotificationPermission;
+  await loadPublicCalendar(true);
+  renderRows();
+}
+async function requestNotificationPermission(){
+  if(!('Notification' in window))return toast('Notifiche non supportate da questo dispositivo');
+  if(Notification.permission==='granted')return toast('Notifiche già abilitate');
+  const result=await Notification.requestPermission();
+  track('notification_interaction',{section:'permission_'+result});
+  toast(result==='granted'?'Notifiche abilitate':'Notifiche non abilitate');
+}
+async function requestEventReminder(x){
+  if(!('Notification' in window))return toast('Notifiche non supportate');
+  if(Notification.permission!=='granted'){
+    const r=await Notification.requestPermission();if(r!=='granted')return toast('Permesso notifiche non concesso');
+  }
+  localStorage.setItem('scd:reminder:'+x.id,JSON.stringify({id:x.id,title:x.title,date:x.date,time:x.time,createdAt:new Date().toISOString()}));
+  toast('Promemoria salvato sul dispositivo');
+}
+function openLocationHub(){
+  const saved=localStorage.getItem(LOCATION_KEY)==='granted';
+  modal(`<span class="eyebrow">SCD TERRITORIO</span><h2>Posizione e mappe</h2><p>La posizione viene richiesta solo quando la scegli tu. Non viene inviata a social, CRM o telemetria e non viene conservata dal Club.</p><div class="notice"><b>Uso previsto:</b> trovare il Centro Sportivo, calcolare un percorso e preparare una condivisione geolocalizzata sotto il tuo controllo.</div><div class="choice-grid"><button class="choice-tile" id="locateMe"><b>Usa la mia posizione</b><small>${saved?'Permesso già utilizzato su questo dispositivo':'Richiederà il consenso del browser'}</small></button><a class="choice-tile" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent('Centro Sportivo Comunale Colico Via Lido')}" target="_blank" rel="noopener"><b>Centro Sportivo su Maps</b><small>Apri Google Maps</small></a></div><div id="locationResult"></div>`);
+  $('#locateMe').onclick=locateUser;
+}
+function locateUser(){
+  const mount=$('#locationResult');
+  if(!navigator.geolocation){mount.innerHTML='<div class="notice error-note">Geolocalizzazione non disponibile.</div>';return}
+  mount.innerHTML='<div class="loading-line">Richiesta posizione al dispositivo…</div>';
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const coords={lat:pos.coords.latitude,lng:pos.coords.longitude,accuracy:pos.coords.accuracy};
+    state.location=coords;localStorage.setItem(LOCATION_KEY,'granted');
+    const q=encodeURIComponent(coords.lat+','+coords.lng);
+    const shareText=encodeURIComponent('SCD ColicoDerviese · '+coords.lat.toFixed(5)+','+coords.lng.toFixed(5));
+    mount.innerHTML=`<div class="status-box"><b>Posizione disponibile sul dispositivo.</b><br>Precisione stimata: ${Math.round(coords.accuracy)} m. Le coordinate non sono state inviate alla SCD.</div><div class="mini-links"><a href="https://www.google.com/maps/search/?api=1&query=${q}" target="_blank" rel="noopener">APRI LA MIA POSIZIONE</a><a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent('Centro Sportivo Comunale Colico Via Lido')}" target="_blank" rel="noopener">PERCORSO PER IL CENTRO SPORTIVO</a></div>`;
+    track('feature_use',{section:'location_local_only'});
+  },err=>{mount.innerHTML='<div class="notice error-note">Posizione non disponibile: '+esc(err.message||'permesso negato')+'</div>'},{enableHighAccuracy:false,timeout:10000,maximumAge:300000});
 }
 async function checkServiceHealth(){
   updateApiBadge('checking','Connessione…');
@@ -161,7 +299,7 @@ async function loadSummary(silent=false){
   state.summary=data;localStorage.setItem('scd:r21:summary',JSON.stringify(data));render(data);if(!silent)toast(radar&&radar.items?.length?'SCD Radar aggiornato':'Dati SCD aggiornati')
 }
 function publicData(data){return (data&&data.public)||FALLBACK.public}
-function render(data){const p=publicData(data);$$('[data-season]').forEach(el=>el.textContent=data.season||'2026/27');$('#updatedAt').textContent=data.generatedAt||'ora';renderHero(p);renderTicker(p);renderMatches(p);renderEvents(p);renderNews(p);renderSponsors(p)}
+function render(data){const p=publicData(data);document.querySelectorAll('[data-season]').forEach(el=>el.textContent=data.season||'2026/27');$('#updatedAt').textContent=data.generatedAt||'ora';renderHero(p);renderTicker(p);renderMatches(p);renderEvents(p);renderNews(p);renderSponsors(p);renderTodayAgenda()}
 function renderHero(p){const n=p.nextMatch||{};$('#nextDate').textContent=fmtDate(field(n,'date','data'));$('#nextTime').textContent=field(n,'time','ora')||'—';const opp=displayValue(field(n,'opponentName','opponent','avversario','title'),'Avversario');$('#nextOpponent').textContent=opp;$('#opponentBadge').textContent=opp.slice(0,1).toUpperCase();$('#nextVenue').textContent=field(n,'venue','luogo','field')||'Sede da aggiornare'}
 function renderTicker(p){const h=p.highlights||[];$('#liveTicker').innerHTML='<span>'+esc(h.slice(0,5).map(x=>field(x,'title','subject','event')||'Aggiornamento SCD').join('  •  ')||'SCD ColicoDerviese · aggiornamenti in corso')+'</span>'}
 function renderMatches(p){const n=p.nextMatch||{};const l=p.lastResult||{};const cards=[];if(Object.keys(n).length)cards.push(matchCard(n,'PROSSIMA GARA',false));if(Object.keys(l).length)cards.push(matchCard(l,'ULTIMO RISULTATO',true));const extras=(p.highlights||[]).filter(x=>/gara|match|risultat/i.test([x.feedType,x.title,x.subject].join(' '))).slice(0,2);extras.forEach((x,i)=>cards.push(`<article class="match-card"><span class="tag">AGGIORNAMENTO GARA</span><h3>${esc(field(x,'title','subject')||'SCD ColicoDerviese')}</h3><p>${esc(field(x,'message','venue','status')||'Aggiornamento disponibile')}</p><div class="scoreline"><small>${esc(fmtDate(field(x,'date')))}</small><strong>→</strong></div></article>`));if(!cards.length)cards.push('<article class="match-card"><span class="tag">CALENDARIO SCD</span><h3>Dati gara in sincronizzazione</h3><p>La Super App non mostra partite inventate. Apri il calendario ufficiale o aggiorna tra poco.</p><div class="scoreline"><small>Fonte: SCD / federazione</small><strong>↻</strong></div></article>');$('#matchGrid').innerHTML=cards.join('')}
@@ -509,6 +647,9 @@ function openPublicAction(kind,seed={}){
   if(kind==='fantasy'||kind==='fantasy-rules')return openFantasy(kind==='fantasy-rules');
   if(kind==='cards')return openCards();
   if(kind==='contacts')return openContacts();
+  if(kind==='calendar')return openCalendar();
+  if(kind==='location')return openLocationHub();
+  if(kind==='notifications')return requestNotificationPermission();
   const label=kind==='sponsor'?'Azienda / organizzazione':kind==='product'?'Azienda / attività':'Nome e cognome';
   const topic=kind==='rent'?'Data / fascia oraria richiesta':kind==='tournament'?'Torneo / categoria / annata':kind==='tickets'?'Gara / evento':kind==='initiatives'?'Titolo iniziativa':'Oggetto';
   modal(`<span class="eyebrow">SCD CONNECT</span><h2>${esc(m.title)}</h2><p>${esc(m.subtitle)}</p><form id="publicActionForm"><div class="form-grid">${formField(label,'paName')}${formField('Email','paEmail','email')}${formField('Telefono','paPhone','tel',true,'inputmode="tel"')}${formField(topic,'paTopic')}<div class="field full"><label>Messaggio</label><textarea id="paMessage" required placeholder="Scrivi qui le informazioni utili…"></textarea></div><div class="field full"><label class="check"><input id="paPrivacy" type="checkbox" required> <span>Autorizzo il trattamento dei dati per gestire questa richiesta.</span></label></div></div><div id="paStatus"></div><div class="modal-actions"><button type="button" class="outline" id="paCancel">ANNULLA</button><button class="primary" type="submit">INVIA RICHIESTA</button></div></form>`);
@@ -549,6 +690,47 @@ function openFantasy(rulesOnly=false){const rules=`<div class="notice"><b>Princi
 function openSky(){const p=$('#skyPanel');p.classList.add('open');p.setAttribute('aria-hidden','false');setTimeout(()=>$('#skyInput').focus(),150)}function closeSky(){const p=$('#skyPanel');p.classList.remove('open');p.setAttribute('aria-hidden','true')}
 function skyAnswer(q){const p=publicData(state.summary||FALLBACK);const t=q.toLowerCase();if(/prossim|gara|partita/.test(t)){const n=p.nextMatch||{};return `Prossima gara: ${field(n,'team')||'SCD ColicoDerviese'} contro ${field(n,'opponentName','opponent')||'avversario'}, ${fmtDate(field(n,'date'))}${field(n,'time')?' alle '+field(n,'time'):''}.`}if(/event|torneo/.test(t)){const e=(p.initiatives||[])[0];return e?`In evidenza: ${field(e,'title','event')}. ${[fmtDate(field(e,'date')),field(e,'venue')].filter(Boolean).join(' · ')}.`:'Apri Eventi e Tornei: trovi iniziative, programmi e link di iscrizione.'}if(/iscriv|tesser|giocare|open day|prova/.test(t))return 'Per entrare nella SCD usa “Vuoi giocare con noi?”. La richiesta non assegna automaticamente un tesseramento: viene verificata dalla Segreteria.';if(/registr|profil/.test(t))return 'Puoi registrarti con nome, cognome, email e telefono. Il profilo nasce senza privilegi; la Direzione assegna in seguito l’accesso qualificato.';if(/access|pin|mister|staff|famiglia|atleta/.test(t))return 'Gli accessi qualificati vengono assegnati dalla Direzione SCD. Dopo l’abilitazione userai email e PIN personale.';if(/sponsor|partner|prodotto|fornitore/.test(t))return 'Apri il Commercial Hub: puoi diventare sponsor, proporre prodotti o servizi e richiedere una proposta personalizzata.';if(/campo|affitt|impianto/.test(t))return 'Puoi inviare una richiesta per affitto campo o spazi dal Club Services. La disponibilità viene confermata dalla Società.';if(/fantacalcio|fantasy/.test(t))return 'Fantasy SCD è pensato come gioco community gratuito e non monetario. Per tutela e privacy, eventuali atleti minorenni non vengono usati senza base e consenso adeguati.';if(/safeguard|segnal/.test(t))return 'Per Safeguarding usa esclusivamente il canale riservato dedicato, separato dalla community e dal CRM ordinario.';if(/bigliett|ticket/.test(t))return 'La sezione Biglietti gestisce prenotazioni e, quando sarà configurato un canale di pagamento sicuro, anche l’acquisto.';if(/card|tifoso/.test(t))return 'Le Card SCD sono predisposte per Tifoso, Famiglia, Tesserato e Partner con vantaggi e contenuti differenziati.';return 'Posso aiutarti con gare, iscrizioni, tornei, campi, sponsor, community, fantasy, card, biglietti, contatti e area riservata.'}
 function addBubble(text,user=false){const el=document.createElement('div');el.className='bubble '+(user?'user':'bot');el.textContent=text;$('#skyMessages').appendChild(el);$('#skyMessages').scrollTop=$('#skyMessages').scrollHeight}
+function zonedEpoch(date,time,tz='Europe/Rome'){
+  const dm=String(date||'').match(/^(\d{4})-(\d{2})-(\d{2})$/),tm=String(time||'00:00').match(/^(\d{1,2}):(\d{2})/);
+  if(!dm||!tm)return NaN;
+  const guess=Date.UTC(+dm[1],+dm[2]-1,+dm[3],+tm[1],+tm[2],0);
+  const parts=new Intl.DateTimeFormat('en-US',{timeZone:tz,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date(guess)).reduce((o,p)=>(o[p.type]=p.value,o),{});
+  const represented=Date.UTC(+parts.year,+parts.month-1,+parts.day,+parts.hour,+parts.minute,0);
+  return guess-(represented-guess);
+}
+function eventMoment(x){
+  const date=String(x.date||'').slice(0,10),time=String(x.time||'00:00').slice(0,5);
+  const epoch=zonedEpoch(date,time,state.clubTimeZone);
+  return Number.isFinite(epoch)?new Date(epoch):null;
+}
+async function showLocalNotification(title,body,tag){
+  if(!('Notification' in window)||Notification.permission!=='granted')return false;
+  try{
+    if('serviceWorker' in navigator){
+      const reg=await navigator.serviceWorker.ready;
+      await reg.showNotification(title,{body,tag,icon:'./assets/icon-192.png',badge:'./assets/icon-192.png',data:{url:location.href+'#oggi'}});
+      return true;
+    }
+    new Notification(title,{body,tag});
+    return true;
+  }catch{return false}
+}
+async function checkDueReminders(){
+  const now=clubNow().getTime();
+  for(let i=0;i<localStorage.length;i++){
+    const key=localStorage.key(i);if(!key||!key.startsWith('scd:reminder:'))continue;
+    try{
+      const x=JSON.parse(localStorage.getItem(key)||'{}');
+      if(x.notifiedAt)continue;
+      const when=eventMoment(x);if(!when)continue;
+      const diff=when.getTime()-now;
+      if(diff<=30*60*1000&&diff>=-5*60*1000){
+        const ok=await showLocalNotification('SCD ColicoDerviese · '+x.title,'In programma alle '+(x.time||'orario da verificare'),key);
+        if(ok){x.notifiedAt=new Date().toISOString();localStorage.setItem(key,JSON.stringify(x));track('notification_interaction',{section:'calendar_reminder'})}
+      }
+    }catch{}
+  }
+}
 function bindDynamic(){
   $$('[data-scroll]').forEach(b=>b.onclick=()=>$(b.dataset.scroll)?.scrollIntoView({behavior:'smooth'}));
   $$('[data-share]').forEach(b=>b.onclick=async()=>{
@@ -563,14 +745,26 @@ function bindDynamic(){
   $$('[data-action]').forEach(b=>b.onclick=()=>{track('cta_click',{section:b.dataset.action||'unknown'});openPublicAction(b.dataset.action)});
 }
 function boot(){
-  $('#modalClose').onclick=closeModal;$('#modalBackdrop').onclick=e=>{if(e.target===$('#modalBackdrop'))closeModal()};
-  [$('#registerBtn'),$('#heroRegister'),$('#quickRegister'),$('#bottomRegister')].forEach(b=>b&&b.addEventListener('click',openRegister));$('#loginBtn').onclick=openProfile;$('#mobileProfile').onclick=openProfile;$('#heroGames').onclick=()=>$('#gare').scrollIntoView({behavior:'smooth'});$('#refreshBtn').onclick=()=>loadSummary();
-  $('#skyFab').onclick=openSky;const mobileSky=$('#mobileSky');if(mobileSky)mobileSky.onclick=openSky;$('#closeSky').onclick=closeSky;$$('[data-sky]').forEach(b=>b.onclick=()=>{const map={next:'Qual è la prossima gara?',join:'Come posso iscrivermi o fare una prova?',sponsor:'Come posso diventare sponsor?',rent:'Come posso affittare un campo?',fan:'Come funziona la community tifosi?'};const q=map[b.dataset.sky]||'Come posso usare la Super App?';addBubble(q,true);setTimeout(()=>addBubble(skyAnswer(q)),180)});$('#skyForm').onsubmit=e=>{e.preventDefault();const q=$('#skyInput').value.trim();if(!q)return;addBubble(q,true);$('#skyInput').value='';setTimeout(()=>addBubble(skyAnswer(q)),180)};
-  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();state.installPrompt=e;$('#installBtn').hidden=false});$('#installBtn').onclick=async()=>{if(!state.installPrompt)return toast('Dal menu del browser scegli “Installa app” o “Aggiungi alla schermata Home”.');state.installPrompt.prompt();await state.installPrompt.userChoice;state.installPrompt=null;$('#installBtn').hidden=true;track('pwa_install',{section:'install'})};
+  updateClubClock();setInterval(updateClubClock,1000);
+  const modalClose=$('#modalClose'),modalBackdrop=$('#modalBackdrop'),loginBtn=$('#loginBtn'),mobileProfile=$('#mobileProfile'),heroGames=$('#heroGames'),refreshBtn=$('#refreshBtn'),skyFab=$('#skyFab'),closeSkyBtn=$('#closeSky'),skyForm=$('#skyForm'),installBtn=$('#installBtn');
+  if(modalClose)modalClose.onclick=closeModal;
+  if(modalBackdrop)modalBackdrop.onclick=e=>{if(e.target===modalBackdrop)closeModal()};
+  [$('#registerBtn'),$('#heroRegister'),$('#quickRegister'),$('#bottomRegister')].forEach(b=>b&&b.addEventListener('click',openRegister));
+  if(loginBtn)loginBtn.onclick=openProfile;
+  if(mobileProfile)mobileProfile.onclick=openProfile;
+  if(heroGames)heroGames.onclick=()=>$('#gare')?.scrollIntoView({behavior:'smooth'});
+  if(refreshBtn)refreshBtn.onclick=()=>loadSummary();
+  if(skyFab)skyFab.onclick=openSky;
+  const mobileSky=$('#mobileSky');if(mobileSky)mobileSky.onclick=openSky;
+  if(closeSkyBtn)closeSkyBtn.onclick=closeSky;
+  document.querySelectorAll('[data-sky]').forEach(b=>b.onclick=()=>{const map={next:'Qual è la prossima gara?',join:'Come posso iscrivermi o fare una prova?',sponsor:'Come posso diventare sponsor?',rent:'Come posso affittare un campo?',fan:'Come funziona la community tifosi?'};const q=map[b.dataset.sky]||'Come posso usare la Super App?';addBubble(q,true);setTimeout(()=>addBubble(skyAnswer(q)),180)});
+  if(skyForm)skyForm.onsubmit=e=>{e.preventDefault();const input=$('#skyInput'),q=input?.value.trim();if(!q)return;addBubble(q,true);if(input)input.value='';setTimeout(()=>addBubble(skyAnswer(q)),180)};
+  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();state.installPrompt=e;if(installBtn)installBtn.hidden=false});
+  if(installBtn)installBtn.onclick=async()=>{if(!state.installPrompt)return toast('Dal menu del browser scegli “Installa app” o “Aggiungi alla schermata Home”.');state.installPrompt.prompt();await state.installPrompt.userChoice;state.installPrompt=null;installBtn.hidden=true;track('pwa_install',{section:'install'})};
   if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('./sw.js?v=21.8.0',{updateViaCache:'none'})
+  navigator.serviceWorker.register('./sw.js?v=21.10.0',{updateViaCache:'none'})
     .then(reg=>reg.update())
     .catch(()=>{});
-}bindDynamic();checkServiceHealth();restoreManagementSession();track('page_view',{section:(location.hash||'#home').replace('#','')});window.addEventListener('hashchange',()=>track('page_view',{section:(location.hash||'#home').replace('#','')}));loadSummary(true);setInterval(()=>{if(!document.hidden)loadSummary(true)},60000);setInterval(flushListening,120000);
+}bindDynamic();syncClubClock();checkServiceHealth();loadPublicCalendar(true);restoreManagementSession();track('page_view',{section:(location.hash||'#home').replace('#','')});window.addEventListener('hashchange',()=>track('page_view',{section:(location.hash||'#home').replace('#','')}));loadSummary(true);setInterval(()=>{if(!document.hidden)loadSummary(true)},60000);setInterval(flushListening,120000);setInterval(checkDueReminders,60000);setTimeout(checkDueReminders,4000);setInterval(()=>{if(!document.hidden)syncClubClock()},300000);setInterval(()=>{if(!document.hidden)loadPublicCalendar(true)},300000);
 }
 document.addEventListener('DOMContentLoaded',boot);

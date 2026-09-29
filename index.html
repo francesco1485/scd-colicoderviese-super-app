@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="it">
-<head><meta name="scd-build" content="21.8.0">
+<head><meta name="scd-build" content="21.10.0">
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#052a67" />
@@ -9,12 +9,39 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="SCD App" />
   <meta name="format-detection" content="telephone=yes" />
-  <meta name="description" content="SCD ColicoDerviese Super App: gare, risultati, eventi, tesseramenti, community, sponsor, servizi e area personale." />
+  <meta name="description" content="SCD ColicoDerviese Super App ufficiale: calendario, gare, risultati, eventi, territorio, community, sponsor, servizi e area personale." />
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
+  <meta name="author" content="S.D.C. ColicoDerviese" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="it_IT" />
+  <meta property="og:site_name" content="S.D.C. ColicoDerviese" />
+  <meta property="og:title" content="SCD ColicoDerviese · Super App" />
+  <meta property="og:description" content="Calendario, gare, risultati, eventi, territorio e servizi ufficiali SCD ColicoDerviese." />
+  <meta property="og:url" content="https://francesco1485.github.io/scd-colicoderviese-super-app/" />
+  <meta property="og:image" content="https://francesco1485.github.io/scd-colicoderviese-super-app/assets/hero-colico.webp" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="canonical" href="https://francesco1485.github.io/scd-colicoderviese-super-app/" />
   <link rel="manifest" href="./manifest.webmanifest" />
   <link rel="icon" href="./assets/logo-scd.png" />
   <link rel="apple-touch-icon" href="./assets/logo-scd.png" />
   <link rel="preload" href="./assets/hero-colico.webp" as="image" />
-  <link rel="stylesheet" href="./styles.css?v=21.8.0" />
+  <link rel="stylesheet" href="./styles.css?v=21.10.0" />
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"SportsOrganization",
+    "name":"S.D.C. ColicoDerviese",
+    "sport":"Calcio",
+    "url":"https://francesco1485.github.io/scd-colicoderviese-super-app/",
+    "logo":"https://francesco1485.github.io/scd-colicoderviese-super-app/assets/logo-scd.png",
+    "areaServed":["Colico","Dervio","Alto Lario","Lago di Como"],
+    "sameAs":[
+      "https://www.colicoderviese.it/",
+      "https://www.facebook.com/ColicoDerviese?locale=it_IT",
+      "https://www.instagram.com/s.c.d.colicoderviese/"
+    ]
+  }
+  </script>
   <title>SCD ColicoDerviese · Super App</title>
 </head>
 <body>
@@ -33,6 +60,18 @@
       <button class="primary compact" id="registerBtn">Registrati</button>
     </div>
   </header>
+
+  <section class="temporal-core" aria-label="Ora, calendario e territorio">
+    <div class="temporal-now">
+      <span class="live-dot"></span>
+      <div><small>ORA UFFICIALE SCD · EUROPE/ROME</small><strong id="clubClock">Sincronizzazione…</strong></div>
+    </div>
+    <div class="temporal-actions">
+      <button data-action="calendar">CALENDARIO</button>
+      <button data-action="notifications">NOTIFICHE</button>
+      <button data-action="location">MAPPA / POSIZIONE</button>
+    </div>
+  </section>
 
   <main id="home">
     <section class="hero hero-v3">
@@ -69,6 +108,11 @@
       <img class="wide" src="./assets/logo-monza.png" alt="Insieme al Monza">
       <span class="ribbon-divider"></span>
       <img class="wide" src="./assets/logo-sgs.png" alt="FIGC Settore Giovanile e Scolastico 3° livello">
+    </section>
+
+    <section class="section today-core" id="oggi">
+      <div class="section-head today-head"><div><span class="eyebrow">OGGI · TEMPO REALE</span><h2>Agenda SCD di oggi</h2><p>Data e ora sono ancorate al fuso Europe/Rome e il calendario viene letto dal backend SCD.</p></div><button class="outline" data-action="calendar">APRI CALENDARIO</button></div>
+      <div id="todayAgenda" class="today-agenda"><div class="loading-line">Sincronizzazione agenda…</div></div>
     </section>
 
     <section class="signal-strip" aria-label="Aggiornamenti principali">
@@ -178,7 +222,7 @@
   <div class="sponsor-ticker" aria-label="Sponsor SCD"><div class="sponsor-ticker-label">PARTNER SCD</div><div class="sponsor-marquee"><div id="sponsorTrack" class="sponsor-track"><span>SCD COLICODERVIESE · PARTNER DEL TERRITORIO ·</span></div></div></div>
 
   <nav class="mobile-nav" aria-label="Navigazione mobile">
-    <a href="#home"><span>⌂</span>Home</a><a href="#gare"><span>⚽</span>Gare</a><button data-action="avatar" class="avatar-nav"><span>◉</span>Avatar</button><a href="#community"><span>♥</span>Community</a><button id="mobileProfile"><span>●</span>Profilo</button>
+    <a href="#home"><span>⌂</span>Home</a><button data-action="calendar"><span>▣</span>Calendario</button><a href="#gare"><span>⚽</span>Gare</a><button data-action="location"><span>⌖</span>Territorio</button><button id="mobileProfile"><span>●</span>Profilo</button>
   </nav>
 
   <button class="sky-fab" id="skyFab" aria-label="Apri Sky assistente SCD"><span class="sky-face"><img src="./assets/sky.png" alt=""></span><span class="sky-copy"><b>Sky</b><small>Assistente SCD</small></span><span class="sky-ping"></span></button>
@@ -187,6 +231,6 @@
   <div class="modal-backdrop" id="modalBackdrop" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><button class="modal-close" id="modalClose" aria-label="Chiudi">×</button><div id="modalBody"></div></div></div>
   <div class="toast" id="toast" role="status"></div>
 </div>
-<script src="./app.js?v=21.8.0" defer></script>
+<script src="./app.js?v=21.10.0" defer></script>
 </body>
 </html>
