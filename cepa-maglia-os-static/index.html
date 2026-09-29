@@ -55,6 +55,13 @@
       </div>
 
       <div class="nav-group">
+        <div class="nav-label">AGENZIA</div>
+        <button class="nav-item" data-view="products">Prodotti & Sintesi</button>
+        <button class="nav-item" data-view="collaborators">Collaboratori & Guadagni</button>
+        <button class="nav-item" data-view="comparisons">Confronti & Benchmark</button>
+      </div>
+
+      <div class="nav-group">
         <div class="nav-label">CEPA</div>
         <button class="nav-item" data-view="cepa">Centro CEPA</button>
         <button class="nav-item" data-view="territories">SAP & Territori</button>
@@ -63,6 +70,11 @@
       <div class="nav-group">
         <div class="nav-label">DOCUMENTI</div>
         <button class="nav-item" data-view="documents">Archivio & Contratti</button>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-label">AI & COMUNICAZIONE</div>
+        <button class="nav-item" data-view="aiMail">AI Mail & Chat</button>
       </div>
 
       <div class="nav-group">
@@ -216,6 +228,83 @@
       </section>
     </section>
 
+    <section id="productsView" class="view hidden">
+      <section class="section-intro split">
+        <div>
+          <div class="eyebrow">PRODOTTI & SINTESI</div>
+          <h2>Capire un prodotto in pochi minuti, senza perdere il dettaglio.</h2>
+          <p>Ogni scheda collega compagnia, target, sintesi, processo, punti di forza, limiti, confronto e disegno del percorso consulenziale. I dati non verificati restano esplicitamente marcati.</p>
+        </div>
+      </section>
+      <section class="agency-kpis">
+        <div><span>Prodotti / aree</span><strong id="productCount">-</strong></div>
+        <div><span>Da verificare</span><strong id="productToVerify">-</strong></div>
+        <div><span>Confronti</span><strong id="comparisonCount">-</strong></div>
+        <div><span>Compagnie collegate</span><strong id="productProviderCount">-</strong></div>
+      </section>
+      <div id="productGrid" class="product-grid"></div>
+    </section>
+
+    <section id="collaboratorsView" class="view hidden">
+      <section class="section-intro split">
+        <div>
+          <div class="eyebrow">COLLABORATORI & REMUNERAZIONI</div>
+          <h2>Ruoli diversi, prodotti diversi, modelli di guadagno diversi.</h2>
+          <p>La piattaforma separa anagrafica, competenze, territori e condizioni economiche per singolo prodotto o collaborazione. Nessuna percentuale viene inventata: ciò che manca rimane da verificare.</p>
+        </div>
+        <button id="addCollaboratorBtn" class="primary hidden">+ Collaboratore</button>
+      </section>
+      <section class="agency-kpis">
+        <div><span>Collaboratori</span><strong id="collabCount">-</strong></div>
+        <div><span>Attivi verificati</span><strong id="collabVerified">-</strong></div>
+        <div><span>Condizioni prodotto</span><strong id="collabTermsCount">-</strong></div>
+        <div><span>Da verificare</span><strong id="collabTermsPending">-</strong></div>
+      </section>
+      <section class="panel">
+        <div class="panel-head"><div><div class="eyebrow">RETE OPERATIVA</div><h3>Collaboratori e modello economico</h3></div></div>
+        <div id="collaboratorList" class="list"></div>
+      </section>
+    </section>
+
+    <section id="comparisonsView" class="view hidden">
+      <section class="section-intro">
+        <div class="eyebrow">CONFRONTI & BENCHMARK</div>
+        <h2>Confrontare per capire, non per fare classifiche decorative.</h2>
+        <p>Ogni confronto deve indicare fonte, data e livello di confidenza. Punti di forza e debolezza vengono separati dai giudizi commerciali e dalle ipotesi.</p>
+      </section>
+      <div id="comparisonGroups" class="comparison-groups"></div>
+    </section>
+
+    <section id="aiMailView" class="view hidden">
+      <section class="section-intro">
+        <div class="eyebrow">AI MAIL & CHAT</div>
+        <h2>Comunicazioni personalizzate, collegate al contesto reale.</h2>
+        <p>Il motore prepara bozze coerenti con partner, CEPA, clienti e attività. L'invio diretto verrà collegato a un canale email autorizzato; per ora le bozze restano revisionabili e tracciate.</p>
+      </section>
+      <section class="two-col">
+        <article class="panel">
+          <div class="panel-head"><div><div class="eyebrow">MODELLI</div><h3>Parti da uno scopo</h3></div></div>
+          <div id="mailTemplateList" class="template-grid"></div>
+        </article>
+        <article class="panel">
+          <div class="panel-head"><div><div class="eyebrow">COMPOSER</div><h3>Bozza guidata</h3></div></div>
+          <form id="mailComposerForm" class="form mail-composer">
+            <label>Modello<select id="mailTemplateSelect"></select></label>
+            <label>Compagnia / partner<select id="mailPartnerSelect"><option value="">Generale</option></select></label>
+            <div class="inline"><label>Destinatario<input id="mailRecipientName"></label><label>Email<input id="mailRecipientEmail" type="email"></label></div>
+            <label>Contesto<textarea id="mailContext" placeholder="Obiettivo, punti da affrontare, informazioni da richiamare..."></textarea></label>
+            <label>Oggetto<input id="mailSubject"></label>
+            <label>Testo<textarea id="mailBody" class="mail-body"></textarea></label>
+            <div class="composer-actions"><button class="secondary" id="generateMailBtn" type="button">Genera bozza guidata</button><button class="primary" type="submit">Salva bozza</button></div>
+          </form>
+        </article>
+      </section>
+      <section class="panel top-gap">
+        <div class="panel-head"><div><div class="eyebrow">BOZZE</div><h3>Comunicazioni salvate</h3></div></div>
+        <div id="mailDraftList" class="list"></div>
+      </section>
+    </section>
+
     <section id="cepaView" class="view hidden">
       <section class="cepa-hero">
         <div>
@@ -252,6 +341,14 @@
             <span>Materia</span><b>→</b><span>Contenuto / incontro</span><b>→</b><span>Comprensione</span><b>→</b><span>Richiesta volontaria</span><b>→</b><span>Approfondimento</span>
           </div>
         </article>
+      </section>
+
+      <section class="panel top-gap">
+        <div class="panel-head">
+          <div><div class="eyebrow">ORIZZONTE NAZIONALE</div><h3>Sviluppo CEPA per fasi</h3></div>
+          <span class="future-chip">metodo replicabile, qualità controllata</span>
+        </div>
+        <div id="cepaRoadmap" class="roadmap"></div>
       </section>
     </section>
 
@@ -343,6 +440,34 @@
     </section>
   </main>
 </section>
+
+<aside id="aiDock" class="ai-dock hidden">
+  <button id="aiDockToggle" class="ai-dock-toggle" type="button">
+    <img src="./assistant_avatar.webp" alt="Assistente AI Maglia 360">
+    <span><strong>Lia · Assistente AI</strong><small>Lario · Valtellina · Maglia 360</small></span>
+    <b class="online-dot"></b>
+  </button>
+  <div id="aiDockPanel" class="ai-dock-panel hidden">
+    <div class="ai-profile">
+      <img src="./assistant_avatar.webp" alt="">
+      <div><div class="eyebrow">ASSISTENTE TERRITORIALE</div><h3>Lia</h3><p>Leggo i dati presenti nella piattaforma e ti aiuto a orientarti tra compagnie, prodotti, CEPA, attività e bozze email.</p></div>
+    </div>
+    <div id="aiMessages" class="ai-messages">
+      <div class="ai-message bot">Sono collegata ai dati Maglia 360. Posso indicarti cosa è aperto, cosa manca e dove entrare. Le informazioni non verificate restano tali.</div>
+    </div>
+    <div class="ai-quick">
+      <button type="button" data-ai-prompt="Quali attività sono aperte?">Attività</button>
+      <button type="button" data-ai-prompt="Fammi il quadro dei prodotti">Prodotti</button>
+      <button type="button" data-ai-prompt="A che punto è CEPA?">CEPA</button>
+      <button type="button" data-ai-prompt="Preparami una email">Email</button>
+    </div>
+    <form id="aiChatForm" class="ai-chat-form">
+      <input id="aiChatInput" placeholder="Chiedi di partner, prodotti, CEPA, lavoro..." autocomplete="off">
+      <button type="submit">→</button>
+    </form>
+    <p class="ai-disclaimer">Assistente operativo AI-ready. Le decisioni e le comunicazioni finali restano sotto controllo umano.</p>
+  </div>
+</aside>
 
 <section id="blockedView" class="blocked hidden">
   <div class="eyebrow">ACCESSO LIMITATO</div>
