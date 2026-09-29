@@ -34,8 +34,7 @@ const allowedActions = new Set([
   'public.registration','public.partnerLead','public.communitySubmit','public.ticketSubmit','public.telemetry',
   'auth.request','auth.login','auth.validate','auth.pin.change','auth.pin.set',
   'direction.access.set','direction.pin.set','direction.player.approve','direction.player.reject',
-  'direction.diagnostics','direction.evolution','direction.leads','direction.moderation',
-  'safeguarding.submit'
+  'direction.diagnostics','direction.evolution','direction.leads','direction.moderation'
 ]);
 
 function json(res, status, data, headers={}) {

@@ -14,6 +14,12 @@ const allErrors=[];
 for(const viewport of viewports){
   const page=await browser.newPage({viewport});
   const errors=[];
+  const apiActions=[];
+  page.on('request',req=>{
+    if(req.method()==='POST'&&req.url().includes('/api/scd')){
+      try{apiActions.push(JSON.parse(req.postData()||'{}').action||'')}catch{}
+    }
+  });
   page.on('pageerror',e=>errors.push(String(e)));
   page.on('console',msg=>{if(msg.type()==='error')errors.push('console: '+msg.text())});
 
@@ -31,6 +37,16 @@ for(const viewport of viewports){
 
   await page.click('[data-action="requests"]');
   await page.waitForSelector('#requestHistoryMount');
+  await page.click('#modalClose');
+
+  const safeBefore=apiActions.length;
+  await page.locator('[data-action="safeguarding"]').first().click();
+  await page.waitForSelector('#safeForm');
+  await page.fill('#safeMessage','QA safeguarding local-only');
+  await page.click('#safeForm button[type="submit"]');
+  await page.waitForSelector('#safeStatus .status-box');
+  const safeActions=apiActions.slice(safeBefore);
+  if(safeActions.includes('safeguarding.submit')) throw new Error('safeguarding must not transit ordinary API');
   await page.click('#modalClose');
 
   await page.click('#mobileProfile');
