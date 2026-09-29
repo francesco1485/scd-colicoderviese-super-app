@@ -681,6 +681,40 @@ function openFantasy(rulesOnly=false){const rules=`<div class="notice"><b>Princi
 function openSky(){const p=$('#skyPanel');p.classList.add('open');p.setAttribute('aria-hidden','false');setTimeout(()=>$('#skyInput').focus(),150)}function closeSky(){const p=$('#skyPanel');p.classList.remove('open');p.setAttribute('aria-hidden','true')}
 function skyAnswer(q){const p=publicData(state.summary||FALLBACK);const t=q.toLowerCase();if(/prossim|gara|partita/.test(t)){const n=p.nextMatch||{};return `Prossima gara: ${field(n,'team')||'SCD ColicoDerviese'} contro ${field(n,'opponentName','opponent')||'avversario'}, ${fmtDate(field(n,'date'))}${field(n,'time')?' alle '+field(n,'time'):''}.`}if(/event|torneo/.test(t)){const e=(p.initiatives||[])[0];return e?`In evidenza: ${field(e,'title','event')}. ${[fmtDate(field(e,'date')),field(e,'venue')].filter(Boolean).join(' · ')}.`:'Apri Eventi e Tornei: trovi iniziative, programmi e link di iscrizione.'}if(/iscriv|tesser|giocare|open day|prova/.test(t))return 'Per entrare nella SCD usa “Vuoi giocare con noi?”. La richiesta non assegna automaticamente un tesseramento: viene verificata dalla Segreteria.';if(/registr|profil/.test(t))return 'Puoi registrarti con nome, cognome, email e telefono. Il profilo nasce senza privilegi; la Direzione assegna in seguito l’accesso qualificato.';if(/access|pin|mister|staff|famiglia|atleta/.test(t))return 'Gli accessi qualificati vengono assegnati dalla Direzione SCD. Dopo l’abilitazione userai email e PIN personale.';if(/sponsor|partner|prodotto|fornitore/.test(t))return 'Apri il Commercial Hub: puoi diventare sponsor, proporre prodotti o servizi e richiedere una proposta personalizzata.';if(/campo|affitt|impianto/.test(t))return 'Puoi inviare una richiesta per affitto campo o spazi dal Club Services. La disponibilità viene confermata dalla Società.';if(/fantacalcio|fantasy/.test(t))return 'Fantasy SCD è pensato come gioco community gratuito e non monetario. Per tutela e privacy, eventuali atleti minorenni non vengono usati senza base e consenso adeguati.';if(/safeguard|segnal/.test(t))return 'Per Safeguarding usa esclusivamente il canale riservato dedicato, separato dalla community e dal CRM ordinario.';if(/bigliett|ticket/.test(t))return 'La sezione Biglietti gestisce prenotazioni e, quando sarà configurato un canale di pagamento sicuro, anche l’acquisto.';if(/card|tifoso/.test(t))return 'Le Card SCD sono predisposte per Tifoso, Famiglia, Tesserato e Partner con vantaggi e contenuti differenziati.';return 'Posso aiutarti con gare, iscrizioni, tornei, campi, sponsor, community, fantasy, card, biglietti, contatti e area riservata.'}
 function addBubble(text,user=false){const el=document.createElement('div');el.className='bubble '+(user?'user':'bot');el.textContent=text;$('#skyMessages').appendChild(el);$('#skyMessages').scrollTop=$('#skyMessages').scrollHeight}
+function eventMoment(x){
+  const date=String(x.date||'').slice(0,10),time=String(x.time||'00:00').slice(0,5);
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(date))return null;
+  const d=new Date(date+'T'+time+':00');
+  return Number.isFinite(d.getTime())?d:null;
+}
+async function showLocalNotification(title,body,tag){
+  if(!('Notification' in window)||Notification.permission!=='granted')return false;
+  try{
+    if('serviceWorker' in navigator){
+      const reg=await navigator.serviceWorker.ready;
+      await reg.showNotification(title,{body,tag,icon:'./assets/icon-192.png',badge:'./assets/icon-192.png',data:{url:location.href+'#oggi'}});
+      return true;
+    }
+    new Notification(title,{body,tag});
+    return true;
+  }catch{return false}
+}
+async function checkDueReminders(){
+  const now=clubNow().getTime();
+  for(let i=0;i<localStorage.length;i++){
+    const key=localStorage.key(i);if(!key||!key.startsWith('scd:reminder:'))continue;
+    try{
+      const x=JSON.parse(localStorage.getItem(key)||'{}');
+      if(x.notifiedAt)continue;
+      const when=eventMoment(x);if(!when)continue;
+      const diff=when.getTime()-now;
+      if(diff<=30*60*1000&&diff>=-5*60*1000){
+        const ok=await showLocalNotification('SCD ColicoDerviese · '+x.title,'In programma alle '+(x.time||'orario da verificare'),key);
+        if(ok){x.notifiedAt=new Date().toISOString();localStorage.setItem(key,JSON.stringify(x));track('notification_interaction',{section:'calendar_reminder'})}
+      }
+    }catch{}
+  }
+}
 function bindDynamic(){
   $$('[data-scroll]').forEach(b=>b.onclick=()=>$(b.dataset.scroll)?.scrollIntoView({behavior:'smooth'}));
   $$('[data-share]').forEach(b=>b.onclick=async()=>{
@@ -704,6 +738,6 @@ function boot(){
   navigator.serviceWorker.register('./sw.js?v=21.10.0',{updateViaCache:'none'})
     .then(reg=>reg.update())
     .catch(()=>{});
-}bindDynamic();syncClubClock();checkServiceHealth();loadPublicCalendar(true);restoreManagementSession();track('page_view',{section:(location.hash||'#home').replace('#','')});window.addEventListener('hashchange',()=>track('page_view',{section:(location.hash||'#home').replace('#','')}));loadSummary(true);setInterval(()=>{if(!document.hidden)loadSummary(true)},60000);setInterval(flushListening,120000);
+}bindDynamic();syncClubClock();checkServiceHealth();loadPublicCalendar(true);restoreManagementSession();track('page_view',{section:(location.hash||'#home').replace('#','')});window.addEventListener('hashchange',()=>track('page_view',{section:(location.hash||'#home').replace('#','')}));loadSummary(true);setInterval(()=>{if(!document.hidden)loadSummary(true)},60000);setInterval(flushListening,120000);setInterval(checkDueReminders,60000);setTimeout(checkDueReminders,4000);
 }
 document.addEventListener('DOMContentLoaded',boot);
