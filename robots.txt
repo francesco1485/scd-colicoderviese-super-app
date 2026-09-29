@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://francesco1485.github.io/scd-colicoderviese-super-app/sitemap.xml
