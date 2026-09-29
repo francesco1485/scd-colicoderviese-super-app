@@ -14,12 +14,10 @@ jobs:
     timeout-minutes: 3
     steps:
       - name: Validate manifest impact declaration
-        env:
-          EVENT_PATH: ${{ github.event_path }}
         run: |
           node <<'NODE'
           const fs=require('fs');
-          const event=JSON.parse(fs.readFileSync(process.env.EVENT_PATH,'utf8'));
+          const event=JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH,'utf8'));
           const body=event.pull_request?.body||'';
           const fail=(m)=>{console.error('SCD PR POLICY FAIL: '+m);process.exitCode=1};
           if(!body.includes('- [x] Ho letto `SCD_SYSTEM_MANIFEST.json`.')) fail('manifest read checkbox not confirmed');
