@@ -34,19 +34,24 @@
   ],
   "shortcuts": [
     {
+      "name": "Oggi",
+      "short_name": "Oggi",
+      "url": "./#oggi"
+    },
+    {
+      "name": "Calendario",
+      "short_name": "Calendario",
+      "url": "./#oggi"
+    },
+    {
       "name": "Gare",
       "short_name": "Gare",
       "url": "./#gare"
     },
     {
-      "name": "Avatar",
-      "short_name": "Avatar",
-      "url": "./#avatar"
-    },
-    {
-      "name": "Community",
-      "short_name": "Community",
-      "url": "./#community"
+      "name": "Profilo",
+      "short_name": "Profilo",
+      "url": "./#profilo"
     }
   ]
 }
