@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "1.4.0",
+    "version": "1.5.0",
     "effective_at": "2026-09-29",
     "status": "BINDING",
     "language": "it-IT",
@@ -1356,7 +1356,8 @@
       "NO_FAKE_SPORT_DATA",
       "PROVENANCE_CONTRACT",
       "FEATURE_FLAG_ROLLOUT",
-      "OBSERVABILITY_STATUS"
+      "OBSERVABILITY_STATUS",
+      "PRODUCTION_EVIDENCE"
     ],
     "merge_rule": "Non considerare completata una funzione se è verde solo tecnicamente ma viola il manifest o il master visivo.",
     "release_truth": {
@@ -1379,6 +1380,21 @@
         "KNOWN_LIMITATIONS",
         "ROLLBACK"
       ]
+    },
+    "production_evidence": {
+      "required": true,
+      "workflow": ".github/workflows/production-evidence.yml",
+      "artifact": "scd-production-evidence",
+      "pages_url": "https://francesco1485.github.io/scd-colicoderviese-super-app/",
+      "render_base_url": "https://scd-colicoderviese-official-r21.onrender.com",
+      "checks": [
+        "PAGES_BUILD_VERSION",
+        "RENDER_HEALTH_VERSION",
+        "RENDER_FEATURE_FLAGS",
+        "R20_DATA_FABRIC_CONTRACT_END_TO_END"
+      ],
+      "r20_contract_action": "public.datafabric.contract",
+      "failure_semantics": "NOT_LIVE_UNTIL_ALL_REQUIRED_CHECKS_PASS"
     }
   },
   "capability_map": [
@@ -1547,6 +1563,13 @@
         "R20"
       ],
       "contract": "STATUS_LAST_SYNC_LAST_SUCCESS_LAST_ERROR_PROVENANCE"
+    },
+    {
+      "id": "CAP-RUNTIME-EVIDENCE",
+      "domain": "DELIVERY",
+      "required": true,
+      "state": "PARTIAL",
+      "contract": "PAGES_RENDER_R20_END_TO_END_PROOF"
     }
   ],
   "known_noncompliance": [
@@ -1682,7 +1705,18 @@
         "predecessor_main_commit": "7a8f76d824c8a69f9c9e5b64639b29be7c70936b",
         "successor_main_commit": "5947477a3549fbab4e1d4029a86c1e46e57f1ec3"
       }
-    ]
+    ],
+    "runtime_activation": {
+      "release": "R29",
+      "public_probe_action": "public.datafabric.contract",
+      "public_probe_payload": "NON_SENSITIVE_SCHEMA_ONLY",
+      "close_issue_when": [
+        "PAGES_29_VERIFIED",
+        "RENDER_29_VERIFIED",
+        "R20_CONTRACT_R29_VERIFIED",
+        "DATA_FABRIC_PRIVATE_STATUS_VERIFIED_BY_DIRECTION"
+      ]
+    }
   },
   "product_direction": {
     "default_entry_route": "#/pulse",
