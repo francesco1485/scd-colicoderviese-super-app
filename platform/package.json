@@ -1,15 +1,17 @@
 {
   "name": "@scd/command-platform",
-  "version": "22.0.0",
+  "version": "22.0.1",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "tsx watch src/api/server.ts",
     "dev:worker": "tsx watch src/worker/commandWorker.ts",
     "build": "tsc -p tsconfig.json",
-    "start": "node dist/api/server.js",
-    "worker": "node dist/worker/commandWorker.js",
+    "start": "node dist/src/api/server.js",
+    "worker": "node dist/src/worker/commandWorker.js",
     "test": "tsx --test tests/*.test.ts",
     "check": "npm run build && npm test"
   },
