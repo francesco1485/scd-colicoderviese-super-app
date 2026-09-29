@@ -1,4 +1,4 @@
-const APP_VERSION='21.10.0';
+const APP_VERSION='21.11.0';
 const DYNAMIC_ORIGIN=(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)||location.hostname.endsWith('.onrender.com'))
   ? location.origin
   : 'https://scd-colicoderviese-official-r21.onrender.com';
@@ -137,12 +137,12 @@ async function loadPublicCalendar(silent=true){
     const rows=normalizeCalendarRows(raw).sort((a,b)=>calendarSortKey(a)-calendarSortKey(b));
     state.calendar=rows;
     localStorage.setItem(CALENDAR_KEY,JSON.stringify({at:new Date().toISOString(),rows}));
-    renderTodayAgenda();
+    renderTodayAgenda();renderHomeKpis(publicData(state.summary||FALLBACK));
     if(!silent)toast('Calendario SCD aggiornato');
     return rows;
   }catch(e){
     try{state.calendar=JSON.parse(localStorage.getItem(CALENDAR_KEY)||'{}').rows||[]}catch{state.calendar=[]}
-    renderTodayAgenda();
+    renderTodayAgenda();renderHomeKpis(publicData(state.summary||FALLBACK));
     return state.calendar;
   }
 }
@@ -163,15 +163,58 @@ function openCalendarEvent(id){
   $('#eventReminder').onclick=()=>requestEventReminder(x);
 }
 async function openCalendar(){
-  modal('<span class="eyebrow">TEMPO REALE SCD</span><h2>Calendario</h2><p id="calendarClock">'+esc(formatClubDateTime())+'</p><div class="calendar-toolbar"><button class="outline" id="calendarRefresh">AGGIORNA</button><button class="outline" id="calendarNotify">NOTIFICHE</button></div><div id="calendarRows" class="calendar-list"><div class="loading-line">Sincronizzazione calendario…</div></div>');
-  const renderRows=()=>{
-    const mount=$('#calendarRows');if(!mount)return false;
-    const today=clubDateKey(),future=(state.calendar||[]).filter(x=>!x.date||String(x.date).slice(0,10)>=today).slice(0,40);
-    mount.innerHTML=future.length?future.map(x=>`<button class="calendar-row" data-calendar-event="${esc(x.id)}"><time><b>${esc(fmtDate(x.date))}</b><small>${esc(x.time||'')}</small></time><span><b>${esc(x.title)}</b><small>${esc([x.team,x.venue,x.type].filter(Boolean).join(' · '))}</small></span><i>›</i></button>`).join(''):'<div class="empty-state">Calendario pubblico in aggiornamento.</div>';
-    bindCalendarEvents();return true;
+  setActiveNav('calendar');
+  modal('<section class="calendar-app-screen"><header class="calendar-app-head"><div class="calendar-app-brand"><img src="./assets/logo-scd.png" alt="SCD"><div><b>Calendario</b><p>Gare, allenamenti, riunioni ed eventi del club.</p></div></div></header><div class="calendar-tabs" role="tablist"><button class="active" data-cal-filter="ALL">Tutti</button><button data-cal-filter="MATCH">Gare</button><button data-cal-filter="TRAINING">Allenamenti</button><button data-cal-filter="EVENT">Eventi</button></div><div class="calendar-weekbar"><button class="outline" id="calPrev" aria-label="Settimana precedente">‹</button><strong id="calendarRange">Settimana corrente</strong><button class="outline" id="calNext" aria-label="Settimana successiva">›</button></div><div id="calendarDays" class="calendar-days"></div><div id="calendarNext"></div><div id="calendarRows" class="calendar-list"><div class="loading-line">Sincronizzazione calendario…</div></div><div class="calendar-toolbar"><button class="outline" id="calendarRefresh">AGGIORNA</button><button class="primary" id="calendarNotify">NOTIFICHE</button></div></section>');
+  let offset=0,filter='ALL';
+  const isoDate=d=>new Intl.DateTimeFormat('en-CA',{timeZone:state.clubTimeZone,year:'numeric',month:'2-digit',day:'2-digit'}).format(d);
+  const weekStart=()=>{
+    const now=clubNow(),shift=(now.getDay()+6)%7;
+    const d=new Date(now.getTime()-shift*86400000+offset*7*86400000);
+    return new Date(d.getFullYear(),d.getMonth(),d.getDate());
   };
-  const refresh=$('#calendarRefresh'),notify=$('#calendarNotify');
-  if(refresh)refresh.onclick=async()=>{await syncClubClock();await loadPublicCalendar(false);if(!renderRows())return;const clock=$('#calendarClock');if(clock)clock.textContent=formatClubDateTime()};
+  const matchFilter=x=>{
+    const t=[x.type,x.title].join(' ');
+    if(filter==='MATCH')return /gara|partita|campionato|coppa|amichevole|match/i.test(t);
+    if(filter==='TRAINING')return /allenament/i.test(t);
+    if(filter==='EVENT')return !/gara|partita|campionato|coppa|amichevole|match|allenament/i.test(t);
+    return true;
+  };
+  const eventClass=x=>{
+    const t=[x.type,x.title].join(' ');
+    if(/allenament/i.test(t))return 'event-training';
+    if(/gara|partita|campionato|coppa|amichevole|match/i.test(t))return 'event-match';
+    return 'event-club';
+  };
+  const icon=x=>{
+    const t=[x.type,x.title].join(' ');
+    if(/allenament/i.test(t))return '◭';
+    if(/gara|partita|campionato|coppa|amichevole|match/i.test(t))return '⚽';
+    if(/torneo/i.test(t))return '🏆';
+    return '●';
+  };
+  const renderRows=()=>{
+    const mount=$('#calendarRows'),range=$('#calendarRange'),days=$('#calendarDays'),next=$('#calendarNext');
+    if(!mount||!range||!days||!next)return false;
+    const start=weekStart(),endDate=new Date(start.getTime()+6*86400000),startKey=isoDate(start),endKey=isoDate(endDate);
+    range.textContent=new Intl.DateTimeFormat('it-IT',{timeZone:state.clubTimeZone,day:'numeric',month:'long'}).format(start)+' – '+new Intl.DateTimeFormat('it-IT',{timeZone:state.clubTimeZone,day:'numeric',month:'long',year:'numeric'}).format(endDate);
+    const today=clubDateKey();
+    days.innerHTML=Array.from({length:7},(_,i)=>{const d=new Date(start.getTime()+i*86400000),key=isoDate(d);return '<button class="calendar-day '+(key===today?'today':'')+'" data-cal-day="'+key+'"><small>'+new Intl.DateTimeFormat('it-IT',{weekday:'short',timeZone:state.clubTimeZone}).format(d).replace('.','')+'</small><b>'+new Intl.DateTimeFormat('it-IT',{day:'numeric',timeZone:state.clubTimeZone}).format(d)+'</b></button>'}).join('');
+    let rows=(state.calendar||[]).filter(x=>x.date&&String(x.date).slice(0,10)>=startKey&&String(x.date).slice(0,10)<=endKey&&matchFilter(x));
+    rows=rows.sort((a,b)=>calendarSortKey(a)-calendarSortKey(b));
+    const upcoming=(state.calendar||[]).filter(x=>x.date&&String(x.date).slice(0,10)>=today&&matchFilter(x)).sort((a,b)=>calendarSortKey(a)-calendarSortKey(b))[0];
+    next.innerHTML=upcoming?'<button class="calendar-next" data-calendar-event="'+esc(upcoming.id)+'"><span class="next-ico">'+icon(upcoming)+'</span><span><small>PROSSIMO EVENTO</small><b>'+esc(upcoming.title)+'</b><small>'+esc([fmtDate(upcoming.date),upcoming.time,upcoming.venue].filter(Boolean).join(' · '))+'</small></span><i>›</i></button>':'';
+    const groups=new Map();
+    rows.forEach(x=>{const k=String(x.date).slice(0,10);if(!groups.has(k))groups.set(k,[]);groups.get(k).push(x)});
+    mount.innerHTML=groups.size?[...groups.entries()].map(([date,items])=>'<section class="calendar-group"><div class="calendar-group-title"><b>'+esc(fmtDate(date))+'</b><small>'+items.length+' '+(items.length===1?'evento':'eventi')+'</small></div>'+items.map(x=>'<button class="calendar-row '+eventClass(x)+'" data-calendar-event="'+esc(x.id)+'"><span class="event-marker"></span><time><b>'+esc(x.time||'--:--')+'</b><small>'+esc(x.endTime||'')+'</small></time><span><b>'+esc(x.title)+'</b><small>'+esc([x.team,x.venue].filter(Boolean).join(' · ')||x.type)+'</small></span><i>›</i></button>').join('')+'</section>').join(''):'<div class="empty-state">Nessun evento registrato in questa settimana per il filtro scelto.</div>';
+    bindCalendarEvents();
+    document.querySelectorAll('[data-cal-day]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-cal-day]').forEach(x=>x.classList.remove('today'));b.classList.add('today')});
+    return true;
+  };
+  document.querySelectorAll('[data-cal-filter]').forEach(b=>b.onclick=()=>{filter=b.dataset.calFilter;document.querySelectorAll('[data-cal-filter]').forEach(x=>x.classList.toggle('active',x===b));renderRows()});
+  const prev=$('#calPrev'),nextBtn=$('#calNext'),refresh=$('#calendarRefresh'),notify=$('#calendarNotify');
+  if(prev)prev.onclick=()=>{offset--;renderRows()};
+  if(nextBtn)nextBtn.onclick=()=>{offset++;renderRows()};
+  if(refresh)refresh.onclick=async()=>{await syncClubClock();await loadPublicCalendar(false);renderRows()};
   if(notify)notify.onclick=requestNotificationPermission;
   await loadPublicCalendar(true);
   renderRows();
@@ -299,7 +342,23 @@ async function loadSummary(silent=false){
   state.summary=data;localStorage.setItem('scd:r21:summary',JSON.stringify(data));render(data);if(!silent)toast(radar&&radar.items?.length?'SCD Radar aggiornato':'Dati SCD aggiornati')
 }
 function publicData(data){return (data&&data.public)||FALLBACK.public}
-function render(data){const p=publicData(data);document.querySelectorAll('[data-season]').forEach(el=>el.textContent=data.season||'2026/27');$('#updatedAt').textContent=data.generatedAt||'ora';renderHero(p);renderTicker(p);renderMatches(p);renderEvents(p);renderNews(p);renderSponsors(p);renderTodayAgenda()}
+function renderHomeKpis(p){
+  const counts=p.counts||{};
+  const calendar=state.calendar||[];
+  const today=clubDateKey(),weekEnd=new Date(clubNow().getTime()+7*86400000);
+  const weekEndKey=new Intl.DateTimeFormat('en-CA',{timeZone:state.clubTimeZone,year:'numeric',month:'2-digit',day:'2-digit'}).format(weekEnd);
+  const week=calendar.filter(x=>x.date&&String(x.date).slice(0,10)>=today&&String(x.date).slice(0,10)<=weekEndKey);
+  const games=Number(counts.games||week.filter(x=>/gara|partita|campionato|coppa|amichevole|match/i.test([x.type,x.title].join(' '))).length||0);
+  const training=Number(counts.trainings||counts.training||week.filter(x=>/allenament/i.test([x.type,x.title].join(' '))).length||0);
+  const events=Number(counts.events||week.filter(x=>/evento|open day|riunione|torneo/i.test([x.type,x.title].join(' '))).length||0);
+  const initiatives=Number(counts.initiatives||(p.initiatives||[]).length||0);
+  const set=(id,v)=>{const el=$(id);if(el)el.textContent=String(v)};
+  set('#kpiGames',games);set('#kpiTraining',training);set('#kpiEvents',events);set('#kpiInitiatives',initiatives);
+}
+function setActiveNav(name){
+  document.querySelectorAll('.mobile-nav [data-nav]').forEach(el=>el.classList.toggle('active',el.dataset.nav===name));
+}
+function render(data){const p=publicData(data);document.querySelectorAll('[data-season]').forEach(el=>el.textContent=data.season||'2026/27');const updated=$('#updatedAt');if(updated)updated.textContent=data.generatedAt||'ora';renderHero(p);renderTicker(p);renderMatches(p);renderEvents(p);renderNews(p);renderSponsors(p);renderTodayAgenda();renderHomeKpis(p)}
 function renderHero(p){const n=p.nextMatch||{};$('#nextDate').textContent=fmtDate(field(n,'date','data'));$('#nextTime').textContent=field(n,'time','ora')||'—';const opp=displayValue(field(n,'opponentName','opponent','avversario','title'),'Avversario');$('#nextOpponent').textContent=opp;$('#opponentBadge').textContent=opp.slice(0,1).toUpperCase();$('#nextVenue').textContent=field(n,'venue','luogo','field')||'Sede da aggiornare'}
 function renderTicker(p){const h=p.highlights||[];$('#liveTicker').innerHTML='<span>'+esc(h.slice(0,5).map(x=>field(x,'title','subject','event')||'Aggiornamento SCD').join('  •  ')||'SCD ColicoDerviese · aggiornamenti in corso')+'</span>'}
 function renderMatches(p){const n=p.nextMatch||{};const l=p.lastResult||{};const cards=[];if(Object.keys(n).length)cards.push(matchCard(n,'PROSSIMA GARA',false));if(Object.keys(l).length)cards.push(matchCard(l,'ULTIMO RISULTATO',true));const extras=(p.highlights||[]).filter(x=>/gara|match|risultat/i.test([x.feedType,x.title,x.subject].join(' '))).slice(0,2);extras.forEach((x,i)=>cards.push(`<article class="match-card"><span class="tag">AGGIORNAMENTO GARA</span><h3>${esc(field(x,'title','subject')||'SCD ColicoDerviese')}</h3><p>${esc(field(x,'message','venue','status')||'Aggiornamento disponibile')}</p><div class="scoreline"><small>${esc(fmtDate(field(x,'date')))}</small><strong>→</strong></div></article>`));if(!cards.length)cards.push('<article class="match-card"><span class="tag">CALENDARIO SCD</span><h3>Dati gara in sincronizzazione</h3><p>La Super App non mostra partite inventate. Apri il calendario ufficiale o aggiorna tra poco.</p><div class="scoreline"><small>Fonte: SCD / federazione</small><strong>↻</strong></div></article>');$('#matchGrid').innerHTML=cards.join('')}
@@ -490,13 +549,42 @@ async function restoreManagementSession(){
   state.sessionToken=saved.token;
   try{await api('auth.validate',{token:saved.token},saved.token);state.privateData=await api('dashboard.summary',{},saved.token)}catch{clearSession()}
 }
+function openTeams(){
+  setActiveNav('teams');
+  const cal=state.calendar||[];
+  const names=new Map();
+  cal.forEach(x=>{const name=displayValue(x.team,'');if(name)names.set(name,(names.get(name)||0)+1)});
+  const rows=[...names.entries()].sort((a,b)=>b[1]-a[1]);
+  modal('<section class="teams-app-screen"><header class="teams-app-head"><div class="teams-app-brand"><img src="./assets/logo-scd.png" alt="SCD"><div><b>Squadre</b><p>Il mondo sportivo ColicoDerviese, categoria per categoria.</p></div></div></header><div class="mgmt-grid">'+(rows.length?rows.map(([name,count])=>'<button class="mgmt-tile" data-team-name="'+esc(name)+'"><span>⚽</span><b>'+esc(name)+'</b><small>'+count+' attività nel calendario</small></button>').join(''):'<div class="empty-state">Elenco squadre in sincronizzazione con il gestionale SCD.</div>')+'</div><div class="account-rule" style="margin-top:12px"><b>Accesso qualificato:</b> allenamenti, presenze e convocazioni dettagliate restano nelle aree autorizzate di atleta, famiglia e staff.</div></section>');
+  document.querySelectorAll('[data-team-name]').forEach(b=>b.onclick=()=>{const name=b.dataset.teamName;const events=(state.calendar||[]).filter(x=>displayValue(x.team,'')===name).slice(0,8);modal('<section class="teams-app-screen"><header class="teams-app-head"><div class="teams-app-brand"><img src="./assets/logo-scd.png" alt="SCD"><div><b>'+esc(name)+'</b><p>Prossime attività pubbliche disponibili.</p></div></div></header><div class="calendar-list">'+(events.length?events.map(x=>'<button class="calendar-row" data-calendar-event="'+esc(x.id)+'"><time><b>'+esc(fmtDate(x.date))+'</b><small>'+esc(x.time||'')+'</small></time><span><b>'+esc(x.title)+'</b><small>'+esc(x.venue||x.type)+'</small></span><i>›</i></button>').join(''):'<div class="empty-state">Nessuna attività pubblica disponibile.</div>')+'</div></section>');bindCalendarEvents()});
+}
+function openCommunicationsHub(){
+  setActiveNav('');
+  const p=publicData(state.summary||FALLBACK),rows=(p.highlights||[]).slice(0,8);
+  const important=rows.find(x=>/urgent|sospension|variaz|annull|rinvi|cambio/i.test([x.status,x.feedType,x.title,x.message].join(' ')))||rows[0]||{};
+  const rest=rows.filter(x=>x!==important).slice(0,5);
+  modal('<section class="communications-app-screen"><header class="communications-app-head"><div class="communications-app-brand"><img src="./assets/logo-scd.png" alt="SCD"><div><b>Comunicazioni</b><p>Notizie, aggiornamenti e contenuti ufficiali del club.</p></div></div></header><div class="communications-tabs"><button class="active">Club</button><button data-comm-tab="teams">Squadre</button><button data-comm-tab="social">Social</button></div><article class="communication-important"><span class="comm-ico">!</span><div><small>COMUNICAZIONE IN EVIDENZA</small><b>'+esc(field(important,'title','subject','event')||'Aggiornamenti SCD')+'</b><p>'+esc(field(important,'message','excerpt','venue')||'Le informazioni ufficiali del Club vengono pubblicate qui.')+'</p><time>'+esc(field(important,'date','time')||'')+'</time></div></article><div class="communication-list">'+(rest.length?rest.map(x=>'<article><span class="comm-row-ico">▣</span><div><small>'+esc(field(x,'feedType','source')||'CLUB')+'</small><b>'+esc(field(x,'title','subject','event')||'Aggiornamento')+'</b><p>'+esc(field(x,'message','venue','status')||'')+'</p></div><time>'+esc(field(x,'date','time')||'')+'</time></article>').join(''):'<div class="empty-state">Nuove comunicazioni in aggiornamento.</div>')+'</div><section class="social-hub-card"><div><h3>Social Hub</h3><p>I canali ufficiali SCD in un unico spazio, senza numeri inventati.</p></div><div class="social-links"><a href="https://www.instagram.com/s.c.d.colicoderviese/" target="_blank" rel="noopener">Instagram</a><a href="https://www.facebook.com/ColicoDerviese?locale=it_IT" target="_blank" rel="noopener">Facebook</a><a href="https://www.colicoderviese.it/" target="_blank" rel="noopener">Sito ufficiale</a></div><div class="modal-actions"><button class="outline" id="commRefresh">AGGIORNA</button><button class="primary" id="commShare">CONDIVIDI APP</button></div></section></section>');
+  const refresh=$('#commRefresh'),share=$('#commShare');
+  if(refresh)refresh.onclick=async()=>{await loadSummary(false);openCommunicationsHub()};
+  if(share)share.onclick=async()=>{try{if(navigator.share)await navigator.share({title:'SCD ColicoDerviese',text:'Segui gli aggiornamenti ufficiali SCD ColicoDerviese',url:location.href});else await navigator.clipboard.writeText(location.href);toast('Link app pronto per la condivisione')}catch{}};
+  document.querySelectorAll('[data-comm-tab]').forEach(b=>b.onclick=()=>{if(b.dataset.commTab==='teams')openTeams();else toast('Apri i canali ufficiali dal Social Hub')});
+}
 function openProfile(){
+  setActiveNav('profile');
   const count=localRequests().length;
-  modal(`<span class="eyebrow">PROFILO SCD</span><h2>La tua area</h2><p>Un unico ingresso per richieste, identità digitale e funzioni societarie autorizzate.</p><div class="profile-hub-grid"><button class="choice-tile" id="profileRequests"><b>Le mie richieste</b><small>${count} registrate su questo dispositivo</small></button><button class="choice-tile" id="profileAvatar"><b>Avatar & foto</b><small>Identità digitale SCD</small></button><button class="choice-tile" id="profileR20"><b>Area riservata SCD</b><small>Famiglia · Atleta · Staff · Direzione</small></button><button class="choice-tile" id="profileRefresh"><b>Sincronizza</b><small>Controlla servizi e aggiornamenti</small></button></div><div class="notice"><b>Account unico:</b> entri sempre come Utente Base. Gli eventuali permessi societari vengono aggiunti dalla Direzione sullo stesso account.</div>`);
-  $('#profileRequests').onclick=openMyRequests;
-  $('#profileAvatar').onclick=openAvatarStudio;
-  $('#profileR20').onclick=openLogin;
-  $('#profileRefresh').onclick=async()=>{await checkServiceHealth();await loadSummary();};
+  const session=storedSession();
+  modal('<section class="profile-app-screen"><header class="profile-app-head"><div class="profile-app-brand"><img src="./assets/logo-scd.png" alt="SCD"><div><b>Area Riservata</b><p>Un account. Atleta, famiglia, staff e direzione secondo i permessi assegnati.</p></div></div></header><div class="reserved-tabs"><button class="active">Profilo</button><button id="profileReserved">Area riservata</button><button id="profileCalendar">Calendario</button><button id="profileSettings">Impostazioni</button></div><div class="profile-hub-grid visual-profile-grid"><button class="choice-tile" id="profileRequests"><b>Le mie richieste</b><small>'+count+' registrate su questo dispositivo</small></button><button class="choice-tile" id="profileAvatar"><b>Avatar & foto</b><small>Identità digitale SCD</small></button><button class="choice-tile" id="profileR20"><b>Area riservata SCD</b><small>Famiglia · Atleta · Staff · Direzione</small></button><button class="choice-tile" id="profileRefresh"><b>Sincronizza</b><small>Controlla servizi e aggiornamenti</small></button><button class="choice-tile" id="profileCommunications"><b>Comunicazioni</b><small>News e aggiornamenti ufficiali</small></button><button class="choice-tile" id="profileTeams"><b>Squadre</b><small>Calendario e attività pubbliche</small></button><button class="choice-tile" id="profileLocation"><b>Territorio & Maps</b><small>Centro Sportivo, percorso e posizione</small></button></div><div class="account-rule"><b>Account unico:</b> ogni persona entra come Utente Base. I permessi societari vengono aggiunti dalla Direzione sullo stesso account.'+(session.email?'<br><br><b>Email salvata:</b> '+esc(session.email):'')+'</div></section>');
+  const req=$('#profileRequests'),avatar=$('#profileAvatar'),r20=$('#profileR20'),refresh=$('#profileRefresh'),reserved=$('#profileReserved'),cal=$('#profileCalendar'),settings=$('#profileSettings'),communications=$('#profileCommunications'),teams=$('#profileTeams'),locationBtn=$('#profileLocation');
+  if(req)req.onclick=openMyRequests;
+  if(avatar)avatar.onclick=openAvatarStudio;
+  if(r20)r20.onclick=openLogin;
+  if(reserved)reserved.onclick=openLogin;
+  if(cal)cal.onclick=openCalendar;
+  if(settings)settings.onclick=()=>toast('Impostazioni profilo in evoluzione controllata');
+  if(communications)communications.onclick=openCommunicationsHub;
+  if(teams)teams.onclick=openTeams;
+  if(locationBtn)locationBtn.onclick=openLocationHub;
+  if(refresh)refresh.onclick=async()=>{await checkServiceHealth();await loadSummary();await loadPublicCalendar(true);};
 }
 function openDirection(){openLogin()}
 
@@ -648,6 +736,8 @@ function openPublicAction(kind,seed={}){
   if(kind==='cards')return openCards();
   if(kind==='contacts')return openContacts();
   if(kind==='calendar')return openCalendar();
+  if(kind==='teams')return openTeams();
+  if(kind==='communications')return openCommunicationsHub();
   if(kind==='location')return openLocationHub();
   if(kind==='notifications')return requestNotificationPermission();
   const label=kind==='sponsor'?'Azienda / organizzazione':kind==='product'?'Azienda / attività':'Nome e cognome';
@@ -746,12 +836,14 @@ function bindDynamic(){
 }
 function boot(){
   updateClubClock();setInterval(updateClubClock,1000);
-  const modalClose=$('#modalClose'),modalBackdrop=$('#modalBackdrop'),loginBtn=$('#loginBtn'),mobileProfile=$('#mobileProfile'),heroGames=$('#heroGames'),refreshBtn=$('#refreshBtn'),skyFab=$('#skyFab'),closeSkyBtn=$('#closeSky'),skyForm=$('#skyForm'),installBtn=$('#installBtn');
+  const modalClose=$('#modalClose'),modalBackdrop=$('#modalBackdrop'),loginBtn=$('#loginBtn'),mobileProfile=$('#mobileProfile'),heroGames=$('#heroGames'),refreshBtn=$('#refreshBtn'),skyFab=$('#skyFab'),closeSkyBtn=$('#closeSky'),skyForm=$('#skyForm'),installBtn=$('#installBtn'),mobileNotify=$('#mobileNotify'),mobileSettings=$('#mobileSettings');
   if(modalClose)modalClose.onclick=closeModal;
   if(modalBackdrop)modalBackdrop.onclick=e=>{if(e.target===modalBackdrop)closeModal()};
   [$('#registerBtn'),$('#heroRegister'),$('#quickRegister'),$('#bottomRegister')].forEach(b=>b&&b.addEventListener('click',openRegister));
   if(loginBtn)loginBtn.onclick=openProfile;
   if(mobileProfile)mobileProfile.onclick=openProfile;
+  if(mobileNotify)mobileNotify.onclick=requestNotificationPermission;
+  if(mobileSettings)mobileSettings.onclick=openProfile;
   if(heroGames)heroGames.onclick=()=>$('#gare')?.scrollIntoView({behavior:'smooth'});
   if(refreshBtn)refreshBtn.onclick=()=>loadSummary();
   if(skyFab)skyFab.onclick=openSky;
@@ -762,9 +854,9 @@ function boot(){
   window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();state.installPrompt=e;if(installBtn)installBtn.hidden=false});
   if(installBtn)installBtn.onclick=async()=>{if(!state.installPrompt)return toast('Dal menu del browser scegli “Installa app” o “Aggiungi alla schermata Home”.');state.installPrompt.prompt();await state.installPrompt.userChoice;state.installPrompt=null;installBtn.hidden=true;track('pwa_install',{section:'install'})};
   if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('./sw.js?v=21.10.0',{updateViaCache:'none'})
+  navigator.serviceWorker.register('./sw.js?v=21.11.0',{updateViaCache:'none'})
     .then(reg=>reg.update())
     .catch(()=>{});
-}bindDynamic();syncClubClock();checkServiceHealth();loadPublicCalendar(true);restoreManagementSession();track('page_view',{section:(location.hash||'#home').replace('#','')});window.addEventListener('hashchange',()=>track('page_view',{section:(location.hash||'#home').replace('#','')}));loadSummary(true);setInterval(()=>{if(!document.hidden)loadSummary(true)},60000);setInterval(flushListening,120000);setInterval(checkDueReminders,60000);setTimeout(checkDueReminders,4000);setInterval(()=>{if(!document.hidden)syncClubClock()},300000);setInterval(()=>{if(!document.hidden)loadPublicCalendar(true)},300000);
+}bindDynamic();syncClubClock();checkServiceHealth();loadPublicCalendar(true);restoreManagementSession();track('page_view',{section:(location.hash||'#home').replace('#','')});window.addEventListener('hashchange',()=>{const section=(location.hash||'#home').replace('#','');track('page_view',{section});setActiveNav(section==='eventi'?'events':section==='home'?'home':'')});loadSummary(true);setInterval(()=>{if(!document.hidden)loadSummary(true)},60000);setInterval(flushListening,120000);setInterval(checkDueReminders,60000);setTimeout(checkDueReminders,4000);setInterval(()=>{if(!document.hidden)syncClubClock()},300000);setInterval(()=>{if(!document.hidden)loadPublicCalendar(true)},300000);
 }
 document.addEventListener('DOMContentLoaded',boot);

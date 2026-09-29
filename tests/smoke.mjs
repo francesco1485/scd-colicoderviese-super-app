@@ -1,4 +1,6 @@
 import { chromium } from 'playwright';
+import fs from 'node:fs';
+fs.mkdirSync('test-output',{recursive:true});
 
 const base=process.env.SCD_TEST_URL||'http://127.0.0.1:10000';
 const viewports=[
@@ -25,15 +27,27 @@ for(const viewport of viewports){
 
   await page.goto(base,{waitUntil:'domcontentloaded',timeout:30000});
   await page.waitForSelector('#home');
+  await page.waitForSelector('body.scd-ui-v21-11');
+  await page.waitForSelector('.home-kpis');
+  await page.waitForSelector('.mobile-nav [data-nav="calendar"]');
+  if(viewport.width===390) await page.screenshot({path:'test-output/home-390x844.png',fullPage:true});
   await page.waitForFunction(()=>document.documentElement.scrollWidth<=window.innerWidth+3);
   await page.waitForSelector('#clubClock');
   await page.waitForFunction(()=>document.querySelector('#clubClock')?.textContent?.length>8);
 
-  await page.locator('[data-action="calendar"]').first().click();
+  await page.locator('.mobile-nav [data-action="calendar"]').click();
+  await page.waitForSelector('.calendar-app-screen');
+  await page.waitForSelector('.calendar-tabs');
   await page.waitForSelector('#calendarRows');
+  if(viewport.width===390) await page.screenshot({path:'test-output/calendar-390x844.png',fullPage:true});
   await page.click('#modalClose');
 
-  await page.locator('[data-action="location"]').first().click();
+  await page.locator('[data-action="teams"]').first().click();
+  await page.waitForSelector('.teams-app-screen');
+  if(viewport.width===390) await page.screenshot({path:'test-output/teams-390x844.png',fullPage:true});
+  await page.click('#modalClose');
+
+  await page.evaluate(()=>openLocationHub());
   await page.waitForSelector('#locateMe');
   await page.click('#modalClose');
 
@@ -41,7 +55,7 @@ for(const viewport of viewports){
   await page.waitForSelector('#publicActionForm');
   await page.click('#modalClose');
 
-  await page.click('[data-action="avatar"]');
+  await page.locator('.service-grid [data-action="avatar"]').click();
   await page.waitForSelector('#avatarPreview');
   await page.click('#modalClose');
 
@@ -60,7 +74,17 @@ for(const viewport of viewports){
   await page.click('#modalClose');
 
   await page.click('#mobileProfile');
+  await page.waitForSelector('.profile-app-screen');
   await page.waitForSelector('.profile-hub-grid');
+  if(viewport.width===390){
+    await page.screenshot({path:'test-output/profile-390x844.png',fullPage:true});
+    await page.click('#profileCommunications');
+    await page.waitForSelector('.communications-app-screen');
+    await page.screenshot({path:'test-output/communications-390x844.png',fullPage:true});
+    await page.click('#modalClose');
+    await page.click('#mobileProfile');
+    await page.waitForSelector('.profile-app-screen');
+  }
   await page.click('#profileR20');
   await page.waitForSelector('#mgmtLoginForm');
   await page.click('#modalClose');
@@ -82,6 +106,7 @@ for(const viewport of viewports){
     });
     await page.waitForSelector('.mgmt-grid');
     await page.waitForSelector('.mgmt-detail');
+    await page.screenshot({path:'test-output/staff-direction-390x844.png',fullPage:true});
 
     await page.click('#mgmtAttendance');
     await page.waitForSelector('#attTeam');

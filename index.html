@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="it">
-<head><meta name="scd-build" content="21.10.0">
+<head><meta name="scd-build" content="21.11.0">
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#052a67" />
@@ -26,6 +26,7 @@
   <link rel="apple-touch-icon" href="./assets/logo-scd.png" />
   <link rel="preload" href="./assets/hero-colico.webp" as="image" />
   <link rel="stylesheet" href="./styles.css?v=21.10.0" />
+  <link rel="stylesheet" href="./ui-r21-11.css?v=21.11.0" />
   <script type="application/ld+json">
   {
     "@context":"https://schema.org",
@@ -44,7 +45,7 @@
   </script>
   <title>SCD ColicoDerviese · Super App</title>
 </head>
-<body>
+<body class="scd-ui-v21-11">
 <div class="app-shell">
   <header class="topbar" id="topbar">
     <a class="brand" href="#home" aria-label="SCD ColicoDerviese Home">
@@ -58,6 +59,10 @@
       <button class="ghost install-app-btn" id="installBtn">Installa App</button>
       <button class="ghost" id="loginBtn">Area riservata</button>
       <button class="primary compact" id="registerBtn">Registrati</button>
+    </div>
+    <div class="mobile-head-actions" aria-label="Azioni rapide">
+      <button class="app-icon-btn notify" id="mobileNotify" aria-label="Notifiche">♢</button>
+      <button class="app-icon-btn" id="mobileSettings" aria-label="Profilo e impostazioni">⚙</button>
     </div>
   </header>
 
@@ -100,6 +105,13 @@
         </div>
         <div class="match-meta" id="nextVenue">Centro Sportivo · Colico</div><button class="card-cta" data-scroll="#gare">Vedi calendario</button>
       </aside>
+    </section>
+
+    <section class="home-kpis" aria-label="Numeri della settimana">
+      <article class="home-kpi"><span class="ico">⚽</span><div><strong id="kpiGames">0</strong><small>Gare</small></div></article>
+      <article class="home-kpi"><span class="ico">◭</span><div><strong id="kpiTraining">0</strong><small>Allenamenti</small></div></article>
+      <article class="home-kpi"><span class="ico">▣</span><div><strong id="kpiEvents">0</strong><small>Eventi</small></div></article>
+      <article class="home-kpi"><span class="ico">●</span><div><strong id="kpiInitiatives">0</strong><small>Iniziative</small></div></article>
     </section>
 
     <section class="affiliation-ribbon" aria-label="Affiliazioni e riconoscimenti">
@@ -222,7 +234,11 @@
   <div class="sponsor-ticker" aria-label="Sponsor SCD"><div class="sponsor-ticker-label">PARTNER SCD</div><div class="sponsor-marquee"><div id="sponsorTrack" class="sponsor-track"><span>SCD COLICODERVIESE · PARTNER DEL TERRITORIO ·</span></div></div></div>
 
   <nav class="mobile-nav" aria-label="Navigazione mobile">
-    <a href="#home"><span>⌂</span>Home</a><button data-action="calendar"><span>▣</span>Calendario</button><a href="#gare"><span>⚽</span>Gare</a><button data-action="location"><span>⌖</span>Territorio</button><button id="mobileProfile"><span>●</span>Profilo</button>
+    <a href="#home" data-nav="home" class="active"><span>⌂</span>Home</a>
+    <button data-action="calendar" data-nav="calendar"><span>▣</span>Calendario</button>
+    <button data-action="teams" data-nav="teams"><span>♟</span>Squadre</button>
+    <a href="#eventi" data-nav="events"><span>★</span>Eventi</a>
+    <button id="mobileProfile" data-nav="profile"><span>●</span>Profilo</button>
   </nav>
 
   <button class="sky-fab" id="skyFab" aria-label="Apri Sky assistente SCD"><span class="sky-face"><img src="./assets/sky.png" alt=""></span><span class="sky-copy"><b>Sky</b><small>Assistente SCD</small></span><span class="sky-ping"></span></button>
@@ -231,6 +247,6 @@
   <div class="modal-backdrop" id="modalBackdrop" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><button class="modal-close" id="modalClose" aria-label="Chiudi">×</button><div id="modalBody"></div></div></div>
   <div class="toast" id="toast" role="status"></div>
 </div>
-<script src="./app.js?v=21.10.0" defer></script>
+<script src="./app.js?v=21.11.0" defer></script>
 </body>
 </html>
