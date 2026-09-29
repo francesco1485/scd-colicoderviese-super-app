@@ -20,7 +20,7 @@ const viewMeta={
  recovery:['Clienti · Recovery','Campagna operativa sul patrimonio esistente']
 }
 
-let ecosystem=[],projects=[],actions=[],marketHubs=[],marketEntities=[],contacts=[],timeline=[],documents=[],partnerRequirements=[],blueprints=[],subjects=[],initiatives=[],products=[],productKnowledge=[],comparisons=[],collaborators=[],collaboratorTerms=[],portfolioSnapshots=[],mailTemplates=[],mailDrafts=[],cepaExpansion=[],cepaReadiness=[],assistantMessages=[],recoveryRows=[],members=[]
+let ecosystem=[],projects=[],actions=[],marketHubs=[],marketEntities=[],contacts=[],timeline=[],documents=[],partnerRequirements=[],blueprints=[],subjects=[],initiatives=[],cepaContent=[],cepaAcademy=[],cepaSpeakers=[],products=[],productKnowledge=[],comparisons=[],collaborators=[],collaboratorTerms=[],portfolioSnapshots=[],mailTemplates=[],mailDrafts=[],cepaExpansion=[],cepaReadiness=[],assistantMessages=[],recoveryRows=[],members=[]
 let currentPartnerId=null
 
 function msg(text,error=false){$('loginMsg').textContent=text;$('loginMsg').className='message'+(error?' error':'')}
@@ -75,6 +75,8 @@ $('addPartnerDocumentBtn').onclick=()=>openAddDocument(currentPartnerId)
 $('addDocumentBtn').onclick=()=>openAddDocument(null)
 $('addCepaSubjectBtn').onclick=openNewSubject
 $('addCepaInitiativeBtn').onclick=openNewInitiative
+$('addCepaContentBtn').onclick=openNewCepaContent
+$('addCepaSpeakerBtn').onclick=openNewCepaSpeaker
 $('addCollaboratorBtn').onclick=openNewCollaborator
 $('editPartnerBtn').onclick=openEditPartner
 $('mailTemplateSelect').onchange=hydrateMailTemplate
@@ -98,7 +100,7 @@ async function boot(){
   window.orgId=m.organization_id;window.userId=user.id;window.userRole=m.role
   $('workspace').classList.remove('hidden');$('blockedView').classList.add('hidden');$('aiDock').classList.remove('hidden')
   $('sideUser').textContent=user.email||'Utente';$('rolePill').textContent=m.role.replaceAll('_',' ')
-  ;['newEntityBtn','addTimelineBtn','addContactBtn','addPartnerDocumentBtn','addDocumentBtn','addCepaSubjectBtn','addCepaInitiativeBtn','addCollaboratorBtn','editPartnerBtn'].forEach(id=>$(id).classList.toggle('hidden',!isManager()))
+  ;['newEntityBtn','addTimelineBtn','addContactBtn','addPartnerDocumentBtn','addDocumentBtn','addCepaSubjectBtn','addCepaInitiativeBtn','addCepaContentBtn','addCepaSpeakerBtn','addCollaboratorBtn','editPartnerBtn'].forEach(id=>$(id).classList.toggle('hidden',!isManager()))
   await loadAll()
 }
 
@@ -118,6 +120,9 @@ async function loadAll(){
     supabase.from('document_blueprints').select('*').eq('organization_id',window.orgId).eq('status','ready').order('category').order('title'),
     supabase.from('cepa_subjects').select('*').eq('organization_id',window.orgId).order('maturity',{ascending:false}),
     supabase.from('cepa_initiatives').select('*,cepa_subjects(id,title),ecosystem_nodes(id,name,code)').eq('organization_id',window.orgId).order('created_at',{ascending:false}),
+    supabase.from('cepa_content_assets').select('*,cepa_subjects(id,title)').eq('organization_id',window.orgId).order('created_at',{ascending:false}),
+    supabase.from('cepa_academy_modules').select('*').eq('organization_id',window.orgId).order('sequence_no'),
+    supabase.from('cepa_speakers').select('*').eq('organization_id',window.orgId).order('display_name'),
     supabase.from('agency_products').select('*,ecosystem_nodes(id,name,code)').eq('organization_id',window.orgId).eq('active',true).order('category').order('name'),
     supabase.from('product_knowledge_items').select('*').eq('organization_id',window.orgId).order('sort_order'),
     supabase.from('product_comparisons').select('*,agency_products(id,name,comparison_group)').eq('organization_id',window.orgId).order('created_at',{ascending:false}),
@@ -133,7 +138,7 @@ async function loadAll(){
   const res=await Promise.all(q)
   const err=res.find(x=>x.error)?.error
   if(err){console.error(err);$('refreshBtn').textContent='!';return}
-  ;[ecosystem,projects,actions,marketHubs,marketEntities,contacts,timeline,documents,partnerRequirements,blueprints,subjects,initiatives,products,productKnowledge,comparisons,collaborators,collaboratorTerms,portfolioSnapshots,mailTemplates,mailDrafts,cepaExpansion,cepaReadiness,assistantMessages]=res.map(x=>x.data||[])
+  ;[ecosystem,projects,actions,marketHubs,marketEntities,contacts,timeline,documents,partnerRequirements,blueprints,subjects,initiatives,cepaContent,cepaAcademy,cepaSpeakers,products,productKnowledge,comparisons,collaborators,collaboratorTerms,portfolioSnapshots,mailTemplates,mailDrafts,cepaExpansion,cepaReadiness,assistantMessages]=res.map(x=>x.data||[])
   renderEverything()
   $('refreshBtn').textContent='↻'
 }
@@ -232,11 +237,65 @@ function renderCepa(){
   $('cepaSubjectGrid').innerHTML=subjects.map(s=>'<article class="subject-card" data-subject="'+s.id+'"><div class="subject-domain">'+esc(s.domain)+' · '+esc(subjectStatus(s.lifecycle_status))+'</div><h4>'+esc(s.title)+'</h4><p>'+esc(s.description||'')+'</p><div class="tags">'+(s.target_audiences||[]).slice(0,4).map(a=>'<span class="tag">'+esc(a)+'</span>').join('')+'</div><div class="subject-progress"><span style="width:'+Number(s.maturity||0)+'%"></span></div><p>'+esc(s.maturity)+'% maturità · partner: '+esc((s.partner_codes||[]).join(', ')||'da definire')+'</p></article>').join('')||empty('Nessuna materia')
   document.querySelectorAll('[data-subject]').forEach(b=>b.onclick=()=>openSubject(b.dataset.subject))
   $('cepaInitiativeList').innerHTML=initiatives.map(i=>listRow(i.title,(i.cepa_subjects?.title||'Materia da definire')+(i.territory?' · '+i.territory:''),[i.status,i.initiative_type])).join('')||empty('Nessuna iniziativa ancora registrata')
+
+  $('cepaAcademyCount').textContent=cepaAcademy.length+' moduli'
+  $('cepaAcademyList').innerHTML=cepaAcademy.map(m=>'<div class="academy-item '+(isManager()?'clickable':'')+'" '+(isManager()?'data-academy="'+m.id+'"':'')+'><div><span class="academy-seq">'+esc(m.sequence_no)+'</span><strong>'+esc(m.title)+'</strong><small>'+esc(m.description||'')+'</small><small>'+esc((m.audience||[]).join(', '))+(m.estimated_minutes?' · '+esc(m.estimated_minutes)+' min':'')+'</small></div><span class="readiness-status '+(m.status==='ready'||m.status==='published'?'ready':'in_progress')+'">'+esc(m.status)+'</span></div>').join('')||empty('Nessun modulo Academy')
+  document.querySelectorAll('[data-academy]').forEach(b=>b.onclick=()=>openAcademyEditor(b.dataset.academy))
+
+  $('cepaContentList').innerHTML=cepaContent.map(a=>'<div class="content-asset-row"><div><strong>'+esc(a.title)+'</strong><small>'+esc(a.asset_type)+' · '+esc(a.lifecycle_status)+(a.cepa_subjects?.title?' · '+esc(a.cepa_subjects.title):'')+'</small></div><span class="tag">'+esc((a.channels||[]).join(', ')||'canale da definire')+'</span></div>').join('')||empty('Nessun contenuto ancora registrato')
+
+  $('cepaSpeakerList').innerHTML=cepaSpeakers.map(s=>'<div class="speaker-row"><div><strong>'+esc(s.display_name)+'</strong><small>'+esc(s.role_title||'Ruolo da definire')+(s.organization_name?' · '+esc(s.organization_name):'')+'</small><small>'+esc((s.expertise||[]).join(', ')||'Competenze da indicare')+'</small></div><span class="readiness-status '+(s.status==='active'||s.status==='approved'?'ready':'in_progress')+'">'+esc(s.status)+'</span></div>').join('')||empty('Nessun relatore ancora registrato')
+
   $('cepaRoadmap').innerHTML=cepaExpansion.map(s=>'<article class="roadmap-step '+(s.status==='current'?'current':'')+'"><span class="step-no">'+esc(s.stage_no)+'</span><h4>'+esc(s.title)+'</h4><p><strong>'+esc(s.territory)+'</strong></p><p>'+esc(s.objective||'')+'</p><div class="tags"><span class="tag">'+esc(s.status)+'</span></div></article>').join('')||empty('Roadmap nazionale da costruire')
   const ready=cepaReadiness.filter(x=>['ready','verified'].includes(x.status)).length
   $('cepaReadinessSummary').textContent=ready+'/'+cepaReadiness.length+' elementi pronti/verificati'
   $('cepaReadinessGrid').innerHTML=cepaReadiness.map(x=>'<article class="readiness-card '+(isManager()?'clickable':'')+'" '+(isManager()?'data-readiness="'+x.id+'"':'')+'><div class="readiness-top"><div class="eyebrow">'+esc(x.dimension)+'</div><span class="readiness-status '+esc(x.status)+'">'+esc(x.status.replaceAll('_',' '))+'</span></div><h4>'+esc(x.title)+'</h4><p>'+esc(x.description||'')+'</p><p><strong>Livello:</strong> '+esc(x.requirement_level.replaceAll('_',' '))+'</p>'+(x.evidence?'<p><strong>Evidenza:</strong> '+esc(x.evidence)+'</p>':'')+(x.source_reference?'<p><strong>Fonte:</strong> '+esc(x.source_reference)+'</p>':'')+'</article>').join('')||empty('Readiness nazionale da definire')
   document.querySelectorAll('[data-readiness]').forEach(b=>b.onclick=()=>openReadinessEditor(b.dataset.readiness))
+}
+
+function openNewCepaContent(){
+  if(!isManager())return
+  $('modalContent').innerHTML='<div class="eyebrow">CEPA CONTENT FACTORY</div><h2>Nuovo contenuto</h2><form id="cepaContentForm" class="form"><label>Titolo<input id="ccTitle" required></label><div class="inline"><label>Materia<select id="ccSubject"><option value="">Generale CEPA</option>'+subjects.map(s=>'<option value="'+s.id+'">'+esc(s.title)+'</option>').join('')+'</select></label><label>Tipo<select id="ccType"><option value="presentation">Presentazione</option><option value="guide">Guida</option><option value="article">Articolo</option><option value="video">Video</option><option value="faq">FAQ</option><option value="newsletter">Newsletter</option><option value="social">Social</option><option value="webinar">Webinar</option><option value="event_kit">Kit evento</option><option value="course_material">Materiale Academy</option><option value="other">Altro</option></select></label></div><div class="inline"><label>Stato<select id="ccStatus"><option value="idea">Idea</option><option value="draft">Bozza</option><option value="review">Revisione</option><option value="ready">Pronto</option><option value="published">Pubblicato</option></select></label><label>Versione<input id="ccVersion" placeholder="es. 1.0"></label></div><label>Obiettivo<textarea id="ccObjective"></textarea></label><label>Target, separati da virgola<input id="ccAudience"></label><label>Canali, separati da virgola<input id="ccChannels" placeholder="evento, web, social, newsletter"></label><label>Fonte / base scientifica<input id="ccSource"></label><label>URL pubblico<input id="ccUrl"></label><div class="composer-actions"><button class="secondary" type="button" id="ccCancel">Annulla</button><button class="primary" type="submit">Salva contenuto</button></div></form>'
+  $('modal').classList.remove('hidden')
+  $('ccCancel').onclick=closeModal
+  $('cepaContentForm').onsubmit=async e=>{
+    e.preventDefault()
+    const split=v=>v.split(',').map(x=>x.trim()).filter(Boolean)
+    const row={organization_id:window.orgId,subject_id:$('ccSubject').value||null,title:$('ccTitle').value.trim(),asset_type:$('ccType').value,lifecycle_status:$('ccStatus').value,audience:split($('ccAudience').value),channels:split($('ccChannels').value),objective:$('ccObjective').value.trim()||null,version:$('ccVersion').value.trim()||null,source_reference:$('ccSource').value.trim()||null,public_url:$('ccUrl').value.trim()||null,owner_user_id:window.userId}
+    const{error}=await supabase.from('cepa_content_assets').insert(row)
+    if(error)return alert(error.message)
+    closeModal();await loadAll();navigate('cepa')
+  }
+}
+
+function openNewCepaSpeaker(){
+  if(!isManager())return
+  $('modalContent').innerHTML='<div class="eyebrow">RELATORI CEPA</div><h2>Nuovo relatore / candidato</h2><form id="cepaSpeakerForm" class="form"><label>Nome<input id="spName" required></label><div class="inline"><label>Organizzazione<input id="spOrg"></label><label>Ruolo<input id="spRole"></label></div><label>Competenze, separate da virgola<input id="spExpertise"></label><label>Territori, separati da virgola<input id="spTerritories"></label><label>Stato<select id="spStatus"><option value="candidate">Candidato</option><option value="approved">Approvato</option><option value="active">Attivo</option><option value="paused">In pausa</option></select></label><label>Bio<textarea id="spBio"></textarea></label><div class="inline"><label>Email<input id="spEmail" type="email"></label><label>Telefono<input id="spPhone"></label></div><label>Fonte / riferimento<input id="spSource"></label><label>Note<textarea id="spNotes"></textarea></label><div class="composer-actions"><button class="secondary" type="button" id="spCancel">Annulla</button><button class="primary" type="submit">Salva relatore</button></div></form>'
+  $('modal').classList.remove('hidden')
+  $('spCancel').onclick=closeModal
+  $('cepaSpeakerForm').onsubmit=async e=>{
+    e.preventDefault()
+    const split=v=>v.split(',').map(x=>x.trim()).filter(Boolean)
+    const row={organization_id:window.orgId,display_name:$('spName').value.trim(),organization_name:$('spOrg').value.trim()||null,role_title:$('spRole').value.trim()||null,expertise:split($('spExpertise').value),territories:split($('spTerritories').value),status:$('spStatus').value,bio:$('spBio').value.trim()||null,email:$('spEmail').value.trim()||null,phone:$('spPhone').value.trim()||null,source_reference:$('spSource').value.trim()||null,notes:$('spNotes').value.trim()||null}
+    const{error}=await supabase.from('cepa_speakers').insert(row)
+    if(error)return alert(error.message)
+    closeModal();await loadAll();navigate('cepa')
+  }
+}
+
+function openAcademyEditor(id){
+  if(!isManager())return
+  const m=cepaAcademy.find(x=>x.id===id);if(!m)return
+  $('modalContent').innerHTML='<div class="eyebrow">ACADEMY CEPA</div><h2>'+esc(m.title)+'</h2><p class="muted">'+esc(m.description||'')+'</p><form id="academyForm" class="form"><div class="inline"><label>Stato<select id="academyStatus"><option value="draft">Bozza</option><option value="review">Revisione</option><option value="ready">Pronto</option><option value="published">Pubblicato</option><option value="retired">Ritirato</option></select></label><label>Durata minuti<input id="academyMinutes" type="number" min="1" value="'+esc(m.estimated_minutes||'')+'"></label></div><label>Descrizione<textarea id="academyDescription">'+esc(m.description||'')+'</textarea></label><label>Fonte / riferimento<input id="academySource" value="'+esc(m.source_reference||'')+'"></label><div class="composer-actions"><button class="secondary" type="button" id="academyCancel">Annulla</button><button class="primary" type="submit">Salva modulo</button></div></form>'
+  $('academyStatus').value=m.status
+  $('academyCancel').onclick=closeModal
+  $('academyForm').onsubmit=async e=>{
+    e.preventDefault()
+    const row={status:$('academyStatus').value,estimated_minutes:$('academyMinutes').value?Number($('academyMinutes').value):null,description:$('academyDescription').value.trim()||null,source_reference:$('academySource').value.trim()||null,updated_at:new Date().toISOString()}
+    const{error}=await supabase.from('cepa_academy_modules').update(row).eq('id',id).eq('organization_id',window.orgId)
+    if(error)return alert(error.message)
+    closeModal();await loadAll();navigate('cepa')
+  }
 }
 
 function openReadinessEditor(id){
