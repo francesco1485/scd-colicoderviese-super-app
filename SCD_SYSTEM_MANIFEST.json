@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "effective_at": "2026-09-29",
     "status": "BINDING",
     "language": "it-IT",
@@ -392,7 +392,16 @@
       "FUNCTION"
     ],
     "authorization": "SERVER_SIDE_ONLY",
-    "current_identity_engine": "R20"
+    "current_identity_engine": "R20",
+    "target_identity_engine": "SUPABASE_AUTH",
+    "supabase_onboarding": {
+      "state": "STAGED_R35",
+      "default_role": "USER_BASE",
+      "self_role_selection": false,
+      "membership_bootstrap": "AUTH_TRIGGER",
+      "client_context_function": "scd_my_context",
+      "qualified_role_assignment": "SERVER_SIDE_ONLY"
+    }
   },
   "data_architecture": {
     "principle": "La UI non deve conoscere colonne di fogli specifici: usa domini e API stabili.",
@@ -483,7 +492,12 @@
       "legacy_reference_bridge": "scd_external_refs",
       "row_level_security_required": true,
       "dedicated_project_required": true,
-      "activation_feature_flag": "FF-SUPABASE-CORE"
+      "activation_feature_flag": "FF-SUPABASE-CORE",
+      "migrations": [
+        "supabase/migrations/20260929_r33_club_graph_foundation.sql",
+        "supabase/migrations/20260929_r34_rls_performance_hardening.sql",
+        "supabase/migrations/20260929_r35_auth_context_rls_normalization.sql"
+      ]
     }
   },
   "source_registry": {
@@ -1396,7 +1410,7 @@
         ],
         "off_behavior": "KEEP_R20_PRIMARY_AND_SUPABASE_DARK",
         "rollback": "SET_ENV_FALSE",
-        "current_runtime_state": "SCHEMA_READY_PROJECT_NOT_CREATED",
+        "current_runtime_state": "PROJECT_ACTIVE_AUTH_CONTEXT_STAGED",
         "activation_requires": [
           "DEDICATED_SUPABASE_PROJECT_CREATED",
           "MIGRATION_APPLIED",
@@ -1472,7 +1486,8 @@
       "R20_DIRECT_RUNTIME_PROOF",
       "SUPABASE_CONTRACT_VALID",
       "SUPABASE_RLS_SECURITY_REVIEW",
-      "R20_SUPABASE_DUAL_READ_COMPARE"
+      "R20_SUPABASE_DUAL_READ_COMPARE",
+      "SUPABASE_AUTH_CONTEXT_CONTRACT"
     ],
     "merge_rule": "Non considerare completata una funzione se è verde solo tecnicamente ma viola il manifest o il master visivo.",
     "release_truth": {
@@ -1738,6 +1753,18 @@
         "SCD_GMAIL"
       ],
       "contract": "DEDICATED_POSTGRES_AUTH_RLS_STORAGE_REALTIME_DUAL_RUN"
+    },
+    {
+      "id": "CAP-SUPABASE-AUTH-CONTEXT",
+      "domain": "IDENTITY_ACCESS",
+      "required": true,
+      "state": "PARTIAL",
+      "flag": "FF-SUPABASE-CORE",
+      "sources": [
+        "SCD_SUPABASE",
+        "R20"
+      ],
+      "contract": "NEW_USER_DEFAULT_USER_BASE_SERVER_SIDE_ROLE_ASSIGNMENT_MY_CONTEXT_RLS"
     }
   ],
   "known_noncompliance": [
@@ -1781,8 +1808,8 @@
     {
       "id": "GAP-CORE-001",
       "severity": "HIGH",
-      "statement": "Il progetto Supabase dedicato SCD PULSE è stato creato e la migration R33 è applicata; restano da completare hardening performance, Auth/RLS role-scope tests, dual-read R20→Supabase e vertical slice Web/mobile prima del cutover.",
-      "required_fix": "Completare R34 hardening, test Auth/RLS, dual-read, Web slice, mobile slice e rollback; solo dopo valutare FF-SUPABASE-CORE=true.",
+      "statement": "Il progetto Supabase SCD PULSE è attivo e R33/R34 sono applicate; R35 prepara onboarding Auth fail-closed e contesto membership, mentre restano da verificare signup reale, ruoli/scope, dual-read R20→Supabase e vertical slice Web/mobile.",
+      "required_fix": "Applicare R35, verificare Security/Performance Advisors, eseguire signup controllato USER_BASE, role/scope tests, dual-read, Web slice, mobile slice e rollback prima del cutover.",
       "safe_runtime_behavior": "R20 resta primary; SCD_SUPABASE resta dark e non viene dichiarato LIVE."
     }
   ],
@@ -1914,7 +1941,7 @@
       "safe_live_strategy": "SHIP_CORE_WITH_DATAFABRIC_FEATURE_GATE_OFF"
     },
     "supabase_transition": {
-      "release": "R33",
+      "release": "R35",
       "mode": "STRANGLER_DUAL_RUN",
       "project_state": "ACTIVE_HEALTHY",
       "project_creation_requires_user_cost_confirmation": true,
@@ -1928,7 +1955,8 @@
       "no_big_bang": true,
       "no_legacy_delete_before_cutover": true,
       "project_id": "ndevtxxijbcnskgysdit",
-      "migration_state": "R33_APPLIED_R34_HARDENING_PENDING_CI"
+      "migration_state": "R33_R34_APPLIED_R35_STAGED",
+      "auth_context_state": "TRIGGER_AND_MY_CONTEXT_STAGED"
     }
   },
   "product_direction": {
