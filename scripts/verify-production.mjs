@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 
 const EXPECTED_VERSION=process.env.SCD_EXPECTED_VERSION||'30.0.0';
-const EXPECTED_MANIFEST=process.env.SCD_EXPECTED_MANIFEST||'1.6.0';
+const EXPECTED_MANIFEST=process.env.SCD_EXPECTED_MANIFEST||'1.7.0';
 const PAGES_URL=process.env.SCD_PAGES_URL||'https://francesco1485.github.io/scd-colicoderviese-super-app/';
 const RENDER_BASE=(process.env.SCD_RENDER_BASE_URL||'https://scd-colicoderviese-official-r21.onrender.com').replace(/\/$/,'');
 const ATTEMPTS=Math.max(1,Number(process.env.SCD_PROD_VERIFY_ATTEMPTS||20));
@@ -10,7 +10,7 @@ const outDir='test-output';
 fs.mkdirSync(outDir,{recursive:true});
 
 const evidence={
-  release:'R30',
+  release:'R31',
   expectedVersion:EXPECTED_VERSION,
   expectedManifest:EXPECTED_MANIFEST,
   startedAt:new Date().toISOString(),
@@ -84,8 +84,10 @@ async function runChecks(attempt){
     const obs=Array.isArray(d.observabilityFields)&&['status','lastSync','lastSuccess','lastError'].every(x=>d.observabilityFields.includes(x));
     const prov=Array.isArray(d.provenanceFields)&&['SOURCE','TABLE','FIELD','API','FALLBACK','REFRESH'].every(x=>d.provenanceFields.includes(x));
     const ok=r.ok&&j.ok===true&&d.release==='R29'&&d.contractVersion==='1.0.0'&&obs&&prov&&d.safeguarding==='ISOLATED'&&d.destructiveAutoWrite===false;
-    result.checks.r20Contract={httpStatus:r.status,ok,release:d.release||null,contractVersion:d.contractVersion||null,observabilityFieldsOk:obs,provenanceFieldsOk:prov,error:j.error||null};
+    const deterministicMissing=r.ok&&j.ok===false&&/non supportata|non installato|not supported/i.test(String(j.error||''));
+    result.checks.r20Contract={httpStatus:r.status,ok,release:d.release||null,contractVersion:d.contractVersion||null,observabilityFieldsOk:obs,provenanceFieldsOk:prov,error:j.error||null,deterministicMissing};
     if(!ok)result.failures.push('R20_DATA_FABRIC_CONTRACT_END_TO_END');
+    if(deterministicMissing)result.hardFailure='R20_RUNTIME_CONTRACT_MISSING';
   }catch(e){
     result.checks.r20Contract={ok:false,error:String(e.message||e)};
     result.failures.push('R20_DATA_FABRIC_CONTRACT_END_TO_END');
@@ -101,6 +103,7 @@ for(let i=1;i<=ATTEMPTS;i++){
   evidence.lastAttempt=attempt;
   fs.writeFileSync(outDir+'/production-evidence.json',JSON.stringify(evidence,null,2)+'\n');
   if(!attempt.failures.length){passed=true;break}
+  if(attempt.hardFailure){evidence.hardFailure=attempt.hardFailure;console.error('SCD production evidence hard failure',attempt.hardFailure);break}
   console.warn('SCD production evidence pending',{attempt:i,failures:attempt.failures});
   if(i<ATTEMPTS)await sleep(DELAY_MS);
 }
