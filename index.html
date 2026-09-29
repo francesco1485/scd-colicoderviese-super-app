@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="it">
-<head><meta name="scd-build" content="21.15.0">
+<head><meta name="scd-build" content="24.0.0">
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#052a67" />
@@ -27,6 +27,7 @@
   <link rel="preload" href="./assets/hero-colico.webp" as="image" />
   <link rel="stylesheet" href="./styles.css?v=21.10.0" />
   <link rel="stylesheet" href="./ui-r21-11.css?v=21.15.0" />
+  <link rel="stylesheet" href="./ui-r24-shell.css?v=24.0.0" />
   <script type="application/ld+json">
   {
     "@context":"https://schema.org",
@@ -48,12 +49,16 @@
 <body class="scd-ui-v21-11 scd-app-mode">
 <div class="app-shell">
   <header class="topbar" id="topbar">
-    <a class="brand" href="#home" aria-label="SCD ColicoDerviese Home">
+    <a class="brand" href="#/home" aria-label="SCD ColicoDerviese Home">
       <img src="./assets/logo-scd.png" alt="SCD ColicoDerviese" />
       <span><strong>S.C.D.</strong><small>COLICODERVIESE</small></span>
     </a>
     <nav class="desktop-nav" aria-label="Navigazione principale">
-      <a href="#gare">Gare</a><a href="#eventi">Eventi</a><a href="#community">Community</a><a href="#servizi">Servizi</a><a href="#partner">Partner</a>
+      <button type="button" data-r24-route="home" class="active">Home</button>
+      <button type="button" data-r24-route="calendar">Calendario</button>
+      <button type="button" data-r24-route="communications">Comunicazioni</button>
+      <button type="button" data-r24-route="services">Servizi</button>
+      <button type="button" data-r24-route="profile">Profilo</button>
     </nav>
     <div class="top-actions">
       <button class="ghost install-app-btn" id="installBtn">Installa App</button>
@@ -231,14 +236,16 @@
     </section>
   </main>
 
+  <main id="appRouteView" class="app-route-view" aria-live="polite" hidden></main>
+
   <div class="sponsor-ticker" aria-label="Sponsor SCD"><div class="sponsor-ticker-label">PARTNER SCD</div><div class="sponsor-marquee"><div id="sponsorTrack" class="sponsor-track"><span>SCD COLICODERVIESE · PARTNER DEL TERRITORIO ·</span></div></div></div>
 
   <nav class="mobile-nav" aria-label="Navigazione mobile">
-    <a href="#home" data-nav="home" class="active"><span>⌂</span>Home</a>
-    <button data-action="calendar" data-nav="calendar"><span>▣</span>Calendario</button>
-    <button data-action="teams" data-nav="teams"><span>♟</span>Squadre</button>
-    <button data-action="events" data-nav="events"><span>★</span>Eventi</button>
-    <button id="mobileProfile" data-nav="profile"><span>●</span>Profilo</button>
+    <button type="button" data-r24-route="home" data-nav="home" class="active"><span>⌂</span>Home</button>
+    <button type="button" data-r24-route="calendar" data-nav="calendar"><span>▣</span>Calendario</button>
+    <button type="button" data-r24-route="communications" data-nav="communications"><span>✉</span>Comunicazioni</button>
+    <button type="button" data-r24-route="services" data-nav="services"><span>◆</span>Servizi</button>
+    <button type="button" id="mobileProfile" data-r24-route="profile" data-nav="profile"><span>●</span>Profilo</button>
   </nav>
 
   <button class="sky-fab" id="skyFab" aria-label="Apri Sky assistente SCD"><span class="sky-face"><img src="./assets/sky.png" alt=""></span><span class="sky-copy"><b>Sky</b><small>Assistente SCD</small></span><span class="sky-ping"></span></button>
@@ -248,5 +255,6 @@
   <div class="toast" id="toast" role="status"></div>
 </div>
 <script src="./app.js?v=21.15.0" defer></script>
+<script src="./app-r24-router.js?v=24.0.0" defer></script>
 </body>
 </html>
