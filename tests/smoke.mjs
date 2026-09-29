@@ -47,7 +47,7 @@ for(const viewport of viewports){
   if(viewport.width===390) await page.screenshot({path:'test-output/teams-390x844.png',fullPage:true});
   await page.click('#modalClose');
 
-  await page.locator('[data-action="location"]').first().click();
+  await page.evaluate(()=>openLocationHub());
   await page.waitForSelector('#locateMe');
   await page.click('#modalClose');
 
