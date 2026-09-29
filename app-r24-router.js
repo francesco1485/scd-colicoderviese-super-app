@@ -9,6 +9,7 @@
     },
     go(name){
       const route=this.routes.includes(name)?name:'home';
+      try{closeModal()}catch{}
       const hash='#/'+route;
       if(location.hash===hash)this.render(route);
       else location.hash=hash;
