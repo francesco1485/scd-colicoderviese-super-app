@@ -21,6 +21,8 @@ jobs:
         run: |
           node --check app.js
           node --check server.js
+      - name: API contract gate
+        run: npm run test:contract
       - run: npm install --no-save playwright
       - run: npx playwright install --with-deps chromium
       - name: Start SCD server
