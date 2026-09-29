@@ -38,7 +38,7 @@ for(const viewport of viewports){
   await page.waitForSelector('body.r24-router-ready');
   await page.waitForSelector('#home:not([hidden])');
   await page.waitForSelector('.home-kpis');
-  await page.waitForSelector('.mobile-nav [data-nav="calendar"]');
+  await page.waitForSelector('.mobile-nav [data-nav="calendar"]',{state:'attached'});
   await page.waitForSelector('#clubClock');
   await page.waitForFunction(()=>document.querySelector('#clubClock')?.textContent?.length>8);
   await page.waitForFunction(()=>document.documentElement.scrollWidth<=window.innerWidth+3);
