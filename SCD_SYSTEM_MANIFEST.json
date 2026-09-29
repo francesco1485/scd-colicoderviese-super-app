@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "1.7.0",
+    "version": "1.8.0",
     "effective_at": "2026-09-29",
     "status": "BINDING",
     "language": "it-IT",
@@ -1332,12 +1332,21 @@
       "data_fabric_observability": {
         "id": "FF-DATAFABRIC-OBSERVABILITY",
         "runtime_env": "SCD_FEATURE_DATA_FABRIC_OBSERVABILITY",
-        "default_enabled": true,
+        "default_enabled": false,
         "audience": [
           "DIRECTION"
         ],
         "off_behavior": "HIDE_DIRECTION_DETAIL_KEEP_GENERIC_HEALTH",
-        "rollback": "SET_ENV_FALSE"
+        "rollback": "SET_ENV_FALSE",
+        "activation_mode": "MANUAL_AFTER_R20_CONTRACT",
+        "activation_requires": [
+          "R20_ACTION_PUBLIC_DATAFABRIC_CONTRACT_SUPPORTED",
+          "R20_ACTION_DIRECTION_DATAFABRIC_STATUS_SUPPORTED",
+          "VERIFY_R20_DIRECT_GREEN",
+          "PRODUCTION_EVIDENCE_GREEN_WITH_FLAG_TRUE",
+          "DIRECTION_AUTHORIZED_SMOKE_GREEN"
+        ],
+        "current_runtime_state": "GATED_OFF_PENDING_R20_DEPLOY"
       }
     },
     "upstream_resilience": {
@@ -1413,11 +1422,23 @@
       "checks": [
         "PAGES_BUILD_VERSION",
         "RENDER_HEALTH_VERSION",
-        "RENDER_FEATURE_FLAGS",
-        "R20_DATA_FABRIC_CONTRACT_END_TO_END"
+        "RENDER_FEATURE_FLAG_DECLARATION",
+        "R20_DATA_FABRIC_CONTRACT_WHEN_FEATURE_ENABLED"
       ],
       "r20_contract_action": "public.datafabric.contract",
-      "failure_semantics": "NOT_LIVE_UNTIL_ALL_REQUIRED_CHECKS_PASS"
+      "failure_semantics": "CORE_LIVE_REQUIRES_ACTIVE_CHECKS_GREEN; GATED_OFF_CAPABILITIES_REMAIN_EXPLICITLY_NOT_LIVE",
+      "feature_gated_checks": {
+        "FF-DATAFABRIC-OBSERVABILITY": {
+          "when_enabled": [
+            "R20_DATA_FABRIC_CONTRACT_END_TO_END"
+          ],
+          "when_disabled": [
+            "RENDER_FLAG_FALSE_VERIFIED",
+            "DATA_FABRIC_UI_HIDDEN"
+          ],
+          "disabled_status": "GATED_OFF_NOT_LIVE"
+        }
+      }
     }
   },
   "capability_map": [
@@ -1585,14 +1606,22 @@
         "SCD_DRIVE",
         "R20"
       ],
-      "contract": "STATUS_LAST_SYNC_LAST_SUCCESS_LAST_ERROR_PROVENANCE"
+      "contract": "STATUS_LAST_SYNC_LAST_SUCCESS_LAST_ERROR_PROVENANCE",
+      "runtime_state": "GATED_OFF",
+      "activation_requires": [
+        "R20_ACTION_PUBLIC_DATAFABRIC_CONTRACT_SUPPORTED",
+        "R20_ACTION_DIRECTION_DATAFABRIC_STATUS_SUPPORTED",
+        "VERIFY_R20_DIRECT_GREEN",
+        "PRODUCTION_EVIDENCE_GREEN_WITH_FLAG_TRUE",
+        "DIRECTION_AUTHORIZED_SMOKE_GREEN"
+      ]
     },
     {
       "id": "CAP-RUNTIME-EVIDENCE",
       "domain": "DELIVERY",
       "required": true,
-      "state": "PARTIAL",
-      "contract": "PAGES_RENDER_R20_END_TO_END_PROOF"
+      "state": "IMPLEMENTED",
+      "contract": "PAGES_RENDER_ACTIVE_CAPABILITIES_PROOF_WITH_EXPLICIT_GATED_DEPENDENCIES"
     },
     {
       "id": "CAP-UPSTREAM-RESILIENCE",
@@ -1642,6 +1671,13 @@
       "severity": "HIGH",
       "statement": "Confidence/AnConfidence e chat bidirezionale non sono live e non devono essere dichiarate tali.",
       "required_fix": "Completare bridge, storage, autorizzazione, minor safety, report/block/moderation e QA."
+    },
+    {
+      "id": "GAP-R20-001",
+      "severity": "HIGH",
+      "statement": "Il runtime Apps Script R20 in produzione è 2026.09.28-R20.0-PUBLIC-FIRST e non supporta ancora public.datafabric.contract, direction.datafabric.status o direction.diagnostics.",
+      "required_fix": "Aggiornare e ridistribuire il deployment Apps Script R20 canonico usando backend_patch_R21_6_http_api.gs e backend_patch_R25_data_fabric.gs; poi verificare con npm run verify:r20 prima di attivare FF-DATAFABRIC-OBSERVABILITY.",
+      "safe_runtime_behavior": "Mantieni Data Fabric observability disattivato e nascondi la superficie Direzione relativa senza degradare il core pubblico."
     }
   ],
   "development_contract": {
@@ -1747,7 +1783,7 @@
       }
     ],
     "runtime_activation": {
-      "release": "R31",
+      "release": "R32",
       "public_probe_action": "public.datafabric.contract",
       "public_probe_payload": "NON_SENSITIVE_SCHEMA_ONLY",
       "close_issue_when": [
@@ -1764,7 +1800,12 @@
       "canonical_url_must_be_preserved": true,
       "observed_at": "2026-09-29T18:15:23Z",
       "observed_runtime": "2026.09.28-R20.0-PUBLIC-FIRST",
-      "observed_contract_state": "MISSING_PUBLIC_DATAFABRIC_CONTRACT"
+      "observed_contract_state": "MISSING_PUBLIC_DATAFABRIC_CONTRACT",
+      "core_live_without_datafabric": true,
+      "data_fabric_activation": "BLOCKED_UNTIL_R20_DEPLOY",
+      "verified_r20_runtime_version": "2026.09.28-R20.0-PUBLIC-FIRST",
+      "verified_blocker": "public.datafabric.contract and direction.datafabric.status return Azione API non supportata.",
+      "safe_live_strategy": "SHIP_CORE_WITH_DATAFABRIC_FEATURE_GATE_OFF"
     }
   },
   "product_direction": {
