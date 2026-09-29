@@ -1,0 +1,527 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/francesco1485/scd-colicoderviese-super-app/SCD_SYSTEM_MANIFEST.schema.json",
+  "title": "SCD SYSTEM MANIFEST",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "manifest",
+    "north_star",
+    "non_negotiable_invariants",
+    "product",
+    "visual_system",
+    "temporal_core",
+    "identity_and_access",
+    "data_architecture",
+    "source_registry",
+    "drive_vault",
+    "gmail_intelligence",
+    "entity_graph",
+    "calendar_event_engine",
+    "completeness_engine",
+    "communications",
+    "sky_and_avatar",
+    "geo_spatial",
+    "security",
+    "evolution_engine",
+    "analytics",
+    "architecture",
+    "delivery_and_quality",
+    "capability_map",
+    "known_noncompliance",
+    "development_contract"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "manifest": {
+      "type": "object",
+      "required": [
+        "id",
+        "version",
+        "effective_at",
+        "status",
+        "timezone",
+        "authority",
+        "canonical_repository",
+        "change_policy"
+      ],
+      "properties": {
+        "id": {
+          "const": "scd-colicoderviese-system"
+        },
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        },
+        "effective_at": {
+          "type": "string",
+          "format": "date"
+        },
+        "status": {
+          "const": "BINDING"
+        },
+        "language": {
+          "const": "it-IT"
+        },
+        "timezone": {
+          "const": "Europe/Rome"
+        },
+        "authority": {
+          "const": "DIREZIONE_SCD"
+        },
+        "canonical_repository": {
+          "const": "francesco1485/scd-colicoderviese-super-app"
+        },
+        "change_policy": {
+          "type": "object"
+        },
+        "supersedes_as_normative_authority": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "supporting_specs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "north_star": {
+      "type": "object"
+    },
+    "non_negotiable_invariants": {
+      "type": "array",
+      "minItems": 12,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "statement",
+          "enforcement"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^INV-[0-9]{3}$"
+          },
+          "statement": {
+            "type": "string",
+            "minLength": 20
+          },
+          "enforcement": {
+            "enum": [
+              "BLOCKING",
+              "BLOCKING_TARGET"
+            ]
+          }
+        }
+      }
+    },
+    "product": {
+      "type": "object",
+      "required": [
+        "season_model",
+        "core_experiences",
+        "navigation"
+      ],
+      "properties": {
+        "season_model": {
+          "type": "object"
+        },
+        "core_experiences": {
+          "type": "array",
+          "minItems": 6,
+          "maxItems": 6,
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "route",
+              "title",
+              "audience",
+              "purpose",
+              "visual_master"
+            ],
+            "properties": {
+              "id": {
+                "enum": [
+                  "HOME_PUBLIC",
+                  "CALENDAR_LIVE",
+                  "ATHLETE_AREA",
+                  "FAMILY_AREA",
+                  "STAFF_DIRECTION",
+                  "COMMUNICATIONS"
+                ]
+              },
+              "route": {
+                "type": "string",
+                "pattern": "^/app/"
+              },
+              "title": {
+                "type": "string"
+              },
+              "audience": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string"
+                }
+              },
+              "purpose": {
+                "type": "string"
+              },
+              "visual_master": {
+                "type": "string"
+              },
+              "must_not_be": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "secondary_experiences": {
+          "type": "array"
+        },
+        "navigation": {
+          "type": "object"
+        }
+      }
+    },
+    "visual_system": {
+      "type": "object",
+      "required": [
+        "source_of_truth",
+        "style",
+        "component_language",
+        "media_policy",
+        "responsive_qa",
+        "3d_motion"
+      ]
+    },
+    "temporal_core": {
+      "type": "object",
+      "required": [
+        "canonical_timezone",
+        "authoritative_time_required",
+        "drives",
+        "must_know"
+      ],
+      "properties": {
+        "canonical_timezone": {
+          "const": "Europe/Rome"
+        },
+        "authoritative_time_required": {
+          "const": true
+        }
+      }
+    },
+    "identity_and_access": {
+      "type": "object",
+      "required": [
+        "single_account",
+        "registration_fields",
+        "default_role",
+        "roles",
+        "authorization",
+        "current_identity_engine"
+      ],
+      "properties": {
+        "single_account": {
+          "const": true
+        },
+        "default_role": {
+          "const": "USER_BASE"
+        },
+        "authorization": {
+          "const": "SERVER_SIDE_ONLY"
+        },
+        "current_identity_engine": {
+          "const": "R20"
+        }
+      }
+    },
+    "data_architecture": {
+      "type": "object",
+      "required": [
+        "layers",
+        "stable_entity_ids",
+        "domains"
+      ]
+    },
+    "source_registry": {
+      "type": "object",
+      "required": [
+        "trust_scale",
+        "sources",
+        "conflict_resolution"
+      ],
+      "properties": {
+        "sources": {
+          "type": "array",
+          "minItems": 20,
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "kind",
+              "trust"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 2
+              },
+              "kind": {
+                "type": "string"
+              },
+              "trust": {
+                "oneOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ]
+              },
+              "url": {
+                "type": "string"
+              },
+              "account": {
+                "type": "string"
+              },
+              "resource_id": {
+                "type": "string"
+              },
+              "authority_domains": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "rules": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "rule": {
+                "type": "string"
+              },
+              "use": {
+                "type": "string"
+              },
+              "must_preserve": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      }
+    },
+    "drive_vault": {
+      "type": "object",
+      "required": [
+        "role",
+        "catalog_fields",
+        "upload_flow",
+        "dedup_by_hash",
+        "versioning_required"
+      ]
+    },
+    "gmail_intelligence": {
+      "type": "object",
+      "required": [
+        "role",
+        "classifications",
+        "extract",
+        "actions"
+      ]
+    },
+    "entity_graph": {
+      "type": "object",
+      "required": [
+        "required_relations",
+        "alias_resolution_required"
+      ]
+    },
+    "calendar_event_engine": {
+      "type": "object",
+      "required": [
+        "principle",
+        "event_types",
+        "required_event_fields",
+        "views",
+        "states"
+      ]
+    },
+    "completeness_engine": {
+      "type": "object",
+      "required": [
+        "purpose",
+        "entity_profiles",
+        "search_order",
+        "outputs",
+        "confidence_required"
+      ]
+    },
+    "communications": {
+      "type": "object",
+      "required": [
+        "hub",
+        "messaging",
+        "safeguarding"
+      ]
+    },
+    "sky_and_avatar": {
+      "type": "object",
+      "required": [
+        "sky",
+        "personal_avatar",
+        "tamagotchi_evolution"
+      ]
+    },
+    "geo_spatial": {
+      "type": "object",
+      "required": [
+        "target_architecture",
+        "edge_first",
+        "privacy_levels",
+        "location_must_not_be_used_for_hidden_tracking"
+      ]
+    },
+    "security": {
+      "type": "object",
+      "required": [
+        "model",
+        "transport",
+        "preferred_symmetric",
+        "no_custom_crypto",
+        "server_side_authorization",
+        "security_tests"
+      ]
+    },
+    "evolution_engine": {
+      "type": "object",
+      "required": [
+        "loop",
+        "store",
+        "proposal_fields",
+        "production_self_modification"
+      ]
+    },
+    "analytics": {
+      "type": "object",
+      "required": [
+        "privacy_first",
+        "allowed_events",
+        "forbidden_payloads",
+        "non_essential_requires_consent"
+      ]
+    },
+    "architecture": {
+      "type": "object",
+      "required": [
+        "current",
+        "flow",
+        "r22_role",
+        "extensibility"
+      ]
+    },
+    "delivery_and_quality": {
+      "type": "object",
+      "required": [
+        "gates",
+        "merge_rule",
+        "release_truth"
+      ]
+    },
+    "capability_map": {
+      "type": "array",
+      "minItems": 20,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "domain",
+          "required",
+          "state"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^CAP-"
+          },
+          "domain": {
+            "type": "string"
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "state": {
+            "enum": [
+              "IMPLEMENTED",
+              "INTERNAL_TEST",
+              "PARTIAL",
+              "REBUILD_REQUIRED",
+              "PLANNED",
+              "DESIGN_ONLY",
+              "ROADMAP"
+            ]
+          },
+          "screen": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "known_noncompliance": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "severity",
+          "statement",
+          "required_fix"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^GAP-"
+          },
+          "severity": {
+            "enum": [
+              "CRITICAL",
+              "HIGH",
+              "MEDIUM",
+              "LOW"
+            ]
+          },
+          "statement": {
+            "type": "string"
+          },
+          "required_fix": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "development_contract": {
+      "type": "object",
+      "required": [
+        "mandatory_before_code_change",
+        "mandatory_for_new_feature",
+        "prohibited"
+      ]
+    }
+  }
+}
