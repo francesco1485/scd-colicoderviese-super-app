@@ -19,6 +19,8 @@ jobs:
       - run: npm install
       - name: SCD System Manifest gate
         run: npm run test:manifest
+      - name: Supabase Domain Core contract gate
+        run: npm run test:supabase-contract
       - name: Syntax check
         run: |
           node --check app.js
@@ -26,6 +28,7 @@ jobs:
           node --check server.js
           node --check scripts/verify-production.mjs
           node --check scripts/verify-r20-direct.mjs
+          node --check scripts/validate-supabase-contract.mjs
       - name: API contract gate
         run: npm run test:contract
       - name: Upstream resilience gate
