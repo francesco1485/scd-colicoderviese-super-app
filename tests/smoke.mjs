@@ -76,6 +76,11 @@ for(const viewport of viewports){
   await page.click('#mobileProfile');
   await page.waitForSelector('.profile-app-screen');
   await page.waitForSelector('.profile-hub-grid');
+  await page.click('#profileLinkAthlete');
+  await page.waitForSelector('#tesseratoLinkForm');
+  if(viewport.width===390) await page.screenshot({path:'test-output/tesserato-onboarding-390x844.png',fullPage:true});
+  await page.click('#tlCancel');
+  await page.waitForSelector('.profile-app-screen');
   if(viewport.width===390){
     await page.screenshot({path:'test-output/profile-390x844.png',fullPage:true});
     await page.click('#profileCommunications');
