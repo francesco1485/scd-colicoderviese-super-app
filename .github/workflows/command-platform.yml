@@ -30,3 +30,16 @@ jobs:
         run: npm install --prefix platform --no-audit --no-fund
       - name: TypeScript build and tests
         run: npm run check --prefix platform
+      - name: Runtime startup smoke
+        run: |
+          PORT=10020 AUTH_MODE=development COMMAND_EXECUTION_MODE=inline npm start --prefix platform > /tmp/scd-command-platform.log 2>&1 &
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:10020/health > /tmp/scd-command-health.json; then break; fi
+            sleep 1
+          done
+          cat /tmp/scd-command-health.json
+          grep -q '"ok":true' /tmp/scd-command-health.json
+          curl -fsS http://127.0.0.1:10020/v1/commands | grep -q 'analyze-workflow-load'
+      - name: Runtime logs
+        if: always()
+        run: cat /tmp/scd-command-platform.log || true
