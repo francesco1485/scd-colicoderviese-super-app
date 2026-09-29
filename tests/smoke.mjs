@@ -25,12 +25,21 @@ for(const viewport of viewports){
 
   await page.goto(base,{waitUntil:'domcontentloaded',timeout:30000});
   await page.waitForSelector('#home');
+  await page.waitForSelector('body.scd-ui-v21-11');
+  await page.waitForSelector('.home-kpis');
+  await page.waitForSelector('.mobile-nav [data-nav="calendar"]');
   await page.waitForFunction(()=>document.documentElement.scrollWidth<=window.innerWidth+3);
   await page.waitForSelector('#clubClock');
   await page.waitForFunction(()=>document.querySelector('#clubClock')?.textContent?.length>8);
 
   await page.locator('[data-action="calendar"]').first().click();
+  await page.waitForSelector('.calendar-app-screen');
+  await page.waitForSelector('.calendar-tabs');
   await page.waitForSelector('#calendarRows');
+  await page.click('#modalClose');
+
+  await page.locator('[data-action="teams"]').first().click();
+  await page.waitForSelector('.teams-app-screen');
   await page.click('#modalClose');
 
   await page.locator('[data-action="location"]').first().click();
@@ -60,6 +69,7 @@ for(const viewport of viewports){
   await page.click('#modalClose');
 
   await page.click('#mobileProfile');
+  await page.waitForSelector('.profile-app-screen');
   await page.waitForSelector('.profile-hub-grid');
   await page.click('#profileR20');
   await page.waitForSelector('#mgmtLoginForm');
