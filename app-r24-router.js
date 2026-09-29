@@ -1,14 +1,14 @@
 (() => {
   const R24={
-    version:'24.0.0',
-    routes:['home','calendar','communications','services','profile','athlete','family','staff'],
-    current:'home',
+    version:'26.0.0',
+    routes:['pulse','home','calendar','communications','services','profile','athlete','family','staff'],
+    current:'pulse',
     route(){
-      const raw=(location.hash||'#/home').replace(/^#\/?/,'').split('?')[0].trim();
-      return this.routes.includes(raw)?raw:'home';
+      const raw=(location.hash||'#/pulse').replace(/^#\/?/,'').split('?')[0].trim();
+      return this.routes.includes(raw)?raw:'pulse';
     },
     go(name){
-      const route=this.routes.includes(name)?name:'home';
+      const route=this.routes.includes(name)?name:'pulse';
       try{closeModal()}catch{}
       const hash='#/'+route;
       if(location.hash===hash)this.render(route);
@@ -25,16 +25,16 @@
     navItems(){
       const role=this.roleMode();
       if(role==='staff')return [
-        ['staff','▦','Dashboard'],['calendar','▣','Calendario'],['communications','✉','Comunicazioni'],['services','◆','Servizi'],['profile','●','Profilo']
+        ['pulse','◉','Pulse'],['calendar','▣','Sport'],['staff','▦','Direzione'],['communications','✉','Community'],['profile','●','Profilo']
       ];
       if(role==='family')return [
-        ['home','⌂','Home'],['calendar','▣','Calendario'],['family','●','Famiglia'],['communications','✉','Comunicazioni'],['profile','◉','Profilo']
+        ['pulse','◉','Pulse'],['calendar','▣','Sport'],['family','●','Famiglia'],['communications','✉','Community'],['profile','◉','Profilo']
       ];
       if(role==='athlete')return [
-        ['home','⌂','Home'],['calendar','▣','Calendario'],['athlete','●','Atleta'],['communications','✉','Comunicazioni'],['profile','◉','Profilo']
+        ['pulse','◉','Pulse'],['calendar','▣','Sport'],['athlete','●','Atleta'],['communications','✉','Community'],['profile','◉','Profilo']
       ];
       return [
-        ['home','⌂','Home'],['calendar','▣','Calendario'],['communications','✉','Comunicazioni'],['services','◆','Servizi'],['profile','●','Profilo']
+        ['pulse','◉','Pulse'],['calendar','▣','Sport'],['communications','✉','Community'],['services','◆','World'],['profile','●','Profilo']
       ];
     },
     syncNav(){
@@ -46,9 +46,14 @@
       }
       const desktop=document.querySelector('.desktop-nav');
       if(desktop){
-        const desktopItems=this.roleMode()==='staff'
-          ?[['staff','Dashboard'],['calendar','Calendario'],['communications','Comunicazioni'],['services','Servizi'],['profile','Profilo']]
-          :[['home','Home'],['calendar','Calendario'],['communications','Comunicazioni'],['services','Servizi'],['profile','Profilo']];
+        const role=this.roleMode();
+        const desktopItems=role==='staff'
+          ?[['pulse','Pulse'],['calendar','Sport'],['staff','Direzione'],['communications','Community'],['profile','Profilo']]
+          :role==='family'
+            ?[['pulse','Pulse'],['calendar','Sport'],['family','Famiglia'],['communications','Community'],['profile','Profilo']]
+            :role==='athlete'
+              ?[['pulse','Pulse'],['calendar','Sport'],['athlete','Atleta'],['communications','Community'],['profile','Profilo']]
+              :[['pulse','Pulse'],['calendar','Sport'],['communications','Community'],['services','World'],['profile','Profilo']];
         desktop.innerHTML=desktopItems.map(([route,label])=>'<button type="button" data-r24-route="'+route+'" class="'+(this.current===route?'active':'')+'">'+label+'</button>').join('');
         desktop.querySelectorAll('[data-r24-route]').forEach(b=>b.onclick=()=>this.go(b.dataset.r24Route));
       }
@@ -88,6 +93,89 @@
       root.querySelectorAll('[data-r24-action]').forEach(b=>b.onclick=()=>openPublicAction(b.dataset.r24Action));
       root.querySelectorAll('[data-r24-register]').forEach(b=>b.onclick=openRegister);
       root.querySelectorAll('[data-r24-login]').forEach(b=>b.onclick=openLogin);
+    },
+    render_pulse(outlet){
+      const p=publicData(state.summary||FALLBACK);
+      const role=this.roleMode();
+      const now=clubNow();
+      const today=clubDateKey(now);
+      const rows=(state.calendar||[]).slice().sort((a,b)=>String(a.date||'').localeCompare(String(b.date||''))||String(a.time||'').localeCompare(String(b.time||'')));
+      const future=rows.filter(x=>!x.date||String(x.date).slice(0,10)>=today);
+      const todayRows=rows.filter(x=>String(x.date||'').slice(0,10)===today);
+      const isMatch=x=>/gara|partita|campionato|coppa|amichevole|match/i.test([x.type,x.title].join(' '));
+      const isTraining=x=>/allenament/i.test([x.type,x.title].join(' '));
+      const matches=future.filter(isMatch);
+      const trainings=future.filter(isTraining);
+      const nextActivity=future[0]||{};
+      const nextMatch=(p.nextMatch&&Object.keys(p.nextMatch).length)?p.nextMatch:(matches[0]||{});
+      const d=state.privateData||{},personal=d.personal||[],conv=d.convocations||[],requests=(d.direction&&d.direction.requests)||[];
+      const roleLabel=role==='staff'?'DIREZIONE / STAFF':role==='family'?'FAMIGLIA':role==='athlete'?'ATLETA':'SCD COMMUNITY';
+      const userName=role==='base'?'ColicoDerviese':(managementName(d)||displayValue(d.user&&d.user.name,'ColicoDerviese'));
+      const dateLabel=new Intl.DateTimeFormat('it-IT',{timeZone:state.clubTimeZone,weekday:'long',day:'2-digit',month:'long'}).format(now);
+      const skyState=matches.some(x=>String(x.date).slice(0,10)===today)?'MATCHDAY':trainings.some(x=>String(x.date).slice(0,10)===today)?'TRAINING':'CLUB';
+      const todayCount=todayRows.length;
+      const nowCards=(todayRows.length?todayRows:future).slice(0,4).map(x=>{
+        const kind=isMatch(x)?'GARA':isTraining(x)?'ALLENAMENTO':'EVENTO';
+        return '<button type="button" class="r26-time-node" data-r26-event="'+esc(x.id||'')+'"><time>'+esc(x.time||'--:--')+'</time><span>'+esc(kind)+'</span><b>'+esc(x.team||x.title||'Attività SCD')+'</b><small>'+esc(x.venue||'Dato in aggiornamento')+'</small></button>';
+      }).join('')||'<div class="r26-empty"><b>Nessuna attività pubblica registrata per oggi.</b><span>Il sistema continuerà a sincronizzare le fonti SCD.</span></div>';
+
+      const personalCard=role==='staff'
+        ?'<button class="r26-personal-card critical" data-r24-route="staff"><small>OPERATIVITÀ</small><b>'+esc(requests.length)+' richieste Direzione</b><span>'+esc(conv.length)+' convocazioni · '+esc((d.transport&&d.transport.kpis&&d.transport.kpis.requests)||0)+' richieste pulmino</span></button>'
+        :role==='family'
+          ?'<button class="r26-personal-card" data-r24-route="family"><small>FAMILY CIRCLE</small><b>'+esc(personal.length)+' profili collegati</b><span>Impegni, documenti e trasporti nello stesso spazio.</span></button>'
+          :role==='athlete'
+            ?'<button class="r26-personal-card" data-r24-route="athlete"><small>IL MIO SPORT</small><b>'+esc(personal[0]?[personal[0].firstName,personal[0].lastName].filter(Boolean).join(' '):'Profilo atleta')+'</b><span>'+esc(conv.length)+' convocazioni disponibili</span></button>'
+            :'<button class="r26-personal-card" data-r24-action="join"><small>GIOCA CON NOI</small><b>Entra nel mondo SCD</b><span>Open Day, iscrizioni, prove e attività del Club.</span></button>';
+
+      const activityCard='<button class="r26-personal-card energy" data-r24-route="calendar"><small>PROSSIMA ATTIVITÀ</small><b>'+esc(nextActivity.title||nextActivity.team||'Dato in aggiornamento')+'</b><span>'+esc([fmtDate(nextActivity.date),nextActivity.time,nextActivity.venue].filter(Boolean).join(' · '))+'</span></button>';
+
+      const momentRows=(p.highlights||[]).slice(0,6);
+      const moments=momentRows.length?momentRows.map((x,i)=>{
+        const title=field(x,'title','subject','event')||'SCD Moment';
+        const source=field(x,'feedType','source')||'SCD';
+        const meta=field(x,'date','time','status')||'';
+        return '<article class="r26-moment-card m'+(i%3)+'"><div class="r26-moment-orbit"></div><small>'+esc(source)+'</small><h3>'+esc(title)+'</h3><p>'+esc(field(x,'message','excerpt','venue')||'Vita, sport e comunità ColicoDerviese.')+'</p><span>'+esc(meta)+'</span></article>';
+      }).join(''):'<article class="r26-moment-card"><small>SCD MOMENTS</small><h3>Feed in aggiornamento</h3><p>I contenuti verificati del Club compariranno qui.</p></article>';
+
+      const opp=displayValue(field(nextMatch,'opponentName','opponent','avversario','title'),'Dato in aggiornamento');
+      const team=displayValue(field(nextMatch,'team','teamName'),'SCD ColicoDerviese');
+      const matchWhen=[fmtDate(field(nextMatch,'date','data')),field(nextMatch,'time','ora')].filter(Boolean).join(' · ');
+      const matchVenue=field(nextMatch,'venue','luogo','field')||'Dato in aggiornamento';
+
+      outlet.innerHTML=
+      '<section class="r26-pulse-hero">'+
+        '<div class="r26-energy-mesh"></div><div class="r26-energy-ring r1"></div><div class="r26-energy-ring r2"></div>'+
+        '<div class="r26-pulse-top"><div class="r26-brand"><img src="./assets/logo-scd.png" alt="SCD ColicoDerviese"><div><small>SCD PULSE OS · '+esc(roleLabel)+'</small><strong>SCD <span>PULSE</span></strong></div></div><button type="button" class="r26-sync" id="r26PulseSync">↻ <span>SYNC</span></button></div>'+
+        '<div class="r26-pulse-copy"><small>'+esc(dateLabel.toUpperCase())+'</small><h1>'+esc(role==='base'?'Il Club è vivo.':'Buonasera '+userName+'.')+'</h1><p>'+esc(todayCount?todayCount+' attività registrate oggi nel sistema SCD.':'La rete SCD è attiva. Dati e attività si aggiornano dalle fonti ufficiali.')+'</p></div>'+
+        '<button class="r26-sky-state" type="button" data-r24-sky><img src="./assets/sky.png" alt="Sky"><span>SKY · '+esc(skyState)+'</span></button>'+
+        '<div class="r26-pulse-meter"><span></span><b>'+esc(String(Math.min(100,20+todayCount*12)))+'%</b><small>CLUB ENERGY</small></div>'+
+      '</section>'+
+      '<section class="r26-live-strip"><div><span class="r26-live-dot"></span><b>ORA</b><small>'+esc(state.clockSynced?'orario SCD sincronizzato':'sincronizzazione locale')+'</small></div><strong>'+esc(todayCount)+'</strong><span>attività oggi</span><button data-r24-route="calendar">Apri Sport ›</button></section>'+
+      '<section class="r26-time-rail">'+nowCards+'</section>'+
+      '<section class="r26-section"><div class="r26-section-title"><div><small>PERSONALE · RELAZIONALE</small><h2>Per te</h2></div><span>'+esc(roleLabel)+'</span></div><div class="r26-personal-grid">'+personalCard+activityCard+'</div></section>'+
+      '<section class="r26-match-state"><div class="r26-match-copy"><small>CLUB LIVE · PROSSIMA GARA</small><h2>'+esc(team)+' <span>VS</span> '+esc(opp)+'</h2><p>'+esc(matchWhen||'Data in aggiornamento')+' · '+esc(matchVenue)+'</p></div><div class="r26-match-actions"><button type="button" data-r24-route="calendar">Match Centre ›</button><button type="button" data-r24-route="communications">Community ›</button></div></section>'+
+      '<section class="r26-section"><div class="r26-section-title"><div><small>CONTENUTI · MEMORIA · SOCIAL</small><h2>SCD Moments</h2></div><button type="button" data-r24-route="communications">Tutti ›</button></div><div class="r26-moments">'+moments+'</div></section>'+
+      '<section class="r26-section"><div class="r26-section-title"><div><small>ECOSISTEMA</small><h2>SCD World</h2></div></div><div class="r26-world-grid">'+
+        '<button data-r24-route="calendar"><span>⚽</span><b>Sport</b><small>Gare, allenamenti, tornei</small></button>'+
+        '<button data-r24-route="communications"><span>◌</span><b>Community</b><small>News, social, comunicazioni</small></button>'+
+        '<button data-r24-route="services"><span>◆</span><b>World</b><small>Kit, sponsor, eventi, Club</small></button>'+
+        '<button data-r24-route="profile"><span>●</span><b>SCD ID</b><small>Account, ruoli, relazioni</small></button>'+
+      '</div></section>'+
+      '<section class="r26-data-status"><div><span></span><b>DATA FABRIC</b><small>Drive · Gmail · R20 · Sheets · fonti verificate</small></div><div><b>'+esc(state.apiStatus==='ok'?'ONLINE':'SYNC')+'</b><small>stato rete</small></div></section>';
+
+      outlet.querySelectorAll('[data-r26-event]').forEach(b=>b.onclick=()=>openCalendarEvent(b.dataset.r26Event));
+      const sync=outlet.querySelector('#r26PulseSync');
+      if(sync)sync.onclick=async()=>{
+        sync.disabled=true;
+        sync.classList.add('loading');
+        try{
+          await Promise.all([loadSummary(true),loadPublicCalendar(true)]);
+          toast('SCD Pulse sincronizzato');
+          this.render('pulse');
+        }catch(e){toast(e.message||'Sincronizzazione non riuscita')}
+        finally{sync.disabled=false;sync.classList.remove('loading')}
+      };
+      this.bindCommon(outlet);
     },
     render_home(outlet){
       const p=publicData(state.summary||FALLBACK),cal=(state.calendar||[]);
@@ -268,7 +356,7 @@
       this.bindCommon(outlet);
     },
     init(){
-      const brand=document.querySelector('.brand');if(brand)brand.setAttribute('href','#/home');
+      const brand=document.querySelector('.brand');if(brand)brand.setAttribute('href','#/pulse');
       const login=document.querySelector('#loginBtn');if(login)login.onclick=()=>this.go(this.roleMode()==='staff'?'staff':'profile');
       const profile=document.querySelector('#mobileProfile');if(profile)profile.onclick=()=>this.go('profile');
       const settings=document.querySelector('#mobileSettings');if(settings)settings.onclick=()=>this.go('profile');
