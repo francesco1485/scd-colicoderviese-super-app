@@ -108,7 +108,7 @@ assert(sourceById.SPONSOR_MASTER_SHEET.resource_id==='1-5-MUnrrAltflJSATe6bKkjm_
 assert(sourceById.TUTTOCAMPO.use==='CROSS_CHECK_AND_ENRICHMENT','Tuttocampo must remain secondary enrichment');
 assert(sourceById.TEAMSYSTEM_SPORTIVI_IN_CLOUD.trust==='BENCHMARK','TeamSystem must remain benchmark, not factual source');
 assert(sourceById.SCD_SUPABASE.kind==='TARGET_DOMAIN_CORE','SCD Supabase source kind mismatch');
-assert(sourceById.SCD_SUPABASE.state==='PENDING_DEDICATED_PROJECT','SCD Supabase must remain pending until project creation');
+assert(sourceById.SCD_SUPABASE.state==='ACTIVE_HEALTHY','SCD Supabase project state must be ACTIVE_HEALTHY after R34 provisioning');
 assert((sourceById.SCD_SUPABASE.rules||[]).includes('cepa_project_must_not_be_reused'),'CEPA Supabase isolation rule missing');
 
 assert(m.drive_vault.dedup_by_hash===true,'Drive dedup by hash required');
