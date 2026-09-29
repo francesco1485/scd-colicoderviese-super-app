@@ -16,10 +16,12 @@ const sql=fs.existsSync(migrationPath)?fs.readFileSync(migrationPath,'utf8'):'';
 
 if(cfg){
   assert(cfg.schema_version==='1.0.0','wrong Supabase contract schema version');
-  assert(cfg.project?.state==='PENDING_DEDICATED_PROJECT','SCD Supabase must remain pending until a dedicated project is explicitly created');
+  assert(cfg.project?.state==='ACTIVE_HEALTHY','SCD Supabase project must be active after R34 provisioning');
   assert(cfg.project?.dedicated_project_required===true,'dedicated SCD Supabase project required');
   assert(cfg.project?.reuse_cepa_project===false,'CEPA Maglia OS Supabase project must not be reused');
   assert(cfg.project?.creation_requires_explicit_cost_confirmation===true,'Supabase project creation must remain cost-confirmed');
+  assert(cfg.project?.project_id==='ndevtxxijbcnskgysdit','unexpected SCD Supabase project id');
+  assert(cfg.project?.cost?.amount===0 && cfg.project?.cost?.confirmed===true,'Supabase project cost confirmation missing');
   assert(cfg.activation?.feature_flag==='FF-SUPABASE-CORE','wrong Supabase feature flag');
   assert(cfg.activation?.default_enabled===false,'Supabase core must default off before migration proof');
   assert(cfg.migration_mode==='STRANGLER_DUAL_RUN','migration must remain staged dual-run');
