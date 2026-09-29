@@ -7,6 +7,7 @@ const PORT = process.env.PORT || 10000;
 const ROOT = __dirname;
 const UPSTREAM = process.env.SCD_APPS_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbwYQ_3yLYsp-6jX3FIgufBjpmaZb9uO1AklF9hdG-CuLII9J4ITUX1EA-EKuWXBMEc/exec';
 const CACHE_TTL = 10 * 60 * 1000;
+const CLUB_TIME_ZONE = 'Europe/Rome';
 let liveCache = { at: 0, data: null };
 
 const ALLOWED_ORIGINS = new Set([
@@ -36,6 +37,23 @@ const allowedActions = new Set([
   'direction.access.set','direction.pin.set','direction.player.approve','direction.player.reject',
   'direction.diagnostics','direction.evolution',
 ]);
+
+function clubTimePayload(){
+  const now=new Date();
+  const parts=new Intl.DateTimeFormat('it-IT',{
+    timeZone:CLUB_TIME_ZONE,weekday:'long',year:'numeric',month:'2-digit',day:'2-digit',
+    hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false
+  }).formatToParts(now).reduce((o,p)=>(o[p.type]=p.value,o),{});
+  return {
+    ok:true,
+    epochMs:now.getTime(),
+    iso:now.toISOString(),
+    timeZone:CLUB_TIME_ZONE,
+    clubDate:`${parts.year}-${parts.month}-${parts.day}`,
+    clubTime:`${parts.hour}:${parts.minute}:${parts.second}`,
+    weekday:parts.weekday
+  };
+}
 
 function json(res, status, data, headers={}) {
   res.writeHead(status, {'content-type':'application/json; charset=utf-8','cache-control':'no-store',...headers});
@@ -81,7 +99,7 @@ async function fetchOfficialPosts(){
 }
 
 async function fetchGoogleNews(){
-  const q=encodeURIComponent('"ColicoDerviese" OR "SCD ColicoDerviese"');
+  const q=encodeURIComponent('"ColicoDerviese" OR "SCD ColicoDerviese" OR "Colico Derviese"');
   const url=`https://news.google.com/rss/search?q=${q}&hl=it&gl=IT&ceid=IT:it`;
   try{
     const r=await fetch(url,{headers:{'user-agent':'SCD-ColicoDerviese-SuperApp/1.0'}}); if(!r.ok) return [];
@@ -109,8 +127,9 @@ function serveStatic(req,res){
 http.createServer(async(req,res)=>{
   applyCors(req,res); if(req.method==='OPTIONS'){res.writeHead(204);return res.end()}
   const u=new URL(req.url,'http://localhost');
-  if(u.pathname==='/health') return json(res,200,{ok:true,service:'SCD Super App',version:'21.9.0',time:new Date().toISOString()});
-  if(u.pathname==='/api/capabilities') return json(res,200,{ok:true,version:'21.9.0',mode:'GITHUB_PAGES_TO_RENDER_PROXY_TO_R20',actions:[...allowedActions].sort(),isolated:['safeguarding']});
+  if(u.pathname==='/health') return json(res,200,{...clubTimePayload(),service:'SCD Super App',version:'21.10.0'});
+  if(u.pathname==='/api/time') return json(res,200,clubTimePayload());
+  if(u.pathname==='/api/capabilities') return json(res,200,{ok:true,version:'21.10.0',mode:'GITHUB_PAGES_TO_RENDER_PROXY_TO_R20',actions:[...allowedActions].sort(),isolated:['safeguarding']});
   if(u.pathname==='/api/scd') return proxyAppsScript(req,res);
   if(u.pathname==='/api/public') return json(res,200,await fetchPublicFeed(),{'cache-control':'no-store'});
   if(u.pathname==='/api/live') {try{return json(res,200,await getLiveRadar(),{'cache-control':'public, max-age=120'})}catch(e){return json(res,500,{ok:false,error:e.message})}}
