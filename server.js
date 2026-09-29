@@ -34,7 +34,7 @@ const allowedActions = new Set([
   'private.request.submit','private.transport.request','private.message.send',
   'private.convocation.create','private.convocation.reply',
   'private.attendance.get','private.attendance.save',
-  'public.feed','public.club','public.register','public.calendar',
+  'public.feed','public.club','public.register','public.calendar','public.datafabric.contract',
   'public.registration','public.partnerLead','public.communitySubmit','public.ticketSubmit','public.telemetry',
   'auth.request','auth.login','auth.validate','auth.pin.change',
   'direction.access.set','direction.pin.set','direction.player.approve','direction.player.reject',
@@ -131,9 +131,9 @@ function serveStatic(req,res){
 http.createServer(async(req,res)=>{
   applyCors(req,res); if(req.method==='OPTIONS'){res.writeHead(204);return res.end()}
   const u=new URL(req.url,'http://localhost');
-  if(u.pathname==='/health') return json(res,200,{...clubTimePayload(),service:'SCD Super App',version:'28.0.0'});
+  if(u.pathname==='/health') return json(res,200,{...clubTimePayload(),service:'SCD Super App',version:'29.0.0'});
   if(u.pathname==='/api/time') return json(res,200,clubTimePayload());
-  if(u.pathname==='/api/capabilities') return json(res,200,{ok:true,version:'28.0.0',mode:'GITHUB_PAGES_TO_RENDER_PROXY_TO_R20',actions:[...allowedActions].sort(),featureFlags:FEATURE_FLAGS,isolated:['safeguarding']});
+  if(u.pathname==='/api/capabilities') return json(res,200,{ok:true,version:'29.0.0',mode:'GITHUB_PAGES_TO_RENDER_PROXY_TO_R20',actions:[...allowedActions].sort(),featureFlags:FEATURE_FLAGS,isolated:['safeguarding']});
   if(u.pathname==='/api/scd') return proxyAppsScript(req,res);
   if(u.pathname==='/api/public') return json(res,200,await fetchPublicFeed(),{'cache-control':'no-store'});
   if(u.pathname==='/api/live') {try{return json(res,200,await getLiveRadar(),{'cache-control':'public, max-age=120'})}catch(e){return json(res,500,{ok:false,error:e.message})}}
