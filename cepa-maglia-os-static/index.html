@@ -10,7 +10,7 @@
 </head>
 <body>
 <header class="top">
-  <div class="brand"><span class="mark">M</span><div><strong>CEPA MAGLIA OS</strong><small>Operating System della relazione</small></div></div>
+  <div class="brand"><span class="mark">M</span><div><strong>CEPA MAGLIA OS</strong><small>Territorio · Relazione · Consulenza</small></div></div>
   <div class="userbar"><span id="rolePill" class="pill hidden"></span><span id="userPill" class="pill hidden"></span><button id="logoutBtn" class="ghost hidden">Esci</button></div>
 </header>
 
@@ -18,7 +18,7 @@
   <div class="login-card">
     <div class="eyebrow">Accesso riservato</div>
     <h1>Entra nel Command Center</h1>
-    <p class="sub">Piattaforma Web privata per organizzare Recovery, consulenza programmata e lavoro quotidiano.</p>
+    <p class="sub">CEPA non è solo portafoglio: osserva il territorio, costruisce relazioni e trasforma interesse in consulenza.</p>
     <form id="loginForm" class="form">
       <label>Email<input id="email" type="email" autocomplete="email" required></label>
       <label>Password<input id="password" type="password" autocomplete="current-password" minlength="8" required></label>
@@ -33,18 +33,71 @@
 <main id="appView" class="page hidden">
   <section class="hero">
     <div>
-      <div class="eyebrow">Command Center</div>
+      <div class="eyebrow">CEPA Territorial Command Center</div>
       <h1 id="orgTitle">Maglia Assicurazioni</h1>
-      <p id="heroSub">Recovery 50 · primo flusso commerciale reale</p>
+      <p id="heroSub">Prima osserviamo e comprendiamo. Poi creiamo relazione. Solo dopo arriva la consulenza.</p>
     </div>
     <div class="navtabs">
-      <button class="btn active" data-view="recovery">Recovery</button>
-      <button class="btn" data-view="today">Il mio lavoro di oggi</button>
+      <button class="btn active" data-view="territory">Territorio CEPA</button>
+      <button class="btn" data-view="recovery">Recovery</button>
+      <button class="btn" data-view="today">Il mio lavoro</button>
       <button class="btn" data-view="control">Cabina di regia</button>
     </div>
   </section>
 
-  <section id="recoveryView">
+  <section id="territoryView">
+    <section class="kpis">
+      <article class="kpi"><span>Mappati</span><strong id="tMapped">-</strong><small>entità nella Mappa Zero</small></article>
+      <article class="kpi"><span>Vecchio / storico</span><strong id="tLegacy">-</strong><small>base già disponibile</small></article>
+      <article class="kpi"><span>Nuovo Radar</span><strong id="tNew">-</strong><small>nuove entità inserite</small></article>
+      <article class="kpi"><span>Da sviluppare</span><strong id="tOpportunities">-</strong><small>prospect / opportunità / relazioni</small></article>
+    </section>
+
+    <section class="territory-intro">
+      <div>
+        <div class="eyebrow">CEPA Mappa Zero</div>
+        <h2>Due hub pilota: Mandello del Lario + Colico</h2>
+        <p>Il primo layer reale parte dai dati già disponibili. Non li trattiamo come lead automatici: sono entità da conoscere, qualificare e collegare al territorio. Il Radar aggiungerà progressivamente imprese, professionisti, enti, scuole, associazioni e partner.</p>
+      </div>
+      <button id="newEntityBtn" class="primary hidden">+ Nuova entità</button>
+    </section>
+
+    <section id="hubGrid" class="hub-grid"></section>
+
+    <section class="cycle-grid">
+      <article><span>1</span><strong>Mappatura</strong><small id="cycleMapped">-</small></article>
+      <article><span>2</span><strong>Qualificazione</strong><small id="cycleQualified">-</small></article>
+      <article><span>3</span><strong>Attivazione</strong><small id="cycleActivated">-</small></article>
+      <article><span>4</span><strong>Consulenza</strong><small id="cycleAdvisory">-</small></article>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <div><h2>Entità territoriali</h2><p>Primo layer: ecosistema assicurativo già presente nei file caricati. Ogni riga mantiene fonte e stato.</p></div>
+        <div class="panel-actions">
+          <select id="territoryHubFilter" class="compact-select"><option value="">Tutti gli hub</option></select>
+          <select id="territoryStageFilter" class="compact-select">
+            <option value="">Tutti gli stati</option>
+            <option value="observed">Osservato</option>
+            <option value="qualified">Qualificato</option>
+            <option value="prospect">Prospect</option>
+            <option value="opportunity">Opportunità</option>
+            <option value="relationship">Relazione</option>
+          </select>
+          <button id="refreshTerritoryBtn" class="btn">Aggiorna</button>
+        </div>
+      </div>
+      <div id="territoryLoading" class="loader">Caricamento Mappa Zero…</div>
+      <div id="territoryTableWrap" class="table-wrap hidden">
+        <table class="table territory-table">
+          <thead><tr><th>Soggetto</th><th>Hub</th><th>Comune</th><th>Tipologia</th><th>Fonte</th><th>CEPA</th><th>Advisory</th><th>Stato</th><th>Azione</th></tr></thead>
+          <tbody id="territoryBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </section>
+
+  <section id="recoveryView" class="hidden">
     <section class="kpis">
       <article class="kpi"><span>Recovery aperti</span><strong id="kRecovery">-</strong><small>casi attivi</small></article>
       <article class="kpi"><span>Score ≥ 90</span><strong id="kHigh">-</strong><small>priorità iniziale</small></article>
@@ -54,7 +107,7 @@
 
     <section class="panel">
       <div class="panel-head">
-        <div><h2>Recovery 50</h2><p>Selezione reale AssiEasy, ora trasformata in lavoro assegnabile.</p></div>
+        <div><h2>Recovery 50</h2><p>Portafoglio interno: uno dei motori CEPA, non il progetto intero.</p></div>
         <button id="refreshBtn" class="btn">Aggiorna</button>
       </div>
       <div id="loading" class="loader">Caricamento dati protetti…</div>
