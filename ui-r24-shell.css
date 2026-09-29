@@ -785,3 +785,15 @@ body.r24-router-ready #home .register-section{
   body.r24-router-ready .r24-sky-mini{width:52px}
   body.r24-router-ready .r24-event-row{grid-template-columns:58px 82px 1fr 12px}
 }
+
+
+/* R24 viewport cleanup: routed screens own their mobile header; no duplicate chrome. */
+body.r24-router-ready .sponsor-ticker{display:none!important}
+@media(max-width:900px){
+  body.r24-router-ready.scd-app-mode .topbar,
+  body.r24-router-ready.scd-app-mode .temporal-core{display:none!important}
+  body.r24-router-ready .app-route-view{padding-top:0}
+  body.r24-router-ready .r24-home-sky{width:138px;height:174px;right:-2px;bottom:-4px}
+  body.r24-router-ready .r24-home-copy{right:118px}
+  body.r24-router-ready .r24-home-copy p{max-width:220px}
+}
