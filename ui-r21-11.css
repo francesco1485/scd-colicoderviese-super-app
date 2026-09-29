@@ -232,3 +232,128 @@ body.scd-ui-v21-11 .brand small{color:var(--scd-yellow)}
 @media(max-width:560px){.reserved-app-head{border-radius:18px;margin:-6px -2px 10px;padding:15px}.athlete-hero{grid-template-columns:68px 1fr 42px}.athlete-avatar{width:64px;height:64px}.athlete-number{font-size:32px}.reserved-action-grid{grid-template-columns:repeat(3,1fr)}}
 
 .choice-tile.danger-tile{border-color:#f0caca!important;background:#fff6f6!important;color:#8a3030!important;text-decoration:none}.choice-tile.danger-tile b{color:#8a3030!important}.choice-tile.danger-tile small{color:#9a6262!important}
+
+
+/* ===== R21.15 CANONICAL APP MODE =====
+   The browser distribution is an app shell, not a desktop marketing website.
+   The same mobile language is kept at every viewport to prevent visual drift. */
+body.scd-app-mode{background:
+  radial-gradient(circle at 18% 12%,rgba(20,113,214,.28),transparent 28%),
+  linear-gradient(145deg,#031d49,#075bb9 52%,#eef5fb 52%,#eef5fb);
+  min-height:100vh}
+body.scd-app-mode .app-shell{width:100%;max-width:430px;margin:0 auto;min-height:100dvh;background:var(--scd-bg);box-shadow:0 0 70px rgba(2,28,67,.30);padding-bottom:calc(92px + var(--app-safe-bottom))}
+body.scd-app-mode .desktop-nav,body.scd-app-mode .top-actions{display:none!important}
+body.scd-app-mode .mobile-head-actions{display:flex!important}
+body.scd-app-mode .topbar{height:78px;padding:6px 12px 5px;position:sticky;top:0}
+body.scd-app-mode .brand{min-width:0;gap:8px;flex:1}
+body.scd-app-mode .brand img{width:46px;height:58px}
+body.scd-app-mode .brand span{display:block;min-width:0}
+body.scd-app-mode .brand strong{font-size:9px;letter-spacing:.15em}
+body.scd-app-mode .brand small{font-size:15px;line-height:1;font-weight:950;white-space:nowrap}
+
+body.scd-app-mode .temporal-core{top:78px;min-height:32px;height:32px;padding:0 10px;background:#fff;box-shadow:0 4px 14px rgba(3,35,86,.08);border-bottom:1px solid #dfe7f0;z-index:75}
+body.scd-app-mode .temporal-now{width:100%;justify-content:center}
+body.scd-app-mode .temporal-now .live-dot{width:6px;height:6px}
+body.scd-app-mode .temporal-now small{display:none}
+body.scd-app-mode .temporal-now strong{font-size:9px;font-weight:900;color:#315276;max-width:100%;text-align:center}
+body.scd-app-mode .temporal-actions{display:none}
+
+body.scd-app-mode .hero-v3{min-height:430px;height:430px;padding:22px 12px 14px;display:block;position:relative;overflow:hidden;background:#07366f}
+body.scd-app-mode .hero-media{background-position:center 44%;transform:none;animation:none}
+body.scd-app-mode .hero-overlay{background:linear-gradient(0deg,rgba(2,24,60,.92) 0%,rgba(2,31,74,.45) 56%,rgba(0,33,85,.12) 100%)}
+body.scd-app-mode .hero-content{position:absolute;left:16px;right:16px;top:22px;bottom:auto;max-width:none}
+body.scd-app-mode .hero-kicker{background:rgba(2,34,83,.76);padding:5px 8px;font-size:7px;border-color:rgba(255,255,255,.18)}
+body.scd-app-mode .hero-brand-lockup{display:none}
+body.scd-app-mode .hero h1{font-size:34px;line-height:.98;margin-top:132px;text-shadow:0 3px 15px rgba(0,0,0,.45);letter-spacing:-.035em}
+body.scd-app-mode .hero h1 span{display:block;font-size:18px;color:#fff;line-height:1.15;margin-top:4px;max-width:280px}
+body.scd-app-mode .hero-lead,body.scd-app-mode .hero-actions,body.scd-app-mode .hero-trust{display:none}
+body.scd-app-mode .hero-side-card{position:absolute;left:12px;right:12px;bottom:12px;width:auto;padding:11px 12px;border-radius:17px;display:grid;grid-template-columns:68px 1fr 72px;gap:7px;align-items:center;box-shadow:0 9px 28px rgba(0,0,0,.25)}
+body.scd-app-mode .hero-side-card .side-label{grid-column:1/-1;color:#0b62ca;font-size:8px;margin-bottom:-3px}
+body.scd-app-mode .hero-side-card .match-date{font-size:11px;margin:0;color:#0b315f;line-height:1.1}
+body.scd-app-mode .hero-side-card .match-clubs{grid-template-columns:1fr 40px 1fr;gap:3px}
+body.scd-app-mode .hero-side-card .club img,body.scd-app-mode .hero-side-card .fallback-badge{width:36px;height:38px;border-radius:10px}
+body.scd-app-mode .hero-side-card .club b{font-size:8px;margin-top:1px}
+body.scd-app-mode .hero-side-card .versus span{font-size:11px}
+body.scd-app-mode .hero-side-card .versus small{font-size:8px}
+body.scd-app-mode .hero-side-card .match-meta{display:none}
+body.scd-app-mode .hero-side-card .card-cta{min-height:34px;font-size:8px;padding:0 6px;background:var(--scd-blue)}
+
+body.scd-app-mode .home-kpis{padding:10px 10px 0;gap:7px;grid-template-columns:repeat(4,1fr)}
+body.scd-app-mode .home-kpi{min-height:74px;padding:7px 3px;display:block;text-align:center;border-radius:15px}
+body.scd-app-mode .home-kpi .ico{margin:0 auto 4px;width:32px;height:32px;font-size:17px;border-radius:11px}
+body.scd-app-mode .home-kpi strong{font-size:20px}
+body.scd-app-mode .home-kpi small{font-size:6px;margin:0}
+
+body.scd-app-mode .affiliation-ribbon{display:none}
+body.scd-app-mode .today-core{padding:12px 10px 6px}
+body.scd-app-mode .today-head{margin:0 0 7px;align-items:center}
+body.scd-app-mode .today-head .eyebrow{font-size:7px}
+body.scd-app-mode .today-head h2{font-size:17px;margin:2px 0}
+body.scd-app-mode .today-head p{display:none}
+body.scd-app-mode .today-head button{min-height:30px;padding:0 9px;font-size:7px}
+body.scd-app-mode .today-event{border-radius:13px;grid-template-columns:48px 1fr 14px;min-height:56px;padding:8px 9px}
+body.scd-app-mode .today-event time{font-size:10px}
+body.scd-app-mode .today-event span b{font-size:10px}
+body.scd-app-mode .today-event span small{font-size:8px}
+
+body.scd-app-mode .signal-strip{height:38px;padding:0 10px;background:#063774;border-top:0;border-bottom:2px solid var(--scd-yellow)}
+body.scd-app-mode .signal-title{font-size:8px;color:var(--scd-yellow)}
+body.scd-app-mode .signal-track{font-size:9px}
+body.scd-app-mode .api-status{border:0;background:rgba(255,255,255,.12)}
+
+body.scd-app-mode .section{padding:18px 10px}
+body.scd-app-mode .section-head{margin-bottom:10px}
+body.scd-app-mode .section-head .eyebrow{font-size:7px}
+body.scd-app-mode .section-head h2{font-size:21px;margin:3px 0}
+body.scd-app-mode .section-head p{font-size:10px;line-height:1.35}
+body.scd-app-mode .action-grid{padding-top:10px;grid-template-columns:1fr 1fr;gap:7px}
+body.scd-app-mode .action-card{min-height:86px;border-radius:15px;padding:9px;grid-template-columns:34px 1fr;box-shadow:0 6px 18px rgba(4,42,96,.08)}
+body.scd-app-mode .action-card>span{width:34px;height:34px;border-radius:10px;font-size:16px}
+body.scd-app-mode .action-card b{font-size:9px}
+body.scd-app-mode .action-card small{font-size:7px}
+body.scd-app-mode .action-grid>.action-card:nth-child(n+5){display:none}
+
+body.scd-app-mode .match-grid{gap:7px;grid-template-columns:1fr}
+body.scd-app-mode .match-card{border-radius:15px;padding:12px}
+body.scd-app-mode .match-card h3{font-size:13px;margin:6px 0 2px}
+body.scd-app-mode .match-card p{font-size:9px}
+body.scd-app-mode .scoreline{margin-top:9px;padding:8px;border-radius:10px}
+
+body.scd-app-mode .event-section,body.scd-app-mode .avatar-hub,body.scd-app-mode .community-zone,body.scd-app-mode .service-hub,body.scd-app-mode .commercial-hub,body.scd-app-mode .sources,body.scd-app-mode .safety-section,body.scd-app-mode .register-section{display:none!important}
+body.scd-app-mode .news-layout{gap:8px;grid-template-columns:1fr}
+body.scd-app-mode .feature-news{min-height:170px;border-radius:16px;padding:16px}
+body.scd-app-mode .feature-news h3{font-size:20px}
+body.scd-app-mode .news-list{gap:6px}
+body.scd-app-mode .news-row{border-radius:12px;padding:9px;grid-template-columns:38px 1fr auto}
+body.scd-app-mode .news-icon{width:38px;height:38px;border-radius:11px}
+body.scd-app-mode .sponsor-section{padding:12px 10px}
+body.scd-app-mode .sponsor-premium{display:none}
+body.scd-app-mode .sponsor-grid{grid-template-columns:repeat(3,1fr);gap:6px}
+body.scd-app-mode .sponsor-card{min-height:52px;border-radius:11px;padding:6px;font-size:8px}
+
+body.scd-app-mode .sponsor-ticker{left:50%;right:auto;transform:translateX(-50%);width:min(430px,100vw);bottom:calc(66px + var(--app-safe-bottom));height:26px;border-top:1px solid var(--scd-yellow)}
+body.scd-app-mode .sponsor-ticker-label{font-size:7px;padding:0 8px}
+body.scd-app-mode .sponsor-track{font-size:8px}
+body.scd-app-mode .mobile-nav{left:50%;right:auto;transform:translateX(-50%);width:min(430px,100vw);position:fixed;bottom:0;height:calc(66px + var(--app-safe-bottom));padding-bottom:var(--app-safe-bottom);background:#fff;box-shadow:0 -8px 24px rgba(4,42,96,.09);border-top:1px solid #dce5ee;z-index:90;display:grid;grid-template-columns:repeat(5,1fr)}
+body.scd-app-mode .mobile-nav a,body.scd-app-mode .mobile-nav button{border:0;background:transparent;text-decoration:none;color:#31567d;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:8px;font-weight:850;position:relative}
+body.scd-app-mode .mobile-nav span{font-size:18px;margin-bottom:3px}
+body.scd-app-mode .mobile-nav .active{color:var(--scd-blue)}
+body.scd-app-mode .mobile-nav .active:after{content:"";position:absolute;bottom:3px;width:26px;height:3px;border-radius:3px;background:var(--scd-yellow)}
+
+body.scd-app-mode .sky-fab{display:flex!important;width:46px;height:46px;right:max(12px,calc((100vw - 430px)/2 + 12px));bottom:calc(104px + var(--app-safe-bottom));padding:0;border-radius:50%}
+body.scd-app-mode .sky-fab .sky-copy{display:none}
+body.scd-app-mode .sky-fab .sky-face{width:100%;height:100%;border-radius:50%}
+body.scd-app-mode .sky-fab .sky-ping{right:0;top:0}
+body.scd-app-mode .sky-panel{left:50%;right:auto;transform:translateX(-50%) translateY(16px) scale(.97);bottom:calc(74px + var(--app-safe-bottom));width:min(410px,calc(100vw - 20px))}
+body.scd-app-mode .sky-panel.open{transform:translateX(-50%)}
+
+body.scd-app-mode .modal-backdrop{padding:0;display:flex;align-items:stretch;justify-content:center;background:rgba(3,22,54,.58);backdrop-filter:blur(6px)}
+body.scd-app-mode .modal{width:min(430px,100vw);height:100dvh;max-height:none;border-radius:0;padding:18px 12px calc(86px + env(safe-area-inset-bottom));box-shadow:0 0 70px rgba(0,0,0,.35);background:#eef4fb;overflow:auto}
+body.scd-app-mode .modal-close{position:fixed;z-index:4;right:max(12px,calc((100vw - 430px)/2 + 12px));top:12px;width:36px;height:36px;background:rgba(255,255,255,.96);box-shadow:0 6px 18px rgba(4,42,96,.14);color:#06386f}
+
+@media(max-width:430px){
+  body.scd-app-mode .app-shell{max-width:none;box-shadow:none}
+  body.scd-app-mode .sponsor-ticker,body.scd-app-mode .mobile-nav{width:100vw}
+  body.scd-app-mode .sky-fab{right:12px}
+  body.scd-app-mode .modal-close{right:12px}
+}
