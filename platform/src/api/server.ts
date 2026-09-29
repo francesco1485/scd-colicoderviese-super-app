@@ -7,9 +7,31 @@ import { createRuntime } from "../runtime/createRuntime.js";
 import { R20BridgeClient } from "../adapters/R20BridgeClient.js";
 import { R20AuthService } from "../core/auth/R20AuthService.js";
 import { RequestAuth } from "../core/auth/RequestAuth.js";
+import { createCommandWorker } from "../worker/createCommandWorker.js";
 
 const app = Fastify({ logger: true });
 const runtime = await createRuntime();
+const embeddedWorker =
+  process.env.RUN_EMBEDDED_WORKER === "true" && runtime.queueConnection
+    ? createCommandWorker({
+        connection: runtime.queueConnection,
+        registry: runtime.registry,
+        state: runtime.state,
+        events: runtime.events,
+        concurrency: Number(process.env.WORKER_CONCURRENCY ?? 8)
+      })
+    : null;
+
+if (embeddedWorker) {
+  app.log.info(
+    {
+      queue: "scd-commands",
+      concurrency: Number(process.env.WORKER_CONCURRENCY ?? 8)
+    },
+    "embedded command worker enabled"
+  );
+}
+
 const bridge = new R20BridgeClient();
 const auth = new RequestAuth(new R20AuthService(bridge));
 
@@ -42,6 +64,7 @@ app.get("/health", async () => ({
   version: "22.0.0",
   executionMode: runtime.executionMode,
   redisAvailable: runtime.redisAvailable,
+  embeddedWorker: Boolean(embeddedWorker),
   commands: runtime.registry.list().length,
   timestamp: new Date().toISOString()
 }));
@@ -149,6 +172,7 @@ await app.listen({ host: "0.0.0.0", port });
 async function shutdown(signal: string): Promise<void> {
   app.log.info({ signal }, "command platform shutting down");
   await app.close();
+  await embeddedWorker?.close();
   await runtime.close();
   process.exit(0);
 }
