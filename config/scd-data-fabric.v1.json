@@ -1,0 +1,147 @@
+{
+  "schema_version": "1.0.0",
+  "generated_from_verified_sources_at": "2026-09-29",
+  "purpose": "Rendere Drive e Gmail il back-office operativo continuo della SCD Super App senza creare un gestionale parallelo.",
+  "accounts": {
+    "drive": "sportclubcolico@gmail.com",
+    "gmail": "sportclubcolico@gmail.com"
+  },
+  "canonical_resources": {
+    "core": {
+      "id": "1p78Kgla_cCjYxCPjksS8lHxmlFQxuvpd1aBXv6-1H1s",
+      "title": "00 - MASTER CALENDARIO GARE SCD COLICODERVIESE 2026-27 - DEFINITIVO"
+    },
+    "tesserati": {
+      "id": "1mcOVkFRK7igxk87jGE-VqI49PHjNa6OmMu7xd0QYUl8",
+      "title": "04_TESSERATI - Master Operativo SCD ColicoDerviese 2026-27"
+    },
+    "pulmini": {
+      "id": "1eBhjOymnJF6GfE-6-GRuo7UYgkE82ad24_VnY097n9Q",
+      "title": "05_PULMINI - Master Flotta e Trasporti SCD 2026-27"
+    },
+    "mail_operations": {
+      "id": "1wx3ZXwmdZuAr8AM_h08GzOvephm5o5iHMvTLQpRmbJE",
+      "title": "SCD ColicoDerviese - MAIL OPERATIONS APP 2026"
+    },
+    "sponsor_master": {
+      "id": "1-5-MUnrrAltflJSATe6bKkjm_3SItO0gvadi_PXPoAQ",
+      "title": "00 - MASTER SPONSOR INTELLIGENCE - SCD COLICODERVIESE 2026-2028"
+    },
+    "economic_master": {
+      "id": "12nWAbNPM9HoYH_A5beGEuCgvWCqjDF5h5lln0L0Aab8",
+      "title": "SCD COLICODERVIESE - MASTER ECONOMICO FINANZIARIO 2026-2027"
+    },
+    "tournaments_master": {
+      "id": "1fE8SdrmlOdy97kfVh9-7U0n_8NkvQl0x-qPY89RwQm8",
+      "title": "MASTER TORNEI & INIZIATIVE S.D.C. ColicoDerviese 2026-2028"
+    }
+  },
+  "existing_surfaces": {
+    "gmail": [
+      "mail_operations/01_EMAIL_ARCHIVE",
+      "mail_operations/17_SMART_CLASSIFIER",
+      "mail_operations/18_ACTION_QUEUE",
+      "tesserati/MAIL SPORTCLUB"
+    ],
+    "drive": [
+      "tesserati/DRIVE AGGIORNAMENTI",
+      "tesserati/REGISTRO FONTI V2"
+    ],
+    "orchestration": [
+      "core/APP EVENT KERNEL",
+      "core/APP JOBS",
+      "core/APP EVOLUTION QUEUE",
+      "core/APP AUDIT"
+    ]
+  },
+  "pipelines": {
+    "gmail_ingestion": {
+      "source": "SCD_GMAIL",
+      "canonical_archive": "mail_operations/01_EMAIL_ARCHIVE",
+      "classifier_projection": "mail_operations/17_SMART_CLASSIFIER",
+      "action_queue": "mail_operations/18_ACTION_QUEUE",
+      "event_sink": "core/APP EVENT KERNEL",
+      "incremental_key": "GMAIL_MESSAGE_ID",
+      "steps": [
+        "SEARCH_INCREMENTAL",
+        "DEDUPE_BY_MESSAGE_ID",
+        "READ_MESSAGE_METADATA",
+        "EXTRACT_ATTACHMENTS_METADATA",
+        "CLASSIFY_AREA",
+        "DETECT_PRIORITY",
+        "DETECT_ACTION",
+        "APPEND_CANONICAL_ARCHIVE",
+        "APPEND_CLASSIFIER_PROJECTION",
+        "APPEND_ACTION_QUEUE_WHEN_NEEDED",
+        "EMIT_EVENT",
+        "HUMAN_REVIEW_FOR_CRITICAL_CHANGE"
+      ],
+      "critical_keywords": [
+        "variazione gara",
+        "rinvio",
+        "annullamento",
+        "tesseramento",
+        "certificato",
+        "scadenza",
+        "pagamento",
+        "fattura",
+        "bonifico",
+        "figc",
+        "lnd",
+        "crl",
+        "urgente"
+      ]
+    },
+    "drive_catalog": {
+      "source": "SCD_DRIVE",
+      "canonical_catalog": "tesserati/DRIVE AGGIORNAMENTI",
+      "source_registry": "tesserati/REGISTRO FONTI V2",
+      "event_sink": "core/APP EVENT KERNEL",
+      "incremental_key": "DRIVE_FILE_ID",
+      "steps": [
+        "LOAD_REGISTERED_DRIVE_ITEMS",
+        "FETCH_CURRENT_METADATA",
+        "COMPARE_LAST_MODIFIED",
+        "MARK_PRESENT_OR_MISSING",
+        "UPDATE_LAST_CHECK",
+        "EMIT_CHANGE_EVENT",
+        "DO_NOT_MOVE_OR_DELETE_SOURCE"
+      ]
+    }
+  },
+  "classifications": [
+    "FIGC_LND",
+    "TESSERAMENTI",
+    "SERVIZIO_PULMINI",
+    "SPONSOR_PARTNER",
+    "AMMINISTRAZIONE",
+    "TORNEI_EVENTI",
+    "CLUB_HOUSE",
+    "MAGAZZINO",
+    "STAFF",
+    "FAMIGLIA",
+    "IMPIANTI",
+    "SISTEMA",
+    "ALTRO"
+  ],
+  "priorities": [
+    "CRITICA",
+    "ALTA",
+    "MEDIA",
+    "BASSA"
+  ],
+  "review_policy": {
+    "automatic_read_and_catalog": true,
+    "automatic_destructive_write": false,
+    "automatic_role_change": false,
+    "automatic_payment_change": false,
+    "automatic_tesseramento_change": false,
+    "automatic_safeguarding_processing": false,
+    "critical_updates": "HUMAN_CONFIRMATION_REQUIRED"
+  },
+  "target_runtime_actions": [
+    "direction.datafabric.status",
+    "direction.datafabric.scan.gmail",
+    "direction.datafabric.scan.drive"
+  ]
+}
