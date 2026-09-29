@@ -1,3 +1,21 @@
+## SCD:STATE — HARD GATE
+
+- [ ] Ho eseguito `SCD:STATE` prima della prima scrittura e non sto usando stato storico come stato corrente.
+
+STATE_STATUS: UNVERIFIED
+REPOSITORY:
+MAIN_SHA:
+WORKING_BRANCH:
+PR_STATUS:
+CI_STATUS:
+PAGES_STATUS:
+RENDER_STATUS:
+MANIFEST_VERSION:
+DEPENDENCIES:
+DATA_SOURCES_VERIFIED:
+KNOWN_BLOCKERS:
+SAFE_NEXT_ACTION:
+
 ## SCD Manifest Impact
 
 - [ ] Ho letto `SCD_SYSTEM_MANIFEST.json`.
@@ -29,6 +47,17 @@ Indicare gli ID del `source_registry`:
 - [ ] Nessun segreto o credenziale nel repository.
 - [ ] Nessuna escalation di ruolo lato client.
 - [ ] Dati sensibili minimizzati e autorizzati server-side.
+
+### Release evidence
+VERSION:
+COMMIT:
+PR:
+CI STATUS:
+SCREENSHOT MOBILE:
+SCREENSHOT DESKTOP:
+DATA SOURCES:
+KNOWN LIMITATIONS:
+ROLLBACK: vedere sezione seguente
 
 ### Rollback
 Descrivere come annullare la modifica senza perdere dati:
