@@ -1,0 +1,40 @@
+name: SCD Production Evidence
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-evidence
+  cancel-in-progress: true
+
+jobs:
+  verify-production:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: SCD System Manifest gate
+        run: npm run test:manifest
+      - name: Verify Pages, Render and R20 runtime
+        run: npm run verify:production
+        env:
+          SCD_EXPECTED_VERSION: "29.0.0"
+          SCD_EXPECTED_MANIFEST: "1.5.0"
+          SCD_PROD_VERIFY_ATTEMPTS: "20"
+          SCD_PROD_VERIFY_DELAY_MS: "15000"
+      - name: Upload production evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scd-production-evidence
+          path: test-output/production-evidence.json
+          if-no-files-found: error
+          retention-days: 30
