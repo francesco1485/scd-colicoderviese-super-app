@@ -10,20 +10,22 @@
 </head>
 <body>
 <section id="loginView" class="login-shell">
-  <div class="login-brand">
-    <div class="login-mark">M</div>
-    <div class="kicker light">MAGLIA ASSICURAZIONI · HDI</div>
-    <h1>Un centro di regia per relazioni, bisogni e competenze.</h1>
-    <p>Maglia 360 organizza ciò che esiste già e, su una seconda corsia, costruisce nuovo sviluppo. CEPA, SAP e specialisti entrano nel percorso quando servono.</p>
-    <div class="login-flow">
-      <span>Esistente</span><b>→</b><span>Bisogni</span><b>→</b><span>Competenza</span>
-      <span>Sviluppo</span><b>→</b><span>Relazione</span><b>→</b><span>Continuità</span>
+  <div class="login-story">
+    <div class="brand-seal">M</div>
+    <div class="eyebrow light">MAGLIA ASSICURAZIONI · AGENZIA GENERALE HDI</div>
+    <h1>Un ecosistema. Più competenze. Una sola regia.</h1>
+    <p>Qui devono essere visibili, separati e governabili i rapporti con compagnie e partner, il lavoro già esistente, lo sviluppo nuovo, CEPA, SAP, documenti, contratti e attività.</p>
+    <div class="story-grid">
+      <div><span>01</span><strong>Compagnie & partner</strong><small>HDI, Prima/Enea, SLP, Aglea, CIP</small></div>
+      <div><span>02</span><strong>CEPA</strong><small>Materie, programmi, contenuti, SAP</small></div>
+      <div><span>03</span><strong>Documenti</strong><small>Contratti, accordi, dossier, modelli</small></div>
+      <div><span>04</span><strong>Sviluppo</strong><small>Territorio, nuovi soggetti, nuove relazioni</small></div>
     </div>
   </div>
   <div class="login-card">
-    <div class="kicker">ACCESSO RISERVATO</div>
+    <div class="eyebrow">ACCESSO RISERVATO</div>
     <h2>Centro di Regia</h2>
-    <p class="muted">Accedi con un account autorizzato Maglia.</p>
+    <p class="muted">Entra nell'area di lavoro Maglia.</p>
     <form id="loginForm" class="form">
       <label>Email<input id="email" type="email" autocomplete="email" required></label>
       <label>Password<input id="password" type="password" autocomplete="current-password" minlength="8" required></label>
@@ -31,229 +33,320 @@
       <button class="secondary" type="button" id="signupBtn">Attiva account autorizzato</button>
     </form>
     <div id="loginMsg" class="message hidden"></div>
-    <p class="fineprint">Al primo accesso può essere richiesta la conferma via email.</p>
   </div>
 </section>
 
 <section id="workspace" class="workspace hidden">
   <aside class="sidebar">
     <div class="side-brand">
-      <div class="side-mark">M</div>
+      <div class="side-seal">M</div>
       <div><strong>MAGLIA 360</strong><small>Centro di Regia</small></div>
     </div>
+
     <nav class="side-nav">
-      <button class="nav-item active" data-view="regia"><span>01</span>Regia</button>
-      <button class="nav-item" data-view="ecosystem"><span>02</span>Ecosistema</button>
-      <button class="nav-item" data-view="development"><span>03</span>Sviluppo</button>
-      <button class="nav-item" data-view="cepa"><span>04</span>CEPA & SAP</button>
-      <button class="nav-item" data-view="operations"><span>05</span>Operatività</button>
-      <button class="nav-item" data-view="recovery"><span>06</span>Clienti · Recovery</button>
+      <div class="nav-group">
+        <div class="nav-label">HOME</div>
+        <button class="nav-item active" data-view="home">Quadro generale</button>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-label">COMPAGNIE & PARTNER</div>
+        <div id="partnerNav" class="partner-nav"></div>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-label">CEPA</div>
+        <button class="nav-item" data-view="cepa">Centro CEPA</button>
+        <button class="nav-item" data-view="territories">SAP & Territori</button>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-label">DOCUMENTI</div>
+        <button class="nav-item" data-view="documents">Archivio & Contratti</button>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-label">OPERATIVITÀ</div>
+        <button class="nav-item" data-view="development">Sviluppo nuovo</button>
+        <button class="nav-item" data-view="actions">Attività & Scadenze</button>
+        <button class="nav-item" data-view="recovery">Clienti · Recovery</button>
+      </div>
     </nav>
-    <div class="side-foot">
+
+    <div class="side-footer">
       <div id="sideUser" class="side-user"></div>
       <button id="logoutBtn" class="logout">Esci</button>
     </div>
   </aside>
 
   <main class="main">
-    <header class="main-top">
+    <header class="main-header">
       <div>
-        <div class="kicker">MAGLIA ASSICURAZIONI</div>
-        <h1 id="pageTitle">Centro di Regia</h1>
+        <div class="eyebrow">AREA DI LAVORO MAGLIA ASSICURAZIONI</div>
+        <h1 id="pageTitle">Quadro generale</h1>
+        <p id="pageSubtitle">Agenzia Generale HDI · Ecosistema di competenze, relazioni e sviluppo</p>
       </div>
-      <div class="top-actions">
+      <div class="header-actions">
         <span id="rolePill" class="role-pill"></span>
-        <button id="refreshCoreBtn" class="icon-btn" title="Aggiorna">↻</button>
+        <button id="refreshBtn" class="icon-btn" title="Aggiorna">↻</button>
       </div>
     </header>
 
-    <section id="regiaView" class="view">
-      <section class="manifesto">
+    <section id="homeView" class="view">
+      <section class="identity-hero">
         <div>
-          <div class="kicker">DUE STRADE · UN SOLO MOTORE</div>
-          <h2>Valorizzare ciò che Maglia possiede. Costruire ciò che ancora manca.</h2>
-          <p>Il centro non è un CRM e non è CEPA. È il punto in cui relazioni, bisogni, progetti e competenze vengono governati prima di diventare attività concrete.</p>
+          <div class="eyebrow light">CHI SIAMO NEL SISTEMA</div>
+          <h2>Maglia non è un solo mandato. È una regia che connette competenze diverse.</h2>
+          <p>HDI resta la radice assicurativa. Le altre collaborazioni ampliano competenze e possibilità. CEPA crea cultura e relazione. SAP presidia il territorio. Il software deve far vedere chiaramente chi fa cosa, cosa è già successo e cosa deve succedere dopo.</p>
         </div>
-        <div class="manifesto-tag">MAGLIA 360</div>
+        <div class="identity-badge">MAGLIA<br><span>360</span></div>
       </section>
 
-      <section class="dual-lane">
-        <article class="lane-card existing">
-          <div class="lane-head"><span class="lane-no">A</span><div><div class="kicker">PATRIMONIO ESISTENTE</div><h3>Valorizzare ciò che già esiste</h3></div></div>
-          <p>HDI, Prima/Enea, SLP, Aglea, CIP, clienti, produttori, collaborazioni e relazioni già costruite.</p>
-          <div class="lane-metrics">
-            <div><strong id="regEcosystemCount">-</strong><span>nodi ecosistema</span></div>
-            <div><strong id="regExistingProjects">-</strong><span>progetti aperti</span></div>
-            <div><strong id="regExistingActions">-</strong><span>azioni aperte</span></div>
-          </div>
-          <button class="text-link" data-go="ecosystem">Apri ecosistema →</button>
+      <section class="home-grid">
+        <article class="home-card">
+          <div class="eyebrow">ECOSISTEMA ESISTENTE</div>
+          <h3>Compagnie & partner</h3>
+          <p>Ogni rapporto ha una propria stanza: storia, stato, referenti, contratti, documenti, progetti, numeri, idee e attività.</p>
+          <div id="homePartners" class="mini-partners"></div>
         </article>
-
-        <article class="lane-card development">
-          <div class="lane-head"><span class="lane-no">B</span><div><div class="kicker">NUOVO SVILUPPO</div><h3>Costruire nuove relazioni</h3></div></div>
-          <p>Colico e Mandello come primi laboratori: imprese, professionisti, enti, associazioni, partner e futuri SAP.</p>
-          <div class="lane-metrics">
-            <div><strong id="regMappedCount">-</strong><span>entità mappate</span></div>
-            <div><strong id="regQualifiedCount">-</strong><span>qualificate</span></div>
-            <div><strong id="regDevelopmentActions">-</strong><span>azioni aperte</span></div>
-          </div>
+        <article class="home-card">
+          <div class="eyebrow">CEPA</div>
+          <h3>Centro culturale in evoluzione</h3>
+          <p>Materie, target, relatori, partner, contenuti, incontri, programmi e sviluppo della rete SAP.</p>
+          <div class="stat-row"><strong id="homeCepaSubjects">-</strong><span>materie censite</span></div>
+          <button class="text-link" data-go="cepa">Apri CEPA →</button>
+        </article>
+        <article class="home-card">
+          <div class="eyebrow">DOCUMENTI</div>
+          <h3>Archivio & modelli</h3>
+          <p>Accordi, contratti, dossier, verbali, piani di sviluppo e documenti CEPA raccolti in un'unica area.</p>
+          <div class="stat-row"><strong id="homeDocs">-</strong><span>documenti / riferimenti</span></div>
+          <button class="text-link" data-go="documents">Apri archivio →</button>
+        </article>
+        <article class="home-card">
+          <div class="eyebrow">SVILUPPO</div>
+          <h3>Mandello + Colico</h3>
+          <p>Seconda strada separata: nuovi soggetti, nuove relazioni, nuovi segnali e nuove opportunità.</p>
+          <div class="stat-row"><strong id="homeMarket">-</strong><span>entità mappate</span></div>
           <button class="text-link" data-go="development">Apri sviluppo →</button>
         </article>
       </section>
 
-      <section class="section-grid">
-        <div class="panel">
-          <div class="panel-head">
-            <div><div class="kicker">ECOSISTEMA COMPETENZE</div><h3>Cosa Maglia può attivare oggi</h3></div>
-          </div>
-          <div id="regEcosystemStrip" class="ecosystem-strip"></div>
+      <section class="panel">
+        <div class="panel-head">
+          <div><div class="eyebrow">LAVORO REALE</div><h3>Cosa richiede attenzione adesso</h3></div>
+          <button class="small-btn" data-go="actions">Tutte le attività</button>
         </div>
-        <div class="panel">
-          <div class="panel-head">
-            <div><div class="kicker">ATTENZIONE</div><h3>Lavoro da fare</h3></div>
-            <button class="small-btn" data-go="operations">Tutto il lavoro</button>
-          </div>
-          <div id="regActionList" class="compact-list"></div>
-        </div>
-      </section>
-
-      <section class="architecture">
-        <div class="arch-node"><span>01</span><strong>MAGLIA 360</strong><small>Mappa dei bisogni</small></div>
-        <div class="arch-arrow">→</div>
-        <div class="arch-node"><span>02</span><strong>CEPA</strong><small>Educazione e fiducia</small></div>
-        <div class="arch-arrow">→</div>
-        <div class="arch-node"><span>03</span><strong>SAP</strong><small>Presidio territoriale</small></div>
-        <div class="arch-arrow">→</div>
-        <div class="arch-node"><span>04</span><strong>ADVISORY</strong><small>Specialista corretto</small></div>
+        <div id="homeActions" class="list"></div>
       </section>
     </section>
 
-    <section id="ecosystemView" class="view hidden">
-      <section class="section-intro">
-        <div><div class="kicker">STRADA A</div><h2>Ecosistema Maglia</h2><p>Qui non cerchiamo nuovi lead. Ricostruiamo e sviluppiamo rapporti già esistenti, distinguendo ciò che sappiamo da ciò che deve ancora essere verificato.</p></div>
-      </section>
-      <div id="ecosystemGrid" class="ecosystem-grid"></div>
-      <section class="panel">
-        <div class="panel-head"><div><div class="kicker">DOSSIER APERTI</div><h3>Progetti sull'esistente</h3></div></div>
-        <div id="existingProjects" class="project-list"></div>
-      </section>
-    </section>
-
-    <section id="developmentView" class="view hidden">
-      <section class="section-intro split">
-        <div><div class="kicker">STRADA B</div><h2>Sviluppo nuovo</h2><p>La mappa serve a trovare segnali e bisogni, non a collezionare nominativi. Colico e Mandello sono i primi due laboratori.</p></div>
-        <button id="newEntityBtn" class="primary hidden">+ Nuova entità</button>
-      </section>
-
-      <div id="hubGrid" class="hub-grid"></div>
-
-      <section class="funnel">
-        <div><span>1</span><strong>Osservati</strong><b id="devObserved">-</b></div>
-        <div><span>2</span><strong>Qualificati</strong><b id="devQualified">-</b></div>
-        <div><span>3</span><strong>Opportunità</strong><b id="devOpportunity">-</b></div>
-        <div><span>4</span><strong>Relazioni</strong><b id="devRelationship">-</b></div>
-      </section>
-
-      <section class="panel">
-        <div class="panel-head wrap">
-          <div><div class="kicker">MAPPA ZERO</div><h3>Entità territoriali</h3></div>
-          <div class="filters">
-            <select id="territoryHubFilter"><option value="">Tutti gli hub</option></select>
-            <select id="territoryStageFilter">
-              <option value="">Tutti gli stati</option>
-              <option value="observed">Osservato</option>
-              <option value="qualified">Qualificato</option>
-              <option value="prospect">Prospect</option>
-              <option value="opportunity">Opportunità</option>
-              <option value="relationship">Relazione</option>
-              <option value="archived">Archiviato</option>
-            </select>
-          </div>
+    <section id="partnerView" class="view hidden">
+      <section class="partner-hero">
+        <div>
+          <div id="partnerType" class="eyebrow light">COMPAGNIA / PARTNER</div>
+          <h2 id="partnerName">Partner</h2>
+          <p id="partnerCapability">Competenza</p>
         </div>
-        <div class="table-wrap">
-          <table class="table">
-            <thead><tr><th>Soggetto</th><th>Hub</th><th>Tipologia</th><th>Fonte</th><th>CEPA</th><th>Advisory</th><th>Stato</th><th></th></tr></thead>
-            <tbody id="territoryBody"></tbody>
-          </table>
+        <div class="partner-hero-status">
+          <span>STATO RAPPORTO</span>
+          <strong id="partnerStatus">-</strong>
         </div>
+      </section>
+
+      <section class="partner-summary-grid">
+        <article><span>Ruolo nel sistema</span><strong id="partnerRole">-</strong></article>
+        <article><span>Utilizzo oggi</span><strong id="partnerCurrent">-</strong></article>
+        <article><span>Direzione futura</span><strong id="partnerFuture">-</strong></article>
+      </section>
+
+      <section class="partner-tabs">
+        <button class="partner-tab active" data-partner-section="overview">Sintesi</button>
+        <button class="partner-tab" data-partner-section="timeline">Storia</button>
+        <button class="partner-tab" data-partner-section="contacts">Referenti</button>
+        <button class="partner-tab" data-partner-section="documents">Contratti & Documenti</button>
+        <button class="partner-tab" data-partner-section="projects">Progetti & Opportunità</button>
+        <button class="partner-tab" data-partner-section="actions">Attività</button>
+      </section>
+
+      <section id="partnerOverviewSection" class="partner-section">
+        <div class="two-col">
+          <article class="panel">
+            <div class="panel-head"><div><div class="eyebrow">QUADRO ATTUALE</div><h3>Che cosa sappiamo oggi</h3></div><button id="editPartnerBtn" class="small-btn hidden">Modifica</button></div>
+            <div id="partnerOverview" class="prose-box"></div>
+          </article>
+          <article class="panel">
+            <div class="panel-head"><div><div class="eyebrow">DA RICOSTRUIRE</div><h3>Informazioni mancanti</h3></div></div>
+            <div class="checklist">
+              <div>□ accordo / contratto</div>
+              <div>□ referenti e ruoli</div>
+              <div>□ flusso operativo</div>
+              <div>□ dati e clienti collegati</div>
+              <div>□ remunerazione</div>
+              <div>□ formazione e supporto</div>
+              <div>□ criticità</div>
+              <div>□ piano di sviluppo</div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="partnerTimelineSection" class="partner-section hidden">
+        <div class="section-actions"><button id="addTimelineBtn" class="primary hidden">+ Aggiungi evento</button></div>
+        <div id="partnerTimeline" class="timeline"></div>
+      </section>
+
+      <section id="partnerContactsSection" class="partner-section hidden">
+        <div class="section-actions"><button id="addContactBtn" class="primary hidden">+ Aggiungi referente</button></div>
+        <div id="partnerContacts" class="cards-grid"></div>
+      </section>
+
+      <section id="partnerDocumentsSection" class="partner-section hidden">
+        <div class="section-actions"><button id="addPartnerDocumentBtn" class="primary hidden">+ Registra documento</button></div>
+        <div id="partnerDocuments" class="document-grid"></div>
+      </section>
+
+      <section id="partnerProjectsSection" class="partner-section hidden">
+        <div id="partnerProjects" class="list"></div>
+      </section>
+
+      <section id="partnerActionsSection" class="partner-section hidden">
+        <div class="section-actions"><button id="addPartnerActionBtn" class="primary">+ Nuova attività</button></div>
+        <div id="partnerActions" class="list"></div>
       </section>
     </section>
 
     <section id="cepaView" class="view hidden">
       <section class="cepa-hero">
-        <div class="kicker light">CENTRO EDUCATIVO PREVIDENZIALE E ASSICURATIVO</div>
-        <h2>CEPA è il motore culturale. Non è il CRM e non è la vendita.</h2>
-        <p>Trasforma competenze professionali in educazione, contenuti, incontri e richieste volontarie di approfondimento.</p>
-      </section>
-      <section class="cepa-grid">
-        <article><span>01</span><h3>Centro CEPA</h3><p>Metodo, contenuti, standard, relatori, formazione e coordinamento.</p></article>
-        <article><span>02</span><h3>Contenuti & Incontri</h3><p>Temi reali per famiglie, imprese, enti e scuole. Nessuna campagna-prodotto travestita da formazione.</p></article>
-        <article><span>03</span><h3>SAP</h3><p>Presidi territoriali che organizzano attività CEPA e raccolgono richieste di approfondimento.</p></article>
-        <article><span>04</span><h3>Advisory</h3><p>Quando emerge un bisogno reale, il percorso passa alla competenza e allo specialista appropriato.</p></article>
-      </section>
-      <section class="panel">
-        <div class="panel-head"><div><div class="kicker">FLUSSO OPERATIVO</div><h3>Educazione prima della consulenza</h3></div></div>
-        <div class="cepa-flow">
-          <span>Segnale / bisogno</span><b>→</b><span>Contenuto / incontro</span><b>→</b><span>Comprensione</span><b>→</b><span>Richiesta volontaria</span><b>→</b><span>Maglia 360</span><b>→</b><span>Specialista</span>
+        <div>
+          <div class="eyebrow light">CEPA LAB</div>
+          <h2>Un centro educativo vivo, non una pagina statica.</h2>
+          <p>Ogni materia ha una propria anagrafica, un livello di maturità, target, domande, partner, fonti, relatori, contenuti e iniziative. Deve poter crescere e cambiare nel tempo senza rifare il sistema da capo.</p>
         </div>
+        <button id="addCepaSubjectBtn" class="hero-button hidden">+ Nuova materia</button>
       </section>
+
+      <section class="cepa-kpis">
+        <div><span>Materie</span><strong id="cepaSubjectCount">-</strong></div>
+        <div><span>In progettazione</span><strong id="cepaDesignCount">-</strong></div>
+        <div><span>Iniziative</span><strong id="cepaInitiativeCount">-</strong></div>
+        <div><span>Documenti CEPA</span><strong id="cepaDocCount">-</strong></div>
+      </section>
+
       <section class="panel">
-        <div class="panel-head"><div><div class="kicker">PROGETTO COMUNE</div><h3>Architettura Maglia 360 · CEPA · SAP</h3></div></div>
-        <div id="sharedProjects" class="project-list"></div>
+        <div class="panel-head">
+          <div><div class="eyebrow">ANAGRAFICA DELLE MATERIE</div><h3>Materie CEPA</h3></div>
+          <div class="legend"><span class="dot design"></span> progettazione <span class="dot research"></span> ricerca <span class="dot ready"></span> pronta</div>
+        </div>
+        <div id="cepaSubjectGrid" class="subject-grid"></div>
+      </section>
+
+      <section class="two-col top-gap">
+        <article class="panel">
+          <div class="panel-head"><div><div class="eyebrow">INIZIATIVE</div><h3>Programmi, incontri, contenuti</h3></div><button id="addCepaInitiativeBtn" class="small-btn hidden">+ Nuova</button></div>
+          <div id="cepaInitiativeList" class="list"></div>
+        </article>
+        <article class="panel">
+          <div class="panel-head"><div><div class="eyebrow">METODO</div><h3>Educazione prima della consulenza</h3></div></div>
+          <div class="method-flow">
+            <span>Materia</span><b>→</b><span>Contenuto / incontro</span><b>→</b><span>Comprensione</span><b>→</b><span>Richiesta volontaria</span><b>→</b><span>Approfondimento</span>
+          </div>
+        </article>
       </section>
     </section>
 
-    <section id="operationsView" class="view hidden">
-      <section class="section-intro split">
-        <div><div class="kicker">MOTORE COMUNE</div><h2>Operatività</h2><p>Le due strade convergono qui: progetto, azione, responsabile, scadenza, esito e prossimo passo.</p></div>
-        <button id="newActionBtn" class="primary">+ Nuova azione</button>
+    <section id="territoriesView" class="view hidden">
+      <section class="section-intro">
+        <div class="eyebrow">SAP & TERRITORI</div>
+        <h2>Presidi territoriali e sviluppo della rete</h2>
+        <p>Colico e Mandello sono i primi laboratori. Questa area dovrà governare territorio, candidati SAP, incontri richiesti, stato di attivazione e standard CEPA.</p>
       </section>
-      <section class="ops-kpis">
-        <div><span>Aperte</span><strong id="opsOpen">-</strong></div>
-        <div><span>In corso</span><strong id="opsProgress">-</strong></div>
-        <div><span>In attesa</span><strong id="opsWaiting">-</strong></div>
-        <div><span>Completate</span><strong id="opsDone">-</strong></div>
+      <div id="territoryHubCards" class="hub-grid"></div>
+      <section class="panel top-gap">
+        <div class="panel-head"><div><div class="eyebrow">MODELLO SAP</div><h3>Processo di sviluppo</h3></div></div>
+        <div class="sap-flow"><span>Territorio</span><b>→</b><span>Candidato</span><b>→</b><span>2 incontri reali</span><b>→</b><span>Valutazione</span><b>→</b><span>Attivazione SAP</span><b>→</b><span>Monitoraggio</span></div>
+      </section>
+    </section>
+
+    <section id="documentsView" class="view hidden">
+      <section class="section-intro split">
+        <div>
+          <div class="eyebrow">DOCUMENT STUDIO</div>
+          <h2>Archivio, contratti e modelli operativi</h2>
+          <p>Qui confluiscono documenti reali, riferimenti, accordi e una libreria di modelli già strutturati per essere completati e impaginati in modo coerente.</p>
+        </div>
+        <button id="addDocumentBtn" class="primary hidden">+ Registra documento</button>
+      </section>
+
+      <section class="two-col">
+        <article class="panel">
+          <div class="panel-head"><div><div class="eyebrow">ARCHIVIO</div><h3>Documenti registrati</h3></div></div>
+          <div id="documentArchive" class="document-list"></div>
+        </article>
+        <article class="panel">
+          <div class="panel-head"><div><div class="eyebrow">MODELLI PRONTI</div><h3>Blueprint documentali</h3></div></div>
+          <div id="blueprintList" class="blueprint-list"></div>
+        </article>
+      </section>
+    </section>
+
+    <section id="developmentView" class="view hidden">
+      <section class="section-intro split">
+        <div><div class="eyebrow">SVILUPPO NUOVO</div><h2>Seconda strada, separata dall'esistente</h2><p>Ricerca e mappatura servono a costruire nuovo patrimonio relazionale. Ogni soggetto mantiene fonte, motivo, hub, stato e potenziale.</p></div>
+        <button id="newEntityBtn" class="primary hidden">+ Nuova entità</button>
+      </section>
+      <div id="hubGrid" class="hub-grid"></div>
+      <section class="funnel">
+        <div><span>Osservati</span><strong id="devObserved">-</strong></div>
+        <div><span>Qualificati</span><strong id="devQualified">-</strong></div>
+        <div><span>Opportunità</span><strong id="devOpportunity">-</strong></div>
+        <div><span>Relazioni</span><strong id="devRelationship">-</strong></div>
       </section>
       <section class="panel">
         <div class="panel-head wrap">
-          <div><div class="kicker">AZIONI STRATEGICHE</div><h3>Lavoro da fare</h3></div>
+          <div><div class="eyebrow">MAPPA ZERO</div><h3>Entità territoriali</h3></div>
           <div class="filters">
-            <select id="actionLaneFilter"><option value="">Tutte le corsie</option><option value="existing">Esistente</option><option value="development">Sviluppo</option><option value="shared">Comune</option></select>
-            <select id="actionStatusFilter"><option value="">Tutti gli stati</option><option value="open">Aperta</option><option value="in_progress">In corso</option><option value="waiting">In attesa</option><option value="completed">Completata</option><option value="cancelled">Annullata</option></select>
+            <select id="territoryHubFilter"><option value="">Tutti gli hub</option></select>
+            <select id="territoryStageFilter"><option value="">Tutti gli stati</option><option value="observed">Osservato</option><option value="qualified">Qualificato</option><option value="prospect">Prospect</option><option value="opportunity">Opportunità</option><option value="relationship">Relazione</option><option value="archived">Archiviato</option></select>
           </div>
         </div>
-        <div id="actionBoard" class="action-board"></div>
+        <div class="table-wrap"><table class="table"><thead><tr><th>Soggetto</th><th>Hub</th><th>Tipologia</th><th>Fonte</th><th>CEPA</th><th>Advisory</th><th>Stato</th><th></th></tr></thead><tbody id="territoryBody"></tbody></table></div>
+      </section>
+    </section>
+
+    <section id="actionsView" class="view hidden">
+      <section class="section-intro split">
+        <div><div class="eyebrow">MOTORE DEL LAVORO</div><h2>Attività & Scadenze</h2><p>Tutto ciò che nasce dall'esistente, dallo sviluppo o da CEPA deve diventare un'azione con stato, responsabilità ed esito.</p></div>
+        <button id="newActionBtn" class="primary">+ Nuova attività</button>
+      </section>
+      <section class="panel">
+        <div class="panel-head wrap">
+          <div><div class="eyebrow">AZIONI</div><h3>Lavoro aperto</h3></div>
+          <div class="filters"><select id="actionLaneFilter"><option value="">Tutte le corsie</option><option value="existing">Esistente</option><option value="development">Sviluppo</option><option value="shared">Comune</option></select><select id="actionStatusFilter"><option value="">Tutti gli stati</option><option value="open">Aperta</option><option value="in_progress">In corso</option><option value="waiting">In attesa</option><option value="completed">Completata</option><option value="cancelled">Annullata</option></select></div>
+        </div>
+        <div id="actionList" class="list"></div>
       </section>
     </section>
 
     <section id="recoveryView" class="view hidden">
       <section class="section-intro">
-        <div><div class="kicker">CLIENTI · CAMPAGNA OPERATIVA</div><h2>Recovery</h2><p>Recovery resta operativo, ma occupa il posto corretto: una campagna sul patrimonio clienti esistente, non l'architettura del progetto.</p></div>
+        <div class="eyebrow">CLIENTI · CAMPAGNA OPERATIVA</div>
+        <h2>Recovery</h2>
+        <p>Modulo operativo sul portafoglio esistente. Resta funzionante, ma non rappresenta l'architettura complessiva.</p>
       </section>
-      <section class="ops-kpis">
-        <div><span>Aperti</span><strong id="kRecovery">-</strong></div>
-        <div><span>Score ≥ 90</span><strong id="kHigh">-</strong></div>
-        <div><span>Da assegnare</span><strong id="kUnassigned">-</strong></div>
-        <div><span>Lavori aperti</span><strong id="kWork">-</strong></div>
-      </section>
+      <section class="recovery-kpis"><div><span>Aperti</span><strong id="kRecovery">-</strong></div><div><span>Score ≥ 90</span><strong id="kHigh">-</strong></div><div><span>Da assegnare</span><strong id="kUnassigned">-</strong></div><div><span>Lavori aperti</span><strong id="kWork">-</strong></div></section>
       <section class="panel">
-        <div class="panel-head"><div><div class="kicker">PILOTA 50</div><h3>Clienti da lavorare</h3></div><button id="refreshRecoveryBtn" class="small-btn">Aggiorna</button></div>
+        <div class="panel-head"><div><div class="eyebrow">PILOTA 50</div><h3>Clienti da lavorare</h3></div><button id="refreshRecoveryBtn" class="small-btn">Aggiorna</button></div>
         <div id="recoveryLoading" class="loader">Caricamento…</div>
-        <div id="recoveryTableWrap" class="table-wrap hidden">
-          <table class="table recovery-table">
-            <thead><tr><th>#</th><th>Cliente</th><th>Comune</th><th>Uscita</th><th>Motivo</th><th>Score</th><th>Stato</th><th></th></tr></thead>
-            <tbody id="recoveryBody"></tbody>
-          </table>
-        </div>
+        <div id="recoveryTableWrap" class="table-wrap hidden"><table class="table"><thead><tr><th>#</th><th>Cliente</th><th>Comune</th><th>Uscita</th><th>Motivo</th><th>Score</th><th>Stato</th><th></th></tr></thead><tbody id="recoveryBody"></tbody></table></div>
       </section>
     </section>
   </main>
 </section>
 
 <section id="blockedView" class="blocked hidden">
-  <div class="kicker">ACCESSO LIMITATO</div>
-  <h2>Account autenticato, ma non ancora associato all'organizzazione.</h2>
-  <p>Esci e verifica di aver utilizzato un indirizzo autorizzato.</p>
+  <div class="eyebrow">ACCESSO LIMITATO</div>
+  <h2>Account autenticato ma non ancora associato all'organizzazione.</h2>
   <button id="blockedLogout" class="secondary">Esci</button>
 </section>
 
