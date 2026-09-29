@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "1.8.0",
+    "version": "1.9.0",
     "effective_at": "2026-09-29",
     "status": "BINDING",
     "language": "it-IT",
@@ -474,6 +474,16 @@
       ],
       "unknown_value": "UNVERIFIED",
       "rule": "Ogni dato operativo esposto dalla UI deve poter dichiarare provenienza, API, fallback e politica di refresh senza trasformare assenza di prova in prova di assenza."
+    },
+    "domain_core_target": {
+      "engine": "SUPABASE_POSTGRESQL",
+      "config": "config/scd-supabase.v1.json",
+      "migration": "supabase/migrations/20260929_r33_club_graph_foundation.sql",
+      "event_model": "ONE_EVENT_ID_MULTIPLE_PROJECTIONS",
+      "legacy_reference_bridge": "scd_external_refs",
+      "row_level_security_required": true,
+      "dedicated_project_required": true,
+      "activation_feature_flag": "FF-SUPABASE-CORE"
     }
   },
   "source_registry": {
@@ -815,6 +825,30 @@
           "INITIATIVES",
           "EVENTS",
           "PARTNERS"
+        ]
+      },
+      {
+        "id": "SCD_SUPABASE",
+        "kind": "TARGET_DOMAIN_CORE",
+        "trust": "PLANNED_PRIMARY",
+        "authority_domains": [
+          "IDENTITY_LINKS",
+          "PEOPLE",
+          "FAMILIES",
+          "ATHLETES",
+          "TEAMS",
+          "EVENTS",
+          "DOCUMENTS",
+          "AUDIT"
+        ],
+        "state": "PENDING_DEDICATED_PROJECT",
+        "rules": [
+          "dedicated_project_only",
+          "cepa_project_must_not_be_reused",
+          "rls_required",
+          "server_side_role_assignment",
+          "no_service_role_in_client",
+          "dual_run_before_primary"
         ]
       }
     ],
@@ -1347,6 +1381,30 @@
           "DIRECTION_AUTHORIZED_SMOKE_GREEN"
         ],
         "current_runtime_state": "GATED_OFF_PENDING_R20_DEPLOY"
+      },
+      "supabase_core": {
+        "id": "FF-SUPABASE-CORE",
+        "runtime_env": "SCD_FEATURE_SUPABASE_CORE",
+        "default_enabled": false,
+        "audience": [
+          "INTERNAL_MIGRATION",
+          "WEB",
+          "ANDROID",
+          "IOS"
+        ],
+        "off_behavior": "KEEP_R20_PRIMARY_AND_SUPABASE_DARK",
+        "rollback": "SET_ENV_FALSE",
+        "current_runtime_state": "SCHEMA_READY_PROJECT_NOT_CREATED",
+        "activation_requires": [
+          "DEDICATED_SUPABASE_PROJECT_CREATED",
+          "MIGRATION_APPLIED",
+          "RLS_SECURITY_ADVISORS_REVIEWED",
+          "AUTH_ROLE_SCOPE_TESTS_GREEN",
+          "R20_DUAL_READ_COMPARE_GREEN",
+          "WEB_VERTICAL_SLICE_GREEN",
+          "MOBILE_VERTICAL_SLICE_GREEN",
+          "ROLLBACK_PROVEN"
+        ]
       }
     },
     "upstream_resilience": {
@@ -1369,6 +1427,26 @@
         "DATA_FABRIC_SCAN"
       ],
       "rationale": "Cold start or transient Google responses may be non-JSON. Retrying mutations could duplicate writes, so retries are restricted to explicitly read-only actions."
+    },
+    "target": {
+      "domain_core": "SUPABASE_POSTGRESQL",
+      "identity": "SUPABASE_AUTH",
+      "storage": "SUPABASE_STORAGE",
+      "realtime": "SUPABASE_REALTIME",
+      "web": "REACT_TYPESCRIPT_PWA",
+      "mobile": "REACT_NATIVE_EXPO_ANDROID_IOS",
+      "orchestration": "R22_COMMAND_PLATFORM_OR_SUPABASE_EDGE_FUNCTIONS",
+      "transition_pattern": "STRANGLER_DUAL_RUN",
+      "legacy_adapters": [
+        "R20",
+        "SCD_DRIVE",
+        "SCD_GMAIL",
+        "CORE_SHEET",
+        "TESSERATI_SHEET",
+        "PULMINI_SHEET"
+      ],
+      "dedicated_project_required": true,
+      "cepa_project_reuse_forbidden": true
     }
   },
   "delivery_and_quality": {
@@ -1389,7 +1467,10 @@
       "OBSERVABILITY_STATUS",
       "PRODUCTION_EVIDENCE",
       "READ_ONLY_UPSTREAM_RETRY",
-      "R20_DIRECT_RUNTIME_PROOF"
+      "R20_DIRECT_RUNTIME_PROOF",
+      "SUPABASE_CONTRACT_VALID",
+      "SUPABASE_RLS_SECURITY_REVIEW",
+      "R20_SUPABASE_DUAL_READ_COMPARE"
     ],
     "merge_rule": "Non considerare completata una funzione se è verde solo tecnicamente ma viola il manifest o il master visivo.",
     "release_truth": {
@@ -1508,7 +1589,9 @@
       "id": "CAP-ENTITY-GRAPH",
       "domain": "DATA_FABRIC",
       "required": true,
-      "state": "PLANNED"
+      "state": "PARTIAL",
+      "target_core": "SCD_SUPABASE",
+      "contract": "STABLE_IDS_RELATIONS_PROVENANCE_SINGLE_EVENT_MODEL"
     },
     {
       "id": "CAP-COMPLETENESS",
@@ -1639,6 +1722,20 @@
         "R20"
       ],
       "contract": "DIRECT_RUNTIME_PROBE_AND_PRESERVE_CANONICAL_WEB_APP_URL"
+    },
+    {
+      "id": "CAP-SUPABASE-CORE",
+      "domain": "DOMAIN_CORE",
+      "required": true,
+      "state": "PARTIAL",
+      "flag": "FF-SUPABASE-CORE",
+      "sources": [
+        "SCD_SUPABASE",
+        "R20",
+        "SCD_DRIVE",
+        "SCD_GMAIL"
+      ],
+      "contract": "DEDICATED_POSTGRES_AUTH_RLS_STORAGE_REALTIME_DUAL_RUN"
     }
   ],
   "known_noncompliance": [
@@ -1678,6 +1775,13 @@
       "statement": "Il runtime Apps Script R20 in produzione è 2026.09.28-R20.0-PUBLIC-FIRST e non supporta ancora public.datafabric.contract, direction.datafabric.status o direction.diagnostics.",
       "required_fix": "Aggiornare e ridistribuire il deployment Apps Script R20 canonico usando backend_patch_R21_6_http_api.gs e backend_patch_R25_data_fabric.gs; poi verificare con npm run verify:r20 prima di attivare FF-DATAFABRIC-OBSERVABILITY.",
       "safe_runtime_behavior": "Mantieni Data Fabric observability disattivato e nascondi la superficie Direzione relativa senza degradare il core pubblico."
+    },
+    {
+      "id": "GAP-CORE-001",
+      "severity": "HIGH",
+      "statement": "SCD PULSE non dispone ancora di un progetto Supabase dedicato; il Domain Core runtime resta R20/Google mentre lo schema Supabase è solo preparato nel repository.",
+      "required_fix": "Creare un progetto Supabase dedicato SCD con conferma costi, applicare R33 migration, verificare RLS/Auth, eseguire dual-read R20→Supabase e attivare FF-SUPABASE-CORE soltanto dopo vertical slice Web e mobile verdi.",
+      "safe_runtime_behavior": "R20 resta primary; SCD_SUPABASE resta dark e non viene dichiarato LIVE."
     }
   ],
   "development_contract": {
@@ -1806,6 +1910,21 @@
       "verified_r20_runtime_version": "2026.09.28-R20.0-PUBLIC-FIRST",
       "verified_blocker": "public.datafabric.contract and direction.datafabric.status return Azione API non supportata.",
       "safe_live_strategy": "SHIP_CORE_WITH_DATAFABRIC_FEATURE_GATE_OFF"
+    },
+    "supabase_transition": {
+      "release": "R33",
+      "mode": "STRANGLER_DUAL_RUN",
+      "project_state": "NOT_CREATED",
+      "project_creation_requires_user_cost_confirmation": true,
+      "dedicated_project_required": true,
+      "reuse_cepa_project": false,
+      "config": "config/scd-supabase.v1.json",
+      "migration": "supabase/migrations/20260929_r33_club_graph_foundation.sql",
+      "validator": "scripts/validate-supabase-contract.mjs",
+      "current_primary": "R20",
+      "target_primary": "SCD_SUPABASE",
+      "no_big_bang": true,
+      "no_legacy_delete_before_cutover": true
     }
   },
   "product_direction": {
