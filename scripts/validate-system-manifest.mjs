@@ -97,7 +97,7 @@ includesAll(sourceIds,[
   'SCD_DRIVE','SCD_GMAIL','R20','CORE_SHEET','TESSERATI_SHEET','PULMINI_SHEET','MAIL_OPERATIONS_SHEET','SPONSOR_MASTER_SHEET','ECONOMIC_MASTER_SHEET','TOURNAMENTS_MASTER_SHEET',
   'FIGC','LND','CR_LOMBARDIA','SGS','SPORT_E_SALUTE','RASD','TUTTOCAMPO',
   'SCD_OFFICIAL_SITE','SCD_FACEBOOK','SCD_INSTAGRAM','TUTTITALIA',
-  'SEGRETARIO_CALCIO','TEAMSYSTEM_SPORTIVI_IN_CLOUD','SQUBY','ATHLETIS'
+  'SEGRETARIO_CALCIO','TEAMSYSTEM_SPORTIVI_IN_CLOUD','SQUBY','ATHLETIS','SCD_SUPABASE'
 ],'source registry');
 const sourceById=Object.fromEntries(sources.map(x=>[x.id,x]));
 assert(sourceById.SCD_DRIVE.account==='sportclubcolico@gmail.com','Drive engine account changed');
@@ -107,6 +107,9 @@ assert(sourceById.MAIL_OPERATIONS_SHEET.resource_id==='1wx3ZXwmdZuAr8AM_h08GzOve
 assert(sourceById.SPONSOR_MASTER_SHEET.resource_id==='1-5-MUnrrAltflJSATe6bKkjm_3SItO0gvadi_PXPoAQ','sponsor master source id mismatch');
 assert(sourceById.TUTTOCAMPO.use==='CROSS_CHECK_AND_ENRICHMENT','Tuttocampo must remain secondary enrichment');
 assert(sourceById.TEAMSYSTEM_SPORTIVI_IN_CLOUD.trust==='BENCHMARK','TeamSystem must remain benchmark, not factual source');
+assert(sourceById.SCD_SUPABASE.kind==='TARGET_DOMAIN_CORE','SCD Supabase source kind mismatch');
+assert(sourceById.SCD_SUPABASE.state==='PENDING_DEDICATED_PROJECT','SCD Supabase must remain pending until project creation');
+assert((sourceById.SCD_SUPABASE.rules||[]).includes('cepa_project_must_not_be_reused'),'CEPA Supabase isolation rule missing');
 
 assert(m.drive_vault.dedup_by_hash===true,'Drive dedup by hash required');
 assert(m.drive_vault.versioning_required===true,'Drive versioning required');
@@ -152,10 +155,18 @@ assert(m.architecture.extensibility.data_ui_separation===true,'data/UI separatio
 assert(m.architecture.feature_flags?.data_fabric_observability?.id==='FF-DATAFABRIC-OBSERVABILITY','Data Fabric observability feature flag missing');
 assert(m.architecture.feature_flags?.data_fabric_observability?.runtime_env==='SCD_FEATURE_DATA_FABRIC_OBSERVABILITY','Data Fabric feature flag env mismatch');
 assert(m.architecture.feature_flags?.data_fabric_observability?.default_enabled===false,'Data Fabric observability must default off until R20 contract is live');
+assert(m.architecture.feature_flags?.supabase_core?.id==='FF-SUPABASE-CORE','Supabase core feature flag missing');
+assert(m.architecture.feature_flags?.supabase_core?.runtime_env==='SCD_FEATURE_SUPABASE_CORE','Supabase core runtime env mismatch');
+assert(m.architecture.feature_flags?.supabase_core?.default_enabled===false,'Supabase core must default off before cutover');
+assert(m.architecture.target?.domain_core==='SUPABASE_POSTGRESQL','target domain core must be Supabase PostgreSQL');
+assert(m.architecture.target?.cepa_project_reuse_forbidden===true,'CEPA project reuse must remain forbidden');
 includesAll(m.architecture.feature_flags?.data_fabric_observability?.activation_requires||[],['R20_ACTION_PUBLIC_DATAFABRIC_CONTRACT_SUPPORTED','R20_ACTION_DIRECTION_DATAFABRIC_STATUS_SUPPORTED','VERIFY_R20_DIRECT_GREEN','PRODUCTION_EVIDENCE_GREEN_WITH_FLAG_TRUE','DIRECTION_AUTHORIZED_SMOKE_GREEN'],'Data Fabric activation requirements');
 assert(m.architecture.upstream_resilience?.retry_mode==='READ_ONLY_ONLY','upstream retries must remain read-only only');
 assert(m.architecture.upstream_resilience?.max_attempts===2,'upstream read-only retry attempts mismatch');
 includesAll(m.data_architecture?.provenance_contract?.ui_question_fields||[],['SOURCE','TABLE','FIELD','API','FALLBACK','REFRESH'],'provenance contract');
+assert(m.data_architecture?.domain_core_target?.engine==='SUPABASE_POSTGRESQL','Supabase domain core target missing');
+assert(m.data_architecture?.domain_core_target?.event_model==='ONE_EVENT_ID_MULTIPLE_PROJECTIONS','Supabase event model mismatch');
+assert(m.data_architecture?.domain_core_target?.row_level_security_required===true,'Supabase RLS requirement missing');
 assert(m.north_star.r20_must_not_be_replaced_without_verified_migration===true,'R20 migration guardrail missing');
 
 const stateGate=m.development_contract?.state_gate||{};
@@ -176,6 +187,10 @@ assert(m.development_contract?.runtime_activation?.core_live_without_datafabric=
 assert(m.development_contract?.runtime_activation?.data_fabric_activation==='BLOCKED_UNTIL_R20_DEPLOY','Data Fabric activation blocker must remain explicit');
 assert(m.development_contract?.runtime_activation?.r20_direct_verifier==='scripts/verify-r20-direct.mjs','R20 direct verifier missing from runtime activation');
 assert(m.development_contract?.runtime_activation?.canonical_url_must_be_preserved===true,'R20 canonical Web App URL must be preserved');
+assert(m.development_contract?.supabase_transition?.mode==='STRANGLER_DUAL_RUN','Supabase transition must remain strangler dual-run');
+assert(m.development_contract?.supabase_transition?.project_creation_requires_user_cost_confirmation===true,'Supabase project creation must remain cost-confirmed');
+assert(m.development_contract?.supabase_transition?.reuse_cepa_project===false,'CEPA Supabase project must not be reused');
+assert(m.development_contract?.supabase_transition?.current_primary==='R20','R20 must remain primary until verified cutover');
 const r25r26=(m.development_contract?.release_dependencies||[]).find(x=>x.predecessor==='R25'&&x.successor==='R26');
 assert(r25r26?.relation==='REQUIRED_PREDECESSOR','R25 -> R26 dependency must remain explicit');
 assert(r25r26?.status==='SATISFIED_IN_MAIN','R25 -> R26 dependency must be recorded as satisfied in main');
@@ -188,13 +203,13 @@ for(const cap of caps){
 }
 includesAll(caps.map(x=>x.id),[
   'CAP-HOME','CAP-CALENDAR','CAP-ATHLETE','CAP-FAMILY','CAP-STAFF','CAP-COMMS','CAP-RUNTIME-EVIDENCE','CAP-UPSTREAM-RESILIENCE','CAP-R20-RUNTIME-ACTIVATION',
-  'CAP-DRIVE-CATALOG','CAP-GMAIL-INGESTION','CAP-DATAFABRIC-OBSERVABILITY','CAP-ENTITY-GRAPH','CAP-COMPLETENESS',
+  'CAP-DRIVE-CATALOG','CAP-GMAIL-INGESTION','CAP-DATAFABRIC-OBSERVABILITY','CAP-ENTITY-GRAPH','CAP-COMPLETENESS','CAP-SUPABASE-CORE',
   'CAP-CHAT','CAP-CONFIDENCE','CAP-ANCONFIDENCE','CAP-SAFEGUARDING','CAP-SKY','CAP-AVATAR',
   'CAP-TAMAGOTCHI','CAP-GEO','CAP-R22','CAP-PWA','CAP-ANDROID','CAP-IOS'
 ],'capability map');
 
 const gaps=m.known_noncompliance||[];
-includesAll(gaps.map(x=>x.id),['GAP-UI-001','GAP-UI-002','GAP-DATA-001','GAP-EVENT-001','GAP-COMMS-001'],'known noncompliance');
+includesAll(gaps.map(x=>x.id),['GAP-UI-001','GAP-UI-002','GAP-DATA-001','GAP-EVENT-001','GAP-COMMS-001','GAP-CORE-001'],'known noncompliance');
 
 const requiredRepoFiles=[
   'AGENTS.md',
@@ -212,6 +227,10 @@ const requiredRepoFiles=[
   'docs/adr/ADR-0004-read-only-upstream-retry.md',
   'docs/adr/ADR-0005-r20-runtime-activation.md',
   'docs/adr/ADR-0006-r32-safe-live-core.md',
+  'docs/adr/ADR-0007-supabase-domain-core.md',
+  'config/scd-supabase.v1.json',
+  'supabase/migrations/20260929_r33_club_graph_foundation.sql',
+  'scripts/validate-supabase-contract.mjs',
   'docs/runbooks/R20-RUNTIME-DEPLOY.md',
   'scripts/verify-r20-direct.mjs',
   'tests/upstream-resilience.mjs',
@@ -231,6 +250,7 @@ const pkg=readJson(path.join(root,'package.json'));
 assert(pkg?.scripts?.['test:manifest']==='node scripts/validate-system-manifest.mjs','package.json must expose test:manifest');
 assert(pkg?.scripts?.['test:resilience']==='node tests/upstream-resilience.mjs','package.json must expose test:resilience');
 assert(pkg?.scripts?.['verify:r20']==='node scripts/verify-r20-direct.mjs','package.json must expose verify:r20');
+assert(pkg?.scripts?.['test:supabase-contract']==='node scripts/validate-supabase-contract.mjs','package.json must expose test:supabase-contract');
 
 for(const workflow of ['.github/workflows/e2e.yml','.github/workflows/pages.yml','.github/workflows/command-platform.yml','.github/workflows/system-manifest.yml']){
   const file=path.join(root,workflow);
