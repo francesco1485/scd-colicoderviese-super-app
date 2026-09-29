@@ -1,0 +1,1502 @@
+{
+  "$schema": "./SCD_SYSTEM_MANIFEST.schema.json",
+  "manifest": {
+    "id": "scd-colicoderviese-system",
+    "name": "SCD SYSTEM MANIFEST",
+    "version": "1.0.0",
+    "effective_at": "2026-09-29",
+    "status": "BINDING",
+    "language": "it-IT",
+    "timezone": "Europe/Rome",
+    "authority": "DIREZIONE_SCD",
+    "canonical_repository": "francesco1485/scd-colicoderviese-super-app",
+    "change_policy": {
+      "manifest_first": true,
+      "rule": "Ogni modifica che cambia architettura, dati, ruoli, fonti, routing, sicurezza, UX, telemetria o capacità deve aggiornare questo manifest nello stesso PR o prima del codice.",
+      "breaking_change_requires_direction_approval": true,
+      "no_silent_reinterpretation": true,
+      "legacy_documents_are_non_normative": true
+    },
+    "supersedes_as_normative_authority": [
+      "PROJECT_CONSTITUTION.md",
+      "SCD_PERMANENT_COMMANDS.md",
+      "VISUAL_SYSTEM_LOCK.md"
+    ],
+    "supporting_specs": [
+      "EVOLUTION_ENGINE.md",
+      "MESSAGING_SECURITY_CONTRACT.md",
+      "MEDIA_ASSET_POLICY.md",
+      "PLAY_STORE_SUBMISSION.md"
+    ]
+  },
+  "north_star": {
+    "definition": "Un unico sistema operativo digitale della S.D.C. ColicoDerviese che rappresenta l'intera società sportiva, non un sito e non una sola agenda.",
+    "single_product": true,
+    "channels": [
+      "WEB_DESKTOP",
+      "WEB_MOBILE",
+      "PWA",
+      "ANDROID",
+      "IOS_FUTURE"
+    ],
+    "single_codebase_preference": true,
+    "same_data_same_permissions_same_identity_across_channels": true,
+    "drive_and_gmail_are_backoffice_engines": true,
+    "r20_must_not_be_replaced_without_verified_migration": true,
+    "progressive_evolution_not_rewrite": true
+  },
+  "non_negotiable_invariants": [
+    {
+      "id": "INV-001",
+      "statement": "La Super App è un'applicazione cross-platform, non una landing page o un sito aziendale generico.",
+      "enforcement": "BLOCKING"
+    },
+    {
+      "id": "INV-002",
+      "statement": "Desktop e mobile sono viste responsive dello stesso prodotto e degli stessi dati; il desktop non è una semplice cornice smartphone da 430px.",
+      "enforcement": "BLOCKING_TARGET"
+    },
+    {
+      "id": "INV-003",
+      "statement": "Drive e Gmail sportclubcolico@gmail.com sono il back-office informativo permanente; i file originali restano catalogabili e recuperabili.",
+      "enforcement": "BLOCKING"
+    },
+    {
+      "id": "INV-004",
+      "statement": "R20 resta il motore operativo esistente per identità, ruoli, scope e funzioni gestionali finché una migrazione verificata non viene approvata.",
+      "enforcement": "BLOCKING"
+    },
+    {
+      "id": "INV-005",
+      "statement": "Account unico: ogni persona nasce UTENTE_BASE e riceve successivamente ruoli/scope autorizzati dalla Direzione.",
+      "enforcement": "BLOCKING"
+    },
+    {
+      "id": "INV-006",
+      "statement": "Nessun dato sportivo deve essere inventato; se assente usare DATO_IN_AGGIORNAMENTO o stato equivalente.",
+      "enforcement": "BLOCKING"
+    },
+    {
+      "id": "INV-007",
+      "statement": "Safeguarding è separato da CRM, chat ordinaria, analytics, ticketing e community.",
+      "enforcement": "BLOCKING"
+    },
+    {
+      "id": "INV-008",
+      "statement": "Le tavole grafiche approvate sono la Source of Truth visiva e devono essere tradotte in componenti reali, non usate come semplici immagini decorative.",
+      "enforcement": "BLOCKING_TARGET"
+    },
+    {
+      "id": "INV-009",
+      "statement": "Ogni evento societario esiste una sola volta e viene proiettato sulle viste autorizzate di società, squadra, atleta, famiglia, staff, impianto e comunicazioni.",
+      "enforcement": "BLOCKING_TARGET"
+    },
+    {
+      "id": "INV-010",
+      "statement": "Nessun cambiamento critico autonomo in produzione su ruoli, permessi, pagamenti, tesseramenti, presenze, documenti, dati personali o safeguarding.",
+      "enforcement": "BLOCKING"
+    },
+    {
+      "id": "INV-011",
+      "statement": "Ogni nuova fonte esterna entra tramite Source Adapter con trust, dominio, timestamp, URL/identificatore e regole di conflitto.",
+      "enforcement": "BLOCKING_TARGET"
+    },
+    {
+      "id": "INV-012",
+      "statement": "La piattaforma deve poter crescere per moduli, adapter, comandi, schema versionato e feature flag senza ricominciare da zero.",
+      "enforcement": "BLOCKING_TARGET"
+    }
+  ],
+  "product": {
+    "season_model": {
+      "current_season": "2026/27",
+      "season_is_first_class_dimension": true,
+      "future_seasons_must_not_require_app_rebuild": true
+    },
+    "core_experiences": [
+      {
+        "id": "HOME_PUBLIC",
+        "route": "/app/home",
+        "title": "Home Pubblica",
+        "audience": [
+          "PUBLIC",
+          "USER_BASE",
+          "AUTHORIZED_USERS"
+        ],
+        "purpose": "Sintesi dinamica della società adesso: prossima gara, ultimo risultato, settimana, iniziative, news, sponsor, territorio e CTA.",
+        "visual_master": "HOME_PUBBLICA_APPROVED_BOARD",
+        "must_not_be": "landing_marketing_lunga"
+      },
+      {
+        "id": "CALENDAR_LIVE",
+        "route": "/app/calendar",
+        "title": "Calendario Live",
+        "audience": [
+          "PUBLIC_LIMITED",
+          "AUTHORIZED_USERS"
+        ],
+        "purpose": "Calendario societario multi-squadra, multi-annata, multi-evento e personalizzato per ruolo/scope.",
+        "visual_master": "CALENDARIO_LIVE_APPROVED_BOARD"
+      },
+      {
+        "id": "ATHLETE_AREA",
+        "route": "/app/athlete",
+        "title": "Area Atleta",
+        "audience": [
+          "ATHLETE"
+        ],
+        "purpose": "Profilo, convocazioni, documenti, pagamenti, tesseramento, messaggi, trasporti e prossimi impegni.",
+        "visual_master": "AREA_ATLETA_APPROVED_BOARD"
+      },
+      {
+        "id": "FAMILY_AREA",
+        "route": "/app/family",
+        "title": "Area Famiglia",
+        "audience": [
+          "FAMILY"
+        ],
+        "purpose": "Gestione figli collegati, quote, documenti, kit, tesseramenti, attività, trasporti e comunicazioni.",
+        "visual_master": "AREA_FAMIGLIA_APPROVED_BOARD"
+      },
+      {
+        "id": "STAFF_DIRECTION",
+        "route": "/app/staff",
+        "title": "Area Staff / Direzione",
+        "audience": [
+          "MISTER",
+          "STAFF",
+          "MANAGER",
+          "SECRETARIAT",
+          "REGISTRATION",
+          "TOURNAMENTS",
+          "DIRECTION",
+          "ADMIN"
+        ],
+        "purpose": "Dashboard operativa societaria: squadre, atleti, staff, documenti, convocazioni, presenze, richieste, trasporti, comunicazioni, statistiche e strumenti.",
+        "visual_master": "AREA_STAFF_DIREZIONE_APPROVED_BOARD"
+      },
+      {
+        "id": "COMMUNICATIONS",
+        "route": "/app/communications",
+        "title": "Comunicazioni",
+        "audience": [
+          "PUBLIC_LIMITED",
+          "AUTHORIZED_USERS"
+        ],
+        "purpose": "Comunicazioni Club, Squadre e Social, avvisi urgenti, feed, newsletter e strumenti di pubblicazione autorizzati.",
+        "visual_master": "COMUNICAZIONI_APPROVED_BOARD"
+      }
+    ],
+    "secondary_experiences": [
+      {
+        "id": "PROFILE",
+        "route": "/app/profile"
+      },
+      {
+        "id": "SERVICES",
+        "route": "/app/services"
+      },
+      {
+        "id": "SETTINGS",
+        "route": "/app/settings"
+      },
+      {
+        "id": "SHOP",
+        "route": "/app/shop"
+      },
+      {
+        "id": "COMMUNITY",
+        "route": "/app/community"
+      },
+      {
+        "id": "SPONSOR",
+        "route": "/app/sponsor"
+      },
+      {
+        "id": "TOURNAMENTS",
+        "route": "/app/tournaments"
+      },
+      {
+        "id": "FIELDS",
+        "route": "/app/fields"
+      },
+      {
+        "id": "TICKETING",
+        "route": "/app/tickets"
+      },
+      {
+        "id": "CARD",
+        "route": "/app/card"
+      }
+    ],
+    "navigation": {
+      "role_adaptive": true,
+      "mobile_bottom_navigation": true,
+      "desktop_top_or_side_navigation": true,
+      "same_routes_across_channels": true,
+      "never_create_second_product_for_desktop": true
+    }
+  },
+  "visual_system": {
+    "source_of_truth": "APPROVED_SCD_VISUAL_BOARDS",
+    "style": {
+      "identity": [
+        "CALCIO",
+        "SQUADRA",
+        "FIGC",
+        "LND",
+        "SETTORE_GIOVANILE",
+        "TERRITORIO",
+        "COMUNITA",
+        "TECNOLOGIA_MODERNA"
+      ],
+      "palette": [
+        "BLU_SCD",
+        "AZZURRO",
+        "GIALLO_SCD",
+        "BIANCO"
+      ],
+      "territory": [
+        "COLICO",
+        "ALTO_LARIO",
+        "LAGO",
+        "MONTAGNE",
+        "CENTRO_SPORTIVO"
+      ],
+      "mascot": "SKY",
+      "avoid": [
+        "SaaS_generico",
+        "dashboard_grigia_anonima",
+        "WordPress_template",
+        "minimalismo_senza_identita"
+      ]
+    },
+    "component_language": [
+      "HEADER_SCD",
+      "CARD_BIANCA_ARROTONDATA",
+      "CTA_GIALLO_BLU",
+      "BADGE_STATO",
+      "MATCH_CARD",
+      "EVENT_CARD",
+      "CALENDAR_FILTERS",
+      "SPONSOR_STRIP",
+      "AFFILIATIONS",
+      "BOTTOM_NAV",
+      "ROLE_DASHBOARD",
+      "SKY_ASSISTANT"
+    ],
+    "media_policy": {
+      "official_logos_must_not_be_redrawn": true,
+      "graphic_assets_format": "PNG_RGBA_TRANSPARENT",
+      "photos_formats": [
+        "WEBP",
+        "JPEG",
+        "AVIF"
+      ],
+      "no_foreign_rectangular_background_around_logos": true
+    },
+    "responsive_qa": {
+      "required_mobile_viewports": [
+        "360x800",
+        "390x844",
+        "393x852",
+        "430x932"
+      ],
+      "required_desktop_viewports": [
+        "1280x800",
+        "1440x900",
+        "1920x1080"
+      ],
+      "desktop_rule": "Usare lo spazio disponibile con la stessa grammatica visiva; non limitare l'intera app a max-width 430px.",
+      "visual_regression_required": true,
+      "master_comparison_required_before_merge": true
+    },
+    "3d_motion": {
+      "allowed_for": [
+        "HERO",
+        "SKY",
+        "AVATAR",
+        "TRANSITIONS",
+        "PROMO",
+        "SPONSOR_SHOWCASE",
+        "AR_FUTURE"
+      ],
+      "avoid_for": [
+        "DENSE_TABLES",
+        "DOCUMENT_FORMS",
+        "PAYMENTS",
+        "ADMIN_HIGH_DENSITY"
+      ],
+      "prefers_reduced_motion_required": true
+    }
+  },
+  "temporal_core": {
+    "canonical_timezone": "Europe/Rome",
+    "authoritative_time_required": true,
+    "drives": [
+      "HOME",
+      "CALENDAR",
+      "NOTIFICATIONS",
+      "REMINDERS",
+      "NEXT_MATCH",
+      "TODAY_AGENDA",
+      "SEASON_CONTEXT"
+    ],
+    "must_know": [
+      "NOW",
+      "DATE",
+      "DAY",
+      "WEEK",
+      "SEASON",
+      "TODAY_EVENTS",
+      "NEXT_EVENT",
+      "NEXT_MATCH"
+    ],
+    "endpoint_current": "/api/time"
+  },
+  "identity_and_access": {
+    "single_account": true,
+    "registration_fields": [
+      "first_name",
+      "last_name",
+      "email",
+      "phone",
+      "privacy_acceptance"
+    ],
+    "default_role": "USER_BASE",
+    "self_select_role_at_registration": false,
+    "roles": [
+      "USER_BASE",
+      "FAMILY",
+      "ATHLETE",
+      "MISTER",
+      "STAFF",
+      "MANAGER",
+      "SECRETARIAT",
+      "REGISTRATION",
+      "TOURNAMENTS",
+      "DIRECTION",
+      "ADMIN",
+      "SYSTEM"
+    ],
+    "multi_role_same_account": true,
+    "scope_dimensions": [
+      "SEASON",
+      "TEAM",
+      "PLAYER",
+      "FAMILY_RELATION",
+      "AREA",
+      "FUNCTION"
+    ],
+    "authorization": "SERVER_SIDE_ONLY",
+    "current_identity_engine": "R20"
+  },
+  "data_architecture": {
+    "principle": "La UI non deve conoscere colonne di fogli specifici: usa domini e API stabili.",
+    "layers": [
+      "SOURCE",
+      "INGESTION",
+      "NORMALIZATION",
+      "ENTITY_GRAPH",
+      "TRUST",
+      "DOMAIN_CORE",
+      "API",
+      "UI"
+    ],
+    "stable_entity_ids": [
+      "SEASON_ID",
+      "PERSON_ID",
+      "USER_ID",
+      "PLAYER_ID",
+      "FAMILY_ID",
+      "TEAM_ID",
+      "EVENT_ID",
+      "MATCH_ID",
+      "DOCUMENT_ID",
+      "FACILITY_ID",
+      "TRANSPORT_ID",
+      "SPONSOR_ID",
+      "TOURNAMENT_ID",
+      "COMMUNICATION_ID",
+      "THREAD_ID",
+      "SOURCE_RECORD_ID"
+    ],
+    "domains": [
+      "SEASONS",
+      "PEOPLE",
+      "USERS",
+      "ATHLETES",
+      "FAMILIES",
+      "STAFF",
+      "TEAMS",
+      "CATEGORIES",
+      "YEARS",
+      "EVENTS",
+      "MATCHES",
+      "TRAININGS",
+      "CONVOCATIONS",
+      "ATTENDANCE",
+      "TOURNAMENTS",
+      "TRANSPORT",
+      "FACILITIES",
+      "DOCUMENTS",
+      "TESSERAMENTI",
+      "CERTIFICATES",
+      "PAYMENTS",
+      "KIT_INVENTORY",
+      "COMMUNICATIONS",
+      "MESSAGING",
+      "SPONSORS",
+      "SUPPLIERS",
+      "CRM",
+      "SHOP",
+      "CARDS",
+      "TICKETING",
+      "COMMUNITY",
+      "RADAR",
+      "INITIATIVES",
+      "MEDIA",
+      "NOTIFICATIONS",
+      "AUDIT"
+    ]
+  },
+  "source_registry": {
+    "trust_scale": {
+      "CERTIFIED": 100,
+      "OFFICIAL": 95,
+      "INTERNAL_VERIFIED": 90,
+      "STRUCTURED_SECONDARY": 80,
+      "PUBLIC_OFFICIAL_SCD": 75,
+      "KNOWLEDGE": 65,
+      "WEB_VERIFIED": 55,
+      "USER_SUBMISSION": 40,
+      "BENCHMARK": "N/A"
+    },
+    "sources": [
+      {
+        "id": "SCD_DRIVE",
+        "kind": "INTERNAL_BACKOFFICE",
+        "trust": "INTERNAL_VERIFIED",
+        "authority_domains": [
+          "DOCUMENTS",
+          "MASTER_DATA",
+          "ARCHIVES",
+          "FILES",
+          "MEDIA",
+          "OPERATIONS"
+        ],
+        "account": "sportclubcolico@gmail.com",
+        "rules": [
+          "preserve_original_file",
+          "catalog_by_drive_file_id",
+          "hash_and_version",
+          "never_expose_credentials"
+        ]
+      },
+      {
+        "id": "SCD_GMAIL",
+        "kind": "INTERNAL_EVENT_INBOX",
+        "trust": "INTERNAL_VERIFIED",
+        "authority_domains": [
+          "INCOMING_COMMUNICATION",
+          "ATTACHMENTS",
+          "OPERATIONAL_SIGNAL"
+        ],
+        "account": "sportclubcolico@gmail.com",
+        "rules": [
+          "classify",
+          "extract_dates",
+          "extract_entities",
+          "archive_relevant_attachments_to_drive",
+          "critical_changes_require_validation"
+        ]
+      },
+      {
+        "id": "R20",
+        "kind": "INTERNAL_OPERATIONAL_CORE",
+        "trust": "INTERNAL_VERIFIED",
+        "authority_domains": [
+          "AUTH",
+          "ROLES",
+          "SCOPES",
+          "SESSIONS",
+          "ATTENDANCE",
+          "CONVOCATIONS",
+          "REQUESTS",
+          "TRANSPORT",
+          "CALENDAR",
+          "DIRECTION"
+        ],
+        "must_preserve": true
+      },
+      {
+        "id": "CORE_SHEET",
+        "kind": "GOOGLE_SHEET",
+        "trust": "INTERNAL_VERIFIED",
+        "resource_id": "1p78Kgla_cCjYxCPjksS8lHxmlFQxuvpd1aBXv6-1H1s",
+        "authority_domains": [
+          "APP_PUBLIC_REQUESTS",
+          "APP_COMMERCIAL_CRM",
+          "APP_FANTACALCIO",
+          "APP_FAN_CARDS",
+          "APP_TICKETING",
+          "APP_COMMUNITY",
+          "APP_PUBLIC_RADAR",
+          "APP_PUBLIC_PRIORITY",
+          "APP_EVOLUTION_QUEUE",
+          "APP_CONFIG"
+        ]
+      },
+      {
+        "id": "TESSERATI_SHEET",
+        "kind": "GOOGLE_SHEET",
+        "trust": "INTERNAL_VERIFIED",
+        "resource_id": "1mcOVkFRK7igxk87jGE-VqI49PHjNa6OmMu7xd0QYUl8",
+        "authority_domains": [
+          "ATHLETES",
+          "TESSERAMENTI",
+          "TEAM_MEMBERSHIP"
+        ]
+      },
+      {
+        "id": "PULMINI_SHEET",
+        "kind": "GOOGLE_SHEET",
+        "trust": "INTERNAL_VERIFIED",
+        "resource_id": "1eBhjOymnJF6GfE-6-GRuo7UYgkE82ad24_VnY097n9Q",
+        "authority_domains": [
+          "TRANSPORT",
+          "VEHICLES"
+        ]
+      },
+      {
+        "id": "SPONSOR_SHEET",
+        "kind": "GOOGLE_SHEET",
+        "trust": "INTERNAL_VERIFIED",
+        "resource_id": "1wx3ZXwmdZuAr8AM_h08GzOvephm5o5iHMvTLQpRmbJE",
+        "authority_domains": [
+          "SPONSORS",
+          "PARTNERS",
+          "COMMERCIAL"
+        ]
+      },
+      {
+        "id": "FIGC",
+        "kind": "FEDERATION_OFFICIAL",
+        "trust": "CERTIFIED",
+        "url": "https://www.figc.it/",
+        "authority_domains": [
+          "FEDERAL_RULES",
+          "REGISTRATION",
+          "OFFICIAL_COMPETITIONS"
+        ]
+      },
+      {
+        "id": "LND",
+        "kind": "FEDERATION_OFFICIAL",
+        "trust": "CERTIFIED",
+        "url": "https://www.lnd.it/",
+        "authority_domains": [
+          "OFFICIAL_COMPETITIONS",
+          "RULES",
+          "RESULTS",
+          "CALENDAR_VARIATIONS"
+        ]
+      },
+      {
+        "id": "CR_LOMBARDIA",
+        "kind": "FEDERATION_OFFICIAL",
+        "trust": "CERTIFIED",
+        "url": "https://www.crlombardia.it/",
+        "authority_domains": [
+          "COMMUNICATI",
+          "CALENDARS",
+          "RULES",
+          "TESSERAMENTO",
+          "SGS",
+          "FACILITIES",
+          "FORMS"
+        ]
+      },
+      {
+        "id": "SGS",
+        "kind": "FEDERATION_OFFICIAL",
+        "trust": "CERTIFIED",
+        "authority_domains": [
+          "YOUTH_SECTOR",
+          "GRASSROOTS",
+          "CLUB_RECOGNITION"
+        ]
+      },
+      {
+        "id": "SPORT_E_SALUTE",
+        "kind": "INSTITUTIONAL_OFFICIAL",
+        "trust": "OFFICIAL",
+        "url": "https://www.sportesalute.eu/",
+        "authority_domains": [
+          "RASD_GUIDANCE",
+          "SPORT_WORK",
+          "GRANTS",
+          "FACILITIES",
+          "TRAINING",
+          "ADMIN_GENERAL"
+        ]
+      },
+      {
+        "id": "RASD",
+        "kind": "INSTITUTIONAL_REGISTRY",
+        "trust": "CERTIFIED",
+        "url": "https://registro.sportesalute.eu/#/login",
+        "authority_domains": [
+          "REGISTRY_STATUS",
+          "SPORT_ACTIVITY",
+          "ADMIN_COMPLIANCE"
+        ]
+      },
+      {
+        "id": "TUTTOCAMPO",
+        "kind": "SPORT_DATA_SECONDARY",
+        "trust": "STRUCTURED_SECONDARY",
+        "url": "https://www.tuttocampo.it/",
+        "authority_domains": [
+          "RESULTS",
+          "STANDINGS",
+          "CALENDARS",
+          "TEAMS",
+          "PLAYERS",
+          "STATS"
+        ],
+        "use": "CROSS_CHECK_AND_ENRICHMENT"
+      },
+      {
+        "id": "SCD_OFFICIAL_SITE",
+        "kind": "PUBLIC_OFFICIAL_SCD",
+        "trust": "PUBLIC_OFFICIAL_SCD",
+        "url": "https://www.colicoderviese.it/",
+        "authority_domains": [
+          "PUBLIC_NEWS",
+          "PUBLIC_EVENTS",
+          "OFFICIAL_PUBLIC_CONTENT"
+        ]
+      },
+      {
+        "id": "SCD_FACEBOOK",
+        "kind": "PUBLIC_OFFICIAL_SCD",
+        "trust": "PUBLIC_OFFICIAL_SCD",
+        "url": "https://www.facebook.com/ColicoDerviese?locale=it_IT",
+        "authority_domains": [
+          "PUBLIC_SOCIAL_CONTENT"
+        ]
+      },
+      {
+        "id": "SCD_INSTAGRAM",
+        "kind": "PUBLIC_OFFICIAL_SCD",
+        "trust": "PUBLIC_OFFICIAL_SCD",
+        "url": "https://www.instagram.com/s.c.d.colicoderviese/",
+        "authority_domains": [
+          "PUBLIC_SOCIAL_CONTENT"
+        ]
+      },
+      {
+        "id": "AC_MONZA",
+        "kind": "AFFILIATION_PARTNER",
+        "trust": "OFFICIAL",
+        "authority_domains": [
+          "AFFILIATION",
+          "PARTNER_INITIATIVES"
+        ]
+      },
+      {
+        "id": "TUTTITALIA",
+        "kind": "TERRITORIAL_DATA",
+        "trust": "STRUCTURED_SECONDARY",
+        "url": "https://www.tuttitalia.it/",
+        "authority_domains": [
+          "MUNICIPALITIES",
+          "DEMOGRAPHICS",
+          "TERRITORY"
+        ],
+        "use": "TERRITORIAL_INTELLIGENCE"
+      },
+      {
+        "id": "SEGRETARIO_CALCIO",
+        "kind": "KNOWLEDGE_SOURCE",
+        "trust": "KNOWLEDGE",
+        "url": "https://segretariocalcio.altervista.org/",
+        "authority_domains": [
+          "OPERATIONAL_KNOWLEDGE"
+        ],
+        "rule": "never_override_FIGC_LND"
+      },
+      {
+        "id": "TEAMSYSTEM_SPORTIVI_IN_CLOUD",
+        "kind": "PRODUCT_BENCHMARK",
+        "trust": "BENCHMARK",
+        "url": "https://www.teamsystem.com/sport/sportivi-in-cloud/",
+        "use": "FEATURE_AND_WORKFLOW_BENCHMARK_ONLY"
+      },
+      {
+        "id": "SQUBY",
+        "kind": "PRODUCT_BENCHMARK",
+        "trust": "BENCHMARK",
+        "url": "https://www.squby.it/funzionalita/",
+        "use": "FEATURE_AND_UX_BENCHMARK_ONLY"
+      },
+      {
+        "id": "ATHLETIS",
+        "kind": "PRODUCT_BENCHMARK",
+        "trust": "BENCHMARK",
+        "url": "https://athletis.cloud/login",
+        "use": "SPORT_WORKFLOW_BENCHMARK_ONLY"
+      },
+      {
+        "id": "WEB_VERIFIED",
+        "kind": "EXTERNAL_RADAR",
+        "trust": "WEB_VERIFIED",
+        "authority_domains": [
+          "NEWS",
+          "TERRITORY",
+          "SPORT_TECH",
+          "OPPORTUNITIES"
+        ],
+        "rule": "must_store_source_url_date_timestamp"
+      }
+    ],
+    "conflict_resolution": [
+      "CERTIFIED_OR_OFFICIAL beats STRUCTURED_SECONDARY for official sports facts",
+      "INTERNAL_VERIFIED beats public copies for internal operations unless official federation variation is newer and validated",
+      "BENCHMARK never becomes SCD factual data",
+      "conflicts create review tasks instead of silent overwrite"
+    ]
+  },
+  "drive_vault": {
+    "role": "PERMANENT_DIGITAL_HARD_DISK_AND_CATALOG",
+    "preserve_existing_structure": true,
+    "catalog_fields": [
+      "DOCUMENT_ID",
+      "DRIVE_FILE_ID",
+      "TITLE",
+      "TYPE",
+      "SEASON_ID",
+      "PERSON_ID",
+      "PLAYER_ID",
+      "TEAM_ID",
+      "SOURCE",
+      "SOURCE_MESSAGE_ID",
+      "CREATED_AT",
+      "EXPIRES_AT",
+      "VERSION",
+      "HASH",
+      "STATUS",
+      "PERMISSIONS",
+      "RELATED_ENTITIES"
+    ],
+    "upload_flow": [
+      "RECEIVE_FILE",
+      "SECURITY_CHECK",
+      "CLASSIFY",
+      "ENTITY_LINK",
+      "LOGICAL_RENAME_METADATA",
+      "SAVE_TO_DRIVE",
+      "HASH",
+      "CATALOG",
+      "UPDATE_DOMAIN",
+      "NOTIFY_IF_REQUIRED"
+    ],
+    "dedup_by_hash": true,
+    "versioning_required": true
+  },
+  "gmail_intelligence": {
+    "role": "OPERATIONAL_EVENT_SENSOR",
+    "classifications": [
+      "FIGC",
+      "LND",
+      "MATCH",
+      "TESSERAMENTO",
+      "TOURNAMENT",
+      "SPONSOR",
+      "SUPPLIER",
+      "PAYMENT",
+      "DOCUMENT",
+      "FAMILY",
+      "STAFF",
+      "FACILITY",
+      "ADMIN",
+      "OTHER"
+    ],
+    "extract": [
+      "SENDER",
+      "SUBJECT",
+      "ENTITIES",
+      "DATES",
+      "DEADLINES",
+      "ATTACHMENTS",
+      "REFERENCES",
+      "URGENCY"
+    ],
+    "actions": [
+      "ARCHIVE",
+      "LINK_DOCUMENT",
+      "PROPOSE_UPDATE",
+      "CREATE_DEADLINE",
+      "CREATE_EVENT",
+      "CREATE_REQUEST",
+      "ALERT_DIRECTION"
+    ],
+    "critical_updates_default": "HUMAN_CONFIRMATION_REQUIRED"
+  },
+  "entity_graph": {
+    "required_relations": [
+      "PERSON_HAS_ACCOUNT",
+      "PERSON_HAS_ROLE",
+      "PERSON_IN_FAMILY",
+      "FAMILY_GUARDS_ATHLETE",
+      "ATHLETE_REGISTERED_TO_TEAM",
+      "STAFF_ASSIGNED_TO_TEAM",
+      "TEAM_IN_SEASON",
+      "EVENT_RELATES_TO_TEAM",
+      "EVENT_RELATES_TO_PERSON",
+      "EVENT_USES_FACILITY",
+      "EVENT_USES_TRANSPORT",
+      "DOCUMENT_RELATES_TO_ENTITY",
+      "COMMUNICATION_RELATES_TO_EVENT",
+      "SPONSOR_RELATES_TO_ASSET"
+    ],
+    "alias_resolution_required": true,
+    "examples": [
+      "U16 Elite == Under 16 Elite == category alias when verified"
+    ]
+  },
+  "calendar_event_engine": {
+    "principle": "Un solo EVENT_ID, molte proiezioni autorizzate.",
+    "event_types": [
+      "MATCH",
+      "TRAINING",
+      "FRIENDLY",
+      "TOURNAMENT",
+      "MEETING",
+      "OPEN_DAY",
+      "CAMP",
+      "CLUB_EVENT",
+      "DEADLINE",
+      "TRANSPORT",
+      "DOCUMENT_DEADLINE",
+      "COMMERCIAL_INITIATIVE",
+      "FEDERAL_EVENT"
+    ],
+    "required_event_fields": [
+      "EVENT_ID",
+      "SEASON_ID",
+      "TYPE",
+      "START_AT",
+      "END_AT",
+      "STATUS",
+      "SOURCE",
+      "SOURCE_UPDATED_AT",
+      "TEAM_IDS",
+      "CATEGORY_IDS",
+      "YEAR_IDS",
+      "PERSON_IDS",
+      "FACILITY_ID",
+      "VISIBILITY",
+      "RESPONSIBLE_IDS",
+      "TRANSPORT_LINK",
+      "DOCUMENT_LINKS",
+      "COMMUNICATION_LINKS",
+      "PRIORITY",
+      "NOTIFICATION_POLICY"
+    ],
+    "views": [
+      "CLUB",
+      "TEAM",
+      "YEAR",
+      "ATHLETE",
+      "FAMILY",
+      "STAFF",
+      "FACILITY",
+      "TRANSPORT",
+      "TOURNAMENT",
+      "PUBLIC"
+    ],
+    "states": [
+      "DRAFT",
+      "SCHEDULED",
+      "CONFIRMED",
+      "CHANGED",
+      "POSTPONED",
+      "CANCELLED",
+      "COMPLETED"
+    ]
+  },
+  "completeness_engine": {
+    "enabled_target": true,
+    "purpose": "Capire cosa manca nelle schede e cercare il dato/documento prima di chiedere nuovo inserimento.",
+    "entity_profiles": [
+      "ATHLETE",
+      "FAMILY",
+      "STAFF",
+      "TEAM",
+      "EVENT",
+      "SPONSOR",
+      "DOCUMENT"
+    ],
+    "search_order": [
+      "DOMAIN_CORE",
+      "SCD_DRIVE",
+      "SCD_GMAIL_ATTACHMENTS",
+      "OFFICIAL_SOURCES",
+      "SECONDARY_SOURCES"
+    ],
+    "outputs": [
+      "MISSING",
+      "FOUND_EXACT",
+      "POSSIBLE_MATCH",
+      "CONFLICT",
+      "OUTDATED"
+    ],
+    "confidence_required": true,
+    "auto_link_threshold": "only for non-sensitive deterministic matches",
+    "sensitive_or_critical_match": "HUMAN_CONFIRMATION_REQUIRED"
+  },
+  "communications": {
+    "hub": {
+      "single_message_multi_channel": true,
+      "channels": [
+        "IN_APP",
+        "PUSH",
+        "EMAIL",
+        "WHATSAPP_OFFICIAL_ADAPTER_FUTURE"
+      ],
+      "channel_selection_by": [
+        "AUDIENCE",
+        "CONSENT",
+        "URGENCY",
+        "POLICY",
+        "MESSAGE_TYPE"
+      ],
+      "avoid_duplicate_manual_composition": true
+    },
+    "messaging": {
+      "states": [
+        "STANDARD",
+        "OPERATIVO",
+        "CONFIDENCE",
+        "ANCONFIDENCE"
+      ],
+      "confidence": "restricted_identified_auditable",
+      "anconfidence": "protected_pseudonymous_identity_exposure_controlled_by_policy",
+      "safeguarding_is_not_chat_level": true,
+      "minor_safety": {
+        "private_unsupervised_minor_chat_default": false,
+        "guardian_or_authorized_staff_required_where_applicable": true,
+        "block_report_moderation_required_before_1to1": true
+      },
+      "whatsapp": {
+        "official_business_api_only": true,
+        "opt_in_required": true,
+        "confidence_export_default": false,
+        "anconfidence_export_default": false,
+        "safeguarding_export": false
+      }
+    },
+    "safeguarding": {
+      "isolated": true,
+      "pec": "calciocolicoderviese@pec.it",
+      "subject": "RISERVATO - SAFEGUARDING",
+      "emergency": "112",
+      "excluded_from": [
+        "CRM",
+        "COMMUNITY",
+        "ORDINARY_MESSAGING",
+        "ANALYTICS",
+        "TICKETING"
+      ]
+    }
+  },
+  "sky_and_avatar": {
+    "sky": {
+      "role": "CONTEXTUAL_CLUB_ASSISTANT",
+      "not_decorative_only": true,
+      "functions": [
+        "NAVIGATION",
+        "FAQ",
+        "EVENTS",
+        "REGISTRATION",
+        "MATCH_INFO",
+        "CONTACTS",
+        "SPONSOR_INFO",
+        "CONTEXT_ALERTS",
+        "SAFEGUARDING_ROUTING_ONLY"
+      ],
+      "context_inputs": [
+        "USER_ROLE",
+        "USER_SCOPE",
+        "SCREEN",
+        "SEASON",
+        "AUTHORIZED_EVENTS",
+        "AUTHORIZED_DOCUMENT_STATUS"
+      ],
+      "must_not_bypass_permissions": true
+    },
+    "personal_avatar": {
+      "photo_or_generated": true,
+      "parameters": [
+        "ROLE",
+        "NUMBER",
+        "SKIN_TONE",
+        "HAIR",
+        "EXPRESSION",
+        "KIT"
+      ],
+      "local_processing_default": true,
+      "export": "PNG_RGBA_TRANSPARENT",
+      "3d_roadmap": [
+        "2D_DYNAMIC",
+        "ANIMATED_2D",
+        "3D_MODEL",
+        "DYNAMIC_KIT",
+        "CONTEXT_ANIMATION",
+        "VOICE",
+        "AR"
+      ]
+    },
+    "tamagotchi_evolution": {
+      "target": true,
+      "audiences": [
+        "YOUTH",
+        "ATHLETE",
+        "FAN_COMMUNITY"
+      ],
+      "safe_signals": [
+        "PARTICIPATION",
+        "EXPERIENCES",
+        "ATTENDANCE",
+        "BADGES",
+        "EDUCATIONAL_GOALS",
+        "SPORT_MILESTONES"
+      ],
+      "forbidden_default": [
+        "hidden_biometric_scoring",
+        "mental_state_inference",
+        "competence_scoring_of_minors",
+        "manipulative_pressure"
+      ],
+      "purpose": "belonging_growth_participation"
+    }
+  },
+  "geo_spatial": {
+    "target_architecture": [
+      "EDGE_GEOLOCATION",
+      "H3",
+      "POSTGIS_FUTURE",
+      "MAPLIBRE"
+    ],
+    "edge_first": true,
+    "precise_location_default": false,
+    "privacy_levels": [
+      "NONE",
+      "REGION",
+      "H3_CELL",
+      "GEOFENCE_ONLY",
+      "PRECISE_TEMPORARY",
+      "EMERGENCY_AUTHORIZED"
+    ],
+    "raw_sensor_upload_default": false,
+    "preferred_cloud_data": [
+      "DERIVED_FEATURES",
+      "GEOFENCE_EVENTS",
+      "H3_AGGREGATES"
+    ],
+    "precise_location_requires": [
+      "PURPOSE",
+      "CONSENT",
+      "MINIMUM_NECESSARY",
+      "RETENTION"
+    ],
+    "location_must_not_be_used_for_hidden_tracking": true
+  },
+  "security": {
+    "model": "ZERO_TRUST",
+    "transport": "TLS",
+    "at_rest": "ENVELOPE_ENCRYPTION_WHERE_SENSITIVE",
+    "preferred_symmetric": [
+      "AES-256-GCM",
+      "ChaCha20-Poly1305"
+    ],
+    "signing_and_key_agility": [
+      "Ed25519",
+      "X25519",
+      "ML-KEM_FUTURE",
+      "ML-DSA_FUTURE"
+    ],
+    "e2ee_scope": "Only features that are actually end-to-end encrypted may be called E2EE.",
+    "no_custom_crypto": true,
+    "server_side_authorization": true,
+    "audit_required_for_sensitive_access": true,
+    "secrets_must_not_be_committed": true,
+    "security_tests": [
+      "AUTH_BYPASS",
+      "RBAC_ESCALATION",
+      "IDOR_BOLA",
+      "SESSION_REPLAY",
+      "XSS",
+      "CSRF",
+      "SQL_INJECTION",
+      "UPLOAD_ABUSE",
+      "COMMAND_INJECTION",
+      "PLUGIN_ABUSE",
+      "RATE_LIMIT",
+      "SECRET_SCAN",
+      "DEPENDENCY_SCAN",
+      "SAFEGUARDING_ISOLATION",
+      "MINOR_MESSAGING_SAFETY",
+      "LOCATION_INFERENCE"
+    ]
+  },
+  "evolution_engine": {
+    "loop": [
+      "LISTEN",
+      "OBSERVE",
+      "ANALYZE",
+      "FIND_GAP",
+      "PROPOSE",
+      "PRIORITIZE",
+      "DEVELOP",
+      "TEST",
+      "VISUAL_COMPARE",
+      "VERIFY",
+      "APPROVE",
+      "PUBLISH",
+      "MEASURE",
+      "IMPROVE"
+    ],
+    "store": "APP EVOLUTION QUEUE",
+    "proposal_fields": [
+      "PROBLEM",
+      "EVIDENCE",
+      "AFFECTED_USERS",
+      "SOLUTION",
+      "USER_VALUE",
+      "CLUB_VALUE",
+      "COMMERCIAL_VALUE",
+      "RISK",
+      "COST",
+      "PRIORITY",
+      "CONFIDENCE",
+      "TEST",
+      "SUCCESS_CRITERIA",
+      "ROLLBACK"
+    ],
+    "production_self_modification": false,
+    "ai_can": [
+      "ANALYZE",
+      "PROPOSE",
+      "GENERATE_DRAFT_PLUGIN",
+      "GENERATE_TESTS",
+      "RUN_STAGING_CHECKS"
+    ],
+    "ai_cannot_without_approval": [
+      "CHANGE_ROLES",
+      "CHANGE_PERMISSIONS",
+      "CHANGE_PAYMENTS",
+      "CHANGE_TESSERAMENTI",
+      "CHANGE_ATTENDANCE",
+      "CHANGE_SENSITIVE_DOCUMENTS",
+      "CHANGE_SAFEGUARDING",
+      "DEPLOY_CRITICAL_CHANGE"
+    ]
+  },
+  "analytics": {
+    "privacy_first": true,
+    "allowed_events": [
+      "PAGE_VIEW",
+      "CTA_CLICK",
+      "FORM_START",
+      "FORM_COMPLETE",
+      "FORM_ABANDON",
+      "API_ERROR",
+      "CLIENT_ERROR",
+      "SLOW_LOAD",
+      "SEARCH_USE",
+      "PWA_INSTALL",
+      "SHARE",
+      "RETURN_VISIT",
+      "NOTIFICATION_INTERACTION",
+      "FEATURE_USE",
+      "FEEDBACK_SUBMIT"
+    ],
+    "forbidden_payloads": [
+      "PASSWORD",
+      "PIN",
+      "SAFEGUARDING_CONTENT",
+      "PRIVATE_FORM_CONTENT",
+      "DOCUMENT_CONTENT",
+      "HEALTH_DATA",
+      "PRIVATE_MESSAGES",
+      "UNNECESSARY_SENSITIVE_DATA"
+    ],
+    "non_essential_requires_consent": true
+  },
+  "architecture": {
+    "current": {
+      "frontend_repository": "francesco1485/scd-colicoderviese-super-app",
+      "public_web": "https://francesco1485.github.io/scd-colicoderviese-super-app/",
+      "r21_api": "https://scd-colicoderviese-official-r21.onrender.com",
+      "r20_apps_script": "https://script.google.com/macros/s/AKfycbwYQ_3yLYsp-6jX3FIgufBjpmaZb9uO1AklF9hdG-CuLII9J4ITUX1EA-EKuWXBMEc/exec",
+      "r22_command_platform": "https://scd-colicoderviese-command-r22.onrender.com",
+      "android_package": "it.colicoderviese.app",
+      "ios_bundle_planned": "it.colicoderviese.app"
+    },
+    "flow": [
+      "CLIENT",
+      "R21_OR_R22_API",
+      "R20_BRIDGE",
+      "GOOGLE_SHEETS_DRIVE"
+    ],
+    "r22_role": "ORCHESTRATION_COMMAND_EVENT_PLUGIN_LAYER_NOT_SECOND_GESTIONALE",
+    "extensibility": {
+      "adapter_pattern": true,
+      "command_plugin_pattern": true,
+      "versioned_schemas": true,
+      "feature_flags_required_for_high_risk_rollout": true,
+      "stable_api_contracts": true,
+      "data_ui_separation": true
+    }
+  },
+  "delivery_and_quality": {
+    "gates": [
+      "MANIFEST_VALID",
+      "SOURCE_CONTRACT_VALID",
+      "AUTH_AND_SCOPE_VALID",
+      "FUNCTIONAL_TESTS",
+      "API_CONTRACT",
+      "MOBILE_E2E_360_390_393_430",
+      "DESKTOP_RESPONSIVE_E2E",
+      "VISUAL_MASTER_COMPARE",
+      "NO_BROWSER_ERRORS",
+      "SAFEGUARDING_ISOLATION",
+      "NO_FAKE_SPORT_DATA"
+    ],
+    "merge_rule": "Non considerare completata una funzione se è verde solo tecnicamente ma viola il manifest o il master visivo.",
+    "release_truth": {
+      "do_not_say_live_without": [
+        "DEPLOYMENT_PROOF",
+        "HEALTH_PROOF",
+        "FUNCTIONAL_PROOF"
+      ],
+      "do_not_say_dynamic_if": "frontend_is_using_static_fallback_as_primary",
+      "do_not_say_integrated_if": "R20_and_new_layer_do_not_exchange_real_data",
+      "do_not_say_play_store_public_if": "only_internal_test"
+    }
+  },
+  "capability_map": [
+    {
+      "id": "CAP-HOME",
+      "domain": "UI",
+      "required": true,
+      "state": "REBUILD_REQUIRED",
+      "screen": "HOME_PUBLIC"
+    },
+    {
+      "id": "CAP-CALENDAR",
+      "domain": "EVENTS",
+      "required": true,
+      "state": "PARTIAL",
+      "screen": "CALENDAR_LIVE"
+    },
+    {
+      "id": "CAP-ATHLETE",
+      "domain": "PRIVATE_UI",
+      "required": true,
+      "state": "PARTIAL",
+      "screen": "ATHLETE_AREA"
+    },
+    {
+      "id": "CAP-FAMILY",
+      "domain": "PRIVATE_UI",
+      "required": true,
+      "state": "PARTIAL",
+      "screen": "FAMILY_AREA"
+    },
+    {
+      "id": "CAP-STAFF",
+      "domain": "MANAGEMENT",
+      "required": true,
+      "state": "PARTIAL",
+      "screen": "STAFF_DIRECTION"
+    },
+    {
+      "id": "CAP-COMMS",
+      "domain": "COMMUNICATION",
+      "required": true,
+      "state": "PARTIAL",
+      "screen": "COMMUNICATIONS"
+    },
+    {
+      "id": "CAP-DRIVE-CATALOG",
+      "domain": "DATA_FABRIC",
+      "required": true,
+      "state": "PLANNED"
+    },
+    {
+      "id": "CAP-GMAIL-INGESTION",
+      "domain": "DATA_FABRIC",
+      "required": true,
+      "state": "PLANNED"
+    },
+    {
+      "id": "CAP-ENTITY-GRAPH",
+      "domain": "DATA_FABRIC",
+      "required": true,
+      "state": "PLANNED"
+    },
+    {
+      "id": "CAP-COMPLETENESS",
+      "domain": "INTELLIGENCE",
+      "required": true,
+      "state": "PLANNED"
+    },
+    {
+      "id": "CAP-SOURCE-TRUST",
+      "domain": "INTELLIGENCE",
+      "required": true,
+      "state": "PARTIAL"
+    },
+    {
+      "id": "CAP-CHAT",
+      "domain": "MESSAGING",
+      "required": true,
+      "state": "DESIGN_ONLY"
+    },
+    {
+      "id": "CAP-CONFIDENCE",
+      "domain": "MESSAGING",
+      "required": true,
+      "state": "DESIGN_ONLY"
+    },
+    {
+      "id": "CAP-ANCONFIDENCE",
+      "domain": "MESSAGING",
+      "required": true,
+      "state": "DESIGN_ONLY"
+    },
+    {
+      "id": "CAP-SAFEGUARDING",
+      "domain": "SAFETY",
+      "required": true,
+      "state": "PARTIAL"
+    },
+    {
+      "id": "CAP-SKY",
+      "domain": "ASSISTANT",
+      "required": true,
+      "state": "PARTIAL"
+    },
+    {
+      "id": "CAP-AVATAR",
+      "domain": "IDENTITY",
+      "required": true,
+      "state": "PARTIAL"
+    },
+    {
+      "id": "CAP-TAMAGOTCHI",
+      "domain": "GAMIFICATION",
+      "required": true,
+      "state": "ROADMAP"
+    },
+    {
+      "id": "CAP-GEO",
+      "domain": "GEO",
+      "required": true,
+      "state": "ROADMAP"
+    },
+    {
+      "id": "CAP-R22",
+      "domain": "PLATFORM",
+      "required": true,
+      "state": "IMPLEMENTED"
+    },
+    {
+      "id": "CAP-PWA",
+      "domain": "DISTRIBUTION",
+      "required": true,
+      "state": "IMPLEMENTED"
+    },
+    {
+      "id": "CAP-ANDROID",
+      "domain": "DISTRIBUTION",
+      "required": true,
+      "state": "INTERNAL_TEST"
+    },
+    {
+      "id": "CAP-IOS",
+      "domain": "DISTRIBUTION",
+      "required": true,
+      "state": "ROADMAP"
+    }
+  ],
+  "known_noncompliance": [
+    {
+      "id": "GAP-UI-001",
+      "severity": "CRITICAL",
+      "statement": "Il frontend attuale usa ancora una Home lunga con grandi aree aperte come modali; il target richiede vere screen/route applicative.",
+      "required_fix": "Implementare AppShell e router reale per le sei core experiences."
+    },
+    {
+      "id": "GAP-UI-002",
+      "severity": "CRITICAL",
+      "statement": "Il desktop attuale è limitato a una shell max 430px; il target richiede layout desktop responsive della stessa app.",
+      "required_fix": "Rimuovere il vincolo globale 430px su desktop e creare breakpoint desktop coerenti col master."
+    },
+    {
+      "id": "GAP-DATA-001",
+      "severity": "HIGH",
+      "statement": "Drive e Gmail non sono ancora pienamente indicizzati come Data Fabric/catalogo continuo.",
+      "required_fix": "Implementare Drive Catalog + Gmail Ingestion con entity linking, dedup, trust e review."
+    },
+    {
+      "id": "GAP-EVENT-001",
+      "severity": "HIGH",
+      "statement": "Il modello unico evento multi-proiezione non è ancora il contratto runtime completo.",
+      "required_fix": "Normalizzare calendario societario in EVENT_ID unico con viste per scope."
+    },
+    {
+      "id": "GAP-COMMS-001",
+      "severity": "HIGH",
+      "statement": "Confidence/AnConfidence e chat bidirezionale non sono live e non devono essere dichiarate tali.",
+      "required_fix": "Completare bridge, storage, autorizzazione, minor safety, report/block/moderation e QA."
+    }
+  ],
+  "development_contract": {
+    "mandatory_before_code_change": [
+      "READ_SCD_SYSTEM_MANIFEST",
+      "IDENTIFY_AFFECTED_CAPABILITIES",
+      "IDENTIFY_DATA_SOURCES",
+      "IDENTIFY_ROLES_AND_SCOPES",
+      "IDENTIFY_VISUAL_MASTER",
+      "DECLARE_MANIFEST_IMPACT"
+    ],
+    "mandatory_for_new_feature": [
+      "CAPABILITY_ID",
+      "PUBLIC_OR_PRIVATE",
+      "AUDIENCE",
+      "SOURCE_OF_TRUTH",
+      "PERMISSIONS",
+      "FALLBACK",
+      "EVENTS_OR_TRACKING",
+      "COST",
+      "TESTS",
+      "ROLLBACK"
+    ],
+    "prohibited": [
+      "NEW_PARALLEL_GESTIONALE_WITHOUT_APPROVAL",
+      "NEW_UNREGISTERED_DATA_SOURCE",
+      "NEW_ROLE_SELF_ASSIGNMENT",
+      "FAKE_SPORT_DATA",
+      "UNSCOPED_PRIVATE_DATA",
+      "SAFEGUARDING_IN_ORDINARY_PIPELINES",
+      "GENERIC_VISUAL_REDESIGN_IGNORING_MASTER",
+      "PRODUCTION_SELF_MODIFICATION",
+      "SECRETS_IN_REPOSITORY"
+    ]
+  }
+}
