@@ -1,4 +1,4 @@
-const APP_VERSION='21.11.0';
+const APP_VERSION='21.12.0';
 const DYNAMIC_ORIGIN=(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)||location.hostname.endsWith('.onrender.com'))
   ? location.origin
   : 'https://scd-colicoderviese-official-r21.onrender.com';
@@ -455,11 +455,11 @@ function openManagementHome(data){
     dir?'<button class="mgmt-tile direction" id="mgmtEvolution"><span>↗</span><b>Evolution Queue</b><small>Miglioramenti e priorità</small></button>':'',
     dir?'<button class="mgmt-tile direction" id="mgmtDiagnostics"><span>⌁</span><b>Diagnostica</b><small>Stato tecnico</small></button>':''
   ].filter(Boolean).join('');
-  modal('<div class="mgmt-head"><div><span class="eyebrow">AREA RISERVATA</span><h2>'+esc(managementName(d))+'</h2><p>'+esc(managementRole(d))+(u.area?' · '+esc(u.area):'')+'</p></div><img src="./assets/logo-scd.png" alt="SCD"></div><div class="mgmt-kpis">'+mgmtKpi('Profili',personal.length)+mgmtKpi('Convocazioni',(d.convocations||[]).length)+mgmtKpi('Richieste',(d.direction&&d.direction.requests||[]).length)+mgmtKpi('Pulmini',transport.requests||0)+'</div><div class="mgmt-grid">'+cards+'</div>'+managementDetailHtml(d)+'<div class="modal-actions"><button class="outline" id="mgmtSync">SINCRONIZZA</button><button class="outline danger-soft" id="mgmtLogout">ESCI</button></div>');
+  const dashLabel=dir?'AREA STAFF / DIREZIONE':staff?'AREA STAFF':'AREA RISERVATA';const dashTitle=dir?'Direzione ColicoDerviese':staff?'Staff ColicoDerviese':managementName(d);modal('<div class="mgmt-head"><div><span class="eyebrow">'+dashLabel+'</span><h2>'+esc(dashTitle)+'</h2><p>'+esc(managementName(d))+' · '+esc(managementRole(d))+(u.area?' · '+esc(u.area):'')+'</p></div><img src="./assets/logo-scd.png" alt="SCD"></div><div class="mgmt-kpis">'+mgmtKpi('Profili',personal.length)+mgmtKpi('Convocazioni',(d.convocations||[]).length)+mgmtKpi('Richieste',(d.direction&&d.direction.requests||[]).length)+mgmtKpi('Pulmini',transport.requests||0)+'</div><div class="mgmt-grid">'+cards+'</div>'+managementDetailHtml(d)+'<div class="modal-actions"><button class="outline" id="mgmtSync">SINCRONIZZA</button><button class="outline danger-soft" id="mgmtLogout">ESCI</button></div>');
   $('#mgmtRequests').onclick=openMyRequests;
   $('#mgmtNewRequest').onclick=openInternalRequestManager;
   $('#mgmtPin').onclick=openPinManager;
-  $('#mgmtProfiles')&&($('#mgmtProfiles').onclick=()=>openPersonalProfiles(d));
+  $('#mgmtProfiles')&&($('#mgmtProfiles').onclick=()=>openAthleteFamilyView(d,0));
   $('#mgmtAttendance')&&($('#mgmtAttendance').onclick=openAttendanceManager);
   $('#mgmtConvocations')&&($('#mgmtConvocations').onclick=openConvocationManager);
   $('#mgmtMessages')&&($('#mgmtMessages').onclick=openMessageManager);
@@ -471,6 +471,32 @@ function openManagementHome(data){
   $$('[data-auth-decision]').forEach(b=>b.onclick=async()=>{try{const action=b.dataset.authDecision==='approve'?'direction.player.approve':'direction.player.reject';await mgmtApi(action,{authId:b.dataset.authId});toast(b.dataset.authDecision==='approve'?'Autorizzazione approvata':'Autorizzazione respinta');state.privateData=await mgmtApi('dashboard.summary');openManagementHome(state.privateData)}catch(e){toast(e.message||'Operazione non riuscita')}});
   $('#mgmtSync').onclick=async()=>{try{state.privateData=await mgmtApi('dashboard.summary');toast('Area aggiornata');openManagementHome(state.privateData)}catch(e){toast(e.message||'Sincronizzazione non riuscita')}};
   $('#mgmtLogout').onclick=()=>{clearSession();closeModal();toast('Sessione chiusa')};
+}
+function openAthleteFamilyView(d=state.privateData||{},index=0){
+  const rows=d.personal||[];if(!rows.length)return toast('Nessun profilo atleta collegato');
+  const p=rows[Math.max(0,Math.min(index,rows.length-1))]||rows[0],u=d.user||{};
+  const fullName=[p.firstName,p.lastName].filter(Boolean).join(' ')||p.fullName||'Atleta SCD';
+  const key=String(p.code||p.playerCode||p.personId||p.id||'');
+  const conv=(d.convocations||[]).filter(x=>!key||String(x.playerCode||x.personId||x.playerId||'')===key||String(x.player||'').toLowerCase().includes(fullName.toLowerCase())).slice(0,4);
+  const next=conv[0]||null;
+  const payment=displayValue(p.paymentStatus||p.payment||p.feeStatus||'','Dato in aggiornamento');
+  const cert=displayValue(p.certificateStatus||p.certificateExpiry||'','Dato in aggiornamento');
+  const figc=displayValue(p.figcStatus||p.recordStatus||'','Dato in aggiornamento');
+  const identity=displayValue(p.identityStatus||p.idDocumentStatus||'','Dato in aggiornamento');
+  const initials=esc(((p.firstName||fullName||'?')[0]+(p.lastName||'')[0]).toUpperCase());
+  const avatar=p.photoUrl?'<img src="'+esc(p.photoUrl)+'" alt="">':'<span>'+initials+'</span>';
+  const selector=rows.map((x,i)=>{const name=[x.firstName,x.lastName].filter(Boolean).join(' ')||x.fullName||('Atleta '+(i+1));const ini=esc(((x.firstName||name||'?')[0]+(x.lastName||'')[0]).toUpperCase());return '<button class="family-profile '+(i===index?'active':'')+'" data-family-index="'+i+'"><span class="family-avatar">'+(x.photoUrl?'<img src="'+esc(x.photoUrl)+'" alt="">':ini)+'</span><b>'+esc(name.split(' ')[0])+'</b><small>'+esc(x.teamName||x.group||'')+'</small></button>'}).join('');
+  modal('<section class="reserved-app-screen"><header class="reserved-app-head"><div class="reserved-app-brand"><img src="./assets/logo-scd.png" alt="SCD"><div><b>Area Riservata</b><p>'+esc(fullName)+(p.teamName?' · '+esc(p.teamName):'')+'</p></div></div></header><div class="reserved-tabs role-tabs"><button class="'+(rows.length===1?'active':'')+'" data-role-view="athlete">Atleta</button><button class="'+(rows.length>1?'active':'')+'" data-role-view="family">Famiglia</button>'+(u.staff?'<button data-role-view="staff">Staff</button>':'<button disabled>Staff</button>')+'</div>'+(rows.length>1?'<section class="family-profiles"><div class="family-title"><h3>I profili collegati</h3><small>'+rows.length+' profili</small></div><div class="family-profile-strip">'+selector+'</div></section>':'')+'<article class="athlete-hero"><div class="athlete-avatar">'+avatar+'</div><div class="athlete-copy"><small>PROFILO ATLETA</small><h3>'+esc(fullName)+'</h3><p>'+esc(p.teamName||p.group||'Squadra in aggiornamento')+'</p><span class="status-pill '+(/tesserat|attiv|valido/i.test(figc)?'ok':'')+'">'+esc(figc)+'</span></div><div class="athlete-number">'+esc(p.number||p.shirtNumber||'')+'</div></article><div class="reserved-action-grid"><button id="reservedConv"><span>▣</span><b>Convocazioni</b><small>'+conv.length+' disponibili</small></button><button id="reservedPayments"><span>▰</span><b>Pagamenti</b><small>'+esc(payment)+'</small></button><button id="reservedDocs"><span>▤</span><b>Documenti</b><small>Stato personale</small></button><button id="reservedMessages"><span>✉</span><b>Messaggi</b><small>Comunicazioni</small></button><button id="reservedTransport"><span>▰</span><b>Pulmino</b><small>Trasporti</small></button><button id="reservedProfile"><span>●</span><b>Il mio profilo</b><small>Dati collegati</small></button></div>'+(next?'<section class="reserved-block"><div class="reserved-block-head"><h3>Prossima convocazione</h3><small>'+esc(next.response||'DA CONFERMARE')+'</small></div><article class="reserved-next"><time><b>'+esc(fmtDate(next.date||''))+'</b><small>'+esc(next.meetingTime||'')+'</small></time><div><b>'+esc(next.team||next.teamName||'Convocazione SCD')+'</b><small>'+esc(next.meetingPlace||'Luogo in aggiornamento')+'</small></div><span>›</span></article></section>':'')+'<section class="reserved-block"><div class="reserved-block-head"><h3>I miei documenti</h3><small>Stato R20</small></div><div class="reserved-docs"><article><span>▤</span><div><b>Certificato medico</b><small>'+esc(cert)+'</small></div></article><article><span>▣</span><div><b>Tesseramento FIGC</b><small>'+esc(figc)+'</small></div></article><article><span>▰</span><div><b>Documento identità</b><small>'+esc(identity)+'</small></div></article></div></section><a class="reserved-shop" href="https://colicoderviese.webnova.it/shop" target="_blank" rel="noopener"><div><small>CLUB SHOP</small><b>Kit ufficiale e abbigliamento</b></div><span>VAI ALLO SHOP →</span></a><div class="modal-actions"><button class="outline" id="reservedBack">DASHBOARD</button></div></section>');
+  document.querySelectorAll('[data-family-index]').forEach(b=>b.onclick=()=>openAthleteFamilyView(d,Number(b.dataset.familyIndex||0)));
+  document.querySelectorAll('[data-role-view]').forEach(b=>b.onclick=()=>{if(b.dataset.roleView==='staff'&&u.staff)openManagementHome(d);else if(b.dataset.roleView==='athlete'&&rows.length)openAthleteFamilyView(d,0);else if(b.dataset.roleView==='family')openAthleteFamilyView(d,index)});
+  const back=$('#reservedBack'),convBtn=$('#reservedConv'),payBtn=$('#reservedPayments'),docsBtn=$('#reservedDocs'),msgBtn=$('#reservedMessages'),transportBtn=$('#reservedTransport'),profileBtn=$('#reservedProfile');
+  if(back)back.onclick=()=>openManagementHome(d);
+  if(convBtn)convBtn.onclick=()=>next?openCalendarEvent(next.id||next.convocationId||''):toast('Convocazioni in aggiornamento');
+  if(payBtn)payBtn.onclick=()=>toast('Stato pagamenti: '+payment);
+  if(docsBtn)docsBtn.onclick=()=>toast('Documenti sincronizzati dal gestionale SCD');
+  if(msgBtn)msgBtn.onclick=u.staff?openMessageManager:openCommunicationsHub;
+  if(transportBtn)transportBtn.onclick=openTransportManager;
+  if(profileBtn)profileBtn.onclick=()=>openPersonalProfiles(d);
 }
 function openPersonalProfiles(d=state.privateData||{}){
   const rows=d.personal||[];
@@ -854,7 +880,7 @@ function boot(){
   window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();state.installPrompt=e;if(installBtn)installBtn.hidden=false});
   if(installBtn)installBtn.onclick=async()=>{if(!state.installPrompt)return toast('Dal menu del browser scegli “Installa app” o “Aggiungi alla schermata Home”.');state.installPrompt.prompt();await state.installPrompt.userChoice;state.installPrompt=null;installBtn.hidden=true;track('pwa_install',{section:'install'})};
   if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('./sw.js?v=21.11.0',{updateViaCache:'none'})
+  navigator.serviceWorker.register('./sw.js?v=21.12.0',{updateViaCache:'none'})
     .then(reg=>reg.update())
     .catch(()=>{});
 }bindDynamic();syncClubClock();checkServiceHealth();loadPublicCalendar(true);restoreManagementSession();track('page_view',{section:(location.hash||'#home').replace('#','')});window.addEventListener('hashchange',()=>{const section=(location.hash||'#home').replace('#','');track('page_view',{section});setActiveNav(section==='eventi'?'events':section==='home'?'home':'')});loadSummary(true);setInterval(()=>{if(!document.hidden)loadSummary(true)},60000);setInterval(flushListening,120000);setInterval(checkDueReminders,60000);setTimeout(checkDueReminders,4000);setInterval(()=>{if(!document.hidden)syncClubClock()},300000);setInterval(()=>{if(!document.hidden)loadPublicCalendar(true)},300000);
