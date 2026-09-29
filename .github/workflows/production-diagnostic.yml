@@ -1,0 +1,45 @@
+name: SCD Production Diagnostic
+
+on:
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Probe production endpoints
+        run: |
+          node <<'NODE'
+          const base='https://scd-colicoderviese-official-r21.onrender.com';
+          async function text(url,options={}){
+            const r=await fetch(url,{redirect:'follow',cache:'no-store',...options});
+            const body=await r.text();
+            return {status:r.status,body};
+          }
+          const health=await text(base+'/health?diag='+Date.now());
+          const caps=await text(base+'/api/capabilities?diag='+Date.now());
+          const contract=await text(base+'/api/scd',{
+            method:'POST',
+            headers:{'content-type':'application/json','x-scd-client':'production-diagnostic'},
+            body:JSON.stringify({action:'public.datafabric.contract',payload:{},sessionToken:''})
+          });
+          const safe=(label,x)=>{
+            let parsed=null;
+            try{parsed=JSON.parse(x.body)}catch{}
+            console.log('\n### '+label+' HTTP '+x.status);
+            console.log(JSON.stringify(parsed??{raw:x.body.slice(0,1200)},null,2));
+          };
+          safe('HEALTH',health);
+          safe('CAPABILITIES',caps);
+          safe('R20_CONTRACT',contract);
+          NODE
