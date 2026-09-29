@@ -35,7 +35,7 @@ for(const viewport of viewports){
   await page.waitForSelector('#clubClock');
   await page.waitForFunction(()=>document.querySelector('#clubClock')?.textContent?.length>8);
 
-  await page.locator('[data-action="calendar"]').first().click();
+  await page.locator('.mobile-nav [data-action="calendar"]').click();
   await page.waitForSelector('.calendar-app-screen');
   await page.waitForSelector('.calendar-tabs');
   await page.waitForSelector('#calendarRows');
