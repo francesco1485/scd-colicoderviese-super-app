@@ -18,7 +18,7 @@ const allErrors=[];
 async function goRoute(page,route){
   await page.evaluate(r=>window.R24.go(r),route);
   await page.waitForFunction(r=>location.hash==='#/'+r,route);
-  if(route==='home')await page.waitForSelector('#home:not([hidden])');
+  if(route==='home')await page.waitForSelector('#appRouteView:not([hidden]) .r24-home-hero');
   else await page.waitForSelector('#appRouteView:not([hidden]) .r24-screen-head');
 }
 
@@ -36,8 +36,8 @@ for(const viewport of viewports){
 
   await page.goto(base+'#/home',{waitUntil:'domcontentloaded',timeout:30000});
   await page.waitForSelector('body.r24-router-ready');
-  await page.waitForSelector('#home:not([hidden])');
-  await page.waitForSelector('.home-kpis');
+  await page.waitForSelector('#appRouteView:not([hidden]) .r24-home-hero');
+  await page.waitForSelector('.r24-home-kpis');
   await page.waitForSelector('.mobile-nav [data-nav="calendar"]',{state:'attached'});
   await page.waitForSelector('#clubClock');
   await page.waitForFunction(()=>document.querySelector('#clubClock')?.textContent?.length>8);
