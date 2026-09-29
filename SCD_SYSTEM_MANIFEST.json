@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "1.5.0",
+    "version": "1.6.0",
     "effective_at": "2026-09-29",
     "status": "BINDING",
     "language": "it-IT",
@@ -1339,6 +1339,27 @@
         "off_behavior": "HIDE_DIRECTION_DETAIL_KEEP_GENERIC_HEALTH",
         "rollback": "SET_ENV_FALSE"
       }
+    },
+    "upstream_resilience": {
+      "release": "R30",
+      "retry_mode": "READ_ONLY_ONLY",
+      "max_attempts": 2,
+      "delay_ms": 450,
+      "retry_on": [
+        "NETWORK_ERROR",
+        "INVALID_JSON_OR_TRANSIENT_HTML"
+      ],
+      "never_retry": [
+        "PUBLIC_REGISTRATION_WRITE",
+        "PARTNER_LEAD_WRITE",
+        "COMMUNITY_WRITE",
+        "TICKET_WRITE",
+        "AUTH_REQUEST",
+        "PRIVATE_WRITE",
+        "DIRECTION_WRITE",
+        "DATA_FABRIC_SCAN"
+      ],
+      "rationale": "Cold start or transient Google responses may be non-JSON. Retrying mutations could duplicate writes, so retries are restricted to explicitly read-only actions."
     }
   },
   "delivery_and_quality": {
@@ -1357,7 +1378,8 @@
       "PROVENANCE_CONTRACT",
       "FEATURE_FLAG_ROLLOUT",
       "OBSERVABILITY_STATUS",
-      "PRODUCTION_EVIDENCE"
+      "PRODUCTION_EVIDENCE",
+      "READ_ONLY_UPSTREAM_RETRY"
     ],
     "merge_rule": "Non considerare completata una funzione se è verde solo tecnicamente ma viola il manifest o il master visivo.",
     "release_truth": {
@@ -1570,6 +1592,13 @@
       "required": true,
       "state": "PARTIAL",
       "contract": "PAGES_RENDER_R20_END_TO_END_PROOF"
+    },
+    {
+      "id": "CAP-UPSTREAM-RESILIENCE",
+      "domain": "DELIVERY",
+      "required": true,
+      "state": "IMPLEMENTED",
+      "contract": "RETRY_TRANSIENT_UPSTREAM_FAILURES_FOR_READ_ONLY_ACTIONS_ONLY"
     }
   ],
   "known_noncompliance": [
@@ -1715,7 +1744,9 @@
         "RENDER_29_VERIFIED",
         "R20_CONTRACT_R29_VERIFIED",
         "DATA_FABRIC_PRIVATE_STATUS_VERIFIED_BY_DIRECTION"
-      ]
+      ],
+      "bridge_release": "R30",
+      "bridge_rule": "READ_ONLY_RETRY_NO_MUTATION_RETRY"
     }
   },
   "product_direction": {
