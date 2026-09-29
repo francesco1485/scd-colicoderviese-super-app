@@ -20,7 +20,7 @@ const viewMeta={
  recovery:['Clienti · Recovery','Campagna operativa sul patrimonio esistente']
 }
 
-let ecosystem=[],projects=[],actions=[],marketHubs=[],marketEntities=[],contacts=[],timeline=[],documents=[],blueprints=[],subjects=[],initiatives=[],products=[],comparisons=[],collaborators=[],collaboratorTerms=[],mailTemplates=[],mailDrafts=[],cepaExpansion=[],recoveryRows=[],members=[]
+let ecosystem=[],projects=[],actions=[],marketHubs=[],marketEntities=[],contacts=[],timeline=[],documents=[],blueprints=[],subjects=[],initiatives=[],products=[],productKnowledge=[],comparisons=[],collaborators=[],collaboratorTerms=[],portfolioSnapshots=[],mailTemplates=[],mailDrafts=[],cepaExpansion=[],cepaReadiness=[],recoveryRows=[],members=[]
 let currentPartnerId=null
 
 function msg(text,error=false){$('loginMsg').textContent=text;$('loginMsg').className='message'+(error?' error':'')}
@@ -118,17 +118,20 @@ async function loadAll(){
     supabase.from('cepa_subjects').select('*').eq('organization_id',window.orgId).order('maturity',{ascending:false}),
     supabase.from('cepa_initiatives').select('*,cepa_subjects(id,title),ecosystem_nodes(id,name,code)').eq('organization_id',window.orgId).order('created_at',{ascending:false}),
     supabase.from('agency_products').select('*,ecosystem_nodes(id,name,code)').eq('organization_id',window.orgId).eq('active',true).order('category').order('name'),
+    supabase.from('product_knowledge_items').select('*').eq('organization_id',window.orgId).order('sort_order'),
     supabase.from('product_comparisons').select('*,agency_products(id,name,comparison_group)').eq('organization_id',window.orgId).order('created_at',{ascending:false}),
     supabase.from('agency_collaborators').select('*').eq('organization_id',window.orgId).eq('active',true).order('display_name'),
     supabase.from('collaborator_product_terms').select('*,agency_products(id,name),ecosystem_nodes(id,name,code)').eq('organization_id',window.orgId).order('created_at',{ascending:false}),
+    supabase.from('collaborator_portfolio_snapshots').select('*,agency_collaborators(id,display_name,collaborator_type)').eq('organization_id',window.orgId).order('premium_total',{ascending:false}),
     supabase.from('ai_mail_templates').select('*').eq('organization_id',window.orgId).eq('active',true).order('title'),
     supabase.from('ai_mail_drafts').select('*,ecosystem_nodes(id,name),ai_mail_templates(id,title)').eq('organization_id',window.orgId).order('created_at',{ascending:false}).limit(100),
-    supabase.from('cepa_expansion_stages').select('*').eq('organization_id',window.orgId).order('stage_no')
+    supabase.from('cepa_expansion_stages').select('*').eq('organization_id',window.orgId).order('stage_no'),
+    supabase.from('cepa_readiness_items').select('*').eq('organization_id',window.orgId).order('dimension').order('title')
   ]
   const res=await Promise.all(q)
   const err=res.find(x=>x.error)?.error
   if(err){console.error(err);$('refreshBtn').textContent='!';return}
-  ;[ecosystem,projects,actions,marketHubs,marketEntities,contacts,timeline,documents,blueprints,subjects,initiatives,products,comparisons,collaborators,collaboratorTerms,mailTemplates,mailDrafts,cepaExpansion]=res.map(x=>x.data||[])
+  ;[ecosystem,projects,actions,marketHubs,marketEntities,contacts,timeline,documents,blueprints,subjects,initiatives,products,productKnowledge,comparisons,collaborators,collaboratorTerms,portfolioSnapshots,mailTemplates,mailDrafts,cepaExpansion,cepaReadiness]=res.map(x=>x.data||[])
   renderEverything()
   $('refreshBtn').textContent='↻'
 }
@@ -188,6 +191,9 @@ function renderCepa(){
   document.querySelectorAll('[data-subject]').forEach(b=>b.onclick=()=>openSubject(b.dataset.subject))
   $('cepaInitiativeList').innerHTML=initiatives.map(i=>listRow(i.title,(i.cepa_subjects?.title||'Materia da definire')+(i.territory?' · '+i.territory:''),[i.status,i.initiative_type])).join('')||empty('Nessuna iniziativa ancora registrata')
   $('cepaRoadmap').innerHTML=cepaExpansion.map(s=>'<article class="roadmap-step '+(s.status==='current'?'current':'')+'"><span class="step-no">'+esc(s.stage_no)+'</span><h4>'+esc(s.title)+'</h4><p><strong>'+esc(s.territory)+'</strong></p><p>'+esc(s.objective||'')+'</p><div class="tags"><span class="tag">'+esc(s.status)+'</span></div></article>').join('')||empty('Roadmap nazionale da costruire')
+  const ready=cepaReadiness.filter(x=>['ready','verified'].includes(x.status)).length
+  $('cepaReadinessSummary').textContent=ready+'/'+cepaReadiness.length+' elementi pronti/verificati'
+  $('cepaReadinessGrid').innerHTML=cepaReadiness.map(x=>'<article class="readiness-card"><div class="readiness-top"><div class="eyebrow">'+esc(x.dimension)+'</div><span class="readiness-status '+esc(x.status)+'">'+esc(x.status.replaceAll('_',' '))+'</span></div><h4>'+esc(x.title)+'</h4><p>'+esc(x.description||'')+'</p><p><strong>Livello:</strong> '+esc(x.requirement_level.replaceAll('_',' '))+'</p>'+(x.evidence?'<p><strong>Evidenza:</strong> '+esc(x.evidence)+'</p>':'')+'</article>').join('')||empty('Readiness nazionale da definire')
 }
 
 function renderTerritories(){
@@ -221,9 +227,10 @@ function openProduct(id){
   const p=products.find(x=>x.id===id);if(!p)return
   const provider=p.ecosystem_nodes?.name||'Maglia'
   const pc=comparisons.filter(c=>c.product_id===id)
+  const knowledge=productKnowledge.filter(k=>k.product_id===id)
   const strengths=(p.strengths||[])
   const weaknesses=(p.weaknesses||[])
-  $('modalContent').innerHTML='<div class="eyebrow">SCHEDA PRODOTTO</div><h2>'+esc(p.name)+'</h2><p class="muted">'+esc(provider)+' · '+esc(p.category)+' · '+esc(p.maturity_status)+'</p><div class="product-route"><div>Target</div><div>Bisogno</div><div>Analisi</div><div>'+esc(provider)+'</div><div>Follow-up</div></div><div class="prose-box"><p><strong>Sintesi</strong><br>'+esc(p.summary||'Da completare')+'</p><p><strong>Target</strong><br>'+esc((p.audience||[]).join(', ')||'Da definire')+'</p><p><strong>Processo</strong><br>'+esc(p.process_notes||'Da ricostruire sul processo reale di agenzia.')+'</p><p><strong>Note / esclusioni</strong><br>'+esc(p.exclusions_notes||'Da verificare sui documenti ufficiali.')+'</p></div><div class="strength-weak-grid"><div class="sw-box strength"><h4>Punti di forza</h4>'+(strengths.length?'<ul>'+strengths.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'<p class="muted">Da compilare dopo verifica documentale.</p>')+'</div><div class="sw-box weak"><h4>Punti deboli / limiti</h4>'+(weaknesses.length?'<ul>'+weaknesses.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'<p class="muted">Da compilare dopo verifica documentale.</p>')+'</div></div><div class="modal-section"><h4>Confronti</h4>'+(pc.length?pc.map(c=>'<p class="muted"><strong>'+esc(c.benchmark_name)+'</strong><br>'+esc(c.comparison_scope||'')+' · '+esc(c.status)+(c.source_date?' · '+esc(fmtDate(c.source_date)):'')+'</p>').join(''):'<p class="muted">Nessun confronto verificato ancora. La struttura è pronta per fonti, data, metriche e note.</p>')+'</div>'
+  $('modalContent').innerHTML='<div class="eyebrow">SCHEDA PRODOTTO</div><h2>'+esc(p.name)+'</h2><p class="muted">'+esc(provider)+' · '+esc(p.category)+' · '+esc(p.maturity_status)+'</p><div class="product-route"><div>Target</div><div>Bisogno</div><div>Analisi</div><div>'+esc(provider)+'</div><div>Follow-up</div></div><div class="prose-box"><p><strong>Sintesi</strong><br>'+esc(p.summary||'Da completare')+'</p><p><strong>Target</strong><br>'+esc((p.audience||[]).join(', ')||'Da definire')+'</p><p><strong>Processo</strong><br>'+esc(p.process_notes||'Da ricostruire sul processo reale di agenzia.')+'</p><p><strong>Note / esclusioni</strong><br>'+esc(p.exclusions_notes||'Da verificare sui documenti ufficiali.')+'</p></div><div class="strength-weak-grid"><div class="sw-box strength"><h4>Punti di forza</h4>'+(strengths.length?'<ul>'+strengths.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'<p class="muted">Da compilare dopo verifica documentale.</p>')+'</div><div class="sw-box weak"><h4>Punti deboli / limiti</h4>'+(weaknesses.length?'<ul>'+weaknesses.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'<p class="muted">Da compilare dopo verifica documentale.</p>')+'</div></div><div class="modal-section"><h4>Checklist di conoscenza</h4><div class="knowledge-list">'+(knowledge.length?knowledge.map(k=>'<div class="knowledge-item"><strong>'+esc(k.title)+'</strong><small>'+esc(k.content||'')+'</small><span class="tag">'+esc(k.verification_status)+'</span></div>').join(''):'<p class="muted">Checklist non ancora impostata.</p>')+'</div></div><div class="modal-section"><h4>Confronti</h4>'+(pc.length?pc.map(c=>'<p class="muted"><strong>'+esc(c.benchmark_name)+'</strong><br>'+esc(c.comparison_scope||'')+' · '+esc(c.status)+(c.source_date?' · '+esc(fmtDate(c.source_date)):'')+'</p>').join(''):'<p class="muted">Nessun confronto verificato ancora. La struttura è pronta per fonti, data, metriche e note.</p>')+'</div>'
   $('modal').classList.remove('hidden')
 }
 
@@ -237,6 +244,13 @@ function renderCollaborators(){
     return '<div class="collab-row"><div><strong>'+esc(c.display_name)+'</strong><small>'+esc(c.role_description||c.collaborator_type)+'</small></div><div><strong>'+esc(c.area||'Da definire')+'</strong><small>'+esc(c.territory||'Territorio da verificare')+'</small></div><div><span class="money-status">'+esc(c.earning_model||'da verificare')+'</span><small>'+esc(c.earning_notes||'')+'</small></div><div><strong>'+terms.length+' condizioni collegate</strong><small>'+terms.filter(t=>t.verification_status!=='verified').length+' da verificare</small></div><button class="small-btn" data-collaborator="'+c.id+'">Apri</button></div>'
   }).join('')||empty('Nessun collaboratore censito')
   document.querySelectorAll('[data-collaborator]').forEach(b=>b.onclick=()=>openCollaborator(b.dataset.collaborator))
+  $('portfolioSnapshotGrid').innerHTML=portfolioSnapshots.map(s=>{
+    const c=s.agency_collaborators||{}
+    const ratio=s.clients_count?Number(s.policies_count/s.clients_count).toFixed(2):'—'
+    const avg=s.clients_count&&s.premium_total!=null?Math.round(Number(s.premium_total)/s.clients_count):null
+    const mix=Object.entries(s.portfolio_mix||{}).slice(0,7)
+    return '<article class="portfolio-card '+(c.collaborator_type==='agency_central'?'central':'')+'"><div class="eyebrow">'+esc(c.collaborator_type==='agency_central'?'AGENZIA CENTRALE':'PRODUTTORE')+'</div><h4>'+esc(c.display_name||'Rete')+'</h4><div class="portfolio-metrics"><div><strong>'+esc(s.clients_count)+'</strong><span>clienti</span></div><div><strong>'+esc(s.policies_count)+'</strong><span>polizze</span></div><div><strong>'+esc(ratio)+'</strong><span>polizze/cliente</span></div></div><p>Premi analizzati: <strong>€ '+Number(s.premium_total||0).toLocaleString('it-IT',{maximumFractionDigits:0})+'</strong>'+(avg!=null?' · medio cliente € '+avg.toLocaleString('it-IT'):'')+'</p><p>Modello: '+esc(s.commercial_model||'da definire')+'</p><div class="portfolio-mix">'+mix.map(([k,v])=>'<span>'+esc(k)+': '+esc(typeof v==='object'?JSON.stringify(v):v)+'</span>').join('')+'</div></article>'
+  }).join('')||empty('Snapshot rete non disponibile')
 }
 
 function openCollaborator(id){
@@ -328,11 +342,14 @@ function askAssistant(q){
   }else if(s.includes('prodot')||s.includes('confront')){
     const pending=products.filter(p=>p.maturity_status==='to_verify').length
     reply='Ho '+products.length+' schede prodotto/area censite; '+pending+' sono ancora da verificare. I confronti verificati sono '+comparisons.filter(c=>c.status==='verified').length+'. Posso portarti nella sezione Prodotti o Confronti.'
-  }else if(s.includes('collabor')||s.includes('guadagn')||s.includes('provvig')){
-    reply='Sono censiti '+collaborators.length+' collaboratori e '+collaboratorTerms.length+' condizioni economiche per prodotto/rapporto. '+collaboratorTerms.filter(t=>t.verification_status!=='verified').length+' condizioni sono ancora da verificare: non inserisco percentuali senza evidenza.'
+  }else if(s.includes('collabor')||s.includes('guadagn')||s.includes('provvig')||s.includes('rete produtt')){
+    const totalClients=portfolioSnapshots.reduce((n,x)=>n+Number(x.clients_count||0),0)
+    const totalPolicies=portfolioSnapshots.reduce((n,x)=>n+Number(x.policies_count||0),0)
+    reply='Sono censiti '+collaborators.length+' nodi della rete e '+portfolioSnapshots.length+' snapshot di portafoglio, per '+totalClients+' clienti e '+totalPolicies+' polizze analizzate. Le condizioni economiche prodotto-specifiche verificate sono '+collaboratorTerms.filter(t=>t.verification_status==='verified').length+': le provvigioni mancanti restano da ricostruire dall’estratto conto produttore.'
   }else if(s.includes('cepa')||s.includes('nazional')){
     const current=cepaExpansion.find(x=>x.status==='current')
-    reply='CEPA ha '+subjects.length+' materie censite. La fase corrente della roadmap è '+(current?current.title+' su '+current.territory:'da definire')+'. La roadmap contiene '+cepaExpansion.length+' fasi fino allo scenario nazionale, mantenute come piano evolutivo e non come risultati già acquisiti.'
+    const ready=cepaReadiness.filter(x=>['ready','verified'].includes(x.status)).length
+    reply='CEPA ha '+subjects.length+' materie censite. La fase corrente è '+(current?current.title+' su '+current.territory:'da definire')+'. Per la readiness di scala risultano '+ready+' elementi pronti/verificati su '+cepaReadiness.length+'. La roadmap futura resta un piano, non un risultato già acquisito.'
   }else if(s.includes('email')||s.includes('mail')){
     reply='Posso preparare e salvare una bozza personalizzata usando i modelli Maglia/CEPA. Ti porto in AI Mail & Chat. L’invio diretto resta separato finché non colleghiamo un canale email autorizzato.'
     navigate('aiMail')
