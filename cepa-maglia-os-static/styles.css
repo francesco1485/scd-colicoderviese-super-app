@@ -127,3 +127,14 @@
 .knowledge-item .tag{margin-top:5px}
 @media(max-width:900px){.portfolio-grid{grid-template-columns:1fr 1fr}.readiness-grid{grid-template-columns:1fr}}
 @media(max-width:560px){.portfolio-grid{grid-template-columns:1fr}.portfolio-metrics{grid-template-columns:1fr 1fr 1fr}}
+
+.requirements-list{padding:10px 16px 16px;display:grid;gap:8px}
+.requirement-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start;border:1px solid #e1e5df;border-radius:11px;padding:10px;background:#fafbf8}
+.requirement-row strong{display:block;color:var(--navy);font-size:10px}
+.requirement-row small{display:block;color:var(--muted);font-size:8px;line-height:1.4;margin-top:3px}
+.req-status{font-size:8px;font-weight:900;text-transform:uppercase;padding:4px 7px;border-radius:999px;background:#f7ece6;color:#80523b}
+.req-status.verified{background:var(--green-soft);color:#45623a}
+.req-status.received{background:var(--blue-soft);color:#3d6177}
+.req-status.requested{background:var(--gold-soft);color:#775f34}
+.req-status.not_applicable{background:#eef0ef;color:#5f6963}
+.compact-docs{padding:12px}
