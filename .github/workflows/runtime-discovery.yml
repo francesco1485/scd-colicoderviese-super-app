@@ -1,0 +1,29 @@
+name: SCD Runtime Discovery
+
+on:
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Discover Render runtime targets
+        run: node scripts/discover-runtime.mjs
+      - name: Upload discovery evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scd-runtime-discovery
+          path: test-output/render-discovery.json
+          if-no-files-found: error
+          retention-days: 7
