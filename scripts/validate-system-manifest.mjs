@@ -151,6 +151,8 @@ assert(m.architecture.r22_role==='ORCHESTRATION_COMMAND_EVENT_PLUGIN_LAYER_NOT_S
 assert(m.architecture.extensibility.data_ui_separation===true,'data/UI separation required');
 assert(m.architecture.feature_flags?.data_fabric_observability?.id==='FF-DATAFABRIC-OBSERVABILITY','Data Fabric observability feature flag missing');
 assert(m.architecture.feature_flags?.data_fabric_observability?.runtime_env==='SCD_FEATURE_DATA_FABRIC_OBSERVABILITY','Data Fabric feature flag env mismatch');
+assert(m.architecture.upstream_resilience?.retry_mode==='READ_ONLY_ONLY','upstream retries must remain read-only only');
+assert(m.architecture.upstream_resilience?.max_attempts===2,'upstream read-only retry attempts mismatch');
 includesAll(m.data_architecture?.provenance_contract?.ui_question_fields||[],['SOURCE','TABLE','FIELD','API','FALLBACK','REFRESH'],'provenance contract');
 assert(m.north_star.r20_must_not_be_replaced_without_verified_migration===true,'R20 migration guardrail missing');
 
@@ -178,7 +180,7 @@ for(const cap of caps){
   assert(['IMPLEMENTED','INTERNAL_TEST','PARTIAL','REBUILD_REQUIRED','PLANNED','DESIGN_ONLY','ROADMAP'].includes(cap.state),'invalid capability state '+cap.id);
 }
 includesAll(caps.map(x=>x.id),[
-  'CAP-HOME','CAP-CALENDAR','CAP-ATHLETE','CAP-FAMILY','CAP-STAFF','CAP-COMMS','CAP-RUNTIME-EVIDENCE',
+  'CAP-HOME','CAP-CALENDAR','CAP-ATHLETE','CAP-FAMILY','CAP-STAFF','CAP-COMMS','CAP-RUNTIME-EVIDENCE','CAP-UPSTREAM-RESILIENCE',
   'CAP-DRIVE-CATALOG','CAP-GMAIL-INGESTION','CAP-DATAFABRIC-OBSERVABILITY','CAP-ENTITY-GRAPH','CAP-COMPLETENESS',
   'CAP-CHAT','CAP-CONFIDENCE','CAP-ANCONFIDENCE','CAP-SAFEGUARDING','CAP-SKY','CAP-AVATAR',
   'CAP-TAMAGOTCHI','CAP-GEO','CAP-R22','CAP-PWA','CAP-ANDROID','CAP-IOS'
@@ -200,6 +202,8 @@ const requiredRepoFiles=[
   'docs/adr/ADR-0001-scd-state-hard-gate.md',
   'docs/adr/ADR-0002-datafabric-observability.md',
   'docs/adr/ADR-0003-production-evidence.md',
+  'docs/adr/ADR-0004-read-only-upstream-retry.md',
+  'tests/upstream-resilience.mjs',
   'scripts/verify-production.mjs',
   '.github/workflows/production-evidence.yml'
 ];
@@ -214,6 +218,7 @@ for(const legacy of ['PROJECT_CONSTITUTION.md','SCD_PERMANENT_COMMANDS.md','VISU
 
 const pkg=readJson(path.join(root,'package.json'));
 assert(pkg?.scripts?.['test:manifest']==='node scripts/validate-system-manifest.mjs','package.json must expose test:manifest');
+assert(pkg?.scripts?.['test:resilience']==='node tests/upstream-resilience.mjs','package.json must expose test:resilience');
 
 for(const workflow of ['.github/workflows/e2e.yml','.github/workflows/pages.yml','.github/workflows/command-platform.yml','.github/workflows/system-manifest.yml']){
   const file=path.join(root,workflow);
