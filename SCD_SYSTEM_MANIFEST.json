@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "1.7.0",
+    "version": "1.8.0",
     "effective_at": "2026-09-29",
     "status": "BINDING",
     "language": "it-IT",
@@ -1332,12 +1332,20 @@
       "data_fabric_observability": {
         "id": "FF-DATAFABRIC-OBSERVABILITY",
         "runtime_env": "SCD_FEATURE_DATA_FABRIC_OBSERVABILITY",
-        "default_enabled": true,
+        "default_enabled": false,
         "audience": [
           "DIRECTION"
         ],
         "off_behavior": "HIDE_DIRECTION_DETAIL_KEEP_GENERIC_HEALTH",
-        "rollback": "SET_ENV_FALSE"
+        "rollback": "SET_ENV_FALSE_AND_REDEPLOY",
+        "activation_gate": "R20_DIRECT_RUNTIME_PROOF_AND_PRODUCTION_EVIDENCE",
+        "activation_sequence": [
+          "VERIFY_R20_DIRECT",
+          "VERIFY_PRODUCTION_EVIDENCE",
+          "SET_RENDER_ENV_TRUE",
+          "REDEPLOY_RENDER",
+          "VERIFY_CAPABILITIES_TRUE"
+        ]
       }
     },
     "upstream_resilience": {
@@ -1380,7 +1388,8 @@
       "OBSERVABILITY_STATUS",
       "PRODUCTION_EVIDENCE",
       "READ_ONLY_UPSTREAM_RETRY",
-      "R20_DIRECT_RUNTIME_PROOF"
+      "R20_DIRECT_RUNTIME_PROOF",
+      "FAIL_CLOSED_FEATURE_FLAGS"
     ],
     "merge_rule": "Non considerare completata una funzione se è verde solo tecnicamente ma viola il manifest o il master visivo.",
     "release_truth": {
@@ -1747,7 +1756,7 @@
       }
     ],
     "runtime_activation": {
-      "release": "R31",
+      "release": "R32",
       "public_probe_action": "public.datafabric.contract",
       "public_probe_payload": "NON_SENSITIVE_SCHEMA_ONLY",
       "close_issue_when": [
@@ -1764,7 +1773,13 @@
       "canonical_url_must_be_preserved": true,
       "observed_at": "2026-09-29T18:15:23Z",
       "observed_runtime": "2026.09.28-R20.0-PUBLIC-FIRST",
-      "observed_contract_state": "MISSING_PUBLIC_DATAFABRIC_CONTRACT"
+      "observed_contract_state": "MISSING_PUBLIC_DATAFABRIC_CONTRACT",
+      "data_fabric_flag_default": "OFF",
+      "enable_only_after": [
+        "R20_DIRECT_RUNTIME_PROOF",
+        "PRODUCTION_EVIDENCE_PRECONDITIONS"
+      ],
+      "current_runtime_flag": "OFF_UNTIL_R20_CONTRACT_VERIFIED"
     }
   },
   "product_direction": {
