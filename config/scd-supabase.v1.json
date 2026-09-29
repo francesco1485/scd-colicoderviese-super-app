@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0.0",
-  "release": "R33",
+  "release": "R34",
   "purpose": "Fondazione del nuovo Domain Core SCD PULSE su Supabase/PostgreSQL, separato da CEPA Maglia OS e attivato per migrazione progressiva senza interrompere R20.",
   "project": {
-    "state": "PENDING_DEDICATED_PROJECT",
+    "state": "ACTIVE_HEALTHY",
     "dedicated_project_required": true,
     "reuse_cepa_project": false,
     "preferred_region": "eu-central-1",
@@ -16,7 +16,15 @@
       "url": "SCD_SUPABASE_URL",
       "service_role_key": "SCD_SUPABASE_SERVICE_ROLE_KEY"
     },
-    "secret_policy": "SERVER_SECRETS_NEVER_COMMITTED_OR_EXPOSED_TO_CLIENT"
+    "secret_policy": "SERVER_SECRETS_NEVER_COMMITTED_OR_EXPOSED_TO_CLIENT",
+    "project_id": "ndevtxxijbcnskgysdit",
+    "project_url": "https://ndevtxxijbcnskgysdit.supabase.co",
+    "region": "eu-central-1",
+    "cost": {
+      "amount": 0,
+      "recurrence": "monthly",
+      "confirmed": true
+    }
   },
   "target_runtime": {
     "database": "SUPABASE_POSTGRESQL",
@@ -51,7 +59,11 @@
     "event_principle": "ONE_EVENT_ID_MULTIPLE_PROJECTIONS",
     "provenance_required": true,
     "rls_required": true,
-    "server_side_role_assignment": true
+    "server_side_role_assignment": true,
+    "migrations": [
+      "supabase/migrations/20260929_r33_club_graph_foundation.sql",
+      "supabase/migrations/20260929_r34_rls_performance_hardening.sql"
+    ]
   },
   "activation": {
     "feature_flag": "FF-SUPABASE-CORE",
@@ -67,6 +79,18 @@
       "MOBILE_VERTICAL_SLICE_GREEN",
       "ROLLBACK_PROVEN"
     ],
-    "rollback": "SET_SCD_FEATURE_SUPABASE_CORE_FALSE_AND_KEEP_R20_PRIMARY"
+    "rollback": "SET_SCD_FEATURE_SUPABASE_CORE_FALSE_AND_KEEP_R20_PRIMARY",
+    "completed": [
+      "DEDICATED_SUPABASE_PROJECT_CREATED",
+      "MIGRATION_APPLIED",
+      "RLS_SECURITY_ADVISORS_REVIEWED"
+    ],
+    "pending": [
+      "AUTH_ROLE_SCOPE_TESTS_GREEN",
+      "R20_DUAL_READ_COMPARE_GREEN",
+      "WEB_VERTICAL_SLICE_GREEN",
+      "MOBILE_VERTICAL_SLICE_GREEN",
+      "ROLLBACK_PROVEN"
+    ]
   }
 }
