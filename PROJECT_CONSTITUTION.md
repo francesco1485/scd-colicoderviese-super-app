@@ -1,4 +1,4 @@
-# SCD COLICODERVIESE DIGITAL ECOSYSTEM — COSTITUZIONE DI PROGETTO
+> **NON NORMATIVO / STORICO.** La fonte normativa unica e machine-readable del progetto è [`SCD_SYSTEM_MANIFEST.json`](./SCD_SYSTEM_MANIFEST.json). In caso di conflitto prevale sempre il manifest. Questo file resta come memoria e specifica di supporto.\n\n# SCD COLICODERVIESE DIGITAL ECOSYSTEM — COSTITUZIONE DI PROGETTO
 
 ## Perché è nata questa App
 La Super App S.D.C. ColicoDerviese non nasce come semplice sito, vetrina o agenda. Nasce per unire in un unico ecosistema digitale:
