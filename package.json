@@ -1,6 +1,6 @@
 {
   "name": "scd-colicoderviese-super-app",
-  "version": "24.0.0",
+  "version": "26.0.0",
   "private": true,
   "engines": {
     "node": ">=20"
