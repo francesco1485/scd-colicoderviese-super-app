@@ -179,13 +179,32 @@ function renderPartner(){
   const rr=partnerRequirements.filter(x=>x.ecosystem_node_id===n.id)
   const covered=rr.filter(x=>['received','verified','not_applicable'].includes(x.status)).length
   $('partnerDocCoverage').textContent=rr.length?covered+'/'+rr.length+' coperti':'nessun requisito'
-  $('partnerDocRequirements').innerHTML=rr.map(x=>'<div class="requirement-row"><div><strong>'+esc(x.title)+'</strong><small>'+esc(x.verification_note||'')+(x.ecosystem_documents?.title?' · Collegato: '+esc(x.ecosystem_documents.title):'')+'</small></div><span class="req-status '+esc(x.status)+'">'+esc(x.status.replaceAll('_',' '))+'</span></div>').join('')||empty('Checklist documentale non ancora impostata')
+  $('partnerDocRequirements').innerHTML=rr.map(x=>'<div class="requirement-row"><div><strong>'+esc(x.title)+'</strong><small>'+esc(x.verification_note||'')+(x.ecosystem_documents?.title?' · Collegato: '+esc(x.ecosystem_documents.title):'')+(x.due_date?' · entro '+esc(fmtDate(x.due_date)):'')+'</small></div><div class="requirement-actions"><span class="req-status '+esc(x.status)+'">'+esc(x.status.replaceAll('_',' '))+'</span>'+(isManager()?'<button class="small-btn" type="button" data-requirement-edit="'+x.id+'">Aggiorna</button>':'')+'</div></div>').join('')||empty('Checklist documentale non ancora impostata')
+  document.querySelectorAll('[data-requirement-edit]').forEach(b=>b.onclick=()=>openRequirementEditor(b.dataset.requirementEdit))
   const pp=projects.filter(x=>x.ecosystem_node_id===n.id)
   $('partnerProjects').innerHTML=pp.map(p=>listRow(p.title,p.objective||'', [projectStatus(p.status),p.priority,p.next_action||'prossima azione da definire'])).join('')||empty('Nessun progetto collegato')
   const aa=actions.filter(x=>x.ecosystem_node_id===n.id)
   $('partnerActions').innerHTML=aa.map(actionRow).join('')||empty('Nessuna attività collegata')
   bindActionButtons()
 }
+function openRequirementEditor(id){
+  if(!isManager())return
+  const r=partnerRequirements.find(x=>x.id===id);if(!r)return
+  const partner=ecosystem.find(x=>x.id===r.ecosystem_node_id)
+  const partnerDocs=documents.filter(d=>d.ecosystem_node_id===r.ecosystem_node_id)
+  $('modalContent').innerHTML='<div class="eyebrow">DOSSIER COLLABORAZIONE</div><h2>'+esc(partner?.name||'Partner')+'</h2><p class="muted">'+esc(r.title)+'</p><form id="requirementForm" class="form"><div class="inline"><label>Stato<select id="reqStatus"><option value="missing">Mancante in piattaforma</option><option value="requested">Richiesto</option><option value="received">Ricevuto</option><option value="verified">Verificato</option><option value="not_applicable">Non applicabile</option></select></label><label>Scadenza / follow-up<input id="reqDue" type="date" value="'+esc(r.due_date||'')+'"></label></div><label>Documento collegato<select id="reqDocument"><option value="">Nessun documento collegato</option>'+partnerDocs.map(d=>'<option value="'+d.id+'">'+esc(d.title)+' · '+esc(d.document_status)+'</option>').join('')+'</select></label><label>Nota di verifica<textarea id="reqNote">'+esc(r.verification_note||'')+'</textarea></label><p class="form-note">Per marcare “Verificato” occorre collegare un documento registrato nel dossier.</p><div class="composer-actions"><button class="secondary" type="button" id="reqCancel">Annulla</button><button class="primary" type="submit">Salva</button></div></form>'
+  $('reqStatus').value=r.status
+  $('reqDocument').value=r.fulfilled_document_id||''
+  $('reqCancel').onclick=()=>{closeModal();renderPartner()}
+  $('requirementForm').onsubmit=async e=>{
+    e.preventDefault()
+    const row={status:$('reqStatus').value,due_date:$('reqDue').value||null,fulfilled_document_id:$('reqDocument').value||null,verification_note:$('reqNote').value.trim()||null,updated_at:new Date().toISOString()}
+    const{error}=await supabase.from('partner_document_requirements').update(row).eq('id',id).eq('organization_id',window.orgId)
+    if(error)return alert(error.message)
+    closeModal();await loadAll();renderPartner()
+  }
+}
+
 function docCard(d){return '<article class="doc-card"><div class="doc-type">'+esc(d.document_type)+'</div><h4>'+esc(d.title)+'</h4><p>'+esc(d.notes||'')+'</p><div class="tags"><span class="tag">'+esc(d.document_status)+'</span>'+(d.version?'<span class="tag">v '+esc(d.version)+'</span>':'')+'</div></article>'}
 
 function renderCepa(){
@@ -199,7 +218,24 @@ function renderCepa(){
   $('cepaRoadmap').innerHTML=cepaExpansion.map(s=>'<article class="roadmap-step '+(s.status==='current'?'current':'')+'"><span class="step-no">'+esc(s.stage_no)+'</span><h4>'+esc(s.title)+'</h4><p><strong>'+esc(s.territory)+'</strong></p><p>'+esc(s.objective||'')+'</p><div class="tags"><span class="tag">'+esc(s.status)+'</span></div></article>').join('')||empty('Roadmap nazionale da costruire')
   const ready=cepaReadiness.filter(x=>['ready','verified'].includes(x.status)).length
   $('cepaReadinessSummary').textContent=ready+'/'+cepaReadiness.length+' elementi pronti/verificati'
-  $('cepaReadinessGrid').innerHTML=cepaReadiness.map(x=>'<article class="readiness-card"><div class="readiness-top"><div class="eyebrow">'+esc(x.dimension)+'</div><span class="readiness-status '+esc(x.status)+'">'+esc(x.status.replaceAll('_',' '))+'</span></div><h4>'+esc(x.title)+'</h4><p>'+esc(x.description||'')+'</p><p><strong>Livello:</strong> '+esc(x.requirement_level.replaceAll('_',' '))+'</p>'+(x.evidence?'<p><strong>Evidenza:</strong> '+esc(x.evidence)+'</p>':'')+'</article>').join('')||empty('Readiness nazionale da definire')
+  $('cepaReadinessGrid').innerHTML=cepaReadiness.map(x=>'<article class="readiness-card '+(isManager()?'clickable':'')+'" '+(isManager()?'data-readiness="'+x.id+'"':'')+'><div class="readiness-top"><div class="eyebrow">'+esc(x.dimension)+'</div><span class="readiness-status '+esc(x.status)+'">'+esc(x.status.replaceAll('_',' '))+'</span></div><h4>'+esc(x.title)+'</h4><p>'+esc(x.description||'')+'</p><p><strong>Livello:</strong> '+esc(x.requirement_level.replaceAll('_',' '))+'</p>'+(x.evidence?'<p><strong>Evidenza:</strong> '+esc(x.evidence)+'</p>':'')+(x.source_reference?'<p><strong>Fonte:</strong> '+esc(x.source_reference)+'</p>':'')+'</article>').join('')||empty('Readiness nazionale da definire')
+  document.querySelectorAll('[data-readiness]').forEach(b=>b.onclick=()=>openReadinessEditor(b.dataset.readiness))
+}
+
+function openReadinessEditor(id){
+  if(!isManager())return
+  const x=cepaReadiness.find(r=>r.id===id);if(!x)return
+  $('modalContent').innerHTML='<div class="eyebrow">CEPA NATIONAL READINESS</div><h2>'+esc(x.title)+'</h2><p class="muted">'+esc(x.dimension)+' · '+esc(x.requirement_level.replaceAll('_',' '))+'</p><form id="readinessForm" class="form"><div class="inline"><label>Stato<select id="readyStatus"><option value="to_do">Da fare</option><option value="in_progress">In corso</option><option value="ready">Pronto</option><option value="verified">Verificato</option><option value="blocked">Bloccato</option></select></label><label>Priorità<select id="readyPriority"><option value="low">Bassa</option><option value="normal">Normale</option><option value="high">Alta</option><option value="urgent">Urgente</option></select></label></div><label>Evidenza<textarea id="readyEvidence">'+esc(x.evidence||'')+'</textarea></label><label>Fonte / riferimento<input id="readySource" value="'+esc(x.source_reference||'')+'"></label><p class="form-note">“Verificato” richiede un’evidenza concreta. Una slide ottimista non è un’evidenza, purtroppo per metà dei consigli di amministrazione.</p><div class="composer-actions"><button class="secondary" type="button" id="readyCancel">Annulla</button><button class="primary" type="submit">Salva</button></div></form>'
+  $('readyStatus').value=x.status
+  $('readyPriority').value=x.priority
+  $('readyCancel').onclick=closeModal
+  $('readinessForm').onsubmit=async e=>{
+    e.preventDefault()
+    const row={status:$('readyStatus').value,priority:$('readyPriority').value,evidence:$('readyEvidence').value.trim()||null,source_reference:$('readySource').value.trim()||null,updated_at:new Date().toISOString()}
+    const{error}=await supabase.from('cepa_readiness_items').update(row).eq('id',id).eq('organization_id',window.orgId)
+    if(error)return alert(error.message)
+    closeModal();await loadAll();navigate('cepa')
+  }
 }
 
 function renderTerritories(){
@@ -236,8 +272,25 @@ function openProduct(id){
   const knowledge=productKnowledge.filter(k=>k.product_id===id)
   const strengths=(p.strengths||[])
   const weaknesses=(p.weaknesses||[])
-  $('modalContent').innerHTML='<div class="eyebrow">SCHEDA PRODOTTO</div><h2>'+esc(p.name)+'</h2><p class="muted">'+esc(provider)+' · '+esc(p.category)+' · '+esc(p.maturity_status)+'</p><div class="product-route"><div>Target</div><div>Bisogno</div><div>Analisi</div><div>'+esc(provider)+'</div><div>Follow-up</div></div><div class="prose-box"><p><strong>Sintesi</strong><br>'+esc(p.summary||'Da completare')+'</p><p><strong>Target</strong><br>'+esc((p.audience||[]).join(', ')||'Da definire')+'</p><p><strong>Processo</strong><br>'+esc(p.process_notes||'Da ricostruire sul processo reale di agenzia.')+'</p><p><strong>Note / esclusioni</strong><br>'+esc(p.exclusions_notes||'Da verificare sui documenti ufficiali.')+'</p></div><div class="strength-weak-grid"><div class="sw-box strength"><h4>Punti di forza</h4>'+(strengths.length?'<ul>'+strengths.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'<p class="muted">Da compilare dopo verifica documentale.</p>')+'</div><div class="sw-box weak"><h4>Punti deboli / limiti</h4>'+(weaknesses.length?'<ul>'+weaknesses.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'<p class="muted">Da compilare dopo verifica documentale.</p>')+'</div></div><div class="modal-section"><h4>Checklist di conoscenza</h4><div class="knowledge-list">'+(knowledge.length?knowledge.map(k=>'<div class="knowledge-item"><strong>'+esc(k.title)+'</strong><small>'+esc(k.content||'')+'</small><span class="tag">'+esc(k.verification_status)+'</span></div>').join(''):'<p class="muted">Checklist non ancora impostata.</p>')+'</div></div><div class="modal-section"><h4>Confronti</h4>'+(pc.length?pc.map(c=>'<p class="muted"><strong>'+esc(c.benchmark_name)+'</strong><br>'+esc(c.comparison_scope||'')+' · '+esc(c.status)+(c.source_date?' · '+esc(fmtDate(c.source_date)):'')+'</p>').join(''):'<p class="muted">Nessun confronto verificato ancora. La struttura è pronta per fonti, data, metriche e note.</p>')+'</div>'
+  $('modalContent').innerHTML='<div class="eyebrow">SCHEDA PRODOTTO</div><h2>'+esc(p.name)+'</h2><p class="muted">'+esc(provider)+' · '+esc(p.category)+' · '+esc(p.maturity_status)+'</p><div class="product-route"><div>Target</div><div>Bisogno</div><div>Analisi</div><div>'+esc(provider)+'</div><div>Follow-up</div></div><div class="prose-box"><p><strong>Sintesi</strong><br>'+esc(p.summary||'Da completare')+'</p><p><strong>Target</strong><br>'+esc((p.audience||[]).join(', ')||'Da definire')+'</p><p><strong>Processo</strong><br>'+esc(p.process_notes||'Da ricostruire sul processo reale di agenzia.')+'</p><p><strong>Note / esclusioni</strong><br>'+esc(p.exclusions_notes||'Da verificare sui documenti ufficiali.')+'</p></div><div class="strength-weak-grid"><div class="sw-box strength"><h4>Punti di forza</h4>'+(strengths.length?'<ul>'+strengths.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'<p class="muted">Da compilare dopo verifica documentale.</p>')+'</div><div class="sw-box weak"><h4>Punti deboli / limiti</h4>'+(weaknesses.length?'<ul>'+weaknesses.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'<p class="muted">Da compilare dopo verifica documentale.</p>')+'</div></div><div class="modal-section"><div class="modal-section-head"><h4>Checklist di conoscenza</h4><span class="muted">Verifica = serve una fonte</span></div><div class="knowledge-list">'+(knowledge.length?knowledge.map(k=>'<div class="knowledge-item"><strong>'+esc(k.title)+'</strong><small>'+esc(k.content||'')+'</small>'+(k.source_reference||k.source_url?'<small><b>Fonte:</b> '+esc(k.source_reference||k.source_url)+'</small>':'')+'<div class="inline-actions"><span class="tag">'+esc(k.verification_status)+'</span>'+(isManager()?'<button class="small-btn" type="button" data-knowledge-edit="'+k.id+'">Modifica</button>':'')+'</div></div>').join(''):'<p class="muted">Checklist non ancora impostata.</p>')+'</div></div><div class="modal-section"><h4>Confronti</h4>'+(pc.length?pc.map(c=>'<p class="muted"><strong>'+esc(c.benchmark_name)+'</strong><br>'+esc(c.comparison_scope||'')+' · '+esc(c.status)+(c.source_date?' · '+esc(fmtDate(c.source_date)):'')+'</p>').join(''):'<p class="muted">Nessun confronto verificato ancora. La struttura è pronta per fonti, data, metriche e note.</p>')+'</div>'
   $('modal').classList.remove('hidden')
+  document.querySelectorAll('[data-knowledge-edit]').forEach(b=>b.onclick=()=>openKnowledgeEditor(b.dataset.knowledgeEdit,id))
+}
+
+function openKnowledgeEditor(itemId,productId){
+  if(!isManager())return
+  const k=productKnowledge.find(x=>x.id===itemId);if(!k)return
+  const p=products.find(x=>x.id===productId)
+  $('modalContent').innerHTML='<div class="eyebrow">CONOSCENZA PRODOTTO</div><h2>'+esc(p?.name||'Prodotto')+'</h2><p class="muted">'+esc(k.item_type)+' · '+esc(k.title)+'</p><form id="knowledgeForm" class="form"><label>Titolo<input id="knTitle" value="'+esc(k.title)+'"></label><label>Contenuto<textarea id="knContent">'+esc(k.content||'')+'</textarea></label><div class="inline"><label>Stato<select id="knStatus"><option value="to_verify">Da verificare</option><option value="verified">Verificato</option><option value="superseded">Superato</option></select></label><label>Data fonte<input id="knSourceDate" type="date" value="'+esc(k.source_date||'')+'"></label></div><label>Riferimento fonte<input id="knSourceReference" value="'+esc(k.source_reference||'')+'" placeholder="es. Set informativo HDI, versione/data"></label><label>URL fonte pubblica<input id="knSourceUrl" value="'+esc(k.source_url||'')+'" placeholder="https://..."></label><p class="form-note">Per impostare “Verificato” è obbligatorio indicare almeno una fonte. Il database lo impedisce anche se qualcuno prova a fare il furbo con il pulsante.</p><div class="composer-actions"><button class="secondary" type="button" id="knCancel">Annulla</button><button class="primary" type="submit">Salva</button></div></form>'
+  $('knStatus').value=k.verification_status
+  $('knCancel').onclick=()=>openProduct(productId)
+  $('knowledgeForm').onsubmit=async e=>{
+    e.preventDefault()
+    const row={title:$('knTitle').value.trim(),content:$('knContent').value.trim()||null,verification_status:$('knStatus').value,source_reference:$('knSourceReference').value.trim()||null,source_url:$('knSourceUrl').value.trim()||null,source_date:$('knSourceDate').value||null,updated_at:new Date().toISOString()}
+    const{error}=await supabase.from('product_knowledge_items').update(row).eq('id',itemId).eq('organization_id',window.orgId)
+    if(error)return alert(error.message)
+    await loadAll();openProduct(productId)
+  }
 }
 
 function renderCollaborators(){
@@ -262,8 +315,44 @@ function renderCollaborators(){
 function openCollaborator(id){
   const c=collaborators.find(x=>x.id===id);if(!c)return
   const terms=collaboratorTerms.filter(t=>t.collaborator_id===id)
-  $('modalContent').innerHTML='<div class="eyebrow">COLLABORATORE</div><h2>'+esc(c.display_name)+'</h2><p class="muted">'+esc(c.area||'Area da definire')+' · '+esc(c.territory||'Territorio da verificare')+'</p><div class="prose-box"><p><strong>Ruolo</strong><br>'+esc(c.role_description||'Da completare')+'</p><p><strong>Modello guadagno generale</strong><br>'+esc(c.earning_model||'Da verificare')+'</p><p><strong>Note economiche</strong><br>'+esc(c.earning_notes||'Nessuna condizione economica verificata inserita.')+'</p></div><div class="modal-section"><h4>Condizioni per prodotto / collaborazione</h4>'+(terms.length?terms.map(t=>'<p class="muted"><strong>'+esc(t.agency_products?.name||t.ecosystem_nodes?.name||t.activity_scope||'Ambito')+'</strong><br>'+esc(t.earning_type)+' · '+esc(t.verification_status)+(t.percentage!=null?' · '+esc(t.percentage)+'%':'')+(t.fixed_amount!=null?' · € '+esc(t.fixed_amount):'')+(t.bonus_rule?' · '+esc(t.bonus_rule):'')+'</p>').join(''):'<p class="muted">Nessuna condizione caricata. Va ricostruita dalle regole reali di agenzia.</p>')+'</div>'
+  $('modalContent').innerHTML='<div class="eyebrow">COLLABORATORE</div><h2>'+esc(c.display_name)+'</h2><p class="muted">'+esc(c.area||'Area da definire')+' · '+esc(c.territory||'Territorio da verificare')+'</p><div class="prose-box"><p><strong>Ruolo</strong><br>'+esc(c.role_description||'Da completare')+'</p><p><strong>Modello guadagno generale</strong><br>'+esc(c.earning_model||'Da verificare')+'</p><p><strong>Note economiche</strong><br>'+esc(c.earning_notes||'Nessuna condizione economica verificata inserita.')+'</p></div><div class="modal-section"><div class="modal-section-head"><h4>Condizioni per prodotto / collaborazione</h4>'+(isManager()?'<button class="primary" type="button" id="addTermBtn">+ Condizione</button>':'')+'</div>'+(terms.length?terms.map(t=>'<div class="term-row"><div><strong>'+esc(t.agency_products?.name||t.ecosystem_nodes?.name||t.activity_scope||'Ambito')+'</strong><small>'+esc(t.earning_type)+' · '+esc(t.verification_status)+(t.percentage!=null?' · '+esc(t.percentage)+'%':'')+(t.fixed_amount!=null?' · € '+Number(t.fixed_amount).toLocaleString('it-IT'):'')+(t.bonus_rule?' · '+esc(t.bonus_rule):'')+'</small>'+(t.source_reference?'<small><b>Fonte:</b> '+esc(t.source_reference)+'</small>':'')+'</div>'+(isManager()?'<button class="small-btn" type="button" data-term-edit="'+t.id+'">Modifica</button>':'')+'</div>').join(''):'<p class="muted">Nessuna condizione caricata. Va ricostruita dalle regole reali di agenzia.</p>')+'</div>'
   $('modal').classList.remove('hidden')
+  if(isManager()){
+    $('addTermBtn').onclick=()=>openTermEditor(id,null)
+    document.querySelectorAll('[data-term-edit]').forEach(b=>b.onclick=()=>openTermEditor(id,b.dataset.termEdit))
+  }
+}
+
+function openTermEditor(collaboratorId,termId=null){
+  if(!isManager())return
+  const c=collaborators.find(x=>x.id===collaboratorId);if(!c)return
+  const t=termId?collaboratorTerms.find(x=>x.id===termId):null
+  const docOptions=documents.map(d=>'<option value="'+d.id+'">'+esc((d.ecosystem_nodes?.name?d.ecosystem_nodes.name+' · ':'')+d.title)+'</option>').join('')
+  $('modalContent').innerHTML='<div class="eyebrow">CONDIZIONE ECONOMICA</div><h2>'+esc(c.display_name)+'</h2><form id="termForm" class="form"><div class="inline"><label>Prodotto<select id="termProduct"><option value="">Nessun prodotto specifico</option>'+products.map(p=>'<option value="'+p.id+'">'+esc(p.name)+'</option>').join('')+'</select></label><label>Compagnia / partner<select id="termPartner"><option value="">Nessuna</option>'+ecosystem.map(n=>'<option value="'+n.id+'">'+esc(n.name)+'</option>').join('')+'</select></label></div><label>Ambito attività<input id="termScope" placeholder="es. acquisizione, gestione, rinnovi, sviluppo"></label><div class="inline"><label>Tipo guadagno<select id="termType"><option value="to_verify">Da verificare</option><option value="percentage">Percentuale</option><option value="fixed">Fisso</option><option value="bonus">Bonus</option><option value="mixed">Misto</option><option value="none">Nessun compenso diretto</option></select></label><label>Stato verifica<select id="termVerification"><option value="to_verify">Da verificare</option><option value="verified">Verificato</option><option value="expired">Scaduto</option></select></label></div><div class="inline"><label>Percentuale %<input id="termPercentage" type="number" step="0.0001" min="0"></label><label>Importo fisso €<input id="termFixed" type="number" step="0.01" min="0"></label></div><label>Regola bonus<textarea id="termBonus"></textarea></label><div class="inline"><label>Valida dal<input id="termFrom" type="date"></label><label>Valida fino al<input id="termTo" type="date"></label></div><label>Documento fonte<select id="termSourceDoc"><option value="">Nessun documento collegato</option>'+docOptions+'</select></label><label>Riferimento fonte<input id="termSourceRef" placeholder="es. lettera incarico / prospetto provvigionale 2026"></label><label>Note<textarea id="termNotes"></textarea></label><p class="form-note">Una condizione può diventare “Verificata” solo se è collegata a un documento o a un riferimento fonte.</p><div class="composer-actions"><button class="secondary" type="button" id="termCancel">Annulla</button><button class="primary" type="submit">Salva</button></div></form>'
+  if(t){
+    $('termProduct').value=t.product_id||''
+    $('termPartner').value=t.ecosystem_node_id||''
+    $('termScope').value=t.activity_scope||''
+    $('termType').value=t.earning_type||'to_verify'
+    $('termVerification').value=t.verification_status||'to_verify'
+    $('termPercentage').value=t.percentage??''
+    $('termFixed').value=t.fixed_amount??''
+    $('termBonus').value=t.bonus_rule||''
+    $('termFrom').value=t.valid_from||''
+    $('termTo').value=t.valid_to||''
+    $('termSourceDoc').value=t.source_document_id||''
+    $('termSourceRef').value=t.source_reference||''
+    $('termNotes').value=t.notes||''
+  }
+  $('termCancel').onclick=()=>openCollaborator(collaboratorId)
+  $('termForm').onsubmit=async e=>{
+    e.preventDefault()
+    const row={organization_id:window.orgId,collaborator_id:collaboratorId,product_id:$('termProduct').value||null,ecosystem_node_id:$('termPartner').value||null,activity_scope:$('termScope').value.trim()||null,earning_type:$('termType').value,percentage:$('termPercentage').value?Number($('termPercentage').value):null,fixed_amount:$('termFixed').value?Number($('termFixed').value):null,bonus_rule:$('termBonus').value.trim()||null,valid_from:$('termFrom').value||null,valid_to:$('termTo').value||null,verification_status:$('termVerification').value,source_document_id:$('termSourceDoc').value||null,source_reference:$('termSourceRef').value.trim()||null,notes:$('termNotes').value.trim()||null,updated_at:new Date().toISOString()}
+    const q=termId?supabase.from('collaborator_product_terms').update(row).eq('id',termId).eq('organization_id',window.orgId):supabase.from('collaborator_product_terms').insert(row)
+    const{error}=await q
+    if(error)return alert(error.message)
+    await loadAll();openCollaborator(collaboratorId)
+  }
 }
 
 function openNewCollaborator(){
