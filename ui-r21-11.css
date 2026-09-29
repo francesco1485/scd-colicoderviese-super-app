@@ -195,3 +195,20 @@ body.scd-ui-v21-11 .brand small{color:var(--scd-yellow)}
   .calendar-tabs{grid-template-columns:repeat(4,1fr)}
   .calendar-tabs button{min-height:34px;font-size:8px}
 }
+
+
+.communications-app-screen{min-height:100%}
+.communications-app-head{background:linear-gradient(130deg,#043786,#075fc9);color:#fff;border-radius:22px;padding:18px;margin:-6px -4px 12px;position:relative;overflow:hidden}
+.communications-app-head:after{content:"";position:absolute;inset:0;background:url('./assets/hero-colico.webp') center/cover no-repeat;opacity:.12}
+.communications-app-head>*{position:relative;z-index:1}
+.communications-app-brand{display:flex;align-items:center;gap:10px}.communications-app-brand img{width:42px;height:50px;object-fit:contain}.communications-app-brand b{font-size:22px}.communications-app-brand p{margin:4px 0 0;color:#d9e8fa;font-size:10px}
+.communications-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:#eaf1f8;border-radius:14px;padding:5px;margin:10px 0}
+.communications-tabs button{border:0;border-radius:10px;background:transparent;min-height:38px;color:#325276;font-size:10px;font-weight:900}.communications-tabs button.active{background:#fff;color:#062a66;box-shadow:0 5px 12px rgba(4,42,96,.08);border-bottom:3px solid var(--scd-yellow)}
+.communication-important{display:grid;grid-template-columns:52px 1fr;gap:10px;background:linear-gradient(110deg,#fff9dd,#fff);border:2px solid var(--scd-yellow);border-radius:17px;padding:12px;margin:9px 0}
+.comm-ico{width:52px;height:52px;border-radius:50%;background:var(--scd-yellow);display:grid;place-items:center;font-size:24px;font-weight:950;color:var(--scd-navy)}
+.communication-important small,.communication-important b,.communication-important p,.communication-important time{display:block}.communication-important small{font-size:7px;letter-spacing:.12em;font-weight:950}.communication-important b{font-size:14px;margin:3px 0}.communication-important p{font-size:10px;color:#536b86;margin:0 0 5px}.communication-important time{font-size:8px;color:#6a7e95}
+.communication-list{display:grid;gap:6px}.communication-list article{display:grid;grid-template-columns:42px 1fr auto;gap:8px;align-items:center;background:#fff;border:1px solid var(--scd-line);border-radius:14px;padding:9px}
+.comm-row-ico{width:42px;height:42px;border-radius:11px;background:#edf4fb;display:grid;place-items:center;color:#07366f}
+.communication-list small,.communication-list b,.communication-list p{display:block}.communication-list small{font-size:7px;letter-spacing:.1em;color:#607792}.communication-list b{font-size:10px}.communication-list p{font-size:8px;margin:2px 0 0;color:#6c7f93}.communication-list time{font-size:8px;color:#6e8298}
+.social-hub-card{margin-top:10px;background:#fff;border:1px solid var(--scd-line);border-radius:16px;padding:12px}.social-hub-card h3{margin:0;color:var(--scd-navy)}.social-hub-card p{font-size:9px;color:#657a90}.social-links{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.social-links a{border:1px solid #dce6ef;border-radius:12px;padding:10px 6px;text-align:center;text-decoration:none;color:#0757b5;font-size:9px;font-weight:900;background:#f8fbff}
+@media(max-width:560px){.communications-app-head{border-radius:18px;margin:-6px -2px 10px;padding:15px}.communication-important{grid-template-columns:46px 1fr}.comm-ico{width:46px;height:46px}.social-links{grid-template-columns:1fr 1fr 1fr}}
