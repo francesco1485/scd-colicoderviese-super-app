@@ -9,7 +9,7 @@ const UPSTREAM = process.env.SCD_APPS_SCRIPT_URL || 'https://script.google.com/m
 const CACHE_TTL = 10 * 60 * 1000;
 const CLUB_TIME_ZONE = 'Europe/Rome';
 const FEATURE_FLAGS = Object.freeze({
-  dataFabricObservability: process.env.SCD_FEATURE_DATA_FABRIC_OBSERVABILITY !== 'false'
+  dataFabricObservability: process.env.SCD_FEATURE_DATA_FABRIC_OBSERVABILITY === 'true'
 });
 let liveCache = { at: 0, data: null };
 
