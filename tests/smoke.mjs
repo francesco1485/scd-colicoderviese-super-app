@@ -55,7 +55,7 @@ for(const viewport of viewports){
   await page.waitForSelector('#publicActionForm');
   await page.click('#modalClose');
 
-  await page.click('[data-action="avatar"]');
+  await page.locator('.service-grid [data-action="avatar"]').click();
   await page.waitForSelector('#avatarPreview');
   await page.click('#modalClose');
 
