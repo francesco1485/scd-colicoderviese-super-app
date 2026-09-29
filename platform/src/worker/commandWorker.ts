@@ -8,15 +8,17 @@ import { createRedisConnection } from "../core/queue/connection.js";
 import type { CommandJobData } from "../core/queue/types.js";
 import { RedisKeyValueStore } from "../core/state/RedisKeyValueStore.js";
 
-const connection = createRedisConnection();
-if (!connection) {
+const maybeConnection = createRedisConnection();
+if (!maybeConnection) {
   throw new Error("REDIS_URL is required for the external command worker");
 }
+const connection = maybeConnection;
 
-const stateConnection = createRedisConnection();
-if (!stateConnection) {
+const maybeStateConnection = createRedisConnection();
+if (!maybeStateConnection) {
   throw new Error("REDIS_URL is required for worker state");
 }
+const stateConnection = maybeStateConnection;
 
 const pluginDirectory =
   process.env.PLUGIN_DIR ??
