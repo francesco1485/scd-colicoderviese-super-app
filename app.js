@@ -491,7 +491,7 @@ function openAthleteFamilyView(d=state.privateData||{},index=0){
   document.querySelectorAll('[data-role-view]').forEach(b=>b.onclick=()=>{if(b.dataset.roleView==='staff'&&u.staff)openManagementHome(d);else if(b.dataset.roleView==='athlete'&&rows.length)openAthleteFamilyView(d,0);else if(b.dataset.roleView==='family')openAthleteFamilyView(d,index)});
   const back=$('#reservedBack'),convBtn=$('#reservedConv'),payBtn=$('#reservedPayments'),docsBtn=$('#reservedDocs'),msgBtn=$('#reservedMessages'),transportBtn=$('#reservedTransport'),profileBtn=$('#reservedProfile');
   if(back)back.onclick=()=>openManagementHome(d);
-  if(convBtn)convBtn.onclick=()=>next?openCalendarEvent(next.id||next.convocationId||''):toast('Convocazioni in aggiornamento');
+  if(convBtn)convBtn.onclick=()=>{if(!next)return toast('Convocazioni in aggiornamento');modal('<span class="eyebrow">CONVOCAZIONE</span><h2>'+esc(next.team||next.teamName||'Convocazione SCD')+'</h2><p>'+esc([fmtDate(next.date||''),next.meetingTime,next.meetingPlace].filter(Boolean).join(' · '))+'</p><div class="status-box"><b>Stato:</b> '+esc(next.response||'DA CONFERMARE')+'</div><div class="modal-actions"><button class="primary" id="convBackReserved">TORNA AL PROFILO</button></div>');const back=$('#convBackReserved');if(back)back.onclick=()=>openAthleteFamilyView(d,index)};
   if(payBtn)payBtn.onclick=()=>toast('Stato pagamenti: '+payment);
   if(docsBtn)docsBtn.onclick=()=>toast('Documenti sincronizzati dal gestionale SCD');
   if(msgBtn)msgBtn.onclick=u.staff?openMessageManager:openCommunicationsHub;
