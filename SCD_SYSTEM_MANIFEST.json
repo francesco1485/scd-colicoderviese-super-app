@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "1.2.0",
+    "version": "1.3.0",
     "effective_at": "2026-09-29",
     "status": "BINDING",
     "language": "it-IT",
@@ -15,7 +15,10 @@
       "rule": "Ogni modifica che cambia architettura, dati, ruoli, fonti, routing, sicurezza, UX, telemetria o capacità deve aggiornare questo manifest nello stesso PR o prima del codice.",
       "breaking_change_requires_direction_approval": true,
       "no_silent_reinterpretation": true,
-      "legacy_documents_are_non_normative": true
+      "legacy_documents_are_non_normative": true,
+      "state_first": true,
+      "no_write_without_verified_state": true,
+      "unverified_is_not_false_or_absent": true
     },
     "supersedes_as_normative_authority": [
       "PROJECT_CONSTITUTION.md",
@@ -1336,7 +1339,18 @@
       ],
       "do_not_say_dynamic_if": "frontend_is_using_static_fallback_as_primary",
       "do_not_say_integrated_if": "R20_and_new_layer_do_not_exchange_real_data",
-      "do_not_say_play_store_public_if": "only_internal_test"
+      "do_not_say_play_store_public_if": "only_internal_test",
+      "required_evidence": [
+        "VERSION",
+        "COMMIT",
+        "PR",
+        "CI_STATUS",
+        "SCREENSHOT_MOBILE",
+        "SCREENSHOT_DESKTOP",
+        "DATA_SOURCES",
+        "KNOWN_LIMITATIONS",
+        "ROLLBACK"
+      ]
     }
   },
   "capability_map": [
@@ -1556,6 +1570,76 @@
       "GENERIC_VISUAL_REDESIGN_IGNORING_MASTER",
       "PRODUCTION_SELF_MODIFICATION",
       "SECRETS_IN_REPOSITORY"
+    ],
+    "state_gate": {
+      "id": "SCD:STATE",
+      "mode": "PRECONDITION_GATE",
+      "required_before": [
+        "FILE_WRITE",
+        "COMMIT",
+        "PUSH",
+        "BRANCH_CREATE",
+        "MERGE",
+        "DEPLOY",
+        "DATA_WRITE",
+        "CONFIG_CHANGE"
+      ],
+      "minimum_evidence": [
+        "REPOSITORY",
+        "CURRENT_MAIN_SHA",
+        "CURRENT_WORKING_BRANCH",
+        "WORKING_TREE",
+        "OPEN_PR",
+        "PR_STATUS",
+        "CI_STATUS",
+        "PAGES_STATUS",
+        "RENDER_STATUS",
+        "MANIFEST_VERSION_OR_HASH",
+        "RELEASE_DEPENDENCIES",
+        "DATA_SOURCES_VERIFIED",
+        "KNOWN_BLOCKERS",
+        "SAFE_NEXT_ACTION"
+      ],
+      "allowed_status_values": [
+        "VERIFIED",
+        "UNVERIFIED",
+        "NOT_AVAILABLE",
+        "NOT_APPLICABLE"
+      ],
+      "failure_rule": "NO_STATE_NO_WRITE",
+      "unavailable_mode": [
+        "READ",
+        "INSPECT",
+        "DIAGNOSE",
+        "PROPOSE"
+      ],
+      "unverified_semantics": "UNVERIFIED_IS_NOT_FALSE_OR_NOT_PRESENT"
+    },
+    "operating_cycle": [
+      "SCD:STATE",
+      "SCD:INVENTORY",
+      "SCD:GAP",
+      "SCD:PLAN",
+      "SCD:BUILD",
+      "SCD:DATA",
+      "SCD:SECURITY",
+      "SCD:VISUAL",
+      "SCD:QA",
+      "SCD:REVIEW",
+      "SCD:MERGE",
+      "SCD:DEPLOY",
+      "SCD:PROVE",
+      "SCD:ROLLBACK"
+    ],
+    "release_dependencies": [
+      {
+        "predecessor": "R25",
+        "successor": "R26",
+        "relation": "REQUIRED_PREDECESSOR",
+        "status": "SATISFIED_IN_MAIN",
+        "predecessor_main_commit": "7a8f76d824c8a69f9c9e5b64639b29be7c70936b",
+        "successor_main_commit": "5947477a3549fbab4e1d4029a86c1e46e57f1ec3"
+      }
     ]
   },
   "product_direction": {
