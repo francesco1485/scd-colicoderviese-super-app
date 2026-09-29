@@ -117,3 +117,15 @@ Esempi futuri:
 - Rollback soltanto su ultimo tentativo fallito del worker.
 - SIGTERM: il worker usa `worker.close()` e termina dopo il drain.
 - Safeguarding resta esterno alla messaggistica e ai flussi ordinari.
+
+## Embedded queue mode
+
+Per mantenere il pilot a costo zero, la stessa istanza web può anche consumare la coda BullMQ.
+
+```env
+REDIS_URL=redis://...
+COMMAND_EXECUTION_MODE=queue
+RUN_EMBEDDED_WORKER=true
+```
+
+In questo assetto API e worker condividono il servizio web. È adatto al pilot e a carichi moderati. Quando il volume richiederà isolamento operativo, lo stesso worker può essere eseguito come servizio separato senza cambiare il contratto dei comandi.

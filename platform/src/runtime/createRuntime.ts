@@ -46,6 +46,8 @@ export async function createRuntime() {
     state,
     events,
     queue,
+    queueConnection: queueRedis,
+    stateConnection: stateRedis,
     executor,
     executionMode,
     redisAvailable: Boolean(stateRedis && queueRedis),
