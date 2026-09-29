@@ -4,6 +4,7 @@ import path from 'node:path';
 const root=process.cwd();
 const configPath=path.join(root,'config/scd-supabase.v1.json');
 const migrationPath=path.join(root,'supabase/migrations/20260929_r33_club_graph_foundation.sql');
+const authMigrationPath=path.join(root,'supabase/migrations/20260929_r35_auth_context_rls_normalization.sql');
 
 function fail(message){console.error('SCD SUPABASE CONTRACT FAIL:',message);process.exitCode=1}
 function assert(condition,message){if(!condition)fail(message)}
@@ -11,8 +12,10 @@ function readJson(file){try{return JSON.parse(fs.readFileSync(file,'utf8'))}catc
 
 assert(fs.existsSync(configPath),'config/scd-supabase.v1.json missing');
 assert(fs.existsSync(migrationPath),'R33 migration missing');
+assert(fs.existsSync(authMigrationPath),'R35 auth migration missing');
 const cfg=readJson(configPath);
 const sql=fs.existsSync(migrationPath)?fs.readFileSync(migrationPath,'utf8'):'';
+const authSql=fs.existsSync(authMigrationPath)?fs.readFileSync(authMigrationPath,'utf8'):'';
 
 if(cfg){
   assert(cfg.schema_version==='1.0.0','wrong Supabase contract schema version');
@@ -25,6 +28,9 @@ if(cfg){
   assert(cfg.activation?.feature_flag==='FF-SUPABASE-CORE','wrong Supabase feature flag');
   assert(cfg.activation?.default_enabled===false,'Supabase core must default off before migration proof');
   assert(cfg.migration_mode==='STRANGLER_DUAL_RUN','migration must remain staged dual-run');
+  assert(cfg.auth_context?.signup_default_role==='USER_BASE','Auth signup must default USER_BASE');
+  assert(cfg.auth_context?.self_role_selection===false,'Auth cannot self-select qualified role');
+  assert(cfg.auth_context?.context_function==='scd_my_context','Auth context function mismatch');
 }
 
 const requiredTables=[
@@ -46,6 +52,9 @@ assert(sql.includes('scd_external_refs'),'legacy adapter bridge missing');
 assert(!/\bdrop\s+(table|schema|database)\b/i.test(sql),'destructive DROP statement forbidden in R33 foundation');
 assert(!/\btruncate\b/i.test(sql),'TRUNCATE forbidden in R33 foundation');
 assert(!/service_role_key\s*[:=]\s*['"][^'"]+['"]/i.test(sql),'service role secret must never be committed');
+for(const token of ['scd_handle_new_user','on_auth_user_created_scd','scd_my_context','USER_BASE']) assert(authSql.includes(token),'R35 auth contract missing '+token);
+assert(!/create\s+policy[\s\S]{0,180}for\s+all/i.test(authSql),'R35 normalized write policies must not use FOR ALL');
+assert(/security\s+definer[\s\S]{0,160}set\s+search_path\s*=\s*public/i.test(authSql),'Auth trigger security definer must pin search_path');
 
 if(process.exitCode)process.exit(process.exitCode);
 console.log('SCD SUPABASE CONTRACT PASS',{

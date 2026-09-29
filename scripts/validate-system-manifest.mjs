@@ -84,6 +84,10 @@ assert(m.identity_and_access.single_account===true,'single-account rule must rem
 assert(m.identity_and_access.default_role==='USER_BASE','default role must be USER_BASE');
 assert(m.identity_and_access.self_select_role_at_registration===false,'users must not self-assign roles');
 assert(m.identity_and_access.authorization==='SERVER_SIDE_ONLY','authorization must be server-side');
+assert(m.identity_and_access.target_identity_engine==='SUPABASE_AUTH','target identity engine must be Supabase Auth');
+assert(m.identity_and_access?.supabase_onboarding?.default_role==='USER_BASE','Supabase onboarding must default USER_BASE');
+assert(m.identity_and_access?.supabase_onboarding?.self_role_selection===false,'Supabase onboarding cannot self-select role');
+assert(m.identity_and_access?.supabase_onboarding?.client_context_function==='scd_my_context','Supabase context function mismatch');
 includesAll(
   m.identity_and_access.roles||[],
   ['USER_BASE','FAMILY','ATHLETE','MISTER','STAFF','MANAGER','SECRETARIAT','REGISTRATION','TOURNAMENTS','DIRECTION'],
@@ -203,7 +207,7 @@ for(const cap of caps){
 }
 includesAll(caps.map(x=>x.id),[
   'CAP-HOME','CAP-CALENDAR','CAP-ATHLETE','CAP-FAMILY','CAP-STAFF','CAP-COMMS','CAP-RUNTIME-EVIDENCE','CAP-UPSTREAM-RESILIENCE','CAP-R20-RUNTIME-ACTIVATION',
-  'CAP-DRIVE-CATALOG','CAP-GMAIL-INGESTION','CAP-DATAFABRIC-OBSERVABILITY','CAP-ENTITY-GRAPH','CAP-COMPLETENESS','CAP-SUPABASE-CORE',
+  'CAP-DRIVE-CATALOG','CAP-GMAIL-INGESTION','CAP-DATAFABRIC-OBSERVABILITY','CAP-ENTITY-GRAPH','CAP-COMPLETENESS','CAP-SUPABASE-CORE','CAP-SUPABASE-AUTH-CONTEXT',
   'CAP-CHAT','CAP-CONFIDENCE','CAP-ANCONFIDENCE','CAP-SAFEGUARDING','CAP-SKY','CAP-AVATAR',
   'CAP-TAMAGOTCHI','CAP-GEO','CAP-R22','CAP-PWA','CAP-ANDROID','CAP-IOS'
 ],'capability map');
@@ -228,7 +232,9 @@ const requiredRepoFiles=[
   'docs/adr/ADR-0005-r20-runtime-activation.md',
   'docs/adr/ADR-0006-r32-safe-live-core.md',
   'docs/adr/ADR-0007-supabase-domain-core.md',
+  'docs/adr/ADR-0008-supabase-auth-context.md',
   'config/scd-supabase.v1.json',
+  'supabase/migrations/20260929_r35_auth_context_rls_normalization.sql',
   'supabase/migrations/20260929_r33_club_graph_foundation.sql',
   'scripts/validate-supabase-contract.mjs',
   'docs/runbooks/R20-RUNTIME-DEPLOY.md',
