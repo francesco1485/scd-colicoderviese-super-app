@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 
-const EXPECTED_VERSION=process.env.SCD_EXPECTED_VERSION||'32.0.0';
-const EXPECTED_MANIFEST=process.env.SCD_EXPECTED_MANIFEST||'1.8.0';
+const EXPECTED_VERSION=process.env.SCD_EXPECTED_VERSION||'35.0.0';
+const EXPECTED_MANIFEST=process.env.SCD_EXPECTED_MANIFEST||'2.1.0';
 const PAGES_URL=process.env.SCD_PAGES_URL||'https://francesco1485.github.io/scd-colicoderviese-super-app/';
 const RENDER_BASE=(process.env.SCD_RENDER_BASE_URL||'https://scd-colicoderviese-official-r21.onrender.com').replace(/\/$/,'');
 const ATTEMPTS=Math.max(1,Number(process.env.SCD_PROD_VERIFY_ATTEMPTS||20));
@@ -10,7 +10,7 @@ const outDir='test-output';
 fs.mkdirSync(outDir,{recursive:true});
 
 const evidence={
-  release:'R32',
+  release:'R35',
   expectedVersion:EXPECTED_VERSION,
   expectedManifest:EXPECTED_MANIFEST,
   startedAt:new Date().toISOString(),
@@ -65,10 +65,15 @@ async function runChecks(attempt){
     const j=parseJson('Render capabilities',r.text);
     const actionOk=Array.isArray(j.actions)&&j.actions.includes('public.datafabric.contract');
     const dataFabricEnabled=j.featureFlags?.dataFabricObservability;
-    const flagDeclared=typeof dataFabricEnabled==='boolean';
-    const ok=r.ok&&j.ok===true&&j.version===EXPECTED_VERSION&&actionOk&&flagDeclared;
-    result.checks.renderCapabilities={httpStatus:r.status,ok,version:j.version||null,actionOk,flagDeclared,dataFabricEnabled};
-    if(!ok)result.failures.push('RENDER_FEATURE_FLAGS');
+    const dataFabricFlagDeclared=typeof dataFabricEnabled==='boolean';
+    const supabaseCoreEnabled=j.featureFlags?.supabaseCore;
+    const supabaseFlagDeclared=typeof supabaseCoreEnabled==='boolean';
+    const supabaseConfigured=j.domainCore?.configured===true;
+    const supabaseProjectOk=j.domainCore?.projectId==='ndevtxxijbcnskgysdit';
+    const supabaseSafelyDark=supabaseCoreEnabled===false;
+    const ok=r.ok&&j.ok===true&&j.version===EXPECTED_VERSION&&actionOk&&dataFabricFlagDeclared&&supabaseFlagDeclared&&supabaseConfigured&&supabaseProjectOk&&supabaseSafelyDark;
+    result.checks.renderCapabilities={httpStatus:r.status,ok,version:j.version||null,actionOk,dataFabricFlagDeclared,dataFabricEnabled,supabaseFlagDeclared,supabaseCoreEnabled,supabaseConfigured,supabaseProjectOk,supabaseSafelyDark};
+    if(!ok)result.failures.push('RENDER_FEATURE_FLAGS_OR_DOMAIN_CORE_CONFIG');
   }catch(e){
     result.checks.renderCapabilities={ok:false,error:String(e.message||e),dataFabricEnabled:null};
     result.failures.push('RENDER_FEATURE_FLAGS');
@@ -125,6 +130,7 @@ evidence.finalStatus=passed?'VERIFIED':'UNVERIFIED';
 evidence.safeToDeclareLive=passed;
 evidence.safeToDeclareDataFabricLive=passed&&evidence.lastAttempt?.checks?.renderCapabilities?.dataFabricEnabled===true&&evidence.lastAttempt?.checks?.r20Contract?.ok===true;
 evidence.dataFabricRuntimeState=evidence.lastAttempt?.checks?.renderCapabilities?.dataFabricEnabled===false?'GATED_OFF_NOT_LIVE':(evidence.safeToDeclareDataFabricLive?'VERIFIED_LIVE':'UNVERIFIED');
+evidence.supabaseRuntimeState=evidence.lastAttempt?.checks?.renderCapabilities?.supabaseCoreEnabled===false&&evidence.lastAttempt?.checks?.renderCapabilities?.supabaseConfigured===true?'DARK_DUAL_RUN_READY':'UNVERIFIED';
 fs.writeFileSync(outDir+'/production-evidence.json',JSON.stringify(evidence,null,2)+'\n');
 
 if(!passed){
@@ -137,5 +143,6 @@ console.log('SCD PRODUCTION EVIDENCE PASS',{
   attempts:evidence.attempts.length,
   pages:PAGES_URL,
   render:RENDER_BASE,
-  dataFabricRuntimeState:evidence.dataFabricRuntimeState
+  dataFabricRuntimeState:evidence.dataFabricRuntimeState,
+  supabaseRuntimeState:evidence.supabaseRuntimeState
 });
