@@ -60,22 +60,14 @@
       const outlet=document.querySelector('#appRouteView');
       const ticker=document.querySelector('.sponsor-ticker');
       if(!home||!outlet)return;
-      if(name==='home'){
-        outlet.hidden=true;
-        outlet.innerHTML='';
-        home.hidden=false;
-        if(ticker)ticker.hidden=false;
-        window.scrollTo({top:0,behavior:'instant'});
-      }else{
-        home.hidden=true;
-        if(ticker)ticker.hidden=true;
-        outlet.hidden=false;
-        outlet.innerHTML='';
-        const renderer=this['render_'+name];
-        if(typeof renderer==='function')renderer.call(this,outlet);
-        else this.render_notFound(outlet);
-        window.scrollTo({top:0,behavior:'instant'});
-      }
+      home.hidden=true;
+      if(ticker)ticker.hidden=true;
+      outlet.hidden=false;
+      outlet.innerHTML='';
+      const renderer=this['render_'+name];
+      if(typeof renderer==='function')renderer.call(this,outlet);
+      else this.render_notFound(outlet);
+      window.scrollTo({top:0,behavior:'auto'});
       this.syncNav();
       this.updateHeader();
       try{track('page_view',{section:'r24_'+name})}catch{}
@@ -96,6 +88,34 @@
       root.querySelectorAll('[data-r24-action]').forEach(b=>b.onclick=()=>openPublicAction(b.dataset.r24Action));
       root.querySelectorAll('[data-r24-register]').forEach(b=>b.onclick=openRegister);
       root.querySelectorAll('[data-r24-login]').forEach(b=>b.onclick=openLogin);
+    },
+    render_home(outlet){
+      const p=publicData(state.summary||FALLBACK),cal=(state.calendar||[]);
+      const counts={
+        games:cal.length?cal.filter(x=>/gara|partita|campionato|coppa|amichevole|match/i.test([x.type,x.title].join(' '))).length:'—',
+        trainings:cal.length?cal.filter(x=>/allenament/i.test([x.type,x.title].join(' '))).length:'—',
+        events:cal.length?cal.filter(x=>!/gara|partita|campionato|coppa|amichevole|match|allenament/i.test([x.type,x.title].join(' '))).length:'—',
+        initiatives:(p.initiatives||[]).length||'—'
+      };
+      const n=p.nextMatch||{};
+      const team=displayValue(field(n,'team','teamName'),'SCD ColicoDerviese');
+      const opp=displayValue(field(n,'opponentName','opponent','avversario'),'Dato in aggiornamento');
+      const when=[fmtDate(field(n,'date','data')),field(n,'time','ora')].filter(Boolean).join(' · ');
+      const sponsors=(p.sponsors||[]).slice(0,4);
+      const sponsorHtml=sponsors.length?sponsors.map(x=>{
+        const name=field(x,'name','sponsor','company','title')||'Partner SCD';
+        const logo=field(x,'logo','logoUrl','image');
+        return '<div class="r24-home-sponsor">'+(logo?'<img src="'+esc(logo)+'" alt="'+esc(name)+'">':'<b>'+esc(name)+'</b>')+'</div>';
+      }).join(''):'<div class="r24-home-sponsor"><b>Partner SCD</b></div>';
+      outlet.innerHTML=
+        '<section class="r24-home-hero"><div class="r24-home-hero-bg"></div><div class="r24-home-brand"><img src="./assets/logo-scd.png" alt="SCD"><div><small>S.D.C.</small><b>COLICO<span>DERVIESE</span></b><em>PIÙ DI UNA SQUADRA. UN TERRITORIO, UNA FAMIGLIA.</em></div></div><div class="r24-home-copy"><small>STAGIONE '+esc((state.summary&&state.summary.season)||'2026/27')+'</small><h1>Questa settimana</h1><p>Sport, crescita e comunità nel cuore dell’Alto Lario.</p></div><img class="r24-home-sky" src="./assets/sky.png" alt="Sky mascotte SCD"><button class="r24-home-bell" type="button" id="r24HomeNotify" aria-label="Notifiche">♢</button></section>'+
+        '<section class="r24-home-kpis"><article><span>⚽</span><strong>'+esc(counts.games)+'</strong><small>Gare</small></article><article><span>◭</span><strong>'+esc(counts.trainings)+'</strong><small>Allenamenti</small></article><article><span>▣</span><strong>'+esc(counts.events)+'</strong><small>Eventi</small></article><article><span>●</span><strong>'+esc(counts.initiatives)+'</strong><small>Iniziative</small></article></section>'+
+        '<section class="r24-home-match"><div class="r24-home-match-head"><b>PROSSIMA GARA</b><button type="button" data-r24-route="calendar">Vedi tutte ›</button></div><div class="r24-home-match-body"><time><b>'+esc(field(n,'date','data')?fmtDate(field(n,'date','data')):'Dato in aggiornamento')+'</b><small>'+esc(field(n,'time','ora')||'')+'</small></time><div class="r24-home-team"><img src="./assets/logo-scd.png" alt=""><b>'+esc(team)+'</b></div><strong>VS</strong><div class="r24-home-team opponent"><span>'+esc((opp||'?').slice(0,1).toUpperCase())+'</span><b>'+esc(opp)+'</b></div></div><div class="r24-home-match-meta">'+esc(field(n,'venue','luogo','field')||when||'Dato in aggiornamento')+'</div></section>'+
+        '<section class="r24-home-quick"><button type="button" data-r24-route="calendar"><span class="training">◭</span><div><b>Allenamenti</b><small>Consulta attività e categorie</small></div><i>›</i></button><button type="button" data-r24-action="join"><span class="open">●</span><div><b>Open Day</b><small>Vieni a scoprire il calcio con noi</small></div><i>›</i></button></section>'+
+        '<section class="r24-home-sponsors"><div class="r24-home-section-title"><b>I nostri sponsor</b><button type="button" data-r24-route="services">Vedi tutti ›</button></div><div>'+sponsorHtml+'</div></section>'+
+        '<section class="r24-home-world"><div class="r24-home-world-photo"></div><div><small>MONDO COLICODERVIESE</small><h2>Notizie, storie, eventi e territorio</h2><p>La vita del Club, dentro e fuori dal campo.</p><button type="button" data-r24-route="communications">Scopri ›</button></div></section>';
+      const notify=outlet.querySelector('#r24HomeNotify');if(notify)notify.onclick=requestNotificationPermission;
+      this.bindCommon(outlet);
     },
     render_notFound(outlet){
       outlet.innerHTML=this.shellHeader('Percorso non disponibile','La sezione richiesta non fa parte del contratto applicativo.')+'<section class="r24-panel"><button class="primary" data-r24-route="home">TORNA ALLA HOME</button></section>';
