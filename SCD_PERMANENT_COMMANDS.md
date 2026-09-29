@@ -1,4 +1,4 @@
-# SCD PERMANENT COMMANDS — MASTER
+> **NON NORMATIVO / STORICO.** La fonte normativa unica e machine-readable del progetto è [`SCD_SYSTEM_MANIFEST.json`](./SCD_SYSTEM_MANIFEST.json). In caso di conflitto prevale sempre il manifest. Questo file resta come memoria e specifica di supporto.\n\n# SCD PERMANENT COMMANDS — MASTER
 
 Questo file è vincolante per OGNI sviluppo, documento, modulo, automazione, applicazione, sito, grafica, database, comunicazione digitale e progetto tecnologico collegato a S.D.C. ColicoDerviese. In caso di conflitto con istruzioni generiche successive, prevalgono le regole permanenti SCD salvo modifica esplicita della Direzione.
 

@@ -26,6 +26,8 @@ jobs:
           node-version: '20'
           cache: 'npm'
           cache-dependency-path: platform/package.json
+      - name: SCD System Manifest gate
+        run: npm run test:manifest
       - name: Install platform dependencies
         run: npm install --prefix platform --no-audit --no-fund
       - name: TypeScript build and tests

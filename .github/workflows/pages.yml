@@ -21,6 +21,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: SCD System Manifest gate
+        run: npm run test:manifest
+
       - name: Prepare static site
         run: |
           node --check app.js
