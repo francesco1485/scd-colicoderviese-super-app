@@ -730,10 +730,21 @@ function bindDynamic(){
 }
 function boot(){
   updateClubClock();setInterval(updateClubClock,1000);
-  $('#modalClose').onclick=closeModal;$('#modalBackdrop').onclick=e=>{if(e.target===$('#modalBackdrop'))closeModal()};
-  [$('#registerBtn'),$('#heroRegister'),$('#quickRegister'),$('#bottomRegister')].forEach(b=>b&&b.addEventListener('click',openRegister));$('#loginBtn').onclick=openProfile;$('#mobileProfile').onclick=openProfile;$('#heroGames').onclick=()=>$('#gare').scrollIntoView({behavior:'smooth'});$('#refreshBtn').onclick=()=>loadSummary();
-  $('#skyFab').onclick=openSky;const mobileSky=$('#mobileSky');if(mobileSky)mobileSky.onclick=openSky;$('#closeSky').onclick=closeSky;$$('[data-sky]').forEach(b=>b.onclick=()=>{const map={next:'Qual è la prossima gara?',join:'Come posso iscrivermi o fare una prova?',sponsor:'Come posso diventare sponsor?',rent:'Come posso affittare un campo?',fan:'Come funziona la community tifosi?'};const q=map[b.dataset.sky]||'Come posso usare la Super App?';addBubble(q,true);setTimeout(()=>addBubble(skyAnswer(q)),180)});$('#skyForm').onsubmit=e=>{e.preventDefault();const q=$('#skyInput').value.trim();if(!q)return;addBubble(q,true);$('#skyInput').value='';setTimeout(()=>addBubble(skyAnswer(q)),180)};
-  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();state.installPrompt=e;$('#installBtn').hidden=false});$('#installBtn').onclick=async()=>{if(!state.installPrompt)return toast('Dal menu del browser scegli “Installa app” o “Aggiungi alla schermata Home”.');state.installPrompt.prompt();await state.installPrompt.userChoice;state.installPrompt=null;$('#installBtn').hidden=true;track('pwa_install',{section:'install'})};
+  const modalClose=$('#modalClose'),modalBackdrop=$('#modalBackdrop'),loginBtn=$('#loginBtn'),mobileProfile=$('#mobileProfile'),heroGames=$('#heroGames'),refreshBtn=$('#refreshBtn'),skyFab=$('#skyFab'),closeSkyBtn=$('#closeSky'),skyForm=$('#skyForm'),installBtn=$('#installBtn');
+  if(modalClose)modalClose.onclick=closeModal;
+  if(modalBackdrop)modalBackdrop.onclick=e=>{if(e.target===modalBackdrop)closeModal()};
+  [$('#registerBtn'),$('#heroRegister'),$('#quickRegister'),$('#bottomRegister')].forEach(b=>b&&b.addEventListener('click',openRegister));
+  if(loginBtn)loginBtn.onclick=openProfile;
+  if(mobileProfile)mobileProfile.onclick=openProfile;
+  if(heroGames)heroGames.onclick=()=>$('#gare')?.scrollIntoView({behavior:'smooth'});
+  if(refreshBtn)refreshBtn.onclick=()=>loadSummary();
+  if(skyFab)skyFab.onclick=openSky;
+  const mobileSky=$('#mobileSky');if(mobileSky)mobileSky.onclick=openSky;
+  if(closeSkyBtn)closeSkyBtn.onclick=closeSky;
+  $('[data-sky]').forEach(b=>b.onclick=()=>{const map={next:'Qual è la prossima gara?',join:'Come posso iscrivermi o fare una prova?',sponsor:'Come posso diventare sponsor?',rent:'Come posso affittare un campo?',fan:'Come funziona la community tifosi?'};const q=map[b.dataset.sky]||'Come posso usare la Super App?';addBubble(q,true);setTimeout(()=>addBubble(skyAnswer(q)),180)});
+  if(skyForm)skyForm.onsubmit=e=>{e.preventDefault();const input=$('#skyInput'),q=input?.value.trim();if(!q)return;addBubble(q,true);if(input)input.value='';setTimeout(()=>addBubble(skyAnswer(q)),180)};
+  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();state.installPrompt=e;if(installBtn)installBtn.hidden=false});
+  if(installBtn)installBtn.onclick=async()=>{if(!state.installPrompt)return toast('Dal menu del browser scegli “Installa app” o “Aggiungi alla schermata Home”.');state.installPrompt.prompt();await state.installPrompt.userChoice;state.installPrompt=null;installBtn.hidden=true;track('pwa_install',{section:'install'})};
   if('serviceWorker' in navigator){
   navigator.serviceWorker.register('./sw.js?v=21.10.0',{updateViaCache:'none'})
     .then(reg=>reg.update())
