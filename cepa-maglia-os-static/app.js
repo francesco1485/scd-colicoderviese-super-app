@@ -159,6 +159,23 @@ function renderHome(){
   $('homeCepaSubjects').textContent=subjects.length
   $('homeDocs').textContent=documents.length
   $('homeMarket').textContent=marketEntities.length
+
+  const knowledgeVerified=productKnowledge.filter(x=>x.verification_status==='verified').length
+  $('homeKnowledgeVerified').textContent=knowledgeVerified+'/'+productKnowledge.length
+  $('homeKnowledgeTotal').textContent='elementi conoscenza verificati'
+
+  const termsVerified=collaboratorTerms.filter(x=>x.verification_status==='verified').length
+  $('homeTermsVerified').textContent=termsVerified+'/'+collaboratorTerms.length
+  $('homeTermsTotal').textContent='condizioni economiche verificate'
+
+  const partnerCovered=partnerRequirements.filter(x=>['received','verified','not_applicable'].includes(x.status)).length
+  $('homePartnerDocsCovered').textContent=partnerCovered+'/'+partnerRequirements.length
+  $('homePartnerDocsTotal').textContent='requisiti dossier coperti'
+
+  const cepaReady=cepaReadiness.filter(x=>['ready','verified'].includes(x.status)).length
+  $('homeCepaReady').textContent=cepaReady+'/'+cepaReadiness.length
+  $('homeCepaReadyTotal').textContent='elementi pronti / verificati'
+
   const open=actions.filter(a=>!['completed','cancelled'].includes(a.status)).sort(actionSort).slice(0,8)
   $('homeActions').innerHTML=open.map(a=>listRow(a.title,(a.ecosystem_nodes?.name||a.market_entities?.name||a.strategic_projects?.title||laneLabel(a.lane)),[actionStatus(a.status),a.priority,a.due_at?fmtDate(a.due_at):'senza scadenza'])).join('')||empty('Nessuna attività aperta')
 }
