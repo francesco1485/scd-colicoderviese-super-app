@@ -158,14 +158,16 @@ function openCalendarEvent(id){
 async function openCalendar(){
   modal('<span class="eyebrow">TEMPO REALE SCD</span><h2>Calendario</h2><p id="calendarClock">'+esc(formatClubDateTime())+'</p><div class="calendar-toolbar"><button class="outline" id="calendarRefresh">AGGIORNA</button><button class="outline" id="calendarNotify">NOTIFICHE</button></div><div id="calendarRows" class="calendar-list"><div class="loading-line">Sincronizzazione calendario…</div></div>');
   const renderRows=()=>{
-    const mount=$('#calendarRows');if(!mount)return;
+    const mount=$('#calendarRows');if(!mount)return false;
     const today=clubDateKey(),future=(state.calendar||[]).filter(x=>!x.date||String(x.date).slice(0,10)>=today).slice(0,40);
     mount.innerHTML=future.length?future.map(x=>`<button class="calendar-row" data-calendar-event="${esc(x.id)}"><time><b>${esc(fmtDate(x.date))}</b><small>${esc(x.time||'')}</small></time><span><b>${esc(x.title)}</b><small>${esc([x.team,x.venue,x.type].filter(Boolean).join(' · '))}</small></span><i>›</i></button>`).join(''):'<div class="empty-state">Calendario pubblico in aggiornamento.</div>';
-    bindCalendarEvents();
+    bindCalendarEvents();return true;
   };
-  await loadPublicCalendar(true);renderRows();
-  $('#calendarRefresh').onclick=async()=>{await syncClubClock();await loadPublicCalendar(false);renderRows();$('#calendarClock').textContent=formatClubDateTime()};
-  $('#calendarNotify').onclick=requestNotificationPermission;
+  const refresh=$('#calendarRefresh'),notify=$('#calendarNotify');
+  if(refresh)refresh.onclick=async()=>{await syncClubClock();await loadPublicCalendar(false);if(!renderRows())return;const clock=$('#calendarClock');if(clock)clock.textContent=formatClubDateTime()};
+  if(notify)notify.onclick=requestNotificationPermission;
+  await loadPublicCalendar(true);
+  renderRows();
 }
 async function requestNotificationPermission(){
   if(!('Notification' in window))return toast('Notifiche non supportate da questo dispositivo');
