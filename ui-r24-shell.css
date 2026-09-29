@@ -1,3 +1,151 @@
+
+/* R24 compact public home, derived from approved mobile master */
+body.r24-router-ready .r24-home-hero{
+  min-height:420px;
+  border-radius:28px;
+  position:relative;
+  overflow:hidden;
+  color:#fff;
+  box-shadow:var(--r24-shadow);
+  margin-bottom:0;
+  background:#07366f;
+}
+body.r24-router-ready .r24-home-hero-bg{
+  position:absolute;inset:0;
+  background:
+    linear-gradient(0deg,rgba(2,27,66,.86) 0%,rgba(4,41,91,.28) 56%,rgba(2,44,101,.08) 100%),
+    url('./assets/hero-colico.webp') center 44%/cover no-repeat;
+}
+body.r24-router-ready .r24-home-brand{
+  position:absolute;z-index:2;left:22px;top:20px;display:flex;align-items:center;gap:12px;
+}
+body.r24-router-ready .r24-home-brand img{width:62px;height:76px;object-fit:contain;filter:drop-shadow(0 6px 14px rgba(0,0,0,.25))}
+body.r24-router-ready .r24-home-brand div{display:grid}
+body.r24-router-ready .r24-home-brand small{font-size:9px;font-weight:900;letter-spacing:.18em}
+body.r24-router-ready .r24-home-brand b{font-size:25px;line-height:.95;color:#fff;letter-spacing:-.03em}
+body.r24-router-ready .r24-home-brand b span{color:var(--r24-yellow)}
+body.r24-router-ready .r24-home-brand em{font-style:normal;font-size:7px;letter-spacing:.17em;margin-top:5px;font-weight:800;color:#eef5ff}
+body.r24-router-ready .r24-home-copy{position:absolute;z-index:2;left:24px;right:130px;bottom:26px}
+body.r24-router-ready .r24-home-copy small{display:inline-block;background:rgba(2,35,83,.74);border:1px solid rgba(255,255,255,.16);padding:5px 8px;border-radius:999px;font-size:7px;font-weight:950;letter-spacing:.12em}
+body.r24-router-ready .r24-home-copy h1{font-size:43px;line-height:.92;letter-spacing:-.04em;margin:10px 0 4px;color:#fff;text-shadow:0 4px 14px rgba(0,0,0,.32)}
+body.r24-router-ready .r24-home-copy p{margin:0;font-size:16px;line-height:1.2;font-weight:750;color:#fff;max-width:470px}
+body.r24-router-ready .r24-home-sky{
+  position:absolute;z-index:2;right:10px;bottom:-7px;width:180px;height:220px;object-fit:contain;filter:drop-shadow(0 14px 18px rgba(0,0,0,.28))
+}
+body.r24-router-ready .r24-home-bell{
+  position:absolute;z-index:3;right:18px;top:18px;width:42px;height:42px;border-radius:14px;border:1px solid rgba(255,255,255,.28);background:rgba(4,44,97,.5);color:#fff;font-size:20px;backdrop-filter:blur(8px)
+}
+body.r24-router-ready .r24-home-kpis{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;
+  margin:-1px 18px 14px;position:relative;z-index:4;transform:translateY(-18px)
+}
+body.r24-router-ready .r24-home-kpis article{
+  min-height:94px;border:1px solid var(--r24-line);border-radius:18px;background:#fff;box-shadow:0 10px 24px rgba(4,42,96,.1);
+  display:grid;place-items:center;align-content:center;text-align:center;padding:8px
+}
+body.r24-router-ready .r24-home-kpis span{font-size:21px}
+body.r24-router-ready .r24-home-kpis strong{font-size:25px;color:var(--r24-navy);line-height:1;margin-top:5px}
+body.r24-router-ready .r24-home-kpis small{font-size:7px;text-transform:uppercase;letter-spacing:.07em;font-weight:950;color:#637b94;margin-top:4px}
+body.r24-router-ready .r24-home-match{
+  background:#fff;border:1px solid var(--r24-line);border-radius:22px;box-shadow:var(--r24-shadow);padding:0;margin:-8px 0 12px;overflow:hidden
+}
+body.r24-router-ready .r24-home-match-head{
+  min-height:38px;background:linear-gradient(90deg,#0a70e8,#0758bd);color:#fff;padding:0 14px;display:flex;align-items:center;justify-content:space-between
+}
+body.r24-router-ready .r24-home-match-head b{font-size:10px;letter-spacing:.04em}
+body.r24-router-ready .r24-home-match-head button{border:0;background:transparent;color:#fff;font-size:9px;font-weight:900}
+body.r24-router-ready .r24-home-match-body{
+  display:grid;grid-template-columns:130px 1fr 40px 1fr;gap:8px;align-items:center;padding:16px 18px 10px
+}
+body.r24-router-ready .r24-home-match-body>time{border-right:1px solid #dbe5ef;padding-right:12px}
+body.r24-router-ready .r24-home-match-body time b,body.r24-router-ready .r24-home-match-body time small{display:block}
+body.r24-router-ready .r24-home-match-body time b{font-size:13px;color:var(--r24-navy)}
+body.r24-router-ready .r24-home-match-body time small{font-size:16px;font-weight:950;color:#0a58b4;margin-top:4px}
+body.r24-router-ready .r24-home-team{text-align:center}
+body.r24-router-ready .r24-home-team img{width:54px;height:62px;object-fit:contain;display:block;margin:0 auto 4px}
+body.r24-router-ready .r24-home-team>span{width:54px;height:54px;border-radius:14px;background:#082b67;color:#fff;display:grid;place-items:center;margin:0 auto 6px;font-size:24px;font-weight:950}
+body.r24-router-ready .r24-home-team b{display:block;font-size:11px;color:var(--r24-navy)}
+body.r24-router-ready .r24-home-match-body>strong{text-align:center;color:var(--r24-navy);font-size:18px}
+body.r24-router-ready .r24-home-match-meta{padding:0 18px 14px;text-align:center;font-size:9px;color:#5e7893}
+body.r24-router-ready .r24-home-quick{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+body.r24-router-ready .r24-home-quick button{
+  min-height:96px;background:#fff;border:1px solid var(--r24-line);border-radius:18px;padding:12px;display:grid;grid-template-columns:48px 1fr 16px;gap:9px;align-items:center;text-align:left
+}
+body.r24-router-ready .r24-home-quick>button>span{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;font-size:22px}
+body.r24-router-ready .r24-home-quick .training{background:#e8faef;color:#0c9b5f}
+body.r24-router-ready .r24-home-quick .open{background:#fff3bd;color:#745b00}
+body.r24-router-ready .r24-home-quick b{display:block;font-size:11px;color:var(--r24-navy)}
+body.r24-router-ready .r24-home-quick small{display:block;font-size:8px;color:#72859a;margin-top:3px}
+body.r24-router-ready .r24-home-quick i{font-style:normal;color:#224c79;font-size:20px}
+body.r24-router-ready .r24-home-sponsors{
+  border-radius:20px;background:linear-gradient(110deg,#04347d,#075ec6);color:#fff;padding:12px;margin-bottom:12px
+}
+body.r24-router-ready .r24-home-section-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+body.r24-router-ready .r24-home-section-title b{font-size:13px}
+body.r24-router-ready .r24-home-section-title button{border:0;background:transparent;color:#fff;font-size:9px;font-weight:900}
+body.r24-router-ready .r24-home-sponsors>div:last-child{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+body.r24-router-ready .r24-home-sponsor{height:62px;border-radius:13px;background:#fff;display:grid;place-items:center;padding:8px;color:#0b356f;text-align:center}
+body.r24-router-ready .r24-home-sponsor img{max-width:100%;max-height:42px;object-fit:contain}
+body.r24-router-ready .r24-home-sponsor b{font-size:9px}
+body.r24-router-ready .r24-home-world{
+  display:grid;grid-template-columns:42% 1fr;min-height:150px;background:#fff;border:1px solid var(--r24-line);border-radius:20px;overflow:hidden;box-shadow:0 9px 24px rgba(5,42,102,.08)
+}
+body.r24-router-ready .r24-home-world-photo{background:url('./assets/hero-colico.webp') center 52%/cover no-repeat}
+body.r24-router-ready .r24-home-world>div:last-child{padding:15px}
+body.r24-router-ready .r24-home-world small{font-size:7px;letter-spacing:.12em;font-weight:950;color:#0a64cf}
+body.r24-router-ready .r24-home-world h2{font-size:18px;line-height:1.05;color:var(--r24-navy);margin:5px 0}
+body.r24-router-ready .r24-home-world p{font-size:9px;line-height:1.45;color:#6b8298;margin:0 0 8px}
+body.r24-router-ready .r24-home-world button{border:0;background:#0b68d8;color:#fff;border-radius:999px;padding:8px 13px;font-size:9px;font-weight:950}
+
+@media(min-width:901px){
+  body.r24-router-ready .r24-home-hero{min-height:520px}
+  body.r24-router-ready .r24-home-brand{left:38px;top:34px}
+  body.r24-router-ready .r24-home-brand img{width:86px;height:104px}
+  body.r24-router-ready .r24-home-brand b{font-size:38px}
+  body.r24-router-ready .r24-home-brand em{font-size:9px}
+  body.r24-router-ready .r24-home-copy{left:42px;bottom:45px;right:330px}
+  body.r24-router-ready .r24-home-copy h1{font-size:70px}
+  body.r24-router-ready .r24-home-copy p{font-size:22px}
+  body.r24-router-ready .r24-home-sky{width:300px;height:360px;right:34px;bottom:-14px}
+  body.r24-router-ready .r24-home-kpis{margin:-20px 42px 12px;transform:none}
+  body.r24-router-ready .r24-home-match{margin:0 42px 14px}
+  body.r24-router-ready .r24-home-quick,
+  body.r24-router-ready .r24-home-sponsors,
+  body.r24-router-ready .r24-home-world{margin-left:42px;margin-right:42px}
+  body.r24-router-ready .r24-home-quick{grid-template-columns:1fr 1fr}
+  body.r24-router-ready .r24-home-world{grid-template-columns:34% 1fr}
+}
+
+@media(max-width:900px){
+  body.r24-router-ready .app-route-view:has(.r24-home-hero){padding-top:0}
+  body.r24-router-ready .r24-home-hero{border-radius:0;min-height:430px;margin-left:-10px;margin-right:-10px}
+  body.r24-router-ready .r24-home-brand{left:15px;top:15px}
+  body.r24-router-ready .r24-home-brand img{width:54px;height:66px}
+  body.r24-router-ready .r24-home-brand b{font-size:18px}
+  body.r24-router-ready .r24-home-brand em{font-size:5.5px}
+  body.r24-router-ready .r24-home-copy{left:16px;right:110px;bottom:28px}
+  body.r24-router-ready .r24-home-copy h1{font-size:38px}
+  body.r24-router-ready .r24-home-copy p{font-size:14px}
+  body.r24-router-ready .r24-home-sky{width:155px;height:190px;right:-8px}
+  body.r24-router-ready .r24-home-kpis{margin:-18px 0 10px}
+  body.r24-router-ready .r24-home-kpis article{min-height:82px;border-radius:15px}
+  body.r24-router-ready .r24-home-kpis span{font-size:18px}
+  body.r24-router-ready .r24-home-kpis strong{font-size:21px}
+  body.r24-router-ready .r24-home-match-body{grid-template-columns:86px 1fr 28px 1fr;padding:12px 10px 8px}
+  body.r24-router-ready .r24-home-team img{width:43px;height:50px}
+  body.r24-router-ready .r24-home-team>span{width:43px;height:43px;font-size:20px}
+  body.r24-router-ready .r24-home-team b{font-size:8px}
+  body.r24-router-ready .r24-home-match-body time b{font-size:9px}
+  body.r24-router-ready .r24-home-match-body time small{font-size:13px}
+  body.r24-router-ready .r24-home-quick{gap:7px}
+  body.r24-router-ready .r24-home-quick button{grid-template-columns:42px 1fr 12px;padding:9px;min-height:82px}
+  body.r24-router-ready .r24-home-quick>button>span{width:42px;height:42px}
+  body.r24-router-ready .r24-home-sponsors>div:last-child{grid-template-columns:repeat(3,minmax(0,1fr))}
+  body.r24-router-ready .r24-home-sponsor:nth-child(n+4){display:none}
+  body.r24-router-ready .r24-home-world{min-height:136px}
+  body.r24-router-ready .r24-home-world h2{font-size:14px}
+}
+
 /* R24 PRODUCT SHELL
    Canonical responsive app layer. Keeps legacy components available while
    turning the primary experience into routed screens instead of full-screen modals. */
