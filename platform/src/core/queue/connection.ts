@@ -1,8 +1,8 @@
-import IORedis from "ioredis";
+import { Redis } from "ioredis";
 
-export function createRedisConnection(url = process.env.REDIS_URL): IORedis | null {
+export function createRedisConnection(url = process.env.REDIS_URL): Redis | null {
   if (!url) return null;
-  return new IORedis(url, {
+  return new Redis(url, {
     maxRetriesPerRequest: null,
     enableReadyCheck: true,
     lazyConnect: false
