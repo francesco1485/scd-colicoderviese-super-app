@@ -1,0 +1,32 @@
+name: SCD Manifest PR Policy
+
+on:
+  pull_request:
+    branches: ["main"]
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  pr-policy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Validate manifest impact declaration
+        run: |
+          node <<'NODE'
+          const fs=require('fs');
+          const event=JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH,'utf8'));
+          const body=event.pull_request?.body||'';
+          const fail=(m)=>{console.error('SCD PR POLICY FAIL: '+m);process.exitCode=1};
+          if(!body.includes('- [x] Ho letto `SCD_SYSTEM_MANIFEST.json`.')) fail('manifest read checkbox not confirmed');
+          if(!/CAP-[A-Z0-9-]+/.test(body)) fail('declare at least one CAP-* capability or CAP-NONE');
+          if(!/(R20|SCD_DRIVE|SCD_GMAIL|CORE_SHEET|TESSERATI_SHEET|PULMINI_SHEET|SPONSOR_SHEET|FIGC|LND|CR_LOMBARDIA|SGS|SPORT_E_SALUTE|RASD|TUTTOCAMPO|SCD_OFFICIAL_SITE|SCD_FACEBOOK|SCD_INSTAGRAM|TUTTITALIA|SEGRETARIO_CALCIO|TEAMSYSTEM_SPORTIVI_IN_CLOUD|SQUBY|ATHLETIS|WEB_VERIFIED|SOURCE-NONE)/.test(body)) fail('declare at least one registered source id or SOURCE-NONE');
+          const noContract=body.includes('- [x] Nessuna modifica contrattuale: il manifest non richiede aggiornamento.');
+          const changed=body.includes('- [x] Modifica contrattuale: `SCD_SYSTEM_MANIFEST.json` è aggiornato in questo PR.');
+          if(noContract===changed) fail('check exactly one Manifest impact option');
+          if(!body.includes('### Rollback')) fail('rollback section missing');
+          if(process.exitCode) process.exit(process.exitCode);
+          console.log('SCD PR POLICY PASS');
+          NODE

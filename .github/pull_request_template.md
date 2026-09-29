@@ -9,11 +9,11 @@
 
 ### Capability coinvolte
 Indicare gli ID `CAP-*`:
-<!-- esempio: CAP-CALENDAR, CAP-FAMILY -->
+<!-- esempio: CAP-CALENDAR, CAP-FAMILY; usare CAP-NONE solo se davvero non applicabile -->
 
 ### Fonte/i dati coinvolte
 Indicare gli ID del `source_registry`:
-<!-- esempio: R20, SCD_DRIVE, CR_LOMBARDIA -->
+<!-- esempio: R20, SCD_DRIVE, CR_LOMBARDIA; usare SOURCE-NONE solo se davvero non applicabile -->
 
 ### Manifest
 - [ ] Nessuna modifica contrattuale: il manifest non richiede aggiornamento.
