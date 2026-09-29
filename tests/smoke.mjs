@@ -39,7 +39,7 @@ for(const viewport of viewports){
   await page.waitForSelector('#appRouteView:not([hidden]) .r24-home-hero');
   await page.waitForSelector('.r24-home-kpis');
   await page.waitForSelector('.mobile-nav [data-nav="calendar"]',{state:'attached'});
-  await page.waitForSelector('#clubClock');
+  await page.waitForSelector('#clubClock',{state:'attached'});
   await page.waitForFunction(()=>document.querySelector('#clubClock')?.textContent?.length>8);
   await page.waitForFunction(()=>document.documentElement.scrollWidth<=window.innerWidth+3);
 
