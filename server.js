@@ -36,6 +36,7 @@ const allowedActions = new Set([
   'auth.request','auth.login','auth.validate','auth.pin.change',
   'direction.access.set','direction.pin.set','direction.player.approve','direction.player.reject',
   'direction.diagnostics','direction.evolution',
+  'direction.datafabric.status','direction.datafabric.scan.gmail','direction.datafabric.scan.drive',
 ]);
 
 function clubTimePayload(){
