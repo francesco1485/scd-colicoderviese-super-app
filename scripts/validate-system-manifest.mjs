@@ -151,6 +151,8 @@ assert(m.architecture.r22_role==='ORCHESTRATION_COMMAND_EVENT_PLUGIN_LAYER_NOT_S
 assert(m.architecture.extensibility.data_ui_separation===true,'data/UI separation required');
 assert(m.architecture.feature_flags?.data_fabric_observability?.id==='FF-DATAFABRIC-OBSERVABILITY','Data Fabric observability feature flag missing');
 assert(m.architecture.feature_flags?.data_fabric_observability?.runtime_env==='SCD_FEATURE_DATA_FABRIC_OBSERVABILITY','Data Fabric feature flag env mismatch');
+assert(m.architecture.feature_flags?.data_fabric_observability?.default_enabled===false,'Data Fabric observability must default off until R20 contract is live');
+includesAll(m.architecture.feature_flags?.data_fabric_observability?.activation_requires||[],['R20_ACTION_PUBLIC_DATAFABRIC_CONTRACT_SUPPORTED','R20_ACTION_DIRECTION_DATAFABRIC_STATUS_SUPPORTED','VERIFY_R20_DIRECT_GREEN','PRODUCTION_EVIDENCE_GREEN_WITH_FLAG_TRUE','DIRECTION_AUTHORIZED_SMOKE_GREEN'],'Data Fabric activation requirements');
 assert(m.architecture.upstream_resilience?.retry_mode==='READ_ONLY_ONLY','upstream retries must remain read-only only');
 assert(m.architecture.upstream_resilience?.max_attempts===2,'upstream read-only retry attempts mismatch');
 includesAll(m.data_architecture?.provenance_contract?.ui_question_fields||[],['SOURCE','TABLE','FIELD','API','FALLBACK','REFRESH'],'provenance contract');
@@ -169,6 +171,9 @@ includesAll(releaseEvidence,['VERSION','COMMIT','PR','CI_STATUS','SCREENSHOT_MOB
 assert(m.delivery_and_quality?.production_evidence?.required===true,'production evidence must remain required');
 assert(m.delivery_and_quality?.production_evidence?.workflow==='.github/workflows/production-evidence.yml','production evidence workflow mismatch');
 assert(m.delivery_and_quality?.production_evidence?.r20_contract_action==='public.datafabric.contract','R20 public contract probe mismatch');
+assert(m.delivery_and_quality?.production_evidence?.feature_gated_checks?.['FF-DATAFABRIC-OBSERVABILITY']?.disabled_status==='GATED_OFF_NOT_LIVE','Data Fabric gated-off evidence state missing');
+assert(m.development_contract?.runtime_activation?.core_live_without_datafabric===true,'Core live must remain independent from gated Data Fabric observability');
+assert(m.development_contract?.runtime_activation?.data_fabric_activation==='BLOCKED_UNTIL_R20_DEPLOY','Data Fabric activation blocker must remain explicit');
 assert(m.development_contract?.runtime_activation?.r20_direct_verifier==='scripts/verify-r20-direct.mjs','R20 direct verifier missing from runtime activation');
 assert(m.development_contract?.runtime_activation?.canonical_url_must_be_preserved===true,'R20 canonical Web App URL must be preserved');
 const r25r26=(m.development_contract?.release_dependencies||[]).find(x=>x.predecessor==='R25'&&x.successor==='R26');
@@ -206,6 +211,7 @@ const requiredRepoFiles=[
   'docs/adr/ADR-0003-production-evidence.md',
   'docs/adr/ADR-0004-read-only-upstream-retry.md',
   'docs/adr/ADR-0005-r20-runtime-activation.md',
+  'docs/adr/ADR-0006-r32-safe-live-core.md',
   'docs/runbooks/R20-RUNTIME-DEPLOY.md',
   'scripts/verify-r20-direct.mjs',
   'tests/upstream-resilience.mjs',
