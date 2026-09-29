@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "release": "R34",
+  "release": "R35",
   "purpose": "Fondazione del nuovo Domain Core SCD PULSE su Supabase/PostgreSQL, separato da CEPA Maglia OS e attivato per migrazione progressiva senza interrompere R20.",
   "project": {
     "state": "ACTIVE_HEALTHY",
@@ -62,7 +62,8 @@
     "server_side_role_assignment": true,
     "migrations": [
       "supabase/migrations/20260929_r33_club_graph_foundation.sql",
-      "supabase/migrations/20260929_r34_rls_performance_hardening.sql"
+      "supabase/migrations/20260929_r34_rls_performance_hardening.sql",
+      "supabase/migrations/20260929_r35_auth_context_rls_normalization.sql"
     ]
   },
   "activation": {
@@ -92,5 +93,13 @@
       "MOBILE_VERTICAL_SLICE_GREEN",
       "ROLLBACK_PROVEN"
     ]
+  },
+  "auth_context": {
+    "state": "STAGED",
+    "signup_default_role": "USER_BASE",
+    "self_role_selection": false,
+    "bootstrap_trigger": "on_auth_user_created_scd",
+    "context_function": "scd_my_context",
+    "qualified_role_assignment": "SERVER_SIDE_ONLY"
   }
 }
