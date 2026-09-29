@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "1.3.0",
+    "version": "1.4.0",
     "effective_at": "2026-09-29",
     "status": "BINDING",
     "language": "it-IT",
@@ -461,7 +461,20 @@
       "MEDIA",
       "NOTIFICATIONS",
       "AUDIT"
-    ]
+    ],
+    "provenance_contract": {
+      "required": true,
+      "ui_question_fields": [
+        "SOURCE",
+        "TABLE",
+        "FIELD",
+        "API",
+        "FALLBACK",
+        "REFRESH"
+      ],
+      "unknown_value": "UNVERIFIED",
+      "rule": "Ogni dato operativo esposto dalla UI deve poter dichiarare provenienza, API, fallback e politica di refresh senza trasformare assenza di prova in prova di assenza."
+    }
   },
   "source_registry": {
     "trust_scale": {
@@ -1314,6 +1327,18 @@
       "feature_flags_required_for_high_risk_rollout": true,
       "stable_api_contracts": true,
       "data_ui_separation": true
+    },
+    "feature_flags": {
+      "data_fabric_observability": {
+        "id": "FF-DATAFABRIC-OBSERVABILITY",
+        "runtime_env": "SCD_FEATURE_DATA_FABRIC_OBSERVABILITY",
+        "default_enabled": true,
+        "audience": [
+          "DIRECTION"
+        ],
+        "off_behavior": "HIDE_DIRECTION_DETAIL_KEEP_GENERIC_HEALTH",
+        "rollback": "SET_ENV_FALSE"
+      }
     }
   },
   "delivery_and_quality": {
@@ -1328,7 +1353,10 @@
       "VISUAL_MASTER_COMPARE",
       "NO_BROWSER_ERRORS",
       "SAFEGUARDING_ISOLATION",
-      "NO_FAKE_SPORT_DATA"
+      "NO_FAKE_SPORT_DATA",
+      "PROVENANCE_CONTRACT",
+      "FEATURE_FLAG_ROLLOUT",
+      "OBSERVABILITY_STATUS"
     ],
     "merge_rule": "Non considerare completata una funzione se è verde solo tecnicamente ma viola il manifest o il master visivo.",
     "release_truth": {
@@ -1505,6 +1533,20 @@
       "domain": "DISTRIBUTION",
       "required": true,
       "state": "ROADMAP"
+    },
+    {
+      "id": "CAP-DATAFABRIC-OBSERVABILITY",
+      "domain": "DATA_FABRIC",
+      "required": true,
+      "state": "PARTIAL",
+      "audience": "DIRECTION",
+      "flag": "FF-DATAFABRIC-OBSERVABILITY",
+      "sources": [
+        "SCD_GMAIL",
+        "SCD_DRIVE",
+        "R20"
+      ],
+      "contract": "STATUS_LAST_SYNC_LAST_SUCCESS_LAST_ERROR_PROVENANCE"
     }
   ],
   "known_noncompliance": [
