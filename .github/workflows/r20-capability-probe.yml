@@ -1,0 +1,62 @@
+name: SCD R20 Capability Probe
+
+on:
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Probe safe R20 capabilities
+        run: |
+          node <<'NODE'
+          const base='https://scd-colicoderviese-official-r21.onrender.com/api/scd';
+          const actions=[
+            ['public.feed',{limit:1}],
+            ['public.datafabric.contract',{}],
+            ['direction.datafabric.status',{}],
+            ['direction.diagnostics',{}]
+          ];
+          async function call(action,payload){
+            const ctrl=new AbortController();
+            const timer=setTimeout(()=>ctrl.abort(),20000);
+            try{
+              const r=await fetch(base,{
+                method:'POST',
+                redirect:'follow',
+                cache:'no-store',
+                signal:ctrl.signal,
+                headers:{'content-type':'application/json','x-scd-client':'r20-capability-probe'},
+                body:JSON.stringify({action,payload,sessionToken:''})
+              });
+              const text=await r.text();
+              let parsed=null;try{parsed=JSON.parse(text)}catch{}
+              return {status:r.status,body:parsed??{raw:text.slice(0,500)}};
+            }catch(e){
+              return {status:0,body:{ok:false,error:String(e.message||e),code:e.name||'ERROR'}};
+            }finally{clearTimeout(timer)}
+          }
+          for(const [action,payload] of actions){
+            const x=await call(action,payload);
+            console.log('\n### '+action+' HTTP '+x.status);
+            const body=x.body||{};
+            const safe={
+              ok:body.ok??null,
+              httpStatus:body.httpStatus??null,
+              version:body.version??body.data?.version??null,
+              release:body.release??body.data?.release??null,
+              error:body.error??body.data?.error??null,
+              dataKeys:body.data&&typeof body.data==='object'?Object.keys(body.data).sort():[]
+            };
+            console.log(JSON.stringify(safe,null,2));
+          }
+          NODE
