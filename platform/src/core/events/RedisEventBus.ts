@@ -1,9 +1,9 @@
-import type IORedis from "ioredis";
+import type { Redis } from "ioredis";
 import type { DomainEvent, EventBus } from "./EventBus.js";
 
 export class RedisEventBus implements EventBus {
   public constructor(
-    private readonly redis: IORedis,
+    private readonly redis: Redis,
     private readonly stream = "scd:events"
   ) {}
 
