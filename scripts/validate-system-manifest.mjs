@@ -149,6 +149,9 @@ includesAll(m.analytics.forbidden_payloads||[],['PASSWORD','PIN','SAFEGUARDING_C
 
 assert(m.architecture.r22_role==='ORCHESTRATION_COMMAND_EVENT_PLUGIN_LAYER_NOT_SECOND_GESTIONALE','R22 cannot become a second gestionale');
 assert(m.architecture.extensibility.data_ui_separation===true,'data/UI separation required');
+assert(m.architecture.feature_flags?.data_fabric_observability?.id==='FF-DATAFABRIC-OBSERVABILITY','Data Fabric observability feature flag missing');
+assert(m.architecture.feature_flags?.data_fabric_observability?.runtime_env==='SCD_FEATURE_DATA_FABRIC_OBSERVABILITY','Data Fabric feature flag env mismatch');
+includesAll(m.data_architecture?.provenance_contract?.ui_question_fields||[],['SOURCE','TABLE','FIELD','API','FALLBACK','REFRESH'],'provenance contract');
 assert(m.north_star.r20_must_not_be_replaced_without_verified_migration===true,'R20 migration guardrail missing');
 
 const stateGate=m.development_contract?.state_gate||{};
@@ -173,7 +176,7 @@ for(const cap of caps){
 }
 includesAll(caps.map(x=>x.id),[
   'CAP-HOME','CAP-CALENDAR','CAP-ATHLETE','CAP-FAMILY','CAP-STAFF','CAP-COMMS',
-  'CAP-DRIVE-CATALOG','CAP-GMAIL-INGESTION','CAP-ENTITY-GRAPH','CAP-COMPLETENESS',
+  'CAP-DRIVE-CATALOG','CAP-GMAIL-INGESTION','CAP-DATAFABRIC-OBSERVABILITY','CAP-ENTITY-GRAPH','CAP-COMPLETENESS',
   'CAP-CHAT','CAP-CONFIDENCE','CAP-ANCONFIDENCE','CAP-SAFEGUARDING','CAP-SKY','CAP-AVATAR',
   'CAP-TAMAGOTCHI','CAP-GEO','CAP-R22','CAP-PWA','CAP-ANDROID','CAP-IOS'
 ],'capability map');
@@ -191,7 +194,8 @@ const requiredRepoFiles=[
   'SCD_PERMANENT_COMMANDS.md',
   'VISUAL_SYSTEM_LOCK.md',
   '.github/workflows/manifest-pr-policy.yml',
-  'docs/adr/ADR-0001-scd-state-hard-gate.md'
+  'docs/adr/ADR-0001-scd-state-hard-gate.md',
+  'docs/adr/ADR-0002-datafabric-observability.md'
 ];
 for(const file of requiredRepoFiles){
   assert(fs.existsSync(path.join(root,file)),'required governance file missing: '+file);

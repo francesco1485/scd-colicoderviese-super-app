@@ -351,6 +351,38 @@ function r25SheetCount_(bookId, sheetName, headerKey) {
   return Math.max(0, sh.getLastRow() - headerRow);
 }
 
+function r25ObsRead_(name) {
+  try {
+    var raw = PropertiesService.getScriptProperties().getProperty('R25_OBS_' + String(name || '').toUpperCase());
+    return raw ? JSON.parse(raw) : {};
+  } catch (_) { return {}; }
+}
+
+function r25ObsWrite_(name, status, result, error) {
+  var old = r25ObsRead_(name);
+  var now = new Date().toISOString();
+  var next = {
+    status:status,
+    lastSync:now,
+    lastSuccess:status === 'OK' ? now : (old.lastSuccess || ''),
+    lastError:status === 'ERROR' ? r25Clean_(error || 'Errore non specificato', 500) : '',
+    lastResult:status === 'OK' ? result : (old.lastResult || null)
+  };
+  PropertiesService.getScriptProperties().setProperty('R25_OBS_' + String(name || '').toUpperCase(), JSON.stringify(next));
+  return next;
+}
+
+function r25RunObserved_(name, fn) {
+  try {
+    var result = fn();
+    r25ObsWrite_(name, 'OK', result, '');
+    return result;
+  } catch (err) {
+    r25ObsWrite_(name, 'ERROR', null, String(err && err.message ? err.message : err));
+    throw err;
+  }
+}
+
 function r25DataFabricStatus_(token) {
   var actor = r25RequireDirection_(token);
   return {
@@ -374,18 +406,26 @@ function r25DataFabricStatus_(token) {
       destructiveAutoWrite:false,
       safeguarding:'ISOLATED'
     },
+    observability:{
+      gmail:r25ObsRead_('gmail'),
+      drive:r25ObsRead_('drive')
+    },
+    provenance:{
+      gmail:{source:'SCD_GMAIL',table:'01_EMAIL_ARCHIVE / 17_SMART_CLASSIFIER / 18_ACTION_QUEUE',field:'UID',api:'direction.datafabric.scan.gmail',fallback:'NO_WRITE',refresh:'15m'},
+      drive:{source:'SCD_DRIVE',table:'DRIVE AGGIORNAMENTI / REGISTRO FONTI V2',field:'ID DRIVE',api:'direction.datafabric.scan.drive',fallback:'NO_WRITE',refresh:'1h'}
+    },
     checkedAt:new Date().toISOString()
   };
 }
 
 function r25ScanGmail_(token, payload) {
   r25RequireDirection_(token);
-  return r25WithLock_(function(){ return r25IngestGmail_(payload || {}); });
+  return r25WithLock_(function(){ return r25RunObserved_('gmail', function(){ return r25IngestGmail_(payload || {}); }); });
 }
 
 function r25ScanDrive_(token, payload) {
   r25RequireDirection_(token);
-  return r25WithLock_(function(){ return r25RefreshDriveCatalog_(payload || {}); });
+  return r25WithLock_(function(){ return r25RunObserved_('drive', function(){ return r25RefreshDriveCatalog_(payload || {}); }); });
 }
 
 function r25WithLock_(fn) {
@@ -395,11 +435,11 @@ function r25WithLock_(fn) {
 }
 
 function r25GmailIngestScheduled_() {
-  return r25WithLock_(function(){ return r25IngestGmail_({days:7,limit:60}); });
+  return r25WithLock_(function(){ return r25RunObserved_('gmail', function(){ return r25IngestGmail_({days:7,limit:60}); }); });
 }
 
 function r25DriveCatalogScheduled_() {
-  return r25WithLock_(function(){ return r25RefreshDriveCatalog_({limit:200}); });
+  return r25WithLock_(function(){ return r25RunObserved_('drive', function(){ return r25RefreshDriveCatalog_({limit:200}); }); });
 }
 
 function r25InstallDataFabricTriggers() {

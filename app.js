@@ -1,4 +1,4 @@
-const APP_VERSION='21.15.0';
+const APP_VERSION='28.0.0';
 const DYNAMIC_ORIGIN=(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)||location.hostname.endsWith('.onrender.com'))
   ? location.origin
   : 'https://scd-colicoderviese-official-r21.onrender.com';
@@ -6,6 +6,7 @@ const API=DYNAMIC_ORIGIN+'/api/scd';
 const LIVE_API=DYNAMIC_ORIGIN+'/api/live';
 const HEALTH_API=DYNAMIC_ORIGIN+'/health';
 const TIME_API=DYNAMIC_ORIGIN+'/api/time';
+const CAPABILITIES_API=DYNAMIC_ORIGIN+'/api/capabilities';
 const CALENDAR_KEY='scd:calendar:v1';
 const LOCATION_KEY='scd:location:consent:v1';
 const REQUESTS_KEY='scd:requests:v1';
@@ -23,7 +24,7 @@ const FALLBACK={
     ],counts:{games:0,events:0,initiatives:0,news:1}
   }
 };
-let state={summary:null,installPrompt:null,session:null,sessionToken:'',privateData:null,apiStatus:'checking',clockOffsetMs:0,clubTimeZone:'Europe/Rome',clockSynced:false,calendar:[],location:null};
+let state={summary:null,installPrompt:null,session:null,sessionToken:'',privateData:null,apiStatus:'checking',clockOffsetMs:0,clubTimeZone:'Europe/Rome',clockSynced:false,calendar:[],location:null,capabilities:null,featureFlags:{dataFabricObservability:false},dataFabricStatus:null,dataFabricError:''};
 
 function localRequests(){
   try{return JSON.parse(localStorage.getItem(REQUESTS_KEY)||'[]')}catch{return []}
@@ -73,6 +74,22 @@ function updateApiBadge(status,label){
   const el=$('#apiStatus'); if(!el)return;
   el.className='api-status '+status;
   el.innerHTML=`<i></i><span>${esc(label)}</span>`;
+}
+function featureEnabled(name){return state.featureFlags&&state.featureFlags[name]===true}
+async function loadCapabilities(){
+  try{
+    const r=await fetch(CAPABILITIES_API,{cache:'no-store'});
+    if(!r.ok)throw new Error('capabilities '+r.status);
+    const j=await r.json();
+    state.capabilities=j;
+    state.featureFlags={...state.featureFlags,...(j.featureFlags||{})};
+    window.dispatchEvent(new CustomEvent('scd:capabilities',{detail:j}));
+    return j;
+  }catch(e){
+    state.capabilities=null;
+    state.featureFlags={...state.featureFlags,dataFabricObservability:false};
+    return null;
+  }
 }
 function clubNow(){return new Date(Date.now()+(state.clockOffsetMs||0))}
 function clubDateKey(d=clubNow()){
@@ -416,6 +433,21 @@ async function mgmtApi(action,payload={}){
   if(!state.sessionToken)throw new Error('Sessione non disponibile');
   return api(action,payload,state.sessionToken);
 }
+async function loadDataFabricStatus(force=false){
+  if(!featureEnabled('dataFabricObservability'))throw new Error('Osservabilità Data Fabric disattivata');
+  if(!state.sessionToken)throw new Error('Sessione Direzione non disponibile');
+  const cached=state.dataFabricStatus;
+  if(!force&&cached&&Date.now()-Number(cached.loadedAt||0)<30000)return cached.data;
+  try{
+    const data=await mgmtApi('direction.datafabric.status');
+    state.dataFabricStatus={data,loadedAt:Date.now()};
+    state.dataFabricError='';
+    return data;
+  }catch(e){
+    state.dataFabricError=String(e&&e.message?e.message:e);
+    throw e;
+  }
+}
 function privateTeams(d=state.privateData||{}){
   const src=(d.attendance&&d.attendance.teams)||d.teams||d.visibleTeams||[];
   const seen=new Set();
@@ -595,6 +627,47 @@ async function openEvolutionManager(){
     const data=await mgmtApi('direction.evolution',{limit:30}),rows=Array.isArray(data)?data:(data.rows||data.items||[]);
     $('#evolutionRows').innerHTML=rows.length?'<div class="evolution-list">'+rows.map(x=>'<article><span>'+esc(x.status||x.STATUS||'')+'</span><b>'+esc(x.module||x.MODULE||x.problem||x.PROBLEM||'Proposta')+'</b><p>'+esc(x.problem||x.PROBLEM||x.proposedAction||x.PROPOSED_ACTION||'')+'</p></article>').join('')+'</div>':'<div class="empty-state">Nessuna proposta visibile.</div>';
   }catch(e){$('#evolutionRows').innerHTML='<div class="notice error-note">'+esc(e.message||'Evolution Queue non disponibile')+'</div>'}
+}
+function dataFabricProvenanceRow(label,x={}){
+  return '<article class="request-history-card" data-r28-provenance><div><span class="request-kind">'+esc(label)+'</span><b>'+esc(x.source||'UNVERIFIED')+'</b><small>'+esc([x.table,x.field].filter(Boolean).join(' · ')||'Provenienza non disponibile')+'</small></div><div class="request-state">'+esc(x.refresh||'UNVERIFIED')+'</div><code>'+esc(x.api||'NO API')+'</code></article>';
+}
+function dataFabricObservation(label,x={}){
+  const status=x.status||'UNVERIFIED';
+  const success=x.lastSuccess||'mai verificato';
+  const err=x.lastError||'nessun errore registrato';
+  return '<article class="notice"><b>'+esc(label)+' · '+esc(status)+'</b><br>Last sync: '+esc(x.lastSync||'UNVERIFIED')+'<br>Last success: '+esc(success)+'<br>Last error: '+esc(err)+'</article>';
+}
+async function openDataFabricManager(){
+  if(!featureEnabled('dataFabricObservability'))return modal('<span class="eyebrow">DIREZIONE · DATA FABRIC</span><h2>Osservabilità disattivata</h2><div class="notice">Feature flag FF-DATAFABRIC-OBSERVABILITY non attivo.</div>');
+  modal('<span class="eyebrow">DIREZIONE · DATA FABRIC</span><h2>Fonti, sincronizzazioni e provenienza</h2><div id="r28FabricRows" class="loading-line">Verifica stato reale…</div>');
+  const mount=$('#r28FabricRows');
+  const renderFabric=x=>{
+    const counts=x.counts||{},obs=x.observability||{},prov=x.provenance||{};
+    mount.innerHTML=
+      '<div class="mgmt-kpis">'+mgmtKpi('Email archiviate',counts.emailArchive||0)+mgmtKpi('Coda azioni',counts.actionQueue||0)+mgmtKpi('Drive catalogo',counts.driveCatalog||0)+mgmtKpi('Eventi kernel',counts.eventKernel||0)+'</div>'+
+      '<div class="notice"><b>Release '+esc(x.release||'R25')+'</b><br>Ultima verifica stato: '+esc(x.checkedAt||'UNVERIFIED')+'<br>Scritture distruttive automatiche: '+esc(x.policy&&x.policy.destructiveAutoWrite===false?'NO':'UNVERIFIED')+' · Safeguarding: '+esc(x.policy?.safeguarding||'UNVERIFIED')+'</div>'+
+      '<div class="choice-grid">'+dataFabricObservation('Gmail',obs.gmail||{})+dataFabricObservation('Drive',obs.drive||{})+'</div>'+
+      '<h3>Provenienza</h3><div class="request-history">'+dataFabricProvenanceRow('GMAIL',prov.gmail||{})+dataFabricProvenanceRow('DRIVE',prov.drive||{})+'</div>'+
+      '<div class="modal-actions"><button class="outline" id="r28FabricRefresh">AGGIORNA STATO</button><button class="outline" id="r28ScanGmail">SCANSIONA GMAIL</button><button class="primary" id="r28ScanDrive">SCANSIONA DRIVE</button></div>';
+    const refresh=$('#r28FabricRefresh'),gmail=$('#r28ScanGmail'),drive=$('#r28ScanDrive');
+    if(refresh)refresh.onclick=()=>runStatus();
+    if(gmail)gmail.onclick=()=>runScan('direction.datafabric.scan.gmail','Gmail');
+    if(drive)drive.onclick=()=>runScan('direction.datafabric.scan.drive','Drive');
+  };
+  const runStatus=async()=>{mount.innerHTML='<div class="loading-line">Verifica stato reale…</div>';try{renderFabric(await loadDataFabricStatus(true))}catch(e){mount.innerHTML='<div class="notice error-note"><b>Data Fabric non verificabile.</b><br>'+esc(e.message||e)+'</div>'}};
+  const runScan=async(action,label)=>{
+    mount.insertAdjacentHTML('afterbegin','<div class="loading-line" id="r28ScanProgress">Scansione '+esc(label)+' in corso…</div>');
+    try{
+      const result=await mgmtApi(action,{});
+      toast(label+' verificato');
+      state.dataFabricStatus=null;
+      await runStatus();
+      console.info('[SCD DATA FABRIC]',action,result);
+    }catch(e){
+      const p=$('#r28ScanProgress');if(p)p.outerHTML='<div class="notice error-note">'+esc(e.message||'Scansione non riuscita')+'</div>';
+    }
+  };
+  await runStatus();
 }
 async function openDiagnosticsManager(){
   modal('<span class="eyebrow">DIREZIONE · QA</span><h2>Diagnostica sistema</h2><div id="diagRows" class="loading-line">Analisi in corso…</div>');
@@ -924,9 +997,9 @@ function boot(){
   window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();state.installPrompt=e;if(installBtn)installBtn.hidden=false});
   if(installBtn)installBtn.onclick=async()=>{if(!state.installPrompt)return toast('Dal menu del browser scegli “Installa app” o “Aggiungi alla schermata Home”.');state.installPrompt.prompt();await state.installPrompt.userChoice;state.installPrompt=null;installBtn.hidden=true;track('pwa_install',{section:'install'})};
   if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('./sw.js?v=21.15.0',{updateViaCache:'none'})
+  navigator.serviceWorker.register('./sw.js?v=28.0.0',{updateViaCache:'none'})
     .then(reg=>reg.update())
     .catch(()=>{});
-}bindDynamic();syncClubClock();checkServiceHealth();loadPublicCalendar(true);restoreManagementSession();track('page_view',{section:(location.hash||'#home').replace('#','')});window.addEventListener('hashchange',()=>{const section=(location.hash||'#home').replace('#','');track('page_view',{section});setActiveNav(section==='eventi'?'events':section==='home'?'home':'')});loadSummary(true);setInterval(()=>{if(!document.hidden)loadSummary(true)},60000);setInterval(flushListening,120000);setInterval(checkDueReminders,60000);setTimeout(checkDueReminders,4000);setInterval(()=>{if(!document.hidden)syncClubClock()},300000);setInterval(()=>{if(!document.hidden)loadPublicCalendar(true)},300000);
+}bindDynamic();syncClubClock();checkServiceHealth();loadCapabilities();loadPublicCalendar(true);restoreManagementSession();track('page_view',{section:(location.hash||'#home').replace('#','')});window.addEventListener('hashchange',()=>{const section=(location.hash||'#home').replace('#','');track('page_view',{section});setActiveNav(section==='eventi'?'events':section==='home'?'home':'')});loadSummary(true);setInterval(()=>{if(!document.hidden)loadSummary(true)},60000);setInterval(flushListening,120000);setInterval(checkDueReminders,60000);setTimeout(checkDueReminders,4000);setInterval(()=>{if(!document.hidden)syncClubClock()},300000);setInterval(()=>{if(!document.hidden)loadPublicCalendar(true)},300000);
 }
 document.addEventListener('DOMContentLoaded',boot);

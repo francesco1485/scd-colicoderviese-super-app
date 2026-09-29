@@ -123,6 +123,7 @@ for(const viewport of viewports){
   if(viewport.width===390){
     await page.evaluate(()=>{
       state.sessionToken='qa-session';
+      state.featureFlags={...state.featureFlags,dataFabricObservability:true};
       state.privateData={
         user:{name:'QA SCD',email:'qa@example.test',role:'STAFF',area:'U16',staff:true},
         permissions:{direction:true,manageAccess:true},
@@ -142,7 +143,31 @@ for(const viewport of viewports){
     });
     await page.waitForSelector('.r24-service-grid.staff');
     await page.waitForSelector('#r24Attendance');
-    await page.screenshot({path:'test-output/r24-staff-direction-390x844.png',fullPage:true});
+    await page.waitForSelector('#r28DataFabric');
+    await page.screenshot({path:'test-output/r28-staff-direction-390x844.png',fullPage:true});
+
+    await page.evaluate(()=>{
+      window.mgmtApi=async(action)=>{
+        if(action==='direction.datafabric.status')return {
+          ok:true,release:'R25',checkedAt:'2026-09-29T17:30:00.000Z',
+          counts:{emailArchive:120,classifier:118,actionQueue:9,driveCatalog:44,sourceRegistry:12,eventKernel:301},
+          policy:{criticalChanges:'HUMAN_CONFIRMATION_REQUIRED',destructiveAutoWrite:false,safeguarding:'ISOLATED'},
+          observability:{
+            gmail:{status:'OK',lastSync:'2026-09-29T17:15:00.000Z',lastSuccess:'2026-09-29T17:15:00.000Z',lastError:''},
+            drive:{status:'OK',lastSync:'2026-09-29T17:00:00.000Z',lastSuccess:'2026-09-29T17:00:00.000Z',lastError:''}
+          },
+          provenance:{
+            gmail:{source:'SCD_GMAIL',table:'01_EMAIL_ARCHIVE',field:'UID',api:'direction.datafabric.scan.gmail',fallback:'NO_WRITE',refresh:'15m'},
+            drive:{source:'SCD_DRIVE',table:'DRIVE AGGIORNAMENTI',field:'ID DRIVE',api:'direction.datafabric.scan.drive',fallback:'NO_WRITE',refresh:'1h'}
+          }
+        };
+        return {};
+      };
+    });
+    await page.click('#r28DataFabric');
+    await page.waitForSelector('#r28FabricRows [data-r28-provenance]');
+    await page.screenshot({path:'test-output/r28-data-fabric-390x844.png',fullPage:true});
+    await page.click('#modalClose');
 
     await goRoute(page,'family');
     await page.waitForSelector('.r24-family-strip');
@@ -180,6 +205,10 @@ for(const viewport of viewports){
 const api=await browser.newPage();
 const health=await api.request.get(base+'/health');
 if(!health.ok())throw new Error('health endpoint failed '+health.status());
+const capabilities=await api.request.get(base+'/api/capabilities');
+if(!capabilities.ok())throw new Error('capabilities endpoint failed '+capabilities.status());
+const capabilitiesJson=await capabilities.json();
+if(typeof capabilitiesJson.featureFlags?.dataFabricObservability!=='boolean')throw new Error('dataFabricObservability feature flag missing');
 const time=await api.request.get(base+'/api/time');
 if(!time.ok())throw new Error('time endpoint failed '+time.status());
 const timeJson=await time.json();
@@ -195,5 +224,5 @@ if(!deleteHtml.includes('deleteForm')||!deleteHtml.includes('ELIMINAZIONE ACCOUN
 await api.close();
 
 if(allErrors.length)throw new Error('browser errors: '+allErrors.join(' || '));
-console.log('SCD R26 smoke PASS',{viewports:viewports.map(v=>v.width+'x'+v.height)});
+console.log('SCD R28 smoke PASS',{viewports:viewports.map(v=>v.width+'x'+v.height)});
 await browser.close();
