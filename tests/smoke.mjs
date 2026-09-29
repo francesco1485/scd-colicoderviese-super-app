@@ -78,7 +78,9 @@ for(const viewport of viewports){
   await page.click('#modalClose');
 
   const safeBefore=apiActions.length;
-  await page.locator('[data-action="safeguarding"]').first().click();
+  await page.click('#mobileProfile');
+  await page.waitForSelector('.profile-app-screen');
+  await page.click('#profileSafeguarding');
   await page.waitForSelector('#safeForm');
   await page.fill('#safeMessage','QA safeguarding local-only');
   await page.click('#safeForm button[type="submit"]');
