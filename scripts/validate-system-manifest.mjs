@@ -169,6 +169,8 @@ includesAll(releaseEvidence,['VERSION','COMMIT','PR','CI_STATUS','SCREENSHOT_MOB
 assert(m.delivery_and_quality?.production_evidence?.required===true,'production evidence must remain required');
 assert(m.delivery_and_quality?.production_evidence?.workflow==='.github/workflows/production-evidence.yml','production evidence workflow mismatch');
 assert(m.delivery_and_quality?.production_evidence?.r20_contract_action==='public.datafabric.contract','R20 public contract probe mismatch');
+assert(m.development_contract?.runtime_activation?.r20_direct_verifier==='scripts/verify-r20-direct.mjs','R20 direct verifier missing from runtime activation');
+assert(m.development_contract?.runtime_activation?.canonical_url_must_be_preserved===true,'R20 canonical Web App URL must be preserved');
 const r25r26=(m.development_contract?.release_dependencies||[]).find(x=>x.predecessor==='R25'&&x.successor==='R26');
 assert(r25r26?.relation==='REQUIRED_PREDECESSOR','R25 -> R26 dependency must remain explicit');
 assert(r25r26?.status==='SATISFIED_IN_MAIN','R25 -> R26 dependency must be recorded as satisfied in main');
@@ -180,7 +182,7 @@ for(const cap of caps){
   assert(['IMPLEMENTED','INTERNAL_TEST','PARTIAL','REBUILD_REQUIRED','PLANNED','DESIGN_ONLY','ROADMAP'].includes(cap.state),'invalid capability state '+cap.id);
 }
 includesAll(caps.map(x=>x.id),[
-  'CAP-HOME','CAP-CALENDAR','CAP-ATHLETE','CAP-FAMILY','CAP-STAFF','CAP-COMMS','CAP-RUNTIME-EVIDENCE','CAP-UPSTREAM-RESILIENCE',
+  'CAP-HOME','CAP-CALENDAR','CAP-ATHLETE','CAP-FAMILY','CAP-STAFF','CAP-COMMS','CAP-RUNTIME-EVIDENCE','CAP-UPSTREAM-RESILIENCE','CAP-R20-RUNTIME-ACTIVATION',
   'CAP-DRIVE-CATALOG','CAP-GMAIL-INGESTION','CAP-DATAFABRIC-OBSERVABILITY','CAP-ENTITY-GRAPH','CAP-COMPLETENESS',
   'CAP-CHAT','CAP-CONFIDENCE','CAP-ANCONFIDENCE','CAP-SAFEGUARDING','CAP-SKY','CAP-AVATAR',
   'CAP-TAMAGOTCHI','CAP-GEO','CAP-R22','CAP-PWA','CAP-ANDROID','CAP-IOS'
@@ -203,6 +205,9 @@ const requiredRepoFiles=[
   'docs/adr/ADR-0002-datafabric-observability.md',
   'docs/adr/ADR-0003-production-evidence.md',
   'docs/adr/ADR-0004-read-only-upstream-retry.md',
+  'docs/adr/ADR-0005-r20-runtime-activation.md',
+  'docs/runbooks/R20-RUNTIME-DEPLOY.md',
+  'scripts/verify-r20-direct.mjs',
   'tests/upstream-resilience.mjs',
   'scripts/verify-production.mjs',
   '.github/workflows/production-evidence.yml'
@@ -219,6 +224,7 @@ for(const legacy of ['PROJECT_CONSTITUTION.md','SCD_PERMANENT_COMMANDS.md','VISU
 const pkg=readJson(path.join(root,'package.json'));
 assert(pkg?.scripts?.['test:manifest']==='node scripts/validate-system-manifest.mjs','package.json must expose test:manifest');
 assert(pkg?.scripts?.['test:resilience']==='node tests/upstream-resilience.mjs','package.json must expose test:resilience');
+assert(pkg?.scripts?.['verify:r20']==='node scripts/verify-r20-direct.mjs','package.json must expose verify:r20');
 
 for(const workflow of ['.github/workflows/e2e.yml','.github/workflows/pages.yml','.github/workflows/command-platform.yml','.github/workflows/system-manifest.yml']){
   const file=path.join(root,workflow);
