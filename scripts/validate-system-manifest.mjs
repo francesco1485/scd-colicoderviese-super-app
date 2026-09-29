@@ -117,6 +117,10 @@ includesAll(m.calendar_event_engine.required_event_fields||[],[
 
 includesAll(m.gmail_intelligence.existing_runtime_surfaces||[],['MAIL_OPERATIONS_SHEET/01_EMAIL_ARCHIVE','MAIL_OPERATIONS_SHEET/17_SMART_CLASSIFIER','MAIL_OPERATIONS_SHEET/18_ACTION_QUEUE'],'Gmail existing runtime surfaces');
 assert(m.completeness_engine.confidence_required===true,'Completeness Engine confidence required');
+assert(m.product_direction?.default_entry_route==='#/pulse','R26 default entry route must be #/pulse');
+assert(m.product_direction?.experience_model==='CLUB_GRAPH_DRIVEN','R26 experience model must remain graph-driven');
+assert(m.product_direction?.visual_principle==='ABSTRACT_ADAPTIVE_SUBLIMATION','R26 visual principle mismatch');
+assert(m.product_direction?.no_rewrite_rule===true,'R26 no-rewrite rule must remain true');
 includesAll(m.completeness_engine.search_order||[],['DOMAIN_CORE','SCD_DRIVE','SCD_GMAIL_ATTACHMENTS'],'Completeness search order');
 
 assert(m.communications.safeguarding.isolated===true,'Safeguarding must stay isolated');
