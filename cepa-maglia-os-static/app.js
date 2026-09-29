@@ -8,6 +8,10 @@ const localInput=v=>{if(!v)return'';const d=new Date(v);return new Date(d-d.getT
 const isManager=()=>['super_admin','supervisor','manager'].includes(window.userRole)
 const viewMeta={
  home:['Quadro generale','Agenzia Generale HDI · Ecosistema di competenze, relazioni e sviluppo'],
+ products:['Prodotti & Sintesi','Schede consulenziali, punti di forza, limiti e percorsi di confronto'],
+ collaborators:['Collaboratori & Guadagni','Ruoli, competenze e remunerazioni differenziate per attività e prodotto'],
+ comparisons:['Confronti & Benchmark','Analisi verificabili tra soluzioni e realtà comparabili'],
+ aiMail:['AI Mail & Chat','Bozze personalizzate, contesto relazionale e assistenza operativa'],
  cepa:['Centro CEPA','Materie, contenuti, programmi, iniziative e sviluppo del metodo'],
  territories:['SAP & Territori','Presidi territoriali, candidature, incontri e sviluppo della rete'],
  documents:['Archivio & Contratti','Documenti, accordi, dossier e modelli pronti'],
@@ -16,7 +20,7 @@ const viewMeta={
  recovery:['Clienti · Recovery','Campagna operativa sul patrimonio esistente']
 }
 
-let ecosystem=[],projects=[],actions=[],marketHubs=[],marketEntities=[],contacts=[],timeline=[],documents=[],blueprints=[],subjects=[],initiatives=[],recoveryRows=[],members=[]
+let ecosystem=[],projects=[],actions=[],marketHubs=[],marketEntities=[],contacts=[],timeline=[],documents=[],blueprints=[],subjects=[],initiatives=[],products=[],comparisons=[],collaborators=[],collaboratorTerms=[],mailTemplates=[],mailDrafts=[],cepaExpansion=[],recoveryRows=[],members=[]
 let currentPartnerId=null
 
 function msg(text,error=false){$('loginMsg').textContent=text;$('loginMsg').className='message'+(error?' error':'')}
@@ -71,7 +75,14 @@ $('addPartnerDocumentBtn').onclick=()=>openAddDocument(currentPartnerId)
 $('addDocumentBtn').onclick=()=>openAddDocument(null)
 $('addCepaSubjectBtn').onclick=openNewSubject
 $('addCepaInitiativeBtn').onclick=openNewInitiative
+$('addCollaboratorBtn').onclick=openNewCollaborator
 $('editPartnerBtn').onclick=openEditPartner
+$('mailTemplateSelect').onchange=hydrateMailTemplate
+$('generateMailBtn').onclick=generateMailDraft
+$('mailComposerForm').onsubmit=saveMailDraft
+$('aiDockToggle').onclick=()=>{$('aiDockPanel').classList.toggle('hidden')}
+$('aiChatForm').onsubmit=e=>{e.preventDefault();const q=$('aiChatInput').value.trim();if(!q)return;askAssistant(q);$('aiChatInput').value=''}
+document.querySelectorAll('[data-ai-prompt]').forEach(b=>b.onclick=()=>askAssistant(b.dataset.aiPrompt))
 $('territoryHubFilter').onchange=renderMarketTable
 $('territoryStageFilter').onchange=renderMarketTable
 $('actionLaneFilter').onchange=renderActions
@@ -80,14 +91,14 @@ $('refreshRecoveryBtn').onclick=loadRecovery
 
 async function boot(){
   const{data:{user}}=await supabase.auth.getUser()
-  if(!user){$('loginView').classList.remove('hidden');$('workspace').classList.add('hidden');$('blockedView').classList.add('hidden');return}
+  if(!user){$('loginView').classList.remove('hidden');$('workspace').classList.add('hidden');$('blockedView').classList.add('hidden');$('aiDock').classList.add('hidden');return}
   const{data:m,error}=await supabase.from('organization_memberships').select('organization_id,role').eq('user_id',user.id).eq('active',true).limit(1).maybeSingle()
   $('loginView').classList.add('hidden')
   if(error||!m){$('workspace').classList.add('hidden');$('blockedView').classList.remove('hidden');return}
   window.orgId=m.organization_id;window.userId=user.id;window.userRole=m.role
-  $('workspace').classList.remove('hidden');$('blockedView').classList.add('hidden')
+  $('workspace').classList.remove('hidden');$('blockedView').classList.add('hidden');$('aiDock').classList.remove('hidden')
   $('sideUser').textContent=user.email||'Utente';$('rolePill').textContent=m.role.replaceAll('_',' ')
-  ;['newEntityBtn','addTimelineBtn','addContactBtn','addPartnerDocumentBtn','addDocumentBtn','addCepaSubjectBtn','addCepaInitiativeBtn','editPartnerBtn'].forEach(id=>$(id).classList.toggle('hidden',!isManager()))
+  ;['newEntityBtn','addTimelineBtn','addContactBtn','addPartnerDocumentBtn','addDocumentBtn','addCepaSubjectBtn','addCepaInitiativeBtn','addCollaboratorBtn','editPartnerBtn'].forEach(id=>$(id).classList.toggle('hidden',!isManager()))
   await loadAll()
 }
 
@@ -105,18 +116,25 @@ async function loadAll(){
     supabase.from('ecosystem_documents').select('*,ecosystem_nodes(id,name,code)').eq('organization_id',window.orgId).order('created_at',{ascending:false}),
     supabase.from('document_blueprints').select('*').eq('organization_id',window.orgId).eq('status','ready').order('category').order('title'),
     supabase.from('cepa_subjects').select('*').eq('organization_id',window.orgId).order('maturity',{ascending:false}),
-    supabase.from('cepa_initiatives').select('*,cepa_subjects(id,title),ecosystem_nodes(id,name,code)').eq('organization_id',window.orgId).order('created_at',{ascending:false})
+    supabase.from('cepa_initiatives').select('*,cepa_subjects(id,title),ecosystem_nodes(id,name,code)').eq('organization_id',window.orgId).order('created_at',{ascending:false}),
+    supabase.from('agency_products').select('*,ecosystem_nodes(id,name,code)').eq('organization_id',window.orgId).eq('active',true).order('category').order('name'),
+    supabase.from('product_comparisons').select('*,agency_products(id,name,comparison_group)').eq('organization_id',window.orgId).order('created_at',{ascending:false}),
+    supabase.from('agency_collaborators').select('*').eq('organization_id',window.orgId).eq('active',true).order('display_name'),
+    supabase.from('collaborator_product_terms').select('*,agency_products(id,name),ecosystem_nodes(id,name,code)').eq('organization_id',window.orgId).order('created_at',{ascending:false}),
+    supabase.from('ai_mail_templates').select('*').eq('organization_id',window.orgId).eq('active',true).order('title'),
+    supabase.from('ai_mail_drafts').select('*,ecosystem_nodes(id,name),ai_mail_templates(id,title)').eq('organization_id',window.orgId).order('created_at',{ascending:false}).limit(100),
+    supabase.from('cepa_expansion_stages').select('*').eq('organization_id',window.orgId).order('stage_no')
   ]
   const res=await Promise.all(q)
   const err=res.find(x=>x.error)?.error
   if(err){console.error(err);$('refreshBtn').textContent='!';return}
-  ;[ecosystem,projects,actions,marketHubs,marketEntities,contacts,timeline,documents,blueprints,subjects,initiatives]=res.map(x=>x.data||[])
+  ;[ecosystem,projects,actions,marketHubs,marketEntities,contacts,timeline,documents,blueprints,subjects,initiatives,products,comparisons,collaborators,collaboratorTerms,mailTemplates,mailDrafts,cepaExpansion]=res.map(x=>x.data||[])
   renderEverything()
   $('refreshBtn').textContent='↻'
 }
 
 function renderEverything(){
-  renderPartnerNav();renderHome();renderPartner();renderCepa();renderTerritories();renderDocuments();renderDevelopment();renderActions()
+  renderPartnerNav();renderHome();renderPartner();renderProducts();renderCollaborators();renderComparisons();renderMail();renderCepa();renderTerritories();renderDocuments();renderDevelopment();renderActions()
 }
 
 function renderPartnerNav(){
@@ -169,6 +187,7 @@ function renderCepa(){
   $('cepaSubjectGrid').innerHTML=subjects.map(s=>'<article class="subject-card" data-subject="'+s.id+'"><div class="subject-domain">'+esc(s.domain)+' · '+esc(subjectStatus(s.lifecycle_status))+'</div><h4>'+esc(s.title)+'</h4><p>'+esc(s.description||'')+'</p><div class="tags">'+(s.target_audiences||[]).slice(0,4).map(a=>'<span class="tag">'+esc(a)+'</span>').join('')+'</div><div class="subject-progress"><span style="width:'+Number(s.maturity||0)+'%"></span></div><p>'+esc(s.maturity)+'% maturità · partner: '+esc((s.partner_codes||[]).join(', ')||'da definire')+'</p></article>').join('')||empty('Nessuna materia')
   document.querySelectorAll('[data-subject]').forEach(b=>b.onclick=()=>openSubject(b.dataset.subject))
   $('cepaInitiativeList').innerHTML=initiatives.map(i=>listRow(i.title,(i.cepa_subjects?.title||'Materia da definire')+(i.territory?' · '+i.territory:''),[i.status,i.initiative_type])).join('')||empty('Nessuna iniziativa ancora registrata')
+  $('cepaRoadmap').innerHTML=cepaExpansion.map(s=>'<article class="roadmap-step '+(s.status==='current'?'current':'')+'"><span class="step-no">'+esc(s.stage_no)+'</span><h4>'+esc(s.title)+'</h4><p><strong>'+esc(s.territory)+'</strong></p><p>'+esc(s.objective||'')+'</p><div class="tags"><span class="tag">'+esc(s.status)+'</span></div></article>').join('')||empty('Roadmap nazionale da costruire')
 }
 
 function renderTerritories(){
@@ -182,6 +201,146 @@ function renderDocuments(){
   $('documentArchive').innerHTML=documents.map(d=>'<div class="document-row"><h4>'+esc(d.title)+'</h4><p>'+esc(d.document_type)+' · '+esc(d.document_status)+(d.ecosystem_nodes?.name?' · '+esc(d.ecosystem_nodes.name):'')+'</p><p>'+esc(d.notes||'')+'</p></div>').join('')||empty('Nessun documento registrato')
   $('blueprintList').innerHTML=blueprints.map(b=>'<div class="blueprint-row" data-blueprint="'+b.id+'"><h4>'+esc(b.title)+'</h4><p>'+esc(b.category)+' · struttura pronta</p><p>'+esc(b.intended_use||'')+'</p></div>').join('')||empty('Nessun modello disponibile')
   document.querySelectorAll('[data-blueprint]').forEach(b=>b.onclick=()=>openBlueprint(b.dataset.blueprint))
+}
+
+
+function renderProducts(){
+  $('productCount').textContent=products.length
+  $('productToVerify').textContent=products.filter(p=>p.maturity_status==='to_verify').length
+  $('comparisonCount').textContent=comparisons.filter(c=>c.status==='verified').length
+  $('productProviderCount').textContent=new Set(products.map(p=>p.ecosystem_node_id).filter(Boolean)).size
+  $('productGrid').innerHTML=products.map(p=>{
+    const provider=p.ecosystem_nodes?.name||'Maglia'
+    const verified=p.maturity_status==='verified'||p.maturity_status==='active'
+    return '<article class="product-card" data-product="'+p.id+'"><div class="product-provider">'+esc(provider)+'</div><h3>'+esc(p.name)+'</h3><p>'+esc(p.summary||'Sintesi da completare')+'</p><div class="product-meta"><span class="tag">'+esc(p.category)+'</span><span class="verification-badge '+(verified?'verified':'')+'">'+esc(verified?'verificato':'da verificare')+'</span></div></article>'
+  }).join('')||empty('Nessun prodotto o area censita')
+  document.querySelectorAll('[data-product]').forEach(b=>b.onclick=()=>openProduct(b.dataset.product))
+}
+
+function openProduct(id){
+  const p=products.find(x=>x.id===id);if(!p)return
+  const provider=p.ecosystem_nodes?.name||'Maglia'
+  const pc=comparisons.filter(c=>c.product_id===id)
+  const strengths=(p.strengths||[])
+  const weaknesses=(p.weaknesses||[])
+  $('modalContent').innerHTML='<div class="eyebrow">SCHEDA PRODOTTO</div><h2>'+esc(p.name)+'</h2><p class="muted">'+esc(provider)+' · '+esc(p.category)+' · '+esc(p.maturity_status)+'</p><div class="product-route"><div>Target</div><div>Bisogno</div><div>Analisi</div><div>'+esc(provider)+'</div><div>Follow-up</div></div><div class="prose-box"><p><strong>Sintesi</strong><br>'+esc(p.summary||'Da completare')+'</p><p><strong>Target</strong><br>'+esc((p.audience||[]).join(', ')||'Da definire')+'</p><p><strong>Processo</strong><br>'+esc(p.process_notes||'Da ricostruire sul processo reale di agenzia.')+'</p><p><strong>Note / esclusioni</strong><br>'+esc(p.exclusions_notes||'Da verificare sui documenti ufficiali.')+'</p></div><div class="strength-weak-grid"><div class="sw-box strength"><h4>Punti di forza</h4>'+(strengths.length?'<ul>'+strengths.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'<p class="muted">Da compilare dopo verifica documentale.</p>')+'</div><div class="sw-box weak"><h4>Punti deboli / limiti</h4>'+(weaknesses.length?'<ul>'+weaknesses.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'<p class="muted">Da compilare dopo verifica documentale.</p>')+'</div></div><div class="modal-section"><h4>Confronti</h4>'+(pc.length?pc.map(c=>'<p class="muted"><strong>'+esc(c.benchmark_name)+'</strong><br>'+esc(c.comparison_scope||'')+' · '+esc(c.status)+(c.source_date?' · '+esc(fmtDate(c.source_date)):'')+'</p>').join(''):'<p class="muted">Nessun confronto verificato ancora. La struttura è pronta per fonti, data, metriche e note.</p>')+'</div>'
+  $('modal').classList.remove('hidden')
+}
+
+function renderCollaborators(){
+  $('collabCount').textContent=collaborators.length
+  $('collabVerified').textContent=collaborators.filter(c=>c.status==='active').length
+  $('collabTermsCount').textContent=collaboratorTerms.length
+  $('collabTermsPending').textContent=collaboratorTerms.filter(t=>t.verification_status!=='verified').length
+  $('collaboratorList').innerHTML=collaborators.map(c=>{
+    const terms=collaboratorTerms.filter(t=>t.collaborator_id===c.id)
+    return '<div class="collab-row"><div><strong>'+esc(c.display_name)+'</strong><small>'+esc(c.role_description||c.collaborator_type)+'</small></div><div><strong>'+esc(c.area||'Da definire')+'</strong><small>'+esc(c.territory||'Territorio da verificare')+'</small></div><div><span class="money-status">'+esc(c.earning_model||'da verificare')+'</span><small>'+esc(c.earning_notes||'')+'</small></div><div><strong>'+terms.length+' condizioni collegate</strong><small>'+terms.filter(t=>t.verification_status!=='verified').length+' da verificare</small></div><button class="small-btn" data-collaborator="'+c.id+'">Apri</button></div>'
+  }).join('')||empty('Nessun collaboratore censito')
+  document.querySelectorAll('[data-collaborator]').forEach(b=>b.onclick=()=>openCollaborator(b.dataset.collaborator))
+}
+
+function openCollaborator(id){
+  const c=collaborators.find(x=>x.id===id);if(!c)return
+  const terms=collaboratorTerms.filter(t=>t.collaborator_id===id)
+  $('modalContent').innerHTML='<div class="eyebrow">COLLABORATORE</div><h2>'+esc(c.display_name)+'</h2><p class="muted">'+esc(c.area||'Area da definire')+' · '+esc(c.territory||'Territorio da verificare')+'</p><div class="prose-box"><p><strong>Ruolo</strong><br>'+esc(c.role_description||'Da completare')+'</p><p><strong>Modello guadagno generale</strong><br>'+esc(c.earning_model||'Da verificare')+'</p><p><strong>Note economiche</strong><br>'+esc(c.earning_notes||'Nessuna condizione economica verificata inserita.')+'</p></div><div class="modal-section"><h4>Condizioni per prodotto / collaborazione</h4>'+(terms.length?terms.map(t=>'<p class="muted"><strong>'+esc(t.agency_products?.name||t.ecosystem_nodes?.name||t.activity_scope||'Ambito')+'</strong><br>'+esc(t.earning_type)+' · '+esc(t.verification_status)+(t.percentage!=null?' · '+esc(t.percentage)+'%':'')+(t.fixed_amount!=null?' · € '+esc(t.fixed_amount):'')+(t.bonus_rule?' · '+esc(t.bonus_rule):'')+'</p>').join(''):'<p class="muted">Nessuna condizione caricata. Va ricostruita dalle regole reali di agenzia.</p>')+'</div>'
+  $('modal').classList.remove('hidden')
+}
+
+function openNewCollaborator(){
+  if(!isManager())return
+  $('modalContent').innerHTML='<div class="eyebrow">RETE AGENZIA</div><h2>Nuovo collaboratore</h2><form id="collabForm" class="form"><label>Nome<input id="colName" required></label><div class="inline"><label>Area<input id="colArea"></label><label>Territorio<input id="colTerritory"></label></div><label>Ruolo<textarea id="colRole"></textarea></label><label>Modello guadagno generale<input id="colEarning" placeholder="es. provvigione, fisso, bonus, misto, da verificare"></label><label>Note economiche<textarea id="colEarningNotes"></textarea></label><button class="primary" type="submit">Salva collaboratore</button></form>'
+  $('modal').classList.remove('hidden')
+  $('collabForm').onsubmit=async e=>{
+    e.preventDefault()
+    const row={organization_id:window.orgId,display_name:$('colName').value.trim(),collaborator_type:'collaborator',area:$('colArea').value.trim()||null,territory:$('colTerritory').value.trim()||null,role_description:$('colRole').value.trim()||null,earning_model:$('colEarning').value.trim()||'da_verificare',earning_notes:$('colEarningNotes').value.trim()||null,status:'to_verify'}
+    const{error}=await supabase.from('agency_collaborators').insert(row)
+    if(error)return alert(error.message)
+    closeModal();await loadAll()
+  }
+}
+
+function renderComparisons(){
+  const groups=[...new Set(products.map(p=>p.comparison_group||p.category).filter(Boolean))]
+  $('comparisonGroups').innerHTML=groups.map(g=>{
+    const gp=products.filter(p=>(p.comparison_group||p.category)===g)
+    const gc=comparisons.filter(c=>c.agency_products?.comparison_group===g)
+    const verified=gc.filter(c=>c.status==='verified')
+    const names=gp.map(p=>p.name).join(' · ')
+    return '<article class="comparison-card"><div class="comparison-head"><div><div class="eyebrow">'+esc(g)+'</div><h3>'+esc(names)+'</h3></div><span class="verification-badge '+(verified.length?'verified':'')+'">'+(verified.length?verified.length+' confronti verificati':'benchmark da costruire')+'</span></div><div class="comparison-body"><div class="strength-weak-grid"><div class="sw-box strength"><h4>Punti di forza censiti</h4><ul>'+((gp.flatMap(p=>p.strengths||[])).length?gp.flatMap(p=>p.strengths||[]).map(x=>'<li>'+esc(x)+'</li>').join(''):'<li>Da verificare su documentazione e processo reale.</li>')+'</ul></div><div class="sw-box weak"><h4>Punti deboli / limiti</h4><ul>'+((gp.flatMap(p=>p.weaknesses||[])).length?gp.flatMap(p=>p.weaknesses||[]).map(x=>'<li>'+esc(x)+'</li>').join(''):'<li>Da verificare senza attribuire giudizi non documentati.</li>')+'</ul></div></div><div class="compare-note">'+(verified.length?verified.map(c=>'<strong>'+esc(c.benchmark_name)+'</strong><br>'+esc(c.comparison_scope||'')+(c.source_url?'<br>Fonte registrata':'')).join('<br><br>'):'Il confronto non viene riempito con punteggi inventati. Verranno registrati solo dati comparabili con fonte, data e livello di confidenza.')+'</div></div></article>'
+  }).join('')||empty('Nessun gruppo di confronto')
+}
+
+function renderMail(){
+  $('mailTemplateList').innerHTML=mailTemplates.map(t=>'<div class="template-card" data-mail-template="'+t.id+'"><h4>'+esc(t.title)+'</h4><p>'+esc(t.purpose)+' · '+esc(t.audience||'')+'</p></div>').join('')||empty('Nessun modello email')
+  document.querySelectorAll('[data-mail-template]').forEach(b=>b.onclick=()=>{ $('mailTemplateSelect').value=b.dataset.mailTemplate; hydrateMailTemplate(); $('mailContext').focus() })
+  const cur=$('mailTemplateSelect').value
+  $('mailTemplateSelect').innerHTML='<option value="">Scegli un modello</option>'+mailTemplates.map(t=>'<option value="'+t.id+'">'+esc(t.title)+'</option>').join('')
+  if(mailTemplates.some(t=>t.id===cur))$('mailTemplateSelect').value=cur
+  $('mailPartnerSelect').innerHTML='<option value="">Generale</option>'+ecosystem.map(n=>'<option value="'+n.id+'">'+esc(n.name)+'</option>').join('')
+  $('mailDraftList').innerHTML=mailDrafts.map(d=>listRow(d.subject||d.purpose||'Bozza email',(d.recipient_name||d.recipient_email||'destinatario da definire')+(d.ecosystem_nodes?.name?' · '+d.ecosystem_nodes.name:''),[d.status,fmtDate(d.created_at)])).join('')||empty('Nessuna bozza salvata')
+}
+
+function hydrateMailTemplate(){
+  const t=mailTemplates.find(x=>x.id===$('mailTemplateSelect').value)
+  if(!t)return
+  $('mailSubject').value=t.subject_pattern||''
+  $('mailBody').value=t.body_pattern||''
+}
+function fillPattern(text,vars){
+  return String(text||'').replace(/{{\s*([^}]+)\s*}}/g,(_,k)=>vars[k.trim()]??'['+k.trim()+']')
+}
+function generateMailDraft(){
+  const t=mailTemplates.find(x=>x.id===$('mailTemplateSelect').value)
+  if(!t)return alert('Scegli prima un modello.')
+  const partner=ecosystem.find(x=>x.id===$('mailPartnerSelect').value)
+  const context=$('mailContext').value.trim()
+  const vars={
+    partner:partner?.name||'Maglia / partner',
+    nome:$('mailRecipientName').value.trim()||'',
+    tema:context||'[tema da definire]',
+    punti:context||'[punti da definire]',
+    dettagli:context||'[dettagli da definire]',
+    documenti:context||'[documenti da definire]'
+  }
+  $('mailSubject').value=fillPattern(t.subject_pattern,vars)
+  $('mailBody').value=fillPattern(t.body_pattern,vars)
+}
+async function saveMailDraft(e){
+  e.preventDefault()
+  const row={organization_id:window.orgId,created_by:window.userId,ecosystem_node_id:$('mailPartnerSelect').value||null,template_id:$('mailTemplateSelect').value||null,recipient_name:$('mailRecipientName').value.trim()||null,recipient_email:$('mailRecipientEmail').value.trim()||null,purpose:mailTemplates.find(x=>x.id===$('mailTemplateSelect').value)?.purpose||'custom',context:$('mailContext').value.trim()||null,subject:$('mailSubject').value.trim()||null,body:$('mailBody').value.trim()||null,status:'draft'}
+  const{error}=await supabase.from('ai_mail_drafts').insert(row)
+  if(error)return alert(error.message)
+  $('mailContext').value='';$('mailSubject').value='';$('mailBody').value=''
+  await loadAll()
+}
+
+function addAssistantMessage(text,type='bot'){
+  const d=document.createElement('div');d.className='ai-message '+type;d.textContent=text;$('aiMessages').appendChild(d);$('aiMessages').scrollTop=$('aiMessages').scrollHeight
+}
+function askAssistant(q){
+  addAssistantMessage(q,'user')
+  const s=q.toLowerCase()
+  let reply=''
+  if(s.includes('attivit')||s.includes('scadenz')){
+    const open=actions.filter(a=>!['completed','cancelled'].includes(a.status))
+    const due=open.filter(a=>a.due_at).sort(actionSort).slice(0,3)
+    reply='Ci sono '+open.length+' attività aperte. '+(due.length?'Le prime con scadenza: '+due.map(a=>a.title+' ('+fmtDate(a.due_at)+')').join('; ')+'.':'Non risultano scadenze registrate sulle prime attività.')
+  }else if(s.includes('prodot')||s.includes('confront')){
+    const pending=products.filter(p=>p.maturity_status==='to_verify').length
+    reply='Ho '+products.length+' schede prodotto/area censite; '+pending+' sono ancora da verificare. I confronti verificati sono '+comparisons.filter(c=>c.status==='verified').length+'. Posso portarti nella sezione Prodotti o Confronti.'
+  }else if(s.includes('collabor')||s.includes('guadagn')||s.includes('provvig')){
+    reply='Sono censiti '+collaborators.length+' collaboratori e '+collaboratorTerms.length+' condizioni economiche per prodotto/rapporto. '+collaboratorTerms.filter(t=>t.verification_status!=='verified').length+' condizioni sono ancora da verificare: non inserisco percentuali senza evidenza.'
+  }else if(s.includes('cepa')||s.includes('nazional')){
+    const current=cepaExpansion.find(x=>x.status==='current')
+    reply='CEPA ha '+subjects.length+' materie censite. La fase corrente della roadmap è '+(current?current.title+' su '+current.territory:'da definire')+'. La roadmap contiene '+cepaExpansion.length+' fasi fino allo scenario nazionale, mantenute come piano evolutivo e non come risultati già acquisiti.'
+  }else if(s.includes('email')||s.includes('mail')){
+    reply='Posso preparare e salvare una bozza personalizzata usando i modelli Maglia/CEPA. Ti porto in AI Mail & Chat. L’invio diretto resta separato finché non colleghiamo un canale email autorizzato.'
+    navigate('aiMail')
+  }else{
+    const names=ecosystem.map(n=>n.code).join(', ')
+    reply='Posso lavorare sui dati presenti in piattaforma: compagnie e partner ('+names+'), prodotti, collaboratori, CEPA, territorio, documenti e attività. Dimmi quale area vuoi leggere o quale azione vuoi preparare.'
+  }
+  setTimeout(()=>addAssistantMessage(reply,'bot'),120)
 }
 
 function renderDevelopment(){
