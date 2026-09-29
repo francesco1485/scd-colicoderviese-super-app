@@ -93,6 +93,18 @@ function doPost(e) {
       case 'direction.evolution':
         data = getEvolutionQueue(token, Number(payload.limit || 30));
         break;
+      case 'direction.datafabric.status':
+        if (typeof r25DataFabricStatus_ !== 'function') throw new Error('Modulo R25 Data Fabric non installato');
+        data = r25DataFabricStatus_(token);
+        break;
+      case 'direction.datafabric.scan.gmail':
+        if (typeof r25ScanGmail_ !== 'function') throw new Error('Modulo R25 Data Fabric non installato');
+        data = r25ScanGmail_(token, payload);
+        break;
+      case 'direction.datafabric.scan.drive':
+        if (typeof r25ScanDrive_ !== 'function') throw new Error('Modulo R25 Data Fabric non installato');
+        data = r25ScanDrive_(token, payload);
+        break;
       case 'direction.access.set':
         data = setActorAccess(token, payload);
         break;
