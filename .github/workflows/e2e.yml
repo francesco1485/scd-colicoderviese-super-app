@@ -22,6 +22,7 @@ jobs:
       - name: Syntax check
         run: |
           node --check app.js
+          node --check app-r24-router.js
           node --check server.js
       - name: API contract gate
         run: npm run test:contract
@@ -48,7 +49,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: scd-r21-15-runtime-visual-qa
+          name: scd-r24-runtime-visual-qa
           path: test-output/*.png
           if-no-files-found: ignore
           retention-days: 14

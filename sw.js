@@ -1,5 +1,5 @@
-const CACHE='scd-r21-15-shell-v1';
-const CORE=['./','./index.html','./delete-account.html','./styles.css?v=21.10.0','./ui-r21-11.css?v=21.15.0','./app.js?v=21.15.0','./manifest.webmanifest','./assets/logo-scd.png','./assets/hero-colico.webp','./assets/sky.png','./assets/icon-192.png','./assets/icon-512.png'];
+const CACHE='scd-r24-shell-v1';
+const CORE=['./','./index.html','./delete-account.html','./styles.css?v=21.10.0','./ui-r21-11.css?v=21.15.0','./ui-r24-shell.css?v=24.0.0','./app.js?v=21.15.0','./app-r24-router.js?v=24.0.0','./manifest.webmanifest','./assets/logo-scd.png','./assets/hero-colico.webp','./assets/sky.png','./assets/icon-192.png','./assets/icon-512.png'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',e=>{
@@ -12,4 +12,4 @@ self.addEventListener('fetch',e=>{
   }
   e.respondWith(caches.match(e.request).then(cached=>cached||fetch(e.request).then(r=>{const copy=r.clone();caches.open(CACHE).then(c=>c.put(e.request,copy));return r})));
 });
-self.addEventListener('notificationclick',event=>{event.notification.close();const url=(event.notification.data&&event.notification.data.url)||'./#oggi';event.waitUntil(clients.matchAll({type:'window',includeUncontrolled:true}).then(list=>{for(const c of list){if('focus' in c)return c.focus()}return clients.openWindow?clients.openWindow(url):undefined}))});
+self.addEventListener('notificationclick',event=>{event.notification.close();const url=(event.notification.data&&event.notification.data.url)||'./#/home';event.waitUntil(clients.matchAll({type:'window',includeUncontrolled:true}).then(list=>{for(const c of list){if('focus' in c)return c.focus()}return clients.openWindow?clients.openWindow(url):undefined}))});

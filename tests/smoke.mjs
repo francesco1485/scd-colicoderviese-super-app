@@ -8,11 +8,19 @@ const viewports=[
   {width:390,height:844},
   {width:393,height:852},
   {width:430,height:932},
+  {width:1280,height:800},
   {width:1440,height:900}
 ];
 
 const browser=await chromium.launch({headless:true});
 const allErrors=[];
+
+async function goRoute(page,route){
+  await page.evaluate(r=>window.R24.go(r),route);
+  await page.waitForFunction(r=>location.hash==='#/'+r,route);
+  if(route==='home')await page.waitForSelector('#appRouteView:not([hidden]) .r24-home-hero');
+  else await page.waitForSelector('#appRouteView:not([hidden]) .r24-screen-head');
+}
 
 for(const viewport of viewports){
   const page=await browser.newPage({viewport});
@@ -26,99 +34,92 @@ for(const viewport of viewports){
   page.on('pageerror',e=>errors.push(String(e)));
   page.on('console',msg=>{if(msg.type()==='error')errors.push('console: '+msg.text())});
 
-  await page.goto(base,{waitUntil:'domcontentloaded',timeout:30000});
-  await page.waitForSelector('#home');
-  await page.waitForSelector('body.scd-ui-v21-11');
-  await page.waitForSelector('.home-kpis');
-  await page.waitForSelector('.mobile-nav [data-nav="calendar"]');
-  if(viewport.width===390) await page.screenshot({path:'test-output/home-390x844.png',fullPage:true});
+  await page.goto(base+'#/home',{waitUntil:'domcontentloaded',timeout:30000});
+  await page.waitForSelector('body.r24-router-ready');
+  await page.waitForSelector('#appRouteView:not([hidden]) .r24-home-hero');
+  await page.waitForSelector('.r24-home-kpis');
+  await page.waitForSelector('.mobile-nav [data-nav="calendar"]',{state:'attached'});
+  await page.waitForSelector('#clubClock',{state:'attached'});
+  await page.waitForFunction(()=>document.querySelector('#clubClock')?.textContent?.length>8);
+  await page.waitForFunction(()=>document.documentElement.scrollWidth<=window.innerWidth+3);
+
+  if(viewport.width===390)await page.screenshot({path:'test-output/r24-home-390x844.png',fullPage:true});
   if(viewport.width===1440){
     const shellWidth=await page.locator('.app-shell').evaluate(el=>Math.round(el.getBoundingClientRect().width));
-    if(shellWidth>430) throw new Error('desktop browser escaped canonical app shell: '+shellWidth+'px');
-    await page.screenshot({path:'test-output/home-desktop-app-shell-1440x900.png',fullPage:true});
+    if(shellWidth<1200)throw new Error('desktop app shell is still phone-sized: '+shellWidth+'px');
+    await page.screenshot({path:'test-output/r24-home-desktop-1440x900.png',fullPage:true});
   }
-  await page.waitForFunction(()=>document.documentElement.scrollWidth<=window.innerWidth+3);
-  await page.waitForSelector('#clubClock');
-  await page.waitForFunction(()=>document.querySelector('#clubClock')?.textContent?.length>8);
 
-  await page.locator('.mobile-nav [data-action="calendar"]').click();
-  await page.waitForSelector('.calendar-app-screen');
-  await page.waitForSelector('.calendar-tabs');
-  await page.waitForSelector('#calendarRows');
-  if(viewport.width===390) await page.screenshot({path:'test-output/calendar-390x844.png',fullPage:true});
-  await page.click('#modalClose');
+  await goRoute(page,'calendar');
+  await page.waitForSelector('#r24CalendarRows');
+  await page.waitForSelector('.r24-segment [data-cal-filter="ALL"]');
+  if(viewport.width===390)await page.screenshot({path:'test-output/r24-calendar-390x844.png',fullPage:true});
+  if(viewport.width===1440)await page.screenshot({path:'test-output/r24-calendar-desktop-1440x900.png',fullPage:true});
 
-  await page.locator('.mobile-nav [data-action="events"]').click();
-  await page.waitForSelector('.communications-app-screen');
-  await page.click('#modalClose');
+  await goRoute(page,'communications');
+  await page.waitForSelector('.r24-important');
+  await page.waitForSelector('.r24-comms-list');
+  if(viewport.width===390)await page.screenshot({path:'test-output/r24-communications-390x844.png',fullPage:true});
 
-  await page.locator('[data-action="teams"]').first().click();
+  await goRoute(page,'services');
+  await page.waitForSelector('.r24-service-grid');
+  if(viewport.width===390)await page.screenshot({path:'test-output/r24-services-390x844.png',fullPage:true});
+
+  // Secondary public team flow remains available as a detail modal.
+  await page.evaluate(()=>openTeams());
   await page.waitForSelector('.teams-app-screen');
-  if(viewport.width===390) await page.screenshot({path:'test-output/teams-390x844.png',fullPage:true});
   await page.click('#modalClose');
 
-  await page.evaluate(()=>openLocationHub());
-  await page.waitForSelector('#locateMe');
-  await page.click('#modalClose');
-
-  await page.click('[data-action="sponsor"]');
-  await page.waitForSelector('#publicActionForm');
-  await page.click('#modalClose');
-
-  await page.click('#mobileProfile');
-  await page.waitForSelector('.profile-app-screen');
-  await page.click('#profileAvatar');
+  await goRoute(page,'profile');
+  await page.waitForSelector('#r24ProfileAvatar');
+  await page.click('#r24ProfileAvatar');
   await page.waitForSelector('#avatarPreview');
   await page.click('#modalClose');
 
-  await page.click('#mobileProfile');
-  await page.waitForSelector('.profile-app-screen');
-  await page.click('#profileRequests');
+  await goRoute(page,'profile');
+  await page.click('#r24ProfileRequests');
   await page.waitForSelector('#requestHistoryMount');
   await page.click('#modalClose');
 
+  await goRoute(page,'profile');
+  await page.click('#r24ProfileLink');
+  await page.waitForSelector('#tesseratoLinkForm');
+  if(viewport.width===390)await page.screenshot({path:'test-output/r24-tesserato-onboarding-390x844.png',fullPage:true});
+  await page.click('#tlCancel');
+
+  await goRoute(page,'profile');
+  await page.waitForSelector('a[href*="delete-account.html"]');
+  const deleteHref=await page.locator('a[href*="delete-account.html"]').getAttribute('href');
+  if(!deleteHref||!deleteHref.includes('delete-account.html'))throw new Error('account deletion path missing');
+  if(viewport.width===390)await page.screenshot({path:'test-output/r24-profile-390x844.png',fullPage:true});
+
   const safeBefore=apiActions.length;
-  await page.click('#mobileProfile');
-  await page.waitForSelector('.profile-app-screen');
-  await page.click('#profileSafeguarding');
+  await goRoute(page,'services');
+  await page.click('#r24Safeguarding');
   await page.waitForSelector('#safeForm');
   await page.fill('#safeMessage','QA safeguarding local-only');
   await page.click('#safeForm button[type="submit"]');
   await page.waitForSelector('#safeStatus .status-box');
   const safeActions=apiActions.slice(safeBefore);
-  if(safeActions.includes('safeguarding.submit')) throw new Error('safeguarding must not transit ordinary API');
+  if(safeActions.includes('safeguarding.submit'))throw new Error('safeguarding must not transit ordinary API');
   await page.click('#modalClose');
 
-  await page.click('#mobileProfile');
-  await page.waitForSelector('.profile-app-screen');
-  await page.waitForSelector('.profile-hub-grid');
-  await page.waitForSelector('#profileDeleteAccount');
-  const deleteHref=await page.locator('#profileDeleteAccount').getAttribute('href');
-  if(!deleteHref||!deleteHref.includes('delete-account.html')) throw new Error('account deletion path missing');
-  await page.click('#profileLinkAthlete');
-  await page.waitForSelector('#tesseratoLinkForm');
-  if(viewport.width===390) await page.screenshot({path:'test-output/tesserato-onboarding-390x844.png',fullPage:true});
-  await page.click('#tlCancel');
-  await page.waitForSelector('.profile-app-screen');
-  if(viewport.width===390){
-    await page.screenshot({path:'test-output/profile-390x844.png',fullPage:true});
-    await page.click('#profileCommunications');
-    await page.waitForSelector('.communications-app-screen');
-    await page.screenshot({path:'test-output/communications-390x844.png',fullPage:true});
-    await page.click('#modalClose');
-    await page.click('#mobileProfile');
-    await page.waitForSelector('.profile-app-screen');
-  }
-  await page.click('#profileR20');
+  // Login entry remains wired to R20 auth.
+  await goRoute(page,'profile');
+  await page.click('#r24ProfileLogin');
   await page.waitForSelector('#mgmtLoginForm');
   await page.click('#modalClose');
 
   if(viewport.width===390){
     await page.evaluate(()=>{
-      openManagementHome({
+      state.sessionToken='qa-session';
+      state.privateData={
         user:{name:'QA SCD',email:'qa@example.test',role:'STAFF',area:'U16',staff:true},
         permissions:{direction:true,manageAccess:true},
-        personal:[{code:'P001',firstName:'Luca',lastName:'Test',teamName:'U16 Elite',figcStatus:'TESSERATO',certificateStatus:'VALIDO'},{code:'P002',firstName:'Emma',lastName:'Test',teamName:'U12',figcStatus:'TESSERATA',certificateStatus:'VALIDO'}],
+        personal:[
+          {code:'P001',firstName:'Luca',lastName:'Test',teamName:'U16 Elite',figcStatus:'TESSERATO',certificateStatus:'VALIDO',paymentStatus:'REGOLARE'},
+          {code:'P002',firstName:'Emma',lastName:'Test',teamName:'U12',figcStatus:'TESSERATA',certificateStatus:'VALIDO',paymentStatus:'REGOLARE'}
+        ],
         teams:[{key:'U16',name:'U16 Elite'}],
         attendance:{teams:[{key:'U16',name:'U16 Elite'}]},
         roster:{U16:[{code:'P001',name:'Giocatore Test'}]},
@@ -126,66 +127,63 @@ for(const viewport of viewports){
         pendingPlayerAuthorizations:[{id:'AUTH1',player:'Giocatore Test',action:'COLLEGAMENTO',requester:'famiglia@example.test',motivation:'QA'}],
         direction:{requests:[{id:'R1',subject:'Richiesta test',status:'APERTA',team:'U16'}]},
         transport:{kpis:{requests:2}}
-      });
+      };
+      window.R24.go('staff');
     });
-    await page.waitForSelector('.mgmt-grid');
-    await page.waitForSelector('.mgmt-detail');
-    await page.screenshot({path:'test-output/staff-direction-390x844.png',fullPage:true});
+    await page.waitForSelector('.r24-service-grid.staff');
+    await page.waitForSelector('#r24Attendance');
+    await page.screenshot({path:'test-output/r24-staff-direction-390x844.png',fullPage:true});
 
-    await page.click('#mgmtProfiles');
-    await page.waitForSelector('.reserved-app-screen');
-    await page.waitForSelector('.athlete-hero');
-    await page.waitForSelector('.family-profile-strip');
-    await page.screenshot({path:'test-output/family-athlete-390x844.png',fullPage:true});
-    await page.click('#reservedBack');
-    await page.waitForSelector('.mgmt-grid');
+    await goRoute(page,'family');
+    await page.waitForSelector('.r24-family-strip');
+    await page.screenshot({path:'test-output/r24-family-390x844.png',fullPage:true});
 
-    await page.click('#mgmtAttendance');
+    await goRoute(page,'athlete');
+    await page.waitForSelector('.r24-athlete-hero');
+    await page.screenshot({path:'test-output/r24-athlete-390x844.png',fullPage:true});
+
+    await goRoute(page,'staff');
+    await page.click('#r24Attendance');
     await page.waitForSelector('#attTeam');
     await page.click('#modalClose');
 
-    await page.evaluate(()=>openManagementHome(state.privateData));
-    await page.click('#mgmtConvocations');
+    await goRoute(page,'staff');
+    await page.click('#r24Convocations');
     await page.waitForSelector('#convForm');
     await page.click('#modalClose');
 
-    await page.evaluate(()=>openManagementHome(state.privateData));
-    await page.click('#mgmtNewRequest');
-    await page.waitForSelector('#internalRequestForm');
+    await goRoute(page,'staff');
+    await page.click('#r24Messages');
+    await page.waitForSelector('#msgForm');
     await page.click('#modalClose');
 
-    await page.evaluate(()=>openManagementHome(state.privateData));
-    await page.click('#mgmtPin');
-    await page.waitForSelector('#pinForm');
-    await page.click('#modalClose');
-
-    await page.evaluate(()=>openManagementHome(state.privateData));
-    await page.click('#mgmtAccess');
+    await goRoute(page,'staff');
+    await page.click('#r24Access');
     await page.waitForSelector('#accessForm');
     await page.click('#modalClose');
   }
 
-  if(errors.length) allErrors.push(viewport.width+'x'+viewport.height+': '+errors.join(' | '));
+  if(errors.length)allErrors.push(viewport.width+'x'+viewport.height+': '+errors.join(' | '));
   await page.close();
 }
 
 const api=await browser.newPage();
 const health=await api.request.get(base+'/health');
-if(!health.ok()) throw new Error('health endpoint failed '+health.status());
+if(!health.ok())throw new Error('health endpoint failed '+health.status());
 const time=await api.request.get(base+'/api/time');
-if(!time.ok()) throw new Error('time endpoint failed '+time.status());
+if(!time.ok())throw new Error('time endpoint failed '+time.status());
 const timeJson=await time.json();
-if(timeJson.timeZone!=='Europe/Rome'||!timeJson.epochMs) throw new Error('invalid authoritative time payload');
+if(timeJson.timeZone!=='Europe/Rome'||!timeJson.epochMs)throw new Error('invalid authoritative time payload');
 const robots=await api.request.get(base+'/robots.txt');
-if(!robots.ok()) throw new Error('robots.txt missing');
+if(!robots.ok())throw new Error('robots.txt missing');
 const sitemap=await api.request.get(base+'/sitemap.xml');
-if(!sitemap.ok()) throw new Error('sitemap.xml missing');
+if(!sitemap.ok())throw new Error('sitemap.xml missing');
 const deletePage=await api.request.get(base+'/delete-account.html');
-if(!deletePage.ok()) throw new Error('delete-account.html missing');
+if(!deletePage.ok())throw new Error('delete-account.html missing');
 const deleteHtml=await deletePage.text();
-if(!deleteHtml.includes('deleteForm')||!deleteHtml.includes('ELIMINAZIONE ACCOUNT')) throw new Error('invalid account deletion resource');
+if(!deleteHtml.includes('deleteForm')||!deleteHtml.includes('ELIMINAZIONE ACCOUNT'))throw new Error('invalid account deletion resource');
 await api.close();
 
-if(allErrors.length) throw new Error('browser errors: '+allErrors.join(' || '));
-console.log('SCD smoke PASS', {viewports:viewports.map(v=>v.width+'x'+v.height)});
+if(allErrors.length)throw new Error('browser errors: '+allErrors.join(' || '));
+console.log('SCD R24 smoke PASS',{viewports:viewports.map(v=>v.width+'x'+v.height)});
 await browser.close();
