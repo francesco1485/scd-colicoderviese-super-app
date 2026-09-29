@@ -151,6 +151,8 @@ assert(m.architecture.r22_role==='ORCHESTRATION_COMMAND_EVENT_PLUGIN_LAYER_NOT_S
 assert(m.architecture.extensibility.data_ui_separation===true,'data/UI separation required');
 assert(m.architecture.feature_flags?.data_fabric_observability?.id==='FF-DATAFABRIC-OBSERVABILITY','Data Fabric observability feature flag missing');
 assert(m.architecture.feature_flags?.data_fabric_observability?.runtime_env==='SCD_FEATURE_DATA_FABRIC_OBSERVABILITY','Data Fabric feature flag env mismatch');
+assert(m.architecture.feature_flags?.data_fabric_observability?.default_enabled===false,'Data Fabric observability must fail closed by default');
+assert(m.architecture.feature_flags?.data_fabric_observability?.activation_gate==='R20_DIRECT_RUNTIME_PROOF_AND_PRODUCTION_EVIDENCE','Data Fabric activation gate mismatch');
 assert(m.architecture.upstream_resilience?.retry_mode==='READ_ONLY_ONLY','upstream retries must remain read-only only');
 assert(m.architecture.upstream_resilience?.max_attempts===2,'upstream read-only retry attempts mismatch');
 includesAll(m.data_architecture?.provenance_contract?.ui_question_fields||[],['SOURCE','TABLE','FIELD','API','FALLBACK','REFRESH'],'provenance contract');
@@ -206,6 +208,7 @@ const requiredRepoFiles=[
   'docs/adr/ADR-0003-production-evidence.md',
   'docs/adr/ADR-0004-read-only-upstream-retry.md',
   'docs/adr/ADR-0005-r20-runtime-activation.md',
+  'docs/adr/ADR-0006-datafabric-fail-closed.md',
   'docs/runbooks/R20-RUNTIME-DEPLOY.md',
   'scripts/verify-r20-direct.mjs',
   'tests/upstream-resilience.mjs',
