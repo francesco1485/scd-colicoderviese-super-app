@@ -105,12 +105,19 @@ async function syncClubClock(){
     return null;
   }
 }
+function normalizeCalendarDate(v){
+  const s=String(v||'').trim();if(!s)return '';
+  let m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);if(m)return m[1]+'-'+m[2]+'-'+m[3];
+  m=s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);if(m)return m[3]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[1]).padStart(2,'0');
+  const d=new Date(s);if(Number.isFinite(d.getTime()))return d.toISOString().slice(0,10);
+  return s;
+}
 function normalizeCalendarRows(raw){
   const rows=Array.isArray(raw)?raw:(raw?.rows||raw?.items||raw?.events||raw?.calendar||[]);
   return rows.map((x,i)=>({
     id:x.id||x.eventId||x.uid||('CAL-'+i),
     title:field(x,'title','event','name','subject')||'Evento SCD',
-    date:field(x,'date','data','startDate')||'',
+    date:normalizeCalendarDate(field(x,'date','data','startDate')),
     time:field(x,'time','ora','startTime')||'',
     endTime:field(x,'endTime','fine')||'',
     type:field(x,'type','kind','category','eventType')||'EVENTO',
