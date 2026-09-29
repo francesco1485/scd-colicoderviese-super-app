@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 
-const EXPECTED_VERSION=process.env.SCD_EXPECTED_VERSION||'30.0.0';
-const EXPECTED_MANIFEST=process.env.SCD_EXPECTED_MANIFEST||'1.7.0';
+const EXPECTED_VERSION=process.env.SCD_EXPECTED_VERSION||'32.0.0';
+const EXPECTED_MANIFEST=process.env.SCD_EXPECTED_MANIFEST||'1.8.0';
 const PAGES_URL=process.env.SCD_PAGES_URL||'https://francesco1485.github.io/scd-colicoderviese-super-app/';
 const RENDER_BASE=(process.env.SCD_RENDER_BASE_URL||'https://scd-colicoderviese-official-r21.onrender.com').replace(/\/$/,'');
 const ATTEMPTS=Math.max(1,Number(process.env.SCD_PROD_VERIFY_ATTEMPTS||20));
@@ -10,7 +10,7 @@ const outDir='test-output';
 fs.mkdirSync(outDir,{recursive:true});
 
 const evidence={
-  release:'R31',
+  release:'R32',
   expectedVersion:EXPECTED_VERSION,
   expectedManifest:EXPECTED_MANIFEST,
   startedAt:new Date().toISOString(),
@@ -64,33 +64,46 @@ async function runChecks(attempt){
     const r=await getText(RENDER_BASE+'/api/capabilities?scd_verify='+Date.now());
     const j=parseJson('Render capabilities',r.text);
     const actionOk=Array.isArray(j.actions)&&j.actions.includes('public.datafabric.contract');
-    const flagOk=j.featureFlags?.dataFabricObservability===true;
-    const ok=r.ok&&j.ok===true&&j.version===EXPECTED_VERSION&&actionOk&&flagOk;
-    result.checks.renderCapabilities={httpStatus:r.status,ok,version:j.version||null,actionOk,flagOk};
+    const dataFabricEnabled=j.featureFlags?.dataFabricObservability;
+    const flagDeclared=typeof dataFabricEnabled==='boolean';
+    const ok=r.ok&&j.ok===true&&j.version===EXPECTED_VERSION&&actionOk&&flagDeclared;
+    result.checks.renderCapabilities={httpStatus:r.status,ok,version:j.version||null,actionOk,flagDeclared,dataFabricEnabled};
     if(!ok)result.failures.push('RENDER_FEATURE_FLAGS');
   }catch(e){
-    result.checks.renderCapabilities={ok:false,error:String(e.message||e)};
+    result.checks.renderCapabilities={ok:false,error:String(e.message||e),dataFabricEnabled:null};
     result.failures.push('RENDER_FEATURE_FLAGS');
   }
 
-  try{
-    const r=await getText(RENDER_BASE+'/api/scd',{
-      method:'POST',
-      headers:{'content-type':'application/json','x-scd-client':'production-evidence'},
-      body:JSON.stringify({action:'public.datafabric.contract',payload:{},sessionToken:''})
-    });
-    const j=parseJson('R20 contract probe',r.text);
-    const d=j.data||{};
-    const obs=Array.isArray(d.observabilityFields)&&['status','lastSync','lastSuccess','lastError'].every(x=>d.observabilityFields.includes(x));
-    const prov=Array.isArray(d.provenanceFields)&&['SOURCE','TABLE','FIELD','API','FALLBACK','REFRESH'].every(x=>d.provenanceFields.includes(x));
-    const ok=r.ok&&j.ok===true&&d.release==='R29'&&d.contractVersion==='1.0.0'&&obs&&prov&&d.safeguarding==='ISOLATED'&&d.destructiveAutoWrite===false;
-    const deterministicMissing=r.ok&&j.ok===false&&/non supportata|non installato|not supported/i.test(String(j.error||''));
-    result.checks.r20Contract={httpStatus:r.status,ok,release:d.release||null,contractVersion:d.contractVersion||null,observabilityFieldsOk:obs,provenanceFieldsOk:prov,error:j.error||null,deterministicMissing};
-    if(!ok)result.failures.push('R20_DATA_FABRIC_CONTRACT_END_TO_END');
-    if(deterministicMissing)result.hardFailure='R20_RUNTIME_CONTRACT_MISSING';
-  }catch(e){
-    result.checks.r20Contract={ok:false,error:String(e.message||e)};
-    result.failures.push('R20_DATA_FABRIC_CONTRACT_END_TO_END');
+  if(result.checks.renderCapabilities?.dataFabricEnabled===true){
+    try{
+      const r=await getText(RENDER_BASE+'/api/scd',{
+        method:'POST',
+        headers:{'content-type':'application/json','x-scd-client':'production-evidence'},
+        body:JSON.stringify({action:'public.datafabric.contract',payload:{},sessionToken:''})
+      });
+      const j=parseJson('R20 contract probe',r.text);
+      const d=j.data||{};
+      const obs=Array.isArray(d.observabilityFields)&&['status','lastSync','lastSuccess','lastError'].every(x=>d.observabilityFields.includes(x));
+      const prov=Array.isArray(d.provenanceFields)&&['SOURCE','TABLE','FIELD','API','FALLBACK','REFRESH'].every(x=>d.provenanceFields.includes(x));
+      const ok=r.ok&&j.ok===true&&d.release==='R29'&&d.contractVersion==='1.0.0'&&obs&&prov&&d.safeguarding==='ISOLATED'&&d.destructiveAutoWrite===false;
+      const deterministicMissing=r.ok&&j.ok===false&&/non supportata|non installato|not supported/i.test(String(j.error||''));
+      result.checks.r20Contract={httpStatus:r.status,ok,required:true,release:d.release||null,contractVersion:d.contractVersion||null,observabilityFieldsOk:obs,provenanceFieldsOk:prov,error:j.error||null,deterministicMissing};
+      if(!ok)result.failures.push('R20_DATA_FABRIC_CONTRACT_END_TO_END');
+      if(deterministicMissing)result.hardFailure='R20_RUNTIME_CONTRACT_MISSING';
+    }catch(e){
+      result.checks.r20Contract={ok:false,required:true,error:String(e.message||e)};
+      result.failures.push('R20_DATA_FABRIC_CONTRACT_END_TO_END');
+    }
+  }else if(result.checks.renderCapabilities?.dataFabricEnabled===false){
+    result.checks.r20Contract={
+      ok:true,
+      required:false,
+      skipped:true,
+      state:'GATED_OFF_NOT_LIVE',
+      reason:'FF-DATAFABRIC-OBSERVABILITY disabled until R20 deployment is upgraded'
+    };
+  }else{
+    result.checks.r20Contract={ok:false,required:false,skipped:true,state:'UNVERIFIED',reason:'feature flag state unavailable'};
   }
 
   return result;
@@ -110,6 +123,8 @@ for(let i=1;i<=ATTEMPTS;i++){
 evidence.finishedAt=new Date().toISOString();
 evidence.finalStatus=passed?'VERIFIED':'UNVERIFIED';
 evidence.safeToDeclareLive=passed;
+evidence.safeToDeclareDataFabricLive=passed&&evidence.lastAttempt?.checks?.renderCapabilities?.dataFabricEnabled===true&&evidence.lastAttempt?.checks?.r20Contract?.ok===true;
+evidence.dataFabricRuntimeState=evidence.lastAttempt?.checks?.renderCapabilities?.dataFabricEnabled===false?'GATED_OFF_NOT_LIVE':(evidence.safeToDeclareDataFabricLive?'VERIFIED_LIVE':'UNVERIFIED');
 fs.writeFileSync(outDir+'/production-evidence.json',JSON.stringify(evidence,null,2)+'\n');
 
 if(!passed){
@@ -121,5 +136,6 @@ console.log('SCD PRODUCTION EVIDENCE PASS',{
   manifest:EXPECTED_MANIFEST,
   attempts:evidence.attempts.length,
   pages:PAGES_URL,
-  render:RENDER_BASE
+  render:RENDER_BASE,
+  dataFabricRuntimeState:evidence.dataFabricRuntimeState
 });
