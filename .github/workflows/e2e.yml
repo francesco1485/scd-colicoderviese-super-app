@@ -25,6 +25,7 @@ jobs:
           node --check app-r24-router.js
           node --check server.js
           node --check scripts/verify-production.mjs
+          node --check scripts/verify-r20-direct.mjs
       - name: API contract gate
         run: npm run test:contract
       - name: Upstream resilience gate

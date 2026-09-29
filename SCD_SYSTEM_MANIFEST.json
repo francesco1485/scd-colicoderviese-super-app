@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "1.6.0",
+    "version": "1.7.0",
     "effective_at": "2026-09-29",
     "status": "BINDING",
     "language": "it-IT",
@@ -1379,7 +1379,8 @@
       "FEATURE_FLAG_ROLLOUT",
       "OBSERVABILITY_STATUS",
       "PRODUCTION_EVIDENCE",
-      "READ_ONLY_UPSTREAM_RETRY"
+      "READ_ONLY_UPSTREAM_RETRY",
+      "R20_DIRECT_RUNTIME_PROOF"
     ],
     "merge_rule": "Non considerare completata una funzione se è verde solo tecnicamente ma viola il manifest o il master visivo.",
     "release_truth": {
@@ -1599,6 +1600,16 @@
       "required": true,
       "state": "IMPLEMENTED",
       "contract": "RETRY_TRANSIENT_UPSTREAM_FAILURES_FOR_READ_ONLY_ACTIONS_ONLY"
+    },
+    {
+      "id": "CAP-R20-RUNTIME-ACTIVATION",
+      "domain": "DELIVERY",
+      "required": true,
+      "state": "PARTIAL",
+      "sources": [
+        "R20"
+      ],
+      "contract": "DIRECT_RUNTIME_PROBE_AND_PRESERVE_CANONICAL_WEB_APP_URL"
     }
   ],
   "known_noncompliance": [
@@ -1736,7 +1747,7 @@
       }
     ],
     "runtime_activation": {
-      "release": "R29",
+      "release": "R31",
       "public_probe_action": "public.datafabric.contract",
       "public_probe_payload": "NON_SENSITIVE_SCHEMA_ONLY",
       "close_issue_when": [
@@ -1746,7 +1757,14 @@
         "DATA_FABRIC_PRIVATE_STATUS_VERIFIED_BY_DIRECTION"
       ],
       "bridge_release": "R30",
-      "bridge_rule": "READ_ONLY_RETRY_NO_MUTATION_RETRY"
+      "bridge_rule": "READ_ONLY_RETRY_NO_MUTATION_RETRY",
+      "r20_direct_verifier": "scripts/verify-r20-direct.mjs",
+      "runbook": "docs/runbooks/R20-RUNTIME-DEPLOY.md",
+      "required_r20_contract": "public.datafabric.contract",
+      "canonical_url_must_be_preserved": true,
+      "observed_at": "2026-09-29T18:15:23Z",
+      "observed_runtime": "2026.09.28-R20.0-PUBLIC-FIRST",
+      "observed_contract_state": "MISSING_PUBLIC_DATAFABRIC_CONTRACT"
     }
   },
   "product_direction": {
