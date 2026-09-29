@@ -20,7 +20,8 @@ const required=[
   'auth.request','auth.login','auth.validate','auth.pin.change',
   'dashboard.summary','account.requests','private.request.submit','private.transport.request','private.message.send',
   'private.convocation.create','private.convocation.reply','private.attendance.get','private.attendance.save',
-  'direction.access.set','direction.pin.set','direction.player.approve','direction.player.reject','direction.diagnostics','direction.evolution'
+  'direction.access.set','direction.pin.set','direction.player.approve','direction.player.reject','direction.diagnostics','direction.evolution',
+  'direction.datafabric.status','direction.datafabric.scan.gmail','direction.datafabric.scan.drive'
 ];
 const missing=required.filter(x=>!serverActions.includes(x));
 if(missing.length){
