@@ -58,6 +58,7 @@
         <div class="nav-label">AGENZIA</div>
         <button class="nav-item" data-view="products">Prodotti & Sintesi</button>
         <button class="nav-item" data-view="collaborators">Collaboratori & Guadagni</button>
+        <button class="nav-item" data-view="growthKits">Kit Collaboratore</button>
         <button class="nav-item" data-view="comparisons">Confronti & Benchmark</button>
       </div>
 
@@ -80,6 +81,7 @@
       <div class="nav-group">
         <div class="nav-label">OPERATIVITÀ</div>
         <button class="nav-item" data-view="development">Sviluppo nuovo</button>
+        <button class="nav-item" data-view="networkRadar">Radar Rete</button>
         <button class="nav-item" data-view="actions">Attività & Scadenze</button>
         <button class="nav-item" data-view="recovery">Clienti · Recovery</button>
       </div>
@@ -449,6 +451,89 @@
           <div class="panel-head"><div><div class="eyebrow">MODELLI PRONTI</div><h3>Blueprint documentali</h3></div></div>
           <div id="blueprintList" class="blueprint-list"></div>
         </article>
+      </section>
+    </section>
+
+    <section id="growthKitsView" class="view hidden">
+      <section class="section-intro split">
+        <div>
+          <div class="eyebrow">KIT COLLABORATORE</div>
+          <h2>Valutare il collaboratore, capire cosa proporgli, dargli strumenti utilizzabili con il cliente.</h2>
+          <p>Qui il punto non è consegnare un catalogo di prodotti. Si parte dal portafoglio, dal territorio, dal modello economico e dalla capacità relazionale. Da lì si costruisce un piano concreto con documenti, domande, materiali e supporti grafici.</p>
+        </div>
+        <button id="newAssessmentBtn" class="primary hidden">+ Valutazione</button>
+      </section>
+
+      <section class="agency-kpis">
+        <div><span>Kit operativi</span><strong id="growthKitCount">-</strong></div>
+        <div><span>Valutazioni</span><strong id="assessmentCount">-</strong></div>
+        <div><span>Collaboratori coperti</span><strong id="assessmentCollabCount">-</strong></div>
+        <div><span>Kit pronti</span><strong id="growthKitReady">-</strong></div>
+      </section>
+
+      <section class="two-col">
+        <article class="panel">
+          <div class="panel-head"><div><div class="eyebrow">METODO</div><h3>Come si costruisce la proposta</h3></div></div>
+          <div class="proposal-flow">
+            <div><b>1</b><strong>Fotografia</strong><small>portafoglio, clienti, premi, contatti, mix</small></div>
+            <div><b>2</b><strong>Valutazione</strong><small>relazione, profondità, territorio, digitale, compliance</small></div>
+            <div><b>3</b><strong>Direzione</strong><small>quali bisogni e segmenti hanno più senso</small></div>
+            <div><b>4</b><strong>Kit cliente</strong><small>domande, documenti, grafica, specialista</small></div>
+            <div><b>5</b><strong>Piano 90 giorni</strong><small>azioni, appuntamenti, check-up, follow-up</small></div>
+          </div>
+        </article>
+        <article class="panel">
+          <div class="panel-head"><div><div class="eyebrow">VALUTAZIONI</div><h3>Collaboratori analizzati</h3></div></div>
+          <div id="assessmentList" class="list"></div>
+        </article>
+      </section>
+
+      <section class="panel top-gap">
+        <div class="panel-head"><div><div class="eyebrow">PLAYBOOK</div><h3>Kit da usare con collaboratori e clienti</h3></div></div>
+        <div id="growthKitGrid" class="growth-kit-grid"></div>
+      </section>
+    </section>
+
+    <section id="networkRadarView" class="view hidden">
+      <section class="section-intro split">
+        <div>
+          <div class="eyebrow">RADAR RETE</div>
+          <h2>Ricerca continua di intermediari, collaboratori e imprese potenzialmente interessanti.</h2>
+          <p>Partenza dai due poli Maglia di Mandello del Lario e Colico. IVASS RUI, Registro Imprese e siti pubblici alimentano una mappa separata dai clienti: prima si osserva, poi si verifica, poi eventualmente si apre un contatto.</p>
+        </div>
+        <button id="newDistributionCandidateBtn" class="primary hidden">+ Candidato</button>
+      </section>
+
+      <section class="agency-kpis">
+        <div><span>Candidati mappati</span><strong id="distCandidateCount">-</strong></div>
+        <div><span>Sezione B</span><strong id="distBCount">-</strong></div>
+        <div><span>Sezione E</span><strong id="distECount">-</strong></div>
+        <div><span>Qualificati / contatto</span><strong id="distActiveCount">-</strong></div>
+      </section>
+
+      <section class="source-lanes">
+        <article><div class="source-mark">IVASS</div><h3>RUI · Sezione B</h3><p>Broker. Ricerca per stato operativo, provincia, sede, sito, eventuali relazioni e dati pubblici del registro.</p><span>Fonte ufficiale · aggiornamento RUI quotidiano</span></article>
+        <article><div class="source-mark">IVASS</div><h3>RUI · Sezione E</h3><p>Collaboratori degli intermediari. Utile per individuare professionalità già inserite nella distribuzione e capire la rete di appartenenza.</p><span>Fonte ufficiale · dati pubblici professionali</span></article>
+        <article><div class="source-mark">CCIAA</div><h3>Registro Imprese</h3><p>Imprese per territorio, attività, dimensione, stato, addetti e dati economici disponibili. Serve a cercare anche soggetti fuori dal RUI.</p><span>Fonte camerale · Telemaco / elenchi ufficiali</span></article>
+      </section>
+
+      <section class="panel top-gap">
+        <div class="panel-head">
+          <div><div class="eyebrow">WATCHLIST</div><h3>Mandello e Colico · anelli di ricerca</h3></div>
+          <span class="future-chip">15 / 30 / 60 km = ipotesi iniziale modificabile</span>
+        </div>
+        <div id="distributionWatchlists" class="watchlist-grid"></div>
+      </section>
+
+      <section class="panel top-gap">
+        <div class="panel-head wrap">
+          <div><div class="eyebrow">CANDIDATI</div><h3>Anagrafica rete potenziale</h3></div>
+          <div class="filters">
+            <select id="distKindFilter"><option value="">Tutti</option><option value="rui_b">RUI B</option><option value="rui_e">RUI E</option><option value="company">Impresa</option><option value="professional">Professionista</option><option value="sap_candidate">Candidato SAP</option></select>
+            <select id="distStageFilter"><option value="">Tutti gli stati</option><option value="discovered">Scoperto</option><option value="reviewed">Rivisto</option><option value="qualified">Qualificato</option><option value="contact_planned">Contatto pianificato</option><option value="contacted">Contattato</option><option value="meeting">Incontro</option><option value="proposal">Proposta</option><option value="relationship">Relazione</option><option value="sap_candidate">SAP</option><option value="archived">Archiviato</option></select>
+          </div>
+        </div>
+        <div class="table-wrap"><table class="table"><thead><tr><th>Soggetto</th><th>Fonte</th><th>RUI/P.IVA</th><th>Territorio</th><th>Fit</th><th>Confidenza</th><th>Stato</th><th></th></tr></thead><tbody id="distributionCandidateBody"></tbody></table></div>
       </section>
     </section>
 
