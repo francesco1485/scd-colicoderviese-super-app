@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 440" role="img" aria-label="Formazione e confronto C.E.P.A.">
+<defs><linearGradient id="cbg" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#f6faf4"/><stop offset="1" stop-color="#e6f1e2"/></linearGradient><linearGradient id="board" x1="0" x2="1"><stop stop-color="#244e3d"/><stop offset="1" stop-color="#4c7757"/></linearGradient></defs>
+<rect width="900" height="440" fill="url(#cbg)"/><rect x="430" y="72" width="370" height="215" rx="18" fill="#fff"/><rect x="457" y="98" width="316" height="162" rx="10" fill="url(#board)"/>
+<path d="M490 222l55-58 43 31 58-72 75 83" stroke="#b7e09d" stroke-width="12" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="721" cy="206" r="11" fill="#ffe39a"/>
+<circle cx="286" cy="145" r="42" fill="#e6b68f"/><path d="M232 190q54-57 108 0v103H232z" fill="#235440"/><rect x="321" y="165" width="78" height="14" rx="7" transform="rotate(-17 321 165)" fill="#235440"/>
+<circle cx="150" cy="305" r="29" fill="#ddb18b"/><path d="M113 337q37-44 74 0v70h-74z" fill="#173f59"/><circle cx="268" cy="312" r="27" fill="#cf9f78"/><path d="M235 342q33-40 66 0v65h-66z" fill="#5c6f7a"/><circle cx="382" cy="305" r="30" fill="#e0ae88"/><path d="M344 338q38-45 76 0v69h-76z" fill="#2d6b58"/>
+<rect x="93" y="397" width="710" height="16" rx="8" fill="#d1ddd3"/>
+</svg>
