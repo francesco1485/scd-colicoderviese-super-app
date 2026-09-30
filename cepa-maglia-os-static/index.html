@@ -6,8 +6,8 @@
 <meta name="robots" content="noindex,nofollow,noarchive">
 <meta name="referrer" content="no-referrer">
 <title>Maglia 360 | Centro di Regia</title>
-<link rel="stylesheet" href="./styles.css?v=20260930-1605">
-<link rel="stylesheet" href="./visual-master-shell.css?v=20260930-1605">
+<link rel="stylesheet" href="./styles.css?v=20260930-v3-live-2010">
+<link rel="stylesheet" href="./visual-master-shell.css?v=20260930-v3-live-2010">
 </head>
 <body>
 <section id="loginView" class="login-shell">
@@ -99,36 +99,320 @@
   <button id="sidebarBackdrop" class="sidebar-backdrop hidden" type="button" aria-label="Chiudi menu"></button>
 
   <main class="main">
-    <header class="main-header">
-      <div class="header-left">
+    <header class="main-header app-topbar">
+      <div class="topbar-brand-zone">
         <button id="mobileMenuBtn" class="mobile-menu-btn" type="button" aria-label="Apri menu">☰</button>
+        <div class="history-controls" aria-label="Cronologia navigazione">
+          <button id="navBackBtn" type="button" aria-label="Indietro" title="Indietro">‹</button>
+          <button id="navForwardBtn" type="button" aria-label="Avanti" title="Avanti">›</button>
+        </div>
         <div class="header-brand">
           <strong>Maglia <span>360</span></strong>
           <small>Agenzia Generale HDI</small>
         </div>
-        <div class="header-context">
-          <div class="eyebrow">AREA DI LAVORO</div>
-          <h1 id="pageTitle">Quadro generale</h1>
-          <p id="pageSubtitle">Agenzia Generale HDI · Ecosistema di competenze, relazioni e sviluppo</p>
-        </div>
       </div>
-      <div class="header-right">
-        <div class="header-cepa">
-          <small>Da Maglia Assicurazioni nasce</small>
-          <strong>C.E.P.A.</strong>
-          <span>Centro Educazione Previdenziale e Assicurativa</span>
+
+      <div class="header-context">
+        <div class="eyebrow">AREA DI LAVORO</div>
+        <h1 id="pageTitle">Home</h1>
+        <p id="pageSubtitle">Sistema operativo commerciale e territoriale</p>
+      </div>
+
+      <div class="global-search-shell">
+        <span class="global-search-icon" aria-hidden="true">⌕</span>
+        <input id="globalSearchInput" type="search" autocomplete="off" placeholder="Cerca clienti, pratiche, partner, C.E.P.A., documenti, materiali..." aria-label="Ricerca globale">
+        <kbd>Ctrl K</kbd>
+        <div id="globalSearchResults" class="global-search-results hidden" role="listbox"></div>
+      </div>
+
+      <div class="header-right topbar-actions">
+        <label class="office-quick-select">
+          <span aria-hidden="true">⌖</span>
+          <select id="officeQuickSelector" aria-label="Seleziona ufficio">
+            <option value="">Tutte le sedi</option>
+          </select>
+        </label>
+        <button id="headerNotificationsBtn" class="topbar-icon-btn" type="button" aria-label="Notifiche">
+          <span aria-hidden="true">♢</span><b id="headerNotificationBadge" class="notification-badge hidden">0</b>
+        </button>
+        <div class="header-user-card">
+          <span id="headerUserInitials" class="header-avatar">U</span>
+          <div><strong id="headerUserName">Utente</strong><small id="rolePill"></small></div>
         </div>
-        <div class="header-actions">
-          <button id="focusModeBtn" class="small-btn" type="button" title="Riduci la schermata alle priorità">◎ Focus</button>
-          <a class="public-preview-link" href="./presentazione.html" target="_blank" rel="noopener">Vetrina progetto</a>
-          <span id="rolePill" class="role-pill"></span>
-          <button id="refreshBtn" class="icon-btn" title="Aggiorna">↻</button>
-        </div>
+        <button id="refreshBtn" class="topbar-icon-btn" title="Aggiorna" aria-label="Aggiorna">↻</button>
       </div>
     </header>
 
     <section id="homeView" class="view">
-      <maglia-dashboard id="magliaDashboard"></maglia-dashboard>
+      <div class="command-home">
+        <section class="home-hero">
+          <div class="home-hero-copy">
+            <div class="home-kicker">MAGLIA 360 · SISTEMA OPERATIVO</div>
+            <h2>Scegli il tuo ambiente di lavoro</h2>
+            <p>Ogni accesso ti connette con il tuo ruolo, la tua sede e le priorità della Direzione.</p>
+          </div>
+          <div class="home-hero-visual" aria-hidden="true">
+            <img src="./assets/office-colico.svg" alt="">
+          </div>
+          <div class="home-hero-brand">
+            <strong>MAGLIA</strong><span>ASSICURAZIONI</span>
+            <i></i>
+            <b>HDI</b><small>ASSICURAZIONI</small>
+          </div>
+        </section>
+
+        <section class="home-status-strip" aria-label="Stato operativo">
+          <button id="homeDirectionTile" type="button" class="status-tile direction">
+            <span class="status-icon">✉</span><div><small>Messaggio Direzione</small><strong id="homeDirectionTitle">Nessun messaggio urgente</strong><em id="homeDirectionText">Consulta le comunicazioni interne.</em></div><b>›</b>
+          </button>
+          <button id="homePriorityTile" type="button" class="status-tile priority">
+            <span class="status-icon">⚑</span><div><small>Priorità</small><strong><span id="homePriorityCount">0</span> attività urgenti</strong><em>Da gestire con precedenza.</em></div><b>›</b>
+          </button>
+          <button id="homeNotificationTile" type="button" class="status-tile notification">
+            <span class="status-icon">●</span><div><small>Notifiche</small><strong><span id="homeNotificationCount">0</span> da verificare</strong><em>Aggiornamenti della rete.</em></div><b>›</b>
+          </button>
+          <button id="homeDeadlineTile" type="button" class="status-tile deadline">
+            <span class="status-icon">□</span><div><small>Scadenze</small><strong><span id="homeDeadlineCount">0</span> in arrivo</strong><em>Nei prossimi 7 giorni.</em></div><b>›</b>
+          </button>
+        </section>
+
+        <section class="home-content-grid">
+          <div class="home-environment-zone">
+            <div class="home-section-heading">
+              <div><span>AMBIENTI PRINCIPALI</span><h3>Dove vuoi lavorare?</h3></div>
+              <div class="carousel-controls">
+                <button id="homeEnvironmentPrev" type="button" aria-label="Scorri indietro">‹</button>
+                <button id="homeEnvironmentNext" type="button" aria-label="Scorri avanti">›</button>
+              </div>
+            </div>
+            <div id="homeEnvironmentCards" class="home-environment-cards"></div>
+
+            <div class="home-section-heading future-heading">
+              <div><span>SVILUPPO FUTURO</span><h3>Altri uffici e presìdi</h3><small>Le sedi future sono indicate come sviluppo, non come operative.</small></div>
+              <div class="carousel-controls">
+                <button id="futureOfficePrev" type="button" aria-label="Scorri indietro">‹</button>
+                <button id="futureOfficeNext" type="button" aria-label="Scorri avanti">›</button>
+              </div>
+            </div>
+            <div id="futureOfficeCards" class="future-office-cards"></div>
+          </div>
+
+          <aside class="home-right-rail">
+            <section class="rail-panel">
+              <div class="rail-title"><h3>Le tue priorità</h3><button id="openAllPrioritiesBtn" type="button">Vedi tutte →</button></div>
+              <div id="homePriorityList" class="home-priority-list"></div>
+            </section>
+            <section class="rail-panel">
+              <div class="rail-title"><h3>Notizie interne</h3><button id="openAllNewsBtn" type="button">Vedi tutte →</button></div>
+              <div id="homeNewsList" class="home-news-list"></div>
+            </section>
+          </aside>
+        </section>
+
+        <section id="directionOverview" class="direction-overview">
+          <div class="office-section-head">
+            <div><span>DIREZIONE</span><h3>Confronto sedi e priorità</h3></div>
+            <small id="officeAccessNote">Vista Direzione</small>
+          </div>
+          <div id="directionCompareSummary" class="direction-compare-summary"></div>
+          <div id="directionProduction" class="direction-production"></div>
+          <div id="directionPriorities" class="direction-priorities"></div>
+        </section>
+
+        <div class="home-admin-actions">
+          <button id="manageOfficeUsersBtn" class="small-btn hidden" type="button">Gestione sedi utenti</button>
+          <span id="officeEntryRole" class="home-role-note"></span>
+        </div>
+      </div>
+    </section>
+
+    <section id="cepaHubView" class="view hidden">
+      <div class="cepa-hub-workspace">
+        <nav class="office-breadcrumb" aria-label="Percorso C.E.P.A.">
+          <button type="button" data-office-home>MAGLIA 360</button><span>›</span><strong>C.E.P.A.</strong>
+        </nav>
+
+        <section class="cepa-hub-hero">
+          <div class="cepa-brand-lockup">
+            <div class="cepa-brand-origin">
+              <span>DA MAGLIA ASSICURAZIONI S.A.S.</span>
+              <strong>Agenzia Generale HDI</strong>
+            </div>
+            <div class="cepa-brand-mark">C.E.P.A.</div>
+            <p>Centro Educazione Previdenziale e Assicurativa</p>
+          </div>
+          <div class="cepa-hub-copy">
+            <span>PROGETTO PERMANENTE</span>
+            <h2>La responsabilità non si sconta.</h2>
+            <p>Formazione, confronto e consapevolezza nelle scelte assicurative e previdenziali. Il Centro governa il metodo; i territori trasformano il progetto in incontri e relazioni reali.</p>
+          </div>
+        </section>
+
+        <section class="cepa-theme-strip" aria-label="Aree educative">
+          <div><i class="cepa-theme-icon">01</i><strong>Protezione</strong><span>Rischi, responsabilità e tutela quotidiana.</span></div>
+          <div><i class="cepa-theme-icon">02</i><strong>Previdenza</strong><span>Scelte di lungo periodo e consapevolezza.</span></div>
+          <div><i class="cepa-theme-icon">03</i><strong>Persone e imprese</strong><span>Bisogni reali, lavoro, welfare e continuità.</span></div>
+          <div><i class="cepa-theme-icon">04</i><strong>Consapevolezza</strong><span>Comprendere prima di scegliere.</span></div>
+        </section>
+
+        <section class="cepa-structure-grid">
+          <button id="openCepaCentralBtn" class="cepa-structure-card central" type="button">
+            <div class="cepa-structure-index">00</div>
+            <div>
+              <span>GOVERNANCE</span>
+              <h3>Centro CEPA</h3>
+              <p>Materie, programmi, contenuti, Academy, relatori, standard, documentazione e sviluppo del metodo.</p>
+            </div>
+            <strong>Apri Centro CEPA →</strong>
+          </button>
+          <div>
+            <div class="office-section-head">
+              <div><span>TERRITORI ATTIVI</span><h3>C.E.P.A. nelle sedi</h3></div>
+              <small>Attività e relazioni restano separate per territorio.</small>
+            </div>
+            <div id="cepaTerritoryCards" class="cepa-territory-cards"></div>
+          </div>
+        </section>
+
+        <section class="cepa-future-lane">
+          <div>
+            <span>SVILUPPO FUTURO</span>
+            <h3>SAP, nuovi territori e rete educativa</h3>
+            <p>La struttura è pronta per aggiungere nuovi presidi senza mescolare attività, contatti e programmazione delle sedi esistenti.</p>
+          </div>
+          <div class="cepa-future-steps">
+            <b>Territorio</b><em>→</em><b>Candidato SAP</b><em>→</em><b>2 incontri reali</b><em>→</em><b>Valutazione</b><em>→</em><b>Attivazione</b>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section id="cepaTerritoryView" class="view hidden">
+      <div class="cepa-territory-workspace">
+        <nav class="office-breadcrumb" aria-label="Percorso C.E.P.A. territoriale">
+          <button type="button" data-office-home>MAGLIA 360</button><span>›</span>
+          <button type="button" id="cepaTerritoryBack">C.E.P.A.</button><span>›</span>
+          <strong id="cepaTerritoryBreadcrumb">Territorio</strong>
+        </nav>
+
+        <section id="cepaTerritoryIdentity" class="cepa-territory-identity"></section>
+        <section id="cepaTerritorySummary" class="cepa-territory-summary"></section>
+
+        <section class="cepa-territory-grid">
+          <article class="office-panel">
+            <div class="office-section-head">
+              <div><span>PROGRAMMA LOCALE</span><h3>Attività C.E.P.A.</h3></div>
+              <button id="cepaTerritoryNewActivityBtn" class="small-btn" type="button">+ Attività</button>
+            </div>
+            <div id="cepaTerritoryActivities" class="cepa-territory-list"></div>
+          </article>
+          <article class="office-panel">
+            <div class="office-section-head">
+              <div><span>RETE TERRITORIALE</span><h3>Aziende, scuole, enti e relazioni</h3></div>
+            </div>
+            <div id="cepaTerritoryNetwork" class="cepa-network-summary"></div>
+          </article>
+        </section>
+
+        <section class="office-panel cepa-territory-method">
+          <div class="office-section-head">
+            <div><span>METODO</span><h3>Dal Centro al territorio</h3></div>
+          </div>
+          <div class="cepa-method-path">
+            <span>Centro CEPA</span><b>→</b><span>Programma</span><b>→</b><span>Territorio</span><b>→</b><span>Incontro</span><b>→</b><span>Follow-up</span><b>→</b><span>Apprendimento</span>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section id="officeView" class="view hidden">
+      <div class="office-workspace">
+        <nav class="office-breadcrumb" aria-label="Percorso">
+          <button type="button" data-office-home>MAGLIA 360</button><span>›</span><strong id="officeBreadcrumbName">Ufficio</strong>
+        </nav>
+        <section id="officeIdentity" class="office-identity"></section>
+        <section id="officeDirectionMessage" class="direction-message hidden"></section>
+        <section id="officeSummary" class="office-summary"></section>
+
+        <section class="office-analytics-grid">
+          <article class="office-panel office-trend-panel">
+            <div class="office-section-head">
+              <div><span>ANDAMENTO</span><h3>Produzione ultimi mesi</h3></div>
+              <small id="officeTrendLabel">Storico mensile</small>
+            </div>
+            <div id="officeTrendChart" class="office-trend-chart"></div>
+          </article>
+          <article class="office-panel office-workload-panel">
+            <div class="office-section-head">
+              <div><span>LAVORO</span><h3>Situazione operativa</h3></div>
+              <small>Rinnovi, proposte e pratiche</small>
+            </div>
+            <div id="officeWorkloadVisual" class="office-workload-visual"></div>
+          </article>
+        </section>
+
+        <section class="office-products-section">
+          <div class="office-section-head">
+            <div><span>AREE DI LAVORO</span><h3>Prodotti e servizi</h3></div>
+            <small>I dati mensili restano storicizzati per sede e prodotto.</small>
+          </div>
+          <div id="officeProductBars" class="office-product-bars"></div>
+        </section>
+
+        <section class="office-lower-grid">
+          <article class="office-panel">
+            <div class="office-section-head"><div><span>OPERATIVITÀ</span><h3>Priorità della sede</h3></div></div>
+            <div id="officePriorities" class="office-priority-list"></div>
+          </article>
+          <article class="office-panel">
+            <div class="office-section-head"><div><span>C.E.P.A.</span><h3>Attività territoriali</h3></div><button id="officeCepaOpenBtn" class="small-btn" type="button">Apri C.E.P.A. sede →</button></div>
+            <div id="officeCepa" class="office-cepa-list"></div>
+          </article>
+        </section>
+      </div>
+    </section>
+
+    <section id="officeProductView" class="view hidden">
+      <div class="product-office-workspace">
+        <nav class="office-breadcrumb" aria-label="Percorso">
+          <button type="button" data-office-home>MAGLIA 360</button><span>›</span>
+          <button type="button" id="productOfficeBack">Ufficio</button><span>›</span>
+          <strong id="productBreadcrumbName">Prodotto</strong>
+        </nav>
+        <section id="productOfficeIdentity" class="product-office-identity"></section>
+        <section id="productOfficeMetrics" class="product-office-metrics"></section>
+        <section class="product-insight-grid">
+          <article class="office-panel product-trend-panel">
+            <div class="office-section-head">
+              <div><span>ANDAMENTO PRODOTTO</span><h3>Produzione storica</h3></div>
+              <small id="productTrendLabel">Ultimi mesi disponibili</small>
+            </div>
+            <div id="productTrendChart" class="office-trend-chart"></div>
+          </article>
+          <article class="office-panel product-month-panel">
+            <div class="office-section-head">
+              <div><span>MESE CORRENTE</span><h3>Attività commerciale</h3></div>
+              <small>Valori dello snapshot selezionato</small>
+            </div>
+            <div id="productMonthVisual" class="office-workload-visual"></div>
+          </article>
+        </section>
+        <section class="product-flow-panel">
+          <div class="office-section-head">
+            <div><span>FLUSSO OPERATIVO</span><h3>Dove si concentra il lavoro</h3></div>
+            <small>Il percorso cambia in base alla categoria del prodotto.</small>
+          </div>
+          <div id="productFlowVisual" class="product-flow-visual"></div>
+        </section>
+        <section id="productStageBoard" class="product-stage-board"></section>
+        <section class="office-panel">
+          <div class="office-section-head">
+            <div><span>PRATICHE</span><h3>Lavoro aperto</h3></div>
+            <button id="newOfficeCaseBtn" class="small-btn" type="button">+ Nuova pratica</button>
+          </div>
+          <div id="productCaseList" class="product-case-list"></div>
+        </section>
+      </div>
     </section>
 
     <section id="partnerView" class="view hidden">
@@ -670,34 +954,38 @@
   </main>
 </section>
 
-<aside id="aiDock" class="ai-dock hidden">
-  <button id="aiDockToggle" class="ai-dock-toggle" type="button">
-    <img src="./assistant_avatar.webp" alt="Assistente AI Maglia 360">
-    <span><strong>Lia · Assistente AI</strong><small>Lario · Valtellina · Maglia 360</small></span>
-    <b class="online-dot"></b>
-  </button>
-  <div id="aiDockPanel" class="ai-dock-panel hidden">
-    <div class="ai-profile">
-      <img src="./assistant_avatar.webp" alt="">
-      <div><div class="eyebrow">ASSISTENTE TERRITORIALE</div><h3>Lia</h3><p>Leggo i dati presenti nella piattaforma e ti aiuto a orientarti tra compagnie, prodotti, CEPA, attività e bozze email.</p></div>
+<aside id="aiDock" class="ai-dock hidden" aria-label="Lia assistente">
+  <div id="aiDockPanel" class="ai-dock-panel hidden" role="dialog" aria-label="Lia">
+    <div class="lia-panel-head">
+      <div class="lia-panel-title">
+        <span class="lia-mark">L</span>
+        <div><strong>Lia</strong><small>Assistente generale e operativo</small></div>
+      </div>
+      <button id="aiDockClose" class="lia-close" type="button" aria-label="Chiudi Lia">×</button>
+    </div>
+    <div class="lia-context-note">
+      <strong id="liaContextLabel">Contesto: MAGLIA 360</strong>
+      <span>Puoi chiedere anche argomenti esterni al gestionale. Il contesto serve ad aiutarti, non a limitarti.</span>
     </div>
     <div id="aiMessages" class="ai-messages">
-      <div class="ai-message bot">Sono collegata ai dati Maglia 360. Posso indicarti cosa è aperto, cosa manca e dove entrare. Le informazioni non verificate restano tali.</div>
+      <div class="ai-message bot">Sono disponibile quando ti servo. Posso aiutarti sul lavoro in MAGLIA 360 oppure su domande, analisi, testi, ricerca, normativa, formazione e idee più generali.</div>
     </div>
     <div class="ai-quick">
-      <button type="button" data-ai-prompt="Cosa devo fare oggi?">Oggi</button>
-      <button type="button" data-ai-prompt="Preparami un incontro con un cliente">Prepara incontro</button>
-      <button type="button" data-ai-prompt="Analizza un collaboratore">Collaboratore</button>
-      <button type="button" data-ai-prompt="Trova opportunità di rete">Opportunità</button>
-      <button type="button" data-ai-prompt="Preparami una email">Email</button>
-      <button type="button" data-ai-prompt="A che punto è CEPA?">CEPA</button>
+      <button type="button" data-ai-prompt="Cosa devo fare oggi nel contesto in cui mi trovo?">Priorità</button>
+      <button type="button" data-ai-prompt="Aiutami ad analizzare il problema che ti descriverò">Analizza</button>
+      <button type="button" data-ai-prompt="Preparami una bozza professionale">Scrivi</button>
+      <button type="button" data-ai-prompt="Fammi una ricerca ragionata sull'argomento che ti indicherò">Ricerca</button>
     </div>
     <form id="aiChatForm" class="ai-chat-form">
-      <input id="aiChatInput" placeholder="Chiedi di partner, prodotti, CEPA, lavoro..." autocomplete="off">
-      <button type="submit">→</button>
+      <textarea id="aiChatInput" rows="2" placeholder="Chiedi a Lia qualsiasi cosa..." autocomplete="off"></textarea>
+      <button type="submit" aria-label="Invia">→</button>
     </form>
-    <p class="ai-disclaimer">Assistente operativo AI-ready. Le decisioni e le comunicazioni finali restano sotto controllo umano.</p>
+    <p class="ai-disclaimer">Le azioni operative seguono ruolo, permessi e approvazioni. Le risposte generali sono separate dai dati interni.</p>
   </div>
+  <button id="aiDockToggle" class="ai-dock-toggle" type="button" aria-label="Apri Lia" title="Apri Lia">
+    <span class="lia-floating-mark">L</span>
+    <span class="lia-floating-label">Lia</span>
+  </button>
 </aside>
 
 <section id="blockedView" class="blocked hidden">
@@ -706,6 +994,13 @@
   <button id="blockedLogout" class="secondary">Esci</button>
 </section>
 
+<div id="officeQuickActions" class="office-quick-actions hidden">
+  <button id="newDirectionMessageBtn" type="button">Messaggio Direzione</button>
+  <button id="importAssiEasyBtn" type="button">Importa AssiEasy</button>
+  <button id="newMonthlyDataBtn" type="button">Dati mensili</button>
+  <button id="newCepaActivityBtn" type="button">Attività C.E.P.A.</button>
+</div>
+
 <div id="modal" class="modal hidden">
   <div class="modal-card">
     <button id="modalClose" class="modal-x" aria-label="Chiudi">×</button>
@@ -713,7 +1008,7 @@
   </div>
 </div>
 
-<script type="module" src="./dashboard-component.js?v=20260930-1605"></script>
-<script type="module" src="./app.js?v=20260930-1605"></script>
+<script type="module" src="./dashboard-component.js?v=20260930-v2-CEPA-1915"></script>
+<script type="module" src="./app.js?v=20260930-v3-live-2010"></script>
 </body>
 </html>
