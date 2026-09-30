@@ -311,3 +311,111 @@ body{
   .header-actions #focusModeBtn,
   .role-pill{display:none}
 }
+
+/* --- Maglia 360 navigation states --- */
+.sidebar-close{
+  margin-left:auto;
+  width:28px;
+  height:28px;
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:8px;
+  background:rgba(255,255,255,.06);
+  color:#fff;
+  cursor:pointer;
+  display:grid;
+  place-items:center;
+  font-size:18px;
+  line-height:1;
+}
+.mobile-menu-btn{
+  display:none;
+  width:34px;
+  height:34px;
+  border:1px solid var(--m360-master-line);
+  border-radius:9px;
+  background:#fff;
+  color:var(--m360-master-navy);
+  cursor:pointer;
+}
+.sidebar-backdrop{
+  display:none;
+}
+.workspace.sidebar-collapsed{
+  grid-template-columns:64px minmax(0,1fr);
+}
+.workspace.sidebar-collapsed .sidebar{
+  padding-left:7px;
+  padding-right:7px;
+}
+.workspace.sidebar-collapsed .side-brand-copy,
+.workspace.sidebar-collapsed .nav-label,
+.workspace.sidebar-collapsed .nav-item .nav-sub,
+.workspace.sidebar-collapsed .side-footer{
+  display:none;
+}
+.workspace.sidebar-collapsed .side-brand{
+  justify-content:center;
+}
+.workspace.sidebar-collapsed .side-seal{
+  width:36px;
+  height:36px;
+}
+.workspace.sidebar-collapsed .sidebar-close{
+  position:absolute;
+  top:58px;
+  left:17px;
+  width:30px;
+  height:30px;
+  font-size:0;
+}
+.workspace.sidebar-collapsed .sidebar-close::before{
+  content:"›";
+  font-size:20px;
+}
+.workspace.sidebar-collapsed .nav-item{
+  min-height:38px;
+  padding:7px 4px;
+  text-align:center;
+  overflow:hidden;
+  white-space:nowrap;
+  text-indent:-9999px;
+}
+.workspace.sidebar-collapsed .nav-item::before{
+  content:"•";
+  text-indent:0;
+  display:block;
+  font-size:18px;
+  line-height:1;
+}
+@media(max-width:900px){
+  .mobile-menu-btn{display:grid;place-items:center}
+  .sidebar-close{display:grid}
+  .workspace.sidebar-collapsed{grid-template-columns:1fr}
+  .workspace.sidebar-collapsed .side-brand-copy,
+  .workspace.sidebar-collapsed .nav-label,
+  .workspace.sidebar-collapsed .nav-item .nav-sub,
+  .workspace.sidebar-collapsed .side-footer{display:initial}
+  .workspace.sidebar-collapsed .nav-item{
+    text-indent:0;
+    text-align:left;
+    padding:7px 9px;
+  }
+  .workspace.sidebar-collapsed .nav-item::before{display:none}
+  .workspace.sidebar-collapsed .sidebar-close{
+    position:static;
+    width:28px;
+    height:28px;
+    font-size:18px;
+  }
+  .workspace.sidebar-collapsed .sidebar-close::before{content:none}
+  .workspace.nav-open .sidebar{transform:translateX(0)}
+  .workspace.nav-open .sidebar-backdrop{
+    display:block;
+    position:fixed;
+    inset:0;
+    z-index:80;
+    border:0;
+    background:rgba(5,24,39,.48);
+    backdrop-filter:blur(2px);
+  }
+}
