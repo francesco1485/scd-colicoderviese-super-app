@@ -109,6 +109,18 @@ function doPost(e) {
         if (typeof r25ScanDrive_ !== 'function') throw new Error('Modulo R25 Data Fabric non installato');
         data = r25ScanDrive_(token, payload);
         break;
+      case 'private.commercial.snapshot':
+        if (typeof r42CommercialSnapshot_ !== 'function') throw new Error('Modulo R42 Sponsor non installato');
+        data = r42CommercialSnapshot_(token, payload);
+        break;
+      case 'direction.commercial.sponsor.create':
+        if (typeof r42SponsorCreate_ !== 'function') throw new Error('Modulo R42 Sponsor non installato');
+        data = r42SponsorCreate_(token, payload);
+        break;
+      case 'direction.commercial.activation.create':
+        if (typeof r42SponsorActivationCreate_ !== 'function') throw new Error('Modulo R42 Sponsor non installato');
+        data = r42SponsorActivationCreate_(token, payload);
+        break;
       case 'direction.drive.folder.create':
         if (typeof r42CreateDriveFolder_ !== 'function') throw new Error('Modulo R42 Lia non installato');
         data = r42CreateDriveFolder_(token, payload);
