@@ -131,9 +131,9 @@
       <div class="office-entry">
         <section class="office-entry-head">
           <div>
-            <div class="office-kicker">MAGLIA 360 · SEDI OPERATIVE</div>
-            <h2>Entra nell'ufficio in cui devi lavorare.</h2>
-            <p>La Direzione vede l'insieme. Ogni utente lavora soltanto nelle sedi assegnate, con dati, prodotti, pratiche e C.E.P.A. del proprio territorio.</p>
+            <div class="office-kicker">MAGLIA 360 · AMBIENTI DI LAVORO</div>
+            <h2>Scegli dove devi lavorare.</h2>
+            <p>Uffici operativi e progetto C.E.P.A. hanno strutture distinte, dati territoriali separati e una regia comune della Direzione.</p>
           </div>
           <div class="office-entry-actions">
             <button id="manageOfficeUsersBtn" class="office-admin-btn hidden" type="button">Gestione sedi utenti</button>
@@ -146,7 +146,31 @@
 
         <section id="directionMessage" class="direction-message hidden"></section>
 
-        <section class="office-entry-grid">
+        <section class="workspace-worlds" aria-label="Ambienti principali">
+          <button id="agencyWorldCard" class="workspace-world agency-world" type="button">
+            <div class="world-symbol">M</div>
+            <div class="world-copy">
+              <span>AGENZIA · OPERATIVITÀ</span>
+              <h3>Uffici Maglia 360</h3>
+              <p>Produzione, prodotti, rinnovi, preventivi, pratiche, clienti e sviluppo commerciale.</p>
+              <div class="world-tags"><b>Colico</b><b>Mandello</b><b>Sedi future</b></div>
+            </div>
+            <strong class="world-enter">Vai agli uffici ↓</strong>
+          </button>
+
+          <button id="cepaWorldCard" class="workspace-world cepa-world" type="button">
+            <div class="world-symbol">C</div>
+            <div class="world-copy">
+              <span>C.E.P.A. · PROGETTO TERRITORIALE</span>
+              <h3>Centro Educazione Previdenziale e Assicurativa</h3>
+              <p>Centro centrale, attività territoriali, SAP, Academy, contenuti, relatori, scuole, aziende ed enti.</p>
+              <div class="world-tags"><b>Centro CEPA</b><b>Colico</b><b>Mandello</b><b>Nuovi territori</b></div>
+            </div>
+            <strong class="world-enter">Entra in C.E.P.A. →</strong>
+          </button>
+        </section>
+
+        <section id="agencyOfficeSection" class="office-entry-grid">
           <div>
             <div class="office-section-head">
               <div><span>SEDI ATTIVE</span><h3>I tuoi uffici</h3></div>
@@ -170,6 +194,105 @@
             <span>SVILUPPO FUTURO</span>
             <strong>Nuove sedi</strong>
             <p>Lo spazio è previsto nell'architettura, ma nessuna sede futura viene mostrata come operativa finché non viene realmente attivata.</p>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section id="cepaHubView" class="view hidden">
+      <div class="cepa-hub-workspace">
+        <nav class="office-breadcrumb" aria-label="Percorso C.E.P.A.">
+          <button type="button" data-office-home>MAGLIA 360</button><span>›</span><strong>C.E.P.A.</strong>
+        </nav>
+
+        <section class="cepa-hub-hero">
+          <div class="cepa-brand-lockup">
+            <div class="cepa-brand-origin">
+              <span>DA MAGLIA ASSICURAZIONI S.A.S.</span>
+              <strong>Agenzia Generale HDI</strong>
+            </div>
+            <div class="cepa-brand-mark">C.E.P.A.</div>
+            <p>Centro Educazione Previdenziale e Assicurativa</p>
+          </div>
+          <div class="cepa-hub-copy">
+            <span>PROGETTO PERMANENTE</span>
+            <h2>La responsabilità non si sconta.</h2>
+            <p>Formazione, confronto e consapevolezza nelle scelte assicurative e previdenziali. Il Centro governa il metodo; i territori trasformano il progetto in incontri e relazioni reali.</p>
+          </div>
+        </section>
+
+        <section class="cepa-theme-strip" aria-label="Aree educative">
+          <div><i class="cepa-theme-icon">01</i><strong>Protezione</strong><span>Rischi, responsabilità e tutela quotidiana.</span></div>
+          <div><i class="cepa-theme-icon">02</i><strong>Previdenza</strong><span>Scelte di lungo periodo e consapevolezza.</span></div>
+          <div><i class="cepa-theme-icon">03</i><strong>Persone e imprese</strong><span>Bisogni reali, lavoro, welfare e continuità.</span></div>
+          <div><i class="cepa-theme-icon">04</i><strong>Consapevolezza</strong><span>Comprendere prima di scegliere.</span></div>
+        </section>
+
+        <section class="cepa-structure-grid">
+          <button id="openCepaCentralBtn" class="cepa-structure-card central" type="button">
+            <div class="cepa-structure-index">00</div>
+            <div>
+              <span>GOVERNANCE</span>
+              <h3>Centro CEPA</h3>
+              <p>Materie, programmi, contenuti, Academy, relatori, standard, documentazione e sviluppo del metodo.</p>
+            </div>
+            <strong>Apri Centro CEPA →</strong>
+          </button>
+          <div>
+            <div class="office-section-head">
+              <div><span>TERRITORI ATTIVI</span><h3>C.E.P.A. nelle sedi</h3></div>
+              <small>Attività e relazioni restano separate per territorio.</small>
+            </div>
+            <div id="cepaTerritoryCards" class="cepa-territory-cards"></div>
+          </div>
+        </section>
+
+        <section class="cepa-future-lane">
+          <div>
+            <span>SVILUPPO FUTURO</span>
+            <h3>SAP, nuovi territori e rete educativa</h3>
+            <p>La struttura è pronta per aggiungere nuovi presidi senza mescolare attività, contatti e programmazione delle sedi esistenti.</p>
+          </div>
+          <div class="cepa-future-steps">
+            <b>Territorio</b><em>→</em><b>Candidato SAP</b><em>→</em><b>2 incontri reali</b><em>→</em><b>Valutazione</b><em>→</em><b>Attivazione</b>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section id="cepaTerritoryView" class="view hidden">
+      <div class="cepa-territory-workspace">
+        <nav class="office-breadcrumb" aria-label="Percorso C.E.P.A. territoriale">
+          <button type="button" data-office-home>MAGLIA 360</button><span>›</span>
+          <button type="button" id="cepaTerritoryBack">C.E.P.A.</button><span>›</span>
+          <strong id="cepaTerritoryBreadcrumb">Territorio</strong>
+        </nav>
+
+        <section id="cepaTerritoryIdentity" class="cepa-territory-identity"></section>
+        <section id="cepaTerritorySummary" class="cepa-territory-summary"></section>
+
+        <section class="cepa-territory-grid">
+          <article class="office-panel">
+            <div class="office-section-head">
+              <div><span>PROGRAMMA LOCALE</span><h3>Attività C.E.P.A.</h3></div>
+              <button id="cepaTerritoryNewActivityBtn" class="small-btn" type="button">+ Attività</button>
+            </div>
+            <div id="cepaTerritoryActivities" class="cepa-territory-list"></div>
+          </article>
+          <article class="office-panel">
+            <div class="office-section-head">
+              <div><span>RETE TERRITORIALE</span><h3>Aziende, scuole, enti e relazioni</h3></div>
+            </div>
+            <div id="cepaTerritoryNetwork" class="cepa-network-summary"></div>
+          </article>
+        </section>
+
+        <section class="office-panel cepa-territory-method">
+          <div class="office-section-head">
+            <div><span>METODO</span><h3>Dal Centro al territorio</h3></div>
+          </div>
+          <div class="cepa-method-path">
+            <span>Centro CEPA</span><b>→</b><span>Programma</span><b>→</b><span>Territorio</span><b>→</b><span>Incontro</span><b>→</b><span>Follow-up</span><b>→</b><span>Apprendimento</span>
           </div>
         </section>
       </div>
@@ -215,7 +338,7 @@
             <div id="officePriorities" class="office-priority-list"></div>
           </article>
           <article class="office-panel">
-            <div class="office-section-head"><div><span>C.E.P.A.</span><h3>Attività territoriali</h3></div></div>
+            <div class="office-section-head"><div><span>C.E.P.A.</span><h3>Attività territoriali</h3></div><button id="officeCepaOpenBtn" class="small-btn" type="button">Apri C.E.P.A. sede →</button></div>
             <div id="officeCepa" class="office-cepa-list"></div>
           </article>
         </section>
