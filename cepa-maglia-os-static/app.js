@@ -53,6 +53,7 @@ $('signupBtn').onclick=async()=>{const email=$('email').value.trim(),password=$(
 
 function setHeader(title,subtitle){$('pageTitle').textContent=title;$('pageSubtitle').textContent=subtitle}
 function navigate(view){
+  currentPartnerId=null
   document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'))
   $(view+'View').classList.remove('hidden')
   document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===view))
@@ -294,6 +295,7 @@ function renderPartner(){
   $('partnerType').textContent=n.regulatory_domain==='insurance'?'COMPAGNIA / COLLABORAZIONE ASSICURATIVA':'PARTNER SPECIALISTICO'
   $('partnerRole').textContent=n.strategic_role||'Da definire';$('partnerCurrent').textContent=n.current_use||'Da verificare';$('partnerFuture').textContent=n.future_role||'Da analizzare'
   $('partnerOverview').innerHTML='<p><strong>Fonte del dato</strong><br>'+esc(n.source_note||n.source_basis||'Da documentare')+'</p><p><strong>Perimetro</strong><br>'+esc(n.regulatory_domain||'Da definire')+'</p><p><strong>Priorità strategica</strong><br>'+esc(n.priority)+'/100</p>'
+
   const tl=timeline.filter(x=>x.ecosystem_node_id===n.id)
   $('partnerTimeline').innerHTML=tl.map(x=>'<article class="timeline-item"><time>'+esc(fmtDate(x.event_date))+'</time><h4>'+esc(x.title)+'</h4><p>'+esc(x.description||'')+'</p><div class="tags"><span class="tag">'+esc(x.event_type)+'</span><span class="tag">'+(x.verified?'verificato':'da verificare')+'</span></div></article>').join('')||empty('Cronologia storica da ricostruire')
   const cc=contacts.filter(x=>x.ecosystem_node_id===n.id)
@@ -305,12 +307,37 @@ function renderPartner(){
   $('partnerDocCoverage').textContent=rr.length?covered+'/'+rr.length+' coperti':'nessun requisito'
   $('partnerDocRequirements').innerHTML=rr.map(x=>'<div class="requirement-row"><div><strong>'+esc(x.title)+'</strong><small>'+esc(x.verification_note||'')+(x.ecosystem_documents?.title?' · Collegato: '+esc(x.ecosystem_documents.title):'')+(x.due_date?' · entro '+esc(fmtDate(x.due_date)):'')+'</small></div><div class="requirement-actions"><span class="req-status '+esc(x.status)+'">'+esc(x.status.replaceAll('_',' '))+'</span>'+(isManager()?'<button class="small-btn" type="button" data-requirement-edit="'+x.id+'">Aggiorna</button>':'')+'</div></div>').join('')||empty('Checklist documentale non ancora impostata')
   document.querySelectorAll('[data-requirement-edit]').forEach(b=>b.onclick=()=>openRequirementEditor(b.dataset.requirementEdit))
+
+  const linkedProducts=products.filter(p=>p.ecosystem_node_id===n.id)
+  $('partnerOperationalProducts').innerHTML=linkedProducts.map(p=>{
+    const kk=productKnowledge.filter(k=>k.product_id===p.id)
+    const verified=kk.filter(k=>k.verification_status==='verified').length
+    const trigger=kk.find(k=>k.item_type==='specialist_trigger')
+    return '<button class="partner-op-row" type="button" data-partner-product="'+p.id+'"><div><strong>'+esc(p.name)+'</strong><small>'+verified+'/'+kk.length+' elementi verificati · '+esc(p.maturity_status)+'</small>'+(trigger?'<small><b>Trigger:</b> '+esc(trigger.content)+'</small>':'<small>Trigger specialistico da definire.</small>')+'</div><span>Apri →</span></button>'
+  }).join('')||empty('Nessuna scheda prodotto collegata')
+  document.querySelectorAll('[data-partner-product]').forEach(b=>b.onclick=()=>openProduct(b.dataset.partnerProduct))
+
+  $('partnerOpsCoverage').textContent=rr.length?Math.round((covered/rr.length)*100)+'%':'0%'
+  const missing=rr.filter(x=>!['received','verified','not_applicable'].includes(x.status))
+  $('partnerOpsDocuments').innerHTML=(missing.length?missing.slice(0,6).map(x=>'<div class="partner-op-row static"><div><strong>'+esc(x.title)+'</strong><small>'+esc(x.status.replaceAll('_',' '))+(x.due_date?' · '+esc(fmtDate(x.due_date)):'')+'</small></div><span class="req-status '+esc(x.status)+'">'+esc(x.status)+'</span></div>').join(''):'<div class="partner-op-ok">Dossier minimo coperto secondo gli stati registrati.</div>')
+
+  const partnerProductIds=new Set(linkedProducts.map(p=>p.id))
+  const tt=collaboratorTerms.filter(t=>t.ecosystem_node_id===n.id||partnerProductIds.has(t.product_id))
+  const verifiedTerms=tt.filter(t=>t.verification_status==='verified')
+  $('partnerOpsTerms').innerHTML=verifiedTerms.length?verifiedTerms.slice(0,6).map(t=>'<div class="partner-op-row static"><div><strong>'+esc(t.agency_products?.name||t.activity_scope||'Condizione')+'</strong><small>'+esc(t.earning_type)+(t.percentage!=null?' · '+esc(t.percentage)+'%':'')+(t.fixed_amount!=null?' · € '+Number(t.fixed_amount).toLocaleString('it-IT'):'')+'</small><small>Fonte: '+esc(t.source_reference||'documento collegato')+'</small></div><span class="verification-badge verified">verificato</span></div>').join(''):'<div class="partner-op-warning">Nessuna remunerazione prodotto-specifica verificata. Non vengono mostrati valori presunti.</div>'
+
+  const aa=actions.filter(x=>x.ecosystem_node_id===n.id)
+  const openAa=aa.filter(x=>!['completed','cancelled'].includes(x.status)).sort(actionSort)
+  $('partnerOpsActions').innerHTML=openAa.slice(0,4).map(a=>'<button class="partner-op-row" type="button" data-op-action="'+a.id+'"><div><strong>'+esc(a.title)+'</strong><small>'+esc(actionStatus(a.status))+(a.due_at?' · '+esc(fmtDate(a.due_at)):'')+'</small></div><span>'+esc(a.priority)+'</span></button>').join('')||'<div class="partner-op-ok">Nessuna attività aperta collegata.</div>'
+  document.querySelectorAll('[data-op-action]').forEach(b=>b.onclick=()=>openAction(b.dataset.opAction))
+  if($('partnerAskLiaBtn'))$('partnerAskLiaBtn').onclick=()=>{ $('aiDock').classList.remove('hidden');$('aiDockPanel').classList.remove('hidden');askAssistant('Quadro operativo di '+n.name+': cosa sappiamo, cosa manca e qual è il prossimo passo?') }
+
   const pp=projects.filter(x=>x.ecosystem_node_id===n.id)
   $('partnerProjects').innerHTML=pp.map(p=>listRow(p.title,p.objective||'', [projectStatus(p.status),p.priority,p.next_action||'prossima azione da definire'])).join('')||empty('Nessun progetto collegato')
-  const aa=actions.filter(x=>x.ecosystem_node_id===n.id)
   $('partnerActions').innerHTML=aa.map(actionRow).join('')||empty('Nessuna attività collegata')
   bindActionButtons()
 }
+
 function openRequirementEditor(id){
   if(!isManager())return
   const r=partnerRequirements.find(x=>x.id===id);if(!r)return
@@ -448,9 +475,19 @@ function openProduct(id){
   const provider=p.ecosystem_nodes?.name||'Maglia'
   const pc=comparisons.filter(c=>c.product_id===id)
   const knowledge=productKnowledge.filter(k=>k.product_id===id)
+  const sources=knowledge.filter(k=>k.verification_status==='verified'&&(k.source_reference||k.source_url))
+  const triggers=knowledge.filter(k=>k.item_type==='specialist_trigger')
+  const limits=knowledge.filter(k=>['limit','exclusion'].includes(k.item_type))
   const strengths=(p.strengths||[])
   const weaknesses=(p.weaknesses||[])
-  $('modalContent').innerHTML='<div class="eyebrow">SCHEDA PRODOTTO</div><h2>'+esc(p.name)+'</h2><p class="muted">'+esc(provider)+' · '+esc(p.category)+' · '+esc(p.maturity_status)+'</p><div class="product-route"><div>Target</div><div>Bisogno</div><div>Analisi</div><div>'+esc(provider)+'</div><div>Follow-up</div></div><div class="prose-box"><p><strong>Sintesi</strong><br>'+esc(p.summary||'Da completare')+'</p><p><strong>Target</strong><br>'+esc((p.audience||[]).join(', ')||'Da definire')+'</p><p><strong>Processo</strong><br>'+esc(p.process_notes||'Da ricostruire sul processo reale di agenzia.')+'</p><p><strong>Note / esclusioni</strong><br>'+esc(p.exclusions_notes||'Da verificare sui documenti ufficiali.')+'</p></div><div class="strength-weak-grid"><div class="sw-box strength"><h4>Punti di forza</h4>'+(strengths.length?'<ul>'+strengths.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'<p class="muted">Da compilare dopo verifica documentale.</p>')+'</div><div class="sw-box weak"><h4>Punti deboli / limiti</h4>'+(weaknesses.length?'<ul>'+weaknesses.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'<p class="muted">Da compilare dopo verifica documentale.</p>')+'</div></div><div class="modal-section"><div class="modal-section-head"><h4>Checklist di conoscenza</h4><span class="muted">Verifica = serve una fonte</span></div><div class="knowledge-list">'+(knowledge.length?knowledge.map(k=>'<div class="knowledge-item"><strong>'+esc(k.title)+'</strong><small>'+esc(k.content||'')+'</small>'+(k.source_reference||k.source_url?'<small><b>Fonte:</b> '+esc(k.source_reference||k.source_url)+'</small>':'')+'<div class="inline-actions"><span class="tag">'+esc(k.verification_status)+'</span>'+(isManager()?'<button class="small-btn" type="button" data-knowledge-edit="'+k.id+'">Modifica</button>':'')+'</div></div>').join(''):'<p class="muted">Checklist non ancora impostata.</p>')+'</div></div><div class="modal-section"><h4>Confronti</h4>'+(pc.length?pc.map(c=>'<p class="muted"><strong>'+esc(c.benchmark_name)+'</strong><br>'+esc(c.comparison_scope||'')+' · '+esc(c.status)+(c.source_date?' · '+esc(fmtDate(c.source_date)):'')+'</p>').join(''):'<p class="muted">Nessun confronto verificato ancora. La struttura è pronta per fonti, data, metriche e note.</p>')+'</div>'
+  const block=(title,items,emptyText)=>'<div class="product-focus-block"><h4>'+title+'</h4>'+(items.length?items.map(k=>'<div class="knowledge-item '+(k.verification_status==='verified'?'verified-item':'')+'"><strong>'+esc(k.title)+'</strong><small>'+esc(k.content||'')+'</small>'+(k.source_reference||k.source_url?'<small><b>Fonte:</b> '+esc(k.source_reference||k.source_url)+'</small>':'')+'<span class="verification-badge '+(k.verification_status==='verified'?'verified':'')+'">'+esc(k.verification_status.replaceAll('_',' '))+'</span></div>').join(''):'<p class="muted">'+emptyText+'</p>')+'</div>'
+  $('modalContent').innerHTML='<div class="eyebrow">SCHEDA PRODOTTO 360</div><h2>'+esc(p.name)+'</h2><p class="muted">'+esc(provider)+' · '+esc(p.category)+' · '+esc(p.maturity_status)+'</p>'+
+    '<div class="product-route"><div>Bisogno</div><div>Fonte</div><div>Limiti</div><div>Trigger specialista</div><div>Confronto</div></div>'+
+    '<div class="prose-box"><p><strong>Sintesi</strong><br>'+esc(p.summary||'Da completare')+'</p><p><strong>Target</strong><br>'+esc((p.audience||[]).join(', ')||'Da definire')+'</p><p><strong>Processo</strong><br>'+esc(p.process_notes||'Da ricostruire sul processo reale di agenzia.')+'</p></div>'+
+    '<div class="product-focus-grid">'+block('Fonti verificate',sources,'Nessuna fonte verificata registrata.')+block('Specialist trigger',triggers,'Trigger da definire e validare sul processo reale.')+block('Limiti / esclusioni',limits,'Da estrarre esclusivamente dalla documentazione vigente.')+'</div>'+
+    '<div class="strength-weak-grid"><div class="sw-box strength"><h4>Punti di forza documentati</h4>'+(strengths.length?'<ul>'+strengths.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'<p class="muted">Non ancora consolidati da documentazione.</p>')+'</div><div class="sw-box weak"><h4>Punti deboli / limiti documentati</h4>'+(weaknesses.length?'<ul>'+weaknesses.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'<p class="muted">Non ancora consolidati da documentazione.</p>')+'</div></div>'+
+    '<div class="modal-section"><h4>Confronti</h4>'+(pc.length?pc.map(c=>'<div class="comparison-inline"><strong>'+esc(c.benchmark_name)+'</strong><span>'+esc(c.status)+(c.confidence!=null?' · confidenza '+esc(c.confidence)+'%':'')+(c.source_date?' · '+esc(fmtDate(c.source_date)):'')+'</span><small>'+esc(c.comparison_scope||'')+'</small>'+(c.notes?'<small>'+esc(c.notes)+'</small>':'')+'</div>').join(''):'<p class="muted">Nessun confronto registrato. Nessun ranking viene generato senza fonti omogenee.</p>')+'</div>'+
+    '<details class="modal-section"><summary>Checklist completa ('+knowledge.length+')</summary><div class="knowledge-list">'+(knowledge.length?knowledge.map(k=>'<div class="knowledge-item"><strong>'+esc(k.title)+'</strong><small>'+esc(k.content||'')+'</small><div class="inline-actions"><span class="tag">'+esc(k.verification_status)+'</span>'+(isManager()?'<button class="small-btn" type="button" data-knowledge-edit="'+k.id+'">Modifica</button>':'')+'</div></div>').join(''):'<p class="muted">Checklist non ancora impostata.</p>')+'</div></details>'
   $('modal').classList.remove('hidden')
   document.querySelectorAll('[data-knowledge-edit]').forEach(b=>b.onclick=()=>openKnowledgeEditor(b.dataset.knowledgeEdit,id))
 }
@@ -493,10 +530,16 @@ function renderCollaborators(){
 function openCollaborator(id){
   const c=collaborators.find(x=>x.id===id);if(!c)return
   const terms=collaboratorTerms.filter(t=>t.collaborator_id===id)
-  $('modalContent').innerHTML='<div class="eyebrow">COLLABORATORE</div><h2>'+esc(c.display_name)+'</h2><p class="muted">'+esc(c.area||'Area da definire')+' · '+esc(c.territory||'Territorio da verificare')+'</p><div class="prose-box"><p><strong>Ruolo</strong><br>'+esc(c.role_description||'Da completare')+'</p><p><strong>Modello guadagno generale</strong><br>'+esc(c.earning_model||'Da verificare')+'</p><p><strong>Note economiche</strong><br>'+esc(c.earning_notes||'Nessuna condizione economica verificata inserita.')+'</p></div><div class="modal-section"><div class="modal-section-head"><h4>Condizioni per prodotto / collaborazione</h4>'+(isManager()?'<button class="primary" type="button" id="addTermBtn">+ Condizione</button>':'')+'</div>'+(terms.length?terms.map(t=>'<div class="term-row"><div><strong>'+esc(t.agency_products?.name||t.ecosystem_nodes?.name||t.activity_scope||'Ambito')+'</strong><small>'+esc(t.earning_type)+' · '+esc(t.verification_status)+(t.percentage!=null?' · '+esc(t.percentage)+'%':'')+(t.fixed_amount!=null?' · € '+Number(t.fixed_amount).toLocaleString('it-IT'):'')+(t.bonus_rule?' · '+esc(t.bonus_rule):'')+'</small>'+(t.source_reference?'<small><b>Fonte:</b> '+esc(t.source_reference)+'</small>':'')+'</div>'+(isManager()?'<button class="small-btn" type="button" data-term-edit="'+t.id+'">Modifica</button>':'')+'</div>').join(''):'<p class="muted">Nessuna condizione caricata. Va ricostruita dalle regole reali di agenzia.</p>')+'</div>'
+  const assessment=businessAssessments.filter(a=>a.collaborator_id===id).sort((a,b)=>String(b.assessment_date).localeCompare(String(a.assessment_date)))[0]
+  const score=assessment?avgAssessment(assessment):null
+  $('modalContent').innerHTML='<div class="eyebrow">COLLABORATORE 360</div><h2>'+esc(c.display_name)+'</h2><p class="muted">'+esc(c.area||'Area da definire')+' · '+esc(c.territory||'Territorio da verificare')+'</p>'+
+    '<div class="collab-360-grid"><div class="prose-box"><p><strong>Ruolo</strong><br>'+esc(c.role_description||'Da completare')+'</p><p><strong>Modello guadagno generale</strong><br>'+esc(c.earning_model||'Da verificare')+'</p><p><strong>Note economiche</strong><br>'+esc(c.earning_notes||'Nessuna condizione economica verificata inserita.')+'</p></div>'+
+    '<div class="assessment-summary"><span>Valutazione 360</span><strong>'+(score!=null?esc(score)+'/100':'—')+'</strong><small>'+(assessment?esc(assessment.status)+' · '+esc(fmtDate(assessment.assessment_date)):'Nessuna valutazione registrata')+'</small>'+(assessment?.proposal_direction?'<p>'+esc(assessment.proposal_direction)+'</p>':'')+'</div></div>'+
+    '<div class="modal-section"><div class="modal-section-head"><h4>Condizioni per prodotto / collaborazione</h4>'+(isManager()?'<button class="primary" type="button" id="addTermBtn">+ Condizione</button>':'')+'</div>'+
+    (terms.length?terms.map(t=>'<div class="term-row"><div><strong>'+esc(t.agency_products?.name||t.ecosystem_nodes?.name||t.activity_scope||'Ambito')+'</strong><small>'+esc(t.earning_type)+' · '+esc(t.verification_status)+(t.percentage!=null?' · '+esc(t.percentage)+'%':'')+(t.fixed_amount!=null?' · € '+Number(t.fixed_amount).toLocaleString('it-IT'):'')+(t.bonus_rule?' · '+esc(t.bonus_rule):'')+'</small>'+(t.source_reference?'<small><b>Fonte:</b> '+esc(t.source_reference)+'</small>':'<small>Fonte economica non registrata.</small>')+'</div><span class="verification-badge '+(t.verification_status==='verified'?'verified':'')+'">'+esc(t.verification_status.replaceAll('_',' '))+'</span>'+(isManager()?'<button class="small-btn" type="button" data-term-edit="'+t.id+'">Modifica</button>':'')+'</div>').join(''):'<p class="muted">Nessuna condizione caricata. Le percentuali non vengono stimate: servono accordi, estratti o regole interne verificabili.</p>')+'</div>'
   $('modal').classList.remove('hidden')
   if(isManager()){
-    $('addTermBtn').onclick=()=>openTermEditor(id,null)
+    if($('addTermBtn'))$('addTermBtn').onclick=()=>openTermEditor(id,null)
     document.querySelectorAll('[data-term-edit]').forEach(b=>b.onclick=()=>openTermEditor(id,b.dataset.termEdit))
   }
 }
@@ -647,7 +690,22 @@ function renderMail(){
   $('mailTemplateSelect').innerHTML='<option value="">Scegli un modello</option>'+mailTemplates.map(t=>'<option value="'+t.id+'">'+esc(t.title)+'</option>').join('')
   if(mailTemplates.some(t=>t.id===cur))$('mailTemplateSelect').value=cur
   $('mailPartnerSelect').innerHTML='<option value="">Generale</option>'+ecosystem.map(n=>'<option value="'+n.id+'">'+esc(n.name)+'</option>').join('')
-  $('mailDraftList').innerHTML=mailDrafts.map(d=>listRow(d.subject||d.purpose||'Bozza email',(d.recipient_name||d.recipient_email||'destinatario da definire')+(d.ecosystem_nodes?.name?' · '+d.ecosystem_nodes.name:''),[d.status,fmtDate(d.created_at)])).join('')||empty('Nessuna bozza salvata')
+  $('mailDraftList').innerHTML=mailDrafts.map(d=>{
+    let action=''
+    if(d.status==='draft')action='<button class="small-btn" data-mail-status="'+d.id+'" data-next-status="review">Invia in revisione</button>'
+    else if(d.status==='review'&&isManager())action='<button class="small-btn" data-mail-status="'+d.id+'" data-next-status="approved">Approva</button>'
+    else if(d.status==='approved')action='<span class="mail-safe-note">Approvata · nessun invio automatico</span>'
+    return '<div class="mail-draft-row"><div><strong>'+esc(d.subject||d.purpose||'Bozza email')+'</strong><small>'+esc(d.recipient_name||d.recipient_email||'destinatario da definire')+(d.ecosystem_nodes?.name?' · '+esc(d.ecosystem_nodes.name):'')+'</small><small>'+esc(fmtDateTime(d.updated_at||d.created_at))+'</small></div><span class="mail-status '+esc(d.status)+'">'+esc(d.status)+'</span>'+action+'</div>'
+  }).join('')||empty('Nessuna bozza salvata')
+  document.querySelectorAll('[data-mail-status]').forEach(b=>b.onclick=()=>updateMailStatus(b.dataset.mailStatus,b.dataset.nextStatus))
+}
+async function updateMailStatus(id,nextStatus){
+  const d=mailDrafts.find(x=>x.id===id);if(!d)return
+  const allowed=(d.status==='draft'&&nextStatus==='review')||(d.status==='review'&&nextStatus==='approved'&&isManager())
+  if(!allowed)return alert('Passaggio di stato non consentito.')
+  const{error}=await supabase.from('ai_mail_drafts').update({status:nextStatus,updated_at:new Date().toISOString()}).eq('id',id).eq('organization_id',window.orgId)
+  if(error)return alert(error.message)
+  await loadAll()
 }
 
 function hydrateMailTemplate(){
@@ -704,11 +762,22 @@ async function persistAssistantMessage(content,sender,intent=null,context={}){
 }
 function askAssistant(q){
   addAssistantMessage(q,'user')
-  persistAssistantMessage(q,'user','query',{})
+  const activePartner=currentPartnerId?ecosystem.find(x=>x.id===currentPartnerId):null
+  const context=activePartner?{partner_id:activePartner.id,partner_code:activePartner.code,partner_name:activePartner.name}:{}
+  persistAssistantMessage(q,'user','query',context)
 
   const s=q.toLowerCase()
   let reply=''
-  if(s.includes('oggi')||s.includes('attivit')||s.includes('scadenz')){
+  if(activePartner&&(s.includes('quadro')||s.includes('partner')||s.includes('manca')||s.includes('dossier')||s.includes('prossimo'))){
+    const pp=products.filter(p=>p.ecosystem_node_id===activePartner.id)
+    const rr=partnerRequirements.filter(x=>x.ecosystem_node_id===activePartner.id)
+    const covered=rr.filter(x=>['received','verified','not_applicable'].includes(x.status)).length
+    const missing=rr.filter(x=>!['received','verified','not_applicable'].includes(x.status))
+    const aa=actions.filter(x=>x.ecosystem_node_id===activePartner.id&&!['completed','cancelled'].includes(x.status)).sort(actionSort)
+    const productIds=new Set(pp.map(p=>p.id))
+    const verifiedTerms=collaboratorTerms.filter(t=>(t.ecosystem_node_id===activePartner.id||productIds.has(t.product_id))&&t.verification_status==='verified')
+    reply=activePartner.name+': '+pp.length+' schede prodotto collegate; dossier '+covered+'/'+rr.length+' coperto; '+verifiedTerms.length+' condizioni economiche verificate; '+aa.length+' attività aperte. '+(missing.length?'Priorità documentale: '+missing.slice(0,3).map(x=>x.title).join('; ')+'. ':'Nessun requisito minimo risulta scoperto. ')+(aa.length?'Primo prossimo passo: '+aa[0].title+'.':'Non c’è un’attività aperta: conviene registrare il prossimo passo prima di considerare il dossier completo.')
+  }else if(s.includes('oggi')||s.includes('attivit')||s.includes('scadenz')){
     const open=actions.filter(a=>!['completed','cancelled'].includes(a.status))
     const due=open.filter(a=>a.due_at).sort(actionSort).slice(0,3)
     const urgent=open.filter(a=>a.priority==='urgent').length
@@ -742,7 +811,7 @@ function askAssistant(q){
     const names=ecosystem.map(n=>n.code).join(', ')
     reply='Posso lavorare sui dati presenti in piattaforma: compagnie e partner ('+names+'), prodotti, collaboratori, CEPA, territorio, documenti e attività. Dimmi quale area vuoi leggere o quale azione vuoi preparare.'
   }
-  setTimeout(()=>{addAssistantMessage(reply,'bot');persistAssistantMessage(reply,'assistant','response',{matched:true})},120)
+  setTimeout(()=>{addAssistantMessage(reply,'bot');persistAssistantMessage(reply,'assistant','response',{matched:true,...context})},120)
 }
 
 function renderDevelopment(){
