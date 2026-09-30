@@ -227,6 +227,16 @@ function evidenceFor(row,kind){
     )
   };
 }
+function readWeeklyEditorial(weekStart){
+  try{
+    const file=path.join(ROOT,'content','weekly-news.json');
+    const raw=JSON.parse(fs.readFileSync(file,'utf8'));
+    if(raw?.status!=='PUBLISHED')return null;
+    if(String(raw.weekStart||'')!==String(weekStart||''))return null;
+    if(!Array.isArray(raw.cards)||!raw.cards.length)return null;
+    return raw;
+  }catch{return null}
+}
 async function buildWeeklyNewsroom(){
   const week=currentClubWeek();
   let calendarRaw=null,feedRaw=null;
@@ -320,17 +330,22 @@ async function buildWeeklyNewsroom(){
     });
   }
 
+  const editorial=readWeeklyEditorial(week.start);
+  const mergedCards=editorial
+    ?[...cards.filter(x=>x.id==='week-overview'),...editorial.cards,...cards.filter(x=>x.id!=='week-overview'&&!editorial.cards.some(y=>y.id===x.id))]
+    :cards;
   return {
     ok:true,
     release:'R40',
-    generator:'SCD_NEWSROOM_GROUNDED_V1',
+    generator:editorial?'CHATGPT_WEEKLY_EDITORIAL_PLUS_GROUNDED_RUNTIME':'SCD_NEWSROOM_GROUNDED_V1',
     editorialPolicy:'VERIFIED_STRUCTURED_FACTS_ONLY',
     staleSiteContent:false,
     generatedAt:new Date().toISOString(),
     week,
-    sources:sourceStatus,
+    sources:{...sourceStatus,weeklyEditorial:editorial?'PUBLISHED':'NO_CURRENT_PUBLISHED_EDITORIAL'},
+    editorial:editorial?{generatedAt:editorial.generatedAt,generatedBy:editorial.generatedBy,sourceCount:(editorial.sources||[]).length}:null,
     calendar:{rows:calendar,counts:{activities:calendar.length,matches:matches.length,trainings:trainings.length,tournaments:tournaments.length,groups:teams.length},groups:teams},
-    cards
+    cards:mergedCards
   };
 }
 
