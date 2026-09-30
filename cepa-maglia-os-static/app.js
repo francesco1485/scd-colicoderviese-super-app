@@ -23,7 +23,7 @@ const viewMeta={
  liaWorkbench:['Lia · Workbench','Assistente operativo con permessi, ricerca, cartelle di lavoro e artefatti tracciati']
 }
 
-let ecosystem=[],projects=[],actions=[],marketHubs=[],marketEntities=[],contacts=[],timeline=[],documents=[],partnerRequirements=[],blueprints=[],subjects=[],initiatives=[],cepaContent=[],cepaAcademy=[],cepaSpeakers=[],products=[],productKnowledge=[],comparisons=[],collaborators=[],collaboratorTerms=[],portfolioSnapshots=[],businessAssessments=[],growthKits=[],distributionWatchlists=[],distributionCandidates=[],distributionEvidence=[],mailTemplates=[],mailDrafts=[],cepaExpansion=[],cepaReadiness=[],assistantMessages=[],recoveryRows=[],members=[],liaCapabilities=[],liaFolders=[],liaOrders=[],liaFiles=[],researchSources=[],researchInsights=[],liaActionRules=[],liaApprovals=[],roleViewAccess=[]
+let ecosystem=[],projects=[],actions=[],marketHubs=[],marketEntities=[],contacts=[],timeline=[],documents=[],partnerRequirements=[],blueprints=[],subjects=[],initiatives=[],cepaContent=[],cepaAcademy=[],cepaSpeakers=[],products=[],productKnowledge=[],comparisons=[],collaborators=[],collaboratorTerms=[],portfolioSnapshots=[],businessAssessments=[],growthKits=[],distributionWatchlists=[],distributionCandidates=[],distributionEvidence=[],mailTemplates=[],mailDrafts=[],cepaExpansion=[],cepaReadiness=[],assistantMessages=[],recoveryRows=[],members=[],liaCapabilities=[],liaFolders=[],liaOrders=[],liaFiles=[],researchSources=[],researchInsights=[],liaActionRules=[],liaApprovals=[],roleViewAccess=[],liaAutomationRuns=[]
 let currentPartnerId=null
 
 function msg(text,error=false){$('loginMsg').textContent=text;$('loginMsg').className='message'+(error?' error':'')}
@@ -281,12 +281,13 @@ async function loadAll(){
     supabase.from('research_insights').select('*,research_sources(id,name,url)').eq('organization_id',window.orgId).order('updated_at',{ascending:false}).limit(100),
     supabase.from('ai_action_catalog').select('*').eq('organization_id',window.orgId).eq('active',true).order('risk_level').order('code'),
     supabase.from('ai_action_approvals').select('*').eq('organization_id',window.orgId).order('created_at',{ascending:false}).limit(100),
-    supabase.from('organization_role_views').select('*').eq('organization_id',window.orgId).eq('role',window.userRole).eq('active',true).order('view_code')
+    supabase.from('organization_role_views').select('*').eq('organization_id',window.orgId).eq('role',window.userRole).eq('active',true).order('view_code'),
+    supabase.from('ai_automation_runs').select('*,distribution_research_watchlists(id,name,cadence,market_hubs(id,name,city,province))').eq('organization_id',window.orgId).order('created_at',{ascending:false}).limit(100)
   ]
   const res=await Promise.all(q)
   const err=res.find(x=>x.error)?.error
   if(err){console.error(err);$('refreshBtn').textContent='!';return}
-  ;[ecosystem,projects,actions,marketHubs,marketEntities,contacts,timeline,documents,partnerRequirements,blueprints,subjects,initiatives,cepaContent,cepaAcademy,cepaSpeakers,products,productKnowledge,comparisons,collaborators,collaboratorTerms,portfolioSnapshots,businessAssessments,growthKits,distributionWatchlists,distributionCandidates,distributionEvidence,mailTemplates,mailDrafts,cepaExpansion,cepaReadiness,assistantMessages,liaCapabilities,liaFolders,liaOrders,liaFiles,researchSources,researchInsights,liaActionRules,liaApprovals,roleViewAccess]=res.map(x=>x.data||[])
+  ;[ecosystem,projects,actions,marketHubs,marketEntities,contacts,timeline,documents,partnerRequirements,blueprints,subjects,initiatives,cepaContent,cepaAcademy,cepaSpeakers,products,productKnowledge,comparisons,collaborators,collaboratorTerms,portfolioSnapshots,businessAssessments,growthKits,distributionWatchlists,distributionCandidates,distributionEvidence,mailTemplates,mailDrafts,cepaExpansion,cepaReadiness,assistantMessages,liaCapabilities,liaFolders,liaOrders,liaFiles,researchSources,researchInsights,liaActionRules,liaApprovals,roleViewAccess,liaAutomationRuns]=res.map(x=>x.data||[])
   renderEverything()
   $('refreshBtn').textContent='↻'
 }
@@ -822,6 +823,21 @@ function renderComparisons(){
   }).join('')||empty('Nessun gruppo di confronto')
 }
 
+async function runLiaAutomation(id){
+  const run=liaAutomationRuns.find(x=>x.id===id)
+  if(!run)return
+  const box=$('liaWorkbenchResult')
+  if(box){box.className='message';box.textContent='Lia sta eseguendo la ricerca programmata…'}
+  try{
+    const{data,error}=await supabase.functions.invoke('lia-workbench',{body:{organization_id:window.orgId,automation_run_id:id}})
+    if(error)throw error
+    if(box){box.textContent=data?.message||'Automazione aggiornata.';box.className='message'+(data?.action==='automation_run_partial'?' warning':'')}
+    await loadAll()
+  }catch(error){
+    if(box){box.textContent='Automazione non completata: '+(error?.message||String(error));box.className='message error'}
+  }
+}
+
 async function decideLiaApproval(id,status){
   if(!isManager())return alert('Decisione non autorizzata per questo ruolo.')
   const row=liaApprovals.find(x=>x.id===id)
@@ -856,6 +872,17 @@ function renderLiaWorkbench(){
     return '<div class="lia-work-row"><div><strong>'+esc(o.action_type.replaceAll('_',' '))+'</strong><small>'+esc(o.result_summary||o.prompt)+'</small>'+fileHtml+'</div><span class="lia-order-status '+esc(o.status)+'">'+esc(o.status)+'</span></div>'
   }).join('')||empty('Nessun ordine operativo')
   document.querySelectorAll('[data-lia-file]').forEach(b=>b.onclick=()=>openLiaFile(b.dataset.liaFile))
+
+  const queuedRuns=liaAutomationRuns.filter(r=>r.status==='queued').length
+  $('liaAutomationCount').textContent=queuedRuns+' in coda'
+  $('liaAutomationList').innerHTML=liaAutomationRuns.map(r=>{
+    const w=r.distribution_research_watchlists||{}
+    const city=w.market_hubs?.city||'Territorio'
+    const canRun=isManager()&&['queued','failed','partial'].includes(r.status)
+    const button=canRun?'<button type="button" class="small-btn" data-lia-automation="'+r.id+'">Esegui</button>':''
+    return '<div class="lia-automation-row"><div><strong>'+esc(w.name||'Automazione Radar')+'</strong><small>'+esc(city)+' · '+esc(w.cadence||'')+' · '+esc(fmtDateTime(r.scheduled_for))+'</small><p>'+esc(r.result_summary||'In attesa del motore di ricerca.')+'</p></div><div><span class="lia-order-status '+esc(r.status)+'">'+esc(r.status)+'</span>'+button+'</div></div>'
+  }).join('')||empty('Nessuna automazione Radar')
+  document.querySelectorAll('[data-lia-automation]').forEach(b=>b.onclick=()=>runLiaAutomation(b.dataset.liaAutomation))
 
   const trustLabel={primary:'Primaria',official:'Ufficiale',secondary:'Secondaria',discovery_only:'Discovery'}
   $('liaSourceList').innerHTML=researchSources.map(src=>
