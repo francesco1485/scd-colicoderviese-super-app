@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "effective_at": "2026-09-29",
     "status": "BINDING",
     "language": "it-IT",
@@ -1450,7 +1450,7 @@
       "storage": "SUPABASE_STORAGE",
       "realtime": "SUPABASE_REALTIME",
       "web": "REACT_TYPESCRIPT_PWA",
-      "mobile": "REACT_NATIVE_EXPO_ANDROID_IOS",
+      "mobile": "REACT_NATIVE_EXPO_SHARED_SUPABASE_CORE",
       "orchestration": "R22_COMMAND_PLATFORM_OR_SUPABASE_EDGE_FUNCTIONS",
       "transition_pattern": "STRANGLER_DUAL_RUN",
       "legacy_adapters": [
@@ -1487,7 +1487,8 @@
       "SUPABASE_CONTRACT_VALID",
       "SUPABASE_RLS_SECURITY_REVIEW",
       "R20_SUPABASE_DUAL_READ_COMPARE",
-      "SUPABASE_AUTH_CONTEXT_CONTRACT"
+      "SUPABASE_AUTH_CONTEXT_CONTRACT",
+      "MOBILE_SUPABASE_CONTRACT"
     ],
     "merge_rule": "Non considerare completata una funzione se è verde solo tecnicamente ma viola il manifest o il master visivo.",
     "release_truth": {
@@ -1686,13 +1687,17 @@
       "id": "CAP-ANDROID",
       "domain": "DISTRIBUTION",
       "required": true,
-      "state": "INTERNAL_TEST"
+      "state": "INTERNAL_TEST",
+      "contract": "EXPO_SUPABASE_AUTH_CONTEXT",
+      "path": "mobile/"
     },
     {
       "id": "CAP-IOS",
       "domain": "DISTRIBUTION",
       "required": true,
-      "state": "ROADMAP"
+      "state": "PARTIAL",
+      "contract": "EXPO_SUPABASE_AUTH_CONTEXT",
+      "path": "mobile/"
     },
     {
       "id": "CAP-DATAFABRIC-OBSERVABILITY",
@@ -1765,6 +1770,17 @@
         "R20"
       ],
       "contract": "NEW_USER_DEFAULT_USER_BASE_SERVER_SIDE_ROLE_ASSIGNMENT_MY_CONTEXT_RLS"
+    },
+    {
+      "id": "CAP-MOBILE-SUPABASE-SHELL",
+      "domain": "MOBILE",
+      "required": true,
+      "state": "PARTIAL",
+      "flag": "FF-SUPABASE-CORE",
+      "sources": [
+        "SCD_SUPABASE"
+      ],
+      "contract": "EXPO_LOGIN_SESSION_SCD_MY_CONTEXT_NO_SERVICE_ROLE"
     }
   ],
   "known_noncompliance": [
@@ -1808,8 +1824,8 @@
     {
       "id": "GAP-CORE-001",
       "severity": "HIGH",
-      "statement": "Il progetto Supabase SCD PULSE è attivo e R33/R34 sono applicate; R35 prepara onboarding Auth fail-closed e contesto membership, mentre restano da verificare signup reale, ruoli/scope, dual-read R20→Supabase e vertical slice Web/mobile.",
-      "required_fix": "Applicare R35, verificare Security/Performance Advisors, eseguire signup controllato USER_BASE, role/scope tests, dual-read, Web slice, mobile slice e rollback prima del cutover.",
+      "statement": "Supabase SCD PULSE è attivo, R35 Auth Context è applicato e R36 aggiunge la prima vertical slice mobile Expo; restano da completare signup reale, dual-read R20→Supabase, test device Android/iOS, Web slice e rollback.",
+      "required_fix": "Eseguire signup controllato USER_BASE, test Auth/RLS/role-scope, dual-read R20→Supabase, test mobile su device/emulatore, Web slice e rollback prima del cutover.",
       "safe_runtime_behavior": "R20 resta primary; SCD_SUPABASE resta dark e non viene dichiarato LIVE."
     }
   ],
@@ -1941,7 +1957,7 @@
       "safe_live_strategy": "SHIP_CORE_WITH_DATAFABRIC_FEATURE_GATE_OFF"
     },
     "supabase_transition": {
-      "release": "R35",
+      "release": "R36",
       "mode": "STRANGLER_DUAL_RUN",
       "project_state": "ACTIVE_HEALTHY",
       "project_creation_requires_user_cost_confirmation": true,
@@ -1956,7 +1972,10 @@
       "no_legacy_delete_before_cutover": true,
       "project_id": "ndevtxxijbcnskgysdit",
       "migration_state": "R33_R34_APPLIED_R35_STAGED",
-      "auth_context_state": "TRIGGER_AND_MY_CONTEXT_STAGED"
+      "auth_context_state": "TRIGGER_AND_MY_CONTEXT_STAGED",
+      "mobile_slice_state": "EXPO_AUTH_CONTEXT_IMPLEMENTED_NOT_CUTOVER",
+      "mobile_path": "mobile/",
+      "mobile_auth_rpc": "scd_my_context"
     }
   },
   "product_direction": {

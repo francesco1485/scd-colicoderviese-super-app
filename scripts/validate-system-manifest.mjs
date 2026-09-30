@@ -209,7 +209,7 @@ includesAll(caps.map(x=>x.id),[
   'CAP-HOME','CAP-CALENDAR','CAP-ATHLETE','CAP-FAMILY','CAP-STAFF','CAP-COMMS','CAP-RUNTIME-EVIDENCE','CAP-UPSTREAM-RESILIENCE','CAP-R20-RUNTIME-ACTIVATION',
   'CAP-DRIVE-CATALOG','CAP-GMAIL-INGESTION','CAP-DATAFABRIC-OBSERVABILITY','CAP-ENTITY-GRAPH','CAP-COMPLETENESS','CAP-SUPABASE-CORE','CAP-SUPABASE-AUTH-CONTEXT',
   'CAP-CHAT','CAP-CONFIDENCE','CAP-ANCONFIDENCE','CAP-SAFEGUARDING','CAP-SKY','CAP-AVATAR',
-  'CAP-TAMAGOTCHI','CAP-GEO','CAP-R22','CAP-PWA','CAP-ANDROID','CAP-IOS'
+  'CAP-TAMAGOTCHI','CAP-GEO','CAP-R22','CAP-PWA','CAP-ANDROID','CAP-IOS','CAP-MOBILE-SUPABASE-SHELL'
 ],'capability map');
 
 const gaps=m.known_noncompliance||[];
@@ -233,6 +233,13 @@ const requiredRepoFiles=[
   'docs/adr/ADR-0006-r32-safe-live-core.md',
   'docs/adr/ADR-0007-supabase-domain-core.md',
   'docs/adr/ADR-0008-supabase-auth-context.md',
+  'docs/adr/ADR-0009-mobile-supabase-shell.md',
+  'mobile/package.json',
+  'mobile/app.json',
+  'mobile/App.tsx',
+  'mobile/src/lib/supabase.ts',
+  'mobile/src/lib/context.ts',
+  'scripts/validate-mobile-contract.mjs',
   'config/scd-supabase.v1.json',
   'supabase/migrations/20260929_r35_auth_context_rls_normalization.sql',
   'supabase/migrations/20260929_r33_club_graph_foundation.sql',
@@ -257,6 +264,7 @@ assert(pkg?.scripts?.['test:manifest']==='node scripts/validate-system-manifest.
 assert(pkg?.scripts?.['test:resilience']==='node tests/upstream-resilience.mjs','package.json must expose test:resilience');
 assert(pkg?.scripts?.['verify:r20']==='node scripts/verify-r20-direct.mjs','package.json must expose verify:r20');
 assert(pkg?.scripts?.['test:supabase-contract']==='node scripts/validate-supabase-contract.mjs','package.json must expose test:supabase-contract');
+assert(pkg?.scripts?.['test:mobile-contract']==='node scripts/validate-mobile-contract.mjs','package.json must expose test:mobile-contract');
 
 for(const workflow of ['.github/workflows/e2e.yml','.github/workflows/pages.yml','.github/workflows/command-platform.yml','.github/workflows/system-manifest.yml']){
   const file=path.join(root,workflow);

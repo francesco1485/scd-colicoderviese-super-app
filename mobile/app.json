@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "SCD PULSE",
+    "slug": "scd-pulse",
+    "scheme": "scdpulse",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "plugins": ["expo-router"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "it.colicoderviese.scdpulse"
+    },
+    "android": {
+      "package": "it.colicoderviese.scdpulse",
+      "adaptiveIcon": {
+        "backgroundColor": "#052A67"
+      }
+    },
+    "extra": {
+      "supabaseUrlEnv": "EXPO_PUBLIC_SCD_SUPABASE_URL",
+      "supabaseKeyEnv": "EXPO_PUBLIC_SCD_SUPABASE_PUBLISHABLE_KEY"
+    }
+  }
+}
