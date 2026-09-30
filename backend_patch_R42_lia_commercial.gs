@@ -9,7 +9,8 @@ var R42_LIA = {
   COMMERCIAL_ROOT_ID:'18SiudaLO9k1JnDeBoTKgy-nkjv_DgGyp',
   COMMERCIAL_ROOT_NAME:'02 SPONSOR E PARTNER',
   MAPPING_ROOT_ID:'1SN8wWjFni0haVda3ZMRFiRbJgTEvCU9d',
-  MAPPING_FOLDER:'01 MAPPING TERRITORIALE'
+  MAPPING_FOLDER:'01 MAPPING TERRITORIALE',
+  HANDOFF_ROOT_ID:'1HYg6ORHFDeZX2lfcH-_ZjBthCFOxEhbv'
 };
 
 function r42RequireDirection_(token) {
@@ -188,5 +189,80 @@ function r42SaveCommercialMapping_(token, payload) {
     fileName:fileName,
     source:String(payload.source || 'OPENSTREETMAP_OVERPASS'),
     coverage:String(payload.coverage || 'PARTIAL_NOT_EXHAUSTIVE')
+  };
+}
+
+
+function r42RequireInternal_(token) {
+  if (!token) throw new Error('Sessione SCD mancante');
+  if (typeof sessionActor_ !== 'function') throw new Error('R20 sessionActor non disponibile');
+  var actor = sessionActor_(token);
+  var role = String((actor && (actor.role || actor.coreRole || actor.type)) || '').toUpperCase();
+  var internalRoles = ['MISTER','STAFF','MANAGER','DIRIGENTE','SEGRETERIA','SECRETARIAT','TESSERAMENTI','REGISTRATION','TORNEI','TOURNAMENTS','DIREZIONE','ADMIN','DG'];
+  var ok = !!(actor && (actor.staff || (actor.permissions && actor.permissions.direction) || internalRoles.indexOf(role) >= 0));
+  if (!ok) throw new Error('Handoff Lia disponibile solo agli utenti interni autorizzati');
+  return actor;
+}
+
+function r42SafeHandoffRef_(ref) {
+  ref = ref || {};
+  return {
+    name: clean_(ref.name || '', 180),
+    type: clean_(ref.type || '', 80),
+    id: clean_(ref.id || ref.fileId || '', 180),
+    url: clean_(ref.url || '', 700)
+  };
+}
+
+function r42SaveLiaHandoff_(token, payload) {
+  var actor = r42RequireInternal_(token);
+  payload = payload || {};
+  var command = clean_(payload.command || '', 5000);
+  if (!command) throw new Error('Comando Lia mancante');
+
+  var refs = Array.isArray(payload.refs) ? payload.refs.slice(0, 20).map(r42SafeHandoffRef_) : [];
+  var packet = {
+    schema: 'SCD_LIA_HANDOFF_V1',
+    createdAt: new Date().toISOString(),
+    status: 'PENDING_REMOTE_SUPPORT',
+    assistant: 'LIA',
+    destination: 'CHATGPT_REMOTE_SUPPORT',
+    actor: {
+      email: email_(actor.email || ''),
+      role: clean_(actor.role || actor.coreRole || actor.type || '', 80),
+      area: clean_(actor.area || '', 120)
+    },
+    command: command,
+    context: {
+      module: clean_(payload.module || 'LIA', 80),
+      entityType: clean_(payload.entityType || '', 80),
+      entityId: clean_(payload.entityId || '', 160),
+      currentState: clean_(payload.currentState || '', 1000),
+      requestedOutput: clean_(payload.requestedOutput || '', 1000)
+    },
+    refs: refs,
+    rules: [
+      'NO_PASSWORD_PIN_TOKEN_SECRET',
+      'NO_SAFEGUARDING_IN_ORDINARY_HANDOFF',
+      'USE_REFERENCED_SOURCES_OR_REQUEST_EXPLICIT_RESEARCH',
+      'RETURN_TRACEABLE_OUTPUT'
+    ]
+  };
+
+  var folder = DriveApp.getFolderById(R42_LIA.HANDOFF_ROOT_ID);
+  if (!folder) throw new Error('Cartella Lia Remote Handoff non disponibile');
+  var stamp = Utilities.formatDate(new Date(), Session.getScriptTimeZone() || 'Europe/Rome', 'yyyyMMdd_HHmmss');
+  var shortRole = r42SafeName_(packet.actor.role || 'INTERNAL','INTERNAL').replace(/\s+/g,'_');
+  var fileName = 'LIA_HANDOFF_' + stamp + '_' + shortRole + '.json';
+  var file = folder.createFile(fileName, JSON.stringify(packet, null, 2), MimeType.PLAIN_TEXT);
+
+  r42Audit_(actor,'LIA_REMOTE_HANDOFF_CREATED',file.getId(),clean_(command,500));
+  return {
+    ok:true,
+    handoffId:file.getId(),
+    fileName:fileName,
+    url:file.getUrl(),
+    status:packet.status,
+    createdAt:packet.createdAt
   };
 }
