@@ -1,6 +1,6 @@
 (() => {
   const R24={
-    version:'39.0.0',
+    version:'40.0.0',
     routes:['pulse','home','calendar','communications','services','profile','athlete','family','staff'],
     current:'pulse',
     route(){
@@ -123,27 +123,7 @@
         return '<article class="r38-partner">'+(logo?'<img src="'+esc(logo)+'" alt="'+esc(name)+'">':'<div><b>'+esc(name)+'</b><small>Partner SCD</small></div>')+'</article>';
       }).join('')||sponsorNames.slice(0,4).map(name=>'<article class="r38-partner"><div><b>'+esc(name)+'</b><small>Partner SCD</small></div></article>').join('');
 
-      const initiativeRows=(p.initiatives||[]).map(x=>({
-        id:field(x,'id','eventId'),
-        date:field(x,'date','eventDate'),
-        time:field(x,'time','hour'),
-        title:field(x,'title','event','name'),
-        venue:field(x,'venue','place'),
-        type:field(x,'type','category')||'EVENTO'
-      })).filter(x=>x.title);
-      const eventRows=[...future.slice(0,5).map(x=>({...x,title:x.title||x.team||'Attività SCD'})),...initiativeRows].slice(0,7);
-      if(!eventRows.length){
-        eventRows.push(
-          {date:'2026-12-08',time:'10:30',title:'Christmas Lario Cup · 1ª edizione',venue:'Colico',type:'TORNEO'},
-          {date:'2027-05-22',time:'',title:'Memorial Internazionale José Nasazzi · 7ª edizione',venue:'Colico',type:'EVENTO'}
-        );
-      }
-      const eventsHtml=eventRows.map(x=>'<button class="r38-event" type="button" data-meta-key="events" '+(x.id?'data-r26-event="'+esc(x.id)+'"':'data-r24-route="calendar"')+'><time>'+esc(fmtDate(x.date)||'DATA')+'</time><small>'+esc(x.time||x.type||'SCD')+'</small><b>'+esc(x.title||'Attività SCD')+'</b><em>'+esc(x.venue||'Dato in aggiornamento')+'</em></button>').join('');
-
-      const highlights=(p.highlights||[]).slice(0,7);
-      const moments=highlights.length?highlights.map(x=>'<article class="r38-moment"><small>'+esc(field(x,'feedType','source')||'SCD')+'</small><h3>'+esc(field(x,'title','subject','event')||'Aggiornamento SCD')+'</h3><p>'+esc(field(x,'message','excerpt','venue')||'Contenuto ufficiale in aggiornamento.')+'</p><time>'+esc(field(x,'date','time','status')||'')+'</time></article>').join(''):'<article class="r38-moment"><small>SCD RADAR</small><h3>Il Club, senza rumore inutile.</h3><p>News, risultati, eventi e contenuti verificati arriveranno qui dalle fonti SCD.</p><time>Feed in aggiornamento</time></article>';
-
-      const worldData=role==='staff'
+      const roleWorldData=role==='staff'
         ?[
           ['staff','▦','Direzione','Operatività, richieste, dati e controllo','staff'],
           ['calendar','⚽','Sport','Gare, attività e calendario societario','sport'],
@@ -170,7 +150,51 @@
               ['services','◆','Club','Iscrizioni, campi, card e servizi','club'],
               ['profile','●','SCD ID','Il tuo profilo, avatar e mondo personale','profile']
             ];
-      const worlds=worldData.map(([route,icon,title,copy,key])=>'<button class="r38-world" type="button" data-meta-key="'+key+'" data-r24-route="'+route+'" data-twin-evolve="1" data-evo-reason="'+esc(key)+'"><span>'+icon+'</span><b>'+esc(title)+'</b><small>'+esc(copy)+'</small></button>').join('');
+      const worlds=roleWorldData.map(([route,icon,title,copy,key])=>'<button class="r38-world" type="button" data-meta-key="'+key+'" data-r24-route="'+route+'" data-twin-evolve="1" data-evo-reason="'+esc(key)+'"><span>'+icon+'</span><b>'+esc(title)+'</b><small>'+esc(copy)+'</small></button>').join('');
+
+      const weekday=new Intl.DateTimeFormat('en-US',{timeZone:state.clubTimeZone,weekday:'short'}).format(now);
+      const dayIndex={Mon:0,Tue:1,Wed:2,Thu:3,Fri:4,Sat:5,Sun:6}[weekday]??0;
+      const localNoon=new Date(today+'T12:00:00');
+      const weekStartDate=new Date(localNoon.getTime()-dayIndex*86400000);
+      const weekEndDate=new Date(weekStartDate.getTime()+6*86400000);
+      const dateKey=d=>new Intl.DateTimeFormat('en-CA',{timeZone:state.clubTimeZone,year:'numeric',month:'2-digit',day:'2-digit'}).format(d);
+      const weekStart=dateKey(weekStartDate),weekEnd=dateKey(weekEndDate);
+      const localWeek=rows.filter(x=>x.date&&String(x.date).slice(0,10)>=weekStart&&String(x.date).slice(0,10)<=weekEnd);
+      const newsroomRows=Array.isArray(state.newsroom?.calendar?.rows)?state.newsroom.calendar.rows:[];
+      const weekRows=(newsroomRows.length?newsroomRows:localWeek).slice().sort((a,b)=>String(a.date||'').localeCompare(String(b.date||''))||String(a.time||'').localeCompare(String(b.time||'')));
+      const groupLabel=x=>displayValue(x.category||x.birthYear||x.team||field(x,'category','annata','team'),'SCD');
+      const groups=[...new Set(weekRows.map(groupLabel).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),'it',{numeric:true}));
+      const kindOf=x=>{
+        const t=[x.kind,x.type,x.title].join(' ');
+        if(/allenament|training/i.test(t))return 'ALLENAMENTO';
+        if(/gara|partita|campionato|coppa|amichevole|match/i.test(t))return 'GARA';
+        if(/torneo|tournament/i.test(t))return 'TORNEO';
+        return 'EVENTO';
+      };
+      const weekCounts=state.newsroom?.calendar?.counts||{
+        activities:weekRows.length,
+        matches:weekRows.filter(x=>kindOf(x)==='GARA').length,
+        trainings:weekRows.filter(x=>kindOf(x)==='ALLENAMENTO').length,
+        tournaments:weekRows.filter(x=>kindOf(x)==='TORNEO').length,
+        groups:groups.length
+      };
+      const weekFilters='<button class="active" type="button" data-r40-team-filter="ALL">TUTTE</button>'+groups.map(g=>'<button type="button" data-r40-team-filter="'+esc(g)+'">'+esc(g)+'</button>').join('');
+      const dayGroups=new Map();
+      weekRows.forEach(x=>{const k=String(x.date||'').slice(0,10)||'SENZA-DATA';if(!dayGroups.has(k))dayGroups.set(k,[]);dayGroups.get(k).push(x)});
+      const weekHtml=dayGroups.size?[...dayGroups.entries()].map(([date,items])=>{
+        const d=date==='SENZA-DATA'?'DATA IN AGGIORNAMENTO':new Intl.DateTimeFormat('it-IT',{timeZone:state.clubTimeZone,weekday:'long',day:'numeric',month:'long'}).format(new Date(date+'T12:00:00'));
+        return '<article class="r40-day" data-r40-day><header><span>'+esc(d.toUpperCase())+'</span><b>'+items.length+'</b></header><div>'+items.map(x=>{
+          const grp=groupLabel(x);
+          return '<button class="r40-week-event" type="button" data-r40-week-group="'+esc(grp)+'" '+(x.id?'data-r26-event="'+esc(x.id)+'"':'data-r24-route="calendar"')+'><span class="r40-time">'+esc(x.time||'--:--')+'</span><span class="r40-event-main"><small>'+esc(grp)+' · '+esc(kindOf(x))+'</small><b>'+esc(x.title||x.team||'Attività SCD')+'</b><em>'+esc([x.team&&x.team!==grp?x.team:'',x.opponent,x.venue].filter(Boolean).join(' · ')||'Dettagli in aggiornamento')+'</em></span>'+(x.result?'<strong>'+esc(x.result)+'</strong>':'<i>›</i>')+'</button>';
+        }).join('')+'</div></article>';
+      }).join(''):'<div class="r40-empty"><b>Nessuna attività sportiva verificata per questa settimana.</b><p>Il calendario non viene riempito con dati inventati.</p></div>';
+
+      const newsroom=state.newsroom;
+      const newsroomCards=Array.isArray(newsroom?.cards)?newsroom.cards:[];
+      const newsHtml=newsroomCards.length?newsroomCards.map(card=>{
+        const evidence=Array.isArray(card.evidence)?card.evidence.length:0;
+        return '<article class="r40-news-card"><small>'+esc(card.category||'SCD NEWSROOM AI')+'</small><h3>'+esc(card.title||'Sintesi settimanale')+'</h3><p class="r40-news-dek">'+esc(card.dek||'')+'</p><p>'+esc(card.body||'')+'</p><footer><span>'+evidence+' evidenze</span><span>DATI VERIFICATI</span></footer></article>';
+      }).join(''):'<article class="r40-news-card"><small>SCD NEWSROOM AI</small><h3>Nessuna news automatica senza fatti.</h3><p>Risultati, classifiche, calendario e iniziative alimenteranno qui il racconto settimanale. Il sito datato non viene usato come riempitivo.</p><footer><span>0 evidenze</span><span>ATTESA DATI</span></footer></article>';
 
       outlet.innerHTML=
       '<div class="r38-universe">'+
@@ -193,6 +217,19 @@
           '<button class="r38-orbit" data-r24-route="services" data-meta-key="club"><i>◆</i><b>SCD World</b><small>Servizi</small></button>'+
         '</section>'+
 
+        '<section class="r40-week-shell r38-section" data-meta-key="sport">'+
+          '<div class="r40-week-head"><div><small>SETTIMANA SCD · TUTTE LE ANNATE</small><h2>Dal lunedì alla domenica. Tutta la vita sportiva.</h2><p>Prima squadra, agonistica, attività di base, allenamenti, gare, tornei ed eventi: un solo calendario, senza tagliare via nessuno.</p></div><button type="button" data-r24-route="calendar">APRI CALENDARIO ›</button></div>'+
+          '<div class="r40-week-stats"><div><b>'+esc(weekCounts.activities||0)+'</b><span>attività</span></div><div><b>'+esc(weekCounts.matches||0)+'</b><span>gare</span></div><div><b>'+esc(weekCounts.trainings||0)+'</b><span>allenamenti</span></div><div><b>'+esc(weekCounts.groups||groups.length||0)+'</b><span>annate / gruppi</span></div></div>'+
+          '<div class="r40-team-filters" aria-label="Filtra per annata">'+weekFilters+'</div>'+
+          '<div class="r40-week-days">'+weekHtml+'</div>'+
+        '</section>'+
+
+        '<section class="r40-newsroom r38-section" data-meta-key="community">'+
+          '<div class="r40-news-head"><div><small>SCD NEWSROOM AI · SETTIMANALE</small><h2>Le news nascono dai fatti del Club.</h2><p>Risultati inseriti, classifiche strutturate, calendario e iniziative territoriali. Nessun commento recuperato dal sito datato.</p></div><button type="button" id="r40NewsRefresh">RIGENERA ›</button></div>'+
+          '<div class="r40-news-grid">'+newsHtml+'</div>'+
+          '<div class="r40-news-policy"><span>◎</span><p><b>Politica editoriale R40:</b> se manca un dato verificato, la Newsroom non inventa il contenuto. Il vecchio sito resta escluso dalle news fino a nuova verifica di freschezza.</p></div>'+
+        '</section>'+
+
         '<section class="r38-section"><div class="r38-section-head"><div><small>UN CLUB · PIÙ MODI DI VIVERLO</small><h2>Il tuo mondo SCD</h2></div><button type="button" data-r24-route="profile">Il mio SCD ID ›</button></div><div class="r38-worlds" data-meta-container>'+worlds+'</div></section>'+
 
         '<section class="r38-twin-grid r38-section">'+
@@ -209,8 +246,6 @@
           '</article>'+
         '</section>'+
 
-        '<section class="r38-section"><div class="r38-section-head"><div><small>GARE · ALLENAMENTI · TORNEI · EVENTI</small><h2>Da non perdere</h2></div><button type="button" data-r24-route="calendar">Calendario completo ›</button></div><div class="r38-event-rail">'+eventsHtml+'</div></section>'+
-
         '<section class="r38-section"><div class="r38-section-head"><div><small>FAN LAB · INTERAZIONE</small><h2>Qui non sei uno spettatore.</h2></div><button type="button" data-r24-route="communications">Community ›</button></div><div class="r38-fan-lab" data-meta-container>'+
           '<button class="r38-fan" type="button" data-r24-action="fan" data-meta-key="fan" data-twin-evolve="3" data-evo-reason="mvp"><i>🔥</i><b>Vota l’MVP</b><small>Scegli il tuo protagonista del weekend.</small></button>'+
           '<button class="r38-fan" type="button" data-r24-action="fan" data-meta-key="community" data-twin-evolve="3" data-evo-reason="pronostico"><i>🎯</i><b>Pronostico SCD</b><small>Gioco community gratuito, senza denaro o betting.</small></button>'+
@@ -218,22 +253,37 @@
           '<button class="r38-fan" type="button" data-twin-mirror-open data-meta-key="mirror" data-twin-evolve="1"><i>⚡</i><b>Sfida Mirror</b><small>Domande, curiosità e scorciatoie sul Club.</small></button>'+
         '</div></section>'+
 
-        '<section class="r38-section"><div class="r38-section-head"><div><small>SCD RADAR · FONTI VERIFICATE</small><h2>Momenti, notizie, territorio.</h2></div><button type="button" data-r24-route="communications">Tutto il feed ›</button></div><div class="r38-moments">'+moments+'</div></section>'+
-
         '<section class="r38-section"><div class="r38-section-head"><div><small>PARTNER · TERRITORIO</small><h2>Chi cresce con noi.</h2></div><button type="button" data-r24-action="sponsor" data-meta-key="sponsors">Diventa partner ›</button></div><div class="r38-partners">'+sponsorSpot+'</div></section>'+
         '<section class="r39-growth-loop"><article class="r39-growth-card dark"><small>IL CICLO CHE FINANZIA IL CLUB</small><h3>Più valore → più partecipazione → più opportunità.</h3><p>L’obiettivo non è trattenerti senza motivo. È diventare abbastanza utile e piacevole da farti tornare: sport, servizi, eventi e community aumentano il valore reale per famiglie, partner e territorio.</p><button type="button" data-r24-action="idea" data-meta-key="community">PROPONI UN’IDEA</button></article><article class="r39-growth-card"><small>PARTNER VALUE</small><h3>Visibilità che deve produrre risultati.</h3><p>Sponsor, eventi, card, shop e iniziative vengono progettati per generare metriche verificabili, non loghi messi in fondo a una pagina dimenticata.</p><button type="button" data-r24-action="sponsor" data-meta-key="sponsors">SCOPRI LE PARTNERSHIP</button></article></section>'+
       '</div>';
 
       outlet.querySelectorAll('[data-r26-event]').forEach(b=>b.onclick=()=>openCalendarEvent(b.dataset.r26Event));
+      outlet.querySelectorAll('[data-r40-team-filter]').forEach(b=>b.onclick=()=>{
+        const wanted=b.dataset.r40TeamFilter;
+        outlet.querySelectorAll('[data-r40-team-filter]').forEach(x=>x.classList.toggle('active',x===b));
+        outlet.querySelectorAll('[data-r40-week-group]').forEach(ev=>{ev.hidden=wanted!=='ALL'&&ev.dataset.r40WeekGroup!==wanted});
+        outlet.querySelectorAll('[data-r40-day]').forEach(day=>{
+          const any=[...day.querySelectorAll('[data-r40-week-group]')].some(ev=>!ev.hidden);
+          day.hidden=!any;
+        });
+      });
       const sync=outlet.querySelector('#r38Sync');
       if(sync)sync.onclick=async()=>{
         sync.disabled=true;
         try{
-          await Promise.all([loadSummary(true),loadPublicCalendar(true)]);
+          await Promise.all([loadSummary(true),loadPublicCalendar(true),loadWeeklyNewsroom(true)]);
           toast('SCD Universe sincronizzato');
           this.render('pulse');
         }catch(e){toast(e.message||'Sincronizzazione non riuscita')}
         finally{sync.disabled=false}
+      };
+      const newsRefresh=outlet.querySelector('#r40NewsRefresh');
+      if(newsRefresh)newsRefresh.onclick=async()=>{
+        newsRefresh.disabled=true;
+        try{
+          await Promise.all([loadPublicCalendar(true),loadWeeklyNewsroom(false)]);
+          this.render('pulse');
+        }finally{newsRefresh.disabled=false}
       };
       this.bindCommon(outlet);
       try{window.SCDMeta?.apply(outlet,role)}catch{}
