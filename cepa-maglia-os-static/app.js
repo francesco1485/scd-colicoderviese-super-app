@@ -23,7 +23,7 @@ const viewMeta={
  liaWorkbench:['Lia · Workbench','Assistente operativo con permessi, ricerca, cartelle di lavoro e artefatti tracciati']
 }
 
-let ecosystem=[],projects=[],actions=[],marketHubs=[],marketEntities=[],contacts=[],timeline=[],documents=[],partnerRequirements=[],blueprints=[],subjects=[],initiatives=[],cepaContent=[],cepaAcademy=[],cepaSpeakers=[],products=[],productKnowledge=[],comparisons=[],collaborators=[],collaboratorTerms=[],portfolioSnapshots=[],businessAssessments=[],growthKits=[],distributionWatchlists=[],distributionCandidates=[],distributionEvidence=[],mailTemplates=[],mailDrafts=[],cepaExpansion=[],cepaReadiness=[],assistantMessages=[],recoveryRows=[],members=[],liaCapabilities=[],liaFolders=[],liaOrders=[],researchSources=[]
+let ecosystem=[],projects=[],actions=[],marketHubs=[],marketEntities=[],contacts=[],timeline=[],documents=[],partnerRequirements=[],blueprints=[],subjects=[],initiatives=[],cepaContent=[],cepaAcademy=[],cepaSpeakers=[],products=[],productKnowledge=[],comparisons=[],collaborators=[],collaboratorTerms=[],portfolioSnapshots=[],businessAssessments=[],growthKits=[],distributionWatchlists=[],distributionCandidates=[],distributionEvidence=[],mailTemplates=[],mailDrafts=[],cepaExpansion=[],cepaReadiness=[],assistantMessages=[],recoveryRows=[],members=[],liaCapabilities=[],liaFolders=[],liaOrders=[],liaFiles=[],researchSources=[]
 let currentPartnerId=null
 
 function msg(text,error=false){$('loginMsg').textContent=text;$('loginMsg').className='message'+(error?' error':'')}
@@ -137,18 +137,55 @@ $('territoryStageFilter').onchange=renderMarketTable
 $('actionLaneFilter').onchange=renderActions
 $('actionStatusFilter').onchange=renderActions
 $('refreshRecoveryBtn').onclick=loadRecovery
+
+function safeLiaFileName(name='file'){
+  return String(name).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Za-z0-9._-]+/g,'_').replace(/^_+|_+$/g,'').slice(-120)||'file'
+}
+async function uploadLiaFiles(fileList){
+  const files=[...(fileList||[])].slice(0,12)
+  if(!files.length)return[]
+  const uploaded=[]
+  try{
+    for(let i=0;i<files.length;i++){
+      const file=files[i]
+      if(file.size>26214400)throw new Error(file.name+': supera il limite di 25 MB')
+      const path=window.orgId+'/'+window.userId+'/'+Date.now()+'-'+i+'-'+safeLiaFileName(file.name)
+      const{error}=await supabase.storage.from('lia-workspace').upload(path,file,{contentType:file.type||undefined,upsert:false})
+      if(error)throw error
+      uploaded.push({path,name:file.name,mime_type:file.type||null,size_bytes:file.size})
+    }
+    return uploaded
+  }catch(error){
+    if(uploaded.length){
+      try{await supabase.storage.from('lia-workspace').remove(uploaded.map(x=>x.path))}catch(_){}
+    }
+    throw error
+  }
+}
+async function openLiaFile(fileId){
+  const item=liaFiles.find(x=>x.id===fileId)
+  if(!item)return
+  const{data,error}=await supabase.storage.from(item.bucket_id||'lia-workspace').createSignedUrl(item.object_path,120)
+  if(error)return alert(error.message)
+  if(data?.signedUrl)window.open(data.signedUrl,'_blank','noopener')
+}
+
 $('liaWorkbenchForm').onsubmit=async e=>{
   e.preventDefault()
   const q=$('liaWorkbenchCommand').value.trim()
+  const input=$('liaWorkbenchFiles')
   if(!q)return
   const box=$('liaWorkbenchResult')
   box.className='message'
-  box.textContent='Lia sta elaborando il comando…'
+  box.textContent='Lia sta preparando il lavoro…'
   try{
-    const{data,error}=await supabase.functions.invoke('lia-workbench',{body:{organization_id:window.orgId,command:q}})
+    const attachments=await uploadLiaFiles(input?.files)
+    if(attachments.length)box.textContent='Allegati caricati in area privata. Lia sta creando l’ordine di lavoro…'
+    const{data,error}=await supabase.functions.invoke('lia-workbench',{body:{organization_id:window.orgId,command:q,attachments}})
     if(error)throw error
     box.textContent=data?.message||'Operazione registrata.'
     box.className='message'+(data?.partial?' warning':'')
+    if(input)input.value=''
     await loadAll()
   }catch(error){
     box.textContent='Operazione non completata: '+(error?.message||String(error))
@@ -215,12 +252,13 @@ async function loadAll(){
     supabase.from('organization_ai_capabilities').select('*').eq('organization_id',window.orgId).eq('role',window.userRole).eq('active',true).order('capability'),
     supabase.from('ai_workspace_folders').select('*').eq('organization_id',window.orgId).order('created_at',{ascending:false}).limit(100),
     supabase.from('ai_work_orders').select('*').eq('organization_id',window.orgId).order('created_at',{ascending:false}).limit(60),
+    supabase.from('ai_work_order_files').select('*').eq('organization_id',window.orgId).order('created_at',{ascending:false}).limit(120),
     supabase.from('research_sources').select('*').eq('organization_id',window.orgId).eq('active',true).order('trust_level').order('name')
   ]
   const res=await Promise.all(q)
   const err=res.find(x=>x.error)?.error
   if(err){console.error(err);$('refreshBtn').textContent='!';return}
-  ;[ecosystem,projects,actions,marketHubs,marketEntities,contacts,timeline,documents,partnerRequirements,blueprints,subjects,initiatives,cepaContent,cepaAcademy,cepaSpeakers,products,productKnowledge,comparisons,collaborators,collaboratorTerms,portfolioSnapshots,businessAssessments,growthKits,distributionWatchlists,distributionCandidates,distributionEvidence,mailTemplates,mailDrafts,cepaExpansion,cepaReadiness,assistantMessages,liaCapabilities,liaFolders,liaOrders,researchSources]=res.map(x=>x.data||[])
+  ;[ecosystem,projects,actions,marketHubs,marketEntities,contacts,timeline,documents,partnerRequirements,blueprints,subjects,initiatives,cepaContent,cepaAcademy,cepaSpeakers,products,productKnowledge,comparisons,collaborators,collaboratorTerms,portfolioSnapshots,businessAssessments,growthKits,distributionWatchlists,distributionCandidates,distributionEvidence,mailTemplates,mailDrafts,cepaExpansion,cepaReadiness,assistantMessages,liaCapabilities,liaFolders,liaOrders,liaFiles,researchSources]=res.map(x=>x.data||[])
   renderEverything()
   $('refreshBtn').textContent='↻'
 }
@@ -751,9 +789,12 @@ function renderLiaWorkbench(){
     return '<div class="lia-work-row"><div><strong>'+esc(f.name)+'</strong><small>'+esc(f.folder_type)+city+'</small></div><span>'+esc(fmtDateTime(f.created_at))+'</span></div>'
   }).join('')||empty('Nessuna cartella di lavoro')
 
-  $('liaOrderList').innerHTML=liaOrders.map(o=>
-    '<div class="lia-work-row"><div><strong>'+esc(o.action_type.replaceAll('_',' '))+'</strong><small>'+esc(o.result_summary||o.prompt)+'</small></div><span class="lia-order-status '+esc(o.status)+'">'+esc(o.status)+'</span></div>'
-  ).join('')||empty('Nessun ordine operativo')
+  $('liaOrderList').innerHTML=liaOrders.map(o=>{
+    const files=liaFiles.filter(f=>f.work_order_id===o.id)
+    const fileHtml=files.length?'<div class="lia-file-links">'+files.map(f=>'<button type="button" data-lia-file="'+f.id+'">'+esc(f.original_name)+'</button>').join('')+'</div>':''
+    return '<div class="lia-work-row"><div><strong>'+esc(o.action_type.replaceAll('_',' '))+'</strong><small>'+esc(o.result_summary||o.prompt)+'</small>'+fileHtml+'</div><span class="lia-order-status '+esc(o.status)+'">'+esc(o.status)+'</span></div>'
+  }).join('')||empty('Nessun ordine operativo')
+  document.querySelectorAll('[data-lia-file]').forEach(b=>b.onclick=()=>openLiaFile(b.dataset.liaFile))
 
   const trustLabel={primary:'Primaria',official:'Ufficiale',secondary:'Secondaria',discovery_only:'Discovery'}
   $('liaSourceList').innerHTML=researchSources.map(src=>
