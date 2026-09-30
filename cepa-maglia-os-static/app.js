@@ -460,13 +460,53 @@ function renderHome(){
   document.querySelectorAll('[data-office-id]').forEach(b=>b.onclick=()=>openOffice(b.dataset.officeId))
 
   if(isDirectionRole()){
-    $('directionProduction').innerHTML=offices.map(h=>'<article><div><strong>'+esc(h.city)+'</strong><small>'+esc(fmtMonth(latestOfficePeriod(h.id)))+'</small></div>'+renderMiniProductionChart(h.id)+'</article>').join('')
+    const officeRows=offices.map(h=>{
+      const period=latestOfficePeriod(h.id)
+      const snaps=period?officeSnapshots.filter(x=>x.hub_id===h.id&&x.period_month===period):[]
+      return {
+        id:h.id,
+        city:h.city,
+        period,
+        premium:snaps.reduce((n,x)=>n+Number(x.premium_total||0),0),
+        proposals:snaps.reduce((n,x)=>n+Number(x.proposals_count||0),0),
+        renewals:snaps.reduce((n,x)=>n+Number(x.renewals_due||0),0),
+        open:officeOpenCases(h.id).length
+      }
+    })
+    const total=officeRows.reduce((a,x)=>({
+      premium:a.premium+x.premium,
+      proposals:a.proposals+x.proposals,
+      renewals:a.renewals+x.renewals,
+      open:a.open+x.open
+    }),{premium:0,proposals:0,renewals:0,open:0})
+    $('directionCompareSummary').innerHTML=
+      '<div><span>Produzione totale</span><strong>'+esc(total.premium?fmtMoney(total.premium):'Da importare')+'</strong><small>somma sedi attive</small></div>'+
+      '<div><span>Proposte</span><strong>'+total.proposals+'</strong><small>mese corrente</small></div>'+
+      '<div><span>Rinnovi</span><strong>'+total.renewals+'</strong><small>da lavorare</small></div>'+
+      '<div><span>Pratiche aperte</span><strong>'+total.open+'</strong><small>tutte le sedi</small></div>'
+
+    $('directionProduction').innerHTML=officeRows.map(h=>
+      '<article>'+
+        '<div class="direction-office-title"><div><strong>'+esc(h.city)+'</strong><small>'+esc(fmtMonth(h.period))+'</small></div><button type="button" data-office-id="'+h.id+'">Entra →</button></div>'+
+        '<div class="direction-office-kpis">'+
+          '<div><span>Produzione</span><b>'+esc(h.period?fmtMoney(h.premium):'—')+'</b></div>'+
+          '<div><span>Proposte</span><b>'+h.proposals+'</b></div>'+
+          '<div><span>Rinnovi</span><b>'+h.renewals+'</b></div>'+
+          '<div><span>Pratiche</span><b>'+h.open+'</b></div>'+
+        '</div>'+
+        renderMiniProductionChart(h.id)+
+      '</article>'
+    ).join('')
+
     const allCases=offices.flatMap(h=>officeOpenCases(h.id)).sort((a,b)=>({urgent:0,high:1,normal:2,low:3}[a.priority]??9)-({urgent:0,high:1,normal:2,low:3}[b.priority]??9))
-    $('directionPriorities').innerHTML='<div class="direction-priority-head"><strong>Priorità</strong><span>'+allCases.length+' aperte</span></div>'+
-      (allCases.slice(0,5).map(x=>'<button type="button" data-office-id="'+x.hub_id+'"><strong>'+esc(x.title)+'</strong><small>'+esc(marketHubs.find(h=>h.id===x.hub_id)?.city||'Sede')+' · '+esc(String(x.case_type).replaceAll('_',' '))+'</small><span>'+esc(x.priority)+'</span></button>').join('')||'<p class="office-muted">Nessuna priorità di sede registrata.</p>')
-    $('directionOverview')?.classList?.remove('hidden')
+    $('directionPriorities').innerHTML='<div class="direction-priority-head"><strong>Priorità della rete</strong><span>'+allCases.length+' aperte</span></div>'+
+      (allCases.slice(0,6).map(x=>'<button type="button" data-office-id="'+x.hub_id+'"><strong>'+esc(x.title)+'</strong><small>'+esc(marketHubs.find(h=>h.id===x.hub_id)?.city||'Sede')+' · '+esc(String(x.case_type).replaceAll('_',' '))+'</small><span>'+esc(x.priority)+'</span></button>').join('')||'<p class="office-muted">Nessuna priorità di sede registrata.</p>')
+    $('directionOverview').classList.remove('hidden')
+    document.querySelectorAll('#directionOverview [data-office-id]').forEach(b=>b.onclick=()=>openOffice(b.dataset.officeId))
   }else{
-    $('directionProduction').innerHTML='<div class="production-empty"><strong>Vista personale</strong><span>Entra nella sede assegnata per vedere attività e prodotti.</span></div>'
+    $('directionOverview').classList.add('hidden')
+    $('directionCompareSummary').innerHTML=''
+    $('directionProduction').innerHTML=''
     $('directionPriorities').innerHTML=''
   }
 }
