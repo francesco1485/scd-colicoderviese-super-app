@@ -178,7 +178,7 @@ function openPartner(id){
   $('aiDock').classList.remove('hidden')
   window.scrollTo({top:0,behavior:'smooth'})
 }
-document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>navigate(b.dataset.view))
+document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>b.dataset.view==='cepa'?openCepaHub():navigate(b.dataset.view))
 document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>navigate(b.dataset.go))
 document.querySelectorAll('.partner-tab').forEach(b=>b.onclick=()=>showPartnerSection(b.dataset.partnerSection))
 function showPartnerSection(section){
