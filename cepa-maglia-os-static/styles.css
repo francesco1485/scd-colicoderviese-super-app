@@ -889,3 +889,15 @@ body{background:var(--paper);color:var(--ink)}
 @media(max-width:620px){
   .candidate-governance{grid-template-columns:1fr}
 }
+
+
+.automation-waiting{
+  display:inline-flex;
+  align-items:center;
+  border-radius:999px;
+  padding:4px 7px;
+  background:#eef4f8;
+  color:#607788;
+  font-size:8px;
+  font-weight:800;
+}
