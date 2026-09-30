@@ -101,7 +101,7 @@ includesAll(sourceIds,[
   'SCD_DRIVE','SCD_GMAIL','R20','CORE_SHEET','TESSERATI_SHEET','PULMINI_SHEET','MAIL_OPERATIONS_SHEET','SPONSOR_MASTER_SHEET','ECONOMIC_MASTER_SHEET','TOURNAMENTS_MASTER_SHEET',
   'FIGC','LND','CR_LOMBARDIA','SGS','SPORT_E_SALUTE','RASD','TUTTOCAMPO',
   'SCD_OFFICIAL_SITE','SCD_FACEBOOK','SCD_INSTAGRAM','TUTTITALIA',
-  'SEGRETARIO_CALCIO','TEAMSYSTEM_SPORTIVI_IN_CLOUD','SQUBY','ATHLETIS','SCD_SUPABASE'
+  'SEGRETARIO_CALCIO','TEAMSYSTEM_SPORTIVI_IN_CLOUD','SQUBY','ATHLETIS','SCD_SUPABASE','SCD_AI_WEEKLY_EDITORIAL'
 ],'source registry');
 const sourceById=Object.fromEntries(sources.map(x=>[x.id,x]));
 assert(sourceById.SCD_DRIVE.account==='sportclubcolico@gmail.com','Drive engine account changed');
@@ -114,6 +114,10 @@ assert(sourceById.TEAMSYSTEM_SPORTIVI_IN_CLOUD.trust==='BENCHMARK','TeamSystem m
 assert(sourceById.SCD_SUPABASE.kind==='TARGET_DOMAIN_CORE','SCD Supabase source kind mismatch');
 assert(sourceById.SCD_SUPABASE.state==='ACTIVE_HEALTHY','SCD Supabase project state must be ACTIVE_HEALTHY after R34 provisioning');
 assert((sourceById.SCD_SUPABASE.rules||[]).includes('cepa_project_must_not_be_reused'),'CEPA Supabase isolation rule missing');
+assert(sourceById.SCD_OFFICIAL_SITE.news_policy==='DISABLED_FOR_NEWS_UNTIL_FRESHNESS_VERIFIED','stale official site must stay disabled for app news');
+assert(!(sourceById.SCD_OFFICIAL_SITE.authority_domains||[]).includes('PUBLIC_NEWS'),'official site must not remain news authority while stale');
+assert(sourceById.SCD_AI_WEEKLY_EDITORIAL.trust==='DERIVED_VERIFIED','AI weekly editorial must be derived verified');
+assert((sourceById.SCD_AI_WEEKLY_EDITORIAL.rules||[]).includes('must_include_evidence'),'AI weekly editorial evidence rule missing');
 
 assert(m.drive_vault.dedup_by_hash===true,'Drive dedup by hash required');
 assert(m.drive_vault.versioning_required===true,'Drive versioning required');
@@ -134,6 +138,12 @@ assert(m.product_direction?.cumulative_integration_rule===true,'cumulative integ
 assert(m.product_direction?.human_centered_os?.mental_state_inference===false,'mental state inference must remain false');
 assert(m.product_direction?.human_centered_os?.dark_patterns===false,'dark patterns must remain false');
 assert(m.development_contract?.human_centered_rules?.pleasant_work_is_product_requirement===true,'pleasant work requirement missing');
+assert(m.product_direction?.weekly_sport_calendar?.scope==='ALL_AGE_GROUPS_ALL_SPORTING_ACTIVITY_CURRENT_WEEK','R40 weekly calendar scope mismatch');
+assert(m.product_direction?.weekly_sport_calendar?.no_hidden_default_slice===true,'R40 weekly calendar must show all by default');
+assert(m.product_direction?.ai_newsroom?.policy==='VERIFIED_STRUCTURED_FACTS_ONLY','R40 newsroom policy mismatch');
+assert(m.product_direction?.ai_newsroom?.stale_site_content===false,'R40 newsroom must exclude stale site content');
+assert(m.product_direction?.ai_newsroom?.fail_closed===true,'R40 newsroom must fail closed');
+assert(m.development_contract?.weekly_newsroom?.runtime_endpoint==='/api/newsroom','R40 newsroom endpoint mismatch');
 assert(m.manifest.change_policy?.cumulative_directives===true,'cumulative directive governance missing');
 includesAll(m.completeness_engine.search_order||[],['DOMAIN_CORE','SCD_DRIVE','SCD_GMAIL_ATTACHMENTS'],'Completeness search order');
 
@@ -217,7 +227,7 @@ includesAll(caps.map(x=>x.id),[
   'CAP-HOME','CAP-CALENDAR','CAP-ATHLETE','CAP-FAMILY','CAP-STAFF','CAP-COMMS','CAP-RUNTIME-EVIDENCE','CAP-UPSTREAM-RESILIENCE','CAP-R20-RUNTIME-ACTIVATION',
   'CAP-DRIVE-CATALOG','CAP-GMAIL-INGESTION','CAP-DATAFABRIC-OBSERVABILITY','CAP-ENTITY-GRAPH','CAP-COMPLETENESS','CAP-SUPABASE-CORE','CAP-SUPABASE-AUTH-CONTEXT',
   'CAP-CHAT','CAP-CONFIDENCE','CAP-ANCONFIDENCE','CAP-SAFEGUARDING','CAP-SKY','CAP-AVATAR',
-  'CAP-TAMAGOTCHI','CAP-GEO','CAP-R22','CAP-PWA','CAP-ANDROID','CAP-IOS','CAP-MOBILE-SUPABASE-SHELL','CAP-SCD-UNIVERSE','CAP-META-ADAPTIVE','CAP-SCD-TWIN','CAP-SCD-MIRROR','CAP-SOCIAL-RADAR','CAP-HUMAN-OS','CAP-PRIVATE-DESK','CAP-COGNITIVE-ERGONOMICS','CAP-GROWTH-LOOP'
+  'CAP-TAMAGOTCHI','CAP-GEO','CAP-R22','CAP-PWA','CAP-ANDROID','CAP-IOS','CAP-MOBILE-SUPABASE-SHELL','CAP-SCD-UNIVERSE','CAP-META-ADAPTIVE','CAP-SCD-TWIN','CAP-SCD-MIRROR','CAP-SOCIAL-RADAR','CAP-HUMAN-OS','CAP-PRIVATE-DESK','CAP-COGNITIVE-ERGONOMICS','CAP-GROWTH-LOOP','CAP-WEEKLY-SPORT-CALENDAR','CAP-AI-NEWSROOM'
 ],'capability map');
 
 const gaps=m.known_noncompliance||[];
@@ -246,6 +256,11 @@ const requiredRepoFiles=[
   'docs/SCD_UNIVERSE_R38.md',
   'docs/SCD_HUMAN_OS_R39.md',
   'docs/adr/ADR-0011-human-centered-cognitive-os.md',
+  'docs/adr/ADR-0012-r40-weekly-sport-ai-newsroom.md',
+  'docs/SCD_NEWSROOM_R40.md',
+  'content/weekly-news.json',
+  'ui-r40-weekly.css',
+  'scripts/validate-newsroom-contract.mjs',
   'ui-r39-human.css',
   'scd-experience-engine.js',
   'scripts/validate-human-os-contract.mjs',
@@ -286,6 +301,7 @@ assert(pkg?.scripts?.['test:supabase-contract']==='node scripts/validate-supabas
 assert(pkg?.scripts?.['test:mobile-contract']==='node scripts/validate-mobile-contract.mjs','package.json must expose test:mobile-contract');
 assert(pkg?.scripts?.['test:universe-contract']==='node scripts/validate-universe-contract.mjs','package.json must expose test:universe-contract');
 assert(pkg?.scripts?.['test:human-os-contract']==='node scripts/validate-human-os-contract.mjs','package.json must expose test:human-os-contract');
+assert(pkg?.scripts?.['test:newsroom-contract']==='node scripts/validate-newsroom-contract.mjs','package.json must expose test:newsroom-contract');
 
 for(const workflow of ['.github/workflows/e2e.yml','.github/workflows/pages.yml','.github/workflows/command-platform.yml','.github/workflows/system-manifest.yml']){
   const file=path.join(root,workflow);
