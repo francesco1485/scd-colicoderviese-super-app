@@ -670,34 +670,38 @@
   </main>
 </section>
 
-<aside id="aiDock" class="ai-dock hidden">
-  <button id="aiDockToggle" class="ai-dock-toggle" type="button">
-    <img src="./assistant_avatar.webp" alt="Assistente AI Maglia 360">
-    <span><strong>Lia · Assistente AI</strong><small>Lario · Valtellina · Maglia 360</small></span>
-    <b class="online-dot"></b>
-  </button>
-  <div id="aiDockPanel" class="ai-dock-panel hidden">
-    <div class="ai-profile">
-      <img src="./assistant_avatar.webp" alt="">
-      <div><div class="eyebrow">ASSISTENTE TERRITORIALE</div><h3>Lia</h3><p>Leggo i dati presenti nella piattaforma e ti aiuto a orientarti tra compagnie, prodotti, CEPA, attività e bozze email.</p></div>
+<aside id="aiDock" class="ai-dock hidden" aria-label="Lia assistente">
+  <div id="aiDockPanel" class="ai-dock-panel hidden" role="dialog" aria-label="Lia">
+    <div class="lia-panel-head">
+      <div class="lia-panel-title">
+        <span class="lia-mark">L</span>
+        <div><strong>Lia</strong><small>Assistente generale e operativo</small></div>
+      </div>
+      <button id="aiDockClose" class="lia-close" type="button" aria-label="Chiudi Lia">×</button>
+    </div>
+    <div class="lia-context-note">
+      <strong id="liaContextLabel">Contesto: MAGLIA 360</strong>
+      <span>Puoi chiedere anche argomenti esterni al gestionale. Il contesto serve ad aiutarti, non a limitarti.</span>
     </div>
     <div id="aiMessages" class="ai-messages">
-      <div class="ai-message bot">Sono collegata ai dati Maglia 360. Posso indicarti cosa è aperto, cosa manca e dove entrare. Le informazioni non verificate restano tali.</div>
+      <div class="ai-message bot">Sono disponibile quando ti servo. Posso aiutarti sul lavoro in MAGLIA 360 oppure su domande, analisi, testi, ricerca, normativa, formazione e idee più generali.</div>
     </div>
     <div class="ai-quick">
-      <button type="button" data-ai-prompt="Cosa devo fare oggi?">Oggi</button>
-      <button type="button" data-ai-prompt="Preparami un incontro con un cliente">Prepara incontro</button>
-      <button type="button" data-ai-prompt="Analizza un collaboratore">Collaboratore</button>
-      <button type="button" data-ai-prompt="Trova opportunità di rete">Opportunità</button>
-      <button type="button" data-ai-prompt="Preparami una email">Email</button>
-      <button type="button" data-ai-prompt="A che punto è CEPA?">CEPA</button>
+      <button type="button" data-ai-prompt="Cosa devo fare oggi nel contesto in cui mi trovo?">Priorità</button>
+      <button type="button" data-ai-prompt="Aiutami ad analizzare il problema che ti descriverò">Analizza</button>
+      <button type="button" data-ai-prompt="Preparami una bozza professionale">Scrivi</button>
+      <button type="button" data-ai-prompt="Fammi una ricerca ragionata sull'argomento che ti indicherò">Ricerca</button>
     </div>
     <form id="aiChatForm" class="ai-chat-form">
-      <input id="aiChatInput" placeholder="Chiedi di partner, prodotti, CEPA, lavoro..." autocomplete="off">
-      <button type="submit">→</button>
+      <textarea id="aiChatInput" rows="2" placeholder="Chiedi a Lia qualsiasi cosa..." autocomplete="off"></textarea>
+      <button type="submit" aria-label="Invia">→</button>
     </form>
-    <p class="ai-disclaimer">Assistente operativo AI-ready. Le decisioni e le comunicazioni finali restano sotto controllo umano.</p>
+    <p class="ai-disclaimer">Le azioni operative seguono ruolo, permessi e approvazioni. Le risposte generali sono separate dai dati interni.</p>
   </div>
+  <button id="aiDockToggle" class="ai-dock-toggle" type="button" aria-label="Apri Lia" title="Apri Lia">
+    <span class="lia-floating-mark">L</span>
+    <span class="lia-floating-label">Lia</span>
+  </button>
 </aside>
 
 <section id="blockedView" class="blocked hidden">
