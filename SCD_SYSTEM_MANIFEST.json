@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.2.0",
+    "version": "3.3.0",
     "effective_at": "2026-09-30",
     "status": "BINDING",
     "language": "it-IT",
@@ -1991,7 +1991,7 @@
       "sources": [
         "SCD_SUPABASE"
       ],
-      "contract": "EXPO_LOGIN_SESSION_SCD_MY_CONTEXT_NO_SERVICE_ROLE"
+      "contract": "PUBLIC_REAL_DATA_DASHBOARD_PLUS_SUPABASE_AUTH_CONTEXT"
     },
     {
       "id": "CAP-SCD-UNIVERSE",
@@ -2119,6 +2119,17 @@
         "SCD_AI_WEEKLY_EDITORIAL"
       ],
       "contract": "WEEKLY_GROUNDED_EDITORIAL_NO_STALE_SITE"
+    },
+    {
+      "id": "CAP-MOBILE-PUBLIC-DASHBOARD",
+      "domain": "MOBILE",
+      "required": true,
+      "state": "PARTIAL",
+      "sources": [
+        "R20",
+        "SCD_SUPABASE"
+      ],
+      "contract": "IMMUTABLE_TYPES_PUBLIC_FEED_WEEKLY_NEWSROOM_NO_HARDCODED_FIXTURES"
     }
   ],
   "known_noncompliance": [
@@ -2357,7 +2368,7 @@
     "visual_principle": "SPATIAL_SPORT_EDITORIAL_HIGH_IMPACT",
     "legacy_home_route": "#/home",
     "no_rewrite_rule": false,
-    "release": "R40",
+    "release": "R41",
     "product_name": "SCD UNIVERSE",
     "audience_fit": [
       "YOUTH",
@@ -2503,6 +2514,24 @@
         "INVENTED_RESULTS",
         "INVENTED_STANDINGS",
         "INVENTED_QUOTES"
+      ]
+    },
+    "mobile_dashboard": {
+      "state": "IMPLEMENTED_BRANCH",
+      "source_model": "IMMUTABLE_TYPED_REAL_DATA",
+      "public_endpoints": [
+        "/api/public",
+        "/api/newsroom"
+      ],
+      "stale_site_content": false,
+      "hardcoded_match_fixture": false,
+      "components": [
+        "HERO",
+        "NEXT_MATCH",
+        "SCD_TWIN",
+        "WEEK_ALL_AGE_GROUPS",
+        "AI_NEWSROOM",
+        "RESERVED_ACCESS"
       ]
     }
   }
