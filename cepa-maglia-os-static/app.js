@@ -23,7 +23,7 @@ const viewMeta={
  liaWorkbench:['Lia · Workbench','Assistente operativo con permessi, ricerca, cartelle di lavoro e artefatti tracciati']
 }
 
-let ecosystem=[],projects=[],actions=[],marketHubs=[],marketEntities=[],contacts=[],timeline=[],documents=[],partnerRequirements=[],blueprints=[],subjects=[],initiatives=[],cepaContent=[],cepaAcademy=[],cepaSpeakers=[],products=[],productKnowledge=[],comparisons=[],collaborators=[],collaboratorTerms=[],portfolioSnapshots=[],businessAssessments=[],growthKits=[],distributionWatchlists=[],distributionCandidates=[],distributionEvidence=[],mailTemplates=[],mailDrafts=[],cepaExpansion=[],cepaReadiness=[],assistantMessages=[],recoveryRows=[],members=[],liaCapabilities=[],liaFolders=[],liaOrders=[],liaFiles=[],researchSources=[],researchInsights=[]
+let ecosystem=[],projects=[],actions=[],marketHubs=[],marketEntities=[],contacts=[],timeline=[],documents=[],partnerRequirements=[],blueprints=[],subjects=[],initiatives=[],cepaContent=[],cepaAcademy=[],cepaSpeakers=[],products=[],productKnowledge=[],comparisons=[],collaborators=[],collaboratorTerms=[],portfolioSnapshots=[],businessAssessments=[],growthKits=[],distributionWatchlists=[],distributionCandidates=[],distributionEvidence=[],mailTemplates=[],mailDrafts=[],cepaExpansion=[],cepaReadiness=[],assistantMessages=[],recoveryRows=[],members=[],liaCapabilities=[],liaFolders=[],liaOrders=[],liaFiles=[],researchSources=[],researchInsights=[],liaActionRules=[],liaApprovals=[]
 let currentPartnerId=null
 
 function msg(text,error=false){$('loginMsg').textContent=text;$('loginMsg').className='message'+(error?' error':'')}
@@ -254,12 +254,14 @@ async function loadAll(){
     supabase.from('ai_work_orders').select('*').eq('organization_id',window.orgId).order('created_at',{ascending:false}).limit(60),
     supabase.from('ai_work_order_files').select('*').eq('organization_id',window.orgId).order('created_at',{ascending:false}).limit(120),
     supabase.from('research_sources').select('*').eq('organization_id',window.orgId).eq('active',true).order('trust_level').order('name'),
-    supabase.from('research_insights').select('*,research_sources(id,name,url)').eq('organization_id',window.orgId).order('updated_at',{ascending:false}).limit(100)
+    supabase.from('research_insights').select('*,research_sources(id,name,url)').eq('organization_id',window.orgId).order('updated_at',{ascending:false}).limit(100),
+    supabase.from('ai_action_catalog').select('*').eq('organization_id',window.orgId).eq('active',true).order('risk_level').order('code'),
+    supabase.from('ai_action_approvals').select('*').eq('organization_id',window.orgId).order('created_at',{ascending:false}).limit(100)
   ]
   const res=await Promise.all(q)
   const err=res.find(x=>x.error)?.error
   if(err){console.error(err);$('refreshBtn').textContent='!';return}
-  ;[ecosystem,projects,actions,marketHubs,marketEntities,contacts,timeline,documents,partnerRequirements,blueprints,subjects,initiatives,cepaContent,cepaAcademy,cepaSpeakers,products,productKnowledge,comparisons,collaborators,collaboratorTerms,portfolioSnapshots,businessAssessments,growthKits,distributionWatchlists,distributionCandidates,distributionEvidence,mailTemplates,mailDrafts,cepaExpansion,cepaReadiness,assistantMessages,liaCapabilities,liaFolders,liaOrders,liaFiles,researchSources,researchInsights]=res.map(x=>x.data||[])
+  ;[ecosystem,projects,actions,marketHubs,marketEntities,contacts,timeline,documents,partnerRequirements,blueprints,subjects,initiatives,cepaContent,cepaAcademy,cepaSpeakers,products,productKnowledge,comparisons,collaborators,collaboratorTerms,portfolioSnapshots,businessAssessments,growthKits,distributionWatchlists,distributionCandidates,distributionEvidence,mailTemplates,mailDrafts,cepaExpansion,cepaReadiness,assistantMessages,liaCapabilities,liaFolders,liaOrders,liaFiles,researchSources,researchInsights,liaActionRules,liaApprovals]=res.map(x=>x.data||[])
   renderEverything()
   $('refreshBtn').textContent='↻'
 }
@@ -777,6 +779,21 @@ function renderComparisons(){
   }).join('')||empty('Nessun gruppo di confronto')
 }
 
+async function decideLiaApproval(id,status){
+  if(!isManager())return alert('Decisione non autorizzata per questo ruolo.')
+  const row=liaApprovals.find(x=>x.id===id)
+  if(!row||row.status!=='pending')return
+  const note=status==='approved'
+    ? 'Approvazione amministrativa registrata. L’esecuzione esterna resta separata finché il relativo connettore non è attivo.'
+    : 'Richiesta rifiutata dall’amministratore.'
+  const{error}=await supabase.from('ai_action_approvals').update({
+    status,approved_by:window.userId,decision_note:note,
+    decided_at:new Date().toISOString(),updated_at:new Date().toISOString()
+  }).eq('id',id).eq('organization_id',window.orgId).eq('status','pending')
+  if(error)return alert(error.message)
+  await loadAll()
+}
+
 function renderLiaWorkbench(){
   if(!$('liaCapabilityList'))return
   const levelLabel={admin:'Amministrazione ed esecuzione',execute:'Esecuzione autorizzata',prepare:'Preparazione e proposta',support:'Supporto al ruolo'}
@@ -806,6 +823,23 @@ function renderLiaWorkbench(){
   $('liaInsightList').innerHTML=researchInsights.map(i=>
     '<article class="lia-insight-card"><div class="lia-insight-top"><div><strong>'+esc(i.title)+'</strong><small>'+esc(i.category.replaceAll('_',' '))+(i.research_sources?.name?' · '+esc(i.research_sources.name):'')+'</small></div><span class="insight-confidence '+esc(i.confidence)+'">'+esc(i.confidence)+'</span></div><p>'+esc(i.insight_summary)+'</p><div class="lia-application"><b>Applicazione Maglia 360</b><span>'+esc(i.application_hypothesis||'Da definire')+'</span></div></article>'
   ).join('')||empty('Nessun insight metodologico registrato')
+
+  const policyLabel={auto:'Esegue',prepare:'Prepara',approval_required:'Approva prima',blocked:'Bloccato'}
+  $('liaActionRuleCount').textContent=liaActionRules.length+' regole'
+  $('liaActionCatalog').innerHTML=liaActionRules.map(r=>
+    '<div class="lia-policy-row"><div><strong>'+esc(r.title)+'</strong><small>'+esc(r.capability)+' · rischio '+esc(r.risk_level)+'</small></div><span class="lia-policy '+esc(r.execution_policy)+'">'+esc(policyLabel[r.execution_policy]||r.execution_policy)+'</span></div>'
+  ).join('')||empty('Nessuna regola di autonomia')
+
+  const pending=liaApprovals.filter(a=>a.status==='pending').length
+  $('liaApprovalCount').textContent=pending+' in attesa'
+  $('liaApprovalList').innerHTML=liaApprovals.map(a=>{
+    const rule=liaActionRules.find(r=>r.code===a.action_code)
+    const canDecide=isManager()&&a.status==='pending'
+    const actions=canDecide?'<div class="lia-approval-actions"><button type="button" data-lia-approve="'+a.id+'">Approva</button><button type="button" data-lia-reject="'+a.id+'">Rifiuta</button></div>':''
+    return '<div class="lia-work-row approval"><div><strong>'+esc(rule?.title||a.action_code)+'</strong><small>'+esc(a.status)+' · '+esc(fmtDateTime(a.created_at))+'</small>'+actions+'</div><span class="lia-approval-status '+esc(a.status)+'">'+esc(a.status)+'</span></div>'
+  }).join('')||empty('Nessuna richiesta di approvazione')
+  document.querySelectorAll('[data-lia-approve]').forEach(b=>b.onclick=()=>decideLiaApproval(b.dataset.liaApprove,'approved'))
+  document.querySelectorAll('[data-lia-reject]').forEach(b=>b.onclick=()=>decideLiaApproval(b.dataset.liaReject,'rejected'))
 }
 
 function renderMail(){
@@ -886,7 +920,7 @@ async function persistAssistantMessage(content,sender,intent=null,context={}){
   if(!error)assistantMessages.push({...row,created_at:new Date().toISOString()})
 }
 async function runLiaWorkbench(q){
-  const actionable=/\b(crea|creare|cartella|sottocartella|mapping|mappa|ricerca|ricercare|azienda|aziende|attivita|attività|scadenza|promemoria|progetto|locandina|brochure|contratto|documento|allega|allegato)\b/i.test(q)
+  const actionable=/\b(crea|creare|cartella|sottocartella|mapping|mappa|ricerca|ricercare|azienda|aziende|attivita|attività|scadenza|promemoria|progetto|locandina|brochure|contratto|documento|allega|allegato|invia|manda|spedisci|pubblica|posta|condividi|cancella|elimina|rimuovi|contatta|accedi|entra|usa)\b/i.test(q)
   if(!actionable||!window.orgId)return null
   try{
     const{data,error}=await supabase.functions.invoke('lia-workbench',{body:{organization_id:window.orgId,command:q}})
