@@ -26,7 +26,7 @@ const viewMeta={
 
 let ecosystem=[],projects=[],actions=[],marketHubs=[],marketEntities=[],contacts=[],timeline=[],documents=[],partnerRequirements=[],blueprints=[],subjects=[],initiatives=[],cepaContent=[],cepaAcademy=[],cepaSpeakers=[],products=[],productKnowledge=[],comparisons=[],collaborators=[],collaboratorTerms=[],portfolioSnapshots=[],businessAssessments=[],growthKits=[],distributionWatchlists=[],distributionCandidates=[],distributionEvidence=[],mailTemplates=[],mailDrafts=[],cepaExpansion=[],cepaReadiness=[],assistantMessages=[],recoveryRows=[],members=[],liaCapabilities=[],liaFolders=[],liaOrders=[],liaFiles=[],researchSources=[],researchInsights=[],liaActionRules=[],liaApprovals=[],roleViewAccess=[],liaAutomationRuns=[]
 let officeAssignments=[],officeMessages=[],officeSnapshots=[],officeCases=[],officeWorkflow=[],officeCepaActivities=[],officeImports=[]
-let commercialClients=[],pipelineCases=[],clientCheckups=[],clientInteractions=[],clientWorkItems=[]
+let commercialClients=[],pipelineCases=[],clientCheckups=[],clientInteractions=[],clientWorkItems=[],clientPolicies=[]
 let currentPartnerId=null,currentOfficeId=null,currentOfficeProductId=null,currentCepaHubId=null,currentCommerceTab='clients'
 
 function msg(text,error=false){$('loginMsg').textContent=text;$('loginMsg').className='message'+(error?' error':'')}
@@ -137,6 +137,7 @@ function globalSearchItems(query){
   marketEntities.forEach(x=>{if(has(x.name,x.city,x.entity_type))out.push({kind:'entity',id:x.id,label:x.name,meta:(x.city||'')+' · '+entityType(x.entity_type)})})
   cepaContent.forEach(x=>{if(has(x.title,x.asset_type))out.push({kind:'cepa',id:x.id,label:x.title,meta:'C.E.P.A. · contenuto'})})
   commercialClients.forEach(x=>{const name=clientDisplayName(x);if(has(name,x.city,x.province,x.email,x.mobile,x.metadata?.producer,x.metadata?.producer_code))out.push({kind:'client',id:x.id,label:name,meta:'Cliente 360 · '+(x.city||x.status||'')})})
+  clientPolicies.forEach(p=>{if(has(p.policy_number,p.branch_name,p.product_name,p.company_name,p.producer_name,p.producer_code))out.push({kind:'policy',id:p.client_id,label:p.policy_number||p.product_name||'Polizza',meta:'Polizza · '+[p.company_name,p.branch_name].filter(Boolean).join(' · ')})})
   if(has('cliente 360 clienti portafoglio motore portafoglio pipeline commerciale'))out.unshift({kind:'commerce',id:'clients',label:'Cliente 360',meta:'Clienti, portafoglio e pipeline commerciale'})
   if(has('cepa centro educazione previdenziale assicurativa'))out.unshift({kind:'cepa',id:'cepa',label:'C.E.P.A.',meta:'Centro Educazione Previdenziale e Assicurativa'})
   return out.slice(0,12)
@@ -168,6 +169,7 @@ function openGlobalSearchItem(item){
   else if(item.kind==='document')navigate('documents')
   else if(item.kind==='collaborator')navigate('collaborators')
   else if(item.kind==='client'){openCommerceTab('clients');openClient360(item.id)}
+  else if(item.kind==='policy'){openCommerceTab('clients');openClient360(item.id)}
   else if(item.kind==='commerce')openCommerceTab(item.id||'clients')
   else if(item.kind==='entity')navigate('development')
   else if(item.kind==='cepa')openCepaHub()
@@ -530,12 +532,13 @@ async function loadAll(){
     supabase.from('pipeline_cases').select('*,clients(id,kind,status,first_name,last_name,business_name,email,mobile,city,province,next_action,next_action_at,metadata)').eq('organization_id',window.orgId).order('updated_at',{ascending:false}).limit(2000),
     supabase.from('checkups').select('*').eq('organization_id',window.orgId).order('updated_at',{ascending:false}).limit(1000),
     supabase.from('client_interactions').select('*').eq('organization_id',window.orgId).order('occurred_at',{ascending:false}).limit(2000),
-    supabase.from('work_items').select('*').eq('organization_id',window.orgId).order('updated_at',{ascending:false}).limit(2000)
+    supabase.from('work_items').select('*').eq('organization_id',window.orgId).order('updated_at',{ascending:false}).limit(2000),
+    supabase.from('client_policies').select('*,clients(id,kind,status,first_name,last_name,business_name,city,province),agency_products(id,code,name,category)').eq('organization_id',window.orgId).order('expiry_date',{ascending:true}).limit(10000)
   ]
   const res=await Promise.all(q)
   const err=res.find(x=>x.error)?.error
   if(err){console.error(err);$('refreshBtn').textContent='!';return}
-  ;[ecosystem,projects,actions,marketHubs,marketEntities,contacts,timeline,documents,partnerRequirements,blueprints,subjects,initiatives,cepaContent,cepaAcademy,cepaSpeakers,products,productKnowledge,comparisons,collaborators,collaboratorTerms,portfolioSnapshots,businessAssessments,growthKits,distributionWatchlists,distributionCandidates,distributionEvidence,mailTemplates,mailDrafts,cepaExpansion,cepaReadiness,assistantMessages,liaCapabilities,liaFolders,liaOrders,liaFiles,researchSources,researchInsights,liaActionRules,liaApprovals,roleViewAccess,liaAutomationRuns,officeAssignments,officeMessages,officeSnapshots,officeCases,officeWorkflow,officeCepaActivities,officeImports,commercialClients,pipelineCases,clientCheckups,clientInteractions,clientWorkItems]=res.map(x=>x.data||[])
+  ;[ecosystem,projects,actions,marketHubs,marketEntities,contacts,timeline,documents,partnerRequirements,blueprints,subjects,initiatives,cepaContent,cepaAcademy,cepaSpeakers,products,productKnowledge,comparisons,collaborators,collaboratorTerms,portfolioSnapshots,businessAssessments,growthKits,distributionWatchlists,distributionCandidates,distributionEvidence,mailTemplates,mailDrafts,cepaExpansion,cepaReadiness,assistantMessages,liaCapabilities,liaFolders,liaOrders,liaFiles,researchSources,researchInsights,liaActionRules,liaApprovals,roleViewAccess,liaAutomationRuns,officeAssignments,officeMessages,officeSnapshots,officeCases,officeWorkflow,officeCepaActivities,officeImports,commercialClients,pipelineCases,clientCheckups,clientInteractions,clientWorkItems,clientPolicies]=res.map(x=>x.data||[])
   renderEverything()
   $('refreshBtn').textContent='↻'
 }
@@ -561,6 +564,7 @@ function renderOperatingPlan(){
     commercialClients.length>0,
     pipelineCases.length>0,
     portfolioSnapshots.length>0,
+    clientPolicies.length>0,
     researchSources.length>0
   ]
   const health=Math.round(checks.filter(Boolean).length/checks.length*100)
@@ -602,6 +606,7 @@ function renderOperatingPlan(){
     ['Cliente 360',commercialClients.length,commercialClients.length?'Perimetro cliente caricato':'Da importare'],
     ['Portafoglio produttori',portfolioSnapshots.length,portfolioSnapshots.length?'Snapshot rete disponibili':'Da importare'],
     ['Pipeline commerciale',pipelineCases.length,pipelineCases.length?'Casi commerciali presenti':'Da attivare'],
+    ['Polizze individuali',clientPolicies.length,clientPolicies.length?'Policy Ledger attivo':'Da importare da AssiEasy'],
     ['Snapshot AssiEasy sede/prodotto',officeSnapshots.length,officeSnapshots.length?'Disponibili':'Da importare'],
     ['Workflow pratiche',officeWorkflow.length,officeWorkflow.length?'Configurato':'Da completare'],
     ['Documenti',documents.length,documents.length?'Archivio attivo':'Da popolare'],
@@ -632,8 +637,8 @@ function renderOperatingPlan(){
     const openPipeline=pipelineCases.filter(x=>!['won','lost','closed'].includes(x.stage)).length
     const portfolioClients=portfolioSnapshots.reduce((n,x)=>n+Number(x.clients_count||0),0)
     $('planDeliveryGrid').innerHTML=[
-      ['clients','Cliente 360',commercialClients.length+' accessibili','Identità, contatti, produttore, portafoglio disponibile, pipeline, check-up e prossime azioni.'],
-      ['portfolio','Motore Portafoglio',portfolioClients+' clienti negli snapshot','Profondità, polizze/cliente, premi, mix e gap dati senza inventare coperture mancanti.'],
+      ['clients','Cliente 360',commercialClients.length+' accessibili · '+clientPolicies.length+' polizze','Identità, contatti, produttore, polizze, pipeline, check-up e prossime azioni nello stesso profilo.'],
+      ['portfolio','Motore Portafoglio',portfolioClients+' clienti negli snapshot · '+clientPolicies.length+' polizze individuali','Profondità, polizze/cliente, premi, mix, rinnovi e gap dati senza inventare coperture mancanti.'],
       ['pipeline','Pipeline Commerciale',openPipeline+' casi aperti','Acquisizione, sviluppo, retention e recovery con stadi ed esiti nello stesso motore.']
     ].map(x=>'<button type="button" class="plan-delivery-card" data-commerce-open="'+x[0]+'"><span>'+x[1]+'</span><strong>'+esc(x[2])+'</strong><p>'+esc(x[3])+'</p><b>Apri →</b></button>').join('')
     document.querySelectorAll('[data-commerce-open]').forEach(b=>b.onclick=()=>openCommerceTab(b.dataset.commerceOpen))
@@ -650,6 +655,7 @@ function renderOperatingPlan(){
   if(!commercialClients.length)focus={title:'Attivare Cliente 360',text:'Importa e collega i clienti reali prima di costruire automazioni commerciali sul portafoglio.',target:'products'}
   else if(!portfolioSnapshots.length)focus={title:'Consolidare il Motore Portafoglio',text:'Servono snapshot verificabili per produttore prima di calcolare profondità e sviluppo rete.',target:'products'}
   else if(!pipelineCases.length)focus={title:'Attivare la Pipeline Commerciale',text:'Collega clienti e opportunità a stadi operativi con responsabilità ed esito.',target:'products'}
+  else if(!clientPolicies.length)focus={title:'Importare le polizze individuali',text:'Cliente 360 è pronto: ora serve il dettaglio reale delle polizze AssiEasy per rinnovi, mono-ramo e cross-selling.',target:'products'}
   else if(!officeSnapshots.length)focus={title:'Standardizzare i dati mensili',text:'Il prossimo salto arriva dagli snapshot AssiEasy coerenti per Colico e Mandello.',target:'products'}
   else if(!marketEntities.length)focus={title:'Avviare il mapping territoriale',text:'Costruisci una base qualificata di aziende, professionisti, enti e opportunità per comune.',target:'development'}
   else if(!researchSources.length)focus={title:'Attivare la base R&S',text:'Registra fonti ufficiali e di mercato così Lia può alimentare il progetto con ricerca tracciata.',target:'liaWorkbench'}
@@ -1694,6 +1700,10 @@ function pipelineLabel(v){return({acquisition:'Acquisizione',development:'Svilup
 function pipelineStageLabel(v){return({selected:'Selezionato',assigned:'Assegnato',contacted:'Contattato',appointment:'Appuntamento',checkup:'Check-up',proposal:'Proposta',won:'Acquisito',lost:'Perso',closed:'Chiuso'})[v]||v}
 function currency(v){return v==null||v===''?'—':'€ '+Number(v).toLocaleString('it-IT',{maximumFractionDigits:0})}
 function clientPipelineRows(clientId){return pipelineCases.filter(x=>x.client_id===clientId)}
+function clientPolicyRows(clientId){return clientPolicies.filter(x=>x.client_id===clientId)}
+function policyStatusLabel(v){return({active:'Attiva',expiring:'In scadenza',expired:'Scaduta',cancelled:'Annullata',suspended:'Sospesa',unknown:'Da verificare'})[v]||v}
+function policyIsOpen(p){return['active','expiring','unknown'].includes(p.policy_status)}
+function daysUntil(v){if(!v)return null;const d=new Date(v+'T12:00:00');return Math.ceil((d-Date.now())/86400000)}
 function openCommerceTab(tab='clients'){
   currentCommerceTab=['clients','portfolio','pipeline','catalog'].includes(tab)?tab:'clients'
   navigate('products')
@@ -1747,11 +1757,15 @@ function renderClient360(){
   $('client360Body').innerHTML=rows.map(c=>{
     const meta=c.metadata||{}
     const cases=clientPipelineRows(c.id)
+    const policies=clientPolicyRows(c.id)
+    const activePolicies=policies.filter(policyIsOpen)
     const active=cases.find(x=>!['won','lost','closed'].includes(x.stage))||cases[0]
     const branches=normalizeMetaList(meta.final_branches)
     const productsMeta=normalizeMetaList(meta.final_products)
-    const depth=Math.max(branches.length,productsMeta.length)
-    return '<tr data-client360="'+c.id+'"><td><strong>'+esc(clientDisplayName(c))+'</strong><small>'+esc(c.kind==='company'?'Azienda':'Persona')+'</small></td><td>'+esc(c.status||'—')+'</td><td>'+esc(c.city||'—')+(c.province?' <small>'+esc(c.province)+'</small>':'')+'</td><td>'+esc(meta.producer||'—')+'</td><td><strong>'+esc(depth||'—')+'</strong><small>'+(branches.length?esc(branches.slice(0,2).join(' · ')):'dettaglio non disponibile')+'</small></td><td>'+esc(active?pipelineStageLabel(active.stage):'Nessuna')+'</td><td>'+esc(c.next_action||'—')+(c.next_action_at?'<small>'+esc(fmtDateTime(c.next_action_at))+'</small>':'')+'</td><td><button type="button" class="small-btn" data-open-client="'+c.id+'">Apri</button></td></tr>'
+    const actualBranches=[...new Set(activePolicies.map(p=>p.branch_name).filter(Boolean))]
+    const depth=activePolicies.length||Math.max(branches.length,productsMeta.length)
+    const depthNote=activePolicies.length?(activePolicies.length+' polizze · '+(actualBranches.length||'—')+' rami'):(branches.length?branches.slice(0,2).join(' · ')+' · segnale fonte':'dettaglio non disponibile')
+    return '<tr data-client360="'+c.id+'"><td><strong>'+esc(clientDisplayName(c))+'</strong><small>'+esc(c.kind==='company'?'Azienda':'Persona')+'</small></td><td>'+esc(c.status||'—')+'</td><td>'+esc(c.city||'—')+(c.province?' <small>'+esc(c.province)+'</small>':'')+'</td><td>'+esc(meta.producer||'—')+'</td><td><strong>'+esc(depth||'—')+'</strong><small>'+esc(depthNote)+'</small></td><td>'+esc(active?pipelineStageLabel(active.stage):'Nessuna')+'</td><td>'+esc(c.next_action||'—')+(c.next_action_at?'<small>'+esc(fmtDateTime(c.next_action_at))+'</small>':'')+'</td><td><button type="button" class="small-btn" data-open-client="'+c.id+'">Apri</button></td></tr>'
   }).join('')||'<tr><td colspan="8"><div class="empty">Nessun cliente corrisponde ai filtri.</div></td></tr>'
   document.querySelectorAll('[data-open-client]').forEach(b=>b.onclick=()=>openClient360(b.dataset.openClient))
 }
@@ -1762,10 +1776,18 @@ function renderPortfolioEngine(){
   const totalPolicies=portfolioSnapshots.reduce((n,x)=>n+Number(x.policies_count||0),0)
   const totalPremium=portfolioSnapshots.reduce((n,x)=>n+Number(x.premium_total||0),0)
   const ratio=totalClients?totalPolicies/totalClients:0
+  const ledgerOpen=clientPolicies.filter(policyIsOpen)
+  const ledgerClients=new Set(ledgerOpen.map(x=>x.client_id)).size
+  const ledgerPremium=ledgerOpen.reduce((n,x)=>n+Number(x.annual_premium||0),0)
+  const renewals90=ledgerOpen.filter(x=>{const d=daysUntil(x.renewal_date||x.expiry_date);return d!=null&&d>=0&&d<=90}).length
   $('portfolioEngineClients').textContent=financial?totalClients:'—'
   $('portfolioEnginePolicies').textContent=financial?totalPolicies:'—'
   $('portfolioEngineRatio').textContent=financial?ratio.toFixed(2):'—'
   $('portfolioEnginePremium').textContent=financial?currency(totalPremium):'Riservato'
+  if($('policyLedgerCount'))$('policyLedgerCount').textContent=clientPolicies.length
+  if($('policyLedgerClients'))$('policyLedgerClients').textContent=ledgerClients
+  if($('policyLedgerRenewals'))$('policyLedgerRenewals').textContent=renewals90
+  if($('policyLedgerPremium'))$('policyLedgerPremium').textContent=financial&&ledgerPremium?currency(ledgerPremium):(ledgerPremium?'Riservato':'—')
   if(!financial){
     $('portfolioEngineGrid').innerHTML='<div class="restricted-panel"><strong>Motore Portafoglio riservato alla Direzione</strong><p>Premi, profondità e snapshot produttori seguono i permessi economici già esistenti. Nessun dato viene duplicato in una vista meno protetta.</p></div>'
     $('portfolioMixSummary').innerHTML=''
@@ -1788,8 +1810,12 @@ function renderPortfolioEngine(){
   $('portfolioMixSummary').innerHTML=mixes.length
     ?mixes.map(([k,v])=>'<div><span>'+esc(k)+'</span><strong>'+Number(v).toLocaleString('it-IT')+'</strong></div>').join('')
     :'<div class="empty">Il mix aggregato non è disponibile in forma numerica negli snapshot correnti.</div>'
-  if($('portfolioDataGap'))$('portfolioDataGap').innerHTML=
-    '<strong>Copertura dati attuale</strong><p>Il motore usa '+portfolioSnapshots.length+' snapshot produttori e '+commercialClients.length+' record cliente accessibili. Le polizze attive a livello singolo cliente e gli snapshot mensili sede/prodotto non sono ancora caricati: il sistema li segnala come gap invece di ricostruirli per supposizione.</p>'
+  if($('portfolioDataGap')){
+    const coverage=commercialClients.length?Math.round(ledgerClients/commercialClients.length*100):0
+    $('portfolioDataGap').innerHTML=clientPolicies.length
+      ?'<strong>Copertura Policy Ledger</strong><p>'+clientPolicies.length+' polizze individuali collegate a '+ledgerClients+' clienti accessibili ('+coverage+'% del perimetro cliente corrente). I dati restanti rimangono esplicitamente da importare.</p>'
+      :'<strong>Copertura dati attuale</strong><p>Il motore usa '+portfolioSnapshots.length+' snapshot produttori e '+commercialClients.length+' record cliente accessibili. Il Policy Ledger individuale è pronto ma vuoto: serve l’export AssiEasy delle polizze per attivare rinnovi, mono-ramo e cross-selling affidabili.</p>'
+  }
 }
 function renderCommercialPipeline(){
   if(!$('pipelineBoard'))return
@@ -1815,6 +1841,7 @@ function openClient360(id){
   const c=commercialClients.find(x=>x.id===id);if(!c)return
   const meta=c.metadata||{}
   const cases=clientPipelineRows(id)
+  const policies=clientPolicyRows(id)
   const checkups=clientCheckups.filter(x=>x.client_id===id)
   const interactions=clientInteractions.filter(x=>x.client_id===id)
   const works=clientWorkItems.filter(x=>x.client_id===id)
@@ -1822,11 +1849,33 @@ function openClient360(id){
   $('modalContent').innerHTML='<div class="eyebrow">CLIENTE 360</div><h2>'+esc(clientDisplayName(c))+'</h2><p class="muted">'+esc(c.status||'—')+' · '+esc(c.city||'Località non indicata')+(c.province?' ('+esc(c.province)+')':'')+'</p>'+
     '<div class="client360-identity"><div><span>Contatto</span><strong>'+esc(c.mobile||c.email||'Non disponibile')+'</strong><small>'+esc([c.email,c.mobile].filter(Boolean).join(' · ')||'Contatti non valorizzati')+'</small></div><div><span>Produttore</span><strong>'+esc(meta.producer||'Non indicato')+'</strong><small>'+esc(meta.producer_code||'')+'</small></div><div><span>Fonte</span><strong>'+esc(c.source||'AssiEasy / import')+'</strong><small>'+esc(meta.source_snapshot_date?fmtDate(meta.source_snapshot_date):'Data snapshot non disponibile')+'</small></div><div><span>Valore indicativo</span><strong>'+currency(meta.final_premium_indicative)+'</strong><small>solo se presente nella fonte importata</small></div></div>'+
     '<div class="client360-detail-grid">'+blockList('Rami',normalizeMetaList(meta.final_branches))+blockList('Prodotti',normalizeMetaList(meta.final_products))+blockList('Compagnie',normalizeMetaList(meta.final_companies))+blockList('Motivazioni / classe',normalizeMetaList(meta.final_reason_class||meta.final_reasons_raw))+'</div>'+
+    '<div class="client-policy-ledger"><div class="modal-section-head"><div><span>POLICY LEDGER</span><h4>Polizze individuali</h4></div>'+(isManager()?'<button type="button" class="primary" id="clientNewPolicyBtn">+ Polizza</button>':'')+'</div>'+
+    (policies.length?policies.map(p=>'<button type="button" class="client-policy-row" data-policy-id="'+p.id+'"><div><strong>'+esc(p.policy_number||p.product_name||'Polizza')+'</strong><small>'+esc([p.company_name,p.branch_name,p.product_name].filter(Boolean).join(' · ')||'Dettaglio da completare')+'</small></div><div><span class="policy-status '+esc(p.policy_status)+'">'+esc(policyStatusLabel(p.policy_status))+'</span><b>'+esc(p.annual_premium!=null?currency(p.annual_premium):'—')+'</b><small>'+(p.renewal_date||p.expiry_date?'Rinnovo/scadenza '+esc(fmtDate(p.renewal_date||p.expiry_date)):'Data non disponibile')+'</small></div></button>').join(''):'<div class="policy-empty"><strong>Nessuna polizza individuale importata.</strong><p>I segnali AssiEasy presenti nel profilo non vengono trasformati in polizze fittizie. Il ledger si popola solo con record reali.</p></div>')+'</div>'+
     '<div class="client360-link-grid"><section><header><strong>Pipeline</strong><span>'+cases.length+'</span></header>'+(cases.length?cases.map(x=>'<button type="button" data-modal-pipeline="'+x.id+'"><b>'+esc(pipelineLabel(x.pipeline))+'</b><small>'+esc(pipelineStageLabel(x.stage))+(x.reason?' · '+esc(x.reason):'')+'</small></button>').join(''):'<p>Nessun caso commerciale.</p>')+'</section><section><header><strong>Check-up</strong><span>'+checkups.length+'</span></header>'+(checkups.length?checkups.map(x=>'<div><b>'+esc(x.checkup_type)+'</b><small>'+esc(x.status)+(x.scheduled_at?' · '+esc(fmtDateTime(x.scheduled_at)):'')+'</small></div>').join(''):'<p>Nessun check-up registrato.</p>')+'</section><section><header><strong>Attività</strong><span>'+works.length+'</span></header>'+(works.length?works.slice(0,6).map(x=>'<div><b>'+esc(x.title)+'</b><small>'+esc(x.status)+(x.due_at?' · '+esc(fmtDateTime(x.due_at)):'')+'</small></div>').join(''):'<p>Nessuna attività cliente.</p>')+'</section><section><header><strong>Interazioni</strong><span>'+interactions.length+'</span></header>'+(interactions.length?interactions.slice(0,6).map(x=>'<div><b>'+esc(x.channel)+' · '+esc(x.outcome)+'</b><small>'+esc(fmtDateTime(x.occurred_at))+'</small></div>').join(''):'<p>Nessuna interazione registrata.</p>')+'</section></div>'+
     '<div class="modal-section"><div class="modal-section-head"><h4>Prossimo passo</h4><button type="button" class="primary" id="clientNewPipelineBtn">+ Opportunità</button></div><p>'+esc(c.next_action||'Nessuna prossima azione registrata.')+(c.next_action_at?' · '+esc(fmtDateTime(c.next_action_at)):'')+'</p></div>'
   $('modal').classList.remove('hidden')
   document.querySelectorAll('[data-modal-pipeline]').forEach(b=>b.onclick=()=>openPipelineCase(b.dataset.modalPipeline))
+  document.querySelectorAll('[data-policy-id]').forEach(b=>b.onclick=()=>openPolicyEditor(id,b.dataset.policyId))
+  if($('clientNewPolicyBtn'))$('clientNewPolicyBtn').onclick=()=>openPolicyEditor(id,null)
   $('clientNewPipelineBtn').onclick=()=>openNewPipelineCase(id)
+}
+function openPolicyEditor(clientId,policyId=null){
+  const c=commercialClients.find(x=>x.id===clientId);if(!c)return
+  const p=policyId?clientPolicies.find(x=>x.id===policyId):null
+  const editable=isManager()
+  $('modalContent').innerHTML='<div class="eyebrow">POLICY LEDGER</div><h2>'+esc(p?'Polizza '+(p.policy_number||''):'Nuova polizza')+'</h2><p class="muted">'+esc(clientDisplayName(c))+'</p><form id="policyForm" class="form"><div class="inline"><label>Numero polizza<input id="polNumber" value="'+esc(p?.policy_number||'')+'"></label><label>Stato<select id="polStatus"><option value="active">Attiva</option><option value="expiring">In scadenza</option><option value="expired">Scaduta</option><option value="cancelled">Annullata</option><option value="suspended">Sospesa</option><option value="unknown">Da verificare</option></select></label></div><div class="inline"><label>Ramo<input id="polBranch" value="'+esc(p?.branch_name||'')+'"></label><label>Prodotto<input id="polProductName" value="'+esc(p?.product_name||'')+'"></label></div><div class="inline"><label>Compagnia<input id="polCompany" value="'+esc(p?.company_name||'')+'"></label><label>Premio annuo €<input id="polPremium" type="number" min="0" step="0.01" value="'+esc(p?.annual_premium??'')+'"></label></div><div class="inline"><label>Decorrenza<input id="polStart" type="date" value="'+esc(p?.start_date||'')+'"></label><label>Scadenza<input id="polExpiry" type="date" value="'+esc(p?.expiry_date||'')+'"></label></div><div class="inline"><label>Rinnovo<input id="polRenewal" type="date" value="'+esc(p?.renewal_date||'')+'"></label><label>Produttore<input id="polProducer" value="'+esc(p?.producer_name||c.metadata?.producer||'')+'"></label></div><label>Riferimento fonte<input id="polSource" value="'+esc(p?.source_reference||'')+'" placeholder="Export AssiEasy / riferimento verificabile"></label>'+(editable?'<button type="submit" class="primary">Salva polizza</button>':'<p class="form-note">Polizza in sola lettura per questo profilo.</p>')+'</form>'
+  $('polStatus').value=p?.policy_status||'active'
+  if(!editable)document.querySelectorAll('#policyForm input,#policyForm select').forEach(x=>x.disabled=true)
+  $('modal').classList.remove('hidden')
+  if(editable)$('policyForm').onsubmit=async e=>{
+    e.preventDefault()
+    const row={organization_id:window.orgId,client_id:clientId,policy_number:$('polNumber').value.trim()||null,policy_status:$('polStatus').value,branch_name:$('polBranch').value.trim()||null,product_name:$('polProductName').value.trim()||null,company_name:$('polCompany').value.trim()||null,annual_premium:$('polPremium').value?Number($('polPremium').value):null,start_date:$('polStart').value||null,expiry_date:$('polExpiry').value||null,renewal_date:$('polRenewal').value||null,producer_name:$('polProducer').value.trim()||null,producer_code:c.metadata?.producer_code||p?.producer_code||null,source_system:p?.source_system||'MANUAL',source_reference:$('polSource').value.trim()||null,metadata:{...(p?.metadata||{}),updated_via:'maglia360_policy_editor'},updated_at:new Date().toISOString()}
+    let result
+    if(p)result=await supabase.from('client_policies').update(row).eq('id',p.id).eq('organization_id',window.orgId)
+    else result=await supabase.from('client_policies').insert(row)
+    if(result.error)return alert(result.error.message)
+    await loadAll();openClient360(clientId)
+  }
 }
 function openNewPipelineCase(clientId=null){
   const available=commercialClients
