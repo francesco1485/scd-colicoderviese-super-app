@@ -3712,3 +3712,168 @@ a:focus-visible{
   content:"✦";
   margin-right:5px;
 }
+
+
+/* =========================================================
+   MAGLIA 360 · V6 CLIENTE 360 / PORTAFOGLIO / PIPELINE
+   ========================================================= */
+.plan-delivery-section{background:linear-gradient(135deg,#f8fbfc,#eef7f5)!important}
+.plan-delivery-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.plan-delivery-card{
+  display:grid;grid-template-columns:1fr auto;gap:5px 12px;align-items:start;
+  min-height:132px;padding:17px;border:1px solid #dbe7e9;border-radius:16px;
+  background:rgba(255,255,255,.88);text-align:left;cursor:pointer;
+  box-shadow:0 9px 24px rgba(30,71,88,.05)
+}
+.plan-delivery-card:hover{transform:translateY(-2px);box-shadow:0 14px 28px rgba(30,71,88,.08)}
+.plan-delivery-card span{grid-column:1/-1;color:#63818d;font-size:9px;font-weight:850;letter-spacing:.08em;text-transform:uppercase}
+.plan-delivery-card strong{color:#183f58;font-size:18px}
+.plan-delivery-card p{grid-column:1/-1;margin:4px 0 0;color:#758994;font-size:10px;line-height:1.55}
+.plan-delivery-card b{grid-column:2;grid-row:2;color:#397c72;font-size:10px}
+
+.commerce-workspace{display:grid;gap:14px}
+.commerce-hero{
+  display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,.65fr);gap:18px;align-items:center;
+  padding:24px;border:1px solid #dce7eb;border-radius:20px;
+  background:
+    radial-gradient(circle at 90% 15%,rgba(77,158,152,.13),transparent 30%),
+    linear-gradient(135deg,#fbfdfd,#f0f6f8);
+  box-shadow:0 14px 34px rgba(22,60,81,.06)
+}
+.commerce-hero .eyebrow{color:#4e8d86}
+.commerce-hero h2{margin:4px 0 8px;color:#173f58;font-size:27px;letter-spacing:-.035em}
+.commerce-hero p{max-width:850px;margin:0;color:#6d838f;font-size:12px;line-height:1.6}
+.commerce-hero-note{padding:16px;border:1px solid rgba(77,158,152,.18);border-radius:14px;background:rgba(255,255,255,.72)}
+.commerce-hero-note span{display:block;color:#67928d;font-size:8px;font-weight:850;letter-spacing:.09em}
+.commerce-hero-note strong{display:block;margin-top:7px;color:#244f5f;font-size:12px;line-height:1.55}
+
+.commerce-tabs{
+  display:flex;gap:5px;overflow:auto;padding:5px;border:1px solid #dbe5ea;border-radius:13px;background:#fff;
+  scrollbar-width:thin
+}
+.commerce-tabs button{
+  flex:0 0 auto;min-height:38px;padding:8px 14px;border:0;border-radius:9px;background:transparent;
+  color:#607783;font-size:10px;font-weight:800;cursor:pointer
+}
+.commerce-tabs button:hover{background:#f2f7f8;color:#254b61}
+.commerce-tabs button.active{background:#163f59;color:#fff;box-shadow:0 7px 16px rgba(23,63,89,.14)}
+.commerce-panel{display:grid;gap:13px}
+.commerce-panel-head{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;padding:4px 2px}
+.commerce-panel-head>div>span{color:#5d918a;font-size:8px;font-weight:850;letter-spacing:.1em}
+.commerce-panel-head h3{margin:3px 0;color:#183f58;font-size:19px}
+.commerce-panel-head p{max-width:920px;margin:3px 0 0;color:#758995;font-size:10px;line-height:1.55}
+.commerce-panel-head.split{align-items:center}
+.commerce-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.commerce-kpis>div{
+  padding:14px 15px;border:1px solid #dfe8ec;border-radius:13px;background:#fff;
+  box-shadow:0 7px 20px rgba(29,67,88,.035)
+}
+.commerce-kpis span{display:block;color:#778c97;font-size:8px;font-weight:750;text-transform:uppercase;letter-spacing:.05em}
+.commerce-kpis strong{display:block;margin-top:4px;color:#173f59;font-size:20px;letter-spacing:-.025em}
+.commerce-filters{display:grid!important;grid-template-columns:minmax(220px,1.4fr) minmax(130px,.7fr) minmax(160px,.9fr)!important;gap:7px!important}
+.commerce-filters input,.commerce-filters select,.commerce-pipeline-actions select{
+  min-height:36px;border:1px solid #d7e2e7;border-radius:9px;background:#fff;color:#294d61;font-size:10px
+}
+.commerce-table strong{display:block;color:#21485e;font-size:10px}
+.commerce-table small{display:block;margin-top:2px;color:#8798a1;font-size:8px;line-height:1.35}
+
+.client360-identity{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:15px 0}
+.client360-identity>div{padding:13px;border:1px solid #dfe8ec;border-radius:12px;background:#f9fbfc}
+.client360-identity span,.client360-detail-block>span{display:block;color:#7c919b;font-size:8px;font-weight:800;text-transform:uppercase}
+.client360-identity strong{display:block;margin-top:4px;color:#193f57;font-size:12px}
+.client360-identity small{display:block;margin-top:3px;color:#8999a2;font-size:8px}
+.client360-detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.client360-detail-block{padding:14px;border:1px solid #e1e8eb;border-radius:12px;background:#fff}
+.client360-detail-block>div{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.client360-detail-block b{padding:5px 8px;border-radius:999px;background:#edf5f4;color:#376d68;font-size:8px}
+.client360-detail-block small{display:block;margin-top:7px;color:#8799a1;font-size:9px}
+.client360-link-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:10px}
+.client360-link-grid section{padding:14px;border:1px solid #dfe7eb;border-radius:13px;background:#f9fbfc}
+.client360-link-grid header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;color:#234b60}
+.client360-link-grid header strong{font-size:11px}
+.client360-link-grid header span{min-width:23px;padding:3px 6px;border-radius:999px;background:#e5efef;text-align:center;font-size:8px}
+.client360-link-grid button,.client360-link-grid section>div{
+  display:block;width:100%;padding:8px 0;border:0;border-top:1px solid #e5ecef;background:transparent;text-align:left;color:#244c61
+}
+.client360-link-grid button:first-of-type,.client360-link-grid section>div:first-of-type{border-top:0}
+.client360-link-grid b{display:block;font-size:9px}
+.client360-link-grid small{display:block;margin-top:2px;color:#84969e;font-size:8px}
+.client360-link-grid p{margin:6px 0;color:#8999a1;font-size:9px}
+
+.portfolio-data-gap{
+  padding:13px 15px;border:1px solid #e5dfc8;border-radius:12px;background:#fffaf0;color:#6f674d
+}
+.portfolio-data-gap strong{display:block;font-size:10px}
+.portfolio-data-gap p{margin:4px 0 0;font-size:9px;line-height:1.55}
+.portfolio-layout{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(260px,.55fr);gap:12px;align-items:start}
+.portfolio-engine-grid{display:grid;gap:9px}
+.portfolio-engine-card{
+  padding:16px;border:1px solid #dce6ea;border-radius:15px;background:#fff;
+  box-shadow:0 7px 20px rgba(29,67,88,.04)
+}
+.portfolio-engine-card.central{border-color:#b9dcd6;background:linear-gradient(135deg,#fff,#f3faf8)}
+.portfolio-engine-card>div:first-child span{color:#6a918c;font-size:8px;font-weight:850;letter-spacing:.08em}
+.portfolio-engine-card h4{margin:3px 0;color:#1d475d;font-size:13px}
+.portfolio-engine-card>div:first-child small{color:#85979f;font-size:8px}
+.portfolio-engine-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin-top:12px}
+.portfolio-engine-metrics b{padding:10px;border-radius:10px;background:#f5f8f9;color:#204b60;font-size:13px}
+.portfolio-engine-metrics small{display:block;margin-top:3px;color:#86979e;font-size:7px;font-weight:600}
+.portfolio-mini-mix{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
+.portfolio-mini-mix span{padding:5px 7px;border-radius:7px;background:#eef5f4;color:#53736f;font-size:8px}
+.portfolio-mini-mix strong{color:#235c55}
+.portfolio-engine-card footer{display:flex;justify-content:space-between;gap:8px;margin-top:10px;padding-top:9px;border-top:1px solid #e7edef;color:#8999a1;font-size:7px}
+.portfolio-mix-panel{position:sticky;top:88px}
+.portfolio-mix-summary{display:grid;gap:6px}
+.portfolio-mix-summary>div{display:flex;justify-content:space-between;gap:10px;padding:8px;border-radius:8px;background:#f5f8f9}
+.portfolio-mix-summary span{color:#607985;font-size:9px}
+.portfolio-mix-summary strong{color:#244d61;font-size:10px}
+
+.commerce-pipeline-actions{display:flex;gap:7px;align-items:center}
+.commerce-pipeline-actions select{min-width:150px;padding:0 9px}
+.pipeline-board{
+  display:grid;grid-template-columns:repeat(9,minmax(190px,1fr));gap:8px;overflow:auto;padding-bottom:8px;
+  scroll-snap-type:x proximity
+}
+.pipeline-column{
+  min-height:320px;padding:8px;border:1px solid #dfe7eb;border-radius:13px;background:#f6f9fa;
+  scroll-snap-align:start
+}
+.pipeline-column>header{display:flex;justify-content:space-between;align-items:center;padding:5px 5px 9px;color:#486775}
+.pipeline-column>header span{font-size:9px;font-weight:850;text-transform:uppercase}
+.pipeline-column>header strong{min-width:22px;padding:3px 6px;border-radius:999px;background:#e4eeee;text-align:center;font-size:8px}
+.pipeline-column>div{display:grid;gap:7px}
+.pipeline-card{
+  position:relative;padding:11px;border:1px solid #dde6e9;border-radius:11px;background:#fff;cursor:pointer;
+  box-shadow:0 5px 14px rgba(30,68,87,.04)
+}
+.pipeline-card:hover{border-color:#b9d4d5;box-shadow:0 9px 18px rgba(30,68,87,.07)}
+.pipeline-card strong{display:block;padding-right:45px;color:#214a5f;font-size:10px}
+.pipeline-card small{display:block;margin-top:2px;color:#79909a;font-size:8px}
+.pipeline-card p{margin:8px 0;color:#6d838e;font-size:8px;line-height:1.4}
+.pipeline-card footer{display:flex;justify-content:space-between;gap:5px;color:#83979f;font-size:7px}
+.pipeline-card>b{position:absolute;top:10px;right:9px;color:#47736d;font-size:8px}
+.pipeline-empty{padding:24px 8px;text-align:center;color:#9aa8ae;font-size:8px}
+.pipeline-case-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.commerce-catalog-intro{padding-top:4px!important}
+
+@media(max-width:1180px){
+  .plan-delivery-grid{grid-template-columns:1fr}
+  .commerce-hero{grid-template-columns:1fr}
+  .portfolio-layout{grid-template-columns:1fr}
+  .portfolio-mix-panel{position:static}
+}
+@media(max-width:860px){
+  .commerce-kpis,.client360-identity{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .commerce-filters{grid-template-columns:1fr!important}
+  .commerce-panel-head.split{align-items:flex-start;flex-direction:column}
+  .client360-detail-grid,.client360-link-grid{grid-template-columns:1fr}
+  .portfolio-engine-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:560px){
+  .commerce-hero{padding:17px}
+  .commerce-hero h2{font-size:22px}
+  .commerce-kpis,.client360-identity{grid-template-columns:1fr}
+  .commerce-tabs{margin:0 -2px}
+  .commerce-pipeline-actions{width:100%;align-items:stretch;flex-direction:column}
+  .portfolio-engine-card footer{flex-direction:column}
+}
