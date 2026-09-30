@@ -170,3 +170,47 @@
 .academy-seq{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--navy);color:#fff;font-size:8px;font-weight:900;margin-right:7px;vertical-align:middle}
 @media(max-width:1100px){.cepa-engine-grid{grid-template-columns:1fr 1fr}.cepa-engine-grid>.panel:first-child{grid-column:1/-1}}
 @media(max-width:720px){.cepa-engine-grid{grid-template-columns:1fr}.cepa-engine-grid>.panel:first-child{grid-column:auto}}
+
+/* --- Collaborator Growth + Network Radar --- */
+.proposal-flow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;padding:16px}
+.proposal-flow>div{border:1px solid var(--line);border-radius:13px;background:#fafbf8;padding:12px;min-height:120px}
+.proposal-flow b{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--navy);color:#fff;font-size:9px;margin-bottom:9px}
+.proposal-flow strong{display:block;color:var(--navy);font-size:10px}
+.proposal-flow small{display:block;color:var(--muted);font-size:8px;line-height:1.45;margin-top:5px}
+.growth-kit-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:16px}
+.growth-kit-card{border:1px solid var(--line);border-radius:16px;background:#fff;padding:16px;cursor:pointer;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.growth-kit-card:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(16,45,63,.09);border-color:#c7d3ca}
+.growth-kit-card h3{margin:5px 0 7px;color:var(--navy);font-size:15px}
+.growth-kit-card p{font-size:9px;line-height:1.5;color:var(--muted);min-height:54px}
+.kit-footer{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid #eceeea;font-size:8px;color:var(--muted);text-transform:uppercase;font-weight:900}
+.kit-footer b{color:var(--green)}
+.kit-block-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+.kit-block{border:1px solid var(--line);border-radius:13px;padding:13px;background:#fafbf8}
+.kit-block h4{margin:0 0 8px;color:var(--navy);font-size:11px}
+.kit-block ul{margin:0;padding-left:17px;color:var(--muted);font-size:9px;line-height:1.55}
+.score-form-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.source-lanes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0 0 14px}
+.source-lanes article{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;position:relative;overflow:hidden}
+.source-lanes article:before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:linear-gradient(90deg,var(--green),#9eb992)}
+.source-mark{display:inline-block;font-size:8px;font-weight:900;letter-spacing:.12em;color:var(--green);background:var(--green-soft);padding:5px 7px;border-radius:999px}
+.source-lanes h3{color:var(--navy);font-size:14px;margin:9px 0 6px}
+.source-lanes p{font-size:9px;line-height:1.5;color:var(--muted);min-height:54px}
+.source-lanes span{font-size:8px;color:#69776f}
+.watchlist-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:16px}
+.watch-card{border:1px solid var(--line);border-radius:14px;padding:14px;background:linear-gradient(145deg,#fff,#f8faf7)}
+.watch-card h3{margin:4px 0 8px;color:var(--navy);font-size:13px}
+.watch-card p,.watch-card small{display:block;font-size:8px;line-height:1.45;color:var(--muted);margin:4px 0}
+.ring-row{display:flex;gap:6px;flex-wrap:wrap;margin:9px 0}
+.ring-row span{display:inline-flex;align-items:center;justify-content:center;min-width:44px;padding:6px 8px;border-radius:999px;background:#eef4ec;color:#486343;font-size:8px;font-weight:900}
+.stage.discovered,.stage.reviewed{background:#f0f1ef;color:#687169}
+.stage.contact_planned,.stage.contacted{background:var(--gold-soft);color:#765f35}
+.stage.meeting,.stage.proposal{background:var(--blue-soft);color:#3f6478}
+.stage.sap_candidate{background:#ebe7f3;color:#5f527d}
+@media(max-width:1050px){
+ .proposal-flow{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .growth-kit-grid{grid-template-columns:1fr 1fr}
+ .source-lanes{grid-template-columns:1fr}
+}
+@media(max-width:700px){
+ .proposal-flow,.growth-kit-grid,.watchlist-grid,.score-form-grid,.kit-block-grid{grid-template-columns:1fr}
+}
