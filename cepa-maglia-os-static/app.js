@@ -32,6 +32,14 @@ $('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()})
 async function logout(){await supabase.auth.signOut();location.reload()}
 $('logoutBtn').onclick=logout;$('blockedLogout').onclick=logout
 
+function setMobileNav(open){
+  $('workspace').classList.toggle('nav-open',!!open)
+  $('sidebarBackdrop').classList.toggle('hidden',!open)
+}
+$('mobileMenuBtn').onclick=()=>setMobileNav(true)
+$('sidebarCloseBtn').onclick=()=>setMobileNav(false)
+$('sidebarBackdrop').onclick=()=>setMobileNav(false)
+
 $('loginForm').onsubmit=async e=>{e.preventDefault();const{error}=await supabase.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error)return msg(error.message,true);await boot()}
 $('signupBtn').onclick=async()=>{const email=$('email').value.trim(),password=$('password').value;if(!email||password.length<8)return msg('Inserisci email e una password di almeno 8 caratteri.',true);const{data,error}=await supabase.auth.signUp({email,password});if(error)return msg(error.message,true);if(data.session)await boot();else msg('Account creato. Controlla la mail di conferma e poi accedi.')}
 
@@ -43,6 +51,7 @@ function navigate(view){
   document.querySelectorAll('[data-partner-id]').forEach(b=>b.classList.remove('active'))
   const m=viewMeta[view]||['Centro di Regia','']
   setHeader(m[0],m[1])
+  setMobileNav(false)
   if(view==='recovery')loadRecovery()
   window.scrollTo({top:0,behavior:'smooth'})
 }
@@ -56,6 +65,7 @@ function openPartner(id){
   setHeader(n.name,n.capability+' · dossier relazione')
   showPartnerSection('overview')
   renderPartner()
+  setMobileNav(false)
   window.scrollTo({top:0,behavior:'smooth'})
 }
 document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>navigate(b.dataset.view))
@@ -105,6 +115,8 @@ async function boot(){
   if(error||!m){$('workspace').classList.add('hidden');$('blockedView').classList.remove('hidden');return}
   window.orgId=m.organization_id;window.userId=user.id;window.userRole=m.role
   $('workspace').classList.remove('hidden');$('blockedView').classList.add('hidden');$('aiDock').classList.remove('hidden')
+  setMobileNav(false)
+  if(window.innerWidth>=1450)$('aiDockPanel').classList.remove('hidden')
   $('sideUser').textContent=user.email||'Utente';$('rolePill').textContent=m.role.replaceAll('_',' ')
   ;['newEntityBtn','addTimelineBtn','addContactBtn','addPartnerDocumentBtn','addDocumentBtn','addCepaSubjectBtn','addCepaInitiativeBtn','addCepaContentBtn','addCepaSpeakerBtn','addCollaboratorBtn','newAssessmentBtn','newDistributionCandidateBtn','editPartnerBtn'].forEach(id=>$(id).classList.toggle('hidden',!isManager()))
   await loadAll()
@@ -171,10 +183,76 @@ function entityType(v){return ({insurance_intermediary:'Intermediario assicurati
 function stageLabel(v){return ({observed:'Osservato',qualified:'Qualificato',prospect:'Prospect',opportunity:'Opportunità',relationship:'Relazione',archived:'Archiviato'})[v]||v}
 
 function renderHome(){
-  $('homePartners').innerHTML=ecosystem.map(n=>'<span>'+esc(n.code)+'</span>').join('')
-  $('homeCepaSubjects').textContent=subjects.length
+  const partnerShort=n=>{
+    if(n.code==='HDI')return 'HDI'
+    if(n.code==='PRIMA_ENEA')return 'PRIMA'
+    if(n.code==='SLP')return 'SLP'
+    if(n.code==='AGLEA')return 'AGLEA'
+    if(n.code==='CIP')return 'CIP'
+    return (n.code||n.name||'M').slice(0,6)
+  }
+  const partnerLabel=n=>{
+    if(n.code==='HDI')return 'Compagnia madre'
+    if(n.code==='PRIMA_ENEA')return 'Partner strategico'
+    return 'Partner'
+  }
+
+  $('homePartnerCards').innerHTML=ecosystem.slice(0,5).map(n=>
+    '<article class="home-partner-card" data-home-partner="'+n.id+'">'+
+      '<div class="partner-monogram">'+esc(partnerShort(n))+'</div>'+
+      '<strong>'+esc(n.name)+'</strong>'+
+      '<small>'+esc(n.capability||n.strategic_role||'Competenza da definire')+'</small>'+
+      '<em>'+esc(partnerLabel(n))+'</em>'+
+    '</article>'
+  ).join('')||empty('Compagnie e partner da completare')
+  document.querySelectorAll('[data-home-partner]').forEach(b=>b.onclick=()=>openPartner(b.dataset.homePartner))
+
+  const iconMap={mobilita:'🚙',casa:'⌂',salute:'♥',previdenza:'▥',tutela_legale:'⚖',energia:'◇',impresa:'▦'}
+  const displayName=p=>{
+    const n=p.name||''
+    if(/auto|motor/i.test(n))return 'Auto'
+    if(/casa/i.test(n))return 'Casa'
+    if(/salute/i.test(n))return 'Salute'
+    if(/previd/i.test(n))return 'Previdenza'
+    if(/tutela/i.test(n))return 'Tutela Legale'
+    if(/energia/i.test(n))return 'Energia'
+    if(/impresa/i.test(n))return 'Impresa'
+    return n
+  }
+  const quick=[...products].slice(0,6)
+  $('homeProductStrip').innerHTML=quick.map(p=>
+    '<button class="home-product-chip" type="button" data-home-product="'+p.id+'">'+
+      '<span>'+esc(iconMap[p.category]||'◈')+'</span><div><strong>'+esc(displayName(p))+'</strong><small>'+esc(p.summary||p.category||'Scheda in sviluppo')+'</small></div>'+
+    '</button>'
+  ).join('')||empty('Prodotti da completare')
+  document.querySelectorAll('[data-home-product]').forEach(b=>b.onclick=()=>openProduct(b.dataset.homeProduct))
+
+  const preview=[...portfolioSnapshots].slice(0,5)
+  $('homeCollaboratorPreview').innerHTML=preview.map(s=>{
+    const c=s.agency_collaborators||{}
+    const ratio=s.clients_count?Number(s.policies_count/s.clients_count).toFixed(2):'—'
+    return '<div class="home-preview-row"><strong>'+esc(c.display_name||'Rete')+'</strong><span>'+esc(s.clients_count)+' clienti · '+esc(ratio)+' pol./cliente</span><b>€ '+Number(s.premium_total||0).toLocaleString('it-IT',{maximumFractionDigits:0})+'</b></div>'
+  }).join('')||empty('Snapshot collaboratori non disponibile')
+
+  const relationSolid=ecosystem.filter(n=>['core','active','project_active'].includes(n.relationship_status)).length
+  const verifiedProducts=productKnowledge.filter(x=>x.verification_status==='verified').length
+  const missingDocs=partnerRequirements.filter(x=>x.status==='missing').length
+  const pendingTerms=collaboratorTerms.filter(x=>x.verification_status!=='verified').length
+  const cepaReady=cepaReadiness.filter(x=>['ready','verified'].includes(x.status)).length
+  $('homeBenchmarkPreview').innerHTML=
+    '<div class="benchmark-column"><h4>Punti solidi oggi</h4>'+
+      '<div>'+relationSolid+' relazioni ecosistema attive/core</div>'+
+      '<div>'+cepaReady+' elementi CEPA pronti/verificati</div>'+
+      '<div>'+portfolioSnapshots.length+' snapshot rete disponibili</div>'+
+    '</div>'+
+    '<div class="benchmark-column risk"><h4>Da completare</h4>'+
+      '<div>'+missingDocs+' requisiti partner non ancora registrati</div>'+
+      '<div>'+pendingTerms+' condizioni economiche da verificare</div>'+
+      '<div>'+verifiedProducts+'/'+productKnowledge.length+' elementi prodotto verificati</div>'+
+    '</div>'
+
   $('homeDocs').textContent=documents.length
-  $('homeMarket').textContent=marketEntities.length
+  $('homeMarket').textContent=marketEntities.length+distributionCandidates.length
 
   const knowledgeVerified=productKnowledge.filter(x=>x.verification_status==='verified').length
   $('homeKnowledgeVerified').textContent=knowledgeVerified+'/'+productKnowledge.length
@@ -188,11 +266,10 @@ function renderHome(){
   $('homePartnerDocsCovered').textContent=partnerCovered+'/'+partnerRequirements.length
   $('homePartnerDocsTotal').textContent='requisiti dossier coperti'
 
-  const cepaReady=cepaReadiness.filter(x=>['ready','verified'].includes(x.status)).length
   $('homeCepaReady').textContent=cepaReady+'/'+cepaReadiness.length
   $('homeCepaReadyTotal').textContent='elementi pronti / verificati'
 
-  const open=actions.filter(a=>!['completed','cancelled'].includes(a.status)).sort(actionSort).slice(0,8)
+  const open=actions.filter(a=>!['completed','cancelled'].includes(a.status)).sort(actionSort).slice(0,6)
   $('homeActions').innerHTML=open.map(a=>listRow(a.title,(a.ecosystem_nodes?.name||a.market_entities?.name||a.strategic_projects?.title||laneLabel(a.lane)),[actionStatus(a.status),a.priority,a.due_at?fmtDate(a.due_at):'senza scadenza'])).join('')||empty('Nessuna attività aperta')
 }
 
