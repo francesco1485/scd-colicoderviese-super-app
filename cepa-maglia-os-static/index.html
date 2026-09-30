@@ -41,57 +41,44 @@
   <aside class="sidebar">
     <div class="side-brand">
       <div class="side-seal">M</div>
-      <div class="side-brand-copy"><strong>MAGLIA 360</strong><small>Agenzia Generale HDI</small></div>
+      <div class="side-brand-copy"><strong>MAGLIA 360</strong><small>Sistema operativo commerciale</small></div>
       <button id="sidebarCloseBtn" class="sidebar-close" type="button" aria-label="Chiudi menu">×</button>
     </div>
 
     <nav class="side-nav">
-      <div class="nav-group">
-        <div class="nav-label">HOME</div>
-        <button class="nav-item active" data-view="home">Quadro generale</button>
+      <div class="nav-group primary-nav">
+        <button class="nav-item active" data-view="home">Home</button>
+        <button class="nav-item" data-view="products">Clienti e Prodotti</button>
+        <button class="nav-item" data-view="collaborators">Rete e Collaboratori</button>
+        <button class="nav-item" data-view="actions">Attività e Opportunità</button>
+        <button class="nav-item" data-view="documents">Pratiche e Documenti</button>
+        <button class="nav-item" data-view="cepa">C.E.P.A.</button>
+        <button class="nav-item" data-view="comparisons">Report e Analisi</button>
+        <button class="nav-item" data-view="liaWorkbench">Lia · Assistente AI</button>
       </div>
 
-      <div class="nav-group">
+      <div class="nav-group compact-nav">
+        <div class="nav-label">SVILUPPO</div>
+        <button class="nav-item" data-view="development">Sviluppo territoriale</button>
+        <button class="nav-item" data-view="networkRadar">Radar Rete</button>
+        <button class="nav-item" data-view="growthKits">Kit Collaboratore</button>
+      </div>
+
+      <div class="nav-group partner-nav-group">
         <div class="nav-label">COMPAGNIE & PARTNER</div>
         <div id="partnerNav" class="partner-nav"></div>
       </div>
 
-      <div class="nav-group">
-        <div class="nav-label">AGENZIA</div>
-        <button class="nav-item" data-view="products">Prodotti & Sintesi</button>
-        <button class="nav-item" data-view="collaborators">Collaboratori & Guadagni</button>
-        <button class="nav-item" data-view="growthKits">Kit Collaboratore</button>
-        <button class="nav-item" data-view="comparisons">Confronti & Benchmark</button>
-      </div>
-
-      <div class="nav-group">
-        <div class="nav-label">CEPA</div>
-        <button class="nav-item" data-view="cepa">Centro CEPA</button>
-        <button class="nav-item" data-view="territories">SAP & Territori</button>
-      </div>
-
-      <div class="nav-group">
-        <div class="nav-label">DOCUMENTI</div>
-        <button class="nav-item" data-view="documents">Archivio & Contratti</button>
-      </div>
-
-      <div class="nav-group">
-        <div class="nav-label">AI & COMUNICAZIONE</div>
+      <div class="nav-group utility-nav">
+        <div class="nav-label">STRUMENTI</div>
         <button class="nav-item" data-view="aiMail">AI Mail & Chat</button>
-        <button class="nav-item" data-view="liaWorkbench">Lia · Workbench</button>
-      </div>
-
-      <div class="nav-group">
-        <div class="nav-label">OPERATIVITÀ</div>
-        <button class="nav-item" data-view="development">Sviluppo nuovo</button>
-        <button class="nav-item" data-view="networkRadar">Radar Rete</button>
-        <button class="nav-item" data-view="actions">Attività & Scadenze</button>
         <button class="nav-item" data-view="recovery">Clienti · Recovery</button>
+        <button class="nav-item" data-view="territories">SAP & Territori</button>
       </div>
     </nav>
 
     <div class="side-footer">
-      <div class="confidential-note">🔒 RISERVATO · USO INTERNO <span class="build-badge">build 30.09 · 09:50</span></div>
+      <div class="confidential-note">RISERVATO · USO INTERNO <span class="build-badge">Maglia 360</span></div>
       <div id="sideUser" class="side-user"></div>
       <button id="logoutBtn" class="logout">Esci</button>
     </div>
@@ -152,7 +139,7 @@
             <p>Ogni accesso ti connette con il tuo ruolo, la tua sede e le priorità della Direzione.</p>
           </div>
           <div class="home-hero-visual" aria-hidden="true">
-            <img src="./assets/office-colico.svg" alt="">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Colico_Panorama.jpg/1280px-Colico_Panorama.jpg" alt="Panorama di Colico sul Lago di Como">
           </div>
           <div class="home-hero-brand">
             <strong>MAGLIA</strong><span>ASSICURAZIONI</span>
@@ -244,7 +231,8 @@
           <div class="cepa-hub-copy">
             <span>PROGETTO PERMANENTE</span>
             <h2>La responsabilità non si sconta.</h2>
-            <p>Formazione, confronto e consapevolezza nelle scelte assicurative e previdenziali. Il Centro governa il metodo; i territori trasformano il progetto in incontri e relazioni reali.</p>
+            <p>Formazione, confronto e consapevolezza nelle scelte assicurative e previdenziali. Il Centro governa il metodo; Colico e Mandello trasformano il progetto in attività territoriali reali.</p>
+            <div class="cepa-hero-actions"><button id="cepaHeroCentralBtn" type="button">Centro C.E.P.A.</button><button id="cepaHeroTerritoriesBtn" type="button">Territori e attività</button></div>
           </div>
         </section>
 
@@ -332,7 +320,16 @@
         </nav>
         <section id="officeIdentity" class="office-identity"></section>
         <section id="officeDirectionMessage" class="direction-message hidden"></section>
+        <section id="officePartnerStrip" class="office-partner-strip"></section>
         <section id="officeSummary" class="office-summary"></section>
+        <section id="officeSmartHint" class="office-smart-hint"></section>
+        <section class="office-today-panel">
+          <div class="office-section-head">
+            <div><span>IL TUO LAVORO OGGI</span><h3>Priorità operative della sede</h3></div>
+            <small>Valori derivati dai dati disponibili.</small>
+          </div>
+          <div id="officeTodayCards" class="office-today-cards"></div>
+        </section>
 
         <section class="office-analytics-grid">
           <article class="office-panel office-trend-panel">
@@ -354,7 +351,7 @@
         <section class="office-products-section">
           <div class="office-section-head">
             <div><span>AREE DI LAVORO</span><h3>Prodotti e servizi</h3></div>
-            <small>I dati mensili restano storicizzati per sede e prodotto.</small>
+            <small>Entra nel prodotto per lavorare su rinnovi, preventivi, pratiche e opportunità.</small>
           </div>
           <div id="officeProductBars" class="office-product-bars"></div>
         </section>
