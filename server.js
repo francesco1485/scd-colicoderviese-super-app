@@ -57,6 +57,7 @@ const allowedActions = new Set([
   'direction.access.set','direction.pin.set','direction.player.approve','direction.player.reject',
   'direction.diagnostics','direction.evolution',
   'direction.datafabric.status','direction.datafabric.scan.gmail','direction.datafabric.scan.drive',
+  'direction.drive.folder.create','direction.commercial.mapping.save',
 ]);
 
 function clubTimePayload(){
