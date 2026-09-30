@@ -261,6 +261,7 @@ async function boot(){
   try{setFocusMode(localStorage.getItem('maglia360_focus')==='1')}catch(_){setFocusMode(false)}
 
   $('sideUser').textContent=user.email||'Utente';$('rolePill').textContent=m.role.replaceAll('_',' ')
+  $('manageOfficeUsersBtn')?.classList.toggle('hidden',!isDirectionRole())
   ;['newEntityBtn','addTimelineBtn','addContactBtn','addPartnerDocumentBtn','addDocumentBtn','addCepaSubjectBtn','addCepaInitiativeBtn','addCepaContentBtn','addCepaSpeakerBtn','addCollaboratorBtn','newAssessmentBtn','newDistributionCandidateBtn','editPartnerBtn'].forEach(id=>$(id).classList.toggle('hidden',!isManager()))
   await loadAll()
   $('aiDock').classList.remove('hidden')
@@ -705,7 +706,107 @@ function openCepaActivityEditor(){
   }
 }
 
+async function openOfficeAssignmentsEditor(){
+  if(!isDirectionRole())return
+  await loadMembers()
+  if(!members.length)return alert('Nessun utente assegnabile disponibile.')
+  const memberOptions=members.map(m=>'<option value="'+m.user_id+'">'+esc(m.full_name||m.email||m.user_id)+' · '+esc(m.role||'')+'</option>').join('')
+  showModal(
+    '<div class="eyebrow">DIREZIONE · ACCESSI</div><h2>Assegna le sedi agli utenti</h2>'+
+    '<p class="form-note">La persona vedrà la schermata iniziale MAGLIA 360, ma potrà entrare solo negli uffici assegnati. Direzione, supervisor e manager mantengono la vista globale.</p>'+
+    '<form id="officeAssignmentForm" class="form-stack">'+
+      '<label>Utente<select id="oaUser">'+memberOptions+'</select></label>'+
+      '<div id="oaOfficeList" class="office-assignment-list"></div>'+
+      '<div class="form-two"><label>Livello<select id="oaLevel"><option value="work">Operativo</option><option value="read">Sola lettura</option><option value="manage">Gestione sede</option></select></label>'+
+      '<label>Sede principale<select id="oaPrimary"><option value="">Nessuna</option>'+marketHubs.map(h=>'<option value="'+h.id+'">'+esc(h.city)+'</option>').join('')+'</select></label></div>'+
+      '<button class="primary" type="submit">Salva assegnazioni</button>'+
+    '</form>'
+  )
+  const renderAssignments=()=>{
+    const uid=$('oaUser').value
+    $('oaOfficeList').innerHTML=marketHubs.filter(h=>h.active!==false).map(h=>{
+      const found=officeAssignments.find(a=>a.user_id===uid&&a.hub_id===h.id&&a.active)
+      return '<label class="office-assignment-item"><input type="checkbox" data-office-assignment="'+h.id+'" '+(found?'checked':'')+'><span><strong>'+esc(h.city)+'</strong><small>'+esc(h.address||'')+'</small></span></label>'
+    }).join('')
+    const active=officeAssignments.filter(a=>a.user_id===uid&&a.active)
+    const primary=active.find(a=>a.is_primary)
+    $('oaPrimary').value=primary?.hub_id||''
+    const level=active[0]?.access_level
+    if(level)$('oaLevel').value=level
+  }
+  $('oaUser').onchange=renderAssignments
+  renderAssignments()
+  $('officeAssignmentForm').onsubmit=async e=>{
+    e.preventDefault()
+    const uid=$('oaUser').value
+    const level=$('oaLevel').value
+    const primary=$('oaPrimary').value||null
+    const selected=new Set([...document.querySelectorAll('[data-office-assignment]:checked')].map(x=>x.dataset.officeAssignment))
+    const operations=[]
+    for(const h of marketHubs.filter(x=>x.active!==false)){
+      const existing=officeAssignments.find(a=>a.user_id===uid&&a.hub_id===h.id)
+      if(selected.has(h.id)){
+        const row={
+          organization_id:window.orgId,hub_id:h.id,user_id:uid,access_level:level,
+          is_primary:primary===h.id,active:true,assigned_by:window.userId,updated_at:new Date().toISOString()
+        }
+        operations.push(supabase.from('office_user_assignments').upsert(row,{onConflict:'organization_id,hub_id,user_id'}))
+      }else if(existing?.active){
+        operations.push(supabase.from('office_user_assignments').update({active:false,is_primary:false,updated_at:new Date().toISOString()}).eq('id',existing.id))
+      }
+    }
+    const results=await Promise.all(operations)
+    const error=results.find(x=>x.error)?.error
+    if(error)return alert(error.message)
+    closeModal();await loadAll();renderHome()
+  }
+}
+
+async function openAssiEasyImport(){
+  const office=selectedOffice()
+  if(!office)return
+  showModal(
+    '<div class="eyebrow">IMPORT DATI · '+esc(office.city)+'</div><h2>Carica export AssiEasy</h2>'+
+    '<p class="form-note">Il file originale viene conservato in area privata e associato a sede e mese. Il primo export reale servirà a definire il mapping automatico senza inventare colonne.</p>'+
+    '<form id="assiEasyImportForm" class="form-stack">'+
+      '<label>Mese di riferimento<input id="aeMonth" type="month" value="'+new Date().toISOString().slice(0,7)+'" required></label>'+
+      '<label>Tipo dati<select id="aeDataKind"><option value="portfolio_monthly">Portafoglio mensile</option><option value="renewals">Rinnovi</option><option value="production">Produzione</option><option value="customers">Clienti</option><option value="other">Altro export</option></select></label>'+
+      '<label>File export<input id="aeFile" type="file" accept=".csv,.txt,.xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv" required></label>'+
+      '<div class="import-safety-note"><strong>Nessuna elaborazione distruttiva.</strong><span>Il file viene archiviato; i dati mensili esistenti non vengono cancellati o sovrascritti senza mapping verificato.</span></div>'+
+      '<button class="primary" type="submit">Carica e registra</button>'+
+    '</form>'
+  )
+  $('assiEasyImportForm').onsubmit=async e=>{
+    e.preventDefault()
+    const file=$('aeFile').files?.[0]
+    if(!file)return
+    if(file.size>26214400)return alert('Il file supera il limite di 25 MB.')
+    const ext=(file.name.split('.').pop()||'').toLowerCase()
+    if(!['csv','txt','xlsx','xls'].includes(ext))return alert('Formato non supportato. Usa CSV, TXT, XLSX o XLS.')
+    try{
+      const path=window.orgId+'/'+window.userId+'/office-imports/'+office.id+'/'+Date.now()+'-'+safeLiaFileName(file.name)
+      const{error:uploadError}=await supabase.storage.from('lia-workspace').upload(path,file,{contentType:file.type||undefined,upsert:false})
+      if(uploadError)throw uploadError
+      const row={
+        organization_id:window.orgId,hub_id:office.id,period_month:$('aeMonth').value+'-01',
+        source_system:'ASSIEASY',data_kind:$('aeDataKind').value,original_name:file.name,
+        storage_path:path,status:'uploaded',imported_by:window.userId,
+        validation_summary:{file_size:file.size,mime_type:file.type||null,extension:ext,parser_status:'awaiting_verified_mapping'}
+      }
+      const{error:insertError}=await supabase.from('office_data_imports').insert(row)
+      if(insertError){
+        try{await supabase.storage.from('lia-workspace').remove([path])}catch(_){}
+        throw insertError
+      }
+      closeModal();await loadAll();openOffice(office.id)
+      alert('Export AssiEasy archiviato. Il file è pronto per la definizione del mapping verificato.')
+    }catch(error){alert(error?.message||String(error))}
+  }
+}
+
+$('manageOfficeUsersBtn').onclick=openOfficeAssignmentsEditor
 $('newDirectionMessageBtn').onclick=openDirectionMessageEditor
+$('importAssiEasyBtn').onclick=openAssiEasyImport
 $('newMonthlyDataBtn').onclick=()=>{
   const office=selectedOffice();if(!office)return
   const options=products.map(p=>'<option value="'+p.id+'">'+esc(p.name)+'</option>').join('')
