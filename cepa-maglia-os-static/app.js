@@ -118,9 +118,22 @@ const brandIdentity={
   AGLEA:{label:'Aglea Salus',accent:'#2C7A62',accent2:'#69A95A',surface:'#F2F8F5'},
   CIP:{label:'CIP Energia',accent:'#E88A21',accent2:'#F3B35A',surface:'#FFF7EC'}
 }
+function getBrand(node){
+  if(!node)return null
+  const fallback=brandIdentity[node.code]||{}
+  const meta=node.metadata?.brand||{}
+  return {
+    label:node.name||fallback.label||node.code,
+    accent:meta.ui_accent||fallback.accent||'#0B6F5C',
+    accent2:meta.ui_accent_secondary||fallback.accent2||'#1E6F9F',
+    surface:fallback.surface||'#F4F7F9',
+    officialSite:meta.official_site||null,
+    logoStatus:meta.logo_asset_status||null
+  }
+}
 function applyBrandContext(node=null){
   const root=document.documentElement
-  const brand=node?brandIdentity[node.code]:null
+  const brand=getBrand(node)
   root.style.setProperty('--context-accent',brand?.accent||'#0B6F5C')
   root.style.setProperty('--context-accent-2',brand?.accent2||'#1E6F9F')
   root.style.setProperty('--context-surface',brand?.surface||'#F4F7F9')
@@ -369,8 +382,20 @@ function officeMessagesFor(hubId=null){
 }
 function brandForProduct(product){
   const node=ecosystem.find(x=>x.id===product?.ecosystem_node_id)
-  return {node,brand:node?brandIdentity[node.code]:null}
+  return {node,brand:getBrand(node)}
 }
+function productWorkTypes(product){
+  const common={
+    mobilita:[['renewal','Rinnovi'],['quote','Preventivi'],['proposal','Proposte'],['practice','Pratiche'],['mono_branch','Mono ramo'],['cross_sell','Cross selling']],
+    casa:[['renewal','Rinnovi'],['quote','Preventivi'],['proposal','Proposte'],['practice','Pratiche'],['mono_branch','Mono ramo'],['cross_sell','Cross selling']],
+    impresa:[['feasibility','Studi fattibilità'],['quote','Preventivi'],['proposal','Proposte'],['practice','Pratiche'],['renewal','Rinnovi'],['cross_sell','Cross selling']],
+    salute:[['feasibility','Analisi bisogno'],['quote','Preventivi'],['proposal','Proposte'],['practice','Pratiche'],['cross_sell','Sviluppo relazione']],
+    tutela_legale:[['quote','Preventivi'],['proposal','Proposte'],['practice','Pratiche'],['renewal','Rinnovi'],['cross_sell','Sviluppo relazione']],
+    energia:[['feasibility','Analisi fornitura'],['quote','Offerte'],['proposal','Proposte'],['practice','Pratiche'],['cross_sell','Sviluppo relazione']]
+  }
+  return common[product?.category]||[['proposal','Proposte'],['quote','Preventivi'],['practice','Pratiche'],['cross_sell','Sviluppo relazione']]
+}
+let currentProductCaseFilter='all'
 function fmtMoney(v){
   if(v==null||Number.isNaN(Number(v)))return '—'
   return new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(Number(v))
@@ -508,6 +533,7 @@ function openOfficeProduct(productId){
   const product=products.find(x=>x.id===productId)
   if(!office||!product)return
   currentOfficeProductId=productId
+  currentProductCaseFilter='all'
   const {node}=brandForProduct(product)
   applyBrandContext(node||null)
   document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'))
@@ -532,7 +558,7 @@ function renderOfficeProduct(){
   const {node,brand}=brandForProduct(product)
   const accent=brand?.accent||'#0b6f5c'
 
-  $('productOfficeIdentity').innerHTML='<div class="product-company-band" style="--product-accent:'+esc(accent)+'"><div class="brand-wordmark large">'+esc(node?.code||'MAGLIA')+'</div><div><span>'+esc(node?.name||'MAGLIA 360')+'</span><h2>'+esc(product.name)+'</h2><p>Ufficio '+esc(office.city)+' · '+esc(String(product.category||'').replaceAll('_',' '))+'</p></div></div><div class="office-period"><span>Snapshot</span><strong>'+esc(fmtMonth(snap?.period_month||null))+'</strong></div>'
+  $('productOfficeIdentity').innerHTML='<div class="product-company-band" style="--product-accent:'+esc(accent)+'"><div class="brand-wordmark large">'+esc(node?.code||'MAGLIA')+'</div><div><span>'+esc(node?.name||'MAGLIA 360')+'</span><h2>'+esc(product.name)+'</h2><p>Ufficio '+esc(office.city)+' · '+esc(String(product.category||'').replaceAll('_',' '))+'</p>'+(brand?.officialSite?'<a class="official-brand-link" href="'+esc(brand.officialSite)+'" target="_blank" rel="noopener">Sito ufficiale ↗</a>':'')+'</div></div><div class="office-period"><span>Snapshot</span><strong>'+esc(fmtMonth(snap?.period_month||null))+'</strong></div>'
   $('productOfficeMetrics').innerHTML=
     '<div><span>Premi</span><strong>'+esc(snap?.premium_total!=null?fmtMoney(snap.premium_total):'—')+'</strong></div>'+
     '<div><span>Attive</span><strong>'+Number(snap?.active_policies||0)+'</strong></div>'+
@@ -545,13 +571,19 @@ function renderOfficeProduct(){
 
   const typeCounts={}
   cases.forEach(x=>{typeCounts[x.case_type]=(typeCounts[x.case_type]||0)+1})
-  const types=[
-    ['renewal','Rinnovi'],['proposal','Proposte'],['quote','Preventivi'],['feasibility','Studi fattibilità'],
-    ['practice','Da lavorare'],['mono_branch','Mono ramo'],['cross_sell','Cross selling']
-  ]
-  $('productStageBoard').innerHTML=types.map(([code,label])=>'<button type="button" class="product-stage-card"><span>'+esc(label)+'</span><strong>'+Number(typeCounts[code]||0)+'</strong><small>'+esc(officeWorkflow.filter(x=>x.case_type===code).slice(0,4).map(x=>x.label).join(' · ')||'Workflow configurato')+'</small></button>').join('')
-
-  $('productCaseList').innerHTML=cases.map(x=>'<div class="product-case-row"><div><strong>'+esc(x.title)+'</strong><small>'+esc(String(x.case_type).replaceAll('_',' '))+' · '+esc(x.stage_code.replaceAll('_',' '))+(x.due_at?' · '+esc(fmtDate(x.due_at)):'')+'</small></div><span class="priority-tag '+esc(x.priority)+'">'+esc(x.priority)+'</span></div>').join('')||'<div class="office-empty compact"><strong>Nessuna pratica aperta</strong><p>Le nuove pratiche di questo prodotto appariranno qui.</p></div>'
+  const types=productWorkTypes(product)
+  $('productStageBoard').innerHTML=
+    '<button type="button" class="product-stage-card '+(currentProductCaseFilter==='all'?'active':'')+'" data-case-filter="all"><span>Tutto il lavoro</span><strong>'+cases.length+'</strong><small>Vista completa del prodotto</small></button>'+
+    types.map(([code,label])=>'<button type="button" class="product-stage-card '+(currentProductCaseFilter===code?'active':'')+'" data-case-filter="'+code+'"><span>'+esc(label)+'</span><strong>'+Number(typeCounts[code]||0)+'</strong><small>'+esc(officeWorkflow.filter(x=>x.case_type===code).slice(0,4).map(x=>x.label).join(' · ')||'Workflow configurato')+'</small></button>').join('')
+  const renderCaseRows=()=>{
+    const visible=currentProductCaseFilter==='all'?cases:cases.filter(x=>x.case_type===currentProductCaseFilter)
+    $('productCaseList').innerHTML=visible.map(x=>'<div class="product-case-row"><div><strong>'+esc(x.title)+'</strong><small>'+esc(String(x.case_type).replaceAll('_',' '))+' · '+esc(x.stage_code.replaceAll('_',' '))+(x.due_at?' · '+esc(fmtDate(x.due_at)):'')+'</small></div><span class="priority-tag '+esc(x.priority)+'">'+esc(x.priority)+'</span></div>').join('')||'<div class="office-empty compact"><strong>Nessuna pratica in questo stato</strong><p>Le attività compariranno qui quando verranno registrate.</p></div>'
+  }
+  document.querySelectorAll('[data-case-filter]').forEach(b=>b.onclick=()=>{
+    currentProductCaseFilter=b.dataset.caseFilter
+    renderOfficeProduct()
+  })
+  renderCaseRows()
 }
 
 document.querySelectorAll('[data-office-home]').forEach(b=>b.onclick=()=>{
