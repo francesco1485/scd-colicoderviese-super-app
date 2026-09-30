@@ -444,6 +444,8 @@ function openOffice(id){
   $('officeBreadcrumbName').textContent='Ufficio '+office.city
   setHeader('Ufficio '+office.city,'Sede operativa · '+(office.address||''))
   renderOffice()
+  showOfficeQuickActions(true)
+  $('newDirectionMessageBtn').classList.toggle('hidden',!isDirectionRole())
   setLiaOpen(false)
   window.scrollTo({top:0,behavior:'smooth'})
 }
@@ -513,6 +515,8 @@ function openOfficeProduct(productId){
   $('productBreadcrumbName').textContent=product.name
   setHeader(product.name,'Ufficio '+office.city+' · '+(node?.name||'MAGLIA 360'))
   renderOfficeProduct()
+  showOfficeQuickActions(true)
+  $('newDirectionMessageBtn').classList.toggle('hidden',!isDirectionRole())
   setLiaOpen(false)
   window.scrollTo({top:0,behavior:'smooth'})
 }
@@ -550,9 +554,166 @@ function renderOfficeProduct(){
 }
 
 document.querySelectorAll('[data-office-home]').forEach(b=>b.onclick=()=>{
-  currentOfficeId=null;currentOfficeProductId=null;window.activeOfficeName=null;applyBrandContext(null);navigate('home')
+  currentOfficeId=null;currentOfficeProductId=null;window.activeOfficeName=null;showOfficeQuickActions(false);applyBrandContext(null);navigate('home')
 })
 $('productOfficeBack').onclick=()=>openOffice(currentOfficeId)
+
+function showOfficeQuickActions(show){
+  const box=$('officeQuickActions')
+  if(!box)return
+  box.classList.toggle('hidden',!show)
+}
+function selectedOffice(){
+  return marketHubs.find(x=>x.id===currentOfficeId)||null
+}
+function selectedOfficeProduct(){
+  return products.find(x=>x.id===currentOfficeProductId)||null
+}
+function openDirectionMessageEditor(){
+  if(!isDirectionRole())return
+  const options=accessibleOffices().map(h=>'<option value="'+h.id+'">'+esc(h.city)+'</option>').join('')
+  showModal(
+    '<div class="eyebrow">DIREZIONE</div><h2>Nuova comunicazione interna</h2>'+
+    '<form id="directionMessageForm" class="form-stack">'+
+      '<label>Destinazione<select id="dmHub"><option value="">Tutte le sedi</option>'+options+'</select></label>'+
+      '<label>Tipo<select id="dmType"><option value="information">Informazione</option><option value="priority">Priorità</option><option value="commercial">Proposta commerciale</option><option value="cepa">C.E.P.A.</option><option value="administrative">Amministrativa</option><option value="training">Formazione</option></select></label>'+
+      '<label>Priorità<select id="dmPriority"><option value="normal">Normale</option><option value="high">Alta</option><option value="urgent">Urgente</option></select></label>'+
+      '<label>Titolo<input id="dmTitle" required maxlength="180"></label>'+
+      '<label>Messaggio<textarea id="dmBody" rows="5" required></textarea></label>'+
+      '<label class="check-line"><input id="dmAck" type="checkbox"> Richiedi presa visione</label>'+
+      '<button class="primary" type="submit">Pubblica messaggio</button>'+
+    '</form>'
+  )
+  $('directionMessageForm').onsubmit=async e=>{
+    e.preventDefault()
+    const row={
+      organization_id:window.orgId,
+      hub_id:$('dmHub').value||null,
+      title:$('dmTitle').value.trim(),
+      body:$('dmBody').value.trim(),
+      message_type:$('dmType').value,
+      priority:$('dmPriority').value,
+      requires_ack:$('dmAck').checked,
+      created_by:window.userId
+    }
+    const{error}=await supabase.from('office_direction_messages').insert(row)
+    if(error)return alert(error.message)
+    closeModal();await loadAll()
+  }
+}
+function openMonthlyDataEditor(productId=currentOfficeProductId){
+  const office=selectedOffice()
+  const product=products.find(x=>x.id===productId)
+  if(!office||!product)return
+  const current=latestSnapshotFor(office.id,product.id)
+  const month=(current?.period_month||new Date().toISOString().slice(0,7)+'-01').slice(0,7)
+  showModal(
+    '<div class="eyebrow">DATI MENSILI</div><h2>'+esc(product.name)+' · '+esc(office.city)+'</h2>'+
+    '<p class="form-note">Inserimento manuale iniziale. Il parser AssiEasy userà gli stessi campi e conserverà uno snapshot per ogni mese.</p>'+
+    '<form id="monthlyDataForm" class="form-stack compact-grid">'+
+      '<label>Mese<input id="mdMonth" type="month" value="'+esc(month)+'" required></label>'+
+      '<label>Clienti<input id="mdClients" type="number" min="0" value="'+Number(current?.clients_count||0)+'"></label>'+
+      '<label>Polizze attive<input id="mdActive" type="number" min="0" value="'+Number(current?.active_policies||0)+'"></label>'+
+      '<label>Premi €<input id="mdPremium" type="number" min="0" step="0.01" value="'+Number(current?.premium_total||0)+'"></label>'+
+      '<label>Rinnovi da lavorare<input id="mdRenewals" type="number" min="0" value="'+Number(current?.renewals_due||0)+'"></label>'+
+      '<label>Rinnovi completati<input id="mdRenewed" type="number" min="0" value="'+Number(current?.renewals_completed||0)+'"></label>'+
+      '<label>Proposte<input id="mdProposals" type="number" min="0" value="'+Number(current?.proposals_count||0)+'"></label>'+
+      '<label>Preventivi da fare<input id="mdQuotesTodo" type="number" min="0" value="'+Number(current?.quotes_to_do||0)+'"></label>'+
+      '<label>Preventivi fatti<input id="mdQuotesDone" type="number" min="0" value="'+Number(current?.quotes_done||0)+'"></label>'+
+      '<label>Perse<input id="mdLost" type="number" min="0" value="'+Number(current?.lost_count||0)+'"></label>'+
+      '<label>Mono ramo<input id="mdMono" type="number" min="0" value="'+Number(current?.mono_branch_count||0)+'"></label>'+
+      '<label>Cross selling<input id="mdCross" type="number" min="0" value="'+Number(current?.cross_sell_opportunities||0)+'"></label>'+
+      '<label>Studi fattibilità<input id="mdFeasibility" type="number" min="0" value="'+Number(current?.feasibility_studies||0)+'"></label>'+
+      '<label>Pratiche aperte<input id="mdOpenCases" type="number" min="0" value="'+Number(current?.open_cases||0)+'"></label>'+
+      '<button class="primary full" type="submit">Salva snapshot mensile</button>'+
+    '</form>'
+  )
+  $('monthlyDataForm').onsubmit=async e=>{
+    e.preventDefault()
+    const n=id=>Number($(id).value||0)
+    const row={
+      organization_id:window.orgId,hub_id:office.id,product_id:product.id,
+      period_month:$('mdMonth').value+'-01',source_system:'manual',
+      clients_count:n('mdClients'),active_policies:n('mdActive'),premium_total:n('mdPremium'),
+      renewals_due:n('mdRenewals'),renewals_completed:n('mdRenewed'),proposals_count:n('mdProposals'),
+      quotes_to_do:n('mdQuotesTodo'),quotes_done:n('mdQuotesDone'),lost_count:n('mdLost'),
+      mono_branch_count:n('mdMono'),cross_sell_opportunities:n('mdCross'),feasibility_studies:n('mdFeasibility'),
+      open_cases:n('mdOpenCases'),imported_by:window.userId,updated_at:new Date().toISOString()
+    }
+    const{error}=await supabase.from('office_product_monthly_snapshots')
+      .upsert(row,{onConflict:'organization_id,hub_id,product_id,period_month'})
+    if(error)return alert(error.message)
+    closeModal();await loadAll();openOfficeProduct(product.id)
+  }
+}
+function openOfficeCaseEditor(){
+  const office=selectedOffice(),product=selectedOfficeProduct()
+  if(!office||!product)return
+  showModal(
+    '<div class="eyebrow">NUOVA PRATICA</div><h2>'+esc(product.name)+' · '+esc(office.city)+'</h2>'+
+    '<form id="officeCaseForm" class="form-stack">'+
+      '<label>Tipo<select id="ocType"><option value="renewal">Rinnovo</option><option value="proposal">Proposta</option><option value="quote">Preventivo</option><option value="feasibility">Studio fattibilità</option><option value="practice">Pratica</option><option value="mono_branch">Mono ramo</option><option value="cross_sell">Cross selling</option><option value="other">Altro</option></select></label>'+
+      '<label>Titolo<input id="ocTitle" required maxlength="220"></label>'+
+      '<label>Priorità<select id="ocPriority"><option value="normal">Normale</option><option value="high">Alta</option><option value="urgent">Urgente</option><option value="low">Bassa</option></select></label>'+
+      '<label>Scadenza<input id="ocDue" type="datetime-local"></label>'+
+      '<label>Valore stimato €<input id="ocValue" type="number" min="0" step="0.01"></label>'+
+      '<button class="primary" type="submit">Crea pratica</button>'+
+    '</form>'
+  )
+  $('officeCaseForm').onsubmit=async e=>{
+    e.preventDefault()
+    const type=$('ocType').value
+    const firstStage=officeWorkflow.filter(x=>x.case_type===type).sort((a,b)=>a.sort_order-b.sort_order)[0]
+    const row={
+      organization_id:window.orgId,hub_id:office.id,product_id:product.id,
+      case_type:type,stage_code:firstStage?.stage_code||'open',status:'open',
+      title:$('ocTitle').value.trim(),priority:$('ocPriority').value,
+      due_at:$('ocDue').value?new Date($('ocDue').value).toISOString():null,
+      estimated_value:$('ocValue').value?Number($('ocValue').value):null,
+      assigned_to:window.userId,created_by:window.userId
+    }
+    const{error}=await supabase.from('office_product_cases').insert(row)
+    if(error)return alert(error.message)
+    closeModal();await loadAll();openOfficeProduct(product.id)
+  }
+}
+function openCepaActivityEditor(){
+  const office=selectedOffice()
+  if(!office)return
+  showModal(
+    '<div class="eyebrow">C.E.P.A. · '+esc(office.city)+'</div><h2>Nuova attività territoriale</h2>'+
+    '<form id="cepaOfficeForm" class="form-stack">'+
+      '<label>Tipo<select id="caType"><option value="event">Evento</option><option value="training">Formazione</option><option value="sap">SAP</option><option value="company_meeting">Incontro azienda</option><option value="school">Scuola</option><option value="public_entity">Ente pubblico</option><option value="appointment">Appuntamento</option><option value="content">Contenuto</option><option value="other">Altro</option></select></label>'+
+      '<label>Titolo<input id="caTitle" required maxlength="220"></label>'+
+      '<label>Descrizione<textarea id="caDescription" rows="4"></textarea></label>'+
+      '<label>Data<input id="caDate" type="datetime-local"></label>'+
+      '<label>Luogo<input id="caLocation"></label>'+
+      '<button class="primary" type="submit">Crea attività C.E.P.A.</button>'+
+    '</form>'
+  )
+  $('cepaOfficeForm').onsubmit=async e=>{
+    e.preventDefault()
+    const row={
+      organization_id:window.orgId,hub_id:office.id,activity_type:$('caType').value,
+      title:$('caTitle').value.trim(),description:$('caDescription').value.trim()||null,
+      scheduled_at:$('caDate').value?new Date($('caDate').value).toISOString():null,
+      location_name:$('caLocation').value.trim()||null,status:'planned',assigned_to:window.userId,created_by:window.userId
+    }
+    const{error}=await supabase.from('office_cepa_activities').insert(row)
+    if(error)return alert(error.message)
+    closeModal();await loadAll();openOffice(office.id)
+  }
+}
+
+$('newDirectionMessageBtn').onclick=openDirectionMessageEditor
+$('newMonthlyDataBtn').onclick=()=>{
+  const office=selectedOffice();if(!office)return
+  const options=products.map(p=>'<option value="'+p.id+'">'+esc(p.name)+'</option>').join('')
+  showModal('<div class="eyebrow">DATI MENSILI</div><h2>Scegli il prodotto</h2><form id="pickMonthlyProduct" class="form-stack"><label>Prodotto<select id="pickProduct">'+options+'</select></label><button class="primary" type="submit">Continua</button></form>')
+  $('pickMonthlyProduct').onsubmit=e=>{e.preventDefault();const pid=$('pickProduct').value;closeModal();openMonthlyDataEditor(pid)}
+}
+$('newCepaActivityBtn').onclick=openCepaActivityEditor
+$('newOfficeCaseBtn').onclick=openOfficeCaseEditor
 
 function renderPartner(){
   if(!currentPartnerId)return
