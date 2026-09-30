@@ -1,9 +1,10 @@
-const APP_VERSION='32.0.0';
+const APP_VERSION='40.0.0';
 const DYNAMIC_ORIGIN=(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)||location.hostname.endsWith('.onrender.com'))
   ? location.origin
   : 'https://scd-colicoderviese-official-r21.onrender.com';
 const API=DYNAMIC_ORIGIN+'/api/scd';
 const LIVE_API=DYNAMIC_ORIGIN+'/api/live';
+const NEWSROOM_API=DYNAMIC_ORIGIN+'/api/newsroom';
 const HEALTH_API=DYNAMIC_ORIGIN+'/health';
 const TIME_API=DYNAMIC_ORIGIN+'/api/time';
 const CAPABILITIES_API=DYNAMIC_ORIGIN+'/api/capabilities';
@@ -24,7 +25,7 @@ const FALLBACK={
     ],counts:{games:0,events:0,initiatives:0,news:1}
   }
 };
-let state={summary:null,installPrompt:null,session:null,sessionToken:'',privateData:null,apiStatus:'checking',clockOffsetMs:0,clubTimeZone:'Europe/Rome',clockSynced:false,calendar:[],location:null,capabilities:null,featureFlags:{dataFabricObservability:false},dataFabricStatus:null,dataFabricError:''};
+let state={summary:null,newsroom:null,installPrompt:null,session:null,sessionToken:'',privateData:null,apiStatus:'checking',clockOffsetMs:0,clubTimeZone:'Europe/Rome',clockSynced:false,calendar:[],location:null,capabilities:null,featureFlags:{dataFabricObservability:false},dataFabricStatus:null,dataFabricError:''};
 
 function localRequests(){
   try{return JSON.parse(localStorage.getItem(REQUESTS_KEY)||'[]')}catch{return []}
@@ -137,9 +138,14 @@ function normalizeCalendarRows(raw){
     date:normalizeCalendarDate(field(x,'date','data','startDate')),
     time:field(x,'time','ora','startTime')||'',
     endTime:field(x,'endTime','fine')||'',
-    type:field(x,'type','kind','category','eventType')||'EVENTO',
+    type:field(x,'type','kind','eventType')||field(x,'category','categoria')||'EVENTO',
+    category:displayValue(field(x,'category','categoria','ageGroup','annata'),''),
+    birthYear:displayValue(field(x,'birthYear','year','anno'),''),
     venue:field(x,'venue','luogo','field','location')||'',
     team:displayValue(field(x,'team','teamName','squadra'),''),
+    opponent:displayValue(field(x,'opponent','opponentName','avversario'),''),
+    competition:displayValue(field(x,'competition','campionato','league'),''),
+    result:displayValue(field(x,'result','score','risultato','finalScore'),''),
     source:field(x,'source','fonte')||'SCD',
     url:field(x,'url','link','sourceUrl')||''
   })).filter(x=>x.date||x.title);
@@ -350,13 +356,27 @@ function normalizePublic(raw){
   return obj;
 }
 async function loadSummary(silent=false){
-  let base=null,radar=null;
-  try{base=normalizePublic(await api('public.feed',{limit:40}))}catch(e){const cached=localStorage.getItem('scd:r21:summary');base=cached?JSON.parse(cached):JSON.parse(JSON.stringify(FALLBACK))}
-  try{const r=await fetch(LIVE_API,{cache:'no-store'});if(r.ok)radar=await r.json()}catch{}
+  let base=null;
+  try{base=normalizePublic(await api('public.feed',{limit:80}))}catch(e){const cached=localStorage.getItem('scd:r21:summary');base=cached?JSON.parse(cached):JSON.parse(JSON.stringify(FALLBACK))}
   const data=base||JSON.parse(JSON.stringify(FALLBACK));data.public=data.public||{};
-  if(radar&&Array.isArray(radar.items)&&radar.items.length){const internal=data.public.highlights||[];data.public.highlights=[...radar.items,...internal].slice(0,24);data.generatedAt=new Date(radar.generatedAt||Date.now()).toLocaleString('it-IT')}
   if(!Array.isArray(data.public.sponsors)||!data.public.sponsors.length)data.public.sponsors=FALLBACK.public.sponsors;
-  state.summary=data;localStorage.setItem('scd:r21:summary',JSON.stringify(data));render(data);if(!silent)toast(radar&&radar.items?.length?'SCD Radar aggiornato':'Dati SCD aggiornati')
+  state.summary=data;localStorage.setItem('scd:r21:summary',JSON.stringify(data));render(data);if(!silent)toast('Dati SCD aggiornati')
+}
+async function loadWeeklyNewsroom(silent=true){
+  try{
+    const r=await fetch(NEWSROOM_API,{cache:'no-store'});
+    if(!r.ok)throw new Error('newsroom '+r.status);
+    const j=await r.json();
+    if(j.ok!==true)throw new Error(j.error||'Newsroom non disponibile');
+    state.newsroom=j;
+    localStorage.setItem('scd:newsroom:v1',JSON.stringify(j));
+    if(!silent)toast('SCD Newsroom aggiornata');
+    window.dispatchEvent(new CustomEvent('scd:newsroom',{detail:j}));
+    return j;
+  }catch(e){
+    try{state.newsroom=JSON.parse(localStorage.getItem('scd:newsroom:v1')||'null')}catch{state.newsroom=null}
+    return state.newsroom;
+  }
 }
 function publicData(data){return (data&&data.public)||FALLBACK.public}
 function renderHomeKpis(p){
@@ -1000,6 +1020,6 @@ function boot(){
   navigator.serviceWorker.register('./sw.js?v=28.0.0',{updateViaCache:'none'})
     .then(reg=>reg.update())
     .catch(()=>{});
-}bindDynamic();syncClubClock();checkServiceHealth();loadCapabilities();loadPublicCalendar(true);restoreManagementSession();track('page_view',{section:(location.hash||'#home').replace('#','')});window.addEventListener('hashchange',()=>{const section=(location.hash||'#home').replace('#','');track('page_view',{section});setActiveNav(section==='eventi'?'events':section==='home'?'home':'')});loadSummary(true);setInterval(()=>{if(!document.hidden)loadSummary(true)},60000);setInterval(flushListening,120000);setInterval(checkDueReminders,60000);setTimeout(checkDueReminders,4000);setInterval(()=>{if(!document.hidden)syncClubClock()},300000);setInterval(()=>{if(!document.hidden)loadPublicCalendar(true)},300000);
+}bindDynamic();syncClubClock();checkServiceHealth();loadCapabilities();loadPublicCalendar(true);loadWeeklyNewsroom(true);restoreManagementSession();track('page_view',{section:(location.hash||'#home').replace('#','')});window.addEventListener('hashchange',()=>{const section=(location.hash||'#home').replace('#','');track('page_view',{section});setActiveNav(section==='eventi'?'events':section==='home'?'home':'')});loadSummary(true);setInterval(()=>{if(!document.hidden)loadSummary(true)},60000);setInterval(()=>{if(!document.hidden)loadWeeklyNewsroom(true)},300000);setInterval(flushListening,120000);setInterval(checkDueReminders,60000);setTimeout(checkDueReminders,4000);setInterval(()=>{if(!document.hidden)syncClubClock()},300000);setInterval(()=>{if(!document.hidden)loadPublicCalendar(true)},300000);
 }
 document.addEventListener('DOMContentLoaded',boot);
