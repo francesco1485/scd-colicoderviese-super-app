@@ -135,9 +135,12 @@
             <h2>Entra nell'ufficio in cui devi lavorare.</h2>
             <p>La Direzione vede l'insieme. Ogni utente lavora soltanto nelle sedi assegnate, con dati, prodotti, pratiche e C.E.P.A. del proprio territorio.</p>
           </div>
-          <div class="office-role-box">
-            <span>Accesso</span>
-            <strong id="officeEntryRole">—</strong>
+          <div class="office-entry-actions">
+            <button id="manageOfficeUsersBtn" class="office-admin-btn hidden" type="button">Gestione sedi utenti</button>
+            <div class="office-role-box">
+              <span>Accesso</span>
+              <strong id="officeEntryRole">—</strong>
+            </div>
           </div>
         </section>
 
@@ -801,6 +804,7 @@
 
 <div id="officeQuickActions" class="office-quick-actions hidden">
   <button id="newDirectionMessageBtn" type="button">Messaggio Direzione</button>
+  <button id="importAssiEasyBtn" type="button">Importa AssiEasy</button>
   <button id="newMonthlyDataBtn" type="button">Dati mensili</button>
   <button id="newCepaActivityBtn" type="button">Attività C.E.P.A.</button>
 </div>
