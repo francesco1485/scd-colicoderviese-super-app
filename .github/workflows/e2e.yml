@@ -23,6 +23,8 @@ jobs:
         run: npm run test:supabase-contract
       - name: Mobile Supabase contract gate
         run: npm run test:mobile-contract
+      - name: R41 mobile public dashboard contract
+        run: npm run test:mobile-contract
       - name: SCD Universe contract gate
         run: npm run test:universe-contract
       - name: Human OS contract gate
