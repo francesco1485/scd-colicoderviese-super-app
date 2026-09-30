@@ -596,7 +596,17 @@
       const runBtn=outlet.querySelector('#r42LiaRun');if(runBtn)runBtn.onclick=run;
       const handoffBtn=outlet.querySelector('#r42LiaHandoff');if(handoffBtn)handoffBtn.onclick=async()=>{
         const q=String(command.value||'').trim()||'Supporto generale Lia';
-        const packet=handoff(q);await navigator.clipboard.writeText(packet);toast('Pacchetto di supporto copiato');
+        const packet=handoff(q);
+        try{
+          const saved=await postCommand('save-lia-handoff',{command:q,module:'LIA',currentState:'Richiesta preparata dal Command Center R42',requestedOutput:'Supporto remoto ChatGPT tracciato',refs:[]});
+          const data=saved.result||{};
+          result.innerHTML='<div class="r42-lia-answer"><small>HANDOFF SALVATO</small><h2>Richiesta pronta per il supporto remoto</h2><p>Il pacchetto è stato archiviato nella coda Lia su Drive, senza token o credenziali.</p>'+(data.url?'<a class="primary" href="'+esc(data.url)+'" target="_blank" rel="noopener">APRI HANDOFF</a>':'')+'</div>';
+          await navigator.clipboard.writeText(packet).catch(()=>{});
+          toast('Handoff Lia salvato');
+        }catch(e){
+          await navigator.clipboard.writeText(packet).catch(()=>{});
+          toast('Bridge handoff non attivo: pacchetto copiato');
+        }
       };
       this.bindCommon(outlet);
     },
