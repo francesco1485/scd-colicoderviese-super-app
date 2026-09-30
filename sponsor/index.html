@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#061f4d">
+  <meta name="description" content="SCD Sponsor & Partnership Development — regia sponsor, partnership, convenzioni, asset e sviluppo marketing.">
+  <title>SCD Sponsor & Partnership Development</title>
+  <link rel="icon" href="../assets/logo-scd.png">
+  <link rel="stylesheet" href="./sponsor.css?v=1.0.0">
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <img src="../assets/logo-scd.png" alt="SCD ColicoDerviese">
+      <div><strong>SCD</strong><span>Sponsor OS</span></div>
+    </div>
+    <nav id="sideNav">
+      <button class="nav-item active" data-view="home"><span>⌂</span>Control Room</button>
+      <button class="nav-item" data-view="storici"><span>◴</span>Sponsor storici</button>
+      <button class="nav-item" data-view="attuali"><span>◆</span>Sponsor attuali</button>
+      <button class="nav-item" data-view="convenzioni"><span>✦</span>Convenzioni & Idee</button>
+      <button class="nav-item" data-view="ricerca"><span>◎</span>Ricerca & Marketing</button>
+      <button class="nav-item" data-view="asset"><span>▦</span>Asset & Opportunità</button>
+      <button class="nav-item" data-view="led"><span>▭</span>LED & Visibilità</button>
+      <button class="nav-item" data-view="azioni"><span>✓</span>Azioni & Scadenze</button>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="system-state"><span></span><b>MASTER ZERO</b><small>30.09.2026</small></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <button class="mobile-menu" id="mobileMenu">☰</button>
+      <div class="search-wrap">
+        <span class="search-icon">⌕</span>
+        <input id="globalSearch" placeholder="Cerca sponsor, referente, contratto, LED, rinnovi, asset, idee…">
+        <kbd>CTRL K</kbd>
+        <div class="search-results" id="searchResults" hidden></div>
+      </div>
+      <div class="top-actions">
+        <select id="seasonSelect" aria-label="Stagione">
+          <option>2026/27</option><option>2025/26</option><option>2024/25</option>
+        </select>
+        <button class="icon-btn" title="Notifiche">◉<span class="dot"></span></button>
+        <button class="profile-btn"><span>FC</span><div><b>Direzione</b><small>Vista completa</small></div></button>
+      </div>
+    </header>
+
+    <section class="view active" id="view-home">
+      <div class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow">SCD COLICODERVIESE · SPONSOR & PARTNERSHIP DEVELOPMENT</div>
+          <h1>Una regia unica per <em>sponsor, relazioni e sviluppo.</em></h1>
+          <p>Storico, contratti, convenzioni, ricerca, asset, LED, proposte, materiali e prossime azioni in un solo ambiente operativo.</p>
+          <div class="hero-actions">
+            <button class="primary" data-open-view="attuali">Apri sponsor attuali</button>
+            <button class="secondary" id="newSponsorBtn">+ Nuovo sponsor</button>
+          </div>
+        </div>
+        <div class="hero-stats">
+          <div><small>Cash verificato</small><strong>€4.400</strong><span>esclusi ibridi/non verificati</span></div>
+          <div><small>LED censiti</small><strong>19</strong><span>3 in attesa approvazione</span></div>
+          <div><small>Asset commerciali</small><strong>18</strong><span>inventario iniziale</span></div>
+          <div><small>Risposte aziendali</small><strong>13</strong><span>pipeline verificata</span></div>
+        </div>
+      </div>
+
+      <div class="today-panel">
+        <div>
+          <small>PRIORITÀ OPERATIVE</small>
+          <h2>Da fare oggi</h2>
+        </div>
+        <div class="today-list" id="todayList"></div>
+      </div>
+
+      <div class="section-head">
+        <div><small>LE 5 MACRO AREE</small><h2>Il progetto Sponsor, diviso come serve davvero</h2></div>
+        <span class="live-pill">DINAMICO</span>
+      </div>
+
+      <div class="macro-grid">
+        <article class="macro-card blue" data-open-view="storici">
+          <div class="macro-top"><span class="macro-icon">◴</span><span class="count">01</span></div>
+          <h3>Sponsor storici</h3><p>Relazioni passate, anni, continuità, asset utilizzati, valore e possibilità di riattivazione.</p>
+          <div class="macro-meta"><span>Storico pluriennale</span><b>Apri →</b></div>
+        </article>
+        <article class="macro-card navy" data-open-view="attuali">
+          <div class="macro-top"><span class="macro-icon">◆</span><span class="count">02</span></div>
+          <h3>Sponsor attuali</h3><p>Contratti, importi, asset occupati, loghi, referenti, rinnovi, materiali e stato amministrativo.</p>
+          <div class="macro-meta"><span>7 documentati</span><b>Apri →</b></div>
+        </article>
+        <article class="macro-card cyan" data-open-view="convenzioni">
+          <div class="macro-top"><span class="macro-icon">✦</span><span class="count">03</span></div>
+          <h3>Convenzioni & Idee</h3><p>Benefit tesserati, hospitality, fornitori, barter e idee che possono diventare accordi o partnership.</p>
+          <div class="macro-meta"><span>Pipeline viva</span><b>Apri →</b></div>
+        </article>
+        <article class="macro-card yellow" data-open-view="ricerca">
+          <div class="macro-top"><span class="macro-icon">◎</span><span class="count">04</span></div>
+          <h3>Ricerca & Sviluppo Marketing</h3><p>Prospect, categorie, territorio, campagne, social, benchmark, contenuti e nuove opportunità commerciali.</p>
+          <div class="macro-meta"><span>Research → Deal</span><b>Apri →</b></div>
+        </article>
+        <article class="macro-card white" data-open-view="asset">
+          <div class="macro-top"><span class="macro-icon">▦</span><span class="count">05</span></div>
+          <h3>Asset & Opportunità</h3><p>Tutto ciò che SCD può vendere o sviluppare: LED, tornei, divise, Club House, strutture, hospitality, media e community.</p>
+          <div class="macro-meta"><span>18 asset iniziali</span><b>Apri →</b></div>
+        </article>
+      </div>
+
+      <div class="home-lower">
+        <section class="panel">
+          <div class="panel-head"><div><small>RELAZIONI</small><h3>Ultimi movimenti</h3></div><button data-open-view="convenzioni">Vedi tutti</button></div>
+          <div class="timeline" id="recentTimeline"></div>
+        </section>
+        <section class="panel">
+          <div class="panel-head"><div><small>INTELLIGENCE</small><h3>Suggerimenti automatici</h3></div><span class="ai-badge">AI LOCALE</span></div>
+          <div class="insights" id="insights"></div>
+        </section>
+      </div>
+    </section>
+
+    <section class="view" id="view-storici"><div class="page-head"><div><small>MACRO AREA 01</small><h1>Sponsor storici</h1><p>Ricostruzione relazione, stagioni, asset e opportunità di ritorno.</p></div></div><div class="toolbar"><input class="local-search" data-target="storiciGrid" placeholder="Filtra sponsor storici…"><select><option>Tutti gli anni</option><option>2025/26</option><option>2024/25</option><option>2023/24</option></select><select><option>Tutti i settori</option><option>Tecnologia</option><option>Automotive</option><option>Sportswear</option></select></div><div class="cards-grid" id="storiciGrid"></div></section>
+
+    <section class="view" id="view-attuali"><div class="page-head"><div><small>MACRO AREA 02</small><h1>Sponsor attuali</h1><p>Rapporti verificati, contratti, importi, asset, referenti e rinnovi.</p></div><button class="primary" id="newSponsorBtn2">+ Nuovo sponsor</button></div><div class="toolbar"><input class="local-search" data-target="sponsorGrid" placeholder="Filtra sponsor attuali…"><select id="statusFilter"><option value="">Tutti gli stati</option><option>DOCUMENTATO</option><option>ECONOMICAMENTE DOCUMENTATO</option><option>PARTNER TECNICO DA COMPLETARE</option></select></div><div class="cards-grid sponsor-grid" id="sponsorGrid"></div></section>
+
+    <section class="view" id="view-convenzioni"><div class="page-head"><div><small>MACRO AREA 03</small><h1>Convenzioni & Idee</h1><p>Benefit, forniture, barter, servizi e collaborazioni da trasformare in valore per la community.</p></div><button class="secondary">+ Nuova idea</button></div><div class="pipeline" id="convenzioniGrid"></div></section>
+
+    <section class="view" id="view-ricerca"><div class="page-head"><div><small>MACRO AREA 04</small><h1>Ricerca & Sviluppo Marketing</h1><p>Prospect, categorie merceologiche, territorio, campagne e sviluppo relazionale.</p></div><button class="primary">+ Nuovo prospect</button></div><div class="research-layout"><div class="panel"><div class="panel-head"><div><small>PIPELINE</small><h3>Research → Qualifica → Contatto → Proposta</h3></div></div><div id="researchPipeline"></div></div><div class="panel"><div class="panel-head"><div><small>RADAR</small><h3>Categorie da sviluppare</h3></div></div><div class="radar-list" id="radarList"></div></div></div></section>
+
+    <section class="view" id="view-asset"><div class="page-head"><div><small>MACRO AREA 05</small><h1>Asset & Opportunità</h1><p>Inventario commerciale: libero, occupato, parziale, riservato o da sviluppare.</p></div><button class="secondary">+ Nuovo asset</button></div><div class="asset-grid" id="assetGrid"></div></section>
+
+    <section class="view" id="view-led"><div class="page-head"><div><small>MODULO OPERATIVO</small><h1>LED & Visibilità</h1><p>Materiali, preview, approvazioni, mapping hardware e playlist.</p></div></div><div class="led-board" id="ledBoard"></div></section>
+    <section class="view" id="view-azioni"><div class="page-head"><div><small>OPERATIVO</small><h1>Azioni & Scadenze</h1><p>Priorità, follow-up, audit e rinnovi.</p></div></div><div class="tasks" id="taskBoard"></div></section>
+  </main>
+
+  <button class="assistant-fab" id="assistantFab"><span>✦</span><b>LIA SPONSOR</b></button>
+  <aside class="assistant" id="assistant" hidden>
+    <div class="assistant-head"><div><span>✦</span><div><b>Lia Sponsor</b><small>Intelligence locale · nessun costo API</small></div></div><button id="assistantClose">×</button></div>
+    <div class="assistant-body" id="assistantBody">
+      <div class="bot-msg">Posso cercare sponsor, contratti, LED, rinnovi, asset liberi, scadenze e suggerire prossime azioni usando i dati presenti nella Web App.</div>
+    </div>
+    <div class="quick-prompts"><button>Cosa devo fare oggi?</button><button>LED bloccati</button><button>Asset liberi</button><button>Rinnovi</button></div>
+    <form id="assistantForm"><input id="assistantInput" placeholder="Scrivi un comando…"><button>Invia</button></form>
+  </aside>
+
+  <div class="modal-wrap" id="sponsorModal" hidden><div class="modal sponsor-detail"><button class="modal-close" data-close-modal>×</button><div id="sponsorDetail"></div></div></div>
+  <div class="modal-wrap" id="newSponsorModal" hidden><div class="modal form-modal"><button class="modal-close" data-close-modal>×</button><div class="form-head"><small>NUOVO SPONSOR</small><h2>Crea una nuova scheda</h2><p>La bozza viene salvata localmente sul dispositivo finché non colleghiamo il backend gratuito SCD.</p></div><form id="newSponsorForm" class="form-grid"><label>Nome sponsor<input required name="name"></label><label>Settore<input name="sector"></label><label>Referente<input name="contact"></label><label>Email<input type="email" name="email"></label><label>Stagione<input name="season" value="2026/27"></label><label>Tipo relazione<select name="type"><option>Sponsor</option><option>Partner tecnico</option><option>Convenzione</option><option>Fornitore / barter</option><option>Prospect</option></select></label><label class="wide">Note<textarea name="notes" rows="4"></textarea></label><div class="wide form-actions"><button type="button" class="secondary" data-close-modal>Annulla</button><button class="primary">Salva bozza locale</button></div></form></div></div>
+</div>
+<script src="./sponsor.js?v=1.0.0"></script>
+</body>
+</html>
