@@ -97,6 +97,7 @@ function navigate(view){
     return
   }
   currentPartnerId=null
+  applyBrandContext(null)
   document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'))
   $(view+'View').classList.remove('hidden')
   document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===view))
@@ -104,10 +105,29 @@ function navigate(view){
   const m=viewMeta[view]||['Centro di Regia','']
   setHeader(m[0],m[1])
   setMobileNav(false)
-  $('aiDock').classList.toggle('hidden',view==='home')
+  $('aiDock').classList.remove('hidden')
+  setLiaOpen(false)
   if(view==='recovery')loadRecovery()
   window.scrollTo({top:0,behavior:'smooth'})
 }
+const brandIdentity={
+  HDI:{label:'HDI Assicurazioni',accent:'#007A53',accent2:'#D71920',surface:'#F1F8F5'},
+  PRIMA_ENEA:{label:'Prima Assicurazioni',accent:'#6F2DBD',accent2:'#9B51E0',surface:'#F7F1FC'},
+  SLP:{label:'SLP Assicurazioni',accent:'#075EA8',accent2:'#2E83C7',surface:'#F1F7FC'},
+  AGLEA:{label:'Aglea Salus',accent:'#2C7A62',accent2:'#69A95A',surface:'#F2F8F5'},
+  CIP:{label:'CIP Energia',accent:'#E88A21',accent2:'#F3B35A',surface:'#FFF7EC'}
+}
+function applyBrandContext(node=null){
+  const root=document.documentElement
+  const brand=node?brandIdentity[node.code]:null
+  root.style.setProperty('--context-accent',brand?.accent||'#0B6F5C')
+  root.style.setProperty('--context-accent-2',brand?.accent2||'#1E6F9F')
+  root.style.setProperty('--context-surface',brand?.surface||'#F4F7F9')
+  document.body.dataset.contextBrand=node?.code||'MAGLIA'
+  const label=$('liaContextLabel')
+  if(label)label.textContent='Contesto: '+(node?.name||window.activeOfficeName||'MAGLIA 360')
+}
+
 function openPartner(id){
   if(!canOpenView('partners'))return
   currentPartnerId=id
@@ -116,6 +136,7 @@ function openPartner(id){
   document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'))
   const btn=document.querySelector('[data-partner-id="'+id+'"]');if(btn)btn.classList.add('active')
   const n=ecosystem.find(x=>x.id===id);if(!n)return
+  applyBrandContext(n)
   setHeader(n.name,n.capability+' · dossier relazione')
   showPartnerSection('overview')
   renderPartner()
@@ -153,7 +174,13 @@ $('editPartnerBtn').onclick=openEditPartner
 $('mailTemplateSelect').onchange=hydrateMailTemplate
 $('generateMailBtn').onclick=generateMailDraft
 $('mailComposerForm').onsubmit=saveMailDraft
-$('aiDockToggle').onclick=()=>{$('aiDockPanel').classList.toggle('hidden')}
+function setLiaOpen(open){
+  $('aiDockPanel').classList.toggle('hidden',!open)
+  $('aiDockToggle').classList.toggle('hidden',!!open)
+}
+$('aiDockToggle').onclick=()=>setLiaOpen(true)
+$('aiDockClose').onclick=()=>setLiaOpen(false)
+document.addEventListener('keydown',e=>{if(e.key==='Escape')setLiaOpen(false)})
 $('aiChatForm').onsubmit=e=>{e.preventDefault();const q=$('aiChatInput').value.trim();if(!q)return;askAssistant(q);$('aiChatInput').value=''}
 document.querySelectorAll('[data-ai-prompt]').forEach(b=>b.onclick=()=>askAssistant(b.dataset.aiPrompt))
 $('territoryHubFilter').onchange=renderMarketTable
@@ -231,11 +258,12 @@ async function boot(){
   $('workspace').classList.remove('hidden');$('blockedView').classList.add('hidden');$('aiDock').classList.remove('hidden')
   setMobileNav(false)
   try{setFocusMode(localStorage.getItem('maglia360_focus')==='1')}catch(_){setFocusMode(false)}
-  if(window.innerWidth>=1450)$('aiDockPanel').classList.remove('hidden')
+
   $('sideUser').textContent=user.email||'Utente';$('rolePill').textContent=m.role.replaceAll('_',' ')
   ;['newEntityBtn','addTimelineBtn','addContactBtn','addPartnerDocumentBtn','addDocumentBtn','addCepaSubjectBtn','addCepaInitiativeBtn','addCepaContentBtn','addCepaSpeakerBtn','addCollaboratorBtn','newAssessmentBtn','newDistributionCandidateBtn','editPartnerBtn'].forEach(id=>$(id).classList.toggle('hidden',!isManager()))
   await loadAll()
-  $('aiDock').classList.add('hidden')
+  $('aiDock').classList.remove('hidden')
+  setLiaOpen(false)
 }
 
 async function loadAll(){
@@ -1177,8 +1205,7 @@ async function askAssistant(q){
     reply='Posso preparare e salvare una bozza personalizzata usando i modelli Maglia/CEPA. Ti porto in AI Mail & Chat. L’invio diretto resta separato finché non colleghiamo un canale email autorizzato.'
     navigate('aiMail')
   }else{
-    const names=ecosystem.map(n=>n.code).join(', ')
-    reply='Posso lavorare sui dati presenti in piattaforma: compagnie e partner ('+names+'), prodotti, collaboratori, CEPA, territorio, documenti e attività. Dimmi quale area vuoi leggere o quale azione vuoi preparare.'
+    reply='Questa domanda non riguarda necessariamente i dati interni di MAGLIA 360. La nuova architettura di Lia prevede un motore generale separato dal Workbench operativo. Al momento questo ambiente V2 mantiene sicure e attive le funzioni aziendali; il collegamento del motore conversazionale generale richiede il relativo servizio LLM lato server e non verrà simulato con risposte preconfezionate.'
   }
   setTimeout(()=>{addAssistantMessage(reply,'bot');persistAssistantMessage(reply,'assistant','response',{matched:true,...context})},120)
 }
