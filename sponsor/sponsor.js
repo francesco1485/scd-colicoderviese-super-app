@@ -15,7 +15,8 @@ search:'<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="m16 16 
 bell:'<svg viewBox="0 0 24 24"><path d="M6 16h12l-1.5-2.5V9a4.5 4.5 0 0 0-9 0v4.5z"/><path d="M10 19h4"/></svg>',
 screen:'<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M9 21h6M12 17v4"/></svg>',
 crown:'<svg viewBox="0 0 24 24"><path d="m4 8 4 4 4-7 4 7 4-4-2 10H6z"/><path d="M6 21h12"/></svg>',
-clock:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>'
+clock:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+compass:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2.2 4.8-4.8 2.2 2.2-4.8z"/></svg>'
 };
 document.querySelectorAll('[data-icon]').forEach(el=>{el.innerHTML=ICONS[el.dataset.icon]||''});
 
@@ -75,6 +76,54 @@ const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll
 const initials=name=>name.split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase();
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 
+function sponsorIntel(s){
+  let evidence=25;
+  const reasons=[];
+  if(s.status==='DOCUMENTATO'){evidence+=28;reasons.push('Rapporto documentato');}
+  else if(/ECONOMICAMENTE/.test(s.status)){evidence+=16;reasons.push('Valore economico documentato, struttura rapporto incompleta');}
+  else reasons.push('Accordo da completare o verificare');
+  if((s.contacts||[]).length){evidence+=14;reasons.push('Referente/contatto disponibile');} else reasons.push('Referente non ancora collegato');
+  if(s.period && !/verificare/i.test(s.period)){evidence+=10;} else reasons.push('Durata o scadenza da verificare');
+  if(s.asset && !/ricostruire/i.test(s.asset)){evidence+=10;} else reasons.push('Asset corrente da ricostruire');
+  if(s.value && !/DA VERIFICARE|ibrido/i.test(s.value)){evidence+=8;} else reasons.push('Valore o natura economica da normalizzare');
+  if(s.history)evidence+=5;
+  evidence=Math.min(100,evidence);
+
+  const activation=/ricostruire/i.test(s.asset)?38:/Fornitura tecnica/i.test(s.asset)?62:82;
+  const relationship=/pluriennale|2022|2023|2024|storico/i.test((s.period||'')+' '+(s.since||'')+' '+(s.history||''))?86:68;
+  const renewal=/RINNOVARE/.test(s.class)?45:/AUDIT|RICOSTRUIRE|NORMALIZZARE/.test(s.class)?35:72;
+  const state=evidence>=75?'verified':evidence<60?'partial':'opportunity';
+
+  return {evidence,activation,relationship,renewal,state,reasons};
+}
+function portfolioIntel(){
+  const rows=DATA.sponsors.map(s=>({s,intel:sponsorIntel(s)}));
+  return {
+    rows,
+    avgEvidence:Math.round(rows.reduce((a,x)=>a+x.intel.evidence,0)/rows.length),
+    complete:rows.filter(x=>x.intel.evidence>=75).length,
+    partial:rows.filter(x=>x.intel.evidence<75).length,
+    decisions:rows.filter(x=>/AUDIT|RICOSTRUIRE|NORMALIZZARE|RINNOVARE/.test(x.s.class)||x.intel.evidence<65)
+  };
+}
+function assetFit(s,a){
+  const text=(s.sector+' '+s.tags.join(' ')).toLowerCase();
+  const asset=(a[0]+' '+a[1]+' '+a[2]).toLowerCase();
+  let score=1; const why=[];
+  const add=(n,r)=>{score+=n;why.push(r)};
+  if(/tecnologia|technology/.test(text)&&/media|digital|led|youth|tech/.test(asset))add(3,'Coerenza tecnologia ↔ media/digital/giovani');
+  if(/automotive|mobility|officina/.test(text)&&/navetta|mobilità|evento|led/.test(asset))add(3,'Coerenza mobilità ↔ servizio/evento/visibilità');
+  if(/sportswear|tecnico|kit/.test(text)&&/divise|giovanile|goalkeeper|evento/.test(asset))add(4,'Coerenza partner tecnico ↔ kit/settore giovanile');
+  if(/corporate|territorio|servizi/.test(text)&&/community|torneo|club house|led|partner club/.test(asset))add(2,'Coerenza territoriale ↔ community/evento/B2B');
+  if(/edilizia|coperture/.test(text)&&/struttura|centro sportivo|club house/.test(asset))add(3,'Coerenza edilizia ↔ struttura/impianto');
+  if(/Disponibile/.test(a[4]))add(1,'Asset dichiarato disponibile');
+  if(/Attivo|In proposta/.test(a[4])){score-=1;why.push('Asset già attivo/in proposta: verificare disponibilità ed esclusiva');}
+  if(/AUDIT|RICOSTRUIRE|NORMALIZZARE/.test(s.class)){score-=1;why.push('Prima completare audit del rapporto corrente');}
+  score=Math.max(0,Math.min(6,score));
+  return {score,level:score>=4?'high':score>=2?'mid':'low',why};
+}
+
+
 function openView(name){
   $$('.view').forEach(v=>v.classList.remove('active'));
   $('#view-'+name)?.classList.add('active');
@@ -84,10 +133,91 @@ function openView(name){
 }
 $$('[data-view]').forEach(el=>el.addEventListener('click',e=>{if(el.tagName==='BUTTON' || el.classList.contains('macro-visual') || el.classList.contains('hero-cta')) openView(el.dataset.view)}));
 $('#mobileMenu').onclick=()=>$('#sidebar').classList.toggle('open');
+$('#modeSwitch button').forEach(b=>b.onclick=()=>{$('#modeSwitch button').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.body.dataset.mode=b.dataset.mode;});
+
 
 function priorityClass(p){return /URGENTE|MOLTO/.test(p)?'urgent':''}
 $('#todayList').innerHTML=DATA.tasks.slice(0,5).map((t,i)=>'<div class="priority-row"><span class="priority-check '+(i===0?'done':'')+'"></span><b>'+esc(t[1])+' · '+esc(t[2])+'</b><time>'+(9+i*2)+':00</time><span class="priority-badge '+priorityClass(t[0])+'">'+esc(t[0])+'</span></div>').join('');
 $('#recentTimeline').innerHTML=DATA.responses.slice(0,5).map((r,i)=>'<div class="activity-row"><span class="activity-dot">'+(i+1)+'</span><div><b>'+esc(r.name)+'</b><span>'+esc(r.outcome)+'</span></div><time>'+esc(r.date)+'</time></div>').join('');
+
+const PINT=portfolioIntel();
+(function renderIntelligenceHome(){
+  const pos=[[11,18],[77,12],[84,58],[62,76],[24,73],[5,52],[48,7]];
+  const map=$('#relationshipMap');
+  if(map){
+    let html='<div class="map-center">SCD</div>';
+    PINT.rows.forEach((x,i)=>{
+      const p=pos[i%pos.length],abbr=initials(x.s.name);
+      html+='<span class="map-node '+x.intel.state+'" style="left:'+p[0]+'%;top:'+p[1]+'%" title="'+esc(x.s.name)+' · dati '+x.intel.evidence+'%">'+esc(abbr)+'</span>';
+    });
+    map.innerHTML=html;
+  }
+
+  const decisions=[
+    ...PINT.decisions.slice(0,4).map(x=>({title:x.s.name,text:x.s.next,kind:/RINNOVARE/.test(x.s.class)?'Rinnovo':'Audit',action:x.s.name}))
+  ];
+  const dc=$('#decisionCenter');
+  if(dc){
+    dc.innerHTML=decisions.map(d=>'<div class="decision-item"><span class="decision-icon">!</span><div><b>'+esc(d.title)+'</b><p>'+esc(d.text)+'</p></div><button data-sponsor-decision="'+esc(d.action)+'">'+esc(d.kind)+'</button></div>').join('');
+    $('#decisionCount').textContent=String(decisions.length);
+    dc.querySelectorAll('[data-sponsor-decision]').forEach(b=>b.onclick=()=>openSponsorDetail(b.dataset.sponsorDecision));
+  }
+
+  const gr=$('#growthRadar');
+  if(gr){
+    gr.innerHTML='<div class="growth-ring"><i class="growth-axis"></i><i class="growth-axis"></i><i class="growth-axis"></i><span class="growth-dot hot" style="left:66%;top:17%"></span><span class="growth-dot" style="left:25%;top:54%"></span><span class="growth-dot" style="left:57%;top:70%"></span><span class="growth-label" style="left:71%;top:6%">Community</span><span class="growth-label" style="left:3%;top:54%">Eventi</span><span class="growth-label" style="left:59%;top:82%">Media</span></div><div class="growth-summary"><div><small>ASSET DISPONIBILI</small><b>'+DATA.assets.filter(a=>a[4]==='Disponibile').length+'</b></div><div><small>DATI DA COMPLETARE</small><b>'+PINT.partial+'</b></div></div>';
+  }
+})();
+
+(function renderScenarioLab(){
+  const sponsorSubset=DATA.sponsors.slice(0,6);
+  const assetSubset=DATA.assets.filter(a=>['Disponibile','In sviluppo','Da studiare'].includes(a[4])).slice(0,6);
+  const matrix=$('#fitMatrix');
+  if(matrix){
+    let html='<div class="fit-table"><div class="fit-cell head">SPONSOR / ASSET</div>'+assetSubset.map(a=>'<div class="fit-cell head">'+esc(a[0])+'</div>').join('');
+    sponsorSubset.forEach((s,si)=>{
+      html+='<div class="fit-cell row-head">'+esc(s.name)+'</div>';
+      assetSubset.forEach((a,ai)=>{
+        const f=assetFit(s,a),label=f.level==='high'?'FORTE':f.level==='mid'?'DA VALUTARE':'DEBOLE';
+        html+='<div class="fit-cell fit-'+f.level+'">'+label+'<button data-fit="'+si+':'+ai+'" aria-label="Analizza '+esc(s.name)+' e '+esc(a[0])+'"></button></div>';
+      });
+    });
+    html+='</div>';matrix.innerHTML=html;
+    matrix.querySelectorAll('[data-fit]').forEach(b=>b.onclick=()=>{
+      const [si,ai]=b.dataset.fit.split(':').map(Number),s=sponsorSubset[si],a=assetSubset[ai],f=assetFit(s,a);
+      $('#scenarioTitle').textContent=s.name+' × '+a[0];
+      const cautions=[];
+      if(/AUDIT|RICOSTRUIRE|NORMALIZZARE/.test(s.class))cautions.push('Completare prima l’audit del rapporto corrente.');
+      if(a[4]!=='Disponibile')cautions.push('Lo stato asset è "'+a[4]+'": verificare disponibilità reale ed eventuali esclusive.');
+      $('#scenarioInspector').innerHTML='<div class="reason-list">'+
+        f.why.map(x=>'<div class="reason positive"><b>Elemento favorevole</b><span>'+esc(x)+'</span></div>').join('')+
+        cautions.map(x=>'<div class="reason caution"><b>Controllo necessario</b><span>'+esc(x)+'</span></div>').join('')+
+        '<div class="reason"><b>Regola</b><span>Il sistema non stima probabilità di chiusura. Evidenzia soltanto coerenze e dati mancanti.</span></div></div>';
+    });
+  }
+
+  const cb=$('#confidenceBoard');
+  if(cb)cb.innerHTML='<div class="confidence-list">'+[
+    ['Identità sponsor',100],['Valori economici',Math.round(PINT.rows.reduce((a,x)=>a+(!/DA VERIFICARE|ibrido/.test(x.s.value)?100:35),0)/PINT.rows.length)],
+    ['Asset correnti',Math.round(PINT.rows.reduce((a,x)=>a+(!/ricostruire/i.test(x.s.asset)?100:35),0)/PINT.rows.length)],
+    ['Contatti',Math.round(PINT.rows.reduce((a,x)=>a+((x.s.contacts||[]).length?100:25),0)/PINT.rows.length)],
+    ['Completezza media',PINT.avgEvidence]
+  ].map(x=>'<div class="confidence-row"><b>'+x[0]+'</b><span class="confidence-bar"><i style="width:'+x[1]+'%"></i></span><span>'+x[1]+'%</span></div>').join('')+'</div>';
+
+  const nba=$('#nextBestActions');
+  if(nba)nba.innerHTML='<div class="action-intel-list">'+PINT.decisions.slice(0,6).map((x,i)=>'<div class="action-intel"><div><b>'+(i+1)+'. '+esc(x.s.name)+'</b><p>'+esc(x.s.next)+'</p></div><em>'+x.intel.evidence+'% dati</em></div>').join('')+'</div>';
+})();
+
+const marketingIdeas=[
+  ['✦','Partnership Story','Trasforma sponsor + territorio + persone in un racconto editoriale coerente.'],
+  ['▭','LED Concept','Costruisci uno spot sponsor-only partendo da identità, messaggio autorizzato e obiettivo.'],
+  ['◎','Community Activation','Collega convenzione o sponsor a famiglie, tesserati, torneo e territorio.'],
+  ['◈','Event Experience','Integra naming, hospitality, LED, social, premiazioni e presenza fisica.'],
+  ['↗','Renewal Dossier','Prepara report dell’anno, prove di attivazione e proposta di continuità.'],
+  ['◫','Content System','Pianifica contenuti social, foto, video e report senza ripetere sempre lo stesso messaggio.']
+];
+if($('#marketingIdeas'))$('#marketingIdeas').innerHTML=marketingIdeas.map(x=>'<article class="marketing-idea"><span>'+x[0]+'</span><h4>'+x[1]+'</h4><p>'+x[2]+'</p><button data-lia="'+esc(x[1])+' per SCD">Apri con Lia →</button></article>').join('');
+
 
 function sponsorCard(s){
   return '<article class="sponsor-card" data-name="'+esc(s.name.toLowerCase())+'" data-status="'+esc(s.status)+'" onclick="openSponsorDetail(\''+s.name.replace(/'/g,"\\'")+'\')">'+
@@ -144,6 +274,7 @@ function contractProgress(s){if(/2027/.test(s.period))return 55;if(/pluriennale/
 
 window.openSponsorDetail=function(name){
   const s=DATA.sponsors.find(x=>x.name===name); if(!s)return;
+  const intel=sponsorIntel(s);
   const proposals=proposalIdeas(s), deadlines=sponsorDeadlines(s), contacts=s.contacts||[];
   $('#sponsorDetailPage').innerHTML=
   '<button class="detail-back" id="detailBack">← Torna agli sponsor</button>'+
@@ -157,6 +288,12 @@ window.openSponsorDetail=function(name){
     '<article class="detail-kpi"><small>STRATEGICITÀ</small><b>'+(/DA RICOSTRUIRE|AUDIT/.test(s.class)?'Da valutare':'Alta')+'</b></article>'+
     '<article class="detail-kpi"><small>RELAZIONE</small><b>'+(/storico|pluriennale/i.test(s.history+' '+s.period)?'Storica':'Attiva')+'</b></article>'+
   '</section>'+
+  '<section class="intel-strip">'+
+    '<article class="intel-metric"><small>SOLIDITÀ DATI</small><b>'+intel.evidence+'%</b><div class="intel-meter"><i style="width:'+intel.evidence+'%"></i></div></article>'+
+    '<article class="intel-metric"><small>ATTIVAZIONE DOCUMENTATA</small><b>'+intel.activation+'%</b><div class="intel-meter"><i style="width:'+intel.activation+'%"></i></div></article>'+
+    '<article class="intel-metric"><small>STORICITÀ RELAZIONE</small><b>'+intel.relationship+'%</b><div class="intel-meter"><i style="width:'+intel.relationship+'%"></i></div></article>'+
+    '<article class="intel-metric"><small>PRONTEZZA RINNOVO</small><b>'+intel.renewal+'%</b><div class="intel-meter"><i style="width:'+intel.renewal+'%"></i></div></article>'+
+  '</section>'+
   '<section class="detail-grid">'+
     '<div class="detail-column">'+
       '<article class="detail-panel"><header><h3>Contratti attuali</h3><button>Vedi tutti →</button></header><div class="contract-card"><div class="contract-card-top"><div><h4>'+esc(currentContractType(s))+' · 2026/27</h4><small>'+esc(s.period)+'</small></div><strong>'+esc(s.value)+'</strong></div><div class="progress-line"><i style="width:'+contractProgress(s)+'%"></i></div></div></article>'+
@@ -169,7 +306,7 @@ window.openSponsorDetail=function(name){
       '<article class="detail-panel"><header><h3>Storico collaborazione</h3><button>Vedi tutto →</button></header><div class="history-list"><div class="history-item"><time>'+esc(s.since)+'</time><b>Avvio / storico relazione</b><span>'+esc(s.history)+'</span></div><div class="history-item"><time>2026</time><b>Situazione corrente</b><span>'+esc(s.class)+'</span></div></div></article>'+
     '</div>'+
     '<div class="detail-column">'+
-      '<article class="detail-lia-card"><div class="detail-lia-top"><div class="detail-lia-avatar">L</div><div><b>Lia Sponsor</b><span class="ai-pill">AI locale</span></div></div><p>Analisi specifica del rapporto con '+esc(s.name)+'.</p><div class="suggestion-list">'+proposals.map(p=>'<div class="suggestion"><b>'+esc(p.title)+'</b>'+esc(p.text)+'</div>').join('')+'</div></article>'+
+      '<article class="detail-lia-card"><div class="detail-lia-top"><div class="detail-lia-avatar">L</div><div><b>Lia Sponsor</b><span class="ai-pill">AI locale</span></div></div><p>Analisi specifica del rapporto con '+esc(s.name)+'.</p><div class="suggestion-list">'+proposals.map(p=>'<div class="suggestion"><b>'+esc(p.title)+'</b>'+esc(p.text)+'</div>').join('')+'</div><div class="detail-reasoning"><h4>Perché il sistema ragiona così</h4><ul>'+intel.reasons.map(r=>'<li>'+esc(r)+'</li>').join('')+'</ul></div></article>'+
       '<article class="detail-panel"><header><h3>Note direzione</h3><button>+ Nota</button></header><div class="direction-note">'+esc(s.history)+'<br><br><b>Prossima azione:</b> '+esc(s.next)+'</div></article>'+
     '</div>'+
   '</section>';
@@ -198,14 +335,17 @@ globalSearch.addEventListener('input',()=>{
 document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();globalSearch.focus()}});
 
 function botAnswer(q){
-  const t=q.toLowerCase();
-  if(t.includes('oggi')||t.includes('fare'))return 'Priorità immediate: Caffè Teti, VIP Immagine e Lario Spurghi. Subito dopo: McDonald’s, Therabody, Iperal e audit DECAR/SACO.';
-  if(t.includes('led'))return 'LED: HDI Maglia, Dell’Oca e Carcano sono in attesa approvazione. DEGO, ATV, Iperal, LEGEA, NBC e Saglio sono in revisione. Gli altri richiedono completamento fonti/materiali.';
-  if(t.includes('asset')&&t.includes('liber'))return 'Asset indicati come disponibili: Family & Community Partner, Torneo Title Sponsor, Centro Sportivo - Area Club House e LED bordo campo. Prima di proporre va sempre verificata l’esclusiva di categoria.';
-  if(t.includes('rinn'))return 'Rinnovi prioritari: Coperture Rasero entro febbraio 2027. Noratech richiede report 2026 e proposta upgrade. Pedroncelli va verificata la scadenza finale.';
+  const t=q.toLowerCase(),p=portfolioIntel();
+  if(t.includes('portafoglio')||t.includes('analizza'))return 'Portafoglio: '+p.rows.length+' rapporti censiti. Completezza media dati '+p.avgEvidence+'%. '+p.complete+' rapporti hanno una base informativa solida; '+p.partial+' richiedono completamenti. Le priorità strutturali sono '+p.decisions.slice(0,4).map(x=>x.s.name).join(', ')+'. Non sto stimando probabilità commerciali: sto leggendo qualità dei dati e prossime azioni.';
+  if(t.includes('incomplet')||t.includes('manca'))return 'Dati da completare soprattutto su: '+p.rows.filter(x=>x.intel.evidence<75).map(x=>x.s.name+' ('+x.intel.evidence+'%)').join(', ')+'. Conviene chiudere prima asset, durata, contatti e natura economica.';
+  if(t.includes('cresc')||t.includes('opportun'))return 'Crescita: gli asset oggi segnati disponibili sono '+DATA.assets.filter(a=>a[4]==='Disponibile').map(a=>a[0]).join(', ')+'. Prima di abbinarli a un’azienda, Scenario Lab controlla coerenza settore/asset, stato del rapporto e necessità di verificare esclusive.';
+  if(t.includes('oggi')||t.includes('fare'))return 'Priorità immediate: Caffè Teti, VIP Immagine e Lario Spurghi. Subito dopo: McDonald’s, Therabody, Iperal e audit DECAR/SACO. Sul portafoglio attuale, DECAR, SACO e Bianchi Bazzi richiedono ricostruzione prima di qualsiasi proposta evolutiva.';
+  if(t.includes('led'))return 'LED: HDI Maglia, Dell’Oca e Carcano sono in attesa approvazione. DEGO, ATV, Iperal, LEGEA, NBC e Saglio sono in revisione. Gli altri richiedono completamento fonti/materiali. Nessun nuovo spot dovrebbe partire senza logo/materiale ufficiale e messaggio autorizzato.';
+  if(t.includes('asset')&&t.includes('liber'))return 'Asset indicati come disponibili: Family & Community Partner, Torneo Title Sponsor, Centro Sportivo - Area Club House e LED bordo campo. Prima di proporre va verificata ogni esclusiva di categoria e l’eventuale occupazione reale.';
+  if(t.includes('rinn'))return 'Rinnovi: Coperture Rasero va preparato con anticipo; Noratech richiede Sponsor Report 2026 e proposta upgrade; Pedroncelli richiede verifica scadenza e situazione amministrativa. Il rinnovo parte dalle prove di attivazione, non dal nuovo prezzo.';
   const sponsor=DATA.sponsors.find(s=>t.includes(s.name.toLowerCase().split(' ')[0]));
-  if(sponsor)return sponsor.name+': '+sponsor.class+'. Prossima azione: '+sponsor.next+'. Valore: '+sponsor.value+'.';
-  return 'Posso aiutarti con sponsor, contratti, LED, rinnovi, asset, pipeline e prossime azioni usando soltanto i dati presenti nella piattaforma.';
+  if(sponsor){const i=sponsorIntel(sponsor);return sponsor.name+': '+sponsor.class+'. Solidità dati '+i.evidence+'%. Fatto certo: '+sponsor.asset+'; valore: '+sponsor.value+'. Prossima azione: '+sponsor.next+'. Punti da verificare: '+i.reasons.filter(x=>/verific|ricostru|normalizzare|non ancora/.test(x.toLowerCase())).join('; ')+'.';}
+  return 'Posso ragionare su portafoglio, completezza dati, sponsor, contratti, LED, rinnovi, asset, pipeline, Scenario Lab e prossime azioni. Le conclusioni sono sempre separate tra fatti verificati, ipotesi e controlli necessari.';
 }
 function addMsg(text,cls){const d=document.createElement('div');d.className=cls;d.textContent=text;$('#assistantBody').appendChild(d);$('#assistantBody').scrollTop=$('#assistantBody').scrollHeight}
 const assistant=$('#assistant');
@@ -228,3 +368,4 @@ $('#newSponsorForm').onsubmit=e=>{
   const arr=JSON.parse(localStorage.getItem('scd_sponsor_drafts')||'[]');arr.push(draft);localStorage.setItem('scd_sponsor_drafts',JSON.stringify(arr));
   newModal.hidden=true;e.target.reset();openAssistant('Ho salvato una nuova bozza sponsor locale. Cosa devo completare prima di considerarla valida?');
 };
+document.addEventListener('click',e=>{const liaBtn=e.target.closest('[data-lia]');if(liaBtn&&typeof openAssistant==='function'){e.preventDefault();openAssistant(liaBtn.dataset.lia||liaBtn.textContent.trim())}});
