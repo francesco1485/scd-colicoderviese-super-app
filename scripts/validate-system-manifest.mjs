@@ -128,9 +128,10 @@ includesAll(m.calendar_event_engine.required_event_fields||[],[
 includesAll(m.gmail_intelligence.existing_runtime_surfaces||[],['MAIL_OPERATIONS_SHEET/01_EMAIL_ARCHIVE','MAIL_OPERATIONS_SHEET/17_SMART_CLASSIFIER','MAIL_OPERATIONS_SHEET/18_ACTION_QUEUE'],'Gmail existing runtime surfaces');
 assert(m.completeness_engine.confidence_required===true,'Completeness Engine confidence required');
 assert(m.product_direction?.default_entry_route==='#/pulse','R26 default entry route must be #/pulse');
-assert(m.product_direction?.experience_model==='CLUB_GRAPH_DRIVEN','R26 experience model must remain graph-driven');
-assert(m.product_direction?.visual_principle==='ABSTRACT_ADAPTIVE_SUBLIMATION','R26 visual principle mismatch');
-assert(m.product_direction?.no_rewrite_rule===true,'R26 no-rewrite rule must remain true');
+assert(m.product_direction?.experience_model==='ADAPTIVE_CLUB_OS','R38 experience model must be adaptive club OS');
+assert(m.product_direction?.visual_principle==='SPATIAL_SPORT_EDITORIAL_HIGH_IMPACT','R38 visual principle mismatch');
+assert(m.product_direction?.cumulative_integration_rule===true,'R38 cumulative integration rule missing');
+assert(m.manifest.change_policy?.cumulative_directives===true,'cumulative directive governance missing');
 includesAll(m.completeness_engine.search_order||[],['DOMAIN_CORE','SCD_DRIVE','SCD_GMAIL_ATTACHMENTS'],'Completeness search order');
 
 assert(m.communications.safeguarding.isolated===true,'Safeguarding must stay isolated');
@@ -141,6 +142,10 @@ assert(m.communications.messaging.minor_safety.private_unsupervised_minor_chat_d
 assert(m.sky_and_avatar.sky.must_not_bypass_permissions===true,'Sky must not bypass permissions');
 assert(m.sky_and_avatar.personal_avatar.local_processing_default===true,'avatar local processing default required');
 assert(m.sky_and_avatar.tamagotchi_evolution.forbidden_default.includes('hidden_biometric_scoring'),'Tamagotchi youth guardrail missing');
+assert(m.sky_and_avatar.tamagotchi_evolution.forbidden_default.includes('talent_ranking'),'Twin talent ranking guardrail missing');
+assert(m.sky_and_avatar?.mirror?.no_permission_bypass===true,'Mirror permission bypass must remain forbidden');
+assert(m.analytics?.meta_adaptive?.storage==='LOCAL_DEVICE_ONLY_R38','Meta R38 must remain local-device only');
+assert(m.analytics?.meta_adaptive?.external_sync===false,'Meta R38 external sync must remain off');
 
 assert(m.geo_spatial.edge_first===true,'geo must remain edge-first');
 assert(m.geo_spatial.precise_location_default===false,'precise location must not default on');
@@ -209,7 +214,7 @@ includesAll(caps.map(x=>x.id),[
   'CAP-HOME','CAP-CALENDAR','CAP-ATHLETE','CAP-FAMILY','CAP-STAFF','CAP-COMMS','CAP-RUNTIME-EVIDENCE','CAP-UPSTREAM-RESILIENCE','CAP-R20-RUNTIME-ACTIVATION',
   'CAP-DRIVE-CATALOG','CAP-GMAIL-INGESTION','CAP-DATAFABRIC-OBSERVABILITY','CAP-ENTITY-GRAPH','CAP-COMPLETENESS','CAP-SUPABASE-CORE','CAP-SUPABASE-AUTH-CONTEXT',
   'CAP-CHAT','CAP-CONFIDENCE','CAP-ANCONFIDENCE','CAP-SAFEGUARDING','CAP-SKY','CAP-AVATAR',
-  'CAP-TAMAGOTCHI','CAP-GEO','CAP-R22','CAP-PWA','CAP-ANDROID','CAP-IOS','CAP-MOBILE-SUPABASE-SHELL'
+  'CAP-TAMAGOTCHI','CAP-GEO','CAP-R22','CAP-PWA','CAP-ANDROID','CAP-IOS','CAP-MOBILE-SUPABASE-SHELL','CAP-SCD-UNIVERSE','CAP-META-ADAPTIVE','CAP-SCD-TWIN','CAP-SCD-MIRROR','CAP-SOCIAL-RADAR'
 ],'capability map');
 
 const gaps=m.known_noncompliance||[];
@@ -234,6 +239,12 @@ const requiredRepoFiles=[
   'docs/adr/ADR-0007-supabase-domain-core.md',
   'docs/adr/ADR-0008-supabase-auth-context.md',
   'docs/adr/ADR-0009-mobile-supabase-shell.md',
+  'docs/adr/ADR-0010-r38-scd-universe.md',
+  'docs/SCD_UNIVERSE_R38.md',
+  'ui-r38-universe.css',
+  'scd-meta-engine.js',
+  'scd-twin.js',
+  'scripts/validate-universe-contract.mjs',
   'mobile/package.json',
   'mobile/app.json',
   'mobile/App.tsx',
@@ -265,6 +276,7 @@ assert(pkg?.scripts?.['test:resilience']==='node tests/upstream-resilience.mjs',
 assert(pkg?.scripts?.['verify:r20']==='node scripts/verify-r20-direct.mjs','package.json must expose verify:r20');
 assert(pkg?.scripts?.['test:supabase-contract']==='node scripts/validate-supabase-contract.mjs','package.json must expose test:supabase-contract');
 assert(pkg?.scripts?.['test:mobile-contract']==='node scripts/validate-mobile-contract.mjs','package.json must expose test:mobile-contract');
+assert(pkg?.scripts?.['test:universe-contract']==='node scripts/validate-universe-contract.mjs','package.json must expose test:universe-contract');
 
 for(const workflow of ['.github/workflows/e2e.yml','.github/workflows/pages.yml','.github/workflows/command-platform.yml','.github/workflows/system-manifest.yml']){
   const file=path.join(root,workflow);
