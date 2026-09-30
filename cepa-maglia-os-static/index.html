@@ -99,103 +99,130 @@
   <button id="sidebarBackdrop" class="sidebar-backdrop hidden" type="button" aria-label="Chiudi menu"></button>
 
   <main class="main">
-    <header class="main-header">
-      <div class="header-left">
+    <header class="main-header app-topbar">
+      <div class="topbar-brand-zone">
         <button id="mobileMenuBtn" class="mobile-menu-btn" type="button" aria-label="Apri menu">☰</button>
+        <div class="history-controls" aria-label="Cronologia navigazione">
+          <button id="navBackBtn" type="button" aria-label="Indietro" title="Indietro">‹</button>
+          <button id="navForwardBtn" type="button" aria-label="Avanti" title="Avanti">›</button>
+        </div>
         <div class="header-brand">
           <strong>Maglia <span>360</span></strong>
           <small>Agenzia Generale HDI</small>
         </div>
-        <div class="header-context">
-          <div class="eyebrow">AREA DI LAVORO</div>
-          <h1 id="pageTitle">Quadro generale</h1>
-          <p id="pageSubtitle">Agenzia Generale HDI · Ecosistema di competenze, relazioni e sviluppo</p>
-        </div>
       </div>
-      <div class="header-right">
-        <div class="header-cepa">
-          <small>Da Maglia Assicurazioni nasce</small>
-          <strong>C.E.P.A.</strong>
-          <span>Centro Educazione Previdenziale e Assicurativa</span>
+
+      <div class="header-context">
+        <div class="eyebrow">AREA DI LAVORO</div>
+        <h1 id="pageTitle">Home</h1>
+        <p id="pageSubtitle">Sistema operativo commerciale e territoriale</p>
+      </div>
+
+      <div class="global-search-shell">
+        <span class="global-search-icon" aria-hidden="true">⌕</span>
+        <input id="globalSearchInput" type="search" autocomplete="off" placeholder="Cerca clienti, pratiche, partner, C.E.P.A., documenti, materiali..." aria-label="Ricerca globale">
+        <kbd>Ctrl K</kbd>
+        <div id="globalSearchResults" class="global-search-results hidden" role="listbox"></div>
+      </div>
+
+      <div class="header-right topbar-actions">
+        <label class="office-quick-select">
+          <span aria-hidden="true">⌖</span>
+          <select id="officeQuickSelector" aria-label="Seleziona ufficio">
+            <option value="">Tutte le sedi</option>
+          </select>
+        </label>
+        <button id="headerNotificationsBtn" class="topbar-icon-btn" type="button" aria-label="Notifiche">
+          <span aria-hidden="true">♢</span><b id="headerNotificationBadge" class="notification-badge hidden">0</b>
+        </button>
+        <div class="header-user-card">
+          <span id="headerUserInitials" class="header-avatar">U</span>
+          <div><strong id="headerUserName">Utente</strong><small id="rolePill"></small></div>
         </div>
-        <div class="header-actions">
-          <button id="focusModeBtn" class="small-btn" type="button" title="Riduci la schermata alle priorità">◎ Focus</button>
-          <a class="public-preview-link" href="./presentazione.html" target="_blank" rel="noopener">Vetrina progetto</a>
-          <span id="rolePill" class="role-pill"></span>
-          <button id="refreshBtn" class="icon-btn" title="Aggiorna">↻</button>
-        </div>
+        <button id="refreshBtn" class="topbar-icon-btn" title="Aggiorna" aria-label="Aggiorna">↻</button>
       </div>
     </header>
 
     <section id="homeView" class="view">
-      <div class="office-entry">
-        <section class="office-entry-head">
-          <div>
-            <div class="office-kicker">MAGLIA 360 · AMBIENTI DI LAVORO</div>
-            <h2>Scegli dove devi lavorare.</h2>
-            <p>Uffici operativi e progetto C.E.P.A. hanno strutture distinte, dati territoriali separati e una regia comune della Direzione.</p>
+      <div class="command-home">
+        <section class="home-hero">
+          <div class="home-hero-copy">
+            <div class="home-kicker">MAGLIA 360 · SISTEMA OPERATIVO</div>
+            <h2>Scegli il tuo ambiente di lavoro</h2>
+            <p>Ogni accesso ti connette con il tuo ruolo, la tua sede e le priorità della Direzione.</p>
           </div>
-          <div class="office-entry-actions">
-            <button id="manageOfficeUsersBtn" class="office-admin-btn hidden" type="button">Gestione sedi utenti</button>
-            <div class="office-role-box">
-              <span>Accesso</span>
-              <strong id="officeEntryRole">—</strong>
-            </div>
+          <div class="home-hero-visual" aria-hidden="true">
+            <img src="./assets/office-colico.svg" alt="">
+          </div>
+          <div class="home-hero-brand">
+            <strong>MAGLIA</strong><span>ASSICURAZIONI</span>
+            <i></i>
+            <b>HDI</b><small>ASSICURAZIONI</small>
           </div>
         </section>
 
-        <section id="directionMessage" class="direction-message hidden"></section>
-
-        <section class="workspace-worlds" aria-label="Ambienti principali">
-          <button id="agencyWorldCard" class="workspace-world agency-world" type="button">
-            <div class="world-symbol">M</div>
-            <div class="world-copy">
-              <span>AGENZIA · OPERATIVITÀ</span>
-              <h3>Uffici Maglia 360</h3>
-              <p>Produzione, prodotti, rinnovi, preventivi, pratiche, clienti e sviluppo commerciale.</p>
-              <div class="world-tags"><b>Colico</b><b>Mandello</b><b>Sedi future</b></div>
-            </div>
-            <strong class="world-enter">Vai agli uffici ↓</strong>
+        <section class="home-status-strip" aria-label="Stato operativo">
+          <button id="homeDirectionTile" type="button" class="status-tile direction">
+            <span class="status-icon">✉</span><div><small>Messaggio Direzione</small><strong id="homeDirectionTitle">Nessun messaggio urgente</strong><em id="homeDirectionText">Consulta le comunicazioni interne.</em></div><b>›</b>
           </button>
-
-          <button id="cepaWorldCard" class="workspace-world cepa-world" type="button">
-            <div class="world-symbol">C</div>
-            <div class="world-copy">
-              <span>C.E.P.A. · PROGETTO TERRITORIALE</span>
-              <h3>Centro Educazione Previdenziale e Assicurativa</h3>
-              <p>Centro centrale, attività territoriali, SAP, Academy, contenuti, relatori, scuole, aziende ed enti.</p>
-              <div class="world-tags"><b>Centro CEPA</b><b>Colico</b><b>Mandello</b><b>Nuovi territori</b></div>
-            </div>
-            <strong class="world-enter">Entra in C.E.P.A. →</strong>
+          <button id="homePriorityTile" type="button" class="status-tile priority">
+            <span class="status-icon">⚑</span><div><small>Priorità</small><strong><span id="homePriorityCount">0</span> attività urgenti</strong><em>Da gestire con precedenza.</em></div><b>›</b>
+          </button>
+          <button id="homeNotificationTile" type="button" class="status-tile notification">
+            <span class="status-icon">●</span><div><small>Notifiche</small><strong><span id="homeNotificationCount">0</span> da verificare</strong><em>Aggiornamenti della rete.</em></div><b>›</b>
+          </button>
+          <button id="homeDeadlineTile" type="button" class="status-tile deadline">
+            <span class="status-icon">□</span><div><small>Scadenze</small><strong><span id="homeDeadlineCount">0</span> in arrivo</strong><em>Nei prossimi 7 giorni.</em></div><b>›</b>
           </button>
         </section>
 
-        <section id="agencyOfficeSection" class="office-entry-grid">
-          <div>
-            <div class="office-section-head">
-              <div><span>SEDI ATTIVE</span><h3>I tuoi uffici</h3></div>
-              <small id="officeAccessNote"></small>
+        <section class="home-content-grid">
+          <div class="home-environment-zone">
+            <div class="home-section-heading">
+              <div><span>AMBIENTI PRINCIPALI</span><h3>Dove vuoi lavorare?</h3></div>
+              <div class="carousel-controls">
+                <button id="homeEnvironmentPrev" type="button" aria-label="Scorri indietro">‹</button>
+                <button id="homeEnvironmentNext" type="button" aria-label="Scorri avanti">›</button>
+              </div>
             </div>
-            <div id="officeCards" class="office-cards"></div>
+            <div id="homeEnvironmentCards" class="home-environment-cards"></div>
+
+            <div class="home-section-heading future-heading">
+              <div><span>SVILUPPO FUTURO</span><h3>Altri uffici e presìdi</h3><small>Le sedi future sono indicate come sviluppo, non come operative.</small></div>
+              <div class="carousel-controls">
+                <button id="futureOfficePrev" type="button" aria-label="Scorri indietro">‹</button>
+                <button id="futureOfficeNext" type="button" aria-label="Scorri avanti">›</button>
+              </div>
+            </div>
+            <div id="futureOfficeCards" class="future-office-cards"></div>
           </div>
-          <aside id="directionOverview" class="direction-overview">
-            <div class="office-section-head">
-              <div><span>DIREZIONE</span><h3>Confronto sedi e priorità</h3></div>
-              <small>Si aggiorna con gli snapshot mensili delle sedi.</small>
-            </div>
-            <div id="directionCompareSummary" class="direction-compare-summary"></div>
-            <div id="directionProduction" class="direction-production"></div>
-            <div id="directionPriorities" class="direction-priorities"></div>
+
+          <aside class="home-right-rail">
+            <section class="rail-panel">
+              <div class="rail-title"><h3>Le tue priorità</h3><button id="openAllPrioritiesBtn" type="button">Vedi tutte →</button></div>
+              <div id="homePriorityList" class="home-priority-list"></div>
+            </section>
+            <section class="rail-panel">
+              <div class="rail-title"><h3>Notizie interne</h3><button id="openAllNewsBtn" type="button">Vedi tutte →</button></div>
+              <div id="homeNewsList" class="home-news-list"></div>
+            </section>
           </aside>
         </section>
 
-        <section id="futureOfficeSection" class="future-office-section hidden">
-          <div>
-            <span>SVILUPPO FUTURO</span>
-            <strong>Nuove sedi</strong>
-            <p>Lo spazio è previsto nell'architettura, ma nessuna sede futura viene mostrata come operativa finché non viene realmente attivata.</p>
+        <section id="directionOverview" class="direction-overview">
+          <div class="office-section-head">
+            <div><span>DIREZIONE</span><h3>Confronto sedi e priorità</h3></div>
+            <small id="officeAccessNote">Vista Direzione</small>
           </div>
+          <div id="directionCompareSummary" class="direction-compare-summary"></div>
+          <div id="directionProduction" class="direction-production"></div>
+          <div id="directionPriorities" class="direction-priorities"></div>
         </section>
+
+        <div class="home-admin-actions">
+          <button id="manageOfficeUsersBtn" class="small-btn hidden" type="button">Gestione sedi utenti</button>
+          <span id="officeEntryRole" class="home-role-note"></span>
+        </div>
       </div>
     </section>
 
