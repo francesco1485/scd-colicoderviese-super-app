@@ -23,7 +23,7 @@ const viewMeta={
  liaWorkbench:['Lia · Workbench','Assistente operativo con permessi, ricerca, cartelle di lavoro e artefatti tracciati']
 }
 
-let ecosystem=[],projects=[],actions=[],marketHubs=[],marketEntities=[],contacts=[],timeline=[],documents=[],partnerRequirements=[],blueprints=[],subjects=[],initiatives=[],cepaContent=[],cepaAcademy=[],cepaSpeakers=[],products=[],productKnowledge=[],comparisons=[],collaborators=[],collaboratorTerms=[],portfolioSnapshots=[],businessAssessments=[],growthKits=[],distributionWatchlists=[],distributionCandidates=[],distributionEvidence=[],mailTemplates=[],mailDrafts=[],cepaExpansion=[],cepaReadiness=[],assistantMessages=[],recoveryRows=[],members=[],liaCapabilities=[],liaFolders=[],liaOrders=[],liaFiles=[],researchSources=[]
+let ecosystem=[],projects=[],actions=[],marketHubs=[],marketEntities=[],contacts=[],timeline=[],documents=[],partnerRequirements=[],blueprints=[],subjects=[],initiatives=[],cepaContent=[],cepaAcademy=[],cepaSpeakers=[],products=[],productKnowledge=[],comparisons=[],collaborators=[],collaboratorTerms=[],portfolioSnapshots=[],businessAssessments=[],growthKits=[],distributionWatchlists=[],distributionCandidates=[],distributionEvidence=[],mailTemplates=[],mailDrafts=[],cepaExpansion=[],cepaReadiness=[],assistantMessages=[],recoveryRows=[],members=[],liaCapabilities=[],liaFolders=[],liaOrders=[],liaFiles=[],researchSources=[],researchInsights=[]
 let currentPartnerId=null
 
 function msg(text,error=false){$('loginMsg').textContent=text;$('loginMsg').className='message'+(error?' error':'')}
@@ -253,12 +253,13 @@ async function loadAll(){
     supabase.from('ai_workspace_folders').select('*').eq('organization_id',window.orgId).order('created_at',{ascending:false}).limit(100),
     supabase.from('ai_work_orders').select('*').eq('organization_id',window.orgId).order('created_at',{ascending:false}).limit(60),
     supabase.from('ai_work_order_files').select('*').eq('organization_id',window.orgId).order('created_at',{ascending:false}).limit(120),
-    supabase.from('research_sources').select('*').eq('organization_id',window.orgId).eq('active',true).order('trust_level').order('name')
+    supabase.from('research_sources').select('*').eq('organization_id',window.orgId).eq('active',true).order('trust_level').order('name'),
+    supabase.from('research_insights').select('*,research_sources(id,name,url)').eq('organization_id',window.orgId).order('updated_at',{ascending:false}).limit(100)
   ]
   const res=await Promise.all(q)
   const err=res.find(x=>x.error)?.error
   if(err){console.error(err);$('refreshBtn').textContent='!';return}
-  ;[ecosystem,projects,actions,marketHubs,marketEntities,contacts,timeline,documents,partnerRequirements,blueprints,subjects,initiatives,cepaContent,cepaAcademy,cepaSpeakers,products,productKnowledge,comparisons,collaborators,collaboratorTerms,portfolioSnapshots,businessAssessments,growthKits,distributionWatchlists,distributionCandidates,distributionEvidence,mailTemplates,mailDrafts,cepaExpansion,cepaReadiness,assistantMessages,liaCapabilities,liaFolders,liaOrders,liaFiles,researchSources]=res.map(x=>x.data||[])
+  ;[ecosystem,projects,actions,marketHubs,marketEntities,contacts,timeline,documents,partnerRequirements,blueprints,subjects,initiatives,cepaContent,cepaAcademy,cepaSpeakers,products,productKnowledge,comparisons,collaborators,collaboratorTerms,portfolioSnapshots,businessAssessments,growthKits,distributionWatchlists,distributionCandidates,distributionEvidence,mailTemplates,mailDrafts,cepaExpansion,cepaReadiness,assistantMessages,liaCapabilities,liaFolders,liaOrders,liaFiles,researchSources,researchInsights]=res.map(x=>x.data||[])
   renderEverything()
   $('refreshBtn').textContent='↻'
 }
@@ -800,6 +801,11 @@ function renderLiaWorkbench(){
   $('liaSourceList').innerHTML=researchSources.map(src=>
     '<article class="lia-source-card"><div><strong>'+esc(src.name)+'</strong><small>'+esc(src.source_type.replaceAll('_',' '))+' · '+esc(src.access_mode.replaceAll('_',' '))+'</small></div><span class="source-trust '+esc(src.trust_level)+'">'+esc(trustLabel[src.trust_level]||src.trust_level)+'</span><p>'+esc(src.use_case||'Fonte di lavoro')+'</p></article>'
   ).join('')||empty('Nessuna fonte registrata')
+
+  $('liaInsightCount').textContent=researchInsights.length+' insight'
+  $('liaInsightList').innerHTML=researchInsights.map(i=>
+    '<article class="lia-insight-card"><div class="lia-insight-top"><div><strong>'+esc(i.title)+'</strong><small>'+esc(i.category.replaceAll('_',' '))+(i.research_sources?.name?' · '+esc(i.research_sources.name):'')+'</small></div><span class="insight-confidence '+esc(i.confidence)+'">'+esc(i.confidence)+'</span></div><p>'+esc(i.insight_summary)+'</p><div class="lia-application"><b>Applicazione Maglia 360</b><span>'+esc(i.application_hypothesis||'Da definire')+'</span></div></article>'
+  ).join('')||empty('Nessun insight metodologico registrato')
 }
 
 function renderMail(){
