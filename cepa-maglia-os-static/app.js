@@ -415,6 +415,40 @@ function fmtMonth(v){
   if(!v)return 'Nessun dato mensile'
   return new Intl.DateTimeFormat('it-IT',{month:'long',year:'numeric'}).format(new Date(v+'T12:00:00'))
 }
+function monthlySeries(hubId,productId=null){
+  const rows=officeSnapshots.filter(x=>x.hub_id===hubId&&(!productId||x.product_id===productId))
+  const byMonth={}
+  rows.forEach(x=>{
+    if(!x.period_month)return
+    const item=byMonth[x.period_month]||(byMonth[x.period_month]={premium:0,proposals:0,renewals:0,quotes:0,lost:0})
+    item.premium+=Number(x.premium_total||0)
+    item.proposals+=Number(x.proposals_count||0)
+    item.renewals+=Number(x.renewals_due||0)
+    item.quotes+=Number(x.quotes_to_do||0)
+    item.lost+=Number(x.lost_count||0)
+  })
+  return Object.entries(byMonth).sort((a,b)=>a[0].localeCompare(b[0])).slice(-6).map(([month,data])=>({month,...data}))
+}
+function trendSvg(series,key='premium'){
+  if(!series.length)return '<div class="trend-empty"><strong>Dati storici da importare</strong><span>Il grafico apparirà quando saranno disponibili almeno gli snapshot mensili della sede.</span></div>'
+  const width=640,height=220,padX=36,padTop=24,padBottom=38
+  const values=series.map(x=>Number(x[key]||0))
+  const max=Math.max(...values,1)
+  const step=series.length>1?(width-padX*2)/(series.length-1):0
+  const points=series.map((x,i)=>{
+    const px=padX+i*step
+    const py=padTop+(1-(Number(x[key]||0)/max))*(height-padTop-padBottom)
+    return {x:px,y:py,value:Number(x[key]||0),month:x.month}
+  })
+  const poly=points.map(p=>p.x.toFixed(1)+','+p.y.toFixed(1)).join(' ')
+  const area=poly+' '+(points.at(-1)?.x||padX)+','+(height-padBottom)+' '+(points[0]?.x||padX)+','+(height-padBottom)
+  const labels=points.map(p=>'<g><circle cx="'+p.x+'" cy="'+p.y+'" r="5"></circle><text x="'+p.x+'" y="'+(height-13)+'" text-anchor="middle">'+esc(new Intl.DateTimeFormat('it-IT',{month:'short'}).format(new Date(p.month+'T12:00:00')))+'</text></g>').join('')
+  return '<div class="trend-svg-wrap"><svg viewBox="0 0 '+width+' '+height+'" role="img" aria-label="Andamento ultimi mesi"><defs><linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--context-accent)" stop-opacity=".22"></stop><stop offset="100%" stop-color="var(--context-accent)" stop-opacity="0"></stop></linearGradient></defs><line class="trend-axis" x1="'+padX+'" y1="'+(height-padBottom)+'" x2="'+(width-padX)+'" y2="'+(height-padBottom)+'"></line><polygon class="trend-area" points="'+area+'"></polygon><polyline class="trend-line" points="'+poly+'"></polyline>'+labels+'</svg><div class="trend-summary"><span>Periodo</span><strong>'+esc(fmtMonth(series[0].month))+' → '+esc(fmtMonth(series.at(-1).month))+'</strong><span>Ultimo valore</span><strong>'+esc(key==='premium'?fmtMoney(values.at(-1)):String(values.at(-1)))+'</strong></div></div>'
+}
+function workloadVisual(items){
+  const max=Math.max(...items.map(x=>Number(x.value||0)),1)
+  return items.map(x=>'<div class="workload-row"><div><span>'+esc(x.label)+'</span><strong>'+Number(x.value||0)+'</strong></div><div class="workload-track"><i style="width:'+Math.max(x.value?8:0,Math.round(Number(x.value||0)/max*100))+'%"></i></div></div>').join('')
+}
 function renderMiniProductionChart(hubId){
   const rows=officeSnapshots.filter(x=>x.hub_id===hubId&&x.premium_total!=null)
   const byMonth={}
@@ -557,6 +591,19 @@ function renderOffice(){
     '<div><span>Rinnovi</span><strong>'+renewals+'</strong><small>in scadenza</small></div>'+
     '<div><span>Pratiche aperte</span><strong>'+cases.length+'</strong><small>lavoro corrente</small></div>'
 
+  const officeSeries=monthlySeries(office.id)
+  $('officeTrendChart').innerHTML=trendSvg(officeSeries,'premium')
+  $('officeTrendLabel').textContent=officeSeries.length?officeSeries.length+' mesi disponibili':'Nessuno storico disponibile'
+  const monthQuotes=monthSnaps.reduce((n,x)=>n+Number(x.quotes_to_do||0),0)
+  const monthLost=monthSnaps.reduce((n,x)=>n+Number(x.lost_count||0),0)
+  $('officeWorkloadVisual').innerHTML=workloadVisual([
+    {label:'Rinnovi da lavorare',value:renewals},
+    {label:'Proposte mese',value:proposals},
+    {label:'Preventivi da fare',value:monthQuotes},
+    {label:'Pratiche aperte',value:cases.length},
+    {label:'Perse nel mese',value:monthLost}
+  ])
+
   $('officeProductBars').innerHTML=products.map(p=>{
     const snap=latestSnapshotFor(office.id,p.id)
     const open=officeOpenCases(office.id,p.id)
@@ -623,6 +670,17 @@ function renderOfficeProduct(){
     '<div><span>Perse</span><strong>'+Number(snap?.lost_count||0)+'</strong></div>'+
     '<div><span>Mono ramo</span><strong>'+Number(snap?.mono_branch_count||0)+'</strong></div>'+
     '<div><span>Pratiche</span><strong>'+cases.length+'</strong></div>'
+
+  const productSeries=monthlySeries(office.id,product.id)
+  $('productTrendChart').innerHTML=trendSvg(productSeries,'premium')
+  $('productTrendLabel').textContent=productSeries.length?productSeries.length+' mesi disponibili':'Storico da importare'
+  $('productMonthVisual').innerHTML=workloadVisual([
+    {label:'Rinnovi',value:Number(snap?.renewals_due||0)},
+    {label:'Proposte',value:Number(snap?.proposals_count||0)},
+    {label:'Preventivi da fare',value:Number(snap?.quotes_to_do||0)},
+    {label:'Perse',value:Number(snap?.lost_count||0)},
+    {label:'Mono ramo',value:Number(snap?.mono_branch_count||0)}
+  ])
 
   const typeCounts={}
   cases.forEach(x=>{typeCounts[x.case_type]=(typeCounts[x.case_type]||0)+1})
