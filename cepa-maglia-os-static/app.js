@@ -73,6 +73,15 @@ $('loginForm').onsubmit=async e=>{e.preventDefault();const{error}=await supabase
 $('signupBtn').onclick=async()=>{const email=$('email').value.trim(),password=$('password').value;if(!email||password.length<8)return msg('Inserisci email e una password di almeno 8 caratteri.',true);const{data,error}=await supabase.auth.signUp({email,password});if(error)return msg(error.message,true);if(data.session)await boot();else msg('Account creato. Controlla la mail di conferma e poi accedi.')}
 
 function setHeader(title,subtitle){$('pageTitle').textContent=title;$('pageSubtitle').textContent=subtitle}
+function setOfficeShell(active){
+  const ws=$('workspace')
+  if(!ws)return
+  ws.classList.toggle('office-shell',!!active)
+  if(active){
+    ws.classList.remove('sidebar-collapsed','nav-open')
+    $('sidebarBackdrop')?.classList.add('hidden')
+  }
+}
 function accessForView(view){
   if(isManager())return'manage'
   return roleViewAccess.find(x=>x.view_code===view&&x.active)?.access_level||'hidden'
@@ -98,6 +107,7 @@ function navigate(view){
     return
   }
   currentPartnerId=null
+  setOfficeShell(view==='home')
   applyBrandContext(null)
   document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'))
   $(view+'View').classList.remove('hidden')
@@ -145,6 +155,7 @@ function applyBrandContext(node=null){
 function openPartner(id){
   if(!canOpenView('partners'))return
   currentPartnerId=id
+  setOfficeShell(false)
   document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'))
   $('partnerView').classList.remove('hidden')
   document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'))
@@ -465,6 +476,7 @@ function openOffice(id){
   if(!office)return
   currentOfficeId=id
   currentOfficeProductId=null
+  setOfficeShell(true)
   window.activeOfficeName='Ufficio '+office.city
   applyBrandContext(null)
   document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'))
@@ -536,6 +548,7 @@ function openOfficeProduct(productId){
   if(!office||!product)return
   currentOfficeProductId=productId
   currentProductCaseFilter='all'
+  setOfficeShell(true)
   const {node}=brandForProduct(product)
   applyBrandContext(node||null)
   document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'))
