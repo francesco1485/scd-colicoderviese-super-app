@@ -1348,3 +1348,179 @@ body{
   .global-search-shell kbd{display:none}
   .global-search-shell{grid-template-columns:22px minmax(0,1fr)}
 }
+
+
+/* =========================================================
+   MAGLIA 360 · V4 SHELL / LOGIN / NAVIGATION
+   ========================================================= */
+
+/* Login: same world as the app, not a separate brochure */
+.login-shell{
+  background:#eef4f7!important;
+}
+.login-story{
+  position:relative!important;
+  isolation:isolate;
+  overflow:hidden!important;
+  background:#0d3851!important;
+  color:#fff!important;
+}
+.login-story::before{
+  content:"";
+  position:absolute;
+  inset:-3%;
+  z-index:-2;
+  background:
+    linear-gradient(90deg,rgba(6,36,55,.90) 0%,rgba(6,36,55,.72) 52%,rgba(6,36,55,.24) 100%),
+    url("https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Colico_Panorama.jpg/1280px-Colico_Panorama.jpg") center/cover no-repeat;
+  filter:saturate(.86) contrast(.98);
+  animation:v4LoginDrift 24s ease-in-out infinite alternate;
+}
+.login-story::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:-1;
+  background:
+    radial-gradient(circle at 26% 20%,rgba(102,181,168,.22),transparent 28%),
+    linear-gradient(180deg,transparent 62%,rgba(3,29,45,.34));
+}
+@keyframes v4LoginDrift{
+  from{transform:scale(1.03) translate3d(0,0,0)}
+  to{transform:scale(1.08) translate3d(-1.5%,.8%,0)}
+}
+.login-story h1{
+  max-width:670px!important;
+  color:#fff!important;
+  text-shadow:0 3px 24px rgba(0,0,0,.16);
+}
+.login-story>p{
+  color:rgba(255,255,255,.84)!important;
+}
+.login-story .eyebrow{color:#a9dfd2!important}
+.story-grid div{
+  border-color:rgba(255,255,255,.17)!important;
+  background:rgba(255,255,255,.09)!important;
+  backdrop-filter:blur(9px);
+  box-shadow:0 10px 28px rgba(2,29,44,.10);
+}
+.story-grid span{color:#abdacf!important}
+.story-grid strong{color:#fff!important}
+.story-grid small{color:rgba(255,255,255,.72)!important}
+.login-panel{
+  background:
+    radial-gradient(circle at 35% 18%,rgba(126,185,177,.12),transparent 24%),
+    linear-gradient(180deg,#f6f9fb,#eef4f7)!important;
+}
+.login-card{
+  border:1px solid rgba(89,124,143,.18)!important;
+  background:rgba(255,255,255,.91)!important;
+  backdrop-filter:blur(18px);
+  box-shadow:0 26px 70px rgba(26,60,80,.14)!important;
+}
+.login-card .primary{
+  background:linear-gradient(135deg,#174c67,#26786f)!important;
+  box-shadow:0 10px 22px rgba(32,102,96,.18);
+}
+
+/* Sidebar: calmer information architecture */
+.workspace.office-shell .side-nav,
+.workspace.cepa-shell .side-nav{
+  padding:10px!important;
+  gap:13px!important;
+}
+.workspace.office-shell .primary-nav,
+.workspace.cepa-shell .primary-nav{
+  display:grid;
+  gap:4px;
+}
+.workspace.office-shell .primary-nav .nav-item,
+.workspace.cepa-shell .primary-nav .nav-item{
+  min-height:41px!important;
+  padding-left:37px!important;
+  position:relative;
+}
+.workspace.office-shell .primary-nav .nav-item::before,
+.workspace.cepa-shell .primary-nav .nav-item::before{
+  position:absolute;
+  left:11px;
+  top:50%;
+  transform:translateY(-50%);
+  width:18px;
+  text-align:center;
+  color:#b6d2dc;
+  font-size:14px;
+  font-weight:700;
+}
+.nav-item[data-view="home"]::before{content:"⌂"}
+.nav-item[data-view="products"]::before{content:"◇"}
+.nav-item[data-view="collaborators"]::before{content:"◎"}
+.nav-item[data-view="actions"]::before{content:"↗"}
+.nav-item[data-view="documents"]::before{content:"▤"}
+.nav-item[data-view="cepa"]::before{content:"⌑"}
+.nav-item[data-view="comparisons"]::before{content:"▥"}
+.nav-item[data-view="liaWorkbench"]::before{content:"✦"}
+.workspace.office-shell .primary-nav .nav-item.active::before,
+.workspace.cepa-shell .primary-nav .nav-item.active::before{color:#fff}
+.workspace.office-shell .compact-nav .nav-item,
+.workspace.office-shell .utility-nav .nav-item,
+.workspace.cepa-shell .compact-nav .nav-item,
+.workspace.cepa-shell .utility-nav .nav-item{
+  min-height:34px!important;
+  color:#c5dbe3!important;
+  font-size:10px!important;
+}
+.partner-nav-group{
+  padding-top:4px;
+  border-top:1px solid rgba(255,255,255,.08);
+}
+.partner-nav{
+  display:grid!important;
+  gap:3px!important;
+  max-height:178px;
+  overflow:auto;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(255,255,255,.18) transparent;
+}
+.partner-nav .nav-item{
+  min-height:31px!important;
+  color:#b9d1da!important;
+  font-size:9px!important;
+}
+.side-footer{
+  background:linear-gradient(180deg,rgba(6,39,58,.26),rgba(6,39,58,.55))!important;
+}
+
+/* More natural topbar */
+.workspace.office-shell .main-header,
+.workspace.cepa-shell .main-header{
+  background:rgba(250,252,253,.94)!important;
+  border-bottom-color:rgba(84,119,139,.16)!important;
+}
+.global-search-shell{
+  background:rgba(255,255,255,.90)!important;
+  border-color:rgba(82,120,140,.18)!important;
+  box-shadow:0 7px 22px rgba(31,69,91,.05)!important;
+}
+.global-search-shell:focus-within{
+  border-color:rgba(65,143,151,.35)!important;
+  box-shadow:0 0 0 4px rgba(65,143,151,.08),0 12px 28px rgba(31,69,91,.07)!important;
+}
+.office-quick-select{
+  background:linear-gradient(135deg,#194f69,#28776f)!important;
+  border-color:transparent!important;
+}
+.office-quick-select select{
+  background:transparent!important;
+}
+
+/* Mobile navigation remains an overlay only where space is genuinely limited */
+@media(max-width:900px){
+  .workspace.office-shell .sidebar,
+  .workspace.cepa-shell .sidebar{
+    box-shadow:20px 0 45px rgba(4,31,47,.24)!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .login-story::before{animation:none!important}
+}
