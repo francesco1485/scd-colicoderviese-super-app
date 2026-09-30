@@ -300,3 +300,9 @@ body.v5[data-active-view="sponsor-detail"] .workspace{background:radial-gradient
   body.v5 .macro-visual{height:205px}
   body.v5 .sponsor-card{min-height:300px}
 }
+
+body.v5 .hero-visual{--v5-x:0;--v5-y:0}
+body.v5 .hero-photo{transform:translate3d(calc(var(--v5-x) * -9px),calc(var(--v5-y) * -7px),0) scale(1.055);transition:transform .18s ease-out}
+body.v5 .hero-content{transform:translate3d(calc(var(--v5-x) * 5px),calc(var(--v5-y) * 3px),0);transition:transform .22s ease-out}
+body.v5 .hero-hud{transform:translate3d(calc(var(--v5-x) * 10px),calc(var(--v5-y) * 7px),0);transition:transform .18s ease-out}
+@media(prefers-reduced-motion:reduce){body.v5 .hero-photo,body.v5 .hero-content,body.v5 .hero-hud{transform:none!important;transition:none!important}}
