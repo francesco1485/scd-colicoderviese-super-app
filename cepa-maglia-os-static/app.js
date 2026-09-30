@@ -8,6 +8,7 @@ const localInput=v=>{if(!v)return'';const d=new Date(v);return new Date(d-d.getT
 const isManager=()=>['super_admin','supervisor','manager'].includes(window.userRole)
 const viewMeta={
  home:['Quadro generale','Agenzia Generale HDI · Ecosistema di competenze, relazioni e sviluppo'],
+ operatingPlan:['Piano Operativo','Architettura, dati, metodo, roadmap e sviluppo continuo di MAGLIA 360'],
  products:['Prodotti & Sintesi','Schede consulenziali, punti di forza, limiti e percorsi di confronto'],
  collaborators:['Collaboratori & Guadagni','Ruoli, competenze e remunerazioni differenziate per attività e prodotto'],
  growthKits:['Kit Collaboratore','Valutazione del portafoglio, proposta di sviluppo, documentazione e strumenti per il cliente'],
@@ -120,11 +121,13 @@ function globalSearchItems(query){
   const q=String(query||'').trim().toLowerCase()
   if(!q)return[
     {kind:'home',id:'home',label:'Home Maglia 360',meta:'Ambienti di lavoro'},
+    {kind:'plan',id:'operatingPlan',label:'Piano Operativo',meta:'Metodo, roadmap e sviluppo continuo'},
     {kind:'cepa',id:'cepa',label:'Progetto C.E.P.A.',meta:'Centro e territori'},
     ...accessibleOffices().slice(0,3).map(x=>({kind:'office',id:x.id,label:'Ufficio '+x.city,meta:'Sede operativa'}))
   ]
   const has=(...parts)=>parts.filter(Boolean).join(' ').toLowerCase().includes(q)
   const out=[]
+  if(has('piano operativo metodo roadmap sviluppo continuo architettura maglia 360'))out.push({kind:'plan',id:'operatingPlan',label:'Piano Operativo',meta:'Metodo, roadmap e sviluppo continuo'})
   accessibleOffices().forEach(x=>{if(has(x.city,x.name,x.address))out.push({kind:'office',id:x.id,label:'Ufficio '+x.city,meta:x.address||'Sede operativa'})})
   ecosystem.forEach(x=>{if(has(x.name,x.code,x.capability))out.push({kind:'partner',id:x.id,label:x.name,meta:x.capability||'Partner'})})
   products.forEach(x=>{if(has(x.name,x.code,x.category))out.push({kind:'product',id:x.id,label:x.name,meta:'Prodotto · '+String(x.category||'').replaceAll('_',' ')})})
@@ -152,6 +155,7 @@ function openGlobalSearchItem(item){
   $('globalSearchResults')?.classList.add('hidden')
   if($('globalSearchInput'))$('globalSearchInput').value=''
   if(item.kind==='home')navigate('home')
+  else if(item.kind==='plan')navigate('operatingPlan')
   else if(item.kind==='office')openOffice(item.id)
   else if(item.kind==='partner')openPartner(item.id)
   else if(item.kind==='product'){
@@ -216,6 +220,7 @@ function setCepaShell(active){
   ws.classList.toggle('cepa-shell',!!active)
 }
 function accessForView(view){
+  if(view==='operatingPlan')return isManager()?'manage':'read'
   if(isManager())return'manage'
   return roleViewAccess.find(x=>x.view_code===view&&x.active)?.access_level||'hidden'
 }
@@ -526,7 +531,102 @@ async function loadAll(){
 }
 
 function renderEverything(){
-  renderPartnerNav();renderHome();renderCepaHub();renderCepaTerritory();renderOffice();renderOfficeProduct();renderPartner();renderProducts();renderCollaborators();renderGrowthKits();renderComparisons();renderMail();renderCepa();renderTerritories();renderDocuments();renderDevelopment();renderNetworkRadar();renderActions();renderAssistantHistory();renderLiaWorkbench();applyRoleViewAccess();renderHeaderControls()
+  renderPartnerNav();renderHome();renderOperatingPlan();renderCepaHub();renderCepaTerritory();renderOffice();renderOfficeProduct();renderPartner();renderProducts();renderCollaborators();renderGrowthKits();renderComparisons();renderMail();renderCepa();renderTerritories();renderDocuments();renderDevelopment();renderNetworkRadar();renderActions();renderAssistantHistory();renderLiaWorkbench();applyRoleViewAccess();renderHeaderControls()
+}
+
+function renderOperatingPlan(){
+  if(!$('planEngineGrid'))return
+
+  const activeActions=actions.filter(x=>!['completed','cancelled'].includes(x.status))
+  const activeCepa=officeCepaActivities.filter(x=>!['completed','cancelled'].includes(x.status))
+  const qualifiedEntities=marketEntities.filter(x=>!['observed','archived'].includes(x.stage))
+  const checks=[
+    officeSnapshots.length>0,
+    products.length>0,
+    ecosystem.length>0,
+    documents.length>0,
+    marketEntities.length>0,
+    (cepaContent.length+activeCepa.length)>0,
+    activeActions.length>0,
+    researchSources.length>0
+  ]
+  const health=Math.round(checks.filter(Boolean).length/checks.length*100)
+  $('planHealthScore').textContent=health+'%'
+  $('planHealthLabel').textContent=health>=88?'struttura operativa':health>=63?'base solida, da completare':'fondamenta in costruzione'
+  $('planOfficeCount').textContent=accessibleOffices().length
+  $('planProductCount').textContent=products.length
+  $('planPartnerCount').textContent=ecosystem.length
+  $('planEntityCount').textContent=marketEntities.length
+  $('planActionCount').textContent=activeActions.length
+  $('planResearchCount').textContent=researchSources.length+' / '+researchInsights.length
+
+  const engines=[
+    {code:'01',title:'Sedi & Control Room',desc:'Colico, Mandello e future sedi. Dati mensili, priorità, pratiche e messaggi della Direzione.',metric:accessibleOffices().length+' sedi accessibili',target:'home',tone:'blue'},
+    {code:'02',title:'Portafoglio & Prodotti',desc:'Produzione, rinnovi, preventivi, proposte, perse, mono ramo e sviluppo per singolo prodotto.',metric:products.length+' aree prodotto',target:'products',tone:'green'},
+    {code:'03',title:'Sviluppo Commerciale',desc:'Mapping territoriale, qualificazione, opportunità, contatti e costruzione di nuove relazioni.',metric:qualifiedEntities.length+' soggetti qualificati',target:'development',tone:'amber'},
+    {code:'04',title:'Partner & Compagnie',desc:'Dossier, referenti, documenti, prodotti, condizioni, progetti e opportunità dell’ecosistema.',metric:ecosystem.length+' nodi ecosistema',target:'products',tone:'violet'},
+    {code:'05',title:'C.E.P.A.',desc:'Centro, programmi, contenuti, relatori, attività territoriali, SAP e sviluppo del metodo educativo.',metric:activeCepa.length+' attività territoriali aperte',target:'cepa',tone:'sage'},
+    {code:'06',title:'Lia · Ricerca & Sviluppo',desc:'Ricerca, analisi, documenti, idee, mapping, artefatti e ordini operativi con regole di autonomia.',metric:liaOrders.length+' ordini · '+researchInsights.length+' insight',target:'liaWorkbench',tone:'teal'}
+  ]
+  $('planEngineGrid').innerHTML=engines.map(x=>
+    '<button type="button" class="plan-engine '+x.tone+'" data-plan-go="'+x.target+'"><div class="plan-engine-code">'+x.code+'</div><div><h4>'+esc(x.title)+'</h4><p>'+esc(x.desc)+'</p><span>'+esc(x.metric)+'</span></div><b>→</b></button>'
+  ).join('')
+  document.querySelectorAll('[data-plan-go]').forEach(b=>b.onclick=()=>b.dataset.planGo==='cepa'?openCepaHub():navigate(b.dataset.planGo))
+
+  const cycle=[
+    ['01','Dati','Import, documenti, fonti e anagrafiche'],
+    ['02','Analisi','Trend, bisogni, rischi e opportunità'],
+    ['03','Priorità','Che cosa merita attenzione oggi'],
+    ['04','Azione','Pratica, contatto, proposta o incontro'],
+    ['05','Esito','Risultato, motivazione e follow-up'],
+    ['06','Apprendimento','Regole e focus migliorano nel tempo']
+  ]
+  $('planCycle').innerHTML=cycle.map((x,i)=>
+    '<div><b>'+x[0]+'</b><strong>'+x[1]+'</strong><small>'+x[2]+'</small></div>'+(i<cycle.length-1?'<i>→</i>':'')
+  ).join('')
+
+  const dataRows=[
+    ['Snapshot AssiEasy',officeSnapshots.length,officeSnapshots.length?'Disponibili':'Da importare'],
+    ['Workflow pratiche',officeWorkflow.length,officeWorkflow.length?'Configurato':'Da completare'],
+    ['Documenti',documents.length,documents.length?'Archivio attivo':'Da popolare'],
+    ['Dossier partner',partnerRequirements.length,partnerRequirements.length?'Requisiti presenti':'Da strutturare'],
+    ['Mapping territoriale',marketEntities.length,marketEntities.length?'Mappa attiva':'Da avviare'],
+    ['Fonti R&S',researchSources.length,researchSources.length?'Fonti registrate':'Da registrare']
+  ]
+  $('planDataReadiness').innerHTML=dataRows.map(x=>
+    '<div><span>'+esc(x[0])+'</span><strong>'+x[1]+'</strong><small>'+esc(x[2])+'</small><i class="'+(x[1]?'ready':'missing')+'"></i></div>'
+  ).join('')
+
+  const roadmap=[
+    {phase:'ORA',title:'Rendere affidabile il lavoro quotidiano',items:['Snapshot mensili per sede e prodotto','Pratiche e stati operativi coerenti','Priorità e scadenze','Dossier partner verificabili','Programmazione C.E.P.A. per territorio']},
+    {phase:'PROSSIMO',title:'Trasformare dati in sviluppo',items:['Anagrafica cliente e nucleo','Cross selling e mono ramo','Mapping comunale strutturato','Funnel commerciale','Contenuti e kit per ruolo']},
+    {phase:'FUTURO',title:'Scalare senza perdere controllo',items:['Nuove sedi e profili','Connettori e import più automatici','Automazioni di ricerca','Benchmark e previsioni operative','Replica controllata del modello territoriale']}
+  ]
+  $('planRoadmap').innerHTML=roadmap.map((x,i)=>
+    '<article class="roadmap-column phase-'+i+'"><span>'+x.phase+'</span><h4>'+esc(x.title)+'</h4>'+x.items.map(y=>'<div>• '+esc(y)+'</div>').join('')+'</article>'
+  ).join('')
+
+  $('planResearchSummary').innerHTML=
+    '<div><strong>'+researchSources.length+'</strong><span>fonti registrate</span></div>'+
+    '<div><strong>'+researchInsights.length+'</strong><span>insight raccolti</span></div>'+
+    '<div><strong>'+liaAutomationRuns.filter(x=>x.status==='queued').length+'</strong><span>ricerche in coda</span></div>'+
+    '<div><strong>'+liaOrders.filter(x=>!['completed','cancelled'].includes(x.status)).length+'</strong><span>ordini aperti</span></div>'
+
+  $('planGovernance').innerHTML=[
+    ['Direzione','Priorità, sedi, autorizzazioni, strategie e decisioni finali'],
+    ['Operatori','Lavoro e aggiornamenti della propria sede'],
+    ['Specialisti','Prodotti, partner, contenuti e competenze verticali'],
+    ['Lia','Ricerca, preparazione, analisi ed esecuzione entro le regole assegnate']
+  ].map(x=>'<div><strong>'+x[0]+'</strong><span>'+x[1]+'</span></div>').join('')
+
+  let focus={title:'Consolidare il lavoro per prodotto',text:'Porta rinnovi, preventivi, proposte, pratiche ed esiti in un flusso unico e leggibile.',target:'actions'}
+  if(!officeSnapshots.length)focus={title:'Standardizzare i dati mensili',text:'Il primo salto di qualità arriva dagli snapshot AssiEasy coerenti per Colico e Mandello.',target:'products'}
+  else if(!marketEntities.length)focus={title:'Avviare il mapping territoriale',text:'Costruisci una base qualificata di aziende, professionisti, enti e opportunità per comune.',target:'development'}
+  else if(!researchSources.length)focus={title:'Attivare la base R&S',text:'Registra fonti ufficiali e di mercato così Lia può alimentare il progetto con ricerca tracciata.',target:'liaWorkbench'}
+  else if(!activeCepa.length)focus={title:'Programmare C.E.P.A. per sede',text:'Porta il metodo CEPA dalla governance centrale a un calendario reale per Colico e Mandello.',target:'cepa'}
+  $('planNextFocus').textContent=focus.title
+  $('planNextFocusText').textContent=focus.text
+  $('planNextFocusBtn').onclick=()=>focus.target==='cepa'?openCepaHub():navigate(focus.target)
 }
 
 function renderPartnerNav(){
