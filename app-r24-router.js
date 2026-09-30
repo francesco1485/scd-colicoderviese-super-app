@@ -448,7 +448,7 @@
     render_commercial(outlet){
       const d=state.privateData||{},u=d.user||{},perm=d.permissions||{};
       const direction=!!perm.direction||['DIREZIONE','ADMIN'].includes(String(u.role||'').toUpperCase());
-      const portfolio=[
+      let portfolio=[
         {name:'Noratech Srl',sector:'Tecnologia / corporate',status:'ATTIVO',years:'2026',value:'€400 + IVA',assets:['SOCIAL','CENTRO SPORTIVO'],next:'Report 2026 + proposta upgrade 2027',evidence:'Contratto + PEC'},
         {name:'Coperture Rasero Srl',sector:'Edilizia',status:'ATTIVO',years:'2026-2027',value:'€500 + IVA',assets:['BORDO CAMPO','SITO'],next:'Mappare striscione e rinnovo',evidence:'Contratto'},
         {name:'Officine Pedroncelli Srl',sector:'Mobility / officina',status:'ATTIVO',years:'2024-2026',value:'€500 + IVA / anno',assets:['PULMINO'],next:'Verificare scadenza e foto mezzo',evidence:'Contratto / fattura'},
@@ -457,7 +457,7 @@
         {name:'Bianchi Bazzi Angelo Srl',sector:'Corporate / territorio',status:'AUDIT',years:'2026',value:'€1.500 + IVA',assets:['DA RICOSTRUIRE'],next:'Recuperare accordo e materiali',evidence:'Documentazione contabile'},
         {name:'Saglio Sport / LEGEA',sector:'Sportswear / partner tecnico',status:'PARTNER TECNICO',years:'2026/27',value:'DA VERIFICARE',assets:['KIT','ABBIGLIAMENTO'],next:'Ricostruire accordo, esclusiva e visibilità',evidence:'Gmail / fatturazione'}
       ];
-      const led=[
+      let led=[
         ['DEGO ARREDAMENTI','Arredamento / design','IN REVISIONE','PRESENTE - DA RICONVALIDARE','PRESENTE','DA ACQUISIRE'],
         ['ATV VALVE','Industria / valvole','IN REVISIONE','PRESENTE - DA RICONVALIDARE','PRESENTE','DA ACQUISIRE'],
         ['IPERAL','GDO / retail','IN REVISIONE','PRESENTE - DA RICONVALIDARE','PRESENTE','DA ACQUISIRE'],
@@ -483,8 +483,14 @@
         'DELLOCA':'./assets/sponsors/delloca.png',
         'CARCANO':'./assets/sponsors/carcano.jpg'
       };
+      const sponsorLogoMap={
+        'HDI MAGLIA':'./assets/sponsors/hdi-maglia.png',
+        "Dell'Oca Petroli":'./assets/sponsors/delloca.png',
+        'DELLOCA':'./assets/sponsors/delloca.png',
+        'CARCANO':'./assets/sponsors/carcano.jpg'
+      };
       const assetTypes=['MAIN SPONSOR','MAGLIA GARA','ABBIGLIAMENTO ALLENAMENTO','SQUADRA','SETTORE GIOVANILE','TORNEO','EVENTO','LED WALL','CARTELLONISTICA','SITO / DIGITAL','SOCIAL','HOSPITALITY','CONVENZIONE','PARTNER TECNICO','FORNITORE','STRUTTURA / AREA','MASCOTTE','FONDO SOLIDALE / CSR','BARTER','ALTRO'];
-      const card=s=>'<article class="r42-sponsor-card" data-r42-sponsor-card="'+esc(s.name)+'" data-status="'+esc(s.status)+'"><div class="r42-sponsor-logo" aria-label="Logo '+esc(s.name)+'"><span>'+esc(s.name.split(/\\s+/).slice(0,2).map(v=>v[0]).join('').toUpperCase())+'</span><small>LOGO DA COLLEGARE</small></div><div class="r42-sponsor-card-body"><div class="r42-card-top"><div><h3>'+esc(s.name)+'</h3><p>'+esc(s.sector)+'</p></div><span class="r42-state">'+esc(s.status)+'</span></div><div class="r42-tags">'+s.assets.map(a=>'<span>'+esc(a)+'</span>').join('')+'</div><dl><div><dt>ANNI</dt><dd>'+esc(s.years)+'</dd></div><div><dt>PROSSIMA AZIONE</dt><dd>'+esc(s.next)+'</dd></div></dl>'+(direction?'<div class="r42-economic"><b>'+esc(s.value)+'</b><small>'+esc(s.evidence)+'</small></div>':'')+'<button type="button" class="r42-open-detail" data-open-sponsor="'+esc(s.name)+'">APRI SCHEDA SPONSOR</button></div></article>';
+      const card=s=>{const logoSrc=sponsorLogoMap[s.name]||sponsorLogoMap[s.brand]||'';return '<article class="r42-sponsor-card" data-r42-sponsor-card="'+esc(s.name)+'" data-status="'+esc(s.status)+'"><div class="r42-sponsor-logo '+(logoSrc?'has-image':'')+'" aria-label="Logo '+esc(s.name)+'">'+(logoSrc?'<img src="'+esc(logoSrc)+'" alt="'+esc(s.name)+'">':'<span>'+esc(s.name.split(/\\s+/).slice(0,2).map(v=>v[0]).join('').toUpperCase())+'</span><small>'+esc(s.logoStatus||'LOGO DA COLLEGARE')+'</small>')+'</div><div class="r42-sponsor-card-body"><div class="r42-card-top"><div><h3>'+esc(s.name)+'</h3><p>'+esc(s.sector)+'</p></div><span class="r42-state">'+esc(s.status)+'</span></div><div class="r42-tags">'+(s.assets||[]).map(a=>'<span>'+esc(a)+'</span>').join('')+'</div><dl><div><dt>ANNI</dt><dd>'+esc(s.years||'DA COMPLETARE')+'</dd></div><div><dt>PROSSIMA AZIONE</dt><dd>'+esc(s.next||'Completare scheda sponsor')+'</dd></div></dl>'+(direction&&s.value?'<div class="r42-economic"><b>'+esc(s.value)+'</b><small>'+esc(s.evidence||'')+'</small></div>':'')+'<button type="button" class="r42-open-detail" data-open-sponsor="'+esc(s.name)+'">APRI SCHEDA SPONSOR</button></div></article>'};
       const ledCard=s=>{const logoSrc=ledLogoMap[s.name];return '<article class="r42-led-card" data-led-status="'+esc(s.status)+'"><div class="r42-led-logo '+(logoSrc?'has-image':'')+'">'+(logoSrc?'<img src="'+esc(logoSrc)+'" alt="'+esc(s.name)+'">':'<span>'+esc(s.name.split(/\\s+/).slice(0,2).map(v=>v[0]).join('').toUpperCase())+'</span>')+'</div><div><div class="r42-card-top"><div><h3>'+esc(s.name)+'</h3><p>'+esc(s.sector)+'</p></div><span class="r42-state">'+esc(s.status)+'</span></div><div class="r42-led-meta"><span>Logo <b>'+esc(s.logo)+'</b></span><span>Master <b>'+esc(s.mp4)+(s.mp4==='PRESENTE'?' · 20s legacy → 40s target':'')+'</b></span><span>Approvazione <b>'+esc(s.approval)+'</b></span></div></div></article>'};
       const readyApproval=led.filter(x=>x.status==='ATTESA APPROVAZIONE').length;
       const mp4Ready=led.filter(x=>x.mp4==='PRESENTE').length;
@@ -549,13 +555,62 @@
         drawer.hidden=false;
         drawer.scrollIntoView({behavior:'smooth',block:'start'});
       };
-      outlet.querySelectorAll('[data-open-sponsor]').forEach(b=>b.onclick=()=>{const s=portfolio.find(x=>x.name===b.dataset.openSponsor);if(s)renderSponsorDetail(s)});
+      const bindSponsorCards=()=>outlet.querySelectorAll('[data-open-sponsor]').forEach(b=>b.onclick=()=>{const s=portfolio.find(x=>x.name===b.dataset.openSponsor);if(s)renderSponsorDetail(s)});
+      bindSponsorCards();
       const drawerClose=outlet.querySelector('#r42DrawerClose');if(drawerClose)drawerClose.onclick=()=>drawer.hidden=true;
       const form=outlet.querySelector('#r42NewSponsorForm');
       const newBtn=outlet.querySelector('#r42NewSponsor'),cancel=outlet.querySelector('#r42CancelSponsor'),save=outlet.querySelector('#r42SaveSponsor');
       if(newBtn)newBtn.onclick=()=>{form.hidden=false;form.scrollIntoView({behavior:'smooth',block:'start'})};
       if(cancel)cancel.onclick=()=>form.hidden=true;
-      if(save)save.onclick=()=>toast('Salvataggio disabilitato finché l’adapter Sponsor Master non è autorizzato.');
+      if(save)save.onclick=()=>toast('Salvataggio protetto: sarà attivo dopo il deploy del backend Sponsor Master R42.');
+
+      fetch('./data/commercial-r42.json',{cache:'no-store'})
+        .then(r=>{if(!r.ok)throw new Error('snapshot '+r.status);return r.json()})
+        .then(snap=>{
+          const anag=Array.isArray(snap.anagrafica)?snap.anagrafica:[];
+          const seasons=Array.isArray(snap.seasons)?snap.seasons:[];
+          const acts=Array.isArray(snap.activations)?snap.activations:[];
+          const ledRows=Array.isArray(snap.led)?snap.led:[];
+          if(anag.length){
+            portfolio=anag.map(a=>{
+              const id=String(a.SPONSOR_ID||'');
+              const ss=seasons.filter(x=>String(x.SPONSOR_ID||'')===id);
+              const aa=acts.filter(x=>String(x.SPONSOR_ID||'')===id);
+              const years=[...new Set(ss.map(x=>x.STAGIONE).filter(Boolean))];
+              const cash=ss.reduce((sum,x)=>sum+(Number(x.IMPORTO_CASH)||0),0);
+              return {
+                id,
+                name:String(a.BRAND_NOME||a.RAGIONE_SOCIALE||id),
+                brand:String(a.BRAND_NOME||''),
+                sector:String(a.SETTORE||a.TIPO_ATTIVITA||'DA CLASSIFICARE'),
+                status:String(a.STATO||'DA QUALIFICARE'),
+                years:years.length?years.join(' · '):String(a.SPONSOR_DAL||'DA COMPLETARE'),
+                value:direction&&cash?'€ '+cash.toLocaleString('it-IT'):'',
+                assets:[...new Set(aa.map(x=>String(x.TIPO_SPONSORIZZAZIONE||x.TIPO_MANUALE||'')).filter(Boolean))],
+                next:String(a.NOTE||'Completare scheda sponsor'),
+                evidence:String(a.SOURCE_TYPE||'MASTER SPONSOR'),
+                logoStatus:String(a.LOGO_STATUS||'DA ACQUISIRE')
+              };
+            });
+            const mount=outlet.querySelector('#r42SponsorCards');
+            if(mount){mount.innerHTML=portfolio.map(card).join('');bindSponsorCards()}
+          }
+          if(ledRows.length){
+            led=ledRows.map((x,i)=>({
+              order:Number(x.Ordine||i+1),
+              name:String(x.Sponsor||''),
+              sector:String(x.Categoria||''),
+              status:String(x['Stato operativo']||'NON AVVIATO'),
+              logo:String(x['Logo originale']||'MANCANTE'),
+              mp4:String(x['Master MP4']||'MANCANTE'),
+              approval:String(x['Approvazione sponsor']||'NON RICHIESTA')
+            }));
+            const lm=outlet.querySelector('#r42LedList');
+            if(lm)lm.innerHTML=led.map(ledCard).join('');
+          }
+        })
+        .catch(err=>console.warn('[R42 Commercial Snapshot]',err));
+
       this.bindCommon(outlet);
     },
     render_lia(outlet){
