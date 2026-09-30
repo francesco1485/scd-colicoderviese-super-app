@@ -192,6 +192,9 @@ function entityType(v){return ({insurance_intermediary:'Intermediario assicurati
 function stageLabel(v){return ({observed:'Osservato',qualified:'Qualificato',prospect:'Prospect',opportunity:'Opportunità',relationship:'Relazione',archived:'Archiviato'})[v]||v}
 
 function renderHome(){
+  const dash=$('magliaDashboard')
+  if(!dash)return
+
   const partnerShort=n=>{
     if(n.code==='HDI')return 'HDI'
     if(n.code==='PRIMA_ENEA')return 'PRIMA'
@@ -205,18 +208,6 @@ function renderHome(){
     if(n.code==='PRIMA_ENEA')return 'Partner strategico'
     return 'Partner'
   }
-
-  $('homePartnerCards').innerHTML=ecosystem.slice(0,5).map(n=>
-    '<article class="home-partner-card" data-home-partner="'+n.id+'">'+
-      '<div class="partner-monogram">'+esc(partnerShort(n))+'</div>'+
-      '<strong>'+esc(n.name)+'</strong>'+
-      '<small>'+esc(n.capability||n.strategic_role||'Competenza da definire')+'</small>'+
-      '<em>'+esc(partnerLabel(n))+'</em>'+
-    '</article>'
-  ).join('')||empty('Compagnie e partner da completare')
-  document.querySelectorAll('[data-home-partner]').forEach(b=>b.onclick=()=>openPartner(b.dataset.homePartner))
-
-  const iconMap={mobilita:'🚙',casa:'⌂',salute:'♥',previdenza:'▥',tutela_legale:'⚖',energia:'◇',impresa:'▦'}
   const displayName=p=>{
     const n=p.name||''
     if(/auto|motor/i.test(n))return 'Auto'
@@ -228,58 +219,69 @@ function renderHome(){
     if(/impresa/i.test(n))return 'Impresa'
     return n
   }
-  const quick=[...products].slice(0,6)
-  $('homeProductStrip').innerHTML=quick.map(p=>
-    '<button class="home-product-chip" type="button" data-home-product="'+p.id+'">'+
-      '<span>'+esc(iconMap[p.category]||'◈')+'</span><div><strong>'+esc(displayName(p))+'</strong><small>'+esc(p.summary||p.category||'Scheda in sviluppo')+'</small></div>'+
-    '</button>'
-  ).join('')||empty('Prodotti da completare')
-  document.querySelectorAll('[data-home-product]').forEach(b=>b.onclick=()=>openProduct(b.dataset.homeProduct))
-
-  const preview=[...portfolioSnapshots].slice(0,5)
-  $('homeCollaboratorPreview').innerHTML=preview.map(s=>{
-    const c=s.agency_collaborators||{}
-    const ratio=s.clients_count?Number(s.policies_count/s.clients_count).toFixed(2):'—'
-    return '<div class="home-preview-row"><strong>'+esc(c.display_name||'Rete')+'</strong><span>'+esc(s.clients_count)+' clienti · '+esc(ratio)+' pol./cliente</span><b>€ '+Number(s.premium_total||0).toLocaleString('it-IT',{maximumFractionDigits:0})+'</b></div>'
-  }).join('')||empty('Snapshot collaboratori non disponibile')
 
   const relationSolid=ecosystem.filter(n=>['core','active','project_active'].includes(n.relationship_status)).length
   const verifiedProducts=productKnowledge.filter(x=>x.verification_status==='verified').length
   const missingDocs=partnerRequirements.filter(x=>x.status==='missing').length
   const pendingTerms=collaboratorTerms.filter(x=>x.verification_status!=='verified').length
   const cepaReady=cepaReadiness.filter(x=>['ready','verified'].includes(x.status)).length
-  $('homeBenchmarkPreview').innerHTML=
-    '<div class="benchmark-column"><h4>Punti solidi oggi</h4>'+
-      '<div>'+relationSolid+' relazioni ecosistema attive/core</div>'+
-      '<div>'+cepaReady+' elementi CEPA pronti/verificati</div>'+
-      '<div>'+portfolioSnapshots.length+' snapshot rete disponibili</div>'+
-    '</div>'+
-    '<div class="benchmark-column risk"><h4>Da completare</h4>'+
-      '<div>'+missingDocs+' requisiti partner non ancora registrati</div>'+
-      '<div>'+pendingTerms+' condizioni economiche da verificare</div>'+
-      '<div>'+verifiedProducts+'/'+productKnowledge.length+' elementi prodotto verificati</div>'+
-    '</div>'
-
-  $('homeDocs').textContent=documents.length
-  $('homeMarket').textContent=marketEntities.length+distributionCandidates.length
-
-  const knowledgeVerified=productKnowledge.filter(x=>x.verification_status==='verified').length
-  $('homeKnowledgeVerified').textContent=knowledgeVerified+'/'+productKnowledge.length
-  $('homeKnowledgeTotal').textContent='elementi conoscenza verificati'
-
   const termsVerified=collaboratorTerms.filter(x=>x.verification_status==='verified').length
-  $('homeTermsVerified').textContent=termsVerified+'/'+collaboratorTerms.length
-  $('homeTermsTotal').textContent='condizioni economiche verificate'
-
   const partnerCovered=partnerRequirements.filter(x=>['received','verified','not_applicable'].includes(x.status)).length
-  $('homePartnerDocsCovered').textContent=partnerCovered+'/'+partnerRequirements.length
-  $('homePartnerDocsTotal').textContent='requisiti dossier coperti'
+  const open=actions.filter(a=>!['completed','cancelled'].includes(a.status)).sort(actionSort)
 
-  $('homeCepaReady').textContent=cepaReady+'/'+cepaReadiness.length
-  $('homeCepaReadyTotal').textContent='elementi pronti / verificati'
+  dash.data={
+    partners:ecosystem.slice(0,5).map(n=>({
+      id:n.id,code:n.code,name:n.name,short:partnerShort(n),label:partnerLabel(n),
+      subtitle:n.capability||n.strategic_role||'Competenza da definire'
+    })),
+    products:products.slice(0,6).map(p=>({
+      id:p.id,name:p.name,label:displayName(p),category:p.category,
+      shortSummary:p.summary||p.category||'Scheda in sviluppo'
+    })),
+    collaborators:portfolioSnapshots.slice(0,5).map(s=>({
+      id:s.agency_collaborators?.id||s.collaborator_id,
+      name:s.agency_collaborators?.display_name||'Rete',
+      detail:(s.clients_count||0)+' clienti · '+(s.clients_count?Number(s.policies_count/s.clients_count).toFixed(2):'—')+' pol./cliente',
+      value:'€ '+Number(s.premium_total||0).toLocaleString('it-IT',{maximumFractionDigits:0})
+    })),
+    benchmark:{
+      solid:[
+        relationSolid+' relazioni ecosistema attive/core',
+        cepaReady+' elementi CEPA pronti/verificati',
+        portfolioSnapshots.length+' snapshot rete disponibili'
+      ],
+      improve:[
+        missingDocs+' requisiti partner non ancora registrati',
+        pendingTerms+' condizioni economiche da verificare',
+        verifiedProducts+'/'+productKnowledge.length+' elementi prodotto verificati'
+      ]
+    },
+    metrics:{
+      docs:documents.length,
+      market:marketEntities.length+distributionCandidates.length,
+      knowledge:verifiedProducts+'/'+productKnowledge.length,
+      terms:termsVerified+'/'+collaboratorTerms.length,
+      partnerDocs:partnerCovered+'/'+partnerRequirements.length,
+      cepa:cepaReady+'/'+cepaReadiness.length
+    },
+    cepa:{steps:['Centro CEPA','Sportelli SAP','Mandello','Lecco','Italia']},
+    actions:open.slice(0,5).map(a=>({
+      id:a.id,title:a.title,
+      detail:(a.ecosystem_nodes?.name||a.market_entities?.name||a.strategic_projects?.title||laneLabel(a.lane))+(a.due_at?' · '+fmtDate(a.due_at):''),
+      priority:a.priority
+    })),
+    user:{label:window.userEmail||'Area riservata',role:(window.userRole||'').replaceAll('_',' ')}
+  }
 
-  const open=actions.filter(a=>!['completed','cancelled'].includes(a.status)).sort(actionSort).slice(0,6)
-  $('homeActions').innerHTML=open.map(a=>listRow(a.title,(a.ecosystem_nodes?.name||a.market_entities?.name||a.strategic_projects?.title||laneLabel(a.lane)),[actionStatus(a.status),a.priority,a.due_at?fmtDate(a.due_at):'senza scadenza'])).join('')||empty('Nessuna attività aperta')
+  if(!dash.dataset.bound){
+    dash.dataset.bound='1'
+    dash.addEventListener('navigate',e=>navigate(e.detail.view))
+    dash.addEventListener('open-partner',e=>openPartner(e.detail.id))
+    dash.addEventListener('open-product',e=>openProduct(e.detail.id))
+    dash.addEventListener('open-collaborator',e=>openCollaborator(e.detail.id))
+    dash.addEventListener('open-action',e=>openAction(e.detail.id))
+    dash.addEventListener('ask-assistant',e=>askAssistant(e.detail.prompt))
+  }
 }
 
 function renderPartner(){
