@@ -23,6 +23,8 @@ jobs:
         run: npm run test:supabase-contract
       - name: Mobile Supabase contract gate
         run: npm run test:mobile-contract
+      - name: SCD Universe contract gate
+        run: npm run test:universe-contract
       - name: Syntax check
         run: |
           node --check app.js
@@ -32,6 +34,9 @@ jobs:
           node --check scripts/verify-r20-direct.mjs
           node --check scripts/validate-supabase-contract.mjs
           node --check scripts/validate-mobile-contract.mjs
+          node --check scripts/validate-universe-contract.mjs
+          node --check scd-meta-engine.js
+          node --check scd-twin.js
       - name: API contract gate
         run: npm run test:contract
       - name: Upstream resilience gate
