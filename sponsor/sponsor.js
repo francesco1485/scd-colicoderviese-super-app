@@ -278,7 +278,7 @@ window.openSponsorDetail=function(name){
   const proposals=proposalIdeas(s), deadlines=sponsorDeadlines(s), contacts=s.contacts||[];
   $('#sponsorDetailPage').innerHTML=
   '<button class="detail-back" id="detailBack">← Torna agli sponsor</button>'+
-  '<section class="sponsor-hero"><div class="sponsor-hero-content"><div class="detail-logo">'+esc(initials(s.name))+'</div><div class="detail-title"><small>'+esc(s.sector.toUpperCase())+'</small><h1>'+esc(s.name)+'</h1><p>'+esc(s.asset)+'</p><span class="hero-status">'+esc(s.class)+'</span></div></div><div class="sponsor-hero-quote">Più di uno sponsor.<br>Un compagno di strada.</div></section>'+
+  '<section class="sponsor-hero"><div class="sponsor-hero-content"><div class="detail-logo">'+esc(initials(s.name))+'</div><div class="detail-title"><small>'+esc(s.sector.toUpperCase())+'</small><h1>'+esc(s.name)+'</h1><p>'+esc(s.asset)+'</p><span class="hero-status">'+esc(s.class)+'</span></div></div><div class="sponsor-hero-quote">Più di uno sponsor.<br>Un compagno di strada.</div><div class="sponsor-holo"><small>RELATIONSHIP INTELLIGENCE</small><b>'+intel.evidence+'% dati solidi</b><span>'+esc(s.next)+'</span></div></section>'+
   '<nav class="detail-tabs">'+['Panoramica','Contratti','Documenti','Visibilità','Attività','Contatti','Note'].map((t,i)=>'<button class="'+(i===0?'active':'')+'">'+t+'</button>').join('')+'</nav>'+
   '<section class="detail-kpis">'+
     '<article class="detail-kpi"><small>INIZIO RAPPORTO</small><b>'+esc(s.since)+'</b></article>'+
