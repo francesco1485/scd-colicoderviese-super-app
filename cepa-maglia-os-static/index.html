@@ -40,7 +40,8 @@
   <aside class="sidebar">
     <div class="side-brand">
       <div class="side-seal">M</div>
-      <div><strong>MAGLIA 360</strong><small>Centro di Regia</small></div>
+      <div class="side-brand-copy"><strong>MAGLIA 360</strong><small>Agenzia Generale HDI</small></div>
+      <button id="sidebarCloseBtn" class="sidebar-close" type="button" aria-label="Chiudi menu">×</button>
     </div>
 
     <nav class="side-nav">
@@ -92,64 +93,122 @@
       <button id="logoutBtn" class="logout">Esci</button>
     </div>
   </aside>
+  <button id="sidebarBackdrop" class="sidebar-backdrop hidden" type="button" aria-label="Chiudi menu"></button>
 
   <main class="main">
     <header class="main-header">
-      <div>
-        <div class="eyebrow">AREA DI LAVORO MAGLIA ASSICURAZIONI</div>
-        <h1 id="pageTitle">Quadro generale</h1>
-        <p id="pageSubtitle">Agenzia Generale HDI · Ecosistema di competenze, relazioni e sviluppo</p>
+      <div class="header-left">
+        <button id="mobileMenuBtn" class="mobile-menu-btn" type="button" aria-label="Apri menu">☰</button>
+        <div class="header-brand">
+          <strong>Maglia <span>360</span></strong>
+          <small>Agenzia Generale HDI</small>
+        </div>
+        <div class="header-context">
+          <div class="eyebrow">AREA DI LAVORO</div>
+          <h1 id="pageTitle">Quadro generale</h1>
+          <p id="pageSubtitle">Agenzia Generale HDI · Ecosistema di competenze, relazioni e sviluppo</p>
+        </div>
       </div>
-      <div class="header-actions">
-        <span id="rolePill" class="role-pill"></span>
-        <button id="refreshBtn" class="icon-btn" title="Aggiorna">↻</button>
+      <div class="header-right">
+        <div class="header-cepa">
+          <small>Da Maglia Assicurazioni nasce</small>
+          <strong>C.E.P.A.</strong>
+          <span>Centro Educazione Previdenziale e Assicurativa</span>
+        </div>
+        <div class="header-actions">
+          <span id="rolePill" class="role-pill"></span>
+          <button id="refreshBtn" class="icon-btn" title="Aggiorna">↻</button>
+        </div>
       </div>
     </header>
 
     <section id="homeView" class="view">
-      <section class="identity-hero">
-        <div>
-          <div class="eyebrow light">CHI SIAMO NEL SISTEMA</div>
-          <h2>Maglia non è un solo mandato. È una regia che connette competenze diverse.</h2>
-          <p>HDI resta la radice assicurativa. Le altre collaborazioni ampliano competenze e possibilità. CEPA crea cultura e relazione. SAP presidia il territorio. Il software deve far vedere chiaramente chi fa cosa, cosa è già successo e cosa deve succedere dopo.</p>
+      <section class="territory-hero">
+        <div class="territory-copy">
+          <div class="territory-breadcrumb">Lago di Como · Colico · Mandello · Lecco · Valtellina</div>
+          <h2>Persone, protezione e opportunità per un territorio che cresce.</h2>
+          <p>Maglia 360 unisce consulenza, rete, competenze specialistiche e C.E.P.A. in un'unica regia. Ogni schermata deve portare a una decisione, a un contatto o a un prossimo passo.</p>
+          <div class="hero-actions">
+            <button class="hero-cta primary" data-go="cepa">Scopri C.E.P.A. →</button>
+            <button class="hero-cta secondary" data-go="territories">Il nostro territorio</button>
+          </div>
         </div>
-        <div class="identity-badge">MAGLIA<br><span>360</span></div>
+        <div class="territory-map-card">
+          <div class="territory-map-title">Territorio attivo</div>
+          <span>● Colico</span>
+          <span>● Mandello del Lario</span>
+          <span>● Lecco</span>
+          <span>● Valtellina</span>
+          <span>● Lago di Como</span>
+          <small>Territorio · Persone · Futuro</small>
+        </div>
       </section>
 
-      <section class="home-grid">
-        <article class="home-card">
-          <div class="eyebrow">ECOSISTEMA ESISTENTE</div>
-          <h3>Compagnie & partner</h3>
-          <p>Ogni rapporto ha una propria stanza: storia, stato, referenti, contratti, documenti, progetti, numeri, idee e attività.</p>
-          <div id="homePartners" class="mini-partners"></div>
+      <section class="visual-band">
+        <div class="band-head">
+          <div><div class="band-icon">↔</div><div><strong>Compagnie madri e collaborazioni</strong><small>Un ecosistema di competenze da leggere in un colpo d'occhio.</small></div></div>
+          <button class="text-link" data-go="products">Tutte le competenze →</button>
+        </div>
+        <div id="homePartnerCards" class="partner-card-strip"></div>
+      </section>
+
+      <section class="visual-band">
+        <div class="band-head">
+          <div><div class="band-icon">▣</div><div><strong>Prodotti e sintesi</strong><small>Soluzioni principali per persone, famiglie, professionisti e imprese.</small></div></div>
+          <button class="text-link" data-go="products">Vedi tutti i prodotti →</button>
+        </div>
+        <div id="homeProductStrip" class="product-quick-strip"></div>
+      </section>
+
+      <section class="dashboard-split">
+        <article class="visual-band compact-band">
+          <div class="band-head">
+            <div><div class="band-icon">●</div><div><strong>Collaboratori e remunerazioni</strong><small>La rete, il portafoglio e il lavoro da sviluppare.</small></div></div>
+            <button class="text-link" data-go="collaborators">Gestisci →</button>
+          </div>
+          <div id="homeCollaboratorPreview" class="home-table-preview"></div>
         </article>
-        <article class="home-card">
-          <div class="eyebrow">CEPA</div>
-          <h3>Centro culturale in evoluzione</h3>
-          <p>Materie, target, relatori, partner, contenuti, incontri, programmi e sviluppo della rete SAP.</p>
-          <div class="stat-row"><strong id="homeCepaSubjects">-</strong><span>materie censite</span></div>
-          <button class="text-link" data-go="cepa">Apri CEPA →</button>
-        </article>
-        <article class="home-card">
-          <div class="eyebrow">DOCUMENTI</div>
-          <h3>Archivio & modelli</h3>
-          <p>Accordi, contratti, dossier, verbali, piani di sviluppo e documenti CEPA raccolti in un'unica area.</p>
-          <div class="stat-row"><strong id="homeDocs">-</strong><span>documenti / riferimenti</span></div>
-          <button class="text-link" data-go="documents">Apri archivio →</button>
-        </article>
-        <article class="home-card">
-          <div class="eyebrow">SVILUPPO</div>
-          <h3>Mandello + Colico</h3>
-          <p>Seconda strada separata: nuovi soggetti, nuove relazioni, nuovi segnali e nuove opportunità.</p>
-          <div class="stat-row"><strong id="homeMarket">-</strong><span>entità mappate</span></div>
-          <button class="text-link" data-go="development">Apri sviluppo →</button>
+
+        <article class="visual-band compact-band">
+          <div class="band-head">
+            <div><div class="band-icon">⚖</div><div><strong>Confronti e benchmark</strong><small>Capire dove siamo forti e cosa va migliorato.</small></div></div>
+            <button class="text-link" data-go="comparisons">Apri analisi →</button>
+          </div>
+          <div id="homeBenchmarkPreview" class="benchmark-preview"></div>
         </article>
       </section>
 
-      <section class="panel control-tower-panel">
+      <section class="dashboard-split lower-split">
+        <article class="visual-band">
+          <div class="band-head">
+            <div><div class="band-icon">◆</div><div><strong>C.E.P.A. · Centro Educazione Previdenziale e Assicurativa</strong><small>Formazione, contenuti, relatori, SAP e sviluppo territoriale.</small></div></div>
+            <button class="text-link" data-go="cepa">Scopri CEPA →</button>
+          </div>
+          <div class="cepa-journey">
+            <button data-go="cepa"><span>01</span><strong>Centro CEPA</strong><small>Colico</small></button>
+            <i></i>
+            <button data-go="territories"><span>02</span><strong>Sportelli SAP</strong><small>Sedi locali</small></button>
+            <i></i>
+            <button data-go="territories"><span>03</span><strong>Mandello</strong><small>Pilota</small></button>
+            <i></i>
+            <button data-go="territories"><span>04</span><strong>Lecco</strong><small>Consolidamento</small></button>
+            <i></i>
+            <button data-go="cepa"><span>05</span><strong>Italia</strong><small>Visione nazionale</small></button>
+          </div>
+        </article>
+
+        <article class="mini-tools-grid">
+          <button class="tool-tile" data-go="documents"><span>▤</span><strong>Documenti e contratti</strong><small><b id="homeDocs">-</b> riferimenti in archivio</small></button>
+          <button class="tool-tile" data-go="aiMail"><span>✉</span><strong>AI Mail & Chat</strong><small>Comunicazioni guidate e contestuali</small></button>
+          <button class="tool-tile" data-go="networkRadar"><span>⌖</span><strong>Radar Rete</strong><small><b id="homeMarket">-</b> entità / candidati osservati</small></button>
+          <button class="tool-tile" data-go="growthKits"><span>◎</span><strong>Kit Collaboratore</strong><small>Valutazione, piano 90 giorni, materiali cliente</small></button>
+        </article>
+      </section>
+
+      <section class="panel control-tower-panel top-gap">
         <div class="panel-head">
           <div><div class="eyebrow">CONTROL TOWER DELLA CONOSCENZA</div><h3>Quanto del sistema è realmente documentato</h3></div>
-          <span class="future-chip">misura la certezza, non la performance commerciale</span>
+          <span class="future-chip">certezza prima della complessità</span>
         </div>
         <div class="certainty-grid">
           <button class="certainty-card" data-go="products"><span>Prodotti</span><strong id="homeKnowledgeVerified">-</strong><small id="homeKnowledgeTotal">elementi verificati</small></button>
@@ -159,10 +218,10 @@
         </div>
       </section>
 
-      <section class="panel top-gap">
+      <section class="panel top-gap focus-panel">
         <div class="panel-head">
-          <div><div class="eyebrow">LAVORO REALE</div><h3>Cosa richiede attenzione adesso</h3></div>
-          <button class="small-btn" data-go="actions">Tutte le attività</button>
+          <div><div class="eyebrow">OGGI</div><h3>Cosa richiede attenzione adesso</h3></div>
+          <button class="small-btn" data-go="actions">Apri agenda operativa</button>
         </div>
         <div id="homeActions" class="list"></div>
       </section>
