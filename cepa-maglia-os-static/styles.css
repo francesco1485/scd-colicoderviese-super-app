@@ -579,3 +579,41 @@ body{background:var(--paper);color:var(--ink)}
   .lia-source-grid{grid-template-columns:1fr}
   .lia-capability-row,.lia-work-row{align-items:flex-start;flex-direction:column}
 }
+
+
+.form-hint{
+  display:block;
+  margin-top:6px;
+  color:#7890a0;
+  font-size:10px;
+  font-weight:500;
+  line-height:1.4;
+}
+#liaWorkbenchFiles{
+  width:100%;
+  margin-top:7px;
+  padding:10px;
+  border:1px dashed #bfd0dc;
+  border-radius:10px;
+  background:#f9fcfe;
+  color:#38566c;
+}
+.lia-file-links{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:7px;
+}
+.lia-file-links button{
+  border:1px solid #d4e2eb;
+  border-radius:999px;
+  background:#f7fbfd;
+  color:#15577e;
+  padding:5px 8px;
+  font-size:9px;
+  cursor:pointer;
+}
+.lia-file-links button:hover{
+  background:#eaf5fb;
+  border-color:#a8c8db;
+}
