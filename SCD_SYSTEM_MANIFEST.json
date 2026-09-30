@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "2.2.0",
+    "version": "2.3.0",
     "effective_at": "2026-09-29",
     "status": "BINDING",
     "language": "it-IT",
@@ -1538,6 +1538,15 @@
           "disabled_status": "GATED_OFF_NOT_LIVE"
         }
       }
+    },
+    "visual_acceptance": {
+      "r37": [
+        "COMPACT_HEADER",
+        "HERO_MAX_238_MOBILE",
+        "SPONSOR_MARQUEE_VISIBLE",
+        "FAN_ZONE_VISIBLE",
+        "NO_EMPTY_MARKETING_COPY"
+      ]
     }
   },
   "capability_map": [
@@ -1547,7 +1556,7 @@
       "required": true,
       "state": "PARTIAL",
       "screen": "SCD_PULSE",
-      "contract": "ROLE_AWARE_LIVE_CLUB_ENTRY"
+      "contract": "COMPACT_MEDIA_FIRST_SPONSOR_VISIBLE_ENGAGEMENT_DRIVEN"
     },
     {
       "id": "CAP-HOME",
@@ -1781,6 +1790,17 @@
         "SCD_SUPABASE"
       ],
       "contract": "EXPO_LOGIN_SESSION_SCD_MY_CONTEXT_NO_SERVICE_ROLE"
+    },
+    {
+      "id": "CAP-FAN-ENGAGEMENT",
+      "domain": "COMMUNITY",
+      "required": true,
+      "state": "PARTIAL",
+      "sources": [
+        "SCD_OFFICIAL_SITE",
+        "R20"
+      ],
+      "contract": "MVP_PREDICTION_STORY_SKY_NO_GAMBLING"
     }
   ],
   "known_noncompliance": [
@@ -1990,6 +2010,20 @@
     ],
     "visual_principle": "ABSTRACT_ADAPTIVE_SUBLIMATION",
     "legacy_home_route": "#/home",
-    "no_rewrite_rule": true
+    "no_rewrite_rule": true,
+    "release": "R37",
+    "visual_mode": "CONTENT_FIRST_CLUB_MEDIA",
+    "header_rule": "COMPACT",
+    "hero_rule": "PHOTO_LED_COMPACT",
+    "sponsor_visibility": "ALWAYS_VISIBLE_ON_PULSE",
+    "engagement_modules": [
+      "MVP",
+      "PRONOSTICO_COMMUNITY",
+      "SKY_CHALLENGE",
+      "MATCHDAY_STORY",
+      "TOURNAMENTS"
+    ],
+    "no_empty_dashboard": true,
+    "no_giant_blue_slab": true
   }
 }
