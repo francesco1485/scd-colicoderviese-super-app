@@ -50,6 +50,8 @@ for(const viewport of viewports){
   await page.waitForFunction(()=>document.documentElement.scrollWidth<=window.innerWidth+3);
   await page.waitForFunction(()=>Boolean(window.SCDMeta)&&Boolean(window.SCDTwin)&&Boolean(window.SCDExperience));
   await page.waitForSelector('.r39-experience-bar');
+  await page.waitForSelector('.r40-week-shell');
+  await page.waitForSelector('.r40-newsroom');
   const metaMode=await page.evaluate(()=>window.SCDMeta.snapshot('base').mode);
   if(metaMode!=='PRIVACY_FIRST_ON_DEVICE')throw new Error('SCD Meta privacy mode missing');
   const cognitive=await page.evaluate(()=>window.SCDExperience.frictionSnapshot());
@@ -59,11 +61,11 @@ for(const viewport of viewports){
   if(focusMode!=='focus')throw new Error('Focus mode did not activate');
   await page.click('[data-experience-mode="DISCOVER"]');
 
-  if(viewport.width===390)await page.screenshot({path:'test-output/r39-human-os-390x844.png',fullPage:true});
+  if(viewport.width===390)await page.screenshot({path:'test-output/r40-weekly-newsroom-390x844.png',fullPage:true});
   if(viewport.width===1440){
     const shellWidth=await page.locator('.app-shell').evaluate(el=>Math.round(el.getBoundingClientRect().width));
     if(shellWidth<1200)throw new Error('desktop app shell is still phone-sized: '+shellWidth+'px');
-    await page.screenshot({path:'test-output/r39-human-os-desktop-1440x900.png',fullPage:true});
+    await page.screenshot({path:'test-output/r40-weekly-newsroom-desktop-1440x900.png',fullPage:true});
   }
 
   // Legacy R24 home remains available during migration, but Pulse is the default entry.
@@ -221,6 +223,11 @@ const capabilities=await api.request.get(base+'/api/capabilities');
 if(!capabilities.ok())throw new Error('capabilities endpoint failed '+capabilities.status());
 const capabilitiesJson=await capabilities.json();
 if(typeof capabilitiesJson.featureFlags?.dataFabricObservability!=='boolean')throw new Error('dataFabricObservability feature flag missing');
+const newsroom=await api.request.get(base+'/api/newsroom');
+if(!newsroom.ok())throw new Error('newsroom endpoint failed '+newsroom.status());
+const newsroomJson=await newsroom.json();
+if(newsroomJson.release!=='R40'||newsroomJson.staleSiteContent!==false||newsroomJson.editorialPolicy!=='VERIFIED_STRUCTURED_FACTS_ONLY')throw new Error('invalid R40 newsroom contract');
+if(!Array.isArray(newsroomJson.calendar?.rows)||!Array.isArray(newsroomJson.cards))throw new Error('invalid R40 newsroom payload');
 const time=await api.request.get(base+'/api/time');
 if(!time.ok())throw new Error('time endpoint failed '+time.status());
 const timeJson=await time.json();
@@ -236,5 +243,5 @@ if(!deleteHtml.includes('deleteForm')||!deleteHtml.includes('ELIMINAZIONE ACCOUN
 await api.close();
 
 if(allErrors.length)throw new Error('browser errors: '+allErrors.join(' || '));
-console.log('SCD R39 smoke PASS',{viewports:viewports.map(v=>v.width+'x'+v.height)});
+console.log('SCD R40 smoke PASS',{viewports:viewports.map(v=>v.width+'x'+v.height)});
 await browser.close();
