@@ -1040,3 +1040,8 @@ input:focus-visible{
   .opsLia{grid-column:auto;align-items:flex-start;flex-direction:column}
   .hero h1{font-size:26px!important}
 }
+
+
+/* V2: Lia is never a permanent dashboard column */
+.assistant{display:none!important}
+.shell{grid-template-columns:minmax(0,1fr)!important}
