@@ -724,14 +724,29 @@ function openEventsHub(){
 }
 function openCommunicationsHub(){
   setActiveNav('');
-  const p=publicData(state.summary||FALLBACK),rows=(p.highlights||[]).slice(0,8);
-  const important=rows.find(x=>/urgent|sospension|variaz|annull|rinvi|cambio/i.test([x.status,x.feedType,x.title,x.message].join(' ')))||rows[0]||{};
-  const rest=rows.filter(x=>x!==important).slice(0,5);
-  modal('<section class="communications-app-screen"><header class="communications-app-head"><div class="communications-app-brand"><img src="./assets/logo-scd.png" alt="SCD"><div><b>Comunicazioni</b><p>Notizie, aggiornamenti e contenuti ufficiali del club.</p></div></div></header><div class="communications-tabs"><button class="active">Club</button><button data-comm-tab="teams">Squadre</button><button data-comm-tab="social">Social</button></div><article class="communication-important"><span class="comm-ico">!</span><div><small>COMUNICAZIONE IN EVIDENZA</small><b>'+esc(field(important,'title','subject','event')||'Aggiornamenti SCD')+'</b><p>'+esc(field(important,'message','excerpt','venue')||'Le informazioni ufficiali del Club vengono pubblicate qui.')+'</p><time>'+esc(field(important,'date','time')||'')+'</time></div></article><div class="communication-list">'+(rest.length?rest.map(x=>'<article><span class="comm-row-ico">▣</span><div><small>'+esc(field(x,'feedType','source')||'CLUB')+'</small><b>'+esc(field(x,'title','subject','event')||'Aggiornamento')+'</b><p>'+esc(field(x,'message','venue','status')||'')+'</p></div><time>'+esc(field(x,'date','time')||'')+'</time></article>').join(''):'<div class="empty-state">Nuove comunicazioni in aggiornamento.</div>')+'</div><section class="social-hub-card"><div><h3>Social Hub</h3><p>I canali ufficiali SCD in un unico spazio, senza numeri inventati.</p></div><div class="social-links"><a href="https://www.instagram.com/s.c.d.colicoderviese/" target="_blank" rel="noopener">Instagram</a><a href="https://www.facebook.com/ColicoDerviese?locale=it_IT" target="_blank" rel="noopener">Facebook</a><a href="https://www.colicoderviese.it/" target="_blank" rel="noopener">Sito ufficiale</a></div><div class="modal-actions"><button class="outline" id="commRefresh">AGGIORNA</button><button class="primary" id="commShare">CONDIVIDI APP</button></div></section></section>');
+  const p=publicData(state.summary||FALLBACK);
+  const internal=(p.highlights||[]).filter(x=>{
+    const src=[field(x,'source','fonte','feedType'),field(x,'sourceUrl','url','link')].join(' ').toLowerCase();
+    return !/official_site|sito ufficiale|google news|web_news|instagram|facebook/.test(src);
+  });
+  const important=internal.find(x=>/urgent|sospension|variaz|annull|rinvi|cambio/i.test([x.status,x.feedType,x.title,x.message].join(' ')))||internal[0]||{};
+  const comms=internal.filter(x=>x!==important).slice(0,5);
+  const newsroom=Array.isArray(state.newsroom?.cards)?state.newsroom.cards:[];
+  const newsroomHtml=newsroom.length?newsroom.map(x=>'<article><span class="comm-row-ico">AI</span><div><small>'+esc(x.category||'SCD NEWSROOM AI')+'</small><b>'+esc(x.title||'Sintesi settimanale')+'</b><p>'+esc(x.dek||x.body||'')+'</p></div><time>'+esc(state.newsroom?.week?.start||'')+'</time></article>').join(''):'<div class="empty-state">La Newsroom non pubblica nulla finché non ci sono dati verificati.</div>';
+  modal('<section class="communications-app-screen"><header class="communications-app-head"><div class="communications-app-brand"><img src="./assets/logo-scd.png" alt="SCD"><div><b>Comunicazioni & Newsroom</b><p>Comunicazioni operative del Club e sintesi settimanali costruite da dati verificati.</p></div></div></header><div class="communications-tabs"><button class="active">Club</button><button data-comm-tab="teams">Squadre</button><button data-comm-tab="newsroom">Newsroom AI</button><button data-comm-tab="social">Social</button></div><article class="communication-important"><span class="comm-ico">!</span><div><small>COMUNICAZIONE OPERATIVA</small><b>'+esc(field(important,'title','subject','event')||'Nessuna comunicazione urgente')+'</b><p>'+esc(field(important,'message','excerpt','venue')||'Le comunicazioni operative verificate vengono pubblicate qui.')+'</p><time>'+esc(field(important,'date','time')||'')+'</time></div></article><div class="communication-list" id="communicationList">'+(comms.length?comms.map(x=>'<article><span class="comm-row-ico">▣</span><div><small>'+esc(field(x,'feedType','source')||'CLUB')+'</small><b>'+esc(field(x,'title','subject','event')||'Aggiornamento')+'</b><p>'+esc(field(x,'message','venue','status')||'')+'</p></div><time>'+esc(field(x,'date','time')||'')+'</time></article>').join(''):'<div class="empty-state">Nessuna comunicazione operativa nuova.</div>')+'</div><section class="social-hub-card"><div><h3>Canali ufficiali</h3><p>I link restano disponibili, ma le news dell’app non vengono riempite con contenuti datati del sito.</p></div><div class="social-links"><a href="https://www.instagram.com/s.c.d.colicoderviese/" target="_blank" rel="noopener">Instagram</a><a href="https://www.facebook.com/ColicoDerviese?locale=it_IT" target="_blank" rel="noopener">Facebook</a><a href="https://www.colicoderviese.it/" target="_blank" rel="noopener">Sito ufficiale</a></div><div class="modal-actions"><button class="outline" id="commRefresh">AGGIORNA DATI</button><button class="primary" id="commShare">CONDIVIDI APP</button></div></section></section>');
+  const list=$('#communicationList');
+  document.querySelectorAll('[data-comm-tab]').forEach(b=>b.onclick=()=>{
+    document.querySelectorAll('.communications-tabs button').forEach(x=>x.classList.toggle('active',x===b));
+    if(b.dataset.commTab==='teams')return openTeams();
+    if(b.dataset.commTab==='newsroom'){
+      if(list)list.innerHTML=newsroomHtml;
+      return;
+    }
+    if(b.dataset.commTab==='social')return toast('Apri i canali ufficiali dai link qui sotto');
+  });
   const refresh=$('#commRefresh'),share=$('#commShare');
-  if(refresh)refresh.onclick=async()=>{await loadSummary(false);openCommunicationsHub()};
-  if(share)share.onclick=async()=>{try{if(navigator.share)await navigator.share({title:'SCD ColicoDerviese',text:'Segui gli aggiornamenti ufficiali SCD ColicoDerviese',url:location.href});else await navigator.clipboard.writeText(location.href);toast('Link app pronto per la condivisione')}catch{}};
-  document.querySelectorAll('[data-comm-tab]').forEach(b=>b.onclick=()=>{if(b.dataset.commTab==='teams')openTeams();else toast('Apri i canali ufficiali dal Social Hub')});
+  if(refresh)refresh.onclick=async()=>{await Promise.all([loadSummary(true),loadWeeklyNewsroom(false)]);openCommunicationsHub()};
+  if(share)share.onclick=async()=>{try{if(navigator.share)await navigator.share({title:'SCD ColicoDerviese',text:'Segui SCD Universe',url:location.href});else await navigator.clipboard.writeText(location.href);toast('Link app pronto per la condivisione')}catch{}};
 }
 function openProfile(){
   setActiveNav('profile');
