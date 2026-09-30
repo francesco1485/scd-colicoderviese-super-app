@@ -1396,3 +1396,88 @@ body[data-context-brand="CIP"] .main-header{border-bottom-color:#f2dfc6}
   background:var(--context-surface);
   box-shadow:0 0 0 1px color-mix(in srgb,var(--context-accent) 20%,transparent);
 }
+
+
+.office-card{padding:0!important;overflow:hidden}
+.office-card-visual{
+  position:relative;
+  min-height:174px;
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:16px;
+  padding:20px;
+  overflow:hidden;
+  color:#fff;
+  background:linear-gradient(145deg,#0b3d5a,#0d6b6a);
+}
+.office-card-visual.colico{
+  background:
+    radial-gradient(circle at 78% 14%,rgba(255,255,255,.18),transparent 16%),
+    linear-gradient(145deg,#0a3151 0%,#0c5770 52%,#0a7564 100%);
+}
+.office-card-visual.mandello{
+  background:
+    radial-gradient(circle at 80% 18%,rgba(255,255,255,.16),transparent 16%),
+    linear-gradient(145deg,#12354e 0%,#315d73 54%,#557d76 100%);
+}
+.office-landscape{position:absolute;inset:0;opacity:.34;pointer-events:none}
+.office-landscape .mountain{
+  position:absolute;
+  bottom:42px;
+  width:54%;
+  height:58%;
+  background:rgba(255,255,255,.19);
+  clip-path:polygon(0 100%,34% 32%,50% 58%,69% 12%,100% 100%);
+}
+.office-landscape .mountain.one{left:-5%}
+.office-landscape .mountain.two{right:-9%;transform:scaleX(-1);opacity:.65}
+.office-landscape .lake{
+  position:absolute;
+  left:-4%;right:-4%;bottom:-10px;height:64px;
+  border-radius:50% 50% 0 0 / 34% 34% 0 0;
+  background:rgba(255,255,255,.13);
+  box-shadow:0 -10px 30px rgba(255,255,255,.06);
+}
+.office-visual-copy{position:relative;z-index:1;min-width:0;text-align:left}
+.office-visual-copy small{
+  display:block;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.08em;
+  color:#aee4d5;
+}
+.office-visual-copy strong{
+  display:block;
+  margin-top:6px;
+  font-size:28px;
+  letter-spacing:-.025em;
+  color:#fff;
+}
+.office-visual-copy span{display:block;margin-top:4px;font-size:12px;color:#d4e4e9}
+.office-card-visual>b{
+  position:relative;z-index:1;flex:0 0 auto;
+  border:1px solid rgba(255,255,255,.25);
+  border-radius:10px;
+  padding:9px 11px;
+  background:rgba(255,255,255,.10);
+  color:#fff;
+  font-size:12px;
+}
+.office-card-top{padding:14px 18px 0}
+.office-card-top>div p{font-size:12px!important;margin:1px 0 0!important}
+.office-live{
+  margin-left:auto;
+  border-radius:999px;
+  padding:5px 8px;
+  background:#e6f5ed;
+  color:#0b7656;
+  font-size:10px;
+  font-weight:800;
+  text-transform:uppercase;
+}
+.office-card-metrics{margin:14px 18px 18px!important}
+@media(max-width:560px){
+  .office-card-visual{min-height:155px;align-items:flex-start;flex-direction:column}
+  .office-card-visual>b{margin-top:auto}
+}
