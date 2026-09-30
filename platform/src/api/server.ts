@@ -86,6 +86,7 @@ app.post<{ Params: { command: string }; Body: unknown }>(
         payload: unknown;
         tenantId: string;
         actor: typeof actor;
+        sessionToken?: string;
         correlationId?: string;
         idempotencyKey?: string;
       } = {
@@ -94,6 +95,8 @@ app.post<{ Params: { command: string }; Body: unknown }>(
         tenantId: process.env.SCD_TENANT_ID ?? "scd-colicoderviese",
         actor
       };
+      const sessionHeader = request.headers["x-scd-session"];
+      if (typeof sessionHeader === "string" && sessionHeader) submission.sessionToken = sessionHeader;
 
       if (typeof correlationHeader === "string") submission.correlationId = correlationHeader;
       if (typeof idempotencyHeader === "string") submission.idempotencyKey = idempotencyHeader;
