@@ -19,10 +19,11 @@ const viewMeta={
  development:['Sviluppo nuovo','Seconda strada: mappatura, qualificazione e nuove relazioni'],
  networkRadar:['Radar Rete','Ricerca continua IVASS, Registro Imprese e territorio per nuova rete e collaborazioni'],
  actions:['Attività & Scadenze','Motore operativo comune a tutto il sistema'],
- recovery:['Clienti · Recovery','Campagna operativa sul patrimonio esistente']
+ recovery:['Clienti · Recovery','Campagna operativa sul patrimonio esistente'],
+ liaWorkbench:['Lia · Workbench','Assistente operativo con permessi, ricerca, cartelle di lavoro e artefatti tracciati']
 }
 
-let ecosystem=[],projects=[],actions=[],marketHubs=[],marketEntities=[],contacts=[],timeline=[],documents=[],partnerRequirements=[],blueprints=[],subjects=[],initiatives=[],cepaContent=[],cepaAcademy=[],cepaSpeakers=[],products=[],productKnowledge=[],comparisons=[],collaborators=[],collaboratorTerms=[],portfolioSnapshots=[],businessAssessments=[],growthKits=[],distributionWatchlists=[],distributionCandidates=[],distributionEvidence=[],mailTemplates=[],mailDrafts=[],cepaExpansion=[],cepaReadiness=[],assistantMessages=[],recoveryRows=[],members=[]
+let ecosystem=[],projects=[],actions=[],marketHubs=[],marketEntities=[],contacts=[],timeline=[],documents=[],partnerRequirements=[],blueprints=[],subjects=[],initiatives=[],cepaContent=[],cepaAcademy=[],cepaSpeakers=[],products=[],productKnowledge=[],comparisons=[],collaborators=[],collaboratorTerms=[],portfolioSnapshots=[],businessAssessments=[],growthKits=[],distributionWatchlists=[],distributionCandidates=[],distributionEvidence=[],mailTemplates=[],mailDrafts=[],cepaExpansion=[],cepaReadiness=[],assistantMessages=[],recoveryRows=[],members=[],liaCapabilities=[],liaFolders=[],liaOrders=[],researchSources=[]
 let currentPartnerId=null
 
 function msg(text,error=false){$('loginMsg').textContent=text;$('loginMsg').className='message'+(error?' error':'')}
@@ -136,6 +137,28 @@ $('territoryStageFilter').onchange=renderMarketTable
 $('actionLaneFilter').onchange=renderActions
 $('actionStatusFilter').onchange=renderActions
 $('refreshRecoveryBtn').onclick=loadRecovery
+$('liaWorkbenchForm').onsubmit=async e=>{
+  e.preventDefault()
+  const q=$('liaWorkbenchCommand').value.trim()
+  if(!q)return
+  const box=$('liaWorkbenchResult')
+  box.className='message'
+  box.textContent='Lia sta elaborando il comando…'
+  try{
+    const{data,error}=await supabase.functions.invoke('lia-workbench',{body:{organization_id:window.orgId,command:q}})
+    if(error)throw error
+    box.textContent=data?.message||'Operazione registrata.'
+    box.className='message'+(data?.partial?' warning':'')
+    await loadAll()
+  }catch(error){
+    box.textContent='Operazione non completata: '+(error?.message||String(error))
+    box.className='message error'
+  }
+}
+document.querySelectorAll('[data-lia-example]').forEach(b=>b.onclick=()=>{
+  $('liaWorkbenchCommand').value=b.dataset.liaExample
+  $('liaWorkbenchCommand').focus()
+})
 
 async function boot(){
   const{data:{user}}=await supabase.auth.getUser()
@@ -188,18 +211,22 @@ async function loadAll(){
     supabase.from('ai_mail_drafts').select('*,ecosystem_nodes(id,name),ai_mail_templates(id,title)').eq('organization_id',window.orgId).order('created_at',{ascending:false}).limit(100),
     supabase.from('cepa_expansion_stages').select('*').eq('organization_id',window.orgId).order('stage_no'),
     supabase.from('cepa_readiness_items').select('*').eq('organization_id',window.orgId).order('dimension').order('title'),
-    supabase.from('ai_assistant_messages').select('*').eq('organization_id',window.orgId).eq('user_id',window.userId).order('created_at').limit(30)
+    supabase.from('ai_assistant_messages').select('*').eq('organization_id',window.orgId).eq('user_id',window.userId).order('created_at').limit(30),
+    supabase.from('organization_ai_capabilities').select('*').eq('organization_id',window.orgId).eq('role',window.userRole).eq('active',true).order('capability'),
+    supabase.from('ai_workspace_folders').select('*').eq('organization_id',window.orgId).order('created_at',{ascending:false}).limit(100),
+    supabase.from('ai_work_orders').select('*').eq('organization_id',window.orgId).order('created_at',{ascending:false}).limit(60),
+    supabase.from('research_sources').select('*').eq('organization_id',window.orgId).eq('active',true).order('trust_level').order('name')
   ]
   const res=await Promise.all(q)
   const err=res.find(x=>x.error)?.error
   if(err){console.error(err);$('refreshBtn').textContent='!';return}
-  ;[ecosystem,projects,actions,marketHubs,marketEntities,contacts,timeline,documents,partnerRequirements,blueprints,subjects,initiatives,cepaContent,cepaAcademy,cepaSpeakers,products,productKnowledge,comparisons,collaborators,collaboratorTerms,portfolioSnapshots,businessAssessments,growthKits,distributionWatchlists,distributionCandidates,distributionEvidence,mailTemplates,mailDrafts,cepaExpansion,cepaReadiness,assistantMessages]=res.map(x=>x.data||[])
+  ;[ecosystem,projects,actions,marketHubs,marketEntities,contacts,timeline,documents,partnerRequirements,blueprints,subjects,initiatives,cepaContent,cepaAcademy,cepaSpeakers,products,productKnowledge,comparisons,collaborators,collaboratorTerms,portfolioSnapshots,businessAssessments,growthKits,distributionWatchlists,distributionCandidates,distributionEvidence,mailTemplates,mailDrafts,cepaExpansion,cepaReadiness,assistantMessages,liaCapabilities,liaFolders,liaOrders,researchSources]=res.map(x=>x.data||[])
   renderEverything()
   $('refreshBtn').textContent='↻'
 }
 
 function renderEverything(){
-  renderPartnerNav();renderHome();renderPartner();renderProducts();renderCollaborators();renderGrowthKits();renderComparisons();renderMail();renderCepa();renderTerritories();renderDocuments();renderDevelopment();renderNetworkRadar();renderActions();renderAssistantHistory()
+  renderPartnerNav();renderHome();renderPartner();renderProducts();renderCollaborators();renderGrowthKits();renderComparisons();renderMail();renderCepa();renderTerritories();renderDocuments();renderDevelopment();renderNetworkRadar();renderActions();renderAssistantHistory();renderLiaWorkbench()
 }
 
 function renderPartnerNav(){
@@ -709,6 +736,29 @@ function renderComparisons(){
     const names=gp.map(p=>p.name).join(' · ')
     return '<article class="comparison-card"><div class="comparison-head"><div><div class="eyebrow">'+esc(g)+'</div><h3>'+esc(names)+'</h3></div><span class="verification-badge '+(verified.length?'verified':'')+'">'+(verified.length?verified.length+' confronti verificati':'benchmark da costruire')+'</span></div><div class="comparison-body"><div class="strength-weak-grid"><div class="sw-box strength"><h4>Punti di forza censiti</h4><ul>'+((gp.flatMap(p=>p.strengths||[])).length?gp.flatMap(p=>p.strengths||[]).map(x=>'<li>'+esc(x)+'</li>').join(''):'<li>Da verificare su documentazione e processo reale.</li>')+'</ul></div><div class="sw-box weak"><h4>Punti deboli / limiti</h4><ul>'+((gp.flatMap(p=>p.weaknesses||[])).length?gp.flatMap(p=>p.weaknesses||[]).map(x=>'<li>'+esc(x)+'</li>').join(''):'<li>Da verificare senza attribuire giudizi non documentati.</li>')+'</ul></div></div><div class="compare-note">'+(verified.length?verified.map(c=>'<strong>'+esc(c.benchmark_name)+'</strong><br>'+esc(c.comparison_scope||'')+(c.source_url?'<br>Fonte registrata':'')).join('<br><br>'):'Il confronto non viene riempito con punteggi inventati. Verranno registrati solo dati comparabili con fonte, data e livello di confidenza.')+'</div></div></article>'
   }).join('')||empty('Nessun gruppo di confronto')
+}
+
+function renderLiaWorkbench(){
+  if(!$('liaCapabilityList'))return
+  const levelLabel={admin:'Amministrazione ed esecuzione',execute:'Esecuzione autorizzata',prepare:'Preparazione e proposta',support:'Supporto al ruolo'}
+  $('liaRoleMode').textContent=(window.userRole||'viewer').replaceAll('_',' ')+' · '+(isManager()?'esecuzione operativa':'supporto per ruolo')
+  $('liaCapabilityList').innerHTML=liaCapabilities.map(c=>
+    '<div class="lia-capability-row"><div><strong>'+esc(c.capability.replaceAll('.',' · '))+'</strong><small>'+esc(levelLabel[c.permission_level]||c.permission_level)+'</small></div><span class="lia-level '+esc(c.permission_level)+'">'+esc(c.permission_level)+'</span></div>'
+  ).join('')||empty('Nessuna capacità assegnata')
+
+  $('liaFolderList').innerHTML=liaFolders.map(f=>{
+    const city=f.scope?.city?' · '+esc(f.scope.city):''
+    return '<div class="lia-work-row"><div><strong>'+esc(f.name)+'</strong><small>'+esc(f.folder_type)+city+'</small></div><span>'+esc(fmtDateTime(f.created_at))+'</span></div>'
+  }).join('')||empty('Nessuna cartella di lavoro')
+
+  $('liaOrderList').innerHTML=liaOrders.map(o=>
+    '<div class="lia-work-row"><div><strong>'+esc(o.action_type.replaceAll('_',' '))+'</strong><small>'+esc(o.result_summary||o.prompt)+'</small></div><span class="lia-order-status '+esc(o.status)+'">'+esc(o.status)+'</span></div>'
+  ).join('')||empty('Nessun ordine operativo')
+
+  const trustLabel={primary:'Primaria',official:'Ufficiale',secondary:'Secondaria',discovery_only:'Discovery'}
+  $('liaSourceList').innerHTML=researchSources.map(src=>
+    '<article class="lia-source-card"><div><strong>'+esc(src.name)+'</strong><small>'+esc(src.source_type.replaceAll('_',' '))+' · '+esc(src.access_mode.replaceAll('_',' '))+'</small></div><span class="source-trust '+esc(src.trust_level)+'">'+esc(trustLabel[src.trust_level]||src.trust_level)+'</span><p>'+esc(src.use_case||'Fonte di lavoro')+'</p></article>'
+  ).join('')||empty('Nessuna fonte registrata')
 }
 
 function renderMail(){
