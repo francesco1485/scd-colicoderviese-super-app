@@ -159,7 +159,7 @@ async function loadAll(){
     supabase.from('product_comparisons').select('*,agency_products(id,name,comparison_group)').eq('organization_id',window.orgId).order('created_at',{ascending:false}),
     supabase.from('agency_collaborators').select('*').eq('organization_id',window.orgId).eq('active',true).order('display_name'),
     supabase.from('collaborator_product_terms').select('*,agency_products(id,name),ecosystem_nodes(id,name,code)').eq('organization_id',window.orgId).order('created_at',{ascending:false}),
-    supabase.from('collaborator_portfolio_snapshots').select('*,agency_collaborators(id,display_name,collaborator_type)').eq('organization_id',window.orgId).order('premium_total',{ascending:false}),
+    supabase.from('collaborator_portfolio_snapshots').select('*,agency_collaborators(id,display_name,collaborator_type,area,territory,earning_model,status)').eq('organization_id',window.orgId).order('premium_total',{ascending:false}),
     supabase.from('collaborator_business_assessments').select('*,agency_collaborators(id,display_name)').eq('organization_id',window.orgId).order('assessment_date',{ascending:false}),
     supabase.from('collaborator_growth_kits').select('*').eq('organization_id',window.orgId).order('title'),
     supabase.from('distribution_research_watchlists').select('*,market_hubs(id,name,city)').eq('organization_id',window.orgId).order('name'),
@@ -242,12 +242,21 @@ function renderHome(){
       id:p.id,name:p.name,label:displayName(p),category:p.category,
       shortSummary:p.summary||p.category||'Scheda in sviluppo'
     })),
-    collaborators:portfolioSnapshots.slice(0,5).map(s=>({
-      id:s.agency_collaborators?.id||s.collaborator_id,
-      name:s.agency_collaborators?.display_name||'Rete',
-      detail:(s.clients_count||0)+' clienti · '+(s.clients_count?Number(s.policies_count/s.clients_count).toFixed(2):'—')+' pol./cliente',
-      value:'€ '+Number(s.premium_total||0).toLocaleString('it-IT',{maximumFractionDigits:0})
-    })),
+    collaborators:portfolioSnapshots
+      .filter(s=>s.agency_collaborators?.collaborator_type!=='agency_central')
+      .slice(0,5)
+      .map(s=>{
+        const c=s.agency_collaborators||{}
+        return {
+          id:c.id||s.collaborator_id,
+          name:c.display_name||'Rete',
+          territory:c.territory||c.area||'Territorio da definire',
+          detail:(s.clients_count||0)+' clienti · '+(s.policies_count||0)+' polizze',
+          terms:c.earning_model==='da_verificare'?'Da verificare':String(c.earning_model||'Da definire').replaceAll('_',' '),
+          status:c.status==='active'?'Attivo':String(c.status||'').replaceAll('_',' '),
+          value:'€ '+Number(s.premium_total||0).toLocaleString('it-IT',{maximumFractionDigits:0})
+        }
+      }),
     benchmark:{
       solid:[
         relationSolid+' relazioni ecosistema attive/core',
