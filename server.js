@@ -39,7 +39,7 @@ function applyCors(req,res){
 const READ_ONLY_RETRY_ACTIONS = new Set([
   'public.feed','public.club','public.calendar','public.datafabric.contract',
   'dashboard.summary','private.dashboard','private.week','account.requests',
-  'private.attendance.get','auth.validate','direction.diagnostics',
+  'private.attendance.get','private.commercial.snapshot','auth.validate','direction.diagnostics',
   'direction.evolution','direction.datafabric.status'
 ]);
 const UPSTREAM_READ_ATTEMPTS = 2;
@@ -58,6 +58,7 @@ const allowedActions = new Set([
   'direction.diagnostics','direction.evolution',
   'direction.datafabric.status','direction.datafabric.scan.gmail','direction.datafabric.scan.drive',
   'direction.drive.folder.create','direction.commercial.mapping.save','private.lia.handoff.save',
+  'private.commercial.snapshot','direction.commercial.sponsor.create','direction.commercial.activation.create',
 ]);
 
 function clubTimePayload(){
