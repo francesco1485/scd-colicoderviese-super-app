@@ -125,7 +125,8 @@ function assetFit(s,a){
 
 
 function openView(name){
-  $$('.view').forEach(v=>v.classList.remove('active'));
+  document.body.dataset.activeView=name;
+  $('.view').forEach(v=>v.classList.remove('active'));
   $('#view-'+name)?.classList.add('active');
   $$('.nav-item[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===name));
   if(innerWidth<821) $('#sidebar').classList.remove('open');
@@ -369,3 +370,23 @@ $('#newSponsorForm').onsubmit=e=>{
   newModal.hidden=true;e.target.reset();openAssistant('Ho salvato una nuova bozza sponsor locale. Cosa devo completare prima di considerarla valida?');
 };
 document.addEventListener('click',e=>{const liaBtn=e.target.closest('[data-lia]');if(liaBtn&&typeof openAssistant==='function'){e.preventDefault();openAssistant(liaBtn.dataset.lia||liaBtn.textContent.trim())}});
+
+const cinematicPointer=()=>{
+  if(window.matchMedia('(pointer:fine)').matches){
+    const hero=document.querySelector('.hero-visual');
+    if(hero){
+      hero.addEventListener('pointermove',e=>{
+        const r=hero.getBoundingClientRect();
+        const x=(e.clientX-r.left)/r.width-.5;
+        const y=(e.clientY-r.top)/r.height-.5;
+        hero.style.setProperty('--v5-x',x.toFixed(3));
+        hero.style.setProperty('--v5-y',y.toFixed(3));
+      });
+      hero.addEventListener('pointerleave',()=>{
+        hero.style.setProperty('--v5-x','0');
+        hero.style.setProperty('--v5-y','0');
+      });
+    }
+  }
+};
+cinematicPointer();
