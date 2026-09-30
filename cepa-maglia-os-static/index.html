@@ -241,6 +241,10 @@
           <article class="plan-panel"><div class="plan-section-head"><div><span>DATI</span><h3>Fondamenta informative</h3></div></div><div id="planDataReadiness" class="plan-readiness-list"></div></article>
         </section>
         <section class="plan-section"><div class="plan-section-head"><div><span>ROADMAP</span><h3>Ora, prossimo, futuro</h3></div></div><div id="planRoadmap" class="plan-roadmap"></div></section>
+        <section class="plan-section plan-delivery-section">
+          <div class="plan-section-head"><div><span>NUCLEO OPERATIVO</span><h3>Cliente, portafoglio e pipeline</h3><small>Tre ambienti collegati agli stessi dati reali, non tre silos duplicati.</small></div></div>
+          <div id="planDeliveryGrid" class="plan-delivery-grid"></div>
+        </section>
         <section class="plan-two-col">
           <article class="plan-panel remote-work-panel"><div class="plan-section-head"><div><span>LIA · R&S</span><h3>Lavoro continuo da remoto</h3></div><span id="planRemoteStatus" class="future-chip">attivo</span></div><p>Ricerca, analisi, idee e miglioramenti concreti, con tracciabilità e controllo delle azioni sensibili.</p><div id="planResearchSummary" class="plan-research-summary"></div><button type="button" class="primary" data-view="liaWorkbench">Apri Lia Workbench →</button></article>
           <article class="plan-panel"><div class="plan-section-head"><div><span>GOVERNANCE</span><h3>Chi decide cosa</h3></div></div><div id="planGovernance" class="plan-governance"></div></article>
@@ -556,20 +560,97 @@
     </section>
 
     <section id="productsView" class="view hidden">
-      <section class="section-intro split">
-        <div>
-          <div class="eyebrow">PRODOTTI & SINTESI</div>
-          <h2>Capire un prodotto in pochi minuti, senza perdere il dettaglio.</h2>
-          <p>Ogni scheda collega compagnia, target, sintesi, processo, punti di forza, limiti, confronto e disegno del percorso consulenziale. I dati non verificati restano esplicitamente marcati.</p>
-        </div>
-      </section>
-      <section class="agency-kpis">
-        <div><span>Prodotti / aree</span><strong id="productCount">-</strong></div>
-        <div><span>Da verificare</span><strong id="productToVerify">-</strong></div>
-        <div><span>Confronti</span><strong id="comparisonCount">-</strong></div>
-        <div><span>Compagnie collegate</span><strong id="productProviderCount">-</strong></div>
-      </section>
-      <div id="productGrid" class="product-grid"></div>
+      <div class="commerce-workspace">
+        <section class="commerce-hero">
+          <div>
+            <div class="eyebrow">CLIENTI & PORTAFOGLIO</div>
+            <h2>Dal cliente alla relazione, senza perdere il filo commerciale.</h2>
+            <p>Cliente 360, portafoglio, pipeline e prodotti lavorano sullo stesso patrimonio informativo. I dati mancanti restano visibili come gap, non vengono riempiti con stime decorative.</p>
+          </div>
+          <div class="commerce-hero-note">
+            <span>METODO</span>
+            <strong>Cliente → bisogno → check-up → proposta → esito → revisione</strong>
+          </div>
+        </section>
+
+        <nav id="commerceWorkspaceTabs" class="commerce-tabs" aria-label="Ambiente clienti e portafoglio">
+          <button type="button" data-commerce-tab="clients" class="active">Cliente 360</button>
+          <button type="button" data-commerce-tab="portfolio">Motore Portafoglio</button>
+          <button type="button" data-commerce-tab="pipeline">Pipeline Commerciale</button>
+          <button type="button" data-commerce-tab="catalog">Catalogo Prodotti</button>
+        </nav>
+
+        <section data-commerce-panel="clients" class="commerce-panel">
+          <div class="commerce-panel-head">
+            <div><span>CLIENTE 360</span><h3>Perimetro clienti disponibile</h3><p id="client360Scope"></p></div>
+          </div>
+          <section class="commerce-kpis">
+            <div><span>Clienti accessibili</span><strong id="client360Count">—</strong></div>
+            <div><span>Attivi</span><strong id="client360Active">—</strong></div>
+            <div><span>Persi</span><strong id="client360Lost">—</strong></div>
+            <div><span>Con pipeline</span><strong id="client360WithPipeline">—</strong></div>
+          </section>
+          <section class="panel">
+            <div class="panel-head wrap">
+              <div><div class="eyebrow">ANAGRAFICA OPERATIVA</div><h3>Cerca e apri il cliente</h3></div>
+              <div class="filters commerce-filters">
+                <input id="client360Search" type="search" placeholder="Nome, comune, produttore, ramo...">
+                <select id="client360Status"><option value="">Tutti gli stati</option><option value="active">Attivi</option><option value="lost">Persi</option><option value="prospect">Prospect</option><option value="archived">Archiviati</option></select>
+                <select id="client360Producer"><option value="">Tutti i produttori</option></select>
+              </div>
+            </div>
+            <div class="table-wrap"><table class="table commerce-table"><thead><tr><th>Cliente</th><th>Stato</th><th>Territorio</th><th>Produttore</th><th>Profondità</th><th>Pipeline</th><th>Prossimo passo</th><th></th></tr></thead><tbody id="client360Body"></tbody></table></div>
+          </section>
+        </section>
+
+        <section data-commerce-panel="portfolio" class="commerce-panel hidden">
+          <div class="commerce-panel-head">
+            <div><span>MOTORE PORTAFOGLIO</span><h3>Profondità, mix e sviluppo della rete</h3><p>La lettura usa gli snapshot produttori già registrati. Premi e indicatori economici rispettano i permessi di Direzione.</p></div>
+          </div>
+          <section class="commerce-kpis">
+            <div><span>Clienti snapshot</span><strong id="portfolioEngineClients">—</strong></div>
+            <div><span>Polizze snapshot</span><strong id="portfolioEnginePolicies">—</strong></div>
+            <div><span>Polizze / cliente</span><strong id="portfolioEngineRatio">—</strong></div>
+            <div><span>Premi analizzati</span><strong id="portfolioEnginePremium">—</strong></div>
+          </section>
+          <div id="portfolioDataGap" class="portfolio-data-gap"></div>
+          <div class="portfolio-layout">
+            <section><div id="portfolioEngineGrid" class="portfolio-engine-grid"></div></section>
+            <aside class="panel portfolio-mix-panel"><div class="panel-head"><div><div class="eyebrow">MIX AGGREGATO</div><h3>Composizione disponibile</h3></div></div><div id="portfolioMixSummary" class="portfolio-mix-summary"></div></aside>
+          </div>
+        </section>
+
+        <section data-commerce-panel="pipeline" class="commerce-panel hidden">
+          <div class="commerce-panel-head split">
+            <div><span>PIPELINE COMMERCIALE</span><h3>Un solo flusso dalla selezione all'esito</h3><p>Acquisizione, sviluppo, retention e recovery condividono stadi, responsabilità, attività e check-up.</p></div>
+            <div class="commerce-pipeline-actions"><select id="pipelineTypeFilter"><option value="">Tutte le pipeline</option><option value="acquisition">Acquisizione</option><option value="development">Sviluppo</option><option value="retention">Retention</option><option value="recovery">Recovery</option></select><button id="newPipelineCaseBtn" type="button" class="primary">+ Opportunità</button></div>
+          </div>
+          <section class="commerce-kpis">
+            <div><span>Casi aperti</span><strong id="pipelineOpenCount">—</strong></div>
+            <div><span>Da assegnare</span><strong id="pipelineUnassignedCount">—</strong></div>
+            <div><span>In check-up</span><strong id="pipelineCheckupCount">—</strong></div>
+            <div><span>Valore stimato</span><strong id="pipelineEstimatedValue">—</strong></div>
+          </section>
+          <div id="pipelineBoard" class="pipeline-board"></div>
+        </section>
+
+        <section data-commerce-panel="catalog" class="commerce-panel hidden">
+          <section class="section-intro split commerce-catalog-intro">
+            <div>
+              <div class="eyebrow">CATALOGO PRODOTTI</div>
+              <h2>Capire un prodotto in pochi minuti, senza perdere il dettaglio.</h2>
+              <p>Compagnia, target, sintesi, processo, punti di forza, limiti, confronto e percorso consulenziale. I dati non verificati restano esplicitamente marcati.</p>
+            </div>
+          </section>
+          <section class="agency-kpis">
+            <div><span>Prodotti / aree</span><strong id="productCount">-</strong></div>
+            <div><span>Da verificare</span><strong id="productToVerify">-</strong></div>
+            <div><span>Confronti</span><strong id="comparisonCount">-</strong></div>
+            <div><span>Compagnie collegate</span><strong id="productProviderCount">-</strong></div>
+          </section>
+          <div id="productGrid" class="product-grid"></div>
+        </section>
+      </div>
     </section>
 
     <section id="collaboratorsView" class="view hidden">
