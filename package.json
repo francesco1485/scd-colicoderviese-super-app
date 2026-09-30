@@ -1,13 +1,13 @@
 {
   "name": "scd-colicoderviese-super-app",
-  "version": "35.0.0",
+  "version": "38.0.0",
   "private": true,
   "engines": {
     "node": ">=20"
   },
   "scripts": {
     "start": "node server.js",
-    "check": "npm run test:manifest && npm run test:supabase-contract && npm run test:mobile-contract && node --check server.js && node --check app.js && node --check app-r24-router.js && node --check scripts/verify-production.mjs && node --check scripts/verify-r20-direct.mjs && node --check scripts/validate-supabase-contract.mjs && node --check scripts/validate-mobile-contract.mjs",
+    "check": "npm run test:manifest && npm run test:supabase-contract && npm run test:mobile-contract && npm run test:universe-contract && node --check server.js && node --check app.js && node --check scd-meta-engine.js && node --check scd-twin.js && node --check app-r24-router.js && node --check scripts/verify-production.mjs && node --check scripts/verify-r20-direct.mjs && node --check scripts/validate-supabase-contract.mjs && node --check scripts/validate-mobile-contract.mjs && node --check scripts/validate-universe-contract.mjs",
     "build": "npm run check",
     "test:smoke": "node tests/smoke.mjs",
     "test:contract": "node tests/api-contract.mjs",
@@ -19,6 +19,7 @@
     "test:resilience": "node tests/upstream-resilience.mjs",
     "verify:r20": "node scripts/verify-r20-direct.mjs",
     "test:supabase-contract": "node scripts/validate-supabase-contract.mjs",
-    "test:mobile-contract": "node scripts/validate-mobile-contract.mjs"
+    "test:mobile-contract": "node scripts/validate-mobile-contract.mjs",
+    "test:universe-contract": "node scripts/validate-universe-contract.mjs"
   }
 }

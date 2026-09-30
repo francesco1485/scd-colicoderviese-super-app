@@ -18,7 +18,7 @@ const allErrors=[];
 async function goRoute(page,route){
   await page.evaluate(r=>window.R24.go(r),route);
   await page.waitForFunction(r=>location.hash==='#/'+r,route);
-  if(route==='pulse')await page.waitForSelector('#appRouteView:not([hidden]) .r26-pulse-hero');
+  if(route==='pulse')await page.waitForSelector('#appRouteView:not([hidden]) .r38-universe');
   else if(route==='home')await page.waitForSelector('#appRouteView:not([hidden]) .r24-home-hero');
   else await page.waitForSelector('#appRouteView:not([hidden]) .r24-screen-head');
 }
@@ -37,22 +37,26 @@ for(const viewport of viewports){
 
   await page.goto(base+'#/pulse',{waitUntil:'domcontentloaded',timeout:30000});
   await page.waitForSelector('body.r24-router-ready');
-  await page.waitForSelector('#appRouteView:not([hidden]) .r26-pulse-hero');
-  await page.waitForSelector('.r26-time-rail');
-  await page.waitForSelector('.r26-personal-grid');
-  await page.waitForSelector('.r26-match-state');
-  await page.waitForSelector('.r26-moments');
-  await page.waitForSelector('.r26-world-grid');
+  await page.waitForSelector('#appRouteView:not([hidden]) .r38-universe');
+  await page.waitForSelector('.r38-hero');
+  await page.waitForSelector('.r38-sponsor-rail');
+  await page.waitForSelector('.r38-worlds');
+  await page.waitForSelector('.r38-twin-card');
+  await page.waitForSelector('.r38-mirror');
+  await page.waitForSelector('.r38-fan-lab');
   await page.waitForSelector('.mobile-nav [data-nav="calendar"]',{state:'attached'});
   await page.waitForSelector('#clubClock',{state:'attached'});
   await page.waitForFunction(()=>document.querySelector('#clubClock')?.textContent?.length>8);
   await page.waitForFunction(()=>document.documentElement.scrollWidth<=window.innerWidth+3);
+  await page.waitForFunction(()=>Boolean(window.SCDMeta)&&Boolean(window.SCDTwin));
+  const metaMode=await page.evaluate(()=>window.SCDMeta.snapshot('base').mode);
+  if(metaMode!=='PRIVACY_FIRST_ON_DEVICE')throw new Error('SCD Meta privacy mode missing');
 
-  if(viewport.width===390)await page.screenshot({path:'test-output/r26-pulse-390x844.png',fullPage:true});
+  if(viewport.width===390)await page.screenshot({path:'test-output/r38-universe-390x844.png',fullPage:true});
   if(viewport.width===1440){
     const shellWidth=await page.locator('.app-shell').evaluate(el=>Math.round(el.getBoundingClientRect().width));
     if(shellWidth<1200)throw new Error('desktop app shell is still phone-sized: '+shellWidth+'px');
-    await page.screenshot({path:'test-output/r26-pulse-desktop-1440x900.png',fullPage:true});
+    await page.screenshot({path:'test-output/r38-universe-desktop-1440x900.png',fullPage:true});
   }
 
   // Legacy R24 home remains available during migration, but Pulse is the default entry.
@@ -224,5 +228,5 @@ if(!deleteHtml.includes('deleteForm')||!deleteHtml.includes('ELIMINAZIONE ACCOUN
 await api.close();
 
 if(allErrors.length)throw new Error('browser errors: '+allErrors.join(' || '));
-console.log('SCD R28 smoke PASS',{viewports:viewports.map(v=>v.width+'x'+v.height)});
+console.log('SCD R38 smoke PASS',{viewports:viewports.map(v=>v.width+'x'+v.height)});
 await browser.close();
