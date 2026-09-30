@@ -187,8 +187,8 @@ function openCalendarEvent(id){
 }
 async function openCalendar(){
   setActiveNav('calendar');
-  modal('<section class="calendar-app-screen"><header class="calendar-app-head"><div class="calendar-app-brand"><img src="./assets/logo-scd.png" alt="SCD"><div><b>Calendario</b><p>Gare, allenamenti, riunioni ed eventi del club.</p></div></div></header><div class="calendar-tabs" role="tablist"><button class="active" data-cal-filter="ALL">Tutti</button><button data-cal-filter="MATCH">Gare</button><button data-cal-filter="TRAINING">Allenamenti</button><button data-cal-filter="EVENT">Eventi</button></div><div class="calendar-weekbar"><button class="outline" id="calPrev" aria-label="Settimana precedente">‹</button><strong id="calendarRange">Settimana corrente</strong><button class="outline" id="calNext" aria-label="Settimana successiva">›</button></div><div id="calendarDays" class="calendar-days"></div><div id="calendarNext"></div><div id="calendarRows" class="calendar-list"><div class="loading-line">Sincronizzazione calendario…</div></div><div class="calendar-toolbar"><button class="outline" id="calendarRefresh">AGGIORNA</button><button class="primary" id="calendarNotify">NOTIFICHE</button></div></section>');
-  let offset=0,filter='ALL';
+  modal('<section class="calendar-app-screen"><header class="calendar-app-head"><div class="calendar-app-brand"><img src="./assets/logo-scd.png" alt="SCD"><div><b>Calendario</b><p>Gare, allenamenti, riunioni ed eventi del club.</p></div></div></header><div class="calendar-tabs" role="tablist"><button class="active" data-cal-filter="ALL">Tutti</button><button data-cal-filter="MATCH">Gare</button><button data-cal-filter="TRAINING">Allenamenti</button><button data-cal-filter="EVENT">Eventi</button></div><div class="calendar-weekbar"><button class="outline" id="calPrev" aria-label="Settimana precedente">‹</button><strong id="calendarRange">Settimana corrente</strong><button class="outline" id="calNext" aria-label="Settimana successiva">›</button></div><div id="calendarTeams" class="calendar-team-filters" aria-label="Filtra per annata o squadra"></div><div id="calendarDays" class="calendar-days"></div><div id="calendarNext"></div><div id="calendarRows" class="calendar-list"><div class="loading-line">Sincronizzazione calendario…</div></div><div class="calendar-toolbar"><button class="outline" id="calendarRefresh">AGGIORNA</button><button class="primary" id="calendarNotify">NOTIFICHE</button></div></section>');
+  let offset=0,filter='ALL',teamFilter='ALL';
   const isoDate=d=>new Intl.DateTimeFormat('en-CA',{timeZone:state.clubTimeZone,year:'numeric',month:'2-digit',day:'2-digit'}).format(d);
   const weekStart=()=>{
     const now=clubNow(),shift=(now.getDay()+6)%7;
@@ -216,19 +216,23 @@ async function openCalendar(){
     return '●';
   };
   const renderRows=()=>{
-    const mount=$('#calendarRows'),range=$('#calendarRange'),days=$('#calendarDays'),next=$('#calendarNext');
-    if(!mount||!range||!days||!next)return false;
+    const mount=$('#calendarRows'),range=$('#calendarRange'),days=$('#calendarDays'),next=$('#calendarNext'),teams=$('#calendarTeams');
+    if(!mount||!range||!days||!next||!teams)return false;
     const start=weekStart(),endDate=new Date(start.getTime()+6*86400000),startKey=isoDate(start),endKey=isoDate(endDate);
     range.textContent=new Intl.DateTimeFormat('it-IT',{timeZone:state.clubTimeZone,day:'numeric',month:'long'}).format(start)+' – '+new Intl.DateTimeFormat('it-IT',{timeZone:state.clubTimeZone,day:'numeric',month:'long',year:'numeric'}).format(endDate);
     const today=clubDateKey();
     days.innerHTML=Array.from({length:7},(_,i)=>{const d=new Date(start.getTime()+i*86400000),key=isoDate(d);return '<button class="calendar-day '+(key===today?'today':'')+'" data-cal-day="'+key+'"><small>'+new Intl.DateTimeFormat('it-IT',{weekday:'short',timeZone:state.clubTimeZone}).format(d).replace('.','')+'</small><b>'+new Intl.DateTimeFormat('it-IT',{day:'numeric',timeZone:state.clubTimeZone}).format(d)+'</b></button>'}).join('');
-    let rows=(state.calendar||[]).filter(x=>x.date&&String(x.date).slice(0,10)>=startKey&&String(x.date).slice(0,10)<=endKey&&matchFilter(x));
+    const weekAll=(state.calendar||[]).filter(x=>x.date&&String(x.date).slice(0,10)>=startKey&&String(x.date).slice(0,10)<=endKey);
+    const labels=[...new Set(weekAll.map(x=>displayValue(x.category||x.birthYear||x.team,'')).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'it',{numeric:true}));
+    teams.innerHTML='<button class="'+(teamFilter==='ALL'?'active':'')+'" data-cal-team="ALL">Tutte le annate</button>'+labels.map(x=>'<button class="'+(teamFilter===x?'active':'')+'" data-cal-team="'+esc(x)+'">'+esc(x)+'</button>').join('');
+    document.querySelectorAll('[data-cal-team]').forEach(b=>b.onclick=()=>{teamFilter=b.dataset.calTeam;renderRows()});
+    let rows=weekAll.filter(matchFilter).filter(x=>teamFilter==='ALL'||displayValue(x.category||x.birthYear||x.team,'')===teamFilter);
     rows=rows.sort((a,b)=>calendarSortKey(a)-calendarSortKey(b));
     const upcoming=(state.calendar||[]).filter(x=>x.date&&String(x.date).slice(0,10)>=today&&matchFilter(x)).sort((a,b)=>calendarSortKey(a)-calendarSortKey(b))[0];
     next.innerHTML=upcoming?'<button class="calendar-next" data-calendar-event="'+esc(upcoming.id)+'"><span class="next-ico">'+icon(upcoming)+'</span><span><small>PROSSIMO EVENTO</small><b>'+esc(upcoming.title)+'</b><small>'+esc([fmtDate(upcoming.date),upcoming.time,upcoming.venue].filter(Boolean).join(' · '))+'</small></span><i>›</i></button>':'';
     const groups=new Map();
     rows.forEach(x=>{const k=String(x.date).slice(0,10);if(!groups.has(k))groups.set(k,[]);groups.get(k).push(x)});
-    mount.innerHTML=groups.size?[...groups.entries()].map(([date,items])=>'<section class="calendar-group"><div class="calendar-group-title"><b>'+esc(fmtDate(date))+'</b><small>'+items.length+' '+(items.length===1?'evento':'eventi')+'</small></div>'+items.map(x=>'<button class="calendar-row '+eventClass(x)+'" data-calendar-event="'+esc(x.id)+'"><span class="event-marker"></span><time><b>'+esc(x.time||'--:--')+'</b><small>'+esc(x.endTime||'')+'</small></time><span><b>'+esc(x.title)+'</b><small>'+esc([x.team,x.venue].filter(Boolean).join(' · ')||x.type)+'</small></span><i>›</i></button>').join('')+'</section>').join(''):'<div class="empty-state">Nessun evento registrato in questa settimana per il filtro scelto.</div>';
+    mount.innerHTML=groups.size?[...groups.entries()].map(([date,items])=>'<section class="calendar-group"><div class="calendar-group-title"><b>'+esc(fmtDate(date))+'</b><small>'+items.length+' '+(items.length===1?'evento':'eventi')+'</small></div>'+items.map(x=>'<button class="calendar-row '+eventClass(x)+'" data-calendar-event="'+esc(x.id)+'"><span class="event-marker"></span><time><b>'+esc(x.time||'--:--')+'</b><small>'+esc(x.endTime||'')+'</small></time><span><b>'+esc(x.title)+'</b><small>'+esc([x.category||x.birthYear,x.team,x.opponent,x.venue].filter(Boolean).join(' · ')||x.type)+'</small></span><i>›</i></button>').join('')+'</section>').join(''):'<div class="empty-state">Nessun evento registrato in questa settimana per il filtro scelto.</div>';
     bindCalendarEvents();
     document.querySelectorAll('[data-cal-day]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-cal-day]').forEach(x=>x.classList.remove('today'));b.classList.add('today')});
     return true;
