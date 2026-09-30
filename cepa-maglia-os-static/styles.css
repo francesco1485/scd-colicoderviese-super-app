@@ -1380,3 +1380,19 @@ body[data-context-brand="CIP"] .main-header{border-bottom-color:#f2dfc6}
   .office-admin-btn{min-height:44px}
   .office-assignment-list{grid-template-columns:1fr}
 }
+
+
+.official-brand-link{
+  display:inline-flex;
+  margin-top:7px;
+  color:var(--context-accent);
+  font-size:12px;
+  font-weight:700;
+  text-decoration:none;
+}
+.official-brand-link:hover{text-decoration:underline}
+.product-stage-card.active{
+  border-color:var(--context-accent);
+  background:var(--context-surface);
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--context-accent) 20%,transparent);
+}
