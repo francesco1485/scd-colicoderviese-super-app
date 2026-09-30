@@ -784,3 +784,46 @@ body{background:var(--paper);color:var(--ink)}
   font-size:11px;
   line-height:1.55;
 }
+
+
+.lia-automation-list{
+  display:grid;
+  gap:8px;
+  padding:14px;
+}
+.lia-automation-row{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:12px;
+  align-items:start;
+  padding:11px 12px;
+  border:1px solid #dce8ef;
+  border-radius:11px;
+  background:#fff;
+}
+.lia-automation-row strong{
+  display:block;
+  color:#143f61;
+  font-size:11px;
+}
+.lia-automation-row small{
+  display:block;
+  margin-top:3px;
+  color:#7c8f9e;
+  font-size:9px;
+}
+.lia-automation-row p{
+  margin:6px 0 0;
+  color:#587184;
+  font-size:9.5px;
+  line-height:1.45;
+}
+.lia-automation-row>div:last-child{
+  display:grid;
+  justify-items:end;
+  gap:7px;
+}
+@media(max-width:620px){
+  .lia-automation-row{grid-template-columns:1fr}
+  .lia-automation-row>div:last-child{justify-items:start}
+}
