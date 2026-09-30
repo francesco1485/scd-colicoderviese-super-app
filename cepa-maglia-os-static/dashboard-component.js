@@ -153,7 +153,7 @@ class MagliaDashboard extends HTMLElement{
 
   <aside class="rail">
     <section class="panel assistant">
-      <div class="assistantHead"><img class="avatar" src="./assistant_avatar.webp" alt=""><div><div class="status"><span class="dot"></span><strong>Lia</strong></div><small>Assistente AI Maglia 360</small></div></div>
+      <div class="assistantHead"><img class="avatar" src="./assistant_avatar.webp" alt=""><div><div class="status"><span class="dot"></span><strong>Lia</strong></div><small>La tua collega digitale Maglia 360</small></div></div>
       <div class="portrait"><img src="./assistant_avatar.webp" alt="Assistente territoriale Maglia 360"></div>
       <div class="quick">
         <button data-ai="Cosa devo fare oggi?">\${this.icon("chart")}<div><strong>Cosa facciamo oggi?</strong><small>Priorità e scadenze.</small></div></button>
