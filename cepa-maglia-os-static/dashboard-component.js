@@ -35,7 +35,7 @@ class MagliaDashboard extends HTMLElement{
   render(){
     const d=this._data||FALLBACK,p=d.partners||[],pr=d.products||[],c=d.collaborators||[],m=d.metrics||FALLBACK.metrics,b=d.benchmark||FALLBACK.benchmark,a=d.actions||[];
     const productIcon=x=>({mobilita:"car",casa:"home",salute:"heart",tutela_legale:"scale",impresa:"chart",energia:"shield",previdenza:"chart"}[x.category]||"shield");
-    this.shadowRoot.innerHTML=\`
+    this.shadowRoot.innerHTML=`
 <style>
 :host{display:block;color:#143247;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 *{box-sizing:border-box}button,input{font:inherit}button{cursor:pointer}
@@ -85,8 +85,8 @@ class MagliaDashboard extends HTMLElement{
     <section class="panel hero">
       <div class="heroCopy">
         <div class="crumb">Lago di Como · Colico · Mandello · Lecco · Valtellina</div>
-        <h1>\${esc(COPY.heroTitle)}</h1>
-        <p>\${esc(COPY.heroBody)}</p>
+        <h1>${esc(COPY.heroTitle)}</h1>
+        <p>${esc(COPY.heroBody)}</p>
         <div class="heroActions">
           <button class="primary" data-nav="cepa">Scopri C.E.P.A. →</button>
           <button class="secondary" data-nav="territories">Il territorio</button>
@@ -99,54 +99,54 @@ class MagliaDashboard extends HTMLElement{
           <path d="M18 105C50 88 70 75 94 53M126 116c28-6 51-18 72-38m-62-47c36 8 66 24 96 55"/>
           <circle cx="74" cy="71" r="5"/><circle cx="116" cy="31" r="5"/><circle cx="135" cy="100" r="5"/><circle cx="198" cy="77" r="5"/>
         </svg>
-        <div class="territories">\${COPY.territories.map(x=>'<span>'+esc(x)+'</span>').join('')}</div>
+        <div class="territories">${COPY.territories.map(x=>'<span>'+esc(x)+'</span>').join('')}</div>
       </div>
     </section>
 
     <section class="panel">
-      <div class="sectionHead"><div>\${this.icon("shield")}<div><strong>Compagnie madri e collaborazioni</strong><small>Un ecosistema di competenze in un colpo d'occhio.</small></div></div><button class="linkBtn" data-nav="products">Tutte le competenze →</button></div>
-      <div class="partners">\${p.slice(0,5).map((x,i)=>'<button class="partner" data-partner="'+esc(x.id)+'"><span class="logo">'+esc(x.short||x.code||("P"+(i+1)))+'</span><strong>'+esc(x.name)+'</strong><small>'+esc(x.subtitle||x.capability||"Competenza da definire")+'</small><span class="badge">'+esc(x.label||"partner")+'</span></button>').join('')||'<div class="partner"><strong>Dati partner in caricamento</strong></div>'}</div>
+      <div class="sectionHead"><div>${this.icon("shield")}<div><strong>Compagnie madri e collaborazioni</strong><small>Un ecosistema di competenze in un colpo d'occhio.</small></div></div><button class="linkBtn" data-nav="products">Tutte le competenze →</button></div>
+      <div class="partners">${p.slice(0,5).map((x,i)=>'<button class="partner" data-partner="'+esc(x.id)+'"><span class="logo">'+esc(x.short||x.code||("P"+(i+1)))+'</span><strong>'+esc(x.name)+'</strong><small>'+esc(x.subtitle||x.capability||"Competenza da definire")+'</small><span class="badge">'+esc(x.label||"partner")+'</span></button>').join('')||'<div class="partner"><strong>Dati partner in caricamento</strong></div>'}</div>
     </section>
 
     <section class="panel">
-      <div class="sectionHead"><div>\${this.icon("chart")}<div><strong>Prodotti e sintesi</strong><small>Leggere subito il bisogno, poi aprire il dettaglio.</small></div></div><button class="linkBtn" data-nav="products">Vedi prodotti →</button></div>
-      <div class="products">\${pr.slice(0,6).map(x=>'<button class="product" data-product="'+esc(x.id)+'">'+this.icon(productIcon(x))+'<div><strong>'+esc(x.label||x.name)+'</strong><small>'+esc(x.shortSummary||x.category||"Scheda in sviluppo")+'</small></div></button>').join('')||'<div class="product"><strong>Prodotti in caricamento</strong></div>'}</div>
+      <div class="sectionHead"><div>${this.icon("chart")}<div><strong>Prodotti e sintesi</strong><small>Leggere subito il bisogno, poi aprire il dettaglio.</small></div></div><button class="linkBtn" data-nav="products">Vedi prodotti →</button></div>
+      <div class="products">${pr.slice(0,6).map(x=>'<button class="product" data-product="'+esc(x.id)+'">'+this.icon(productIcon(x))+'<div><strong>'+esc(x.label||x.name)+'</strong><small>'+esc(x.shortSummary||x.category||"Scheda in sviluppo")+'</small></div></button>').join('')||'<div class="product"><strong>Prodotti in caricamento</strong></div>'}</div>
     </section>
 
     <div class="grid2">
       <section class="panel">
-        <div class="sectionHead"><div>\${this.icon("people")}<div><strong>Collaboratori e remunerazioni</strong><small>Rete, portafoglio e sviluppo.</small></div></div><button class="linkBtn" data-nav="collaborators">Gestisci →</button></div>
-        <div class="rows">\${c.slice(0,5).map(x=>'<button class="row" data-collaborator="'+esc(x.id)+'"><strong>'+esc(x.name)+'</strong><span>'+esc(x.detail||"")+'</span><b>'+esc(x.value||"")+'</b></button>').join('')||'<div class="row"><strong>Nessun dato disponibile</strong></div>'}</div>
+        <div class="sectionHead"><div>${this.icon("people")}<div><strong>Collaboratori e remunerazioni</strong><small>Rete, portafoglio e sviluppo.</small></div></div><button class="linkBtn" data-nav="collaborators">Gestisci →</button></div>
+        <div class="rows">${c.slice(0,5).map(x=>'<button class="row" data-collaborator="'+esc(x.id)+'"><strong>'+esc(x.name)+'</strong><span>'+esc(x.detail||"")+'</span><b>'+esc(x.value||"")+'</b></button>').join('')||'<div class="row"><strong>Nessun dato disponibile</strong></div>'}</div>
       </section>
       <section class="panel">
-        <div class="sectionHead"><div>\${this.icon("scale")}<div><strong>Confronti e benchmark</strong><small>Solidità e aree da completare.</small></div></div><button class="linkBtn" data-nav="comparisons">Apri analisi →</button></div>
-        <div class="benchmark"><div class="bench"><h4>Punti solidi</h4>\${(b.solid||[]).slice(0,4).map(x=>'<div>'+esc(x)+'</div>').join('')}</div><div class="bench warn"><h4>Da completare</h4>\${(b.improve||[]).slice(0,4).map(x=>'<div>'+esc(x)+'</div>').join('')}</div></div>
+        <div class="sectionHead"><div>${this.icon("scale")}<div><strong>Confronti e benchmark</strong><small>Solidità e aree da completare.</small></div></div><button class="linkBtn" data-nav="comparisons">Apri analisi →</button></div>
+        <div class="benchmark"><div class="bench"><h4>Punti solidi</h4>${(b.solid||[]).slice(0,4).map(x=>'<div>'+esc(x)+'</div>').join('')}</div><div class="bench warn"><h4>Da completare</h4>${(b.improve||[]).slice(0,4).map(x=>'<div>'+esc(x)+'</div>').join('')}</div></div>
       </section>
     </div>
 
     <div class="bottom">
       <section class="panel">
-        <div class="sectionHead"><div>\${this.icon("school")}<div><strong>C.E.P.A. · Centro Educazione Previdenziale e Assicurativa</strong><small>Formazione, contenuti, SAP e territorio.</small></div></div><button class="linkBtn" data-nav="cepa">Scopri CEPA →</button></div>
-        <div class="journey">\${(d.cepa?.steps||FALLBACK.cepa.steps).map((x,i)=>'<button class="step" data-nav="'+(i===1||i===2||i===3?'territories':'cepa')+'"><span>0'+(i+1)+'</span><strong>'+esc(x)+'</strong><small>'+(i===0?'Centro':i===4?'Visione':'Territorio')+'</small></button>'+(i<4?'<i class="line"></i>':'')).join('')}</div>
+        <div class="sectionHead"><div>${this.icon("school")}<div><strong>C.E.P.A. · Centro Educazione Previdenziale e Assicurativa</strong><small>Formazione, contenuti, SAP e territorio.</small></div></div><button class="linkBtn" data-nav="cepa">Scopri CEPA →</button></div>
+        <div class="journey">${(d.cepa?.steps||FALLBACK.cepa.steps).map((x,i)=>'<button class="step" data-nav="'+(i===1||i===2||i===3?'territories':'cepa')+'"><span>0'+(i+1)+'</span><strong>'+esc(x)+'</strong><small>'+(i===0?'Centro':i===4?'Visione':'Territorio')+'</small></button>'+(i<4?'<i class="line"></i>':'')).join('')}</div>
       </section>
       <section class="panel">
-        <div class="sectionHead"><div>\${this.icon("radar")}<div><strong>Strumenti di lavoro</strong><small>Accessi rapidi alle azioni utili.</small></div></div></div>
+        <div class="sectionHead"><div>${this.icon("radar")}<div><strong>Strumenti di lavoro</strong><small>Accessi rapidi alle azioni utili.</small></div></div></div>
         <div class="tools">
-          <button class="tool" data-nav="documents">\${this.icon("docs")}<div><strong>Documenti</strong><small>\${esc(m.docs)} riferimenti</small></div></button>
-          <button class="tool" data-nav="aiMail">\${this.icon("mail")}<div><strong>AI Mail & Chat</strong><small>Comunicazioni guidate</small></div></button>
-          <button class="tool" data-nav="networkRadar">\${this.icon("radar")}<div><strong>Radar Rete</strong><small>\${esc(m.market)} soggetti osservati</small></div></button>
-          <button class="tool" data-nav="growthKits">\${this.icon("people")}<div><strong>Kit Collaboratore</strong><small>Valutazione e strumenti cliente</small></div></button>
+          <button class="tool" data-nav="documents">${this.icon("docs")}<div><strong>Documenti</strong><small>${esc(m.docs)} riferimenti</small></div></button>
+          <button class="tool" data-nav="aiMail">${this.icon("mail")}<div><strong>AI Mail & Chat</strong><small>Comunicazioni guidate</small></div></button>
+          <button class="tool" data-nav="networkRadar">${this.icon("radar")}<div><strong>Radar Rete</strong><small>${esc(m.market)} soggetti osservati</small></div></button>
+          <button class="tool" data-nav="growthKits">${this.icon("people")}<div><strong>Kit Collaboratore</strong><small>Valutazione e strumenti cliente</small></div></button>
         </div>
       </section>
     </div>
 
     <section class="panel">
-      <div class="sectionHead"><div>\${this.icon("shield")}<div><strong>Control Tower della conoscenza</strong><small>Quanto è realmente documentato.</small></div></div></div>
+      <div class="sectionHead"><div>${this.icon("shield")}<div><strong>Control Tower della conoscenza</strong><small>Quanto è realmente documentato.</small></div></div></div>
       <div class="control">
-        <button class="metric" data-nav="products"><span>Prodotti</span><strong>\${esc(m.knowledge)}</strong></button>
-        <button class="metric" data-nav="collaborators"><span>Remunerazioni</span><strong>\${esc(m.terms)}</strong></button>
-        <button class="metric" data-nav="documents"><span>Dossier partner</span><strong>\${esc(m.partnerDocs)}</strong></button>
-        <button class="metric" data-nav="cepa"><span>CEPA readiness</span><strong>\${esc(m.cepa)}</strong></button>
+        <button class="metric" data-nav="products"><span>Prodotti</span><strong>${esc(m.knowledge)}</strong></button>
+        <button class="metric" data-nav="collaborators"><span>Remunerazioni</span><strong>${esc(m.terms)}</strong></button>
+        <button class="metric" data-nav="documents"><span>Dossier partner</span><strong>${esc(m.partnerDocs)}</strong></button>
+        <button class="metric" data-nav="cepa"><span>CEPA readiness</span><strong>${esc(m.cepa)}</strong></button>
       </div>
     </section>
   </div>
@@ -156,22 +156,22 @@ class MagliaDashboard extends HTMLElement{
       <div class="assistantHead"><img class="avatar" src="./assistant_avatar.webp" alt=""><div><div class="status"><span class="dot"></span><strong>Lia</strong></div><small>La tua collega digitale Maglia 360</small></div></div>
       <div class="portrait"><img src="./assistant_avatar.webp" alt="Assistente territoriale Maglia 360"></div>
       <div class="quick">
-        <button data-ai="Cosa devo fare oggi?">\${this.icon("chart")}<div><strong>Cosa facciamo oggi?</strong><small>Priorità e scadenze.</small></div></button>
-        <button data-ai="Preparami un incontro con un cliente">\${this.icon("people")}<div><strong>Prepara un incontro</strong><small>Domande, documenti e grafica.</small></div></button>
-        <button data-ai="Trova opportunità di rete">\${this.icon("search")}<div><strong>Trova opportunità</strong><small>Radar e nuova rete.</small></div></button>
-        <button data-nav="aiMail">\${this.icon("mail")}<div><strong>Scrivi una mail</strong><small>Bozza personalizzata.</small></div></button>
+        <button data-ai="Cosa devo fare oggi?">${this.icon("chart")}<div><strong>Cosa facciamo oggi?</strong><small>Priorità e scadenze.</small></div></button>
+        <button data-ai="Preparami un incontro con un cliente">${this.icon("people")}<div><strong>Prepara un incontro</strong><small>Domande, documenti e grafica.</small></div></button>
+        <button data-ai="Trova opportunità di rete">${this.icon("search")}<div><strong>Trova opportunità</strong><small>Radar e nuova rete.</small></div></button>
+        <button data-nav="aiMail">${this.icon("mail")}<div><strong>Scrivi una mail</strong><small>Bozza personalizzata.</small></div></button>
       </div>
       <form class="chat"><input aria-label="Chiedi a Lia" placeholder="Chiedi a Lia..."><button aria-label="Invia">→</button></form>
     </section>
 
     <section class="panel">
-      <div class="sectionHead"><div>\${this.icon("chart")}<div><strong>Oggi</strong><small>Le prime attività che meritano attenzione.</small></div></div><button class="linkBtn" data-nav="actions">Agenda →</button></div>
-      <div class="today">\${a.slice(0,5).map(x=>'<button class="todayRow" data-action="'+esc(x.id)+'"><div><strong>'+esc(x.title)+'</strong><small>'+esc(x.detail||"")+'</small></div><span>'+esc(x.priority||"")+'</span></button>').join('')||'<div class="todayRow"><strong>Nessuna attività aperta</strong></div>'}</div>
+      <div class="sectionHead"><div>${this.icon("chart")}<div><strong>Oggi</strong><small>Le prime attività che meritano attenzione.</small></div></div><button class="linkBtn" data-nav="actions">Agenda →</button></div>
+      <div class="today">${a.slice(0,5).map(x=>'<button class="todayRow" data-action="'+esc(x.id)+'"><div><strong>'+esc(x.title)+'</strong><small>'+esc(x.detail||"")+'</small></div><span>'+esc(x.priority||"")+'</span></button>').join('')||'<div class="todayRow"><strong>Nessuna attività aperta</strong></div>'}</div>
     </section>
 
-    <section class="panel user"><div><strong>\${esc(d.user?.label||"Area riservata")}</strong><small>\${esc(d.user?.role||"")}</small></div><span class="privacy">🔒 riservato</span></section>
+    <section class="panel user"><div><strong>${esc(d.user?.label||"Area riservata")}</strong><small>${esc(d.user?.role||"")}</small></div><span class="privacy">🔒 riservato</span></section>
   </aside>
-</div>\`;
+</div>`;
     this.shadowRoot.querySelectorAll("[data-nav]").forEach(el=>el.addEventListener("click",()=>this.dispatch("navigate",{view:el.dataset.nav})));
     this.shadowRoot.querySelectorAll("[data-partner]").forEach(el=>el.addEventListener("click",()=>this.dispatch("open-partner",{id:el.dataset.partner})));
     this.shadowRoot.querySelectorAll("[data-product]").forEach(el=>el.addEventListener("click",()=>this.dispatch("open-product",{id:el.dataset.product})));
