@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.0.0",
+    "version": "3.1.0",
     "effective_at": "2026-09-30",
     "status": "BINDING",
     "language": "it-IT",
@@ -1393,7 +1393,31 @@
       "CR_LOMBARDIA",
       "TUTTOCAMPO"
     ],
-    "future_mode": "PROPOSE_REVOLUTIONARY_SAFE_FEATURES_WITH_EVIDENCE_AND_ROLLBACK"
+    "future_mode": "PROPOSE_REVOLUTIONARY_SAFE_FEATURES_WITH_EVIDENCE_AND_ROLLBACK",
+    "human_value_loop": [
+      "OBSERVE_REAL_USAGE",
+      "MEASURE_FRICTION",
+      "SIMPLIFY",
+      "PERSONALIZE_SAFE_SURFACE_ORDER",
+      "PROPOSE",
+      "TEST",
+      "MEASURE_VALUE",
+      "KEEP_OR_ROLLBACK"
+    ],
+    "optimization_target": [
+      "UTILITY",
+      "CLARITY",
+      "PLEASURE_OF_USE",
+      "TASK_COMPLETION",
+      "RETURN_VALUE",
+      "CLUB_VALUE",
+      "PARTNER_VALUE"
+    ],
+    "never_optimize_for": [
+      "COMPULSIVE_SCREEN_TIME",
+      "MINOR_PRESSURE",
+      "HIDDEN_VULNERABILITY_TARGETING"
+    ]
   },
   "analytics": {
     "privacy_first": true,
@@ -1458,6 +1482,30 @@
           "SCD_OFFICIAL_SITE"
         ]
       }
+    },
+    "human_centered": {
+      "state": "IMPLEMENTED_R39_LOCAL_PREFERENCE_LAYER",
+      "experience_modes": [
+        "DISCOVER",
+        "QUICK",
+        "FOCUS"
+      ],
+      "density_modes": [
+        "COMFORT",
+        "BALANCED",
+        "COMPACT"
+      ],
+      "inferred_mental_state": false,
+      "personal_vulnerability_targeting": false,
+      "minor_dark_patterns": false,
+      "objective_friction_signals_future": [
+        "FORM_ABANDON",
+        "REPEATED_SEARCH",
+        "EXCESSIVE_BACKTRACK",
+        "FAILED_TASK",
+        "SLOW_LOAD"
+      ],
+      "rule": "Objective interaction friction may improve UI; it must not be interpreted as a psychological diagnosis."
     }
   },
   "architecture": {
@@ -1573,7 +1621,10 @@
       "meta_adaptive": "SCD_META_ENGINE_PRIVACY_FIRST",
       "virtual_collaborator": "SCD_MIRROR_ON_SKY_ENGINE",
       "evolving_avatar": "SCD_TWIN",
-      "social_radar": "OFFICIAL_PLATFORM_ADAPTERS_WHEN_AUTHORIZED"
+      "social_radar": "OFFICIAL_PLATFORM_ADAPTERS_WHEN_AUTHORIZED",
+      "cognitive_experience_engine": "SCD_EXPERIENCE_ENGINE_LOCAL_FIRST",
+      "staff_workspace": "PRIVATE_DESK_ROLE_SCOPE",
+      "revenue_intelligence": "VERIFIED_METRICS_ONLY_FUTURE_ADAPTERS"
     }
   },
   "delivery_and_quality": {
@@ -1604,7 +1655,11 @@
       "META_ADAPTIVE_PRIVACY_CONTRACT",
       "TWIN_SAFE_GROWTH_CONTRACT",
       "SPONSOR_VISIBILITY",
-      "FIRST_VIEWPORT_USEFULNESS"
+      "FIRST_VIEWPORT_USEFULNESS",
+      "HUMAN_OS_CONTRACT",
+      "NO_MENTAL_STATE_INFERENCE",
+      "NO_DARK_PATTERNS_FOR_MINORS",
+      "PRIVATE_DESK_SCOPE_CONTRACT"
     ],
     "merge_rule": "Non considerare completata una funzione se è verde solo tecnicamente ma viola il manifest o il master visivo.",
     "release_truth": {
@@ -1958,6 +2013,52 @@
         "SCD_FACEBOOK"
       ],
       "contract": "REAL_PLATFORM_SIGNALS_AUTHORIZED_ADAPTERS_ONLY"
+    },
+    {
+      "id": "CAP-HUMAN-OS",
+      "domain": "EXPERIENCE",
+      "required": true,
+      "state": "PARTIAL",
+      "sources": [
+        "LOCAL_PREFERENCES",
+        "R20"
+      ],
+      "contract": "DISCOVER_QUICK_FOCUS_EXPLICIT_NO_MENTAL_INFERENCE"
+    },
+    {
+      "id": "CAP-PRIVATE-DESK",
+      "domain": "MANAGEMENT",
+      "required": true,
+      "state": "PARTIAL",
+      "sources": [
+        "R20",
+        "SCD_DRIVE",
+        "SCD_GMAIL"
+      ],
+      "contract": "ROLE_SCOPE_SHORT_ACTION_QUEUE_NO_ARCHIVE_HUNTING"
+    },
+    {
+      "id": "CAP-COGNITIVE-ERGONOMICS",
+      "domain": "UX",
+      "required": true,
+      "state": "PARTIAL",
+      "sources": [
+        "LOCAL_PREFERENCES"
+      ],
+      "contract": "PROGRESSIVE_DISCLOSURE_DENSITY_MOTION_TEXT_SCALE"
+    },
+    {
+      "id": "CAP-GROWTH-LOOP",
+      "domain": "COMMERCIAL",
+      "required": true,
+      "state": "DESIGN_ONLY",
+      "sources": [
+        "SPONSOR_MASTER_SHEET",
+        "SCD_OFFICIAL_SITE",
+        "SCD_INSTAGRAM",
+        "SCD_FACEBOOK"
+      ],
+      "contract": "VERIFIED_METRICS_NO_FAKE_REVENUE_NO_CHILD_EXPLOITATION"
     }
   ],
   "known_noncompliance": [
@@ -2160,6 +2261,16 @@
       "deletion_rule": "Cancellare o sostituire soltanto elementi esplicitamente superati, duplicati o incompatibili con il nuovo contratto, documentando la ragione.",
       "improvement_rule": "Ogni integrazione deve migliorare utilita, affidabilita, design, automazione o sicurezza senza creare doppioni.",
       "source_rule": "Drive e Gmail sportclubcolico@gmail.com restano backoffice permanente; i dati operativi entrano tramite adapter/provenienza, non tramite copie manuali incontrollate."
+    },
+    "human_centered_rules": {
+      "cumulative": true,
+      "pleasant_work_is_product_requirement": true,
+      "confidential_tools_must_be_role_scoped": true,
+      "archive_navigation_is_not_primary_workflow": true,
+      "mental_state_inference_forbidden": true,
+      "explicit_preferences_preferred": true,
+      "generational_adaptation_without_age_profiling": true,
+      "revenue_must_follow_real_user_value": true
     }
   },
   "product_direction": {
@@ -2175,7 +2286,7 @@
     "visual_principle": "SPATIAL_SPORT_EDITORIAL_HIGH_IMPACT",
     "legacy_home_route": "#/home",
     "no_rewrite_rule": false,
-    "release": "R38",
+    "release": "R39",
     "product_name": "SCD UNIVERSE",
     "audience_fit": [
       "YOUTH",
@@ -2191,6 +2302,78 @@
     "adaptive_meta_engine": "SCD_META_ENGINE",
     "virtual_collaborator": "SCD_MIRROR",
     "evolving_identity": "SCD_TWIN",
-    "cumulative_integration_rule": true
+    "cumulative_integration_rule": true,
+    "human_centered_os": {
+      "name": "SCD HUMAN OS",
+      "principle": "USEFUL_ENOUGH_TO_RETURN_NOT_ADDICTIVE",
+      "modes": [
+        "DISCOVER",
+        "QUICK",
+        "FOCUS"
+      ],
+      "densities": [
+        "COMFORT",
+        "BALANCED",
+        "COMPACT"
+      ],
+      "explicit_user_choice": true,
+      "mental_state_inference": false,
+      "dark_patterns": false,
+      "minor_compulsion_mechanics": false,
+      "private_staff_workspace": "PRIVATE_DESK",
+      "cognitive_ergonomics": [
+        "PROGRESSIVE_DISCLOSURE",
+        "SHORT_ACTION_QUEUE",
+        "ROLE_RELEVANCE",
+        "LOW_SEARCH_COST",
+        "CLEAR_NEXT_ACTION"
+      ]
+    },
+    "generational_fit": {
+      "rule": "ADAPT_BY_ROLE_SCOPE_EXPLICIT_PREFERENCE_AND_VIEWPORT_NOT_BY_HIDDEN_AGE_OR_PSYCHOLOGICAL_INFERENCE",
+      "audiences": [
+        "YOUTH",
+        "ATHLETE",
+        "FAMILY",
+        "FAN",
+        "STAFF",
+        "DIRECTION",
+        "PARTNER",
+        "OLDER_ADULT"
+      ],
+      "supports": [
+        "TEXT_SCALE",
+        "DENSITY",
+        "MOTION_REDUCTION",
+        "QUICK_MODE",
+        "FOCUS_MODE",
+        "DISCOVER_MODE"
+      ]
+    },
+    "economic_growth_loop": {
+      "principle": "REAL_VALUE_FIRST",
+      "stages": [
+        "USEFUL_CONTENT_AND_SERVICES",
+        "QUALIFIED_RETURN",
+        "PARTNER_VALUE",
+        "REVENUE_AND_RESOURCES",
+        "BETTER_SERVICES_FOR_CHILDREN_AND_FAMILIES"
+      ],
+      "verified_metrics_only": true,
+      "no_fake_revenue": true,
+      "no_child_exploitation": true,
+      "candidate_metrics": [
+        "ACTIVE_USERS",
+        "RETURN_VISITS",
+        "TASK_COMPLETION",
+        "TIME_SAVED",
+        "SPONSOR_IMPRESSIONS",
+        "SPONSOR_CLICKS",
+        "CONSENTED_LEADS",
+        "EVENT_CONVERSIONS",
+        "CARD_CONVERSIONS",
+        "SHOP_REFERRALS"
+      ]
+    }
   }
 }

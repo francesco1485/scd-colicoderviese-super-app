@@ -48,15 +48,22 @@ for(const viewport of viewports){
   await page.waitForSelector('#clubClock',{state:'attached'});
   await page.waitForFunction(()=>document.querySelector('#clubClock')?.textContent?.length>8);
   await page.waitForFunction(()=>document.documentElement.scrollWidth<=window.innerWidth+3);
-  await page.waitForFunction(()=>Boolean(window.SCDMeta)&&Boolean(window.SCDTwin));
+  await page.waitForFunction(()=>Boolean(window.SCDMeta)&&Boolean(window.SCDTwin)&&Boolean(window.SCDExperience));
+  await page.waitForSelector('.r39-experience-bar');
   const metaMode=await page.evaluate(()=>window.SCDMeta.snapshot('base').mode);
   if(metaMode!=='PRIVACY_FIRST_ON_DEVICE')throw new Error('SCD Meta privacy mode missing');
+  const cognitive=await page.evaluate(()=>window.SCDExperience.frictionSnapshot());
+  if(cognitive.principle!=='NO_MENTAL_STATE_INFERENCE')throw new Error('Human OS mental-state guardrail missing');
+  await page.click('[data-experience-mode="FOCUS"]');
+  const focusMode=await page.evaluate(()=>document.body.dataset.scdExperience);
+  if(focusMode!=='focus')throw new Error('Focus mode did not activate');
+  await page.click('[data-experience-mode="DISCOVER"]');
 
-  if(viewport.width===390)await page.screenshot({path:'test-output/r38-universe-390x844.png',fullPage:true});
+  if(viewport.width===390)await page.screenshot({path:'test-output/r39-human-os-390x844.png',fullPage:true});
   if(viewport.width===1440){
     const shellWidth=await page.locator('.app-shell').evaluate(el=>Math.round(el.getBoundingClientRect().width));
     if(shellWidth<1200)throw new Error('desktop app shell is still phone-sized: '+shellWidth+'px');
-    await page.screenshot({path:'test-output/r38-universe-desktop-1440x900.png',fullPage:true});
+    await page.screenshot({path:'test-output/r39-human-os-desktop-1440x900.png',fullPage:true});
   }
 
   // Legacy R24 home remains available during migration, but Pulse is the default entry.
@@ -145,6 +152,7 @@ for(const viewport of viewports){
       };
       window.R24.go('staff');
     });
+    await page.waitForSelector('.r39-private-desk');
     await page.waitForSelector('.r24-service-grid.staff');
     await page.waitForSelector('#r24Attendance');
     await page.waitForSelector('#r28DataFabric');
@@ -228,5 +236,5 @@ if(!deleteHtml.includes('deleteForm')||!deleteHtml.includes('ELIMINAZIONE ACCOUN
 await api.close();
 
 if(allErrors.length)throw new Error('browser errors: '+allErrors.join(' || '));
-console.log('SCD R38 smoke PASS',{viewports:viewports.map(v=>v.width+'x'+v.height)});
+console.log('SCD R39 smoke PASS',{viewports:viewports.map(v=>v.width+'x'+v.height)});
 await browser.close();

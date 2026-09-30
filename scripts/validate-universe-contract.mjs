@@ -12,7 +12,7 @@ const meta=read('scd-meta-engine.js');
 const twin=read('scd-twin.js');
 const index=read('index.html');
 
-assert(m.manifest?.version==='3.0.0','manifest must be 3.0.0 for R38');
+assert(/^3\./.test(m.manifest?.version||''),'manifest must remain SCD Universe major v3');
 assert(m.manifest?.change_policy?.cumulative_directives===true,'cumulative directives contract missing');
 assert(m.product_direction?.product_name==='SCD UNIVERSE','product name mismatch');
 assert(m.product_direction?.experience_model==='ADAPTIVE_CLUB_OS','adaptive club OS contract missing');
@@ -46,9 +46,9 @@ for(const token of ['Scintilla','Rookie','Playmaker','Capitano','Leggenda','APP_
 }
 assert(twin.includes("scd:twin:v1"),'Twin local storage contract missing');
 
-assert(index.includes('ui-r38-universe.css?v=38.0.0'),'R38 CSS not loaded');
-assert(index.includes('scd-meta-engine.js?v=38.0.0'),'Meta engine not loaded');
-assert(index.includes('scd-twin.js?v=38.0.0'),'Twin engine not loaded');
+assert(/ui-r38-universe\.css\?v=(38|39)\.0\.0/.test(index),'R38 Universe CSS not loaded');
+assert(/scd-meta-engine\.js\?v=(38|39)\.0\.0/.test(index),'Meta engine not loaded');
+assert(/scd-twin\.js\?v=(38|39)\.0\.0/.test(index),'Twin engine not loaded');
 
 if(process.exitCode)process.exit(process.exitCode);
 console.log('SCD UNIVERSE CONTRACT PASS',{
