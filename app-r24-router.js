@@ -1,7 +1,7 @@
 (() => {
   const R24={
     version:'42.0.0',
-    routes:['pulse','home','calendar','communications','services','profile','athlete','family','staff','commercial'],
+    routes:['pulse','home','calendar','communications','services','profile','athlete','family','staff','commercial','lia'],
     current:'pulse',
     route(){
       const raw=(location.hash||'#/pulse').replace(/^#\/?/,'').split('?')[0].trim();
@@ -25,7 +25,7 @@
     navItems(){
       const role=this.roleMode();
       if(role==='staff')return [
-        ['pulse','◉','Pulse'],['calendar','▣','Sport'],['staff','▦','Direzione'],['commercial','◆','Commerciale'],['profile','●','Profilo']
+        ['pulse','◉','Pulse'],['calendar','▣','Sport'],['staff','▦','Direzione'],['commercial','◆','Commerciale'],['lia','✦','Lia'],['profile','●','Profilo']
       ];
       if(role==='family')return [
         ['pulse','◉','Pulse'],['calendar','▣','Sport'],['family','●','Famiglia'],['communications','✉','Community'],['profile','◉','Profilo']
@@ -48,7 +48,7 @@
       if(desktop){
         const role=this.roleMode();
         const desktopItems=role==='staff'
-          ?[['pulse','Pulse'],['calendar','Sport'],['staff','Direzione'],['commercial','Commerciale'],['profile','Profilo']]
+          ?[['pulse','Pulse'],['calendar','Sport'],['staff','Direzione'],['commercial','Commerciale'],['lia','Lia'],['profile','Profilo']]
           :role==='family'
             ?[['pulse','Pulse'],['calendar','Sport'],['family','Famiglia'],['communications','Community'],['profile','Profilo']]
             :role==='athlete'
@@ -467,7 +467,7 @@
           '<button><span>05</span><b>Partner Success</b><small>Deliverable, proof, KPI, report, rinnovo e upsell.</small></button>'+
           '<button><span>06</span><b>Development Radar</b><small>Idee, innovazione e nuove fonti di ricavo.</small></button>'+
           '<button><span>07</span><b>LED Control Room</b><small>Produzione, approvazioni, mapping e playlist.</small></button>'+
-          '<button><span>08</span><b>Task & Audit</b><small>Owner, scadenze, blocchi, decisioni e tracciabilità.</small></button>'+
+          '<button><span>08</span><b>Task & Audit</b><small>Owner, scadenze, blocchi, decisioni e tracciabilità.</small></button>'+'<button data-r24-route="lia"><span>AI</span><b>Lia · Assistente operativo</b><small>Comandi, ricerca, mapping, documenti e supporto per ruolo.</small></button>'+
         '</div>'+
         '<div class="r42-priority"><div><small>PRINCIPIO OPERATIVO</small><h2>Idea → Ricerca → Fit → Prodotto → Opportunità → Attivazione → Proof → KPI → Rinnovo</h2><p>Lo score non decide. Fonti, blocchi, disponibilità e prossima azione restano visibili e verificabili.</p></div><span>ZERO DATABASE PARALLELI</span></div>'+
       '</section>'+
@@ -494,6 +494,112 @@
       if(search)search.oninput=()=>{const q=search.value.trim().toLowerCase();outlet.querySelectorAll('[data-r42-company]').forEach(row=>row.hidden=q&&!String(row.dataset.r42Company||'').toLowerCase().includes(q))};
       this.bindCommon(outlet);
     },
+    render_lia(outlet){
+      const d=state.privateData||{},u=d.user||{},p=d.permissions||{};
+      const token=state.sessionToken||storedSession().token||'';
+      if(!token)return this.privateGate(outlet,'Lia · Assistente operativo','Accedi per usare Lia con il tuo ruolo e il tuo perimetro autorizzato.');
+      const role=String(u.role||u.coreRole||u.type||(p.direction?'DIREZIONE':'USER_BASE')).toUpperCase();
+      const direction=!!p.direction||role==='DIREZIONE'||role==='ADMIN';
+      const liaApi=location.hostname==='scd-commercial-r42-staging.onrender.com'
+        ?'https://scd-lia-r42-staging.onrender.com'
+        :'https://scd-colicoderviese-command-r22.onrender.com';
+      const roleCopy=direction
+        ?'Puoi impartire comandi operativi autorizzati. Le azioni irreversibili o sensibili restano soggette a conferma.'
+        :'Lia ti supporta nel perimetro del tuo ruolo. Non può elevare privilegi o operare fuori scope.';
+      outlet.innerHTML=this.shellHeader('Lia','Assistente operativo interno SCD: capisce, pianifica, esegue ciò che è autorizzato e registra il risultato.','ASSISTENTE · RUOLI · COMANDI')+
+      '<section class="r42-lia-status"><div><span class="r42-lia-orb">L</span><div><small>SESSIONE</small><b>'+esc(role)+'</b><p>'+esc(roleCopy)+'</p></div></div><span>'+(direction?'POTERI DIREZIONE':'SUPPORTO DI RUOLO')+'</span></section>'+
+      '<section class="r42-lia-shell">'+
+        '<div class="r42-lia-main"><div class="r42-lia-prompt"><label for="r42LiaCommand">Cosa deve fare Lia?</label><textarea id="r42LiaCommand" rows="5" placeholder="Esempio: Mappa tutte le attività del Comune di Colico e prepara il lavoro commerciale."></textarea><div class="r42-lia-actions"><button class="primary" id="r42LiaRun">ESEGUI / PREPARA</button><button class="outline" id="r42LiaHandoff">PREPARA SUPPORTO CHATGPT</button></div></div>'+
+        '<div class="r42-lia-result" id="r42LiaResult"><div class="r42-empty"><b>Lia è pronta.</b><span>I comandi vengono autorizzati dal server in base al ruolo. Nessun privilegio nasce dal browser.</span></div></div></div>'+
+        '<aside class="r42-lia-side"><small>COMANDI RAPIDI</small>'+
+          '<button data-lia-command="Mappa tutte le aziende e attività presenti nel Comune di Colico e mostrami il risultato senza salvare."><b>Mapping Colico</b><span>Ricerca open-data, senza scritture</span></button>'+
+          (direction?'<button data-lia-command="Mappa tutte le aziende e attività presenti nel Comune di Colico, crea la cartella di mapping commerciale e salva il risultato."><b>Mapping + Drive</b><span>Direzione · salvataggio tracciato</span></button>':'')+
+          (direction?'<button data-lia-command="Crea una sottocartella MAPPING TERRITORIALE / COLICO nel lavoro commerciale."><b>Crea cartella Colico</b><span>Direzione · Drive</span></button>':'')+
+          '<button data-lia-command="Prepara una bozza di contratto sponsor usando i documenti che allegherò e indicami cosa serve per completarla."><b>Contratto / documenti</b><span>Piano + handoff documentale</span></button>'+
+          '<button data-lia-command="Prepara una locandina sponsor: definisci brief, materiali, formati e controlli prima della generazione grafica."><b>Locandina</b><span>Brief creativo + handoff</span></button>'+
+        '</aside>'+
+      '</section>'+
+      '<section class="r42-lia-policy"><b>Lia non è esterna.</b><span>R22 esegue i comandi; R20/Drive/Supabase restano fonti e motori autorizzati. Il supporto ChatGPT remoto passa per un pacchetto strutturato finché non esiste un canale gratuito, autorizzato e sicuro di collegamento diretto.</span></section>';
+
+      const command=outlet.querySelector('#r42LiaCommand');
+      const result=outlet.querySelector('#r42LiaResult');
+      outlet.querySelectorAll('[data-lia-command]').forEach(b=>b.onclick=()=>{command.value=b.dataset.liaCommand||'';command.focus()});
+
+      const municipalityOf=q=>{
+        const m=String(q||'').match(/(?:comune\\s+di|comune\\s+del|a)\\s+([A-Za-zÀ-ÿ'’ -]{2,60})(?=\\s+(?:e|con|senza|mostra|prepara|crea|salva|tutte|tutti)\\b|[,.]|$)/i);
+        return m?m[1].trim():(/colico/i.test(q)?'Colico':'');
+      };
+      const postCommand=async(name,payload)=>{
+        const r=await fetch(liaApi.replace(/\\/$/,'')+'/v1/commands/'+encodeURIComponent(name),{
+          method:'POST',
+          headers:{'content-type':'application/json','x-scd-session':token,'x-correlation-id':'lia-'+Date.now()},
+          body:JSON.stringify(payload)
+        });
+        const j=await r.json().catch(()=>({ok:false,error:'Risposta Lia non valida'}));
+        if(!r.ok)throw new Error(j.error||'Comando Lia non riuscito');
+        return j;
+      };
+      const handoff=q=>{
+        const packet={
+          schema:'SCD_LIA_HANDOFF_V1',
+          createdAt:new Date().toISOString(),
+          assistant:'LIA',
+          destination:'CHATGPT_REMOTE_SUPPORT',
+          actor:{role:role},
+          command:q,
+          system:{release:'R42',route:'#/lia'},
+          rules:['Nessun PIN/token/segreto','Usare fonti reali e citabili','Restituire output pronto da reimportare in Lia']
+        };
+        return JSON.stringify(packet,null,2);
+      };
+      const renderMap=data=>{
+        const map=data&&data.result?data.result:data;
+        const rows=(map&&map.items)||[];
+        return '<div class="r42-lia-answer"><div class="r42-lia-answer-head"><div><small>RISULTATO</small><h2>'+esc(map.municipality||'Mapping territoriale')+'</h2><p>'+esc(map.source||'')+' · '+esc(map.coverage||'')+'</p></div><strong>'+esc(map.count??rows.length)+'</strong></div>'+
+          '<div class="r42-lia-table"><div class="r42-lia-row head"><span>NOME</span><span>CATEGORIA</span><span>CONTATTO</span></div>'+
+          rows.slice(0,80).map(x=>'<div class="r42-lia-row"><span><b>'+esc(x.name||'')+'</b><small>'+esc(x.address||'')+'</small></span><span>'+esc(x.category||'')+'</span><span>'+esc(x.website||x.email||x.phone||'DA ARRICCHIRE')+'</span></div>').join('')+'</div>'+
+          (rows.length>80?'<p class="r42-lia-more">Mostrate 80 righe su '+esc(rows.length)+'.</p>':'')+'</div>';
+      };
+
+      const run=async()=>{
+        const q=String(command.value||'').trim();
+        if(!q)return;
+        result.innerHTML='<div class="r42-lia-loading"><span></span><b>Lia sta lavorando…</b><small>Verifica ruolo, comando e fonti.</small></div>';
+        const municipality=municipalityOf(q);
+        try{
+          if(/mapp/i.test(q)&&/aziend|attivit/i.test(q)&&municipality){
+            const wantsSave=/salva|drive|crea.+cartell/i.test(q);
+            const cmd=wantsSave&&direction?'build-municipality-commercial-map':'map-municipality-businesses';
+            const response=await postCommand(cmd,{municipality,limit:300,...(cmd==='build-municipality-commercial-map'?{dryRun:false}:{})});
+            if(response.result&&response.result.mapping){
+              const saved=response.result.saved||{};
+              result.innerHTML=renderMap(response.result.mapping)+(saved.spreadsheetUrl?'<div class="r42-lia-saved"><b>Salvato su Drive</b><a href="'+esc(saved.spreadsheetUrl)+'" target="_blank" rel="noopener">Apri mapping</a></div>':'');
+            }else result.innerHTML=renderMap(response.result||response);
+            return;
+          }
+          if(/crea/i.test(q)&&/cartell/i.test(q)&&direction){
+            const municipality=municipalityOf(q)||'COLICO';
+            const response=await postCommand('create-drive-folder',{path:['MAPPING TERRITORIALE',municipality],purpose:'Lia · sviluppo commerciale territoriale'});
+            const data=response.result||{};
+            result.innerHTML='<div class="r42-lia-answer"><small>ESEGUITO</small><h2>Cartella pronta</h2><p>'+esc((data.path||[]).join(' / '))+'</p>'+(data.url?'<a class="primary" href="'+esc(data.url)+'" target="_blank" rel="noopener">APRI DRIVE</a>':'')+'</div>';
+            return;
+          }
+          const packet=handoff(q);
+          result.innerHTML='<div class="r42-lia-answer"><small>PIANO / HANDOFF</small><h2>Questo comando richiede un modulo di produzione dedicato.</h2><p>Lia ha preparato il pacchetto da usare con il supporto ChatGPT remoto senza inventare un’esecuzione inesistente.</p><pre class="r42-lia-code">'+esc(packet)+'</pre><button class="outline" id="r42CopyHandoff">COPIA PACCHETTO</button></div>';
+          const copy=outlet.querySelector('#r42CopyHandoff');if(copy)copy.onclick=async()=>{await navigator.clipboard.writeText(packet);toast('Pacchetto Lia copiato')};
+        }catch(e){
+          const msg=String(e&&e.message?e.message:e);
+          const bridgeBlock=/Azione API non consentita|Modulo R42 Lia non installato|R20 action failed/i.test(msg);
+          result.innerHTML='<div class="r42-lia-error"><b>'+esc(bridgeBlock?'Bridge R20 da aggiornare':'Comando non completato')+'</b><p>'+esc(msg)+'</p>'+(bridgeBlock?'<small>Il motore Lia è pronto, ma la scrittura Drive resta correttamente bloccata finché il patch R42 non viene distribuito sul Web App R20 canonico.</small>':'')+'</div>';
+        }
+      };
+      const runBtn=outlet.querySelector('#r42LiaRun');if(runBtn)runBtn.onclick=run;
+      const handoffBtn=outlet.querySelector('#r42LiaHandoff');if(handoffBtn)handoffBtn.onclick=async()=>{
+        const q=String(command.value||'').trim()||'Supporto generale Lia';
+        const packet=handoff(q);await navigator.clipboard.writeText(packet);toast('Pacchetto di supporto copiato');
+      };
+      this.bindCommon(outlet);
+    },
     render_staff(outlet){
       const d=state.privateData||{},u=d.user||{},p=d.permissions||{};
       if(!state.sessionToken&&!storedSession().token)return this.privateGate(outlet,'Area Staff / Direzione','Gestione operativa della società secondo ruolo e scope.');
@@ -511,6 +617,7 @@
       '<section class="r24-staff-ident"><div><small>PROFILO OPERATIVO</small><h2>'+esc(managementName(d))+'</h2><p>'+esc(role)+(u.area?' · '+esc(u.area):'')+'</p></div><span>'+esc(dir?'DIREZIONE':staff?'STAFF':'RISERVATO')+'</span></section>'+
       '<section class="r24-calendar-summary four"><article><strong>'+personal.length+'</strong><span>Profili</span></article><article><strong>'+conv.length+'</strong><span>Convocazioni</span></article><article><strong>'+requests.length+'</strong><span>Richieste</span></article><article><strong>'+esc(transport.requests||0)+'</strong><span>Pulmini</span></article></section>'+
       '<section class="r24-service-grid staff">'+
+      '<button id="r42LiaStaff" data-r24-route="lia"><span>✦</span><b>Lia</b><small>Assistente operativo per il tuo ruolo</small></button>'+
       (personal.length?'<button data-r24-route="'+(personal.length>1?'family':'athlete')+'"><span>●</span><b>Atleti / Famiglie</b><small>'+personal.length+' profili collegati</small></button>':'')+
       (staff?'<button id="r24Attendance"><span>✓</span><b>Presenze</b><small>Registro squadra</small></button><button id="r24Convocations"><span>⚽</span><b>Convocazioni</b><small>Crea e gestisci</small></button><button id="r24Messages"><span>✉</span><b>Comunicazioni</b><small>Messaggi operativi</small></button>':'')+
       '<button id="r24Requests"><span>☑</span><b>Richieste</b><small>Invii e stato</small></button>'+
