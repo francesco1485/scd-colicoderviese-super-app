@@ -390,3 +390,7 @@ body{background:var(--paper);color:var(--ink)}
   .mini-tools-grid,.certainty-grid{grid-template-columns:1fr 1fr}
   .band-head strong{font-size:10px}.band-head small{font-size:7px}
 }
+
+.public-preview-link{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);background:#fff;color:#1a4b68;border-radius:999px;padding:7px 10px;font-size:8px;font-weight:900;white-space:nowrap}
+.public-preview-link:hover{background:#eef7f4;border-color:#c8dcd3}
+@media(max-width:900px){.public-preview-link{display:none}}
