@@ -1328,3 +1328,55 @@ body[data-context-brand="CIP"] .main-header{border-bottom-color:#f2dfc6}
   .form-stack.compact-grid{grid-template-columns:1fr}
   .form-stack.compact-grid .full{grid-column:auto}
 }
+
+
+.office-entry-actions{
+  display:flex;
+  align-items:stretch;
+  gap:10px;
+  flex:0 0 auto;
+}
+.office-admin-btn{
+  border:1px solid rgba(255,255,255,.24);
+  border-radius:12px;
+  padding:0 14px;
+  background:rgba(255,255,255,.08);
+  color:#fff;
+  font-size:13px;
+  font-weight:700;
+}
+.office-admin-btn:hover{background:rgba(255,255,255,.14)}
+.office-assignment-list{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+}
+.office-assignment-item{
+  display:flex!important;
+  align-items:center;
+  gap:10px;
+  min-height:64px;
+  padding:10px 12px;
+  border:1px solid #dbe5ea;
+  border-radius:12px;
+  background:#fbfdfe;
+}
+.office-assignment-item input{width:auto!important;margin:0}
+.office-assignment-item span{min-width:0}
+.office-assignment-item strong{display:block;font-size:14px;color:#183e58}
+.office-assignment-item small{display:block;margin-top:3px;font-size:11px;color:#7b8e9a}
+.import-safety-note{
+  display:grid;
+  gap:3px;
+  padding:11px 12px;
+  border:1px solid #d8e7df;
+  border-radius:10px;
+  background:#f1f8f4;
+}
+.import-safety-note strong{font-size:12px;color:#0a7454}
+.import-safety-note span{font-size:12px;line-height:1.45;color:#577166}
+@media(max-width:760px){
+  .office-entry-actions{width:100%;flex-direction:column}
+  .office-admin-btn{min-height:44px}
+  .office-assignment-list{grid-template-columns:1fr}
+}
