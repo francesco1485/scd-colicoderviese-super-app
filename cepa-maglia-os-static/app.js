@@ -545,6 +545,14 @@ function renderGrowthKits(){
   $('assessmentList').innerHTML=businessAssessments.map(a=>listRow(a.agency_collaborators?.display_name||'Collaboratore',a.proposal_direction||a.client_base_profile||'Valutazione da completare',[a.status,a.assessment_date,'indice '+(avgAssessment(a)??'—')+'/100'])).join('')||empty('Nessuna valutazione ancora registrata')
   $('growthKitGrid').innerHTML=growthKits.map(k=>'<article class="growth-kit-card" data-growth-kit="'+k.id+'"><div class="eyebrow">'+esc(k.use_case.replaceAll('_',' '))+'</div><h3>'+esc(k.title)+'</h3><p>'+esc(k.objective||'')+'</p><div class="tags">'+(k.recommended_areas||[]).slice(0,6).map(x=>'<span class="tag">'+esc(x)+'</span>').join('')+'</div><div class="kit-footer"><span>'+esc(k.status)+'</span><b>Apri →</b></div></article>').join('')||empty('Nessun kit operativo')
   document.querySelectorAll('[data-growth-kit]').forEach(b=>b.onclick=()=>openGrowthKit(b.dataset.growthKit))
+
+  const clientTools=blueprints.filter(b=>b.category==='client_tools')
+  const toolIcon=code=>code==='TABLE_BUSINESS_RISK'?'▦':code==='TABLE_FAMILY_360'?'◎':code==='TABLE_90_DAY_PLAN'?'90':code==='TABLE_RISK_PROTECTION'?'→':'▣'
+  $('clientToolBlueprints').innerHTML=clientTools.map(b=>{
+    const outline=Array.isArray(b.outline)?b.outline:(b.outline?.sections||[])
+    return '<article class="client-tool-card" data-client-tool="'+b.id+'"><div class="client-tool-visual"><span>'+esc(toolIcon(b.code))+'</span><div class="client-tool-lines">'+outline.slice(0,5).map(()=>'<i></i>').join('')+'</div></div><div><div class="eyebrow">A4 / A3</div><h4>'+esc(b.title)+'</h4><p>'+esc(b.intended_use||'')+'</p><small>'+esc(outline.slice(0,4).join(' · '))+'</small></div><b>Apri anteprima →</b></article>'
+  }).join('')||empty('Nessuna grafica cliente pronta')
+  document.querySelectorAll('[data-client-tool]').forEach(b=>b.onclick=()=>openBlueprint(b.dataset.clientTool))
 }
 function openGrowthKit(id){
   const k=growthKits.find(x=>x.id===id);if(!k)return
