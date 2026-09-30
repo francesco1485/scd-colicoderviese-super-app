@@ -37,14 +37,19 @@ for(const p of [
   "platform/src/adapters/OpenStreetMapBusinessMapper.ts",
   "platform/src/plugins/map-municipality-businesses/MapMunicipalityBusinessesCommand.ts",
   "platform/src/plugins/build-municipality-commercial-map/BuildMunicipalityCommercialMapCommand.ts",
-  "platform/src/plugins/create-drive-folder/CreateDriveFolderCommand.ts"
+  "platform/src/plugins/create-drive-folder/CreateDriveFolderCommand.ts",
+  "platform/src/plugins/save-lia-handoff/SaveLiaHandoffCommand.ts"
 ])assert(exists(p),"missing runtime file "+p);
 
 assert(bridge.includes("direction.drive.folder.create"),"R20 folder action missing");
 assert(bridge.includes("direction.commercial.mapping.save"),"R20 mapping action missing");
+assert(bridge.includes("private.lia.handoff.save"),"R20 handoff action missing");
 assert(patch.includes("r42RequireDirection_"),"Direction gate missing in R42 backend");
 assert(patch.includes("r42CreateDriveFolder_"),"Drive folder implementation missing");
 assert(patch.includes("r42SaveCommercialMapping_"),"mapping persistence missing");
+assert(patch.includes("r42SaveLiaHandoff_"),"remote handoff persistence missing");
+assert(patch.includes("1HYg6ORHFDeZX2lfcH-_ZjBthCFOxEhbv"),"canonical handoff folder missing");
+assert(patch.includes("18SiudaLO9k1JnDeBoTKgy-nkjv_DgGyp"),"canonical commercial folder missing");
 assert(!patch.toLowerCase().includes("deletefolder"),"destructive folder deletion must not exist");
 assert(patch.includes("PARTIAL_NOT_EXHAUSTIVE"),"mapping coverage disclaimer missing");
 
