@@ -3322,3 +3322,43 @@ a:focus-visible{
   .cepa-hub-hero{grid-template-columns:1fr!important}
   .cepa-territory-hero-photo{min-height:250px;flex-direction:column;align-items:flex-start}
 }
+
+
+/* Media credits: visible but unobtrusive */
+.media-credits{
+  color:#81939d;
+  font-size:8px;
+  line-height:1.35;
+}
+.media-credits a{
+  color:inherit;
+  text-decoration:none;
+}
+.media-credits a:hover{text-decoration:underline}
+.login-media-credit{
+  position:absolute;
+  left:clamp(48px,5vw,78px);
+  bottom:24px;
+  color:rgba(255,255,255,.62);
+  z-index:2;
+}
+.home-media-credits{
+  margin-top:8px;
+  text-align:right;
+}
+.office-identity-photo,
+.cepa-territory-hero-photo{position:relative}
+.office-media-credit{
+  position:absolute;
+  right:12px;
+  bottom:8px;
+  z-index:2;
+  color:rgba(255,255,255,.62);
+  font-size:7px;
+  font-weight:500;
+  letter-spacing:.01em;
+}
+@media(max-width:760px){
+  .login-media-credit{left:24px;bottom:16px}
+  .home-media-credits{text-align:left}
+}
