@@ -1,10 +1,12 @@
 const COPY=Object.freeze({
-  heroTitle:"Persone, protezione e opportunità per un territorio che cresce.",
-  heroBody:"Dal Lario alla Valtellina, Maglia 360 mette in relazione consulenza, territorio, competenze specialistiche e sviluppo C.E.P.A.",
+  heroTitle:"Centro di Regia. Tutto ciò che richiede attenzione, in un solo posto.",
+  heroBody:"MAGLIA 360 unisce attività, rete, Lia, Radar IVASS, documenti, partner e sviluppo territoriale in una cabina operativa unica.",
   territories:["Colico","Mandello del Lario","Lecco","Valtellina","Lago di Como"]
 });
 const FALLBACK=Object.freeze({
-  partners:[],products:[],collaborators:[],actions:[],
+  partners:[],products:[],collaborators:[],actions:[],approvals:[],automations:[],workOrders:[],insights:[],
+  radar:{official:0,pendingReview:0,contactApproved:0,discovered:0},
+  system:{sources:0,insights:0,folders:0,orders:0,automations:0},
   benchmark:{solid:[],improve:[]},
   metrics:{docs:0,market:0,knowledge:"0/0",terms:"0/0",partnerDocs:"0/0",cepa:"0/0"},
   cepa:{steps:["Centro CEPA","Sportelli SAP","Mandello","Lecco","Italia"]},
@@ -33,7 +35,7 @@ class MagliaDashboard extends HTMLElement{
   dispatch(type,detail={}){this.dispatchEvent(new CustomEvent(type,{detail,bubbles:true,composed:true}))}
   icon(name){return '<span class="icon">'+(ICONS[name]||ICONS.chart)+'</span>'}
   render(){
-    const d=this._data||FALLBACK,p=d.partners||[],pr=d.products||[],c=d.collaborators||[],m=d.metrics||FALLBACK.metrics,b=d.benchmark||FALLBACK.benchmark,a=d.actions||[];
+    const d=this._data||FALLBACK,p=d.partners||[],pr=d.products||[],c=d.collaborators||[],m=d.metrics||FALLBACK.metrics,b=d.benchmark||FALLBACK.benchmark,a=d.actions||[],radar=d.radar||FALLBACK.radar,approvals=d.approvals||[],automations=d.automations||[],workOrders=d.workOrders||[],insights=d.insights||[],system=d.system||FALLBACK.system;
     const productIcon=x=>({mobilita:"car",casa:"home",salute:"heart",tutela_legale:"scale",impresa:"chart",energia:"shield",previdenza:"chart"}[x.category]||"shield");
     this.shadowRoot.innerHTML=`
 <style>
@@ -176,6 +178,46 @@ class MagliaDashboard extends HTMLElement{
     <section class="panel user"><div><strong>${esc(d.user?.label||"Area riservata")}</strong><small>${esc(d.user?.role||"")}</small></div><span class="privacy">🔒 riservato</span></section>
   </aside>
 </div>`;
+    const hero=this.shadowRoot.querySelector(".hero");
+    if(hero){
+      const board=document.createElement("section");
+      board.className="opsBoard";
+      const pending=approvals.filter(x=>x.status==="pending").length;
+      const queued=automations.filter(x=>["queued","running"].includes(x.status)).length;
+      const latest=workOrders[0];
+      board.innerHTML=
+        '<button class="opsMetric" data-nav="actions"><span>DA FARE</span><strong>'+esc(a.length)+'</strong><small>attività aperte</small></button>'+
+        '<button class="opsMetric" data-nav="networkRadar"><span>RADAR IVASS</span><strong>'+esc(radar.official)+'</strong><small>'+esc(radar.pendingReview)+' da revisionare</small></button>'+
+        '<button class="opsMetric" data-nav="liaWorkbench"><span>DECISIONI</span><strong>'+esc(pending)+'</strong><small>approvazioni in attesa</small></button>'+
+        '<button class="opsMetric" data-nav="liaWorkbench"><span>AUTOMAZIONI</span><strong>'+esc(queued)+'</strong><small>'+esc(system.automations)+' run registrate</small></button>'+
+        '<div class="opsLia"><div><span>LIA · ULTIMO LAVORO</span><strong>'+esc(latest?.title||"Pronta per un nuovo incarico")+'</strong><small>'+esc(latest?.detail||"Assegna un lavoro dal Workbench.")+'</small></div><button data-nav="liaWorkbench">Apri Workbench →</button></div>';
+      hero.after(board);
+    }
+
+    const assistant=this.shadowRoot.querySelector(".assistant");
+    if(assistant){
+      const portrait=assistant.querySelector(".portrait");
+      if(portrait)portrait.remove();
+      const head=assistant.querySelector(".assistantHead");
+      if(head){
+        const img=head.querySelector("img");
+        if(img)img.remove();
+      }
+    }
+
+    const insightsPanel=document.createElement("section");
+    insightsPanel.className="opsInsights panel";
+    insightsPanel.innerHTML='<div class="sectionHead"><div>'+this.icon("radar")+'<div><strong>Intelligence operativa</strong><small>Fonti, insight e controllo delle azioni.</small></div></div><button class="linkBtn" data-nav="liaWorkbench">Apri Idea Lab →</button></div>'+
+      '<div class="opsInsightGrid">'+
+      '<div><span>Fonti attive</span><strong>'+esc(system.sources)+'</strong></div>'+
+      '<div><span>Insight</span><strong>'+esc(system.insights)+'</strong></div>'+
+      '<div><span>Spazi Lia</span><strong>'+esc(system.folders)+'</strong></div>'+
+      '<div><span>Ordini Lia</span><strong>'+esc(system.orders)+'</strong></div>'+
+      '</div>'+
+      '<div class="opsInsightList">'+(insights.slice(0,3).map(x=>'<button data-nav="liaWorkbench"><strong>'+esc(x.title)+'</strong><small>'+esc(x.detail||"")+'</small></button>').join("")||'<span class="opsEmpty">Nessun insight recente.</span>')+'</div>';
+    const lastPanel=this.shadowRoot.querySelector(".main > .panel:last-child");
+    if(lastPanel)lastPanel.after(insightsPanel);
+
     this.shadowRoot.querySelectorAll("[data-nav]").forEach(el=>el.addEventListener("click",()=>this.dispatch("navigate",{view:el.dataset.nav})));
     this.shadowRoot.querySelectorAll("[data-partner]").forEach(el=>el.addEventListener("click",()=>this.dispatch("open-partner",{id:el.dataset.partner})));
     this.shadowRoot.querySelectorAll("[data-product]").forEach(el=>el.addEventListener("click",()=>this.dispatch("open-product",{id:el.dataset.product})));
