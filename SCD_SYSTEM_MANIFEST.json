@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.1.0",
+    "version": "3.2.0",
     "effective_at": "2026-09-30",
     "status": "BINDING",
     "language": "it-IT",
@@ -727,13 +727,14 @@
       {
         "id": "SCD_OFFICIAL_SITE",
         "kind": "PUBLIC_OFFICIAL_SCD",
-        "trust": "PUBLIC_OFFICIAL_SCD",
+        "trust": "PUBLIC_OFFICIAL_SCD_STALE_FOR_NEWS",
         "url": "https://www.colicoderviese.it/",
         "authority_domains": [
-          "PUBLIC_NEWS",
           "PUBLIC_EVENTS",
-          "OFFICIAL_PUBLIC_CONTENT"
-        ]
+          "OFFICIAL_PUBLIC_CONTENT",
+          "NAVIGATION_REFERENCE"
+        ],
+        "news_policy": "DISABLED_FOR_NEWS_UNTIL_FRESHNESS_VERIFIED"
       },
       {
         "id": "SCD_FACEBOOK",
@@ -742,7 +743,8 @@
         "url": "https://www.facebook.com/ColicoDerviese?locale=it_IT",
         "authority_domains": [
           "PUBLIC_SOCIAL_CONTENT"
-        ]
+        ],
+        "news_policy": "LINK_ONLY_UNTIL_AUTHORIZED_FRESHNESS_ADAPTER"
       },
       {
         "id": "SCD_INSTAGRAM",
@@ -751,7 +753,8 @@
         "url": "https://www.instagram.com/s.c.d.colicoderviese/",
         "authority_domains": [
           "PUBLIC_SOCIAL_CONTENT"
-        ]
+        ],
+        "news_policy": "LINK_ONLY_UNTIL_AUTHORIZED_FRESHNESS_ADAPTER"
       },
       {
         "id": "AC_MONZA",
@@ -881,6 +884,22 @@
         ],
         "project_id": "ndevtxxijbcnskgysdit",
         "region": "eu-central-1"
+      },
+      {
+        "id": "SCD_AI_WEEKLY_EDITORIAL",
+        "kind": "GENERATED_EDITORIAL_FROM_VERIFIED_SOURCES",
+        "trust": "DERIVED_VERIFIED",
+        "authority_domains": [
+          "WEEKLY_EDITORIAL_SYNTHESIS"
+        ],
+        "file": "content/weekly-news.json",
+        "rules": [
+          "must_match_current_week",
+          "must_be_published",
+          "must_include_evidence",
+          "no_stale_site_fillers",
+          "no_invented_sport_facts"
+        ]
       }
     ],
     "conflict_resolution": [
@@ -1417,6 +1436,16 @@
       "COMPULSIVE_SCREEN_TIME",
       "MINOR_PRESSURE",
       "HIDDEN_VULNERABILITY_TARGETING"
+    ],
+    "newsroom_loop": [
+      "COLLECT_VERIFIED_RESULTS",
+      "COLLECT_STANDINGS_IF_AVAILABLE",
+      "COLLECT_WEEK_CALENDAR",
+      "COLLECT_TERRITORIAL_INITIATIVES",
+      "GROUND_EACH_EDITORIAL_CARD",
+      "GENERATE_WEEKLY_COPY",
+      "VALIDATE_EVIDENCE",
+      "PUBLISH_OR_FAIL_CLOSED"
     ]
   },
   "analytics": {
@@ -1624,7 +1653,10 @@
       "social_radar": "OFFICIAL_PLATFORM_ADAPTERS_WHEN_AUTHORIZED",
       "cognitive_experience_engine": "SCD_EXPERIENCE_ENGINE_LOCAL_FIRST",
       "staff_workspace": "PRIVATE_DESK_ROLE_SCOPE",
-      "revenue_intelligence": "VERIFIED_METRICS_ONLY_FUTURE_ADAPTERS"
+      "revenue_intelligence": "VERIFIED_METRICS_ONLY_FUTURE_ADAPTERS",
+      "newsroom": "RENDER_GROUNDED_RUNTIME_PLUS_WEEKLY_CHATGPT_EDITORIAL",
+      "week_calendar": "R20_PUBLIC_CALENDAR_ALL_AGE_GROUPS",
+      "stale_site_news": "DISABLED"
     }
   },
   "delivery_and_quality": {
@@ -1659,7 +1691,11 @@
       "HUMAN_OS_CONTRACT",
       "NO_MENTAL_STATE_INFERENCE",
       "NO_DARK_PATTERNS_FOR_MINORS",
-      "PRIVATE_DESK_SCOPE_CONTRACT"
+      "PRIVATE_DESK_SCOPE_CONTRACT",
+      "NEWSROOM_CONTRACT",
+      "ALL_ANNATE_WEEK_CALENDAR",
+      "NO_STALE_SITE_NEWS",
+      "EDITORIAL_EVIDENCE_REQUIRED"
     ],
     "merge_rule": "Non considerare completata una funzione se è verde solo tecnicamente ma viola il manifest o il master visivo.",
     "release_truth": {
@@ -1732,7 +1768,8 @@
       "domain": "EVENTS",
       "required": true,
       "state": "PARTIAL",
-      "screen": "CALENDAR_LIVE"
+      "screen": "CALENDAR_LIVE",
+      "contract": "ALL_ANNATE_ALL_WEEK_ACTIVITY_FILTERABLE"
     },
     {
       "id": "CAP-ATHLETE",
@@ -2008,11 +2045,10 @@
       "required": true,
       "state": "PARTIAL",
       "sources": [
-        "SCD_OFFICIAL_SITE",
         "SCD_INSTAGRAM",
         "SCD_FACEBOOK"
       ],
-      "contract": "REAL_PLATFORM_SIGNALS_AUTHORIZED_ADAPTERS_ONLY"
+      "contract": "LINK_ONLY_UNTIL_AUTHORIZED_FRESHNESS_ADAPTER"
     },
     {
       "id": "CAP-HUMAN-OS",
@@ -2059,6 +2095,30 @@
         "SCD_FACEBOOK"
       ],
       "contract": "VERIFIED_METRICS_NO_FAKE_REVENUE_NO_CHILD_EXPLOITATION"
+    },
+    {
+      "id": "CAP-WEEKLY-SPORT-CALENDAR",
+      "domain": "EVENTS",
+      "required": true,
+      "state": "PARTIAL",
+      "sources": [
+        "R20"
+      ],
+      "contract": "MON_SUN_ALL_TEAMS_NO_DEFAULT_SLICE"
+    },
+    {
+      "id": "CAP-AI-NEWSROOM",
+      "domain": "COMMUNICATION",
+      "required": true,
+      "state": "PARTIAL",
+      "sources": [
+        "R20",
+        "SCD_DRIVE",
+        "SCD_GMAIL",
+        "SCD_SUPABASE",
+        "SCD_AI_WEEKLY_EDITORIAL"
+      ],
+      "contract": "WEEKLY_GROUNDED_EDITORIAL_NO_STALE_SITE"
     }
   ],
   "known_noncompliance": [
@@ -2271,6 +2331,17 @@
       "explicit_preferences_preferred": true,
       "generational_adaptation_without_age_profiling": true,
       "revenue_must_follow_real_user_value": true
+    },
+    "weekly_newsroom": {
+      "release": "R40",
+      "runtime_endpoint": "/api/newsroom",
+      "editorial_file": "content/weekly-news.json",
+      "stale_site_disabled": true,
+      "current_week_required": true,
+      "evidence_required_for_published_editorial": true,
+      "fail_closed": true,
+      "website_news_source": "DISABLED",
+      "web_news_scrape": "DISABLED"
     }
   },
   "product_direction": {
@@ -2286,7 +2357,7 @@
     "visual_principle": "SPATIAL_SPORT_EDITORIAL_HIGH_IMPACT",
     "legacy_home_route": "#/home",
     "no_rewrite_rule": false,
-    "release": "R39",
+    "release": "R40",
     "product_name": "SCD UNIVERSE",
     "audience_fit": [
       "YOUTH",
@@ -2373,6 +2444,65 @@
         "EVENT_CONVERSIONS",
         "CARD_CONVERSIONS",
         "SHOP_REFERRALS"
+      ]
+    },
+    "weekly_sport_calendar": {
+      "scope": "ALL_AGE_GROUPS_ALL_SPORTING_ACTIVITY_CURRENT_WEEK",
+      "week": "MONDAY_TO_SUNDAY",
+      "default_view": "ALL",
+      "filters": [
+        "TEAM",
+        "CATEGORY",
+        "ANNATA",
+        "TYPE"
+      ],
+      "no_hidden_default_slice": true,
+      "fields": [
+        "DATE",
+        "TIME",
+        "TEAM",
+        "CATEGORY",
+        "BIRTH_YEAR",
+        "OPPONENT",
+        "COMPETITION",
+        "VENUE",
+        "RESULT",
+        "SOURCE"
+      ]
+    },
+    "ai_newsroom": {
+      "name": "SCD NEWSROOM AI",
+      "cadence": "WEEKLY",
+      "runtime_generator": "SCD_NEWSROOM_GROUNDED_V1",
+      "editorial_file": "content/weekly-news.json",
+      "editorial_generator": "CHATGPT_WEEKLY_EDITORIAL",
+      "policy": "VERIFIED_STRUCTURED_FACTS_ONLY",
+      "stale_site_content": false,
+      "fail_closed": true,
+      "source_priority": [
+        "R20",
+        "SCD_DRIVE",
+        "SCD_GMAIL",
+        "SCD_SUPABASE",
+        "SPONSOR_MASTER_SHEET",
+        "FIGC",
+        "LND",
+        "CR_LOMBARDIA"
+      ],
+      "allowed_evidence": [
+        "RESULTS",
+        "STANDINGS",
+        "CALENDAR",
+        "TOURNAMENTS",
+        "TERRITORIAL_INITIATIVES",
+        "VERIFIED_INTERNAL_DATA"
+      ],
+      "forbidden_fillers": [
+        "STALE_SITE_ARTICLES",
+        "UNVERIFIED_WEB_COMMENTS",
+        "INVENTED_RESULTS",
+        "INVENTED_STANDINGS",
+        "INVENTED_QUOTES"
       ]
     }
   }
