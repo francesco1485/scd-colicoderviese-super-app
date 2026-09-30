@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 440" role="img" aria-label="Paesaggio del Lario per Ufficio Colico">
+<defs><linearGradient id="sky" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#bfe7fa"/><stop offset="1" stop-color="#f3fbff"/></linearGradient><linearGradient id="lake" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#5bb3d0"/><stop offset="1" stop-color="#1e7897"/></linearGradient></defs>
+<rect width="900" height="440" fill="url(#sky)"/><circle cx="730" cy="78" r="42" fill="#fff2ae" opacity=".86"/>
+<path d="M0 220L95 112l92 70 82-117 91 127 92-98 95 107 93-121 93 105 70-64 107 99z" fill="#8faebc"/><path d="M0 235L130 153l90 55 96-94 111 103 96-72 100 76 105-97 172 111z" fill="#6f929f"/>
+<rect y="225" width="900" height="215" fill="url(#lake)"/><path d="M0 286q160-36 330 0t320 0 250 7v147H0z" fill="#3d8ca2" opacity=".45"/>
+<path d="M525 233l58-55 37 38 55-25 60 42z" fill="#496c61"/>
+<g fill="#f5f0e4"><rect x="558" y="202" width="58" height="43"/><rect x="624" y="206" width="65" height="39"/><rect x="696" y="198" width="56" height="47"/></g>
+<g fill="#b85f45"><path d="M553 202l34-23 34 23z"/><path d="M620 206l36-20 37 20z"/><path d="M691 198l33-22 33 22z"/></g>
+<rect x="644" y="112" width="25" height="94" fill="#eee9dc"/><polygon points="640,112 673,112 657,73" fill="#555c5e"/><rect x="651" y="129" width="11" height="18" rx="5" fill="#44616b"/>
+<path d="M505 245q83 20 165 0t170 0" stroke="#d8f2f8" stroke-width="3" fill="none" opacity=".7"/>
+</svg>
