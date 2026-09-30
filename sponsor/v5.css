@@ -1,0 +1,302 @@
+/* SCD Sponsor Platform V5 — Cinematic Operating System */
+:root{
+  --v5-ink:#071a33;
+  --v5-navy:#061d39;
+  --v5-navy-2:#0a315d;
+  --v5-blue:#2a88dd;
+  --v5-cyan:#55c7e8;
+  --v5-gold:#f4cf55;
+  --v5-white:#f8fbff;
+  --v5-glass:rgba(248,252,255,.78);
+  --v5-glass-dark:rgba(5,27,53,.76);
+  --v5-line:rgba(164,201,233,.25);
+  --v5-shadow:0 32px 90px rgba(5,26,51,.20);
+  --v5-soft-shadow:0 18px 45px rgba(12,52,91,.12);
+}
+html{background:#eaf2f9}
+body.v5{
+  background:
+    radial-gradient(circle at 73% 4%,rgba(75,171,231,.18),transparent 23%),
+    radial-gradient(circle at 25% 96%,rgba(244,207,85,.11),transparent 19%),
+    linear-gradient(180deg,#edf5fc 0%,#e8f0f7 100%);
+  color:#193552;
+}
+body.v5:before{
+  content:"";position:fixed;inset:0;z-index:-10;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(61,128,190,.035) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(61,128,190,.035) 1px,transparent 1px);
+  background-size:32px 32px;
+  mask-image:linear-gradient(to bottom,black,transparent 85%);
+}
+body.v5 .ambient{opacity:.13;filter:blur(100px)}
+body.v5 .sidebar{
+  width:252px;
+  background:
+    linear-gradient(180deg,rgba(4,23,47,.96),rgba(5,31,60,.94)),
+    url('../assets/hero-colico.webp') center/cover;
+  color:white;border-right:1px solid rgba(142,200,239,.14);
+  box-shadow:18px 0 55px rgba(3,23,47,.15);
+  backdrop-filter:blur(28px) saturate(1.1);
+  padding:18px 15px;
+}
+body.v5 .sidebar:before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    linear-gradient(180deg,rgba(3,21,45,.78),rgba(4,26,52,.94)),
+    radial-gradient(circle at 25% 15%,rgba(58,164,227,.18),transparent 30%);
+}
+body.v5 .sidebar>*{position:relative;z-index:2}
+body.v5 .brand-lockup{
+  border:1px solid rgba(255,255,255,.08);border-radius:18px;
+  background:linear-gradient(145deg,rgba(255,255,255,.08),rgba(255,255,255,.02));
+  padding:12px 10px 13px;margin-bottom:10px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 16px 34px rgba(0,0,0,.10)
+}
+body.v5 .brand-lockup img{width:70px;height:82px;filter:drop-shadow(0 14px 18px rgba(0,0,0,.20))}
+body.v5 .brand-lockup b{color:#d4e8f8;font-size:9px}
+body.v5 .brand-lockup strong{color:#fff;font-size:17px}
+body.v5 .brand-lockup span{color:#8cc8ee}
+body.v5 .brand-lockup small{color:#f2cf5d}
+body.v5 .nav-item{color:#c5d6e7;border:1px solid transparent;padding:10px 11px;margin:1px 0}
+body.v5 .nav-item:hover{background:rgba(255,255,255,.07);color:#fff;border-color:rgba(122,190,235,.10);transform:translateX(3px)}
+body.v5 .nav-item.active{
+  background:linear-gradient(110deg,rgba(48,139,216,.95),rgba(66,171,225,.78));
+  color:white;border-color:rgba(161,221,252,.32);
+  box-shadow:0 12px 26px rgba(18,100,170,.26),inset 0 1px 0 rgba(255,255,255,.18)
+}
+body.v5 .nav-item.active:after{
+  content:"";margin-left:auto;width:7px;height:7px;border-radius:50%;background:var(--v5-gold);
+  box-shadow:0 0 0 5px rgba(244,207,85,.11)
+}
+body.v5 .side-divider{background:linear-gradient(90deg,transparent,rgba(159,208,238,.24),transparent)}
+body.v5 .territory-card{
+  height:170px;border:1px solid rgba(155,211,244,.18);
+  background-image:linear-gradient(180deg,rgba(7,36,70,.05),rgba(4,24,49,.86)),url('../assets/hero-colico.webp');
+  box-shadow:0 18px 45px rgba(0,0,0,.18)
+}
+body.v5 .workspace{margin-left:252px}
+body.v5 .topbar{
+  height:72px;padding:10px 26px;
+  background:rgba(239,247,253,.74);
+  border-bottom:1px solid rgba(161,195,224,.20);
+  backdrop-filter:blur(26px) saturate(1.18);
+  box-shadow:0 8px 30px rgba(15,52,87,.04)
+}
+body.v5 .command-search{max-width:820px}
+body.v5 .command-search input{
+  height:44px;border-radius:15px;
+  border:1px solid rgba(127,173,210,.30);
+  background:rgba(255,255,255,.76);
+  box-shadow:0 12px 26px rgba(21,63,103,.06),inset 0 1px 0 rgba(255,255,255,.9);
+}
+body.v5 .mode-switch{background:rgba(219,234,247,.7);border-color:rgba(133,178,214,.20)}
+body.v5 .profile-card{border-left-color:rgba(123,161,197,.22)}
+body.v5 .view{padding:20px 26px 60px}
+body.v5 .hero-visual{
+  min-height:438px;border-radius:28px;
+  border:1px solid rgba(188,224,247,.28);
+  box-shadow:0 34px 95px rgba(7,36,72,.25),inset 0 1px 0 rgba(255,255,255,.28);
+  perspective:1200px;
+}
+body.v5 .hero-photo{
+  background-image:
+    linear-gradient(90deg,rgba(4,25,53,.82),rgba(8,51,91,.40) 48%,rgba(6,33,66,.20)),
+    url('../assets/hero-colico.webp');
+  background-position:center 48%;
+  filter:saturate(1.04) contrast(1.07);
+  transform:scale(1.04)
+}
+body.v5 .hero-overlay{
+  background:
+    linear-gradient(180deg,rgba(5,25,50,.05),rgba(5,25,50,.25)),
+    radial-gradient(circle at 79% 24%,rgba(69,187,234,.14),transparent 23%),
+    linear-gradient(90deg,rgba(3,24,50,.76),rgba(5,41,81,.22) 60%,rgba(3,24,50,.16))
+}
+body.v5 .hero-gridlines{opacity:.34;background-size:42px 42px}
+body.v5 .hero-content{padding:74px 52px;width:min(720px,67%)}
+body.v5 .hero-kicker{font-size:9px;letter-spacing:.21em;color:#9bd5f3}
+body.v5 .hero-content h1{font-size:46px;line-height:1.00;max-width:760px;text-shadow:0 10px 30px rgba(0,0,0,.18)}
+body.v5 .hero-content p{font-size:12px;max-width:610px;color:#e3eef8}
+body.v5 .hero-cta,body.v5 .hero-ghost{padding:12px 18px;font-size:9px}
+body.v5 .hero-cta{background:linear-gradient(145deg,#fff7cf,#f4cf55);color:#15385d}
+body.v5 .hero-ghost{background:rgba(255,255,255,.10);border-color:rgba(255,255,255,.28)}
+body.v5 .hero-hud{
+  border-color:rgba(141,215,246,.25);
+  background:linear-gradient(145deg,rgba(11,56,99,.34),rgba(7,36,70,.18));
+  box-shadow:0 18px 45px rgba(0,0,0,.10),inset 0 1px 0 rgba(255,255,255,.10)
+}
+body.v5 .hero-club-badge{width:142px;bottom:-22px;right:36px;filter:drop-shadow(0 18px 32px rgba(0,0,0,.25))}
+body.v5 .hero-visual:after{
+  content:"";position:absolute;right:-1px;bottom:-1px;width:38%;height:42%;z-index:2;pointer-events:none;
+  background:linear-gradient(135deg,transparent,rgba(69,184,230,.06));
+  clip-path:polygon(35% 0,100% 0,100% 100%,0 100%);
+}
+body.v5 .kpi-strip{gap:10px;margin-top:12px}
+body.v5 .kpi-strip article{
+  min-height:76px;border-radius:18px;
+  background:linear-gradient(145deg,rgba(255,255,255,.90),rgba(245,250,255,.74));
+  border:1px solid rgba(188,211,231,.55);
+  box-shadow:0 16px 34px rgba(23,61,97,.07);
+  backdrop-filter:blur(16px)
+}
+body.v5 .kpi-strip article:hover{transform:translateY(-3px);transition:.22s ease;box-shadow:0 20px 42px rgba(23,61,97,.11)}
+body.v5 .kpi-icon{box-shadow:inset 0 1px 0 rgba(255,255,255,.75),0 8px 18px rgba(40,97,145,.10)}
+body.v5 .kpi-strip strong{font-size:21px}
+body.v5 .macro-visual-grid{gap:10px;margin-top:12px}
+body.v5 .macro-visual{
+  height:260px;border-radius:22px;
+  border:1px solid rgba(196,222,241,.22);
+  box-shadow:0 22px 55px rgba(6,35,68,.15);
+  transform-style:preserve-3d;
+}
+body.v5 .macro-visual:hover{transform:translateY(-7px) scale(1.015)}
+body.v5 .macro-visual .macro-shade{background:linear-gradient(180deg,rgba(4,24,50,.02),rgba(3,23,46,.90))}
+body.v5 .macro-visual h2{font-size:23px}
+body.v5 .macro-visual p{font-size:9px;color:#e4eef7}
+body.v5 .macro-visual>button{background:rgba(255,255,255,.10);border-color:rgba(255,255,255,.52);box-shadow:0 10px 18px rgba(0,0,0,.12)}
+body.v5 .macro-visual.historic .macro-bg{background-image:linear-gradient(rgba(5,28,55,.05),rgba(5,28,55,.20)),url('../assets/event-insieme.webp');filter:sepia(.18) saturate(.9) contrast(1.05)}
+body.v5 .macro-visual.current .macro-bg{background-image:url('../assets/hero-colico.webp');background-position:43% center}
+body.v5 .macro-visual.ideas .macro-bg{background-image:linear-gradient(rgba(9,50,89,.02),rgba(7,42,78,.18)),url('../assets/sky.webp')}
+body.v5 .macro-visual.opportunity .macro-bg{background-image:linear-gradient(rgba(5,33,63,.08),rgba(5,33,63,.20)),url('../assets/hero-colico.webp');background-position:85% center;filter:saturate(.98) brightness(.88)}
+body.v5 .intelligence-layer{gap:10px;margin-top:12px}
+body.v5 .intelligence-card{
+  border-radius:20px;min-height:250px;
+  background:linear-gradient(145deg,rgba(255,255,255,.88),rgba(240,248,254,.73));
+  border:1px solid rgba(175,205,229,.50);
+  box-shadow:0 20px 55px rgba(17,57,96,.09)
+}
+body.v5 .relationship-map{height:165px}
+body.v5 .map-center{width:64px;height:64px;box-shadow:0 14px 30px rgba(47,133,204,.26)}
+body.v5 .map-node{box-shadow:0 10px 24px rgba(26,65,103,.18)}
+body.v5 .decision-item,body.v5 .growth-summary div{background:rgba(255,255,255,.74);border:1px solid rgba(206,222,236,.60)}
+body.v5 .vision-ribbon{
+  min-height:145px;border-radius:22px;margin-top:12px;
+  background:linear-gradient(115deg,#071d3b,#0b3c70 55%,#0c5b87);
+  border:1px solid rgba(125,201,237,.18);box-shadow:0 24px 60px rgba(7,37,74,.17)
+}
+body.v5 .vision-ribbon::before{opacity:.20;filter:saturate(.8)}
+body.v5 .vision-ribbon h3{font-size:21px}
+body.v5 .home-workbench{gap:10px;margin-top:12px}
+body.v5 .work-panel,body.v5 .glass-panel,body.v5 .sponsor-card,body.v5 .pipeline-card,body.v5 .asset-card,body.v5 .detail-panel,body.v5 .scenario-stage,body.v5 .scenario-inspector{
+  background:linear-gradient(145deg,rgba(255,255,255,.88),rgba(243,249,254,.74));
+  border:1px solid rgba(184,211,232,.46);
+  box-shadow:0 16px 40px rgba(20,58,95,.08)
+}
+body.v5 .work-panel,body.v5 .glass-panel{border-radius:18px}
+body.v5 .lia-home{
+  background:
+    linear-gradient(145deg,rgba(248,252,255,.90),rgba(226,243,254,.76)),
+    radial-gradient(circle at 90% 12%,rgba(67,178,231,.18),transparent 32%)
+}
+body.v5 .lia-avatar{background:linear-gradient(145deg,#d9effc,#9bccea 42%,#28699f);box-shadow:0 10px 24px rgba(39,108,159,.20)}
+body.v5 .page-heading{
+  min-height:158px;border-radius:22px;
+  background:linear-gradient(105deg,rgba(255,255,255,.96),rgba(238,248,255,.80));
+  box-shadow:0 18px 50px rgba(18,56,94,.09)
+}
+body.v5 .page-heading h1{font-size:34px;color:#153f6c}
+body.v5 .page-heading p{font-size:10px;max-width:720px}
+body.v5 .filter-line{gap:10px}
+body.v5 .filter-line input,body.v5 .filter-line select{
+  min-height:42px;border-radius:12px;background:rgba(255,255,255,.82);
+  box-shadow:0 8px 20px rgba(21,61,97,.05)
+}
+body.v5 .sponsor-grid{gap:12px}
+body.v5 .sponsor-card{
+  position:relative;overflow:hidden;border-radius:18px;padding:16px;padding-top:90px;
+  min-height:330px;transition:.24s ease
+}
+body.v5 .sponsor-card:before{
+  content:"";position:absolute;left:0;right:0;top:0;height:78px;
+  background-image:linear-gradient(90deg,rgba(5,32,64,.80),rgba(8,65,112,.38)),url('../assets/hero-colico.webp');
+  background-size:cover;background-position:center;
+}
+body.v5 .sponsor-card:nth-child(2n):before{background-image:linear-gradient(90deg,rgba(6,38,70,.78),rgba(8,75,120,.30)),url('../assets/event-insieme.webp')}
+body.v5 .sponsor-card:nth-child(3n):before{background-image:linear-gradient(90deg,rgba(8,48,83,.76),rgba(14,80,120,.28)),url('../assets/sky.webp')}
+body.v5 .sponsor-card:hover{transform:translateY(-5px);box-shadow:0 24px 55px rgba(17,56,94,.14)}
+body.v5 .sponsor-head{position:relative}
+body.v5 .sponsor-logo{width:58px;height:58px;margin-top:-44px;background:white;border:4px solid rgba(255,255,255,.95);box-shadow:0 12px 24px rgba(12,52,89,.16);color:#1f629e}
+body.v5 .status-pill{margin-top:-32px;background:rgba(240,250,245,.92);border:1px solid rgba(95,171,130,.16)}
+body.v5 .sponsor-metrics div{background:rgba(242,247,252,.74);border:1px solid rgba(216,227,237,.60)}
+body.v5 .pipeline-grid,body.v5 .asset-grid{gap:12px}
+body.v5 .pipeline-card,body.v5 .asset-card{border-radius:18px}
+body.v5 .asset-card{min-height:155px;position:relative;overflow:hidden}
+body.v5 .asset-card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(#54b7e2,#f0ca54)}
+body.v5 .folder-hub{gap:12px}
+body.v5 .folder-card{border-radius:17px;min-height:135px;background:linear-gradient(145deg,rgba(255,255,255,.90),rgba(243,249,254,.74));box-shadow:0 15px 36px rgba(20,58,95,.08)}
+body.v5 .folder-icon{box-shadow:0 10px 22px rgba(53,132,201,.18)}
+body.v5 .led-board{gap:10px}
+body.v5 .led-row{min-height:80px;border-radius:16px}
+body.v5 .led-logo{width:54px;height:54px;border-radius:13px;background:linear-gradient(145deg,#0a315d,#0c5b8b);box-shadow:0 10px 22px rgba(7,50,90,.18)}
+body.v5 .event-grid{gap:12px}
+body.v5 .event-card{min-height:230px;border-radius:20px;box-shadow:0 22px 55px rgba(7,40,76,.16)}
+body.v5 .report-card{border-radius:18px;background:linear-gradient(145deg,rgba(255,255,255,.90),rgba(243,249,254,.76));box-shadow:0 16px 40px rgba(19,57,95,.08)}
+body.v5 .scenario-stage,body.v5 .scenario-inspector{border-radius:20px}
+body.v5 .fit-cell{min-height:58px;border-radius:10px}
+body.v5 .marketing-studio{gap:12px}
+body.v5 .studio-visual{min-height:230px;border-radius:20px;background:
+  linear-gradient(145deg,rgba(6,35,68,.78),rgba(7,53,95,.70)),
+  url('../assets/hero-colico.webp') center/cover}
+body.v5 .marketing-idea{border-radius:16px;box-shadow:0 14px 34px rgba(18,56,94,.07)}
+body.v5 .sponsor-hero{
+  min-height:320px;border-radius:26px;
+  background-image:linear-gradient(90deg,rgba(4,28,58,.86),rgba(6,55,99,.28)),url('../assets/hero-colico.webp');
+  border:1px solid rgba(164,214,243,.20);
+  box-shadow:0 32px 90px rgba(6,36,71,.24)
+}
+body.v5 .sponsor-hero-content{padding:54px 42px}
+body.v5 .detail-logo{width:138px;height:138px;border-radius:18px;box-shadow:0 20px 42px rgba(0,0,0,.22)}
+body.v5 .detail-title h1{font-size:37px}
+body.v5 .sponsor-hero-quote{font-size:18px;right:42px;top:62px}
+body.v5 .sponsor-holo{
+  width:240px;height:105px;right:40px;bottom:28px;border-radius:17px;
+  background:linear-gradient(145deg,rgba(5,42,78,.62),rgba(9,78,119,.28));
+  box-shadow:0 16px 36px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.08)
+}
+body.v5 .detail-tabs{border-radius:15px;padding:7px;background:rgba(255,255,255,.82);backdrop-filter:blur(18px)}
+body.v5 .detail-kpis{gap:8px}
+body.v5 .detail-kpi{border-radius:15px;min-height:76px;background:linear-gradient(145deg,rgba(255,255,255,.93),rgba(242,249,254,.76));box-shadow:0 12px 26px rgba(20,58,95,.06)}
+body.v5 .intel-strip{gap:8px}
+body.v5 .intel-metric{border-radius:13px;background:linear-gradient(145deg,rgba(255,255,255,.90),rgba(240,248,254,.75))}
+body.v5 .detail-grid{gap:10px}
+body.v5 .detail-panel{border-radius:17px}
+body.v5 .detail-lia-card{border-radius:17px;background:
+  linear-gradient(145deg,rgba(247,252,255,.92),rgba(225,242,252,.80)),
+  radial-gradient(circle at 90% 10%,rgba(85,190,232,.14),transparent 30%);
+  box-shadow:0 16px 38px rgba(17,59,99,.08)
+}
+body.v5 .lia-fab{right:22px;bottom:22px;border-radius:999px;padding:12px 16px;background:linear-gradient(145deg,#2d8bd8,#4bb9df);box-shadow:0 18px 42px rgba(38,114,177,.28)}
+body.v5 .assistant-drawer{border-radius:24px;border-color:rgba(167,205,232,.50);box-shadow:0 34px 95px rgba(7,35,69,.28)}
+body.v5 .assistant-drawer>header{background:linear-gradient(145deg,#eff8fe,#dff1fb)}
+body.v5 .form-modal{border-radius:24px}
+body.v5[data-active-view="media"] .workspace{background:radial-gradient(circle at 80% 20%,rgba(56,175,225,.10),transparent 28%)}
+body.v5[data-active-view="scenario"] .workspace{background:radial-gradient(circle at 75% 22%,rgba(86,156,228,.10),transparent 28%)}
+body.v5[data-active-view="sponsor-detail"] .workspace{background:radial-gradient(circle at 70% 14%,rgba(80,171,228,.11),transparent 24%)}
+@media(max-width:1180px){
+  body.v5 .hero-content h1{font-size:39px}
+  body.v5 .macro-visual{height:235px}
+  body.v5 .sponsor-card{min-height:310px}
+}
+@media(max-width:820px){
+  body.v5 .sidebar{width:246px}
+  body.v5 .workspace{margin-left:0}
+  body.v5 .topbar{height:66px;padding:9px 12px}
+  body.v5 .view{padding:14px 12px 46px}
+  body.v5 .hero-visual{min-height:460px;border-radius:22px}
+  body.v5 .hero-content{width:100%;padding:58px 24px}
+  body.v5 .hero-content h1{font-size:31px}
+  body.v5 .hero-content p{font-size:10px}
+  body.v5 .macro-visual{height:215px}
+  body.v5 .page-heading{min-height:138px;padding:16px}
+  body.v5 .page-heading h1{font-size:27px}
+  body.v5 .sponsor-card{padding-top:82px}
+  body.v5 .sponsor-hero{min-height:365px}
+  body.v5 .sponsor-hero-content{padding:34px 20px}
+}
+@media(max-width:520px){
+  body.v5 .hero-content h1{font-size:28px}
+  body.v5 .kpi-strip{gap:7px}
+  body.v5 .macro-visual{height:205px}
+  body.v5 .sponsor-card{min-height:300px}
+}
