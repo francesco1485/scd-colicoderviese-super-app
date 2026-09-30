@@ -109,6 +109,14 @@ function doPost(e) {
         if (typeof r25ScanDrive_ !== 'function') throw new Error('Modulo R25 Data Fabric non installato');
         data = r25ScanDrive_(token, payload);
         break;
+      case 'direction.drive.folder.create':
+        if (typeof r42CreateDriveFolder_ !== 'function') throw new Error('Modulo R42 Lia non installato');
+        data = r42CreateDriveFolder_(token, payload);
+        break;
+      case 'direction.commercial.mapping.save':
+        if (typeof r42SaveCommercialMapping_ !== 'function') throw new Error('Modulo R42 Lia non installato');
+        data = r42SaveCommercialMapping_(token, payload);
+        break;
       case 'direction.access.set':
         data = setActorAccess(token, payload);
         break;
