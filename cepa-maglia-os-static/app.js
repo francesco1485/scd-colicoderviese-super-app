@@ -265,6 +265,25 @@ const brandIdentity={
   AGLEA:{label:'Aglea Salus',accent:'#2C7A62',accent2:'#69A95A',surface:'#F2F8F5'},
   CIP:{label:'CIP Energia',accent:'#E88A21',accent2:'#F3B35A',surface:'#FFF7EC'}
 }
+const MAGLIA_MEDIA={
+  officeTeam:'https://images.pexels.com/photos/3182778/pexels-photo-3182778.jpeg?auto=compress&cs=tinysrgb&w=1200',
+  cepaTraining:'https://images.pexels.com/photos/7993954/pexels-photo-7993954.jpeg?auto=compress&cs=tinysrgb&w=1200',
+  colico:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Colico_Panorama.jpg/1280px-Colico_Panorama.jpg',
+  mandello:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Mandello_del_Lario_panorama.jpg?width=1600'
+}
+function mediaForOffice(office){
+  const code=String(office?.code||'').toUpperCase()
+  const city=String(office?.city||'').toLowerCase()
+  return code.includes('MANDELLO')||city.includes('mandello')?MAGLIA_MEDIA.mandello:MAGLIA_MEDIA.colico
+}
+function officeSmartFocus({period,renewals,quotes,proposals,cases,lost}){
+  if(!period)return{tone:'info',title:'Completa il quadro dati',text:'Carica lo snapshot mensile AssiEasy: la piattaforma potrà costruire confronti, trend e priorità attendibili.',action:'Dati mensili'}
+  if(renewals>0&&renewals>=Math.max(quotes,proposals))return{tone:'warning',title:'Presidia i rinnovi',text:renewals+' rinnovi richiedono attenzione. Conviene lavorarli prima di ampliare il nuovo flusso commerciale.',action:'Rinnovi'}
+  if(quotes>0&&proposals===0)return{tone:'opportunity',title:'Trasforma preventivi in proposte',text:'Ci sono '+quotes+' preventivi da lavorare e nessuna proposta registrata nello snapshot corrente.',action:'Preventivi'}
+  if(lost>0)return{tone:'review',title:'Analizza le pratiche perse',text:lost+' pratiche risultano perse nel mese. Verifica motivo, recuperabilità e possibili azioni di retention.',action:'Analisi'}
+  if(cases>0)return{tone:'info',title:'Riduci il lavoro aperto',text:'Ci sono '+cases+' pratiche aperte nella sede. Concentrati sulle scadenze e sulle attività ad alto impatto.',action:'Pratiche'}
+  return{tone:'positive',title:'Quadro operativo sotto controllo',text:'Non emergono criticità forti dai dati disponibili. Usa il tempo liberato per sviluppo commerciale e cross selling.',action:'Sviluppo'}
+}
 function getBrand(node){
   if(!node)return null
   const fallback=brandIdentity[node.code]||{}
@@ -633,7 +652,7 @@ function renderHome(){
   cards.push(
     '<button type="button" class="environment-card agency-card" data-home-action="agency">'+
       '<div class="environment-card-head"><span class="environment-icon">▦</span><div><small>AGENZIA</small><h3>Uffici Maglia 360</h3><p>Il mondo operativo dell’agenzia.</p></div></div>'+
-      '<img class="environment-visual" src="./assets/office-team.svg" alt="Ambiente di lavoro Maglia 360">'+
+      '<img class="environment-visual" src="'+MAGLIA_MEDIA.officeTeam+'" alt="Ambiente di lavoro Maglia 360">'+
       '<div class="environment-stats">'+
         '<div><strong>'+offices.length+'</strong><span>Sedi attive</span></div>'+
         '<div><strong>'+allOpen.length+'</strong><span>Pratiche aperte</span></div>'+
@@ -650,7 +669,7 @@ function renderHome(){
     const policies=snaps.reduce((n,x)=>n+Number(x.active_policies||0),0)
     const quotes=snaps.reduce((n,x)=>n+Number(x.quotes_to_do||0),0)
     const cases=officeOpenCases(h.id)
-    const img=h.code==='MANDELLO'?'./assets/office-mandello.svg':'./assets/office-colico.svg'
+    const img=mediaForOffice(h)
     cards.push(
       '<button type="button" class="environment-card office-env-card" data-office-id="'+h.id+'">'+
         '<div class="environment-card-head"><span class="environment-icon pin">⌖</span><div><small>UFFICIO OPERATIVO</small><h3>Ufficio '+esc(h.city)+'</h3><p>'+esc(h.address||'Operatività territoriale')+'</p></div><b class="status-chip">Operativo</b></div>'+
@@ -672,7 +691,7 @@ function renderHome(){
     cards.push(
       '<button type="button" id="cepaWorldCard" class="environment-card cepa-env-card" data-home-action="cepa">'+
         '<div class="environment-card-head"><span class="environment-icon cepa">⌂</span><div><small>PROGETTO TERRITORIALE</small><h3>Progetto C.E.P.A.</h3><p>Centro Educazione Previdenziale e Assicurativa.</p></div><b class="status-chip cepa">In sviluppo</b></div>'+
-        '<img class="environment-visual" src="./assets/cepa-training.svg" alt="Formazione e confronto C.E.P.A.">'+
+        '<img class="environment-visual" src="'+MAGLIA_MEDIA.cepaTraining+'" alt="Formazione e confronto C.E.P.A.">'+
         '<div class="environment-stats">'+
           '<div><strong>'+cepaOpen+'</strong><span>Attività aperte</span></div>'+
           '<div><strong>'+mapped+'</strong><span>Soggetti mappati</span></div>'+
@@ -751,6 +770,7 @@ function renderCepaHub(){
     const next=open.filter(x=>x.scheduled_at).sort((a,b)=>new Date(a.scheduled_at)-new Date(b.scheduled_at))[0]
     const entities=marketEntities.filter(x=>x.hub_id===h.id)
     return '<button class="cepa-territory-card" type="button" data-cepa-hub="'+h.id+'">'+
+      '<div class="cepa-territory-photo" style="background-image:linear-gradient(180deg,rgba(10,45,66,.04),rgba(10,45,66,.46)),url(&quot;'+esc(mediaForOffice(h))+'&quot;)"></div>'+
       '<div class="cepa-territory-top"><span>C.E.P.A. · TERRITORIO</span><b>'+esc(h.city)+'</b></div>'+
       '<div class="cepa-territory-kpis"><div><strong>'+open.length+'</strong><small>attività aperte</small></div><div><strong>'+entities.length+'</strong><small>soggetti mappati</small></div></div>'+
       '<p>'+(next?'Prossimo: '+esc(next.title)+(next.scheduled_at?' · '+esc(fmtDateTime(next.scheduled_at)):''):'Programmazione territoriale da sviluppare')+'</p>'+
@@ -835,8 +855,10 @@ function renderCepaTerritory(){
   const publicBodies=entities.filter(x=>/public|ente|comune|municip/i.test(classify(x)))
 
   $('cepaTerritoryIdentity').innerHTML=
-    '<div><span>C.E.P.A. · PRESIDIO TERRITORIALE</span><h2>'+esc(hub.city)+'</h2><p>'+esc(hub.address||'')+'</p></div>'+
-    '<div class="cepa-territory-badge"><strong>Maglia 360</strong><span>Centro CEPA → territorio</span></div>'
+    '<div class="cepa-territory-hero-photo" style="background-image:linear-gradient(90deg,rgba(7,40,58,.82),rgba(7,40,58,.24)),url(&quot;'+esc(mediaForOffice(hub))+'&quot;)">'+
+      '<div><span>C.E.P.A. · PRESIDIO TERRITORIALE</span><h2>'+esc(hub.city)+'</h2><p>'+esc(hub.address||'')+'</p></div>'+
+      '<div class="cepa-territory-badge"><strong>Maglia 360</strong><span>Centro CEPA → territorio</span></div>'+
+    '</div>'
 
   $('cepaTerritorySummary').innerHTML=
     '<div><span>Attività aperte</span><strong>'+open.length+'</strong><small>programma locale</small></div>'+
@@ -894,7 +916,13 @@ function renderOffice(){
   const renewals=monthSnaps.reduce((n,x)=>n+Number(x.renewals_due||0),0)
   const cases=officeOpenCases(office.id)
 
-  $('officeIdentity').innerHTML='<div><span>SEDE OPERATIVA · LC</span><h2>'+esc(office.city)+'</h2><p>'+esc(office.address||'')+'</p></div><div class="office-period"><span>Ultimo aggiornamento dati</span><strong>'+esc(fmtMonth(period))+'</strong></div>'
+  const officePhoto=mediaForOffice(office)
+  $('officeIdentity').innerHTML=
+    '<div class="office-identity-photo" style="background-image:linear-gradient(90deg,rgba(7,38,58,.88) 0%,rgba(7,38,58,.56) 52%,rgba(7,38,58,.16) 100%),url(&quot;'+esc(officePhoto)+'&quot;)">'+
+      '<div class="office-identity-copy"><span>SEDE OPERATIVA · LAGO DI COMO</span><h2>Ufficio '+esc(office.city)+'</h2><p>'+esc(office.address||'Presidio territoriale Maglia 360')+'</p>'+
+      '<div class="office-hero-chips"><b>'+activePolicies+' polizze attive</b><b>'+renewals+' rinnovi</b><b>'+cases.length+' pratiche aperte</b></div></div>'+
+      '<div class="office-period"><span>Ultimo aggiornamento dati</span><strong>'+esc(fmtMonth(period))+'</strong></div>'+
+    '</div>'
   const localMessage=officeMessagesFor(office.id)[0]
   const box=$('officeDirectionMessage')
   if(localMessage){
@@ -909,11 +937,29 @@ function renderOffice(){
     '<div><span>Rinnovi</span><strong>'+renewals+'</strong><small>in scadenza</small></div>'+
     '<div><span>Pratiche aperte</span><strong>'+cases.length+'</strong><small>lavoro corrente</small></div>'
 
+  const monthQuotes=monthSnaps.reduce((n,x)=>n+Number(x.quotes_to_do||0),0)
+  const monthLost=monthSnaps.reduce((n,x)=>n+Number(x.lost_count||0),0)
+  const partnerNodes=ecosystem.filter(x=>['HDI','PRIMA_ENEA','SLP','AGLEA','CIP'].includes(x.code)).slice(0,5)
+  $('officePartnerStrip').innerHTML='<div class="office-partner-title"><span>ECOSISTEMA</span><strong>Compagnie e partner</strong></div>'+
+    partnerNodes.map(n=>{const b=getBrand(n);return '<button type="button" data-office-partner="'+n.id+'" style="--partner-accent:'+esc(b?.accent||'#2b7a6b')+'"><span>'+esc(n.code.replace('_ENEA',''))+'</span><strong>'+esc(n.name)+'</strong><small>'+esc(n.capability||'Partner')+'</small></button>'}).join('')
+  document.querySelectorAll('[data-office-partner]').forEach(b=>b.onclick=()=>openPartner(b.dataset.officePartner))
+
+  const focus=officeSmartFocus({period,renewals,quotes:monthQuotes,proposals,cases:cases.length,lost:monthLost})
+  $('officeSmartHint').className='office-smart-hint '+focus.tone
+  $('officeSmartHint').innerHTML='<div class="smart-orb">L</div><div><span>LIA · FOCUS OPERATIVO</span><strong>'+esc(focus.title)+'</strong><p>'+esc(focus.text)+'</p></div><button type="button" id="officeSmartAction">'+esc(focus.action)+' →</button>'
+  $('officeTodayCards').innerHTML=[
+    ['Preventivi da fare',monthQuotes,'quote'],
+    ['Rinnovi in scadenza',renewals,'renewal'],
+    ['Polizze attive',activePolicies,'active'],
+    ['Pratiche in lavorazione',cases.length,'practice'],
+    ['Pratiche perse',monthLost,'lost'],
+    ['Proposte del mese',proposals,'proposal']
+  ].map(([label,value,tone])=>'<div class="today-card '+tone+'"><span>'+esc(label)+'</span><strong>'+Number(value||0)+'</strong><i></i></div>').join('')
+  $('officeSmartAction').onclick=()=>{ if(focus.action==='Dati mensili')openMonthlyDataEditor(); else document.querySelector('.office-products-section')?.scrollIntoView({behavior:'smooth',block:'start'}) }
+
   const officeSeries=monthlySeries(office.id)
   $('officeTrendChart').innerHTML=trendSvg(officeSeries,'premium')
   $('officeTrendLabel').textContent=officeSeries.length?officeSeries.length+' mesi disponibili':'Nessuno storico disponibile'
-  const monthQuotes=monthSnaps.reduce((n,x)=>n+Number(x.quotes_to_do||0),0)
-  const monthLost=monthSnaps.reduce((n,x)=>n+Number(x.lost_count||0),0)
   $('officeWorkloadVisual').innerHTML=workloadVisual([
     {label:'Rinnovi da lavorare',value:renewals},
     {label:'Proposte mese',value:proposals},
@@ -982,7 +1028,8 @@ function renderOfficeProduct(){
   const {node,brand}=brandForProduct(product)
   const accent=brand?.accent||'#0b6f5c'
 
-  $('productOfficeIdentity').innerHTML='<div class="product-company-band" style="--product-accent:'+esc(accent)+'"><div class="brand-wordmark large">'+esc(node?.code||'MAGLIA')+'</div><div><span>'+esc(node?.name||'MAGLIA 360')+'</span><h2>'+esc(product.name)+'</h2><p>Ufficio '+esc(office.city)+' · '+esc(String(product.category||'').replaceAll('_',' '))+'</p>'+(brand?.officialSite?'<a class="official-brand-link" href="'+esc(brand.officialSite)+'" target="_blank" rel="noopener">Sito ufficiale ↗</a>':'')+'</div></div><div class="office-period"><span>Snapshot</span><strong>'+esc(fmtMonth(snap?.period_month||null))+'</strong></div>'
+  const productOfficePhoto=mediaForOffice(office)
+  $('productOfficeIdentity').innerHTML='<div class="product-company-band" style="--product-accent:'+esc(accent)+';--office-photo:url(&quot;'+esc(productOfficePhoto)+'&quot;)"><div class="brand-wordmark large">'+esc(node?.code||'MAGLIA')+'</div><div><span>'+esc(node?.name||'MAGLIA 360')+'</span><h2>'+esc(product.name)+'</h2><p>Ufficio '+esc(office.city)+' · '+esc(String(product.category||'').replaceAll('_',' '))+'</p>'+(brand?.officialSite?'<a class="official-brand-link" href="'+esc(brand.officialSite)+'" target="_blank" rel="noopener">Sito ufficiale ↗</a>':'')+'</div></div><div class="office-period"><span>Snapshot</span><strong>'+esc(fmtMonth(snap?.period_month||null))+'</strong></div>'
   $('productOfficeMetrics').innerHTML=
     '<div><span>Premi</span><strong>'+esc(snap?.premium_total!=null?fmtMoney(snap.premium_total):'—')+'</strong></div>'+
     '<div><span>Attive</span><strong>'+Number(snap?.active_policies||0)+'</strong></div>'+
@@ -1048,6 +1095,8 @@ if($('openAllNewsBtn'))$('openAllNewsBtn').onclick=()=>navigate('actions')
 
 $('productOfficeBack').onclick=()=>openOffice(currentOfficeId)
 $('openCepaCentralBtn').onclick=openCepaCentral
+if($('cepaHeroCentralBtn'))$('cepaHeroCentralBtn').onclick=openCepaCentral
+if($('cepaHeroTerritoriesBtn'))$('cepaHeroTerritoriesBtn').onclick=()=>document.querySelector('.cepa-structure-grid')?.scrollIntoView({behavior:'smooth',block:'start'})
 $('cepaTerritoryBack').onclick=openCepaHub
 $('cepaTerritoryNewActivityBtn').onclick=()=>{if(currentCepaHubId){currentOfficeId=currentCepaHubId;openCepaActivityEditor()}}
 $('officeCepaOpenBtn').onclick=()=>{if(currentOfficeId)openCepaTerritory(currentOfficeId)}
