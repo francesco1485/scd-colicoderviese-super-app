@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 440" role="img" aria-label="Paesaggio del Lario per Ufficio Mandello">
+<defs><linearGradient id="sky2" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#d8ecf5"/><stop offset="1" stop-color="#f5fbf8"/></linearGradient><linearGradient id="lake2" x1="0" x2="1"><stop stop-color="#3d8ca4"/><stop offset="1" stop-color="#5aa98f"/></linearGradient></defs>
+<rect width="900" height="440" fill="url(#sky2)"/><path d="M0 220l120-126 72 86 90-134 101 154 104-95 87 87 115-118 211 146z" fill="#809fac"/><path d="M0 238l135-88 82 75 90-96 100 104 100-74 107 68 115-87 171 98z" fill="#617f89"/>
+<rect y="232" width="900" height="208" fill="url(#lake2)"/><path d="M90 262l120-48 105 37 124-31 111 44 122-29 142 35v170H90z" fill="#6a8c72" opacity=".76"/>
+<g fill="#f1eadb"><rect x="192" y="223" width="58" height="48"/><rect x="258" y="211" width="76" height="59"/><rect x="346" y="225" width="62" height="45"/></g>
+<g fill="#a75a47"><path d="M187 223l34-23 34 23z"/><path d="M252 211l44-27 44 27z"/><path d="M340 225l37-21 37 21z"/></g>
+<rect x="292" y="122" width="24" height="89" fill="#eee7d8"/><polygon points="288,122 320,122 304,82" fill="#545c5d"/><circle cx="304" cy="148" r="8" fill="#48666e"/>
+<path d="M0 310q160 25 320 0t310 0 270 5" fill="none" stroke="#d8f2f1" stroke-width="3" opacity=".65"/>
+</svg>
