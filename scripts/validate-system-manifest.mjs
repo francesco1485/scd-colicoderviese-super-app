@@ -130,7 +130,10 @@ assert(m.completeness_engine.confidence_required===true,'Completeness Engine con
 assert(m.product_direction?.default_entry_route==='#/pulse','R26 default entry route must be #/pulse');
 assert(m.product_direction?.experience_model==='ADAPTIVE_CLUB_OS','R38 experience model must be adaptive club OS');
 assert(m.product_direction?.visual_principle==='SPATIAL_SPORT_EDITORIAL_HIGH_IMPACT','R38 visual principle mismatch');
-assert(m.product_direction?.cumulative_integration_rule===true,'R38 cumulative integration rule missing');
+assert(m.product_direction?.cumulative_integration_rule===true,'cumulative integration rule missing');
+assert(m.product_direction?.human_centered_os?.mental_state_inference===false,'mental state inference must remain false');
+assert(m.product_direction?.human_centered_os?.dark_patterns===false,'dark patterns must remain false');
+assert(m.development_contract?.human_centered_rules?.pleasant_work_is_product_requirement===true,'pleasant work requirement missing');
 assert(m.manifest.change_policy?.cumulative_directives===true,'cumulative directive governance missing');
 includesAll(m.completeness_engine.search_order||[],['DOMAIN_CORE','SCD_DRIVE','SCD_GMAIL_ATTACHMENTS'],'Completeness search order');
 
@@ -214,7 +217,7 @@ includesAll(caps.map(x=>x.id),[
   'CAP-HOME','CAP-CALENDAR','CAP-ATHLETE','CAP-FAMILY','CAP-STAFF','CAP-COMMS','CAP-RUNTIME-EVIDENCE','CAP-UPSTREAM-RESILIENCE','CAP-R20-RUNTIME-ACTIVATION',
   'CAP-DRIVE-CATALOG','CAP-GMAIL-INGESTION','CAP-DATAFABRIC-OBSERVABILITY','CAP-ENTITY-GRAPH','CAP-COMPLETENESS','CAP-SUPABASE-CORE','CAP-SUPABASE-AUTH-CONTEXT',
   'CAP-CHAT','CAP-CONFIDENCE','CAP-ANCONFIDENCE','CAP-SAFEGUARDING','CAP-SKY','CAP-AVATAR',
-  'CAP-TAMAGOTCHI','CAP-GEO','CAP-R22','CAP-PWA','CAP-ANDROID','CAP-IOS','CAP-MOBILE-SUPABASE-SHELL','CAP-SCD-UNIVERSE','CAP-META-ADAPTIVE','CAP-SCD-TWIN','CAP-SCD-MIRROR','CAP-SOCIAL-RADAR'
+  'CAP-TAMAGOTCHI','CAP-GEO','CAP-R22','CAP-PWA','CAP-ANDROID','CAP-IOS','CAP-MOBILE-SUPABASE-SHELL','CAP-SCD-UNIVERSE','CAP-META-ADAPTIVE','CAP-SCD-TWIN','CAP-SCD-MIRROR','CAP-SOCIAL-RADAR','CAP-HUMAN-OS','CAP-PRIVATE-DESK','CAP-COGNITIVE-ERGONOMICS','CAP-GROWTH-LOOP'
 ],'capability map');
 
 const gaps=m.known_noncompliance||[];
@@ -241,6 +244,11 @@ const requiredRepoFiles=[
   'docs/adr/ADR-0009-mobile-supabase-shell.md',
   'docs/adr/ADR-0010-r38-scd-universe.md',
   'docs/SCD_UNIVERSE_R38.md',
+  'docs/SCD_HUMAN_OS_R39.md',
+  'docs/adr/ADR-0011-human-centered-cognitive-os.md',
+  'ui-r39-human.css',
+  'scd-experience-engine.js',
+  'scripts/validate-human-os-contract.mjs',
   'ui-r38-universe.css',
   'scd-meta-engine.js',
   'scd-twin.js',
@@ -277,6 +285,7 @@ assert(pkg?.scripts?.['verify:r20']==='node scripts/verify-r20-direct.mjs','pack
 assert(pkg?.scripts?.['test:supabase-contract']==='node scripts/validate-supabase-contract.mjs','package.json must expose test:supabase-contract');
 assert(pkg?.scripts?.['test:mobile-contract']==='node scripts/validate-mobile-contract.mjs','package.json must expose test:mobile-contract');
 assert(pkg?.scripts?.['test:universe-contract']==='node scripts/validate-universe-contract.mjs','package.json must expose test:universe-contract');
+assert(pkg?.scripts?.['test:human-os-contract']==='node scripts/validate-human-os-contract.mjs','package.json must expose test:human-os-contract');
 
 for(const workflow of ['.github/workflows/e2e.yml','.github/workflows/pages.yml','.github/workflows/command-platform.yml','.github/workflows/system-manifest.yml']){
   const file=path.join(root,workflow);
