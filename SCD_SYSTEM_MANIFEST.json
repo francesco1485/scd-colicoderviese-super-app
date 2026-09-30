@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.4.0",
+    "version": "3.5.0",
     "effective_at": "2026-09-30",
     "status": "BINDING",
     "language": "it-IT",
@@ -239,6 +239,10 @@
       {
         "id": "COMMERCIAL_OS",
         "route": "/app/commercial"
+      },
+      {
+        "id": "LIA",
+        "route": "/app/lia"
       }
     ],
     "navigation": {
@@ -2157,6 +2161,69 @@
         "NO_PARALLEL_DATABASE",
         "FREE_STACK_ONLY"
       ]
+    },
+    {
+      "id": "CAP-LIA-OPERATOR",
+      "domain": "ASSISTANT_ORCHESTRATION",
+      "required": true,
+      "state": "PARTIAL",
+      "screen": "LIA",
+      "audience": [
+        "USER_BASE",
+        "FAMILY",
+        "ATHLETE",
+        "MISTER",
+        "STAFF",
+        "MANAGER",
+        "SECRETARIAT",
+        "REGISTRATION",
+        "TOURNAMENTS",
+        "DIRECTION",
+        "ADMIN"
+      ],
+      "sources": [
+        "R20",
+        "SCD_DRIVE",
+        "SCD_GMAIL",
+        "SPONSOR_MASTER_SHEET",
+        "CORE_SHEET",
+        "SCD_SUPABASE",
+        "WEB_VERIFIED"
+      ],
+      "contract": "ROLE_SCOPED_COMMAND_PLAN_EXECUTE_AUDIT_APPROVAL_HANDOFF",
+      "runtime": "R22_COMMAND_PLATFORM",
+      "rules": [
+        "NO_BROWSER_ROLE_ESCALATION",
+        "SERVER_SIDE_AUTHORIZATION_REQUIRED",
+        "DIRECTION_ADMIN_CAN_EXECUTE_AUTHORIZED_OPERATIONAL_COMMANDS",
+        "OTHER_ROLES_ONLY_WITHIN_ASSIGNED_ROLE_AND_SCOPE",
+        "HIGH_RISK_IRREVERSIBLE_ACTIONS_REQUIRE_EXPLICIT_APPROVAL",
+        "SAFEGUARDING_NEVER_ENTERS_LIA_ORDINARY_PIPELINE",
+        "NO_PRIVATE_PERSON_SCRAPING",
+        "PUBLIC_PROFESSIONAL_CONTACTS_ONLY_FOR_COMMERCIAL_MAPPING",
+        "REMOTE_CHATGPT_SUPPORT_USES_STRUCTURED_HANDOFF_UNTIL_AUTHORIZED_FREE_CHANNEL_EXISTS"
+      ]
+    },
+    {
+      "id": "CAP-LIA-TERRITORY-MAPPING",
+      "domain": "COMMERCIAL_INTELLIGENCE",
+      "required": true,
+      "state": "PARTIAL",
+      "screen": "LIA",
+      "audience": [
+        "STAFF",
+        "MANAGER",
+        "SECRETARIAT",
+        "TOURNAMENTS",
+        "DIRECTION",
+        "ADMIN"
+      ],
+      "sources": [
+        "WEB_VERIFIED",
+        "SCD_DRIVE"
+      ],
+      "contract": "OPEN_DATA_MAPPING_PARTIAL_COVERAGE_PROVENANCE_NO_INTEREST_INFERENCE",
+      "write_gate": "DIRECTION_OR_ADMIN_ONLY"
     }
   ],
   "known_noncompliance": [
