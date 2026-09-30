@@ -1,6 +1,6 @@
 (() => {
   const R24={
-    version:'38.0.0',
+    version:'39.0.0',
     routes:['pulse','home','calendar','communications','services','profile','athlete','family','staff'],
     current:'pulse',
     route(){
@@ -75,6 +75,7 @@
       window.scrollTo({top:0,behavior:'auto'});
       this.syncNav();
       this.updateHeader();
+      try{window.SCDExperience?.bind(outlet,this.roleMode())}catch{}
       try{track('page_view',{section:'r24_'+name})}catch{}
     },
     updateHeader(){
@@ -180,6 +181,7 @@
           '</div>'+
         '</section>'+
         '<section class="r38-sponsor-rail"><strong>PARTNER SCD</strong><div class="r38-sponsor-window"><div class="r38-sponsor-track">'+sponsorLoop+'</div></div></section>'+
+        '<section class="r39-experience-bar" aria-label="Modalità esperienza"><div class="r39-experience-copy"><span>◎</span><div><b>Come vuoi vivere SCD adesso?</b><small>Scopri = completa · Rapida = essenziale · Focus = solo ciò che serve.</small></div></div><div class="r39-mode-switch"><button type="button" data-experience-mode="DISCOVER">SCOPRI</button><button type="button" data-experience-mode="QUICK">RAPIDA</button><button type="button" data-experience-mode="FOCUS">FOCUS</button></div></section>'+
         '<section class="r38-live"><div class="r38-live-copy"><span class="r38-live-pulse"></span><div><b>SCD LIVE</b><small>'+esc(todayRows.length?todayRows.length+' attività registrate oggi':'Fonti ufficiali in sincronizzazione')+'</small></div></div><strong>'+esc(todayRows.length)+'</strong><button type="button" id="r38Sync">↻ SINCRONIZZA</button></section>'+
         '<section class="r38-orbits">'+
           '<button class="r38-orbit" data-r24-route="calendar" data-meta-key="match" data-twin-evolve="1"><i>⚽</i><b>Matchday</b><small>Gare & live</small></button>'+
@@ -219,6 +221,7 @@
         '<section class="r38-section"><div class="r38-section-head"><div><small>SCD RADAR · FONTI VERIFICATE</small><h2>Momenti, notizie, territorio.</h2></div><button type="button" data-r24-route="communications">Tutto il feed ›</button></div><div class="r38-moments">'+moments+'</div></section>'+
 
         '<section class="r38-section"><div class="r38-section-head"><div><small>PARTNER · TERRITORIO</small><h2>Chi cresce con noi.</h2></div><button type="button" data-r24-action="sponsor" data-meta-key="sponsors">Diventa partner ›</button></div><div class="r38-partners">'+sponsorSpot+'</div></section>'+
+        '<section class="r39-growth-loop"><article class="r39-growth-card dark"><small>IL CICLO CHE FINANZIA IL CLUB</small><h3>Più valore → più partecipazione → più opportunità.</h3><p>L’obiettivo non è trattenerti senza motivo. È diventare abbastanza utile e piacevole da farti tornare: sport, servizi, eventi e community aumentano il valore reale per famiglie, partner e territorio.</p><button type="button" data-r24-action="idea" data-meta-key="community">PROPONI UN’IDEA</button></article><article class="r39-growth-card"><small>PARTNER VALUE</small><h3>Visibilità che deve produrre risultati.</h3><p>Sponsor, eventi, card, shop e iniziative vengono progettati per generare metriche verificabili, non loghi messi in fondo a una pagina dimenticata.</p><button type="button" data-r24-action="sponsor" data-meta-key="sponsors">SCOPRI LE PARTNERSHIP</button></article></section>'+
       '</div>';
 
       outlet.querySelectorAll('[data-r26-event]').forEach(b=>b.onclick=()=>openCalendarEvent(b.dataset.r26Event));
@@ -397,7 +400,15 @@
       if(!state.sessionToken&&!storedSession().token)return this.privateGate(outlet,'Area Staff / Direzione','Gestione operativa della società secondo ruolo e scope.');
       const personal=d.personal||[],conv=d.convocations||[],requests=(d.direction&&d.direction.requests)||[],transport=(d.transport&&d.transport.kpis)||{};
       const role=managementRole(d),dir=!!p.direction,staff=!!u.staff||dir;
+      const focusPrimary=requests.length
+        ?'<button class="r39-focus-item urgent" id="r39DeskRequests"><span>DA GESTIRE</span><b>'+esc(requests.length)+' richieste aperte</b><small>Apri solo ciò che richiede attenzione.</small></button>'
+        :'<button class="r39-focus-item" id="r39DeskMessages"><span>STATO</span><b>Nessuna richiesta aperta</b><small>Puoi passare a comunicazioni o programmazione.</small></button>';
+      const focusSport=conv.length
+        ?'<button class="r39-focus-item action" id="r39DeskConvocations"><span>SPORT</span><b>'+esc(conv.length)+' convocazioni</b><small>Controlla e gestisci il flusso squadra.</small></button>'
+        :'<button class="r39-focus-item action" data-r24-route="calendar"><span>SPORT</span><b>Calendario societario</b><small>Vai direttamente agli impegni.</small></button>';
+      const focusTransport='<button class="r39-focus-item" id="r39DeskTransport"><span>LOGISTICA</span><b>'+esc(transport.requests||0)+' richieste pulmino</b><small>Trasporti senza cercare tra cartelle e fogli.</small></button>';
       outlet.innerHTML=this.shellHeader(dir?'Direzione ColicoDerviese':'Area Staff','Squadre, persone, attività, documenti e operatività societaria.','STAFF · DIREZIONE')+
+      '<section class="r39-private-desk"><div class="r39-desk-top"><div><small>PRIVATE DESK · '+esc(role)+'</small><h2>Il lavoro che conta, davanti.</h2><p>Questa area mostra priorità e strumenti consentiti dal tuo ruolo. Gli archivi restano dietro al sistema: qui devi lavorare, non cercare file.</p></div><span class="r39-private-badge">RISERVATO · ROLE/SCOPE</span></div><div class="r39-focus-queue">'+focusPrimary+focusSport+focusTransport+'</div><div class="r39-desk-controls"><button type="button" data-experience-mode="FOCUS">FOCUS</button><button type="button" data-experience-mode="QUICK">RAPIDA</button><button type="button" data-experience-mode="DISCOVER">COMPLETA</button><button type="button" data-twin-mirror-open>CHIEDI A MIRROR</button></div></section>'+
       '<section class="r24-staff-ident"><div><small>PROFILO OPERATIVO</small><h2>'+esc(managementName(d))+'</h2><p>'+esc(role)+(u.area?' · '+esc(u.area):'')+'</p></div><span>'+esc(dir?'DIREZIONE':staff?'STAFF':'RISERVATO')+'</span></section>'+
       '<section class="r24-calendar-summary four"><article><strong>'+personal.length+'</strong><span>Profili</span></article><article><strong>'+conv.length+'</strong><span>Convocazioni</span></article><article><strong>'+requests.length+'</strong><span>Richieste</span></article><article><strong>'+esc(transport.requests||0)+'</strong><span>Pulmini</span></article></section>'+
       '<section class="r24-service-grid staff">'+
@@ -410,6 +421,7 @@
       const bind=(id,fn)=>{const el=outlet.querySelector(id);if(el)el.onclick=fn};
       bind('#r24Attendance',openAttendanceManager);bind('#r24Convocations',openConvocationManager);bind('#r24Messages',openMessageManager);
       bind('#r24Requests',openMyRequests);bind('#r24Transport',openTransportManager);bind('#r24Access',openAccessManager);bind('#r24Evolution',openEvolutionManager);bind('#r24Diagnostics',openDiagnosticsManager);bind('#r28DataFabric',openDataFabricManager);
+      bind('#r39DeskRequests',openMyRequests);bind('#r39DeskMessages',openMessageManager);bind('#r39DeskConvocations',openConvocationManager);bind('#r39DeskTransport',openTransportManager);
       bind('#r24StaffSync',async()=>{try{state.privateData=await mgmtApi('dashboard.summary');toast('Area aggiornata');this.render('staff')}catch(e){toast(e.message||'Sincronizzazione non riuscita')}});
       bind('#r24StaffLogout',()=>{clearSession();toast('Sessione chiusa');this.go('profile')});
       this.bindCommon(outlet);
