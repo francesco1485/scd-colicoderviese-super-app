@@ -891,7 +891,7 @@ async function runLiaAutomation(id){
   try{
     const{data,error}=await supabase.functions.invoke('lia-workbench',{body:{organization_id:window.orgId,automation_run_id:id}})
     if(error)throw error
-    if(box){box.textContent=data?.message||'Automazione aggiornata.';box.className='message'+(data?.action==='automation_run_partial'?' warning':'')}
+    if(box){box.textContent=data?.message||'Automazione aggiornata.';box.className='message'+(data?.action==='automation_queued'?' warning':'')}
     await loadAll()
   }catch(error){
     if(box){box.textContent='Automazione non completata: '+(error?.message||String(error));box.className='message error'}
@@ -946,8 +946,8 @@ function renderLiaWorkbench(){
   $('liaAutomationList').innerHTML=liaAutomationRuns.map(r=>{
     const w=r.distribution_research_watchlists||{}
     const city=w.market_hubs?.city||'Territorio'
-    const canRun=isManager()&&['queued','failed','partial'].includes(r.status)
-    const button=canRun?'<button type="button" class="small-btn" data-lia-automation="'+r.id+'">Esegui</button>':''
+    const canRun=isManager()&&['failed','partial'].includes(r.status)
+    const button=canRun?'<button type="button" class="small-btn" data-lia-automation="'+r.id+'">Rimetti in coda</button>':(r.status==='queued'?'<span class="automation-waiting">in attesa worker</span>':'')
     return '<div class="lia-automation-row"><div><strong>'+esc(w.name||'Automazione Radar')+'</strong><small>'+esc(city)+' · '+esc(w.cadence||'')+' · '+esc(fmtDateTime(r.scheduled_for))+'</small><p>'+esc(r.result_summary||'In attesa del motore di ricerca.')+'</p></div><div><span class="lia-order-status '+esc(r.status)+'">'+esc(r.status)+'</span>'+button+'</div></div>'
   }).join('')||empty('Nessuna automazione Radar')
   document.querySelectorAll('[data-lia-automation]').forEach(b=>b.onclick=()=>runLiaAutomation(b.dataset.liaAutomation))
