@@ -402,11 +402,46 @@ function renderHome(){
       cepa:cepaReady+'/'+cepaReadiness.length
     },
     cepa:{steps:['Centro CEPA','Sportelli SAP','Mandello','Lecco','Italia']},
-    actions:open.slice(0,5).map(a=>({
+    actions:open.slice(0,6).map(a=>({
       id:a.id,title:a.title,
       detail:(a.ecosystem_nodes?.name||a.market_entities?.name||a.strategic_projects?.title||laneLabel(a.lane))+(a.due_at?' · '+fmtDate(a.due_at):''),
       priority:a.priority
     })),
+    radar:{
+      official:distributionCandidates.filter(x=>x.source_provider==='IVASS RUI').length,
+      pendingReview:distributionCandidates.filter(x=>x.source_provider==='IVASS RUI'&&x.review_status==='pending').length,
+      contactApproved:distributionCandidates.filter(x=>x.contact_policy_status==='approved_for_contact').length,
+      discovered:distributionCandidates.filter(x=>x.stage==='discovered').length
+    },
+    approvals:liaApprovals.filter(x=>x.status==='pending').slice(0,4).map(x=>({
+      id:x.id,
+      title:(liaActionRules.find(r=>r.code===x.action_code)?.title||x.action_code||'Approvazione'),
+      detail:x.request_payload?.display_name||x.request_payload?.purpose||'Decisione amministrativa',
+      status:x.status
+    })),
+    automations:liaAutomationRuns.slice(0,4).map(x=>({
+      id:x.id,
+      title:x.distribution_research_watchlists?.name||'Automazione Radar',
+      detail:(x.distribution_research_watchlists?.market_hubs?.city||'Territorio')+(x.result_summary?' · '+x.result_summary:''),
+      status:x.status
+    })),
+    workOrders:liaOrders.slice(0,4).map(x=>({
+      id:x.id,
+      title:String(x.action_type||'Lavoro Lia').replaceAll('_',' '),
+      detail:x.result_summary||x.prompt||'Ordine operativo registrato',
+      status:x.status
+    })),
+    insights:researchInsights.slice(0,4).map(x=>({
+      id:x.id,title:x.title,
+      detail:(x.research_sources?.name?x.research_sources.name+' · ':'')+(x.application_hypothesis||x.insight_summary||'')
+    })),
+    system:{
+      sources:researchSources.length,
+      insights:researchInsights.length,
+      folders:liaFolders.length,
+      orders:liaOrders.length,
+      automations:liaAutomationRuns.length
+    },
     user:{label:window.userEmail||'Area riservata',role:(window.userRole||'').replaceAll('_',' ')}
   }
 
