@@ -547,7 +547,7 @@
         drawerName.textContent=s.name;
         drawerBody.innerHTML='<div class="r42-drawer-status"><span class="r42-state">'+esc(s.status)+'</span><b>'+esc(s.sector)+'</b></div>'+
           '<nav class="r42-detail-tabs"><button class="active">OVERVIEW</button><button>SPONSORIZZAZIONI</button><button>STORICO</button><button>MATERIALI</button>'+(direction?'<button>ECONOMICO</button>':'')+'</nav>'+
-          '<div class="r42-detail-grid"><div><small>STAGIONI / ANNI</small><b>'+esc(s.years)+'</b></div><div><small>REFERENTE</small><b>DA VERIFICARE / COLLEGARE</b></div><div><small>CONTATTI</small><b>DA RECUPERARE DAL MASTER / GMAIL</b></div><div><small>EVIDENZA</small><b>'+esc(s.evidence)+'</b></div></div>'+
+          '<div class="r42-detail-grid"><div><small>STAGIONI / ANNI</small><b>'+esc(s.years||'DA COMPLETARE')+'</b></div><div><small>REFERENTE</small><b>'+esc(s.contactName||'DA COLLEGARE')+'</b><span>'+esc(s.contactRole||'')+'</span></div><div><small>CONTATTI</small><b>'+esc(s.contactEmail||s.contactPhone||'DA COMPLETARE')+'</b><span>'+esc(s.contactEmail&&s.contactPhone?s.contactPhone:'')+'</span></div><div><small>EVIDENZA</small><b>'+esc(s.evidence||'MASTER SPONSOR')+'</b></div></div>'+
           '<section class="r42-detail-section"><small>COSA SPONSORIZZA / ASSET</small><div class="r42-tags">'+s.assets.map(a=>'<span>'+esc(a)+'</span>').join('')+'</div></section>'+
           '<section class="r42-detail-section"><small>PROSSIMA AZIONE</small><p>'+esc(s.next)+'</p></section>'+
           '<section class="r42-detail-section"><small>MATERIALI BRAND</small><p>Logo ufficiale, documenti, contratto, immagini e materiali LED vengono collegati alla stessa anagrafica sponsor. Se mancanti restano marcati come DA ACQUISIRE.</p></section>'+
@@ -570,14 +570,18 @@
           const anag=Array.isArray(snap.anagrafica)?snap.anagrafica:[];
           const seasons=Array.isArray(snap.seasons)?snap.seasons:[];
           const acts=Array.isArray(snap.activations)?snap.activations:[];
+          const contacts=Array.isArray(snap.contacts)?snap.contacts:[];
           const ledRows=Array.isArray(snap.led)?snap.led:[];
           if(anag.length){
             portfolio=anag.map(a=>{
               const id=String(a.SPONSOR_ID||'');
               const ss=seasons.filter(x=>String(x.SPONSOR_ID||'')===id);
               const aa=acts.filter(x=>String(x.SPONSOR_ID||'')===id);
+              const cc=contacts.filter(x=>String(x.SPONSOR_ID||'')===id);
+              const primary=cc.find(x=>x.REFERENTE_PRINCIPALE===true||String(x.REFERENTE_PRINCIPALE||'').toUpperCase()==='TRUE')||cc[0]||{};
               const years=[...new Set(ss.map(x=>x.STAGIONE).filter(Boolean))];
               const cash=ss.reduce((sum,x)=>sum+(Number(x.IMPORTO_CASH)||0),0);
+              const contactName=[primary.NOME,primary.COGNOME].filter(Boolean).join(' ')||String(primary.RUOLO||'');
               return {
                 id,
                 name:String(a.BRAND_NOME||a.RAGIONE_SOCIALE||id),
@@ -589,7 +593,16 @@
                 assets:[...new Set(aa.map(x=>String(x.TIPO_SPONSORIZZAZIONE||x.TIPO_MANUALE||'')).filter(Boolean))],
                 next:String(a.NOTE||'Completare scheda sponsor'),
                 evidence:String(a.SOURCE_TYPE||'MASTER SPONSOR'),
-                logoStatus:String(a.LOGO_STATUS||'DA ACQUISIRE')
+                logoStatus:String(a.LOGO_STATUS||'DA ACQUISIRE'),
+                contactName:contactName,
+                contactRole:String(primary.RUOLO||''),
+                contactEmail:String(primary.EMAIL||''),
+                contactPhone:String(primary.TELEFONO||''),
+                contacts:cc,
+                seasons:ss,
+                activationRows:aa,
+                driveFolder:String(a.DRIVE_FOLDER||''),
+                logoLink:String(a.LOGO_LINK||'')
               };
             });
             const mount=outlet.querySelector('#r42SponsorCards');
