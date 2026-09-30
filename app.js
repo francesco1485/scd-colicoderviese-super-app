@@ -1036,7 +1036,7 @@ function boot(){
   window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();state.installPrompt=e;if(installBtn)installBtn.hidden=false});
   if(installBtn)installBtn.onclick=async()=>{if(!state.installPrompt)return toast('Dal menu del browser scegli “Installa app” o “Aggiungi alla schermata Home”.');state.installPrompt.prompt();await state.installPrompt.userChoice;state.installPrompt=null;installBtn.hidden=true;track('pwa_install',{section:'install'})};
   if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('./sw.js?v=28.0.0',{updateViaCache:'none'})
+  navigator.serviceWorker.register('./sw.js?v=40.0.0',{updateViaCache:'none'})
     .then(reg=>reg.update())
     .catch(()=>{});
 }bindDynamic();syncClubClock();checkServiceHealth();loadCapabilities();loadPublicCalendar(true);loadWeeklyNewsroom(true);restoreManagementSession();track('page_view',{section:(location.hash||'#home').replace('#','')});window.addEventListener('hashchange',()=>{const section=(location.hash||'#home').replace('#','');track('page_view',{section});setActiveNav(section==='eventi'?'events':section==='home'?'home':'')});loadSummary(true);setInterval(()=>{if(!document.hidden)loadSummary(true)},60000);setInterval(()=>{if(!document.hidden)loadWeeklyNewsroom(true)},300000);setInterval(flushListening,120000);setInterval(checkDueReminders,60000);setTimeout(checkDueReminders,4000);setInterval(()=>{if(!document.hidden)syncClubClock()},300000);setInterval(()=>{if(!document.hidden)loadPublicCalendar(true)},300000);
