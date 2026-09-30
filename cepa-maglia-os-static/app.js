@@ -60,6 +60,7 @@ function navigate(view){
   const m=viewMeta[view]||['Centro di Regia','']
   setHeader(m[0],m[1])
   setMobileNav(false)
+  $('aiDock').classList.toggle('hidden',view==='home')
   if(view==='recovery')loadRecovery()
   window.scrollTo({top:0,behavior:'smooth'})
 }
@@ -74,6 +75,7 @@ function openPartner(id){
   showPartnerSection('overview')
   renderPartner()
   setMobileNav(false)
+  $('aiDock').classList.remove('hidden')
   window.scrollTo({top:0,behavior:'smooth'})
 }
 document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>navigate(b.dataset.view))
@@ -121,7 +123,7 @@ async function boot(){
   const{data:m,error}=await supabase.from('organization_memberships').select('organization_id,role').eq('user_id',user.id).eq('active',true).limit(1).maybeSingle()
   $('loginView').classList.add('hidden')
   if(error||!m){$('workspace').classList.add('hidden');$('blockedView').classList.remove('hidden');return}
-  window.orgId=m.organization_id;window.userId=user.id;window.userRole=m.role
+  window.orgId=m.organization_id;window.userId=user.id;window.userRole=m.role;window.userEmail=user.email||''
   $('workspace').classList.remove('hidden');$('blockedView').classList.add('hidden');$('aiDock').classList.remove('hidden')
   setMobileNav(false)
   try{setFocusMode(localStorage.getItem('maglia360_focus')==='1')}catch(_){setFocusMode(false)}
@@ -129,6 +131,7 @@ async function boot(){
   $('sideUser').textContent=user.email||'Utente';$('rolePill').textContent=m.role.replaceAll('_',' ')
   ;['newEntityBtn','addTimelineBtn','addContactBtn','addPartnerDocumentBtn','addDocumentBtn','addCepaSubjectBtn','addCepaInitiativeBtn','addCepaContentBtn','addCepaSpeakerBtn','addCollaboratorBtn','newAssessmentBtn','newDistributionCandidateBtn','editPartnerBtn'].forEach(id=>$(id).classList.toggle('hidden',!isManager()))
   await loadAll()
+  $('aiDock').classList.add('hidden')
 }
 
 async function loadAll(){
