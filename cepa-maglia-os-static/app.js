@@ -25,7 +25,7 @@ const viewMeta={
 
 let ecosystem=[],projects=[],actions=[],marketHubs=[],marketEntities=[],contacts=[],timeline=[],documents=[],partnerRequirements=[],blueprints=[],subjects=[],initiatives=[],cepaContent=[],cepaAcademy=[],cepaSpeakers=[],products=[],productKnowledge=[],comparisons=[],collaborators=[],collaboratorTerms=[],portfolioSnapshots=[],businessAssessments=[],growthKits=[],distributionWatchlists=[],distributionCandidates=[],distributionEvidence=[],mailTemplates=[],mailDrafts=[],cepaExpansion=[],cepaReadiness=[],assistantMessages=[],recoveryRows=[],members=[],liaCapabilities=[],liaFolders=[],liaOrders=[],liaFiles=[],researchSources=[],researchInsights=[],liaActionRules=[],liaApprovals=[],roleViewAccess=[],liaAutomationRuns=[]
 let officeAssignments=[],officeMessages=[],officeSnapshots=[],officeCases=[],officeWorkflow=[],officeCepaActivities=[],officeImports=[]
-let currentPartnerId=null,currentOfficeId=null,currentOfficeProductId=null
+let currentPartnerId=null,currentOfficeId=null,currentOfficeProductId=null,currentCepaHubId=null
 
 function msg(text,error=false){$('loginMsg').textContent=text;$('loginMsg').className='message'+(error?' error':'')}
 function closeModal(){$('modal').classList.add('hidden')}
@@ -77,10 +77,17 @@ function setOfficeShell(active){
   const ws=$('workspace')
   if(!ws)return
   ws.classList.toggle('office-shell',!!active)
+  if(!active)ws.classList.remove('cepa-shell')
   if(active){
     ws.classList.remove('sidebar-collapsed','nav-open')
     $('sidebarBackdrop')?.classList.add('hidden')
   }
+}
+function setCepaShell(active){
+  const ws=$('workspace')
+  if(!ws)return
+  if(active)setOfficeShell(true)
+  ws.classList.toggle('cepa-shell',!!active)
 }
 function accessForView(view){
   if(isManager())return'manage'
@@ -107,6 +114,8 @@ function navigate(view){
     return
   }
   currentPartnerId=null
+  currentCepaHubId=null
+  setCepaShell(false)
   setOfficeShell(view==='home')
   applyBrandContext(null)
   document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'))
@@ -354,7 +363,7 @@ async function loadAll(){
 }
 
 function renderEverything(){
-  renderPartnerNav();renderHome();renderOffice();renderOfficeProduct();renderPartner();renderProducts();renderCollaborators();renderGrowthKits();renderComparisons();renderMail();renderCepa();renderTerritories();renderDocuments();renderDevelopment();renderNetworkRadar();renderActions();renderAssistantHistory();renderLiaWorkbench();applyRoleViewAccess()
+  renderPartnerNav();renderHome();renderCepaHub();renderCepaTerritory();renderOffice();renderOfficeProduct();renderPartner();renderProducts();renderCollaborators();renderGrowthKits();renderComparisons();renderMail();renderCepa();renderTerritories();renderDocuments();renderDevelopment();renderNetworkRadar();renderActions();renderAssistantHistory();renderLiaWorkbench();applyRoleViewAccess()
 }
 
 function renderPartnerNav(){
@@ -463,6 +472,7 @@ function renderHome(){
   const offices=accessibleOffices()
   $('officeEntryRole').textContent=String(window.userRole||'utente').replaceAll('_',' ')
   $('officeAccessNote').textContent=isDirectionRole()?'Vista Direzione · tutte le sedi attive':'Vedi solo le sedi assegnate al tuo profilo'
+  $('cepaWorldCard').classList.toggle('hidden',!canOpenView('cepa'))
   $('futureOfficeSection').classList.toggle('hidden',!isDirectionRole())
 
   const globalMessage=officeMessagesFor(null)[0]
@@ -545,11 +555,125 @@ function renderHome(){
   }
 }
 
+function renderCepaHub(){
+  const holder=$('cepaTerritoryCards')
+  if(!holder)return
+  const offices=accessibleOffices()
+  holder.innerHTML=offices.map(h=>{
+    const acts=officeCepaActivities.filter(x=>x.hub_id===h.id)
+    const open=acts.filter(x=>!['completed','cancelled'].includes(x.status))
+    const next=open.filter(x=>x.scheduled_at).sort((a,b)=>new Date(a.scheduled_at)-new Date(b.scheduled_at))[0]
+    const entities=marketEntities.filter(x=>x.hub_id===h.id)
+    return '<button class="cepa-territory-card" type="button" data-cepa-hub="'+h.id+'">'+
+      '<div class="cepa-territory-top"><span>C.E.P.A. · TERRITORIO</span><b>'+esc(h.city)+'</b></div>'+
+      '<div class="cepa-territory-kpis"><div><strong>'+open.length+'</strong><small>attività aperte</small></div><div><strong>'+entities.length+'</strong><small>soggetti mappati</small></div></div>'+
+      '<p>'+(next?'Prossimo: '+esc(next.title)+(next.scheduled_at?' · '+esc(fmtDateTime(next.scheduled_at)):''):'Programmazione territoriale da sviluppare')+'</p>'+
+      '<em>Entra nel territorio →</em>'+
+    '</button>'
+  }).join('')||'<div class="office-empty"><strong>Nessun territorio accessibile</strong><p>La Direzione deve assegnare almeno una sede al profilo.</p></div>'
+  document.querySelectorAll('[data-cepa-hub]').forEach(b=>b.onclick=()=>openCepaTerritory(b.dataset.cepaHub))
+}
+
+function openCepaHub(){
+  if(!canOpenView('cepa'))return
+  currentCepaHubId=null
+  currentOfficeId=null
+  currentOfficeProductId=null
+  setCepaShell(true)
+  applyBrandContext(null)
+  document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'))
+  $('cepaHubView').classList.remove('hidden')
+  setHeader('C.E.P.A.','Centro centrale e attività territoriali')
+  window.activeOfficeName='C.E.P.A.'
+  if($('liaContextLabel'))$('liaContextLabel').textContent='Contesto: C.E.P.A.'
+  renderCepaHub()
+  showOfficeQuickActions(false)
+  setLiaOpen(false)
+  window.scrollTo({top:0,behavior:'smooth'})
+}
+
+function openCepaCentral(){
+  if(!canOpenView('cepa'))return
+  currentCepaHubId=null
+  currentOfficeId=null
+  currentOfficeProductId=null
+  setCepaShell(true)
+  document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'))
+  $('cepaView').classList.remove('hidden')
+  setHeader('Centro C.E.P.A.','Governance, materie, Academy, contenuti e standard')
+  window.activeOfficeName='Centro C.E.P.A.'
+  if($('liaContextLabel'))$('liaContextLabel').textContent='Contesto: Centro C.E.P.A.'
+  renderCepa()
+  showOfficeQuickActions(false)
+  setLiaOpen(false)
+  window.scrollTo({top:0,behavior:'smooth'})
+}
+
+function openCepaTerritory(hubId){
+  if(!canOpenView('cepa'))return
+  const hub=accessibleOffices().find(x=>x.id===hubId)
+  if(!hub)return
+  currentCepaHubId=hubId
+  currentOfficeId=hubId
+  currentOfficeProductId=null
+  setCepaShell(true)
+  document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'))
+  $('cepaTerritoryView').classList.remove('hidden')
+  $('cepaTerritoryBreadcrumb').textContent='C.E.P.A. '+hub.city
+  setHeader('C.E.P.A. '+hub.city,'Attività educative e sviluppo territoriale')
+  window.activeOfficeName='C.E.P.A. '+hub.city
+  if($('liaContextLabel'))$('liaContextLabel').textContent='Contesto: C.E.P.A. '+hub.city
+  renderCepaTerritory()
+  showOfficeQuickActions(false)
+  setLiaOpen(false)
+  window.scrollTo({top:0,behavior:'smooth'})
+}
+
+function renderCepaTerritory(){
+  if(!currentCepaHubId)return
+  const hub=marketHubs.find(x=>x.id===currentCepaHubId)
+  if(!hub)return
+  const activities=officeCepaActivities.filter(x=>x.hub_id===hub.id)
+  const open=activities.filter(x=>!['completed','cancelled'].includes(x.status))
+  const completed=activities.filter(x=>x.status==='completed')
+  const entities=marketEntities.filter(x=>x.hub_id===hub.id)
+  const classify=x=>String(x.entity_type||'')+' '+(x.tags||[]).join(' ')
+  const schools=entities.filter(x=>/school|scuol/i.test(classify(x)))
+  const companies=entities.filter(x=>/company|business|impres|azienda/i.test(classify(x)))
+  const publicBodies=entities.filter(x=>/public|ente|comune|municip/i.test(classify(x)))
+
+  $('cepaTerritoryIdentity').innerHTML=
+    '<div><span>C.E.P.A. · PRESIDIO TERRITORIALE</span><h2>'+esc(hub.city)+'</h2><p>'+esc(hub.address||'')+'</p></div>'+
+    '<div class="cepa-territory-badge"><strong>Maglia 360</strong><span>Centro CEPA → territorio</span></div>'
+
+  $('cepaTerritorySummary').innerHTML=
+    '<div><span>Attività aperte</span><strong>'+open.length+'</strong><small>programma locale</small></div>'+
+    '<div><span>Completate</span><strong>'+completed.length+'</strong><small>storico attività</small></div>'+
+    '<div><span>Soggetti mappati</span><strong>'+entities.length+'</strong><small>rete territoriale</small></div>'+
+    '<div><span>Scuole / enti</span><strong>'+(schools.length+publicBodies.length)+'</strong><small>potenziali interlocutori</small></div>'
+
+  $('cepaTerritoryActivities').innerHTML=open
+    .sort((a,b)=>(a.scheduled_at?new Date(a.scheduled_at):Infinity)-(b.scheduled_at?new Date(b.scheduled_at):Infinity))
+    .map(x=>'<div class="cepa-territory-activity"><div><span>'+esc(String(x.activity_type).replaceAll('_',' '))+'</span><strong>'+esc(x.title)+'</strong><small>'+(x.scheduled_at?esc(fmtDateTime(x.scheduled_at)):'Data da definire')+(x.location_name?' · '+esc(x.location_name):'')+'</small></div><b>'+esc(x.status)+'</b></div>').join('')||
+    '<div class="office-empty compact"><strong>Nessuna attività ancora programmata</strong><p>Il territorio è pronto per costruire il proprio calendario C.E.P.A.</p></div>'
+
+  $('cepaTerritoryNetwork').innerHTML=
+    '<div class="cepa-network-kpis">'+
+      '<div><strong>'+companies.length+'</strong><span>Aziende</span></div>'+
+      '<div><strong>'+schools.length+'</strong><span>Scuole</span></div>'+
+      '<div><strong>'+publicBodies.length+'</strong><span>Enti</span></div>'+
+      '<div><strong>'+Math.max(0,entities.length-companies.length-schools.length-publicBodies.length)+'</strong><span>Altri soggetti</span></div>'+
+    '</div>'+
+    '<div class="cepa-network-list">'+entities.slice(0,6).map(x=>'<div><strong>'+esc(x.name)+'</strong><small>'+esc(x.entity_type||'soggetto')+(x.stage?' · '+esc(x.stage):'')+'</small></div>').join('')+'</div>'
+}
+
 function openOffice(id){
   const office=accessibleOffices().find(x=>x.id===id)
   if(!office)return
   currentOfficeId=id
   currentOfficeProductId=null
+  currentCepaHubId=null
+  setCepaShell(false)
   setOfficeShell(true)
   window.activeOfficeName='Ufficio '+office.city
   applyBrandContext(null)
@@ -635,6 +759,8 @@ function openOfficeProduct(productId){
   if(!office||!product)return
   currentOfficeProductId=productId
   currentProductCaseFilter='all'
+  currentCepaHubId=null
+  setCepaShell(false)
   setOfficeShell(true)
   const {node}=brandForProduct(product)
   applyBrandContext(node||null)
@@ -711,9 +837,15 @@ function renderOfficeProduct(){
 }
 
 document.querySelectorAll('[data-office-home]').forEach(b=>b.onclick=()=>{
-  currentOfficeId=null;currentOfficeProductId=null;window.activeOfficeName=null;showOfficeQuickActions(false);applyBrandContext(null);navigate('home')
+  currentOfficeId=null;currentOfficeProductId=null;currentCepaHubId=null;window.activeOfficeName=null;showOfficeQuickActions(false);setCepaShell(false);applyBrandContext(null);navigate('home')
 })
 $('productOfficeBack').onclick=()=>openOffice(currentOfficeId)
+$('agencyWorldCard').onclick=()=>document.getElementById('agencyOfficeSection')?.scrollIntoView({behavior:'smooth',block:'start'})
+$('cepaWorldCard').onclick=openCepaHub
+$('openCepaCentralBtn').onclick=openCepaCentral
+$('cepaTerritoryBack').onclick=openCepaHub
+$('cepaTerritoryNewActivityBtn').onclick=()=>{if(currentCepaHubId){currentOfficeId=currentCepaHubId;openCepaActivityEditor()}}
+$('officeCepaOpenBtn').onclick=()=>{if(currentOfficeId)openCepaTerritory(currentOfficeId)}
 
 function showOfficeQuickActions(show){
   const box=$('officeQuickActions')
