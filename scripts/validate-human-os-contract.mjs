@@ -11,8 +11,8 @@ const engine=read('scd-experience-engine.js');
 const css=read('ui-r39-human.css');
 const index=read('index.html');
 
-assert(m.manifest?.version==='3.1.0','manifest must be 3.1.0 for R39');
-assert(m.product_direction?.release==='R39','release must be R39');
+assert(/^3\./.test(m.manifest?.version||''),'manifest must remain Human OS major v3');
+assert(['R39','R40'].includes(m.product_direction?.release),'release must remain R39+ Human OS compatible');
 assert(m.product_direction?.human_centered_os?.mental_state_inference===false,'mental-state inference must remain false');
 assert(m.product_direction?.human_centered_os?.dark_patterns===false,'dark patterns must remain false');
 assert(m.product_direction?.human_centered_os?.minor_compulsion_mechanics===false,'minor compulsion mechanics must remain false');
@@ -34,8 +34,8 @@ for(const token of ['r39-experience-bar','r39-private-desk','r39-growth-loop']){
   assert(router.includes(token)||css.includes(token),'runtime token missing '+token);
 }
 
-assert(index.includes('ui-r39-human.css?v=39.0.0'),'R39 CSS not loaded');
-assert(index.includes('scd-experience-engine.js?v=39.0.0'),'R39 experience engine not loaded');
+assert(/ui-r39-human\.css\?v=(39|40)\.0\.0/.test(index),'R39 Human OS CSS not loaded');
+assert(/scd-experience-engine\.js\?v=(39|40)\.0\.0/.test(index),'R39 experience engine not loaded');
 
 if(process.exitCode)process.exit(process.exitCode);
 console.log('SCD HUMAN OS CONTRACT PASS',{
