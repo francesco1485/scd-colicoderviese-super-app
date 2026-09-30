@@ -80,6 +80,7 @@ class MagliaDashboard extends HTMLElement{
 @media(max-width:820px){.hero{grid-template-columns:1fr}.visual{display:none}.partners{display:flex;overflow:auto}.partner{min-width:170px}.products{display:flex;overflow:auto}.product{min-width:150px}.grid2,.bottom{grid-template-columns:1fr}.control{grid-template-columns:1fr 1fr}.rail{display:grid;grid-template-columns:1fr;grid-template-rows:auto auto}.assistant{grid-template-rows:auto auto auto}.portrait{display:none}.quick{grid-template-columns:1fr 1fr}.chat{grid-column:1}}
 @media(max-width:520px){.hero h1{font-size:31px}.hero{padding:14px}.products,.partners{padding-right:2px}.control{grid-template-columns:1fr 1fr}.row{grid-template-columns:1fr auto}.row span{display:none}}
 </style>
+<style>@import url("./dashboard-master.css?v=20260930-1205");</style>
 <div class="shell">
   <div class="main">
     <section class="panel hero">
