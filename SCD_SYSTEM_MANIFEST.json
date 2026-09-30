@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.5.0",
+    "version": "3.6.0",
     "effective_at": "2026-09-30",
     "status": "BINDING",
     "language": "it-IT",
@@ -238,7 +238,25 @@
       },
       {
         "id": "COMMERCIAL_OS",
-        "route": "/app/commercial"
+        "route": "/app/commercial",
+        "title": "Sponsor & LED Control Room",
+        "purpose": "Gestione commerciale sportiva integrata: sponsor e partner, stagioni, attivazioni multiple, asset sponsorizzabili, materiali brand, LED wall, approvazioni, contratti, rinnovi e vista economica riservata alla Direzione.",
+        "sponsor_model": {
+          "company_is_single_canonical_entity": true,
+          "multiple_seasons_per_sponsor": true,
+          "multiple_activation_types_per_sponsor": true,
+          "manual_activation_type_allowed": true,
+          "official_logo_required_when_available": true,
+          "economic_fields_direction_only": true
+        },
+        "led_model": {
+          "single_sponsor_per_spot": true,
+          "target_duration_seconds": 40,
+          "target_format": "MP4",
+          "target_resolution": "1920x1080",
+          "approval_required_before_playlist": true,
+          "no_unrequested_decorative_overlays": true
+        }
       },
       {
         "id": "LIA",
