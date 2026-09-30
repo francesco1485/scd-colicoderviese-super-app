@@ -689,3 +689,75 @@ body{background:var(--paper);color:var(--ink)}
 @media(max-width:760px){
   .lia-insight-grid{grid-template-columns:1fr}
 }
+
+
+.lia-action-catalog{
+  display:grid;
+  gap:7px;
+  padding:14px;
+}
+.lia-policy-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:9px 10px;
+  border:1px solid #e1eaf0;
+  border-radius:10px;
+  background:#fff;
+}
+.lia-policy-row strong{
+  display:block;
+  color:#153e60;
+  font-size:11px;
+}
+.lia-policy-row small{
+  display:block;
+  margin-top:3px;
+  color:#7a8d9c;
+  font-size:8.5px;
+}
+.lia-policy{
+  flex:0 0 auto;
+  display:inline-flex;
+  align-items:center;
+  border-radius:999px;
+  padding:5px 8px;
+  font-size:8px;
+  font-weight:800;
+  text-transform:uppercase;
+}
+.lia-policy.auto{background:#e3f5ec;color:#096a4b}
+.lia-policy.prepare{background:#e8f2ff;color:#195f9c}
+.lia-policy.approval_required{background:#fff2dc;color:#936018}
+.lia-policy.blocked{background:#ffebee;color:#a12e42}
+.lia-approval-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:7px;
+}
+.lia-approval-actions button{
+  border:1px solid #d2e0e8;
+  border-radius:8px;
+  background:#fff;
+  color:#15587e;
+  padding:5px 8px;
+  font-size:9px;
+  font-weight:700;
+  cursor:pointer;
+}
+.lia-approval-actions button:last-child{
+  color:#a02f42;
+}
+.lia-approval-status{
+  flex:0 0 auto;
+  border-radius:999px;
+  padding:5px 8px;
+  font-size:8px;
+  font-weight:800;
+  text-transform:uppercase;
+}
+.lia-approval-status.pending{background:#fff2dc;color:#936018}
+.lia-approval-status.approved{background:#e3f5ec;color:#096a4b}
+.lia-approval-status.rejected,.lia-approval-status.cancelled,.lia-approval-status.expired{background:#ffebee;color:#a12e42}
