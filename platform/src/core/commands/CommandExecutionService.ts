@@ -11,6 +11,7 @@ export interface SubmitCommandRequest {
   payload: unknown;
   tenantId: string;
   actor: CommandContext["actor"];
+  sessionToken?: string;
   correlationId?: string;
   causationId?: string;
   idempotencyKey?: string;
@@ -39,6 +40,7 @@ export class CommandExecutionService {
       events: this.events,
       signal: controller.signal
     };
+    if (request.sessionToken !== undefined) context.sessionToken = request.sessionToken;
     if (request.causationId !== undefined) context.causationId = request.causationId;
     if (request.idempotencyKey !== undefined) context.idempotencyKey = request.idempotencyKey;
 
