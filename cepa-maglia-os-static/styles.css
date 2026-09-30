@@ -617,3 +617,75 @@ body{background:var(--paper);color:var(--ink)}
   background:#eaf5fb;
   border-color:#a8c8db;
 }
+
+
+.lia-insight-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+  padding:14px;
+}
+.lia-insight-card{
+  display:grid;
+  gap:10px;
+  padding:13px;
+  border:1px solid #dde8ef;
+  border-radius:12px;
+  background:linear-gradient(180deg,#fff,#fbfdff);
+}
+.lia-insight-top{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:flex-start;
+}
+.lia-insight-top strong{
+  display:block;
+  color:#123f66;
+  font-size:12px;
+}
+.lia-insight-top small{
+  display:block;
+  margin-top:3px;
+  color:#7990a1;
+  font-size:9px;
+}
+.lia-insight-card p{
+  margin:0;
+  color:#4f687b;
+  font-size:10px;
+  line-height:1.5;
+}
+.lia-application{
+  display:grid;
+  gap:4px;
+  padding:9px 10px;
+  border-radius:9px;
+  background:#eff8f4;
+  color:#315d50;
+}
+.lia-application b{
+  font-size:9px;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+}
+.lia-application span{
+  font-size:9.5px;
+  line-height:1.45;
+}
+.insight-confidence{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:999px;
+  padding:5px 8px;
+  font-size:8px;
+  font-weight:800;
+  text-transform:uppercase;
+}
+.insight-confidence.high{background:#e3f5ec;color:#0a6f4e}
+.insight-confidence.medium{background:#fff3de;color:#91601a}
+.insight-confidence.low{background:#f3f4f6;color:#65717c}
+@media(max-width:760px){
+  .lia-insight-grid{grid-template-columns:1fr}
+}
