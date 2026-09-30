@@ -117,7 +117,10 @@ class MagliaDashboard extends HTMLElement{
     <div class="grid2">
       <section class="panel">
         <div class="sectionHead"><div>${this.icon("people")}<div><strong>Collaboratori e remunerazioni</strong><small>Rete, portafoglio e sviluppo.</small></div></div><button class="linkBtn" data-nav="collaborators">Gestisci →</button></div>
-        <div class="rows">${c.slice(0,5).map(x=>'<button class="row" data-collaborator="'+esc(x.id)+'"><strong>'+esc(x.name)+'</strong><span>'+esc(x.detail||"")+'</span><b>'+esc(x.value||"")+'</b></button>').join('')||'<div class="row"><strong>Nessun dato disponibile</strong></div>'}</div>
+        <div class="rows">
+          <div class="rowsHead"><span>Nome</span><span>Territorio</span><span>Portafoglio</span><span>Condizioni</span><span>Premi</span></div>
+          ${c.slice(0,5).map(x=>'<button class="row" data-collaborator="'+esc(x.id)+'"><strong>'+esc(x.name)+'</strong><span>'+esc(x.territory||"Territorio da definire")+'</span><span>'+esc(x.detail||"")+'</span><span class="rowTerms">'+esc(x.terms||"Da definire")+'</span><b>'+esc(x.value||"")+'</b></button>').join('')||'<div class="row"><strong>Nessun dato disponibile</strong></div>'}
+        </div>
       </section>
       <section class="panel">
         <div class="sectionHead"><div>${this.icon("scale")}<div><strong>Confronti e benchmark</strong><small>Solidità e aree da completare.</small></div></div><button class="linkBtn" data-nav="comparisons">Apri analisi →</button></div>
