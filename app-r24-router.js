@@ -548,8 +548,13 @@
         drawerBody.innerHTML='<div class="r42-drawer-status"><span class="r42-state">'+esc(s.status)+'</span><b>'+esc(s.sector)+'</b></div>'+
           '<nav class="r42-detail-tabs"><button class="active">OVERVIEW</button><button>SPONSORIZZAZIONI</button><button>STORICO</button><button>MATERIALI</button>'+(direction?'<button>ECONOMICO</button>':'')+'</nav>'+
           '<div class="r42-detail-grid"><div><small>STAGIONI / ANNI</small><b>'+esc(s.years||'DA COMPLETARE')+'</b></div><div><small>REFERENTE</small><b>'+esc(s.contactName||'DA COLLEGARE')+'</b><span>'+esc(s.contactRole||'')+'</span></div><div><small>CONTATTI</small><b>'+esc(s.contactEmail||s.contactPhone||'DA COMPLETARE')+'</b><span>'+esc(s.contactEmail&&s.contactPhone?s.contactPhone:'')+'</span></div><div><small>EVIDENZA</small><b>'+esc(s.evidence||'MASTER SPONSOR')+'</b></div></div>'+
-          '<section class="r42-detail-section"><small>COSA SPONSORIZZA / ASSET</small><div class="r42-tags">'+s.assets.map(a=>'<span>'+esc(a)+'</span>').join('')+'</div></section>'+
-          '<section class="r42-detail-section"><small>PROSSIMA AZIONE</small><p>'+esc(s.next)+'</p></section>'+
+          '<section class="r42-detail-section"><small>COSA SPONSORIZZA / ASSET</small><div class="r42-tags">'+(s.assets||[]).map(a=>'<span>'+esc(a)+'</span>').join('')+'</div>'+
+            ((s.activationRows||[]).length?'<div class="r42-mini-table">'+(s.activationRows||[]).map(a=>'<div><b>'+esc(a.TIPO_SPONSORIZZAZIONE||a.TIPO_MANUALE||'ATTIVAZIONE')+'</b><span>'+esc(a.STAGIONE||'')+'</span><span>'+esc(a.STATO||'')+'</span><small>'+esc(a.ASSET_DESCRIZIONE||a.TIPO_MANUALE||'')+'</small></div>').join('')+'</div>':'<p>Nessuna attivazione normalizzata ancora collegata.</p>')+
+          '</section>'+
+          '<section class="r42-detail-section"><small>STORICO STAGIONI</small>'+
+            ((s.seasons||[]).length?'<div class="r42-mini-table seasons">'+(s.seasons||[]).map(y=>'<div><b>'+esc(y.STAGIONE||'STAGIONE')+'</b><span>'+esc(y.STATO_SPONSOR||'')+'</span><span>'+esc(y.RINNOVO_STATO||'')+'</span>'+(direction&&y.IMPORTO_CASH?'<small>Cash: € '+esc(String(y.IMPORTO_CASH))+'</small>':'')+'</div>').join('')+'</div>':'<p>Storico stagioni da completare.</p>')+
+          '</section>'+
+          '<section class="r42-detail-section"><small>PROSSIMA AZIONE</small><p>'+esc(s.next||'Completare scheda sponsor')+'</p></section>'+
           '<section class="r42-detail-section"><small>MATERIALI BRAND</small><p>Logo ufficiale, documenti, contratto, immagini e materiali LED vengono collegati alla stessa anagrafica sponsor. Se mancanti restano marcati come DA ACQUISIRE.</p></section>'+
           (direction?'<section class="r42-detail-section economic"><small>VISTA DIREZIONE</small><b>'+esc(s.value)+'</b><p>Valore verificato disponibile. Fatturazione, pagamenti, barter e storico economico saranno letti dal Source of Truth autorizzato.</p></section>':'');
         drawer.hidden=false;
