@@ -446,52 +446,94 @@
       renderDetail(0);this.bindCommon(outlet);
     },
     render_commercial(outlet){
-      const p=publicData(state.summary||FALLBACK);
-      const sponsors=(p.sponsors||[]).slice(0,24);
       const d=state.privateData||{},u=d.user||{},perm=d.permissions||{};
       const direction=!!perm.direction||['DIREZIONE','ADMIN'].includes(String(u.role||'').toUpperCase());
-      const sponsorRows=sponsors.length?sponsors.map((x,i)=>{
-        const name=field(x,'name','sponsor','company','title')||('Partner '+(i+1));
-        return '<button class="r42-company" type="button" data-r42-company="'+esc(name)+'"><span class="r42-company-mark">'+esc((name[0]||'S').toUpperCase())+'</span><span><b>'+esc(name)+'</b><small>PARTNER PUBBLICO · FIT OPERATIVO DA VERIFICARE</small></span><i>—</i></button>';
-      }).join(''):'<div class="r42-empty"><b>Dati partner in aggiornamento</b><span>Il modulo non inventa aziende o stati mancanti.</span></div>';
-      outlet.innerHTML=this.shellHeader('Commercial Development OS','Ricerca, sponsor, prodotti, opportunità, attivazioni e sviluppo in un unico ciclo.','DIREZIONE · COMMERCIALE · R42')+
-      '<section class="r42-status"><div><span class="r42-dot"></span><b>STAGING READ ONLY</b><small>Nessuna scrittura commerciale abilitata in R42.</small></div><span>'+(direction?'SESSIONE DIREZIONE':'ANTEPRIMA SICURA')+'</span></section>'+
-      '<section class="r42-kpis"><article><small>PARTNER PUBBLICI</small><strong>'+esc(sponsors.length||'—')+'</strong><span>dal feed già disponibile</span></article><article><small>OPPORTUNITÀ</small><strong>—</strong><span>DATO IN AGGIORNAMENTO</span></article><article><small>APPROVAZIONI</small><strong>—</strong><span>DATO IN AGGIORNAMENTO</span></article><article><small>PRONTO FLUSSO</small><strong>—</strong><span>DATO IN AGGIORNAMENTO</span></article></section>'+
-      '<section class="r42-tabs" role="tablist"><button class="active" data-r42-tab="control">CONTROL ROOM</button><button data-r42-tab="research">RESEARCH & FIT</button><button data-r42-tab="sources">FONTI</button></section>'+
+      const portfolio=[
+        {name:'Noratech Srl',sector:'Tecnologia / corporate',status:'ATTIVO',years:'2026',value:'€400 + IVA',assets:['SOCIAL','CENTRO SPORTIVO'],next:'Report 2026 + proposta upgrade 2027',evidence:'Contratto + PEC'},
+        {name:'Coperture Rasero Srl',sector:'Edilizia',status:'ATTIVO',years:'2026-2027',value:'€500 + IVA',assets:['BORDO CAMPO','SITO'],next:'Mappare striscione e rinnovo',evidence:'Contratto'},
+        {name:'Officine Pedroncelli Srl',sector:'Mobility / officina',status:'ATTIVO',years:'2024-2026',value:'€500 + IVA / anno',assets:['PULMINO'],next:'Verificare scadenza e foto mezzo',evidence:'Contratto / fattura'},
+        {name:'DECAR Srl',sector:'Automotive',status:'AUDIT',years:'2026',value:'€1.500 + IVA',assets:['DA RICOSTRUIRE'],next:'Recuperare accordo e asset 2026',evidence:'Fattura / pagamento'},
+        {name:'SACO Multiservizi',sector:'Servizi',status:'DA NORMALIZZARE',years:'2026',value:'€2.440 fatturati',assets:['SPONSOR + FORNITURA'],next:'Separare sponsorship, fornitura e barter',evidence:'Fatturazione'},
+        {name:'Bianchi Bazzi Angelo Srl',sector:'Corporate / territorio',status:'AUDIT',years:'2026',value:'€1.500 + IVA',assets:['DA RICOSTRUIRE'],next:'Recuperare accordo e materiali',evidence:'Documentazione contabile'},
+        {name:'Saglio Sport / LEGEA',sector:'Sportswear / partner tecnico',status:'PARTNER TECNICO',years:'2026/27',value:'DA VERIFICARE',assets:['KIT','ABBIGLIAMENTO'],next:'Ricostruire accordo, esclusiva e visibilità',evidence:'Gmail / fatturazione'}
+      ];
+      const led=[
+        ['DEGO ARREDAMENTI','Arredamento / design','IN REVISIONE','PRESENTE - DA RICONVALIDARE','PRESENTE','DA ACQUISIRE'],
+        ['ATV VALVE','Industria / valvole','IN REVISIONE','PRESENTE - DA RICONVALIDARE','PRESENTE','DA ACQUISIRE'],
+        ['IPERAL','GDO / retail','IN REVISIONE','PRESENTE - DA RICONVALIDARE','PRESENTE','DA ACQUISIRE'],
+        ['LEGEA','Sportswear / partner tecnico','IN REVISIONE','PRESENTE - DA RICONVALIDARE','PRESENTE','DA ACQUISIRE'],
+        ['NBC ELETTRONICA','Elettronica / tecnologia','IN REVISIONE','PRESENTE - DA RICONVALIDARE','PRESENTE','DA ACQUISIRE'],
+        ['SAGLIO SPORT','Sportswear / partner tecnico','IN REVISIONE','PRESENTE - DA RICONVALIDARE','PRESENTE','DA ACQUISIRE'],
+        ['HDI MAGLIA','Assicurazioni','ATTESA APPROVAZIONE','VERIFICATO','PRESENTE','DA ACQUISIRE'],
+        ['DELLOCA','Energia / carburanti / mobilità','ATTESA APPROVAZIONE','VERIFICATO','PRESENTE','DA ACQUISIRE'],
+        ['CARCANO','Industria / alluminio','ATTESA APPROVAZIONE','VERIFICATO','PRESENTE','DA ACQUISIRE'],
+        ['MDS IMPIANTI','Impiantistica','FONTI VERIFICATE','MANCANTE','MANCANTE','NON RICHIESTA'],
+        ['RIGAMONTI GEOM. GINO','Edilizia / infrastrutture','FONTI VERIFICATE','MANCANTE','MANCANTE','NON RICHIESTA'],
+        ['TARABINI PAOLO','Termoidraulica / impianti','FONTI VERIFICATE','MANCANTE','MANCANTE','NON RICHIESTA'],
+        ['TURBOJET SPURGHI','Servizi ambientali','FONTI VERIFICATE','ASSET UFFICIALE INDIVIDUATO','MANCANTE','NON RICHIESTA'],
+        ['GGLASS','Auto / cristalli','FONTI VERIFICATE','FONTE UFFICIALE VERIFICATA','MANCANTE','NON RICHIESTA'],
+        ['BIRRIFICIO LEGNONE','Food & Beverage / eventi','FONTI VERIFICATE','MANCANTE','MANCANTE','NON RICHIESTA'],
+        ['RIVARENO COLICO','Gelateria / retail','FONTI VERIFICATE','NON VALIDATO','MANCANTE','NON RICHIESTA'],
+        ['TRAFILERIE ALLUMINIO ALEXIA','Industria / alluminio','FONTI VERIFICATE','FONTE UFFICIALE VERIFICATA','MANCANTE','NON RICHIESTA'],
+        ['GAIO BAR RISTORANTE','Ristorazione / eventi','FONTI VERIFICATE','MANCANTE','MANCANTE','NON RICHIESTA'],
+        ['I VIAGGI DELLO SQUALO','Turismo / viaggi','FONTI VERIFICATE','MANCANTE','MANCANTE','NON RICHIESTA']
+      ].map((x,i)=>({order:i+1,name:x[0],sector:x[1],status:x[2],logo:x[3],mp4:x[4],approval:x[5]}));
+      const assetTypes=['MAIN SPONSOR','MAGLIA GARA','ABBIGLIAMENTO ALLENAMENTO','SQUADRA','SETTORE GIOVANILE','TORNEO','EVENTO','LED WALL','CARTELLONISTICA','SITO / DIGITAL','SOCIAL','HOSPITALITY','CONVENZIONE','PARTNER TECNICO','FORNITORE','STRUTTURA / AREA','MASCOTTE','FONDO SOLIDALE / CSR','BARTER','ALTRO'];
+      const card=s=>'<article class="r42-sponsor-card" data-r42-sponsor-card="'+esc(s.name)+'" data-status="'+esc(s.status)+'"><div class="r42-sponsor-logo" aria-label="Logo '+esc(s.name)+'"><span>'+esc(s.name.split(/\s+/).slice(0,2).map(v=>v[0]).join('').toUpperCase())+'</span><small>LOGO</small></div><div class="r42-sponsor-card-body"><div class="r42-card-top"><div><h3>'+esc(s.name)+'</h3><p>'+esc(s.sector)+'</p></div><span class="r42-state">'+esc(s.status)+'</span></div><div class="r42-tags">'+s.assets.map(a=>'<span>'+esc(a)+'</span>').join('')+'</div><dl><div><dt>ANNI</dt><dd>'+esc(s.years)+'</dd></div><div><dt>PROSSIMA AZIONE</dt><dd>'+esc(s.next)+'</dd></div></dl>'+(direction?'<div class="r42-economic"><b>'+esc(s.value)+'</b><small>'+esc(s.evidence)+'</small></div>':'')+'</div></article>';
+      const ledCard=s=>'<article class="r42-led-card" data-led-status="'+esc(s.status)+'"><div class="r42-led-logo"><span>'+esc(s.name.split(/\s+/).slice(0,2).map(v=>v[0]).join('').toUpperCase())+'</span></div><div><div class="r42-card-top"><div><h3>'+esc(s.name)+'</h3><p>'+esc(s.sector)+'</p></div><span class="r42-state">'+esc(s.status)+'</span></div><div class="r42-led-meta"><span>Logo <b>'+esc(s.logo)+'</b></span><span>MP4 <b>'+esc(s.mp4)+'</b></span><span>Approvazione <b>'+esc(s.approval)+'</b></span></div></div></article>';
+      const readyApproval=led.filter(x=>x.status==='ATTESA APPROVAZIONE').length;
+      const mp4Ready=led.filter(x=>x.mp4==='PRESENTE').length;
+      outlet.innerHTML=this.shellHeader('Sponsor & LED Control Room','Portafoglio sponsor, attivazioni, materiali, spot LED e vista Direzione nello stesso ambiente.','COMMERCIAL DEVELOPMENT OS · R42')+
+      '<section class="r42-status"><div><span class="r42-dot"></span><b>VERTICAL SLICE SPONSOR + LED</b><small>Snapshot verificato dal Master Sponsor Intelligence. Scritture ancora disabilitate.</small></div><span>'+(direction?'SESSIONE DIREZIONE':'VISTA OPERATIVA')+'</span></section>'+
+      '<section class="r42-kpis"><article><small>RAPPORTI DOCUMENTATI</small><strong>'+portfolio.length+'</strong><span>portafoglio verificato / audit</span></article><article><small>SPONSOR LED</small><strong>'+led.length+'</strong><span>control room corrente</span></article><article><small>MP4 PRESENTI</small><strong>'+mp4Ready+'</strong><span>master già censiti</span></article><article><small>DA APPROVARE</small><strong>'+readyApproval+'</strong><span>HDI · DellOca · Carcano</span></article></section>'+
+      '<section class="r42-tabs" role="tablist"><button class="active" data-r42-tab="control">CONTROL ROOM</button><button data-r42-tab="sponsors">SPONSOR</button><button data-r42-tab="led">LED WALL</button><button data-r42-tab="assets">ASSET</button><button data-r42-tab="sources">FONTI</button></section>'+
       '<section class="r42-view" data-r42-view="control">'+
+        '<div class="r42-control-hero"><div><small>OGGI</small><h2>Cosa richiede attenzione</h2><p>Tre spot sono in attesa di approvazione sponsor. Sei sponsor LED hanno MP4 e preview già presenti ma materiali e intelligence vanno ancora riallineati.</p></div><button type="button" data-r42-open="led">APRI LED CONTROL ROOM</button></div>'+
         '<div class="r42-grid">'+
-          '<button data-r42-open="research"><span>01</span><b>Research & Fit</b><small>Fonti, segnali, compatibilità, timing e next action.</small></button>'+
-          '<button><span>02</span><b>Aziende</b><small>Anagrafica canonica e relazioni.</small></button>'+
-          '<button><span>03</span><b>Opportunità</b><small>Pipeline, owner, valore, stage e prossima azione.</small></button>'+
-          '<button><span>04</span><b>Prodotti / Asset</b><small>LED, eventi, strutture, community e nuovi prodotti.</small></button>'+
-          '<button><span>05</span><b>Partner Success</b><small>Deliverable, proof, KPI, report, rinnovo e upsell.</small></button>'+
-          '<button><span>06</span><b>Development Radar</b><small>Idee, innovazione e nuove fonti di ricavo.</small></button>'+
-          '<button><span>07</span><b>LED Control Room</b><small>Produzione, approvazioni, mapping e playlist.</small></button>'+
-          '<button><span>08</span><b>Task & Audit</b><small>Owner, scadenze, blocchi, decisioni e tracciabilità.</small></button>'+'<button data-r24-route="lia"><span>AI</span><b>Lia · Assistente operativo</b><small>Comandi, ricerca, mapping, documenti e supporto per ruolo.</small></button>'+
+          '<button data-r42-open="sponsors"><span>01</span><b>Sponsor & Partner</b><small>Schede, logo, settore, contatti, anni e attivazioni.</small></button>'+
+          '<button data-r42-open="led"><span>02</span><b>LED Wall Studio</b><small>Logo, master MP4, preview, approvazioni e playlist.</small></button>'+
+          '<button data-r42-open="assets"><span>03</span><b>Asset sponsorizzabili</b><small>Maglie, LED, tornei, strutture, social, hospitality e altro.</small></button>'+
+          '<button><span>04</span><b>Rinnovi & storico</b><small>Stagioni, continuità, upgrade e rapporti da difendere.</small></button>'+
+          '<button><span>05</span><b>Contratti</b><small>Durata, esclusiva, deliverable, documenti e stato amministrativo.</small></button>'+
+          '<button><span>06</span><b>Materiali brand</b><small>Loghi originali, formati, autorizzazioni e creatività.</small></button>'+
+          '<button><span>07</span><b>Nuovi sponsor</b><small>Inserimento guidato di aziende non ancora censite.</small></button>'+
+          '<button data-r24-route="lia"><span>AI</span><b>Lia · Assistente operativo</b><small>Ricerca, documenti, follow-up e supporto autorizzato.</small></button>'+
         '</div>'+
-        '<div class="r42-priority"><div><small>PRINCIPIO OPERATIVO</small><h2>Idea → Ricerca → Fit → Prodotto → Opportunità → Attivazione → Proof → KPI → Rinnovo</h2><p>Lo score non decide. Fonti, blocchi, disponibilità e prossima azione restano visibili e verificabili.</p></div><span>ZERO DATABASE PARALLELI</span></div>'+
       '</section>'+
-      '<section class="r42-view" data-r42-view="research" hidden>'+
-        '<div class="r42-panel-head"><div><small>RESEARCH & FIT</small><h2>Aziende e partner già esposti dal feed pubblico</h2><p>In staging mostriamo solo dati non sensibili già disponibili. Il fit commerciale reale arriverà dall’adapter Sponsor Master autorizzato.</p></div><input id="r42Search" type="search" placeholder="Cerca azienda…"></div>'+
-        '<div class="r42-company-list" id="r42CompanyList">'+sponsorRows+'</div>'+
-        '<div class="r42-research-note"><b>Score storico = segnale non decisionale.</b><span>La decisione operativa deve sempre mostrare evidenze, blocchi, fonte e next action.</span></div>'+
+      '<section class="r42-view" data-r42-view="sponsors" hidden>'+
+        '<div class="r42-panel-head"><div><small>PORTAFOGLIO SPONSOR</small><h2>Sponsor reali e rapporti documentati</h2><p>Ogni azienda deve avere un’unica scheda, più attivazioni e più stagioni. Il valore economico è mostrato solo alla Direzione.</p></div><div class="r42-panel-actions"><input id="r42SponsorSearch" type="search" placeholder="Cerca sponsor…"><button type="button" id="r42NewSponsor">+ NUOVO SPONSOR</button></div></div>'+
+        '<div class="r42-filterbar"><button class="active" data-sponsor-filter="ALL">TUTTI</button><button data-sponsor-filter="ATTIVO">ATTIVI</button><button data-sponsor-filter="AUDIT">AUDIT</button><button data-sponsor-filter="PARTNER TECNICO">PARTNER TECNICI</button></div>'+
+        '<div class="r42-sponsor-cards" id="r42SponsorCards">'+portfolio.map(card).join('')+'</div>'+
+        '<div class="r42-inline-form" id="r42NewSponsorForm" hidden><div><small>NUOVO SPONSOR / PARTNER</small><h3>Inserimento guidato</h3><p>La UI è pronta; il salvataggio verrà collegato solo all’adapter autorizzato.</p></div><div class="r42-form-grid"><label>Azienda<input placeholder="Ragione sociale / brand"></label><label>Settore<input placeholder="Es. edilizia, banca, food"></label><label>Referente<input placeholder="Nome e ruolo"></label><label>Email<input type="email" placeholder="email professionale"></label><label>Sponsor dal<input placeholder="Es. 2024/25"></label><label>Tipo sponsorizzazione<select><option>Seleziona…</option>'+assetTypes.map(x=>'<option>'+esc(x)+'</option>').join('')+'</select></label></div><label class="r42-wide">Altro / descrizione manuale<textarea rows="3" placeholder="Dettagli, asset non presenti nel menu, note operative"></textarea></label><div class="r42-form-actions"><button type="button" id="r42CancelSponsor">ANNULLA</button><button type="button" id="r42SaveSponsor" class="primary">SALVA QUANDO COLLEGATO</button></div></div>'+
+      '</section>'+
+      '<section class="r42-view" data-r42-view="led" hidden>'+
+        '<div class="r42-panel-head"><div><small>LED WALL STUDIO</small><h2>19 sponsor nel flusso LED</h2><p>Uno sponsor alla volta, identità pulita, spot MP4 da 40 secondi, approvazione prima della messa in onda.</p></div><input id="r42LedSearch" type="search" placeholder="Cerca sponsor LED…"></div>'+
+        '<div class="r42-filterbar"><button class="active" data-led-filter="ALL">TUTTI</button><button data-led-filter="ATTESA APPROVAZIONE">DA APPROVARE</button><button data-led-filter="IN REVISIONE">IN REVISIONE</button><button data-led-filter="FONTI VERIFICATE">DA PRODURRE</button></div>'+
+        '<div class="r42-led-list" id="r42LedList">'+led.map(ledCard).join('')+'</div>'+
+        '<div class="r42-led-spec"><b>STANDARD VIDEO SCD LED</b><span>MP4 · 1920×1080 · 40 secondi · sponsor singolo · nessuna sovrapposizione decorativa non richiesta</span></div>'+
+      '</section>'+
+      '<section class="r42-view" data-r42-view="assets" hidden>'+
+        '<div class="r42-panel-head"><div><small>CATALOGO ASSET</small><h2>Cosa può sponsorizzare un’azienda</h2><p>Menu standard + voce Altro/manuale. Uno sponsor può avere più asset contemporaneamente e per stagioni diverse.</p></div></div>'+
+        '<div class="r42-asset-cloud">'+assetTypes.map(x=>'<span>'+esc(x)+'</span>').join('')+'</div>'+
       '</section>'+
       '<section class="r42-view" data-r42-view="sources" hidden>'+
-        '<div class="r42-source-list">'+
-          '<article><b>SPONSOR_MASTER_SHEET</b><span>Source of Truth sponsor/intelligence registrata nel Manifest</span><i>ADAPTER DA VERIFICARE</i></article>'+
-          '<article><b>CORE_SHEET</b><span>CRM e richieste commerciali esistenti</span><i>REGISTRATA</i></article>'+
-          '<article><b>SCD_SUPABASE</b><span>Domain Core / Auth / RLS in dual-run</span><i>STAGED</i></article>'+
-          '<article><b>SCD_DRIVE</b><span>Documenti, dossier, contratti e materiali</span><i>BACKOFFICE</i></article>'+
-          '<article><b>SCD_GMAIL</b><span>Segnali, contatti e allegati commerciali autorizzati</span><i>BACKOFFICE</i></article>'+
-        '</div>'+
+        '<div class="r42-source-list"><article><b>MASTER SPONSOR INTELLIGENCE</b><span>CRM, Sponsor Attivi & Asset, Loghi e Brand, LED Control Room</span><i>CANONICO COMMERCIALE</i></article><article><b>SCD OPERATIVO PILOTA</b><span>Stakeholder, opportunità, task, touchpoint e lineage</span><i>SOURCE OF TRUTH OPERATIVA</i></article><article><b>SCD DRIVE</b><span>Contratti, loghi, proposte, master MP4 e preview</span><i>BACKOFFICE</i></article><article><b>SCD GMAIL</b><span>Storico relazioni e approvazioni</span><i>BACKOFFICE</i></article></div>'+
       '</section>';
-      const tabs=[...outlet.querySelectorAll('[data-r42-tab]')];
-      const views=[...outlet.querySelectorAll('[data-r42-view]')];
+      const tabs=[...outlet.querySelectorAll('[data-r42-tab]')],views=[...outlet.querySelectorAll('[data-r42-view]')];
       const open=name=>{tabs.forEach(b=>b.classList.toggle('active',b.dataset.r42Tab===name));views.forEach(v=>v.hidden=v.dataset.r42View!==name)};
       tabs.forEach(b=>b.onclick=()=>open(b.dataset.r42Tab));
       outlet.querySelectorAll('[data-r42-open]').forEach(b=>b.onclick=()=>open(b.dataset.r42Open));
-      const search=outlet.querySelector('#r42Search');
-      if(search)search.oninput=()=>{const q=search.value.trim().toLowerCase();outlet.querySelectorAll('[data-r42-company]').forEach(row=>row.hidden=q&&!String(row.dataset.r42Company||'').toLowerCase().includes(q))};
+      const sponsorSearch=outlet.querySelector('#r42SponsorSearch');
+      if(sponsorSearch)sponsorSearch.oninput=()=>{const q=sponsorSearch.value.trim().toLowerCase();outlet.querySelectorAll('[data-r42-sponsor-card]').forEach(x=>x.hidden=q&&!String(x.dataset.r42SponsorCard||'').toLowerCase().includes(q))};
+      outlet.querySelectorAll('[data-sponsor-filter]').forEach(b=>b.onclick=()=>{outlet.querySelectorAll('[data-sponsor-filter]').forEach(x=>x.classList.remove('active'));b.classList.add('active');const f=b.dataset.sponsorFilter;outlet.querySelectorAll('[data-r42-sponsor-card]').forEach(x=>x.hidden=f!=='ALL'&&!String(x.dataset.status||'').includes(f))});
+      const ledSearch=outlet.querySelector('#r42LedSearch');
+      if(ledSearch)ledSearch.oninput=()=>{const q=ledSearch.value.trim().toLowerCase();outlet.querySelectorAll('.r42-led-card').forEach(x=>x.hidden=q&&!x.textContent.toLowerCase().includes(q))};
+      outlet.querySelectorAll('[data-led-filter]').forEach(b=>b.onclick=()=>{outlet.querySelectorAll('[data-led-filter]').forEach(x=>x.classList.remove('active'));b.classList.add('active');const f=b.dataset.ledFilter;outlet.querySelectorAll('[data-led-status]').forEach(x=>x.hidden=f!=='ALL'&&x.dataset.ledStatus!==f)});
+      const form=outlet.querySelector('#r42NewSponsorForm');
+      const newBtn=outlet.querySelector('#r42NewSponsor'),cancel=outlet.querySelector('#r42CancelSponsor'),save=outlet.querySelector('#r42SaveSponsor');
+      if(newBtn)newBtn.onclick=()=>{form.hidden=false;form.scrollIntoView({behavior:'smooth',block:'start'})};
+      if(cancel)cancel.onclick=()=>form.hidden=true;
+      if(save)save.onclick=()=>toast('Salvataggio disabilitato finché l’adapter Sponsor Master non è autorizzato.');
       this.bindCommon(outlet);
     },
     render_lia(outlet){
