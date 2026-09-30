@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.3.0",
+    "version": "3.4.0",
     "effective_at": "2026-09-30",
     "status": "BINDING",
     "language": "it-IT",
@@ -235,6 +235,10 @@
       {
         "id": "CARD",
         "route": "/app/card"
+      },
+      {
+        "id": "COMMERCIAL_OS",
+        "route": "/app/commercial"
       }
     ],
     "navigation": {
@@ -2130,6 +2134,29 @@
         "SCD_SUPABASE"
       ],
       "contract": "IMMUTABLE_TYPES_PUBLIC_FEED_WEEKLY_NEWSROOM_NO_HARDCODED_FIXTURES"
+    },
+    {
+      "id": "CAP-COMMERCIAL-DEVELOPMENT-OS",
+      "domain": "COMMERCIAL",
+      "required": true,
+      "state": "PARTIAL",
+      "screen": "COMMERCIAL_OS",
+      "audience": "DIRECTION",
+      "sources": [
+        "SPONSOR_MASTER_SHEET",
+        "CORE_SHEET",
+        "SCD_DRIVE",
+        "SCD_GMAIL",
+        "SCD_SUPABASE"
+      ],
+      "contract": "IDEA_RESEARCH_FIT_PRODUCT_OPPORTUNITY_ACTIVATION_PROOF_KPI_RENEWAL_WITH_PROVENANCE",
+      "runtime_state": "R42_READ_ONLY_FIRST",
+      "activation_requires": [
+        "DIRECTION_AUTHORIZED_SESSION",
+        "SPONSOR_MASTER_ADAPTER_VERIFIED",
+        "NO_PARALLEL_DATABASE",
+        "FREE_STACK_ONLY"
+      ]
     }
   ],
   "known_noncompliance": [
