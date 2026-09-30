@@ -9,6 +9,7 @@ const files=[
   'ui-r21-11.css',
   'ui-r24-shell.css',
   'ui-r26-pulse.css',
+  'ui-r37-vibe.css',
   'app.js',
   'app-r24-router.js',
   'manifest.webmanifest',
@@ -31,11 +32,11 @@ fs.cpSync(path.join(root,'assets'),path.join(out,'assets'),{recursive:true});
 fs.writeFileSync(path.join(out,'.nojekyll'),'','utf8');
 
 const html=fs.readFileSync(path.join(out,'index.html'),'utf8');
-for(const required of ['ui-r21-11.css','ui-r24-shell.css','ui-r26-pulse.css','app.js','app-r24-router.js','manifest.webmanifest']){
+for(const required of ['ui-r21-11.css','ui-r24-shell.css','ui-r26-pulse.css','ui-r37-vibe.css','app.js','app-r24-router.js','manifest.webmanifest']){
   if(!html.includes(required)) throw new Error('index.html does not reference '+required);
 }
 const sw=fs.readFileSync(path.join(out,'sw.js'),'utf8');
-for(const required of ['ui-r21-11.css','ui-r24-shell.css','ui-r26-pulse.css','app-r24-router.js','delete-account.html']){
+for(const required of ['ui-r21-11.css','ui-r24-shell.css','ui-r26-pulse.css','ui-r37-vibe.css','app-r24-router.js','delete-account.html']){
   if(!sw.includes(required)) throw new Error('service worker does not cache '+required);
 }
 
