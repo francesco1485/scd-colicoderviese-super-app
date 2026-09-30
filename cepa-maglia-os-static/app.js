@@ -40,6 +40,14 @@ $('mobileMenuBtn').onclick=()=>setMobileNav(true)
 $('sidebarCloseBtn').onclick=()=>setMobileNav(false)
 $('sidebarBackdrop').onclick=()=>setMobileNav(false)
 
+function setFocusMode(on){
+  $('workspace').classList.toggle('focus-mode',!!on)
+  $('focusModeBtn').classList.toggle('active',!!on)
+  $('focusModeBtn').textContent=on?'● Focus attivo':'◎ Focus'
+  try{localStorage.setItem('maglia360_focus',on?'1':'0')}catch(_){}
+}
+$('focusModeBtn').onclick=()=>setFocusMode(!$('workspace').classList.contains('focus-mode'))
+
 $('loginForm').onsubmit=async e=>{e.preventDefault();const{error}=await supabase.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error)return msg(error.message,true);await boot()}
 $('signupBtn').onclick=async()=>{const email=$('email').value.trim(),password=$('password').value;if(!email||password.length<8)return msg('Inserisci email e una password di almeno 8 caratteri.',true);const{data,error}=await supabase.auth.signUp({email,password});if(error)return msg(error.message,true);if(data.session)await boot();else msg('Account creato. Controlla la mail di conferma e poi accedi.')}
 
@@ -116,6 +124,7 @@ async function boot(){
   window.orgId=m.organization_id;window.userId=user.id;window.userRole=m.role
   $('workspace').classList.remove('hidden');$('blockedView').classList.add('hidden');$('aiDock').classList.remove('hidden')
   setMobileNav(false)
+  try{setFocusMode(localStorage.getItem('maglia360_focus')==='1')}catch(_){setFocusMode(false)}
   if(window.innerWidth>=1450)$('aiDockPanel').classList.remove('hidden')
   $('sideUser').textContent=user.email||'Utente';$('rolePill').textContent=m.role.replaceAll('_',' ')
   ;['newEntityBtn','addTimelineBtn','addContactBtn','addPartnerDocumentBtn','addDocumentBtn','addCepaSubjectBtn','addCepaInitiativeBtn','addCepaContentBtn','addCepaSpeakerBtn','addCollaboratorBtn','newAssessmentBtn','newDistributionCandidateBtn','editPartnerBtn'].forEach(id=>$(id).classList.toggle('hidden',!isManager()))
