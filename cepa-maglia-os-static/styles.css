@@ -3700,3 +3700,15 @@ a:focus-visible{
   .plan-next-focus{align-items:flex-start;flex-direction:column}
   .plan-next-focus button{width:100%}
 }
+
+
+.lia-example-continuous{
+  border-color:rgba(54,137,125,.24)!important;
+  background:linear-gradient(135deg,#edf8f5,#f6fbfa)!important;
+  color:#2c6d64!important;
+  font-weight:800!important;
+}
+.lia-example-continuous::before{
+  content:"✦";
+  margin-right:5px;
+}
