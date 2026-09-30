@@ -7,6 +7,7 @@ const required=[
   'mobile/App.tsx',
   'mobile/src/lib/supabase.ts',
   'mobile/src/lib/context.ts',
+  'mobile/src/lib/publicApi.ts',
   'mobile/.env.example',
   'mobile/README.md'
 ];
@@ -23,7 +24,7 @@ if(!pkg.dependencies?.['@supabase/supabase-js']){console.error('SCD MOBILE CONTR
 if(!pkg.dependencies?.expo){console.error('SCD MOBILE CONTRACT FAIL: Expo missing');process.exitCode=1}
 
 const app=fs.readFileSync('mobile/App.tsx','utf8');
-for(const token of ['signInWithPassword','loadMyContext','UNVERIFIED']){
+for(const token of ['signInWithPassword','loadMyContext','loadMobilePublicDashboard','SCD NEWSROOM AI','SETTIMANA SCD']){
   if(!app.includes(token)){console.error('SCD MOBILE CONTRACT FAIL: missing '+token);process.exitCode=1}
 }
 
@@ -34,3 +35,8 @@ if(/service[_-]?role/i.test(supabase)){console.error('SCD MOBILE CONTRACT FAIL: 
 
 if(process.exitCode)process.exit(process.exitCode);
 console.log('SCD MOBILE CONTRACT PASS',{channel:'ANDROID_IOS',auth:'SUPABASE_AUTH',rpc:'scd_my_context'});
+
+const publicApi=fs.readFileSync('mobile/src/lib/publicApi.ts','utf8');
+for(const token of ['/api/public','/api/newsroom','Readonly<','MobilePublicDashboard']){if(!publicApi.includes(token)){console.error('SCD MOBILE CONTRACT FAIL: public API token missing '+token);process.exitCode=1}}
+if(/ACD Dato|DOMENICA 6 OTT|Stadio Comunale di Colico/.test(publicApi)){console.error('SCD MOBILE CONTRACT FAIL: hardcoded match fixture forbidden');process.exitCode=1}
+if(process.exitCode)process.exit(process.exitCode);
