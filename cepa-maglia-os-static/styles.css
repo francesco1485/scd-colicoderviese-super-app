@@ -1532,3 +1532,130 @@ body[data-context-brand="CIP"] .main-header{border-bottom-color:#f2dfc6}
   display:block;height:100%;border-radius:999px;
   background:linear-gradient(90deg,var(--context-accent),var(--context-accent-2))
 }
+
+
+/* =========================================================
+   MAGLIA 360 V2 · DIRECTION VIEW
+   ========================================================= */
+.office-entry-grid{
+  grid-template-columns:1fr!important;
+  gap:24px!important;
+}
+.direction-overview{
+  padding:20px!important;
+  border:1px solid #dce6eb!important;
+  border-radius:18px!important;
+  background:#fff!important;
+}
+.direction-compare-summary{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+  margin-bottom:14px;
+}
+.direction-compare-summary>div{
+  min-height:88px;
+  padding:14px;
+  border:1px solid #e0e8ec;
+  border-radius:12px;
+  background:#f8fafb;
+}
+.direction-compare-summary span{
+  display:block;
+  color:#718692;
+  font-size:11px;
+}
+.direction-compare-summary strong{
+  display:block;
+  margin-top:6px;
+  color:#163f5a;
+  font-size:22px;
+  line-height:1.05;
+}
+.direction-compare-summary small{
+  display:block;
+  margin-top:5px;
+  color:#8999a2;
+  font-size:11px;
+}
+.direction-production{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px!important;
+}
+.direction-production article{
+  min-height:240px;
+  padding:16px!important;
+  border:1px solid #e0e8ec!important;
+  border-radius:14px!important;
+  background:linear-gradient(180deg,#fff,#fbfdfe)!important;
+}
+.direction-office-title{
+  display:flex!important;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.direction-office-title>div{display:block!important}
+.direction-office-title strong{
+  display:block!important;
+  color:#173e59!important;
+  font-size:16px!important;
+}
+.direction-office-title small{
+  display:block!important;
+  margin-top:3px!important;
+  color:#758894!important;
+  font-size:11px!important;
+}
+.direction-office-title button{
+  border:1px solid #d6e2e8;
+  border-radius:9px;
+  padding:7px 10px;
+  background:#fff;
+  color:#0b6d58;
+  font-size:11px;
+  font-weight:800;
+}
+.direction-office-kpis{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:7px;
+  margin:12px 0 8px;
+}
+.direction-office-kpis div{
+  padding:9px;
+  border-radius:9px;
+  background:#f3f7f9;
+}
+.direction-office-kpis span{
+  display:block;
+  color:#798d98;
+  font-size:10px;
+}
+.direction-office-kpis b{
+  display:block;
+  margin-top:3px;
+  color:#23485f;
+  font-size:13px;
+}
+.direction-priorities{
+  margin-top:16px!important;
+  padding-top:14px;
+  border-top:1px solid #e8eef1;
+}
+.direction-priority-head{
+  margin-bottom:5px!important;
+}
+.direction-priorities button{
+  padding:11px 4px!important;
+  font-size:12px!important;
+}
+@media(max-width:860px){
+  .direction-compare-summary{grid-template-columns:repeat(2,1fr)}
+  .direction-production{grid-template-columns:1fr!important}
+}
+@media(max-width:520px){
+  .direction-compare-summary{grid-template-columns:1fr}
+  .direction-office-kpis{grid-template-columns:repeat(2,1fr)}
+}
