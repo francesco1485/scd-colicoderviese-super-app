@@ -117,6 +117,10 @@ function doPost(e) {
         if (typeof r42SaveCommercialMapping_ !== 'function') throw new Error('Modulo R42 Lia non installato');
         data = r42SaveCommercialMapping_(token, payload);
         break;
+      case 'private.lia.handoff.save':
+        if (typeof r42SaveLiaHandoff_ !== 'function') throw new Error('Modulo R42 Lia non installato');
+        data = r42SaveLiaHandoff_(token, payload);
+        break;
       case 'direction.access.set':
         data = setActorAccess(token, payload);
         break;
