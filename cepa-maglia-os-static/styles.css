@@ -3877,3 +3877,46 @@ a:focus-visible{
   .commerce-pipeline-actions{width:100%;align-items:stretch;flex-direction:column}
   .portfolio-engine-card footer{flex-direction:column}
 }
+
+
+/* V7 · POLICY LEDGER */
+.policy-ledger-kpis{margin-top:-4px}
+.policy-ledger-kpis>div{
+  background:linear-gradient(180deg,#fff,#f7fbfa);
+  border-color:#d6e7e3
+}
+.client-policy-ledger{
+  margin:14px 0 4px;padding:14px;border:1px solid #dce7e8;border-radius:14px;background:#f9fbfb
+}
+.client-policy-ledger .modal-section-head>div>span{
+  display:block;color:#5b8c86;font-size:8px;font-weight:850;letter-spacing:.08em
+}
+.client-policy-ledger .modal-section-head h4{margin:3px 0 0;color:#21495f}
+.client-policy-row{
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(180px,.42fr);gap:12px;align-items:center;
+  width:100%;margin-top:7px;padding:11px 12px;border:1px solid #dfe7e9;border-radius:11px;
+  background:#fff;text-align:left;cursor:pointer
+}
+.client-policy-row:hover{border-color:#bcd6d4;box-shadow:0 7px 16px rgba(31,72,88,.05)}
+.client-policy-row strong{display:block;color:#214b60;font-size:10px}
+.client-policy-row small{display:block;margin-top:3px;color:#81949d;font-size:8px}
+.client-policy-row>div:last-child{text-align:right}
+.client-policy-row>div:last-child b{display:block;margin-top:4px;color:#234e61;font-size:10px}
+.policy-status{
+  display:inline-block;padding:4px 7px;border-radius:999px;background:#eef3f4;color:#5e737d;
+  font-size:7px;font-weight:850;text-transform:uppercase;letter-spacing:.04em
+}
+.policy-status.active{background:#e9f5ee;color:#3f7659}
+.policy-status.expiring{background:#fff4dd;color:#8b6a28}
+.policy-status.expired,.policy-status.cancelled{background:#f8ecea;color:#8f5d56}
+.policy-status.suspended{background:#f2eef8;color:#6e628b}
+.policy-empty{
+  margin-top:8px;padding:13px;border:1px dashed #cad8dc;border-radius:11px;background:#fff
+}
+.policy-empty strong{color:#385c6c;font-size:10px}
+.policy-empty p{margin:5px 0 0;color:#84969f;font-size:9px;line-height:1.5}
+
+@media(max-width:680px){
+  .client-policy-row{grid-template-columns:1fr}
+  .client-policy-row>div:last-child{text-align:left}
+}
