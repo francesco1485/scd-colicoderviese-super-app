@@ -24,7 +24,8 @@ const viewMeta={
 }
 
 let ecosystem=[],projects=[],actions=[],marketHubs=[],marketEntities=[],contacts=[],timeline=[],documents=[],partnerRequirements=[],blueprints=[],subjects=[],initiatives=[],cepaContent=[],cepaAcademy=[],cepaSpeakers=[],products=[],productKnowledge=[],comparisons=[],collaborators=[],collaboratorTerms=[],portfolioSnapshots=[],businessAssessments=[],growthKits=[],distributionWatchlists=[],distributionCandidates=[],distributionEvidence=[],mailTemplates=[],mailDrafts=[],cepaExpansion=[],cepaReadiness=[],assistantMessages=[],recoveryRows=[],members=[],liaCapabilities=[],liaFolders=[],liaOrders=[],liaFiles=[],researchSources=[],researchInsights=[],liaActionRules=[],liaApprovals=[],roleViewAccess=[],liaAutomationRuns=[]
-let currentPartnerId=null
+let officeAssignments=[],officeMessages=[],officeSnapshots=[],officeCases=[],officeWorkflow=[],officeCepaActivities=[],officeImports=[]
+let currentPartnerId=null,currentOfficeId=null,currentOfficeProductId=null,currentCepaHubId=null
 
 function msg(text,error=false){$('loginMsg').textContent=text;$('loginMsg').className='message'+(error?' error':'')}
 function closeModal(){$('modal').classList.add('hidden')}
@@ -62,16 +63,158 @@ window.addEventListener('resize',()=>{
 
 function setFocusMode(on){
   $('workspace').classList.toggle('focus-mode',!!on)
-  $('focusModeBtn').classList.toggle('active',!!on)
-  $('focusModeBtn').textContent=on?'● Focus attivo':'◎ Focus'
+  const btn=$('focusModeBtn')
+  if(btn){
+    btn.classList.toggle('active',!!on)
+    btn.textContent=on?'● Focus attivo':'◎ Focus'
+  }
   try{localStorage.setItem('maglia360_focus',on?'1':'0')}catch(_){}
 }
-$('focusModeBtn').onclick=()=>setFocusMode(!$('workspace').classList.contains('focus-mode'))
+if($('focusModeBtn'))$('focusModeBtn').onclick=()=>setFocusMode(!$('workspace').classList.contains('focus-mode'))
 
 $('loginForm').onsubmit=async e=>{e.preventDefault();const{error}=await supabase.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error)return msg(error.message,true);await boot()}
 $('signupBtn').onclick=async()=>{const email=$('email').value.trim(),password=$('password').value;if(!email||password.length<8)return msg('Inserisci email e una password di almeno 8 caratteri.',true);const{data,error}=await supabase.auth.signUp({email,password});if(error)return msg(error.message,true);if(data.session)await boot();else msg('Account creato. Controlla la mail di conferma e poi accedi.')}
 
 function setHeader(title,subtitle){$('pageTitle').textContent=title;$('pageSubtitle').textContent=subtitle}
+
+let appRouteStack=[]
+let appRouteIndex=-1
+let suppressRouteRecord=false
+function routeKey(route){try{return JSON.stringify(route||{})}catch(_){return''}}
+function updateRouteButtons(){
+  const back=$('navBackBtn'),forward=$('navForwardBtn')
+  if(back)back.disabled=appRouteIndex<=0
+  if(forward)forward.disabled=appRouteIndex<0||appRouteIndex>=appRouteStack.length-1
+}
+function recordRoute(route){
+  if(suppressRouteRecord||!route)return
+  const key=routeKey(route)
+  if(appRouteIndex>=0&&routeKey(appRouteStack[appRouteIndex])===key)return
+  appRouteStack=appRouteStack.slice(0,appRouteIndex+1)
+  appRouteStack.push(route)
+  appRouteIndex=appRouteStack.length-1
+  updateRouteButtons()
+}
+function applyRoute(route){
+  if(!route)return
+  suppressRouteRecord=true
+  try{
+    if(route.kind==='office')openOffice(route.id)
+    else if(route.kind==='product'){currentOfficeId=route.officeId;openOfficeProduct(route.id)}
+    else if(route.kind==='partner')openPartner(route.id)
+    else if(route.kind==='cepaHub')openCepaHub()
+    else if(route.kind==='cepaTerritory')openCepaTerritory(route.id)
+    else if(route.kind==='cepaCentral')openCepaCentral()
+    else navigate(route.view||'home')
+  }finally{
+    suppressRouteRecord=false
+    updateRouteButtons()
+  }
+}
+function goRouteBack(){if(appRouteIndex>0){appRouteIndex--;applyRoute(appRouteStack[appRouteIndex])}}
+function goRouteForward(){if(appRouteIndex<appRouteStack.length-1){appRouteIndex++;applyRoute(appRouteStack[appRouteIndex])}}
+if($('navBackBtn'))$('navBackBtn').onclick=goRouteBack
+if($('navForwardBtn'))$('navForwardBtn').onclick=goRouteForward
+
+function globalSearchItems(query){
+  const q=String(query||'').trim().toLowerCase()
+  if(!q)return[
+    {kind:'home',id:'home',label:'Home Maglia 360',meta:'Ambienti di lavoro'},
+    {kind:'cepa',id:'cepa',label:'Progetto C.E.P.A.',meta:'Centro e territori'},
+    ...accessibleOffices().slice(0,3).map(x=>({kind:'office',id:x.id,label:'Ufficio '+x.city,meta:'Sede operativa'}))
+  ]
+  const has=(...parts)=>parts.filter(Boolean).join(' ').toLowerCase().includes(q)
+  const out=[]
+  accessibleOffices().forEach(x=>{if(has(x.city,x.name,x.address))out.push({kind:'office',id:x.id,label:'Ufficio '+x.city,meta:x.address||'Sede operativa'})})
+  ecosystem.forEach(x=>{if(has(x.name,x.code,x.capability))out.push({kind:'partner',id:x.id,label:x.name,meta:x.capability||'Partner'})})
+  products.forEach(x=>{if(has(x.name,x.code,x.category))out.push({kind:'product',id:x.id,label:x.name,meta:'Prodotto · '+String(x.category||'').replaceAll('_',' ')})})
+  documents.forEach(x=>{if(has(x.title,x.category,x.document_status))out.push({kind:'document',id:x.id,label:x.title,meta:'Documento'})})
+  collaborators.forEach(x=>{if(has(x.display_name,x.area,x.territory))out.push({kind:'collaborator',id:x.id,label:x.display_name,meta:'Collaboratore · '+(x.area||'')})})
+  marketEntities.forEach(x=>{if(has(x.name,x.city,x.entity_type))out.push({kind:'entity',id:x.id,label:x.name,meta:(x.city||'')+' · '+entityType(x.entity_type)})})
+  cepaContent.forEach(x=>{if(has(x.title,x.asset_type))out.push({kind:'cepa',id:x.id,label:x.title,meta:'C.E.P.A. · contenuto'})})
+  if(has('cepa centro educazione previdenziale assicurativa'))out.unshift({kind:'cepa',id:'cepa',label:'C.E.P.A.',meta:'Centro Educazione Previdenziale e Assicurativa'})
+  return out.slice(0,12)
+}
+function renderGlobalSearch(query){
+  const box=$('globalSearchResults')
+  if(!box)return
+  const items=globalSearchItems(query)
+  box.innerHTML=items.map((x,i)=>'<button type="button" data-search-index="'+i+'"><strong>'+esc(x.label)+'</strong><small>'+esc(x.meta||'')+'</small></button>').join('')||'<div class="search-empty">Nessun risultato trovato.</div>'
+  box.classList.remove('hidden')
+  box._items=items
+  box.querySelectorAll('[data-search-index]').forEach(b=>b.onclick=()=>{
+    const item=items[Number(b.dataset.searchIndex)]
+    openGlobalSearchItem(item)
+  })
+}
+function openGlobalSearchItem(item){
+  if(!item)return
+  $('globalSearchResults')?.classList.add('hidden')
+  if($('globalSearchInput'))$('globalSearchInput').value=''
+  if(item.kind==='home')navigate('home')
+  else if(item.kind==='office')openOffice(item.id)
+  else if(item.kind==='partner')openPartner(item.id)
+  else if(item.kind==='product'){
+    if(currentOfficeId&&accessibleOffices().some(x=>x.id===currentOfficeId))openOfficeProduct(item.id)
+    else navigate('products')
+  }
+  else if(item.kind==='document')navigate('documents')
+  else if(item.kind==='collaborator')navigate('collaborators')
+  else if(item.kind==='entity')navigate('development')
+  else if(item.kind==='cepa')openCepaHub()
+}
+if($('globalSearchInput')){
+  $('globalSearchInput').onfocus=e=>renderGlobalSearch(e.target.value)
+  $('globalSearchInput').oninput=e=>renderGlobalSearch(e.target.value)
+  $('globalSearchInput').onkeydown=e=>{
+    if(e.key==='Escape')$('globalSearchResults').classList.add('hidden')
+    if(e.key==='Enter'){
+      e.preventDefault()
+      const items=globalSearchItems(e.currentTarget.value)
+      if(items[0])openGlobalSearchItem(items[0])
+    }
+  }
+}
+document.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){
+    e.preventDefault()
+    $('globalSearchInput')?.focus()
+  }
+})
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.global-search-shell'))$('globalSearchResults')?.classList.add('hidden')
+})
+function renderHeaderControls(){
+  const select=$('officeQuickSelector')
+  if(select){
+    const current=select.value
+    select.innerHTML='<option value="">Tutte le sedi</option>'+accessibleOffices().map(x=>'<option value="'+x.id+'">'+esc(x.city)+'</option>').join('')
+    if(current&&accessibleOffices().some(x=>x.id===current))select.value=current
+    if(currentOfficeId&&accessibleOffices().some(x=>x.id===currentOfficeId))select.value=currentOfficeId
+  }
+  const urgent=officeCases.filter(x=>!['completed','cancelled'].includes(x.status)&&['urgent','high'].includes(x.priority)).length
+  const badge=$('headerNotificationBadge')
+  if(badge){badge.textContent=String(urgent);badge.classList.toggle('hidden',urgent===0)}
+}
+if($('officeQuickSelector'))$('officeQuickSelector').onchange=e=>e.target.value?openOffice(e.target.value):navigate('home')
+if($('headerNotificationsBtn'))$('headerNotificationsBtn').onclick=()=>navigate('actions')
+
+function setOfficeShell(active){
+  const ws=$('workspace')
+  if(!ws)return
+  ws.classList.toggle('office-shell',!!active)
+  if(!active)ws.classList.remove('cepa-shell')
+  if(active){
+    ws.classList.remove('sidebar-collapsed','nav-open')
+    $('sidebarBackdrop')?.classList.add('hidden')
+  }
+}
+function setCepaShell(active){
+  const ws=$('workspace')
+  if(!ws)return
+  if(active)setOfficeShell(true)
+  ws.classList.toggle('cepa-shell',!!active)
+}
 function accessForView(view){
   if(isManager())return'manage'
   return roleViewAccess.find(x=>x.view_code===view&&x.active)?.access_level||'hidden'
@@ -97,6 +240,10 @@ function navigate(view){
     return
   }
   currentPartnerId=null
+  currentCepaHubId=null
+  setCepaShell(false)
+  setOfficeShell(view==='home')
+  applyBrandContext(null)
   document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'))
   $(view+'View').classList.remove('hidden')
   document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===view))
@@ -104,26 +251,64 @@ function navigate(view){
   const m=viewMeta[view]||['Centro di Regia','']
   setHeader(m[0],m[1])
   setMobileNav(false)
-  $('aiDock').classList.toggle('hidden',view==='home')
+  $('aiDock').classList.remove('hidden')
+  setLiaOpen(false)
   if(view==='recovery')loadRecovery()
+  recordRoute({kind:'view',view})
+  renderHeaderControls()
   window.scrollTo({top:0,behavior:'smooth'})
 }
+const brandIdentity={
+  HDI:{label:'HDI Assicurazioni',accent:'#007A53',accent2:'#D71920',surface:'#F1F8F5'},
+  PRIMA_ENEA:{label:'Prima Assicurazioni',accent:'#6F2DBD',accent2:'#9B51E0',surface:'#F7F1FC'},
+  SLP:{label:'SLP Assicurazioni',accent:'#075EA8',accent2:'#2E83C7',surface:'#F1F7FC'},
+  AGLEA:{label:'Aglea Salus',accent:'#2C7A62',accent2:'#69A95A',surface:'#F2F8F5'},
+  CIP:{label:'CIP Energia',accent:'#E88A21',accent2:'#F3B35A',surface:'#FFF7EC'}
+}
+function getBrand(node){
+  if(!node)return null
+  const fallback=brandIdentity[node.code]||{}
+  const meta=node.metadata?.brand||{}
+  return {
+    label:node.name||fallback.label||node.code,
+    accent:meta.ui_accent||fallback.accent||'#0B6F5C',
+    accent2:meta.ui_accent_secondary||fallback.accent2||'#1E6F9F',
+    surface:fallback.surface||'#F4F7F9',
+    officialSite:meta.official_site||null,
+    logoStatus:meta.logo_asset_status||null
+  }
+}
+function applyBrandContext(node=null){
+  const root=document.documentElement
+  const brand=getBrand(node)
+  root.style.setProperty('--context-accent',brand?.accent||'#0B6F5C')
+  root.style.setProperty('--context-accent-2',brand?.accent2||'#1E6F9F')
+  root.style.setProperty('--context-surface',brand?.surface||'#F4F7F9')
+  document.body.dataset.contextBrand=node?.code||'MAGLIA'
+  const label=$('liaContextLabel')
+  if(label)label.textContent='Contesto: '+(node?.name||window.activeOfficeName||'MAGLIA 360')
+}
+
 function openPartner(id){
   if(!canOpenView('partners'))return
   currentPartnerId=id
+  setOfficeShell(false)
   document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'))
   $('partnerView').classList.remove('hidden')
   document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'))
   const btn=document.querySelector('[data-partner-id="'+id+'"]');if(btn)btn.classList.add('active')
   const n=ecosystem.find(x=>x.id===id);if(!n)return
+  applyBrandContext(n)
   setHeader(n.name,n.capability+' · dossier relazione')
   showPartnerSection('overview')
   renderPartner()
   setMobileNav(false)
   $('aiDock').classList.remove('hidden')
+  recordRoute({kind:'partner',id})
+  renderHeaderControls()
   window.scrollTo({top:0,behavior:'smooth'})
 }
-document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>navigate(b.dataset.view))
+document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>b.dataset.view==='cepa'?openCepaHub():navigate(b.dataset.view))
 document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>navigate(b.dataset.go))
 document.querySelectorAll('.partner-tab').forEach(b=>b.onclick=()=>showPartnerSection(b.dataset.partnerSection))
 function showPartnerSection(section){
@@ -153,7 +338,13 @@ $('editPartnerBtn').onclick=openEditPartner
 $('mailTemplateSelect').onchange=hydrateMailTemplate
 $('generateMailBtn').onclick=generateMailDraft
 $('mailComposerForm').onsubmit=saveMailDraft
-$('aiDockToggle').onclick=()=>{$('aiDockPanel').classList.toggle('hidden')}
+function setLiaOpen(open){
+  $('aiDockPanel').classList.toggle('hidden',!open)
+  $('aiDockToggle').classList.toggle('hidden',!!open)
+}
+$('aiDockToggle').onclick=()=>setLiaOpen(true)
+$('aiDockClose').onclick=()=>setLiaOpen(false)
+document.addEventListener('keydown',e=>{if(e.key==='Escape')setLiaOpen(false)})
 $('aiChatForm').onsubmit=e=>{e.preventDefault();const q=$('aiChatInput').value.trim();if(!q)return;askAssistant(q);$('aiChatInput').value=''}
 document.querySelectorAll('[data-ai-prompt]').forEach(b=>b.onclick=()=>askAssistant(b.dataset.aiPrompt))
 $('territoryHubFilter').onchange=renderMarketTable
@@ -231,11 +422,20 @@ async function boot(){
   $('workspace').classList.remove('hidden');$('blockedView').classList.add('hidden');$('aiDock').classList.remove('hidden')
   setMobileNav(false)
   try{setFocusMode(localStorage.getItem('maglia360_focus')==='1')}catch(_){setFocusMode(false)}
-  if(window.innerWidth>=1450)$('aiDockPanel').classList.remove('hidden')
+
   $('sideUser').textContent=user.email||'Utente';$('rolePill').textContent=m.role.replaceAll('_',' ')
+  if($('headerUserName'))$('headerUserName').textContent=(user.email||'Utente').split('@')[0]
+  if($('headerUserInitials'))$('headerUserInitials').textContent=((user.email||'U').split('@')[0].split(/[._-]/).map(x=>x[0]).join('').slice(0,2)||'U').toUpperCase()
+  $('manageOfficeUsersBtn')?.classList.toggle('hidden',!isDirectionRole())
   ;['newEntityBtn','addTimelineBtn','addContactBtn','addPartnerDocumentBtn','addDocumentBtn','addCepaSubjectBtn','addCepaInitiativeBtn','addCepaContentBtn','addCepaSpeakerBtn','addCollaboratorBtn','newAssessmentBtn','newDistributionCandidateBtn','editPartnerBtn'].forEach(id=>$(id).classList.toggle('hidden',!isManager()))
   await loadAll()
-  $('aiDock').classList.add('hidden')
+  setCepaShell(false)
+  setOfficeShell(true)
+  setHeader('Home','Sistema operativo commerciale e territoriale')
+  $('aiDock').classList.remove('hidden')
+  setLiaOpen(false)
+  if(appRouteIndex<0)recordRoute({kind:'view',view:'home'})
+  renderHeaderControls()
 }
 
 async function loadAll(){
@@ -282,18 +482,25 @@ async function loadAll(){
     supabase.from('ai_action_catalog').select('*').eq('organization_id',window.orgId).eq('active',true).order('risk_level').order('code'),
     supabase.from('ai_action_approvals').select('*').eq('organization_id',window.orgId).order('created_at',{ascending:false}).limit(100),
     supabase.from('organization_role_views').select('*').eq('organization_id',window.orgId).eq('role',window.userRole).eq('active',true).order('view_code'),
-    supabase.from('ai_automation_runs').select('*,distribution_research_watchlists(id,name,cadence,market_hubs(id,name,city,province))').eq('organization_id',window.orgId).order('created_at',{ascending:false}).limit(100)
+    supabase.from('ai_automation_runs').select('*,distribution_research_watchlists(id,name,cadence,market_hubs(id,name,city,province))').eq('organization_id',window.orgId).order('created_at',{ascending:false}).limit(100),
+    supabase.from('office_user_assignments').select('*').eq('organization_id',window.orgId).eq('active',true).order('is_primary',{ascending:false}),
+    supabase.from('office_direction_messages').select('*').eq('organization_id',window.orgId).eq('active',true).order('priority',{ascending:false}).order('starts_at',{ascending:false}).limit(50),
+    supabase.from('office_product_monthly_snapshots').select('*,agency_products(id,code,name,category,ecosystem_node_id)').eq('organization_id',window.orgId).order('period_month',{ascending:false}).limit(500),
+    supabase.from('office_product_cases').select('*,agency_products(id,code,name,category,ecosystem_node_id)').eq('organization_id',window.orgId).order('priority',{ascending:false}).order('due_at').limit(500),
+    supabase.from('office_product_workflow_stages').select('*').eq('organization_id',window.orgId).eq('active',true).order('case_type').order('sort_order'),
+    supabase.from('office_cepa_activities').select('*').eq('organization_id',window.orgId).order('scheduled_at',{ascending:true}).limit(200),
+    supabase.from('office_data_imports').select('*').eq('organization_id',window.orgId).order('created_at',{ascending:false}).limit(100)
   ]
   const res=await Promise.all(q)
   const err=res.find(x=>x.error)?.error
   if(err){console.error(err);$('refreshBtn').textContent='!';return}
-  ;[ecosystem,projects,actions,marketHubs,marketEntities,contacts,timeline,documents,partnerRequirements,blueprints,subjects,initiatives,cepaContent,cepaAcademy,cepaSpeakers,products,productKnowledge,comparisons,collaborators,collaboratorTerms,portfolioSnapshots,businessAssessments,growthKits,distributionWatchlists,distributionCandidates,distributionEvidence,mailTemplates,mailDrafts,cepaExpansion,cepaReadiness,assistantMessages,liaCapabilities,liaFolders,liaOrders,liaFiles,researchSources,researchInsights,liaActionRules,liaApprovals,roleViewAccess,liaAutomationRuns]=res.map(x=>x.data||[])
+  ;[ecosystem,projects,actions,marketHubs,marketEntities,contacts,timeline,documents,partnerRequirements,blueprints,subjects,initiatives,cepaContent,cepaAcademy,cepaSpeakers,products,productKnowledge,comparisons,collaborators,collaboratorTerms,portfolioSnapshots,businessAssessments,growthKits,distributionWatchlists,distributionCandidates,distributionEvidence,mailTemplates,mailDrafts,cepaExpansion,cepaReadiness,assistantMessages,liaCapabilities,liaFolders,liaOrders,liaFiles,researchSources,researchInsights,liaActionRules,liaApprovals,roleViewAccess,liaAutomationRuns,officeAssignments,officeMessages,officeSnapshots,officeCases,officeWorkflow,officeCepaActivities,officeImports]=res.map(x=>x.data||[])
   renderEverything()
   $('refreshBtn').textContent='↻'
 }
 
 function renderEverything(){
-  renderPartnerNav();renderHome();renderPartner();renderProducts();renderCollaborators();renderGrowthKits();renderComparisons();renderMail();renderCepa();renderTerritories();renderDocuments();renderDevelopment();renderNetworkRadar();renderActions();renderAssistantHistory();renderLiaWorkbench();applyRoleViewAccess()
+  renderPartnerNav();renderHome();renderCepaHub();renderCepaTerritory();renderOffice();renderOfficeProduct();renderPartner();renderProducts();renderCollaborators();renderGrowthKits();renderComparisons();renderMail();renderCepa();renderTerritories();renderDocuments();renderDevelopment();renderNetworkRadar();renderActions();renderAssistantHistory();renderLiaWorkbench();applyRoleViewAccess();renderHeaderControls()
 }
 
 function renderPartnerNav(){
@@ -308,153 +515,799 @@ function subjectStatus(v){return ({research:'Ricerca',design:'Progettazione',rea
 function entityType(v){return ({insurance_intermediary:'Intermediario assicurativo',company:'Impresa',professional:'Professionista',public_entity:'Ente',school:'Scuola',association:'Associazione',partner:'Partner',sap_candidate:'Potenziale SAP',other:'Altro'})[v]||v}
 function stageLabel(v){return ({observed:'Osservato',qualified:'Qualificato',prospect:'Prospect',opportunity:'Opportunità',relationship:'Relazione',archived:'Archiviato'})[v]||v}
 
+function isDirectionRole(){
+  return ['super_admin','supervisor','manager'].includes(window.userRole)
+}
+function accessibleOffices(){
+  if(isDirectionRole())return marketHubs.filter(x=>x.active!==false)
+  const allowed=new Set(officeAssignments.filter(x=>x.user_id===window.userId&&x.active).map(x=>x.hub_id))
+  return marketHubs.filter(x=>allowed.has(x.id)&&x.active!==false)
+}
+function latestSnapshotFor(hubId,productId){
+  return officeSnapshots
+    .filter(x=>x.hub_id===hubId&&x.product_id===productId)
+    .sort((a,b)=>String(b.period_month).localeCompare(String(a.period_month)))[0]||null
+}
+function latestOfficePeriod(hubId){
+  return officeSnapshots.filter(x=>x.hub_id===hubId).map(x=>x.period_month).sort().reverse()[0]||null
+}
+function officeOpenCases(hubId,productId=null){
+  return officeCases.filter(x=>x.hub_id===hubId&&(!productId||x.product_id===productId)&&!['completed','cancelled'].includes(x.status))
+}
+function officeMessagesFor(hubId=null){
+  return officeMessages.filter(x=>(x.hub_id===null||x.hub_id===hubId)&&x.active!==false)
+}
+function brandForProduct(product){
+  const node=ecosystem.find(x=>x.id===product?.ecosystem_node_id)
+  return {node,brand:getBrand(node)}
+}
+function productWorkTypes(product){
+  const common={
+    mobilita:[['renewal','Rinnovi'],['quote','Preventivi'],['proposal','Proposte'],['practice','Pratiche'],['mono_branch','Mono ramo'],['cross_sell','Cross selling']],
+    casa:[['renewal','Rinnovi'],['quote','Preventivi'],['proposal','Proposte'],['practice','Pratiche'],['mono_branch','Mono ramo'],['cross_sell','Cross selling']],
+    impresa:[['feasibility','Studi fattibilità'],['quote','Preventivi'],['proposal','Proposte'],['practice','Pratiche'],['renewal','Rinnovi'],['cross_sell','Cross selling']],
+    salute:[['feasibility','Analisi bisogno'],['quote','Preventivi'],['proposal','Proposte'],['practice','Pratiche'],['cross_sell','Sviluppo relazione']],
+    tutela_legale:[['quote','Preventivi'],['proposal','Proposte'],['practice','Pratiche'],['renewal','Rinnovi'],['cross_sell','Sviluppo relazione']],
+    energia:[['feasibility','Analisi fornitura'],['quote','Offerte'],['proposal','Proposte'],['practice','Pratiche'],['cross_sell','Sviluppo relazione']]
+  }
+  return common[product?.category]||[['proposal','Proposte'],['quote','Preventivi'],['practice','Pratiche'],['cross_sell','Sviluppo relazione']]
+}
+let currentProductCaseFilter='all'
+function fmtMoney(v){
+  if(v==null||Number.isNaN(Number(v)))return '—'
+  return new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(Number(v))
+}
+function fmtMonth(v){
+  if(!v)return 'Nessun dato mensile'
+  return new Intl.DateTimeFormat('it-IT',{month:'long',year:'numeric'}).format(new Date(v+'T12:00:00'))
+}
+function monthlySeries(hubId,productId=null){
+  const rows=officeSnapshots.filter(x=>x.hub_id===hubId&&(!productId||x.product_id===productId))
+  const byMonth={}
+  rows.forEach(x=>{
+    if(!x.period_month)return
+    const item=byMonth[x.period_month]||(byMonth[x.period_month]={premium:0,proposals:0,renewals:0,quotes:0,lost:0})
+    item.premium+=Number(x.premium_total||0)
+    item.proposals+=Number(x.proposals_count||0)
+    item.renewals+=Number(x.renewals_due||0)
+    item.quotes+=Number(x.quotes_to_do||0)
+    item.lost+=Number(x.lost_count||0)
+  })
+  return Object.entries(byMonth).sort((a,b)=>a[0].localeCompare(b[0])).slice(-6).map(([month,data])=>({month,...data}))
+}
+function trendSvg(series,key='premium'){
+  if(!series.length)return '<div class="trend-empty"><strong>Dati storici da importare</strong><span>Il grafico apparirà quando saranno disponibili almeno gli snapshot mensili della sede.</span></div>'
+  const width=640,height=220,padX=36,padTop=24,padBottom=38
+  const values=series.map(x=>Number(x[key]||0))
+  const max=Math.max(...values,1)
+  const step=series.length>1?(width-padX*2)/(series.length-1):0
+  const points=series.map((x,i)=>{
+    const px=padX+i*step
+    const py=padTop+(1-(Number(x[key]||0)/max))*(height-padTop-padBottom)
+    return {x:px,y:py,value:Number(x[key]||0),month:x.month}
+  })
+  const poly=points.map(p=>p.x.toFixed(1)+','+p.y.toFixed(1)).join(' ')
+  const area=poly+' '+(points.at(-1)?.x||padX)+','+(height-padBottom)+' '+(points[0]?.x||padX)+','+(height-padBottom)
+  const labels=points.map(p=>'<g><circle cx="'+p.x+'" cy="'+p.y+'" r="5"></circle><text x="'+p.x+'" y="'+(height-13)+'" text-anchor="middle">'+esc(new Intl.DateTimeFormat('it-IT',{month:'short'}).format(new Date(p.month+'T12:00:00')))+'</text></g>').join('')
+  return '<div class="trend-svg-wrap"><svg viewBox="0 0 '+width+' '+height+'" role="img" aria-label="Andamento ultimi mesi"><defs><linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--context-accent)" stop-opacity=".22"></stop><stop offset="100%" stop-color="var(--context-accent)" stop-opacity="0"></stop></linearGradient></defs><line class="trend-axis" x1="'+padX+'" y1="'+(height-padBottom)+'" x2="'+(width-padX)+'" y2="'+(height-padBottom)+'"></line><polygon class="trend-area" points="'+area+'"></polygon><polyline class="trend-line" points="'+poly+'"></polyline>'+labels+'</svg><div class="trend-summary"><span>Periodo</span><strong>'+esc(fmtMonth(series[0].month))+' → '+esc(fmtMonth(series.at(-1).month))+'</strong><span>Ultimo valore</span><strong>'+esc(key==='premium'?fmtMoney(values.at(-1)):String(values.at(-1)))+'</strong></div></div>'
+}
+function workloadVisual(items){
+  const max=Math.max(...items.map(x=>Number(x.value||0)),1)
+  return items.map(x=>'<div class="workload-row"><div><span>'+esc(x.label)+'</span><strong>'+Number(x.value||0)+'</strong></div><div class="workload-track"><i style="width:'+Math.max(x.value?8:0,Math.round(Number(x.value||0)/max*100))+'%"></i></div></div>').join('')
+}
+function renderMiniProductionChart(hubId){
+  const rows=officeSnapshots.filter(x=>x.hub_id===hubId&&x.premium_total!=null)
+  const byMonth={}
+  rows.forEach(x=>{byMonth[x.period_month]=(byMonth[x.period_month]||0)+Number(x.premium_total||0)})
+  const months=Object.entries(byMonth).sort((a,b)=>a[0].localeCompare(b[0])).slice(-6)
+  if(!months.length)return '<div class="production-empty"><strong>Dati mensili non ancora importati</strong><span>Il primo caricamento AssiEasy creerà lo storico della sede.</span></div>'
+  const max=Math.max(...months.map(x=>x[1]),1)
+  return '<div class="production-chart">'+months.map(([m,v])=>'<div class="production-bar"><span style="height:'+Math.max(8,Math.round(v/max*74))+'px"></span><small>'+esc(new Intl.DateTimeFormat('it-IT',{month:'short'}).format(new Date(m+'T12:00:00')))+'</small><b>'+esc(fmtMoney(v))+'</b></div>').join('')+'</div>'
+}
+
 function renderHome(){
-  const dash=$('magliaDashboard')
-  if(!dash)return
+  const offices=accessibleOffices()
+  $('officeEntryRole').textContent='Accesso: '+String(window.userRole||'utente').replaceAll('_',' ')
+  $('officeAccessNote').textContent=isDirectionRole()?'Vista Direzione · tutte le sedi attive':'Solo sedi assegnate al profilo'
 
-  const partnerShort=n=>{
-    if(n.code==='HDI')return 'HDI'
-    if(n.code==='PRIMA_ENEA')return 'PRIMA'
-    if(n.code==='SLP')return 'SLP'
-    if(n.code==='AGLEA')return 'AGLEA'
-    if(n.code==='CIP')return 'CIP'
-    return (n.code||n.name||'M').slice(0,6)
-  }
-  const partnerLabel=n=>{
-    if(n.code==='HDI')return 'Compagnia madre'
-    if(n.code==='PRIMA_ENEA')return 'Partner strategico'
-    return 'Partner'
-  }
-  const displayName=p=>{
-    const n=p.name||''
-    if(/auto|motor/i.test(n))return 'Auto'
-    if(/casa/i.test(n))return 'Casa'
-    if(/salute/i.test(n))return 'Salute'
-    if(/previd/i.test(n))return 'Previdenza'
-    if(/tutela/i.test(n))return 'Tutela Legale'
-    if(/energia/i.test(n))return 'Energia'
-    if(/impresa/i.test(n))return 'Impresa'
-    return n
-  }
+  const allOpen=offices.flatMap(h=>officeOpenCases(h.id))
+  const urgent=allOpen.filter(x=>['urgent','high'].includes(x.priority))
+  const now=Date.now(),next7=now+7*24*60*60*1000
+  const deadlines=allOpen.filter(x=>x.due_at&&new Date(x.due_at).getTime()>=now&&new Date(x.due_at).getTime()<=next7)
+  const activeMessages=officeMessages.filter(x=>x.active!==false)
+  const globalMessage=officeMessagesFor(null)[0]
 
-  const relationSolid=ecosystem.filter(n=>['core','active','project_active'].includes(n.relationship_status)).length
-  const verifiedProducts=productKnowledge.filter(x=>x.verification_status==='verified').length
-  const missingDocs=partnerRequirements.filter(x=>x.status==='missing').length
-  const pendingTerms=collaboratorTerms.filter(x=>x.verification_status!=='verified').length
-  const cepaReady=cepaReadiness.filter(x=>['ready','verified'].includes(x.status)).length
-  const termsVerified=collaboratorTerms.filter(x=>x.verification_status==='verified').length
-  const partnerCovered=partnerRequirements.filter(x=>['received','verified','not_applicable'].includes(x.status)).length
-  const open=actions.filter(a=>!['completed','cancelled'].includes(a.status)).sort(actionSort)
+  $('homePriorityCount').textContent=urgent.length
+  $('homeNotificationCount').textContent=activeMessages.length
+  $('homeDeadlineCount').textContent=deadlines.length
+  $('homeDirectionTitle').textContent=globalMessage?.title||'Nessun messaggio urgente'
+  $('homeDirectionText').textContent=globalMessage?.body||'Consulta le comunicazioni interne.'
 
-  dash.data={
-    partners:ecosystem.slice(0,5).map(n=>({
-      id:n.id,code:n.code,name:n.name,short:partnerShort(n),label:partnerLabel(n),
-      subtitle:n.capability||n.strategic_role||'Competenza da definire'
-    })),
-    products:products.slice(0,6).map(p=>({
-      id:p.id,name:p.name,label:displayName(p),category:p.category,
-      shortSummary:p.summary||p.category||'Scheda in sviluppo'
-    })),
-    collaborators:(isManager()?portfolioSnapshots
-      .filter(s=>s.agency_collaborators?.collaborator_type!=='agency_central')
-      .slice(0,5)
-      .map(s=>{
-        const c=s.agency_collaborators||{}
-        return {
-          id:c.id||s.collaborator_id,
-          name:c.display_name||'Rete',
-          territory:c.territory||c.area||'Territorio da definire',
-          detail:(s.clients_count||0)+' clienti · '+(s.policies_count||0)+' polizze',
-          terms:c.earning_model==='da_verificare'?'Da verificare':String(c.earning_model||'Da definire').replaceAll('_',' '),
-          status:c.status==='active'?'Attivo':String(c.status||'').replaceAll('_',' '),
-          value:'€ '+Number(s.premium_total||0).toLocaleString('it-IT',{maximumFractionDigits:0})
-        }
-      })
-      :collaborators
-        .filter(c=>c.collaborator_type!=='agency_central')
-        .slice(0,5)
-        .map(c=>({
-          id:c.id,name:c.display_name||'Rete',
-          territory:c.territory||c.area||'Territorio da definire',
-          detail:c.role_description||String(c.collaborator_type||'Collaboratore').replaceAll('_',' '),
-          terms:'Supporto ruolo',
-          status:c.status==='active'?'Attivo':String(c.status||'').replaceAll('_',' '),
-          value:'Dati riservati'
-        }))),
-    benchmark:{
-      solid:[
-        relationSolid+' relazioni ecosistema attive/core',
-        cepaReady+' elementi CEPA pronti/verificati',
-        portfolioSnapshots.length+' snapshot rete disponibili'
-      ],
-      improve:[
-        missingDocs+' requisiti partner non ancora registrati',
-        pendingTerms+' condizioni economiche da verificare',
-        verifiedProducts+'/'+productKnowledge.length+' elementi prodotto verificati'
-      ]
-    },
-    metrics:{
-      docs:documents.length,
-      market:marketEntities.length+distributionCandidates.length,
-      knowledge:verifiedProducts+'/'+productKnowledge.length,
-      terms:termsVerified+'/'+collaboratorTerms.length,
-      partnerDocs:partnerCovered+'/'+partnerRequirements.length,
-      cepa:cepaReady+'/'+cepaReadiness.length
-    },
-    cepa:{steps:['Centro CEPA','Sportelli SAP','Mandello','Lecco','Italia']},
-    actions:open.slice(0,6).map(a=>({
-      id:a.id,title:a.title,
-      detail:(a.ecosystem_nodes?.name||a.market_entities?.name||a.strategic_projects?.title||laneLabel(a.lane))+(a.due_at?' · '+fmtDate(a.due_at):''),
-      priority:a.priority
-    })),
-    radar:{
-      official:distributionCandidates.filter(x=>x.source_provider==='IVASS RUI').length,
-      pendingReview:distributionCandidates.filter(x=>x.source_provider==='IVASS RUI'&&x.review_status==='pending').length,
-      contactApproved:distributionCandidates.filter(x=>x.contact_policy_status==='approved_for_contact').length,
-      discovered:distributionCandidates.filter(x=>x.stage==='discovered').length
-    },
-    approvals:liaApprovals.filter(x=>x.status==='pending').slice(0,4).map(x=>({
-      id:x.id,
-      title:(liaActionRules.find(r=>r.code===x.action_code)?.title||x.action_code||'Approvazione'),
-      detail:x.request_payload?.display_name||x.request_payload?.purpose||'Decisione amministrativa',
-      status:x.status
-    })),
-    automations:liaAutomationRuns.slice(0,4).map(x=>({
-      id:x.id,
-      title:x.distribution_research_watchlists?.name||'Automazione Radar',
-      detail:(x.distribution_research_watchlists?.market_hubs?.city||'Territorio')+(x.result_summary?' · '+x.result_summary:''),
-      status:x.status
-    })),
-    workOrders:liaOrders.slice(0,4).map(x=>({
-      id:x.id,
-      title:String(x.action_type||'Lavoro Lia').replaceAll('_',' '),
-      detail:x.result_summary||x.prompt||'Ordine operativo registrato',
-      status:x.status
-    })),
-    insights:researchInsights.slice(0,4).map(x=>({
-      id:x.id,title:x.title,
-      detail:(x.research_sources?.name?x.research_sources.name+' · ':'')+(x.application_hypothesis||x.insight_summary||'')
-    })),
-    system:{
-      sources:researchSources.length,
-      insights:researchInsights.length,
-      folders:liaFolders.length,
-      orders:liaOrders.length,
-      automations:liaAutomationRuns.length
-    },
-    user:{label:window.userEmail||'Area riservata',role:(window.userRole||'').replaceAll('_',' ')}
+  const totalPeriod=offices.map(h=>latestOfficePeriod(h.id)).filter(Boolean).sort().reverse()[0]||null
+  const totalSnaps=totalPeriod?officeSnapshots.filter(x=>offices.some(h=>h.id===x.hub_id)&&x.period_month===totalPeriod):[]
+  const totalPremium=totalSnaps.reduce((n,x)=>n+Number(x.premium_total||0),0)
+  const totalPolicies=totalSnaps.reduce((n,x)=>n+Number(x.active_policies||0),0)
+  const totalQuotes=totalSnaps.reduce((n,x)=>n+Number(x.quotes_to_do||0),0)
+
+  const cards=[]
+  cards.push(
+    '<button type="button" class="environment-card agency-card" data-home-action="agency">'+
+      '<div class="environment-card-head"><span class="environment-icon">▦</span><div><small>AGENZIA</small><h3>Uffici Maglia 360</h3><p>Il mondo operativo dell’agenzia.</p></div></div>'+
+      '<img class="environment-visual" src="./assets/office-team.svg" alt="Ambiente di lavoro Maglia 360">'+
+      '<div class="environment-stats">'+
+        '<div><strong>'+offices.length+'</strong><span>Sedi attive</span></div>'+
+        '<div><strong>'+allOpen.length+'</strong><span>Pratiche aperte</span></div>'+
+        '<div><strong>'+totalQuotes+'</strong><span>Preventivi</span></div>'+
+        '<div><strong>'+(totalPeriod?esc(fmtMoney(totalPremium)):'—')+'</strong><span>Produzione</span></div>'+
+      '</div><span class="environment-cta">Vai agli Uffici Maglia 360 →</span>'+
+    '</button>'
+  )
+
+  offices.forEach(h=>{
+    const period=latestOfficePeriod(h.id)
+    const snaps=period?officeSnapshots.filter(x=>x.hub_id===h.id&&x.period_month===period):[]
+    const premium=snaps.reduce((n,x)=>n+Number(x.premium_total||0),0)
+    const policies=snaps.reduce((n,x)=>n+Number(x.active_policies||0),0)
+    const quotes=snaps.reduce((n,x)=>n+Number(x.quotes_to_do||0),0)
+    const cases=officeOpenCases(h.id)
+    const img=h.code==='MANDELLO'?'./assets/office-mandello.svg':'./assets/office-colico.svg'
+    cards.push(
+      '<button type="button" class="environment-card office-env-card" data-office-id="'+h.id+'">'+
+        '<div class="environment-card-head"><span class="environment-icon pin">⌖</span><div><small>UFFICIO OPERATIVO</small><h3>Ufficio '+esc(h.city)+'</h3><p>'+esc(h.address||'Operatività territoriale')+'</p></div><b class="status-chip">Operativo</b></div>'+
+        '<img class="environment-visual" src="'+img+'" alt="Paesaggio del territorio di '+esc(h.city)+'">'+
+        '<div class="environment-stats">'+
+          '<div><strong>'+policies+'</strong><span>Polizze attive</span></div>'+
+          '<div><strong>'+quotes+'</strong><span>Preventivi</span></div>'+
+          '<div><strong>'+cases.length+'</strong><span>Pratiche aperte</span></div>'+
+          '<div><strong>'+(period?esc(fmtMoney(premium)):'—')+'</strong><span>Produzione</span></div>'+
+        '</div><span class="environment-cta">Vai a Ufficio '+esc(h.city)+' →</span>'+
+      '</button>'
+    )
+  })
+
+  if(canOpenView('cepa')){
+    const cepaOpen=officeCepaActivities.filter(x=>!['completed','cancelled'].includes(x.status)).length
+    const mapped=marketEntities.length
+    const nextEvents=officeCepaActivities.filter(x=>x.scheduled_at&&new Date(x.scheduled_at)>=new Date()&&!['completed','cancelled'].includes(x.status)).length
+    cards.push(
+      '<button type="button" id="cepaWorldCard" class="environment-card cepa-env-card" data-home-action="cepa">'+
+        '<div class="environment-card-head"><span class="environment-icon cepa">⌂</span><div><small>PROGETTO TERRITORIALE</small><h3>Progetto C.E.P.A.</h3><p>Centro Educazione Previdenziale e Assicurativa.</p></div><b class="status-chip cepa">In sviluppo</b></div>'+
+        '<img class="environment-visual" src="./assets/cepa-training.svg" alt="Formazione e confronto C.E.P.A.">'+
+        '<div class="environment-stats">'+
+          '<div><strong>'+cepaOpen+'</strong><span>Attività aperte</span></div>'+
+          '<div><strong>'+mapped+'</strong><span>Soggetti mappati</span></div>'+
+          '<div><strong>'+cepaContent.length+'</strong><span>Contenuti</span></div>'+
+          '<div><strong>'+nextEvents+'</strong><span>Prossimi eventi</span></div>'+
+        '</div><span class="environment-cta">Vai al Progetto C.E.P.A. →</span>'+
+      '</button>'
+    )
+  }
+  $('homeEnvironmentCards').innerHTML=cards.join('')
+
+  document.querySelectorAll('#homeEnvironmentCards [data-office-id]').forEach(b=>b.onclick=()=>openOffice(b.dataset.officeId))
+  document.querySelectorAll('#homeEnvironmentCards [data-home-action]').forEach(b=>b.onclick=()=>{
+    if(b.dataset.homeAction==='cepa')openCepaHub()
+    else if(b.dataset.homeAction==='agency')$('directionOverview').scrollIntoView({behavior:'smooth',block:'start'})
+  })
+
+  const future=[
+    {title:'Nuovo presidio',area:'Territorio lecchese',copy:'Spazio predisposto per una futura sede operativa.'},
+    {title:'Nuovo presidio',area:'Alto Lario',copy:'Architettura pronta per estendere servizi e rete.'},
+    {title:'Nuovo presidio',area:'Valtellina',copy:'Sviluppo futuro senza confonderlo con sedi già attive.'}
+  ]
+  $('futureOfficeCards').innerHTML=future.map((x,i)=>
+    '<article class="future-office-card"><div class="future-visual '+(i%2?'alt':'')+'"></div><div><span>PROSSIMAMENTE</span><h4>'+esc(x.title)+'</h4><strong>'+esc(x.area)+'</strong><p>'+esc(x.copy)+'</p></div></article>'
+  ).join('')
+
+  $('homePriorityList').innerHTML=(urgent.slice(0,5).map(x=>
+    '<button type="button" data-priority-office="'+x.hub_id+'"><span class="priority-dot '+esc(x.priority)+'"></span><div><strong>'+esc(x.title)+'</strong><small>'+esc(marketHubs.find(h=>h.id===x.hub_id)?.city||'Sede')+(x.due_at?' · '+esc(fmtDate(x.due_at)):'')+'</small></div><b>›</b></button>'
+  ).join('')||'<div class="rail-empty">Nessuna priorità urgente.</div>')
+  document.querySelectorAll('[data-priority-office]').forEach(b=>b.onclick=()=>openOffice(b.dataset.priorityOffice))
+
+  $('homeNewsList').innerHTML=(activeMessages.slice(0,4).map(x=>
+    '<article><span class="news-marker '+esc(x.message_type||'information')+'"></span><div><strong>'+esc(x.title)+'</strong><p>'+esc(x.body)+'</p><small>'+esc(x.hub_id?(marketHubs.find(h=>h.id===x.hub_id)?.city||'Sede'):'Direzione')+'</small></div></article>'
+  ).join('')||'<div class="rail-empty">Nessuna nuova comunicazione interna.</div>')
+
+  if(isDirectionRole()){
+    const officeRows=offices.map(h=>{
+      const period=latestOfficePeriod(h.id)
+      const snaps=period?officeSnapshots.filter(x=>x.hub_id===h.id&&x.period_month===period):[]
+      return {
+        id:h.id,city:h.city,period,
+        premium:snaps.reduce((n,x)=>n+Number(x.premium_total||0),0),
+        proposals:snaps.reduce((n,x)=>n+Number(x.proposals_count||0),0),
+        renewals:snaps.reduce((n,x)=>n+Number(x.renewals_due||0),0),
+        open:officeOpenCases(h.id).length
+      }
+    })
+    const total=officeRows.reduce((a,x)=>({premium:a.premium+x.premium,proposals:a.proposals+x.proposals,renewals:a.renewals+x.renewals,open:a.open+x.open}),{premium:0,proposals:0,renewals:0,open:0})
+    $('directionCompareSummary').innerHTML=
+      '<div><span>Produzione totale</span><strong>'+esc(total.premium?fmtMoney(total.premium):'Da importare')+'</strong><small>somma sedi attive</small></div>'+
+      '<div><span>Proposte</span><strong>'+total.proposals+'</strong><small>mese corrente</small></div>'+
+      '<div><span>Rinnovi</span><strong>'+total.renewals+'</strong><small>da lavorare</small></div>'+
+      '<div><span>Pratiche aperte</span><strong>'+total.open+'</strong><small>tutte le sedi</small></div>'
+    $('directionProduction').innerHTML=officeRows.map(h=>
+      '<article><div class="direction-office-title"><div><strong>'+esc(h.city)+'</strong><small>'+esc(fmtMonth(h.period))+'</small></div><button type="button" data-office-id="'+h.id+'">Entra →</button></div>'+
+      '<div class="direction-office-kpis"><div><span>Produzione</span><b>'+esc(h.period?fmtMoney(h.premium):'—')+'</b></div><div><span>Proposte</span><b>'+h.proposals+'</b></div><div><span>Rinnovi</span><b>'+h.renewals+'</b></div><div><span>Pratiche</span><b>'+h.open+'</b></div></div>'+renderMiniProductionChart(h.id)+'</article>'
+    ).join('')
+    $('directionPriorities').innerHTML='<div class="direction-priority-head"><strong>Priorità della rete</strong><span>'+allOpen.length+' aperte</span></div>'+
+      (allOpen.slice(0,6).map(x=>'<button type="button" data-office-id="'+x.hub_id+'"><strong>'+esc(x.title)+'</strong><small>'+esc(marketHubs.find(h=>h.id===x.hub_id)?.city||'Sede')+' · '+esc(String(x.case_type).replaceAll('_',' '))+'</small><span>'+esc(x.priority)+'</span></button>').join('')||'<p class="office-muted">Nessuna priorità di sede registrata.</p>')
+    $('directionOverview').classList.remove('hidden')
+    document.querySelectorAll('#directionOverview [data-office-id]').forEach(b=>b.onclick=()=>openOffice(b.dataset.officeId))
+  }else{
+    $('directionOverview').classList.add('hidden')
   }
 
-  if(!dash.dataset.bound){
-    dash.dataset.bound='1'
-    dash.addEventListener('navigate',e=>navigate(e.detail.view))
-    dash.addEventListener('open-partner',e=>openPartner(e.detail.id))
-    dash.addEventListener('open-product',e=>openProduct(e.detail.id))
-    dash.addEventListener('open-collaborator',e=>openCollaborator(e.detail.id))
-    dash.addEventListener('open-action',e=>openAction(e.detail.id))
-    dash.addEventListener('ask-assistant',e=>askAssistant(e.detail.prompt))
+  renderHeaderControls()
+}
+
+function renderCepaHub(){
+  const holder=$('cepaTerritoryCards')
+  if(!holder)return
+  const offices=accessibleOffices()
+  holder.innerHTML=offices.map(h=>{
+    const acts=officeCepaActivities.filter(x=>x.hub_id===h.id)
+    const open=acts.filter(x=>!['completed','cancelled'].includes(x.status))
+    const next=open.filter(x=>x.scheduled_at).sort((a,b)=>new Date(a.scheduled_at)-new Date(b.scheduled_at))[0]
+    const entities=marketEntities.filter(x=>x.hub_id===h.id)
+    return '<button class="cepa-territory-card" type="button" data-cepa-hub="'+h.id+'">'+
+      '<div class="cepa-territory-top"><span>C.E.P.A. · TERRITORIO</span><b>'+esc(h.city)+'</b></div>'+
+      '<div class="cepa-territory-kpis"><div><strong>'+open.length+'</strong><small>attività aperte</small></div><div><strong>'+entities.length+'</strong><small>soggetti mappati</small></div></div>'+
+      '<p>'+(next?'Prossimo: '+esc(next.title)+(next.scheduled_at?' · '+esc(fmtDateTime(next.scheduled_at)):''):'Programmazione territoriale da sviluppare')+'</p>'+
+      '<em>Entra nel territorio →</em>'+
+    '</button>'
+  }).join('')||'<div class="office-empty"><strong>Nessun territorio accessibile</strong><p>La Direzione deve assegnare almeno una sede al profilo.</p></div>'
+  document.querySelectorAll('[data-cepa-hub]').forEach(b=>b.onclick=()=>openCepaTerritory(b.dataset.cepaHub))
+}
+
+function openCepaHub(){
+  if(!canOpenView('cepa'))return
+  currentCepaHubId=null
+  currentOfficeId=null
+  currentOfficeProductId=null
+  setCepaShell(true)
+  applyBrandContext(null)
+  document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'))
+  $('cepaHubView').classList.remove('hidden')
+  setHeader('C.E.P.A.','Centro centrale e attività territoriali')
+  window.activeOfficeName='C.E.P.A.'
+  if($('liaContextLabel'))$('liaContextLabel').textContent='Contesto: C.E.P.A.'
+  renderCepaHub()
+  showOfficeQuickActions(false)
+  setLiaOpen(false)
+  recordRoute({kind:'cepaHub'})
+  renderHeaderControls()
+  window.scrollTo({top:0,behavior:'smooth'})
+}
+
+function openCepaCentral(){
+  if(!canOpenView('cepa'))return
+  currentCepaHubId=null
+  currentOfficeId=null
+  currentOfficeProductId=null
+  setCepaShell(true)
+  document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'))
+  $('cepaView').classList.remove('hidden')
+  setHeader('Centro C.E.P.A.','Governance, materie, Academy, contenuti e standard')
+  window.activeOfficeName='Centro C.E.P.A.'
+  if($('liaContextLabel'))$('liaContextLabel').textContent='Contesto: Centro C.E.P.A.'
+  renderCepa()
+  showOfficeQuickActions(false)
+  setLiaOpen(false)
+  recordRoute({kind:'cepaCentral'})
+  renderHeaderControls()
+  window.scrollTo({top:0,behavior:'smooth'})
+}
+
+function openCepaTerritory(hubId){
+  if(!canOpenView('cepa'))return
+  const hub=accessibleOffices().find(x=>x.id===hubId)
+  if(!hub)return
+  currentCepaHubId=hubId
+  currentOfficeId=hubId
+  currentOfficeProductId=null
+  setCepaShell(true)
+  document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'))
+  $('cepaTerritoryView').classList.remove('hidden')
+  $('cepaTerritoryBreadcrumb').textContent='C.E.P.A. '+hub.city
+  setHeader('C.E.P.A. '+hub.city,'Attività educative e sviluppo territoriale')
+  window.activeOfficeName='C.E.P.A. '+hub.city
+  if($('liaContextLabel'))$('liaContextLabel').textContent='Contesto: C.E.P.A. '+hub.city
+  renderCepaTerritory()
+  showOfficeQuickActions(false)
+  setLiaOpen(false)
+  recordRoute({kind:'cepaTerritory',id:hubId})
+  renderHeaderControls()
+  window.scrollTo({top:0,behavior:'smooth'})
+}
+
+function renderCepaTerritory(){
+  if(!currentCepaHubId)return
+  const hub=marketHubs.find(x=>x.id===currentCepaHubId)
+  if(!hub)return
+  const activities=officeCepaActivities.filter(x=>x.hub_id===hub.id)
+  const open=activities.filter(x=>!['completed','cancelled'].includes(x.status))
+  const completed=activities.filter(x=>x.status==='completed')
+  const entities=marketEntities.filter(x=>x.hub_id===hub.id)
+  const classify=x=>String(x.entity_type||'')+' '+(x.tags||[]).join(' ')
+  const schools=entities.filter(x=>/school|scuol/i.test(classify(x)))
+  const companies=entities.filter(x=>/company|business|impres|azienda/i.test(classify(x)))
+  const publicBodies=entities.filter(x=>/public|ente|comune|municip/i.test(classify(x)))
+
+  $('cepaTerritoryIdentity').innerHTML=
+    '<div><span>C.E.P.A. · PRESIDIO TERRITORIALE</span><h2>'+esc(hub.city)+'</h2><p>'+esc(hub.address||'')+'</p></div>'+
+    '<div class="cepa-territory-badge"><strong>Maglia 360</strong><span>Centro CEPA → territorio</span></div>'
+
+  $('cepaTerritorySummary').innerHTML=
+    '<div><span>Attività aperte</span><strong>'+open.length+'</strong><small>programma locale</small></div>'+
+    '<div><span>Completate</span><strong>'+completed.length+'</strong><small>storico attività</small></div>'+
+    '<div><span>Soggetti mappati</span><strong>'+entities.length+'</strong><small>rete territoriale</small></div>'+
+    '<div><span>Scuole / enti</span><strong>'+(schools.length+publicBodies.length)+'</strong><small>potenziali interlocutori</small></div>'
+
+  $('cepaTerritoryActivities').innerHTML=open
+    .sort((a,b)=>(a.scheduled_at?new Date(a.scheduled_at):Infinity)-(b.scheduled_at?new Date(b.scheduled_at):Infinity))
+    .map(x=>'<div class="cepa-territory-activity"><div><span>'+esc(String(x.activity_type).replaceAll('_',' '))+'</span><strong>'+esc(x.title)+'</strong><small>'+(x.scheduled_at?esc(fmtDateTime(x.scheduled_at)):'Data da definire')+(x.location_name?' · '+esc(x.location_name):'')+'</small></div><b>'+esc(x.status)+'</b></div>').join('')||
+    '<div class="office-empty compact"><strong>Nessuna attività ancora programmata</strong><p>Il territorio è pronto per costruire il proprio calendario C.E.P.A.</p></div>'
+
+  $('cepaTerritoryNetwork').innerHTML=
+    '<div class="cepa-network-kpis">'+
+      '<div><strong>'+companies.length+'</strong><span>Aziende</span></div>'+
+      '<div><strong>'+schools.length+'</strong><span>Scuole</span></div>'+
+      '<div><strong>'+publicBodies.length+'</strong><span>Enti</span></div>'+
+      '<div><strong>'+Math.max(0,entities.length-companies.length-schools.length-publicBodies.length)+'</strong><span>Altri soggetti</span></div>'+
+    '</div>'+
+    '<div class="cepa-network-list">'+entities.slice(0,6).map(x=>'<div><strong>'+esc(x.name)+'</strong><small>'+esc(x.entity_type||'soggetto')+(x.stage?' · '+esc(x.stage):'')+'</small></div>').join('')+'</div>'
+}
+
+function openOffice(id){
+  const office=accessibleOffices().find(x=>x.id===id)
+  if(!office)return
+  currentOfficeId=id
+  currentOfficeProductId=null
+  currentCepaHubId=null
+  setCepaShell(false)
+  setOfficeShell(true)
+  window.activeOfficeName='Ufficio '+office.city
+  applyBrandContext(null)
+  document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'))
+  $('officeView').classList.remove('hidden')
+  $('officeBreadcrumbName').textContent='Ufficio '+office.city
+  setHeader('Ufficio '+office.city,'Sede operativa · '+(office.address||''))
+  renderOffice()
+  showOfficeQuickActions(true)
+  $('newDirectionMessageBtn').classList.toggle('hidden',!isDirectionRole())
+  setLiaOpen(false)
+  recordRoute({kind:'office',id})
+  renderHeaderControls()
+  window.scrollTo({top:0,behavior:'smooth'})
+}
+
+function renderOffice(){
+  if(!currentOfficeId)return
+  const office=marketHubs.find(x=>x.id===currentOfficeId)
+  if(!office)return
+  const period=latestOfficePeriod(office.id)
+  const monthSnaps=period?officeSnapshots.filter(x=>x.hub_id===office.id&&x.period_month===period):[]
+  const premium=monthSnaps.reduce((n,x)=>n+Number(x.premium_total||0),0)
+  const activePolicies=monthSnaps.reduce((n,x)=>n+Number(x.active_policies||0),0)
+  const proposals=monthSnaps.reduce((n,x)=>n+Number(x.proposals_count||0),0)
+  const renewals=monthSnaps.reduce((n,x)=>n+Number(x.renewals_due||0),0)
+  const cases=officeOpenCases(office.id)
+
+  $('officeIdentity').innerHTML='<div><span>SEDE OPERATIVA · LC</span><h2>'+esc(office.city)+'</h2><p>'+esc(office.address||'')+'</p></div><div class="office-period"><span>Ultimo aggiornamento dati</span><strong>'+esc(fmtMonth(period))+'</strong></div>'
+  const localMessage=officeMessagesFor(office.id)[0]
+  const box=$('officeDirectionMessage')
+  if(localMessage){
+    box.classList.remove('hidden')
+    box.innerHTML='<div><span>DALLA DIREZIONE</span><strong>'+esc(localMessage.title)+'</strong><p>'+esc(localMessage.body)+'</p></div>'
+  }else box.classList.add('hidden')
+
+  $('officeSummary').innerHTML=
+    '<div><span>Produzione mese</span><strong>'+esc(period?fmtMoney(premium):'Da importare')+'</strong><small>'+esc(fmtMonth(period))+'</small></div>'+
+    '<div><span>Polizze attive</span><strong>'+activePolicies+'</strong><small>dati snapshot</small></div>'+
+    '<div><span>Proposte mese</span><strong>'+proposals+'</strong><small>tutti i prodotti</small></div>'+
+    '<div><span>Rinnovi</span><strong>'+renewals+'</strong><small>in scadenza</small></div>'+
+    '<div><span>Pratiche aperte</span><strong>'+cases.length+'</strong><small>lavoro corrente</small></div>'
+
+  const officeSeries=monthlySeries(office.id)
+  $('officeTrendChart').innerHTML=trendSvg(officeSeries,'premium')
+  $('officeTrendLabel').textContent=officeSeries.length?officeSeries.length+' mesi disponibili':'Nessuno storico disponibile'
+  const monthQuotes=monthSnaps.reduce((n,x)=>n+Number(x.quotes_to_do||0),0)
+  const monthLost=monthSnaps.reduce((n,x)=>n+Number(x.lost_count||0),0)
+  $('officeWorkloadVisual').innerHTML=workloadVisual([
+    {label:'Rinnovi da lavorare',value:renewals},
+    {label:'Proposte mese',value:proposals},
+    {label:'Preventivi da fare',value:monthQuotes},
+    {label:'Pratiche aperte',value:cases.length},
+    {label:'Perse nel mese',value:monthLost}
+  ])
+
+  $('officeProductBars').innerHTML=products.map(p=>{
+    const snap=latestSnapshotFor(office.id,p.id)
+    const open=officeOpenCases(office.id,p.id)
+    const {node,brand}=brandForProduct(p)
+    const accent=brand?.accent||'#0b6f5c'
+    return '<button class="office-product-bar" type="button" data-office-product="'+p.id+'" style="--product-accent:'+esc(accent)+'">'+
+      '<div class="product-brand-context"><span class="brand-wordmark">'+esc(node?.code||'MAGLIA')+'</span><small>'+esc(node?.name||'Maglia 360')+'</small></div>'+
+      '<div class="office-product-name"><strong>'+esc(p.name)+'</strong><span>'+esc(String(p.category||'').replaceAll('_',' '))+'</span></div>'+
+      '<div class="product-bar-metrics">'+
+        '<div><span>Premi</span><b>'+esc(snap?.premium_total!=null?fmtMoney(snap.premium_total):'—')+'</b></div>'+
+        '<div><span>Rinnovi</span><b>'+Number(snap?.renewals_due||0)+'</b></div>'+
+        '<div><span>Proposte</span><b>'+Number(snap?.proposals_count||0)+'</b></div>'+
+        '<div><span>Preventivi</span><b>'+Number(snap?.quotes_to_do||0)+'</b></div>'+
+        '<div><span>Perse</span><b>'+Number(snap?.lost_count||0)+'</b></div>'+
+        '<div><span>Mono ramo</span><b>'+Number(snap?.mono_branch_count||0)+'</b></div>'+
+        '<div><span>Pratiche</span><b>'+open.length+'</b></div>'+
+      '</div><span class="product-enter">Apri →</span></button>'
+  }).join('')
+  document.querySelectorAll('[data-office-product]').forEach(b=>b.onclick=()=>openOfficeProduct(b.dataset.officeProduct))
+
+  $('officePriorities').innerHTML=cases.slice(0,8).map(x=>'<div class="office-priority-row"><div><strong>'+esc(x.title)+'</strong><small>'+esc(String(x.case_type).replaceAll('_',' '))+(x.due_at?' · '+esc(fmtDate(x.due_at)):'')+'</small></div><span class="priority-tag '+esc(x.priority)+'">'+esc(x.priority)+'</span></div>').join('')||'<p class="office-muted">Nessuna pratica prioritaria registrata.</p>'
+  const cepa=officeCepaActivities.filter(x=>x.hub_id===office.id&&!['completed','cancelled'].includes(x.status))
+  $('officeCepa').innerHTML=cepa.slice(0,6).map(x=>'<div class="office-cepa-row"><div><strong>'+esc(x.title)+'</strong><small>'+esc(String(x.activity_type).replaceAll('_',' '))+(x.scheduled_at?' · '+esc(fmtDateTime(x.scheduled_at)):'')+'</small></div><span>'+esc(x.status)+'</span></div>').join('')||'<p class="office-muted">Nessuna attività C.E.P.A. ancora registrata per questa sede.</p>'
+}
+
+function openOfficeProduct(productId){
+  const office=marketHubs.find(x=>x.id===currentOfficeId)
+  const product=products.find(x=>x.id===productId)
+  if(!office||!product)return
+  currentOfficeProductId=productId
+  currentProductCaseFilter='all'
+  currentCepaHubId=null
+  setCepaShell(false)
+  setOfficeShell(true)
+  const {node}=brandForProduct(product)
+  applyBrandContext(node||null)
+  document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'))
+  $('officeProductView').classList.remove('hidden')
+  $('productOfficeBack').textContent='Ufficio '+office.city
+  $('productBreadcrumbName').textContent=product.name
+  setHeader(product.name,'Ufficio '+office.city+' · '+(node?.name||'MAGLIA 360'))
+  renderOfficeProduct()
+  showOfficeQuickActions(true)
+  $('newDirectionMessageBtn').classList.toggle('hidden',!isDirectionRole())
+  setLiaOpen(false)
+  recordRoute({kind:'product',officeId:office.id,id:productId})
+  renderHeaderControls()
+  window.scrollTo({top:0,behavior:'smooth'})
+}
+
+function renderOfficeProduct(){
+  if(!currentOfficeId||!currentOfficeProductId)return
+  const office=marketHubs.find(x=>x.id===currentOfficeId)
+  const product=products.find(x=>x.id===currentOfficeProductId)
+  if(!office||!product)return
+  const snap=latestSnapshotFor(office.id,product.id)
+  const cases=officeOpenCases(office.id,product.id)
+  const {node,brand}=brandForProduct(product)
+  const accent=brand?.accent||'#0b6f5c'
+
+  $('productOfficeIdentity').innerHTML='<div class="product-company-band" style="--product-accent:'+esc(accent)+'"><div class="brand-wordmark large">'+esc(node?.code||'MAGLIA')+'</div><div><span>'+esc(node?.name||'MAGLIA 360')+'</span><h2>'+esc(product.name)+'</h2><p>Ufficio '+esc(office.city)+' · '+esc(String(product.category||'').replaceAll('_',' '))+'</p>'+(brand?.officialSite?'<a class="official-brand-link" href="'+esc(brand.officialSite)+'" target="_blank" rel="noopener">Sito ufficiale ↗</a>':'')+'</div></div><div class="office-period"><span>Snapshot</span><strong>'+esc(fmtMonth(snap?.period_month||null))+'</strong></div>'
+  $('productOfficeMetrics').innerHTML=
+    '<div><span>Premi</span><strong>'+esc(snap?.premium_total!=null?fmtMoney(snap.premium_total):'—')+'</strong></div>'+
+    '<div><span>Attive</span><strong>'+Number(snap?.active_policies||0)+'</strong></div>'+
+    '<div><span>Rinnovi</span><strong>'+Number(snap?.renewals_due||0)+'</strong></div>'+
+    '<div><span>Proposte</span><strong>'+Number(snap?.proposals_count||0)+'</strong></div>'+
+    '<div><span>Preventivi da fare</span><strong>'+Number(snap?.quotes_to_do||0)+'</strong></div>'+
+    '<div><span>Perse</span><strong>'+Number(snap?.lost_count||0)+'</strong></div>'+
+    '<div><span>Mono ramo</span><strong>'+Number(snap?.mono_branch_count||0)+'</strong></div>'+
+    '<div><span>Pratiche</span><strong>'+cases.length+'</strong></div>'
+
+  const productSeries=monthlySeries(office.id,product.id)
+  $('productTrendChart').innerHTML=trendSvg(productSeries,'premium')
+  $('productTrendLabel').textContent=productSeries.length?productSeries.length+' mesi disponibili':'Storico da importare'
+  $('productMonthVisual').innerHTML=workloadVisual([
+    {label:'Rinnovi',value:Number(snap?.renewals_due||0)},
+    {label:'Proposte',value:Number(snap?.proposals_count||0)},
+    {label:'Preventivi da fare',value:Number(snap?.quotes_to_do||0)},
+    {label:'Perse',value:Number(snap?.lost_count||0)},
+    {label:'Mono ramo',value:Number(snap?.mono_branch_count||0)}
+  ])
+
+  const typeCounts={}
+  cases.forEach(x=>{typeCounts[x.case_type]=(typeCounts[x.case_type]||0)+1})
+  const types=productWorkTypes(product)
+  const flowTotal=Math.max(1,types.reduce((n,[code])=>n+Number(typeCounts[code]||0),0))
+  $('productFlowVisual').innerHTML=types.map(([code,label],idx)=>{
+    const count=Number(typeCounts[code]||0)
+    const share=Math.round(count/flowTotal*100)
+    const stages=officeWorkflow.filter(x=>x.case_type===code).sort((a,b)=>a.sort_order-b.sort_order)
+    return '<button type="button" class="product-flow-step" data-case-filter="'+code+'">'+
+      '<div class="product-flow-index">'+String(idx+1).padStart(2,'0')+'</div>'+
+      '<div class="product-flow-copy"><span>'+esc(label)+'</span><strong>'+count+'</strong><small>'+esc(stages.slice(0,3).map(x=>x.label).join(' → ')||'Workflow attivo')+'</small></div>'+
+      '<div class="product-flow-meter"><i style="width:'+Math.max(count?12:0,share)+'%"></i></div>'+
+    '</button>'
+  }).join('')
+  $('productStageBoard').innerHTML=
+    '<button type="button" class="product-stage-card '+(currentProductCaseFilter==='all'?'active':'')+'" data-case-filter="all"><span>Tutto il lavoro</span><strong>'+cases.length+'</strong><small>Vista completa del prodotto</small></button>'+
+    types.map(([code,label])=>'<button type="button" class="product-stage-card '+(currentProductCaseFilter===code?'active':'')+'" data-case-filter="'+code+'"><span>'+esc(label)+'</span><strong>'+Number(typeCounts[code]||0)+'</strong><small>'+esc(officeWorkflow.filter(x=>x.case_type===code).slice(0,4).map(x=>x.label).join(' · ')||'Workflow configurato')+'</small></button>').join('')
+  const renderCaseRows=()=>{
+    const visible=currentProductCaseFilter==='all'?cases:cases.filter(x=>x.case_type===currentProductCaseFilter)
+    $('productCaseList').innerHTML=visible.map(x=>'<div class="product-case-row"><div><strong>'+esc(x.title)+'</strong><small>'+esc(String(x.case_type).replaceAll('_',' '))+' · '+esc(x.stage_code.replaceAll('_',' '))+(x.due_at?' · '+esc(fmtDate(x.due_at)):'')+'</small></div><span class="priority-tag '+esc(x.priority)+'">'+esc(x.priority)+'</span></div>').join('')||'<div class="office-empty compact"><strong>Nessuna pratica in questo stato</strong><p>Le attività compariranno qui quando verranno registrate.</p></div>'
+  }
+  document.querySelectorAll('[data-case-filter]').forEach(b=>b.onclick=()=>{
+    currentProductCaseFilter=b.dataset.caseFilter
+    renderOfficeProduct()
+  })
+  renderCaseRows()
+}
+
+document.querySelectorAll('[data-office-home]').forEach(b=>b.onclick=()=>{
+  currentOfficeId=null;currentOfficeProductId=null;currentCepaHubId=null;window.activeOfficeName=null;showOfficeQuickActions(false);setCepaShell(false);applyBrandContext(null);navigate('home')
+})
+if($('homeEnvironmentPrev'))$('homeEnvironmentPrev').onclick=()=>$('homeEnvironmentCards').scrollBy({left:-420,behavior:'smooth'})
+if($('homeEnvironmentNext'))$('homeEnvironmentNext').onclick=()=>$('homeEnvironmentCards').scrollBy({left:420,behavior:'smooth'})
+if($('futureOfficePrev'))$('futureOfficePrev').onclick=()=>$('futureOfficeCards').scrollBy({left:-330,behavior:'smooth'})
+if($('futureOfficeNext'))$('futureOfficeNext').onclick=()=>$('futureOfficeCards').scrollBy({left:330,behavior:'smooth'})
+if($('homePriorityTile'))$('homePriorityTile').onclick=()=>navigate('actions')
+if($('homeNotificationTile'))$('homeNotificationTile').onclick=()=>navigate('actions')
+if($('homeDeadlineTile'))$('homeDeadlineTile').onclick=()=>navigate('actions')
+if($('homeDirectionTile'))$('homeDirectionTile').onclick=()=>document.querySelector('.home-news-list')?.scrollIntoView({behavior:'smooth',block:'center'})
+if($('openAllPrioritiesBtn'))$('openAllPrioritiesBtn').onclick=()=>navigate('actions')
+if($('openAllNewsBtn'))$('openAllNewsBtn').onclick=()=>navigate('actions')
+
+$('productOfficeBack').onclick=()=>openOffice(currentOfficeId)
+$('openCepaCentralBtn').onclick=openCepaCentral
+$('cepaTerritoryBack').onclick=openCepaHub
+$('cepaTerritoryNewActivityBtn').onclick=()=>{if(currentCepaHubId){currentOfficeId=currentCepaHubId;openCepaActivityEditor()}}
+$('officeCepaOpenBtn').onclick=()=>{if(currentOfficeId)openCepaTerritory(currentOfficeId)}
+
+function showOfficeQuickActions(show){
+  const box=$('officeQuickActions')
+  if(!box)return
+  box.classList.toggle('hidden',!show)
+}
+function selectedOffice(){
+  return marketHubs.find(x=>x.id===currentOfficeId)||null
+}
+function selectedOfficeProduct(){
+  return products.find(x=>x.id===currentOfficeProductId)||null
+}
+function openDirectionMessageEditor(){
+  if(!isDirectionRole())return
+  const options=accessibleOffices().map(h=>'<option value="'+h.id+'">'+esc(h.city)+'</option>').join('')
+  showModal(
+    '<div class="eyebrow">DIREZIONE</div><h2>Nuova comunicazione interna</h2>'+
+    '<form id="directionMessageForm" class="form-stack">'+
+      '<label>Destinazione<select id="dmHub"><option value="">Tutte le sedi</option>'+options+'</select></label>'+
+      '<label>Tipo<select id="dmType"><option value="information">Informazione</option><option value="priority">Priorità</option><option value="commercial">Proposta commerciale</option><option value="cepa">C.E.P.A.</option><option value="administrative">Amministrativa</option><option value="training">Formazione</option></select></label>'+
+      '<label>Priorità<select id="dmPriority"><option value="normal">Normale</option><option value="high">Alta</option><option value="urgent">Urgente</option></select></label>'+
+      '<label>Titolo<input id="dmTitle" required maxlength="180"></label>'+
+      '<label>Messaggio<textarea id="dmBody" rows="5" required></textarea></label>'+
+      '<label class="check-line"><input id="dmAck" type="checkbox"> Richiedi presa visione</label>'+
+      '<button class="primary" type="submit">Pubblica messaggio</button>'+
+    '</form>'
+  )
+  $('directionMessageForm').onsubmit=async e=>{
+    e.preventDefault()
+    const row={
+      organization_id:window.orgId,
+      hub_id:$('dmHub').value||null,
+      title:$('dmTitle').value.trim(),
+      body:$('dmBody').value.trim(),
+      message_type:$('dmType').value,
+      priority:$('dmPriority').value,
+      requires_ack:$('dmAck').checked,
+      created_by:window.userId
+    }
+    const{error}=await supabase.from('office_direction_messages').insert(row)
+    if(error)return alert(error.message)
+    closeModal();await loadAll()
   }
 }
+function openMonthlyDataEditor(productId=currentOfficeProductId){
+  const office=selectedOffice()
+  const product=products.find(x=>x.id===productId)
+  if(!office||!product)return
+  const current=latestSnapshotFor(office.id,product.id)
+  const month=(current?.period_month||new Date().toISOString().slice(0,7)+'-01').slice(0,7)
+  showModal(
+    '<div class="eyebrow">DATI MENSILI</div><h2>'+esc(product.name)+' · '+esc(office.city)+'</h2>'+
+    '<p class="form-note">Inserimento manuale iniziale. Il parser AssiEasy userà gli stessi campi e conserverà uno snapshot per ogni mese.</p>'+
+    '<form id="monthlyDataForm" class="form-stack compact-grid">'+
+      '<label>Mese<input id="mdMonth" type="month" value="'+esc(month)+'" required></label>'+
+      '<label>Clienti<input id="mdClients" type="number" min="0" value="'+Number(current?.clients_count||0)+'"></label>'+
+      '<label>Polizze attive<input id="mdActive" type="number" min="0" value="'+Number(current?.active_policies||0)+'"></label>'+
+      '<label>Premi €<input id="mdPremium" type="number" min="0" step="0.01" value="'+Number(current?.premium_total||0)+'"></label>'+
+      '<label>Rinnovi da lavorare<input id="mdRenewals" type="number" min="0" value="'+Number(current?.renewals_due||0)+'"></label>'+
+      '<label>Rinnovi completati<input id="mdRenewed" type="number" min="0" value="'+Number(current?.renewals_completed||0)+'"></label>'+
+      '<label>Proposte<input id="mdProposals" type="number" min="0" value="'+Number(current?.proposals_count||0)+'"></label>'+
+      '<label>Preventivi da fare<input id="mdQuotesTodo" type="number" min="0" value="'+Number(current?.quotes_to_do||0)+'"></label>'+
+      '<label>Preventivi fatti<input id="mdQuotesDone" type="number" min="0" value="'+Number(current?.quotes_done||0)+'"></label>'+
+      '<label>Perse<input id="mdLost" type="number" min="0" value="'+Number(current?.lost_count||0)+'"></label>'+
+      '<label>Mono ramo<input id="mdMono" type="number" min="0" value="'+Number(current?.mono_branch_count||0)+'"></label>'+
+      '<label>Cross selling<input id="mdCross" type="number" min="0" value="'+Number(current?.cross_sell_opportunities||0)+'"></label>'+
+      '<label>Studi fattibilità<input id="mdFeasibility" type="number" min="0" value="'+Number(current?.feasibility_studies||0)+'"></label>'+
+      '<label>Pratiche aperte<input id="mdOpenCases" type="number" min="0" value="'+Number(current?.open_cases||0)+'"></label>'+
+      '<button class="primary full" type="submit">Salva snapshot mensile</button>'+
+    '</form>'
+  )
+  $('monthlyDataForm').onsubmit=async e=>{
+    e.preventDefault()
+    const n=id=>Number($(id).value||0)
+    const row={
+      organization_id:window.orgId,hub_id:office.id,product_id:product.id,
+      period_month:$('mdMonth').value+'-01',source_system:'manual',
+      clients_count:n('mdClients'),active_policies:n('mdActive'),premium_total:n('mdPremium'),
+      renewals_due:n('mdRenewals'),renewals_completed:n('mdRenewed'),proposals_count:n('mdProposals'),
+      quotes_to_do:n('mdQuotesTodo'),quotes_done:n('mdQuotesDone'),lost_count:n('mdLost'),
+      mono_branch_count:n('mdMono'),cross_sell_opportunities:n('mdCross'),feasibility_studies:n('mdFeasibility'),
+      open_cases:n('mdOpenCases'),imported_by:window.userId,updated_at:new Date().toISOString()
+    }
+    const{error}=await supabase.from('office_product_monthly_snapshots')
+      .upsert(row,{onConflict:'organization_id,hub_id,product_id,period_month'})
+    if(error)return alert(error.message)
+    closeModal();await loadAll();openOfficeProduct(product.id)
+  }
+}
+function openOfficeCaseEditor(){
+  const office=selectedOffice(),product=selectedOfficeProduct()
+  if(!office||!product)return
+  showModal(
+    '<div class="eyebrow">NUOVA PRATICA</div><h2>'+esc(product.name)+' · '+esc(office.city)+'</h2>'+
+    '<form id="officeCaseForm" class="form-stack">'+
+      '<label>Tipo<select id="ocType"><option value="renewal">Rinnovo</option><option value="proposal">Proposta</option><option value="quote">Preventivo</option><option value="feasibility">Studio fattibilità</option><option value="practice">Pratica</option><option value="mono_branch">Mono ramo</option><option value="cross_sell">Cross selling</option><option value="other">Altro</option></select></label>'+
+      '<label>Titolo<input id="ocTitle" required maxlength="220"></label>'+
+      '<label>Priorità<select id="ocPriority"><option value="normal">Normale</option><option value="high">Alta</option><option value="urgent">Urgente</option><option value="low">Bassa</option></select></label>'+
+      '<label>Scadenza<input id="ocDue" type="datetime-local"></label>'+
+      '<label>Valore stimato €<input id="ocValue" type="number" min="0" step="0.01"></label>'+
+      '<button class="primary" type="submit">Crea pratica</button>'+
+    '</form>'
+  )
+  $('officeCaseForm').onsubmit=async e=>{
+    e.preventDefault()
+    const type=$('ocType').value
+    const firstStage=officeWorkflow.filter(x=>x.case_type===type).sort((a,b)=>a.sort_order-b.sort_order)[0]
+    const row={
+      organization_id:window.orgId,hub_id:office.id,product_id:product.id,
+      case_type:type,stage_code:firstStage?.stage_code||'open',status:'open',
+      title:$('ocTitle').value.trim(),priority:$('ocPriority').value,
+      due_at:$('ocDue').value?new Date($('ocDue').value).toISOString():null,
+      estimated_value:$('ocValue').value?Number($('ocValue').value):null,
+      assigned_to:window.userId,created_by:window.userId
+    }
+    const{error}=await supabase.from('office_product_cases').insert(row)
+    if(error)return alert(error.message)
+    closeModal();await loadAll();openOfficeProduct(product.id)
+  }
+}
+function openCepaActivityEditor(){
+  const office=selectedOffice()
+  if(!office)return
+  showModal(
+    '<div class="eyebrow">C.E.P.A. · '+esc(office.city)+'</div><h2>Nuova attività territoriale</h2>'+
+    '<form id="cepaOfficeForm" class="form-stack">'+
+      '<label>Tipo<select id="caType"><option value="event">Evento</option><option value="training">Formazione</option><option value="sap">SAP</option><option value="company_meeting">Incontro azienda</option><option value="school">Scuola</option><option value="public_entity">Ente pubblico</option><option value="appointment">Appuntamento</option><option value="content">Contenuto</option><option value="other">Altro</option></select></label>'+
+      '<label>Titolo<input id="caTitle" required maxlength="220"></label>'+
+      '<label>Descrizione<textarea id="caDescription" rows="4"></textarea></label>'+
+      '<label>Data<input id="caDate" type="datetime-local"></label>'+
+      '<label>Luogo<input id="caLocation"></label>'+
+      '<button class="primary" type="submit">Crea attività C.E.P.A.</button>'+
+    '</form>'
+  )
+  $('cepaOfficeForm').onsubmit=async e=>{
+    e.preventDefault()
+    const row={
+      organization_id:window.orgId,hub_id:office.id,activity_type:$('caType').value,
+      title:$('caTitle').value.trim(),description:$('caDescription').value.trim()||null,
+      scheduled_at:$('caDate').value?new Date($('caDate').value).toISOString():null,
+      location_name:$('caLocation').value.trim()||null,status:'planned',assigned_to:window.userId,created_by:window.userId
+    }
+    const{error}=await supabase.from('office_cepa_activities').insert(row)
+    if(error)return alert(error.message)
+    closeModal();await loadAll();openOffice(office.id)
+  }
+}
+
+async function openOfficeAssignmentsEditor(){
+  if(!isDirectionRole())return
+  await loadMembers()
+  if(!members.length)return alert('Nessun utente assegnabile disponibile.')
+  const memberOptions=members.map(m=>'<option value="'+m.user_id+'">'+esc(m.full_name||m.email||m.user_id)+' · '+esc(m.role||'')+'</option>').join('')
+  showModal(
+    '<div class="eyebrow">DIREZIONE · ACCESSI</div><h2>Assegna le sedi agli utenti</h2>'+
+    '<p class="form-note">La persona vedrà la schermata iniziale MAGLIA 360, ma potrà entrare solo negli uffici assegnati. Direzione, supervisor e manager mantengono la vista globale.</p>'+
+    '<form id="officeAssignmentForm" class="form-stack">'+
+      '<label>Utente<select id="oaUser">'+memberOptions+'</select></label>'+
+      '<div id="oaOfficeList" class="office-assignment-list"></div>'+
+      '<div class="form-two"><label>Livello<select id="oaLevel"><option value="work">Operativo</option><option value="read">Sola lettura</option><option value="manage">Gestione sede</option></select></label>'+
+      '<label>Sede principale<select id="oaPrimary"><option value="">Nessuna</option>'+marketHubs.map(h=>'<option value="'+h.id+'">'+esc(h.city)+'</option>').join('')+'</select></label></div>'+
+      '<button class="primary" type="submit">Salva assegnazioni</button>'+
+    '</form>'
+  )
+  const renderAssignments=()=>{
+    const uid=$('oaUser').value
+    $('oaOfficeList').innerHTML=marketHubs.filter(h=>h.active!==false).map(h=>{
+      const found=officeAssignments.find(a=>a.user_id===uid&&a.hub_id===h.id&&a.active)
+      return '<label class="office-assignment-item"><input type="checkbox" data-office-assignment="'+h.id+'" '+(found?'checked':'')+'><span><strong>'+esc(h.city)+'</strong><small>'+esc(h.address||'')+'</small></span></label>'
+    }).join('')
+    const active=officeAssignments.filter(a=>a.user_id===uid&&a.active)
+    const primary=active.find(a=>a.is_primary)
+    $('oaPrimary').value=primary?.hub_id||''
+    const level=active[0]?.access_level
+    if(level)$('oaLevel').value=level
+  }
+  $('oaUser').onchange=renderAssignments
+  renderAssignments()
+  $('officeAssignmentForm').onsubmit=async e=>{
+    e.preventDefault()
+    const uid=$('oaUser').value
+    const level=$('oaLevel').value
+    const primary=$('oaPrimary').value||null
+    const selected=new Set([...document.querySelectorAll('[data-office-assignment]:checked')].map(x=>x.dataset.officeAssignment))
+    const operations=[]
+    for(const h of marketHubs.filter(x=>x.active!==false)){
+      const existing=officeAssignments.find(a=>a.user_id===uid&&a.hub_id===h.id)
+      if(selected.has(h.id)){
+        const row={
+          organization_id:window.orgId,hub_id:h.id,user_id:uid,access_level:level,
+          is_primary:primary===h.id,active:true,assigned_by:window.userId,updated_at:new Date().toISOString()
+        }
+        operations.push(supabase.from('office_user_assignments').upsert(row,{onConflict:'organization_id,hub_id,user_id'}))
+      }else if(existing?.active){
+        operations.push(supabase.from('office_user_assignments').update({active:false,is_primary:false,updated_at:new Date().toISOString()}).eq('id',existing.id))
+      }
+    }
+    const results=await Promise.all(operations)
+    const error=results.find(x=>x.error)?.error
+    if(error)return alert(error.message)
+    closeModal();await loadAll();renderHome()
+  }
+}
+
+async function openAssiEasyImport(){
+  const office=selectedOffice()
+  if(!office)return
+  showModal(
+    '<div class="eyebrow">IMPORT DATI · '+esc(office.city)+'</div><h2>Carica export AssiEasy</h2>'+
+    '<p class="form-note">Il file originale viene conservato in area privata e associato a sede e mese. Il primo export reale servirà a definire il mapping automatico senza inventare colonne.</p>'+
+    '<form id="assiEasyImportForm" class="form-stack">'+
+      '<label>Mese di riferimento<input id="aeMonth" type="month" value="'+new Date().toISOString().slice(0,7)+'" required></label>'+
+      '<label>Tipo dati<select id="aeDataKind"><option value="portfolio_monthly">Portafoglio mensile</option><option value="renewals">Rinnovi</option><option value="production">Produzione</option><option value="customers">Clienti</option><option value="other">Altro export</option></select></label>'+
+      '<label>File export<input id="aeFile" type="file" accept=".csv,.txt,.xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv" required></label>'+
+      '<div class="import-safety-note"><strong>Nessuna elaborazione distruttiva.</strong><span>Il file viene archiviato; i dati mensili esistenti non vengono cancellati o sovrascritti senza mapping verificato.</span></div>'+
+      '<button class="primary" type="submit">Carica e registra</button>'+
+    '</form>'
+  )
+  $('assiEasyImportForm').onsubmit=async e=>{
+    e.preventDefault()
+    const file=$('aeFile').files?.[0]
+    if(!file)return
+    if(file.size>26214400)return alert('Il file supera il limite di 25 MB.')
+    const ext=(file.name.split('.').pop()||'').toLowerCase()
+    if(!['csv','txt','xlsx','xls'].includes(ext))return alert('Formato non supportato. Usa CSV, TXT, XLSX o XLS.')
+    try{
+      const path=window.orgId+'/'+window.userId+'/office-imports/'+office.id+'/'+Date.now()+'-'+safeLiaFileName(file.name)
+      const{error:uploadError}=await supabase.storage.from('lia-workspace').upload(path,file,{contentType:file.type||undefined,upsert:false})
+      if(uploadError)throw uploadError
+      const row={
+        organization_id:window.orgId,hub_id:office.id,period_month:$('aeMonth').value+'-01',
+        source_system:'ASSIEASY',data_kind:$('aeDataKind').value,original_name:file.name,
+        storage_path:path,status:'uploaded',imported_by:window.userId,
+        validation_summary:{file_size:file.size,mime_type:file.type||null,extension:ext,parser_status:'awaiting_verified_mapping'}
+      }
+      const{error:insertError}=await supabase.from('office_data_imports').insert(row)
+      if(insertError){
+        try{await supabase.storage.from('lia-workspace').remove([path])}catch(_){}
+        throw insertError
+      }
+      closeModal();await loadAll();openOffice(office.id)
+      alert('Export AssiEasy archiviato. Il file è pronto per la definizione del mapping verificato.')
+    }catch(error){alert(error?.message||String(error))}
+  }
+}
+
+$('manageOfficeUsersBtn').onclick=openOfficeAssignmentsEditor
+$('newDirectionMessageBtn').onclick=openDirectionMessageEditor
+$('importAssiEasyBtn').onclick=openAssiEasyImport
+$('newMonthlyDataBtn').onclick=()=>{
+  const office=selectedOffice();if(!office)return
+  const options=products.map(p=>'<option value="'+p.id+'">'+esc(p.name)+'</option>').join('')
+  showModal('<div class="eyebrow">DATI MENSILI</div><h2>Scegli il prodotto</h2><form id="pickMonthlyProduct" class="form-stack"><label>Prodotto<select id="pickProduct">'+options+'</select></label><button class="primary" type="submit">Continua</button></form>')
+  $('pickMonthlyProduct').onsubmit=e=>{e.preventDefault();const pid=$('pickProduct').value;closeModal();openMonthlyDataEditor(pid)}
+}
+$('newCepaActivityBtn').onclick=openCepaActivityEditor
+$('newOfficeCaseBtn').onclick=openOfficeCaseEditor
 
 function renderPartner(){
   if(!currentPartnerId)return
@@ -1177,8 +2030,7 @@ async function askAssistant(q){
     reply='Posso preparare e salvare una bozza personalizzata usando i modelli Maglia/CEPA. Ti porto in AI Mail & Chat. L’invio diretto resta separato finché non colleghiamo un canale email autorizzato.'
     navigate('aiMail')
   }else{
-    const names=ecosystem.map(n=>n.code).join(', ')
-    reply='Posso lavorare sui dati presenti in piattaforma: compagnie e partner ('+names+'), prodotti, collaboratori, CEPA, territorio, documenti e attività. Dimmi quale area vuoi leggere o quale azione vuoi preparare.'
+    reply='Questa domanda non riguarda necessariamente i dati interni di MAGLIA 360. La nuova architettura di Lia prevede un motore generale separato dal Workbench operativo. Al momento questo ambiente V2 mantiene sicure e attive le funzioni aziendali; il collegamento del motore conversazionale generale richiede il relativo servizio LLM lato server e non verrà simulato con risposte preconfezionate.'
   }
   setTimeout(()=>{addAssistantMessage(reply,'bot');persistAssistantMessage(reply,'assistant','response',{matched:true,...context})},120)
 }
