@@ -587,6 +587,17 @@ function renderOfficeProduct(){
   const typeCounts={}
   cases.forEach(x=>{typeCounts[x.case_type]=(typeCounts[x.case_type]||0)+1})
   const types=productWorkTypes(product)
+  const flowTotal=Math.max(1,types.reduce((n,[code])=>n+Number(typeCounts[code]||0),0))
+  $('productFlowVisual').innerHTML=types.map(([code,label],idx)=>{
+    const count=Number(typeCounts[code]||0)
+    const share=Math.round(count/flowTotal*100)
+    const stages=officeWorkflow.filter(x=>x.case_type===code).sort((a,b)=>a.sort_order-b.sort_order)
+    return '<button type="button" class="product-flow-step" data-case-filter="'+code+'">'+
+      '<div class="product-flow-index">'+String(idx+1).padStart(2,'0')+'</div>'+
+      '<div class="product-flow-copy"><span>'+esc(label)+'</span><strong>'+count+'</strong><small>'+esc(stages.slice(0,3).map(x=>x.label).join(' → ')||'Workflow attivo')+'</small></div>'+
+      '<div class="product-flow-meter"><i style="width:'+Math.max(count?12:0,share)+'%"></i></div>'+
+    '</button>'
+  }).join('')
   $('productStageBoard').innerHTML=
     '<button type="button" class="product-stage-card '+(currentProductCaseFilter==='all'?'active':'')+'" data-case-filter="all"><span>Tutto il lavoro</span><strong>'+cases.length+'</strong><small>Vista completa del prodotto</small></button>'+
     types.map(([code,label])=>'<button type="button" class="product-stage-card '+(currentProductCaseFilter===code?'active':'')+'" data-case-filter="'+code+'"><span>'+esc(label)+'</span><strong>'+Number(typeCounts[code]||0)+'</strong><small>'+esc(officeWorkflow.filter(x=>x.case_type===code).slice(0,4).map(x=>x.label).join(' · ')||'Workflow configurato')+'</small></button>').join('')
