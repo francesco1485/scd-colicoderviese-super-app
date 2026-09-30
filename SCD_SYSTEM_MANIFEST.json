@@ -3,8 +3,8 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "2.2.0",
-    "effective_at": "2026-09-29",
+    "version": "3.0.0",
+    "effective_at": "2026-09-30",
     "status": "BINDING",
     "language": "it-IT",
     "timezone": "Europe/Rome",
@@ -18,7 +18,9 @@
       "legacy_documents_are_non_normative": true,
       "state_first": true,
       "no_write_without_verified_state": true,
-      "unverified_is_not_false_or_absent": true
+      "unverified_is_not_false_or_absent": true,
+      "cumulative_directives": true,
+      "cumulative_directives_rule": "Ogni nuova direttiva utente integra le precedenti; sostituzioni o cancellazioni avvengono solo quando esplicitamente richieste o quando una componente è resa obsoleta dalla nuova architettura, con verifica analitica e rollback."
     },
     "supersedes_as_normative_authority": [
       "PROJECT_CONSTITUTION.md",
@@ -33,7 +35,7 @@
     ]
   },
   "north_star": {
-    "definition": "Un unico sistema operativo digitale della S.D.C. ColicoDerviese che rappresenta l'intera società sportiva, non un sito e non una sola agenda.",
+    "definition": "SCD UNIVERSE: sistema operativo digitale vivo della S.D.C. ColicoDerviese, bello da usare, utile ogni giorno e capace di unire sport, famiglia, tifo, servizi, partner e gestione interna in una sola esperienza adattiva.",
     "single_product": true,
     "channels": [
       "WEB_DESKTOP",
@@ -46,7 +48,10 @@
     "same_data_same_permissions_same_identity_across_channels": true,
     "drive_and_gmail_are_backoffice_engines": true,
     "r20_must_not_be_replaced_without_verified_migration": true,
-    "progressive_evolution_not_rewrite": true
+    "progressive_evolution_not_rewrite": true,
+    "cumulative_product_evolution": true,
+    "real_platform_evidence_first": true,
+    "futuristic_proposals_allowed_when_labeled_and_safe": true
   },
   "non_negotiable_invariants": [
     {
@@ -251,7 +256,10 @@
         "SETTORE_GIOVANILE",
         "TERRITORIO",
         "COMUNITA",
-        "TECNOLOGIA_MODERNA"
+        "SPATIAL_TECH",
+        "FUTURE_SPORT",
+        "MULTI_GENERATION",
+        "HIGH_IMPACT_EDITORIAL"
       ],
       "palette": [
         "BLU_SCD",
@@ -271,22 +279,29 @@
         "SaaS_generico",
         "dashboard_grigia_anonima",
         "WordPress_template",
-        "minimalismo_senza_identita"
+        "minimalismo_senza_identita",
+        "grande_barra_blu_dominante",
+        "schermate_vuote",
+        "card_senza_azione",
+        "sponsor_nascosti"
       ]
     },
     "component_language": [
-      "HEADER_SCD",
-      "CARD_BIANCA_ARROTONDATA",
-      "CTA_GIALLO_BLU",
-      "BADGE_STATO",
+      "COMPACT_SHELL",
+      "SPATIAL_PHOTO_HERO",
+      "LIVE_STRIP",
+      "SPONSOR_MARQUEE",
+      "STORY_ORBITS",
+      "ROLE_WORLDS",
+      "SCD_TWIN",
+      "SCD_MIRROR",
       "MATCH_CARD",
-      "EVENT_CARD",
-      "CALENDAR_FILTERS",
-      "SPONSOR_STRIP",
-      "AFFILIATIONS",
-      "BOTTOM_NAV",
+      "EVENT_RAIL",
+      "FAN_LAB",
+      "SCD_MOMENTS",
       "ROLE_DASHBOARD",
-      "SKY_ASSISTANT"
+      "BOTTOM_NAV",
+      "SOURCE_STATUS"
     ],
     "media_policy": {
       "official_logos_must_not_be_redrawn": true,
@@ -1195,9 +1210,39 @@
         "hidden_biometric_scoring",
         "mental_state_inference",
         "competence_scoring_of_minors",
-        "manipulative_pressure"
+        "manipulative_pressure",
+        "talent_ranking"
       ],
-      "purpose": "belonging_growth_participation"
+      "purpose": "belonging_growth_participation",
+      "state": "IMPLEMENTED_LOCAL_R38",
+      "stages": [
+        "SCINTILLA",
+        "ROOKIE",
+        "PLAYMAKER",
+        "CAPITANO",
+        "LEGGENDA"
+      ],
+      "storage": "LOCAL_DEVICE_R38",
+      "sync_target": "SUPABASE_PROFILE_FUTURE_AFTER_PRIVACY_REVIEW",
+      "signals_r38": [
+        "APP_VISIT",
+        "FEATURE_EXPLORATION",
+        "COMMUNITY_PARTICIPATION",
+        "AVATAR_USE",
+        "MIRROR_USE"
+      ]
+    },
+    "mirror": {
+      "state": "IMPLEMENTED_R38_FRONTEND",
+      "role": "CONTEXTUAL_VIRTUAL_COLLABORATOR",
+      "engine": "SKY_EXISTING_ENGINE",
+      "surfaces": [
+        "PULSE_EMBEDDED",
+        "FLOATING_ASSISTANT",
+        "FUTURE_MOBILE"
+      ],
+      "permissions": "INHERIT_USER_ROLE_AND_SCOPE",
+      "no_permission_bypass": true
     }
   },
   "geo_spatial": {
@@ -1320,7 +1365,35 @@
       "CHANGE_SENSITIVE_DOCUMENTS",
       "CHANGE_SAFEGUARDING",
       "DEPLOY_CRITICAL_CHANGE"
-    ]
+    ],
+    "meta_loop": [
+      "REAL_SOURCE_SIGNAL",
+      "NORMALIZE",
+      "TRUST_SCORE",
+      "OBSERVE_USAGE",
+      "DETECT_GAP",
+      "ADAPT_SAFE_UI",
+      "PROPOSE_INNOVATION",
+      "TEST",
+      "VISUAL_COMPARE",
+      "MEASURE",
+      "HUMAN_APPROVE_CRITICAL_CHANGE"
+    ],
+    "cumulative_directives": true,
+    "real_source_priority": [
+      "SCD_DRIVE",
+      "SCD_GMAIL",
+      "R20",
+      "SCD_SUPABASE",
+      "SCD_OFFICIAL_SITE",
+      "SCD_INSTAGRAM",
+      "SCD_FACEBOOK",
+      "FIGC",
+      "LND",
+      "CR_LOMBARDIA",
+      "TUTTOCAMPO"
+    ],
+    "future_mode": "PROPOSE_REVOLUTIONARY_SAFE_FEATURES_WITH_EVIDENCE_AND_ROLLBACK"
   },
   "analytics": {
     "privacy_first": true,
@@ -1351,7 +1424,41 @@
       "PRIVATE_MESSAGES",
       "UNNECESSARY_SENSITIVE_DATA"
     ],
-    "non_essential_requires_consent": true
+    "non_essential_requires_consent": true,
+    "meta_adaptive": {
+      "id": "SCD_META_ENGINE",
+      "state": "IMPLEMENTED_R38_ON_DEVICE",
+      "purpose": "Adattare ordine e priorita delle superfici senza creare un profilo sensibile o nascosto.",
+      "inputs": [
+        "ROLE_MODE",
+        "SAFE_INTERACTION_CATEGORY",
+        "RECENCY",
+        "EXPLICIT_FEATURE_USE"
+      ],
+      "forbidden_inputs": [
+        "SAFEGUARDING",
+        "HEALTH",
+        "PRIVATE_MESSAGES",
+        "DOCUMENT_CONTENT",
+        "PASSWORD",
+        "PIN",
+        "BIOMETRICS",
+        "MENTAL_STATE",
+        "MINOR_COMPETENCE_SCORE"
+      ],
+      "storage": "LOCAL_DEVICE_ONLY_R38",
+      "external_sync": false,
+      "transparent_reset": true,
+      "future_social_signal_adapter": {
+        "state": "PLANNED",
+        "rule": "Solo metriche ufficiali/autorizzate da piattaforme reali; niente scraping non autorizzato e niente dati personali superflui.",
+        "sources": [
+          "SCD_INSTAGRAM",
+          "SCD_FACEBOOK",
+          "SCD_OFFICIAL_SITE"
+        ]
+      }
+    }
   },
   "architecture": {
     "current": {
@@ -1462,7 +1569,11 @@
         "PULMINI_SHEET"
       ],
       "dedicated_project_required": true,
-      "cepa_project_reuse_forbidden": true
+      "cepa_project_reuse_forbidden": true,
+      "meta_adaptive": "SCD_META_ENGINE_PRIVACY_FIRST",
+      "virtual_collaborator": "SCD_MIRROR_ON_SKY_ENGINE",
+      "evolving_avatar": "SCD_TWIN",
+      "social_radar": "OFFICIAL_PLATFORM_ADAPTERS_WHEN_AUTHORIZED"
     }
   },
   "delivery_and_quality": {
@@ -1488,7 +1599,12 @@
       "SUPABASE_RLS_SECURITY_REVIEW",
       "R20_SUPABASE_DUAL_READ_COMPARE",
       "SUPABASE_AUTH_CONTEXT_CONTRACT",
-      "MOBILE_SUPABASE_CONTRACT"
+      "MOBILE_SUPABASE_CONTRACT",
+      "R38_UNIVERSE_CONTRACT",
+      "META_ADAPTIVE_PRIVACY_CONTRACT",
+      "TWIN_SAFE_GROWTH_CONTRACT",
+      "SPONSOR_VISIBILITY",
+      "FIRST_VIEWPORT_USEFULNESS"
     ],
     "merge_rule": "Non considerare completata una funzione se è verde solo tecnicamente ma viola il manifest o il master visivo.",
     "release_truth": {
@@ -1547,7 +1663,7 @@
       "required": true,
       "state": "PARTIAL",
       "screen": "SCD_PULSE",
-      "contract": "ROLE_AWARE_LIVE_CLUB_ENTRY"
+      "contract": "SCD_UNIVERSE_SPATIAL_USEFUL_ADAPTIVE_ENTRY"
     },
     {
       "id": "CAP-HOME",
@@ -1651,19 +1767,22 @@
       "id": "CAP-SKY",
       "domain": "ASSISTANT",
       "required": true,
-      "state": "PARTIAL"
+      "state": "PARTIAL",
+      "contract": "SKY_PLUS_EMBEDDED_SCD_MIRROR"
     },
     {
       "id": "CAP-AVATAR",
       "domain": "IDENTITY",
       "required": true,
-      "state": "PARTIAL"
+      "state": "PARTIAL",
+      "contract": "LOCAL_AVATAR_PLUS_SCD_TWIN"
     },
     {
       "id": "CAP-TAMAGOTCHI",
       "domain": "GAMIFICATION",
       "required": true,
-      "state": "ROADMAP"
+      "state": "PARTIAL",
+      "contract": "SCD_TWIN_SAFE_PARTICIPATION_GROWTH"
     },
     {
       "id": "CAP-GEO",
@@ -1781,20 +1900,78 @@
         "SCD_SUPABASE"
       ],
       "contract": "EXPO_LOGIN_SESSION_SCD_MY_CONTEXT_NO_SERVICE_ROLE"
+    },
+    {
+      "id": "CAP-SCD-UNIVERSE",
+      "domain": "EXPERIENCE",
+      "required": true,
+      "state": "PARTIAL",
+      "sources": [
+        "R20",
+        "SCD_DRIVE",
+        "SCD_GMAIL",
+        "SCD_OFFICIAL_SITE",
+        "SPONSOR_MASTER_SHEET"
+      ],
+      "contract": "SPATIAL_MULTI_GENERATION_ADAPTIVE_CLUB_OS"
+    },
+    {
+      "id": "CAP-META-ADAPTIVE",
+      "domain": "INTELLIGENCE",
+      "required": true,
+      "state": "PARTIAL",
+      "sources": [
+        "WEB_VERIFIED",
+        "SCD_OFFICIAL_SITE"
+      ],
+      "contract": "ON_DEVICE_SAFE_CATEGORY_ADAPTATION_NO_SENSITIVE_PROFILING"
+    },
+    {
+      "id": "CAP-SCD-TWIN",
+      "domain": "IDENTITY_GAMIFICATION",
+      "required": true,
+      "state": "PARTIAL",
+      "sources": [
+        "SOURCE-NONE"
+      ],
+      "contract": "LOCAL_SAFE_EVOLUTION_NO_TALENT_OR_MENTAL_SCORING"
+    },
+    {
+      "id": "CAP-SCD-MIRROR",
+      "domain": "ASSISTANT",
+      "required": true,
+      "state": "PARTIAL",
+      "sources": [
+        "R20",
+        "SCD_OFFICIAL_SITE"
+      ],
+      "contract": "CONTEXTUAL_COLLABORATOR_INHERITS_ROLE_SCOPE"
+    },
+    {
+      "id": "CAP-SOCIAL-RADAR",
+      "domain": "COMMUNICATION",
+      "required": true,
+      "state": "PARTIAL",
+      "sources": [
+        "SCD_OFFICIAL_SITE",
+        "SCD_INSTAGRAM",
+        "SCD_FACEBOOK"
+      ],
+      "contract": "REAL_PLATFORM_SIGNALS_AUTHORIZED_ADAPTERS_ONLY"
     }
   ],
   "known_noncompliance": [
     {
       "id": "GAP-UI-001",
-      "severity": "CRITICAL",
-      "statement": "Il frontend attuale usa ancora una Home lunga con grandi aree aperte come modali; il target richiede vere screen/route applicative.",
-      "required_fix": "Implementare AppShell e router reale per le sei core experiences."
+      "severity": "HIGH",
+      "statement": "R38 ricostruisce Pulse come SCD Universe; le altre screen R24 restano operative ma devono essere progressivamente riallineate alla nuova grammatica visiva e adattiva.",
+      "required_fix": "Applicare il design system R38 a Calendar, Communications, Services, Profile, Athlete, Family e Staff senza perdere funzionalita."
     },
     {
       "id": "GAP-UI-002",
-      "severity": "CRITICAL",
-      "statement": "Il desktop attuale è limitato a una shell max 430px; il target richiede layout desktop responsive della stessa app.",
-      "required_fix": "Rimuovere il vincolo globale 430px su desktop e creare breakpoint desktop coerenti col master."
+      "severity": "HIGH",
+      "statement": "R38 rimuove il carattere phone-sized della Pulse e introduce layout desktop pieno; il riallineamento desktop delle screen legacy resta progressivo.",
+      "required_fix": "Estendere i pattern desktop R38 alle restanti screen e mantenere visual regression 1280/1440/1920."
     },
     {
       "id": "GAP-DATA-001",
@@ -1976,20 +2153,44 @@
       "mobile_slice_state": "EXPO_AUTH_CONTEXT_IMPLEMENTED_NOT_CUTOVER",
       "mobile_path": "mobile/",
       "mobile_auth_rpc": "scd_my_context"
+    },
+    "cumulative_directives": {
+      "enabled": true,
+      "rule": "Ogni nuova indicazione utente si somma a quelle precedenti e viene integrata analiticamente nello stesso sistema.",
+      "deletion_rule": "Cancellare o sostituire soltanto elementi esplicitamente superati, duplicati o incompatibili con il nuovo contratto, documentando la ragione.",
+      "improvement_rule": "Ogni integrazione deve migliorare utilita, affidabilita, design, automazione o sicurezza senza creare doppioni.",
+      "source_rule": "Drive e Gmail sportclubcolico@gmail.com restano backoffice permanente; i dati operativi entrano tramite adapter/provenienza, non tramite copie manuali incontrollate."
     }
   },
   "product_direction": {
     "default_entry_route": "#/pulse",
-    "experience_model": "CLUB_GRAPH_DRIVEN",
+    "experience_model": "ADAPTIVE_CLUB_OS",
     "primary_worlds": [
       "PULSE",
       "SPORT",
       "COMMUNITY",
-      "WORLD",
+      "CLUB",
       "SCD_ID"
     ],
-    "visual_principle": "ABSTRACT_ADAPTIVE_SUBLIMATION",
+    "visual_principle": "SPATIAL_SPORT_EDITORIAL_HIGH_IMPACT",
     "legacy_home_route": "#/home",
-    "no_rewrite_rule": true
+    "no_rewrite_rule": false,
+    "release": "R38",
+    "product_name": "SCD UNIVERSE",
+    "audience_fit": [
+      "YOUTH",
+      "ATHLETE",
+      "FAMILY",
+      "FAN",
+      "STAFF",
+      "DIRECTION",
+      "PARTNER"
+    ],
+    "useful_first_viewport": true,
+    "sponsor_visibility": "PERSISTENT_ON_PULSE",
+    "adaptive_meta_engine": "SCD_META_ENGINE",
+    "virtual_collaborator": "SCD_MIRROR",
+    "evolving_identity": "SCD_TWIN",
+    "cumulative_integration_rule": true
   }
 }
