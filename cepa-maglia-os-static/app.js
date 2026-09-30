@@ -434,8 +434,10 @@ function renderHome(){
     const cases=officeOpenCases(h.id)
     const urgent=cases.filter(x=>x.priority==='urgent'||x.priority==='high').length
     const cepa=officeCepaActivities.filter(x=>x.hub_id===h.id&&!['completed','cancelled'].includes(x.status)).length
+    const visualClass=h.code==='COLICO'?'colico':(h.code==='MANDELLO'?'mandello':'default')
     return '<button class="office-card" type="button" data-office-id="'+h.id+'">'+
-      '<div class="office-card-top"><span class="office-pin">●</span><div><small>UFFICIO OPERATIVO</small><strong>'+esc(h.city)+'</strong><p>'+esc(h.address||'')+'</p></div><b>Entra →</b></div>'+
+      '<div class="office-card-visual '+visualClass+'"><div class="office-landscape" aria-hidden="true"><span class="mountain one"></span><span class="mountain two"></span><span class="lake"></span></div><div class="office-visual-copy"><small>MAGLIA 360 · SEDE</small><strong>'+esc(h.city)+'</strong><span>'+esc(h.province||'LC')+' · Lago di Como</span></div><b>Entra nell’ufficio →</b></div>'+
+      '<div class="office-card-top"><span class="office-pin">●</span><div><small>UFFICIO OPERATIVO</small><p>'+esc(h.address||'')+'</p></div><span class="office-live">attivo</span></div>'+
       '<div class="office-card-metrics">'+
         '<div><span>Produzione</span><strong>'+(period?esc(fmtMoney(premium)):'Da importare')+'</strong><small>'+esc(fmtMonth(period))+'</small></div>'+
         '<div><span>Pratiche</span><strong>'+cases.length+'</strong><small>'+urgent+' priorità alte</small></div>'+
