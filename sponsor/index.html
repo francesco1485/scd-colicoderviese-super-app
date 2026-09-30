@@ -30,6 +30,7 @@
       <button class="nav-item" data-view="contratti"><span class="nav-icon" data-icon="file"></span><b>Contratti</b></button>
       <button class="nav-item" data-view="convenzioni"><span class="nav-icon" data-icon="bulb"></span><b>Convenzioni & Idee</b></button>
       <button class="nav-item" data-view="ricerca"><span class="nav-icon" data-icon="chart"></span><b>Marketing & Sviluppo</b></button>
+      <button class="nav-item" data-view="scenario"><span class="nav-icon" data-icon="compass"></span><b>Scenario Lab</b></button>
       <button class="nav-item" data-view="asset"><span class="nav-icon" data-icon="target"></span><b>Asset & Opportunità</b></button>
       <button class="nav-item" data-view="documenti"><span class="nav-icon" data-icon="folder"></span><b>Documenti</b></button>
       <button class="nav-item" data-view="media"><span class="nav-icon" data-icon="image"></span><b>Media & LED</b></button>
@@ -60,6 +61,7 @@
         <div class="search-results" id="searchResults" hidden></div>
       </div>
       <div class="top-actions">
+        <div class="mode-switch" id="modeSwitch"><button class="active" data-mode="focus">Focus</button><button data-mode="explore">Esplora</button></div>
         <button class="notify-btn" aria-label="Notifiche"><span class="nav-icon" data-icon="bell"></span><i></i></button>
         <div class="profile-card">
           <span class="profile-avatar">SCD</span>
@@ -100,6 +102,24 @@
         <article><span class="kpi-icon gold" data-icon="target"></span><div><strong>18</strong><small>Asset commerciali</small></div><em>inventario iniziale</em></article>
         <article><span class="kpi-icon violet" data-icon="chart"></span><div><strong>13</strong><small>Risposte aziende</small></div><em>pipeline verificata</em></article>
         <article><span class="kpi-icon green" data-icon="screen"></span><div><strong>19</strong><small>Sponsor LED</small></div><em>3 da approvare</em></article>
+      </section>
+
+      <section class="intelligence-layer">
+        <article class="intelligence-card relationship-intel">
+          <header><div><span class="intelligence-mark">✦</span><div><small>SCD INTELLIGENCE CORE</small><h3>Mappa relazioni e solidità dati</h3></div></div><button data-lia="Analizza il portafoglio sponsor">Analizza →</button></header>
+          <div class="relationship-map" id="relationshipMap"></div>
+          <footer><span><i class="legend-dot verified"></i>Dati solidi</span><span><i class="legend-dot partial"></i>Da completare</span><span><i class="legend-dot opportunity"></i>Opportunità</span></footer>
+        </article>
+
+        <article class="intelligence-card decision-center">
+          <header><div><span class="intelligence-mark gold">◆</span><div><small>DECISION CENTER</small><h3>Ciò che richiede una scelta</h3></div></div><span class="decision-count" id="decisionCount">0</span></header>
+          <div id="decisionCenter" class="decision-list"></div>
+        </article>
+
+        <article class="intelligence-card growth-radar">
+          <header><div><span class="intelligence-mark cyan">◎</span><div><small>GROWTH RADAR</small><h3>Dove ha senso crescere</h3></div></div><button data-view="scenario">Apri Lab →</button></header>
+          <div id="growthRadar" class="growth-radar-body"></div>
+        </article>
       </section>
 
       <section class="macro-visual-grid">
@@ -193,6 +213,33 @@
       <div class="research-layout">
         <article class="glass-panel"><header><small>PIPELINE</small><h3>Research → Qualifica → Contatto → Proposta</h3></header><div id="researchPipeline"></div></article>
         <article class="glass-panel"><header><small>RADAR</small><h3>Categorie da sviluppare</h3></header><div id="radarList"></div></article>
+      </div>
+      <section class="marketing-studio">
+        <article class="studio-visual">
+          <div class="studio-orbit"><span></span><i></i><b></b></div>
+          <div><small>MARKETING STUDIO</small><h3>Trasforma una relazione in una storia da raccontare</h3><p>Partnership, territorio, persone, evento, contenuto, LED e social diventano un unico progetto narrativo.</p></div>
+        </article>
+        <div id="marketingIdeas" class="marketing-ideas"></div>
+      </section>
+    </section>
+
+    <section class="view" id="view-scenario">
+      <div class="page-heading"><div><small>INTELLIGENCE & SIMULAZIONE</small><h1>Scenario Lab</h1><p>Incrocia sponsor, asset, completezza dati, compatibilità di categoria e prossime azioni senza trasformare ipotesi in fatti.</p></div></div>
+      <div class="scenario-layout">
+        <article class="scenario-stage">
+          <header><div><small>OPPORTUNITY FIT MATRIX</small><h3>Sponsor × Asset</h3></div><span class="logic-badge">SPIEGABILE</span></header>
+          <div id="fitMatrix" class="fit-matrix"></div>
+        </article>
+        <article class="scenario-inspector">
+          <header><small>WHY THIS FIT?</small><h3 id="scenarioTitle">Seleziona un incrocio</h3></header>
+          <div id="scenarioInspector" class="scenario-inspector-body">
+            <p>La matrice usa soltanto criteri visibili: settore, tipo di asset, relazione corrente, completezza dati, esclusività da verificare e stato operativo.</p>
+          </div>
+        </article>
+      </div>
+      <div class="scenario-bottom">
+        <article class="glass-panel"><header><small>DATA CONFIDENCE</small><h3>Cosa sappiamo davvero</h3></header><div id="confidenceBoard"></div></article>
+        <article class="glass-panel"><header><small>NEXT BEST ACTION</small><h3>Azioni suggerite dal sistema</h3></header><div id="nextBestActions"></div></article>
       </div>
     </section>
 
