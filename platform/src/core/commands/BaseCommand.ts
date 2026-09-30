@@ -25,6 +25,7 @@ export interface Actor {
 export interface CommandContext {
   tenantId: string;
   actor: Actor;
+  sessionToken?: string;
   correlationId: string;
   causationId?: string;
   idempotencyKey?: string;
