@@ -66,7 +66,7 @@
       const ticker=document.querySelector('.sponsor-ticker');
       if(!home||!outlet)return;
       home.hidden=true;
-      if(ticker)ticker.hidden=true;
+      if(ticker)ticker.hidden=name!=='pulse';
       outlet.hidden=false;
       outlet.innerHTML='';
       const renderer=this['render_'+name];
@@ -103,77 +103,72 @@
       const future=rows.filter(x=>!x.date||String(x.date).slice(0,10)>=today);
       const todayRows=rows.filter(x=>String(x.date||'').slice(0,10)===today);
       const isMatch=x=>/gara|partita|campionato|coppa|amichevole|match/i.test([x.type,x.title].join(' '));
-      const isTraining=x=>/allenament/i.test([x.type,x.title].join(' '));
-      const matches=future.filter(isMatch);
-      const trainings=future.filter(isTraining);
-      const nextActivity=future[0]||{};
-      const nextMatch=(p.nextMatch&&Object.keys(p.nextMatch).length)?p.nextMatch:(matches[0]||{});
-      const d=state.privateData||{},personal=d.personal||[],conv=d.convocations||[],requests=(d.direction&&d.direction.requests)||[];
+      const nextMatch=(p.nextMatch&&Object.keys(p.nextMatch).length)?p.nextMatch:(future.find(isMatch)||{});
       const roleLabel=role==='staff'?'DIREZIONE / STAFF':role==='family'?'FAMIGLIA':role==='athlete'?'ATLETA':'SCD COMMUNITY';
-      const userName=role==='base'?'ColicoDerviese':(managementName(d)||displayValue(d.user&&d.user.name,'ColicoDerviese'));
       const dateLabel=new Intl.DateTimeFormat('it-IT',{timeZone:state.clubTimeZone,weekday:'long',day:'2-digit',month:'long'}).format(now);
-      const skyState=matches.some(x=>String(x.date).slice(0,10)===today)?'MATCHDAY':trainings.some(x=>String(x.date).slice(0,10)===today)?'TRAINING':'CLUB';
-      const todayCount=todayRows.length;
-      const nowCards=(todayRows.length?todayRows:future).slice(0,4).map(x=>{
-        const kind=isMatch(x)?'GARA':isTraining(x)?'ALLENAMENTO':'EVENTO';
-        return '<button type="button" class="r26-time-node" data-r26-event="'+esc(x.id||'')+'"><time>'+esc(x.time||'--:--')+'</time><span>'+esc(kind)+'</span><b>'+esc(x.team||x.title||'Attività SCD')+'</b><small>'+esc(x.venue||'Dato in aggiornamento')+'</small></button>';
-      }).join('')||'<div class="r26-empty"><b>Nessuna attività pubblica registrata per oggi.</b><span>Il sistema continuerà a sincronizzare le fonti SCD.</span></div>';
-
-      const personalCard=role==='staff'
-        ?'<button class="r26-personal-card critical" data-r24-route="staff"><small>OPERATIVITÀ</small><b>'+esc(requests.length)+' richieste Direzione</b><span>'+esc(conv.length)+' convocazioni · '+esc((d.transport&&d.transport.kpis&&d.transport.kpis.requests)||0)+' richieste pulmino</span></button>'
-        :role==='family'
-          ?'<button class="r26-personal-card" data-r24-route="family"><small>FAMILY CIRCLE</small><b>'+esc(personal.length)+' profili collegati</b><span>Impegni, documenti e trasporti nello stesso spazio.</span></button>'
-          :role==='athlete'
-            ?'<button class="r26-personal-card" data-r24-route="athlete"><small>IL MIO SPORT</small><b>'+esc(personal[0]?[personal[0].firstName,personal[0].lastName].filter(Boolean).join(' '):'Profilo atleta')+'</b><span>'+esc(conv.length)+' convocazioni disponibili</span></button>'
-            :'<button class="r26-personal-card" data-r24-action="join"><small>GIOCA CON NOI</small><b>Entra nel mondo SCD</b><span>Open Day, iscrizioni, prove e attività del Club.</span></button>';
-
-      const activityCard='<button class="r26-personal-card energy" data-r24-route="calendar"><small>PROSSIMA ATTIVITÀ</small><b>'+esc(nextActivity.title||nextActivity.team||'Dato in aggiornamento')+'</b><span>'+esc([fmtDate(nextActivity.date),nextActivity.time,nextActivity.venue].filter(Boolean).join(' · '))+'</span></button>';
-
-      const momentRows=(p.highlights||[]).slice(0,6);
-      const moments=momentRows.length?momentRows.map((x,i)=>{
-        const title=field(x,'title','subject','event')||'SCD Moment';
-        const source=field(x,'feedType','source')||'SCD';
-        const meta=field(x,'date','time','status')||'';
-        return '<article class="r26-moment-card m'+(i%3)+'"><div class="r26-moment-orbit"></div><small>'+esc(source)+'</small><h3>'+esc(title)+'</h3><p>'+esc(field(x,'message','excerpt','venue')||'Vita, sport e comunità ColicoDerviese.')+'</p><span>'+esc(meta)+'</span></article>';
-      }).join(''):'<article class="r26-moment-card"><small>SCD MOMENTS</small><h3>Feed in aggiornamento</h3><p>I contenuti verificati del Club compariranno qui.</p></article>';
-
-      const opp=displayValue(field(nextMatch,'opponentName','opponent','avversario','title'),'Dato in aggiornamento');
       const team=displayValue(field(nextMatch,'team','teamName'),'SCD ColicoDerviese');
+      const opp=displayValue(field(nextMatch,'opponentName','opponent','avversario','title'),'Dato in aggiornamento');
       const matchWhen=[fmtDate(field(nextMatch,'date','data')),field(nextMatch,'time','ora')].filter(Boolean).join(' · ');
       const matchVenue=field(nextMatch,'venue','luogo','field')||'Dato in aggiornamento';
 
-      outlet.innerHTML=
-      '<section class="r26-pulse-hero">'+
-        '<div class="r26-energy-mesh"></div><div class="r26-energy-ring r1"></div><div class="r26-energy-ring r2"></div>'+
-        '<div class="r26-pulse-top"><div class="r26-brand"><img src="./assets/logo-scd.png" alt="SCD ColicoDerviese"><div><small>SCD PULSE OS · '+esc(roleLabel)+'</small><strong>SCD <span>PULSE</span></strong></div></div><button type="button" class="r26-sync" id="r26PulseSync">↻ <span>SYNC</span></button></div>'+
-        '<div class="r26-pulse-copy"><small>'+esc(dateLabel.toUpperCase())+'</small><h1>'+esc(role==='base'?'Il Club è vivo.':'Buonasera '+userName+'.')+'</h1><p>'+esc(todayCount?todayCount+' attività registrate oggi nel sistema SCD.':'La rete SCD è attiva. Dati e attività si aggiornano dalle fonti ufficiali.')+'</p></div>'+
-        '<button class="r26-sky-state" type="button" data-r24-sky><img src="./assets/sky.png" alt="Sky"><span>SKY · '+esc(skyState)+'</span></button>'+
-        '<div class="r26-pulse-meter"><span></span><b>'+esc(String(Math.min(100,20+todayCount*12)))+'%</b><small>CLUB ENERGY</small></div>'+
-      '</section>'+
-      '<section class="r26-live-strip"><div><span class="r26-live-dot"></span><b>ORA</b><small>'+esc(state.clockSynced?'orario SCD sincronizzato':'sincronizzazione locale')+'</small></div><strong>'+esc(todayCount)+'</strong><span>attività oggi</span><button data-r24-route="calendar">Apri Sport ›</button></section>'+
-      '<section class="r26-time-rail">'+nowCards+'</section>'+
-      '<section class="r26-section"><div class="r26-section-title"><div><small>PERSONALE · RELAZIONALE</small><h2>Per te</h2></div><span>'+esc(roleLabel)+'</span></div><div class="r26-personal-grid">'+personalCard+activityCard+'</div></section>'+
-      '<section class="r26-match-state"><div class="r26-match-copy"><small>CLUB LIVE · PROSSIMA GARA</small><h2>'+esc(team)+' <span>VS</span> '+esc(opp)+'</h2><p>'+esc(matchWhen||'Data in aggiornamento')+' · '+esc(matchVenue)+'</p></div><div class="r26-match-actions"><button type="button" data-r24-route="calendar">Match Centre ›</button><button type="button" data-r24-route="communications">Community ›</button></div></section>'+
-      '<section class="r26-section"><div class="r26-section-title"><div><small>CONTENUTI · MEMORIA · SOCIAL</small><h2>SCD Moments</h2></div><button type="button" data-r24-route="communications">Tutti ›</button></div><div class="r26-moments">'+moments+'</div></section>'+
-      '<section class="r26-section"><div class="r26-section-title"><div><small>ECOSISTEMA</small><h2>SCD World</h2></div></div><div class="r26-world-grid">'+
-        '<button data-r24-route="calendar"><span>⚽</span><b>Sport</b><small>Gare, allenamenti, tornei</small></button>'+
-        '<button data-r24-route="communications"><span>◌</span><b>Community</b><small>News, social, comunicazioni</small></button>'+
-        '<button data-r24-route="services"><span>◆</span><b>World</b><small>Kit, sponsor, eventi, Club</small></button>'+
-        '<button data-r24-route="profile"><span>●</span><b>SCD ID</b><small>Account, ruoli, relazioni</small></button>'+
-      '</div></section>'+
-      '<section class="r26-data-status"><div><span></span><b>DATA FABRIC</b><small>'+esc(role==='staff'&&featureEnabled('dataFabricObservability')?'Drive · Gmail · R20 · provenienza disponibile in Direzione':'R20 · fonti pubbliche · stato rete verificabile')+'</small></div><div><b>'+esc(state.apiStatus==='online'?'ONLINE':state.apiStatus==='partial'?'RESILIENTE':'CHECK')+'</b><small>stato rete</small></div></section>';
+      const sourceSponsors=(p.sponsors||[]).map(x=>field(x,'name','sponsor','company','title')).filter(Boolean);
+      const verifiedSponsors=['Noratech Srl','Bianchi Bazzi Angelo Srl'];
+      const sponsorNames=[...new Set([...sourceSponsors,...verifiedSponsors])];
+      const sponsorLoop=[...sponsorNames,...sponsorNames,...sponsorNames,...sponsorNames].map(x=>'<span>'+esc(x)+'</span>').join('');
 
+      const fallbackEvents=[
+        {date:'2026-12-08',time:'10:30',title:'Christmas Lario Cup · 1ª edizione',venue:'Colico',type:'TORNEO'},
+        {date:'2027-05-22',time:'',title:'Memorial Internazionale José Nasazzi · 7ª edizione',venue:'Colico',type:'EVENTO'}
+      ];
+      const eventRows=(future.length?future.slice(0,6):fallbackEvents);
+      const eventHtml=eventRows.map(x=>'<button class="r37-event" type="button" '+(x.id?'data-r26-event="'+esc(x.id)+'"':'data-r24-route="calendar"')+'><time>'+esc(fmtDate(x.date)||'DATA')+'</time><small>'+esc(x.time||x.type||'SCD')+'</small><b>'+esc(x.title||x.team||'Attività SCD')+'</b><em>'+esc(x.venue||'Dato in aggiornamento')+'</em></button>').join('');
+
+      const highlightRows=(p.highlights||[]).slice(0,6);
+      const momentHtml=highlightRows.length?highlightRows.map((x,i)=>'<article class="r37-moment"><small>'+esc(field(x,'feedType','source')||'SCD')+'</small><h3>'+esc(field(x,'title','subject','event')||'Aggiornamento SCD')+'</h3><p>'+esc(field(x,'message','excerpt','venue')||'Contenuto ufficiale in aggiornamento.')+'</p><em>'+esc(field(x,'date','time','status')||'')+'</em></article>').join(''):'<article class="r37-moment"><small>SCD MOMENTS</small><h3>La vita del Club arriva qui</h3><p>News, foto, risultati e storie vengono pubblicati soltanto da fonti verificate.</p><em>Feed in aggiornamento</em></article>';
+
+      outlet.innerHTML=
+      '<section class="r26-pulse-hero r37-vibe-hero">'+
+        '<div class="r37-hero-top"><div class="r37-mini-brand"><img src="./assets/logo-scd.png" alt="SCD ColicoDerviese"><div><small>'+esc(roleLabel)+'</small><b>SCD COLICODERVIESE</b></div></div><button class="r37-sync" id="r37Sync">↻ AGGIORNA</button></div>'+
+        '<div class="r37-hero-copy"><small>'+esc(dateLabel.toUpperCase())+'</small><h1>Vivi la SCD.<br>Ogni giorno.</h1><p>Partite, allenamenti, tornei, community, servizi e territorio. Niente vetrina vuota: qui deve succedere qualcosa.</p><div class="r37-hero-actions"><button class="primary" data-r24-route="calendar">COSA SUCCEDE OGGI</button><button class="glass" data-r24-action="join">GIOCA CON NOI</button></div></div>'+
+        '<div class="r37-match-chip"><small>PROSSIMA GARA</small><b>'+esc(team)+' vs '+esc(opp)+'</b><span>'+esc(matchWhen||'Data in aggiornamento')+' · '+esc(matchVenue)+'</span></div>'+
+      '</section>'+
+      '<section class="r37-sponsor-marquee" aria-label="Partner SCD"><div class="r37-sponsor-label">PARTNER SCD</div><div class="r37-marquee-window"><div class="r37-marquee-track">'+sponsorLoop+'</div></div></section>'+
+      '<section class="r37-story-rail" aria-label="Azioni rapide">'+
+        '<button class="r37-story" data-r24-route="calendar"><i>⚽</i><b>Matchday</b><small>Gare & live</small></button>'+
+        '<button class="r37-story" data-r24-action="fan"><i>🔥</i><b>MVP</b><small>Vota & partecipa</small></button>'+
+        '<button class="r37-story" data-r24-action="fan"><i>🎯</i><b>Pronostico</b><small>Solo community</small></button>'+
+        '<button class="r37-story" data-r24-sky><i>🦊</i><b>Sfida Sky</b><small>Chiedi & gioca</small></button>'+
+        '<button class="r37-story" data-r24-action="tournament"><i>🏆</i><b>Tornei</b><small>Iscrizioni</small></button>'+
+        '<button class="r37-story" data-r24-action="story"><i>📸</i><b>La tua foto</b><small>Community</small></button>'+
+        '<button class="r37-story" data-r24-route="services"><i>◆</i><b>SCD World</b><small>Club & servizi</small></button>'+
+      '</section>'+
+      '<section class="r37-grid">'+
+        '<article class="r37-card r37-match-card"><small>CLUB LIVE · PROSSIMA GARA</small><h2>'+esc(team)+'<br>VS '+esc(opp)+'</h2><p>'+esc(matchWhen||'Data in aggiornamento')+' · '+esc(matchVenue)+'</p><button data-r24-route="calendar">APRI MATCH CENTRE ›</button></article>'+
+        '<article class="r37-card"><small>QUICK PLAY</small><h2>Entra, gioca, partecipa.</h2><div class="r37-quick-card"><button data-r24-action="fan"><span>🔥</span><b>MVP</b><small>Community</small></button><button data-r24-action="fan"><span>🎯</span><b>Pronostico</b><small>No denaro</small></button><button data-r24-sky><span>🦊</span><b>Sky</b><small>Assistente</small></button><button data-r24-action="idea"><span>💡</span><b>La tua idea</b><small>Proponila</small></button></div></article>'+
+      '</section>'+
+      '<section class="r37-section"><div class="r37-title"><div><small>CALENDARIO · EVENTI · TORNEI</small><h2>Da non perdere</h2></div><button data-r24-route="calendar">Tutto il calendario ›</button></div><div class="r37-event-rail">'+eventHtml+'</div></section>'+
+      '<section class="r37-section"><div class="r37-title"><div><small>FAN ZONE</small><h2>Non guardare soltanto.</h2></div><button data-r24-route="communications">Community ›</button></div><div class="r37-fan-grid">'+
+        '<button class="r37-fan-card" data-r24-action="fan"><span>🔥</span><b>Vota l’MVP</b><small>Il tuo giocatore del weekend</small></button>'+
+        '<button class="r37-fan-card" data-r24-action="fan"><span>🎯</span><b>Pronostico SCD</b><small>Gioco community gratuito</small></button>'+
+        '<button class="r37-fan-card" data-r24-action="story"><span>📸</span><b>Matchday Story</b><small>Invia foto e momenti</small></button>'+
+        '<button class="r37-fan-card" data-r24-sky><span>⚡</span><b>Sfida Sky</b><small>Domande, curiosità, scorciatoie</small></button>'+
+      '</div></section>'+
+      '<section class="r37-section"><div class="r37-title"><div><small>NEWS · FOTO · TERRITORIO</small><h2>SCD Moments</h2></div><button data-r24-route="communications">Vedi tutto ›</button></div><div class="r37-moments">'+momentHtml+'</div></section>'+
+      '<section class="r26-data-status"><div><span></span><b>SCD PULSE</b><small>'+esc(todayRows.length?todayRows.length+' attività registrate oggi':'Fonti SCD in sincronizzazione')+'</small></div><div><b>'+esc(state.apiStatus==='online'?'ONLINE':state.apiStatus==='partial'?'RESILIENTE':'CHECK')+'</b><small>rete</small></div></section>';
+
+      const ticker=document.querySelector('.sponsor-ticker');
+      if(ticker){
+        ticker.hidden=false;
+        const track=ticker.querySelector('#sponsorTrack')||ticker.querySelector('.sponsor-track');
+        if(track)track.innerHTML=sponsorNames.map(x=>'<span>'+esc(x)+' · PARTNER SCD · </span>').join('');
+      }
       outlet.querySelectorAll('[data-r26-event]').forEach(b=>b.onclick=()=>openCalendarEvent(b.dataset.r26Event));
-      const sync=outlet.querySelector('#r26PulseSync');
+      const sync=outlet.querySelector('#r37Sync');
       if(sync)sync.onclick=async()=>{
         sync.disabled=true;
-        sync.classList.add('loading');
-        try{
-          await Promise.all([loadSummary(true),loadPublicCalendar(true)]);
-          toast('SCD Pulse sincronizzato');
-          this.render('pulse');
-        }catch(e){toast(e.message||'Sincronizzazione non riuscita')}
-        finally{sync.disabled=false;sync.classList.remove('loading')}
+        try{await Promise.all([loadSummary(true),loadPublicCalendar(true)]);toast('SCD aggiornato');this.render('pulse')}
+        catch(e){toast(e.message||'Sincronizzazione non riuscita')}
+        finally{sync.disabled=false}
       };
       this.bindCommon(outlet);
     },
