@@ -36,15 +36,16 @@ export async function mapMunicipalityBusinesses(
     +'nwr(area.a)["name"]["amenity"~"restaurant|cafe|bar|bank|pharmacy|clinic|fuel|car_rental|car_repair|marketplace|cinema|theatre"];'
     +');out center tags '+safeLimit+';';
 
-  const response=await fetch("https://overpass-api.de/api/interpreter",{
+  const init:RequestInit={
     method:"POST",
     headers:{
       "content-type":"application/x-www-form-urlencoded;charset=UTF-8",
       "user-agent":"SCD-ColicoDerviese-Lia/42.0 (+https://github.com/francesco1485/scd-colicoderviese-super-app)"
     },
-    body:new URLSearchParams({data:query}),
-    signal
-  });
+    body:new URLSearchParams({data:query})
+  };
+  if(signal)init.signal=signal;
+  const response=await fetch("https://overpass-api.de/api/interpreter",init);
   if(!response.ok)throw new Error("OpenStreetMap/Overpass non disponibile: "+response.status);
   const raw=await response.json() as {elements?:Array<any>};
   const seen=new Set<string>();
