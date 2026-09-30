@@ -660,3 +660,37 @@ input:focus-visible{
   .row span{display:none}
   .benchmark{grid-template-columns:1fr}
 }
+
+/* Grounded collaborator table */
+.rowsHead{
+  display:grid;
+  grid-template-columns:minmax(110px,1.05fr) minmax(150px,1.2fr) minmax(95px,.85fr) minmax(85px,.72fr) minmax(72px,.62fr);
+  gap:7px;
+  padding:5px 2px 4px;
+  border-bottom:1px solid #e8eef3;
+  color:#8ca0b1;
+  font-size:6px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.055em;
+}
+.row{
+  grid-template-columns:minmax(110px,1.05fr) minmax(150px,1.2fr) minmax(95px,.85fr) minmax(85px,.72fr) minmax(72px,.62fr);
+}
+.rowTerms{
+  display:inline-flex;
+  align-items:center;
+  width:max-content;
+  max-width:100%;
+  padding:3px 6px;
+  border-radius:999px;
+  background:#fff2df;
+  color:#8b652b!important;
+  font-size:6.5px!important;
+  font-weight:800;
+}
+@media(max-width:720px){
+  .rowsHead{display:none}
+  .row{grid-template-columns:1fr auto}
+  .row>span{display:none}
+}
