@@ -579,7 +579,7 @@
           }
           if(/crea/i.test(q)&&/cartell/i.test(q)&&direction){
             const municipality=municipalityOf(q)||'COLICO';
-            const response=await postCommand('create-drive-folder',{path:['MAPPING TERRITORIALE',municipality],purpose:'Lia · sviluppo commerciale territoriale'});
+            const response=await postCommand('create-drive-folder',{path:['01 MAPPING TERRITORIALE',municipality],purpose:'Lia · sviluppo commerciale territoriale'});
             const data=response.result||{};
             result.innerHTML='<div class="r42-lia-answer"><small>ESEGUITO</small><h2>Cartella pronta</h2><p>'+esc((data.path||[]).join(' / '))+'</p>'+(data.url?'<a class="primary" href="'+esc(data.url)+'" target="_blank" rel="noopener">APRI DRIVE</a>':'')+'</div>';
             return;
