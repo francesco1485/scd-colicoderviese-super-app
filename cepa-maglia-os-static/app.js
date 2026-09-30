@@ -276,6 +276,13 @@ function mediaForOffice(office){
   const city=String(office?.city||'').toLowerCase()
   return code.includes('MANDELLO')||city.includes('mandello')?MAGLIA_MEDIA.mandello:MAGLIA_MEDIA.colico
 }
+function mediaCreditForOffice(office){
+  const code=String(office?.code||'').toUpperCase()
+  const city=String(office?.city||'').toLowerCase()
+  return code.includes('MANDELLO')||city.includes('mandello')
+    ?'Foto: Andrzej Otrębski · CC BY-SA 3.0'
+    :'Foto: BKLuis · CC BY-SA 4.0'
+}
 function officeSmartFocus({period,renewals,quotes,proposals,cases,lost}){
   if(!period)return{tone:'info',title:'Completa il quadro dati',text:'Carica lo snapshot mensile AssiEasy: la piattaforma potrà costruire confronti, trend e priorità attendibili.',action:'Dati mensili'}
   if(renewals>0&&renewals>=Math.max(quotes,proposals))return{tone:'warning',title:'Presidia i rinnovi',text:renewals+' rinnovi richiedono attenzione. Conviene lavorarli prima di ampliare il nuovo flusso commerciale.',action:'Rinnovi'}
@@ -858,6 +865,7 @@ function renderCepaTerritory(){
     '<div class="cepa-territory-hero-photo" style="background-image:linear-gradient(90deg,rgba(7,40,58,.82),rgba(7,40,58,.24)),url(&quot;'+esc(mediaForOffice(hub))+'&quot;)">'+
       '<div><span>C.E.P.A. · PRESIDIO TERRITORIALE</span><h2>'+esc(hub.city)+'</h2><p>'+esc(hub.address||'')+'</p></div>'+
       '<div class="cepa-territory-badge"><strong>Maglia 360</strong><span>Centro CEPA → territorio</span></div>'+
+      '<small class="office-media-credit">'+esc(mediaCreditForOffice(hub))+'</small>'+
     '</div>'
 
   $('cepaTerritorySummary').innerHTML=
@@ -922,6 +930,7 @@ function renderOffice(){
       '<div class="office-identity-copy"><span>SEDE OPERATIVA · LAGO DI COMO</span><h2>Ufficio '+esc(office.city)+'</h2><p>'+esc(office.address||'Presidio territoriale Maglia 360')+'</p>'+
       '<div class="office-hero-chips"><b>'+activePolicies+' polizze attive</b><b>'+renewals+' rinnovi</b><b>'+cases.length+' pratiche aperte</b></div></div>'+
       '<div class="office-period"><span>Ultimo aggiornamento dati</span><strong>'+esc(fmtMonth(period))+'</strong></div>'+
+      '<small class="office-media-credit">'+esc(mediaCreditForOffice(office))+'</small>'+
     '</div>'
   const localMessage=officeMessagesFor(office.id)[0]
   const box=$('officeDirectionMessage')
@@ -955,7 +964,7 @@ function renderOffice(){
     ['Pratiche perse',monthLost,'lost'],
     ['Proposte del mese',proposals,'proposal']
   ].map(([label,value,tone])=>'<div class="today-card '+tone+'"><span>'+esc(label)+'</span><strong>'+Number(value||0)+'</strong><i></i></div>').join('')
-  $('officeSmartAction').onclick=()=>{ if(focus.action==='Dati mensili')openMonthlyDataEditor(); else document.querySelector('.office-products-section')?.scrollIntoView({behavior:'smooth',block:'start'}) }
+  $('officeSmartAction').onclick=()=>{ if(focus.action==='Dati mensili')$('newMonthlyDataBtn')?.click(); else document.querySelector('.office-products-section')?.scrollIntoView({behavior:'smooth',block:'start'}) }
 
   const officeSeries=monthlySeries(office.id)
   $('officeTrendChart').innerHTML=trendSvg(officeSeries,'premium')
