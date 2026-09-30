@@ -761,3 +761,26 @@ body{background:var(--paper);color:var(--ink)}
 .lia-approval-status.pending{background:#fff2dc;color:#936018}
 .lia-approval-status.approved{background:#e3f5ec;color:#096a4b}
 .lia-approval-status.rejected,.lia-approval-status.cancelled,.lia-approval-status.expired{background:#ffebee;color:#a12e42}
+
+
+.money-status.restricted{
+  background:#eef2f5;
+  color:#5d6e7b;
+}
+.restricted-panel{
+  padding:18px;
+  border:1px dashed #cbd9e2;
+  border-radius:12px;
+  background:#f8fbfd;
+  color:#536c7e;
+}
+.restricted-panel strong{
+  display:block;
+  color:#183f5e;
+  margin-bottom:5px;
+}
+.restricted-panel p{
+  margin:0;
+  font-size:11px;
+  line-height:1.55;
+}
