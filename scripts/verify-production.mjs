@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 
-const EXPECTED_VERSION=process.env.SCD_EXPECTED_VERSION||'39.0.0';
-const EXPECTED_MANIFEST=process.env.SCD_EXPECTED_MANIFEST||'3.1.0';
+const EXPECTED_VERSION=process.env.SCD_EXPECTED_VERSION||'40.0.0';
+const EXPECTED_MANIFEST=process.env.SCD_EXPECTED_MANIFEST||'3.2.0';
 const PAGES_URL=process.env.SCD_PAGES_URL||'https://francesco1485.github.io/scd-colicoderviese-super-app/';
 const RENDER_BASE=(process.env.SCD_RENDER_BASE_URL||'https://scd-colicoderviese-official-r21.onrender.com').replace(/\/$/,'');
 const ATTEMPTS=Math.max(1,Number(process.env.SCD_PROD_VERIFY_ATTEMPTS||20));
@@ -10,7 +10,7 @@ const outDir='test-output';
 fs.mkdirSync(outDir,{recursive:true});
 
 const evidence={
-  release:'R39',
+  release:'R40',
   expectedVersion:EXPECTED_VERSION,
   expectedManifest:EXPECTED_MANIFEST,
   startedAt:new Date().toISOString(),
@@ -77,6 +77,20 @@ async function runChecks(attempt){
   }catch(e){
     result.checks.renderCapabilities={ok:false,error:String(e.message||e),dataFabricEnabled:null};
     result.failures.push('RENDER_FEATURE_FLAGS');
+  }
+
+  try{
+    const r=await getText(RENDER_BASE+'/api/newsroom?scd_verify='+Date.now());
+    const j=parseJson('Render newsroom',r.text);
+    const policyOk=j.editorialPolicy==='VERIFIED_STRUCTURED_FACTS_ONLY'&&j.staleSiteContent===false;
+    const calendarOk=Array.isArray(j.calendar?.rows)&&typeof j.calendar?.counts?.activities==='number';
+    const cardsOk=Array.isArray(j.cards)&&j.cards.length>0;
+    const ok=r.ok&&j.ok===true&&j.release==='R40'&&policyOk&&calendarOk&&cardsOk;
+    result.checks.newsroom={httpStatus:r.status,ok,release:j.release||null,policyOk,calendarOk,cardsOk,staleSiteContent:j.staleSiteContent};
+    if(!ok)result.failures.push('R40_NEWSROOM_CONTRACT');
+  }catch(e){
+    result.checks.newsroom={ok:false,error:String(e.message||e)};
+    result.failures.push('R40_NEWSROOM_CONTRACT');
   }
 
   if(result.checks.renderCapabilities?.dataFabricEnabled===true){

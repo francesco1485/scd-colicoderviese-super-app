@@ -132,37 +132,234 @@ async function fetchPublicFeed(){
     return parsed;
   }catch(e){return {ok:false,error:String(e.message||e)}}
 }
-async function fetchOfficialPosts(){
-  const endpoints=[
-    'https://www.colicoderviese.it/wp-json/wp/v2/posts?per_page=10&_fields=date,link,title,excerpt',
-    'https://www.colicoderviese.it/wp-json/wp/v2/pages?per_page=5&_fields=date,link,title,excerpt'
-  ];
-  for(const url of endpoints){
-    try{
-      const r=await fetch(url,{headers:{'user-agent':'SCD-ColicoDerviese-SuperApp/1.0'}}); if(!r.ok) continue;
-      const rows=await r.json(); if(!Array.isArray(rows)) continue;
-      return rows.map(x=>({title:stripHtml(x.title?.rendered||''),message:stripHtml(x.excerpt?.rendered||'').slice(0,240),date:(x.date||'').slice(0,10),source:'Sito ufficiale SCD',sourceUrl:x.link,feedType:'OFFICIAL_SITE',priority:90})).filter(x=>x.title);
-    }catch{}
+function pick(obj,...keys){
+  for(const key of keys){
+    const value=obj?.[key];
+    if(value!=null&&String(value).trim()!=='')return value;
   }
-  return [];
+  return '';
 }
-
-async function fetchGoogleNews(){
-  const q=encodeURIComponent('"ColicoDerviese" OR "SCD ColicoDerviese" OR "Colico Derviese"');
-  const url=`https://news.google.com/rss/search?q=${q}&hl=it&gl=IT&ceid=IT:it`;
+function unwrapPayload(raw){
+  if(raw&&raw.ok===true&&raw.data!=null)return raw.data;
+  if(raw&&raw.data!=null&&Object.keys(raw).length<=4)return raw.data;
+  return raw;
+}
+function rowsFrom(raw){
+  const data=unwrapPayload(raw);
+  if(Array.isArray(data))return data;
+  return data?.rows||data?.items||data?.events||data?.calendar||data?.feed||data?.highlights||[];
+}
+function isoDateOnly(value){
+  const text=String(value||'').trim();
+  if(!text)return '';
+  let m=text.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(m)return m[1]+'-'+m[2]+'-'+m[3];
+  m=text.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);
+  if(m)return m[3]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[1]).padStart(2,'0');
+  const d=new Date(text);
+  return Number.isFinite(d.getTime())?d.toISOString().slice(0,10):'';
+}
+function romeDateParts(date=new Date()){
+  return new Intl.DateTimeFormat('en-CA',{timeZone:CLUB_TIME_ZONE,year:'numeric',month:'2-digit',day:'2-digit',weekday:'short'}).formatToParts(date).reduce((o,p)=>(o[p.type]=p.value,o),{});
+}
+function currentClubWeek(){
+  const now=new Date();
+  const p=romeDateParts(now);
+  const localNoon=new Date(p.year+'-'+p.month+'-'+p.day+'T12:00:00Z');
+  const weekday=new Intl.DateTimeFormat('en-US',{timeZone:CLUB_TIME_ZONE,weekday:'short'}).format(now);
+  const dayIndex={Mon:0,Tue:1,Wed:2,Thu:3,Fri:4,Sat:5,Sun:6}[weekday]??0;
+  const start=new Date(localNoon.getTime()-dayIndex*86400000);
+  const end=new Date(start.getTime()+6*86400000);
+  const fmt=d=>new Intl.DateTimeFormat('en-CA',{timeZone:'UTC',year:'numeric',month:'2-digit',day:'2-digit'}).format(d);
+  return {start:fmt(start),end:fmt(end)};
+}
+function eventKind(row){
+  const text=[pick(row,'type','kind','eventType'),pick(row,'title','event','name','subject')].join(' ');
+  if(/allenament|training/i.test(text))return 'TRAINING';
+  if(/gara|partita|campionato|coppa|amichevole|match/i.test(text))return 'MATCH';
+  if(/torneo|tournament/i.test(text))return 'TOURNAMENT';
+  return 'EVENT';
+}
+function teamLabel(row){
+  return String(pick(row,'team','teamName','squadra','category','categoria','ageGroup','annata')||'SCD').trim();
+}
+function resultText(row){
+  return String(pick(row,'result','score','risultato','finalScore')||'').trim();
+}
+function feedRows(raw){
+  const data=unwrapPayload(raw);
+  if(Array.isArray(data))return data;
+  return data?.items||data?.feed||data?.highlights||data?.rows||[];
+}
+function safeInternalFeed(rows){
+  return rows.filter(row=>{
+    const source=String(pick(row,'source','fonte','feedType','kind')||'').toLowerCase();
+    const url=String(pick(row,'sourceUrl','url','link')||'').toLowerCase();
+    return !/official_site|sito ufficiale|google news|web_news|instagram|facebook/.test(source+' '+url);
+  });
+}
+function extractStructuredResults(rows){
+  return safeInternalFeed(rows).filter(row=>{
+    const text=[pick(row,'status'),pick(row,'title','subject','event'),pick(row,'message')].join(' ');
+    return Boolean(resultText(row))||/risultat|finale|terminat|full time/i.test(text);
+  });
+}
+function extractStandings(rows){
+  return safeInternalFeed(rows).filter(row=>{
+    return pick(row,'position','rank','posizione')!==''||pick(row,'points','punti')!=='';
+  });
+}
+function initiativeRows(raw){
+  const data=unwrapPayload(raw);
+  const direct=data?.initiatives||data?.events||[];
+  return Array.isArray(direct)?direct:[];
+}
+function evidenceFor(row,kind){
+  return {
+    kind,
+    source:String(pick(row,'source','fonte')||'R20_STRUCTURED'),
+    recordId:String(pick(row,'id','eventId','uid','code')||''),
+    date:isoDateOnly(pick(row,'date','data','eventDate','startDate')),
+    fields:Object.fromEntries(
+      ['team','teamName','squadra','title','event','name','result','score','risultato','position','rank','points','punti','venue','luogo']
+        .filter(k=>row?.[k]!=null&&String(row[k]).trim()!=='')
+        .map(k=>[k,row[k]])
+    )
+  };
+}
+function readWeeklyEditorial(weekStart){
   try{
-    const r=await fetch(url,{headers:{'user-agent':'SCD-ColicoDerviese-SuperApp/1.0'}}); if(!r.ok) return [];
-    const xml=await r.text(); const items=[...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)].slice(0,8);
-    return items.map(m=>{const x=m[1]; const title=decodeXml((x.match(/<title>([\s\S]*?)<\/title>/)||[])[1]||''); const link=decodeXml((x.match(/<link>([\s\S]*?)<\/link>/)||[])[1]||''); const pub=decodeXml((x.match(/<pubDate>([\s\S]*?)<\/pubDate>/)||[])[1]||''); const source=decodeXml((x.match(/<source[^>]*>([\s\S]*?)<\/source>/)||[])[1]||'Google News');return {title,message:'Contenuto pubblico indicizzato sul web. Apri la fonte originale per i dettagli.',date:pub?new Date(pub).toISOString().slice(0,10):'',source,sourceUrl:link,feedType:'WEB_NEWS',priority:45}}).filter(x=>x.title&&x.link!=='' );
-  }catch{return []}
+    const file=path.join(ROOT,'content','weekly-news.json');
+    const raw=JSON.parse(fs.readFileSync(file,'utf8'));
+    if(raw?.status!=='PUBLISHED')return null;
+    if(String(raw.weekStart||'')!==String(weekStart||''))return null;
+    if(!Array.isArray(raw.cards)||!raw.cards.length)return null;
+    return raw;
+  }catch{return null}
+}
+async function buildWeeklyNewsroom(){
+  const week=currentClubWeek();
+  let calendarRaw=null,feedRaw=null;
+  const sourceStatus={calendar:'ERROR',feed:'ERROR',officialSite:'DISABLED_FOR_NEWS',webNews:'DISABLED_FOR_NEWS'};
+  try{
+    const c=await callAppsScript('public.calendar',{rangeKey:'ALL',offset:0},'');
+    calendarRaw=c.parsed;sourceStatus.calendar='OK';
+  }catch(e){sourceStatus.calendar='ERROR:'+String(e.code||e.message||e)}
+  try{
+    const f=await callAppsScript('public.feed',{limit:80},'');
+    feedRaw=f.parsed;sourceStatus.feed='OK';
+  }catch(e){sourceStatus.feed='ERROR:'+String(e.code||e.message||e)}
+
+  const calendar=rowsFrom(calendarRaw).map((row,i)=>({
+    id:pick(row,'id','eventId','uid')||'CAL-'+i,
+    title:String(pick(row,'title','event','name','subject')||'Attività SCD'),
+    date:isoDateOnly(pick(row,'date','data','startDate')),
+    time:String(pick(row,'time','ora','startTime')||''),
+    endTime:String(pick(row,'endTime','fine')||''),
+    team:teamLabel(row),
+    category:String(pick(row,'category','categoria','ageGroup','annata')||''),
+    venue:String(pick(row,'venue','luogo','field','location')||''),
+    kind:eventKind(row),
+    source:String(pick(row,'source','fonte')||'R20_CALENDAR')
+  })).filter(x=>x.date&&x.date>=week.start&&x.date<=week.end);
+
+  const teams=[...new Set(calendar.map(x=>x.category||x.team).filter(x=>x&&x!=='SCD'))];
+  const matches=calendar.filter(x=>x.kind==='MATCH');
+  const trainings=calendar.filter(x=>x.kind==='TRAINING');
+  const tournaments=calendar.filter(x=>x.kind==='TOURNAMENT');
+  const feed=feedRows(feedRaw);
+  const results=extractStructuredResults(feed).slice(0,8);
+  const standings=extractStandings(feed).slice(0,6);
+  const initiatives=initiativeRows(feedRaw).filter(x=>{
+    const d=isoDateOnly(pick(x,'date','eventDate','data'));
+    return !d||d>=week.start;
+  }).slice(0,6);
+
+  const cards=[];
+  if(calendar.length){
+    cards.push({
+      id:'week-overview',
+      category:'SETTIMANA SCD',
+      title:calendar.length+' attività, tutte le annate insieme',
+      dek:matches.length+' gare · '+trainings.length+' allenamenti'+(tournaments.length?' · '+tournaments.length+' tornei':'')+' · '+teams.length+' gruppi/annate rilevati.',
+      body:'Il calendario settimanale viene costruito dai dati sportivi strutturati SCD. Nessun contenuto del vecchio sito viene usato per riempire questa sintesi.',
+      evidence:calendar.slice(0,12).map(x=>({kind:'CALENDAR',source:x.source,recordId:x.id,date:x.date,fields:{team:x.team,category:x.category,title:x.title,kind:x.kind,venue:x.venue}}))
+    });
+  }
+  if(results.length){
+    const first=results[0],team=teamLabel(first),score=resultText(first)||String(pick(first,'message')||'Risultato inserito');
+    cards.push({
+      id:'results',
+      category:'RISULTATI',
+      title:'I risultati inseriti diventano racconto',
+      dek:team+' · '+score,
+      body:results.length===1?'Un risultato verificato alimenta la sintesi settimanale.':'Sono presenti '+results.length+' risultati strutturati: la Newsroom li usa per creare il riepilogo senza commenti presi da siti datati.',
+      evidence:results.map(x=>evidenceFor(x,'RESULT'))
+    });
+  }
+  if(standings.length){
+    const first=standings[0],team=teamLabel(first),position=pick(first,'position','rank','posizione'),points=pick(first,'points','punti');
+    cards.push({
+      id:'standings',
+      category:'CLASSIFICHE',
+      title:'Classifica: dati, non opinioni',
+      dek:[team,position!==''?'posizione '+position:'',points!==''?points+' punti':''].filter(Boolean).join(' · '),
+      body:'La classifica viene raccontata soltanto quando posizione o punti arrivano da un dato strutturato verificabile.',
+      evidence:standings.map(x=>evidenceFor(x,'STANDING'))
+    });
+  }
+  if(initiatives.length){
+    const first=initiatives[0];
+    cards.push({
+      id:'territory',
+      category:'TERRITORIO & CLUB',
+      title:String(pick(first,'title','event','name')||'Iniziative SCD e territorio'),
+      dek:[isoDateOnly(pick(first,'date','eventDate','data')),pick(first,'venue','luogo','place')].filter(Boolean).join(' · '),
+      body:'Le iniziative vengono collegate al racconto sportivo quando esistono dati interni verificati. Il sistema non completa i vuoti con articoli vecchi.',
+      evidence:initiatives.map(x=>evidenceFor(x,'INITIATIVE'))
+    });
+  }
+  if(!cards.length){
+    cards.push({
+      id:'waiting-for-facts',
+      category:'SCD NEWSROOM AI',
+      title:'Nessuna notizia automatica senza dati verificati',
+      dek:'La Newsroom resta vuota invece di recuperare commenti o articoli datati.',
+      body:'Quando vengono inseriti calendario, risultati, classifiche o iniziative, la sintesi settimanale si rigenera automaticamente.',
+      evidence:[]
+    });
+  }
+
+  const editorial=readWeeklyEditorial(week.start);
+  const mergedCards=editorial
+    ?[...cards.filter(x=>x.id==='week-overview'),...editorial.cards,...cards.filter(x=>x.id!=='week-overview'&&!editorial.cards.some(y=>y.id===x.id))]
+    :cards;
+  return {
+    ok:true,
+    release:'R40',
+    generator:editorial?'CHATGPT_WEEKLY_EDITORIAL_PLUS_GROUNDED_RUNTIME':'SCD_NEWSROOM_GROUNDED_V1',
+    editorialPolicy:'VERIFIED_STRUCTURED_FACTS_ONLY',
+    staleSiteContent:false,
+    generatedAt:new Date().toISOString(),
+    week,
+    sources:{...sourceStatus,weeklyEditorial:editorial?'PUBLISHED':'NO_CURRENT_PUBLISHED_EDITORIAL'},
+    editorial:editorial?{generatedAt:editorial.generatedAt,generatedBy:editorial.generatedBy,sourceCount:(editorial.sources||[]).length}:null,
+    calendar:{rows:calendar,counts:{activities:calendar.length,matches:matches.length,trainings:trainings.length,tournaments:tournaments.length,groups:teams.length},groups:teams},
+    cards:mergedCards
+  };
 }
 
 async function getLiveRadar(){
-  if(liveCache.data && Date.now()-liveCache.at<CACHE_TTL) return liveCache.data;
-  const [official,news]=await Promise.all([fetchOfficialPosts(),fetchGoogleNews()]);
-  const seen=new Set(); const items=[...official,...news].filter(x=>{const k=(x.title||'').toLowerCase().replace(/\W/g,'').slice(0,90);if(!k||seen.has(k))return false;seen.add(k);return true}).sort((a,b)=>(b.priority||0)-(a.priority||0)||String(b.date).localeCompare(String(a.date))).slice(0,16);
-  const data={ok:true,generatedAt:new Date().toISOString(),sources:[{name:'Sito ufficiale SCD',status:official.length?'OK':'NO_DATA'},{name:'Web/Google News',status:news.length?'OK':'NO_DATA'},{name:'Tuttocampo',status:'LINK_ONLY',url:'https://www.tuttocampo.it/'},{name:'CR Lombardia',status:'LINK_ONLY',url:'https://www.crlombardia.it/'},{name:'Facebook SCD',status:'LINK_ONLY',url:'https://www.facebook.com/ColicoDerviese?locale=it_IT'},{name:'Instagram SCD',status:'LINK_ONLY',url:'https://www.instagram.com/s.c.d.colicoderviese/'},{name:'FIGC/LND',status:'LINK_ONLY',url:'https://www.lnd.it/'}],items};
-  liveCache={at:Date.now(),data};return data;
+  return {
+    ok:true,
+    generatedAt:new Date().toISOString(),
+    policy:'DISABLED_FOR_NEWS_UNTIL_FRESHNESS_GUARANTEED',
+    sources:[
+      {name:'Sito ufficiale SCD',status:'DISABLED_FOR_NEWS'},
+      {name:'Web/Google News',status:'DISABLED_FOR_NEWS'}
+    ],
+    items:[]
+  };
 }
 
 const mime={'.html':'text/html; charset=utf-8','.js':'application/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.webmanifest':'application/manifest+json','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.svg':'image/svg+xml','.ico':'image/x-icon','.xml':'application/xml; charset=utf-8','.txt':'text/plain; charset=utf-8'};
@@ -176,12 +373,13 @@ function serveStatic(req,res){
 http.createServer(async(req,res)=>{
   applyCors(req,res); if(req.method==='OPTIONS'){res.writeHead(204);return res.end()}
   const u=new URL(req.url,'http://localhost');
-  if(u.pathname==='/health') return json(res,200,{...clubTimePayload(),service:'SCD Super App',version:'39.0.0'});
+  if(u.pathname==='/health') return json(res,200,{...clubTimePayload(),service:'SCD Super App',version:'40.0.0'});
   if(u.pathname==='/api/time') return json(res,200,clubTimePayload());
-  if(u.pathname==='/api/capabilities') return json(res,200,{ok:true,version:'39.0.0',mode:'GITHUB_PAGES_RENDER_R20_SUPABASE_DUAL_RUN',actions:[...allowedActions].sort(),featureFlags:FEATURE_FLAGS,domainCore:SUPABASE_RUNTIME,isolated:['safeguarding']});
-  if(u.pathname==='/api/core-status') return json(res,200,{ok:true,version:'39.0.0',featureFlags:FEATURE_FLAGS,domainCore:SUPABASE_RUNTIME,currentPrimary:'R20',targetPrimary:'SCD_SUPABASE'});
+  if(u.pathname==='/api/capabilities') return json(res,200,{ok:true,version:'40.0.0',mode:'GITHUB_PAGES_RENDER_R20_SUPABASE_DUAL_RUN',actions:[...allowedActions].sort(),featureFlags:FEATURE_FLAGS,domainCore:SUPABASE_RUNTIME,isolated:['safeguarding']});
+  if(u.pathname==='/api/core-status') return json(res,200,{ok:true,version:'40.0.0',featureFlags:FEATURE_FLAGS,domainCore:SUPABASE_RUNTIME,currentPrimary:'R20',targetPrimary:'SCD_SUPABASE'});
   if(u.pathname==='/api/scd') return proxyAppsScript(req,res);
   if(u.pathname==='/api/public') return json(res,200,await fetchPublicFeed(),{'cache-control':'no-store'});
-  if(u.pathname==='/api/live') {try{return json(res,200,await getLiveRadar(),{'cache-control':'public, max-age=120'})}catch(e){return json(res,500,{ok:false,error:e.message})}}
+  if(u.pathname==='/api/newsroom') {try{return json(res,200,await buildWeeklyNewsroom(),{'cache-control':'public, max-age=180'})}catch(e){return json(res,500,{ok:false,error:e.message})}}
+  if(u.pathname==='/api/live') {try{return json(res,200,await getLiveRadar(),{'cache-control':'public, max-age=300'})}catch(e){return json(res,500,{ok:false,error:e.message})}}
   return serveStatic(req,res);
 }).listen(PORT,()=>console.log(`SCD Super App listening on ${PORT}`));

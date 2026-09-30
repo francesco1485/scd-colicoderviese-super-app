@@ -1,9 +1,10 @@
-const APP_VERSION='32.0.0';
+const APP_VERSION='40.0.0';
 const DYNAMIC_ORIGIN=(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)||location.hostname.endsWith('.onrender.com'))
   ? location.origin
   : 'https://scd-colicoderviese-official-r21.onrender.com';
 const API=DYNAMIC_ORIGIN+'/api/scd';
 const LIVE_API=DYNAMIC_ORIGIN+'/api/live';
+const NEWSROOM_API=DYNAMIC_ORIGIN+'/api/newsroom';
 const HEALTH_API=DYNAMIC_ORIGIN+'/health';
 const TIME_API=DYNAMIC_ORIGIN+'/api/time';
 const CAPABILITIES_API=DYNAMIC_ORIGIN+'/api/capabilities';
@@ -24,7 +25,7 @@ const FALLBACK={
     ],counts:{games:0,events:0,initiatives:0,news:1}
   }
 };
-let state={summary:null,installPrompt:null,session:null,sessionToken:'',privateData:null,apiStatus:'checking',clockOffsetMs:0,clubTimeZone:'Europe/Rome',clockSynced:false,calendar:[],location:null,capabilities:null,featureFlags:{dataFabricObservability:false},dataFabricStatus:null,dataFabricError:''};
+let state={summary:null,newsroom:null,installPrompt:null,session:null,sessionToken:'',privateData:null,apiStatus:'checking',clockOffsetMs:0,clubTimeZone:'Europe/Rome',clockSynced:false,calendar:[],location:null,capabilities:null,featureFlags:{dataFabricObservability:false},dataFabricStatus:null,dataFabricError:''};
 
 function localRequests(){
   try{return JSON.parse(localStorage.getItem(REQUESTS_KEY)||'[]')}catch{return []}
@@ -137,9 +138,14 @@ function normalizeCalendarRows(raw){
     date:normalizeCalendarDate(field(x,'date','data','startDate')),
     time:field(x,'time','ora','startTime')||'',
     endTime:field(x,'endTime','fine')||'',
-    type:field(x,'type','kind','category','eventType')||'EVENTO',
+    type:field(x,'type','kind','eventType')||field(x,'category','categoria')||'EVENTO',
+    category:displayValue(field(x,'category','categoria','ageGroup','annata'),''),
+    birthYear:displayValue(field(x,'birthYear','year','anno'),''),
     venue:field(x,'venue','luogo','field','location')||'',
     team:displayValue(field(x,'team','teamName','squadra'),''),
+    opponent:displayValue(field(x,'opponent','opponentName','avversario'),''),
+    competition:displayValue(field(x,'competition','campionato','league'),''),
+    result:displayValue(field(x,'result','score','risultato','finalScore'),''),
     source:field(x,'source','fonte')||'SCD',
     url:field(x,'url','link','sourceUrl')||''
   })).filter(x=>x.date||x.title);
@@ -181,8 +187,8 @@ function openCalendarEvent(id){
 }
 async function openCalendar(){
   setActiveNav('calendar');
-  modal('<section class="calendar-app-screen"><header class="calendar-app-head"><div class="calendar-app-brand"><img src="./assets/logo-scd.png" alt="SCD"><div><b>Calendario</b><p>Gare, allenamenti, riunioni ed eventi del club.</p></div></div></header><div class="calendar-tabs" role="tablist"><button class="active" data-cal-filter="ALL">Tutti</button><button data-cal-filter="MATCH">Gare</button><button data-cal-filter="TRAINING">Allenamenti</button><button data-cal-filter="EVENT">Eventi</button></div><div class="calendar-weekbar"><button class="outline" id="calPrev" aria-label="Settimana precedente">‹</button><strong id="calendarRange">Settimana corrente</strong><button class="outline" id="calNext" aria-label="Settimana successiva">›</button></div><div id="calendarDays" class="calendar-days"></div><div id="calendarNext"></div><div id="calendarRows" class="calendar-list"><div class="loading-line">Sincronizzazione calendario…</div></div><div class="calendar-toolbar"><button class="outline" id="calendarRefresh">AGGIORNA</button><button class="primary" id="calendarNotify">NOTIFICHE</button></div></section>');
-  let offset=0,filter='ALL';
+  modal('<section class="calendar-app-screen"><header class="calendar-app-head"><div class="calendar-app-brand"><img src="./assets/logo-scd.png" alt="SCD"><div><b>Calendario</b><p>Gare, allenamenti, riunioni ed eventi del club.</p></div></div></header><div class="calendar-tabs" role="tablist"><button class="active" data-cal-filter="ALL">Tutti</button><button data-cal-filter="MATCH">Gare</button><button data-cal-filter="TRAINING">Allenamenti</button><button data-cal-filter="EVENT">Eventi</button></div><div class="calendar-weekbar"><button class="outline" id="calPrev" aria-label="Settimana precedente">‹</button><strong id="calendarRange">Settimana corrente</strong><button class="outline" id="calNext" aria-label="Settimana successiva">›</button></div><div id="calendarTeams" class="calendar-team-filters" aria-label="Filtra per annata o squadra"></div><div id="calendarDays" class="calendar-days"></div><div id="calendarNext"></div><div id="calendarRows" class="calendar-list"><div class="loading-line">Sincronizzazione calendario…</div></div><div class="calendar-toolbar"><button class="outline" id="calendarRefresh">AGGIORNA</button><button class="primary" id="calendarNotify">NOTIFICHE</button></div></section>');
+  let offset=0,filter='ALL',teamFilter='ALL';
   const isoDate=d=>new Intl.DateTimeFormat('en-CA',{timeZone:state.clubTimeZone,year:'numeric',month:'2-digit',day:'2-digit'}).format(d);
   const weekStart=()=>{
     const now=clubNow(),shift=(now.getDay()+6)%7;
@@ -210,19 +216,23 @@ async function openCalendar(){
     return '●';
   };
   const renderRows=()=>{
-    const mount=$('#calendarRows'),range=$('#calendarRange'),days=$('#calendarDays'),next=$('#calendarNext');
-    if(!mount||!range||!days||!next)return false;
+    const mount=$('#calendarRows'),range=$('#calendarRange'),days=$('#calendarDays'),next=$('#calendarNext'),teams=$('#calendarTeams');
+    if(!mount||!range||!days||!next||!teams)return false;
     const start=weekStart(),endDate=new Date(start.getTime()+6*86400000),startKey=isoDate(start),endKey=isoDate(endDate);
     range.textContent=new Intl.DateTimeFormat('it-IT',{timeZone:state.clubTimeZone,day:'numeric',month:'long'}).format(start)+' – '+new Intl.DateTimeFormat('it-IT',{timeZone:state.clubTimeZone,day:'numeric',month:'long',year:'numeric'}).format(endDate);
     const today=clubDateKey();
     days.innerHTML=Array.from({length:7},(_,i)=>{const d=new Date(start.getTime()+i*86400000),key=isoDate(d);return '<button class="calendar-day '+(key===today?'today':'')+'" data-cal-day="'+key+'"><small>'+new Intl.DateTimeFormat('it-IT',{weekday:'short',timeZone:state.clubTimeZone}).format(d).replace('.','')+'</small><b>'+new Intl.DateTimeFormat('it-IT',{day:'numeric',timeZone:state.clubTimeZone}).format(d)+'</b></button>'}).join('');
-    let rows=(state.calendar||[]).filter(x=>x.date&&String(x.date).slice(0,10)>=startKey&&String(x.date).slice(0,10)<=endKey&&matchFilter(x));
+    const weekAll=(state.calendar||[]).filter(x=>x.date&&String(x.date).slice(0,10)>=startKey&&String(x.date).slice(0,10)<=endKey);
+    const labels=[...new Set(weekAll.map(x=>displayValue(x.category||x.birthYear||x.team,'')).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'it',{numeric:true}));
+    teams.innerHTML='<button class="'+(teamFilter==='ALL'?'active':'')+'" data-cal-team="ALL">Tutte le annate</button>'+labels.map(x=>'<button class="'+(teamFilter===x?'active':'')+'" data-cal-team="'+esc(x)+'">'+esc(x)+'</button>').join('');
+    document.querySelectorAll('[data-cal-team]').forEach(b=>b.onclick=()=>{teamFilter=b.dataset.calTeam;renderRows()});
+    let rows=weekAll.filter(matchFilter).filter(x=>teamFilter==='ALL'||displayValue(x.category||x.birthYear||x.team,'')===teamFilter);
     rows=rows.sort((a,b)=>calendarSortKey(a)-calendarSortKey(b));
     const upcoming=(state.calendar||[]).filter(x=>x.date&&String(x.date).slice(0,10)>=today&&matchFilter(x)).sort((a,b)=>calendarSortKey(a)-calendarSortKey(b))[0];
     next.innerHTML=upcoming?'<button class="calendar-next" data-calendar-event="'+esc(upcoming.id)+'"><span class="next-ico">'+icon(upcoming)+'</span><span><small>PROSSIMO EVENTO</small><b>'+esc(upcoming.title)+'</b><small>'+esc([fmtDate(upcoming.date),upcoming.time,upcoming.venue].filter(Boolean).join(' · '))+'</small></span><i>›</i></button>':'';
     const groups=new Map();
     rows.forEach(x=>{const k=String(x.date).slice(0,10);if(!groups.has(k))groups.set(k,[]);groups.get(k).push(x)});
-    mount.innerHTML=groups.size?[...groups.entries()].map(([date,items])=>'<section class="calendar-group"><div class="calendar-group-title"><b>'+esc(fmtDate(date))+'</b><small>'+items.length+' '+(items.length===1?'evento':'eventi')+'</small></div>'+items.map(x=>'<button class="calendar-row '+eventClass(x)+'" data-calendar-event="'+esc(x.id)+'"><span class="event-marker"></span><time><b>'+esc(x.time||'--:--')+'</b><small>'+esc(x.endTime||'')+'</small></time><span><b>'+esc(x.title)+'</b><small>'+esc([x.team,x.venue].filter(Boolean).join(' · ')||x.type)+'</small></span><i>›</i></button>').join('')+'</section>').join(''):'<div class="empty-state">Nessun evento registrato in questa settimana per il filtro scelto.</div>';
+    mount.innerHTML=groups.size?[...groups.entries()].map(([date,items])=>'<section class="calendar-group"><div class="calendar-group-title"><b>'+esc(fmtDate(date))+'</b><small>'+items.length+' '+(items.length===1?'evento':'eventi')+'</small></div>'+items.map(x=>'<button class="calendar-row '+eventClass(x)+'" data-calendar-event="'+esc(x.id)+'"><span class="event-marker"></span><time><b>'+esc(x.time||'--:--')+'</b><small>'+esc(x.endTime||'')+'</small></time><span><b>'+esc(x.title)+'</b><small>'+esc([x.category||x.birthYear,x.team,x.opponent,x.venue].filter(Boolean).join(' · ')||x.type)+'</small></span><i>›</i></button>').join('')+'</section>').join(''):'<div class="empty-state">Nessun evento registrato in questa settimana per il filtro scelto.</div>';
     bindCalendarEvents();
     document.querySelectorAll('[data-cal-day]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-cal-day]').forEach(x=>x.classList.remove('today'));b.classList.add('today')});
     return true;
@@ -350,13 +360,27 @@ function normalizePublic(raw){
   return obj;
 }
 async function loadSummary(silent=false){
-  let base=null,radar=null;
-  try{base=normalizePublic(await api('public.feed',{limit:40}))}catch(e){const cached=localStorage.getItem('scd:r21:summary');base=cached?JSON.parse(cached):JSON.parse(JSON.stringify(FALLBACK))}
-  try{const r=await fetch(LIVE_API,{cache:'no-store'});if(r.ok)radar=await r.json()}catch{}
+  let base=null;
+  try{base=normalizePublic(await api('public.feed',{limit:80}))}catch(e){const cached=localStorage.getItem('scd:r21:summary');base=cached?JSON.parse(cached):JSON.parse(JSON.stringify(FALLBACK))}
   const data=base||JSON.parse(JSON.stringify(FALLBACK));data.public=data.public||{};
-  if(radar&&Array.isArray(radar.items)&&radar.items.length){const internal=data.public.highlights||[];data.public.highlights=[...radar.items,...internal].slice(0,24);data.generatedAt=new Date(radar.generatedAt||Date.now()).toLocaleString('it-IT')}
   if(!Array.isArray(data.public.sponsors)||!data.public.sponsors.length)data.public.sponsors=FALLBACK.public.sponsors;
-  state.summary=data;localStorage.setItem('scd:r21:summary',JSON.stringify(data));render(data);if(!silent)toast(radar&&radar.items?.length?'SCD Radar aggiornato':'Dati SCD aggiornati')
+  state.summary=data;localStorage.setItem('scd:r21:summary',JSON.stringify(data));render(data);if(!silent)toast('Dati SCD aggiornati')
+}
+async function loadWeeklyNewsroom(silent=true){
+  try{
+    const r=await fetch(NEWSROOM_API,{cache:'no-store'});
+    if(!r.ok)throw new Error('newsroom '+r.status);
+    const j=await r.json();
+    if(j.ok!==true)throw new Error(j.error||'Newsroom non disponibile');
+    state.newsroom=j;
+    localStorage.setItem('scd:newsroom:v1',JSON.stringify(j));
+    if(!silent)toast('SCD Newsroom aggiornata');
+    window.dispatchEvent(new CustomEvent('scd:newsroom',{detail:j}));
+    return j;
+  }catch(e){
+    try{state.newsroom=JSON.parse(localStorage.getItem('scd:newsroom:v1')||'null')}catch{state.newsroom=null}
+    return state.newsroom;
+  }
 }
 function publicData(data){return (data&&data.public)||FALLBACK.public}
 function renderHomeKpis(p){
@@ -377,12 +401,17 @@ function setActiveNav(name){
 }
 function render(data){const p=publicData(data);document.querySelectorAll('[data-season]').forEach(el=>el.textContent=data.season||'2026/27');const updated=$('#updatedAt');if(updated)updated.textContent=data.generatedAt||'ora';renderHero(p);renderTicker(p);renderMatches(p);renderEvents(p);renderNews(p);renderSponsors(p);renderTodayAgenda();renderHomeKpis(p)}
 function renderHero(p){const n=p.nextMatch||{};$('#nextDate').textContent=fmtDate(field(n,'date','data'));$('#nextTime').textContent=field(n,'time','ora')||'—';const opp=displayValue(field(n,'opponentName','opponent','avversario','title'),'Avversario');$('#nextOpponent').textContent=opp;$('#opponentBadge').textContent=opp.slice(0,1).toUpperCase();$('#nextVenue').textContent=field(n,'venue','luogo','field')||'Sede da aggiornare'}
-function renderTicker(p){const h=p.highlights||[];$('#liveTicker').innerHTML='<span>'+esc(h.slice(0,5).map(x=>field(x,'title','subject','event')||'Aggiornamento SCD').join('  •  ')||'SCD ColicoDerviese · aggiornamenti in corso')+'</span>'}
-function renderMatches(p){const n=p.nextMatch||{};const l=p.lastResult||{};const cards=[];if(Object.keys(n).length)cards.push(matchCard(n,'PROSSIMA GARA',false));if(Object.keys(l).length)cards.push(matchCard(l,'ULTIMO RISULTATO',true));const extras=(p.highlights||[]).filter(x=>/gara|match|risultat/i.test([x.feedType,x.title,x.subject].join(' '))).slice(0,2);extras.forEach((x,i)=>cards.push(`<article class="match-card"><span class="tag">AGGIORNAMENTO GARA</span><h3>${esc(field(x,'title','subject')||'SCD ColicoDerviese')}</h3><p>${esc(field(x,'message','venue','status')||'Aggiornamento disponibile')}</p><div class="scoreline"><small>${esc(fmtDate(field(x,'date')))}</small><strong>→</strong></div></article>`));if(!cards.length)cards.push('<article class="match-card"><span class="tag">CALENDARIO SCD</span><h3>Dati gara in sincronizzazione</h3><p>La Super App non mostra partite inventate. Apri il calendario ufficiale o aggiorna tra poco.</p><div class="scoreline"><small>Fonte: SCD / federazione</small><strong>↻</strong></div></article>');$('#matchGrid').innerHTML=cards.join('')}
+function renderTicker(p){const news=Array.isArray(state.newsroom?.cards)?state.newsroom.cards:[];const week=Array.isArray(state.newsroom?.calendar?.rows)?state.newsroom.calendar.rows:[];const titles=news.map(x=>x.title).filter(Boolean).slice(0,4);if(!titles.length)titles.push(...week.map(x=>[x.team,x.title].filter(Boolean).join(' · ')).filter(Boolean).slice(0,4));$('#liveTicker').innerHTML='<span>'+esc(titles.join('  •  ')||'SCD ColicoDerviese · dati verificati in aggiornamento')+'</span>'}
+function renderMatches(p){const n=p.nextMatch||{};const l=p.lastResult||{};const cards=[];if(Object.keys(n).length)cards.push(matchCard(n,'PROSSIMA GARA',false));if(Object.keys(l).length)cards.push(matchCard(l,'ULTIMO RISULTATO',true));const extras=(state.calendar||[]).filter(x=>x.result&&/gara|partita|campionato|coppa|amichevole|match/i.test([x.type,x.title].join(' '))).sort((a,b)=>calendarSortKey(b)-calendarSortKey(a)).slice(0,2);extras.forEach(x=>cards.push(matchCard(x,'RISULTATO INSERITO',true)));if(!cards.length)cards.push('<article class="match-card"><span class="tag">CALENDARIO SCD</span><h3>Dati gara in sincronizzazione</h3><p>La Super App non mostra partite inventate. Apri il calendario o aggiorna tra poco.</p><div class="scoreline"><small>Fonte: dati SCD strutturati</small><strong>↻</strong></div></article>');$('#matchGrid').innerHTML=cards.join('')}
 function matchCard(x,label,result){const opp=displayValue(field(x,'opponentName','opponent','avversario','title'),'Avversario');const team=displayValue(field(x,'team','teamName'),'SCD ColicoDerviese');const score=displayValue(field(x,'result','score','risultato'),'');return `<article class="match-card ${result?'result':''}"><span class="tag">${label}</span><h3>${esc(team)} · ${esc(opp)}</h3><p>${esc(fmtDate(field(x,'date','data')))}${field(x,'time','ora')?' · '+esc(field(x,'time','ora')):''}</p><div class="scoreline"><small>${esc(field(x,'venue','luogo','field')||'Sede da aggiornare')}</small><strong>${esc(score||'VS')}</strong></div></article>`}
 function eventImage(x,i){return field(x,'image','imageUrl','featuredImage')||(i===0?'/assets/event-insieme.webp':'')}
 function renderEvents(p){const rows=(p.initiatives||[]).slice(0,5);const use=rows.length?rows:FALLBACK.public.initiatives;$('#eventGrid').innerHTML=use.slice(0,3).map((x,i)=>{const img=eventImage(x,i);const title=field(x,'title','event','name')||'Evento SCD';const url=field(x,'registrationUrl','url','link');return `<article class="event-card ${i===0?'feature':''}">${img?`<img src="${esc(img)}" alt="${esc(title)}" loading="lazy">`:''}<div class="event-shade"></div><div class="event-content"><span class="event-type">${esc(field(x,'type','kind','status')||'EVENTO SCD')}</span><h3>${esc(title)}</h3><p>${esc([fmtDate(field(x,'date')),field(x,'time'),field(x,'venue','luogo')].filter(Boolean).join(' · '))}</p><div class="event-actions">${url?`<a class="go" href="${esc(url)}" target="_blank" rel="noopener">ISCRIVITI</a>`:`<button class="go" data-event-register="${esc(title)}">SCOPRI</button>`}<button class="share" data-share="${esc(title)}">CONDIVIDI</button></div></div></article>`}).join('');bindDynamic()}
-function renderNews(p){const rows=(p.highlights||[]).slice(0,6);const use=rows.length?rows:FALLBACK.public.highlights;const f=use[0]||{};$('#featureNews').innerHTML=`<span class="news-source">${esc(field(f,'source','feedType')||'SCD PULSE')}</span><h3>${esc(field(f,'title','subject','event')||'Aggiornamento SCD')}</h3><p>${esc(field(f,'message','excerpt','venue')||'Informazioni societarie e territoriali in aggiornamento.')}</p>`;$('#newsList').innerHTML=use.slice(1,6).map(x=>`<div class="news-row"><span class="news-icon">${/urgent|variaz|cambio/i.test([x.status,x.feedType,x.title].join(' '))?'!':'◉'}</span><span><b>${esc(field(x,'title','subject','event')||'Aggiornamento')}</b><small>${esc(field(x,'message','venue','status')||field(x,'feedType')||'SCD')}</small></span><time>${esc(field(x,'date','time')||'')}</time></div>`).join('')}
+function renderNews(p){
+  const rows=Array.isArray(state.newsroom?.cards)?state.newsroom.cards:[];
+  const f=rows[0]||{};
+  $('#featureNews').innerHTML=`<span class="news-source">${esc(f.category||'SCD NEWSROOM AI')}</span><h3>${esc(f.title||'Nessuna news automatica senza dati verificati')}</h3><p>${esc(f.dek||f.body||'Risultati, classifiche, calendario e iniziative alimentano la sintesi settimanale. Il sito datato non viene usato come riempitivo.')}</p>`;
+  $('#newsList').innerHTML=rows.slice(1,6).map(x=>`<div class="news-row"><span class="news-icon">AI</span><span><b>${esc(x.title||'Sintesi SCD')}</b><small>${esc(x.dek||x.body||'')}</small></span><time>${esc(state.newsroom?.week?.start||'')}</time></div>`).join('')||'<div class="empty-state">Nessun altro contenuto editoriale verificato questa settimana.</div>';
+}
 function renderSponsors(p){const rows=(p.sponsors||[]).slice(0,12);const use=rows.length?rows:FALLBACK.public.sponsors;$('#sponsorGrid').innerHTML=use.slice(0,8).map(x=>{const name=field(x,'name','sponsor','company','title')||'Partner SCD';const logo=field(x,'logo','logoUrl','image');const url=field(x,'url','website','link');const inner=logo?`<img src="${esc(logo)}" alt="${esc(name)}" loading="lazy">`:`<span>${esc(name)}</span>`;return url?`<a class="sponsor-card" href="${esc(url)}" target="_blank" rel="noopener">${inner}</a>`:`<div class="sponsor-card">${inner}</div>`}).join('');const names=use.map(x=>field(x,'name','sponsor','company','title')||'Partner SCD');const text=(names.length?names:['SCD Partner']).join('   ◆   ');$('#sponsorTrack').innerHTML=`<span>${esc(text)}   ◆   ${esc(text)}</span>`}
 function openRegister(){modal(`<span class="eyebrow">SCD COMMUNITY</span><h2>Registrati</h2><p>Crei un solo account SCD. Entri sempre come Utente Base e continui a ricevere news, gare, eventi, community e servizi. Se fai parte della Società, la Direzione abiliterà in seguito le funzioni dedicate senza creare un secondo account.</p><form id="registerForm"><div class="form-grid"><div class="field"><label>Nome</label><input id="regName" required autocomplete="given-name"></div><div class="field"><label>Cognome</label><input id="regSurname" required autocomplete="family-name"></div><div class="field"><label>Email</label><input id="regEmail" type="email" required autocomplete="email"></div><div class="field"><label>Telefono</label><input id="regPhone" type="tel" required inputmode="tel" autocomplete="tel"></div><div class="field full"><label class="check"><input id="regPrivacy" type="checkbox" required> <span>Ho letto l’informativa privacy e autorizzo il trattamento dei dati necessari alla registrazione e alla gestione dell’accesso SCD.</span></label></div></div><div id="regStatus"></div><div class="modal-actions"><button type="button" class="outline" id="cancelReg">ANNULLA</button><button class="primary" type="submit">REGISTRATI</button></div></form>`);$('#cancelReg').onclick=closeModal;$('#registerForm').onsubmit=submitRegistration}
 function registrationProfile(){try{return JSON.parse(localStorage.getItem('scd:last-registration')||'{}')}catch{return {}}}
@@ -700,14 +729,29 @@ function openEventsHub(){
 }
 function openCommunicationsHub(){
   setActiveNav('');
-  const p=publicData(state.summary||FALLBACK),rows=(p.highlights||[]).slice(0,8);
-  const important=rows.find(x=>/urgent|sospension|variaz|annull|rinvi|cambio/i.test([x.status,x.feedType,x.title,x.message].join(' ')))||rows[0]||{};
-  const rest=rows.filter(x=>x!==important).slice(0,5);
-  modal('<section class="communications-app-screen"><header class="communications-app-head"><div class="communications-app-brand"><img src="./assets/logo-scd.png" alt="SCD"><div><b>Comunicazioni</b><p>Notizie, aggiornamenti e contenuti ufficiali del club.</p></div></div></header><div class="communications-tabs"><button class="active">Club</button><button data-comm-tab="teams">Squadre</button><button data-comm-tab="social">Social</button></div><article class="communication-important"><span class="comm-ico">!</span><div><small>COMUNICAZIONE IN EVIDENZA</small><b>'+esc(field(important,'title','subject','event')||'Aggiornamenti SCD')+'</b><p>'+esc(field(important,'message','excerpt','venue')||'Le informazioni ufficiali del Club vengono pubblicate qui.')+'</p><time>'+esc(field(important,'date','time')||'')+'</time></div></article><div class="communication-list">'+(rest.length?rest.map(x=>'<article><span class="comm-row-ico">▣</span><div><small>'+esc(field(x,'feedType','source')||'CLUB')+'</small><b>'+esc(field(x,'title','subject','event')||'Aggiornamento')+'</b><p>'+esc(field(x,'message','venue','status')||'')+'</p></div><time>'+esc(field(x,'date','time')||'')+'</time></article>').join(''):'<div class="empty-state">Nuove comunicazioni in aggiornamento.</div>')+'</div><section class="social-hub-card"><div><h3>Social Hub</h3><p>I canali ufficiali SCD in un unico spazio, senza numeri inventati.</p></div><div class="social-links"><a href="https://www.instagram.com/s.c.d.colicoderviese/" target="_blank" rel="noopener">Instagram</a><a href="https://www.facebook.com/ColicoDerviese?locale=it_IT" target="_blank" rel="noopener">Facebook</a><a href="https://www.colicoderviese.it/" target="_blank" rel="noopener">Sito ufficiale</a></div><div class="modal-actions"><button class="outline" id="commRefresh">AGGIORNA</button><button class="primary" id="commShare">CONDIVIDI APP</button></div></section></section>');
+  const p=publicData(state.summary||FALLBACK);
+  const internal=(p.highlights||[]).filter(x=>{
+    const src=[field(x,'source','fonte','feedType'),field(x,'sourceUrl','url','link')].join(' ').toLowerCase();
+    return !/official_site|sito ufficiale|google news|web_news|instagram|facebook/.test(src);
+  });
+  const important=internal.find(x=>/urgent|sospension|variaz|annull|rinvi|cambio/i.test([x.status,x.feedType,x.title,x.message].join(' ')))||internal[0]||{};
+  const comms=internal.filter(x=>x!==important).slice(0,5);
+  const newsroom=Array.isArray(state.newsroom?.cards)?state.newsroom.cards:[];
+  const newsroomHtml=newsroom.length?newsroom.map(x=>'<article><span class="comm-row-ico">AI</span><div><small>'+esc(x.category||'SCD NEWSROOM AI')+'</small><b>'+esc(x.title||'Sintesi settimanale')+'</b><p>'+esc(x.dek||x.body||'')+'</p></div><time>'+esc(state.newsroom?.week?.start||'')+'</time></article>').join(''):'<div class="empty-state">La Newsroom non pubblica nulla finché non ci sono dati verificati.</div>';
+  modal('<section class="communications-app-screen"><header class="communications-app-head"><div class="communications-app-brand"><img src="./assets/logo-scd.png" alt="SCD"><div><b>Comunicazioni & Newsroom</b><p>Comunicazioni operative del Club e sintesi settimanali costruite da dati verificati.</p></div></div></header><div class="communications-tabs"><button class="active">Club</button><button data-comm-tab="teams">Squadre</button><button data-comm-tab="newsroom">Newsroom AI</button><button data-comm-tab="social">Social</button></div><article class="communication-important"><span class="comm-ico">!</span><div><small>COMUNICAZIONE OPERATIVA</small><b>'+esc(field(important,'title','subject','event')||'Nessuna comunicazione urgente')+'</b><p>'+esc(field(important,'message','excerpt','venue')||'Le comunicazioni operative verificate vengono pubblicate qui.')+'</p><time>'+esc(field(important,'date','time')||'')+'</time></div></article><div class="communication-list" id="communicationList">'+(comms.length?comms.map(x=>'<article><span class="comm-row-ico">▣</span><div><small>'+esc(field(x,'feedType','source')||'CLUB')+'</small><b>'+esc(field(x,'title','subject','event')||'Aggiornamento')+'</b><p>'+esc(field(x,'message','venue','status')||'')+'</p></div><time>'+esc(field(x,'date','time')||'')+'</time></article>').join(''):'<div class="empty-state">Nessuna comunicazione operativa nuova.</div>')+'</div><section class="social-hub-card"><div><h3>Canali ufficiali</h3><p>I link restano disponibili, ma le news dell’app non vengono riempite con contenuti datati del sito.</p></div><div class="social-links"><a href="https://www.instagram.com/s.c.d.colicoderviese/" target="_blank" rel="noopener">Instagram</a><a href="https://www.facebook.com/ColicoDerviese?locale=it_IT" target="_blank" rel="noopener">Facebook</a><a href="https://www.colicoderviese.it/" target="_blank" rel="noopener">Sito ufficiale</a></div><div class="modal-actions"><button class="outline" id="commRefresh">AGGIORNA DATI</button><button class="primary" id="commShare">CONDIVIDI APP</button></div></section></section>');
+  const list=$('#communicationList');
+  document.querySelectorAll('[data-comm-tab]').forEach(b=>b.onclick=()=>{
+    document.querySelectorAll('.communications-tabs button').forEach(x=>x.classList.toggle('active',x===b));
+    if(b.dataset.commTab==='teams')return openTeams();
+    if(b.dataset.commTab==='newsroom'){
+      if(list)list.innerHTML=newsroomHtml;
+      return;
+    }
+    if(b.dataset.commTab==='social')return toast('Apri i canali ufficiali dai link qui sotto');
+  });
   const refresh=$('#commRefresh'),share=$('#commShare');
-  if(refresh)refresh.onclick=async()=>{await loadSummary(false);openCommunicationsHub()};
-  if(share)share.onclick=async()=>{try{if(navigator.share)await navigator.share({title:'SCD ColicoDerviese',text:'Segui gli aggiornamenti ufficiali SCD ColicoDerviese',url:location.href});else await navigator.clipboard.writeText(location.href);toast('Link app pronto per la condivisione')}catch{}};
-  document.querySelectorAll('[data-comm-tab]').forEach(b=>b.onclick=()=>{if(b.dataset.commTab==='teams')openTeams();else toast('Apri i canali ufficiali dal Social Hub')});
+  if(refresh)refresh.onclick=async()=>{await Promise.all([loadSummary(true),loadWeeklyNewsroom(false)]);openCommunicationsHub()};
+  if(share)share.onclick=async()=>{try{if(navigator.share)await navigator.share({title:'SCD ColicoDerviese',text:'Segui SCD Universe',url:location.href});else await navigator.clipboard.writeText(location.href);toast('Link app pronto per la condivisione')}catch{}};
 }
 function openProfile(){
   setActiveNav('profile');
@@ -997,9 +1041,9 @@ function boot(){
   window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();state.installPrompt=e;if(installBtn)installBtn.hidden=false});
   if(installBtn)installBtn.onclick=async()=>{if(!state.installPrompt)return toast('Dal menu del browser scegli “Installa app” o “Aggiungi alla schermata Home”.');state.installPrompt.prompt();await state.installPrompt.userChoice;state.installPrompt=null;installBtn.hidden=true;track('pwa_install',{section:'install'})};
   if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('./sw.js?v=28.0.0',{updateViaCache:'none'})
+  navigator.serviceWorker.register('./sw.js?v=40.0.0',{updateViaCache:'none'})
     .then(reg=>reg.update())
     .catch(()=>{});
-}bindDynamic();syncClubClock();checkServiceHealth();loadCapabilities();loadPublicCalendar(true);restoreManagementSession();track('page_view',{section:(location.hash||'#home').replace('#','')});window.addEventListener('hashchange',()=>{const section=(location.hash||'#home').replace('#','');track('page_view',{section});setActiveNav(section==='eventi'?'events':section==='home'?'home':'')});loadSummary(true);setInterval(()=>{if(!document.hidden)loadSummary(true)},60000);setInterval(flushListening,120000);setInterval(checkDueReminders,60000);setTimeout(checkDueReminders,4000);setInterval(()=>{if(!document.hidden)syncClubClock()},300000);setInterval(()=>{if(!document.hidden)loadPublicCalendar(true)},300000);
+}bindDynamic();syncClubClock();checkServiceHealth();loadCapabilities();loadPublicCalendar(true);loadWeeklyNewsroom(true);restoreManagementSession();track('page_view',{section:(location.hash||'#home').replace('#','')});window.addEventListener('hashchange',()=>{const section=(location.hash||'#home').replace('#','');track('page_view',{section});setActiveNav(section==='eventi'?'events':section==='home'?'home':'')});loadSummary(true);setInterval(()=>{if(!document.hidden)loadSummary(true)},60000);setInterval(()=>{if(!document.hidden)loadWeeklyNewsroom(true)},300000);setInterval(flushListening,120000);setInterval(checkDueReminders,60000);setTimeout(checkDueReminders,4000);setInterval(()=>{if(!document.hidden)syncClubClock()},300000);setInterval(()=>{if(!document.hidden)loadPublicCalendar(true)},300000);
 }
 document.addEventListener('DOMContentLoaded',boot);

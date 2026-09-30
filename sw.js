@@ -1,5 +1,5 @@
-const CACHE='scd-r39-human-os-v1';
-const CORE=['./','./index.html','./delete-account.html','./styles.css?v=21.10.0','./ui-r21-11.css?v=21.15.0','./ui-r24-shell.css?v=24.0.0','./ui-r26-pulse.css?v=26.0.0','./ui-r38-universe.css?v=39.0.0','./ui-r39-human.css?v=39.0.0','./app.js?v=39.0.0','./scd-meta-engine.js?v=39.0.0','./scd-twin.js?v=39.0.0','./scd-experience-engine.js?v=39.0.0','./app-r24-router.js?v=39.0.0','./manifest.webmanifest','./assets/logo-scd.png','./assets/hero-colico.webp','./assets/sky.png','./assets/icon-192.png','./assets/icon-512.png'];
+const CACHE='scd-r40-weekly-newsroom-v1';
+const CORE=['./','./index.html','./delete-account.html','./styles.css?v=21.10.0','./ui-r21-11.css?v=21.15.0','./ui-r24-shell.css?v=24.0.0','./ui-r26-pulse.css?v=26.0.0','./ui-r38-universe.css?v=40.0.0','./ui-r39-human.css?v=40.0.0','./ui-r40-weekly.css?v=40.0.0','./app.js?v=40.0.0','./scd-meta-engine.js?v=40.0.0','./scd-twin.js?v=40.0.0','./scd-experience-engine.js?v=40.0.0','./app-r24-router.js?v=40.0.0','./manifest.webmanifest','./assets/logo-scd.png','./assets/hero-colico.webp','./assets/sky.png','./assets/icon-192.png','./assets/icon-512.png'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',e=>{
