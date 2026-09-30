@@ -10,17 +10,19 @@ const viewMeta={
  home:['Quadro generale','Agenzia Generale HDI · Ecosistema di competenze, relazioni e sviluppo'],
  products:['Prodotti & Sintesi','Schede consulenziali, punti di forza, limiti e percorsi di confronto'],
  collaborators:['Collaboratori & Guadagni','Ruoli, competenze e remunerazioni differenziate per attività e prodotto'],
+ growthKits:['Kit Collaboratore','Valutazione del portafoglio, proposta di sviluppo, documentazione e strumenti per il cliente'],
  comparisons:['Confronti & Benchmark','Analisi verificabili tra soluzioni e realtà comparabili'],
  aiMail:['AI Mail & Chat','Bozze personalizzate, contesto relazionale e assistenza operativa'],
  cepa:['Centro CEPA','Materie, contenuti, programmi, iniziative e sviluppo del metodo'],
  territories:['SAP & Territori','Presidi territoriali, candidature, incontri e sviluppo della rete'],
  documents:['Archivio & Contratti','Documenti, accordi, dossier e modelli pronti'],
  development:['Sviluppo nuovo','Seconda strada: mappatura, qualificazione e nuove relazioni'],
+ networkRadar:['Radar Rete','Ricerca continua IVASS, Registro Imprese e territorio per nuova rete e collaborazioni'],
  actions:['Attività & Scadenze','Motore operativo comune a tutto il sistema'],
  recovery:['Clienti · Recovery','Campagna operativa sul patrimonio esistente']
 }
 
-let ecosystem=[],projects=[],actions=[],marketHubs=[],marketEntities=[],contacts=[],timeline=[],documents=[],partnerRequirements=[],blueprints=[],subjects=[],initiatives=[],cepaContent=[],cepaAcademy=[],cepaSpeakers=[],products=[],productKnowledge=[],comparisons=[],collaborators=[],collaboratorTerms=[],portfolioSnapshots=[],mailTemplates=[],mailDrafts=[],cepaExpansion=[],cepaReadiness=[],assistantMessages=[],recoveryRows=[],members=[]
+let ecosystem=[],projects=[],actions=[],marketHubs=[],marketEntities=[],contacts=[],timeline=[],documents=[],partnerRequirements=[],blueprints=[],subjects=[],initiatives=[],cepaContent=[],cepaAcademy=[],cepaSpeakers=[],products=[],productKnowledge=[],comparisons=[],collaborators=[],collaboratorTerms=[],portfolioSnapshots=[],businessAssessments=[],growthKits=[],distributionWatchlists=[],distributionCandidates=[],distributionEvidence=[],mailTemplates=[],mailDrafts=[],cepaExpansion=[],cepaReadiness=[],assistantMessages=[],recoveryRows=[],members=[]
 let currentPartnerId=null
 
 function msg(text,error=false){$('loginMsg').textContent=text;$('loginMsg').className='message'+(error?' error':'')}
@@ -78,6 +80,10 @@ $('addCepaInitiativeBtn').onclick=openNewInitiative
 $('addCepaContentBtn').onclick=openNewCepaContent
 $('addCepaSpeakerBtn').onclick=openNewCepaSpeaker
 $('addCollaboratorBtn').onclick=openNewCollaborator
+$('newAssessmentBtn').onclick=()=>openAssessmentEditor(null)
+$('newDistributionCandidateBtn').onclick=()=>openDistributionCandidateEditor(null)
+$('distKindFilter').onchange=renderDistributionCandidates
+$('distStageFilter').onchange=renderDistributionCandidates
 $('editPartnerBtn').onclick=openEditPartner
 $('mailTemplateSelect').onchange=hydrateMailTemplate
 $('generateMailBtn').onclick=generateMailDraft
@@ -100,7 +106,7 @@ async function boot(){
   window.orgId=m.organization_id;window.userId=user.id;window.userRole=m.role
   $('workspace').classList.remove('hidden');$('blockedView').classList.add('hidden');$('aiDock').classList.remove('hidden')
   $('sideUser').textContent=user.email||'Utente';$('rolePill').textContent=m.role.replaceAll('_',' ')
-  ;['newEntityBtn','addTimelineBtn','addContactBtn','addPartnerDocumentBtn','addDocumentBtn','addCepaSubjectBtn','addCepaInitiativeBtn','addCepaContentBtn','addCepaSpeakerBtn','addCollaboratorBtn','editPartnerBtn'].forEach(id=>$(id).classList.toggle('hidden',!isManager()))
+  ;['newEntityBtn','addTimelineBtn','addContactBtn','addPartnerDocumentBtn','addDocumentBtn','addCepaSubjectBtn','addCepaInitiativeBtn','addCepaContentBtn','addCepaSpeakerBtn','addCollaboratorBtn','newAssessmentBtn','newDistributionCandidateBtn','editPartnerBtn'].forEach(id=>$(id).classList.toggle('hidden',!isManager()))
   await loadAll()
 }
 
@@ -129,6 +135,11 @@ async function loadAll(){
     supabase.from('agency_collaborators').select('*').eq('organization_id',window.orgId).eq('active',true).order('display_name'),
     supabase.from('collaborator_product_terms').select('*,agency_products(id,name),ecosystem_nodes(id,name,code)').eq('organization_id',window.orgId).order('created_at',{ascending:false}),
     supabase.from('collaborator_portfolio_snapshots').select('*,agency_collaborators(id,display_name,collaborator_type)').eq('organization_id',window.orgId).order('premium_total',{ascending:false}),
+    supabase.from('collaborator_business_assessments').select('*,agency_collaborators(id,display_name)').eq('organization_id',window.orgId).order('assessment_date',{ascending:false}),
+    supabase.from('collaborator_growth_kits').select('*').eq('organization_id',window.orgId).order('title'),
+    supabase.from('distribution_research_watchlists').select('*,market_hubs(id,name,city)').eq('organization_id',window.orgId).order('name'),
+    supabase.from('distribution_candidates').select('*,market_hubs(id,name,city)').eq('organization_id',window.orgId).order('updated_at',{ascending:false}),
+    supabase.from('distribution_candidate_evidence').select('*').eq('organization_id',window.orgId).order('observed_at',{ascending:false}).limit(500),
     supabase.from('ai_mail_templates').select('*').eq('organization_id',window.orgId).eq('active',true).order('title'),
     supabase.from('ai_mail_drafts').select('*,ecosystem_nodes(id,name),ai_mail_templates(id,title)').eq('organization_id',window.orgId).order('created_at',{ascending:false}).limit(100),
     supabase.from('cepa_expansion_stages').select('*').eq('organization_id',window.orgId).order('stage_no'),
@@ -138,13 +149,13 @@ async function loadAll(){
   const res=await Promise.all(q)
   const err=res.find(x=>x.error)?.error
   if(err){console.error(err);$('refreshBtn').textContent='!';return}
-  ;[ecosystem,projects,actions,marketHubs,marketEntities,contacts,timeline,documents,partnerRequirements,blueprints,subjects,initiatives,cepaContent,cepaAcademy,cepaSpeakers,products,productKnowledge,comparisons,collaborators,collaboratorTerms,portfolioSnapshots,mailTemplates,mailDrafts,cepaExpansion,cepaReadiness,assistantMessages]=res.map(x=>x.data||[])
+  ;[ecosystem,projects,actions,marketHubs,marketEntities,contacts,timeline,documents,partnerRequirements,blueprints,subjects,initiatives,cepaContent,cepaAcademy,cepaSpeakers,products,productKnowledge,comparisons,collaborators,collaboratorTerms,portfolioSnapshots,businessAssessments,growthKits,distributionWatchlists,distributionCandidates,distributionEvidence,mailTemplates,mailDrafts,cepaExpansion,cepaReadiness,assistantMessages]=res.map(x=>x.data||[])
   renderEverything()
   $('refreshBtn').textContent='↻'
 }
 
 function renderEverything(){
-  renderPartnerNav();renderHome();renderPartner();renderProducts();renderCollaborators();renderComparisons();renderMail();renderCepa();renderTerritories();renderDocuments();renderDevelopment();renderActions();renderAssistantHistory()
+  renderPartnerNav();renderHome();renderPartner();renderProducts();renderCollaborators();renderGrowthKits();renderComparisons();renderMail();renderCepa();renderTerritories();renderDocuments();renderDevelopment();renderNetworkRadar();renderActions();renderAssistantHistory()
 }
 
 function renderPartnerNav(){
@@ -441,6 +452,81 @@ function openNewCollaborator(){
     const{error}=await supabase.from('agency_collaborators').insert(row)
     if(error)return alert(error.message)
     closeModal();await loadAll()
+  }
+}
+
+
+function avgAssessment(a){
+  const vals=['relationship_quality','portfolio_depth','development_potential','advisory_readiness','local_network_strength','digital_readiness','compliance_readiness'].map(k=>a[k]).filter(v=>v!=null)
+  return vals.length?Math.round(vals.reduce((x,y)=>x+Number(y),0)/vals.length):null
+}
+function renderGrowthKits(){
+  $('growthKitCount').textContent=growthKits.length
+  $('assessmentCount').textContent=businessAssessments.length
+  $('assessmentCollabCount').textContent=new Set(businessAssessments.map(a=>a.collaborator_id)).size
+  $('growthKitReady').textContent=growthKits.filter(k=>k.status==='ready').length
+  $('assessmentList').innerHTML=businessAssessments.map(a=>listRow(a.agency_collaborators?.display_name||'Collaboratore',a.proposal_direction||a.client_base_profile||'Valutazione da completare',[a.status,a.assessment_date,'indice '+(avgAssessment(a)??'—')+'/100'])).join('')||empty('Nessuna valutazione ancora registrata')
+  $('growthKitGrid').innerHTML=growthKits.map(k=>'<article class="growth-kit-card" data-growth-kit="'+k.id+'"><div class="eyebrow">'+esc(k.use_case.replaceAll('_',' '))+'</div><h3>'+esc(k.title)+'</h3><p>'+esc(k.objective||'')+'</p><div class="tags">'+(k.recommended_areas||[]).slice(0,6).map(x=>'<span class="tag">'+esc(x)+'</span>').join('')+'</div><div class="kit-footer"><span>'+esc(k.status)+'</span><b>Apri →</b></div></article>').join('')||empty('Nessun kit operativo')
+  document.querySelectorAll('[data-growth-kit]').forEach(b=>b.onclick=()=>openGrowthKit(b.dataset.growthKit))
+}
+function openGrowthKit(id){
+  const k=growthKits.find(x=>x.id===id);if(!k)return
+  const block=(title,arr)=>'<div class="kit-block"><h4>'+title+'</h4><ul>'+((arr||[]).length?(arr||[]).map(x=>'<li>'+esc(x)+'</li>').join(''):'<li>Da completare</li>')+'</ul></div>'
+  $('modalContent').innerHTML='<div class="eyebrow">KIT OPERATIVO</div><h2>'+esc(k.title)+'</h2><p class="muted">'+esc(k.objective||'')+'</p><div class="prose-box"><p><strong>Come aprire la conversazione</strong><br>'+esc(k.opening_script||'Da definire')+'</p><p><strong>Follow-up</strong><br>'+esc(k.follow_up_process||'Da definire')+'</p></div><div class="kit-block-grid">'+block('Domande utili',k.need_questions)+block('Documentazione',k.required_documents)+block('Da consegnare al cliente',k.client_deliverables)+block('Grafiche / supporti',k.visual_aids)+'</div><div class="prose-box"><p><strong>Nota compliance</strong><br>'+esc(k.compliance_notes||'')+'</p><p><strong>Fonte metodo</strong><br>'+esc(k.source_reference||'')+'</p></div>'
+  $('modal').classList.remove('hidden')
+}
+function openAssessmentEditor(id=null){
+  if(!isManager())return
+  const a=id?businessAssessments.find(x=>x.id===id):null
+  $('modalContent').innerHTML='<div class="eyebrow">VALUTAZIONE COLLABORATORE</div><h2>Fotografia Business 360</h2><form id="assessmentForm" class="form"><label>Collaboratore<select id="assCollaborator" required><option value="">Seleziona</option>'+collaborators.map(c=>'<option value="'+c.id+'">'+esc(c.display_name)+'</option>').join('')+'</select></label><div class="inline"><label>Periodo<input id="assPeriod" placeholder="es. 2026 YTD"></label><label>Stato<select id="assStatus"><option value="draft">Bozza</option><option value="review">Revisione</option><option value="validated">Validata</option></select></label></div><div class="score-form-grid">'+['relationship_quality|Qualità relazione','portfolio_depth|Profondità portafoglio','development_potential|Potenziale sviluppo','advisory_readiness|Prontezza consulenziale','local_network_strength|Forza rete locale','digital_readiness|Prontezza digitale','compliance_readiness|Prontezza compliance'].map(x=>{const [k,l]=x.split('|');return '<label>'+l+'<input id="ass_'+k+'" type="number" min="0" max="100"></label>'}).join('')+'</div><label>Modello di business<textarea id="assBusiness"></textarea></label><label>Profilo clientela<textarea id="assClients"></textarea></label><label>Punti di forza, separati da ;<textarea id="assStrengths"></textarea></label><label>Gap, separati da ;<textarea id="assGaps"></textarea></label><label>Direzione proposta<textarea id="assDirection"></textarea></label><label>Evidenza / fonte<input id="assEvidence"></label><p class="form-note">L’indice è una sintesi descrittiva interna delle dimensioni valutate, non una previsione di vendita.</p><button class="primary" type="submit">Salva valutazione</button></form>'
+  $('modal').classList.remove('hidden')
+  if(a){
+    $('assCollaborator').value=a.collaborator_id;$('assPeriod').value=a.period_label||'';$('assStatus').value=a.status
+    for(const k of ['relationship_quality','portfolio_depth','development_potential','advisory_readiness','local_network_strength','digital_readiness','compliance_readiness'])$('ass_'+k).value=a[k]??''
+    $('assBusiness').value=a.business_model||'';$('assClients').value=a.client_base_profile||'';$('assStrengths').value=(a.strengths||[]).join('; ');$('assGaps').value=(a.gaps||[]).join('; ');$('assDirection').value=a.proposal_direction||'';$('assEvidence').value=a.evidence_reference||''
+  }
+  $('assessmentForm').onsubmit=async e=>{
+    e.preventDefault()
+    const arr=v=>v.split(';').map(x=>x.trim()).filter(Boolean)
+    const row={organization_id:window.orgId,collaborator_id:$('assCollaborator').value,period_label:$('assPeriod').value.trim()||null,status:$('assStatus').value,business_model:$('assBusiness').value.trim()||null,client_base_profile:$('assClients').value.trim()||null,strengths:arr($('assStrengths').value),gaps:arr($('assGaps').value),proposal_direction:$('assDirection').value.trim()||null,evidence_reference:$('assEvidence').value.trim()||null,created_by:window.userId,updated_at:new Date().toISOString()}
+    for(const k of ['relationship_quality','portfolio_depth','development_potential','advisory_readiness','local_network_strength','digital_readiness','compliance_readiness'])row[k]=$('ass_'+k).value?Number($('ass_'+k).value):null
+    const q=id?supabase.from('collaborator_business_assessments').update(row).eq('id',id).eq('organization_id',window.orgId):supabase.from('collaborator_business_assessments').insert(row)
+    const{error}=await q;if(error)return alert(error.message);closeModal();await loadAll();navigate('growthKits')
+  }
+}
+
+function renderNetworkRadar(){
+  $('distCandidateCount').textContent=distributionCandidates.length
+  $('distBCount').textContent=distributionCandidates.filter(x=>x.rui_section==='B'||x.candidate_kind==='rui_b').length
+  $('distECount').textContent=distributionCandidates.filter(x=>x.rui_section==='E'||x.candidate_kind==='rui_e').length
+  $('distActiveCount').textContent=distributionCandidates.filter(x=>['qualified','contact_planned','contacted','meeting','proposal','relationship','sap_candidate'].includes(x.stage)).length
+  $('distributionWatchlists').innerHTML=distributionWatchlists.map(w=>'<article class="watch-card"><div class="eyebrow">'+esc(w.market_hubs?.city||'TERRITORIO')+'</div><h3>'+esc(w.name)+'</h3><p>Fonti: '+esc((w.source_types||[]).join(' · '))+'</p><p>RUI: '+esc((w.rui_sections||[]).join(', ')||'—')+' · Province: '+esc((w.provinces||[]).join(', ')||'—')+'</p><div class="ring-row">'+(w.rings_km||[]).map(r=>'<span>'+esc(r)+' km</span>').join('')+'</div><small>'+esc(w.notes||'')+'</small></article>').join('')||empty('Nessuna watchlist')
+  renderDistributionCandidates()
+}
+function candidateFit(c){
+  const vals=['territory_fit','network_fit','service_fit','reachability_score'].map(k=>c[k]).filter(v=>v!=null)
+  return vals.length?Math.round(vals.reduce((a,b)=>a+Number(b),0)/vals.length):null
+}
+function renderDistributionCandidates(){
+  const kind=$('distKindFilter').value,stage=$('distStageFilter').value
+  const rows=distributionCandidates.filter(c=>(!kind||c.candidate_kind===kind)&&(!stage||c.stage===stage))
+  $('distributionCandidateBody').innerHTML=rows.map(c=>'<tr><td><span class="name">'+esc(c.display_name)+'</span><span class="tiny">'+esc(c.candidate_kind.replaceAll('_',' '))+'</span></td><td>'+esc(c.source_provider)+'</td><td>'+esc(c.rui_number||c.vat_number||'—')+'</td><td>'+esc([c.city,c.province].filter(Boolean).join(' · ')||'—')+'</td><td>'+scoreHtml(candidateFit(c))+'</td><td>'+scoreHtml(c.evidence_confidence)+'</td><td><span class="stage '+esc(c.stage)+'">'+esc(c.stage.replaceAll('_',' '))+'</span></td><td>'+(isManager()?'<button class="small-btn" data-dist-candidate="'+c.id+'">Apri</button>':'')+'</td></tr>').join('')||'<tr><td colspan="8">'+empty('Nessun candidato ancora importato. La struttura è pronta per il primo ingest IVASS/Registro Imprese.')+'</td></tr>'
+  document.querySelectorAll('[data-dist-candidate]').forEach(b=>b.onclick=()=>openDistributionCandidateEditor(b.dataset.distCandidate))
+}
+function openDistributionCandidateEditor(id=null){
+  if(!isManager())return
+  const c=id?distributionCandidates.find(x=>x.id===id):null
+  $('modalContent').innerHTML='<div class="eyebrow">RADAR RETE</div><h2>'+(c?'Qualifica candidato':'Nuovo candidato')+'</h2><form id="distCandidateForm" class="form"><div class="inline"><label>Tipo<select id="dcKind"><option value="rui_b">RUI B</option><option value="rui_e">RUI E</option><option value="rui_a">RUI A</option><option value="rui_f">RUI F</option><option value="company">Impresa</option><option value="professional">Professionista</option><option value="sap_candidate">Candidato SAP</option><option value="other">Altro</option></select></label><label>Persona / società<select id="dcEntity"><option value="person">Persona</option><option value="company">Società</option><option value="organization">Organizzazione</option></select></label></div><label>Nome / ragione sociale<input id="dcName" required></label><div class="inline"><label>Sezione RUI<input id="dcSection" maxlength="2"></label><label>Numero RUI<input id="dcRui"></label></div><div class="inline"><label>P.IVA<input id="dcVat"></label><label>REA<input id="dcRea"></label></div><div class="inline"><label>Comune<input id="dcCity"></label><label>Provincia<input id="dcProvince"></label></div><label>Intermediario di riferimento<input id="dcParent"></label><label>Sito<input id="dcWebsite"></label><div class="inline"><label>Email professionale pubblica<input id="dcEmail" type="email"></label><label>Telefono professionale pubblico<input id="dcPhone"></label></div><div class="inline"><label>Fonte<select id="dcSource"><option value="IVASS RUI">IVASS RUI</option><option value="Registro Imprese">Registro Imprese</option><option value="Sito pubblico">Sito pubblico</option><option value="Altro">Altro</option></select></label><label>Stato<select id="dcStage"><option value="discovered">Scoperto</option><option value="reviewed">Rivisto</option><option value="qualified">Qualificato</option><option value="contact_planned">Contatto pianificato</option><option value="contacted">Contattato</option><option value="meeting">Incontro</option><option value="proposal">Proposta</option><option value="relationship">Relazione</option><option value="sap_candidate">SAP</option><option value="archived">Archiviato</option></select></label></div><div class="score-form-grid"><label>Fit territorio<input id="dcTerritoryFit" type="number" min="0" max="100"></label><label>Fit rete<input id="dcNetworkFit" type="number" min="0" max="100"></label><label>Fit servizi<input id="dcServiceFit" type="number" min="0" max="100"></label><label>Raggiungibilità<input id="dcReach" type="number" min="0" max="100"></label><label>Confidenza evidenze<input id="dcConfidence" type="number" min="0" max="100"></label></div><label>Fonte URL<input id="dcSourceUrl"></label><label>Nota qualificazione<textarea id="dcNote"></textarea></label><label>Prossima azione<input id="dcNext"></label><p class="form-note">Usare solo dati professionali/pubblici pertinenti. Nessun contatto automatico: prima qualificazione umana, poi eventuale apertura relazione.</p><button class="primary" type="submit">Salva candidato</button></form>'
+  $('modal').classList.remove('hidden')
+  if(c){
+    const set=(id,v)=>{$(id).value=v??''};set('dcKind',c.candidate_kind);set('dcEntity',c.entity_type);set('dcName',c.display_name);set('dcSection',c.rui_section);set('dcRui',c.rui_number);set('dcVat',c.vat_number);set('dcRea',c.rea_number);set('dcCity',c.city);set('dcProvince',c.province);set('dcParent',c.parent_intermediary_name);set('dcWebsite',c.website);set('dcEmail',c.public_email);set('dcPhone',c.public_phone);set('dcSource',c.source_provider);set('dcStage',c.stage);set('dcTerritoryFit',c.territory_fit);set('dcNetworkFit',c.network_fit);set('dcServiceFit',c.service_fit);set('dcReach',c.reachability_score);set('dcConfidence',c.evidence_confidence);set('dcSourceUrl',c.source_url);set('dcNote',c.qualification_note);set('dcNext',c.next_action)
+  }
+  $('distCandidateForm').onsubmit=async e=>{
+    e.preventDefault()
+    const val=id=>$(id).value.trim()||null,num=id=>$(id).value?Number($(id).value):null
+    const row={organization_id:window.orgId,candidate_kind:$('dcKind').value,entity_type:$('dcEntity').value,display_name:$('dcName').value.trim(),rui_section:val('dcSection'),rui_number:val('dcRui'),vat_number:val('dcVat'),rea_number:val('dcRea'),city:val('dcCity'),province:val('dcProvince'),parent_intermediary_name:val('dcParent'),website:val('dcWebsite'),public_email:val('dcEmail'),public_phone:val('dcPhone'),source_provider:$('dcSource').value,source_url:val('dcSourceUrl'),stage:$('dcStage').value,territory_fit:num('dcTerritoryFit'),network_fit:num('dcNetworkFit'),service_fit:num('dcServiceFit'),reachability_score:num('dcReach'),evidence_confidence:num('dcConfidence'),qualification_note:val('dcNote'),next_action:val('dcNext'),last_verified_at:new Date().toISOString(),updated_at:new Date().toISOString(),source_record_key:val('dcRui')||val('dcVat')||$('dcName').value.trim().toLowerCase().replace(/\s+/g,'-')}
+    const q=id?supabase.from('distribution_candidates').update(row).eq('id',id).eq('organization_id',window.orgId):supabase.from('distribution_candidates').insert(row)
+    const{error}=await q;if(error)return alert(error.message);closeModal();await loadAll();navigate('networkRadar')
   }
 }
 
