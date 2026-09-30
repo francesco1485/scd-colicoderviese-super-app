@@ -78,6 +78,7 @@
       <div class="nav-group">
         <div class="nav-label">AI & COMUNICAZIONE</div>
         <button class="nav-item" data-view="aiMail">AI Mail & Chat</button>
+        <button class="nav-item" data-view="liaWorkbench">Lia · Workbench</button>
       </div>
 
       <div class="nav-group">
@@ -322,6 +323,57 @@
       <section class="panel top-gap">
         <div class="panel-head"><div><div class="eyebrow">BOZZE</div><h3>Comunicazioni salvate</h3></div></div>
         <div id="mailDraftList" class="list"></div>
+      </section>
+    </section>
+
+    <section id="liaWorkbenchView" class="view hidden">
+      <section class="section-intro split">
+        <div>
+          <div class="eyebrow">LIA · WORKBENCH</div>
+          <h2>Assistente operativo con permessi, memoria di lavoro e azioni tracciate.</h2>
+          <p>Lia esegue ciò che il ruolo consente. Gli amministratori possono creare strutture, avviare mapping e predisporre artefatti; operatori e specialisti ricevono supporto e preparano contenuti nel proprio perimetro.</p>
+        </div>
+        <span id="liaRoleMode" class="future-chip">-</span>
+      </section>
+
+      <section class="lia-command-grid">
+        <article class="panel lia-command-panel">
+          <div class="panel-head"><div><div class="eyebrow">COMANDO</div><h3>Assegna un lavoro a Lia</h3></div></div>
+          <form id="liaWorkbenchForm" class="form">
+            <label>Istruzione
+              <textarea id="liaWorkbenchCommand" placeholder="Esempio: crea nel Comune di Colico la cartella Mapping aziendale e le sottocartelle Lettera A e Lettera B, poi ricerca le attività pubbliche corrispondenti."></textarea>
+            </label>
+            <div class="lia-command-examples">
+              <button type="button" data-lia-example="Crea nel Comune di Colico la cartella Mapping aziendale e le sottocartelle Lettera A e Lettera B.">Cartelle Colico A/B</button>
+              <button type="button" data-lia-example="Nel Comune di Colico avvia il mapping aziendale delle lettere A e B e ricerca le attività pubbliche da qualificare commercialmente.">Mapping aziende A/B</button>
+              <button type="button" data-lia-example="Crea una locandina CEPA per un incontro territoriale, predisponendo struttura e contenuti per la revisione.">Locandina CEPA</button>
+              <button type="button" data-lia-example="Prepara un contratto partendo dai documenti che allegherò, mantenendo tracciabilità delle fonti e delle modifiche.">Contratto da allegati</button>
+            </div>
+            <button class="primary" type="submit">Esegui / prepara secondo il mio ruolo</button>
+          </form>
+          <div id="liaWorkbenchResult" class="message hidden"></div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head"><div><div class="eyebrow">PERMESSI</div><h3>Cosa può fare questo accesso</h3></div></div>
+          <div id="liaCapabilityList" class="lia-capability-list"></div>
+        </article>
+      </section>
+
+      <section class="two-col top-gap">
+        <article class="panel">
+          <div class="panel-head"><div><div class="eyebrow">SPAZI DI LAVORO</div><h3>Cartelle create da Lia</h3></div></div>
+          <div id="liaFolderList" class="lia-work-list"></div>
+        </article>
+        <article class="panel">
+          <div class="panel-head"><div><div class="eyebrow">ORDINI OPERATIVI</div><h3>Coda e cronologia</h3></div></div>
+          <div id="liaOrderList" class="lia-work-list"></div>
+        </article>
+      </section>
+
+      <section class="panel top-gap">
+        <div class="panel-head"><div><div class="eyebrow">FONTI DI RICERCA</div><h3>Fonti autorizzate e livello di affidabilità</h3></div></div>
+        <div id="liaSourceList" class="lia-source-grid"></div>
       </section>
     </section>
 
