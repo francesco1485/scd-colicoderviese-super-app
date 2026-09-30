@@ -792,24 +792,84 @@ function candidateFit(c){
 function renderDistributionCandidates(){
   const kind=$('distKindFilter').value,stage=$('distStageFilter').value
   const rows=distributionCandidates.filter(c=>(!kind||c.candidate_kind===kind)&&(!stage||c.stage===stage))
-  $('distributionCandidateBody').innerHTML=rows.map(c=>'<tr><td><span class="name">'+esc(c.display_name)+'</span><span class="tiny">'+esc(c.candidate_kind.replaceAll('_',' '))+'</span></td><td>'+esc(c.source_provider)+'</td><td>'+esc(c.rui_number||c.vat_number||'—')+'</td><td>'+esc([c.city,c.province].filter(Boolean).join(' · ')||'—')+'</td><td>'+scoreHtml(candidateFit(c))+'</td><td>'+scoreHtml(c.evidence_confidence)+'</td><td><span class="stage '+esc(c.stage)+'">'+esc(c.stage.replaceAll('_',' '))+'</span></td><td>'+(isManager()?'<button class="small-btn" data-dist-candidate="'+c.id+'">Apri</button>':'')+'</td></tr>').join('')||'<tr><td colspan="8">'+empty('Nessun candidato ancora importato. La struttura è pronta per il primo ingest IVASS/Registro Imprese.')+'</td></tr>'
+  $('distributionCandidateBody').innerHTML=rows.map(c=>{
+    const official=c.source_provider==='IVASS RUI'
+    const source='<span class="source-cell">'+esc(c.source_provider)+(official?'<b class="official-source-badge">ufficiale</b>':'')+'</span>'
+    const lock=c.contact_restricted?'<span class="contact-lock">contatto bloccato</span>':'<span class="contact-open">contatto autorizzato</span>'
+    const review='<span class="review-state '+esc(c.review_status||'pending')+'">'+esc(c.review_status||'pending')+'</span>'
+    return '<tr><td><span class="name">'+esc(c.display_name)+'</span><span class="tiny">'+esc(c.candidate_kind.replaceAll('_',' '))+'</span></td><td>'+source+'<span class="tiny">'+review+' · '+lock+'</span></td><td>'+esc(c.rui_number||c.vat_number||'—')+'</td><td>'+esc([c.city,c.province].filter(Boolean).join(' · ')||'—')+'</td><td>'+scoreHtml(candidateFit(c))+'</td><td>'+scoreHtml(c.evidence_confidence)+'</td><td><span class="stage '+esc(c.stage)+'">'+esc(c.stage.replaceAll('_',' '))+'</span></td><td>'+(isManager()?'<button class="small-btn" data-dist-candidate="'+c.id+'">Apri</button>':'')+'</td></tr>'
+  }).join('')||'<tr><td colspan="8">'+empty('Nessun candidato ancora importato. La struttura è pronta per il primo ingest IVASS/Registro Imprese.')+'</td></tr>'
   document.querySelectorAll('[data-dist-candidate]').forEach(b=>b.onclick=()=>openDistributionCandidateEditor(b.dataset.distCandidate))
 }
 function openDistributionCandidateEditor(id=null){
   if(!isManager())return
   const c=id?distributionCandidates.find(x=>x.id===id):null
-  $('modalContent').innerHTML='<div class="eyebrow">RADAR RETE</div><h2>'+(c?'Qualifica candidato':'Nuovo candidato')+'</h2><form id="distCandidateForm" class="form"><div class="inline"><label>Tipo<select id="dcKind"><option value="rui_b">RUI B</option><option value="rui_e">RUI E</option><option value="rui_a">RUI A</option><option value="rui_f">RUI F</option><option value="company">Impresa</option><option value="professional">Professionista</option><option value="sap_candidate">Candidato SAP</option><option value="other">Altro</option></select></label><label>Persona / società<select id="dcEntity"><option value="person">Persona</option><option value="company">Società</option><option value="organization">Organizzazione</option></select></label></div><label>Nome / ragione sociale<input id="dcName" required></label><div class="inline"><label>Sezione RUI<input id="dcSection" maxlength="2"></label><label>Numero RUI<input id="dcRui"></label></div><div class="inline"><label>P.IVA<input id="dcVat"></label><label>REA<input id="dcRea"></label></div><div class="inline"><label>Comune<input id="dcCity"></label><label>Provincia<input id="dcProvince"></label></div><label>Intermediario di riferimento<input id="dcParent"></label><label>Sito<input id="dcWebsite"></label><div class="inline"><label>Email professionale pubblica<input id="dcEmail" type="email"></label><label>Telefono professionale pubblico<input id="dcPhone"></label></div><div class="inline"><label>Fonte<select id="dcSource"><option value="IVASS RUI">IVASS RUI</option><option value="Registro Imprese">Registro Imprese</option><option value="Sito pubblico">Sito pubblico</option><option value="Altro">Altro</option></select></label><label>Stato<select id="dcStage"><option value="discovered">Scoperto</option><option value="reviewed">Rivisto</option><option value="qualified">Qualificato</option><option value="contact_planned">Contatto pianificato</option><option value="contacted">Contattato</option><option value="meeting">Incontro</option><option value="proposal">Proposta</option><option value="relationship">Relazione</option><option value="sap_candidate">SAP</option><option value="archived">Archiviato</option></select></label></div><div class="score-form-grid"><label>Fit territorio<input id="dcTerritoryFit" type="number" min="0" max="100"></label><label>Fit rete<input id="dcNetworkFit" type="number" min="0" max="100"></label><label>Fit servizi<input id="dcServiceFit" type="number" min="0" max="100"></label><label>Raggiungibilità<input id="dcReach" type="number" min="0" max="100"></label><label>Confidenza evidenze<input id="dcConfidence" type="number" min="0" max="100"></label></div><label>Fonte URL<input id="dcSourceUrl"></label><label>Nota qualificazione<textarea id="dcNote"></textarea></label><label>Prossima azione<input id="dcNext"></label><p class="form-note">Usare solo dati professionali/pubblici pertinenti. Nessun contatto automatico: prima qualificazione umana, poi eventuale apertura relazione.</p><button class="primary" type="submit">Salva candidato</button></form>'
+  $('modalContent').innerHTML='<div class="eyebrow">RADAR RETE</div><h2>'+(c?'Qualifica candidato':'Nuovo candidato')+'</h2><form id="distCandidateForm" class="form"><div class="inline"><label>Tipo<select id="dcKind"><option value="rui_b">RUI B</option><option value="rui_e">RUI E</option><option value="rui_a">RUI A</option><option value="rui_f">RUI F</option><option value="company">Impresa</option><option value="professional">Professionista</option><option value="sap_candidate">Candidato SAP</option><option value="other">Altro</option></select></label><label>Persona / società<select id="dcEntity"><option value="person">Persona</option><option value="company">Società</option><option value="organization">Organizzazione</option></select></label></div><label>Nome / ragione sociale<input id="dcName" required></label><div class="inline"><label>Sezione RUI<input id="dcSection" maxlength="2"></label><label>Numero RUI<input id="dcRui"></label></div><div class="inline"><label>P.IVA<input id="dcVat"></label><label>REA<input id="dcRea"></label></div><div class="inline"><label>Comune<input id="dcCity"></label><label>Provincia<input id="dcProvince"></label></div><label>Intermediario di riferimento<input id="dcParent"></label><label>Sito<input id="dcWebsite"></label><div class="inline"><label>Email professionale pubblica<input id="dcEmail" type="email"></label><label>Telefono professionale pubblico<input id="dcPhone"></label></div><div class="inline"><label>Fonte<select id="dcSource"><option value="IVASS RUI">IVASS RUI</option><option value="Registro Imprese">Registro Imprese</option><option value="Sito pubblico">Sito pubblico</option><option value="Altro">Altro</option></select></label><label>Stato<select id="dcStage"><option value="discovered">Scoperto</option><option value="reviewed">Rivisto</option><option value="qualified">Qualificato</option><option value="contact_planned">Contatto pianificato</option><option value="contacted">Contattato</option><option value="meeting">Incontro</option><option value="proposal">Proposta</option><option value="relationship">Relazione</option><option value="sap_candidate">SAP</option><option value="archived">Archiviato</option></select></label></div><div class="score-form-grid"><label>Fit territorio<input id="dcTerritoryFit" type="number" min="0" max="100"></label><label>Fit rete<input id="dcNetworkFit" type="number" min="0" max="100"></label><label>Fit servizi<input id="dcServiceFit" type="number" min="0" max="100"></label><label>Raggiungibilità<input id="dcReach" type="number" min="0" max="100"></label><label>Confidenza evidenze<input id="dcConfidence" type="number" min="0" max="100"></label></div><label>Fonte URL<input id="dcSourceUrl"></label><label>Nota qualificazione<textarea id="dcNote"></textarea></label><label>Prossima azione<input id="dcNext"></label><div id="dcGovernance" class="candidate-governance"></div><p class="form-note">Usare solo dati professionali/pubblici pertinenti. Nessun contatto automatico: prima revisione umana, poi autorizzazione esplicita al contatto.</p><button class="primary" type="submit">Salva candidato</button></form>'
   $('modal').classList.remove('hidden')
   if(c){
     const set=(id,v)=>{$(id).value=v??''};set('dcKind',c.candidate_kind);set('dcEntity',c.entity_type);set('dcName',c.display_name);set('dcSection',c.rui_section);set('dcRui',c.rui_number);set('dcVat',c.vat_number);set('dcRea',c.rea_number);set('dcCity',c.city);set('dcProvince',c.province);set('dcParent',c.parent_intermediary_name);set('dcWebsite',c.website);set('dcEmail',c.public_email);set('dcPhone',c.public_phone);set('dcSource',c.source_provider);set('dcStage',c.stage);set('dcTerritoryFit',c.territory_fit);set('dcNetworkFit',c.network_fit);set('dcServiceFit',c.service_fit);set('dcReach',c.reachability_score);set('dcConfidence',c.evidence_confidence);set('dcSourceUrl',c.source_url);set('dcNote',c.qualification_note);set('dcNext',c.next_action)
+    const reviewDone=c.review_status==='reviewed'
+    const contactApproved=!c.contact_restricted&&c.contact_policy_status==='approved_for_contact'
+    $('dcGovernance').innerHTML='<div><strong>Revisione</strong><span>'+esc(c.review_status||'pending')+'</span></div><div><strong>Contatto</strong><span>'+esc(c.contact_policy_status||'blocked_pending_review')+'</span></div>'+
+      (!reviewDone?'<button type="button" class="secondary" id="dcReviewBtn">Conferma revisione commerciale</button>':'')+
+      (reviewDone&&!contactApproved?'<button type="button" class="secondary" id="dcContactApprovalBtn">Richiedi autorizzazione contatto</button>':'')+
+      (contactApproved?'<span class="contact-open">Contatto autorizzato</span>':'')
+    const reviewBtn=$('dcReviewBtn');if(reviewBtn)reviewBtn.onclick=()=>reviewDistributionCandidate(c.id)
+    const contactBtn=$('dcContactApprovalBtn');if(contactBtn)contactBtn.onclick=()=>requestDistributionContactApproval(c.id)
+  }else{
+    $('dcGovernance').innerHTML='<div><strong>Nuovo candidato</strong><span>Il contatto resterà bloccato fino a revisione e approvazione.</span></div>'
   }
   $('distCandidateForm').onsubmit=async e=>{
     e.preventDefault()
     const val=id=>$(id).value.trim()||null,num=id=>$(id).value?Number($(id).value):null
-    const row={organization_id:window.orgId,candidate_kind:$('dcKind').value,entity_type:$('dcEntity').value,display_name:$('dcName').value.trim(),rui_section:val('dcSection'),rui_number:val('dcRui'),vat_number:val('dcVat'),rea_number:val('dcRea'),city:val('dcCity'),province:val('dcProvince'),parent_intermediary_name:val('dcParent'),website:val('dcWebsite'),public_email:val('dcEmail'),public_phone:val('dcPhone'),source_provider:$('dcSource').value,source_url:val('dcSourceUrl'),stage:$('dcStage').value,territory_fit:num('dcTerritoryFit'),network_fit:num('dcNetworkFit'),service_fit:num('dcServiceFit'),reachability_score:num('dcReach'),evidence_confidence:num('dcConfidence'),qualification_note:val('dcNote'),next_action:val('dcNext'),last_verified_at:new Date().toISOString(),updated_at:new Date().toISOString(),source_record_key:val('dcRui')||val('dcVat')||$('dcName').value.trim().toLowerCase().replace(/\s+/g,'-')}
+    const desiredStage=$('dcStage').value
+    const contactStages=['contact_planned','contacted','meeting','proposal','relationship']
+    if(c&&contactStages.includes(desiredStage)&&c.contact_restricted){
+      return alert('Il contatto è ancora bloccato. Completa la revisione e ottieni prima l’autorizzazione al contatto.')
+    }
+    const row={organization_id:window.orgId,candidate_kind:$('dcKind').value,entity_type:$('dcEntity').value,display_name:$('dcName').value.trim(),rui_section:val('dcSection'),rui_number:val('dcRui'),vat_number:val('dcVat'),rea_number:val('dcRea'),city:val('dcCity'),province:val('dcProvince'),parent_intermediary_name:val('dcParent'),website:val('dcWebsite'),public_email:val('dcEmail'),public_phone:val('dcPhone'),source_provider:$('dcSource').value,source_url:val('dcSourceUrl'),stage:desiredStage,territory_fit:num('dcTerritoryFit'),network_fit:num('dcNetworkFit'),service_fit:num('dcServiceFit'),reachability_score:num('dcReach'),evidence_confidence:num('dcConfidence'),qualification_note:val('dcNote'),next_action:val('dcNext'),last_verified_at:new Date().toISOString(),updated_at:new Date().toISOString(),source_record_key:val('dcRui')||val('dcVat')||$('dcName').value.trim().toLowerCase().replace(/\s+/g,'-')}
     const q=id?supabase.from('distribution_candidates').update(row).eq('id',id).eq('organization_id',window.orgId):supabase.from('distribution_candidates').insert(row)
     const{error}=await q;if(error)return alert(error.message);closeModal();await loadAll();navigate('networkRadar')
   }
+}
+
+async function reviewDistributionCandidate(id){
+  if(!isManager())return
+  const c=distributionCandidates.find(x=>x.id===id);if(!c)return
+  const{error}=await supabase.from('distribution_candidates').update({
+    review_status:'reviewed',
+    reviewed_at:new Date().toISOString(),
+    stage:c.stage==='discovered'?'reviewed':c.stage,
+    contact_restricted:true,
+    contact_policy_status:'approval_required_before_contact',
+    updated_at:new Date().toISOString()
+  }).eq('id',id).eq('organization_id',window.orgId)
+  if(error)return alert(error.message)
+  closeModal();await loadAll();openDistributionCandidateEditor(id)
+}
+
+async function requestDistributionContactApproval(id){
+  if(!isManager())return
+  const c=distributionCandidates.find(x=>x.id===id);if(!c)return
+  if(c.review_status!=='reviewed')return alert('Completa prima la revisione commerciale.')
+  const existing=liaApprovals.find(a=>a.action_code==='external.business_contact'&&a.status==='pending'&&a.request_payload?.candidate_id===id)
+  if(existing)return alert('Esiste già una richiesta di approvazione in attesa.')
+  const{error}=await supabase.from('ai_action_approvals').insert({
+    organization_id:window.orgId,
+    action_code:'external.business_contact',
+    requested_by:window.userId,
+    status:'pending',
+    request_payload:{
+      candidate_id:id,
+      display_name:c.display_name,
+      rui_number:c.rui_number||null,
+      source_provider:c.source_provider,
+      purpose:'abilitazione pianificazione contatto commerciale'
+    },
+    expires_at:new Date(Date.now()+7*24*60*60*1000).toISOString()
+  })
+  if(error)return alert(error.message)
+  closeModal();await loadAll();openDistributionCandidateEditor(id)
 }
 
 function renderComparisons(){
@@ -850,6 +910,14 @@ async function decideLiaApproval(id,status){
     decided_at:new Date().toISOString(),updated_at:new Date().toISOString()
   }).eq('id',id).eq('organization_id',window.orgId).eq('status','pending')
   if(error)return alert(error.message)
+  if(status==='approved'&&row.action_code==='external.business_contact'&&row.request_payload?.candidate_id){
+    const{error:candidateError}=await supabase.from('distribution_candidates').update({
+      contact_restricted:false,
+      contact_policy_status:'approved_for_contact',
+      updated_at:new Date().toISOString()
+    }).eq('id',row.request_payload.candidate_id).eq('organization_id',window.orgId)
+    if(candidateError)return alert(candidateError.message)
+  }
   await loadAll()
 }
 
