@@ -9,7 +9,7 @@ const isManager=()=>['super_admin','supervisor','manager'].includes(window.userR
 const viewMeta={
  home:['Quadro generale','Agenzia Generale HDI · Ecosistema di competenze, relazioni e sviluppo'],
  operatingPlan:['Piano Operativo','Architettura, dati, metodo, roadmap e sviluppo continuo di MAGLIA 360'],
- products:['Prodotti & Sintesi','Schede consulenziali, punti di forza, limiti e percorsi di confronto'],
+ products:['Clienti & Portafoglio','Cliente 360, motore portafoglio, pipeline commerciale e catalogo prodotti'],
  collaborators:['Collaboratori & Guadagni','Ruoli, competenze e remunerazioni differenziate per attività e prodotto'],
  growthKits:['Kit Collaboratore','Valutazione del portafoglio, proposta di sviluppo, documentazione e strumenti per il cliente'],
  comparisons:['Confronti & Benchmark','Analisi verificabili tra soluzioni e realtà comparabili'],
@@ -26,7 +26,8 @@ const viewMeta={
 
 let ecosystem=[],projects=[],actions=[],marketHubs=[],marketEntities=[],contacts=[],timeline=[],documents=[],partnerRequirements=[],blueprints=[],subjects=[],initiatives=[],cepaContent=[],cepaAcademy=[],cepaSpeakers=[],products=[],productKnowledge=[],comparisons=[],collaborators=[],collaboratorTerms=[],portfolioSnapshots=[],businessAssessments=[],growthKits=[],distributionWatchlists=[],distributionCandidates=[],distributionEvidence=[],mailTemplates=[],mailDrafts=[],cepaExpansion=[],cepaReadiness=[],assistantMessages=[],recoveryRows=[],members=[],liaCapabilities=[],liaFolders=[],liaOrders=[],liaFiles=[],researchSources=[],researchInsights=[],liaActionRules=[],liaApprovals=[],roleViewAccess=[],liaAutomationRuns=[]
 let officeAssignments=[],officeMessages=[],officeSnapshots=[],officeCases=[],officeWorkflow=[],officeCepaActivities=[],officeImports=[]
-let currentPartnerId=null,currentOfficeId=null,currentOfficeProductId=null,currentCepaHubId=null
+let commercialClients=[],pipelineCases=[],clientCheckups=[],clientInteractions=[],clientWorkItems=[]
+let currentPartnerId=null,currentOfficeId=null,currentOfficeProductId=null,currentCepaHubId=null,currentCommerceTab='clients'
 
 function msg(text,error=false){$('loginMsg').textContent=text;$('loginMsg').className='message'+(error?' error':'')}
 function closeModal(){$('modal').classList.add('hidden')}
@@ -135,6 +136,8 @@ function globalSearchItems(query){
   collaborators.forEach(x=>{if(has(x.display_name,x.area,x.territory))out.push({kind:'collaborator',id:x.id,label:x.display_name,meta:'Collaboratore · '+(x.area||'')})})
   marketEntities.forEach(x=>{if(has(x.name,x.city,x.entity_type))out.push({kind:'entity',id:x.id,label:x.name,meta:(x.city||'')+' · '+entityType(x.entity_type)})})
   cepaContent.forEach(x=>{if(has(x.title,x.asset_type))out.push({kind:'cepa',id:x.id,label:x.title,meta:'C.E.P.A. · contenuto'})})
+  commercialClients.forEach(x=>{const name=clientDisplayName(x);if(has(name,x.city,x.province,x.email,x.mobile,x.metadata?.producer,x.metadata?.producer_code))out.push({kind:'client',id:x.id,label:name,meta:'Cliente 360 · '+(x.city||x.status||'')})})
+  if(has('cliente 360 clienti portafoglio motore portafoglio pipeline commerciale'))out.unshift({kind:'commerce',id:'clients',label:'Cliente 360',meta:'Clienti, portafoglio e pipeline commerciale'})
   if(has('cepa centro educazione previdenziale assicurativa'))out.unshift({kind:'cepa',id:'cepa',label:'C.E.P.A.',meta:'Centro Educazione Previdenziale e Assicurativa'})
   return out.slice(0,12)
 }
@@ -164,6 +167,8 @@ function openGlobalSearchItem(item){
   }
   else if(item.kind==='document')navigate('documents')
   else if(item.kind==='collaborator')navigate('collaborators')
+  else if(item.kind==='client'){openCommerceTab('clients');openClient360(item.id)}
+  else if(item.kind==='commerce')openCommerceTab(item.id||'clients')
   else if(item.kind==='entity')navigate('development')
   else if(item.kind==='cepa')openCepaHub()
 }
@@ -520,18 +525,23 @@ async function loadAll(){
     supabase.from('office_product_cases').select('*,agency_products(id,code,name,category,ecosystem_node_id)').eq('organization_id',window.orgId).order('priority',{ascending:false}).order('due_at').limit(500),
     supabase.from('office_product_workflow_stages').select('*').eq('organization_id',window.orgId).eq('active',true).order('case_type').order('sort_order'),
     supabase.from('office_cepa_activities').select('*').eq('organization_id',window.orgId).order('scheduled_at',{ascending:true}).limit(200),
-    supabase.from('office_data_imports').select('*').eq('organization_id',window.orgId).order('created_at',{ascending:false}).limit(100)
+    supabase.from('office_data_imports').select('*').eq('organization_id',window.orgId).order('created_at',{ascending:false}).limit(100),
+    supabase.from('clients').select('*').eq('organization_id',window.orgId).order('updated_at',{ascending:false}).limit(5000),
+    supabase.from('pipeline_cases').select('*,clients(id,kind,status,first_name,last_name,business_name,email,mobile,city,province,next_action,next_action_at,metadata)').eq('organization_id',window.orgId).order('updated_at',{ascending:false}).limit(2000),
+    supabase.from('checkups').select('*').eq('organization_id',window.orgId).order('updated_at',{ascending:false}).limit(1000),
+    supabase.from('client_interactions').select('*').eq('organization_id',window.orgId).order('occurred_at',{ascending:false}).limit(2000),
+    supabase.from('work_items').select('*').eq('organization_id',window.orgId).order('updated_at',{ascending:false}).limit(2000)
   ]
   const res=await Promise.all(q)
   const err=res.find(x=>x.error)?.error
   if(err){console.error(err);$('refreshBtn').textContent='!';return}
-  ;[ecosystem,projects,actions,marketHubs,marketEntities,contacts,timeline,documents,partnerRequirements,blueprints,subjects,initiatives,cepaContent,cepaAcademy,cepaSpeakers,products,productKnowledge,comparisons,collaborators,collaboratorTerms,portfolioSnapshots,businessAssessments,growthKits,distributionWatchlists,distributionCandidates,distributionEvidence,mailTemplates,mailDrafts,cepaExpansion,cepaReadiness,assistantMessages,liaCapabilities,liaFolders,liaOrders,liaFiles,researchSources,researchInsights,liaActionRules,liaApprovals,roleViewAccess,liaAutomationRuns,officeAssignments,officeMessages,officeSnapshots,officeCases,officeWorkflow,officeCepaActivities,officeImports]=res.map(x=>x.data||[])
+  ;[ecosystem,projects,actions,marketHubs,marketEntities,contacts,timeline,documents,partnerRequirements,blueprints,subjects,initiatives,cepaContent,cepaAcademy,cepaSpeakers,products,productKnowledge,comparisons,collaborators,collaboratorTerms,portfolioSnapshots,businessAssessments,growthKits,distributionWatchlists,distributionCandidates,distributionEvidence,mailTemplates,mailDrafts,cepaExpansion,cepaReadiness,assistantMessages,liaCapabilities,liaFolders,liaOrders,liaFiles,researchSources,researchInsights,liaActionRules,liaApprovals,roleViewAccess,liaAutomationRuns,officeAssignments,officeMessages,officeSnapshots,officeCases,officeWorkflow,officeCepaActivities,officeImports,commercialClients,pipelineCases,clientCheckups,clientInteractions,clientWorkItems]=res.map(x=>x.data||[])
   renderEverything()
   $('refreshBtn').textContent='↻'
 }
 
 function renderEverything(){
-  renderPartnerNav();renderHome();renderOperatingPlan();renderCepaHub();renderCepaTerritory();renderOffice();renderOfficeProduct();renderPartner();renderProducts();renderCollaborators();renderGrowthKits();renderComparisons();renderMail();renderCepa();renderTerritories();renderDocuments();renderDevelopment();renderNetworkRadar();renderActions();renderAssistantHistory();renderLiaWorkbench();applyRoleViewAccess();renderHeaderControls()
+  renderPartnerNav();renderHome();renderOperatingPlan();renderCepaHub();renderCepaTerritory();renderOffice();renderOfficeProduct();renderPartner();renderProducts();renderCommerceWorkspace();renderCollaborators();renderGrowthKits();renderComparisons();renderMail();renderCepa();renderTerritories();renderDocuments();renderDevelopment();renderNetworkRadar();renderActions();renderAssistantHistory();renderLiaWorkbench();applyRoleViewAccess();renderHeaderControls()
 }
 
 function renderOperatingPlan(){
@@ -548,6 +558,9 @@ function renderOperatingPlan(){
     marketEntities.length>0,
     (cepaContent.length+activeCepa.length)>0,
     activeActions.length>0,
+    commercialClients.length>0,
+    pipelineCases.length>0,
+    portfolioSnapshots.length>0,
     researchSources.length>0
   ]
   const health=Math.round(checks.filter(Boolean).length/checks.length*100)
@@ -562,8 +575,8 @@ function renderOperatingPlan(){
 
   const engines=[
     {code:'01',title:'Sedi & Control Room',desc:'Colico, Mandello e future sedi. Dati mensili, priorità, pratiche e messaggi della Direzione.',metric:accessibleOffices().length+' sedi accessibili',target:'home',tone:'blue'},
-    {code:'02',title:'Portafoglio & Prodotti',desc:'Produzione, rinnovi, preventivi, proposte, perse, mono ramo e sviluppo per singolo prodotto.',metric:products.length+' aree prodotto',target:'products',tone:'green'},
-    {code:'03',title:'Sviluppo Commerciale',desc:'Mapping territoriale, qualificazione, opportunità, contatti e costruzione di nuove relazioni.',metric:qualifiedEntities.length+' soggetti qualificati',target:'development',tone:'amber'},
+    {code:'02',title:'Cliente 360 & Portafoglio',desc:'Anagrafica cliente, profondità di relazione, mix di portafoglio, produttori e opportunità di sviluppo basate sui dati disponibili.',metric:commercialClients.length+' clienti accessibili · '+portfolioSnapshots.length+' snapshot rete',target:'products',tone:'green'},
+    {code:'03',title:'Pipeline Commerciale',desc:'Acquisizione, sviluppo, retention e recovery in un flusso unico: selezione, contatto, appuntamento, check-up, proposta ed esito.',metric:pipelineCases.filter(x=>!['won','lost','closed'].includes(x.stage)).length+' casi aperti',target:'products',tone:'amber'},
     {code:'04',title:'Partner & Compagnie',desc:'Dossier, referenti, documenti, prodotti, condizioni, progetti e opportunità dell’ecosistema.',metric:ecosystem.length+' nodi ecosistema',target:'products',tone:'violet'},
     {code:'05',title:'C.E.P.A.',desc:'Centro, programmi, contenuti, relatori, attività territoriali, SAP e sviluppo del metodo educativo.',metric:activeCepa.length+' attività territoriali aperte',target:'cepa',tone:'sage'},
     {code:'06',title:'Lia · Ricerca & Sviluppo',desc:'Ricerca, analisi, documenti, idee, mapping, artefatti e ordini operativi con regole di autonomia.',metric:liaOrders.length+' ordini · '+researchInsights.length+' insight',target:'liaWorkbench',tone:'teal'}
@@ -586,7 +599,10 @@ function renderOperatingPlan(){
   ).join('')
 
   const dataRows=[
-    ['Snapshot AssiEasy',officeSnapshots.length,officeSnapshots.length?'Disponibili':'Da importare'],
+    ['Cliente 360',commercialClients.length,commercialClients.length?'Perimetro cliente caricato':'Da importare'],
+    ['Portafoglio produttori',portfolioSnapshots.length,portfolioSnapshots.length?'Snapshot rete disponibili':'Da importare'],
+    ['Pipeline commerciale',pipelineCases.length,pipelineCases.length?'Casi commerciali presenti':'Da attivare'],
+    ['Snapshot AssiEasy sede/prodotto',officeSnapshots.length,officeSnapshots.length?'Disponibili':'Da importare'],
     ['Workflow pratiche',officeWorkflow.length,officeWorkflow.length?'Configurato':'Da completare'],
     ['Documenti',documents.length,documents.length?'Archivio attivo':'Da popolare'],
     ['Dossier partner',partnerRequirements.length,partnerRequirements.length?'Requisiti presenti':'Da strutturare'],
@@ -598,8 +614,8 @@ function renderOperatingPlan(){
   ).join('')
 
   const roadmap=[
-    {phase:'ORA',title:'Rendere affidabile il lavoro quotidiano',items:['Snapshot mensili per sede e prodotto','Pratiche e stati operativi coerenti','Priorità e scadenze','Dossier partner verificabili','Programmazione C.E.P.A. per territorio']},
-    {phase:'PROSSIMO',title:'Trasformare dati in sviluppo',items:['Anagrafica cliente e nucleo','Cross selling e mono ramo','Mapping comunale strutturato','Funnel commerciale','Contenuti e kit per ruolo']},
+    {phase:'ORA',title:'Rendere operativo il motore commerciale',items:['Cliente 360 sul perimetro realmente importato','Motore Portafoglio su rete e produttori','Pipeline Commerciale unica','Snapshot mensili per sede e prodotto','Pratiche, priorità e scadenze coerenti']},
+    {phase:'PROSSIMO',title:'Aumentare profondità e qualità dati',items:['Import portafoglio cliente attivo e polizze','Nuclei familiari e relazioni aziendali','Cross selling e mono ramo a livello cliente','Mapping comunale strutturato','Campagne e kit per ruolo']},
     {phase:'FUTURO',title:'Scalare senza perdere controllo',items:['Nuove sedi e profili','Connettori e import più automatici','Automazioni di ricerca','Benchmark e previsioni operative','Replica controllata del modello territoriale']}
   ]
   $('planRoadmap').innerHTML=roadmap.map((x,i)=>
@@ -612,6 +628,17 @@ function renderOperatingPlan(){
     '<div><strong>'+liaAutomationRuns.filter(x=>x.status==='queued').length+'</strong><span>ricerche in coda</span></div>'+
     '<div><strong>'+liaOrders.filter(x=>!['completed','cancelled'].includes(x.status)).length+'</strong><span>ordini aperti</span></div>'
 
+  if($('planDeliveryGrid')){
+    const openPipeline=pipelineCases.filter(x=>!['won','lost','closed'].includes(x.stage)).length
+    const portfolioClients=portfolioSnapshots.reduce((n,x)=>n+Number(x.clients_count||0),0)
+    $('planDeliveryGrid').innerHTML=[
+      ['clients','Cliente 360',commercialClients.length+' accessibili','Identità, contatti, produttore, portafoglio disponibile, pipeline, check-up e prossime azioni.'],
+      ['portfolio','Motore Portafoglio',portfolioClients+' clienti negli snapshot','Profondità, polizze/cliente, premi, mix e gap dati senza inventare coperture mancanti.'],
+      ['pipeline','Pipeline Commerciale',openPipeline+' casi aperti','Acquisizione, sviluppo, retention e recovery con stadi ed esiti nello stesso motore.']
+    ].map(x=>'<button type="button" class="plan-delivery-card" data-commerce-open="'+x[0]+'"><span>'+x[1]+'</span><strong>'+esc(x[2])+'</strong><p>'+esc(x[3])+'</p><b>Apri →</b></button>').join('')
+    document.querySelectorAll('[data-commerce-open]').forEach(b=>b.onclick=()=>openCommerceTab(b.dataset.commerceOpen))
+  }
+
   $('planGovernance').innerHTML=[
     ['Direzione','Priorità, sedi, autorizzazioni, strategie e decisioni finali'],
     ['Operatori','Lavoro e aggiornamenti della propria sede'],
@@ -620,7 +647,10 @@ function renderOperatingPlan(){
   ].map(x=>'<div><strong>'+x[0]+'</strong><span>'+x[1]+'</span></div>').join('')
 
   let focus={title:'Consolidare il lavoro per prodotto',text:'Porta rinnovi, preventivi, proposte, pratiche ed esiti in un flusso unico e leggibile.',target:'actions'}
-  if(!officeSnapshots.length)focus={title:'Standardizzare i dati mensili',text:'Il primo salto di qualità arriva dagli snapshot AssiEasy coerenti per Colico e Mandello.',target:'products'}
+  if(!commercialClients.length)focus={title:'Attivare Cliente 360',text:'Importa e collega i clienti reali prima di costruire automazioni commerciali sul portafoglio.',target:'products'}
+  else if(!portfolioSnapshots.length)focus={title:'Consolidare il Motore Portafoglio',text:'Servono snapshot verificabili per produttore prima di calcolare profondità e sviluppo rete.',target:'products'}
+  else if(!pipelineCases.length)focus={title:'Attivare la Pipeline Commerciale',text:'Collega clienti e opportunità a stadi operativi con responsabilità ed esito.',target:'products'}
+  else if(!officeSnapshots.length)focus={title:'Standardizzare i dati mensili',text:'Il prossimo salto arriva dagli snapshot AssiEasy coerenti per Colico e Mandello.',target:'products'}
   else if(!marketEntities.length)focus={title:'Avviare il mapping territoriale',text:'Costruisci una base qualificata di aziende, professionisti, enti e opportunità per comune.',target:'development'}
   else if(!researchSources.length)focus={title:'Attivare la base R&S',text:'Registra fonti ufficiali e di mercato così Lia può alimentare il progetto con ricerca tracciata.',target:'liaWorkbench'}
   else if(!activeCepa.length)focus={title:'Programmare C.E.P.A. per sede',text:'Porta il metodo CEPA dalla governance centrale a un calendario reale per Colico e Mandello.',target:'cepa'}
@@ -1647,6 +1677,218 @@ function renderProducts(){
     return '<article class="product-card" data-product="'+p.id+'"><div class="product-provider">'+esc(provider)+'</div><h3>'+esc(p.name)+'</h3><p>'+esc(p.summary||'Sintesi da completare')+'</p><div class="product-meta"><span class="tag">'+esc(p.category)+'</span><span class="verification-badge '+(verified?'verified':'')+'">'+esc(verified?'verificato':'da verificare')+'</span></div></article>'
   }).join('')||empty('Nessun prodotto o area censita')
   document.querySelectorAll('[data-product]').forEach(b=>b.onclick=()=>openProduct(b.dataset.product))
+}
+
+
+function clientDisplayName(c){
+  if(!c)return'Cliente'
+  return c.business_name||[c.first_name,c.last_name].filter(Boolean).join(' ')||c.last_name||'Cliente'
+}
+function normalizeMetaList(v){
+  if(Array.isArray(v))return v.map(x=>typeof x==='object'?JSON.stringify(x):String(x)).filter(Boolean)
+  if(v&&typeof v==='object')return Object.entries(v).map(([k,val])=>typeof val==='object'?k+': '+JSON.stringify(val):k+': '+val)
+  if(v==null||v==='')return[]
+  return String(v).split(/[;,|]/).map(x=>x.trim()).filter(Boolean)
+}
+function pipelineLabel(v){return({acquisition:'Acquisizione',development:'Sviluppo',retention:'Retention',recovery:'Recovery'})[v]||v}
+function pipelineStageLabel(v){return({selected:'Selezionato',assigned:'Assegnato',contacted:'Contattato',appointment:'Appuntamento',checkup:'Check-up',proposal:'Proposta',won:'Acquisito',lost:'Perso',closed:'Chiuso'})[v]||v}
+function currency(v){return v==null||v===''?'—':'€ '+Number(v).toLocaleString('it-IT',{maximumFractionDigits:0})}
+function clientPipelineRows(clientId){return pipelineCases.filter(x=>x.client_id===clientId)}
+function openCommerceTab(tab='clients'){
+  currentCommerceTab=['clients','portfolio','pipeline','catalog'].includes(tab)?tab:'clients'
+  navigate('products')
+  renderCommerceWorkspace()
+}
+function setCommerceTab(tab){
+  currentCommerceTab=['clients','portfolio','pipeline','catalog'].includes(tab)?tab:'clients'
+  document.querySelectorAll('[data-commerce-tab]').forEach(b=>b.classList.toggle('active',b.dataset.commerceTab===currentCommerceTab))
+  document.querySelectorAll('[data-commerce-panel]').forEach(p=>p.classList.toggle('hidden',p.dataset.commercePanel!==currentCommerceTab))
+}
+function renderCommerceWorkspace(){
+  if(!$('commerceWorkspaceTabs'))return
+  document.querySelectorAll('[data-commerce-tab]').forEach(b=>b.onclick=()=>setCommerceTab(b.dataset.commerceTab))
+  if($('client360Search'))$('client360Search').oninput=renderClient360
+  if($('client360Status'))$('client360Status').onchange=renderClient360
+  if($('client360Producer'))$('client360Producer').onchange=renderClient360
+  if($('pipelineTypeFilter'))$('pipelineTypeFilter').onchange=renderCommercialPipeline
+  if($('newPipelineCaseBtn'))$('newPipelineCaseBtn').onclick=openNewPipelineCase
+  renderClient360()
+  renderPortfolioEngine()
+  renderCommercialPipeline()
+  setCommerceTab(currentCommerceTab)
+}
+function renderClient360(){
+  if(!$('client360Body'))return
+  const sourceCount=commercialClients.filter(c=>c.metadata?.recovery_pilot_rank!=null).length
+  $('client360Count').textContent=commercialClients.length
+  $('client360Active').textContent=commercialClients.filter(c=>c.status==='active').length
+  $('client360Lost').textContent=commercialClients.filter(c=>c.status==='lost').length
+  $('client360WithPipeline').textContent=new Set(pipelineCases.map(x=>x.client_id)).size
+  if($('client360Scope'))$('client360Scope').textContent=sourceCount===commercialClients.length&&commercialClients.length
+    ?'Perimetro attuale: '+commercialClients.length+' clienti del pilota Recovery importati da AssiEasy. Non è ancora il portafoglio clienti attivo completo.'
+    :'Perimetro attuale: '+commercialClients.length+' clienti accessibili in base a ruolo e dati importati.'
+
+  const producer=$('client360Producer')
+  if(producer){
+    const current=producer.value
+    const names=[...new Set(commercialClients.map(c=>c.metadata?.producer).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'it'))
+    producer.innerHTML='<option value="">Tutti i produttori</option>'+names.map(x=>'<option>'+esc(x)+'</option>').join('')
+    if(names.includes(current))producer.value=current
+  }
+
+  const q=String($('client360Search')?.value||'').trim().toLowerCase()
+  const status=$('client360Status')?.value||''
+  const prod=$('client360Producer')?.value||''
+  const rows=commercialClients.filter(c=>{
+    const meta=c.metadata||{}
+    const hay=[clientDisplayName(c),c.city,c.province,c.email,c.mobile,meta.producer,meta.producer_code,...normalizeMetaList(meta.final_branches),...normalizeMetaList(meta.final_products)].join(' ').toLowerCase()
+    return(!q||hay.includes(q))&&(!status||c.status===status)&&(!prod||meta.producer===prod)
+  })
+  $('client360Body').innerHTML=rows.map(c=>{
+    const meta=c.metadata||{}
+    const cases=clientPipelineRows(c.id)
+    const active=cases.find(x=>!['won','lost','closed'].includes(x.stage))||cases[0]
+    const branches=normalizeMetaList(meta.final_branches)
+    const productsMeta=normalizeMetaList(meta.final_products)
+    const depth=Math.max(branches.length,productsMeta.length)
+    return '<tr data-client360="'+c.id+'"><td><strong>'+esc(clientDisplayName(c))+'</strong><small>'+esc(c.kind==='company'?'Azienda':'Persona')+'</small></td><td>'+esc(c.status||'—')+'</td><td>'+esc(c.city||'—')+(c.province?' <small>'+esc(c.province)+'</small>':'')+'</td><td>'+esc(meta.producer||'—')+'</td><td><strong>'+esc(depth||'—')+'</strong><small>'+(branches.length?esc(branches.slice(0,2).join(' · ')):'dettaglio non disponibile')+'</small></td><td>'+esc(active?pipelineStageLabel(active.stage):'Nessuna')+'</td><td>'+esc(c.next_action||'—')+(c.next_action_at?'<small>'+esc(fmtDateTime(c.next_action_at))+'</small>':'')+'</td><td><button type="button" class="small-btn" data-open-client="'+c.id+'">Apri</button></td></tr>'
+  }).join('')||'<tr><td colspan="8"><div class="empty">Nessun cliente corrisponde ai filtri.</div></td></tr>'
+  document.querySelectorAll('[data-open-client]').forEach(b=>b.onclick=()=>openClient360(b.dataset.openClient))
+}
+function renderPortfolioEngine(){
+  if(!$('portfolioEngineGrid'))return
+  const financial=isManager()
+  const totalClients=portfolioSnapshots.reduce((n,x)=>n+Number(x.clients_count||0),0)
+  const totalPolicies=portfolioSnapshots.reduce((n,x)=>n+Number(x.policies_count||0),0)
+  const totalPremium=portfolioSnapshots.reduce((n,x)=>n+Number(x.premium_total||0),0)
+  const ratio=totalClients?totalPolicies/totalClients:0
+  $('portfolioEngineClients').textContent=financial?totalClients:'—'
+  $('portfolioEnginePolicies').textContent=financial?totalPolicies:'—'
+  $('portfolioEngineRatio').textContent=financial?ratio.toFixed(2):'—'
+  $('portfolioEnginePremium').textContent=financial?currency(totalPremium):'Riservato'
+  if(!financial){
+    $('portfolioEngineGrid').innerHTML='<div class="restricted-panel"><strong>Motore Portafoglio riservato alla Direzione</strong><p>Premi, profondità e snapshot produttori seguono i permessi economici già esistenti. Nessun dato viene duplicato in una vista meno protetta.</p></div>'
+    $('portfolioMixSummary').innerHTML=''
+    return
+  }
+  $('portfolioEngineGrid').innerHTML=portfolioSnapshots.map(s=>{
+    const c=s.agency_collaborators||{}
+    const ppc=s.clients_count?Number(s.policies_count||0)/Number(s.clients_count):0
+    const avg=s.clients_count&&s.premium_total!=null?Number(s.premium_total)/Number(s.clients_count):null
+    const mix=Object.entries(s.portfolio_mix||{}).sort((a,b)=>Number(b[1]||0)-Number(a[1]||0)).slice(0,5)
+    return '<article class="portfolio-engine-card '+(c.collaborator_type==='agency_central'?'central':'')+'"><div><span>'+(c.collaborator_type==='agency_central'?'AGENZIA CENTRALE':'PRODUTTORE')+'</span><h4>'+esc(c.display_name||'Rete')+'</h4><small>'+esc(c.territory||s.snapshot_label||'')+'</small></div><div class="portfolio-engine-metrics"><b>'+Number(s.clients_count||0).toLocaleString('it-IT')+'<small>clienti</small></b><b>'+Number(s.policies_count||0).toLocaleString('it-IT')+'<small>polizze</small></b><b>'+ppc.toFixed(2)+'<small>polizze/cliente</small></b><b>'+(avg!=null?currency(avg):'—')+'<small>premio/cliente</small></b></div><div class="portfolio-mini-mix">'+mix.map(([k,v])=>'<span>'+esc(k)+' <strong>'+esc(typeof v==='object'?JSON.stringify(v):v)+'</strong></span>').join('')+'</div><footer><span>Fonte: '+esc(s.source_reference||'snapshot registrato')+'</span><span>'+esc(s.observed_at?fmtDate(s.observed_at):'data non indicata')+'</span></footer></article>'
+  }).join('')||empty('Snapshot portafoglio non disponibili.')
+
+  const agg={}
+  portfolioSnapshots.forEach(s=>Object.entries(s.portfolio_mix||{}).forEach(([k,v])=>{
+    const n=typeof v==='number'?v:Number(v)
+    if(Number.isFinite(n))agg[k]=(agg[k]||0)+n
+  }))
+  const mixes=Object.entries(agg).sort((a,b)=>b[1]-a[1])
+  $('portfolioMixSummary').innerHTML=mixes.length
+    ?mixes.map(([k,v])=>'<div><span>'+esc(k)+'</span><strong>'+Number(v).toLocaleString('it-IT')+'</strong></div>').join('')
+    :'<div class="empty">Il mix aggregato non è disponibile in forma numerica negli snapshot correnti.</div>'
+  if($('portfolioDataGap'))$('portfolioDataGap').innerHTML=
+    '<strong>Copertura dati attuale</strong><p>Il motore usa '+portfolioSnapshots.length+' snapshot produttori e '+commercialClients.length+' record cliente accessibili. Le polizze attive a livello singolo cliente e gli snapshot mensili sede/prodotto non sono ancora caricati: il sistema li segnala come gap invece di ricostruirli per supposizione.</p>'
+}
+function renderCommercialPipeline(){
+  if(!$('pipelineBoard'))return
+  const type=$('pipelineTypeFilter')?.value||''
+  const rows=pipelineCases.filter(x=>!type||x.pipeline===type)
+  const open=rows.filter(x=>!['won','lost','closed'].includes(x.stage))
+  $('pipelineOpenCount').textContent=open.length
+  $('pipelineUnassignedCount').textContent=open.filter(x=>!x.assigned_to).length
+  $('pipelineCheckupCount').textContent=rows.filter(x=>x.stage==='checkup').length
+  const value=open.reduce((n,x)=>n+Number(x.estimated_value||0),0)
+  $('pipelineEstimatedValue').textContent=value?currency(value):'—'
+  const stages=['selected','assigned','contacted','appointment','checkup','proposal','won','lost','closed']
+  $('pipelineBoard').innerHTML=stages.map(stage=>{
+    const items=rows.filter(x=>x.stage===stage)
+    return '<section class="pipeline-column"><header><span>'+pipelineStageLabel(stage)+'</span><strong>'+items.length+'</strong></header><div>'+items.map(x=>{
+      const c=x.clients||commercialClients.find(k=>k.id===x.client_id)||{}
+      return '<article class="pipeline-card" data-pipeline-case="'+x.id+'"><div><strong>'+esc(clientDisplayName(c))+'</strong><small>'+esc(pipelineLabel(x.pipeline))+'</small></div><p>'+esc(x.reason||'Motivo da completare')+'</p><footer><span>'+(x.score!=null?'Score '+esc(x.score):'Score —')+'</span><span>'+esc(x.assigned_to?'assegnato':'da assegnare')+'</span></footer>'+(x.estimated_value!=null?'<b>'+currency(x.estimated_value)+'</b>':'')+'</article>'
+    }).join('')+(items.length?'':'<div class="pipeline-empty">Nessun caso</div>')+'</div></section>'
+  }).join('')
+  document.querySelectorAll('[data-pipeline-case]').forEach(b=>b.onclick=()=>openPipelineCase(b.dataset.pipelineCase))
+}
+function openClient360(id){
+  const c=commercialClients.find(x=>x.id===id);if(!c)return
+  const meta=c.metadata||{}
+  const cases=clientPipelineRows(id)
+  const checkups=clientCheckups.filter(x=>x.client_id===id)
+  const interactions=clientInteractions.filter(x=>x.client_id===id)
+  const works=clientWorkItems.filter(x=>x.client_id===id)
+  const blockList=(title,arr)=>'<div class="client360-detail-block"><span>'+title+'</span>'+(arr.length?'<div>'+arr.map(x=>'<b>'+esc(x)+'</b>').join('')+'</div>':'<small>Dato non disponibile</small>')+'</div>'
+  $('modalContent').innerHTML='<div class="eyebrow">CLIENTE 360</div><h2>'+esc(clientDisplayName(c))+'</h2><p class="muted">'+esc(c.status||'—')+' · '+esc(c.city||'Località non indicata')+(c.province?' ('+esc(c.province)+')':'')+'</p>'+
+    '<div class="client360-identity"><div><span>Contatto</span><strong>'+esc(c.mobile||c.email||'Non disponibile')+'</strong><small>'+esc([c.email,c.mobile].filter(Boolean).join(' · ')||'Contatti non valorizzati')+'</small></div><div><span>Produttore</span><strong>'+esc(meta.producer||'Non indicato')+'</strong><small>'+esc(meta.producer_code||'')+'</small></div><div><span>Fonte</span><strong>'+esc(c.source||'AssiEasy / import')+'</strong><small>'+esc(meta.source_snapshot_date?fmtDate(meta.source_snapshot_date):'Data snapshot non disponibile')+'</small></div><div><span>Valore indicativo</span><strong>'+currency(meta.final_premium_indicative)+'</strong><small>solo se presente nella fonte importata</small></div></div>'+
+    '<div class="client360-detail-grid">'+blockList('Rami',normalizeMetaList(meta.final_branches))+blockList('Prodotti',normalizeMetaList(meta.final_products))+blockList('Compagnie',normalizeMetaList(meta.final_companies))+blockList('Motivazioni / classe',normalizeMetaList(meta.final_reason_class||meta.final_reasons_raw))+'</div>'+
+    '<div class="client360-link-grid"><section><header><strong>Pipeline</strong><span>'+cases.length+'</span></header>'+(cases.length?cases.map(x=>'<button type="button" data-modal-pipeline="'+x.id+'"><b>'+esc(pipelineLabel(x.pipeline))+'</b><small>'+esc(pipelineStageLabel(x.stage))+(x.reason?' · '+esc(x.reason):'')+'</small></button>').join(''):'<p>Nessun caso commerciale.</p>')+'</section><section><header><strong>Check-up</strong><span>'+checkups.length+'</span></header>'+(checkups.length?checkups.map(x=>'<div><b>'+esc(x.checkup_type)+'</b><small>'+esc(x.status)+(x.scheduled_at?' · '+esc(fmtDateTime(x.scheduled_at)):'')+'</small></div>').join(''):'<p>Nessun check-up registrato.</p>')+'</section><section><header><strong>Attività</strong><span>'+works.length+'</span></header>'+(works.length?works.slice(0,6).map(x=>'<div><b>'+esc(x.title)+'</b><small>'+esc(x.status)+(x.due_at?' · '+esc(fmtDateTime(x.due_at)):'')+'</small></div>').join(''):'<p>Nessuna attività cliente.</p>')+'</section><section><header><strong>Interazioni</strong><span>'+interactions.length+'</span></header>'+(interactions.length?interactions.slice(0,6).map(x=>'<div><b>'+esc(x.channel)+' · '+esc(x.outcome)+'</b><small>'+esc(fmtDateTime(x.occurred_at))+'</small></div>').join(''):'<p>Nessuna interazione registrata.</p>')+'</section></div>'+
+    '<div class="modal-section"><div class="modal-section-head"><h4>Prossimo passo</h4><button type="button" class="primary" id="clientNewPipelineBtn">+ Opportunità</button></div><p>'+esc(c.next_action||'Nessuna prossima azione registrata.')+(c.next_action_at?' · '+esc(fmtDateTime(c.next_action_at)):'')+'</p></div>'
+  $('modal').classList.remove('hidden')
+  document.querySelectorAll('[data-modal-pipeline]').forEach(b=>b.onclick=()=>openPipelineCase(b.dataset.modalPipeline))
+  $('clientNewPipelineBtn').onclick=()=>openNewPipelineCase(id)
+}
+function openNewPipelineCase(clientId=null){
+  const available=commercialClients
+  if(!available.length)return alert('Nessun cliente accessibile da collegare alla pipeline.')
+  $('modalContent').innerHTML='<div class="eyebrow">PIPELINE COMMERCIALE</div><h2>Nuova opportunità</h2><form id="pipelineNewForm" class="form"><label>Cliente<select id="pcClient">'+available.map(c=>'<option value="'+c.id+'">'+esc(clientDisplayName(c))+'</option>').join('')+'</select></label><div class="inline"><label>Pipeline<select id="pcType"><option value="acquisition">Acquisizione</option><option value="development">Sviluppo</option><option value="retention">Retention</option><option value="recovery">Recovery</option></select></label><label>Stadio<select id="pcStage"><option value="selected">Selezionato</option><option value="assigned">Assegnato</option><option value="contacted">Contattato</option><option value="appointment">Appuntamento</option><option value="checkup">Check-up</option><option value="proposal">Proposta</option></select></label></div><label>Motivo / bisogno<textarea id="pcReason" required></textarea></label><label>Valore stimato<input id="pcValue" type="number" min="0" step="0.01"></label><button type="submit" class="primary">Crea opportunità</button></form>'
+  if(clientId)$('pcClient').value=clientId
+  $('modal').classList.remove('hidden')
+  $('pipelineNewForm').onsubmit=async e=>{
+    e.preventDefault()
+    const row={organization_id:window.orgId,client_id:$('pcClient').value,pipeline:$('pcType').value,stage:$('pcStage').value,assigned_to:window.userId,estimated_value:$('pcValue').value?Number($('pcValue').value):null,reason:$('pcReason').value.trim(),metadata:{source:'maglia360_pipeline_ui'}}
+    const{error}=await supabase.from('pipeline_cases').insert(row)
+    if(error)return alert(error.message)
+    closeModal();await loadAll();openCommerceTab('pipeline')
+  }
+}
+function openPipelineCase(id){
+  const x=pipelineCases.find(p=>p.id===id);if(!x)return
+  const c=x.clients||commercialClients.find(k=>k.id===x.client_id)||{}
+  const canEdit=isManager()||x.assigned_to===window.userId
+  const works=clientWorkItems.filter(w=>w.pipeline_case_id===id)
+  const checks=clientCheckups.filter(k=>k.client_id===x.client_id)
+  $('modalContent').innerHTML='<div class="eyebrow">PIPELINE COMMERCIALE</div><h2>'+esc(clientDisplayName(c))+'</h2><p class="muted">'+esc(pipelineLabel(x.pipeline))+' · '+esc(pipelineStageLabel(x.stage))+'</p><form id="pipelineEditForm" class="form"><div class="inline"><label>Stadio<select id="peStage">'+['selected','assigned','contacted','appointment','checkup','proposal','won','lost','closed'].map(v=>'<option value="'+v+'">'+pipelineStageLabel(v)+'</option>').join('')+'</select></label><label>Valore stimato<input id="peValue" type="number" min="0" step="0.01" value="'+esc(x.estimated_value??'')+'"></label></div><label>Motivo / bisogno<textarea id="peReason">'+esc(x.reason||'')+'</textarea></label>'+(canEdit?'<button type="submit" class="primary">Aggiorna pipeline</button>':'<p class="form-note">Caso in sola lettura per questo profilo.</p>')+'</form><div class="pipeline-case-actions"><button type="button" class="secondary" id="pipelineWorkBtn">+ Attività</button><button type="button" class="secondary" id="pipelineCheckupBtn">Programma Check-up</button><button type="button" class="secondary" id="pipelineClientBtn">Apri Cliente 360</button></div><div class="two-col top-gap"><div class="prose-box"><strong>Attività collegate</strong><p>'+(works.length?works.map(w=>esc(w.title)+' · '+esc(w.status)).join('<br>'):'Nessuna attività.')+'</p></div><div class="prose-box"><strong>Check-up cliente</strong><p>'+(checks.length?checks.map(k=>esc(k.status)+(k.scheduled_at?' · '+esc(fmtDateTime(k.scheduled_at)):'')).join('<br>'):'Nessun check-up.')+'</p></div></div>'
+  $('peStage').value=x.stage
+  if(!canEdit){$('peStage').disabled=true;$('peValue').disabled=true;$('peReason').disabled=true}
+  $('modal').classList.remove('hidden')
+  if(canEdit)$('pipelineEditForm').onsubmit=async e=>{
+    e.preventDefault()
+    const stage=$('peStage').value
+    const patch={stage,estimated_value:$('peValue').value?Number($('peValue').value):null,reason:$('peReason').value.trim()||null,closed_at:['won','lost','closed'].includes(stage)?(x.closed_at||new Date().toISOString()):null,updated_at:new Date().toISOString()}
+    const{error}=await supabase.from('pipeline_cases').update(patch).eq('id',id).eq('organization_id',window.orgId)
+    if(error)return alert(error.message)
+    closeModal();await loadAll();openCommerceTab('pipeline')
+  }
+  $('pipelineWorkBtn').onclick=()=>openPipelineWorkItem(id)
+  $('pipelineCheckupBtn').onclick=()=>openPipelineCheckup(id)
+  $('pipelineClientBtn').onclick=()=>openClient360(x.client_id)
+}
+function openPipelineWorkItem(caseId){
+  const x=pipelineCases.find(p=>p.id===caseId);if(!x)return
+  $('modalContent').innerHTML='<div class="eyebrow">ATTIVITÀ CLIENTE</div><h2>Nuovo follow-up commerciale</h2><form id="pipelineWorkForm" class="form"><label>Titolo<input id="pwTitle" value="Follow-up '+esc(pipelineLabel(x.pipeline))+'" required></label><label>Descrizione<textarea id="pwDesc">'+esc(x.reason||'')+'</textarea></label><div class="inline"><label>Priorità<select id="pwPriority"><option value="normal">Normale</option><option value="high">Alta</option><option value="urgent">Urgente</option><option value="low">Bassa</option></select></label><label>Scadenza<input id="pwDue" type="datetime-local"></label></div><button type="submit" class="primary">Crea attività</button></form>'
+  $('modal').classList.remove('hidden')
+  $('pipelineWorkForm').onsubmit=async e=>{
+    e.preventDefault()
+    const row={organization_id:window.orgId,client_id:x.client_id,pipeline_case_id:x.id,assigned_to:window.userId,created_by:window.userId,work_type:'commercial_followup',title:$('pwTitle').value.trim(),description:$('pwDesc').value.trim()||null,priority:$('pwPriority').value,status:'open',due_at:$('pwDue').value?new Date($('pwDue').value).toISOString():null,metadata:{source:'maglia360_pipeline_ui'}}
+    const{error}=await supabase.from('work_items').insert(row)
+    if(error)return alert(error.message)
+    await loadAll();openPipelineCase(caseId)
+  }
+}
+function openPipelineCheckup(caseId){
+  const x=pipelineCases.find(p=>p.id===caseId);if(!x)return
+  $('modalContent').innerHTML='<div class="eyebrow">CHECK-UP MAGLIA 360</div><h2>Programma check-up</h2><form id="pipelineCheckupForm" class="form"><label>Data e ora<input id="pcheckAt" type="datetime-local" required></label><label>Nota iniziale<textarea id="pcheckSummary">'+esc(x.reason||'')+'</textarea></label><button type="submit" class="primary">Programma</button></form>'
+  $('modal').classList.remove('hidden')
+  $('pipelineCheckupForm').onsubmit=async e=>{
+    e.preventDefault()
+    const row={organization_id:window.orgId,client_id:x.client_id,advisor_user_id:window.userId,checkup_type:'maglia_360',status:'scheduled',scheduled_at:new Date($('pcheckAt').value).toISOString(),summary:$('pcheckSummary').value.trim()||null}
+    const{error}=await supabase.from('checkups').insert(row)
+    if(error)return alert(error.message)
+    const upd=await supabase.from('pipeline_cases').update({stage:'checkup',updated_at:new Date().toISOString()}).eq('id',caseId).eq('organization_id',window.orgId)
+    if(upd.error)return alert(upd.error.message)
+    await loadAll();openPipelineCase(caseId)
+  }
 }
 
 function openProduct(id){
