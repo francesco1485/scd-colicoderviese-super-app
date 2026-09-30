@@ -886,7 +886,7 @@ async function persistAssistantMessage(content,sender,intent=null,context={}){
   if(!error)assistantMessages.push({...row,created_at:new Date().toISOString()})
 }
 async function runLiaWorkbench(q){
-  const actionable=/\b(crea|creare|cartella|sottocartella|mapping|mappa|ricerca|ricercare|azienda|aziende|attivita|attività|locandina|brochure|contratto|documento|allega|allegato)\b/i.test(q)
+  const actionable=/\b(crea|creare|cartella|sottocartella|mapping|mappa|ricerca|ricercare|azienda|aziende|attivita|attività|scadenza|promemoria|progetto|locandina|brochure|contratto|documento|allega|allegato)\b/i.test(q)
   if(!actionable||!window.orgId)return null
   try{
     const{data,error}=await supabase.functions.invoke('lia-workbench',{body:{organization_id:window.orgId,command:q}})
@@ -918,6 +918,12 @@ async function askAssistant(q){
       navigate('development')
     }else if(executed.action==='artifact_queued'){
       navigate(executed.artifact?.artifact_type==='contract'||executed.artifact?.artifact_type==='document'?'documents':'aiMail')
+    }else if(executed.action==='strategic_action_created'){
+      await loadAll()
+      navigate('actions')
+    }else if(executed.action==='strategic_project_created'){
+      await loadAll()
+      navigate('development')
     }
     return
   }
