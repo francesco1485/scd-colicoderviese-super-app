@@ -703,10 +703,18 @@ function askAssistant(q){
 
   const s=q.toLowerCase()
   let reply=''
-  if(s.includes('attivit')||s.includes('scadenz')){
+  if(s.includes('oggi')||s.includes('attivit')||s.includes('scadenz')){
     const open=actions.filter(a=>!['completed','cancelled'].includes(a.status))
     const due=open.filter(a=>a.due_at).sort(actionSort).slice(0,3)
-    reply='Ci sono '+open.length+' attività aperte. '+(due.length?'Le prime con scadenza: '+due.map(a=>a.title+' ('+fmtDate(a.due_at)+')').join('; ')+'.':'Non risultano scadenze registrate sulle prime attività.')
+    const urgent=open.filter(a=>a.priority==='urgent').length
+    reply='Per oggi vedo '+open.length+' attività aperte'+(urgent?' e '+urgent+' urgenti':'')+'. '+(due.length?'Le prime con scadenza: '+due.map(a=>a.title+' ('+fmtDate(a.due_at)+')').join('; ')+'.':'Non risultano scadenze registrate sulle prime attività.')+' Se vuoi lavorare con meno distrazioni, attiva Focus nella barra superiore.'
+  }else if(s.includes('incontro')||s.includes('appuntamento')){
+    reply='Per preparare bene un incontro partirei da tre cose: chi incontriamo, perché ora e quale bisogno vogliamo capire. Poi preparo contesto, domande, documenti, eventuale grafica da tavolo e prossimo passo. Nel Kit Collaboratore sono già presenti Mappa Famiglia 360, Business Risk Map, Rischio → Conseguenza → Protezione e Piano 90 Giorni.'
+    navigate('growthKits')
+  }else if(s.includes('opportun')||s.includes('radar')||s.includes('rete')){
+    const active=distributionCandidates.filter(x=>['qualified','contact_planned','contacted','meeting','proposal'].includes(x.stage)).length
+    reply='Il Radar Rete contiene '+distributionCandidates.length+' candidati censiti e '+active+' già oltre la semplice scoperta. Posso portarti nella mappa IVASS / Registro Imprese per qualificare chi vale davvero un contatto.'
+    navigate('networkRadar')
   }else if(s.includes('prodot')||s.includes('confront')){
     const pending=products.filter(p=>p.maturity_status==='to_verify').length
     reply='Ho '+products.length+' schede prodotto/area censite; '+pending+' sono ancora da verificare. I confronti verificati sono '+comparisons.filter(c=>c.status==='verified').length+'. Posso portarti nella sezione Prodotti o Confronti.'
