@@ -6,8 +6,10 @@
 
 var R42_LIA = {
   RELEASE:'R42.0',
-  ROOT_FOLDER:'SCD COMMERCIAL DEVELOPMENT',
-  MAPPING_FOLDER:'MAPPING TERRITORIALE'
+  COMMERCIAL_ROOT_ID:'18SiudaLO9k1JnDeBoTKgy-nkjv_DgGyp',
+  COMMERCIAL_ROOT_NAME:'02 SPONSOR E PARTNER',
+  MAPPING_ROOT_ID:'1SN8wWjFni0haVda3ZMRFiRbJgTEvCU9d',
+  MAPPING_FOLDER:'01 MAPPING TERRITORIALE'
 };
 
 function r42RequireDirection_(token) {
@@ -41,7 +43,9 @@ function r42GetOrCreateFolder_(parent, name) {
 }
 
 function r42CommercialRoot_() {
-  return r42GetOrCreateFolder_(DriveApp.getRootFolder(), R42_LIA.ROOT_FOLDER);
+  var folder = DriveApp.getFolderById(R42_LIA.COMMERCIAL_ROOT_ID);
+  if (!folder) throw new Error('Radice commerciale SCD non disponibile');
+  return folder;
 }
 
 function r42Audit_(actor, eventType, entityId, notes) {
@@ -76,7 +80,7 @@ function r42CreateDriveFolder_(token, payload) {
   if (!path.length || path.length > 8) throw new Error('Percorso cartella non valido');
 
   var folder = r42CommercialRoot_();
-  var createdPath = [R42_LIA.ROOT_FOLDER];
+  var createdPath = [R42_LIA.COMMERCIAL_ROOT_NAME];
   path.forEach(function(part) {
     var safe = r42SafeName_(part,'CARTELLA');
     folder = r42GetOrCreateFolder_(folder, safe);
@@ -110,7 +114,8 @@ function r42SaveCommercialMapping_(token, payload) {
   if (!items.length) throw new Error('Nessuna riga di mapping da salvare');
 
   var root = r42CommercialRoot_();
-  var mappingRoot = r42GetOrCreateFolder_(root,R42_LIA.MAPPING_FOLDER);
+  var mappingRoot = DriveApp.getFolderById(R42_LIA.MAPPING_ROOT_ID);
+  if (!mappingRoot) mappingRoot = r42GetOrCreateFolder_(root,R42_LIA.MAPPING_FOLDER);
   var municipalityFolder = r42GetOrCreateFolder_(mappingRoot,municipality);
 
   var stamp = Utilities.formatDate(new Date(), Session.getScriptTimeZone() || 'Europe/Rome', 'yyyyMMdd_HHmmss');
