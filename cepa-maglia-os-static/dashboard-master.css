@@ -694,3 +694,58 @@ input:focus-visible{
   .row{grid-template-columns:1fr auto}
   .row>span{display:none}
 }
+
+
+/* --- Lia as work assistant, not visual protagonist --- */
+.shell{
+  grid-template-columns:minmax(0,1fr) 268px;
+}
+.rail{
+  gap:8px;
+}
+.assistant{
+  grid-template-rows:auto 112px auto auto;
+}
+.assistantHead{
+  min-height:48px;
+}
+.avatar{
+  width:34px;
+  height:34px;
+}
+.portrait{
+  height:112px;
+  overflow:hidden;
+}
+.portrait img{
+  height:112px;
+  object-fit:cover;
+  object-position:50% 18%;
+  filter:saturate(.9) contrast(.96);
+}
+.quick{
+  grid-template-columns:1fr;
+}
+.quick button,
+.quick button:first-child,
+.quick button:last-child{
+  grid-column:auto;
+  min-height:48px;
+}
+.quick button:first-child{
+  background:linear-gradient(135deg,#0b6f54,#0a5b47);
+}
+.chat{
+  padding-top:6px;
+}
+@media(max-width:1180px){
+  .shell{grid-template-columns:1fr}
+  .assistant{grid-template-columns:150px 1fr;grid-template-rows:auto auto auto}
+  .portrait{height:150px;grid-row:2/4}
+  .portrait img{height:150px}
+}
+@media(max-width:860px){
+  .assistant{grid-template-columns:1fr;grid-template-rows:auto 120px auto auto}
+  .portrait{height:120px;grid-row:auto}
+  .portrait img{height:120px}
+}
