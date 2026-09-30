@@ -404,3 +404,14 @@ body{background:var(--paper);color:var(--ink)}
 .client-tool-card h4{margin:4px 0 5px;color:var(--navy);font-size:12px}.client-tool-card p{font-size:8px;line-height:1.45;color:var(--muted);margin:0}.client-tool-card small{display:block;font-size:7px;line-height:1.35;color:#7f8f97;margin-top:5px}.client-tool-card>b{font-size:8px;color:var(--green)}
 @media(max-width:1100px){.client-tool-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:620px){.client-tool-grid{display:flex;overflow:auto;scroll-snap-type:x mandatory;padding-right:8px}.client-tool-card{min-width:230px;scroll-snap-align:start}}
+
+.focus-mode-btn{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);background:#fff;color:#1b4b67;border-radius:999px;padding:7px 10px;font-size:8px;font-weight:900;cursor:pointer;white-space:nowrap}
+.focus-mode-btn.active{background:#0f8e68;color:#fff;border-color:#0f8e68}
+.confidential-note{font-size:7px;font-weight:900;letter-spacing:.08em;color:#88a5b5;margin-bottom:8px}
+.workspace.focus-mode #homeView>.visual-band,
+.workspace.focus-mode #homeView>.dashboard-split,
+.workspace.focus-mode #homeView>.control-tower-panel{display:none}
+.workspace.focus-mode #homeView>.territory-hero{min-height:205px}
+.workspace.focus-mode #homeView>.territory-hero .territory-copy h2{font-size:clamp(28px,3vw,45px)}
+.workspace.focus-mode #homeView>.focus-panel{margin-top:0}
+@media(max-width:900px){.focus-mode-btn{display:none}.workspace.focus-mode #homeView>.territory-hero{min-height:280px}}
