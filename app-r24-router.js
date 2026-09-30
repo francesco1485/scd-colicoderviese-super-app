@@ -1,6 +1,6 @@
 (() => {
   const R24={
-    version:'40.0.0',
+    version:'42.0.0',
     routes:['pulse','home','calendar','communications','services','profile','athlete','family','staff','commercial'],
     current:'pulse',
     route(){
