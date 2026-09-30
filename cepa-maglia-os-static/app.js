@@ -33,12 +33,31 @@ async function logout(){await supabase.auth.signOut();location.reload()}
 $('logoutBtn').onclick=logout;$('blockedLogout').onclick=logout
 
 function setMobileNav(open){
+  const mobile=window.matchMedia('(max-width:900px)').matches
+  if(!mobile)return
   $('workspace').classList.toggle('nav-open',!!open)
   $('sidebarBackdrop').classList.toggle('hidden',!open)
+  document.documentElement.style.overflow=open?'hidden':''
+}
+function setDesktopSidebar(collapsed){
+  if(window.matchMedia('(max-width:900px)').matches)return
+  $('workspace').classList.toggle('sidebar-collapsed',!!collapsed)
+  try{localStorage.setItem('maglia360_sidebar',collapsed?'collapsed':'expanded')}catch(_){}
 }
 $('mobileMenuBtn').onclick=()=>setMobileNav(true)
-$('sidebarCloseBtn').onclick=()=>setMobileNav(false)
+$('sidebarCloseBtn').onclick=()=>{
+  if(window.matchMedia('(max-width:900px)').matches)setMobileNav(false)
+  else setDesktopSidebar(!$('workspace').classList.contains('sidebar-collapsed'))
+}
 $('sidebarBackdrop').onclick=()=>setMobileNav(false)
+document.addEventListener('keydown',e=>{if(e.key==='Escape')setMobileNav(false)})
+window.addEventListener('resize',()=>{
+  if(!window.matchMedia('(max-width:900px)').matches){
+    $('workspace').classList.remove('nav-open')
+    $('sidebarBackdrop').classList.add('hidden')
+    document.documentElement.style.overflow=''
+  }
+})
 
 function setFocusMode(on){
   $('workspace').classList.toggle('focus-mode',!!on)
@@ -769,11 +788,42 @@ async function persistAssistantMessage(content,sender,intent=null,context={}){
   const{error}=await supabase.from('ai_assistant_messages').insert(row)
   if(!error)assistantMessages.push({...row,created_at:new Date().toISOString()})
 }
-function askAssistant(q){
+async function runLiaWorkbench(q){
+  const actionable=/\b(crea|creare|cartella|sottocartella|mapping|mappa|ricerca|ricercare|azienda|aziende|attivita|attività|locandina|brochure|contratto|documento|allega|allegato)\b/i.test(q)
+  if(!actionable||!window.orgId)return null
+  try{
+    const{data,error}=await supabase.functions.invoke('lia-workbench',{body:{organization_id:window.orgId,command:q}})
+    if(error)throw error
+    if(data?.action&&data.action!=='support_only')return data
+    return null
+  }catch(error){
+    console.warn('Lia workbench non disponibile',error)
+    return null
+  }
+}
+
+async function askAssistant(q){
   addAssistantMessage(q,'user')
   const activePartner=currentPartnerId?ecosystem.find(x=>x.id===currentPartnerId):null
   const context=activePartner?{partner_id:activePartner.id,partner_code:activePartner.code,partner_name:activePartner.name}:{}
   persistAssistantMessage(q,'user','query',context)
+
+  const executed=await runLiaWorkbench(q)
+  if(executed){
+    const reply=executed.message||'Operazione registrata.'
+    addAssistantMessage(reply,'bot')
+    persistAssistantMessage(reply,'assistant','execution',{...context,action:executed.action,work_order_id:executed.work_order_id||null})
+    if(executed.action==='territory_mapping_completed'||executed.action==='territory_mapping_partial'){
+      await loadAll()
+      navigate('development')
+    }else if(executed.action==='workspace_created'){
+      await loadAll()
+      navigate('development')
+    }else if(executed.action==='artifact_queued'){
+      navigate(executed.artifact?.artifact_type==='contract'||executed.artifact?.artifact_type==='document'?'documents':'aiMail')
+    }
+    return
+  }
 
   const s=q.toLowerCase()
   let reply=''
