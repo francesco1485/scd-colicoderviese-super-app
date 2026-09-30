@@ -1,7 +1,7 @@
 (() => {
   const R24={
     version:'40.0.0',
-    routes:['pulse','home','calendar','communications','services','profile','athlete','family','staff'],
+    routes:['pulse','home','calendar','communications','services','profile','athlete','family','staff','commercial'],
     current:'pulse',
     route(){
       const raw=(location.hash||'#/pulse').replace(/^#\/?/,'').split('?')[0].trim();
@@ -25,7 +25,7 @@
     navItems(){
       const role=this.roleMode();
       if(role==='staff')return [
-        ['pulse','◉','Pulse'],['calendar','▣','Sport'],['staff','▦','Direzione'],['communications','✉','Community'],['profile','●','Profilo']
+        ['pulse','◉','Pulse'],['calendar','▣','Sport'],['staff','▦','Direzione'],['commercial','◆','Commerciale'],['profile','●','Profilo']
       ];
       if(role==='family')return [
         ['pulse','◉','Pulse'],['calendar','▣','Sport'],['family','●','Famiglia'],['communications','✉','Community'],['profile','◉','Profilo']
@@ -48,7 +48,7 @@
       if(desktop){
         const role=this.roleMode();
         const desktopItems=role==='staff'
-          ?[['pulse','Pulse'],['calendar','Sport'],['staff','Direzione'],['communications','Community'],['profile','Profilo']]
+          ?[['pulse','Pulse'],['calendar','Sport'],['staff','Direzione'],['commercial','Commerciale'],['profile','Profilo']]
           :role==='family'
             ?[['pulse','Pulse'],['calendar','Sport'],['family','Famiglia'],['communications','Community'],['profile','Profilo']]
             :role==='athlete'
@@ -444,6 +444,55 @@
       };
       outlet.querySelectorAll('[data-r24-family]').forEach(b=>b.onclick=()=>{outlet.querySelectorAll('[data-r24-family]').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderDetail(Number(b.dataset.r24Family||0))});
       renderDetail(0);this.bindCommon(outlet);
+    },
+    render_commercial(outlet){
+      const p=publicData(state.summary||FALLBACK);
+      const sponsors=(p.sponsors||[]).slice(0,24);
+      const d=state.privateData||{},u=d.user||{},perm=d.permissions||{};
+      const direction=!!perm.direction||['DIREZIONE','ADMIN'].includes(String(u.role||'').toUpperCase());
+      const sponsorRows=sponsors.length?sponsors.map((x,i)=>{
+        const name=field(x,'name','sponsor','company','title')||('Partner '+(i+1));
+        return '<button class="r42-company" type="button" data-r42-company="'+esc(name)+'"><span class="r42-company-mark">'+esc((name[0]||'S').toUpperCase())+'</span><span><b>'+esc(name)+'</b><small>PARTNER PUBBLICO · FIT OPERATIVO DA VERIFICARE</small></span><i>—</i></button>';
+      }).join(''):'<div class="r42-empty"><b>Dati partner in aggiornamento</b><span>Il modulo non inventa aziende o stati mancanti.</span></div>';
+      outlet.innerHTML=this.shellHeader('Commercial Development OS','Ricerca, sponsor, prodotti, opportunità, attivazioni e sviluppo in un unico ciclo.','DIREZIONE · COMMERCIALE · R42')+
+      '<section class="r42-status"><div><span class="r42-dot"></span><b>STAGING READ ONLY</b><small>Nessuna scrittura commerciale abilitata in R42.</small></div><span>'+(direction?'SESSIONE DIREZIONE':'ANTEPRIMA SICURA')+'</span></section>'+
+      '<section class="r42-kpis"><article><small>PARTNER PUBBLICI</small><strong>'+esc(sponsors.length||'—')+'</strong><span>dal feed già disponibile</span></article><article><small>OPPORTUNITÀ</small><strong>—</strong><span>DATO IN AGGIORNAMENTO</span></article><article><small>APPROVAZIONI</small><strong>—</strong><span>DATO IN AGGIORNAMENTO</span></article><article><small>PRONTO FLUSSO</small><strong>—</strong><span>DATO IN AGGIORNAMENTO</span></article></section>'+
+      '<section class="r42-tabs" role="tablist"><button class="active" data-r42-tab="control">CONTROL ROOM</button><button data-r42-tab="research">RESEARCH & FIT</button><button data-r42-tab="sources">FONTI</button></section>'+
+      '<section class="r42-view" data-r42-view="control">'+
+        '<div class="r42-grid">'+
+          '<button data-r42-open="research"><span>01</span><b>Research & Fit</b><small>Fonti, segnali, compatibilità, timing e next action.</small></button>'+
+          '<button><span>02</span><b>Aziende</b><small>Anagrafica canonica e relazioni.</small></button>'+
+          '<button><span>03</span><b>Opportunità</b><small>Pipeline, owner, valore, stage e prossima azione.</small></button>'+
+          '<button><span>04</span><b>Prodotti / Asset</b><small>LED, eventi, strutture, community e nuovi prodotti.</small></button>'+
+          '<button><span>05</span><b>Partner Success</b><small>Deliverable, proof, KPI, report, rinnovo e upsell.</small></button>'+
+          '<button><span>06</span><b>Development Radar</b><small>Idee, innovazione e nuove fonti di ricavo.</small></button>'+
+          '<button><span>07</span><b>LED Control Room</b><small>Produzione, approvazioni, mapping e playlist.</small></button>'+
+          '<button><span>08</span><b>Task & Audit</b><small>Owner, scadenze, blocchi, decisioni e tracciabilità.</small></button>'+
+        '</div>'+
+        '<div class="r42-priority"><div><small>PRINCIPIO OPERATIVO</small><h2>Idea → Ricerca → Fit → Prodotto → Opportunità → Attivazione → Proof → KPI → Rinnovo</h2><p>Lo score non decide. Fonti, blocchi, disponibilità e prossima azione restano visibili e verificabili.</p></div><span>ZERO DATABASE PARALLELI</span></div>'+
+      '</section>'+
+      '<section class="r42-view" data-r42-view="research" hidden>'+
+        '<div class="r42-panel-head"><div><small>RESEARCH & FIT</small><h2>Aziende e partner già esposti dal feed pubblico</h2><p>In staging mostriamo solo dati non sensibili già disponibili. Il fit commerciale reale arriverà dall’adapter Sponsor Master autorizzato.</p></div><input id="r42Search" type="search" placeholder="Cerca azienda…"></div>'+
+        '<div class="r42-company-list" id="r42CompanyList">'+sponsorRows+'</div>'+
+        '<div class="r42-research-note"><b>Score storico = segnale non decisionale.</b><span>La decisione operativa deve sempre mostrare evidenze, blocchi, fonte e next action.</span></div>'+
+      '</section>'+
+      '<section class="r42-view" data-r42-view="sources" hidden>'+
+        '<div class="r42-source-list">'+
+          '<article><b>SPONSOR_MASTER_SHEET</b><span>Source of Truth sponsor/intelligence registrata nel Manifest</span><i>ADAPTER DA VERIFICARE</i></article>'+
+          '<article><b>CORE_SHEET</b><span>CRM e richieste commerciali esistenti</span><i>REGISTRATA</i></article>'+
+          '<article><b>SCD_SUPABASE</b><span>Domain Core / Auth / RLS in dual-run</span><i>STAGED</i></article>'+
+          '<article><b>SCD_DRIVE</b><span>Documenti, dossier, contratti e materiali</span><i>BACKOFFICE</i></article>'+
+          '<article><b>SCD_GMAIL</b><span>Segnali, contatti e allegati commerciali autorizzati</span><i>BACKOFFICE</i></article>'+
+        '</div>'+
+      '</section>';
+      const tabs=[...outlet.querySelectorAll('[data-r42-tab]')];
+      const views=[...outlet.querySelectorAll('[data-r42-view]')];
+      const open=name=>{tabs.forEach(b=>b.classList.toggle('active',b.dataset.r42Tab===name));views.forEach(v=>v.hidden=v.dataset.r42View!==name)};
+      tabs.forEach(b=>b.onclick=()=>open(b.dataset.r42Tab));
+      outlet.querySelectorAll('[data-r42-open]').forEach(b=>b.onclick=()=>open(b.dataset.r42Open));
+      const search=outlet.querySelector('#r42Search');
+      if(search)search.oninput=()=>{const q=search.value.trim().toLowerCase();outlet.querySelectorAll('[data-r42-company]').forEach(row=>row.hidden=q&&!String(row.dataset.r42Company||'').toLowerCase().includes(q))};
+      this.bindCommon(outlet);
     },
     render_staff(outlet){
       const d=state.privateData||{},u=d.user||{},p=d.permissions||{};
