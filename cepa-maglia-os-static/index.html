@@ -128,7 +128,96 @@
     </header>
 
     <section id="homeView" class="view">
-      <maglia-dashboard id="magliaDashboard"></maglia-dashboard>
+      <div class="office-entry">
+        <section class="office-entry-head">
+          <div>
+            <div class="office-kicker">MAGLIA 360 · SEDI OPERATIVE</div>
+            <h2>Entra nell'ufficio in cui devi lavorare.</h2>
+            <p>La Direzione vede l'insieme. Ogni utente lavora soltanto nelle sedi assegnate, con dati, prodotti, pratiche e C.E.P.A. del proprio territorio.</p>
+          </div>
+          <div class="office-role-box">
+            <span>Accesso</span>
+            <strong id="officeEntryRole">—</strong>
+          </div>
+        </section>
+
+        <section id="directionMessage" class="direction-message hidden"></section>
+
+        <section class="office-entry-grid">
+          <div>
+            <div class="office-section-head">
+              <div><span>SEDI ATTIVE</span><h3>I tuoi uffici</h3></div>
+              <small id="officeAccessNote"></small>
+            </div>
+            <div id="officeCards" class="office-cards"></div>
+          </div>
+          <aside class="direction-overview">
+            <div class="office-section-head">
+              <div><span>DIREZIONE</span><h3>Produzione e priorità</h3></div>
+            </div>
+            <div id="directionProduction" class="direction-production"></div>
+            <div id="directionPriorities" class="direction-priorities"></div>
+          </aside>
+        </section>
+
+        <section id="futureOfficeSection" class="future-office-section hidden">
+          <div>
+            <span>SVILUPPO FUTURO</span>
+            <strong>Nuove sedi</strong>
+            <p>Lo spazio è previsto nell'architettura, ma nessuna sede futura viene mostrata come operativa finché non viene realmente attivata.</p>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section id="officeView" class="view hidden">
+      <div class="office-workspace">
+        <nav class="office-breadcrumb" aria-label="Percorso">
+          <button type="button" data-office-home>MAGLIA 360</button><span>›</span><strong id="officeBreadcrumbName">Ufficio</strong>
+        </nav>
+        <section id="officeIdentity" class="office-identity"></section>
+        <section id="officeDirectionMessage" class="direction-message hidden"></section>
+        <section id="officeSummary" class="office-summary"></section>
+
+        <section class="office-products-section">
+          <div class="office-section-head">
+            <div><span>AREE DI LAVORO</span><h3>Prodotti e servizi</h3></div>
+            <small>I dati mensili restano storicizzati per sede e prodotto.</small>
+          </div>
+          <div id="officeProductBars" class="office-product-bars"></div>
+        </section>
+
+        <section class="office-lower-grid">
+          <article class="office-panel">
+            <div class="office-section-head"><div><span>OPERATIVITÀ</span><h3>Priorità della sede</h3></div></div>
+            <div id="officePriorities" class="office-priority-list"></div>
+          </article>
+          <article class="office-panel">
+            <div class="office-section-head"><div><span>C.E.P.A.</span><h3>Attività territoriali</h3></div></div>
+            <div id="officeCepa" class="office-cepa-list"></div>
+          </article>
+        </section>
+      </div>
+    </section>
+
+    <section id="officeProductView" class="view hidden">
+      <div class="product-office-workspace">
+        <nav class="office-breadcrumb" aria-label="Percorso">
+          <button type="button" data-office-home>MAGLIA 360</button><span>›</span>
+          <button type="button" id="productOfficeBack">Ufficio</button><span>›</span>
+          <strong id="productBreadcrumbName">Prodotto</strong>
+        </nav>
+        <section id="productOfficeIdentity" class="product-office-identity"></section>
+        <section id="productOfficeMetrics" class="product-office-metrics"></section>
+        <section id="productStageBoard" class="product-stage-board"></section>
+        <section class="office-panel">
+          <div class="office-section-head">
+            <div><span>PRATICHE</span><h3>Lavoro aperto</h3></div>
+            <button id="newOfficeCaseBtn" class="small-btn" type="button">+ Nuova pratica</button>
+          </div>
+          <div id="productCaseList" class="product-case-list"></div>
+        </section>
+      </div>
     </section>
 
     <section id="partnerView" class="view hidden">
