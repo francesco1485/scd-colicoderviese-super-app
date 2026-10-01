@@ -695,3 +695,106 @@ crmEmailForm?.addEventListener('submit',async e=>{
   }
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&crmEmailModal&&!crmEmailModal.hidden)closeCrmEmailComposer()});
+
+
+/* ===== R48 ACTIVATION STUDIO + PARTNER WALL ===== */
+const activationCopy={
+  'LEDWall Matchday':{kicker:'LEDWALL MATCHDAY',title:'Il tuo brand entra nella partita.',text:'Creatività dinamica pensata per campo, tribuna e contenuti autorizzati.'},
+  'Sponsor Wall / Interviste':{kicker:'SPONSOR WALL',title:'Il partner resta visibile anche fuori dal campo.',text:'Backdrop, interviste e contenuti media con presenza ordinata e riconoscibile.'},
+  'Divisa sublimatica':{kicker:'KIT PARTNERSHIP',title:'Il brand vive con la squadra.',text:'Posizionamento integrato nel kit, subordinato a disponibilità, regolamenti ed esclusività.'},
+  'Torneo brandizzato':{kicker:'TITLE PARTNERSHIP',title:'Un evento può portare il nome di un progetto.',text:'Torneo, hospitality, premiazioni e territorio dentro una singola attivazione.'},
+  'Gazebo / Partner Corner':{kicker:'PARTNER CORNER',title:'Dal logo alla relazione diretta.',text:'Uno spazio fisico per incontrare famiglie, pubblico e community durante eventi autorizzati.'},
+  'Struttura brandizzata':{kicker:'VENUE BRANDING',title:'Uno spazio SCD può diventare esperienza di marca.',text:'Club House, area giochi, tendostruttura o altra zona reale, solo dopo verifica tecnica.'},
+  'Pixellot / Match Content':{kicker:'MATCH CONTENT',title:'La visibilità diventa contenuto.',text:'Clip, highlights e proof video utilizzabili soltanto nel perimetro di diritti e autorizzazioni.'},
+  'Supporter Card / Convenzione':{kicker:'SCD BENEFIT NETWORK',title:'Il partner entra nella vita quotidiana della community.',text:'Benefit, convenzioni e Card collegano azienda, persone e territorio.'},
+  'Web App Partner Hub':{kicker:'PARTNER HUB',title:'Una presenza digitale ordinata e misurabile.',text:'Profilo partner, progetto, materiali, proof, richieste e rinnovi nella web app SCD.'}
+};
+
+function activationValue(id,fallback=''){
+  return String($(id)?.value||fallback);
+}
+function renderActivationStudio(){
+  const sponsor=activationValue('#activationSponsor','Nuova azienda / prospect');
+  const goal=activationValue('#activationGoal','Visibilità territoriale');
+  const asset=activationValue('#activationAsset','LEDWall Matchday');
+  const audience=activationValue('#activationAudience','Famiglie e tesserati');
+  const channel=activationValue('#activationChannel','Centro Sportivo');
+  const territory=activationValue('#activationTerritory','Colico');
+  const copy=activationCopy[asset]||activationCopy['LEDWall Matchday'];
+
+  if($('#activationPreviewKicker'))$('#activationPreviewKicker').textContent=copy.kicker;
+  if($('#activationPreviewTitle'))$('#activationPreviewTitle').textContent=copy.title;
+  if($('#activationPreviewText'))$('#activationPreviewText').textContent=copy.text;
+  if($('#activationPreviewTerritory'))$('#activationPreviewTerritory').textContent=territory;
+  if($('#activationPreviewChips'))$('#activationPreviewChips').innerHTML=[
+    sponsor,goal,audience,channel,territory
+  ].map(x=>'<span>'+esc(x)+'</span>').join('');
+
+  const visual=$('#activationVisual');
+  if(visual){
+    const maps={
+      'LEDWall Matchday':'linear-gradient(135deg,rgba(5,20,25,.82),rgba(11,80,92,.68)),url("../assets/hero-colico.webp") center/cover',
+      'Sponsor Wall / Interviste':'linear-gradient(135deg,rgba(5,20,25,.88),rgba(30,74,83,.62)),url("../assets/event-insieme.webp") center/cover',
+      'Torneo brandizzato':'linear-gradient(135deg,rgba(5,20,25,.72),rgba(13,101,112,.62)),url("../assets/event-insieme.webp") center/cover',
+      'Gazebo / Partner Corner':'linear-gradient(135deg,rgba(6,30,38,.68),rgba(16,109,121,.56)),url("../assets/event-insieme.webp") center/cover',
+      'Pixellot / Match Content':'linear-gradient(135deg,rgba(5,20,25,.78),rgba(17,74,85,.62)),url("../assets/hero-colico.webp") center/cover',
+      'Supporter Card / Convenzione':'linear-gradient(135deg,#0a5271,#16a3ad)',
+      'Web App Partner Hub':'linear-gradient(135deg,#071419,#0e5969)'
+    };
+    visual.style.background=maps[asset]||'linear-gradient(135deg,rgba(6,28,34,.84),rgba(13,84,99,.72)),url("../assets/hero-colico.webp") center/cover';
+  }
+}
+function initActivationStudio(){
+  const sel=$('#activationSponsor');
+  if(!sel)return;
+  const names=['Nuova azienda / prospect',...sponsors.map(x=>x.name),...proposals.map(x=>x.name)];
+  sel.innerHTML=[...new Set(names)].map(x=>'<option>'+esc(x)+'</option>').join('');
+  ['#activationSponsor','#activationGoal','#activationAsset','#activationAudience','#activationChannel','#activationTerritory']
+    .forEach(id=>$(id)?.addEventListener('change',renderActivationStudio));
+  $('#activationReset')?.addEventListener('click',()=>{
+    ['#activationSponsor','#activationGoal','#activationAsset','#activationAudience','#activationChannel','#activationTerritory'].forEach(id=>{
+      const el=$(id);if(el)el.selectedIndex=0;
+    });
+    renderActivationStudio();
+    if($('#activationSaved'))$('#activationSaved').textContent='Scenario azzerato. Nessuna modifica ai dati CRM.';
+  });
+  $('#activationSave')?.addEventListener('click',()=>{
+    const payload={
+      sponsor:activationValue('#activationSponsor'),
+      goal:activationValue('#activationGoal'),
+      asset:activationValue('#activationAsset'),
+      audience:activationValue('#activationAudience'),
+      channel:activationValue('#activationChannel'),
+      territory:activationValue('#activationTerritory'),
+      savedAt:new Date().toISOString()
+    };
+    localStorage.setItem('scd_activation_scenario_v1',JSON.stringify(payload));
+    if($('#activationSaved'))$('#activationSaved').textContent='Scenario locale salvato alle '+new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'})+'. Nessun invio esterno effettuato.';
+    if($('#activationStatus'))$('#activationStatus').textContent='Scenario salvato';
+  });
+  try{
+    const saved=JSON.parse(localStorage.getItem('scd_activation_scenario_v1')||'null');
+    if(saved){
+      const map={activationSponsor:saved.sponsor,activationGoal:saved.goal,activationAsset:saved.asset,activationAudience:saved.audience,activationChannel:saved.channel,activationTerritory:saved.territory};
+      Object.entries(map).forEach(([id,val])=>{const el=$('#'+id);if(el&&val)[...el.options].some((o,i)=>o.text===val?(el.selectedIndex=i,true):false)});
+      if($('#activationSaved'))$('#activationSaved').textContent='Ultimo scenario locale recuperato. Nessun dato è stato inviato all’esterno.';
+      if($('#activationStatus'))$('#activationStatus').textContent='Bozza recuperata';
+    }
+  }catch(e){}
+  renderActivationStudio();
+}
+
+let partnerWallOrder=[];
+function renderPartnerWall(shuffle=false){
+  const el=$('#partnerWallGrid');if(!el)return;
+  if(!partnerWallOrder.length){
+    partnerWallOrder=[...new Set([...sponsors.map(x=>x.name),...proposals.filter(x=>!/SOSPESA/.test(x.status)).map(x=>x.name)])].slice(0,12);
+  }
+  if(shuffle)partnerWallOrder=[...partnerWallOrder].sort(()=>Math.random()-.5);
+  el.innerHTML=partnerWallOrder.map((n,i)=>'<span class="'+(i<3?'selected':'')+'">'+esc(n)+'</span>').join('');
+  $$('#partnerWallGrid span').forEach(x=>x.onclick=()=>x.classList.toggle('selected'));
+}
+$('#shufflePartnerWall')?.addEventListener('click',()=>renderPartnerWall(true));
+renderPartnerWall();
+initActivationStudio();
+
