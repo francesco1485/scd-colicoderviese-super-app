@@ -34,5 +34,7 @@ for(const token of ['initLedProductionHub','renderLedProfileDetail','ledMotionBr
   assert(js.includes(token),'LED Production Hub interaction missing: '+token);
 }
 assert(js.includes("p.logoAssetStatus!=='APPROVED_OFFICIAL_ASSET'"),'final MP4 logo gate missing in UI');
+assert(js.includes('MASTER MP4 BLOCCATO'),'blocked master state missing');
+assert(js.includes('Risoluzione LED nativa: da rilevare alla consegna'),'native LED unresolved notice missing');
 assert(!js.includes("fetch('/config/sponsor-motion-profiles.json'"),'must not use public config bypass');
 console.log('LED production contract PASS');
