@@ -90,6 +90,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: scd-r24-runtime-visual-qa
-          path: test-output/*.png
+          path: test-output/*
           if-no-files-found: ignore
           retention-days: 14
