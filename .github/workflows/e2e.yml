@@ -37,6 +37,8 @@ jobs:
         run: npm run test:intake-contract
       - name: Intake signed link security gate
         run: npm run test:intake-links
+      - name: Sponsor operations contract gate
+        run: npm run test:sponsor-operations
       - name: Syntax check
         run: |
           node --check app.js
@@ -62,6 +64,8 @@ jobs:
           node --check scd-adaptive-engine.js
           node --check scd-meta-engine.js
           node --check scd-twin.js
+          node --check sponsor/app.js
+          node --check scripts/validate-sponsor-operations.mjs
       - name: API contract gate
         run: npm run test:contract
       - name: Upstream resilience gate
