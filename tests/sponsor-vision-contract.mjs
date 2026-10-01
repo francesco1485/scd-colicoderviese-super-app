@@ -6,6 +6,7 @@ function assert(c,m){if(!c)fail(m)}
 const pub=fs.readFileSync(new URL('../sponsor/index.html',import.meta.url),'utf8');
 const app=fs.readFileSync(new URL('../sponsor/app.html',import.meta.url),'utf8');
 const js=fs.readFileSync(new URL('../sponsor/app.js',import.meta.url),'utf8');
+const pubJs=fs.readFileSync(new URL('../sponsor/sponsor.js',import.meta.url),'utf8');
 
 for(const token of [
   'LEDWall SCD',
@@ -53,7 +54,7 @@ assert(pub.includes('sponsor-wall-experience'),'public Sponsor Wall experience m
 assert(pub.includes('data-wall-mode="INTERVISTE"'),'Sponsor Wall interview mode missing');
 assert(pub.includes('data-wall-mode="EVENTI"'),'Sponsor Wall event mode missing');
 assert(pub.includes('data-wall-mode="WEB"'),'Sponsor Wall web mode missing');
-assert(js.includes('setSponsorWallMode'),'Sponsor Wall interaction missing');
+assert(pubJs.includes('setSponsorWallMode'),'Sponsor Wall interaction missing');
 
 for(const token of [
   'SCD Partner OS',
@@ -136,7 +137,6 @@ assert(js.includes('async function hydratePartnerHubDetail'),'Partner Hub CRM de
 assert(js.includes('data.agreements'),'Partner Hub agreement hydration missing');
 assert(js.includes('data.touchpoints'),'Partner Hub touchpoint hydration missing');
 
-const pubJs=fs.readFileSync(new URL('../sponsor/sponsor.js',import.meta.url),'utf8');
 assert(pubJs.includes('const $=s=>Array.from(document.querySelectorAll(s));'),'public multi-selector helper missing');
 assert(!pubJs.includes('const $=s=>Array.from(document.querySelectorAll(s));'),'public selector helper duplicated');
 
