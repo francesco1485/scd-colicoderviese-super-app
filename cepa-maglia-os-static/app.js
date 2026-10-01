@@ -14,6 +14,7 @@ const isManager=()=>['super_admin','supervisor','manager'].includes(window.userR
 const isAccessApprover=()=>window.userId===ACCESS_APPROVER_ID&&String(window.userEmail||'').toLowerCase()===ACCESS_APPROVER_EMAIL
 const viewMeta={
  home:['Quadro generale','Agenzia Generale HDI · Ecosistema di competenze, relazioni e sviluppo'],
+ personalCrm:['Il mio CRM','Scrivania personale adattiva · clienti, attività, pipeline, sede e priorità'],
  operatingPlan:['Piano Operativo','Architettura, dati, metodo, roadmap e sviluppo continuo di MAGLIA 360'],
  products:['Clienti & Portafoglio','Cliente 360, motore portafoglio, pipeline commerciale e catalogo prodotti'],
  collaborators:['Collaboratori & Guadagni','Ruoli, competenze e remunerazioni differenziate per attività e prodotto'],
@@ -34,6 +35,7 @@ const viewMeta={
 let ecosystem=[],projects=[],actions=[],marketHubs=[],marketEntities=[],contacts=[],timeline=[],documents=[],partnerRequirements=[],blueprints=[],subjects=[],initiatives=[],cepaContent=[],cepaAcademy=[],cepaSpeakers=[],products=[],productKnowledge=[],comparisons=[],collaborators=[],collaboratorTerms=[],portfolioSnapshots=[],businessAssessments=[],growthKits=[],distributionWatchlists=[],distributionCandidates=[],distributionEvidence=[],mailTemplates=[],mailDrafts=[],cepaExpansion=[],cepaReadiness=[],assistantMessages=[],recoveryRows=[],members=[],liaCapabilities=[],liaFolders=[],liaOrders=[],liaFiles=[],researchSources=[],researchInsights=[],liaActionRules=[],liaApprovals=[],roleViewAccess=[],liaAutomationRuns=[],assetRegistry=[],expertProtocols=[],uxUsageEvents=[],accessRequests=[],commercialLeads=[],publicShowcase=[]
 let officeAssignments=[],officeMessages=[],officeSnapshots=[],officeCases=[],officeWorkflow=[],officeCepaActivities=[],officeImports=[]
 let commercialClients=[],pipelineCases=[],clientCheckups=[],clientInteractions=[],clientWorkItems=[],clientPolicies=[]
+let crmProfiles=[],crmModules=[]
 let currentPartnerId=null,currentOfficeId=null,currentOfficeProductId=null,currentCepaHubId=null,currentCommerceTab='clients'
 
 function msg(text,error=false){$('loginMsg').textContent=text;$('loginMsg').className='message'+(error?' error':'')}
@@ -347,6 +349,7 @@ function setCepaShell(active){
   ws.classList.toggle('cepa-shell',!!active)
 }
 function accessForView(view){
+  if(view==='personalCrm')return'manage'
   if(view==='accessAdmin')return isAccessApprover()?'manage':'hidden'
   if(view==='operatingPlan')return isManager()?'manage':'read'
   if(isManager())return'manage'
@@ -669,19 +672,234 @@ async function loadAll(){
     supabase.from('ux_usage_events').select('*').eq('organization_id',window.orgId).order('created_at',{ascending:false}).limit(500),
     isAccessApprover()?supabase.from('public_access_requests').select('*').eq('organization_id',window.orgId).order('created_at',{ascending:false}).limit(250):Promise.resolve({data:[],error:null}),
     isAccessApprover()?supabase.from('public_commercial_leads').select('*').eq('organization_id',window.orgId).order('created_at',{ascending:false}).limit(250):Promise.resolve({data:[],error:null}),
-    isAccessApprover()?supabase.from('public_showcase_items').select('*').eq('organization_id',window.orgId).order('sort_order').order('title'):Promise.resolve({data:[],error:null})
+    isAccessApprover()?supabase.from('public_showcase_items').select('*').eq('organization_id',window.orgId).order('sort_order').order('title'):Promise.resolve({data:[],error:null}),
+    supabase.from('crm_user_profiles').select('*').eq('organization_id',window.orgId).eq('user_id',window.userId).limit(1),
+    supabase.from('crm_user_modules').select('*').eq('organization_id',window.orgId).eq('user_id',window.userId).order('sort_order')
   ]
   const res=await Promise.all(q)
   const err=res.find(x=>x.error)?.error
   if(err){console.error(err);$('refreshBtn').textContent='!';return}
-  ;[ecosystem,projects,actions,marketHubs,marketEntities,contacts,timeline,documents,partnerRequirements,blueprints,subjects,initiatives,cepaContent,cepaAcademy,cepaSpeakers,products,productKnowledge,comparisons,collaborators,collaboratorTerms,portfolioSnapshots,businessAssessments,growthKits,distributionWatchlists,distributionCandidates,distributionEvidence,mailTemplates,mailDrafts,cepaExpansion,cepaReadiness,assistantMessages,liaCapabilities,liaFolders,liaOrders,liaFiles,researchSources,researchInsights,liaActionRules,liaApprovals,roleViewAccess,liaAutomationRuns,officeAssignments,officeMessages,officeSnapshots,officeCases,officeWorkflow,officeCepaActivities,officeImports,commercialClients,pipelineCases,clientCheckups,clientInteractions,clientWorkItems,clientPolicies,assetRegistry,expertProtocols,uxUsageEvents,accessRequests,commercialLeads,publicShowcase]=res.map(x=>x.data||[])
+  ;[ecosystem,projects,actions,marketHubs,marketEntities,contacts,timeline,documents,partnerRequirements,blueprints,subjects,initiatives,cepaContent,cepaAcademy,cepaSpeakers,products,productKnowledge,comparisons,collaborators,collaboratorTerms,portfolioSnapshots,businessAssessments,growthKits,distributionWatchlists,distributionCandidates,distributionEvidence,mailTemplates,mailDrafts,cepaExpansion,cepaReadiness,assistantMessages,liaCapabilities,liaFolders,liaOrders,liaFiles,researchSources,researchInsights,liaActionRules,liaApprovals,roleViewAccess,liaAutomationRuns,officeAssignments,officeMessages,officeSnapshots,officeCases,officeWorkflow,officeCepaActivities,officeImports,commercialClients,pipelineCases,clientCheckups,clientInteractions,clientWorkItems,clientPolicies,assetRegistry,expertProtocols,uxUsageEvents,accessRequests,commercialLeads,publicShowcase,crmProfiles,crmModules]=res.map(x=>x.data||[])
   renderEverything()
+  syncCrmLearning(false).catch(error=>console.warn('CRM learning',error?.message||error))
   $('refreshBtn').textContent='↻'
 }
 
 function renderEverything(){
-  renderPartnerNav();renderHome();renderOperatingPlan();renderCepaHub();renderCepaTerritory();renderOffice();renderOfficeProduct();renderPartner();renderProducts();renderCommerceWorkspace();renderCollaborators();renderGrowthKits();renderComparisons();renderMail();renderCepa();renderTerritories();renderDocuments();renderDevelopment();renderNetworkRadar();renderActions();renderAssistantHistory();renderLiaWorkbench();renderAccessAdmin();applyRoleViewAccess();renderHeaderControls()
+  renderPartnerNav();renderHome();renderPersonalCRM();renderOperatingPlan();renderCepaHub();renderCepaTerritory();renderOffice();renderOfficeProduct();renderPartner();renderProducts();renderCommerceWorkspace();renderCollaborators();renderGrowthKits();renderComparisons();renderMail();renderCepa();renderTerritories();renderDocuments();renderDevelopment();renderNetworkRadar();renderActions();renderAssistantHistory();renderLiaWorkbench();renderAccessAdmin();applyRoleViewAccess();renderHeaderControls()
 }
+
+
+const CRM_MODULE_META={
+  today:{label:'Oggi',desc:'Attività, scadenze e prossime azioni',target:'actions'},
+  clients:{label:'Clienti',desc:'Relazioni e Cliente 360',target:'clients'},
+  pipeline:{label:'Pipeline',desc:'Opportunità e avanzamento commerciale',target:'pipeline'},
+  portfolio:{label:'Portafoglio',desc:'Polizze, rinnovi e sviluppo',target:'portfolio'},
+  office:{label:'Sede',desc:'Priorità e lavoro della sede',target:'office'},
+  partners:{label:'Partner',desc:'Dossier, referenti e opportunità',target:'partners'},
+  collaborators:{label:'Collaboratori',desc:'Rete, performance e sviluppo',target:'collaborators'},
+  cepa:{label:'C.E.P.A.',desc:'Programmi, territorio e attività',target:'cepa'},
+  research:{label:'Ricerca & Sviluppo',desc:'Radar, segnali e innovazione',target:'liaWorkbench'},
+  documents:{label:'Documenti',desc:'Pratiche, accordi e materiali',target:'documents'}
+}
+function crmProfile(){return crmProfiles[0]||null}
+function crmPersonalWork(){
+  const ownClient=clientWorkItems.filter(x=>!['completed','cancelled'].includes(x.status)&&(x.assigned_to===window.userId||(isManager()&&!x.assigned_to)))
+  const strategic=actions.filter(x=>!['completed','cancelled'].includes(x.status)&&(x.assigned_to===window.userId||(isManager()&&!x.assigned_to)))
+  return[
+    ...ownClient.map(x=>({...x,_source:'client',_label:x.title,_target:'products'})),
+    ...strategic.map(x=>({...x,_source:'strategic',_label:x.title,_target:'actions'}))
+  ]
+}
+function crmPersonalPipeline(){
+  return pipelineCases.filter(x=>!['won','lost','closed'].includes(x.stage)&&(x.assigned_to===window.userId||(isManager()&&!x.assigned_to)))
+}
+function crmUserEvents30d(){
+  const since=Date.now()-30*86400000
+  return uxUsageEvents.filter(x=>x.user_id===window.userId&&new Date(x.created_at).getTime()>=since)
+}
+function crmModuleUsage(key){
+  const events=crmUserEvents30d()
+  const viewMap={
+    today:['personalCrm','home','actions'],
+    clients:['products'],
+    pipeline:['products'],
+    portfolio:['products'],
+    office:['office','officeProduct'],
+    partners:['partner'],
+    collaborators:['collaborators','growthKits'],
+    cepa:['cepa','cepaTerritory','territories'],
+    research:['liaWorkbench','networkRadar','development'],
+    documents:['documents']
+  }
+  return events.filter(e=>{
+    if(String(e.action_key||'').includes('crm_module_'+key))return true
+    if(key==='clients'&&e.action_key==='commerce_tab_clients')return true
+    if(key==='pipeline'&&e.action_key==='commerce_tab_pipeline')return true
+    if(key==='portfolio'&&e.action_key==='commerce_tab_portfolio')return true
+    return(viewMap[key]||[]).includes(e.view_key)
+  })
+}
+function crmModuleUrgency(key){
+  const now=Date.now(),week=now+7*86400000
+  const work=crmPersonalWork()
+  const pipeline=crmPersonalPipeline()
+  const renewals=clientPolicies.filter(policyIsOpen).filter(p=>{const d=daysUntil(p.renewal_date||p.expiry_date);return d!=null&&d>=0&&d<=90}).length
+  const map={
+    today:work.filter(x=>!x.due_at||new Date(x.due_at).getTime()<=week).length,
+    clients:commercialClients.filter(c=>c.next_action_at&&new Date(c.next_action_at).getTime()<=week).length+pipeline.length,
+    pipeline:pipeline.length,
+    portfolio:renewals,
+    office:officeCases.filter(x=>!['completed','cancelled'].includes(x.status)&&accessibleOffices().some(h=>h.id===x.hub_id)).length,
+    partners:actions.filter(x=>x.metadata?.domain==='partner_readiness'&&!['completed','cancelled'].includes(x.status)).length,
+    collaborators:actions.filter(x=>x.metadata?.domain==='collaborator_readiness'&&!['completed','cancelled'].includes(x.status)).length,
+    cepa:officeCepaActivities.filter(x=>!['completed','cancelled'].includes(x.status)).length,
+    research:researchInsights.filter(x=>['observed','reviewed'].includes(x.status)).length,
+    documents:partnerRequirements.filter(x=>!['received','verified','not_applicable'].includes(x.status)).length
+  }
+  return Math.min(100,(map[key]||0)*12)
+}
+function crmModuleScore(m){
+  if(m.pinned)return 1000+Number(m.learned_weight||m.base_weight||0)
+  return Number(m.learned_weight||m.base_weight||0)
+}
+function crmOpenModule(key){
+  recordUxEvent('action','personalCrm','crm_module_'+key,true)
+  const target=CRM_MODULE_META[key]?.target
+  if(target==='clients'||target==='pipeline'||target==='portfolio')return openCommerceTab(target)
+  if(target==='office'){
+    const office=accessibleOffices()[0]
+    return office?openOffice(office.id):navigate('home')
+  }
+  if(target==='partners'){
+    const first=ecosystem[0]
+    return first?openPartner(first.id):navigate('home')
+  }
+  if(target)navigate(target)
+}
+async function toggleCrmPin(id){
+  const row=crmModules.find(x=>x.id===id);if(!row)return
+  const pinned=!row.pinned
+  const{error}=await supabase.from('crm_user_modules').update({pinned,manual_lock:pinned,updated_at:new Date().toISOString()}).eq('id',id).eq('organization_id',window.orgId).eq('user_id',window.userId)
+  if(error)return alert(error.message)
+  row.pinned=pinned;row.manual_lock=pinned
+  renderPersonalCRM()
+}
+async function setCrmAdaptation(enabled){
+  const p=crmProfile();if(!p)return
+  const patch={adaptation_enabled:enabled,adaptation_mode:enabled?'adaptive':'manual',updated_at:new Date().toISOString()}
+  const{error}=await supabase.from('crm_user_profiles').update(patch).eq('id',p.id).eq('organization_id',window.orgId).eq('user_id',window.userId)
+  if(error)return alert(error.message)
+  Object.assign(p,patch)
+  renderPersonalCRM()
+  if(enabled)syncCrmLearning(true)
+}
+async function syncCrmLearning(force=false){
+  const p=crmProfile()
+  if(!p||!p.adaptation_enabled||!crmModules.length)return
+  if(!force&&p.last_learning_at&&Date.now()-new Date(p.last_learning_at).getTime()<6*3600000)return
+  const events=crmUserEvents30d()
+  const updates=[]
+  for(const m of crmModules){
+    if(m.manual_lock)continue
+    const uses=crmModuleUsage(m.module_key)
+    const usageScore=Math.min(100,uses.length*8)
+    const urgency=crmModuleUrgency(m.module_key)
+    const base=Number(m.base_weight||50)
+    const learned=Math.max(0,Math.min(100,Math.round(base*.55+usageScore*.25+urgency*.20)))
+    const last=uses.map(x=>x.created_at).sort().reverse()[0]||null
+    updates.push({...m,learned_weight:learned,usage_count_30d:uses.length,last_used_at:last,updated_at:new Date().toISOString()})
+  }
+  if(updates.length){
+    const payload=updates.map(x=>({
+      id:x.id,organization_id:x.organization_id,user_id:x.user_id,module_key:x.module_key,visible:x.visible,pinned:x.pinned,
+      manual_lock:x.manual_lock,sort_order:x.sort_order,base_weight:x.base_weight,learned_weight:x.learned_weight,
+      usage_count_30d:x.usage_count_30d,last_used_at:x.last_used_at,config:x.config,updated_at:x.updated_at
+    }))
+    const{error}=await supabase.from('crm_user_modules').upsert(payload,{onConflict:'id'})
+    if(error)throw error
+    updates.forEach(u=>{const row=crmModules.find(x=>x.id===u.id);if(row)Object.assign(row,u)})
+  }
+  const confidence=Math.min(100,Math.round(Math.sqrt(events.length)*12))
+  const learnedContext={
+    ...(p.learned_context||{}),
+    events_30d:events.length,
+    open_work:crmPersonalWork().length,
+    open_pipeline:crmPersonalPipeline().length,
+    accessible_offices:accessibleOffices().length,
+    last_reason:'usage + workload + role baseline'
+  }
+  const now=new Date().toISOString()
+  const{error:pe}=await supabase.from('crm_user_profiles').update({learning_confidence:confidence,learned_context:learnedContext,last_learning_at:now,onboarding_stage:confidence>=70?'mature':confidence>=30?'active':'learning',updated_at:now}).eq('id',p.id).eq('organization_id',window.orgId).eq('user_id',window.userId)
+  if(pe)throw pe
+  Object.assign(p,{learning_confidence:confidence,learned_context:learnedContext,last_learning_at:now,onboarding_stage:confidence>=70?'mature':confidence>=30?'active':'learning'})
+  renderPersonalCRM()
+}
+function renderPersonalCRM(){
+  if(!$('crmAdaptiveModules'))return
+  const p=crmProfile()
+  const work=crmPersonalWork()
+  const pipeline=crmPersonalPipeline()
+  const now=Date.now(),endToday=new Date();endToday.setHours(23,59,59,999)
+  const urgentWork=work.filter(x=>x.priority==='urgent'||x.priority==='high'||(x.due_at&&new Date(x.due_at).getTime()<=endToday.getTime()))
+  const overdue=work.filter(x=>x.due_at&&new Date(x.due_at).getTime()<=endToday.getTime())
+  $('crmTodayCount').textContent=work.length
+  $('crmOverdueCount').textContent=overdue.length
+  $('crmPipelineCount').textContent=pipeline.length
+  $('crmClientCount').textContent=commercialClients.length
+  $('crmPersonaLabel').textContent=(p?.persona_type||window.userRole||'standard').replaceAll('_',' ')
+  $('crmProfileBadge').textContent=p?.adaptation_enabled?'Standard + adattamento automatico':'Configurazione manuale'
+  const confidence=Number(p?.learning_confidence||0)
+  $('crmLearningMeter').style.width=confidence+'%'
+  $('crmLearningLabel').textContent=confidence<25?'Apprendimento iniziale':confidence<60?'Sta riconoscendo il tuo modo di lavorare':confidence<85?'Profilo operativo consolidato':'Profilo maturo · continua a evolvere'
+  $('crmAdaptToggle').checked=!!p?.adaptation_enabled
+  $('crmAdaptToggle').onchange=e=>setCrmAdaptation(e.target.checked)
+  $('crmRelearnBtn').disabled=!p?.adaptation_enabled
+  $('crmRelearnBtn').onclick=()=>syncCrmLearning(true)
+  $('crmOpenActionsBtn').onclick=()=>navigate('actions')
+
+  const focus=[
+    ...urgentWork.map(x=>({type:x._source==='client'?'ATTIVITÀ CLIENTE':'AZIONE',title:x._label,detail:[x.priority,x.due_at?fmtDateTime(x.due_at):null,x.next_action].filter(Boolean).join(' · '),score:(x.priority==='urgent'?100:x.priority==='high'?80:60),open:()=>x._source==='client'&&x.client_id?openClient360(x.client_id):navigate('actions')})),
+    ...pipeline.slice(0,8).map(x=>{const c=x.clients||commercialClients.find(k=>k.id===x.client_id)||{};return{type:'PIPELINE',title:clientDisplayName(c),detail:pipelineLabel(x.pipeline)+' · '+pipelineStageLabel(x.stage)+(x.reason?' · '+x.reason:''),score:70,open:()=>openPipelineCase(x.id)}})
+  ].sort((a,b)=>b.score-a.score).slice(0,10)
+  $('crmFocusList').innerHTML=focus.map((x,i)=>'<button type="button" class="crm-focus-row" data-crm-focus="'+i+'"><b>'+String(i+1).padStart(2,'0')+'</b><div><span>'+esc(x.type)+'</span><strong>'+esc(x.title)+'</strong><small>'+esc(x.detail||'Prossima azione da definire')+'</small></div><i>→</i></button>').join('')||empty('Nessuna priorità personale urgente. Il CRM continuerà a osservare il lavoro assegnato.')
+  document.querySelectorAll('[data-crm-focus]').forEach(b=>b.onclick=()=>focus[Number(b.dataset.crmFocus)]?.open())
+
+  const modules=crmModules.filter(x=>x.visible).sort((a,b)=>Number(b.pinned)-Number(a.pinned)||crmModuleScore(b)-crmModuleScore(a)||a.sort_order-b.sort_order)
+  $('crmModuleCount').textContent=modules.length+' moduli'
+  $('crmAdaptiveModules').innerHTML=modules.map((m,i)=>{
+    const meta=CRM_MODULE_META[m.module_key]||{label:m.module_key,desc:'Modulo CRM'}
+    const usage=m.usage_count_30d||0,urg=crmModuleUrgency(m.module_key)
+    const why=m.pinned?'Fissato da te':urg>=60?'Sale per carico di lavoro':usage>=5?'Sale perché lo usi spesso':'Priorità standard del tuo profilo'
+    return '<article class="crm-module-card '+(m.pinned?'pinned':'')+'" data-crm-module="'+m.module_key+'"><header><span>'+String(i+1).padStart(2,'0')+'</span><button type="button" data-crm-pin="'+m.id+'" title="'+(m.pinned?'Sblocca':'Fissa')+'">'+(m.pinned?'●':'○')+'</button></header><h3>'+esc(meta.label)+'</h3><p>'+esc(meta.desc)+'</p><div class="crm-module-weight"><i style="width:'+Math.min(100,Number(m.learned_weight||m.base_weight||0))+'%"></i></div><small>'+esc(why)+' · uso 30 gg '+usage+'</small></article>'
+  }).join('')
+  document.querySelectorAll('[data-crm-module]').forEach(card=>card.onclick=e=>{if(e.target.closest('[data-crm-pin]'))return;crmOpenModule(card.dataset.crmModule)})
+  document.querySelectorAll('[data-crm-pin]').forEach(b=>b.onclick=e=>{e.stopPropagation();toggleCrmPin(b.dataset.crmPin)})
+
+  const dueClients=commercialClients.slice().sort((a,b)=>{
+    const ta=a.next_action_at?new Date(a.next_action_at).getTime():Number.MAX_SAFE_INTEGER
+    const tb=b.next_action_at?new Date(b.next_action_at).getTime():Number.MAX_SAFE_INTEGER
+    return ta-tb
+  }).slice(0,7)
+  $('crmClientList').innerHTML=dueClients.map(c=>'<button type="button" data-crm-client="'+c.id+'"><div><strong>'+esc(clientDisplayName(c))+'</strong><small>'+esc([c.city,c.province,c.metadata?.producer].filter(Boolean).join(' · ')||'Cliente 360')+'</small></div><span>'+(c.next_action_at?esc(fmtDateTime(c.next_action_at)):'Apri')+'</span></button>').join('')||empty('Nessun cliente disponibile nel perimetro corrente.')
+  document.querySelectorAll('[data-crm-client]').forEach(b=>b.onclick=()=>openClient360(b.dataset.crmClient))
+
+  $('crmPipelineList').innerHTML=pipeline.slice(0,7).map(x=>{const c=x.clients||commercialClients.find(k=>k.id===x.client_id)||{};return'<button type="button" data-crm-pipeline="'+x.id+'"><div><strong>'+esc(clientDisplayName(c))+'</strong><small>'+esc(pipelineLabel(x.pipeline)+' · '+pipelineStageLabel(x.stage))+'</small></div><span>'+esc(x.estimated_value?currency(x.estimated_value):'Apri')+'</span></button>'}).join('')||empty('Nessuna opportunità personale aperta.')
+  document.querySelectorAll('[data-crm-pipeline]').forEach(b=>b.onclick=()=>openPipelineCase(b.dataset.crmPipeline))
+
+  $('crmOfficeList').innerHTML=accessibleOffices().map(h=>'<button type="button" data-crm-office="'+h.id+'"><div><strong>'+esc(h.name||h.city)+'</strong><small>'+esc([h.city,h.address].filter(Boolean).join(' · '))+'</small></div><span>'+esc(officeAssignments.find(x=>x.hub_id===h.id&&x.user_id===window.userId)?.access_level||'direzione')+'</span></button>').join('')||empty('Nessuna sede assegnata.')
+  document.querySelectorAll('[data-crm-office]').forEach(b=>b.onclick=()=>openOffice(b.dataset.crmOffice))
+  document.querySelectorAll('[data-crm-open]').forEach(b=>b.onclick=()=>crmOpenModule(b.dataset.crmOpen))
+
+  const top=modules.slice(0,3).map(m=>CRM_MODULE_META[m.module_key]?.label||m.module_key)
+  $('crmLearningPanel').innerHTML=
+    '<div><span>Profilo</span><strong>'+esc(p?.persona_type||'standard')+'</strong></div>'+
+    '<div><span>Confidenza</span><strong>'+Math.round(confidence)+'%</strong></div>'+
+    '<div><span>Segnali 30 gg</span><strong>'+crmUserEvents30d().length+'</strong></div>'+
+    '<div><span>Moduli prioritari</span><strong>'+esc(top.join(' · ')||'—')+'</strong></div>'+
+    '<p>Il modello usa ruolo iniziale, utilizzo recente e carico operativo. Non cambia permessi, dati o moduli fissati manualmente.</p>'
+}
+
 
 function renderOperatingPlan(){
   if(!$('planEngineGrid'))return
@@ -701,6 +919,7 @@ function renderOperatingPlan(){
     pipelineCases.length>0,
     portfolioSnapshots.length>0,
     clientPolicies.length>0,
+    crmProfiles.length>0&&crmModules.length>0,
     researchSources.length>0
   ]
   const health=Math.round(checks.filter(Boolean).length/checks.length*100)
@@ -742,6 +961,7 @@ function renderOperatingPlan(){
     ['Cliente 360',commercialClients.length,commercialClients.length?'Perimetro cliente caricato':'Da importare'],
     ['Portafoglio produttori',portfolioSnapshots.length,portfolioSnapshots.length?'Snapshot rete disponibili':'Da importare'],
     ['Pipeline commerciale',pipelineCases.length,pipelineCases.length?'Casi commerciali presenti':'Da attivare'],
+    ['CRM personale',crmModules.length,crmModules.length?'Profilo adattivo attivo':'Da inizializzare'],
     ['Polizze individuali',clientPolicies.length,clientPolicies.length?'Policy Ledger attivo':'Da importare da AssiEasy'],
     ['Snapshot AssiEasy sede/prodotto',officeSnapshots.length,officeSnapshots.length?'Disponibili':'Da importare'],
     ['Workflow pratiche',officeWorkflow.length,officeWorkflow.length?'Configurato':'Da completare'],
@@ -1920,6 +2140,7 @@ function setCommerceTab(tab){
   currentCommerceTab=['clients','portfolio','pipeline','catalog'].includes(tab)?tab:'clients'
   document.querySelectorAll('[data-commerce-tab]').forEach(b=>b.classList.toggle('active',b.dataset.commerceTab===currentCommerceTab))
   document.querySelectorAll('[data-commerce-panel]').forEach(p=>p.classList.toggle('hidden',p.dataset.commercePanel!==currentCommerceTab))
+  if(window.userId)recordUxEvent('action','products','commerce_tab_'+currentCommerceTab,true)
 }
 function renderCommerceWorkspace(){
   if(!$('commerceWorkspaceTabs'))return
