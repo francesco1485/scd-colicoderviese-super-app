@@ -444,6 +444,7 @@ function renderCrmInspector(data){
   el.innerHTML=
     '<div class="crm-profile-head"><small>'+esc(s.TIPO||'PROFILO')+'</small><h2>'+esc(s.NOME||'Profilo')+'</h2><p>'+esc(s.CATEGORIA||'')+'</p></div>'+
     (blocked?'<div class="crm-alert"><b>CONTATTO BLOCCATO</b><span>Policy '+esc(crmPolicyLabel(data.safety?.contactPolicy))+'. Nessun follow-up esterno deve partire automaticamente.</span></div>':'')+
+    (!blocked&&s.EMAIL?'<div class="crm-primary-actions"><button class="btn-yellow" id="crmEmailAction" type="button">✉ Prepara email istituzionale</button></div>':'')+
     '<div class="crm-facts">'+
       '<div><small>STATO</small><b>'+esc(s.STATO_RELAZIONE||'—')+'</b></div>'+
       '<div><small>OWNER</small><b>'+esc(s.OWNER||'—')+'</b></div>'+
@@ -457,6 +458,8 @@ function renderCrmInspector(data){
       (tps.length?tps.slice(0,8).map(x=>'<div class="crm-timeline"><time>'+esc(x.TIMESTAMP||'')+'</time><div><b>'+esc(x.OGGETTO||x.CANALE||'Touchpoint')+'</b><p>'+esc(x.SINTESI||'')+'</p><small>'+esc(x.ESITO||'')+'</small></div></div>').join(''):'<p>Nessun touchpoint registrato.</p>')+
     '</section>'+
     '<section class="crm-section"><h3>Attività e opportunità</h3><p>'+tasks.length+' task collegati · '+opps.length+' opportunità collegate</p></section>';
+  const mailBtn=$('#crmEmailAction');
+  if(mailBtn)mailBtn.onclick=()=>openCrmEmailComposer(data);
 }
 async function loadCrm(){
   crmState.loading=true;crmState.error='';renderCrmTable();
@@ -484,3 +487,120 @@ if($('#crmRefresh'))$('#crmRefresh').onclick=loadCrm;
 if($('#crmSearch'))$('#crmSearch').addEventListener('input',renderCrmTable);
 if($('#crmPolicy'))$('#crmPolicy').addEventListener('change',renderCrmTable);
 loadCrm();
+
+
+/* ===== R40.2 COMUNICAZIONI ISTITUZIONALI ===== */
+const crmMailState={templates:[],preview:null,current:null};
+const crmEmailModal=$('#crmEmailModal');
+const crmEmailForm=$('#crmEmailForm');
+
+async function communicationApi(mode,payload={}){
+  if(mode==='templates'){
+    const r=await fetch('/api/sponsor/communication',{credentials:'same-origin',cache:'no-store'});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok||j.ok===false)throw new Error(j.error||'Template email non disponibili');
+    return j.data||[];
+  }
+  const r=await fetch('/api/sponsor/communication',{
+    method:'POST',credentials:'same-origin',
+    headers:{'content-type':'application/json'},
+    body:JSON.stringify({...payload,mode})
+  });
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok||j.ok===false)throw new Error(j.error||'Operazione email non riuscita');
+  return j.data||{};
+}
+async function ensureCrmMailTemplates(){
+  if(crmMailState.templates.length)return crmMailState.templates;
+  const rows=await communicationApi('templates');
+  crmMailState.templates=Array.isArray(rows)?rows:[];
+  const sel=$('#crmEmailTemplate');
+  if(sel)sel.innerHTML='<option value="">Seleziona template…</option>'+crmMailState.templates.map(t=>
+    '<option value="'+esc(t.id)+'">'+esc(t.category+' · '+t.name)+'</option>'
+  ).join('');
+  return crmMailState.templates;
+}
+function resetCrmMailApproval(){
+  crmMailState.preview=null;
+  const p=$('#crmMailPreview');if(p){p.hidden=true;p.innerHTML=''}
+  const chk=$('#crmEmailConfirm');if(chk)chk.checked=false;
+  const send=$('#crmEmailSendBtn');if(send)send.disabled=true;
+}
+async function openCrmEmailComposer(data){
+  const s=data?.stakeholder||{};
+  if(data?.safety?.externalContactBlocked)return;
+  crmMailState.current=data;
+  resetCrmMailApproval();
+  crmEmailModal.hidden=false;
+  try{
+    await ensureCrmMailTemplates();
+  }catch(e){
+    const p=$('#crmMailPreview');p.hidden=false;p.innerHTML='<div class="crm-mail-error">'+esc(e.message)+'</div>';
+  }
+  crmEmailForm.elements.stakeholderId.value=s.STAKEHOLDER_ID||'';
+  crmEmailForm.elements.to.value=s.EMAIL||'';
+  crmEmailForm.elements.project.value=s.CATEGORIA||'';
+  crmEmailForm.elements.subject.value='';
+  crmEmailForm.elements.message.value='';
+  crmEmailForm.elements.cc.value='';
+  crmEmailForm.elements.nextAction.value=s.PROSSIMA_AZIONE||'';
+  crmEmailForm.elements.nextDeadline.value=/^\d{4}-\d{2}-\d{2}$/.test(String(s.PROSSIMA_SCADENZA||''))?s.PROSSIMA_SCADENZA:'';
+  requestAnimationFrame(()=>$('#crmEmailTemplate')?.focus());
+}
+function closeCrmEmailComposer(){
+  crmEmailModal.hidden=true;
+  resetCrmMailApproval();
+  crmMailState.current=null;
+}
+if($('#closeCrmEmail'))$('#closeCrmEmail').onclick=closeCrmEmailComposer;
+crmEmailModal?.addEventListener('click',e=>{if(e.target===crmEmailModal)closeCrmEmailComposer()});
+crmEmailForm?.addEventListener('input',e=>{
+  if(e.target.id==='crmEmailConfirm'){
+    $('#crmEmailSendBtn').disabled=!(crmMailState.preview&&e.target.checked);
+    return;
+  }
+  resetCrmMailApproval();
+});
+function crmMailPayload(){
+  const fd=new FormData(crmEmailForm);
+  return Object.fromEntries(fd.entries());
+}
+if($('#crmEmailPreviewBtn'))$('#crmEmailPreviewBtn').onclick=async()=>{
+  const p=$('#crmMailPreview');
+  try{
+    if(!crmEmailForm.reportValidity())return;
+    p.hidden=false;p.innerHTML='<div class="crm-mail-loading">Generazione anteprima istituzionale…</div>';
+    const data=await communicationApi('preview',crmMailPayload());
+    crmMailState.preview=data;
+    p.innerHTML='<div class="crm-mail-meta"><b>Da:</b> '+esc(data.sender||'')+'<br><b>A:</b> '+esc(data.to||'')+'<br><b>Firma:</b> '+esc((data.signature?.name||'')+' · '+(data.signature?.role||''))+'<br><b>Oggetto:</b> '+esc(data.subject||'')+'</div><div class="crm-mail-render">'+String(data.html||'')+'</div>';
+    const chk=$('#crmEmailConfirm');chk.checked=false;
+    $('#crmEmailSendBtn').disabled=true;
+  }catch(e){
+    crmMailState.preview=null;
+    p.hidden=false;p.innerHTML='<div class="crm-mail-error">'+esc(e.message||'Anteprima non disponibile')+'</div>';
+  }
+};
+if($('#crmEmailConfirm'))$('#crmEmailConfirm').onchange=e=>{
+  $('#crmEmailSendBtn').disabled=!(crmMailState.preview&&e.target.checked);
+};
+crmEmailForm?.addEventListener('submit',async e=>{
+  e.preventDefault();
+  if(!crmMailState.preview||!$('#crmEmailConfirm').checked)return;
+  const send=$('#crmEmailSendBtn'),preview=$('#crmMailPreview');
+  send.disabled=true;send.textContent='Invio in corso…';
+  try{
+    const payload={...crmMailPayload(),confirm:true};
+    const data=await communicationApi('send',payload);
+    preview.hidden=false;
+    preview.innerHTML='<div class="crm-mail-success"><b>Email inviata e registrata nel CRM.</b><span>ID '+esc(data.mailId||'')+'</span></div>';
+    if(crmState.selected)await openCrmProfile(crmState.selected);
+    await loadCrm();
+    $('#crmEmailConfirm').checked=false;
+  }catch(err){
+    preview.hidden=false;preview.innerHTML='<div class="crm-mail-error">'+esc(err.message||'Invio non riuscito')+'</div>';
+    send.disabled=false;
+  }finally{
+    send.textContent='Invia email istituzionale';
+  }
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&crmEmailModal&&!crmEmailModal.hidden)closeCrmEmailComposer()});
