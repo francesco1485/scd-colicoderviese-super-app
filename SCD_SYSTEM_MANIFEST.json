@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.7.0",
+    "version": "3.8.0",
     "effective_at": "2026-10-01",
     "status": "BINDING",
     "language": "it-IT",
@@ -131,7 +131,7 @@
           "USER_BASE",
           "AUTHORIZED_USERS"
         ],
-        "purpose": "Sintesi dinamica della società adesso: prossima gara, ultimo risultato, settimana, iniziative, news, sponsor, territorio e CTA.",
+        "purpose": "Ingresso pubblico immediato e comprensibile: settimana corrente, ricerca, prossima gara con dati verificati, eventi prossimi, Newsroom settimanale, community, sponsor e percorsi di accesso; avatar e personalizzazione restano successivi e facoltativi.",
         "visual_master": "HOME_PUBBLICA_APPROVED_BOARD",
         "must_not_be": "landing_marketing_lunga"
       },
@@ -2018,7 +2018,8 @@
       "domain": "UI",
       "required": true,
       "state": "PARTIAL",
-      "screen": "HOME_PUBLIC"
+      "screen": "HOME_PUBLIC",
+      "contract": "CURRENT_WEEK_FIRST_SEARCH_MATCH_CENTER_EVENTS_NEWS_COMMUNITY_SPONSORS_JOIN_CLUB"
     },
     {
       "id": "CAP-CALENDAR",
@@ -2117,14 +2118,14 @@
       "domain": "ASSISTANT",
       "required": true,
       "state": "PARTIAL",
-      "contract": "SKY_PLUS_EMBEDDED_SCD_MIRROR"
+      "contract": "FLOATING_CONTEXTUAL_CHATBOT_NOT_HERO_NO_PERMISSION_BYPASS"
     },
     {
       "id": "CAP-AVATAR",
       "domain": "IDENTITY",
       "required": true,
       "state": "PARTIAL",
-      "contract": "LOCAL_AVATAR_PLUS_SCD_TWIN"
+      "contract": "DEFERRED_OPTIONAL_SEARCHABLE_SYNTHETIC_PROFILE_STUDIO"
     },
     {
       "id": "CAP-TAMAGOTCHI",
@@ -2911,6 +2912,61 @@
       "twin": "SYNTHETIC_EVOLVING_IDENTITY",
       "mirror": "CONTEXTUAL_OPERATIONAL_ASSISTANT",
       "tts": "NATIVE_CLIENT_SIDE_BASELINE"
+    },
+    "home_public_entry": {
+      "priority": "CURRENT_WEEK_FIRST",
+      "first_viewport": [
+        "CURRENT_WEEK",
+        "GLOBAL_PUBLIC_SEARCH",
+        "NEXT_MATCH"
+      ],
+      "content_order": [
+        "CURRENT_WEEK",
+        "NEXT_MATCH",
+        "UPCOMING_EVENTS",
+        "WEEKLY_NEWS",
+        "COMMUNITY_POLL",
+        "SPONSOR_RAIL",
+        "JOIN_CLUB"
+      ],
+      "global_search": [
+        "MATCHES",
+        "EVENTS",
+        "NEWS",
+        "TEAMS",
+        "PUBLIC_AUTHORIZED_PROFILES_ONLY"
+      ],
+      "match_center": {
+        "standings": "VERIFIED_STRUCTURED_ONLY",
+        "recent_form": "VERIFIED_STRUCTURED_ONLY",
+        "head_to_head": "VERIFIED_STRUCTURED_ONLY",
+        "missing_data": "DATO_IN_AGGIORNAMENTO",
+        "invented_stats": false
+      },
+      "community_poll": {
+        "surface": "READY",
+        "aggregate_results": "ONLY_FROM_VERIFIED_BACKEND",
+        "local_demo_percentages": false,
+        "mentions": "PUBLIC_OR_EXPLICITLY_AUTHORIZED_PROFILES_ONLY"
+      },
+      "sponsor_rail": "VERIFIED_PARTNERS_ONLY",
+      "sky": "FLOATING_CHATBOT_NOT_HERO",
+      "avatar": {
+        "onboarding_required": false,
+        "configure_after_entry": true,
+        "searchable_catalog": true,
+        "skippable": true
+      },
+      "join_club_paths": [
+        "FAN",
+        "USER_BASE",
+        "ATHLETE_REQUEST",
+        "FAMILY",
+        "STAFF_REQUEST",
+        "PARTNER",
+        "OTHER_AUTHORIZED"
+      ],
+      "role_assignment": "DIRECTION_ONLY"
     }
   },
   "research_intelligence": {
