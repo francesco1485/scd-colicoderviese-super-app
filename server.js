@@ -203,12 +203,16 @@ async function handleSponsorLogin(req,res){
     return json(res,200,{ok:true,isDirection:sponsorDirection(login.user),user:{name:login.user.name,email:login.user.email,role:login.user.role}});
   }catch(e){return json(res,403,{ok:false,error:e.message||'Accesso non autorizzato'})}
 }
-async function handleSponsorSession(req,res){
+async function handleSponsorSession(req,res,u){
   if(req.method!=='GET')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  const probe=String(u?.searchParams?.get('probe')||'')==='1';
   try{
     const s=await validateSponsorSession(req);
-    return json(res,200,{ok:true,isDirection:s.isDirection,user:{name:s.user.name,email:s.user.email,role:s.user.role}});
-  }catch(e){return json(res,401,{ok:false,error:'SESSION_REQUIRED'})}
+    return json(res,200,{ok:true,authenticated:true,isDirection:s.isDirection,user:{name:s.user.name,email:s.user.email,role:s.user.role}});
+  }catch(e){
+    if(probe)return json(res,200,{ok:true,authenticated:false});
+    return json(res,401,{ok:false,error:'SESSION_REQUIRED'});
+  }
 }
 async function handleSponsorLogout(req,res){
   res.setHeader('set-cookie',sponsorCookie(req,'',0));
@@ -706,7 +710,7 @@ http.createServer(async(req,res)=>{
   if(u.pathname==='/api/sponsor/request-access') return handleSponsorAccessRequest(req,res);
   if(u.pathname==='/api/sponsor/otp') return handleSponsorOtp(req,res);
   if(u.pathname==='/api/sponsor/login') return handleSponsorLogin(req,res);
-  if(u.pathname==='/api/sponsor/session') return handleSponsorSession(req,res);
+  if(u.pathname==='/api/sponsor/session') return handleSponsorSession(req,res,u);
   if(u.pathname==='/api/sponsor/logout') return handleSponsorLogout(req,res);
   if(u.pathname==='/api/sponsor/crm') return handleSponsorCrm(req,res,u);
   if(u.pathname==='/api/sponsor/communication') return handleSponsorCommunication(req,res);
