@@ -1538,3 +1538,70 @@ body{background:linear-gradient(180deg,#eef5fb,#f7fbfe 55%,#edf5fb);color:var(--
   .led-production-gate{align-items:flex-start;flex-direction:column}
   .led-detail-actions{justify-content:flex-start}
 }
+
+
+/* ===== R52 GROUNDED VISIONARY SCENE LIBRARY ===== */
+.activation-scene-guide{
+  border:1px solid #d9e7f2;
+  background:linear-gradient(135deg,#f6fbff,#eef6fc);
+  border-radius:14px;
+  padding:12px 14px;
+  display:grid;
+  gap:5px;
+}
+.activation-scene-guide small{font-size:.62rem;letter-spacing:.11em;color:#0870cf;font-weight:900}
+.activation-scene-guide strong{font-size:.82rem;color:#0b4e82}
+.activation-scene-guide span{font-size:.72rem;line-height:1.45;color:#607a91}
+.activation-scene-guide span b{color:#345e7f}
+
+.activation-visual[data-scene="SCENE-COLICO-STADIUM-DAY"]{
+  background:
+    linear-gradient(125deg,rgba(3,26,53,.88),rgba(8,112,207,.48)),
+    url('../assets/hero-colico.webp') center 43%/cover;
+}
+.activation-visual[data-scene="SCENE-MATCH-NIGHT"]{
+  background:
+    radial-gradient(circle at 78% 18%,rgba(32,183,230,.20),transparent 27%),
+    linear-gradient(135deg,rgba(2,10,26,.96),rgba(4,46,89,.83)),
+    url('../assets/hero-colico.webp') center 43%/cover;
+}
+.activation-visual[data-scene="SCENE-MATCH-NIGHT"]:after{
+  content:"";position:absolute;inset:auto 0 0;height:42%;
+  background:linear-gradient(180deg,transparent,rgba(3,16,34,.5));
+  pointer-events:none;
+}
+.activation-visual[data-scene="SCENE-TRIBUNA-LAKE-CONCEPT"]{
+  background:
+    linear-gradient(115deg,rgba(3,26,53,.90) 0%,rgba(6,79,130,.55) 54%,rgba(11,152,221,.18) 100%),
+    url('../assets/hero-colico.webp') center 34%/cover;
+}
+.activation-visual[data-scene="SCENE-TRIBUNA-LAKE-CONCEPT"] .activation-territory-signature:after{
+  content:"CONCEPT VISIVO · NON FOTO DOCUMENTARIA";
+  display:block;margin-top:4px;font-size:.5rem;letter-spacing:.08em;color:#ffe98a;font-weight:900;
+}
+.activation-visual[data-scene="SCENE-PARTNER-TERRITORY"]{
+  background:
+    linear-gradient(120deg,rgba(3,26,53,.92),rgba(8,112,207,.55)),
+    url('../assets/hero-colico.webp') center/cover;
+}
+.activation-visual[data-scene="SCENE-FAMILY-TOURNAMENT"]{
+  background:
+    linear-gradient(120deg,rgba(3,26,53,.76),rgba(8,112,207,.42)),
+    url('../assets/event-insieme.webp') center/cover;
+}
+.activation-visual[data-scene="SCENE-SPONSOR-WALL"]{
+  background:
+    linear-gradient(135deg,#052e59,#0870cf);
+}
+.activation-visual[data-scene="SCENE-SPONSOR-WALL"]:before{
+  background-image:
+    linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px);
+  background-size:92px 58px;
+  opacity:.45;
+}
+.activation-visual[data-scene="SCENE-CARD-LIFESTYLE"]{
+  background:
+    radial-gradient(circle at 76% 18%,rgba(255,213,0,.22),transparent 25%),
+    linear-gradient(135deg,#031a35,#0870cf 62%,#0b98dd);
+}
