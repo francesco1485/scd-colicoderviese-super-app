@@ -36,7 +36,7 @@ if(!html.includes('scd-meta-engine.js')) fail('canonical Meta engine not mounted
 if(!html.includes('scd-twin.js')) fail('canonical Twin engine not mounted');
 
 const preview=manifest.architecture?.nextgen_preview;
-if(preview?.state!=='PREVIEW_NOT_PRODUCTION_PRIMARY') fail('preview must remain non-primary until promotion');
+if(!['PREVIEW_NOT_PRODUCTION_PRIMARY','PRODUCTION_PRIMARY'].includes(preview?.state)) fail('invalid NextGen runtime state');
 if(preview?.frontend_api_topology!=='SAME_ORIGIN') fail('same-origin topology missing');
 if(preview?.visual_mode!=='SYNTHETIC_NO_REAL_PHOTOGRAPHY') fail('synthetic visual mode missing');
 if(manifest.visual_system?.media_policy?.nextgen_real_photography_in_ui!==false) fail('real photography must be disabled in NextGen UI');
