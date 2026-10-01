@@ -325,6 +325,140 @@ function renderMentions(q=''){
 }
 $('#mentionSearch')?.addEventListener('input',e=>renderMentions(e.target.value));
 
+
+function readPrivateSession(){
+ try{return JSON.parse(localStorage.getItem(PRIVATE_SESSION_KEY)||'{}')}catch{return {}}
+}
+function savePrivateSession(token,email){
+ state.privateToken=String(token||'');state.privateEmail=String(email||'');
+ localStorage.setItem(PRIVATE_SESSION_KEY,JSON.stringify({token:state.privateToken,email:state.privateEmail,savedAt:new Date().toISOString()}));
+}
+function clearPrivateSession(){
+ state.privateToken='';state.privateEmail='';state.privateData=null;state.workspace=null;state.privateError='';
+ localStorage.removeItem(PRIVATE_SESSION_KEY);
+}
+async function privatePost(action,payload={},token=state.privateToken){
+ const r=await fetch(API_BASE+'/api/scd',{method:'POST',headers:{'content-type':'application/json','x-scd-client':'private-desk'},body:JSON.stringify({action,payload,sessionToken:String(token||'')})});
+ const j=await r.json().catch(()=>({ok:false,error:'Risposta privata non valida'}));
+ if(!r.ok||j.ok===false)throw new Error(j.error||'Funzione riservata non disponibile');
+ return j.data||j;
+}
+function legacyWorkspace(data={}){
+ const u=data.user||{},p=data.permissions||{},mods=['CALENDARIO'];
+ if(u.staff||p.direction)mods.push('COMUNICAZIONI');
+ if(data.transport)mods.push('PULMINI');
+ if(Array.isArray(data.personal)&&data.personal.length)mods.push('TESSERATI');
+ if(p.direction)mods.push('APPROVAZIONI','DOCUMENTI','CRM');
+ return {email:String(u.email||state.privateEmail||''),name:String(u.name||u.fullName||u.email||'Profilo SCD'),role:String(u.role||u.coreRole||u.type||(p.direction?'DIREZIONE':'STAFF')),privateDeskProfile:'R20_FALLBACK',defaultModules:[...new Set(mods)],communicationScope:[],dataScope:['R20 DASHBOARD'],areas:[]};
+}
+async function loadWorkspaceProfile(){
+ try{return await privatePost('private.user.workspace',{})}
+ catch(err){
+   const msg=String(err?.message||err||'');
+   if(/Azione API non consentita|workspace|non installato|non disponibile/i.test(msg))return null;
+   throw err;
+ }
+}
+const deskModuleMeta={
+ DASHBOARD:['⌂','Dashboard','Priorità e stato operativo'],
+ CALENDARIO:['▦','Calendario','Gare, attività ed eventi'],
+ CRM:['◆','CRM Sponsor','Relazioni, follow-up e opportunità'],
+ CONTRATTI:['▤','Contratti','Accordi e stato delivery'],
+ REPORT:['▥','Report','Evidenze e rendicontazione'],
+ APPROVAZIONI:['✓','Approvazioni','Decisioni riservate'],
+ COMUNICAZIONI:['✉','Comunicazioni','Perimetro e firma di ruolo'],
+ EVENTI:['◫','Eventi','Attività e manifestazioni'],
+ DOCUMENTI:['▣','Documenti','Pratiche e raccolta documentale'],
+ SEGRETERIA:['⌘','Segreteria','Operatività societaria'],
+ SCADENZE:['◷','Scadenze','Promemoria e adempimenti'],
+ KIT:['◈','Kit','Materiali e dotazioni'],
+ PULMINI:['▰','Pulmini','Trasporti e richieste'],
+ TESSERATI:['●','Tesserati','Profili e documenti autorizzati'],
+ TORNEI_EVENTI:['★','Tornei & Eventi','Organizzazione e calendario'],
+ BIGLIETTERIA:['◧','Biglietteria','Accessi e attività evento'],
+ DRIVE_TORNEI:['□','Drive Tornei','Documenti evento autorizzati'],
+ PARTNER_EVENTO:['◇','Partner Evento','Relazioni collegate agli eventi']
+};
+function deskMeta(module){return deskModuleMeta[module]||['•',String(module||'Modulo').replaceAll('_',' '),'Funzione autorizzata dal profilo']}
+function bindPrivateDesk(){
+ const form=$('#privateDeskLoginForm');
+ if(form)form.onsubmit=async e=>{
+   e.preventDefault();
+   const email=String($('#privateDeskEmail')?.value||'').trim(),code=String($('#privateDeskCode')?.value||'').trim(),st=$('#privateDeskLoginState'),btn=$('button[type="submit"]',form);
+   btn.disabled=true;if(st)st.textContent='Verifico account e permessi…';
+   try{
+     const out=await privatePost('auth.login',{email,pin:code,code},'');
+     const token=String(out.token||out.sessionToken||out.accessToken||'');
+     if(!token)throw new Error('Sessione non restituita dal gestionale');
+     savePrivateSession(token,email);await ensurePrivateDesk(true);toast('Private Desk attivato');
+   }catch(err){if(st)st.textContent=String(err.message||err)}
+   finally{btn.disabled=false}
+ };
+ $('#privateDeskRequestCode')?.addEventListener('click',async()=>{
+   const email=String($('#privateDeskEmail')?.value||'').trim(),st=$('#privateDeskLoginState'),btn=$('#privateDeskRequestCode');
+   if(!email){if(st)st.textContent='Inserisci prima la email.';return}
+   btn.disabled=true;
+   try{await privatePost('auth.request',{email},'');if(st)st.textContent='Se l’account è abilitato, il codice temporaneo è stato inviato.'}
+   catch(err){if(st)st.textContent=String(err.message||err)}
+   finally{btn.disabled=false}
+ });
+ $('#privateDeskLogout')?.addEventListener('click',()=>{clearPrivateSession();renderPrivateDesk();toast('Sessione privata chiusa')});
+ $('[data-private-module]').forEach(b=>b.onclick=()=>openPrivateModule(b.dataset.privateModule));
+}
+function renderPrivateDesk(){
+ const queue=$('#actionQueue'),dock=$('#deskServiceDock'),status=$('#deskScopeStatus'),title=$('#deskHeroTitle'),copy=$('#deskHeroCopy');
+ if(!queue||!dock)return;
+ const saved=readPrivateSession(),w=state.workspace;
+ if(!saved.token||!state.privateToken||!w){
+   if(status)status.textContent='ACCESSO RICHIESTO';
+   if(title)title.innerHTML='Il tuo lavoro.<br>Solo quello autorizzato.';
+   if(copy)copy.textContent='Accedi con l’account SCD. Ruolo, moduli e dati vengono assegnati dalla Società.';
+   queue.innerHTML='<form class="desk-auth-card" id="privateDeskLoginForm"><span class="eyebrow">ACCOUNT SCD</span><h3>Accedi al Private Desk</h3><p>Email societaria e PIN/codice temporaneo. Nessun ruolo viene scelto manualmente.</p><label>Email<input id="privateDeskEmail" type="email" autocomplete="email" required value="'+esc(saved.email||'')+'"></label><label>PIN / codice<input id="privateDeskCode" type="password" inputmode="numeric" autocomplete="current-password" required></label><div class="desk-auth-actions"><button class="btn primary" type="submit">Accedi</button><button class="btn glass" type="button" id="privateDeskRequestCode">Richiedi codice</button></div><small id="privateDeskLoginState">'+esc(state.privateError||'')+'</small></form>';
+   dock.innerHTML='<div class="desk-service-empty"><b>Moduli protetti</b><span>Compaiono dopo autenticazione e verifica dello scope.</span></div>';
+   bindPrivateDesk();return;
+ }
+ const modules=[...new Set((w.defaultModules||[]).map(x=>String(x||'').trim().toUpperCase()).filter(Boolean))];
+ if(status)status.textContent=(w.privateDeskProfile||'ROLE / SCOPE').replaceAll('_',' ');
+ if(title)title.innerHTML=esc(w.name||'Private Desk')+'<br><em>'+esc(w.role||'Profilo SCD')+'</em>';
+ if(copy)copy.textContent='Mostro soltanto moduli e dati assegnati al tuo account.';
+ queue.innerHTML='<article class="desk-profile-live"><div><span class="eyebrow">PROFILO OPERATIVO</span><h3>'+esc(w.name||w.email||'Utente SCD')+'</h3><p>'+esc(w.role||'')+' · '+esc(w.privateDeskProfile||'ROLE/SCOPE')+'</p></div><button type="button" id="privateDeskLogout">Esci</button></article><article class="desk-scope-card"><b>Scope dati</b><span>'+esc((w.dataScope||[]).join(' · ')||'Scope dal gestionale')+'</span><b>Comunicazioni</b><span>'+esc((w.communicationScope||[]).join(' · ')||'Secondo ruolo')+'</span></article>';
+ dock.innerHTML=modules.length?modules.map(module=>{const m=deskMeta(module);return '<button type="button" data-private-module="'+esc(module)+'"><span>'+m[0]+'</span><b>'+esc(m[1])+'</b><small>'+esc(m[2])+'</small></button>'}).join(''):'<div class="desk-service-empty"><b>Nessun modulo assegnato</b><span>Il profilo è autenticato ma non ha moduli attivi.</span></div>';
+ bindPrivateDesk();
+}
+async function ensurePrivateDesk(force=false){
+ const saved=readPrivateSession();
+ if(!saved.token){renderPrivateDesk();return}
+ if(state.privateLoading)return;
+ if(!force&&state.privateToken===saved.token&&state.workspace){renderPrivateDesk();return}
+ state.privateLoading=true;state.privateToken=String(saved.token||'');state.privateEmail=String(saved.email||'');state.privateError='';
+ const queue=$('#actionQueue');if(queue)queue.innerHTML='<div class="desk-private-loading"><b>Carico il tuo spazio di lavoro…</b><span>Ruolo, scope e moduli arrivano dal gestionale.</span></div>';
+ try{
+   await privatePost('auth.validate',{token:state.privateToken},state.privateToken);
+   state.privateData=await privatePost('dashboard.summary',{},state.privateToken);
+   let workspace=null;try{workspace=await loadWorkspaceProfile()}catch(err){console.warn('[private-desk] workspace',err)}
+   state.workspace=workspace||legacyWorkspace(state.privateData);renderPrivateDesk();
+ }catch(err){
+   const msg=String(err.message||err);clearPrivateSession();state.privateError=msg;renderPrivateDesk();
+ }finally{state.privateLoading=false}
+}
+function openPrivateModule(module){
+ const w=state.workspace||{},d=state.privateData||{},m=deskMeta(module);
+ if(['CALENDARIO','EVENTI','TORNEI_EVENTI','BIGLIETTERIA'].includes(module)){setView('calendar');return}
+ if(['CRM','CONTRATTI','REPORT','APPROVAZIONI'].includes(module)){
+   const layer=openPanel(m[1],'<div class="panel-detail private-module-panel"><span class="eyebrow">AREA COMMERCIALE RISERVATA</span><h2>'+esc(m[1])+'</h2><p>Questa funzione prosegue nella Sponsor Platform protetta.</p><button class="btn primary" id="deskOpenSponsorPortal">Apri Sponsor Platform</button></div>');
+   $('#deskOpenSponsorPortal',layer).onclick=()=>{location.href='/sponsor/?login=1'};return;
+ }
+ if(module==='DOCUMENTI'){
+   const admin=(w.areas||[]).some(x=>x.canAdmin===true)||String(w.privateDeskProfile||'').toUpperCase()==='EXECUTIVE_FULL';
+   const layer=openPanel('Documenti','<div class="panel-detail private-module-panel"><span class="eyebrow">DOCUMENTI · ROLE/SCOPE</span><h2>'+esc(w.role||'Profilo SCD')+'</h2><p>'+esc(admin?'Accesso agli strumenti amministrativi documentali autorizzato.':'Sono mostrati soltanto i documenti del perimetro assegnato.')+'</p>'+(admin?'<button class="btn primary" id="deskOpenIntakeAdmin">Apri Intake Admin</button>':'')+'</div>');
+   if(admin)$('#deskOpenIntakeAdmin',layer).onclick=()=>{location.href='./intake/admin.html'};return;
+ }
+ if(module==='COMUNICAZIONI'){openPanel('Comunicazioni','<div class="panel-detail private-module-panel"><span class="eyebrow">FIRMA E PERIMETRO</span><h2>'+esc(w.role||'Profilo SCD')+'</h2><p>'+esc((w.communicationScope||[]).join(' · ')||'Perimetro definito dal ruolo')+'</p><small>Invii esterni soggetti a firma, policy e autorizzazioni.</small></div>');return}
+ if(module==='TESSERATI'){const people=Array.isArray(d.personal)?d.personal:[];openPanel('Tesserati','<div class="panel-detail private-module-panel"><span class="eyebrow">PROFILI AUTORIZZATI</span><h2>'+people.length+' profili disponibili</h2><p>'+esc(people.length?people.slice(0,8).map(x=>[x.firstName,x.lastName].filter(Boolean).join(' ')||x.fullName||'Profilo').join(' · '):'Nessun profilo restituito per questo account.')+'</p></div>');return}
+ if(module==='PULMINI'){const k=d.transport?.kpis||{};openPanel('Pulmini & Trasporti','<div class="panel-detail private-module-panel"><span class="eyebrow">LOGISTICA</span><h2>'+esc(String(k.requests??0))+' richieste</h2><p>Dati letti dal dashboard privato corrente.</p></div>');return}
+ openPanel(m[1],'<div class="panel-detail private-module-panel"><span class="eyebrow">PRIVATE DESK</span><h2>'+esc(m[1])+'</h2><p>'+esc(m[2])+'. Modulo assegnato dal profilo '+esc(w.privateDeskProfile||'ROLE/SCOPE')+'.</p></div>');
+}
+
 async function postAction(action,payload){
  const r=await fetch(API_BASE+'/api/scd',{method:'POST',headers:{'content-type':'application/json','x-scd-client':'public-home'},body:JSON.stringify({action,payload,sessionToken:''})});
  const j=await r.json().catch(()=>({ok:false,error:'Risposta non valida'}));
