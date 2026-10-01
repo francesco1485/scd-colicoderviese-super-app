@@ -1625,8 +1625,9 @@ body[data-scd-theme="arena"] select:focus-visible{
   grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);
   gap:24px;
   background:
-    linear-gradient(120deg,rgba(3,39,75,.98),rgba(7,96,156,.91)),
-    url('./assets/hero-colico.webp') center/cover;
+    radial-gradient(circle at 85% 12%,rgba(118,218,255,.22),transparent 28%),
+    radial-gradient(circle at 72% 82%,rgba(255,213,28,.10),transparent 24%),
+    linear-gradient(140deg,#032745 0%,#07558e 56%,#0c8dbe 100%);
   color:#fff;
   box-shadow:0 24px 70px rgba(3,40,76,.2);
   overflow:hidden;
