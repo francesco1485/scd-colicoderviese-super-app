@@ -10,7 +10,75 @@
 <link rel="stylesheet" href="./visual-master-shell.css?v=20261001-v9-recovery360-1220">
 </head>
 <body>
-<section id="loginView" class="login-shell">
+<section id="publicPortal" class="public-portal">
+  <header class="public-header">
+    <div class="public-brand"><div class="public-brand-mark">M</div><div><strong>MAGLIA 360</strong><small>Maglia Assicurazioni · Agenzia Generale HDI</small></div></div>
+    <nav class="public-nav">
+      <button type="button" data-public-scroll="publicInitiatives">Iniziative</button>
+      <button type="button" id="publicPartnerBtn">Partner & Sponsor</button>
+      <button type="button" id="publicAccessBtn">Richiedi accesso</button>
+      <button type="button" id="publicLoginBtn" class="public-login-btn">Area riservata</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="public-hero">
+      <div class="public-hero-copy">
+        <div class="eyebrow">MAGLIA 360 · RELAZIONI, TERRITORIO, SVILUPPO</div>
+        <h1>Idee, competenze e relazioni che diventano progetti concreti.</h1>
+        <p>Una vetrina aperta per imprese, persone, professionisti, partner e realtà del territorio. L’area operativa interna resta riservata e accessibile solo previa autorizzazione.</p>
+        <div class="public-hero-actions">
+          <button type="button" class="primary" id="publicHeroContactBtn">Proponi una collaborazione</button>
+          <button type="button" class="secondary" data-public-scroll="publicInitiatives">Scopri le iniziative</button>
+        </div>
+        <div class="public-trust-strip">
+          <span>Impresa</span><span>Welfare</span><span>C.E.P.A.</span><span>Territorio</span><span>Rete</span><span>Partnership</span>
+        </div>
+      </div>
+      <aside class="public-hero-panel">
+        <span>COME LAVORIAMO</span>
+        <strong>Prima capiamo il bisogno. Poi costruiamo la proposta.</strong>
+        <div><b>01</b><p>Richiesta o candidatura</p></div>
+        <div><b>02</b><p>Valutazione e contatto</p></div>
+        <div><b>03</b><p>Progetto dedicato</p></div>
+        <small>Condizioni economiche e accordi restano riservati e vengono definiti solo dopo il confronto diretto.</small>
+      </aside>
+    </section>
+
+    <section id="publicInitiatives" class="public-section">
+      <div class="public-section-head">
+        <div><span>VETRINA</span><h2>Iniziative e possibilità di collaborazione</h2><p>Le proposte pubblicate qui sono una porta d’ingresso. Nessun costo viene esposto: ogni progetto viene approfondito con il referente interessato.</p></div>
+        <button type="button" class="secondary" id="publicGeneralContactBtn">Raccontaci la tua idea</button>
+      </div>
+      <div id="publicShowcaseGrid" class="public-showcase-grid"><div class="loader">Caricamento iniziative…</div></div>
+    </section>
+
+    <section class="public-section public-sponsor-band">
+      <div>
+        <span>AZIENDE · BRAND · PARTNER</span>
+        <h2>Vuoi sostenere un’iniziativa o costruire qualcosa insieme?</h2>
+        <p>Valutiamo sponsor, partnership, servizi, collaborazioni territoriali e progetti dedicati. La richiesta non comporta impegni e viene presa in carico direttamente.</p>
+      </div>
+      <button type="button" class="primary" id="publicSponsorCta">Diventa sponsor / partner</button>
+    </section>
+
+    <section class="public-section public-access-band">
+      <div>
+        <span>ACCESSO RISERVATO</span>
+        <h2>MAGLIA 360 interno è protetto.</h2>
+        <p>Per collaboratori e soggetti autorizzati l’accesso viene attivato solo dopo verifica amministrativa. Sono richiesti soltanto nome, email e telefono, oltre a una breve indicazione del motivo della richiesta.</p>
+      </div>
+      <div class="public-access-actions"><button type="button" class="secondary" id="publicAccessCta">Richiedi accesso</button><button type="button" class="secondary" id="publicLoginCta">Hai già un accesso</button></div>
+    </section>
+  </main>
+
+  <footer class="public-footer">
+    <strong>MAGLIA 360</strong>
+    <span>Vetrina commerciale e relazionale · area interna ad accesso riservato</span>
+  </footer>
+</section>
+
+<section id="loginView" class="login-shell hidden">
   <div class="login-story">
     <div class="brand-seal">M</div>
     <div class="eyebrow light">MAGLIA 360 · SISTEMA OPERATIVO COMMERCIALE</div>
@@ -32,9 +100,25 @@
       <label>Email<input id="email" type="email" autocomplete="email" required></label>
       <label>Password<input id="password" type="password" autocomplete="current-password" minlength="8" required></label>
       <button class="primary" type="submit">Accedi</button>
-      <button class="secondary" type="button" id="signupBtn">Attiva account autorizzato</button>
+      <button class="secondary" type="button" id="signupBtn">Richiedi accesso autorizzato</button>
+      <button class="login-back-public" type="button" id="backToPublicBtn">← Torna alla vetrina</button>
     </form>
     <div id="loginMsg" class="message hidden"></div>
+    <p class="login-security-note">Non è possibile creare autonomamente un account. Ogni nuova utenza deve essere approvata dall’amministratore autorizzato.</p>
+  </div>
+</section>
+
+<section id="resetPasswordView" class="reset-password-shell hidden">
+  <div class="reset-password-card">
+    <div class="eyebrow">ATTIVAZIONE ACCESSO</div>
+    <h2>Imposta la tua password personale</h2>
+    <p>L’amministratore ha autorizzato l’accesso. La credenziale temporanea non viene mai mostrata o inviata in chiaro: scegli ora una password personale.</p>
+    <form id="resetPasswordForm" class="form">
+      <label>Nuova password<input id="resetPassword" type="password" autocomplete="new-password" minlength="10" required></label>
+      <label>Conferma password<input id="resetPasswordConfirm" type="password" autocomplete="new-password" minlength="10" required></label>
+      <button class="primary" type="submit">Attiva accesso</button>
+    </form>
+    <div id="resetPasswordMsg" class="message hidden"></div>
   </div>
 </section>
 
@@ -76,6 +160,7 @@
         <button class="nav-item" data-view="aiMail">AI Mail & Chat</button>
         <button class="nav-item" data-view="recovery">Clienti · Recovery</button>
         <button class="nav-item" data-view="territories">SAP & Territori</button>
+        <button class="nav-item" data-view="accessAdmin">Accessi & Richieste</button>
       </div>
     </nav>
 
@@ -870,6 +955,35 @@
           <span id="liaInsightCount" class="future-chip">-</span>
         </div>
         <div id="liaInsightList" class="lia-insight-grid"></div>
+      </section>
+    </section>
+
+    <section id="accessAdminView" class="view hidden">
+      <section class="section-intro split">
+        <div>
+          <div class="eyebrow">ACCESSI & RICHIESTE</div>
+          <h2>Autorizzazioni, sponsor e contatti dalla vetrina.</h2>
+          <p>Le richieste di accesso sono approvabili esclusivamente dall’amministratore autorizzato. I contatti commerciali restano separati dagli utenti interni e non vedono dati riservati.</p>
+        </div>
+        <span class="future-chip">Approvatore · francescocoppola1485@gmail.com</span>
+      </section>
+
+      <section class="agency-kpis">
+        <div><span>Accessi in attesa</span><strong id="accessPendingCount">—</strong></div>
+        <div><span>Accessi attivati</span><strong id="accessActivatedCount">—</strong></div>
+        <div><span>Lead nuovi</span><strong id="commercialLeadNewCount">—</strong></div>
+        <div><span>Sponsor / partner</span><strong id="sponsorLeadCount">—</strong></div>
+      </section>
+
+      <section class="two-col top-gap access-admin-grid">
+        <article class="panel">
+          <div class="panel-head"><div><div class="eyebrow">ACCESSO INTERNO</div><h3>Richieste da autorizzare</h3></div></div>
+          <div id="accessRequestList" class="access-request-list"></div>
+        </article>
+        <article class="panel">
+          <div class="panel-head"><div><div class="eyebrow">VETRINA COMMERCIALE</div><h3>Richieste sponsor, partner e aziende</h3></div></div>
+          <div id="commercialLeadList" class="commercial-lead-list"></div>
+        </article>
       </section>
     </section>
 
