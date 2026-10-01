@@ -367,7 +367,7 @@ Sono intoccabili salvo autorizzazione esplicita della Direzione:
 Un asset ufficiale NON deve essere ridisegnato, reinterpretato, ricolorato o ricostruito dall'AI. Sono consentite soltanto trasformazioni tecniche non creative: scontorno, alpha, trim, compressione lossless/visually-lossless, conversione di formato e ridimensionamento proporzionale.
 
 ### 4. CARTELLE E REGISTRO ASSET
-Il riferimento machine-readable è `config/SCD_ASSET_REGISTRY.json`.
+Il riferimento machine-readable è `config/scd-assets.v1.json`.
 Le famiglie logiche obbligatorie sono:
 - CLUB_OFFICIAL;
 - FEDERATION_OFFICIAL;
