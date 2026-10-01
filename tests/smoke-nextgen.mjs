@@ -38,8 +38,8 @@ for(const viewport of viewports){
   if(realPhotoRefs.length)throw new Error('forbidden real photography loaded: '+realPhotoRefs.join(','));
 
   const adaptive=await page.evaluate(()=>window.SCDAdaptive.snapshot());
-  if(!['phone','phone-wide','tablet','desktop','wide'].includes(adaptive.viewportClass))throw new Error('adaptive viewport class missing');
-  const adaptiveAttr=await page.evaluate(()=>document.documentElement.dataset.scdViewportClass||'');
+  if(!['PHONE_COMPACT','PHONE','PHONE_LARGE','TABLET','LAPTOP','DESKTOP','WIDE','ULTRAWIDE'].includes(adaptive.viewportClass))throw new Error('adaptive viewport class missing');
+  const adaptiveAttr=await page.evaluate(()=>String(document.documentElement.dataset.scdViewport||'').toUpperCase());
   if(adaptiveAttr!==adaptive.viewportClass)throw new Error('adaptive viewport dataset not applied');
 
   const meta=await page.evaluate(()=>window.SCDMeta.snapshot('base'));
