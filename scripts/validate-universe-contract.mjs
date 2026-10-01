@@ -46,7 +46,12 @@ for(const token of ['Scintilla','Rookie','Playmaker','Capitano','Leggenda','APP_
 }
 assert(twin.includes("scd:twin:v1"),'Twin local storage contract missing');
 
-assert(/ui-r38-universe\.css\?v=(38|39|40)\.0\.0/.test(index),'R38 Universe CSS not loaded');
+const isNextGenSynthetic=m.architecture?.nextgen_preview?.visual_mode==='SYNTHETIC_NO_REAL_PHOTOGRAPHY';
+if(isNextGenSynthetic){
+  assert(/scd-synth\.css\?v=0\.3\.[0-9]+/.test(index),'NextGen synthetic CSS not loaded');
+}else{
+  assert(/ui-r38-universe\.css\?v=(38|39|40)\.0\.0/.test(index),'R38 Universe CSS not loaded');
+}
 assert(/scd-meta-engine\.js\?v=(38|39|40)\.0\.0/.test(index),'Meta engine not loaded');
 assert(/scd-twin\.js\?v=(38|39|40)\.0\.0/.test(index),'Twin engine not loaded');
 
