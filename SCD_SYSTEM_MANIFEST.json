@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.9.0",
+    "version": "3.10.0",
     "effective_at": "2026-10-01",
     "status": "BINDING",
     "language": "it-IT",
@@ -1134,6 +1134,27 @@
           "LINK_WITH_ATTRIBUTION"
         ],
         "use": "NEWSROOM_EXTERNAL_CROSS_CHECK_AND_STORY_DISCOVERY"
+      },
+      {
+        "id": "SCD_ORGANIGRAMMA_2026_27",
+        "kind": "INTERNAL_VERIFIED_DOCUMENT",
+        "trust": "INTERNAL_VERIFIED",
+        "authority_domains": [
+          "ORGANIGRAMMA",
+          "SOCIETARY_ROLES",
+          "SPORTS_STAFF_ROLES",
+          "TEAM_STAFF_ASSIGNMENTS",
+          "TRANSPORT_COLLABORATORS"
+        ],
+        "rules": [
+          "PRIVATE_SOURCE_NOT_PUBLIC_DIRECTORY",
+          "CONTACTS_COMPENSATION_CONTRACT_FIELDS_NEVER_PUBLIC",
+          "MINIMIZE_PERSONAL_DATA_IN_UI",
+          "SOURCE_ROLE_DOES_NOT_AUTO_GRANT_APP_PERMISSION",
+          "APP_ROLE_ASSIGNMENT_REQUIRES_SERVER_SIDE_DIRECTION_APPROVAL",
+          "SEASON_SCOPED_2026_27"
+        ],
+        "use": "ROLE_AND_SCOPE_RECONCILIATION_FOR_PRIVATE_APP_AREAS"
       }
     ],
     "conflict_resolution": [
@@ -2575,6 +2596,17 @@
         "TUTTOCAMPO"
       ],
       "contract": "OFFICIAL_CHANNELS_FIRST_PRIVATE_PIXELLOT_AUTH_EXTERNAL_MEDIA_ATTRIBUTED_NO_AUTO_REPUBLISH"
+    },
+    {
+      "id": "CAP-STAFF-ROLE-INGESTION",
+      "domain": "IDENTITY_ACCESS",
+      "required": true,
+      "state": "PARTIAL",
+      "sources": [
+        "SCD_ORGANIGRAMMA_2026_27",
+        "R20"
+      ],
+      "contract": "PARSE_INTERNAL_ORGANIGRAMMA_MAP_FUNCTIONAL_ROLE_AND_TEAM_SCOPE_DIRECTION_APPROVAL_REQUIRED"
     }
   ],
   "known_noncompliance": [
@@ -3108,6 +3140,35 @@
       "minors_policy": "NO_PUBLICATION_WITHOUT_REQUIRED_MEDIA_AUTHORIZATION",
       "pixellot_policy": "PRIVATE_BY_DEFAULT_AUTHORIZED_STAFF_ONLY",
       "no_auto_republish": true
+    },
+    "staff_role_ingestion": {
+      "source": "SCD_ORGANIGRAMMA_2026_27",
+      "season": "2026/27",
+      "state": "SOURCE_PARSED_MAPPING_PENDING_AUTH_REVIEW",
+      "detected_sections": [
+        "ORGANI_SOCIETARI",
+        "DELEGHE_DECISIONALI",
+        "CONSULENZA_ESTERNA",
+        "CARICHE_SPORTIVE_FIGC",
+        "DIRIGENTI_COLLABORATORI_STRUTTURA",
+        "DIRIGENTI_ACCOMPAGNATORI",
+        "PULMINI",
+        "ALLENATORI_CON_PATENTINO",
+        "STAFF_E_ATLETI_PRIMA_SQUADRA",
+        "STAFF_E_ATLETI_JUNIORES_ELITE",
+        "STAFF_E_ATLETI_U16_ELITE",
+        "STAFF_E_ATLETI_U15",
+        "STAFF_E_ATLETI_U13",
+        "STAFF_E_ATLETI_U12",
+        "STAFF_E_ATLETI_U11_U10_U9"
+      ],
+      "app_mapping_policy": "FUNCTIONAL_ROLE_PLUS_TEAM_SCOPE_NOT_RAW_SPREADSHEET_LABEL",
+      "public_people_search": false,
+      "public_profile_requires_explicit_authorization": true,
+      "contacts_private": true,
+      "compensation_private": true,
+      "contract_status_private": true,
+      "no_automatic_permission_grant": true
     }
   },
   "research_intelligence": {
