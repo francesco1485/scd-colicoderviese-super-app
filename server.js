@@ -54,6 +54,7 @@ const READ_ONLY_RETRY_ACTIONS = new Set([
 ]);
 const UPSTREAM_READ_ATTEMPTS = 2;
 const UPSTREAM_RETRY_DELAY_MS = 450;
+const UPSTREAM_TIMEOUT_MS = Math.max(1000,Math.min(15000,Number(process.env.SCD_UPSTREAM_TIMEOUT_MS)||5000));
 const wait = ms => new Promise(resolve=>setTimeout(resolve,ms));
 
 const allowedActions = new Set([
@@ -103,6 +104,7 @@ async function callAppsScript(action,payload={},sessionToken=''){
         method:'POST',
         redirect:'follow',
         headers:{'content-type':'application/json','user-agent':'SCD-ColicoDerviese-Bridge/30.0'},
+        signal:AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
         body:JSON.stringify({action,payload,sessionToken})
       });
       const text=await upstream.text();
