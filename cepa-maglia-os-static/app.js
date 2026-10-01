@@ -35,7 +35,7 @@ const viewMeta={
 let ecosystem=[],projects=[],actions=[],marketHubs=[],marketEntities=[],contacts=[],timeline=[],documents=[],partnerRequirements=[],blueprints=[],subjects=[],initiatives=[],cepaContent=[],cepaAcademy=[],cepaSpeakers=[],products=[],productKnowledge=[],comparisons=[],collaborators=[],collaboratorTerms=[],portfolioSnapshots=[],businessAssessments=[],growthKits=[],distributionWatchlists=[],distributionCandidates=[],distributionEvidence=[],mailTemplates=[],mailDrafts=[],cepaExpansion=[],cepaReadiness=[],assistantMessages=[],recoveryRows=[],members=[],liaCapabilities=[],liaFolders=[],liaOrders=[],liaFiles=[],researchSources=[],researchInsights=[],liaActionRules=[],liaApprovals=[],roleViewAccess=[],liaAutomationRuns=[],assetRegistry=[],expertProtocols=[],uxUsageEvents=[],accessRequests=[],commercialLeads=[],publicShowcase=[]
 let officeAssignments=[],officeMessages=[],officeSnapshots=[],officeCases=[],officeWorkflow=[],officeCepaActivities=[],officeImports=[]
 let commercialClients=[],pipelineCases=[],clientCheckups=[],clientInteractions=[],clientWorkItems=[],clientPolicies=[]
-let crmProfiles=[],crmModules=[]
+let crmProfiles=[],crmModules=[],crmRoleTemplates=[],crmRecommendations=[]
 let currentPartnerId=null,currentOfficeId=null,currentOfficeProductId=null,currentCepaHubId=null,currentCommerceTab='clients'
 
 function msg(text,error=false){$('loginMsg').textContent=text;$('loginMsg').className='message'+(error?' error':'')}
@@ -677,12 +677,15 @@ async function loadAll(){
     isAccessApprover()?supabase.from('public_commercial_leads').select('*').eq('organization_id',window.orgId).order('created_at',{ascending:false}).limit(250):Promise.resolve({data:[],error:null}),
     isAccessApprover()?supabase.from('public_showcase_items').select('*').eq('organization_id',window.orgId).order('sort_order').order('title'):Promise.resolve({data:[],error:null}),
     supabase.from('crm_user_profiles').select('*').eq('organization_id',window.orgId).eq('user_id',window.userId).limit(1),
-    supabase.from('crm_user_modules').select('*').eq('organization_id',window.orgId).eq('user_id',window.userId).order('sort_order')
+    supabase.from('crm_user_modules').select('*').eq('organization_id',window.orgId).eq('user_id',window.userId).order('sort_order'),
+    supabase.from('crm_role_templates').select('*').eq('organization_id',window.orgId).eq('role',window.userRole).eq('active',true).limit(1),
+    supabase.from('crm_user_recommendations').select('*').eq('organization_id',window.orgId).eq('user_id',window.userId).eq('status','active').order('score',{ascending:false}).limit(20)
   ]
   const res=await Promise.all(q)
   const err=res.find(x=>x.error)?.error
   if(err){console.error(err);$('refreshBtn').textContent='!';return}
-  ;[ecosystem,projects,actions,marketHubs,marketEntities,contacts,timeline,documents,partnerRequirements,blueprints,subjects,initiatives,cepaContent,cepaAcademy,cepaSpeakers,products,productKnowledge,comparisons,collaborators,collaboratorTerms,portfolioSnapshots,businessAssessments,growthKits,distributionWatchlists,distributionCandidates,distributionEvidence,mailTemplates,mailDrafts,cepaExpansion,cepaReadiness,assistantMessages,liaCapabilities,liaFolders,liaOrders,liaFiles,researchSources,researchInsights,liaActionRules,liaApprovals,roleViewAccess,liaAutomationRuns,officeAssignments,officeMessages,officeSnapshots,officeCases,officeWorkflow,officeCepaActivities,officeImports,commercialClients,pipelineCases,clientCheckups,clientInteractions,clientWorkItems,clientPolicies,assetRegistry,expertProtocols,uxUsageEvents,accessRequests,commercialLeads,publicShowcase,crmProfiles,crmModules]=res.map(x=>x.data||[])
+  ;[ecosystem,projects,actions,marketHubs,marketEntities,contacts,timeline,documents,partnerRequirements,blueprints,subjects,initiatives,cepaContent,cepaAcademy,cepaSpeakers,products,productKnowledge,comparisons,collaborators,collaboratorTerms,portfolioSnapshots,businessAssessments,growthKits,distributionWatchlists,distributionCandidates,distributionEvidence,mailTemplates,mailDrafts,cepaExpansion,cepaReadiness,assistantMessages,liaCapabilities,liaFolders,liaOrders,liaFiles,researchSources,researchInsights,liaActionRules,liaApprovals,roleViewAccess,liaAutomationRuns,officeAssignments,officeMessages,officeSnapshots,officeCases,officeWorkflow,officeCepaActivities,officeImports,commercialClients,pipelineCases,clientCheckups,clientInteractions,clientWorkItems,clientPolicies,assetRegistry,expertProtocols,uxUsageEvents,accessRequests,commercialLeads,publicShowcase,crmProfiles,crmModules,crmRoleTemplates,crmRecommendations]=res.map(x=>x.data||[])
+  if(await ensureCrmBaseline())return loadAll()
   renderEverything()
   syncCrmLearning(false).catch(error=>console.warn('CRM learning',error?.message||error))
   $('refreshBtn').textContent='↻'
@@ -693,6 +696,42 @@ function renderEverything(){
 }
 
 
+function crmRoleTemplate(){return crmRoleTemplates[0]||null}
+async function ensureCrmBaseline(){
+  const template=crmRoleTemplate()
+  let created=false
+  if(!crmProfiles.length){
+    const personaMap={super_admin:'direction',supervisor:'direction',manager:'hybrid',operator:'commercial',specialist:'specialist',viewer:'viewer'}
+    const focusMap={super_admin:'management',supervisor:'management',manager:'sales',operator:'sales',specialist:'portfolio',viewer:'balanced'}
+    const{error}=await supabase.from('crm_user_profiles').insert({
+      organization_id:window.orgId,user_id:window.userId,
+      persona_type:personaMap[window.userRole]||'hybrid',
+      adaptation_mode:'adaptive',home_module:'today',focus_mode:focusMap[window.userRole]||'balanced',
+      adaptation_enabled:true,onboarding_stage:'new',learning_confidence:0,
+      preferences:{template_name:template?.template_name||window.userRole,quick_actions:template?.default_quick_actions||[]},
+      learned_context:{seeded_from:'role_template',role_baseline:window.userRole}
+    })
+    if(error)throw error
+    created=true
+  }
+  const allKeys=['today','clients','pipeline','portfolio','office','partners','collaborators','cepa','research','documents']
+  const existing=new Set(crmModules.map(x=>x.module_key))
+  const missing=allKeys.filter(k=>!existing.has(k))
+  if(missing.length){
+    const focus=Array.isArray(template?.default_focus_areas)?template.default_focus_areas:[]
+    const order=[...focus,...allKeys.filter(k=>!focus.includes(k))]
+    const rows=missing.map(k=>({
+      organization_id:window.orgId,user_id:window.userId,module_key:k,visible:true,pinned:false,manual_lock:false,
+      sort_order:order.indexOf(k)+1,base_weight:k==='today'?95:(focus.includes(k)?85:50),
+      learned_weight:k==='today'?95:(focus.includes(k)?85:50),usage_count_30d:0,
+      config:{seeded_from_role:window.userRole}
+    }))
+    const{error}=await supabase.from('crm_user_modules').insert(rows)
+    if(error)throw error
+    created=true
+  }
+  return created
+}
 const CRM_MODULE_META={
   today:{label:'Oggi',desc:'Attività, scadenze e prossime azioni',target:'actions'},
   clients:{label:'Clienti',desc:'Relazioni e Cliente 360',target:'clients'},
@@ -827,18 +866,54 @@ async function syncCrmLearning(force=false){
     updates.forEach(u=>{const row=crmModules.find(x=>x.id===u.id);if(row)Object.assign(row,u)})
   }
   const confidence=Math.min(100,Math.round(Math.sqrt(events.length)*12))
+  const ranked=crmModules.filter(x=>x.visible).slice().sort((a,b)=>crmModuleScore(b)-crmModuleScore(a))
+  const dominant=ranked[0]?.module_key||'today'
+  const roleLocked=['super_admin','supervisor'].includes(window.userRole)
+  const personaFocus=dominant==='office'?['office','service']:
+    ['partners','collaborators'].includes(dominant)?['network','network']:
+    ['clients','pipeline'].includes(dominant)?['commercial','sales']:
+    ['portfolio','documents'].includes(dominant)?['specialist','portfolio']:
+    dominant==='cepa'?['hybrid','cepa']:
+    dominant==='research'?['specialist','balanced']:
+    ['hybrid','balanced']
+  const persona=roleLocked?'direction':personaFocus[0]
+  const focus=roleLocked?'management':personaFocus[1]
+  const template=crmRoleTemplate()
   const learnedContext={
     ...(p.learned_context||{}),
     events_30d:events.length,
     open_work:crmPersonalWork().length,
     open_pipeline:crmPersonalPipeline().length,
     accessible_offices:accessibleOffices().length,
-    last_reason:'usage + workload + role baseline'
+    dominant_module:dominant,
+    role_template:template?.template_name||window.userRole,
+    last_reason:'uso + carico operativo + template ruolo'
   }
   const now=new Date().toISOString()
-  const{error:pe}=await supabase.from('crm_user_profiles').update({learning_confidence:confidence,learned_context:learnedContext,last_learning_at:now,onboarding_stage:confidence>=70?'mature':confidence>=30?'active':'learning',updated_at:now}).eq('id',p.id).eq('organization_id',window.orgId).eq('user_id',window.userId)
+  const patch={learning_confidence:confidence,learned_context:learnedContext,last_learning_at:now,onboarding_stage:confidence>=70?'mature':confidence>=30?'active':'learning',persona_type:persona,focus_mode:focus,home_module:dominant,updated_at:now}
+  const{error:pe}=await supabase.from('crm_user_profiles').update(patch).eq('id',p.id).eq('organization_id',window.orgId).eq('user_id',window.userId)
   if(pe)throw pe
-  Object.assign(p,{learning_confidence:confidence,learned_context:learnedContext,last_learning_at:now,onboarding_stage:confidence>=70?'mature':confidence>=30?'active':'learning'})
+  Object.assign(p,patch)
+
+  const recs=ranked.slice(0,3).map((m,i)=>{
+    const meta=CRM_MODULE_META[m.module_key]||{label:m.module_key}
+    const usage=Number(m.usage_count_30d||0),urg=crmModuleUrgency(m.module_key)
+    return{
+      organization_id:window.orgId,user_id:window.userId,recommendation_type:'focus_area',
+      recommendation_key:m.module_key,title:'Mantieni '+meta.label+' tra le priorità',
+      rationale:urg>=60?'Carico operativo elevato nel modulo.':usage>=5?'Lo utilizzi frequentemente negli ultimi 30 giorni.':'È coerente con il tuo profilo e il lavoro corrente.',
+      score:Math.max(1,Math.min(100,Math.round(Number(m.learned_weight||m.base_weight||0)))),
+      status:'active',evidence:{usage_30d:usage,urgency:urg,rank:i+1,role:window.userRole},updated_at:now
+    }
+  })
+  if(recs.length){
+    const{error:re}=await supabase.from('crm_user_recommendations').upsert(recs,{onConflict:'organization_id,user_id,recommendation_type,recommendation_key'})
+    if(re)console.warn('CRM recommendations',re.message)
+    else{
+      const{data}=await supabase.from('crm_user_recommendations').select('*').eq('organization_id',window.orgId).eq('user_id',window.userId).eq('status','active').order('score',{ascending:false}).limit(20)
+      crmRecommendations=data||[]
+    }
+  }
   renderPersonalCRM()
 }
 function renderPersonalCRM(){
@@ -900,10 +975,15 @@ function renderPersonalCRM(){
   const top=modules.slice(0,3).map(m=>CRM_MODULE_META[m.module_key]?.label||m.module_key)
   $('crmLearningPanel').innerHTML=
     '<div><span>Profilo</span><strong>'+esc(p?.persona_type||'standard')+'</strong></div>'+
+    '<div><span>Focus</span><strong>'+esc(p?.focus_mode||'balanced')+'</strong></div>'+
     '<div><span>Confidenza</span><strong>'+Math.round(confidence)+'%</strong></div>'+
     '<div><span>Segnali 30 gg</span><strong>'+crmUserEvents30d().length+'</strong></div>'+
     '<div><span>Moduli prioritari</span><strong>'+esc(top.join(' · ')||'—')+'</strong></div>'+
     '<p>Il modello usa ruolo iniziale, utilizzo recente e carico operativo. Non cambia permessi, dati o moduli fissati manualmente.</p>'
+  if($('crmTemplateLabel'))$('crmTemplateLabel').textContent=crmRoleTemplate()?.template_name||'Template '+window.userRole.replaceAll('_',' ')
+  if($('crmRecommendationList'))$('crmRecommendationList').innerHTML=crmRecommendations.map(r=>
+    '<article class="crm-recommendation-row"><div><span>'+esc(r.recommendation_type.replaceAll('_',' '))+'</span><strong>'+esc(r.title)+'</strong><p>'+esc(r.rationale)+'</p></div><b>'+Math.round(Number(r.score||0))+'</b></article>'
+  ).join('')||empty('Il CRM sta ancora raccogliendo abbastanza segnali per formulare suggerimenti personali.')
 }
 
 
