@@ -49,7 +49,7 @@ function applyCors(req,res){
 
 const READ_ONLY_RETRY_ACTIONS = new Set([
   'public.feed','public.club','public.calendar','public.datafabric.contract',
-  'dashboard.summary','private.dashboard','private.week','account.requests',
+  'dashboard.summary','private.dashboard','private.week','account.requests','private.crm.summary','private.crm.detail',
   'private.attendance.get','auth.validate','direction.diagnostics',
   'direction.evolution','direction.datafabric.status'
 ]);
@@ -59,7 +59,7 @@ const UPSTREAM_TIMEOUT_MS = Math.max(1000,Math.min(15000,Number(process.env.SCD_
 const wait = ms => new Promise(resolve=>setTimeout(resolve,ms));
 
 const allowedActions = new Set([
-  'dashboard.summary','private.dashboard','private.week','account.requests',
+  'dashboard.summary','private.dashboard','private.week','account.requests','private.crm.summary','private.crm.detail',
   'private.request.submit','private.transport.request','private.message.send',
   'private.convocation.create','private.convocation.reply',
   'private.attendance.get','private.attendance.save',
@@ -213,6 +213,20 @@ async function handleSponsorSession(req,res){
 async function handleSponsorLogout(req,res){
   res.setHeader('set-cookie',sponsorCookie(req,'',0));
   return json(res,200,{ok:true});
+}
+async function handleSponsorCrm(req,res,u){
+  if(req.method!=='GET')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  try{
+    const s=await validateSponsorSession(req);
+    const id=String(u.searchParams.get('id')||'').trim();
+    const action=id?'private.crm.detail':'private.crm.summary';
+    const payload=id?{id}:{limit:Math.max(1,Math.min(500,Number(u.searchParams.get('limit')||250)))};
+    const {parsed}=await callAppsScript(action,payload,s.token);
+    const d=unwrapPayload(parsed);
+    return json(res,200,{ok:true,data:d},{'cache-control':'no-store'});
+  }catch(e){
+    return json(res,403,{ok:false,error:e.message||'CRM_ACCESS_DENIED'});
+  }
 }
 async function serveSponsorPrivate(req,res,u){
   try{
@@ -672,6 +686,7 @@ http.createServer(async(req,res)=>{
   if(u.pathname==='/api/sponsor/login') return handleSponsorLogin(req,res);
   if(u.pathname==='/api/sponsor/session') return handleSponsorSession(req,res);
   if(u.pathname==='/api/sponsor/logout') return handleSponsorLogout(req,res);
+  if(u.pathname==='/api/sponsor/crm') return handleSponsorCrm(req,res,u);
   if(['/sponsor/app','/sponsor/app/','/sponsor/app.html','/sponsor/app.js'].includes(u.pathname)) return serveSponsorPrivate(req,res,u);
   if(u.pathname==='/api/scd') return proxyAppsScript(req,res);
   if(u.pathname==='/api/intake/form') return handleIntakeForm(req,res,u);
