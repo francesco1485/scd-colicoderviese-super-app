@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.10.0",
+    "version": "3.11.0",
     "effective_at": "2026-10-01",
     "status": "BINDING",
     "language": "it-IT",
@@ -2152,7 +2152,7 @@
       "required": true,
       "state": "PARTIAL",
       "screen": "HOME_PUBLIC",
-      "contract": "CURRENT_WEEK_FIRST_SEARCH_MATCH_CENTER_EVENTS_NEWS_COMMUNITY_SPONSORS_JOIN_CLUB"
+      "contract": "CURRENT_WEEK_FIRST_SEARCH_MATCH_CENTER_EVENTS_NEWS_MEDIA_COMMUNITY_SPONSORS_AFFILIATIONS_JOIN_CLUB_REAL_PUBLIC_NAV"
     },
     {
       "id": "CAP-CALENDAR",
@@ -2160,7 +2160,11 @@
       "required": true,
       "state": "PARTIAL",
       "screen": "CALENDAR_LIVE",
-      "contract": "ALL_ANNATE_ALL_WEEK_ACTIVITY_FILTERABLE"
+      "contract": "DEDICATED_PUBLIC_VIEW_CURRENT_WEEK_NEXT_30_ALL_AVAILABLE_TEAM_CATEGORY_TYPE_SEARCH_FAIL_CLOSED",
+      "sources": [
+        "R20",
+        "SCD_SUPABASE"
+      ]
     },
     {
       "id": "CAP-ATHLETE",
@@ -2629,14 +2633,26 @@
         "R20"
       ],
       "contract": "PARSE_INTERNAL_ORGANIGRAMMA_MAP_FUNCTIONAL_ROLE_AND_TEAM_SCOPE_DIRECTION_APPROVAL_REQUIRED"
+    },
+    {
+      "id": "CAP-PUBLIC-TEAMS",
+      "domain": "SPORT_PUBLIC",
+      "required": true,
+      "state": "PARTIAL",
+      "sources": [
+        "R20",
+        "SCD_SUPABASE",
+        "CR_LOMBARDIA"
+      ],
+      "contract": "DEDICATED_PUBLIC_TEAMS_DIRECTORY_VERIFIED_METADATA_NEXT_ACTIVITY_NO_PRIVATE_ROSTER"
     }
   ],
   "known_noncompliance": [
     {
       "id": "GAP-UI-001",
       "severity": "HIGH",
-      "statement": "R38 ricostruisce Pulse come SCD Universe; le altre screen R24 restano operative ma devono essere progressivamente riallineate alla nuova grammatica visiva e adattiva.",
-      "required_fix": "Applicare il design system R38 a Calendar, Communications, Services, Profile, Athlete, Family e Staff senza perdere funzionalita."
+      "statement": "R44 riallinea Home, Calendario pubblico e Squadre pubbliche alla grammatica SCD Universe; Communications, Services/Profile riservato, Athlete, Family e Staff restano da riallineare progressivamente.",
+      "required_fix": "Applicare il design system R38/R44 a Communications, Services/Profile riservato, Athlete, Family e Staff senza perdere funzionalita."
     },
     {
       "id": "GAP-UI-002",
@@ -3030,7 +3046,7 @@
     "visual_principle": "SPATIAL_SPORT_EDITORIAL_HIGH_IMPACT",
     "legacy_home_route": "#/home",
     "no_rewrite_rule": false,
-    "release": "R40",
+    "release": "R44",
     "product_name": "SCD UNIVERSE",
     "audience_fit": [
       "YOUTH",
@@ -3315,6 +3331,74 @@
       "compensation_private": true,
       "contract_status_private": true,
       "no_automatic_permission_grant": true
+    },
+    "public_core_navigation": {
+      "state": "DEDICATED_PUBLIC_VIEWS",
+      "routes": [
+        {
+          "id": "HOME",
+          "hash": "#pulse",
+          "surface": "HOME_PUBLIC"
+        },
+        {
+          "id": "CALENDAR",
+          "hash": "#calendar",
+          "surface": "CALENDAR_LIVE"
+        },
+        {
+          "id": "TEAMS",
+          "hash": "#teams",
+          "surface": "PUBLIC_TEAMS_DIRECTORY"
+        },
+        {
+          "id": "COMMUNITY",
+          "hash": "#pulse?section=community",
+          "surface": "COMMUNITY_PULSE"
+        },
+        {
+          "id": "PROFILE",
+          "hash": "#twin",
+          "surface": "SCD_TWIN"
+        }
+      ],
+      "rules": [
+        "BOTTOM_NAV_OPENS_REAL_VIEWS_NOT_TRANSIENT_MODAL_FOR_CALENDAR_AND_TEAMS",
+        "CALENDAR_LOADS_VERIFIED_PUBLIC_CALENDAR_ON_DEMAND",
+        "TEAMS_DERIVE_FROM_VERIFIED_PUBLIC_SPORT_DATA",
+        "SEARCH_AND_FILTERS_MUST_WORK_ON_MOBILE_AND_DESKTOP",
+        "MISSING_DATA_FAILS_CLOSED_WITH_CLEAR_STATE",
+        "NO_PRIVATE_ROSTER_OR_CONTACTS_IN_PUBLIC_TEAMS"
+      ],
+      "calendar": {
+        "default_period": "CURRENT_WEEK",
+        "available_periods": [
+          "CURRENT_WEEK",
+          "NEXT_30_DAYS",
+          "ALL_AVAILABLE_PUBLIC"
+        ],
+        "filters": [
+          "TEAM",
+          "CATEGORY",
+          "TYPE",
+          "TEXT_SEARCH"
+        ],
+        "source_priority": [
+          "R20",
+          "SCD_SUPABASE"
+        ],
+        "event_detail": "SOURCE_GROUNDED"
+      },
+      "teams": {
+        "source": "VERIFIED_PUBLIC_CALENDAR_AND_PUBLIC_TEAM_METADATA",
+        "cards": [
+          "TEAM_NAME",
+          "CATEGORY",
+          "NEXT_ACTIVITY",
+          "NEXT_MATCH"
+        ],
+        "people": "PUBLIC_AUTHORIZED_PROFILES_ONLY",
+        "private_roster": false
+      }
     }
   },
   "research_intelligence": {
