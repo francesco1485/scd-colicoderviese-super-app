@@ -1,12 +1,6 @@
 {
-  "schemaVersion": "1.0.0",
+  "schemaVersion": "1.1.0",
   "source": "SCD_MEDIA_MOTION_LAB",
-  "defaultPreview": {
-    "width": 1920,
-    "height": 1080,
-    "fps": 25,
-    "durationSeconds": 20
-  },
   "nativeLedStatus": "DA_RILEVARE_ALLA_CONSEGNA",
   "profiles": [
     {
@@ -81,5 +75,20 @@
         "report erogazione"
       ]
     }
-  ]
+  ],
+  "previewSource": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 25,
+    "durationSeconds": 20
+  },
+  "productionTarget": {
+    "durationSeconds": 40,
+    "resolutionStatus": "NATIVE_LED_RESOLUTION_TO_BE_MEASURED",
+    "rule": "ONE_SPONSOR_ONE_STORYBOARD_ONE_APPROVAL_ONE_MASTER",
+    "logoRequirement": "OFFICIAL_APPROVED_LOGO_REQUIRED_BEFORE_FINAL_MP4",
+    "cameraSafe": true,
+    "stadiumReadable": true,
+    "territoryLayer": "SCD_COLICO_LAKE_COMO_TRANSITIONS_ONLY"
+  }
 }
