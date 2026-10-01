@@ -350,6 +350,10 @@ function r216CrmDetail_(token, payload) {
   var opportunities = r216CrmTable_('COMMERCIALE_OPPORTUNITA').filter(function(r){
     return String(r.PARTNER||'').trim().toLowerCase()===String(stakeholder.NOME||'').trim().toLowerCase();
   });
+  var agreements = r216CrmTable_('SPONSOR_CONTRATTI').filter(function(r){
+    return String(r['SPONSOR ID']||'')===id ||
+      String(r.PARTNER||'').trim().toLowerCase()===String(stakeholder.NOME||'').trim().toLowerCase();
+  });
   var relations = r216CrmTable_('RELAZIONI_MASTER').filter(function(r){
     return String(r.DA_ID||'')===id || String(r.A_ID||'')===id;
   });
@@ -359,6 +363,7 @@ function r216CrmDetail_(token, payload) {
     touchpoints:touchpoints.slice(0,100),
     tasks:tasks.slice(0,100),
     opportunities:opportunities.slice(0,50),
+    agreements:agreements.slice(0,50),
     relations:relations.slice(0,100),
     safety:{
       contactPolicy:String(stakeholder.CONTACT_POLICY || ''),
