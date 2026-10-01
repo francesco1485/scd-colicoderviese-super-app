@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.5.0",
+    "version": "3.6.0",
     "effective_at": "2026-10-01",
     "status": "BINDING",
     "language": "it-IT",
@@ -595,6 +595,57 @@
         "supabase/migrations/20260929_r34_rls_performance_hardening.sql",
         "supabase/migrations/20260929_r35_auth_context_rls_normalization.sql"
       ]
+    },
+    "intake_hub": {
+      "state": "FOUNDATION_IMPLEMENTED_RUNTIME_UPLOAD_BLOCKED",
+      "root_folder_id": "1VTJJTFYN2PWfkYeTF24XayGMn2wHcu0U",
+      "log_sheet_id": "1ruGLKpFYdirMV6NvOHWoCsSxy3f7Yd9VMfCykuQrmgY",
+      "folder_model": [
+        "00_CONFIG",
+        "01_INBOX",
+        "02_ROUTED",
+        "03_LOGS",
+        "04_TEMPLATES",
+        "05_ARCHIVE"
+      ],
+      "routed_domains": [
+        "AMMINISTRAZIONE",
+        "TESSERAMENTI",
+        "CERTIFICATI_MEDICI",
+        "TORNEI_EVENTI",
+        "TRASPORTI_PULMINI",
+        "SPONSOR_PARTNER",
+        "STAFF_TECNICI",
+        "COMUNICAZIONI",
+        "IMPIANTI",
+        "SAFEGUARDING_ISOLATO"
+      ],
+      "link_access_modes": [
+        "PUBLIC_SAFE",
+        "TOKENIZED",
+        "AUTHENTICATED",
+        "ROLE_SCOPED",
+        "ONE_TIME",
+        "EXPIRING"
+      ],
+      "request_flow": [
+        "LINK",
+        "CONTEXT",
+        "METADATA",
+        "VALIDATE",
+        "REQUEST_ID",
+        "STAGE",
+        "ROUTE",
+        "RENAME",
+        "LOG",
+        "NOTIFY",
+        "ARCHIVE"
+      ],
+      "runtime_upload_adapter": "NOT_CONNECTED",
+      "fail_closed": true,
+      "safeguarding_separate": true,
+      "no_ephemeral_storage_as_final": true,
+      "admin_configurable": true
     }
   },
   "source_registry": {
@@ -1673,6 +1724,28 @@
       ],
       "no_fingerprinting": true,
       "purpose": "Improve layout, resolution, density and task usability across device classes."
+    },
+    "intake_metrics": {
+      "state": "CONTRACTED",
+      "allowed": [
+        "FORM_START",
+        "FORM_COMPLETE",
+        "FORM_ABANDON",
+        "UPLOAD_ERROR",
+        "INVALID_FILE",
+        "ROUTE_SUCCESS",
+        "ROUTE_FAILURE",
+        "AVERAGE_COMPLETION_TIME",
+        "VIEWPORT_CLASS",
+        "ACCESSIBILITY_PREFERENCE"
+      ],
+      "forbidden": [
+        "DOCUMENT_CONTENT",
+        "HEALTH_DETAIL",
+        "SAFEGUARDING_DETAIL",
+        "PRIVATE_MESSAGE_CONTENT"
+      ],
+      "purpose": "Reduce friction and improve document intake workflows."
     }
   },
   "architecture": {
@@ -2370,6 +2443,18 @@
         "SOURCE-NONE"
       ],
       "contract": "SOURCE_GROUNDED_MULTIDISCIPLINARY_RESEARCH_WITH_HIGH_IMPACT_GUARDRAILS"
+    },
+    {
+      "id": "CAP-INTAKE-HUB",
+      "domain": "DOCUMENT_OPERATIONS",
+      "required": true,
+      "state": "PARTIAL",
+      "sources": [
+        "SCD_DRIVE",
+        "CORE_SHEET",
+        "R20"
+      ],
+      "contract": "TALLY_STYLE_LINK_INTAKE_DRIVE_ROUTING_LOGGING_FAIL_CLOSED_UNTIL_SERVER_UPLOAD_ADAPTER"
     }
   ],
   "known_noncompliance": [
@@ -2416,6 +2501,13 @@
       "statement": "Supabase SCD PULSE è attivo, R35 Auth Context è applicato e R36 aggiunge la prima vertical slice mobile Expo; restano da completare signup reale, dual-read R20→Supabase, test device Android/iOS, Web slice e rollback.",
       "required_fix": "Eseguire signup controllato USER_BASE, test Auth/RLS/role-scope, dual-read R20→Supabase, test mobile su device/emulatore, Web slice e rollback prima del cutover.",
       "safe_runtime_behavior": "R20 resta primary; SCD_SUPABASE resta dark e non viene dichiarato LIVE."
+    },
+    {
+      "id": "GAP-INTAKE-001",
+      "severity": "HIGH",
+      "statement": "SCD Intake Hub Drive structure and log registry exist, but the production runtime has no verified server-side Drive upload/router adapter.",
+      "required_fix": "Implement authenticated server-side upload adapter with MIME/size validation, routing rules, logging, rate limiting and scoped access; verify in staging before exposing public upload links.",
+      "safe_runtime_behavior": "Keep file upload links disabled/fail-closed; do not store final documents on ephemeral Render disk."
     }
   ],
   "development_contract": {
