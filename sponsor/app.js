@@ -1,11 +1,35 @@
 
+const $=s=>document.querySelector(s), $=s=>Array.from(document.querySelectorAll(s));
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const initials=n=>n.split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase();
+let sponsorAccess={profile:'NON_AUTORIZZATO',platform:false};
+
+function applySponsorCapabilities(caps={}){
+  sponsorAccess={...sponsorAccess,...caps};
+  const profile=String(sponsorAccess.profile||'ACCESSO AUTORIZZATO').replaceAll('_',' ');
+  document.documentElement.dataset.sponsorProfile=String(sponsorAccess.profile||'').toLowerCase();
+  const roleEl=$('#sessionRole');
+  if(roleEl)roleEl.dataset.profile=profile;
+  const gates={
+    settings:'settings'
+  };
+  Object.entries(gates).forEach(([view,cap])=>{
+    const allowed=sponsorAccess[cap]===true;
+    $('[data-view="'+view+'"]').forEach(el=>{el.hidden=!allowed;el.setAttribute('aria-hidden',String(!allowed))});
+    const section=$('#view-'+view);
+    if(section&&!allowed)section.hidden=true;
+  });
+}
+
 async function loadSponsorSession(){
   try{
     const r=await fetch('/api/sponsor/session',{credentials:'same-origin',cache:'no-store'});
     if(!r.ok)throw new Error('SESSION_REQUIRED');
     const d=await r.json();
     if($('#sessionName'))$('#sessionName').textContent=d.user?.name||d.user?.email||'Area riservata';
-    if($('#sessionRole'))$('#sessionRole').textContent=(d.user?.role||'Accesso autorizzato')+(d.isDirection?' · Direzione':'');
+    applySponsorCapabilities(d.capabilities||{});
+    const profile=String(d.capabilities?.profile||'ACCESSO AUTORIZZATO').replaceAll('_',' ');
+    if($('#sessionRole'))$('#sessionRole').textContent=(d.user?.role||'Accesso autorizzato')+' · '+profile;
   }catch(e){
     location.replace('/sponsor/?login=1');
   }
