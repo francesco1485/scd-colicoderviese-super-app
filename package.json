@@ -28,6 +28,7 @@
     "test:asset-adaptive-contract": "node scripts/validate-asset-adaptive-contract.mjs",
     "test:intake-contract": "node scripts/validate-intake-contract.mjs",
     "test:intake-links": "node scripts/validate-intake-link-factory.mjs",
-    "test:sponsor-operations": "node scripts/validate-sponsor-operations.mjs"
+    "test:sponsor-operations": "node scripts/validate-sponsor-operations.mjs",
+    "test:sponsor-smoke": "node tests/smoke-sponsor.mjs"
   }
 }
