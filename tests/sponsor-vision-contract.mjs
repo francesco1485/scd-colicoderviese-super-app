@@ -65,4 +65,35 @@ assert(js.includes('renderCampaignStudio'),'Campaign Studio renderer missing');
 assert(js.includes('renderSponsorWall'),'Sponsor Wall renderer missing');
 
 
+for(const token of [
+  'SCD CLUB EXPERIENCE · ALTO LARIO / LAGO DI COMO',
+  'Standard internazionale. Identità profondamente locale.',
+  'data-club-module="partner"',
+  'data-club-module="led"',
+  'data-club-module="media"',
+  'data-club-module="community"',
+  'data-club-module="events"',
+  'data-club-module="territory"',
+  'BRIEF',
+  'RINNOVO'
+]) assert(pub.includes(token),'R48 public club system missing: '+token);
+
+for(const token of [
+  'Club Standard 360°',
+  'Activation Studio',
+  'SPONSOR ACTIVATION DESIGN',
+  'id="activationSponsor"',
+  'id="partnerWallGrid"',
+  'SCD BENEFIT NETWORK',
+  'SCD Supporter Card',
+  'SCD Tesserato Card'
+]) assert(app.includes(token),'R48 reserved club system missing: '+token);
+
+for(const token of [
+  'const activationCopy=',
+  'renderActivationStudio',
+  'renderPartnerWall',
+  'scd_activation_scenario_v1'
+]) assert(js.includes(token),'R48 app interaction missing: '+token);
+
 console.log('Sponsor vision contract PASS');
