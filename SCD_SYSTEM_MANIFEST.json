@@ -2169,7 +2169,7 @@
       "id": "CAP-NEXTGEN-SYNTHETIC-UI",
       "domain": "EXPERIENCE",
       "required": true,
-      "state": "PREVIEW",
+      "state": "PARTIAL",
       "sources": [
         "SOURCE-NONE"
       ],
@@ -2189,7 +2189,7 @@
       "id": "CAP-VALUE-ENGINE",
       "domain": "COMMERCIAL",
       "required": true,
-      "state": "PREVIEW",
+      "state": "PARTIAL",
       "sources": [
         "SPONSOR_MASTER_SHEET",
         "MAIL_OPERATIONS_SHEET",
