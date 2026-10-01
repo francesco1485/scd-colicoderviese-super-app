@@ -50,4 +50,19 @@ assert(js.includes("SOSPESA · NON INVIARE"),'suspended prospect visibility miss
 assert(js.includes("Pixellot & Match Content"),'internal video asset missing');
 assert(js.includes("Partner Hub Web App"),'internal web app partner asset missing');
 
+for(const token of [
+  'SCD Partner OS',
+  'view-partnerhub',
+  'view-campaigns',
+  'view-mediahub',
+  'Partner Hub',
+  'Campaign Studio',
+  'Media Hub',
+  'COLICO · LAKE COMO'
+]) assert(app.includes(token),'Partner OS interactive module missing: '+token);
+assert(js.includes('renderPartnerHub'),'Partner Hub renderer missing');
+assert(js.includes('renderCampaignStudio'),'Campaign Studio renderer missing');
+assert(js.includes('renderSponsorWall'),'Sponsor Wall renderer missing');
+
+
 console.log('Sponsor vision contract PASS');
