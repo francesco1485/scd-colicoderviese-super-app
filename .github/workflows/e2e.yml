@@ -66,6 +66,7 @@ jobs:
           node --check scd-twin.js
           node --check sponsor/app.js
           node --check scripts/validate-sponsor-operations.mjs
+          node --check tests/smoke-sponsor.mjs
       - name: API contract gate
         run: npm run test:contract
       - name: Upstream resilience gate
@@ -86,6 +87,8 @@ jobs:
           exit 1
       - name: Smoke test mobile app
         run: npm run test:smoke
+      - name: Sponsor private workbench smoke
+        run: npm run test:sponsor-smoke
       - name: Server logs
         if: always()
         run: cat /tmp/scd-server.log || true
