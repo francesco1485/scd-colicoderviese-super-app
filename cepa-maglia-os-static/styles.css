@@ -4417,3 +4417,33 @@ a:focus-visible{
   .crm-lower-grid>article:last-child,.crm-learning-summary>p{grid-column:auto}
   .crm-module-card{min-height:0}
 }
+
+
+/* =========================================================
+   MAGLIA 360 · V14 PERSONAL CRM COACH
+   ========================================================= */
+.crm-recommendation-panel{
+  margin-top:12px;
+  background:
+    radial-gradient(circle at 92% 10%,rgba(77,158,152,.10),transparent 28%),
+    linear-gradient(180deg,#fff,#f8fbfb)
+}
+.crm-recommendation-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.crm-recommendation-row{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:start;
+  padding:12px;border:1px solid #dfe8ea;border-radius:12px;background:#fff
+}
+.crm-recommendation-row span{
+  display:block;color:#5d8c88;font-size:7px;font-weight:900;text-transform:uppercase;letter-spacing:.07em
+}
+.crm-recommendation-row strong{display:block;margin-top:3px;color:#21495e;font-size:10px}
+.crm-recommendation-row p{margin:5px 0 0;color:#748992;font-size:8px;line-height:1.45}
+.crm-recommendation-row>b{
+  display:grid;place-items:center;min-width:38px;height:38px;border-radius:11px;background:#eaf4f2;color:#356f68;font-size:12px
+}
+.crm-learning-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
+.crm-learning-summary>div:nth-child(5){grid-column:1/-1}
+
+@media(max-width:900px){
+  .crm-recommendation-list{grid-template-columns:1fr}
+}
