@@ -114,9 +114,10 @@ $('#otpLoginForm').addEventListener('submit',async e=>{
 });
 
 // If a valid session already exists, keep a discreet shortcut available.
-if(!ON_PUBLIC_STATIC)fetch('/api/sponsor/session',{credentials:'same-origin'}).then(async r=>{
+if(!ON_PUBLIC_STATIC)fetch('/api/sponsor/session?probe=1',{credentials:'same-origin'}).then(async r=>{
   if(!r.ok)return;
   const d=await r.json();
+  if(d.authenticated!==true)return;
   const b=document.createElement('a');
   b.className='session-chip';
   b.href=d.isDirection?'/sponsor/admin':'/sponsor/app';
