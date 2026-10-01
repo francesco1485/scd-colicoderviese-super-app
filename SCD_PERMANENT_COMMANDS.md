@@ -582,3 +582,28 @@ Metriche consentite:
 form_start, form_complete, form_abandon, upload_error, invalid_file, route_success, route_failure, average_completion_time, device_class, accessibility_preference.
 
 Scopo: ridurre attrito e migliorare il modulo. Vietato profilare fragilita o contenuto personale.
+
+## COMANDO OPERATIVO BREVE — SCD:EXPERT + SCD:ASSET
+
+Ogni nuova richiesta complessa deve essere letta con due filtri prima di costruire:
+
+### SCD:EXPERT
+`CLASSIFICA -> SELEZIONA DOMINI -> VERIFICA FONTI -> DISTINGUI FATTI/ANALISI/PROPOSTE -> SCEGLI STRUMENTI -> COSTRUISCI -> TESTA -> MISURA -> MIGLIORA`
+
+Domini combinabili: sport, FIGC/LND/SGS, amministrazione, lavoro/contratti/P.IVA, Office/Google Workspace, Acrobat/PDF, Adobe/Canva/CapCut, web/app/PWA/mobile, backend/database/API/AI, automazione, dati/algoritmi/crittografia applicata, cybersecurity difensiva e OSINT lecito, mappe/geografia/territorio, storia/cultura/letteratura, marketing/comunicazione/social, sponsor/vendite/commercio, import-export/procurement/prezzi, finanza/mercati informativa, turismo/ospitalità, food/wine/beverage, nutrizione sportiva informativa, relazioni internazionali/geopolitica aggiornata, gaming/community/messaggistica, asset/loghi/stemmi/immagini, scontorno/vettorializzazione/provenance, scrittura/copy/narrativa, cartelle/link/document routing/logging.
+
+### SCD:ASSET
+`KEEP_LOCKED -> KEEP_ENHANCE -> REBUILD_IMPROVE -> RESEARCH_REAL_ASSET -> GENERATE_ORIGINAL`
+
+Regole vincolanti:
+- asset ufficiali e master reali: mai ridisegnati, mai sostituiti da AI;
+- loghi avversari: ricerca e verifica reale prima del render;
+- sponsor: denominazione e wordmark esatti, solo stato CONFIRMED/ACTIVE;
+- kit: soltanto da riferimento ufficiale verificato;
+- derivazioni consentite: resize proporzionale, alpha/scontorno fedele, trim, ottimizzazione, conversione formato;
+- ogni asset reale deve conservare fonte, data verifica, stagione/validità, confidence, master path e hash quando disponibile;
+- in assenza di verifica usare placeholder neutro e stato esplicito, mai una ricostruzione “simile”.
+
+### AUTONOMIA
+È consentita autonomia per analisi, ricerca pubblica/autorizzata, inventario, classificazione, prototipi, branch, test, UX reversibile e documentazione.
+Sono sempre soggetti a Direzione: ruoli, permessi, pagamenti, dati personali/sensibili, contratti vincolanti, safeguarding, cancellazioni irreversibili, migrazioni distruttive e nuove spese non approvate.

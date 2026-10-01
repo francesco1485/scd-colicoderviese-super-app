@@ -198,7 +198,19 @@ assert(stateGate.failure_rule==='NO_STATE_NO_WRITE','NO STATE -> NO WRITE rule m
 includesAll(stateGate.required_before||[],['FILE_WRITE','COMMIT','PUSH','BRANCH_CREATE','MERGE','DEPLOY','DATA_WRITE','CONFIG_CHANGE'],'SCD:STATE write coverage');
 includesAll(stateGate.minimum_evidence||[],['REPOSITORY','CURRENT_MAIN_SHA','CURRENT_WORKING_BRANCH','CI_STATUS','PAGES_STATUS','MANIFEST_VERSION_OR_HASH','RELEASE_DEPENDENCIES','KNOWN_BLOCKERS','SAFE_NEXT_ACTION'],'SCD:STATE evidence');
 includesAll(stateGate.allowed_status_values||[],['VERIFIED','UNVERIFIED','NOT_AVAILABLE','NOT_APPLICABLE'],'SCD:STATE statuses');
-includesAll(m.development_contract?.operating_cycle||[],['SCD:STATE','SCD:INVENTORY','SCD:GAP','SCD:PLAN','SCD:BUILD','SCD:DATA','SCD:QA','SCD:MERGE','SCD:DEPLOY','SCD:PROVE','SCD:ROLLBACK'],'development operating cycle');
+includesAll(m.development_contract?.operating_cycle||[],['SCD:STATE','SCD:EXPERT','SCD:INVENTORY','SCD:GAP','SCD:PLAN','SCD:BUILD','SCD:DATA','SCD:QA','SCD:MERGE','SCD:DEPLOY','SCD:PROVE','SCD:ROLLBACK'],'development operating cycle');
+const expert=m.development_contract?.global_expert_router||{};
+assert(expert.command==='SCD:EXPERT','SCD:EXPERT command missing');
+assert(expert.mode==='MULTIDISCIPLINARY_SOURCE_AWARE_ROUTER','SCD:EXPERT mode mismatch');
+includesAll(expert.asset_decision_values||[],['KEEP_LOCKED','KEEP_ENHANCE','REBUILD_IMPROVE','RESEARCH_REAL_ASSET','GENERATE_ORIGINAL'],'SCD:EXPERT asset decisions');
+assert(expert.cybersecurity_scope==='DEFENSIVE_AUTHORIZED_OSINT_AND_SECURE_ENGINEERING_ONLY','cybersecurity scope must remain defensive/authorized');
+assert(expert.research_scope==='PUBLIC_AUTHORIZED_SOURCES_ONLY','research scope must remain public/authorized');
+assert(expert.autonomy?.production_rule==='NO_CRITICAL_AUTONOMOUS_PRODUCTION_CHANGE','critical autonomous production change must remain forbidden');
+const assetGate=m.development_contract?.asset_decision_gate||{};
+assert(assetGate.command==='SCD:ASSET','SCD:ASSET command missing');
+assert(assetGate.registry==='config/scd-assets.v1.json','asset registry path mismatch');
+assert(assetGate.creative_reconstruction_of_official_assets===false,'official asset creative reconstruction must remain forbidden');
+includesAll(assetGate.immutable_families||[],['CLUB_OFFICIAL','FEDERATION_OFFICIAL','AFFILIATION_OFFICIAL','KIT_OFFICIAL','OPPONENT_OFFICIAL','SPONSOR_OFFICIAL'],'immutable asset families');
 const releaseEvidence=m.delivery_and_quality?.release_truth?.required_evidence||[];
 includesAll(releaseEvidence,['VERSION','COMMIT','PR','CI_STATUS','SCREENSHOT_MOBILE','SCREENSHOT_DESKTOP','DATA_SOURCES','KNOWN_LIMITATIONS','ROLLBACK'],'release evidence');
 assert(m.delivery_and_quality?.production_evidence?.required===true,'production evidence must remain required');
@@ -275,6 +287,7 @@ const requiredRepoFiles=[
   'mobile/src/lib/context.ts',
   'scripts/validate-mobile-contract.mjs',
   'config/scd-supabase.v1.json',
+  'config/scd-assets.v1.json',
   'supabase/migrations/20260929_r35_auth_context_rls_normalization.sql',
   'supabase/migrations/20260929_r33_club_graph_foundation.sql',
   'scripts/validate-supabase-contract.mjs',

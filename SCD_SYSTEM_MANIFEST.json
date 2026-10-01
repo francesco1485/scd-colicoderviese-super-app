@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.8.0",
+    "version": "3.9.0",
     "effective_at": "2026-10-01",
     "status": "BINDING",
     "language": "it-IT",
@@ -1721,7 +1721,7 @@
       "rule": "Objective interaction friction may improve UI; it must not be interpreted as a psychological diagnosis."
     },
     "adaptive_device_metrics": {
-      "state": "PLANNED_PRIVACY_FIRST",
+      "state": "LOCAL_RUNTIME_IMPLEMENTED_AGGREGATED_INTELLIGENCE_PLANNED",
       "aggregate_only": true,
       "allowed": [
         "VIEWPORT_CLASS",
@@ -1730,10 +1730,31 @@
         "ACCESSIBILITY_PREFERENCE",
         "LAYOUT_ERROR",
         "OVERFLOW",
-        "SLOW_LOAD"
+        "SLOW_LOAD",
+        "ORIENTATION",
+        "DPR_CLASS",
+        "SAFE_AREA_STATE",
+        "REDUCED_MOTION",
+        "COLOR_SCHEME",
+        "STANDALONE_MODE"
       ],
       "no_fingerprinting": true,
-      "purpose": "Improve layout, resolution, density and task usability across device classes."
+      "purpose": "Improve layout, resolution, density and task usability across device classes.",
+      "runtime_engine": "scd-adaptive-engine.js",
+      "adaptation_targets": [
+        "TYPOGRAPHY",
+        "DENSITY",
+        "COLUMN_COUNT",
+        "TOUCH_TARGETS",
+        "NAVIGATION",
+        "RAILS",
+        "OVERLAYS",
+        "MODALS",
+        "MEDIA_LOADING",
+        "INITIAL_INFORMATION_DENSITY"
+      ],
+      "device_model_detection": false,
+      "feature_detection_first": true
     },
     "intake_metrics": {
       "state": "CONTRACTED",
@@ -2442,7 +2463,7 @@
         "SCD_GMAIL",
         "R20"
       ],
-      "contract": "MULTIDISCIPLINARY_ROUTING_CURRENT_SOURCE_VERIFICATION_AND_CONTROLLED_AUTONOMY"
+      "contract": "SCD_EXPERT_MULTIDISCIPLINARY_ROUTING_KEEP_ENHANCE_REBUILD_RESEARCH_GENERATE_CURRENT_SOURCE_VERIFICATION_CONTROLLED_AUTONOMY"
     },
     {
       "id": "CAP-WORLD-RESEARCH-ENGINE",
@@ -2599,6 +2620,7 @@
     },
     "operating_cycle": [
       "SCD:STATE",
+      "SCD:EXPERT",
       "SCD:INVENTORY",
       "SCD:GAP",
       "SCD:PLAN",
@@ -2707,7 +2729,35 @@
         "GENERATE_ORIGINAL"
       ],
       "real_asset_priority": true,
-      "no_ai_substitution_for_official_asset": true
+      "no_ai_substitution_for_official_asset": true,
+      "command": "SCD:ASSET",
+      "registry": "config/scd-assets.v1.json",
+      "output_fields": [
+        "DECISION",
+        "MASTER_ASSET",
+        "DERIVED_ASSET_ALLOWED",
+        "SOURCE",
+        "PROVENANCE",
+        "RISK",
+        "TEST",
+        "ROLLBACK"
+      ],
+      "immutable_families": [
+        "CLUB_OFFICIAL",
+        "FEDERATION_OFFICIAL",
+        "AFFILIATION_OFFICIAL",
+        "KIT_OFFICIAL",
+        "OPPONENT_OFFICIAL",
+        "SPONSOR_OFFICIAL"
+      ],
+      "technical_derivatives_allowed": [
+        "RESIZE_PROPORTIONAL",
+        "ALPHA_CLEANUP",
+        "TRIM",
+        "LOSSLESS_OR_VISUALLY_LOSSLESS_OPTIMIZATION",
+        "FORMAT_CONVERSION"
+      ],
+      "creative_reconstruction_of_official_assets": false
     },
     "global_expert_router": {
       "state": "BINDING",
@@ -2723,7 +2773,100 @@
         "SAFETY",
         "GEOPOLITICS_CURRENT"
       ],
-      "high_stakes_rule": "CURRENT_SOURCES_AND_CLEAR_FACT_ANALYSIS_DECISION_SEPARATION"
+      "high_stakes_rule": "CURRENT_SOURCES_AND_CLEAR_FACT_ANALYSIS_DECISION_SEPARATION",
+      "command": "SCD:EXPERT",
+      "mode": "MULTIDISCIPLINARY_SOURCE_AWARE_ROUTER",
+      "decision_protocol": [
+        "CLASSIFY_TASK",
+        "IDENTIFY_FIXED_ASSETS_AND_CONTRACTS",
+        "SELECT_RELEVANT_DOMAINS",
+        "IDENTIFY_REQUIRED_CURRENT_SOURCES",
+        "SEPARATE_FACT_ANALYSIS_PROPOSAL",
+        "SELECT_TOOLCHAIN",
+        "PROPOSE_OR_BUILD",
+        "TEST",
+        "MEASURE",
+        "KEEP_OR_ROLLBACK"
+      ],
+      "asset_decision_values": [
+        "KEEP_LOCKED",
+        "KEEP_ENHANCE",
+        "REBUILD_IMPROVE",
+        "RESEARCH_REAL_ASSET",
+        "GENERATE_ORIGINAL"
+      ],
+      "domains": [
+        "SPORT_FIGC_LND_SGS",
+        "TOURNAMENTS_EVENTS_ANIMATION",
+        "CLUB_OPERATIONS",
+        "ADMINISTRATION",
+        "LABOR_CONTRACTS_PIVA",
+        "OFFICE_GOOGLE_WORKSPACE",
+        "PDF_ACROBAT",
+        "ADOBE_PHOTOSHOP_ILLUSTRATOR_INDESIGN",
+        "CANVA_CAPCUT_MEDIA",
+        "WEB_PWA_MOBILE_BACKEND_DATABASE",
+        "AUTOMATION_API_AI",
+        "DATA_ALGORITHMS_CRYPTOGRAPHY_APPLIED",
+        "CYBERSECURITY_DEFENSIVE",
+        "OSINT_PUBLIC_AUTHORIZED",
+        "GEO_MAPS_TERRITORY",
+        "HISTORY_LITERATURE_CULTURE",
+        "MARKETING_COMMUNICATION_SOCIAL",
+        "SPONSORSHIP_SALES_COMMERCIAL",
+        "IMPORT_EXPORT_PROCUREMENT_PRICING",
+        "FINANCE_MARKETS_BROKER_INFORMATIONAL",
+        "TOURISM_TRAVEL_HOSPITALITY",
+        "FOOD_WINE_BEVERAGE",
+        "NUTRITION_SPORT_INFORMATIONAL",
+        "INTERNATIONAL_RELATIONS_GEOPOLITICS_CURRENT",
+        "GAMING_COMMUNITY_MESSAGING",
+        "ASSET_RESEARCH_LOGOS_CRESTS_IMAGES",
+        "IMAGE_CUTOUT_VECTOR_PROVENANCE",
+        "WRITING_COPY_NARRATIVE_POETRY",
+        "DOCUMENT_ARCHITECTURE_FOLDER_LINK_ROUTING_LOGGING",
+        "WORLD_RESEARCH_DEEP_FIND"
+      ],
+      "software_roundtrip_rule": "PRESERVE_MASTER_NATIVE_FORMAT_WHEN_EDITABILITY_MATTERS_AND_EXPORT_PURPOSE_SPECIFIC_DERIVATIVES",
+      "autonomy": {
+        "default": "CONTROLLED",
+        "allowed": [
+          "ANALYZE",
+          "RESEARCH_PUBLIC_AUTHORIZED",
+          "INVENTORY",
+          "CLASSIFY",
+          "PROPOSE",
+          "PROTOTYPE",
+          "CREATE_BRANCH",
+          "WRITE_TESTS",
+          "IMPROVE_REVERSIBLE_UX",
+          "DOCUMENT"
+        ],
+        "requires_direction_approval": [
+          "ROLE_OR_PERMISSION_CHANGE",
+          "PAYMENT",
+          "PERSONAL_OR_SENSITIVE_DATA_CHANGE",
+          "BINDING_CONTRACT",
+          "IRREVERSIBLE_DELETE",
+          "SAFEGUARDING_FLOW",
+          "DESTRUCTIVE_MIGRATION",
+          "NEW_UNAPPROVED_COST"
+        ],
+        "production_rule": "NO_CRITICAL_AUTONOMOUS_PRODUCTION_CHANGE"
+      },
+      "output_contract": [
+        "TASK_CLASS",
+        "DOMAINS",
+        "FIXED",
+        "IMPROVABLE",
+        "MISSING",
+        "SOURCE_PLAN",
+        "TOOLCHAIN",
+        "RISK",
+        "TEST",
+        "ROLLBACK",
+        "NEXT_ACTION"
+      ]
     },
     "asset_change_rule": {
       "official_asset_change": "ADMIN_APPROVAL_PLUS_REGISTRY_HASH_UPDATE",

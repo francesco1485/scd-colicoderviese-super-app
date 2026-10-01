@@ -266,3 +266,79 @@ radial-gradient(circle at 84% 0%,rgba(41,215,255,.12),transparent 31%),
   .join-paths{grid-template-columns:1fr}
   .match-main{grid-template-columns:1fr 1fr}.match-when{grid-column:1/-1;grid-row:2}.match-team{grid-row:1}
 }
+
+
+/* R42 SIMPLE PUBLIC HOME */
+.topbar{
+  height:68px;
+  padding:0 18px;
+  grid-template-columns:auto 1fr auto;
+}
+.brand img{width:40px;height:46px}
+.brand b{font-size:16px}
+.brand small{font-size:8px;letter-spacing:.14em}
+.top-center{justify-self:center;font-size:10px}
+.top-actions{align-items:center;gap:7px}
+.top-link{
+  min-height:40px;
+  display:flex;
+  align-items:center;
+  gap:7px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:rgba(255,255,255,.035);
+  color:#dfeeff;
+  padding:0 12px;
+  font-size:10px;
+  font-weight:850;
+}
+.top-link span{font-size:14px;color:var(--cyan)}
+.top-link-accent{
+  border-color:rgba(255,216,74,.28);
+  background:rgba(255,216,74,.08);
+  color:#ffe76f;
+}
+.world-switch,
+.global-experience-dock,
+.home-secondary-hero,
+.ng-command-ring,
+.pulse-strip,
+.ng-constellation,
+.worlds-preview,
+.ng-value-engine{
+  display:none!important;
+}
+.home-first{
+  margin-top:12px;
+  border-radius:22px;
+  box-shadow:0 14px 46px rgba(0,0,0,.22);
+}
+.home-first-head{margin-bottom:14px}
+.home-first h1{font-size:clamp(30px,3.8vw,54px);max-width:650px}
+.home-first .day{min-height:145px}
+.home-practical-grid{margin-top:14px}
+.newsroom{padding-top:34px;padding-bottom:34px}
+.community-pulse{margin-top:14px}
+.verified-sponsor-rail{margin-top:14px}
+.join-club{margin-top:14px;margin-bottom:90px}
+@media(max-width:900px){
+  .topbar{height:62px;padding:0 12px;grid-template-columns:auto 1fr auto}
+  .top-center{display:none}
+  .top-actions{gap:5px}
+  .top-link{width:38px;min-width:38px;padding:0;justify-content:center}
+  .top-link b{display:none}
+  .avatar-mini{width:38px;height:38px}
+  .home-first{margin-top:8px}
+  .home-first-head{gap:8px}
+}
+@media(max-width:520px){
+  .brand span{display:none}
+  .home-first{padding:14px}
+  .home-first h1{font-size:31px}
+  .home-first-head p{font-size:11px;line-height:1.4}
+  .week-calendar-cta{width:100%;text-align:center}
+  .public-search-shell{border-radius:14px}
+  .home-practical-grid{gap:12px}
+  .match-center,.upcoming-events{border-radius:18px}
+  .newsroom{padding-top:28px;padding-bottom:28px}
+}
