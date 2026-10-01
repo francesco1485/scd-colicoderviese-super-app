@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 
 const EXPECTED_VERSION=process.env.SCD_EXPECTED_VERSION||'40.0.0';
-const EXPECTED_MANIFEST=process.env.SCD_EXPECTED_MANIFEST||'3.6.0';
+const EXPECTED_MANIFEST=process.env.SCD_EXPECTED_MANIFEST||'3.7.0';
 const PAGES_URL=process.env.SCD_PAGES_URL||'https://francesco1485.github.io/scd-colicoderviese-super-app/';
 const RENDER_BASE=(process.env.SCD_RENDER_BASE_URL||'https://scd-colicoderviese-official-r21.onrender.com').replace(/\/$/,'');
 const ATTEMPTS=Math.max(1,Number(process.env.SCD_PROD_VERIFY_ATTEMPTS||20));
