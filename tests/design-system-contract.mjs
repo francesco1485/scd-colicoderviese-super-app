@@ -56,9 +56,11 @@ for(const token of [
 ]) assert(doc.includes(token),'design governance doc missing: '+token);
 
 assert(motion.source==='SCD_MEDIA_MOTION_LAB','motion profile source missing');
-assert(motion.defaultPreview?.width===1920&&motion.defaultPreview?.height===1080,'motion preview resolution missing');
-assert(motion.defaultPreview?.fps===25,'motion preview fps missing');
-assert(motion.defaultPreview?.durationSeconds===20,'motion preview duration missing');
+assert(motion.previewSource?.width===1920&&motion.previewSource?.height===1080,'motion preview resolution missing');
+assert(motion.previewSource?.fps===25,'motion preview fps missing');
+assert(motion.previewSource?.durationSeconds===20,'motion preview duration missing');
+assert(motion.productionTarget?.durationSeconds===40,'LED production target duration missing');
+assert(motion.productionTarget?.logoRequirement==='OFFICIAL_APPROVED_LOGO_REQUIRED_BEFORE_FINAL_MP4','final MP4 logo gate missing');
 for(const partner of ['GGlass','TA Cleaning','AGC Medical']){
   const p=motion.profiles.find(x=>x.partnerName===partner);
   assert(Boolean(p),'motion profile missing: '+partner);
@@ -72,6 +74,8 @@ assert(server.includes('handleSponsorMotionProfiles'),'motion profile handler mi
 assert(app.includes('id="motionProfileGrid"'),'Motion Lab grid missing');
 assert(app.includes('id="motionInspector"'),'Motion Lab inspector missing');
 assert(appJs.includes('loadMotionProfiles'),'Motion Lab loader missing');
+assert(appJs.includes('fetchMotionConfig'),'shared protected motion loader missing');
+assert(!appJs.includes("fetch('/config/sponsor-motion-profiles.json'"),'motion config must not bypass protected endpoint');
 assert(appJs.includes('renderMotionInspector'),'Motion Lab inspector renderer missing');
 
 console.log('SCD design system contract PASS',{
