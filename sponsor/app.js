@@ -6,6 +6,8 @@ let sponsorAccess={profile:'NON_AUTORIZZATO',platform:false};
 let sponsorSession={user:null,capabilities:{}};
 let partnerHubCurrent='';
 let campaignFilter='TUTTI';
+let motionProfilesState={profiles:[],defaultPreview:null,nativeLedStatus:'DA_RILEVARE_ALLA_CONSEGNA'};
+let motionProfileCurrent='';
 
 function applySponsorCapabilities(caps={}){
   sponsorAccess={...sponsorAccess,...caps};
@@ -24,6 +26,64 @@ function applySponsorCapabilities(caps={}){
   });
 }
 
+function motionStatusLabel(status=''){
+  if(status==='TEMPLATE')return 'TEMPLATE';
+  if(status.includes('DA_RIVEDERE'))return 'DA RIVEDERE';
+  return String(status||'DA VERIFICARE').replaceAll('_',' ');
+}
+function renderMotionInspector(id){
+  const box=$('#motionInspector');if(!box)return;
+  const p=motionProfilesState.profiles.find(x=>x.id===id)||motionProfilesState.profiles[0];
+  if(!p){box.innerHTML='<small>MOTION PROFILE</small><h3>Nessun profilo disponibile</h3>';return}
+  motionProfileCurrent=p.id;
+  const spec=motionProfilesState.defaultPreview||{};
+  box.innerHTML=
+    '<small>MOTION PROFILE · '+esc(p.id)+'</small>'+
+    '<h3>'+esc(p.partnerName)+'</h3>'+
+    '<div class="motion-inspector-status"><span class="status-badge orange">'+esc(motionStatusLabel(p.productionStatus))+'</span><span class="status-badge '+(p.logoAssetStatus==='MISSING_OFFICIAL_REPO_ASSET'?'red':'blue')+'">'+esc(p.logoAssetStatus.replaceAll('_',' '))+'</span></div>'+
+    '<div class="motion-spec-row"><span><b>'+esc(spec.width||'—')+'×'+esc(spec.height||'—')+'</b><small>preview</small></span><span><b>'+esc(spec.fps||'—')+' fps</b><small>frame rate</small></span><span><b>'+esc(spec.durationSeconds||'—')+' sec</b><small>durata</small></span></div>'+
+    '<dl class="motion-detail-list">'+
+      '<div><dt>Messaggio</dt><dd>'+esc(p.message)+'</dd></div>'+
+      '<div><dt>Movimento</dt><dd>'+esc(p.motionConcept)+'</dd></div>'+
+      '<div><dt>Vista tribuna</dt><dd>'+esc(p.stadiumView)+'</dd></div>'+
+      '<div><dt>Camera-safe</dt><dd>'+esc(p.cameraView)+'</dd></div>'+
+      '<div><dt>Identità SCD / Lago</dt><dd>'+esc(p.lakeIdentity)+'</dd></div>'+
+    '</dl>'+
+    '<div class="motion-proof"><small>PROOF PLAN</small>'+p.proofPlan.map(x=>'<span>'+esc(x)+'</span>').join('')+'</div>'+
+    '<div class="motion-inspector-actions"><button class="btn-yellow" id="motionToActivation">Crea attivazione</button><button class="btn-light" data-view="media">Apri LED</button></div>'+
+    '<p class="motion-safety-note">Il master LED definitivo resta bloccato finché non sono disponibili logo ufficiale approvato e specifiche native dell’impianto.</p>';
+  $('[data-motion-id]').forEach(el=>el.classList.toggle('active',el.dataset.motionId===p.id));
+  const go=$('#motionToActivation');if(go)go.onclick=()=>openView('activationstudio');
+  const mediaBtn=box.querySelector('[data-view="media"]');if(mediaBtn)mediaBtn.onclick=()=>openView('media');
+}
+function renderMotionProfiles(){
+  const grid=$('#motionProfileGrid'),state=$('#motionSystemState');
+  if(!grid)return;
+  const rows=motionProfilesState.profiles||[];
+  if(state)state.textContent=rows.length+' profili · LED nativo '+String(motionProfilesState.nativeLedStatus||'DA RILEVARE').replaceAll('_',' ').toLowerCase();
+  grid.innerHTML=rows.map((p,i)=>
+    '<button class="motion-profile-card '+(i===0?'active':'')+'" data-motion-id="'+esc(p.id)+'" type="button">'+
+      '<div class="motion-card-top"><span>'+String(i+1).padStart(2,'0')+'</span><b>'+esc(p.partnerName)+'</b></div>'+
+      '<div class="motion-card-preview"><i></i><strong>'+esc(p.message)+'</strong><small>'+esc(motionStatusLabel(p.productionStatus))+'</small></div>'+
+      '<div class="motion-card-foot"><span>'+esc((motionProfilesState.defaultPreview?.durationSeconds||'—')+' sec')+'</span><span>'+esc((motionProfilesState.defaultPreview?.fps||'—')+' fps')+'</span></div>'+
+    '</button>'
+  ).join('');
+  $('[data-motion-id]').forEach(btn=>btn.onclick=()=>renderMotionInspector(btn.dataset.motionId));
+  renderMotionInspector(motionProfileCurrent||rows[0]?.id||'');
+}
+async function loadMotionProfiles(){
+  try{
+    const r=await fetch('/api/sponsor/motion-profiles',{credentials:'same-origin',cache:'no-store'});
+    if(!r.ok)throw new Error('MOTION_PROFILES_HTTP_'+r.status);
+    const d=await r.json();
+    motionProfilesState=d.data||motionProfilesState;
+    renderMotionProfiles();
+  }catch(e){
+    const state=$('#motionSystemState');if(state)state.textContent='Motion Lab non disponibile';
+    const grid=$('#motionProfileGrid');if(grid)grid.innerHTML='<div class="motion-load-error">Impossibile caricare i profili motion: '+esc(e.message||e)+'</div>';
+  }
+}
+
 async function loadSponsorSession(){
   try{
     const r=await fetch('/api/sponsor/session',{credentials:'same-origin',cache:'no-store'});
@@ -34,6 +94,7 @@ async function loadSponsorSession(){
     applySponsorCapabilities(d.capabilities||{});
     const profile=String(d.capabilities?.profile||'ACCESSO AUTORIZZATO').replaceAll('_',' ');
     if($('#sessionRole'))$('#sessionRole').textContent=(d.user?.role||'Accesso autorizzato')+' · '+profile;
+    loadMotionProfiles();
   }catch(e){
     location.replace('/sponsor/?login=1');
   }
