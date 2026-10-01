@@ -20,6 +20,9 @@ if(!html.includes('SCD MIRROR')) fail('Mirror surface missing');
 if(!html.includes('PRIVATE DESK')) fail('Private Desk missing');
 if(!html.includes('SCD WEEKLY RADAR')) fail('Weekly Radar missing');
 if(!html.includes('SCD AI NEWSROOM')) fail('AI Newsroom missing');
+for(const token of ['SCD HOME · QUESTA SETTIMANA','publicSearchInput','matchCenter','upcomingEvents','communityPulse','sponsorRail','joinClub','data-public-action="calendar"','avatarSearch','SKY']){
+  if(!html.includes(token)) fail('current-week public entry missing '+token);
+}
 
 for(const forbidden of ['hero-colico.webp','event-insieme.webp','photoInput','t.photo']){
   if(all.includes(forbidden)) fail('forbidden real-photo runtime reference: '+forbidden);
@@ -44,6 +47,10 @@ if(manifest.sky_and_avatar?.personal_avatar?.rendering_mode!=='SYNTHETIC_ONLY') 
 if(manifest.sky_and_avatar?.mirror?.separate_from_twin!==true) fail('Mirror and Twin must remain separate');
 
 const capIds=new Set((manifest.capability_map||[]).map(x=>x.id));
+if(manifest.product_direction?.home_public_entry?.priority!=='CURRENT_WEEK_FIRST') fail('home current-week-first contract missing');
+if(manifest.product_direction?.home_public_entry?.avatar?.onboarding_required!==false) fail('avatar must remain optional at onboarding');
+if(manifest.product_direction?.home_public_entry?.match_center?.invented_stats!==false) fail('invented match statistics must remain forbidden');
+
 for(const id of ['CAP-NEXTGEN-SYNTHETIC-UI','CAP-LOCAL-TTS','CAP-VALUE-ENGINE']){
   if(!capIds.has(id)) fail('missing capability '+id);
 }
