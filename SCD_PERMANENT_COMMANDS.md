@@ -147,3 +147,186 @@ Questa direttiva sostituisce la dipendenza da fotografie reali nella UI Next Gen
 - Il valore economico deve nascere dall'utilita': Family Benefit, Event Experience, Partner Story, hospitality, merchandising, tornei, servizi e attivazioni misurabili.
 - Drive e Gmail restano motori di back-office: l'utente non naviga cartelle o posta, ma vede azioni, priorita', scadenze, relazioni, documenti ed eventi derivati dalle fonti.
 - L'esperienza deve restare multi-eta', accessibile e comprensibile senza dipendere da gergo gestionale.
+
+
+## COMANDO SCD GLOBAL EXPERT ROUTER + ASSET INTEGRITY + ADAPTIVE EXPERIENCE (2026-10-01)
+
+Questa direttiva e' cumulativa e vincolante per tutto l'ecosistema SCD. Non autorizza la sostituzione arbitraria di asset ufficiali, dati reali o processi gia' verificati.
+
+### 1. CRITERIO DI DECISIONE: KEEP / ENHANCE / REBUILD / RESEARCH / GENERATE
+Prima di creare o modificare qualsiasi elemento, classificare l'oggetto in una sola categoria operativa:
+
+- **KEEP_LOCKED**: non modificare contenuto, forma, proporzioni, colori, scritte o identita. Esempi: logo SCD ufficiale, loghi FIGC/LND/SGS/partner ufficiali, loghi sponsor approvati, stemmi reali delle squadre avversarie, kit ufficiali approvati, documenti originali, dati federali certificati.
+- **KEEP_ENHANCE**: preservare il contenuto reale ma migliorare presentazione, accessibilita, compressione, scontorno, responsive, contrasto, metadata, indicizzazione o formato tecnico senza alterarne l'identita.
+- **REBUILD_IMPROVE**: ricostruire interfaccia, flusso, impaginazione o logica quando la forma esistente e' debole, obsoleta, ridondante o incompatibile con l'esperienza SCD, preservando dati, contratti, provenienza e funzioni valide.
+- **RESEARCH_REAL_ASSET**: quando manca uno stemma, un logo squadra, un wordmark sponsor, un kit o altro elemento reale, cercarlo da fonte ufficiale o verificata, registrare provenienza e data, e usare l'asset reale. Vietato inventare o ridisegnare una versione "simile" se l'originale esiste.
+- **GENERATE_ORIGINAL**: usare grafica sintetica originale solo per ambienti, texture, scene, visual editoriali, illustrazioni, elementi decorativi o concetti che non sostituiscono asset ufficiali o fatti reali.
+
+Ogni decisione deve rispondere a: COSA E' FISSO, COSA E' MIGLIORABILE, COSA E' MANCANTE, QUALE FONTE E' AUTOREVOLE, QUALE RISCHIO ESISTE, QUALE TEST DIMOSTRA IL MIGLIORAMENTO.
+
+### 2. ASSET UFFICIALI: PUNTI FISSI
+La cartella asset canonica del progetto e' `assets/`. Gli asset ufficiali gia' presenti e approvati sono riferimenti stabili e non devono essere ridisegnati.
+
+Asset SCD correnti bloccati:
+- `assets/logo-scd.png`
+- `assets/logo-scd.webp`
+- `assets/logo-lnd.png`
+- `assets/logo-lnd.webp`
+- `assets/logo-sgs.png`
+- `assets/logo-sgs.webp`
+- `assets/logo-monza.png`
+- `assets/logo-monza.webp`
+
+Regole:
+- mai sostituire un asset LOCKED con generazione AI;
+- mai alterare wordmark, lettere, stemma, colori sociali o proporzioni;
+- consentiti solo conversione formato, ottimizzazione peso, scontorno, trim e alpha se il risultato e' pixel-faithful all'originale;
+- conservare sempre originale + variante ottimizzata;
+- ogni asset deve avere SOURCE, SOURCE_URL/FILE, VERIFIED_AT, RIGHTS/USAGE_STATUS quando applicabile, HASH e STATUS.
+
+### 3. KIT SCD
+Il kit ufficiale e' un asset identitario reale.
+- Deve derivare da foto, mockup, scheda tecnica o file ufficiale approvato.
+- Colori, sponsor, posizione loghi, pattern, numeri e scritte non devono essere inventati.
+- Miglioramenti grafici sono ammessi soltanto come rappresentazione tecnica/fotorealistica fedele.
+- Se manca la fonte ufficiale, mostrare `KIT_NON_VERIFICATO` e non pubblicare una ricostruzione come ufficiale.
+- Il Twin puo' usare una versione sintetica del kit solo dopo averne verificato il design reale.
+
+### 4. LOGHI SQUADRE AVVERSARIE
+Per match, calendario, tornei e classifiche:
+- cercare sempre lo stemma reale della societa avversaria;
+- priorita fonti: sito ufficiale club, FIGC/LND/CR, lega/competizione ufficiale, canale social ufficiale verificabile, fonte sportiva strutturata come fallback;
+- registrare club, stagione, URL/fonte, data verifica e hash asset;
+- non usare loghi generati, ricostruiti a memoria o presi da aggregatori senza cross-check se una fonte ufficiale e' disponibile;
+- se il logo non e' verificabile usare placeholder neutro con stato `LOGO_DA_VERIFICARE`, mai uno stemma inventato.
+
+### 5. SPONSOR: LOGO + SCRITTURA ESATTA
+Lo sponsor deve essere mostrato con:
+- denominazione esatta;
+- logo/wordmark ufficiale;
+- eventuale payoff solo se approvato;
+- categoria e stato della partnership verificati;
+- data di validita e fonte contrattuale/CRM quando disponibili.
+
+Mai trasformare un prospect in sponsor confermato. Mai riscrivere automaticamente un logo testuale con un font "simile". Se manca l'asset originale, richiedere/ricercare il file ufficiale.
+
+### 6. SCD ADAPTIVE EXPERIENCE ENGINE
+La piattaforma deve adattarsi in tempo reale al contesto tecnico senza profilazione invasiva.
+
+Segnali ammessi:
+- viewport reale;
+- orientamento;
+- devicePixelRatio;
+- safe-area;
+- touch / mouse / keyboard;
+- hover capability;
+- reduced motion;
+- contrast preference;
+- color scheme;
+- font scaling/accessibility;
+- larghezza/altezza del contenitore;
+- resize e fold/hinge API quando disponibili;
+- network quality solo come categoria tecnica e solo se API supportata;
+- performance timing e errori tecnici non sensibili.
+
+Segnali vietati:
+- fingerprinting occulto;
+- identificazione univoca del dispositivo senza necessita e consenso;
+- raccolta di dati sensibili;
+- inferenza di stato mentale, salute, fragilita o capacita personale.
+
+Il layout deve adattarsi a smartphone Android, iPhone, tablet, foldable, desktop, notebook, display touch, monitor ultrawide e schermi futuri tramite feature detection e container/responsive design, non tramite liste rigide di modelli.
+
+### 7. REAL-TIME VISUAL QA
+Ogni release UI deve verificare:
+- overflow;
+- clipping;
+- leggibilita;
+- target touch;
+- contrasto;
+- densita;
+- immagini/loghi non deformati;
+- safe areas;
+- rotazione;
+- tastiera virtuale;
+- zoom/font scaling;
+- desktop wide;
+- motion reduced;
+- caricamento lento/fallback;
+- DPR alto.
+
+Le risoluzioni fisse obbligatorie restano baseline, ma non sono il limite: aggiungere test fluidi e breakpoint di contenuto.
+
+### 8. AUTOMATION + USAGE INTELLIGENCE
+L'uso della piattaforma puo' alimentare miglioramenti automatici solo con metriche privacy-first:
+- feature use;
+- task completion;
+- error rate;
+- slow load;
+- navigation backtrack;
+- search use;
+- form abandonment;
+- viewport class;
+- input mode;
+- performance class;
+- accessibility preference esplicita.
+
+Pipeline:
+`OBSERVE -> AGGREGATE -> FIND FRICTION -> PROPOSE CHANGE -> A/B OR STAGING TEST -> VISUAL QA -> HUMAN APPROVAL IF CRITICAL -> RELEASE -> MEASURE -> KEEP/ROLLBACK`.
+
+Nessuna interfaccia deve cambiare in produzione in modo imprevedibile per un singolo utente senza contratto, rollback e controllo.
+
+### 9. GLOBAL EXPERT ROUTER
+Per ogni richiesta, selezionare automaticamente il dominio di competenza necessario e combinare piu domini quando il problema e' multidisciplinare.
+
+Domini inclusi, senza pretesa di infallibilita:
+- sport, FIGC/LND/SGS, tornei, eventi, animazione, hospitality;
+- amministrazione, Terzo Settore, lavoro, contratti, collaborazioni, autonomi e P.IVA;
+- Office, Excel/Sheets, Word/Docs, PowerPoint/Slides, PDF/Acrobat;
+- Photoshop, Illustrator, Canva, CapCut e pipeline media;
+- web, app, PWA, mobile, backend, database, automazione, API, AI;
+- cybersecurity difensiva, hardening, secure coding, incident analysis e OSINT legale su fonti pubbliche;
+- dati, algoritmi, crittografia applicata, formule analitiche e modellazione;
+- geografia, mappe, territorio, storia, letteratura, cultura, ricerca;
+- commercio, marketing, sponsor, vendite, import/export, procurement, prodotti e prezzi;
+- finanza, mercati e broker come analisi informativa e comparativa, con fonti aggiornate quando la decisione e' sensibile;
+- turismo, viaggi, ricettivita, food, cultura gastronomica, vini e bevande;
+- nutrizione e alimentazione sportiva in modo informativo e prudente, senza sostituire professionisti sanitari;
+- relazioni internazionali e geopolitica con fonti aggiornate, descrizione neutrale e distinzione tra fatti e analisi;
+- comunicazione, messaggistica, community, piattaforme social, gaming e sistemi relazionali;
+- ricerca asset, loghi, stemmi, immagini, scontorno, vettorializzazione fedele, metadata e provenance;
+- scrittura, copy, narrativa, poesia originale, storia sportiva e aziendale.
+
+### 10. RESEARCH DEEP-FIND
+La ricerca avanzata deve essere intensa ma lecita:
+- usare fonti pubbliche, ufficiali, archivi accessibili, motori di ricerca, database autorizzati e documenti forniti;
+- incrociare piu fonti per elementi difficili da trovare;
+- distinguere sempre `VERIFIED`, `LIKELY`, `UNVERIFIED`;
+- conservare URL, data, fonte e contesto;
+- nessun accesso abusivo, bypass di autenticazioni, exploit, credential harvesting, malware, stalking o acquisizione non autorizzata.
+
+### 11. MULTI-SOFTWARE ROUNDTRIP
+Quando si lavora tra Office, Acrobat, Adobe, Canva, CapCut o altri strumenti:
+- preservare il master originale;
+- usare formati interoperabili;
+- evitare rasterizzazioni inutili;
+- preservare trasparenza, font/licenze, profili colore, bleed e dimensioni;
+- creare output editabile quando richiesto;
+- mantenere naming/versioning coerente;
+- registrare quale file e' MASTER, EXPORT, PREVIEW o ARCHIVE.
+
+### 12. ANALISI LAVORATIVA GLOBALE
+Il sistema puo' analizzare ruoli e attivita lavorative di qualunque settore attraverso una struttura comune:
+`RUOLO -> COMPITI -> COMPETENZE -> STRUMENTI -> RESPONSABILITA -> INPUT -> OUTPUT -> RISCHI -> KPI -> AUTOMAZIONI -> CONTRATTO/INQUADRAMENTO -> COSTI -> COMPLIANCE`.
+
+Per diritto del lavoro, contratti, fiscalita, finanza, salute, sicurezza e geopolitica corrente: usare fonti aggiornate e distinguere sempre informazione, analisi e decisione professionale.
+
+### 13. AUTONOMIA CONTROLLATA
+L'assistente deve continuare a migliorare il sistema quando:
+- l'obiettivo e' gia definito dalla Direzione;
+- la modifica e' reversibile;
+- non cambia permessi, pagamenti, dati sensibili o obblighi legali;
+- esistono test e rollback;
+- la Source of Truth non viene violata.
+
+Richiedono approvazione esplicita della Direzione: modifiche critiche a ruoli, permessi, dati personali, contratti, pagamenti, tesseramenti, safeguarding, produzione irreversibile o nuova spesa.
