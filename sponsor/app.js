@@ -9,6 +9,8 @@ let campaignFilter='TUTTI';
 let motionProfilesState={profiles:[],previewSource:null,nativeLedStatus:'DA_RILEVARE_ALLA_CONSEGNA'};
 let motionProfileCurrent='';
 let motionConfigPromise=null;
+let creativeSceneState={scenes:[]};
+let creativeScenePromise=null;
 
 function fetchMotionConfig(){
   if(!motionConfigPromise){
@@ -17,6 +19,48 @@ function fetchMotionConfig(){
       .catch(e=>{motionConfigPromise=null;throw e});
   }
   return motionConfigPromise;
+}
+
+function fetchCreativeScenes(){
+  if(!creativeScenePromise){
+    creativeScenePromise=fetch('/api/sponsor/creative-scenes',{credentials:'same-origin',cache:'no-store'})
+      .then(async r=>{if(!r.ok)throw new Error('CREATIVE_SCENES_HTTP_'+r.status);const d=await r.json();if(!d?.data?.scenes)throw new Error('CREATIVE_SCENES_INVALID');return d.data})
+      .catch(e=>{creativeScenePromise=null;throw e});
+  }
+  return creativeScenePromise;
+}
+function creativeSceneById(id){
+  return (creativeSceneState.scenes||[]).find(x=>x.id===id)||creativeSceneState.scenes?.[0]||null;
+}
+function renderActivationSceneGuide(){
+  const box=$('#activationSceneGuide');if(!box)return;
+  const scene=creativeSceneById(activationValue('#activationScene',''));
+  if(!scene){
+    box.innerHTML='<small>SCENE LIBRARY</small><span>Nessuna scena disponibile.</span>';
+    return;
+  }
+  box.innerHTML=
+    '<small>'+esc(scene.label)+'</small>'+
+    '<strong>'+esc(scene.visualDirection)+'</strong>'+
+    '<span><b>Realtà:</b> '+esc(scene.realityAnchor)+'</span>'+
+    '<span><b>Creatività:</b> '+esc(scene.fantasyAllowance)+'</span>'+
+    '<span><b>Non rappresentare come reale:</b> '+esc((scene.forbidden||[]).join(' · '))+'</span>';
+}
+function renderActivationSceneOptions(){
+  const sel=$('#activationScene');if(!sel)return;
+  const current=sel.value;
+  sel.innerHTML=(creativeSceneState.scenes||[]).map(x=>'<option value="'+esc(x.id)+'">'+esc(x.label)+'</option>').join('');
+  if(current&&[...sel.options].some((o,i)=>o.value===current?(sel.selectedIndex=i,true):false)){}
+  renderActivationSceneGuide();
+}
+async function loadCreativeScenes(){
+  try{
+    creativeSceneState=await fetchCreativeScenes();
+    renderActivationSceneOptions();
+    renderActivationStudio();
+  }catch(e){
+    const box=$('#activationSceneGuide');if(box)box.innerHTML='<small>SCENE LIBRARY</small><span>Scene Library non disponibile: '+esc(e.message||e)+'</span>';
+  }
 }
 
 function applySponsorCapabilities(caps={}){
@@ -106,6 +150,8 @@ async function loadSponsorSession(){
     applySponsorCapabilities(d.capabilities||{});
     const profile=String(d.capabilities?.profile||'ACCESSO AUTORIZZATO').replaceAll('_',' ');
     if($('#sessionRole'))$('#sessionRole').textContent=(d.user?.role||'Accesso autorizzato')+' · '+profile;
+    loadMotionProfiles();
+    loadCreativeScenes();
     loadMotionProfiles();
   }catch(e){
     location.replace('/sponsor/?login=1');
@@ -1020,6 +1066,7 @@ function activationPayload(){
     cta:activationValue('#activationCta','SCOPRI IL PROGETTO').trim(),
     format:activationValue('#activationFormat','LED_16_3'),
     theme:activationValue('#activationTheme','CLUB'),
+    scene:activationValue('#activationScene','SCENE-COLICO-STADIUM-DAY'),
     logoState:activationValue('#activationLogoState','DA_VERIFICARE'),
     previewMode:activationPreviewMode
   };
@@ -1040,6 +1087,7 @@ function activationBriefText(p){
     'Territorio: '+p.territory,
     'Formato: '+p.format,
     'Stile: '+p.theme,
+    'Scena: '+p.scene,
     'Headline: '+p.headline,
     'Messaggio: '+p.message,
     'CTA: '+p.cta,
@@ -1090,6 +1138,7 @@ function renderActivationStudio(){
   if(visual){
     visual.dataset.format=p.format;
     visual.dataset.theme=p.theme;
+    visual.dataset.scene=p.scene;
     visual.dataset.previewMode=activationPreviewMode;
     visual.dataset.asset=p.asset.replace(/[^a-z0-9]+/gi,'-').toLowerCase();
     visual.style.background='';
@@ -1100,6 +1149,7 @@ function renderActivationStudio(){
     btn.classList.toggle('active',active);
     btn.setAttribute('aria-selected',active?'true':'false');
   });
+  renderActivationSceneGuide();
   renderActivationBrief({...p,headline,message});
 }
 function applyActivationAssetDefaults(){
@@ -1112,13 +1162,13 @@ function applyActivationAssetDefaults(){
 }
 function applyCreativePreset(name){
   const presets={
-    impact:{goal:'Brand awareness',theme:'NIGHT',format:'LED_16_3',headline:'Il tuo brand entra nella partita.',message:'Una presenza forte, leggibile e costruita per il matchday.',cta:'DIVENTA PARTNER'},
-    territory:{goal:'Visibilità territoriale',theme:'LAKE',format:'WEB_16_9',headline:'Il territorio ci unisce.',message:'Sport, Colico e Lago di Como dentro una relazione che crea valore.',cta:'SCOPRI SCD'},
-    community:{goal:'Community e famiglie',theme:'CLUB',format:'SOCIAL_4_5',headline:'Più vicini al club. Più valore sul territorio.',message:'Benefit, esperienze e relazioni pensate per famiglie, tesserati e sostenitori.',cta:'ENTRA NELLA COMMUNITY'},
-    business:{goal:'Lead e contatti',theme:'GOLD',format:'WEB_16_9',headline:'Una partnership che lavora.',message:'Asset, relazioni e proof dentro un progetto misurabile e professionale.',cta:'COSTRUIAMO IL PROGETTO'}
+    impact:{goal:'Brand awareness',theme:'NIGHT',scene:'SCENE-MATCH-NIGHT',format:'LED_16_3',headline:'Il tuo brand entra nella partita.',message:'Una presenza forte, leggibile e costruita per il matchday.',cta:'DIVENTA PARTNER'},
+    territory:{goal:'Visibilità territoriale',theme:'LAKE',scene:'SCENE-TRIBUNA-LAKE-CONCEPT',format:'WEB_16_9',headline:'Il territorio ci unisce.',message:'Sport, Colico e Lago di Como dentro una relazione che crea valore.',cta:'SCOPRI SCD'},
+    community:{goal:'Community e famiglie',theme:'CLUB',scene:'SCENE-CARD-LIFESTYLE',format:'SOCIAL_4_5',headline:'Più vicini al club. Più valore sul territorio.',message:'Benefit, esperienze e relazioni pensate per famiglie, tesserati e sostenitori.',cta:'ENTRA NELLA COMMUNITY'},
+    business:{goal:'Lead e contatti',theme:'GOLD',scene:'SCENE-PARTNER-TERRITORY',format:'WEB_16_9',headline:'Una partnership che lavora.',message:'Asset, relazioni e proof dentro un progetto misurabile e professionale.',cta:'COSTRUIAMO IL PROGETTO'}
   };
   const p=presets[name]||presets.impact;
-  const map={activationGoal:p.goal,activationTheme:p.theme,activationFormat:p.format,activationHeadline:p.headline,activationMessage:p.message,activationCta:p.cta};
+  const map={activationGoal:p.goal,activationTheme:p.theme,activationScene:p.scene,activationFormat:p.format,activationHeadline:p.headline,activationMessage:p.message,activationCta:p.cta};
   Object.entries(map).forEach(([id,val])=>{
     const el=$('#'+id);if(!el)return;
     if(el.tagName==='SELECT'){
@@ -1154,7 +1204,7 @@ function initActivationStudio(){
   const names=['Nuova azienda / prospect',...sponsors.map(x=>x.name),...proposals.map(x=>x.name)];
   sel.innerHTML=[...new Set(names)].map(x=>'<option>'+esc(x)+'</option>').join('');
 
-  ['#activationSponsor','#activationGoal','#activationAudience','#activationChannel','#activationTerritory','#activationFormat','#activationTheme','#activationLogoState']
+  ['#activationSponsor','#activationGoal','#activationAudience','#activationChannel','#activationTerritory','#activationFormat','#activationTheme','#activationScene','#activationLogoState']
     .forEach(id=>$(id)?.addEventListener('change',renderActivationStudio));
   ['#activationHeadline','#activationMessage','#activationCta']
     .forEach(id=>$(id)?.addEventListener('input',renderActivationStudio));
@@ -1167,7 +1217,7 @@ function initActivationStudio(){
   $$('[data-creative-preset]').forEach(btn=>btn.addEventListener('click',()=>applyCreativePreset(btn.dataset.creativePreset)));
 
   $('#activationReset')?.addEventListener('click',()=>{
-    ['#activationSponsor','#activationGoal','#activationAsset','#activationAudience','#activationChannel','#activationTerritory','#activationFormat','#activationTheme','#activationLogoState'].forEach(id=>{
+    ['#activationSponsor','#activationGoal','#activationAsset','#activationAudience','#activationChannel','#activationTerritory','#activationFormat','#activationTheme','#activationScene','#activationLogoState'].forEach(id=>{
       const el=$(id);if(el)el.selectedIndex=0;
     });
     activationPreviewMode='DESKTOP';
@@ -1189,7 +1239,7 @@ function initActivationStudio(){
     if(saved){
       const map={
         activationSponsor:saved.sponsor,activationGoal:saved.goal,activationAsset:saved.asset,activationAudience:saved.audience,
-        activationChannel:saved.channel,activationTerritory:saved.territory,activationFormat:saved.format,activationTheme:saved.theme,
+        activationChannel:saved.channel,activationTerritory:saved.territory,activationFormat:saved.format,activationTheme:saved.theme,activationScene:saved.scene,
         activationLogoState:saved.logoState,activationHeadline:saved.headline,activationMessage:saved.message,activationCta:saved.cta
       };
       Object.entries(map).forEach(([id,val])=>{
