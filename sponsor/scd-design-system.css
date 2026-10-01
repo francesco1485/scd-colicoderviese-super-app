@@ -1,0 +1,105 @@
+/* SCD ColicoDerviese · Canonical Design System
+   Source of truth: config/scd-visual-system.json
+   Loaded after page-specific styles to keep public + Partner OS aligned.
+*/
+:root{
+  --scd-navy:#031a35;
+  --scd-navy-2:#052e59;
+  --scd-blue:#0870cf;
+  --scd-lake:#0b98dd;
+  --scd-cyan:#20b7e6;
+  --scd-yellow:#ffd500;
+  --scd-gold:#f0b900;
+  --scd-white:#fff;
+  --scd-paper:#eef5fb;
+  --scd-ink:#123657;
+  --scd-muted:#627e98;
+  --scd-line:#d5e4f0;
+  --scd-success:#179765;
+  --scd-warning:#e49b2f;
+  --scd-danger:#ca5656;
+  --scd-radius-sm:9px;
+  --scd-radius-md:14px;
+  --scd-radius-lg:20px;
+  --scd-radius-hero:26px;
+  --scd-shadow-card:0 18px 48px rgba(3,35,72,.11);
+  --scd-shadow-hero:0 22px 60px rgba(3,35,72,.13);
+
+  --navy:var(--scd-navy);
+  --navy2:var(--scd-navy-2);
+  --blue:var(--scd-blue);
+  --blue2:var(--scd-lake);
+  --cyan:var(--scd-cyan);
+  --yellow:var(--scd-yellow);
+  --gold:var(--scd-gold);
+  --bg:var(--scd-paper);
+  --paper:var(--scd-paper);
+  --white:var(--scd-white);
+  --ink:var(--scd-ink);
+  --muted:var(--scd-muted);
+  --line:var(--scd-line);
+  --green:var(--scd-success);
+  --orange:var(--scd-warning);
+  --red:var(--scd-danger);
+  --shadow:var(--scd-shadow-card);
+}
+
+html{accent-color:var(--scd-blue)}
+body{
+  font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  text-rendering:optimizeLegibility;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--scd-yellow);color:var(--scd-navy)}
+a,button,input,select,textarea{font:inherit}
+button,a,[role="button"]{touch-action:manipulation}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{
+  outline:3px solid var(--scd-yellow);
+  outline-offset:3px;
+}
+.btn-yellow,.primary-cta{
+  background:var(--scd-yellow)!important;
+  color:var(--scd-navy)!important;
+}
+.club-location-pill{
+  color:#ffe56a!important;
+  border-color:rgba(255,213,0,.25)!important;
+}
+.status-badge.blue{background:#e6f3fc!important;color:#0a6fa9!important}
+.status-badge.green{background:#e9f7f0!important;color:#16734f!important}
+.status-badge.orange{background:#fff6e7!important;color:#8d6515!important}
+.status-badge.red{background:#fff0f0!important;color:#9a4040!important}
+
+.scd-territory-signature{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:7px 10px;
+  border-radius:999px;
+  border:1px solid rgba(32,183,230,.2);
+  background:rgba(32,183,230,.06);
+  color:var(--scd-blue);
+  font-size:.72rem;
+  font-weight:850;
+  letter-spacing:.04em;
+}
+.scd-territory-signature::before{
+  content:"";
+  width:7px;height:7px;border-radius:50%;
+  background:var(--scd-yellow);
+  box-shadow:0 0 0 4px rgba(255,213,0,.12);
+}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    scroll-behavior:auto!important;
+    animation-duration:.01ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.01ms!important;
+  }
+}
+
+@media (max-width:760px){
+  :root{--scd-radius-hero:18px}
+  button,a{min-height:44px}
+}
