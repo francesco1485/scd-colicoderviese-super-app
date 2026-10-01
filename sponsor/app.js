@@ -3,6 +3,9 @@ const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const initials=n=>n.split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase();
 let sponsorAccess={profile:'NON_AUTORIZZATO',platform:false};
+let sponsorSession={user:null,capabilities:{}};
+let partnerHubCurrent='';
+let campaignFilter='TUTTI';
 
 function applySponsorCapabilities(caps={}){
   sponsorAccess={...sponsorAccess,...caps};
@@ -26,6 +29,7 @@ async function loadSponsorSession(){
     const r=await fetch('/api/sponsor/session',{credentials:'same-origin',cache:'no-store'});
     if(!r.ok)throw new Error('SESSION_REQUIRED');
     const d=await r.json();
+    sponsorSession=d;
     if($('#sessionName'))$('#sessionName').textContent=d.user?.name||d.user?.email||'Area riservata';
     applySponsorCapabilities(d.capabilities||{});
     const profile=String(d.capabilities?.profile||'ACCESSO AUTORIZZATO').replaceAll('_',' ');
@@ -182,6 +186,50 @@ const folders=['Contratti','Proposte','Loghi ufficiali','Foto','Video & LED','Em
 const tags=['@Direzione','@Commerciale','@Amministrazione','@Marketing','@Eventi','@Segreteria'];
 const pollOptions=[['led','LED & Media'],['eventi','Tornei & Eventi'],['conv','Convenzioni famiglie'],['club','Club House & Hospitality']];
 
+const campaignModules=[
+  {name:'LEDWall Matchday',channel:'LED',status:'IN PRODUZIONE',visual:'Bordo campo · playlist sponsor',desc:'Spot dedicati, rotazione programmata, camera view e proof di presenza.'},
+  {name:'Social Partner Story',channel:'SOCIAL',status:'DA MODELLARE',visual:'Story · reel · post',desc:'Format coordinati per raccontare il partner senza perdere l’identità SCD.'},
+  {name:'Torneo Brandizzato',channel:'EVENTO',status:'DISPONIBILE SU FORMAT APPROVATI',visual:'Title sponsor · hospitality',desc:'Naming, gazebo, premiazioni, contenuti e presenza fisica durante il torneo.'},
+  {name:'Gazebo & Partner Corner',channel:'EVENTO',status:'IN SVILUPPO',visual:'Attivazione sul territorio',desc:'Spazio azienda per eventi, open day e giornate community.'},
+  {name:'Struttura Brandizzata',channel:'STRUTTURA',status:'IN SVILUPPO',visual:'Club House · dehor · area gioco',desc:'Presenza continuativa collegata a uno spazio reale e approvato.'},
+  {name:'Partner Hub Web App',channel:'DIGITALE',status:'IN SVILUPPO',visual:'Profilo · convenzioni · proof',desc:'Una presenza digitale collegata a progetto, relazione e materiali erogati.'},
+  {name:'Supporter Card Benefit',channel:'DIGITALE',status:'DA MODELLARE',visual:'Card · convenzione · community',desc:'Benefit verificati, riconoscimento digitale e relazione con il territorio.'},
+  {name:'Sponsor Wall / Interview',channel:'STRUTTURA',status:'PROGETTO',visual:'Backdrop · media · premiazioni',desc:'Sistema modulare per interviste, conferenze, premiazioni e contenuti sponsor.'}
+];
+
+function renderPartnerHub(){
+  const sel=$('#partnerHubSelect'); if(!sel) return;
+  if(!partnerHubCurrent) partnerHubCurrent=sponsors[0]?.name||'';
+  sel.innerHTML=sponsors.map(s=>'<option value="'+esc(s.name)+'">'+esc(s.name)+'</option>').join('');
+  if(!sponsors.some(s=>s.name===partnerHubCurrent)) partnerHubCurrent=sponsors[0]?.name||'';
+  sel.value=partnerHubCurrent;
+  const s=sponsors.find(x=>x.name===partnerHubCurrent);
+  if(!s)return;
+  $('#partnerHubName').textContent=s.name;
+  $('#partnerHubMeta').textContent=[s.sector,s.type].filter(Boolean).join(' · ');
+  $('#partnerHubStatus').textContent=s.status;
+  $('#partnerHubPeriod').textContent=s.period||'Periodo da verificare';
+  $('#partnerHubValue').textContent=s.value||'Da verificare';
+  $('#partnerHubAsset').textContent=s.asset||'Da ricostruire';
+  $('#partnerHubNext').textContent=s.next||'Da definire';
+  $('#partnerHubContact').textContent=s.contact||'Da verificare';
+  sel.onchange=()=>{partnerHubCurrent=sel.value;renderPartnerHub()};
+  const btn=$('#partnerHubCrmBtn'); if(btn)btn.onclick=()=>openSponsor(s.name);
+}
+
+function renderCampaignStudio(){
+  const mount=$('#campaignGrid'); if(!mount)return;
+  const rows=campaignModules.filter(x=>campaignFilter==='TUTTI'||x.channel===campaignFilter);
+  mount.innerHTML=rows.map((x,i)=>'<article class="campaign-item"><div class="campaign-visual"><span>'+esc(x.channel)+'</span><b>'+esc(x.visual)+'</b></div><div class="campaign-body"><h3>'+esc(x.name)+'</h3><p>'+esc(x.desc)+'</p><div class="campaign-meta"><b>'+esc(x.status)+'</b><span>'+String(i+1).padStart(2,'0')+'</span></div></div></article>').join('');
+  $('[data-campaign-filter]').forEach(b=>b.classList.toggle('active',b.dataset.campaignFilter===campaignFilter));
+}
+
+function renderSponsorWall(){
+  const wall=$('#sponsorWallTiles');if(!wall)return;
+  wall.innerHTML=sponsors.slice(0,9).map(s=>'<span class="wall-tile">'+esc(s.name.replace(/Srl|S\.r\.l\.|S\.p\.A\.|Snc/gi,'').trim())+'</span>').join('');
+}
+
+
 function openView(name){
   $$('.view').forEach(v=>v.classList.remove('active'));
   $('#view-'+name)?.classList.add('active');
@@ -189,7 +237,8 @@ function openView(name){
   if(innerWidth<901)$('#sidebar').classList.remove('open');
   window.scrollTo({top:0,behavior:'smooth'});
 }
-$$('[data-view]').forEach(b=>b.addEventListener('click',()=>openView(b.dataset.view)));
+$('[data-view]').forEach(b=>b.addEventListener('click',()=>openView(b.dataset.view)));
+$('#campaignToolbar')?.addEventListener('click',e=>{const b=e.target.closest('[data-campaign-filter]');if(!b)return;campaignFilter=b.dataset.campaignFilter;renderCampaignStudio()});
 $('#mobileMenu').onclick=()=>$('#sidebar').classList.toggle('open');
 
 function renderKpis(){
@@ -386,7 +435,7 @@ $('#newSponsorForm').onsubmit=e=>{e.preventDefault();const fd=new FormData(e.tar
 
 $('#promoReviewBtn').onclick=()=>{localStorage.setItem('scd_promo_review','review');$('#promoText').textContent='Promozione messa in revisione interna. Nessuna pubblicazione automatica.'};
 
-renderKpis();renderSponsorStrip();homeContracts();homeProposals();renderAvailability();renderHomeEvents();renderPipeline();renderNews();renderStats();renderPoll();renderTags();
+renderKpis();renderSponsorStrip();homeContracts();homeProposals();renderAvailability();renderHomeEvents();renderPipeline();renderNews();renderStats();renderPoll();renderTags();renderPartnerHub();renderCampaignStudio();renderSponsorWall();
 renderSponsorViews();renderContracts();renderProposalGrid();renderConventions();renderSuppliers();renderCommercialInitiatives();renderAudience();renderFolders();renderLed();renderEvents();renderReport();renderAssets();renderScenario();renderSettings();
 
 function activateKeyboardCards(){
