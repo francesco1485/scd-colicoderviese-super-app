@@ -1,0 +1,194 @@
+{
+  "version": "1.0.0",
+  "season": "2026/27",
+  "source": "SCD_ORGANIGRAMMA_2026_27",
+  "privacy": "NO_PERSONAL_NAMES_CONTACTS_COMPENSATION_OR_CONTRACT_DETAILS_IN_REPOSITORY",
+  "authorization": {
+    "auto_grant": false,
+    "approval": "DIRECTION_SERVER_SIDE_ONLY",
+    "principle": "SOURCE_LABEL_IS_EVIDENCE_FOR_REVIEW_NOT_AN_APP_PERMISSION"
+  },
+  "explicit_role_candidates": [
+    {
+      "source_label": "PRESIDENTE",
+      "candidate_app_roles": [
+        "DIRECTION"
+      ],
+      "scope": [
+        "AREA:CLUB"
+      ]
+    },
+    {
+      "source_label": "VICE PRESIDENTE",
+      "candidate_app_roles": [
+        "DIRECTION"
+      ],
+      "scope": [
+        "AREA:CLUB"
+      ]
+    },
+    {
+      "source_label": "CONSIGLIERE",
+      "candidate_app_roles": [
+        "DIRECTION"
+      ],
+      "scope": [
+        "AREA:CLUB"
+      ]
+    },
+    {
+      "source_label": "SEGRETARIO VERBALIZZANTE",
+      "candidate_app_roles": [
+        "SECRETARIAT"
+      ],
+      "scope": [
+        "FUNCTION:SECRETARIAT"
+      ]
+    },
+    {
+      "source_label": "TESORIERE",
+      "candidate_app_roles": [
+        "ADMIN"
+      ],
+      "scope": [
+        "FUNCTION:ADMINISTRATION"
+      ]
+    },
+    {
+      "source_label": "DIRETTORE GENERALE",
+      "candidate_app_roles": [
+        "DIRECTION"
+      ],
+      "scope": [
+        "AREA:CLUB"
+      ]
+    },
+    {
+      "source_label": "CONSULENTE TECNICO",
+      "candidate_app_roles": [
+        "STAFF"
+      ],
+      "scope": [
+        "FUNCTION:TECHNICAL_CONSULTING"
+      ]
+    },
+    {
+      "source_label": "RESPONSABILE ATTIVITA' DI BASE",
+      "candidate_app_roles": [
+        "MANAGER"
+      ],
+      "scope": [
+        "AREA:ATTIVITA_DI_BASE"
+      ]
+    },
+    {
+      "source_label": "SOCI EFFETTIVI AVENTI DIRITTO AL VOTO IN ASSEMBLEA",
+      "candidate_app_roles": [
+        "USER_BASE"
+      ],
+      "scope": [],
+      "note": "La qualità di socio e il diritto di voto non equivalgono a permessi applicativi."
+    }
+  ],
+  "section_candidates": [
+    {
+      "section": "TESSERATI CARICHE SPORTIVE FIGC",
+      "candidate_app_roles": [
+        "MANAGER",
+        "STAFF"
+      ],
+      "scope_rule": "FUNCTION_OR_TEAM_REQUIRED"
+    },
+    {
+      "section": "TESSERATI DIRIGENTI COLLABORATORI STRUTTURA",
+      "candidate_app_roles": [
+        "STAFF"
+      ],
+      "scope_rule": "FUNCTION_REQUIRED"
+    },
+    {
+      "section": "TESSERATI DIRIGENTI ACCOMPAGNATORI ANNATE",
+      "candidate_app_roles": [
+        "STAFF"
+      ],
+      "scope_rule": "TEAM_REQUIRED"
+    },
+    {
+      "section": "TESSERATI DIRIGENTI E COLLABORATORI PULMINO",
+      "candidate_app_roles": [
+        "STAFF"
+      ],
+      "scope_rule": "FUNCTION:TRANSPORT"
+    },
+    {
+      "section": "TESSERATI CON PATENTINO ALLENATORI",
+      "candidate_app_roles": [
+        "MISTER"
+      ],
+      "scope_rule": "TEAM_REQUIRED"
+    },
+    {
+      "section": "TESSERATI ATLETI E STAFF CON CONTRATTO PRIMA SQUADRA",
+      "candidate_app_roles": [
+        "ATHLETE",
+        "MISTER",
+        "STAFF"
+      ],
+      "scope_rule": "TEAM:PRIMA_SQUADRA_ROW_CLASSIFICATION_REQUIRED"
+    },
+    {
+      "section": "TESSERATI ATLETI E STAFF CON CONTRATTO JUNIORES ELITE",
+      "candidate_app_roles": [
+        "ATHLETE",
+        "MISTER",
+        "STAFF"
+      ],
+      "scope_rule": "TEAM:JUNIORES_ELITE_ROW_CLASSIFICATION_REQUIRED"
+    },
+    {
+      "section": "TESSERATI ATLETI E STAFF CON CONTRATTO U16 ELITE",
+      "candidate_app_roles": [
+        "ATHLETE",
+        "MISTER",
+        "STAFF"
+      ],
+      "scope_rule": "TEAM:U16_ELITE_ROW_CLASSIFICATION_REQUIRED"
+    },
+    {
+      "section": "TESSERATI ATLETI E STAFF CON CONTRATTO U15 PROVINCIALE",
+      "candidate_app_roles": [
+        "ATHLETE",
+        "MISTER",
+        "STAFF"
+      ],
+      "scope_rule": "TEAM:U15_PROVINCIALE_ROW_CLASSIFICATION_REQUIRED"
+    },
+    {
+      "section": "TESSERATI ATLETI E STAFF CON CONTRATTO U13 PROVINCIALE",
+      "candidate_app_roles": [
+        "ATHLETE",
+        "MISTER",
+        "STAFF"
+      ],
+      "scope_rule": "TEAM:U13_PROVINCIALE_ROW_CLASSIFICATION_REQUIRED"
+    },
+    {
+      "section": "TESSERATI ATLETI E STAFF CON CONTRATTO U12 PROVINCIALE",
+      "candidate_app_roles": [
+        "ATHLETE",
+        "MISTER",
+        "STAFF"
+      ],
+      "scope_rule": "TEAM:U12_PROVINCIALE_ROW_CLASSIFICATION_REQUIRED"
+    },
+    {
+      "section": "TESSERATI ATLETI E STAFF CON CONTRATTO U11 / U10 / U9",
+      "candidate_app_roles": [
+        "ATHLETE",
+        "MISTER",
+        "STAFF"
+      ],
+      "scope_rule": "TEAM:U11_U10_U9_ROW_CLASSIFICATION_REQUIRED"
+    }
+  ]
+}
