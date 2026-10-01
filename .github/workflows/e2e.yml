@@ -35,6 +35,8 @@ jobs:
         run: npm run test:asset-adaptive-contract
       - name: Intake Hub contract gate
         run: npm run test:intake-contract
+      - name: Intake signed link security gate
+        run: npm run test:intake-links
       - name: Syntax check
         run: |
           node --check app.js
@@ -51,6 +53,9 @@ jobs:
           node --check scripts/validate-asset-adaptive-contract.mjs
           node --check scripts/validate-intake-contract.mjs
           node --check intake/intake.js
+          node --check intake/admin.js
+          node --check lib/intake-links.js
+          node --check scripts/validate-intake-link-factory.mjs
           node --check scd-ng.js
           node --check scd-interactions.js
           node --check scd-experience-engine.js
