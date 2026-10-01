@@ -24,6 +24,13 @@ for(const viewport of viewports){
 
   await page.goto(base+'/#pulse',{waitUntil:'domcontentloaded',timeout:30000});
   await page.waitForSelector('#view-pulse.active');
+  await page.waitForSelector('.home-first');
+  await page.waitForSelector('#publicSearchInput');
+  await page.waitForSelector('#matchCenter');
+  await page.waitForSelector('#upcomingEvents');
+  await page.waitForSelector('#communityPulse');
+  await page.waitForSelector('#sponsorRail');
+  await page.waitForSelector('#joinClub');
   await page.waitForSelector('.hero-synth');
   await page.waitForSelector('.ng-command-ring');
   await page.waitForSelector('#weekRail');
@@ -33,6 +40,13 @@ for(const viewport of viewports){
   await page.waitForSelector('.ng-value-engine');
   await page.waitForFunction(()=>Boolean(window.SCDNextGen)&&Boolean(window.SCDMeta)&&Boolean(window.SCDTwin)&&Boolean(window.SCDExperience)&&Boolean(window.SCDAdaptive));
   await page.waitForFunction(()=>document.documentElement.scrollWidth<=window.innerWidth+3);
+
+  const firstView=await page.locator('.home-first').evaluate(el=>({top:el.getBoundingClientRect().top,bottom:el.getBoundingClientRect().bottom}));
+  if(firstView.top>220)throw new Error('current-week home entry not visible early enough: '+firstView.top);
+  const homeBeforeHero=await page.evaluate(()=>document.querySelector('.home-first').compareDocumentPosition(document.querySelector('.hero')) & Node.DOCUMENT_POSITION_FOLLOWING);
+  if(!homeBeforeHero)throw new Error('weekly home entry must precede secondary hero');
+  const navLabels=await page.locator('.bottom-nav button').allTextContents();
+  for(const label of ['Home','Calendario','Squadre','Community','Profilo'])if(!navLabels.some(x=>x.includes(label)))throw new Error('mobile nav missing '+label);
 
   const realPhotoRefs=await page.evaluate(()=>[...document.querySelectorAll('img')].map(x=>x.getAttribute('src')||'').filter(x=>/hero-colico|event-insieme/i.test(x)));
   if(realPhotoRefs.length)throw new Error('forbidden real photography loaded: '+realPhotoRefs.join(','));
