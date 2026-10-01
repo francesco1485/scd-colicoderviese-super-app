@@ -166,10 +166,20 @@ for(const viewport of [{width:390,height:844},{width:1440,height:900}]){
   sponsor.on('console',m=>{if(m.type()==='error')sponsorErrors.push('console: '+m.text())});
 
   await sponsor.goto(base+'/sponsor/',{waitUntil:'domcontentloaded',timeout:30000});
+  await sponsor.waitForSelector('.club-system');
   await sponsor.waitForSelector('.ledwall-launch');
   await sponsor.waitForSelector('.opportunity-grid.extended');
   await sponsor.waitForSelector('#ecosistema');
   await sponsor.waitForSelector('#convenzioni');
+
+  const clubTitleBefore=String(await sponsor.locator('#clubModuleTitle').textContent()||'');
+  await sponsor.click('[data-club-module="led"]');
+  await sponsor.waitForFunction(()=>document.querySelector('#clubModuleKicker')?.textContent==='LEDWALL MATCHDAY');
+  const clubTitleLed=String(await sponsor.locator('#clubModuleTitle').textContent()||'');
+  if(clubTitleBefore===clubTitleLed)throw new Error('club experience module did not change');
+  await sponsor.click('[data-club-module="territory"]');
+  await sponsor.waitForFunction(()=>document.querySelector('#clubModuleKicker')?.textContent==='COLICO · ALTO LARIO');
+  if(!(await sponsor.locator('#clubDeviceMain').textContent()).includes('LAGO DI COMO'))throw new Error('territory preview missing Lake Como identity');
 
   await sponsor.click('[data-open="access"]');
   await sponsor.waitForSelector('#accessModal:not([hidden])');
