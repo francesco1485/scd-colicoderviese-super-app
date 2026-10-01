@@ -331,7 +331,7 @@ async function buildWeeklyNewsroom(){
     feedRaw=f.parsed;sourceStatus.feed='OK';
   }catch(e){sourceStatus.feed='ERROR:'+String(e.code||e.message||e)}
 
-  const calendar=rowsFrom(calendarRaw).map((row,i)=>({
+  const allCalendar=rowsFrom(calendarRaw).map((row,i)=>({
     id:pick(row,'id','eventId','uid')||'CAL-'+i,
     title:String(pick(row,'title','event','name','subject')||'Attività SCD'),
     date:isoDateOnly(pick(row,'date','data','startDate')),
@@ -339,10 +339,23 @@ async function buildWeeklyNewsroom(){
     endTime:String(pick(row,'endTime','fine')||''),
     team:teamLabel(row),
     category:String(pick(row,'category','categoria','ageGroup','annata')||''),
+    opponent:String(pick(row,'opponent','opponentName','avversario')||''),
+    competition:String(pick(row,'competition','campionato','league')||''),
     venue:String(pick(row,'venue','luogo','field','location')||''),
     kind:eventKind(row),
     source:String(pick(row,'source','fonte')||'R20_CALENDAR')
-  })).filter(x=>x.date&&x.date>=week.start&&x.date<=week.end);
+  })).filter(x=>x.date);
+
+  const calendar=allCalendar.filter(x=>x.date>=week.start&&x.date<=week.end);
+  const nowParts=romeDateParts();
+  const today=nowParts.year+'-'+nowParts.month+'-'+nowParts.day;
+  const horizonDate=new Date(today+'T12:00:00Z');
+  horizonDate.setUTCDate(horizonDate.getUTCDate()+30);
+  const horizon=new Intl.DateTimeFormat('en-CA',{timeZone:'UTC',year:'numeric',month:'2-digit',day:'2-digit'}).format(horizonDate);
+  const upcomingEvents=allCalendar
+    .filter(x=>x.date>=today&&x.date<=horizon&&x.kind!=='TRAINING')
+    .sort((a,b)=>(a.date+'T'+(a.time||'00:00')).localeCompare(b.date+'T'+(b.time||'00:00')))
+    .slice(0,20);
 
   const teams=[...new Set(calendar.map(x=>x.category||x.team).filter(x=>x&&x!=='SCD'))];
   const matches=calendar.filter(x=>x.kind==='MATCH');
@@ -350,7 +363,30 @@ async function buildWeeklyNewsroom(){
   const tournaments=calendar.filter(x=>x.kind==='TOURNAMENT');
   const feed=feedRows(feedRaw);
   const results=extractStructuredResults(feed).slice(0,8);
-  const standings=extractStandings(feed).slice(0,6);
+  const standings=extractStandings(feed).slice(0,12);
+  const feedData=unwrapPayload(feedRaw)||{};
+  const rawPartners=Array.isArray(feedData.sponsors)?feedData.sponsors:(Array.isArray(feedData.partners)?feedData.partners:[]);
+  const partners=rawPartners
+    .filter(row=>row?.verified===true||/attiv|confermat|documentat|verified/i.test(String(pick(row,'status','state','stato')||'')))
+    .map((row,i)=>({
+      id:String(pick(row,'id','code')||'PARTNER-'+i),
+      name:String(pick(row,'name','company','ragioneSociale','sponsor')||'').trim(),
+      tier:String(pick(row,'tier','category','area')||''),
+      source:String(pick(row,'source','fonte')||'R20_PUBLIC_FEED')
+    }))
+    .filter(x=>x.name)
+    .slice(0,20);
+  const rawProfiles=Array.isArray(feedData.publicProfiles)?feedData.publicProfiles:[];
+  const publicProfiles=rawProfiles
+    .filter(row=>row?.public===true||row?.authorizedPublic===true||row?.publiclySearchable===true)
+    .map((row,i)=>({
+      id:String(pick(row,'id','profileId')||'PUBLIC-'+i),
+      displayName:String(pick(row,'displayName','name')||'').trim(),
+      role:String(pick(row,'role','label')||''),
+      team:String(pick(row,'team','category')||'')
+    }))
+    .filter(x=>x.displayName)
+    .slice(0,50);
   const initiatives=initiativeRows(feedRaw).filter(x=>{
     const d=isoDateOnly(pick(x,'date','eventDate','data'));
     return !d||d>=week.start;
@@ -426,6 +462,33 @@ async function buildWeeklyNewsroom(){
     sources:{...sourceStatus,weeklyEditorial:editorial?'PUBLISHED':'NO_CURRENT_PUBLISHED_EDITORIAL'},
     editorial:editorial?{generatedAt:editorial.generatedAt,generatedBy:editorial.generatedBy,sourceCount:(editorial.sources||[]).length}:null,
     calendar:{rows:calendar,counts:{activities:calendar.length,matches:matches.length,trainings:trainings.length,tournaments:tournaments.length,groups:teams.length},groups:teams},
+    upcomingEvents,
+    sportData:{
+      results:results.map((row,i)=>({
+        id:String(pick(row,'id','eventId','uid')||'RESULT-'+i),
+        team:teamLabel(row),
+        opponent:String(pick(row,'opponent','opponentName','avversario')||''),
+        result:resultText(row)||String(pick(row,'message')||''),
+        date:isoDateOnly(pick(row,'date','data','eventDate')),
+        competition:String(pick(row,'competition','campionato','league')||''),
+        source:String(pick(row,'source','fonte')||'R20_STRUCTURED')
+      })),
+      standings:standings.map((row,i)=>({
+        id:String(pick(row,'id','code')||'STANDING-'+i),
+        team:teamLabel(row),
+        position:String(pick(row,'position','rank','posizione')||''),
+        points:String(pick(row,'points','punti')||''),
+        played:String(pick(row,'played','games','giocate')||''),
+        wins:String(pick(row,'wins','vittorie')||''),
+        draws:String(pick(row,'draws','pareggi')||''),
+        losses:String(pick(row,'losses','sconfitte')||''),
+        source:String(pick(row,'source','fonte')||'R20_STRUCTURED')
+      })),
+      headToHead:[],
+      headToHeadState:'UNVERIFIED_NOT_CONNECTED'
+    },
+    partners,
+    publicProfiles,
     cards:mergedCards
   };
 }
