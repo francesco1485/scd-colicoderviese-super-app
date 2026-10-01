@@ -419,6 +419,12 @@ function r216SignatureForActor_(actor,userRow,template){
     if(!userPerson || !sigPerson || userPerson!==sigPerson){
       throw new Error('Firma personale non autorizzata: identita account/persona non coincidente.');
     }
+  } else if(r216Upper_(sig.SIGN_MODE)==='ROLE'){
+    var sigAccount=email_(sig.ACCOUNT_EMAIL||'');
+    var actorAccount=email_(actor && actor.email || '');
+    if(sigAccount && sigAccount!==actorAccount){
+      throw new Error('Firma di ruolo non autorizzata per l account autenticato.');
+    }
   }
   if(!r216Bool_(sig.CAN_EXTERNAL_SEND)) throw new Error('Il profilo firma non e autorizzato a comunicazioni esterne.');
   return sig;
