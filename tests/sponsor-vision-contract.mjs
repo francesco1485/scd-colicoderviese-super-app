@@ -49,6 +49,11 @@ assert(pub.includes('I loghi ufficiali saranno mostrati solo dopo caricamento'),
 assert(js.includes("SOSPESA · NON INVIARE"),'suspended prospect visibility missing');
 assert(js.includes("Pixellot & Match Content"),'internal video asset missing');
 assert(js.includes("Partner Hub Web App"),'internal web app partner asset missing');
+assert(pub.includes('sponsor-wall-experience'),'public Sponsor Wall experience missing');
+assert(pub.includes('data-wall-mode="INTERVISTE"'),'Sponsor Wall interview mode missing');
+assert(pub.includes('data-wall-mode="EVENTI"'),'Sponsor Wall event mode missing');
+assert(pub.includes('data-wall-mode="WEB"'),'Sponsor Wall web mode missing');
+assert(js.includes('setSponsorWallMode'),'Sponsor Wall interaction missing');
 
 for(const token of [
   'SCD Partner OS',
