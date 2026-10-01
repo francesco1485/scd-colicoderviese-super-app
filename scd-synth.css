@@ -78,3 +78,21 @@ radial-gradient(circle at 84% 0%,rgba(99,174,191,.09),transparent 31%),#091a2b}
  .ng-twin-locker{margin:0 12px 100px}.ng-locker-rail{grid-template-columns:1fr 1fr}
 }
 @media(max-width:560px){.ng-value-grid{grid-template-columns:1fr}.ng-value-card{min-height:200px}.ng-orbit:before{width:300px;height:300px}.ng-orbit:after{width:190px;height:190px}.ng-node{min-width:96px;padding:9px}.ng-node.n-a{left:2%}.ng-node.n-b{right:2%}.ng-node.n-c{right:1%}.ng-node.n-d{left:1%}.ng-node.n-e{left:38%}.ng-node.n-f{left:36%}}
+
+
+/* SYNTHETIC TWIN APPEARANCE */
+#avatarFigure .head{position:relative;overflow:visible;transition:background .25s ease}
+#avatarFigure[data-tone="t1"] .head{background:linear-gradient(160deg,#e6c0a0,#bf8b6b)}
+#avatarFigure[data-tone="t2"] .head{background:linear-gradient(160deg,#d5a178,#9b694d)}
+#avatarFigure[data-tone="t3"] .head{background:linear-gradient(160deg,#bd7f55,#7c4a32)}
+#avatarFigure[data-tone="t4"] .head{background:linear-gradient(160deg,#8a583d,#4b2e23)}
+#avatarFigure .head:before{content:"";position:absolute;left:10%;right:10%;top:-10px;height:46px;border-radius:60% 60% 34% 34%;background:#172230;z-index:2;box-shadow:inset 0 -5px 0 rgba(255,255,255,.03)}
+#avatarFigure[data-hair="h2"] .head:before{height:60px;border-radius:70% 55% 44% 38%;transform:rotate(-4deg)}
+#avatarFigure[data-hair="h3"] .head:before{height:54px;border-radius:50%;background:
+radial-gradient(circle at 18% 30%,#192536 0 10px,transparent 11px),
+radial-gradient(circle at 38% 18%,#192536 0 11px,transparent 12px),
+radial-gradient(circle at 58% 18%,#192536 0 11px,transparent 12px),
+radial-gradient(circle at 78% 30%,#192536 0 10px,transparent 11px),
+#172230}
+#avatarFigure[data-hair="h4"] .head:before{height:15px;top:-2px;border-radius:50%;background:#26313b}
+#avatarFigure .head:after{content:"";position:absolute;left:26%;top:58%;width:48%;height:18px;border-bottom:2px solid rgba(32,26,24,.55);border-radius:0 0 50% 50%;z-index:3}
