@@ -17,7 +17,7 @@ const legacy=[
 ];
 const nova=[
   'scd-ng.css','scd-synth.css','scd-ng.js','scd-interactions.js',
-  'scd-meta-engine.js','scd-twin.js','scd-experience-engine.js'
+  'scd-adaptive-engine.js','scd-meta-engine.js','scd-twin.js','scd-experience-engine.js'
 ];
 const files=[...common,...(nextgen?nova:legacy)];
 
