@@ -451,3 +451,134 @@ pagamenti, permessi, ruoli, dati sensibili, contratti vincolanti, comunicazioni 
 
 Regola permanente:
 OSSERVA → VERIFICA → CONSERVA CIO CHE È CORRETTO → MIGLIORA CIO CHE PUÒ CRESCERE → SOSTITUISCI SOLO CON PROVA → MISURA → IMPARA → RIPETI.
+
+
+## COMANDO SCD INTAKE HUB — LINK, CARTELLE, DOCUMENT ROUTING E LOGGING (2026-10-01)
+
+Questa direttiva e' cumulativa. Trasforma la raccolta documenti in un servizio guidato, simile per semplicita a piattaforme form-first, senza dipendere da una singola piattaforma esterna.
+
+### 1. EXPERTISE OPERATIVA
+L'assistente deve operare come esperto di:
+- architettura cartelle e spazi documentali;
+- naming, versioning, retention e archiviazione;
+- link pubblici/privati, accessi, token, scadenze e scope;
+- moduli multi-step, conditional logic, hidden metadata e redirect;
+- upload documenti, validazione MIME/dimensione e checksum;
+- routing automatico verso cartella corretta;
+- log/audit di invio, spostamento, rinomina, approvazione e archiviazione;
+- Drive, Sheets, Gmail, API, webhook, Apps Script e adapter server-side;
+- progettazione esperienze tipo Tally/form-builder, ma con identita e workflow SCD propri.
+
+### 2. PRINCIPIO: L'UTENTE NON DEVE CONOSCERE DRIVE
+L'utente deve ricevere un link chiaro e compilare/inviare. Il sistema decide:
+`LINK -> IDENTIFICA CONTESTO -> RACCOGLI METADATA -> VALIDA -> CREA REQUEST_ID -> STAGE -> ROUTE -> RENAME -> LOG -> NOTIFICA -> ARCHIVIA`.
+
+Nessun utente pubblico deve navigare cartelle interne, conoscere ID Drive o scegliere manualmente destinazioni sensibili.
+
+### 3. STRUTTURA CANONICA
+Root Drive: `SCD INTAKE HUB`.
+
+Sottostruttura:
+- `00_CONFIG`
+- `01_INBOX`
+- `02_ROUTED`
+- `03_LOGS`
+- `04_TEMPLATES`
+- `05_ARCHIVE`
+
+Domini iniziali sotto `02_ROUTED`:
+AMMINISTRAZIONE, TESSERAMENTI, CERTIFICATI_MEDICI, TORNEI_EVENTI, TRASPORTI_PULMINI, SPONSOR_PARTNER, STAFF_TECNICI, COMUNICAZIONI, IMPIANTI, SAFEGUARDING_ISOLATO.
+
+### 4. LINK REGISTRY
+Ogni link deve avere:
+LINK_ID, SLUG, TITLE, AUDIENCE, CATEGORY, ACCESS_MODE, REQUIRES_LOGIN, TOKEN_MODE, FILE_UPLOAD, MAX_FILES, ACCEPTED_TYPES, ROUTING_RULE_ID, SUCCESS_MESSAGE, EXPIRES_AT, CREATED_AT, STATUS.
+
+Access modes ammessi:
+- PUBLIC_SAFE
+- TOKENIZED
+- AUTHENTICATED
+- ROLE_SCOPED
+- ONE_TIME
+- EXPIRING
+
+I link non devono mai incorporare permessi Drive sensibili.
+
+### 5. ROUTING RULES
+Ogni routing rule deve dichiarare:
+RULE_ID, CATEGORY, DOCUMENT_TYPE, ROLE_SCOPE, TEAM_CATEGORY, DESTINATION_FOLDER_ID, RENAME_PATTERN, REQUIRE_APPROVAL, SENSITIVE, RETENTION_CLASS, OWNER_SCOPE, FALLBACK_FOLDER_ID, PRIORITY, VERIFIED_AT.
+
+Nessun file viene instradato per semplice nome libero dell'utente se esiste una regola strutturata.
+
+### 6. LOG OBBLIGATORIO
+Ogni evento deve avere almeno:
+TIMESTAMP, REQUEST_ID, LINK_ID, SUBMITTER_CONTEXT, CATEGORY, DOCUMENT_TYPE, FILE_NAME, FILE_ID, SOURCE_FOLDER, DESTINATION_FOLDER, STATUS, ROUTING_RULE, VERIFIED_AT.
+
+Per dati sensibili usare minimizzazione: il log registra il fatto operativo, non il contenuto del documento.
+
+### 7. FAIL CLOSED
+Se manca l'adapter server-side autorizzato per upload/spostamento Drive:
+- il link puo essere preparato e testato in staging;
+- l'upload pubblico NON viene dichiarato operativo;
+- nessun file viene salvato su storage effimero come se fosse definitivo;
+- lo stato deve essere `UPLOAD_ADAPTER_NOT_CONNECTED`.
+
+### 8. SICUREZZA
+- antivirus/content scanning quando tecnicamente disponibile prima della pubblicazione interna;
+- whitelist MIME/estensioni;
+- limite dimensioni;
+- nomi file sanitizzati;
+- nessun path traversal;
+- nessun accesso diretto a cartelle riservate;
+- token con scadenza per link privati;
+- rate limit e anti-abuse;
+- audit append-only per azioni critiche;
+- segregazione netta SAFEGUARDING.
+
+### 9. CREAZIONE CARTELLE AUTOMATICA
+La creazione automatica di sottocartelle e' ammessa solo da pattern registrati:
+`{DOMAIN}/{SEASON}/{ENTITY_ID}`
+`{YEAR}/{EVENT_ID}`
+`{PARTNER_ID}/{CONTRACT_ID}`
+`{ATHLETE_ID}/{DOCUMENT_CLASS}`.
+
+Mai creare cartelle da testo libero non sanificato.
+
+### 10. ACCESSIBILITA E MULTI-DEVICE
+I link intake devono essere mobile-first, leggibili da smartphone, tablet e PC, con:
+- step brevi;
+- progressivo disclosure;
+- touch target adeguati;
+- caricamento file chiaro;
+- stato upload;
+- conferma finale;
+- ricevuta/request ID;
+- ripresa sicura quando supportata.
+
+### 11. NOTIFICHE
+Dopo routing verificato il sistema puo:
+- confermare all'utente;
+- creare task interno;
+- notificare owner/scope;
+- alimentare action queue;
+- inviare promemoria se incompleto;
+- chiudere la pratica quando approvata.
+
+Le notifiche non devono esporre dati sanitari, safeguarding o documenti riservati nel testo.
+
+### 12. AMMINISTRAZIONE REMOTA
+La Direzione deve poter:
+- attivare/disattivare link;
+- cambiare routing rule;
+- vedere errori e code;
+- rigenerare token;
+- modificare scadenze;
+- sospendere un modulo;
+- cambiare destinazione;
+- vedere metriche aggregate;
+senza modificare il codice per ogni variazione ordinaria.
+
+### 13. AUTOMAZIONE EVOLUTIVA
+Metriche consentite:
+form_start, form_complete, form_abandon, upload_error, invalid_file, route_success, route_failure, average_completion_time, device_class, accessibility_preference.
+
+Scopo: ridurre attrito e migliorare il modulo. Vietato profilare fragilita o contenuto personale.
