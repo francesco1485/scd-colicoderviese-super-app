@@ -140,4 +140,30 @@ assert(js.includes('data.touchpoints'),'Partner Hub touchpoint hydration missing
 assert(pubJs.includes('const $$=s=>Array.from(document.querySelectorAll(s));'),'public multi-selector helper missing');
 assert(!pubJs.includes('const $=s=>Array.from(document.querySelectorAll(s));'),'public selector helper duplicated');
 
+
+for(const token of [
+  'Creative Factory',
+  'id="activationHeadline"',
+  'id="activationMessage"',
+  'id="activationCta"',
+  'id="activationFormat"',
+  'id="activationTheme"',
+  'id="activationLogoState"',
+  'data-creative-preset="territory"',
+  'id="activationCopyBrief"',
+  'id="activationExport"',
+  'id="activationBrandName"',
+  'data-preview-mode="LED"'
+]) assert(app.includes(token),'R50 Creative Factory structure missing: '+token);
+
+for(const token of [
+  'activationPayload',
+  'activationBriefText',
+  'renderActivationBrief',
+  'applyCreativePreset',
+  'downloadActivationJson',
+  'copyActivationBrief',
+  "scd_activation_scenario_v2"
+]) assert(js.includes(token),'R50 Creative Factory interaction missing: '+token);
+
 console.log('Sponsor vision contract PASS');
