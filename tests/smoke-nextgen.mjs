@@ -162,10 +162,10 @@ for(const viewport of [{width:390,height:844},{width:1440,height:900}]){
   await sponsor.click('#accessModal [data-close]');
   await sponsor.waitForSelector('#accessModal',{state:'hidden'});
 
-  await sponsor.click('[data-open="login"]');
-  await sponsor.waitForSelector('#loginModal:not([hidden])');
-  await sponsor.click('#loginModal [data-close]');
-  await sponsor.waitForSelector('#loginModal',{state:'hidden'});
+  const reservedHref=await sponsor.locator('.access-button').getAttribute('href');
+  if(reservedHref!=='https://scd-colicoderviese-official-r21.onrender.com/sponsor/?login=1')throw new Error('reserved access direct link mismatch: '+reservedHref);
+  const footerReserved=await sponsor.locator('.footer-actions a').getAttribute('href');
+  if(footerReserved!==reservedHref)throw new Error('footer reserved access link mismatch');
 
   const overflow=await sponsor.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+3);
   if(overflow)throw new Error('sponsor public horizontal overflow '+viewport.width+'px');
