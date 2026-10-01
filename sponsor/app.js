@@ -1,3 +1,21 @@
+
+async function loadSponsorSession(){
+  try{
+    const r=await fetch('/api/sponsor/session',{credentials:'same-origin',cache:'no-store'});
+    if(!r.ok)throw new Error('SESSION_REQUIRED');
+    const d=await r.json();
+    if($('#sessionName'))$('#sessionName').textContent=d.user?.name||d.user?.email||'Area riservata';
+    if($('#sessionRole'))$('#sessionRole').textContent=(d.user?.role||'Accesso autorizzato')+(d.isDirection?' · Direzione':'');
+  }catch(e){
+    location.replace('/sponsor/?login=1');
+  }
+}
+if($('#sponsorLogout'))$('#sponsorLogout').onclick=async()=>{
+  try{await fetch('/api/sponsor/logout',{method:'POST',credentials:'same-origin'})}catch(e){}
+  location.replace('/sponsor/?login=1');
+};
+loadSponsorSession();
+
 const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const initials=n=>n.split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase();
