@@ -808,3 +808,32 @@ radial-gradient(circle at 84% 0%,rgba(41,215,255,.12),transparent 31%),
   .team-card-match{grid-column:2;padding:8px 0 0;border-left:0;border-top:1px solid rgba(255,255,255,.07)}
   .team-card-arrow{grid-column:3;grid-row:1/3}
 }
+
+
+/* R45 · Private Desk NOVA role-scoped runtime */
+.desk-auth-card{grid-column:1/-1;border:1px solid rgba(120,202,240,.28);background:linear-gradient(145deg,rgba(6,35,64,.95),rgba(8,72,111,.82));border-radius:22px;padding:22px;color:#fff;display:grid;gap:12px}
+.desk-auth-card h3{margin:0;font-size:clamp(22px,3vw,34px)}
+.desk-auth-card p{margin:0;color:#c4d9e8;max-width:760px}
+.desk-auth-card label{display:grid;gap:6px;font-size:12px;font-weight:900;letter-spacing:.05em;color:#b8d3e5}
+.desk-auth-card input{width:100%;min-width:0;border:1px solid rgba(255,255,255,.22);border-radius:12px;background:rgba(255,255,255,.09);color:#fff;padding:12px 13px;font:inherit;outline:none}
+.desk-auth-card input:focus{border-color:#72d2f5;box-shadow:0 0 0 3px rgba(72,184,230,.12)}
+.desk-auth-actions{display:flex;gap:9px;flex-wrap:wrap}
+.desk-auth-card>small{min-height:18px;color:#b7d9ec}
+.desk-profile-live{grid-column:1/-1;display:flex;justify-content:space-between;gap:18px;align-items:center;border-radius:18px;padding:17px 18px;background:linear-gradient(125deg,#082641,#0c527f);color:#fff}
+.desk-profile-live h3{margin:3px 0;font-size:23px}
+.desk-profile-live p{margin:0;color:#bad6e7}
+.desk-profile-live button{border:1px solid rgba(255,255,255,.24);background:transparent;color:#fff;border-radius:999px;padding:8px 12px;font-weight:850;cursor:pointer}
+.desk-scope-card{grid-column:1/-1;display:grid;grid-template-columns:auto minmax(0,1fr);gap:7px 13px;padding:15px 17px;border:1px solid rgba(45,89,122,.18);border-radius:17px;background:rgba(255,255,255,.76)}
+.desk-scope-card b{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#2a6f98}
+.desk-scope-card span{font-size:13px;color:#506b7f;overflow-wrap:anywhere}
+.desk-service-empty{grid-column:1/-1;border:1px dashed rgba(72,116,147,.34);border-radius:16px;padding:20px;display:grid;gap:4px;color:#5f768a}
+.desk-service-empty b{color:#244f76}
+.desk-private-loading{grid-column:1/-1;border-radius:18px;padding:22px;background:#eef7fb;display:grid;gap:5px;color:#476a82}
+.desk-private-loading b{color:#205b80}
+.private-module-panel .btn{margin-top:14px}
+#deskHeroTitle em{font-style:normal;color:#70cff2}
+@media(max-width:680px){
+  .desk-profile-live{align-items:flex-start;flex-direction:column}
+  .desk-scope-card{grid-template-columns:1fr}
+  .desk-auth-actions .btn{width:100%}
+}
