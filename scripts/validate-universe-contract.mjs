@@ -48,7 +48,7 @@ assert(twin.includes("scd:twin:v1"),'Twin local storage contract missing');
 
 const isNextGenSynthetic=m.architecture?.nextgen_preview?.visual_mode==='SYNTHETIC_NO_REAL_PHOTOGRAPHY';
 if(isNextGenSynthetic){
-  assert(/scd-synth\\.css\\?v=0\\.[0-9]+\\.[0-9]+/.test(index),'NextGen synthetic CSS not loaded');
+  assert(index.includes('scd-synth.css?v='),'NextGen synthetic CSS not loaded');
 }else{
   assert(/ui-r38-universe\.css\?v=(38|39|40)\.0\.0/.test(index),'R38 Universe CSS not loaded');
 }
