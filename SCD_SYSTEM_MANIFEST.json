@@ -368,90 +368,66 @@
       "prefers_reduced_motion_required": true
     },
     "asset_integrity": {
-      "classification": [
-        "KEEP_LOCKED",
-        "KEEP_ENHANCE",
-        "REBUILD_IMPROVE",
-        "RESEARCH_REAL_ASSET",
-        "GENERATE_ORIGINAL"
-      ],
-      "canonical_root": "assets/",
-      "locked_assets": [
-        "assets/logo-scd.png",
-        "assets/logo-scd.webp",
-        "assets/logo-lnd.png",
-        "assets/logo-lnd.webp",
-        "assets/logo-sgs.png",
-        "assets/logo-sgs.webp",
-        "assets/logo-monza.png",
-        "assets/logo-monza.webp"
-      ],
-      "protected_classes": [
+      "registry": "config/scd-assets.v1.json",
+      "official_asset_rule": "NEVER_GENERATE_OR_REDRAW_WHEN_REAL_VERIFIABLE_ASSET_EXISTS",
+      "immutable_classes": [
         "OFFICIAL_CLUB_LOGO",
         "FEDERATION_LOGO",
-        "TEAM_OPPONENT_CREST",
-        "OFFICIAL_KIT",
-        "SPONSOR_LOGO",
-        "SPONSOR_WORDMARK"
+        "AFFILIATION_PARTNER_LOGO",
+        "SPONSOR_OFFICIAL",
+        "KIT_OFFICIAL",
+        "OPPONENT_OFFICIAL"
       ],
-      "official_asset_rule": "NEVER_GENERATE_OR_REDRAW_WHEN_REAL_VERIFIABLE_ASSET_EXISTS",
-      "provenance_required": [
-        "SOURCE",
-        "SOURCE_URL_OR_FILE",
-        "VERIFIED_AT",
-        "HASH",
-        "RIGHTS_OR_USAGE_STATUS",
-        "STATUS"
+      "allowed_technical_transforms": [
+        "ALPHA_CLEANUP",
+        "TRIM",
+        "PROPORTIONAL_RESIZE",
+        "LOSSLESS_OR_VISUALLY_LOSSLESS_CONVERSION"
       ],
-      "opponent_logo_rule": "OFFICIAL_FIRST_CROSS_CHECK_REQUIRED_NO_GENERATED_CREST",
-      "sponsor_rule": "EXACT_LEGAL_OR_APPROVED_NAME_AND_OFFICIAL_WORDMARK_ONLY",
-      "kit_rule": "REAL_APPROVED_REFERENCE_REQUIRED_BEFORE_OFFICIAL_RENDER"
+      "opponent_logo_policy": "REAL_VERIFIED_ONLY",
+      "sponsor_wordmark_policy": "EXACT_OFFICIAL_ONLY",
+      "kit_policy": "APPROVED_REAL_REFERENCE_REQUIRED",
+      "fallback": "NEUTRAL_PLACEHOLDER_WITH_UNVERIFIED_STATUS",
+      "admin_override_required": true
     },
     "adaptive_experience": {
-      "state": "CONTRACTED",
       "strategy": "FEATURE_DETECTION_CONTAINER_RESPONSIVE",
-      "targets": [
-        "ANDROID",
-        "IPHONE",
+      "viewport_classes": [
+        "PHONE_COMPACT",
+        "PHONE",
+        "PHONE_LARGE",
         "TABLET",
-        "FOLDABLE",
+        "LAPTOP",
         "DESKTOP",
-        "NOTEBOOK",
-        "TOUCH_DISPLAY",
-        "ULTRAWIDE",
-        "FUTURE_SCREEN"
+        "WIDE",
+        "ULTRAWIDE"
       ],
-      "allowed_signals": [
+      "signals": [
         "VIEWPORT",
+        "VISUAL_VIEWPORT",
+        "DPR",
         "ORIENTATION",
-        "DEVICE_PIXEL_RATIO",
-        "SAFE_AREA",
-        "INPUT_CAPABILITY",
-        "HOVER_CAPABILITY",
+        "POINTER",
+        "HOVER",
         "REDUCED_MOTION",
-        "CONTRAST_PREFERENCE",
+        "CONTRAST",
         "COLOR_SCHEME",
-        "FONT_SCALING",
-        "CONTAINER_SIZE",
-        "FOLD_OR_HINGE_IF_AVAILABLE",
-        "NETWORK_CLASS_IF_AVAILABLE",
-        "PERFORMANCE_TIMING",
-        "TECHNICAL_ERRORS"
+        "NETWORK_CLASS"
       ],
-      "forbidden_signals": [
-        "HIDDEN_FINGERPRINTING",
-        "UNNECESSARY_DEVICE_UNIQUE_ID",
-        "MENTAL_STATE",
-        "HEALTH",
-        "VULNERABILITY",
-        "MINOR_COMPETENCE"
-      ],
-      "real_time_observers": [
-        "RESIZE_OBSERVER",
-        "MATCH_MEDIA",
-        "VISUAL_VIEWPORT_IF_AVAILABLE"
-      ],
-      "fluid_qa_required": true
+      "real_time_reflow": true,
+      "device_model_fingerprinting": false,
+      "user_agent_layout_branching": false,
+      "safe_targets": [
+        "DENSITY",
+        "TYPE_SCALE",
+        "COLUMNS",
+        "HIT_AREA",
+        "NAVIGATION",
+        "RAILS",
+        "OVERLAYS",
+        "MEDIA_LOADING",
+        "INITIAL_INFORMATION_VOLUME"
+      ]
     }
   },
   "temporal_core": {
@@ -1562,7 +1538,38 @@
       "GENERATE_WEEKLY_COPY",
       "VALIDATE_EVIDENCE",
       "PUBLISH_OR_FAIL_CLOSED"
-    ]
+    ],
+    "adaptive_usage": {
+      "mode": "PRIVACY_FIRST",
+      "allowed_signals": [
+        "FEATURE_USE",
+        "TASK_COMPLETION",
+        "SEARCH_USE",
+        "BACKTRACK",
+        "ERROR_RATE",
+        "LOAD_TIME",
+        "VIEWPORT_CLASS",
+        "ORIENTATION_CHANGE",
+        "ABANDON",
+        "RETURN_VISIT"
+      ],
+      "prohibited": [
+        "PRIVATE_CONTENT",
+        "PASSWORDS",
+        "HEALTH",
+        "SAFEGUARDING",
+        "PRIVATE_MESSAGES",
+        "MENTAL_STATE_INFERENCE",
+        "DEVICE_FINGERPRINT"
+      ],
+      "automatic_adjustments": [
+        "ORDER",
+        "DENSITY",
+        "PRIORITY",
+        "REVERSIBLE_SUGGESTIONS"
+      ],
+      "critical_changes_require_approval": true
+    }
   },
   "analytics": {
     "privacy_first": true,
@@ -1845,7 +1852,11 @@
       "NEXTGEN_NO_REAL_PHOTO_CONTRACT",
       "NEXTGEN_SAME_ORIGIN_API",
       "NEXTGEN_TWIN_MIRROR_SEPARATION",
-      "NEXTGEN_LOCAL_TTS_CONTRACT"
+      "NEXTGEN_LOCAL_TTS_CONTRACT",
+      "OFFICIAL_ASSET_INTEGRITY",
+      "REAL_OPPONENT_LOGO_OR_UNVERIFIED_PLACEHOLDER",
+      "EXACT_SPONSOR_WORDMARK",
+      "ADAPTIVE_RUNTIME_NO_FINGERPRINTING"
     ],
     "merge_rule": "Non considerare completata una funzione se è verde solo tecnicamente ma viola il manifest o il master visivo.",
     "release_truth": {
@@ -2348,6 +2359,37 @@
         "R20"
       ],
       "contract": "MULTIDISCIPLINARY_ROUTING_CURRENT_SOURCE_VERIFICATION_AND_CONTROLLED_AUTONOMY"
+    },
+    {
+      "id": "CAP-ASSET-GUARDIAN",
+      "domain": "EXPERIENCE",
+      "required": true,
+      "state": "IMPLEMENTED",
+      "sources": [
+        "SOURCE-NONE"
+      ],
+      "contract": "LOCKED_OFFICIAL_ASSETS_REAL_OPPONENT_LOGOS_EXACT_SPONSOR_WORDMARKS_VERIFIED_KITS"
+    },
+    {
+      "id": "CAP-ADAPTIVE-RUNTIME",
+      "domain": "EXPERIENCE",
+      "required": true,
+      "state": "IMPLEMENTED",
+      "sources": [
+        "SOURCE-NONE"
+      ],
+      "contract": "CAPABILITY_FIRST_REALTIME_RESPONSIVE_NO_DEVICE_FINGERPRINTING"
+    },
+    {
+      "id": "CAP-WORLD-RESEARCH-ENGINE",
+      "domain": "INTELLIGENCE",
+      "required": true,
+      "state": "PARTIAL",
+      "sources": [
+        "WEB_VERIFIED",
+        "SOURCE-NONE"
+      ],
+      "contract": "SOURCE_GROUNDED_MULTIDISCIPLINARY_RESEARCH_WITH_HIGH_IMPACT_GUARDRAILS"
     }
   ],
   "known_noncompliance": [
@@ -2599,6 +2641,12 @@
         "GEOPOLITICS_CURRENT"
       ],
       "high_stakes_rule": "CURRENT_SOURCES_AND_CLEAR_FACT_ANALYSIS_DECISION_SEPARATION"
+    },
+    "asset_change_rule": {
+      "official_asset_change": "ADMIN_APPROVAL_PLUS_REGISTRY_HASH_UPDATE",
+      "derived_asset_change": "PROVENANCE_REQUIRED",
+      "opponent_asset": "VERIFY_SOURCE_BEFORE_RENDER",
+      "sponsor_asset": "CONFIRMED_OR_ACTIVE_ONLY"
     }
   },
   "product_direction": {
@@ -2782,5 +2830,90 @@
       "mirror": "CONTEXTUAL_OPERATIONAL_ASSISTANT",
       "tts": "NATIVE_CLIENT_SIDE_BASELINE"
     }
+  },
+  "research_intelligence": {
+    "mode": "SOURCE_GROUNDED_MULTIDISCIPLINARY",
+    "method": [
+      "INTERNAL_REALITY",
+      "INVENTORY",
+      "KEEP_IMPROVE_REPLACE_CLASSIFICATION",
+      "EXTERNAL_RESEARCH",
+      "SYNTHESIS",
+      "PROTOTYPE",
+      "TEST",
+      "MEASURE",
+      "ITERATE"
+    ],
+    "classification": [
+      "KEEP_LOCKED",
+      "KEEP_OPTIMIZE",
+      "IMPROVE",
+      "REPLACE",
+      "DISCARD"
+    ],
+    "fact_labels": [
+      "FACT",
+      "INFERENCE",
+      "HYPOTHESIS",
+      "PROPOSAL"
+    ],
+    "updated_source_required_for": [
+      "LAW",
+      "TAX",
+      "LABOUR",
+      "FINANCE",
+      "HEALTH",
+      "NUTRITION",
+      "GEOPOLITICS",
+      "PRICES",
+      "IMPORT_EXPORT",
+      "FEDERATION_RULES"
+    ],
+    "cybersecurity_scope": "AUTHORIZED_DEFENSIVE_SECURITY_AND_PUBLIC_OSINT_ONLY",
+    "office_media_scope": [
+      "MICROSOFT_365",
+      "GOOGLE_WORKSPACE",
+      "LIBREOFFICE",
+      "ACROBAT_PDF",
+      "PHOTOSHOP",
+      "ILLUSTRATOR",
+      "INDESIGN",
+      "CANVA",
+      "CAPCUT",
+      "EQUIVALENT_TOOLS"
+    ],
+    "research_domains": [
+      "SPORT",
+      "FEDERATIONS",
+      "TOURNAMENTS",
+      "EVENTS",
+      "HOSPITALITY",
+      "TRAVEL",
+      "MAPS",
+      "GEOGRAPHY",
+      "HISTORY",
+      "LITERATURE",
+      "GASTRONOMY",
+      "BEVERAGE",
+      "COMMERCE",
+      "IMPORT_EXPORT",
+      "PROCUREMENT",
+      "PRICING",
+      "FINANCE",
+      "MARKETING",
+      "PLATFORMS",
+      "GAMING",
+      "COMMUNICATION",
+      "SOFTWARE",
+      "AUTOMATION",
+      "CYBERSECURITY",
+      "ALGORITHMS",
+      "DATA",
+      "MEDIA",
+      "IMAGES",
+      "LOGOS",
+      "DOCUMENT_RESEARCH"
+    ],
+    "high_impact_rule": "VERIFY_JURISDICTION_DATE_SOURCE_AND_ESCALATE_WHEN_PROFESSIONAL_LICENSE_IS_REQUIRED"
   }
 }
