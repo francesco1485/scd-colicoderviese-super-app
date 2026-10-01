@@ -2567,7 +2567,7 @@ function renderAccessAdmin(){
     (r.company_name?'<p><b>Realtà:</b> '+esc(r.company_name)+'</p>':'')+
     (r.request_reason?'<p>'+esc(r.request_reason)+'</p>':'')+
     '<footer><small>'+esc(fmtDateTime(r.created_at))+'</small>'+
-    (r.status==='pending'?'<div><select data-access-role="'+r.id+'"><option value="viewer">Viewer</option><option value="operator">Operatore</option><option value="specialist">Specialista</option></select><button type="button" class="small-btn" data-access-approve="'+r.id+'">Approva</button><button type="button" class="small-btn danger" data-access-reject="'+r.id+'">Rifiuta</button></div>':'<span>'+esc(r.assigned_role||'')+'</span>')+
+    (r.status==='pending'?'<div><select data-access-role="'+r.id+'"><option value="viewer">Viewer</option><option value="operator">Operatore</option><option value="specialist">Specialista</option></select><button type="button" class="small-btn" data-access-approve="'+r.id+'">Approva</button><button type="button" class="small-btn danger" data-access-reject="'+r.id+'">Rifiuta</button></div>':r.status==='approved_pending_activation'?'<div><span>'+esc(r.assigned_role||'')+'</span><button type="button" class="small-btn" data-access-resend="'+r.id+'">Reinvia attivazione</button></div>':'<span>'+esc(r.assigned_role||'')+'</span>')+
     '</footer></article>'
   ).join('')||empty('Nessuna richiesta di accesso.')
 
@@ -2576,6 +2576,7 @@ function renderAccessAdmin(){
     manageAccessRequest(b.dataset.accessApprove,'approve',role)
   })
   document.querySelectorAll('[data-access-reject]').forEach(b=>b.onclick=()=>manageAccessRequest(b.dataset.accessReject,'reject'))
+  document.querySelectorAll('[data-access-resend]').forEach(b=>b.onclick=()=>manageAccessRequest(b.dataset.accessResend,'resend_activation'))
 
   $('commercialLeadList').innerHTML=commercialLeads.map(l=>
     '<article class="commercial-lead-card"><div class="access-request-head"><div><strong>'+esc(l.company_name||l.full_name)+'</strong><small>'+esc(l.full_name)+' · '+esc(l.email)+' · '+esc(l.phone)+'</small></div><span>'+esc(l.lead_type)+'</span></div>'+
