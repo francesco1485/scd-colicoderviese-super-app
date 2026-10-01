@@ -7,7 +7,7 @@
   <meta name="description" content="SCD ColicoDerviese Sponsor Platform">
   <title>SCD Sponsor Platform · Area riservata</title>
   <link rel="icon" href="../assets/logo-scd.png">
-  <link rel="stylesheet" href="./app.css?v=10.1.0">
+  <link rel="stylesheet" href="./app.css?v=10.2.0">
 </head>
 <body>
 <a class="skip-link" href="#mainContent">Salta al contenuto principale</a>
@@ -37,6 +37,8 @@
       <button class="nav-link" data-view="eventi"><i data-icon="calendar"></i><span>Eventi</span></button>
       <button class="nav-link" data-view="report"><i data-icon="chart"></i><span>Report & Analytics</span></button>
       <button class="nav-link" data-view="opportunita"><i data-icon="link"></i><span>Opportunità</span></button>
+      <button class="nav-link" data-view="catalogo"><i data-icon="diamond"></i><span>Catalogo commerciale</span></button>
+      <button class="nav-link" data-view="communityvalue"><i data-icon="star"></i><span>Card & Merch</span></button>
       <button class="nav-link" data-view="scenario"><i data-icon="lab"></i><span>Scenario Lab</span></button>
       <button class="nav-link" data-view="settings"><i data-icon="settings"></i><span>Impostazioni</span></button>
     </nav>
@@ -76,7 +78,7 @@
           <p>Una piattaforma per costruire insieme il futuro dello sport, del territorio e della nostra comunità.</p>
           <div class="hero-actions">
             <button class="btn-yellow" id="homeNewSponsor">⊕ Nuova proposta sponsor</button>
-            <button class="btn-outline" data-view="media">▷ Media & LED</button>
+            <button class="btn-outline" data-view="catalogo">▷ Catalogo sponsor</button>
           </div>
         </div>
         <div class="hero-quote">Più di una squadra.<br>Un territorio<br>che cresce insieme.</div>
@@ -261,7 +263,8 @@
     </section>
 
     <section class="view" id="view-media">
-      <div class="page-head"><div><small>MEDIA & VISIBILITÀ</small><h1>LED & Media</h1><p>Master, approvazioni, materiali ufficiali e stato produzione.</p></div></div>
+      <div class="page-head"><div><small>MEDIA & VISIBILITÀ</small><h1>LED, Video & Pixellot</h1><p>LEDWall, spot, materiali ufficiali, match content e possibili attivazioni video. Pixellot resta una fonte privata autenticata: nessun contenuto viene pubblicato o commercializzato senza verifica di diritti e autorizzazioni.</p></div></div>
+      <div class="media-rule"><strong>Regola media SCD</strong><span>LED = asset commerciale operativo. Pixellot = contenuto protetto da trattare solo nel perimetro autorizzato. Ogni attivazione deve avere prova di consegna e fonte.</span></div>
       <div class="led-grid" id="ledGrid"></div>
     </section>
 
@@ -278,6 +281,40 @@
     <section class="view" id="view-opportunita">
       <div class="page-head"><div><small>INVENTARIO COMMERCIALE</small><h1>Asset & opportunità</h1><p>Cosa SCD può valorizzare, sviluppare o proporre.</p></div></div>
       <div class="asset-grid" id="assetGrid"></div>
+    </section>
+
+
+    <section class="view" id="view-catalogo">
+      <div class="page-head"><div><small>OFFERTA COMMERCIALE SCD</small><h1>Catalogo sponsorizzazioni</h1><p>Una mappa unica di ciò che possiamo valorizzare oggi e di ciò che stiamo progettando. Disponibilità, esclusività e prezzi restano sempre soggetti a verifica prima di una proposta.</p></div><button class="btn-yellow" data-view="crm">Apri CRM</button></div>
+      <div class="catalog-grid">
+        <article class="catalog-card hot"><span>01 · MEDIA</span><h3>LEDWall & spot</h3><p>Messaggi dinamici, spot dedicati, matchday, tornei e attivazioni coordinate.</p><small>Operativo / da censire capacità</small></article>
+        <article class="catalog-card"><span>02 · KIT</span><h3>Divise sublimatiche</h3><p>Maglie gara, allenamento, portieri e posizioni integrate dopo verifica tecnica e contrattuale.</p><small>Inventario posizioni in corso</small></article>
+        <article class="catalog-card"><span>03 · IMPIANTO</span><h3>Striscioni & cartellonistica</h3><p>Bordo campo, tribuna, ingressi, percorsi e altri spazi reali del centro sportivo.</p><small>Da censire misure e disponibilità</small></article>
+        <article class="catalog-card"><span>04 · EVENTI</span><h3>Gazebo & Partner Corner</h3><p>Presenza fisica, sampling, dimostrazioni e relazione diretta durante eventi autorizzati.</p><small>Progetto</small></article>
+        <article class="catalog-card"><span>05 · STRUTTURE</span><h3>Aree brandizzate</h3><p>Club House, tendostruttura, dehor, area giochi, palestra, ristoro e spazi approvati.</p><small>Progetto / disponibilità da verificare</small></article>
+        <article class="catalog-card"><span>06 · EVENTO</span><h3>Torneo brandizzato</h3><p>Title sponsor, hospitality, premiazione, area partner, social e presenza al centro sportivo.</p><small>Disponibile su format approvati</small></article>
+        <article class="catalog-card"><span>07 · FAMILY</span><h3>Mascotte Partner</h3><p>Divisa brandizzata, pre-gara, foto, attività bambini e contenuti community.</p><small>Progetto</small></article>
+        <article class="catalog-card"><span>08 · VIDEO</span><h3>Pixellot & Match Content</h3><p>Partite, highlight e clip utilizzabili solo quando accessi, diritti e autorizzazioni lo consentono.</p><small>Idea da strutturare</small></article>
+        <article class="catalog-card"><span>09 · COMMUNITY</span><h3>Merchandising SCD</h3><p>Prodotti ufficiali, gadget evento e possibili capsule partner.</p><small>Idea da strutturare</small></article>
+        <article class="catalog-card"><span>10 · MEMBERSHIP</span><h3>Carta Tifoso</h3><p>Appartenenza, convenzioni, eventi e benefit community.</p><small>Da modellare</small></article>
+        <article class="catalog-card"><span>11 · SERVIZI</span><h3>Carta Tesserato</h3><p>Benefit e servizi collegati al ruolo reale e alle autorizzazioni.</p><small>Da modellare</small></article>
+        <article class="catalog-card"><span>12 · DIGITAL</span><h3>Partner Hub Web App</h3><p>Scheda partner, progetto, convenzioni, contenuti e proof di delivery.</p><small>In sviluppo</small></article>
+      </div>
+      <article class="catalog-policy"><strong>Regola commerciale</strong><p>Un asset entra in proposta soltanto se esiste davvero, è disponibile, non viola accordi/esclusive e ha un responsabile interno. Il catalogo ispira; il CRM governa.</p></article>
+    </section>
+
+    <section class="view" id="view-communityvalue">
+      <div class="page-head"><div><small>COMMUNITY VALUE ENGINE</small><h1>Card, merchandising & convenzioni</h1><p>Strumenti per trasformare il rapporto con tifosi, tesserati, famiglie e partner in utilità concreta e misurabile.</p></div></div>
+      <div class="community-value-grid">
+        <article><span>CARD</span><h3>Carta Tesserato</h3><p>Identità di servizio, benefit, convenzioni e accesso alle funzioni coerenti con il profilo.</p><b>Non sostituisce il tesseramento FIGC</b></article>
+        <article><span>CARD</span><h3>Carta Tifoso / Sostenitore</h3><p>Community, vantaggi, eventi, merchandising e possibili formule di sostegno.</p><b>Membership da modellare</b></article>
+        <article><span>SHOP</span><h3>Merchandising SCD</h3><p>Felpe, maglie tifoso, cappellini, gadget e capsule evento/partner da sviluppare con controllo economico.</p><b>Catalogo prodotti da costruire</b></article>
+        <article><span>BENEFIT</span><h3>Convenzioni</h3><p>Partner territoriali, condizioni chiare, stato reale e misurazione dell'utilizzo quando possibile.</p><b>Pubbliche solo dopo formalizzazione</b></article>
+      </div>
+      <div class="app-map-panel">
+        <div><small>MAPPA WEB APP</small><h3>Pubblico → Community → Partner → Area riservata</h3><p>La stessa piattaforma accompagna l'utente dalle informazioni sportive ai benefit e, per chi è autorizzato, alle funzioni operative.</p></div>
+        <div class="app-map-flow"><span>Squadre & calendario</span><i>→</i><span>Video & media</span><i>→</i><span>Card & convenzioni</span><i>→</i><span>Partner Hub</span><i>→</i><span>CRM & gestione</span></div>
+      </div>
     </section>
 
     <section class="view" id="view-scenario">
@@ -340,6 +377,6 @@
   </div>
 </div>
 
-<script src="./app.js?v=10.1.0"></script>
+<script src="./app.js?v=10.2.0"></script>
 </body>
 </html>
