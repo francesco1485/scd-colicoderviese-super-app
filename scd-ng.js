@@ -68,20 +68,46 @@ function loadTwin(){
 }
 function applyTwin(t=loadTwin()){
   const name=t.name||'Il mio Twin',num=t.number||10,xp=Number(t.xp||0);
-  $('#twinName').textContent=name;$('#twinXp').textContent=xp+' XP';$('#avatarNumber').textContent=num;$('#miniInitials').textContent=(name==='Il mio Twin'?'SCD':name.slice(0,2)).toUpperCase();
-  $('#twinNameInput').value=t.name||'';$('#numberInput').value=num;
-  
+  $('#twinName').textContent=name;
+  $('#twinXp').textContent=xp+' XP';
+  $('#avatarNumber').textContent=num;
+  $('#miniInitials').textContent=(name==='Il mio Twin'?'SCD':name.slice(0,2)).toUpperCase();
+  $('#twinNameInput').value=t.name||'';
+  $('#numberInput').value=num;
+  if($('#roleInput')&&t.role)$('#roleInput').value=t.role;
+  if($('#toneInput')&&t.tone)$('#toneInput').value=t.tone;
+  if($('#hairInput')&&t.hair)$('#hairInput').value=t.hair;
+  const figure=$('#avatarFigure');
+  if(figure){
+    figure.dataset.tone=t.tone||'t2';
+    figure.dataset.hair=t.hair||'h1';
+    if(t.kit)figure.dataset.kit=t.kit;
+  }
 }
 applyTwin();
-$('#photoInput').addEventListener('change',e=>{
- const f=e.target.files?.[0];if(!f)return;
- if(f.size>3_000_000)return toast('Foto troppo grande: massimo 3 MB per questa demo locale');
- const rd=new FileReader();rd.onload=()=>{const t=loadTwin();t.photo=rd.result;localStorage.setItem(twinKey,JSON.stringify(t));applyTwin(t);toast('Foto applicata localmente')};rd.readAsDataURL(f);
-});
+
 $('#saveTwin').addEventListener('click',()=>{
- const t=loadTwin();t.name=$('#twinNameInput').value.trim().slice(0,24)||'Il mio Twin';t.number=Math.max(1,Math.min(99,Number($('#numberInput').value||10)));t.role=$('#roleInput').value;localStorage.setItem(twinKey,JSON.stringify(t));applyTwin(t);toast('Twin salvato sul dispositivo');
+  const t=loadTwin();
+  t.name=$('#twinNameInput').value.trim().slice(0,24)||'Il mio Twin';
+  t.number=Math.max(1,Math.min(99,Number($('#numberInput').value||10)));
+  t.role=$('#roleInput').value;
+  t.tone=$('#toneInput')?.value||'t2';
+  t.hair=$('#hairInput')?.value||'h1';
+  localStorage.setItem(twinKey,JSON.stringify(t));
+  applyTwin(t);
+  toast('Twin sintetico salvato sul dispositivo');
 });
-$('#missionBtn').addEventListener('click',()=>{const t=loadTwin();t.xp=Number(t.xp||0)+10;localStorage.setItem(twinKey,JSON.stringify(t));applyTwin(t);$('#avatarFigure').animate([{transform:'translateY(0)'},{transform:'translateY(-14px)'},{transform:'translateY(0)'}],{duration:500});toast('+10 XP · missione sicura')});
+$('#missionBtn').addEventListener('click',()=>{
+  const t=loadTwin();
+  t.xp=Number(t.xp||0)+10;
+  localStorage.setItem(twinKey,JSON.stringify(t));
+  applyTwin(t);
+  $('#avatarFigure').animate(
+    [{transform:'translateY(0)'},{transform:'translateY(-14px)'},{transform:'translateY(0)'}],
+    {duration:500}
+  );
+  toast('+10 XP · missione sicura');
+});
 
 const mirror=$('#mirror');
 function openMirror(){mirror.classList.add('open');mirror.setAttribute('aria-hidden','false');setTimeout(()=>$('#mirrorInput').focus(),200)}
