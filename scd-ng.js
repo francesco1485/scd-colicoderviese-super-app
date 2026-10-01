@@ -281,8 +281,8 @@ $('#missionBtn')?.addEventListener('click',()=>{
 });
 
 const mirror=$('#mirror');
-function openMirror(){mirror.classList.add('open');mirror.setAttribute('aria-hidden','false');setTimeout(()=>$('#mirrorInput')?.focus(),200)}
-function closeMirror(){mirror.classList.remove('open');mirror.setAttribute('aria-hidden','true')}
+function openMirror(){mirror.classList.add('open');mirror.setAttribute('aria-hidden','false');const fab=$('#mirrorFab');if(fab)fab.hidden=true;setTimeout(()=>$('#mirrorInput')?.focus(),200)}
+function closeMirror(){mirror.classList.remove('open');mirror.setAttribute('aria-hidden','true');const fab=$('#mirrorFab');if(fab)fab.hidden=false}
 ['#mirrorFab','#openMirrorFromCard','#openMirrorDesk','#ngMirrorQuick'].forEach(s=>$(s)?.addEventListener('click',openMirror));$('#closeMirror')?.addEventListener('click',closeMirror);
 function mirrorReply(q){
  const x=norm(q);
