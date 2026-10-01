@@ -101,4 +101,31 @@ for(const token of [
   'scd_activation_scenario_v1'
 ]) assert(js.includes(token),'R48 app interaction missing: '+token);
 
+
+for(const token of [
+  'view-territory',
+  'SCD TERRITORY HUB',
+  'Colico non è lo sfondo. È parte del prodotto.',
+  'id="partnerHubJourney"',
+  'PARTNER JOURNEY',
+  'Crea attivazione'
+]) assert(app.includes(token),'R49 world club structure missing: '+token);
+
+for(const token of [
+  'const territoryModules=',
+  'renderTerritoryHub',
+  'partnerJourneyFor',
+  'campaignPreview',
+  'campaignAssetMap'
+]) assert(js.includes(token),'R49 world club interaction missing: '+token);
+
+assert(js.includes("$('.view').forEach"),'multi-view selector must use $ helper');
+assert(js.includes("$('[data-view]').forEach"),'multi-action selector must use $ helper');
+assert(js.includes("$('[data-campaign-filter]').forEach"),'campaign filters must use $ helper');
+assert(!js.includes("$('[data-view]').forEach"),'single selector incorrectly used for multiple view actions');
+
+const pubJs=fs.readFileSync(new URL('../sponsor/sponsor.js',import.meta.url),'utf8');
+assert(pubJs.includes('const $=s=>Array.from(document.querySelectorAll(s));'),'public multi-selector helper missing');
+assert(!pubJs.includes('const $=s=>Array.from(document.querySelectorAll(s));'),'public selector helper duplicated');
+
 console.log('Sponsor vision contract PASS');
