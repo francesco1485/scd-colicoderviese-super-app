@@ -495,3 +495,60 @@ body{background:
 @media(max-width:1400px){.world-module-grid{grid-template-columns:repeat(3,1fr)}.partner-service-board,.partner-hub-grid,.mediahub-grid{grid-template-columns:repeat(2,1fr)}.campaign-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:1000px){.sidebar{width:250px}.main{margin-left:0}.club-location-pill{display:none}.mediahub-feature,.partner-hub-hero{grid-template-columns:1fr}.world-hero .hero-content{width:100%;padding-right:26px}.world-hero .hero-quote{display:none}}
 @media(max-width:700px){.world-module-grid,.campaign-grid,.partner-hub-grid,.partner-service-board,.mediahub-grid{grid-template-columns:1fr}.world-module-grid button{min-height:88px}.world-hero .hero-content{padding:28px 18px}.world-hero h1{font-size:2.6rem}.world-hero h2{font-size:1.35rem}.partner-hub-actions select{min-width:100%}.campaign-rule{flex-direction:column}.mediahub-screen{min-height:240px}.sponsor-wall-live>div{grid-template-columns:repeat(2,1fr)}}
+
+
+/* ===== R48 WORLD-CLASS CLUB SYSTEM ===== */
+:root{
+  --navy:#071419;--navy2:#0b2a35;--blue:#0f6f84;--blue2:#168dac;--cyan:#36c5c8;
+  --yellow:#f2c94c;--gold:#d0a344;--bg:#eef3f3;--white:#fffdf9;--ink:#17313a;--muted:#6b8188;
+  --line:#d8e2e3;--green:#1e9c6a;--orange:#e9a23a;--red:#cf5a5a;--shadow:0 18px 46px rgba(7,38,48,.10)
+}
+.sidebar{background:linear-gradient(180deg,#071419,#0a2630 72%,#061116);box-shadow:10px 0 34px rgba(0,0,0,.18)}
+.nav-link.active{background:linear-gradient(90deg,#0f6f84,#0b5466);box-shadow:inset 3px 0 0 var(--yellow),0 8px 18px rgba(0,0,0,.18)}
+.topbar{background:rgba(7,20,25,.96)}
+.searchbar input{background:rgba(11,42,53,.86);border-color:rgba(74,173,189,.26)}
+.hero{min-height:300px;border-radius:0 0 24px 24px}
+.hero-shade{background:linear-gradient(90deg,rgba(7,20,25,.94) 0%,rgba(9,56,67,.66) 46%,rgba(8,34,42,.14) 76%,rgba(8,34,42,.26) 100%)}
+.hero-content{padding:38px 34px;width:64%}
+.hero h1{font-size:46px}.hero h2{font-size:22px}.hero p{font-size:12px;max-width:560px}.hero-eyebrow{color:var(--yellow);letter-spacing:.12em}
+.btn-yellow{background:var(--yellow);color:#10262d}
+.page-head small{color:#1c8292}.page-head h1{color:#153c47}
+.panel,.kpi-card,.sponsor-strip,.data-table,.proposal-card,.asset-card,.folder-card,.led-card,.report-card,.settings-card,.detail-panel{border-color:var(--line);box-shadow:var(--shadow)}
+.lia-panel{background:linear-gradient(180deg,#071d25,#061419);border-color:rgba(54,197,200,.22)}
+.lia-actions button{background:#0b3541;border-color:rgba(54,197,200,.34)}
+.strip-item{background:#f4f7f6;color:#365d67}
+.status-badge.blue{background:#e6f4f6;color:#197785}
+.status-badge.orange{background:#fff4dd;color:#94640e}
+
+/* Command Center */
+.club-command-center{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(430px,.85fr);gap:12px;margin:14px 0 16px}
+.command-intro{border-radius:18px;padding:20px;background:linear-gradient(135deg,#071419,#0f4655);color:#fff;box-shadow:0 18px 42px rgba(7,33,41,.16);position:relative;overflow:hidden}
+.command-intro:after{content:"";position:absolute;width:260px;height:260px;border-radius:50%;right:-100px;top:-130px;border:1px solid rgba(255,255,255,.10);box-shadow:0 0 0 34px rgba(255,255,255,.025),0 0 0 70px rgba(255,255,255,.02)}
+.command-intro>span{font-size:8px;letter-spacing:.14em;color:#7fe1e0;font-weight:900}.command-intro h3{font-size:24px;margin:5px 0 7px}.command-intro p{font-size:9px;line-height:1.5;color:#c9d9dc;max-width:680px}
+.command-flow{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:15px}.command-flow b{font-size:7px;letter-spacing:.08em;padding:7px 9px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1)}.command-flow i{font-style:normal;color:var(--yellow)}
+.command-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.command-actions button{border:1px solid #dce6e7;background:#fff;border-radius:16px;padding:13px;text-align:left;cursor:pointer;box-shadow:0 10px 28px rgba(7,38,48,.05);transition:.2s}.command-actions button:hover{transform:translateY(-2px);border-color:#9fcbd1}.command-actions small{display:block;font-size:6px;letter-spacing:.12em;color:#19849a;font-weight:900}.command-actions strong{display:block;font-size:11px;color:#1b4a55;margin:3px 0}.command-actions span{display:block;font-size:7px;color:#7b9095}
+
+/* Activation Studio */
+.activation-layout{display:grid;grid-template-columns:minmax(360px,.92fr) minmax(420px,1.08fr);gap:12px}
+.activation-builder,.activation-preview{background:#fff;border:1px solid var(--line);border-radius:18px;padding:17px;box-shadow:var(--shadow)}
+.activation-builder-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.activation-builder-head small{font-size:7px;letter-spacing:.12em;color:#19849a;font-weight:900}.activation-builder-head h3{font-size:16px;margin:4px 0}.activation-status{font-size:6px;font-weight:850;border-radius:999px;padding:6px 8px;background:#eef6f5;color:#34776f}
+.activation-fields{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}.activation-fields label{font-size:7px;color:#61777d;font-weight:750;display:grid;gap:5px}.activation-fields select{width:100%;border:1px solid #d9e3e4;border-radius:10px;padding:9px;background:#fbfdfd;color:#214b56;font-size:8px}
+.activation-actions{display:flex;gap:8px;margin-top:12px}.activation-saved{font-size:7px;color:#76898e;margin:9px 0 0}
+.activation-preview{padding:0;overflow:hidden;background:#071419;color:#fff}.activation-preview-top{height:54px;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.10)}.activation-preview-top span{font-size:7px;letter-spacing:.12em;color:#9fd6da;font-weight:900}.activation-preview-top img{width:34px;height:42px;object-fit:contain}
+.activation-visual{min-height:270px;padding:24px;background:linear-gradient(135deg,rgba(6,28,34,.84),rgba(13,84,99,.72)),url('../assets/hero-colico.webp') center/cover;display:flex;flex-direction:column;justify-content:end}.activation-visual small{font-size:8px;letter-spacing:.15em;color:var(--yellow);font-weight:900}.activation-visual h3{font-size:30px;line-height:1.02;margin:7px 0 9px;max-width:560px}.activation-visual p{font-size:10px;line-height:1.5;color:#d9e7e9;max-width:520px}
+.activation-chip-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:13px}.activation-chip-row span{font-size:7px;padding:6px 8px;border-radius:999px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.12)}
+.activation-proof{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(255,255,255,.08)}.activation-proof div{background:#0a222b;padding:13px 16px}.activation-proof small{font-size:6px;color:#7fb3bd;display:block;letter-spacing:.1em}.activation-proof b{font-size:9px;display:block;margin-top:4px}
+.activation-quality-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px}.activation-quality-grid article{background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px;box-shadow:0 8px 22px rgba(7,38,48,.04)}.activation-quality-grid span{font-size:7px;font-weight:900;color:#19849a}.activation-quality-grid h3{font-size:10px;margin:4px 0}.activation-quality-grid p{font-size:7px;line-height:1.4;color:#73878d;margin:0}
+
+/* Sponsor Wall + Media Hub */
+.media-studio-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:10px;margin-bottom:10px}.partner-wall-manager,.media-hub-preview{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:var(--shadow)}.partner-wall-manager header{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.partner-wall-manager small,.media-hub-preview>small{font-size:6px;letter-spacing:.12em;color:#1b8190;font-weight:900}.partner-wall-manager h3,.media-hub-preview h3{font-size:13px;margin:3px 0}.partner-wall-manager>p{font-size:7px;color:#71868c;line-height:1.45}
+.partner-wall-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px;background:linear-gradient(135deg,#0b3540,#10262d);padding:11px;border-radius:12px}.partner-wall-grid span{min-height:45px;background:#fff;border-radius:8px;display:grid;place-items:center;text-align:center;padding:7px;font-size:6.5px;font-weight:850;color:#214c57}.partner-wall-grid span.selected{background:var(--yellow);color:#18323a}
+.media-hub-stage{min-height:150px;border-radius:12px;background:linear-gradient(180deg,rgba(7,20,25,.08),rgba(7,20,25,.78)),url('../assets/hero-colico.webp') center/cover;color:#fff;display:flex;align-items:end;gap:10px;padding:14px}.media-play{width:36px;height:36px;border-radius:50%;background:#fff;color:#0c6575;display:grid;place-items:center}.media-hub-stage b{font-size:9px;display:block}.media-hub-stage span{font-size:6px;color:#d1e1e3}.media-hub-list{display:grid;gap:5px;margin-top:8px}.media-hub-list span{display:flex;justify-content:space-between;gap:8px;background:#f6f9f9;border-radius:8px;padding:8px;font-size:6.5px;color:#48636a}.media-hub-list em{font-style:normal;font-size:6px;color:#167e8f;font-weight:850}
+
+/* Wallet / benefits */
+.wallet-showcase{display:grid;grid-template-columns:1fr 1fr 1.1fr;gap:10px;margin-top:12px}.wallet-card{min-height:170px;border-radius:18px;padding:18px;color:#fff;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 18px 34px rgba(7,38,48,.12);position:relative;overflow:hidden}.wallet-card:after{content:"";position:absolute;width:180px;height:180px;border-radius:50%;right:-70px;top:-80px;border:1px solid rgba(255,255,255,.15);box-shadow:0 0 0 30px rgba(255,255,255,.04),0 0 0 60px rgba(255,255,255,.025)}.wallet-card.supporter{background:linear-gradient(135deg,#0a5271,#16a3ad)}.wallet-card.tesserato{background:linear-gradient(135deg,#18242a,#a37a2d)}.wallet-card>*{position:relative;z-index:2}.wallet-card small{font-size:7px;letter-spacing:.11em}.wallet-card strong{font-size:16px}.wallet-card span{font-size:8px;font-weight:850}.wallet-card em{font-size:7px;font-style:normal;color:#e7f3f4}
+.wallet-benefits{border-radius:18px;background:#fff;border:1px solid var(--line);padding:18px;box-shadow:var(--shadow)}.wallet-benefits small{font-size:7px;letter-spacing:.11em;color:#1a8492;font-weight:900}.wallet-benefits h3{font-size:16px;margin:5px 0 12px}.wallet-benefits>div{display:flex;flex-wrap:wrap;gap:6px}.wallet-benefits span{font-size:7px;padding:6px 8px;border-radius:999px;background:#eef5f5;color:#3a646d;font-weight:800}
+
+@media(max-width:1200px){.club-command-center,.activation-layout{grid-template-columns:1fr}.activation-quality-grid{grid-template-columns:repeat(3,1fr)}.wallet-showcase{grid-template-columns:1fr 1fr}.wallet-benefits{grid-column:1/-1}}
+@media(max-width:900px){.hero-content{width:100%;padding:28px 20px}.hero h1{font-size:38px}.club-command-center{margin-top:10px}.command-actions{grid-template-columns:repeat(2,1fr)}.media-studio-grid{grid-template-columns:1fr}.activation-fields{grid-template-columns:1fr 1fr}}
+@media(max-width:620px){.command-actions,.activation-fields,.activation-quality-grid,.wallet-showcase{grid-template-columns:1fr}.partner-wall-grid{grid-template-columns:repeat(2,1fr)}.activation-visual h3{font-size:25px}.activation-proof{grid-template-columns:1fr}}
