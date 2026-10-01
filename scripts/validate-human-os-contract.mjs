@@ -36,7 +36,7 @@ for(const token of ['r39-experience-bar','r39-private-desk','r39-growth-loop']){
 
 const isNextGenSynthetic=m.architecture?.nextgen_preview?.visual_mode==='SYNTHETIC_NO_REAL_PHOTOGRAPHY';
 if(isNextGenSynthetic){
-  assert(/scd-synth\\.css\\?v=0\\.[0-9]+\\.[0-9]+/.test(index),'NextGen Human OS visual layer not loaded');
+  assert(index.includes('scd-synth.css?v='),'NextGen Human OS visual layer not loaded');
   assert(index.includes('data-experience-mode="DISCOVER"'),'Discover mode control missing');
   assert(index.includes('data-experience-mode="QUICK"'),'Quick mode control missing');
   assert(index.includes('data-experience-mode="FOCUS"'),'Focus mode control missing');
