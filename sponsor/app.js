@@ -244,6 +244,45 @@ const territoryModules={
 let territoryCurrent='centro';
 
 
+function partnerHubRecords(){
+  const rows=sponsors.map(s=>({...s,crmId:'',source:'DOSSIER'}));
+  const crmRows=Array.isArray(crmState?.rows)?crmState.rows:[];
+  crmRows.forEach(r=>{
+    const hay=[r.type,r.category,r.area,r.tags,r.relationshipStatus].join(' ').toLowerCase();
+    if(!/sponsor|partner|fornitor|azienda|prospect|convenzion|commercial/.test(hay))return;
+    const idx=rows.findIndex(x=>x.name.trim().toLowerCase()===String(r.name||'').trim().toLowerCase());
+    const current=idx>=0?rows[idx]:{};
+    const merged={
+      ...current,
+      name:r.name||current.name||'Profilo CRM',
+      sector:[r.category,r.area].filter(Boolean).join(' · ')||current.sector||'Relazione territoriale',
+      status:r.relationshipStatus||current.status||'CRM',
+      value:r.relationshipValue||current.value||'Da verificare',
+      period:current.period||'Periodo da verificare',
+      asset:current.asset||(Number(r.opportunities||0)>0?String(r.opportunities)+' opportunità collegate':'Asset da collegare'),
+      next:r.nextAction||current.next||'Prossima azione da definire',
+      contact:r.email||r.phone||current.contact||'Referente da verificare',
+      crmId:r.id||'',
+      contactPolicy:r.contactPolicy||'',
+      openTasks:Number(r.openTasks||0),
+      touchpoints:Number(r.touchpoints||0),
+      opportunities:Number(r.opportunities||0),
+      source:'CRM'
+    };
+    if(idx>=0)rows[idx]=merged; else rows.push(merged);
+  });
+  return rows.sort((a,b)=>String(a.name).localeCompare(String(b.name),'it'));
+}
+function syncActivationPartnersFromCrm(){
+  const sel=$('#activationSponsor');if(!sel)return;
+  const existing=new Set([...sel.options].map(o=>o.text.trim().toLowerCase()));
+  partnerHubRecords().forEach(r=>{
+    const key=String(r.name||'').trim().toLowerCase();
+    if(!key||existing.has(key))return;
+    const o=document.createElement('option');o.textContent=r.name;sel.appendChild(o);existing.add(key);
+  });
+}
+
 function partnerJourneyFor(s){
   const status=String(s.status||'').toUpperCase();
   const asset=String(s.asset||'');
@@ -262,14 +301,15 @@ function partnerJourneyFor(s){
 }
 function renderPartnerHub(){
   const sel=$('#partnerHubSelect'); if(!sel) return;
-  if(!partnerHubCurrent) partnerHubCurrent=sponsors[0]?.name||'';
-  sel.innerHTML=sponsors.map(s=>'<option value="'+esc(s.name)+'">'+esc(s.name)+'</option>').join('');
-  if(!sponsors.some(s=>s.name===partnerHubCurrent)) partnerHubCurrent=sponsors[0]?.name||'';
+  const records=partnerHubRecords();
+  if(!partnerHubCurrent) partnerHubCurrent=records[0]?.name||'';
+  sel.innerHTML=records.map(s=>'<option value="'+esc(s.name)+'">'+esc(s.name)+(s.source==='CRM'?' · CRM':'')+'</option>').join('');
+  if(!records.some(s=>s.name===partnerHubCurrent)) partnerHubCurrent=records[0]?.name||'';
   sel.value=partnerHubCurrent;
-  const s=sponsors.find(x=>x.name===partnerHubCurrent);
+  const s=records.find(x=>x.name===partnerHubCurrent);
   if(!s)return;
   $('#partnerHubName').textContent=s.name;
-  $('#partnerHubMeta').textContent=[s.sector,s.type].filter(Boolean).join(' · ');
+  $('#partnerHubMeta').textContent=[s.sector,s.type,s.source==='CRM'?'Profilo CRM sincronizzato':'Dossier commerciale'].filter(Boolean).join(' · ');
   $('#partnerHubStatus').textContent=s.status;
   $('#partnerHubPeriod').textContent=s.period||'Periodo da verificare';
   $('#partnerHubValue').textContent=s.value||'Da verificare';
@@ -281,11 +321,18 @@ function renderPartnerHub(){
     '<article class="journey-step '+x.cls+'"><span>'+x.n+'</span><div><small>'+x.label+'</small><b>'+esc(x.state)+'</b></div></article>'
   ).join('');
   sel.onchange=()=>{partnerHubCurrent=sel.value;renderPartnerHub()};
-  const btn=$('#partnerHubCrmBtn'); if(btn)btn.onclick=()=>openSponsor(s.name);
+  const btn=$('#partnerHubCrmBtn');
+  if(btn)btn.onclick=()=>{
+    if(s.crmId){openView('crm');openCrmProfile(s.crmId)}
+    else openSponsor(s.name);
+  };
   const activationBtn=$('#partnerActivationBtn');
   if(activationBtn)activationBtn.onclick=()=>{
     const target=$('#activationSponsor');
-    if(target){[...target.options].some((o,i)=>o.text===s.name?(target.selectedIndex=i,true):false)}
+    if(target){
+      let matched=[...target.options].some((o,i)=>o.text===s.name?(target.selectedIndex=i,true):false);
+      if(!matched){const o=document.createElement('option');o.textContent=s.name;target.appendChild(o);target.selectedIndex=target.options.length-1}
+    }
     openView('activationstudio');
     renderActivationStudio();
   };
@@ -693,6 +740,8 @@ async function loadCrm(){
     const data=await crmApi();
     crmState.rows=Array.isArray(data.rows)?data.rows:[];
     renderCrmKpis(data.kpi||{});
+    renderPartnerHub();
+    syncActivationPartnersFromCrm();
   }catch(e){
     crmState.error=e.message||'Errore CRM';
     renderCrmKpis({});
