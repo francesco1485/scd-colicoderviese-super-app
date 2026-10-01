@@ -3983,3 +3983,83 @@ a:focus-visible{
 @media(max-width:560px){
   .lia-protocol-decision,.lia-ux-summary{grid-template-columns:1fr}
 }
+
+
+/* =========================================================
+   MAGLIA 360 · V9 RECOVERY 360 / COVERAGE / FUTURE RADAR
+   ========================================================= */
+.plan-coverage-section{
+  background:
+    radial-gradient(circle at 92% 8%,rgba(77,158,152,.09),transparent 30%),
+    rgba(255,255,255,.92)
+}
+.plan-coverage-grid{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px
+}
+.plan-coverage-card{
+  display:grid;gap:10px;min-height:164px;padding:14px;border:1px solid #dce6e9;border-radius:14px;
+  background:#fff;text-align:left;cursor:pointer;box-shadow:0 7px 20px rgba(29,67,88,.035)
+}
+.plan-coverage-card:hover{transform:translateY(-2px);box-shadow:0 12px 25px rgba(29,67,88,.065)}
+.plan-coverage-card.complete{border-color:#cfe3d8;background:linear-gradient(180deg,#fff,#f5fbf7)}
+.plan-coverage-card.partial{border-color:#dce5df}
+.plan-coverage-card.critical{border-color:#ead9d4;background:linear-gradient(180deg,#fff,#fdf8f6)}
+.plan-coverage-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.plan-coverage-top span{display:block;color:#76909a;font-size:7px;font-weight:900;letter-spacing:.08em}
+.plan-coverage-top strong{display:block;margin-top:3px;color:#1c465c;font-size:12px}
+.plan-coverage-top>b{color:#2e7067;font-size:16px}
+.plan-coverage-card.critical .plan-coverage-top>b{color:#8a5b52}
+.plan-coverage-bar{height:6px;border-radius:999px;background:#edf2f3;overflow:hidden}
+.plan-coverage-bar i{display:block;height:100%;border-radius:inherit;background:#4d9e98}
+.plan-coverage-card.critical .plan-coverage-bar i{background:#b98276}
+.plan-coverage-checks{display:flex;flex-wrap:wrap;gap:5px}
+.plan-coverage-checks span{
+  padding:5px 7px;border-radius:999px;background:#f1f5f6;color:#71858e;font-size:7px
+}
+.plan-coverage-checks span.ready{background:#eaf6ef;color:#50745d}
+.plan-coverage-checks span.missing{background:#f9ece9;color:#8b6159}
+.plan-coverage-checks b{margin-left:3px}
+
+.plan-recovery-layout{grid-template-columns:minmax(0,1.25fr) minmax(300px,.75fr)}
+.plan-recovery-actions{display:grid;gap:6px}
+.plan-recovery-row{
+  display:grid;grid-template-columns:34px minmax(0,1fr) 18px;gap:9px;align-items:start;
+  width:100%;padding:10px;border:1px solid #e0e8eb;border-radius:11px;background:#fff;text-align:left;cursor:pointer
+}
+.plan-recovery-row:hover{border-color:#bfd4d5;background:#fbfdfd}
+.plan-recovery-row>b{
+  display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:#edf4f5;color:#356779;font-size:8px
+}
+.plan-recovery-row strong{display:block;color:#214a5f;font-size:9px}
+.plan-recovery-row small{display:block;margin-top:2px;color:#7e929b;font-size:7px;text-transform:uppercase}
+.plan-recovery-row p{margin:5px 0 0;color:#728892;font-size:8px;line-height:1.45}
+.plan-recovery-row>span{color:#5f8b88;font-weight:900}
+.plan-panel-action{margin-top:10px;width:100%}
+
+.future-radar-panel{
+  background:
+    radial-gradient(circle at 90% 12%,rgba(91,117,173,.09),transparent 30%),
+    linear-gradient(180deg,#fff,#f8fafc)
+}
+.future-radar-kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.future-radar-kpis>div{padding:11px;border:1px solid #dfe7ec;border-radius:10px;background:#fff}
+.future-radar-kpis strong{display:block;color:#214a5f;font-size:17px}
+.future-radar-kpis span{display:block;margin-top:3px;color:#7f929c;font-size:7px;text-transform:uppercase}
+.future-radar-list{display:grid;gap:6px;margin-top:10px}
+.future-radar-list>div{padding:9px 10px;border:1px solid #e2e8ec;border-radius:9px;background:rgba(255,255,255,.85)}
+.future-radar-list span{display:block;color:#698d91;font-size:7px;font-weight:900;letter-spacing:.08em}
+.future-radar-list strong{display:block;margin-top:2px;color:#264d61;font-size:9px}
+.future-radar-list small{display:block;margin-top:2px;color:#84959e;font-size:7px}
+.plan-future-actions{display:flex;gap:7px;margin-top:10px}
+.plan-future-actions button{flex:1}
+
+@media(max-width:1180px){
+  .plan-coverage-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .plan-recovery-layout{grid-template-columns:1fr}
+}
+@media(max-width:640px){
+  .plan-coverage-grid{grid-template-columns:1fr}
+  .plan-coverage-card{min-height:0}
+  .future-radar-kpis{grid-template-columns:1fr 1fr}
+  .plan-future-actions{flex-direction:column}
+}
