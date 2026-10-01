@@ -428,3 +428,70 @@ h1,h2,h3,h4,strong,b,.hero,.sidebar,.topbar,.event-card{color:#16304d}
 .innovation-shortcuts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.innovation-shortcuts button{border:1px solid #e0e8ef;background:white;border-radius:14px;padding:11px;text-align:left;cursor:pointer;min-width:0}.innovation-shortcuts button:hover{border-color:#9ec9e3}.innovation-shortcuts small{display:block;font-size:.62rem;font-weight:900;letter-spacing:.1em;color:#3992bf}.innovation-shortcuts b{display:block;color:#244f76;font-size:.86rem;margin:3px 0}.innovation-shortcuts span{display:block;color:#7a8ea0;font-size:.66rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media(max-width:1180px){.innovation-ribbon{grid-template-columns:1fr}.innovation-shortcuts{grid-template-columns:repeat(4,1fr)}}
 @media(max-width:760px){.innovation-led{grid-template-columns:1fr}.innovation-ticker{border-left:0;border-right:0;border-top:1px solid rgba(255,255,255,.15);border-bottom:1px solid rgba(255,255,255,.15)}.innovation-shortcuts{grid-template-columns:repeat(2,1fr)}}
+
+
+/* ===== R47 SCD PARTNER OS · WORLD CLUB SYSTEM ===== */
+:root{
+  --club-navy:#042b55;
+  --club-blue:#0872c9;
+  --club-sky:#21a9e3;
+  --club-yellow:#ffd51c;
+  --club-ice:#f4f9fd;
+  --club-line:#d9e7f2;
+  --club-shadow:0 18px 60px rgba(4,43,85,.12);
+}
+body{background:
+  radial-gradient(circle at 80% 0,rgba(33,169,227,.08),transparent 30%),
+  linear-gradient(180deg,#f4f9fd,#eef5fa 44%,#f7fafc);
+}
+.sidebar{width:238px;background:linear-gradient(180deg,#032745 0%,#05477e 52%,#032745 100%);padding:18px 12px 14px}
+.main{margin-left:238px}
+.brand{padding:0 8px 16px;align-items:center}
+.brand img{width:66px;height:86px}
+.brand-copy strong{font-size:14px;letter-spacing:.04em}.brand-copy span{font-size:10px;color:#fff}.brand-copy small{font-size:8px;color:#7bd5f3}
+.nav-section-label{display:block;margin:12px 10px 5px;color:#6eb7dc;font-size:8px;font-weight:900;letter-spacing:.18em}
+.main-nav{gap:3px}.nav-link{min-height:42px;padding:8px 10px;border-radius:11px}.nav-link span{font-size:.86rem}
+.nav-link.active{background:linear-gradient(90deg,#0d76ce,#07599e);box-shadow:inset 3px 0 0 var(--club-yellow),0 8px 20px rgba(0,0,0,.18)}
+.topbar{height:66px;background:rgba(3,35,66,.96);border-bottom:1px solid rgba(255,255,255,.09);box-shadow:0 8px 28px rgba(4,43,85,.12)}
+.club-location-pill{display:inline-flex;align-items:center;min-height:32px;padding:0 10px;border-radius:999px;background:rgba(33,169,227,.13);border:1px solid rgba(123,213,243,.28);color:#c9efff;font-size:10px;font-weight:850;letter-spacing:.07em}
+.searchbar{max-width:720px}.searchbar input{height:42px;background:rgba(2,30,58,.88);border-color:rgba(111,192,233,.33)}
+.view{padding:0 20px 44px}
+.hero.world-hero{min-height:330px;border-radius:0 0 26px 26px;box-shadow:0 24px 70px rgba(3,38,73,.22)}
+.world-hero .hero-bg{background-position:center 38%;filter:saturate(1.1) contrast(1.03)}
+.world-hero .hero-shade{background:linear-gradient(90deg,rgba(3,35,67,.97) 0%,rgba(4,64,107,.79) 46%,rgba(3,45,78,.23) 75%,rgba(3,35,67,.42) 100%)}
+.world-hero .hero-content{padding:38px 36px 34px;width:66%;max-width:840px}
+.world-hero .hero-eyebrow{font-size:.77rem;letter-spacing:.12em}
+.world-hero h1{font-size:clamp(42px,5vw,72px);letter-spacing:-.055em;margin:10px 0 2px}.world-hero h1 em{color:var(--club-yellow)}
+.world-hero h2{font-size:clamp(20px,2.2vw,31px);margin:0 0 8px}.world-hero p{font-size:1rem;max-width:720px;color:#e6f2fa}
+.world-hero-tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:18px}.world-hero-tags span{padding:6px 9px;border-radius:999px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.075);font-size:.68rem;font-weight:850;letter-spacing:.07em}
+.world-hero .hero-quote{top:auto;bottom:34px;right:36px;font-size:23px}
+.world-module-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin:14px 0 18px}
+.world-module-grid button{min-height:108px;border:1px solid var(--club-line);background:linear-gradient(155deg,#fff,#f2f8fc);border-radius:17px;padding:15px;text-align:left;cursor:pointer;box-shadow:0 10px 26px rgba(4,43,85,.055);transition:.2s}
+.world-module-grid button:hover{transform:translateY(-3px);border-color:#87c7e7;box-shadow:0 18px 38px rgba(4,43,85,.11)}
+.world-module-grid span{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--club-yellow);color:#16324d;font-size:.7rem;font-weight:900}
+.world-module-grid b{display:block;margin-top:9px;color:#123f68;font-size:.98rem}.world-module-grid small{display:block;margin-top:4px;color:#6a8298;font-size:.72rem;line-height:1.35}
+.innovation-ribbon{margin:0 0 18px}.innovation-led{background:linear-gradient(110deg,#032c54,#086da9)}
+.world-page-head{padding-top:30px;padding-bottom:20px}.world-page-head small{color:#0a77be}.world-page-head h1{font-size:clamp(32px,4vw,54px);letter-spacing:-.045em;color:#073a67}.world-page-head p{font-size:1rem;max-width:900px}
+.partner-hub-hero{min-height:230px;border-radius:24px;padding:28px;display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:22px;align-items:center;background:
+ linear-gradient(105deg,rgba(3,39,75,.96),rgba(9,110,174,.82)),
+ url('../assets/hero-colico.webp') center/cover;color:white;box-shadow:var(--club-shadow)}
+.partner-live-dot{display:inline-flex;align-items:center;gap:7px;font-size:.7rem;font-weight:900;letter-spacing:.12em;color:#8fe3ff}.partner-live-dot:before{content:"";width:8px;height:8px;border-radius:50%;background:#3fe08e;box-shadow:0 0 0 5px rgba(63,224,142,.12)}
+.partner-hub-copy h2{font-size:clamp(28px,3vw,44px);margin:8px 0 5px}.partner-hub-copy p{color:#dcecf6;margin:0 0 16px}.partner-hub-actions{display:flex;gap:9px;flex-wrap:wrap}.partner-hub-actions select{min-width:260px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.12);color:white;border-radius:10px;padding:10px 12px}.partner-hub-actions select option{color:#17304d}
+.partner-hub-score{align-self:stretch;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);border-radius:20px;padding:22px;display:flex;flex-direction:column;justify-content:center}.partner-hub-score small{font-size:.68rem;letter-spacing:.12em;color:#a7def4}.partner-hub-score strong{font-size:1.55rem;margin:7px 0}.partner-hub-score span{font-size:.83rem;color:#d4eaf5}
+.partner-hub-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0}.partner-hub-grid article{background:white;border:1px solid var(--club-line);border-radius:17px;padding:18px;box-shadow:0 10px 26px rgba(4,43,85,.05)}.partner-hub-grid small{display:block;font-size:.68rem;letter-spacing:.11em;color:#5c90b5;font-weight:900}.partner-hub-grid strong{display:block;margin:7px 0;color:#154b77;font-size:1rem}.partner-hub-grid p{font-size:.78rem;color:#75899b;margin:0}
+.partner-service-board{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.partner-service-board article{position:relative;overflow:hidden;background:linear-gradient(145deg,#052d56,#07558e);border-radius:18px;padding:20px;color:white;min-height:180px}.partner-service-board article:after{content:"";position:absolute;width:150px;height:150px;border:1px solid rgba(255,255,255,.08);border-radius:50%;right:-60px;top:-60px}.partner-service-board span{color:var(--club-yellow);font-weight:900;font-size:.75rem}.partner-service-board h3{font-size:1.2rem;margin:8px 0}.partner-service-board p{font-size:.82rem;color:#d6e9f5}.partner-service-board button{border:0;background:rgba(255,255,255,.11);color:white;border-radius:9px;padding:8px 10px;font-weight:800;font-size:.75rem}
+.campaign-toolbar{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}.campaign-toolbar button{border:1px solid var(--club-line);background:white;color:#426885;border-radius:999px;padding:8px 12px;font-size:.78rem;font-weight:800}.campaign-toolbar button.active{background:#075fa6;color:white;border-color:#075fa6}
+.campaign-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.campaign-item{border:1px solid var(--club-line);background:white;border-radius:18px;overflow:hidden;box-shadow:0 12px 34px rgba(4,43,85,.06);cursor:pointer}.campaign-visual{height:145px;position:relative;background:linear-gradient(135deg,#073a67,#0a83c8);display:flex;align-items:flex-end;padding:16px;color:white;overflow:hidden}.campaign-visual:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 90% 10%,rgba(255,213,28,.28),transparent 32%)}.campaign-visual b{position:relative;z-index:2;font-size:1.15rem}.campaign-visual span{position:absolute;top:14px;left:14px;padding:5px 7px;border-radius:999px;background:var(--club-yellow);color:#17304d;font-size:.62rem;font-weight:900;letter-spacing:.08em}.campaign-body{padding:16px}.campaign-body h3{margin:0 0 6px;color:#174e79;font-size:1rem}.campaign-body p{font-size:.82rem;color:#6c8296;margin:0 0 12px}.campaign-meta{display:flex;justify-content:space-between;gap:8px;border-top:1px solid #edf2f6;padding-top:10px;font-size:.7rem;color:#758a9d}
+.campaign-rule{margin-top:16px;padding:16px 18px;border-radius:16px;background:#fff7d6;border:1px solid #eadb91;display:flex;gap:14px;align-items:flex-start}.campaign-rule strong{color:#755800}.campaign-rule p{margin:0;color:#695f42;font-size:.85rem}
+.mediahub-feature{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(300px,.6fr);gap:14px}.mediahub-screen{min-height:300px;border-radius:22px;background:
+ linear-gradient(180deg,rgba(2,20,38,.06),rgba(2,20,38,.88)),
+ url('../assets/hero-colico.webp') center/cover;position:relative;overflow:hidden;color:white;display:flex;align-items:flex-end;padding:24px;box-shadow:var(--club-shadow)}.mediahub-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:74px;height:74px;border-radius:50%;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.5);backdrop-filter:blur(9px);display:grid;place-items:center;font-size:24px}.mediahub-screen small{display:block;color:#8fdefd;letter-spacing:.11em;font-weight:900}.mediahub-screen strong{display:block;font-size:1.6rem;margin:5px 0}.mediahub-screen span{font-size:.85rem;color:#d8e8f3}
+.sponsor-wall-live{border-radius:22px;background:linear-gradient(145deg,#074f8c,#06315a);padding:18px;color:white;box-shadow:var(--club-shadow)}.sponsor-wall-live>small{font-size:.72rem;color:#99ddf5;letter-spacing:.11em;font-weight:900}.sponsor-wall-live>div{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:12px}.wall-tile{min-height:54px;border-radius:9px;background:white;color:#154a74;display:grid;place-items:center;text-align:center;padding:6px;font-size:.65rem;font-weight:850;box-shadow:inset 0 0 0 1px #dce8f0}
+.mediahub-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px}.mediahub-grid article{background:white;border:1px solid var(--club-line);border-radius:17px;padding:18px}.mediahub-grid small{font-size:.67rem;letter-spacing:.1em;color:#1680b9;font-weight:900}.mediahub-grid h3{font-size:1.06rem;margin:6px 0}.mediahub-grid p{font-size:.82rem;color:#6b8195}.mediahub-grid button{border:0;background:#edf7fd;color:#0a6da8;border-radius:9px;padding:7px 9px;font-size:.75rem;font-weight:850}
+.macro-card,.panel,.sponsor-card,.proposal-card,.asset-card,.folder-card,.led-card,.event-card,.report-card{border-color:var(--club-line);box-shadow:0 11px 30px rgba(4,43,85,.055)}
+.kpi-card{border-color:var(--club-line);border-radius:15px}.kpi-icon{background:#e8f6fd;color:#0872c9}
+.btn-yellow{background:var(--club-yellow);color:#15334e}
+.page-head h1,.crm-profile-head h2,.catalog-card h3,.community-value-grid h3{color:#073f70}
+@media(max-width:1400px){.world-module-grid{grid-template-columns:repeat(3,1fr)}.partner-service-board,.partner-hub-grid,.mediahub-grid{grid-template-columns:repeat(2,1fr)}.campaign-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:1000px){.sidebar{width:250px}.main{margin-left:0}.club-location-pill{display:none}.mediahub-feature,.partner-hub-hero{grid-template-columns:1fr}.world-hero .hero-content{width:100%;padding-right:26px}.world-hero .hero-quote{display:none}}
+@media(max-width:700px){.world-module-grid,.campaign-grid,.partner-hub-grid,.partner-service-board,.mediahub-grid{grid-template-columns:1fr}.world-module-grid button{min-height:88px}.world-hero .hero-content{padding:28px 18px}.world-hero h1{font-size:2.6rem}.world-hero h2{font-size:1.35rem}.partner-hub-actions select{min-width:100%}.campaign-rule{flex-direction:column}.mediahub-screen{min-height:240px}.sponsor-wall-live>div{grid-template-columns:repeat(2,1fr)}}
