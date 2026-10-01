@@ -148,6 +148,10 @@ assert(m.development_contract?.human_centered_rules?.pleasant_work_is_product_re
 assert(m.product_direction?.weekly_sport_calendar?.scope==='ALL_AGE_GROUPS_ALL_SPORTING_ACTIVITY_CURRENT_WEEK','R40 weekly calendar scope mismatch');
 assert(m.product_direction?.weekly_sport_calendar?.no_hidden_default_slice===true,'R40 weekly calendar must show all by default');
 assert(m.product_direction?.public_core_navigation?.state==='DEDICATED_PUBLIC_VIEWS','public core navigation state missing');
+assert(m.product_direction?.sponsor_operations_radar?.state==='PRIVATE_OPERATIONAL_WORKBENCH','sponsor operations state missing');
+assert((m.capability_map||[]).some(x=>x.id==='CAP-SPONSOR-OPERATIONS'),'CAP-SPONSOR-OPERATIONS missing');
+assert((m.product_direction?.sponsor_operations_radar?.rules||[]).includes('PROSPECT_NEVER_RENDERED_AS_CONFIRMED_SPONSOR'),'sponsor prospect separation rule missing');
+
 assert((m.product_direction?.public_core_navigation?.routes||[]).some(x=>x.id==='CALENDAR'&&x.hash==='#calendar'),'dedicated calendar route missing');
 assert((m.product_direction?.public_core_navigation?.routes||[]).some(x=>x.id==='TEAMS'&&x.hash==='#teams'),'dedicated teams route missing');
 assert((m.capability_map||[]).some(x=>x.id==='CAP-PUBLIC-TEAMS'),'CAP-PUBLIC-TEAMS missing');

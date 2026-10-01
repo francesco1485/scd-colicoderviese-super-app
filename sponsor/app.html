@@ -7,7 +7,7 @@
   <meta name="description" content="SCD ColicoDerviese Sponsor Platform">
   <title>SCD Sponsor Platform · Area riservata</title>
   <link rel="icon" href="../assets/logo-scd.png">
-  <link rel="stylesheet" href="./app.css?v=9.1.0">
+  <link rel="stylesheet" href="./app.css?v=9.2.0">
 </head>
 <body>
 <a class="skip-link" href="#mainContent">Salta al contenuto principale</a>
@@ -24,6 +24,7 @@
 
     <nav class="main-nav" id="mainNav">
       <button class="nav-link active" data-view="home"><i data-icon="home"></i><span>Dashboard</span></button>
+      <button class="nav-link" data-view="azioni"><i data-icon="target"></i><span>Azioni commerciali</span></button>
       <button class="nav-link" data-view="sponsor"><i data-icon="users"></i><span>Sponsor</span></button>
       <button class="nav-link" data-view="contratti"><i data-icon="file"></i><span>Contratti</span></button>
       <button class="nav-link" data-view="proposte"><i data-icon="proposal"></i><span>Proposte</span></button>
@@ -119,6 +120,10 @@
 
       <section class="dashboard-layout">
         <div class="dashboard-main">
+          <article class="panel action-queue-panel">
+            <header><div><i data-icon="target"></i><h3>Azioni commerciali da seguire</h3></div><button data-view="azioni">Apri radar →</button></header>
+            <div id="homeActionQueue" class="action-queue-list"></div>
+          </article>
           <div class="dashboard-grid top-grid">
             <article class="panel contracts-panel">
               <header><div><i data-icon="file"></i><h3>Contratti attuali</h3></div><button data-view="contratti">Vedi tutti →</button></header>
@@ -126,7 +131,7 @@
             </article>
 
             <article class="panel proposals-panel">
-              <header><div><i data-icon="bulb"></i><h3>Proposte ipotetiche</h3></div><button data-view="proposte">Vedi tutte →</button></header>
+              <header><div><i data-icon="bulb"></i><h3>Prospect & proposte</h3></div><button data-view="proposte">Vedi tutte →</button></header>
               <div id="homeProposals"></div>
             </article>
 
@@ -193,6 +198,16 @@
           <form id="liaForm"><input id="liaInput" placeholder="Scrivi un messaggio…"><button>➤</button></form>
         </aside>
       </section>
+    </section>
+
+    <section class="view" id="view-azioni">
+      <div class="page-head"><div><small>RADAR OPERATIVO</small><h1>Azioni commerciali</h1><p>Una coda unica per sponsor attuali, prospect, convenzioni, fornitori e iniziative. Mostra ciò che risulta già censito, senza inventare scadenze o probabilità.</p></div></div>
+      <div class="page-tools sponsor-action-tools">
+        <input id="actionSearch" class="filter-input" placeholder="Cerca azienda, azione o area…">
+        <select id="actionLane"><option value="ALL">Tutte le aree</option><option value="CURRENT">Sponsor attuali</option><option value="PROSPECT">Prospect / proposte</option><option value="CONVENTION">Convenzioni</option><option value="SUPPLIER">Fornitori → Sponsor</option><option value="INITIATIVE">Iniziative</option></select>
+      </div>
+      <div class="action-radar-note"><b>Stato operativo</b><span>Le azioni derivano dai dati censiti nella piattaforma. Nessuna voce viene considerata “chiusa” o “urgente” senza un dato esplicito.</span></div>
+      <div class="action-radar-grid" id="actionQueueGrid"></div>
     </section>
 
     <section class="view" id="view-sponsor">
@@ -298,6 +313,6 @@
   </div>
 </div>
 
-<script src="./app.js?v=9.0.0"></script>
+<script src="./app.js?v=9.2.0"></script>
 </body>
 </html>
