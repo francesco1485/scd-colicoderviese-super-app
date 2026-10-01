@@ -2141,12 +2141,13 @@ function openCommerceTab(tab='clients'){
   currentCommerceTab=['clients','portfolio','pipeline','catalog'].includes(tab)?tab:'clients'
   navigate('products')
   renderCommerceWorkspace()
+  if(window.userId)recordUxEvent('action','products','commerce_tab_'+currentCommerceTab,true)
 }
-function setCommerceTab(tab){
+function setCommerceTab(tab,record=true){
   currentCommerceTab=['clients','portfolio','pipeline','catalog'].includes(tab)?tab:'clients'
   document.querySelectorAll('[data-commerce-tab]').forEach(b=>b.classList.toggle('active',b.dataset.commerceTab===currentCommerceTab))
   document.querySelectorAll('[data-commerce-panel]').forEach(p=>p.classList.toggle('hidden',p.dataset.commercePanel!==currentCommerceTab))
-  if(window.userId)recordUxEvent('action','products','commerce_tab_'+currentCommerceTab,true)
+  if(record&&window.userId)recordUxEvent('action','products','commerce_tab_'+currentCommerceTab,true)
 }
 function renderCommerceWorkspace(){
   if(!$('commerceWorkspaceTabs'))return
@@ -2159,7 +2160,7 @@ function renderCommerceWorkspace(){
   renderClient360()
   renderPortfolioEngine()
   renderCommercialPipeline()
-  setCommerceTab(currentCommerceTab)
+  setCommerceTab(currentCommerceTab,false)
 }
 function renderClient360(){
   if(!$('client360Body'))return
