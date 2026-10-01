@@ -441,6 +441,7 @@ function renderCrmInspector(data){
   const tps=Array.isArray(data.touchpoints)?data.touchpoints:[];
   const tasks=Array.isArray(data.tasks)?data.tasks:[];
   const opps=Array.isArray(data.opportunities)?data.opportunities:[];
+  const agreements=Array.isArray(data.agreements)?data.agreements:[];
   el.innerHTML=
     '<div class="crm-profile-head"><small>'+esc(s.TIPO||'PROFILO')+'</small><h2>'+esc(s.NOME||'Profilo')+'</h2><p>'+esc(s.CATEGORIA||'')+'</p></div>'+
     (blocked?'<div class="crm-alert"><b>CONTATTO BLOCCATO</b><span>Policy '+esc(crmPolicyLabel(data.safety?.contactPolicy))+'. Nessun follow-up esterno deve partire automaticamente.</span></div>':'')+
@@ -457,7 +458,10 @@ function renderCrmInspector(data){
     '<section class="crm-section"><h3>Timeline recente</h3>'+
       (tps.length?tps.slice(0,8).map(x=>'<div class="crm-timeline"><time>'+esc(x.TIMESTAMP||'')+'</time><div><b>'+esc(x.OGGETTO||x.CANALE||'Touchpoint')+'</b><p>'+esc(x.SINTESI||'')+'</p><small>'+esc(x.ESITO||'')+'</small></div></div>').join(''):'<p>Nessun touchpoint registrato.</p>')+
     '</section>'+
-    '<section class="crm-section"><h3>Attività e opportunità</h3><p>'+tasks.length+' task collegati · '+opps.length+' opportunità collegate</p></section>';
+    '<section class="crm-section"><h3>Accordi / contratti</h3>'+
+      (agreements.length?agreements.map(a=>'<div class="crm-agreement"><div><b>'+esc(a.PACCHETTO||a.PARTNER||'Accordo')+'</b><small>'+esc(a.STATO||'')+'</small></div><div><span>Valore</span><strong>'+esc(a['VALORE €']!==''&&a['VALORE €']!=null?'€ '+a['VALORE €']:'Da verificare')+'</strong></div><div><span>Incasso</span><strong>'+esc(a['STATO INCASSO']||'Da verificare')+'</strong></div><p>'+esc(a['ASSET PROMESSI']||'')+'</p><small>'+esc(a['PROSSIMA AZIONE']||'')+'</small></div>').join(''):'<p>Nessun accordo formalizzato collegato.</p>')+
+    '</section>'+
+    '<section class="crm-section"><h3>Attività e opportunità</h3><p>'+tasks.length+' task collegati · '+opps.length+' opportunità collegate · '+agreements.length+' accordi collegati</p></section>';
   const mailBtn=$('#crmEmailAction');
   if(mailBtn)mailBtn.onclick=()=>openCrmEmailComposer(data);
 }
