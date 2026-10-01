@@ -1,7 +1,7 @@
 (()=>{
 'use strict';
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
-const state={view:'pulse',filter:'ALL',events:[],news:null};
+const API_BASE='https://scd-universe-ng-api.onrender.com';\nconst state={view:'pulse',filter:'ALL',events:[],news:null};
 const toast=(t)=>{const el=$('#toast');el.textContent=t;el.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('show'),2200)};
 function setView(view){
   state.view=view;
@@ -40,7 +40,7 @@ $('#radarFilters').addEventListener('click',e=>{const b=e.target.closest('[data-
 
 async function hydrate(){
   try{
-    const r=await fetch('/api/newsroom',{cache:'no-store'});
+    const r=await fetch(API_BASE+'/api/newsroom',{cache:'no-store'});
     if(!r.ok)throw new Error('newsroom unavailable');
     const data=await r.json(); state.news=data;
     const rows=Array.isArray(data.calendar?.rows)?data.calendar.rows:[];
@@ -70,7 +70,7 @@ function applyTwin(t=loadTwin()){
   const name=t.name||'Il mio Twin',num=t.number||10,xp=Number(t.xp||0);
   $('#twinName').textContent=name;$('#twinXp').textContent=xp+' XP';$('#avatarNumber').textContent=num;$('#miniInitials').textContent=(name==='Il mio Twin'?'SCD':name.slice(0,2)).toUpperCase();
   $('#twinNameInput').value=t.name||'';$('#numberInput').value=num;
-  if(t.photo){$('#avatarHead').classList.add('photo');$('#avatarHead').style.backgroundImage='url('+JSON.stringify(t.photo).slice(1,-1)+')'}else{$('#avatarHead').classList.remove('photo');$('#avatarHead').style.backgroundImage=''}
+  
 }
 applyTwin();
 $('#photoInput').addEventListener('change',e=>{
