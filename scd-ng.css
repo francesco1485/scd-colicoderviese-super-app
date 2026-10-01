@@ -342,3 +342,149 @@ radial-gradient(circle at 84% 0%,rgba(41,215,255,.12),transparent 31%),
   .match-center,.upcoming-events{border-radius:18px}
   .newsroom{padding-top:28px;padding-bottom:28px}
 }
+
+
+/* R43 MEDIA + INSTITUTIONAL COMPLETION · 2026-10-01 */
+.media-hub,
+.institutional-strip{
+  margin:16px clamp(16px,3vw,42px);
+  border:1px solid rgba(132,194,248,.16);
+  border-radius:24px;
+  background:linear-gradient(160deg,rgba(7,28,59,.96),rgba(5,17,36,.98));
+  box-shadow:0 18px 54px rgba(0,0,0,.18);
+}
+.media-hub{padding:24px}
+.media-hub .section-head{align-items:flex-start}
+.media-hub .section-head p{max-width:760px;color:#9dbbd7;margin:8px 0 0;line-height:1.5}
+.official-channels{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:10px;
+  margin-top:18px;
+}
+.channel-card{
+  min-height:126px;
+  display:grid;
+  align-content:center;
+  justify-items:start;
+  gap:5px;
+  padding:16px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:16px;
+  background:rgba(255,255,255,.045);
+  color:#fff;
+  text-decoration:none;
+  transition:transform .18s ease,border-color .18s ease,background .18s ease;
+}
+.channel-card:hover{
+  transform:translateY(-2px);
+  border-color:rgba(255,216,74,.4);
+  background:rgba(255,216,74,.06);
+}
+.channel-card span{
+  display:grid;
+  place-items:center;
+  min-width:38px;
+  height:38px;
+  padding:0 10px;
+  border-radius:12px;
+  background:#0a2b58;
+  color:#ffd84a;
+  font-size:17px;
+  font-weight:950;
+}
+.channel-card b{font-size:14px}
+.channel-card small{color:#93b5d4;font-size:10px;line-height:1.4}
+.external-sources{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:14px;
+  padding-top:14px;
+  border-top:1px solid rgba(255,255,255,.06);
+}
+.external-sources>span{
+  margin-right:4px;
+  font-size:9px;
+  letter-spacing:.1em;
+  font-weight:950;
+  color:#7fa9cf;
+}
+.external-sources a{
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:999px;
+  padding:8px 10px;
+  background:rgba(255,255,255,.035);
+  color:#dfeeff;
+  text-decoration:none;
+  font-size:10px;
+  font-weight:800;
+}
+.external-sources a:hover{border-color:rgba(255,216,74,.35);color:#ffe76f}
+
+.institutional-strip{
+  padding:20px 22px;
+  display:grid;
+  grid-template-columns:minmax(220px,.7fr) minmax(0,1.3fr);
+  gap:26px;
+  align-items:center;
+}
+.institutional-copy h2{margin:4px 0 8px;font-size:clamp(24px,2.4vw,38px)}
+.institutional-copy p{margin:0;color:#92b2d1;font-size:12px;line-height:1.5}
+.institutional-logos{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+}
+.institutional-logo-card{
+  min-height:106px;
+  display:grid;
+  place-items:center;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:16px;
+  background:#fff;
+  padding:12px;
+  overflow:hidden;
+}
+.institutional-logo-card img{
+  max-width:100%;
+  max-height:78px;
+  object-fit:contain;
+}
+
+.sky-fab{
+  overflow:visible;
+  gap:7px;
+}
+.sky-fab img{
+  width:34px;
+  height:34px;
+  object-fit:contain;
+  filter:drop-shadow(0 4px 10px rgba(0,0,0,.3));
+}
+.mirror-mark{
+  overflow:hidden;
+}
+.mirror-mark img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+}
+
+@media(max-width:1000px){
+  .official-channels{grid-template-columns:repeat(3,1fr)}
+  .institutional-strip{grid-template-columns:1fr}
+}
+@media(max-width:640px){
+  .media-hub,.institutional-strip{margin:14px 12px;border-radius:20px}
+  .media-hub{padding:16px}
+  .official-channels{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:3px}
+  .channel-card{min-width:176px;scroll-snap-align:start}
+  .external-sources{align-items:flex-start}
+  .institutional-strip{padding:16px}
+  .institutional-logos{grid-template-columns:1fr 1fr 1fr;gap:7px}
+  .institutional-logo-card{min-height:84px;padding:8px}
+  .institutional-logo-card img{max-height:60px}
+  .sky-fab img{width:30px;height:30px}
+}
