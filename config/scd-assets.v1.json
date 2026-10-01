@@ -94,6 +94,24 @@
       "source": "SCD_INTERNAL_APPROVED",
       "confidence": "HIGH",
       "verified_at": "2026-10-01"
+    },
+    {
+      "path": "assets/sky.png",
+      "class": "OFFICIAL_CLUB_MASCOT",
+      "status": "LOCKED",
+      "git_blob_sha": "e00cefd92ff6959a5575fded15371ecc1c279056",
+      "source": "SCD_INTERNAL_APPROVED",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-01"
+    },
+    {
+      "path": "assets/sky.webp",
+      "class": "OFFICIAL_CLUB_MASCOT_OPTIMIZED",
+      "status": "LOCKED",
+      "git_blob_sha": "ab79d328127a38a4d78fe7695e8aee849cf172ac",
+      "source": "SCD_INTERNAL_APPROVED",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-01"
     }
   ],
   "provenance_required": [
