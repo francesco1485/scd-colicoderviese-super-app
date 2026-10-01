@@ -1,267 +1,179 @@
 <!doctype html>
 <html lang="it">
-<head><meta name="scd-build" content="40.0.0">
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#052a67" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="SCD App" />
-  <meta name="format-detection" content="telephone=yes" />
-  <meta name="description" content="SCD ColicoDerviese Super App ufficiale: calendario, gare, risultati, eventi, territorio, community, sponsor, servizi e area personale." />
-  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
-  <meta name="author" content="S.D.C. ColicoDerviese" />
-  <meta property="og:type" content="website" />
-  <meta property="og:locale" content="it_IT" />
-  <meta property="og:site_name" content="S.D.C. ColicoDerviese" />
-  <meta property="og:title" content="SCD ColicoDerviese · Super App" />
-  <meta property="og:description" content="Calendario, gare, risultati, eventi, territorio e servizi ufficiali SCD ColicoDerviese." />
-  <meta property="og:url" content="https://francesco1485.github.io/scd-colicoderviese-super-app/" />
-  <meta property="og:image" content="https://francesco1485.github.io/scd-colicoderviese-super-app/assets/hero-colico.webp" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <link rel="canonical" href="https://francesco1485.github.io/scd-colicoderviese-super-app/" />
-  <link rel="manifest" href="./manifest.webmanifest" />
-  <link rel="icon" href="./assets/logo-scd.png" />
-  <link rel="apple-touch-icon" href="./assets/logo-scd.png" />
-  <link rel="preload" href="./assets/hero-colico.webp" as="image" />
-  <link rel="stylesheet" href="./styles.css?v=21.10.0" />
-  <link rel="stylesheet" href="./ui-r21-11.css?v=21.15.0" />
-  <link rel="stylesheet" href="./ui-r24-shell.css?v=24.0.0" />
-  <link rel="stylesheet" href="./ui-r26-pulse.css?v=26.0.0" />
-  <link rel="stylesheet" href="./ui-r38-universe.css?v=40.0.0" />
-  <link rel="stylesheet" href="./ui-r39-human.css?v=40.0.0" />
-  <link rel="stylesheet" href="./ui-r40-weekly.css?v=40.0.0" />
-  <script type="application/ld+json">
-  {
-    "@context":"https://schema.org",
-    "@type":"SportsOrganization",
-    "name":"S.D.C. ColicoDerviese",
-    "sport":"Calcio",
-    "url":"https://francesco1485.github.io/scd-colicoderviese-super-app/",
-    "logo":"https://francesco1485.github.io/scd-colicoderviese-super-app/assets/logo-scd.png",
-    "areaServed":["Colico","Dervio","Alto Lario","Lago di Como"],
-    "sameAs":[
-      "https://www.colicoderviese.it/",
-      "https://www.facebook.com/ColicoDerviese?locale=it_IT",
-      "https://www.instagram.com/s.c.d.colicoderviese/"
-    ]
-  }
-  </script>
-  <title>SCD ColicoDerviese · Super App</title>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#04162f">
+  <meta name="description" content="SCD ColicoDerviese Universe: sport, community, servizi e club operations in una sola esperienza digitale.">
+  <meta name="scd-build" content="NG-0.1.0">
+  <title>SCD Universe · Next Generation</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./assets/logo-scd.png">
+  <link rel="apple-touch-icon" href="./assets/logo-scd.png">
+  <link rel="preload" href="./assets/hero-colico.webp" as="image">
+  <link rel="stylesheet" href="./scd-ng.css?v=0.1.0">
 </head>
-<body class="scd-ui-v21-11 scd-app-mode">
-<div class="app-shell">
-  <header class="topbar" id="topbar">
-    <a class="brand" href="#/pulse" aria-label="SCD ColicoDerviese Home">
-      <img src="./assets/logo-scd.png" alt="SCD ColicoDerviese" />
-      <span><strong>S.C.D.</strong><small>COLICODERVIESE</small></span>
-    </a>
-    <nav class="desktop-nav" aria-label="Navigazione principale">
-      <button type="button" data-r24-route="pulse" class="active">Pulse</button>
-      <button type="button" data-r24-route="calendar">Calendario</button>
-      <button type="button" data-r24-route="communications">Comunicazioni</button>
-      <button type="button" data-r24-route="services">Servizi</button>
-      <button type="button" data-r24-route="profile">Profilo</button>
+<body>
+  <div class="ambient ambient-a"></div><div class="ambient ambient-b"></div>
+  <div class="app" id="app">
+    <header class="topbar">
+      <a class="brand" href="#pulse" data-nav="pulse" aria-label="SCD Universe">
+        <img src="./assets/logo-scd.png" alt="SCD ColicoDerviese">
+        <span><b>SCD</b><small>UNIVERSE</small></span>
+      </a>
+      <div class="top-center"><span class="live-dot"></span><span id="clubNow">Europe/Rome · sincronizzazione</span></div>
+      <div class="top-actions">
+        <button class="icon-btn" id="modeBtn" aria-label="Cambia densità">⌁</button>
+        <button class="avatar-mini" data-nav="twin" aria-label="Apri SCD Twin"><span id="miniInitials">SCD</span></button>
+      </div>
+    </header>
+
+    <nav class="world-switch" aria-label="Mondi SCD">
+      <button class="active" data-nav="pulse"><span>◉</span><b>PULSE</b><small>Club live</small></button>
+      <button data-nav="twin"><span>✦</span><b>SCD TWIN</b><small>Identità viva</small></button>
+      <button data-nav="desk"><span>⌘</span><b>STAFF & FAMILY</b><small>Private Desk</small></button>
     </nav>
-    <div class="top-actions">
-      <button class="ghost install-app-btn" id="installBtn">Installa App</button>
-      <button class="ghost" id="loginBtn">Area riservata</button>
-      <button class="primary compact" id="registerBtn">Registrati</button>
-    </div>
-    <div class="mobile-head-actions" aria-label="Azioni rapide">
-      <button class="app-icon-btn notify" id="mobileNotify" aria-label="Notifiche">♢</button>
-      <button class="app-icon-btn" id="mobileSettings" aria-label="Profilo e impostazioni">⚙</button>
-    </div>
-  </header>
 
-  <section class="temporal-core" aria-label="Ora, calendario e territorio">
-    <div class="temporal-now">
-      <span class="live-dot"></span>
-      <div><small>ORA UFFICIALE SCD · EUROPE/ROME</small><strong id="clubClock">Sincronizzazione…</strong></div>
-    </div>
-    <div class="temporal-actions">
-      <button data-action="calendar">CALENDARIO</button>
-      <button data-action="notifications">NOTIFICHE</button>
-      <button data-action="location">MAPPA / POSIZIONE</button>
-    </div>
-  </section>
+    <main>
+      <section class="view active" id="view-pulse" data-view="pulse">
+        <section class="hero">
+          <div class="hero-bg"></div><div class="hero-shade"></div>
+          <div class="hero-content">
+            <div class="eyebrow">S.D.C. COLICODERVIESE · ALTO LARIO</div>
+            <h1>Il Club non si consulta.<br><em>Si vive.</em></h1>
+            <p>Sport, persone, territorio, servizi e community in un unico spazio. Niente labirinti da gestionale del 2008, grazie al cielo.</p>
+            <div class="hero-actions">
+              <button class="btn primary" data-scroll="#radar">Questa settimana</button>
+              <button class="btn glass" data-nav="desk">Apri il mio spazio</button>
+            </div>
+          </div>
+          <aside class="hero-live">
+            <div class="label">OGGI NEL CLUB</div>
+            <strong id="todayHeadline">Dato in aggiornamento</strong>
+            <p id="todayDetail">Le attività reali compariranno quando la fonte calendario sarà collegata a questa nuova shell.</p>
+            <div class="source-chip"><span></span><b>PROVENANCE FIRST</b></div>
+          </aside>
+        </section>
 
-  <main id="home">
-    <section class="hero hero-v3">
-      <div class="hero-media" aria-hidden="true"></div><div class="hero-overlay"></div>
-      <div class="hero-content">
-        <div class="hero-kicker"><span class="live-dot"></span> SCD COMMUNITY · STAGIONE <span data-season>2026/27</span></div>
-        <div class="hero-brand-lockup">
-          <img class="hero-logo" src="./assets/logo-scd.png" alt="SCD ColicoDerviese">
-          <div><span>S.D.C.</span><strong>COLICO<span>DERVIESE</span></strong><small>PIÙ DI UNA SQUADRA. UN TERRITORIO, UNA FAMIGLIA.</small></div>
+        <section class="pulse-strip">
+          <div><small>PROSSIMA GARA</small><b id="nextMatch">Dato in aggiornamento</b></div>
+          <div><small>ATTIVITÀ OGGI</small><b id="todayCount">—</b></div>
+          <div><small>SETTIMANA</small><b id="weekCount">—</b></div>
+          <div><small>NEWSROOM</small><b>Verified facts only</b></div>
+        </section>
+
+        <section class="section" id="radar">
+          <div class="section-head">
+            <div><span class="eyebrow">SCD WEEKLY RADAR</span><h2>Tutta la settimana, in una sola vista</h2></div>
+            <div class="segmented" id="radarFilters">
+              <button class="active" data-filter="ALL">Tutto</button><button data-filter="AGONISTICA">Agonistica</button><button data-filter="BASE">Attività di base</button><button data-filter="EVENTI">Eventi</button>
+            </div>
+          </div>
+          <div class="week-rail" id="weekRail"></div>
+        </section>
+
+        <section class="section newsroom">
+          <div class="section-head"><div><span class="eyebrow">SCD AI NEWSROOM</span><h2>Fatti reali. Narrazione nuova.</h2></div><button class="text-btn" id="refreshData">Aggiorna ↻</button></div>
+          <div class="editorial-grid">
+            <article class="story lead-story"><div class="story-photo"></div><div class="story-copy"><small>STORIA DELLA SETTIMANA</small><h3 id="storyTitle">In attesa di fatti verificati</h3><p id="storyText">La nuova Newsroom non riempie i vuoti con articoli vecchi o risultati inventati. Quando arrivano dati verificati, li trasforma in racconto.</p><span class="verified">VERIFICATION · FAIL CLOSED</span></div></article>
+            <article class="story compact"><small>PROSSIMO WEEKEND</small><h3>Calendario verificato</h3><p>Gare, tornei e raduni saranno pubblicati solo con fonte tracciabile.</p></article>
+            <article class="story compact sponsor-story"><small>PARTNER EXPERIENCE</small><h3>Valore, non francobolli</h3><p>Spazi sponsor integrati nell’esperienza e misurabili, senza confondere prospect e partner confermati.</p></article>
+          </div>
+        </section>
+
+        <section class="section worlds-preview">
+          <div class="section-head"><div><span class="eyebrow">DUE MOTORI PERSONALI</span><h2>Un’identità che cresce. Un assistente che lavora.</h2></div></div>
+          <div class="world-cards">
+            <button class="world-card twin-card" data-nav="twin">
+              <span class="orb">✦</span><small>SCD TWIN</small><h3>Il tuo alter ego sportivo</h3><p>Cresce con partecipazione, esplorazione e missioni sicure. Non con talento, peso, salute o giudizi sui minori.</p><i>Apri Twin →</i>
+            </button>
+            <button class="world-card mirror-card" id="openMirrorFromCard">
+              <span class="orb">✧</span><small>SCD MIRROR</small><h3>Il collaboratore virtuale</h3><p>Resta discreto. Lo apri quando serve per capire, cercare, organizzare e portare a termine un’attività.</p><i>Apri Mirror →</i>
+            </button>
+          </div>
+        </section>
+
+        <section class="partner-rail">
+          <span>PARTNER SCD</span><div class="partner-marquee"><b>Partner confermati · Fonte non ancora collegata a questa shell</b><b>Match Partner</b><b>Family Benefit</b><b>Event Partner</b></div>
+        </section>
+      </section>
+
+      <section class="view" id="view-twin" data-view="twin">
+        <div class="twin-stage">
+          <div class="twin-copy">
+            <span class="eyebrow">SCD TWIN · IDENTITÀ EVOLUTIVA</span>
+            <h2>Non una mascotte.<br><em>Una presenza personale.</em></h2>
+            <p>Il principio nasce dai virtual pet: una creatura digitale evolve in base alla cura e alle interazioni nel tempo. L’originale Tamagotchi cresceva attraverso alimentazione, pulizia, gioco, cura e disciplina. Qui conserviamo il senso di continuità, non personaggi, grafica o marchi altrui.</p>
+            <div class="stage-track"><span class="done">SCINTILLA</span><span>ROOKIE</span><span>PLAYMAKER</span><span>CAPITANO</span><span>LEGGENDA</span></div>
+          </div>
+          <div class="twin-avatar-zone">
+            <div class="halo h1"></div><div class="halo h2"></div>
+            <div class="avatar-figure" id="avatarFigure">
+              <div class="head" id="avatarHead"><span id="avatarFace">◉</span></div>
+              <div class="body"><div class="shirt"><img src="./assets/logo-scd.png" alt=""><b id="avatarNumber">10</b></div><div class="legs"></div></div>
+            </div>
+            <div class="twin-level"><b id="twinName">Il mio Twin</b><span>SCINTILLA · <strong id="twinXp">0 XP</strong></span></div>
+          </div>
         </div>
-        <h1>Questa settimana.<br><span>Il mondo ColicoDerviese, vivo.</span></h1>
-        <p class="hero-lead">Gare, risultati, eventi, community, iscrizioni e opportunità. Tutto pensato prima per smartphone, sempre collegato alle fonti e ai servizi del Club.</p>
-        <div class="hero-actions">
-          <button class="primary large" id="heroRegister">REGISTRATI</button>
-          <button class="yellow large" data-action="join">VUOI GIOCARE CON NOI?</button>
-          <button class="glass large" id="heroGames">PROSSIME GARE</button>
+
+        <section class="twin-control">
+          <div class="control-panel">
+            <h3>Crea il tuo alter ego</h3>
+            <label>Nome Twin<input id="twinNameInput" maxlength="24" placeholder="Es. Fenix"></label>
+            <div class="inline-fields"><label>Numero<input id="numberInput" type="number" min="1" max="99" value="10"></label><label>Ruolo<select id="roleInput"><option>Calciatore</option><option>Portiere</option><option>Mister</option><option>Tifoso</option><option>Dirigente</option></select></label></div>
+            <label class="upload">Foto di riferimento<input id="photoInput" type="file" accept="image/*"><span>Carica foto</span><small>Anteprima locale sul dispositivo. Nessuna identificazione biometrica.</small></label>
+            <div class="twin-actions"><button class="btn primary" id="saveTwin">Salva Twin</button><button class="btn glass" id="missionBtn">Missione sicura +10 XP</button></div>
+          </div>
+          <div class="mission-panel">
+            <span class="eyebrow">MOTORE DI CRESCITA</span>
+            <h3>Cresce perché partecipi, non perché “sei più bravo”.</h3>
+            <div class="mission-list"><div><b>Esplora il club</b><span>+10 XP</span></div><div><b>Partecipa a un evento</b><span>+20 XP</span></div><div><b>Completa il tuo profilo</b><span>+10 XP</span></div><div><b>Missione community moderata</b><span>+15 XP</span></div></div>
+            <p class="privacy-note">Per i minori: niente ranking di talento, valutazioni psicologiche, peso, salute, umore clinico o meccaniche compulsive.</p>
+          </div>
+        </section>
+      </section>
+
+      <section class="view" id="view-desk" data-view="desk">
+        <section class="desk-hero">
+          <div><span class="eyebrow">PRIVATE DESK</span><h2>Dimmi cosa devi fare.<br>Non dove hai salvato il file.</h2><p>Il sistema deve trasformare Drive, Gmail, fogli e dati federali in azioni, scadenze e decisioni. Il contrario sarebbe troppo semplice da sbagliare.</p></div>
+          <button class="btn primary" id="openMirrorDesk">Chiedi a SCD Mirror</button>
+        </section>
+        <div class="desk-grid">
+          <section class="action-queue"><div class="section-head mini"><div><span class="eyebrow">DA GESTIRE</span><h3>Priorità operative</h3></div><span class="status-pill">ROLE / SCOPE</span></div><div id="actionQueue"><article><span>1</span><div><b>Fonte non ancora collegata</b><small>Le priorità compariranno dopo autenticazione e scope reale.</small></div></article></div></section>
+          <section class="desk-map"><div class="section-head mini"><div><span class="eyebrow">CLUB GRAPH</span><h3>Il club come rete viva</h3></div></div><div class="graph"><span class="node center">SCD</span><span class="node n1">PERSONE</span><span class="node n2">SQUADRE</span><span class="node n3">EVENTI</span><span class="node n4">DOCUMENTI</span><span class="node n5">SPONSOR</span><span class="node n6">TRASPORTI</span></div></section>
         </div>
-        <div class="hero-trust"><span>● Fonti verificate</span><span>● Aggiornamento continuo</span><span>● Accessi qualificati dalla Direzione</span></div>
+        <section class="service-dock">
+          <button><span>▣</span><b>Calendario</b><small>Squadre · gare · attività</small></button>
+          <button><span>✓</span><b>Convocazioni</b><small>Invia · raccogli risposte</small></button>
+          <button><span>⌁</span><b>Trasporti</b><small>Pulmini · punti · richieste</small></button>
+          <button><span>◫</span><b>Documenti</b><small>Tesseramenti · certificati</small></button>
+          <button><span>✉</span><b>Comunicazioni</b><small>Gmail trasformata in azioni</small></button>
+          <button><span>◆</span><b>Sponsor</b><small>CRM · attivazioni · valore</small></button>
+        </section>
+      </section>
+    </main>
+
+    <nav class="bottom-nav">
+      <button class="active" data-nav="pulse"><span>◉</span>Pulse</button>
+      <button data-nav="twin"><span>✦</span>Twin</button>
+      <button data-nav="desk"><span>⌘</span>Desk</button>
+      <button id="mirrorNav"><span>✧</span>Mirror</button>
+    </nav>
+
+    <button class="mirror-fab" id="mirrorFab" aria-label="Apri SCD Mirror"><span>✧</span><b>Mirror</b></button>
+    <aside class="mirror" id="mirror" aria-hidden="true">
+      <header><div><span class="mirror-mark">✧</span><span><b>SCD MIRROR</b><small>Collaboratore virtuale</small></span></div><button id="closeMirror">×</button></header>
+      <div class="mirror-context"><span>CONTESTO</span><b id="mirrorContext">PULSE · PUBBLICO</b></div>
+      <div class="mirror-messages" id="mirrorMessages">
+        <div class="msg ai">Sono qui quando servi tu, non quando serve aumentare una metrica. Posso orientarti tra calendario, documenti, trasporti, comunicazioni, sponsor e attività del club. Le azioni riservate restano soggette a ruolo e permessi.</div>
       </div>
-      <aside class="hero-side-card" id="nextMatchCard">
-        <div class="side-label">PROSSIMA GARA</div><div class="match-date" id="nextDate">Aggiornamento…</div>
-        <div class="match-clubs">
-          <div class="club"><img src="./assets/logo-scd.png" alt="SCD"><b>SCD</b></div>
-          <div class="versus"><span>VS</span><small id="nextTime">—</small></div>
-          <div class="club opponent"><div class="fallback-badge" id="opponentBadge">?</div><b id="nextOpponent">Da definire</b></div>
-        </div>
-        <div class="match-meta" id="nextVenue">Centro Sportivo · Colico</div><button class="card-cta" data-scroll="#gare">Vedi calendario</button>
-      </aside>
-    </section>
+      <div class="quick-prompts"><button>Che devo fare oggi?</button><button>Apri calendario</button><button>Documenti in scadenza</button></div>
+      <form id="mirrorForm"><input id="mirrorInput" autocomplete="off" placeholder="Chiedi qualcosa sul lavoro SCD…"><button>Invia</button></form>
+      <footer>AI shell locale · nessun bypass permessi · dati sensibili esclusi</footer>
+    </aside>
 
-    <section class="home-kpis" aria-label="Numeri della settimana">
-      <article class="home-kpi"><span class="ico">⚽</span><div><strong id="kpiGames">0</strong><small>Gare</small></div></article>
-      <article class="home-kpi"><span class="ico">◭</span><div><strong id="kpiTraining">0</strong><small>Allenamenti</small></div></article>
-      <article class="home-kpi"><span class="ico">▣</span><div><strong id="kpiEvents">0</strong><small>Eventi</small></div></article>
-      <article class="home-kpi"><span class="ico">●</span><div><strong id="kpiInitiatives">0</strong><small>Iniziative</small></div></article>
-    </section>
-
-    <section class="affiliation-ribbon" aria-label="Affiliazioni e riconoscimenti">
-      <img src="./assets/logo-lnd.png" alt="Lega Nazionale Dilettanti">
-      <span class="ribbon-divider"></span>
-      <img class="wide" src="./assets/logo-monza.png" alt="Insieme al Monza">
-      <span class="ribbon-divider"></span>
-      <img class="wide" src="./assets/logo-sgs.png" alt="FIGC Settore Giovanile e Scolastico 3° livello">
-    </section>
-
-    <section class="section today-core" id="oggi">
-      <div class="section-head today-head"><div><span class="eyebrow">OGGI · TEMPO REALE</span><h2>Agenda SCD di oggi</h2><p>Data e ora sono ancorate al fuso Europe/Rome e il calendario viene letto dal backend SCD.</p></div><button class="outline" data-action="calendar">APRI CALENDARIO</button></div>
-      <div id="todayAgenda" class="today-agenda"><div class="loading-line">Sincronizzazione agenda…</div></div>
-    </section>
-
-    <section class="signal-strip" aria-label="Aggiornamenti principali">
-      <div class="signal-title"><span class="pulse"></span> FLASH</div><div class="signal-track" id="liveTicker"><span>Caricamento aggiornamenti SCD…</span></div><div class="api-status checking" id="apiStatus"><i></i><span>Connessione…</span></div><div class="updated" id="updatedAt">ora</div>
-    </section>
-
-    <section class="section action-grid" aria-label="Azioni principali">
-      <button class="action-card action-join" data-action="join"><span>⚽</span><b>VUOI GIOCARE CON NOI?</b><small>Preiscrizione, prova, Open Day</small></button>
-      <button class="action-card action-sponsor" data-action="sponsor"><span>◆</span><b>DIVENTA SPONSOR</b><small>Partnership e visibilità</small></button>
-      <button class="action-card" data-action="rent"><span>⌂</span><b>AFFITTA I CAMPI</b><small>Richiedi disponibilità</small></button>
-      <button class="action-card" data-action="tournament"><span>🏆</span><b>ISCRIVITI A UN TORNEO</b><small>Squadre e società</small></button>
-      <button class="action-card" data-action="tickets"><span>🎟</span><b>BIGLIETTI & EVENTI</b><small>Prenota o acquista quando disponibile</small></button>
-      <button class="action-card" data-action="cards"><span>★</span><b>CARD SCD</b><small>Tifoso · Famiglia · Tesserato · Partner</small></button>
-      <button class="action-card action-avatar" data-action="avatar"><span>◉</span><b>CREA IL TUO AVATAR</b><small>Foto profilo o calciatore SCD · PNG trasparente</small></button>
-    </section>
-
-    <section class="section" id="gare">
-      <div class="section-head"><div><span class="eyebrow">IL CAMPO, ADESSO</span><h2>Gare e risultati</h2><p>Partite, variazioni, risultati e fonti. Gli allenamenti restano nelle aree autorizzate.</p></div><a class="text-link" href="#fonti">Fonti →</a></div>
-      <div class="match-grid" id="matchGrid"></div>
-    </section>
-
-    <section class="section event-section" id="eventi">
-      <div class="section-head inverted"><div><span class="eyebrow">VIVI IL CLUB</span><h2>Eventi, tornei e iniziative</h2><p>Locandina, programma, luogo, iscrizione e condivisione. Ogni evento deve portare a un'azione.</p></div><button class="light-btn" data-action="initiatives">Proponi un'iniziativa</button></div>
-      <div class="event-grid" id="eventGrid"></div>
-    </section>
-
-
-    <section class="section avatar-hub" id="avatar">
-      <div class="avatar-hub-copy">
-        <span class="eyebrow">IDENTITÀ DIGITALE SCD</span>
-        <h2>La tua faccia. Il tuo avatar. I tuoi colori.</h2>
-        <p>Carica una foto oppure crea un avatar da calciatore SCD. Tutto viene elaborato sul dispositivo e preparato senza riquadri: output PNG con trasparenza.</p>
-        <div class="avatar-badges"><span>PNG TRASPARENTE</span><span>ZERO COSTI</span><span>PRIVACY-FIRST</span><span>NESSUN RIQUADRO</span></div>
-        <div class="hero-actions"><button class="primary large" data-action="avatar">CREA AVATAR</button><button class="outline large" data-action="media">PULISCI FOTO / LOGO</button></div>
-      </div>
-      <div class="avatar-hub-preview" aria-hidden="true">
-        <div class="avatar-orbit"></div>
-        <div class="avatar-sample"><div class="avatar-head">●</div><div class="avatar-shirt"><b>10</b></div><div class="avatar-ball">⚽</div></div>
-        <div class="avatar-tip"><b>Sky consiglia</b><span>Niente quadrati colorati attorno ai loghi.</span></div>
-      </div>
-    </section>
-
-    <section class="section community-zone" id="community">
-      <div class="section-head inverted"><div><span class="eyebrow">SCD COMMUNITY</span><h2>Non solo spettatori. Una comunità che partecipa.</h2><p>Spazi moderati per tifosi, idee, sondaggi, fantasy e contributi dal territorio.</p></div></div>
-      <div class="community-grid">
-        <article class="community-card featured"><div class="cc-icon">⚽</div><div><small>NUOVO</small><h3>Fantasy SCD</h3><p>Fantacalcio interno non monetario per adulti/atleti aderenti e area collegamento a fantasy esterni. Nessuna scommessa, nessun premio in denaro.</p><div class="card-buttons"><button data-action="fantasy">ENTRA NEL FANTASY</button><button class="secondary" data-action="fantasy-rules">REGOLE</button></div></div></article>
-        <article class="community-card"><div class="cc-icon">💬</div><h3>Area Tifosi</h3><p>Sondaggi, MVP, quiz, reazioni e messaggi moderati.</p><button data-action="fan">PARTECIPA</button></article>
-        <article class="community-card"><div class="cc-icon">💡</div><h3>Hai un'idea o un progetto?</h3><p>Proponi iniziative, collaborazioni o progetti alla Società.</p><button data-action="idea">PROPONI</button></article>
-        <article class="community-card"><div class="cc-icon">📸</div><h3>Invia una foto o una notizia</h3><p>Contributi community pubblicati solo dopo moderazione.</p><button data-action="story">INVIA</button></article>
-      </div>
-    </section>
-
-    <section class="section service-hub" id="servizi">
-      <div class="section-head"><div><span class="eyebrow">CLUB SERVICES</span><h2>Tutto ciò che può servire, in un solo hub</h2><p>Ingresso al Club, campi, tornei, biglietteria, card, shop, contatti e proposte.</p></div></div>
-      <div class="service-grid">
-        <button class="service-card" data-action="join"><span>⚽</span><b>Entra nella SCD</b><small>Preiscrizione e prova</small></button>
-        <button class="service-card" data-action="rent"><span>🏟</span><b>Affitta campo / spazi</b><small>Disponibilità e richiesta</small></button>
-        <button class="service-card" data-action="tournament"><span>🏆</span><b>Tornei</b><small>Iscrizione squadra</small></button>
-        <button class="service-card" data-action="tickets"><span>🎟</span><b>Biglietti</b><small>Eventi e gare abilitate</small></button>
-        <button class="service-card" data-action="cards"><span>💳</span><b>Card SCD</b><small>Tifoso · Famiglia · Tesserato · Partner</small></button>
-        <button class="service-card" data-action="avatar"><span>◉</span><b>Avatar & Media</b><small>Foto, avatar e PNG trasparenti</small></button>
-        <button class="service-card" data-action="requests"><span>☑</span><b>Le mie richieste</b><small>Invii, ID e stato</small></button>
-        <a class="service-card" href="https://colicoderviese.webnova.it/shop" target="_blank" rel="noopener"><span>🛍</span><b>Shop Ufficiale</b><small>Merchandising</small></a>
-        <button class="service-card" data-action="contacts"><span>☎</span><b>Contatti</b><small>Parla con noi</small></button>
-        <button class="service-card safeguarding" data-action="safeguarding"><span>🛡</span><b>Safeguarding</b><small>Canale riservato</small></button>
-      </div>
-    </section>
-
-    <section class="section commercial-hub" id="partner">
-      <div class="commercial-copy"><span class="eyebrow light">COMMERCIAL HUB</span><h2>Il Club come piattaforma di valore per il territorio.</h2><p>Sponsor, fornitori e partner possono proporre prodotti, servizi e progetti. La Super App misura visibilità, click e lead per trasformare gli asset digitali in opportunità commerciali future.</p><div class="hero-actions"><button class="yellow large" data-action="sponsor">DIVENTA SPONSOR</button><button class="glass large" data-action="product">PROPONI PRODOTTI / SERVIZI</button></div></div>
-      <div class="commercial-assets"><span>APP BANNER</span><span>EVENT NAMING</span><span>LED CAMPO</span><span>SOCIAL</span><span>TORNEI</span><span>CLUB HOUSE</span><span>DIVISE</span><span>AREA FITNESS</span></div>
-    </section>
-
-    <section class="section" id="news">
-      <div class="section-head"><div><span class="eyebrow">SCD RADAR</span><h2>News, variazioni e territorio</h2><p>Feed pubblico con fonte, link e deduplica. Sito SCD, fonti sportive/federali e web.</p></div><button class="outline" id="refreshBtn">Aggiorna ora</button></div>
-      <div class="news-layout"><article class="feature-news" id="featureNews"></article><div class="news-list" id="newsList"></div></div>
-    </section>
-
-    <section class="section sources" id="fonti">
-      <div class="section-head"><div><span class="eyebrow">COLLEGAMENTI UFFICIALI</span><h2>Ogni informazione deve portare alla fonte giusta</h2></div></div>
-      <div class="source-grid">
-        <a href="https://www.colicoderviese.it/" target="_blank" rel="noopener"><b>Sito ufficiale SCD</b><span>News e comunicazioni</span></a>
-        <a href="https://www.tuttocampo.it/" target="_blank" rel="noopener"><b>Tuttocampo</b><span>Gare, risultati, classifiche</span></a>
-        <a href="https://www.lnd.it/" target="_blank" rel="noopener"><b>FIGC / LND</b><span>Comunicati e attività ufficiali</span></a>
-        <a href="https://www.crlombardia.it/" target="_blank" rel="noopener"><b>CR Lombardia</b><span>Comunicati e attività regionali</span></a>
-        <a href="https://www.facebook.com/ColicoDerviese?locale=it_IT" target="_blank" rel="noopener"><b>Facebook SCD</b><span>Pagina ufficiale</span></a>
-        <a href="https://www.instagram.com/s.c.d.colicoderviese/" target="_blank" rel="noopener"><b>Instagram SCD</b><span>Profilo ufficiale</span></a>
-        <a href="https://www.acmonza.com/" target="_blank" rel="noopener"><b>AC Monza</b><span>Affiliazione Insieme al Monza</span></a>
-      </div>
-    </section>
-
-    <section class="section sponsor-section" id="sponsor">
-      <div class="section-head"><div><span class="eyebrow">PARTNER SCD</span><h2>Visibilità misurabile, non loghi dimenticati</h2><p>Banner, ticker, eventi, offerte e lead. Ogni asset potrà avere periodo, audience e performance.</p></div><button class="outline" data-action="sponsor">Richiedi proposta</button></div>
-      <div class="sponsor-premium" id="sponsorPremium"><div class="sponsor-copy"><small>PARTNER IN EVIDENZA</small><h3>Il territorio cresce insieme</h3><p>Spazio premium governato dal Partner Hub SCD.</p></div><div class="sponsor-mark">SCD<br>PARTNER</div></div>
-      <div class="sponsor-grid" id="sponsorGrid"></div>
-    </section>
-
-    <section class="section safety-section">
-      <div class="safety-card"><div><span class="eyebrow">TUTELA & ASCOLTO</span><h2>Segnalazioni e Safeguarding</h2><p>Un canale separato dalle normali richieste. Riservato, sobrio, accessibile e non collegato alla community pubblica.</p></div><button class="primary large" data-action="safeguarding">APRI CANALE RISERVATO</button></div>
-    </section>
-
-    <section class="section register-section">
-      <div class="register-card"><div><span class="eyebrow light">SCD COMMUNITY</span><h2>Un account SCD. Sempre con te.</h2><p>La registrazione è uguale per tutti: nome, cognome, email e telefono. Entri come Utente Base e resti aggiornato su gare, news, eventi, community e servizi. Le eventuali funzioni interne vengono aggiunte dalla Direzione sullo stesso account.</p></div><div class="register-steps"><span><b>1</b> Installa</span><span><b>2</b> Registrati</span><span><b>3</b> Resta aggiornato</span></div><button class="yellow large" id="bottomRegister">CREA PROFILO</button></div>
-    </section>
-  </main>
-
-  <main id="appRouteView" class="app-route-view" aria-live="polite" hidden></main>
-
-  <div class="sponsor-ticker" aria-label="Sponsor SCD"><div class="sponsor-ticker-label">PARTNER SCD</div><div class="sponsor-marquee"><div id="sponsorTrack" class="sponsor-track"><span>SCD COLICODERVIESE · PARTNER DEL TERRITORIO ·</span></div></div></div>
-
-  <nav class="mobile-nav" aria-label="Navigazione mobile">
-    <button type="button" data-r24-route="home" data-nav="home" class="active"><span>⌂</span>Home</button>
-    <button type="button" data-r24-route="calendar" data-nav="calendar"><span>▣</span>Calendario</button>
-    <button type="button" data-r24-route="communications" data-nav="communications"><span>✉</span>Comunicazioni</button>
-    <button type="button" data-r24-route="services" data-nav="services"><span>◆</span>Servizi</button>
-    <button type="button" id="mobileProfile" data-r24-route="profile" data-nav="profile"><span>●</span>Profilo</button>
-  </nav>
-
-  <button class="sky-fab" id="skyFab" aria-label="Apri Sky assistente SCD"><span class="sky-face"><img src="./assets/sky.png" alt=""></span><span class="sky-copy"><b>Sky</b><small>Assistente SCD</small></span><span class="sky-ping"></span></button>
-  <div class="sky-panel" id="skyPanel" aria-hidden="true"><div class="sky-head"><div><span class="sky-avatar"><img src="./assets/sky.png" alt=""></span><span><b>Sky</b><small>Assistente SCD</small></span></div><button id="closeSky" aria-label="Chiudi">×</button></div><div class="sky-messages" id="skyMessages"><div class="bubble bot">Ciao. Posso aiutarti con gare, iscrizioni, tornei, campi, sponsor, card, community e contatti SCD.</div></div><div class="sky-chips"><button data-sky="next">Prossima gara</button><button data-sky="join">Iscrizioni</button><button data-sky="sponsor">Sponsor</button><button data-sky="rent">Campi</button><button data-sky="fan">Community</button></div><form class="sky-input" id="skyForm"><input id="skyInput" placeholder="Chiedi a Sky…" autocomplete="off"><button>Invia</button></form></div>
-
-  <div class="modal-backdrop" id="modalBackdrop" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><button class="modal-close" id="modalClose" aria-label="Chiudi">×</button><div id="modalBody"></div></div></div>
-  <div class="toast" id="toast" role="status"></div>
-</div>
-<script src="./app.js?v=40.0.0" defer></script>
-<script src="./scd-meta-engine.js?v=40.0.0" defer></script>
-<script src="./scd-twin.js?v=40.0.0" defer></script>
-<script src="./scd-experience-engine.js?v=40.0.0" defer></script>
-<script src="./app-r24-router.js?v=40.0.0" defer></script>
+    <div class="toast" id="toast" role="status"></div>
+  </div>
+  <script src="./scd-ng.js?v=0.1.0" defer></script>
 </body>
 </html>
