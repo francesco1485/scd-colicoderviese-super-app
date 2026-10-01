@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="./sponsor.css?v=8.0.0">
 </head>
 <body>
+<a class="skip-link" href="#mainContent">Salta al contenuto principale</a>
 <div class="app" id="app">
   <aside class="sidebar" id="sidebar">
     <div class="brand">
@@ -42,14 +43,14 @@
     </div>
   </aside>
 
-  <main class="main">
+  <main class="main" id="mainContent" tabindex="-1">
     <header class="topbar">
       <button class="mobile-menu" id="mobileMenu" aria-label="Apri menu">☰</button>
       <div class="searchbar">
         <i data-icon="search"></i>
         <input id="globalSearch" autocomplete="off" placeholder="Cerca sponsor, contratti, opportunità, documenti…">
         <kbd>⌘ K</kbd>
-        <div id="searchResults" class="search-results" hidden></div>
+        <div id="searchResults" class="search-results" role="listbox" aria-live="polite" hidden></div>
       </div>
       <div class="top-actions">
         <span class="lang-pill">🇮🇹 IT</span>
@@ -183,7 +184,7 @@
             <button data-lia="Prepara un report per la Direzione">▣ Prepara report</button>
             <button data-lia="Idee per eventi e attivazioni">◎ Idee eventi</button>
           </div>
-          <div class="lia-chat" id="liaChat"><div class="lia-bot">Scrivimi cosa vuoi analizzare.</div></div>
+          <div class="lia-chat" id="liaChat" aria-live="polite"><div class="lia-bot">Scrivimi cosa vuoi analizzare.</div></div>
           <form id="liaForm"><input id="liaInput" placeholder="Scrivi un messaggio…"><button>➤</button></form>
         </aside>
       </section>
