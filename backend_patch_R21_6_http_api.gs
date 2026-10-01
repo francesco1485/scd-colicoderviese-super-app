@@ -464,12 +464,13 @@ function r216Fill_(source,vars,html){
 }
 function r216LetterheadHtml_(profile,bodyHtml,signature){
   var legal = r216Html_(profile.LEGAL_FOOTER || '');
-  var logo = profile.LOGO_DRIVE_ID ? '<img src="cid:scdLogo" alt="S.D.C. ColicoDerviese" style="max-width:92px;height:auto;display:block">' : '';
+  var displayName = r216Html_(profile.DISPLAY_NAME || profile.LEGAL_NAME || 'S.D.C. Colicoderviese');
+  var logo = profile.LOGO_DRIVE_ID ? '<img src="cid:scdLogo" alt="'+displayName+'" style="max-width:92px;height:auto;display:block">' : '';
   return [
     '<div style="font-family:Arial,Helvetica,sans-serif;color:#16304d;max-width:760px;margin:0 auto">',
     '<div style="border-bottom:4px solid #0a2b54;padding:0 0 14px;margin-bottom:22px;display:flex;align-items:center;gap:16px">',
     logo,
-    '<div><div style="font-size:20px;font-weight:700;color:#061b35">S.D.C. ColicoDerviese</div>',
+    '<div><div style="font-size:20px;font-weight:700;color:#061b35">',displayName,'</div>',
     '<div style="font-size:12px;color:#52687d">Societa sportiva · persone · territorio · organizzazione</div></div></div>',
     '<div style="font-size:15px;line-height:1.65">',bodyHtml,'</div>',
     '<div style="margin-top:26px;padding-top:16px;border-top:1px solid #dfe7ef;font-size:14px;line-height:1.5">',String(signature.HTML_SIGNATURE || ''),'</div>',
@@ -495,7 +496,7 @@ function r216CommunicationContext_(token,payload){
   var profile = r216ProfileMap_();
   var html = r216LetterheadHtml_(profile,body || r216Html_(text).replace(/\n/g,'<br>'),sig);
   var fullText = (text || String(body).replace(/<[^>]+>/g,' ')) + '\n\n' +
-    String(sig.DISPLAY_NAME || '') + '\n' + String(sig.ROLE_LABEL || '') + '\nS.D.C. ColicoDerviese\n' +
+    String(sig.DISPLAY_NAME || '') + '\n' + String(sig.ROLE_LABEL || '') + '\n' + String(profile.DISPLAY_NAME || profile.LEGAL_NAME || 'S.D.C. Colicoderviese') + '\n' +
     String(profile.LEGAL_FOOTER || '');
   return {actor:actor,userRow:userRow,template:template,signature:sig,stakeholder:stakeholder,to:to,subject:subject,text:fullText,html:html,profile:profile};
 }
@@ -556,7 +557,7 @@ function r216CommunicationSend_(token,payload){
   }
   var options = {
     htmlBody:c.html,
-    name:String(c.profile.DEFAULT_FROM_NAME || 'S.D.C. ColicoDerviese'),
+    name:String(c.profile.DEFAULT_FROM_NAME || c.profile.DISPLAY_NAME || c.profile.LEGAL_NAME || 'S.D.C. Colicoderviese'),
     replyTo:String(c.signature.REPLY_TO || expected)
   };
   var cc = clean_(payload.cc || '',500);
