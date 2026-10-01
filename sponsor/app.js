@@ -15,7 +15,7 @@ function applySponsorCapabilities(caps={}){
   };
   Object.entries(gates).forEach(([view,cap])=>{
     const allowed=sponsorAccess[cap]===true;
-    $('[data-view="'+view+'"]').forEach(el=>{el.hidden=!allowed;el.setAttribute('aria-hidden',String(!allowed))});
+    $$('[data-view="'+view+'"]').forEach(el=>{el.hidden=!allowed;el.setAttribute('aria-hidden',String(!allowed))});
     const section=$('#view-'+view);
     if(section&&!allowed)section.hidden=true;
   });
