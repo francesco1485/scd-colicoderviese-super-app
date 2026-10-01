@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#061b35">
+  <meta name="description" content="SCD ColicoDerviese Sponsor Platform">
+  <title>SCD Sponsor Platform · Area riservata</title>
+  <link rel="icon" href="../assets/logo-scd.png">
+  <link rel="stylesheet" href="./sponsor.css?v=8.0.0">
+</head>
+<body>
+<a class="skip-link" href="#mainContent">Salta al contenuto principale</a>
+<div class="app" id="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <img src="../assets/logo-scd.png" alt="SCD ColicoDerviese">
+      <div class="brand-copy">
+        <strong>S.C.D.<br>COLICODERVIESE</strong>
+        <span>SPONSOR PLATFORM</span>
+        <small>PERSONE · TERRITORIO<br>OPPORTUNITÀ</small>
+      </div>
+    </div>
+
+    <nav class="main-nav" id="mainNav">
+      <button class="nav-link active" data-view="home"><i data-icon="home"></i><span>Dashboard</span></button>
+      <button class="nav-link" data-view="sponsor"><i data-icon="users"></i><span>Sponsor</span></button>
+      <button class="nav-link" data-view="contratti"><i data-icon="file"></i><span>Contratti</span></button>
+      <button class="nav-link" data-view="proposte"><i data-icon="proposal"></i><span>Proposte</span></button>
+      <button class="nav-link" data-view="documenti"><i data-icon="folder"></i><span>Documenti</span></button>
+      <button class="nav-link" data-view="media"><i data-icon="screen"></i><span>Media & LED</span></button>
+      <button class="nav-link" data-view="eventi"><i data-icon="calendar"></i><span>Eventi</span></button>
+      <button class="nav-link" data-view="report"><i data-icon="chart"></i><span>Report & Analytics</span></button>
+      <button class="nav-link" data-view="opportunita"><i data-icon="link"></i><span>Opportunità</span></button>
+      <button class="nav-link" data-view="scenario"><i data-icon="lab"></i><span>Scenario Lab</span></button>
+      <button class="nav-link" data-view="settings"><i data-icon="settings"></i><span>Impostazioni</span></button>
+    </nav>
+
+    <div class="sidebar-spacer"></div>
+    <div class="sidebar-image">
+      <div class="sidebar-image-overlay"></div>
+      <p>Più di una squadra.<br>Un territorio<br>che cresce insieme.</p>
+    </div>
+  </aside>
+
+  <main class="main" id="mainContent" tabindex="-1">
+    <header class="topbar">
+      <button class="mobile-menu" id="mobileMenu" aria-label="Apri menu">☰</button>
+      <div class="searchbar">
+        <i data-icon="search"></i>
+        <input id="globalSearch" autocomplete="off" placeholder="Cerca sponsor, contratti, opportunità, documenti…">
+        <kbd>⌘ K</kbd>
+        <div id="searchResults" class="search-results" role="listbox" aria-live="polite" hidden></div>
+      </div>
+      <div class="top-actions">
+        <span class="lang-pill">🇮🇹 IT</span>
+        <button class="notify"><i data-icon="bell"></i><b>3</b></button>
+        <button class="profile"><span>SCD</span><div><strong>Direzione Sponsor</strong><small>Vista completa</small></div><em>⌄</em></button>
+      </div>
+    </header>
+
+    <section class="view active" id="view-home">
+      <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-shade"></div>
+        <div class="hero-content">
+          <span class="hero-eyebrow">S.C.D. COLICODERVIESE</span>
+          <h1>SCD <em>Sponsor Platform</em></h1>
+          <h2>Persone, territorio, opportunità.</h2>
+          <p>Una piattaforma per costruire insieme il futuro dello sport, del territorio e della nostra comunità.</p>
+          <div class="hero-actions">
+            <button class="btn-yellow" id="homeNewSponsor">⊕ Nuova proposta sponsor</button>
+            <button class="btn-outline" data-view="media">▷ Media & LED</button>
+          </div>
+        </div>
+        <div class="hero-quote">Più di una squadra.<br>Un territorio<br>che cresce insieme.</div>
+      </section>
+
+      <section class="macro-row">
+        <article class="macro-card gold" data-view="storici" role="button" tabindex="0" aria-label="Apri storici">
+          <div class="macro-photo historic"></div><div class="macro-overlay"></div>
+          <i data-icon="history"></i><div><h3>Sponsor storici</h3><p>Le nostre radici,<br>un valore che continua</p></div><button>›</button>
+        </article>
+        <article class="macro-card blue" data-view="sponsor" role="button" tabindex="0" aria-label="Apri sponsor">
+          <div class="macro-photo current"></div><div class="macro-overlay"></div>
+          <i data-icon="diamond"></i><div><h3>Sponsor attuali</h3><p>Insieme oggi,<br>per nuovi traguardi</p></div><button>›</button>
+        </article>
+        <article class="macro-card cyan" data-view="proposte" role="button" tabindex="0" aria-label="Apri proposte">
+          <div class="macro-photo ideas"></div><div class="macro-overlay"></div>
+          <i data-icon="bulb"></i><div><h3>Convenzioni e idee</h3><p>Sinergie, vantaggi<br>e nuove opportunità</p></div><button>›</button>
+        </article>
+        <article class="macro-card blue" data-view="report" role="button" tabindex="0" aria-label="Apri report">
+          <div class="macro-photo research"></div><div class="macro-overlay"></div>
+          <i data-icon="chart"></i><div><h3>Ricerca & sviluppo marketing</h3><p>Dati, strategie,<br>crescita</p></div><button>›</button>
+        </article>
+        <article class="macro-card gold" data-view="opportunita" role="button" tabindex="0" aria-label="Apri opportunita">
+          <div class="macro-photo opportunity"></div><div class="macro-overlay"></div>
+          <i data-icon="target"></i><div><h3>Asset & opportunità</h3><p>Spazi, visibilità<br>e nuovi progetti</p></div><button>›</button>
+        </article>
+      </section>
+
+      <section class="kpi-row" id="homeKpis"></section>
+
+      <section class="sponsor-strip">
+        <div class="strip-title"><i data-icon="star"></i><strong>Sponsor & partner</strong></div>
+        <div class="strip-window"><div class="strip-track" id="sponsorStrip"></div></div>
+        <button data-view="sponsor">Vedi tutti →</button>
+      </section>
+
+      <section class="promo-bar" id="promoBar">
+        <div><span>DA AUTORIZZARE</span><strong>Spazio promozionale / convenzioni</strong><p id="promoText">Nessuna promozione pubblica senza approvazione Direzione.</p></div>
+        <button id="promoReviewBtn">Gestisci</button>
+      </section>
+
+      <section class="dashboard-layout">
+        <div class="dashboard-main">
+          <div class="dashboard-grid top-grid">
+            <article class="panel contracts-panel">
+              <header><div><i data-icon="file"></i><h3>Contratti attuali</h3></div><button data-view="contratti">Vedi tutti →</button></header>
+              <div id="homeContracts"></div>
+            </article>
+
+            <article class="panel proposals-panel">
+              <header><div><i data-icon="bulb"></i><h3>Proposte ipotetiche</h3></div><button data-view="proposte">Vedi tutte →</button></header>
+              <div id="homeProposals"></div>
+            </article>
+
+            <article class="panel scenario-teaser">
+              <header><div><i data-icon="lab"></i><h3>Scenario Lab</h3></div><button data-view="scenario">Apri →</button></header>
+              <div class="scenario-image"></div>
+              <p>Incrocia sponsor, asset e dati verificati per scoprire nuove opportunità senza inventare probabilità.</p>
+              <button class="btn-yellow small" data-view="scenario">Apri Scenario Lab →</button>
+            </article>
+          </div>
+
+          <div class="dashboard-grid middle-grid">
+            <article class="panel availability-panel">
+              <header><div><i data-icon="search"></i><h3>Disponibilità & ricerca</h3></div><span class="tiny-live">LIVE DATI</span></header>
+              <input id="availabilitySearch" placeholder="LED, torneo, Club House, divise, hospitality…">
+              <div id="availabilityResults" class="compact-list"></div>
+            </article>
+
+            <article class="panel events-panel">
+              <header><div><i data-icon="calendar"></i><h3>Eventi & attivazioni</h3></div><button data-view="eventi">Vedi tutti →</button></header>
+              <div id="homeEvents"></div>
+            </article>
+
+            <article class="panel pipeline-panel">
+              <header><div><i data-icon="target"></i><h3>Opportunità in pipeline</h3></div><button data-view="opportunita">Vedi tutte →</button></header>
+              <div id="homePipeline"></div>
+            </article>
+          </div>
+
+          <div class="dashboard-grid bottom-grid">
+            <article class="panel news-panel">
+              <header><div><i data-icon="news"></i><h3>News settimanali</h3></div><span class="source-pill">Fonti ufficiali</span></header>
+              <div id="weeklyNews"></div>
+            </article>
+
+            <article class="panel stats-panel">
+              <header><div><i data-icon="chart"></i><h3>Classifica & statistiche</h3></div>
+                <select id="statsSelector"><option value="prima2526">Prima Squadra 2025/26</option><option value="u16">U16 2025/26</option><option value="u18">U18 2026/27</option></select>
+              </header>
+              <div id="statsSnapshot"></div>
+            </article>
+
+            <article class="panel community-panel">
+              <header><div><i data-icon="poll"></i><h3>Sondaggio & persone</h3></div><span class="tiny-live local">LOCALE</span></header>
+              <p>Quale area sponsor sviluppiamo per prima?</p>
+              <div id="livePoll"></div>
+              <div class="people-tags" id="peopleTags"></div>
+              <small id="tagState">Nessun tag selezionato</small>
+            </article>
+          </div>
+        </div>
+
+        <aside class="lia-panel" id="liaPanel">
+          <header><div><span>✦</span><strong>Lia Sponsor</strong></div><small>Assistente AI locale</small></header>
+          <div class="lia-message">Ciao. Posso cercare sponsor, analizzare opportunità, preparare una proposta, controllare LED, rinnovi e asset.</div>
+          <div class="lia-actions">
+            <button data-lia="Cerca nuovi sponsor nel nostro territorio">⌕ Cerca sponsor</button>
+            <button data-lia="Analizza una proposta sponsor">▤ Analizza proposta</button>
+            <button data-lia="Valuta il valore dei nostri asset">↗ Valuta asset</button>
+            <button data-lia="Prepara un report per la Direzione">▣ Prepara report</button>
+            <button data-lia="Idee per eventi e attivazioni">◎ Idee eventi</button>
+          </div>
+          <div class="lia-chat" id="liaChat" aria-live="polite"><div class="lia-bot">Scrivimi cosa vuoi analizzare.</div></div>
+          <form id="liaForm"><input id="liaInput" placeholder="Scrivi un messaggio…"><button>➤</button></form>
+        </aside>
+      </section>
+    </section>
+
+    <section class="view" id="view-sponsor">
+      <div class="page-head"><div><small>PORTAFOGLIO SPONSOR</small><h1>Sponsor attuali</h1><p>Una scheda unica per rapporto, contratto, asset, documenti, contatti e rinnovi.</p></div><button class="btn-yellow" id="newSponsorBtn">+ Nuovo sponsor</button></div>
+      <div class="page-tools"><input class="filter-input" id="sponsorFilter" placeholder="Cerca sponsor…"><select id="sponsorStatus"><option value="">Tutti gli stati</option><option>DOCUMENTATO</option><option>ECONOMICAMENTE</option><option>PARTNER TECNICO</option></select></div>
+      <div class="sponsor-grid" id="sponsorGrid"></div>
+    </section>
+
+    <section class="view" id="view-storici">
+      <div class="page-head"><div><small>ARCHIVIO RELAZIONALE</small><h1>Sponsor storici</h1><p>Continuità, stagioni, asset utilizzati e possibilità di riattivazione.</p></div></div>
+      <div class="sponsor-grid" id="storiciGrid"></div>
+    </section>
+
+    <section class="view" id="view-contratti">
+      <div class="page-head"><div><small>AMMINISTRAZIONE</small><h1>Contratti</h1><p>Durata, importi verificati, asset, scadenze e stato documentale.</p></div></div>
+      <div class="data-table" id="contractsTable"></div>
+    </section>
+
+    <section class="view" id="view-proposte">
+      <div class="page-head"><div><small>PIPELINE COMMERCIALE</small><h1>Proposte, convenzioni & idee</h1><p>Dal primo contatto alla formalizzazione dell’accordo.</p></div></div>
+      <div class="proposal-grid" id="proposalGrid"></div>
+    </section>
+
+    <section class="view" id="view-documenti">
+      <div class="page-head"><div><small>DOCUMENT HUB</small><h1>Documenti</h1><p>Contratti, proposte, loghi, foto, video, email, fatture e report.</p></div></div>
+      <div class="folder-grid" id="folderGrid"></div>
+    </section>
+
+    <section class="view" id="view-media">
+      <div class="page-head"><div><small>MEDIA & VISIBILITÀ</small><h1>LED & Media</h1><p>Master, approvazioni, materiali ufficiali e stato produzione.</p></div></div>
+      <div class="led-grid" id="ledGrid"></div>
+    </section>
+
+    <section class="view" id="view-eventi">
+      <div class="page-head"><div><small>AGENDA & ATTIVAZIONI</small><h1>Eventi</h1><p>Tornei, community, hospitality e attivazioni sponsor.</p></div></div>
+      <div class="event-grid" id="eventGrid"></div>
+    </section>
+
+    <section class="view" id="view-report">
+      <div class="page-head"><div><small>DIREZIONE</small><h1>Report & Analytics</h1><p>Dati economici, completezza, priorità, rinnovi e criticità.</p></div></div>
+      <div class="report-grid" id="reportGrid"></div>
+    </section>
+
+    <section class="view" id="view-opportunita">
+      <div class="page-head"><div><small>INVENTARIO COMMERCIALE</small><h1>Asset & opportunità</h1><p>Cosa SCD può valorizzare, sviluppare o proporre.</p></div></div>
+      <div class="asset-grid" id="assetGrid"></div>
+    </section>
+
+    <section class="view" id="view-scenario">
+      <div class="page-head"><div><small>INTELLIGENCE</small><h1>Scenario Lab</h1><p>Compatibilità sponsor × asset con motivazioni visibili e controlli necessari.</p></div></div>
+      <div class="scenario-layout">
+        <div class="scenario-matrix" id="fitMatrix"></div>
+        <aside class="scenario-inspector" id="scenarioInspector"><h3>Seleziona un incrocio</h3><p>Il sistema evidenzia coerenze, dati mancanti ed esclusività da verificare. Non predice la firma di un contratto.</p></aside>
+      </div>
+    </section>
+
+    <section class="view" id="view-settings">
+      <div class="page-head"><div><small>GOVERNANCE</small><h1>Impostazioni</h1><p>Asset immutabili, adattamento dispositivo, fonti e utilizzo locale.</p></div></div>
+      <div class="settings-grid" id="settingsGrid"></div>
+    </section>
+
+    <section class="view" id="view-detail">
+      <div id="sponsorDetail"></div>
+    </section>
+  </main>
+</div>
+
+<div class="modal" id="newSponsorModal" role="dialog" aria-modal="true" aria-labelledby="newSponsorTitle" hidden>
+  <div class="modal-card">
+    <button class="modal-x" id="closeNewSponsor">×</button>
+    <small>NUOVO SPONSOR / PARTNER</small><h2 id="newSponsorTitle">Crea una bozza</h2>
+    <form id="newSponsorForm">
+      <label>Nome<input name="name" required></label><label>Settore<input name="sector"></label>
+      <label>Referente<input name="contact"></label><label>Email<input type="email" name="email"></label>
+      <label>Stagione<input name="season" value="2026/27"></label><label>Tipo<select name="type"><option>Sponsor</option><option>Partner tecnico</option><option>Convenzione</option><option>Fornitore / barter</option><option>Prospect</option></select></label>
+      <label class="wide">Note<textarea name="notes" rows="4"></textarea></label>
+      <div class="wide modal-actions"><button type="button" class="btn-light" id="cancelNewSponsor">Annulla</button><button class="btn-yellow">Salva bozza locale</button></div>
+    </form>
+  </div>
+</div>
+
+<script src="./app.js?v=9.0.0"></script>
+</body>
+</html>
