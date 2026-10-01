@@ -103,7 +103,7 @@ $('#otpLoginForm').addEventListener('submit',async e=>{
     const r=await api('/api/sponsor/login',{email:loginEmail,code});
     state.className='form-state ok';
     state.textContent='Accesso verificato. Apertura piattaforma…';
-    location.href=r.isDirection?'/sponsor/admin':'/sponsor/app';
+    location.href='/sponsor/app';
   }catch(err){
     state.className='form-state error';state.textContent=err.message;
   }finally{pending(btn,false)}
@@ -119,3 +119,7 @@ fetch('/api/sponsor/session',{credentials:'same-origin'}).then(async r=>{
   b.textContent='Sessione attiva · Apri area riservata';
   document.body.appendChild(b);
 }).catch(()=>{});
+
+const sponsorQuery=new URLSearchParams(location.search);
+if(sponsorQuery.get('access')==='1')openModal('access');
+if(sponsorQuery.get('login')==='1')openModal('login');
