@@ -33,6 +33,8 @@ jobs:
         run: npm run test:nextgen-contract
       - name: Asset integrity & adaptive experience gate
         run: npm run test:asset-adaptive-contract
+      - name: Intake Hub contract gate
+        run: npm run test:intake-contract
       - name: Syntax check
         run: |
           node --check app.js
@@ -47,6 +49,8 @@ jobs:
           node --check scripts/validate-newsroom-contract.mjs
           node --check scripts/validate-nextgen-contract.mjs
           node --check scripts/validate-asset-adaptive-contract.mjs
+          node --check scripts/validate-intake-contract.mjs
+          node --check intake/intake.js
           node --check scd-ng.js
           node --check scd-interactions.js
           node --check scd-experience-engine.js

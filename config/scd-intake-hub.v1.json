@@ -1,0 +1,68 @@
+{
+  "version": "1.0.0",
+  "effective_at": "2026-10-01",
+  "state": "FOUNDATION_IMPLEMENTED_RUNTIME_UPLOAD_BLOCKED",
+  "drive": {
+    "root": {
+      "id": "1VTJJTFYN2PWfkYeTF24XayGMn2wHcu0U",
+      "name": "SCD INTAKE HUB"
+    },
+    "inbox": {
+      "id": "163DiKtKr8pBxjs49yz_L3LU-J9VlJX3V",
+      "name": "01_INBOX"
+    },
+    "routed": {
+      "id": "1vBhYX5Md4LtHgnxWqYtkIOF0zJ3W2jYM",
+      "name": "02_ROUTED"
+    },
+    "logs": {
+      "id": "1yWbA-3C6c1TNcZ4Nfu51kyTGDPHtUGJd",
+      "name": "03_LOGS"
+    },
+    "templates": {
+      "id": "1rESfSAGL4fR9uDEe9jJ4HQPl5EpbqYk0",
+      "name": "04_TEMPLATES"
+    },
+    "archive": {
+      "id": "1v0wJS7MjX-JwCZzAyWKbnV_OEU3k9Kvv",
+      "name": "05_ARCHIVE"
+    }
+  },
+  "log_sheet": {
+    "id": "1ruGLKpFYdirMV6NvOHWoCsSxy3f7Yd9VMfCykuQrmgY",
+    "tabs": [
+      "INTAKE_LOG",
+      "ROUTING_RULES",
+      "LINKS",
+      "FOLDER_REGISTRY",
+      "STATUS"
+    ]
+  },
+  "domains": {
+    "AMMINISTRAZIONE": "1PUR-_GWgt6errg0hRTfgU_F0OSvHM2_y",
+    "TESSERAMENTI": "1B1iE7uZTJRBOpvCcKxlT8vUEkvxaj2Su",
+    "CERTIFICATI_MEDICI": "1WIu4H3Wno7HWlWx-0frzNChXRio-uFCg",
+    "TORNEI_EVENTI": "1nLVGUaqfP4erOmoRe3f8wCkdVawWrO7V",
+    "TRASPORTI_PULMINI": "1hMBlTEASTz10lJH8PCB6Cq6yvVzHxsO0",
+    "SPONSOR_PARTNER": "1fqctZCsepdz7naZQlxNet0Ep77ScobID",
+    "STAFF_TECNICI": "10gev-fWy6Bf_XUdEb_EPeuH4yfnmna5y",
+    "COMUNICAZIONI": "1h7aKTquiPcUmiw8pkGrK61QW4oIf_foS",
+    "IMPIANTI": "1T7KWFB2S3IzWm9PFEu3sE0M5UuRxEVZJ",
+    "SAFEGUARDING_ISOLATO": "15hUoD4mj2ze4Mh1wTf_bGg8itsyua3dC"
+  },
+  "runtime": {
+    "upload_adapter": "NOT_CONNECTED",
+    "final_storage": "GOOGLE_DRIVE",
+    "ephemeral_disk_final_storage": false,
+    "fail_closed": true
+  },
+  "security": {
+    "sanitize_file_name": true,
+    "mime_allowlist_required": true,
+    "max_size_required": true,
+    "token_expiry_required_for_private_links": true,
+    "rate_limit_required": true,
+    "audit_required": true,
+    "safeguarding_isolated": true
+  }
+}

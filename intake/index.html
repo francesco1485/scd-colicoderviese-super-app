@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#07111c">
+  <title>SCD Intake Hub</title>
+  <link rel="icon" href="../assets/logo-scd.png">
+  <link rel="stylesheet" href="./intake.css?v=1.0.0">
+</head>
+<body>
+  <main class="shell">
+    <header class="brand">
+      <img src="../assets/logo-scd.png" alt="SCD ColicoDerviese">
+      <div><b>SCD INTAKE HUB</b><span>Documenti e richieste</span></div>
+    </header>
+
+    <section class="panel" id="formPanel" aria-live="polite">
+      <div class="status-line"><span class="dot"></span><span id="formStatus">Caricamento configurazione…</span></div>
+      <p class="eyebrow" id="formCategory">SCD</p>
+      <h1 id="formTitle">Invia una pratica</h1>
+      <p class="lead" id="formLead">Il sistema identifica la pratica, valida i dati e la instrada senza chiederti di conoscere cartelle o percorsi interni.</p>
+
+      <form id="intakeForm" novalidate>
+        <label>Nome e cognome
+          <input name="name" autocomplete="name" required maxlength="80">
+        </label>
+        <label>Email
+          <input name="email" type="email" autocomplete="email" required maxlength="120">
+        </label>
+        <label>Categoria / squadra
+          <input name="teamCategory" maxlength="80" placeholder="Es. Under 14, Prima Squadra, Staff">
+        </label>
+        <label>Tipo documento
+          <select name="documentType" id="documentType"></select>
+        </label>
+        <label>Note
+          <textarea name="notes" rows="4" maxlength="800" placeholder="Solo informazioni utili alla pratica."></textarea>
+        </label>
+
+        <div class="upload-box" id="uploadBox">
+          <div>
+            <b>Allegati</b>
+            <span id="uploadHint">Caricamento documenti non ancora attivo.</span>
+          </div>
+          <input type="file" id="fileInput" multiple disabled>
+        </div>
+
+        <div class="privacy-note">
+          I documenti sensibili vengono trattati in percorsi separati e con accessi limitati. Il contenuto dei file non viene inserito nei log operativi.
+        </div>
+
+        <button type="submit" id="submitBtn" disabled>Invia pratica</button>
+      </form>
+
+      <div class="receipt" id="receipt" hidden></div>
+    </section>
+
+    <footer>
+      <a href="../">Torna a SCD Universe</a>
+      <span>Routing documentale SCD · fail-closed</span>
+    </footer>
+  </main>
+  <script src="./intake.js?v=1.0.0" defer></script>
+</body>
+</html>
