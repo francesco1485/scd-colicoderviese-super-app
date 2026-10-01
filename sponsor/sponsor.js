@@ -1,4 +1,4 @@
-const PRIVATE_SPONSOR_ORIGIN='https://scd-colicoderviese-super-app.onrender.com';
+const PRIVATE_SPONSOR_ORIGIN='https://scd-colicoderviese-official-r21.onrender.com';
 const ON_PUBLIC_STATIC=['scd-sponsor-platform.onrender.com','francesco1485.github.io'].includes(location.hostname);
 const $=s=>document.querySelector(s);
 const $$=s=>Array.from(document.querySelectorAll(s));
