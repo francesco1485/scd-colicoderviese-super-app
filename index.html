@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#04162f">
   <meta name="description" content="SCD ColicoDerviese Universe: sport, community, servizi e club operations in una sola esperienza digitale.">
-  <meta name="scd-build" content="NG-0.3.1">
+  <meta name="scd-build" content="NG-0.3.2">
   <title>SCD Universe · Next Generation</title>
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./assets/logo-scd.png">
   <link rel="apple-touch-icon" href="./assets/logo-scd.png">
-    <link rel="stylesheet" href="./scd-ng.css?v=0.3.1">\n  <link rel="stylesheet" href="./scd-synth.css?v=0.3.1">
+    <link rel="stylesheet" href="./scd-ng.css?v=0.3.1">\n  <link rel="stylesheet" href="./scd-synth.css?v=0.3.2">
 </head>
 <body>
   <div class="ambient ambient-a"></div><div class="ambient ambient-b"></div>
@@ -170,7 +170,7 @@
             <h3>Crea il tuo alter ego</h3>
             <label>Nome Twin<input id="twinNameInput" maxlength="24" placeholder="Es. Fenix"></label>
             <div class="inline-fields"><label>Numero<input id="numberInput" type="number" min="1" max="99" value="10"></label><label>Ruolo<select id="roleInput"><option>Calciatore</option><option>Portiere</option><option>Mister</option><option>Tifoso</option><option>Dirigente</option></select></label></div>
-            <label class="upload">Foto di riferimento<input id="photoInput" type="file" accept="image/*"><span>Carica foto</span><small>Anteprima locale sul dispositivo. Nessuna identificazione biometrica.</small></label>
+            <div class="synthetic-identity"><span class="eyebrow">IDENTITÀ SINTETICA</span><p>Nessuna foto reale viene mostrata. Il Twin usa una rappresentazione originale generata e personalizzabile.</p><div class="inline-fields"><label>Tono<select id="toneInput"><option value="t1">Chiaro</option><option value="t2">Medio</option><option value="t3">Caldo</option><option value="t4">Scuro</option></select></label><label>Stile<select id="hairInput"><option value="h1">Corto</option><option value="h2">Medio</option><option value="h3">Riccio</option><option value="h4">Rasato</option></select></label></div></div>
             <div class="twin-actions"><button class="btn primary" id="saveTwin">Salva Twin</button><button class="btn glass" id="missionBtn">Missione sicura +10 XP</button></div>
           </div>
           <div class="mission-panel">
@@ -244,6 +244,6 @@
 
     <div class="toast" id="toast" role="status"></div>
   </div>
-  <script src="./scd-ng.js?v=0.3.1" defer></script>\n  <script src="./scd-interactions.js?v=0.3.1" defer></script>
+  <script src="./scd-ng.js?v=0.3.2" defer></script>\n  <script src="./scd-interactions.js?v=0.3.2" defer></script>
 </body>
 </html>
