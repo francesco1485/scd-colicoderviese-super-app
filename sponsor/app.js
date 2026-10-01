@@ -299,6 +299,40 @@ function partnerJourneyFor(s){
     {n:'06',label:'RINNOVO',state:renewal?'IN PREPARAZIONE':'DA PROGRAMMARE',cls:renewal?'active':'pending'}
   ];
 }
+async function hydratePartnerHubDetail(record){
+  const bar=$('#partnerHubEvidence');if(!bar)return;
+  if(!record?.crmId){
+    bar.innerHTML='<span><b>'+String(record?.touchpoints||0)+'</b><small>touchpoint</small></span><span><b>'+String(record?.openTasks||0)+'</b><small>attività</small></span><span><b>'+String(record?.opportunities||0)+'</b><small>opportunità</small></span><span><b>—</b><small>accordi</small></span>';
+    return;
+  }
+  const expected=record.name;
+  bar.classList.add('loading');
+  try{
+    const data=await crmApi(record.crmId);
+    if(partnerHubCurrent!==expected)return;
+    const tps=Array.isArray(data.touchpoints)?data.touchpoints:[];
+    const tasks=Array.isArray(data.tasks)?data.tasks:[];
+    const opps=Array.isArray(data.opportunities)?data.opportunities:[];
+    const agreements=Array.isArray(data.agreements)?data.agreements:[];
+    bar.innerHTML=[
+      [tps.length,'touchpoint'],
+      [tasks.filter(t=>String(t.STATO||'').toUpperCase()!=='FATTO').length,'attività aperte'],
+      [opps.length,'opportunità'],
+      [agreements.length,'accordi']
+    ].map(x=>'<span><b>'+esc(x[0])+'</b><small>'+esc(x[1])+'</small></span>').join('');
+    const agreement=agreements[0]||null;
+    if(agreement){
+      const value=agreement['VALORE €'];
+      if((!record.value||/DA VERIFICARE/i.test(record.value))&&value!==''&&value!=null)$('#partnerHubValue').textContent='€ '+String(value);
+      if((!record.asset||/DA RICOSTRUIRE|DA VERIFICARE/i.test(record.asset))&&agreement['ASSET PROMESSI'])$('#partnerHubAsset').textContent=agreement['ASSET PROMESSI'];
+    }
+  }catch(e){
+    if(partnerHubCurrent===expected)bar.innerHTML='<span class="wide"><b>Dati dettaglio non disponibili</b><small>'+esc(e.message||'CRM detail error')+'</small></span>';
+  }finally{
+    bar.classList.remove('loading');
+  }
+}
+
 function renderPartnerHub(){
   const sel=$('#partnerHubSelect'); if(!sel) return;
   const records=partnerHubRecords();
@@ -326,6 +360,7 @@ function renderPartnerHub(){
     if(s.crmId){openView('crm');openCrmProfile(s.crmId)}
     else openSponsor(s.name);
   };
+  hydratePartnerHubDetail(s);
   const activationBtn=$('#partnerActivationBtn');
   if(activationBtn)activationBtn.onclick=()=>{
     const target=$('#activationSponsor');
