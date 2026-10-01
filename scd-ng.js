@@ -62,7 +62,7 @@ async function hydrate(){
 }
 hydrate();$('#refreshData').addEventListener('click',()=>{hydrate();toast('Aggiornamento richiesto')});
 
-const twinKey='scd:nextgen:twin:v1';
+const twinKey='scd:twin:v1';
 function loadTwin(){
   try{return JSON.parse(localStorage.getItem(twinKey)||'{}')}catch{return {}}
 }
