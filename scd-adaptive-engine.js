@@ -22,7 +22,7 @@
       viewportClass:classify(width),
       width,
       height,
-      dpr:Math.max(1,Math.min(4,Number(window.window.devicePixelRatio)||1)),
+      dpr:Math.max(1,Math.min(4,Number(window.devicePixelRatio)||1)),
       orientation:width>=height?'LANDSCAPE':'PORTRAIT',
       pointerFine:Boolean(mm('(pointer: fine)')?.matches),
       hover:Boolean(mm('(hover: hover)')?.matches),
@@ -59,7 +59,7 @@
   };
   addEventListener('resize',schedule,{passive:true});
   addEventListener('orientationchange',schedule,{passive:true});
-  window.window.visualViewport?.addEventListener('resize',schedule,{passive:true});
+  window.visualViewport?.addEventListener('resize',schedule,{passive:true});
   network()?.addEventListener?.('change',schedule);
   ['(prefers-reduced-motion: reduce)','(prefers-contrast: more)','(prefers-color-scheme: dark)','(pointer: fine)','(hover: hover)','(display-mode: standalone)']
     .forEach(q=>mm(q)?.addEventListener?.('change',schedule));
