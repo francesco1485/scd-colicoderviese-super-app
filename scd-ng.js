@@ -449,5 +449,5 @@ $('#mirrorForm')?.addEventListener('submit',e=>{e.preventDefault();const q=$('#m
 $$('.quick-prompts button').forEach(b=>b.addEventListener('click',()=>{appendMsg(b.textContent,'user');setTimeout(()=>appendMsg(mirrorReply(b.textContent),'ai'),140)}));
 
 const hash=location.hash.replace('#','').split('?')[0];if(['pulse','calendar','teams','twin','desk'].includes(hash))setView(hash);
-window.SCDNextGen={setView,hydrate,openMirror,openCalendar:openCalendarPanel,search:runSearch};
+window.SCDNextGen={setView,hydrate,openMirror,openCalendar:openCalendarPanel,openTeams:openTeamsPanel,loadCalendar:ensurePublicCalendar,search:runSearch};
 })();
