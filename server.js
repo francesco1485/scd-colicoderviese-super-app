@@ -49,7 +49,7 @@ function applyCors(req,res){
 
 const READ_ONLY_RETRY_ACTIONS = new Set([
   'public.feed','public.club','public.calendar','public.datafabric.contract',
-  'dashboard.summary','private.dashboard','private.week','account.requests','private.crm.summary','private.crm.detail',
+  'dashboard.summary','private.dashboard','private.week','account.requests','private.crm.summary','private.crm.detail','private.communication.templates','private.communication.preview',
   'private.attendance.get','auth.validate','direction.diagnostics',
   'direction.evolution','direction.datafabric.status'
 ]);
@@ -59,7 +59,7 @@ const UPSTREAM_TIMEOUT_MS = Math.max(1000,Math.min(15000,Number(process.env.SCD_
 const wait = ms => new Promise(resolve=>setTimeout(resolve,ms));
 
 const allowedActions = new Set([
-  'dashboard.summary','private.dashboard','private.week','account.requests','private.crm.summary','private.crm.detail',
+  'dashboard.summary','private.dashboard','private.week','account.requests','private.crm.summary','private.crm.detail','private.communication.templates','private.communication.preview','private.communication.send',
   'private.request.submit','private.transport.request','private.message.send',
   'private.convocation.create','private.convocation.reply',
   'private.attendance.get','private.attendance.save',
@@ -226,6 +226,28 @@ async function handleSponsorCrm(req,res,u){
     return json(res,200,{ok:true,data:d},{'cache-control':'no-store'});
   }catch(e){
     return json(res,403,{ok:false,error:e.message||'CRM_ACCESS_DENIED'});
+  }
+}
+async function handleSponsorCommunication(req,res){
+  try{
+    const s=await validateSponsorSession(req);
+    if(req.method==='GET'){
+      const {parsed}=await callAppsScript('private.communication.templates',{},s.token);
+      return json(res,200,{ok:true,data:unwrapPayload(parsed)},{'cache-control':'no-store'});
+    }
+    if(req.method!=='POST')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+    const body=JSON.parse(await readBody(req)||'{}');
+    const mode=String(body.mode||'preview').toLowerCase();
+    if(!['preview','send'].includes(mode))return json(res,400,{ok:false,error:'MODE_NOT_ALLOWED'});
+    const action=mode==='send'?'private.communication.send':'private.communication.preview';
+    const payload={...body};delete payload.mode;
+    const {parsed}=await callAppsScript(action,payload,s.token);
+    const d=unwrapPayload(parsed);
+    if(parsed&&parsed.ok===false)return json(res,400,{ok:false,error:parsed.error||'COMMUNICATION_FAILED'});
+    return json(res,200,{ok:true,data:d},{'cache-control':'no-store'});
+  }catch(e){
+    const code=e.message==='SESSION_REQUIRED'?401:400;
+    return json(res,code,{ok:false,error:e.message||'COMMUNICATION_FAILED'});
   }
 }
 async function serveSponsorPrivate(req,res,u){
@@ -687,6 +709,7 @@ http.createServer(async(req,res)=>{
   if(u.pathname==='/api/sponsor/session') return handleSponsorSession(req,res);
   if(u.pathname==='/api/sponsor/logout') return handleSponsorLogout(req,res);
   if(u.pathname==='/api/sponsor/crm') return handleSponsorCrm(req,res,u);
+  if(u.pathname==='/api/sponsor/communication') return handleSponsorCommunication(req,res);
   if(['/sponsor/app','/sponsor/app/','/sponsor/app.html','/sponsor/app.js'].includes(u.pathname)) return serveSponsorPrivate(req,res,u);
   if(u.pathname==='/api/scd') return proxyAppsScript(req,res);
   if(u.pathname==='/api/intake/form') return handleIntakeForm(req,res,u);
