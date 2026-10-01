@@ -4320,3 +4320,100 @@ a:focus-visible{
   .partner-overview-facts{grid-template-columns:1fr}
   .readiness-mini{min-width:0}
 }
+
+
+/* =========================================================
+   MAGLIA 360 · V14 PERSONAL ADAPTIVE CRM
+   ========================================================= */
+.personal-crm-workspace{display:grid;gap:18px}
+.crm-hero{
+  display:grid;grid-template-columns:minmax(0,1.55fr) minmax(280px,.45fr);gap:18px;align-items:stretch;
+  padding:24px;border:1px solid #d8e5e8;border-radius:20px;
+  background:
+    radial-gradient(circle at 86% 18%,rgba(77,158,152,.12),transparent 28%),
+    linear-gradient(135deg,#ffffff,#f6fafb);
+  box-shadow:0 16px 42px rgba(25,63,82,.055)
+}
+.crm-hero h2{margin:6px 0 10px;color:#153f58;font-size:clamp(28px,3.3vw,46px);line-height:1.05;letter-spacing:-.035em}
+.crm-hero p{max-width:900px;margin:0;color:#6f8490;font-size:13px;line-height:1.7}
+.crm-profile-card{
+  display:flex;flex-direction:column;justify-content:center;padding:18px;border:1px solid #dce7e9;border-radius:16px;background:rgba(255,255,255,.88)
+}
+.crm-profile-card>span{color:#6f8b95;font-size:9px;font-weight:900;letter-spacing:.08em}
+.crm-profile-card>strong{margin-top:5px;color:#1d4b61;font-size:24px;text-transform:capitalize}
+.crm-profile-card>small{margin-top:4px;color:#7e919b;font-size:10px}
+.crm-learning-meter{height:8px;margin-top:15px;border-radius:999px;background:#e7eef0;overflow:hidden}
+.crm-learning-meter i{display:block;height:100%;width:0;border-radius:inherit;background:#4d9e98;transition:width .35s ease}
+.crm-profile-card>em{margin-top:7px;color:#5c777f;font-size:9px;font-style:normal}
+
+.crm-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.crm-kpis>div{padding:16px;border:1px solid #dfe8eb;border-radius:14px;background:#fff}
+.crm-kpis span{display:block;color:#738995;font-size:9px;font-weight:800}
+.crm-kpis strong{display:block;margin-top:5px;color:#193f55;font-size:26px}
+.crm-kpis small{display:block;margin-top:3px;color:#8a9aa2;font-size:9px}
+
+.crm-top-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(320px,.65fr);gap:12px}
+.crm-focus-panel,.crm-learning-panel{min-height:320px}
+.crm-focus-list{display:grid;gap:7px}
+.crm-focus-row{
+  display:grid;grid-template-columns:38px minmax(0,1fr) 22px;gap:10px;align-items:center;
+  width:100%;padding:11px 12px;border:1px solid #e0e8eb;border-radius:11px;background:#fff;text-align:left;cursor:pointer
+}
+.crm-focus-row:hover{border-color:#bfd5d4;background:#fbfdfd;transform:translateY(-1px)}
+.crm-focus-row>b{display:grid;place-items:center;width:32px;height:32px;border-radius:9px;background:#edf5f5;color:#356d6a;font-size:9px}
+.crm-focus-row span{display:block;color:#6d8a94;font-size:8px;font-weight:900;letter-spacing:.07em}
+.crm-focus-row strong{display:block;margin-top:2px;color:#234b60;font-size:11px}
+.crm-focus-row small{display:block;margin-top:3px;color:#7c9099;font-size:9px;line-height:1.45}
+.crm-focus-row>i{color:#5b8b88;font-style:normal;font-weight:900}
+
+.crm-adapt-switch{display:flex!important;align-items:center;gap:7px;color:#647b86!important;font-size:9px!important;font-weight:800!important}
+.crm-adapt-switch input{width:auto!important;margin:0!important}
+.crm-learning-summary{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.crm-learning-summary>div{padding:12px;border:1px solid #e0e8eb;border-radius:11px;background:#f9fbfc}
+.crm-learning-summary span{display:block;color:#7b9099;font-size:8px;text-transform:uppercase;font-weight:850}
+.crm-learning-summary strong{display:block;margin-top:4px;color:#21495e;font-size:13px;line-height:1.35}
+.crm-learning-summary>p{grid-column:1/-1;margin:0;padding:11px 12px;border-radius:10px;background:#eef6f4;color:#5c7779;font-size:9px;line-height:1.55}
+
+.crm-adaptive-modules{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.crm-module-card{
+  min-height:178px;padding:14px;border:1px solid #dfe8eb;border-radius:14px;background:#fff;cursor:pointer;
+  box-shadow:0 7px 18px rgba(25,63,82,.03)
+}
+.crm-module-card:hover{border-color:#bfd5d4;transform:translateY(-2px);box-shadow:0 12px 24px rgba(25,63,82,.06)}
+.crm-module-card.pinned{border-color:#bcdad4;background:linear-gradient(180deg,#fff,#f5fbf9)}
+.crm-module-card header{display:flex;align-items:center;justify-content:space-between}
+.crm-module-card header>span{color:#7a9099;font-size:8px;font-weight:900}
+.crm-module-card header button{border:0;background:transparent;color:#4d8e87;font-size:14px;cursor:pointer}
+.crm-module-card h3{margin:13px 0 6px;color:#1e485d;font-size:16px}
+.crm-module-card p{min-height:42px;margin:0;color:#758a94;font-size:9px;line-height:1.55}
+.crm-module-weight{height:6px;margin:14px 0 7px;border-radius:999px;background:#e8eff1;overflow:hidden}
+.crm-module-weight i{display:block;height:100%;border-radius:inherit;background:#4d9e98}
+.crm-module-card small{display:block;color:#82959d;font-size:8px;line-height:1.45}
+
+.crm-lower-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.crm-mini-list,.crm-office-list{display:grid;gap:7px}
+.crm-mini-list>button,.crm-office-list>button{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;width:100%;
+  padding:11px 12px;border:1px solid #e0e8eb;border-radius:10px;background:#fff;text-align:left;cursor:pointer
+}
+.crm-mini-list>button:hover,.crm-office-list>button:hover{border-color:#bfd5d4;background:#fbfdfd}
+.crm-mini-list strong,.crm-office-list strong{display:block;color:#244d62;font-size:10px}
+.crm-mini-list small,.crm-office-list small{display:block;margin-top:3px;color:#83969f;font-size:8px}
+.crm-mini-list>button>span,.crm-office-list>button>span{color:#5e7e88;font-size:8px;font-weight:850;text-align:right}
+
+@media(max-width:1180px){
+  .crm-adaptive-modules{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .crm-lower-grid{grid-template-columns:1fr 1fr}
+  .crm-lower-grid>article:last-child{grid-column:1/-1}
+}
+@media(max-width:900px){
+  .crm-hero,.crm-top-grid{grid-template-columns:1fr}
+  .crm-kpis{grid-template-columns:1fr 1fr}
+}
+@media(max-width:640px){
+  .crm-hero{padding:18px}
+  .crm-hero h2{font-size:30px}
+  .crm-kpis,.crm-adaptive-modules,.crm-lower-grid,.crm-learning-summary{grid-template-columns:1fr}
+  .crm-lower-grid>article:last-child,.crm-learning-summary>p{grid-column:auto}
+  .crm-module-card{min-height:0}
+}
