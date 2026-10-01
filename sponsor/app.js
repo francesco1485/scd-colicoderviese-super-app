@@ -18,7 +18,7 @@ function applySponsorCapabilities(caps={}){
   };
   Object.entries(gates).forEach(([view,cap])=>{
     const allowed=sponsorAccess[cap]===true;
-    $$$('[data-view="'+view+'"]').forEach(el=>{el.hidden=!allowed;el.setAttribute('aria-hidden',String(!allowed))});
+    $$('[data-view="'+view+'"]').forEach(el=>{el.hidden=!allowed;el.setAttribute('aria-hidden',String(!allowed))});
     const section=$('#view-'+view);
     if(section&&!allowed)section.hidden=true;
   });
@@ -67,7 +67,7 @@ star:'<svg viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-
 news:'<svg viewBox="0 0 24 24"><path d="M4 5h13v14H4z"/><path d="M17 8h3v11h-3M7 9h7M7 12h7M7 15h4"/></svg>',
 poll:'<svg viewBox="0 0 24 24"><path d="M5 20v-5M12 20V8M19 20V4"/></svg>'
 };
-$$$('[data-icon]').forEach(el=>el.innerHTML=ICONS[el.dataset.icon]||'');
+$$('[data-icon]').forEach(el=>el.innerHTML=ICONS[el.dataset.icon]||'');
 
 const sponsors=[
 {name:'Noratech Srl',sector:'Tecnologia / corporate',status:'DOCUMENTATO',value:'€400 + IVA',period:'17/07/2026 - 30/12/2026',asset:'Social + Centro Sportivo',next:'Sponsor Report 2026 e proposta upgrade 2027',since:'2022',type:'Sponsor',contact:'Lucia Cappelletti'},
@@ -325,7 +325,7 @@ function renderCampaignStudio(){
   const rows=campaignModules.filter(x=>campaignFilter==='TUTTI'||x.channel===campaignFilter);
   mount.innerHTML=rows.map((x,i)=>
     '<article class="campaign-item" data-campaign-index="'+campaignModules.indexOf(x)+'">'+
-      '<div class="campaign-visual cv-'+campaignVisualKind(x)+'"><span>'+esc(x.channel)+'</span>'+campaignPreview(x)+'</div>'+
+      '<div class="campaign-visual kind-'+campaignVisualKind(x)+'"><span>'+esc(x.channel)+'</span>'+campaignPreview(x)+'</div>'+
       '<div class="campaign-body"><h3>'+esc(x.name)+'</h3><p>'+esc(x.desc)+'</p>'+
       '<div class="campaign-meta"><b>'+esc(x.status)+'</b><span>'+String(i+1).padStart(2,'0')+'</span></div></div>'+
     '</article>'
@@ -359,16 +359,16 @@ function renderTerritoryHub(key=territoryCurrent){
     '<p>'+esc(data.text)+'</p>'+
     '<div class="territory-facts">'+data.facts.map(x=>'<span>'+esc(x)+'</span>').join('')+'</div>'+
     '<div class="territory-inspector-actions"><button class="btn-yellow" id="territoryPrimaryAction">'+esc(data.actionLabel)+'</button><button class="btn-light" id="territoryCrmAction">Apri CRM</button></div>';
-  $('[data-territory-node]').forEach(b=>b.classList.toggle('active',b.dataset.territoryNode===territoryCurrent));
+  $$('[data-territory-node]').forEach(b=>b.classList.toggle('active',b.dataset.territoryNode===territoryCurrent));
   $('#territoryPrimaryAction').onclick=()=>openView(data.action);
   $('#territoryCrmAction').onclick=()=>openView('crm');
 }
-$('[data-territory-node]').forEach(b=>b.onclick=()=>renderTerritoryHub(b.dataset.territoryNode));
+$$('[data-territory-node]').forEach(b=>b.onclick=()=>renderTerritoryHub(b.dataset.territoryNode));
 
 function openView(name){
-  $$$('.view').forEach(v=>v.classList.remove('active'));
+  $$('.view').forEach(v=>v.classList.remove('active'));
   $('#view-'+name)?.classList.add('active');
-  $$$('.nav-link').forEach(b=>b.classList.toggle('active',b.dataset.view===name));
+  $$('.nav-link').forEach(b=>b.classList.toggle('active',b.dataset.view===name));
   if(innerWidth<901)$('#sidebar').classList.remove('open');
   window.scrollTo({top:0,behavior:'smooth'});
 }
@@ -427,13 +427,13 @@ function pollState(){try{return JSON.parse(localStorage.getItem('scd_poll_v8')||
 function renderPoll(){
   const s=pollState(),total=Object.values(s.votes).reduce((a,b)=>a+Number(b||0),0);
   $('#livePoll').innerHTML=pollOptions.map(([id,label])=>{const n=Number(s.votes[id]||0),pct=total?Math.round(n/total*100):0;return '<button class="poll-option '+(s.choice===id?'selected':'')+'" data-poll="'+id+'"><div><b>'+label+'</b><span>'+n+' · '+pct+'%</span></div><i><span style="width:'+pct+'%"></span></i></button>'}).join('');
-  $$$('[data-poll]').forEach(b=>b.onclick=()=>{const st=pollState();if(st.choice)return;st.choice=b.dataset.poll;st.votes[b.dataset.poll]=Number(st.votes[b.dataset.poll]||0)+1;localStorage.setItem('scd_poll_v8',JSON.stringify(st));renderPoll()});
+  $$('[data-poll]').forEach(b=>b.onclick=()=>{const st=pollState();if(st.choice)return;st.choice=b.dataset.poll;st.votes[b.dataset.poll]=Number(st.votes[b.dataset.poll]||0)+1;localStorage.setItem('scd_poll_v8',JSON.stringify(st));renderPoll()});
 }
 function renderTags(){
   const active=localStorage.getItem('scd_tag_v8')||'';
   $('#peopleTags').innerHTML=tags.map(t=>'<button class="people-tag '+(active===t?'active':'')+'" data-tag="'+t+'">'+t+'</button>').join('');
   $('#tagState').textContent=active?'Tag attivo: '+active:'Nessun tag selezionato';
-  $$$('[data-tag]').forEach(b=>b.onclick=()=>{const next=active===b.dataset.tag?'':b.dataset.tag;localStorage.setItem('scd_tag_v8',next);renderTags()});
+  $$('[data-tag]').forEach(b=>b.onclick=()=>{const next=active===b.dataset.tag?'':b.dataset.tag;localStorage.setItem('scd_tag_v8',next);renderTags()});
 }
 
 function sponsorCard(s){
@@ -516,7 +516,7 @@ function renderScenario(){
   let html='<div class="fit-grid"><div class="fit-cell head">SPONSOR / ASSET</div>'+aa.map(a=>'<div class="fit-cell head">'+esc(a[0])+'</div>').join('');
   ss.forEach((s,si)=>{html+='<div class="fit-cell head">'+esc(s.name)+'</div>';aa.forEach((a,ai)=>{const f=fit(s,a);html+='<button class="fit-cell '+f.level+'" data-fit="'+si+':'+ai+'">'+(f.level==='high'?'FORTE':f.level==='mid'?'VALUTARE':'DEBOLE')+'</button>'})});
   html+='</div>';$('#fitMatrix').innerHTML=html;
-  $$$('[data-fit]').forEach(b=>b.onclick=()=>{const [si,ai]=b.dataset.fit.split(':').map(Number),s=ss[si],a=aa[ai],f=fit(s,a);$('#scenarioInspector').innerHTML='<h3>'+esc(s.name)+' × '+esc(a[0])+'</h3><ul>'+f.why.map(x=>'<li>'+esc(x)+'</li>').join('')+'<li>Verificare esclusiva e disponibilità reale prima di proporre.</li><li>Il sistema non predice la firma del contratto.</li></ul>'});
+  $$('[data-fit]').forEach(b=>b.onclick=()=>{const [si,ai]=b.dataset.fit.split(':').map(Number),s=ss[si],a=aa[ai],f=fit(s,a);$('#scenarioInspector').innerHTML='<h3>'+esc(s.name)+' × '+esc(a[0])+'</h3><ul>'+f.why.map(x=>'<li>'+esc(x)+'</li>').join('')+'<li>Verificare esclusiva e disponibilità reale prima di proporre.</li><li>Il sistema non predice la firma del contratto.</li></ul>'});
 }
 
 function detectDevice(){
@@ -546,7 +546,7 @@ function searchItems(){
     ...led.map(l=>({title:l[0],meta:'LED · '+l[1],view:'media'}))
   ];
 }
-$('#globalSearch').addEventListener('input',e=>{const q=e.target.value.toLowerCase().trim(),box=$('#searchResults');if(!q){box.hidden=true;return}const rows=searchItems().filter(x=>(x.title+' '+x.meta).toLowerCase().includes(q)).slice(0,12);box.innerHTML=rows.length?rows.map((x,i)=>'<div class="search-result" data-sr="'+i+'"><b>'+esc(x.title)+'</b><small>'+esc(x.meta)+'</small></div>').join(''):'<div class="search-result"><b>Nessun risultato</b></div>';box.hidden=false;$$$('[data-sr]').forEach(el=>el.onclick=()=>{const x=rows[+el.dataset.sr];box.hidden=true;e.target.value='';x.action?x.action():openView(x.view)})});
+$('#globalSearch').addEventListener('input',e=>{const q=e.target.value.toLowerCase().trim(),box=$('#searchResults');if(!q){box.hidden=true;return}const rows=searchItems().filter(x=>(x.title+' '+x.meta).toLowerCase().includes(q)).slice(0,12);box.innerHTML=rows.length?rows.map((x,i)=>'<div class="search-result" data-sr="'+i+'"><b>'+esc(x.title)+'</b><small>'+esc(x.meta)+'</small></div>').join(''):'<div class="search-result"><b>Nessun risultato</b></div>';box.hidden=false;$$('[data-sr]').forEach(el=>el.onclick=()=>{const x=rows[+el.dataset.sr];box.hidden=true;e.target.value='';x.action?x.action():openView(x.view)})});
 document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('#globalSearch').focus()}});
 
 function liaAnswer(q){
@@ -560,7 +560,7 @@ function liaAnswer(q){
   return 'Posso aiutarti su sponsor, proposte, contratti, asset, LED, rinnovi, eventi e report usando i dati presenti nella piattaforma.';
 }
 function addLia(text,cls){const d=document.createElement('div');d.className=cls;d.textContent=text;$('#liaChat').appendChild(d);$('#liaChat').scrollTop=$('#liaChat').scrollHeight}
-$$$('[data-lia]').forEach(b=>b.onclick=()=>{addLia(b.dataset.lia,'lia-user');setTimeout(()=>addLia(liaAnswer(b.dataset.lia),'lia-bot'),80)});
+$$('[data-lia]').forEach(b=>b.onclick=()=>{addLia(b.dataset.lia,'lia-user');setTimeout(()=>addLia(liaAnswer(b.dataset.lia),'lia-bot'),80)});
 $('#liaForm').onsubmit=e=>{e.preventDefault();const q=$('#liaInput').value.trim();if(!q)return;addLia(q,'lia-user');$('#liaInput').value='';setTimeout(()=>addLia(liaAnswer(q),'lia-bot'),80)};
 
 const modal=$('#newSponsorModal');
@@ -654,7 +654,7 @@ function renderCrmTable(){
       '<span><b>'+esc(x.nextAction||'Nessuna azione registrata')+'</b><small>'+esc(x.nextDeadline||'')+'</small></span>'+
       '<span><em class="crm-policy '+(crmBlocked(x)?'blocked':'')+'">'+esc(crmPolicyLabel(x.contactPolicy))+'</em><small>'+esc(x.preferredChannel||'')+'</small></span>'+
       '</button>').join(''):'<div class="crm-empty">Nessun profilo corrisponde ai filtri.</div>');
-  $$$('[data-crm-id]').forEach(b=>b.onclick=()=>openCrmProfile(b.dataset.crmId));
+  $$('[data-crm-id]').forEach(b=>b.onclick=()=>openCrmProfile(b.dataset.crmId));
 }
 function renderCrmInspector(data){
   const el=$('#crmInspector');if(!el)return;
