@@ -106,6 +106,8 @@ for(const viewport of viewports){
   await page.evaluate(()=>window.SCDNextGen.setView('desk'));
   await page.waitForSelector('#view-desk.active .desk-hero');
   await page.waitForSelector('.service-dock');
+  await page.waitForSelector('#privateDeskLoginForm');
+  if((await page.locator('#deskScopeStatus').textContent())!=='ACCESSO RICHIESTO')throw new Error('Private Desk anonymous gate missing');
 
   await page.evaluate(()=>window.SCDNextGen.openMirror());
   await page.waitForSelector('#mirror.open');
