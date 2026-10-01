@@ -62,7 +62,7 @@ function renderMotionInspector(id){
     '<div class="motion-proof"><small>PROOF PLAN</small>'+p.proofPlan.map(x=>'<span>'+esc(x)+'</span>').join('')+'</div>'+
     '<div class="motion-inspector-actions"><button class="btn-yellow" id="motionToActivation">Crea attivazione</button><button class="btn-light" data-view="media">Apri LED</button></div>'+
     '<p class="motion-safety-note">Il master LED definitivo resta bloccato finché non sono disponibili logo ufficiale approvato e specifiche native dell’impianto.</p>';
-  $('[data-motion-id]').forEach(el=>el.classList.toggle('active',el.dataset.motionId===p.id));
+  $$('[data-motion-id]').forEach(el=>el.classList.toggle('active',el.dataset.motionId===p.id));
   const go=$('#motionToActivation');if(go)go.onclick=()=>openView('activationstudio');
   const mediaBtn=box.querySelector('[data-view="media"]');if(mediaBtn)mediaBtn.onclick=()=>{ledMotionSelected=p.id;openView('media');renderLedProfileList();renderLedProfileDetail();};
 }
@@ -78,7 +78,7 @@ function renderMotionProfiles(){
       '<div class="motion-card-foot"><span>'+esc(((motionProfilesState.previewSource||motionProfilesState.defaultPreview)?.durationSeconds||'—')+' sec')+'</span><span>'+esc(((motionProfilesState.previewSource||motionProfilesState.defaultPreview)?.fps||'—')+' fps')+'</span></div>'+
     '</button>'
   ).join('');
-  $('[data-motion-id]').forEach(btn=>btn.onclick=()=>renderMotionInspector(btn.dataset.motionId));
+  $$('[data-motion-id]').forEach(btn=>btn.onclick=()=>renderMotionInspector(btn.dataset.motionId));
   renderMotionInspector(motionProfileCurrent||rows[0]?.id||'');
 }
 async function loadMotionProfiles(){
