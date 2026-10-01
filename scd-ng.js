@@ -449,7 +449,7 @@ function openPrivateModule(module){
    $('#deskOpenSponsorPortal',layer).onclick=()=>{location.href='/sponsor/?login=1'};return;
  }
  if(module==='DOCUMENTI'){
-   const admin=(w.areas||[]).some(x=>x.canAdmin===true)||String(w.privateDeskProfile||'').toUpperCase()==='EXECUTIVE_FULL';
+   const admin=(w.areas||[]).some(x=>x.canAdmin===true)||String(w.privateDeskProfile||'').toUpperCase()==='EXECUTIVE_FULL'||state.privateData?.permissions?.direction===true;
    const layer=openPanel('Documenti','<div class="panel-detail private-module-panel"><span class="eyebrow">DOCUMENTI · ROLE/SCOPE</span><h2>'+esc(w.role||'Profilo SCD')+'</h2><p>'+esc(admin?'Accesso agli strumenti amministrativi documentali autorizzato.':'Sono mostrati soltanto i documenti del perimetro assegnato.')+'</p>'+(admin?'<button class="btn primary" id="deskOpenIntakeAdmin">Apri Intake Admin</button>':'')+'</div>');
    if(admin)$('#deskOpenIntakeAdmin',layer).onclick=()=>{location.href='./intake/admin.html'};return;
  }
