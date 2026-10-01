@@ -35,6 +35,9 @@ if(!interactions.includes('speechSynthesis')) fail('local TTS runtime missing');
 if(!js.includes("fetch(API_BASE+'/api/newsroom'")) fail('newsroom must use same-origin API abstraction');
 if(!js.includes("const API_BASE=''")) fail('NextGen canonical app must use same-origin API');
 if(!js.includes("const twinKey='scd:twin:v1'")) fail('canonical Twin storage key missing');
+if(!js.includes("private.user.workspace")) fail('role-scoped Private Desk workspace action missing');
+if(!js.includes("privateDeskLoginForm")) fail('Private Desk authentication runtime missing');
+if(!html.includes('deskServiceDock')) fail('Private Desk adaptive service dock missing');
 if(!html.includes('scd-meta-engine.js')) fail('canonical Meta engine not mounted');
 if(!html.includes('scd-twin.js')) fail('canonical Twin engine not mounted');
 
