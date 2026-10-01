@@ -377,3 +377,110 @@ function closeSponsorModalAccessible(){
 $('#closeNewSponsor').onclick=closeSponsorModalAccessible;
 $('#cancelNewSponsor').onclick=closeSponsorModalAccessible;
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.hidden)closeSponsorModalAccessible()});
+
+
+/* ===== R40.1 CRM RELAZIONALE ===== */
+const crmState={rows:[],selected:null,loading:false,error:''};
+
+function crmPolicyLabel(value){
+  const v=String(value||'').toUpperCase();
+  if(v==='SOSPESO_NON_INVIARE')return 'SOSPESO · NON INVIARE';
+  if(v==='NO_CONTACT')return 'NO CONTACT';
+  if(v==='AUTO_OK')return 'AUTO OK';
+  if(v==='MANUALE')return 'MANUALE';
+  return v||'DA DEFINIRE';
+}
+function crmBlocked(row){
+  return /SOSPESO|NO_CONTACT/.test(String(row?.contactPolicy||'').toUpperCase());
+}
+async function crmApi(id=''){
+  const url='/api/sponsor/crm'+(id?'?id='+encodeURIComponent(id):'?limit=300');
+  const r=await fetch(url,{credentials:'same-origin',cache:'no-store'});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok||j.ok===false)throw new Error(j.error||'CRM non disponibile');
+  return j.data||{};
+}
+function renderCrmKpis(kpi={}){
+  const el=$('#crmKpis');if(!el)return;
+  const data=[
+    ['Profili CRM',String(kpi.total??crmState.rows.length),'Record canonici persone/aziende'],
+    ['Relazioni aperte',String(kpi.active??'—'),'Escluse chiuse negative/perse'],
+    ['Contatti sospesi',String(kpi.suspended??crmState.rows.filter(crmBlocked).length),'Nessun invio esterno automatico'],
+    ['Prossime azioni',String(kpi.due??crmState.rows.filter(x=>x.nextDeadline).length),'Profili con scadenza valorizzata']
+  ];
+  el.innerHTML=data.map(x=>'<article class="report-card"><h3>'+esc(x[0])+'</h3><div class="report-value">'+esc(x[1])+'</div><p>'+esc(x[2])+'</p></article>').join('');
+}
+function crmFilteredRows(){
+  const q=String($('#crmSearch')?.value||'').trim().toLowerCase();
+  const policy=String($('#crmPolicy')?.value||'').trim().toUpperCase();
+  return crmState.rows.filter(x=>{
+    const hay=[x.name,x.category,x.area,x.location,x.tags,x.email,x.phone,x.owner,x.relationshipStatus].join(' ').toLowerCase();
+    return (!q||hay.includes(q))&&(!policy||String(x.contactPolicy||'').toUpperCase()===policy);
+  });
+}
+function renderCrmTable(){
+  const el=$('#crmTable');if(!el)return;
+  if(crmState.loading){el.innerHTML='<div class="crm-empty">Caricamento CRM…</div>';return}
+  if(crmState.error){el.innerHTML='<div class="crm-empty"><b>CRM non disponibile</b><span>'+esc(crmState.error)+'</span></div>';return}
+  const rows=crmFilteredRows();
+  el.innerHTML='<div class="crm-row crm-head"><span>Profilo</span><span>Relazione</span><span>Ultimo contatto</span><span>Prossima azione</span><span>Policy</span></div>'+
+    (rows.length?rows.map(x=>
+      '<button class="crm-row crm-record" data-crm-id="'+esc(x.id)+'">'+
+      '<span><b>'+esc(x.name)+'</b><small>'+esc(x.category||x.type||'')+'</small></span>'+
+      '<span><b>'+esc(x.relationshipStatus||'—')+'</b><small>'+esc(x.owner||'Owner da definire')+'</small></span>'+
+      '<span><b>'+esc(x.lastContact||x.lastTouchpoint?.timestamp||'—')+'</b><small>'+esc(x.lastTouchpoint?.channel||'')+'</small></span>'+
+      '<span><b>'+esc(x.nextAction||'Nessuna azione registrata')+'</b><small>'+esc(x.nextDeadline||'')+'</small></span>'+
+      '<span><em class="crm-policy '+(crmBlocked(x)?'blocked':'')+'">'+esc(crmPolicyLabel(x.contactPolicy))+'</em><small>'+esc(x.preferredChannel||'')+'</small></span>'+
+      '</button>').join(''):'<div class="crm-empty">Nessun profilo corrisponde ai filtri.</div>');
+  $$('[data-crm-id]').forEach(b=>b.onclick=()=>openCrmProfile(b.dataset.crmId));
+}
+function renderCrmInspector(data){
+  const el=$('#crmInspector');if(!el)return;
+  if(!data){el.innerHTML='<h3>Profilo CRM</h3><p>Seleziona una persona o azienda per vedere il profilo relazionale completo.</p>';return}
+  const s=data.stakeholder||{},blocked=data.safety?.externalContactBlocked;
+  const tps=Array.isArray(data.touchpoints)?data.touchpoints:[];
+  const tasks=Array.isArray(data.tasks)?data.tasks:[];
+  const opps=Array.isArray(data.opportunities)?data.opportunities:[];
+  el.innerHTML=
+    '<div class="crm-profile-head"><small>'+esc(s.TIPO||'PROFILO')+'</small><h2>'+esc(s.NOME||'Profilo')+'</h2><p>'+esc(s.CATEGORIA||'')+'</p></div>'+
+    (blocked?'<div class="crm-alert"><b>CONTATTO BLOCCATO</b><span>Policy '+esc(crmPolicyLabel(data.safety?.contactPolicy))+'. Nessun follow-up esterno deve partire automaticamente.</span></div>':'')+
+    '<div class="crm-facts">'+
+      '<div><small>STATO</small><b>'+esc(s.STATO_RELAZIONE||'—')+'</b></div>'+
+      '<div><small>OWNER</small><b>'+esc(s.OWNER||'—')+'</b></div>'+
+      '<div><small>CANALE</small><b>'+esc(s.PREFERRED_CHANNEL||'—')+'</b></div>'+
+      '<div><small>PROSSIMA SCADENZA</small><b>'+esc(s.PROSSIMA_SCADENZA||'—')+'</b></div>'+
+    '</div>'+
+    '<section class="crm-section"><h3>Prossima azione</h3><p>'+esc(s.PROSSIMA_AZIONE||'Nessuna azione registrata')+'</p></section>'+
+    '<section class="crm-section"><h3>Contatti</h3><p>'+esc(s.EMAIL||'')+(s.EMAIL&&s.TELEFONO?' · ':'')+esc(s.TELEFONO||'')+'</p><p>'+esc(s.LOCALITA||'')+'</p></section>'+
+    '<section class="crm-section"><h3>Tag</h3><p>'+esc(s.CRM_TAGS||'Nessun tag')+'</p></section>'+
+    '<section class="crm-section"><h3>Timeline recente</h3>'+
+      (tps.length?tps.slice(0,8).map(x=>'<div class="crm-timeline"><time>'+esc(x.TIMESTAMP||'')+'</time><div><b>'+esc(x.OGGETTO||x.CANALE||'Touchpoint')+'</b><p>'+esc(x.SINTESI||'')+'</p><small>'+esc(x.ESITO||'')+'</small></div></div>').join(''):'<p>Nessun touchpoint registrato.</p>')+
+    '</section>'+
+    '<section class="crm-section"><h3>Attività e opportunità</h3><p>'+tasks.length+' task collegati · '+opps.length+' opportunità collegate</p></section>';
+}
+async function loadCrm(){
+  crmState.loading=true;crmState.error='';renderCrmTable();
+  try{
+    const data=await crmApi();
+    crmState.rows=Array.isArray(data.rows)?data.rows:[];
+    renderCrmKpis(data.kpi||{});
+  }catch(e){
+    crmState.error=e.message||'Errore CRM';
+    renderCrmKpis({});
+  }finally{
+    crmState.loading=false;renderCrmTable();
+  }
+}
+async function openCrmProfile(id){
+  const el=$('#crmInspector');if(el)el.innerHTML='<h3>Profilo CRM</h3><p>Caricamento profilo…</p>';
+  try{
+    const data=await crmApi(id);
+    crmState.selected=id;renderCrmInspector(data);
+  }catch(e){
+    if(el)el.innerHTML='<h3>Profilo CRM</h3><p>'+esc(e.message||'Profilo non disponibile')+'</p>';
+  }
+}
+if($('#crmRefresh'))$('#crmRefresh').onclick=loadCrm;
+if($('#crmSearch'))$('#crmSearch').addEventListener('input',renderCrmTable);
+if($('#crmPolicy'))$('#crmPolicy').addEventListener('change',renderCrmTable);
+loadCrm();
