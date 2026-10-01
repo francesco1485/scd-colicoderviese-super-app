@@ -133,6 +133,7 @@
     <nav class="side-nav">
       <div class="nav-group primary-nav">
         <button class="nav-item active" data-view="home">Home</button>
+        <button class="nav-item" data-view="personalCrm">Il mio CRM</button>
         <button class="nav-item" data-view="operatingPlan">Piano Operativo</button>
         <button class="nav-item" data-view="products">Clienti e Prodotti</button>
         <button class="nav-item" data-view="collaborators">Rete e Collaboratori</button>
@@ -303,6 +304,74 @@
           <span>·</span>
           <a href="https://commons.wikimedia.org/wiki/File:Mandello_del_Lario_panorama.jpg" target="_blank" rel="noopener">Mandello · Andrzej Otrębski · CC BY-SA 3.0</a>
         </div>
+      </div>
+    </section>
+
+    <section id="personalCrmView" class="view hidden">
+      <div class="personal-crm-workspace">
+        <section class="crm-hero">
+          <div>
+            <div class="eyebrow">IL MIO CRM · MAGLIA 360</div>
+            <h2>La tua scrivania cambia con il lavoro reale.</h2>
+            <p>Parti da un modello standard coerente con ruolo e sede. Nel tempo MAGLIA 360 riordina priorità e moduli in base a utilizzo, clienti, pipeline, scadenze e attività, senza modificare ciò che hai fissato manualmente.</p>
+          </div>
+          <div class="crm-profile-card">
+            <span>PROFILO CRM</span>
+            <strong id="crmPersonaLabel">—</strong>
+            <small id="crmProfileBadge">Configurazione standard</small>
+            <div class="crm-learning-meter"><i id="crmLearningMeter"></i></div>
+            <em id="crmLearningLabel">Apprendimento iniziale</em>
+          </div>
+        </section>
+
+        <section class="crm-kpis">
+          <div><span>Attività mie aperte</span><strong id="crmTodayCount">—</strong><small>assegnate a te</small></div>
+          <div><span>Scadute / oggi</span><strong id="crmOverdueCount">—</strong><small>da gestire prima</small></div>
+          <div><span>Opportunità mie</span><strong id="crmPipelineCount">—</strong><small>pipeline aperta</small></div>
+          <div><span>Clienti nel mio perimetro</span><strong id="crmClientCount">—</strong><small>accessibili oggi</small></div>
+        </section>
+
+        <section class="crm-top-grid">
+          <article class="panel crm-focus-panel">
+            <div class="panel-head">
+              <div><div class="eyebrow">OGGI</div><h3>Il lavoro che viene prima</h3><p>Attività, prossime azioni e opportunità ordinate per urgenza.</p></div>
+              <button id="crmOpenActionsBtn" type="button" class="small-btn">Tutte le attività →</button>
+            </div>
+            <div id="crmFocusList" class="crm-focus-list"></div>
+          </article>
+
+          <article class="panel crm-learning-panel">
+            <div class="panel-head">
+              <div><div class="eyebrow">CRM ADATTIVO</div><h3>Come si sta modellando</h3></div>
+              <label class="crm-adapt-switch"><input id="crmAdaptToggle" type="checkbox"><span>Adattamento</span></label>
+            </div>
+            <div id="crmLearningPanel" class="crm-learning-summary"></div>
+            <button id="crmRelearnBtn" type="button" class="secondary">Ricalcola priorità CRM</button>
+          </article>
+        </section>
+
+        <section class="panel crm-modules-panel">
+          <div class="panel-head wrap">
+            <div><div class="eyebrow">MODULI PERSONALI</div><h3>La tua sequenza di lavoro</h3><p>I moduli fissati restano stabili. Gli altri possono salire o scendere in base al lavoro reale.</p></div>
+            <span id="crmModuleCount" class="future-chip">—</span>
+          </div>
+          <div id="crmAdaptiveModules" class="crm-adaptive-modules"></div>
+        </section>
+
+        <section class="crm-lower-grid">
+          <article class="panel">
+            <div class="panel-head"><div><div class="eyebrow">CLIENTI</div><h3>Relazioni da seguire</h3></div><button type="button" class="small-btn" data-crm-open="clients">Cliente 360 →</button></div>
+            <div id="crmClientList" class="crm-mini-list"></div>
+          </article>
+          <article class="panel">
+            <div class="panel-head"><div><div class="eyebrow">PIPELINE</div><h3>Opportunità assegnate</h3></div><button type="button" class="small-btn" data-crm-open="pipeline">Pipeline →</button></div>
+            <div id="crmPipelineList" class="crm-mini-list"></div>
+          </article>
+          <article class="panel">
+            <div class="panel-head"><div><div class="eyebrow">SEDI</div><h3>Il tuo perimetro operativo</h3></div></div>
+            <div id="crmOfficeList" class="crm-office-list"></div>
+          </article>
+        </section>
       </div>
     </section>
 
