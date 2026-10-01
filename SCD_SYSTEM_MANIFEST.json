@@ -2335,17 +2335,17 @@
         "SCD_DRIVE",
         "WEB_VERIFIED"
       ],
-      "contract": "LOCKED_OFFICIAL_ASSETS_REAL_OPPONENT_CRESTS_EXACT_SPONSOR_WORDMARKS_PROVENANCE_HASH"
+      "contract": "LOCKED_OFFICIAL_ASSETS_REAL_OPPONENT_CRESTS_EXACT_SPONSOR_WORDMARKS_VERIFIED_KITS_PROVENANCE_HASH"
     },
     {
       "id": "CAP-ADAPTIVE-EXPERIENCE",
       "domain": "EXPERIENCE",
       "required": true,
-      "state": "PARTIAL",
+      "state": "IMPLEMENTED",
       "sources": [
         "SOURCE-NONE"
       ],
-      "contract": "FEATURE_DETECTION_FLUID_LAYOUT_NO_FINGERPRINTING_REAL_TIME_QA"
+      "contract": "FEATURE_DETECTION_EIGHT_VIEWPORT_CLASSES_REAL_TIME_REFLOW_NO_FINGERPRINTING"
     },
     {
       "id": "CAP-GLOBAL-EXPERT-ROUTER",
@@ -2359,26 +2359,6 @@
         "R20"
       ],
       "contract": "MULTIDISCIPLINARY_ROUTING_CURRENT_SOURCE_VERIFICATION_AND_CONTROLLED_AUTONOMY"
-    },
-    {
-      "id": "CAP-ASSET-GUARDIAN",
-      "domain": "EXPERIENCE",
-      "required": true,
-      "state": "IMPLEMENTED",
-      "sources": [
-        "SOURCE-NONE"
-      ],
-      "contract": "LOCKED_OFFICIAL_ASSETS_REAL_OPPONENT_LOGOS_EXACT_SPONSOR_WORDMARKS_VERIFIED_KITS"
-    },
-    {
-      "id": "CAP-ADAPTIVE-RUNTIME",
-      "domain": "EXPERIENCE",
-      "required": true,
-      "state": "IMPLEMENTED",
-      "sources": [
-        "SOURCE-NONE"
-      ],
-      "contract": "CAPABILITY_FIRST_REALTIME_RESPONSIVE_NO_DEVICE_FINGERPRINTING"
     },
     {
       "id": "CAP-WORLD-RESEARCH-ENGINE",
