@@ -42,7 +42,9 @@ for(const viewport of viewports){
   await page.waitForSelector('.newsroom');
   await page.waitForSelector('.worlds-preview',{state:'attached'});
   await page.waitForSelector('.ng-value-engine',{state:'attached'});
-  await page.waitForFunction(()=>Boolean(window.SCDNextGen)&&Boolean(window.SCDMeta)&&Boolean(window.SCDTwin)&&Boolean(window.SCDExperience)&&Boolean(window.SCDAdaptive));
+  await page.waitForTimeout(700);
+  const runtimeFlags=await page.evaluate(()=>({nextGen:Boolean(window.SCDNextGen),meta:Boolean(window.SCDMeta),twin:Boolean(window.SCDTwin),experience:Boolean(window.SCDExperience),adaptive:Boolean(window.SCDAdaptive)}));
+  if(!Object.values(runtimeFlags).every(Boolean))throw new Error('runtime boot incomplete '+JSON.stringify(runtimeFlags)+' browserErrors='+errors.join(' | '));
   await page.waitForFunction(()=>document.documentElement.scrollWidth<=window.innerWidth+3);
 
   const firstView=await page.locator('.home-first').evaluate(el=>({top:el.getBoundingClientRect().top,bottom:el.getBoundingClientRect().bottom}));
