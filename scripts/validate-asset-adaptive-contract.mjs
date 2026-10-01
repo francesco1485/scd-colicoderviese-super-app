@@ -21,12 +21,21 @@ for(const asset of registry.locked_assets||[]){
 for(const folder of ['assets/kits/','assets/opponents/','assets/sponsors/']){
   if(registry.folders && !Object.values(registry.folders).includes(folder))fail('missing canonical folder declaration '+folder);
 }
+for(const field of ['SOURCE','VERIFIED_AT','SEASON_OR_VALIDITY','CONFIDENCE','MASTER_PATH']){
+  if(!(registry.provenance_required||[]).includes(field))fail('provenance fields missing '+field);
+}
+if(registry.rules?.opponent_crest!=='REAL_VERIFIED_ONLY')fail('opponent crest real-only rule missing');
+if(registry.rules?.sponsor_wordmark!=='EXACT_OFFICIAL_ONLY')fail('sponsor exact wordmark rule missing');
+if(registry.rules?.kit!=='APPROVED_REAL_REFERENCE_REQUIRED')fail('kit verified reference rule missing');
 
 if(manifest.visual_system?.asset_integrity?.official_asset_rule!=='NEVER_GENERATE_OR_REDRAW_WHEN_REAL_VERIFIABLE_ASSET_EXISTS')fail('official asset rule missing');
 if(manifest.visual_system?.adaptive_experience?.strategy!=='FEATURE_DETECTION_CONTAINER_RESPONSIVE')fail('adaptive feature detection contract missing');
 if(!html.includes('scd-adaptive-engine.js'))fail('adaptive runtime not mounted');
 for(const token of ['ResizeObserver','visualViewport','prefers-reduced-motion','prefers-contrast','devicePixelRatio']){
   if(!adaptive.includes(token))fail('adaptive signal missing '+token);
+}
+for(const token of ['PHONE_COMPACT','PHONE','PHONE_LARGE','TABLET','LAPTOP','DESKTOP','WIDE','ULTRAWIDE']){
+  if(!adaptive.includes(token))fail('adaptive viewport class missing '+token);
 }
 for(const forbidden of ['userAgent','canvas.toDataURL','AudioContext','enumerateDevices']){
   if(adaptive.includes(forbidden))fail('fingerprinting-adjacent token forbidden '+forbidden);
