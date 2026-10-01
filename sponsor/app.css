@@ -1276,3 +1276,265 @@ body{background:linear-gradient(180deg,#eef5fb,#f7fbfe 55%,#edf5fb);color:var(--
   .motion-profile-grid{grid-template-columns:1fr}
   .motion-spec-row{grid-template-columns:1fr 1fr 1fr}
 }
+
+
+/* ===== R51 LED PRODUCTION HUB ===== */
+.led-production-hub{
+  margin:14px 0 18px;
+  border:1px solid #cfe0ec;
+  border-radius:24px;
+  padding:20px;
+  background:
+    radial-gradient(circle at 92% 8%,rgba(32,183,230,.10),transparent 22%),
+    linear-gradient(180deg,#ffffff,#f5faff);
+  box-shadow:0 18px 52px rgba(3,47,87,.08);
+}
+.led-production-head{
+  display:flex;
+  justify-content:space-between;
+  gap:24px;
+  align-items:flex-start;
+  margin-bottom:16px;
+}
+.led-production-head>div:first-child{max-width:720px}
+.led-production-head small{
+  display:block;
+  font-size:.68rem;
+  font-weight:950;
+  letter-spacing:.13em;
+  color:#0879bc;
+}
+.led-production-head h2{
+  margin:5px 0 7px;
+  color:#073e70;
+  font-size:1.45rem;
+}
+.led-production-head p{
+  margin:0;
+  color:#6b8295;
+  line-height:1.52;
+  font-size:.82rem;
+}
+.led-production-specs{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(150px,1fr));
+  gap:7px;
+  min-width:min(520px,48%);
+}
+.led-production-specs span{
+  display:grid;
+  gap:3px;
+  padding:11px 12px;
+  border-radius:13px;
+  background:#062c52;
+  color:#fff;
+}
+.led-production-specs small{
+  font-size:.57rem;
+  letter-spacing:.10em;
+  color:#78d8f5;
+}
+.led-production-specs b{
+  font-size:.73rem;
+  line-height:1.25;
+}
+.led-production-layout{
+  display:grid;
+  grid-template-columns:minmax(220px,.34fr) minmax(0,1fr);
+  gap:12px;
+}
+.led-profile-list{
+  display:grid;
+  align-content:start;
+  gap:7px;
+}
+.led-profile-list button{
+  min-height:62px;
+  border:1px solid #d8e7f1;
+  background:#f7fbfe;
+  color:#16486f;
+  border-radius:14px;
+  padding:10px 12px;
+  text-align:left;
+  cursor:pointer;
+  transition:.18s;
+}
+.led-profile-list button:hover,
+.led-profile-list button:focus-visible{
+  transform:translateY(-1px);
+  border-color:#8bc7e8;
+  box-shadow:0 9px 24px rgba(3,58,100,.08);
+}
+.led-profile-list button.active{
+  background:linear-gradient(135deg,#064f8e,#078cc7);
+  color:#fff;
+  border-color:#0a87c4;
+}
+.led-profile-list span{
+  display:block;
+  font-size:.82rem;
+  font-weight:900;
+}
+.led-profile-list small{
+  display:block;
+  margin-top:4px;
+  font-size:.63rem;
+  line-height:1.25;
+  color:#7890a2;
+}
+.led-profile-list button.active small{color:#cceaf7}
+.led-profile-detail{
+  border:1px solid #d9e7f1;
+  border-radius:18px;
+  overflow:hidden;
+  background:#fff;
+}
+.led-detail-hero{
+  min-height:138px;
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:18px;
+  padding:20px;
+  color:#fff;
+  background:
+    linear-gradient(105deg,rgba(2,22,46,.96),rgba(5,81,134,.82)),
+    url('../assets/hero-colico.webp') center 45%/cover;
+}
+.led-detail-hero small{
+  font-size:.6rem;
+  letter-spacing:.11em;
+  color:#7bd9f5;
+  font-weight:900;
+}
+.led-detail-hero h3{
+  font-size:1.65rem;
+  line-height:1;
+  margin:5px 0;
+}
+.led-detail-hero p{
+  margin:0;
+  font-size:.82rem;
+  color:#dcebf4;
+}
+.led-master-state{
+  flex:0 0 auto;
+  border-radius:999px;
+  padding:8px 10px;
+  font-size:.63rem;
+  font-weight:950;
+  letter-spacing:.06em;
+  border:1px solid rgba(255,255,255,.18);
+}
+.led-master-state.blocked{
+  background:#fff2c7;
+  color:#7a5900;
+  border-color:#ffe285;
+}
+.led-master-state.ready{
+  background:#dff7eb;
+  color:#176a4d;
+  border-color:#a8e4c9;
+}
+.led-detail-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:0;
+}
+.led-detail-grid section{
+  min-height:120px;
+  padding:17px 18px;
+  border-right:1px solid #e6eef4;
+  border-bottom:1px solid #e6eef4;
+}
+.led-detail-grid section:nth-child(2n){border-right:0}
+.led-detail-grid small,
+.led-proof-plan>small,
+.led-production-gate small{
+  display:block;
+  font-size:.61rem;
+  letter-spacing:.11em;
+  color:#0a83c3;
+  font-weight:950;
+}
+.led-detail-grid p{
+  margin:7px 0 0;
+  color:#61798d;
+  font-size:.78rem;
+  line-height:1.52;
+}
+.led-proof-plan{
+  padding:16px 18px;
+  border-bottom:1px solid #e6eef4;
+  background:#f8fbfd;
+}
+.led-proof-plan>div{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+  margin-top:9px;
+}
+.led-proof-plan span{
+  padding:7px 9px;
+  border-radius:999px;
+  background:#e9f5fc;
+  color:#176a9a;
+  border:1px solid #cce6f5;
+  font-size:.67rem;
+  font-weight:800;
+}
+.led-production-gate{
+  display:flex;
+  justify-content:space-between;
+  gap:14px;
+  align-items:center;
+  padding:16px 18px;
+}
+.led-production-gate b{
+  display:block;
+  margin-top:3px;
+  font-size:.82rem;
+  color:#173f60;
+}
+.led-production-gate span{
+  display:block;
+  margin-top:2px;
+  font-size:.68rem;
+  color:#7a8f9f;
+}
+.led-detail-actions{
+  display:flex;
+  gap:7px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+.led-detail-actions button{min-height:40px}
+.led-load-error{
+  display:grid;
+  gap:3px;
+  padding:15px;
+  border-radius:14px;
+  background:#fff4e6;
+  border:1px solid #edd2a9;
+  color:#745221;
+}
+.led-load-error span{font-size:.72rem}
+
+@media(max-width:1150px){
+  .led-production-head{flex-direction:column}
+  .led-production-specs{min-width:0;width:100%}
+}
+@media(max-width:850px){
+  .led-production-layout{grid-template-columns:1fr}
+  .led-profile-list{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:620px){
+  .led-production-hub{padding:14px;border-radius:18px}
+  .led-production-specs{grid-template-columns:1fr}
+  .led-profile-list{grid-template-columns:1fr}
+  .led-detail-hero{align-items:flex-start;flex-direction:column}
+  .led-detail-grid{grid-template-columns:1fr}
+  .led-detail-grid section,.led-detail-grid section:nth-child(2n){border-right:0}
+  .led-production-gate{align-items:flex-start;flex-direction:column}
+  .led-detail-actions{justify-content:flex-start}
+}
