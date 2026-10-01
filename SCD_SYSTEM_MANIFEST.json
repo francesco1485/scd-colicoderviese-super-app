@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.9.0",
+    "version": "3.10.0",
     "effective_at": "2026-10-01",
     "status": "BINDING",
     "language": "it-IT",
@@ -856,7 +856,7 @@
         "id": "TUTTOCAMPO",
         "kind": "SPORT_DATA_SECONDARY",
         "trust": "STRUCTURED_SECONDARY",
-        "url": "https://www.tuttocampo.it/",
+        "url": "https://www.tuttocampo.it/Lombardia",
         "authority_domains": [
           "RESULTS",
           "STANDINGS",
@@ -865,7 +865,11 @@
           "PLAYERS",
           "STATS"
         ],
-        "use": "CROSS_CHECK_AND_ENRICHMENT"
+        "use": "CROSS_CHECK_AND_ENRICHMENT",
+        "rules": [
+          "SECONDARY_NOT_AUTHORITATIVE_WHEN_OFFICIAL_FEDERAL_DATA_EXISTS",
+          "CROSS_CHECK_BEFORE_PUBLISHING"
+        ]
       },
       {
         "id": "SCD_OFFICIAL_SITE",
@@ -1043,6 +1047,114 @@
           "no_stale_site_fillers",
           "no_invented_sport_facts"
         ]
+      },
+      {
+        "id": "SCD_TIKTOK",
+        "kind": "PUBLIC_OFFICIAL_SCD",
+        "trust": "PUBLIC_OFFICIAL_SCD",
+        "url": "https://www.tiktok.com/@s.c.d..colicoderv",
+        "authority_domains": [
+          "PUBLIC_SOCIAL_CONTENT",
+          "SHORT_VIDEO",
+          "CAMPAIGNS",
+          "COMMUNITY_STORYTELLING"
+        ],
+        "rules": [
+          "LINK_OR_AUTHORIZED_ADAPTER_ONLY",
+          "DO_NOT_INFER_PRIVATE_PROFILE_DATA",
+          "PUBLISH_ONLY_AUTHORIZED_CONTENT"
+        ],
+        "use": "MEDIA_HUB_AND_NEWSROOM_ENRICHMENT"
+      },
+      {
+        "id": "SCD_YOUTUBE",
+        "kind": "PUBLIC_OFFICIAL_SCD",
+        "trust": "PUBLIC_OFFICIAL_SCD",
+        "url": "https://www.youtube.com/@S.C.D.ColicoDerviese",
+        "authority_domains": [
+          "PUBLIC_VIDEO",
+          "MATCH_VIDEO",
+          "CLUB_STORYTELLING",
+          "EVENT_VIDEO"
+        ],
+        "rules": [
+          "LINK_OR_AUTHORIZED_ADAPTER_ONLY",
+          "VIDEO_METADATA_MUST_REMAIN_SOURCE_GROUNDED"
+        ],
+        "use": "MEDIA_HUB_AND_VIDEO_ARCHIVE"
+      },
+      {
+        "id": "SCD_PIXELLOT",
+        "kind": "PRIVATE_AUTHENTICATED_VIDEO_PLATFORM",
+        "trust": "INTERNAL_AUTHENTICATED",
+        "url": "https://you.pixellot.tv/my/events/videos/?limit=25",
+        "authority_domains": [
+          "MATCH_VIDEO_ARCHIVE",
+          "TRAINING_VIDEO_WHEN_AUTHORIZED",
+          "VIDEO_REVIEW"
+        ],
+        "rules": [
+          "AUTHENTICATED_ACCESS_ONLY",
+          "NEVER_EXPOSE_ACCOUNT_PRIVATE_LIBRARY_PUBLICLY",
+          "PUBLISH_CLIPS_ONLY_AFTER_RIGHTS_AND_PRIVACY_REVIEW",
+          "MINOR_MEDIA_REQUIRES_AUTHORIZATION"
+        ],
+        "use": "STAFF_VIDEO_HUB_AND_APPROVED_PUBLIC_CLIP_PIPELINE"
+      },
+      {
+        "id": "LECCO_CHANNEL",
+        "kind": "EXTERNAL_LOCAL_MEDIA",
+        "trust": "EXTERNAL_EDITORIAL",
+        "url": "https://www.youtube.com/@LeccoChannel",
+        "authority_domains": [
+          "LOCAL_SPORT_VIDEO",
+          "TERRITORIAL_COVERAGE",
+          "EXTERNAL_REPORTING"
+        ],
+        "rules": [
+          "NOT_OFFICIAL_SCD_SOURCE",
+          "CROSS_CHECK_BEFORE_REPUBLISHING",
+          "LINK_WITH_ATTRIBUTION"
+        ],
+        "use": "NEWSROOM_EXTERNAL_CROSS_CHECK_AND_MEDIA_DISCOVERY"
+      },
+      {
+        "id": "SPRINT_E_SPORT_LOMBARDIA",
+        "kind": "EXTERNAL_SPORT_MEDIA",
+        "trust": "EXTERNAL_EDITORIAL",
+        "url": "https://www.sprintesport.it/sezioni/265/sprint-e-sport-lombardia",
+        "authority_domains": [
+          "YOUTH_FOOTBALL_REPORTING",
+          "REGIONAL_FOOTBALL_NEWS",
+          "MATCH_REPORTING"
+        ],
+        "rules": [
+          "NOT_OFFICIAL_SCD_SOURCE",
+          "CROSS_CHECK_RESULTS_AND_CLAIMS_WITH_OFFICIAL_OR_STRUCTURED_SOURCES",
+          "LINK_WITH_ATTRIBUTION"
+        ],
+        "use": "NEWSROOM_EXTERNAL_CROSS_CHECK_AND_STORY_DISCOVERY"
+      },
+      {
+        "id": "SCD_ORGANIGRAMMA_2026_27",
+        "kind": "INTERNAL_VERIFIED_DOCUMENT",
+        "trust": "INTERNAL_VERIFIED",
+        "authority_domains": [
+          "ORGANIGRAMMA",
+          "SOCIETARY_ROLES",
+          "SPORTS_STAFF_ROLES",
+          "TEAM_STAFF_ASSIGNMENTS",
+          "TRANSPORT_COLLABORATORS"
+        ],
+        "rules": [
+          "PRIVATE_SOURCE_NOT_PUBLIC_DIRECTORY",
+          "CONTACTS_COMPENSATION_CONTRACT_FIELDS_NEVER_PUBLIC",
+          "MINIMIZE_PERSONAL_DATA_IN_UI",
+          "SOURCE_ROLE_DOES_NOT_AUTO_GRANT_APP_PERMISSION",
+          "APP_ROLE_ASSIGNMENT_REQUIRES_SERVER_SIDE_DIRECTION_APPROVAL",
+          "SEASON_SCOPED_2026_27"
+        ],
+        "use": "ROLE_AND_SCOPE_RECONCILIATION_FOR_PRIVATE_APP_AREAS"
       }
     ],
     "conflict_resolution": [
@@ -2487,6 +2599,36 @@
         "R20"
       ],
       "contract": "TALLY_STYLE_LINK_INTAKE_DRIVE_ROUTING_LOGGING_FAIL_CLOSED_UNTIL_SERVER_UPLOAD_ADAPTER"
+    },
+    {
+      "id": "CAP-MEDIA-SOCIAL-HUB",
+      "domain": "COMMUNICATION_MEDIA",
+      "required": true,
+      "state": "PARTIAL",
+      "sources": [
+        "SCD_OFFICIAL_SITE",
+        "SCD_FACEBOOK",
+        "SCD_INSTAGRAM",
+        "SCD_TIKTOK",
+        "SCD_YOUTUBE",
+        "SCD_PIXELLOT",
+        "LECCO_CHANNEL",
+        "SPRINT_E_SPORT_LOMBARDIA",
+        "CR_LOMBARDIA",
+        "TUTTOCAMPO"
+      ],
+      "contract": "OFFICIAL_CHANNELS_FIRST_PRIVATE_PIXELLOT_AUTH_EXTERNAL_MEDIA_ATTRIBUTED_NO_AUTO_REPUBLISH"
+    },
+    {
+      "id": "CAP-STAFF-ROLE-INGESTION",
+      "domain": "IDENTITY_ACCESS",
+      "required": true,
+      "state": "PARTIAL",
+      "sources": [
+        "SCD_ORGANIGRAMMA_2026_27",
+        "R20"
+      ],
+      "contract": "PARSE_INTERNAL_ORGANIGRAMMA_MAP_FUNCTIONAL_ROLE_AND_TEAM_SCOPE_DIRECTION_APPROVAL_REQUIRED"
     }
   ],
   "known_noncompliance": [
@@ -3068,8 +3210,10 @@
         "NEXT_MATCH",
         "UPCOMING_EVENTS",
         "WEEKLY_NEWS",
+        "MEDIA_HUB",
         "COMMUNITY_POLL",
         "SPONSOR_RAIL",
+        "INSTITUTIONAL_STRIP",
         "JOIN_CLUB"
       ],
       "global_search": [
@@ -3110,6 +3254,67 @@
         "OTHER_AUTHORIZED"
       ],
       "role_assignment": "DIRECTION_ONLY"
+    },
+    "media_and_social_hub": {
+      "state": "SOURCE_REGISTRY_READY_UI_PUBLIC_LINKS",
+      "official_channels": [
+        "SCD_OFFICIAL_SITE",
+        "SCD_FACEBOOK",
+        "SCD_INSTAGRAM",
+        "SCD_TIKTOK",
+        "SCD_YOUTUBE"
+      ],
+      "authenticated_video": [
+        "SCD_PIXELLOT"
+      ],
+      "institutional_sport_sources": [
+        "FIGC",
+        "LND",
+        "CR_LOMBARDIA",
+        "SGS"
+      ],
+      "secondary_sport_data": [
+        "TUTTOCAMPO"
+      ],
+      "external_editorial_sources": [
+        "LECCO_CHANNEL",
+        "SPRINT_E_SPORT_LOMBARDIA"
+      ],
+      "public_home_policy": "SHOW_OFFICIAL_CHANNELS_AND_APPROVED_PUBLIC_MEDIA_ONLY",
+      "newsroom_policy": "SOURCE_GROUNDED_WITH_OFFICIAL_PRIORITY_AND_EXTERNAL_ATTRIBUTION",
+      "video_policy": "PUBLIC_VIDEO_ONLY_IF_PUBLIC_OR_EXPLICITLY_APPROVED_FOR_PUBLICATION",
+      "minors_policy": "NO_PUBLICATION_WITHOUT_REQUIRED_MEDIA_AUTHORIZATION",
+      "pixellot_policy": "PRIVATE_BY_DEFAULT_AUTHORIZED_STAFF_ONLY",
+      "no_auto_republish": true
+    },
+    "staff_role_ingestion": {
+      "source": "SCD_ORGANIGRAMMA_2026_27",
+      "season": "2026/27",
+      "state": "SOURCE_PARSED_MAPPING_PENDING_AUTH_REVIEW",
+      "detected_sections": [
+        "ORGANI_SOCIETARI",
+        "DELEGHE_DECISIONALI",
+        "CONSULENZA_ESTERNA",
+        "CARICHE_SPORTIVE_FIGC",
+        "DIRIGENTI_COLLABORATORI_STRUTTURA",
+        "DIRIGENTI_ACCOMPAGNATORI",
+        "PULMINI",
+        "ALLENATORI_CON_PATENTINO",
+        "STAFF_E_ATLETI_PRIMA_SQUADRA",
+        "STAFF_E_ATLETI_JUNIORES_ELITE",
+        "STAFF_E_ATLETI_U16_ELITE",
+        "STAFF_E_ATLETI_U15_PROVINCIALE",
+        "STAFF_E_ATLETI_U13_PROVINCIALE",
+        "STAFF_E_ATLETI_U12_PROVINCIALE",
+        "STAFF_E_ATLETI_U11_U10_U9"
+      ],
+      "app_mapping_policy": "FUNCTIONAL_ROLE_PLUS_TEAM_SCOPE_NOT_RAW_SPREADSHEET_LABEL",
+      "public_people_search": false,
+      "public_profile_requires_explicit_authorization": true,
+      "contacts_private": true,
+      "compensation_private": true,
+      "contract_status_private": true,
+      "no_automatic_permission_grant": true
     }
   },
   "research_intelligence": {
