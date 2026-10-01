@@ -24,6 +24,7 @@
 
     <nav class="main-nav" id="mainNav">
       <button class="nav-link active" data-view="home"><i data-icon="home"></i><span>Dashboard</span></button>
+      <button class="nav-link" data-view="crm"><i data-icon="users"></i><span>CRM</span></button>
       <button class="nav-link" data-view="sponsor"><i data-icon="users"></i><span>Sponsor</span></button>
       <button class="nav-link" data-view="contratti"><i data-icon="file"></i><span>Contratti</span></button>
       <button class="nav-link" data-view="proposte"><i data-icon="proposal"></i><span>Proposte</span></button>
@@ -195,6 +196,20 @@
       </section>
     </section>
 
+
+    <section class="view" id="view-crm">
+      <div class="page-head"><div><small>CRM RELAZIONALE SCD</small><h1>Persone, aziende e relazioni</h1><p>Un profilo unico per ogni soggetto, con timeline, touchpoint, opportunità, attività e prossima azione. I dati arrivano dai master canonici.</p></div><button class="btn-yellow" id="crmRefresh">Aggiorna CRM</button></div>
+      <div class="report-grid" id="crmKpis"></div>
+      <div class="page-tools">
+        <input class="filter-input" id="crmSearch" placeholder="Cerca persona, azienda, categoria, tag, località…">
+        <select id="crmPolicy"><option value="">Tutte le policy</option><option value="MANUALE">Manuale</option><option value="SOSPESO_NON_INVIARE">Sospeso - non inviare</option><option value="NO_CONTACT">No contact</option><option value="AUTO_OK">Auto OK</option></select>
+      </div>
+      <div class="crm-layout">
+        <div class="data-table" id="crmTable"></div>
+        <aside class="detail-panel crm-inspector" id="crmInspector"><h3>Profilo CRM</h3><p>Seleziona una persona o azienda per vedere il profilo relazionale completo.</p></aside>
+      </div>
+    </section>
+
     <section class="view" id="view-sponsor">
       <div class="page-head"><div><small>PORTAFOGLIO SPONSOR</small><h1>Sponsor attuali</h1><p>Una scheda unica per rapporto, contratto, asset, documenti, contatti e rinnovi.</p></div><button class="btn-yellow" id="newSponsorBtn">+ Nuovo sponsor</button></div>
       <div class="page-tools"><input class="filter-input" id="sponsorFilter" placeholder="Cerca sponsor…"><select id="sponsorStatus"><option value="">Tutti gli stati</option><option>DOCUMENTATO</option><option>ECONOMICAMENTE</option><option>PARTNER TECNICO</option></select></div>
@@ -298,6 +313,6 @@
   </div>
 </div>
 
-<script src="./app.js?v=9.0.0"></script>
+<script src="./app.js?v=10.0.0"></script>
 </body>
 </html>
