@@ -86,7 +86,7 @@ for(const token of [
 
 for(const token of [
   'Club Standard 360°',
-  'Activation Studio',
+  'Creative Factory',
   'SPONSOR ACTIVATION DESIGN',
   'id="activationSponsor"',
   'id="partnerWallGrid"',
