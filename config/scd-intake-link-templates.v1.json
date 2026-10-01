@@ -1,0 +1,208 @@
+{
+  "version": "1.0.0",
+  "effective_at": "2026-10-01",
+  "upload_runtime": "BLOCKED_UNTIL_VERIFIED_DRIVE_ADAPTER",
+  "templates": [
+    {
+      "id": "LINK-TESS-001",
+      "slug": "tesseramenti",
+      "title": "Invio documenti tesseramento",
+      "category": "TESSERAMENTI",
+      "audience": "FAMIGLIA_ATLETA",
+      "access_mode": "TOKENIZED",
+      "enabled": true,
+      "max_files": 6,
+      "accepted_types": [
+        "PDF",
+        "JPG",
+        "JPEG",
+        "PNG"
+      ],
+      "document_types": [
+        "Documento identità",
+        "Modulo tesseramento",
+        "Permesso / nulla osta",
+        "Altro documento tesseramento"
+      ],
+      "routing_rule_id": "RR-TESS-001"
+    },
+    {
+      "id": "LINK-MED-001",
+      "slug": "certificato-medico",
+      "title": "Invio certificato medico",
+      "category": "CERTIFICATI MEDICI",
+      "audience": "FAMIGLIA_ATLETA",
+      "access_mode": "TOKENIZED",
+      "enabled": true,
+      "max_files": 2,
+      "accepted_types": [
+        "PDF",
+        "JPG",
+        "JPEG",
+        "PNG"
+      ],
+      "document_types": [
+        "Certificato medico agonistico",
+        "Certificato medico non agonistico"
+      ],
+      "routing_rule_id": "RR-MED-001",
+      "sensitive": true
+    },
+    {
+      "id": "LINK-TOUR-001",
+      "slug": "tornei-eventi",
+      "title": "Documenti torneo o evento",
+      "category": "TORNEI & EVENTI",
+      "audience": "STAFF_DIRIGENTI",
+      "access_mode": "TOKENIZED",
+      "enabled": true,
+      "max_files": 10,
+      "accepted_types": [
+        "PDF",
+        "XLSX",
+        "DOCX",
+        "JPG",
+        "JPEG",
+        "PNG"
+      ],
+      "document_types": [
+        "Iscrizione",
+        "Regolamento",
+        "Distinta",
+        "Logistica",
+        "Pasti",
+        "Altro"
+      ],
+      "routing_rule_id": "RR-TOUR-001"
+    },
+    {
+      "id": "LINK-TRANS-001",
+      "slug": "trasporti",
+      "title": "Richiesta trasporto o pulmino",
+      "category": "TRASPORTI",
+      "audience": "FAMIGLIA_STAFF",
+      "access_mode": "TOKENIZED",
+      "enabled": true,
+      "max_files": 3,
+      "accepted_types": [
+        "PDF",
+        "JPG",
+        "JPEG",
+        "PNG"
+      ],
+      "document_types": [
+        "Richiesta trasporto",
+        "Autorizzazione",
+        "Delega",
+        "Altro"
+      ],
+      "routing_rule_id": "RR-TRANS-001"
+    },
+    {
+      "id": "LINK-SP-001",
+      "slug": "partner",
+      "title": "Documenti sponsor o partner",
+      "category": "SPONSOR & PARTNER",
+      "audience": "PARTNER",
+      "access_mode": "TOKENIZED",
+      "enabled": true,
+      "max_files": 10,
+      "accepted_types": [
+        "PDF",
+        "DOCX",
+        "XLSX",
+        "JPG",
+        "JPEG",
+        "PNG",
+        "SVG"
+      ],
+      "document_types": [
+        "Logo ufficiale",
+        "Contratto",
+        "Offerta",
+        "Materiale grafico",
+        "Fattura",
+        "Altro"
+      ],
+      "routing_rule_id": "RR-SPONSOR-001"
+    },
+    {
+      "id": "LINK-STAFF-001",
+      "slug": "staff",
+      "title": "Documenti staff e tecnici",
+      "category": "STAFF & TECNICI",
+      "audience": "STAFF",
+      "access_mode": "TOKENIZED",
+      "enabled": true,
+      "max_files": 8,
+      "accepted_types": [
+        "PDF",
+        "DOCX",
+        "JPG",
+        "JPEG",
+        "PNG"
+      ],
+      "document_types": [
+        "Contratto",
+        "Qualifica",
+        "Documento",
+        "Certificazione",
+        "Altro"
+      ],
+      "routing_rule_id": "RR-STAFF-001"
+    },
+    {
+      "id": "LINK-ADMIN-001",
+      "slug": "amministrazione",
+      "title": "Invio documenti amministrativi",
+      "category": "AMMINISTRAZIONE",
+      "audience": "SEGRETERIA_DIREZIONE",
+      "access_mode": "TOKENIZED",
+      "enabled": true,
+      "max_files": 10,
+      "accepted_types": [
+        "PDF",
+        "DOCX",
+        "XLSX",
+        "JPG",
+        "JPEG",
+        "PNG"
+      ],
+      "document_types": [
+        "Fattura",
+        "Contratto",
+        "Ricevuta",
+        "Verbale",
+        "Dichiarazione",
+        "Altro"
+      ],
+      "routing_rule_id": "RR-ADMIN-001"
+    },
+    {
+      "id": "LINK-PLANT-001",
+      "slug": "impianti",
+      "title": "Segnalazioni e documenti impianti",
+      "category": "IMPIANTI",
+      "audience": "STAFF_IMPIANTI",
+      "access_mode": "TOKENIZED",
+      "enabled": true,
+      "max_files": 8,
+      "accepted_types": [
+        "PDF",
+        "DOCX",
+        "XLSX",
+        "JPG",
+        "JPEG",
+        "PNG"
+      ],
+      "document_types": [
+        "Segnalazione",
+        "Preventivo",
+        "Manutenzione",
+        "Omologazione",
+        "Altro"
+      ],
+      "routing_rule_id": "RR-PLANT-001"
+    }
+  ]
+}
