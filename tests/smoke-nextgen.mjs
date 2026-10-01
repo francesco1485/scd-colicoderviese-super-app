@@ -28,7 +28,9 @@ for(const viewport of viewports){
   await page.waitForSelector('#publicSearchInput');
   await page.waitForSelector('#matchCenter');
   await page.waitForSelector('#upcomingEvents');
+  await page.waitForSelector('#mediaHub');
   await page.waitForSelector('#communityPulse');
+  await page.waitForSelector('#institutionalStrip');
   await page.waitForSelector('#sponsorRail');
   await page.waitForSelector('#joinClub');
   await page.waitForSelector('.hero-synth',{state:'attached'});
@@ -45,7 +47,13 @@ for(const viewport of viewports){
   if(firstView.top>300)throw new Error('current-week home entry not visible early enough: '+firstView.top);
   const homeBeforeHero=await page.evaluate(()=>document.querySelector('.home-first').compareDocumentPosition(document.querySelector('.hero')) & Node.DOCUMENT_POSITION_FOLLOWING);
   if(!homeBeforeHero)throw new Error('weekly home entry must precede secondary hero');
-  const navLabels=await page.locator('.bottom-nav button').allTextContents();
+  const officialLinks=await page.locator('#mediaHub .official-channels a').count();
+  if(officialLinks!==5)throw new Error('Media Hub official links mismatch: '+officialLinks);
+  const institutionalLogos=await page.locator('#institutionalStrip img').count();
+  if(institutionalLogos!==3)throw new Error('institutional logos mismatch: '+institutionalLogos);
+  const skyAsset=await page.locator('#mirrorFab img').getAttribute('src');
+  if(!/assets\/sky\.png$/.test(String(skyAsset||'')))throw new Error('official Sky mascot missing from chatbot');
+    const navLabels=await page.locator('.bottom-nav button').allTextContents();
   for(const label of ['Home','Calendario','Squadre','Community','Profilo'])if(!navLabels.some(x=>x.includes(label)))throw new Error('mobile nav missing '+label);
   const visibleLegacy=await page.evaluate(()=>['.home-secondary-hero','.ng-command-ring','.pulse-strip','.ng-constellation','.worlds-preview','.ng-value-engine'].filter(sel=>{const el=document.querySelector(sel);return el&&getComputedStyle(el).display!=='none'}));
   if(visibleLegacy.length)throw new Error('secondary clutter visible on public home: '+visibleLegacy.join(','));

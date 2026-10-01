@@ -20,7 +20,7 @@ if(!html.includes('SCD MIRROR')) fail('Mirror surface missing');
 if(!html.includes('PRIVATE DESK')) fail('Private Desk missing');
 if(!html.includes('SCD HOME · QUESTA SETTIMANA') && !html.includes('SCD WEEKLY RADAR')) fail('current-week surface missing');
 if(!html.includes('SCD AI NEWSROOM')) fail('AI Newsroom missing');
-for(const token of ['SCD HOME · QUESTA SETTIMANA','publicSearchInput','matchCenter','upcomingEvents','communityPulse','sponsorRail','joinClub','data-public-action="calendar"','avatarSearch','SKY']){
+for(const token of ['SCD HOME · QUESTA SETTIMANA','publicSearchInput','matchCenter','upcomingEvents','mediaHub','communityPulse','sponsorRail','institutionalStrip','joinClub','data-public-action="calendar"','avatarSearch','SKY','./assets/sky.png']){
   if(!html.includes(token)) fail('current-week public entry missing '+token);
 }
 

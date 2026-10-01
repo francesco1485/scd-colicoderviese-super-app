@@ -3,6 +3,13 @@
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const API_BASE='';
 const state={view:'pulse',filter:'ALL',events:[],upcoming:[],news:null,sportData:{results:[],standings:[],headToHead:[]},partners:[],publicProfiles:[],nextMatch:null};
+const officialChannels=[
+ {id:'site',label:'Sito ufficiale',url:'https://www.colicoderviese.it/',terms:'sito web comunicazioni servizi'},
+ {id:'facebook',label:'Facebook SCD',url:'https://www.facebook.com/ColicoDerviese',terms:'facebook social pagina'},
+ {id:'instagram',label:'Instagram SCD',url:'https://www.instagram.com/s.c.d.colicoderviese/',terms:'instagram social foto reel'},
+ {id:'tiktok',label:'TikTok SCD',url:'https://www.tiktok.com/@s.c.d..colicoderv',terms:'tiktok social video'},
+ {id:'youtube',label:'YouTube SCD',url:'https://www.youtube.com/@S.C.D.ColicoDerviese',terms:'youtube video partite club'}
+];
 const toast=(t)=>{const el=$('#toast');if(!el)return;el.textContent=t;el.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('show'),2200)};
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const norm=s=>String(s??'').toLocaleLowerCase('it-IT').normalize('NFD').replace(/[\u0300-\u036f]/g,'');
@@ -129,6 +136,7 @@ function buildSearchIndex(){
  (state.news?.cards||[]).forEach((x,i)=>items.push({kind:'NEWS',title:x.title,meta:x.category||'SCD Newsroom',action:'news',id:String(i),terms:[x.title,x.dek,x.body,x.category]}));
  [...new Set(state.events.flatMap(x=>[x.team,x.category]).filter(Boolean))].forEach(x=>items.push({kind:'SQUADRA',title:x,meta:'Calendario e contenuti pubblici',action:'team',id:x,terms:[x]}));
  state.publicProfiles.forEach(x=>items.push({kind:'PROFILO PUBBLICO',title:x.displayName,meta:[x.role,x.team].filter(Boolean).join(' · '),action:'profile',id:x.id,terms:[x.displayName,x.role,x.team]}));
+ officialChannels.forEach(x=>items.push({kind:'CANALE UFFICIALE',title:x.label,meta:'SCD ColicoDerviese',action:'channel',id:x.id,terms:[x.label,x.terms]}));
  return items;
 }
 function runSearch(q){
@@ -146,6 +154,7 @@ function handleSearchResult(kind,id){
  if(kind==='team'){const input=$('#publicSearchInput');if(input){input.value=id;runSearch(id)}return}
  if(kind==='news'){document.querySelector('.newsroom')?.scrollIntoView({behavior:'smooth'});return}
  if(kind==='profile'){openPanel('Profilo pubblico','<div class="panel-detail"><b>Profilo autorizzato</b><p>Le informazioni mostrate rispettano la visibilità concessa dalla Società.</p></div>')}
+ if(kind==='channel'){const ch=officialChannels.find(x=>x.id===id);if(ch)window.open(ch.url,'_blank','noopener,noreferrer')}
 }
 $('#publicSearchInput')?.addEventListener('input',e=>runSearch(e.target.value));
 $('#clearPublicSearch')?.addEventListener('click',()=>{const input=$('#publicSearchInput'),box=$('#publicSearchResults');if(input){input.value='';input.focus()}if(box){box.hidden=true;box.innerHTML=''}});
@@ -272,8 +281,8 @@ $('#missionBtn')?.addEventListener('click',()=>{
 });
 
 const mirror=$('#mirror');
-function openMirror(){mirror.classList.add('open');mirror.setAttribute('aria-hidden','false');setTimeout(()=>$('#mirrorInput')?.focus(),200)}
-function closeMirror(){mirror.classList.remove('open');mirror.setAttribute('aria-hidden','true')}
+function openMirror(){mirror.classList.add('open');mirror.setAttribute('aria-hidden','false');const fab=$('#mirrorFab');if(fab)fab.hidden=true;setTimeout(()=>$('#mirrorInput')?.focus(),200)}
+function closeMirror(){mirror.classList.remove('open');mirror.setAttribute('aria-hidden','true');const fab=$('#mirrorFab');if(fab)fab.hidden=false}
 ['#mirrorFab','#openMirrorFromCard','#openMirrorDesk','#ngMirrorQuick'].forEach(s=>$(s)?.addEventListener('click',openMirror));$('#closeMirror')?.addEventListener('click',closeMirror);
 function mirrorReply(q){
  const x=norm(q);
@@ -282,6 +291,7 @@ function mirrorReply(q){
  if(/tesser/.test(x))return 'Per il tesseramento apri “Entra nel Club” e scegli Tesserato / Atleta. La richiesta non attribuisce automaticamente la qualità di socio.';
  if(/tifos/.test(x))return 'Apri “Entra nel Club” e scegli Diventa tifoso: nasce un profilo base, senza ruoli riservati automatici.';
  if(/sponsor|partner/.test(x))return 'La barra Partner mostra solo soggetti verificati dalla fonte collegata. Per una proposta usa Sponsor / Partner in “Entra nel Club”.';
+ if(/youtube|video|instagram|facebook|tiktok|social|media/.test(x)){document.querySelector('#mediaHub')?.scrollIntoView({behavior:'smooth'});return 'Ti porto al Media Hub: lì trovi i canali ufficiali SCD separati dalle fonti esterne da verificare.';}
  if(/segreter|contatt/.test(x))return 'Puoi inviare una richiesta dal percorso “Altro profilo” oppure usare i recapiti ufficiali della Segreteria presenti nei canali societari.';
  if(/calend|allen/.test(x))return 'Apri Calendario: la settimana corrente resta il punto di partenza e non vengono inventati eventi mancanti.';
  if(/document|certificat/.test(x))return 'I documenti riservati restano nel Private Desk e richiedono ruolo e autorizzazione.';
