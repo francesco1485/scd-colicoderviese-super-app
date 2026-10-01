@@ -6,8 +6,8 @@
   "scope":"./",
   "display":"standalone",
   "orientation":"portrait-primary",
-  "background_color":"#031126",
-  "theme_color":"#04162f",
+  "background_color":"#eef5fb",
+  "theme_color":"#062d61",
   "description":"Sport, community, servizi, identità digitale e Private Desk SCD ColicoDerviese.",
   "categories":["sports","social","productivity"],
   "icons":[
