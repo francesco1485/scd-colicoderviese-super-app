@@ -127,6 +127,37 @@ for(const viewport of viewports){
   await page.close();
 }
 
+// Sponsor public journey: real browser interaction on desktop and mobile.
+for(const viewport of [{width:390,height:844},{width:1440,height:900}]){
+  const sponsor=await browser.newPage({viewport});
+  const sponsorErrors=[];
+  sponsor.on('pageerror',e=>sponsorErrors.push(String(e)));
+  sponsor.on('console',m=>{if(m.type()==='error')sponsorErrors.push('console: '+m.text())});
+
+  await sponsor.goto(base+'/sponsor/',{waitUntil:'domcontentloaded',timeout:30000});
+  await sponsor.waitForSelector('.ledwall-launch');
+  await sponsor.waitForSelector('.opportunity-grid.extended');
+  await sponsor.waitForSelector('#ecosistema');
+  await sponsor.waitForSelector('#convenzioni');
+
+  await sponsor.click('[data-open="access"]');
+  await sponsor.waitForSelector('#accessModal:not([hidden])');
+  await sponsor.click('#accessModal [data-close]');
+  await sponsor.waitForSelector('#accessModal',{state:'hidden'});
+
+  await sponsor.click('[data-open="login"]');
+  await sponsor.waitForSelector('#loginModal:not([hidden])');
+  await sponsor.click('#loginModal [data-close]');
+  await sponsor.waitForSelector('#loginModal',{state:'hidden'});
+
+  const overflow=await sponsor.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+3);
+  if(overflow)throw new Error('sponsor public horizontal overflow '+viewport.width+'px');
+  if(sponsorErrors.length)throw new Error('sponsor browser errors '+viewport.width+'px: '+sponsorErrors.join(' | '));
+
+  await sponsor.screenshot({path:'test-output/sponsor-'+viewport.width+'x'+viewport.height+'.png',fullPage:true});
+  await sponsor.close();
+}
+
 const api=await browser.newPage();
 const health=await api.request.get(base+'/health');
 if(!health.ok())throw new Error('health endpoint failed '+health.status());
