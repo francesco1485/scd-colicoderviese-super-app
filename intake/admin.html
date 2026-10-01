@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#07111c">
+  <title>SCD Link Factory</title>
+  <link rel="icon" href="../assets/logo-scd.png">
+  <link rel="stylesheet" href="./intake.css?v=1.1.0">
+</head>
+<body>
+  <main class="shell">
+    <header class="brand">
+      <img src="../assets/logo-scd.png" alt="SCD ColicoDerviese">
+      <div><b>SCD LINK FACTORY</b><span>Direzione · Intake Hub</span></div>
+    </header>
+
+    <section class="panel">
+      <div class="status-line"><span class="dot"></span><span id="adminStatus">Verifico sessione e moduli…</span></div>
+      <p class="eyebrow">DIREZIONE</p>
+      <h1>Crea il link giusto.<br>Il routing resta dietro.</h1>
+      <p class="lead">Scegli il tipo di pratica e la scadenza. Il link è firmato, non espone cartelle Drive e non contiene dati personali.</p>
+
+      <form id="linkFactory" hidden>
+        <label>Modulo
+          <select id="templateSelect"></select>
+        </label>
+        <label>Validità del link
+          <select id="expiry">
+            <option value="24">24 ore</option>
+            <option value="72" selected>3 giorni</option>
+            <option value="168">7 giorni</option>
+            <option value="336">14 giorni</option>
+            <option value="720">30 giorni</option>
+          </select>
+        </label>
+        <div class="factory-meta" id="factoryMeta"></div>
+        <button type="submit">Genera link protetto</button>
+      </form>
+
+      <section class="link-result" id="linkResult" hidden>
+        <span>LINK GENERATO</span>
+        <textarea id="generatedLink" readonly rows="4"></textarea>
+        <div class="result-actions">
+          <button type="button" id="copyLink">Copia link</button>
+          <a id="openLink" target="_blank" rel="noopener">Apri prova</a>
+        </div>
+        <small id="linkWarning"></small>
+      </section>
+
+      <div class="admin-block" id="adminBlock" hidden>
+        <b>Accesso Direzione richiesto</b>
+        <p>Apri prima l'Area riservata SCD e accedi con un profilo Direzione/Admin. La pagina non accetta scorciatoie creative, che per una volta è una qualità.</p>
+        <a href="../#desk">Torna al Private Desk</a>
+      </div>
+    </section>
+
+    <footer>
+      <a href="../#desk">Private Desk</a>
+      <span>Link firmati · nessun ID Drive esposto</span>
+    </footer>
+  </main>
+  <script src="./admin.js?v=1.1.0" defer></script>
+</body>
+</html>

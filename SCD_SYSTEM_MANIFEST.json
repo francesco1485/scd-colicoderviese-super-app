@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.6.0",
+    "version": "3.7.0",
     "effective_at": "2026-10-01",
     "status": "BINDING",
     "language": "it-IT",
@@ -597,7 +597,7 @@
       ]
     },
     "intake_hub": {
-      "state": "FOUNDATION_IMPLEMENTED_RUNTIME_UPLOAD_BLOCKED",
+      "state": "LINK_FACTORY_IMPLEMENTED_RUNTIME_UPLOAD_BLOCKED",
       "root_folder_id": "1VTJJTFYN2PWfkYeTF24XayGMn2wHcu0U",
       "log_sheet_id": "1ruGLKpFYdirMV6NvOHWoCsSxy3f7Yd9VMfCykuQrmgY",
       "folder_model": [
@@ -645,7 +645,17 @@
       "fail_closed": true,
       "safeguarding_separate": true,
       "no_ephemeral_storage_as_final": true,
-      "admin_configurable": true
+      "admin_configurable": true,
+      "link_factory": {
+        "state": "IMPLEMENTED",
+        "signing": "HMAC_SHA256_SERVER_SIDE",
+        "token_payload": "NO_PII",
+        "max_ttl_days": 30,
+        "admin_scope": "DIRECTION_OR_ADMIN",
+        "public_form_resolution": "SERVER_VERIFIED_TOKEN",
+        "audit_sink": "R20_TELEMETRY_BEST_EFFORT",
+        "upload_state": "BLOCKED_UNTIL_DRIVE_ADAPTER_VERIFIED"
+      }
     }
   },
   "source_registry": {
@@ -2505,9 +2515,9 @@
     {
       "id": "GAP-INTAKE-001",
       "severity": "HIGH",
-      "statement": "SCD Intake Hub Drive structure and log registry exist, but the production runtime has no verified server-side Drive upload/router adapter.",
-      "required_fix": "Implement authenticated server-side upload adapter with MIME/size validation, routing rules, logging, rate limiting and scoped access; verify in staging before exposing public upload links.",
-      "safe_runtime_behavior": "Keep file upload links disabled/fail-closed; do not store final documents on ephemeral Render disk."
+      "statement": "Signed Intake Link Factory is implemented, but final document upload/routing to Google Drive is not yet connected server-side.",
+      "required_fix": "Implement authenticated server-side Drive adapter with MIME/size validation, routing, audit persistence and rate limiting; then enable upload flag.",
+      "safe_runtime_behavior": "Signed links can be issued and verified; file controls and submission remain disabled."
     }
   ],
   "development_contract": {
