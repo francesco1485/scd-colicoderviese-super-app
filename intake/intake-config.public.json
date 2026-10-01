@@ -1,0 +1,174 @@
+{
+  "version": "1.0.0",
+  "runtimeState": "UPLOAD_ADAPTER_NOT_CONNECTED",
+  "forms": {
+    "tesseramenti": {
+      "id": "LINK-TESS-001",
+      "title": "Invio documenti tesseramento",
+      "category": "TESSERAMENTI",
+      "access": "AUTHENTICATED",
+      "accepted": [
+        "PDF",
+        "JPG",
+        "JPEG",
+        "PNG"
+      ],
+      "maxFiles": 6,
+      "types": [
+        "Documento identità",
+        "Modulo tesseramento",
+        "Permesso / nulla osta",
+        "Altro documento tesseramento"
+      ]
+    },
+    "certificato-medico": {
+      "id": "LINK-MED-001",
+      "title": "Invio certificato medico",
+      "category": "CERTIFICATI MEDICI",
+      "access": "AUTHENTICATED",
+      "accepted": [
+        "PDF",
+        "JPG",
+        "JPEG",
+        "PNG"
+      ],
+      "maxFiles": 2,
+      "types": [
+        "Certificato medico agonistico",
+        "Certificato medico non agonistico"
+      ]
+    },
+    "tornei-eventi": {
+      "id": "LINK-TOUR-001",
+      "title": "Documenti torneo o evento",
+      "category": "TORNEI & EVENTI",
+      "access": "ROLE_SCOPED",
+      "accepted": [
+        "PDF",
+        "XLSX",
+        "DOCX",
+        "JPG",
+        "JPEG",
+        "PNG"
+      ],
+      "maxFiles": 10,
+      "types": [
+        "Iscrizione",
+        "Regolamento",
+        "Distinta",
+        "Logistica",
+        "Pasti",
+        "Altro"
+      ]
+    },
+    "trasporti": {
+      "id": "LINK-TRANS-001",
+      "title": "Richiesta trasporto o pulmino",
+      "category": "TRASPORTI",
+      "access": "AUTHENTICATED",
+      "accepted": [
+        "PDF",
+        "JPG",
+        "JPEG",
+        "PNG"
+      ],
+      "maxFiles": 3,
+      "types": [
+        "Richiesta trasporto",
+        "Autorizzazione",
+        "Delega",
+        "Altro"
+      ]
+    },
+    "partner": {
+      "id": "LINK-SP-001",
+      "title": "Documenti sponsor o partner",
+      "category": "SPONSOR & PARTNER",
+      "access": "TOKENIZED",
+      "accepted": [
+        "PDF",
+        "DOCX",
+        "XLSX",
+        "JPG",
+        "JPEG",
+        "PNG",
+        "SVG"
+      ],
+      "maxFiles": 10,
+      "types": [
+        "Logo ufficiale",
+        "Contratto",
+        "Offerta",
+        "Materiale grafico",
+        "Fattura",
+        "Altro"
+      ]
+    },
+    "staff": {
+      "id": "LINK-STAFF-001",
+      "title": "Documenti staff e tecnici",
+      "category": "STAFF & TECNICI",
+      "access": "AUTHENTICATED",
+      "accepted": [
+        "PDF",
+        "DOCX",
+        "JPG",
+        "JPEG",
+        "PNG"
+      ],
+      "maxFiles": 8,
+      "types": [
+        "Contratto",
+        "Qualifica",
+        "Documento",
+        "Certificazione",
+        "Altro"
+      ]
+    },
+    "amministrazione": {
+      "id": "LINK-ADMIN-001",
+      "title": "Invio documenti amministrativi",
+      "category": "AMMINISTRAZIONE",
+      "access": "ROLE_SCOPED",
+      "accepted": [
+        "PDF",
+        "DOCX",
+        "XLSX",
+        "JPG",
+        "JPEG",
+        "PNG"
+      ],
+      "maxFiles": 10,
+      "types": [
+        "Fattura",
+        "Contratto",
+        "Ricevuta",
+        "Verbale",
+        "Dichiarazione",
+        "Altro"
+      ]
+    },
+    "impianti": {
+      "id": "LINK-PLANT-001",
+      "title": "Segnalazioni e documenti impianti",
+      "category": "IMPIANTI",
+      "access": "ROLE_SCOPED",
+      "accepted": [
+        "PDF",
+        "DOCX",
+        "XLSX",
+        "JPG",
+        "JPEG",
+        "PNG"
+      ],
+      "maxFiles": 8,
+      "types": [
+        "Segnalazione",
+        "Preventivo",
+        "Manutenzione",
+        "Omologazione",
+        "Altro"
+      ]
+    }
+  }
+}
