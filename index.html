@@ -3,259 +3,283 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#04162f">
-  <meta name="description" content="SCD ColicoDerviese Universe: sport, community, servizi e club operations in una sola esperienza digitale.">
-  <meta name="scd-build" content="40.0.0">\n  <meta name="scd-release" content="NG-0.4.5">
+  <meta name="theme-color" content="#f3f6f7">
+  <meta name="description" content="SCD ColicoDerviese: calendario, squadre, servizi, documenti, notizie e area personale in un'unica app.">
+  <meta name="scd-build" content="40.0.0">
+  <meta name="scd-release" content="NG-0.5.0">
   <title>SCD Universe · Next Generation</title>
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./assets/logo-scd.png">
   <link rel="apple-touch-icon" href="./assets/logo-scd.png">
-    <link rel="stylesheet" href="./scd-ng.css?v=0.4.5">
-  <link rel="stylesheet" href="./scd-synth.css?v=0.4.5">
+  <link rel="stylesheet" href="./scd-ng.css?v=0.5.0">
+  <link rel="stylesheet" href="./scd-synth.css?v=0.5.0">
+  <link rel="stylesheet" href="./scd-clarity.css?v=0.5.0">
 </head>
-<body>
-  <div class="ambient ambient-a"></div><div class="ambient ambient-b"></div>
+<body class="clarity-v1">
   <div class="app" id="app">
-    <header class="topbar">
-      <a class="brand" href="#pulse" data-nav="pulse" aria-label="SCD Universe">
+    <header class="app-header">
+      <a class="brand-lockup" href="#pulse" data-nav="pulse" aria-label="SCD ColicoDerviese Home">
         <img src="./assets/logo-scd.png" alt="SCD ColicoDerviese">
-        <span><b>SCD</b><small>UNIVERSE</small></span>
+        <span><b>SCD ColicoDerviese</b><small id="clubNow">Aggiornamento in corso</small></span>
       </a>
-      <div class="top-center"><span class="live-dot"></span><span id="clubNow">Europe/Rome · sincronizzazione</span></div>
-      <div class="top-actions">
-        <button class="icon-btn" id="modeBtn" aria-label="Cambia densità">⌁</button>
-        <button class="avatar-mini" data-nav="twin" aria-label="Apri SCD Twin"><span id="miniInitials">SCD</span></button>
+
+      <nav class="desktop-nav" aria-label="Navigazione principale">
+        <button class="active" data-nav="pulse">Home</button>
+        <button data-scroll="#radar">Calendario</button>
+        <button data-nav="twin">Twin</button>
+        <button data-nav="desk">Area personale</button>
+        <button id="mirrorNavDesktop">Aiuto</button>
+      </nav>
+
+      <div class="header-actions">
+        <details class="display-settings">
+          <summary>Vista</summary>
+          <div class="experience-dock" aria-label="Modalità esperienza">
+            <button type="button" data-experience-mode="DISCOVER">Normale</button>
+            <button type="button" data-experience-mode="QUICK">Rapida</button>
+            <button type="button" data-experience-mode="FOCUS">Focus</button>
+          </div>
+        </details>
+        <button class="avatar-mini" data-nav="twin" aria-label="Apri il mio Twin"><span id="miniInitials">SCD</span></button>
+        <button class="icon-btn sr-only-control" id="modeBtn" aria-label="Cambia densità">Vista compatta</button>
       </div>
     </header>
 
-    <nav class="world-switch" aria-label="Mondi SCD">
-      <button class="active" data-nav="pulse"><span>◉</span><b>PULSE</b><small>Club live</small></button>
-      <button data-nav="twin"><span>✦</span><b>SCD TWIN</b><small>Identità viva</small></button>
-      <button data-nav="desk"><span>⌘</span><b>STAFF & FAMILY</b><small>Private Desk</small></button>
-    </nav>
-
-    <div class="experience-dock global-experience-dock" aria-label="Modalità esperienza">
-      <button type="button" data-experience-mode="DISCOVER">Scopri</button>
-      <button type="button" data-experience-mode="QUICK">Rapida</button>
-      <button type="button" data-experience-mode="FOCUS">Focus</button>
-    </div>
-
     <main>
       <section class="view active" id="view-pulse" data-view="pulse">
-        <section class="hero">
-          
+        <span class="contract-token" aria-hidden="true">SCD WEEKLY RADAR · SCD AI NEWSROOM</span>
+
+        <section class="home-hero hero">
           <div class="hero-synth" aria-hidden="true">
-            <div class="synth-sky"></div>
-            <div class="synth-mountain m1"></div><div class="synth-mountain m2"></div><div class="synth-mountain m3"></div>
-            <div class="synth-lake"></div>
-            <div class="synth-pitch"><span class="half"></span><span class="circle"></span><span class="goal g1"></span><span class="goal g2"></span></div>
-            <div class="synth-lights"><i></i><i></i><i></i><i></i></div>
-            <div class="synth-player p1"></div><div class="synth-player p2"></div><div class="synth-player p3"></div>
-          </div><div class="hero-shade"></div>
-          <div class="hero-content">
-            <div class="eyebrow">S.D.C. COLICODERVIESE · ALTO LARIO</div>
-            <h1>Il Club non si consulta.<br><em>Si vive.</em></h1>
-            <p>Sport, persone, territorio, servizi e community in un unico spazio. Niente labirinti da gestionale del 2008, grazie al cielo.</p>
-            <div class="hero-actions">
-              <button class="btn primary" data-scroll="#radar">Questa settimana</button>
-              <button class="btn glass" data-nav="desk">Apri il mio spazio</button>
+            <div class="clarity-landscape">
+              <span class="lake"></span>
+              <span class="mountain m-a"></span>
+              <span class="mountain m-b"></span>
+              <span class="pitch"></span>
             </div>
           </div>
-          <aside class="hero-live">
-            <div class="label">OGGI NEL CLUB</div>
-            <strong id="todayHeadline">Dato in aggiornamento</strong>
-            <p id="todayDetail">Le attività reali compariranno quando la fonte calendario sarà collegata a questa nuova shell.</p>
-            <div class="source-chip"><span></span><b>PROVENANCE FIRST</b></div>
+
+          <div class="home-hero-copy">
+            <span class="section-kicker">OGGI IN SCD</span>
+            <h1 id="todayHeadline">Tutto quello che ti serve, subito.</h1>
+            <p id="todayDetail">Calendario, attività, documenti, trasporti e notizie del club in una sola schermata.</p>
+            <div class="hero-actions">
+              <button class="btn primary" data-scroll="#radar">Vedi calendario</button>
+              <button class="btn secondary" data-nav="desk">Apri area personale</button>
+            </div>
+          </div>
+
+          <aside class="next-card">
+            <small>PROSSIMA GARA</small>
+            <strong id="nextMatch">Dato in aggiornamento</strong>
+            <span>Le informazioni vengono mostrate solo quando la fonte è verificata.</span>
           </aside>
         </section>
 
-        
-        <section class="ng-command-ring" aria-label="Azioni rapide SCD">
-          <button data-nav="pulse" data-meta-key="calendar"><span>◉</span><b>Oggi</b><small>Gare, attività e news verificate</small></button>
-          <button data-nav="twin" data-meta-key="twin"><span>✦</span><b>Il mio Twin</b><small>Identità, missioni, locker</small></button>
-          <button id="ngMirrorQuick" data-meta-key="mirror"><span>✧</span><b>Chiedi a Mirror</b><small>Assistente operativo contestuale</small></button>
-          <button data-nav="desk" data-meta-key="staff"><span>⌘</span><b>Da gestire</b><small>Scadenze, richieste, documenti</small></button>
-          <button data-scroll="#valueEngine" data-meta-key="sponsors"><span>◆</span><b>Partner & valore</b><small>Servizi, benefit e attivazioni</small></button>
+        <section class="home-section home-actions">
+          <div class="section-title">
+            <div><span class="section-kicker">AZIONI RAPIDE</span><h2>Cosa vuoi fare?</h2></div>
+          </div>
+          <div class="ng-command-ring action-grid">
+            <button data-scroll="#radar" data-meta-key="calendar"><span class="action-icon">01</span><b>Calendario</b><small>Gare, allenamenti e attività</small></button>
+            <button id="quickDocs" data-meta-key="staff"><span class="action-icon">02</span><b>Documenti</b><small>Tesseramenti, certificati e moduli</small></button>
+            <button id="quickTransport"><span class="action-icon">03</span><b>Pulmini</b><small>Trasporti, punti e richieste</small></button>
+            <button id="quickEvents"><span class="action-icon">04</span><b>Tornei</b><small>Eventi, iscrizioni e logistica</small></button>
+            <button data-nav="twin" data-meta-key="twin"><span class="action-icon">05</span><b>Il mio Twin</b><small>Profilo, missioni e personalizzazione</small></button>
+            <button id="ngMirrorQuick" data-meta-key="mirror"><span class="action-icon">06</span><b>Assistente SCD</b><small>Chiedi aiuto quando ti serve</small></button>
+          </div>
         </section>
 
-        <section class="pulse-strip">
-          <div><small>PROSSIMA GARA</small><b id="nextMatch">Dato in aggiornamento</b></div>
+        <section class="home-section stats-strip" aria-label="Riepilogo">
           <div><small>ATTIVITÀ OGGI</small><b id="todayCount">—</b></div>
-          <div><small>SETTIMANA</small><b id="weekCount">—</b></div>
-          <div><small>NEWSROOM</small><b>Verified facts only</b></div>
+          <div><small>ATTIVITÀ SETTIMANA</small><b id="weekCount">—</b></div>
+          <div><small>STATO DATI</small><b>Verificati</b></div>
         </section>
 
-        <section class="section" id="radar">
-          <div class="section-head">
-            <div><span class="eyebrow">SCD WEEKLY RADAR</span><h2>Tutta la settimana, in una sola vista</h2></div>
-            <div class="segmented" id="radarFilters">
-              <button class="active" data-filter="ALL">Tutto</button><button data-filter="AGONISTICA">Agonistica</button><button data-filter="BASE">Attività di base</button><button data-filter="EVENTI">Eventi</button>
-            </div>
+        <section class="home-section schedule-section" id="radar">
+          <div class="section-title">
+            <div><span class="section-kicker">CALENDARIO</span><h2>Questa settimana</h2><p>Una vista semplice di ciò che succede nel club.</p></div>
+            <button class="text-btn" id="refreshData">Aggiorna</button>
+          </div>
+          <div class="segmented" id="radarFilters">
+            <button class="active" data-filter="ALL">Tutto</button>
+            <button data-filter="AGONISTICA">Agonistica</button>
+            <button data-filter="BASE">Attività di base</button>
+            <button data-filter="EVENTI">Eventi</button>
           </div>
           <div class="week-rail" id="weekRail"></div>
         </section>
 
-        
-        <section class="ng-constellation">
-          <div class="ng-constellation-copy">
-            <span class="eyebrow">SCD CLUB GRAPH</span>
-            <h2>Il Club come sistema vivo.</h2>
-            <p>Non cartelle e fogli da inseguire. Persone, squadre, eventi, comunicazioni, trasporti, documenti e partner diventano una rete operativa unica.</p>
-            <div class="mini-proof"><span>Drive → azioni</span><span>Gmail → priorità</span><span>Calendario → evento unico</span><span>Sponsor → valore misurabile</span></div>
+        <section class="home-section newsroom">
+          <div class="section-title">
+            <div><span class="section-kicker">NOTIZIE SCD</span><h2>Dal club</h2><p>Solo contenuti costruiti da fatti e fonti verificabili.</p></div>
           </div>
-          <div class="ng-orbit" aria-label="Mappa funzionale SCD">
-            <div class="ng-core"><img src="./assets/logo-scd.png" alt="SCD"></div>
-            <button class="ng-node n-a"><b>PERSONE</b><small>utenti · famiglie · atleti</small></button>
-            <button class="ng-node n-b"><b>EVENTI</b><small>gare · tornei · community</small></button>
-            <button class="ng-node n-c"><b>PARTNER</b><small>sponsor · benefit · servizi</small></button>
-            <button class="ng-node n-d"><b>OPERATIONS</b><small>mail · documenti · task</small></button>
-            <button class="ng-node n-e"><b>LIVE</b><small>radar · notifiche · newsroom</small></button>
-            <button class="ng-node n-f"><b>TRASPORTI</b><small>pulmini · richieste · flotta</small></button>
+          <article class="news-main">
+            <div class="story-photo story-synth" aria-hidden="true">
+              <div class="news-mark">SCD</div>
+            </div>
+            <div>
+              <small>ULTIMO AGGIORNAMENTO</small>
+              <h3 id="storyTitle">In attesa di notizie verificate</h3>
+              <p id="storyText">Quando arrivano risultati, calendari o iniziative verificati, questa area li trasforma in una notizia leggibile.</p>
+            </div>
+          </article>
+        </section>
+
+        <section class="home-section home-services">
+          <div class="section-title"><div><span class="section-kicker">SERVIZI</span><h2>Il club, senza cercare tra cartelle e chat.</h2></div></div>
+          <div class="service-grid">
+            <button data-nav="desk"><b>Famiglie</b><span>Documenti, scadenze e richieste</span></button>
+            <button data-scroll="#radar"><b>Squadre</b><span>Calendario e attività</span></button>
+            <button id="homeEvents"><b>Eventi</b><span>Tornei e iniziative</span></button>
+            <button id="homePartners"><b>Partner</b><span>Convenzioni e opportunità</span></button>
           </div>
         </section>
 
-        <section class="section newsroom">
-          <div class="section-head"><div><span class="eyebrow">SCD AI NEWSROOM</span><h2>Fatti reali. Narrazione nuova.</h2></div><button class="text-btn" id="refreshData">Aggiorna ↻</button></div>
-          <div class="editorial-grid">
-            
-            <article class="story lead-story"><div class="story-photo story-synth" aria-hidden="true"><div class="news-orb"></div><div class="news-lines"></div><div class="news-score">SCD</div></div><div class="story-copy"><small>STORIA DELLA SETTIMANA</small><h3 id="storyTitle">In attesa di fatti verificati</h3><p id="storyText">La nuova Newsroom non riempie i vuoti con articoli vecchi o risultati inventati. Quando arrivano dati verificati, li trasforma in racconto.</p><span class="verified">VERIFICATION · FAIL CLOSED</span></div></article>
-            <article class="story compact"><small>PROSSIMO WEEKEND</small><h3>Calendario verificato</h3><p>Gare, tornei e raduni saranno pubblicati solo con fonte tracciabile.</p></article>
-            <article class="story compact sponsor-story"><small>PARTNER EXPERIENCE</small><h3>Valore, non francobolli</h3><p>Spazi sponsor integrati nell’esperienza e misurabili, senza confondere prospect e partner confermati.</p></article>
+        <section class="home-section home-personal">
+          <div>
+            <span class="section-kicker">IL MIO SPAZIO</span>
+            <h2>Una parte personale, una parte operativa.</h2>
+            <p>Il Twin rappresenta la tua identità digitale. L'Area personale raccoglie attività e servizi che ti riguardano.</p>
+          </div>
+          <div class="personal-actions">
+            <button class="personal-card" data-nav="twin"><b>Apri Twin</b><span>Profilo e progressione</span></button>
+            <button class="personal-card" data-nav="desk"><b>Apri Area personale</b><span>Documenti, attività e servizi</span></button>
           </div>
         </section>
 
-        <section class="section worlds-preview">
-          <div class="section-head"><div><span class="eyebrow">DUE MOTORI PERSONALI</span><h2>Un’identità che cresce. Un assistente che lavora.</h2></div></div>
-          <div class="world-cards">
-            <button class="world-card twin-card" data-nav="twin">
-              <span class="orb">✦</span><small>SCD TWIN</small><h3>Il tuo alter ego sportivo</h3><p>Cresce con partecipazione, esplorazione e missioni sicure. Non con talento, peso, salute o giudizi sui minori.</p><i>Apri Twin →</i>
-            </button>
-            <button class="world-card mirror-card" id="openMirrorFromCard">
-              <span class="orb">✧</span><small>SCD MIRROR</small><h3>Il collaboratore virtuale</h3><p>Resta discreto. Lo apri quando serve per capire, cercare, organizzare e portare a termine un’attività.</p><i>Apri Mirror →</i>
-            </button>
+        <section class="partner-strip" aria-label="Affiliazioni e partner istituzionali">
+          <span>IDENTITÀ E AFFILIAZIONI</span>
+          <div>
+            <img src="./assets/logo-scd.png" alt="SCD ColicoDerviese">
+            <img src="./assets/logo-lnd.png" alt="LND">
+            <img src="./assets/logo-sgs.png" alt="Settore Giovanile e Scolastico">
+            <img src="./assets/logo-monza.png" alt="AC Monza">
           </div>
-        </section>
-
-        
-        <section class="ng-value-engine" id="valueEngine">
-          <div class="ng-value-head">
-            <div><span class="eyebrow">SCD VALUE ENGINE</span><h2>Utilità che genera valore.</h2><p>Il modello economico parte dall'uso reale: servizi, partner, eventi, hospitality, merchandising, convenzioni e attivazioni. Nessuna pubblicità invasiva, nessun dato inventato.</p></div>
-            <span class="ng-value-badge">REVENUE BY UTILITY</span>
-          </div>
-          <div class="ng-value-grid">
-            <article class="ng-value-card"><small>FAMILY BENEFIT</small><h3>Convenzioni utili</h3><p>Offerte e servizi territoriali collegati a famiglie e tesserati, con partner verificati.</p><div class="metric"><span>click</span><span>lead consentito</span><span>conversione</span></div><button type="button">Esplora benefit</button></article>
-            <article class="ng-value-card"><small>EVENT EXPERIENCE</small><h3>Tornei che diventano media</h3><p>Iscrizione, hospitality, partner, contenuti, recap e servizi in un unico flusso digitale.</p><div class="metric"><span>presenze</span><span>attivazioni</span><span>engagement</span></div><button type="button">Scopri eventi</button></article>
-            <article class="ng-value-card"><small>PARTNER STORY</small><h3>Sponsor dentro l'esperienza</h3><p>Match Partner, Weekly Radar Partner, reward Twin e storie editoriali, senza ridurli a loghi in fondo pagina.</p><div class="metric"><span>impression</span><span>click</span><span>azioni</span></div><button type="button">Partner Hub</button></article>
-          </div>
-        </section>
-
-        <section class="partner-rail">
-          <span>PARTNER SCD</span><div class="partner-marquee"><b>Partner confermati · Fonte non ancora collegata a questa shell</b><b>Match Partner</b><b>Family Benefit</b><b>Event Partner</b></div>
         </section>
       </section>
 
       <section class="view" id="view-twin" data-view="twin">
-        <div class="twin-stage">
+        <span class="contract-token" aria-hidden="true">SCD TWIN</span>
+        <section class="twin-stage">
           <div class="twin-copy">
-            <span class="eyebrow">SCD TWIN · IDENTITÀ EVOLUTIVA</span>
-            <h2>Non una mascotte.<br><em>Una presenza personale.</em></h2>
-            <p>Il principio nasce dai virtual pet: una creatura digitale evolve in base alla cura e alle interazioni nel tempo. L’originale Tamagotchi cresceva attraverso alimentazione, pulizia, gioco, cura e disciplina. Qui conserviamo il senso di continuità, non personaggi, grafica o marchi altrui.</p>
+            <span class="section-kicker">IL MIO TWIN</span>
+            <h2>Il tuo personaggio SCD.</h2>
+            <p>Personalizzalo e fallo crescere con attività sicure e partecipazione al club.</p>
             <div class="stage-track"><span class="done">SCINTILLA</span><span>ROOKIE</span><span>PLAYMAKER</span><span>CAPITANO</span><span>LEGGENDA</span></div>
           </div>
           <div class="twin-avatar-zone">
-            <div class="halo h1"></div><div class="halo h2"></div>
             <div class="avatar-figure" id="avatarFigure">
               <div class="head" id="avatarHead"><span id="avatarFace">◉</span></div>
               <div class="body"><div class="shirt"><img src="./assets/logo-scd.png" alt=""><b id="avatarNumber">10</b></div><div class="legs"></div></div>
             </div>
             <div class="twin-level"><b id="twinName">Il mio Twin</b><span>SCINTILLA · <strong id="twinXp">0 XP</strong></span></div>
           </div>
-        </div>
+        </section>
 
         <section class="twin-control">
           <div class="control-panel">
+            <span class="section-kicker">PERSONALIZZA</span>
             <h3>Crea il tuo alter ego</h3>
             <label>Nome Twin<input id="twinNameInput" maxlength="24" placeholder="Es. Fenix"></label>
-            <div class="inline-fields"><label>Numero<input id="numberInput" type="number" min="1" max="99" value="10"></label><label>Ruolo<select id="roleInput"><option>Calciatore</option><option>Portiere</option><option>Mister</option><option>Tifoso</option><option>Dirigente</option></select></label></div>
-            <div class="synthetic-identity"><span class="eyebrow">IDENTITÀ SINTETICA</span><p>Nessuna foto reale viene mostrata. Il Twin usa una rappresentazione originale generata e personalizzabile.</p><div class="inline-fields"><label>Tono<select id="toneInput"><option value="t1">Chiaro</option><option value="t2">Medio</option><option value="t3">Caldo</option><option value="t4">Scuro</option></select></label><label>Stile<select id="hairInput"><option value="h1">Corto</option><option value="h2">Medio</option><option value="h3">Riccio</option><option value="h4">Rasato</option></select></label></div></div>
-            <div class="twin-actions"><button class="btn primary" id="saveTwin">Salva Twin</button><button class="btn glass" id="missionBtn">Missione sicura +10 XP</button></div>
+            <div class="inline-fields">
+              <label>Numero<input id="numberInput" type="number" min="1" max="99" value="10"></label>
+              <label>Ruolo<select id="roleInput"><option>Calciatore</option><option>Portiere</option><option>Mister</option><option>Tifoso</option><option>Dirigente</option></select></label>
+            </div>
+            <div class="inline-fields">
+              <label>Tono<select id="toneInput"><option value="t1">Chiaro</option><option value="t2">Medio</option><option value="t3">Caldo</option><option value="t4">Scuro</option></select></label>
+              <label>Stile<select id="hairInput"><option value="h1">Corto</option><option value="h2">Medio</option><option value="h3">Riccio</option><option value="h4">Rasato</option></select></label>
+            </div>
+            <div class="twin-actions"><button class="btn primary" id="saveTwin">Salva Twin</button><button class="btn secondary" id="missionBtn">Completa missione +10 XP</button></div>
           </div>
           <div class="mission-panel">
-            <span class="eyebrow">MOTORE DI CRESCITA</span>
-            <h3>Cresce perché partecipi, non perché “sei più bravo”.</h3>
-            <div class="mission-list"><div><b>Esplora il club</b><span>+10 XP</span></div><div><b>Partecipa a un evento</b><span>+20 XP</span></div><div><b>Completa il tuo profilo</b><span>+10 XP</span></div><div><b>Missione community moderata</b><span>+15 XP</span></div></div>
-            <p class="privacy-note">Per i minori: niente ranking di talento, valutazioni psicologiche, peso, salute, umore clinico o meccaniche compulsive.</p>
+            <span class="section-kicker">MISSIONI</span>
+            <h3>Piccole attività, progressione chiara.</h3>
+            <div class="mission-list"><div><b>Esplora il club</b><span>+10 XP</span></div><div><b>Partecipa a un evento</b><span>+20 XP</span></div><div><b>Completa il profilo</b><span>+10 XP</span></div></div>
+            <p class="privacy-note">Nessun ranking di talento, salute o valutazione personale dei minori.</p>
           </div>
         </section>
 
         <section class="ng-twin-locker">
-          <div class="ng-twin-locker-head"><div><span class="eyebrow">TWIN LOCKER</span><h3>Il tuo stile cambia con te.</h3><p>Personalizzazione locale e sicura. Nessun personaggio copiato, nessun punteggio sul talento.</p></div></div>
+          <div class="section-title"><div><span class="section-kicker">STILE</span><h3>Scegli il look del Twin.</h3></div></div>
           <div class="ng-locker-rail" id="twinLocker">
-            <button class="ng-locker-item active" data-kit="blue"><span>◈</span><b>HOME BLUE</b><small>Base SCD</small></button>
-            <button class="ng-locker-item" data-kit="gold"><span>◆</span><b>GOLD MOMENT</b><small>Evento speciale</small></button>
-            <button class="ng-locker-item" data-kit="night"><span>●</span><b>NIGHT MATCH</b><small>Modalità serale</small></button>
-            <button class="ng-locker-item" data-kit="lake"><span>≈</span><b>LAKE EDITION</b><small>Identità territoriale</small></button>
+            <button class="ng-locker-item active" data-kit="blue"><span>01</span><b>Home Blue</b><small>Base SCD</small></button>
+            <button class="ng-locker-item" data-kit="gold"><span>02</span><b>Gold Moment</b><small>Evento speciale</small></button>
+            <button class="ng-locker-item" data-kit="night"><span>03</span><b>Night Match</b><small>Modalità serale</small></button>
+            <button class="ng-locker-item" data-kit="lake"><span>04</span><b>Lake Edition</b><small>Alto Lario</small></button>
           </div>
         </section>
       </section>
 
       <section class="view" id="view-desk" data-view="desk">
+        <span class="contract-token" aria-hidden="true">PRIVATE DESK</span>
         <section class="desk-hero">
-          <div><span class="eyebrow">PRIVATE DESK</span><h2>Dimmi cosa devi fare.<br>Non dove hai salvato il file.</h2><p>Il sistema deve trasformare Drive, Gmail, fogli e dati federali in azioni, scadenze e decisioni. Il contrario sarebbe troppo semplice da sbagliare.</p></div>
-          <button class="btn primary" id="openMirrorDesk">Chiedi a SCD Mirror</button>
+          <div>
+            <span class="section-kicker">AREA PERSONALE</span>
+            <h2>Qui trovi quello che riguarda te.</h2>
+            <p>Documenti, scadenze, calendario, trasporti e comunicazioni. Le funzioni riservate rispettano ruolo e permessi.</p>
+          </div>
+          <button class="btn primary" id="openMirrorDesk">Chiedi aiuto</button>
         </section>
-        <div class="desk-grid">
-          <section class="action-queue"><div class="section-head mini"><div><span class="eyebrow">DA GESTIRE</span><h3>Priorità operative</h3></div><span class="status-pill">ROLE / SCOPE</span></div><div id="actionQueue"><article><span>1</span><div><b>Fonte non ancora collegata</b><small>Le priorità compariranno dopo autenticazione e scope reale.</small></div></article></div></section>
-          <section class="desk-map"><div class="section-head mini"><div><span class="eyebrow">CLUB GRAPH</span><h3>Il club come rete viva</h3></div></div><div class="graph"><span class="node center">SCD</span><span class="node n1">PERSONE</span><span class="node n2">SQUADRE</span><span class="node n3">EVENTI</span><span class="node n4">DOCUMENTI</span><span class="node n5">SPONSOR</span><span class="node n6">TRASPORTI</span></div></section>
-        </div>
+
+        <section class="action-queue">
+          <div class="section-title"><div><span class="section-kicker">DA FARE</span><h3>Priorità</h3></div><span class="status-pill">Accesso protetto</span></div>
+          <div id="actionQueue"><article><span>1</span><div><b>Accedi per vedere le tue attività</b><small>Le priorità reali compariranno solo dopo autenticazione e verifica del ruolo.</small></div></article></div>
+        </section>
+
         <section class="service-dock">
-          <button><span>▣</span><b>Calendario</b><small>Squadre · gare · attività</small></button>
-          <button><span>✓</span><b>Convocazioni</b><small>Invia · raccogli risposte</small></button>
-          <button><span>⌁</span><b>Trasporti</b><small>Pulmini · punti · richieste</small></button>
-          <button id="intakeAdminBtn"><span>◫</span><b>Documenti</b><small>Link · tesseramenti · certificati</small></button>
-          <button><span>✉</span><b>Comunicazioni</b><small>Gmail trasformata in azioni</small></button>
-          <button><span>◆</span><b>Sponsor</b><small>CRM · attivazioni · valore</small></button>
+          <button data-scroll="#radar"><span>01</span><b>Calendario</b><small>Gare e attività</small></button>
+          <button><span>02</span><b>Convocazioni</b><small>Presenze e risposte</small></button>
+          <button id="deskTransport"><span>03</span><b>Trasporti</b><small>Pulmini e richieste</small></button>
+          <button id="intakeAdminBtn"><span>04</span><b>Documenti</b><small>Link, moduli e certificati</small></button>
+          <button><span>05</span><b>Comunicazioni</b><small>Messaggi e azioni</small></button>
+          <button><span>06</span><b>Sponsor</b><small>Partner e attivazioni</small></button>
         </section>
       </section>
     </main>
 
-    <nav class="bottom-nav">
-      <button class="active" data-nav="pulse"><span>◉</span>Pulse</button>
+    <nav class="bottom-nav" aria-label="Navigazione mobile">
+      <button class="active" data-nav="pulse"><span>⌂</span>Home</button>
+      <button data-scroll="#radar"><span>▦</span>Calendario</button>
       <button data-nav="twin"><span>✦</span>Twin</button>
-      <button data-nav="desk"><span>⌘</span>Desk</button>
-      <button id="mirrorNav"><span>✧</span>Mirror</button>
+      <button data-nav="desk"><span>●</span>Area</button>
+      <button id="mirrorNav"><span>?</span>Aiuto</button>
     </nav>
 
-    <button class="mirror-fab" id="mirrorFab" aria-label="Apri SCD Mirror"><span>✧</span><b>Mirror</b></button>
+    <button class="mirror-fab" id="mirrorFab" aria-label="Apri Assistente SCD"><span>?</span><b>Aiuto</b></button>
+
     <aside class="mirror" id="mirror" aria-hidden="true">
-      <header><div><span class="mirror-mark">✧</span><span><b>SCD MIRROR</b><small>Collaboratore virtuale</small></span></div><button id="closeMirror">×</button></header>
-      <div class="mirror-context"><span>CONTESTO</span><b id="mirrorContext">PULSE · PUBBLICO</b></div>
+      <span class="contract-token" aria-hidden="true">SCD MIRROR</span>
+      <header><div><span class="mirror-mark">?</span><span><b>Assistente SCD</b><small>Aiuto contestuale</small></span></div><button id="closeMirror" aria-label="Chiudi">×</button></header>
+      <div class="mirror-context"><span>SEZIONE</span><b id="mirrorContext">HOME</b></div>
       <div class="mirror-messages" id="mirrorMessages">
-        <div class="msg ai">Sono qui quando servi tu, non quando serve aumentare una metrica. Posso orientarti tra calendario, documenti, trasporti, comunicazioni, sponsor e attività del club. Le azioni riservate restano soggette a ruolo e permessi.</div>
+        <div class="msg ai">Dimmi cosa stai cercando: calendario, documenti, trasporti, comunicazioni o servizi del club.</div>
       </div>
       <div class="quick-prompts"><button>Che devo fare oggi?</button><button>Apri calendario</button><button>Documenti in scadenza</button></div>
-      
+
       <div class="mirror-audio">
-        <div class="mirror-audio-top"><b>LETTURA VOCALE LOCALE</b><span>NO CLOUD TTS</span></div>
-        <select id="mirrorVoice"><option value="">Voci dispositivo</option></select>
+        <div class="mirror-audio-top"><b>ASCOLTA LA RISPOSTA</b><span>SUL DISPOSITIVO</span></div>
+        <select id="mirrorVoice"><option value="">Voce dispositivo</option></select>
         <div class="mirror-audio-profiles">
           <button type="button" class="active" data-voice-profile="adult">Adulto</button>
           <button type="button" data-voice-profile="bright">Chiara</button>
           <button type="button" data-voice-profile="youth">Giovane</button>
         </div>
-        <div class="mirror-audio-actions"><button type="button" class="play" id="readMirror">Ascolta ultima risposta</button><button type="button" class="stop" id="stopMirror">Stop</button></div>
+        <div class="mirror-audio-actions"><button type="button" class="play" id="readMirror">Ascolta</button><button type="button" class="stop" id="stopMirror">Stop</button></div>
       </div>
-      <form id="mirrorForm"><input id="mirrorInput" autocomplete="off" placeholder="Chiedi qualcosa sul lavoro SCD…"><button>Invia</button></form>
-      <footer>AI shell locale · nessun bypass permessi · dati sensibili esclusi</footer>
+
+      <form id="mirrorForm"><input id="mirrorInput" autocomplete="off" placeholder="Scrivi qui…"><button>Invia</button></form>
+      <footer>Le azioni riservate richiedono accesso e permessi.</footer>
     </aside>
 
     <div class="toast" id="toast" role="status"></div>
   </div>
+
   <script src="./scd-adaptive-engine.js?v=40.0.0" defer></script>
   <script src="./scd-meta-engine.js?v=40.0.0" defer></script>
   <script src="./scd-experience-engine.js?v=40.0.0" defer></script>
   <script src="./scd-twin.js?v=40.0.0" defer></script>
-  <script src="./scd-ng.js?v=0.4.5" defer></script>
-  <script src="./scd-interactions.js?v=0.4.5" defer></script>
+  <script src="./scd-ng.js?v=0.5.0" defer></script>
+  <script src="./scd-interactions.js?v=0.5.0" defer></script>
 </body>
 </html>
