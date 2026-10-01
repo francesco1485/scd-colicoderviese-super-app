@@ -82,6 +82,9 @@ function doPost(e) {
       case 'private.communication.send':
         data = r216CommunicationSend_(token, payload);
         break;
+      case 'private.communication.health':
+        data = r216CommunicationHealth_(token);
+        break;
       case 'private.week':
         data = getWeekForUser(token, Number(payload.offset || 0));
         break;
@@ -214,11 +217,22 @@ function r216PublicRequest_(payload, type) {
     UPDATED_BY:email,
     NOTE:'R21.7 · kind=' + clean_(payload.kind || '', 80)
   });
+  var notificationSent = false;
+  var notificationError = '';
   try {
     MailApp.sendEmail('sportclubcolico@gmail.com','[SCD APP] '+(type || 'CONTATTO')+' · '+id,
       'ID: '+id+'\nTipo: '+(type || 'CONTATTO')+'\nNome: '+name+'\nEmail: '+email+'\nTelefono: '+phone+'\nOggetto: '+(payload.topic || '')+'\n\n'+(payload.message || ''));
-  } catch (mailErr) { console.error('R21 request notify',mailErr); }
-  return {requestId:id,status:'NUOVA',type:type || 'CONTATTO',stored:true};
+    notificationSent = true;
+  } catch (mailErr) {
+    notificationError = String(mailErr && mailErr.message ? mailErr.message : mailErr);
+    console.error('R21 request notify',notificationError);
+  }
+  return {
+    requestId:id,status:'NUOVA',type:type || 'CONTATTO',stored:true,
+    notificationSent:notificationSent,
+    notificationError:notificationError,
+    mailQuotaRemaining:MailApp.getRemainingDailyQuota()
+  };
 }
 
 function r216MyRequests_(token) {
@@ -567,6 +581,32 @@ function r216UpdateStakeholderAfterMail_(stakeholder,payload,now){
   if(payload.nextDeadline) set('PROSSIMA_SCADENZA',clean_(payload.nextDeadline,80));
   set('PROFILE_UPDATED_AT',now);
 }
+function r216CommunicationHealth_(token){
+  var actor = r216CrmActor_(token);
+  var profile = r216ProfileMap_();
+  var configured = email_(profile.DEFAULT_FROM_EMAIL || 'sportclubcolico@gmail.com');
+  var effective = email_(Session.getEffectiveUser().getEmail() || '');
+  var archive = r216CrmTable_('MAIL_ARCHIVIO');
+  var last = archive.length ? archive[archive.length-1] : {};
+  return {
+    ready:!!effective && effective===configured,
+    configuredSender:configured,
+    effectiveSender:effective,
+    senderMatches:!!effective && effective===configured,
+    remainingDailyQuota:MailApp.getRemainingDailyQuota(),
+    lastMail:{
+      id:String(last.MAIL_ID||''),
+      status:String(last.STATUS||''),
+      sentAt:String(last.SENT_AT||last.CREATED_AT||''),
+      to:String(last.TO||''),
+      subject:String(last.SUBJECT||''),
+      error:String(last.ERROR||'')
+    },
+    actor:email_(actor && actor.email || ''),
+    checkedAt:new Date()
+  };
+}
+
 function r216CommunicationSend_(token,payload){
   payload = payload || {};
   if(payload.confirm !== true) throw new Error('Conferma umana obbligatoria prima dell invio.');
