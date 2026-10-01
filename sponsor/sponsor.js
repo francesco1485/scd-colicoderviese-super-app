@@ -1,5 +1,5 @@
 const PRIVATE_SPONSOR_ORIGIN='https://scd-colicoderviese-super-app.onrender.com';
-const ON_PUBLIC_STATIC=location.hostname==='scd-sponsor-platform.onrender.com';
+const ON_PUBLIC_STATIC=['scd-sponsor-platform.onrender.com','francesco1485.github.io'].includes(location.hostname);
 const $=s=>document.querySelector(s);
 const $$=s=>Array.from(document.querySelectorAll(s));
 
@@ -8,7 +8,7 @@ function modal(name){
 }
 function openModal(name){
   if(name==='login'&&ON_PUBLIC_STATIC){location.href=PRIVATE_SPONSOR_ORIGIN+'/sponsor/?login=1';return}
-  $('.modal').forEach(x=>x.hidden=true);
+  $$('.modal').forEach(x=>x.hidden=true);
   const m=modal(name); if(!m)return;
   m.hidden=false;
   document.body.classList.add('modal-open');
