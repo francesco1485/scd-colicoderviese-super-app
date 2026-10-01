@@ -31,8 +31,8 @@ for(const viewport of viewports){
   await page.waitForSelector('#communityPulse');
   await page.waitForSelector('#sponsorRail');
   await page.waitForSelector('#joinClub');
-  await page.waitForSelector('.hero-synth');
-  await page.waitForSelector('.ng-command-ring');
+  await page.waitForSelector('.hero-synth',{state:'attached'});
+  await page.waitForSelector('.ng-command-ring',{state:'attached'});
   await page.waitForSelector('#weekRail');
   await page.waitForSelector('.ng-constellation');
   await page.waitForSelector('.newsroom');
