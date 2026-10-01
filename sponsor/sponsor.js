@@ -1,7 +1,74 @@
 const PRIVATE_SPONSOR_ORIGIN='https://scd-colicoderviese-official-r21.onrender.com';
 const ON_PUBLIC_STATIC=['scd-sponsor-platform.onrender.com','francesco1485.github.io'].includes(location.hostname);
 const $=s=>document.querySelector(s);
-const $$=s=>Array.from(document.querySelectorAll(s));
+const $=s=>Array.from(document.querySelectorAll(s));
+
+const clubModules={
+  partner:{
+    kicker:'PARTNER HUB',
+    title:'Ogni azienda entra in un progetto, non in un elenco loghi.',
+    text:'Profilo partner, obiettivi, asset attivati, documenti, appuntamenti, proof e rinnovi in un unico percorso leggibile.',
+    points:['Profilo 360°','Asset attivi','Scadenze e rinnovi','Proof di delivery'],
+    cta:'Parla con SCD',
+    preview:'<div class="ui-hero"><small>PARTNER HUB</small><h4>Benvenuto, Rossi Srl</h4><p>Stagione 2026/27 · Partner attivo</p></div><div class="ui-kpis"><b>80%<small>attivazioni completate</small></b><b>12<small>materiali caricati</small></b><b>3<small>richieste aperte</small></b></div><div class="ui-list"><span>LEDWall Matchday <em>ATTIVO</em></span><span>Sponsor Wall <em>PRONTO</em></span><span>Convenzione <em>DA FORMALIZZARE</em></span></div>'
+  },
+  led:{
+    kicker:'LEDWALL MATCHDAY',
+    title:'Il brand entra nel ritmo della partita.',
+    text:'Playlist sponsor, creatività dedicate, rotazioni programmate e proof fotografico/video costruiti per tribuna e camera principale.',
+    points:['Spot su misura','Rotazione per gara','Camera safe','Report sponsor'],
+    cta:'Costruiamo lo spot LED',
+    preview:'<div class="ui-led"><div class="ui-led-main">SCD COLICODERVIESE</div><div class="ui-led-rotate"><span>GGLASS</span><span>TA CLEANING</span><span>AGC MEDICAL</span></div></div><div class="ui-kpis"><b>20s<small>preview spot</small></b><b>25fps<small>master video</small></b><b>4<small>canali proof</small></b></div><div class="ui-list"><span>Tribuna <em>VISIBILE</em></span><span>Camera principale <em>DA COLLAUDARE</em></span><span>Pixellot <em>DIRITTI DA VERIFICARE</em></span></div>'
+  },
+  media:{
+    kicker:'MEDIA & SPONSOR WALL',
+    title:'Il partner deve essere riconoscibile anche quando la partita finisce.',
+    text:'Backdrop interviste, contenuti video, Pixellot autorizzato, social e materiali scaricabili diventano un unico Media Hub.',
+    points:['Sponsor Wall','Interviste','Clip partner','Archivio materiali'],
+    cta:'Scopri il Media Hub',
+    preview:'<div class="ui-media"><div class="ui-wall"><b>SCD</b><span>NORATECH</span><span>RASERO</span><span>DECAR</span><span>SACO</span><span>LEGEA</span><span>BIANCHI BAZZI</span></div><div class="ui-video"><i>▶</i><strong>Match Content</strong><small>clip · interviste · proof</small></div></div><div class="ui-list"><span>Intervista post gara <em>03:42</em></span><span>Clip sponsor <em>02:15</em></span><span>Best moments <em>05:20</em></span></div>'
+  },
+  community:{
+    kicker:'CARD & CONVENZIONI',
+    title:'La community deve ricevere valore concreto, non soltanto comunicazioni.',
+    text:'Supporter Card, Tesserato Card, benefit territoriali, QR e convenzioni diventano un sistema semplice da usare e misurare.',
+    points:['Supporter Card','Tesserato Card','Benefit territoriali','QR / Wallet futuro'],
+    cta:'Scopri le convenzioni',
+    preview:'<div class="ui-cards"><article><small>SCD SUPPORTER</small><b>COMMUNITY CARD</b><em>La passione che ti porta più vicino.</em></article><article><small>SCD TESSERATO</small><b>PLAYER & STAFF</b><em>Dentro la squadra. Dentro i vantaggi.</em></article></div><div class="ui-list"><span>Food & ristorazione <em>IN SVILUPPO</em></span><span>Sport & benessere <em>IN SVILUPPO</em></span><span>Turismo & servizi <em>IN SVILUPPO</em></span></div>'
+  },
+  events:{
+    kicker:'EVENTI & TORNEI',
+    title:'Un torneo può diventare un’esperienza di marca completa.',
+    text:'Title partnership, gazebo, hospitality, premiazioni, famiglie e territorio: ogni evento può offrire attivazioni diverse e misurabili.',
+    points:['Title sponsor','Gazebo & corner','Hospitality','Family experience'],
+    cta:'Costruiamo un evento',
+    preview:'<div class="ui-event"><div class="ui-event-badge">TORNEO SCD</div><h4>Sport · famiglie · territorio</h4><div class="ui-event-grid"><span>GAZEBO</span><span>LED</span><span>PREMIAZIONI</span><span>HOSPITALITY</span></div></div><div class="ui-kpis"><b>16<small>squadre concept</small></b><b>1<small>title partner</small></b><b>4<small>attivazioni core</small></b></div>'
+  },
+  territory:{
+    kicker:'COLICO · ALTO LARIO',
+    title:'Un club locale può comunicare con la qualità di un club internazionale.',
+    text:'La differenza è il contesto: lago, montagne, turismo, famiglie, imprese e sport. Il territorio non è uno sfondo: è parte del prodotto sponsor.',
+    points:['Colico','Alto Lario','Lago di Como','Rete imprese e famiglie'],
+    cta:'Entra nella rete SCD',
+    preview:'<div class="ui-territory"><div class="territory-map-card"><small>HOME OF SCD</small><h4>COLICO</h4><b>ALTO LARIO · LAGO DI COMO</b><p>Sport · turismo · imprese · community</p></div><div class="territory-points"><span>Centro Sportivo</span><span>Club House</span><span>Eventi</span><span>Partner Network</span></div></div>'
+  }
+};
+
+function renderClubModule(key='partner'){
+  const m=clubModules[key]||clubModules.partner;
+  const kicker=$('#clubModuleKicker'),title=$('#clubModuleTitle'),text=$('#clubModuleText'),points=$('#clubModulePoints'),cta=$('#clubModuleCta'),preview=$('#clubDeviceMain');
+  if(kicker)kicker.textContent=m.kicker;
+  if(title)title.textContent=m.title;
+  if(text)text.textContent=m.text;
+  if(points)points.innerHTML=m.points.map(x=>'<span>'+x+'</span>').join('');
+  if(cta)cta.textContent=m.cta;
+  if(preview)preview.innerHTML=m.preview;
+  $('[data-club-module]').forEach(b=>b.classList.toggle('active',b.dataset.clubModule===key));
+}
+$('[data-club-module]').forEach(b=>b.addEventListener('click',()=>renderClubModule(b.dataset.clubModule)));
+renderClubModule('partner');
+
+
 
 function modal(name){
   return name==='access'?$('#accessModal'):$('#loginModal');
