@@ -1,7 +1,8 @@
 (()=>{
 'use strict';
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
-const API_BASE='';\nconst state={view:'pulse',filter:'ALL',events:[],news:null};
+const API_BASE='';
+const state={view:'pulse',filter:'ALL',events:[],news:null};
 const toast=(t)=>{const el=$('#toast');el.textContent=t;el.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('show'),2200)};
 function setView(view){
   state.view=view;
