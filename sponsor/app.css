@@ -392,3 +392,10 @@ h1,h2,h3,h4,strong,b,.hero,.sidebar,.topbar,.event-card{color:#16304d}
   .crm-email-modal-card{padding:14px}
   .crm-mail-render{padding:8px}
 }
+
+.crm-agreement{border:1px solid #dfe7ef;border-radius:12px;padding:12px;margin:9px 0;background:#fbfdff;display:grid;gap:8px}
+.crm-agreement>div:first-child{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.crm-agreement b{font-size:.9rem;color:#244f76}.crm-agreement small{font-size:.74rem;color:#71869a}
+.crm-agreement>div:not(:first-child){display:flex;justify-content:space-between;gap:10px;font-size:.78rem}
+.crm-agreement>div span{color:#7a8ea2}.crm-agreement>div strong{color:#2e587e;text-align:right}
+.crm-agreement p{margin:0;font-size:.82rem;line-height:1.45;color:#52687d}
