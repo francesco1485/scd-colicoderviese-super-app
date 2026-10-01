@@ -31,11 +31,16 @@ for(const viewport of viewports){
   await page.waitForSelector('.newsroom');
   await page.waitForSelector('.worlds-preview');
   await page.waitForSelector('.ng-value-engine');
-  await page.waitForFunction(()=>Boolean(window.SCDNextGen)&&Boolean(window.SCDMeta)&&Boolean(window.SCDTwin)&&Boolean(window.SCDExperience));
+  await page.waitForFunction(()=>Boolean(window.SCDNextGen)&&Boolean(window.SCDMeta)&&Boolean(window.SCDTwin)&&Boolean(window.SCDExperience)&&Boolean(window.SCDAdaptive));
   await page.waitForFunction(()=>document.documentElement.scrollWidth<=window.innerWidth+3);
 
   const realPhotoRefs=await page.evaluate(()=>[...document.querySelectorAll('img')].map(x=>x.getAttribute('src')||'').filter(x=>/hero-colico|event-insieme/i.test(x)));
   if(realPhotoRefs.length)throw new Error('forbidden real photography loaded: '+realPhotoRefs.join(','));
+
+  const adaptive=await page.evaluate(()=>window.SCDAdaptive.snapshot());
+  if(!['phone','phone-wide','tablet','desktop','wide'].includes(adaptive.viewportClass))throw new Error('adaptive viewport class missing');
+  const adaptiveAttr=await page.evaluate(()=>document.documentElement.dataset.scdViewportClass||'');
+  if(adaptiveAttr!==adaptive.viewportClass)throw new Error('adaptive viewport dataset not applied');
 
   const meta=await page.evaluate(()=>window.SCDMeta.snapshot('base'));
   if(meta.mode!=='PRIVACY_FIRST_ON_DEVICE')throw new Error('Meta privacy-first mode missing');
