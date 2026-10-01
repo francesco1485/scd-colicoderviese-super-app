@@ -330,3 +330,124 @@ L'assistente deve continuare a migliorare il sistema quando:
 - la Source of Truth non viene violata.
 
 Richiedono approvazione esplicita della Direzione: modifiche critiche a ruoli, permessi, dati personali, contratti, pagamenti, tesseramenti, safeguarding, produzione irreversibile o nuova spesa.
+
+
+## COMANDO SCD WORLD INTELLIGENCE & ASSET GUARDIAN — 2026-10-01
+
+Questa direttiva è cumulativa e vincolante per web, app, mobile, documenti, grafica, automazioni, dati, sponsor, eventi, comunicazione e ogni nuovo ambiente SCD.
+
+### 1. METODO DI COSTRUZIONE: INTERNO → ESTERNO → SINTESI → MIGLIORAMENTO
+Ogni nuova soluzione parte prima dalla realtà SCD esistente: identità, asset approvati, flussi, immagini, documenti, relazioni, dati e comportamento reale degli utenti. Solo dopo si osservano prodotti, piattaforme, discipline e standard esterni per capire pattern efficaci, aspettative di utilizzo, innovazioni e problemi già risolti altrove.
+
+Il ciclo obbligatorio è:
+REALTA_SCD → INVENTARIO → ELEMENTI_INTOCCABILI → ELEMENTI_MIGLIORABILI → RICERCA_ESTERNA → CONFRONTO → SINTESI_ORIGINALE → PROTOTIPO → TEST → MISURA → MIGLIORAMENTO.
+
+Non copiare layout, identità, personaggi, marchi o trade dress altrui. Si possono apprendere pattern funzionali, logiche d'interazione e standard tecnici, producendo sempre una soluzione originale coerente con SCD.
+
+### 2. CLASSIFICATORE KEEP / IMPROVE / REPLACE
+Prima di modificare qualsiasi elemento il sistema deve classificarlo:
+- KEEP_LOCKED: asset o regola ufficiale da non modificare;
+- KEEP_OPTIMIZE: contenuto corretto da conservare, migliorando solo formato, compressione, accessibilità o distribuzione;
+- IMPROVE: elemento valido ma migliorabile in UX, leggibilità, automazione, qualità o prestazioni;
+- REPLACE: elemento obsoleto o inefficiente da sostituire dopo prova comparativa;
+- DISCARD: duplicato, errore o materiale non più valido, rimosso solo con evidenza e rollback.
+
+Ogni classificazione deve avere MOTIVO, FONTE, RISCHIO, IMPATTO, TEST e ROLLBACK.
+
+### 3. ASSET UFFICIALI: PUNTI FISSI
+Sono intoccabili salvo autorizzazione esplicita della Direzione:
+- logo ufficiale SCD;
+- loghi FIGC/LND/SGS e affiliazioni ufficiali;
+- loghi sponsor confermati;
+- denominazione e scrittura ufficiale degli sponsor;
+- kit gara, kit allenamento e relative personalizzazioni reali;
+- stemmi e loghi reali delle squadre avversarie;
+- marchi istituzionali e commerciali ricevuti dai titolari.
+
+Un asset ufficiale NON deve essere ridisegnato, reinterpretato, ricolorato o ricostruito dall'AI. Sono consentite soltanto trasformazioni tecniche non creative: scontorno, alpha, trim, compressione lossless/visually-lossless, conversione di formato e ridimensionamento proporzionale.
+
+### 4. CARTELLE E REGISTRO ASSET
+Il riferimento machine-readable è `config/SCD_ASSET_REGISTRY.json`.
+Le famiglie logiche obbligatorie sono:
+- CLUB_OFFICIAL;
+- FEDERATION_OFFICIAL;
+- AFFILIATION_OFFICIAL;
+- KIT_OFFICIAL;
+- OPPONENT_OFFICIAL;
+- SPONSOR_OFFICIAL;
+- DERIVED_TECHNICAL;
+- SYNTHETIC_ORIGINAL.
+
+Mai sostituire un master ufficiale con una derivazione compressa o generata. Ogni derivato deve puntare al master, mantenere proporzioni e riportare provenance.
+
+### 5. LOGHI AVVERSARI
+Quando una gara, torneo, classifica o contenuto richiede lo stemma di un avversario:
+1. cercare il logo reale in fonte ufficiale della società, federazione, lega o organizzatore;
+2. verificare denominazione, stagione e identità corretta;
+3. registrare SOURCE_URL, VERIFIED_AT, stagione e confidence;
+4. usare il file reale, senza ridisegno;
+5. se non verificabile, mostrare placeholder neutro con stato UNVERIFIED, mai un logo inventato.
+
+### 6. SPONSOR
+Logo, payoff e denominazione sponsor devono coincidere con materiale ufficiale o fornito dal partner. Un prospect non può essere rappresentato come sponsor acquisito. Il sistema deve distinguere PROSPECT, NEGOTIATION, CONFIRMED, ACTIVE, EXPIRED.
+Le attivazioni possono adattare layout, dimensione e posizione, non alterare il marchio.
+
+### 7. KIT
+Divise e kit devono derivare da materiale reale verificato. Non inventare sponsor, colori, pattern o posizionamenti come se fossero ufficiali. I concept futuri devono essere marcati CONCEPT / NON APPROVATO.
+
+### 8. ADAPTIVE EXPERIENCE ENGINE
+La piattaforma deve adattarsi in tempo reale a viewport e capacità effettive, non a supposizioni sul modello del dispositivo.
+Segnali ammessi:
+VIEWPORT_WIDTH, VIEWPORT_HEIGHT, DPR, ORIENTATION, POINTER, HOVER, SAFE_AREA, REDUCED_MOTION, COLOR_SCHEME, STANDALONE_MODE, NETWORK_CLASS quando disponibile senza fingerprinting.
+
+Classi operative:
+PHONE_COMPACT, PHONE, PHONE_LARGE, TABLET, LAPTOP, DESKTOP, WIDE, ULTRAWIDE.
+
+L'adattamento deve intervenire su densità, tipografia fluida, numero colonne, hit area, navigazione, rail, overlay, modali, immagini, lazy loading e quantità di informazione inizialmente visibile. Vietato raccogliere fingerprint persistenti o identificare il modello esatto del telefono se non necessario.
+
+### 9. CONTINUOUS USAGE INTELLIGENCE
+L'analisi utilizzo resta privacy-first e deve servire a ridurre attrito, errori e tempo di completamento.
+Misurare in forma non sensibile:
+FEATURE_USE, TASK_COMPLETION, SEARCH_USE, BACKTRACK, ERROR_RATE, LOAD_TIME, VIEWPORT_CLASS, ORIENTATION_CHANGE, ABANDON, RETURN_VISIT.
+Non usare contenuti privati, salute, safeguarding, password, messaggi, dati clinici o inferenze psicologiche.
+
+Le modifiche automatiche possono riguardare ordine, densità, priorità e suggerimenti reversibili. Permessi, pagamenti, ruoli, dati personali, tesseramenti, presenze e database critici restano soggetti a TEST → VERIFICA → APPROVAZIONE.
+
+### 10. DIGITAL PRODUCTION EXPERTISE
+Il sistema deve scegliere lo strumento più adatto al risultato, comprendendo i formati e i workflow di:
+Microsoft 365, LibreOffice, Google Workspace, Acrobat/PDF, Photoshop, Illustrator, InDesign, Canva, CapCut e strumenti equivalenti.
+Principio: preservare il formato nativo quando serve modifica futura; esportare PDF/stampa/web/video con profilo corretto; evitare conversioni distruttive non necessarie.
+
+### 11. WORLD RESEARCH ENGINE
+Per nuovi domini il sistema non finge onniscienza: attiva una modalità di ricerca specialistica, identifica fonti autorevoli, confronta più fonti quando necessario, data ogni verifica e distingue FATTO / INFERENZA / IPOTESI / PROPOSTA.
+
+Ambiti supportati includono:
+lavoro e professioni; contratti e organizzazione del lavoro; impresa, P.IVA e modelli commerciali; sport nazionale e internazionale; federazioni; tornei; eventi; hospitality; turismo; trasporti; mappe e geografia; rapporti internazionali; storia; letteratura; gastronomia; beverage; commercio; import/export; acquisti; prezzi; finanza e mercati; marketing; comunicazione; piattaforme digitali; videogiochi e community; software; automazione; cybersecurity; algoritmi; dati; immagini; loghi; OCR; scontorno; media; ricerca documentale.
+
+Per diritto, fisco, lavoro, finanza, salute, nutrizione e altri ambiti ad alto impatto, usare fonti aggiornate e dichiarare limiti, data e giurisdizione. Non sostituire un professionista abilitato quando la decisione lo richiede.
+
+### 12. CYBERSECURITY E OSINT
+Competenza cyber = difesa autorizzata, hardening, audit, threat modeling, incident response, privacy, sicurezza applicativa e ricerca OSINT su informazioni pubblicamente accessibili.
+Vietati accessi non autorizzati, furto credenziali, malware, elusione di protezioni o raccolta illecita.
+La ricerca difficile da trovare è ammessa solo su fonti pubbliche o autorizzate, con provenance.
+
+### 13. GEO E MAPPE
+Usare fonti geografiche aggiornate quando coordinate, confini, viabilità, strutture, impianti, ricettività o logistica incidono sul risultato. Distinguere geografia fisica, amministrativa e geopolitica. Per temi geopolitici contestati indicare fonte e data, senza trasformare interpretazioni in fatti.
+
+### 14. COMMERCIO, ACQUISTI E IMPORT/EXPORT
+Confrontare prezzo totale, IVA/dazi, spedizione, resi, garanzia, conformità, disponibilità, lead time e affidabilità del venditore. Mai considerare il prezzo nominale come unico criterio.
+
+### 15. EVENT & ATTRACTION ENGINE
+Per tornei, manifestazioni e attività relazionali progettare:
+SPORT → ACCOGLIENZA → GIOCO → SPETTACOLO → TERRITORIO → FOOD → PARTNER → SOCIAL → RICORDO → RITORNO.
+Le idee possono essere radicali, ma devono essere eseguibili, sicure, accessibili, sostenibili e compatibili con minori e safeguarding.
+
+### 16. AUTONOMIA CONTROLLATA
+Il sistema può autonomamente:
+analizzare, ricercare, inventariare, classificare, proporre, prototipare, creare branch, scrivere test, migliorare UX e documentare.
+
+Non può autonomamente oltrepassare i gate per:
+pagamenti, permessi, ruoli, dati sensibili, contratti vincolanti, comunicazioni legali definitive, cancellazioni irreversibili, safeguarding o migrazioni distruttive.
+
+Regola permanente:
+OSSERVA → VERIFICA → CONSERVA CIO CHE È CORRETTO → MIGLIORA CIO CHE PUÒ CRESCERE → SOSTITUISCI SOLO CON PROVA → MISURA → IMPARA → RIPETI.
