@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.4.0",
+    "version": "3.5.0",
     "effective_at": "2026-10-01",
     "status": "BINDING",
     "language": "it-IT",
@@ -366,6 +366,92 @@
         "ADMIN_HIGH_DENSITY"
       ],
       "prefers_reduced_motion_required": true
+    },
+    "asset_integrity": {
+      "classification": [
+        "KEEP_LOCKED",
+        "KEEP_ENHANCE",
+        "REBUILD_IMPROVE",
+        "RESEARCH_REAL_ASSET",
+        "GENERATE_ORIGINAL"
+      ],
+      "canonical_root": "assets/",
+      "locked_assets": [
+        "assets/logo-scd.png",
+        "assets/logo-scd.webp",
+        "assets/logo-lnd.png",
+        "assets/logo-lnd.webp",
+        "assets/logo-sgs.png",
+        "assets/logo-sgs.webp",
+        "assets/logo-monza.png",
+        "assets/logo-monza.webp"
+      ],
+      "protected_classes": [
+        "OFFICIAL_CLUB_LOGO",
+        "FEDERATION_LOGO",
+        "TEAM_OPPONENT_CREST",
+        "OFFICIAL_KIT",
+        "SPONSOR_LOGO",
+        "SPONSOR_WORDMARK"
+      ],
+      "official_asset_rule": "NEVER_GENERATE_OR_REDRAW_WHEN_REAL_VERIFIABLE_ASSET_EXISTS",
+      "provenance_required": [
+        "SOURCE",
+        "SOURCE_URL_OR_FILE",
+        "VERIFIED_AT",
+        "HASH",
+        "RIGHTS_OR_USAGE_STATUS",
+        "STATUS"
+      ],
+      "opponent_logo_rule": "OFFICIAL_FIRST_CROSS_CHECK_REQUIRED_NO_GENERATED_CREST",
+      "sponsor_rule": "EXACT_LEGAL_OR_APPROVED_NAME_AND_OFFICIAL_WORDMARK_ONLY",
+      "kit_rule": "REAL_APPROVED_REFERENCE_REQUIRED_BEFORE_OFFICIAL_RENDER"
+    },
+    "adaptive_experience": {
+      "state": "CONTRACTED",
+      "strategy": "FEATURE_DETECTION_CONTAINER_RESPONSIVE",
+      "targets": [
+        "ANDROID",
+        "IPHONE",
+        "TABLET",
+        "FOLDABLE",
+        "DESKTOP",
+        "NOTEBOOK",
+        "TOUCH_DISPLAY",
+        "ULTRAWIDE",
+        "FUTURE_SCREEN"
+      ],
+      "allowed_signals": [
+        "VIEWPORT",
+        "ORIENTATION",
+        "DEVICE_PIXEL_RATIO",
+        "SAFE_AREA",
+        "INPUT_CAPABILITY",
+        "HOVER_CAPABILITY",
+        "REDUCED_MOTION",
+        "CONTRAST_PREFERENCE",
+        "COLOR_SCHEME",
+        "FONT_SCALING",
+        "CONTAINER_SIZE",
+        "FOLD_OR_HINGE_IF_AVAILABLE",
+        "NETWORK_CLASS_IF_AVAILABLE",
+        "PERFORMANCE_TIMING",
+        "TECHNICAL_ERRORS"
+      ],
+      "forbidden_signals": [
+        "HIDDEN_FINGERPRINTING",
+        "UNNECESSARY_DEVICE_UNIQUE_ID",
+        "MENTAL_STATE",
+        "HEALTH",
+        "VULNERABILITY",
+        "MINOR_COMPETENCE"
+      ],
+      "real_time_observers": [
+        "RESIZE_OBSERVER",
+        "MATCH_MEDIA",
+        "VISUAL_VIEWPORT_IF_AVAILABLE"
+      ],
+      "fluid_qa_required": true
     }
   },
   "temporal_core": {
@@ -1565,6 +1651,21 @@
         "SLOW_LOAD"
       ],
       "rule": "Objective interaction friction may improve UI; it must not be interpreted as a psychological diagnosis."
+    },
+    "adaptive_device_metrics": {
+      "state": "PLANNED_PRIVACY_FIRST",
+      "aggregate_only": true,
+      "allowed": [
+        "VIEWPORT_CLASS",
+        "INPUT_MODE",
+        "PERFORMANCE_CLASS",
+        "ACCESSIBILITY_PREFERENCE",
+        "LAYOUT_ERROR",
+        "OVERFLOW",
+        "SLOW_LOAD"
+      ],
+      "no_fingerprinting": true,
+      "purpose": "Improve layout, resolution, density and task usability across device classes."
     }
   },
   "architecture": {
@@ -2213,6 +2314,40 @@
         "TOURNAMENTS_MASTER_SHEET"
       ],
       "contract": "UTILITY_FIRST_PARTNER_VALUE_VERIFIED_METRICS_NO_PROSPECT_AS_CONFIRMED_SPONSOR"
+    },
+    {
+      "id": "CAP-ASSET-INTEGRITY",
+      "domain": "BRAND_MEDIA",
+      "required": true,
+      "state": "IMPLEMENTED",
+      "sources": [
+        "SCD_DRIVE",
+        "WEB_VERIFIED"
+      ],
+      "contract": "LOCKED_OFFICIAL_ASSETS_REAL_OPPONENT_CRESTS_EXACT_SPONSOR_WORDMARKS_PROVENANCE_HASH"
+    },
+    {
+      "id": "CAP-ADAPTIVE-EXPERIENCE",
+      "domain": "EXPERIENCE",
+      "required": true,
+      "state": "PARTIAL",
+      "sources": [
+        "SOURCE-NONE"
+      ],
+      "contract": "FEATURE_DETECTION_FLUID_LAYOUT_NO_FINGERPRINTING_REAL_TIME_QA"
+    },
+    {
+      "id": "CAP-GLOBAL-EXPERT-ROUTER",
+      "domain": "OPERATIONS",
+      "required": true,
+      "state": "IMPLEMENTED",
+      "sources": [
+        "WEB_VERIFIED",
+        "SCD_DRIVE",
+        "SCD_GMAIL",
+        "R20"
+      ],
+      "contract": "MULTIDISCIPLINARY_ROUTING_CURRENT_SOURCE_VERIFICATION_AND_CONTROLLED_AUTONOMY"
     }
   ],
   "known_noncompliance": [
@@ -2436,6 +2571,34 @@
       "fail_closed": true,
       "website_news_source": "DISABLED",
       "web_news_scrape": "DISABLED"
+    },
+    "asset_decision_gate": {
+      "required_before_visual_or_media_change": true,
+      "decision_values": [
+        "KEEP_LOCKED",
+        "KEEP_ENHANCE",
+        "REBUILD_IMPROVE",
+        "RESEARCH_REAL_ASSET",
+        "GENERATE_ORIGINAL"
+      ],
+      "real_asset_priority": true,
+      "no_ai_substitution_for_official_asset": true
+    },
+    "global_expert_router": {
+      "state": "BINDING",
+      "rule": "Route each task to one or more relevant domains, verify current high-stakes facts externally when needed, and preserve source provenance.",
+      "cybersecurity_scope": "DEFENSIVE_AUTHORIZED_OSINT_AND_SECURE_ENGINEERING_ONLY",
+      "research_scope": "PUBLIC_AUTHORIZED_SOURCES_ONLY",
+      "high_stakes_domains": [
+        "LAW",
+        "LABOR",
+        "TAX",
+        "FINANCE",
+        "HEALTH",
+        "SAFETY",
+        "GEOPOLITICS_CURRENT"
+      ],
+      "high_stakes_rule": "CURRENT_SOURCES_AND_CLEAR_FACT_ANALYSIS_DECISION_SEPARATION"
     }
   },
   "product_direction": {
