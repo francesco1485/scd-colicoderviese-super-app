@@ -67,8 +67,12 @@ for(const viewport of viewports){
     blue:getComputedStyle(document.documentElement).getPropertyValue('--blue').trim(),
     gold:getComputedStyle(document.documentElement).getPropertyValue('--gold').trim()
   }));
-  if(palette.bg!=='#eef5fb'||palette.blue!=='#0059d6'||palette.gold!=='#f5c400')throw new Error('premium sports palette not applied '+JSON.stringify(palette));
-  const sportHubButtons=await page.locator('#sportHub button').count();
+  if(palette.bg!=='#f2f5f9'||palette.blue!=='#1664e8'||palette.gold!=='#ffc928')throw new Error('SCD Arena palette not applied '+JSON.stringify(palette));
+  const arenaTheme=await page.evaluate(()=>document.body.dataset.scdTheme);
+  if(arenaTheme!=='arena')throw new Error('SCD Arena theme marker missing');
+  const arenaLabel=String(await page.locator('#sportHub .sport-superbar-title span').textContent()||'');
+  if(!arenaLabel.includes('SCD ARENA'))throw new Error('SCD Arena identity missing');
+    const sportHubButtons=await page.locator('#sportHub button').count();
   if(sportHubButtons!==6)throw new Error('Sport Hub actions mismatch: '+sportHubButtons);
   const officialLinks=await page.locator('#mediaHub .official-channels a').count();
   if(officialLinks!==5)throw new Error('Media Hub official links mismatch: '+officialLinks);
@@ -203,7 +207,11 @@ if(!capabilities.ok())throw new Error('capabilities endpoint failed '+capabiliti
 const cap=await capabilities.json();
 if(typeof cap.featureFlags?.supabaseCore!=='boolean')throw new Error('supabase feature flag missing');
 
-for(const resource of ['/manifest.webmanifest','/sw.js','/robots.txt','/sitemap.xml']){
+const pwaManifest=await api.request.get(base+'/manifest.webmanifest');
+if(!pwaManifest.ok())throw new Error('manifest.webmanifest missing');
+const pwaJson=await pwaManifest.json();
+if(pwaJson.theme_color!=='#041c3a'||pwaJson.background_color!=='#f2f5f9')throw new Error('SCD Arena PWA colors missing');
+for(const resource of ['/sw.js','/robots.txt','/sitemap.xml']){
   const rr=await api.request.get(base+resource);
   if(!rr.ok())throw new Error(resource+' missing');
 }

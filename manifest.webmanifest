@@ -1,22 +1,53 @@
 {
-  "name":"SCD Universe · ColicoDerviese",
-  "short_name":"SCD Universe",
-  "id":"./",
-  "start_url":"./#pulse",
-  "scope":"./",
-  "display":"standalone",
-  "orientation":"portrait-primary",
-  "background_color":"#eef5fb",
-  "theme_color":"#062d61",
-  "description":"Sport, community, servizi, identità digitale e Private Desk SCD ColicoDerviese.",
-  "categories":["sports","social","productivity"],
-  "icons":[
-    {"src":"./assets/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},
-    {"src":"./assets/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}
+  "name": "SCD Universe · ColicoDerviese",
+  "short_name": "SCD Universe",
+  "id": "./",
+  "start_url": "./#pulse",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f2f5f9",
+  "theme_color": "#041c3a",
+  "description": "SCD Arena: sport, matchday, squadre, community, media, servizi e Private Desk ColicoDerviese in una sola web app.",
+  "categories": [
+    "sports",
+    "social",
+    "productivity"
   ],
-  "shortcuts":[
-    {"name":"Pulse","short_name":"Pulse","url":"./#pulse"},
-    {"name":"SCD Twin","short_name":"Twin","url":"./#twin"},
-    {"name":"Private Desk","short_name":"Desk","url":"./#desk"}
+  "icons": [
+    {
+      "src": "./assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Home",
+      "short_name": "Home",
+      "url": "./#pulse"
+    },
+    {
+      "name": "Calendario",
+      "short_name": "Calendario",
+      "url": "./#calendar"
+    },
+    {
+      "name": "Squadre",
+      "short_name": "Squadre",
+      "url": "./#teams"
+    },
+    {
+      "name": "Private Desk",
+      "short_name": "Desk",
+      "url": "./#desk"
+    }
   ]
 }
