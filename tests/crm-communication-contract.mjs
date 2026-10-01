@@ -33,6 +33,7 @@ assert(bridge.includes("TOUCHPOINTS_MASTER"),'CRM touchpoint audit missing');
 assert(bridge.includes("SOCIETA_PROFILE"),'canonical society profile missing');
 assert(bridge.includes("FIRME_RUOLI"),'role/person signature registry missing');
 assert(bridge.includes("Firma personale non autorizzata: identita account/persona non coincidente."),'personal signature identity binding missing');
+assert(bridge.includes("Firma di ruolo non autorizzata per l account autenticato."),'role signature account binding missing');
 assert(bridge.includes("EMAIL_TEMPLATE"),'email template registry missing');
 assert(bridge.includes("profile.LEGAL_NAME || profile.DISPLAY_NAME"),'legal institutional identity precedence missing');
 assert(html.includes('id="crmEmailModal"'),'institutional email composer UI missing');
