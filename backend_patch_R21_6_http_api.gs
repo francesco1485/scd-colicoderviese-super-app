@@ -64,6 +64,12 @@ function doPost(e) {
       case 'account.requests':
         data = r216MyRequests_(token);
         break;
+      case 'private.crm.summary':
+        data = r216CrmSummary_(token, payload);
+        break;
+      case 'private.crm.detail':
+        data = r216CrmDetail_(token, payload);
+        break;
       case 'private.week':
         data = getWeekForUser(token, Number(payload.offset || 0));
         break;
@@ -213,4 +219,141 @@ function r216MyRequests_(token) {
   }).slice(-50).reverse().map(function(r) {
     return {id:r.REQUEST_ID,createdAt:r.CREATED_AT,type:r.TYPE,status:r.STATUS,topic:r.OGGETTO,updatedAt:r.UPDATED_AT,note:r.NOTE};
   });
+}
+
+
+/* R40.1 CRM RELAZIONALE SCD
+ * Un solo stakeholder canonico; touchpoint, task e opportunita restano nei rispettivi master.
+ * Nessuna azione esterna viene eseguita da queste funzioni.
+ */
+function r216CrmActor_(token) {
+  if (!token) throw new Error('Sessione mancante');
+  var actor = sessionActor_(token);
+  if (!actor || !actor.email) throw new Error('Sessione non valida');
+  return actor;
+}
+function r216CrmTable_(name) {
+  var t = table_(sheet_(SCD.CORE_ID, name));
+  return t && t.rows ? t.rows : [];
+}
+function r216CrmDateMs_(value) {
+  if (!value) return 0;
+  var d = value instanceof Date ? value : new Date(value);
+  return isNaN(d.getTime()) ? 0 : d.getTime();
+}
+function r216CrmSummary_(token, payload) {
+  r216CrmActor_(token);
+  payload = payload || {};
+  var limit = Math.max(1, Math.min(500, Number(payload.limit || 250)));
+  var stakeholders = r216CrmTable_('STAKEHOLDERS_MASTER');
+  var touchpoints = r216CrmTable_('TOUCHPOINTS_MASTER');
+  var opportunities = r216CrmTable_('COMMERCIALE_OPPORTUNITA');
+  var tasks = r216CrmTable_('TASKS_MASTER');
+
+  var tpBy = {}, taskBy = {}, oppByName = {};
+  touchpoints.forEach(function(r) {
+    var id = String(r.STAKEHOLDER_ID || '');
+    if (!id) return;
+    (tpBy[id] = tpBy[id] || []).push(r);
+  });
+  tasks.forEach(function(r) {
+    var id = String(r['ID ENTITA'] || r['ID ENTITÀ'] || '');
+    if (!id) return;
+    (taskBy[id] = taskBy[id] || []).push(r);
+  });
+  opportunities.forEach(function(r) {
+    var name = String(r.PARTNER || '').trim().toLowerCase();
+    if (!name) return;
+    (oppByName[name] = oppByName[name] || []).push(r);
+  });
+
+  var rows = stakeholders.filter(function(r) {
+    return String(r.STAKEHOLDER_ID || '').trim() && String(r.NOME || '').trim();
+  }).map(function(r) {
+    var id = String(r.STAKEHOLDER_ID || '');
+    var tps = tpBy[id] || [];
+    tps.sort(function(a,b){return r216CrmDateMs_(b.TIMESTAMP)-r216CrmDateMs_(a.TIMESTAMP)});
+    var ownTasks = (taskBy[id] || []).filter(function(t){return String(t.STATO || '').toUpperCase() !== 'FATTO'});
+    var opps = oppByName[String(r.NOME || '').trim().toLowerCase()] || [];
+    return {
+      id:id,
+      type:String(r.TIPO || ''),
+      name:String(r.NOME || ''),
+      category:String(r.CATEGORIA || ''),
+      area:String(r.AREA || ''),
+      relationshipStatus:String(r.STATO_RELAZIONE || ''),
+      owner:String(r.OWNER || ''),
+      email:String(r.EMAIL || ''),
+      phone:String(r.TELEFONO || ''),
+      location:String(r.LOCALITA || ''),
+      relationshipValue:String(r.VALORE_REL || ''),
+      lastContact:String(r.ULTIMO_CONTATTO || ''),
+      nextAction:String(r.PROSSIMA_AZIONE || ''),
+      nextDeadline:String(r.PROSSIMA_SCADENZA || ''),
+      preferredChannel:String(r.PREFERRED_CHANNEL || ''),
+      contactPolicy:String(r.CONTACT_POLICY || ''),
+      tags:String(r.CRM_TAGS || ''),
+      profileUpdatedAt:String(r.PROFILE_UPDATED_AT || ''),
+      touchpoints:tps.length,
+      openTasks:ownTasks.length,
+      opportunities:opps.length,
+      lastTouchpoint:tps.length ? {
+        timestamp:String(tps[0].TIMESTAMP || ''),
+        channel:String(tps[0].CANALE || ''),
+        subject:String(tps[0].OGGETTO || ''),
+        outcome:String(tps[0].ESITO || '')
+      } : null
+    };
+  });
+  rows.sort(function(a,b) {
+    var ad=r216CrmDateMs_(a.nextDeadline), bd=r216CrmDateMs_(b.nextDeadline);
+    if (ad && bd && ad !== bd) return ad-bd;
+    if (ad && !bd) return -1;
+    if (!ad && bd) return 1;
+    return a.name.localeCompare(b.name);
+  });
+  var suspended = rows.filter(function(x){return /SOSPESO|NO_CONTACT/.test(String(x.contactPolicy||''))}).length;
+  return {
+    generatedAt:new Date(),
+    rows:rows.slice(0,limit),
+    kpi:{
+      total:rows.length,
+      active:rows.filter(function(x){return !/CHIUSA|NEGATIVA|PERSO/.test(String(x.relationshipStatus||'').toUpperCase())}).length,
+      suspended:suspended,
+      due:rows.filter(function(x){return !!x.nextDeadline}).length
+    },
+    policy:'READ_ONLY_RELATIONSHIP_VIEW'
+  };
+}
+function r216CrmDetail_(token, payload) {
+  r216CrmActor_(token);
+  payload = payload || {};
+  var id = String(payload.id || payload.stakeholderId || '').trim();
+  if (!id) throw new Error('Stakeholder mancante');
+  var stakeholder = r216CrmTable_('STAKEHOLDERS_MASTER').filter(function(r){return String(r.STAKEHOLDER_ID||'')===id})[0];
+  if (!stakeholder) throw new Error('Stakeholder non trovato');
+
+  var touchpoints = r216CrmTable_('TOUCHPOINTS_MASTER').filter(function(r){return String(r.STAKEHOLDER_ID||'')===id});
+  touchpoints.sort(function(a,b){return r216CrmDateMs_(b.TIMESTAMP)-r216CrmDateMs_(a.TIMESTAMP)});
+  var tasks = r216CrmTable_('TASKS_MASTER').filter(function(r){
+    return String(r['ID ENTITA'] || r['ID ENTITÀ'] || '')===id;
+  });
+  var opportunities = r216CrmTable_('COMMERCIALE_OPPORTUNITA').filter(function(r){
+    return String(r.PARTNER||'').trim().toLowerCase()===String(stakeholder.NOME||'').trim().toLowerCase();
+  });
+  var relations = r216CrmTable_('RELAZIONI_MASTER').filter(function(r){
+    return String(r.DA_ID||'')===id || String(r.A_ID||'')===id;
+  });
+
+  return {
+    stakeholder:stakeholder,
+    touchpoints:touchpoints.slice(0,100),
+    tasks:tasks.slice(0,100),
+    opportunities:opportunities.slice(0,50),
+    relations:relations.slice(0,100),
+    safety:{
+      contactPolicy:String(stakeholder.CONTACT_POLICY || ''),
+      externalContactBlocked:/SOSPESO|NO_CONTACT/.test(String(stakeholder.CONTACT_POLICY || ''))
+    }
+  };
 }
