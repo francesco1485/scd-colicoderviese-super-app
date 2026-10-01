@@ -121,7 +121,10 @@ async function loadPublicPortal(){
   }
   publicShowcase=data||[]
   $('publicShowcaseGrid').innerHTML=publicShowcase.map(x=>
-    '<article class="public-showcase-card '+(x.featured?'featured':'')+'"><div><span>'+esc(x.eyebrow||x.category)+'</span><h3>'+esc(x.title)+'</h3><p>'+esc(x.summary)+'</p></div><div class="public-showcase-footer"><small>'+esc(x.audience||'Proposta su misura')+'</small><button type="button" data-public-item="'+x.id+'">'+esc(x.cta_label||'Richiedi informazioni')+' →</button></div></article>'
+    '<article class="public-showcase-card '+(x.featured?'featured':'')+'">'+
+      (x.visual_url?'<div class="public-showcase-visual"><img src="'+esc(x.visual_url)+'" alt="" loading="lazy"></div>':'')+
+      '<div><span>'+esc(x.eyebrow||x.category)+'</span><h3>'+esc(x.title)+'</h3><p>'+esc(x.summary)+'</p></div>'+
+      '<div class="public-showcase-footer"><small>'+esc(x.audience||'Proposta su misura')+'</small><button type="button" data-public-item="'+x.id+'">'+esc(x.cta_label||'Richiedi informazioni')+' →</button></div></article>'
   ).join('')||'<div class="empty">Nuove iniziative in preparazione.</div>'
   document.querySelectorAll('[data-public-item]').forEach(b=>b.onclick=()=>{
     const item=publicShowcase.find(x=>x.id===b.dataset.publicItem)
@@ -659,12 +662,13 @@ async function loadAll(){
     supabase.from('expert_protocols').select('*').eq('organization_id',window.orgId).eq('status','active').order('version',{ascending:false}).limit(20),
     supabase.from('ux_usage_events').select('*').eq('organization_id',window.orgId).order('created_at',{ascending:false}).limit(500),
     isAccessApprover()?supabase.from('public_access_requests').select('*').eq('organization_id',window.orgId).order('created_at',{ascending:false}).limit(250):Promise.resolve({data:[],error:null}),
-    isAccessApprover()?supabase.from('public_commercial_leads').select('*').eq('organization_id',window.orgId).order('created_at',{ascending:false}).limit(250):Promise.resolve({data:[],error:null})
+    isAccessApprover()?supabase.from('public_commercial_leads').select('*').eq('organization_id',window.orgId).order('created_at',{ascending:false}).limit(250):Promise.resolve({data:[],error:null}),
+    isAccessApprover()?supabase.from('public_showcase_items').select('*').eq('organization_id',window.orgId).order('sort_order').order('title'):Promise.resolve({data:[],error:null})
   ]
   const res=await Promise.all(q)
   const err=res.find(x=>x.error)?.error
   if(err){console.error(err);$('refreshBtn').textContent='!';return}
-  ;[ecosystem,projects,actions,marketHubs,marketEntities,contacts,timeline,documents,partnerRequirements,blueprints,subjects,initiatives,cepaContent,cepaAcademy,cepaSpeakers,products,productKnowledge,comparisons,collaborators,collaboratorTerms,portfolioSnapshots,businessAssessments,growthKits,distributionWatchlists,distributionCandidates,distributionEvidence,mailTemplates,mailDrafts,cepaExpansion,cepaReadiness,assistantMessages,liaCapabilities,liaFolders,liaOrders,liaFiles,researchSources,researchInsights,liaActionRules,liaApprovals,roleViewAccess,liaAutomationRuns,officeAssignments,officeMessages,officeSnapshots,officeCases,officeWorkflow,officeCepaActivities,officeImports,commercialClients,pipelineCases,clientCheckups,clientInteractions,clientWorkItems,clientPolicies,assetRegistry,expertProtocols,uxUsageEvents,accessRequests,commercialLeads]=res.map(x=>x.data||[])
+  ;[ecosystem,projects,actions,marketHubs,marketEntities,contacts,timeline,documents,partnerRequirements,blueprints,subjects,initiatives,cepaContent,cepaAcademy,cepaSpeakers,products,productKnowledge,comparisons,collaborators,collaboratorTerms,portfolioSnapshots,businessAssessments,growthKits,distributionWatchlists,distributionCandidates,distributionEvidence,mailTemplates,mailDrafts,cepaExpansion,cepaReadiness,assistantMessages,liaCapabilities,liaFolders,liaOrders,liaFiles,researchSources,researchInsights,liaActionRules,liaApprovals,roleViewAccess,liaAutomationRuns,officeAssignments,officeMessages,officeSnapshots,officeCases,officeWorkflow,officeCepaActivities,officeImports,commercialClients,pipelineCases,clientCheckups,clientInteractions,clientWorkItems,clientPolicies,assetRegistry,expertProtocols,uxUsageEvents,accessRequests,commercialLeads,publicShowcase]=res.map(x=>x.data||[])
   renderEverything()
   $('refreshBtn').textContent='↻'
 }
@@ -2561,6 +2565,10 @@ function renderAccessAdmin(){
   $('accessActivatedCount').textContent=accessRequests.filter(x=>x.status==='activated').length
   $('commercialLeadNewCount').textContent=commercialLeads.filter(x=>x.status==='new').length
   $('sponsorLeadCount').textContent=commercialLeads.filter(x=>['sponsor','partner'].includes(x.lead_type)&&!['closed','lost'].includes(x.status)).length
+  if($('showcaseTotalCount'))$('showcaseTotalCount').textContent=publicShowcase.length
+  if($('showcasePublishedCount'))$('showcasePublishedCount').textContent=publicShowcase.filter(x=>x.published).length
+  if($('showcaseFeaturedCount'))$('showcaseFeaturedCount').textContent=publicShowcase.filter(x=>x.featured).length
+  if($('showcaseVisualCount'))$('showcaseVisualCount').textContent=publicShowcase.filter(x=>x.visual_url).length
 
   $('accessRequestList').innerHTML=accessRequests.map(r=>
     '<article class="access-request-card '+esc(r.status)+'"><div class="access-request-head"><div><strong>'+esc(r.full_name)+'</strong><small>'+esc(r.email)+' · '+esc(r.phone)+'</small></div><span>'+esc(r.status.replaceAll('_',' '))+'</span></div>'+
@@ -2578,17 +2586,91 @@ function renderAccessAdmin(){
   document.querySelectorAll('[data-access-reject]').forEach(b=>b.onclick=()=>manageAccessRequest(b.dataset.accessReject,'reject'))
   document.querySelectorAll('[data-access-resend]').forEach(b=>b.onclick=()=>manageAccessRequest(b.dataset.accessResend,'resend_activation'))
 
-  $('commercialLeadList').innerHTML=commercialLeads.map(l=>
-    '<article class="commercial-lead-card"><div class="access-request-head"><div><strong>'+esc(l.company_name||l.full_name)+'</strong><small>'+esc(l.full_name)+' · '+esc(l.email)+' · '+esc(l.phone)+'</small></div><span>'+esc(l.lead_type)+'</span></div>'+
+  $('commercialLeadList').innerHTML=commercialLeads.map(l=>{
+    const linkedAction=actions.find(a=>a.metadata?.public_commercial_lead_id===l.id)
+    return '<article class="commercial-lead-card"><div class="access-request-head"><div><strong>'+esc(l.company_name||l.full_name)+'</strong><small>'+esc(l.full_name)+' · '+esc(l.email)+' · '+esc(l.phone)+'</small></div><span>'+esc(l.lead_type)+'</span></div>'+
     (l.interest_area?'<p><b>Interesse:</b> '+esc(l.interest_area)+'</p>':'')+
     (l.message?'<p>'+esc(l.message)+'</p>':'')+
-    '<footer><small>'+esc(fmtDateTime(l.created_at))+'</small><select data-lead-status="'+l.id+'"><option value="new">Nuovo</option><option value="contacted">Contattato</option><option value="qualified">Qualificato</option><option value="opportunity">Opportunità</option><option value="closed">Chiuso</option><option value="lost">Perso</option></select></footer></article>'
-  ).join('')||empty('Nessun contatto commerciale dalla vetrina.')
+    '<footer><small>'+esc(fmtDateTime(l.created_at))+(linkedAction?' · attività collegata':'')+'</small><div class="lead-footer-actions"><select data-lead-status="'+l.id+'"><option value="new">Nuovo</option><option value="contacted">Contattato</option><option value="qualified">Qualificato</option><option value="opportunity">Opportunità</option><option value="closed">Chiuso</option><option value="lost">Perso</option></select>'+(linkedAction?'<button type="button" class="small-btn" data-lead-action="'+linkedAction.id+'">Apri attività</button>':'')+'</div></footer></article>'
+  }).join('')||empty('Nessun contatto commerciale dalla vetrina.')
   document.querySelectorAll('[data-lead-status]').forEach(sel=>{
     const row=commercialLeads.find(x=>x.id===sel.dataset.leadStatus);if(row)sel.value=row.status
     sel.onchange=()=>updateCommercialLead(sel.dataset.leadStatus,sel.value)
   })
+  document.querySelectorAll('[data-lead-action]').forEach(b=>b.onclick=()=>{navigate('actions');setTimeout(()=>openAction(b.dataset.leadAction),80)})
+  renderShowcaseManager()
 }
+
+
+function showcaseAssetUrl(a){
+  if(!a)return''
+  if(a.source_url)return a.source_url
+  const p=String(a.repository_path||'')
+  const prefix='cepa-maglia-os-static/'
+  return p.startsWith(prefix)?'./'+p.slice(prefix.length):''
+}
+function renderShowcaseManager(){
+  if(!$('showcaseManagerList')||!isAccessApprover())return
+  $('newShowcaseItemBtn').onclick=()=>openShowcaseEditor(null)
+  $('showcaseManagerList').innerHTML=publicShowcase.map(x=>
+    '<article class="showcase-manager-card '+(x.published?'published':'draft')+'">'+
+      (x.visual_url?'<div class="showcase-manager-thumb"><img src="'+esc(x.visual_url)+'" alt=""></div>':'<div class="showcase-manager-thumb empty-thumb">M360</div>')+
+      '<div class="showcase-manager-copy"><div><span>'+esc(x.category)+' · ordine '+esc(x.sort_order)+'</span><h4>'+esc(x.title)+'</h4><p>'+esc(x.summary)+'</p></div>'+
+      '<div class="showcase-manager-tags"><b>'+(x.published?'PUBBLICATA':'NASCOSTA')+'</b>'+(x.featured?'<b>IN EVIDENZA</b>':'')+'<small>'+esc(x.audience||'')+'</small></div></div>'+
+      '<button type="button" class="small-btn" data-showcase-edit="'+x.id+'">Modifica</button>'+
+    '</article>'
+  ).join('')||empty('Nessuna proposta pubblica.')
+  document.querySelectorAll('[data-showcase-edit]').forEach(b=>b.onclick=()=>openShowcaseEditor(b.dataset.showcaseEdit))
+}
+function openShowcaseEditor(id=null){
+  if(!isAccessApprover())return
+  const x=id?publicShowcase.find(v=>v.id===id):null
+  const usableAssets=assetRegistry.filter(a=>showcaseAssetUrl(a)&&a.governance_status!=='reject')
+  $('modalContent').innerHTML='<div class="eyebrow">VETRINA MANAGER</div><h2>'+(x?'Modifica proposta':'Nuova proposta pubblica')+'</h2><p class="muted">Qui si gestisce ciò che il pubblico vede. Prezzi, provvigioni e condizioni economiche non fanno parte di questo contenuto.</p>'+
+    '<form id="showcaseEditorForm" class="form">'+
+      '<div class="inline"><label>Categoria<input id="scCategory" value="'+esc(x?.category||'partnership')+'" required></label><label>Eyebrow<input id="scEyebrow" value="'+esc(x?.eyebrow||'')+'"></label></div>'+
+      '<label>Titolo<input id="scTitle" value="'+esc(x?.title||'')+'" required></label>'+
+      '<label>Sintesi pubblica<textarea id="scSummary" required>'+esc(x?.summary||'')+'</textarea></label>'+
+      '<label>Destinatari<input id="scAudience" value="'+esc(x?.audience||'')+'" placeholder="Aziende · persone · professionisti"></label>'+
+      '<div class="inline"><label>Call to action<input id="scCta" value="'+esc(x?.cta_label||'Richiedi informazioni')+'"></label><label>Ordine<input id="scOrder" type="number" min="0" step="1" value="'+esc(x?.sort_order??100)+'"></label></div>'+
+      '<label>Asset ufficiale<select id="scAsset"><option value="">Nessuno / usa URL manuale</option>'+usableAssets.map(a=>'<option value="'+a.id+'">'+esc(a.asset_name)+' · '+esc(governanceLabel(a.governance_status))+'</option>').join('')+'</select></label>'+
+      '<label>URL immagine<input id="scVisual" type="url" value="'+esc(x?.visual_url||'')+'" placeholder="https://..."></label>'+
+      '<div class="showcase-editor-checks"><label><input id="scPublished" type="checkbox" '+(x?.published?'checked':'')+'> Pubblicata</label><label><input id="scFeatured" type="checkbox" '+(x?.featured?'checked':'')+'> In evidenza</label></div>'+
+      '<button type="submit" class="primary">Salva proposta</button>'+
+    '</form>'
+  $('modal').classList.remove('hidden')
+  $('scAsset').onchange=e=>{
+    const a=assetRegistry.find(v=>v.id===e.target.value)
+    const url=showcaseAssetUrl(a)
+    if(url)$('scVisual').value=url
+  }
+  $('showcaseEditorForm').onsubmit=async e=>{
+    e.preventDefault()
+    const title=$('scTitle').value.trim()
+    const slugBase=title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,70)||'proposta'
+    const row={
+      organization_id:window.orgId,
+      project_scope:'MAGLIA_360',
+      category:$('scCategory').value.trim()||'partnership',
+      eyebrow:$('scEyebrow').value.trim()||null,
+      title,
+      summary:$('scSummary').value.trim(),
+      audience:$('scAudience').value.trim()||null,
+      cta_label:$('scCta').value.trim()||'Richiedi informazioni',
+      visual_url:$('scVisual').value.trim()||null,
+      published:$('scPublished').checked,
+      featured:$('scFeatured').checked,
+      sort_order:Number($('scOrder').value||100),
+      updated_at:new Date().toISOString()
+    }
+    let result
+    if(x) result=await supabase.from('public_showcase_items').update(row).eq('id',x.id).eq('organization_id',window.orgId)
+    else result=await supabase.from('public_showcase_items').insert({...row,slug:slugBase+'-'+Date.now().toString().slice(-5)})
+    if(result.error)return alert(result.error.message)
+    closeModal();await loadAll()
+  }
+}
+
 async function manageAccessRequest(id,action,role='viewer'){
   if(!isAccessApprover())return
   const{data,error}=await supabase.functions.invoke('manage-access-request',{body:{request_id:id,action,role}})
@@ -2598,8 +2680,19 @@ async function manageAccessRequest(id,action,role='viewer'){
 }
 async function updateCommercialLead(id,status){
   if(!isAccessApprover())return
+  const lead=commercialLeads.find(x=>x.id===id);if(!lead)return
   const{error}=await supabase.from('public_commercial_leads').update({status,updated_at:new Date().toISOString()}).eq('id',id).eq('organization_id',window.orgId)
   if(error)return alert(error.message)
+  const linked=actions.find(a=>a.metadata?.public_commercial_lead_id===id)
+  if(linked){
+    const actionStatus=['closed','lost'].includes(status)?'completed':status==='opportunity'?'in_progress':linked.status
+    const next=status==='new'?'Contattare il lead e verificare interesse.':
+      status==='contacted'?'Qualificare bisogno, interlocutore e prossima azione.':
+      status==='qualified'?'Valutare proposta, partner e percorso commerciale.':
+      status==='opportunity'?'Aprire sviluppo concreto e definire appuntamento/proposta.':
+      status==='closed'?'Registrare esito finale della relazione.':'Archiviare motivazione della perdita.'
+    await supabase.from('strategic_actions').update({status:actionStatus,next_action:next,updated_at:new Date().toISOString()}).eq('id',linked.id).eq('organization_id',window.orgId)
+  }
   await loadAll()
 }
 
