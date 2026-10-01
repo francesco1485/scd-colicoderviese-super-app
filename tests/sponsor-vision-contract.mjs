@@ -124,6 +124,8 @@ assert(js.includes("$$('.view').forEach"),'multi-view selector must use $$ helpe
 assert(js.includes("$$('[data-view]').forEach"),'multi-action selector must use $$ helper');
 assert(js.includes("$$('[data-campaign-filter]').forEach"),'campaign filters must use $$ helper');
 assert(!/(^|[^$])\$\('\[data-view\]'\)\.forEach/m.test(js),'single selector incorrectly used for multiple view actions');
+assert(js.includes("$('[data-motion-id]').forEach"),'motion profile controls must use $ helper');
+assert(!/(^|[^$])\$\('\[data-motion-id\]'\)\.forEach/m.test(js),'single selector incorrectly used for motion profile collection');
 
 
 assert(js.includes('function partnerHubRecords()'),'Partner Hub CRM synchronization missing');
