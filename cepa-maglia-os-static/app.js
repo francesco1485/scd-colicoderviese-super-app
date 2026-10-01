@@ -651,6 +651,70 @@ function renderOperatingPlan(){
     document.querySelectorAll('[data-commerce-open]').forEach(b=>b.onclick=()=>openCommerceTab(b.dataset.commerceOpen))
   }
 
+  const coverageDomains=[
+    {key:'clienti',title:'Clienti & Portafoglio',target:'products',checks:[
+      ['Clienti',commercialClients.length],['Polizze',clientPolicies.length],['Check-up',clientCheckups.length],['Interazioni',clientInteractions.length],['Task cliente',clientWorkItems.length]
+    ]},
+    {key:'sedi',title:'Sedi operative',target:'home',checks:[
+      ['Sedi',accessibleOffices().length],['Snapshot mensili',officeSnapshots.length],['Pratiche',officeCases.length],['Import',officeImports.length],['Attività CEPA sede',officeCepaActivities.length]
+    ]},
+    {key:'rete',title:'Collaboratori & Rete',target:'collaborators',checks:[
+      ['Collaboratori',collaborators.length],['Snapshot rete',portfolioSnapshots.length],['Assessment',businessAssessments.length],['Growth kit',growthKits.length],['Candidati futuri',distributionCandidates.length]
+    ]},
+    {key:'partner',title:'Partner & Prodotti',target:'products',checks:[
+      ['Partner',ecosystem.length],['Contatti',contacts.length],['Documenti',documents.length],['Prodotti',products.length],['Knowledge',productKnowledge.length]
+    ]},
+    {key:'cepa',title:'C.E.P.A.',target:'cepa',checks:[
+      ['Materie',subjects.length],['Iniziative',initiatives.length],['Contenuti',cepaContent.length],['Academy',cepaAcademy.length],['Relatori',cepaSpeakers.length]
+    ]},
+    {key:'ricerca',title:'Ricerca & Sviluppo',target:'liaWorkbench',checks:[
+      ['Fonti',researchSources.length],['Insight',researchInsights.length],['Watchlist',distributionWatchlists.length],['Evidenze rete',distributionEvidence.length],['Automazioni',liaAutomationRuns.length]
+    ]},
+    {key:'governance',title:'Governance & Asset',target:'liaWorkbench',checks:[
+      ['Protocolli',expertProtocols.length],['Asset registrati',assetRegistry.length],['Regole Lia',liaActionRules.length],['Progetti',projects.length],['Azioni',actions.length]
+    ]}
+  ]
+  const coverageRows=coverageDomains.map(d=>{
+    const done=d.checks.filter(x=>Number(x[1]||0)>0).length
+    const pct=Math.round(done/d.checks.length*100)
+    return {...d,done,pct}
+  })
+  const coverageOverall=Math.round(coverageRows.reduce((n,x)=>n+x.pct,0)/coverageRows.length)
+  if($('planCoverageOverall'))$('planCoverageOverall').textContent=coverageOverall+'% copertura'
+  if($('planCoverageGrid'))$('planCoverageGrid').innerHTML=coverageRows.map(d=>
+    '<button type="button" class="plan-coverage-card '+(d.pct===100?'complete':d.pct>=60?'partial':'critical')+'" data-coverage-go="'+d.target+'">'+
+      '<div class="plan-coverage-top"><div><span>'+esc(d.key.toUpperCase())+'</span><strong>'+esc(d.title)+'</strong></div><b>'+d.pct+'%</b></div>'+
+      '<div class="plan-coverage-bar"><i style="width:'+d.pct+'%"></i></div>'+
+      '<div class="plan-coverage-checks">'+d.checks.map(x=>'<span class="'+(x[1]?'ready':'missing')+'">'+esc(x[0])+' <b>'+Number(x[1]||0)+'</b></span>').join('')+'</div>'+
+    '</button>'
+  ).join('')
+  document.querySelectorAll('[data-coverage-go]').forEach(b=>b.onclick=()=>b.dataset.coverageGo==='cepa'?openCepaHub():navigate(b.dataset.coverageGo))
+
+  const recoveryProject=projects.find(x=>x.theme==='system-recovery')
+  const recoveryActions=recoveryProject?actions.filter(x=>x.project_id===recoveryProject.id&&!['completed','cancelled'].includes(x.status)):[]
+  const priorityRank={urgent:0,high:1,normal:2,low:3}
+  recoveryActions.sort((a,b)=>(priorityRank[a.priority]??9)-(priorityRank[b.priority]??9)||new Date(a.created_at)-new Date(b.created_at))
+  if($('planRecoveryCount'))$('planRecoveryCount').textContent=recoveryActions.length+' aperte'
+  if($('planRecoveryActions'))$('planRecoveryActions').innerHTML=recoveryActions.slice(0,10).map((a,i)=>
+    '<button type="button" class="plan-recovery-row" data-view="actions"><b>'+String(i+1).padStart(2,'0')+'</b><div><strong>'+esc(a.title)+'</strong><small>'+esc((a.metadata?.domain||a.lane||'sistema').replaceAll('_',' '))+' · '+esc(a.priority||'normal')+'</small><p>'+esc(a.next_action||a.description||'')+'</p></div><span>→</span></button>'
+  ).join('')||empty('Nessuna azione Recovery aperta')
+
+  const pendingCandidates=distributionCandidates.filter(x=>!['archived','rejected'].includes(x.stage))
+  const observedInsights=researchInsights.filter(x=>['observed','reviewed'].includes(x.status))
+  const activeWatchlists=distributionWatchlists.filter(x=>x.status==='active')
+  if($('planFutureCount'))$('planFutureCount').textContent=(pendingCandidates.length+activeWatchlists.length)+' segnali rete'
+  if($('planFutureRadar'))$('planFutureRadar').innerHTML=
+    '<div class="future-radar-kpis">'+
+      '<div><strong>'+collaborators.length+'</strong><span>collaboratori attuali</span></div>'+
+      '<div><strong>'+pendingCandidates.length+'</strong><span>candidati futuri</span></div>'+
+      '<div><strong>'+activeWatchlists.length+'</strong><span>watchlist attive</span></div>'+
+      '<div><strong>'+observedInsights.length+'</strong><span>insight utilizzabili</span></div>'+
+    '</div>'+
+    '<div class="future-radar-list">'+
+      pendingCandidates.slice(0,4).map(x=>'<div><span>RETE</span><strong>'+esc(x.display_name||x.name||'Candidato')+'</strong><small>'+esc([x.city,x.province,x.stage].filter(Boolean).join(' · '))+'</small></div>').join('')+
+      observedInsights.slice(0,4).map(x=>'<div><span>R&S</span><strong>'+esc(x.title)+'</strong><small>'+esc(x.category.replaceAll('_',' '))+' · '+esc(x.confidence)+'</small></div>').join('')+
+    '</div>'
+
   $('planGovernance').innerHTML=[
     ['Direzione','Priorità, sedi, autorizzazioni, strategie e decisioni finali'],
     ['Operatori','Lavoro e aggiornamenti della propria sede'],
