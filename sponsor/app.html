@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#061b35">
+  <meta name="theme-color" content="#042b55">
   <meta name="description" content="SCD ColicoDerviese Sponsor Platform">
-  <title>SCD Sponsor Platform · Area riservata</title>
+  <title>SCD Partner OS · ColicoDerviese</title>
   <link rel="icon" href="../assets/logo-scd.png">
-  <link rel="stylesheet" href="./app.css?v=10.2.0">
+  <link rel="stylesheet" href="./app.css?v=11.0.0">
 </head>
 <body>
 <a class="skip-link" href="#mainContent">Salta al contenuto principale</a>
@@ -17,14 +17,19 @@
       <img src="../assets/logo-scd.png" alt="SCD ColicoDerviese">
       <div class="brand-copy">
         <strong>S.C.D.<br>COLICODERVIESE</strong>
-        <span>SPONSOR PLATFORM</span>
-        <small>PERSONE · TERRITORIO<br>OPPORTUNITÀ</small>
+        <span>SCD PARTNER OS</span>
+        <small>COLICO · LAGO DI COMO<br>SPORT · TERRITORIO · RELAZIONI</small>
       </div>
     </div>
 
     <nav class="main-nav" id="mainNav">
+      <span class="nav-section-label">CONTROL ROOM</span>
       <button class="nav-link active" data-view="home"><i data-icon="home"></i><span>Dashboard</span></button>
-      <button class="nav-link" data-view="crm"><i data-icon="users"></i><span>CRM</span></button>
+      <button class="nav-link" data-view="partnerhub"><i data-icon="diamond"></i><span>Partner Hub</span></button>
+      <button class="nav-link" data-view="campaigns"><i data-icon="proposal"></i><span>Campaign Studio</span></button>
+      <button class="nav-link" data-view="mediahub"><i data-icon="screen"></i><span>Media Hub</span></button>
+      <span class="nav-section-label">RELAZIONI</span>
+      <button class="nav-link" data-view="crm"><i data-icon="users"></i><span>CRM 360°</span></button>
       <button class="nav-link" data-view="sponsor"><i data-icon="users"></i><span>Sponsor</span></button>
       <button class="nav-link" data-view="contratti"><i data-icon="file"></i><span>Contratti</span></button>
       <button class="nav-link" data-view="proposte"><i data-icon="proposal"></i><span>Proposte</span></button>
@@ -32,8 +37,9 @@
       <button class="nav-link" data-view="fornitori"><i data-icon="link"></i><span>Fornitori → Sponsor</span></button>
       <button class="nav-link" data-view="iniziative"><i data-icon="bulb"></i><span>Iniziative commerciali</span></button>
       <button class="nav-link" data-view="audience"><i data-icon="users"></i><span>Audience SCD</span></button>
-      <button class="nav-link" data-view="documenti"><i data-icon="folder"></i><span>Documenti</span></button>
-      <button class="nav-link" data-view="media"><i data-icon="screen"></i><span>Media & LED</span></button>
+      <span class="nav-section-label">ATTIVAZIONE</span>
+      <button class="nav-link" data-view="documenti"><i data-icon="folder"></i><span>Document Hub</span></button>
+      <button class="nav-link" data-view="media"><i data-icon="screen"></i><span>LED & Pixellot</span></button>
       <button class="nav-link" data-view="eventi"><i data-icon="calendar"></i><span>Eventi</span></button>
       <button class="nav-link" data-view="report"><i data-icon="chart"></i><span>Report & Analytics</span></button>
       <button class="nav-link" data-view="opportunita"><i data-icon="link"></i><span>Opportunità</span></button>
@@ -60,7 +66,7 @@
         <div id="searchResults" class="search-results" role="listbox" aria-live="polite" hidden></div>
       </div>
       <div class="top-actions">
-        <span class="lang-pill">🇮🇹 IT</span>
+        <span class="club-location-pill">COLICO · LAKE COMO</span><span class="lang-pill">🇮🇹 IT</span>
         <button class="notify"><i data-icon="bell"></i><b>3</b></button>
         <button class="profile" id="sessionProfile" type="button"><span>SCD</span><div><strong id="sessionName">Area riservata</strong><small id="sessionRole">Accesso autorizzato</small></div><em>⌄</em></button>
         <button class="session-logout" id="sponsorLogout" type="button">Esci</button>
@@ -68,20 +74,31 @@
     </header>
 
     <section class="view active" id="view-home">
-      <section class="hero">
+      <section class="hero world-hero">
         <div class="hero-bg"></div>
         <div class="hero-shade"></div>
         <div class="hero-content">
-          <span class="hero-eyebrow">S.C.D. COLICODERVIESE</span>
-          <h1>SCD <em>Sponsor Platform</em></h1>
-          <h2>Persone, territorio, opportunità.</h2>
-          <p>Una piattaforma per costruire insieme il futuro dello sport, del territorio e della nostra comunità.</p>
+          <span class="hero-eyebrow">S.C.D. COLICODERVIESE · COLICO · LAGO DI COMO</span>
+          <h1>SCD <em>Partner OS</em></h1>
+          <h2>Un club locale con mentalità internazionale.</h2>
+          <p>Una sola control room per sponsor, aziende, LEDWall, convenzioni, Card, media, eventi, documenti e relazioni. Tutto costruito intorno alla realtà SCD e al territorio del Lago di Como.</p>
           <div class="hero-actions">
-            <button class="btn-yellow" id="homeNewSponsor">⊕ Nuova proposta sponsor</button>
-            <button class="btn-outline" data-view="catalogo">▷ Catalogo sponsor</button>
+            <button class="btn-yellow" id="homeNewSponsor">⊕ Nuova opportunità</button>
+            <button class="btn-outline" data-view="partnerhub">Partner Hub</button>
+            <button class="btn-outline" data-view="campaigns">Campaign Studio</button>
           </div>
+          <div class="world-hero-tags"><span>PARTNER</span><span>COMMUNITY</span><span>MEDIA</span><span>CONVENZIONI</span><span>GESTIONE</span></div>
         </div>
-        <div class="hero-quote">Più di una squadra.<br>Un territorio<br>che cresce insieme.</div>
+        <div class="hero-quote">Dal lago al campo.<br>Dal campo<br>alle relazioni.</div>
+      </section>
+
+      <section class="world-module-grid" aria-label="Moduli principali SCD Partner OS">
+        <button data-view="partnerhub"><span>01</span><b>Partner Hub</b><small>profilo · accordi · materiali · richieste</small></button>
+        <button data-view="media"><span>02</span><b>LED Matchday</b><small>playlist sponsor · camera view · proof</small></button>
+        <button data-view="campaigns"><span>03</span><b>Campaign Studio</b><small>social · LED · tornei · strutture</small></button>
+        <button data-view="convenzioni"><span>04</span><b>Benefit Network</b><small>convenzioni · Card · territorio</small></button>
+        <button data-view="mediahub"><span>05</span><b>Media Hub</b><small>Pixellot · clip · sponsor wall</small></button>
+        <button data-view="crm"><span>06</span><b>CRM 360°</b><small>lead · pipeline · task · follow-up</small></button>
       </section>
 
       <section class="innovation-ribbon">
@@ -212,6 +229,49 @@
       </section>
     </section>
 
+
+    <section class="view" id="view-partnerhub">
+      <div class="page-head world-page-head"><div><small>SCD PARTNER HUB</small><h1>Ogni partner ha il proprio spazio.</h1><p>Profilo azienda, stato del rapporto, asset concordati, materiali, richieste, appuntamenti, documenti e prossima azione in una sola vista.</p></div><button class="btn-yellow" data-view="crm">Apri CRM 360°</button></div>
+      <div class="partner-hub-hero">
+        <div class="partner-hub-copy"><span class="partner-live-dot">LIVE DATA</span><h2 id="partnerHubName">Seleziona un partner</h2><p id="partnerHubMeta">Il profilo viene costruito dai dati documentati presenti nel sistema.</p><div class="partner-hub-actions"><select id="partnerHubSelect" aria-label="Seleziona partner"></select><button class="btn-light" id="partnerHubCrmBtn">Apri scheda CRM</button></div></div>
+        <div class="partner-hub-score"><small>STATO RELAZIONE</small><strong id="partnerHubStatus">—</strong><span id="partnerHubPeriod">—</span></div>
+      </div>
+      <div class="partner-hub-grid">
+        <article><small>VALORE / RAPPORTO</small><strong id="partnerHubValue">—</strong><p>Valore disponibile solo se documentato.</p></article>
+        <article><small>ASSET COLLEGATI</small><strong id="partnerHubAsset">—</strong><p>Presenza concordata o da ricostruire.</p></article>
+        <article><small>PROSSIMA AZIONE</small><strong id="partnerHubNext">—</strong><p>Il CRM governa il follow-up.</p></article>
+        <article><small>REFERENTE</small><strong id="partnerHubContact">—</strong><p>Contatto operativo documentato.</p></article>
+      </div>
+      <section class="partner-service-board">
+        <article><span>01</span><h3>Materiali</h3><p>Logo, creatività, video, documenti e versioni approvate.</p><button data-view="documenti">Apri Document Hub</button></article>
+        <article><span>02</span><h3>Attivazioni</h3><p>LEDWall, sito, tornei, strutture, hospitality e media.</p><button data-view="catalogo">Apri asset</button></article>
+        <article><span>03</span><h3>Proof</h3><p>Foto, clip, date e report per dimostrare ciò che SCD ha erogato.</p><button data-view="mediahub">Apri Media Hub</button></article>
+        <article><span>04</span><h3>Relazione</h3><p>Touchpoint, email, appuntamenti, rinnovi e prossime azioni.</p><button data-view="crm">Apri CRM</button></article>
+      </section>
+    </section>
+
+    <section class="view" id="view-campaigns">
+      <div class="page-head world-page-head"><div><small>SCD CAMPAIGN STUDIO</small><h1>Un partner. Più canali. Una sola identità.</h1><p>Trasformiamo ogni partnership in un sistema coordinato: LEDWall, social, sito, tornei, gazebo, strutture e contenuti media.</p></div><button class="btn-yellow" data-view="catalogo">Catalogo asset</button></div>
+      <div class="campaign-toolbar" id="campaignToolbar">
+        <button class="active" data-campaign-filter="TUTTI">Tutti</button><button data-campaign-filter="LED">LEDWall</button><button data-campaign-filter="SOCIAL">Social</button><button data-campaign-filter="EVENTO">Eventi</button><button data-campaign-filter="STRUTTURA">Strutture</button><button data-campaign-filter="DIGITALE">Web App</button>
+      </div>
+      <div class="campaign-grid" id="campaignGrid"></div>
+      <article class="campaign-rule"><strong>Metodo SCD</strong><p>Ogni creatività deve avere obiettivo, canale, durata, responsabile, approvazione e prova di consegna. Niente immagini isolate senza relazione con un’attivazione reale.</p></article>
+    </section>
+
+    <section class="view" id="view-mediahub">
+      <div class="page-head world-page-head"><div><small>SCD MEDIA HUB</small><h1>Il contenuto diventa valore sponsor.</h1><p>Pixellot, LEDWall, sponsor wall, interviste, clip e prove di presenza in un unico ambiente, nel rispetto dei diritti e delle autorizzazioni.</p></div><button class="btn-yellow" data-view="media">Gestisci LED & Pixellot</button></div>
+      <div class="mediahub-feature">
+        <div class="mediahub-screen"><div class="mediahub-play">▶</div><div><small>PIXELLOT / MATCH CONTENT</small><strong>Campo · partita · sponsor visibility</strong><span>Contenuti disponibili solo nel perimetro autorizzato</span></div></div>
+        <aside class="sponsor-wall-live"><small>SPONSOR WALL · PREVIEW</small><div id="sponsorWallTiles"></div></aside>
+      </div>
+      <div class="mediahub-grid">
+        <article><small>LED PROOF</small><h3>Matchday evidence</h3><p>Foto e clip della presenza LED vista da tribuna e camera.</p><button data-view="media">Apri LED</button></article>
+        <article><small>INTERVISTE</small><h3>Sponsor Wall</h3><p>Backdrop ordinato per conferenze, premiazioni e contenuti partner.</p><button data-view="campaigns">Apri Campaign Studio</button></article>
+        <article><small>CLIP</small><h3>Partner Content</h3><p>Recap, best moments, evento e contenuti brandizzati approvati.</p><button data-view="documenti">Apri materiali</button></article>
+        <article><small>REPORT</small><h3>Delivery Report</h3><p>Asset erogati, date, evidenze e stato del rapporto.</p><button data-view="report">Apri analytics</button></article>
+      </div>
+    </section>
 
     <section class="view" id="view-crm">
       <div class="page-head"><div><small>CRM RELAZIONALE SCD</small><h1>Persone, aziende e relazioni</h1><p>Un profilo unico per ogni soggetto, con timeline, touchpoint, opportunità, attività e prossima azione. I dati arrivano dai master canonici.</p></div><button class="btn-yellow" id="crmRefresh">Aggiorna CRM</button></div>
@@ -391,6 +451,6 @@
   </div>
 </div>
 
-<script src="./app.js?v=10.2.0"></script>
+<script src="./app.js?v=11.0.0"></script>
 </body>
 </html>
