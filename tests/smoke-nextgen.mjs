@@ -2,6 +2,15 @@ import { chromium } from 'playwright';
 import fs from 'node:fs';
 
 fs.mkdirSync('test-output',{recursive:true});
+let checkpoint='BOOT';
+function mark(name){checkpoint=name;console.log('[SMOKE CHECKPOINT]',name)}
+function persistFailure(kind,err){
+  const payload={kind,checkpoint,error:String(err?.stack||err?.message||err||'unknown'),at:new Date().toISOString()};
+  try{fs.writeFileSync('test-output/smoke-checkpoint.json',JSON.stringify(payload,null,2))}catch{}
+  console.error('[SMOKE FAILURE]',JSON.stringify(payload));
+}
+process.on('uncaughtException',err=>{persistFailure('uncaughtException',err);process.exit(1)});
+process.on('unhandledRejection',err=>{persistFailure('unhandledRejection',err);process.exit(1)});
 const base=process.env.SCD_TEST_URL||'http://127.0.0.1:10000';
 const viewports=[
   {width:360,height:800},
@@ -17,6 +26,7 @@ const browser=await chromium.launch({headless:true});
 const allErrors=[];
 
 for(const viewport of viewports){
+  mark('NOVA_VIEWPORT_'+viewport.width+'x'+viewport.height);
   const page=await browser.newPage({viewport});
   const errors=[];
   page.on('pageerror',e=>errors.push(String(e)));
@@ -83,10 +93,12 @@ for(const viewport of viewports){
   await page.evaluate(()=>window.SCDExperience.setMode('DISCOVER'));
   if(await page.evaluate(()=>document.body.dataset.scdExperience)!=='discover')throw new Error('Discover mode failed');
 
+  mark('CALENDAR_'+viewport.width);
   await page.evaluate(()=>window.SCDNextGen.setView('calendar'));
   await page.waitForSelector('#view-calendar.active');
   await page.waitForSelector('#calendarPublicList');
   if(await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+3))throw new Error('calendar view horizontal overflow');
+  mark('TEAMS_'+viewport.width);
   await page.evaluate(()=>window.SCDNextGen.setView('teams'));
   await page.waitForSelector('#view-teams.active');
   await page.waitForSelector('#publicTeamsGrid');
@@ -95,6 +107,7 @@ for(const viewport of viewports){
   if((await page.locator('#calendarTypeFilter option').count())<5)throw new Error('calendar type filters missing');
   await page.evaluate(()=>window.SCDNextGen.setView('pulse'));
 
+  mark('TWIN_'+viewport.width);
   await page.evaluate(()=>window.SCDNextGen.setView('twin'));
   await page.waitForSelector('#view-twin.active .twin-stage');
   await page.waitForSelector('#twinLocker');
@@ -103,6 +116,7 @@ for(const viewport of viewports){
   const afterXp=await page.locator('#twinXp').textContent();
   if(beforeXp===afterXp)throw new Error('Twin XP did not evolve');
 
+  mark('PRIVATE_DESK_'+viewport.width);
   await page.evaluate(()=>window.SCDNextGen.setView('desk'));
   await page.waitForSelector('#view-desk.active .desk-hero');
   await page.waitForSelector('.service-dock');
@@ -130,6 +144,7 @@ for(const viewport of viewports){
 }
 
 // Sponsor public journey: real browser interaction on desktop and mobile.
+mark('SPONSOR_BROWSER_JOURNEY');
 for(const viewport of [{width:390,height:844},{width:1440,height:900}]){
   const sponsor=await browser.newPage({viewport});
   const sponsorErrors=[];
@@ -160,6 +175,7 @@ for(const viewport of [{width:390,height:844},{width:1440,height:900}]){
   await sponsor.close();
 }
 
+mark('API_CHECKS');
 const api=await browser.newPage();
 const health=await api.request.get(base+'/health');
 if(!health.ok())throw new Error('health endpoint failed '+health.status());
