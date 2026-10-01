@@ -34,7 +34,15 @@ for(const token of ['r39-experience-bar','r39-private-desk','r39-growth-loop']){
   assert(router.includes(token)||css.includes(token),'runtime token missing '+token);
 }
 
-assert(/ui-r39-human\.css\?v=(39|40)\.0\.0/.test(index),'R39 Human OS CSS not loaded');
+const isNextGenSynthetic=m.architecture?.nextgen_preview?.visual_mode==='SYNTHETIC_NO_REAL_PHOTOGRAPHY';
+if(isNextGenSynthetic){
+  assert(index.includes('scd-synth.css?v='),'NextGen Human OS visual layer not loaded');
+  assert(index.includes('data-experience-mode="DISCOVER"'),'Discover mode control missing');
+  assert(index.includes('data-experience-mode="QUICK"'),'Quick mode control missing');
+  assert(index.includes('data-experience-mode="FOCUS"'),'Focus mode control missing');
+}else{
+  assert(/ui-r39-human\.css\?v=(39|40)\.0\.0/.test(index),'R39 Human OS CSS not loaded');
+}
 assert(/scd-experience-engine\.js\?v=(39|40)\.0\.0/.test(index),'R39 experience engine not loaded');
 
 if(process.exitCode)process.exit(process.exitCode);

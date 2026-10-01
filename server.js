@@ -24,6 +24,9 @@ const ALLOWED_ORIGINS = new Set([
   'https://francesco1485.github.io',
   'https://scd-colicoderviese-official-r21.onrender.com',
   'https://scd-colicoderviese-super-app.onrender.com',
+  'https://scd-universe-synthetic.onrender.com',
+  'https://scd-universe-nextgen.onrender.com',
+  'https://scd-universe-nova.onrender.com',
   'http://localhost:10000',
   'http://127.0.0.1:10000'
 ]);

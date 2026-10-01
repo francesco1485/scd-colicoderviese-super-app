@@ -3,8 +3,8 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.2.0",
-    "effective_at": "2026-09-30",
+    "version": "3.3.0",
+    "effective_at": "2026-10-01",
     "status": "BINDING",
     "language": "it-IT",
     "timezone": "Europe/Rome",
@@ -262,10 +262,11 @@
         "HIGH_IMPACT_EDITORIAL"
       ],
       "palette": [
-        "BLU_SCD",
-        "AZZURRO",
-        "GIALLO_SCD",
-        "BIANCO"
+        "MINERAL_NAVY",
+        "LAKE_AQUA",
+        "MUTED_GOLD",
+        "WARM_WHITE",
+        "LOW_SATURATION_ACCENTS"
       ],
       "territory": [
         "COLICO",
@@ -283,12 +284,16 @@
         "grande_barra_blu_dominante",
         "schermate_vuote",
         "card_senza_azione",
-        "sponsor_nascosti"
+        "sponsor_nascosti",
+        "REAL_PHOTOGRAPHY_IN_NEXTGEN_UI",
+        "HIGH_SATURATION_FULL_SCREEN_COLOR",
+        "BROCHURE_HERO",
+        "GENERIC_WHITE_CARD_GRID",
+        "PHOTO_DEPENDENT_LAYOUT"
       ]
     },
     "component_language": [
       "COMPACT_SHELL",
-      "SPATIAL_PHOTO_HERO",
       "LIVE_STRIP",
       "SPONSOR_MARQUEE",
       "STORY_ORBITS",
@@ -301,7 +306,13 @@
       "SCD_MOMENTS",
       "ROLE_DASHBOARD",
       "BOTTOM_NAV",
-      "SOURCE_STATUS"
+      "SOURCE_STATUS",
+      "SYNTHETIC_SPATIAL_HERO",
+      "QUICK_ACTION_RING",
+      "CLUB_GRAPH_CONSTELLATION",
+      "VALUE_ENGINE",
+      "TWIN_LOCKER",
+      "LOCAL_TTS"
     ],
     "media_policy": {
       "official_logos_must_not_be_redrawn": true,
@@ -311,7 +322,16 @@
         "JPEG",
         "AVIF"
       ],
-      "no_foreign_rectangular_background_around_logos": true
+      "no_foreign_rectangular_background_around_logos": true,
+      "nextgen_real_photography_in_ui": false,
+      "allowed_real_media": [
+        "OFFICIAL_LOGOS",
+        "FUNCTIONAL_DOCUMENTS",
+        "USER_MEDIA_WHEN_REQUIRED_BY_SERVICE_AND_AUTHORIZED"
+      ],
+      "synthetic_scene_rule": "SPORT_TERRITORY_STADIUM_AND_EDITORIAL_ATMOSPHERE_MUST_BE_ORIGINAL_SYNTHETIC_RENDERING",
+      "no_raster_layout_patches": true,
+      "no_raw_user_photo_render_in_twin": true
     },
     "responsive_qa": {
       "required_mobile_viewports": [
@@ -1189,14 +1209,15 @@
       "must_not_bypass_permissions": true
     },
     "personal_avatar": {
-      "photo_or_generated": true,
+      "photo_or_generated": false,
       "parameters": [
         "ROLE",
         "NUMBER",
         "SKIN_TONE",
         "HAIR",
         "EXPRESSION",
-        "KIT"
+        "KIT",
+        "STYLE"
       ],
       "local_processing_default": true,
       "export": "PNG_RGBA_TRANSPARENT",
@@ -1208,7 +1229,11 @@
         "CONTEXT_ANIMATION",
         "VOICE",
         "AR"
-      ]
+      ],
+      "rendering_mode": "SYNTHETIC_ONLY",
+      "private_photo_reference_future": true,
+      "raw_photo_display": false,
+      "output_rule": "ORIGINAL_SYNTHETIC_ALTER_EGO_ONLY"
     },
     "tamagotchi_evolution": {
       "target": true,
@@ -1249,7 +1274,9 @@
         "COMMUNITY_PARTICIPATION",
         "AVATAR_USE",
         "MIRROR_USE"
-      ]
+      ],
+      "conceptual_reference": "VIRTUAL_PET_CONTINUITY_CARE_FEEDBACK_EVOLUTION_NOT_COPYRIGHTED_CHARACTER",
+      "twin_and_mirror_separate": true
     },
     "mirror": {
       "state": "IMPLEMENTED_R38_FRONTEND",
@@ -1261,7 +1288,10 @@
         "FUTURE_MOBILE"
       ],
       "permissions": "INHERIT_USER_ROLE_AND_SCOPE",
-      "no_permission_bypass": true
+      "no_permission_bypass": true,
+      "separate_from_twin": true,
+      "voice_layer": "CLIENT_SIDE_NATIVE_TTS_OPTIONAL",
+      "voice_rule": "USER_INITIATED_ONLY_PRIVATE_CONTENT"
     }
   },
   "geo_spatial": {
@@ -1657,6 +1687,17 @@
       "newsroom": "RENDER_GROUNDED_RUNTIME_PLUS_WEEKLY_CHATGPT_EDITORIAL",
       "week_calendar": "R20_PUBLIC_CALENDAR_ALL_AGE_GROUPS",
       "stale_site_news": "DISABLED"
+    },
+    "nextgen_preview": {
+      "state": "PREVIEW_NOT_PRODUCTION_PRIMARY",
+      "branch": "scd-web-restart-v1",
+      "canonical_preview_url": "https://scd-universe.onrender.com",
+      "runtime": "RENDER_NODE_WEB_SERVICE",
+      "frontend_api_topology": "SAME_ORIGIN",
+      "primary_data_core": "R20",
+      "supabase_mode": "DARK_DUAL_RUN",
+      "visual_mode": "SYNTHETIC_NO_REAL_PHOTOGRAPHY",
+      "rollback": "KEEP_MAIN_R40_AND_OFFICIAL_RENDER_UNCHANGED"
     }
   },
   "delivery_and_quality": {
@@ -1695,7 +1736,11 @@
       "NEWSROOM_CONTRACT",
       "ALL_ANNATE_WEEK_CALENDAR",
       "NO_STALE_SITE_NEWS",
-      "EDITORIAL_EVIDENCE_REQUIRED"
+      "EDITORIAL_EVIDENCE_REQUIRED",
+      "NEXTGEN_NO_REAL_PHOTO_CONTRACT",
+      "NEXTGEN_SAME_ORIGIN_API",
+      "NEXTGEN_TWIN_MIRROR_SEPARATION",
+      "NEXTGEN_LOCAL_TTS_CONTRACT"
     ],
     "merge_rule": "Non considerare completata una funzione se è verde solo tecnicamente ma viola il manifest o il master visivo.",
     "release_truth": {
@@ -2119,6 +2164,38 @@
         "SCD_AI_WEEKLY_EDITORIAL"
       ],
       "contract": "WEEKLY_GROUNDED_EDITORIAL_NO_STALE_SITE"
+    },
+    {
+      "id": "CAP-NEXTGEN-SYNTHETIC-UI",
+      "domain": "EXPERIENCE",
+      "required": true,
+      "state": "PARTIAL",
+      "sources": [
+        "SOURCE-NONE"
+      ],
+      "contract": "NO_REAL_PHOTOGRAPHY_OR_RASTER_LAYOUT_PATCHES_SYNTHETIC_ORIGINAL_SCENES_LOW_FATIGUE_PALETTE"
+    },
+    {
+      "id": "CAP-LOCAL-TTS",
+      "domain": "ACCESSIBILITY",
+      "required": true,
+      "state": "PARTIAL",
+      "sources": [
+        "SOURCE-NONE"
+      ],
+      "contract": "CLIENT_SIDE_NATIVE_SPEECH_SYNTHESIS_NO_PAID_CLOUD_BASELINE_USER_INITIATED"
+    },
+    {
+      "id": "CAP-VALUE-ENGINE",
+      "domain": "COMMERCIAL",
+      "required": true,
+      "state": "PARTIAL",
+      "sources": [
+        "SPONSOR_MASTER_SHEET",
+        "MAIL_OPERATIONS_SHEET",
+        "TOURNAMENTS_MASTER_SHEET"
+      ],
+      "contract": "UTILITY_FIRST_PARTNER_VALUE_VERIFIED_METRICS_NO_PROSPECT_AS_CONFIRMED_SPONSOR"
     }
   ],
   "known_noncompliance": [
@@ -2165,6 +2242,13 @@
       "statement": "Supabase SCD PULSE è attivo, R35 Auth Context è applicato e R36 aggiunge la prima vertical slice mobile Expo; restano da completare signup reale, dual-read R20→Supabase, test device Android/iOS, Web slice e rollback.",
       "required_fix": "Eseguire signup controllato USER_BASE, test Auth/RLS/role-scope, dual-read R20→Supabase, test mobile su device/emulatore, Web slice e rollback prima del cutover.",
       "safe_runtime_behavior": "R20 resta primary; SCD_SUPABASE resta dark e non viene dichiarato LIVE."
+    },
+    {
+      "id": "GAP-NOVA-001",
+      "severity": "HIGH",
+      "statement": "SCD Universe Nova è una preview NextGen separata dalla produzione R40 e non può essere promossa finché CI, browser QA mobile/desktop, API/newsroom proof e rollback non sono verdi.",
+      "required_fix": "Aprire PR verso main, eseguire validator NextGen, E2E, visual QA 360/390/430 e 1280/1440/1920, verificare /health e /api/newsroom, poi decidere promozione.",
+      "safe_runtime_behavior": "Main R40 e servizio ufficiale restano invariati."
     }
   ],
   "development_contract": {
@@ -2504,6 +2588,26 @@
         "INVENTED_STANDINGS",
         "INVENTED_QUOTES"
       ]
+    },
+    "nextgen_preview": {
+      "release": "NG-0.4.5",
+      "name": "SCD UNIVERSE NOVA",
+      "status": "PREVIEW",
+      "entry": "#/pulse",
+      "visual": "SYNTHETIC_SPATIAL_LOW_FATIGUE",
+      "product_patterns": [
+        "IMMEDIATE_FEED",
+        "QUICK_ACTIONS",
+        "HORIZONTAL_RAILS",
+        "PERSISTENT_PROFILE",
+        "CONTEXTUAL_NOTIFICATIONS",
+        "SAFE_PROGRESSION",
+        "ROLE_ADAPTIVE_PRIVATE_DESK"
+      ],
+      "no_real_photography": true,
+      "twin": "SYNTHETIC_EVOLVING_IDENTITY",
+      "mirror": "CONTEXTUAL_OPERATIONAL_ASSISTANT",
+      "tts": "NATIVE_CLIENT_SIDE_BASELINE"
     }
   }
 }

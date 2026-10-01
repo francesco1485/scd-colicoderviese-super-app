@@ -1,57 +1,22 @@
 {
-  "name": "SCD ColicoDerviese Super App",
-  "short_name": "SCD App",
-  "id": "./",
-  "start_url": "./",
-  "scope": "./",
-  "display": "standalone",
-  "display_override": [
-    "standalone",
-    "minimal-ui"
+  "name":"SCD Universe · ColicoDerviese",
+  "short_name":"SCD Universe",
+  "id":"./",
+  "start_url":"./#pulse",
+  "scope":"./",
+  "display":"standalone",
+  "orientation":"portrait-primary",
+  "background_color":"#031126",
+  "theme_color":"#04162f",
+  "description":"Sport, community, servizi, identità digitale e Private Desk SCD ColicoDerviese.",
+  "categories":["sports","social","productivity"],
+  "icons":[
+    {"src":"./assets/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},
+    {"src":"./assets/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}
   ],
-  "orientation": "portrait-primary",
-  "background_color": "#052a67",
-  "theme_color": "#052a67",
-  "description": "Applicazione ufficiale S.D.C. ColicoDerviese: gare, risultati, eventi, community, servizi, profilo, avatar e area riservata.",
-  "categories": [
-    "sports",
-    "social",
-    "utilities"
-  ],
-  "icons": [
-    {
-      "src": "./assets/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "./assets/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "Oggi",
-      "short_name": "Oggi",
-      "url": "./#oggi"
-    },
-    {
-      "name": "Calendario",
-      "short_name": "Calendario",
-      "url": "./#oggi"
-    },
-    {
-      "name": "Gare",
-      "short_name": "Gare",
-      "url": "./#gare"
-    },
-    {
-      "name": "Profilo",
-      "short_name": "Profilo",
-      "url": "./#profilo"
-    }
+  "shortcuts":[
+    {"name":"Pulse","short_name":"Pulse","url":"./#pulse"},
+    {"name":"SCD Twin","short_name":"Twin","url":"./#twin"},
+    {"name":"Private Desk","short_name":"Desk","url":"./#desk"}
   ]
 }
