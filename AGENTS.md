@@ -42,6 +42,36 @@ Regola vincolante: **NO STATE → NO WRITE**.
 
 `UNVERIFIED` non equivale a falso, assente o non esistente. Se lo stato necessario non può essere verificato, sono consentite solo lettura, ispezione, diagnostica e proposta del passo successivo.
 
+
+
+## SCD:EXPERT — ROUTER OPERATIVO OBBLIGATORIO
+Prima di costruire, modificare o ricercare una soluzione complessa, classificare il lavoro con `SCD:EXPERT`.
+
+Output minimo:
+- `TASK_CLASS`
+- `DOMAINS`
+- `FIXED`
+- `IMPROVABLE`
+- `MISSING`
+- `SOURCE_PLAN`
+- `TOOLCHAIN`
+- `RISK`
+- `TEST`
+- `ROLLBACK`
+- `NEXT_ACTION`
+
+Regola: usare competenze multidisciplinari reali, non fingere onniscienza. Nei domini ad alta criticita o attualita usare fonti correnti e distinguere FATTO, ANALISI, IPOTESI e PROPOSTA.
+
+## SCD:ASSET — KEEP / ENHANCE / REBUILD / RESEARCH / GENERATE
+Prima di qualunque modifica visuale o media classificare ogni elemento:
+- `KEEP_LOCKED`: logo, stemma, kit, wordmark, asset ufficiale, dato certificato. Non alterare identita, proporzioni, colori o scritte.
+- `KEEP_ENHANCE`: mantenere contenuto reale migliorando solo resa tecnica, scontorno, alpha, trim, peso, accessibilita e responsive.
+- `REBUILD_IMPROVE`: ricostruire UX/layout/logica preservando dati, provenance e funzioni valide.
+- `RESEARCH_REAL_ASSET`: cercare il file reale da fonte ufficiale o verificata. Mai inventare uno stemma, uno sponsor o un kit esistente.
+- `GENERATE_ORIGINAL`: creare solo elementi originali non sostitutivi di asset ufficiali o fatti reali.
+
+Registro canonico asset: `config/scd-assets.v1.json`.
+
 ## Obblighi
 1. Identificare le capability `CAP-*` coinvolte.
 2. Verificare fonte dati, ruolo/scope, schermata e visual master.
