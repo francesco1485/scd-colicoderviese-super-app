@@ -1,5 +1,5 @@
-const CACHE='scd-nextgen-0.1.0';
-const CORE=['./','./index.html','./scd-ng.css?v=0.1.0','./scd-ng.js?v=0.1.0','./manifest.webmanifest','./assets/logo-scd.png','./assets/hero-colico.webp','./assets/event-insieme.webp','./assets/icon-192.png','./assets/icon-512.png'];
+const CACHE='scd-nextgen-0.3.1';
+const CORE=['./','./index.html','./scd-ng.css?v=0.3.1','./scd-synth.css?v=0.3.1','./scd-ng.js?v=0.3.1','./scd-interactions.js?v=0.3.1','./manifest.webmanifest','./assets/logo-scd.png','./assets/icon-192.png','./assets/icon-512.png'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;const u=new URL(e.request.url);if(u.pathname.includes('/api/'))return;e.respondWith(fetch(e.request,{cache:'no-store'}).catch(()=>caches.match(e.request).then(r=>r||caches.match('./index.html'))))});
