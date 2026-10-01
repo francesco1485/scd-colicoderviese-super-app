@@ -120,9 +120,9 @@ for(const token of [
   'campaignAssetMap'
 ]) assert(js.includes(token),'R49 world club interaction missing: '+token);
 
-assert(js.includes("$('.view').forEach"),'multi-view selector must use $ helper');
-assert(js.includes("$('[data-view]').forEach"),'multi-action selector must use $ helper');
-assert(js.includes("$('[data-campaign-filter]').forEach"),'campaign filters must use $ helper');
+assert(js.includes("$$('.view').forEach"),'multi-view selector must use $$ helper');
+assert(js.includes("$$('[data-view]').forEach"),'multi-action selector must use $$ helper');
+assert(js.includes("$$('[data-campaign-filter]').forEach"),'campaign filters must use $$ helper');
 assert(!/(^|[^$])\$\('\[data-view\]'\)\.forEach/m.test(js),'single selector incorrectly used for multiple view actions');
 
 
@@ -137,7 +137,7 @@ assert(js.includes('async function hydratePartnerHubDetail'),'Partner Hub CRM de
 assert(js.includes('data.agreements'),'Partner Hub agreement hydration missing');
 assert(js.includes('data.touchpoints'),'Partner Hub touchpoint hydration missing');
 
-assert(pubJs.includes('const $=s=>Array.from(document.querySelectorAll(s));'),'public multi-selector helper missing');
+assert(pubJs.includes('const $$=s=>Array.from(document.querySelectorAll(s));'),'public multi-selector helper missing');
 assert(!pubJs.includes('const $=s=>Array.from(document.querySelectorAll(s));'),'public selector helper duplicated');
 
 console.log('Sponsor vision contract PASS');
