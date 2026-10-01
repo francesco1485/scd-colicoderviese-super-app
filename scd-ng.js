@@ -21,8 +21,8 @@ const clientEventKind=row=>{const t=norm([pick(row,'kind','type','eventType'),pi
 
 function setView(view){
   state.view=view;
-  $('[data-view]').forEach(x=>x.classList.toggle('active',x.dataset.view===view));
-  $('[data-nav]').forEach(x=>x.classList.toggle('active',x.dataset.nav===view));
+  $$('[data-view]').forEach(x=>x.classList.toggle('active',x.dataset.view===view));
+  $$('[data-nav]').forEach(x=>x.classList.toggle('active',x.dataset.nav===view));
   const ctx=view==='desk'?'PRIVATE DESK · ROLE/SCOPE':view==='twin'?'PROFILO · AVATAR FACOLTATIVO':view==='calendar'?'CALENDARIO · PUBBLICO':view==='teams'?'SQUADRE · PUBBLICO':'HOME · PUBBLICO';
   const ctxEl=$('#mirrorContext');if(ctxEl)ctxEl.textContent=ctx;
   history.replaceState(null,'','#'+view);
@@ -32,7 +32,7 @@ function setView(view){
 }
 $$('[data-nav]').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.nav)));
 $('#modeBtn')?.addEventListener('click',()=>{document.body.classList.toggle('compact');toast(document.body.classList.contains('compact')?'Densità compatta':'Densità comfort')});
-$('[data-scroll]').forEach(b=>b.addEventListener('click',()=>{const target=$(b.dataset.scroll);if(!target)return;const go=()=>target.scrollIntoView({behavior:'smooth',block:'start'});if(target.closest('#view-pulse')&&state.view!=='pulse'){setView('pulse');setTimeout(go,120)}else go()}));
+$$('[data-scroll]').forEach(b=>b.addEventListener('click',()=>{const target=$(b.dataset.scroll);if(!target)return;const go=()=>target.scrollIntoView({behavior:'smooth',block:'start'});if(target.closest('#view-pulse')&&state.view!=='pulse'){setView('pulse');setTimeout(go,120)}else go()}));
 
 function clubClock(){
   const d=new Date(), parts=new Intl.DateTimeFormat('it-IT',{timeZone:'Europe/Rome',weekday:'short',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}).format(d);
