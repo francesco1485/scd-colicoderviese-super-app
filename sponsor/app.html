@@ -7,7 +7,7 @@
   <meta name="description" content="SCD ColicoDerviese Sponsor Platform">
   <title>SCD Sponsor Platform · Area riservata</title>
   <link rel="icon" href="../assets/logo-scd.png">
-  <link rel="stylesheet" href="./app.css?v=9.1.0">
+  <link rel="stylesheet" href="./app.css?v=10.1.0">
 </head>
 <body>
 <a class="skip-link" href="#mainContent">Salta al contenuto principale</a>
@@ -313,6 +313,33 @@
   </div>
 </div>
 
-<script src="./app.js?v=10.0.0"></script>
+
+<div class="modal" id="crmEmailModal" role="dialog" aria-modal="true" aria-labelledby="crmEmailTitle" hidden>
+  <div class="modal-card crm-email-modal-card">
+    <button class="modal-x" id="closeCrmEmail" type="button" aria-label="Chiudi">×</button>
+    <small>COMUNICAZIONE ISTITUZIONALE</small>
+    <h2 id="crmEmailTitle">Prepara email</h2>
+    <p class="modal-intro">Il messaggio partirà da <strong>sportclubcolico@gmail.com</strong> e sarà firmato in base all'utente autenticato e al ruolo autorizzato.</p>
+    <form id="crmEmailForm">
+      <input type="hidden" name="stakeholderId">
+      <label>Destinatario<input type="email" name="to" required></label>
+      <label>Template<select name="templateId" id="crmEmailTemplate" required><option value="">Caricamento template…</option></select></label>
+      <label>Progetto / pratica<input name="project" placeholder="Es. Coffee Partner, rinnovo, convenzione…"></label>
+      <label>Oggetto / riferimento<input name="subject" placeholder="Usato dai template che lo prevedono"></label>
+      <label class="wide">Messaggio<textarea name="message" rows="7" required placeholder="Scrivi il contenuto specifico. Intestazione, firma e dati societari vengono aggiunti dal sistema."></textarea></label>
+      <label>CC<input type="text" name="cc" placeholder="Opzionale"></label>
+      <label>Prossima azione CRM<input name="nextAction" placeholder="Es. attendere riscontro / fissare incontro"></label>
+      <label>Prossima scadenza<input type="date" name="nextDeadline"></label>
+      <div class="wide crm-mail-preview" id="crmMailPreview" hidden></div>
+      <label class="wide crm-confirm"><input type="checkbox" id="crmEmailConfirm"> <span>Ho verificato destinatario, contenuto, firma e prossima azione. Autorizzo l'invio.</span></label>
+      <div class="wide modal-actions">
+        <button type="button" class="btn-light" id="crmEmailPreviewBtn">Anteprima</button>
+        <button type="submit" class="btn-yellow" id="crmEmailSendBtn" disabled>Invia email istituzionale</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="./app.js?v=10.1.0"></script>
 </body>
 </html>
