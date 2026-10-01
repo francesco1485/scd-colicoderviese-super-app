@@ -22,6 +22,7 @@ const SUPABASE_RUNTIME = Object.freeze({
 let liveCache = { at: 0, data: null };
 
 const INTAKE_TEMPLATES = JSON.parse(fs.readFileSync(path.join(__dirname,'config','scd-intake-link-templates.v1.json'),'utf8'));
+const SPONSOR_MOTION_PROFILES = JSON.parse(fs.readFileSync(path.join(__dirname,'config','sponsor-motion-profiles.json'),'utf8'));
 const INTAKE_TEMPLATE_MAP = new Map((INTAKE_TEMPLATES.templates||[]).map(x=>[x.slug,x]));
 const INTAKE_SECRET = process.env.SCD_INTAKE_LINK_SECRET || '';
 const INTAKE_PUBLIC_BASE = (process.env.SCD_PUBLIC_BASE_URL || 'https://scd-universe.onrender.com').replace(/\/$/,'');
@@ -267,6 +268,15 @@ async function handleSponsorMailHealth(req,res){
   }catch(e){
     const code=e.message==='SESSION_REQUIRED'?401:502;
     return json(res,code,{ok:false,error:e.message||'MAIL_HEALTH_FAILED'});
+  }
+}
+async function handleSponsorMotionProfiles(req,res){
+  if(req.method!=='GET')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  try{
+    await validateSponsorSession(req);
+    return json(res,200,{ok:true,data:SPONSOR_MOTION_PROFILES},{'cache-control':'no-store'});
+  }catch(e){
+    return json(res,e.message==='SESSION_REQUIRED'?401:403,{ok:false,error:e.message||'MOTION_PROFILES_ACCESS_DENIED'});
   }
 }
 async function handleSponsorCommunication(req,res){
@@ -758,6 +768,7 @@ http.createServer(async(req,res)=>{
   if(u.pathname==='/api/sponsor/logout') return handleSponsorLogout(req,res);
   if(u.pathname==='/api/sponsor/crm') return handleSponsorCrm(req,res,u);
   if(u.pathname==='/api/sponsor/mail-health') return handleSponsorMailHealth(req,res);
+  if(u.pathname==='/api/sponsor/motion-profiles') return handleSponsorMotionProfiles(req,res);
   if(u.pathname==='/api/sponsor/communication') return handleSponsorCommunication(req,res);
   if(['/sponsor/app','/sponsor/app/','/sponsor/app.html','/sponsor/app.js'].includes(u.pathname)) return serveSponsorPrivate(req,res,u);
   if(u.pathname==='/api/scd') return proxyAppsScript(req,res);
