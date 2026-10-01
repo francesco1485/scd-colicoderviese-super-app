@@ -413,6 +413,13 @@ function r216SignatureForActor_(actor,userRow,template){
     if(candidate && (!candidate.ACCOUNT_EMAIL || email_(candidate.ACCOUNT_EMAIL)===email_(actor.email||''))) sig=candidate;
   }
   if(!sig) throw new Error('Firma non configurata per l account autenticato.');
+  if(r216Upper_(sig.SIGN_MODE)==='PERSON'){
+    var userPerson=String(userRow.PERSON_ID||'').trim();
+    var sigPerson=String(sig.PERSON_ID||'').trim();
+    if(!userPerson || !sigPerson || userPerson!==sigPerson){
+      throw new Error('Firma personale non autorizzata: identita account/persona non coincidente.');
+    }
+  }
   if(!r216Bool_(sig.CAN_EXTERNAL_SEND)) throw new Error('Il profilo firma non e autorizzato a comunicazioni esterne.');
   return sig;
 }
