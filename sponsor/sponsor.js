@@ -76,6 +76,85 @@ const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll
 const initials=name=>name.split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase();
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 
+const ASSET_GOVERNANCE={
+  immutable:[
+    {name:'Logo SCD ufficiale',rule:'Usare sempre il master ufficiale. Vietati ridisegno, ricolorazione, deformazione, testo ricreato o stemma sintetico.'},
+    {name:'Loghi sponsor',rule:'Usare file ufficiale o press kit verificato. Consentiti solo ridimensionamento, padding, scontorno tecnico e adattamento di contenitore senza alterare il marchio.'},
+    {name:'Kit gara / allenamento',rule:'Colori, pattern, sponsor placement e stemma devono derivare da foto/file reali della stagione corretta.'},
+    {name:'Loghi squadre avversarie',rule:'Recuperare da fonte ufficiale club, federazione/lega o media kit verificato. Non generare stemmi plausibili.'}
+  ],
+  adaptable:[
+    {name:'Foto e ambienti',rule:'Possono essere ritagliati, corretti, scontornati, migliorati e integrati in layout, mantenendo il contenuto sostanziale riconoscibile.'},
+    {name:'Materiali sponsor derivati',rule:'Si possono creare mockup, presentazioni, LED, social e dossier partendo dagli asset ufficiali, marcando sempre ciò che è proposta.'},
+    {name:'UI / visual design',rule:'Libera evoluzione grafica purché non alteri dati, loghi, identità ufficiali o stato reale delle relazioni.'}
+  ],
+  sourcePriority:[
+    'Cartella master SCD / file ufficiale autorizzato',
+    'Sito o press kit ufficiale azienda/club/federazione',
+    'Fonte istituzionale o competizione ufficiale',
+    'Archivio SCD verificato / documento contrattuale',
+    'Fonte pubblica autorevole con controllo incrociato'
+  ]
+};
+
+function detectDeviceProfile(){
+  const nav=navigator||{};
+  const conn=nav.connection||nav.mozConnection||nav.webkitConnection||{};
+  const mm=q=>window.matchMedia?window.matchMedia(q).matches:false;
+  const w=Math.round(window.innerWidth),h=Math.round(window.innerHeight),dpr=Number(window.devicePixelRatio||1);
+  const pointer=mm('(pointer:coarse)')?'touch':mm('(pointer:fine)')?'fine':'mixed';
+  const reducedMotion=mm('(prefers-reduced-motion: reduce)');
+  const saveData=!!conn.saveData;
+  const memory=nav.deviceMemory||null;
+  const cores=nav.hardwareConcurrency||null;
+  const gamut=mm('(color-gamut: p3)')?'P3':mm('(color-gamut: srgb)')?'sRGB':'standard';
+  let tier='high';
+  if(saveData||reducedMotion||(memory&&memory<=2)||(cores&&cores<=2)||w<420)tier='light';
+  else if((memory&&memory<=4)||(cores&&cores<=4)||w<900)tier='balanced';
+  const form=w<600?'phone':w<1024?'tablet':w<1600?'desktop':'large-display';
+  const profile={w,h,dpr,pointer,reducedMotion,saveData,memory,cores,gamut,tier,form,orientation:w>=h?'landscape':'portrait'};
+  document.body.dataset.quality=tier;
+  document.body.dataset.formFactor=form;
+  document.body.dataset.pointer=pointer;
+  document.documentElement.style.setProperty('--adaptive-dpr',String(Math.min(dpr,3)));
+  return profile;
+}
+
+function loadUsage(){
+  try{return JSON.parse(localStorage.getItem('scd_usage_v1')||'{"views":{},"actions":{},"sessions":0,"lastView":"home"}')}catch(e){return {views:{},actions:{},sessions:0,lastView:'home'}}
+}
+const USAGE=loadUsage();
+USAGE.sessions=(USAGE.sessions||0)+1;
+function saveUsage(){try{localStorage.setItem('scd_usage_v1',JSON.stringify(USAGE))}catch(e){}}
+function trackView(name){USAGE.views[name]=(USAGE.views[name]||0)+1;USAGE.lastView=name;saveUsage();renderUsageProfile();}
+function trackAction(name){USAGE.actions[name]=(USAGE.actions[name]||0)+1;saveUsage();renderUsageProfile();}
+
+let DEVICE_PROFILE=detectDeviceProfile();
+function renderGovernance(){
+  const a=$('#assetPolicySummary');
+  if(a)a.innerHTML=ASSET_GOVERNANCE.immutable.map(x=>'<div class="protocol-row"><span class="protocol-lock">◆</span><div><b>'+esc(x.name)+'</b><p>'+esc(x.rule)+'</p></div></div>').join('');
+  const s=$('#sourcePolicy');
+  if(s)s.innerHTML=ASSET_GOVERNANCE.sourcePriority.map((x,i)=>'<div class="protocol-row source"><span>'+(i+1)+'</span><div><b>'+esc(x)+'</b><p>'+(i===0?'Fonte primaria preferita':i<3?'Fonte ufficiale/istituzionale':'Usare con verifica incrociata')+'</p></div></div>').join('');
+  renderDeviceProfile();renderUsageProfile();
+}
+function renderDeviceProfile(){
+  const d=$('#deviceProfile');if(!d)return;
+  const p=DEVICE_PROFILE;
+  d.innerHTML='<div class="device-grid">'+[
+    ['Formato',p.form],['Viewport',p.w+'×'+p.h],['Densità',p.dpr+'×'],['Input',p.pointer],
+    ['Qualità',p.tier],['Colore',p.gamut],['Orientamento',p.orientation],['Risparmio dati',p.saveData?'Sì':'No']
+  ].map(x=>'<div><small>'+x[0]+'</small><b>'+esc(x[1])+'</b></div>').join('')+'</div>'+
+  '<p class="device-note">La piattaforma adatta movimento, densità e carico grafico in tempo reale. Nessun dato dispositivo viene inviato fuori dalla pagina.</p>';
+}
+function renderUsageProfile(){
+  const u=$('#usageProfile');if(!u)return;
+  const topViews=Object.entries(USAGE.views||{}).sort((a,b)=>b[1]-a[1]).slice(0,4);
+  u.innerHTML='<div class="usage-kpis"><div><small>SESSIONI LOCALI</small><b>'+USAGE.sessions+'</b></div><div><small>ULTIMA AREA</small><b>'+esc(USAGE.lastView||'home')+'</b></div></div>'+
+  '<div class="usage-bars">'+(topViews.length?topViews.map(([k,v])=>'<div><span>'+esc(k)+'</span><i><b style="width:'+Math.min(100,v*18)+'%"></b></i><em>'+v+'</em></div>').join(''):'<p>Il sistema inizierà a capire quali aree usi di più dopo la navigazione.</p>')+'</div>'+
+  '<p class="device-note">Analisi solo locale per migliorare priorità, densità e accessi rapidi. Nessun tracciamento pubblicitario.</p>';
+}
+
+
 function sponsorIntel(s){
   let evidence=25;
   const reasons=[];
@@ -126,6 +205,7 @@ function assetFit(s,a){
 
 function openView(name){
   document.body.dataset.activeView=name;
+  trackView(name);
   $('.view').forEach(v=>v.classList.remove('active'));
   $('#view-'+name)?.classList.add('active');
   $$('.nav-item[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===name));
@@ -390,3 +470,15 @@ const cinematicPointer=()=>{
   }
 };
 cinematicPointer();
+
+window.addEventListener('resize',()=>{clearTimeout(window.__scdResizeTimer);window.__scdResizeTimer=setTimeout(()=>{DEVICE_PROFILE=detectDeviceProfile();renderDeviceProfile()},160)});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')saveUsage()});
+document.addEventListener('click',e=>{
+  const btn=e.target.closest('button,[data-view],[data-lia],.sponsor-card,.macro-visual');
+  if(btn){
+    const label=btn.dataset.view||btn.dataset.lia||btn.getAttribute('aria-label')||btn.textContent.trim().slice(0,60);
+    if(label)trackAction(label);
+  }
+},{capture:true});
+renderGovernance();
+saveUsage();
