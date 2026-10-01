@@ -2,6 +2,7 @@
   const q=(s,r=document)=>r.querySelector(s);
   const qa=(s,r=document)=>[...r.querySelectorAll(s)];
   const twinKey='scd:twin:v1';
+  window.SCDExperience?.bind?.(document,'base');
 
   q('#ngMirrorQuick')?.addEventListener('click',()=>{
     window.SCDMeta?.record?.('mirror',1);
