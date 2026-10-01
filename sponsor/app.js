@@ -1209,3 +1209,130 @@ $('#shufflePartnerWall')?.addEventListener('click',()=>renderPartnerWall(true));
 renderPartnerWall();
 initActivationStudio();
 
+
+
+/* ===== R51 LED PRODUCTION HUB ===== */
+let ledMotionConfig=null;
+let ledMotionSelected='';
+
+function ledStatusLabel(value){
+  const map={
+    MISSING_OFFICIAL_REPO_ASSET:'Logo ufficiale mancante',
+    REQUIRED_BEFORE_PRODUCTION:'Logo ufficiale richiesto',
+    CONCEPT_DA_RIVEDERE_CON_LOGO_UFFICIALE:'Concept da rivedere',
+    TEMPLATE:'Template SCD'
+  };
+  return map[value]||String(value||'Da verificare').replaceAll('_',' ');
+}
+function ledMotionBrief(profile){
+  if(!profile)return '';
+  return [
+    'SCD LED PRODUCTION HUB',
+    'Partner: '+profile.partnerName,
+    'Messaggio: '+profile.message,
+    'Motion concept: '+profile.motionConcept,
+    'Vista tribuna: '+profile.stadiumView,
+    'Camera view: '+profile.cameraView,
+    'Identità territoriale: '+profile.lakeIdentity,
+    'Logo: '+ledStatusLabel(profile.logoAssetStatus),
+    'Produzione: '+ledStatusLabel(profile.productionStatus),
+    'Target: '+String(ledMotionConfig?.productionTarget?.durationSeconds||40)+' secondi',
+    'Risoluzione LED nativa: da rilevare alla consegna',
+    'Proof: '+(profile.proofPlan||[]).join(' · ')
+  ].join('\n');
+}
+function renderLedProductionSpecs(){
+  const el=$('#ledProductionSpecs');if(!el||!ledMotionConfig)return;
+  const preview=ledMotionConfig.previewSource||{};
+  const target=ledMotionConfig.productionTarget||{};
+  el.innerHTML=
+    '<span><small>PREVIEW SORGENTE</small><b>'+esc(preview.width||'—')+'×'+esc(preview.height||'—')+' · '+esc(preview.fps||'—')+' fps · '+esc(preview.durationSeconds||'—')+'s</b></span>'+
+    '<span><small>TARGET PRODUZIONE</small><b>'+esc(target.durationSeconds||40)+'s · master per sponsor</b></span>'+
+    '<span><small>LED NATIVO</small><b>Da rilevare alla consegna</b></span>';
+}
+function renderLedProfileList(){
+  const el=$('#ledProfileList');if(!el||!ledMotionConfig)return;
+  const rows=Array.isArray(ledMotionConfig.profiles)?ledMotionConfig.profiles:[];
+  if(!ledMotionSelected)ledMotionSelected=rows[0]?.id||'';
+  el.innerHTML=rows.map(p=>
+    '<button type="button" class="'+(p.id===ledMotionSelected?'active':'')+'" data-led-profile="'+esc(p.id)+'">'+
+      '<span>'+esc(p.partnerName)+'</span><small>'+esc(ledStatusLabel(p.productionStatus))+'</small>'+
+    '</button>'
+  ).join('');
+  $$('[data-led-profile]').forEach(btn=>btn.onclick=()=>{
+    ledMotionSelected=btn.dataset.ledProfile||'';
+    renderLedProfileList();
+    renderLedProfileDetail();
+  });
+}
+function renderLedProfileDetail(){
+  const el=$('#ledProfileDetail');if(!el||!ledMotionConfig)return;
+  const p=(ledMotionConfig.profiles||[]).find(x=>x.id===ledMotionSelected)||ledMotionConfig.profiles?.[0];
+  if(!p){el.innerHTML='<p>Nessun profilo motion disponibile.</p>';return}
+  const logoBlocked=p.logoAssetStatus!=='APPROVED_OFFICIAL_ASSET';
+  el.innerHTML=
+    '<div class="led-detail-hero">'+
+      '<div><small>'+esc(p.id)+'</small><h3>'+esc(p.partnerName)+'</h3><p>'+esc(p.message||'')+'</p></div>'+
+      '<span class="led-master-state '+(logoBlocked?'blocked':'ready')+'">'+(logoBlocked?'MASTER MP4 BLOCCATO':'PRONTO PER MASTER')+'</span>'+
+    '</div>'+
+    '<div class="led-detail-grid">'+
+      '<section><small>MOTION CONCEPT</small><p>'+esc(p.motionConcept||'')+'</p></section>'+
+      '<section><small>VISTA TRIBUNA</small><p>'+esc(p.stadiumView||'')+'</p></section>'+
+      '<section><small>CAMERA SAFE</small><p>'+esc(p.cameraView||'')+'</p></section>'+
+      '<section><small>IDENTITÀ COLICO / LAGO</small><p>'+esc(p.lakeIdentity||'')+'</p></section>'+
+    '</div>'+
+    '<div class="led-proof-plan"><small>PROOF PLAN</small><div>'+(p.proofPlan||[]).map(x=>'<span>'+esc(x)+'</span>').join('')+'</div></div>'+
+    '<div class="led-production-gate"><div><small>GATE PRODUZIONE</small><b>'+esc(ledStatusLabel(p.logoAssetStatus))+'</b><span>'+esc(ledStatusLabel(p.productionStatus))+'</span></div>'+
+      '<div class="led-detail-actions">'+
+        '<button class="btn-light" type="button" id="ledCopyStoryboard">Copia storyboard</button>'+
+        '<button class="btn-light" type="button" id="ledOpenDocuments">Apri Documenti</button>'+
+        '<button class="btn-yellow" type="button" id="ledUseCreativeFactory">Porta in Creative Factory</button>'+
+      '</div>'+
+    '</div>';
+  $('#ledCopyStoryboard')?.addEventListener('click',async()=>{
+    const text=ledMotionBrief(p);
+    try{
+      if(navigator.clipboard&&window.isSecureContext)await navigator.clipboard.writeText(text);
+      else{
+        const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();
+      }
+      $('#ledCopyStoryboard').textContent='Storyboard copiato';
+      setTimeout(()=>{const b=$('#ledCopyStoryboard');if(b)b.textContent='Copia storyboard'},1400);
+    }catch(e){}
+  });
+  $('#ledOpenDocuments')?.addEventListener('click',()=>openView('documenti'));
+  $('#ledUseCreativeFactory')?.addEventListener('click',()=>{
+    openView('activationstudio');
+    const partner=$('#activationSponsor');
+    if(partner){
+      let matched=[...partner.options].some((o,i)=>o.text===p.partnerName?(partner.selectedIndex=i,true):false);
+      if(!matched){const o=document.createElement('option');o.textContent=p.partnerName;partner.appendChild(o);partner.selectedIndex=partner.options.length-1}
+    }
+    const asset=$('#activationAsset');
+    if(asset)[...asset.options].some((o,i)=>o.text==='LEDWall Matchday'?(asset.selectedIndex=i,true):false);
+    if($('#activationHeadline'))$('#activationHeadline').value=p.message||'Il tuo brand entra nella partita.';
+    if($('#activationMessage'))$('#activationMessage').value=p.stadiumView||p.motionConcept||'';
+    if($('#activationFormat'))$('#activationFormat').value='LED_16_3';
+    if($('#activationTheme'))$('#activationTheme').value='LAKE';
+    if($('#activationLogoState'))$('#activationLogoState').value=p.logoAssetStatus==='APPROVED_OFFICIAL_ASSET'?'APPROVATO':'DA_VERIFICARE';
+    activationPreviewMode='LED';
+    renderActivationStudio();
+  });
+}
+async function initLedProductionHub(){
+  const mount=$('#ledProfileList');if(!mount)return;
+  try{
+    const res=await fetch('/config/sponsor-motion-profiles.json',{cache:'no-store',headers:{accept:'application/json'}});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const data=await res.json();
+    if(!data||!Array.isArray(data.profiles))throw new Error('Formato profili motion non valido');
+    ledMotionConfig=data;
+    renderLedProductionSpecs();
+    renderLedProfileList();
+    renderLedProfileDetail();
+  }catch(e){
+    mount.innerHTML='<div class="led-load-error"><b>Profili motion non disponibili</b><span>'+esc(e.message||'Errore caricamento')+'</span></div>';
+    const detail=$('#ledProfileDetail');if(detail)detail.innerHTML='<p>Il Media Hub resta operativo; il registro motion va verificato nel deployment.</p>';
+  }
+}
+initLedProductionHub();
