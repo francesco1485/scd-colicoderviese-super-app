@@ -64,11 +64,11 @@
 
         
         <section class="ng-command-ring" aria-label="Azioni rapide SCD">
-          <button data-nav="pulse"><span>◉</span><b>Oggi</b><small>Gare, attività e news verificate</small></button>
-          <button data-nav="twin"><span>✦</span><b>Il mio Twin</b><small>Identità, missioni, locker</small></button>
-          <button id="ngMirrorQuick"><span>✧</span><b>Chiedi a Mirror</b><small>Assistente operativo contestuale</small></button>
-          <button data-nav="desk"><span>⌘</span><b>Da gestire</b><small>Scadenze, richieste, documenti</small></button>
-          <button data-scroll="#valueEngine"><span>◆</span><b>Partner & valore</b><small>Servizi, benefit e attivazioni</small></button>
+          <button data-nav="pulse" data-meta-key="calendar"><span>◉</span><b>Oggi</b><small>Gare, attività e news verificate</small></button>
+          <button data-nav="twin" data-meta-key="twin"><span>✦</span><b>Il mio Twin</b><small>Identità, missioni, locker</small></button>
+          <button id="ngMirrorQuick" data-meta-key="mirror"><span>✧</span><b>Chiedi a Mirror</b><small>Assistente operativo contestuale</small></button>
+          <button data-nav="desk" data-meta-key="staff"><span>⌘</span><b>Da gestire</b><small>Scadenze, richieste, documenti</small></button>
+          <button data-scroll="#valueEngine" data-meta-key="sponsors"><span>◆</span><b>Partner & valore</b><small>Servizi, benefit e attivazioni</small></button>
         </section>
 
         <section class="pulse-strip">
@@ -244,6 +244,6 @@
 
     <div class="toast" id="toast" role="status"></div>
   </div>
-  <script src="./scd-ng.js?v=0.3.2" defer></script>\n  <script src="./scd-interactions.js?v=0.3.2" defer></script>
+  <script src="./scd-meta-engine.js?v=40.0.0" defer></script>\n  <script src="./scd-twin.js?v=40.0.0" defer></script>\n  <script src="./scd-ng.js?v=0.3.2" defer></script>\n  <script src="./scd-interactions.js?v=0.3.2" defer></script>
 </body>
 </html>
