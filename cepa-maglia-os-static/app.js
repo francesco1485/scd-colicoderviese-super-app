@@ -405,10 +405,16 @@ const MAGLIA_MEDIA={
   colico:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Colico_Panorama.jpg/1280px-Colico_Panorama.jpg',
   mandello:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Mandello_del_Lario_panorama.jpg?width=1600'
 }
+function registeredAssetUrl(key,fallback=''){
+  const a=assetRegistry.find(x=>x.canonical_key===key&&x.is_active!==false&&x.governance_status!=='reject')
+  return a?.source_url||showcaseAssetUrl(a)||fallback
+}
 function mediaForOffice(office){
   const code=String(office?.code||'').toUpperCase()
   const city=String(office?.city||'').toLowerCase()
-  return code.includes('MANDELLO')||city.includes('mandello')?MAGLIA_MEDIA.mandello:MAGLIA_MEDIA.colico
+  return code.includes('MANDELLO')||city.includes('mandello')
+    ?registeredAssetUrl('territory_mandello_panorama',MAGLIA_MEDIA.mandello)
+    :registeredAssetUrl('territory_colico_panorama',MAGLIA_MEDIA.colico)
 }
 function mediaCreditForOffice(office){
   const code=String(office?.code||'').toUpperCase()
@@ -993,7 +999,7 @@ function renderHome(){
   cards.push(
     '<button type="button" class="environment-card agency-card" data-home-action="agency">'+
       '<div class="environment-card-head"><span class="environment-icon">▦</span><div><small>AGENZIA</small><h3>Uffici Maglia 360</h3><p>Il mondo operativo dell’agenzia.</p></div></div>'+
-      '<img class="environment-visual" src="'+MAGLIA_MEDIA.officeTeam+'" alt="Ambiente di lavoro Maglia 360">'+
+      '<img class="environment-visual" src="'+registeredAssetUrl('visual_office_team',MAGLIA_MEDIA.officeTeam)+'" alt="Ambiente di lavoro Maglia 360">'+
       '<div class="environment-stats">'+
         '<div><strong>'+offices.length+'</strong><span>Sedi attive</span></div>'+
         '<div><strong>'+allOpen.length+'</strong><span>Pratiche aperte</span></div>'+
@@ -1032,7 +1038,7 @@ function renderHome(){
     cards.push(
       '<button type="button" id="cepaWorldCard" class="environment-card cepa-env-card" data-home-action="cepa">'+
         '<div class="environment-card-head"><span class="environment-icon cepa">⌂</span><div><small>PROGETTO TERRITORIALE</small><h3>Progetto C.E.P.A.</h3><p>Centro Educazione Previdenziale e Assicurativa.</p></div><b class="status-chip cepa">In sviluppo</b></div>'+
-        '<img class="environment-visual" src="'+MAGLIA_MEDIA.cepaTraining+'" alt="Formazione e confronto C.E.P.A.">'+
+        '<img class="environment-visual" src="'+registeredAssetUrl('visual_cepa_training',MAGLIA_MEDIA.cepaTraining)+'" alt="Formazione e confronto C.E.P.A.">'+
         '<div class="environment-stats">'+
           '<div><strong>'+cepaOpen+'</strong><span>Attività aperte</span></div>'+
           '<div><strong>'+mapped+'</strong><span>Soggetti mappati</span></div>'+
