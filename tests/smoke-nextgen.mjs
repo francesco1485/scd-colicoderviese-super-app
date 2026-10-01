@@ -33,6 +33,8 @@ for(const viewport of viewports){
   await page.waitForSelector('#institutionalStrip');
   await page.waitForSelector('#sponsorRail');
   await page.waitForSelector('#joinClub');
+  await page.waitForSelector('#view-calendar',{state:'attached'});
+  await page.waitForSelector('#view-teams',{state:'attached'});
   await page.waitForSelector('.hero-synth',{state:'attached'});
   await page.waitForSelector('.ng-command-ring',{state:'attached'});
   await page.waitForSelector('#weekRail');
@@ -40,7 +42,9 @@ for(const viewport of viewports){
   await page.waitForSelector('.newsroom');
   await page.waitForSelector('.worlds-preview',{state:'attached'});
   await page.waitForSelector('.ng-value-engine',{state:'attached'});
-  await page.waitForFunction(()=>Boolean(window.SCDNextGen)&&Boolean(window.SCDMeta)&&Boolean(window.SCDTwin)&&Boolean(window.SCDExperience)&&Boolean(window.SCDAdaptive));
+  await page.waitForTimeout(700);
+  const runtimeFlags=await page.evaluate(()=>({nextGen:Boolean(window.SCDNextGen),meta:Boolean(window.SCDMeta),twin:Boolean(window.SCDTwin),experience:Boolean(window.SCDExperience),adaptive:Boolean(window.SCDAdaptive)}));
+  if(!Object.values(runtimeFlags).every(Boolean))throw new Error('runtime boot incomplete '+JSON.stringify(runtimeFlags)+' browserErrors='+errors.join(' | '));
   await page.waitForFunction(()=>document.documentElement.scrollWidth<=window.innerWidth+3);
 
   const firstView=await page.locator('.home-first').evaluate(el=>({top:el.getBoundingClientRect().top,bottom:el.getBoundingClientRect().bottom}));
@@ -78,6 +82,18 @@ for(const viewport of viewports){
   if(await page.evaluate(()=>document.body.dataset.scdExperience)!=='quick')throw new Error('Quick mode failed');
   await page.evaluate(()=>window.SCDExperience.setMode('DISCOVER'));
   if(await page.evaluate(()=>document.body.dataset.scdExperience)!=='discover')throw new Error('Discover mode failed');
+
+  await page.evaluate(()=>window.SCDNextGen.setView('calendar'));
+  await page.waitForSelector('#view-calendar.active');
+  await page.waitForSelector('#calendarPublicList');
+  if(await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+3))throw new Error('calendar view horizontal overflow');
+  await page.evaluate(()=>window.SCDNextGen.setView('teams'));
+  await page.waitForSelector('#view-teams.active');
+  await page.waitForSelector('#publicTeamsGrid');
+  if(await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+3))throw new Error('teams view horizontal overflow');
+  if((await page.locator('#calendarPeriod [data-period]').count())!==3)throw new Error('calendar period controls missing');
+  if((await page.locator('#calendarTypeFilter option').count())<5)throw new Error('calendar type filters missing');
+  await page.evaluate(()=>window.SCDNextGen.setView('pulse'));
 
   await page.evaluate(()=>window.SCDNextGen.setView('twin'));
   await page.waitForSelector('#view-twin.active .twin-stage');

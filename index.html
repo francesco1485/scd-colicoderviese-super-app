@@ -258,6 +258,61 @@
         </section>
 </section>
 
+      <section class="view public-core-view" id="view-calendar" data-view="calendar">
+        <section class="public-core-hero">
+          <div>
+            <span class="eyebrow">CALENDARIO LIVE · SCD</span>
+            <h1>Tutto il Club, <em>giorno per giorno.</em></h1>
+            <p>Gare, allenamenti, tornei ed eventi pubblici verificati. Filtra senza scavare tra fogli, chat e messaggi dispersi.</p>
+          </div>
+          <button class="btn glass" type="button" data-nav="pulse">← Home</button>
+        </section>
+
+        <section class="calendar-workbench">
+          <div class="calendar-toolbar">
+            <label class="core-search"><span>⌕</span><input id="calendarSearch" type="search" autocomplete="off" placeholder="Cerca squadra, avversario, campo, attività…"></label>
+            <div class="segmented core-period" id="calendarPeriod">
+              <button class="active" type="button" data-period="WEEK">Settimana</button>
+              <button type="button" data-period="30">30 giorni</button>
+              <button type="button" data-period="ALL">Tutto</button>
+            </div>
+          </div>
+          <div class="calendar-filters">
+            <label>Squadra<select id="calendarTeamFilter"><option value="ALL">Tutte</option></select></label>
+            <label>Categoria<select id="calendarCategoryFilter"><option value="ALL">Tutte</option></select></label>
+            <label>Tipo<select id="calendarTypeFilter"><option value="ALL">Tutti</option><option value="MATCH">Gare</option><option value="TRAINING">Allenamenti</option><option value="TOURNAMENT">Tornei</option><option value="EVENT">Eventi</option></select></label>
+            <button class="text-btn reset-core-filters" type="button" id="calendarReset">Azzera filtri</button>
+          </div>
+          <div class="calendar-kpis" id="calendarKpis">
+            <div><small>ATTIVITÀ</small><b>—</b></div><div><small>GARE</small><b>—</b></div><div><small>ALLENAMENTI</small><b>—</b></div><div><small>TORNEI / EVENTI</small><b>—</b></div>
+          </div>
+          <div class="calendar-public-list" id="calendarPublicList">
+            <div class="core-loading"><b>Calendario in sincronizzazione</b><small>Mostriamo soltanto attività disponibili dalla fonte verificata.</small></div>
+          </div>
+        </section>
+      </section>
+
+      <section class="view public-core-view" id="view-teams" data-view="teams">
+        <section class="public-core-hero teams-hero">
+          <div>
+            <span class="eyebrow">SQUADRE · SCD</span>
+            <h1>Trova subito <em>la tua squadra.</em></h1>
+            <p>Le squadre vengono ricostruite dai dati sportivi pubblici verificati. Nessuna rosa privata, nessun recapito personale esposto.</p>
+          </div>
+          <button class="btn glass" type="button" data-nav="pulse">← Home</button>
+        </section>
+        <section class="teams-directory">
+          <div class="teams-toolbar">
+            <label class="core-search"><span>⌕</span><input id="teamsSearch" type="search" autocomplete="off" placeholder="Cerca squadra o categoria…"></label>
+            <label class="teams-category">Categoria<select id="teamsCategoryFilter"><option value="ALL">Tutte</option></select></label>
+          </div>
+          <div class="teams-summary"><b id="teamsCount">0 squadre</b><span>Calendario e prossimi impegni pubblici</span></div>
+          <div class="public-teams-grid" id="publicTeamsGrid">
+            <div class="core-loading"><b>Squadre in sincronizzazione</b><small>La directory si compone dai dati verificati del Club.</small></div>
+          </div>
+        </section>
+      </section>
+
       <section class="view" id="view-twin" data-view="twin">
         <div class="twin-stage">
           <div class="twin-copy">
@@ -329,8 +384,8 @@
 
     <nav class="bottom-nav" aria-label="Navigazione principale">
       <button class="active" data-nav="pulse"><span>⌂</span>Home</button>
-      <button data-public-action="calendar"><span>▦</span>Calendario</button>
-      <button data-public-action="teams"><span>⚽</span>Squadre</button>
+      <button data-nav="calendar"><span>▦</span>Calendario</button>
+      <button data-nav="teams"><span>⚽</span>Squadre</button>
       <button data-scroll="#communityPulse"><span>◎</span>Community</button>
       <button data-nav="twin"><span>◉</span>Profilo</button>
     </nav>

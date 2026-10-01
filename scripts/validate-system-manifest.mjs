@@ -147,6 +147,11 @@ assert(m.product_direction?.human_centered_os?.dark_patterns===false,'dark patte
 assert(m.development_contract?.human_centered_rules?.pleasant_work_is_product_requirement===true,'pleasant work requirement missing');
 assert(m.product_direction?.weekly_sport_calendar?.scope==='ALL_AGE_GROUPS_ALL_SPORTING_ACTIVITY_CURRENT_WEEK','R40 weekly calendar scope mismatch');
 assert(m.product_direction?.weekly_sport_calendar?.no_hidden_default_slice===true,'R40 weekly calendar must show all by default');
+assert(m.product_direction?.public_core_navigation?.state==='DEDICATED_PUBLIC_VIEWS','public core navigation state missing');
+assert((m.product_direction?.public_core_navigation?.routes||[]).some(x=>x.id==='CALENDAR'&&x.hash==='#calendar'),'dedicated calendar route missing');
+assert((m.product_direction?.public_core_navigation?.routes||[]).some(x=>x.id==='TEAMS'&&x.hash==='#teams'),'dedicated teams route missing');
+assert((m.capability_map||[]).some(x=>x.id==='CAP-PUBLIC-TEAMS'),'CAP-PUBLIC-TEAMS missing');
+
 assert(m.product_direction?.ai_newsroom?.policy==='VERIFIED_STRUCTURED_FACTS_ONLY','R40 newsroom policy mismatch');
 assert(m.product_direction?.ai_newsroom?.stale_site_content===false,'R40 newsroom must exclude stale site content');
 assert(m.product_direction?.ai_newsroom?.fail_closed===true,'R40 newsroom must fail closed');

@@ -2,7 +2,7 @@
 'use strict';
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const API_BASE='';
-const state={view:'pulse',filter:'ALL',events:[],upcoming:[],news:null,sportData:{results:[],standings:[],headToHead:[]},partners:[],publicProfiles:[],nextMatch:null};
+const state={view:'pulse',filter:'ALL',events:[],upcoming:[],fullCalendar:[],calendarLoaded:false,calendarLoading:false,calendarSourceState:'UNVERIFIED',calendarPeriod:'WEEK',calendarTeam:'ALL',calendarCategory:'ALL',calendarType:'ALL',calendarSearch:'',teamsSearch:'',teamsCategory:'ALL',news:null,sportData:{results:[],standings:[],headToHead:[]},partners:[],publicProfiles:[],nextMatch:null};
 const officialChannels=[
  {id:'site',label:'Sito ufficiale',url:'https://www.colicoderviese.it/',terms:'sito web comunicazioni servizi'},
  {id:'facebook',label:'Facebook SCD',url:'https://www.facebook.com/ColicoDerviese',terms:'facebook social pagina'},
@@ -15,19 +15,24 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&
 const norm=s=>String(s??'').toLocaleLowerCase('it-IT').normalize('NFD').replace(/[\u0300-\u036f]/g,'');
 const todayKey=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome'}).format(new Date());
 const fmtDate=v=>{if(!v)return 'Dato in aggiornamento';const d=new Date(String(v).slice(0,10)+'T12:00:00');return Number.isFinite(d.getTime())?new Intl.DateTimeFormat('it-IT',{weekday:'short',day:'2-digit',month:'short'}).format(d):String(v)};
+const pick=(obj,...keys)=>{for(const k of keys){const v=obj?.[k];if(v!=null&&String(v).trim()!=='')return v}return ''};
+const isoClientDate=v=>{const s=String(v||'').trim();if(!s)return '';let m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);if(m)return m[1]+'-'+m[2]+'-'+m[3];m=s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);if(m)return m[3]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[1]).padStart(2,'0');const d=new Date(s);return Number.isFinite(d.getTime())?d.toISOString().slice(0,10):''};
+const clientEventKind=row=>{const t=norm([pick(row,'kind','type','eventType'),pick(row,'title','event','name','subject')].join(' '));if(/allenament|training/.test(t))return 'TRAINING';if(/gara|partita|campionato|coppa|amichevole|match/.test(t))return 'MATCH';if(/torneo|tournament/.test(t))return 'TOURNAMENT';return 'EVENT'};
 
 function setView(view){
   state.view=view;
   $$('[data-view]').forEach(x=>x.classList.toggle('active',x.dataset.view===view));
   $$('[data-nav]').forEach(x=>x.classList.toggle('active',x.dataset.nav===view));
-  const ctx=view==='desk'?'PRIVATE DESK · ROLE/SCOPE':view==='twin'?'PROFILO · AVATAR FACOLTATIVO':'HOME · PUBBLICO';
+  const ctx=view==='desk'?'PRIVATE DESK · ROLE/SCOPE':view==='twin'?'PROFILO · AVATAR FACOLTATIVO':view==='calendar'?'CALENDARIO · PUBBLICO':view==='teams'?'SQUADRE · PUBBLICO':'HOME · PUBBLICO';
   const ctxEl=$('#mirrorContext');if(ctxEl)ctxEl.textContent=ctx;
   history.replaceState(null,'','#'+view);
   window.scrollTo({top:0,behavior:'smooth'});
+  if(view==='calendar')ensurePublicCalendar();
+  if(view==='teams')ensurePublicCalendar();
 }
 $$('[data-nav]').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.nav)));
 $('#modeBtn')?.addEventListener('click',()=>{document.body.classList.toggle('compact');toast(document.body.classList.contains('compact')?'Densità compatta':'Densità comfort')});
-$$('[data-scroll]').forEach(b=>b.addEventListener('click',()=>$(b.dataset.scroll)?.scrollIntoView({behavior:'smooth',block:'start'})));
+$$('[data-scroll]').forEach(b=>b.addEventListener('click',()=>{const target=$(b.dataset.scroll);if(!target)return;const go=()=>target.scrollIntoView({behavior:'smooth',block:'start'});if(target.closest('#view-pulse')&&state.view!=='pulse'){setView('pulse');setTimeout(go,120)}else go()}));
 
 function clubClock(){
   const d=new Date(), parts=new Intl.DateTimeFormat('it-IT',{timeZone:'Europe/Rome',weekday:'short',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}).format(d);
@@ -68,22 +73,163 @@ function openPanel(title,body){
   return layer;
 }
 function openEvent(id){
- const x=[...state.events,...state.upcoming].find(e=>String(e.id)===String(id));if(!x)return;
+ const x=[...state.fullCalendar,...state.events,...state.upcoming].find(e=>String(e.id)===String(id));if(!x)return;
  openPanel(x.title||'Evento SCD','<div class="panel-detail"><span class="eyebrow">'+esc(x.kind||'EVENTO')+'</span><h2>'+esc(x.team||'SCD')+'</h2><p>'+esc([fmtDate(x.date),x.time,x.opponent,x.venue].filter(Boolean).join(' · '))+'</p><small>Fonte: '+esc(x.source||'SCD')+'</small></div>');
 }
-function openCalendarPanel(){
- const rows=[...state.events,...state.upcoming].filter((x,i,a)=>a.findIndex(y=>String(y.id)===String(x.id))===i).sort((a,b)=>(a.date+(a.time||'')).localeCompare(b.date+(b.time||'')));
- const body=rows.length?'<div class="panel-list">'+rows.slice(0,30).map(x=>'<button type="button" data-panel-event="'+esc(x.id)+'"><time>'+esc(fmtDate(x.date))+(x.time?' · '+esc(x.time):'')+'</time><b>'+esc(x.title||x.team||'Evento SCD')+'</b><small>'+esc([x.team,x.opponent,x.venue].filter(Boolean).join(' · '))+'</small></button>').join('')+'</div>':'<div class="panel-empty"><b>Calendario in aggiornamento</b><p>Nessun evento pubblico verificato disponibile.</p></div>';
- const layer=openPanel('Calendario SCD',body);
- $$('[data-panel-event]',layer).forEach(b=>b.onclick=()=>openEvent(b.dataset.panelEvent));
-}
-function openTeamsPanel(){
- const names=[...new Set([...state.events,...state.upcoming].flatMap(x=>[x.team,x.category]).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),'it'));
- openPanel('Squadre e categorie',names.length?'<div class="team-cloud">'+names.map(x=>'<button type="button" data-team-search="'+esc(x)+'">'+esc(x)+'</button>').join('')+'</div>':'<div class="panel-empty"><b>Dati in aggiornamento</b><p>Le squadre compariranno dalla fonte sportiva verificata.</p></div>');
- $$('[data-team-search]').forEach(b=>b.onclick=()=>{setView('pulse');const q=$('#publicSearchInput');if(q){q.value=b.dataset.teamSearch;runSearch(q.value)}});
-}
+function openCalendarPanel(){setView('calendar')}
+function openTeamsPanel(){setView('teams')}
 $$('[data-public-action="calendar"]').forEach(b=>b.addEventListener('click',openCalendarPanel));
 $$('[data-public-action="teams"]').forEach(b=>b.addEventListener('click',openTeamsPanel));
+
+function normalizeCalendarRows(raw){
+ const data=raw?.data||raw||{};
+ const rows=Array.isArray(data)?data:(Array.isArray(data.rows)?data.rows:Array.isArray(data.items)?data.items:Array.isArray(data.events)?data.events:Array.isArray(data.calendar?.rows)?data.calendar.rows:[]);
+ return rows.map((row,i)=>({
+   id:String(pick(row,'id','eventId','uid')||'PUB-'+i+'-'+isoClientDate(pick(row,'date','data','startDate'))),
+   title:String(pick(row,'title','event','name','subject')||'Attività SCD'),
+   date:isoClientDate(pick(row,'date','data','startDate')),
+   time:String(pick(row,'time','ora','startTime')||''),
+   endTime:String(pick(row,'endTime','fine')||''),
+   team:String(pick(row,'team','teamName','squadra')||'SCD'),
+   category:String(pick(row,'category','categoria','ageGroup','annata')||''),
+   opponent:String(pick(row,'opponent','opponentName','avversario')||''),
+   competition:String(pick(row,'competition','campionato','league')||''),
+   venue:String(pick(row,'venue','luogo','field','location')||''),
+   kind:clientEventKind(row),
+   source:String(pick(row,'source','fonte')||'R20_PUBLIC_CALENDAR')
+ })).filter(x=>x.date);
+}
+function mergeCalendarRows(...groups){
+ const map=new Map();
+ groups.flat().forEach((x,i)=>{
+   if(!x||!x.date)return;
+   const key=String(x.id||'')||[x.date,x.time,x.team,x.title,x.opponent].join('|');
+   const prior=map.get(key)||{};
+   map.set(key,{...prior,...x,id:x.id||prior.id||'MERGED-'+i});
+ });
+ return [...map.values()].sort((a,b)=>(a.date+'T'+(a.time||'00:00')).localeCompare(b.date+'T'+(b.time||'00:00')));
+}
+function fallbackCalendarRows(){
+ return mergeCalendarRows(state.events||[],state.upcoming||[]);
+}
+async function ensurePublicCalendar(force=false){
+ if(state.calendarLoading)return;
+ if(state.calendarLoaded&&!force){renderPublicCalendar();renderPublicTeams();return}
+ state.calendarLoading=true;
+ const cal=$('#calendarPublicList'),teams=$('#publicTeamsGrid');
+ if(cal)cal.innerHTML='<div class="core-loading"><b>Sincronizzo il calendario pubblico</b><small>Sto interrogando la fonte SCD senza inventare gli eventi mancanti.</small></div>';
+ if(teams)teams.innerHTML='<div class="core-loading"><b>Sincronizzo le squadre</b><small>La directory viene costruita dal calendario pubblico verificato.</small></div>';
+ try{
+   const out=await postAction('public.calendar',{rangeKey:'ALL',offset:0,limit:500});
+   const rows=normalizeCalendarRows(out);
+   const fallback=fallbackCalendarRows();
+   state.fullCalendar=mergeCalendarRows(rows,fallback);
+   state.calendarSourceState=rows.length?'VERIFIED_PUBLIC_CALENDAR':'PARTIAL_NEWSROOM_FALLBACK';
+   state.calendarLoaded=true;
+ }catch(err){
+   state.fullCalendar=fallbackCalendarRows();
+   state.calendarSourceState=state.fullCalendar.length?'PARTIAL_NEWSROOM_FALLBACK':'UNAVAILABLE';
+   state.calendarLoaded=true;
+ }
+ state.calendarLoading=false;
+ renderPublicCalendar();
+ renderPublicTeams();
+}
+function calendarBounds(period){
+ const today=todayKey();
+ if(period==='ALL')return {start:'0000-01-01',end:'9999-12-31'};
+ if(period==='30'){const d=new Date(today+'T12:00:00');d.setDate(d.getDate()+30);return {start:today,end:new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome'}).format(d)}}
+ const week=currentWeek();return {start:new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome'}).format(week[0]),end:new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome'}).format(week[6])};
+}
+function calendarFilterRows(){
+ const bounds=calendarBounds(state.calendarPeriod),term=norm(state.calendarSearch);
+ return (state.fullCalendar||[]).filter(x=>{
+   if(x.date<bounds.start||x.date>bounds.end)return false;
+   if(state.calendarTeam!=='ALL'&&x.team!==state.calendarTeam)return false;
+   if(state.calendarCategory!=='ALL'&&x.category!==state.calendarCategory)return false;
+   if(state.calendarType!=='ALL'&&x.kind!==state.calendarType)return false;
+   if(term&&!norm([x.team,x.category,x.title,x.opponent,x.competition,x.venue,x.kind].join(' ')).includes(term))return false;
+   return true;
+ });
+}
+function syncCalendarFilters(){
+ const rows=state.fullCalendar||[];
+ const team=$('#calendarTeamFilter'),cat=$('#calendarCategoryFilter');
+ if(team){
+   const vals=[...new Set(rows.map(x=>x.team).filter(x=>x&&x!=='SCD'))].sort((a,b)=>a.localeCompare(b,'it'));
+   team.innerHTML='<option value="ALL">Tutte</option>'+vals.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join('');
+   team.value=vals.includes(state.calendarTeam)?state.calendarTeam:'ALL';
+   if(team.value==='ALL')state.calendarTeam='ALL';
+ }
+ if(cat){
+   const vals=[...new Set(rows.map(x=>x.category).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'it'));
+   cat.innerHTML='<option value="ALL">Tutte</option>'+vals.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join('');
+   cat.value=vals.includes(state.calendarCategory)?state.calendarCategory:'ALL';
+   if(cat.value==='ALL')state.calendarCategory='ALL';
+ }
+}
+function renderPublicCalendar(){
+ const mount=$('#calendarPublicList');if(!mount)return;
+ syncCalendarFilters();
+ const rows=calendarFilterRows();
+ const kpis=$$('#calendarKpis b');
+ const games=rows.filter(x=>x.kind==='MATCH').length,training=rows.filter(x=>x.kind==='TRAINING').length,other=rows.length-games-training;
+ [rows.length,games,training,other].forEach((v,i)=>{if(kpis[i])kpis[i].textContent=String(v)});
+ const periodButtons=$$('#calendarPeriod [data-period]');periodButtons.forEach(b=>b.classList.toggle('active',b.dataset.period===state.calendarPeriod));
+ if(!rows.length){
+   mount.innerHTML='<div class="core-empty"><b>Nessuna attività trovata</b><p>Non risultano eventi pubblici verificati con questi filtri. Puoi cambiare periodo o azzerare i filtri.</p><small>Stato fonte: '+esc(state.calendarSourceState)+'</small></div>';
+   return;
+ }
+ const groups=new Map();
+ rows.forEach(x=>{if(!groups.has(x.date))groups.set(x.date,[]);groups.get(x.date).push(x)});
+ mount.innerHTML=[...groups.entries()].map(([date,items])=>'<section class="calendar-day-group"><header><time>'+esc(fmtDate(date))+'</time><span>'+items.length+' attività</span></header><div class="calendar-day-events">'+items.map(x=>'<button type="button" class="calendar-event-row" data-calendar-event="'+esc(x.id)+'"><span class="calendar-event-time">'+esc(x.time||'—')+'</span><span class="calendar-event-main"><small>'+esc(x.kind)+'</small><b>'+esc(x.team||x.title||'SCD')+'</b><em>'+esc([x.title,x.opponent?('vs '+x.opponent):'',x.competition].filter(Boolean).join(' · '))+'</em></span><span class="calendar-event-place">'+esc(x.venue||'Sede in aggiornamento')+'</span><span class="calendar-event-arrow">›</span></button>').join('')+'</div></section>').join('');
+ $$('[data-calendar-event]',mount).forEach(b=>b.onclick=()=>openEvent(b.dataset.calendarEvent));
+}
+function publicTeamModels(){
+ const today=todayKey(),map=new Map();
+ (state.fullCalendar||[]).forEach(x=>{
+   const name=x.team&&x.team!=='SCD'?x.team:(x.category||'');
+   if(!name)return;
+   if(!map.has(name))map.set(name,{name,categories:new Set(),rows:[]});
+   const t=map.get(name);if(x.category)t.categories.add(x.category);t.rows.push(x);
+ });
+ return [...map.values()].map(t=>{
+   t.rows.sort((a,b)=>(a.date+(a.time||'')).localeCompare(b.date+(b.time||'')));
+   const future=t.rows.filter(x=>x.date>=today);
+   return {name:t.name,categories:[...t.categories],rows:t.rows,next:future[0]||null,nextMatch:future.find(x=>x.kind==='MATCH')||null};
+ }).sort((a,b)=>a.name.localeCompare(b.name,'it'));
+}
+function syncTeamsFilters(models){
+ const cat=$('#teamsCategoryFilter');if(!cat)return;
+ const vals=[...new Set(models.flatMap(x=>x.categories).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'it'));
+ cat.innerHTML='<option value="ALL">Tutte</option>'+vals.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join('');
+ cat.value=vals.includes(state.teamsCategory)?state.teamsCategory:'ALL';
+ if(cat.value==='ALL')state.teamsCategory='ALL';
+}
+function renderPublicTeams(){
+ const mount=$('#publicTeamsGrid');if(!mount)return;
+ const models=publicTeamModels();syncTeamsFilters(models);
+ const term=norm(state.teamsSearch);
+ const rows=models.filter(t=>(state.teamsCategory==='ALL'||t.categories.includes(state.teamsCategory))&&(!term||norm([t.name,...t.categories].join(' ')).includes(term)));
+ const count=$('#teamsCount');if(count)count.textContent=rows.length+' '+(rows.length===1?'squadra':'squadre');
+ if(!rows.length){
+   mount.innerHTML='<div class="core-empty"><b>Nessuna squadra trovata</b><p>La directory mostra solo squadre ricavabili dai dati sportivi pubblici verificati.</p><small>Stato fonte: '+esc(state.calendarSourceState)+'</small></div>';
+   return;
+ }
+ mount.innerHTML=rows.map(t=>{
+   const next=t.next,nextMatch=t.nextMatch;
+   return '<button type="button" class="public-team-card" data-public-team="'+esc(t.name)+'"><span class="team-card-mark">'+esc((t.name||'?').slice(0,2).toUpperCase())+'</span><div class="team-card-copy"><small>'+esc(t.categories.join(' · ')||'SCD')+'</small><h3>'+esc(t.name)+'</h3><p>'+(next?esc('Prossima attività · '+fmtDate(next.date)+(next.time?' · '+next.time:'')):'Nessuna attività futura verificata')+'</p></div><div class="team-card-match"><small>PROSSIMA GARA</small><b>'+esc(nextMatch?(nextMatch.opponent||nextMatch.title||fmtDate(nextMatch.date)):'Dato in aggiornamento')+'</b><span>'+esc(nextMatch?[fmtDate(nextMatch.date),nextMatch.time].filter(Boolean).join(' · '):'')+'</span></div><span class="team-card-arrow">›</span></button>';
+ }).join('');
+ $$('[data-public-team]',mount).forEach(b=>b.onclick=()=>{state.calendarTeam=b.dataset.publicTeam;state.calendarPeriod='ALL';setView('calendar');renderPublicCalendar()});
+}
+$('#calendarSearch')?.addEventListener('input',e=>{state.calendarSearch=e.target.value;renderPublicCalendar()});
+$('#calendarTeamFilter')?.addEventListener('change',e=>{state.calendarTeam=e.target.value;renderPublicCalendar()});
+$('#calendarCategoryFilter')?.addEventListener('change',e=>{state.calendarCategory=e.target.value;renderPublicCalendar()});
+$('#calendarTypeFilter')?.addEventListener('change',e=>{state.calendarType=e.target.value;renderPublicCalendar()});
+$('#calendarPeriod')?.addEventListener('click',e=>{const b=e.target.closest('[data-period]');if(!b)return;state.calendarPeriod=b.dataset.period;renderPublicCalendar()});
+$('#calendarReset')?.addEventListener('click',()=>{state.calendarSearch='';state.calendarTeam='ALL';state.calendarCategory='ALL';state.calendarType='ALL';state.calendarPeriod='WEEK';if($('#calendarSearch'))$('#calendarSearch').value='';if($('#calendarTypeFilter'))$('#calendarTypeFilter').value='ALL';renderPublicCalendar()});
+$('#teamsSearch')?.addEventListener('input',e=>{state.teamsSearch=e.target.value;renderPublicTeams()});
+$('#teamsCategoryFilter')?.addEventListener('change',e=>{state.teamsCategory=e.target.value;renderPublicTeams()});
 
 function renderMatchCenter(){
  const match=state.nextMatch;
@@ -132,9 +278,9 @@ function renderWeekMeta(data){
 
 function buildSearchIndex(){
  const items=[];
- state.events.forEach(x=>items.push({kind:x.kind==='MATCH'?'PARTITA':'EVENTO',title:[x.team,x.opponent].filter(Boolean).join(' vs ')||x.title,meta:[fmtDate(x.date),x.time,x.venue].filter(Boolean).join(' · '),action:'event',id:x.id,terms:[x.team,x.category,x.title,x.opponent,x.competition,x.venue]}));
+ const searchableCalendar=(state.fullCalendar&&state.fullCalendar.length)?state.fullCalendar:state.events;searchableCalendar.forEach(x=>items.push({kind:x.kind==='MATCH'?'PARTITA':'EVENTO',title:[x.team,x.opponent].filter(Boolean).join(' vs ')||x.title,meta:[fmtDate(x.date),x.time,x.venue].filter(Boolean).join(' · '),action:'event',id:x.id,terms:[x.team,x.category,x.title,x.opponent,x.competition,x.venue]}));
  (state.news?.cards||[]).forEach((x,i)=>items.push({kind:'NEWS',title:x.title,meta:x.category||'SCD Newsroom',action:'news',id:String(i),terms:[x.title,x.dek,x.body,x.category]}));
- [...new Set(state.events.flatMap(x=>[x.team,x.category]).filter(Boolean))].forEach(x=>items.push({kind:'SQUADRA',title:x,meta:'Calendario e contenuti pubblici',action:'team',id:x,terms:[x]}));
+ [...new Set(searchableCalendar.flatMap(x=>[x.team,x.category]).filter(x=>x&&x!=='SCD'))].forEach(x=>items.push({kind:'SQUADRA',title:x,meta:'Calendario e contenuti pubblici',action:'team',id:x,terms:[x]}));
  state.publicProfiles.forEach(x=>items.push({kind:'PROFILO PUBBLICO',title:x.displayName,meta:[x.role,x.team].filter(Boolean).join(' · '),action:'profile',id:x.id,terms:[x.displayName,x.role,x.team]}));
  officialChannels.forEach(x=>items.push({kind:'CANALE UFFICIALE',title:x.label,meta:'SCD ColicoDerviese',action:'channel',id:x.id,terms:[x.label,x.terms]}));
  return items;
@@ -151,7 +297,7 @@ function runSearch(q){
 function handleSearchResult(kind,id){
  const box=$('#publicSearchResults');if(box)box.hidden=true;
  if(kind==='event')return openEvent(id);
- if(kind==='team'){const input=$('#publicSearchInput');if(input){input.value=id;runSearch(id)}return}
+ if(kind==='team'){state.teamsSearch=id;setView('teams');const input=$('#teamsSearch');if(input)input.value=id;renderPublicTeams();return}
  if(kind==='news'){document.querySelector('.newsroom')?.scrollIntoView({behavior:'smooth'});return}
  if(kind==='profile'){openPanel('Profilo pubblico','<div class="panel-detail"><b>Profilo autorizzato</b><p>Le informazioni mostrate rispettano la visibilità concessa dalla Società.</p></div>')}
  if(kind==='channel'){const ch=officialChannels.find(x=>x.id===id);if(ch)window.open(ch.url,'_blank','noopener,noreferrer')}
@@ -225,10 +371,10 @@ async function hydrate(){
     if($('#todayDetail'))$('#todayDetail').textContent=todayEv.length?todayEv.slice(0,3).map(x=>[x.team,x.time,x.title].filter(Boolean).join(' · ')).join('  |  '):'Nessuna attività verificata disponibile nella fonte collegata.';
     const card=Array.isArray(data.cards)?data.cards.find(c=>c.evidence?.length):null;
     if(card){if($('#storyTitle'))$('#storyTitle').textContent=card.title||'SCD Newsroom';if($('#storyText'))$('#storyText').textContent=card.dek||card.body||'Contenuto verificato'}
-    renderWeek();renderWeekMeta(data);renderMatchCenter();renderUpcoming();renderPartners();renderMentions();
+    state.fullCalendar=mergeCalendarRows(state.fullCalendar,state.events,state.upcoming);renderWeek();renderWeekMeta(data);renderMatchCenter();renderUpcoming();renderPartners();renderMentions();if(state.view==='calendar')renderPublicCalendar();if(state.view==='teams')renderPublicTeams();
   }catch(e){
     if($('#weekCount'))$('#weekCount').textContent='—';if($('#todayCount'))$('#todayCount').textContent='—';
-    renderWeek();renderMatchCenter();renderUpcoming();renderPartners();renderMentions();
+    state.fullCalendar=mergeCalendarRows(state.fullCalendar,state.events,state.upcoming);renderWeek();renderMatchCenter();renderUpcoming();renderPartners();renderMentions();if(state.view==='calendar')renderPublicCalendar();if(state.view==='teams')renderPublicTeams();
   }
 }
 hydrate();$('#refreshData')?.addEventListener('click',()=>{hydrate();toast('Aggiornamento richiesto')});
@@ -293,7 +439,7 @@ function mirrorReply(q){
  if(/sponsor|partner/.test(x))return 'La barra Partner mostra solo soggetti verificati dalla fonte collegata. Per una proposta usa Sponsor / Partner in “Entra nel Club”.';
  if(/youtube|video|instagram|facebook|tiktok|social|media/.test(x)){document.querySelector('#mediaHub')?.scrollIntoView({behavior:'smooth'});return 'Ti porto al Media Hub: lì trovi i canali ufficiali SCD separati dalle fonti esterne da verificare.';}
  if(/segreter|contatt/.test(x))return 'Puoi inviare una richiesta dal percorso “Altro profilo” oppure usare i recapiti ufficiali della Segreteria presenti nei canali societari.';
- if(/calend|allen/.test(x))return 'Apri Calendario: la settimana corrente resta il punto di partenza e non vengono inventati eventi mancanti.';
+ if(/calend|allen/.test(x)){setView('calendar');return 'Ho aperto il Calendario SCD: parte dalla settimana corrente e puoi estenderlo a 30 giorni o a tutti i dati pubblici disponibili.';}
  if(/document|certificat/.test(x))return 'I documenti riservati restano nel Private Desk e richiedono ruolo e autorizzazione.';
  if(/pulmin|trasport/.test(x))return 'I trasporti sono un servizio riservato: richieste e dati personali richiedono autenticazione e scope.';
  return 'Posso orientarti tra prossima partita, eventi, tesseramento, tifosi, sponsor e contatti. Le azioni riservate restano soggette a ruolo e permessi.';
@@ -302,6 +448,6 @@ function appendMsg(text,kind){const d=document.createElement('div');d.className=
 $('#mirrorForm')?.addEventListener('submit',e=>{e.preventDefault();const q=$('#mirrorInput').value.trim();if(!q)return;appendMsg(q,'user');$('#mirrorInput').value='';setTimeout(()=>appendMsg(mirrorReply(q),'ai'),180)});
 $$('.quick-prompts button').forEach(b=>b.addEventListener('click',()=>{appendMsg(b.textContent,'user');setTimeout(()=>appendMsg(mirrorReply(b.textContent),'ai'),140)}));
 
-const hash=location.hash.replace('#','');if(['pulse','twin','desk'].includes(hash))setView(hash);
-window.SCDNextGen={setView,hydrate,openMirror,openCalendar:openCalendarPanel,search:runSearch};
+const hash=location.hash.replace('#','').split('?')[0];if(['pulse','calendar','teams','twin','desk'].includes(hash))setView(hash);
+window.SCDNextGen={setView,hydrate,openMirror,openCalendar:openCalendarPanel,openTeams:openTeamsPanel,loadCalendar:ensurePublicCalendar,search:runSearch};
 })();

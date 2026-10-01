@@ -12,7 +12,8 @@ const css=read('ui-r39-human.css');
 const index=read('index.html');
 
 assert(/^3\./.test(m.manifest?.version||''),'manifest must remain Human OS major v3');
-assert(['R39','R40'].includes(m.product_direction?.release),'release must remain R39+ Human OS compatible');
+const releaseNumber=Number(String(m.product_direction?.release||'').replace(/^R/i,''));
+assert(Number.isFinite(releaseNumber)&&releaseNumber>=39,'release must remain R39+ Human OS compatible');
 assert(m.product_direction?.human_centered_os?.mental_state_inference===false,'mental-state inference must remain false');
 assert(m.product_direction?.human_centered_os?.dark_patterns===false,'dark patterns must remain false');
 assert(m.product_direction?.human_centered_os?.minor_compulsion_mechanics===false,'minor compulsion mechanics must remain false');
@@ -47,7 +48,7 @@ assert(/scd-experience-engine\.js\?v=(39|40)\.0\.0/.test(index),'R39 experience 
 
 if(process.exitCode)process.exit(process.exitCode);
 console.log('SCD HUMAN OS CONTRACT PASS',{
-  release:'R39',
+  release:m.product_direction?.release,
   modes:['DISCOVER','QUICK','FOCUS'],
   privacy:'NO_MENTAL_STATE_INFERENCE',
   privateDesk:'ROLE_SCOPE',
