@@ -330,3 +330,7 @@ h1,h2,h3,h4,strong,b,.hero,.sidebar,.topbar,.event-card{color:#16304d}
   .page-head h1{font-size:1.8rem}
   .stats-metrics{grid-template-columns:1fr}
 }
+
+.session-logout{min-height:44px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;border-radius:999px;padding:0 14px;font-weight:750;cursor:pointer}
+.session-logout:hover{background:rgba(255,255,255,.14)}
+@media(max-width:900px){.session-logout{padding:0 10px}.top-actions{gap:6px}}
