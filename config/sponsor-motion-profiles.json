@@ -1,0 +1,85 @@
+{
+  "schemaVersion": "1.0.0",
+  "source": "SCD_MEDIA_MOTION_LAB",
+  "defaultPreview": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 25,
+    "durationSeconds": 20
+  },
+  "nativeLedStatus": "DA_RILEVARE_ALLA_CONSEGNA",
+  "profiles": [
+    {
+      "id": "MOTION-GGLASS-01",
+      "partnerName": "GGlass",
+      "sourceEvidence": "PREVIEW_VIDEO_UTENTE",
+      "logoAssetStatus": "MISSING_OFFICIAL_REPO_ASSET",
+      "productionStatus": "CONCEPT_DA_RIVEDERE_CON_LOGO_UFFICIALE",
+      "message": "Mobilità & sicurezza",
+      "motionConcept": "Ingresso pulito con riflesso orizzontale, brand reveal progressivo e uscita laterale controllata.",
+      "stadiumView": "Logo grande, massimo un messaggio secondario, contrasto elevato per lettura dalla tribuna.",
+      "cameraView": "Movimento più lento nella zona centrale e permanenza del marchio nella safe area della camera.",
+      "lakeIdentity": "Richiamo SCD discreto con linea azzurro-lago nella transizione, senza alterare l'identità del partner.",
+      "proofPlan": [
+        "foto tribuna",
+        "clip camera principale",
+        "frame LED pulito",
+        "report erogazione"
+      ]
+    },
+    {
+      "id": "MOTION-TA-CLEANING-01",
+      "partnerName": "TA Cleaning",
+      "sourceEvidence": "PREVIEW_VIDEO_UTENTE",
+      "logoAssetStatus": "MISSING_OFFICIAL_REPO_ASSET",
+      "productionStatus": "CONCEPT_DA_RIVEDERE_CON_LOGO_UFFICIALE",
+      "message": "Pulizia professionale",
+      "motionConcept": "Reveal a fascia con effetto wipe ordinato, superfici nette e chiusura sul logo.",
+      "stadiumView": "Forme ampie e leggibili, testo ridotto, nessun dettaglio minuto.",
+      "cameraView": "Transizione progressiva senza lampeggi rapidi; logo stabile nel momento di massima esposizione.",
+      "lakeIdentity": "Uso del blu SCD solo come cornice di sistema o raccordo tra spot, non come colore imposto al partner.",
+      "proofPlan": [
+        "foto tribuna",
+        "clip camera principale",
+        "frame LED pulito",
+        "report erogazione"
+      ]
+    },
+    {
+      "id": "MOTION-AGC-MEDICAL-01",
+      "partnerName": "AGC Medical",
+      "sourceEvidence": "PREVIEW_VIDEO_UTENTE",
+      "logoAssetStatus": "MISSING_OFFICIAL_REPO_ASSET",
+      "productionStatus": "CONCEPT_DA_RIVEDERE_CON_LOGO_UFFICIALE",
+      "message": "Performance & prevenzione",
+      "motionConcept": "Entrata con linea dinamica morbida, ritmo sportivo controllato e focus finale sul marchio.",
+      "stadiumView": "Messaggio essenziale, forte gerarchia tra logo e servizio, permanenza sufficiente alla lettura.",
+      "cameraView": "Safe area centrale, velocità moderata, niente microtesti durante la ripresa.",
+      "lakeIdentity": "Accento azzurro-lago come elemento di transizione SCD, mantenendo il visual partner dominante.",
+      "proofPlan": [
+        "foto tribuna",
+        "clip camera principale",
+        "frame LED pulito",
+        "report erogazione"
+      ]
+    },
+    {
+      "id": "MOTION-GENERIC-SCD-01",
+      "partnerName": "Nuovo Partner",
+      "sourceEvidence": "TEMPLATE_SCD",
+      "logoAssetStatus": "REQUIRED_BEFORE_PRODUCTION",
+      "productionStatus": "TEMPLATE",
+      "message": "Il tuo brand entra nella partita.",
+      "motionConcept": "Brand reveal, messaggio singolo, permanenza, uscita e raccordo SCD tra uno sponsor e il successivo.",
+      "stadiumView": "Logo dominante e massimo 6-8 parole leggibili da distanza.",
+      "cameraView": "Zona centrale protetta, transizioni non frenetiche, permanenza del logo prima del cambio sponsor.",
+      "lakeIdentity": "Blu SCD, azzurro Lago di Como e giallo club solo nei raccordi comuni della playlist.",
+      "proofPlan": [
+        "foto tribuna",
+        "clip camera principale",
+        "frame LED pulito",
+        "report erogazione"
+      ]
+    }
+  ]
+}
