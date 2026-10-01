@@ -28,9 +28,9 @@ for(const viewport of viewports){
 
   await page.setContent(html,{waitUntil:'domcontentloaded'});
   await page.waitForSelector('#view-home.active');
-  await page.waitForSelector('#homeActionQueue .action-mini');
+  await page.waitForTimeout(600);
   const actionCount=await page.locator('#homeActionQueue .action-mini').count();
-  if(actionCount<4)throw new Error('home commercial action queue too small: '+actionCount);
+  if(actionCount<4)throw new Error('home commercial action queue too small: '+actionCount+' browserErrors='+errors.join(' | '));
 
   const sponsorStrip=await page.locator('#sponsorStrip').innerText();
   for(const prospect of ['IPERAL','HDI MAGLIA','DELLOCA','CARCANO']){
