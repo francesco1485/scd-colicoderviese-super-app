@@ -131,3 +131,19 @@ Niente dark pattern, urgenza artificiale, notifiche manipolative o dipendenza pr
 ### 10. Architettura
 Twin state, Mirror context, Club Graph, Event Core, notifications e media devono essere componenti separati con contratti API espliciti.
 Il reset grafico Next Generation puo' sostituire completamente la vecchia presentazione, ma non distrugge R20, Supabase, provenance, sicurezza, fonti o migrazione Strangler/Dual Run.
+
+
+## COMANDO VISUAL MASS-USE — NO REAL PHOTOGRAPHY (2026-10-01)
+
+Questa direttiva sostituisce la dipendenza da fotografie reali nella UI Next Generation.
+
+- Vietato usare fotografie reali come hero, sfondi editoriali, copertine o decorazione della Super App NextGen.
+- Sono ammessi soltanto: logo ufficiale, icone ufficiali, documenti funzionali e media utente quando necessari al servizio.
+- Le scene sportive e territoriali dell'interfaccia devono essere create internamente con grafica sintetica originale: CSS, SVG, WebGL/Canvas o asset generativi originali.
+- La grafica deve evocare sport, Alto Lario, stadio, energia, community e futuro senza copiare layout, personaggi o trade dress di altri prodotti.
+- Il riferimento non e' una singola app: adottare pattern di prodotto gia' compresi da utenti di massa, come feed immediato, rail orizzontali, storie, quick actions, profilo persistente, notifiche contestuali, social proof, personalizzazione e progressione.
+- La palette deve ridurre affaticamento visivo: fondi profondi desaturati, blu minerale, acqua/grigio lago, oro attenuato, bianco caldo; colori ad alta saturazione solo per micro-accenti.
+- Ogni schermata deve avere una ragione d'uso quotidiana e un'azione primaria evidente.
+- Il valore economico deve nascere dall'utilita': Family Benefit, Event Experience, Partner Story, hospitality, merchandising, tornei, servizi e attivazioni misurabili.
+- Drive e Gmail restano motori di back-office: l'utente non naviga cartelle o posta, ma vede azioni, priorita', scadenze, relazioni, documenti ed eventi derivati dalle fonti.
+- L'esperienza deve restare multi-eta', accessibile e comprensibile senza dipendere da gergo gestionale.
