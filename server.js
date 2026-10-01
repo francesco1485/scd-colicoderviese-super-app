@@ -125,15 +125,31 @@ function sponsorLoginPayload(raw){
     permissions:dash.permissions||d.permissions||{}
   };
 }
-function sponsorStaffAllowed(user){
-  const role=String(user?.role||'').trim().toUpperCase();
+function sponsorRoleKey(user){
+  const email=String(user?.email||'').trim().toLowerCase();
+  const role=String(user?.role||user?.coreRole||'').trim().toUpperCase();
   const type=String(user?.type||'').trim().toUpperCase();
-  return user?.staff===true||role==='DG'||type==='DIREZIONE'||user?.email==='sportclubcolico@gmail.com';
+  if(email==='sportclubcolico@gmail.com'||role==='DG'||role==='DIREZIONE'||type==='DIREZIONE')return 'DIREZIONE';
+  if(/COMMERCIAL|COMMERCIALE|SPONSOR|PARTNER|MARKETING|ACCOUNT/.test(role+' '+type))return 'COMMERCIALE';
+  return 'NON_AUTORIZZATO';
+}
+function sponsorStaffAllowed(user){
+  return sponsorRoleKey(user)!=='NON_AUTORIZZATO';
 }
 function sponsorDirection(user){
-  const role=String(user?.role||'').trim().toUpperCase();
-  const type=String(user?.type||'').trim().toUpperCase();
-  return role==='DG'||type==='DIREZIONE'||user?.email==='sportclubcolico@gmail.com';
+  return sponsorRoleKey(user)==='DIREZIONE';
+}
+function sponsorCapabilities(user){
+  const profile=sponsorRoleKey(user);
+  if(profile==='DIREZIONE')return {
+    profile,platform:true,crm:true,communications:true,contracts:true,finance:true,
+    catalog:true,conventions:true,events:true,media:true,settings:true,admin:true
+  };
+  if(profile==='COMMERCIALE')return {
+    profile,platform:true,crm:true,communications:true,contracts:true,finance:false,
+    catalog:true,conventions:true,events:true,media:true,settings:false,admin:false
+  };
+  return {profile,platform:false};
 }
 async function validateSponsorSession(req){
   const token=sponsorSessionToken(req);
@@ -200,7 +216,7 @@ async function handleSponsorLogin(req,res){
     if(!login.token||!login.user?.email)throw new Error('Accesso non valido.');
     if(!sponsorStaffAllowed(login.user))throw new Error('Questo account non è autorizzato alla Sponsor Platform.');
     res.setHeader('set-cookie',sponsorCookie(req,login.token,21600));
-    return json(res,200,{ok:true,isDirection:sponsorDirection(login.user),user:{name:login.user.name,email:login.user.email,role:login.user.role}});
+    return json(res,200,{ok:true,isDirection:sponsorDirection(login.user),capabilities:sponsorCapabilities(login.user),user:{name:login.user.name,email:login.user.email,role:login.user.role}});
   }catch(e){return json(res,403,{ok:false,error:e.message||'Accesso non autorizzato'})}
 }
 async function handleSponsorSession(req,res,u){
@@ -208,7 +224,7 @@ async function handleSponsorSession(req,res,u){
   const probe=String(u?.searchParams?.get('probe')||'')==='1';
   try{
     const s=await validateSponsorSession(req);
-    return json(res,200,{ok:true,authenticated:true,isDirection:s.isDirection,user:{name:s.user.name,email:s.user.email,role:s.user.role}});
+    return json(res,200,{ok:true,authenticated:true,isDirection:s.isDirection,capabilities:sponsorCapabilities(s.user),user:{name:s.user.name,email:s.user.email,role:s.user.role}});
   }catch(e){
     if(probe)return json(res,200,{ok:true,authenticated:false});
     return json(res,401,{ok:false,error:'SESSION_REQUIRED'});
