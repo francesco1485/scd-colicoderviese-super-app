@@ -1713,8 +1713,11 @@ function renderPartner(){
   $('partnerName').textContent=n.name;$('partnerCapability').textContent=n.capability;$('partnerStatus').textContent=relationshipLabel(n.relationship_status)
   $('partnerType').textContent=n.regulatory_domain==='insurance'?'COMPAGNIA / COLLABORAZIONE ASSICURATIVA':'PARTNER SPECIALISTICO'
   $('partnerRole').textContent=n.strategic_role||'Da definire';$('partnerCurrent').textContent=n.current_use||'Da verificare';$('partnerFuture').textContent=n.future_role||'Da analizzare'
-  $('partnerOverview').innerHTML='<p><strong>Fonte del dato</strong><br>'+esc(n.source_note||n.source_basis||'Da documentare')+'</p><p><strong>Perimetro</strong><br>'+esc(n.regulatory_domain||'Da definire')+'</p><p><strong>Priorità strategica</strong><br>'+esc(n.priority)+'/100</p>'
+  const readiness=partnerReadiness(n)
+  const recoveryAction=actions.find(a=>a.ecosystem_node_id===n.id&&a.metadata?.domain==='partner_readiness'&&!['completed','cancelled'].includes(a.status))
+  $('partnerOverview').innerHTML=readinessHtml(readiness)+'<div class="partner-overview-facts"><p><strong>Fonte del dato</strong><br>'+esc(n.source_note||n.source_basis||'Da documentare')+'</p><p><strong>Perimetro</strong><br>'+esc(n.regulatory_domain||'Da definire')+'</p><p><strong>Priorità strategica</strong><br>'+esc(n.priority)+'/100</p></div>'+(recoveryAction?'<button type="button" class="small-btn dossier-action-link" id="partnerRecoveryActionBtn">Apri azione Recovery →</button>':'')
 
+  if(recoveryAction&&$('partnerRecoveryActionBtn'))$('partnerRecoveryActionBtn').onclick=()=>{navigate('actions');setTimeout(()=>openAction(recoveryAction.id),80)}
   const tl=timeline.filter(x=>x.ecosystem_node_id===n.id)
   $('partnerTimeline').innerHTML=tl.map(x=>'<article class="timeline-item"><time>'+esc(fmtDate(x.event_date))+'</time><h4>'+esc(x.title)+'</h4><p>'+esc(x.description||'')+'</p><div class="tags"><span class="tag">'+esc(x.event_type)+'</span><span class="tag">'+(x.verified?'verificato':'da verificare')+'</span></div></article>').join('')||empty('Cronologia storica da ricostruire')
   const cc=contacts.filter(x=>x.ecosystem_node_id===n.id)
@@ -2182,6 +2185,48 @@ function openKnowledgeEditor(itemId,productId){
   }
 }
 
+
+function readinessSummary(checks){
+  const total=checks.length||1
+  const ready=checks.filter(x=>x.ready).length
+  return{score:Math.round(ready/total*100),ready,total,missing:checks.filter(x=>!x.ready).map(x=>x.label)}
+}
+function collaboratorReadiness(c){
+  const terms=collaboratorTerms.filter(t=>t.collaborator_id===c.id)
+  const snapshots=portfolioSnapshots.filter(x=>x.collaborator_id===c.id)
+  const assessments=businessAssessments.filter(x=>x.collaborator_id===c.id)
+  return readinessSummary([
+    {label:'ruolo',ready:!!c.role_description},
+    {label:'area',ready:!!c.area},
+    {label:'territorio',ready:!!c.territory},
+    {label:'contatto diretto',ready:!!(c.email||c.phone)},
+    {label:'snapshot portafoglio',ready:snapshots.length>0},
+    {label:'assessment 360',ready:assessments.length>0},
+    {label:'condizioni economiche verificate',ready:terms.some(t=>t.verification_status==='verified')}
+  ])
+}
+function partnerReadiness(n){
+  const cc=contacts.filter(x=>x.ecosystem_node_id===n.id)
+  const dd=documents.filter(x=>x.ecosystem_node_id===n.id)
+  const rr=partnerRequirements.filter(x=>x.ecosystem_node_id===n.id)
+  const covered=rr.filter(x=>['received','verified','not_applicable'].includes(x.status)).length
+  const pp=products.filter(x=>x.ecosystem_node_id===n.id)
+  return readinessSummary([
+    {label:'ruolo strategico',ready:!!n.strategic_role},
+    {label:'utilizzo attuale',ready:!!n.current_use},
+    {label:'sviluppo futuro',ready:!!n.future_role},
+    {label:'fonte',ready:!!(n.source_note||n.source_basis)},
+    {label:'referente',ready:cc.length>0},
+    {label:'documenti',ready:dd.length>0},
+    {label:'checklist documentale',ready:rr.length>0&&covered===rr.length},
+    {label:'prodotti collegati',ready:pp.length>0}
+  ])
+}
+function readinessHtml(r){
+  const tone=r.score>=85?'good':r.score>=55?'partial':'critical'
+  return '<div class="dossier-readiness '+tone+'"><div><span>Completezza dossier</span><strong>'+r.score+'%</strong></div><div class="dossier-readiness-bar"><i style="width:'+r.score+'%"></i></div>'+(r.missing.length?'<small>Manca: '+esc(r.missing.join(' · '))+'</small>':'<small>Dossier operativo completo secondo i controlli attuali.</small>')+'</div>'
+}
+
 function renderCollaborators(){
   const financial=isManager()
   $('collabCount').textContent=collaborators.length
@@ -2190,10 +2235,11 @@ function renderCollaborators(){
   $('collabTermsPending').textContent=financial?collaboratorTerms.filter(t=>t.verification_status!=='verified').length:'—'
   $('collaboratorList').innerHTML=collaborators.map(c=>{
     const terms=financial?collaboratorTerms.filter(t=>t.collaborator_id===c.id):[]
+    const readiness=collaboratorReadiness(c)
     const economic=financial
       ?'<div><span class="money-status">'+esc(c.earning_model||'da verificare')+'</span><small>'+esc(c.earning_notes||'')+'</small></div><div><strong>'+terms.length+' condizioni collegate</strong><small>'+terms.filter(t=>t.verification_status!=='verified').length+' da verificare</small></div>'
       :'<div><span class="money-status restricted">Economico riservato</span><small>Visibile alla direzione</small></div><div><strong>Supporto per ruolo</strong><small>Territorio, competenze e strumenti</small></div>'
-    return '<div class="collab-row"><div><strong>'+esc(c.display_name)+'</strong><small>'+esc(c.role_description||c.collaborator_type)+'</small></div><div><strong>'+esc(c.area||'Da definire')+'</strong><small>'+esc(c.territory||'Territorio da verificare')+'</small></div>'+economic+'<button class="small-btn" data-collaborator="'+c.id+'">Apri</button></div>'
+    return '<div class="collab-row"><div><strong>'+esc(c.display_name)+'</strong><small>'+esc(c.role_description||c.collaborator_type)+'</small></div><div><strong>'+esc(c.area||'Da definire')+'</strong><small>'+esc(c.territory||'Territorio da verificare')+'</small></div>'+economic+'<div class="readiness-mini '+(readiness.score>=85?'good':readiness.score>=55?'partial':'critical')+'"><strong>'+readiness.score+'%</strong><small>'+esc(readiness.missing.slice(0,2).join(' · ')||'completo')+'</small></div><button class="small-btn" data-collaborator="'+c.id+'">Apri</button></div>'
   }).join('')||empty('Nessun collaboratore censito')
   document.querySelectorAll('[data-collaborator]').forEach(b=>b.onclick=()=>openCollaborator(b.dataset.collaborator))
   $('portfolioSnapshotGrid').innerHTML=financial
@@ -2213,12 +2259,15 @@ function openCollaborator(id){
   const terms=financial?collaboratorTerms.filter(t=>t.collaborator_id===id):[]
   const assessment=businessAssessments.filter(a=>a.collaborator_id===id).sort((a,b)=>String(b.assessment_date).localeCompare(String(a.assessment_date)))[0]
   const score=assessment?avgAssessment(assessment):null
-  $('modalContent').innerHTML='<div class="eyebrow">COLLABORATORE 360</div><h2>'+esc(c.display_name)+'</h2><p class="muted">'+esc(c.area||'Area da definire')+' · '+esc(c.territory||'Territorio da verificare')+'</p>'+
+  const readiness=collaboratorReadiness(c)
+  const recoveryAction=actions.find(a=>a.metadata?.collaborator_id===c.id&&!['completed','cancelled'].includes(a.status))
+  $('modalContent').innerHTML='<div class="eyebrow">COLLABORATORE 360</div><h2>'+esc(c.display_name)+'</h2><p class="muted">'+esc(c.area||'Area da definire')+' · '+esc(c.territory||'Territorio da verificare')+'</p>'+readinessHtml(readiness)+(recoveryAction?'<button type="button" class="small-btn dossier-action-link" id="collabRecoveryActionBtn">Apri azione Recovery →</button>':'')+
     '<div class="collab-360-grid"><div class="prose-box"><p><strong>Ruolo</strong><br>'+esc(c.role_description||'Da completare')+'</p>'+(financial?'<p><strong>Modello guadagno generale</strong><br>'+esc(c.earning_model||'Da verificare')+'</p><p><strong>Note economiche</strong><br>'+esc(c.earning_notes||'Nessuna condizione economica verificata inserita.')+'</p>':'<p><strong>Dati economici</strong><br>Riservati ai ruoli di direzione.</p>')+'</div>'+
     '<div class="assessment-summary"><span>Valutazione 360</span><strong>'+(score!=null?esc(score)+'/100':'—')+'</strong><small>'+(assessment?esc(assessment.status)+' · '+esc(fmtDate(assessment.assessment_date)):'Nessuna valutazione registrata')+'</small>'+(assessment?.proposal_direction?'<p>'+esc(assessment.proposal_direction)+'</p>':'')+'</div></div>'+
     '<div class="modal-section"><div class="modal-section-head"><h4>Condizioni per prodotto / collaborazione</h4>'+(isManager()?'<button class="primary" type="button" id="addTermBtn">+ Condizione</button>':'')+'</div>'+
     (terms.length?terms.map(t=>'<div class="term-row"><div><strong>'+esc(t.agency_products?.name||t.ecosystem_nodes?.name||t.activity_scope||'Ambito')+'</strong><small>'+esc(t.earning_type)+' · '+esc(t.verification_status)+(t.percentage!=null?' · '+esc(t.percentage)+'%':'')+(t.fixed_amount!=null?' · € '+Number(t.fixed_amount).toLocaleString('it-IT'):'')+(t.bonus_rule?' · '+esc(t.bonus_rule):'')+'</small>'+(t.source_reference?'<small><b>Fonte:</b> '+esc(t.source_reference)+'</small>':'<small>Fonte economica non registrata.</small>')+'</div><span class="verification-badge '+(t.verification_status==='verified'?'verified':'')+'">'+esc(t.verification_status.replaceAll('_',' '))+'</span>'+(isManager()?'<button class="small-btn" type="button" data-term-edit="'+t.id+'">Modifica</button>':'')+'</div>').join(''):'<p class="muted">Nessuna condizione caricata. Le percentuali non vengono stimate: servono accordi, estratti o regole interne verificabili.</p>')+'</div>'
   $('modal').classList.remove('hidden')
+  if(recoveryAction&&$('collabRecoveryActionBtn'))$('collabRecoveryActionBtn').onclick=()=>{closeModal();navigate('actions');setTimeout(()=>openAction(recoveryAction.id),80)}
   if(isManager()){
     if($('addTermBtn'))$('addTermBtn').onclick=()=>openTermEditor(id,null)
     document.querySelectorAll('[data-term-edit]').forEach(b=>b.onclick=()=>openTermEditor(id,b.dataset.termEdit))
