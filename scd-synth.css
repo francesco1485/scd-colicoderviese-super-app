@@ -117,3 +117,25 @@ body[data-scd-density="compact"] .section{padding-top:30px;padding-bottom:30px}
 @media(max-width:900px){
   .global-experience-dock{position:fixed;z-index:72;left:50%;right:auto;top:auto;transform:translateX(-50%);bottom:82px;margin:0;background:rgba(7,17,28,.94);backdrop-filter:blur(18px);box-shadow:0 12px 28px rgba(0,0,0,.25)}
 }
+
+
+/* ADAPTIVE EXPERIENCE ENGINE */
+:root{--scd-touch-target:44px;--scd-adaptive-gap:12px;--scd-adaptive-columns:3}
+button,a,input,select{min-height:min(var(--scd-touch-target),100%)}
+html[data-scd-viewport="phone_compact"] .ng-command-ring{grid-template-columns:1fr 1fr;gap:var(--scd-adaptive-gap);margin-left:14px;margin-right:14px}
+html[data-scd-viewport="phone_compact"] .ng-command-ring button{min-height:78px;padding:11px}
+html[data-scd-viewport="phone_compact"] .section{padding-left:14px;padding-right:14px}
+html[data-scd-viewport="phone"] .ng-command-ring,
+html[data-scd-viewport="phone_large"] .ng-command-ring{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--scd-adaptive-gap)}
+html[data-scd-viewport="tablet"] .ng-command-ring{grid-template-columns:repeat(3,minmax(0,1fr))}
+html[data-scd-viewport="wide"] .app,
+html[data-scd-viewport="ultrawide"] .app{max-width:1920px;margin-inline:auto}
+html[data-scd-orientation="landscape"][data-scd-viewport^="phone"] .hero{min-height:min(82svh,620px)}
+html[data-scd-pointer="coarse"] button,
+html[data-scd-pointer="coarse"] a{min-height:46px}
+html[data-scd-motion="reduced"] *,
+html[data-scd-motion="reduced"] *::before,
+html[data-scd-motion="reduced"] *::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+html[data-scd-contrast="high"] .status-pill,
+html[data-scd-contrast="high"] .experience-dock,
+html[data-scd-contrast="high"] .ng-command-ring button{border-color:rgba(255,255,255,.42)}
