@@ -30,6 +30,8 @@ assert(bridge.includes("Session.getEffectiveUser().getEmail()"),'effective sende
 assert(bridge.includes("DEFAULT_FROM_EMAIL"),'canonical institutional sender missing');
 assert(bridge.includes("MAIL_ARCHIVIO"),'outbound audit archive missing');
 assert(bridge.includes("TOUCHPOINTS_MASTER"),'CRM touchpoint audit missing');
+assert(bridge.includes("SPONSOR_CONTRATTI"),'CRM agreement registry missing');
+assert(js.includes("data.agreements"),'CRM 360 agreement UI missing');
 assert(bridge.includes("SOCIETA_PROFILE"),'canonical society profile missing');
 assert(bridge.includes("FIRME_RUOLI"),'role/person signature registry missing');
 assert(bridge.includes("Firma personale non autorizzata: identita account/persona non coincidente."),'personal signature identity binding missing');
