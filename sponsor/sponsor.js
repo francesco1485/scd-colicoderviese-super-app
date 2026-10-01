@@ -1,7 +1,7 @@
 const PRIVATE_SPONSOR_ORIGIN='https://scd-colicoderviese-official-r21.onrender.com';
 const ON_PUBLIC_STATIC=['scd-sponsor-platform.onrender.com','francesco1485.github.io'].includes(location.hostname);
 const $=s=>document.querySelector(s);
-const $=s=>Array.from(document.querySelectorAll(s));
+const $$=s=>Array.from(document.querySelectorAll(s));
 
 const clubModules={
   partner:{
@@ -63,9 +63,9 @@ function renderClubModule(key='partner'){
   if(points)points.innerHTML=m.points.map(x=>'<span>'+x+'</span>').join('');
   if(cta)cta.textContent=m.cta;
   if(preview)preview.innerHTML=m.preview;
-  $('[data-club-module]').forEach(b=>b.classList.toggle('active',b.dataset.clubModule===key));
+  $$('[data-club-module]').forEach(b=>b.classList.toggle('active',b.dataset.clubModule===key));
 }
-$('[data-club-module]').forEach(b=>b.addEventListener('click',()=>renderClubModule(b.dataset.clubModule)));
+$$('[data-club-module]').forEach(b=>b.addEventListener('click',()=>renderClubModule(b.dataset.clubModule)));
 renderClubModule('partner');
 
 
