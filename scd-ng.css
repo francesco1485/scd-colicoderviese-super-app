@@ -1614,3 +1614,46 @@ body[data-scd-theme="arena"] select:focus-visible{
   body[data-scd-theme="arena"] .world-switch{margin-top:8px}
   body[data-scd-theme="arena"] .sport-superbar{box-shadow:0 16px 34px rgba(4,28,58,.16)}
 }
+
+
+/* ===== R47 PUBLIC PARTNER & COMMUNITY HUB ===== */
+.public-partner-hub{
+  margin:24px 0;
+  padding:28px;
+  border-radius:24px;
+  display:grid;
+  grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);
+  gap:24px;
+  background:
+    linear-gradient(120deg,rgba(3,39,75,.98),rgba(7,96,156,.91)),
+    url('./assets/hero-colico.webp') center/cover;
+  color:#fff;
+  box-shadow:0 24px 70px rgba(3,40,76,.2);
+  overflow:hidden;
+  position:relative
+}
+.public-partner-hub:after{
+  content:"";position:absolute;width:330px;height:330px;border:1px solid rgba(255,255,255,.09);
+  border-radius:50%;right:-120px;top:-140px;box-shadow:0 0 0 55px rgba(255,255,255,.025),0 0 0 115px rgba(255,255,255,.018)
+}
+.public-partner-copy,.public-partner-modules{position:relative;z-index:2}
+.public-partner-copy .eyebrow{color:#ffd51c}
+.public-partner-copy h2{font-size:clamp(30px,4vw,52px);line-height:1.02;letter-spacing:-.045em;margin:7px 0 12px;color:#fff}
+.public-partner-copy h2 em{font-style:normal;color:#ffd51c}
+.public-partner-copy p{max-width:650px;color:#d8eaf5;line-height:1.55}
+.public-partner-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.public-partner-actions a{text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+.public-partner-modules{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.public-partner-modules a,.public-partner-modules button{
+  min-height:132px;border:1px solid rgba(255,255,255,.17);border-radius:17px;padding:15px;
+  background:rgba(255,255,255,.09);backdrop-filter:blur(8px);color:white;text-decoration:none;text-align:left;
+  display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;cursor:pointer;transition:.2s
+}
+.public-partner-modules a:hover,.public-partner-modules button:hover{transform:translateY(-3px);background:rgba(255,255,255,.15);border-color:rgba(255,213,28,.7)}
+.public-partner-modules span{position:absolute;align-self:flex-start;top:12px;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#ffd51c;color:#17324d;font-size:11px;font-weight:900}
+.public-partner-modules a,.public-partner-modules button{position:relative}
+.public-partner-modules b{font-size:1rem;margin-bottom:5px}
+.public-partner-modules small{font-size:.76rem;line-height:1.35;color:#cbe1ee}
+@media(max-width:1000px){.public-partner-hub{grid-template-columns:1fr}.public-partner-modules{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:700px){.public-partner-hub{padding:20px}.public-partner-modules{grid-template-columns:1fr 1fr}.public-partner-modules a,.public-partner-modules button{min-height:112px}}
+@media(max-width:460px){.public-partner-modules{grid-template-columns:1fr}}
