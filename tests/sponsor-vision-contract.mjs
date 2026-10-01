@@ -124,6 +124,12 @@ assert(js.includes("$('[data-view]').forEach"),'multi-action selector must use $
 assert(js.includes("$('[data-campaign-filter]').forEach"),'campaign filters must use $ helper');
 assert(!/(^|[^$])\$\('\[data-view\]'\)\.forEach/m.test(js),'single selector incorrectly used for multiple view actions');
 
+
+assert(js.includes('function partnerHubRecords()'),'Partner Hub CRM synchronization missing');
+assert(js.includes("source:'CRM'"),'Partner Hub CRM source marker missing');
+assert(js.includes('syncActivationPartnersFromCrm'),'Activation Studio CRM synchronization missing');
+assert(js.includes('if(s.crmId){openView(\'crm\');openCrmProfile(s.crmId)}'),'Partner Hub CRM drill-down missing');
+
 const pubJs=fs.readFileSync(new URL('../sponsor/sponsor.js',import.meta.url),'utf8');
 assert(pubJs.includes('const $=s=>Array.from(document.querySelectorAll(s));'),'public multi-selector helper missing');
 assert(!pubJs.includes('const $=s=>Array.from(document.querySelectorAll(s));'),'public selector helper duplicated');
