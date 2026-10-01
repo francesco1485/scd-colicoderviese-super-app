@@ -27,49 +27,110 @@
       "path": "assets/logo-scd.png",
       "class": "OFFICIAL_CLUB_LOGO",
       "status": "LOCKED",
-      "git_blob_sha": "fb15174aa297a5b2fcd487d7ba3053dc082d2a2c"
+      "git_blob_sha": "fb15174aa297a5b2fcd487d7ba3053dc082d2a2c",
+      "source": "SCD_INTERNAL_APPROVED",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-01"
     },
     {
       "path": "assets/logo-scd.webp",
       "class": "OFFICIAL_CLUB_LOGO_OPTIMIZED",
       "status": "LOCKED",
-      "git_blob_sha": "998c0a49762cd45b812f7936454a5b040e469bcc"
+      "git_blob_sha": "998c0a49762cd45b812f7936454a5b040e469bcc",
+      "source": "SCD_INTERNAL_APPROVED",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-01"
     },
     {
       "path": "assets/logo-lnd.png",
       "class": "FEDERATION_LOGO",
       "status": "LOCKED",
-      "git_blob_sha": "5a063f67de20ddac8baff201ff87f9695514b507"
+      "git_blob_sha": "5a063f67de20ddac8baff201ff87f9695514b507",
+      "source": "SCD_INTERNAL_APPROVED",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-01"
     },
     {
       "path": "assets/logo-lnd.webp",
       "class": "FEDERATION_LOGO_OPTIMIZED",
       "status": "LOCKED",
-      "git_blob_sha": "7fae59f6381aa01c441eb1a3e03ee96f4dbee92c"
+      "git_blob_sha": "7fae59f6381aa01c441eb1a3e03ee96f4dbee92c",
+      "source": "SCD_INTERNAL_APPROVED",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-01"
     },
     {
       "path": "assets/logo-sgs.png",
       "class": "FEDERATION_LOGO",
       "status": "LOCKED",
-      "git_blob_sha": "9f21cc9ed59d758f922e747aef0f303fa4a0a17b"
+      "git_blob_sha": "9f21cc9ed59d758f922e747aef0f303fa4a0a17b",
+      "source": "SCD_INTERNAL_APPROVED",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-01"
     },
     {
       "path": "assets/logo-sgs.webp",
       "class": "FEDERATION_LOGO_OPTIMIZED",
       "status": "LOCKED",
-      "git_blob_sha": "b37491201fbb434229242ed9c9399615128ddd77"
+      "git_blob_sha": "b37491201fbb434229242ed9c9399615128ddd77",
+      "source": "SCD_INTERNAL_APPROVED",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-01"
     },
     {
       "path": "assets/logo-monza.png",
       "class": "AFFILIATION_PARTNER_LOGO",
       "status": "LOCKED",
-      "git_blob_sha": "55a56a8fc31014bfdbff938971c4514de700cb55"
+      "git_blob_sha": "55a56a8fc31014bfdbff938971c4514de700cb55",
+      "source": "SCD_INTERNAL_APPROVED",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-01"
     },
     {
       "path": "assets/logo-monza.webp",
       "class": "AFFILIATION_PARTNER_LOGO_OPTIMIZED",
       "status": "LOCKED",
-      "git_blob_sha": "eac5c723a9d545521f2521880d78904ecc1e9601"
+      "git_blob_sha": "eac5c723a9d545521f2521880d78904ecc1e9601",
+      "source": "SCD_INTERNAL_APPROVED",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-01"
     }
-  ]
+  ],
+  "provenance_required": [
+    "SOURCE",
+    "VERIFIED_AT",
+    "SEASON_OR_VALIDITY",
+    "CONFIDENCE",
+    "MASTER_PATH"
+  ],
+  "source_priority": {
+    "opponents": [
+      "OFFICIAL_CLUB_SITE",
+      "FEDERATION_OR_LEAGUE",
+      "OFFICIAL_TOURNAMENT_ORGANIZER"
+    ],
+    "sponsors": [
+      "PARTNER_SUPPLIED_OFFICIAL_ASSET",
+      "OFFICIAL_BRAND_SITE"
+    ],
+    "kits": [
+      "SCD_APPROVED_REFERENCE",
+      "OFFICIAL_SUPPLIER_REFERENCE"
+    ]
+  },
+  "sponsor_states": [
+    "PROSPECT",
+    "NEGOTIATION",
+    "CONFIRMED",
+    "ACTIVE",
+    "EXPIRED"
+  ],
+  "render_rules": {
+    "sponsor_logo": [
+      "CONFIRMED",
+      "ACTIVE"
+    ],
+    "opponent_logo": "VERIFIED_ONLY",
+    "kit": "APPROVED_REAL_REFERENCE_ONLY"
+  }
 }
