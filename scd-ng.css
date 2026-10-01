@@ -1306,3 +1306,311 @@ select:focus-visible{
   .bottom-nav{bottom:max(10px,env(safe-area-inset-bottom))}
   .mirror{bottom:max(8px,env(safe-area-inset-bottom))}
 }
+
+
+/* R47 SCD ARENA · GRAND SPORTS WEB APP · 2026-10-01
+   REBUILD_IMPROVE: interfaccia e palette. KEEP_LOCKED: tutti gli asset ufficiali. */
+:root{
+  --ink:#081b33;
+  --muted:#66788c;
+  --bg:#f2f5f9;
+  --panel:#ffffff;
+  --panel2:#e9f0f7;
+  --navy:#041c3a;
+  --navy2:#0a2e5c;
+  --blue:#1664e8;
+  --cyan:#00a9b8;
+  --gold:#ffc928;
+  --live:#14b86e;
+  --alert:#ef5b4d;
+  --line:rgba(8,27,51,.12);
+  --glass:rgba(255,255,255,.90);
+  --shadow:0 24px 60px rgba(14,48,86,.14);
+}
+html{background:var(--bg)}
+body[data-scd-theme="arena"]{
+  background:
+    radial-gradient(circle at 8% 0%,rgba(22,100,232,.09),transparent 26%),
+    radial-gradient(circle at 93% 8%,rgba(0,169,184,.08),transparent 24%),
+    linear-gradient(180deg,#f8fafc 0%,#f2f5f9 46%,#edf2f7 100%);
+  color:var(--ink);
+}
+body[data-scd-theme="arena"] .app{max-width:1600px}
+body[data-scd-theme="arena"] .ambient-a{background:rgba(22,100,232,.09)}
+body[data-scd-theme="arena"] .ambient-b{background:rgba(255,201,40,.07)}
+
+body[data-scd-theme="arena"] .topbar{
+  height:76px;
+  background:
+    linear-gradient(90deg,rgba(4,28,58,.99),rgba(7,41,82,.98) 58%,rgba(5,57,96,.97));
+  border-bottom:1px solid rgba(255,255,255,.10);
+  box-shadow:0 12px 34px rgba(4,28,58,.18);
+}
+body[data-scd-theme="arena"] .brand small{color:var(--gold)}
+body[data-scd-theme="arena"] .live-dot{background:var(--live);box-shadow:0 0 16px rgba(20,184,110,.75)}
+body[data-scd-theme="arena"] .top-link,
+body[data-scd-theme="arena"] .avatar-mini{
+  border-color:rgba(255,255,255,.13);
+  background:rgba(255,255,255,.055);
+}
+body[data-scd-theme="arena"] .top-link:hover,
+body[data-scd-theme="arena"] .avatar-mini:hover{background:rgba(255,255,255,.10)}
+body[data-scd-theme="arena"] .top-link-accent{
+  background:var(--gold)!important;
+  color:var(--navy)!important;
+}
+
+body[data-scd-theme="arena"] .world-switch{
+  background:linear-gradient(135deg,#061f3f,#0a315f);
+  border-color:rgba(255,255,255,.08);
+  box-shadow:0 14px 32px rgba(4,28,58,.12);
+}
+body[data-scd-theme="arena"] .world-switch button{color:#a9bfd5}
+body[data-scd-theme="arena"] .world-switch button>span{color:#71d2da}
+body[data-scd-theme="arena"] .world-switch button.active{
+  background:linear-gradient(135deg,rgba(22,100,232,.72),rgba(0,169,184,.34));
+  color:#fff;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.10),0 8px 20px rgba(2,18,38,.18);
+}
+body[data-scd-theme="arena"] .world-switch button.active>span{color:var(--gold)}
+
+body[data-scd-theme="arena"] .home-first{
+  position:relative;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 92% 0%,rgba(0,169,184,.09),transparent 32%),
+    linear-gradient(145deg,#ffffff,#f7faff);
+  border-color:rgba(8,27,51,.10);
+  box-shadow:0 18px 46px rgba(14,48,86,.10);
+}
+body[data-scd-theme="arena"] .home-first:before{
+  content:"";
+  position:absolute;
+  inset:0 0 auto;
+  height:6px;
+  background:linear-gradient(90deg,var(--gold) 0 18%,var(--blue) 18% 66%,var(--cyan) 66% 100%);
+}
+body[data-scd-theme="arena"] .home-first .eyebrow{color:#087e91}
+body[data-scd-theme="arena"] .home-first h1{color:var(--navy)}
+body[data-scd-theme="arena"] .home-first h1 em{color:var(--blue)}
+body[data-scd-theme="arena"] .week-calendar-cta{
+  background:var(--navy)!important;
+  color:#fff!important;
+}
+body[data-scd-theme="arena"] .week-calendar-cta:hover{background:var(--blue)!important}
+body[data-scd-theme="arena"] .public-search-shell{
+  border-color:rgba(8,27,51,.11)!important;
+  box-shadow:0 8px 22px rgba(14,48,86,.06);
+}
+body[data-scd-theme="arena"] .segmented button.active{
+  background:var(--blue)!important;
+  color:#fff!important;
+}
+body[data-scd-theme="arena"] .week-rail .day.today{
+  outline:2px solid rgba(22,100,232,.24);
+  background:linear-gradient(180deg,#eef5ff,#ffffff);
+}
+body[data-scd-theme="arena"] .day.today .day-name{color:var(--blue)}
+body[data-scd-theme="arena"] .event-pill{
+  background:#eef5ff!important;
+  border-color:rgba(22,100,232,.13)!important;
+}
+
+body[data-scd-theme="arena"] .sport-superbar{
+  position:relative;
+  overflow:hidden;
+  padding:12px;
+  border-color:rgba(255,255,255,.08);
+  background:
+    radial-gradient(circle at 95% -20%,rgba(0,169,184,.26),transparent 35%),
+    linear-gradient(115deg,#041c3a 0%,#0a2e5c 56%,#0b426b 100%);
+  box-shadow:0 22px 50px rgba(4,28,58,.19);
+}
+body[data-scd-theme="arena"] .sport-superbar:before{
+  content:"";
+  position:absolute;
+  width:420px;
+  height:420px;
+  right:-190px;
+  bottom:-315px;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:50%;
+  box-shadow:0 0 0 42px rgba(255,255,255,.018),0 0 0 84px rgba(255,255,255,.012);
+  pointer-events:none;
+}
+body[data-scd-theme="arena"] .sport-superbar>*{position:relative;z-index:1}
+body[data-scd-theme="arena"] .sport-superbar-title{
+  background:linear-gradient(135deg,rgba(22,100,232,.38),rgba(0,169,184,.16));
+  border:1px solid rgba(255,255,255,.09);
+}
+body[data-scd-theme="arena"] .sport-superbar-title span{color:var(--gold)}
+body[data-scd-theme="arena"] .sport-superbar-title b{font-size:16px}
+body[data-scd-theme="arena"] .sport-superbar-title small{color:#bdd1e4}
+body[data-scd-theme="arena"] .sport-superbar button{
+  border-color:rgba(255,255,255,.10);
+  background:rgba(255,255,255,.065);
+  color:#fff;
+}
+body[data-scd-theme="arena"] .sport-superbar button:hover{
+  border-color:rgba(255,201,40,.38);
+  background:rgba(255,255,255,.11);
+}
+body[data-scd-theme="arena"] .sport-superbar button>span{color:#78d9df}
+body[data-scd-theme="arena"] .sport-superbar button>small{color:#afc5d8}
+body[data-scd-theme="arena"] .sport-superbar button.is-following{
+  border-color:rgba(255,201,40,.45);
+  background:linear-gradient(180deg,rgba(255,201,40,.15),rgba(255,255,255,.06));
+}
+body[data-scd-theme="arena"] .sport-superbar button.is-following>span{color:var(--gold)}
+
+body[data-scd-theme="arena"] .match-center{
+  background:
+    radial-gradient(circle at 50% -20%,rgba(0,169,184,.28),transparent 36%),
+    linear-gradient(145deg,#08285a 0%,#155ad0 58%,#087e98 100%)!important;
+  box-shadow:0 24px 56px rgba(16,70,145,.25)!important;
+}
+body[data-scd-theme="arena"] .match-center .eyebrow{color:#8de8e8!important}
+body[data-scd-theme="arena"] .match-center .btn.primary{
+  background:var(--gold)!important;
+  color:var(--navy)!important;
+}
+body[data-scd-theme="arena"] .match-insights>div{
+  background:rgba(255,255,255,.10)!important;
+  border-color:rgba(255,255,255,.14)!important;
+}
+body[data-scd-theme="arena"] .upcoming-events{
+  background:#fff!important;
+  border-color:rgba(8,27,51,.10)!important;
+}
+body[data-scd-theme="arena"] .upcoming-card{
+  background:#f6f9fc!important;
+  border-color:rgba(8,27,51,.10)!important;
+}
+body[data-scd-theme="arena"] .upcoming-card time{color:#087e91!important}
+
+body[data-scd-theme="arena"] .newsroom{
+  background:linear-gradient(180deg,#eaf0f7 0%,rgba(242,245,249,.25) 100%);
+}
+body[data-scd-theme="arena"] .newsroom .story{border-color:rgba(8,27,51,.10)!important}
+body[data-scd-theme="arena"] .newsroom .story small{color:#087e91}
+body[data-scd-theme="arena"] .verified{color:var(--live)!important}
+
+body[data-scd-theme="arena"] .media-hub{
+  background:
+    radial-gradient(circle at 84% -10%,rgba(0,169,184,.27),transparent 35%),
+    linear-gradient(145deg,#041c3a,#0b3768 58%,#07566c)!important;
+  box-shadow:0 22px 52px rgba(4,28,58,.19);
+}
+body[data-scd-theme="arena"] .channel-card:hover{
+  border-color:rgba(255,201,40,.40)!important;
+  background:rgba(255,255,255,.12)!important;
+}
+
+body[data-scd-theme="arena"] .community-pulse{
+  background:
+    radial-gradient(circle at 92% 0%,rgba(0,169,184,.08),transparent 30%),
+    #fff!important;
+}
+body[data-scd-theme="arena"] .poll-question small,
+body[data-scd-theme="arena"] .mention-box label{color:#087e91!important}
+body[data-scd-theme="arena"] .poll-options button.selected{
+  background:var(--blue)!important;
+  border-color:var(--blue)!important;
+}
+
+body[data-scd-theme="arena"] .verified-sponsor-rail{
+  background:linear-gradient(90deg,#fff,#f8fafc)!important;
+  border-color:rgba(8,27,51,.10)!important;
+}
+body[data-scd-theme="arena"] .verified-sponsor-rail>span{
+  background:var(--gold)!important;
+  color:var(--navy)!important;
+}
+body[data-scd-theme="arena"] .verified-sponsor-rail button{
+  background:var(--navy)!important;
+  color:#fff!important;
+}
+body[data-scd-theme="arena"] .institutional-strip{
+  background:#fff!important;
+  border-color:rgba(8,27,51,.10)!important;
+}
+body[data-scd-theme="arena"] .join-club{
+  background:
+    radial-gradient(circle at 92% -10%,rgba(255,201,40,.18),transparent 33%),
+    linear-gradient(145deg,#041c3a,#0b3768 62%,#07596f)!important;
+}
+body[data-scd-theme="arena"] .join-club .eyebrow,
+body[data-scd-theme="arena"] .join-paths button span{color:var(--gold)!important}
+
+body[data-scd-theme="arena"] .public-core-hero{
+  background:
+    radial-gradient(circle at 88% 0%,rgba(255,201,40,.16),transparent 32%),
+    linear-gradient(145deg,#041c3a,#155ad0 70%,#087e98)!important;
+}
+body[data-scd-theme="arena"] .calendar-workbench,
+body[data-scd-theme="arena"] .teams-directory{
+  border-color:rgba(8,27,51,.10)!important;
+  box-shadow:0 18px 44px rgba(14,48,86,.09)!important;
+}
+body[data-scd-theme="arena"] .core-period button.active{
+  background:var(--blue)!important;
+  border-color:var(--blue)!important;
+}
+body[data-scd-theme="arena"] .calendar-event-time{color:var(--blue)!important}
+body[data-scd-theme="arena"] .calendar-event-main small,
+body[data-scd-theme="arena"] .team-card-copy small{color:#087e91!important}
+body[data-scd-theme="arena"] .team-card-mark{
+  background:linear-gradient(145deg,var(--blue),var(--cyan))!important;
+}
+
+body[data-scd-theme="arena"] .twin-stage{
+  background:
+    radial-gradient(circle at 72% 40%,rgba(0,169,184,.25),transparent 30%),
+    radial-gradient(circle at 77% 46%,rgba(255,201,40,.13),transparent 42%),
+    linear-gradient(135deg,#041c3a,#155ad0)!important;
+}
+body[data-scd-theme="arena"] .desk-hero{
+  background:
+    radial-gradient(circle at 88% -5%,rgba(0,169,184,.20),transparent 30%),
+    linear-gradient(135deg,#041c3a,#0b3768)!important;
+}
+body[data-scd-theme="arena"] .node.center{
+  background:var(--gold)!important;
+  color:var(--navy)!important;
+}
+body[data-scd-theme="arena"] .service-dock button:hover{
+  border-color:rgba(22,100,232,.25)!important;
+  transform:translateY(-2px);
+}
+body[data-scd-theme="arena"] .service-dock span{color:#087e91!important}
+
+body[data-scd-theme="arena"] .bottom-nav{
+  background:rgba(4,28,58,.96)!important;
+  border-color:rgba(255,255,255,.10)!important;
+  box-shadow:0 18px 46px rgba(4,28,58,.25);
+}
+body[data-scd-theme="arena"] .bottom-nav button.active{
+  background:rgba(255,201,40,.15)!important;
+}
+body[data-scd-theme="arena"] .bottom-nav button.active span{color:var(--gold)!important}
+body[data-scd-theme="arena"] .mirror{
+  background:rgba(4,28,58,.985)!important;
+}
+body[data-scd-theme="arena"] .mirror-fab{
+  background:linear-gradient(135deg,var(--blue),#087e98)!important;
+}
+body[data-scd-theme="arena"] .msg.user{background:var(--blue)!important}
+body[data-scd-theme="arena"] #mirrorInput{background:#03162f!important}
+
+body[data-scd-theme="arena"] button:focus-visible,
+body[data-scd-theme="arena"] a:focus-visible,
+body[data-scd-theme="arena"] input:focus-visible,
+body[data-scd-theme="arena"] select:focus-visible{
+  outline:3px solid rgba(22,100,232,.34);
+}
+
+@media(max-width:900px){
+  body[data-scd-theme="arena"] .topbar{height:68px}
+  body[data-scd-theme="arena"] .world-switch{margin-top:8px}
+  body[data-scd-theme="arena"] .sport-superbar{box-shadow:0 16px 34px rgba(4,28,58,.16)}
+}
