@@ -2,6 +2,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { URL } = require('url');
+const { issueIntakeToken, verifyIntakeToken } = require('./lib/intake-links');
 
 const PORT = process.env.PORT || 10000;
 const ROOT = process.env.SCD_STATIC_DIR ? path.resolve(__dirname,process.env.SCD_STATIC_DIR) : __dirname;
@@ -19,6 +20,12 @@ const SUPABASE_RUNTIME = Object.freeze({
   mode:FEATURE_FLAGS.supabaseCore?'DUAL_RUN_ACTIVE':'DARK_DUAL_RUN'
 });
 let liveCache = { at: 0, data: null };
+
+const INTAKE_TEMPLATES = JSON.parse(fs.readFileSync(path.join(__dirname,'config','scd-intake-link-templates.v1.json'),'utf8'));
+const INTAKE_TEMPLATE_MAP = new Map((INTAKE_TEMPLATES.templates||[]).map(x=>[x.slug,x]));
+const INTAKE_SECRET = process.env.SCD_INTAKE_LINK_SECRET || '';
+const INTAKE_PUBLIC_BASE = (process.env.SCD_PUBLIC_BASE_URL || 'https://scd-universe.onrender.com').replace(/\/$/,'');
+const INTAKE_UPLOAD_READY = process.env.SCD_INTAKE_UPLOAD_ADAPTER_READY === 'true';
 
 const ALLOWED_ORIGINS = new Set([
   'https://francesco1485.github.io',
@@ -128,6 +135,75 @@ async function proxyAppsScript(req,res){
   }catch(e){console.error('[api/scd] failed',e.message||e);return json(res,502,{ok:false,error:e.message||'Backend SCD non disponibile'})}
 }
 
+
+function safeIntakeTemplate(t){
+  if(!t)return null;
+  return {
+    id:t.id,slug:t.slug,title:t.title,category:t.category,audience:t.audience,
+    accessMode:t.access_mode,maxFiles:t.max_files,acceptedTypes:t.accepted_types||[],
+    documentTypes:t.document_types||[],sensitive:Boolean(t.sensitive),
+    uploadReady:INTAKE_UPLOAD_READY
+  };
+}
+function intakeRoleAllowed(raw){
+  const d=unwrapPayload(raw)||{},u=d.user||d.profile||d||{},p=d.permissions||{};
+  const role=String(u.role||u.coreRole||u.type||'').toUpperCase();
+  return p.direction===true||role==='DIREZIONE'||role==='ADMIN';
+}
+async function validateDirectionSession(token){
+  if(!token)throw new Error('SESSION_REQUIRED');
+  const {parsed}=await callAppsScript('auth.validate',{token},token);
+  if(!intakeRoleAllowed(parsed))throw new Error('DIRECTION_SCOPE_REQUIRED');
+  return unwrapPayload(parsed);
+}
+async function bestEffortIntakeAudit(event,payload={}){
+  try{
+    await callAppsScript('public.telemetry',{
+      event,
+      section:'intake_hub',
+      payload:{...payload,token:undefined,sessionToken:undefined}
+    },'');
+  }catch(e){console.warn('[intake:audit] telemetry unavailable',event,e.message||e)}
+}
+async function handleIntakeForm(req,res,u){
+  const slug=String(u.searchParams.get('slug')||'').trim().toLowerCase();
+  const token=String(u.searchParams.get('token')||'');
+  const t=INTAKE_TEMPLATE_MAP.get(slug);
+  if(!t||t.enabled!==true)return json(res,404,{ok:false,error:'FORM_NOT_FOUND'});
+  const verified=verifyIntakeToken(token,{secret:INTAKE_SECRET,slug});
+  if(!verified.ok)return json(res,403,{ok:false,error:'LINK_INVALID',reason:verified.error});
+  bestEffortIntakeAudit('intake_form_open',{linkId:t.id,slug,mode:verified.payload.mode});
+  return json(res,200,{ok:true,runtimeState:INTAKE_UPLOAD_READY?'READY':'UPLOAD_ADAPTER_NOT_CONNECTED',form:safeIntakeTemplate(t)});
+}
+async function handleIntakeAdminTemplates(req,res){
+  if(req.method!=='POST')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  try{
+    const body=JSON.parse(await readBody(req)||'{}');
+    await validateDirectionSession(body.sessionToken||'');
+    return json(res,200,{ok:true,uploadReady:INTAKE_UPLOAD_READY,templates:(INTAKE_TEMPLATES.templates||[]).filter(x=>x.enabled).map(safeIntakeTemplate)});
+  }catch(e){return json(res,403,{ok:false,error:e.message||'ACCESS_DENIED'})}
+}
+async function handleIntakeAdminLink(req,res){
+  if(req.method!=='POST')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  try{
+    if(!INTAKE_SECRET||INTAKE_SECRET.length<24)return json(res,503,{ok:false,error:'LINK_FACTORY_NOT_CONFIGURED'});
+    const body=JSON.parse(await readBody(req)||'{}');
+    const actor=await validateDirectionSession(body.sessionToken||'');
+    const slug=String(body.slug||'').trim().toLowerCase();
+    const t=INTAKE_TEMPLATE_MAP.get(slug);
+    if(!t||t.enabled!==true)return json(res,404,{ok:false,error:'FORM_NOT_FOUND'});
+    const hours=Math.max(1,Math.min(720,Number(body.expiresHours)||72));
+    const token=issueIntakeToken({slug,mode:t.access_mode||'TOKENIZED',expiresInSeconds:hours*3600,secret:INTAKE_SECRET});
+    const url=INTAKE_PUBLIC_BASE+'/intake/?form='+encodeURIComponent(slug)+'&token='+encodeURIComponent(token);
+    const who=String(actor?.user?.email||actor?.email||actor?.user?.name||'direction');
+    await bestEffortIntakeAudit('intake_link_issued',{linkId:t.id,slug,expiresHours:hours,issuedBy:who});
+    console.log('[intake:link] issued',t.id,slug,'ttlHours',hours);
+    return json(res,200,{ok:true,linkId:t.id,slug,url,expiresHours:hours,uploadReady:INTAKE_UPLOAD_READY});
+  }catch(e){
+    const code=e.message==='SESSION_REQUIRED'||e.message==='DIRECTION_SCOPE_REQUIRED'?403:400;
+    return json(res,code,{ok:false,error:e.message||'LINK_ISSUE_FAILED'});
+  }
+}
 
 async function fetchPublicFeed(){
   try{
@@ -391,6 +467,9 @@ http.createServer(async(req,res)=>{
   if(u.pathname==='/api/capabilities') return json(res,200,{ok:true,version:'40.0.0',mode:'GITHUB_PAGES_RENDER_R20_SUPABASE_DUAL_RUN',actions:[...allowedActions].sort(),featureFlags:FEATURE_FLAGS,domainCore:SUPABASE_RUNTIME,isolated:['safeguarding']});
   if(u.pathname==='/api/core-status') return json(res,200,{ok:true,version:'40.0.0',featureFlags:FEATURE_FLAGS,domainCore:SUPABASE_RUNTIME,currentPrimary:'R20',targetPrimary:'SCD_SUPABASE'});
   if(u.pathname==='/api/scd') return proxyAppsScript(req,res);
+  if(u.pathname==='/api/intake/form') return handleIntakeForm(req,res,u);
+  if(u.pathname==='/api/intake/admin/templates') return handleIntakeAdminTemplates(req,res);
+  if(u.pathname==='/api/intake/admin/link') return handleIntakeAdminLink(req,res);
   if(u.pathname==='/api/public') return json(res,200,await fetchPublicFeed(),{'cache-control':'no-store'});
   if(u.pathname==='/api/newsroom') {try{return json(res,200,await buildWeeklyNewsroom(),{'cache-control':'public, max-age=180'})}catch(e){return json(res,500,{ok:false,error:e.message})}}
   if(u.pathname==='/api/live') {try{return json(res,200,await getLiveRadar(),{'cache-control':'public, max-age=300'})}catch(e){return json(res,500,{ok:false,error:e.message})}}
