@@ -1605,3 +1605,37 @@ body{background:linear-gradient(180deg,#eef5fb,#f7fbfe 55%,#edf5fb);color:var(--
     radial-gradient(circle at 76% 18%,rgba(255,213,0,.22),transparent 25%),
     linear-gradient(135deg,#031a35,#0870cf 62%,#0b98dd);
 }
+
+
+/* ===== R53 COMMUNITY BENEFIT NETWORK ===== */
+.convention-record{
+  position:relative;
+  overflow:hidden;
+  border-color:#d7e7f2;
+  box-shadow:0 12px 30px rgba(3,49,91,.055);
+}
+.convention-record:before{
+  content:"";
+  position:absolute;
+  left:0;top:0;bottom:0;width:4px;
+  background:linear-gradient(180deg,var(--scd-blue,#0870cf),var(--scd-cyan,#20b7e6));
+}
+.convention-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:9px}
+.convention-head small{display:block;font-size:.6rem;letter-spacing:.1em;color:#0b80bd;font-weight:900}
+.convention-head h3{margin:4px 0 0!important}
+.convention-record>p{padding:11px 12px;border-radius:11px;background:#f5f9fc;border:1px solid #e4eef5}
+.convention-record .card-row{align-items:flex-start}
+.convention-record .card-row b{max-width:62%;text-align:right;line-height:1.35}
+.convention-next{margin-top:12px;padding:11px 12px;border-radius:11px;background:linear-gradient(135deg,#031a35,#075b98);color:white}
+.convention-next small{display:block;font-size:.57rem;letter-spacing:.1em;color:#83dcf7;font-weight:900}
+.convention-next strong{display:block;margin-top:3px;font-size:.78rem;line-height:1.4}
+.convention-record footer{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:10px;padding-top:9px;border-top:1px solid #e7eef4}
+.convention-record footer span{font-size:.63rem;color:#73899c}
+.convention-record footer em{font-style:normal;font-size:.57rem;font-weight:900;letter-spacing:.08em;color:#0b76ad}
+.community-empty{grid-column:1/-1;border:1px dashed #bfd5e4;border-radius:15px;background:#f7fbfe;padding:20px;color:#607b91}
+.community-empty b{display:block;color:#0a598f}.community-empty p{margin:5px 0;font-size:.82rem}.community-empty small{font-size:.68rem}
+@media(max-width:620px){
+  .convention-head{flex-direction:column}
+  .convention-record .card-row{display:grid;grid-template-columns:1fr}
+  .convention-record .card-row b{max-width:none;text-align:left}
+}
