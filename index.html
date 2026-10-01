@@ -10,7 +10,7 @@
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./assets/logo-scd.png">
   <link rel="apple-touch-icon" href="./assets/logo-scd.png">
-    <link rel="stylesheet" href="./scd-ng.css?v=0.4.5">
+    <link rel="stylesheet" href="./scd-ng.css?v=0.4.6">
   <link rel="stylesheet" href="./scd-synth.css?v=0.4.5">
 </head>
 <body>
@@ -364,14 +364,14 @@
 
       <section class="view" id="view-desk" data-view="desk">
         <section class="desk-hero">
-          <div><span class="eyebrow">PRIVATE DESK</span><h2>Dimmi cosa devi fare.<br>Non dove hai salvato il file.</h2><p>Il sistema deve trasformare Drive, Gmail, fogli e dati federali in azioni, scadenze e decisioni. Il contrario sarebbe troppo semplice da sbagliare.</p></div>
+          <div><span class="eyebrow">PRIVATE DESK</span><h2 id="deskHeroTitle">Dimmi cosa devi fare.<br>Non dove hai salvato il file.</h2><p id="deskHeroCopy">Il sistema deve trasformare Drive, Gmail, fogli e dati federali in azioni, scadenze e decisioni. Il contrario sarebbe troppo semplice da sbagliare.</p></div>
           <button class="btn primary" id="openMirrorDesk">Chiedi a SCD Mirror</button>
         </section>
         <div class="desk-grid">
-          <section class="action-queue"><div class="section-head mini"><div><span class="eyebrow">DA GESTIRE</span><h3>Priorità operative</h3></div><span class="status-pill">ROLE / SCOPE</span></div><div id="actionQueue"><article><span>1</span><div><b>Fonte non ancora collegata</b><small>Le priorità compariranno dopo autenticazione e scope reale.</small></div></article></div></section>
+          <section class="action-queue"><div class="section-head mini"><div><span class="eyebrow">DA GESTIRE</span><h3>Priorità operative</h3></div><span class="status-pill" id="deskScopeStatus">ROLE / SCOPE</span></div><div id="actionQueue"><article><span>1</span><div><b>Fonte non ancora collegata</b><small>Le priorità compariranno dopo autenticazione e scope reale.</small></div></article></div></section>
           <section class="desk-map"><div class="section-head mini"><div><span class="eyebrow">CLUB GRAPH</span><h3>Il club come rete viva</h3></div></div><div class="graph"><span class="node center">SCD</span><span class="node n1">PERSONE</span><span class="node n2">SQUADRE</span><span class="node n3">EVENTI</span><span class="node n4">DOCUMENTI</span><span class="node n5">SPONSOR</span><span class="node n6">TRASPORTI</span></div></section>
         </div>
-        <section class="service-dock">
+        <section class="service-dock" id="deskServiceDock">
           <button><span>▣</span><b>Calendario</b><small>Squadre · gare · attività</small></button>
           <button><span>✓</span><b>Convocazioni</b><small>Invia · raccogli risposte</small></button>
           <button><span>⌁</span><b>Trasporti</b><small>Pulmini · punti · richieste</small></button>
@@ -419,7 +419,7 @@
   <script src="./scd-meta-engine.js?v=40.0.0" defer></script>
   <script src="./scd-experience-engine.js?v=40.0.0" defer></script>
   <script src="./scd-twin.js?v=40.0.0" defer></script>
-  <script src="./scd-ng.js?v=0.4.5" defer></script>
+  <script src="./scd-ng.js?v=0.4.6" defer></script>
   <script src="./scd-interactions.js?v=0.4.5" defer></script>
 </body>
 </html>
