@@ -100,6 +100,7 @@ radial-gradient(circle at 78% 30%,#192536 0 10px,transparent 11px),
 
 /* HUMAN OS MODES */
 .experience-dock{display:flex;gap:3px;padding:4px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.025)}
+.global-experience-dock{position:sticky;z-index:48;top:88px;width:max-content;margin:10px 28px 0 auto;background:rgba(7,17,28,.78);backdrop-filter:blur(18px);box-shadow:0 10px 26px rgba(0,0,0,.18)}
 .experience-dock button{border:0;background:transparent;color:var(--muted);border-radius:999px;padding:7px 9px;font-size:9px;font-weight:900;letter-spacing:.03em}
 .experience-dock button.active{background:rgba(159,203,210,.13);color:#f4f7f8;box-shadow:inset 0 0 0 1px rgba(159,203,210,.12)}
 body[data-scd-experience="quick"] .ng-constellation,
@@ -114,5 +115,5 @@ body[data-scd-experience="focus"] #view-pulse .hero{min-height:410px}
 body[data-scd-density="compact"] .day{min-height:190px}
 body[data-scd-density="compact"] .section{padding-top:30px;padding-bottom:30px}
 @media(max-width:900px){
-  .experience-dock{position:fixed;z-index:72;left:50%;transform:translateX(-50%);bottom:82px;background:rgba(7,17,28,.88);backdrop-filter:blur(18px);box-shadow:0 12px 28px rgba(0,0,0,.25)}
+  .global-experience-dock{position:fixed;z-index:72;left:50%;right:auto;top:auto;transform:translateX(-50%);bottom:82px;margin:0;background:rgba(7,17,28,.94);backdrop-filter:blur(18px);box-shadow:0 12px 28px rgba(0,0,0,.25)}
 }
