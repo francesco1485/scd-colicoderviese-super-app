@@ -65,3 +65,27 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 @media(max-width:760px){.ledwall-launch,.media-commerce{grid-template-columns:1fr}.ledwall-screen{min-height:230px}.ledwall-focus{min-height:190px;gap:15px}.ledwall-focus img{width:68px}.opportunity-grid.extended{grid-template-columns:1fr}.ecosystem-grid{grid-template-columns:1fr}.ecosystem-cta{align-items:flex-start;flex-direction:column}.media-commerce-card{min-height:0}.ledwall-meta{flex-direction:column}}
 
 .future-conventions{display:flex;flex-wrap:wrap;gap:7px;margin-top:15px}.future-conventions span{font-size:10px;font-weight:850;letter-spacing:.05em;padding:6px 9px;border-radius:999px;border:1px solid rgba(255,255,255,.17);background:rgba(255,255,255,.055);color:#c7dae7}
+
+/* R40.4 mobile overflow hardening: shrink intrinsic grid/flex content instead of clipping */
+.ledwall-launch>*,
+.ledwall-stage,
+.ledwall-frame,
+.ledwall-screen,
+.ledwall-marquee,
+.media-commerce>*,
+.ecosystem-grid>*,
+.ecosystem-cta>*,
+.network>*,
+.partner-call>*,
+.initiative-card>*,
+.public-header>*,
+.public-hero>*{min-width:0}
+.ledwall-marquee span{max-width:none}
+@media(max-width:760px){
+  .ledwall-launch{padding-left:18px;padding-right:18px}
+  .ledwall-stage{width:100%;max-width:100%}
+  .ledwall-frame,.ledwall-screen,.ledwall-marquee{width:100%;max-width:100%}
+  .ledwall-focus{min-width:0}
+  .ledwall-focus>div{min-width:0}
+  .ledwall-focus strong{overflow-wrap:anywhere}
+}
