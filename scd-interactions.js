@@ -1,9 +1,12 @@
 (()=>{
   const q=(s,r=document)=>r.querySelector(s);
   const qa=(s,r=document)=>[...r.querySelectorAll(s)];
-  const twinKey='scd:nextgen:twin:v1';
+  const twinKey='scd:twin:v1';
 
-  q('#ngMirrorQuick')?.addEventListener('click',()=>window.SCDNextGen?.openMirror?.());
+  q('#ngMirrorQuick')?.addEventListener('click',()=>{
+    window.SCDMeta?.record?.('mirror',1);
+    window.SCDNextGen?.openMirror?.();
+  });
 
   q('#twinLocker')?.addEventListener('click',e=>{
     const b=e.target.closest('[data-kit]');
