@@ -1,3 +1,5 @@
+const PRIVATE_SPONSOR_ORIGIN='https://scd-colicoderviese-super-app.onrender.com';
+const ON_PUBLIC_STATIC=location.hostname==='scd-sponsor-platform.onrender.com';
 const $=s=>document.querySelector(s);
 const $$=s=>Array.from(document.querySelectorAll(s));
 
@@ -5,7 +7,8 @@ function modal(name){
   return name==='access'?$('#accessModal'):$('#loginModal');
 }
 function openModal(name){
-  $$('.modal').forEach(x=>x.hidden=true);
+  if(name==='login'&&ON_PUBLIC_STATIC){location.href=PRIVATE_SPONSOR_ORIGIN+'/sponsor/?login=1';return}
+  $('.modal').forEach(x=>x.hidden=true);
   const m=modal(name); if(!m)return;
   m.hidden=false;
   document.body.classList.add('modal-open');
@@ -22,7 +25,8 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModals()});
 $$('.modal').forEach(m=>m.addEventListener('mousedown',e=>{if(e.target===m)closeModals()}));
 
 async function api(url,body){
-  const res=await fetch(url,{
+  const target=ON_PUBLIC_STATIC?PRIVATE_SPONSOR_ORIGIN+url:url;
+  const res=await fetch(target,{
     method:'POST',
     headers:{'content-type':'application/json'},
     credentials:'same-origin',
@@ -110,7 +114,7 @@ $('#otpLoginForm').addEventListener('submit',async e=>{
 });
 
 // If a valid session already exists, keep a discreet shortcut available.
-fetch('/api/sponsor/session',{credentials:'same-origin'}).then(async r=>{
+if(!ON_PUBLIC_STATIC)fetch('/api/sponsor/session',{credentials:'same-origin'}).then(async r=>{
   if(!r.ok)return;
   const d=await r.json();
   const b=document.createElement('a');
