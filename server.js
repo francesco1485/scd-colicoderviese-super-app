@@ -93,6 +93,140 @@ function json(res, status, data, headers={}) {
 }
 function readBody(req){return new Promise((resolve,reject)=>{let s='';req.on('data',c=>{s+=c;if(s.length>1_000_000){req.destroy();reject(new Error('Payload troppo grande'))}});req.on('end',()=>resolve(s));req.on('error',reject)})}
 function stripHtml(s=''){return String(s).replace(/<[^>]*>/g,' ').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/&#8217;/g,"'").replace(/\s+/g,' ').trim()}
+
+const SPONSOR_SESSION_COOKIE='scd_sponsor_session';
+function parseCookies(req){
+  const raw=String(req.headers.cookie||'');
+  return raw.split(';').map(x=>x.trim()).filter(Boolean).reduce((o,p)=>{
+    const i=p.indexOf('='); if(i<1)return o;
+    try{o[p.slice(0,i)]=decodeURIComponent(p.slice(i+1))}catch{o[p.slice(0,i)]=p.slice(i+1)}
+    return o;
+  },{});
+}
+function sponsorCookie(req,token,maxAge=21600){
+  const secure=String(req.headers['x-forwarded-proto']||'').toLowerCase()==='https'||process.env.NODE_ENV==='production';
+  return SPONSOR_SESSION_COOKIE+'='+encodeURIComponent(token||'')+'; Path=/; HttpOnly; SameSite=Lax; Max-Age='+Math.max(0,Number(maxAge)||0)+(secure?'; Secure':'');
+}
+function sponsorSessionToken(req){return String(parseCookies(req)[SPONSOR_SESSION_COOKIE]||'')}
+function sponsorUserFrom(raw){
+  const d=unwrapPayload(raw)||{};
+  if(d.user)return d.user;
+  if(d.data&&d.data.user)return d.data.user;
+  if(d.dashboard&&d.dashboard.user)return d.dashboard.user;
+  return {};
+}
+function sponsorLoginPayload(raw){
+  const d=unwrapPayload(raw)||{};
+  const dash=d.data||d.dashboard||{};
+  return {
+    token:String(d.token||d.sessionToken||d.accessToken||''),
+    user:dash.user||d.user||{},
+    permissions:dash.permissions||d.permissions||{}
+  };
+}
+function sponsorStaffAllowed(user){
+  const role=String(user?.role||'').trim().toUpperCase();
+  const type=String(user?.type||'').trim().toUpperCase();
+  return user?.staff===true||role==='DG'||type==='DIREZIONE'||user?.email==='sportclubcolico@gmail.com';
+}
+function sponsorDirection(user){
+  const role=String(user?.role||'').trim().toUpperCase();
+  const type=String(user?.type||'').trim().toUpperCase();
+  return role==='DG'||type==='DIREZIONE'||user?.email==='sportclubcolico@gmail.com';
+}
+async function validateSponsorSession(req){
+  const token=sponsorSessionToken(req);
+  if(!token)throw new Error('SESSION_REQUIRED');
+  const {parsed}=await callAppsScript('auth.validate',{token},token);
+  const user=sponsorUserFrom(parsed);
+  if(!user?.email||!sponsorStaffAllowed(user))throw new Error('SPONSOR_ACCESS_DENIED');
+  return {token,user,isDirection:sponsorDirection(user)};
+}
+async function handleSponsorLead(req,res){
+  if(req.method!=='POST')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  try{
+    const b=JSON.parse(await readBody(req)||'{}');
+    const name=String(b.name||'').trim(),email=String(b.email||'').trim(),phone=String(b.phone||'').trim(),company=String(b.company||'').trim();
+    if(!name||!email||!phone||!company)return json(res,400,{ok:false,error:'Azienda, nome, email e telefono sono obbligatori.'});
+    if(b.privacy!==true)return json(res,400,{ok:false,error:'Devi autorizzare il trattamento dei dati per la richiesta.'});
+    const payload={
+      kind:'sponsor',name,email,phone,privacy:true,
+      topic:'PARTNERSHIP · '+company+' · '+String(b.interest||'Proposta libera'),
+      category:String(b.sector||''),
+      message:'Azienda: '+company+'\nSettore: '+String(b.sector||'')+'\nInteresse: '+String(b.interest||'')+'\n\n'+String(b.message||'')
+    };
+    const {parsed}=await callAppsScript('public.partnerLead',payload,'');
+    const d=unwrapPayload(parsed)||{};
+    return json(res,200,{ok:true,requestId:d.requestId||'',status:d.status||'NUOVA'});
+  }catch(e){return json(res,400,{ok:false,error:e.message||'Richiesta non registrata'})}
+}
+async function handleSponsorAccessRequest(req,res){
+  if(req.method!=='POST')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  try{
+    const b=JSON.parse(await readBody(req)||'{}');
+    const name=String(b.name||'').trim(),email=String(b.email||'').trim(),phone=String(b.phone||'').trim();
+    if(!name||!email||!phone)return json(res,400,{ok:false,error:'Nome, email e telefono sono obbligatori.'});
+    if(b.privacy!==true)return json(res,400,{ok:false,error:'Devi autorizzare il trattamento dei dati per la richiesta.'});
+    const rel=String(b.relationship||'Altro');
+    const payload={
+      kind:'contacts',name,email,phone,privacy:true,
+      topic:'RICHIESTA ACCESSO SPONSOR PLATFORM · '+rel,
+      category:'ACCESSO RISERVATO',
+      message:'Rapporto con SCD: '+rel+'\n\nMotivo: '+String(b.message||'')
+    };
+    const {parsed}=await callAppsScript('public.ticketSubmit',payload,'');
+    const d=unwrapPayload(parsed)||{};
+    return json(res,200,{ok:true,requestId:d.requestId||'',status:'IN ATTESA DIREZIONE'});
+  }catch(e){return json(res,400,{ok:false,error:e.message||'Richiesta accesso non registrata'})}
+}
+async function handleSponsorOtp(req,res){
+  if(req.method!=='POST')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  try{
+    const b=JSON.parse(await readBody(req)||'{}');
+    const email=String(b.email||'').trim();
+    if(!email)return json(res,400,{ok:false,error:'Inserisci la email.'});
+    try{await callAppsScript('auth.request',{email},'')}catch(e){console.warn('[sponsor-auth] otp request',e.message||e)}
+    return json(res,200,{ok:true,message:'Se l’indirizzo è stato approvato, riceverai il codice temporaneo.'});
+  }catch(e){return json(res,400,{ok:false,error:'Richiesta codice non valida'})}
+}
+async function handleSponsorLogin(req,res){
+  if(req.method!=='POST')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  try{
+    const b=JSON.parse(await readBody(req)||'{}');
+    const email=String(b.email||'').trim(),code=String(b.code||b.pin||'').trim();
+    const {parsed}=await callAppsScript('auth.login',{email,code},'');
+    const login=sponsorLoginPayload(parsed);
+    if(!login.token||!login.user?.email)throw new Error('Accesso non valido.');
+    if(!sponsorStaffAllowed(login.user))throw new Error('Questo account non è autorizzato alla Sponsor Platform.');
+    res.setHeader('set-cookie',sponsorCookie(req,login.token,21600));
+    return json(res,200,{ok:true,isDirection:sponsorDirection(login.user),user:{name:login.user.name,email:login.user.email,role:login.user.role}});
+  }catch(e){return json(res,403,{ok:false,error:e.message||'Accesso non autorizzato'})}
+}
+async function handleSponsorSession(req,res){
+  if(req.method!=='GET')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  try{
+    const s=await validateSponsorSession(req);
+    return json(res,200,{ok:true,isDirection:s.isDirection,user:{name:s.user.name,email:s.user.email,role:s.user.role}});
+  }catch(e){return json(res,401,{ok:false,error:'SESSION_REQUIRED'})}
+}
+async function handleSponsorLogout(req,res){
+  res.setHeader('set-cookie',sponsorCookie(req,'',0));
+  return json(res,200,{ok:true});
+}
+async function serveSponsorPrivate(req,res,u){
+  try{
+    await validateSponsorSession(req);
+    if(u.pathname==='/sponsor/app'||u.pathname==='/sponsor/app/'||u.pathname==='/sponsor/app.html')return serveStatic(req,res,'/sponsor/app.html');
+    if(u.pathname==='/sponsor/app.js')return serveStatic(req,res,'/sponsor/app.js');
+    return json(res,404,{ok:false,error:'NOT_FOUND'});
+  }catch(e){
+    if(req.method==='GET'&&/text\/html/.test(String(req.headers.accept||''))){
+      res.writeHead(302,{location:'/sponsor/?access=1','cache-control':'no-store'});return res.end();
+    }
+    return json(res,401,{ok:false,error:'ACCESS_REQUIRED'});
+  }
+}
+
 function decodeXml(s=''){return String(s).replace(/<!\[CDATA\[|\]\]>/g,'').replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>')}
 
 async function callAppsScript(action,payload={},sessionToken=''){
@@ -507,8 +641,8 @@ async function getLiveRadar(){
 }
 
 const mime={'.html':'text/html; charset=utf-8','.js':'application/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.webmanifest':'application/manifest+json','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.svg':'image/svg+xml','.ico':'image/x-icon','.xml':'application/xml; charset=utf-8','.txt':'text/plain; charset=utf-8'};
-function serveStatic(req,res){
-  const u=new URL(req.url,'http://localhost'); let pathname=decodeURIComponent(u.pathname);
+function serveStatic(req,res,overridePath){
+  const u=new URL(req.url,'http://localhost'); let pathname=overridePath||decodeURIComponent(u.pathname);
   if(pathname==='/'||pathname==='') pathname='/index.html';
   const file=path.normalize(path.join(ROOT,pathname)); if(!file.startsWith(ROOT)) {res.writeHead(403);return res.end('Forbidden')}
   fs.stat(file,(err,st)=>{
@@ -531,6 +665,13 @@ http.createServer(async(req,res)=>{
   if(u.pathname==='/api/time') return json(res,200,clubTimePayload());
   if(u.pathname==='/api/capabilities') return json(res,200,{ok:true,version:'40.0.0',mode:'GITHUB_PAGES_RENDER_R20_SUPABASE_DUAL_RUN',actions:[...allowedActions].sort(),featureFlags:FEATURE_FLAGS,domainCore:SUPABASE_RUNTIME,isolated:['safeguarding']});
   if(u.pathname==='/api/core-status') return json(res,200,{ok:true,version:'40.0.0',featureFlags:FEATURE_FLAGS,domainCore:SUPABASE_RUNTIME,currentPrimary:'R20',targetPrimary:'SCD_SUPABASE'});
+  if(u.pathname==='/api/sponsor/lead') return handleSponsorLead(req,res);
+  if(u.pathname==='/api/sponsor/request-access') return handleSponsorAccessRequest(req,res);
+  if(u.pathname==='/api/sponsor/otp') return handleSponsorOtp(req,res);
+  if(u.pathname==='/api/sponsor/login') return handleSponsorLogin(req,res);
+  if(u.pathname==='/api/sponsor/session') return handleSponsorSession(req,res);
+  if(u.pathname==='/api/sponsor/logout') return handleSponsorLogout(req,res);
+  if(['/sponsor/app','/sponsor/app/','/sponsor/app.html','/sponsor/app.js'].includes(u.pathname)) return serveSponsorPrivate(req,res,u);
   if(u.pathname==='/api/scd') return proxyAppsScript(req,res);
   if(u.pathname==='/api/intake/form') return handleIntakeForm(req,res,u);
   if(u.pathname==='/api/intake/admin/templates') return handleIntakeAdminTemplates(req,res);
