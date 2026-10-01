@@ -482,3 +482,81 @@ document.addEventListener('click',e=>{
 },{capture:true});
 renderGovernance();
 saveUsage();
+
+
+/* ===== HOME PULSE V7 ===== */
+const HOME_EVENTS_V7=[
+  {date:'09 MAG 2027',title:'Torneo nazionale · annata 2019',meta:'16 squadre · sport, musica e territorio',status:'PROPOSTA DA CONFERMARE',tone:'draft'},
+  {date:'DA DEFINIRE',title:'Family & Community Day',meta:'Attivazione territoriale collegabile a partnership',status:'IN VALUTAZIONE',tone:'review'},
+  {date:'DA FISSARE',title:'Sopralluogo Caffè Teti',meta:'Club House · Coffee Partner',status:'URGENTE',tone:'urgent'}
+];
+const WEEKLY_NEWS_V7=[
+  {date:'17/09/2026',title:'Under 18 Élite: ritiro dal campionato 2026/27',meta:'Comunicazione ufficiale SCD',source:'SCD ufficiale'},
+  {date:'09/07/2026',title:'Affiliazione SCD ColicoDerviese × AC Monza',meta:'Percorso tecnico, educativo e territoriale',source:'SCD ufficiale'},
+  {date:'20/07/2026',title:'Iscrizioni stagione 2026/27 aperte',meta:'Procedura online per nuovi e già tesserati',source:'SCD ufficiale'}
+];
+const SPORT_STATS_V7={
+  prima2526:{eyebrow:'STORICO UFFICIALE',title:'Prima Squadra · Promozione 2025/26 · Girone B',metrics:[['POSIZIONE','4ª'],['PUNTI','59'],['GARE','30'],['MEDIA PUNTI','1,97']],note:'Dato storico ufficiale. La classifica 2026/27 non viene mostrata finché non è sincronizzata con una fonte ufficiale aggiornata.',source:'CR Lombardia'},
+  u16:{eyebrow:'PERCORSO SPORTIVO',title:'U16 · stagione 2025/26',metrics:[['ESITO','Play-off vinti'],['PERCORSO','Verso Élite'],['FONTE','SCD ufficiale'],['STATO','Storico']],note:'Percorso storico SCD. Non vengono inventati punti o classifiche non presenti nella fonte.',source:'SCD ufficiale'},
+  u18:{eyebrow:'STAGIONE 2026/27',title:'Under 18 Élite',metrics:[['STATO','Ritirata'],['DATA','17/09/2026'],['COMPETIZIONE','U18 Élite'],['FONTE','SCD ufficiale']],note:'Ritiro formalmente comunicato. Non viene mostrata una classifica come se la squadra fosse ancora in competizione.',source:'SCD ufficiale'}
+};
+const PEOPLE_TAGS_V7=['@Direzione','@Commerciale','@Amministrazione','@Marketing','@Eventi','@Segreteria','@Tecnico'];
+const PROMO_ITEMS_V7=[
+  {id:'mcd',title:"McDonald's territoriale",text:'Convenzione tesserati 10% · formalizzazione operativa in corso',state:'IN ATTIVAZIONE'},
+  {id:'piadina',title:'La Piadineria',text:'Benefit 10%-12% · accordo da formalizzare prima della pubblicazione',state:'DA FORMALIZZARE'}
+];
+const POLL_OPTIONS_V7=[
+  {id:'led',label:'LED & Media'},
+  {id:'eventi',label:'Tornei & Eventi'},
+  {id:'conv',label:'Convenzioni famiglie'},
+  {id:'club',label:'Club House & Hospitality'}
+];
+
+function renderAvailabilityV7(query=''){
+  const box=$('#availabilityResults'); if(!box)return;
+  const q=query.toLowerCase().trim();
+  const rows=DATA.assets.filter(a=>(a[0]+' '+a[1]+' '+a[2]+' '+a[4]).toLowerCase().includes(q)).slice(0,6);
+  box.innerHTML=rows.length?rows.map(a=>'<button class="availability-row" data-view="asset"><span><b>'+esc(a[0])+'</b><small>'+esc(a[1])+' · '+esc(a[2])+'</small></span><em class="'+(/Disponibile/.test(a[4])?'free':/Parzialmente/.test(a[4])?'partial':'review')+'">'+esc(a[4])+'</em></button>').join(''):'<div class="empty-state">Nessun asset trovato. Prova con LED, torneo, Club House, hospitality o divise.</div>';
+}
+function renderStatsV7(key){
+  const s=SPORT_STATS_V7[key]||SPORT_STATS_V7.prima2526,box=$('#statsSnapshot');if(!box)return;
+  box.innerHTML='<div class="stats-head"><small>'+esc(s.eyebrow)+'</small><h4>'+esc(s.title)+'</h4></div><div class="stats-metrics">'+s.metrics.map(m=>'<div><small>'+esc(m[0])+'</small><b>'+esc(m[1])+'</b></div>').join('')+'</div><p>'+esc(s.note)+'</p><span class="stats-source">Fonte: '+esc(s.source)+'</span>';
+}
+function loadPollV7(){try{return JSON.parse(localStorage.getItem('scd_live_poll_v1')||'{"votes":{},"choice":null}')}catch(e){return {votes:{},choice:null}}}
+function renderPollV7(){
+  const box=$('#livePoll');if(!box)return;
+  const state=loadPollV7(),total=Object.values(state.votes||{}).reduce((a,b)=>a+Number(b||0),0);
+  box.innerHTML=POLL_OPTIONS_V7.map(o=>{const n=Number(state.votes[o.id]||0),pct=total?Math.round(n/total*100):0,selected=state.choice===o.id;return '<button class="poll-option '+(selected?'selected':'')+'" data-poll="'+o.id+'"><div><b>'+esc(o.label)+'</b><span>'+n+' voti locali · '+pct+'%</span></div><i><span style="width:'+pct+'%"></span></i></button>'}).join('');
+  box.querySelectorAll('[data-poll]').forEach(b=>b.onclick=()=>{const st=loadPollV7();if(st.choice)return;st.choice=b.dataset.poll;st.votes[b.dataset.poll]=Number(st.votes[b.dataset.poll]||0)+1;localStorage.setItem('scd_live_poll_v1',JSON.stringify(st));renderPollV7()});
+}
+function loadTagV7(){try{return localStorage.getItem('scd_active_tag')||''}catch(e){return ''}}
+function renderTagsV7(){
+  const box=$('#peopleTags');if(!box)return;const active=loadTagV7();
+  box.innerHTML=PEOPLE_TAGS_V7.map(t=>'<button class="people-tag '+(active===t?'active':'')+'" data-tag="'+esc(t)+'">'+esc(t)+'</button>').join('');
+  if($('#tagState'))$('#tagState').textContent=active?'Tag attivo: '+active:'Nessun tag selezionato';
+  box.querySelectorAll('[data-tag]').forEach(b=>b.onclick=()=>{const next=loadTagV7()===b.dataset.tag?'':b.dataset.tag;localStorage.setItem('scd_active_tag',next);renderTagsV7()});
+}
+function renderPromoV7(){
+  const box=$('#promoGate');if(!box)return;let states={};try{states=JSON.parse(localStorage.getItem('scd_promo_review_v1')||'{}')}catch(e){}
+  box.innerHTML=PROMO_ITEMS_V7.map(p=>'<article class="promo-item"><div><b>'+esc(p.title)+'</b><span>'+esc(p.text)+'</span></div><em>'+esc(states[p.id]||p.state)+'</em><button data-promo="'+p.id+'">'+((states[p.id]||'').includes('REVISIONE')?'In revisione':'Metti in revisione')+'</button></article>').join('');
+  box.querySelectorAll('[data-promo]').forEach(b=>b.onclick=()=>{states[b.dataset.promo]='REVISIONE INTERNA';localStorage.setItem('scd_promo_review_v1',JSON.stringify(states));renderPromoV7()});
+}
+
+renderAvailabilityV7();
+if($('#availabilitySearch'))$('#availabilitySearch').addEventListener('input',e=>renderAvailabilityV7(e.target.value));
+if($('#homeEvents'))$('#homeEvents').innerHTML=HOME_EVENTS_V7.map(e=>'<div class="home-event '+e.tone+'"><time>'+esc(e.date)+'</time><div><b>'+esc(e.title)+'</b><span>'+esc(e.meta)+'</span></div><em>'+esc(e.status)+'</em></div>').join('');
+if($('#weeklyNews')){
+  const latest=WEEKLY_NEWS_V7[0];
+  $('#weeklyNews').innerHTML='<div class="news-week-status"><b>Nessuna nuova pubblicazione ufficiale negli ultimi 7 giorni</b><span>Ultimo aggiornamento ufficiale censito: '+esc(latest.date)+'</span></div>'+WEEKLY_NEWS_V7.map(n=>'<article class="news-row"><time>'+esc(n.date)+'</time><div><b>'+esc(n.title)+'</b><span>'+esc(n.meta)+'</span></div><em>'+esc(n.source)+'</em></article>').join('');
+}
+renderStatsV7('prima2526');
+if($('#statsSelector'))$('#statsSelector').addEventListener('change',e=>renderStatsV7(e.target.value));
+renderPollV7();
+renderTagsV7();
+renderPromoV7();
+if($('#sponsorMarqueeTrack')){
+  const names=[...new Set([...DATA.sponsors.map(s=>s.name),'HDI MAGLIA','DELLOCA','CARCANO','IPERAL'])];
+  const items=names.map(n=>'<span class="sponsor-marquee-item">'+esc(n)+'</span>').join('');
+  $('#sponsorMarqueeTrack').innerHTML=items+items;
+}
+if($('#toggleAdvanced'))$('#toggleAdvanced').onclick=()=>{const layer=$('#advancedIntelligence'),collapsed=layer.classList.toggle('is-collapsed');$('#toggleAdvanced').textContent=collapsed?'Mostra analisi avanzata ↓':'Nascondi analisi avanzata ↑'};
