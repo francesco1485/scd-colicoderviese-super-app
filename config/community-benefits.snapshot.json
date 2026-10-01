@@ -1,0 +1,45 @@
+{
+  "schemaVersion": "1.0.0",
+  "sourceTable": "CONVENZIONI_MASTER",
+  "sourceMode": "CANONICAL_MASTER_SNAPSHOT_FALLBACK",
+  "snapshotAt": "2026-10-01",
+  "privacy": "PUBLIC_SAFE_PROJECTION_NO_CONTACTS",
+  "rows": [
+    {
+      "id": "CONV-MCDONALDS-2026",
+      "name": "McDonald's territoriale",
+      "category": "FOOD / COMMUNITY",
+      "status": "IN ATTIVAZIONE",
+      "benefit": "Sconto community",
+      "conditions": "10% su tutti i prodotti secondo proposta ricevuta",
+      "audience": "Tesserati / staff; perimetro finale da confermare",
+      "recognition": "Tessera valida mostrata alla cassa",
+      "territory": "Colico / Villa di Tirano; area franchisee Sondrio-Castione da confermare in formalizzazione",
+      "agreementDocument": "",
+      "lastActivity": "28/09/2026",
+      "nextAction": "Definire numero/formato tessere, perimetro punti vendita e formalizzazione operativa",
+      "usageKpi": "DA ATTIVARE",
+      "linkedCard": "SI - futura Card SCD",
+      "owner": "DIREZIONE / COMMERCIALE",
+      "updatedAt": "01/10/2026"
+    },
+    {
+      "id": "CONV-LAPIADINERIA-2026",
+      "name": "La Piadineria",
+      "category": "FOOD / COMMUNITY",
+      "status": "PRONTA PER FORMALIZZAZIONE",
+      "benefit": "Sconto community",
+      "conditions": "10% cassa con badge/lettera; 12% con Carta Mondo Piada o app secondo risposta aziendale",
+      "audience": "Tesserati / community SCD da definire nell'accordo",
+      "recognition": "Badge/lettera convenzione oppure Carta Mondo Piada/app",
+      "territory": "Piantedo C.C. Fuentes; Lecco C.C. La Meridiana; Lecco Via Cavour; Castione Andevenno Centro Iperal; online nei punti aderenti",
+      "agreementDocument": "DA RICEVERE",
+      "lastActivity": "30/09/2026",
+      "nextAction": "Confermare interesse e ricevere lettera convenzione da restituire firmata",
+      "usageKpi": "DA ATTIVARE",
+      "linkedCard": "SI - futura Card SCD",
+      "owner": "DIREZIONE / COMMERCIALE",
+      "updatedAt": "01/10/2026"
+    }
+  ]
+}
