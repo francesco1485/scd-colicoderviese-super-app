@@ -130,6 +130,12 @@ assert(js.includes("source:'CRM'"),'Partner Hub CRM source marker missing');
 assert(js.includes('syncActivationPartnersFromCrm'),'Activation Studio CRM synchronization missing');
 assert(js.includes('if(s.crmId){openView(\'crm\');openCrmProfile(s.crmId)}'),'Partner Hub CRM drill-down missing');
 
+
+assert(app.includes('id="partnerHubEvidence"'),'Partner Hub evidence bar missing');
+assert(js.includes('async function hydratePartnerHubDetail'),'Partner Hub CRM detail hydration missing');
+assert(js.includes('data.agreements'),'Partner Hub agreement hydration missing');
+assert(js.includes('data.touchpoints'),'Partner Hub touchpoint hydration missing');
+
 const pubJs=fs.readFileSync(new URL('../sponsor/sponsor.js',import.meta.url),'utf8');
 assert(pubJs.includes('const $=s=>Array.from(document.querySelectorAll(s));'),'public multi-selector helper missing');
 assert(!pubJs.includes('const $=s=>Array.from(document.querySelectorAll(s));'),'public selector helper duplicated');
