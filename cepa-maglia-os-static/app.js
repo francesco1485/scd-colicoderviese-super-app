@@ -1,11 +1,17 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.0'
-const supabase=createClient('https://dfnwzwutvnwiitiffwvr.supabase.co','sb_publishable_n0Fmw2PlLeaXsoFVsKb8MA_VbPqUbNn',{auth:{persistSession:true,autoRefreshToken:true}})
+const PUBLIC_ORG_ID='bddc5caf-2859-4f8e-bd51-a792fca40eca'
+const ACCESS_APPROVER_ID='6a04c8de-1470-49fb-ab66-13dff9a62802'
+const ACCESS_APPROVER_EMAIL='francescocoppola1485@gmail.com'
+const initialAuthUrl=location.href
+let passwordRecoveryMode=/type=recovery/i.test(initialAuthUrl)
+const supabase=createClient('https://dfnwzwutvnwiitiffwvr.supabase.co','sb_publishable_n0Fmw2PlLeaXsoFVsKb8MA_VbPqUbNn',{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}})
 const $=id=>document.getElementById(id)
 const esc=(v='')=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))
 const fmtDate=v=>v?new Intl.DateTimeFormat('it-IT',{dateStyle:'medium'}).format(new Date(v)):'—'
 const fmtDateTime=v=>v?new Intl.DateTimeFormat('it-IT',{dateStyle:'short',timeStyle:'short'}).format(new Date(v)):'—'
 const localInput=v=>{if(!v)return'';const d=new Date(v);return new Date(d-d.getTimezoneOffset()*60000).toISOString().slice(0,16)}
 const isManager=()=>['super_admin','supervisor','manager'].includes(window.userRole)
+const isAccessApprover=()=>window.userId===ACCESS_APPROVER_ID&&String(window.userEmail||'').toLowerCase()===ACCESS_APPROVER_EMAIL
 const viewMeta={
  home:['Quadro generale','Agenzia Generale HDI · Ecosistema di competenze, relazioni e sviluppo'],
  operatingPlan:['Piano Operativo','Architettura, dati, metodo, roadmap e sviluppo continuo di MAGLIA 360'],
@@ -21,10 +27,11 @@ const viewMeta={
  networkRadar:['Radar Rete','Ricerca continua IVASS, Registro Imprese e territorio per nuova rete e collaborazioni'],
  actions:['Attività & Scadenze','Motore operativo comune a tutto il sistema'],
  recovery:['Clienti · Recovery','Campagna operativa sul patrimonio esistente'],
+ accessAdmin:['Accessi & Richieste','Autorizzazioni utenze, sponsor, partner e contatti dalla vetrina pubblica'],
  liaWorkbench:['Lia · Workbench','Assistente operativo con permessi, ricerca, cartelle di lavoro e artefatti tracciati']
 }
 
-let ecosystem=[],projects=[],actions=[],marketHubs=[],marketEntities=[],contacts=[],timeline=[],documents=[],partnerRequirements=[],blueprints=[],subjects=[],initiatives=[],cepaContent=[],cepaAcademy=[],cepaSpeakers=[],products=[],productKnowledge=[],comparisons=[],collaborators=[],collaboratorTerms=[],portfolioSnapshots=[],businessAssessments=[],growthKits=[],distributionWatchlists=[],distributionCandidates=[],distributionEvidence=[],mailTemplates=[],mailDrafts=[],cepaExpansion=[],cepaReadiness=[],assistantMessages=[],recoveryRows=[],members=[],liaCapabilities=[],liaFolders=[],liaOrders=[],liaFiles=[],researchSources=[],researchInsights=[],liaActionRules=[],liaApprovals=[],roleViewAccess=[],liaAutomationRuns=[],assetRegistry=[],expertProtocols=[],uxUsageEvents=[]
+let ecosystem=[],projects=[],actions=[],marketHubs=[],marketEntities=[],contacts=[],timeline=[],documents=[],partnerRequirements=[],blueprints=[],subjects=[],initiatives=[],cepaContent=[],cepaAcademy=[],cepaSpeakers=[],products=[],productKnowledge=[],comparisons=[],collaborators=[],collaboratorTerms=[],portfolioSnapshots=[],businessAssessments=[],growthKits=[],distributionWatchlists=[],distributionCandidates=[],distributionEvidence=[],mailTemplates=[],mailDrafts=[],cepaExpansion=[],cepaReadiness=[],assistantMessages=[],recoveryRows=[],members=[],liaCapabilities=[],liaFolders=[],liaOrders=[],liaFiles=[],researchSources=[],researchInsights=[],liaActionRules=[],liaApprovals=[],roleViewAccess=[],liaAutomationRuns=[],assetRegistry=[],expertProtocols=[],uxUsageEvents=[],accessRequests=[],commercialLeads=[],publicShowcase=[]
 let officeAssignments=[],officeMessages=[],officeSnapshots=[],officeCases=[],officeWorkflow=[],officeCepaActivities=[],officeImports=[]
 let commercialClients=[],pipelineCases=[],clientCheckups=[],clientInteractions=[],clientWorkItems=[],clientPolicies=[]
 let currentPartnerId=null,currentOfficeId=null,currentOfficeProductId=null,currentCepaHubId=null,currentCommerceTab='clients'
@@ -75,7 +82,116 @@ function setFocusMode(on){
 if($('focusModeBtn'))$('focusModeBtn').onclick=()=>setFocusMode(!$('workspace').classList.contains('focus-mode'))
 
 $('loginForm').onsubmit=async e=>{e.preventDefault();const{error}=await supabase.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error)return msg(error.message,true);await boot()}
-$('signupBtn').onclick=async()=>{const email=$('email').value.trim(),password=$('password').value;if(!email||password.length<8)return msg('Inserisci email e una password di almeno 8 caratteri.',true);const{data,error}=await supabase.auth.signUp({email,password});if(error)return msg(error.message,true);if(data.session)await boot();else msg('Account creato. Controlla la mail di conferma e poi accedi.')}
+$('signupBtn').onclick=()=>openPublicAccessForm($('email').value.trim())
+$('backToPublicBtn').onclick=showPublicPortal
+
+
+
+function showPublicPortal(){
+  $('publicPortal')?.classList.remove('hidden')
+  $('loginView')?.classList.add('hidden')
+  $('resetPasswordView')?.classList.add('hidden')
+  $('workspace')?.classList.add('hidden')
+  $('blockedView')?.classList.add('hidden')
+  $('aiDock')?.classList.add('hidden')
+  loadPublicPortal()
+}
+function showLoginView(){
+  $('publicPortal')?.classList.add('hidden')
+  $('loginView')?.classList.remove('hidden')
+  $('resetPasswordView')?.classList.add('hidden')
+  $('workspace')?.classList.add('hidden')
+  $('blockedView')?.classList.add('hidden')
+  setTimeout(()=>$('email')?.focus(),50)
+}
+function showResetPasswordView(){
+  $('publicPortal')?.classList.add('hidden')
+  $('loginView')?.classList.add('hidden')
+  $('resetPasswordView')?.classList.remove('hidden')
+  $('workspace')?.classList.add('hidden')
+  $('blockedView')?.classList.add('hidden')
+  $('aiDock')?.classList.add('hidden')
+}
+async function loadPublicPortal(){
+  if(!$('publicShowcaseGrid'))return
+  const{data,error}=await supabase.from('public_showcase_items').select('*').eq('organization_id',PUBLIC_ORG_ID).eq('published',true).order('sort_order')
+  if(error){
+    $('publicShowcaseGrid').innerHTML='<div class="empty">Le iniziative non sono disponibili in questo momento.</div>'
+    return
+  }
+  publicShowcase=data||[]
+  $('publicShowcaseGrid').innerHTML=publicShowcase.map(x=>
+    '<article class="public-showcase-card '+(x.featured?'featured':'')+'"><div><span>'+esc(x.eyebrow||x.category)+'</span><h3>'+esc(x.title)+'</h3><p>'+esc(x.summary)+'</p></div><div class="public-showcase-footer"><small>'+esc(x.audience||'Proposta su misura')+'</small><button type="button" data-public-item="'+x.id+'">'+esc(x.cta_label||'Richiedi informazioni')+' →</button></div></article>'
+  ).join('')||'<div class="empty">Nuove iniziative in preparazione.</div>'
+  document.querySelectorAll('[data-public-item]').forEach(b=>b.onclick=()=>{
+    const item=publicShowcase.find(x=>x.id===b.dataset.publicItem)
+    openPublicLeadForm(item?.id||null,item?.category==='sponsor'?'sponsor':item?.category==='network'?'collaborator':item?.category==='partnership'?'partner':'information')
+  })
+}
+function openPublicAccessForm(prefillEmail=''){
+  $('modalContent').innerHTML='<div class="eyebrow">RICHIESTA ACCESSO</div><h2>Richiedi l’abilitazione a MAGLIA 360</h2><p class="muted">L’account non viene creato automaticamente. La richiesta viene verificata e può essere autorizzata solo dall’amministratore.</p><form id="publicAccessForm" class="form"><label>Nome e cognome<input id="paName" autocomplete="name" required></label><label>Email<input id="paEmail" type="email" autocomplete="email" value="'+esc(prefillEmail)+'" required></label><label>Telefono<input id="paPhone" autocomplete="tel" required></label><label>Azienda / organizzazione, se presente<input id="paCompany"></label><label>Motivo della richiesta<textarea id="paReason" placeholder="Collaboratore, partner, supporto operativo, altro..."></textarea></label><label class="public-consent"><input id="paConsent" type="checkbox" required> Autorizzo il contatto per la gestione di questa richiesta.</label><input id="paWebsite" class="public-honeypot" tabindex="-1" autocomplete="off"><button class="primary" type="submit">Invia richiesta</button></form><div id="publicFormMsg" class="message hidden"></div>'
+  $('modal').classList.remove('hidden')
+  $('publicAccessForm').onsubmit=async e=>{
+    e.preventDefault()
+    const btn=e.submitter; if(btn)btn.disabled=true
+    const{data,error}=await supabase.functions.invoke('public-portal-request',{body:{
+      type:'access',full_name:$('paName').value.trim(),email:$('paEmail').value.trim(),phone:$('paPhone').value.trim(),
+      company_name:$('paCompany').value.trim(),message:$('paReason').value.trim(),requested_profile:'generic',
+      consent_contact:$('paConsent').checked,website:$('paWebsite').value
+    }})
+    if(btn)btn.disabled=false
+    const box=$('publicFormMsg')
+    box.textContent=error?(error.message||'Invio non riuscito.'):(data?.message||'Richiesta ricevuta.')
+    box.className='message'+(error||data?.ok===false?' error':'')
+    if(!error&&data?.ok!==false)e.target.reset()
+  }
+}
+function openPublicLeadForm(itemId=null,leadType='information'){
+  const item=publicShowcase.find(x=>x.id===itemId)
+  $('modalContent').innerHTML='<div class="eyebrow">CONTATTO COMMERCIALE</div><h2>'+(item?esc(item.title):'Parliamo del tuo progetto')+'</h2><p class="muted">Nessun costo viene mostrato o accettato da questo modulo. La richiesta serve ad aprire un contatto e costruire una proposta dedicata.</p><form id="publicLeadForm" class="form"><label>Nome e cognome<input id="plName" autocomplete="name" required></label><label>Azienda / realtà<input id="plCompany"></label><div class="inline"><label>Email<input id="plEmail" type="email" autocomplete="email" required></label><label>Telefono<input id="plPhone" autocomplete="tel" required></label></div><label>Interesse<input id="plInterest" value="'+esc(item?.title||'')+'"></label><label>Raccontaci cosa stai cercando<textarea id="plMessage"></textarea></label><label class="public-consent"><input id="plConsent" type="checkbox" required> Autorizzo il contatto per approfondire questa richiesta.</label><input id="plWebsite" class="public-honeypot" tabindex="-1" autocomplete="off"><button class="primary" type="submit">Invia richiesta di contatto</button></form><div id="publicFormMsg" class="message hidden"></div>'
+  $('modal').classList.remove('hidden')
+  $('publicLeadForm').onsubmit=async e=>{
+    e.preventDefault()
+    const btn=e.submitter;if(btn)btn.disabled=true
+    const{data,error}=await supabase.functions.invoke('public-portal-request',{body:{
+      type:'commercial',lead_type:leadType,showcase_item_id:itemId,full_name:$('plName').value.trim(),company_name:$('plCompany').value.trim(),
+      email:$('plEmail').value.trim(),phone:$('plPhone').value.trim(),interest_area:$('plInterest').value.trim(),message:$('plMessage').value.trim(),
+      consent_contact:$('plConsent').checked,website:$('plWebsite').value
+    }})
+    if(btn)btn.disabled=false
+    const box=$('publicFormMsg')
+    box.textContent=error?(error.message||'Invio non riuscito.'):(data?.message||'Richiesta ricevuta.')
+    box.className='message'+(error||data?.ok===false?' error':'')
+    if(!error&&data?.ok!==false)e.target.reset()
+  }
+}
+function bindPublicPortal(){
+  $('publicLoginBtn')?.addEventListener('click',showLoginView)
+  $('publicLoginCta')?.addEventListener('click',showLoginView)
+  $('publicAccessBtn')?.addEventListener('click',()=>openPublicAccessForm())
+  $('publicAccessCta')?.addEventListener('click',()=>openPublicAccessForm())
+  $('publicPartnerBtn')?.addEventListener('click',()=>openPublicLeadForm(null,'partner'))
+  $('publicHeroContactBtn')?.addEventListener('click',()=>openPublicLeadForm(null,'partner'))
+  $('publicGeneralContactBtn')?.addEventListener('click',()=>openPublicLeadForm(null,'information'))
+  $('publicSponsorCta')?.addEventListener('click',()=>openPublicLeadForm(null,'sponsor'))
+  document.querySelectorAll('[data-public-scroll]').forEach(b=>b.onclick=()=>document.getElementById(b.dataset.publicScroll)?.scrollIntoView({behavior:'smooth'}))
+}
+bindPublicPortal()
+
+if($('resetPasswordForm'))$('resetPasswordForm').onsubmit=async e=>{
+  e.preventDefault()
+  const pass=$('resetPassword').value,confirm=$('resetPasswordConfirm').value
+  const box=$('resetPasswordMsg')
+  if(pass.length<10||pass!==confirm){box.textContent='Le password devono coincidere e contenere almeno 10 caratteri.';box.className='message error';return}
+  const{error}=await supabase.auth.updateUser({password:pass})
+  if(error){box.textContent=error.message;box.className='message error';return}
+  const{data,error:activateError}=await supabase.functions.invoke('manage-access-request',{body:{action:'activate_self'}})
+  if(activateError||data?.ok===false){box.textContent=data?.message||activateError?.message||'Password aggiornata, ma attivazione non completata.';box.className='message error';return}
+  passwordRecoveryMode=false
+  history.replaceState({},document.title,location.pathname)
+  box.textContent='Accesso attivato.';box.className='message'
+  setTimeout(()=>boot(),350)
+}
 
 function setHeader(title,subtitle){$('pageTitle').textContent=title;$('pageSubtitle').textContent=subtitle}
 
@@ -204,8 +320,9 @@ function renderHeaderControls(){
     if(currentOfficeId&&accessibleOffices().some(x=>x.id===currentOfficeId))select.value=currentOfficeId
   }
   const urgent=officeCases.filter(x=>!['completed','cancelled'].includes(x.status)&&['urgent','high'].includes(x.priority)).length
+  const publicPending=isAccessApprover()?accessRequests.filter(x=>x.status==='pending').length+commercialLeads.filter(x=>x.status==='new').length:0
   const badge=$('headerNotificationBadge')
-  if(badge){badge.textContent=String(urgent);badge.classList.toggle('hidden',urgent===0)}
+  if(badge){badge.textContent=String(urgent+publicPending);badge.classList.toggle('hidden',urgent+publicPending===0)}
 }
 if($('officeQuickSelector'))$('officeQuickSelector').onchange=e=>e.target.value?openOffice(e.target.value):navigate('home')
 if($('headerNotificationsBtn'))$('headerNotificationsBtn').onclick=()=>navigate('actions')
@@ -227,6 +344,7 @@ function setCepaShell(active){
   ws.classList.toggle('cepa-shell',!!active)
 }
 function accessForView(view){
+  if(view==='accessAdmin')return isAccessApprover()?'manage':'hidden'
   if(view==='operatingPlan')return isManager()?'manage':'read'
   if(isManager())return'manage'
   return roleViewAccess.find(x=>x.view_code===view&&x.active)?.access_level||'hidden'
@@ -453,10 +571,11 @@ document.querySelectorAll('[data-lia-example]').forEach(b=>b.onclick=()=>{
 
 async function boot(){
   const{data:{user}}=await supabase.auth.getUser()
-  if(!user){$('loginView').classList.remove('hidden');$('workspace').classList.add('hidden');$('blockedView').classList.add('hidden');$('aiDock').classList.add('hidden');return}
+  if(passwordRecoveryMode&&user){showResetPasswordView();return}
+  if(!user){showPublicPortal();return}
   const{data:m,error}=await supabase.from('organization_memberships').select('organization_id,role').eq('user_id',user.id).eq('active',true).limit(1).maybeSingle()
-  $('loginView').classList.add('hidden')
-  if(error||!m){$('workspace').classList.add('hidden');$('blockedView').classList.remove('hidden');return}
+  $('publicPortal')?.classList.add('hidden');$('loginView').classList.add('hidden');$('resetPasswordView')?.classList.add('hidden')
+  if(error||!m){$('workspace').classList.add('hidden');$('blockedView').classList.remove('hidden');$('aiDock').classList.add('hidden');return}
   window.orgId=m.organization_id;window.userId=user.id;window.userRole=m.role;window.userEmail=user.email||''
   $('workspace').classList.remove('hidden');$('blockedView').classList.add('hidden');$('aiDock').classList.remove('hidden')
   setMobileNav(false)
@@ -538,18 +657,20 @@ async function loadAll(){
     supabase.from('client_policies').select('*,clients(id,kind,status,first_name,last_name,business_name,city,province),agency_products(id,code,name,category)').eq('organization_id',window.orgId).order('expiry_date',{ascending:true}).limit(10000),
     supabase.from('asset_registry').select('*').eq('organization_id',window.orgId).eq('is_active',true).order('governance_status').order('asset_name').limit(1000),
     supabase.from('expert_protocols').select('*').eq('organization_id',window.orgId).eq('status','active').order('version',{ascending:false}).limit(20),
-    supabase.from('ux_usage_events').select('*').eq('organization_id',window.orgId).order('created_at',{ascending:false}).limit(500)
+    supabase.from('ux_usage_events').select('*').eq('organization_id',window.orgId).order('created_at',{ascending:false}).limit(500),
+    isAccessApprover()?supabase.from('public_access_requests').select('*').eq('organization_id',window.orgId).order('created_at',{ascending:false}).limit(250):Promise.resolve({data:[],error:null}),
+    isAccessApprover()?supabase.from('public_commercial_leads').select('*').eq('organization_id',window.orgId).order('created_at',{ascending:false}).limit(250):Promise.resolve({data:[],error:null})
   ]
   const res=await Promise.all(q)
   const err=res.find(x=>x.error)?.error
   if(err){console.error(err);$('refreshBtn').textContent='!';return}
-  ;[ecosystem,projects,actions,marketHubs,marketEntities,contacts,timeline,documents,partnerRequirements,blueprints,subjects,initiatives,cepaContent,cepaAcademy,cepaSpeakers,products,productKnowledge,comparisons,collaborators,collaboratorTerms,portfolioSnapshots,businessAssessments,growthKits,distributionWatchlists,distributionCandidates,distributionEvidence,mailTemplates,mailDrafts,cepaExpansion,cepaReadiness,assistantMessages,liaCapabilities,liaFolders,liaOrders,liaFiles,researchSources,researchInsights,liaActionRules,liaApprovals,roleViewAccess,liaAutomationRuns,officeAssignments,officeMessages,officeSnapshots,officeCases,officeWorkflow,officeCepaActivities,officeImports,commercialClients,pipelineCases,clientCheckups,clientInteractions,clientWorkItems,clientPolicies,assetRegistry,expertProtocols,uxUsageEvents]=res.map(x=>x.data||[])
+  ;[ecosystem,projects,actions,marketHubs,marketEntities,contacts,timeline,documents,partnerRequirements,blueprints,subjects,initiatives,cepaContent,cepaAcademy,cepaSpeakers,products,productKnowledge,comparisons,collaborators,collaboratorTerms,portfolioSnapshots,businessAssessments,growthKits,distributionWatchlists,distributionCandidates,distributionEvidence,mailTemplates,mailDrafts,cepaExpansion,cepaReadiness,assistantMessages,liaCapabilities,liaFolders,liaOrders,liaFiles,researchSources,researchInsights,liaActionRules,liaApprovals,roleViewAccess,liaAutomationRuns,officeAssignments,officeMessages,officeSnapshots,officeCases,officeWorkflow,officeCepaActivities,officeImports,commercialClients,pipelineCases,clientCheckups,clientInteractions,clientWorkItems,clientPolicies,assetRegistry,expertProtocols,uxUsageEvents,accessRequests,commercialLeads]=res.map(x=>x.data||[])
   renderEverything()
   $('refreshBtn').textContent='↻'
 }
 
 function renderEverything(){
-  renderPartnerNav();renderHome();renderOperatingPlan();renderCepaHub();renderCepaTerritory();renderOffice();renderOfficeProduct();renderPartner();renderProducts();renderCommerceWorkspace();renderCollaborators();renderGrowthKits();renderComparisons();renderMail();renderCepa();renderTerritories();renderDocuments();renderDevelopment();renderNetworkRadar();renderActions();renderAssistantHistory();renderLiaWorkbench();applyRoleViewAccess();renderHeaderControls()
+  renderPartnerNav();renderHome();renderOperatingPlan();renderCepaHub();renderCepaTerritory();renderOffice();renderOfficeProduct();renderPartner();renderProducts();renderCommerceWorkspace();renderCollaborators();renderGrowthKits();renderComparisons();renderMail();renderCepa();renderTerritories();renderDocuments();renderDevelopment();renderNetworkRadar();renderActions();renderAssistantHistory();renderLiaWorkbench();renderAccessAdmin();applyRoleViewAccess();renderHeaderControls()
 }
 
 function renderOperatingPlan(){
@@ -2427,6 +2548,60 @@ function renderLiaWorkbench(){
   document.querySelectorAll('[data-lia-reject]').forEach(b=>b.onclick=()=>decideLiaApproval(b.dataset.liaReject,'rejected'))
 }
 
+
+function renderAccessAdmin(){
+  if(!$('accessRequestList'))return
+  if(!isAccessApprover()){
+    $('accessRequestList').innerHTML=empty('Area riservata all’amministratore autorizzato.')
+    $('commercialLeadList').innerHTML=''
+    return
+  }
+  const pending=accessRequests.filter(x=>x.status==='pending')
+  $('accessPendingCount').textContent=pending.length
+  $('accessActivatedCount').textContent=accessRequests.filter(x=>x.status==='activated').length
+  $('commercialLeadNewCount').textContent=commercialLeads.filter(x=>x.status==='new').length
+  $('sponsorLeadCount').textContent=commercialLeads.filter(x=>['sponsor','partner'].includes(x.lead_type)&&!['closed','lost'].includes(x.status)).length
+
+  $('accessRequestList').innerHTML=accessRequests.map(r=>
+    '<article class="access-request-card '+esc(r.status)+'"><div class="access-request-head"><div><strong>'+esc(r.full_name)+'</strong><small>'+esc(r.email)+' · '+esc(r.phone)+'</small></div><span>'+esc(r.status.replaceAll('_',' '))+'</span></div>'+
+    (r.company_name?'<p><b>Realtà:</b> '+esc(r.company_name)+'</p>':'')+
+    (r.request_reason?'<p>'+esc(r.request_reason)+'</p>':'')+
+    '<footer><small>'+esc(fmtDateTime(r.created_at))+'</small>'+
+    (r.status==='pending'?'<div><select data-access-role="'+r.id+'"><option value="viewer">Viewer</option><option value="operator">Operatore</option><option value="specialist">Specialista</option></select><button type="button" class="small-btn" data-access-approve="'+r.id+'">Approva</button><button type="button" class="small-btn danger" data-access-reject="'+r.id+'">Rifiuta</button></div>':'<span>'+esc(r.assigned_role||'')+'</span>')+
+    '</footer></article>'
+  ).join('')||empty('Nessuna richiesta di accesso.')
+
+  document.querySelectorAll('[data-access-approve]').forEach(b=>b.onclick=()=>{
+    const role=document.querySelector('[data-access-role="'+b.dataset.accessApprove+'"]')?.value||'viewer'
+    manageAccessRequest(b.dataset.accessApprove,'approve',role)
+  })
+  document.querySelectorAll('[data-access-reject]').forEach(b=>b.onclick=()=>manageAccessRequest(b.dataset.accessReject,'reject'))
+
+  $('commercialLeadList').innerHTML=commercialLeads.map(l=>
+    '<article class="commercial-lead-card"><div class="access-request-head"><div><strong>'+esc(l.company_name||l.full_name)+'</strong><small>'+esc(l.full_name)+' · '+esc(l.email)+' · '+esc(l.phone)+'</small></div><span>'+esc(l.lead_type)+'</span></div>'+
+    (l.interest_area?'<p><b>Interesse:</b> '+esc(l.interest_area)+'</p>':'')+
+    (l.message?'<p>'+esc(l.message)+'</p>':'')+
+    '<footer><small>'+esc(fmtDateTime(l.created_at))+'</small><select data-lead-status="'+l.id+'"><option value="new">Nuovo</option><option value="contacted">Contattato</option><option value="qualified">Qualificato</option><option value="opportunity">Opportunità</option><option value="closed">Chiuso</option><option value="lost">Perso</option></select></footer></article>'
+  ).join('')||empty('Nessun contatto commerciale dalla vetrina.')
+  document.querySelectorAll('[data-lead-status]').forEach(sel=>{
+    const row=commercialLeads.find(x=>x.id===sel.dataset.leadStatus);if(row)sel.value=row.status
+    sel.onchange=()=>updateCommercialLead(sel.dataset.leadStatus,sel.value)
+  })
+}
+async function manageAccessRequest(id,action,role='viewer'){
+  if(!isAccessApprover())return
+  const{data,error}=await supabase.functions.invoke('manage-access-request',{body:{request_id:id,action,role}})
+  if(error||data?.ok===false)return alert(data?.message||error?.message||'Operazione non riuscita.')
+  alert(data?.message||'Operazione completata.')
+  await loadAll()
+}
+async function updateCommercialLead(id,status){
+  if(!isAccessApprover())return
+  const{error}=await supabase.from('public_commercial_leads').update({status,updated_at:new Date().toISOString()}).eq('id',id).eq('organization_id',window.orgId)
+  if(error)return alert(error.message)
+  await loadAll()
+}
+
 function renderMail(){
   $('mailTemplateList').innerHTML=mailTemplates.map(t=>'<div class="template-card" data-mail-template="'+t.id+'"><h4>'+esc(t.title)+'</h4><p>'+esc(t.purpose)+' · '+esc(t.audience||'')+'</p></div>').join('')||empty('Nessun modello email')
   document.querySelectorAll('[data-mail-template]').forEach(b=>b.onclick=()=>{ $('mailTemplateSelect').value=b.dataset.mailTemplate; hydrateMailTemplate(); $('mailContext').focus() })
@@ -2707,5 +2882,13 @@ function caseById(id){return recoveryRows.find(x=>x.id===id)}
 async function openAssign(id){await loadMembers();const x=caseById(id);if(!x)return;$('modalContent').innerHTML='<div class="eyebrow">RECOVERY</div><h2>Assegna cliente</h2><form id="assignForm" class="form"><label>Operatore<select id="assignee">'+members.map(m=>'<option value="'+m.user_id+'">'+esc(m.full_name)+' · '+esc(m.role)+'</option>').join('')+'</select></label><label>Data attività<input id="assignDue" type="datetime-local" required></label><button class="primary" type="submit">Assegna</button></form>';$('assignDue').value=localInput(new Date(Date.now()+300000));$('modal').classList.remove('hidden');$('assignForm').onsubmit=async e=>{e.preventDefault();const{error}=await supabase.rpc('assign_recovery_case',{p_case_id:id,p_assigned_to:$('assignee').value,p_due_at:new Date($('assignDue').value).toISOString()});if(error)return alert(error.message);closeModal();await loadRecovery()}}
 function openOutcome(id){$('modalContent').innerHTML='<div class="eyebrow">RECOVERY</div><h2>Registra esito</h2><form id="outcomeForm" class="form"><label>Esito<select id="outcome"><option value="no_answer">Non risponde</option><option value="call_back">Da richiamare</option><option value="appointment">Appuntamento</option><option value="checkup">Check-up Maglia 360</option><option value="recovered">Recuperato</option><option value="not_interested">Non interessato</option><option value="do_not_contact">Non contattare</option></select></label><label>Canale<select id="channel"><option value="phone">Telefono</option><option value="email">Email</option><option value="whatsapp">WhatsApp</option><option value="in_person">Di persona</option><option value="video">Video</option><option value="other">Altro</option></select></label><label>Prossima data<input id="followAt" type="datetime-local"></label><label>Nota<textarea id="rNote"></textarea></label><button class="primary" type="submit">Registra</button></form>';$('modal').classList.remove('hidden');$('outcomeForm').onsubmit=async e=>{e.preventDefault();const f=$('followAt').value;const{error}=await supabase.rpc('record_recovery_outcome',{p_case_id:id,p_outcome:$('outcome').value,p_note:$('rNote').value.trim()||null,p_followup_at:f?new Date(f).toISOString():null,p_channel:$('channel').value});if(error)return alert(error.message);closeModal();await loadRecovery()}}
 
-supabase.auth.onAuthStateChange(()=>setTimeout(boot,0))
+supabase.auth.onAuthStateChange((event,session)=>{
+  if(event==='PASSWORD_RECOVERY'){
+    passwordRecoveryMode=true
+    setTimeout(showResetPasswordView,0)
+    return
+  }
+  if(event==='SIGNED_OUT')passwordRecoveryMode=false
+  setTimeout(boot,0)
+})
 await boot()
