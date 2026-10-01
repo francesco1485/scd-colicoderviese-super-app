@@ -471,7 +471,7 @@ function r216Fill_(source,vars,html){
 }
 function r216LetterheadHtml_(profile,bodyHtml,signature){
   var legal = r216Html_(profile.LEGAL_FOOTER || '');
-  var displayName = r216Html_(profile.DISPLAY_NAME || profile.LEGAL_NAME || 'S.D.C. Colicoderviese');
+  var displayName = r216Html_(profile.LEGAL_NAME || profile.DISPLAY_NAME || 'S.D.C. Colicoderviese');
   var logo = profile.LOGO_DRIVE_ID ? '<img src="cid:scdLogo" alt="'+displayName+'" style="max-width:92px;height:auto;display:block">' : '';
   return [
     '<div style="font-family:Arial,Helvetica,sans-serif;color:#16304d;max-width:760px;margin:0 auto">',
@@ -503,7 +503,7 @@ function r216CommunicationContext_(token,payload){
   var profile = r216ProfileMap_();
   var html = r216LetterheadHtml_(profile,body || r216Html_(text).replace(/\n/g,'<br>'),sig);
   var fullText = (text || String(body).replace(/<[^>]+>/g,' ')) + '\n\n' +
-    String(sig.DISPLAY_NAME || '') + '\n' + String(sig.ROLE_LABEL || '') + '\n' + String(profile.DISPLAY_NAME || profile.LEGAL_NAME || 'S.D.C. Colicoderviese') + '\n' +
+    String(sig.DISPLAY_NAME || '') + '\n' + String(sig.ROLE_LABEL || '') + '\n' + String(profile.LEGAL_NAME || profile.DISPLAY_NAME || 'S.D.C. Colicoderviese') + '\n' +
     String(profile.LEGAL_FOOTER || '');
   return {actor:actor,userRow:userRow,template:template,signature:sig,stakeholder:stakeholder,to:to,subject:subject,text:fullText,html:html,profile:profile};
 }
