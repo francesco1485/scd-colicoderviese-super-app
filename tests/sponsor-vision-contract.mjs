@@ -31,6 +31,20 @@ for(const token of [
 
 assert(pub.includes('PRONTA PER FORMALIZZAZIONE'),'convention formalization status missing');
 assert(pub.includes('IN ATTIVAZIONE'),'convention activation status missing');
+
+for(const token of [
+  'GGlass',
+  'TA Cleaning',
+  'AGC Medical',
+  'Preview video: 1920×1080 · 25 fps · 20 sec',
+  'Non un cartellone. Un palinsesto.',
+  'SCD Supporter Card',
+  'SCD Tesserato Card',
+  'La passione che ti porta più vicino.',
+  'Dentro la squadra. Dentro i vantaggi.',
+  'Più vicini al club. Più valore sul territorio.'
+]) assert(pub.includes(token),'R47 commercial experience missing: '+token);
+
 assert(pub.includes('I loghi ufficiali saranno mostrati solo dopo caricamento'),'official logo governance missing');
 assert(js.includes("SOSPESA · NON INVIARE"),'suspended prospect visibility missing');
 assert(js.includes("Pixellot & Match Content"),'internal video asset missing');
