@@ -441,3 +441,31 @@ body.v5 .hero-content{transform:translate3d(calc(var(--v5-x) * 5px),calc(var(--v
 body.v5 .hero-hud{transform:translate3d(calc(var(--v5-x) * 10px),calc(var(--v5-y) * 7px),0);transition:transform .18s ease-out}
 @media(prefers-reduced-motion:reduce){body.v5 .hero-photo,body.v5 .hero-content,body.v5 .hero-hud{transform:none!important;transition:none!important}}
 
+
+
+/* Asset governance + adaptive experience */
+.system-governance{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}
+.governance-card{background:linear-gradient(145deg,rgba(255,255,255,.92),rgba(242,248,253,.80));border:1px solid rgba(184,211,232,.58);border-radius:18px;padding:14px;box-shadow:0 16px 38px rgba(21,58,94,.07)}
+.governance-card header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.governance-card header small{display:block;font-size:6px;letter-spacing:.15em;color:#7e9ab6;font-weight:850}
+.governance-card header h3{font-size:11px;margin:2px 0 0;color:#284f79}
+.governance-state{font-size:6px;font-weight:850;border-radius:999px;padding:5px 7px}
+.governance-state.locked{background:#fff0dd;color:#a86e10}.governance-state.adaptive{background:#e8f5ff;color:#347fb8}.governance-state.local{background:#edf1ff;color:#6c73c3}.governance-state.verified{background:#e9f6ef;color:#3d8c68}
+.protocol-list{display:grid;gap:7px}.protocol-row{display:grid;grid-template-columns:24px 1fr;gap:8px;padding:8px;border:1px solid #e7edf4;border-radius:10px;background:rgba(255,255,255,.70)}
+.protocol-row.source{grid-template-columns:24px 1fr}.protocol-row>span{width:24px;height:24px;border-radius:8px;background:#eff5fb;color:#4c84b9;display:grid;place-items:center;font-size:7px;font-weight:850}.protocol-lock{background:#fff4db!important;color:#b18318!important}
+.protocol-row b{font-size:7px;display:block;color:#365d84}.protocol-row p{font-size:6px;line-height:1.45;color:#7d91a5;margin:2px 0 0}
+.device-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.device-grid>div{background:#f7fafc;border:1px solid #e7edf4;border-radius:9px;padding:7px}
+.device-grid small,.usage-kpis small{display:block;font-size:5px;color:#8b9fb2}.device-grid b,.usage-kpis b{display:block;font-size:8px;color:#315d87;margin-top:2px}
+.device-note{font-size:6px;line-height:1.5;color:#8195a8;margin:8px 0 0}
+.usage-kpis{display:grid;grid-template-columns:1fr 1fr;gap:6px}.usage-kpis>div{background:#f7fafc;border:1px solid #e7edf4;border-radius:9px;padding:8px}
+.usage-bars{display:grid;gap:6px;margin-top:8px}.usage-bars>div{display:grid;grid-template-columns:100px 1fr 20px;gap:7px;align-items:center}.usage-bars span,.usage-bars em{font-size:6px;color:#6f8499;font-style:normal}.usage-bars i{height:5px;border-radius:999px;background:#e9f0f6;overflow:hidden}.usage-bars i b{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#4f9ad9,#6bc2df)}
+body[data-quality="light"] .hero-hud,body[data-quality="light"] .studio-orbit,body[data-quality="light"] .hero-gridlines{display:none!important}
+body[data-quality="light"] .hero-photo,body[data-quality="light"] .hero-content,body[data-quality="light"] .macro-visual,body[data-quality="light"] .sponsor-card{transform:none!important;transition:none!important}
+body[data-quality="light"] .hero-visual,body[data-quality="light"] .macro-visual,body[data-quality="light"] .sponsor-card,body[data-quality="light"] .work-panel,body[data-quality="light"] .intelligence-card{box-shadow:0 8px 20px rgba(15,48,80,.08)!important}
+body[data-quality="balanced"] .hero-hud{opacity:.75}
+body[data-form-factor="large-display"] .workspace{max-width:1900px}
+body[data-form-factor="large-display"] .view{padding-left:34px;padding-right:34px}
+body[data-form-factor="phone"] .command-search input{font-size:16px}
+body[data-pointer="touch"] button,body[data-pointer="touch"] .nav-item{min-height:42px}
+@media(max-width:900px){.system-governance{grid-template-columns:1fr}.device-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.device-grid{grid-template-columns:1fr 1fr}.usage-bars>div{grid-template-columns:80px 1fr 18px}}
