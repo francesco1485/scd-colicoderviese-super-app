@@ -1,0 +1,85 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "SCD_VISUAL_SYSTEM",
+  "club": "S.C.D. ColicoDerviese",
+  "territory": "Colico · Alto Lario · Lago di Como",
+  "principles": [
+    "STANDARD_INTERNAZIONALE_IDENTITA_LOCALE",
+    "SPORT_TERRITORIO_RELAZIONI",
+    "DATI_PRIMA_DELLE_DECORAZIONI",
+    "VISUALE_EMOZIONALE_INTERFACCIA_RAZIONALE",
+    "UN_SOLO_SISTEMA_VISIVO"
+  ],
+  "colors": {
+    "navy": "#031A35",
+    "navy2": "#052E59",
+    "blue": "#0870CF",
+    "lake": "#0B98DD",
+    "cyan": "#20B7E6",
+    "yellow": "#FFD500",
+    "gold": "#F0B900",
+    "white": "#FFFFFF",
+    "paper": "#EEF5FB",
+    "ink": "#123657",
+    "muted": "#627E98",
+    "line": "#D5E4F0",
+    "success": "#179765",
+    "warning": "#E49B2F",
+    "danger": "#CA5656"
+  },
+  "typography": {
+    "family": "Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif",
+    "headlineWeight": 900,
+    "bodyWeight": 500,
+    "labelWeight": 850,
+    "maxTextWidth": "72ch"
+  },
+  "shape": {
+    "radiusSmall": 9,
+    "radiusMedium": 14,
+    "radiusLarge": 20,
+    "radiusHero": 26,
+    "pill": 999
+  },
+  "spacing": {
+    "xs": 6,
+    "sm": 9,
+    "md": 14,
+    "lg": 20,
+    "xl": 28,
+    "xxl": 40
+  },
+  "shadow": {
+    "card": "0 18px 48px rgba(3,35,72,.11)",
+    "hero": "0 22px 60px rgba(3,35,72,.13)",
+    "overlay": "0 12px 30px rgba(2,22,46,.18)"
+  },
+  "motion": {
+    "reducedMotionRequired": true,
+    "microInteractionMs": 180,
+    "panelTransitionMs": 260,
+    "ledPreview": {
+      "previewResolution": "1920x1080",
+      "fps": 25,
+      "durationSeconds": 20,
+      "masterStatus": "PREVIEW_SPEC_NOT_LED_NATIVE",
+      "nativeLedSpecStatus": "DA_RILEVARE_ALLA_CONSEGNA",
+      "safeRules": [
+        "logo sempre leggibile",
+        "un messaggio principale per scena",
+        "alto contrasto",
+        "movimento non frenetico",
+        "camera-safe da collaudare",
+        "vista tribuna da collaudare",
+        "nessuna risoluzione LED inventata"
+      ]
+    }
+  },
+  "environments": {
+    "public": "EMOZIONALE_COMMERCIALE",
+    "partnerOs": "OPERATIVO_RELAZIONALE",
+    "crm": "DENSO_MA_LEGGIBILE",
+    "led": "DINAMICO_CAMERA_SAFE",
+    "sponsorWall": "MODULARE_BRAND_SAFE"
+  }
+}
