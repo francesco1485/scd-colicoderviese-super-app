@@ -179,3 +179,84 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .wall-use-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px}.wall-use-grid article{background:white;border:1px solid #dce8f0;border-radius:16px;padding:19px}.wall-use-grid span{display:inline-grid;place-items:center;width:29px;height:29px;border-radius:50%;background:#ffd51c;color:#17324d;font-size:10px;font-weight:900}.wall-use-grid h3{font-size:18px;margin:9px 0 6px}.wall-use-grid p{font-size:13px;color:#667d90;margin:0}
 @media(max-width:900px){.wall-partner-grid{grid-template-columns:repeat(3,1fr)}.wall-use-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:620px){.wall-partner-grid{grid-template-columns:repeat(2,1fr)}.wall-topline{grid-template-columns:1fr}.wall-topline span:last-child{text-align:left}.wall-use-grid{grid-template-columns:1fr}.wall-club-mark{justify-content:flex-start}}
+
+
+/* ===== R49 PUBLIC SCD WORLD CLUB IDENTITY ===== */
+:root{
+  --navy:#031a35;--navy2:#052e59;--blue:#0870cf;--cyan:#20b7e6;
+  --yellow:#ffd500;--paper:#eef5fb;--white:#ffffff;--ink:#123657;--muted:#627e98;
+  --line:#d5e4f0;--green:#179765;--red:#ca5656;--shadow:0 22px 60px rgba(3,35,72,.12)
+}
+body{background:linear-gradient(180deg,#f5faff,#eef5fb 52%,#f8fbfe);color:var(--ink)}
+.site-header{background:rgba(3,26,53,.97);border-bottom:1px solid rgba(255,255,255,.08);box-shadow:0 10px 30px rgba(2,22,46,.16)}
+.public-brand small{color:#7bcff0}
+.public-nav a{color:#d9e9f6}.public-nav a:hover{color:var(--yellow)}
+.access-button{border-color:rgba(255,213,0,.5);color:#102d4c;background:var(--yellow)}
+.public-hero-layer{background:linear-gradient(92deg,rgba(2,20,43,.97) 0%,rgba(3,50,96,.88) 49%,rgba(4,87,143,.22) 78%,rgba(2,25,52,.28) 100%)}
+.hero-copy .eyebrow{color:var(--yellow)}
+.hero-copy h1 em{color:#70d6f6}
+.hero-copy p{color:#d9eaf6}
+.hero-insight{background:rgba(3,31,61,.72);border-color:rgba(255,255,255,.18)}
+.hero-insight small{color:#83d9f5}
+.primary-cta{background:var(--yellow);color:#113250}
+.secondary-cta{border-color:rgba(255,255,255,.48);color:white}
+
+.club-system{background:linear-gradient(180deg,#031a35 0%,#042b55 54%,#053a6c 100%)}
+.club-system:before{background:radial-gradient(circle,rgba(32,183,230,.22),transparent 62%)}
+.club-system-head p{color:#d1e4f2}
+.territory-signature{background:linear-gradient(145deg,rgba(255,255,255,.09),rgba(255,255,255,.035))}
+.territory-signature span{color:#d9ebf5}.territory-signature small{color:#78cdec}
+.club-system-shell{background:rgba(2,22,46,.58);border-color:rgba(255,255,255,.14)}
+.club-module-nav button{color:#d2e3ef}.club-module-nav button:hover,.club-module-nav button.active{background:var(--yellow);color:#12304c}
+.club-module-copy>span{color:#64d2f3}.club-module-copy p{color:#d1e3ef}
+.device-nav{background:linear-gradient(180deg,#031a35,#064c81)}
+.device-nav i.on{background:#0870cf}
+.device-main{background:linear-gradient(180deg,#f8fbfe,#edf5fb)}
+.ui-hero{background:linear-gradient(135deg,rgba(4,74,127,.83),rgba(5,40,74,.83)),url('../assets/hero-colico.webp') center/cover}
+.ui-hero small{color:#8fe4ff}.ui-kpis b{color:#0870cf}.ui-list em{color:#0a7bb5}
+.ui-led{background:#041a32}.ui-led-main{background:linear-gradient(90deg,#0757a5,#0c9ed8)}
+.ui-wall{background:linear-gradient(135deg,#064d88,#032e57)}.ui-video i{color:#0870cf}
+.ui-cards article:first-child{background:linear-gradient(135deg,#07528b,#0aa0d6)}.ui-cards article:last-child{background:linear-gradient(135deg,#041a35,#d0a22e)}
+.ui-event{background:linear-gradient(135deg,rgba(3,31,61,.82),rgba(6,104,170,.62)),url('../assets/event-insieme.webp') center/cover}
+.territory-map-card{background:linear-gradient(135deg,rgba(3,31,61,.62),rgba(5,100,161,.55)),url('../assets/hero-colico.webp') center/cover}
+.territory-points span{color:#174f7b;border-color:#d9e7f1}
+.world-standard-flow span{color:#d1e3ef}.world-standard-flow i{color:#6bbfdf}
+
+.ledwall-launch{background:linear-gradient(180deg,#eef6fb 0%,#f7fbfe 100%)}
+.ledwall-stage{background:linear-gradient(145deg,#020e1d,#06335f)}
+.ledwall-screen{background:radial-gradient(circle at 25% 15%,#0a5b9b,#031a35 58%,#010910)}
+.ledwall-camera-bar b{color:var(--yellow)}
+.ledwall-visibility b{color:#70d9f5}
+.led-commercial-proof{background:#fff}
+.led-proof-grid article{background:#f2f7fb;border-top-color:var(--yellow)}
+.led-proof-grid b{color:#0870cf}
+
+.sponsor-wall-experience{background:linear-gradient(180deg,#f5f9fc,#eef5fb)}
+.wall-mode-switch button.active{background:#0870cf;border-color:#0870cf}
+.sponsor-wall-stage{background:linear-gradient(145deg,#064c87,#032e57)}
+.sponsor-wall-stage[data-wall-stage="EVENTI"]{background:linear-gradient(145deg,#053c70,#0a7ab7)}
+.sponsor-wall-stage[data-wall-stage="WEB"]{background:linear-gradient(145deg,#031a35,#0d6b99)}
+.wall-club-mark small{color:#8edfff}
+
+.opportunities.section-shell{background:linear-gradient(180deg,#031a35,#052d57)}
+.op-card{background:linear-gradient(155deg,#073d71,#04294f);border-color:rgba(255,255,255,.12)}
+.op-card.featured{background:linear-gradient(155deg,#075da7,#03315d);border-color:rgba(255,213,0,.72)}
+.op-card b{color:#77dfff}
+
+.ecosystem.section-shell{background:linear-gradient(180deg,#031a35,#052d57)}
+.ecosystem-grid article{background:rgba(255,255,255,.055)}
+.ecosystem-grid p{color:#d1e3ef}
+.ecosystem-cta{background:linear-gradient(90deg,rgba(9,126,191,.16),rgba(255,213,0,.08))}
+
+.cards-commerce{background:linear-gradient(180deg,#031a35,#052e59)}
+.card-product{background:linear-gradient(145deg,rgba(255,255,255,.08),rgba(255,255,255,.035))}
+.supporter .card-mock{background:linear-gradient(135deg,#07538e,#0a9ed4 60%,#1fc8e2)}
+.player .card-mock{background:linear-gradient(135deg,#031a35,#07518b 58%,#d2a62f)}
+.card-copy>span{color:#7bdcf7}
+
+.media-commerce-card.video{background:linear-gradient(145deg,#031a35,#086da9)}
+.media-commerce-card.merch{background:linear-gradient(145deg,#fff8d7,#fff);border-color:#e5d59a}
+.network.section-shell{background:linear-gradient(145deg,#031a35,#064d82)}
+.future-conventions span{color:#d7e9f5}
+.partner-call{background:linear-gradient(135deg,#031a35,#0768aa)}
+.public-footer{background:#021426}
