@@ -44,6 +44,7 @@
       <button class="nav-link" data-view="report"><i data-icon="chart"></i><span>Report & Analytics</span></button>
       <button class="nav-link" data-view="opportunita"><i data-icon="link"></i><span>Opportunità</span></button>
       <button class="nav-link" data-view="catalogo"><i data-icon="diamond"></i><span>Catalogo commerciale</span></button>
+      <button class="nav-link" data-view="activationstudio"><i data-icon="target"></i><span>Activation Studio</span></button>
       <button class="nav-link" data-view="communityvalue"><i data-icon="star"></i><span>Card & Merch</span></button>
       <button class="nav-link" data-view="scenario"><i data-icon="lab"></i><span>Scenario Lab</span></button>
       <button class="nav-link" data-view="settings"><i data-icon="settings"></i><span>Impostazioni</span></button>
@@ -112,6 +113,23 @@
           <button data-view="communityvalue"><small>COMMUNITY</small><b>Card SCD</b><span>tifoso · tesserato</span></button>
           <button data-view="communityvalue"><small>SHOP</small><b>Merch</b><span>prodotti & capsule</span></button>
           <button data-view="convenzioni"><small>BENEFIT</small><b>Convenzioni</b><span>attive · in sviluppo</span></button>
+        </div>
+      </section>
+
+      <section class="club-command-center">
+        <div class="command-intro">
+          <span>CLUB STANDARD 360°</span>
+          <h3>Qualità internazionale, controllo locale.</h3>
+          <p>Ogni relazione deve avere un percorso chiaro: brief, proposta, attivazione, prova, report e rinnovo. Il sistema rende visibile dove siamo e cosa manca.</p>
+          <div class="command-flow">
+            <b>BRIEF</b><i>→</i><b>PROPOSTA</b><i>→</i><b>ATTIVAZIONE</b><i>→</i><b>PROOF</b><i>→</i><b>REPORT</b><i>→</i><b>RINNOVO</b>
+          </div>
+        </div>
+        <div class="command-actions">
+          <button data-view="activationstudio"><small>CREA</small><strong>Activation Studio</strong><span>Costruisci un progetto sponsor</span></button>
+          <button data-view="crm"><small>RELAZIONE</small><strong>CRM 360°</strong><span>Persone, aziende, follow-up</span></button>
+          <button data-view="media"><small>VISIBILITÀ</small><strong>Media Hub</strong><span>LED, video, Sponsor Wall</span></button>
+          <button data-view="communityvalue"><small>COMMUNITY</small><strong>Card & Benefit</strong><span>Convenzioni e appartenenza</span></button>
         </div>
       </section>
 
@@ -339,6 +357,26 @@
     <section class="view" id="view-media">
       <div class="page-head"><div><small>MEDIA & VISIBILITÀ</small><h1>LED, Video & Pixellot</h1><p>LEDWall, spot, materiali ufficiali, match content e possibili attivazioni video. Pixellot resta una fonte privata autenticata: nessun contenuto viene pubblicato o commercializzato senza verifica di diritti e autorizzazioni.</p></div></div>
       <div class="media-rule"><strong>Regola media SCD</strong><span>LED = asset commerciale operativo. Pixellot = contenuto protetto da trattare solo nel perimetro autorizzato. Ogni attivazione deve avere prova di consegna e fonte.</span></div>
+      <div class="media-studio-grid">
+        <article class="partner-wall-manager">
+          <header><div><small>SPONSOR WALL</small><h3>Backdrop interviste & contenuti</h3></div><button class="btn-light" id="shufflePartnerWall">Rigenera ordine</button></header>
+          <p>Una parete partner leggibile, ordinata per presenza e non per casualità. Utile per interviste, conferenze, foto e contenuti social.</p>
+          <div class="partner-wall-grid" id="partnerWallGrid"></div>
+        </article>
+        <article class="media-hub-preview">
+          <small>MEDIA HUB</small>
+          <h3>Dal match al proof sponsor</h3>
+          <div class="media-hub-stage">
+            <div class="media-play">▶</div>
+            <div><b>Pixellot / Match Content</b><span>uso subordinato a diritti e autorizzazioni</span></div>
+          </div>
+          <div class="media-hub-list">
+            <span>Intervista post gara <em>Sponsor Wall</em></span>
+            <span>Clip partner <em>LED / Social</em></span>
+            <span>Best moments <em>Proof</em></span>
+          </div>
+        </article>
+      </div>
       <div class="led-grid" id="ledGrid"></div>
     </section>
 
@@ -357,6 +395,57 @@
       <div class="asset-grid" id="assetGrid"></div>
     </section>
 
+
+    <section class="view" id="view-activationstudio">
+      <div class="page-head"><div><small>SPONSOR ACTIVATION DESIGN</small><h1>Activation Studio</h1><p>Progetta una proposta coerente prima di portarla nel CRM: obiettivo, asset, pubblico, canale e contesto territoriale. Nessun prezzo o disponibilità viene inventato.</p></div><button class="btn-yellow" data-view="crm">Apri CRM</button></div>
+
+      <div class="activation-layout">
+        <article class="activation-builder">
+          <div class="activation-builder-head">
+            <div><small>PROJECT BUILDER</small><h3>Costruisci l’attivazione</h3></div>
+            <span class="activation-status" id="activationStatus">Bozza locale</span>
+          </div>
+          <div class="activation-fields">
+            <label>Partner / prospect<select id="activationSponsor"></select></label>
+            <label>Obiettivo<select id="activationGoal"><option>Visibilità territoriale</option><option>Lead e contatti</option><option>Community e famiglie</option><option>Brand awareness</option><option>Evento / hospitality</option><option>Rinnovo e upgrade</option></select></label>
+            <label>Asset<select id="activationAsset"><option>LEDWall Matchday</option><option>Sponsor Wall / Interviste</option><option>Divisa sublimatica</option><option>Torneo brandizzato</option><option>Gazebo / Partner Corner</option><option>Struttura brandizzata</option><option>Pixellot / Match Content</option><option>Supporter Card / Convenzione</option><option>Web App Partner Hub</option></select></label>
+            <label>Pubblico<select id="activationAudience"><option>Famiglie e tesserati</option><option>Tifosi e pubblico gara</option><option>Aziende e stakeholder</option><option>Settore giovanile</option><option>Territorio / turismo</option><option>Community digitale</option></select></label>
+            <label>Canale<select id="activationChannel"><option>Centro Sportivo</option><option>Web App SCD</option><option>Social</option><option>Evento / torneo</option><option>Video / Media Hub</option><option>Multicanale</option></select></label>
+            <label>Territorio<select id="activationTerritory"><option>Colico</option><option>Alto Lario</option><option>Lago di Como</option><option>Rete territoriale ampliata</option></select></label>
+          </div>
+          <div class="activation-actions">
+            <button class="btn-light" id="activationReset" type="button">Reset</button>
+            <button class="btn-yellow" id="activationSave" type="button">Salva scenario locale</button>
+          </div>
+          <p class="activation-saved" id="activationSaved">Nessuno scenario salvato in questa sessione.</p>
+        </article>
+
+        <article class="activation-preview">
+          <div class="activation-preview-top">
+            <span>SCD COLICODERVIESE · PARTNER PROJECT</span>
+            <img src="../assets/logo-scd.png" alt="">
+          </div>
+          <div class="activation-visual" id="activationVisual">
+            <small id="activationPreviewKicker">LEDWALL MATCHDAY</small>
+            <h3 id="activationPreviewTitle">Il tuo brand entra nella partita.</h3>
+            <p id="activationPreviewText">Una presenza dinamica costruita per campo, tribuna e contenuti.</p>
+            <div class="activation-chip-row" id="activationPreviewChips"></div>
+          </div>
+          <div class="activation-proof">
+            <div><small>STANDARD</small><b>Brief → Asset → Proof</b></div>
+            <div><small>TERRITORIO</small><b id="activationPreviewTerritory">Colico</b></div>
+          </div>
+        </article>
+      </div>
+
+      <div class="activation-quality-grid">
+        <article><span>01</span><h3>Coerenza</h3><p>Il progetto deve avere senso per settore, pubblico e obiettivo.</p></article>
+        <article><span>02</span><h3>Disponibilità</h3><p>L’asset deve essere reale, disponibile e libero da incompatibilità.</p></article>
+        <article><span>03</span><h3>Produzione</h3><p>Creatività leggibile, formati corretti e responsabilità definite.</p></article>
+        <article><span>04</span><h3>Proof</h3><p>Foto, clip o report devono dimostrare ciò che è stato erogato.</p></article>
+        <article><span>05</span><h3>Rinnovo</h3><p>Il valore prodotto diventa la base del prossimo incontro.</p></article>
+      </div>
+    </section>
 
     <section class="view" id="view-catalogo">
       <div class="page-head"><div><small>OFFERTA COMMERCIALE SCD</small><h1>Catalogo sponsorizzazioni</h1><p>Una mappa unica di ciò che possiamo valorizzare oggi e di ciò che stiamo progettando. Disponibilità, esclusività e prezzi restano sempre soggetti a verifica prima di una proposta.</p></div><button class="btn-yellow" data-view="crm">Apri CRM</button></div>
@@ -380,10 +469,15 @@
     <section class="view" id="view-communityvalue">
       <div class="page-head"><div><small>COMMUNITY VALUE ENGINE</small><h1>Card, merchandising & convenzioni</h1><p>Strumenti per trasformare il rapporto con tifosi, tesserati, famiglie e partner in utilità concreta e misurabile.</p></div></div>
       <div class="community-value-grid">
-        <article><span>CARD</span><h3>Carta Tesserato</h3><p>Identità di servizio, benefit, convenzioni e accesso alle funzioni coerenti con il profilo.</p><b>Non sostituisce il tesseramento FIGC</b></article>
-        <article><span>CARD</span><h3>Carta Tifoso / Sostenitore</h3><p>Community, vantaggi, eventi, merchandising e possibili formule di sostegno.</p><b>Membership da modellare</b></article>
+        <article><span>CARD</span><h3>SCD Tesserato Card</h3><p>Identità di servizio, benefit, convenzioni e accesso alle funzioni coerenti con il profilo.</p><b>“Dentro la squadra. Dentro i vantaggi.”</b></article>
+        <article><span>CARD</span><h3>SCD Supporter Card</h3><p>Community, vantaggi, eventi, merchandising e possibili formule di sostegno.</p><b>“La passione che ti porta più vicino.”</b></article>
         <article><span>SHOP</span><h3>Merchandising SCD</h3><p>Felpe, maglie tifoso, cappellini, gadget e capsule evento/partner da sviluppare con controllo economico.</p><b>Catalogo prodotti da costruire</b></article>
         <article><span>BENEFIT</span><h3>Convenzioni</h3><p>Partner territoriali, condizioni chiare, stato reale e misurazione dell'utilizzo quando possibile.</p><b>Pubbliche solo dopo formalizzazione</b></article>
+      </div>
+      <div class="wallet-showcase">
+        <article class="wallet-card supporter"><small>SCD SUPPORTER</small><strong>COLICODERVIESE</strong><span>COMMUNITY CARD</span><em>Più vicini al club. Più valore sul territorio.</em></article>
+        <article class="wallet-card tesserato"><small>SCD TESSERATO</small><strong>COLICODERVIESE</strong><span>PLAYER & STAFF CARD</span><em>Identità, servizi, benefit.</em></article>
+        <div class="wallet-benefits"><small>SCD BENEFIT NETWORK</small><h3>Il territorio dentro la Card</h3><div><span>Food</span><span>Sport</span><span>Salute</span><span>Turismo</span><span>Mobilità</span><span>Servizi</span></div></div>
       </div>
       <div class="app-map-panel">
         <div><small>MAPPA WEB APP</small><h3>Pubblico → Community → Partner → Area riservata</h3><p>La stessa piattaforma accompagna l'utente dalle informazioni sportive ai benefit e, per chi è autorizzato, alle funzioni operative.</p></div>
@@ -451,6 +545,6 @@
   </div>
 </div>
 
-<script src="./app.js?v=11.0.0"></script>
+<script src="./app.js?v=12.0.0"></script>
 </body>
 </html>
