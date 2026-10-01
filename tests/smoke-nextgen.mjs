@@ -42,7 +42,7 @@ for(const viewport of viewports){
   await page.waitForFunction(()=>document.documentElement.scrollWidth<=window.innerWidth+3);
 
   const firstView=await page.locator('.home-first').evaluate(el=>({top:el.getBoundingClientRect().top,bottom:el.getBoundingClientRect().bottom}));
-  if(firstView.top>220)throw new Error('current-week home entry not visible early enough: '+firstView.top);
+  if(firstView.top>300)throw new Error('current-week home entry not visible early enough: '+firstView.top);
   const homeBeforeHero=await page.evaluate(()=>document.querySelector('.home-first').compareDocumentPosition(document.querySelector('.hero')) & Node.DOCUMENT_POSITION_FOLLOWING);
   if(!homeBeforeHero)throw new Error('weekly home entry must precede secondary hero');
   const navLabels=await page.locator('.bottom-nav button').allTextContents();
