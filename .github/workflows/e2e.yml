@@ -29,6 +29,8 @@ jobs:
         run: npm run test:human-os-contract
       - name: Weekly sport & AI newsroom contract gate
         run: npm run test:newsroom-contract
+      - name: NextGen synthetic contract gate
+        run: npm run test:nextgen-contract
       - name: Syntax check
         run: |
           node --check app.js
@@ -41,6 +43,9 @@ jobs:
           node --check scripts/validate-universe-contract.mjs
           node --check scripts/validate-human-os-contract.mjs
           node --check scripts/validate-newsroom-contract.mjs
+          node --check scripts/validate-nextgen-contract.mjs
+          node --check scd-ng.js
+          node --check scd-interactions.js
           node --check scd-experience-engine.js
           node --check scd-meta-engine.js
           node --check scd-twin.js
