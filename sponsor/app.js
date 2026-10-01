@@ -59,8 +59,8 @@ const proposals=[
 {name:'Caffè Teti',area:'Coffee Partner / Club House',status:'Positivo',next:'Sopralluogo + proposta finale',value:'Fornitura / valore da definire'},
 {name:'VIP Immagine',area:'Cartellonistica / sponsor board',status:'Positivo',next:'Telefonare + mappa spazi',value:'Da definire'},
 {name:"McDonald's territoriale",area:'Convenzione tesserati',status:'Da formalizzare',next:'Formalizzare convenzione 10%',value:'Benefit community'},
-{name:'La Roncaiola',area:'Lavanderia tecnica',status:'Interessata',next:'Definire volumi e frequenza',value:'Da definire'},
-{name:'Bonazzi Grafica',area:'Grafica / stampa',status:'Interessata',next:'Fabbisogno annuo + barter',value:'Barter / fornitura'},
+{name:'La Roncaiola',area:'Lavanderia tecnica',status:'SOSPESA · NON INVIARE',next:'Attendere riattivazione Direzione',value:'Da definire'},
+{name:'Bonazzi Grafica',area:'Grafica / stampa',status:'SOSPESA · NON INVIARE',next:'Attendere riattivazione Direzione',value:'Barter / fornitura'},
 {name:'Therabody',area:'Recovery Partner',status:'Instradato B2B',next:'Compilare form partnership',value:'Da definire'}
 ];
 
@@ -90,7 +90,14 @@ const commercialInitiatives=[
 {name:"ColicoDerviese Card · Partner",type:"CARD / B2B",status:"DA MODELLARE",target:"Sponsor, partner, aziende",goal:"Hospitality, network e benefit B2B",next:"Definire livelli partner e collegamento dossier sponsor"},
 {name:"Tessera Tifoso / Community",type:"MEMBERSHIP",status:"IDEA DA STRUTTURARE",target:"Tifosi e territorio",goal:"Trasformare pubblico occasionale in community misurabile",next:"Evitare duplicazione con Card Sostenitore"},
 {name:"Spot LED Sponsor 40 secondi",type:"MEDIA / SPONSOR",status:"IN PRODUZIONE",target:"Sponsor attuali e futuri",goal:"Spot dedicato, leggibile, un solo sponsor protagonista",next:"Creare master, sottoporre idea e produrre MP4 dopo approvazione"},
-{name:"Torneo nazionale 2019 · 09/05/2027",type:"EVENTO / SPONSOR",status:"DA CONFERMARE",target:"Squadre, famiglie, aziende, territorio",goal:"Sport, musica, degustazioni e asset commerciali",next:"Definire format, capacità, pacchetti e rete ricettiva"}
+{name:"Torneo nazionale 2019 · 09/05/2027",type:"EVENTO / SPONSOR",status:"DA CONFERMARE",target:"Squadre, famiglie, aziende, territorio",goal:"Sport, musica, degustazioni e asset commerciali",next:"Definire format, capacità, pacchetti e rete ricettiva"},
+{name:"Video Partner / Match Content",type:"MEDIA / VIDEO",status:"IDEA DA STRUTTURARE",target:"Sponsor e partner media",goal:"Valorizzare partite, highlight e clip SCD nel rispetto dei diritti Pixellot",next:"Definire diritti, formati, inventory e proof di delivery"},
+{name:"Merchandising SCD",type:"MERCHANDISING / COMMUNITY",status:"IDEA DA STRUTTURARE",target:"Tifosi, famiglie, tesserati",goal:"Prodotti ufficiali, gadget e capsule partner",next:"Definire gamma, costi, margini, produzione e canale vendita"},
+{name:"Gazebo & Partner Corner",type:"EVENTO / ATTIVAZIONE",status:"IDEA DA VALIDARE",target:"Sponsor, fornitori, convenzioni",goal:"Presenza fisica utile durante tornei, open day e giornate community",next:"Definire spazi, sicurezza, servizi e regole evento"},
+{name:"Strutture brandizzate",type:"IMPIANTO / SPONSOR",status:"IDEA DA STUDIARE",target:"Sponsor pluriennali / territoriali",goal:"Associare partner a spazi reali con presenza continuativa",next:"Censire aree, misure, esclusività, durata e proof fotografico"},
+{name:"Mascotte Partner",type:"FAMILY / ATTIVAZIONE",status:"IDEA DA VALIDARE",target:"Brand family-friendly",goal:"Divisa mascotte, pre-gara, foto, eventi e contenuti community",next:"Definire inventory, frequenza e regole di utilizzo"},
+{name:"Sublimated Kit Partner",type:"KIT / SPONSOR",status:"IDEA DA STUDIARE",target:"Sponsor territoriali / tecnici",goal:"Posizioni integrate su divise sublimatiche e pacchetti multi-canale",next:"Censire posizioni libere e compatibilità tecnica/regolamentare"},
+{name:"Partner Hub Web App SCD",type:"DIGITALE / B2B",status:"IN SVILUPPO",target:"Sponsor, convenzioni e partner",goal:"Schede partner, progetti, benefit, contenuti e proof di delivery",next:"Collegare catalogo pubblico, CRM e stato erogazione"}
 ];
 
 const audience=[
@@ -115,7 +122,17 @@ const assets=[
 ['LED bordo campo','Media','Disponibile','Da definire'],
 ['Divise settore giovanile','Kit tecnico','Parziale','€1.500'],
 ['Sport Tourism Network','Turismo','In sviluppo','Da definire'],
-['Performance & Recovery Center','Performance','Da studiare','Da definire']
+['Performance & Recovery Center','Performance','Da studiare','Da definire'],
+['Divise sublimatiche','Kit / visibilità','Da censire per posizioni','Da definire'],
+['Striscioni & cartellonistica','Impianto','Da censire','Da definire'],
+['Gazebo / Partner Corner','Evento','In sviluppo','Da definire'],
+['Strutture brandizzate','Impianto','In sviluppo','Da definire'],
+['Mascotte Partner','Family / attivazione','In sviluppo','Da definire'],
+['Pixellot & Match Content','Media / video','Da strutturare','Da definire'],
+['Merchandising SCD','Community / retail','Da strutturare','Da definire'],
+['Carta Tifoso / Sostenitore','Membership','Da modellare','Da definire'],
+['Carta Tesserato','Community / servizi','Da modellare','Da definire'],
+['Partner Hub Web App','Digitale','In sviluppo','Da definire']
 ];
 
 const led=[
