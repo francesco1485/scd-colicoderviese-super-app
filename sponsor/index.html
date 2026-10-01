@@ -104,7 +104,61 @@
         <article><span class="kpi-icon green" data-icon="screen"></span><div><strong>19</strong><small>Sponsor LED</small></div><em>3 da approvare</em></article>
       </section>
 
-      <section class="intelligence-layer">
+      <section class="home-pulse-grid">
+        <article class="pulse-card availability-card">
+          <header><div><span class="pulse-icon">⌕</span><div><small>DISPONIBILITÀ & RICERCA</small><h3>Cosa è disponibile adesso</h3></div></div><span class="pulse-live">LIVE DATI</span></header>
+          <div class="availability-search"><input id="availabilitySearch" placeholder="Cerca LED, torneo, Club House, divise, hospitality…"></div>
+          <div id="availabilityResults" class="availability-results"></div>
+        </article>
+
+        <article class="pulse-card events-card">
+          <header><div><span class="pulse-icon">◫</span><div><small>AGENDA</small><h3>Prossimi eventi</h3></div></div><button data-view="eventi">Calendario →</button></header>
+          <div id="homeEvents" class="home-events"></div>
+        </article>
+
+        <article class="pulse-card news-card">
+          <header><div><span class="pulse-icon">◉</span><div><small>SETTIMANA SCD</small><h3>News verificate</h3></div></div><span class="source-chip">fonti ufficiali</span></header>
+          <div id="weeklyNews" class="weekly-news"></div>
+        </article>
+
+        <article class="pulse-card stats-card">
+          <header><div><span class="pulse-icon">↗</span><div><small>SPORT DATA</small><h3>Classifica & statistiche</h3></div></div><select id="statsSelector"><option value="prima2526">Prima Squadra 2025/26</option><option value="u16">U16 2025/26</option><option value="u18">U18 2026/27</option></select></header>
+          <div id="statsSnapshot" class="stats-snapshot"></div>
+        </article>
+      </section>
+
+      <section class="community-control-grid">
+        <article class="community-card poll-card">
+          <header><div><small>SONDAGGIO</small><h3>Priorità community</h3></div><span class="local-live">LIVE LOCALE</span></header>
+          <p>Quale area sponsor va sviluppata per prima?</p>
+          <div id="livePoll" class="live-poll"></div>
+          <small class="poll-note">Voto salvato sul dispositivo. Sincronizzazione multiutente da collegare.</small>
+        </article>
+
+        <article class="community-card people-card">
+          <header><div><small>PERSONE</small><h3>Tag rapidi</h3></div><span class="source-chip">operativo</span></header>
+          <p>Tagga il ruolo a cui assegnare o segnalare un elemento.</p>
+          <div id="peopleTags" class="people-tags"></div>
+          <div id="tagState" class="tag-state">Nessun tag selezionato</div>
+        </article>
+
+        <article class="community-card promo-card">
+          <header><div><small>PROMO GATE</small><h3>Barra promozionale</h3></div><span class="approval-chip">DA AUTORIZZARE</span></header>
+          <div id="promoGate" class="promo-gate"></div>
+        </article>
+      </section>
+
+      <section class="sponsor-marquee-wrap">
+        <div class="sponsor-marquee-head"><div><small>SPONSOR / PARTNER</small><h3>Relazioni in evidenza</h3></div><span>solo denominazioni verificate · loghi ufficiali da collegare</span></div>
+        <div class="sponsor-marquee"><div id="sponsorMarqueeTrack" class="sponsor-marquee-track"></div></div>
+      </section>
+
+      <section class="advanced-toggle-row">
+        <div><small>INTELLIGENCE AVANZATA</small><h3>Approfondisci solo quando serve</h3></div>
+        <button id="toggleAdvanced">Mostra analisi avanzata ↓</button>
+      </section>
+
+      <section class="intelligence-layer is-collapsed" id="advancedIntelligence">
         <article class="intelligence-card relationship-intel">
           <header><div><span class="intelligence-mark">✦</span><div><small>SCD INTELLIGENCE CORE</small><h3>Mappa relazioni e solidità dati</h3></div></div><button data-lia="Analizza il portafoglio sponsor">Analizza →</button></header>
           <div class="relationship-map" id="relationshipMap"></div>
