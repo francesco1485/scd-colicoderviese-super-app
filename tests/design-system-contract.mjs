@@ -10,6 +10,7 @@ const app=fs.readFileSync(new URL('../sponsor/app.html',import.meta.url),'utf8')
 const pages=fs.readFileSync(new URL('../scripts/build-pages.mjs',import.meta.url),'utf8');
 const doc=fs.readFileSync(new URL('../docs/design/SCD-VISUAL-AND-MOTION-SYSTEM.md',import.meta.url),'utf8');
 const motion=JSON.parse(fs.readFileSync(new URL('../config/sponsor-motion-profiles.json',import.meta.url),'utf8'));
+const scenes=JSON.parse(fs.readFileSync(new URL('../config/scd-creative-scenes.json',import.meta.url),'utf8'));
 const server=fs.readFileSync(new URL('../server.js',import.meta.url),'utf8');
 const appJs=fs.readFileSync(new URL('../sponsor/app.js',import.meta.url),'utf8');
 
@@ -77,6 +78,24 @@ assert(appJs.includes('loadMotionProfiles'),'Motion Lab loader missing');
 assert(appJs.includes('fetchMotionConfig'),'shared protected motion loader missing');
 assert(!appJs.includes("fetch('/config/sponsor-motion-profiles.json'"),'motion config must not bypass protected endpoint');
 assert(appJs.includes('renderMotionInspector'),'Motion Lab inspector renderer missing');
+
+assert(scenes.id==='SCD_CREATIVE_SCENE_LIBRARY','creative scene library id missing');
+assert(scenes.rule==='VISIONARY_BUT_GROUNDED','grounded visionary rule missing');
+assert(Array.isArray(scenes.scenes)&&scenes.scenes.length>=6,'creative scene library too small');
+for(const scene of scenes.scenes){
+  assert(Boolean(scene.realityAnchor),'scene reality anchor missing: '+scene.id);
+  assert(Boolean(scene.fantasyAllowance),'scene fantasy allowance missing: '+scene.id);
+  assert(Array.isArray(scene.forbidden)&&scene.forbidden.length>=1,'scene forbidden rules missing: '+scene.id);
+  assert(Boolean(scene.visualDirection),'scene visual direction missing: '+scene.id);
+}
+const lakeScene=scenes.scenes.find(x=>x.id==='SCENE-TRIBUNA-LAKE-CONCEPT');
+assert(Boolean(lakeScene),'tribune/lake concept scene missing');
+assert(lakeScene.forbidden.join(' ').toLowerCase().includes('fotografia documentaria'),'tribune/lake documentary safeguard missing');
+assert(server.includes("'/api/sponsor/creative-scenes'"),'protected creative scene endpoint missing');
+assert(app.includes('id="activationScene"'),'Creative Factory scene selector missing');
+assert(app.includes('id="activationSceneGuide"'),'Creative Factory scene guide missing');
+assert(appJs.includes('fetchCreativeScenes'),'creative scene loader missing');
+assert(appJs.includes('renderActivationSceneGuide'),'creative scene guide renderer missing');
 
 console.log('SCD design system contract PASS',{
   schema:visual.schemaVersion,
