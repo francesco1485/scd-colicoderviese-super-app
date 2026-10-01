@@ -36,6 +36,7 @@ for(const viewport of viewports){
   await page.waitForSelector('#view-pulse.active');
   await page.waitForSelector('.home-first');
   await page.waitForSelector('#publicSearchInput');
+  await page.waitForSelector('#sportHub');
   await page.waitForSelector('#matchCenter');
   await page.waitForSelector('#upcomingEvents');
   await page.waitForSelector('#mediaHub');
@@ -61,6 +62,14 @@ for(const viewport of viewports){
   if(firstView.top>300)throw new Error('current-week home entry not visible early enough: '+firstView.top);
   const homeBeforeHero=await page.evaluate(()=>document.querySelector('.home-first').compareDocumentPosition(document.querySelector('.hero')) & Node.DOCUMENT_POSITION_FOLLOWING);
   if(!homeBeforeHero)throw new Error('weekly home entry must precede secondary hero');
+  const palette=await page.evaluate(()=>({
+    bg:getComputedStyle(document.documentElement).getPropertyValue('--bg').trim(),
+    blue:getComputedStyle(document.documentElement).getPropertyValue('--blue').trim(),
+    gold:getComputedStyle(document.documentElement).getPropertyValue('--gold').trim()
+  }));
+  if(palette.bg!=='#eef5fb'||palette.blue!=='#0059d6'||palette.gold!=='#f5c400')throw new Error('premium sports palette not applied '+JSON.stringify(palette));
+  const sportHubButtons=await page.locator('#sportHub button').count();
+  if(sportHubButtons!==6)throw new Error('Sport Hub actions mismatch: '+sportHubButtons);
   const officialLinks=await page.locator('#mediaHub .official-channels a').count();
   if(officialLinks!==5)throw new Error('Media Hub official links mismatch: '+officialLinks);
   const institutionalLogos=await page.locator('#institutionalStrip img').count();
@@ -102,6 +111,7 @@ for(const viewport of viewports){
   await page.evaluate(()=>window.SCDNextGen.setView('teams'));
   await page.waitForSelector('#view-teams.active');
   await page.waitForSelector('#publicTeamsGrid');
+  await page.waitForSelector('#followTeamSelect');
   if(await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+3))throw new Error('teams view horizontal overflow');
   if((await page.locator('#calendarPeriod [data-period]').count())!==3)throw new Error('calendar period controls missing');
   if((await page.locator('#calendarTypeFilter option').count())<5)throw new Error('calendar type filters missing');
