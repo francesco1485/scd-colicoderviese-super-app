@@ -268,3 +268,30 @@ $('#promoReviewBtn').onclick=()=>{localStorage.setItem('scd_promo_review','revie
 
 renderKpis();renderSponsorStrip();homeContracts();homeProposals();renderAvailability();renderHomeEvents();renderPipeline();renderNews();renderStats();renderPoll();renderTags();
 renderSponsorViews();renderContracts();renderProposalGrid();renderFolders();renderLed();renderEvents();renderReport();renderAssets();renderScenario();renderSettings();
+
+function activateKeyboardCards(){
+  document.addEventListener('keydown',e=>{
+    const card=e.target.closest('.macro-card[role="button"],.sponsor-card[role="button"]');
+    if(!card || !['Enter',' '].includes(e.key))return;
+    e.preventDefault();
+    if(card.matches('.macro-card')) openView(card.dataset.view);
+    if(card.matches('.sponsor-card')) openSponsor(card.dataset.sponsorName);
+  });
+}
+activateKeyboardCards();
+
+let lastModalFocus=null;
+function openSponsorModalAccessible(){
+  lastModalFocus=document.activeElement;
+  modal.hidden=false;
+  requestAnimationFrame(()=>$('#newSponsorForm input[name="name"]')?.focus());
+}
+$('#homeNewSponsor').onclick=openSponsorModalAccessible;
+$('#newSponsorBtn').onclick=openSponsorModalAccessible;
+function closeSponsorModalAccessible(){
+  modal.hidden=true;
+  if(lastModalFocus&&typeof lastModalFocus.focus==='function')lastModalFocus.focus();
+}
+$('#closeNewSponsor').onclick=closeSponsorModalAccessible;
+$('#cancelNewSponsor').onclick=closeSponsorModalAccessible;
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.hidden)closeSponsorModalAccessible()});
