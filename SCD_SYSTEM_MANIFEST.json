@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.3.0",
+    "version": "3.4.0",
     "effective_at": "2026-10-01",
     "status": "BINDING",
     "language": "it-IT",
@@ -1689,15 +1689,19 @@
       "stale_site_news": "DISABLED"
     },
     "nextgen_preview": {
-      "state": "PREVIEW_NOT_PRODUCTION_PRIMARY",
-      "branch": "scd-web-restart-v1",
+      "state": "PRODUCTION_PRIMARY",
+      "branch": "main",
       "canonical_preview_url": "https://scd-universe.onrender.com",
       "runtime": "RENDER_NODE_WEB_SERVICE",
       "frontend_api_topology": "SAME_ORIGIN",
       "primary_data_core": "R20",
       "supabase_mode": "DARK_DUAL_RUN",
       "visual_mode": "SYNTHETIC_NO_REAL_PHOTOGRAPHY",
-      "rollback": "KEEP_MAIN_R40_AND_OFFICIAL_RENDER_UNCHANGED"
+      "rollback": "REVERT_MAIN_TO_PRE_NEXTGEN_RELEASE_OR_REDEPLOY_PREVIOUS_RENDER_REVISION",
+      "canonical_public_url": "https://scd-universe.onrender.com",
+      "official_render_url": "https://scd-colicoderviese-official-r21.onrender.com",
+      "production_main_sha": "8c86ad7ad015504a38ec5946e9c4886779ede020",
+      "promoted_at": "2026-10-01"
     }
   },
   "delivery_and_quality": {
@@ -1762,7 +1766,20 @@
         "DATA_SOURCES",
         "KNOWN_LIMITATIONS",
         "ROLLBACK"
-      ]
+      ],
+      "current_web_release": {
+        "name": "SCD UNIVERSE NOVA",
+        "release": "NG-0.4.5",
+        "runtime_version": "40.0.0",
+        "manifest_version": "3.4.0",
+        "main_sha": "8c86ad7ad015504a38ec5946e9c4886779ede020",
+        "github_pages": "VERIFIED_GREEN",
+        "render_official": "VERIFIED_LIVE",
+        "production_evidence": "VERIFIED_GREEN",
+        "e2e": "VERIFIED_GREEN",
+        "primary_data_core": "R20",
+        "supabase": "DARK_DUAL_RUN_ACTIVE_HEALTHY"
+      }
     },
     "production_evidence": {
       "required": true,
@@ -2169,7 +2186,7 @@
       "id": "CAP-NEXTGEN-SYNTHETIC-UI",
       "domain": "EXPERIENCE",
       "required": true,
-      "state": "PARTIAL",
+      "state": "IMPLEMENTED",
       "sources": [
         "SOURCE-NONE"
       ],
@@ -2179,7 +2196,7 @@
       "id": "CAP-LOCAL-TTS",
       "domain": "ACCESSIBILITY",
       "required": true,
-      "state": "PARTIAL",
+      "state": "IMPLEMENTED",
       "sources": [
         "SOURCE-NONE"
       ],
@@ -2242,13 +2259,6 @@
       "statement": "Supabase SCD PULSE è attivo, R35 Auth Context è applicato e R36 aggiunge la prima vertical slice mobile Expo; restano da completare signup reale, dual-read R20→Supabase, test device Android/iOS, Web slice e rollback.",
       "required_fix": "Eseguire signup controllato USER_BASE, test Auth/RLS/role-scope, dual-read R20→Supabase, test mobile su device/emulatore, Web slice e rollback prima del cutover.",
       "safe_runtime_behavior": "R20 resta primary; SCD_SUPABASE resta dark e non viene dichiarato LIVE."
-    },
-    {
-      "id": "GAP-NOVA-001",
-      "severity": "HIGH",
-      "statement": "SCD Universe Nova è una preview NextGen separata dalla produzione R40 e non può essere promossa finché CI, browser QA mobile/desktop, API/newsroom proof e rollback non sono verdi.",
-      "required_fix": "Aprire PR verso main, eseguire validator NextGen, E2E, visual QA 360/390/430 e 1280/1440/1920, verificare /health e /api/newsroom, poi decidere promozione.",
-      "safe_runtime_behavior": "Main R40 e servizio ufficiale restano invariati."
     }
   ],
   "development_contract": {
@@ -2592,7 +2602,7 @@
     "nextgen_preview": {
       "release": "NG-0.4.5",
       "name": "SCD UNIVERSE NOVA",
-      "status": "PREVIEW",
+      "status": "LIVE",
       "entry": "#/pulse",
       "visual": "SYNTHETIC_SPATIAL_LOW_FATIGUE",
       "product_patterns": [
