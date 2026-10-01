@@ -51,3 +51,65 @@ body.compact .section{padding-top:34px;padding-bottom:34px}body.compact .hero{mi
  .twin-copy h2{font-size:42px}.h1{width:300px;height:300px}.h2{width:380px;height:380px}.service-dock{grid-template-columns:1fr 1fr}.service-dock button{min-height:120px}
 }
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+/* NG-0.3 VALUE ENGINE */
+.ng-command-ring{margin:12px 28px 0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.ng-command-ring button{min-height:86px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.025));color:white;padding:14px;text-align:left;transition:.22s transform,.22s border-color,.22s background}
+.ng-command-ring button:hover{transform:translateY(-3px);border-color:rgba(41,215,255,.36);background:linear-gradient(180deg,rgba(10,101,255,.18),rgba(255,255,255,.03))}
+.ng-command-ring span{display:block;color:var(--cyan);font-size:18px;margin-bottom:10px}
+.ng-command-ring b{display:block;font-size:12px}.ng-command-ring small{display:block;margin-top:4px;color:var(--muted);font-size:9px;line-height:1.35}
+
+.ng-constellation{margin:8px 28px 0;border:1px solid var(--line);border-radius:30px;background:
+radial-gradient(circle at 72% 40%,rgba(41,215,255,.12),transparent 28%),
+radial-gradient(circle at 64% 58%,rgba(255,211,61,.08),transparent 33%),
+linear-gradient(135deg,rgba(255,255,255,.04),rgba(255,255,255,.018));
+display:grid;grid-template-columns:.8fr 1.2fr;min-height:430px;overflow:hidden}
+.ng-constellation-copy{padding:48px}.ng-constellation-copy h2{font-size:48px;line-height:1;letter-spacing:-.045em;margin:8px 0 14px}
+.ng-constellation-copy p{color:var(--muted);line-height:1.65;max-width:540px}.ng-constellation-copy .mini-proof{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px}
+.ng-constellation-copy .mini-proof span{border:1px solid var(--line);border-radius:999px;padding:8px 10px;font-size:9px;color:#c8d8eb}
+.ng-orbit{position:relative;min-height:430px;isolation:isolate}
+.ng-orbit:before,.ng-orbit:after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:50%;border:1px solid rgba(41,215,255,.18);pointer-events:none}
+.ng-orbit:before{width:360px;height:360px}.ng-orbit:after{width:240px;height:240px;border-color:rgba(255,211,61,.18)}
+.ng-core{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:112px;height:112px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 40% 30%,#174a92,#071b36 70%);border:1px solid rgba(255,255,255,.18);box-shadow:0 0 60px rgba(10,101,255,.25)}
+.ng-core img{width:70px;height:80px;object-fit:contain}
+.ng-node{position:absolute;border:1px solid rgba(41,215,255,.24);background:rgba(5,25,50,.86);backdrop-filter:blur(14px);color:white;border-radius:16px;padding:11px 13px;min-width:112px;text-align:left;box-shadow:0 12px 30px rgba(0,0,0,.2);transition:.25s transform,.25s border-color}
+.ng-node:hover{transform:scale(1.04);border-color:rgba(255,211,61,.45)}
+.ng-node b{display:block;font-size:11px}.ng-node small{display:block;color:var(--muted);font-size:9px;margin-top:3px}
+.ng-node.n-a{left:10%;top:16%}.ng-node.n-b{right:8%;top:13%}.ng-node.n-c{right:4%;bottom:18%}.ng-node.n-d{left:7%;bottom:16%}.ng-node.n-e{left:44%;top:4%}.ng-node.n-f{left:42%;bottom:4%}
+
+.ng-value-engine{margin:56px 28px 0;border-radius:32px;border:1px solid rgba(255,211,61,.17);overflow:hidden;background:
+linear-gradient(110deg,rgba(255,211,61,.08),transparent 28%),
+radial-gradient(circle at 84% 0%,rgba(41,215,255,.12),transparent 31%),
+#06172f}
+.ng-value-head{padding:48px 48px 20px;display:flex;justify-content:space-between;gap:28px;align-items:end}
+.ng-value-head h2{font-size:50px;line-height:1;letter-spacing:-.05em;margin:8px 0}.ng-value-head p{color:var(--muted);max-width:690px;line-height:1.6}
+.ng-value-badge{border:1px solid rgba(255,211,61,.36);color:var(--gold);border-radius:999px;padding:10px 12px;font-size:9px;font-weight:900;letter-spacing:.1em;white-space:nowrap}
+.ng-value-grid{padding:18px 48px 48px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.ng-value-card{position:relative;min-height:230px;padding:24px;border-radius:22px;border:1px solid var(--line);background:rgba(255,255,255,.035);overflow:hidden}
+.ng-value-card:before{content:"";position:absolute;right:-30px;top:-30px;width:110px;height:110px;border-radius:50%;background:radial-gradient(circle,rgba(41,215,255,.18),transparent 68%)}
+.ng-value-card small{color:var(--cyan);font-size:9px;font-weight:900;letter-spacing:.12em}.ng-value-card h3{font-size:26px;margin:10px 0}.ng-value-card p{color:var(--muted);font-size:12px;line-height:1.55;min-height:58px}
+.ng-value-card .metric{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0}.ng-value-card .metric span{font-size:8px;border:1px solid var(--line);border-radius:999px;padding:6px 8px;color:#c7d7ea}
+.ng-value-card button,.ng-value-card a{display:inline-flex;border:0;border-radius:11px;padding:10px 12px;background:var(--gold);color:#101722;font-size:10px;font-weight:900;text-decoration:none}
+
+.ng-twin-locker{margin:0 28px 110px;border:1px solid var(--line);border-radius:26px;padding:28px;background:rgba(255,255,255,.03)}
+.ng-twin-locker-head{display:flex;justify-content:space-between;align-items:end;gap:16px}.ng-twin-locker h3{font-size:30px;margin:5px 0}.ng-twin-locker p{color:var(--muted);font-size:12px;max-width:620px}
+.ng-locker-rail{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:20px}.ng-locker-item{border:1px solid var(--line);background:rgba(255,255,255,.035);color:white;border-radius:18px;padding:16px;text-align:left;min-height:112px}
+.ng-locker-item.active{border-color:rgba(255,211,61,.55);box-shadow:inset 0 0 0 1px rgba(255,211,61,.2)}.ng-locker-item span{display:block;font-size:24px;margin-bottom:16px}.ng-locker-item b{display:block;font-size:11px}.ng-locker-item small{color:var(--muted);font-size:9px}
+#avatarFigure[data-kit="gold"] .shirt{background:linear-gradient(135deg,#ffcc24,#c98900)}#avatarFigure[data-kit="night"] .shirt{background:linear-gradient(135deg,#06142b,#143e7a)}#avatarFigure[data-kit="lake"] .shirt{background:linear-gradient(135deg,#04a9d8,#0b66ff)}
+
+.mirror-audio{margin:0 12px 8px;border:1px solid var(--line);border-radius:16px;padding:10px;background:rgba(255,255,255,.035)}
+.mirror-audio-top{display:flex;justify-content:space-between;align-items:center;gap:8px}.mirror-audio-top b{font-size:10px}.mirror-audio-top span{font-size:8px;color:var(--cyan)}
+.mirror-audio select{width:100%;margin-top:8px;background:#031126;color:white;border:1px solid var(--line);border-radius:10px;padding:8px;font-size:9px}
+.mirror-audio-profiles{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:7px}.mirror-audio-profiles button{border:1px solid var(--line);border-radius:9px;background:rgba(255,255,255,.04);color:var(--muted);padding:7px;font-size:8px}
+.mirror-audio-profiles button.active{background:var(--blue);color:white;border-color:transparent}.mirror-audio-actions{display:grid;grid-template-columns:1fr auto;gap:6px;margin-top:7px}.mirror-audio-actions button{border:0;border-radius:9px;padding:8px;font-weight:900;font-size:9px}.mirror-audio-actions .play{background:var(--gold);color:#101722}.mirror-audio-actions .stop{background:rgba(255,255,255,.08);color:white}
+
+@media(max-width:900px){
+ .ng-command-ring{margin:10px 12px 0;grid-template-columns:repeat(2,1fr)}.ng-command-ring button:last-child{grid-column:1/-1}
+ .ng-constellation{margin:10px 12px 0;grid-template-columns:1fr}.ng-constellation-copy{padding:34px 24px 8px}.ng-constellation-copy h2{font-size:40px}.ng-orbit{min-height:390px}
+ .ng-value-engine{margin:40px 12px 0}.ng-value-head{padding:34px 24px 10px;display:block}.ng-value-head h2{font-size:40px}.ng-value-badge{display:inline-block;margin-top:12px}.ng-value-grid{padding:14px 24px 30px;grid-template-columns:1fr 1fr}
+ .ng-twin-locker{margin:0 12px 100px}.ng-locker-rail{grid-template-columns:1fr 1fr}
+}
+@media(max-width:560px){
+ .ng-value-grid{grid-template-columns:1fr}.ng-value-card{min-height:200px}.ng-orbit:before{width:300px;height:300px}.ng-orbit:after{width:190px;height:190px}
+ .ng-node{min-width:96px;padding:9px}.ng-node.n-a{left:2%}.ng-node.n-b{right:2%}.ng-node.n-c{right:1%}.ng-node.n-d{left:1%}.ng-node.n-e{left:38%}.ng-node.n-f{left:36%}
+}
