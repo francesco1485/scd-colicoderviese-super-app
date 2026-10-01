@@ -6,8 +6,18 @@ let sponsorAccess={profile:'NON_AUTORIZZATO',platform:false};
 let sponsorSession={user:null,capabilities:{}};
 let partnerHubCurrent='';
 let campaignFilter='TUTTI';
-let motionProfilesState={profiles:[],defaultPreview:null,nativeLedStatus:'DA_RILEVARE_ALLA_CONSEGNA'};
+let motionProfilesState={profiles:[],previewSource:null,nativeLedStatus:'DA_RILEVARE_ALLA_CONSEGNA'};
 let motionProfileCurrent='';
+let motionConfigPromise=null;
+
+function fetchMotionConfig(){
+  if(!motionConfigPromise){
+    motionConfigPromise=fetch('/api/sponsor/motion-profiles',{credentials:'same-origin',cache:'no-store'})
+      .then(async r=>{if(!r.ok)throw new Error('MOTION_PROFILES_HTTP_'+r.status);const d=await r.json();if(!d?.data?.profiles)throw new Error('MOTION_PROFILES_INVALID');return d.data})
+      .catch(e=>{motionConfigPromise=null;throw e});
+  }
+  return motionConfigPromise;
+}
 
 function applySponsorCapabilities(caps={}){
   sponsorAccess={...sponsorAccess,...caps};
@@ -36,7 +46,7 @@ function renderMotionInspector(id){
   const p=motionProfilesState.profiles.find(x=>x.id===id)||motionProfilesState.profiles[0];
   if(!p){box.innerHTML='<small>MOTION PROFILE</small><h3>Nessun profilo disponibile</h3>';return}
   motionProfileCurrent=p.id;
-  const spec=motionProfilesState.defaultPreview||{};
+  const spec=motionProfilesState.previewSource||motionProfilesState.defaultPreview||{};
   box.innerHTML=
     '<small>MOTION PROFILE · '+esc(p.id)+'</small>'+
     '<h3>'+esc(p.partnerName)+'</h3>'+
@@ -54,7 +64,7 @@ function renderMotionInspector(id){
     '<p class="motion-safety-note">Il master LED definitivo resta bloccato finché non sono disponibili logo ufficiale approvato e specifiche native dell’impianto.</p>';
   $('[data-motion-id]').forEach(el=>el.classList.toggle('active',el.dataset.motionId===p.id));
   const go=$('#motionToActivation');if(go)go.onclick=()=>openView('activationstudio');
-  const mediaBtn=box.querySelector('[data-view="media"]');if(mediaBtn)mediaBtn.onclick=()=>openView('media');
+  const mediaBtn=box.querySelector('[data-view="media"]');if(mediaBtn)mediaBtn.onclick=()=>{ledMotionSelected=p.id;openView('media');renderLedProfileList();renderLedProfileDetail();};
 }
 function renderMotionProfiles(){
   const grid=$('#motionProfileGrid'),state=$('#motionSystemState');
@@ -65,7 +75,7 @@ function renderMotionProfiles(){
     '<button class="motion-profile-card '+(i===0?'active':'')+'" data-motion-id="'+esc(p.id)+'" type="button">'+
       '<div class="motion-card-top"><span>'+String(i+1).padStart(2,'0')+'</span><b>'+esc(p.partnerName)+'</b></div>'+
       '<div class="motion-card-preview"><i></i><strong>'+esc(p.message)+'</strong><small>'+esc(motionStatusLabel(p.productionStatus))+'</small></div>'+
-      '<div class="motion-card-foot"><span>'+esc((motionProfilesState.defaultPreview?.durationSeconds||'—')+' sec')+'</span><span>'+esc((motionProfilesState.defaultPreview?.fps||'—')+' fps')+'</span></div>'+
+      '<div class="motion-card-foot"><span>'+esc(((motionProfilesState.previewSource||motionProfilesState.defaultPreview)?.durationSeconds||'—')+' sec')+'</span><span>'+esc(((motionProfilesState.previewSource||motionProfilesState.defaultPreview)?.fps||'—')+' fps')+'</span></div>'+
     '</button>'
   ).join('');
   $('[data-motion-id]').forEach(btn=>btn.onclick=()=>renderMotionInspector(btn.dataset.motionId));
@@ -73,11 +83,13 @@ function renderMotionProfiles(){
 }
 async function loadMotionProfiles(){
   try{
-    const r=await fetch('/api/sponsor/motion-profiles',{credentials:'same-origin',cache:'no-store'});
-    if(!r.ok)throw new Error('MOTION_PROFILES_HTTP_'+r.status);
-    const d=await r.json();
-    motionProfilesState=d.data||motionProfilesState;
+    const data=await fetchMotionConfig();
+    motionProfilesState=data;
+    ledMotionConfig=data;
     renderMotionProfiles();
+    renderLedProductionSpecs();
+    renderLedProfileList();
+    renderLedProfileDetail();
   }catch(e){
     const state=$('#motionSystemState');if(state)state.textContent='Motion Lab non disponibile';
     const grid=$('#motionProfileGrid');if(grid)grid.innerHTML='<div class="motion-load-error">Impossibile caricare i profili motion: '+esc(e.message||e)+'</div>';
@@ -1322,14 +1334,13 @@ function renderLedProfileDetail(){
 async function initLedProductionHub(){
   const mount=$('#ledProfileList');if(!mount)return;
   try{
-    const res=await fetch('/config/sponsor-motion-profiles.json',{cache:'no-store',headers:{accept:'application/json'}});
-    if(!res.ok)throw new Error('HTTP '+res.status);
-    const data=await res.json();
-    if(!data||!Array.isArray(data.profiles))throw new Error('Formato profili motion non valido');
+    const data=await fetchMotionConfig();
     ledMotionConfig=data;
+    motionProfilesState=data;
     renderLedProductionSpecs();
     renderLedProfileList();
     renderLedProfileDetail();
+    renderMotionProfiles();
   }catch(e){
     mount.innerHTML='<div class="led-load-error"><b>Profili motion non disponibili</b><span>'+esc(e.message||'Errore caricamento')+'</span></div>';
     const detail=$('#ledProfileDetail');if(detail)detail.innerHTML='<p>Il Media Hub resta operativo; il registro motion va verificato nel deployment.</p>';
