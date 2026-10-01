@@ -49,7 +49,7 @@ function applyCors(req,res){
 
 const READ_ONLY_RETRY_ACTIONS = new Set([
   'public.feed','public.club','public.calendar','public.datafabric.contract',
-  'dashboard.summary','private.dashboard','private.week','account.requests','private.crm.summary','private.crm.detail','private.communication.templates','private.communication.preview',
+  'dashboard.summary','private.dashboard','private.week','account.requests','private.user.workspace','private.crm.summary','private.crm.detail','private.communication.templates','private.communication.preview',
   'private.attendance.get','auth.validate','direction.diagnostics',
   'direction.evolution','direction.datafabric.status'
 ]);
@@ -59,7 +59,7 @@ const UPSTREAM_TIMEOUT_MS = Math.max(1000,Math.min(15000,Number(process.env.SCD_
 const wait = ms => new Promise(resolve=>setTimeout(resolve,ms));
 
 const allowedActions = new Set([
-  'dashboard.summary','private.dashboard','private.week','account.requests','private.crm.summary','private.crm.detail','private.communication.templates','private.communication.preview','private.communication.send',
+  'dashboard.summary','private.dashboard','private.week','account.requests','private.user.workspace','private.crm.summary','private.crm.detail','private.communication.templates','private.communication.preview','private.communication.send',
   'private.request.submit','private.transport.request','private.message.send',
   'private.convocation.create','private.convocation.reply',
   'private.attendance.get','private.attendance.save',

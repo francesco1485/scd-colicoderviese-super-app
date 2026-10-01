@@ -64,6 +64,9 @@ function doPost(e) {
       case 'account.requests':
         data = r216MyRequests_(token);
         break;
+      case 'private.user.workspace':
+        data = r216UserWorkspace_(token);
+        break;
       case 'private.crm.summary':
         data = r216CrmSummary_(token, payload);
         break;
@@ -608,4 +611,56 @@ function r216CommunicationSend_(token,payload){
     r216UpdateStakeholderAfterMail_(c.stakeholder,payload,now);
   }
   return {sent:true,mailId:mailId,to:c.to,subject:c.subject,signatureId:c.signature.SIGNATURE_ID,correlationId:corr};
+}
+
+
+/* R40.5 USER WORKSPACE
+ * Adatta il Private Desk leggendo UTENTI e UTENTI_AREE dal Source of Truth.
+ */
+function r216List_(value) {
+  return String(value || '').split(/[;,]/).map(function(x){ return String(x || '').trim(); }).filter(Boolean);
+}
+function r216UserWorkspace_(token) {
+  var actor = r216CrmActor_(token);
+  var mail = email_(actor && actor.email || '');
+  if (!mail) throw new Error('Utente non autenticato');
+
+  var user = r216CrmTable_('UTENTI').filter(function(r){
+    return email_(r.EMAIL || '') === mail && r216Upper_(r.STATO || 'ATTIVO') === 'ATTIVO';
+  })[0];
+  if (!user) throw new Error('Profilo utente non configurato');
+
+  var areas = r216CrmTable_('UTENTI_AREE').filter(function(r){
+    return email_(r.EMAIL || '') === mail && r216Bool_(r.ATTIVO);
+  }).map(function(r){
+    return {
+      area:String(r.AREA || ''),
+      canView:r216Bool_(r['PUÒ VEDERE']),
+      canCreate:r216Bool_(r['PUÒ CREARE']),
+      canEdit:r216Bool_(r['PUÒ MODIFICARE']),
+      canApprove:r216Bool_(r['PUÒ APPROVARE']),
+      canExport:r216Bool_(r['PUÒ ESPORTARE']),
+      canAdmin:r216Bool_(r['PUÒ AMMINISTRARE']),
+      expiresAt:String(r['SCADENZA ACCESSO'] || ''),
+      note:String(r.NOTE || '')
+    };
+  });
+
+  return {
+    email:mail,
+    name:String(user['NOME / ACCOUNT'] || ''),
+    role:String(user.RUOLO || ''),
+    status:String(user.STATO || ''),
+    crmProfile:String(user.CRM_PROFILE || 'STANDARD'),
+    homeView:String(user.HOME_VIEW || 'dashboard'),
+    adaptiveUi:r216Bool_(user.ADAPTIVE_UI),
+    personId:String(user.PERSON_ID || ''),
+    signatureId:String(user.SIGNATURE_ID || ''),
+    identityMode:String(user.IDENTITY_MODE || ''),
+    privateDeskProfile:String(user.PRIVATE_DESK_PROFILE || 'STANDARD'),
+    defaultModules:r216List_(user.DEFAULT_MODULES),
+    communicationScope:r216List_(user.COMMUNICATION_SCOPE),
+    dataScope:r216List_(user.DATA_SCOPE),
+    areas:areas
+  };
 }
