@@ -64,6 +64,45 @@ const proposals=[
 {name:'Therabody',area:'Recovery Partner',status:'Instradato B2B',next:'Compilare form partnership',value:'Da definire'}
 ];
 
+
+const conventions=[
+{name:"McDonald's territoriale",status:"IN ATTIVAZIONE",benefit:"10% su tutti i prodotti secondo proposta ricevuta",who:"Tesserati / staff, perimetro finale da confermare",how:"Tessera valida alla cassa",where:"Colico / Villa di Tirano; area franchisee Sondrio-Castione da confermare",contact:"Sebastiano Beccalli",next:"Definire formato tessere, punti vendita e formalizzazione",source:"Gmail 1a0c6d258cbeace6"},
+{name:"La Piadineria",status:"PRONTA PER FORMALIZZAZIONE",benefit:"10% con badge/lettera · 12% con Carta Mondo Piada o app",who:"Community SCD da definire nell'accordo",how:"Badge/lettera oppure Carta Mondo Piada/app",where:"Piantedo · Lecco · Castione Andevenno + punti aderenti online",contact:"Annaclara Rossi",next:"Confermare interesse e ricevere lettera convenzione da firmare",source:"Gmail 1a0c32e969d98f3c"}
+];
+
+const suppliers=[
+{name:"Fratelli Trussoni S.r.l.",position:"€695,86",paid:"€0",residual:"€695,86",email:"stefano.libera@trussoni.it",potential:"DA VALUTARE",next:"Ricostruire fatture 2024-2026 e referente commerciale"},
+{name:"Nuova Food Italy S.r.l.s.",position:"€327,65",paid:"€0",residual:"€327,65",email:"nuovafooditaly@hotmail.com",potential:"DA VALUTARE",next:"Ricostruire fatture e condizioni commerciali"},
+{name:"Dott.ssa Monica Castagna",position:"€780",paid:"€260",residual:"€520",email:"monica.castagna@outlook.com",potential:"BASSO",next:"Separare saldo pregresso dalla scelta futura"},
+{name:"Fun Food Italia S.r.l.",position:"€1.093,28",paid:"€273,32",residual:"€819,96",email:"direzione@funfooditalia.com",potential:"DA VALUTARE",next:"Ricostruire volumi e margini per categoria"},
+{name:"Sagim S.r.l.",position:"€471,02",paid:"€157,01",residual:"€314,01",email:"amministrazione@sagimsrl.it",potential:"DA VALUTARE",next:"Analizzare acquisti e prezzi unitari"},
+{name:"Olimpiadi Duemila S.n.c.",position:"€497,76",paid:"€165,92",residual:"€331,84",email:"olimpiadi.2000@virgilio.it",potential:"DA VALUTARE",next:"Capire settore reale e storico acquisti"},
+{name:"Gruppo Gimoka S.p.A.",position:"€999,67",paid:"€249,92",residual:"€749,75",email:"fulvia.bozzini@gruppogimoka.com",potential:"ALTO",next:"Collegare spesa storica alla proposta Coffee Partner"},
+{name:"Panizza Natale S.n.c.",position:"€1.012,72",paid:"€253,18",residual:"€759,54",email:"panizza@dolcitalia.com",potential:"DA VALUTARE",next:"Creare paniere prodotti e ricostruire spesa storica"},
+{name:"Nuova Alimentaria S.r.l.",position:"€1.341,46",paid:"€0",residual:"€1.341,46",email:"nuovaali1@nuovalimentaria.191.it",potential:"DA VALUTARE",next:"Ricostruire fatture 2024-2026 e prima rata"},
+{name:"Erbagel di Sala Pietro S.n.c.",position:"€1.502",paid:"€0",residual:"€1.502",email:"marco.castelnuovo@erbagel.it",potential:"DA VALUTARE",next:"Chiudere condizioni e ricostruire storico acquisti"},
+{name:"Saco Antincendio S.r.l.",position:"€122",paid:"€0",residual:"€122",email:"sacoantincendio@gmail.com",potential:"MEDIO",next:"Ricostruire servizi pluriennali e benchmark"}
+];
+
+const commercialInitiatives=[
+{name:"ColicoDerviese Card · Tesserato",type:"CARD / COMMUNITY",status:"DA MODELLARE",target:"Atleti, staff, famiglie",goal:"Identità, convenzioni, benefit e relazione continuativa",next:"Definire perimetro beneficiari, funzioni e misurazione utilizzo"},
+{name:"ColicoDerviese Card · Sostenitore",type:"CARD / FUNDRAISING",status:"DA MODELLARE",target:"Tifosi, famiglie, territorio",goal:"Appartenenza e sostegno economico continuativo",next:"Definire quota, durata, rinnovo e benefit"},
+{name:"ColicoDerviese Card · Partner",type:"CARD / B2B",status:"DA MODELLARE",target:"Sponsor, partner, aziende",goal:"Hospitality, network e benefit B2B",next:"Definire livelli partner e collegamento dossier sponsor"},
+{name:"Tessera Tifoso / Community",type:"MEMBERSHIP",status:"IDEA DA STRUTTURARE",target:"Tifosi e territorio",goal:"Trasformare pubblico occasionale in community misurabile",next:"Evitare duplicazione con Card Sostenitore"},
+{name:"Spot LED Sponsor 40 secondi",type:"MEDIA / SPONSOR",status:"IN PRODUZIONE",target:"Sponsor attuali e futuri",goal:"Spot dedicato, leggibile, un solo sponsor protagonista",next:"Creare master, sottoporre idea e produrre MP4 dopo approvazione"},
+{name:"Torneo nazionale 2019 · 09/05/2027",type:"EVENTO / SPONSOR",status:"DA CONFERMARE",target:"Squadre, famiglie, aziende, territorio",goal:"Sport, musica, degustazioni e asset commerciali",next:"Definire format, capacità, pacchetti e rete ricettiva"}
+];
+
+const audience=[
+{segment:"Persone attive censite",value:"268",unit:"persone",source:"00 CONTROL ROOM",note:"KPI canonico. Non sommare automaticamente con atleti e staff."},
+{segment:"Atleti attivi",value:"221",unit:"atleti",source:"00 CONTROL ROOM",note:"Sottoinsieme della base persone."},
+{segment:"Staff attivo",value:"53",unit:"persone",source:"00 CONTROL ROOM",note:"Può sovrapporsi alla base persone."},
+{segment:"Atleti operativi",value:"233",unit:"atleti",source:"00 DASH TESSERAMENTI",note:"Definizione diversa da Atleti attivi."},
+{segment:"Atleti FIGC ufficiali",value:"134",unit:"atleti",source:"00 DASH TESSERAMENTI",note:"Sottoinsieme degli atleti operativi."},
+{segment:"Copertura FIGC",value:"57,9%",unit:"copertura",source:"Dashboard tesseramenti",note:"Indicatore qualità dati, non reach commerciale."},
+{segment:"Tessere richieste stampa McDonald's",value:"250",unit:"tessere",source:"Gmail 1a0c6d258cbeace6",note:"Dato logistico, NON KPI audience."}
+];
+
 const assets=[
 ['Family & Community Partner','Community','Disponibile','€5.000'],
 ['Official Water Partner','Fornitura / branding','In proposta','Da definire'],
@@ -192,6 +231,31 @@ function renderContracts(){
 function renderProposalGrid(){
   $('#proposalGrid').innerHTML=proposals.map(p=>'<article class="proposal-card"><h3>'+esc(p.name)+'</h3><p>'+esc(p.area)+'</p><div class="card-row"><span>Stato</span><b>'+esc(p.status)+'</b></div><div class="card-row"><span>Valore</span><b>'+esc(p.value)+'</b></div><div class="card-row"><span>Prossima azione</span><b>'+esc(p.next)+'</b></div></article>').join('');
 }
+
+function renderConventions(){
+  if($('#convenzioniKpi'))$('#convenzioniKpi').innerHTML=[
+    ['Convenzioni censite',String(conventions.length),'Registro dedicato 2026/27'],
+    ['Pronte / in attivazione',String(conventions.filter(x=>/PRONTA|ATTIVAZIONE/.test(x.status)).length),'Nessuna pubblicazione prima della formalizzazione'],
+    ['Card collegate','2','McDonald\'s + La Piadineria da integrare']
+  ].map(x=>'<article class="report-card"><h3>'+x[0]+'</h3><div class="report-value">'+x[1]+'</div><p>'+x[2]+'</p></article>').join('');
+  if($('#convenzioniGrid'))$('#convenzioniGrid').innerHTML=conventions.map(x=>'<article class="proposal-card"><h3>'+esc(x.name)+'</h3><p>'+esc(x.benefit)+'</p><div class="card-row"><span>Stato</span><b>'+esc(x.status)+'</b></div><div class="card-row"><span>Destinatari</span><b>'+esc(x.who)+'</b></div><div class="card-row"><span>Come</span><b>'+esc(x.how)+'</b></div><div class="card-row"><span>Dove</span><b>'+esc(x.where)+'</b></div><div class="card-row"><span>Prossima azione</span><b>'+esc(x.next)+'</b></div><small>'+esc(x.source)+'</small></article>').join('');
+}
+function renderSuppliers(){
+  if($('#fornitoriKpi'))$('#fornitoriKpi').innerHTML=[
+    ['Fornitori censiti',String(suppliers.length),'Posizioni economiche documentate'],
+    ['Radar alto',String(suppliers.filter(x=>x.potential==='ALTO').length),'Da trasformare in proposta mirata'],
+    ['Volumi storici','IN RICOSTRUZIONE','Le posizioni correnti non sono spesa annua']
+  ].map(x=>'<article class="report-card"><h3>'+x[0]+'</h3><div class="report-value">'+x[1]+'</div><p>'+x[2]+'</p></article>').join('');
+  if($('#fornitoriTable'))$('#fornitoriTable').innerHTML='<div class="data-row header"><span>Fornitore</span><span>Posizione 2026</span><span>Residuo</span><span>Potenziale</span><span>Prossima azione</span></div>'+suppliers.map(x=>'<div class="data-row"><b>'+esc(x.name)+'</b><span>'+esc(x.position)+'</span><span>'+esc(x.residual)+'</span><span>'+esc(x.potential)+'</span><span>'+esc(x.next)+'</span></div>').join('');
+}
+function renderCommercialInitiatives(){
+  if($('#iniziativeGrid'))$('#iniziativeGrid').innerHTML=commercialInitiatives.map(x=>'<article class="proposal-card"><h3>'+esc(x.name)+'</h3><p>'+esc(x.goal)+'</p><div class="card-row"><span>Tipo</span><b>'+esc(x.type)+'</b></div><div class="card-row"><span>Target</span><b>'+esc(x.target)+'</b></div><div class="card-row"><span>Stato</span><b>'+esc(x.status)+'</b></div><div class="card-row"><span>Prossima azione</span><b>'+esc(x.next)+'</b></div></article>').join('');
+}
+function renderAudience(){
+  if($('#audienceGrid'))$('#audienceGrid').innerHTML=audience.map(x=>'<article class="report-card"><h3>'+esc(x.segment)+'</h3><div class="report-value">'+esc(x.value)+'</div><p>'+esc(x.unit)+' · '+esc(x.source)+'</p><p>'+esc(x.note)+'</p></article>').join('');
+  $('[data-public-link]').forEach(b=>b.onclick=()=>location.href='/sponsor/');
+}
+
 function renderFolders(){
   $('#folderGrid').innerHTML=folders.map(x=>'<article class="folder-card"><div class="folder-icon"></div><h3>'+esc(x)+'</h3><p>Collega qui i file ufficiali del progetto Sponsor.</p></article>').join('');
 }
@@ -285,7 +349,7 @@ $('#newSponsorForm').onsubmit=e=>{e.preventDefault();const fd=new FormData(e.tar
 $('#promoReviewBtn').onclick=()=>{localStorage.setItem('scd_promo_review','review');$('#promoText').textContent='Promozione messa in revisione interna. Nessuna pubblicazione automatica.'};
 
 renderKpis();renderSponsorStrip();homeContracts();homeProposals();renderAvailability();renderHomeEvents();renderPipeline();renderNews();renderStats();renderPoll();renderTags();
-renderSponsorViews();renderContracts();renderProposalGrid();renderFolders();renderLed();renderEvents();renderReport();renderAssets();renderScenario();renderSettings();
+renderSponsorViews();renderContracts();renderProposalGrid();renderConventions();renderSuppliers();renderCommercialInitiatives();renderAudience();renderFolders();renderLed();renderEvents();renderReport();renderAssets();renderScenario();renderSettings();
 
 function activateKeyboardCards(){
   document.addEventListener('keydown',e=>{
