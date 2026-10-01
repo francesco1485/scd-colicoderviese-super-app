@@ -100,7 +100,7 @@ unique(sourceIds,'source ids');
 includesAll(sourceIds,[
   'SCD_DRIVE','SCD_GMAIL','R20','CORE_SHEET','TESSERATI_SHEET','PULMINI_SHEET','MAIL_OPERATIONS_SHEET','SPONSOR_MASTER_SHEET','ECONOMIC_MASTER_SHEET','TOURNAMENTS_MASTER_SHEET',
   'FIGC','LND','CR_LOMBARDIA','SGS','SPORT_E_SALUTE','RASD','TUTTOCAMPO',
-  'SCD_OFFICIAL_SITE','SCD_FACEBOOK','SCD_INSTAGRAM','TUTTITALIA',
+  'SCD_OFFICIAL_SITE','SCD_FACEBOOK','SCD_INSTAGRAM','SCD_TIKTOK','SCD_YOUTUBE','SCD_PIXELLOT','LECCO_CHANNEL','SPRINT_E_SPORT_LOMBARDIA','SCD_ORGANIGRAMMA_2026_27','TUTTITALIA',
   'SEGRETARIO_CALCIO','TEAMSYSTEM_SPORTIVI_IN_CLOUD','SQUBY','ATHLETIS','SCD_SUPABASE','SCD_AI_WEEKLY_EDITORIAL'
 ],'source registry');
 const sourceById=Object.fromEntries(sources.map(x=>[x.id,x]));
@@ -118,6 +118,13 @@ assert(sourceById.SCD_OFFICIAL_SITE.news_policy==='DISABLED_FOR_NEWS_UNTIL_FRESH
 assert(!(sourceById.SCD_OFFICIAL_SITE.authority_domains||[]).includes('PUBLIC_NEWS'),'official site must not remain news authority while stale');
 assert(sourceById.SCD_AI_WEEKLY_EDITORIAL.trust==='DERIVED_VERIFIED','AI weekly editorial must be derived verified');
 assert((sourceById.SCD_AI_WEEKLY_EDITORIAL.rules||[]).includes('must_include_evidence'),'AI weekly editorial evidence rule missing');
+assert(sourceById.SCD_TIKTOK.kind==='PUBLIC_OFFICIAL_SCD','TikTok official source contract missing');
+assert(sourceById.SCD_YOUTUBE.kind==='PUBLIC_OFFICIAL_SCD','YouTube official source contract missing');
+assert(sourceById.SCD_PIXELLOT.kind==='PRIVATE_AUTHENTICATED_VIDEO_PLATFORM','Pixellot must remain private/authenticated');
+assert(sourceById.SCD_ORGANIGRAMMA_2026_27.trust==='INTERNAL_VERIFIED','organigram source trust mismatch');
+assert(m.product_direction?.media_and_social_hub?.pixellot_policy==='PRIVATE_BY_DEFAULT_AUTHORIZED_STAFF_ONLY','Pixellot privacy policy missing');
+assert(m.product_direction?.staff_role_ingestion?.no_automatic_permission_grant===true,'staff source must never auto-grant app permissions');
+assert(fs.existsSync(path.join(root,'config','scd-role-mapping-2026-27.v1.json')),'role mapping contract missing');
 
 assert(m.drive_vault.dedup_by_hash===true,'Drive dedup by hash required');
 assert(m.drive_vault.versioning_required===true,'Drive versioning required');
@@ -239,7 +246,7 @@ includesAll(caps.map(x=>x.id),[
   'CAP-HOME','CAP-CALENDAR','CAP-ATHLETE','CAP-FAMILY','CAP-STAFF','CAP-COMMS','CAP-RUNTIME-EVIDENCE','CAP-UPSTREAM-RESILIENCE','CAP-R20-RUNTIME-ACTIVATION',
   'CAP-DRIVE-CATALOG','CAP-GMAIL-INGESTION','CAP-DATAFABRIC-OBSERVABILITY','CAP-ENTITY-GRAPH','CAP-COMPLETENESS','CAP-SUPABASE-CORE','CAP-SUPABASE-AUTH-CONTEXT',
   'CAP-CHAT','CAP-CONFIDENCE','CAP-ANCONFIDENCE','CAP-SAFEGUARDING','CAP-SKY','CAP-AVATAR',
-  'CAP-TAMAGOTCHI','CAP-GEO','CAP-R22','CAP-PWA','CAP-ANDROID','CAP-IOS','CAP-MOBILE-SUPABASE-SHELL','CAP-SCD-UNIVERSE','CAP-META-ADAPTIVE','CAP-SCD-TWIN','CAP-SCD-MIRROR','CAP-SOCIAL-RADAR','CAP-HUMAN-OS','CAP-PRIVATE-DESK','CAP-COGNITIVE-ERGONOMICS','CAP-GROWTH-LOOP','CAP-WEEKLY-SPORT-CALENDAR','CAP-AI-NEWSROOM'
+  'CAP-TAMAGOTCHI','CAP-GEO','CAP-R22','CAP-PWA','CAP-ANDROID','CAP-IOS','CAP-MOBILE-SUPABASE-SHELL','CAP-SCD-UNIVERSE','CAP-META-ADAPTIVE','CAP-SCD-TWIN','CAP-SCD-MIRROR','CAP-SOCIAL-RADAR','CAP-HUMAN-OS','CAP-PRIVATE-DESK','CAP-COGNITIVE-ERGONOMICS','CAP-GROWTH-LOOP','CAP-WEEKLY-SPORT-CALENDAR','CAP-AI-NEWSROOM','CAP-MEDIA-SOCIAL-HUB','CAP-STAFF-ROLE-INGESTION'
 ],'capability map');
 
 const gaps=m.known_noncompliance||[];
