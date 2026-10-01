@@ -195,3 +195,19 @@ if(!ON_PUBLIC_STATIC)fetch('/api/sponsor/session?probe=1',{credentials:'same-ori
 const sponsorQuery=new URLSearchParams(location.search);
 if(sponsorQuery.get('access')==='1')openModal('access');
 if(sponsorQuery.get('login')==='1')openModal('login');
+
+
+const wallModeLabels={
+  INTERVISTE:'MEDIA & INTERVISTE',
+  EVENTI:'EVENTI & PREMIAZIONI',
+  WEB:'WEB APP & SOCIAL'
+};
+function setSponsorWallMode(mode){
+  const stage=document.querySelector('[data-wall-stage]');
+  if(!stage)return;
+  stage.dataset.wallStage=mode;
+  const label=document.querySelector('#wallModeLabel');
+  if(label)label.textContent=wallModeLabels[mode]||mode;
+  document.querySelectorAll('[data-wall-mode]').forEach(b=>b.classList.toggle('active',b.dataset.wallMode===mode));
+}
+document.querySelectorAll('[data-wall-mode]').forEach(b=>b.addEventListener('click',()=>setSponsorWallMode(b.dataset.wallMode)));
