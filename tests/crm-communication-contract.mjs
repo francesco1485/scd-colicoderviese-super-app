@@ -16,7 +16,8 @@ for(const action of [
   'private.crm.detail',
   'private.communication.templates',
   'private.communication.preview',
-  'private.communication.send'
+  'private.communication.send',
+  'private.communication.health'
 ]){
   assert(bridge.includes("case '"+action+"'"),'bridge action missing: '+action);
   assert(server.includes("'"+action+"'"),'server action missing: '+action);
@@ -29,6 +30,10 @@ assert(bridge.includes("SOSPESO")&&bridge.includes("NO_CONTACT"),'blocked contac
 assert(bridge.includes("Session.getEffectiveUser().getEmail()"),'effective sender verification missing');
 assert(bridge.includes("DEFAULT_FROM_EMAIL"),'canonical institutional sender missing');
 assert(bridge.includes("MAIL_ARCHIVIO"),'outbound audit archive missing');
+assert(bridge.includes("notificationSent"),'public request mail delivery state missing');
+assert(bridge.includes("remainingDailyQuota"),'mail quota diagnostics missing');
+assert(server.includes("Il codice temporaneo non è stato inviato"),'OTP false-success guard missing');
+assert(server.includes("UPSTREAM_WRITE_TIMEOUT_MS"),'write timeout separation missing');
 assert(bridge.includes("TOUCHPOINTS_MASTER"),'CRM touchpoint audit missing');
 assert(bridge.includes("SPONSOR_CONTRATTI"),'CRM agreement registry missing');
 assert(js.includes("data.agreements"),'CRM 360 agreement UI missing');
