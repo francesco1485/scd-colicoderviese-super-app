@@ -152,6 +152,7 @@ async function loadSponsorSession(){
     if($('#sessionRole'))$('#sessionRole').textContent=(d.user?.role||'Accesso autorizzato')+' · '+profile;
     loadMotionProfiles();
     loadCreativeScenes();
+    loadConventions();
   }catch(e){
     location.replace('/sponsor/?login=1');
   }
@@ -208,10 +209,9 @@ const proposals=[
 ];
 
 
-const conventions=[
-{name:"McDonald's territoriale",status:"IN ATTIVAZIONE",benefit:"10% su tutti i prodotti secondo proposta ricevuta",who:"Tesserati / staff, perimetro finale da confermare",how:"Tessera valida alla cassa",where:"Colico / Villa di Tirano; area franchisee Sondrio-Castione da confermare",contact:"Sebastiano Beccalli",next:"Definire formato tessere, punti vendita e formalizzazione",source:"Gmail 1a0c6d258cbeace6"},
-{name:"La Piadineria",status:"PRONTA PER FORMALIZZAZIONE",benefit:"10% con badge/lettera · 12% con Carta Mondo Piada o app",who:"Community SCD da definire nell'accordo",how:"Badge/lettera oppure Carta Mondo Piada/app",where:"Piantedo · Lecco · Castione Andevenno + punti aderenti online",contact:"Annaclara Rossi",next:"Confermare interesse e ricevere lettera convenzione da firmare",source:"Gmail 1a0c32e969d98f3c"}
-];
+let conventions=[];
+let communityState={sourceMode:'LOADING',sourceTable:'CONVENZIONI_MASTER',generatedAt:'',fallbackReason:''};
+
 
 const suppliers=[
 {name:"Fratelli Trussoni S.r.l.",position:"€695,86",paid:"€0",residual:"€695,86",email:"stefano.libera@trussoni.it",potential:"DA VALUTARE",next:"Ricostruire fatture 2024-2026 e referente commerciale"},
@@ -654,13 +654,81 @@ function renderProposalGrid(){
   $('#proposalGrid').innerHTML=proposals.map(p=>'<article class="proposal-card"><h3>'+esc(p.name)+'</h3><p>'+esc(p.area)+'</p><div class="card-row"><span>Stato</span><b>'+esc(p.status)+'</b></div><div class="card-row"><span>Valore</span><b>'+esc(p.value)+'</b></div><div class="card-row"><span>Prossima azione</span><b>'+esc(p.next)+'</b></div></article>').join('');
 }
 
+async function loadConventions(){
+  try{
+    const r=await fetch('/api/sponsor/community',{credentials:'same-origin',cache:'no-store'});
+    if(!r.ok)throw new Error('COMMUNITY_HTTP_'+r.status);
+    const payload=await r.json();
+    const data=payload?.data||{};
+    communityState={
+      sourceMode:String(data.sourceMode||'UNKNOWN'),
+      sourceTable:String(data.sourceTable||'CONVENZIONI_MASTER'),
+      generatedAt:String(data.generatedAt||data.snapshotAt||''),
+      fallbackReason:String(data.fallbackReason||'')
+    };
+    conventions=(Array.isArray(data.rows)?data.rows:[]).map(x=>({
+      id:String(x.id||''),
+      name:String(x.name||''),
+      category:String(x.category||''),
+      status:String(x.status||''),
+      benefit:String(x.benefit||''),
+      conditions:String(x.conditions||''),
+      who:String(x.audience||''),
+      how:String(x.recognition||''),
+      where:String(x.territory||''),
+      contact:String(x.contactName||''),
+      email:String(x.contactEmail||''),
+      agreementDocument:String(x.agreementDocument||''),
+      lastActivity:String(x.lastActivity||''),
+      next:String(x.nextAction||''),
+      usageKpi:String(x.usageKpi||''),
+      linkedCard:String(x.linkedCard||''),
+      owner:String(x.owner||''),
+      source:String(x.source||communityState.sourceTable),
+      updatedAt:String(x.updatedAt||'')
+    }));
+    renderConventions();
+  }catch(e){
+    communityState={sourceMode:'ERROR',sourceTable:'CONVENZIONI_MASTER',generatedAt:'',fallbackReason:String(e.message||e)};
+    conventions=[];
+    renderConventions();
+  }
+}
+
+function conventionStateClass(status=''){
+  const s=String(status).toUpperCase();
+  if(/ATTIVA|FORMALIZZATA|FIRMATA/.test(s))return 'green';
+  if(/ATTIVAZIONE|FORMALIZZAZIONE/.test(s))return 'orange';
+  return 'blue';
+}
 function renderConventions(){
+  const live=communityState.sourceMode==='LIVE_MASTER';
+  const sourceLabel=live?'LIVE MASTER':communityState.sourceMode==='SNAPSHOT_FALLBACK'?'SNAPSHOT VERIFICATO':communityState.sourceMode==='ERROR'?'DATI NON DISPONIBILI':'CARICAMENTO';
+  const cardLinked=conventions.filter(x=>/^SI\b/i.test(x.linkedCard||'')).length;
   if($('#convenzioniKpi'))$('#convenzioniKpi').innerHTML=[
-    ['Convenzioni censite',String(conventions.length),'Registro dedicato 2026/27'],
-    ['Pronte / in attivazione',String(conventions.filter(x=>/PRONTA|ATTIVAZIONE/.test(x.status)).length),'Nessuna pubblicazione prima della formalizzazione'],
-    ['Card collegate','2','McDonald\'s + La Piadineria da integrare']
-  ].map(x=>'<article class="report-card"><h3>'+x[0]+'</h3><div class="report-value">'+x[1]+'</div><p>'+x[2]+'</p></article>').join('');
-  if($('#convenzioniGrid'))$('#convenzioniGrid').innerHTML=conventions.map(x=>'<article class="proposal-card"><h3>'+esc(x.name)+'</h3><p>'+esc(x.benefit)+'</p><div class="card-row"><span>Stato</span><b>'+esc(x.status)+'</b></div><div class="card-row"><span>Destinatari</span><b>'+esc(x.who)+'</b></div><div class="card-row"><span>Come</span><b>'+esc(x.how)+'</b></div><div class="card-row"><span>Dove</span><b>'+esc(x.where)+'</b></div><div class="card-row"><span>Prossima azione</span><b>'+esc(x.next)+'</b></div><small>'+esc(x.source)+'</small></article>').join('');
+    ['Convenzioni censite',String(conventions.length),communityState.sourceTable+' · '+sourceLabel],
+    ['Pronte / in attivazione',String(conventions.filter(x=>/PRONTA|ATTIVAZIONE/.test(x.status)).length),'Nessuna pubblicazione come attiva prima della formalizzazione'],
+    ['Card collegate',String(cardLinked),'Benefit da integrare solo dopo verifica dell’accordo']
+  ].map(x=>'<article class="report-card"><h3>'+esc(x[0])+'</h3><div class="report-value">'+esc(x[1])+'</div><p>'+esc(x[2])+'</p></article>').join('');
+
+  if(!$('#convenzioniGrid'))return;
+  if(!conventions.length){
+    $('#convenzioniGrid').innerHTML='<article class="community-empty"><b>'+esc(sourceLabel)+'</b><p>Nessuna convenzione disponibile dal registro canonico in questo momento.</p><small>'+esc(communityState.fallbackReason||'Riprova con Aggiorna CRM / sessione attiva.')+'</small></article>';
+    return;
+  }
+  $('#convenzioniGrid').innerHTML=conventions.map(x=>
+    '<article class="proposal-card convention-record">'+
+      '<div class="convention-head"><div><small>'+esc(x.category||'CONVENZIONE')+'</small><h3>'+esc(x.name)+'</h3></div><span class="status-badge '+conventionStateClass(x.status)+'">'+esc(x.status)+'</span></div>'+
+      '<p><b>'+esc(x.benefit||'Benefit da definire')+'</b><br>'+esc(x.conditions||'Condizioni da verificare')+'</p>'+
+      '<div class="card-row"><span>Destinatari</span><b>'+esc(x.who||'Da definire')+'</b></div>'+
+      '<div class="card-row"><span>Riconoscimento</span><b>'+esc(x.how||'Da definire')+'</b></div>'+
+      '<div class="card-row"><span>Territorio</span><b>'+esc(x.where||'Da definire')+'</b></div>'+
+      '<div class="card-row"><span>Card</span><b>'+esc(x.linkedCard||'Non collegata')+'</b></div>'+
+      '<div class="card-row"><span>Accordo</span><b>'+esc(x.agreementDocument||'Da verificare')+'</b></div>'+
+      '<div class="convention-next"><small>PROSSIMA AZIONE</small><strong>'+esc(x.next||'Da definire')+'</strong></div>'+
+      '<footer><span>'+esc(x.owner||'Owner da definire')+'</span><em>'+esc(sourceLabel)+'</em></footer>'+
+    '</article>'
+  ).join('');
 }
 function renderSuppliers(){
   if($('#fornitoriKpi'))$('#fornitoriKpi').innerHTML=[
@@ -771,7 +839,7 @@ $('#newSponsorForm').onsubmit=e=>{e.preventDefault();const fd=new FormData(e.tar
 $('#promoReviewBtn').onclick=()=>{localStorage.setItem('scd_promo_review','review');$('#promoText').textContent='Promozione messa in revisione interna. Nessuna pubblicazione automatica.'};
 
 renderKpis();renderSponsorStrip();homeContracts();homeProposals();renderAvailability();renderHomeEvents();renderPipeline();renderNews();renderStats();renderPoll();renderTags();renderPartnerHub();renderCampaignStudio();renderSponsorWall();renderTerritoryHub();
-renderSponsorViews();renderContracts();renderProposalGrid();renderConventions();renderSuppliers();renderCommercialInitiatives();renderAudience();renderFolders();renderLed();renderEvents();renderReport();renderAssets();renderScenario();renderSettings();
+renderSponsorViews();renderContracts();renderProposalGrid();renderSuppliers();renderCommercialInitiatives();renderAudience();renderFolders();renderLed();renderEvents();renderReport();renderAssets();renderScenario();renderSettings();
 
 function activateKeyboardCards(){
   document.addEventListener('keydown',e=>{
