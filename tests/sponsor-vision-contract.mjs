@@ -122,7 +122,7 @@ for(const token of [
 assert(js.includes("$('.view').forEach"),'multi-view selector must use $ helper');
 assert(js.includes("$('[data-view]').forEach"),'multi-action selector must use $ helper');
 assert(js.includes("$('[data-campaign-filter]').forEach"),'campaign filters must use $ helper');
-assert(!js.includes("$('[data-view]').forEach"),'single selector incorrectly used for multiple view actions');
+assert(!/(^|[^$])\$\('\[data-view\]'\)\.forEach/m.test(js),'single selector incorrectly used for multiple view actions');
 
 const pubJs=fs.readFileSync(new URL('../sponsor/sponsor.js',import.meta.url),'utf8');
 assert(pubJs.includes('const $=s=>Array.from(document.querySelectorAll(s));'),'public multi-selector helper missing');
