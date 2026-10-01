@@ -27,6 +27,10 @@
       <button class="nav-link" data-view="sponsor"><i data-icon="users"></i><span>Sponsor</span></button>
       <button class="nav-link" data-view="contratti"><i data-icon="file"></i><span>Contratti</span></button>
       <button class="nav-link" data-view="proposte"><i data-icon="proposal"></i><span>Proposte</span></button>
+      <button class="nav-link" data-view="convenzioni"><i data-icon="diamond"></i><span>Convenzioni</span></button>
+      <button class="nav-link" data-view="fornitori"><i data-icon="link"></i><span>Fornitori → Sponsor</span></button>
+      <button class="nav-link" data-view="iniziative"><i data-icon="bulb"></i><span>Iniziative commerciali</span></button>
+      <button class="nav-link" data-view="audience"><i data-icon="users"></i><span>Audience SCD</span></button>
       <button class="nav-link" data-view="documenti"><i data-icon="folder"></i><span>Documenti</span></button>
       <button class="nav-link" data-view="media"><i data-icon="screen"></i><span>Media & LED</span></button>
       <button class="nav-link" data-view="eventi"><i data-icon="calendar"></i><span>Eventi</span></button>
@@ -86,7 +90,7 @@
           <div class="macro-photo current"></div><div class="macro-overlay"></div>
           <i data-icon="diamond"></i><div><h3>Sponsor attuali</h3><p>Insieme oggi,<br>per nuovi traguardi</p></div><button>›</button>
         </article>
-        <article class="macro-card cyan" data-view="proposte" role="button" tabindex="0" aria-label="Apri proposte">
+        <article class="macro-card cyan" data-view="convenzioni" role="button" tabindex="0" aria-label="Apri convenzioni">
           <div class="macro-photo ideas"></div><div class="macro-overlay"></div>
           <i data-icon="bulb"></i><div><h3>Convenzioni e idee</h3><p>Sinergie, vantaggi<br>e nuove opportunità</p></div><button>›</button>
         </article>
@@ -210,6 +214,30 @@
     <section class="view" id="view-proposte">
       <div class="page-head"><div><small>PIPELINE COMMERCIALE</small><h1>Proposte, convenzioni & idee</h1><p>Dal primo contatto alla formalizzazione dell’accordo.</p></div></div>
       <div class="proposal-grid" id="proposalGrid"></div>
+    </section>
+
+
+    <section class="view" id="view-convenzioni">
+      <div class="page-head"><div><small>RETE COMMUNITY 2026/27</small><h1>Convenzioni</h1><p>Benefit, condizioni, destinatari, modalità di riconoscimento, territorio, formalizzazione e utilizzo.</p></div><button class="btn-yellow" data-public-link>Vetrina aziende</button></div>
+      <div class="report-grid" id="convenzioniKpi"></div>
+      <div class="proposal-grid" id="convenzioniGrid"></div>
+    </section>
+
+    <section class="view" id="view-fornitori">
+      <div class="page-head"><div><small>SPESA CHE PUÒ DIVENTARE RELAZIONE</small><h1>Fornitori → Sponsor</h1><p>Fatture, continuità, volumi, dipendenza e potenziale di conversione in sponsorizzazione, barter o convenzione.</p></div></div>
+      <div class="report-grid" id="fornitoriKpi"></div>
+      <div class="data-table" id="fornitoriTable"></div>
+    </section>
+
+    <section class="view" id="view-iniziative">
+      <div class="page-head"><div><small>RICAVI E COMMUNITY</small><h1>Iniziative commerciali interne</h1><p>Card, tessere, LED, eventi e progetti che aumentano valore, ricavi e misurabilità della community.</p></div></div>
+      <div class="proposal-grid" id="iniziativeGrid"></div>
+    </section>
+
+    <section class="view" id="view-audience">
+      <div class="page-head"><div><small>PLATEA COMMERCIALE VERIFICATA</small><h1>Audience SCD</h1><p>Numeri utilizzabili nelle proposte commerciali con definizione, fonte e controllo delle sovrapposizioni.</p></div></div>
+      <div class="report-grid" id="audienceGrid"></div>
+      <article class="detail-panel"><h3>Regola di utilizzo</h3><p>I valori non vengono sommati automaticamente quando appartengono a perimetri sovrapposti. La piattaforma distingue persone attive, atleti, staff, pratiche FIGC e dati operativi come il numero di tessere da stampare.</p></article>
     </section>
 
     <section class="view" id="view-documenti">
