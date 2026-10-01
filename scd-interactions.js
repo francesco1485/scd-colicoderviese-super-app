@@ -4,6 +4,10 @@
   const twinKey='scd:twin:v1';
   window.SCDExperience?.bind?.(document,'base');
 
+  q('#intakeAdminBtn')?.addEventListener('click',()=>{
+    location.href='./intake/admin.html';
+  });
+
   q('#ngMirrorQuick')?.addEventListener('click',()=>{
     window.SCDMeta?.record?.('mirror',1);
     window.SCDNextGen?.openMirror?.();
