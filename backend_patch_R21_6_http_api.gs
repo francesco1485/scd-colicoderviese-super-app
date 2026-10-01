@@ -73,6 +73,9 @@ function doPost(e) {
       case 'private.crm.detail':
         data = r216CrmDetail_(token, payload);
         break;
+      case 'private.community.summary':
+        data = r216CommunitySummary_(token, payload);
+        break;
       case 'private.communication.templates':
         data = r216CommunicationTemplates_(token, payload);
         break;
@@ -351,6 +354,55 @@ function r216CrmSummary_(token, payload) {
     policy:'READ_ONLY_RELATIONSHIP_VIEW'
   };
 }
+function r216CommunitySummary_(token, payload) {
+  r216CrmActor_(token);
+  payload = payload || {};
+  var rows = r216CrmTable_('CONVENZIONI_MASTER').filter(function(r) {
+    return String(r.CONV_ID || '').trim() && String(r.AZIENDA || '').trim();
+  }).map(function(r) {
+    return {
+      id:String(r.CONV_ID || ''),
+      name:String(r.AZIENDA || ''),
+      category:String(r.CATEGORIA || ''),
+      status:String(r.STATO || ''),
+      benefit:String(r.BENEFIT || ''),
+      conditions:String(r.CONDIZIONI || ''),
+      audience:String(r.DESTINATARI || ''),
+      recognition:String(r.MODALITA_RICONOSCIMENTO || ''),
+      territory:String(r.PUNTI_VENDITA_TERRITORIO || ''),
+      startDate:String(r.DATA_INIZIO || ''),
+      endDate:String(r.DATA_FINE || ''),
+      contactName:String(r.REFERENTE || ''),
+      contactEmail:String(r.EMAIL || ''),
+      contactPhone:String(r.TELEFONO || ''),
+      agreementDocument:String(r.DOCUMENTO_ACCORDO || ''),
+      source:String(r.FONTE || ''),
+      lastActivity:String(r.ULTIMA_ATTIVITA || ''),
+      nextAction:String(r.PROSSIMA_AZIONE || ''),
+      usageKpi:String(r.KPI_UTILIZZO || ''),
+      linkedCard:String(r.CARD_COLLEGATA || ''),
+      owner:String(r.OWNER || ''),
+      flowId:String(r.FLOW_ID || ''),
+      notes:String(r.NOTE || ''),
+      updatedAt:String(r.UPDATED_AT || '')
+    };
+  });
+  rows.sort(function(a,b){return a.name.localeCompare(b.name)});
+  return {
+    generatedAt:new Date(),
+    sourceTable:'CONVENZIONI_MASTER',
+    sourceMode:'LIVE_MASTER',
+    rows:rows,
+    kpi:{
+      total:rows.length,
+      formalized:rows.filter(function(x){return /ATTIVA|FORMALIZZATA|FIRMATA/.test(String(x.status||'').toUpperCase())}).length,
+      pending:rows.filter(function(x){return /ATTIVAZIONE|FORMALIZZAZIONE|DA RICEVERE|DA FIRMARE/.test(String(x.status||'').toUpperCase())}).length,
+      linkedToCard:rows.filter(function(x){return /^SI\b/i.test(String(x.linkedCard||''))}).length
+    },
+    policy:'NO_PUBLICATION_BEFORE_FORMALIZATION'
+  };
+}
+
 function r216CrmDetail_(token, payload) {
   r216CrmActor_(token);
   payload = payload || {};
