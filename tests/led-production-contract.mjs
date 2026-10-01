@@ -30,8 +30,9 @@ for(const name of ['GGlass','TA Cleaning','AGC Medical']){
 for(const token of ['LED PRODUCTION HUB','id="ledProfileList"','id="ledProfileDetail"','id="ledProductionSpecs"']){
   assert(html.includes(token),'LED Production Hub UI missing: '+token);
 }
-for(const token of ['initLedProductionHub','renderLedProfileDetail','ledMotionBrief','/config/sponsor-motion-profiles.json']){
+for(const token of ['initLedProductionHub','renderLedProfileDetail','ledMotionBrief','/api/sponsor/motion-profiles','fetchMotionConfig']){
   assert(js.includes(token),'LED Production Hub interaction missing: '+token);
 }
 assert(js.includes("p.logoAssetStatus!=='APPROVED_OFFICIAL_ASSET'"),'final MP4 logo gate missing in UI');
+assert(!js.includes("fetch('/config/sponsor-motion-profiles.json'"),'must not use public config bypass');
 console.log('LED production contract PASS');
