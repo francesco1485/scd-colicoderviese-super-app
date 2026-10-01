@@ -34,10 +34,10 @@ for(const viewport of viewports){
   await page.waitForSelector('.hero-synth',{state:'attached'});
   await page.waitForSelector('.ng-command-ring',{state:'attached'});
   await page.waitForSelector('#weekRail');
-  await page.waitForSelector('.ng-constellation');
+  await page.waitForSelector('.ng-constellation',{state:'attached'});
   await page.waitForSelector('.newsroom');
-  await page.waitForSelector('.worlds-preview');
-  await page.waitForSelector('.ng-value-engine');
+  await page.waitForSelector('.worlds-preview',{state:'attached'});
+  await page.waitForSelector('.ng-value-engine',{state:'attached'});
   await page.waitForFunction(()=>Boolean(window.SCDNextGen)&&Boolean(window.SCDMeta)&&Boolean(window.SCDTwin)&&Boolean(window.SCDExperience)&&Boolean(window.SCDAdaptive));
   await page.waitForFunction(()=>document.documentElement.scrollWidth<=window.innerWidth+3);
 
@@ -47,6 +47,8 @@ for(const viewport of viewports){
   if(!homeBeforeHero)throw new Error('weekly home entry must precede secondary hero');
   const navLabels=await page.locator('.bottom-nav button').allTextContents();
   for(const label of ['Home','Calendario','Squadre','Community','Profilo'])if(!navLabels.some(x=>x.includes(label)))throw new Error('mobile nav missing '+label);
+  const visibleLegacy=await page.evaluate(()=>['.home-secondary-hero','.ng-command-ring','.pulse-strip','.ng-constellation','.worlds-preview','.ng-value-engine'].filter(sel=>{const el=document.querySelector(sel);return el&&getComputedStyle(el).display!=='none'}));
+  if(visibleLegacy.length)throw new Error('secondary clutter visible on public home: '+visibleLegacy.join(','));
 
   const realPhotoRefs=await page.evaluate(()=>[...document.querySelectorAll('img')].map(x=>x.getAttribute('src')||'').filter(x=>/hero-colico|event-insieme/i.test(x)));
   if(realPhotoRefs.length)throw new Error('forbidden real photography loaded: '+realPhotoRefs.join(','));
