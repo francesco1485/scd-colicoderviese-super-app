@@ -11,6 +11,15 @@ const officialChannels=[
  {id:'tiktok',label:'TikTok SCD',url:'https://www.tiktok.com/@s.c.d..colicoderv',terms:'tiktok social video'},
  {id:'youtube',label:'YouTube SCD',url:'https://www.youtube.com/@S.C.D.ColicoDerviese',terms:'youtube video partite club'}
 ];
+const FOLLOW_TEAM_KEY='scd:follow-team:v1';
+function loadFollowedTeam(){try{return String(localStorage.getItem(FOLLOW_TEAM_KEY)||'')}catch{return ''}}
+function saveFollowedTeam(name){try{name?localStorage.setItem(FOLLOW_TEAM_KEY,name):localStorage.removeItem(FOLLOW_TEAM_KEY)}catch{}}
+function updateFollowTeamUi(){
+ const name=loadFollowedTeam(),label=$('#sportFollowTeamLabel'),btn=$('#sportFollowTeam');
+ if(label)label.textContent=name?name:'Scegli e segui una squadra';
+ if(btn)btn.classList.toggle('is-following',Boolean(name));
+}
+
 const toast=(t)=>{const el=$('#toast');if(!el)return;el.textContent=t;el.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('show'),2200)};
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const norm=s=>String(s??'').toLocaleLowerCase('it-IT').normalize('NFD').replace(/[\u0300-\u036f]/g,'');
@@ -208,9 +217,16 @@ function syncTeamsFilters(models){
  cat.value=vals.includes(state.teamsCategory)?state.teamsCategory:'ALL';
  if(cat.value==='ALL')state.teamsCategory='ALL';
 }
+function syncFollowTeam(models){
+ const sel=$('#followTeamSelect');if(!sel)return;
+ const current=loadFollowedTeam(),names=models.map(x=>x.name).filter(Boolean);
+ sel.innerHTML='<option value="">Scegli squadra</option>'+names.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join('');
+ sel.value=names.includes(current)?current:'';
+ updateFollowTeamUi();
+}
 function renderPublicTeams(){
  const mount=$('#publicTeamsGrid');if(!mount)return;
- const models=publicTeamModels();syncTeamsFilters(models);
+ const models=publicTeamModels();syncTeamsFilters(models);syncFollowTeam(models);
  const term=norm(state.teamsSearch);
  const rows=models.filter(t=>(state.teamsCategory==='ALL'||t.categories.includes(state.teamsCategory))&&(!term||norm([t.name,...t.categories].join(' ')).includes(term)));
  const count=$('#teamsCount');if(count)count.textContent=rows.length+' '+(rows.length===1?'squadra':'squadre');
@@ -232,6 +248,20 @@ $('#calendarPeriod')?.addEventListener('click',e=>{const b=e.target.closest('[da
 $('#calendarReset')?.addEventListener('click',()=>{state.calendarSearch='';state.calendarTeam='ALL';state.calendarCategory='ALL';state.calendarType='ALL';state.calendarPeriod='WEEK';if($('#calendarSearch'))$('#calendarSearch').value='';if($('#calendarTypeFilter'))$('#calendarTypeFilter').value='ALL';renderPublicCalendar()});
 $('#teamsSearch')?.addEventListener('input',e=>{state.teamsSearch=e.target.value;renderPublicTeams()});
 $('#teamsCategoryFilter')?.addEventListener('change',e=>{state.teamsCategory=e.target.value;renderPublicTeams()});
+$('#saveFollowTeam')?.addEventListener('click',()=>{
+ const sel=$('#followTeamSelect'),name=String(sel?.value||'').trim();
+ if(!name){saveFollowedTeam('');updateFollowTeamUi();toast('Preferenza squadra rimossa');return}
+ saveFollowedTeam(name);updateFollowTeamUi();toast('Ora segui '+name+' su questo dispositivo');
+});
+$('#sportFollowTeam')?.addEventListener('click',()=>{
+ const name=loadFollowedTeam();
+ setView('teams');
+ if(name){
+   state.teamsSearch=name;
+   const input=$('#teamsSearch');if(input)input.value=name;
+   renderPublicTeams();
+ }else setTimeout(()=>$('#followTeamSelect')?.focus(),120);
+});
 
 function renderMatchCenter(){
  const match=state.nextMatch;
@@ -403,7 +433,7 @@ function bindPrivateDesk(){
    finally{btn.disabled=false}
  });
  $('#privateDeskLogout')?.addEventListener('click',()=>{clearPrivateSession();renderPrivateDesk();toast('Sessione privata chiusa')});
- $('[data-private-module]').forEach(b=>b.onclick=()=>openPrivateModule(b.dataset.privateModule));
+ $$('[data-private-module]').forEach(b=>b.onclick=()=>openPrivateModule(b.dataset.privateModule));
 }
 function renderPrivateDesk(){
  const queue=$('#actionQueue'),dock=$('#deskServiceDock'),status=$('#deskScopeStatus'),title=$('#deskHeroTitle'),copy=$('#deskHeroCopy');
@@ -551,7 +581,7 @@ function applyTwin(t=loadTwin()){
   if($('#hairInput')&&t.hair)$('#hairInput').value=t.hair;
   const figure=$('#avatarFigure');if(figure){figure.dataset.tone=t.tone||'t2';figure.dataset.hair=t.hair||'h1';if(t.kit)figure.dataset.kit=t.kit}
 }
-applyTwin();renderAvatarCatalog();
+applyTwin();updateFollowTeamUi();renderAvatarCatalog();
 
 $('#saveTwin')?.addEventListener('click',()=>{
   const t=loadTwin();t.name=$('#twinNameInput').value.trim().slice(0,24)||'Il mio Twin';t.number=Math.max(1,Math.min(99,Number($('#numberInput').value||10)));t.role=$('#roleInput').value;t.tone=$('#toneInput')?.value||'t2';t.hair=$('#hairInput')?.value||'h1';
