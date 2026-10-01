@@ -59,7 +59,8 @@
       adaptive:true,
       role,
       top:rank(keys,role).slice(0,5),
-      storedCategories:Object.keys(load().counts).length
+      storedCategories:Object.keys(load().counts).length,
+      deviceContext:window.SCDAdaptive?.snapshot?.()||null
     };
   }
   function reset(){
