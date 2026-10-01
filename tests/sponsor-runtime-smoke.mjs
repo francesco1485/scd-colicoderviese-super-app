@@ -47,6 +47,11 @@ try{
   assert(jsText.includes('scd-colicoderviese-official-r21.onrender.com'),'public login target is not official service');
   assert(jsText.includes("$('.modal').forEach"),'correct modal collection selector missing');
 
+  const probe=await fetch(base+'/api/sponsor/session?probe=1');
+  assert(probe.status===200,'session probe status '+probe.status);
+  const probeJson=await probe.json();
+  assert(probeJson.authenticated===false,'anonymous session probe must be false');
+
   const guarded=await fetch(base+'/sponsor/app',{
     redirect:'manual',
     headers:{accept:'text/html'}
