@@ -24,6 +24,7 @@ let liveCache = { at: 0, data: null };
 const INTAKE_TEMPLATES = JSON.parse(fs.readFileSync(path.join(__dirname,'config','scd-intake-link-templates.v1.json'),'utf8'));
 const SPONSOR_MOTION_PROFILES = JSON.parse(fs.readFileSync(path.join(__dirname,'config','sponsor-motion-profiles.json'),'utf8'));
 const SCD_CREATIVE_SCENES = JSON.parse(fs.readFileSync(path.join(__dirname,'config','scd-creative-scenes.json'),'utf8'));
+const COMMUNITY_BENEFITS_SNAPSHOT = JSON.parse(fs.readFileSync(path.join(__dirname,'config','community-benefits.snapshot.json'),'utf8'));
 const INTAKE_TEMPLATE_MAP = new Map((INTAKE_TEMPLATES.templates||[]).map(x=>[x.slug,x]));
 const INTAKE_SECRET = process.env.SCD_INTAKE_LINK_SECRET || '';
 const INTAKE_PUBLIC_BASE = (process.env.SCD_PUBLIC_BASE_URL || 'https://scd-universe.onrender.com').replace(/\/$/,'');
@@ -51,7 +52,7 @@ function applyCors(req,res){
 
 const READ_ONLY_RETRY_ACTIONS = new Set([
   'public.feed','public.club','public.calendar','public.datafabric.contract',
-  'dashboard.summary','private.dashboard','private.week','account.requests','private.user.workspace','private.crm.summary','private.crm.detail','private.communication.templates','private.communication.preview',
+  'dashboard.summary','private.dashboard','private.week','account.requests','private.user.workspace','private.crm.summary','private.crm.detail','private.community.summary','private.communication.templates','private.communication.preview',
   'private.attendance.get','auth.validate','direction.diagnostics',
   'direction.evolution','direction.datafabric.status'
 ]);
@@ -62,7 +63,7 @@ const UPSTREAM_WRITE_TIMEOUT_MS = Math.max(5000,Math.min(30000,Number(process.en
 const wait = ms => new Promise(resolve=>setTimeout(resolve,ms));
 
 const allowedActions = new Set([
-  'dashboard.summary','private.dashboard','private.week','account.requests','private.user.workspace','private.crm.summary','private.crm.detail','private.communication.templates','private.communication.preview','private.communication.send','private.communication.health',
+  'dashboard.summary','private.dashboard','private.week','account.requests','private.user.workspace','private.crm.summary','private.crm.detail','private.community.summary','private.communication.templates','private.communication.preview','private.communication.send','private.communication.health',
   'private.request.submit','private.transport.request','private.message.send',
   'private.convocation.create','private.convocation.reply',
   'private.attendance.get','private.attendance.save',
@@ -278,6 +279,28 @@ async function handleSponsorCreativeScenes(req,res){
     return json(res,200,{ok:true,data:SCD_CREATIVE_SCENES},{'cache-control':'no-store'});
   }catch(e){
     return json(res,e.message==='SESSION_REQUIRED'?401:403,{ok:false,error:e.message||'CREATIVE_SCENES_ACCESS_DENIED'});
+  }
+}
+async function handleSponsorCommunity(req,res){
+  if(req.method!=='GET')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  try{
+    const s=await validateSponsorSession(req);
+    try{
+      const result=await callAppsScript('private.community.summary',{},s.token);
+      const d=requireUpstreamSuccess(result,'Community master');
+      return json(res,200,{ok:true,data:d},{'cache-control':'no-store'});
+    }catch(upstreamError){
+      return json(res,200,{
+        ok:true,
+        data:{
+          ...COMMUNITY_BENEFITS_SNAPSHOT,
+          sourceMode:'SNAPSHOT_FALLBACK',
+          fallbackReason:'LIVE_MASTER_BRIDGE_NOT_AVAILABLE'
+        }
+      },{'cache-control':'no-store'});
+    }
+  }catch(e){
+    return json(res,e.message==='SESSION_REQUIRED'?401:403,{ok:false,error:e.message||'COMMUNITY_ACCESS_DENIED'});
   }
 }
 async function handleSponsorMotionProfiles(req,res){
@@ -779,6 +802,7 @@ http.createServer(async(req,res)=>{
   if(u.pathname==='/api/sponsor/crm') return handleSponsorCrm(req,res,u);
   if(u.pathname==='/api/sponsor/mail-health') return handleSponsorMailHealth(req,res);
   if(u.pathname==='/api/sponsor/motion-profiles') return handleSponsorMotionProfiles(req,res);
+  if(u.pathname==='/api/sponsor/community') return handleSponsorCommunity(req,res);
   if(u.pathname==='/api/sponsor/creative-scenes') return handleSponsorCreativeScenes(req,res);
   if(u.pathname==='/api/sponsor/communication') return handleSponsorCommunication(req,res);
   if(['/sponsor/app','/sponsor/app/','/sponsor/app.html','/sponsor/app.js'].includes(u.pathname)) return serveSponsorPrivate(req,res,u);
