@@ -236,7 +236,11 @@
 
         <section class="twin-control">
           <div class="control-panel">
-            <h3>Crea il tuo alter ego</h3>
+            <h3>Avatar Studio · facoltativo</h3>
+            <p class="avatar-skip-note">Puoi configurarlo dopo il primo accesso oppure saltarlo senza perdere nessuna funzione.</p>
+            <label class="avatar-search-label">Cerca uno stile avatar<input id="avatarSearch" type="search" autocomplete="off" placeholder="Es. portiere, lago, mister…"></label>
+            <div class="avatar-catalog" id="avatarCatalog"></div>
+            <button class="text-btn avatar-skip" type="button" id="skipAvatar">Salta per ora</button>
             <label>Nome Twin<input id="twinNameInput" maxlength="24" placeholder="Es. Fenix"></label>
             <div class="inline-fields"><label>Numero<input id="numberInput" type="number" min="1" max="99" value="10"></label><label>Ruolo<select id="roleInput"><option>Calciatore</option><option>Portiere</option><option>Mister</option><option>Tifoso</option><option>Dirigente</option></select></label></div>
             <div class="synthetic-identity"><span class="eyebrow">IDENTITÀ SINTETICA</span><p>Nessuna foto reale viene mostrata. Il Twin usa una rappresentazione originale generata e personalizzabile.</p><div class="inline-fields"><label>Tono<select id="toneInput"><option value="t1">Chiaro</option><option value="t2">Medio</option><option value="t3">Caldo</option><option value="t4">Scuro</option></select></label><label>Stile<select id="hairInput"><option value="h1">Corto</option><option value="h2">Medio</option><option value="h3">Riccio</option><option value="h4">Rasato</option></select></label></div></div>
