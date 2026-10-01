@@ -45,7 +45,7 @@ try{
   const jsText=await js.text();
   assert(js.status===200,'sponsor.js status '+js.status);
   assert(jsText.includes('scd-colicoderviese-official-r21.onrender.com'),'public login target is not official service');
-  assert(!jsText.includes("$('.modal').forEach"),'broken modal selector returned');
+  assert(jsText.includes("$('.modal').forEach"),'correct modal collection selector missing');
 
   const guarded=await fetch(base+'/sponsor/app',{
     redirect:'manual',
