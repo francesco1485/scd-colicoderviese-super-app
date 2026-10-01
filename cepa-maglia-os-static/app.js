@@ -243,12 +243,14 @@ function globalSearchItems(query){
   const q=String(query||'').trim().toLowerCase()
   if(!q)return[
     {kind:'home',id:'home',label:'Home Maglia 360',meta:'Ambienti di lavoro'},
+    {kind:'crm',id:'personalCrm',label:'Il mio CRM',meta:'Scrivania personale adattiva'},
     {kind:'plan',id:'operatingPlan',label:'Piano Operativo',meta:'Metodo, roadmap e sviluppo continuo'},
     {kind:'cepa',id:'cepa',label:'Progetto C.E.P.A.',meta:'Centro e territori'},
     ...accessibleOffices().slice(0,3).map(x=>({kind:'office',id:x.id,label:'Ufficio '+x.city,meta:'Sede operativa'}))
   ]
   const has=(...parts)=>parts.filter(Boolean).join(' ').toLowerCase().includes(q)
   const out=[]
+  if(has('crm mio crm scrivania personale attività clienti pipeline priorità'))out.push({kind:'crm',id:'personalCrm',label:'Il mio CRM',meta:'Scrivania personale adattiva'})
   if(has('piano operativo metodo roadmap sviluppo continuo architettura maglia 360'))out.push({kind:'plan',id:'operatingPlan',label:'Piano Operativo',meta:'Metodo, roadmap e sviluppo continuo'})
   accessibleOffices().forEach(x=>{if(has(x.city,x.name,x.address))out.push({kind:'office',id:x.id,label:'Ufficio '+x.city,meta:x.address||'Sede operativa'})})
   ecosystem.forEach(x=>{if(has(x.name,x.code,x.capability))out.push({kind:'partner',id:x.id,label:x.name,meta:x.capability||'Partner'})})
@@ -280,6 +282,7 @@ function openGlobalSearchItem(item){
   $('globalSearchResults')?.classList.add('hidden')
   if($('globalSearchInput'))$('globalSearchInput').value=''
   if(item.kind==='home')navigate('home')
+  else if(item.kind==='crm')navigate('personalCrm')
   else if(item.kind==='plan')navigate('operatingPlan')
   else if(item.kind==='office')openOffice(item.id)
   else if(item.kind==='partner')openPartner(item.id)
