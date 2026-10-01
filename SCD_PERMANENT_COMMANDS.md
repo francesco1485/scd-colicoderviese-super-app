@@ -73,3 +73,61 @@ Questi comandi non valgono soltanto per la Super App. Devono essere applicati, p
 
 ## 9. REGOLA DI COERENZA
 Ogni nuova funzione deve essere verificata rispetto a: identita SCD, esperienza app-first, account unico, privacy, media trasparente, evoluzione continua, sicurezza, costo sostenibile e Source of Truth visiva.
+
+
+## COMANDO NEXT GENERATION — TWIN + MIRROR + LIVE INTERACTION (2026-10-01)
+
+Questa direttiva e' cumulativa e si integra nel sistema SCD Universe senza creare un secondo prodotto.
+
+### 1. SCD Twin e SCD Mirror sono due sistemi separati
+- SCD TWIN = identita' digitale evolutiva dell'utente, visuale, ludica e persistente.
+- SCD MIRROR = assistente operativo e organizzativo contestuale.
+- Non devono essere fusi in un unico chatbot/mascotte.
+- Twin puo' essere presente nella vita quotidiana dell'app; Mirror resta discreto e si apre quando richiesto.
+
+### 2. Principio Virtual Pet reinterpretato
+Il riferimento funzionale e' la logica storica dei virtual pet: continuita' nel tempo, cura, interazione, crescita, feedback e trasformazione.
+SCD Twin deve essere originale e non riprodurre personaggi, grafica, suoni, nomi, trade dress o altri elementi protetti di Tamagotchi/Bandai.
+Le fasi SCD restano: SCINTILLA > ROOKIE > PLAYMAKER > CAPITANO > LEGGENDA.
+
+### 3. Crescita sicura
+La progressione Twin puo' usare solo segnali sicuri e non sensibili: accesso volontario, esplorazione, partecipazione a eventi verificati, missioni community moderate, completamento di servizi, personalizzazione e badge.
+Vietato usare: talento, prestazione sportiva individuale dei minori, peso, salute, biometria nascosta, stato mentale, stress, fragilita', giudizi tecnici o meccaniche compulsive.
+
+### 4. Avatar personale
+L'utente puo' costruire un alter ego sportivo originale con aspetto, numero, ruolo, kit e accessori SCD.
+La foto caricata e' riferimento volontario e privacy-first; elaborazione locale per impostazione predefinita.
+Nessuna identificazione biometrica.
+Il baseline gratuito deve funzionare senza API a pagamento.
+La modalita' fotorealistica futura deve essere opt-in, verificare licenze dei modelli e preferire elaborazione on-device/WebGPU quando tecnicamente sostenibile.
+Non promettere equivalenza fotografica se il dispositivo o il modello locale non la supportano.
+
+### 5. SCD Mirror
+Mirror eredita ROLE, SCOPE, PAGE CONTEXT e permessi; non li modifica e non li bypassa.
+Puo' orientare, cercare, riassumere, preparare azioni, spiegare regolamenti, aiutare con calendario, convocazioni, trasporti, tesseramenti, documenti, comunicazioni, sponsor, eventi e task.
+Le azioni irreversibili o sensibili richiedono sempre autorizzazione esplicita e controllo server-side.
+Safeguarding resta isolato.
+
+### 6. AI gratuita e adapter
+Il prodotto deve avere un baseline a costo zero: router locale, knowledge cards, ricerca, workflow guidati e regole deterministiche.
+L'integrazione con modelli AI remoti deve essere un adapter separato e non un prerequisito del funzionamento.
+Non dichiarare una AI cloud gratuita permanente senza un provider realmente verificato.
+Un eventuale modello locale nel browser deve rispettare prestazioni, consumo batteria, privacy e compatibilita'.
+
+### 7. Live e real time
+Live non significa animazioni decorative: significa aggiornamento di eventi, notifiche, calendario, stato richieste, risultati e comunicazioni da fonti reali.
+Ogni live datum deve mantenere SOURCE, VERIFIED_AT, CONFIDENCE e fallback.
+Se una fonte non e' collegata: "Dato in aggiornamento" o "Fonte non ancora collegata".
+
+### 8. Media e video
+La piattaforma deve essere pronta per immagini, highlights, video, storytelling sportivo e newsroom.
+Ogni contenuto media deve avere diritti/consensi, provenance, data, team/evento collegato e policy minori.
+Per foto personali e minori valgono privacy, liberatorie e safeguarding.
+
+### 9. Interazione umano-app
+La UX deve privilegiare: risposta immediata, continuita', chiaro next action, feedback visivo, progressione comprensibile, controllo utente, accessibilita' e riduzione della ricerca manuale.
+Niente dark pattern, urgenza artificiale, notifiche manipolative o dipendenza progettata.
+
+### 10. Architettura
+Twin state, Mirror context, Club Graph, Event Core, notifications e media devono essere componenti separati con contratti API espliciti.
+Il reset grafico Next Generation puo' sostituire completamente la vecchia presentazione, ma non distrugge R20, Supabase, provenance, sicurezza, fonti o migrazione Strangler/Dual Run.
