@@ -24,7 +24,8 @@ for(const prospect of ['IPERAL','HDI MAGLIA','DELLOCA','CARCANO']){
 const contracts=js.slice(js.indexOf('function homeContracts()'),js.indexOf('function homeProposals()'));
 if(/status-badge">Attivo/.test(contracts))fail('contract status must not be hardcoded as Attivo');
 if(!contracts.includes('esc(s.status)'))fail('contract cards must expose documented relationship status');
-if(/\$\([^\n;]*\)\??\.forEach\(/.test(js.replace(/\$\$\(/g,'COLLECTION(')))fail('single-element selector used as collection');
+const badSelectorForEach=js.split('\n').filter(line=>/\$\([^)]*\)\??\.forEach\(/.test(line)&&!/\$\$\(/.test(line));
+if(badSelectorForEach.length)fail('single-element selector used as collection: '+badSelectorForEach.join(' | '));
 for(const token of ['...conventions.map','...suppliers.map','...commercialInitiatives.map','...audience.map']){
   if(!js.includes(token))fail('global search coverage missing '+token);
 }
