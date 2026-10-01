@@ -9,6 +9,9 @@ const pub=fs.readFileSync(new URL('../sponsor/index.html',import.meta.url),'utf8
 const app=fs.readFileSync(new URL('../sponsor/app.html',import.meta.url),'utf8');
 const pages=fs.readFileSync(new URL('../scripts/build-pages.mjs',import.meta.url),'utf8');
 const doc=fs.readFileSync(new URL('../docs/design/SCD-VISUAL-AND-MOTION-SYSTEM.md',import.meta.url),'utf8');
+const motion=JSON.parse(fs.readFileSync(new URL('../config/sponsor-motion-profiles.json',import.meta.url),'utf8'));
+const server=fs.readFileSync(new URL('../server.js',import.meta.url),'utf8');
+const appJs=fs.readFileSync(new URL('../sponsor/app.js',import.meta.url),'utf8');
 
 assert(visual.id==='SCD_VISUAL_SYSTEM','visual system id missing');
 assert(visual.club==='S.C.D. ColicoDerviese','club identity mismatch');
@@ -51,6 +54,25 @@ for(const token of [
   'camera-safe',
   'proof'
 ]) assert(doc.includes(token),'design governance doc missing: '+token);
+
+assert(motion.source==='SCD_MEDIA_MOTION_LAB','motion profile source missing');
+assert(motion.defaultPreview?.width===1920&&motion.defaultPreview?.height===1080,'motion preview resolution missing');
+assert(motion.defaultPreview?.fps===25,'motion preview fps missing');
+assert(motion.defaultPreview?.durationSeconds===20,'motion preview duration missing');
+for(const partner of ['GGlass','TA Cleaning','AGC Medical']){
+  const p=motion.profiles.find(x=>x.partnerName===partner);
+  assert(Boolean(p),'motion profile missing: '+partner);
+  assert(p.logoAssetStatus==='MISSING_OFFICIAL_REPO_ASSET','official logo safeguard missing: '+partner);
+  assert(Boolean(p.stadiumView),'tribune-view rule missing: '+partner);
+  assert(Boolean(p.cameraView),'camera-safe rule missing: '+partner);
+  assert(Array.isArray(p.proofPlan)&&p.proofPlan.length>=3,'proof plan missing: '+partner);
+}
+assert(server.includes("'/api/sponsor/motion-profiles'"),'protected motion profile endpoint missing');
+assert(server.includes('handleSponsorMotionProfiles'),'motion profile handler missing');
+assert(app.includes('id="motionProfileGrid"'),'Motion Lab grid missing');
+assert(app.includes('id="motionInspector"'),'Motion Lab inspector missing');
+assert(appJs.includes('loadMotionProfiles'),'Motion Lab loader missing');
+assert(appJs.includes('renderMotionInspector'),'Motion Lab inspector renderer missing');
 
 console.log('SCD design system contract PASS',{
   schema:visual.schemaVersion,
