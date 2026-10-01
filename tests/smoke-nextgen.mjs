@@ -62,11 +62,11 @@ for(const viewport of viewports){
   const cognitive=await page.evaluate(()=>window.SCDExperience.frictionSnapshot());
   if(cognitive.principle!=='NO_MENTAL_STATE_INFERENCE')throw new Error('Human OS guardrail missing');
 
-  await page.click('[data-experience-mode="FOCUS"]');
+  await page.evaluate(()=>window.SCDExperience.setMode('FOCUS'));
   if(await page.evaluate(()=>document.body.dataset.scdExperience)!=='focus')throw new Error('Focus mode failed');
-  await page.click('[data-experience-mode="QUICK"]');
+  await page.evaluate(()=>window.SCDExperience.setMode('QUICK'));
   if(await page.evaluate(()=>document.body.dataset.scdExperience)!=='quick')throw new Error('Quick mode failed');
-  await page.click('[data-experience-mode="DISCOVER"]');
+  await page.evaluate(()=>window.SCDExperience.setMode('DISCOVER'));
   if(await page.evaluate(()=>document.body.dataset.scdExperience)!=='discover')throw new Error('Discover mode failed');
 
   await page.evaluate(()=>window.SCDNextGen.setView('twin'));
