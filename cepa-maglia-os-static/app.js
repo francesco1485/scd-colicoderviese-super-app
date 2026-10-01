@@ -734,9 +734,12 @@ function crmModuleUsage(key){
   }
   return events.filter(e=>{
     if(String(e.action_key||'').includes('crm_module_'+key))return true
-    if(key==='clients'&&e.action_key==='commerce_tab_clients')return true
-    if(key==='pipeline'&&e.action_key==='commerce_tab_pipeline')return true
-    if(key==='portfolio'&&e.action_key==='commerce_tab_portfolio')return true
+    if(key==='clients'){
+      if(e.action_key==='commerce_tab_clients')return true
+      return e.view_key==='products'&&!String(e.action_key||'').startsWith('commerce_tab_')
+    }
+    if(key==='pipeline')return e.action_key==='commerce_tab_pipeline'
+    if(key==='portfolio')return e.action_key==='commerce_tab_portfolio'
     return(viewMap[key]||[]).includes(e.view_key)
   })
 }
