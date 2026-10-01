@@ -77,23 +77,23 @@
       </section>
 
       <section class="macro-row">
-        <article class="macro-card gold" data-view="storici">
+        <article class="macro-card gold" data-view="storici" role="button" tabindex="0" aria-label="Apri storici">
           <div class="macro-photo historic"></div><div class="macro-overlay"></div>
           <i data-icon="history"></i><div><h3>Sponsor storici</h3><p>Le nostre radici,<br>un valore che continua</p></div><button>›</button>
         </article>
-        <article class="macro-card blue" data-view="sponsor">
+        <article class="macro-card blue" data-view="sponsor" role="button" tabindex="0" aria-label="Apri sponsor">
           <div class="macro-photo current"></div><div class="macro-overlay"></div>
           <i data-icon="diamond"></i><div><h3>Sponsor attuali</h3><p>Insieme oggi,<br>per nuovi traguardi</p></div><button>›</button>
         </article>
-        <article class="macro-card cyan" data-view="proposte">
+        <article class="macro-card cyan" data-view="proposte" role="button" tabindex="0" aria-label="Apri proposte">
           <div class="macro-photo ideas"></div><div class="macro-overlay"></div>
           <i data-icon="bulb"></i><div><h3>Convenzioni e idee</h3><p>Sinergie, vantaggi<br>e nuove opportunità</p></div><button>›</button>
         </article>
-        <article class="macro-card blue" data-view="report">
+        <article class="macro-card blue" data-view="report" role="button" tabindex="0" aria-label="Apri report">
           <div class="macro-photo research"></div><div class="macro-overlay"></div>
           <i data-icon="chart"></i><div><h3>Ricerca & sviluppo marketing</h3><p>Dati, strategie,<br>crescita</p></div><button>›</button>
         </article>
-        <article class="macro-card gold" data-view="opportunita">
+        <article class="macro-card gold" data-view="opportunita" role="button" tabindex="0" aria-label="Apri opportunita">
           <div class="macro-photo opportunity"></div><div class="macro-overlay"></div>
           <i data-icon="target"></i><div><h3>Asset & opportunità</h3><p>Spazi, visibilità<br>e nuovi progetti</p></div><button>›</button>
         </article>
@@ -255,10 +255,10 @@
   </main>
 </div>
 
-<div class="modal" id="newSponsorModal" hidden>
+<div class="modal" id="newSponsorModal" role="dialog" aria-modal="true" aria-labelledby="newSponsorTitle" hidden>
   <div class="modal-card">
     <button class="modal-x" id="closeNewSponsor">×</button>
-    <small>NUOVO SPONSOR / PARTNER</small><h2>Crea una bozza</h2>
+    <small>NUOVO SPONSOR / PARTNER</small><h2 id="newSponsorTitle">Crea una bozza</h2>
     <form id="newSponsorForm">
       <label>Nome<input name="name" required></label><label>Settore<input name="sector"></label>
       <label>Referente<input name="contact"></label><label>Email<input type="email" name="email"></label>
