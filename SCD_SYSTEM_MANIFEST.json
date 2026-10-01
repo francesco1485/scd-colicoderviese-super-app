@@ -1691,7 +1691,7 @@
     "nextgen_preview": {
       "state": "PREVIEW_NOT_PRODUCTION_PRIMARY",
       "branch": "scd-web-restart-v1",
-      "canonical_preview_url": "https://scd-universe-nova-app.onrender.com",
+      "canonical_preview_url": "https://scd-universe.onrender.com",
       "runtime": "RENDER_NODE_WEB_SERVICE",
       "frontend_api_topology": "SAME_ORIGIN",
       "primary_data_core": "R20",
@@ -2590,7 +2590,7 @@
       ]
     },
     "nextgen_preview": {
-      "release": "NG-0.4.2",
+      "release": "NG-0.4.5",
       "name": "SCD UNIVERSE NOVA",
       "status": "PREVIEW",
       "entry": "#/pulse",
