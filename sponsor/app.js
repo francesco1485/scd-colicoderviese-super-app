@@ -152,7 +152,6 @@ async function loadSponsorSession(){
     if($('#sessionRole'))$('#sessionRole').textContent=(d.user?.role||'Accesso autorizzato')+' · '+profile;
     loadMotionProfiles();
     loadCreativeScenes();
-    loadMotionProfiles();
   }catch(e){
     location.replace('/sponsor/?login=1');
   }
