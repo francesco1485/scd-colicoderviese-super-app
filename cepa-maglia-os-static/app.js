@@ -24,7 +24,7 @@ const viewMeta={
  liaWorkbench:['Lia · Workbench','Assistente operativo con permessi, ricerca, cartelle di lavoro e artefatti tracciati']
 }
 
-let ecosystem=[],projects=[],actions=[],marketHubs=[],marketEntities=[],contacts=[],timeline=[],documents=[],partnerRequirements=[],blueprints=[],subjects=[],initiatives=[],cepaContent=[],cepaAcademy=[],cepaSpeakers=[],products=[],productKnowledge=[],comparisons=[],collaborators=[],collaboratorTerms=[],portfolioSnapshots=[],businessAssessments=[],growthKits=[],distributionWatchlists=[],distributionCandidates=[],distributionEvidence=[],mailTemplates=[],mailDrafts=[],cepaExpansion=[],cepaReadiness=[],assistantMessages=[],recoveryRows=[],members=[],liaCapabilities=[],liaFolders=[],liaOrders=[],liaFiles=[],researchSources=[],researchInsights=[],liaActionRules=[],liaApprovals=[],roleViewAccess=[],liaAutomationRuns=[]
+let ecosystem=[],projects=[],actions=[],marketHubs=[],marketEntities=[],contacts=[],timeline=[],documents=[],partnerRequirements=[],blueprints=[],subjects=[],initiatives=[],cepaContent=[],cepaAcademy=[],cepaSpeakers=[],products=[],productKnowledge=[],comparisons=[],collaborators=[],collaboratorTerms=[],portfolioSnapshots=[],businessAssessments=[],growthKits=[],distributionWatchlists=[],distributionCandidates=[],distributionEvidence=[],mailTemplates=[],mailDrafts=[],cepaExpansion=[],cepaReadiness=[],assistantMessages=[],recoveryRows=[],members=[],liaCapabilities=[],liaFolders=[],liaOrders=[],liaFiles=[],researchSources=[],researchInsights=[],liaActionRules=[],liaApprovals=[],roleViewAccess=[],liaAutomationRuns=[],assetRegistry=[],expertProtocols=[],uxUsageEvents=[]
 let officeAssignments=[],officeMessages=[],officeSnapshots=[],officeCases=[],officeWorkflow=[],officeCepaActivities=[],officeImports=[]
 let commercialClients=[],pipelineCases=[],clientCheckups=[],clientInteractions=[],clientWorkItems=[],clientPolicies=[]
 let currentPartnerId=null,currentOfficeId=null,currentOfficeProductId=null,currentCepaHubId=null,currentCommerceTab='clients'
@@ -267,6 +267,7 @@ function navigate(view){
   setLiaOpen(false)
   if(view==='recovery')loadRecovery()
   recordRoute({kind:'view',view})
+  recordUxEvent('view',view,null,true)
   renderHeaderControls()
   window.scrollTo({top:0,behavior:'smooth'})
 }
@@ -473,6 +474,7 @@ async function boot(){
   $('aiDock').classList.remove('hidden')
   setLiaOpen(false)
   if(appRouteIndex<0)recordRoute({kind:'view',view:'home'})
+  recordUxEvent('layout','home','boot',true)
   renderHeaderControls()
 }
 
@@ -533,12 +535,15 @@ async function loadAll(){
     supabase.from('checkups').select('*').eq('organization_id',window.orgId).order('updated_at',{ascending:false}).limit(1000),
     supabase.from('client_interactions').select('*').eq('organization_id',window.orgId).order('occurred_at',{ascending:false}).limit(2000),
     supabase.from('work_items').select('*').eq('organization_id',window.orgId).order('updated_at',{ascending:false}).limit(2000),
-    supabase.from('client_policies').select('*,clients(id,kind,status,first_name,last_name,business_name,city,province),agency_products(id,code,name,category)').eq('organization_id',window.orgId).order('expiry_date',{ascending:true}).limit(10000)
+    supabase.from('client_policies').select('*,clients(id,kind,status,first_name,last_name,business_name,city,province),agency_products(id,code,name,category)').eq('organization_id',window.orgId).order('expiry_date',{ascending:true}).limit(10000),
+    supabase.from('asset_registry').select('*').eq('organization_id',window.orgId).eq('is_active',true).order('governance_status').order('asset_name').limit(1000),
+    supabase.from('expert_protocols').select('*').eq('organization_id',window.orgId).eq('status','active').order('version',{ascending:false}).limit(20),
+    supabase.from('ux_usage_events').select('*').eq('organization_id',window.orgId).order('created_at',{ascending:false}).limit(500)
   ]
   const res=await Promise.all(q)
   const err=res.find(x=>x.error)?.error
   if(err){console.error(err);$('refreshBtn').textContent='!';return}
-  ;[ecosystem,projects,actions,marketHubs,marketEntities,contacts,timeline,documents,partnerRequirements,blueprints,subjects,initiatives,cepaContent,cepaAcademy,cepaSpeakers,products,productKnowledge,comparisons,collaborators,collaboratorTerms,portfolioSnapshots,businessAssessments,growthKits,distributionWatchlists,distributionCandidates,distributionEvidence,mailTemplates,mailDrafts,cepaExpansion,cepaReadiness,assistantMessages,liaCapabilities,liaFolders,liaOrders,liaFiles,researchSources,researchInsights,liaActionRules,liaApprovals,roleViewAccess,liaAutomationRuns,officeAssignments,officeMessages,officeSnapshots,officeCases,officeWorkflow,officeCepaActivities,officeImports,commercialClients,pipelineCases,clientCheckups,clientInteractions,clientWorkItems,clientPolicies]=res.map(x=>x.data||[])
+  ;[ecosystem,projects,actions,marketHubs,marketEntities,contacts,timeline,documents,partnerRequirements,blueprints,subjects,initiatives,cepaContent,cepaAcademy,cepaSpeakers,products,productKnowledge,comparisons,collaborators,collaboratorTerms,portfolioSnapshots,businessAssessments,growthKits,distributionWatchlists,distributionCandidates,distributionEvidence,mailTemplates,mailDrafts,cepaExpansion,cepaReadiness,assistantMessages,liaCapabilities,liaFolders,liaOrders,liaFiles,researchSources,researchInsights,liaActionRules,liaApprovals,roleViewAccess,liaAutomationRuns,officeAssignments,officeMessages,officeSnapshots,officeCases,officeWorkflow,officeCepaActivities,officeImports,commercialClients,pipelineCases,clientCheckups,clientInteractions,clientWorkItems,clientPolicies,assetRegistry,expertProtocols,uxUsageEvents]=res.map(x=>x.data||[])
   renderEverything()
   $('refreshBtn').textContent='↻'
 }
@@ -628,6 +633,8 @@ function renderOperatingPlan(){
   ).join('')
 
   $('planResearchSummary').innerHTML=
+    '<div><strong>'+expertProtocols.filter(x=>x.status==='active').length+'</strong><span>protocolli attivi</span></div>'+ 
+    '<div><strong>'+assetRegistry.filter(x=>x.governance_status==='locked').length+'</strong><span>asset LOCKED</span></div>'+ 
     '<div><strong>'+researchSources.length+'</strong><span>fonti registrate</span></div>'+
     '<div><strong>'+researchInsights.length+'</strong><span>insight raccolti</span></div>'+
     '<div><strong>'+liaAutomationRuns.filter(x=>x.status==='queued').length+'</strong><span>ricerche in coda</span></div>'+
@@ -648,7 +655,9 @@ function renderOperatingPlan(){
     ['Direzione','Priorità, sedi, autorizzazioni, strategie e decisioni finali'],
     ['Operatori','Lavoro e aggiornamenti della propria sede'],
     ['Specialisti','Prodotti, partner, contenuti e competenze verticali'],
-    ['Lia','Ricerca, preparazione, analisi ed esecuzione entro le regole assegnate']
+    ['Lia','Ricerca, preparazione, analisi ed esecuzione entro le regole assegnate'],
+    ['Asset Governance','LOCKED, REUSE, ADAPT, REBUILD, VERIFY e REJECT proteggono identità e fonti'],
+    ['Adaptive Expert','Attiva la competenza necessaria in base a contesto, dati, dispositivo e obiettivo']
   ].map(x=>'<div><strong>'+x[0]+'</strong><span>'+x[1]+'</span></div>').join('')
 
   let focus={title:'Consolidare il lavoro per prodotto',text:'Porta rinnovi, preventivi, proposte, pratiche ed esiti in un flusso unico e leggibile.',target:'actions'}
@@ -2258,10 +2267,47 @@ async function decideLiaApproval(id,status){
   await loadAll()
 }
 
+
+function currentDeviceProfile(){
+  const w=Math.round(window.innerWidth||document.documentElement.clientWidth||0)
+  const h=Math.round(window.innerHeight||document.documentElement.clientHeight||0)
+  const device=w<600?'phone':w<1024?'tablet':w<1800?'desktop':'large_display'
+  const orientation=w>=h?'landscape':'portrait'
+  let input='unknown'
+  try{
+    const touch=matchMedia('(pointer: coarse)').matches
+    const mouse=matchMedia('(pointer: fine)').matches
+    input=touch&&mouse?'mixed':touch?'touch':mouse?'mouse':'unknown'
+  }catch(_){}
+  return{device_class:device,viewport_width:w,viewport_height:h,orientation,input_mode:input}
+}
+function recordUxEvent(eventType,viewKey,actionKey=null,success=null,metadata={}){
+  if(!window.orgId||!window.userId)return
+  const row={organization_id:window.orgId,user_id:window.userId,view_key:viewKey||'unknown',action_key:actionKey,event_type:eventType,...currentDeviceProfile(),success,metadata}
+  supabase.from('ux_usage_events').insert(row).then(({error})=>{if(error&&error.code!=='42501')console.warn('UX telemetry',error.message)})
+}
+function orchestratorProtocol(){return expertProtocols.find(x=>x.code==='adaptive_master')||expertProtocols[0]||null}
+function governanceLabel(v){return({locked:'LOCKED',reuse:'REUSE',adapt:'ADAPT',rebuild:'REBUILD',verify:'VERIFY',reject:'REJECT'})[v]||String(v||'VERIFY').toUpperCase()}
+
 function renderLiaWorkbench(){
   if(!$('liaCapabilityList'))return
   const levelLabel={admin:'Amministrazione ed esecuzione',execute:'Esecuzione autorizzata',prepare:'Preparazione e proposta',support:'Supporto al ruolo'}
   $('liaRoleMode').textContent=(window.userRole||'viewer').replaceAll('_',' ')+' · '+(isManager()?'esecuzione operativa':'supporto per ruolo')
+  const protocol=orchestratorProtocol()
+  if($('liaProtocolStatus'))$('liaProtocolStatus').textContent=protocol?'v'+protocol.version+' · '+protocol.status:'non configurato'
+  if($('liaProtocolDecision'))$('liaProtocolDecision').innerHTML=protocol?(protocol.decision_order||[]).map((x,i)=>'<div><b>'+(i+1)+'</b><span>'+esc(x)+'</span></div>').join(''):empty('Protocollo non disponibile')
+  if($('liaProtocolRules'))$('liaProtocolRules').innerHTML=protocol?(protocol.locked_principles||[]).map(x=>'<div class="lia-protocol-rule"><span>✓</span><p>'+esc(x)+'</p></div>').join(''):empty('Nessuna regola bloccata')
+
+  if($('liaAssetCount'))$('liaAssetCount').textContent=assetRegistry.length+' asset'
+  if($('liaAssetRegistry'))$('liaAssetRegistry').innerHTML=assetRegistry.map(a=>'<div class="lia-asset-row"><div><strong>'+esc(a.asset_name)+'</strong><small>'+esc(a.asset_type.replaceAll('_',' '))+' · '+esc(a.project_scope)+(a.repository_path?' · '+esc(a.repository_path):'')+'</small></div><span class="asset-state '+esc(a.governance_status)+'">'+esc(governanceLabel(a.governance_status))+'</span></div>').join('')||empty('Registro pronto. Nessun asset canonico ancora censito.')
+
+  if($('liaUxSummary')){
+    const byDevice=uxUsageEvents.reduce((m,x)=>(m[x.device_class]=(m[x.device_class]||0)+1,m),{})
+    const viewEvents=uxUsageEvents.filter(x=>x.event_type==='view')
+    const popular=Object.entries(viewEvents.reduce((m,x)=>(m[x.view_key]=(m[x.view_key]||0)+1,m),{})).sort((a,b)=>b[1]-a[1]).slice(0,5)
+    $('liaUxSummary').innerHTML=isManager()?'<div><strong>'+uxUsageEvents.length+'</strong><span>eventi recenti</span></div><div><strong>'+esc(Object.entries(byDevice).map(([k,v])=>k+' '+v).join(' · ')||'—')+'</strong><span>dispositivi</span></div><div><strong>'+esc(popular.map(([k,v])=>k+' '+v).join(' · ')||'—')+'</strong><span>viste più usate</span></div>':'<div class="empty">Telemetria aggregata riservata alla Direzione.</div>'
+  }
+
   $('liaCapabilityList').innerHTML=liaCapabilities.map(c=>
     '<div class="lia-capability-row"><div><strong>'+esc(c.capability.replaceAll('.',' · '))+'</strong><small>'+esc(levelLabel[c.permission_level]||c.permission_level)+'</small></div><span class="lia-level '+esc(c.permission_level)+'">'+esc(c.permission_level)+'</span></div>'
   ).join('')||empty('Nessuna capacità assegnata')
