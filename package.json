@@ -7,7 +7,7 @@
   },
   "scripts": {
     "start": "node server.js",
-    "check": "npm run test:manifest && npm run test:supabase-contract && npm run test:mobile-contract && npm run test:universe-contract && npm run test:human-os-contract && npm run test:newsroom-contract && npm run test:nextgen-contract && npm run test:asset-adaptive-contract && node --check server.js && node --check app.js && node --check scd-adaptive-engine.js && node --check scd-meta-engine.js && node --check scd-twin.js && node --check scd-experience-engine.js && node --check app-r24-router.js && node --check scripts/verify-production.mjs && node --check scripts/verify-r20-direct.mjs && node --check scripts/validate-supabase-contract.mjs && node --check scripts/validate-mobile-contract.mjs && node --check scripts/validate-universe-contract.mjs && node --check scripts/validate-human-os-contract.mjs && node --check scripts/validate-newsroom-contract.mjs && node --check scripts/validate-asset-adaptive-contract.mjs",
+    "check": "npm run test:manifest && npm run test:supabase-contract && npm run test:mobile-contract && npm run test:universe-contract && npm run test:human-os-contract && npm run test:newsroom-contract && npm run test:nextgen-contract && npm run test:asset-adaptive-contract && npm run test:intake-contract && node --check server.js && node --check app.js && node --check scd-adaptive-engine.js && node --check scd-meta-engine.js && node --check scd-twin.js && node --check scd-experience-engine.js && node --check app-r24-router.js && node --check scripts/verify-production.mjs && node --check scripts/verify-r20-direct.mjs && node --check scripts/validate-supabase-contract.mjs && node --check scripts/validate-mobile-contract.mjs && node --check scripts/validate-universe-contract.mjs && node --check scripts/validate-human-os-contract.mjs && node --check scripts/validate-newsroom-contract.mjs && node --check scripts/validate-asset-adaptive-contract.mjs && node --check scripts/validate-intake-contract.mjs && node --check intake/intake.js",
     "build": "npm run check",
     "test:smoke": "node tests/smoke-nextgen.mjs",
     "test:contract": "node tests/api-contract.mjs",
@@ -25,6 +25,7 @@
     "test:newsroom-contract": "node scripts/validate-newsroom-contract.mjs",
     "test:nextgen-contract": "node scripts/validate-nextgen-contract.mjs",
     "test:smoke:legacy": "node tests/smoke.mjs",
-    "test:asset-adaptive-contract": "node scripts/validate-asset-adaptive-contract.mjs"
+    "test:asset-adaptive-contract": "node scripts/validate-asset-adaptive-contract.mjs",
+    "test:intake-contract": "node scripts/validate-intake-contract.mjs"
   }
 }
