@@ -42,7 +42,8 @@ for(const forbiddenTable of [
 ]){
   if(new RegExp('insert\\s+into\\s+public\\.'+forbiddenTable,'i').test(sql))fail('R56 must not seed operational rows into '+forbiddenTable);
 }
-if(/plaintext|temporary_password|password\s*=|pin\s*=\s*['"][0-9]/i.test(sql))fail('plaintext credential pattern in schema');
+if(/\b(?:temporary_password|temp_password|password|pin)\b\s+(?:text|varchar|character varying)/i.test(sql))fail('credential storage column forbidden in schema');
+if(/\b(?:password|pin)\s*=\s*['"][^'"]+['"]/i.test(sql))fail('hardcoded credential assignment forbidden in schema');
 
 for(const token of [
   'function r56ResolveIdentity_',
