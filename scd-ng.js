@@ -585,9 +585,10 @@ async function privatePost(action,payload={},token=state.privateToken){
 }
 function legacyWorkspace(data={}){
  const u=data.user||{},p=data.permissions||{},mods=['CALENDARIO'];
- if(u.staff||p.direction)mods.push('COMUNICAZIONI');
- if(data.transport)mods.push('PULMINI');
+ if(u.staff||p.direction)mods.push('COMUNICAZIONI','PRESENZE','CONVOCAZIONI');
+ if(data.transport||Array.isArray(data.personal)&&data.personal.length)mods.push('PULMINI');
  if(Array.isArray(data.personal)&&data.personal.length)mods.push('TESSERATI');
+ mods.push('RICHIESTE');
  if(p.direction)mods.push('APPROVAZIONI','DOCUMENTI','CRM');
  return {email:String(u.email||state.privateEmail||''),name:String(u.name||u.fullName||u.email||'Profilo SCD'),role:String(u.role||u.coreRole||u.type||(p.direction?'DIREZIONE':'STAFF')),privateDeskProfile:'R20_FALLBACK',defaultModules:[...new Set(mods)],communicationScope:[],dataScope:['R20 DASHBOARD'],areas:[]};
 }
@@ -617,7 +618,10 @@ const deskModuleMeta={
  TORNEI_EVENTI:['★','Tornei & Eventi','Organizzazione e calendario'],
  BIGLIETTERIA:['◧','Biglietteria','Accessi e attività evento'],
  DRIVE_TORNEI:['□','Drive Tornei','Documenti evento autorizzati'],
- PARTNER_EVENTO:['◇','Partner Evento','Relazioni collegate agli eventi']
+ PARTNER_EVENTO:['◇','Partner Evento','Relazioni collegate agli eventi'],
+ RICHIESTE:['☑','Richieste','Invii e stato pratiche'],
+ PRESENZE:['✓','Presenze','Registro squadra autorizzato'],
+ CONVOCAZIONI:['⚽','Convocazioni','Crea e gestisci convocazioni']
 };
 function deskMeta(module){return deskModuleMeta[module]||['•',String(module||'Modulo').replaceAll('_',' '),'Funzione autorizzata dal profilo']}
 function bindPrivateDesk(){
@@ -657,7 +661,11 @@ function renderPrivateDesk(){
    dock.innerHTML='<div class="desk-service-empty"><b>Moduli protetti</b><span>Compaiono dopo autenticazione e verifica dello scope.</span></div>';
    bindPrivateDesk();return;
  }
- const modules=[...new Set((w.defaultModules||[]).map(x=>String(x||'').trim().toUpperCase()).filter(Boolean))];
+ const moduleSet=new Set((w.defaultModules||[]).map(x=>String(x||'').trim().toUpperCase()).filter(Boolean)),u=state.privateData?.user||{},perm=state.privateData?.permissions||{},personal=Array.isArray(state.privateData?.personal)?state.privateData.personal:[];
+ if(personal.length){moduleSet.add('TESSERATI');moduleSet.add('PULMINI')}
+ moduleSet.add('RICHIESTE');
+ if(u.staff||perm.direction||['STAFF','MISTER','MANAGER','SECRETARIAT','REGISTRATION','TOURNAMENTS','DIREZIONE','ADMIN'].includes(String(u.role||'').toUpperCase())){moduleSet.add('PRESENZE');moduleSet.add('CONVOCAZIONI');moduleSet.add('COMUNICAZIONI')}
+ const modules=[...moduleSet];
  if(status)status.textContent=(w.privateDeskProfile||'ROLE / SCOPE').replaceAll('_',' ');
  if(title)title.innerHTML=esc(w.name||'Private Desk')+'<br><em>'+esc(w.role||'Profilo SCD')+'</em>';
  if(copy)copy.textContent='Mostro soltanto moduli e dati assegnati al tuo account.';
@@ -746,6 +754,107 @@ function openPrivateProfilesModule(){
    if(action==='requests')return openPrivateRequestsPanel();
  });
 }
+function privateProfileName(p={}){return [p.firstName,p.lastName].filter(Boolean).join(' ')||p.fullName||'Profilo SCD'}
+function privateProfileKey(p={}){return String(p.code||p.playerCode||p.personId||p.id||'')}
+function privateProfileConvocations(p={}){
+ const key=privateProfileKey(p),name=privateProfileName(p).toLowerCase();
+ return (state.privateData?.convocations||[]).filter(x=>!key||String(x.playerCode||x.personId||x.playerId||'')===key||String(x.player||'').toLowerCase().includes(name)).slice(0,6);
+}
+function privateTeams(){
+ const d=state.privateData||{},raw=[...(d.attendance?.teams||[]),...(d.teams||[])],seen=new Set(),out=[];
+ raw.forEach(x=>{const key=String(x.key||x.code||x.id||x.name||'').trim(),name=String(x.name||x.teamName||x.label||key).trim();if(key&&!seen.has(key)){seen.add(key);out.push({key,name})}});
+ (d.personal||[]).forEach(p=>{const name=String(p.teamName||p.group||'').trim();if(name&&!seen.has(name)){seen.add(name);out.push({key:name,name})}});
+ return out;
+}
+function privateStatusValue(p,...keys){for(const k of keys){const v=p?.[k];if(v!==undefined&&v!==null&&String(v).trim())return String(v)}return 'Dato in aggiornamento'}
+function openPrivateProfileStatus(p={},mode='status'){
+ const name=privateProfileName(p),figc=privateStatusValue(p,'figcStatus','recordStatus'),cert=privateStatusValue(p,'certificateStatus','certificateExpiry'),pay=privateStatusValue(p,'paymentStatus','payment','feeStatus'),identity=privateStatusValue(p,'identityStatus','idDocumentStatus');
+ const rows=mode==='documents'
+  ?[['CERTIFICATO MEDICO',cert],['DOCUMENTO IDENTITÀ',identity]]
+  :mode==='payments'
+    ?[['STATO AMMINISTRATIVO',pay]]
+    :[['FIGC / TESSERAMENTO',figc],['CERTIFICATO MEDICO',cert],['QUOTA / PAGAMENTI',pay]];
+ const note=mode==='documents'?'Nessun documento viene dichiarato presente se il gestionale non lo conferma.':mode==='payments'?'Importi, rate e scadenze compaiono solo quando restituiti dal gestionale. Non vengono ricostruiti lato app.':'Sono mostrati esclusivamente i valori restituiti dal profilo autorizzato.';
+ const layer=openPanel(mode==='documents'?'Documenti':mode==='payments'?'Quote & pagamenti':'Stato profilo','<div class="panel-detail r54-private-panel"><span class="eyebrow">AREA RISERVATA · ROLE/SCOPE</span><h2>'+esc(name)+'</h2><div class="r54-live-status-list">'+rows.map(r=>'<article><span>'+esc(r[0])+'</span><b>'+esc(r[1])+'</b></article>').join('')+'</div><p>'+esc(note)+'</p>'+(mode==='documents'?'<button type="button" class="btn primary" id="r54PrivateHelp">Richiedi assistenza</button>':'')+'</div>');
+ if(mode==='documents'){
+   const b=$('#r54PrivateHelp',layer);if(b)b.onclick=()=>openPrivateRequestForm(p,'DOCUMENTO');
+ }
+}
+function openPrivateRequestForm(profile=null,type='INFORMAZIONE'){
+ const teams=privateTeams(),name=profile?privateProfileName(profile):'',team=String(profile?.teamName||profile?.group||'');
+ const layer=openPanel('Nuova richiesta','<form class="join-form r54-private-form" id="r54PrivateRequestForm"><span class="eyebrow">AREA PERSONALE</span><h2>Richiesta al Club</h2><div class="form-grid"><label>Tipo<select name="type"><option '+(type==='DOCUMENTO'?'selected':'')+'>DOCUMENTO</option><option '+(type==='TESSERAMENTO'?'selected':'')+'>TESSERAMENTO</option><option>AMMINISTRAZIONE</option><option>SPORTIVO</option><option>INFORMAZIONE</option><option>ALTRO</option></select></label><label>Squadra / area<select name="team"><option value="">Generale</option>'+teams.map(t=>'<option value="'+esc(t.key)+'" '+(team===t.key||team===t.name?'selected':'')+'>'+esc(t.name)+'</option>').join('')+'</select></label><label class="full">Oggetto<input name="subject" required maxlength="140" value="'+esc(name?('Richiesta · '+name):'')+'"></label><label class="full">Messaggio<textarea name="message" required maxlength="1200"></textarea></label></div><button class="btn primary" type="submit">Invia richiesta</button><p id="r54PrivateRequestState"></p></form>');
+ const form=$('#r54PrivateRequestForm',layer);
+ form.onsubmit=async e=>{
+   e.preventDefault();const fd=new FormData(form),st=$('#r54PrivateRequestState',form),btn=$('button[type="submit"]',form);btn.disabled=true;st.textContent='Invio…';
+   try{
+     const out=await privatePost('private.request.submit',{type:String(fd.get('type')||''),subject:String(fd.get('subject')||''),message:String(fd.get('message')||''),team:String(fd.get('team')||''),personId:privateProfileKey(profile)});
+     st.textContent='Richiesta registrata'+(out?.id||out?.requestId?' · '+String(out.id||out.requestId):'')+'.';toast('Richiesta registrata');
+   }catch(err){st.textContent=String(err.message||err);btn.disabled=false}
+ };
+}
+async function openPrivateRequests(){
+ const layer=openPanel('Le mie richieste','<div class="panel-detail r54-private-panel"><span class="eyebrow">AREA PERSONALE</span><h2>Richieste e pratiche</h2><div id="r54PrivateRequests" class="desk-private-loading"><b>Carico lo stato…</b></div><button type="button" class="btn primary" id="r54NewPrivateRequest">Nuova richiesta</button></div>');
+ const mount=$('#r54PrivateRequests',layer);
+ try{
+   const data=await privatePost('account.requests',{}),rows=Array.isArray(data)?data:(data.rows||data.items||[]);
+   mount.innerHTML=rows.length?'<div class="r54-request-list">'+rows.slice(0,30).map(x=>'<article><div><b>'+esc(x.subject||x.topic||x.type||'Richiesta SCD')+'</b><small>'+esc(x.createdAt||x.created_at||x.date||'')+'</small></div><span>'+esc(x.status||x.state||'IN AGGIORNAMENTO')+'</span></article>').join('')+'</div>':'<div class="desk-service-empty"><b>Nessuna richiesta restituita</b><span>Il gestionale non ha pratiche visibili per questo account.</span></div>';
+ }catch(err){mount.innerHTML='<div class="desk-service-empty"><b>Dato in aggiornamento</b><span>'+esc(String(err.message||err))+'</span></div>'}
+ const add=$('#r54NewPrivateRequest',layer);if(add)add.onclick=()=>openPrivateRequestForm();
+}
+function openPrivateTransport(profile=null){
+ const teams=privateTeams(),team=String(profile?.teamName||profile?.group||''),today=new Date().toISOString().slice(0,10);
+ const layer=openPanel('Pulmino & Trasporti','<form class="join-form r54-private-form" id="r54TransportForm"><span class="eyebrow">LOGISTICA SCD · ROLE/SCOPE</span><h2>Nuova richiesta trasporto</h2><div class="form-grid"><label>Data<input name="date" type="date" value="'+today+'" required></label><label>Ora<input name="time" type="time" required></label><label>Partenza<input name="origin" required maxlength="120"></label><label>Destinazione<input name="destination" required maxlength="120"></label><label>Squadra<select name="team"><option value="">Generale</option>'+teams.map(t=>'<option value="'+esc(t.key)+'" '+(team===t.key||team===t.name?'selected':'')+'>'+esc(t.name)+'</option>').join('')+'</select></label><label>Persone<input name="passengers" type="number" min="1" max="60" value="1"></label><label class="full">Note<textarea name="notes" maxlength="800"></textarea></label></div><button class="btn primary" type="submit">Invia richiesta</button><p id="r54TransportState"></p></form>');
+ const form=$('#r54TransportForm',layer);
+ form.onsubmit=async e=>{
+   e.preventDefault();const fd=new FormData(form),st=$('#r54TransportState',form),btn=$('button[type="submit"]',form);btn.disabled=true;st.textContent='Invio…';
+   try{
+     await privatePost('private.transport.request',{date:String(fd.get('date')||''),time:String(fd.get('time')||''),origin:String(fd.get('origin')||''),destination:String(fd.get('destination')||''),team:String(fd.get('team')||''),type:'TRASFERTA',passengers:Number(fd.get('passengers')||1),notes:String(fd.get('notes')||''),personId:privateProfileKey(profile)});
+     st.textContent='Richiesta trasporto registrata.';toast('Richiesta trasporto registrata');
+   }catch(err){st.textContent=String(err.message||err);btn.disabled=false}
+ };
+}
+function openPrivatePeopleHub(initial=0){
+ const people=Array.isArray(state.privateData?.personal)?state.privateData.personal:[];
+ if(!people.length){openPanel('Atleti & Famiglia','<div class="panel-detail"><h2>Dato in aggiornamento</h2><p>Nessun profilo autorizzato è stato restituito per questo account.</p></div>');return}
+ const layer=openPanel(people.length>1?'Area Famiglia':'Area Atleta','<div id="r54PeopleHub"></div>');
+ const mount=$('#r54PeopleHub',layer);
+ const render=index=>{
+   const p=people[Math.max(0,Math.min(Number(index)||0,people.length-1))],name=privateProfileName(p),conv=privateProfileConvocations(p),active=conv[0]||null,figc=privateStatusValue(p,'figcStatus','recordStatus'),cert=privateStatusValue(p,'certificateStatus','certificateExpiry'),pay=privateStatusValue(p,'paymentStatus','payment','feeStatus');
+   mount.innerHTML='<section class="r54-people-hub"><div class="r54-profile-tabs">'+people.map((x,i)=>'<button type="button" data-r54-person="'+i+'" class="'+(i===index?'active':'')+'"><span>'+esc((x.firstName||privateProfileName(x)).slice(0,1).toUpperCase())+'</span><b>'+esc(privateProfileName(x).split(' ')[0])+'</b><small>'+esc(x.teamName||x.group||'')+'</small></button>').join('')+'</div><div class="r54-profile-hero"><div><small>PROFILO AUTORIZZATO</small><h2>'+esc(name)+'</h2><p>'+esc(p.teamName||p.group||'Squadra in aggiornamento')+'</p></div><span>'+esc(figc)+'</span></div>'+(active?'<div class="r54-live-callup"><div><small>CONVOCAZIONE</small><b>'+esc(active.team||active.teamName||'Gara SCD')+'</b><p>'+esc([fmtDate(active.date||''),active.meetingTime,active.meetingPlace].filter(Boolean).join(' · '))+'</p><em>'+esc(active.response||'DA CONFERMARE')+'</em></div><div><button type="button" class="btn primary" data-r54-callup="PRESENTE" data-conv="'+esc(active.id||active.convocationId||'')+'" data-player="'+esc(active.playerCode||privateProfileKey(p))+'">Conferma presenza</button><button type="button" class="btn glass" data-r54-callup="ASSENTE" data-conv="'+esc(active.id||active.convocationId||'')+'" data-player="'+esc(active.playerCode||privateProfileKey(p))+'">Segnala assenza</button></div></div>':'<div class="r54-live-callup empty"><div><small>CONVOCAZIONI</small><b>Dato in aggiornamento</b><p>Nessuna convocazione autorizzata disponibile.</p></div></div>')+'<div class="r54-profile-kpis"><article><small>FIGC</small><b>'+esc(figc)+'</b></article><article><small>CERTIFICATO</small><b>'+esc(cert)+'</b></article><article><small>PAGAMENTI</small><b>'+esc(pay)+'</b></article></div><div class="r54-profile-actions"><button type="button" data-r54-action="documents">▣<b>Documenti</b></button><button type="button" data-r54-action="payments">▰<b>Quote</b></button><button type="button" data-r54-action="calendar">▦<b>Calendario</b></button><button type="button" data-r54-action="transport">⌁<b>Pulmino</b></button><button type="button" data-r54-action="requests">☑<b>Richieste</b></button><button type="button" data-r54-action="status">✓<b>Stato</b></button></div></section>';
+   $('[data-r54-person]',mount).forEach(b=>b.onclick=()=>render(Number(b.dataset.r54Person)));
+   $('[data-r54-action]',mount).forEach(b=>b.onclick=()=>{const a=b.dataset.r54Action;if(a==='documents')return openPrivateProfileStatus(p,'documents');if(a==='payments')return openPrivateProfileStatus(p,'payments');if(a==='calendar'){layer.classList.remove('open');setView('calendar');return}if(a==='transport')return openPrivateTransport(p);if(a==='requests')return openPrivateRequests();if(a==='status')return openPrivateProfileStatus(p,'status')});
+   $('[data-r54-callup]',mount).forEach(b=>b.onclick=async()=>{if(!b.dataset.conv||!b.dataset.player)return toast('Convocazione incompleta: sincronizza i dati');b.disabled=true;try{await privatePost('private.convocation.reply',{id:b.dataset.conv,player:b.dataset.player,response:b.dataset.r54Callup});state.privateData=await privatePost('dashboard.summary',{});toast('Risposta registrata');render(index)}catch(err){toast(String(err.message||err));b.disabled=false}});
+ };
+ render(initial);
+}
+function openPrivateAttendance(){
+ const teams=privateTeams(),today=new Date().toISOString().slice(0,10);
+ if(!teams.length){openPanel('Presenze','<div class="panel-detail"><h2>Dato in aggiornamento</h2><p>Nessuna squadra autorizzata restituita dal gestionale.</p></div>');return}
+ const layer=openPanel('Registro presenze','<div class="panel-detail r54-private-panel"><span class="eyebrow">STAFF · ROLE/SCOPE</span><h2>Registro squadra</h2><div class="form-grid"><label>Squadra<select id="r54AttTeam">'+teams.map(t=>'<option value="'+esc(t.key)+'">'+esc(t.name)+'</option>').join('')+'</select></label><label>Data<input id="r54AttDate" type="date" value="'+today+'"></label></div><button class="btn primary" id="r54AttLoad">Carica rosa</button><div id="r54AttRows"></div></div>');
+ $('#r54AttLoad',layer).onclick=async()=>{
+   const mount=$('#r54AttRows',layer);mount.innerHTML='<div class="desk-private-loading"><b>Carico registro…</b></div>';
+   try{
+     const data=await privatePost('private.attendance.get',{teamKey:$('#r54AttTeam',layer).value,date:$('#r54AttDate',layer).value}),statuses=data.statuses||['PRESENTE','ASSENTE','GIUSTIFICATO','INFORTUNATO','RITARDO'],players=data.players||[];
+     mount.innerHTML=players.length?'<div class="r54-attendance-list">'+players.map(p=>'<label><span><b>'+esc(p.name||p.fullName||p.code||'Atleta')+'</b><small>'+esc(p.code||'')+'</small></span><select data-r54-att="'+esc(p.code||p.personId||'')+'">'+[''].concat(statuses).map(s=>'<option value="'+esc(s)+'" '+(s===p.status?'selected':'')+'>'+esc(s||'SELEZIONA')+'</option>').join('')+'</select></label>').join('')+'</div><button class="btn primary" id="r54AttSave">Salva presenze</button>':'<div class="desk-service-empty"><b>Rosa non disponibile</b><span>Il gestionale non ha restituito atleti per questa squadra.</span></div>';
+     const save=$('#r54AttSave',layer);if(save)save.onclick=async()=>{const rows=$('[data-r54-att]',layer).filter(x=>x.value).map(x=>({personId:x.dataset.r54Att,status:x.value}));if(!rows.length)return toast('Seleziona almeno una presenza');try{await privatePost('private.attendance.save',{teamKey:$('#r54AttTeam',layer).value,date:$('#r54AttDate',layer).value,eventType:'ALLENAMENTO',rows});toast('Presenze salvate: '+rows.length)}catch(err){toast(String(err.message||err))}};
+   }catch(err){mount.innerHTML='<div class="desk-service-empty"><b>Registro non disponibile</b><span>'+esc(String(err.message||err))+'</span></div>'}
+ };
+}
+function openPrivateConvocations(){
+ const d=state.privateData||{},teams=privateTeams(),today=new Date().toISOString().slice(0,10);
+ if(!teams.length){openPanel('Convocazioni','<div class="panel-detail"><h2>Dato in aggiornamento</h2><p>Nessuna squadra autorizzata restituita.</p></div>');return}
+ const layer=openPanel('Convocazioni','<form class="join-form r54-private-form" id="r54ConvForm"><span class="eyebrow">STAFF · ROLE/SCOPE</span><h2>Nuova convocazione</h2><div class="form-grid"><label>Squadra<select id="r54ConvTeam">'+teams.map(t=>'<option value="'+esc(t.key)+'">'+esc(t.name)+'</option>').join('')+'</select></label><label>Data gara<input id="r54ConvDate" type="date" value="'+today+'" required></label><label>Ritrovo<input id="r54ConvTime" type="time" required></label><label>Luogo<input id="r54ConvPlace" required maxlength="160"></label><label class="full">Note<textarea id="r54ConvNotes" maxlength="800"></textarea></label></div><div id="r54ConvPlayers"></div><button class="btn primary" type="submit">Crea convocazione</button><p id="r54ConvState"></p></form>');
+ const renderPlayers=()=>{const key=$('#r54ConvTeam',layer).value,roster=(d.roster&&d.roster[key])||[];$('#r54ConvPlayers',layer).innerHTML=roster.length?'<div class="r54-player-checks">'+roster.map(p=>'<label><input type="checkbox" data-r54-conv-player value="'+esc(p.code||p.personId||'')+'"> '+esc(p.name||privateProfileName(p))+'</label>').join('')+'</div>':'<div class="desk-service-empty"><b>Rosa in aggiornamento</b><span>La convocazione non inventa atleti mancanti.</span></div>'};
+ $('#r54ConvTeam',layer).onchange=renderPlayers;renderPlayers();
+ $('#r54ConvForm',layer).onsubmit=async e=>{e.preventDefault();const players=$('[data-r54-conv-player]:checked',layer).map(x=>x.value).filter(Boolean),st=$('#r54ConvState',layer);try{await privatePost('private.convocation.create',{teamKey:$('#r54ConvTeam',layer).value,gameDate:$('#r54ConvDate',layer).value,meetingTime:$('#r54ConvTime',layer).value,meetingPlace:$('#r54ConvPlace',layer).value,players,notes:$('#r54ConvNotes',layer).value,notify:true});st.textContent='Convocazione registrata.';toast('Convocazione creata')}catch(err){st.textContent=String(err.message||err)}};
+}
+function openPrivateTeamMessage(){
+ const teams=privateTeams();
+ if(!teams.length){openPanel('Comunicazioni','<div class="panel-detail"><h2>Dato in aggiornamento</h2><p>Nessuna squadra autorizzata restituita.</p></div>');return}
+ const layer=openPanel('Comunicazione squadra','<form class="join-form r54-private-form" id="r54MessageForm"><span class="eyebrow">STAFF · COMUNICAZIONE</span><h2>Nuovo messaggio</h2><label>Squadra<select id="r54MsgTeam">'+teams.map(t=>'<option value="'+esc(t.key)+'">'+esc(t.name)+'</option>').join('')+'</select></label><label>Oggetto<input id="r54MsgSubject" required maxlength="140"></label><label>Messaggio<textarea id="r54MsgBody" required maxlength="2000"></textarea></label><button class="btn primary" type="submit">Invia</button><p id="r54MsgState"></p></form>');
+ $('#r54MessageForm',layer).onsubmit=async e=>{e.preventDefault();const st=$('#r54MsgState',layer);try{await privatePost('private.message.send',{teamKey:$('#r54MsgTeam',layer).value,subject:$('#r54MsgSubject',layer).value,message:$('#r54MsgBody',layer).value});st.textContent='Messaggio registrato.';toast('Messaggio registrato')}catch(err){st.textContent=String(err.message||err)}};
+}
+
 function openPrivateModule(module){
  const w=state.workspace||{},d=state.privateData||{},m=deskMeta(module);
  if(['CALENDARIO','EVENTI','TORNEI_EVENTI','BIGLIETTERIA'].includes(module)){setView('calendar');return}
