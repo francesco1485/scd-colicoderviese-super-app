@@ -93,6 +93,20 @@ async function runChecks(attempt){
     result.failures.push('R40_NEWSROOM_CONTRACT');
   }
 
+  try{
+    const r=await getText(RENDER_BASE+'/api/public/donation-config?scd_verify='+Date.now());
+    const j=parseJson('Render donation config',r.text);
+    const fundOk=j.fund?.id==='SCD_SOLIDARITY_FUND'&&j.fund?.currency==='EUR';
+    const privacyOk=j.publicDonorWall===false&&j.taxBenefitClaim===false;
+    const channelShape=typeof j.channels?.online?.enabled==='boolean'&&typeof j.channels?.bankTransfer?.enabled==='boolean';
+    const ok=r.ok&&j.ok===true&&fundOk&&privacyOk&&channelShape;
+    result.checks.solidarityFund={httpStatus:r.status,ok,fundOk,privacyOk,channelShape,onlineEnabled:j.channels?.online?.enabled===true,bankTransferEnabled:j.channels?.bankTransfer?.enabled===true};
+    if(!ok)result.failures.push('SOLIDARITY_FUND_PUBLIC_CONTRACT');
+  }catch(e){
+    result.checks.solidarityFund={ok:false,error:String(e.message||e)};
+    result.failures.push('SOLIDARITY_FUND_PUBLIC_CONTRACT');
+  }
+
   if(result.checks.renderCapabilities?.dataFabricEnabled===true){
     try{
       const r=await getText(RENDER_BASE+'/api/scd',{
