@@ -89,8 +89,9 @@ for(const token of [
   "if(name==='iniziative')loadDevelopment()",
   'PREVENTIVI RICEVUTI · DA RICONCILIARE',
   'CASSETTO STRATEGICO',
-  'NON VERIFICATI'
-]) assert(js.includes(token),'R50.8 Development interaction missing: '+token);
+  'NON VERIFICATI',
+  'SNAPSHOT VERIFICATO'
+]) assert(js.includes(token),'R50.9 Development interaction missing: '+token);
 assert(pubJs.includes('/api/public/donation-config'),'Solidarity Fund config endpoint missing');
 assert(pubJs.includes('/api/public/donation-intent'),'Solidarity Fund intent endpoint missing');
 assert(pubJs.includes('loadDonationConfig'),'Solidarity Fund config loader missing');
