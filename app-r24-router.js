@@ -419,13 +419,28 @@
       const p=rows[0],name=[p.firstName,p.lastName].filter(Boolean).join(' ')||p.fullName||'Atleta SCD';
       const key=String(p.code||p.playerCode||p.personId||p.id||'');
       const conv=(d.convocations||[]).filter(x=>!key||String(x.playerCode||x.personId||x.playerId||'')===key).slice(0,4);
+      const activeConv=conv[0]||null;
       const figc=displayValue(p.figcStatus||p.recordStatus||'','Dato in aggiornamento');
       const cert=displayValue(p.certificateStatus||p.certificateExpiry||'','Dato in aggiornamento');
       const payment=displayValue(p.paymentStatus||p.payment||p.feeStatus||'','Dato in aggiornamento');
+      const activeBox=activeConv
+        ?'<section class="r53-callup-card"><div><small>CONVOCAZIONE ATTIVA</small><h2>'+esc(activeConv.team||activeConv.teamName||'Gara SCD')+'</h2><p>'+esc([fmtDate(activeConv.date||''),activeConv.meetingTime,activeConv.meetingPlace].filter(Boolean).join(' · '))+'</p><span>Stato: '+esc(activeConv.response||'DA CONFERMARE')+'</span></div><div class="r53-callup-actions"><button type="button" class="primary" data-r53-conv-reply="PRESENTE" data-conv="'+esc(activeConv.id||activeConv.convocationId||'')+'" data-player="'+esc(activeConv.playerCode||key)+'">Conferma presenza</button><button type="button" class="outline" data-r53-conv-reply="ASSENTE" data-conv="'+esc(activeConv.id||activeConv.convocationId||'')+'" data-player="'+esc(activeConv.playerCode||key)+'">Segnala assenza</button></div></section>'
+        :'<section class="r53-callup-card empty"><div><small>CONVOCAZIONI</small><h2>Dato in aggiornamento</h2><p>Nessuna convocazione autorizzata disponibile per questo profilo.</p></div></section>';
       outlet.innerHTML=this.shellHeader('Area Atleta','Profilo personale e prossimi impegni.','ATLETA · '+(p.teamName||'SCD'))+
       '<section class="r24-athlete-hero"><div class="r24-athlete-avatar">'+esc(((p.firstName||name||'?')[0]+(p.lastName||'')[0]).toUpperCase())+'</div><div><small>PROFILO ATLETA</small><h2>'+esc(name)+'</h2><p>'+esc(p.teamName||p.group||'Squadra in aggiornamento')+'</p><span>'+esc(figc)+'</span></div><strong>'+esc(p.number||p.shirtNumber||'')+'</strong></section>'+
+      activeBox+
       '<section class="r24-calendar-summary three"><article><strong>'+conv.length+'</strong><span>Convocazioni</span></article><article><strong>'+esc(cert)+'</strong><span>Certificato</span></article><article><strong>'+esc(payment)+'</strong><span>Pagamenti</span></article></section>'+
       '<section class="r24-panel"><div class="r24-panel-head"><div><small>PROSSIMI IMPEGNI</small><h2>Convocazioni</h2></div><button class="outline" data-r24-route="calendar">Calendario</button></div><div class="r24-event-list">'+(conv.length?conv.map(x=>'<article class="r24-event-row static"><span class="r24-event-kind gara">GARA</span><time><b>'+esc(fmtDate(x.date||''))+'</b><small>'+esc(x.meetingTime||'')+'</small></time><div><b>'+esc(x.team||x.teamName||'Convocazione SCD')+'</b><small>'+esc(x.meetingPlace||'Luogo in aggiornamento')+'</small></div><i>'+esc(x.response||'DA CONFERMARE')+'</i></article>').join(''):'<div class="r24-empty"><b>Dato in aggiornamento</b><span>Nessuna convocazione disponibile.</span></div>')+'</div></section>';
+      outlet.querySelectorAll('[data-r53-conv-reply]').forEach(b=>b.onclick=async()=>{
+        if(!b.dataset.conv||!b.dataset.player)return toast('Convocazione non completa: sincronizza i dati');
+        b.disabled=true;
+        try{
+          await mgmtApi('private.convocation.reply',{id:b.dataset.conv,player:b.dataset.player,response:b.dataset.r53ConvReply});
+          state.privateData=await mgmtApi('dashboard.summary');
+          toast('Risposta registrata: '+b.dataset.r53ConvReply);
+          this.render('athlete');
+        }catch(e){toast(e.message||'Risposta non registrata');b.disabled=false}
+      });
       this.bindCommon(outlet);
     },
     render_family(outlet){
