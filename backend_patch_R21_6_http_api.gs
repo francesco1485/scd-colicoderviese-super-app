@@ -28,6 +28,10 @@ function doPost(e) {
       case 'public.registration':
         data = r216PublicRequest_(payload, 'TESSERAMENTO');
         break;
+      case 'public.identity.resolve':
+        if (typeof r56ResolveIdentity_ !== 'function') throw new Error('Modulo identita R56 non installato');
+        data = r56ResolveIdentity_(payload);
+        break;
       case 'public.partnerLead':
         data = r216PublicRequest_(payload, String(payload.kind || '').toLowerCase() === 'product' ? 'FORNITORE' : 'SPONSOR');
         break;
@@ -144,6 +148,10 @@ function doPost(e) {
         break;
       case 'direction.access.set':
         data = setActorAccess(token, payload);
+        break;
+      case 'direction.access.invite':
+        if (typeof r56InviteAccess_ !== 'function') throw new Error('Modulo inviti R56 non installato');
+        data = r56InviteAccess_(token, payload);
         break;
       case 'direction.pin.set':
         data = directionSetUserPin(token, payload.email || '', payload.pin || '');
