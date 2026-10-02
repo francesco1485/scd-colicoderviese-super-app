@@ -793,7 +793,7 @@ function renderDevelopmentInspector(id=developmentSelected){
       '<div><small>TARGET</small><b>'+esc(x.target||'—')+'</b></div>'+
       '<div><small>OWNER</small><b>'+esc(x.owner||'—')+'</b></div>'+
       '<div><small>CANALE / AREA</small><b>'+esc(x.channel||'—')+'</b></div>'+
-      '<div><small>COSTO VERIFICATO</small><b>'+(x.hasVerifiedCost?esc(x.unitPrice||x.expectedRevenue||x.realRevenue):'NON DISPONIBILE')+'</b></div>'+
+      '<div><small>DATO ECONOMICO VERIFICATO</small><b>'+(x.hasVerifiedCost?esc(x.unitPrice||x.expectedRevenue||x.realRevenue):'NON DISPONIBILE')+'</b></div>'+
       '<div><small>RICONCILIAZIONE</small><b>'+(x.requiresReconciliation?'RICHIESTA':'NON SEGNALATA')+'</b></div>'+
     '</div>'+
     (x.partners?'<div class="development-evidence"><small>PARTNER / CATEGORIE COLLEGABILI</small><p>'+esc(x.partners)+'</p></div>':'')+
@@ -825,7 +825,7 @@ function renderCommercialInitiatives(){
       '<h3>'+esc(x.name)+'</h3><p>'+esc(x.objective||'')+'</p>'+
       '<div class="card-row"><span>Target</span><b>'+esc(x.target||'—')+'</b></div>'+
       '<div class="card-row"><span>Owner</span><b>'+esc(x.owner||'—')+'</b></div>'+
-      '<div class="card-row"><span>Costi</span><b>'+(x.hasVerifiedCost?esc(x.unitPrice||x.expectedRevenue||x.realRevenue):'NON VERIFICATI')+'</b></div>'+
+      '<div class="card-row"><span>Dato economico</span><b>'+(x.hasVerifiedCost?esc(x.unitPrice||x.expectedRevenue||x.realRevenue):'NON VERIFICATI')+'</b></div>'+
       (x.quoteStatus?'<div class="development-quote-chip">PREVENTIVI RICEVUTI · DA RICONCILIARE</div>':'')+
       (x.isDrawer?'<div class="development-drawer-chip">CASSETTO STRATEGICO</div>':'')+
     '</article>'
