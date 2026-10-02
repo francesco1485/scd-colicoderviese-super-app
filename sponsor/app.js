@@ -559,6 +559,7 @@ function openView(name){
   $$('.nav-link').forEach(b=>b.classList.toggle('active',b.dataset.view===name));
   if(name==='eventi')loadAgenda();
   if(name==='iniziative')loadDevelopment();
+  if(name==='home')loadOperationalFocus();
   if(innerWidth<901)$('#sidebar').classList.remove('open');
   window.scrollTo({top:0,behavior:'smooth'});
 }
@@ -840,7 +841,7 @@ async function loadDevelopment(force=false){
   }catch(e){
     developmentState.rows=[];developmentState.error=String(e.message||e);developmentState.loaded=false;
   }finally{
-    developmentState.loading=false;renderCommercialInitiatives();
+    developmentState.loading=false;renderCommercialInitiatives();renderOperationalFocus();
   }
 }
 $('#developmentRefresh')?.addEventListener('click',()=>loadDevelopment(true));
@@ -861,7 +862,7 @@ function renderEvents(){
   $('#eventGrid').innerHTML=events.map(e=>'<article class="event-card"><small>'+esc(e[0])+'</small><h3>'+esc(e[1])+'</h3><p>'+esc(e[2])+' · '+esc(e[3])+'</p></article>').join('');
 }
 
-let agendaState={loaded:false,loading:false,calendarName:'',summaryRecipient:'',eligibleUsers:[],upcoming:[]};
+let agendaState={loaded:false,loading:false,error:'',calendarName:'',summaryRecipient:'',eligibleUsers:[],upcoming:[]};
 async function agendaApi(method='GET',payload=null){
   const options={method,credentials:'same-origin',cache:'no-store',headers:{}};
   if(payload){options.headers['content-type']='application/json';options.body=JSON.stringify(payload)}
@@ -894,13 +895,123 @@ async function loadAgenda(force=false){
   const status=$('#agendaStatusBar');if(status)status.textContent='Sincronizzazione con Google Calendar…';
   try{
     const data=await agendaApi('GET');
-    agendaState={...agendaState,...data,loaded:true,loading:false};
+    agendaState={...agendaState,...data,loaded:true,loading:false,error:''};
     renderAgenda();
   }catch(e){
-    agendaState.loading=false;
+    agendaState.loading=false;agendaState.error=String(e.message||e);
     if(status)status.innerHTML='<span class="error">Agenda non disponibile: '+esc(e.message)+'</span>';
+  }finally{
+    renderOperationalFocus();
   }
 }
+
+function operationalMeta(project){
+  const status=String(project?.status||'').toUpperCase();
+  if(project?.quoteStatus==='RECEIVED_TO_RECONCILE'){
+    return {rank:100,tone:'high',badge:'PREVENTIVI',action:'Riconcilia documenti, fornitore e importi verificati prima di qualsiasi confronto economico.',agendaTitle:'Confronto preventivi · '+project.name};
+  }
+  if(/CONFRONTO TECNICO/.test(status)){
+    return {rank:90,tone:'medium',badge:'TECNICO',action:'Programma il prossimo sopralluogo o confronto tecnico e registra l’esito.',agendaTitle:'Sopralluogo / confronto tecnico · '+project.name};
+  }
+  if(/CONTRATTUALIZZAT|ATTIV/.test(status)){
+    return {rank:70,tone:'medium',badge:'OPERATIVO',action:'Verifica documentazione, stato operativo e prossima attività collegata.',agendaTitle:'Verifica operativa · '+project.name};
+  }
+  if(/DA STRUTTURARE|DA STUDIARE/.test(status)){
+    return {rank:60,tone:'',badge:'DA DEFINIRE',action:'Definisci il prossimo passo tecnico e le eventuali categorie di partner o finanziatori.',agendaTitle:'Definizione progetto · '+project.name};
+  }
+  return {rank:40,tone:'',badge:'FOLLOW-UP',action:'Verifica il prossimo passo dalla scheda progetto e aggiorna lo stato quando supportato da evidenze.',agendaTitle:'Follow-up progetto · '+project.name};
+}
+function operationalProjects(){
+  return developmentState.rows
+    .filter(x=>!x.isDrawer&&!/COMPLETATO/i.test(String(x.status||'')))
+    .map(x=>({project:x,meta:operationalMeta(x)}))
+    .sort((a,b)=>b.meta.rank-a.meta.rank||String(a.project.name).localeCompare(String(b.project.name)))
+    .slice(0,5);
+}
+function renderOperationalFocus(){
+  const root=$('#homeOperationalFocus');if(!root)return;
+  const source=$('#focusSourceState');
+  const devLabel=developmentState.error?'PROGETTI NON DISPONIBILI':developmentState.sourceMode==='LIVE_MASTER'?'LIVE MASTER':developmentState.sourceMode==='SNAPSHOT_VERIFIED'?'SNAPSHOT VERIFICATO':'PROGETTI IN CARICAMENTO';
+  const agendaLabel=agendaState.error?'AGENDA NON DISPONIBILE':agendaState.loaded?'AGENDA COLLEGATA':'AGENDA IN CARICAMENTO';
+  if(source){
+    source.textContent=devLabel+' · '+agendaLabel;
+    source.classList.toggle('is-partial',!!developmentState.error||!!agendaState.error||developmentState.sourceMode!=='LIVE_MASTER');
+  }
+
+  const rows=developmentState.rows||[];
+  const active=rows.filter(x=>!x.isDrawer&&!/COMPLETATO/i.test(String(x.status||'')));
+  const reconcile=active.filter(x=>x.requiresReconciliation||x.quoteStatus==='RECEIVED_TO_RECONCILE').length;
+  const technical=active.filter(x=>/CONFRONTO TECNICO/i.test(String(x.status||''))).length;
+  const agendaCount=Array.isArray(agendaState.upcoming)?agendaState.upcoming.length:0;
+  if($('#focusKpis'))$('#focusKpis').innerHTML=[
+    ['PROGETTI DA SEGUIRE',String(active.length)],
+    ['RICONCILIAZIONI',String(reconcile)],
+    ['CONFRONTI TECNICI',String(technical)],
+    ['APPUNTAMENTI FUTURI',agendaState.error?'—':String(agendaCount)]
+  ].map(x=>'<article><small>'+esc(x[0])+'</small><strong>'+esc(x[1])+'</strong></article>').join('');
+
+  const actions=$('#focusActions');
+  if(actions){
+    const focus=operationalProjects();
+    if(developmentState.loading&&!developmentState.loaded){
+      actions.innerHTML='<article class="operational-empty"><b>Caricamento priorità operative…</b></article>';
+    }else if(developmentState.error||!focus.length){
+      actions.innerHTML='<article class="operational-empty"><b>'+(developmentState.error?'Progetti non disponibili dalla fonte canonica.':'Nessuna azione progetto da evidenziare.')+'</b></article>';
+    }else{
+      actions.innerHTML=focus.map(({project:x,meta})=>{
+        const stakeholder=(Array.isArray(x.relatedSuppliers)?x.relatedSuppliers:[]).find(s=>s.stakeholderId);
+        return '<article class="operational-action '+esc(meta.tone)+'">'+
+          '<span class="operational-action-priority">'+esc(meta.badge)+'</span>'+
+          '<div class="operational-action-copy"><small>'+esc(x.status||'DA VERIFICARE')+'</small><strong>'+esc(x.name)+'</strong><span>'+esc(meta.action)+'</span></div>'+
+          '<div class="operational-action-buttons">'+
+            '<button type="button" class="primary" data-focus-project="'+esc(x.id)+'">Apri progetto</button>'+
+            '<button type="button" data-focus-agenda="'+esc(x.id)+'">Crea appuntamento</button>'+
+            (stakeholder?'<button type="button" data-focus-crm="'+esc(stakeholder.stakeholderId)+'">Apri CRM</button>':'')+
+          '</div>'+
+        '</article>';
+      }).join('');
+      $$('[data-focus-project]').forEach(btn=>btn.onclick=()=>{openView('iniziative');renderDevelopmentInspector(btn.dataset.focusProject)});
+      $$('[data-focus-agenda]').forEach(btn=>btn.onclick=()=>prepareAgendaForProject(btn.dataset.focusAgenda));
+      $$('[data-focus-crm]').forEach(btn=>btn.onclick=()=>{openView('crm');openCrmProfile(btn.dataset.focusCrm)});
+    }
+  }
+
+  const agenda=$('#focusAgenda');
+  if(agenda){
+    if(agendaState.error){
+      agenda.innerHTML='<p>Agenda non disponibile in questo momento. Le priorità progetto restano utilizzabili.</p>';
+    }else if(!agendaState.loaded){
+      agenda.innerHTML='<p>Sincronizzazione agenda…</p>';
+    }else{
+      const upcoming=(agendaState.upcoming||[]).slice(0,3);
+      agenda.innerHTML=upcoming.length?upcoming.map(ev=>
+        '<article class="operational-agenda-row"><time>'+esc(agendaDateLabel(ev.startAt))+'</time><b>'+esc(ev.title||'Evento SCD')+'</b><span>'+esc(ev.location||'Luogo da definire')+'</span></article>'
+      ).join(''):'<p>Nessun appuntamento futuro registrato.</p>';
+    }
+  }
+}
+async function loadOperationalFocus(force=false){
+  await Promise.allSettled([
+    loadDevelopment(force),
+    loadAgenda(force)
+  ]);
+  renderOperationalFocus();
+}
+async function prepareAgendaForProject(id){
+  if(!developmentState.loaded)await loadDevelopment();
+  const project=developmentState.rows.find(x=>x.id===id);
+  if(!project)return;
+  const meta=operationalMeta(project);
+  openView('eventi');
+  await loadAgenda();
+  const form=$('#agendaForm');if(!form)return;
+  if(form.elements.project)form.elements.project.value=project.name||'';
+  if(form.elements.title)form.elements.title.value=meta.agendaTitle||('Incontro operativo · '+project.name);
+  if(form.elements.actionRequired)form.elements.actionRequired.value=meta.action||'';
+  if(form.elements.description)form.elements.description.value='Progetto SCD: '+project.id+'\nStato: '+String(project.status||'DA VERIFICARE')+'\n'+String(project.objective||'');
+  requestAnimationFrame(()=>form.scrollIntoView({behavior:'smooth',block:'start'}));
+}
+
 $('#agendaRefresh')?.addEventListener('click',()=>loadAgenda(true));
 $('#agendaForm')?.addEventListener('submit',async e=>{
   e.preventDefault();
@@ -1024,7 +1135,7 @@ $('#newSponsorForm').onsubmit=e=>{e.preventDefault();const fd=new FormData(e.tar
 $('#promoReviewBtn').onclick=()=>{localStorage.setItem('scd_promo_review','review');$('#promoText').textContent='Promozione messa in revisione interna. Nessuna pubblicazione automatica.'};
 
 renderKpis();renderSponsorStrip();homeContracts();homeProposals();renderAvailability();renderHomeEvents();renderPipeline();renderNews();renderStats();renderPoll();renderTags();renderPartnerHub();renderCampaignStudio();renderSponsorWall();renderTerritoryHub();
-renderSponsorViews();renderContracts();renderProposalGrid();renderSuppliers();renderCommercialInitiatives();renderAudience();renderFolders();renderLed();renderEvents();renderReport();renderAssets();renderScenario();renderSettings();
+renderSponsorViews();renderContracts();renderProposalGrid();renderSuppliers();renderCommercialInitiatives();renderAudience();renderFolders();renderLed();renderEvents();renderReport();renderAssets();renderScenario();renderSettings();loadOperationalFocus();
 
 function activateKeyboardCards(){
   document.addEventListener('keydown',e=>{
