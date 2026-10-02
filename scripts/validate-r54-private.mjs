@@ -37,7 +37,7 @@ for(const token of [
   'data-r54-callup="PRESENTE"',
   'data-r54-callup="ASSENTE"',
   "if(module==='TESSERATI'){openPrivatePeopleHub();return}",
-  "if(module==='PULMINI'){openPrivateTransport();return}",
+  "if(module==='PULMINI'){openPrivateTransport(",
   "if(module==='RICHIESTE'){openPrivateRequests();return}",
   "if(module==='PRESENZE'){openPrivateAttendance();return}",
   "if(module==='CONVOCAZIONI'){openPrivateConvocations();return}"
