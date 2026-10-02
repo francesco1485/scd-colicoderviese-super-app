@@ -11,6 +11,9 @@ const http=read('backend_patch_R21_6_http_api.gs');
 const server=read('server.js');
 const html=read('index.html');
 const css=read('scd-ng.css');
+const comm=JSON.parse(read('config/scd-communication-matrix.v1.json'));
+const engage=JSON.parse(read('config/scd-engagement-rules.v1.json'));
+const calendarLib=read('lib/scd-calendar-fusion.js');
 
 const v=String(manifest.manifest?.version||'0.0.0').split('.').map(Number);
 if((v[0]||0)<3||((v[0]||0)===3&&(v[1]||0)<26))fail('manifest version must be >= 3.26.0');
@@ -66,6 +69,15 @@ if(!(idc?.rules||[]).includes('NAME_ONLY_IDENTITY_MATCH_FORBIDDEN'))fail('identi
 const ci=manifest.product_direction?.club_intelligence_r56;
 if(ci?.sport_stats?.minor_public_talent_ranking!==false)fail('minor public ranking must be false');
 if(ci?.engagement?.fantasy!=='NO_MONEY_NO_BETTING')fail('fantasy safety contract missing');
+
+if(comm.release!=='R56')fail('communication matrix release mismatch');
+if(comm.minors?.direct_1to1_default!==false)fail('minor direct messaging default must be false');
+if(comm.channels?.SAFEGUARDING?.reply!=='ISOLATED_NOT_CHAT')fail('safeguarding must remain isolated');
+if(engage.release!=='R56')fail('engagement rules release mismatch');
+if(engage.global_rules?.money_entry!==false||engage.global_rules?.money_prizes!==false||engage.global_rules?.betting!==false)fail('engagement must remain no-money/no-betting');
+if(engage.global_rules?.minor_public_individual_performance_ranking!==false)fail('minor public performance ranking forbidden');
+if(engage.fantasy?.minor_individual_player_ranking!==false)fail('minor fantasy individual ranking forbidden');
+for(const token of ['FEDERATION_OFFICIAL:100','R20_MANAGER:85','NO_STRONG_LINK','CANONICAL_EVENT_ID_REQUIRED'])if(!calendarLib.includes(token))fail('calendar fusion guard missing '+token);
 
 if(cfg.release!=='R56'||cfg.schema_version!=='1.3.0')fail('Supabase R56 contract mismatch');
 if(!cfg.domain_core?.migrations?.includes('supabase/migrations/20261002_r56_identity_calendar_club_intelligence.sql'))fail('R56 migration not registered');
