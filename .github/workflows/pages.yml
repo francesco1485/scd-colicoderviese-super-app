@@ -35,6 +35,9 @@ jobs:
       - name: Social App contract gate
         run: npm run test:social-app
 
+      - name: R53 football/social core gate
+        run: npm run test:r53-core
+
       - name: Prepare static site
         run: |
           node --check app.js
