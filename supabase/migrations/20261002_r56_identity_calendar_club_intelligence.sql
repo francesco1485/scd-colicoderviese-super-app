@@ -106,7 +106,7 @@ on conflict (organization_id,code) do nothing;
 
 insert into public.scd_calendar_sources
 (organization_id,code,name,source_type,authority_rank,enabled,read_only,sync_mode)
-select id,'RM_INTERNAL','Calendario interno Responsabile','R20_MANAGER',90,true,false,'MANUAL_REVIEW'
+select id,'RM_INTERNAL','Calendario interno Responsabile','R20_MANAGER',85,true,false,'MANUAL_REVIEW'
 from public.scd_organizations where slug='scd-colicoderviese'
 on conflict (organization_id,code) do nothing;
 
