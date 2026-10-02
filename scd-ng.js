@@ -116,6 +116,7 @@ function openPanel(title,body){
   }
   $('#publicPanelTitle',layer).textContent=title;
   $('#publicPanelBody',layer).innerHTML=body;
+  $('.public-panel',layer)?.classList.toggle('wide',/matchday-sheet|team-hub-sheet/.test(String(body||'')));
   layer.classList.add('open');
   return layer;
 }
