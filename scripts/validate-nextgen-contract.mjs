@@ -20,7 +20,7 @@ if(!html.includes('SCD MIRROR')) fail('Mirror surface missing');
 if(!html.includes('PRIVATE DESK')) fail('Private Desk missing');
 if(!html.includes('SCD HOME · QUESTA SETTIMANA') && !html.includes('SCD WEEKLY RADAR')) fail('current-week surface missing');
 if(!html.includes('SCD AI NEWSROOM')) fail('AI Newsroom missing');
-for(const token of ['SCD HOME · QUESTA SETTIMANA','publicSearchInput','matchCenter','upcomingEvents','mediaHub','communityPulse','sponsorRail','partnerCommunityHub','institutionalStrip','joinClub','view-calendar','calendarPublicList','view-teams','publicTeamsGrid','data-public-action="calendar"','avatarSearch','SKY','./assets/sky.png']){
+for(const token of ['SCD HOME · QUESTA SETTIMANA','publicSearchInput','matchCenter','upcomingEvents','mediaHub','communityPulse','sponsorRail','partnerCommunityHub','institutionalStrip','joinClub','view-calendar','calendarPublicList','view-teams','publicTeamsGrid','myTeamDeck','videoArena','data-public-action="calendar"','avatarSearch','SKY','./assets/sky.png']){
   if(!html.includes(token)) fail('current-week public entry missing '+token);
 }
 
@@ -51,6 +51,11 @@ if(manifest.sky_and_avatar?.mirror?.separate_from_twin!==true) fail('Mirror and 
 
 const capIds=new Set((manifest.capability_map||[]).map(x=>x.id));
 if(!capIds.has('CAP-PUBLIC-TEAMS')) fail('missing capability CAP-PUBLIC-TEAMS');
+if(!capIds.has('CAP-PUBLIC-MATCHDAY')) fail('missing capability CAP-PUBLIC-MATCHDAY');
+if(!js.includes('function openMatchday(')) fail('R48 Matchday runtime missing');
+if(!js.includes('function openTeamHub(')) fail('R48 Team Hub runtime missing');
+if(manifest.product_direction?.public_matchday?.no_prediction!==true) fail('R48 Matchday prediction guard missing');
+if(manifest.product_direction?.media_and_social_hub?.video_arena?.pixellot!=='PRIVATE_BY_DEFAULT_AUTHORIZED_STAFF_ONLY') fail('R48 Video Arena Pixellot guard missing');
 if(manifest.product_direction?.home_public_entry?.priority!=='CURRENT_WEEK_FIRST') fail('home current-week-first contract missing');
 if(manifest.product_direction?.home_public_entry?.avatar?.onboarding_required!==false) fail('avatar must remain optional at onboarding');
 if(manifest.product_direction?.home_public_entry?.match_center?.invented_stats!==false) fail('invented match statistics must remain forbidden');

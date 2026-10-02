@@ -12,12 +12,48 @@ const officialChannels=[
  {id:'youtube',label:'YouTube SCD',url:'https://www.youtube.com/@S.C.D.ColicoDerviese',terms:'youtube video partite club'}
 ];
 const FOLLOW_TEAM_KEY='scd:follow-team:v1';
+function teamResultRows(team){
+ const key=norm(team);
+ return (state.sportData.results||[]).filter(x=>{
+   const hay=norm([x.team,x.teamName,x.homeTeam,x.awayTeam].filter(Boolean).join(' '));
+   return key&&hay&&(hay.includes(key)||key.includes(hay));
+ }).slice(0,5);
+}
+function teamStanding(team){
+ const key=norm(team);
+ return (state.sportData.standings||[]).find(x=>{
+   const n=norm(x.team||x.teamName);
+   return key&&n&&(n.includes(key)||key.includes(n));
+ })||null;
+}
+function matchHeadToHead(match){
+ if(!match)return [];
+ const a=norm(match.team),b=norm(match.opponent);
+ if(!a||!b)return [];
+ return (state.sportData.headToHead||[]).filter(x=>{
+   const hay=norm([x.team,x.teamName,x.homeTeam,x.awayTeam,x.opponent,x.opponentName].filter(Boolean).join(' '));
+   return hay.includes(a)&&hay.includes(b);
+ }).slice(0,3);
+}
+function statStandingText(team){
+ const x=teamStanding(team);if(!x)return 'Dato in aggiornamento';
+ return [x.position?'#'+x.position:'',x.points!=null&&String(x.points)!==''?x.points+' pt':''].filter(Boolean).join(' · ')||'Dato verificato disponibile';
+}
+function statFormText(team){
+ const rows=teamResultRows(team),out=rows.map(x=>x.result||x.score).filter(Boolean);
+ return out.length?out.join(' · '):'Dato in aggiornamento';
+}
+function statH2HText(match){
+ const out=matchHeadToHead(match).map(x=>x.result||x.score).filter(Boolean);
+ return out.length?out.join(' · '):'Dato in aggiornamento';
+}
 function loadFollowedTeam(){try{return String(localStorage.getItem(FOLLOW_TEAM_KEY)||'')}catch{return ''}}
 function saveFollowedTeam(name){try{name?localStorage.setItem(FOLLOW_TEAM_KEY,name):localStorage.removeItem(FOLLOW_TEAM_KEY)}catch{}}
 function updateFollowTeamUi(){
  const name=loadFollowedTeam(),label=$('#sportFollowTeamLabel'),btn=$('#sportFollowTeam');
  if(label)label.textContent=name?name:'Scegli e segui una squadra';
  if(btn)btn.classList.toggle('is-following',Boolean(name));
+ renderMyTeamDeck();
 }
 
 const toast=(t)=>{const el=$('#toast');if(!el)return;el.textContent=t;el.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('show'),2200)};
@@ -80,6 +116,7 @@ function openPanel(title,body){
   }
   $('#publicPanelTitle',layer).textContent=title;
   $('#publicPanelBody',layer).innerHTML=body;
+  $('.public-panel',layer)?.classList.toggle('wide',/matchday-sheet|team-hub-sheet/.test(String(body||'')));
   layer.classList.add('open');
   return layer;
 }
@@ -210,6 +247,50 @@ function publicTeamModels(){
    return {name:t.name,categories:[...t.categories],rows:t.rows,next:future[0]||null,nextMatch:future.find(x=>x.kind==='MATCH')||null};
  }).sort((a,b)=>a.name.localeCompare(b.name,'it'));
 }
+function teamModelByName(name){
+ const key=norm(name);
+ return publicTeamModels().find(x=>norm(x.name)===key)||null;
+}
+function renderMyTeamDeck(){
+ const deck=$('#myTeamDeck');if(!deck)return;
+ const name=loadFollowedTeam();
+ if(!name){deck.hidden=true;return}
+ const model=teamModelByName(name);
+ const title=$('#myTeamName'),meta=$('#myTeamMeta');
+ if(title)title.textContent=name;
+ if(meta){
+   const next=model?.nextMatch||model?.next;
+   meta.textContent=next?[next.kind==='MATCH'?'Prossima gara':'Prossima attività',fmtDate(next.date),next.time,next.opponent,next.venue].filter(Boolean).join(' · '):'Squadra seguita · dati pubblici in aggiornamento';
+ }
+ deck.hidden=false;
+}
+async function openTeamHub(name){
+ if(!state.calendarLoaded)await ensurePublicCalendar();
+ const model=teamModelByName(name);
+ if(!model){toast('Dati pubblici della squadra in aggiornamento');return}
+ const followed=norm(loadFollowedTeam())===norm(model.name);
+ const nextMatch=model.nextMatch;
+ const upcoming=model.rows.filter(x=>x.date>=todayKey()).slice(0,6);
+ const schedule=upcoming.length?upcoming.map(x=>'<button type="button" class="team-hub-event" data-teamhub-event="'+esc(x.id)+'"><time>'+esc(fmtDate(x.date))+(x.time?' · '+esc(x.time):'')+'</time><b>'+esc(x.kind==='MATCH'?[x.team,x.opponent].filter(Boolean).join(' vs '):(x.title||x.team))+'</b><small>'+esc([x.competition,x.venue].filter(Boolean).join(' · '))+'</small><i>›</i></button>').join(''):'<div class="panel-empty"><b>Nessuna attività futura verificata</b><p>Il Team Hub non inventa appuntamenti mancanti.</p></div>';
+ const body='<section class="team-hub-sheet"><div class="team-hub-hero"><div class="team-hub-mark">'+esc(model.name.slice(0,2).toUpperCase())+'</div><div><span class="eyebrow">SCD TEAM HUB</span><h2>'+esc(model.name)+'</h2><p>'+esc(model.categories.join(' · ')||'Categoria in aggiornamento')+'</p></div><button type="button" id="teamHubFollow" class="'+(followed?'is-following':'')+'">'+(followed?'★ SEGUITA':'☆ SEGUI')+'</button></div><div class="team-hub-kpis"><article><small>PROSSIMA GARA</small><b>'+esc(nextMatch?(nextMatch.opponent||nextMatch.title||'Dato verificato'):'Dato in aggiornamento')+'</b><span>'+esc(nextMatch?[fmtDate(nextMatch.date),nextMatch.time].filter(Boolean).join(' · '):'')+'</span></article><article><small>CLASSIFICA</small><b>'+esc(statStandingText(model.name))+'</b></article><article><small>FORMA</small><b>'+esc(statFormText(model.name))+'</b></article></div><div class="team-hub-actions">'+(nextMatch?'<button type="button" class="btn primary" id="teamHubMatchday">Apri Matchday</button>':'')+'<button type="button" class="btn glass" id="teamHubCalendar">Calendario squadra</button></div><div class="team-hub-schedule"><div class="panel-section-title"><span>PROSSIMI IMPEGNI</span><b>Fonte pubblica verificata</b></div>'+schedule+'</div></section>';
+ const layer=openPanel('Team Hub · '+model.name,body);
+ $('#teamHubFollow',layer).onclick=()=>{if(followed){saveFollowedTeam('');toast('Squadra rimossa dalle preferenze')}else{saveFollowedTeam(model.name);toast('Ora segui '+model.name)}updateFollowTeamUi();layer.classList.remove('open')};
+ if(nextMatch)$('#teamHubMatchday',layer).onclick=()=>openMatchday(nextMatch);
+ $('#teamHubCalendar',layer).onclick=()=>{state.calendarTeam=model.name;state.calendarPeriod='ALL';layer.classList.remove('open');setView('calendar');renderPublicCalendar()};
+ $$('[data-teamhub-event]',layer).forEach(b=>b.onclick=()=>openEvent(b.dataset.teamhubEvent));
+}
+function openMatchday(match=state.nextMatch){
+ if(!match){toast('Partita verificata non ancora disponibile');return}
+ const standing=statStandingText(match.team),form=statFormText(match.team),h2h=statH2HText(match);
+ const model=teamModelByName(match.team);
+ const nextTeamEvents=(model?.rows||[]).filter(x=>x.date>=match.date).slice(0,4);
+ const upcoming=nextTeamEvents.length?nextTeamEvents.map(x=>'<div class="matchday-next-row"><time>'+esc(fmtDate(x.date))+(x.time?' · '+esc(x.time):'')+'</time><b>'+esc(x.kind==='MATCH'?[x.team,x.opponent].filter(Boolean).join(' vs '):(x.title||x.team))+'</b><span>'+esc(x.venue||'Sede in aggiornamento')+'</span></div>').join(''):'<div class="panel-empty"><b>Calendario squadra in aggiornamento</b></div>';
+ const body='<section class="matchday-sheet"><div class="matchday-kicker"><span>SCD MATCHDAY</span><b>'+esc(match.competition||match.category||'Competizione in aggiornamento')+'</b></div><div class="matchday-scoreboard"><div class="matchday-club"><img src="./assets/logo-scd.png" alt="SCD ColicoDerviese"><b>'+esc(match.team||'SCD')+'</b></div><div class="matchday-center"><time>'+esc(fmtDate(match.date))+'</time><strong>'+esc(match.time||'Orario in aggiornamento')+'</strong><span>'+esc(match.venue||'Campo in aggiornamento')+'</span></div><div class="matchday-club opponent"><div class="matchday-opponent-mark">'+esc((match.opponent||'?').slice(0,2).toUpperCase())+'</div><b>'+esc(match.opponent||'Avversario in aggiornamento')+'</b></div></div><div class="matchday-stats"><article><small>CLASSIFICA</small><b>'+esc(standing)+'</b></article><article><small>FORMA RECENTE</small><b>'+esc(form)+'</b></article><article><small>SCONTRI DIRETTI</small><b>'+esc(h2h)+'</b><span>'+esc(h2h==='Dato in aggiornamento'?'Nessuna fonte verificata collegata per questo confronto.':'Dati disponibili dalla fonte sportiva collegata.')+'</span></article></div><div class="matchday-trust"><span>FONTE</span><b>'+esc(match.source||'SCD')+'</b><small>Nessun dato mancante viene ricostruito o stimato.</small></div><div class="matchday-actions"><button type="button" class="btn primary" id="matchdayTeam">Team Hub</button><button type="button" class="btn glass" id="matchdayMedia">Video & Media</button><button type="button" class="btn glass" id="matchdayCalendar">Calendario</button></div><div class="matchday-next"><div class="panel-section-title"><span>DOPO QUESTA GARA</span><b>prossimi impegni pubblici</b></div>'+upcoming+'</div></section>';
+ const layer=openPanel('Matchday · '+(match.team||'SCD'),body);
+ $('#matchdayTeam',layer).onclick=()=>openTeamHub(match.team||'SCD');
+ $('#matchdayMedia',layer).onclick=()=>{layer.classList.remove('open');setView('pulse');setTimeout(()=>$('#videoArena')?.scrollIntoView({behavior:'smooth',block:'start'}),100)};
+ $('#matchdayCalendar',layer).onclick=()=>{layer.classList.remove('open');state.calendarTeam=match.team||'ALL';state.calendarPeriod='ALL';setView('calendar');renderPublicCalendar()};
+}
 function syncTeamsFilters(models){
  const cat=$('#teamsCategoryFilter');if(!cat)return;
  const vals=[...new Set(models.flatMap(x=>x.categories).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'it'));
@@ -238,7 +319,8 @@ function renderPublicTeams(){
    const next=t.next,nextMatch=t.nextMatch;
    return '<button type="button" class="public-team-card" data-public-team="'+esc(t.name)+'"><span class="team-card-mark">'+esc((t.name||'?').slice(0,2).toUpperCase())+'</span><div class="team-card-copy"><small>'+esc(t.categories.join(' · ')||'SCD')+'</small><h3>'+esc(t.name)+'</h3><p>'+(next?esc('Prossima attività · '+fmtDate(next.date)+(next.time?' · '+next.time:'')):'Nessuna attività futura verificata')+'</p></div><div class="team-card-match"><small>PROSSIMA GARA</small><b>'+esc(nextMatch?(nextMatch.opponent||nextMatch.title||fmtDate(nextMatch.date)):'Dato in aggiornamento')+'</b><span>'+esc(nextMatch?[fmtDate(nextMatch.date),nextMatch.time].filter(Boolean).join(' · '):'')+'</span></div><span class="team-card-arrow">›</span></button>';
  }).join('');
- $$('[data-public-team]',mount).forEach(b=>b.onclick=()=>{state.calendarTeam=b.dataset.publicTeam;state.calendarPeriod='ALL';setView('calendar');renderPublicCalendar()});
+ $$('[data-public-team]',mount).forEach(b=>b.onclick=()=>openTeamHub(b.dataset.publicTeam));
+ renderMyTeamDeck();
 }
 $('#calendarSearch')?.addEventListener('input',e=>{state.calendarSearch=e.target.value;renderPublicCalendar()});
 $('#calendarTeamFilter')?.addEventListener('change',e=>{state.calendarTeam=e.target.value;renderPublicCalendar()});
@@ -251,8 +333,10 @@ $('#teamsCategoryFilter')?.addEventListener('change',e=>{state.teamsCategory=e.t
 $('#saveFollowTeam')?.addEventListener('click',()=>{
  const sel=$('#followTeamSelect'),name=String(sel?.value||'').trim();
  if(!name){saveFollowedTeam('');updateFollowTeamUi();toast('Preferenza squadra rimossa');return}
- saveFollowedTeam(name);updateFollowTeamUi();toast('Ora segui '+name+' su questo dispositivo');
+ saveFollowedTeam(name);updateFollowTeamUi();renderPublicTeams();toast('Ora segui '+name+' su questo dispositivo');
 });
+$('#openMyTeamHub')?.addEventListener('click',()=>{const name=loadFollowedTeam();if(name)openTeamHub(name);else{setView('teams');setTimeout(()=>$('#followTeamSelect')?.focus(),120)}});
+$('#openMyTeamCalendar')?.addEventListener('click',()=>{const name=loadFollowedTeam();if(!name){setView('teams');return}state.calendarTeam=name;state.calendarPeriod='ALL';setView('calendar');renderPublicCalendar()});
 $('#sportFollowTeam')?.addEventListener('click',()=>{
  const name=loadFollowedTeam();
  setView('teams');
@@ -277,20 +361,12 @@ function renderMatchCenter(){
  $('#matchTimeVenue').textContent=[match.time,match.venue].filter(Boolean).join(' · ')||'Ora e campo in aggiornamento';
  $('#matchOpponent').textContent=match.opponent||'Avversario in aggiornamento';
  $('#matchCompetition').textContent=match.competition||match.category||'Competizione in aggiornamento';
- const key=norm(match.team);
- const standing=(state.sportData.standings||[]).find(x=>norm(x.team).includes(key)||key.includes(norm(x.team)));
- $('#matchStanding').textContent=standing?[standing.position?'#'+standing.position:'',standing.points?standing.points+' pt':''].filter(Boolean).join(' · ')||'Dato verificato disponibile':'Dato in aggiornamento';
- const recent=(state.sportData.results||[]).filter(x=>norm(x.team).includes(key)||key.includes(norm(x.team))).slice(0,5);
- $('#matchForm').textContent=recent.length?recent.map(x=>x.result).filter(Boolean).join(' · ')||'Dato in aggiornamento':'Dato in aggiornamento';
- const h2h=state.sportData.headToHead||[];
- $('#matchH2H').textContent=h2h.length?h2h.slice(0,3).map(x=>x.result||x.score).filter(Boolean).join(' · '):'Dato in aggiornamento';
+ $('#matchStanding').textContent=statStandingText(match.team);
+ $('#matchForm').textContent=statFormText(match.team);
+ $('#matchH2H').textContent=statH2HText(match);
 }
-$('#matchAnalyze')?.addEventListener('click',()=>{
- const m=state.nextMatch;
- if(!m)return toast('Partita verificata non ancora disponibile');
- const key=norm(m.team),standing=(state.sportData.standings||[]).find(x=>norm(x.team).includes(key)||key.includes(norm(x.team))),recent=(state.sportData.results||[]).filter(x=>norm(x.team).includes(key)||key.includes(norm(x.team))).slice(0,5);
- openPanel('Analisi prossima partita','<div class="analysis-sheet"><span class="eyebrow">SOLO DATI VERIFICATI</span><h2>'+esc((m.team||'SCD')+' vs '+(m.opponent||'Avversario'))+'</h2><p>'+esc([fmtDate(m.date),m.time,m.venue].filter(Boolean).join(' · '))+'</p><div class="analysis-grid"><div><small>Classifica</small><b>'+esc(standing?[standing.position?'#'+standing.position:'',standing.points?standing.points+' pt':''].filter(Boolean).join(' · ')||'Dato in aggiornamento':'Dato in aggiornamento')+'</b></div><div><small>Ultimi risultati</small><b>'+esc(recent.length?recent.map(x=>x.result).filter(Boolean).join(' · ')||'Dato in aggiornamento':'Dato in aggiornamento')+'</b></div><div><small>Scontri diretti</small><b>Dato in aggiornamento</b><small>In attesa della fonte precisa indicata dalla Società.</small></div></div></div>');
-});
+$('#matchAnalyze')?.addEventListener('click',()=>openMatchday(state.nextMatch));
+
 
 function renderUpcoming(){
  const rail=$('#upcomingEventRail');if(!rail)return;
@@ -329,7 +405,7 @@ function runSearch(q){
 function handleSearchResult(kind,id){
  const box=$('#publicSearchResults');if(box)box.hidden=true;
  if(kind==='event')return openEvent(id);
- if(kind==='team'){state.teamsSearch=id;setView('teams');const input=$('#teamsSearch');if(input)input.value=id;renderPublicTeams();return}
+ if(kind==='team'){openTeamHub(id);return}
  if(kind==='news'){document.querySelector('.newsroom')?.scrollIntoView({behavior:'smooth'});return}
  if(kind==='profile'){openPanel('Profilo pubblico','<div class="panel-detail"><b>Profilo autorizzato</b><p>Le informazioni mostrate rispettano la visibilità concessa dalla Società.</p></div>')}
  if(kind==='channel'){const ch=officialChannels.find(x=>x.id===id);if(ch)window.open(ch.url,'_blank','noopener,noreferrer')}
@@ -354,6 +430,8 @@ function renderMentions(q=''){
  box.innerHTML=rows.length?rows.map(x=>'<button type="button" data-profile-id="'+esc(x.id)+'"><b>@'+esc(x.displayName)+'</b><small>'+esc([x.role,x.team].filter(Boolean).join(' · '))+'</small></button>').join(''):'<small>Nessun profilo pubblico autorizzato disponibile.</small>';
 }
 $('#mentionSearch')?.addEventListener('input',e=>renderMentions(e.target.value));
+$('#pixellotLocked')?.addEventListener('click',()=>openPanel('Pixellot · accesso riservato','<div class="panel-detail"><span class="eyebrow">VIDEO PRIVATO</span><h2>Archivio protetto</h2><p>Pixellot resta privato per impostazione predefinita. L’accesso ai video completi richiede autenticazione e autorizzazione dello staff.</p><small>I clip possono diventare pubblici solo dopo verifica di diritti, privacy e autorizzazioni sui minori.</small><button type="button" class="btn primary" id="pixellotOpenDesk">Apri Private Desk</button></div>'));
+document.addEventListener('click',e=>{if(e.target?.id==='pixellotOpenDesk'){document.querySelector('#publicPanelLayer')?.classList.remove('open');setView('desk')}});
 
 
 function readPrivateSession(){
@@ -537,7 +615,7 @@ async function hydrate(){
     if($('#todayDetail'))$('#todayDetail').textContent=todayEv.length?todayEv.slice(0,3).map(x=>[x.team,x.time,x.title].filter(Boolean).join(' · ')).join('  |  '):'Nessuna attività verificata disponibile nella fonte collegata.';
     const card=Array.isArray(data.cards)?data.cards.find(c=>c.evidence?.length):null;
     if(card){if($('#storyTitle'))$('#storyTitle').textContent=card.title||'SCD Newsroom';if($('#storyText'))$('#storyText').textContent=card.dek||card.body||'Contenuto verificato'}
-    state.fullCalendar=mergeCalendarRows(state.fullCalendar,state.events,state.upcoming);renderWeek();renderWeekMeta(data);renderMatchCenter();renderUpcoming();renderPartners();renderMentions();if(state.view==='calendar')renderPublicCalendar();if(state.view==='teams')renderPublicTeams();
+    state.fullCalendar=mergeCalendarRows(state.fullCalendar,state.events,state.upcoming);renderWeek();renderWeekMeta(data);renderMatchCenter();renderUpcoming();renderPartners();renderMentions();renderMyTeamDeck();if(state.view==='calendar')renderPublicCalendar();if(state.view==='teams')renderPublicTeams();
   }catch(e){
     if($('#weekCount'))$('#weekCount').textContent='—';if($('#todayCount'))$('#todayCount').textContent='—';
     state.fullCalendar=mergeCalendarRows(state.fullCalendar,state.events,state.upcoming);renderWeek();renderMatchCenter();renderUpcoming();renderPartners();renderMentions();if(state.view==='calendar')renderPublicCalendar();if(state.view==='teams')renderPublicTeams();
@@ -615,5 +693,5 @@ $('#mirrorForm')?.addEventListener('submit',e=>{e.preventDefault();const q=$('#m
 $$('.quick-prompts button').forEach(b=>b.addEventListener('click',()=>{appendMsg(b.textContent,'user');setTimeout(()=>appendMsg(mirrorReply(b.textContent),'ai'),140)}));
 
 const hash=location.hash.replace('#','').split('?')[0];if(['pulse','calendar','teams','twin','desk'].includes(hash))setView(hash);
-window.SCDNextGen={setView,hydrate,openMirror,openCalendar:openCalendarPanel,openTeams:openTeamsPanel,loadCalendar:ensurePublicCalendar,search:runSearch};
+window.SCDNextGen={setView,hydrate,openMirror,openCalendar:openCalendarPanel,openTeams:openTeamsPanel,openTeamHub,openMatchday,loadCalendar:ensurePublicCalendar,search:runSearch};
 })();

@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#041c3a">
   <meta name="description" content="SCD ColicoDerviese Universe: sport, community, servizi e club operations in una sola esperienza digitale.">
-  <meta name="scd-build" content="40.0.0">\n  <meta name="scd-release" content="NG-0.5.1">
+  <meta name="scd-build" content="40.0.0">\n  <meta name="scd-release" content="NG-0.6.0">
   <title>SCD Universe · Next Generation</title>
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./assets/logo-scd.png">
   <link rel="apple-touch-icon" href="./assets/logo-scd.png">
-    <link rel="stylesheet" href="./scd-ng.css?v=0.5.1">
+    <link rel="stylesheet" href="./scd-ng.css?v=0.6.0">
   <link rel="stylesheet" href="./scd-synth.css?v=0.4.5">
 </head>
 <body data-scd-theme="arena">
@@ -126,6 +126,18 @@
           <button type="button" data-scroll="#communityPulse"><span>05</span><b>Community</b><small>Sondaggi e partecipazione</small></button>
         </section>
 
+        <section class="my-team-deck" id="myTeamDeck" hidden aria-live="polite">
+          <div class="my-team-deck-copy">
+            <span class="eyebrow">LA MIA SQUADRA</span>
+            <h2 id="myTeamName">Squadra seguita</h2>
+            <p id="myTeamMeta">Calendario e prossimi impegni verificati.</p>
+          </div>
+          <div class="my-team-deck-actions">
+            <button type="button" class="btn primary" id="openMyTeamHub">Apri Team Hub</button>
+            <button type="button" class="btn glass" id="openMyTeamCalendar">Calendario squadra</button>
+          </div>
+        </section>
+
         <section class="home-practical-grid">
           <article class="match-center" id="matchCenter">
             <div class="match-center-head"><div><span class="eyebrow">MATCH CENTER</span><h2>Prossima partita</h2></div><span class="verified-state" id="matchVerifiedState">DATI VERIFICATI</span></div>
@@ -139,7 +151,7 @@
               <div><small>FORMA RECENTE</small><b id="matchForm">Dato in aggiornamento</b></div>
               <div><small>SCONTRI DIRETTI</small><b id="matchH2H">Dato in aggiornamento</b></div>
             </div>
-            <div class="match-actions"><button class="btn primary" type="button" id="matchAnalyze">Analizza la partita</button><button class="btn glass" type="button" data-public-action="calendar">Vedi calendario</button></div>
+            <div class="match-actions"><button class="btn primary" type="button" id="matchAnalyze">Apri Matchday</button><button class="btn glass" type="button" data-public-action="calendar">Vedi calendario</button></div>
           </article>
           <section class="upcoming-events" id="upcomingEvents">
             <div class="section-head mini"><div><span class="eyebrow">PROSSIMI 30 GIORNI</span><h2>Eventi e appuntamenti</h2></div><button class="text-btn" type="button" data-public-action="calendar">Calendario →</button></div>
@@ -184,6 +196,26 @@
               <p>I collegamenti ufficiali restano separati dalle fonti editoriali esterne. Nessun contenuto viene ripubblicato automaticamente senza verifica e autorizzazione.</p>
             </div>
             <span class="status-pill">CANALI UFFICIALI</span>
+          </div>
+          <div class="video-arena" id="videoArena">
+            <article class="video-arena-featured">
+              <div class="video-arena-visual" aria-hidden="true"><span class="video-play">▶</span><b>SCD</b></div>
+              <div>
+                <span class="eyebrow">SCD VIDEO ARENA</span>
+                <h3>La partita continua anche dopo il fischio.</h3>
+                <p>Highlights, match content e storytelling passano soltanto da canali ufficiali o contenuti esplicitamente autorizzati.</p>
+                <div class="video-arena-actions">
+                  <a class="btn primary" href="https://www.youtube.com/@S.C.D.ColicoDerviese" target="_blank" rel="noopener noreferrer">Apri YouTube SCD</a>
+                  <a class="btn glass" href="https://www.tiktok.com/@s.c.d..colicoderv" target="_blank" rel="noopener noreferrer">Video brevi</a>
+                </div>
+              </div>
+            </article>
+            <div class="video-arena-grid">
+              <a href="https://www.youtube.com/@S.C.D.ColicoDerviese" target="_blank" rel="noopener noreferrer"><span>▶</span><b>Highlights & partite</b><small>YouTube ufficiale</small></a>
+              <a href="https://www.instagram.com/s.c.d.colicoderviese/" target="_blank" rel="noopener noreferrer"><span>◎</span><b>Reel & backstage</b><small>Instagram ufficiale</small></a>
+              <a href="https://www.tiktok.com/@s.c.d..colicoderv" target="_blank" rel="noopener noreferrer"><span>♪</span><b>Short video</b><small>TikTok ufficiale</small></a>
+              <button type="button" class="video-locked" id="pixellotLocked"><span>◉</span><b>Pixellot</b><small>Archivio privato · staff autorizzato</small></button>
+            </div>
           </div>
           <div class="official-channels">
             <a class="channel-card" href="https://www.colicoderviese.it/" target="_blank" rel="noopener noreferrer"><span>WWW</span><b>Sito ufficiale</b><small>Comunicazioni e servizi pubblici</small></a>
@@ -454,7 +486,7 @@
   <script src="./scd-meta-engine.js?v=40.0.0" defer></script>
   <script src="./scd-experience-engine.js?v=40.0.0" defer></script>
   <script src="./scd-twin.js?v=40.0.0" defer></script>
-  <script src="./scd-ng.js?v=0.5.0" defer></script>
+  <script src="./scd-ng.js?v=0.6.0" defer></script>
   <script src="./scd-interactions.js?v=0.4.5" defer></script>
 </body>
 </html>

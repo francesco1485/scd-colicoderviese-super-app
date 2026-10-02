@@ -40,6 +40,8 @@ for(const viewport of viewports){
   await page.waitForSelector('#matchCenter');
   await page.waitForSelector('#upcomingEvents');
   await page.waitForSelector('#mediaHub');
+  await page.waitForSelector('#videoArena');
+  await page.waitForSelector('#myTeamDeck',{state:'attached'});
   await page.waitForSelector('#communityPulse');
   await page.waitForSelector('#institutionalStrip');
   await page.waitForSelector('#sponsorRail');
@@ -54,7 +56,7 @@ for(const viewport of viewports){
   await page.waitForSelector('.worlds-preview',{state:'attached'});
   await page.waitForSelector('.ng-value-engine',{state:'attached'});
   await page.waitForTimeout(700);
-  const runtimeFlags=await page.evaluate(()=>({nextGen:Boolean(window.SCDNextGen),meta:Boolean(window.SCDMeta),twin:Boolean(window.SCDTwin),experience:Boolean(window.SCDExperience),adaptive:Boolean(window.SCDAdaptive)}));
+  const runtimeFlags=await page.evaluate(()=>({nextGen:Boolean(window.SCDNextGen),meta:Boolean(window.SCDMeta),twin:Boolean(window.SCDTwin),experience:Boolean(window.SCDExperience),adaptive:Boolean(window.SCDAdaptive),matchday:typeof window.SCDNextGen?.openMatchday==='function',teamHub:typeof window.SCDNextGen?.openTeamHub==='function'}));
   if(!Object.values(runtimeFlags).every(Boolean))throw new Error('runtime boot incomplete '+JSON.stringify(runtimeFlags)+' browserErrors='+errors.join(' | '));
   await page.waitForFunction(()=>document.documentElement.scrollWidth<=window.innerWidth+3);
 
@@ -76,6 +78,10 @@ for(const viewport of viewports){
   if(sportHubButtons!==6)throw new Error('Sport Hub actions mismatch: '+sportHubButtons);
   const officialLinks=await page.locator('#mediaHub .official-channels a').count();
   if(officialLinks!==5)throw new Error('Media Hub official links mismatch: '+officialLinks);
+  const videoArenaItems=await page.locator('#videoArena .video-arena-grid > *').count();
+  if(videoArenaItems!==4)throw new Error('Video Arena item mismatch: '+videoArenaItems);
+  const pixellotLabel=String(await page.locator('#pixellotLocked small').textContent()||'');
+  if(!/privato/i.test(pixellotLabel))throw new Error('Pixellot must remain visibly private');
   const institutionalLogos=await page.locator('#institutionalStrip img').count();
   if(institutionalLogos!==3)throw new Error('institutional logos mismatch: '+institutionalLogos);
   const skyAsset=await page.locator('#mirrorFab img').getAttribute('src');
@@ -119,7 +125,23 @@ for(const viewport of viewports){
   if(await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+3))throw new Error('teams view horizontal overflow');
   if((await page.locator('#calendarPeriod [data-period]').count())!==3)throw new Error('calendar period controls missing');
   if((await page.locator('#calendarTypeFilter option').count())<5)throw new Error('calendar type filters missing');
+  await page.waitForTimeout(250);
+  const teamCardCount=await page.locator('.public-team-card').count();
+  if(teamCardCount>0){
+    await page.locator('.public-team-card').first().click();
+    await page.waitForSelector('.team-hub-sheet');
+    if(await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+3))throw new Error('team hub horizontal overflow');
+    await page.click('#publicPanelClose');
+  }
   await page.evaluate(()=>window.SCDNextGen.setView('pulse'));
+
+  mark('MATCHDAY_'+viewport.width);
+  await page.evaluate(()=>window.SCDNextGen.openMatchday({id:'QA-MATCH',kind:'MATCH',team:'SCD Test',opponent:'Avversario Test',date:'2026-10-04',time:'15:30',venue:'Campo Test',competition:'QA',source:'QA_SYNTHETIC_TEST_ONLY'}));
+  await page.waitForSelector('.matchday-sheet');
+  if(await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+3))throw new Error('matchday horizontal overflow');
+  const matchdayTrust=String(await page.locator('.matchday-trust').textContent()||'');
+  if(!matchdayTrust.includes('QA_SYNTHETIC_TEST_ONLY'))throw new Error('matchday source provenance missing');
+  await page.click('#publicPanelClose');
 
   mark('TWIN_'+viewport.width);
   await page.evaluate(()=>window.SCDNextGen.setView('twin'));
