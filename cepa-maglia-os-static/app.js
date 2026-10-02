@@ -3092,7 +3092,7 @@ function renderAgenda(){
   $('agendaUpcomingCount').textContent=upcoming.length
   $('agendaCepaCount').textContent=upcoming.filter(x=>['cepa_event','initiative'].includes(x.event_type)).length
   $('agendaSponsorCount').textContent=upcoming.filter(x=>['sponsor','partner'].includes(x.event_type)).length
-  $('agendaSyncPendingCount').textContent=agendaEvents.filter(x=>x.calendar_sync_status!=='synced'||x.francesco_summary_status!=='sent').length
+  $('agendaSyncPendingCount').textContent=communicationOutbox.filter(x=>x.status==='pending').length
   $('agendaEventList').innerHTML=shown.map(x=>{
     const attendees=agendaAttendees.filter(a=>a.event_id===x.id)
     const outbox=communicationOutbox.find(m=>m.source_type==='agenda_event'&&m.source_id===x.id)
