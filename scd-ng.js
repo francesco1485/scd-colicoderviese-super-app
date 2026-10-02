@@ -396,7 +396,7 @@ $('#socialPointsLogin')?.addEventListener('click',()=>{
  $('#socialRewardsOpen')?.addEventListener('click',()=>toast('Catalogo premi in aggiornamento.'));
  $('#socialDealsOpen')?.addEventListener('click',()=>toast('Convenzioni territoriali in aggiornamento.'));
  
- function openTeamHub(name){
+ async function openTeamHub(name){
  if(!state.calendarLoaded)await ensurePublicCalendar();
  const model=teamModelByName(name);
  if(!model){toast('Dati pubblici della squadra in aggiornamento');return}
