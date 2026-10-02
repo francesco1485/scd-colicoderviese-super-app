@@ -386,7 +386,17 @@ function renderSocialHub(){
  $$('[data-social-open]',mount).forEach(b=>b.onclick=()=>openSocialItem(map.get(b.dataset.socialOpen)));
  $$('[data-social-share]',mount).forEach(b=>b.onclick=()=>{const row=map.get(b.dataset.socialShare);if(row)shareSocialText(row.share,row.title)});
 }
-async function openTeamHub(name){
+async $('#socialPointsLogin')?.addEventListener('click',()=>{
+  try{
+    if(window.R24?.go)return window.R24.go('profile');
+  }catch{}
+  setView('twin');
+ });
+ $('#socialMvpOpen')?.addEventListener('click',()=>toast('Votazione MVP non disponibile finché il backend non restituisce candidati autorizzati.'));
+ $('#socialRewardsOpen')?.addEventListener('click',()=>toast('Catalogo premi in aggiornamento.'));
+ $('#socialDealsOpen')?.addEventListener('click',()=>toast('Convenzioni territoriali in aggiornamento.'));
+ 
+ function openTeamHub(name){
  if(!state.calendarLoaded)await ensurePublicCalendar();
  const model=teamModelByName(name);
  if(!model){toast('Dati pubblici della squadra in aggiornamento');return}
