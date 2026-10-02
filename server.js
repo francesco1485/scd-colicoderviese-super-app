@@ -26,6 +26,7 @@ const INTAKE_TEMPLATES = JSON.parse(fs.readFileSync(path.join(__dirname,'config'
 const SPONSOR_MOTION_PROFILES = JSON.parse(fs.readFileSync(path.join(__dirname,'config','sponsor-motion-profiles.json'),'utf8'));
 const SCD_CREATIVE_SCENES = JSON.parse(fs.readFileSync(path.join(__dirname,'config','scd-creative-scenes.json'),'utf8'));
 const COMMUNITY_BENEFITS_SNAPSHOT = JSON.parse(fs.readFileSync(path.join(__dirname,'config','community-benefits.snapshot.json'),'utf8'));
+const SPONSOR_DEVELOPMENT_SNAPSHOT = JSON.parse(fs.readFileSync(path.join(__dirname,'config','sponsor-development.snapshot.json'),'utf8'));
 const INTAKE_TEMPLATE_MAP = new Map((INTAKE_TEMPLATES.templates||[]).map(x=>[x.slug,x]));
 const INTAKE_SECRET = process.env.SCD_INTAKE_LINK_SECRET || '';
 const INTAKE_PUBLIC_BASE = (process.env.SCD_PUBLIC_BASE_URL || 'https://scd-universe.onrender.com').replace(/\/$/,'');
@@ -450,18 +451,24 @@ async function handleSponsorAgenda(req,res){
 
 async function handleSponsorDevelopment(req,res){
   if(req.method!=='GET')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  let session;
   try{
-    const s=await validateSponsorSession(req);
-    const {parsed}=await callAppsScript('private.development.summary',{},s.token);
-    if(parsed&&parsed.ok===false)return json(res,503,{ok:false,error:parsed.error||'DEVELOPMENT_SOURCE_UNAVAILABLE'});
-    const data=unwrapPayload(parsed);
-    if(!data||data.sourceMode!=='LIVE_MASTER'||!Array.isArray(data.rows)){
-      return json(res,503,{ok:false,error:'DEVELOPMENT_SOURCE_UNVERIFIED'});
-    }
-    return json(res,200,{ok:true,data},{'cache-control':'no-store'});
+    session=await validateSponsorSession(req);
   }catch(e){
-    const code=e.message==='SESSION_REQUIRED'?401:503;
-    return json(res,code,{ok:false,error:e.message||'DEVELOPMENT_SOURCE_UNAVAILABLE'});
+    return json(res,401,{ok:false,error:e.message||'SESSION_REQUIRED'});
+  }
+  try{
+    const {parsed}=await callAppsScript('private.development.summary',{},session.token);
+    const data=unwrapPayload(parsed);
+    if(parsed&&parsed.ok!==false&&data&&data.sourceMode==='LIVE_MASTER'&&Array.isArray(data.rows)){
+      return json(res,200,{ok:true,data},{'cache-control':'no-store'});
+    }
+    throw new Error(parsed?.error||'DEVELOPMENT_LIVE_MASTER_NOT_READY');
+  }catch(e){
+    const snap=SPONSOR_DEVELOPMENT_SNAPSHOT;
+    const valid=snap&&snap.schema==='SCD_SPONSOR_DEVELOPMENT_SNAPSHOT_V1'&&snap.sourceMode==='SNAPSHOT_VERIFIED'&&Array.isArray(snap.rows)&&snap.rows.length>0&&snap.source?.spreadsheetId==='1jb5Jt1ZYzJA-3oQd85AmwVhAoFQpBPfcsy4HupBzDFA';
+    if(!valid)return json(res,503,{ok:false,error:'DEVELOPMENT_SOURCE_UNAVAILABLE'});
+    return json(res,200,{ok:true,data:{...snap,fallbackReason:String(e.message||'LIVE_MASTER_NOT_READY'),liveMasterReady:false}},{'cache-control':'no-store'});
   }
 }
 

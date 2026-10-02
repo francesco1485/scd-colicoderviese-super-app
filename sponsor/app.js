@@ -793,7 +793,10 @@ function renderCommercialInitiatives(){
   const source=$('#developmentSource');
   if(source){
     if(developmentState.error)source.innerHTML='<span class="error"><b>DATI NON DISPONIBILI</b> · '+esc(developmentState.error)+'</span>';
-    else source.innerHTML='<span><b>'+(developmentState.sourceMode==='LIVE_MASTER'?'LIVE MASTER':'SOURCE IN VERIFICA')+'</b> · '+esc(developmentState.sourceTable||'INIZIATIVE_COMMERCIALI')+(developmentState.generatedAt?' · '+esc(String(developmentState.generatedAt)):'')+'</span>';
+    else {
+      const sourceLabel=developmentState.sourceMode==='LIVE_MASTER'?'LIVE MASTER':developmentState.sourceMode==='SNAPSHOT_VERIFIED'?'SNAPSHOT VERIFICATO':'SOURCE IN VERIFICA';
+      source.innerHTML='<span><b>'+sourceLabel+'</b> · '+esc(developmentState.sourceTable||'INIZIATIVE_COMMERCIALI')+(developmentState.generatedAt?' · revisione '+esc(String(developmentState.generatedAt)):'')+'</span>';
+    }
   }
   const k=developmentState.kpi||{};
   if($('#developmentKpi'))$('#developmentKpi').innerHTML=[
