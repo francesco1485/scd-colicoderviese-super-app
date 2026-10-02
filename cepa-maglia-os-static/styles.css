@@ -4664,3 +4664,31 @@ a:focus-visible{
   .agenda-sync-stack{justify-items:start;grid-template-columns:repeat(2,minmax(0,max-content))}
   .agenda-member-grid{grid-template-columns:1fr}
 }
+
+
+/* =========================================================
+   MAGLIA 360 · V18 CEPA EVENT MANAGEMENT
+   ========================================================= */
+.cepa-initiative-admin-row{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;width:100%;
+  padding:11px;border:1px solid #dfe8eb;border-radius:11px;background:#fff;text-align:left;cursor:pointer
+}
+.cepa-initiative-admin-row:hover{border-color:#c4d9d7;background:#fbfdfd}
+.cepa-initiative-admin-row strong{display:block;color:#244c60;font-size:10px}
+.cepa-initiative-admin-row small{display:block;margin-top:3px;color:#83959e;font-size:7px}
+.cepa-initiative-admin-tags{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:5px}
+.cepa-initiative-admin-tags span{
+  padding:4px 6px;border-radius:999px;background:#eef3f4;color:#657d87;font-size:6.5px;font-weight:850;text-transform:uppercase
+}
+.cepa-initiative-admin-tags span.public{background:#e8f5ed;color:#467259}
+.cepa-initiative-editor .cepa-public-editor-block{
+  padding:14px;border:1px solid #cfe2de;border-radius:13px;
+  background:linear-gradient(180deg,#f7fbfa,#f1f7f6)
+}
+.cepa-public-editor-block>.eyebrow{margin-bottom:10px;color:#4f8983}
+.cepa-initiative-editor textarea{min-height:92px}
+
+@media(max-width:640px){
+  .cepa-initiative-admin-row{grid-template-columns:1fr}
+  .cepa-initiative-admin-tags{justify-content:flex-start}
+}
