@@ -3,7 +3,7 @@
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const API_BASE='';
 const PRIVATE_SESSION_KEY='scd:session:v1';
-const state={view:'pulse',filter:'ALL',events:[],upcoming:[],fullCalendar:[],calendarLoaded:false,calendarLoading:false,calendarSourceState:'UNVERIFIED',calendarPeriod:'WEEK',calendarTeam:'ALL',calendarCategory:'ALL',calendarType:'ALL',calendarSearch:'',teamsSearch:'',teamsCategory:'ALL',news:null,sportData:{results:[],standings:[],headToHead:[]},partners:[],publicProfiles:[],nextMatch:null,privateToken:'',privateEmail:'',privateData:null,workspace:null,privateLoading:false,privateError:''};
+const state={view:'pulse',filter:'ALL',events:[],upcoming:[],fullCalendar:[],calendarLoaded:false,calendarLoading:false,calendarSourceState:'UNVERIFIED',calendarPeriod:'WEEK',calendarTeam:'ALL',calendarCategory:'ALL',calendarType:'ALL',calendarSearch:'',teamsSearch:'',teamsCategory:'ALL',news:null,sportData:{results:[],standings:[],headToHead:[]},partners:[],publicProfiles:[],nextMatch:null,benefits:null,benefitsLoaded:false,benefitsLoading:false,benefitsError:'',privateToken:'',privateEmail:'',privateData:null,workspace:null,privateLoading:false,privateError:''};
 const officialChannels=[
  {id:'site',label:'Sito ufficiale',url:'https://www.colicoderviese.it/',terms:'sito web comunicazioni servizi'},
  {id:'facebook',label:'Facebook SCD',url:'https://www.facebook.com/ColicoDerviese',terms:'facebook social pagina'},
@@ -69,12 +69,13 @@ function setView(view){
   state.view=view;
   $$('[data-view]').forEach(x=>x.classList.toggle('active',x.dataset.view===view));
   $$('[data-nav]').forEach(x=>x.classList.toggle('active',x.dataset.nav===view));
-  const ctx=view==='desk'?'PRIVATE DESK · ROLE/SCOPE':view==='twin'?'PROFILO · AVATAR FACOLTATIVO':view==='calendar'?'CALENDARIO · PUBBLICO':view==='teams'?'SQUADRE · PUBBLICO':'HOME · PUBBLICO';
+  const ctx=view==='desk'?'PRIVATE DESK · ROLE/SCOPE':view==='twin'?'PROFILO · AVATAR FACOLTATIVO':view==='card'?'CARD & BENEFIT · PUBBLICO':view==='calendar'?'CALENDARIO · PUBBLICO':view==='teams'?'SQUADRE · PUBBLICO':'HOME · PUBBLICO';
   const ctxEl=$('#mirrorContext');if(ctxEl)ctxEl.textContent=ctx;
   history.replaceState(null,'','#'+view);
   window.scrollTo({top:0,behavior:'smooth'});
   if(view==='calendar')ensurePublicCalendar();
   if(view==='teams')ensurePublicCalendar();
+  if(view==='card')ensureCardBenefits();
   if(view==='desk')ensurePrivateDesk();
 }
 $$('[data-nav]').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.nav)));
@@ -391,6 +392,7 @@ function buildSearchIndex(){
  [...new Set(searchableCalendar.flatMap(x=>[x.team,x.category]).filter(x=>x&&x!=='SCD'))].forEach(x=>items.push({kind:'SQUADRA',title:x,meta:'Calendario e contenuti pubblici',action:'team',id:x,terms:[x]}));
  state.publicProfiles.forEach(x=>items.push({kind:'PROFILO PUBBLICO',title:x.displayName,meta:[x.role,x.team].filter(Boolean).join(' · '),action:'profile',id:x.id,terms:[x.displayName,x.role,x.team]}));
  officialChannels.forEach(x=>items.push({kind:'CANALE UFFICIALE',title:x.label,meta:'SCD ColicoDerviese',action:'channel',id:x.id,terms:[x.label,x.terms]}));
+ items.push({kind:'SERVIZIO',title:'SCD Card & Benefit Center',meta:'Supporter · Tesserati · Famiglie · Benefit',action:'card',id:'card',terms:['card','tessera','supporter','tesserato','benefit','convenzioni','vantaggi','famiglia']});
  return items;
 }
 function runSearch(q){
@@ -409,9 +411,57 @@ function handleSearchResult(kind,id){
  if(kind==='news'){document.querySelector('.newsroom')?.scrollIntoView({behavior:'smooth'});return}
  if(kind==='profile'){openPanel('Profilo pubblico','<div class="panel-detail"><b>Profilo autorizzato</b><p>Le informazioni mostrate rispettano la visibilità concessa dalla Società.</p></div>')}
  if(kind==='channel'){const ch=officialChannels.find(x=>x.id===id);if(ch)window.open(ch.url,'_blank','noopener,noreferrer')}
+ if(kind==='card'){setView('card');return}
 }
 $('#publicSearchInput')?.addEventListener('input',e=>runSearch(e.target.value));
 $('#clearPublicSearch')?.addEventListener('click',()=>{const input=$('#publicSearchInput'),box=$('#publicSearchResults');if(input){input.value='';input.focus()}if(box){box.hidden=true;box.innerHTML=''}});
+
+function benefitStatusClass(status=''){
+ const s=norm(status);
+ if(/attiv|formalizzat|confermat/.test(s)&&!/attivazione|formalizzazione/.test(s))return 'active';
+ if(/attivazione|formalizzazione/.test(s))return 'pending';
+ return 'waiting';
+}
+function renderCardBenefits(){
+ const data=state.benefits||{},active=Array.isArray(data.active)?data.active:[],pipeline=Array.isArray(data.pipeline)?data.pipeline:[];
+ const source=$('#benefitSourceState'),summary=$('#benefitSummary b'),activeMount=$('#publicBenefitActive'),pipelineMount=$('#publicBenefitPipeline');
+ if(source){
+   source.textContent=state.benefitsError?'FONTE NON DISPONIBILE':data.sourceMode==='PUBLIC_SAFE_SNAPSHOT'?'FONTE PUBBLICA VERIFICATA':'DATO IN AGGIORNAMENTO';
+   source.classList.toggle('pending',Boolean(state.benefitsError));
+ }
+ if(summary[0])summary[0].textContent=String(active.length);
+ if(summary[1])summary[1].textContent=String(pipeline.length);
+ if(!activeMount||!pipelineMount)return;
+ activeMount.innerHTML=active.length?active.map(x=>
+   '<article class="benefit-card active"><div class="benefit-card-head"><span>'+esc(x.category||'BENEFIT')+'</span><b class="benefit-state active">ATTIVO</b></div><h3>'+esc(x.name||'Partner SCD')+'</h3><p>'+esc(x.benefit||'Benefit formalizzato')+'</p><dl><div><dt>Condizioni</dt><dd>'+esc(x.conditions||'Consulta le condizioni ufficiali')+'</dd></div><div><dt>Destinatari</dt><dd>'+esc(x.audience||'Profili autorizzati')+'</dd></div><div><dt>Come usarlo</dt><dd>'+esc(x.recognition||'Secondo accordo formalizzato')+'</dd></div></dl><small>'+esc(x.territory||'Territorio da accordo')+'</small></article>'
+ ).join(''):'<div class="benefit-empty verified-empty"><b>Nessun benefit pubblicato come attivo</b><span>La piattaforma non trasforma una trattativa in una convenzione utilizzabile. Appena esiste evidenza di formalizzazione, comparirà qui.</span></div>';
+ pipelineMount.innerHTML=pipeline.length?pipeline.map(x=>
+   '<article class="benefit-card pipeline"><div class="benefit-card-head"><span>'+esc(x.category||'CONVENZIONE')+'</span><b class="benefit-state '+benefitStatusClass(x.status)+'">'+esc(x.status||'IN VERIFICA')+'</b></div><h3>'+esc(x.name||'Iniziativa SCD')+'</h3><p>'+esc(x.benefit||'Benefit in definizione')+'</p><dl><div><dt>Stato</dt><dd>Non ancora utilizzabile</dd></div><div><dt>Destinatari previsti</dt><dd>'+esc(x.audience||'Da definire')+'</dd></div><div><dt>Territorio</dt><dd>'+esc(x.territory||'Da definire')+'</dd></div></dl><small>Pubblicazione informativa · nessun diritto al benefit finché l’accordo non è formalizzato.</small></article>'
+ ).join(''):'<div class="benefit-empty"><b>Nessuna attivazione pubblica in pipeline</b><span>Le informazioni compaiono solo nella proiezione pubblica autorizzata.</span></div>';
+}
+async function ensureCardBenefits(force=false){
+ if(state.benefitsLoading)return;
+ if(state.benefitsLoaded&&!force){renderCardBenefits();return}
+ state.benefitsLoading=true;state.benefitsError='';
+ const source=$('#benefitSourceState');if(source)source.textContent='SINCRONIZZAZIONE';
+ try{
+   const r=await fetch(API_BASE+'/api/community/benefits',{cache:'no-store'});
+   const data=await r.json().catch(()=>({ok:false,error:'Risposta benefit non valida'}));
+   if(!r.ok||data.ok!==true)throw new Error(data.error||'Benefit Network non disponibile');
+   state.benefits=data;state.benefitsLoaded=true;
+ }catch(err){
+   state.benefits={active:[],pipeline:[]};state.benefitsLoaded=true;state.benefitsError=String(err.message||err);
+ }finally{
+   state.benefitsLoading=false;renderCardBenefits();
+ }
+}
+$('[data-card-focus]').forEach(b=>b.addEventListener('click',()=>{
+ const key=b.dataset.cardFocus;
+ setTimeout(()=>{
+   const target=key==='supporter'?$('#supporterCardProduct'):key==='tesserato'?$('#tesseratoCardProduct'):$('#publicBenefitNetwork');
+   target?.scrollIntoView({behavior:'smooth',block:'center'});
+ },100);
+}));
 
 const pollKey='scd:poll:weekly-ux:v1';
 function loadPoll(){try{return JSON.parse(localStorage.getItem(pollKey)||'{}')}catch{return {}}}
@@ -680,6 +730,7 @@ function mirrorReply(q){
  if(/event/.test(x))return state.upcoming.length?'Ci sono '+state.upcoming.length+' appuntamenti verificati nei prossimi 30 giorni. Apri Calendario per i dettagli.':'Gli eventi pubblici sono in aggiornamento.';
  if(/tesser/.test(x))return 'Per il tesseramento apri “Entra nel Club” e scegli Tesserato / Atleta. La richiesta non attribuisce automaticamente la qualità di socio.';
  if(/tifos/.test(x))return 'Apri “Entra nel Club” e scegli Diventa tifoso: nasce un profilo base, senza ruoli riservati automatici.';
+ if(/card|tessera|convenzion|benefit|vantagg/.test(x)){setView('card');return 'Ho aperto SCD Card & Benefit Center. I benefit sono separati per stato: utilizzabili solo se formalizzati, mentre quelli in attivazione restano chiaramente non utilizzabili.';}
  if(/sponsor|partner/.test(x))return 'La barra Partner mostra solo soggetti verificati dalla fonte collegata. Per una proposta usa Sponsor / Partner in “Entra nel Club”.';
  if(/youtube|video|instagram|facebook|tiktok|social|media/.test(x)){document.querySelector('#mediaHub')?.scrollIntoView({behavior:'smooth'});return 'Ti porto al Media Hub: lì trovi i canali ufficiali SCD separati dalle fonti esterne da verificare.';}
  if(/segreter|contatt/.test(x))return 'Puoi inviare una richiesta dal percorso “Altro profilo” oppure usare i recapiti ufficiali della Segreteria presenti nei canali societari.';
@@ -692,6 +743,6 @@ function appendMsg(text,kind){const d=document.createElement('div');d.className=
 $('#mirrorForm')?.addEventListener('submit',e=>{e.preventDefault();const q=$('#mirrorInput').value.trim();if(!q)return;appendMsg(q,'user');$('#mirrorInput').value='';setTimeout(()=>appendMsg(mirrorReply(q),'ai'),180)});
 $$('.quick-prompts button').forEach(b=>b.addEventListener('click',()=>{appendMsg(b.textContent,'user');setTimeout(()=>appendMsg(mirrorReply(b.textContent),'ai'),140)}));
 
-const hash=location.hash.replace('#','').split('?')[0];if(['pulse','calendar','teams','twin','desk'].includes(hash))setView(hash);
-window.SCDNextGen={setView,hydrate,openMirror,openCalendar:openCalendarPanel,openTeams:openTeamsPanel,openTeamHub,openMatchday,loadCalendar:ensurePublicCalendar,search:runSearch};
+const hash=location.hash.replace('#','').split('?')[0];if(['pulse','calendar','teams','card','twin','desk'].includes(hash))setView(hash);
+window.SCDNextGen={setView,hydrate,openMirror,openCalendar:openCalendarPanel,openTeams:openTeamsPanel,openCard:()=>setView('card'),openTeamHub,openMatchday,loadCalendar:ensurePublicCalendar,loadBenefits:ensureCardBenefits,search:runSearch};
 })();
