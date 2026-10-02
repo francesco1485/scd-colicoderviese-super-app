@@ -35,7 +35,7 @@ const viewMeta={
 
 let ecosystem=[],projects=[],actions=[],marketHubs=[],marketEntities=[],contacts=[],timeline=[],documents=[],partnerRequirements=[],blueprints=[],subjects=[],initiatives=[],cepaContent=[],cepaAcademy=[],cepaSpeakers=[],products=[],productKnowledge=[],comparisons=[],collaborators=[],collaboratorTerms=[],portfolioSnapshots=[],businessAssessments=[],growthKits=[],distributionWatchlists=[],distributionCandidates=[],distributionEvidence=[],mailTemplates=[],mailDrafts=[],cepaExpansion=[],cepaReadiness=[],assistantMessages=[],recoveryRows=[],members=[],liaCapabilities=[],liaFolders=[],liaOrders=[],liaFiles=[],researchSources=[],researchInsights=[],liaActionRules=[],liaApprovals=[],roleViewAccess=[],liaAutomationRuns=[],assetRegistry=[],expertProtocols=[],uxUsageEvents=[],accessRequests=[],commercialLeads=[],publicShowcase=[],integrationRegistry=[],agendaEvents=[],agendaAttendees=[],communicationOutbox=[],relationshipClaims=[]
 let officeAssignments=[],officeMessages=[],officeSnapshots=[],officeCases=[],officeWorkflow=[],officeCepaActivities=[],officeImports=[]
-let commercialClients=[],pipelineCases=[],clientCheckups=[],clientInteractions=[],clientWorkItems=[],clientPolicies=[],publicCepaSubjects=[],publicCepaEvents=[]
+let commercialClients=[],pipelineCases=[],clientCheckups=[],clientInteractions=[],clientWorkItems=[],clientPolicies=[],publicCepaSubjects=[],publicCepaEvents=[],publicAuthConfig={otp_enabled:false,sender:'sportclubcolico@gmail.com'}
 let crmProfiles=[],crmModules=[],crmRoleTemplates=[],crmRecommendations=[]
 let currentPartnerId=null,currentOfficeId=null,currentOfficeProductId=null,currentCepaHubId=null,currentCommerceTab='clients'
 
@@ -141,7 +141,9 @@ async function loadPublicPortal(){
   }else{
     publicCepaSubjects=cepaResult.data?.subjects||[]
     publicCepaEvents=cepaResult.data?.events||[]
+    publicAuthConfig=cepaResult.data?.auth||{otp_enabled:false,sender:'sportclubcolico@gmail.com'}
   }
+  if($('otpLoginBtn'))$('otpLoginBtn').classList.toggle('hidden',!publicAuthConfig.otp_enabled)
   renderPublicCepaFeed()
 }
 function renderPublicCepaFeed(){
@@ -170,6 +172,32 @@ function renderPublicCepaFeed(){
     openPublicLeadForm(null,'event',event?.title||'Evento C.E.P.A.')
   })
 }
+function openOtpLogin(prefillEmail=''){
+  if(!publicAuthConfig?.otp_enabled)return alert('Accesso OTP non ancora attivo: il mittente Auth Sport Club deve essere configurato prima.')
+  let otpEmail=String(prefillEmail||$('email')?.value||'').trim().toLowerCase()
+  $('modalContent').innerHTML='<div class="eyebrow">ACCESSO OTP</div><h2>Codice temporaneo via email</h2><p class="muted">Disponibile solo per account già autorizzati. Il codice non crea nuove utenze.</p><form id="otpRequestForm" class="form"><label>Email autorizzata<input id="otpEmail" type="email" autocomplete="email" value="'+esc(otpEmail)+'" required></label><button type="submit" class="primary">Invia codice</button></form><form id="otpVerifyForm" class="form hidden top-gap"><label>Codice a 6 cifre<input id="otpCode" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required></label><button type="submit" class="primary">Verifica e accedi</button></form><div id="otpMsg" class="message hidden"></div>'
+  $('modal').classList.remove('hidden')
+  $('otpRequestForm').onsubmit=async e=>{
+    e.preventDefault()
+    otpEmail=$('otpEmail').value.trim().toLowerCase()
+    const box=$('otpMsg')
+    const{error}=await supabase.auth.signInWithOtp({email:otpEmail,options:{shouldCreateUser:false}})
+    if(error){box.textContent=error.message;box.className='message error';return}
+    box.textContent='Codice inviato da '+(publicAuthConfig.sender||'Sport Club')+'. Inseriscilo qui sotto.';box.className='message'
+    $('otpVerifyForm').classList.remove('hidden');$('otpCode').focus()
+  }
+  $('otpVerifyForm').onsubmit=async e=>{
+    e.preventDefault()
+    const token=$('otpCode').value.trim()
+    const box=$('otpMsg')
+    const{data,error}=await supabase.auth.verifyOtp({email:otpEmail,token,type:'email'})
+    if(error){box.textContent=error.message;box.className='message error';return}
+    if(!data?.session){box.textContent='Codice verificato ma sessione non disponibile.';box.className='message error';return}
+    closeModal();await boot()
+  }
+}
+if($('otpLoginBtn'))$('otpLoginBtn').onclick=()=>openOtpLogin($('email')?.value||'')
+
 function openPublicAccessForm(prefillEmail=''){
   $('modalContent').innerHTML='<div class="eyebrow">RICHIESTA ACCESSO</div><h2>Richiedi l’abilitazione a MAGLIA 360</h2><p class="muted">L’account non viene creato automaticamente. La richiesta viene verificata e può essere autorizzata solo dall’amministratore.</p><form id="publicAccessForm" class="form"><label>Nome e cognome<input id="paName" autocomplete="name" required></label><label>Email<input id="paEmail" type="email" autocomplete="email" value="'+esc(prefillEmail)+'" required></label><label>Telefono<input id="paPhone" autocomplete="tel" required></label><label>Azienda / organizzazione, se presente<input id="paCompany"></label><label>Motivo della richiesta<textarea id="paReason" placeholder="Collaboratore, partner, supporto operativo, altro..."></textarea></label><label class="public-consent"><input id="paConsent" type="checkbox" required> Autorizzo il contatto per la gestione di questa richiesta.</label><input id="paWebsite" class="public-honeypot" tabindex="-1" autocomplete="off"><button class="primary" type="submit">Invia richiesta</button></form><div id="publicFormMsg" class="message hidden"></div>'
   $('modal').classList.remove('hidden')
