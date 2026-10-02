@@ -40,7 +40,8 @@ for(const file of files){
 fs.cpSync(path.join(root,'assets'),path.join(out,'assets'),{recursive:true});
 
 const communitySnapshot=JSON.parse(fs.readFileSync(path.join(root,'config','community-benefits.snapshot.json'),'utf8'));
-const publicBenefits=buildPublicCommunityBenefits(communitySnapshot);
+const publicBenefitsTimestamp=communitySnapshot.snapshotAt?new Date(String(communitySnapshot.snapshotAt)+'T00:00:00.000Z').toISOString():new Date(0).toISOString();
+const publicBenefits=buildPublicCommunityBenefits(communitySnapshot,publicBenefitsTimestamp);
 fs.mkdirSync(path.join(out,'content'),{recursive:true});
 fs.writeFileSync(path.join(out,'content','community-benefits.public.json'),JSON.stringify(publicBenefits,null,2)+'\n','utf8');
 
