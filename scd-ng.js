@@ -18,7 +18,7 @@ window.addEventListener('appinstalled',()=>{
   const button=document.querySelector('#installApp');
   if(button)button.hidden=true;
 });
-const state={view:'pulse',filter:'ALL',events:[],upcoming:[],fullCalendar:[],calendarLoaded:false,calendarLoading:false,calendarSourceState:'UNVERIFIED',calendarPeriod:'WEEK',calendarTeam:'ALL',calendarCategory:'ALL',calendarType:'ALL',calendarSearch:'',teamsSearch:'',teamsCategory:'ALL',socialFilter:'ALL',socialSearch:'',news:null,clubContent:[],sportData:{results:[],standings:[],headToHead:[]},partners:[],publicProfiles:[],nextMatch:null,privateToken:'',privateEmail:'',privateData:null,workspace:null,privateLoading:false,privateError:''};
+const state={view:'pulse',filter:'ALL',events:[],upcoming:[],fullCalendar:[],calendarLoaded:false,calendarLoading:false,calendarSourceState:'UNVERIFIED',calendarPeriod:'WEEK',calendarTeam:'ALL',calendarCategory:'ALL',calendarType:'ALL',calendarSearch:'',teamsSearch:'',teamsCategory:'ALL',socialFilter:'ALL',socialSearch:'',news:null,clubContent:[],socialLive:null,sportData:{results:[],standings:[],headToHead:[]},partners:[],publicProfiles:[],nextMatch:null,privateToken:'',privateEmail:'',privateData:null,workspace:null,privateLoading:false,privateError:''};
 const officialChannels=[
  {id:'site',label:'Sito ufficiale',url:'https://www.colicoderviese.it/',terms:'sito web comunicazioni servizi'},
  {id:'facebook',label:'Facebook SCD',url:'https://www.facebook.com/ColicoDerviese',terms:'facebook social pagina'},
@@ -337,8 +337,69 @@ async function loadClubContent(){
  renderClubContent();
  renderSocialHub();
 }
+function socialLiveState(){return state.socialLive&&state.socialLive.ok===true?state.socialLive:null}
+function openRewardsCatalog(){
+ const rows=socialLiveState()?.rewards||[];
+ if(!rows.length){toast('Catalogo premi non disponibile da fonte verificata');return}
+ openPanel('Premi Rossoblu','<div class="panel-detail"><span class="eyebrow">CATALOGO VERIFICATO</span><h2>'+rows.length+' premi disponibili</h2><div class="r56-catalog">'+rows.map(x=>'<article><div><small>'+esc(String(x.pointsCost))+' PUNTI</small><h3>'+esc(x.title)+'</h3><p>'+esc(x.description||'')+'</p></div><b>'+(x.quantityAvailable==null?'Disponibile':esc(String(x.quantityAvailable))+' disponibili')+'</b></article>').join('')+'</div><small>Il riscatto resta disabilitato finché l’identità utente e il ledger punti non sono verificati server-side.</small></div>');
+}
+function openDealsCatalog(){
+ const rows=socialLiveState()?.deals||[];
+ if(!rows.length){toast('Convenzioni non disponibili da fonte verificata');return}
+ openPanel('Convenzioni territorio','<div class="panel-detail"><span class="eyebrow">PARTNER VERIFICATI</span><h2>'+rows.length+' opportunità attive</h2><div class="r56-catalog">'+rows.map(x=>'<article><div><small>'+esc(x.discountPercentage!=null?String(x.discountPercentage)+'%':'BENEFIT')+'</small><h3>'+esc(x.title)+'</h3><p>'+esc(x.discountCode?('Codice: '+x.discountCode):'Dettagli disponibili presso il partner.')+'</p></div></article>').join('')+'</div><small>Nessuna geolocalizzazione viene avviata automaticamente. Eventuali funzioni di prossimità richiederanno consenso esplicito.</small></div>');
+}
+function openMvpVerified(){
+ const m=socialLiveState()?.mvp;
+ if(!m?.available){toast('Votazione MVP non disponibile da fonte verificata');return}
+ openPanel('MVP Matchday','<div class="panel-detail"><span class="eyebrow">RISULTATI VERIFICATI</span><h2>'+esc(String(m.totalVotes||0))+' voti registrati</h2><div class="r56-mvp-list">'+m.candidates.map(x=>'<article><div><b>'+esc(x.label)+'</b><small>'+esc(String(x.votes))+' voti</small></div><div class="r56-mvp-track"><span style="width:'+Math.max(0,Math.min(100,Number(x.percentage)||0))+'%"></span></div><strong>'+esc(String(x.percentage))+'%</strong></article>').join('')+'</div><small>La scheda mostra soltanto candidati autorizzati alla pubblicazione. Il voto utente resterà disabilitato finché l’identità non sarà verificata server-side.</small></div>');
+}
+function renderSocialInteractive(){
+ const data=socialLiveState();
+ const badge=$('#socialInteractiveState');
+ const mvpText=$('#socialMvpState'),mvpBtn=$('#socialMvpOpen');
+ const rewardsText=$('#socialRewardsState'),rewardsBtn=$('#socialRewardsOpen');
+ const dealsText=$('#socialDealsState'),dealsBtn=$('#socialDealsOpen');
+ if(!data?.enabled){
+   if(badge)badge.textContent=data?.state||'DATI IN AGGIORNAMENTO';
+   if(mvpText)mvpText.textContent='Nessuna votazione verificata disponibile.';
+   if(mvpBtn){mvpBtn.disabled=true;mvpBtn.textContent='Votazione non disponibile'}
+   if(rewardsText)rewardsText.textContent='Nessun premio verificato pubblicabile.';
+   if(rewardsBtn){rewardsBtn.disabled=true;rewardsBtn.textContent='Catalogo in aggiornamento'}
+   if(dealsText)dealsText.textContent='Mostriamo solo offerte sponsor con fonte verificata e attivazione esplicita.';
+   if(dealsBtn){dealsBtn.disabled=true;dealsBtn.textContent='Offerte in aggiornamento'}
+   return;
+ }
+ if(badge)badge.textContent='SUPABASE · VERIFICATO';
+ const m=data.mvp||{};
+ if(mvpText)mvpText.textContent=m.available?(String(m.candidates.length)+' candidati · '+String(m.totalVotes||0)+' voti verificati'):'Nessuna votazione verificata per questa gara.';
+ if(mvpBtn){mvpBtn.disabled=!m.available;mvpBtn.textContent=m.available?'Apri MVP':'Votazione non disponibile'}
+ const rewards=Array.isArray(data.rewards)?data.rewards:[];
+ if(rewardsText)rewardsText.textContent=rewards.length?(String(rewards.length)+' premi verificati disponibili.'):'Nessun premio verificato pubblicabile.';
+ if(rewardsBtn){rewardsBtn.disabled=!rewards.length;rewardsBtn.textContent=rewards.length?'Apri catalogo':'Catalogo in aggiornamento'}
+ const deals=Array.isArray(data.deals)?data.deals:[];
+ if(dealsText)dealsText.textContent=deals.length?(String(deals.length)+' convenzioni territoriali verificate attive.'):'Nessuna convenzione verificata attiva.';
+ if(dealsBtn){dealsBtn.disabled=!deals.length;dealsBtn.textContent=deals.length?'Apri convenzioni':'Offerte in aggiornamento'}
+}
+async function loadSocialInteractive(){
+ try{
+   const id=String(state.nextMatch?.id||'');
+   const qs=/^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(id)?('?match_id='+encodeURIComponent(id)):'';
+   const r=await fetch(API_BASE+'/api/social/public-state'+qs,{cache:'no-store'});
+   const data=await r.json();
+   state.socialLive=data&&typeof data==='object'?data:null;
+ }catch(e){state.socialLive={ok:false,enabled:false,state:'UNAVAILABLE'}}
+ renderSocialInteractive();
+ renderSocialHub();
+}
 function socialFeedRows(){
  const out=[];
+ const live=socialLiveState()?.liveEvents||[];
+ live.slice(0,30).forEach((x,i)=>out.push({
+   id:'live-'+String(x.id||i),type:'MATCHDAY',icon:'●',label:'LIVE MATCH',
+   title:[x.minuteLabel,x.eventType].filter(Boolean).join(' · ')||'Aggiornamento gara',
+   copy:x.body||'',meta:['SCD SUPABASE · verificato'],team:state.nextMatch?.team||'',
+   action:'match',share:[x.minuteLabel,x.body].filter(Boolean).join(' · ')
+ }));
  if(state.nextMatch){
    const m=state.nextMatch;
    out.push({
@@ -433,9 +494,9 @@ $('#socialPointsLogin')?.addEventListener('click',()=>{
   }catch{}
   setView('twin');
  });
- $('#socialMvpOpen')?.addEventListener('click',()=>toast('Votazione MVP non disponibile finché il backend non restituisce candidati autorizzati.'));
- $('#socialRewardsOpen')?.addEventListener('click',()=>toast('Catalogo premi in aggiornamento.'));
- $('#socialDealsOpen')?.addEventListener('click',()=>toast('Convenzioni territoriali in aggiornamento.'));
+ $('#socialMvpOpen')?.addEventListener('click',openMvpVerified);
+ $('#socialRewardsOpen')?.addEventListener('click',openRewardsCatalog);
+ $('#socialDealsOpen')?.addEventListener('click',openDealsCatalog);
  
  async function openTeamHub(name){
  if(!state.calendarLoaded)await ensurePublicCalendar();
@@ -912,14 +973,14 @@ async function hydrate(){
     if($('#todayDetail'))$('#todayDetail').textContent=todayEv.length?todayEv.slice(0,3).map(x=>[x.team,x.time,x.title].filter(Boolean).join(' · ')).join('  |  '):'Nessuna attività verificata disponibile nella fonte collegata.';
     const card=Array.isArray(data.cards)?data.cards.find(c=>c.evidence?.length):null;
     if(card){if($('#storyTitle'))$('#storyTitle').textContent=card.title||'SCD Newsroom';if($('#storyText'))$('#storyText').textContent=card.dek||card.body||'Contenuto verificato'}
-    state.fullCalendar=mergeCalendarRows(state.fullCalendar,state.events,state.upcoming);renderWeek();renderWeekMeta(data);renderMatchCenter();renderUpcoming();renderPartners();renderMentions();renderMyTeamDeck();renderSocialHub();if(state.view==='calendar')renderPublicCalendar();if(state.view==='teams')renderPublicTeams();
+    state.fullCalendar=mergeCalendarRows(state.fullCalendar,state.events,state.upcoming);renderWeek();renderWeekMeta(data);renderMatchCenter();renderUpcoming();renderPartners();renderMentions();renderMyTeamDeck();renderSocialHub();await loadSocialInteractive();if(state.view==='calendar')renderPublicCalendar();if(state.view==='teams')renderPublicTeams();
   }catch(e){
     if($('#weekCount'))$('#weekCount').textContent='—';if($('#todayCount'))$('#todayCount').textContent='—';
     state.fullCalendar=mergeCalendarRows(state.fullCalendar,state.events,state.upcoming);renderWeek();renderMatchCenter();renderUpcoming();renderPartners();renderMentions();renderSocialHub();if(state.view==='calendar')renderPublicCalendar();if(state.view==='teams')renderPublicTeams();
   }
 }
-loadClubContent();hydrate();$('#refreshData')?.addEventListener('click',()=>{loadClubContent();hydrate();toast('Aggiornamento richiesto')});
-$('#socialRefresh')?.addEventListener('click',async()=>{await Promise.all([loadClubContent(),hydrate()]);renderSocialHub();toast('Feed social aggiornato')});
+loadClubContent();loadSocialInteractive();hydrate();$('#refreshData')?.addEventListener('click',()=>{loadClubContent();hydrate();toast('Aggiornamento richiesto')});
+$('#socialRefresh')?.addEventListener('click',async()=>{await Promise.all([loadClubContent(),hydrate(),loadSocialInteractive()]);renderSocialHub();toast('Feed social aggiornato')});
 $('#installApp')?.addEventListener('click',async()=>{
  if(!deferredInstallPrompt){toast('Installazione disponibile dal menu del browser quando supportata');return}
  deferredInstallPrompt.prompt();
