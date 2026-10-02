@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.18.0",
+    "version": "3.19.0",
     "effective_at": "2026-10-02",
     "status": "BINDING",
     "language": "it-IT",
@@ -3709,7 +3709,7 @@
       }
     },
     "sponsor_center_development": {
-      "state": "SOURCE_IMPLEMENTED_RUNTIME_DEPLOY_REQUIRED",
+      "state": "LIVE_MASTER_WITH_VERIFIED_SNAPSHOT_FALLBACK",
       "private_surface": "PARTNER_OS_EXISTING_INITIATIVES_VIEW",
       "source": "SCD_OPERATIVO_PILOTA/INIZIATIVE_COMMERCIALI",
       "related_sources": [
@@ -3737,7 +3737,9 @@
         "SUPPLIER_STATUS_DISTINCT_FROM_SPONSOR_STATUS",
         "QUOTE_DOCUMENTS_LINKED_WHEN_VERIFIED",
         "FUTURE_DRAWER_NOT_PRESENTED_AS_IMMINENT",
-        "TECHNICAL_AND_AUTHORIZATION_GATES_BEFORE_EXECUTION"
+        "TECHNICAL_AND_AUTHORIZATION_GATES_BEFORE_EXECUTION",
+        "SNAPSHOT_PROVENANCE_REQUIRED",
+        "SNAPSHOT_MUST_SHOW_GENERATED_AT"
       ],
       "canonical_projects": [
         "INIT-CENTRO-RICARICA-EV",
@@ -3762,7 +3764,16 @@
         "VERISURE": "ACTIVE_CONTRACTED_SECURITY_SUPPLIER",
         "TRIBUNA_CAMPO_2": "QUOTES_RECEIVED_SUPPLIER_AND_AMOUNT_MUST_BE_RECONCILED_FROM_EVIDENCE"
       },
-      "fallback": "FAIL_CLOSED_SHOW_SOURCE_UNAVAILABLE_NO_SYNTHETIC_DATA"
+      "fallback": "VERIFIED_SNAPSHOT_ONLY_WITH_SOURCE_TIMESTAMP",
+      "snapshot": {
+        "path": "config/sponsor-development.snapshot.json",
+        "source": "SCD_OPERATIVO_PILOTA",
+        "source_table": "INIZIATIVE_COMMERCIALI",
+        "generation_rule": "GENERATED_FROM_CANONICAL_MASTER_ONLY",
+        "stale_label_required": true,
+        "must_never_present_as_live": true,
+        "replacement_rule": "LIVE_MASTER_ALWAYS_WINS"
+      }
     }
   },
   "research_intelligence": {
