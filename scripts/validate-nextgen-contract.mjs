@@ -20,7 +20,7 @@ if(!html.includes('SCD MIRROR')) fail('Mirror surface missing');
 if(!html.includes('PRIVATE DESK')) fail('Private Desk missing');
 if(!html.includes('SCD HOME · QUESTA SETTIMANA') && !html.includes('SCD WEEKLY RADAR')) fail('current-week surface missing');
 if(!html.includes('SCD AI NEWSROOM')) fail('AI Newsroom missing');
-for(const token of ['SCD HOME · QUESTA SETTIMANA','publicSearchInput','matchCenter','upcomingEvents','mediaHub','communityPulse','sponsorRail','partnerCommunityHub','institutionalStrip','joinClub','view-calendar','calendarPublicList','view-teams','publicTeamsGrid','myTeamDeck','videoArena','data-public-action="calendar"','avatarSearch','SKY','./assets/sky.png']){
+for(const token of ['SCD HOME · QUESTA SETTIMANA','publicSearchInput','matchCenter','upcomingEvents','mediaHub','communityPulse','sponsorRail','partnerCommunityHub','institutionalStrip','joinClub','view-calendar','calendarPublicList','view-teams','publicTeamsGrid','myTeamDeck','videoArena','view-card','membershipPromoBar','publicBenefitNetwork','data-public-action="calendar"','avatarSearch','SKY','./assets/sky.png']){
   if(!html.includes(token)) fail('current-week public entry missing '+token);
 }
 
@@ -52,6 +52,9 @@ if(manifest.sky_and_avatar?.mirror?.separate_from_twin!==true) fail('Mirror and 
 const capIds=new Set((manifest.capability_map||[]).map(x=>x.id));
 if(!capIds.has('CAP-PUBLIC-TEAMS')) fail('missing capability CAP-PUBLIC-TEAMS');
 if(!capIds.has('CAP-PUBLIC-MATCHDAY')) fail('missing capability CAP-PUBLIC-MATCHDAY');
+if(!capIds.has('CAP-CARD-BENEFIT-CENTER')) fail('missing capability CAP-CARD-BENEFIT-CENTER');
+if(!js.includes("fetch(API_BASE+'/api/community/benefits'")) fail('R50 public Benefit Network loader missing');
+if(manifest.product_direction?.card_and_benefit_center?.cards?.tesserato?.self_assignment!==false) fail('R50 Tesserato Card self-assignment guard missing');
 if(!js.includes('function openMatchday(')) fail('R48 Matchday runtime missing');
 if(!js.includes('function openTeamHub(')) fail('R48 Team Hub runtime missing');
 if(manifest.product_direction?.public_matchday?.no_prediction!==true) fail('R48 Matchday prediction guard missing');
