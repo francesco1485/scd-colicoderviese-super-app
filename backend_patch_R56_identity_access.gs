@@ -19,6 +19,71 @@ function r56NormalizePhone_(value) {
   return String(value || '').replace(/[^0-9+]/g, '').replace(/^00/, '+');
 }
 
+function r56CanonicalPeopleSheet_() {
+  try {
+    if (typeof R25_DATA === 'undefined' || !R25_DATA.TESSERATI_ID) return null;
+    var ss = SpreadsheetApp.openById(String(R25_DATA.TESSERATI_ID));
+    return ss.getSheetByName('02 DB PERSONE V2');
+  } catch (e) {
+    console.warn('[R56 CANONICAL PEOPLE]', String(e && e.message ? e.message : e));
+    return null;
+  }
+}
+
+function r56CanonicalBirthKey_(value) {
+  if (!value) return '';
+  if (Object.prototype.toString.call(value) === '[object Date]' && !isNaN(value.getTime())) {
+    return Utilities.formatDate(value, 'Europe/Rome', 'yyyy-MM-dd');
+  }
+  var s = String(value || '').trim();
+  var iso = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (iso) return iso[1] + '-' + iso[2] + '-' + iso[3];
+  var it = s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})$/);
+  if (it) return it[3] + '-' + ('0' + it[2]).slice(-2) + '-' + ('0' + it[1]).slice(-2);
+  return s;
+}
+
+function r56CanonicalPersonFromRow_(row) {
+  row = row || [];
+  return {
+    personId:String(row[0] || '').trim(),
+    personType:String(row[1] || '').trim(),
+    lastName:String(row[2] || '').trim(),
+    firstName:String(row[3] || '').trim(),
+    fiscalCode:String(row[4] || '').trim(),
+    birthDate:r56CanonicalBirthKey_(row[5]),
+    email:email_(row[6] || ''),
+    phone:r56NormalizePhone_(row[7] || ''),
+    status:String(row[8] || '').trim(),
+    group:String(row[9] || '').trim(),
+    role:String(row[10] || '').trim(),
+    source:String(row[11] || 'TESSERATI_SHEET').trim()
+  };
+}
+
+function r56CanonicalPeopleByEmail_(mail) {
+  var sh = r56CanonicalPeopleSheet_();
+  if (!sh || !mail) return [];
+  var last = sh.getLastRow();
+  if (last < 2) return [];
+  var values = sh.getRange(2, 1, last - 1, 12).getValues();
+  return values.map(r56CanonicalPersonFromRow_).filter(function(p){
+    return p.personId && p.email === mail && String(p.status || 'ATTIVO').toUpperCase() !== 'INATTIVO';
+  });
+}
+
+function r56CanonicalPeopleByPhoneBirth_(phone, birth) {
+  var sh = r56CanonicalPeopleSheet_();
+  if (!sh || !phone || !birth) return [];
+  var birthKey = r56CanonicalBirthKey_(birth);
+  var last = sh.getLastRow();
+  if (last < 2) return [];
+  var values = sh.getRange(2, 1, last - 1, 12).getValues();
+  return values.map(r56CanonicalPersonFromRow_).filter(function(p){
+    return p.personId && p.phone === phone && p.birthDate === birthKey && String(p.status || 'ATTIVO').toUpperCase() !== 'INATTIVO';
+  });
+}
+
 function r56IdentityRows_() {
   if (typeof r216CrmTable_ !== 'function') return [];
   try { return r216CrmTable_('UTENTI') || []; } catch (e) { return []; }
@@ -49,6 +114,30 @@ function r56ResolveIdentity_(payload) {
     return {matched:false,matchMethod:'EMAIL_DUPLICATE',confidence:0,status:'PENDING_REVIEW'};
   }
 
+  if (mail) {
+    var canonicalMail = r56CanonicalPeopleByEmail_(mail);
+    if (canonicalMail.length === 1) {
+      var cp = canonicalMail[0];
+      return {
+        matched:true,
+        matchMethod:'CANONICAL_EMAIL_EXACT',
+        confidence:100,
+        status:'EXISTING_PERSON_NO_ACCOUNT',
+        email:mail,
+        personId:cp.personId,
+        personType:cp.personType,
+        role:cp.role,
+        group:cp.group,
+        birthDate:cp.birthDate,
+        active:true,
+        requiresAccountProvision:true
+      };
+    }
+    if (canonicalMail.length > 1) {
+      return {matched:false,matchMethod:'CANONICAL_EMAIL_DUPLICATE',confidence:0,status:'PENDING_REVIEW'};
+    }
+  }
+
   if (phone && birth) {
     var exactPhoneBirth = rows.filter(function(r){
       var rp = r56NormalizePhone_(r.TELEFONO || r.PHONE || '');
@@ -68,6 +157,30 @@ function r56ResolveIdentity_(payload) {
       };
     }
     if (exactPhoneBirth.length > 1) return {matched:false,matchMethod:'PHONE_BIRTHDATE_DUPLICATE',confidence:0,status:'PENDING_REVIEW'};
+  }
+
+  if (phone && birth) {
+    var canonicalPhoneBirth = r56CanonicalPeopleByPhoneBirth_(phone, birth);
+    if (canonicalPhoneBirth.length === 1) {
+      var cb = canonicalPhoneBirth[0];
+      return {
+        matched:true,
+        matchMethod:'CANONICAL_PHONE_BIRTHDATE',
+        confidence:95,
+        status:'EXISTING_PERSON_REVIEW_EMAIL',
+        email:cb.email,
+        personId:cb.personId,
+        personType:cb.personType,
+        role:cb.role,
+        group:cb.group,
+        birthDate:cb.birthDate,
+        active:true,
+        requiresAccountProvision:true
+      };
+    }
+    if (canonicalPhoneBirth.length > 1) {
+      return {matched:false,matchMethod:'CANONICAL_PHONE_BIRTHDATE_DUPLICATE',confidence:0,status:'PENDING_REVIEW'};
+    }
   }
 
   return {matched:false,matchMethod:'NO_STRONG_MATCH',confidence:0,status:'NEW_OR_PENDING'};
@@ -111,6 +224,9 @@ function r56ResolveMyIdentity_(token, payload) {
     confidence:Number(resolved.confidence || 0),
     status:String(resolved.status || 'PENDING_REVIEW'),
     role:String(resolved.role || ''),
+    personId:String(resolved.personId || ''),
+    personType:String(resolved.personType || ''),
+    group:String(resolved.group || ''),
     active:resolved.active !== false
   };
 }
@@ -161,6 +277,8 @@ function r56InviteAccess_(token, payload) {
     active:true,
     source:'R56_INVITE',
     identityState:identity.status,
+    personId:String(identity.personId || ''),
+    identityMode:String(identity.matchMethod || 'DIRECTION_INVITE'),
     mustChangePin:true
   };
 
