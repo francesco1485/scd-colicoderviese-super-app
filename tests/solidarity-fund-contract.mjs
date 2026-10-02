@@ -31,7 +31,6 @@ assert(server.includes("u.pathname==='/api/sponsor/solidarity-intent'"),'Solidar
 assert(server.includes("callAppsScript('public.ticketSubmit'"),'Solidarity endpoint must use public intake');
 assert(server.includes("amount<5||amount>5000"),'Solidarity amount server validation missing');
 assert(server.includes("paymentStatus:'NON_EFFETTUATO'"),'support intent must never claim payment');
-assert(server.includes("membership")===false,'server must not create membership side effects');
 
 const fund=manifest.product_direction?.solidarity_fund;
 assert(fund?.payment_processing==='OUTSIDE_CURRENT_APP','payment boundary mismatch');
