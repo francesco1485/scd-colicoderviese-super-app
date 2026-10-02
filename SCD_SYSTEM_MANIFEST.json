@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.15.0",
+    "version": "3.16.0",
     "effective_at": "2026-10-02",
     "status": "BINDING",
     "language": "it-IT",
@@ -3615,7 +3615,7 @@
       "deep_link_calendar": true
     },
     "solidarity_fund": {
-      "state": "PUBLIC_DONATION_AREA_READY_CHANNELS_CONFIG_GATED",
+      "state": "PUBLIC_DONATION_AND_AGGREGATE_REPORTING_READY_CHANNELS_CONFIG_GATED",
       "id": "SCD_SOLIDARITY_FUND",
       "purpose": "Sostegno alla partecipazione sportiva di ragazzi e famiglie in difficolta secondo criteri e approvazioni societarie.",
       "public_surfaces": [
@@ -3660,7 +3660,30 @@
         "payment_confirmation": false,
         "human_followup": "DIRECTION_OR_ADMINISTRATION"
       },
-      "config_endpoint": "/api/public/donation-config"
+      "config_endpoint": "/api/public/donation-config",
+      "traceability": {
+        "intent_reference_returned": true,
+        "intent_reference_scope": "CONTACT_INTENT_ONLY",
+        "intent_is_not_payment_confirmation": true,
+        "payment_confirmation": "OFFICIAL_CHANNEL_ONLY"
+      },
+      "reporting": {
+        "endpoint": "/api/public/donation-summary",
+        "visibility": "PUBLIC_AGGREGATED_ONLY",
+        "donor_identity_exposure": false,
+        "donor_wall": false,
+        "source_gate": "EXPLICIT_VERIFIED_ENV_CONFIG_REQUIRED",
+        "unavailable_state": "FAIL_CLOSED_NO_INVENTED_TOTALS",
+        "fields": [
+          "CONFIRMED_AMOUNT",
+          "ALLOCATED_AMOUNT",
+          "AVAILABLE_BALANCE",
+          "AS_OF",
+          "SOURCE_LABEL",
+          "SOURCE_URL"
+        ],
+        "privacy_rule": "NO_PERSONAL_DONOR_DATA"
+      }
     }
   },
   "research_intelligence": {
