@@ -4015,12 +4015,9 @@
       "state": "VERTICAL_SLICE_ENHANCEMENT",
       "purpose": "MAKE_FAMILY_ATHLETE_STAFF_ACTIONABLE_INSIDE_THE_EXISTING_SCD_NOVA_PRIVATE_DESK",
       "screens": [
-        "PRIVATE_DESK:TESSERATI",
-        "PRIVATE_DESK:PULMINI",
-        "PRIVATE_DESK:RICHIESTE",
-        "PRIVATE_DESK:PRESENZE",
-        "PRIVATE_DESK:CONVOCAZIONI",
-        "PRIVATE_DESK:COMUNICAZIONI"
+        "PRIVATE_DESK",
+        "AUTHORIZED_PROFILE_HUB",
+        "STAFF_OPERATIONS"
       ],
       "rules": [
         "NO_NEW_PARALLEL_PRIVATE_DESK",
@@ -4035,7 +4032,8 @@
       "supersedes_mock_toasts": true,
       "active_runtime": "scd-ng.js",
       "legacy_router_status": "COMPATIBILITY_ONLY_NOT_PRIMARY",
-      "no_parallel_private_app": true
+      "no_parallel_private_app": true,
+      "runtime": "SCD_NOVA_PRIVATE_DESK"
     }
   },
   "research_intelligence": {
