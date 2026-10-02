@@ -4703,3 +4703,101 @@ a:focus-visible{
 .access-auth-warning strong{display:block;color:#6d5b2b;font-size:9px}
 .access-auth-warning p{margin:5px 0 0;color:#817350;font-size:8px;line-height:1.5}
 .access-auth-warning b{color:#5b4e2d}
+
+
+/* =========================================================
+   MAGLIA 360 · V20 INTERNAL CALENDAR / NOTIFICATIONS
+   ========================================================= */
+.agenda-calendar-panel{
+  background:
+    radial-gradient(circle at 92% 8%,rgba(77,158,152,.08),transparent 28%),
+    linear-gradient(180deg,#fff,#fbfdfd)
+}
+.agenda-calendar-nav{
+  display:flex;align-items:center;gap:7px;flex-wrap:wrap
+}
+.agenda-calendar-nav strong{
+  min-width:160px;color:#21495e;font-size:10px;text-align:center;text-transform:capitalize
+}
+.agenda-weekdays{
+  display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:1px;margin-top:8px;
+  border:1px solid #dfe8eb;border-bottom:0;border-radius:12px 12px 0 0;overflow:hidden;background:#dfe8eb
+}
+.agenda-weekdays span{
+  padding:7px;background:#f4f8f8;color:#70868f;font-size:7px;font-weight:900;text-align:center;text-transform:uppercase;letter-spacing:.06em
+}
+.agenda-calendar-grid{
+  display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:1px;
+  border:1px solid #dfe8eb;border-radius:0 0 12px 12px;overflow:hidden;background:#dfe8eb
+}
+.agenda-calendar-day{
+  min-height:122px;padding:7px;background:#fff
+}
+.agenda-calendar-day.outside{background:#fafbfb}
+.agenda-calendar-day.today{box-shadow:inset 0 0 0 2px #4d9e98}
+.agenda-calendar-day-head{
+  display:flex;justify-content:space-between;align-items:center;margin-bottom:6px
+}
+.agenda-calendar-day-head span{
+  display:grid;place-items:center;width:23px;height:23px;border-radius:50%;color:#4e6976;font-size:8px;font-weight:850
+}
+.agenda-calendar-day.today .agenda-calendar-day-head span{
+  background:#21495e;color:#fff
+}
+.agenda-calendar-day-head b{
+  display:grid;place-items:center;min-width:19px;height:19px;padding:0 5px;border-radius:999px;background:#eef4f5;color:#66818a;font-size:6.5px
+}
+.agenda-calendar-items{display:grid;gap:4px}
+.agenda-calendar-event{
+  width:100%;padding:5px 6px;border:0;border-radius:7px;background:#edf5f4;color:#315f5b;text-align:left;
+  font-size:6.8px;font-weight:800;line-height:1.25;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap
+}
+.agenda-calendar-event span{
+  margin-right:5px;color:#6d858f;font-size:6.3px;font-weight:900
+}
+.agenda-calendar-event.cepa_event,.agenda-calendar-event.initiative{background:#eef2fa;color:#4c6387}
+.agenda-calendar-event.sponsor,.agenda-calendar-event.partner{background:#fbf1e7;color:#8b6235}
+.agenda-calendar-event.internal{background:#f2eff8;color:#665887}
+.agenda-calendar-items small{color:#899aa2;font-size:6.5px}
+
+.notification-center-actions{
+  display:flex;justify-content:flex-end;margin-bottom:10px
+}
+.notification-center-list{
+  display:grid;gap:7px;max-height:min(62vh,620px);overflow:auto;padding-right:2px
+}
+.notification-center-row{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;width:100%;padding:12px;
+  border:1px solid #dfe8eb;border-radius:11px;background:#fff;text-align:left;cursor:pointer
+}
+.notification-center-row.unread{
+  border-color:#bcdad5;background:#f4fbf9;box-shadow:inset 3px 0 0 #4d9e98
+}
+.notification-center-row span{
+  display:block;color:#5f8e89;font-size:6.7px;font-weight:900;text-transform:uppercase;letter-spacing:.06em
+}
+.notification-center-row strong{
+  display:block;margin-top:3px;color:#21495e;font-size:10px
+}
+.notification-center-row p{
+  margin:5px 0 0;color:#748993;font-size:8px;line-height:1.45
+}
+.notification-center-row small{
+  display:block;margin-top:5px;color:#91a0a7;font-size:6.7px
+}
+.notification-center-row>b{
+  align-self:center;color:#3f7f78;font-size:7px
+}
+
+@media(max-width:900px){
+  .agenda-calendar-day{min-height:102px;padding:5px}
+}
+@media(max-width:680px){
+  .agenda-weekdays,.agenda-calendar-grid{
+    grid-template-columns:repeat(7,minmax(44px,1fr));
+    overflow-x:auto
+  }
+  .agenda-calendar-panel{overflow-x:auto}
+  .agenda-calendar-day{min-height:88px}
+  .agenda-calendar-event{font-size:6.2px}
+}
