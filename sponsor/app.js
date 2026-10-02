@@ -228,21 +228,8 @@ const suppliers=[
 {name:"Saco Antincendio S.r.l.",position:"€122",paid:"€0",residual:"€122",email:"sacoantincendio@gmail.com",potential:"MEDIO",next:"Ricostruire servizi pluriennali e benchmark"}
 ];
 
-const commercialInitiatives=[
-{name:"ColicoDerviese Card · Tesserato",type:"CARD / COMMUNITY",status:"DA MODELLARE",target:"Atleti, staff, famiglie",goal:"Identità, convenzioni, benefit e relazione continuativa",next:"Definire perimetro beneficiari, funzioni e misurazione utilizzo"},
-{name:"ColicoDerviese Card · Sostenitore",type:"CARD / FUNDRAISING",status:"DA MODELLARE",target:"Tifosi, famiglie, territorio",goal:"Appartenenza e sostegno economico continuativo",next:"Definire quota, durata, rinnovo e benefit"},
-{name:"ColicoDerviese Card · Partner",type:"CARD / B2B",status:"DA MODELLARE",target:"Sponsor, partner, aziende",goal:"Hospitality, network e benefit B2B",next:"Definire livelli partner e collegamento dossier sponsor"},
-{name:"Tessera Tifoso / Community",type:"MEMBERSHIP",status:"IDEA DA STRUTTURARE",target:"Tifosi e territorio",goal:"Trasformare pubblico occasionale in community misurabile",next:"Evitare duplicazione con Card Sostenitore"},
-{name:"Spot LED Sponsor 40 secondi",type:"MEDIA / SPONSOR",status:"IN PRODUZIONE",target:"Sponsor attuali e futuri",goal:"Spot dedicato, leggibile, un solo sponsor protagonista",next:"Creare master, sottoporre idea e produrre MP4 dopo approvazione"},
-{name:"Torneo nazionale 2019 · 09/05/2027",type:"EVENTO / SPONSOR",status:"DA CONFERMARE",target:"Squadre, famiglie, aziende, territorio",goal:"Sport, musica, degustazioni e asset commerciali",next:"Definire format, capacità, pacchetti e rete ricettiva"},
-{name:"Video Partner / Match Content",type:"MEDIA / VIDEO",status:"IDEA DA STRUTTURARE",target:"Sponsor e partner media",goal:"Valorizzare partite, highlight e clip SCD nel rispetto dei diritti Pixellot",next:"Definire diritti, formati, inventory e proof di delivery"},
-{name:"Merchandising SCD",type:"MERCHANDISING / COMMUNITY",status:"IDEA DA STRUTTURARE",target:"Tifosi, famiglie, tesserati",goal:"Prodotti ufficiali, gadget e capsule partner",next:"Definire gamma, costi, margini, produzione e canale vendita"},
-{name:"Gazebo & Partner Corner",type:"EVENTO / ATTIVAZIONE",status:"IDEA DA VALIDARE",target:"Sponsor, fornitori, convenzioni",goal:"Presenza fisica utile durante tornei, open day e giornate community",next:"Definire spazi, sicurezza, servizi e regole evento"},
-{name:"Strutture brandizzate",type:"IMPIANTO / SPONSOR",status:"IDEA DA STUDIARE",target:"Sponsor pluriennali / territoriali",goal:"Associare partner a spazi reali con presenza continuativa",next:"Censire aree, misure, esclusività, durata e proof fotografico"},
-{name:"Mascotte Partner",type:"FAMILY / ATTIVAZIONE",status:"IDEA DA VALIDARE",target:"Brand family-friendly",goal:"Divisa mascotte, pre-gara, foto, eventi e contenuti community",next:"Definire inventory, frequenza e regole di utilizzo"},
-{name:"Sublimated Kit Partner",type:"KIT / SPONSOR",status:"IDEA DA STUDIARE",target:"Sponsor territoriali / tecnici",goal:"Posizioni integrate su divise sublimatiche e pacchetti multi-canale",next:"Censire posizioni libere e compatibilità tecnica/regolamentare"},
-{name:"Partner Hub Web App SCD",type:"DIGITALE / B2B",status:"IN SVILUPPO",target:"Sponsor, convenzioni e partner",goal:"Schede partner, progetti, benefit, contenuti e proof di delivery",next:"Collegare catalogo pubblico, CRM e stato erogazione"}
-];
+/* R50.8: le iniziative di sviluppo arrivano esclusivamente dalla Source of Truth tramite /api/sponsor/development. */
+
 
 const audience=[
 {segment:"Persone attive censite",value:"268",unit:"persone",source:"00 CONTROL ROOM",note:"KPI canonico. Non sommare automaticamente con atleti e staff."},
