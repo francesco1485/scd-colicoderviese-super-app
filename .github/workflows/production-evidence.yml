@@ -29,7 +29,7 @@ jobs:
           SCD_EXPECTED_VERSION: "40.0.0"
           SCD_EXPECTED_RELEASE: "NG-0.7.0"
           SCD_EXPECTED_COMMIT: "${{ github.sha }}"
-          SCD_EXPECTED_MANIFEST: "3.21.0"
+          SCD_EXPECTED_MANIFEST: "3.23.0"
           SCD_PROD_VERIFY_ATTEMPTS: "20"
           SCD_PROD_VERIFY_DELAY_MS: "15000"
       - name: Upload production evidence
