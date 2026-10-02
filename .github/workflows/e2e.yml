@@ -33,6 +33,10 @@ jobs:
         run: npm run test:r54-private
       - name: R55 public content gate
         run: npm run test:r55-content
+      - name: R56 identity/calendar core gate
+        run: npm run test:r56-core
+      - name: R56 calendar fusion gate
+        run: npm run test:r56-calendar
       - name: SCD Universe contract gate
         run: npm run test:universe-contract
       - name: Human OS contract gate
@@ -84,6 +88,9 @@ jobs:
           node --check scripts/validate-r53-core.mjs
           node --check scripts/validate-r54-private.mjs
           node --check scripts/validate-r55-content.mjs
+          node --check scripts/validate-r56-core.mjs
+          node --check tests/calendar-fusion-contract.mjs
+          node --check lib/scd-calendar-fusion.js
           node --check scd-ng.js
           node --check scd-interactions.js
           node --check scd-experience-engine.js
