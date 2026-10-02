@@ -361,7 +361,7 @@ revoke all on table public.scd_fantasy_leagues from anon, authenticated;
 revoke all on table public.scd_fantasy_entries from anon, authenticated;
 
 comment on table public.scd_identity_links is 'Verified user-person binding. Name-only matching is forbidden.';
-comment on table public.scd_access_invites is 'One-time setup invitations. Store only setup token hashes; never plaintext temporary passwords.';
+comment on table public.scd_access_invites is 'One-time setup invitations. Store only setup token hashes; never temporary credentials in clear text.';
 comment on table public.scd_access_events is 'Minimal access/audit events. Never store PIN, password, safeguarding, health or private message content.';
 comment on table public.scd_calendar_sources is 'Registry for federation, R20, Google Calendar and club event sources with explicit authority and sync state.';
 comment on table public.scd_event_source_links is 'Many sources reconcile into one canonical EVENT_ID.';
