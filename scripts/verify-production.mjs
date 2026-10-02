@@ -93,6 +93,37 @@ async function runChecks(attempt){
     result.failures.push('R40_NEWSROOM_CONTRACT');
   }
 
+  try{
+    const pagesBenefitUrl=PAGES_URL.replace(/\/$/,'')+'/content/community-benefits.public.json?scd_verify='+Date.now();
+    const r=await getText(pagesBenefitUrl);
+    const j=parseJson('Pages public Benefit Network',r.text);
+    const activeOk=Array.isArray(j.active)&&j.active.every(x=>x.formalizationEvidence===true&&x.usableNow===true);
+    const pipelineOk=Array.isArray(j.pipeline)&&j.pipeline.every(x=>x.formalizationEvidence===false&&x.usableNow===false);
+    const privacyText=JSON.stringify(j).toLowerCase();
+    const privacyOk=!['"owner"','"nextaction"','"agreementdocument"','"email"','"phone"'].some(x=>privacyText.includes(x));
+    const ok=r.ok&&j.ok===true&&j.policy==='NO_ACTIVE_BENEFIT_WITHOUT_FORMALIZATION_EVIDENCE'&&activeOk&&pipelineOk&&privacyOk;
+    result.checks.pagesBenefitNetwork={httpStatus:r.status,ok,activeOk,pipelineOk,privacyOk,sourceMode:j.sourceMode||null};
+    if(!ok)result.failures.push('PAGES_CARD_BENEFIT_CONTRACT');
+  }catch(e){
+    result.checks.pagesBenefitNetwork={ok:false,error:String(e.message||e)};
+    result.failures.push('PAGES_CARD_BENEFIT_CONTRACT');
+  }
+
+  try{
+    const r=await getText(RENDER_BASE+'/api/community/benefits?scd_verify='+Date.now());
+    const j=parseJson('Render public Benefit Network',r.text);
+    const activeOk=Array.isArray(j.active)&&j.active.every(x=>x.formalizationEvidence===true&&x.usableNow===true);
+    const pipelineOk=Array.isArray(j.pipeline)&&j.pipeline.every(x=>x.formalizationEvidence===false&&x.usableNow===false);
+    const privacyText=JSON.stringify(j).toLowerCase();
+    const privacyOk=!['"owner"','"nextaction"','"agreementdocument"','"email"','"phone"'].some(x=>privacyText.includes(x));
+    const ok=r.ok&&j.ok===true&&j.public===true&&j.policy==='NO_ACTIVE_BENEFIT_WITHOUT_FORMALIZATION_EVIDENCE'&&activeOk&&pipelineOk&&privacyOk;
+    result.checks.renderBenefitNetwork={httpStatus:r.status,ok,activeOk,pipelineOk,privacyOk,sourceMode:j.sourceMode||null};
+    if(!ok)result.failures.push('RENDER_CARD_BENEFIT_CONTRACT');
+  }catch(e){
+    result.checks.renderBenefitNetwork={ok:false,error:String(e.message||e)};
+    result.failures.push('RENDER_CARD_BENEFIT_CONTRACT');
+  }
+
   if(result.checks.renderCapabilities?.dataFabricEnabled===true){
     try{
       const r=await getText(RENDER_BASE+'/api/scd',{
