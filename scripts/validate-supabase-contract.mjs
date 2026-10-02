@@ -24,6 +24,7 @@ const sql=fs.existsSync(migrationPath)?fs.readFileSync(migrationPath,'utf8'):'';
 const authSql=fs.existsSync(authMigrationPath)?fs.readFileSync(authMigrationPath,'utf8'):'';
 const operativeSql=fs.existsSync(operativeMigrationPath)?fs.readFileSync(operativeMigrationPath,'utf8'):'';
 const operativeIndexSql=fs.existsSync(operativeIndexMigrationPath)?fs.readFileSync(operativeIndexMigrationPath,'utf8'):'';
+const r53Sql=fs.existsSync(r53MigrationPath)?fs.readFileSync(r53MigrationPath,'utf8'):'';
 
 if(cfg){
   assert(cfg.schema_version==='1.2.0','wrong Supabase contract schema version');
