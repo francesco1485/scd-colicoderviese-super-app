@@ -1,0 +1,147 @@
+{
+  "schema_version": "1.0.0",
+  "release": "R56",
+  "principles": [
+    "ROLE_SCOPE_SERVER_SIDE",
+    "ONE_MESSAGE_RIGHT_AUDIENCE",
+    "NO_UNSUPERVISED_MINOR_1TO1",
+    "SAFEGUARDING_SEPARATE",
+    "AUDIT_SENSITIVE_SEND",
+    "WHATSAPP_OFFICIAL_ADAPTER_ONLY"
+  ],
+  "channels": {
+    "CLUB_BROADCAST": {
+      "send": [
+        "DIRECTION",
+        "SECRETARIAT"
+      ],
+      "receive": [
+        "AUTHORIZED_USERS"
+      ],
+      "reply": "OPTIONAL_MODERATED"
+    },
+    "TEAM_CHANNEL": {
+      "send": [
+        "MISTER",
+        "STAFF",
+        "MANAGER"
+      ],
+      "receive": [
+        "TEAM_AUTHORIZED_USERS",
+        "GUARDIANS_WHERE_APPLICABLE"
+      ],
+      "reply": "ROLE_SCOPED"
+    },
+    "FAMILY_THREAD": {
+      "send": [
+        "FAMILY",
+        "SECRETARIAT",
+        "MISTER",
+        "AUTHORIZED_STAFF"
+      ],
+      "receive": [
+        "LINKED_FAMILY_AND_AUTHORIZED_STAFF"
+      ],
+      "reply": "ROLE_SCOPED"
+    },
+    "STAFF_CHANNEL": {
+      "send": [
+        "DIRECTION",
+        "SECRETARIAT",
+        "MISTER",
+        "STAFF",
+        "MANAGER"
+      ],
+      "receive": [
+        "AUTHORIZED_STAFF_ONLY"
+      ],
+      "reply": "ROLE_SCOPED"
+    },
+    "COMMUNITY": {
+      "send": [
+        "REGISTERED_USER"
+      ],
+      "receive": [
+        "PUBLIC_OR_REGISTERED"
+      ],
+      "reply": "MODERATED"
+    },
+    "PARTNER_THREAD": {
+      "send": [
+        "DIRECTION",
+        "AUTHORIZED_COMMERCIAL_STAFF"
+      ],
+      "receive": [
+        "PARTNER_CONTACTS"
+      ],
+      "reply": "CRM_AUDITED"
+    },
+    "SAFEGUARDING": {
+      "send": [
+        "AUTHORIZED_REPORTER"
+      ],
+      "receive": [
+        "SAFEGUARDING_OFFICER"
+      ],
+      "reply": "ISOLATED_NOT_CHAT"
+    }
+  },
+  "role_visibility": {
+    "DIRECTION": [
+      "ALL_OPERATIONAL",
+      "AGGREGATE_ANALYTICS",
+      "ACCESS_AUDIT"
+    ],
+    "SECRETARIAT": [
+      "PEOPLE_ADMIN",
+      "DOCUMENT_STATUS",
+      "TESSERAMENTI",
+      "FAMILY_THREADS",
+      "CALENDAR"
+    ],
+    "MISTER": [
+      "OWN_TEAMS",
+      "ATTENDANCE",
+      "CALLUPS",
+      "TEAM_CHANNEL",
+      "TEAM_CALENDAR"
+    ],
+    "STAFF": [
+      "ASSIGNED_TEAMS",
+      "TEAM_CHANNEL",
+      "ASSIGNED_TASKS"
+    ],
+    "MANAGER": [
+      "ASSIGNED_TEAMS",
+      "TEAM_CHANNEL",
+      "LOGISTICS",
+      "TEAM_CALENDAR"
+    ],
+    "FAMILY": [
+      "LINKED_PEOPLE",
+      "FAMILY_THREAD",
+      "OWN_REQUESTS",
+      "AUTHORIZED_CALENDAR"
+    ],
+    "ATHLETE": [
+      "OWN_PROFILE",
+      "OWN_TEAM",
+      "OWN_CALLUPS",
+      "AUTHORIZED_TEAM_CHANNEL"
+    ],
+    "USER_BASE": [
+      "PUBLIC",
+      "COMMUNITY",
+      "OWN_ACCOUNT"
+    ],
+    "PARTNER": [
+      "OWN_PARTNER_THREAD",
+      "AUTHORIZED_PARTNER_ASSETS"
+    ]
+  },
+  "minors": {
+    "direct_1to1_default": false,
+    "guardian_or_authorized_staff_required": true,
+    "safeguarding_excluded_from_ordinary_messaging": true
+  }
+}
