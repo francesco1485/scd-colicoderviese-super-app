@@ -8,6 +8,7 @@ const manifest=JSON.parse(fs.readFileSync(new URL('../SCD_SYSTEM_MANIFEST.json',
 const server=fs.readFileSync(new URL('../server.js',import.meta.url),'utf8');
 const publicBenefitsLib=fs.readFileSync(new URL('../lib/community-benefits.js',import.meta.url),'utf8');
 const buildPages=fs.readFileSync(new URL('../scripts/build-pages.mjs',import.meta.url),'utf8');
+const publicArtifact=JSON.parse(fs.readFileSync(new URL('../content/community-benefits.public.json',import.meta.url),'utf8'));
 const html=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
 const js=fs.readFileSync(new URL('../scd-ng.js',import.meta.url),'utf8');
 
@@ -29,6 +30,14 @@ for(const forbidden of ['owner','nextAction','agreementDocument','email','phone'
 }
 assert(buildPages.includes("community-benefits.public.json"),'Pages public benefit artifact generation missing');
 assert(buildPages.includes('buildPublicCommunityBenefits'),'Pages must reuse canonical public benefit projection');
+assert(publicArtifact.policy==='NO_ACTIVE_BENEFIT_WITHOUT_FORMALIZATION_EVIDENCE','public benefit artifact policy mismatch');
+assert(Array.isArray(publicArtifact.active)&&Array.isArray(publicArtifact.pipeline),'public benefit artifact lists missing');
+assert(publicArtifact.active.every(x=>x.formalizationEvidence===true&&x.usableNow===true),'public artifact active row missing evidence');
+assert(publicArtifact.pipeline.every(x=>x.formalizationEvidence===false&&x.usableNow===false),'public artifact pipeline row incorrectly usable');
+const artifactSerialized=JSON.stringify(publicArtifact).toLowerCase();
+for(const forbidden of ['"owner"','"nextaction"','"agreementdocument"','"email"','"phone"']){
+  assert(!artifactSerialized.includes(forbidden),'public artifact leaks internal field '+forbidden);
+}
 
 for(const token of ['id="view-card"','id="membershipPromoBar"','id="cardCenter"','id="supporterCardProduct"','id="tesseratoCardProduct"','id="publicBenefitNetwork"','id="publicBenefitActive"','id="publicBenefitPipeline"']){
   assert(html.includes(token),'Card Center UI missing '+token);
