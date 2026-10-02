@@ -104,11 +104,12 @@ function renderMotionInspector(id){
       '<div><dt>Identità SCD / Lago</dt><dd>'+esc(p.lakeIdentity)+'</dd></div>'+
     '</dl>'+
     '<div class="motion-proof"><small>PROOF PLAN</small>'+p.proofPlan.map(x=>'<span>'+esc(x)+'</span>').join('')+'</div>'+
-    '<div class="motion-inspector-actions"><button class="btn-yellow" id="motionToActivation">Crea attivazione</button><button class="btn-light" data-view="media">Apri LED</button></div>'+
+    '<div class="motion-inspector-actions"><button class="btn-yellow" id="motionToActivation">Crea attivazione</button><button class="btn-light" data-view="media">Apri LED</button>'+(p.crmStakeholderId?'<button class="btn-light" id="motionOpenCrm">Apri CRM</button>':'')+'</div>'+
     '<p class="motion-safety-note">Il master LED definitivo resta bloccato finché non sono disponibili logo ufficiale approvato e specifiche native dell’impianto.</p>';
   $$('[data-motion-id]').forEach(el=>el.classList.toggle('active',el.dataset.motionId===p.id));
   const go=$('#motionToActivation');if(go)go.onclick=()=>openView('activationstudio');
   const mediaBtn=box.querySelector('[data-view="media"]');if(mediaBtn)mediaBtn.onclick=()=>{ledMotionSelected=p.id;openView('media');renderLedProfileList();renderLedProfileDetail();};
+  const crmBtn=$('#motionOpenCrm');if(crmBtn)crmBtn.onclick=()=>{openView('crm');openCrmProfile(p.crmStakeholderId);};
 }
 function renderMotionProfiles(){
   const grid=$('#motionProfileGrid'),state=$('#motionSystemState');
@@ -1470,6 +1471,7 @@ function renderLedProfileDetail(){
       '<div class="led-detail-actions">'+
         '<button class="btn-light" type="button" id="ledCopyStoryboard">Copia storyboard</button>'+
         '<button class="btn-light" type="button" id="ledOpenDocuments">Apri Documenti</button>'+
+        (p.crmStakeholderId?'<button class="btn-light" type="button" id="ledOpenCrm">Apri CRM 360°</button>':'')+
         '<button class="btn-yellow" type="button" id="ledUseCreativeFactory">Porta in Creative Factory</button>'+
       '</div>'+
     '</div>';
@@ -1511,6 +1513,7 @@ function renderLedProfileDetail(){
     }catch(e){}
   });
   $('#ledOpenDocuments')?.addEventListener('click',()=>openView('documenti'));
+  $('#ledOpenCrm')?.addEventListener('click',()=>{openView('crm');openCrmProfile(p.crmStakeholderId);});
   $('#ledUseCreativeFactory')?.addEventListener('click',()=>{
     openView('activationstudio');
     const partner=$('#activationSponsor');
