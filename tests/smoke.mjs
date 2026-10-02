@@ -133,7 +133,7 @@ for(const viewport of viewports){
   await page.waitForSelector('#mgmtLoginForm');
   await page.click('#modalClose');
 
-  if(viewport.width===390){
+  if(viewport.width===390||viewport.width===1440){
     await page.evaluate(()=>{
       state.sessionToken='qa-session';
       state.featureFlags={...state.featureFlags,dataFabricObservability:true};
@@ -185,11 +185,42 @@ for(const viewport of viewports){
 
     await goRoute(page,'family');
     await page.waitForSelector('.r24-family-strip');
-    await page.screenshot({path:'test-output/r24-family-390x844.png',fullPage:true});
+    await page.waitForSelector('.r54-family-services');
+    await page.click('[data-r24-family-action="docs"]');
+    await page.waitForSelector('.r54-status-list');
+    await page.waitForSelector('#r54FamilyNewRequest');
+    await page.click('#r54FamilyNewRequest');
+    await page.waitForSelector('#internalRequestForm');
+    await page.click('#modalClose');
+
+    await goRoute(page,'family');
+    await page.click('[data-r24-family-action="transport"]');
+    await page.waitForSelector('#transportForm');
+    await page.click('#modalClose');
+
+    await goRoute(page,'family');
+    await page.click('[data-r24-family-action="requests"]');
+    await page.waitForSelector('#requestHistoryMount');
+    await page.click('#modalClose');
+    await page.screenshot({path:'test-output/r54-family-'+viewport.width+'x'+viewport.height+'.png',fullPage:true});
 
     await goRoute(page,'athlete');
     await page.waitForSelector('.r24-athlete-hero');
-    await page.screenshot({path:'test-output/r24-athlete-390x844.png',fullPage:true});
+    await page.waitForSelector('.r54-private-actions');
+    await page.click('#r54AthleteStatus');
+    await page.waitForSelector('.r54-status-list');
+    await page.click('#modalClose');
+
+    await goRoute(page,'athlete');
+    await page.click('#r54AthleteTransport');
+    await page.waitForSelector('#transportForm');
+    await page.click('#modalClose');
+
+    await goRoute(page,'athlete');
+    await page.click('#r54AthleteRequests');
+    await page.waitForSelector('#requestHistoryMount');
+    await page.click('#modalClose');
+    await page.screenshot({path:'test-output/r54-athlete-'+viewport.width+'x'+viewport.height+'.png',fullPage:true});
 
     await goRoute(page,'staff');
     await page.click('#r24Attendance');
