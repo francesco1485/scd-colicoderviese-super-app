@@ -33,15 +33,20 @@ if(/case 'public\.identity\.resolve':[\s\S]{0,220}r56ResolveIdentity_\(/.test(br
 if(!identity.includes("matched:null")||!identity.includes("role:null"))fail('public resolver must not enumerate account state or role');
 if(!identity.includes("requestOtp(mail)"))fail('existing account preflight must use one-time code');
 if(!identity.includes("mustChangePin:true"))fail('invite must require first-access credential change');
+for(const token of ['r56CanonicalPeopleSheet_','02 DB PERSONE V2','CODICE PERSONA','CANONICAL_EMAIL_EXACT','CANONICAL_PHONE_BIRTHDATE']){
+  if(!identity.includes(token))fail('canonical Tesserati identity binding missing '+token);
+}
 if(/MailApp\.sendEmail[\s\S]{0,500}(password|password permanente)/i.test(identity))fail('invite email must not contain permanent password');
 if(!identity.includes("r56RequireDirection_"))fail('Direction gate missing on invites');
 
-for(const action of ["auth.identity.resolve","auth.access.log","direction.access.invite"]){
+for(const action of ["auth.identity.resolve","auth.access.log","direction.access.invite","direction.access.metrics"]){
   if(!bridge.includes("case '"+action+"':"))fail('bridge action missing '+action);
   if(!server.includes("'"+action+"'"))fail('server allowlist missing '+action);
 }
 if(!runtime.includes("privatePost('auth.identity.resolve'"))fail('authenticated identity resolution missing in active UI');
 if(!runtime.includes("privatePost('auth.access.log'"))fail('authenticated access audit missing in active UI');
+if(!runtime.includes("privatePost('direction.access.metrics'"))fail('Direction access metrics UI missing');
+if(!runtime.includes("METRICHE:['▥','Metriche Accessi'"))fail('Direction metrics module missing');
 if(/identity\?\.matched===true/.test(runtime))fail('public UI must not branch on account enumeration result');
 
 if(!html.includes('id="scdCookieBanner"'))fail('analytics consent banner missing');
