@@ -787,7 +787,7 @@ function renderDevelopmentInspector(id=developmentSelected){
     (x.documents?'<div class="development-evidence"><small>EVIDENZA / DOCUMENTI</small><p>'+esc(x.documents)+'</p></div>':'')+
     (developmentSupplierLabel(x)?'<div class="development-suppliers"><small>FORNITORI / SOGGETTI CANONICI</small>'+developmentSupplierLabel(x)+'</div>':'')+
     '<footer class="development-source-foot">Fonte: '+esc(developmentState.sourceTable||'INIZIATIVE_COMMERCIALI')+' · '+esc(developmentState.sourceMode||'UNKNOWN')+'</footer>';
-  $('.development-card').forEach(el=>el.classList.toggle('selected',el.dataset.developmentId===x.id));
+  $$('.development-card').forEach(el=>el.classList.toggle('selected',el.dataset.developmentId===x.id));
 }
 function renderCommercialInitiatives(){
   const source=$('#developmentSource');
@@ -817,7 +817,7 @@ function renderCommercialInitiatives(){
       (x.isDrawer?'<div class="development-drawer-chip">CASSETTO STRATEGICO</div>':'')+
     '</article>'
   ).join('')||'<article class="development-empty"><b>Nessun progetto nel filtro selezionato.</b></article>';
-  $('.development-card').forEach(el=>{
+  $$('.development-card').forEach(el=>{
     const open=()=>renderDevelopmentInspector(el.dataset.developmentId);
     el.onclick=open;el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open()}};
   });
