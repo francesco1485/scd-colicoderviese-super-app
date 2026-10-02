@@ -567,9 +567,9 @@ function renderTerritoryHub(key=territoryCurrent){
 $$('[data-territory-node]').forEach(b=>b.onclick=()=>renderTerritoryHub(b.dataset.territoryNode));
 
 function openView(name){
-  $('.view').forEach(v=>v.classList.remove('active'));
+  $$('.view').forEach(v=>v.classList.remove('active'));
   $('#view-'+name)?.classList.add('active');
-  $('.nav-link').forEach(b=>b.classList.toggle('active',b.dataset.view===name));
+  $$('.nav-link').forEach(b=>b.classList.toggle('active',b.dataset.view===name));
   if(name==='eventi')loadAgenda();
   if(innerWidth<901)$('#sidebar').classList.remove('open');
   window.scrollTo({top:0,behavior:'smooth'});
@@ -819,7 +819,7 @@ $('#agendaForm')?.addEventListener('submit',async e=>{
     project:String(fd.get('project')||'').trim(),
     actionRequired:String(fd.get('actionRequired')||'').trim(),
     description:String(fd.get('description')||'').trim(),
-    invitees:$('#agendaInvitees input[name="invitee"]:checked').map(x=>x.value),
+    invitees:$$('#agendaInvitees input[name="invitee"]:checked').map(x=>x.value),
     confirm:$('#agendaConfirm')?.checked===true
   };
   btn.disabled=true;state.textContent='Creazione evento e notifiche in corso…';
