@@ -1972,3 +1972,278 @@ body[data-scd-theme="arena"] select:focus-visible{
   .team-hub-event time,.team-hub-event b,.team-hub-event small{grid-column:1}
   .team-hub-event i{grid-column:2;grid-row:1/4}
 }
+
+
+/* R50 SCD CARD + BENEFIT CENTER · 2026-10-02 */
+.membership-promo-bar{
+  display:grid;
+  grid-template-columns:minmax(0,1.2fr) auto auto;
+  gap:14px;
+  align-items:center;
+  margin:12px clamp(16px,3vw,42px);
+  padding:14px 16px;
+  border-radius:18px;
+  background:
+    radial-gradient(circle at 86% -40%,rgba(0,169,184,.25),transparent 36%),
+    linear-gradient(110deg,#041c3a,#0b3768);
+  border:1px solid rgba(255,255,255,.08);
+  color:#fff;
+  box-shadow:0 14px 36px rgba(4,28,58,.14);
+}
+.membership-promo-bar>div:first-child{display:grid;gap:3px;min-width:0}
+.membership-promo-bar>div:first-child span{color:var(--gold);font-size:8px;font-weight:950;letter-spacing:.13em}
+.membership-promo-bar>div:first-child b{font-size:13px;line-height:1.25}
+.membership-promo-paths{display:flex;gap:6px;flex-wrap:wrap}
+.membership-promo-paths button,
+.membership-open{
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:999px;
+  background:rgba(255,255,255,.07);
+  color:#fff;
+  padding:9px 11px;
+  font-size:8px;
+  font-weight:900;
+  cursor:pointer;
+}
+.membership-promo-paths button:hover{background:rgba(255,255,255,.12)}
+.membership-open{
+  background:var(--gold);
+  border-color:var(--gold);
+  color:var(--navy);
+  white-space:nowrap;
+}
+
+.card-hero{
+  background:
+    radial-gradient(circle at 84% 0%,rgba(255,201,40,.20),transparent 30%),
+    radial-gradient(circle at 94% 60%,rgba(0,169,184,.20),transparent 28%),
+    linear-gradient(145deg,#041c3a,#0d3b72 68%,#08798e)!important;
+}
+.card-center{
+  padding:18px clamp(16px,3vw,42px) 46px;
+  display:grid;
+  gap:18px;
+}
+.card-products{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:14px;
+}
+.scd-card-product{
+  display:grid;
+  grid-template-columns:minmax(230px,.85fr) minmax(0,1.15fr);
+  gap:20px;
+  align-items:center;
+  min-height:310px;
+  padding:20px;
+  border:1px solid rgba(8,27,51,.10);
+  border-radius:24px;
+  background:#fff;
+  box-shadow:0 18px 44px rgba(14,48,86,.09);
+}
+.scd-card-visual{
+  position:relative;
+  overflow:hidden;
+  aspect-ratio:1.586/1;
+  border-radius:22px;
+  padding:20px;
+  display:grid;
+  align-content:space-between;
+  background:
+    radial-gradient(circle at 85% 18%,rgba(255,201,40,.20),transparent 28%),
+    linear-gradient(135deg,#041c3a,#155ad0 72%,#00a9b8);
+  color:#fff;
+  box-shadow:0 20px 44px rgba(4,28,58,.24);
+}
+.scd-card-visual:before,
+.scd-card-visual:after{
+  content:"";
+  position:absolute;
+  border-radius:50%;
+  border:1px solid rgba(255,255,255,.11);
+}
+.scd-card-visual:before{width:220px;height:220px;right:-80px;bottom:-110px}
+.scd-card-visual:after{width:150px;height:150px;right:-46px;bottom:-75px}
+.scd-card-visual.player{
+  background:
+    radial-gradient(circle at 84% 16%,rgba(0,169,184,.20),transparent 30%),
+    linear-gradient(135deg,#071a32,#0b3768 65%,#087f95);
+}
+.scd-card-visual>span{font-size:9px;letter-spacing:.13em;font-weight:950;color:var(--gold);z-index:1}
+.scd-card-visual img{position:absolute;right:18px;top:18px;width:46px;height:54px;object-fit:contain;z-index:1}
+.scd-card-visual b{font-size:clamp(22px,2.4vw,34px);line-height:.95;letter-spacing:-.03em;z-index:1}
+.scd-card-visual small{font-size:8px;color:#c9ddeb;letter-spacing:.08em;font-weight:800;z-index:1}
+.scd-card-copy{display:grid;align-content:center;gap:9px}
+.scd-card-copy h2{font-size:clamp(25px,2.6vw,38px);line-height:1;margin:0;color:var(--navy)}
+.scd-card-copy p{margin:0;color:#65788c;font-size:11px;line-height:1.55}
+.card-feature-chips{display:flex;gap:6px;flex-wrap:wrap}
+.card-feature-chips span{
+  padding:7px 9px;
+  border-radius:999px;
+  background:#edf4fb;
+  color:#29516f;
+  font-size:8px;
+  font-weight:850;
+}
+.card-product-actions{display:flex;gap:8px;flex-wrap:wrap}
+.scd-card-copy .btn{justify-self:start}
+.scd-card-copy .btn.glass{background:#eef4fb;color:var(--navy);border-color:rgba(8,27,51,.10)}
+
+.public-benefit-network{
+  padding:22px;
+  border:1px solid rgba(8,27,51,.10);
+  border-radius:24px;
+  background:
+    radial-gradient(circle at 94% 0%,rgba(0,169,184,.08),transparent 28%),
+    #fff;
+  box-shadow:0 18px 44px rgba(14,48,86,.08);
+}
+.benefit-summary{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:9px;
+  margin:14px 0 18px;
+}
+.benefit-summary article{
+  min-height:96px;
+  display:grid;
+  align-content:center;
+  gap:4px;
+  padding:13px;
+  border-radius:16px;
+  background:#f6f9fc;
+  border:1px solid rgba(8,27,51,.08);
+}
+.benefit-summary small{font-size:7px;color:#087e91;font-weight:950;letter-spacing:.10em}
+.benefit-summary b{font-size:20px;color:var(--navy);line-height:1}
+.benefit-summary span{font-size:8px;color:#72869a}
+.benefit-block{margin-top:13px}
+.benefit-block.pipeline{padding-top:14px;border-top:1px solid rgba(8,27,51,.08)}
+.benefit-block-head{display:flex;justify-content:space-between;gap:10px;margin-bottom:9px}
+.benefit-block-head>div{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.benefit-block-head span{font-size:8px;font-weight:950;letter-spacing:.11em;color:var(--navy)}
+.benefit-block-head b{font-size:8px;color:#8091a2}
+.public-benefit-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:9px;
+}
+.benefit-card{
+  position:relative;
+  min-height:210px;
+  display:grid;
+  align-content:start;
+  gap:8px;
+  padding:15px;
+  border-radius:17px;
+  border:1px solid rgba(8,27,51,.09);
+  background:linear-gradient(160deg,#fff,#f8fafc);
+}
+.benefit-card.active{
+  border-color:rgba(20,184,110,.20);
+  background:linear-gradient(155deg,#f7fffb,#fff);
+}
+.benefit-card.pipeline{
+  background:linear-gradient(155deg,#fffaf0,#fff);
+  border-color:rgba(255,201,40,.28);
+}
+.benefit-card-head{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.benefit-card-head>span{font-size:7px;color:#087e91;letter-spacing:.08em;font-weight:950}
+.benefit-state{
+  border-radius:999px;
+  padding:5px 7px;
+  font-size:6.5px;
+  font-weight:950;
+  letter-spacing:.04em;
+  background:#eef3f8;
+  color:#607386;
+  text-align:right;
+}
+.benefit-state.active{background:#e7f8ef;color:#168454}
+.benefit-state.pending{background:#fff2c9;color:#8b6700}
+.benefit-state.waiting{background:#eef3f8;color:#607386}
+.benefit-card h3{margin:0;font-size:17px;color:var(--navy)}
+.benefit-card>p{margin:0;font-size:11px;font-weight:850;color:#2f5877}
+.benefit-card dl{display:grid;gap:6px;margin:0}
+.benefit-card dl div{display:grid;gap:2px}
+.benefit-card dt{font-size:6.5px;color:#8797a7;text-transform:uppercase;letter-spacing:.07em}
+.benefit-card dd{margin:0;font-size:8px;color:#52697e;line-height:1.4}
+.benefit-card>small{font-size:7.5px;line-height:1.45;color:#8292a1}
+.benefit-empty{
+  min-height:140px;
+  display:grid;
+  align-content:center;
+  gap:6px;
+  padding:18px;
+  border:1px dashed rgba(8,27,51,.15);
+  border-radius:17px;
+  color:#66798b;
+}
+.benefit-empty b{font-size:13px;color:var(--navy)}
+.benefit-empty span{font-size:9px;line-height:1.5}
+.benefit-empty.verified-empty{background:#f7fbfa;border-color:rgba(20,184,110,.20)}
+
+.card-access-paths{
+  display:grid;
+  grid-template-columns:minmax(260px,.65fr) minmax(0,1.35fr);
+  gap:14px;
+  padding:20px;
+  border-radius:23px;
+  background:linear-gradient(135deg,#041c3a,#0b3768);
+  color:#fff;
+}
+.card-access-paths h2{margin:5px 0 7px;font-size:28px;color:#fff}
+.card-access-paths p{margin:0;color:#b8ccdd;font-size:10px;line-height:1.5}
+.card-path-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.card-path-grid button{
+  display:grid;
+  grid-template-columns:34px 1fr;
+  grid-template-rows:auto auto;
+  gap:2px 9px;
+  align-items:center;
+  min-height:80px;
+  padding:12px;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:15px;
+  background:rgba(255,255,255,.06);
+  color:#fff;
+  text-align:left;
+  cursor:pointer;
+}
+.card-path-grid button:hover{background:rgba(255,255,255,.10)}
+.card-path-grid button>span{
+  grid-row:1/3;
+  width:32px;height:32px;display:grid;place-items:center;border-radius:10px;
+  background:rgba(255,201,40,.12);color:var(--gold);font-size:14px;font-weight:950
+}
+.card-path-grid b{font-size:10px}
+.card-path-grid small{font-size:7.5px;color:#a8c1d5;line-height:1.35}
+
+@media(max-width:1100px){
+  .card-products{grid-template-columns:1fr}
+  .scd-card-product{grid-template-columns:minmax(250px,.8fr) minmax(0,1.2fr)}
+  .public-benefit-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:900px){
+  .membership-promo-bar{grid-template-columns:1fr}
+  .membership-promo-paths{order:2}
+  .membership-open{justify-self:start}
+  .card-access-paths{grid-template-columns:1fr}
+}
+@media(max-width:680px){
+  .membership-promo-bar{margin:10px 12px;padding:13px}
+  .membership-promo-paths{display:grid;grid-template-columns:repeat(3,1fr);width:100%}
+  .membership-promo-paths button{padding:9px 6px}
+  .membership-open{width:100%}
+  .card-center{padding:12px 12px 38px}
+  .scd-card-product{grid-template-columns:1fr;padding:14px;border-radius:20px}
+  .scd-card-visual{border-radius:18px;padding:16px}
+  .scd-card-copy{padding:2px 2px 5px}
+  .card-product-actions{display:grid;grid-template-columns:1fr}
+  .scd-card-copy .btn{width:100%;justify-content:center}
+  .public-benefit-network{padding:14px;border-radius:20px}
+  .benefit-summary{grid-template-columns:1fr}
+  .public-benefit-grid{grid-template-columns:1fr}
+  .card-access-paths{padding:15px;border-radius:20px}
+  .card-path-grid{grid-template-columns:1fr}
+}
