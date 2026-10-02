@@ -2891,7 +2891,7 @@
         "R20",
         "SCD_SUPABASE"
       ],
-      "contract": "AGGREGATE_ACCESS_METRICS_VERIFIED_SPORT_STATS_FAN_CHECKINS_HEALTHY_GAMIFICATION"
+      "contract": "AGGREGATE_ACCESS_METRICS_VERIFIED_SPORT_STATS_CANONICAL_PLAYER_SOURCE_COMMUNICATION_POLICY_FAN_CHECKINS_HEALTHY_GAMIFICATION"
     }
   ],
   "known_noncompliance": [
@@ -4142,7 +4142,11 @@
         "NO_PLAINTEXT_PERMANENT_PASSWORD_EMAIL",
         "FIRST_ACCESS_PERSONAL_PIN_AVAILABLE",
         "DIRECTION_ONLY_ACCESS_ASSIGNMENT",
-        "AUDIT_REQUIRED"
+        "AUDIT_REQUIRED",
+        "PUBLIC_IDENTITY_RESULT_ENUMERATION_FORBIDDEN",
+        "IDENTITY_MATCH_AFTER_VERIFIED_SESSION",
+        "AUTHENTICATED_ACCESS_AUDIT_NO_COOKIE_REQUIRED",
+        "NON_ESSENTIAL_ANALYTICS_REQUIRES_CONSENT"
       ],
       "current_runtime": "R20",
       "staged_runtime": "SCD_SUPABASE",
@@ -4150,7 +4154,9 @@
         "PRIVATE_DESK:ACCESSI",
         "PRIVATE_DESK:SICUREZZA",
         "PUBLIC_REGISTRATION_IDENTITY_PREFLIGHT"
-      ]
+      ],
+      "public_preflight": "NEUTRAL_RESPONSE_NO_ACCOUNT_OR_ROLE_DISCLOSURE",
+      "first_access": "ONE_TIME_CODE_THEN_PERSONAL_PIN"
     },
     "club_intelligence_r56": {
       "release": "R56",
@@ -4181,7 +4187,9 @@
           "PRIVATE_MESSAGES",
           "DOCUMENT_CONTENT",
           "RAW_LOCATION"
-        ]
+        ],
+        "daily_aggregate_view": "SCD_ACCESS_DAILY_METRICS",
+        "non_essential_consent": "REQUIRED"
       },
       "sport_stats": {
         "team": [
@@ -4201,7 +4209,9 @@
           "RED_CARDS"
         ],
         "minor_public_talent_ranking": false,
-        "provenance_required": true
+        "provenance_required": true,
+        "player_source_of_truth": "SCD_MATCH_PERFORMANCE",
+        "derived_view": "SCD_PLAYER_MATCH_STATS"
       },
       "engagement": {
         "fan_checkin": "VERIFIED_EVENT_ATTENDANCE",
@@ -4209,6 +4219,17 @@
         "minors": "COOPERATIVE_OR_PARTICIPATION_BASED",
         "fantasy": "NO_MONEY_NO_BETTING",
         "monthly_rewards": "VERIFIED_RULES_ONLY"
+      },
+      "communication": {
+        "policy_matrix": "SCD_COMMUNICATION_POLICIES",
+        "channels": [
+          "TEAM",
+          "FAMILY",
+          "STAFF",
+          "ANNOUNCEMENT"
+        ],
+        "minor_rule": "NO_UNSUPERVISED_1TO1",
+        "transport": "EXISTING_R20_TEAM_MESSAGE_INFRASTRUCTURE"
       }
     }
   },
