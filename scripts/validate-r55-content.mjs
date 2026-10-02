@@ -25,7 +25,7 @@ const raw=JSON.stringify(content);
 if(/Mauri Simone|Locatelli Andrea|Nuova Sondrio|ROSSOBLU_PIZZA_10|SCD_KIT_2026/i.test(raw))fail('sample/invented operational data leaked into curated catalog');
 
 for(const token of [
-  'id="clubNow"','id="clubContentRail"','data-social-filter="CLUB"',
+  'id="clubNowContent"','id="clubContentRail"','data-social-filter="CLUB"',
   './scd-ng.css?v=0.6.2','./ui-r52-social.css?v=0.7.1','./scd-ng.js?v=0.7.2'
 ])if(!html.includes(token))fail('R55 HTML contract missing '+token);
 
