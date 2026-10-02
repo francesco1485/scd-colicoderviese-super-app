@@ -404,7 +404,7 @@ function runSearch(q){
 function handleSearchResult(kind,id){
  const box=$('#publicSearchResults');if(box)box.hidden=true;
  if(kind==='event')return openEvent(id);
- if(kind==='team'){state.teamsSearch=id;setView('teams');const input=$('#teamsSearch');if(input)input.value=id;renderPublicTeams();return}
+ if(kind==='team'){openTeamHub(id);return}
  if(kind==='news'){document.querySelector('.newsroom')?.scrollIntoView({behavior:'smooth'});return}
  if(kind==='profile'){openPanel('Profilo pubblico','<div class="panel-detail"><b>Profilo autorizzato</b><p>Le informazioni mostrate rispettano la visibilità concessa dalla Società.</p></div>')}
  if(kind==='channel'){const ch=officialChannels.find(x=>x.id===id);if(ch)window.open(ch.url,'_blank','noopener,noreferrer')}
