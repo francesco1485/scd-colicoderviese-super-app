@@ -262,7 +262,18 @@ const pwaManifest=await api.request.get(base+'/manifest.webmanifest');
 if(!pwaManifest.ok())throw new Error('manifest.webmanifest missing');
 const pwaJson=await pwaManifest.json();
 if(pwaJson.theme_color!=='#041c3a'||pwaJson.background_color!=='#f2f5f9')throw new Error('SCD Arena PWA colors missing');
-for(const resource of ['/sw.js','/robots.txt','/sitemap.xml']){
+if(!Array.isArray(pwaJson.shortcuts)||!pwaJson.shortcuts.some(x=>x.url==='./#card'))throw new Error('SCD Card PWA shortcut missing');
+
+const staticBenefits=await api.request.get(base+'/content/community-benefits.public.json');
+if(!staticBenefits.ok())throw new Error('static public benefit artifact missing');
+const staticBenefitsJson=await staticBenefits.json();
+if(staticBenefitsJson.policy!=='NO_ACTIVE_BENEFIT_WITHOUT_FORMALIZATION_EVIDENCE')throw new Error('static public benefit policy mismatch');
+
+const swResponse=await api.request.get(base+'/sw.js');
+if(!swResponse.ok())throw new Error('/sw.js missing');
+const swText=await swResponse.text();
+if(!swText.includes('community-benefits.public.json'))throw new Error('service worker does not cache public benefit artifact');
+for(const resource of ['/robots.txt','/sitemap.xml']){
   const rr=await api.request.get(base+resource);
   if(!rr.ok())throw new Error(resource+' missing');
 }
