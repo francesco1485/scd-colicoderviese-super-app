@@ -1398,11 +1398,56 @@ function renderLedProfileDetail(){
   const el=$('#ledProfileDetail');if(!el||!ledMotionConfig)return;
   const p=(ledMotionConfig.profiles||[]).find(x=>x.id===ledMotionSelected)||ledMotionConfig.profiles?.[0];
   if(!p){el.innerHTML='<p>Nessun profilo motion disponibile.</p>';return}
-  const logoBlocked=p.logoAssetStatus!=='APPROVED_OFFICIAL_ASSET';
+  const logoReady=p.logoAssetStatus==='APPROVED_OFFICIAL_ASSET'&&p.logoAssetPath;
+  const logoBlocked=!logoReady;
+  const timeline=Array.isArray(p.motionTimeline)?p.motionTimeline:[];
+  const duration=Number(ledMotionConfig?.productionTarget?.storyboardDurationSeconds||ledMotionConfig?.productionTarget?.durationSeconds||40);
+  const partnerMark=logoReady
+    ? '<img src="'+esc(p.logoAssetPath)+'" alt="'+esc(p.partnerName)+'">'
+    : '<strong>'+esc(p.partnerName)+'</strong><small>LOGO UFFICIALE DA COLLEGARE</small>';
+
   el.innerHTML=
     '<div class="led-detail-hero">'+
       '<div><small>'+esc(p.id)+'</small><h3>'+esc(p.partnerName)+'</h3><p>'+esc(p.message||'')+'</p></div>'+
       '<span class="led-master-state '+(logoBlocked?'blocked':'ready')+'">'+(logoBlocked?'MASTER MP4 BLOCCATO':'PRONTO PER MASTER')+'</span>'+
+    '</div>'+
+    '<section class="led-tribuna-simulator" data-led-sim-view="TRIBUNA" data-led-sim-state="PLAYING">'+
+      '<div class="led-sim-toolbar">'+
+        '<div><small>LIVE CONCEPT PREVIEW</small><b>Vista tribuna / camera · '+duration+'s</b></div>'+
+        '<div class="led-sim-controls" role="group" aria-label="Vista simulazione LED">'+
+          '<button type="button" class="active" data-led-sim-view-btn="TRIBUNA">Tribuna</button>'+
+          '<button type="button" data-led-sim-view-btn="CAMERA">Camera</button>'+
+          '<button type="button" data-led-sim-action="RESTART">↻ Riavvia</button>'+
+          '<button type="button" data-led-sim-action="PAUSE">Pausa</button>'+
+        '</div>'+
+      '</div>'+
+      '<div class="led-sim-scene">'+
+        '<div class="led-sim-sky"></div>'+
+        '<div class="led-sim-mountains"></div>'+
+        '<div class="led-sim-lake"><span>LAGO DI COMO · CONCEPT TERRITORIALE</span></div>'+
+        '<div class="led-sim-pitch"><i></i><i></i><i></i></div>'+
+        '<div class="led-sim-stand"><span>VISTA PUBBLICO</span></div>'+
+        '<div class="led-sim-board">'+
+          '<div class="led-sim-motion-line"></div>'+
+          '<div class="led-sim-brand">'+partnerMark+'</div>'+
+          '<div class="led-sim-message">'+esc(p.message||'')+'</div>'+
+          '<div class="led-sim-scd">SCD COLICODERVIESE · COLICO</div>'+
+        '</div>'+
+        '<div class="led-sim-camera-frame"><span>CAMERA SAFE AREA</span></div>'+
+        '<div class="led-sim-concept-label">SIMULAZIONE CONCETTUALE · NON FOTO DOCUMENTARIA</div>'+
+      '</div>'+
+    '</section>'+
+    '<div class="led-storyboard">'+
+      '<div class="led-storyboard-head"><div><small>STORYBOARD '+duration+' SECONDI</small><h4>Movimento pensato per tribuna e ripresa.</h4></div><span>ONE SPONSOR · ONE STORYBOARD · ONE MASTER</span></div>'+
+      '<div class="led-storyboard-track">'+timeline.map((x,i)=>{
+        const span=Math.max(1,Number(x.to||0)-Number(x.from||0));
+        return '<button type="button" data-led-cue="'+i+'" style="--cue-span:'+span+'" title="'+esc(x.action||'')+'">'+
+          '<b>'+esc(x.label||('Fase '+(i+1)))+'</b><small>'+esc(x.from)+'–'+esc(x.to)+'s</small>'+
+        '</button>';
+      }).join('')+'</div>'+
+      '<div class="led-cue-detail" id="ledCueDetail">'+
+        (timeline[0]?'<small>'+esc(timeline[0].label)+'</small><b>'+esc(timeline[0].from)+'–'+esc(timeline[0].to)+' secondi</b><p>'+esc(timeline[0].action||'')+'</p>':'<p>Timeline da definire.</p>')+
+      '</div>'+
     '</div>'+
     '<div class="led-detail-grid">'+
       '<section><small>MOTION CONCEPT</small><p>'+esc(p.motionConcept||'')+'</p></section>'+
@@ -1418,8 +1463,34 @@ function renderLedProfileDetail(){
         '<button class="btn-yellow" type="button" id="ledUseCreativeFactory">Porta in Creative Factory</button>'+
       '</div>'+
     '</div>';
+
+  $$('[data-led-sim-view-btn]').forEach(btn=>btn.onclick=()=>{
+    const sim=$('.led-tribuna-simulator');if(!sim)return;
+    sim.dataset.ledSimView=btn.dataset.ledSimViewBtn||'TRIBUNA';
+    $$('[data-led-sim-view-btn]').forEach(b=>b.classList.toggle('active',b===btn));
+  });
+  $$('[data-led-sim-action]').forEach(btn=>btn.onclick=()=>{
+    const sim=$('.led-tribuna-simulator');if(!sim)return;
+    if(btn.dataset.ledSimAction==='RESTART'){
+      sim.dataset.ledSimState='RESET';
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{sim.dataset.ledSimState='PLAYING'}));
+      const pause=$('[data-led-sim-action="PAUSE"]');if(pause)pause.textContent='Pausa';
+    }else{
+      const paused=sim.dataset.ledSimState==='PAUSED';
+      sim.dataset.ledSimState=paused?'PLAYING':'PAUSED';
+      btn.textContent=paused?'Pausa':'Riprendi';
+    }
+  });
+  $$('[data-led-cue]').forEach(btn=>btn.onclick=()=>{
+    const cue=timeline[Number(btn.dataset.ledCue)];
+    const box=$('#ledCueDetail');if(!cue||!box)return;
+    box.innerHTML='<small>'+esc(cue.label||'Fase')+'</small><b>'+esc(cue.from)+'–'+esc(cue.to)+' secondi</b><p>'+esc(cue.action||'')+'</p>';
+    $$('[data-led-cue]').forEach(x=>x.classList.toggle('active',x===btn));
+  });
+  $('[data-led-cue="0"]')?.classList.add('active');
+
   $('#ledCopyStoryboard')?.addEventListener('click',async()=>{
-    const text=ledMotionBrief(p);
+    const text=ledMotionBrief(p)+'\nTimeline: '+timeline.map(x=>x.from+'-'+x.to+'s '+x.label+' — '+x.action).join(' | ');
     try{
       if(navigator.clipboard&&window.isSecureContext)await navigator.clipboard.writeText(text);
       else{
@@ -1443,7 +1514,8 @@ function renderLedProfileDetail(){
     if($('#activationMessage'))$('#activationMessage').value=p.stadiumView||p.motionConcept||'';
     if($('#activationFormat'))$('#activationFormat').value='LED_16_3';
     if($('#activationTheme'))$('#activationTheme').value='LAKE';
-    if($('#activationLogoState'))$('#activationLogoState').value=p.logoAssetStatus==='APPROVED_OFFICIAL_ASSET'?'APPROVATO':'DA_VERIFICARE';
+    if($('#activationScene'))$('#activationScene').value=p.sceneId||'SCENE-TRIBUNA-LAKE-CONCEPT';
+    if($('#activationLogoState'))$('#activationLogoState').value=logoReady?'APPROVATO':'DA_VERIFICARE';
     activationPreviewMode='LED';
     renderActivationStudio();
   });
