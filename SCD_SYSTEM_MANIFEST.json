@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.18.0",
+    "version": "3.18.1",
     "effective_at": "2026-10-02",
     "status": "BINDING",
     "language": "it-IT",
@@ -594,7 +594,8 @@
         "supabase/migrations/20260929_r33_club_graph_foundation.sql",
         "supabase/migrations/20260929_r34_rls_performance_hardening.sql",
         "supabase/migrations/20260929_r35_auth_context_rls_normalization.sql",
-        "supabase/migrations/20261002_r51_core_operative_engine.sql"
+        "supabase/migrations/20261002_r51_core_operative_engine.sql",
+        "supabase/migrations/20261002_r51_1_operative_index_hardening.sql"
       ],
       "operative_engine": {
         "state": "SCHEMA_STAGED_RUNTIME_GATED",
@@ -611,7 +612,8 @@
           "NO_PUBLIC_DIRECT_PII_ENDPOINT",
           "RLS_REQUIRED",
           "PROVENANCE_REQUIRED"
-        ]
+        ],
+        "index_hardening": "supabase/migrations/20261002_r51_1_operative_index_hardening.sql"
       }
     },
     "intake_hub": {
