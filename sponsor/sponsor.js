@@ -132,6 +132,44 @@ $('#partnerLeadForm').addEventListener('submit',async e=>{
   }finally{pending(btn,false)}
 });
 
+const solidarityDonationForm=$('#solidarityDonationForm');
+if(solidarityDonationForm){
+  const amountInput=$('#donationAmount');
+  const amountButtons=$('[data-donation-amount]');
+  const syncAmountButtons=()=>{
+    const value=Number(amountInput?.value||0);
+    amountButtons.forEach(b=>b.classList.toggle('selected',Number(b.dataset.donationAmount)===value));
+  };
+  amountButtons.forEach(b=>b.addEventListener('click',()=>{
+    if(amountInput)amountInput.value=String(b.dataset.donationAmount||'');
+    syncAmountButtons();
+    amountInput?.focus();
+  }));
+  amountInput?.addEventListener('input',syncAmountButtons);
+  solidarityDonationForm.addEventListener('submit',async e=>{
+    e.preventDefault();
+    const form=e.currentTarget,state=$('#donationState'),followup=$('#donationFollowup'),btn=form.querySelector('[type=submit]');
+    const data=formData(form);
+    data.anonymous=new FormData(form).get('anonymous')==='on';
+    state.textContent='';
+    state.className='donation-state';
+    if(followup)followup.hidden=true;
+    pending(btn,true);
+    try{
+      const r=await api('/api/sponsor/solidarity-intent',data);
+      state.className='donation-state ok';
+      state.textContent='Disponibilità registrata'+(r.requestId?' · '+r.requestId:'')+'. Nessun versamento è stato effettuato in questa pagina.';
+      if(followup)followup.hidden=false;
+      form.reset();
+      if(amountInput)amountInput.value='50';
+      syncAmountButtons();
+    }catch(err){
+      state.className='donation-state error';
+      state.textContent=err.message;
+    }finally{pending(btn,false)}
+  });
+}
+
 $('#accessRequestForm').addEventListener('submit',async e=>{
   e.preventDefault();
   const form=e.currentTarget,state=$('#accessState'),btn=form.querySelector('[type=submit]');
