@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.13.0",
+    "version": "3.14.0",
     "effective_at": "2026-10-02",
     "status": "BINDING",
     "language": "it-IT",
@@ -1155,6 +1155,25 @@
           "SEASON_SCOPED_2026_27"
         ],
         "use": "ROLE_AND_SCOPE_RECONCILIATION_FOR_PRIVATE_APP_AREAS"
+      },
+      {
+        "id": "SCD_GOOGLE_CALENDAR",
+        "kind": "INTERNAL_OPERATIONAL_CALENDAR",
+        "trust": "INTERNAL_VERIFIED",
+        "authority_domains": [
+          "CALENDAR",
+          "AGENDA",
+          "MEETINGS",
+          "COMMERCIAL_INITIATIVES"
+        ],
+        "account": "sportclubcolico@gmail.com",
+        "resource_id": "4446ddfffc997074b2017673da3e459830fd1feeef3c9bb0525564f39c9d4122@group.calendar.google.com",
+        "rules": [
+          "single_event_many_authorized_views",
+          "invite_authorized_users_only",
+          "send_summary_to_club",
+          "no_duplicate_calendar"
+        ]
       }
     ],
     "conflict_resolution": [
@@ -1331,7 +1350,16 @@
       "POSTPONED",
       "CANCELLED",
       "COMPLETED"
-    ]
+    ],
+    "operational_agenda": {
+      "calendar_id": "4446ddfffc997074b2017673da3e459830fd1feeef3c9bb0525564f39c9d4122@group.calendar.google.com",
+      "calendar_name": "S.D.C. ColicoDerviese | Calendario Ufficiale 2026/27",
+      "owner_account": "sportclubcolico@gmail.com",
+      "crm_write_action": "private.agenda.create",
+      "summary_recipient": "sportclubcolico@gmail.com",
+      "invitee_policy": "ACTIVE_AUTHORIZED_USERS_WITH_CALENDAR_SCOPE_OR_EXPLICIT_SELECTION",
+      "rule": "NO_DUPLICATE_CALENDAR_NO_SYNTHETIC_EMAIL"
+    }
   },
   "completeness_engine": {
     "enabled_target": true,
@@ -1416,6 +1444,13 @@
         "ANALYTICS",
         "TICKETING"
       ]
+    },
+    "crm_outbound_policy": {
+      "from_account": "sportclubcolico@gmail.com",
+      "human_confirmation_required": true,
+      "actor_private_copy": "BCC_AUTHENTICATED_ACTOR_IF_DIFFERENT_FROM_CLUB",
+      "archive_required": true,
+      "touchpoint_required": true
     }
   },
   "sky_and_avatar": {
