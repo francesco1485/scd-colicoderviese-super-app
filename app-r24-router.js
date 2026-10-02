@@ -467,19 +467,17 @@
           const action=b.dataset.r24FamilyAction;
           if(action==='transport')return openTransportManager();
           if(action==='requests')return openMyRequests();
-          if(action==='docs')return modal('<span class="eyebrow">FAMIGLIA · DOCUMENTI</span><h2>'+esc(name)+'</h2><div class="r54-status-list"><article><span>CERTIFICATO MEDICO</span><b>'+esc(cert)+'</b></article><article><span>DOCUMENTO IDENTITÀ</span><b>'+esc(identity)+'</b></article></div><p class="r54-data-note">Questa schermata riepiloga solo gli stati restituiti dal profilo autorizzato. Nessun documento viene dichiarato presente se il gestionale non lo conferma.</p><div class="modal-actions"><button type="button" class="primary" id="r54FamilyNewRequest">RICHIEDI ASSISTENZA</button></div>');
+          if(action==='docs'){
+            modal('<span class="eyebrow">FAMIGLIA · DOCUMENTI</span><h2>'+esc(name)+'</h2><div class="r54-status-list"><article><span>CERTIFICATO MEDICO</span><b>'+esc(cert)+'</b></article><article><span>DOCUMENTO IDENTITÀ</span><b>'+esc(identity)+'</b></article></div><p class="r54-data-note">Questa schermata riepiloga solo gli stati restituiti dal profilo autorizzato. Nessun documento viene dichiarato presente se il gestionale non lo conferma.</p><div class="modal-actions"><button type="button" class="primary" id="r54FamilyNewRequest">RICHIEDI ASSISTENZA</button></div>');
+            const requestButton=document.querySelector('#r54FamilyNewRequest');if(requestButton)requestButton.onclick=()=>openInternalRequestManager();
+            return;
+          }
           if(action==='payments')return modal('<span class="eyebrow">FAMIGLIA · QUOTE E PAGAMENTI</span><h2>'+esc(name)+'</h2><div class="r54-status-list"><article><span>STATO AMMINISTRATIVO</span><b>'+esc(payment)+'</b></article></div><p class="r54-data-note">Importi, rate e scadenze compaiono solo quando restituiti dal gestionale. Non vengono ricostruiti lato app.</p>');
           if(action==='status')return modal('<span class="eyebrow">FAMIGLIA · STATO ATLETA</span><h2>'+esc(name)+'</h2><div class="r54-status-list"><article><span>FIGC / TESSERAMENTO</span><b>'+esc(figc)+'</b></article><article><span>CERTIFICATO MEDICO</span><b>'+esc(cert)+'</b></article></div>');
         });
       };
       outlet.querySelectorAll('[data-r24-family]').forEach(b=>b.onclick=()=>{outlet.querySelectorAll('[data-r24-family]').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderDetail(Number(b.dataset.r24Family||0))});
-      renderDetail(0);
-      document.addEventListener('click',function r54FamilyRequestHandler(e){
-        if(e.target?.id!=='r54FamilyNewRequest')return;
-        document.removeEventListener('click',r54FamilyRequestHandler);
-        openInternalRequestManager();
-      },{once:false});
-      this.bindCommon(outlet);
+      renderDetail(0);this.bindCommon(outlet);
     },
     render_staff(outlet){
       const d=state.privateData||{},u=d.user||{},p=d.permissions||{};
