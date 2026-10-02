@@ -567,9 +567,10 @@ function renderTerritoryHub(key=territoryCurrent){
 $$('[data-territory-node]').forEach(b=>b.onclick=()=>renderTerritoryHub(b.dataset.territoryNode));
 
 function openView(name){
-  $$('.view').forEach(v=>v.classList.remove('active'));
+  $('.view').forEach(v=>v.classList.remove('active'));
   $('#view-'+name)?.classList.add('active');
-  $$('.nav-link').forEach(b=>b.classList.toggle('active',b.dataset.view===name));
+  $('.nav-link').forEach(b=>b.classList.toggle('active',b.dataset.view===name));
+  if(name==='eventi')loadAgenda();
   if(innerWidth<901)$('#sidebar').classList.remove('open');
   window.scrollTo({top:0,behavior:'smooth'});
 }
@@ -756,6 +757,84 @@ function renderLed(){
 function renderEvents(){
   $('#eventGrid').innerHTML=events.map(e=>'<article class="event-card"><small>'+esc(e[0])+'</small><h3>'+esc(e[1])+'</h3><p>'+esc(e[2])+' · '+esc(e[3])+'</p></article>').join('');
 }
+
+let agendaState={loaded:false,loading:false,calendarName:'',summaryRecipient:'',eligibleUsers:[],upcoming:[]};
+async function agendaApi(method='GET',payload=null){
+  const options={method,credentials:'same-origin',cache:'no-store',headers:{}};
+  if(payload){options.headers['content-type']='application/json';options.body=JSON.stringify(payload)}
+  const r=await fetch('/api/sponsor/agenda',options);
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok||j.ok===false)throw new Error(j.error||'Agenda SCD non disponibile');
+  return j.data||{};
+}
+function agendaDateLabel(value){
+  const d=new Date(value);
+  if(Number.isNaN(d.getTime()))return String(value||'');
+  return new Intl.DateTimeFormat('it-IT',{weekday:'short',day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}).format(d);
+}
+function renderAgenda(){
+  const status=$('#agendaStatusBar');
+  if(status)status.innerHTML='<span><b>'+esc(agendaState.calendarName||'Agenda SCD')+'</b> · riepilogo '+esc(agendaState.summaryRecipient||'sportclubcolico@gmail.com')+' · '+agendaState.eligibleUsers.length+' account autorizzati</span>';
+  const people=$('#agendaInvitees');
+  if(people)people.innerHTML=agendaState.eligibleUsers.map(u=>
+    '<label class="agenda-person"><input type="checkbox" name="invitee" value="'+esc(u.email)+'"><span><b>'+esc(u.name||u.email)+'</b><small>'+esc(u.role||'')+' · '+esc(u.email)+'</small></span></label>'
+  ).join('')||'<span>Nessun account calendario autorizzato disponibile.</span>';
+  const list=$('#agendaUpcoming');
+  if(list)list.innerHTML=(agendaState.upcoming||[]).length?agendaState.upcoming.map(ev=>
+    '<article class="agenda-event"><time>'+esc(agendaDateLabel(ev.startAt))+'</time><strong>'+esc(ev.title||'Evento SCD')+'</strong><span>'+esc(ev.location||'Luogo da definire')+'</span>'+
+    ((ev.guests||[]).length?'<div class="agenda-attendees">Invitati: '+esc(ev.guests.join(', '))+'</div>':'')+'</article>'
+  ).join(''):'<p>Nessun appuntamento futuro presente nel calendario operativo.</p>';
+}
+async function loadAgenda(force=false){
+  if(agendaState.loading||(!force&&agendaState.loaded))return;
+  agendaState.loading=true;
+  const status=$('#agendaStatusBar');if(status)status.textContent='Sincronizzazione con Google Calendar…';
+  try{
+    const data=await agendaApi('GET');
+    agendaState={...agendaState,...data,loaded:true,loading:false};
+    renderAgenda();
+  }catch(e){
+    agendaState.loading=false;
+    if(status)status.innerHTML='<span class="error">Agenda non disponibile: '+esc(e.message)+'</span>';
+  }
+}
+$('#agendaRefresh')?.addEventListener('click',()=>loadAgenda(true));
+$('#agendaForm')?.addEventListener('submit',async e=>{
+  e.preventDefault();
+  const form=e.currentTarget,state=$('#agendaFormState'),btn=$('#agendaCreate');
+  if(!form.reportValidity())return;
+  const fd=new FormData(form);
+  const start=new Date(String(fd.get('startAt')||''));
+  const end=new Date(String(fd.get('endAt')||''));
+  if(Number.isNaN(start.getTime())||Number.isNaN(end.getTime())||end<=start){
+    state.className='form-state error';state.textContent='Controlla data e orario: la fine deve essere successiva all’inizio.';return;
+  }
+  const payload={
+    title:String(fd.get('title')||'').trim(),
+    type:String(fd.get('type')||'MEETING'),
+    audienceMode:String(fd.get('audienceMode')||'SELECTED'),
+    startAt:start.toISOString(),
+    endAt:end.toISOString(),
+    location:String(fd.get('location')||'').trim(),
+    project:String(fd.get('project')||'').trim(),
+    actionRequired:String(fd.get('actionRequired')||'').trim(),
+    description:String(fd.get('description')||'').trim(),
+    invitees:$('#agendaInvitees input[name="invitee"]:checked').map(x=>x.value),
+    confirm:$('#agendaConfirm')?.checked===true
+  };
+  btn.disabled=true;state.textContent='Creazione evento e notifiche in corso…';
+  try{
+    const data=await agendaApi('POST',payload);
+    state.className='form-state ok';
+    state.textContent='Evento creato nell’Agenda SCD · riepilogo inviato a '+String(data.summaryRecipient||'sportclubcolico@gmail.com')+'.';
+    form.reset();
+    agendaState.loaded=false;
+    await loadAgenda(true);
+  }catch(err){
+    state.className='form-state error';state.textContent=err.message||'Creazione evento non riuscita.';
+  }finally{btn.disabled=false}
+});
+
 function renderReport(){
   const cash=4400;
   $('#reportGrid').innerHTML=[
@@ -1069,7 +1148,7 @@ if($('#crmEmailPreviewBtn'))$('#crmEmailPreviewBtn').onclick=async()=>{
     p.hidden=false;p.innerHTML='<div class="crm-mail-loading">Generazione anteprima istituzionale…</div>';
     const data=await communicationApi('preview',crmMailPayload());
     crmMailState.preview=data;
-    p.innerHTML='<div class="crm-mail-meta"><b>Da:</b> '+esc(data.sender||'')+'<br><b>A:</b> '+esc(data.to||'')+'<br><b>Firma:</b> '+esc((data.signature?.name||'')+' · '+(data.signature?.role||''))+'<br><b>Oggetto:</b> '+esc(data.subject||'')+'</div><div class="crm-mail-render">'+String(data.html||'')+'</div>';
+    p.innerHTML='<div class="crm-mail-meta"><b>Da:</b> '+esc(data.sender||'')+'<br><b>A:</b> '+esc(data.to||'')+(data.internalCopyTo?'<br><b>Copia interna:</b> '+esc(data.internalCopyTo):'')+'<br><b>Firma:</b> '+esc((data.signature?.name||'')+' · '+(data.signature?.role||''))+'<br><b>Oggetto:</b> '+esc(data.subject||'')+'</div><div class="crm-mail-render">'+String(data.html||'')+'</div>';
     const chk=$('#crmEmailConfirm');chk.checked=false;
     $('#crmEmailSendBtn').disabled=true;
   }catch(e){
