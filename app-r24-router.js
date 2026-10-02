@@ -430,7 +430,11 @@
       '<section class="r24-athlete-hero"><div class="r24-athlete-avatar">'+esc(((p.firstName||name||'?')[0]+(p.lastName||'')[0]).toUpperCase())+'</div><div><small>PROFILO ATLETA</small><h2>'+esc(name)+'</h2><p>'+esc(p.teamName||p.group||'Squadra in aggiornamento')+'</p><span>'+esc(figc)+'</span></div><strong>'+esc(p.number||p.shirtNumber||'')+'</strong></section>'+
       activeBox+
       '<section class="r24-calendar-summary three"><article><strong>'+conv.length+'</strong><span>Convocazioni</span></article><article><strong>'+esc(cert)+'</strong><span>Certificato</span></article><article><strong>'+esc(payment)+'</strong><span>Pagamenti</span></article></section>'+
+      '<section class="r54-private-actions" aria-label="Servizi atleta"><button type="button" data-r24-route="calendar"><span>▣</span><b>Calendario</b><small>Gare e attività autorizzate</small></button><button type="button" id="r54AthleteRequests"><span>☑</span><b>Richieste</b><small>Invii e stato pratiche</small></button><button type="button" id="r54AthleteTransport"><span>▰</span><b>Trasporti</b><small>Richiedi il pulmino</small></button><button type="button" id="r54AthleteStatus"><span>✓</span><b>Stato profilo</b><small>FIGC, certificato e quota</small></button></section>'+
       '<section class="r24-panel"><div class="r24-panel-head"><div><small>PROSSIMI IMPEGNI</small><h2>Convocazioni</h2></div><button class="outline" data-r24-route="calendar">Calendario</button></div><div class="r24-event-list">'+(conv.length?conv.map(x=>'<article class="r24-event-row static"><span class="r24-event-kind gara">GARA</span><time><b>'+esc(fmtDate(x.date||''))+'</b><small>'+esc(x.meetingTime||'')+'</small></time><div><b>'+esc(x.team||x.teamName||'Convocazione SCD')+'</b><small>'+esc(x.meetingPlace||'Luogo in aggiornamento')+'</small></div><i>'+esc(x.response||'DA CONFERMARE')+'</i></article>').join(''):'<div class="r24-empty"><b>Dato in aggiornamento</b><span>Nessuna convocazione disponibile.</span></div>')+'</div></section>';
+      const athleteRequests=outlet.querySelector('#r54AthleteRequests');if(athleteRequests)athleteRequests.onclick=()=>openMyRequests();
+      const athleteTransport=outlet.querySelector('#r54AthleteTransport');if(athleteTransport)athleteTransport.onclick=()=>openTransportManager();
+      const athleteStatus=outlet.querySelector('#r54AthleteStatus');if(athleteStatus)athleteStatus.onclick=()=>modal('<span class="eyebrow">AREA ATLETA · STATO PROFILO</span><h2>'+esc(name)+'</h2><div class="r54-status-list"><article><span>FIGC / TESSERAMENTO</span><b>'+esc(figc)+'</b></article><article><span>CERTIFICATO MEDICO</span><b>'+esc(cert)+'</b></article><article><span>QUOTA / PAGAMENTI</span><b>'+esc(payment)+'</b></article></div><p class="r54-data-note">Sono mostrati esclusivamente i valori restituiti dal profilo autorizzato. Se il gestionale non restituisce un dato, resta “Dato in aggiornamento”.</p>');
       outlet.querySelectorAll('[data-r53-conv-reply]').forEach(b=>b.onclick=async()=>{
         if(!b.dataset.conv||!b.dataset.player)return toast('Convocazione non completa: sincronizza i dati');
         b.disabled=true;
@@ -453,12 +457,29 @@
         const p=rows[i]||rows[0],name=[p.firstName,p.lastName].filter(Boolean).join(' ')||p.fullName||'Atleta SCD';
         const key=String(p.code||p.playerCode||p.personId||p.id||'');
         const conv=(d.convocations||[]).filter(x=>!key||String(x.playerCode||x.personId||x.playerId||'')===key).slice(0,3);
-        detail.innerHTML='<section class="r24-profile-hero family"><div class="r24-profile-avatar">'+esc(((p.firstName||name)[0]||'?').toUpperCase())+'</div><div><small>PROFILO COLLEGATO</small><h2>'+esc(name)+'</h2><p>'+esc(p.teamName||p.group||'Squadra in aggiornamento')+'</p></div></section><section class="r24-service-grid compact"><button data-r24-family-action="docs"><span>▤</span><b>Documenti</b><small>'+esc(displayValue(p.certificateStatus||p.certificateExpiry||'','Dato in aggiornamento'))+'</small></button><button data-r24-family-action="payments"><span>▰</span><b>Quote / pagamenti</b><small>'+esc(displayValue(p.paymentStatus||p.payment||'','Dato in aggiornamento'))+'</small></button><button data-r24-route="calendar"><span>▣</span><b>Calendario</b><small>'+conv.length+' convocazioni disponibili</small></button><button data-r24-family-action="transport"><span>▰</span><b>Pulmino</b><small>Trasporti e richieste</small></button></section>';
+        const cert=displayValue(p.certificateStatus||p.certificateExpiry||'','Dato in aggiornamento');
+        const identity=displayValue(p.identityStatus||p.idDocumentStatus||'','Dato in aggiornamento');
+        const payment=displayValue(p.paymentStatus||p.payment||p.feeStatus||'','Dato in aggiornamento');
+        const figc=displayValue(p.figcStatus||p.recordStatus||'','Dato in aggiornamento');
+        detail.innerHTML='<section class="r24-profile-hero family"><div class="r24-profile-avatar">'+esc(((p.firstName||name)[0]||'?').toUpperCase())+'</div><div><small>PROFILO COLLEGATO</small><h2>'+esc(name)+'</h2><p>'+esc(p.teamName||p.group||'Squadra in aggiornamento')+'</p></div></section><section class="r24-service-grid compact r54-family-services"><button data-r24-family-action="docs"><span>▤</span><b>Documenti</b><small>'+esc(cert)+'</small></button><button data-r24-family-action="payments"><span>▰</span><b>Quote / pagamenti</b><small>'+esc(payment)+'</small></button><button data-r24-route="calendar"><span>▣</span><b>Calendario</b><small>'+conv.length+' convocazioni disponibili</small></button><button data-r24-family-action="transport"><span>▰</span><b>Pulmino</b><small>Nuova richiesta trasporto</small></button><button data-r24-family-action="requests"><span>☑</span><b>Richieste</b><small>Storico e stato pratiche</small></button><button data-r24-family-action="status"><span>✓</span><b>Stato atleta</b><small>FIGC e idoneità</small></button></section>';
         detail.querySelectorAll('[data-r24-route]').forEach(b=>b.onclick=()=>this.go(b.dataset.r24Route));
-        detail.querySelectorAll('[data-r24-family-action]').forEach(b=>b.onclick=()=>toast(b.dataset.r24FamilyAction==='docs'?'Documenti sincronizzati dal gestionale SCD':b.dataset.r24FamilyAction==='payments'?'Stato amministrativo in aggiornamento':'Trasporti disponibili secondo autorizzazione'));
+        detail.querySelectorAll('[data-r24-family-action]').forEach(b=>b.onclick=()=>{
+          const action=b.dataset.r24FamilyAction;
+          if(action==='transport')return openTransportManager();
+          if(action==='requests')return openMyRequests();
+          if(action==='docs')return modal('<span class="eyebrow">FAMIGLIA · DOCUMENTI</span><h2>'+esc(name)+'</h2><div class="r54-status-list"><article><span>CERTIFICATO MEDICO</span><b>'+esc(cert)+'</b></article><article><span>DOCUMENTO IDENTITÀ</span><b>'+esc(identity)+'</b></article></div><p class="r54-data-note">Questa schermata riepiloga solo gli stati restituiti dal profilo autorizzato. Nessun documento viene dichiarato presente se il gestionale non lo conferma.</p><div class="modal-actions"><button type="button" class="primary" id="r54FamilyNewRequest">RICHIEDI ASSISTENZA</button></div>');
+          if(action==='payments')return modal('<span class="eyebrow">FAMIGLIA · QUOTE E PAGAMENTI</span><h2>'+esc(name)+'</h2><div class="r54-status-list"><article><span>STATO AMMINISTRATIVO</span><b>'+esc(payment)+'</b></article></div><p class="r54-data-note">Importi, rate e scadenze compaiono solo quando restituiti dal gestionale. Non vengono ricostruiti lato app.</p>');
+          if(action==='status')return modal('<span class="eyebrow">FAMIGLIA · STATO ATLETA</span><h2>'+esc(name)+'</h2><div class="r54-status-list"><article><span>FIGC / TESSERAMENTO</span><b>'+esc(figc)+'</b></article><article><span>CERTIFICATO MEDICO</span><b>'+esc(cert)+'</b></article></div>');
+        });
       };
       outlet.querySelectorAll('[data-r24-family]').forEach(b=>b.onclick=()=>{outlet.querySelectorAll('[data-r24-family]').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderDetail(Number(b.dataset.r24Family||0))});
-      renderDetail(0);this.bindCommon(outlet);
+      renderDetail(0);
+      document.addEventListener('click',function r54FamilyRequestHandler(e){
+        if(e.target?.id!=='r54FamilyNewRequest')return;
+        document.removeEventListener('click',r54FamilyRequestHandler);
+        openInternalRequestManager();
+      },{once:false});
+      this.bindCommon(outlet);
     },
     render_staff(outlet){
       const d=state.privateData||{},u=d.user||{},p=d.permissions||{};
