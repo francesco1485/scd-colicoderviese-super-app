@@ -12,13 +12,17 @@ const CLUB_TIME_ZONE = 'Europe/Rome';
 const DEPLOY_COMMIT = process.env.RENDER_GIT_COMMIT || process.env.SCD_DEPLOY_COMMIT || null;
 const FEATURE_FLAGS = Object.freeze({
   dataFabricObservability: process.env.SCD_FEATURE_DATA_FABRIC_OBSERVABILITY === 'true',
-  supabaseCore: process.env.SCD_FEATURE_SUPABASE_CORE === 'true'
+  supabaseCore: process.env.SCD_FEATURE_SUPABASE_CORE === 'true',
+  socialVerifiedReads: process.env.SCD_FEATURE_SOCIAL_VERIFIED_READS === 'true'
 });
+const SUPABASE_URL=String(process.env.SCD_SUPABASE_URL||'').replace(/\/$/,'');
+const SUPABASE_SERVICE_ROLE_KEY=String(process.env.SCD_SUPABASE_SERVICE_ROLE_KEY||'');
 const SUPABASE_RUNTIME = Object.freeze({
   engine:'SUPABASE_POSTGRESQL',
-  configured:Boolean(process.env.SCD_SUPABASE_URL),
+  configured:Boolean(SUPABASE_URL&&SUPABASE_SERVICE_ROLE_KEY),
   projectId:process.env.SCD_SUPABASE_PROJECT_ID || null,
-  mode:FEATURE_FLAGS.supabaseCore?'DUAL_RUN_ACTIVE':'DARK_DUAL_RUN'
+  mode:FEATURE_FLAGS.supabaseCore?'DUAL_RUN_ACTIVE':'DARK_DUAL_RUN',
+  socialVerifiedReads:FEATURE_FLAGS.socialVerifiedReads
 });
 let liveCache = { at: 0, data: null };
 
@@ -99,6 +103,79 @@ function json(res, status, data, headers={}) {
   res.end(JSON.stringify(data));
 }
 function readBody(req){return new Promise((resolve,reject)=>{let s='';req.on('data',c=>{s+=c;if(s.length>1_000_000){req.destroy();reject(new Error('Payload troppo grande'))}});req.on('end',()=>resolve(s));req.on('error',reject)})}
+function isUuid(value){return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value||''))}
+async function supabaseServerSelect(table,params={}){
+  if(!SUPABASE_RUNTIME.configured)throw new Error('SUPABASE_SERVER_NOT_CONFIGURED');
+  const qs=new URLSearchParams();
+  Object.entries(params).forEach(([k,v])=>{if(v!==undefined&&v!==null&&String(v)!=='')qs.set(k,String(v))});
+  const endpoint=SUPABASE_URL+'/rest/v1/'+encodeURIComponent(table)+(qs.size?'?'+qs.toString():'');
+  const response=await fetch(endpoint,{
+    headers:{
+      apikey:SUPABASE_SERVICE_ROLE_KEY,
+      authorization:'Bearer '+SUPABASE_SERVICE_ROLE_KEY,
+      accept:'application/json'
+    }
+  });
+  const text=await response.text();
+  let data=null;try{data=text?JSON.parse(text):[]}catch{data=[]}
+  if(!response.ok)throw new Error('SUPABASE_READ_'+response.status);
+  return Array.isArray(data)?data:[];
+}
+async function buildPublicSocialState(u){
+  const base={ok:true,enabled:false,source:'SCD_SUPABASE',verifiedAt:new Date().toISOString(),mvp:{available:false,candidates:[],totalVotes:0},rewards:[],deals:[],liveEvents:[]};
+  if(!FEATURE_FLAGS.socialVerifiedReads)return {...base,state:'FEATURE_GATED'};
+  if(!SUPABASE_RUNTIME.configured)return {...base,state:'SERVER_NOT_CONFIGURED'};
+  const orgs=await supabaseServerSelect('scd_organizations',{select:'id,slug,name',slug:'eq.scd-colicoderviese',limit:'1'});
+  const org=orgs[0];if(!org?.id)return {...base,state:'ORGANIZATION_NOT_FOUND'};
+  const nowIso=new Date().toISOString();
+  const matchId=isUuid(u.searchParams.get('match_id'))?u.searchParams.get('match_id'):'';
+  const [rewardsRaw,dealsRaw,candidatesRaw,liveRaw]=await Promise.all([
+    supabaseServerSelect('scd_social_rewards',{
+      select:'id,title,description,points_cost,quantity_available,source_verified_at',
+      organization_id:'eq.'+org.id,active:'eq.true',source_verified_at:'not.is.null',order:'points_cost.asc',limit:'50'
+    }),
+    supabaseServerSelect('scd_social_sponsor_deals',{
+      select:'id,title,discount_code,discount_percentage,starts_at,ends_at,source_verified_at',
+      organization_id:'eq.'+org.id,active:'eq.true',source_verified_at:'not.is.null',order:'created_at.desc',limit:'50'
+    }),
+    matchId?supabaseServerSelect('scd_social_mvp_candidates',{
+      select:'id,match_id,public_label,source_verified_at',
+      organization_id:'eq.'+org.id,match_id:'eq.'+matchId,active:'eq.true',public_media_authorized:'eq.true',source_verified_at:'not.is.null',order:'created_at.asc',limit:'30'
+    }):Promise.resolve([]),
+    matchId?supabaseServerSelect('scd_live_match_events',{
+      select:'id,match_id,minute_label,event_type,body,source_verified_at,created_at',
+      organization_id:'eq.'+org.id,match_id:'eq.'+matchId,published:'eq.true',source_verified_at:'not.is.null',order:'created_at.asc',limit:'100'
+    }):Promise.resolve([])
+  ]);
+  const rewards=rewardsRaw.filter(x=>x.quantity_available===null||Number(x.quantity_available)>0);
+  const deals=dealsRaw.filter(x=>{
+    const start=x.starts_at?new Date(x.starts_at).getTime():-Infinity;
+    const end=x.ends_at?new Date(x.ends_at).getTime():Infinity;
+    const now=Date.now();
+    return start<=now&&end>=now;
+  }).map(x=>({
+    id:x.id,title:x.title,discountCode:x.discount_code||'',discountPercentage:x.discount_percentage??null,
+    startsAt:x.starts_at||null,endsAt:x.ends_at||null,sourceVerifiedAt:x.source_verified_at
+  }));
+  let candidates=candidatesRaw.map(x=>({id:x.id,label:x.public_label,matchId:x.match_id,votes:0,percentage:0,sourceVerifiedAt:x.source_verified_at}));
+  let totalVotes=0;
+  if(matchId&&candidates.length){
+    const votes=await supabaseServerSelect('scd_social_mvp_votes',{
+      select:'candidate_id',organization_id:'eq.'+org.id,match_id:'eq.'+matchId,limit:'5000'
+    });
+    const counts=new Map();
+    votes.forEach(v=>counts.set(v.candidate_id,(counts.get(v.candidate_id)||0)+1));
+    totalVotes=votes.length;
+    candidates=candidates.map(x=>({...x,votes:counts.get(x.id)||0,percentage:totalVotes?Math.round(((counts.get(x.id)||0)*1000)/totalVotes)/10:0}));
+  }
+  return {
+    ...base,enabled:true,state:'VERIFIED_SERVER_READS',organization:{id:org.id,slug:org.slug,name:org.name},
+    matchId:matchId||null,verifiedAt:nowIso,
+    mvp:{available:Boolean(matchId&&candidates.length),candidates,totalVotes},
+    rewards:rewards.map(x=>({id:x.id,title:x.title,description:x.description,pointsCost:x.points_cost,quantityAvailable:x.quantity_available,sourceVerifiedAt:x.source_verified_at})),
+    deals,liveEvents:liveRaw.map(x=>({id:x.id,minuteLabel:x.minute_label||'',eventType:x.event_type,body:x.body,sourceVerifiedAt:x.source_verified_at,createdAt:x.created_at}))
+  };
+}
 function stripHtml(s=''){return String(s).replace(/<[^>]*>/g,' ').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/&#8217;/g,"'").replace(/\s+/g,' ').trim()}
 
 const SPONSOR_SESSION_COOKIE='scd_sponsor_session';
@@ -932,6 +1009,7 @@ http.createServer(async(req,res)=>{
   if(u.pathname==='/api/capabilities') return json(res,200,{ok:true,version:'40.0.0',mode:'GITHUB_PAGES_RENDER_R20_SUPABASE_DUAL_RUN',actions:[...allowedActions].sort(),featureFlags:FEATURE_FLAGS,domainCore:SUPABASE_RUNTIME,isolated:['safeguarding']});
   if(u.pathname==='/api/core-status') return json(res,200,{ok:true,version:'40.0.0',featureFlags:FEATURE_FLAGS,domainCore:SUPABASE_RUNTIME,currentPrimary:'R20',targetPrimary:'SCD_SUPABASE'});
   if(u.pathname==='/api/public/donation-config') return handleDonationConfig(req,res);
+  if(u.pathname==='/api/social/public-state') {try{return json(res,200,await buildPublicSocialState(u),{'cache-control':'public, max-age=30'})}catch(e){return json(res,503,{ok:false,enabled:false,state:'UNAVAILABLE',error:String(e.message||e)})}}
   if(u.pathname==='/api/public/donation-intent') return handleDonationIntent(req,res);
   if(u.pathname==='/api/sponsor/lead') return handleSponsorLead(req,res);
   if(u.pathname==='/api/sponsor/request-access') return handleSponsorAccessRequest(req,res);
