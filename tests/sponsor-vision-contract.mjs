@@ -74,6 +74,8 @@ assert(pubJs.includes('/api/public/donation-config'),'Solidarity Fund config end
 assert(pubJs.includes('/api/public/donation-intent'),'Solidarity Fund intent endpoint missing');
 assert(pubJs.includes('loadDonationConfig'),'Solidarity Fund config loader missing');
 assert(pubJs.includes('syncDonationAmount'),'Solidarity Fund amount synchronization missing');
+assert(pubJs.includes("$('[data-donation-amount]').forEach"),'Solidarity Fund amount controls must use multi-selector helper');
+assert(!/(^|[^$])\$\('\[data-donation-amount\]'\)\.forEach/m.test(pubJs),'single selector incorrectly used for donation amount collection');
 assert(js.includes("SOSPESA · NON INVIARE"),'suspended prospect visibility missing');
 assert(js.includes("Pixellot & Match Content"),'internal video asset missing');
 assert(js.includes("Partner Hub Web App"),'internal web app partner asset missing');
