@@ -17,6 +17,11 @@ assert(cfg.productionTarget?.logoRequirement==='OFFICIAL_APPROVED_LOGO_REQUIRED_
 assert(cfg.productionTarget?.cameraSafe===true,'camera-safe production rule missing');
 assert(cfg.productionTarget?.stadiumReadable===true,'stadium readability rule missing');
 
+assert(cfg.productionTarget?.storyboardDurationSeconds===40,'40s storyboard duration missing');
+assert(Array.isArray(cfg.productionTarget?.requiredGates)&&cfg.productionTarget.requiredGates.includes('OFFICIAL_APPROVED_LOGO'),'official logo production gate list missing');
+assert(Array.isArray(cfg.productionTarget?.previewModes)&&cfg.productionTarget.previewModes.includes('TRIBUNA')&&cfg.productionTarget.previewModes.includes('CAMERA'),'tribuna/camera preview modes missing');
+
+
 for(const name of ['GGlass','TA Cleaning','AGC Medical']){
   const p=cfg.profiles.find(x=>x.partnerName===name);
   assert(p,'motion profile missing: '+name);
@@ -25,12 +30,16 @@ for(const name of ['GGlass','TA Cleaning','AGC Medical']){
   assert(p.cameraView,'camera view missing: '+name);
   assert(p.lakeIdentity,'lake identity missing: '+name);
   assert(Array.isArray(p.proofPlan)&&p.proofPlan.length>=4,'proof plan incomplete: '+name);
+  assert(p.sceneId==='SCENE-TRIBUNA-LAKE-CONCEPT','tribuna/lake scene mapping missing: '+name);
+  assert(p.simulationLabel==='SIMULAZIONE_CONCETTUALE_NON_DOCUMENTARIA','simulation disclosure missing: '+name);
+  assert(Array.isArray(p.motionTimeline)&&p.motionTimeline.length===5,'40s motion timeline must have 5 phases: '+name);
+  assert(p.motionTimeline[0].from===0&&p.motionTimeline[p.motionTimeline.length-1].to===40,'motion timeline must cover 0-40s: '+name);
 }
 
 for(const token of ['LED PRODUCTION HUB','id="ledProfileList"','id="ledProfileDetail"','id="ledProductionSpecs"']){
   assert(html.includes(token),'LED Production Hub UI missing: '+token);
 }
-for(const token of ['initLedProductionHub','renderLedProfileDetail','ledMotionBrief','/api/sponsor/motion-profiles','fetchMotionConfig']){
+for(const token of ['initLedProductionHub','renderLedProfileDetail','ledMotionBrief','/api/sponsor/motion-profiles','fetchMotionConfig','led-tribuna-simulator','data-led-sim-view-btn','data-led-cue','SIMULAZIONE CONCETTUALE · NON FOTO DOCUMENTARIA']){
   assert(js.includes(token),'LED Production Hub interaction missing: '+token);
 }
 assert(js.includes("p.logoAssetStatus!=='APPROVED_OFFICIAL_ASSET'"),'final MP4 logo gate missing in UI');
