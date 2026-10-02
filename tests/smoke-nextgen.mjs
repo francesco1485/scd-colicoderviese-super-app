@@ -135,6 +135,7 @@ for(const viewport of viewports){
   await page.waitForSelector('#socialFilters');
   if((await page.locator('.social-channel-grid a').count())!==5)throw new Error('social official channel count mismatch');
   if(await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+3))throw new Error('social view horizontal overflow');
+  if([390,1440].includes(viewport.width))await page.screenshot({path:'test-output/social-'+viewport.width+'x'+viewport.height+'.png',fullPage:true});
   await page.fill('#socialSearch','SCD');
   await page.click('[data-social-filter="ALL"]');
   await page.evaluate(()=>window.SCDNextGen.setView('teams'));
