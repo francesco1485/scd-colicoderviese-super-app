@@ -228,21 +228,8 @@ const suppliers=[
 {name:"Saco Antincendio S.r.l.",position:"€122",paid:"€0",residual:"€122",email:"sacoantincendio@gmail.com",potential:"MEDIO",next:"Ricostruire servizi pluriennali e benchmark"}
 ];
 
-const commercialInitiatives=[
-{name:"ColicoDerviese Card · Tesserato",type:"CARD / COMMUNITY",status:"DA MODELLARE",target:"Atleti, staff, famiglie",goal:"Identità, convenzioni, benefit e relazione continuativa",next:"Definire perimetro beneficiari, funzioni e misurazione utilizzo"},
-{name:"ColicoDerviese Card · Sostenitore",type:"CARD / FUNDRAISING",status:"DA MODELLARE",target:"Tifosi, famiglie, territorio",goal:"Appartenenza e sostegno economico continuativo",next:"Definire quota, durata, rinnovo e benefit"},
-{name:"ColicoDerviese Card · Partner",type:"CARD / B2B",status:"DA MODELLARE",target:"Sponsor, partner, aziende",goal:"Hospitality, network e benefit B2B",next:"Definire livelli partner e collegamento dossier sponsor"},
-{name:"Tessera Tifoso / Community",type:"MEMBERSHIP",status:"IDEA DA STRUTTURARE",target:"Tifosi e territorio",goal:"Trasformare pubblico occasionale in community misurabile",next:"Evitare duplicazione con Card Sostenitore"},
-{name:"Spot LED Sponsor 40 secondi",type:"MEDIA / SPONSOR",status:"IN PRODUZIONE",target:"Sponsor attuali e futuri",goal:"Spot dedicato, leggibile, un solo sponsor protagonista",next:"Creare master, sottoporre idea e produrre MP4 dopo approvazione"},
-{name:"Torneo nazionale 2019 · 09/05/2027",type:"EVENTO / SPONSOR",status:"DA CONFERMARE",target:"Squadre, famiglie, aziende, territorio",goal:"Sport, musica, degustazioni e asset commerciali",next:"Definire format, capacità, pacchetti e rete ricettiva"},
-{name:"Video Partner / Match Content",type:"MEDIA / VIDEO",status:"IDEA DA STRUTTURARE",target:"Sponsor e partner media",goal:"Valorizzare partite, highlight e clip SCD nel rispetto dei diritti Pixellot",next:"Definire diritti, formati, inventory e proof di delivery"},
-{name:"Merchandising SCD",type:"MERCHANDISING / COMMUNITY",status:"IDEA DA STRUTTURARE",target:"Tifosi, famiglie, tesserati",goal:"Prodotti ufficiali, gadget e capsule partner",next:"Definire gamma, costi, margini, produzione e canale vendita"},
-{name:"Gazebo & Partner Corner",type:"EVENTO / ATTIVAZIONE",status:"IDEA DA VALIDARE",target:"Sponsor, fornitori, convenzioni",goal:"Presenza fisica utile durante tornei, open day e giornate community",next:"Definire spazi, sicurezza, servizi e regole evento"},
-{name:"Strutture brandizzate",type:"IMPIANTO / SPONSOR",status:"IDEA DA STUDIARE",target:"Sponsor pluriennali / territoriali",goal:"Associare partner a spazi reali con presenza continuativa",next:"Censire aree, misure, esclusività, durata e proof fotografico"},
-{name:"Mascotte Partner",type:"FAMILY / ATTIVAZIONE",status:"IDEA DA VALIDARE",target:"Brand family-friendly",goal:"Divisa mascotte, pre-gara, foto, eventi e contenuti community",next:"Definire inventory, frequenza e regole di utilizzo"},
-{name:"Sublimated Kit Partner",type:"KIT / SPONSOR",status:"IDEA DA STUDIARE",target:"Sponsor territoriali / tecnici",goal:"Posizioni integrate su divise sublimatiche e pacchetti multi-canale",next:"Censire posizioni libere e compatibilità tecnica/regolamentare"},
-{name:"Partner Hub Web App SCD",type:"DIGITALE / B2B",status:"IN SVILUPPO",target:"Sponsor, convenzioni e partner",goal:"Schede partner, progetti, benefit, contenuti e proof di delivery",next:"Collegare catalogo pubblico, CRM e stato erogazione"}
-];
+/* R50.8: le iniziative di sviluppo arrivano esclusivamente dalla Source of Truth tramite /api/sponsor/development. */
+
 
 const audience=[
 {segment:"Persone attive censite",value:"268",unit:"persone",source:"00 CONTROL ROOM",note:"KPI canonico. Non sommare automaticamente con atleti e staff."},
@@ -571,6 +558,7 @@ function openView(name){
   $('#view-'+name)?.classList.add('active');
   $$('.nav-link').forEach(b=>b.classList.toggle('active',b.dataset.view===name));
   if(name==='eventi')loadAgenda();
+  if(name==='iniziative')loadDevelopment();
   if(innerWidth<901)$('#sidebar').classList.remove('open');
   window.scrollTo({top:0,behavior:'smooth'});
 }
@@ -740,9 +728,121 @@ function renderSuppliers(){
   ].map(x=>'<article class="report-card"><h3>'+x[0]+'</h3><div class="report-value">'+x[1]+'</div><p>'+x[2]+'</p></article>').join('');
   if($('#fornitoriTable'))$('#fornitoriTable').innerHTML='<div class="data-row header"><span>Fornitore</span><span>Posizione 2026</span><span>Residuo</span><span>Potenziale</span><span>Prossima azione</span></div>'+suppliers.map(x=>'<div class="data-row"><b>'+esc(x.name)+'</b><span>'+esc(x.position)+'</span><span>'+esc(x.residual)+'</span><span>'+esc(x.potential)+'</span><span>'+esc(x.next)+'</span></div>').join('');
 }
-function renderCommercialInitiatives(){
-  if($('#iniziativeGrid'))$('#iniziativeGrid').innerHTML=commercialInitiatives.map(x=>'<article class="proposal-card"><h3>'+esc(x.name)+'</h3><p>'+esc(x.goal)+'</p><div class="card-row"><span>Tipo</span><b>'+esc(x.type)+'</b></div><div class="card-row"><span>Target</span><b>'+esc(x.target)+'</b></div><div class="card-row"><span>Stato</span><b>'+esc(x.status)+'</b></div><div class="card-row"><span>Prossima azione</span><b>'+esc(x.next)+'</b></div></article>').join('');
+const developmentState={rows:[],loading:false,loaded:false,error:'',sourceMode:'',sourceTable:'',generatedAt:'',kpi:{}};
+let developmentScope='ALL';
+let developmentQuery='';
+let developmentSelected='';
+
+async function developmentApi(){
+  const r=await fetch('/api/sponsor/development',{credentials:'same-origin',cache:'no-store'});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok||j.ok===false)throw new Error(j.error||'Source progetti non disponibile');
+  return j.data||{};
 }
+function developmentStatusClass(status=''){
+  const s=String(status).toUpperCase();
+  if(/COMPLETATO|ATTIVO|CONTRATTUALIZZATO|FINANZIATO/.test(s))return 'blue';
+  if(/PREVENTIV|CONFRONTO|VALUTARE|STUDIARE|STRUTTURARE/.test(s))return 'orange';
+  return '';
+}
+function developmentRowsFiltered(){
+  const q=developmentQuery.toLowerCase().trim();
+  return developmentState.rows.filter(x=>{
+    if(developmentScope==='DRAWER'&&!x.isDrawer)return false;
+    if(developmentScope==='QUOTES'&&x.quoteStatus!=='RECEIVED_TO_RECONCILE')return false;
+    if(developmentScope==='ACTIVE'&&(x.isDrawer||/FONDO_SOLIDALE/.test(x.id)))return false;
+    if(q&&!([x.name,x.type,x.status,x.objective,x.partners,x.owner,x.documents].join(' ').toLowerCase().includes(q)))return false;
+    return true;
+  });
+}
+function developmentSupplierLabel(x){
+  const rows=Array.isArray(x.relatedSuppliers)?x.relatedSuppliers:[];
+  if(!rows.length)return '';
+  return rows.map(s=>'<span class="development-supplier"><b>'+esc(s.name||'Fornitore')+'</b><small>'+esc(s.relationshipStatus||'Stato da verificare')+'</small></span>').join('');
+}
+function renderDevelopmentInspector(id=developmentSelected){
+  const box=$('#developmentInspector');if(!box)return;
+  const x=developmentState.rows.find(r=>r.id===id);
+  if(!x){
+    box.innerHTML='<h3>Sviluppo Centro Sportivo</h3><p>Seleziona un progetto per vedere stato, fonte, documenti, fornitori collegati e punti ancora da verificare.</p>';
+    return;
+  }
+  developmentSelected=x.id;
+  const quote=x.quoteStatus==='RECEIVED_TO_RECONCILE'
+    ?'<div class="development-warning"><b>Preventivi ricevuti</b><span>Il sistema non espone importi o fornitori finché non vengono ricondotti a documenti verificati.</span></div>':'';
+  const drawer=x.isDrawer?'<div class="development-drawer-note"><b>CASSETTO STRATEGICO</b><span>Progetto futuro: non presentare come intervento imminente.</span></div>':'';
+  box.innerHTML=
+    '<small>'+esc(x.id)+'</small><h3>'+esc(x.name)+'</h3>'+
+    '<span class="status-badge '+developmentStatusClass(x.status)+'">'+esc(x.status||'DA VERIFICARE')+'</span>'+
+    '<p>'+esc(x.objective||'Obiettivo da definire')+'</p>'+drawer+quote+
+    '<div class="development-detail-grid">'+
+      '<div><small>TIPO</small><b>'+esc(x.type||'—')+'</b></div>'+
+      '<div><small>TARGET</small><b>'+esc(x.target||'—')+'</b></div>'+
+      '<div><small>OWNER</small><b>'+esc(x.owner||'—')+'</b></div>'+
+      '<div><small>CANALE / AREA</small><b>'+esc(x.channel||'—')+'</b></div>'+
+      '<div><small>DATO ECONOMICO VERIFICATO</small><b>'+(x.hasVerifiedCost?esc(x.unitPrice||x.expectedRevenue||x.realRevenue):'NON DISPONIBILE')+'</b></div>'+
+      '<div><small>RICONCILIAZIONE</small><b>'+(x.requiresReconciliation?'RICHIESTA':'NON SEGNALATA')+'</b></div>'+
+    '</div>'+
+    (x.partners?'<div class="development-evidence"><small>PARTNER / CATEGORIE COLLEGABILI</small><p>'+esc(x.partners)+'</p></div>':'')+
+    (x.documents?'<div class="development-evidence"><small>EVIDENZA / DOCUMENTI</small><p>'+esc(x.documents)+'</p></div>':'')+
+    (developmentSupplierLabel(x)?'<div class="development-suppliers"><small>FORNITORI / SOGGETTI CANONICI</small>'+developmentSupplierLabel(x)+'</div>':'')+
+    '<footer class="development-source-foot">Fonte: '+esc(developmentState.sourceTable||'INIZIATIVE_COMMERCIALI')+' · '+esc(developmentState.sourceMode||'UNKNOWN')+'</footer>';
+  $$('.development-card').forEach(el=>el.classList.toggle('selected',el.dataset.developmentId===x.id));
+}
+function renderCommercialInitiatives(){
+  const source=$('#developmentSource');
+  if(source){
+    if(developmentState.error)source.innerHTML='<span class="error"><b>DATI NON DISPONIBILI</b> · '+esc(developmentState.error)+'</span>';
+    else source.innerHTML='<span><b>'+(developmentState.sourceMode==='LIVE_MASTER'?'LIVE MASTER':'SOURCE IN VERIFICA')+'</b> · '+esc(developmentState.sourceTable||'INIZIATIVE_COMMERCIALI')+(developmentState.generatedAt?' · '+esc(String(developmentState.generatedAt)):'')+'</span>';
+  }
+  const k=developmentState.kpi||{};
+  if($('#developmentKpi'))$('#developmentKpi').innerHTML=[
+    ['Progetti censiti',String(k.total??developmentState.rows.length),'Source of Truth operativa'],
+    ['Cassetto strategico',String(k.drawer??developmentState.rows.filter(x=>x.isDrawer).length),'Non sono interventi imminenti'],
+    ['Preventivi da valutare',String(k.quotesToReview??developmentState.rows.filter(x=>x.quoteStatus==='RECEIVED_TO_RECONCILE').length),'Nessun importo finché non verificato'],
+    ['Confronto tecnico',String(k.inTechnicalReview??developmentState.rows.filter(x=>/CONFRONTO TECNICO/i.test(x.status)).length),'Fornitori/prodotti in valutazione']
+  ].map(x=>'<article class="report-card"><h3>'+esc(x[0])+'</h3><div class="report-value">'+esc(x[1])+'</div><p>'+esc(x[2])+'</p></article>').join('');
+  const box=$('#iniziativeGrid');if(!box)return;
+  if(developmentState.loading){box.innerHTML='<article class="development-empty"><b>Caricamento progetti…</b><p>Sto leggendo la Source of Truth.</p></article>';return}
+  if(developmentState.error){box.innerHTML='<article class="development-empty"><b>Pipeline non disponibile</b><p>Nessun dato statico viene mostrato al posto della fonte canonica.</p></article>';renderDevelopmentInspector('');return}
+  const rows=developmentRowsFiltered();
+  box.innerHTML=rows.map(x=>
+    '<article class="proposal-card development-card '+(x.isDrawer?'is-drawer':'')+'" data-development-id="'+esc(x.id)+'" tabindex="0" role="button">'+
+      '<div class="development-card-head"><small>'+esc(x.type||'PROGETTO')+'</small><span class="status-badge '+developmentStatusClass(x.status)+'">'+esc(x.status||'DA VERIFICARE')+'</span></div>'+
+      '<h3>'+esc(x.name)+'</h3><p>'+esc(x.objective||'')+'</p>'+
+      '<div class="card-row"><span>Target</span><b>'+esc(x.target||'—')+'</b></div>'+
+      '<div class="card-row"><span>Owner</span><b>'+esc(x.owner||'—')+'</b></div>'+
+      '<div class="card-row"><span>Dato economico</span><b>'+(x.hasVerifiedCost?esc(x.unitPrice||x.expectedRevenue||x.realRevenue):'NON VERIFICATI')+'</b></div>'+
+      (x.quoteStatus?'<div class="development-quote-chip">PREVENTIVI RICEVUTI · DA RICONCILIARE</div>':'')+
+      (x.isDrawer?'<div class="development-drawer-chip">CASSETTO STRATEGICO</div>':'')+
+    '</article>'
+  ).join('')||'<article class="development-empty"><b>Nessun progetto nel filtro selezionato.</b></article>';
+  $$('.development-card').forEach(el=>{
+    const open=()=>renderDevelopmentInspector(el.dataset.developmentId);
+    el.onclick=open;el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open()}};
+  });
+  if(developmentSelected&&!rows.some(x=>x.id===developmentSelected))renderDevelopmentInspector('');
+}
+async function loadDevelopment(force=false){
+  if(developmentState.loading||(!force&&developmentState.loaded))return;
+  developmentState.loading=true;developmentState.error='';renderCommercialInitiatives();
+  try{
+    const data=await developmentApi();
+    developmentState.rows=Array.isArray(data.rows)?data.rows:[];
+    developmentState.sourceMode=String(data.sourceMode||'');
+    developmentState.sourceTable=String(data.sourceTable||'');
+    developmentState.generatedAt=String(data.generatedAt||'');
+    developmentState.kpi=data.kpi||{};
+    developmentState.loaded=true;
+  }catch(e){
+    developmentState.rows=[];developmentState.error=String(e.message||e);developmentState.loaded=false;
+  }finally{
+    developmentState.loading=false;renderCommercialInitiatives();
+  }
+}
+$('#developmentRefresh')?.addEventListener('click',()=>loadDevelopment(true));
+$('#developmentSearch')?.addEventListener('input',e=>{developmentQuery=e.target.value||'';renderCommercialInitiatives()});
+$('#developmentScope')?.addEventListener('change',e=>{developmentScope=e.target.value||'ALL';renderCommercialInitiatives()});
 function renderAudience(){
   if($('#audienceGrid'))$('#audienceGrid').innerHTML=audience.map(x=>'<article class="report-card"><h3>'+esc(x.segment)+'</h3><div class="report-value">'+esc(x.value)+'</div><p>'+esc(x.unit)+' · '+esc(x.source)+'</p><p>'+esc(x.note)+'</p></article>').join('');
   $$('[data-public-link]').forEach(b=>b.onclick=()=>location.href='/sponsor/');
@@ -891,6 +991,7 @@ function searchItems(){
     ...sponsors.map(s=>({title:s.name,meta:'Sponsor · '+s.sector,view:'sponsor',action:()=>openSponsor(s.name)})),
     ...proposals.map(p=>({title:p.name,meta:'Proposta · '+p.area,view:'proposte'})),
     ...assets.map(a=>({title:a[0],meta:'Asset · '+a[2],view:'opportunita'})),
+    ...developmentState.rows.map(x=>({title:x.name,meta:'Progetto · '+x.status,view:'iniziative',action:()=>{openView('iniziative');renderDevelopmentInspector(x.id)}})),
     ...led.map(l=>({title:l[0],meta:'LED · '+l[1],view:'media'}))
   ];
 }
@@ -903,6 +1004,7 @@ function liaAnswer(q){
   if(t.includes('asset'))return 'Asset segnati disponibili: Family & Community Partner, Torneo Title Sponsor, Club House e LED bordo campo. Prima di proporre va verificata l’esclusiva.';
   if(t.includes('rinn'))return 'Rinnovi prioritari: Rasero, Noratech e verifica scadenza Pedroncelli.';
   if(t.includes('evento'))return 'In evidenza: torneo nazionale 9 maggio 2027 da confermare, Family & Community Day da definire e sopralluogo Caffè Teti da fissare.';
+  if(/centro|progett|tribuna|kompan|verisure|cassetto/.test(t)){const r=developmentState.rows;if(!r.length)return 'La pipeline sviluppo non è disponibile dalla fonte canonica in questo momento.';return 'Development Pipeline: '+r.length+' progetti censiti, '+r.filter(x=>x.isDrawer).length+' nel cassetto strategico e '+r.filter(x=>x.quoteStatus==='RECEIVED_TO_RECONCILE').length+' con preventivi da riconciliare.';}
   if(t.includes('report'))return 'Cash verificato normalizzato: €4.400. Audit prioritari: DECAR, SACO e Bianchi Bazzi.';
   if(t.includes('sponsor'))return 'Posso cercare nel portafoglio attuale, nella pipeline e negli asset. Per ricerca esterna territoriale serve una fonte web aggiornata.';
   return 'Posso aiutarti su sponsor, proposte, contratti, asset, LED, rinnovi, eventi e report usando i dati presenti nella piattaforma.';

@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.17.0",
+    "version": "3.18.0",
     "effective_at": "2026-10-02",
     "status": "BINDING",
     "language": "it-IT",
@@ -1173,6 +1173,26 @@
           "invite_authorized_users_only",
           "send_summary_to_club",
           "no_duplicate_calendar"
+        ]
+      },
+      {
+        "id": "SCD_OPERATIVO_PILOTA",
+        "kind": "GOOGLE_SHEET",
+        "trust": "INTERNAL_VERIFIED",
+        "resource_id": "1jb5Jt1ZYzJA-3oQd85AmwVhAoFQpBPfcsy4HupBzDFA",
+        "authority_domains": [
+          "STAKEHOLDERS",
+          "SUPPLIERS",
+          "COMMERCIAL_INITIATIVES",
+          "RELATIONSHIPS",
+          "DECISIONS",
+          "DATA_LINEAGE",
+          "RELEASES"
+        ],
+        "rules": [
+          "ONE_CANONICAL_RECORD_PER_COMPANY",
+          "NO_DUPLICATE_INITIATIVES",
+          "SOURCE_LINEAGE_REQUIRED"
         ]
       }
     ],
@@ -3687,6 +3707,62 @@
         ],
         "privacy_rule": "NO_PERSONAL_DONOR_DATA"
       }
+    },
+    "sponsor_center_development": {
+      "state": "SOURCE_IMPLEMENTED_RUNTIME_DEPLOY_REQUIRED",
+      "private_surface": "PARTNER_OS_EXISTING_INITIATIVES_VIEW",
+      "source": "SCD_OPERATIVO_PILOTA/INIZIATIVE_COMMERCIALI",
+      "related_sources": [
+        "SCD_OPERATIVO_PILOTA/STAKEHOLDERS_MASTER",
+        "SCD_OPERATIVO_PILOTA/FORNITORI_SPONSOR_RADAR",
+        "SCD_OPERATIVO_PILOTA/DATA_LINEAGE",
+        "SCD_GMAIL"
+      ],
+      "endpoint": "/api/sponsor/development",
+      "upstream_action": "private.development.summary",
+      "lifecycle": [
+        "ROADMAP_FUTURA_CASSETTO",
+        "IDEA_DA_STUDIARE",
+        "IDEA_DA_STRUTTURARE",
+        "IN_CONFRONTO_TECNICO",
+        "PREVENTIVI_RICEVUTI_DA_VALUTARE",
+        "APPROVATO",
+        "FINANZIATO",
+        "IN_ESECUZIONE",
+        "COMPLETATO"
+      ],
+      "rules": [
+        "NO_INVENTED_COSTS",
+        "NO_INFERRED_PARTNERSHIP",
+        "SUPPLIER_STATUS_DISTINCT_FROM_SPONSOR_STATUS",
+        "QUOTE_DOCUMENTS_LINKED_WHEN_VERIFIED",
+        "FUTURE_DRAWER_NOT_PRESENTED_AS_IMMINENT",
+        "TECHNICAL_AND_AUTHORIZATION_GATES_BEFORE_EXECUTION"
+      ],
+      "canonical_projects": [
+        "INIT-CENTRO-RICARICA-EV",
+        "INIT-CENTRO-FITNESS-KOMPAN",
+        "INIT-CENTRO-PLAY-KOMPAN",
+        "INIT-CENTRO-GAZEBO-NUOVO",
+        "INIT-CENTRO-TRIBUNA-C2",
+        "INIT-CENTRO-INFERMERIA",
+        "INIT-CENTRO-SICUREZZA-VERISURE",
+        "INIT-CENTRO-PERCORSO-ACCESSIBILE",
+        "INIT-CENTRO-AREA-SABBIA",
+        "INIT-FUTURE-DEHOR-LUDICO",
+        "INIT-FUTURE-RISTORO-FAMILY",
+        "INIT-FUTURE-MEDIA-PRESS-PODCAST",
+        "INIT-FUTURE-AUDIO-TRIBUNA",
+        "INIT-FUTURE-LIVE-360",
+        "INIT-FUTURE-PHOTO-POINT",
+        "INIT-FUTURE-FREE-WIFI"
+      ],
+      "special_entity_rules": {
+        "KOMPAN": "SUPPLIER_PRODUCT_REFERENCE_NOT_ACQUIRED_SPONSOR",
+        "VERISURE": "ACTIVE_CONTRACTED_SECURITY_SUPPLIER",
+        "TRIBUNA_CAMPO_2": "QUOTES_RECEIVED_SUPPLIER_AND_AMOUNT_MUST_BE_RECONCILED_FROM_EVIDENCE"
+      },
+      "fallback": "FAIL_CLOSED_SHOW_SOURCE_UNAVAILABLE_NO_SYNTHETIC_DATA"
     }
   },
   "research_intelligence": {

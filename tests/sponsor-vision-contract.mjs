@@ -69,9 +69,28 @@ for(const token of [
   'agevolazioni fiscali dipendono dalla normativa applicabile',
   'name="project"'
 ]) assert(pub.includes(token),'R50.4 Center development public surface missing: '+token);
-assert(pub.includes('KOMPAN è un riferimento progettuale da formalizzare'),'KOMPAN must not be represented as acquired partner');
-assert(pub.includes('Verisure è un riferimento progettuale da formalizzare'),'Verisure must not be represented as acquired partner');
+assert(pub.includes('KOMPAN Italia è il produttore in confronto tecnico'),'KOMPAN verified supplier/product status missing');
+assert(pub.includes('Nessuna sponsorizzazione è implicita.'),'KOMPAN must not be represented as acquired sponsor');
+assert(pub.includes('sistema Verisure già contrattualizzato'),'Verisure contracted supplier status missing');
+assert(pub.includes('Sono già presenti preventivi da confrontare'),'Tribuna quote state missing');
 assert(pubJs.includes('[data-project-interest]'),'Center development lead interaction missing');
+for(const token of [
+  'SCD DEVELOPMENT PIPELINE',
+  'id="developmentKpi"',
+  'id="developmentSearch"',
+  'id="developmentScope"',
+  'id="developmentInspector"'
+]) assert(app.includes(token),'R50.8 Development workspace missing: '+token);
+for(const token of [
+  "fetch('/api/sponsor/development'",
+  'developmentState',
+  'loadDevelopment',
+  'renderDevelopmentInspector',
+  "if(name==='iniziative')loadDevelopment()",
+  'PREVENTIVI RICEVUTI · DA RICONCILIARE',
+  'CASSETTO STRATEGICO',
+  'NON VERIFICATI'
+]) assert(js.includes(token),'R50.8 Development interaction missing: '+token);
 assert(pubJs.includes('/api/public/donation-config'),'Solidarity Fund config endpoint missing');
 assert(pubJs.includes('/api/public/donation-intent'),'Solidarity Fund intent endpoint missing');
 assert(pubJs.includes('loadDonationConfig'),'Solidarity Fund config loader missing');

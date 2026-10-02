@@ -7,7 +7,7 @@
   <meta name="description" content="SCD ColicoDerviese Sponsor Platform">
   <title>SCD Partner OS · ColicoDerviese</title>
   <link rel="icon" href="../assets/logo-scd.png">
-  <link rel="stylesheet" href="./app.css?v=18.4.0">
+  <link rel="stylesheet" href="./app.css?v=50.8.0">
   <link rel="stylesheet" href="./scd-design-system.css?v=1.0.0">
 </head>
 <body>
@@ -387,8 +387,17 @@
     </section>
 
     <section class="view" id="view-iniziative">
-      <div class="page-head"><div><small>RICAVI E COMMUNITY</small><h1>Iniziative commerciali interne</h1><p>Card, tessere, LED, eventi e progetti che aumentano valore, ricavi e misurabilità della community.</p></div></div>
-      <div class="proposal-grid" id="iniziativeGrid"></div>
+      <div class="page-head"><div><small>SCD DEVELOPMENT PIPELINE</small><h1>Centro Sportivo & progetti futuri</h1><p>Un unico quadro per interventi reali, fornitori, preventivi, idee nel cassetto e possibili partner. Costi e accordi compaiono solo quando verificati.</p></div><button class="btn-yellow" id="developmentRefresh" type="button">Aggiorna progetti</button></div>
+      <div class="development-source" id="developmentSource"><span>Source of Truth in verifica…</span></div>
+      <div class="report-grid" id="developmentKpi"></div>
+      <div class="page-tools development-tools">
+        <input class="filter-input" id="developmentSearch" placeholder="Cerca progetto, area, fornitore, stato…">
+        <select id="developmentScope"><option value="ALL">Tutti</option><option value="ACTIVE">In sviluppo / attivi</option><option value="QUOTES">Preventivi da valutare</option><option value="DRAWER">Cassetto strategico</option></select>
+      </div>
+      <div class="development-layout">
+        <div class="proposal-grid development-grid" id="iniziativeGrid"></div>
+        <aside class="detail-panel development-inspector" id="developmentInspector"><h3>Sviluppo Centro Sportivo</h3><p>Seleziona un progetto per vedere stato, fonte, documenti, fornitori collegati e punti ancora da verificare.</p></aside>
+      </div>
     </section>
 
     <section class="view" id="view-audience">
@@ -657,6 +666,6 @@
   </div>
 </div>
 
-<script src="./app.js?v=18.4.0"></script>
+<script src="./app.js?v=50.8.0"></script>
 </body>
 </html>

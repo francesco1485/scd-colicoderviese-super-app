@@ -101,7 +101,7 @@ includesAll(sourceIds,[
   'SCD_DRIVE','SCD_GMAIL','R20','CORE_SHEET','TESSERATI_SHEET','PULMINI_SHEET','MAIL_OPERATIONS_SHEET','SPONSOR_MASTER_SHEET','ECONOMIC_MASTER_SHEET','TOURNAMENTS_MASTER_SHEET',
   'FIGC','LND','CR_LOMBARDIA','SGS','SPORT_E_SALUTE','RASD','TUTTOCAMPO',
   'SCD_OFFICIAL_SITE','SCD_FACEBOOK','SCD_INSTAGRAM','SCD_TIKTOK','SCD_YOUTUBE','SCD_PIXELLOT','LECCO_CHANNEL','SPRINT_E_SPORT_LOMBARDIA','SCD_ORGANIGRAMMA_2026_27','TUTTITALIA',
-  'SEGRETARIO_CALCIO','TEAMSYSTEM_SPORTIVI_IN_CLOUD','SQUBY','ATHLETIS','SCD_SUPABASE','SCD_AI_WEEKLY_EDITORIAL','SCD_GOOGLE_CALENDAR'
+  'SEGRETARIO_CALCIO','TEAMSYSTEM_SPORTIVI_IN_CLOUD','SQUBY','ATHLETIS','SCD_SUPABASE','SCD_AI_WEEKLY_EDITORIAL','SCD_GOOGLE_CALENDAR','SCD_OPERATIVO_PILOTA'
 ],'source registry');
 const sourceById=Object.fromEntries(sources.map(x=>[x.id,x]));
 assert(sourceById.SCD_DRIVE.account==='sportclubcolico@gmail.com','Drive engine account changed');
@@ -111,6 +111,8 @@ assert(sourceById.SCD_GOOGLE_CALENDAR.resource_id==='4446ddfffc997074b2017673da3
 assert(sourceById.R20.must_preserve===true,'R20 preservation rule missing');
 assert(sourceById.MAIL_OPERATIONS_SHEET.resource_id==='1wx3ZXwmdZuAr8AM_h08GzOvephm5o5iHMvTLQpRmbJE','mail operations source id mismatch');
 assert(sourceById.SPONSOR_MASTER_SHEET.resource_id==='1-5-MUnrrAltflJSATe6bKkjm_3SItO0gvadi_PXPoAQ','sponsor master source id mismatch');
+assert(sourceById.SCD_OPERATIVO_PILOTA.resource_id==='1jb5Jt1ZYzJA-3oQd85AmwVhAoFQpBPfcsy4HupBzDFA','operational pilot source id mismatch');
+assert((sourceById.SCD_OPERATIVO_PILOTA.authority_domains||[]).includes('COMMERCIAL_INITIATIVES'),'operational initiatives authority missing');
 assert(sourceById.TUTTOCAMPO.use==='CROSS_CHECK_AND_ENRICHMENT','Tuttocampo must remain secondary enrichment');
 assert(sourceById.TEAMSYSTEM_SPORTIVI_IN_CLOUD.trust==='BENCHMARK','TeamSystem must remain benchmark, not factual source');
 assert(sourceById.SCD_SUPABASE.kind==='TARGET_DOMAIN_CORE','SCD Supabase source kind mismatch');
@@ -371,6 +373,10 @@ const serialized=JSON.stringify(m);
 for(const forbiddenKey of ['"password":','"token":','"secret":','"private_key":']){
   assert(!serialized.toLowerCase().includes(forbiddenKey),'manifest appears to contain a committed secret field: '+forbiddenKey);
 }
+
+assert(m.product_direction?.sponsor_center_development?.source==='SCD_OPERATIVO_PILOTA/INIZIATIVE_COMMERCIALI','Sponsor Development source mismatch');
+assert(m.product_direction?.sponsor_center_development?.fallback==='FAIL_CLOSED_SHOW_SOURCE_UNAVAILABLE_NO_SYNTHETIC_DATA','Sponsor Development fallback must remain fail-closed');
+assert((m.product_direction?.sponsor_center_development?.rules||[]).includes('NO_INVENTED_COSTS'),'Sponsor Development no-invented-cost rule missing');
 
 if(process.exitCode) process.exit(process.exitCode);
 console.log('SCD SYSTEM MANIFEST PASS',{

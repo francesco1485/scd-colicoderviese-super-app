@@ -19,7 +19,8 @@ for(const action of [
   'private.communication.send',
   'private.communication.health',
   'private.agenda.summary',
-  'private.agenda.create'
+  'private.agenda.create',
+  'private.development.summary'
 ]){
   assert(bridge.includes("case '"+action+"'"),'bridge action missing: '+action);
   assert(server.includes("'"+action+"'"),'server action missing: '+action);
@@ -45,6 +46,15 @@ assert(html.includes('id="agendaForm"'),'Agenda SCD builder UI missing');
 assert(html.includes('id="agendaInvitees"'),'Agenda authorized invitee UI missing');
 assert(js.includes("fetch('/api/sponsor/agenda'"),'Agenda SCD frontend API missing');
 assert(js.includes("if(name==='eventi')loadAgenda()"),'Agenda lazy loading missing');
+assert(server.includes("u.pathname==='/api/sponsor/development'"),'protected Development route missing');
+assert(bridge.includes("r216CrmTable_('INIZIATIVE_COMMERCIALI')"),'Development canonical initiatives source missing');
+assert(bridge.includes("r216CrmTable_('FORNITORI_SPONSOR_RADAR')"),'Development supplier radar source missing');
+assert(bridge.includes("r216CrmTable_('STAKEHOLDERS_MASTER')"),'Development stakeholder source missing');
+assert(bridge.includes("sourceMode:'LIVE_MASTER'"),'Development source mode contract missing');
+assert(bridge.includes("futureDrawerIsNotImminent:true"),'Development drawer governance missing');
+assert(server.includes("DEVELOPMENT_SOURCE_UNVERIFIED"),'Development fail-closed source verification missing');
+assert(html.includes('id="developmentInspector"'),'Development inspector UI missing');
+assert(js.includes("fetch('/api/sponsor/development'"),'Development frontend API missing');
 assert(bridge.includes("remainingDailyQuota"),'mail quota diagnostics missing');
 assert(server.includes("Il codice temporaneo non è stato inviato"),'OTP false-success guard missing');
 assert(server.includes("UPSTREAM_WRITE_TIMEOUT_MS"),'write timeout separation missing');

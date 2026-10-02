@@ -54,7 +54,7 @@ function applyCors(req,res){
 const READ_ONLY_RETRY_ACTIONS = new Set([
   'public.feed','public.club','public.calendar','public.datafabric.contract',
   'dashboard.summary','private.dashboard','private.week','account.requests','private.user.workspace','private.crm.summary','private.crm.detail','private.community.summary','private.communication.templates','private.communication.preview',
-  'private.attendance.get','private.agenda.summary','auth.validate','direction.diagnostics',
+  'private.attendance.get','private.agenda.summary','private.development.summary','auth.validate','direction.diagnostics',
   'direction.evolution','direction.datafabric.status'
 ]);
 const UPSTREAM_READ_ATTEMPTS = 2;
@@ -64,7 +64,7 @@ const UPSTREAM_WRITE_TIMEOUT_MS = Math.max(5000,Math.min(30000,Number(process.en
 const wait = ms => new Promise(resolve=>setTimeout(resolve,ms));
 
 const allowedActions = new Set([
-  'dashboard.summary','private.dashboard','private.week','account.requests','private.user.workspace','private.crm.summary','private.crm.detail','private.community.summary','private.communication.templates','private.communication.preview','private.communication.send','private.communication.health','private.agenda.summary','private.agenda.create',
+  'dashboard.summary','private.dashboard','private.week','account.requests','private.user.workspace','private.crm.summary','private.crm.detail','private.community.summary','private.communication.templates','private.communication.preview','private.communication.send','private.communication.health','private.agenda.summary','private.agenda.create','private.development.summary',
   'private.request.submit','private.transport.request','private.message.send',
   'private.convocation.create','private.convocation.reply',
   'private.attendance.get','private.attendance.save',
@@ -445,6 +445,23 @@ async function handleSponsorAgenda(req,res){
   }catch(e){
     const code=e.message==='SESSION_REQUIRED'?401:400;
     return json(res,code,{ok:false,error:e.message||'AGENDA_FAILED'});
+  }
+}
+
+async function handleSponsorDevelopment(req,res){
+  if(req.method!=='GET')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  try{
+    const s=await validateSponsorSession(req);
+    const {parsed}=await callAppsScript('private.development.summary',{},s.token);
+    if(parsed&&parsed.ok===false)return json(res,503,{ok:false,error:parsed.error||'DEVELOPMENT_SOURCE_UNAVAILABLE'});
+    const data=unwrapPayload(parsed);
+    if(!data||data.sourceMode!=='LIVE_MASTER'||!Array.isArray(data.rows)){
+      return json(res,503,{ok:false,error:'DEVELOPMENT_SOURCE_UNVERIFIED'});
+    }
+    return json(res,200,{ok:true,data},{'cache-control':'no-store'});
+  }catch(e){
+    const code=e.message==='SESSION_REQUIRED'?401:503;
+    return json(res,code,{ok:false,error:e.message||'DEVELOPMENT_SOURCE_UNAVAILABLE'});
   }
 }
 
@@ -922,6 +939,7 @@ http.createServer(async(req,res)=>{
   if(u.pathname==='/api/sponsor/creative-scenes') return handleSponsorCreativeScenes(req,res);
   if(u.pathname==='/api/sponsor/communication') return handleSponsorCommunication(req,res);
   if(u.pathname==='/api/sponsor/agenda') return handleSponsorAgenda(req,res);
+  if(u.pathname==='/api/sponsor/development') return handleSponsorDevelopment(req,res);
   if(['/sponsor/app','/sponsor/app/','/sponsor/app.html','/sponsor/app.js'].includes(u.pathname)) return serveSponsorPrivate(req,res,u);
   if(u.pathname==='/api/scd') return proxyAppsScript(req,res);
   if(u.pathname==='/api/intake/form') return handleIntakeForm(req,res,u);
