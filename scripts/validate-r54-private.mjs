@@ -6,6 +6,10 @@ const manifest=JSON.parse(read('SCD_SYSTEM_MANIFEST.json'));
 const router=read('app-r24-router.js');
 const app=read('app.js');
 const css=read('ui-r24-shell.css');
+const current=read('scd-ng.js');
+const currentCss=read('scd-ng.css');
+const html=read('index.html');
+const sw=read('sw.js');
 
 const versionParts=String(manifest.manifest?.version||'0.0.0').split('.').map(Number);
 if((versionParts[0]||0)<3||((versionParts[0]||0)===3&&(versionParts[1]||0)<24))fail('manifest version must be >= 3.24.0');
@@ -42,6 +46,22 @@ if(!css.includes('.r54-private-actions')||!css.includes('.r54-status-list'))fail
 for(const fn of ['function openTransportManager','async function openMyRequests','function openInternalRequestManager']){
   if(!app.includes(fn))fail('private action implementation missing '+fn);
 }
+
+for(const token of [
+  'function openPrivateProfilesModule',
+  'function openPrivateTransportPanel',
+  'function openPrivateRequestsPanel',
+  "privatePost('account.requests'",
+  "privatePost('private.transport.request'",
+  "if(module==='TESSERATI'){openPrivateProfilesModule();return}",
+  "if(module==='PULMINI'){openPrivateTransportPanel",
+  'Nessun documento viene dichiarato presente',
+  'Importi, rate e scadenze compaiono solo quando restituiti dal gestionale'
+])if(!current.includes(token))fail('active Private Desk missing '+token);
+if(!currentCss.includes('.r54-current-profile-grid')||!currentCss.includes('.r54-private-form'))fail('active R54 responsive styles missing');
+if(!html.includes('./scd-ng.css?v=0.6.1')||!html.includes('./scd-ng.js?v=0.7.1'))fail('R54 active assets cache bust missing');
+if(!sw.includes("scd-nextgen-0.7.1-r54")||!sw.includes('./scd-ng.js?v=0.7.1'))fail('R54 PWA cache contract missing');
+if(current.includes('Documenti sincronizzati dal gestionale SCD'))fail('active Private Desk must not claim unverified document synchronization');
 
 const caps=new Map((manifest.capability_map||[]).map(x=>[x.id,x]));
 for(const id of ['CAP-ATHLETE','CAP-FAMILY','CAP-STAFF','CAP-PRIVATE-DESK']){
