@@ -24,6 +24,7 @@
     <a href="#sponsorwall">Sponsor Wall</a>
     <a href="#ecosistema">Web App</a>
     <a href="#convenzioni">Convenzioni</a>
+    <a href="#fondo-solidale">Fondo Solidale</a>
     <a href="#contatto">Diventa partner</a>
   </nav>
   <a class="access-button" href="https://scd-colicoderviese-official-r21.onrender.com/sponsor/?login=1">Accedi area riservata</a>
@@ -249,9 +250,82 @@
     <p class="fiscal-note">Eventuali agevolazioni fiscali dipendono dalla normativa applicabile, dal soggetto che effettua l'erogazione e dalla corretta tracciabilità/documentazione. La società non pubblica percentuali o benefici fiscali automatici senza preventiva verifica.</p>
   </section>
 
-  <section class="solidarity-fund" id="fondo-solidale" data-init-id="INIT-FONDO-SOLIDALE">
-    <div class="solidarity-mark"><span>SCD</span><strong>FONDO<br>SOLIDALE</strong></div>
-    <div class="solidarity-copy"><small>SPORT · INCLUSIONE · COMUNITÀ</small><h2>Aiutare un ragazzo a restare nello sport è un progetto di tutta la comunità.</h2><p>Il Fondo Solidale SCD è pensato per sostenere, secondo criteri e approvazioni societarie, la partecipazione sportiva di ragazzi e famiglie in difficoltà. Privati e aziende possono manifestare la volontà di contribuire: il contatto viene gestito direttamente dalla società e ogni erogazione dovrà essere tracciata e documentata secondo le regole applicabili.</p><button type="button" data-project-interest="Fondo Solidale SCD">Voglio sostenere il Fondo</button></div>
+  <section class="solidarity-fund donation-hub" id="fondo-solidale" data-init-id="INIT-FONDO-SOLIDALE">
+    <div class="solidarity-story">
+      <div class="solidarity-mark"><span>SCD</span><strong>FONDO<br>SOLIDALE</strong></div>
+      <div class="solidarity-copy">
+        <small>SPORT · INCLUSIONE · COMUNITÀ</small>
+        <h2>Una donazione spontanea può tenere un ragazzo dentro lo sport.</h2>
+        <p>Il Fondo Solidale SCD raccoglie contributi volontari destinati, secondo criteri e approvazioni societarie, a sostenere la partecipazione sportiva di ragazzi e famiglie in difficoltà. Il contributo è libero, una tantum e non attribuisce automaticamente qualità di socio, tesserato o sponsor.</p>
+        <div class="solidarity-impact">
+          <span>Quote e partecipazione sportiva</span>
+          <span>Materiale e dotazioni</span>
+          <span>Trasporti e accessibilità</span>
+          <span>Progetti di inclusione</span>
+        </div>
+        <p class="solidarity-transparency"><strong>Trasparenza:</strong> nessun nominativo viene pubblicato per impostazione predefinita. Importi raccolti, utilizzi e rendicontazione potranno essere comunicati in forma aggregata e verificata dalla società.</p>
+      </div>
+    </div>
+
+    <div class="donation-panel">
+      <div class="donation-panel-head">
+        <div><small>CONTRIBUTO SPONTANEO</small><h3>Sostieni il Fondo Solidale SCD</h3><p>Scegli l'importo, lascia i dati minimi necessari e prosegui con una modalità di versamento tracciabile quando disponibile.</p></div>
+        <span class="donation-security">Nessun dato carta viene raccolto in questa pagina</span>
+      </div>
+
+      <form id="solidarityDonationForm" class="donation-form">
+        <fieldset class="donation-amount-fieldset">
+          <legend>Importo della donazione</legend>
+          <div class="donation-amounts" role="radiogroup" aria-label="Importi suggeriti">
+            <button type="button" data-donation-amount="10">€10</button>
+            <button type="button" data-donation-amount="25">€25</button>
+            <button type="button" data-donation-amount="50" class="selected">€50</button>
+            <button type="button" data-donation-amount="100">€100</button>
+          </div>
+          <label class="donation-custom">Oppure inserisci un importo libero
+            <span class="donation-input-wrap"><span>€</span><input id="donationAmount" name="amount" type="number" min="5" max="5000" step="1" inputmode="decimal" value="50" required aria-describedby="donationAmountHelp"></span>
+          </label>
+          <small id="donationAmountHelp">Importo minimo €5. Il limite operativo può essere aggiornato dalla società.</small>
+        </fieldset>
+
+        <div class="two">
+          <label>Nome e cognome<input name="name" required autocomplete="name"></label>
+          <label>Email<input name="email" type="email" required autocomplete="email"></label>
+        </div>
+        <div class="two">
+          <label>Telefono facoltativo<input name="phone" autocomplete="tel"></label>
+          <label>Donatore<select name="donorType"><option value="PERSONA">Persona</option><option value="AZIENDA">Azienda / attività</option></select></label>
+        </div>
+        <label>Preferenza di utilizzo <small>(indicativa, non vincolante)</small>
+          <select name="preference">
+            <option value="FONDO_GENERALE">Fondo generale</option>
+            <option value="PARTECIPAZIONE">Quote e partecipazione sportiva</option>
+            <option value="MATERIALE">Materiale e dotazioni</option>
+            <option value="TRASPORTI">Trasporti e accessibilità</option>
+            <option value="INCLUSIONE">Progetti di inclusione</option>
+          </select>
+        </label>
+        <label class="privacy"><input type="checkbox" name="anonymous" checked> Mantieni il mio nome non pubblico. Un'eventuale pubblicazione richiederà un consenso separato.</label>
+        <label class="privacy"><input type="checkbox" name="privacy" required> Autorizzo SCD a utilizzare questi dati esclusivamente per registrare e gestire la mia intenzione di donazione e la relativa documentazione.</label>
+
+        <button class="primary-cta donation-submit" type="submit">Continua con la donazione</button>
+        <p class="donation-state" id="donationState" role="status" aria-live="polite">Verifico le modalità di versamento disponibili…</p>
+
+        <div class="donation-methods" id="donationMethods" hidden>
+          <a id="donationCheckoutLink" class="donation-method-card checkout" href="#" target="_blank" rel="noopener noreferrer" hidden>
+            <span>PAGAMENTO ONLINE</span><b>Prosegui sul gateway autorizzato</b><small>La transazione avviene fuori dalla Web App SCD.</small>
+          </a>
+          <div id="donationBankMethod" class="donation-method-card bank" hidden>
+            <span>BONIFICO TRACCIABILE</span><b id="donationBankBeneficiary"></b><small id="donationBankIban"></small><small id="donationBankReason"></small>
+            <button type="button" id="copyDonationIban">Copia IBAN</button>
+          </div>
+          <div id="donationManualMethod" class="donation-method-card manual" hidden>
+            <span>GESTIONE SCD</span><b>Richiesta registrata</b><small>Se nessun metodo diretto è ancora attivo, la società ti comunicherà una modalità di versamento tracciabile.</small>
+          </div>
+        </div>
+        <p class="fiscal-note donation-note">Il modulo registra l'intenzione di donazione, non certifica l'avvenuto pagamento. Eventuali agevolazioni fiscali, ricevute o attestazioni dipendono dalla normativa applicabile, dal soggetto erogante e dalla corretta tracciabilità/documentazione del versamento.</p>
+      </form>
+    </div>
   </section>
 
 
