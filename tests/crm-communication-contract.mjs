@@ -65,6 +65,17 @@ assert(server.includes("snap.source?.spreadsheetId==='1jb5Jt1ZYzJA-3oQd85AmwVhAo
 assert(developmentSnapshot.schema==='SCD_SPONSOR_DEVELOPMENT_SNAPSHOT_V1','Development snapshot schema mismatch');
 assert(developmentSnapshot.sourceMode==='SNAPSHOT_VERIFIED','Development snapshot must not present as live');
 assert(Array.isArray(developmentSnapshot.rows)&&developmentSnapshot.rows.length>=18,'Development snapshot rows missing');
+assert(bridge.includes('function collectRelatedSuppliers_'),'Development generic supplier resolver missing');
+assert(bridge.includes('function developmentAlias_'),'Development supplier alias normalization missing');
+const fitnessSnapshot=developmentSnapshot.rows.find(x=>x.id==='INIT-CENTRO-FITNESS-KOMPAN');
+assert(fitnessSnapshot&&fitnessSnapshot.relatedSuppliers.some(x=>x.supplierId==='SUP-KOMPAN'),'KOMPAN snapshot relation missing');
+assert(fitnessSnapshot&&fitnessSnapshot.relatedSuppliers.some(x=>x.supplierId==='SUP-SKYFITNESS'),'Skyfitness alternative relation missing');
+const dehorSnapshot=developmentSnapshot.rows.find(x=>x.id==='INIT-FUTURE-DEHOR-LUDICO');
+assert(dehorSnapshot&&dehorSnapshot.quoteStatus==='RECEIVED_TO_RECONCILE','Dehor verified quote status missing');
+assert(dehorSnapshot&&dehorSnapshot.isDrawer===true,'Dehor must remain in strategic drawer');
+assert(dehorSnapshot&&dehorSnapshot.relatedSuppliers.some(x=>x.supplierId==='SUP-VETRATEX'),'Vetratex dehor relation missing');
+assert(developmentSnapshot.source.supplierRange==='FORNITORI_SPONSOR_RADAR!A13:T16','Development snapshot supplier range stale');
+assert(developmentSnapshot.source.stakeholderRange==='STAKEHOLDERS_MASTER!A37:V40','Development snapshot stakeholder range stale');
 assert(html.includes('id="developmentInspector"'),'Development inspector UI missing');
 assert(js.includes("fetch('/api/sponsor/development'"),'Development frontend API missing');
 assert(js.includes("developmentState.sourceMode==='SNAPSHOT_VERIFIED'"),'Development snapshot disclosure label missing');
