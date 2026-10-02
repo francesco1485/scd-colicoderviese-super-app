@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.24.0",
+    "version": "3.25.0",
     "effective_at": "2026-10-02",
     "status": "BINDING",
     "language": "it-IT",
@@ -2821,6 +2821,18 @@
         "R20"
       ],
       "contract": "DERIVED_DAILY_ACTIONS_FROM_CANONICAL_PROJECT_STATUS_AND_AGENDA_NO_SYNTHETIC_DEADLINES_QUOTE_RECONCILIATION_PRIORITY"
+    },
+    {
+      "id": "CAP-PUBLIC-CONTENT-LAYER",
+      "domain": "PUBLIC_CONTENT",
+      "required": true,
+      "state": "PARTIAL",
+      "sources": [
+        "SCD_DIRECTION",
+        "SCD_NEWSROOM",
+        "R20"
+      ],
+      "contract": "VERIFIED_CURATED_CLUB_CONTENT_HOME_SOCIAL_SEARCH_WITH_STATUS_PROVENANCE_AND_FAIL_CLOSED_SPORT_DATA"
     }
   ],
   "known_noncompliance": [
@@ -4034,6 +4046,28 @@
       "legacy_router_status": "COMPATIBILITY_ONLY_NOT_PRIMARY",
       "no_parallel_private_app": true,
       "runtime": "SCD_NOVA_PRIVATE_DESK"
+    },
+    "public_content_r55": {
+      "release": "R55",
+      "state": "CONTENT_LAYER_ACTIVE",
+      "purpose": "FILL_PUBLIC_HOME_SOCIAL_AND_SEARCH_WITH_VERIFIED_CLUB_CONTENT_WITHOUT_INVENTING_SPORT_DATA",
+      "runtime": "scd-ng.js",
+      "source_file": "content/public-club.v1.json",
+      "source_authority": "SCD_DIRECTION",
+      "surfaces": [
+        "HOME:CLUB_NOW",
+        "SOCIAL:CLUB_FEED",
+        "PUBLIC_SEARCH"
+      ],
+      "rules": [
+        "CURATED_CLUB_CONTENT_MUST_DECLARE_SOURCE_AND_STATUS",
+        "PLANNED_PROJECTS_MUST_NOT_BE_PRESENTED_AS_COMPLETED",
+        "NO_PRIVATE_PEOPLE_OR_MINOR_PROFILES",
+        "NO_INVENTED_RESULTS_FIXTURES_SPONSORS_REWARDS_OR_STATISTICS",
+        "SPORT_DATA_REMAINS_FAIL_CLOSED",
+        "STATIC_CURATED_CONTENT_MUST_WORK_ON_PAGES_AND_RENDER"
+      ],
+      "activation": "PUBLIC"
     }
   },
   "research_intelligence": {
