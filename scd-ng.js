@@ -386,7 +386,7 @@ function renderSocialHub(){
  $$('[data-social-open]',mount).forEach(b=>b.onclick=()=>openSocialItem(map.get(b.dataset.socialOpen)));
  $$('[data-social-share]',mount).forEach(b=>b.onclick=()=>{const row=map.get(b.dataset.socialShare);if(row)shareSocialText(row.share,row.title)});
 }
-async $('#socialPointsLogin')?.addEventListener('click',()=>{
+$('#socialPointsLogin')?.addEventListener('click',()=>{
   try{
     if(window.R24?.go)return window.R24.go('profile');
   }catch{}
