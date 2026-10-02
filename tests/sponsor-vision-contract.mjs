@@ -168,4 +168,23 @@ for(const token of [
   "scd_activation_scenario_v2"
 ]) assert(js.includes(token),'R50 Creative Factory interaction missing: '+token);
 
+for(const token of [
+  'function ensureSponsorOperationsSurface()',
+  'data-view="azioni"',
+  'id="view-azioni"',
+  'id="homeActionQueue"',
+  'id="actionQueueGrid"',
+  'function commercialActions()',
+  'function renderActionQueue()',
+  '...suppliers.map',
+  '...commercialInitiatives.map'
+]) assert(js.includes(token),'Sponsor Operations runtime missing: '+token);
+
+assert(js.includes("const names=sponsors.map(s=>s.name);"),'current sponsor strip must contain current sponsor records only');
+const sponsorStripRuntime=js.slice(js.indexOf('function renderSponsorStrip()'),js.indexOf('function homeContracts()'));
+for(const prospect of ['IPERAL','HDI MAGLIA','DELLOCA','CARCANO'])assert(!sponsorStripRuntime.includes(prospect),'prospect leaked into current sponsor strip: '+prospect);
+const contractRuntime=js.slice(js.indexOf('function homeContracts()'),js.indexOf('function homeProposals()'));
+assert(!/status-badge">Attivo/.test(contractRuntime),'contract status must not be hardcoded as Attivo');
+assert(contractRuntime.includes('esc(s.status)'),'documented sponsor relationship status missing');
+
 console.log('Sponsor vision contract PASS');

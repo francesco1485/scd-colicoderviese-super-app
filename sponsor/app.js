@@ -566,6 +566,40 @@ function renderTerritoryHub(key=territoryCurrent){
 }
 $$('[data-territory-node]').forEach(b=>b.onclick=()=>renderTerritoryHub(b.dataset.territoryNode));
 
+function ensureSponsorOperationsSurface(){
+  const navRoot=$('#mainNav');
+  if(navRoot&&!navRoot.querySelector('[data-view="azioni"]')){
+    const after=navRoot.querySelector('[data-view="crm"]');
+    const navButton=document.createElement('button');
+    navButton.className='nav-link';
+    navButton.dataset.view='azioni';
+    navButton.type='button';
+    navButton.innerHTML='<i data-icon="target"></i><span>Azioni commerciali</span>';
+    after?.insertAdjacentElement('afterend',navButton);
+    const icon=navButton.querySelector('i');if(icon)icon.innerHTML=ICONS.target||'';
+  }
+
+  const main=$('.dashboard-main');
+  if(main&&!$('#homeActionQueue')){
+    const panel=document.createElement('article');
+    panel.className='panel action-queue-panel';
+    panel.setAttribute('aria-labelledby','homeActionQueueTitle');
+    panel.innerHTML='<header><div><i data-action-home-icon></i><h3 id="homeActionQueueTitle">Azioni commerciali da seguire</h3></div><button type="button" data-view="azioni">Apri radar →</button></header><div id="homeActionQueue" class="action-queue-list" aria-live="polite"></div>';
+    main.prepend(panel);
+    const icon=panel.querySelector('[data-action-home-icon]');if(icon)icon.innerHTML=ICONS.target||'';
+  }
+
+  const sponsorView=$('#view-sponsor');
+  if(sponsorView&&!$('#view-azioni')){
+    const section=document.createElement('section');
+    section.className='view';
+    section.id='view-azioni';
+    section.innerHTML='<div class="page-head"><div><small>RADAR OPERATIVO</small><h1>Azioni commerciali</h1><p>Una coda unica per sponsor attuali, prospect, convenzioni, fornitori e iniziative. Mostra soltanto informazioni già censite, senza inventare urgenze, probabilità o stati.</p></div></div><div class="page-tools sponsor-action-tools"><input id="actionSearch" class="filter-input" aria-label="Cerca nelle azioni commerciali" placeholder="Cerca azienda, azione o area…"><select id="actionLane" aria-label="Filtra azioni commerciali per area"><option value="ALL">Tutte le aree</option><option value="CURRENT">Sponsor attuali</option><option value="PROSPECT">Prospect / proposte</option><option value="CONVENTION">Convenzioni</option><option value="SUPPLIER">Fornitori → Sponsor</option><option value="INITIATIVE">Iniziative</option></select></div><div class="action-radar-note"><b>Stato operativo</b><span>Le azioni derivano dai dati censiti nella piattaforma. Nessuna voce viene considerata chiusa, urgente o probabile senza un dato esplicito.</span></div><div class="action-radar-grid" id="actionQueueGrid" aria-live="polite"></div>';
+    sponsorView.insertAdjacentElement('beforebegin',section);
+  }
+}
+ensureSponsorOperationsSurface();
+
 function openView(name){
   $$('.view').forEach(v=>v.classList.remove('active'));
   $('#view-'+name)?.classList.add('active');
@@ -589,14 +623,14 @@ function renderKpis(){
 }
 
 function renderSponsorStrip(){
-  const names=[...sponsors.map(s=>s.name),'IPERAL','HDI MAGLIA','DELLOCA','CARCANO'];
+  const names=sponsors.map(s=>s.name);
   const row=names.map(n=>'<span class="strip-item">'+esc(n)+'</span>').join('');
   $('#sponsorStrip').innerHTML=row+row;
 }
 
 function homeContracts(){
   $('#homeContracts').innerHTML='<table class="table-mini"><thead><tr><th>Sponsor</th><th>Tipologia</th><th>Validità</th><th>Stato</th></tr></thead><tbody>'+
-  sponsors.slice(0,4).map(s=>'<tr onclick="openSponsor(\''+s.name.replace(/'/g,"\\'")+'\')"><td><b>'+esc(s.name)+'</b></td><td>'+esc(s.type)+'</td><td>'+esc(s.period)+'</td><td><span class="status-badge">Attivo</span></td></tr>').join('')+'</tbody></table>';
+  sponsors.slice(0,4).map(s=>'<tr onclick="openSponsor(\''+s.name.replace(/'/g,"\\'")+'\')"><td><b>'+esc(s.name)+'</b></td><td>'+esc(s.type)+'</td><td>'+esc(s.period)+'</td><td><span class="status-badge '+(/DOCUMENTATO|PARTNER TECNICO/.test(s.status)?'blue':'orange')+'">'+esc(s.status)+'</span></td></tr>').join('')+'</tbody></table>';
 }
 function homeProposals(){
   $('#homeProposals').innerHTML='<table class="table-mini"><thead><tr><th>Azienda</th><th>Area</th><th>Stato</th><th>Valore</th></tr></thead><tbody>'+
@@ -689,10 +723,12 @@ async function loadConventions(){
       updatedAt:String(x.updatedAt||'')
     }));
     renderConventions();
+    renderActionQueue();
   }catch(e){
     communityState={sourceMode:'ERROR',sourceTable:'CONVENZIONI_MASTER',generatedAt:'',fallbackReason:String(e.message||e)};
     conventions=[];
     renderConventions();
+    renderActionQueue();
   }
 }
 
@@ -746,6 +782,35 @@ function renderAudience(){
   if($('#audienceGrid'))$('#audienceGrid').innerHTML=audience.map(x=>'<article class="report-card"><h3>'+esc(x.segment)+'</h3><div class="report-value">'+esc(x.value)+'</div><p>'+esc(x.unit)+' · '+esc(x.source)+'</p><p>'+esc(x.note)+'</p></article>').join('');
   $$('[data-public-link]').forEach(b=>b.onclick=()=>location.href='/sponsor/');
 }
+
+function commercialActions(){
+  return [
+    ...sponsors.map(x=>({lane:'CURRENT',label:'Sponsor attuale',name:x.name,state:x.status,action:x.next,meta:[x.type,x.period].filter(Boolean).join(' · '),view:'sponsor'})),
+    ...proposals.map(x=>({lane:'PROSPECT',label:'Prospect / proposta',name:x.name,state:x.status,action:x.next,meta:[x.area,x.value].filter(Boolean).join(' · '),view:'proposte'})),
+    ...conventions.map(x=>({lane:'CONVENTION',label:'Convenzione',name:x.name,state:x.status,action:x.next,meta:[x.benefit,x.where].filter(Boolean).join(' · '),view:'convenzioni'})),
+    ...suppliers.map(x=>({lane:'SUPPLIER',label:'Fornitore → Sponsor',name:x.name,state:x.potential,action:x.next,meta:'Posizione documentata: '+x.position+' · residuo '+x.residual,view:'fornitori'})),
+    ...commercialInitiatives.map(x=>({lane:'INITIATIVE',label:'Iniziativa',name:x.name,state:x.status,action:x.next,meta:[x.type,x.target].filter(Boolean).join(' · '),view:'iniziative'}))
+  ].filter(x=>x.action);
+}
+function actionLaneLabel(lane){
+  return ({CURRENT:'SPONSOR ATTUALE',PROSPECT:'PROSPECT / PROPOSTA',CONVENTION:'CONVENZIONE',SUPPLIER:'FORNITORE → SPONSOR',INITIATIVE:'INIZIATIVA'})[lane]||lane;
+}
+function actionCard(x,compact=false){
+  return '<article class="'+(compact?'action-mini':'action-radar-card')+'"><div class="action-radar-top"><span>'+esc(actionLaneLabel(x.lane))+'</span><em>'+esc(x.state||'DA VERIFICARE')+'</em></div><h3>'+esc(x.name)+'</h3><p>'+esc(x.action)+'</p>'+(compact?'':'<small>'+esc(x.meta||'')+'</small><button type="button" data-action-view="'+esc(x.view)+'">Apri area →</button>')+'</article>';
+}
+function renderActionQueue(){
+  const all=commercialActions();
+  const home=$('#homeActionQueue');
+  if(home)home.innerHTML=all.slice(0,6).map(x=>actionCard(x,true)).join('')||'<div class="compact-item"><small>Nessuna azione censita.</small></div>';
+  const mount=$('#actionQueueGrid');if(!mount)return;
+  const term=($('#actionSearch')?.value||'').toLowerCase().trim();
+  const lane=$('#actionLane')?.value||'ALL';
+  const rows=all.filter(x=>(lane==='ALL'||x.lane===lane)&&(!term||[x.name,x.action,x.meta,x.state,x.label].join(' ').toLowerCase().includes(term)));
+  mount.innerHTML=rows.length?rows.map(x=>actionCard(x,false)).join(''):'<div class="action-radar-empty"><b>Nessuna azione trovata</b><span>Modifica i filtri oppure verifica i dati disponibili.</span></div>';
+  $$('[data-action-view]',mount).forEach(b=>b.onclick=()=>openView(b.dataset.actionView));
+}
+$('#actionSearch')?.addEventListener('input',renderActionQueue);
+$('#actionLane')?.addEventListener('change',renderActionQueue);
 
 function renderFolders(){
   $('#folderGrid').innerHTML=folders.map(x=>'<article class="folder-card"><div class="folder-icon"></div><h3>'+esc(x)+'</h3><p>Collega qui i file ufficiali del progetto Sponsor.</p></article>').join('');
@@ -809,8 +874,13 @@ window.openSponsor=function(name){
 
 function searchItems(){
   return [
-    ...sponsors.map(s=>({title:s.name,meta:'Sponsor · '+s.sector,view:'sponsor',action:()=>openSponsor(s.name)})),
-    ...proposals.map(p=>({title:p.name,meta:'Proposta · '+p.area,view:'proposte'})),
+    ...sponsors.map(s=>({title:s.name,meta:'Sponsor attuale · '+s.sector,view:'sponsor',action:()=>openSponsor(s.name)})),
+    ...proposals.map(p=>({title:p.name,meta:'Prospect / proposta · '+p.area,view:'proposte'})),
+    ...conventions.map(x=>({title:x.name,meta:'Convenzione · '+x.status,view:'convenzioni'})),
+    ...suppliers.map(x=>({title:x.name,meta:'Fornitore → Sponsor · '+x.potential,view:'fornitori'})),
+    ...commercialInitiatives.map(x=>({title:x.name,meta:'Iniziativa · '+x.status,view:'iniziative'})),
+    ...audience.map(x=>({title:x.segment,meta:'Audience · '+x.source,view:'audience'})),
+    ...events.map(x=>({title:x[1],meta:'Evento · '+x[0]+' · '+x[3],view:'eventi'})),
     ...assets.map(a=>({title:a[0],meta:'Asset · '+a[2],view:'opportunita'})),
     ...led.map(l=>({title:l[0],meta:'LED · '+l[1],view:'media'}))
   ];
@@ -839,7 +909,7 @@ $('#newSponsorForm').onsubmit=e=>{e.preventDefault();const fd=new FormData(e.tar
 
 $('#promoReviewBtn').onclick=()=>{localStorage.setItem('scd_promo_review','review');$('#promoText').textContent='Promozione messa in revisione interna. Nessuna pubblicazione automatica.'};
 
-renderKpis();renderSponsorStrip();homeContracts();homeProposals();renderAvailability();renderHomeEvents();renderPipeline();renderNews();renderStats();renderPoll();renderTags();renderPartnerHub();renderCampaignStudio();renderSponsorWall();renderTerritoryHub();
+renderKpis();renderSponsorStrip();homeContracts();homeProposals();renderAvailability();renderHomeEvents();renderPipeline();renderNews();renderStats();renderPoll();renderTags();renderPartnerHub();renderCampaignStudio();renderSponsorWall();renderTerritoryHub();renderActionQueue();
 renderSponsorViews();renderContracts();renderProposalGrid();renderSuppliers();renderCommercialInitiatives();renderAudience();renderFolders();renderLed();renderEvents();renderReport();renderAssets();renderScenario();renderSettings();
 
 function activateKeyboardCards(){

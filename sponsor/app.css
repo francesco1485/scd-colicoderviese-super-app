@@ -2204,3 +2204,29 @@ body{background:linear-gradient(180deg,#eef5fb,#f7fbfe 55%,#edf5fb);color:var(--
   .led-source-review-head{flex-direction:column}
   .led-review-compare{grid-template-columns:1fr}
 }
+
+
+/* ===== SPONSOR OPERATIONS RADAR · KEEP_ENHANCE ===== */
+.action-queue-panel{margin-bottom:12px}
+.action-queue-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.action-mini{min-height:126px;padding:13px;border:1px solid #dbe6ef;border-radius:13px;background:linear-gradient(145deg,#fff,#f7fbfe)}
+.action-mini .action-radar-top,.action-radar-card .action-radar-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.action-radar-top span{font-size:.7rem;font-weight:900;letter-spacing:.05em;color:#2a70a8}
+.action-radar-top em{max-width:52%;font-size:.68rem;font-style:normal;font-weight:850;color:#7b5b12;text-align:right}
+.action-mini h3{margin:10px 0 5px;font-size:1rem;color:#16304d}
+.action-mini p{margin:0;color:#52687d;font-size:.82rem;line-height:1.45}
+.sponsor-action-tools{display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,320px);gap:10px}
+.action-radar-note{display:flex;align-items:flex-start;gap:12px;margin:0 0 14px;padding:12px 14px;border:1px solid #dbe6ef;border-radius:12px;background:#f8fbfd}
+.action-radar-note b{font-size:.86rem;color:#1f608f;white-space:nowrap}
+.action-radar-note span{font-size:.82rem;color:#52687d;line-height:1.5}
+.action-radar-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.action-radar-card{display:grid;align-content:start;min-height:220px;padding:16px;border:1px solid #dbe6ef;border-radius:15px;background:#fff;box-shadow:0 12px 30px rgba(17,56,94,.07)}
+.action-radar-card h3{margin:12px 0 7px;font-size:1.1rem;color:#16304d}
+.action-radar-card p{margin:0;color:#364f67;font-size:.92rem;line-height:1.5}
+.action-radar-card small{margin-top:10px;color:#6e8295;font-size:.78rem;line-height:1.45}
+.action-radar-card button{justify-self:start;margin-top:14px;min-height:44px;border:1px solid #cbdce9;border-radius:10px;background:#f5f9fc;color:#205f8f;padding:0 12px;font-weight:850;cursor:pointer}
+.action-radar-card button:hover,.action-radar-card button:focus-visible{background:#eaf4fb;outline:2px solid #0870cf;outline-offset:2px}
+.action-radar-empty{grid-column:1/-1;display:grid;place-items:center;min-height:180px;padding:20px;border:1px dashed #cbdce9;border-radius:14px;color:#52687d;text-align:center}
+.action-radar-empty b{color:#16304d}.action-radar-empty span{font-size:.84rem}
+@media(max-width:1180px){.action-queue-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){.action-queue-list,.action-radar-grid{grid-template-columns:1fr}.sponsor-action-tools{grid-template-columns:1fr}.action-radar-note{flex-direction:column}}

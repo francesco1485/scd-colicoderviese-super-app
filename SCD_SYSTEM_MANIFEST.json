@@ -2658,6 +2658,21 @@
         "TUTTOCAMPO"
       ],
       "contract": "SOURCE_GROUNDED_MATCHDAY_TEAM_OPPONENT_TIME_VENUE_COMPETITION_VERIFIED_STANDINGS_FORM_H2H_FAIL_CLOSED_NO_PREDICTIONS"
+    },
+    {
+      "id": "CAP-SPONSOR-OPERATIONS",
+      "domain": "COMMERCIAL",
+      "required": true,
+      "state": "PARTIAL",
+      "sources": [
+        "SPONSOR_MASTER_SHEET",
+        "ECONOMIC_MASTER_SHEET",
+        "MAIL_OPERATIONS_SHEET",
+        "TOURNAMENTS_MASTER_SHEET",
+        "SCD_GMAIL",
+        "SCD_DRIVE"
+      ],
+      "contract": "PRIVATE_CURRENT_VS_PROSPECT_CONVENTIONS_SUPPLIERS_INITIATIVES_ACTION_QUEUE_SEARCH_NO_FAKE_STATUS"
     }
   ],
   "known_noncompliance": [
@@ -3565,6 +3580,54 @@
       "roster": "NO_PRIVATE_ROSTER",
       "people": "PUBLIC_AUTHORIZED_PROFILES_ONLY",
       "deep_link_calendar": true
+    },
+    "sponsor_operations_radar": {
+      "state": "PRIVATE_OPERATIONAL_WORKBENCH",
+      "audience": [
+        "DIRECTION",
+        "AUTHORIZED_COMMERCIAL_STAFF"
+      ],
+      "principle": "SEPARATE_CURRENT_RELATIONSHIPS_FROM_FUTURE_OPPORTUNITIES_AND_TURN_EACH_RECORD_INTO_A_NEXT_ACTION",
+      "lanes": [
+        "CURRENT_SPONSORS_AND_PARTNERS",
+        "PROSPECTS_AND_PROPOSALS",
+        "CONVENTIONS",
+        "SUPPLIERS_TO_PARTNERS",
+        "COMMERCIAL_INITIATIVES",
+        "EVENT_AND_MEDIA_ASSETS"
+      ],
+      "sources": [
+        "SPONSOR_MASTER_SHEET",
+        "ECONOMIC_MASTER_SHEET",
+        "MAIL_OPERATIONS_SHEET",
+        "TOURNAMENTS_MASTER_SHEET",
+        "SCD_GMAIL",
+        "SCD_DRIVE"
+      ],
+      "rules": [
+        "PROSPECT_NEVER_RENDERED_AS_CONFIRMED_SPONSOR",
+        "CURRENT_SPONSOR_STRIP_USES_DOCUMENTED_CURRENT_RELATIONSHIPS_ONLY",
+        "CONTRACT_STATUS_MUST_NOT_BE_HARDCODED_AS_ACTIVE",
+        "CONVENTION_NOT_PUBLIC_UNTIL_FORMALIZED_AND_DIRECTION_APPROVED",
+        "SUPPLIER_SPEND_IS_NOT_AUTOMATIC_SPONSORSHIP_VALUE",
+        "NO_PREDICTED_CLOSE_PROBABILITY_WITHOUT_VERIFIED_MODEL_AND_DATA",
+        "NEXT_ACTION_VISIBLE_FOR_EACH_PIPELINE_ITEM",
+        "SEARCH_COVERS_SPONSORS_PROSPECTS_CONVENTIONS_SUPPLIERS_INITIATIVES_ASSETS_AND_MEDIA",
+        "PRIVATE_CONTACT_DETAILS_STAY_INSIDE_AUTHENTICATED_WORKBENCH"
+      ],
+      "dashboard": {
+        "primary_blocks": [
+          "ACTION_QUEUE",
+          "CURRENT_RELATIONSHIPS",
+          "PROSPECT_PIPELINE",
+          "CONVENTIONS",
+          "SUPPLIER_RADAR",
+          "COMMERCIAL_INITIATIVES",
+          "AVAILABLE_ASSETS"
+        ],
+        "fake_live_labels": false,
+        "local_poll_must_be_labeled_local": true
+      }
     }
   },
   "research_intelligence": {
