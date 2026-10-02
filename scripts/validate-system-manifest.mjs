@@ -151,6 +151,13 @@ assert(m.product_direction?.public_core_navigation?.state==='DEDICATED_PUBLIC_VI
 assert((m.product_direction?.public_core_navigation?.routes||[]).some(x=>x.id==='CALENDAR'&&x.hash==='#calendar'),'dedicated calendar route missing');
 assert((m.product_direction?.public_core_navigation?.routes||[]).some(x=>x.id==='TEAMS'&&x.hash==='#teams'),'dedicated teams route missing');
 assert((m.capability_map||[]).some(x=>x.id==='CAP-PUBLIC-TEAMS'),'CAP-PUBLIC-TEAMS missing');
+assert((m.capability_map||[]).some(x=>x.id==='CAP-PUBLIC-MATCHDAY'),'CAP-PUBLIC-MATCHDAY missing');
+assert(m.product_direction?.public_matchday?.no_invented_stats===true,'R48 Matchday invented stats must remain forbidden');
+assert(m.product_direction?.public_matchday?.no_prediction===true,'R48 Matchday predictions must remain disabled');
+assert(m.product_direction?.public_matchday?.missing_data==='DATO_IN_AGGIORNAMENTO','R48 Matchday fail-closed state missing');
+assert(m.product_direction?.team_hub?.roster==='NO_PRIVATE_ROSTER','R48 Team Hub private roster guard missing');
+assert(m.product_direction?.team_hub?.followed_team_preference==='LOCAL_DEVICE_ONLY','R48 followed-team preference must remain local');
+assert(m.product_direction?.media_and_social_hub?.video_arena?.pixellot==='PRIVATE_BY_DEFAULT_AUTHORIZED_STAFF_ONLY','R48 Video Arena Pixellot privacy guard missing');
 
 assert(m.product_direction?.ai_newsroom?.policy==='VERIFIED_STRUCTURED_FACTS_ONLY','R40 newsroom policy mismatch');
 assert(m.product_direction?.ai_newsroom?.stale_site_content===false,'R40 newsroom must exclude stale site content');
@@ -251,7 +258,7 @@ includesAll(caps.map(x=>x.id),[
   'CAP-HOME','CAP-CALENDAR','CAP-ATHLETE','CAP-FAMILY','CAP-STAFF','CAP-COMMS','CAP-RUNTIME-EVIDENCE','CAP-UPSTREAM-RESILIENCE','CAP-R20-RUNTIME-ACTIVATION',
   'CAP-DRIVE-CATALOG','CAP-GMAIL-INGESTION','CAP-DATAFABRIC-OBSERVABILITY','CAP-ENTITY-GRAPH','CAP-COMPLETENESS','CAP-SUPABASE-CORE','CAP-SUPABASE-AUTH-CONTEXT',
   'CAP-CHAT','CAP-CONFIDENCE','CAP-ANCONFIDENCE','CAP-SAFEGUARDING','CAP-SKY','CAP-AVATAR',
-  'CAP-TAMAGOTCHI','CAP-GEO','CAP-R22','CAP-PWA','CAP-ANDROID','CAP-IOS','CAP-MOBILE-SUPABASE-SHELL','CAP-SCD-UNIVERSE','CAP-META-ADAPTIVE','CAP-SCD-TWIN','CAP-SCD-MIRROR','CAP-SOCIAL-RADAR','CAP-HUMAN-OS','CAP-PRIVATE-DESK','CAP-COGNITIVE-ERGONOMICS','CAP-GROWTH-LOOP','CAP-WEEKLY-SPORT-CALENDAR','CAP-AI-NEWSROOM','CAP-MEDIA-SOCIAL-HUB','CAP-STAFF-ROLE-INGESTION'
+  'CAP-TAMAGOTCHI','CAP-GEO','CAP-R22','CAP-PWA','CAP-ANDROID','CAP-IOS','CAP-MOBILE-SUPABASE-SHELL','CAP-SCD-UNIVERSE','CAP-META-ADAPTIVE','CAP-SCD-TWIN','CAP-SCD-MIRROR','CAP-SOCIAL-RADAR','CAP-HUMAN-OS','CAP-PRIVATE-DESK','CAP-COGNITIVE-ERGONOMICS','CAP-GROWTH-LOOP','CAP-WEEKLY-SPORT-CALENDAR','CAP-AI-NEWSROOM','CAP-MEDIA-SOCIAL-HUB','CAP-STAFF-ROLE-INGESTION','CAP-PUBLIC-MATCHDAY'
 ],'capability map');
 
 const gaps=m.known_noncompliance||[];
