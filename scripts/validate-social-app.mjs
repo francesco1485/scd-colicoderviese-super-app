@@ -13,7 +13,8 @@ for(const token of [
   'id="socialSearch"',
   'data-nav="social"',
   'ui-r52-social.css',
-  'lib/scd-operative-engine.js'
+  'lib/scd-operative-engine.js',
+  'id="installApp"'
 ]) if(!html.includes(token))fail('index missing '+token);
 
 for(const token of [
@@ -23,6 +24,8 @@ for(const token of [
   'shareSocialText',
   "state.socialFilter",
   "window.SCDOperativeEngine?.buildMatchDayCaption",
+  "navigator.serviceWorker.register('./sw.js')",
+  "beforeinstallprompt",
   "['pulse','calendar','teams','social','twin','desk']"
 ]) if(!js.includes(token))fail('runtime missing '+token);
 
