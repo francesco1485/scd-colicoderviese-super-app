@@ -3615,7 +3615,7 @@
       "deep_link_calendar": true
     },
     "solidarity_fund": {
-      "state": "PUBLIC_DONATION_AND_AGGREGATE_REPORTING_READY_CHANNELS_CONFIG_GATED",
+      "state": "PUBLIC_DONATION_REPORTING_UI_READY_SOURCE_ADAPTER_BLOCKED",
       "id": "SCD_SOLIDARITY_FUND",
       "purpose": "Sostegno alla partecipazione sportiva di ragazzi e famiglie in difficolta secondo criteri e approvazioni societarie.",
       "public_surfaces": [
@@ -3668,19 +3668,20 @@
         "payment_confirmation": "OFFICIAL_CHANNEL_ONLY"
       },
       "reporting": {
-        "endpoint": "/api/public/donation-summary",
+        "surface": "SPONSOR_PUBLIC",
+        "state": "FAIL_CLOSED_UNTIL_VERIFIED_SOURCE_ADAPTER",
+        "endpoint_target": "/api/public/donation-summary",
         "visibility": "PUBLIC_AGGREGATED_ONLY",
         "donor_identity_exposure": false,
         "donor_wall": false,
-        "source_gate": "EXPLICIT_VERIFIED_ENV_CONFIG_REQUIRED",
-        "unavailable_state": "FAIL_CLOSED_NO_INVENTED_TOTALS",
+        "source_gate": "EXPLICIT_VERIFIED_SOURCE_REQUIRED",
+        "unavailable_state": "SHOW_NO_TOTALS",
         "fields": [
           "CONFIRMED_AMOUNT",
           "ALLOCATED_AMOUNT",
           "AVAILABLE_BALANCE",
           "AS_OF",
-          "SOURCE_LABEL",
-          "SOURCE_URL"
+          "SOURCE_LABEL"
         ],
         "privacy_rule": "NO_PERSONAL_DONOR_DATA"
       }

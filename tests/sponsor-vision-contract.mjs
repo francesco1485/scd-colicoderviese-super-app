@@ -62,6 +62,8 @@ for(const token of [
   'Fondo Solidale SCD',
   'id="donationConsole"',
   'id="solidarityIntentForm"',
+  'id="donationReport"',
+  'Rendiconto pubblico in attesa di una fonte ufficiale verificata',
   'data-donation-amount="25"',
   'Nessun elenco pubblico donatori',
   'agevolazioni fiscali dipendono dalla normativa applicabile',
