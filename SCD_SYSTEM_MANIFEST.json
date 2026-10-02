@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.14.0",
+    "version": "3.15.0",
     "effective_at": "2026-10-02",
     "status": "BINDING",
     "language": "it-IT",
@@ -2696,6 +2696,16 @@
         "TUTTOCAMPO"
       ],
       "contract": "SOURCE_GROUNDED_MATCHDAY_TEAM_OPPONENT_TIME_VENUE_COMPETITION_VERIFIED_STANDINGS_FORM_H2H_FAIL_CLOSED_NO_PREDICTIONS"
+    },
+    {
+      "id": "CAP-SOLIDARITY-FUND",
+      "domain": "COMMUNITY_FINANCE_PUBLIC",
+      "required": true,
+      "state": "PARTIAL",
+      "sources": [
+        "R20"
+      ],
+      "contract": "PUBLIC_VOLUNTARY_DONATION_AREA_CONFIG_GATED_OFFICIAL_CHANNELS_NO_CARD_STORAGE_NO_PUBLIC_DONOR_WALL_NO_AUTO_TAX_CLAIMS_NO_ROLE_OR_MEMBERSHIP_SIDE_EFFECTS"
     }
   ],
   "known_noncompliance": [
@@ -3603,6 +3613,54 @@
       "roster": "NO_PRIVATE_ROSTER",
       "people": "PUBLIC_AUTHORIZED_PROFILES_ONLY",
       "deep_link_calendar": true
+    },
+    "solidarity_fund": {
+      "state": "PUBLIC_DONATION_AREA_READY_CHANNELS_CONFIG_GATED",
+      "id": "SCD_SOLIDARITY_FUND",
+      "purpose": "Sostegno alla partecipazione sportiva di ragazzi e famiglie in difficolta secondo criteri e approvazioni societarie.",
+      "public_surfaces": [
+        "HOME_PUBLIC",
+        "SPONSOR_PUBLIC"
+      ],
+      "donation_mode": "VOLUNTARY_SPONTANEOUS",
+      "currency": "EUR",
+      "amount_policy": {
+        "min": 1,
+        "max": 50000,
+        "presets": [
+          10,
+          25,
+          50,
+          100
+        ],
+        "user_can_choose_custom_amount": true
+      },
+      "payment_channels": {
+        "online": "HTTPS_VERIFIED_ENV_CONFIG_ONLY",
+        "bank_transfer": "PUBLIC_ONLY_WITH_EXPLICIT_ENV_ENABLE_AND_VERIFIED_COORDINATES",
+        "card_data_handling": "NEVER_STORED_BY_SCD_FRONTEND_OR_SERVER",
+        "no_channel_configured": "FAIL_CLOSED_SHOW_CONTACT_INSTRUCTIONS_ONLY"
+      },
+      "privacy": {
+        "public_donor_wall": false,
+        "public_anonymity_default": true,
+        "minors_personal_data_in_donation_flow": false,
+        "contact_data_only_for_instruction_request": true
+      },
+      "legal_guards": {
+        "donation_does_not_grant_member_status": true,
+        "donation_does_not_grant_athlete_status": true,
+        "donation_does_not_grant_sponsor_status": true,
+        "automatic_tax_benefit_claims": false,
+        "payment_confirmation_only_from_official_channel": true
+      },
+      "intent_logging": {
+        "endpoint": "/api/public/donation-intent",
+        "upstream_action": "public.ticketSubmit",
+        "payment_confirmation": false,
+        "human_followup": "DIRECTION_OR_ADMINISTRATION"
+      },
+      "config_endpoint": "/api/public/donation-config"
     }
   },
   "research_intelligence": {
