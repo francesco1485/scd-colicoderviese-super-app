@@ -16,15 +16,24 @@ assert(cfg.productionTarget?.resolutionStatus==='NATIVE_LED_RESOLUTION_TO_BE_MEA
 assert(cfg.productionTarget?.logoRequirement==='OFFICIAL_APPROVED_LOGO_REQUIRED_BEFORE_FINAL_MP4','official logo gate missing');
 assert(cfg.productionTarget?.cameraSafe===true,'camera-safe production rule missing');
 assert(cfg.productionTarget?.stadiumReadable===true,'stadium readability rule missing');
+assert(cfg.crmBinding?.source==='STAKEHOLDERS_MASTER','canonical CRM binding source missing');
+assert(cfg.crmBinding?.rule==='ONE_PARTNER_ONE_CANONICAL_STAKEHOLDER','canonical CRM one-partner rule missing');
+assert(cfg.crmBinding?.profileKey==='crmStakeholderId','CRM profile key contract missing');
 
 assert(cfg.productionTarget?.storyboardDurationSeconds===40,'40s storyboard duration missing');
 assert(Array.isArray(cfg.productionTarget?.requiredGates)&&cfg.productionTarget.requiredGates.includes('OFFICIAL_APPROVED_LOGO'),'official logo production gate list missing');
 assert(Array.isArray(cfg.productionTarget?.previewModes)&&cfg.productionTarget.previewModes.includes('TRIBUNA')&&cfg.productionTarget.previewModes.includes('CAMERA'),'tribuna/camera preview modes missing');
 
 
+const expectedCrm={
+  'GGlass':'STK-GGLASS',
+  'TA Cleaning':'STK-TA-CLEANING',
+  'AGC Medical':'STK-AGC-MEDICAL'
+};
 for(const name of ['GGlass','TA Cleaning','AGC Medical']){
   const p=cfg.profiles.find(x=>x.partnerName===name);
   assert(p,'motion profile missing: '+name);
+  assert(p.crmStakeholderId===expectedCrm[name],'canonical CRM stakeholder binding missing: '+name);
   assert(p.motionConcept,'motion concept missing: '+name);
   assert(p.stadiumView,'stadium view missing: '+name);
   assert(p.cameraView,'camera view missing: '+name);
@@ -43,7 +52,7 @@ for(const name of ['GGlass','TA Cleaning','AGC Medical']){
 for(const token of ['LED PRODUCTION HUB','id="ledProfileList"','id="ledProfileDetail"','id="ledProductionSpecs"']){
   assert(html.includes(token),'LED Production Hub UI missing: '+token);
 }
-for(const token of ['initLedProductionHub','renderLedProfileDetail','ledMotionBrief','/api/sponsor/motion-profiles','fetchMotionConfig','led-tribuna-simulator','data-led-sim-view-btn','data-led-cue','SIMULAZIONE CONCETTUALE · NON FOTO DOCUMENTARIA']){
+for(const token of ['initLedProductionHub','renderLedProfileDetail','ledMotionBrief','/api/sponsor/motion-profiles','fetchMotionConfig','led-tribuna-simulator','data-led-sim-view-btn','data-led-cue','SIMULAZIONE CONCETTUALE · NON FOTO DOCUMENTARIA','motionOpenCrm','ledOpenCrm','openCrmProfile(p.crmStakeholderId)']){
   assert(js.includes(token),'LED Production Hub interaction missing: '+token);
 }
 assert(js.includes("p.logoAssetStatus==='APPROVED_OFFICIAL_ASSET'&&p.logoAssetPath"),'final MP4 logo readiness gate missing in UI');
