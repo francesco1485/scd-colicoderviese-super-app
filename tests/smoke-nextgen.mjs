@@ -329,6 +329,77 @@ for(const viewport of [{width:390,height:844},{width:1440,height:900}]){
   await privatePage.close();
 }
 
+// R56 Direction onboarding/access journey.
+mark('R56_IDENTITY_ACCESS_JOURNEY');
+{
+  const page=await browser.newPage({viewport:{width:390,height:844}});
+  const errors=[];let telemetrySeen=false,inviteSeen=false,pinSeen=false;
+  page.on('pageerror',e=>errors.push(String(e)));
+  page.on('console',m=>{if(m.type()==='error')errors.push('console: '+m.text())});
+
+  const directionDashboard={
+    user:{name:'Direzione QA',email:'direction@example.test',role:'DIREZIONE',staff:true},
+    permissions:{direction:true},personal:[],teams:[],convocations:[],transport:{kpis:{requests:0}}
+  };
+  const directionWorkspace={
+    name:'Direzione QA',email:'direction@example.test',role:'DIREZIONE',
+    privateDeskProfile:'EXECUTIVE_FULL',defaultModules:['CALENDARIO','DOCUMENTI'],
+    dataScope:['CLUB'],communicationScope:['ALL_AUTHORIZED'],areas:[{canAdmin:true}]
+  };
+
+  await page.route('**/api/scd',async route=>{
+    const req=route.request();if(req.method()!=='POST')return route.continue();
+    let body={};try{body=JSON.parse(req.postData()||'{}')}catch{}
+    const action=String(body.action||'');let data;
+    if(action==='public.telemetry'){telemetrySeen=true;data={accepted:true}}
+    else if(action==='auth.login')data={token:'qa-direction-token'};
+    else if(action==='auth.validate')data={valid:true};
+    else if(action==='dashboard.summary')data=directionDashboard;
+    else if(action==='private.user.workspace')data=directionWorkspace;
+    else if(action==='direction.access.invite'){inviteSeen=true;data={ok:true,email:'new.user@example.test',role:'FAMILY',identity:{matched:true,matchMethod:'EMAIL_EXACT'},temporaryCodeSent:true}}
+    else if(action==='auth.pin.change'){pinSeen=true;data={ok:true}}
+    else return route.continue();
+    await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({ok:true,data})});
+  });
+
+  await page.goto(base+'/#desk',{waitUntil:'domcontentloaded',timeout:30000});
+  await page.waitForSelector('#scdCookieBanner:not([hidden])');
+  await page.click('#scdAnalyticsAccept');
+  await page.waitForFunction(()=>document.cookie.includes('scd_analytics_consent=yes'));
+  await page.waitForTimeout(100);
+  if(!telemetrySeen)throw new Error('R56 consented telemetry not sent');
+
+  await page.fill('#privateDeskEmail','direction@example.test');
+  await page.fill('#privateDeskCode','123456');
+  await page.click('#privateDeskLoginForm button[type="submit"]');
+  await page.waitForSelector('[data-private-module="ACCESSI"]');
+  await page.waitForSelector('[data-private-module="SICUREZZA"]');
+
+  await page.click('[data-private-module="ACCESSI"]');
+  await page.waitForSelector('#r56InviteForm');
+  await page.fill('#r56InviteEmail','new.user@example.test');
+  await page.selectOption('#r56InviteRole','FAMILY');
+  await page.fill('#r56InviteScope','Famiglia QA');
+  await page.click('#r56InviteForm button[type="submit"]');
+  await page.waitForFunction(()=>document.querySelector('#r56InviteState')?.textContent?.includes('Codice temporaneo inviato'));
+  if(!inviteSeen)throw new Error('R56 invite action not called');
+  await page.click('#publicPanelClose');
+
+  await page.click('[data-private-module="SICUREZZA"]');
+  await page.waitForSelector('#r56PinForm');
+  await page.fill('#r56OldPin','123456');
+  await page.fill('#r56NewPin','654321');
+  await page.fill('#r56NewPin2','654321');
+  await page.click('#r56PinForm button[type="submit"]');
+  await page.waitForFunction(()=>document.querySelector('#r56PinState')?.textContent?.includes('aggiornato'));
+  if(!pinSeen)throw new Error('R56 PIN change action not called');
+
+  if(await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+3))throw new Error('R56 Direction horizontal overflow');
+  await page.screenshot({path:'test-output/r56-access-390x844.png',fullPage:true});
+  if(errors.length)throw new Error('R56 browser errors: '+errors.join(' | '));
+  await page.close();
+}
+
 // Sponsor public journey: real browser interaction on desktop and mobile.
 mark('SPONSOR_BROWSER_JOURNEY');
 for(const viewport of [{width:390,height:844},{width:1440,height:900}]){
