@@ -43,7 +43,8 @@ for(const token of ['LED PRODUCTION HUB','id="ledProfileList"','id="ledProfileDe
 for(const token of ['initLedProductionHub','renderLedProfileDetail','ledMotionBrief','/api/sponsor/motion-profiles','fetchMotionConfig','led-tribuna-simulator','data-led-sim-view-btn','data-led-cue','SIMULAZIONE CONCETTUALE · NON FOTO DOCUMENTARIA']){
   assert(js.includes(token),'LED Production Hub interaction missing: '+token);
 }
-assert(js.includes("p.logoAssetStatus!=='APPROVED_OFFICIAL_ASSET'"),'final MP4 logo gate missing in UI');
+assert(js.includes("p.logoAssetStatus==='APPROVED_OFFICIAL_ASSET'&&p.logoAssetPath"),'final MP4 logo readiness gate missing in UI');
+assert(js.includes('const logoBlocked=!logoReady'),'final MP4 blocked-state derivation missing in UI');
 assert(js.includes('MASTER MP4 BLOCCATO'),'blocked master state missing');
 assert(js.includes('led-source-evidence'),'Drive source evidence UI missing');
 assert(js.includes('Risoluzione LED nativa: da rilevare alla consegna'),'native LED unresolved notice missing');
