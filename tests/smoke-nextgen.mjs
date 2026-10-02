@@ -45,6 +45,7 @@ for(const viewport of viewports){
   await page.waitForSelector('#communityPulse');
   await page.waitForSelector('#institutionalStrip');
   await page.waitForSelector('#sponsorRail');
+  await page.waitForSelector('#solidarityHome');
   await page.waitForSelector('#joinClub');
   await page.waitForSelector('#view-calendar',{state:'attached'});
   await page.waitForSelector('#view-teams',{state:'attached'});
@@ -82,7 +83,9 @@ for(const viewport of viewports){
   if(videoArenaItems!==4)throw new Error('Video Arena item mismatch: '+videoArenaItems);
   const pixellotLabel=String(await page.locator('#pixellotLocked small').textContent()||'');
   if(!/privato/i.test(pixellotLabel))throw new Error('Pixellot must remain visibly private');
-  const institutionalLogos=await page.locator('#institutionalStrip img').count();
+  const solidarityCta=await page.locator('#solidarityHome a[href*="fondo-solidale"]').count();
+  if(solidarityCta!==1)throw new Error('Solidarity Fund home CTA missing');
+    const institutionalLogos=await page.locator('#institutionalStrip img').count();
   if(institutionalLogos!==3)throw new Error('institutional logos mismatch: '+institutionalLogos);
   const skyAsset=await page.locator('#mirrorFab img').getAttribute('src');
   if(!/assets\/sky\.png$/.test(String(skyAsset||'')))throw new Error('official Sky mascot missing from chatbot');
