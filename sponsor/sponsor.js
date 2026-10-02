@@ -234,7 +234,7 @@ function syncDonationAmount(value){
   const input=$('#donationAmount'),hidden=$('#donationIntentAmount');
   if(input)input.value=String(n);
   if(hidden)hidden.value=String(n);
-  $('[data-donation-amount]').forEach(b=>b.classList.toggle('active',Number(b.dataset.donationAmount)===n));
+  $$('[data-donation-amount]').forEach(b=>b.classList.toggle('active',Number(b.dataset.donationAmount)===n));
   syncDonationDirectLink();
 }
 function resolvedDonationUrl(){
@@ -289,7 +289,7 @@ async function loadDonationConfig(){
     state.textContent='Canali diretti momentaneamente non verificabili. Usa il modulo di contatto per ricevere istruzioni ufficiali SCD.';
   }
 }
-$('[data-donation-amount]').forEach(b=>b.addEventListener('click',()=>syncDonationAmount(b.dataset.donationAmount)));
+$$('[data-donation-amount]').forEach(b=>b.addEventListener('click',()=>syncDonationAmount(b.dataset.donationAmount)));
 $('#donationAmount')?.addEventListener('input',e=>syncDonationAmount(e.target.value));
 $('#donationBankToggle')?.addEventListener('click',()=>{
   const box=$('#donationBankBox');if(!box)return;
