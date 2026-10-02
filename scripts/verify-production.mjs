@@ -1,7 +1,8 @@
 import fs from 'node:fs';
 
 const EXPECTED_VERSION=process.env.SCD_EXPECTED_VERSION||'40.0.0';
-const EXPECTED_MANIFEST=process.env.SCD_EXPECTED_MANIFEST||'3.15.0';
+const EXPECTED_MANIFEST=process.env.SCD_EXPECTED_MANIFEST||'3.17.0';
+const EXPECTED_COMMIT=process.env.SCD_EXPECTED_COMMIT||process.env.GITHUB_SHA||'';
 const PAGES_URL=process.env.SCD_PAGES_URL||'https://francesco1485.github.io/scd-colicoderviese-super-app/';
 const RENDER_BASE=(process.env.SCD_RENDER_BASE_URL||'https://scd-colicoderviese-official-r21.onrender.com').replace(/\/$/,'');
 const ATTEMPTS=Math.max(1,Number(process.env.SCD_PROD_VERIFY_ATTEMPTS||20));
@@ -13,6 +14,7 @@ const evidence={
   release:'R40',
   expectedVersion:EXPECTED_VERSION,
   expectedManifest:EXPECTED_MANIFEST,
+  expectedCommit:EXPECTED_COMMIT||null,
   startedAt:new Date().toISOString(),
   pagesUrl:PAGES_URL,
   renderBaseUrl:RENDER_BASE,
@@ -52,9 +54,11 @@ async function runChecks(attempt){
   try{
     const r=await getText(RENDER_BASE+'/health?scd_verify='+Date.now());
     const j=parseJson('Render health',r.text);
-    const ok=r.ok&&j.ok===true&&j.version===EXPECTED_VERSION;
-    result.checks.renderHealth={httpStatus:r.status,ok,version:j.version||null,service:j.service||null};
-    if(!ok)result.failures.push('RENDER_HEALTH_VERSION');
+    const commitOk=Boolean(EXPECTED_COMMIT)&&j.commit===EXPECTED_COMMIT;
+    const ok=r.ok&&j.ok===true&&j.version===EXPECTED_VERSION&&commitOk;
+    result.checks.renderHealth={httpStatus:r.status,ok,version:j.version||null,service:j.service||null,commit:j.commit||null,expectedCommit:EXPECTED_COMMIT||null,commitOk};
+    if(!r.ok||j.ok!==true||j.version!==EXPECTED_VERSION)result.failures.push('RENDER_HEALTH_VERSION');
+    if(!commitOk)result.failures.push('RENDER_HEALTH_COMMIT');
   }catch(e){
     result.checks.renderHealth={ok:false,error:String(e.message||e)};
     result.failures.push('RENDER_HEALTH_VERSION');
@@ -168,6 +172,7 @@ if(!passed){
 console.log('SCD PRODUCTION EVIDENCE PASS',{
   version:EXPECTED_VERSION,
   manifest:EXPECTED_MANIFEST,
+  commit:EXPECTED_COMMIT||null,
   attempts:evidence.attempts.length,
   pages:PAGES_URL,
   render:RENDER_BASE,
