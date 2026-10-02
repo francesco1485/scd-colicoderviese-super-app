@@ -3158,11 +3158,43 @@ async function manageAccessRequest(id,action,role='viewer'){
   alert(data?.message||'Operazione completata.')
   await loadAll()
 }
+function relationshipKey(v=''){
+  return String(v).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim().replace(/\s+/g,' ')
+}
+async function ensureRelationshipClaim(lead){
+  if(!['sponsor','partner','company','collaborator'].includes(lead.lead_type))return{ok:true}
+  const relationshipType=lead.lead_type==='collaborator'?'intermediary':lead.lead_type
+  const name=lead.company_name||lead.full_name
+  const key=relationshipKey(name)
+  if(!key)return{ok:true}
+  const existing=relationshipClaims.find(x=>x.relationship_type===relationshipType&&x.normalized_key===key&&x.status==='active')
+  if(existing&&existing.commercial_lead_id!==lead.id){
+    return{ok:false,message:'Questa realtà risulta già in gestione attiva. Apri la relazione esistente prima di procedere con un nuovo contatto.'}
+  }
+  if(!existing){
+    const{error}=await supabase.from('crm_relationship_claims').insert({
+      organization_id:window.orgId,relationship_type:relationshipType,normalized_key:key,display_name:name,
+      commercial_lead_id:lead.id,owner_user_id:window.userId,status:'active',
+      next_action:'Coordinare il contatto e registrare ogni sviluppo in MAGLIA 360.'
+    })
+    if(error&&error.code==='23505')return{ok:false,message:'La realtà è stata presa in carico da un altro responsabile. Aggiorna la pagina prima di contattarla.'}
+    if(error)return{ok:false,message:error.message}
+  }
+  return{ok:true}
+}
 async function updateCommercialLead(id,status){
   if(!isAccessApprover())return
   const lead=commercialLeads.find(x=>x.id===id);if(!lead)return
-  const{error}=await supabase.from('public_commercial_leads').update({status,updated_at:new Date().toISOString()}).eq('id',id).eq('organization_id',window.orgId)
+  if(['contacted','qualified','opportunity'].includes(status)){
+    const claim=await ensureRelationshipClaim(lead)
+    if(!claim.ok){alert(claim.message);await loadAll();return}
+  }
+  const{error}=await supabase.from('public_commercial_leads').update({status,assigned_to:window.userId,updated_at:new Date().toISOString()}).eq('id',id).eq('organization_id',window.orgId)
   if(error)return alert(error.message)
+  if(['closed','lost'].includes(status)){
+    const claim=relationshipClaims.find(x=>x.commercial_lead_id===id&&x.status==='active')
+    if(claim)await supabase.from('crm_relationship_claims').update({status:'closed',released_at:new Date().toISOString(),updated_at:new Date().toISOString()}).eq('id',claim.id).eq('organization_id',window.orgId)
+  }
   const linked=actions.find(a=>a.metadata?.public_commercial_lead_id===id)
   if(linked){
     const actionStatus=['closed','lost'].includes(status)?'completed':status==='opportunity'?'in_progress':linked.status
