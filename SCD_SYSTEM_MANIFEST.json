@@ -1358,7 +1358,10 @@
       "crm_write_action": "private.agenda.create",
       "summary_recipient": "sportclubcolico@gmail.com",
       "invitee_policy": "ACTIVE_AUTHORIZED_USERS_WITH_CALENDAR_SCOPE_OR_EXPLICIT_SELECTION",
-      "rule": "NO_DUPLICATE_CALENDAR_NO_SYNTHETIC_EMAIL"
+      "rule": "NO_DUPLICATE_CALENDAR_NO_SYNTHETIC_EMAIL",
+      "state": "SOURCE_IMPLEMENTED_RUNTIME_DEPLOY_REQUIRED",
+      "runtime_gate": "R20_APPS_SCRIPT_DEPLOY_AND_PROBE_PRIVATE_AGENDA",
+      "safe_behavior": "FAIL_CLOSED_NO_FALSE_EVENT_CONFIRMATION"
     }
   },
   "completeness_engine": {
