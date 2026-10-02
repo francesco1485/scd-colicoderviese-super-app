@@ -2266,3 +2266,43 @@ body{background:linear-gradient(180deg,#eef5fb,#f7fbfe 55%,#edf5fb);color:var(--
 .development-empty{grid-column:1/-1;padding:22px;border:1px dashed #bfd2e1;border-radius:16px;background:#f7fbfe}.development-empty p{margin:.4rem 0 0;color:#61778c}
 @media(max-width:1050px){.development-layout{grid-template-columns:1fr}.development-inspector{position:static}}
 @media(max-width:720px){.development-grid{grid-template-columns:1fr}.development-tools{grid-template-columns:1fr}.development-detail-grid{grid-template-columns:1fr}}
+
+
+/* ===== R53.1 SPONSOR OPERATIONAL FOCUS ===== */
+.operational-focus{margin:14px 0 18px;padding:18px;border:1px solid var(--line,#d8e2e3);border-radius:20px;background:linear-gradient(145deg,#fff,#f5fafb);box-shadow:0 14px 36px rgba(7,38,48,.07)}
+.operational-focus-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:14px}
+.operational-focus-head small{font-size:7px;letter-spacing:.13em;color:#19849a;font-weight:900}
+.operational-focus-head h2{margin:4px 0 5px;color:#153c47;font-size:21px}
+.operational-focus-head p{margin:0;max-width:720px;color:#6b8188;font-size:8px;line-height:1.5}
+.operational-focus-source{max-width:340px;padding:8px 10px;border-radius:999px;background:#edf6f7;color:#356872;font-size:7px;font-weight:850;text-align:right}
+.operational-focus-source.is-partial{background:#fff4dd;color:#8a6413}
+.operational-focus-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+.operational-focus-kpi article{padding:11px 12px;border:1px solid #dce7e8;border-radius:13px;background:#fff}
+.operational-focus-kpi small{display:block;font-size:6px;letter-spacing:.1em;color:#668188;font-weight:900}
+.operational-focus-kpi strong{display:block;margin-top:4px;color:#153c47;font-size:17px}
+.operational-focus-layout{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(300px,.65fr);gap:10px;align-items:start}
+.operational-action-list{display:grid;gap:8px}
+.operational-action{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:11px;align-items:center;padding:12px;border:1px solid #dce7e8;border-radius:14px;background:#fff}
+.operational-action-priority{min-width:62px;text-align:center;padding:7px 8px;border-radius:999px;font-size:6px;letter-spacing:.08em;font-weight:900;background:#eef5f5;color:#376971}
+.operational-action.high .operational-action-priority{background:#fff0c7;color:#7c5900}
+.operational-action.medium .operational-action-priority{background:#eaf6fb;color:#156f87}
+.operational-action-copy small{display:block;color:#698188;font-size:6px;letter-spacing:.08em;font-weight:850}
+.operational-action-copy strong{display:block;margin:3px 0;color:#153c47;font-size:10px}
+.operational-action-copy span{display:block;color:#6f8489;font-size:7px;line-height:1.4}
+.operational-action-buttons{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.operational-action-buttons button,.operational-agenda-panel button{border:1px solid #cfe0e2;background:#fff;color:#245a65;border-radius:9px;padding:7px 9px;font-size:6.5px;font-weight:850;cursor:pointer}
+.operational-action-buttons button.primary{background:#0f6f84;color:#fff;border-color:#0f6f84}
+.operational-action-buttons button:hover,.operational-agenda-panel button:hover{transform:translateY(-1px)}
+.operational-agenda-panel{border:1px solid #dce7e8;border-radius:15px;background:#071d25;color:#fff;padding:14px}
+.operational-agenda-panel header{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:8px}
+.operational-agenda-panel small{font-size:6px;letter-spacing:.12em;color:#7fe1e0;font-weight:900}
+.operational-agenda-panel h3{margin:3px 0 0;font-size:13px}
+.operational-agenda-panel button{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:#fff}
+.operational-agenda-row{padding:9px 0;border-bottom:1px solid rgba(255,255,255,.09)}
+.operational-agenda-row:last-child{border-bottom:0}
+.operational-agenda-row time{display:block;color:#8edce4;font-size:6px;font-weight:900}
+.operational-agenda-row b{display:block;margin:3px 0;font-size:8px}
+.operational-agenda-row span{display:block;color:#bfd0d4;font-size:6.5px}
+.operational-empty{padding:15px;border:1px dashed #cbdadd;border-radius:13px;background:#f8fbfb;color:#536c72;font-size:8px}
+@media(max-width:1050px){.operational-focus-layout{grid-template-columns:1fr}.operational-focus-kpi{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.operational-focus-head{flex-direction:column}.operational-focus-source{max-width:none;text-align:left}.operational-focus-kpi{grid-template-columns:1fr 1fr}.operational-action{grid-template-columns:1fr}.operational-action-buttons{justify-content:flex-start}}
