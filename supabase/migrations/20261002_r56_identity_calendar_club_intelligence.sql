@@ -295,7 +295,7 @@ returns trigger
 language plpgsql
 security invoker
 set search_path=public
-as $
+as $$
 begin
   if new.audience_mode <> 'ADULT_REGISTERED' and new.public_player_ranking = true then
     raise exception 'SCD_FANTASY_POLICY: public player ranking is not allowed for minor/all-ages modes';
@@ -305,7 +305,7 @@ begin
   end if;
   return new;
 end;
-$;
+$$;
 
 drop trigger if exists scd_fantasy_policy_guard on public.scd_fantasy_leagues;
 create trigger scd_fantasy_policy_guard
