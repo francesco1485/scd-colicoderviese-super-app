@@ -382,8 +382,8 @@ function renderSocialHub(){
    '</article>'
  ).join(''):'<div class="social-empty"><b>Nessun contenuto verificato per questo filtro</b><span>Il feed resta vuoto invece di inventare post o risultati.</span></div>';
  const map=new Map(rows.map(x=>[x.id,x]));
- $('[data-social-open]',mount).forEach(b=>b.onclick=()=>openSocialItem(map.get(b.dataset.socialOpen)));
- $('[data-social-share]',mount).forEach(b=>b.onclick=()=>{const row=map.get(b.dataset.socialShare);if(row)shareSocialText(row.share,row.title)});
+ $$('[data-social-open]',mount).forEach(b=>b.onclick=()=>openSocialItem(map.get(b.dataset.socialOpen)));
+ $$('[data-social-share]',mount).forEach(b=>b.onclick=()=>{const row=map.get(b.dataset.socialShare);if(row)shareSocialText(row.share,row.title)});
 }
 async function openTeamHub(name){
  if(!state.calendarLoaded)await ensurePublicCalendar();
