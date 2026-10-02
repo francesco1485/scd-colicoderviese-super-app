@@ -1437,6 +1437,16 @@ function renderLedProfileDetail(){
         '<div class="led-sim-concept-label">SIMULAZIONE CONCETTUALE · NON FOTO DOCUMENTARIA</div>'+
       '</div>'+
     '</section>'+
+    (p.sourceVideoReview?
+      '<section class="led-source-review">'+
+        '<div class="led-source-review-head"><div><small>SOURCE VIDEO REVIEW</small><h4>'+esc(p.sourceVideoReview.fileName||'Preview sorgente')+'</h4></div>'+
+        '<span>'+esc(p.sourceVideoReview.width)+'×'+esc(p.sourceVideoReview.height)+' · '+esc(p.sourceVideoReview.fps)+' fps · '+esc(p.sourceVideoReview.durationSeconds)+'s</span></div>'+
+        '<div class="led-review-compare">'+
+          '<article><small>SORGENTE</small><b>'+esc(String(p.sourceVideoReview.layout||'').replaceAll('_',' '))+'</b><p>'+esc(String(p.sourceVideoReview.partnerPlacement||'').replaceAll('_',' '))+'</p><em>'+esc(String(p.sourceVideoReview.otherBrandPresence||'').replaceAll('_',' '))+'</em></article>'+
+          '<article><small>CRITICITÀ OSSERVATE</small><ul>'+(p.sourceVideoReview.findings||[]).map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></article>'+
+          '<article><small>TARGET REVISIONE</small><b>'+esc(p.sourceVideoReview.upgradeTarget||'')+'</b><p>Un solo partner protagonista, più movimento, lettura da tribuna e camera, identità Colico/Lago.</p></article>'+
+        '</div>'+
+      '</section>':'')+
     '<div class="led-storyboard">'+
       '<div class="led-storyboard-head"><div><small>STORYBOARD '+duration+' SECONDI</small><h4>Movimento pensato per tribuna e ripresa.</h4></div><span>ONE SPONSOR · ONE STORYBOARD · ONE MASTER</span></div>'+
       '<div class="led-storyboard-track">'+timeline.map((x,i)=>{
