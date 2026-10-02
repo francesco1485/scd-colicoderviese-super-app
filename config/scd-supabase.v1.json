@@ -64,7 +64,8 @@
       "supabase/migrations/20260929_r33_club_graph_foundation.sql",
       "supabase/migrations/20260929_r34_rls_performance_hardening.sql",
       "supabase/migrations/20260929_r35_auth_context_rls_normalization.sql",
-      "supabase/migrations/20261002_r51_core_operative_engine.sql"
+      "supabase/migrations/20261002_r51_core_operative_engine.sql",
+      "supabase/migrations/20261002_r51_1_operative_index_hardening.sql"
     ],
     "operative_engine": {
       "state": "SCHEMA_STAGED_RUNTIME_GATED",
@@ -85,7 +86,8 @@
         "AUTH_ROLE_SCOPE_TESTS_GREEN",
         "R20_DUAL_READ_COMPARE_GREEN",
         "WEB_VERTICAL_SLICE_GREEN"
-      ]
+      ],
+      "index_hardening": "supabase/migrations/20261002_r51_1_operative_index_hardening.sql"
     }
   },
   "activation": {
