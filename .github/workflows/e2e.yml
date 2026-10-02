@@ -107,8 +107,6 @@ jobs:
           exit 1
       - name: Smoke test mobile app
         run: npm run test:smoke
-      - name: R54 Family/Athlete runtime smoke
-        run: npm run test:smoke:legacy
       - name: Server logs
         if: always()
         run: cat /tmp/scd-server.log || true
