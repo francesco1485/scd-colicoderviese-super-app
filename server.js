@@ -303,6 +303,56 @@ async function handleSponsorCommunity(req,res){
     return json(res,e.message==='SESSION_REQUIRED'?401:403,{ok:false,error:e.message||'COMMUNITY_ACCESS_DENIED'});
   }
 }
+const PUBLIC_ACTIVE_BENEFIT_STATUSES = new Set(['ATTIVA','ATTIVO','FORMALIZZATA','FORMALIZZATO','CONFERMATA','CONFERMATO']);
+function publicBenefitProjection(row={}){
+  return {
+    id:String(row.id||''),
+    name:String(row.name||''),
+    category:String(row.category||''),
+    status:String(row.status||'DA VERIFICARE'),
+    benefit:String(row.benefit||''),
+    conditions:String(row.conditions||''),
+    audience:String(row.audience||''),
+    recognition:String(row.recognition||''),
+    territory:String(row.territory||''),
+    updatedAt:String(row.updatedAt||'')
+  };
+}
+function publicBenefitFormalizationEvidence(row={}){
+  const status=String(row.status||'').trim().toUpperCase();
+  const document=String(row.agreementDocument||'').trim().toUpperCase();
+  return PUBLIC_ACTIVE_BENEFIT_STATUSES.has(status)&&Boolean(document)&&!['DA RICEVERE','DA DEFINIRE','NON DISPONIBILE','N/A'].includes(document);
+}
+function publicCommunityBenefitsPayload(){
+  const rows=Array.isArray(COMMUNITY_BENEFITS_SNAPSHOT.rows)?COMMUNITY_BENEFITS_SNAPSHOT.rows:[];
+  const active=[],pipeline=[];
+  for(const row of rows){
+    const projected=publicBenefitProjection(row);
+    if(publicBenefitFormalizationEvidence(row)){
+      active.push({...projected,formalizationEvidence:true,usableNow:true});
+    }else{
+      pipeline.push({...projected,formalizationEvidence:false,usableNow:false});
+    }
+  }
+  return {
+    ok:true,
+    public:true,
+    source:'COMMUNITY_BENEFITS_SNAPSHOT',
+    sourceTable:String(COMMUNITY_BENEFITS_SNAPSHOT.sourceTable||'CONVENZIONI_MASTER'),
+    sourceMode:'PUBLIC_SAFE_SNAPSHOT',
+    snapshotAt:String(COMMUNITY_BENEFITS_SNAPSHOT.snapshotAt||''),
+    policy:'NO_ACTIVE_BENEFIT_WITHOUT_FORMALIZATION_EVIDENCE',
+    generatedAt:new Date().toISOString(),
+    counts:{active:active.length,pipeline:pipeline.length,total:rows.length},
+    active,
+    pipeline
+  };
+}
+function handlePublicCommunityBenefits(req,res){
+  if(req.method!=='GET')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  return json(res,200,publicCommunityBenefitsPayload(),{'cache-control':'public, max-age=180'});
+}
+
 async function handleSponsorMotionProfiles(req,res){
   if(req.method!=='GET')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
   try{
@@ -793,6 +843,7 @@ http.createServer(async(req,res)=>{
   if(u.pathname==='/api/time') return json(res,200,clubTimePayload());
   if(u.pathname==='/api/capabilities') return json(res,200,{ok:true,version:'40.0.0',mode:'GITHUB_PAGES_RENDER_R20_SUPABASE_DUAL_RUN',actions:[...allowedActions].sort(),featureFlags:FEATURE_FLAGS,domainCore:SUPABASE_RUNTIME,isolated:['safeguarding']});
   if(u.pathname==='/api/core-status') return json(res,200,{ok:true,version:'40.0.0',featureFlags:FEATURE_FLAGS,domainCore:SUPABASE_RUNTIME,currentPrimary:'R20',targetPrimary:'SCD_SUPABASE'});
+  if(u.pathname==='/api/community/benefits') return handlePublicCommunityBenefits(req,res);
   if(u.pathname==='/api/sponsor/lead') return handleSponsorLead(req,res);
   if(u.pathname==='/api/sponsor/request-access') return handleSponsorAccessRequest(req,res);
   if(u.pathname==='/api/sponsor/otp') return handleSponsorOtp(req,res);
