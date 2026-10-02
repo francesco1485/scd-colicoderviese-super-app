@@ -152,6 +152,12 @@ assert((m.product_direction?.public_core_navigation?.routes||[]).some(x=>x.id===
 assert((m.product_direction?.public_core_navigation?.routes||[]).some(x=>x.id==='TEAMS'&&x.hash==='#teams'),'dedicated teams route missing');
 assert((m.capability_map||[]).some(x=>x.id==='CAP-PUBLIC-TEAMS'),'CAP-PUBLIC-TEAMS missing');
 assert((m.capability_map||[]).some(x=>x.id==='CAP-PUBLIC-MATCHDAY'),'CAP-PUBLIC-MATCHDAY missing');
+assert((m.capability_map||[]).some(x=>x.id==='CAP-CARD-BENEFIT-CENTER'),'CAP-CARD-BENEFIT-CENTER missing');
+assert((m.product_direction?.public_core_navigation?.routes||[]).some(x=>x.id==='CARD'&&x.hash==='#card'),'dedicated Card Center route missing');
+assert(m.product_direction?.card_and_benefit_center?.benefit_network?.endpoint==='/api/community/benefits','Card benefit endpoint contract missing');
+assert(m.product_direction?.card_and_benefit_center?.benefit_network?.no_active_claim_before_formalization===true,'Card benefits must fail closed before formalization');
+assert(m.product_direction?.card_and_benefit_center?.cards?.tesserato?.self_assignment===false,'Tesserato Card must never self-assign role');
+assert(m.product_direction?.card_and_benefit_center?.cards?.tesserato?.authorization==='DIRECTION_ONLY','Tesserato Card authorization must remain Direction only');
 assert(m.product_direction?.public_matchday?.no_invented_stats===true,'R48 Matchday invented stats must remain forbidden');
 assert(m.product_direction?.public_matchday?.no_prediction===true,'R48 Matchday predictions must remain disabled');
 assert(m.product_direction?.public_matchday?.missing_data==='DATO_IN_AGGIORNAMENTO','R48 Matchday fail-closed state missing');
@@ -270,7 +276,7 @@ includesAll(caps.map(x=>x.id),[
   'CAP-HOME','CAP-CALENDAR','CAP-ATHLETE','CAP-FAMILY','CAP-STAFF','CAP-COMMS','CAP-RUNTIME-EVIDENCE','CAP-UPSTREAM-RESILIENCE','CAP-R20-RUNTIME-ACTIVATION',
   'CAP-DRIVE-CATALOG','CAP-GMAIL-INGESTION','CAP-DATAFABRIC-OBSERVABILITY','CAP-ENTITY-GRAPH','CAP-COMPLETENESS','CAP-SUPABASE-CORE','CAP-SUPABASE-AUTH-CONTEXT',
   'CAP-CHAT','CAP-CONFIDENCE','CAP-ANCONFIDENCE','CAP-SAFEGUARDING','CAP-SKY','CAP-AVATAR',
-  'CAP-TAMAGOTCHI','CAP-GEO','CAP-R22','CAP-PWA','CAP-ANDROID','CAP-IOS','CAP-MOBILE-SUPABASE-SHELL','CAP-SCD-UNIVERSE','CAP-META-ADAPTIVE','CAP-SCD-TWIN','CAP-SCD-MIRROR','CAP-SOCIAL-RADAR','CAP-HUMAN-OS','CAP-PRIVATE-DESK','CAP-COGNITIVE-ERGONOMICS','CAP-GROWTH-LOOP','CAP-WEEKLY-SPORT-CALENDAR','CAP-AI-NEWSROOM','CAP-MEDIA-SOCIAL-HUB','CAP-STAFF-ROLE-INGESTION','CAP-PUBLIC-MATCHDAY'
+  'CAP-TAMAGOTCHI','CAP-GEO','CAP-R22','CAP-PWA','CAP-ANDROID','CAP-IOS','CAP-MOBILE-SUPABASE-SHELL','CAP-SCD-UNIVERSE','CAP-META-ADAPTIVE','CAP-SCD-TWIN','CAP-SCD-MIRROR','CAP-SOCIAL-RADAR','CAP-HUMAN-OS','CAP-PRIVATE-DESK','CAP-COGNITIVE-ERGONOMICS','CAP-GROWTH-LOOP','CAP-WEEKLY-SPORT-CALENDAR','CAP-AI-NEWSROOM','CAP-MEDIA-SOCIAL-HUB','CAP-STAFF-ROLE-INGESTION','CAP-PUBLIC-MATCHDAY','CAP-CARD-BENEFIT-CENTER'
 ],'capability map');
 
 const gaps=m.known_noncompliance||[];
