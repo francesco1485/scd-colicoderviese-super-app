@@ -970,9 +970,9 @@ function renderOperationalFocus(){
           '</div>'+
         '</article>';
       }).join('');
-      $('[data-focus-project]').forEach(btn=>btn.onclick=()=>{openView('iniziative');renderDevelopmentInspector(btn.dataset.focusProject)});
-      $('[data-focus-agenda]').forEach(btn=>btn.onclick=()=>prepareAgendaForProject(btn.dataset.focusAgenda));
-      $('[data-focus-crm]').forEach(btn=>btn.onclick=()=>{openView('crm');openCrmProfile(btn.dataset.focusCrm)});
+      $$('[data-focus-project]').forEach(btn=>btn.onclick=()=>{openView('iniziative');renderDevelopmentInspector(btn.dataset.focusProject)});
+      $$('[data-focus-agenda]').forEach(btn=>btn.onclick=()=>prepareAgendaForProject(btn.dataset.focusAgenda));
+      $$('[data-focus-crm]').forEach(btn=>btn.onclick=()=>{openView('crm');openCrmProfile(btn.dataset.focusCrm)});
     }
   }
 
