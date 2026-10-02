@@ -1,6 +1,6 @@
 {
-  "name": "SCD Universe · ColicoDerviese",
-  "short_name": "SCD Universe",
+  "name": "SCD Social App · ColicoDerviese",
+  "short_name": "SCD Social",
   "id": "./",
   "start_url": "./#pulse",
   "scope": "./",
@@ -8,7 +8,7 @@
   "orientation": "portrait-primary",
   "background_color": "#f2f5f9",
   "theme_color": "#041c3a",
-  "description": "SCD Arena: sport, matchday, squadre, community, media, servizi e Private Desk ColicoDerviese in una sola web app.",
+  "description": "SCD Social App: matchday, squadre, calendario, news verificate, media ufficiali, community e servizi ColicoDerviese.",
   "categories": [
     "sports",
     "social",
@@ -43,6 +43,11 @@
       "name": "Squadre",
       "short_name": "Squadre",
       "url": "./#teams"
+    },
+    {
+      "name": "Social",
+      "short_name": "Social",
+      "url": "./#social"
     },
     {
       "name": "Private Desk",
