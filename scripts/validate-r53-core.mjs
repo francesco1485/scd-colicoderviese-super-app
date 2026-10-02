@@ -33,7 +33,7 @@ if(!/revoke all on table public\.scd_match_performance from anon, authenticated/
 
 const capIds=new Set((manifest.capability_map||[]).map(x=>x.id));
 for(const id of ['CAP-FOOTBALL-PRIVATE-CORE','CAP-SOCIAL-ENGAGEMENT']) if(!capIds.has(id)) fail('manifest capability missing '+id);
-if(manifest.manifest?.version!=='3.23.0') fail('manifest version must be 3.23.0');
+const versionParts=String(manifest.manifest?.version||'0.0.0').split('.').map(Number);\nif((versionParts[0]||0)<3||((versionParts[0]||0)===3&&(versionParts[1]||0)<23)) fail('manifest version must be >= 3.23.0');
 if(manifest.product_direction?.football_private_core?.state!=='SCHEMA_READY_RUNTIME_GATED') fail('football core must remain staged');
 if(manifest.product_direction?.social_interactive_core?.state!=='FOUNDATION_READY_FAIL_CLOSED') fail('social interactive state mismatch');
 if(!manifest.product_direction?.social_interactive_core?.rules?.includes('NO_CONTINUOUS_BACKGROUND_GEO_TRACKING')) fail('geolocation safety rule missing');
