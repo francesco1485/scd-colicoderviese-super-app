@@ -172,6 +172,9 @@ function cleanPublicHttpsUrl(value=''){
 }
 function donationConfig(){
   const paymentUrl=cleanPublicHttpsUrl(process.env.SCD_DONATION_PAYMENT_URL||'');
+  const paymentTemplateRaw=String(process.env.SCD_DONATION_PAYMENT_URL_TEMPLATE||'').trim();
+  const paymentTemplateCheck=paymentTemplateRaw?cleanPublicHttpsUrl(paymentTemplateRaw.replaceAll('{amount}','1.00').replaceAll('{currency}','EUR')):'';
+  const paymentTemplate=paymentTemplateCheck?paymentTemplateRaw:'';
   const bankPublic=process.env.SCD_DONATION_BANK_TRANSFER_PUBLIC==='true';
   const iban=String(process.env.SCD_DONATION_IBAN||'').replace(/\s+/g,'').toUpperCase();
   const accountHolder=String(process.env.SCD_DONATION_ACCOUNT_HOLDER||'').trim();
@@ -189,9 +192,11 @@ function donationConfig(){
     },
     channels:{
       online:{
-        enabled:Boolean(paymentUrl),
+        enabled:Boolean(paymentTemplate||paymentUrl),
         provider:String(process.env.SCD_DONATION_PAYMENT_PROVIDER||'').trim()||null,
-        url:paymentUrl||null
+        url:paymentUrl||null,
+        urlTemplate:paymentTemplate||null,
+        amountAware:Boolean(paymentTemplate)
       },
       bankTransfer:{
         enabled:bankReady,
