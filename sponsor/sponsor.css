@@ -461,3 +461,22 @@ body{background:linear-gradient(180deg,#f5faff,#eef5fb 52%,#f8fbfe);color:var(--
   .donation-presets{grid-template-columns:1fr 1fr}
   .donation-direct-actions{grid-template-columns:1fr}
 }
+
+
+/* R50.6 SOLIDARITY FUND · AGGREGATE REPORTING */
+.donation-report{
+  margin:12px 0;
+  padding:12px;
+  border-radius:13px;
+  border:1px solid rgba(255,255,255,.11);
+  background:rgba(255,255,255,.045);
+}
+.donation-report-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.donation-report-head span{color:var(--yellow);font-size:9px;letter-spacing:.12em;font-weight:950}
+.donation-report-head small{max-width:220px;color:#91aaac;font-size:8.5px;line-height:1.4;text-align:right}
+.donation-report-state{margin-top:9px;padding:9px 10px;border-radius:10px;font-size:9.5px;line-height:1.45}
+.donation-report-state.pending{background:rgba(215,181,109,.08);color:#ded2b1}
+@media(max-width:520px){
+  .donation-report-head{display:grid}
+  .donation-report-head small{text-align:left;max-width:none}
+}
