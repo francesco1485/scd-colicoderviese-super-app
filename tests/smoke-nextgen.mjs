@@ -197,6 +197,73 @@ for(const viewport of viewports){
   await page.close();
 }
 
+// R54 private journey: synthetic authorized context, real UI clicks, no backend writes.
+mark('R54_PRIVATE_JOURNEY');
+for(const viewport of [{width:390,height:844},{width:1440,height:900}]){
+  const privatePage=await browser.newPage({viewport});
+  const privateErrors=[];
+  privatePage.on('pageerror',e=>privateErrors.push(String(e)));
+  privatePage.on('console',m=>{if(m.type()==='error')privateErrors.push('console: '+m.text())});
+  await privatePage.goto(base+'/#/pulse',{waitUntil:'domcontentloaded',timeout:30000});
+  await privatePage.waitForFunction(()=>Boolean(window.R24?.go&&window.openManagementHome));
+  await privatePage.evaluate(()=>{
+    window.openManagementHome({
+      user:{name:'QA Family',email:'qa-family@example.test',role:'FAMILY',staff:false},
+      permissions:{direction:false},
+      personal:[
+        {personId:'QA-P1',firstName:'Atleta',lastName:'Uno',teamName:'U16 QA',figcStatus:'APPROVATO_QA',certificateStatus:'VALIDO_QA',paymentStatus:'REGOLARE_QA',identityStatus:'VERIFICATO_QA'},
+        {personId:'QA-P2',firstName:'Atleta',lastName:'Due',teamName:'U14 QA',figcStatus:'IN_AGGIORNAMENTO_QA',certificateStatus:'IN_AGGIORNAMENTO_QA',paymentStatus:'IN_AGGIORNAMENTO_QA'}
+      ],
+      convocations:[{id:'QA-C1',personId:'QA-P1',team:'U16 QA',date:'2026-10-04',meetingTime:'13:45',meetingPlace:'Campo QA',response:'DA CONFERMARE'}],
+      teams:[{key:'QA-U16',name:'U16 QA'}],
+      transport:{kpis:{requests:0}}
+    });
+    window.R24.go('family');
+  });
+  await privatePage.waitForSelector('#appRouteView .r24-family-strip');
+  await privatePage.waitForSelector('.r54-family-services');
+  if((await privatePage.locator('[data-r24-family-action]').count())!==5)throw new Error('R54 family actions mismatch '+viewport.width);
+  if(await privatePage.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+3))throw new Error('R54 family horizontal overflow '+viewport.width);
+
+  await privatePage.click('[data-r24-family-action="docs"]');
+  await privatePage.waitForSelector('#r54FamilyNewRequest');
+  const docsText=String(await privatePage.locator('.modal-card').textContent()||'');
+  if(!docsText.includes('VALIDO_QA')||!docsText.includes('VERIFICATO_QA'))throw new Error('R54 family document status projection missing');
+  if(/sincronizzati dal gestionale/i.test(docsText))throw new Error('R54 family docs must not claim unverified sync');
+  await privatePage.evaluate(()=>window.closeModal?.());
+
+  await privatePage.click('[data-r24-family-action="payments"]');
+  await privatePage.waitForSelector('.r54-status-list');
+  const paymentText=String(await privatePage.locator('.modal-card').textContent()||'');
+  if(!paymentText.includes('REGOLARE_QA'))throw new Error('R54 payment status projection missing');
+  await privatePage.evaluate(()=>window.closeModal?.());
+
+  await privatePage.click('[data-r24-family-action="transport"]');
+  await privatePage.waitForSelector('#transportForm');
+  await privatePage.evaluate(()=>window.closeModal?.());
+
+  await privatePage.click('[data-r24-family-action="requests"]');
+  await privatePage.waitForSelector('#requestHistoryMount');
+  await privatePage.evaluate(()=>window.closeModal?.());
+
+  if([390,1440].includes(viewport.width))await privatePage.screenshot({path:'test-output/r54-family-'+viewport.width+'x'+viewport.height+'.png',fullPage:true});
+
+  await privatePage.evaluate(()=>window.R24.go('athlete'));
+  await privatePage.waitForSelector('.r53-callup-card');
+  await privatePage.waitForSelector('.r54-private-actions');
+  if((await privatePage.locator('.r54-private-actions button').count())!==4)throw new Error('R54 athlete actions mismatch');
+  await privatePage.click('#r54AthleteStatus');
+  await privatePage.waitForSelector('.r54-status-list');
+  const athleteText=String(await privatePage.locator('.modal-card').textContent()||'');
+  if(!athleteText.includes('APPROVATO_QA')||!athleteText.includes('VALIDO_QA'))throw new Error('R54 athlete status projection missing');
+  await privatePage.evaluate(()=>window.closeModal?.());
+  if(await privatePage.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+3))throw new Error('R54 athlete horizontal overflow '+viewport.width);
+  if([390,1440].includes(viewport.width))await privatePage.screenshot({path:'test-output/r54-athlete-'+viewport.width+'x'+viewport.height+'.png',fullPage:true});
+
+  if(privateErrors.length)throw new Error('R54 private browser errors '+viewport.width+'px: '+privateErrors.join(' | '));
+  await privatePage.close();
+}
+
 // Sponsor public journey: real browser interaction on desktop and mobile.
 mark('SPONSOR_BROWSER_JOURNEY');
 for(const viewport of [{width:390,height:844},{width:1440,height:900}]){
