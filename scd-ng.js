@@ -614,7 +614,10 @@ const deskModuleMeta={
  SCADENZE:['◷','Scadenze','Promemoria e adempimenti'],
  KIT:['◈','Kit','Materiali e dotazioni'],
  PULMINI:['▰','Pulmini','Trasporti e richieste'],
- TESSERATI:['●','Tesserati','Profili e documenti autorizzati'],
+ TESSERATI:['●','Atleti & Famiglia','Profili e servizi autorizzati'],
+ RICHIESTE:['☑','Richieste','Invii e stato pratiche'],
+ PRESENZE:['✓','Presenze','Registro squadra autorizzato'],
+ CONVOCAZIONI:['⚽','Convocazioni','Crea e gestisci le convocazioni'],
  TORNEI_EVENTI:['★','Tornei & Eventi','Organizzazione e calendario'],
  BIGLIETTERIA:['◧','Biglietteria','Accessi e attività evento'],
  DRIVE_TORNEI:['□','Drive Tornei','Documenti evento autorizzati'],
@@ -688,71 +691,6 @@ async function ensurePrivateDesk(force=false){
  }catch(err){
    const msg=String(err.message||err);clearPrivateSession();state.privateError=msg;renderPrivateDesk();
  }finally{state.privateLoading=false}
-}
-function privateProfileName(p={}){
- return [p.firstName,p.lastName].filter(Boolean).join(' ')||p.fullName||'Profilo SCD';
-}
-function privateProfileStatus(p={}){
- return {
-   figc:String(p.figcStatus||p.recordStatus||'Dato in aggiornamento'),
-   certificate:String(p.certificateStatus||p.certificateExpiry||'Dato in aggiornamento'),
-   identity:String(p.identityStatus||p.idDocumentStatus||'Dato in aggiornamento'),
-   payment:String(p.paymentStatus||p.payment||p.feeStatus||'Dato in aggiornamento')
- };
-}
-function privateProfileKey(p={}){
- return String(p.personId||p.playerCode||p.code||p.id||'');
-}
-function privateProfileConvocations(p={},d=state.privateData||{}){
- const key=privateProfileKey(p);
- return (Array.isArray(d.convocations)?d.convocations:[]).filter(x=>!key||String(x.personId||x.playerId||x.playerCode||'')===key).slice(0,4);
-}
-function openPrivateRequestsPanel(){
- const layer=openPanel('Le mie richieste','<div class="panel-detail private-module-panel"><span class="eyebrow">AREA PERSONALE · ROLE/SCOPE</span><h2>Richieste al Club</h2><div id="r54PrivateRequests" class="r54-private-loading">Carico lo stato dal gestionale…</div></div>');
- const mount=$('#r54PrivateRequests',layer);
- privatePost('account.requests',{}).then(out=>{
-   const rows=Array.isArray(out)?out:(out.rows||out.items||[]);
-   mount.innerHTML=rows.length?'<div class="r54-request-list">'+rows.slice(0,30).map(x=>'<article><div><small>'+esc(x.type||x.kind||'RICHIESTA')+'</small><b>'+esc(x.subject||x.topic||x.id||'Richiesta SCD')+'</b><span>'+esc(x.createdAt||x.updatedAt||'')+'</span></div><strong>'+esc(x.status||'IN AGGIORNAMENTO')+'</strong></article>').join('')+'</div>':'<div class="r54-private-empty"><b>Nessuna richiesta disponibile</b><span>Il gestionale non ha restituito pratiche per questo account.</span></div>';
- }).catch(err=>{mount.innerHTML='<div class="r54-private-empty"><b>Dato in aggiornamento</b><span>'+esc(err.message||'Stato richieste non disponibile')+'</span></div>'});
-}
-function openPrivateTransportPanel(profile={}){
- const name=privateProfileName(profile),team=String(profile.teamName||profile.group||'');
- const layer=openPanel('Pulmino & Trasporti','<form class="r54-private-form" id="r54TransportForm"><span class="eyebrow">LOGISTICA · ROLE/SCOPE</span><h2>Nuova richiesta trasporto</h2><p>'+esc(name)+(team?' · '+esc(team):'')+'</p><div class="r54-private-form-grid"><label>Data<input name="date" type="date" required></label><label>Ora<input name="time" type="time" required></label><label>Partenza<input name="origin" required maxlength="160"></label><label>Destinazione<input name="destination" required maxlength="160"></label><label>Persone<input name="passengers" type="number" min="1" max="60" value="1"></label><label class="wide">Note<textarea name="notes" maxlength="800"></textarea></label></div><div class="r54-private-form-actions"><button class="btn primary" type="submit">Invia richiesta</button></div><small id="r54TransportState">La richiesta viene registrata dal backend con il tuo account autorizzato.</small></form>');
- const form=$('#r54TransportForm',layer);
- form.onsubmit=async e=>{
-   e.preventDefault();
-   const fd=new FormData(form),btn=$('button[type="submit"]',form),st=$('#r54TransportState',form);
-   btn.disabled=true;st.textContent='Invio in corso…';
-   try{
-     await privatePost('private.transport.request',{
-       date:String(fd.get('date')||''),time:String(fd.get('time')||''),
-       origin:String(fd.get('origin')||''),destination:String(fd.get('destination')||''),
-       team,type:'TRASFERTA',passengers:Number(fd.get('passengers')||1),notes:String(fd.get('notes')||'')
-     });
-     st.textContent='Richiesta trasporto registrata.';btn.textContent='INVIATA';toast('Richiesta trasporto registrata');
-   }catch(err){st.textContent=String(err.message||'Richiesta non salvata');btn.disabled=false}
- };
-}
-function openPrivateProfileStatus(profile={},mode='status'){
- const s=privateProfileStatus(profile),name=privateProfileName(profile);
- const rows=mode==='payments'
-   ?[['STATO AMMINISTRATIVO',s.payment]]
-   :[['FIGC / TESSERAMENTO',s.figc],['CERTIFICATO MEDICO',s.certificate],['DOCUMENTO IDENTITÀ',s.identity]];
- openPanel(mode==='payments'?'Quote & pagamenti':'Documenti & stato','<div class="panel-detail private-module-panel"><span class="eyebrow">PROFILO AUTORIZZATO · FAIL CLOSED</span><h2>'+esc(name)+'</h2><div class="r54-current-status-list">'+rows.map(x=>'<article><small>'+esc(x[0])+'</small><b>'+esc(x[1])+'</b></article>').join('')+'</div><p class="r54-private-note">'+(mode==='payments'?'Importi, rate e scadenze compaiono solo quando restituiti dal gestionale.':'Sono mostrati solo gli stati restituiti dal profilo autorizzato. Nessun documento viene dichiarato presente se la fonte non lo conferma.')+'</p></div>');
-}
-function openPrivateProfilesModule(){
- const d=state.privateData||{},people=Array.isArray(d.personal)?d.personal:[];
- if(!people.length){openPanel('Profili autorizzati','<div class="panel-detail private-module-panel"><span class="eyebrow">FAMIGLIA / ATLETA</span><h2>Dato in aggiornamento</h2><p>Nessun profilo autorizzato è stato restituito dal gestionale.</p></div>');return}
- const body='<div class="panel-detail private-module-panel r54-current-private"><span class="eyebrow">FAMIGLIA / ATLETA · ROLE/SCOPE</span><h2>Profili autorizzati</h2><p>Scegli cosa devi fare. I dati restano limitati alle persone collegate al tuo account.</p><div class="r54-current-profile-grid">'+people.map((p,i)=>{const s=privateProfileStatus(p),conv=privateProfileConvocations(p,d);return '<article class="r54-current-profile-card" data-r54-profile="'+i+'"><header><div><small>'+esc(p.teamName||p.group||'SCD')+'</small><h3>'+esc(privateProfileName(p))+'</h3></div><span>'+conv.length+' convocazioni</span></header><div class="r54-current-profile-kpis"><span>FIGC <b>'+esc(s.figc)+'</b></span><span>Certificato <b>'+esc(s.certificate)+'</b></span></div><div class="r54-current-profile-actions"><button type="button" data-r54-action="status" data-r54-index="'+i+'">Documenti</button><button type="button" data-r54-action="payments" data-r54-index="'+i+'">Pagamenti</button><button type="button" data-r54-action="calendar" data-r54-index="'+i+'">Calendario</button><button type="button" data-r54-action="transport" data-r54-index="'+i+'">Pulmino</button><button type="button" data-r54-action="requests" data-r54-index="'+i+'">Richieste</button></div>'+(conv.length?'<div class="r54-current-callups">'+conv.map(x=>'<div><span>CONVOCAZIONE</span><b>'+esc(x.team||x.teamName||'Gara SCD')+'</b><small>'+esc([x.date,x.meetingTime,x.meetingPlace].filter(Boolean).join(' · '))+'</small><em>'+esc(x.response||'DA CONFERMARE')+'</em></div>').join('')+'</div>':'')+'</article>'}).join('')+'</div></div>';
- const layer=openPanel('Area Famiglia & Atleta',body);
- $('[data-r54-action]',layer).forEach(b=>b.onclick=()=>{
-   const p=people[Number(b.dataset.r54Index||0)]||people[0],action=b.dataset.r54Action;
-   if(action==='status')return openPrivateProfileStatus(p,'status');
-   if(action==='payments')return openPrivateProfileStatus(p,'payments');
-   if(action==='calendar'){layer.classList.remove('open');setView('calendar');return}
-   if(action==='transport')return openPrivateTransportPanel(p);
-   if(action==='requests')return openPrivateRequestsPanel();
- });
 }
 function privateProfileName(p={}){return [p.firstName,p.lastName].filter(Boolean).join(' ')||p.fullName||'Profilo SCD'}
 function privateProfileKey(p={}){return String(p.code||p.playerCode||p.personId||p.id||'')}
@@ -866,12 +804,19 @@ function openPrivateModule(module){
    const admin=(w.areas||[]).some(x=>x.canAdmin===true)||String(w.privateDeskProfile||'').toUpperCase()==='EXECUTIVE_FULL'||state.privateData?.permissions?.direction===true;
    const layer=openPanel('Documenti','<div class="panel-detail private-module-panel"><span class="eyebrow">DOCUMENTI · ROLE/SCOPE</span><h2>'+esc(w.role||'Profilo SCD')+'</h2><p>'+esc(admin?'Accesso agli strumenti amministrativi documentali autorizzato.':'Sono mostrati soltanto gli stati documentali del perimetro assegnato.')+'</p>'+(admin?'<button class="btn primary" id="deskOpenIntakeAdmin">Apri Intake Admin</button>':'<button class="btn primary" id="deskOpenMyProfiles">Apri profili autorizzati</button>')+'</div>');
    if(admin)$('#deskOpenIntakeAdmin',layer).onclick=()=>{location.href='./intake/admin.html'};
-   else $('#deskOpenMyProfiles',layer).onclick=()=>openPrivateProfilesModule();
+   else $('#deskOpenMyProfiles',layer).onclick=()=>openPrivatePeopleHub();
    return;
  }
- if(module==='COMUNICAZIONI'){openPanel('Comunicazioni','<div class="panel-detail private-module-panel"><span class="eyebrow">FIRMA E PERIMETRO</span><h2>'+esc(w.role||'Profilo SCD')+'</h2><p>'+esc((w.communicationScope||[]).join(' · ')||'Perimetro definito dal ruolo')+'</p><small>Invii esterni soggetti a firma, policy e autorizzazioni.</small></div>');return}
- if(module==='TESSERATI'){openPrivateProfilesModule();return}
- if(module==='PULMINI'){openPrivateTransportPanel((Array.isArray(d.personal)&&d.personal[0])||{});return}
+ if(module==='COMUNICAZIONI'){
+   const canSend=Boolean(d.user?.staff||d.permissions?.direction);
+   if(canSend){openPrivateTeamMessage();return}
+   openPanel('Comunicazioni','<div class="panel-detail private-module-panel"><span class="eyebrow">FIRMA E PERIMETRO</span><h2>'+esc(w.role||'Profilo SCD')+'</h2><p>'+esc((w.communicationScope||[]).join(' · ')||'Perimetro definito dal ruolo')+'</p><small>Invii esterni soggetti a firma, policy e autorizzazioni.</small></div>');return
+ }
+ if(module==='TESSERATI'){openPrivatePeopleHub();return}
+ if(module==='PULMINI'){openPrivateTransport((Array.isArray(d.personal)&&d.personal[0])||null);return}
+ if(module==='RICHIESTE'){openPrivateRequests();return}
+ if(module==='PRESENZE'){openPrivateAttendance();return}
+ if(module==='CONVOCAZIONI'){openPrivateConvocations();return}
  openPanel(m[1],'<div class="panel-detail private-module-panel"><span class="eyebrow">PRIVATE DESK</span><h2>'+esc(m[1])+'</h2><p>'+esc(m[2])+'. Modulo assegnato dal profilo '+esc(w.privateDeskProfile||'ROLE/SCOPE')+'.</p></div>');
 }
 
