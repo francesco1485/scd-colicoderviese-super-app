@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.13.0",
+    "version": "3.14.0",
     "effective_at": "2026-10-02",
     "status": "BINDING",
     "language": "it-IT",
@@ -234,7 +234,14 @@
       },
       {
         "id": "CARD",
-        "route": "/app/card"
+        "route": "/app/card",
+        "title": "SCD Card & Benefit Center",
+        "audience": [
+          "PUBLIC",
+          "USER_BASE",
+          "AUTHORIZED_USERS"
+        ],
+        "purpose": "Supporter Card, Tesserato Card e Benefit Network con stato verificato e nessuna auto-assegnazione di ruoli."
       }
     ],
     "navigation": {
@@ -2658,6 +2665,17 @@
         "TUTTOCAMPO"
       ],
       "contract": "SOURCE_GROUNDED_MATCHDAY_TEAM_OPPONENT_TIME_VENUE_COMPETITION_VERIFIED_STANDINGS_FORM_H2H_FAIL_CLOSED_NO_PREDICTIONS"
+    },
+    {
+      "id": "CAP-CARD-BENEFIT-CENTER",
+      "domain": "COMMUNITY_SERVICES",
+      "required": true,
+      "state": "PARTIAL",
+      "sources": [
+        "SPONSOR_MASTER_SHEET",
+        "R20"
+      ],
+      "contract": "PUBLIC_CARD_CENTER_SUPPORTER_REQUEST_TESSERATO_AUTH_ONLY_PUBLIC_SAFE_BENEFIT_PROJECTION_FORMALIZATION_GATE_NO_ROLE_SELF_ASSIGNMENT"
     }
   ],
   "known_noncompliance": [
@@ -3150,7 +3168,7 @@
     "visual_principle": "SPATIAL_SPORT_EDITORIAL_HIGH_IMPACT",
     "legacy_home_route": "#/home",
     "no_rewrite_rule": false,
-    "release": "R48",
+    "release": "R50",
     "product_name": "SCD UNIVERSE",
     "audience_fit": [
       "YOUTH",
@@ -3299,7 +3317,7 @@
       ]
     },
     "nextgen_preview": {
-      "release": "NG-0.6.0",
+      "release": "NG-0.7.0",
       "name": "SCD ARENA",
       "status": "LIVE",
       "entry": "#/pulse",
@@ -3474,6 +3492,11 @@
           "id": "PROFILE",
           "hash": "#twin",
           "surface": "SCD_TWIN"
+        },
+        {
+          "id": "CARD",
+          "hash": "#card",
+          "surface": "CARD_AND_BENEFIT_CENTER"
         }
       ],
       "rules": [
@@ -3482,7 +3505,9 @@
         "TEAMS_DERIVE_FROM_VERIFIED_PUBLIC_SPORT_DATA",
         "SEARCH_AND_FILTERS_MUST_WORK_ON_MOBILE_AND_DESKTOP",
         "MISSING_DATA_FAILS_CLOSED_WITH_CLEAR_STATE",
-        "NO_PRIVATE_ROSTER_OR_CONTACTS_IN_PUBLIC_TEAMS"
+        "NO_PRIVATE_ROSTER_OR_CONTACTS_IN_PUBLIC_TEAMS",
+        "CARD_BENEFITS_ACTIVE_ONLY_WITH_FORMALIZATION_EVIDENCE",
+        "CARD_NEVER_SELF_ASSIGNS_RESERVED_ROLE"
       ],
       "calendar": {
         "default_period": "CURRENT_WEEK",
@@ -3565,6 +3590,48 @@
       "roster": "NO_PRIVATE_ROSTER",
       "people": "PUBLIC_AUTHORIZED_PROFILES_ONLY",
       "deep_link_calendar": true
+    },
+    "card_and_benefit_center": {
+      "state": "PUBLIC_READ_MODEL_READY",
+      "route": "#card",
+      "canonical_secondary_route": "/app/card",
+      "audiences": [
+        "PUBLIC",
+        "USER_BASE",
+        "ATHLETE_REQUEST",
+        "FAMILY",
+        "STAFF_REQUEST",
+        "PARTNER",
+        "AUTHORIZED_USERS"
+      ],
+      "cards": {
+        "supporter": {
+          "audience": "FAN_USER_BASE",
+          "registration": "PUBLIC_REGISTER_REQUEST",
+          "grants_reserved_role": false
+        },
+        "tesserato": {
+          "audience": "AUTHORIZED_ATHLETE_OR_STAFF",
+          "public_entry": "REQUEST_PATH_ONLY",
+          "self_assignment": false,
+          "authorization": "DIRECTION_ONLY"
+        }
+      },
+      "benefit_network": {
+        "endpoint": "/api/community/benefits",
+        "source": "COMMUNITY_BENEFITS_SNAPSHOT",
+        "source_table": "CONVENZIONI_MASTER",
+        "privacy": "PUBLIC_SAFE_PROJECTION_NO_CONTACTS",
+        "public_active_requires": [
+          "ACTIVE_OR_FORMALIZED_STATUS",
+          "FORMALIZATION_DOCUMENT_EVIDENCE"
+        ],
+        "pipeline_visible_as_non_usable": true,
+        "no_active_claim_before_formalization": true,
+        "no_payment_or_tesseramento_write": true
+      },
+      "account_model": "SINGLE_ACCOUNT_DIRECTION_AUTHORIZATION",
+      "local_or_public_only": true
     }
   },
   "research_intelligence": {
