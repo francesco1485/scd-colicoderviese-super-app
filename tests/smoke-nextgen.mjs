@@ -39,7 +39,7 @@ for(const viewport of viewports){
   await page.waitForSelector('#sportHub');
   await page.waitForSelector('#matchCenter');
   await page.waitForSelector('#upcomingEvents');
-  await page.waitForSelector('#clubNow');
+  await page.waitForSelector('#clubNowContent');
   await page.waitForSelector('#clubContentRail');
   await page.waitForFunction(()=>document.querySelectorAll('#clubContentRail .club-now-card').length>=4);
   await page.waitForSelector('#mediaHub');
