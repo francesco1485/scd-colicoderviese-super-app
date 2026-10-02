@@ -9,6 +9,7 @@ const ROOT = process.env.SCD_STATIC_DIR ? path.resolve(__dirname,process.env.SCD
 const UPSTREAM = process.env.SCD_APPS_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbwYQ_3yLYsp-6jX3FIgufBjpmaZb9uO1AklF9hdG-CuLII9J4ITUX1EA-EKuWXBMEc/exec';
 const CACHE_TTL = 10 * 60 * 1000;
 const CLUB_TIME_ZONE = 'Europe/Rome';
+const DEPLOY_COMMIT = process.env.RENDER_GIT_COMMIT || process.env.SCD_DEPLOY_COMMIT || null;
 const FEATURE_FLAGS = Object.freeze({
   dataFabricObservability: process.env.SCD_FEATURE_DATA_FABRIC_OBSERVABILITY === 'true',
   supabaseCore: process.env.SCD_FEATURE_SUPABASE_CORE === 'true'
@@ -902,7 +903,7 @@ function serveStatic(req,res,overridePath){
 http.createServer(async(req,res)=>{
   applyCors(req,res); if(req.method==='OPTIONS'){res.writeHead(204);return res.end()}
   const u=new URL(req.url,'http://localhost');
-  if(u.pathname==='/health') return json(res,200,{...clubTimePayload(),service:'SCD Super App',version:'40.0.0'});
+  if(u.pathname==='/health') return json(res,200,{...clubTimePayload(),service:'SCD Super App',version:'40.0.0',commit:DEPLOY_COMMIT});
   if(u.pathname==='/api/time') return json(res,200,clubTimePayload());
   if(u.pathname==='/api/capabilities') return json(res,200,{ok:true,version:'40.0.0',mode:'GITHUB_PAGES_RENDER_R20_SUPABASE_DUAL_RUN',actions:[...allowedActions].sort(),featureFlags:FEATURE_FLAGS,domainCore:SUPABASE_RUNTIME,isolated:['safeguarding']});
   if(u.pathname==='/api/core-status') return json(res,200,{ok:true,version:'40.0.0',featureFlags:FEATURE_FLAGS,domainCore:SUPABASE_RUNTIME,currentPrimary:'R20',targetPrimary:'SCD_SUPABASE'});
