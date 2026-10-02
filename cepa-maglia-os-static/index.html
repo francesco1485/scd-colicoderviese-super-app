@@ -226,6 +226,7 @@
         <button class="nav-item" data-view="aiMail">AI Mail & Chat</button>
         <button class="nav-item" data-view="recovery">Clienti · Recovery</button>
         <button class="nav-item" data-view="territories">SAP & Territori</button>
+        <button class="nav-item" data-view="agenda">Agenda condivisa</button>
         <button class="nav-item" data-view="accessAdmin">Accessi & Richieste</button>
       </div>
     </nav>
@@ -1103,6 +1104,53 @@
           <span id="liaInsightCount" class="future-chip">-</span>
         </div>
         <div id="liaInsightList" class="lia-insight-grid"></div>
+      </section>
+    </section>
+
+    <section id="agendaView" class="view hidden">
+      <section class="section-intro split">
+        <div>
+          <div class="eyebrow">AGENDA CONDIVISA</div>
+          <h2>Appuntamenti, iniziative, sponsor e lavori comuni nello stesso flusso.</h2>
+          <p>MAGLIA 360 registra prima l’evento interno, i responsabili e la prossima azione. La sincronizzazione Google Calendar e le email partono solo quando l’integrazione backend risulta attiva.</p>
+        </div>
+        <button id="newAgendaEventBtn" type="button" class="primary">+ Nuovo appuntamento</button>
+      </section>
+
+      <section class="agency-kpis">
+        <div><span>Prossimi</span><strong id="agendaUpcomingCount">—</strong></div>
+        <div><span>CEPA / iniziative</span><strong id="agendaCepaCount">—</strong></div>
+        <div><span>Sponsor / partner</span><strong id="agendaSponsorCount">—</strong></div>
+        <div><span>Sync da completare</span><strong id="agendaSyncPendingCount">—</strong></div>
+      </section>
+
+      <section class="two-col top-gap agenda-layout">
+        <article class="panel">
+          <div class="panel-head wrap">
+            <div><div class="eyebrow">AGENDA OPERATIVA</div><h3>Prossimi appuntamenti e attività comuni</h3></div>
+            <select id="agendaTypeFilter">
+              <option value="">Tutti i tipi</option>
+              <option value="appointment">Appuntamenti</option>
+              <option value="cepa_event">Eventi CEPA</option>
+              <option value="initiative">Iniziative</option>
+              <option value="sponsor">Sponsor</option>
+              <option value="partner">Partner</option>
+              <option value="follow_up">Follow-up</option>
+              <option value="internal">Interni</option>
+            </select>
+          </div>
+          <div id="agendaEventList" class="agenda-event-list"></div>
+        </article>
+
+        <article class="panel agenda-integration-panel">
+          <div class="panel-head"><div><div class="eyebrow">COLLEGAMENTI</div><h3>Email, OTP e Google Calendar</h3></div></div>
+          <div id="agendaIntegrationList" class="agenda-integration-list"></div>
+          <div class="agenda-mail-rule">
+            <span>REGOLA EMAIL</span>
+            <strong>Mittente: sportclubcolico@gmail.com</strong>
+            <p>La copia va al responsabile che ha ordinato l’invio. Appuntamenti, iniziative ed eventi preparano inoltre un riepilogo interno per francescocoppola1485@gmail.com.</p>
+          </div>
+        </article>
       </section>
     </section>
 
