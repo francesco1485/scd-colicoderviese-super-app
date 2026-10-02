@@ -70,9 +70,9 @@ const allowedActions = new Set([
   'private.convocation.create','private.convocation.reply',
   'private.attendance.get','private.attendance.save',
   'public.feed','public.club','public.register','public.calendar','public.datafabric.contract',
-  'public.registration','public.partnerLead','public.communitySubmit','public.ticketSubmit','public.telemetry',
+  'public.registration','public.identity.resolve','public.partnerLead','public.communitySubmit','public.ticketSubmit','public.telemetry',
   'auth.request','auth.login','auth.validate','auth.pin.change',
-  'direction.access.set','direction.pin.set','direction.player.approve','direction.player.reject',
+  'direction.access.set','direction.access.invite','direction.pin.set','direction.player.approve','direction.player.reject',
   'direction.diagnostics','direction.evolution',
   'direction.datafabric.status','direction.datafabric.scan.gmail','direction.datafabric.scan.drive',
 ]);
