@@ -27,6 +27,8 @@ jobs:
         run: npm run test:operative-core
       - name: Social App contract gate
         run: npm run test:social-app
+      - name: R53 football/social core gate
+        run: npm run test:r53-core
       - name: SCD Universe contract gate
         run: npm run test:universe-contract
       - name: Human OS contract gate
@@ -75,6 +77,7 @@ jobs:
           node --check scripts/validate-intake-link-factory.mjs
           node --check scripts/validate-operative-core.mjs
           node --check scripts/validate-social-app.mjs
+          node --check scripts/validate-r53-core.mjs
           node --check scd-ng.js
           node --check scd-interactions.js
           node --check scd-experience-engine.js

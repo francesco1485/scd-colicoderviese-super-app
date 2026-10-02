@@ -1,6 +1,6 @@
 {
-  "schema_version": "1.1.0",
-  "release": "R51",
+  "schema_version": "1.2.0",
+  "release": "R53",
   "purpose": "Domain Core SCD PULSE su Supabase/PostgreSQL con estensione operativa per persone multi-ruolo, tesseramenti LND/FIGC, compliance medica derivata e Match Day collegato al singolo EVENT_ID canonico.",
   "project": {
     "state": "ACTIVE_HEALTHY",
@@ -65,7 +65,8 @@
       "supabase/migrations/20260929_r34_rls_performance_hardening.sql",
       "supabase/migrations/20260929_r35_auth_context_rls_normalization.sql",
       "supabase/migrations/20261002_r51_core_operative_engine.sql",
-      "supabase/migrations/20261002_r51_1_operative_index_hardening.sql"
+      "supabase/migrations/20261002_r51_1_operative_index_hardening.sql",
+      "supabase/migrations/20261002_r53_football_social_private_core.sql"
     ],
     "operative_engine": {
       "state": "SCHEMA_APPLIED_RUNTIME_GATED",
@@ -87,6 +88,50 @@
         "AUTH_ROLE_SCOPE_TESTS_GREEN",
         "R20_DUAL_READ_COMPARE_GREEN",
         "WEB_VERTICAL_SLICE_GREEN"
+      ]
+    },
+    "football_private_core": {
+      "state": "SCHEMA_READY_RUNTIME_GATED",
+      "migration": "supabase/migrations/20261002_r53_football_social_private_core.sql",
+      "tables": [
+        "scd_training_sessions",
+        "scd_training_attendance",
+        "scd_match_performance",
+        "scd_match_callups"
+      ],
+      "canonical_match": "scd_matches.event_id -> scd_events.id",
+      "medical_source_of_truth": "scd_athletes.medical_certificate_expires_at",
+      "figc_source_of_truth": "scd_tesseramenti.portal_status",
+      "activation_requires": [
+        "AUTH_ROLE_SCOPE_TESTS_GREEN",
+        "WEB_VERTICAL_SLICE_GREEN",
+        "ROLLBACK_PROVEN"
+      ]
+    },
+    "social_interactive_core": {
+      "state": "SCHEMA_READY_RUNTIME_GATED",
+      "migration": "supabase/migrations/20261002_r53_football_social_private_core.sql",
+      "tables": [
+        "scd_fan_gamification",
+        "scd_fan_points_ledger",
+        "scd_social_mvp_candidates",
+        "scd_social_mvp_votes",
+        "scd_social_sponsor_deals",
+        "scd_social_rewards",
+        "scd_social_reward_redemptions",
+        "scd_team_messages",
+        "scd_live_match_events"
+      ],
+      "server_authoritative": [
+        "POINTS",
+        "MVP_VOTES",
+        "REWARD_REDEMPTION",
+        "TEAM_MESSAGES_MODERATION"
+      ],
+      "privacy": [
+        "NO_MINOR_AUTO_PUBLICATION",
+        "NO_BACKGROUND_GEOLOCATION",
+        "NO_CLIENT_ROLE_ESCALATION"
       ]
     }
   },

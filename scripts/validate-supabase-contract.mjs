@@ -7,6 +7,7 @@ const migrationPath=path.join(root,'supabase/migrations/20260929_r33_club_graph_
 const authMigrationPath=path.join(root,'supabase/migrations/20260929_r35_auth_context_rls_normalization.sql');
 const operativeMigrationPath=path.join(root,'supabase/migrations/20261002_r51_core_operative_engine.sql');
 const operativeIndexMigrationPath=path.join(root,'supabase/migrations/20261002_r51_1_operative_index_hardening.sql');
+const r53MigrationPath=path.join(root,'supabase/migrations/20261002_r53_football_social_private_core.sql');
 
 function fail(message){console.error('SCD SUPABASE CONTRACT FAIL:',message);process.exitCode=1}
 function assert(condition,message){if(!condition)fail(message)}
@@ -17,14 +18,16 @@ assert(fs.existsSync(migrationPath),'R33 migration missing');
 assert(fs.existsSync(authMigrationPath),'R35 auth migration missing');
 assert(fs.existsSync(operativeMigrationPath),'R51 operative migration missing');
 assert(fs.existsSync(operativeIndexMigrationPath),'R51.1 operative index migration missing');
+assert(fs.existsSync(r53MigrationPath),'R53 football/social migration missing');
 const cfg=readJson(configPath);
 const sql=fs.existsSync(migrationPath)?fs.readFileSync(migrationPath,'utf8'):'';
 const authSql=fs.existsSync(authMigrationPath)?fs.readFileSync(authMigrationPath,'utf8'):'';
 const operativeSql=fs.existsSync(operativeMigrationPath)?fs.readFileSync(operativeMigrationPath,'utf8'):'';
 const operativeIndexSql=fs.existsSync(operativeIndexMigrationPath)?fs.readFileSync(operativeIndexMigrationPath,'utf8'):'';
+const r53Sql=fs.existsSync(r53MigrationPath)?fs.readFileSync(r53MigrationPath,'utf8'):'';
 
 if(cfg){
-  assert(cfg.schema_version==='1.1.0','wrong Supabase contract schema version');
+  assert(cfg.schema_version==='1.2.0','wrong Supabase contract schema version');
   assert(cfg.project?.state==='ACTIVE_HEALTHY','SCD Supabase project must be active after R34 provisioning');
   assert(cfg.project?.dedicated_project_required===true,'dedicated SCD Supabase project required');
   assert(cfg.project?.reuse_cepa_project===false,'CEPA Maglia OS Supabase project must not be reused');
@@ -71,6 +74,9 @@ assert(/alter table public\.scd_person_roles enable row level security/i.test(op
 assert(/alter table public\.scd_tesseramenti enable row level security/i.test(operativeSql),'R51 registrations RLS missing');
 assert(/alter table public\.scd_matches enable row level security/i.test(operativeSql),'R51 matches RLS missing');
 for(const token of ['scd_tesseramenti_person_idx','scd_tesseramenti_season_idx','scd_tesseramenti_category_idx','scd_tesseramenti_team_idx']) assert(operativeIndexSql.includes(token),'R51.1 index hardening missing '+token);
+for(const token of ['scd_training_sessions','scd_match_callups','scd_social_mvp_votes','scd_social_rewards','scd_team_messages']) assert(r53Sql.includes(token),'R53 Supabase core missing '+token);
+assert(cfg.domain_core?.football_private_core?.state==='SCHEMA_READY_RUNTIME_GATED','R53 football core state mismatch');
+assert(cfg.domain_core?.social_interactive_core?.state==='SCHEMA_READY_RUNTIME_GATED','R53 social core state mismatch');
 
 if(process.exitCode)process.exit(process.exitCode);
 console.log('SCD SUPABASE CONTRACT PASS',{

@@ -797,3 +797,30 @@ body.r24-router-ready .sponsor-ticker{display:none!important}
   body.r24-router-ready .r24-home-copy{right:118px}
   body.r24-router-ready .r24-home-copy p{max-width:220px}
 }
+
+
+/* R53 — Athlete callup vertical slice */
+body.r24-router-ready .r53-callup-card{
+  display:flex;align-items:center;justify-content:space-between;gap:18px;
+  margin-bottom:16px;padding:18px 20px;border-radius:22px;
+  background:linear-gradient(135deg,#0d47a1,#1565c0);color:#fff;
+  box-shadow:0 14px 30px rgba(13,71,161,.18);
+}
+body.r24-router-ready .r53-callup-card small{font-size:8px;letter-spacing:.13em;font-weight:950;color:#dbe9ff}
+body.r24-router-ready .r53-callup-card h2{margin:5px 0 6px;font-size:22px;color:#fff}
+body.r24-router-ready .r53-callup-card p{margin:0 0 6px;font-size:11px;color:#e7f0ff}
+body.r24-router-ready .r53-callup-card>div>span{font-size:9px;font-weight:900;color:#fff2b3}
+body.r24-router-ready .r53-callup-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+body.r24-router-ready .r53-callup-actions button{min-height:42px;border-radius:12px;padding:0 14px;font-size:9px;font-weight:950}
+body.r24-router-ready .r53-callup-actions .primary{border:0;background:#fff;color:#0d47a1}
+body.r24-router-ready .r53-callup-actions .outline{border:1px solid rgba(255,255,255,.55);background:transparent;color:#fff}
+body.r24-router-ready .r53-callup-card.empty{background:#fff;color:#26435f;border:1px solid var(--r24-line);box-shadow:var(--r24-shadow)}
+body.r24-router-ready .r53-callup-card.empty small{color:#6e8298}
+body.r24-router-ready .r53-callup-card.empty h2{color:var(--r24-navy)}
+body.r24-router-ready .r53-callup-card.empty p{color:#6e8298}
+
+@media(max-width:700px){
+  body.r24-router-ready .r53-callup-card{display:grid;padding:14px;border-radius:17px}
+  body.r24-router-ready .r53-callup-actions{justify-content:stretch}
+  body.r24-router-ready .r53-callup-actions button{flex:1 1 140px}
+}
