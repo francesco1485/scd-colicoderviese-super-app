@@ -1,4 +1,8 @@
 import fs from 'node:fs';
+import { createRequire } from 'node:module';
+
+const require=createRequire(import.meta.url);
+const { buildPublicCommunityBenefits }=require('../lib/community-benefits.js');
 
 function fail(message){console.error('Card benefit contract FAIL:',message);process.exit(1)}
 function assert(condition,message){if(!condition)fail(message)}
@@ -34,6 +38,9 @@ assert(publicArtifact.policy==='NO_ACTIVE_BENEFIT_WITHOUT_FORMALIZATION_EVIDENCE
 assert(Array.isArray(publicArtifact.active)&&Array.isArray(publicArtifact.pipeline),'public benefit artifact lists missing');
 assert(publicArtifact.active.every(x=>x.formalizationEvidence===true&&x.usableNow===true),'public artifact active row missing evidence');
 assert(publicArtifact.pipeline.every(x=>x.formalizationEvidence===false&&x.usableNow===false),'public artifact pipeline row incorrectly usable');
+const expectedArtifact=buildPublicCommunityBenefits(snapshot,publicArtifact.generatedAt);
+assert(JSON.stringify(publicArtifact)===JSON.stringify(expectedArtifact),'committed public benefit artifact drifted from canonical snapshot projection');
+
 const artifactSerialized=JSON.stringify(publicArtifact).toLowerCase();
 for(const forbidden of ['"owner"','"nextaction"','"agreementdocument"','"email"','"phone"']){
   assert(!artifactSerialized.includes(forbidden),'public artifact leaks internal field '+forbidden);
