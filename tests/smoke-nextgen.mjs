@@ -191,6 +191,10 @@ for(const viewport of viewports){
   await page.waitForSelector('.service-dock');
   await page.waitForSelector('#privateDeskLoginForm');
   if((await page.locator('#deskScopeStatus').textContent())!=='ACCESSO RICHIESTO')throw new Error('Private Desk anonymous gate missing');
+  if(await page.locator('#scdCookieBanner:not([hidden])').count()){
+    await page.click('#scdAnalyticsReject');
+    await page.waitForSelector('#scdCookieBanner',{state:'hidden'});
+  }
 
   await page.evaluate(()=>window.SCDNextGen.openMirror());
   await page.waitForSelector('#mirror.open');
