@@ -21,8 +21,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
       - name: SCD System Manifest gate
         run: npm run test:manifest
+
+      - name: Operative Core contract gate
+        run: npm run test:operative-core
+
+      - name: Social App contract gate
+        run: npm run test:social-app
 
       - name: Prepare static site
         run: |

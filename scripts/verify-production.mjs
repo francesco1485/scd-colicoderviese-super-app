@@ -1,7 +1,8 @@
 import fs from 'node:fs';
 
 const EXPECTED_VERSION=process.env.SCD_EXPECTED_VERSION||'40.0.0';
-const EXPECTED_MANIFEST=process.env.SCD_EXPECTED_MANIFEST||'3.18.0';
+const EXPECTED_RELEASE=process.env.SCD_EXPECTED_RELEASE||'NG-0.7.0';
+const EXPECTED_MANIFEST=process.env.SCD_EXPECTED_MANIFEST||'3.21.0';
 const EXPECTED_COMMIT=process.env.SCD_EXPECTED_COMMIT||process.env.GITHUB_SHA||'';
 const PAGES_URL=process.env.SCD_PAGES_URL||'https://francesco1485.github.io/scd-colicoderviese-super-app/';
 const RENDER_BASE=(process.env.SCD_RENDER_BASE_URL||'https://scd-colicoderviese-official-r21.onrender.com').replace(/\/$/,'');
@@ -11,8 +12,9 @@ const outDir='test-output';
 fs.mkdirSync(outDir,{recursive:true});
 
 const evidence={
-  release:'R40',
+  release:'R52.1',
   expectedVersion:EXPECTED_VERSION,
+  expectedRelease:EXPECTED_RELEASE,
   expectedManifest:EXPECTED_MANIFEST,
   expectedCommit:EXPECTED_COMMIT||null,
   startedAt:new Date().toISOString(),
@@ -37,18 +39,37 @@ function parseJson(label,text){
   try{return JSON.parse(text)}
   catch{throw new Error(label+' returned invalid JSON')}
 }
+function cacheBust(url){return url+(url.includes('?')?'&':'?')+'scd_verify='+Date.now()}
+function systemManifestVersion(j){return j?.manifest?.version||null}
 async function runChecks(attempt){
   const result={attempt,at:new Date().toISOString(),checks:{},failures:[]};
 
   try{
-    const r=await getText(PAGES_URL+(PAGES_URL.includes('?')?'&':'?')+'scd_verify='+Date.now());
-    const hasBuild=new RegExp('name=["\\\']scd-build["\\\'][^>]*content=["\\\']'+EXPECTED_VERSION.replace(/\./g,'\\.')+'["\\\']','i').test(r.text)
-      || new RegExp('content=["\\\']'+EXPECTED_VERSION.replace(/\./g,'\\.')+'["\\\'][^>]*name=["\\\']scd-build["\\\']','i').test(r.text);
-    result.checks.pages={httpStatus:r.status,ok:r.ok&&hasBuild,buildVersion:hasBuild?EXPECTED_VERSION:'MISMATCH'};
-    if(!result.checks.pages.ok)result.failures.push('PAGES_BUILD_VERSION');
+    const r=await getText(cacheBust(PAGES_URL));
+    const escVersion=EXPECTED_VERSION.replace(/\./g,'\\.');
+    const escRelease=EXPECTED_RELEASE.replace(/\./g,'\\.');
+    const hasBuild=new RegExp('name=["\\\']scd-build["\\\'][^>]*content=["\\\']'+escVersion+'["\\\']','i').test(r.text)
+      || new RegExp('content=["\\\']'+escVersion+'["\\\'][^>]*name=["\\\']scd-build["\\\']','i').test(r.text);
+    const hasRelease=new RegExp('name=["\\\']scd-release["\\\'][^>]*content=["\\\']'+escRelease+'["\\\']','i').test(r.text)
+      || new RegExp('content=["\\\']'+escRelease+'["\\\'][^>]*name=["\\\']scd-release["\\\']','i').test(r.text);
+    result.checks.pages={httpStatus:r.status,ok:r.ok&&hasBuild&&hasRelease,buildVersion:hasBuild?EXPECTED_VERSION:'MISMATCH',release:hasRelease?EXPECTED_RELEASE:'MISMATCH'};
+    if(!result.checks.pages.ok)result.failures.push('PAGES_APP_SHELL_VERSION');
   }catch(e){
     result.checks.pages={ok:false,error:String(e.message||e)};
-    result.failures.push('PAGES_BUILD_VERSION');
+    result.failures.push('PAGES_APP_SHELL_VERSION');
+  }
+
+  try{
+    const manifestUrl=new URL('SCD_SYSTEM_MANIFEST.json',PAGES_URL).toString();
+    const r=await getText(cacheBust(manifestUrl));
+    const j=parseJson('Pages system manifest',r.text);
+    const version=systemManifestVersion(j);
+    const ok=r.ok&&version===EXPECTED_MANIFEST&&j?.manifest?.status==='BINDING';
+    result.checks.pagesManifest={httpStatus:r.status,ok,version,status:j?.manifest?.status||null};
+    if(!ok)result.failures.push('PAGES_MANIFEST_VERSION');
+  }catch(e){
+    result.checks.pagesManifest={ok:false,error:String(e.message||e)};
+    result.failures.push('PAGES_MANIFEST_VERSION');
   }
 
   try{
@@ -62,6 +83,18 @@ async function runChecks(attempt){
   }catch(e){
     result.checks.renderHealth={ok:false,error:String(e.message||e)};
     result.failures.push('RENDER_HEALTH_VERSION');
+  }
+
+  try{
+    const r=await getText(cacheBust(RENDER_BASE+'/SCD_SYSTEM_MANIFEST.json'));
+    const j=parseJson('Render system manifest',r.text);
+    const version=systemManifestVersion(j);
+    const ok=r.ok&&version===EXPECTED_MANIFEST&&j?.manifest?.status==='BINDING';
+    result.checks.renderManifest={httpStatus:r.status,ok,version,status:j?.manifest?.status||null};
+    if(!ok)result.failures.push('RENDER_MANIFEST_VERSION');
+  }catch(e){
+    result.checks.renderManifest={ok:false,error:String(e.message||e)};
+    result.failures.push('RENDER_MANIFEST_VERSION');
   }
 
   try{
@@ -171,6 +204,7 @@ if(!passed){
 }
 console.log('SCD PRODUCTION EVIDENCE PASS',{
   version:EXPECTED_VERSION,
+  release:EXPECTED_RELEASE,
   manifest:EXPECTED_MANIFEST,
   commit:EXPECTED_COMMIT||null,
   attempts:evidence.attempts.length,
