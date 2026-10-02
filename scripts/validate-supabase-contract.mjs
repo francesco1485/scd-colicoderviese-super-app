@@ -6,6 +6,7 @@ const configPath=path.join(root,'config/scd-supabase.v1.json');
 const migrationPath=path.join(root,'supabase/migrations/20260929_r33_club_graph_foundation.sql');
 const authMigrationPath=path.join(root,'supabase/migrations/20260929_r35_auth_context_rls_normalization.sql');
 const operativeMigrationPath=path.join(root,'supabase/migrations/20261002_r51_core_operative_engine.sql');
+const operativeIndexMigrationPath=path.join(root,'supabase/migrations/20261002_r51_1_operative_index_hardening.sql');
 
 function fail(message){console.error('SCD SUPABASE CONTRACT FAIL:',message);process.exitCode=1}
 function assert(condition,message){if(!condition)fail(message)}
@@ -15,10 +16,12 @@ assert(fs.existsSync(configPath),'config/scd-supabase.v1.json missing');
 assert(fs.existsSync(migrationPath),'R33 migration missing');
 assert(fs.existsSync(authMigrationPath),'R35 auth migration missing');
 assert(fs.existsSync(operativeMigrationPath),'R51 operative migration missing');
+assert(fs.existsSync(operativeIndexMigrationPath),'R51.1 operative index migration missing');
 const cfg=readJson(configPath);
 const sql=fs.existsSync(migrationPath)?fs.readFileSync(migrationPath,'utf8'):'';
 const authSql=fs.existsSync(authMigrationPath)?fs.readFileSync(authMigrationPath,'utf8'):'';
 const operativeSql=fs.existsSync(operativeMigrationPath)?fs.readFileSync(operativeMigrationPath,'utf8'):'';
+const operativeIndexSql=fs.existsSync(operativeIndexMigrationPath)?fs.readFileSync(operativeIndexMigrationPath,'utf8'):'';
 
 if(cfg){
   assert(cfg.schema_version==='1.1.0','wrong Supabase contract schema version');
@@ -67,6 +70,7 @@ assert(!/generated\s+always\s+as\s*\([^)]*current_date/is.test(operativeSql),'R5
 assert(/alter table public\.scd_person_roles enable row level security/i.test(operativeSql),'R51 person roles RLS missing');
 assert(/alter table public\.scd_tesseramenti enable row level security/i.test(operativeSql),'R51 registrations RLS missing');
 assert(/alter table public\.scd_matches enable row level security/i.test(operativeSql),'R51 matches RLS missing');
+for(const token of ['scd_tesseramenti_person_idx','scd_tesseramenti_season_idx','scd_tesseramenti_category_idx','scd_tesseramenti_team_idx']) assert(operativeIndexSql.includes(token),'R51.1 index hardening missing '+token);
 
 if(process.exitCode)process.exit(process.exitCode);
 console.log('SCD SUPABASE CONTRACT PASS',{
