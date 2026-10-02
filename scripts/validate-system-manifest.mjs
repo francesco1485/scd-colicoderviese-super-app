@@ -374,6 +374,10 @@ for(const forbiddenKey of ['"password":','"token":','"secret":','"private_key":'
   assert(!serialized.toLowerCase().includes(forbiddenKey),'manifest appears to contain a committed secret field: '+forbiddenKey);
 }
 
+assert(m.product_direction?.sponsor_center_development?.source==='SCD_OPERATIVO_PILOTA/INIZIATIVE_COMMERCIALI','Sponsor Development source mismatch');
+assert(m.product_direction?.sponsor_center_development?.fallback==='FAIL_CLOSED_SHOW_SOURCE_UNAVAILABLE_NO_SYNTHETIC_DATA','Sponsor Development fallback must remain fail-closed');
+assert((m.product_direction?.sponsor_center_development?.rules||[]).includes('NO_INVENTED_COSTS'),'Sponsor Development no-invented-cost rule missing');
+
 if(process.exitCode) process.exit(process.exitCode);
 console.log('SCD SYSTEM MANIFEST PASS',{
   version:m.manifest.version,
@@ -382,7 +386,3 @@ console.log('SCD SYSTEM MANIFEST PASS',{
   capabilities:caps.length,
   knownGaps:gaps.length
 });
-
-assert(m.product_direction?.sponsor_center_development?.source==='SCD_OPERATIVO_PILOTA/INIZIATIVE_COMMERCIALI','Sponsor Development source mismatch');
-assert(m.product_direction?.sponsor_center_development?.fallback==='FAIL_CLOSED_SHOW_SOURCE_UNAVAILABLE_NO_SYNTHETIC_DATA','Sponsor Development fallback must remain fail-closed');
-assert((m.product_direction?.sponsor_center_development?.rules||[]).includes('NO_INVENTED_COSTS'),'Sponsor Development no-invented-cost rule missing');
