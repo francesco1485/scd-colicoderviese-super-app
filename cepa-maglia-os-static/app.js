@@ -3041,6 +3041,8 @@ function renderAccessAdmin(){
     return
   }
   const pending=accessRequests.filter(x=>x.status==='pending')
+  const authMail=integrationRegistry.find(x=>x.code==='supabase_auth_email')
+  const authEmailReady=authMail?.status==='active'&&String(authMail?.account_email||'').toLowerCase()==='sportclubcolico@gmail.com'
   $('accessPendingCount').textContent=pending.length
   $('accessActivatedCount').textContent=accessRequests.filter(x=>x.status==='activated').length
   $('commercialLeadNewCount').textContent=commercialLeads.filter(x=>x.status==='new').length
@@ -3050,12 +3052,12 @@ function renderAccessAdmin(){
   if($('showcaseFeaturedCount'))$('showcaseFeaturedCount').textContent=publicShowcase.filter(x=>x.featured).length
   if($('showcaseVisualCount'))$('showcaseVisualCount').textContent=publicShowcase.filter(x=>x.visual_url).length
 
-  $('accessRequestList').innerHTML=accessRequests.map(r=>
+  $('accessRequestList').innerHTML=(authEmailReady?'':'<div class="access-auth-warning"><strong>Attivazioni email sospese</strong><p>Prima di approvare o reinviare un accesso, Supabase Auth deve usare <b>sportclubcolico@gmail.com</b> come mittente configurato. Le richieste restano conservate e autorizzabili appena il canale è attivo.</p></div>')+accessRequests.map(r=>
     '<article class="access-request-card '+esc(r.status)+'"><div class="access-request-head"><div><strong>'+esc(r.full_name)+'</strong><small>'+esc(r.email)+' · '+esc(r.phone)+'</small></div><span>'+esc(r.status.replaceAll('_',' '))+'</span></div>'+
     (r.company_name?'<p><b>Realtà:</b> '+esc(r.company_name)+'</p>':'')+
     (r.request_reason?'<p>'+esc(r.request_reason)+'</p>':'')+
     '<footer><small>'+esc(fmtDateTime(r.created_at))+'</small>'+
-    (r.status==='pending'?'<div><select data-access-role="'+r.id+'"><option value="viewer">Viewer</option><option value="operator">Operatore</option><option value="specialist">Specialista</option></select><button type="button" class="small-btn" data-access-approve="'+r.id+'">Approva</button><button type="button" class="small-btn danger" data-access-reject="'+r.id+'">Rifiuta</button></div>':r.status==='approved_pending_activation'?'<div><span>'+esc(r.assigned_role||'')+'</span><button type="button" class="small-btn" data-access-resend="'+r.id+'">Reinvia attivazione</button></div>':'<span>'+esc(r.assigned_role||'')+'</span>')+
+    (r.status==='pending'?'<div><select data-access-role="'+r.id+'"><option value="viewer">Viewer</option><option value="operator">Operatore</option><option value="specialist">Specialista</option></select>'+(authEmailReady?'<button type="button" class="small-btn" data-access-approve="'+r.id+'">Approva</button>':'<button type="button" class="small-btn" disabled title="Configura prima il mittente Auth Sport Club">Email non configurata</button>')+'<button type="button" class="small-btn danger" data-access-reject="'+r.id+'">Rifiuta</button></div>':r.status==='approved_pending_activation'?'<div><span>'+esc(r.assigned_role||'')+'</span>'+(authEmailReady?'<button type="button" class="small-btn" data-access-resend="'+r.id+'">Reinvia attivazione</button>':'<button type="button" class="small-btn" disabled>Email non configurata</button>')+'</div>':'<span>'+esc(r.assigned_role||'')+'</span>')+
     '</footer></article>'
   ).join('')||empty('Nessuna richiesta di accesso.')
 
@@ -3153,6 +3155,11 @@ function openShowcaseEditor(id=null){
 
 async function manageAccessRequest(id,action,role='viewer'){
   if(!isAccessApprover())return
+  if(['approve','resend_activation'].includes(action)){
+    const authMail=integrationRegistry.find(x=>x.code==='supabase_auth_email')
+    const ready=authMail?.status==='active'&&String(authMail?.account_email||'').toLowerCase()==='sportclubcolico@gmail.com'
+    if(!ready)return alert('Invio sospeso: configura prima Supabase Auth con mittente sportclubcolico@gmail.com.')
+  }
   const{data,error}=await supabase.functions.invoke('manage-access-request',{body:{request_id:id,action,role}})
   if(error||data?.ok===false)return alert(data?.message||error?.message||'Operazione non riuscita.')
   alert(data?.message||'Operazione completata.')
