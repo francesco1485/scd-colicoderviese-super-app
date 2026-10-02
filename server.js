@@ -163,6 +163,98 @@ async function validateSponsorSession(req){
   if(!user?.email||!sponsorStaffAllowed(user))throw new Error('SPONSOR_ACCESS_DENIED');
   return {token,user,isDirection:sponsorDirection(user)};
 }
+
+function cleanPublicHttpsUrl(value=''){
+  try{
+    const u=new URL(String(value||'').trim());
+    return u.protocol==='https:'?u.toString():'';
+  }catch{return ''}
+}
+function donationConfig(){
+  const paymentUrl=cleanPublicHttpsUrl(process.env.SCD_DONATION_PAYMENT_URL||'');
+  const paymentTemplateRaw=String(process.env.SCD_DONATION_PAYMENT_URL_TEMPLATE||'').trim();
+  const paymentTemplateCheck=paymentTemplateRaw?cleanPublicHttpsUrl(paymentTemplateRaw.replaceAll('{amount}','1.00').replaceAll('{currency}','EUR')):'';
+  const paymentTemplate=paymentTemplateCheck?paymentTemplateRaw:'';
+  const bankPublic=process.env.SCD_DONATION_BANK_TRANSFER_PUBLIC==='true';
+  const iban=String(process.env.SCD_DONATION_IBAN||'').replace(/\s+/g,'').toUpperCase();
+  const accountHolder=String(process.env.SCD_DONATION_ACCOUNT_HOLDER||'').trim();
+  const bankReady=bankPublic&&/^[A-Z]{2}[0-9A-Z]{13,32}$/.test(iban)&&Boolean(accountHolder);
+  return {
+    ok:true,
+    fund:{
+      id:'SCD_SOLIDARITY_FUND',
+      name:'Fondo Solidale SCD',
+      purpose:'Sostegno alla partecipazione sportiva di ragazzi e famiglie in difficolta, secondo criteri e approvazioni societarie.',
+      currency:'EUR',
+      presets:[10,25,50,100],
+      minAmount:1,
+      maxAmount:50000
+    },
+    channels:{
+      online:{
+        enabled:Boolean(paymentTemplate||paymentUrl),
+        provider:String(process.env.SCD_DONATION_PAYMENT_PROVIDER||'').trim()||null,
+        url:paymentUrl||null,
+        urlTemplate:paymentTemplate||null,
+        amountAware:Boolean(paymentTemplate)
+      },
+      bankTransfer:{
+        enabled:bankReady,
+        iban:bankReady?iban:null,
+        accountHolder:bankReady?accountHolder:null,
+        causal:bankReady?(String(process.env.SCD_DONATION_CAUSAL||'Erogazione liberale Fondo Solidale SCD').trim()):null
+      }
+    },
+    publicDonorWall:false,
+    taxBenefitClaim:false,
+    note:'La donazione non attribuisce qualifica di socio, tesserato o sponsor. Eventuali agevolazioni fiscali dipendono dalla normativa applicabile e dalla corretta tracciabilita/documentazione.'
+  };
+}
+async function handleDonationConfig(req,res){
+  if(req.method!=='GET')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  return json(res,200,donationConfig(),{'cache-control':'public, max-age=60'});
+}
+async function handleDonationIntent(req,res){
+  if(req.method!=='POST')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  try{
+    const b=JSON.parse(await readBody(req)||'{}');
+    const amount=Number(String(b.amount||'').replace(',','.'));
+    if(!Number.isFinite(amount)||amount<1||amount>50000)return json(res,400,{ok:false,error:'Inserisci un importo valido tra 1 e 50.000 euro.'});
+    const name=String(b.name||'').trim(),email=String(b.email||'').trim(),phone=String(b.phone||'').trim();
+    if(!name||!email||!phone)return json(res,400,{ok:false,error:'Nome, email e telefono sono obbligatori per essere ricontattati.'});
+    if(b.privacy!==true)return json(res,400,{ok:false,error:'Devi autorizzare il trattamento dei dati per la richiesta.'});
+    const anonymous=b.anonymous===true;
+    const donorType=String(b.donorType||'PRIVATO').trim().toUpperCase().slice(0,40);
+    const note=String(b.message||'').trim().slice(0,1200);
+    const payload={
+      kind:'contacts',
+      name,email,phone,privacy:true,
+      topic:'FONDO SOLIDALE SCD · DONAZIONE SPONTANEA · EUR '+amount.toFixed(2),
+      category:'FONDO SOLIDALE',
+      message:[
+        'Importo indicativo: EUR '+amount.toFixed(2),
+        'Tipologia donatore: '+donorType,
+        'Richiesta anonimato pubblico: '+(anonymous?'SI':'NO'),
+        note?'Nota: '+note:'',
+        '',
+        'La presente registrazione e una intenzione/contatto e non costituisce conferma di pagamento.'
+      ].filter(Boolean).join('\n')
+    };
+    const result=await callAppsScript('public.ticketSubmit',payload,'');
+    const d=requireUpstreamSuccess(result,'Registrazione intenzione donazione')||{};
+    return json(res,200,{
+      ok:true,
+      requestId:d.requestId||'',
+      status:d.status||'NUOVA',
+      amount:Number(amount.toFixed(2)),
+      paymentConfirmed:false,
+      message:'Richiesta registrata. Il pagamento si considera effettuato solo tramite un canale ufficiale SCD.'
+    });
+  }catch(e){
+    return json(res,400,{ok:false,error:e.message||'Richiesta di donazione non registrata'});
+  }
+}
+
 async function handleSponsorLead(req,res){
   if(req.method!=='POST')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
   try{
@@ -814,6 +906,8 @@ http.createServer(async(req,res)=>{
   if(u.pathname==='/api/time') return json(res,200,clubTimePayload());
   if(u.pathname==='/api/capabilities') return json(res,200,{ok:true,version:'40.0.0',mode:'GITHUB_PAGES_RENDER_R20_SUPABASE_DUAL_RUN',actions:[...allowedActions].sort(),featureFlags:FEATURE_FLAGS,domainCore:SUPABASE_RUNTIME,isolated:['safeguarding']});
   if(u.pathname==='/api/core-status') return json(res,200,{ok:true,version:'40.0.0',featureFlags:FEATURE_FLAGS,domainCore:SUPABASE_RUNTIME,currentPrimary:'R20',targetPrimary:'SCD_SUPABASE'});
+  if(u.pathname==='/api/public/donation-config') return handleDonationConfig(req,res);
+  if(u.pathname==='/api/public/donation-intent') return handleDonationIntent(req,res);
   if(u.pathname==='/api/sponsor/lead') return handleSponsorLead(req,res);
   if(u.pathname==='/api/sponsor/request-access') return handleSponsorAccessRequest(req,res);
   if(u.pathname==='/api/sponsor/otp') return handleSponsorOtp(req,res);

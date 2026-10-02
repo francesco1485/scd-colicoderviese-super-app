@@ -1972,3 +1972,49 @@ body[data-scd-theme="arena"] select:focus-visible{
   .team-hub-event time,.team-hub-event b,.team-hub-event small{grid-column:1}
   .team-hub-event i{grid-column:2;grid-row:1/4}
 }
+
+
+/* R50.5 SOLIDARITY HOME ENTRY */
+.solidarity-home{
+  margin:16px clamp(16px,3vw,42px);
+  display:grid;
+  grid-template-columns:130px minmax(0,1fr) minmax(240px,.58fr);
+  gap:20px;
+  align-items:center;
+  padding:22px;
+  border:1px solid rgba(8,27,51,.10);
+  border-radius:24px;
+  background:
+    radial-gradient(circle at 92% -10%,rgba(0,169,184,.10),transparent 32%),
+    linear-gradient(145deg,#ffffff,#f3f7fb);
+  box-shadow:0 16px 42px rgba(14,48,86,.08);
+}
+.solidarity-home-mark{
+  aspect-ratio:1/1;
+  border-radius:30px;
+  display:grid;
+  align-content:center;
+  justify-items:start;
+  padding:20px;
+  background:linear-gradient(145deg,var(--navy),#0b4255);
+  color:#fff;
+  box-shadow:0 16px 34px rgba(4,28,58,.18);
+}
+.solidarity-home-mark span{color:var(--gold);font-size:10px;font-weight:950;letter-spacing:.14em}
+.solidarity-home-mark b{font-size:21px;line-height:.92;margin-top:3px}
+.solidarity-home-copy h2{margin:5px 0 8px;color:var(--navy);font-size:clamp(25px,2.7vw,40px);line-height:1.02}
+.solidarity-home-copy p{margin:0;color:var(--muted);font-size:11px;line-height:1.55}
+.solidarity-home-rules{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.solidarity-home-rules span{padding:6px 8px;border-radius:999px;border:1px solid rgba(8,27,51,.10);background:#fff;color:#486278;font-size:8px;font-weight:850}
+.solidarity-home-actions{display:grid;gap:8px;justify-items:start}
+.solidarity-home-actions .btn.primary{display:inline-flex;text-decoration:none;background:var(--gold);color:var(--navy)}
+.solidarity-home-actions small{color:#72859a;font-size:8.5px;line-height:1.45}
+@media(max-width:960px){
+  .solidarity-home{grid-template-columns:100px 1fr}
+  .solidarity-home-actions{grid-column:1/-1}
+}
+@media(max-width:640px){
+  .solidarity-home{margin:14px 12px;grid-template-columns:1fr;padding:16px;border-radius:20px}
+  .solidarity-home-mark{width:105px;border-radius:24px;padding:16px}
+  .solidarity-home-actions .btn.primary{width:100%;justify-content:center}
+}

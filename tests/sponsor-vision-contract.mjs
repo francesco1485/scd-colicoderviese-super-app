@@ -60,12 +60,22 @@ for(const token of [
   'INIT-CENTRO-AREA-SABBIA',
   'INIT-FONDO-SOLIDALE',
   'Fondo Solidale SCD',
+  'id="donationConsole"',
+  'id="solidarityIntentForm"',
+  'data-donation-amount="25"',
+  'Nessun elenco pubblico donatori',
   'agevolazioni fiscali dipendono dalla normativa applicabile',
   'name="project"'
 ]) assert(pub.includes(token),'R50.4 Center development public surface missing: '+token);
 assert(pub.includes('KOMPAN è un riferimento progettuale da formalizzare'),'KOMPAN must not be represented as acquired partner');
 assert(pub.includes('Verisure è un riferimento progettuale da formalizzare'),'Verisure must not be represented as acquired partner');
 assert(pubJs.includes('[data-project-interest]'),'Center development lead interaction missing');
+assert(pubJs.includes('/api/public/donation-config'),'Solidarity Fund config endpoint missing');
+assert(pubJs.includes('/api/public/donation-intent'),'Solidarity Fund intent endpoint missing');
+assert(pubJs.includes('loadDonationConfig'),'Solidarity Fund config loader missing');
+assert(pubJs.includes('syncDonationAmount'),'Solidarity Fund amount synchronization missing');
+assert(pubJs.includes("$('[data-donation-amount]').forEach"),'Solidarity Fund amount controls must use multi-selector helper');
+assert(!/(^|[^$])\$\('\[data-donation-amount\]'\)\.forEach/m.test(pubJs),'single selector incorrectly used for donation amount collection');
 assert(js.includes("SOSPESA · NON INVIARE"),'suspended prospect visibility missing');
 assert(js.includes("Pixellot & Match Content"),'internal video asset missing');
 assert(js.includes("Partner Hub Web App"),'internal web app partner asset missing');

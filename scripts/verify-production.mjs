@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 
 const EXPECTED_VERSION=process.env.SCD_EXPECTED_VERSION||'40.0.0';
-const EXPECTED_MANIFEST=process.env.SCD_EXPECTED_MANIFEST||'3.14.0';
+const EXPECTED_MANIFEST=process.env.SCD_EXPECTED_MANIFEST||'3.15.0';
 const PAGES_URL=process.env.SCD_PAGES_URL||'https://francesco1485.github.io/scd-colicoderviese-super-app/';
 const RENDER_BASE=(process.env.SCD_RENDER_BASE_URL||'https://scd-colicoderviese-official-r21.onrender.com').replace(/\/$/,'');
 const ATTEMPTS=Math.max(1,Number(process.env.SCD_PROD_VERIFY_ATTEMPTS||20));
@@ -91,6 +91,20 @@ async function runChecks(attempt){
   }catch(e){
     result.checks.newsroom={ok:false,error:String(e.message||e)};
     result.failures.push('R40_NEWSROOM_CONTRACT');
+  }
+
+  try{
+    const r=await getText(RENDER_BASE+'/api/public/donation-config?scd_verify='+Date.now());
+    const j=parseJson('Render donation config',r.text);
+    const fundOk=j.fund?.id==='SCD_SOLIDARITY_FUND'&&j.fund?.currency==='EUR';
+    const privacyOk=j.publicDonorWall===false&&j.taxBenefitClaim===false;
+    const channelShape=typeof j.channels?.online?.enabled==='boolean'&&typeof j.channels?.bankTransfer?.enabled==='boolean';
+    const ok=r.ok&&j.ok===true&&fundOk&&privacyOk&&channelShape;
+    result.checks.solidarityFund={httpStatus:r.status,ok,fundOk,privacyOk,channelShape,onlineEnabled:j.channels?.online?.enabled===true,bankTransferEnabled:j.channels?.bankTransfer?.enabled===true};
+    if(!ok)result.failures.push('SOLIDARITY_FUND_PUBLIC_CONTRACT');
+  }catch(e){
+    result.checks.solidarityFund={ok:false,error:String(e.message||e)};
+    result.failures.push('SOLIDARITY_FUND_PUBLIC_CONTRACT');
   }
 
   if(result.checks.renderCapabilities?.dataFabricEnabled===true){

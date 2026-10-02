@@ -104,9 +104,18 @@ async function api(url,body){
   if(!res.ok||data.ok===false)throw new Error(data.error||data.message||'Operazione non riuscita');
   return data;
 }
+async function apiGet(url){
+  const target=ON_PUBLIC_STATIC?PRIVATE_SPONSOR_ORIGIN+url:url;
+  const res=await fetch(target,{method:'GET',credentials:'same-origin',cache:'no-store'});
+  let data={};
+  try{data=await res.json()}catch{}
+  if(!res.ok||data.ok===false)throw new Error(data.error||data.message||'Operazione non riuscita');
+  return data;
+}
 function formData(form){
   const f=new FormData(form),o=Object.fromEntries(f.entries());
   o.privacy=f.get('privacy')==='on';
+  o.anonymous=f.get('anonymous')==='on';
   return o;
 }
 function pending(btn,on){
@@ -212,6 +221,104 @@ function setSponsorWallMode(mode){
 }
 document.querySelectorAll('[data-wall-mode]').forEach(b=>b.addEventListener('click',()=>setSponsorWallMode(b.dataset.wallMode)));
 
+
+/* ===== R50.5 SOLIDARITY FUND · SPONTANEOUS DONATIONS ===== */
+let solidarityConfig=null;
+function donationAmount(){
+  const input=$('#donationAmount');
+  const value=Number(String(input?.value||'').replace(',','.'));
+  return Number.isFinite(value)?Math.max(1,Math.min(50000,value)):25;
+}
+function syncDonationAmount(value){
+  const n=Math.max(1,Math.min(50000,Number(value)||25));
+  const input=$('#donationAmount'),hidden=$('#donationIntentAmount');
+  if(input)input.value=String(n);
+  if(hidden)hidden.value=String(n);
+  $$('[data-donation-amount]').forEach(b=>b.classList.toggle('active',Number(b.dataset.donationAmount)===n));
+  syncDonationDirectLink();
+}
+function resolvedDonationUrl(){
+  const online=solidarityConfig?.channels?.online||{};
+  const amount=donationAmount().toFixed(2);
+  if(online.urlTemplate){
+    return String(online.urlTemplate).replaceAll('{amount}',encodeURIComponent(amount)).replaceAll('{currency}','EUR');
+  }
+  return String(online.url||'');
+}
+function syncDonationDirectLink(){
+  const link=$('#donationOnlineLink');
+  if(!link)return;
+  const url=resolvedDonationUrl();
+  if(url){
+    link.href=url;
+    link.hidden=false;
+    const online=solidarityConfig?.channels?.online||{};
+    const baseLabel=online.provider?'Dona ora con '+online.provider:'Dona ora online';
+    link.textContent=baseLabel+(online.amountAware?' · €'+donationAmount().toFixed(2):'');
+  }else link.hidden=true;
+}
+function renderDonationConfig(){
+  const state=$('#donationChannelState'),bank=$('#donationBankToggle'),box=$('#donationBankBox');
+  if(!state)return;
+  const online=solidarityConfig?.channels?.online||{},transfer=solidarityConfig?.channels?.bankTransfer||{};
+  const channels=[online.enabled?'pagamento online':null,transfer.enabled?'bonifico':null].filter(Boolean);
+  state.className='donation-channel-state '+(channels.length?'ready':'pending');
+  state.textContent=channels.length?'Canali ufficiali disponibili: '+channels.join(' + ')+'.':'Canale di pagamento diretto non ancora pubblicato. Puoi comunque registrare la richiesta e ricevere istruzioni ufficiali dalla società.';
+  syncDonationDirectLink();
+  if(bank){
+    bank.hidden=!transfer.enabled;
+    bank.textContent='Coordinate per bonifico';
+  }
+  if(box){
+    box.hidden=true;
+    if(transfer.enabled){
+      $('#donationAccountHolder').textContent=transfer.accountHolder||'—';
+      $('#donationIban').textContent=transfer.iban||'—';
+      $('#donationCausal').textContent=transfer.causal||'Erogazione liberale Fondo Solidale SCD';
+    }
+  }
+}
+async function loadDonationConfig(){
+  const state=$('#donationChannelState');
+  if(!state)return;
+  try{
+    solidarityConfig=await apiGet('/api/public/donation-config');
+    renderDonationConfig();
+  }catch(err){
+    state.className='donation-channel-state pending';
+    state.textContent='Canali diretti momentaneamente non verificabili. Usa il modulo di contatto per ricevere istruzioni ufficiali SCD.';
+  }
+}
+$$('[data-donation-amount]').forEach(b=>b.addEventListener('click',()=>syncDonationAmount(b.dataset.donationAmount)));
+$('#donationAmount')?.addEventListener('input',e=>syncDonationAmount(e.target.value));
+$('#donationBankToggle')?.addEventListener('click',()=>{
+  const box=$('#donationBankBox');if(!box)return;
+  box.hidden=!box.hidden;
+});
+$('#copyDonationIban')?.addEventListener('click',async()=>{
+  const iban=String($('#donationIban')?.textContent||'').trim();
+  if(!iban||iban==='—')return;
+  try{await navigator.clipboard.writeText(iban);$('#copyDonationIban').textContent='IBAN copiato'}
+  catch{$('#copyDonationIban').textContent='Seleziona e copia l’IBAN'}
+});
+$('#solidarityIntentForm')?.addEventListener('submit',async e=>{
+  e.preventDefault();
+  const form=e.currentTarget,state=$('#solidarityIntentState'),btn=form.querySelector('[type=submit]');
+  const d=formData(form);d.amount=donationAmount();
+  state.textContent='';pending(btn,true);
+  try{
+    const r=await api('/api/public/donation-intent',d);
+    state.className='form-state ok';
+    state.textContent='Richiesta registrata'+(r.requestId?' · '+r.requestId:'')+'. Il pagamento è valido solo quando effettuato tramite un canale ufficiale SCD.';
+    form.reset();
+    syncDonationAmount(d.amount);
+  }catch(err){
+    state.className='form-state error';
+    state.textContent=err.message;
+  }finally{pending(btn,false)}
+});
+syncDonationAmount(25);
+loadDonationConfig();
 
 /* ===== R50.4 CENTER DEVELOPMENT CTA ===== */
 $$('[data-project-interest]').forEach(btn=>btn.addEventListener('click',()=>{

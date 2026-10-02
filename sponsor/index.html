@@ -7,7 +7,7 @@
   <meta name="description" content="SCD ColicoDerviese · Partnership, territorio, sport e opportunità per aziende e partner.">
   <title>SCD ColicoDerviese · Partnership & Sponsor</title>
   <link rel="icon" href="../assets/logo-scd.png">
-  <link rel="stylesheet" href="./sponsor.css?v=13.0.0">
+  <link rel="stylesheet" href="./sponsor.css?v=13.1.0">
   <link rel="stylesheet" href="./scd-design-system.css?v=1.0.0">
 </head>
 <body>
@@ -24,6 +24,7 @@
     <a href="#sponsorwall">Sponsor Wall</a>
     <a href="#ecosistema">Web App</a>
     <a href="#convenzioni">Convenzioni</a>
+    <a href="#fondo-solidale">Fondo Solidale</a>
     <a href="#contatto">Diventa partner</a>
   </nav>
   <a class="access-button" href="https://scd-colicoderviese-official-r21.onrender.com/sponsor/?login=1">Accedi area riservata</a>
@@ -250,8 +251,54 @@
   </section>
 
   <section class="solidarity-fund" id="fondo-solidale" data-init-id="INIT-FONDO-SOLIDALE">
-    <div class="solidarity-mark"><span>SCD</span><strong>FONDO<br>SOLIDALE</strong></div>
-    <div class="solidarity-copy"><small>SPORT · INCLUSIONE · COMUNITÀ</small><h2>Aiutare un ragazzo a restare nello sport è un progetto di tutta la comunità.</h2><p>Il Fondo Solidale SCD è pensato per sostenere, secondo criteri e approvazioni societarie, la partecipazione sportiva di ragazzi e famiglie in difficoltà. Privati e aziende possono manifestare la volontà di contribuire: il contatto viene gestito direttamente dalla società e ogni erogazione dovrà essere tracciata e documentata secondo le regole applicabili.</p><button type="button" data-project-interest="Fondo Solidale SCD">Voglio sostenere il Fondo</button></div>
+    <div class="solidarity-mark"><span>SCD</span><strong>FONDO<br>SOLIDALE</strong><small>COMUNITÀ CHE GIOCA INSIEME</small></div>
+    <div class="solidarity-copy">
+      <small>SPORT · INCLUSIONE · COMUNITÀ</small>
+      <h2>Aiutare un ragazzo a restare nello sport è un progetto di tutta la comunità.</h2>
+      <p>Il Fondo Solidale SCD è pensato per sostenere, secondo criteri e approvazioni societarie, la partecipazione sportiva di ragazzi e famiglie in difficoltà. Privati, famiglie e aziende possono contribuire spontaneamente tramite i soli canali ufficiali pubblicati dalla società.</p>
+      <div class="solidarity-principles"><span>✓ Donazioni spontanee</span><span>✓ Importo libero</span><span>✓ Nessun elenco pubblico donatori</span><span>✓ Tracciabilità e documentazione</span></div>
+      <p class="solidarity-legal">La donazione non attribuisce automaticamente la qualifica di socio, tesserato o sponsor. Eventuali agevolazioni fiscali dipendono dalla normativa applicabile, dal soggetto che effettua l'erogazione e dalla corretta tracciabilità/documentazione.</p>
+    </div>
+    <div class="donation-console" id="donationConsole">
+      <div class="donation-console-head"><span>DONAZIONE SPONTANEA</span><b>Scegli l'importo</b><small>Il pagamento viene effettuato soltanto tramite un canale ufficiale SCD verificato.</small></div>
+      <div class="donation-presets" id="donationPresets">
+        <button type="button" data-donation-amount="10">€10</button>
+        <button type="button" data-donation-amount="25">€25</button>
+        <button type="button" data-donation-amount="50">€50</button>
+        <button type="button" data-donation-amount="100">€100</button>
+      </div>
+      <label class="donation-custom">Altro importo<div><span>€</span><input id="donationAmount" inputmode="decimal" type="number" min="1" max="50000" step="0.01" value="25" aria-label="Importo donazione in euro"></div></label>
+      <div class="donation-channel-state" id="donationChannelState" role="status" aria-live="polite">Verifico i canali ufficiali disponibili…</div>
+      <div class="donation-direct-actions">
+        <a class="donation-online" id="donationOnlineLink" href="#" target="_blank" rel="noopener noreferrer" hidden>Dona ora online</a>
+        <button type="button" class="donation-bank-toggle" id="donationBankToggle" hidden>Coordinate per bonifico</button>
+      </div>
+      <div class="donation-bank-box" id="donationBankBox" hidden>
+        <div><small>INTESTATARIO</small><b id="donationAccountHolder">—</b></div>
+        <div><small>IBAN</small><b id="donationIban">—</b><button type="button" id="copyDonationIban">Copia IBAN</button></div>
+        <div><small>CAUSALE</small><b id="donationCausal">—</b></div>
+      </div>
+      <details class="donation-contact">
+        <summary>Preferisco essere ricontattato / chiedere istruzioni</summary>
+        <form id="solidarityIntentForm">
+          <input type="hidden" name="amount" id="donationIntentAmount" value="25">
+          <div class="two">
+            <label>Nome e cognome<input name="name" required autocomplete="name"></label>
+            <label>Tipologia<select name="donorType"><option value="PRIVATO">Privato / famiglia</option><option value="AZIENDA">Azienda / attività</option><option value="ALTRO">Altro</option></select></label>
+          </div>
+          <div class="two">
+            <label>Email<input name="email" type="email" required autocomplete="email"></label>
+            <label>Telefono<input name="phone" required autocomplete="tel"></label>
+          </div>
+          <label>Nota facoltativa<textarea name="message" rows="2" placeholder="Eventuale messaggio per la società"></textarea></label>
+          <label class="privacy"><input type="checkbox" name="anonymous" checked> Non desidero comparire in eventuali ringraziamenti pubblici.</label>
+          <label class="privacy"><input type="checkbox" name="privacy" required> Autorizzo SCD a utilizzare questi dati esclusivamente per gestire la richiesta relativa alla donazione.</label>
+          <button class="primary-cta form-submit" type="submit">Registra la richiesta</button>
+          <p class="form-state" id="solidarityIntentState" role="status" aria-live="polite"></p>
+        </form>
+      </details>
+      <small class="donation-disclaimer">La registrazione della richiesta non costituisce conferma di pagamento. Nessun beneficio fiscale viene promesso automaticamente.</small>
+    </div>
   </section>
 
 
@@ -410,6 +457,6 @@
   </div>
 </div>
 
-<script src="./sponsor.js?v=18.4.0"></script>
+<script src="./sponsor.js?v=18.5.0"></script>
 </body>
 </html>

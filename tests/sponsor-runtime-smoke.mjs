@@ -3,7 +3,16 @@ import {spawn} from 'node:child_process';
 const port=18765;
 const base='http://127.0.0.1:'+port;
 const child=spawn(process.execPath,['server.js'],{
-  env:{...process.env,PORT:String(port)},
+  env:{
+    ...process.env,
+    PORT:String(port),
+    SCD_DONATION_PAYMENT_URL_TEMPLATE:'https://payments.example.test/donate?amount={amount}&currency={currency}',
+    SCD_DONATION_PAYMENT_PROVIDER:'TEST_PROVIDER',
+    SCD_DONATION_BANK_TRANSFER_PUBLIC:'true',
+    SCD_DONATION_IBAN:'IT00X0000000000000000000000',
+    SCD_DONATION_ACCOUNT_HOLDER:'SCD TEST',
+    SCD_DONATION_CAUSAL:'Test Fondo Solidale'
+  },
   stdio:['ignore','pipe','pipe']
 });
 
@@ -41,6 +50,8 @@ try{
   assert(pubText.includes('Catalogo')||pubText.includes('opportunità'),'public sponsor page missing commercial content');
   assert(pubText.includes('IL CENTRO SPORTIVO CHE CRESCE'),'public Center development surface missing');
   assert(pubText.includes('FONDO')&&pubText.includes('SOLIDALE'),'public Solidarity Fund surface missing');
+  assert(pubText.includes('id="donationConsole"'),'public spontaneous donation console missing');
+  assert(pubText.includes('id="solidarityIntentForm"'),'Solidarity Fund intent form missing');
   assert(pubText.includes('sponsor.js'),'public sponsor page missing JS');
 
   const js=await fetch(base+'/sponsor/sponsor.js');
@@ -48,6 +59,23 @@ try{
   assert(js.status===200,'sponsor.js status '+js.status);
   assert(jsText.includes('scd-colicoderviese-official-r21.onrender.com'),'public login target is not official service');
   assert(jsText.includes("$('.modal').forEach"),'correct modal collection selector missing');
+
+  const donationConfigResponse=await fetch(base+'/api/public/donation-config');
+  assert(donationConfigResponse.status===200,'donation config status '+donationConfigResponse.status);
+  const donationConfig=await donationConfigResponse.json();
+  assert(donationConfig.ok===true,'donation config not ok');
+  assert(donationConfig.channels?.online?.enabled===true,'test online donation channel should be enabled');
+  assert(donationConfig.channels?.online?.amountAware===true,'test payment link should be amount-aware');
+  assert(donationConfig.channels?.bankTransfer?.enabled===true,'test bank transfer should be enabled');
+  assert(donationConfig.publicDonorWall===false,'public donor wall must stay disabled');
+  assert(donationConfig.taxBenefitClaim===false,'automatic tax benefit claim must stay disabled');
+
+  const invalidDonation=await fetch(base+'/api/public/donation-intent',{
+    method:'POST',
+    headers:{'content-type':'application/json'},
+    body:JSON.stringify({amount:0,name:'QA',email:'qa@example.test',phone:'000',privacy:true})
+  });
+  assert(invalidDonation.status===400,'invalid donation amount must fail closed');
 
   const probe=await fetch(base+'/api/sponsor/session?probe=1');
   assert(probe.status===200,'session probe status '+probe.status);
