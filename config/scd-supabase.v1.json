@@ -1,6 +1,6 @@
 {
   "schema_version": "1.2.0",
-  "release": "R53",
+  "release": "R56",
   "purpose": "Domain Core SCD PULSE su Supabase/PostgreSQL con estensione operativa per persone multi-ruolo, tesseramenti LND/FIGC, compliance medica derivata e Match Day collegato al singolo EVENT_ID canonico.",
   "project": {
     "state": "ACTIVE_HEALTHY",
@@ -66,7 +66,8 @@
       "supabase/migrations/20260929_r35_auth_context_rls_normalization.sql",
       "supabase/migrations/20261002_r51_core_operative_engine.sql",
       "supabase/migrations/20261002_r51_1_operative_index_hardening.sql",
-      "supabase/migrations/20261002_r53_football_social_private_core.sql"
+      "supabase/migrations/20261002_r53_football_social_private_core.sql",
+      "supabase/migrations/20261002_r56_social_live_readiness.sql"
     ],
     "operative_engine": {
       "state": "SCHEMA_APPLIED_RUNTIME_GATED",
@@ -109,7 +110,7 @@
       ]
     },
     "social_interactive_core": {
-      "state": "SCHEMA_READY_RUNTIME_GATED",
+      "state": "SCHEMA_READY_SERVER_READS_STAGED",
       "migration": "supabase/migrations/20261002_r53_football_social_private_core.sql",
       "tables": [
         "scd_fan_gamification",
@@ -132,6 +133,16 @@
         "NO_MINOR_AUTO_PUBLICATION",
         "NO_BACKGROUND_GEOLOCATION",
         "NO_CLIENT_ROLE_ESCALATION"
+      ],
+      "hardening_migration": "supabase/migrations/20261002_r56_social_live_readiness.sql",
+      "public_read_endpoint": "/api/social/public-state",
+      "runtime_env": "SCD_FEATURE_SOCIAL_VERIFIED_READS",
+      "activation_requires": [
+        "R56_INDEX_MIGRATION_APPLIED",
+        "SERVER_ENV_CONFIGURED",
+        "PUBLIC_READ_CONTRACT_GREEN",
+        "NO_DIRECT_BROWSER_TABLE_ACCESS",
+        "VERIFIED_ROWS_ONLY"
       ]
     }
   },
@@ -153,7 +164,8 @@
     "completed": [
       "DEDICATED_SUPABASE_PROJECT_CREATED",
       "MIGRATION_APPLIED",
-      "RLS_SECURITY_ADVISORS_REVIEWED"
+      "RLS_SECURITY_ADVISORS_REVIEWED",
+      "R56_SERVER_READ_MODEL_READY"
     ],
     "pending": [
       "AUTH_ROLE_SCOPE_TESTS_GREEN",
