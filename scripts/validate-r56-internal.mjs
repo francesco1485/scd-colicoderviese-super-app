@@ -65,7 +65,7 @@ for(const [code,rank] of [...sql.matchAll(/select id,'([^']+)'[^\n]*\n?[^\n]*?(\
 }
 if(!sql.includes("'FIGC_LND_CRL'")||!sql.includes("'RM_INTERNAL'")||!sql.includes("'SCD_GOOGLE_CALENDAR'")||!sql.includes("'SCD_CLUB_EVENT'"))fail('calendar source registry incomplete');
 if(!sql.includes("'FIGC_LND_CRL','FIGC / LND / CR Lombardia','FEDERATION_OFFICIAL',100"))fail('federation authority rank must be 100');
-if(!sql.includes("'RM_INTERNAL','Calendario interno Responsabile','R20_MANAGER',90"))fail('RM calendar authority rank must be 90');
+if(!sql.includes("'RM_INTERNAL','Calendario interno Responsabile','R20_MANAGER',85"))fail('RM calendar authority rank must be 85');
 
 for(const channel of ["'TEAM'","'FAMILY'","'STAFF'","'ANNOUNCEMENT'"]){
   if(!sql.includes(channel))fail('communication policy missing '+channel);
