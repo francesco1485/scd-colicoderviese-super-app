@@ -162,6 +162,13 @@ assert(m.product_direction?.public_matchday?.missing_data==='DATO_IN_AGGIORNAMEN
 assert(m.product_direction?.team_hub?.roster==='NO_PRIVATE_ROSTER','R48 Team Hub private roster guard missing');
 assert(m.product_direction?.team_hub?.followed_team_preference==='LOCAL_DEVICE_ONLY','R48 followed-team preference must remain local');
 assert(m.product_direction?.media_and_social_hub?.video_arena?.pixellot==='PRIVATE_BY_DEFAULT_AUTHORIZED_STAFF_ONLY','R48 Video Arena Pixellot privacy guard missing');
+assert(m.product_direction?.solidarity_fund?.payment_processing==='OUTSIDE_CURRENT_APP','Solidarity Fund payment boundary missing');
+assert(m.product_direction?.solidarity_fund?.card_data_collection===false,'Solidarity Fund must never collect card data in current app');
+assert(m.product_direction?.solidarity_fund?.donor_publication_default===false,'Solidarity Fund donor publication must default off');
+assert(m.product_direction?.solidarity_fund?.publication_requires_separate_consent===true,'Solidarity Fund public donor consent must remain separate');
+assert(m.product_direction?.solidarity_fund?.membership_effect==='NONE','Solidarity support must not create membership');
+assert(m.product_direction?.solidarity_fund?.role_effect==='NONE','Solidarity support must not grant app roles');
+assert((m.capability_map||[]).some(x=>x.id==='CAP-SOLIDARITY-FUND'),'CAP-SOLIDARITY-FUND missing');
 
 assert(m.product_direction?.ai_newsroom?.policy==='VERIFIED_STRUCTURED_FACTS_ONLY','R40 newsroom policy mismatch');
 assert(m.product_direction?.ai_newsroom?.stale_site_content===false,'R40 newsroom must exclude stale site content');
@@ -274,7 +281,7 @@ includesAll(caps.map(x=>x.id),[
   'CAP-HOME','CAP-CALENDAR','CAP-ATHLETE','CAP-FAMILY','CAP-STAFF','CAP-COMMS','CAP-RUNTIME-EVIDENCE','CAP-UPSTREAM-RESILIENCE','CAP-R20-RUNTIME-ACTIVATION',
   'CAP-DRIVE-CATALOG','CAP-GMAIL-INGESTION','CAP-DATAFABRIC-OBSERVABILITY','CAP-ENTITY-GRAPH','CAP-COMPLETENESS','CAP-SUPABASE-CORE','CAP-SUPABASE-AUTH-CONTEXT',
   'CAP-CHAT','CAP-CONFIDENCE','CAP-ANCONFIDENCE','CAP-SAFEGUARDING','CAP-SKY','CAP-AVATAR',
-  'CAP-TAMAGOTCHI','CAP-GEO','CAP-R22','CAP-PWA','CAP-ANDROID','CAP-IOS','CAP-MOBILE-SUPABASE-SHELL','CAP-SCD-UNIVERSE','CAP-META-ADAPTIVE','CAP-SCD-TWIN','CAP-SCD-MIRROR','CAP-SOCIAL-RADAR','CAP-HUMAN-OS','CAP-PRIVATE-DESK','CAP-COGNITIVE-ERGONOMICS','CAP-GROWTH-LOOP','CAP-WEEKLY-SPORT-CALENDAR','CAP-AI-NEWSROOM','CAP-MEDIA-SOCIAL-HUB','CAP-STAFF-ROLE-INGESTION','CAP-PUBLIC-MATCHDAY'
+  'CAP-TAMAGOTCHI','CAP-GEO','CAP-R22','CAP-PWA','CAP-ANDROID','CAP-IOS','CAP-MOBILE-SUPABASE-SHELL','CAP-SCD-UNIVERSE','CAP-META-ADAPTIVE','CAP-SCD-TWIN','CAP-SCD-MIRROR','CAP-SOCIAL-RADAR','CAP-HUMAN-OS','CAP-PRIVATE-DESK','CAP-COGNITIVE-ERGONOMICS','CAP-GROWTH-LOOP','CAP-WEEKLY-SPORT-CALENDAR','CAP-AI-NEWSROOM','CAP-MEDIA-SOCIAL-HUB','CAP-STAFF-ROLE-INGESTION','CAP-PUBLIC-MATCHDAY','CAP-SOLIDARITY-FUND'
 ],'capability map');
 
 const gaps=m.known_noncompliance||[];
