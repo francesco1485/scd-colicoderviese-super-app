@@ -8,7 +8,7 @@ const nextgen=manifest.architecture?.nextgen_preview?.visual_mode==='SYNTHETIC_N
 
 const common=[
   'index.html','manifest.webmanifest','SCD_SYSTEM_MANIFEST.json','sw.js','delete-account.html',
-  'content/weekly-news.json','robots.txt','sitemap.xml','intake/index.html','intake/admin.html','intake/intake.css','intake/intake-config.public.json','intake/intake.js','intake/admin.js',
+  'content/weekly-news.json','content/public-club.v1.json','robots.txt','sitemap.xml','intake/index.html','intake/admin.html','intake/intake.css','intake/intake-config.public.json','intake/intake.js','intake/admin.js',
   'sponsor/index.html','sponsor/sponsor.css','sponsor/scd-design-system.css','sponsor/sponsor.js'
 ];
 const legacy=[
