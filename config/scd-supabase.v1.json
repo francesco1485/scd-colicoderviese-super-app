@@ -141,7 +141,8 @@
       "tables": [
         "scd_identity_links",
         "scd_access_invites",
-        "scd_access_events"
+        "scd_access_events",
+        "scd_usage_consents"
       ],
       "identity_match": [
         "EMAIL_EXACT",
@@ -150,7 +151,10 @@
         "IMPORT_CANONICAL"
       ],
       "no_name_only_matching": true,
-      "server_side_role_assignment": true
+      "server_side_role_assignment": true,
+      "access_metrics_view": "scd_access_daily_metrics",
+      "public_identity_enumeration": false,
+      "non_essential_analytics_requires_consent": true
     },
     "calendar_intelligence_core": {
       "state": "SCHEMA_READY_RUNTIME_GATED",
@@ -159,11 +163,22 @@
         "scd_calendar_sources",
         "scd_event_source_links",
         "scd_match_team_stats",
-        "scd_player_match_stats"
+        "scd_communication_policies"
       ],
       "canonical_event": "scd_events.id",
       "federation_priority": true,
-      "provenance_required": true
+      "provenance_required": true,
+      "views": [
+        "scd_player_match_stats",
+        "scd_access_daily_metrics"
+      ],
+      "player_stats_source_of_truth": "scd_match_performance",
+      "calendar_source_priority": [
+        "FIGC_LND_CRL",
+        "RM_INTERNAL",
+        "SCD_GOOGLE_CALENDAR",
+        "SCD_CLUB_EVENT"
+      ]
     },
     "engagement_core": {
       "state": "SCHEMA_READY_RUNTIME_GATED",
