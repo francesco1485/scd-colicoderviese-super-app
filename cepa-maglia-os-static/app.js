@@ -28,11 +28,12 @@ const viewMeta={
  networkRadar:['Radar Rete','Ricerca continua IVASS, Registro Imprese e territorio per nuova rete e collaborazioni'],
  actions:['Attività & Scadenze','Motore operativo comune a tutto il sistema'],
  recovery:['Clienti · Recovery','Campagna operativa sul patrimonio esistente'],
+ agenda:['Agenda condivisa','Appuntamenti, iniziative, sponsor, responsabili e sincronizzazione notifiche'],
  accessAdmin:['Accessi & Richieste','Autorizzazioni utenze, sponsor, partner e contatti dalla vetrina pubblica'],
  liaWorkbench:['Lia · Workbench','Assistente operativo con permessi, ricerca, cartelle di lavoro e artefatti tracciati']
 }
 
-let ecosystem=[],projects=[],actions=[],marketHubs=[],marketEntities=[],contacts=[],timeline=[],documents=[],partnerRequirements=[],blueprints=[],subjects=[],initiatives=[],cepaContent=[],cepaAcademy=[],cepaSpeakers=[],products=[],productKnowledge=[],comparisons=[],collaborators=[],collaboratorTerms=[],portfolioSnapshots=[],businessAssessments=[],growthKits=[],distributionWatchlists=[],distributionCandidates=[],distributionEvidence=[],mailTemplates=[],mailDrafts=[],cepaExpansion=[],cepaReadiness=[],assistantMessages=[],recoveryRows=[],members=[],liaCapabilities=[],liaFolders=[],liaOrders=[],liaFiles=[],researchSources=[],researchInsights=[],liaActionRules=[],liaApprovals=[],roleViewAccess=[],liaAutomationRuns=[],assetRegistry=[],expertProtocols=[],uxUsageEvents=[],accessRequests=[],commercialLeads=[],publicShowcase=[]
+let ecosystem=[],projects=[],actions=[],marketHubs=[],marketEntities=[],contacts=[],timeline=[],documents=[],partnerRequirements=[],blueprints=[],subjects=[],initiatives=[],cepaContent=[],cepaAcademy=[],cepaSpeakers=[],products=[],productKnowledge=[],comparisons=[],collaborators=[],collaboratorTerms=[],portfolioSnapshots=[],businessAssessments=[],growthKits=[],distributionWatchlists=[],distributionCandidates=[],distributionEvidence=[],mailTemplates=[],mailDrafts=[],cepaExpansion=[],cepaReadiness=[],assistantMessages=[],recoveryRows=[],members=[],liaCapabilities=[],liaFolders=[],liaOrders=[],liaFiles=[],researchSources=[],researchInsights=[],liaActionRules=[],liaApprovals=[],roleViewAccess=[],liaAutomationRuns=[],assetRegistry=[],expertProtocols=[],uxUsageEvents=[],accessRequests=[],commercialLeads=[],publicShowcase=[],integrationRegistry=[],agendaEvents=[],agendaAttendees=[],communicationOutbox=[],relationshipClaims=[]
 let officeAssignments=[],officeMessages=[],officeSnapshots=[],officeCases=[],officeWorkflow=[],officeCepaActivities=[],officeImports=[]
 let commercialClients=[],pipelineCases=[],clientCheckups=[],clientInteractions=[],clientWorkItems=[],clientPolicies=[],publicCepaSubjects=[],publicCepaEvents=[]
 let crmProfiles=[],crmModules=[],crmRoleTemplates=[],crmRecommendations=[]
@@ -391,6 +392,7 @@ function setCepaShell(active){
 function accessForView(view){
   if(view==='personalCrm')return'manage'
   if(view==='accessAdmin')return isAccessApprover()?'manage':'hidden'
+  if(view==='agenda')return window.userRole==='viewer'?'hidden':(isManager()?'manage':'read')
   if(view==='operatingPlan')return isManager()?'manage':'read'
   if(isManager())return'manage'
   return roleViewAccess.find(x=>x.view_code===view&&x.active)?.access_level||'hidden'
@@ -716,12 +718,17 @@ async function loadAll(){
     supabase.from('crm_user_profiles').select('*').eq('organization_id',window.orgId).eq('user_id',window.userId).limit(1),
     supabase.from('crm_user_modules').select('*').eq('organization_id',window.orgId).eq('user_id',window.userId).order('sort_order'),
     supabase.from('crm_role_templates').select('*').eq('organization_id',window.orgId).eq('role',window.userRole).eq('active',true).limit(1),
-    supabase.from('crm_user_recommendations').select('*').eq('organization_id',window.orgId).eq('user_id',window.userId).eq('status','active').order('score',{ascending:false}).limit(20)
+    supabase.from('crm_user_recommendations').select('*').eq('organization_id',window.orgId).eq('user_id',window.userId).eq('status','active').order('score',{ascending:false}).limit(20),
+    supabase.from('integration_registry').select('*').eq('organization_id',window.orgId).order('code'),
+    supabase.from('crm_agenda_events').select('*').eq('organization_id',window.orgId).order('starts_at',{ascending:true}).limit(500),
+    supabase.from('crm_agenda_attendees').select('*').eq('organization_id',window.orgId).limit(2000),
+    supabase.from('crm_communication_outbox').select('*').eq('organization_id',window.orgId).order('created_at',{ascending:false}).limit(500),
+    supabase.from('crm_relationship_claims').select('*').eq('organization_id',window.orgId).eq('status','active').order('updated_at',{ascending:false}).limit(500)
   ]
   const res=await Promise.all(q)
   const err=res.find(x=>x.error)?.error
   if(err){console.error(err);$('refreshBtn').textContent='!';return}
-  ;[ecosystem,projects,actions,marketHubs,marketEntities,contacts,timeline,documents,partnerRequirements,blueprints,subjects,initiatives,cepaContent,cepaAcademy,cepaSpeakers,products,productKnowledge,comparisons,collaborators,collaboratorTerms,portfolioSnapshots,businessAssessments,growthKits,distributionWatchlists,distributionCandidates,distributionEvidence,mailTemplates,mailDrafts,cepaExpansion,cepaReadiness,assistantMessages,liaCapabilities,liaFolders,liaOrders,liaFiles,researchSources,researchInsights,liaActionRules,liaApprovals,roleViewAccess,liaAutomationRuns,officeAssignments,officeMessages,officeSnapshots,officeCases,officeWorkflow,officeCepaActivities,officeImports,commercialClients,pipelineCases,clientCheckups,clientInteractions,clientWorkItems,clientPolicies,assetRegistry,expertProtocols,uxUsageEvents,accessRequests,commercialLeads,publicShowcase,crmProfiles,crmModules,crmRoleTemplates,crmRecommendations]=res.map(x=>x.data||[])
+  ;[ecosystem,projects,actions,marketHubs,marketEntities,contacts,timeline,documents,partnerRequirements,blueprints,subjects,initiatives,cepaContent,cepaAcademy,cepaSpeakers,products,productKnowledge,comparisons,collaborators,collaboratorTerms,portfolioSnapshots,businessAssessments,growthKits,distributionWatchlists,distributionCandidates,distributionEvidence,mailTemplates,mailDrafts,cepaExpansion,cepaReadiness,assistantMessages,liaCapabilities,liaFolders,liaOrders,liaFiles,researchSources,researchInsights,liaActionRules,liaApprovals,roleViewAccess,liaAutomationRuns,officeAssignments,officeMessages,officeSnapshots,officeCases,officeWorkflow,officeCepaActivities,officeImports,commercialClients,pipelineCases,clientCheckups,clientInteractions,clientWorkItems,clientPolicies,assetRegistry,expertProtocols,uxUsageEvents,accessRequests,commercialLeads,publicShowcase,crmProfiles,crmModules,crmRoleTemplates,crmRecommendations,integrationRegistry,agendaEvents,agendaAttendees,communicationOutbox,relationshipClaims]=res.map(x=>x.data||[])
   if(await ensureCrmBaseline())return loadAll()
   renderEverything()
   syncCrmLearning(false).catch(error=>console.warn('CRM learning',error?.message||error))
@@ -729,7 +736,7 @@ async function loadAll(){
 }
 
 function renderEverything(){
-  renderPartnerNav();renderHome();renderPersonalCRM();renderOperatingPlan();renderCepaHub();renderCepaTerritory();renderOffice();renderOfficeProduct();renderPartner();renderProducts();renderCommerceWorkspace();renderCollaborators();renderGrowthKits();renderComparisons();renderMail();renderCepa();renderTerritories();renderDocuments();renderDevelopment();renderNetworkRadar();renderActions();renderAssistantHistory();renderLiaWorkbench();renderAccessAdmin();applyRoleViewAccess();renderHeaderControls()
+  renderPartnerNav();renderHome();renderPersonalCRM();renderOperatingPlan();renderCepaHub();renderCepaTerritory();renderOffice();renderOfficeProduct();renderPartner();renderProducts();renderCommerceWorkspace();renderCollaborators();renderGrowthKits();renderComparisons();renderMail();renderCepa();renderTerritories();renderDocuments();renderDevelopment();renderNetworkRadar();renderActions();renderAssistantHistory();renderLiaWorkbench();renderAgenda();renderAccessAdmin();applyRoleViewAccess();renderHeaderControls()
 }
 
 
@@ -2952,6 +2959,74 @@ function renderLiaWorkbench(){
   document.querySelectorAll('[data-lia-reject]').forEach(b=>b.onclick=()=>decideLiaApproval(b.dataset.liaReject,'rejected'))
 }
 
+
+
+function agendaTypeLabel(v){return({appointment:'Appuntamento',cepa_event:'Evento CEPA',initiative:'Iniziativa',sponsor:'Sponsor',partner:'Partner',follow_up:'Follow-up',internal:'Interno',other:'Altro'})[v]||v}
+function integrationStatusLabel(v){return({pending:'Da configurare',connected_chat_only:'Connesso in ChatGPT',connected_backend:'Backend collegato',active:'Attivo',degraded:'Parziale',disabled:'Disattivato'})[v]||v}
+function integrationTone(v){return['active','connected_backend'].includes(v)?'good':v==='connected_chat_only'?'partial':v==='degraded'?'critical':'pending'}
+function renderAgenda(){
+  if(!$('agendaEventList'))return
+  const now=Date.now()
+  const upcoming=agendaEvents.filter(x=>x.status!=='cancelled'&&(!x.starts_at||new Date(x.starts_at).getTime()>=now-86400000))
+  const filter=$('agendaTypeFilter')?.value||''
+  const shown=upcoming.filter(x=>!filter||x.event_type===filter)
+  $('agendaUpcomingCount').textContent=upcoming.length
+  $('agendaCepaCount').textContent=upcoming.filter(x=>['cepa_event','initiative'].includes(x.event_type)).length
+  $('agendaSponsorCount').textContent=upcoming.filter(x=>['sponsor','partner'].includes(x.event_type)).length
+  $('agendaSyncPendingCount').textContent=agendaEvents.filter(x=>x.calendar_sync_status!=='synced'||x.francesco_summary_status!=='sent').length
+  $('agendaEventList').innerHTML=shown.map(x=>{
+    const attendees=agendaAttendees.filter(a=>a.event_id===x.id)
+    const outbox=communicationOutbox.find(m=>m.source_type==='agenda_event'&&m.source_id===x.id)
+    return '<article class="agenda-event-card"><div class="agenda-event-date"><strong>'+esc(x.starts_at?fmtDate(x.starts_at):'Da definire')+'</strong><small>'+esc(x.starts_at?new Intl.DateTimeFormat('it-IT',{timeStyle:'short'}).format(new Date(x.starts_at)):'')+'</small></div><div class="agenda-event-copy"><span>'+esc(agendaTypeLabel(x.event_type))+' · '+esc(x.status)+'</span><h4>'+esc(x.title)+'</h4><p>'+esc(x.summary||'Nessun riepilogo inserito.')+'</p><small>'+esc([x.location_name,attendees.length?attendees.length+' invitati':null].filter(Boolean).join(' · ')||'Nessun luogo / invitato')+'</small></div><div class="agenda-sync-stack"><b class="sync-chip '+(x.calendar_sync_status==='synced'?'good':'pending')+'">Calendar '+esc(x.calendar_sync_status.replaceAll('_',' '))+'</b><b class="sync-chip '+(outbox?.status==='sent'?'good':'pending')+'">Mail '+esc(outbox?.status||'pending')+'</b></div></article>'
+  }).join('')||empty('Nessun appuntamento visibile nel periodo corrente.')
+
+  if($('agendaIntegrationList'))$('agendaIntegrationList').innerHTML=integrationRegistry.map(x=>
+    '<div class="agenda-integration-row"><div><strong>'+esc(x.purpose)+'</strong><small>'+esc(x.account_email||x.provider)+' · '+esc((x.capabilities||[]).join(' · '))+'</small></div><span class="integration-state '+integrationTone(x.status)+'">'+esc(integrationStatusLabel(x.status))+'</span></div>'
+  ).join('')||empty('Nessuna integrazione registrata.')
+
+  if($('agendaTypeFilter'))$('agendaTypeFilter').onchange=renderAgenda
+  if($('newAgendaEventBtn'))$('newAgendaEventBtn').onclick=async()=>{if(isManager())await loadMembers();openAgendaEditor()}
+}
+function agendaAudienceMembers(scope,selectedIds){
+  const ids=new Set(selectedIds||[])
+  if(scope==='leadership')members.filter(m=>['super_admin','supervisor','manager'].includes(m.role)).forEach(m=>ids.add(m.user_id))
+  return [...ids]
+}
+function openAgendaEditor(existing=null){
+  const canSelect=isManager()&&members.length
+  $('modalContent').innerHTML='<div class="eyebrow">AGENDA CONDIVISA</div><h2>'+(existing?'Modifica appuntamento':'Nuovo appuntamento / iniziativa')+'</h2><p class="muted">L’evento viene salvato subito in MAGLIA 360. Email e Google Calendar restano in attesa finché il backend delle integrazioni non è attivo.</p><form id="agendaEventForm" class="form"><div class="inline"><label>Tipo<select id="agType"><option value="appointment">Appuntamento</option><option value="cepa_event">Evento CEPA</option><option value="initiative">Iniziativa</option><option value="sponsor">Sponsor</option><option value="partner">Partner</option><option value="follow_up">Follow-up</option><option value="internal">Interno</option><option value="other">Altro</option></select></label><label>Visibilità / partecipazione<select id="agScope"><option value="selected">Persone selezionate</option><option value="leadership">Dirigenza</option><option value="responsibles">Responsabili selezionati</option><option value="private">Privato / creatore</option></select></label></div><label>Titolo<input id="agTitle" required value="'+esc(existing?.title||'')+'"></label><label>Riepilogo<textarea id="agSummary">'+esc(existing?.summary||'')+'</textarea></label><div class="inline"><label>Inizio<input id="agStart" type="datetime-local" value="'+esc(localInput(existing?.starts_at)||'')+'" required></label><label>Fine<input id="agEnd" type="datetime-local" value="'+esc(localInput(existing?.ends_at)||'')+'"></label></div><label>Luogo<input id="agLocation" value="'+esc(existing?.location_name||'')+'"></label>'+
+    (canSelect?'<fieldset class="agenda-member-field"><legend>Persone da coinvolgere</legend><div class="agenda-member-grid">'+members.map(m=>'<label><input type="checkbox" data-agenda-member="'+m.user_id+'"> <span>'+esc(m.full_name)+'</span><small>'+esc(m.role.replaceAll('_',' '))+'</small></label>').join('')+'</div></fieldset>':'')+
+    '<button type="submit" class="primary">Salva in Agenda</button></form><div id="agendaFormMsg" class="message hidden"></div>'
+  $('agType').value=existing?.event_type||'appointment'
+  $('agScope').value=existing?.attendance_scope||'selected'
+  $('modal').classList.remove('hidden')
+  $('agendaEventForm').onsubmit=async e=>{
+    e.preventDefault()
+    const selected=[...document.querySelectorAll('[data-agenda-member]:checked')].map(x=>x.dataset.agendaMember)
+    const starts=new Date($('agStart').value).toISOString()
+    const ends=$('agEnd').value?new Date($('agEnd').value).toISOString():new Date(new Date(starts).getTime()+3600000).toISOString()
+    const row={organization_id:window.orgId,event_type:$('agType').value,title:$('agTitle').value.trim(),summary:$('agSummary').value.trim()||null,starts_at:starts,ends_at:ends,location_name:$('agLocation').value.trim()||null,attendance_scope:$('agScope').value,owner_user_id:window.userId,status:'scheduled',calendar_sync_status:'not_configured',francesco_summary_status:'pending',updated_at:new Date().toISOString()}
+    let eventId=existing?.id||null
+    let result
+    if(existing)result=await supabase.from('crm_agenda_events').update(row).eq('id',existing.id).select('id').single()
+    else result=await supabase.from('crm_agenda_events').insert({...row,created_by:window.userId}).select('id').single()
+    if(result.error){$('agendaFormMsg').textContent=result.error.message;$('agendaFormMsg').className='message error';return}
+    eventId=result.data.id
+    if(!existing){
+      const attendeeIds=agendaAudienceMembers(row.attendance_scope,selected).filter(id=>id!==window.userId)
+      if(attendeeIds.length){
+        const attendeeRows=attendeeIds.map(userId=>({event_id:eventId,organization_id:window.orgId,user_id:userId,attendance_role:'required',notify:true}))
+        const{error}=await supabase.from('crm_agenda_attendees').insert(attendeeRows)
+        if(error)console.warn('agenda attendees',error.message)
+      }
+      const cc=window.userEmail&&window.userEmail.toLowerCase()!==ACCESS_APPROVER_EMAIL?[window.userEmail]:[]
+      const body='Tipo: '+agendaTypeLabel(row.event_type)+'\\nData: '+fmtDateTime(row.starts_at)+'\\nLuogo: '+(row.location_name||'Da definire')+'\\nResponsabile: '+(window.userEmail||window.userId)+'\\n\\n'+(row.summary||'')
+      const{error:mailError}=await supabase.from('crm_communication_outbox').insert({organization_id:window.orgId,actor_user_id:window.userId,communication_type:['cepa_event','initiative','sponsor','partner','appointment','follow_up'].includes(row.event_type)?(row.event_type==='cepa_event'?'event':row.event_type):'summary',source_type:'agenda_event',source_id:eventId,from_email:'sportclubcolico@gmail.com',to_emails:[ACCESS_APPROVER_EMAIL],cc_emails:cc,subject:'[MAGLIA 360] '+row.title+' · '+fmtDateTime(row.starts_at),body_text:body,status:'pending',provider:'gmail',metadata:{requires_backend_dispatch:true,calendar_sync_pending:true}})
+      if(mailError)console.warn('agenda summary outbox',mailError.message)
+    }
+    closeModal();await loadAll();navigate('agenda')
+  }
+}
 
 function renderAccessAdmin(){
   if(!$('accessRequestList'))return
