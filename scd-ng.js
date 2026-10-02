@@ -323,7 +323,7 @@ function renderClubContent(){
  const rows=clubContentItems().slice(0,4);
  const status=$('#clubContentStatus');if(status)status.textContent=rows.length?'CONTENUTI SCD VERIFICATI':'CONTENUTI IN AGGIORNAMENTO';
  mount.innerHTML=rows.length?rows.map((x,i)=>'<article class="club-now-card"><div class="club-now-index">'+String(i+1).padStart(2,'0')+'</div><div><small>'+esc(x.type||'CLUB')+' · '+esc(x.status||'')+'</small><h3>'+esc(x.title||'Aggiornamento SCD')+'</h3><p>'+esc(x.summary||'')+'</p></div><button type="button" data-club-content="'+esc(x.id)+'">Apri</button></article>').join(''):'<article class="club-now-empty"><b>Contenuti in aggiornamento</b><span>La sezione resta vuota finché non esistono contenuti pubblici verificati.</span></article>';
- $('[data-club-content]',mount).forEach(b=>b.onclick=()=>openClubContent(rows.find(x=>x.id===b.dataset.clubContent)));
+ $$('[data-club-content]',mount).forEach(b=>b.onclick=()=>openClubContent(rows.find(x=>x.id===b.dataset.clubContent)));
 }
 async function loadClubContent(){
  try{
