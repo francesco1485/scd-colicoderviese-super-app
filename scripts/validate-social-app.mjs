@@ -31,6 +31,7 @@ for(const token of [
 
 if(!js.includes("if(!Array.isArray(x.evidence)||!x.evidence.length)return"))fail('news must fail closed without evidence');
 if(!js.includes("$$('[data-social-open]',mount).forEach")||!js.includes("$$('[data-social-share]',mount).forEach"))fail('Social feed collection bindings missing');
+if(/(?<!\$)\$\([^;\n]*\)\.forEach/.test(js))fail('singular $ helper cannot drive collection forEach');
 if(!html.includes('Pixellot resta privato'))fail('private video safety declaration missing');
 if(!html.includes('Nessuna ripubblicazione automatica'))fail('no auto-republish policy missing');
 if(!html.includes('rel="noopener noreferrer"'))fail('external social links must be hardened');
