@@ -78,10 +78,18 @@ function r56PublicIdentityResolve_(payload) {
   payload = payload || {};
   var mail = email_(payload.email || '');
   if (!validEmail_(mail)) throw new Error('Email non valida.');
+  try {
+    var resolved = r56ResolveIdentity_({email:mail,phone:payload.phone,birthDate:payload.birthDate});
+    if (resolved.matched === true && resolved.matchMethod === 'EMAIL_EXACT' && resolved.active !== false && typeof requestOtp === 'function') {
+      requestOtp(mail);
+    }
+  } catch (e) {
+    console.warn('[R56 PUBLIC IDENTITY PREFLIGHT]', String(e && e.message ? e.message : e));
+  }
   return {
     accepted:true,
-    status:'EMAIL_VERIFICATION_REQUIRED',
-    nextStep:'REQUEST_ONE_TIME_CODE',
+    status:'CHECK_EMAIL_OR_CONTINUE',
+    nextStep:'GENERIC_ONBOARDING',
     matched:null,
     role:null
   };
