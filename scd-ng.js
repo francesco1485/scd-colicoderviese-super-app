@@ -277,7 +277,7 @@ async function openTeamHub(name){
  $('#teamHubFollow',layer).onclick=()=>{if(followed){saveFollowedTeam('');toast('Squadra rimossa dalle preferenze')}else{saveFollowedTeam(model.name);toast('Ora segui '+model.name)}updateFollowTeamUi();layer.classList.remove('open')};
  if(nextMatch)$('#teamHubMatchday',layer).onclick=()=>openMatchday(nextMatch);
  $('#teamHubCalendar',layer).onclick=()=>{state.calendarTeam=model.name;state.calendarPeriod='ALL';layer.classList.remove('open');setView('calendar');renderPublicCalendar()};
- $('[data-teamhub-event]',layer).forEach(b=>b.onclick=()=>openEvent(b.dataset.teamhubEvent));
+ $$('[data-teamhub-event]',layer).forEach(b=>b.onclick=()=>openEvent(b.dataset.teamhubEvent));
 }
 function openMatchday(match=state.nextMatch){
  if(!match){toast('Partita verificata non ancora disponibile');return}
@@ -319,7 +319,7 @@ function renderPublicTeams(){
    const next=t.next,nextMatch=t.nextMatch;
    return '<button type="button" class="public-team-card" data-public-team="'+esc(t.name)+'"><span class="team-card-mark">'+esc((t.name||'?').slice(0,2).toUpperCase())+'</span><div class="team-card-copy"><small>'+esc(t.categories.join(' · ')||'SCD')+'</small><h3>'+esc(t.name)+'</h3><p>'+(next?esc('Prossima attività · '+fmtDate(next.date)+(next.time?' · '+next.time:'')):'Nessuna attività futura verificata')+'</p></div><div class="team-card-match"><small>PROSSIMA GARA</small><b>'+esc(nextMatch?(nextMatch.opponent||nextMatch.title||fmtDate(nextMatch.date)):'Dato in aggiornamento')+'</b><span>'+esc(nextMatch?[fmtDate(nextMatch.date),nextMatch.time].filter(Boolean).join(' · '):'')+'</span></div><span class="team-card-arrow">›</span></button>';
  }).join('');
- $('[data-public-team]',mount).forEach(b=>b.onclick=()=>openTeamHub(b.dataset.publicTeam));
+ $$('[data-public-team]',mount).forEach(b=>b.onclick=()=>openTeamHub(b.dataset.publicTeam));
  renderMyTeamDeck();
 }
 $('#calendarSearch')?.addEventListener('input',e=>{state.calendarSearch=e.target.value;renderPublicCalendar()});
