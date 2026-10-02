@@ -48,6 +48,7 @@ for(const viewport of viewports){
   await page.waitForSelector('#joinClub');
   await page.waitForSelector('#view-calendar',{state:'attached'});
   await page.waitForSelector('#view-teams',{state:'attached'});
+  await page.waitForSelector('#view-card',{state:'attached'});
   await page.waitForSelector('.hero-synth',{state:'attached'});
   await page.waitForSelector('.ng-command-ring',{state:'attached'});
   await page.waitForSelector('#weekRail');
@@ -56,7 +57,7 @@ for(const viewport of viewports){
   await page.waitForSelector('.worlds-preview',{state:'attached'});
   await page.waitForSelector('.ng-value-engine',{state:'attached'});
   await page.waitForTimeout(700);
-  const runtimeFlags=await page.evaluate(()=>({nextGen:Boolean(window.SCDNextGen),meta:Boolean(window.SCDMeta),twin:Boolean(window.SCDTwin),experience:Boolean(window.SCDExperience),adaptive:Boolean(window.SCDAdaptive),matchday:typeof window.SCDNextGen?.openMatchday==='function',teamHub:typeof window.SCDNextGen?.openTeamHub==='function'}));
+  const runtimeFlags=await page.evaluate(()=>({nextGen:Boolean(window.SCDNextGen),meta:Boolean(window.SCDMeta),twin:Boolean(window.SCDTwin),experience:Boolean(window.SCDExperience),adaptive:Boolean(window.SCDAdaptive),matchday:typeof window.SCDNextGen?.openMatchday==='function',teamHub:typeof window.SCDNextGen?.openTeamHub==='function',card:typeof window.SCDNextGen?.openCard==='function',benefits:typeof window.SCDNextGen?.loadBenefits==='function'}));
   if(!Object.values(runtimeFlags).every(Boolean))throw new Error('runtime boot incomplete '+JSON.stringify(runtimeFlags)+' browserErrors='+errors.join(' | '));
   await page.waitForFunction(()=>document.documentElement.scrollWidth<=window.innerWidth+3);
 
@@ -143,7 +144,17 @@ for(const viewport of viewports){
   if(!matchdayTrust.includes('QA_SYNTHETIC_TEST_ONLY'))throw new Error('matchday source provenance missing');
   await page.click('#publicPanelClose');
 
-  mark('TWIN_'+viewport.width);
+  mark('CARD_'+viewport.width);
+  await page.evaluate(()=>window.SCDNextGen.openCard());
+  await page.waitForSelector('#view-card.active');
+  await page.waitForSelector('#publicBenefitNetwork');
+  await page.waitForFunction(()=>document.querySelector('#benefitSourceState')?.textContent!=='SINCRONIZZAZIONE');
+  if(await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+3))throw new Error('card view horizontal overflow');
+  const cardSummary=await page.locator('#benefitSummary b').allTextContents();
+  if(cardSummary.length<3)throw new Error('Card Benefit summary missing');
+  if([390,1440].includes(viewport.width))await page.screenshot({path:'test-output/card-'+viewport.width+'x'+viewport.height+'.png',fullPage:true});
+
+    mark('TWIN_'+viewport.width);
   await page.evaluate(()=>window.SCDNextGen.setView('twin'));
   await page.waitForSelector('#view-twin.active .twin-stage');
   await page.waitForSelector('#twinLocker');
@@ -238,6 +249,14 @@ const capabilities=await api.request.get(base+'/api/capabilities');
 if(!capabilities.ok())throw new Error('capabilities endpoint failed '+capabilities.status());
 const cap=await capabilities.json();
 if(typeof cap.featureFlags?.supabaseCore!=='boolean')throw new Error('supabase feature flag missing');
+
+const benefits=await api.request.get(base+'/api/community/benefits');
+if(!benefits.ok())throw new Error('community benefits endpoint failed '+benefits.status());
+const benefitsJson=await benefits.json();
+if(benefitsJson.policy!=='NO_ACTIVE_BENEFIT_WITHOUT_FORMALIZATION_EVIDENCE')throw new Error('community benefit policy mismatch');
+if(!Array.isArray(benefitsJson.active)||!Array.isArray(benefitsJson.pipeline))throw new Error('community benefit payload invalid');
+if(benefitsJson.active.some(x=>x.formalizationEvidence!==true||x.usableNow!==true))throw new Error('active benefit without formalization evidence');
+if(benefitsJson.pipeline.some(x=>x.usableNow!==false))throw new Error('pipeline benefit incorrectly usable');
 
 const pwaManifest=await api.request.get(base+'/manifest.webmanifest');
 if(!pwaManifest.ok())throw new Error('manifest.webmanifest missing');
