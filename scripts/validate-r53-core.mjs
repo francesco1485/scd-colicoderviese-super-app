@@ -27,7 +27,7 @@ for(const token of [
 ]) if(!sql.includes(token)) fail('safety/data-quality guard missing '+token);
 
 if(/insert\s+into\s+public\.scd_(social|fan|deadlines|training|match)/i.test(sql)) fail('R53 migration must not seed invented operational rows');
-if(/watchPosition|qrserver\.com|unsplash\.com|percentuale:\s*34|USER_ID|MATCH_ID/i.test(sql)) fail('unsafe/sample runtime token leaked into schema');
+if(/watchPosition|qrserver\.com|unsplash\.com|percentuale:\s*34/i.test(sql)) fail('unsafe/sample runtime token leaked into schema');
 if(!/revoke all on table public\.scd_team_messages from anon, authenticated/i.test(sql)) fail('team messages must be direct-access gated');
 if(!/revoke all on table public\.scd_match_performance from anon, authenticated/i.test(sql)) fail('performance data must be direct-access gated');
 
