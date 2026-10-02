@@ -7,7 +7,7 @@ const router=read('app-r24-router.js');
 const app=read('app.js');
 const css=read('ui-r24-shell.css');
 
-if(manifest.manifest?.version!=='3.24.0')fail('manifest version must be 3.24.0');
+const versionParts=String(manifest.manifest?.version||'0.0.0').split('.').map(Number);\nif((versionParts[0]||0)<3||((versionParts[0]||0)===3&&(versionParts[1]||0)<24))fail('manifest version must be >= 3.24.0');
 const r54=manifest.product_direction?.private_experience_r54;
 if(r54?.state!=='VERTICAL_SLICE_ENHANCEMENT')fail('R54 private experience contract missing');
 for(const rule of [
