@@ -78,7 +78,12 @@ for(const channel of ["'TEAM'","'FAMILY'","'STAFF'","'ANNOUNCEMENT'"]){
 if(!sql.includes('NO_UNSUPERVISED_1TO1')&&!sql.includes('GUARDIAN_OR_STAFF_PRESENT'))fail('minor messaging guard missing');
 
 if(!sql.includes('scd_validate_fantasy_policy'))fail('fantasy policy trigger missing');
-if(!/scd_validate_fantasy_policy[\s\S]*as \$\$[\s\S]*\$\$;/i.test(sql))fail('fantasy policy function must use valid dollar quoting');
+{
+  const fnStart=sql.indexOf('create or replace function public.scd_validate_fantasy_policy()');
+  const fnEnd=sql.indexOf('drop trigger if exists scd_fantasy_policy_guard',fnStart);
+  const fnBlock=fnStart>=0&&fnEnd>fnStart?sql.slice(fnStart,fnEnd):'';
+  if(!fnBlock.includes('as $')||!fnBlock.includes('$;'))fail('fantasy policy function must use valid dollar quoting');
+}
 if(!/monetary_entry\s+boolean\s+not null default false/i.test(sql))fail('fantasy monetary entry guard missing');
 if(!/monetary_prize\s+boolean\s+not null default false/i.test(sql))fail('fantasy monetary prize guard missing');
 if(!sql.includes("public player ranking is not allowed for minor/all-ages modes"))fail('minor public ranking guard missing');
