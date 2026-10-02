@@ -41,8 +41,8 @@ assert(bridge.includes("r216AgendaEligibleUsers_"),'Agenda authorized user filte
 assert(bridge.includes("UTENTI"),'Agenda must resolve invitees from canonical users');
 assert(bridge.includes("MailApp.sendEmail(ctx.summaryEmail"),'Agenda institutional summary email missing');
 assert(bridge.includes("event.deleteEvent()"),'Agenda fail-closed rollback when summary mail fails');
-assert(app.includes('id="agendaForm"'),'Agenda SCD builder UI missing');
-assert(app.includes('id="agendaInvitees"'),'Agenda authorized invitee UI missing');
+assert(html.includes('id="agendaForm"'),'Agenda SCD builder UI missing');
+assert(html.includes('id="agendaInvitees"'),'Agenda authorized invitee UI missing');
 assert(js.includes("fetch('/api/sponsor/agenda'"),'Agenda SCD frontend API missing');
 assert(js.includes("if(name==='eventi')loadAgenda()"),'Agenda lazy loading missing');
 assert(bridge.includes("remainingDailyQuota"),'mail quota diagnostics missing');
