@@ -34,6 +34,7 @@ for(const name of ['GGlass','TA Cleaning','AGC Medical']){
   assert(p.simulationLabel==='SIMULAZIONE_CONCETTUALE_NON_DOCUMENTARIA','simulation disclosure missing: '+name);
   assert(Array.isArray(p.motionTimeline)&&p.motionTimeline.length===5,'40s motion timeline must have 5 phases: '+name);
   assert(p.motionTimeline[0].from===0&&p.motionTimeline[p.motionTimeline.length-1].to===40,'motion timeline must cover 0-40s: '+name);
+  assert(p.logoSourceEvidence&&p.logoSourceEvidence.status,'logo source evidence missing: '+name);
 }
 
 for(const token of ['LED PRODUCTION HUB','id="ledProfileList"','id="ledProfileDetail"','id="ledProductionSpecs"']){
@@ -44,6 +45,7 @@ for(const token of ['initLedProductionHub','renderLedProfileDetail','ledMotionBr
 }
 assert(js.includes("p.logoAssetStatus!=='APPROVED_OFFICIAL_ASSET'"),'final MP4 logo gate missing in UI');
 assert(js.includes('MASTER MP4 BLOCCATO'),'blocked master state missing');
+assert(js.includes('led-source-evidence'),'Drive source evidence UI missing');
 assert(js.includes('Risoluzione LED nativa: da rilevare alla consegna'),'native LED unresolved notice missing');
 assert(!js.includes("fetch('/config/sponsor-motion-profiles.json'"),'must not use public config bypass');
 console.log('LED production contract PASS');
