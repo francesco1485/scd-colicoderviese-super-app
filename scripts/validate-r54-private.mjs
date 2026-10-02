@@ -4,6 +4,7 @@ const fail=m=>{console.error('SCD R54 PRIVATE EXPERIENCE FAIL: '+m);process.exit
 const read=p=>fs.readFileSync(p,'utf8');
 const manifest=JSON.parse(read('SCD_SYSTEM_MANIFEST.json'));
 const router=read('app-r24-router.js');
+const app=read('app.js');
 const css=read('ui-r24-shell.css');
 
 if(manifest.manifest?.version!=='3.24.0')fail('manifest version must be 3.24.0');
@@ -37,6 +38,9 @@ if(router.includes('Trasporti disponibili secondo autorizzazione'))fail('transpo
 if(!router.includes('Non vengono ricostruiti lato app'))fail('payment fail-closed disclosure missing');
 if(!router.includes('Nessun documento viene dichiarato presente'))fail('document fail-closed disclosure missing');
 if(!css.includes('.r54-private-actions')||!css.includes('.r54-status-list'))fail('R54 responsive styles missing');
+for(const fn of ['function openTransportManager','async function openMyRequests','function openInternalRequestManager']){
+  if(!app.includes(fn))fail('private action implementation missing '+fn);
+}
 
 const caps=new Map((manifest.capability_map||[]).map(x=>[x.id,x]));
 for(const id of ['CAP-ATHLETE','CAP-FAMILY','CAP-STAFF','CAP-PRIVATE-DESK']){
