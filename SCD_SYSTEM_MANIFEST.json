@@ -2251,24 +2251,24 @@
       "domain": "PRIVATE_UI",
       "required": true,
       "state": "PARTIAL",
-      "screen": "ATHLETE_AREA",
-      "contract": "AUTHORIZED_PROFILE_CALLUPS_STATUS_CALENDAR_REQUESTS_TRANSPORT_FAIL_CLOSED"
+      "screen": "PRIVATE_DESK:TESSERATI",
+      "contract": "AUTHORIZED_PROFILE_CALLUPS_STATUS_CALENDAR_REQUESTS_TRANSPORT_FAIL_CLOSED_IN_ACTIVE_PRIVATE_DESK"
     },
     {
       "id": "CAP-FAMILY",
       "domain": "PRIVATE_UI",
       "required": true,
       "state": "PARTIAL",
-      "screen": "FAMILY_AREA",
-      "contract": "AUTHORIZED_LINKED_PROFILES_DOCUMENT_STATUS_PAYMENT_STATUS_CALENDAR_TRANSPORT_REQUESTS_FAIL_CLOSED"
+      "screen": "PRIVATE_DESK:TESSERATI",
+      "contract": "AUTHORIZED_LINKED_PROFILES_DOCUMENT_STATUS_PAYMENT_STATUS_CALENDAR_TRANSPORT_REQUESTS_FAIL_CLOSED_IN_ACTIVE_PRIVATE_DESK"
     },
     {
       "id": "CAP-STAFF",
       "domain": "MANAGEMENT",
       "required": true,
       "state": "PARTIAL",
-      "screen": "STAFF_DIRECTION",
-      "contract": "ROLE_SCOPE_OPERATIONAL_DASHBOARD_ATTENDANCE_CALLUPS_MESSAGES_REQUESTS_TRANSPORT"
+      "screen": "PRIVATE_DESK",
+      "contract": "ROLE_SCOPE_OPERATIONAL_DASHBOARD_ATTENDANCE_CALLUPS_MESSAGES_REQUESTS_TRANSPORT_IN_ACTIVE_PRIVATE_DESK"
     },
     {
       "id": "CAP-COMMS",
@@ -4013,11 +4013,14 @@
     "private_experience_r54": {
       "release": "R54",
       "state": "VERTICAL_SLICE_ENHANCEMENT",
-      "purpose": "MAKE_FAMILY_ATHLETE_STAFF_PRIVATE_AREAS_ACTIONABLE_WITH_EXISTING_AUTHORIZED_R20_DATA",
+      "purpose": "MAKE_FAMILY_ATHLETE_STAFF_ACTIONABLE_INSIDE_THE_EXISTING_SCD_NOVA_PRIVATE_DESK",
       "screens": [
-        "ATHLETE_AREA",
-        "FAMILY_AREA",
-        "STAFF_DIRECTION"
+        "PRIVATE_DESK:TESSERATI",
+        "PRIVATE_DESK:PULMINI",
+        "PRIVATE_DESK:RICHIESTE",
+        "PRIVATE_DESK:PRESENZE",
+        "PRIVATE_DESK:CONVOCAZIONI",
+        "PRIVATE_DESK:COMUNICAZIONI"
       ],
       "rules": [
         "NO_NEW_PARALLEL_PRIVATE_DESK",
@@ -4029,7 +4032,10 @@
         "NO_INVENTED_AMOUNTS_DATES_DOCUMENTS_OR_MEDICAL_STATE"
       ],
       "activation": "EXISTING_R20_PRIVATE_SESSION",
-      "supersedes_mock_toasts": true
+      "supersedes_mock_toasts": true,
+      "active_runtime": "scd-ng.js",
+      "legacy_router_status": "COMPATIBILITY_ONLY_NOT_PRIMARY",
+      "no_parallel_private_app": true
     }
   },
   "research_intelligence": {
