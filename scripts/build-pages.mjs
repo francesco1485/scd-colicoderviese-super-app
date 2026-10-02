@@ -1,5 +1,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { createRequire } from 'node:module';
+
+const require=createRequire(import.meta.url);
+const { buildPublicCommunityBenefits }=require('../lib/community-benefits');
 
 const root=process.cwd();
 const out=path.join(root,'_site');
@@ -34,6 +38,12 @@ for(const file of files){
   fs.copyFileSync(src,dest);
 }
 fs.cpSync(path.join(root,'assets'),path.join(out,'assets'),{recursive:true});
+
+const communitySnapshot=JSON.parse(fs.readFileSync(path.join(root,'config','community-benefits.snapshot.json'),'utf8'));
+const publicBenefits=buildPublicCommunityBenefits(communitySnapshot);
+fs.mkdirSync(path.join(out,'content'),{recursive:true});
+fs.writeFileSync(path.join(out,'content','community-benefits.public.json'),JSON.stringify(publicBenefits,null,2)+'\n','utf8');
+
 fs.writeFileSync(path.join(out,'.nojekyll'),'','utf8');
 
 const html=fs.readFileSync(path.join(out,'index.html'),'utf8');
@@ -52,4 +62,4 @@ for(const required of swRequired){
   if(!sw.includes(required)) throw new Error('service worker does not cache '+required);
 }
 
-console.log('SCD Pages artifact built',{mode:nextgen?'NOVA':'LEGACY',files:files.length,assets:fs.readdirSync(path.join(out,'assets')).length});
+console.log('SCD Pages artifact built',{mode:nextgen?'NOVA':'LEGACY',files:files.length,assets:fs.readdirSync(path.join(out,'assets')).length,publicBenefits:publicBenefits.counts});
