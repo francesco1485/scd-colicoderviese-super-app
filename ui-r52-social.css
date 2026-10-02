@@ -1,0 +1,89 @@
+/* R52 — SCD SOCIAL APP MVP */
+
+.social-core-view{padding-bottom:92px}
+.social-hero{
+  margin:18px auto 0;max-width:1480px;padding:28px;border-radius:30px;
+  display:grid;grid-template-columns:minmax(0,1.4fr) minmax(280px,.6fr);gap:18px;
+  background:
+    radial-gradient(circle at 92% 8%,rgba(255,214,65,.20),transparent 24%),
+    linear-gradient(145deg,#07111f 0%,#0a2859 58%,#0a6cff 120%);
+  color:#fff;box-shadow:0 26px 70px rgba(4,20,44,.17)
+}
+.social-hero h1{margin:6px 0 9px;font-size:clamp(30px,4vw,54px);line-height:.98}
+.social-hero h1 em{font-style:normal;color:#ffd84a}
+.social-hero p{max-width:760px;margin:0;color:#cedded;line-height:1.55}
+.social-hero-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.social-hero-card{
+  align-self:stretch;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.07);
+  backdrop-filter:blur(12px);border-radius:22px;padding:18px;display:flex;flex-direction:column;justify-content:space-between
+}
+.social-hero-card small{font-size:11px;letter-spacing:.12em;color:#ffd84a;font-weight:900}
+.social-hero-card b{font-size:22px;line-height:1.05;margin-top:8px}
+.social-hero-card span{font-size:13px;color:#bad0e5;margin-top:8px}
+
+.social-shell{max-width:1480px;margin:14px auto 0;display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:14px}
+.social-main,.social-side{
+  background:#fff;border:1px solid rgba(15,42,84,.09);border-radius:26px;
+  box-shadow:0 16px 38px rgba(7,17,31,.07)
+}
+.social-main{padding:18px}.social-side{padding:16px;height:max-content;position:sticky;top:92px}
+.social-toolbar{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:14px}
+.social-search{flex:1;min-width:240px;display:flex;align-items:center;gap:8px;background:#f3f7fc;border:1px solid #dce6f1;border-radius:16px;padding:0 12px}
+.social-search input{width:100%;border:0;background:transparent;outline:0;padding:12px 0;font:inherit}
+.social-filters{display:flex;gap:6px;overflow:auto;scrollbar-width:none}
+.social-filters::-webkit-scrollbar{display:none}
+.social-filters button{
+  flex:0 0 auto;border:1px solid #dce6f1;background:#fff;color:#44617d;border-radius:999px;
+  padding:9px 12px;font-weight:850;font-size:12px
+}
+.social-filters button.active{background:#07111f;color:#fff;border-color:#07111f}
+
+.social-feed{display:grid;gap:10px}
+.social-card{
+  position:relative;border:1px solid #e2e9f1;background:#fbfdff;border-radius:22px;padding:16px;
+  display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:12px;align-items:start
+}
+.social-card-type{width:44px;height:44px;border-radius:15px;display:grid;place-items:center;background:#eaf3ff;color:#0a6cff;font-weight:950}
+.social-card[data-type="MATCHDAY"] .social-card-type{background:#fff3bd;color:#745c00}
+.social-card[data-type="NEWS"] .social-card-type{background:#ece8ff;color:#5b46d6}
+.social-card[data-type="EVENT"] .social-card-type{background:#e7f8ee;color:#16794a}
+.social-card-body small{font-size:10px;letter-spacing:.1em;color:#68819a;font-weight:900}
+.social-card-body h3{font-size:18px;margin:4px 0 6px;color:#07111f}
+.social-card-body p{margin:0;color:#5d7085;line-height:1.45;font-size:13px}
+.social-card-meta{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
+.social-card-meta span{font-size:10px;padding:5px 7px;border-radius:999px;background:#edf3f9;color:#5c7188}
+.social-card-actions{display:flex;gap:6px;align-items:center}
+.social-card-actions button{
+  border:1px solid #dce6f1;background:#fff;color:#27435f;border-radius:12px;padding:8px 9px;font-weight:850;cursor:pointer
+}
+.social-empty{padding:34px;border:1px dashed #cdd9e6;border-radius:20px;background:#f8fbfe;text-align:center}
+.social-empty b{display:block;font-size:18px}.social-empty span{display:block;margin-top:6px;color:#697d91}
+
+.social-side h3{margin:4px 0 12px}
+.social-follow{
+  border-radius:18px;padding:14px;background:linear-gradient(145deg,#07111f,#0b3472);color:#fff;margin-bottom:12px
+}
+.social-follow small{color:#91b9df}.social-follow b{display:block;font-size:18px;margin:4px 0}
+.social-follow button{margin-top:10px;width:100%}
+.social-channel-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.social-channel-grid a{
+  text-decoration:none;border:1px solid #e0e8f0;border-radius:15px;padding:11px;background:#fff;color:#173654;
+  display:flex;flex-direction:column;gap:4px
+}
+.social-channel-grid a span{font-size:15px;font-weight:950;color:#0a6cff}.social-channel-grid a small{color:#72869a}
+.social-safety{margin-top:12px;padding:12px;border-radius:16px;background:#f3f7fc;color:#50677e;font-size:11px;line-height:1.45}
+.social-safety b{color:#0a2748}
+
+@media(max-width:960px){
+  .social-hero{grid-template-columns:1fr;padding:18px;border-radius:22px;margin:10px 10px 0}
+  .social-shell{grid-template-columns:1fr;margin:10px}
+  .social-side{position:static}
+}
+@media(max-width:640px){
+  .social-main,.social-side{border-radius:20px;padding:12px}
+  .social-card{grid-template-columns:38px minmax(0,1fr);padding:12px}
+  .social-card-type{width:38px;height:38px;border-radius:13px}
+  .social-card-actions{grid-column:2;justify-content:flex-start}
+  .social-card-body h3{font-size:16px}
+  .social-channel-grid{grid-template-columns:1fr 1fr}
+}
