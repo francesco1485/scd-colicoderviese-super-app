@@ -73,6 +73,68 @@ function r56ResolveIdentity_(payload) {
   return {matched:false,matchMethod:'NO_STRONG_MATCH',confidence:0,status:'NEW_OR_PENDING'};
 }
 
+
+function r56PublicIdentityResolve_(payload) {
+  payload = payload || {};
+  var mail = email_(payload.email || '');
+  if (!validEmail_(mail)) throw new Error('Email non valida.');
+  return {
+    accepted:true,
+    status:'EMAIL_VERIFICATION_REQUIRED',
+    nextStep:'REQUEST_ONE_TIME_CODE',
+    matched:null,
+    role:null
+  };
+}
+
+function r56ResolveMyIdentity_(token, payload) {
+  if (!token) throw new Error('Sessione mancante');
+  if (typeof sessionActor_ !== 'function') throw new Error('R20 sessionActor non disponibile');
+  var actor = sessionActor_(token);
+  if (!actor || !actor.email) throw new Error('Sessione non valida');
+  var resolved = r56ResolveIdentity_({
+    email:actor.email,
+    phone:payload && payload.phone,
+    birthDate:payload && payload.birthDate
+  });
+  return {
+    matched:resolved.matched === true,
+    matchMethod:resolved.matchMethod || 'UNVERIFIED',
+    confidence:Number(resolved.confidence || 0),
+    status:String(resolved.status || 'PENDING_REVIEW'),
+    role:String(resolved.role || ''),
+    active:resolved.active !== false
+  };
+}
+
+function r56RecordAccess_(token, payload) {
+  if (!token) throw new Error('Sessione mancante');
+  if (typeof sessionActor_ !== 'function') throw new Error('R20 sessionActor non disponibile');
+  var actor = sessionActor_(token);
+  if (!actor || !actor.email) throw new Error('Sessione non valida');
+  payload = payload || {};
+  var allowedEvents = ['LOGIN_SUCCESS','PRIVATE_DESK_OPEN','SESSION_RESUME','LOGOUT'];
+  var eventType = String(payload.eventType || '').toUpperCase();
+  if (allowedEvents.indexOf(eventType) < 0) throw new Error('Evento accesso non ammesso');
+  var clientKind = String(payload.clientKind || 'WEB').toUpperCase();
+  if (['WEB','PWA','ANDROID','IOS','UNKNOWN'].indexOf(clientKind) < 0) clientKind = 'UNKNOWN';
+  try {
+    if (typeof r216AppendByHeader_ === 'function') {
+      r216AppendByHeader_('APP AUDIT', {
+        TIMESTAMP:new Date(),
+        ACTION:'ACCESS_' + eventType,
+        ACTOR_EMAIL:String(actor.email || ''),
+        RESULT:'RECORDED',
+        SOURCE:'R56',
+        CLIENT:clientKind
+      });
+    }
+  } catch (auditErr) {
+    console.error('[R56 ACCESS AUDIT]', auditErr);
+  }
+  return {stored:true,eventType:eventType,clientKind:clientKind};
+}
+
 function r56InviteAccess_(token, payload) {
   var actor = r56RequireDirection_(token);
   payload = payload || {};
@@ -90,7 +152,8 @@ function r56InviteAccess_(token, payload) {
     scope:payload.scope || {},
     active:true,
     source:'R56_INVITE',
-    identityState:identity.status
+    identityState:identity.status,
+    mustChangePin:true
   };
 
   if (typeof setActorAccess !== 'function') throw new Error('Motore accessi R20 non disponibile');
