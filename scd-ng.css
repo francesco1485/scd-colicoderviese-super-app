@@ -839,6 +839,32 @@ radial-gradient(circle at 84% 0%,rgba(41,215,255,.12),transparent 31%),
   .desk-auth-actions .btn{width:100%}
 }
 
+/* R54 — neutralize generic action-queue article rules on role/scope cards */
+.action-queue article.desk-profile-live{
+  display:flex;
+  background:linear-gradient(125deg,#082641,#0c527f)!important;
+}
+.action-queue article.desk-scope-card{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  background:rgba(255,255,255,.92)!important;
+}
+.action-queue article.desk-scope-card>span{
+  width:auto;
+  height:auto;
+  border-radius:0;
+  background:transparent;
+  display:block;
+  place-items:initial;
+  font-weight:500;
+  color:#506b7f;
+  overflow-wrap:anywhere;
+  min-width:0;
+}
+@media(max-width:680px){
+  .action-queue article.desk-scope-card{grid-template-columns:1fr}
+}
+
 
 /* R46 PREMIUM SPORTS APP PALETTE · 2026-10-01 */
 :root{
