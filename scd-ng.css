@@ -2109,3 +2109,35 @@ body[data-scd-theme="arena"] select:focus-visible{
   .r54-attendance-list label{display:grid}
   .r54-attendance-list select{min-width:0;width:100%}
 }
+
+
+/* R54 visual hardening: Private Desk cards must override generic action-queue article rules. */
+.action-queue .desk-profile-live{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:18px;
+  background:linear-gradient(125deg,#082641,#0c527f)!important;
+  color:#fff!important;
+}
+.action-queue .desk-profile-live h3{color:#fff!important}
+.action-queue .desk-profile-live p{color:#bad6e7!important}
+.action-queue .desk-scope-card{
+  display:grid;
+  grid-template-columns:minmax(108px,auto) minmax(0,1fr);
+  gap:8px 13px;
+  background:#f7fbff!important;
+  color:#173e69;
+}
+.action-queue .desk-scope-card b,
+.action-queue .desk-scope-card span{
+  min-width:0;
+  overflow-wrap:anywhere;
+  word-break:normal;
+}
+@media(max-width:680px){
+  .action-queue .desk-profile-live{display:flex;flex-direction:column;align-items:flex-start}
+  .action-queue .desk-profile-live button{align-self:flex-start}
+  .action-queue .desk-scope-card{display:grid;grid-template-columns:1fr;gap:4px;padding:13px}
+  .action-queue .desk-scope-card span{margin-bottom:7px}
+}
