@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.25.0",
+    "version": "3.26.0",
     "effective_at": "2026-10-02",
     "status": "BINDING",
     "language": "it-IT",
@@ -2784,7 +2784,8 @@
         "SCD_TIKTOK",
         "SCD_YOUTUBE"
       ],
-      "contract": "VERIFIED_PUBLIC_FEED_MATCHDAY_NEWS_EVENTS_MEDIA_LOCAL_FOLLOW_SHARE_FAIL_CLOSED"
+      "contract": "VERIFIED_PUBLIC_FEED_MATCHDAY_NEWS_EVENTS_MEDIA_LOCAL_FOLLOW_SHARE_FAIL_CLOSED",
+      "r56": "VERIFIED_SERVER_READS_STAGED"
     },
     {
       "id": "CAP-FOOTBALL-PRIVATE-CORE",
@@ -2807,7 +2808,8 @@
         "SCD_NEWSROOM",
         "R20"
       ],
-      "contract": "MVP_POINTS_REWARDS_PARTNER_DEALS_TEAM_CHANNELS_FAIL_CLOSED_MODERATED"
+      "contract": "MVP_POINTS_REWARDS_PARTNER_DEALS_TEAM_CHANNELS_FAIL_CLOSED_MODERATED",
+      "r56": "VERIFIED_SERVER_READS_STAGED"
     },
     {
       "id": "CAP-SPONSOR-OPERATIONAL-FOCUS",
@@ -4068,6 +4070,37 @@
         "STATIC_CURATED_CONTENT_MUST_WORK_ON_PAGES_AND_RENDER"
       ],
       "activation": "PUBLIC"
+    },
+    "social_live_readiness_r56": {
+      "release": "R56",
+      "state": "SERVER_READ_MODEL_STAGED",
+      "purpose": "ACTIVATE_VERIFIED_SOCIAL_READS_WITHOUT_EXPOSING_DIRECT_TABLE_ACCESS_OR_ENABLING_UNVERIFIED_WRITES",
+      "runtime": "server.js + scd-ng.js",
+      "endpoint": "/api/social/public-state",
+      "feature_flag": "SCD_FEATURE_SOCIAL_VERIFIED_READS",
+      "surfaces": [
+        "SOCIAL_FAN_ZONE",
+        "MATCHDAY_LIVE_FEED"
+      ],
+      "sources": [
+        "SCD_SUPABASE"
+      ],
+      "rules": [
+        "SERVICE_ROLE_SERVER_ONLY",
+        "DIRECT_ANON_AUTHENTICATED_TABLE_ACCESS_REMAINS_REVOKED",
+        "ONLY_ACTIVE_SOURCE_VERIFIED_ROWS_PUBLIC",
+        "MVP_REQUIRES_PUBLIC_MEDIA_AUTHORIZATION",
+        "MVP_VOTER_IDENTITIES_NEVER_EXPOSED",
+        "REWARD_REDEMPTION_REMAINS_DISABLED_UNTIL_SERVER_IDENTITY_BINDING",
+        "NO_AUTOMATIC_GEOLOCATION",
+        "FEATURE_OFF_RETURNS_FAIL_CLOSED_STATE"
+      ],
+      "activation_requires": [
+        "R56_INDEX_MIGRATION_APPLIED",
+        "SUPABASE_SERVER_ENV_PRESENT",
+        "E2E_GREEN",
+        "PRODUCTION_EVIDENCE_GREEN"
+      ]
     }
   },
   "research_intelligence": {
