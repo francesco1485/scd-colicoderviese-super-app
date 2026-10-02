@@ -33,7 +33,7 @@ if(/case 'public\.identity\.resolve':[\s\S]{0,220}r56ResolveIdentity_\(/.test(br
 if(!identity.includes("matched:null")||!identity.includes("role:null"))fail('public resolver must not enumerate account state or role');
 if(!identity.includes("requestOtp(mail)"))fail('existing account preflight must use one-time code');
 if(!identity.includes("mustChangePin:true"))fail('invite must require first-access credential change');
-for(const token of ['r56CanonicalPeopleSheet_','02 DB PERSONE V2','CODICE PERSONA','CANONICAL_EMAIL_EXACT','CANONICAL_PHONE_BIRTHDATE']){
+for(const token of ['r56CanonicalPeopleSheet_','02 DB PERSONE V2','CANONICAL_EMAIL_EXACT','CANONICAL_PHONE_BIRTHDATE',"personId:String(row[0]","email:email_(row[6]","phone:r56NormalizePhone_(row[7]","role:String(row[10]"]){
   if(!identity.includes(token))fail('canonical Tesserati identity binding missing '+token);
 }
 if(/MailApp\.sendEmail[\s\S]{0,500}(password|password permanente)/i.test(identity))fail('invite email must not contain permanent password');
