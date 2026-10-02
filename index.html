@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#041c3a">
   <meta name="description" content="SCD ColicoDerviese Universe: sport, community, servizi e club operations in una sola esperienza digitale.">
-  <meta name="scd-build" content="40.0.0">\n  <meta name="scd-release" content="NG-0.6.0">
+  <meta name="scd-build" content="40.0.0">\n  <meta name="scd-release" content="NG-0.7.0">
   <title>SCD Universe · Next Generation</title>
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./assets/logo-scd.png">
   <link rel="apple-touch-icon" href="./assets/logo-scd.png">
-    <link rel="stylesheet" href="./scd-ng.css?v=0.6.0">
+    <link rel="stylesheet" href="./scd-ng.css?v=0.7.0">
   <link rel="stylesheet" href="./scd-synth.css?v=0.4.5">
 </head>
 <body data-scd-theme="arena">
@@ -252,6 +252,16 @@
           <span>PARTNER SCD</span><div class="partner-marquee" id="verifiedPartners"><b>Partner verificati · sincronizzazione fonte</b></div><button type="button" data-join="PARTNER">Diventa partner →</button>
         </section>
 
+        <section class="membership-promo-bar" id="membershipPromoBar">
+          <div><span>SCD CARD</span><b>Supporter, tesserati, famiglie e partner. Un accesso, percorsi diversi.</b></div>
+          <div class="membership-promo-paths" aria-label="Percorsi SCD Card">
+            <button type="button" data-nav="card" data-card-focus="supporter">Supporter</button>
+            <button type="button" data-nav="card" data-card-focus="tesserato">Tesserato</button>
+            <button type="button" data-nav="card" data-card-focus="benefit">Benefit</button>
+          </div>
+          <button class="membership-open" type="button" data-nav="card">Apri Card Center →</button>
+        </section>
+
 
         <section class="public-partner-hub" id="partnerCommunityHub">
           <div class="public-partner-copy">
@@ -266,7 +276,7 @@
           <div class="public-partner-modules">
             <a href="./sponsor/#ledwall"><span>01</span><b>LEDWall</b><small>Spot su misura · bordo campo · camera view</small></a>
             <a href="./sponsor/#convenzioni"><span>02</span><b>Convenzioni</b><small>Benefit verificati per community e territorio</small></a>
-            <button type="button" data-join="FAN"><span>03</span><b>Supporter Card</b><small>Appartenenza, vantaggi e iniziative SCD</small></button>
+            <button type="button" data-nav="card" data-card-focus="supporter"><span>03</span><b>Supporter Card</b><small>Appartenenza, vantaggi e iniziative SCD</small></button>
             <button type="button" data-scroll="#mediaHub"><span>04</span><b>Media Hub</b><small>Video, canali ufficiali e match content</small></button>
             <a href="./sponsor/?login=1"><span>05</span><b>Partner Area</b><small>CRM, materiali, attivazioni e documenti</small></a>
             <a href="./sponsor/#opportunita"><span>06</span><b>Asset & Eventi</b><small>Tornei, gazebo, strutture e progetti</small></a>
@@ -380,6 +390,83 @@
         </section>
       </section>
 
+      <section class="view public-core-view" id="view-card" data-view="card">
+        <section class="public-core-hero card-hero">
+          <div>
+            <span class="eyebrow">SCD CARD & BENEFIT CENTER</span>
+            <h1>Più vicino al Club. <em>Senza confondere i ruoli.</em></h1>
+            <p>Supporter, tesserati, famiglie e partner entrano dallo stesso ecosistema. La Card non assegna ruoli: riconosce il percorso autorizzato e collega servizi e benefit realmente disponibili.</p>
+          </div>
+          <button class="btn glass" type="button" data-nav="pulse">← Home</button>
+        </section>
+
+        <section class="card-center" id="cardCenter">
+          <div class="card-products">
+            <article class="scd-card-product supporter" id="supporterCardProduct">
+              <div class="scd-card-visual">
+                <span>SCD SUPPORTER</span>
+                <img src="./assets/logo-scd.png" alt="" aria-hidden="true">
+                <b>COMMUNITY CARD</b>
+                <small>COLICODERVIESE · ALTO LARIO</small>
+              </div>
+              <div class="scd-card-copy">
+                <span class="eyebrow">PER TIFOSI E SOSTENITORI</span>
+                <h2>SCD Supporter Card</h2>
+                <p>Community, iniziative, eventi e benefit pubblicati solo quando risultano formalizzati. La registrazione crea un profilo base, non un ruolo riservato.</p>
+                <div class="card-feature-chips"><span>Community</span><span>Eventi</span><span>Benefit verificati</span></div>
+                <button class="btn primary" type="button" data-join="FAN">Diventa Supporter</button>
+              </div>
+            </article>
+
+            <article class="scd-card-product tesserato" id="tesseratoCardProduct">
+              <div class="scd-card-visual player">
+                <span>SCD TESSERATO</span>
+                <img src="./assets/logo-scd.png" alt="" aria-hidden="true">
+                <b>PLAYER & STAFF</b>
+                <small>PROFILO AUTORIZZATO</small>
+              </div>
+              <div class="scd-card-copy">
+                <span class="eyebrow">ATLETI E STAFF</span>
+                <h2>SCD Tesserato Card</h2>
+                <p>Identità di servizio, accesso alle funzioni consentite e benefit compatibili con il profilo. Il tesseramento e le autorizzazioni restano gestiti dalla Società.</p>
+                <div class="card-feature-chips"><span>Profilo</span><span>Servizi</span><span>Benefit autorizzati</span></div>
+                <div class="card-product-actions"><button class="btn primary" type="button" data-join="ATHLETE_REQUEST">Richiedi percorso</button><button class="btn glass" type="button" data-nav="desk">Accedi al mio spazio</button></div>
+              </div>
+            </article>
+          </div>
+
+          <section class="public-benefit-network" id="publicBenefitNetwork">
+            <div class="section-head">
+              <div><span class="eyebrow">SCD BENEFIT NETWORK</span><h2>Vantaggi reali, stato chiaro.</h2><p>Una convenzione diventa utilizzabile soltanto quando esiste evidenza di formalizzazione. Le trattative in corso sono mostrate come tali, perché “quasi attivo” è un modo creativo di dire “non ancora”.</p></div>
+              <span class="status-pill" id="benefitSourceState">SINCRONIZZAZIONE</span>
+            </div>
+            <div class="benefit-summary" id="benefitSummary">
+              <article><small>ATTIVI E FORMALIZZATI</small><b>—</b><span>utilizzabili ora</span></article>
+              <article><small>IN PIPELINE</small><b>—</b><span>non ancora utilizzabili</span></article>
+              <article><small>POLICY</small><b>FAIL CLOSED</b><span>nessun benefit inventato</span></article>
+            </div>
+            <div class="benefit-block">
+              <div class="benefit-block-head"><div><span>BENEFIT ATTIVI</span><b>Solo accordi formalizzati</b></div></div>
+              <div class="public-benefit-grid" id="publicBenefitActive"><div class="benefit-empty"><b>Dati in aggiornamento</b><span>Carico le convenzioni pubblicabili.</span></div></div>
+            </div>
+            <div class="benefit-block pipeline">
+              <div class="benefit-block-head"><div><span>IN ATTIVAZIONE / FORMALIZZAZIONE</span><b>Visibili, ma non utilizzabili</b></div></div>
+              <div class="public-benefit-grid" id="publicBenefitPipeline"><div class="benefit-empty"><b>Sincronizzazione</b><span>Gli accordi non formalizzati restano separati dai benefit attivi.</span></div></div>
+            </div>
+          </section>
+
+          <section class="card-access-paths">
+            <div><span class="eyebrow">UN ACCOUNT, PIÙ PERCORSI</span><h2>Tu chiedi. La Società autorizza.</h2><p>Nessuna Card permette di auto-assegnarsi un ruolo.</p></div>
+            <div class="card-path-grid">
+              <button type="button" data-join="FAMILY"><span>⌂</span><b>Famiglia</b><small>Richiedi il collegamento ai servizi consentiti</small></button>
+              <button type="button" data-join="STAFF_REQUEST"><span>⌘</span><b>Staff</b><small>Accesso operativo solo dopo autorizzazione</small></button>
+              <button type="button" data-join="PARTNER"><span>◆</span><b>Partner</b><small>Proposte, attivazioni e relazione con il Club</small></button>
+              <button type="button" data-join="OTHER_AUTHORIZED"><span>＋</span><b>Altro profilo</b><small>Richiesta valutata dalla Direzione</small></button>
+            </div>
+          </section>
+        </section>
+      </section>
+
       <section class="view" id="view-twin" data-view="twin">
         <div class="twin-stage">
           <div class="twin-copy">
@@ -486,7 +573,7 @@
   <script src="./scd-meta-engine.js?v=40.0.0" defer></script>
   <script src="./scd-experience-engine.js?v=40.0.0" defer></script>
   <script src="./scd-twin.js?v=40.0.0" defer></script>
-  <script src="./scd-ng.js?v=0.6.0" defer></script>
+  <script src="./scd-ng.js?v=0.7.0" defer></script>
   <script src="./scd-interactions.js?v=0.4.5" defer></script>
 </body>
 </html>
