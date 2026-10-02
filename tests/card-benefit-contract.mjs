@@ -6,24 +6,29 @@ function assert(condition,message){if(!condition)fail(message)}
 const snapshot=JSON.parse(fs.readFileSync(new URL('../config/community-benefits.snapshot.json',import.meta.url),'utf8'));
 const manifest=JSON.parse(fs.readFileSync(new URL('../SCD_SYSTEM_MANIFEST.json',import.meta.url),'utf8'));
 const server=fs.readFileSync(new URL('../server.js',import.meta.url),'utf8');
+const publicBenefitsLib=fs.readFileSync(new URL('../lib/community-benefits.js',import.meta.url),'utf8');
+const buildPages=fs.readFileSync(new URL('../scripts/build-pages.mjs',import.meta.url),'utf8');
 const html=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
 const js=fs.readFileSync(new URL('../scd-ng.js',import.meta.url),'utf8');
 
 assert(snapshot.privacy==='PUBLIC_SAFE_PROJECTION_NO_CONTACTS','community snapshot must remain public-safe');
 assert(server.includes("u.pathname==='/api/community/benefits'"),'public benefit endpoint missing');
-assert(server.includes("policy:'NO_ACTIVE_BENEFIT_WITHOUT_FORMALIZATION_EVIDENCE'"),'formalization fail-closed policy missing');
-assert(server.includes('PUBLIC_ACTIVE_BENEFIT_STATUSES'),'strict public active-status allowlist missing');
-assert(server.includes('publicBenefitFormalizationEvidence'),'formalization evidence gate missing');
-assert(server.includes('usableNow:true'),'active benefit explicit usability state missing');
-assert(server.includes('usableNow:false'),'pipeline non-usable state missing');
+assert(server.includes('buildPublicCommunityBenefits(COMMUNITY_BENEFITS_SNAPSHOT)'),'public endpoint must use canonical projection engine');
+assert(publicBenefitsLib.includes("policy:'NO_ACTIVE_BENEFIT_WITHOUT_FORMALIZATION_EVIDENCE'"),'formalization fail-closed policy missing');
+assert(publicBenefitsLib.includes('PUBLIC_ACTIVE_BENEFIT_STATUSES'),'strict public active-status allowlist missing');
+assert(publicBenefitsLib.includes('publicBenefitFormalizationEvidence'),'formalization evidence gate missing');
+assert(publicBenefitsLib.includes('usableNow:true'),'active benefit explicit usability state missing');
+assert(publicBenefitsLib.includes('usableNow:false'),'pipeline non-usable state missing');
 
-const projectionStart=server.indexOf('function publicBenefitProjection');
-const projectionEnd=server.indexOf('function publicBenefitFormalizationEvidence');
+const projectionStart=publicBenefitsLib.indexOf('function publicBenefitProjection');
+const projectionEnd=publicBenefitsLib.indexOf('function publicBenefitFormalizationEvidence');
 assert(projectionStart>=0&&projectionEnd>projectionStart,'public benefit projection function missing');
-const projection=server.slice(projectionStart,projectionEnd);
+const projection=publicBenefitsLib.slice(projectionStart,projectionEnd);
 for(const forbidden of ['owner','nextAction','agreementDocument','email','phone']){
   assert(!projection.includes(forbidden),'public benefit projection leaks internal field '+forbidden);
 }
+assert(buildPages.includes("community-benefits.public.json"),'Pages public benefit artifact generation missing');
+assert(buildPages.includes('buildPublicCommunityBenefits'),'Pages must reuse canonical public benefit projection');
 
 for(const token of ['id="view-card"','id="membershipPromoBar"','id="cardCenter"','id="supporterCardProduct"','id="tesseratoCardProduct"','id="publicBenefitNetwork"','id="publicBenefitActive"','id="publicBenefitPipeline"']){
   assert(html.includes(token),'Card Center UI missing '+token);
@@ -33,6 +38,7 @@ assert(html.includes('data-join="ATHLETE_REQUEST"'),'Tesserato request path miss
 assert(html.includes('data-nav="desk"'),'authorized private-space path missing');
 
 assert(js.includes("fetch(API_BASE+'/api/community/benefits'"),'public Benefit Network loader missing');
+assert(js.includes("fetch('./content/community-benefits.public.json'"),'GitHub Pages Benefit Network fallback missing');
 assert(js.includes('function renderCardBenefits()'),'Card Benefit renderer missing');
 assert(js.includes('Non ancora utilizzabile'),'pipeline usability guard missing');
 assert(js.includes("if(kind==='card')"),'global search Card Center route missing');
