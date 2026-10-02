@@ -8,7 +8,7 @@
   "orientation": "portrait-primary",
   "background_color": "#f2f5f9",
   "theme_color": "#041c3a",
-  "description": "SCD Arena: sport, matchday, squadre, community, media, servizi e Private Desk ColicoDerviese in una sola web app.",
+  "description": "SCD Arena: sport, matchday, squadre, community, media, SCD Card, benefit, servizi e Private Desk in una sola web app.",
   "categories": [
     "sports",
     "social",
@@ -43,6 +43,11 @@
       "name": "Squadre",
       "short_name": "Squadre",
       "url": "./#teams"
+    },
+    {
+      "name": "SCD Card & Benefit",
+      "short_name": "SCD Card",
+      "url": "./#card"
     },
     {
       "name": "Private Desk",
