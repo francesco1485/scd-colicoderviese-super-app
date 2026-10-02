@@ -2109,3 +2109,14 @@ body{background:linear-gradient(180deg,#eef5fb,#f7fbfe 55%,#edf5fb);color:var(--
   .led-sim-message{opacity:1;transform:translateY(-50%)}
   .led-sim-scd{opacity:1}
 }
+
+.led-source-evidence{
+  display:block;
+  margin-top:7px;
+  max-width:520px;
+  font-style:normal;
+  font-size:.58rem;
+  line-height:1.4;
+  color:#5f7d93;
+  letter-spacing:.02em;
+}
