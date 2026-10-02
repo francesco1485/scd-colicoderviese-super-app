@@ -34,6 +34,7 @@ if(!js.includes("$$('[data-social-open]',mount).forEach")||!js.includes("$$('[da
 if(/(?<!\$)\$\([^;\n]*\)\.forEach/.test(js))fail('singular $ helper cannot drive collection forEach');
 if(!html.includes('Pixellot resta privato'))fail('private video safety declaration missing');
 if(!html.includes('Nessuna ripubblicazione automatica'))fail('no auto-republish policy missing');
+if(html.includes('>\\n  <meta'))fail('literal escaped newline leaked into app shell');
 if(!html.includes('rel="noopener noreferrer"'))fail('external social links must be hardened');
 
 for(const token of ['social-hero','social-feed','social-card','social-channel-grid'])if(!css.includes('.'+token))fail('social css missing '+token);
