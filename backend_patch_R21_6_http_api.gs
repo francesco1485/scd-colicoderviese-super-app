@@ -161,6 +161,10 @@ function doPost(e) {
         if (typeof r56InviteAccess_ !== 'function') throw new Error('Modulo inviti R56 non installato');
         data = r56InviteAccess_(token, payload);
         break;
+      case 'direction.access.metrics':
+        if (typeof r56AccessMetrics_ !== 'function') throw new Error('Modulo metriche R56 non installato');
+        data = r56AccessMetrics_(token, payload);
+        break;
       case 'direction.pin.set':
         data = directionSetUserPin(token, payload.email || '', payload.pin || '');
         break;
