@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.25.0",
+    "version": "3.26.0",
     "effective_at": "2026-10-02",
     "status": "BINDING",
     "language": "it-IT",
@@ -1402,6 +1402,15 @@
       "state": "SOURCE_IMPLEMENTED_RUNTIME_DEPLOY_REQUIRED",
       "runtime_gate": "R20_APPS_SCRIPT_DEPLOY_AND_PROBE_PRIVATE_AGENDA",
       "safe_behavior": "FAIL_CLOSED_NO_FALSE_EVENT_CONFIRMATION"
+    },
+    "source_reconciliation": {
+      "state": "R56_CONTRACTED",
+      "canonical_entity": "EVENT_ID",
+      "federation_priority": true,
+      "r20_manager_calendar": true,
+      "google_calendar_projection": true,
+      "club_events": true,
+      "conflict_state": "PENDING_REVIEW"
     }
   },
   "completeness_engine": {
@@ -1967,6 +1976,19 @@
         "PRIVATE_MESSAGE_CONTENT"
       ],
       "purpose": "Reduce friction and improve document intake workflows."
+    },
+    "access_measurement": {
+      "state": "R56_ACTIVE_AGGREGATE",
+      "consent_cookie": "scd_analytics_consent",
+      "public_nonessential_requires_consent": true,
+      "authenticated_security_audit_separate": true,
+      "raw_identity_in_public_analytics": false,
+      "daily_metrics": [
+        "PAGE_VIEW",
+        "RETURN_VISIT",
+        "FEATURE_USE",
+        "PWA_OPEN"
+      ]
     }
   },
   "architecture": {
@@ -2833,6 +2855,43 @@
         "R20"
       ],
       "contract": "VERIFIED_CURATED_CLUB_CONTENT_HOME_SOCIAL_SEARCH_WITH_STATUS_PROVENANCE_AND_FAIL_CLOSED_SPORT_DATA"
+    },
+    {
+      "id": "CAP-IDENTITY-ACCESS",
+      "domain": "IDENTITY_ACCESS",
+      "required": true,
+      "state": "PARTIAL",
+      "sources": [
+        "R20",
+        "SCD_SUPABASE"
+      ],
+      "contract": "VERIFIED_PERSON_BINDING_DIRECTION_INVITE_TEMP_CODE_ROLE_SCOPE_SERVER_SIDE_AUDIT"
+    },
+    {
+      "id": "CAP-CALENDAR-FUSION",
+      "domain": "CALENDAR",
+      "required": true,
+      "state": "PARTIAL",
+      "sources": [
+        "R20",
+        "SCD_GOOGLE_CALENDAR",
+        "FIGC",
+        "LND",
+        "CR_LOMBARDIA",
+        "TUTTOCAMPO"
+      ],
+      "contract": "ONE_EVENT_ID_SOURCE_PRIORITY_RECONCILIATION_NO_DUPLICATES"
+    },
+    {
+      "id": "CAP-CLUB-INTELLIGENCE",
+      "domain": "ANALYTICS_STATS",
+      "required": true,
+      "state": "PARTIAL",
+      "sources": [
+        "R20",
+        "SCD_SUPABASE"
+      ],
+      "contract": "AGGREGATE_ACCESS_METRICS_VERIFIED_SPORT_STATS_FAN_CHECKINS_HEALTHY_GAMIFICATION"
     }
   ],
   "known_noncompliance": [
@@ -4068,6 +4127,89 @@
         "STATIC_CURATED_CONTENT_MUST_WORK_ON_PAGES_AND_RENDER"
       ],
       "activation": "PUBLIC"
+    },
+    "identity_access_r56": {
+      "release": "R56",
+      "state": "FOUNDATION_ACTIVE_R20_PRIMARY_SUPABASE_STAGED",
+      "purpose": "ONE_ACCOUNT_VERIFIED_PERSON_BINDING_DIRECTION_INVITES_FIRST_ACCESS_SECURITY",
+      "rules": [
+        "ONE_ACCOUNT_PER_PERSON",
+        "NO_CLIENT_ROLE_SELECTION",
+        "NAME_ONLY_IDENTITY_MATCH_FORBIDDEN",
+        "AUTO_MATCH_EMAIL_EXACT_OR_PHONE_BIRTHDATE_ONLY",
+        "AMBIGUOUS_MATCH_PENDING_REVIEW",
+        "TEMPORARY_ACCESS_CODE_ONE_TIME",
+        "NO_PLAINTEXT_PERMANENT_PASSWORD_EMAIL",
+        "FIRST_ACCESS_PERSONAL_PIN_AVAILABLE",
+        "DIRECTION_ONLY_ACCESS_ASSIGNMENT",
+        "AUDIT_REQUIRED"
+      ],
+      "current_runtime": "R20",
+      "staged_runtime": "SCD_SUPABASE",
+      "ui": [
+        "PRIVATE_DESK:ACCESSI",
+        "PRIVATE_DESK:SICUREZZA",
+        "PUBLIC_REGISTRATION_IDENTITY_PREFLIGHT"
+      ]
+    },
+    "club_intelligence_r56": {
+      "release": "R56",
+      "state": "SCHEMA_READY_RUNTIME_GATED",
+      "purpose": "CANONICAL_CALENDAR_STATISTICS_ACCESS_ANALYTICS_FAN_ENGAGEMENT_AND_FUTURE_FANTASY",
+      "calendar": {
+        "principle": "ONE_EVENT_ID_MANY_VERIFIED_SOURCES",
+        "sources": [
+          "FEDERATION_OFFICIAL",
+          "R20_MANAGER",
+          "GOOGLE_CALENDAR",
+          "CLUB_EVENT",
+          "TUTTOCAMPO_VERIFIED",
+          "MANUAL_DIRECTION"
+        ],
+        "reconciliation": "SOURCE_PRIORITY_PLUS_HUMAN_REVIEW_ON_CONFLICT",
+        "federation_rule": "OFFICIAL_FEDERATION_SOURCE_WINS_FOR_OFFICIAL_FIXTURE_FIELDS"
+      },
+      "analytics": {
+        "authenticated_access_audit": "SECURITY_EVENT_NO_OPTIONAL_COOKIE_REQUIRED",
+        "public_usage": "CONSENT_REQUIRED_FIRST_PARTY_AGGREGATE_ONLY",
+        "cookie": "scd_analytics_consent",
+        "forbidden": [
+          "PASSWORD",
+          "PIN",
+          "HEALTH_DATA",
+          "SAFEGUARDING",
+          "PRIVATE_MESSAGES",
+          "DOCUMENT_CONTENT",
+          "RAW_LOCATION"
+        ]
+      },
+      "sport_stats": {
+        "team": [
+          "W",
+          "D",
+          "L",
+          "GOALS_FOR",
+          "GOALS_AGAINST",
+          "YELLOW_CARDS",
+          "RED_CARDS"
+        ],
+        "player_internal": [
+          "MINUTES",
+          "GOALS",
+          "ASSISTS",
+          "YELLOW_CARDS",
+          "RED_CARDS"
+        ],
+        "minor_public_talent_ranking": false,
+        "provenance_required": true
+      },
+      "engagement": {
+        "fan_checkin": "VERIFIED_EVENT_ATTENDANCE",
+        "rewards": "SERVER_AUTHORITATIVE",
+        "minors": "COOPERATIVE_OR_PARTICIPATION_BASED",
+        "fantasy": "NO_MONEY_NO_BETTING",
+        "monthly_rewards": "VERIFIED_RULES_ONLY"
+      }
     }
   },
   "research_intelligence": {
