@@ -53,6 +53,30 @@ create table if not exists public.scd_access_events (
   metadata jsonb not null default '{}'::jsonb
 );
 
+
+create table if not exists public.scd_usage_consents (
+  organization_id uuid not null references public.scd_organizations(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  analytics_allowed boolean not null default false,
+  personalization_allowed boolean not null default false,
+  policy_version text not null,
+  updated_at timestamptz not null default now(),
+  primary key (organization_id,user_id)
+);
+
+create or replace view public.scd_access_daily_metrics
+with (security_invoker=true)
+as
+select
+  organization_id,
+  (occurred_at at time zone 'Europe/Rome')::date as access_date,
+  count(*) filter (where event_type='LOGIN_SUCCESS') as login_events,
+  count(distinct user_id) filter (where user_id is not null) as active_authenticated_users,
+  count(*) filter (where event_type='PUBLIC_VISIT') as public_visits,
+  count(*) filter (where event_type='PWA_OPEN') as pwa_opens
+from public.scd_access_events
+group by organization_id,(occurred_at at time zone 'Europe/Rome')::date;
+
 create table if not exists public.scd_calendar_sources (
   id uuid primary key default gen_random_uuid(),
   organization_id uuid not null references public.scd_organizations(id) on delete cascade,
@@ -73,6 +97,31 @@ create table if not exists public.scd_calendar_sources (
   unique (organization_id, code)
 );
 
+
+insert into public.scd_calendar_sources
+(organization_id,code,name,source_type,authority_rank,enabled,read_only,sync_mode)
+select id,'FIGC_LND_CRL','FIGC / LND / CR Lombardia','FEDERATION_OFFICIAL',100,false,true,'MANUAL_REVIEW'
+from public.scd_organizations where slug='scd-colicoderviese'
+on conflict (organization_id,code) do nothing;
+
+insert into public.scd_calendar_sources
+(organization_id,code,name,source_type,authority_rank,enabled,read_only,sync_mode)
+select id,'RM_INTERNAL','Calendario interno Responsabile','R20_MANAGER',90,true,false,'MANUAL_REVIEW'
+from public.scd_organizations where slug='scd-colicoderviese'
+on conflict (organization_id,code) do nothing;
+
+insert into public.scd_calendar_sources
+(organization_id,code,name,source_type,authority_rank,enabled,read_only,sync_mode)
+select id,'SCD_GOOGLE_CALENDAR','Google Calendar SCD','GOOGLE_CALENDAR',80,false,false,'PUSH'
+from public.scd_organizations where slug='scd-colicoderviese'
+on conflict (organization_id,code) do nothing;
+
+insert into public.scd_calendar_sources
+(organization_id,code,name,source_type,authority_rank,enabled,read_only,sync_mode)
+select id,'SCD_CLUB_EVENT','Eventi e iniziative SCD','CLUB_EVENT',70,true,false,'MANUAL_REVIEW'
+from public.scd_organizations where slug='scd-colicoderviese'
+on conflict (organization_id,code) do nothing;
+
 create table if not exists public.scd_event_source_links (
   id uuid primary key default gen_random_uuid(),
   organization_id uuid not null references public.scd_organizations(id) on delete cascade,
@@ -87,6 +136,61 @@ create table if not exists public.scd_event_source_links (
   updated_at timestamptz not null default now(),
   unique (calendar_source_id, external_event_key)
 );
+
+
+create table if not exists public.scd_communication_policies (
+  id uuid primary key default gen_random_uuid(),
+  organization_id uuid not null references public.scd_organizations(id) on delete cascade,
+  channel_kind text not null
+    check (channel_kind in ('TEAM','FAMILY','STAFF','DIRECTION','ANNOUNCEMENT')),
+  label text not null,
+  sender_roles public.scd_role[] not null,
+  audience_roles public.scd_role[] not null,
+  reply_mode text not null default 'MODERATED'
+    check (reply_mode in ('OPEN','MODERATED','READ_ONLY')),
+  minor_policy text not null default 'NO_UNSUPERVISED_1TO1'
+    check (minor_policy in ('NO_UNSUPERVISED_1TO1','GUARDIAN_OR_STAFF_PRESENT','NOT_APPLICABLE')),
+  active boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (organization_id,channel_kind)
+);
+
+insert into public.scd_communication_policies
+(organization_id,channel_kind,label,sender_roles,audience_roles,reply_mode,minor_policy)
+select id,'TEAM','Canale squadra',
+array['MISTER','STAFF','MANAGER','DIRECTION']::public.scd_role[],
+array['ATHLETE','FAMILY','MISTER','STAFF','MANAGER']::public.scd_role[],
+'MODERATED','GUARDIAN_OR_STAFF_PRESENT'
+from public.scd_organizations where slug='scd-colicoderviese'
+on conflict (organization_id,channel_kind) do nothing;
+
+insert into public.scd_communication_policies
+(organization_id,channel_kind,label,sender_roles,audience_roles,reply_mode,minor_policy)
+select id,'FAMILY','Comunicazioni famiglie',
+array['SECRETARIAT','REGISTRATION','MANAGER','DIRECTION']::public.scd_role[],
+array['FAMILY']::public.scd_role[],
+'MODERATED','GUARDIAN_OR_STAFF_PRESENT'
+from public.scd_organizations where slug='scd-colicoderviese'
+on conflict (organization_id,channel_kind) do nothing;
+
+insert into public.scd_communication_policies
+(organization_id,channel_kind,label,sender_roles,audience_roles,reply_mode,minor_policy)
+select id,'STAFF','Canale staff',
+array['MISTER','STAFF','MANAGER','SECRETARIAT','DIRECTION']::public.scd_role[],
+array['MISTER','STAFF','MANAGER','SECRETARIAT','REGISTRATION','TOURNAMENTS','DIRECTION']::public.scd_role[],
+'OPEN','NOT_APPLICABLE'
+from public.scd_organizations where slug='scd-colicoderviese'
+on conflict (organization_id,channel_kind) do nothing;
+
+insert into public.scd_communication_policies
+(organization_id,channel_kind,label,sender_roles,audience_roles,reply_mode,minor_policy)
+select id,'ANNOUNCEMENT','Avvisi ufficiali',
+array['SECRETARIAT','MANAGER','DIRECTION']::public.scd_role[],
+array['USER_BASE','FAMILY','ATHLETE','MISTER','STAFF','MANAGER','SECRETARIAT','REGISTRATION','TOURNAMENTS','DIRECTION']::public.scd_role[],
+'READ_ONLY','NO_UNSUPERVISED_1TO1'
+from public.scd_organizations where slug='scd-colicoderviese'
+on conflict (organization_id,channel_kind) do nothing;
 
 create table if not exists public.scd_match_team_stats (
   id uuid primary key default gen_random_uuid(),
@@ -106,23 +210,22 @@ create table if not exists public.scd_match_team_stats (
   unique (match_id, team_id)
 );
 
-create table if not exists public.scd_player_match_stats (
-  id uuid primary key default gen_random_uuid(),
-  organization_id uuid not null references public.scd_organizations(id) on delete cascade,
-  match_id uuid not null references public.scd_matches(id) on delete cascade,
-  athlete_id uuid not null references public.scd_athletes(id) on delete cascade,
-  minutes_played integer check (minutes_played between 0 and 130),
-  goals integer not null default 0 check (goals >= 0),
-  assists integer not null default 0 check (assists >= 0),
-  yellow_cards integer not null default 0 check (yellow_cards between 0 and 2),
-  red_cards integer not null default 0 check (red_cards between 0 and 1),
-  public_allowed boolean not null default false,
-  source_id text not null,
-  source_verified_at timestamptz,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now(),
-  unique (match_id, athlete_id)
-);
+create or replace view public.scd_player_match_stats
+with (security_invoker=true)
+as
+select
+  p.id,
+  p.organization_id,
+  p.match_id,
+  p.athlete_id,
+  p.minutes_played,
+  p.goals,
+  p.assists,
+  p.yellow_cards,
+  case when p.red_card then 1 else 0 end as red_cards,
+  p.created_at,
+  p.updated_at
+from public.scd_match_performance p;
 
 create table if not exists public.scd_fan_checkins (
   id uuid primary key default gen_random_uuid(),
@@ -186,6 +289,29 @@ create table if not exists public.scd_fantasy_entries (
   unique (league_id, user_id)
 );
 
+
+create or replace function public.scd_validate_fantasy_policy()
+returns trigger
+language plpgsql
+security invoker
+set search_path=public
+as $
+begin
+  if new.audience_mode <> 'ADULT_REGISTERED' and new.public_player_ranking = true then
+    raise exception 'SCD_FANTASY_POLICY: public player ranking is not allowed for minor/all-ages modes';
+  end if;
+  if new.monetary_entry or new.monetary_prize then
+    raise exception 'SCD_FANTASY_POLICY: money-based fantasy is not allowed';
+  end if;
+  return new;
+end;
+$;
+
+drop trigger if exists scd_fantasy_policy_guard on public.scd_fantasy_leagues;
+create trigger scd_fantasy_policy_guard
+before insert or update on public.scd_fantasy_leagues
+for each row execute function public.scd_validate_fantasy_policy();
+
 create index if not exists scd_identity_links_user_idx on public.scd_identity_links(user_id, link_state);
 create index if not exists scd_identity_links_person_idx on public.scd_identity_links(person_id, link_state);
 create index if not exists scd_access_invites_email_idx on public.scd_access_invites(organization_id, lower(email), status);
@@ -193,7 +319,6 @@ create index if not exists scd_access_events_day_idx on public.scd_access_events
 create index if not exists scd_calendar_sources_org_idx on public.scd_calendar_sources(organization_id, enabled, authority_rank desc);
 create index if not exists scd_event_source_links_event_idx on public.scd_event_source_links(event_id, reconciliation_state);
 create index if not exists scd_match_team_stats_team_idx on public.scd_match_team_stats(team_id, match_id);
-create index if not exists scd_player_match_stats_athlete_idx on public.scd_player_match_stats(athlete_id, match_id);
 create index if not exists scd_fan_checkins_event_idx on public.scd_fan_checkins(event_id, checked_in_at);
 create index if not exists scd_engagement_challenges_status_idx on public.scd_engagement_challenges(organization_id, status, starts_at);
 create index if not exists scd_fantasy_entries_league_idx on public.scd_fantasy_entries(league_id, points desc);
@@ -201,14 +326,27 @@ create index if not exists scd_fantasy_entries_league_idx on public.scd_fantasy_
 alter table public.scd_identity_links enable row level security;
 alter table public.scd_access_invites enable row level security;
 alter table public.scd_access_events enable row level security;
+alter table public.scd_usage_consents enable row level security;
 alter table public.scd_calendar_sources enable row level security;
 alter table public.scd_event_source_links enable row level security;
+alter table public.scd_communication_policies enable row level security;
 alter table public.scd_match_team_stats enable row level security;
-alter table public.scd_player_match_stats enable row level security;
 alter table public.scd_fan_checkins enable row level security;
 alter table public.scd_engagement_challenges enable row level security;
 alter table public.scd_fantasy_leagues enable row level security;
 alter table public.scd_fantasy_entries enable row level security;
+
+
+create policy "scd_usage_consents_self_select" on public.scd_usage_consents
+for select to authenticated using (user_id=(select auth.uid()));
+create policy "scd_usage_consents_self_insert" on public.scd_usage_consents
+for insert to authenticated with check (user_id=(select auth.uid()) and public.scd_is_org_member(organization_id));
+create policy "scd_usage_consents_self_update" on public.scd_usage_consents
+for update to authenticated using (user_id=(select auth.uid()))
+with check (user_id=(select auth.uid()) and public.scd_is_org_member(organization_id));
+
+create policy "scd_communication_policies_member_select" on public.scd_communication_policies
+for select to authenticated using (public.scd_is_org_member(organization_id));
 
 revoke all on table public.scd_identity_links from anon, authenticated;
 revoke all on table public.scd_access_invites from anon, authenticated;
@@ -216,7 +354,7 @@ revoke all on table public.scd_access_events from anon, authenticated;
 revoke all on table public.scd_calendar_sources from anon, authenticated;
 revoke all on table public.scd_event_source_links from anon, authenticated;
 revoke all on table public.scd_match_team_stats from anon, authenticated;
-revoke all on table public.scd_player_match_stats from anon, authenticated;
+revoke all on public.scd_player_match_stats from anon, authenticated;
 revoke all on table public.scd_fan_checkins from anon, authenticated;
 revoke all on table public.scd_engagement_challenges from anon, authenticated;
 revoke all on table public.scd_fantasy_leagues from anon, authenticated;
@@ -227,6 +365,9 @@ comment on table public.scd_access_invites is 'One-time setup invitations. Store
 comment on table public.scd_access_events is 'Minimal access/audit events. Never store PIN, password, safeguarding, health or private message content.';
 comment on table public.scd_calendar_sources is 'Registry for federation, R20, Google Calendar and club event sources with explicit authority and sync state.';
 comment on table public.scd_event_source_links is 'Many sources reconcile into one canonical EVENT_ID.';
-comment on table public.scd_player_match_stats is 'Internal player stats. public_allowed defaults false; minor public talent leaderboards are forbidden.';
+comment on view public.scd_player_match_stats is 'Derived from canonical scd_match_performance; no second player-stat source of truth.';
 comment on table public.scd_engagement_challenges is 'Healthy engagement challenges. Competitive minor leaderboards are blocked at database level.';
 comment on table public.scd_fantasy_leagues is 'No money, no betting. Minor modes are cooperative/team-oriented by contract.';
+
+comment on table public.scd_usage_consents is 'Optional analytics/personalization consent. Essential authenticated access audit does not store content or raw credentials.';
+comment on table public.scd_communication_policies is 'Who may communicate with whom; ordinary messaging never creates unsupervised minor 1:1 channels.';
