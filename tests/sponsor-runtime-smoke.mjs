@@ -82,6 +82,9 @@ try{
   const probeJson=await probe.json();
   assert(probeJson.authenticated===false,'anonymous session probe must be false');
 
+  const developmentGuard=await fetch(base+'/api/sponsor/development');
+  assert(developmentGuard.status===401,'Development API must require Sponsor session, got '+developmentGuard.status);
+
   const guarded=await fetch(base+'/sponsor/app',{
     redirect:'manual',
     headers:{accept:'text/html'}
