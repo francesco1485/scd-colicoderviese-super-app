@@ -33,6 +33,10 @@ for(const viewport of viewports){
   page.on('console',m=>{if(m.type()==='error')errors.push('console: '+m.text())});
 
   await page.goto(base+'/#pulse',{waitUntil:'domcontentloaded',timeout:30000});
+  await page.evaluate(()=>{
+    document.cookie='scd_analytics_consent=no; Path=/; SameSite=Lax';
+    const banner=document.querySelector('#scdCookieBanner');if(banner)banner.hidden=true;
+  });
   await page.waitForSelector('#view-pulse.active');
   await page.waitForSelector('.home-first');
   await page.waitForSelector('#publicSearchInput');
