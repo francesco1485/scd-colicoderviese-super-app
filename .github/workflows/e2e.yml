@@ -31,6 +31,8 @@ jobs:
         run: npm run test:r53-core
       - name: R54 private experience gate
         run: npm run test:r54-private
+      - name: R55 public content gate
+        run: npm run test:r55-content
       - name: SCD Universe contract gate
         run: npm run test:universe-contract
       - name: Human OS contract gate
@@ -81,6 +83,7 @@ jobs:
           node --check scripts/validate-social-app.mjs
           node --check scripts/validate-r53-core.mjs
           node --check scripts/validate-r54-private.mjs
+          node --check scripts/validate-r55-content.mjs
           node --check scd-ng.js
           node --check scd-interactions.js
           node --check scd-experience-engine.js

@@ -18,7 +18,7 @@ window.addEventListener('appinstalled',()=>{
   const button=document.querySelector('#installApp');
   if(button)button.hidden=true;
 });
-const state={view:'pulse',filter:'ALL',events:[],upcoming:[],fullCalendar:[],calendarLoaded:false,calendarLoading:false,calendarSourceState:'UNVERIFIED',calendarPeriod:'WEEK',calendarTeam:'ALL',calendarCategory:'ALL',calendarType:'ALL',calendarSearch:'',teamsSearch:'',teamsCategory:'ALL',socialFilter:'ALL',socialSearch:'',news:null,sportData:{results:[],standings:[],headToHead:[]},partners:[],publicProfiles:[],nextMatch:null,privateToken:'',privateEmail:'',privateData:null,workspace:null,privateLoading:false,privateError:''};
+const state={view:'pulse',filter:'ALL',events:[],upcoming:[],fullCalendar:[],calendarLoaded:false,calendarLoading:false,calendarSourceState:'UNVERIFIED',calendarPeriod:'WEEK',calendarTeam:'ALL',calendarCategory:'ALL',calendarType:'ALL',calendarSearch:'',teamsSearch:'',teamsCategory:'ALL',socialFilter:'ALL',socialSearch:'',news:null,clubContent:[],sportData:{results:[],standings:[],headToHead:[]},partners:[],publicProfiles:[],nextMatch:null,privateToken:'',privateEmail:'',privateData:null,workspace:null,privateLoading:false,privateError:''};
 const officialChannels=[
  {id:'site',label:'Sito ufficiale',url:'https://www.colicoderviese.it/',terms:'sito web comunicazioni servizi'},
  {id:'facebook',label:'Facebook SCD',url:'https://www.facebook.com/ColicoDerviese',terms:'facebook social pagina'},
@@ -304,6 +304,39 @@ function socialMatchCaption(match){
    '#SCDColicoDerviese #Colico #Dervio #MatchDay #CuoreRossoBlu'
  ].join('\n');
 }
+function clubContentItems(){
+ return (Array.isArray(state.clubContent)?state.clubContent:[]).filter(x=>x&&x.public===true&&x.verified===true);
+}
+function openClubContent(item){
+ if(!item)return;
+ const details=Array.isArray(item.details)&&item.details.length?'<ul class="club-content-details">'+item.details.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'';
+ const actions=[];
+ if(item.action==='development')actions.push('<a class="btn primary" href="./sponsor/#opportunita">Progetti & opportunità</a>');
+ if(item.action==='profile')actions.push('<button type="button" class="btn primary" id="clubContentOpenDesk">Apri area riservata</button>');
+ if(item.action==='home')actions.push('<button type="button" class="btn primary" id="clubContentOpenHome">Torna alla Home</button>');
+ const layer=openPanel('SCD Club Now','<div class="panel-detail club-content-panel"><span class="eyebrow">'+esc(item.status||'SCD')+'</span><h2>'+esc(item.title||'Aggiornamento SCD')+'</h2><p>'+esc(item.summary||'')+'</p>'+details+'<div class="club-content-source"><small>FONTE</small><b>'+esc(item.sourceLabel||'Direzione SCD ColicoDerviese')+'</b><span>Aggiornato '+esc(item.updatedAt||'')+'</span></div>'+(actions.length?'<div class="club-content-actions">'+actions.join('')+'</div>':'')+'</div>');
+ const desk=$('#clubContentOpenDesk',layer);if(desk)desk.onclick=()=>{layer.classList.remove('open');setView('desk')};
+ const home=$('#clubContentOpenHome',layer);if(home)home.onclick=()=>{layer.classList.remove('open');setView('pulse')};
+}
+function renderClubContent(){
+ const mount=$('#clubContentRail');if(!mount)return;
+ const rows=clubContentItems().slice(0,4);
+ const status=$('#clubContentStatus');if(status)status.textContent=rows.length?'CONTENUTI SCD VERIFICATI':'CONTENUTI IN AGGIORNAMENTO';
+ mount.innerHTML=rows.length?rows.map((x,i)=>'<article class="club-now-card"><div class="club-now-index">'+String(i+1).padStart(2,'0')+'</div><div><small>'+esc(x.type||'CLUB')+' · '+esc(x.status||'')+'</small><h3>'+esc(x.title||'Aggiornamento SCD')+'</h3><p>'+esc(x.summary||'')+'</p></div><button type="button" data-club-content="'+esc(x.id)+'">Apri</button></article>').join(''):'<article class="club-now-empty"><b>Contenuti in aggiornamento</b><span>La sezione resta vuota finché non esistono contenuti pubblici verificati.</span></article>';
+ $$('[data-club-content]',mount).forEach(b=>b.onclick=()=>openClubContent(rows.find(x=>x.id===b.dataset.clubContent)));
+}
+async function loadClubContent(){
+ try{
+   const r=await fetch('./content/public-club.v1.json',{cache:'no-store'});
+   if(!r.ok)throw new Error('club content unavailable');
+   const data=await r.json();
+   const source=data?.source||{};
+   const items=Array.isArray(data?.items)?data.items:[];
+   state.clubContent=items.filter(x=>x?.public===true).map(x=>({...x,verified:source.verified===true,sourceLabel:source.label||source.id||'SCD',updatedAt:data.updated_at||''}));
+ }catch(e){state.clubContent=[]}
+ renderClubContent();
+ renderSocialHub();
+}
 function socialFeedRows(){
  const out=[];
  if(state.nextMatch){
@@ -323,6 +356,13 @@ function socialFeedRows(){
      copy:[fmtDate(x.date),x.time,x.venue].filter(Boolean).join(' · '),
      meta:[x.source||'Calendario SCD'],team:x.team||'',
      action:'event',actionId:String(x.id||''),share:[x.title||x.team||'Evento SCD',fmtDate(x.date),x.time,x.venue].filter(Boolean).join(' · ')
+   });
+ });
+ clubContentItems().forEach((x,i)=>{
+   out.push({
+     id:'club-'+String(x.id||i),type:'CLUB',icon:x.type==='PROJECT'?'◆':'SCD',label:x.type==='PROJECT'?'SCD PROGETTI':'SCD CLUB',
+     title:x.title||'Aggiornamento SCD',copy:x.summary||'',meta:[x.status||'VERIFICATO',x.sourceLabel||'Direzione SCD'].filter(Boolean),team:'',
+     action:'club',actionId:String(x.id||''),share:[x.title,x.summary].filter(Boolean).join(' — ')
    });
  });
  (state.news?.cards||[]).forEach((x,i)=>{
@@ -351,6 +391,7 @@ function openSocialItem(row){
  if(!row)return;
  if(row.action==='match')return openMatchday(state.nextMatch);
  if(row.action==='event'&&row.actionId)return openEvent(row.actionId);
+ if(row.action==='club'&&row.actionId)return openClubContent(clubContentItems().find(x=>String(x.id)===String(row.actionId)));
  if(row.action==='news'){
    const card=(state.news?.cards||[])[Number(row.actionId)];
    if(!card)return;
@@ -521,7 +562,8 @@ function buildSearchIndex(){
  const searchableCalendar=(state.fullCalendar&&state.fullCalendar.length)?state.fullCalendar:state.events;searchableCalendar.forEach(x=>items.push({kind:x.kind==='MATCH'?'PARTITA':'EVENTO',title:[x.team,x.opponent].filter(Boolean).join(' vs ')||x.title,meta:[fmtDate(x.date),x.time,x.venue].filter(Boolean).join(' · '),action:'event',id:x.id,terms:[x.team,x.category,x.title,x.opponent,x.competition,x.venue]}));
  (state.news?.cards||[]).forEach((x,i)=>items.push({kind:'NEWS',title:x.title,meta:x.category||'SCD Newsroom',action:'news',id:String(i),terms:[x.title,x.dek,x.body,x.category]}));
  [...new Set(searchableCalendar.flatMap(x=>[x.team,x.category]).filter(x=>x&&x!=='SCD'))].forEach(x=>items.push({kind:'SQUADRA',title:x,meta:'Calendario e contenuti pubblici',action:'team',id:x,terms:[x]}));
- state.publicProfiles.forEach(x=>items.push({kind:'PROFILO PUBBLICO',title:x.displayName,meta:[x.role,x.team].filter(Boolean).join(' · '),action:'profile',id:x.id,terms:[x.displayName,x.role,x.team]}));
+ clubContentItems().forEach(x=>items.push({kind:x.type==='PROJECT'?'PROGETTO SCD':'SCD',title:x.title,meta:x.status||'Contenuto verificato',action:'club',id:x.id,terms:[x.title,x.summary,...(x.details||[])]}));
+  state.publicProfiles.forEach(x=>items.push({kind:'PROFILO PUBBLICO',title:x.displayName,meta:[x.role,x.team].filter(Boolean).join(' · '),action:'profile',id:x.id,terms:[x.displayName,x.role,x.team]}));
  officialChannels.forEach(x=>items.push({kind:'CANALE UFFICIALE',title:x.label,meta:'SCD ColicoDerviese',action:'channel',id:x.id,terms:[x.label,x.terms]}));
  return items;
 }
@@ -539,6 +581,7 @@ function handleSearchResult(kind,id){
  if(kind==='event')return openEvent(id);
  if(kind==='team'){openTeamHub(id);return}
  if(kind==='news'){document.querySelector('.newsroom')?.scrollIntoView({behavior:'smooth'});return}
+ if(kind==='club')return openClubContent(clubContentItems().find(x=>String(x.id)===String(id)));
  if(kind==='profile'){openPanel('Profilo pubblico','<div class="panel-detail"><b>Profilo autorizzato</b><p>Le informazioni mostrate rispettano la visibilità concessa dalla Società.</p></div>')}
  if(kind==='channel'){const ch=officialChannels.find(x=>x.id===id);if(ch)window.open(ch.url,'_blank','noopener,noreferrer')}
 }
@@ -875,8 +918,8 @@ async function hydrate(){
     state.fullCalendar=mergeCalendarRows(state.fullCalendar,state.events,state.upcoming);renderWeek();renderMatchCenter();renderUpcoming();renderPartners();renderMentions();renderSocialHub();if(state.view==='calendar')renderPublicCalendar();if(state.view==='teams')renderPublicTeams();
   }
 }
-hydrate();$('#refreshData')?.addEventListener('click',()=>{hydrate();toast('Aggiornamento richiesto')});
-$('#socialRefresh')?.addEventListener('click',async()=>{await hydrate();renderSocialHub();toast('Feed social aggiornato')});
+loadClubContent();hydrate();$('#refreshData')?.addEventListener('click',()=>{loadClubContent();hydrate();toast('Aggiornamento richiesto')});
+$('#socialRefresh')?.addEventListener('click',async()=>{await Promise.all([loadClubContent(),hydrate()]);renderSocialHub();toast('Feed social aggiornato')});
 $('#installApp')?.addEventListener('click',async()=>{
  if(!deferredInstallPrompt){toast('Installazione disponibile dal menu del browser quando supportata');return}
  deferredInstallPrompt.prompt();
