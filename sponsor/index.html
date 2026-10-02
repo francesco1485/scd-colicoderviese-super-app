@@ -269,8 +269,8 @@
 
     <div class="donation-panel">
       <div class="donation-panel-head">
-        <div><small>CONTRIBUTO SPONTANEO</small><h3>Sostieni il Fondo Solidale SCD</h3><p>Scegli l'importo, lascia i dati minimi necessari e prosegui con una modalità di versamento tracciabile quando disponibile.</p></div>
-        <span class="donation-security">Nessun dato carta viene raccolto in questa pagina</span>
+        <div><small>CONTRIBUTO SPONTANEO</small><h3>Sostieni il Fondo Solidale SCD</h3><p>Scegli l'importo, lascia i dati minimi necessari e invia alla società la tua disponibilità a contribuire. La Direzione ti comunicherà poi le modalità tracciabili approvate.</p></div>
+        <span class="donation-security">Nessun pagamento viene effettuato in questa pagina</span>
       </div>
 
       <form id="solidarityDonationForm" class="donation-form">
@@ -308,18 +308,14 @@
         <label class="privacy"><input type="checkbox" name="anonymous" checked> Mantieni il mio nome non pubblico. Un'eventuale pubblicazione richiederà un consenso separato.</label>
         <label class="privacy"><input type="checkbox" name="privacy" required> Autorizzo SCD a utilizzare questi dati esclusivamente per registrare e gestire la mia intenzione di donazione e la relativa documentazione.</label>
 
-        <button class="primary-cta donation-submit" type="submit">Continua con la donazione</button>
-        <p class="donation-state" id="donationState" role="status" aria-live="polite">Verifico le modalità di versamento disponibili…</p>
-
-        <div class="donation-methods" id="donationMethods" hidden>
-          <a id="donationCheckoutLink" class="donation-method-card checkout" href="#" target="_blank" rel="noopener noreferrer" hidden>
-            <span>PAGAMENTO ONLINE</span><b>Prosegui sul gateway autorizzato</b><small>La transazione avviene fuori dalla Web App SCD.</small>
-          </a>
-          <div id="donationManualMethod" class="donation-method-card manual" hidden>
-            <span>GESTIONE SCD</span><b>Richiesta registrata</b><small>Se nessun metodo diretto è ancora attivo, la società ti comunicherà una modalità di versamento tracciabile.</small>
-          </div>
+        <button class="primary-cta donation-submit" type="submit">Invia disponibilità a contribuire</button>
+        <p class="donation-state" id="donationState" role="status" aria-live="polite">Compila il modulo: la società registrerà la richiesta e ti ricontatterà.</p>
+        <div class="donation-followup" id="donationFollowup" hidden>
+          <span>RICHIESTA REGISTRATA</span>
+          <b>La Direzione SCD ti ricontatterà con le modalità tracciabili approvate.</b>
+          <small>Questo passaggio non equivale a pagamento effettuato e non genera automaticamente ricevute o attestazioni.</small>
         </div>
-        <p class="fiscal-note donation-note">Il modulo registra l'intenzione di donazione, non certifica l'avvenuto pagamento. Eventuali agevolazioni fiscali, ricevute o attestazioni dipendono dalla normativa applicabile, dal soggetto erogante e dalla corretta tracciabilità/documentazione del versamento.</p>
+        <p class="fiscal-note donation-note">Il modulo registra la disponibilità a contribuire, non certifica l'avvenuto versamento. Eventuali agevolazioni fiscali, ricevute o attestazioni dipendono dalla normativa applicabile, dal soggetto erogante e dalla corretta tracciabilità/documentazione del versamento.</p>
       </form>
     </div>
   </section>
