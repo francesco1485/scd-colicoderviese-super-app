@@ -197,6 +197,123 @@ for(const viewport of viewports){
   await page.close();
 }
 
+// R54 private journey: live Nova Private Desk with intercepted authorized R20 responses.
+mark('R54_PRIVATE_JOURNEY');
+for(const viewport of [{width:390,height:844},{width:1440,height:900}]){
+  const privatePage=await browser.newPage({viewport});
+  const privateErrors=[];
+  privatePage.on('pageerror',e=>privateErrors.push(String(e)));
+  privatePage.on('console',m=>{if(m.type()==='error')privateErrors.push('console: '+m.text())});
+
+  const dashboard={
+    user:{name:'QA SCD',email:'qa@example.test',role:'STAFF',area:'U16',staff:true},
+    permissions:{direction:false},
+    personal:[
+      {personId:'QA-P1',code:'P001',firstName:'Atleta',lastName:'Uno',teamName:'U16',figcStatus:'APPROVATO_QA',certificateStatus:'VALIDO_QA',paymentStatus:'REGOLARE_QA',identityStatus:'VERIFICATO_QA'},
+      {personId:'QA-P2',code:'P002',firstName:'Atleta',lastName:'Due',teamName:'U14',figcStatus:'IN_AGGIORNAMENTO_QA',certificateStatus:'IN_AGGIORNAMENTO_QA',paymentStatus:'IN_AGGIORNAMENTO_QA'}
+    ],
+    teams:[{key:'U16',name:'U16'},{key:'U14',name:'U14'}],
+    attendance:{teams:[{key:'U16',name:'U16'}]},
+    roster:{U16:[{code:'P001',name:'Atleta Uno'}],U14:[{code:'P002',name:'Atleta Due'}]},
+    convocations:[{id:'QA-C1',playerCode:'P001',team:'U16',date:'2026-10-04',meetingTime:'13:45',meetingPlace:'Campo QA',response:'DA CONFERMARE'}],
+    transport:{kpis:{requests:1}}
+  };
+  const workspace={
+    name:'QA SCD',email:'qa@example.test',role:'STAFF',privateDeskProfile:'QA_ROLE_SCOPE',
+    defaultModules:['CALENDARIO','TESSERATI','PULMINI','COMUNICAZIONI'],
+    dataScope:['QA_AUTHORIZED'],communicationScope:['U16'],areas:[]
+  };
+
+  await privatePage.route('**/api/scd',async route=>{
+    const req=route.request();
+    if(req.method()!=='POST')return route.continue();
+    let body={};try{body=JSON.parse(req.postData()||'{}')}catch{}
+    const action=String(body.action||'');
+    let data;
+    if(action==='auth.login')data={token:'qa-private-token'};
+    else if(action==='auth.validate')data={valid:true};
+    else if(action==='dashboard.summary')data=dashboard;
+    else if(action==='private.user.workspace')data=workspace;
+    else if(action==='account.requests')data={rows:[{id:'REQ-QA-1',subject:'Documento QA',status:'APERTA',createdAt:'2026-10-02T10:00:00Z'}]};
+    else if(action==='private.attendance.get')data={statuses:['PRESENTE','ASSENTE','GIUSTIFICATO'],players:[{code:'P001',name:'Atleta Uno',status:'PRESENTE'}]};
+    else if(['private.attendance.save','private.convocation.create','private.convocation.reply','private.transport.request','private.message.send','private.request.submit'].includes(action))data={ok:true,id:'QA-WRITE-1'};
+    else return route.continue();
+    await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({ok:true,data})});
+  });
+
+  await privatePage.goto(base+'/#desk',{waitUntil:'domcontentloaded',timeout:30000});
+  await privatePage.waitForSelector('#view-desk.active');
+  await privatePage.waitForSelector('#privateDeskLoginForm');
+  await privatePage.fill('#privateDeskEmail','qa@example.test');
+  await privatePage.fill('#privateDeskCode','123456');
+  await privatePage.click('#privateDeskLoginForm button[type="submit"]');
+  await privatePage.waitForSelector('[data-private-module="TESSERATI"]');
+  await privatePage.waitForSelector('[data-private-module="PRESENZE"]');
+  await privatePage.waitForSelector('[data-private-module="CONVOCAZIONI"]');
+  if(await privatePage.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+3))throw new Error('R54 Private Desk horizontal overflow '+viewport.width);
+
+  await privatePage.click('[data-private-module="TESSERATI"]');
+  await privatePage.waitForSelector('.r54-people-hub');
+  const profileText=String(await privatePage.locator('.r54-people-hub').textContent()||'');
+  if(!profileText.includes('APPROVATO_QA')||!profileText.includes('VALIDO_QA')||!profileText.includes('REGOLARE_QA'))throw new Error('R54 profile projection missing');
+  if((await privatePage.locator('[data-r54-person]').count())!==2)throw new Error('R54 linked profiles mismatch');
+
+  await privatePage.click('[data-r54-action="documents"]');
+  await privatePage.waitForSelector('#r54PrivateHelp');
+  const docsText=String(await privatePage.locator('#publicPanelBody').textContent()||'');
+  if(!docsText.includes('VALIDO_QA')||!docsText.includes('VERIFICATO_QA'))throw new Error('R54 document status projection missing');
+  if(/sincronizzati dal gestionale/i.test(docsText))throw new Error('R54 documents must remain fail-closed');
+  await privatePage.click('#publicPanelClose');
+
+  await privatePage.click('[data-private-module="PULMINI"]');
+  await privatePage.waitForSelector('#r54TransportForm');
+  await privatePage.fill('#r54TransportForm input[name="time"]','14:00');
+  await privatePage.fill('#r54TransportForm input[name="origin"]','Colico QA');
+  await privatePage.fill('#r54TransportForm input[name="destination"]','Dervio QA');
+  await privatePage.click('#r54TransportForm button[type="submit"]');
+  await privatePage.waitForFunction(()=>document.querySelector('#r54TransportState')?.textContent?.includes('registrata'));
+  await privatePage.click('#publicPanelClose');
+
+  await privatePage.click('[data-private-module="RICHIESTE"]');
+  await privatePage.waitForSelector('.r54-request-list');
+  if(!String(await privatePage.locator('.r54-request-list').textContent()||'').includes('Documento QA'))throw new Error('R54 request history missing');
+  await privatePage.click('#publicPanelClose');
+
+  await privatePage.click('[data-private-module="PRESENZE"]');
+  await privatePage.waitForSelector('#r54AttLoad');
+  await privatePage.click('#r54AttLoad');
+  await privatePage.waitForSelector('[data-r54-att]');
+  await privatePage.click('#r54AttSave');
+  await privatePage.click('#publicPanelClose');
+
+  await privatePage.click('[data-private-module="CONVOCAZIONI"]');
+  await privatePage.waitForSelector('#r54ConvForm');
+  await privatePage.fill('#r54ConvTime','13:45');
+  await privatePage.fill('#r54ConvPlace','Campo QA');
+  const callupChecks=privatePage.locator('[data-r54-conv-player]');
+  if(await callupChecks.count())await callupChecks.first().check();
+  await privatePage.click('#r54ConvForm button[type="submit"]');
+  await privatePage.waitForFunction(()=>document.querySelector('#r54ConvState')?.textContent?.includes('registrata'));
+  await privatePage.click('#publicPanelClose');
+
+  await privatePage.click('[data-private-module="COMUNICAZIONI"]');
+  await privatePage.waitForSelector('#r54MessageForm');
+  await privatePage.fill('#r54MsgSubject','Messaggio QA');
+  await privatePage.fill('#r54MsgBody','Contenuto QA autorizzato');
+  await privatePage.click('#r54MessageForm button[type="submit"]');
+  await privatePage.waitForFunction(()=>document.querySelector('#r54MsgState')?.textContent?.includes('registrato'));
+  await privatePage.click('#publicPanelClose');
+
+  await privatePage.click('[data-private-module="TESSERATI"]');
+  await privatePage.waitForSelector('.r54-people-hub');
+  if(await privatePage.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+3))throw new Error('R54 profile hub horizontal overflow '+viewport.width);
+  await privatePage.screenshot({path:'test-output/r54-private-'+viewport.width+'x'+viewport.height+'.png',fullPage:true});
+  await privatePage.click('#publicPanelClose');
+
+  if(privateErrors.length)throw new Error('R54 private browser errors '+viewport.width+'px: '+privateErrors.join(' | '));
+  await privatePage.close();
+}
+
 // Sponsor public journey: real browser interaction on desktop and mobile.
 mark('SPONSOR_BROWSER_JOURNEY');
 for(const viewport of [{width:390,height:844},{width:1440,height:900}]){

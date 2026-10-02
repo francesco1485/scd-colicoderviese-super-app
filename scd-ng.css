@@ -839,6 +839,32 @@ radial-gradient(circle at 84% 0%,rgba(41,215,255,.12),transparent 31%),
   .desk-auth-actions .btn{width:100%}
 }
 
+/* R54 — neutralize generic action-queue article rules on role/scope cards */
+.action-queue article.desk-profile-live{
+  display:flex;
+  background:linear-gradient(125deg,#082641,#0c527f)!important;
+}
+.action-queue article.desk-scope-card{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  background:rgba(255,255,255,.92)!important;
+}
+.action-queue article.desk-scope-card>span{
+  width:auto;
+  height:auto;
+  border-radius:0;
+  background:transparent;
+  display:block;
+  place-items:initial;
+  font-weight:500;
+  color:#506b7f;
+  overflow-wrap:anywhere;
+  min-width:0;
+}
+@media(max-width:680px){
+  .action-queue article.desk-scope-card{grid-template-columns:1fr}
+}
+
 
 /* R46 PREMIUM SPORTS APP PALETTE · 2026-10-01 */
 :root{
@@ -2017,4 +2043,101 @@ body[data-scd-theme="arena"] select:focus-visible{
   .solidarity-home{margin:14px 12px;grid-template-columns:1fr;padding:16px;border-radius:20px}
   .solidarity-home-mark{width:105px;border-radius:24px;padding:16px}
   .solidarity-home-actions .btn.primary{width:100%;justify-content:center}
+}
+
+
+/* R54 — Live Private Experience inside SCD Nova */
+.r54-private-panel{max-width:760px}
+.r54-live-status-list{display:grid;gap:8px;margin:16px 0}
+.r54-live-status-list article{border:1px solid #dbe6f1;border-radius:14px;background:#f8fbfe;padding:12px}
+.r54-live-status-list span{display:block;font-size:8px;font-weight:950;letter-spacing:.1em;color:#698198}
+.r54-live-status-list b{display:block;margin-top:5px;color:#0a315e;font-size:14px;overflow-wrap:anywhere}
+.r54-private-form{display:grid;gap:12px}
+.r54-private-form .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.r54-private-form label{display:grid;gap:5px;font-size:9px;font-weight:900;color:#56718d}
+.r54-private-form label.full{grid-column:1/-1}
+.r54-private-form input,.r54-private-form select,.r54-private-form textarea{width:100%;border:1px solid #cbdbea;border-radius:12px;background:#fff;color:#092d58;padding:10px;min-height:42px}
+.r54-private-form textarea{min-height:92px;resize:vertical}
+.r54-request-list{display:grid;gap:8px;margin:14px 0}
+.r54-request-list article{display:flex;justify-content:space-between;gap:12px;align-items:center;border:1px solid #dce7f1;border-radius:14px;padding:11px;background:#fff}
+.r54-request-list b,.r54-request-list small{display:block}
+.r54-request-list b{font-size:11px;color:#0a315e}
+.r54-request-list small{font-size:8px;color:#7890a5;margin-top:3px}
+.r54-request-list span{font-size:8px;font-weight:950;color:#0d5fb8}
+.r54-people-hub{display:grid;gap:14px}
+.r54-profile-tabs{display:flex;gap:8px;overflow:auto;padding-bottom:4px}
+.r54-profile-tabs button{min-width:110px;border:1px solid #dce7f1;border-radius:16px;background:#fff;padding:10px;text-align:center;color:#173e69}
+.r54-profile-tabs button.active{border-color:#1664e8;box-shadow:0 8px 18px rgba(22,100,232,.13)}
+.r54-profile-tabs span{width:40px;height:40px;border-radius:13px;background:#eaf3ff;color:#0d5fb8;display:grid;place-items:center;margin:0 auto 6px;font-weight:950}
+.r54-profile-tabs b,.r54-profile-tabs small{display:block}
+.r54-profile-tabs b{font-size:10px}.r54-profile-tabs small{font-size:7px;color:#74899e;margin-top:2px}
+.r54-profile-hero{display:flex;justify-content:space-between;align-items:center;gap:14px;border:1px solid #dce7f1;border-radius:18px;background:#fff;padding:16px}
+.r54-profile-hero small{font-size:8px;letter-spacing:.12em;font-weight:950;color:#70869d}
+.r54-profile-hero h2{margin:4px 0;color:#0a315e;font-size:23px}
+.r54-profile-hero p{margin:0;color:#6c8298;font-size:10px}
+.r54-profile-hero>span{border-radius:999px;background:#edf5ff;color:#0d5fb8;padding:7px 9px;font-size:8px;font-weight:950}
+.r54-live-callup{display:flex;justify-content:space-between;gap:14px;align-items:center;border-radius:18px;padding:16px;background:linear-gradient(135deg,#0d47a1,#1664e8);color:#fff}
+.r54-live-callup.empty{background:#f7fafc;color:#173e69;border:1px solid #dce7f1}
+.r54-live-callup small{display:block;font-size:8px;letter-spacing:.1em;font-weight:950;opacity:.8}
+.r54-live-callup b{display:block;font-size:16px;margin-top:4px}
+.r54-live-callup p{margin:5px 0;font-size:10px;opacity:.88}
+.r54-live-callup em{font-style:normal;font-size:8px;font-weight:950}
+.r54-live-callup>div:last-child{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+.r54-profile-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.r54-profile-kpis article{border:1px solid #dce7f1;border-radius:14px;background:#fff;padding:12px}
+.r54-profile-kpis small{display:block;font-size:7px;letter-spacing:.08em;color:#70869d;font-weight:950}
+.r54-profile-kpis b{display:block;margin-top:5px;color:#0a315e;font-size:11px;overflow-wrap:anywhere}
+.r54-profile-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.r54-profile-actions button{min-height:76px;border:1px solid #dce7f1;border-radius:14px;background:#fff;color:#0d5fb8;padding:11px;text-align:left;font-size:17px}
+.r54-profile-actions b{display:block;margin-top:12px;color:#173e69;font-size:10px}
+.r54-attendance-list{display:grid;gap:7px;margin:14px 0}
+.r54-attendance-list label{display:flex;justify-content:space-between;gap:12px;align-items:center;border:1px solid #dce7f1;border-radius:12px;padding:10px;background:#fff}
+.r54-attendance-list b,.r54-attendance-list small{display:block}.r54-attendance-list b{font-size:10px;color:#173e69}.r54-attendance-list small{font-size:7px;color:#7890a5}
+.r54-attendance-list select{min-width:150px;border:1px solid #cbdbea;border-radius:9px;padding:8px}
+.r54-player-checks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:12px 0}
+.r54-player-checks label{border:1px solid #dce7f1;border-radius:10px;background:#fff;padding:9px;font-size:9px;color:#173e69}
+
+@media(max-width:700px){
+  .r54-private-form .form-grid{grid-template-columns:1fr}
+  .r54-private-form label.full{grid-column:auto}
+  .r54-profile-hero,.r54-live-callup{display:grid}
+  .r54-live-callup>div:last-child{justify-content:stretch}
+  .r54-live-callup>div:last-child .btn{flex:1}
+  .r54-profile-kpis{grid-template-columns:1fr}
+  .r54-profile-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .r54-player-checks{grid-template-columns:1fr}
+  .r54-attendance-list label{display:grid}
+  .r54-attendance-list select{min-width:0;width:100%}
+}
+
+
+/* R54 visual hardening: Private Desk cards must override generic action-queue article rules. */
+.action-queue .desk-profile-live{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:18px;
+  background:linear-gradient(125deg,#082641,#0c527f)!important;
+  color:#fff!important;
+}
+.action-queue .desk-profile-live h3{color:#fff!important}
+.action-queue .desk-profile-live p{color:#bad6e7!important}
+.action-queue .desk-scope-card{
+  display:grid;
+  grid-template-columns:minmax(108px,auto) minmax(0,1fr);
+  gap:8px 13px;
+  background:#f7fbff!important;
+  color:#173e69;
+}
+.action-queue .desk-scope-card b,
+.action-queue .desk-scope-card span{
+  min-width:0;
+  overflow-wrap:anywhere;
+  word-break:normal;
+}
+@media(max-width:680px){
+  .action-queue .desk-profile-live{display:flex;flex-direction:column;align-items:flex-start}
+  .action-queue .desk-profile-live button{align-self:flex-start}
+  .action-queue .desk-scope-card{display:grid;grid-template-columns:1fr;gap:4px;padding:13px}
+  .action-queue .desk-scope-card span{margin-bottom:7px}
 }

@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.23.0",
+    "version": "3.24.0",
     "effective_at": "2026-10-02",
     "status": "BINDING",
     "language": "it-IT",
@@ -2251,21 +2251,24 @@
       "domain": "PRIVATE_UI",
       "required": true,
       "state": "PARTIAL",
-      "screen": "ATHLETE_AREA"
+      "screen": "PRIVATE_DESK:TESSERATI",
+      "contract": "AUTHORIZED_PROFILE_CALLUPS_STATUS_CALENDAR_REQUESTS_TRANSPORT_FAIL_CLOSED_IN_ACTIVE_PRIVATE_DESK"
     },
     {
       "id": "CAP-FAMILY",
       "domain": "PRIVATE_UI",
       "required": true,
       "state": "PARTIAL",
-      "screen": "FAMILY_AREA"
+      "screen": "PRIVATE_DESK:TESSERATI",
+      "contract": "AUTHORIZED_LINKED_PROFILES_DOCUMENT_STATUS_PAYMENT_STATUS_CALENDAR_TRANSPORT_REQUESTS_FAIL_CLOSED_IN_ACTIVE_PRIVATE_DESK"
     },
     {
       "id": "CAP-STAFF",
       "domain": "MANAGEMENT",
       "required": true,
       "state": "PARTIAL",
-      "screen": "STAFF_DIRECTION"
+      "screen": "PRIVATE_DESK",
+      "contract": "ROLE_SCOPE_OPERATIONAL_DASHBOARD_ATTENDANCE_CALLUPS_MESSAGES_REQUESTS_TRANSPORT_IN_ACTIVE_PRIVATE_DESK"
     },
     {
       "id": "CAP-COMMS",
@@ -2546,7 +2549,7 @@
         "SCD_DRIVE",
         "SCD_GMAIL"
       ],
-      "contract": "ROLE_SCOPE_SHORT_ACTION_QUEUE_NO_ARCHIVE_HUNTING_PLUS_CALLUP_RESPONSE_VERTICAL_SLICE"
+      "contract": "ROLE_SCOPE_ACTION_CENTER_WITH_FAMILY_ATHLETE_STAFF_VERTICAL_SLICES_NO_ARCHIVE_HUNTING"
     },
     {
       "id": "CAP-COGNITIVE-ERGONOMICS",
@@ -4006,6 +4009,31 @@
       ],
       "fallback": "SHOW_AVAILABLE_SOURCE_AND_DISCLOSE_UNAVAILABLE_DEPENDENCY",
       "tracking": "NONE_CLIENT_ANALYTICS_BY_DEFAULT"
+    },
+    "private_experience_r54": {
+      "release": "R54",
+      "state": "VERTICAL_SLICE_ENHANCEMENT",
+      "purpose": "MAKE_FAMILY_ATHLETE_STAFF_ACTIONABLE_INSIDE_THE_EXISTING_SCD_NOVA_PRIVATE_DESK",
+      "screens": [
+        "PRIVATE_DESK",
+        "AUTHORIZED_PROFILE_HUB",
+        "STAFF_OPERATIONS"
+      ],
+      "rules": [
+        "NO_NEW_PARALLEL_PRIVATE_DESK",
+        "ROLE_SCOPE_FROM_BACKEND_ONLY",
+        "PROFILE_DATA_ONLY_FOR_AUTHORIZED_LINKED_PERSON",
+        "DOCUMENT_AND_PAYMENT_VALUES_MUST_BE_RETURNED_BY_BACKEND_OR_FAIL_CLOSED",
+        "TRANSPORT_REQUEST_USES_EXISTING_PRIVATE_TRANSPORT_ACTION",
+        "REQUESTS_USE_EXISTING_ACCOUNT_REQUESTS_ACTION",
+        "NO_INVENTED_AMOUNTS_DATES_DOCUMENTS_OR_MEDICAL_STATE"
+      ],
+      "activation": "EXISTING_R20_PRIVATE_SESSION",
+      "supersedes_mock_toasts": true,
+      "active_runtime": "scd-ng.js",
+      "legacy_router_status": "COMPATIBILITY_ONLY_NOT_PRIMARY",
+      "no_parallel_private_app": true,
+      "runtime": "SCD_NOVA_PRIVATE_DESK"
     }
   },
   "research_intelligence": {

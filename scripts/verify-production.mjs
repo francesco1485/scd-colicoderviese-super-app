@@ -2,7 +2,7 @@ import fs from 'node:fs';
 
 const EXPECTED_VERSION=process.env.SCD_EXPECTED_VERSION||'40.0.0';
 const EXPECTED_RELEASE=process.env.SCD_EXPECTED_RELEASE||'NG-0.7.0';
-const EXPECTED_MANIFEST=process.env.SCD_EXPECTED_MANIFEST||'3.23.0';
+const EXPECTED_MANIFEST=process.env.SCD_EXPECTED_MANIFEST||'3.24.0';
 const EXPECTED_COMMIT=process.env.SCD_EXPECTED_COMMIT||process.env.GITHUB_SHA||'';
 const PAGES_URL=process.env.SCD_PAGES_URL||'https://francesco1485.github.io/scd-colicoderviese-super-app/';
 const RENDER_BASE=(process.env.SCD_RENDER_BASE_URL||'https://scd-colicoderviese-official-r21.onrender.com').replace(/\/$/,'');
@@ -12,7 +12,7 @@ const outDir='test-output';
 fs.mkdirSync(outDir,{recursive:true});
 
 const evidence={
-  release:'R53.1',
+  release:'R54',
   expectedVersion:EXPECTED_VERSION,
   expectedRelease:EXPECTED_RELEASE,
   expectedManifest:EXPECTED_MANIFEST,

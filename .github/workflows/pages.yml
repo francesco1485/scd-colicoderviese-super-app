@@ -38,6 +38,9 @@ jobs:
       - name: R53 football/social core gate
         run: npm run test:r53-core
 
+      - name: R54 private experience gate
+        run: npm run test:r54-private
+
       - name: Prepare static site
         run: |
           node --check app.js
