@@ -213,7 +213,7 @@ function bindPublicPortal(){
   $('publicAccessBtn')?.addEventListener('click',()=>openPublicAccessForm())
   $('publicAccessCta')?.addEventListener('click',()=>openPublicAccessForm())
   $('publicPartnerBtn')?.addEventListener('click',()=>openPublicLeadForm(null,'partner'))
-  $('publicHeroContactBtn')?.addEventListener('click',()=>openPublicLeadForm(null,'partner'))
+  $('publicHeroContactBtn')?.addEventListener('click',()=>openPublicLeadForm(null,'event','Proposta incontro C.E.P.A.'))
   $('publicGeneralContactBtn')?.addEventListener('click',()=>openPublicLeadForm(null,'information'))
   $('publicSponsorCta')?.addEventListener('click',()=>openPublicLeadForm(null,'sponsor','Sponsorship C.E.P.A.'))
   $('publicNetworkCta')?.addEventListener('click',()=>openPublicLeadForm(null,'collaborator','Percorso SAP / rete C.E.P.A.'))
@@ -2988,6 +2988,7 @@ function renderAgenda(){
   if($('newAgendaEventBtn'))$('newAgendaEventBtn').onclick=async()=>{if(isManager())await loadMembers();openAgendaEditor()}
 }
 function agendaAudienceMembers(scope,selectedIds){
+  if(scope==='private')return[]
   const ids=new Set(selectedIds||[])
   if(scope==='leadership')members.filter(m=>['super_admin','supervisor','manager'].includes(m.role)).forEach(m=>ids.add(m.user_id))
   return [...ids]
