@@ -34,7 +34,7 @@ const viewMeta={
 
 let ecosystem=[],projects=[],actions=[],marketHubs=[],marketEntities=[],contacts=[],timeline=[],documents=[],partnerRequirements=[],blueprints=[],subjects=[],initiatives=[],cepaContent=[],cepaAcademy=[],cepaSpeakers=[],products=[],productKnowledge=[],comparisons=[],collaborators=[],collaboratorTerms=[],portfolioSnapshots=[],businessAssessments=[],growthKits=[],distributionWatchlists=[],distributionCandidates=[],distributionEvidence=[],mailTemplates=[],mailDrafts=[],cepaExpansion=[],cepaReadiness=[],assistantMessages=[],recoveryRows=[],members=[],liaCapabilities=[],liaFolders=[],liaOrders=[],liaFiles=[],researchSources=[],researchInsights=[],liaActionRules=[],liaApprovals=[],roleViewAccess=[],liaAutomationRuns=[],assetRegistry=[],expertProtocols=[],uxUsageEvents=[],accessRequests=[],commercialLeads=[],publicShowcase=[]
 let officeAssignments=[],officeMessages=[],officeSnapshots=[],officeCases=[],officeWorkflow=[],officeCepaActivities=[],officeImports=[]
-let commercialClients=[],pipelineCases=[],clientCheckups=[],clientInteractions=[],clientWorkItems=[],clientPolicies=[]
+let commercialClients=[],pipelineCases=[],clientCheckups=[],clientInteractions=[],clientWorkItems=[],clientPolicies=[],publicCepaSubjects=[],publicCepaEvents=[]
 let crmProfiles=[],crmModules=[],crmRoleTemplates=[],crmRecommendations=[]
 let currentPartnerId=null,currentOfficeId=null,currentOfficeProductId=null,currentCepaHubId=null,currentCommerceTab='clients'
 
@@ -116,21 +116,57 @@ function showResetPasswordView(){
 }
 async function loadPublicPortal(){
   if(!$('publicShowcaseGrid'))return
-  const{data,error}=await supabase.from('public_showcase_items').select('*').eq('organization_id',PUBLIC_ORG_ID).eq('published',true).order('sort_order')
-  if(error){
-    $('publicShowcaseGrid').innerHTML='<div class="empty">Le iniziative non sono disponibili in questo momento.</div>'
-    return
+  const [showcaseResult,cepaResult]=await Promise.all([
+    supabase.from('public_showcase_items').select('*').eq('organization_id',PUBLIC_ORG_ID).eq('published',true).order('sort_order'),
+    supabase.functions.invoke('public-cepa-feed',{body:{}})
+  ])
+  if(showcaseResult.error){
+    $('publicShowcaseGrid').innerHTML='<div class="empty">Le opportunità di collaborazione non sono disponibili in questo momento.</div>'
+  }else{
+    publicShowcase=showcaseResult.data||[]
+    $('publicShowcaseGrid').innerHTML=publicShowcase.map(x=>
+      '<article class="public-showcase-card '+(x.featured?'featured':'')+'">'+
+        (x.visual_url?'<div class="public-showcase-visual"><img src="'+esc(x.visual_url)+'" alt="" loading="lazy"></div>':'')+
+        '<div><span>'+esc(x.eyebrow||x.category)+'</span><h3>'+esc(x.title)+'</h3><p>'+esc(x.summary)+'</p></div>'+
+        '<div class="public-showcase-footer"><small>'+esc(x.audience||'Proposta su misura')+'</small><button type="button" data-public-item="'+x.id+'">'+esc(x.cta_label||'Richiedi informazioni')+' →</button></div></article>'
+    ).join('')||'<div class="empty">Nuove collaborazioni in preparazione.</div>'
+    document.querySelectorAll('[data-public-item]').forEach(b=>b.onclick=()=>{
+      const item=publicShowcase.find(x=>x.id===b.dataset.publicItem)
+      openPublicLeadForm(item?.id||null,item?.category==='sponsor'?'sponsor':item?.category==='network'?'collaborator':item?.category==='partnership'?'partner':'information',item?.title||'')
+    })
   }
-  publicShowcase=data||[]
-  $('publicShowcaseGrid').innerHTML=publicShowcase.map(x=>
-    '<article class="public-showcase-card '+(x.featured?'featured':'')+'">'+
-      (x.visual_url?'<div class="public-showcase-visual"><img src="'+esc(x.visual_url)+'" alt="" loading="lazy"></div>':'')+
-      '<div><span>'+esc(x.eyebrow||x.category)+'</span><h3>'+esc(x.title)+'</h3><p>'+esc(x.summary)+'</p></div>'+
-      '<div class="public-showcase-footer"><small>'+esc(x.audience||'Proposta su misura')+'</small><button type="button" data-public-item="'+x.id+'">'+esc(x.cta_label||'Richiedi informazioni')+' →</button></div></article>'
-  ).join('')||'<div class="empty">Nuove iniziative in preparazione.</div>'
-  document.querySelectorAll('[data-public-item]').forEach(b=>b.onclick=()=>{
-    const item=publicShowcase.find(x=>x.id===b.dataset.publicItem)
-    openPublicLeadForm(item?.id||null,item?.category==='sponsor'?'sponsor':item?.category==='network'?'collaborator':item?.category==='partnership'?'partner':'information')
+  if(cepaResult.error||cepaResult.data?.ok===false){
+    publicCepaSubjects=[];publicCepaEvents=[]
+  }else{
+    publicCepaSubjects=cepaResult.data?.subjects||[]
+    publicCepaEvents=cepaResult.data?.events||[]
+  }
+  renderPublicCepaFeed()
+}
+function renderPublicCepaFeed(){
+  if($('publicCepaThemeGrid'))$('publicCepaThemeGrid').innerHTML=publicCepaSubjects.map(x=>
+    '<article class="cepa-theme-card"><span>'+esc(String(x.domain||'educazione').replaceAll('_',' '))+'</span><strong>'+esc(x.title)+'</strong><p>'+esc(x.description||'Contenuto in sviluppo presso il Centro C.E.P.A.')+'</p><small>'+esc((x.target_audiences||[]).join(' · '))+'</small></article>'
+  ).join('')||'<div class="empty public-empty-state"><strong>Catalogo in aggiornamento.</strong><p>I temi C.E.P.A. verranno pubblicati man mano che completano il percorso di validazione interna.</p></div>'
+
+  const upcoming=publicCepaEvents.filter(x=>!x.completed_at)
+  const past=publicCepaEvents.filter(x=>!!x.completed_at)
+  const card=(x,pastEvent=false)=>{
+    const visual=x.hero_url||x.poster_url||x.gallery?.[0]?.url||''
+    const when=x.planned_at?fmtDateTime(x.planned_at):pastEvent&&x.completed_at?fmtDateTime(x.completed_at):'Data in definizione'
+    const place=[x.venue_name,x.territory].filter(Boolean).join(' · ')||'Territorio in definizione'
+    return '<article class="cepa-event-card '+(x.featured?'featured':'')+'">'+
+      (visual?'<div class="cepa-event-visual"><img src="'+esc(visual)+'" alt="" loading="lazy"></div>':'<div class="cepa-event-visual placeholder"><span>C.E.P.A.</span></div>')+
+      '<div class="cepa-event-content"><div class="cepa-event-meta"><span>'+esc(when)+'</span><span>'+esc(place)+'</span></div><h3>'+esc(x.title)+'</h3><p>'+esc(x.summary||'Dettagli dell’iniziativa in aggiornamento.')+'</p><small>'+esc(x.audience||'Aperto ai destinatari indicati dal Centro C.E.P.A.')+'</small>'+
+      '<button type="button" data-cepa-event="'+x.id+'" data-cepa-event-past="'+(pastEvent?'1':'0')+'">'+(pastEvent?'Scopri l’iniziativa':'Richiedi informazioni / partecipa')+' →</button></div></article>'
+  }
+  if($('publicCepaUpcomingGrid'))$('publicCepaUpcomingGrid').innerHTML=upcoming.map(x=>card(x,false)).join('')||
+    '<div class="empty public-empty-state"><strong>Nessun evento pubblico ancora confermato.</strong><p>Il calendario comparirà qui soltanto quando data, luogo e contenuti saranno verificati dal Centro C.E.P.A.</p></div>'
+  if($('publicCepaPastGrid'))$('publicCepaPastGrid').innerHTML=past.map(x=>card(x,true)).join('')||
+    '<div class="empty public-empty-state"><strong>L’archivio pubblico è ancora vuoto.</strong><p>Foto, locandine e materiali compariranno qui dopo i primi eventi C.E.P.A. registrati e conclusi.</p></div>'
+
+  document.querySelectorAll('[data-cepa-event]').forEach(b=>b.onclick=()=>{
+    const event=publicCepaEvents.find(x=>x.id===b.dataset.cepaEvent)
+    openPublicLeadForm(null,'event',event?.title||'Evento C.E.P.A.')
   })
 }
 function openPublicAccessForm(prefillEmail=''){
@@ -151,9 +187,9 @@ function openPublicAccessForm(prefillEmail=''){
     if(!error&&data?.ok!==false)e.target.reset()
   }
 }
-function openPublicLeadForm(itemId=null,leadType='information'){
+function openPublicLeadForm(itemId=null,leadType='information',interestOverride=''){
   const item=publicShowcase.find(x=>x.id===itemId)
-  $('modalContent').innerHTML='<div class="eyebrow">CONTATTO COMMERCIALE</div><h2>'+(item?esc(item.title):'Parliamo del tuo progetto')+'</h2><p class="muted">Nessun costo viene mostrato o accettato da questo modulo. La richiesta serve ad aprire un contatto e costruire una proposta dedicata.</p><form id="publicLeadForm" class="form"><label>Nome e cognome<input id="plName" autocomplete="name" required></label><label>Azienda / realtà<input id="plCompany"></label><div class="inline"><label>Email<input id="plEmail" type="email" autocomplete="email" required></label><label>Telefono<input id="plPhone" autocomplete="tel" required></label></div><label>Interesse<input id="plInterest" value="'+esc(item?.title||'')+'"></label><label>Raccontaci cosa stai cercando<textarea id="plMessage"></textarea></label><label class="public-consent"><input id="plConsent" type="checkbox" required> Autorizzo il contatto per approfondire questa richiesta.</label><input id="plWebsite" class="public-honeypot" tabindex="-1" autocomplete="off"><button class="primary" type="submit">Invia richiesta di contatto</button></form><div id="publicFormMsg" class="message hidden"></div>'
+  $('modalContent').innerHTML='<div class="eyebrow">CONTATTO COMMERCIALE</div><h2>'+(item?esc(item.title):'Parliamo del tuo progetto')+'</h2><p class="muted">Nessun costo viene mostrato o accettato da questo modulo. La richiesta serve ad aprire un contatto e costruire una proposta dedicata.</p><form id="publicLeadForm" class="form"><label>Nome e cognome<input id="plName" autocomplete="name" required></label><label>Azienda / realtà<input id="plCompany"></label><div class="inline"><label>Email<input id="plEmail" type="email" autocomplete="email" required></label><label>Telefono<input id="plPhone" autocomplete="tel" required></label></div><label>Interesse<input id="plInterest" value="'+esc(interestOverride||item?.title||'')+'"></label><label>Raccontaci cosa stai cercando<textarea id="plMessage"></textarea></label><label class="public-consent"><input id="plConsent" type="checkbox" required> Autorizzo il contatto per approfondire questa richiesta.</label><input id="plWebsite" class="public-honeypot" tabindex="-1" autocomplete="off"><button class="primary" type="submit">Invia richiesta di contatto</button></form><div id="publicFormMsg" class="message hidden"></div>'
   $('modal').classList.remove('hidden')
   $('publicLeadForm').onsubmit=async e=>{
     e.preventDefault()
@@ -178,7 +214,8 @@ function bindPublicPortal(){
   $('publicPartnerBtn')?.addEventListener('click',()=>openPublicLeadForm(null,'partner'))
   $('publicHeroContactBtn')?.addEventListener('click',()=>openPublicLeadForm(null,'partner'))
   $('publicGeneralContactBtn')?.addEventListener('click',()=>openPublicLeadForm(null,'information'))
-  $('publicSponsorCta')?.addEventListener('click',()=>openPublicLeadForm(null,'sponsor'))
+  $('publicSponsorCta')?.addEventListener('click',()=>openPublicLeadForm(null,'sponsor','Sponsorship C.E.P.A.'))
+  $('publicNetworkCta')?.addEventListener('click',()=>openPublicLeadForm(null,'collaborator','Percorso SAP / rete C.E.P.A.'))
   document.querySelectorAll('[data-public-scroll]').forEach(b=>b.onclick=()=>document.getElementById(b.dataset.publicScroll)?.scrollIntoView({behavior:'smooth'}))
 }
 bindPublicPortal()
