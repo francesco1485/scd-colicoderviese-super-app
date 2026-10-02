@@ -5,6 +5,7 @@ const root=process.cwd();
 const configPath=path.join(root,'config/scd-supabase.v1.json');
 const migrationPath=path.join(root,'supabase/migrations/20260929_r33_club_graph_foundation.sql');
 const authMigrationPath=path.join(root,'supabase/migrations/20260929_r35_auth_context_rls_normalization.sql');
+const operativeMigrationPath=path.join(root,'supabase/migrations/20261002_r51_core_operative_engine.sql');
 
 function fail(message){console.error('SCD SUPABASE CONTRACT FAIL:',message);process.exitCode=1}
 function assert(condition,message){if(!condition)fail(message)}
@@ -13,12 +14,14 @@ function readJson(file){try{return JSON.parse(fs.readFileSync(file,'utf8'))}catc
 assert(fs.existsSync(configPath),'config/scd-supabase.v1.json missing');
 assert(fs.existsSync(migrationPath),'R33 migration missing');
 assert(fs.existsSync(authMigrationPath),'R35 auth migration missing');
+assert(fs.existsSync(operativeMigrationPath),'R51 operative migration missing');
 const cfg=readJson(configPath);
 const sql=fs.existsSync(migrationPath)?fs.readFileSync(migrationPath,'utf8'):'';
 const authSql=fs.existsSync(authMigrationPath)?fs.readFileSync(authMigrationPath,'utf8'):'';
+const operativeSql=fs.existsSync(operativeMigrationPath)?fs.readFileSync(operativeMigrationPath,'utf8'):'';
 
 if(cfg){
-  assert(cfg.schema_version==='1.0.0','wrong Supabase contract schema version');
+  assert(cfg.schema_version==='1.1.0','wrong Supabase contract schema version');
   assert(cfg.project?.state==='ACTIVE_HEALTHY','SCD Supabase project must be active after R34 provisioning');
   assert(cfg.project?.dedicated_project_required===true,'dedicated SCD Supabase project required');
   assert(cfg.project?.reuse_cepa_project===false,'CEPA Maglia OS Supabase project must not be reused');
@@ -31,6 +34,9 @@ if(cfg){
   assert(cfg.auth_context?.signup_default_role==='USER_BASE','Auth signup must default USER_BASE');
   assert(cfg.auth_context?.self_role_selection===false,'Auth cannot self-select qualified role');
   assert(cfg.auth_context?.context_function==='scd_my_context','Auth context function mismatch');
+  assert(cfg.domain_core?.operative_engine?.state==='SCHEMA_STAGED_RUNTIME_GATED','operative engine must remain runtime gated');
+  assert(cfg.domain_core?.operative_engine?.medical_source_of_truth==='scd_athletes.medical_certificate_expires_at','medical source of truth mismatch');
+  assert(cfg.domain_core?.operative_engine?.event_source_of_truth==='scd_events.id','event source of truth mismatch');
 }
 
 const requiredTables=[
@@ -55,6 +61,12 @@ assert(!/service_role_key\s*[:=]\s*['"][^'"]+['"]/i.test(sql),'service role secr
 for(const token of ['scd_handle_new_user','on_auth_user_created_scd','scd_my_context','USER_BASE']) assert(authSql.includes(token),'R35 auth contract missing '+token);
 assert(!/create\s+policy[\s\S]{0,180}for\s+all/i.test(authSql),'R35 normalized write policies must not use FOR ALL');
 assert(/security\s+definer[\s\S]{0,160}set\s+search_path\s*=\s*public/i.test(authSql),'Auth trigger security definer must pin search_path');
+
+for(const token of ['scd_person_roles','scd_tesseramenti','scd_matches','scd_secretariat_alerts_v','scd_match_day_v','security_invoker = true']) assert(operativeSql.includes(token),'R51 operative contract missing '+token);
+assert(!/generated\s+always\s+as\s*\([^)]*current_date/is.test(operativeSql),'R51 must derive date-sensitive medical status at read time');
+assert(/alter table public\.scd_person_roles enable row level security/i.test(operativeSql),'R51 person roles RLS missing');
+assert(/alter table public\.scd_tesseramenti enable row level security/i.test(operativeSql),'R51 registrations RLS missing');
+assert(/alter table public\.scd_matches enable row level security/i.test(operativeSql),'R51 matches RLS missing');
 
 if(process.exitCode)process.exit(process.exitCode);
 console.log('SCD SUPABASE CONTRACT PASS',{
