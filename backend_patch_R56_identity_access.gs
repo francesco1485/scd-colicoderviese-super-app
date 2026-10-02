@@ -259,6 +259,61 @@ function r56RecordAccess_(token, payload) {
   return {stored:true,eventType:eventType,clientKind:clientKind};
 }
 
+function r56AccessMetrics_(token, payload) {
+  r56RequireDirection_(token);
+  payload = payload || {};
+  var days = Math.max(1, Math.min(90, Number(payload.days || 30)));
+  var since = new Date();
+  since.setTime(since.getTime() - days * 24 * 60 * 60 * 1000);
+  var rows = r56IdentityRows_();
+  try { rows = r216CrmTable_('APP AUDIT') || []; } catch (e) { rows = []; }
+
+  var daily = {};
+  var users = {};
+  var loginEvents = 0;
+  var deskOpens = 0;
+  rows.forEach(function(r){
+    var action = String(r.ACTION || '').toUpperCase();
+    if (action.indexOf('ACCESS_') !== 0) return;
+    var dt = r.TIMESTAMP instanceof Date ? r.TIMESTAMP : new Date(r.TIMESTAMP || '');
+    if (isNaN(dt.getTime()) || dt < since) return;
+    var key = Utilities.formatDate(dt, 'Europe/Rome', 'yyyy-MM-dd');
+    if (!daily[key]) daily[key] = {date:key,loginEvents:0,privateDeskOpens:0,activeUsers:{}};
+    var mail = email_(r.ACTOR_EMAIL || r.EMAIL || '');
+    if (mail) {
+      users[mail] = true;
+      daily[key].activeUsers[mail] = true;
+    }
+    if (action === 'ACCESS_LOGIN_SUCCESS') {
+      loginEvents++;
+      daily[key].loginEvents++;
+    }
+    if (action === 'ACCESS_PRIVATE_DESK_OPEN') {
+      deskOpens++;
+      daily[key].privateDeskOpens++;
+    }
+  });
+
+  var dailyRows = Object.keys(daily).sort().map(function(k){
+    return {
+      date:k,
+      loginEvents:daily[k].loginEvents,
+      privateDeskOpens:daily[k].privateDeskOpens,
+      activeUsers:Object.keys(daily[k].activeUsers).length
+    };
+  });
+
+  return {
+    days:days,
+    loginEvents:loginEvents,
+    privateDeskOpens:deskOpens,
+    activeUsers:Object.keys(users).length,
+    daily:dailyRows,
+    privacy:'AGGREGATE_ONLY',
+    generatedAt:new Date()
+  };
+}
+
 function r56InviteAccess_(token, payload) {
   var actor = r56RequireDirection_(token);
   payload = payload || {};
