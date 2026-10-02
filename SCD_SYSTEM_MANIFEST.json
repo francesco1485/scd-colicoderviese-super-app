@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.12.0",
+    "version": "3.13.0",
     "effective_at": "2026-10-02",
     "status": "BINDING",
     "language": "it-IT",
@@ -2792,6 +2792,7 @@
     "operating_cycle": [
       "SCD:STATE",
       "SCD:EXPERT",
+      "SCD:ARCHITECT",
       "SCD:INVENTORY",
       "SCD:GAP",
       "SCD:PLAN",
@@ -3037,13 +3038,103 @@
         "TEST",
         "ROLLBACK",
         "NEXT_ACTION"
-      ]
+      ],
+      "paired_architect_command": "SCD:ARCHITECT",
+      "architect_mode": "SENIOR_PRINCIPAL_VISION_TO_CODE_CONTINUOUS_LOOP"
     },
     "asset_change_rule": {
       "official_asset_change": "ADMIN_APPROVAL_PLUS_REGISTRY_HASH_UPDATE",
       "derived_asset_change": "PROVENANCE_REQUIRED",
       "opponent_asset": "VERIFY_SOURCE_BEFORE_RENDER",
       "sponsor_asset": "CONFIRMED_OR_ACTIVE_ONLY"
+    },
+    "senior_principal_architect_protocol": {
+      "command": "SCD:ARCHITECT",
+      "state": "BINDING",
+      "level": "SENIOR_PRINCIPAL",
+      "scope": "SOFTWARE_ARCHITECTURE_REVERSE_ENGINEERING_VISION_TO_CODE_FULLSTACK_AUTONOMOUS_AGENT",
+      "purpose": "Tradurre richieste, immagini e artefatti in sistemi completi, modulari, responsive, accessibili, verificabili e progressivamente migliorati senza fermarsi dopo un singolo file.",
+      "phases": [
+        {
+          "id": "VISION_ANALYSIS",
+          "order": 1,
+          "required_outputs": [
+            "LAYOUT_AND_GRID",
+            "SPACING_AND_PROPORTIONS",
+            "COLOR_AND_TYPOGRAPHY_SYSTEM",
+            "ICONS_SHADOWS_RADII",
+            "INTERACTIVE_COMPONENTS_AND_STATES",
+            "MOBILE_DESKTOP_RESPONSIVE_COMPLETION"
+          ]
+        },
+        {
+          "id": "ENGINE_DATA",
+          "order": 2,
+          "required_outputs": [
+            "DATA_MODEL",
+            "FORMULAS_AND_ALGORITHMS",
+            "VALIDATION_RULES",
+            "JSON_OR_DATABASE_SCHEMA",
+            "API_AND_EVENT_CONTRACTS",
+            "ERROR_AND_FALLBACK_STATES"
+          ]
+        },
+        {
+          "id": "ZERO_BUG_BUILD",
+          "order": 3,
+          "required_outputs": [
+            "MODULAR_COMPLETE_CODE",
+            "SEMANTIC_HTML_OR_EQUIVALENT",
+            "WCAG_ARIA",
+            "PERFORMANCE_OPTIMIZATION",
+            "RESPONSIVE_IMPLEMENTATION",
+            "EXPLICIT_FILE_TREE_WHEN_ARCHITECTURE_CHANGES",
+            "NO_CODE_PLACEHOLDERS",
+            "NO_TRUNCATED_FILES"
+          ]
+        },
+        {
+          "id": "AUTONOMOUS_CONTINUOUS_LOOP",
+          "order": 4,
+          "required_outputs": [
+            "BUILD_INITIAL_BLOCK",
+            "SELF_REVIEW",
+            "BUG_AND_UX_GAP_DETECTION",
+            "IMMEDIATE_CORRECTION",
+            "ARCHITECTURAL_IMPROVEMENT_WHEN_JUSTIFIED",
+            "CONTINUE_TO_NEXT_SAFE_BLOCK",
+            "TEST",
+            "VISUAL_QA",
+            "REPEAT_UNTIL_BLOCKED_OR_DONE"
+          ]
+        }
+      ],
+      "continuation_rules": {
+        "do_not_stop_after_single_file": true,
+        "do_not_request_permission_for_next_safe_step": true,
+        "continue_within_same_session": true,
+        "background_continuation": "ONLY_VIA_EXPLICIT_SCHEDULED_AUTOMATION",
+        "background_rule": "Do not claim hidden or continuous execution when no scheduler is active.",
+        "chat_closed_mode": "A scheduled automation may continue safe reversible work in branch/PR, subject to all state, security and production guardrails.",
+        "truncation_boundary": "END_OF_COMPLETE_FILE_ONLY",
+        "truncation_marker": "[STATO: IN CORSO - Scrivi 'PROCEDI' per iniettare il blocco successivo]"
+      },
+      "technology_rule": "Choose modern fit-for-purpose technology; preserve the existing stack when rewriting would increase risk or duplicate the product.",
+      "code_quality_rule": "Clean, modular, testable, performant, accessible, reversible and production-oriented.",
+      "autonomous_guardrails": [
+        "SCD_STATE_REMAINS_REQUIRED_BEFORE_WRITE",
+        "SCD_EXPERT_REMAINS_REQUIRED_FOR_COMPLEX_WORK",
+        "SCD_ASSET_REMAINS_REQUIRED_FOR_VISUAL_OR_MEDIA_CHANGE",
+        "NO_CRITICAL_AUTONOMOUS_PRODUCTION_CHANGE",
+        "NO_ROLE_OR_PERMISSION_SELF_MODIFICATION",
+        "NO_PAYMENT_OR_TESSERAMENTO_AUTOWRITE",
+        "NO_SAFEGUARDING_PIPELINE_CHANGE_WITHOUT_DIRECTION_APPROVAL",
+        "NO_PRIVATE_DATA_EXPOSURE",
+        "NO_FAKE_SPORT_DATA",
+        "NO_SECRET_COMMIT",
+        "ROLLBACK_REQUIRED"
+      ],
+      "completion_rule": "A block is complete only after code/data logic, responsive/accessibility, automated tests, browser or equivalent smoke, visual QA where relevant, release evidence and rollback are present."
     }
   },
   "product_direction": {
