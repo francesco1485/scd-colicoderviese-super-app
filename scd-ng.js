@@ -661,6 +661,8 @@ const deskModuleMeta={
  RICHIESTE:['☑','Richieste','Invii e stato pratiche'],
  PRESENZE:['✓','Presenze','Registro squadra autorizzato'],
  CONVOCAZIONI:['⚽','Convocazioni','Crea e gestisci le convocazioni'],
+ ACCESSI:['♙','Utenti & Accessi','Inviti, ruoli e attivazione account'],
+ SICUREZZA:['⌁','Sicurezza account','PIN personale e sessione'],
  TORNEI_EVENTI:['★','Tornei & Eventi','Organizzazione e calendario'],
  BIGLIETTERIA:['◧','Biglietteria','Accessi e attività evento'],
  DRIVE_TORNEI:['□','Drive Tornei','Documenti evento autorizzati'],
@@ -709,8 +711,9 @@ function renderPrivateDesk(){
  }
  const moduleSet=new Set((w.defaultModules||[]).map(x=>String(x||'').trim().toUpperCase()).filter(Boolean)),u=state.privateData?.user||{},perm=state.privateData?.permissions||{},personal=Array.isArray(state.privateData?.personal)?state.privateData.personal:[];
  if(personal.length){moduleSet.add('TESSERATI');moduleSet.add('PULMINI')}
- moduleSet.add('RICHIESTE');
+ moduleSet.add('RICHIESTE');moduleSet.add('SICUREZZA');
  if(u.staff||perm.direction||['STAFF','MISTER','MANAGER','SECRETARIAT','REGISTRATION','TOURNAMENTS','DIREZIONE','ADMIN'].includes(String(u.role||'').toUpperCase())){moduleSet.add('PRESENZE');moduleSet.add('CONVOCAZIONI');moduleSet.add('COMUNICAZIONI')}
+ if(perm.direction||['DIREZIONE','ADMIN'].includes(String(u.role||'').toUpperCase()))moduleSet.add('ACCESSI');
  const modules=[...moduleSet];
  if(status)status.textContent=(w.privateDeskProfile||'ROLE / SCOPE').replaceAll('_',' ');
  if(title)title.innerHTML=esc(w.name||'Private Desk')+'<br><em>'+esc(w.role||'Profilo SCD')+'</em>';
@@ -837,6 +840,34 @@ function openPrivateTeamMessage(){
  $('#r54MessageForm',layer).onsubmit=async e=>{e.preventDefault();const st=$('#r54MsgState',layer);try{await privatePost('private.message.send',{teamKey:$('#r54MsgTeam',layer).value,subject:$('#r54MsgSubject',layer).value,message:$('#r54MsgBody',layer).value});st.textContent='Messaggio registrato.';toast('Messaggio registrato')}catch(err){st.textContent=String(err.message||err)}};
 }
 
+function openPrivateSecurity(){
+ const layer=openPanel('Sicurezza account','<form class="join-form r54-private-form" id="r56PinForm"><span class="eyebrow">ACCOUNT SCD</span><h2>Imposta il tuo PIN personale</h2><p>Se sei entrato con un codice temporaneo, sostituiscilo con un PIN personale. Non viene mai mostrato o inviato dalla Societa dopo la modifica.</p><label>Codice / PIN attuale<input id="r56OldPin" type="password" inputmode="numeric" autocomplete="current-password" required></label><label>Nuovo PIN<input id="r56NewPin" type="password" inputmode="numeric" autocomplete="new-password" minlength="6" required></label><label>Ripeti nuovo PIN<input id="r56NewPin2" type="password" inputmode="numeric" autocomplete="new-password" minlength="6" required></label><button class="btn primary" type="submit">Aggiorna PIN</button><p id="r56PinState"></p></form>');
+ const form=$('#r56PinForm',layer);
+ form.onsubmit=async e=>{
+   e.preventDefault();const oldPin=$('#r56OldPin',form).value,newPin=$('#r56NewPin',form).value,newPin2=$('#r56NewPin2',form).value,st=$('#r56PinState',form),btn=$('button[type="submit"]',form);
+   if(newPin!==newPin2){st.textContent='I nuovi PIN non coincidono.';return}
+   if(newPin.length<6){st.textContent='Usa almeno 6 cifre.';return}
+   btn.disabled=true;st.textContent='Aggiornamento…';
+   try{await privatePost('auth.pin.change',{oldPin,newPin});st.textContent='PIN personale aggiornato.';toast('PIN aggiornato')}
+   catch(err){st.textContent=String(err.message||err);btn.disabled=false}
+ };
+}
+function openPrivateAccessManager(){
+ const d=state.privateData||{},u=d.user||{},perm=d.permissions||{},isDirection=perm.direction===true||['DIREZIONE','ADMIN'].includes(String(u.role||'').toUpperCase());
+ if(!isDirection){openPanel('Utenti & Accessi','<div class="panel-detail"><h2>Accesso non autorizzato</h2><p>La gestione account e ruoli e riservata alla Direzione.</p></div>');return}
+ const roles=['USER_BASE','FAMILY','ATHLETE','MISTER','STAFF','MANAGER','SECRETARIAT','REGISTRATION','TOURNAMENTS'];
+ const layer=openPanel('Utenti & Accessi','<form class="join-form r54-private-form" id="r56InviteForm"><span class="eyebrow">DIREZIONE · ACCESSI</span><h2>Invita una persona</h2><p>Il sistema invia un codice temporaneo monouso. Nessuna password permanente viene spedita via email.</p><div class="form-grid"><label>Email<input id="r56InviteEmail" type="email" required autocomplete="email"></label><label>Ruolo<select id="r56InviteRole">'+roles.map(r=>'<option>'+r+'</option>').join('')+'</select></label><label>Telefono facoltativo<input id="r56InvitePhone" inputmode="tel"></label><label>Data di nascita facoltativa<input id="r56InviteBirth" type="date"></label><label class="full">Scope / note operative<textarea id="r56InviteScope" maxlength="500" placeholder="Es. squadra U16, solo calendario, famiglia atleta..."></textarea></label></div><button class="btn primary" type="submit">Invia accesso</button><p id="r56InviteState"></p></form>');
+ const form=$('#r56InviteForm',layer);
+ form.onsubmit=async e=>{
+   e.preventDefault();const st=$('#r56InviteState',form),btn=$('button[type="submit"]',form);btn.disabled=true;st.textContent='Verifico anagrafica e preparo invito…';
+   try{
+     const out=await privatePost('direction.access.invite',{email:$('#r56InviteEmail',form).value,role:$('#r56InviteRole',form).value,phone:$('#r56InvitePhone',form).value,birthDate:$('#r56InviteBirth',form).value,scope:{note:$('#r56InviteScope',form).value}});
+     const label=out?.identity?.matched?'Profilo esistente riconosciuto. ':'';
+     st.textContent=label+'Codice temporaneo inviato a '+String(out.email||'')+'. Al primo accesso deve impostare il PIN personale.';
+     btn.textContent='INVITO INVIATO';toast('Accesso inviato');
+   }catch(err){st.textContent=String(err.message||err);btn.disabled=false}
+ };
+}
 function openPrivateModule(module){
  const w=state.workspace||{},d=state.privateData||{},m=deskMeta(module);
  if(['CALENDARIO','EVENTI','TORNEI_EVENTI','BIGLIETTERIA'].includes(module)){setView('calendar');return}
@@ -861,6 +892,8 @@ function openPrivateModule(module){
  if(module==='RICHIESTE'){openPrivateRequests();return}
  if(module==='PRESENZE'){openPrivateAttendance();return}
  if(module==='CONVOCAZIONI'){openPrivateConvocations();return}
+ if(module==='ACCESSI'){openPrivateAccessManager();return}
+ if(module==='SICUREZZA'){openPrivateSecurity();return}
  openPanel(m[1],'<div class="panel-detail private-module-panel"><span class="eyebrow">PRIVATE DESK</span><h2>'+esc(m[1])+'</h2><p>'+esc(m[2])+'. Modulo assegnato dal profilo '+esc(w.privateDeskProfile||'ROLE/SCOPE')+'.</p></div>');
 }
 
@@ -881,6 +914,12 @@ function openJoin(kind){
    e.preventDefault();const fd=new FormData(form),firstName=String(fd.get('firstName')||'').trim(),lastName=String(fd.get('lastName')||'').trim(),email=String(fd.get('email')||'').trim(),phone=String(fd.get('phone')||'').trim();
    const btn=$('button[type="submit"]',form),st=$('#joinFormState',form);btn.disabled=true;st.textContent='Invio in corso…';
    try{
+     let identity=null;try{identity=await postAction('public.identity.resolve',{email,phone})}catch{}
+     if(identity?.matched===true&&identity?.matchMethod==='EMAIL_EXACT'&&identity?.active!==false){
+       await postAction('auth.request',{email});
+       st.textContent='Account SCD gia riconosciuto. Ti abbiamo inviato un codice temporaneo per accedere senza creare un duplicato.';
+       btn.textContent='ACCOUNT RICONOSCIUTO';toast('Account SCD riconosciuto');return;
+     }
      const payload={firstName,lastName,name:[firstName,lastName].filter(Boolean).join(' '),email,phone,privacy:true,topic:'SCD Super App · '+label,category:kind,message:'Richiesta percorso '+label+' dalla home pubblica.'};
      const out=await postAction(action,payload);
      st.textContent='Richiesta registrata'+(out.requestId?' · '+out.requestId:'')+'.';
