@@ -23,6 +23,10 @@ jobs:
         run: npm run test:supabase-contract
       - name: Mobile Supabase contract gate
         run: npm run test:mobile-contract
+      - name: Operative Core contract gate
+        run: npm run test:operative-core
+      - name: Social App contract gate
+        run: npm run test:social-app
       - name: SCD Universe contract gate
         run: npm run test:universe-contract
       - name: Human OS contract gate
@@ -67,7 +71,10 @@ jobs:
           node --check intake/intake.js
           node --check intake/admin.js
           node --check lib/intake-links.js
+          node --check lib/scd-operative-engine.js
           node --check scripts/validate-intake-link-factory.mjs
+          node --check scripts/validate-operative-core.mjs
+          node --check scripts/validate-social-app.mjs
           node --check scd-ng.js
           node --check scd-interactions.js
           node --check scd-experience-engine.js
