@@ -24,10 +24,10 @@ for(const item of content.items){
 const raw=JSON.stringify(content);
 if(/Mauri Simone|Locatelli Andrea|Nuova Sondrio|ROSSOBLU_PIZZA_10|SCD_KIT_2026/i.test(raw))fail('sample/invented operational data leaked into curated catalog');
 
-for(const token of [
-  'id="clubNowContent"','id="clubContentRail"','data-social-filter="CLUB"',
-  './scd-ng.css?v=0.6.2','./ui-r52-social.css?v=0.7.1','./scd-ng.js?v=0.7.2'
-])if(!html.includes(token))fail('R55 HTML contract missing '+token);
+for(const token of ['id="clubNowContent"','id="clubContentRail"','data-social-filter="CLUB"'])if(!html.includes(token))fail('R55 HTML contract missing '+token);
+if(!/\.\/scd-ng\.css\?v=0\.6\.(?:[2-9]\d*)/.test(html))fail('R55 CSS asset version regressed');
+if(!/\.\/ui-r52-social\.css\?v=0\.7\.(?:[1-9]\d*)/.test(html))fail('R55 social CSS asset version regressed');
+if(!/\.\/scd-ng\.js\?v=0\.7\.(?:[2-9]\d*)/.test(html))fail('R55 JS asset version regressed');
 
 for(const token of [
   'function loadClubContent','function renderClubContent','function openClubContent',
@@ -37,7 +37,7 @@ for(const token of [
 
 for(const token of ['.club-now-grid','.club-now-card','.club-content-details'])if(!css.includes(token))fail('R55 public content style missing '+token);
 if(!socialCss.includes('.social-card[data-type="CLUB"]'))fail('R55 social content style missing');
-if(!sw.includes("scd-nextgen-0.7.2-r55")||!sw.includes('./content/public-club.v1.json'))fail('R55 PWA cache contract missing');
+if(!/scd-nextgen-0\.7\.(?:[2-9]\d*)-r\d+/.test(sw)||!sw.includes('./content/public-club.v1.json'))fail('R55 PWA cache contract missing');
 
 if(!process.exitCode)console.log('SCD R55 CONTENT FILL PASS',{
   items:content.items.length,
