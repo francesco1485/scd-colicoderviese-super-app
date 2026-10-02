@@ -289,6 +289,7 @@ function socialMatchCaption(match){
    opponent,
    away_team:opponent,
    match_date:iso,
+   match_time:String(match.time||''),
    venue_name:match.venue||'Campo in aggiornamento'
  };
  try{
