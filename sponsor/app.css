@@ -2120,3 +2120,87 @@ body{background:linear-gradient(180deg,#eef5fb,#f7fbfe 55%,#edf5fb);color:var(--
   color:#5f7d93;
   letter-spacing:.02em;
 }
+
+/* ===== R55 LED SOURCE REVIEW ===== */
+.led-source-review{
+  padding:17px 18px;
+  background:linear-gradient(180deg,#f8fbfe,#f2f7fb);
+  border-bottom:1px solid #dfeaf2;
+}
+.led-source-review-head{
+  display:flex;
+  justify-content:space-between;
+  gap:16px;
+  align-items:flex-start;
+  margin-bottom:12px;
+}
+.led-source-review-head small{
+  display:block;
+  color:#0a83c3;
+  font-size:.58rem;
+  font-weight:950;
+  letter-spacing:.11em;
+}
+.led-source-review-head h4{
+  margin:4px 0 0;
+  color:#123f63;
+  font-size:1rem;
+}
+.led-source-review-head>span{
+  padding:7px 9px;
+  border:1px solid #d2e4ef;
+  border-radius:999px;
+  background:#fff;
+  color:#496b83;
+  font-size:.58rem;
+  font-weight:850;
+}
+.led-review-compare{
+  display:grid;
+  grid-template-columns:.85fr 1.25fr 1fr;
+  gap:9px;
+}
+.led-review-compare article{
+  min-height:132px;
+  border:1px solid #dce8f0;
+  border-radius:13px;
+  background:#fff;
+  padding:12px;
+}
+.led-review-compare article:nth-child(2){
+  border-color:#ecdba0;
+  background:#fffaf0;
+}
+.led-review-compare article:nth-child(3){
+  border-color:#b9dff1;
+  background:#f0f9fe;
+}
+.led-review-compare small{
+  display:block;
+  color:#0b83c4;
+  font-size:.54rem;
+  font-weight:950;
+  letter-spacing:.09em;
+}
+.led-review-compare b{
+  display:block;
+  margin-top:6px;
+  color:#173f60;
+  font-size:.72rem;
+  line-height:1.35;
+}
+.led-review-compare p,
+.led-review-compare li,
+.led-review-compare em{
+  color:#687f92;
+  font-size:.64rem;
+  line-height:1.42;
+}
+.led-review-compare p{margin:6px 0 0}
+.led-review-compare em{display:block;margin-top:7px;font-style:normal;color:#8a6f27}
+.led-review-compare ul{margin:7px 0 0;padding-left:16px}
+.led-review-compare li+li{margin-top:3px}
+@media(max-width:900px){
+  .led-source-review-head{flex-direction:column}
+  .led-review-compare{grid-template-columns:1fr}
+}
