@@ -49,6 +49,7 @@ for(const viewport of viewports){
   await page.waitForSelector('#joinClub');
   await page.waitForSelector('#view-calendar',{state:'attached'});
   await page.waitForSelector('#view-teams',{state:'attached'});
+  await page.waitForSelector('#view-social',{state:'attached'});
   await page.waitForSelector('.hero-synth',{state:'attached'});
   await page.waitForSelector('.ng-command-ring',{state:'attached'});
   await page.waitForSelector('#weekRail');
@@ -57,7 +58,7 @@ for(const viewport of viewports){
   await page.waitForSelector('.worlds-preview',{state:'attached'});
   await page.waitForSelector('.ng-value-engine',{state:'attached'});
   await page.waitForTimeout(700);
-  const runtimeFlags=await page.evaluate(()=>({nextGen:Boolean(window.SCDNextGen),meta:Boolean(window.SCDMeta),twin:Boolean(window.SCDTwin),experience:Boolean(window.SCDExperience),adaptive:Boolean(window.SCDAdaptive),matchday:typeof window.SCDNextGen?.openMatchday==='function',teamHub:typeof window.SCDNextGen?.openTeamHub==='function'}));
+  const runtimeFlags=await page.evaluate(()=>({nextGen:Boolean(window.SCDNextGen),meta:Boolean(window.SCDMeta),twin:Boolean(window.SCDTwin),experience:Boolean(window.SCDExperience),adaptive:Boolean(window.SCDAdaptive),matchday:typeof window.SCDNextGen?.openMatchday==='function',teamHub:typeof window.SCDNextGen?.openTeamHub==='function',social:typeof window.SCDNextGen?.openSocial==='function'}));
   if(!Object.values(runtimeFlags).every(Boolean))throw new Error('runtime boot incomplete '+JSON.stringify(runtimeFlags)+' browserErrors='+errors.join(' | '));
   await page.waitForFunction(()=>document.documentElement.scrollWidth<=window.innerWidth+3);
 
@@ -90,7 +91,7 @@ for(const viewport of viewports){
   const skyAsset=await page.locator('#mirrorFab img').getAttribute('src');
   if(!/assets\/sky\.png$/.test(String(skyAsset||'')))throw new Error('official Sky mascot missing from chatbot');
     const navLabels=await page.locator('.bottom-nav button').allTextContents();
-  for(const label of ['Home','Calendario','Squadre','Community','Profilo'])if(!navLabels.some(x=>x.includes(label)))throw new Error('mobile nav missing '+label);
+  for(const label of ['Home','Calendario','Squadre','Social','Profilo'])if(!navLabels.some(x=>x.includes(label)))throw new Error('mobile nav missing '+label);
   const visibleLegacy=await page.evaluate(()=>['.home-secondary-hero','.ng-command-ring','.pulse-strip','.ng-constellation','.worlds-preview','.ng-value-engine'].filter(sel=>{const el=document.querySelector(sel);return el&&getComputedStyle(el).display!=='none'}));
   if(visibleLegacy.length)throw new Error('secondary clutter visible on public home: '+visibleLegacy.join(','));
 
@@ -126,6 +127,20 @@ for(const viewport of viewports){
   await page.waitForSelector('#publicTeamsGrid');
   await page.waitForSelector('#followTeamSelect');
   if(await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+3))throw new Error('teams view horizontal overflow');
+  mark('SOCIAL_'+viewport.width);
+  await page.evaluate(()=>window.SCDNextGen.setView('social'));
+  await page.waitForSelector('#view-social.active');
+  await page.waitForSelector('#socialFeed');
+  await page.waitForSelector('#socialSearch');
+  await page.waitForSelector('#socialFilters');
+  if((await page.locator('.social-channel-grid a').count())!==5)throw new Error('social official channel count mismatch');
+  if(await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+3))throw new Error('social view horizontal overflow');
+  if([390,1440].includes(viewport.width))await page.screenshot({path:'test-output/social-'+viewport.width+'x'+viewport.height+'.png',fullPage:true});
+  await page.fill('#socialSearch','SCD');
+  await page.click('[data-social-filter="ALL"]');
+  await page.evaluate(()=>window.SCDNextGen.setView('teams'));
+  await page.waitForSelector('#view-teams.active');
+
   if((await page.locator('#calendarPeriod [data-period]').count())!==3)throw new Error('calendar period controls missing');
   if((await page.locator('#calendarTypeFilter option').count())<5)throw new Error('calendar type filters missing');
   await page.waitForTimeout(250);
