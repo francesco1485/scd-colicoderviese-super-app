@@ -252,7 +252,9 @@ function syncDonationDirectLink(){
   if(url){
     link.href=url;
     link.hidden=false;
-    link.textContent=(solidarityConfig?.channels?.online?.provider?'Dona ora con '+solidarityConfig.channels.online.provider:'Dona ora online')+' · €'+donationAmount().toFixed(2);
+    const online=solidarityConfig?.channels?.online||{};
+    const baseLabel=online.provider?'Dona ora con '+online.provider:'Dona ora online';
+    link.textContent=baseLabel+(online.amountAware?' · €'+donationAmount().toFixed(2):'');
   }else link.hidden=true;
 }
 function renderDonationConfig(){
