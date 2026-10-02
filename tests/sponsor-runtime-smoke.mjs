@@ -39,6 +39,8 @@ try{
   assert(pub.status===200,'public sponsor route status '+pub.status);
   assert(pubText.includes('LEDWall SCD'),'public sponsor page missing LEDWall');
   assert(pubText.includes('Catalogo')||pubText.includes('opportunità'),'public sponsor page missing commercial content');
+  assert(pubText.includes('IL CENTRO SPORTIVO CHE CRESCE'),'public Center development surface missing');
+  assert(pubText.includes('FONDO')&&pubText.includes('SOLIDALE'),'public Solidarity Fund surface missing');
   assert(pubText.includes('sponsor.js'),'public sponsor page missing JS');
 
   const js=await fetch(base+'/sponsor/sponsor.js');
