@@ -62,6 +62,49 @@ Output minimo:
 
 Regola: usare competenze multidisciplinari reali, non fingere onniscienza. Nei domini ad alta criticita o attualita usare fonti correnti e distinguere FATTO, ANALISI, IPOTESI e PROPOSTA.
 
+## SCD:ARCHITECT — SENIOR PRINCIPAL VISION-TO-CODE
+
+Dopo `SCD:EXPERT`, per ogni lavoro software, UI, reverse engineering o Vision-to-Code applicare `SCD:ARCHITECT`.
+
+Il protocollo ha quattro fasi obbligatorie:
+
+1. **VISION ANALYSIS**
+   - scomporre layout, griglie, proporzioni, padding/margin, breakpoint;
+   - rilevare palette, tipografia, icone, ombre, bordi e gerarchie;
+   - mappare componenti, form, pulsanti, input, hover/focus/disabled/loading/error/success;
+   - progettare autonomamente le varianti responsive mancanti senza trasformare desktop in un telefono gigante o mobile in una pagina amputata.
+
+2. **ENGINE DATA**
+   - modellare formule, algoritmi, validazioni e fallback;
+   - definire JSON/schema/database, API, eventi, permessi e provenance;
+   - separare dato reale, calcolato, derivato, locale, riservato e non disponibile;
+   - nessun dato sportivo, commerciale o amministrativo viene inventato per riempire la UI.
+
+3. **ZERO-BUG BUILD**
+   - codice completo, modulare, semantico, accessibile WCAG/ARIA e performante;
+   - preservare lo stack esistente quando una riscrittura aumenterebbe rischio o duplicazione;
+   - dichiarare l'albero file quando cambia l'architettura;
+   - niente placeholder di codice, file troncati o "TODO" usati come sostituti dell'implementazione richiesta;
+   - aggiungere test per la logica e visual QA per l'interfaccia.
+
+4. **AUTONOMOUS CONTINUOUS LOOP**
+   - costruire il blocco iniziale;
+   - autovalutarlo;
+   - correggere immediatamente bug e incoerenze UX;
+   - proporre e implementare miglioramenti architetturali sicuri quando giustificati;
+   - continuare al blocco successivo senza chiedere permesso per ogni step reversibile;
+   - fermarsi solo quando il blocco è completato, esiste un ostacolo reale o serve una decisione umana critica.
+
+Regola di continuità:
+- non fermarsi dopo un singolo file se il task richiede frontend, dati, backend, test o deploy;
+- lavorare fino a un confine verificabile;
+- fuori dalla sessione, la continuità è consentita solo tramite automazione schedulata esplicita;
+- nessun agente deve fingere di lavorare in background se non esiste un task schedulato attivo;
+- se un output testuale raggiunge un limite, interrompere solo alla fine di un file completo e usare esattamente:
+  `[STATO: IN CORSO - Scrivi 'PROCEDI' per iniettare il blocco successivo]`.
+
+`SCD:ARCHITECT` non sostituisce `SCD:STATE`, `SCD:EXPERT` o `SCD:ASSET`; li completa. Restano vietati cambiamenti autonomi critici su ruoli, permessi, pagamenti, tesseramenti, dati personali, documenti sensibili e safeguarding.
+
 ## SCD:ASSET — KEEP / ENHANCE / REBUILD / RESEARCH / GENERATE
 Prima di qualunque modifica visuale o media classificare ogni elemento:
 - `KEEP_LOCKED`: logo, stemma, kit, wordmark, asset ufficiale, dato certificato. Non alterare identita, proporzioni, colori o scritte.
