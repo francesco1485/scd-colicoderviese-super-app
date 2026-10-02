@@ -1456,7 +1456,7 @@ function renderLedProfileDetail(){
       '<section><small>IDENTITÀ COLICO / LAGO</small><p>'+esc(p.lakeIdentity||'')+'</p></section>'+
     '</div>'+
     '<div class="led-proof-plan"><small>PROOF PLAN</small><div>'+(p.proofPlan||[]).map(x=>'<span>'+esc(x)+'</span>').join('')+'</div></div>'+
-    '<div class="led-production-gate"><div><small>GATE PRODUZIONE</small><b>'+esc(ledStatusLabel(p.logoAssetStatus))+'</b><span>'+esc(ledStatusLabel(p.productionStatus))+'</span></div>'+
+    '<div class="led-production-gate"><div><small>GATE PRODUZIONE</small><b>'+esc(ledStatusLabel(p.logoAssetStatus))+'</b><span>'+esc(ledStatusLabel(p.productionStatus))+'</span>'+(p.logoSourceEvidence?'<em class="led-source-evidence">'+esc(p.logoSourceEvidence.title)+' · '+esc(p.logoSourceEvidence.status.replaceAll('_',' '))+'</em>':'')+'</div>'+
       '<div class="led-detail-actions">'+
         '<button class="btn-light" type="button" id="ledCopyStoryboard">Copia storyboard</button>'+
         '<button class="btn-light" type="button" id="ledOpenDocuments">Apri Documenti</button>'+
