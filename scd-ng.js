@@ -756,7 +756,7 @@ $('#socialSearch')?.addEventListener('input',e=>{state.socialSearch=String(e.tar
 $('#socialFilters')?.addEventListener('click',e=>{
  const b=e.target.closest('[data-social-filter]');if(!b)return;
  state.socialFilter=b.dataset.socialFilter||'ALL';
- $('#socialFilters [data-social-filter]').forEach(x=>x.classList.toggle('active',x===b));
+ $$('#socialFilters [data-social-filter]').forEach(x=>x.classList.toggle('active',x===b));
  renderSocialHub();
 });
 
