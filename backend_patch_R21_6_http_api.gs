@@ -94,6 +94,9 @@ function doPost(e) {
       case 'private.agenda.create':
         data = r216AgendaCreate_(token, payload);
         break;
+      case 'private.development.summary':
+        data = r216DevelopmentSummary_(token, payload);
+        break;
       case 'private.week':
         data = getWeekForUser(token, Number(payload.offset || 0));
         break;
@@ -360,6 +363,104 @@ function r216CrmSummary_(token, payload) {
     policy:'READ_ONLY_RELATIONSHIP_VIEW'
   };
 }
+
+function r216DevelopmentSummary_(token, payload) {
+  r216CrmActor_(token);
+  payload = payload || {};
+  var initiatives = r216CrmTable_('INIZIATIVE_COMMERCIALI');
+  var suppliers = r216CrmTable_('FORNITORI_SPONSOR_RADAR');
+  var stakeholders = r216CrmTable_('STAKEHOLDERS_MASTER');
+  var supplierByName = {};
+  suppliers.forEach(function(r){
+    var key=String(r.AZIENDA||'').trim().toUpperCase();
+    if(key) supplierByName[key]=r;
+  });
+  var stakeholderByName = {};
+  stakeholders.forEach(function(r){
+    var key=String(r.NOME||'').trim().toUpperCase();
+    if(key) stakeholderByName[key]=r;
+  });
+  function supplierRef_(name){
+    var key=String(name||'').trim().toUpperCase();
+    var s=supplierByName[key]||null;
+    var st=stakeholderByName[key]||null;
+    if(!s && !st) return null;
+    return {
+      supplierId:s ? String(s.SUPPLIER_ID||'') : '',
+      stakeholderId:st ? String(st.STAKEHOLDER_ID||'') : '',
+      name:String((s&&s.AZIENDA)||(st&&st.NOME)||name||''),
+      relationshipStatus:String((s&&s.STATO_RAPPORTO)||(st&&st.STATO_RELAZIONE)||''),
+      email:String((s&&s.EMAIL)||(st&&st.EMAIL)||''),
+      contact:String((s&&s.CONTATTO)||''),
+      commercialPosition:String((s&&s.POSIZIONE_COMMERCIALE)||''),
+      sponsorPotential:String((s&&s.POTENZIALE_SPONSOR)||'')
+    };
+  }
+  var rows = initiatives.filter(function(r){
+    var id=String(r.INIT_ID||'').trim();
+    return /^INIT-(CENTRO|FUTURE)-/.test(id) || id==='INIT-FONDO-SOLIDALE';
+  }).map(function(r){
+    var id=String(r.INIT_ID||'').trim();
+    var status=String(r.STATO||'').trim();
+    var docs=String(r.DOCUMENTI||'').trim();
+    var partners=String(r.PARTNER_COLLEGABILI||'').trim();
+    var related=[];
+    if(/KOMPAN/i.test([r.NOME,r.OBIETTIVO,partners,docs].join(' '))){
+      var k=supplierRef_('KOMPAN ITALIA')||supplierRef_('KOMPAN Italia'); if(k)related.push(k);
+    }
+    if(/VERISURE/i.test([r.NOME,r.OBIETTIVO,partners,docs].join(' '))){
+      var v=supplierRef_('VERISURE')||supplierRef_('Verisure'); if(v)related.push(v);
+    }
+    return {
+      id:id,
+      name:String(r.NOME||''),
+      type:String(r.TIPO||''),
+      target:String(r.TARGET||''),
+      status:status,
+      objective:String(r.OBIETTIVO||''),
+      audience:String(r.PLATEA_TARGET||''),
+      units:String(r.UNITA_ATTIVE||''),
+      unitPrice:String(r.PREZZO_UNITARIO||''),
+      expectedRevenue:String(r.RICAVO_ATTESO||''),
+      realRevenue:String(r.RICAVO_REALE||''),
+      partners:partners,
+      channel:String(r.CANALE||''),
+      startDate:String(r.DATA_INIZIO||''),
+      endDate:String(r.DATA_FINE||''),
+      owner:String(r.OWNER||''),
+      documents:docs,
+      isDrawer:/CASSETTO|ROADMAP FUTURA/i.test(status),
+      quoteStatus:/PREVENTIVI RICEVUTI/i.test(status)?'RECEIVED_TO_RECONCILE':'',
+      hasVerifiedCost:!!String(r.PREZZO_UNITARIO||r.RICAVO_ATTESO||r.RICAVO_REALE||'').trim(),
+      requiresReconciliation:/DA RICONDURRE|DA VALUTARE|DA CONFERMARE|PREVENTIVI RICEVUTI/i.test([status,docs].join(' ')),
+      relatedSuppliers:related
+    };
+  });
+  rows.sort(function(a,b){
+    if(a.isDrawer!==b.isDrawer) return a.isDrawer?1:-1;
+    return a.name.localeCompare(b.name);
+  });
+  return {
+    generatedAt:new Date(),
+    sourceMode:'LIVE_MASTER',
+    sourceTable:'INIZIATIVE_COMMERCIALI',
+    supplierTable:'FORNITORI_SPONSOR_RADAR',
+    rows:rows,
+    kpi:{
+      total:rows.length,
+      drawer:rows.filter(function(x){return x.isDrawer}).length,
+      quotesToReview:rows.filter(function(x){return x.quoteStatus==='RECEIVED_TO_RECONCILE'}).length,
+      inTechnicalReview:rows.filter(function(x){return /CONFRONTO TECNICO/i.test(x.status)}).length,
+      activeOrContracted:rows.filter(function(x){return /ATTIVO|CONTRATTUALIZZATO|ESECUZIONE|COMPLETATO/i.test(x.status)}).length
+    },
+    policy:{
+      noInventedCosts:true,
+      noInferredPartnership:true,
+      futureDrawerIsNotImminent:true
+    }
+  };
+}
+
 function r216CommunitySummary_(token, payload) {
   r216CrmActor_(token);
   payload = payload || {};
