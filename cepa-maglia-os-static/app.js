@@ -2985,7 +2985,10 @@ function renderAgenda(){
   ).join('')||empty('Nessuna integrazione registrata.')
 
   if($('agendaTypeFilter'))$('agendaTypeFilter').onchange=renderAgenda
-  if($('newAgendaEventBtn'))$('newAgendaEventBtn').onclick=async()=>{if(isManager())await loadMembers();openAgendaEditor()}
+  if($('newAgendaEventBtn')){
+    $('newAgendaEventBtn').classList.toggle('hidden',accessForView('agenda')!=='manage')
+    $('newAgendaEventBtn').onclick=async()=>{if(accessForView('agenda')!=='manage')return;await loadMembers();openAgendaEditor()}
+  }
 }
 function agendaAudienceMembers(scope,selectedIds){
   if(scope==='private')return[]
