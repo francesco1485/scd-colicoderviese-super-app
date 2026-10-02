@@ -88,6 +88,12 @@ function doPost(e) {
       case 'private.communication.health':
         data = r216CommunicationHealth_(token);
         break;
+      case 'private.agenda.summary':
+        data = r216AgendaSummary_(token, payload);
+        break;
+      case 'private.agenda.create':
+        data = r216AgendaCreate_(token, payload);
+        break;
       case 'private.week':
         data = getWeekForUser(token, Number(payload.offset || 0));
         break;
@@ -609,7 +615,8 @@ function r216CommunicationPreview_(token,payload){
     signature:{id:c.signature.SIGNATURE_ID,name:c.signature.DISPLAY_NAME,role:c.signature.ROLE_LABEL},
     stakeholderId:c.stakeholder ? String(c.stakeholder.STAKEHOLDER_ID||'') : '',
     requiresHumanConfirmation:true,
-    sender:String(c.profile.DEFAULT_FROM_EMAIL || 'sportclubcolico@gmail.com')
+    sender:String(c.profile.DEFAULT_FROM_EMAIL || 'sportclubcolico@gmail.com'),
+    internalCopyTo:(email_(c.actor.email||'') && email_(c.actor.email||'') !== email_(c.profile.DEFAULT_FROM_EMAIL || 'sportclubcolico@gmail.com')) ? email_(c.actor.email||'') : ''
   };
 }
 function r216UpdateStakeholderAfterMail_(stakeholder,payload,now){
@@ -675,6 +682,8 @@ function r216CommunicationSend_(token,payload){
   };
   var cc = clean_(payload.cc || '',500);
   if(cc) options.cc = cc;
+  var actorCopy = email_(c.actor && c.actor.email || '');
+  if(actorCopy && actorCopy !== expected && actorCopy !== c.to) options.bcc = actorCopy;
   var logoId = String(c.profile.LOGO_DRIVE_ID || '').trim();
   if(logoId){
     try{ options.inlineImages = {scdLogo:DriveApp.getFileById(logoId).getBlob()}; }catch(logoErr){ console.error('Logo email',logoErr); }
@@ -702,7 +711,181 @@ function r216CommunicationSend_(token,payload){
     });
     r216UpdateStakeholderAfterMail_(c.stakeholder,payload,now);
   }
-  return {sent:true,mailId:mailId,to:c.to,subject:c.subject,signatureId:c.signature.SIGNATURE_ID,correlationId:corr};
+  return {sent:true,mailId:mailId,to:c.to,subject:c.subject,signatureId:c.signature.SIGNATURE_ID,correlationId:corr,internalCopyTo:(options.bcc||'')};
+}
+
+
+
+/* R50.4 AGENDA SCD
+ * Un solo calendario operativo Google, account autorizzati dal master UTENTI,
+ * riepilogo obbligatorio alla casella istituzionale e audit di ogni creazione.
+ */
+function r216AgendaEligibleUsers_(actor){
+  var actorEmail = email_(actor && actor.email || '');
+  var rows = r216CrmTable_('UTENTI');
+  return rows.filter(function(r){
+    var mail = email_(r.EMAIL || '');
+    if(!mail || r216Upper_(r.STATO || '') !== 'ATTIVO') return false;
+    var scope = r216Upper_([
+      r['AREE PREVISTE'] || '',
+      r.DEFAULT_MODULES || '',
+      r.DATA_SCOPE || '',
+      r.RUOLO || ''
+    ].join(' '));
+    return mail === 'sportclubcolico@gmail.com' || mail === actorEmail || scope.indexOf('CALENDARIO') >= 0 || scope.indexOf('DIREZIONE') >= 0;
+  }).map(function(r){
+    return {
+      email:email_(r.EMAIL || ''),
+      name:String(r['NOME / ACCOUNT'] || r.EMAIL || ''),
+      role:String(r.RUOLO || ''),
+      calendarAuthorized:true
+    };
+  });
+}
+function r216AgendaProfile_(){
+  var profile = r216ProfileMap_();
+  var calendarId = String(profile.GOOGLE_CALENDAR_ID || '').trim();
+  if(!calendarId) throw new Error('Calendario operativo SCD non configurato.');
+  var cal = CalendarApp.getCalendarById(calendarId);
+  if(!cal) throw new Error('Calendario operativo SCD non accessibile dal runtime.');
+  return {
+    profile:profile,
+    calendar:cal,
+    calendarId:calendarId,
+    calendarName:String(profile.GOOGLE_CALENDAR_NAME || cal.getName() || 'Agenda SCD'),
+    summaryEmail:email_(profile.AGENDA_SUMMARY_EMAIL || profile.DEFAULT_FROM_EMAIL || 'sportclubcolico@gmail.com')
+  };
+}
+function r216AgendaSummary_(token,payload){
+  var actor = r216CrmActor_(token);
+  var ctx = r216AgendaProfile_();
+  var now = new Date();
+  var end = new Date(now.getTime() + 120*24*60*60*1000);
+  var events = ctx.calendar.getEvents(now,end).slice(0,80).map(function(ev){
+    var guests = [];
+    try{ guests = ev.getGuestList().map(function(g){return email_(g.getEmail()||'');}).filter(Boolean); }catch(e){}
+    return {
+      id:String(ev.getId() || ''),
+      title:String(ev.getTitle() || ''),
+      startAt:ev.getStartTime(),
+      endAt:ev.getEndTime(),
+      location:String(ev.getLocation() || ''),
+      description:clean_(ev.getDescription() || '',2000),
+      guests:guests
+    };
+  });
+  return {
+    calendarId:ctx.calendarId,
+    calendarName:ctx.calendarName,
+    owner:'sportclubcolico@gmail.com',
+    summaryRecipient:ctx.summaryEmail,
+    inviteePolicy:String(ctx.profile.AGENDA_INVITEE_POLICY || 'UTENTI_ATTIVI_SCOPE_CALENDARIO'),
+    eligibleUsers:r216AgendaEligibleUsers_(actor),
+    upcoming:events,
+    generatedAt:now
+  };
+}
+function r216AgendaCreate_(token,payload){
+  payload = payload || {};
+  if(payload.confirm !== true) throw new Error('Conferma umana obbligatoria prima di creare l evento.');
+  var actor = r216CrmActor_(token);
+  var ctx = r216AgendaProfile_();
+  var title = clean_(payload.title || '',140);
+  var type = r216Upper_(payload.type || 'MEETING');
+  var allowedTypes = ['MEETING','COMMERCIAL_INITIATIVE','CLUB_EVENT','DEADLINE'];
+  if(allowedTypes.indexOf(type) < 0) throw new Error('Tipologia agenda non consentita.');
+  var start = new Date(payload.startAt || '');
+  var end = new Date(payload.endAt || '');
+  if(!title || isNaN(start.getTime()) || isNaN(end.getTime()) || end.getTime() <= start.getTime()){
+    throw new Error('Titolo, inizio e fine validi sono obbligatori.');
+  }
+  var eligible = r216AgendaEligibleUsers_(actor);
+  var allowed = {};
+  eligible.forEach(function(u){allowed[email_(u.email)] = u;});
+  var requested = Array.isArray(payload.invitees) ? payload.invitees.map(email_).filter(Boolean) : [];
+  var mode = r216Upper_(payload.audienceMode || 'SELECTED');
+  var guests = mode === 'ALL_AUTHORIZED'
+    ? Object.keys(allowed)
+    : requested.filter(function(mail){return !!allowed[mail];});
+  var actorEmail = email_(actor.email || '');
+  if(actorEmail && actorEmail !== 'sportclubcolico@gmail.com' && allowed[actorEmail] && guests.indexOf(actorEmail)<0) guests.push(actorEmail);
+  guests = guests.filter(function(mail){return mail !== 'sportclubcolico@gmail.com';}).filter(function(mail,i,a){return a.indexOf(mail)===i;});
+  var corr = clean_(payload.correlationId || ('FLOW-AGENDA-' + Utilities.getUuid().slice(0,8).toUpperCase()),120);
+  var project = clean_(payload.project || '',250);
+  var location = clean_(payload.location || '',300);
+  var actionRequired = clean_(payload.actionRequired || '',1600);
+  var description = clean_(payload.description || '',3000);
+  var stakeholderId = clean_(payload.stakeholderId || '',120);
+  var eventDescription = [
+    'AGENDA SCD',
+    'Tipo: '+type,
+    'Progetto / sponsor: '+project,
+    'Creato da: '+actorEmail,
+    'Cosa preparare: '+actionRequired,
+    '',
+    description,
+    '',
+    'Correlation ID: '+corr
+  ].join('\n');
+  var event = ctx.calendar.createEvent(title,start,end,{
+    description:eventDescription,
+    location:location,
+    guests:guests.join(','),
+    sendInvites:guests.length>0
+  });
+  var summaryBody = [
+    'Nuovo appuntamento / iniziativa SCD',
+    '',
+    'Titolo: '+title,
+    'Tipo: '+type,
+    'Inizio: '+start,
+    'Fine: '+end,
+    'Luogo: '+location,
+    'Progetto / sponsor: '+project,
+    'Creato da: '+actorEmail,
+    'Invitati: '+(guests.join(', ') || 'nessun invito aggiuntivo'),
+    'Cosa preparare: '+actionRequired,
+    '',
+    'Note:',
+    description,
+    '',
+    'Event ID: '+String(event.getId()||''),
+    'Correlation ID: '+corr
+  ].join('\n');
+  try{
+    MailApp.sendEmail(ctx.summaryEmail,'[AGENDA SCD] '+title,summaryBody);
+  }catch(mailErr){
+    try{event.deleteEvent();}catch(deleteErr){}
+    throw new Error('Evento non confermato: riepilogo istituzionale non inviato. '+String(mailErr && mailErr.message ? mailErr.message : mailErr));
+  }
+  r216AppendByHeader_('DATA_LINEAGE',{
+    LINEAGE_ID:'DL-AGENDA-' + Utilities.getUuid().slice(0,8).toUpperCase(),
+    TIMESTAMP:new Date(),FLOW:'AGENDA_SCD',SOURCE:'GOOGLE_CALENDAR',SOURCE_ID:String(event.getId()||''),
+    PROCESSOR:'CRM AGENDA R50.4',TRANSFORMATION:'Evento operativo + inviti autorizzati + riepilogo istituzionale',
+    DESTINATION:'SCD_GOOGLE_CALENDAR',ENTITY_TYPE:'EVENT',ENTITY_ID:String(event.getId()||''),
+    KPI_IMPACT:'COORDINAMENTO',ACTOR:actorEmail,STATUS:'SYNCED',CORRELATION_ID:corr,
+    NOTES:'Calendario canonico '+ctx.calendarId
+  });
+  if(stakeholderId){
+    r216AppendByHeader_('TOUCHPOINTS_MASTER',{
+      TOUCHPOINT_ID:'TP-' + Utilities.getUuid().slice(0,8).toUpperCase(),
+      TIMESTAMP:new Date(),STAKEHOLDER_ID:stakeholderId,CANALE:'INCONTRO',DIREZIONE:'INTERNA',
+      OGGETTO:title,SINTESI:clean_(project+' · '+description,1200),SENTIMENT:'',ESITO:'PROGRAMMATO',
+      PROSSIMA_AZIONE:actionRequired,SCADENZA:start,OWNER:actorEmail,FONTE:'GOOGLE_CALENDAR',
+      ID_FONTE:String(event.getId()||''),CORRELATION_ID:corr,NOTE:'Agenda SCD R50.4'
+    });
+  }
+  return {
+    created:true,
+    eventId:String(event.getId()||''),
+    calendarId:ctx.calendarId,
+    calendarName:ctx.calendarName,
+    invited:guests,
+    summarySent:true,
+    summaryRecipient:ctx.summaryEmail,
+    actor:actorEmail,
+    correlationId:corr
+  };
 }
 
 

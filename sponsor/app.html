@@ -7,7 +7,7 @@
   <meta name="description" content="SCD ColicoDerviese Sponsor Platform">
   <title>SCD Partner OS · ColicoDerviese</title>
   <link rel="icon" href="../assets/logo-scd.png">
-  <link rel="stylesheet" href="./app.css?v=18.2.0">
+  <link rel="stylesheet" href="./app.css?v=18.4.0">
   <link rel="stylesheet" href="./scd-design-system.css?v=1.0.0">
 </head>
 <body>
@@ -37,6 +37,7 @@
       <button class="nav-link" data-view="catalogo"><i data-icon="target"></i><span>Asset & Catalogo</span></button>
 
       <span class="nav-section-label">GESTIONE</span>
+      <button class="nav-link" data-view="eventi"><i data-icon="calendar"></i><span>Agenda SCD</span></button>
       <button class="nav-link" data-view="documenti"><i data-icon="folder"></i><span>Document Hub</span></button>
       <button class="nav-link" data-view="report"><i data-icon="chart"></i><span>Analytics</span></button>
       <button class="nav-link" data-view="settings"><i data-icon="settings"></i><span>Impostazioni</span></button>
@@ -440,7 +441,32 @@
     </section>
 
     <section class="view" id="view-eventi">
-      <div class="page-head"><div><small>AGENDA & ATTIVAZIONI</small><h1>Eventi</h1><p>Tornei, community, hospitality e attivazioni sponsor.</p></div></div>
+      <div class="page-head"><div><small>AGENDA SCD · GOOGLE CALENDAR CONDIVISO</small><h1>Eventi, appuntamenti e lavori da coordinare</h1><p>Un solo appuntamento, un solo calendario operativo, persone autorizzate informate e riepilogo sempre alla casella istituzionale.</p></div><button class="btn-yellow" id="agendaRefresh" type="button">Aggiorna agenda</button></div>
+      <div class="agenda-status-bar" id="agendaStatusBar"><span>Connessione Agenda SCD in verifica…</span></div>
+      <div class="agenda-layout">
+        <form class="agenda-builder" id="agendaForm">
+          <div class="agenda-builder-head"><div><small>NUOVO EVENTO OPERATIVO</small><h3>Crea appuntamento / iniziativa</h3></div><span>richiede conferma</span></div>
+          <div class="agenda-fields">
+            <label class="wide">Titolo<input name="title" maxlength="140" required placeholder="es. Sopralluogo sponsor · Area fitness outdoor"></label>
+            <label>Tipologia<select name="type"><option value="MEETING">Incontro</option><option value="COMMERCIAL_INITIATIVE">Iniziativa commerciale</option><option value="CLUB_EVENT">Evento società</option><option value="DEADLINE">Scadenza</option></select></label>
+            <label>Visibilità<select name="audienceMode"><option value="SELECTED">Solo persone selezionate</option><option value="ALL_AUTHORIZED">Tutti gli autorizzati Agenda</option></select></label>
+            <label>Inizio<input name="startAt" type="datetime-local" required></label>
+            <label>Fine<input name="endAt" type="datetime-local" required></label>
+            <label class="wide">Luogo<input name="location" placeholder="Centro Sportivo, azienda, online…"></label>
+            <label class="wide">Progetto / sponsor<input name="project" placeholder="Progetto, partner o attività collegata"></label>
+            <label class="wide">Cosa bisogna preparare<textarea name="actionRequired" rows="3" placeholder="Materiali, documenti, sopralluogo, allestimento, persone necessarie…"></textarea></label>
+            <label class="wide">Note condivise<textarea name="description" rows="4" placeholder="Contesto e informazioni che devono conoscere gli invitati."></textarea></label>
+          </div>
+          <fieldset class="agenda-people"><legend>Persone / uffici autorizzati</legend><div id="agendaInvitees"><span>Caricamento account autorizzati…</span></div></fieldset>
+          <label class="agenda-confirm"><input type="checkbox" name="confirm" id="agendaConfirm" required> Confermo la creazione dell'evento, l'invio degli inviti selezionati e il riepilogo a sportclubcolico@gmail.com.</label>
+          <button class="btn-yellow" type="submit" id="agendaCreate">Crea nell'Agenda SCD</button>
+          <p class="form-state" id="agendaFormState" role="status" aria-live="polite"></p>
+        </form>
+        <div class="agenda-upcoming">
+          <header><div><small>PROSSIMI APPUNTAMENTI</small><h3>Agenda condivisa</h3></div></header>
+          <div id="agendaUpcoming"><p>Caricamento agenda…</p></div>
+        </div>
+      </div>
       <div class="event-grid" id="eventGrid"></div>
     </section>
 
@@ -631,6 +657,6 @@
   </div>
 </div>
 
-<script src="./app.js?v=18.2.0"></script>
+<script src="./app.js?v=18.4.0"></script>
 </body>
 </html>

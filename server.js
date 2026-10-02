@@ -53,7 +53,7 @@ function applyCors(req,res){
 const READ_ONLY_RETRY_ACTIONS = new Set([
   'public.feed','public.club','public.calendar','public.datafabric.contract',
   'dashboard.summary','private.dashboard','private.week','account.requests','private.user.workspace','private.crm.summary','private.crm.detail','private.community.summary','private.communication.templates','private.communication.preview',
-  'private.attendance.get','auth.validate','direction.diagnostics',
+  'private.attendance.get','private.agenda.summary','auth.validate','direction.diagnostics',
   'direction.evolution','direction.datafabric.status'
 ]);
 const UPSTREAM_READ_ATTEMPTS = 2;
@@ -63,7 +63,7 @@ const UPSTREAM_WRITE_TIMEOUT_MS = Math.max(5000,Math.min(30000,Number(process.en
 const wait = ms => new Promise(resolve=>setTimeout(resolve,ms));
 
 const allowedActions = new Set([
-  'dashboard.summary','private.dashboard','private.week','account.requests','private.user.workspace','private.crm.summary','private.crm.detail','private.community.summary','private.communication.templates','private.communication.preview','private.communication.send','private.communication.health',
+  'dashboard.summary','private.dashboard','private.week','account.requests','private.user.workspace','private.crm.summary','private.crm.detail','private.community.summary','private.communication.templates','private.communication.preview','private.communication.send','private.communication.health','private.agenda.summary','private.agenda.create',
   'private.request.submit','private.transport.request','private.message.send',
   'private.convocation.create','private.convocation.reply',
   'private.attendance.get','private.attendance.save',
@@ -170,11 +170,12 @@ async function handleSponsorLead(req,res){
     const name=String(b.name||'').trim(),email=String(b.email||'').trim(),phone=String(b.phone||'').trim(),company=String(b.company||'').trim();
     if(!name||!email||!phone||!company)return json(res,400,{ok:false,error:'Azienda, nome, email e telefono sono obbligatori.'});
     if(b.privacy!==true)return json(res,400,{ok:false,error:'Devi autorizzare il trattamento dei dati per la richiesta.'});
+    const project=String(b.project||'').trim();
     const payload={
       kind:'sponsor',name,email,phone,privacy:true,
-      topic:'PARTNERSHIP · '+company+' · '+String(b.interest||'Proposta libera'),
+      topic:'PARTNERSHIP · '+company+' · '+String(b.interest||'Proposta libera')+(project?' · '+project:''),
       category:String(b.sector||''),
-      message:'Azienda: '+company+'\nSettore: '+String(b.sector||'')+'\nInteresse: '+String(b.interest||'')+'\n\n'+String(b.message||'')
+      message:'Azienda: '+company+'\nSettore: '+String(b.sector||'')+'\nInteresse: '+String(b.interest||'')+'\nProgetto / area: '+project+'\n\n'+String(b.message||'')
     };
     const result=await callAppsScript('public.partnerLead',payload,'');
     const d=requireUpstreamSuccess(result,'Registrazione richiesta sponsor')||{};
@@ -334,6 +335,26 @@ async function handleSponsorCommunication(req,res){
     return json(res,code,{ok:false,error:e.message||'COMMUNICATION_FAILED'});
   }
 }
+
+async function handleSponsorAgenda(req,res){
+  try{
+    const s=await validateSponsorSession(req);
+    if(req.method==='GET'){
+      const {parsed}=await callAppsScript('private.agenda.summary',{},s.token);
+      if(parsed&&parsed.ok===false)return json(res,400,{ok:false,error:parsed.error||'AGENDA_SUMMARY_FAILED'});
+      return json(res,200,{ok:true,data:unwrapPayload(parsed)},{'cache-control':'no-store'});
+    }
+    if(req.method!=='POST')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+    const body=JSON.parse(await readBody(req)||'{}');
+    const {parsed}=await callAppsScript('private.agenda.create',body,s.token);
+    if(parsed&&parsed.ok===false)return json(res,400,{ok:false,error:parsed.error||'AGENDA_CREATE_FAILED'});
+    return json(res,200,{ok:true,data:unwrapPayload(parsed)},{'cache-control':'no-store'});
+  }catch(e){
+    const code=e.message==='SESSION_REQUIRED'?401:400;
+    return json(res,code,{ok:false,error:e.message||'AGENDA_FAILED'});
+  }
+}
+
 async function serveSponsorPrivate(req,res,u){
   try{
     await validateSponsorSession(req);
@@ -805,6 +826,7 @@ http.createServer(async(req,res)=>{
   if(u.pathname==='/api/sponsor/community') return handleSponsorCommunity(req,res);
   if(u.pathname==='/api/sponsor/creative-scenes') return handleSponsorCreativeScenes(req,res);
   if(u.pathname==='/api/sponsor/communication') return handleSponsorCommunication(req,res);
+  if(u.pathname==='/api/sponsor/agenda') return handleSponsorAgenda(req,res);
   if(['/sponsor/app','/sponsor/app/','/sponsor/app.html','/sponsor/app.js'].includes(u.pathname)) return serveSponsorPrivate(req,res,u);
   if(u.pathname==='/api/scd') return proxyAppsScript(req,res);
   if(u.pathname==='/api/intake/form') return handleIntakeForm(req,res,u);

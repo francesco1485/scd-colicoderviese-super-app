@@ -1,4 +1,4 @@
-# R20 Runtime Deploy — R40.2
+# R20 Runtime Deploy — R50.4
 
 ## Obiettivo
 
@@ -68,3 +68,21 @@ Dal pannello Apps Script ripristinare la precedente versione del deployment cano
 - i contatti con policy `SOSPESO_NON_INVIARE` o `NO_CONTACT` sono bloccati;
 - ogni invio viene registrato in `MAIL_ARCHIVIO` e, se collegato a stakeholder, in `TOUCHPOINTS_MASTER`;
 - la ragione sociale e i dati fiscali sono letti da `SOCIETA_PROFILE`, non hardcoded nel frontend.
+
+
+### Acceptance Agenda SCD R50.4
+
+Prima di dichiarare l'Agenda operativa in produzione verificare anche:
+
+- `private.agenda.summary` risponde soltanto con sessione valida;
+- `private.agenda.create` richiede `confirm=true`;
+- il calendario usato è esclusivamente `S.D.C. ColicoDerviese | Calendario Ufficiale 2026/27`;
+- l'ID calendario resta `4446ddfffc997074b2017673da3e459830fd1feeef3c9bb0525564f39c9d4122@group.calendar.google.com`;
+- gli invitati sono risolti da `UTENTI` attivi con scope/area coerente, senza indirizzi sintetizzati;
+- ogni evento invia un riepilogo a `sportclubcolico@gmail.com`;
+- se il riepilogo istituzionale fallisce, la creazione evento deve fallire e il nuovo evento deve essere eliminato;
+- ogni creazione genera un record `DATA_LINEAGE`;
+- quando è presente uno stakeholder, l'appuntamento viene collegato al CRM tramite `TOUCHPOINTS_MASTER`;
+- le email CRM continuano a partire dall'account istituzionale e, se l'attore autenticato è diverso, ricevono copia interna riservata tramite BCC.
+
+Non dichiarare l'Agenda scrivente LIVE finché il deployment Apps Script canonico non è stato aggiornato e verificato con una sessione autorizzata.

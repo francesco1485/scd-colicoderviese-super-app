@@ -101,11 +101,13 @@ includesAll(sourceIds,[
   'SCD_DRIVE','SCD_GMAIL','R20','CORE_SHEET','TESSERATI_SHEET','PULMINI_SHEET','MAIL_OPERATIONS_SHEET','SPONSOR_MASTER_SHEET','ECONOMIC_MASTER_SHEET','TOURNAMENTS_MASTER_SHEET',
   'FIGC','LND','CR_LOMBARDIA','SGS','SPORT_E_SALUTE','RASD','TUTTOCAMPO',
   'SCD_OFFICIAL_SITE','SCD_FACEBOOK','SCD_INSTAGRAM','SCD_TIKTOK','SCD_YOUTUBE','SCD_PIXELLOT','LECCO_CHANNEL','SPRINT_E_SPORT_LOMBARDIA','SCD_ORGANIGRAMMA_2026_27','TUTTITALIA',
-  'SEGRETARIO_CALCIO','TEAMSYSTEM_SPORTIVI_IN_CLOUD','SQUBY','ATHLETIS','SCD_SUPABASE','SCD_AI_WEEKLY_EDITORIAL'
+  'SEGRETARIO_CALCIO','TEAMSYSTEM_SPORTIVI_IN_CLOUD','SQUBY','ATHLETIS','SCD_SUPABASE','SCD_AI_WEEKLY_EDITORIAL','SCD_GOOGLE_CALENDAR'
 ],'source registry');
 const sourceById=Object.fromEntries(sources.map(x=>[x.id,x]));
 assert(sourceById.SCD_DRIVE.account==='sportclubcolico@gmail.com','Drive engine account changed');
 assert(sourceById.SCD_GMAIL.account==='sportclubcolico@gmail.com','Gmail engine account changed');
+assert(sourceById.SCD_GOOGLE_CALENDAR.account==='sportclubcolico@gmail.com','Calendar owner account changed');
+assert(sourceById.SCD_GOOGLE_CALENDAR.resource_id==='4446ddfffc997074b2017673da3e459830fd1feeef3c9bb0525564f39c9d4122@group.calendar.google.com','Agenda SCD calendar id mismatch');
 assert(sourceById.R20.must_preserve===true,'R20 preservation rule missing');
 assert(sourceById.MAIL_OPERATIONS_SHEET.resource_id==='1wx3ZXwmdZuAr8AM_h08GzOvephm5o5iHMvTLQpRmbJE','mail operations source id mismatch');
 assert(sourceById.SPONSOR_MASTER_SHEET.resource_id==='1-5-MUnrrAltflJSATe6bKkjm_3SItO0gvadi_PXPoAQ','sponsor master source id mismatch');
@@ -132,6 +134,8 @@ includesAll(m.drive_vault.existing_catalog_surfaces||[],['TESSERATI_SHEET/DRIVE 
 includesAll(m.drive_vault.catalog_fields||[],['DOCUMENT_ID','DRIVE_FILE_ID','HASH','VERSION','PERMISSIONS'],'Drive catalog');
 
 assert(/Un solo EVENT_ID/i.test(m.calendar_event_engine.principle),'event single-source principle missing');
+assert(m.calendar_event_engine?.operational_agenda?.summary_recipient==='sportclubcolico@gmail.com','Agenda SCD summary recipient mismatch');
+assert(m.communications?.crm_outbound_policy?.actor_private_copy==='BCC_AUTHENTICATED_ACTOR_IF_DIFFERENT_FROM_CLUB','CRM actor copy policy missing');
 includesAll(m.calendar_event_engine.required_event_fields||[],[
   'EVENT_ID','SEASON_ID','TYPE','START_AT','END_AT','STATUS','SOURCE','TEAM_IDS','PERSON_IDS','VISIBILITY'
 ],'event model');

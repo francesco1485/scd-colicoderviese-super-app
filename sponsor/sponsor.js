@@ -211,3 +211,22 @@ function setSponsorWallMode(mode){
   document.querySelectorAll('[data-wall-mode]').forEach(b=>b.classList.toggle('active',b.dataset.wallMode===mode));
 }
 document.querySelectorAll('[data-wall-mode]').forEach(b=>b.addEventListener('click',()=>setSponsorWallMode(b.dataset.wallMode)));
+
+
+/* ===== R50.4 CENTER DEVELOPMENT CTA ===== */
+$$('[data-project-interest]').forEach(btn=>btn.addEventListener('click',()=>{
+  const form=$('#partnerLeadForm');
+  if(!form)return;
+  const project=String(btn.dataset.projectInterest||'').trim();
+  const input=$('#partnerProject');
+  if(input)input.value=project;
+  const select=form.elements.interest;
+  if(select){
+    if(project==='Fondo Solidale SCD')select.value='Fondo Solidale SCD';
+    else if(/dona|donazione/i.test(project))select.value='Donazione beni / servizi';
+    else if(/brandizza|adotta/i.test(project))select.value='Adotta / brandizza un\'area';
+    else select.value='Progetto Centro Sportivo';
+  }
+  form.scrollIntoView({behavior:'smooth',block:'center'});
+  setTimeout(()=>form.elements.company?.focus(),350);
+}));

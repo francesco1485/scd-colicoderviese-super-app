@@ -2204,3 +2204,36 @@ body{background:linear-gradient(180deg,#eef5fb,#f7fbfe 55%,#edf5fb);color:var(--
   .led-source-review-head{flex-direction:column}
   .led-review-compare{grid-template-columns:1fr}
 }
+
+
+/* ===== R50.4 AGENDA SCD ===== */
+.agenda-status-bar{margin:0 0 18px;padding:12px 15px;border-radius:14px;background:#eaf5ff;border:1px solid #c8e4f7;color:#173b5e;font-size:13px}
+.agenda-layout{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr);gap:18px;align-items:start;margin-bottom:22px}
+.agenda-builder,.agenda-upcoming{background:#fff;border:1px solid #dce8f2;border-radius:22px;box-shadow:0 12px 34px rgba(3,26,53,.07);padding:20px}
+.agenda-builder-head,.agenda-upcoming header{display:flex;justify-content:space-between;gap:15px;align-items:flex-start;margin-bottom:17px}
+.agenda-builder-head small,.agenda-upcoming small{font-size:10px;font-weight:900;letter-spacing:.13em;color:#0870cf}
+.agenda-builder-head h3,.agenda-upcoming h3{margin:4px 0 0;color:#031a35;font-size:22px}
+.agenda-builder-head>span{font-size:11px;font-weight:850;background:#fff4bd;color:#6d5300;padding:7px 9px;border-radius:999px}
+.agenda-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.agenda-fields label{font-size:12px;font-weight:800;color:#31506d}
+.agenda-fields label.wide{grid-column:1/-1}
+.agenda-fields input,.agenda-fields select,.agenda-fields textarea{display:block;width:100%;margin-top:6px;border:1px solid #cbdbe8;border-radius:11px;padding:11px 12px;background:#f9fcff;color:#031a35;font:inherit}
+.agenda-fields textarea{resize:vertical}
+.agenda-people{margin:16px 0;border:1px solid #d8e5ef;border-radius:14px;padding:13px}
+.agenda-people legend{padding:0 6px;color:#31506d;font-size:12px;font-weight:850}
+#agendaInvitees{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.agenda-person{display:flex;align-items:flex-start;gap:8px;padding:9px;border-radius:10px;background:#f4f8fb;font-size:12px;color:#24435e}
+.agenda-person input{margin-top:2px}
+.agenda-person b{display:block;color:#031a35}
+.agenda-person small{display:block;color:#678096}
+.agenda-confirm{display:flex;gap:9px;align-items:flex-start;margin:14px 0;color:#526b82;font-size:12px;line-height:1.45}
+.agenda-confirm input{margin-top:2px}
+.agenda-upcoming{position:sticky;top:18px}
+.agenda-event{border-bottom:1px solid #e3edf4;padding:13px 0}
+.agenda-event:first-child{padding-top:0}.agenda-event:last-child{border-bottom:0;padding-bottom:0}
+.agenda-event time{display:block;color:#0870cf;font-size:11px;font-weight:900;letter-spacing:.05em}
+.agenda-event strong{display:block;color:#031a35;margin:5px 0 3px}
+.agenda-event span{display:block;color:#667e93;font-size:12px;line-height:1.45}
+.agenda-event .agenda-attendees{margin-top:7px;color:#49657f;font-size:11px}
+@media(max-width:960px){.agenda-layout{grid-template-columns:1fr}.agenda-upcoming{position:static}}
+@media(max-width:620px){.agenda-fields,#agendaInvitees{grid-template-columns:1fr}.agenda-fields label.wide{grid-column:auto}.agenda-builder,.agenda-upcoming{padding:15px;border-radius:17px}}
