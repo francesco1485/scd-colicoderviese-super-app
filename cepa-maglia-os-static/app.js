@@ -2137,7 +2137,8 @@ function renderCepa(){
   $('cepaDocCount').textContent=documents.filter(d=>d.tags?.includes('CEPA')).length
   $('cepaSubjectGrid').innerHTML=subjects.map(s=>'<article class="subject-card" data-subject="'+s.id+'"><div class="subject-domain">'+esc(s.domain)+' · '+esc(subjectStatus(s.lifecycle_status))+'</div><h4>'+esc(s.title)+'</h4><p>'+esc(s.description||'')+'</p><div class="tags">'+(s.target_audiences||[]).slice(0,4).map(a=>'<span class="tag">'+esc(a)+'</span>').join('')+'</div><div class="subject-progress"><span style="width:'+Number(s.maturity||0)+'%"></span></div><p>'+esc(s.maturity)+'% maturità · partner: '+esc((s.partner_codes||[]).join(', ')||'da definire')+'</p></article>').join('')||empty('Nessuna materia')
   document.querySelectorAll('[data-subject]').forEach(b=>b.onclick=()=>openSubject(b.dataset.subject))
-  $('cepaInitiativeList').innerHTML=initiatives.map(i=>listRow(i.title,(i.cepa_subjects?.title||'Materia da definire')+(i.territory?' · '+i.territory:''),[i.status,i.initiative_type])).join('')||empty('Nessuna iniziativa ancora registrata')
+  $('cepaInitiativeList').innerHTML=initiatives.map(i=>'<button type="button" class="cepa-initiative-admin-row" data-cepa-initiative="'+i.id+'"><div><strong>'+esc(i.title)+'</strong><small>'+esc((i.cepa_subjects?.title||'Materia da definire')+(i.territory?' · '+i.territory:''))+'</small></div><div class="cepa-initiative-admin-tags"><span>'+esc(i.status)+'</span><span>'+esc(i.initiative_type)+'</span>'+(i.published?'<span class="public">PUBBLICO</span>':'')+'</div></button>').join('')||empty('Nessuna iniziativa ancora registrata')
+  document.querySelectorAll('[data-cepa-initiative]').forEach(b=>b.onclick=()=>openCepaInitiativeEditor(b.dataset.cepaInitiative))
 
   $('cepaAcademyCount').textContent=cepaAcademy.length+' moduli'
   $('cepaAcademyList').innerHTML=cepaAcademy.map(m=>'<div class="academy-item '+(isManager()?'clickable':'')+'" '+(isManager()?'data-academy="'+m.id+'"':'')+'><div><span class="academy-seq">'+esc(m.sequence_no)+'</span><strong>'+esc(m.title)+'</strong><small>'+esc(m.description||'')+'</small><small>'+esc((m.audience||[]).join(', '))+(m.estimated_minutes?' · '+esc(m.estimated_minutes)+' min':'')+'</small></div><span class="readiness-status '+(m.status==='ready'||m.status==='published'?'ready':'in_progress')+'">'+esc(m.status)+'</span></div>').join('')||empty('Nessun modulo Academy')
@@ -3414,11 +3415,119 @@ function openSubject(id){
   $('modalContent').innerHTML='<div class="eyebrow">MATERIA CEPA</div><h2>'+esc(s.title)+'</h2><form id="editSubjectForm" class="form"><label>Descrizione<textarea id="esDesc">'+esc(s.description||'')+'</textarea></label><div class="inline"><label>Stato<select id="esStatus"><option value="research">Ricerca</option><option value="design">Progettazione</option><option value="ready">Pronta</option><option value="active">Attiva</option><option value="review">Revisione</option><option value="archived">Archiviata</option></select></label><label>Maturità<input id="esMaturity" type="number" min="0" max="100" value="'+esc(s.maturity)+'"></label></div><label>Target<input id="esAudience" value="'+esc((s.target_audiences||[]).join(', '))+'"></label><label>Partner<input id="esPartners" value="'+esc((s.partner_codes||[]).join(', '))+'"></label><label>Domande chiave<textarea id="esQuestions">'+esc((s.key_questions||[]).join('\n'))+'</textarea></label><label>Note<textarea id="esNotes">'+esc(s.notes||'')+'</textarea></label>'+(isManager()?'<button class="primary" type="submit">Aggiorna materia</button>':'')+'</form>';$('esStatus').value=s.lifecycle_status;$('modal').classList.remove('hidden')
   if(isManager())$('editSubjectForm').onsubmit=async e=>{e.preventDefault();const patch={description:$('esDesc').value.trim()||null,lifecycle_status:$('esStatus').value,maturity:Number($('esMaturity').value||0),target_audiences:$('esAudience').value.split(',').map(x=>x.trim()).filter(Boolean),partner_codes:$('esPartners').value.split(',').map(x=>x.trim()).filter(Boolean),key_questions:$('esQuestions').value.split('\n').map(x=>x.trim()).filter(Boolean),notes:$('esNotes').value.trim()||null,updated_at:new Date().toISOString()};const{error}=await supabase.from('cepa_subjects').update(patch).eq('id',id).eq('organization_id',window.orgId);if(error)return alert(error.message);closeModal();await loadAll()}
 }
-function openNewInitiative(){
-  if(!isManager())return
-  $('modalContent').innerHTML='<div class="eyebrow">CEPA</div><h2>Nuova iniziativa</h2><form id="initiativeForm" class="form"><label>Materia<select id="iSubject"><option value="">Da definire</option>'+subjects.map(s=>'<option value="'+s.id+'">'+esc(s.title)+'</option>').join('')+'</select></label><label>Titolo<input id="iTitle" required></label><div class="inline"><label>Tipo<input id="iType" placeholder="evento, webinar, guida..." required></label><label>Territorio<input id="iTerritory"></label></div><label>Target<input id="iAudience"></label><label>Obiettivo<textarea id="iObjective"></textarea></label><label>Stato<select id="iStatus"><option value="idea">Idea</option><option value="design">Progettazione</option><option value="planned">Pianificata</option><option value="active">Attiva</option></select></label><button class="primary" type="submit">Crea iniziativa</button></form>';$('modal').classList.remove('hidden')
-  $('initiativeForm').onsubmit=async e=>{e.preventDefault();const row={organization_id:window.orgId,subject_id:$('iSubject').value||null,title:$('iTitle').value.trim(),initiative_type:$('iType').value.trim(),territory:$('iTerritory').value.trim()||null,audience:$('iAudience').value.trim()||null,objective:$('iObjective').value.trim()||null,status:$('iStatus').value,created_by:window.userId};const{error}=await supabase.from('cepa_initiatives').insert(row);if(error)return alert(error.message);closeModal();await loadAll()}
+function openNewInitiative(){openCepaInitiativeEditor(null)}
+function cepaPublicAssetOptions(selectedId=''){
+  const usable=assetRegistry.filter(a=>a.is_active!==false&&a.governance_status!=='reject'&&['photo','graphic','document','template','other'].includes(a.asset_type))
+  return '<option value="">Nessun asset</option>'+usable.map(a=>'<option value="'+a.id+'" '+(a.id===selectedId?'selected':'')+'>'+esc(a.asset_name)+' · '+esc(governanceLabel(a.governance_status))+'</option>').join('')
 }
+function slugifyPublic(v=''){
+  return String(v).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,80)
+}
+function openCepaInitiativeEditor(id=null){
+  if(!isManager())return
+  const x=id?initiatives.find(i=>i.id===id):null
+  if(id&&!x)return
+  $('modalContent').innerHTML=
+    '<div class="eyebrow">CENTRO C.E.P.A. · INIZIATIVA</div><h2>'+(x?'Modifica iniziativa':'Nuova iniziativa')+'</h2>'+
+    '<p class="muted">Un solo record governa attività interna, Agenda e vetrina pubblica. I dati pubblici restano separati dalle note operative.</p>'+
+    '<form id="initiativeForm" class="form cepa-initiative-editor">'+
+      '<label>Materia<select id="iSubject"><option value="">Da definire</option>'+subjects.map(v=>'<option value="'+v.id+'">'+esc(v.title)+'</option>').join('')+'</select></label>'+
+      '<label>Titolo<input id="iTitle" required value="'+esc(x?.title||'')+'"></label>'+
+      '<div class="inline"><label>Tipo<input id="iType" placeholder="incontro, evento, webinar, guida..." required value="'+esc(x?.initiative_type||'incontro')+'"></label><label>Territorio<input id="iTerritory" value="'+esc(x?.territory||'')+'"></label></div>'+
+      '<label>Destinatari<input id="iAudience" value="'+esc(x?.audience||'')+'" placeholder="Persone, PMI, scuole, enti, intermediari..."></label>'+
+      '<label>Obiettivo interno<textarea id="iObjective">'+esc(x?.objective||'')+'</textarea></label>'+
+      '<div class="inline"><label>Stato<select id="iStatus"><option value="idea">Idea</option><option value="design">Progettazione</option><option value="planned">Pianificata</option><option value="active">Attiva</option><option value="completed">Completata</option><option value="cancelled">Annullata</option></select></label><label>Registrazione<select id="iRegistration"><option value="closed">Chiusa</option><option value="request">Su richiesta</option><option value="open">Aperta</option><option value="full">Completa</option></select></label></div>'+
+      '<div class="inline"><label>Data / ora prevista<input id="iPlanned" type="datetime-local" value="'+esc(localInput(x?.planned_at)||'')+'"></label><label>Data conclusione<input id="iCompleted" type="datetime-local" value="'+esc(localInput(x?.completed_at)||'')+'"></label></div>'+
+      '<div class="inline"><label>Luogo<input id="iVenue" value="'+esc(x?.venue_name||'')+'"></label><label>Indirizzo<input id="iVenueAddress" value="'+esc(x?.venue_address||'')+'"></label></div>'+
+      '<div class="cepa-public-editor-block"><div class="eyebrow">VETRINA PUBBLICA</div><label>Sintesi pubblica<textarea id="iPublicSummary" placeholder="Descrizione chiara e attrattiva, senza note interne o commerciali riservate.">'+esc(x?.public_summary||'')+'</textarea></label>'+
+      '<div class="inline"><label>Locandina / poster<select id="iPoster">'+cepaPublicAssetOptions(x?.poster_asset_id||'')+'</select></label><label>Cover / foto<select id="iHero">'+cepaPublicAssetOptions(x?.hero_asset_id||'')+'</select></label></div>'+
+      '<div class="inline"><label>Capienza<input id="iCapacity" type="number" min="1" value="'+esc(x?.capacity||'')+'"></label><label>Slug pubblico<input id="iSlug" value="'+esc(x?.slug||'')+'" placeholder="generato dal titolo"></label></div>'+
+      '<div class="showcase-editor-checks"><label><input id="iPublished" type="checkbox" '+(x?.published?'checked':'')+'> Pubblica nella vetrina C.E.P.A.</label><label><input id="iFeatured" type="checkbox" '+(x?.featured?'checked':'')+'> Metti in evidenza</label></div></div>'+
+      '<label>Note interne<textarea id="iNotes">'+esc(x?.notes||'')+'</textarea></label>'+
+      '<div class="composer-actions"><button type="button" class="secondary" id="iCancel">Annulla</button><button class="primary" type="submit">'+(x?'Salva modifiche':'Crea iniziativa')+'</button></div>'+
+    '</form><div id="initiativeFormMsg" class="message hidden"></div>'
+  $('iSubject').value=x?.subject_id||''
+  $('iStatus').value=x?.status||'idea'
+  $('iRegistration').value=x?.registration_status||'closed'
+  $('iCancel').onclick=closeModal
+  $('modal').classList.remove('hidden')
+
+  $('initiativeForm').onsubmit=async e=>{
+    e.preventDefault()
+    const published=$('iPublished').checked
+    const planned=$('iPlanned').value?new Date($('iPlanned').value).toISOString():null
+    const completed=$('iCompleted').value?new Date($('iCompleted').value).toISOString():null
+    const publicSummary=$('iPublicSummary').value.trim()||null
+    const box=$('initiativeFormMsg')
+    if(published&&!publicSummary){
+      box.textContent='Per pubblicare serve una sintesi pubblica.';box.className='message error';return
+    }
+    if(published&&!planned&&!completed){
+      box.textContent='Per pubblicare un evento serve almeno una data prevista o una data di conclusione.';box.className='message error';return
+    }
+    const title=$('iTitle').value.trim()
+    const row={
+      organization_id:window.orgId,
+      subject_id:$('iSubject').value||null,
+      title,
+      initiative_type:$('iType').value.trim(),
+      territory:$('iTerritory').value.trim()||null,
+      audience:$('iAudience').value.trim()||null,
+      objective:$('iObjective').value.trim()||null,
+      status:$('iStatus').value,
+      planned_at:planned,
+      completed_at:completed,
+      public_summary:publicSummary,
+      venue_name:$('iVenue').value.trim()||null,
+      venue_address:$('iVenueAddress').value.trim()||null,
+      registration_status:$('iRegistration').value,
+      capacity:$('iCapacity').value?Number($('iCapacity').value):null,
+      poster_asset_id:$('iPoster').value||null,
+      hero_asset_id:$('iHero').value||null,
+      featured:$('iFeatured').checked,
+      published,
+      published_at:published?(x?.published_at||new Date().toISOString()):null,
+      slug:($('iSlug').value.trim()||slugifyPublic(title))||null,
+      notes:$('iNotes').value.trim()||null,
+      created_by:x?.created_by||window.userId,
+      updated_at:new Date().toISOString()
+    }
+    let result
+    if(x)result=await supabase.from('cepa_initiatives').update(row).eq('id',x.id).eq('organization_id',window.orgId).select('*').single()
+    else result=await supabase.from('cepa_initiatives').insert(row).select('*').single()
+    if(result.error){box.textContent=result.error.message;box.className='message error';return}
+    const saved=result.data
+
+    if(planned&&!saved.agenda_event_id&&saved.status!=='cancelled'){
+      const agendaRow={
+        organization_id:window.orgId,event_type:'cepa_event',title:saved.title,summary:saved.public_summary||saved.objective||null,
+        starts_at:planned,ends_at:new Date(new Date(planned).getTime()+7200000).toISOString(),location_name:saved.venue_name||saved.territory||null,
+        attendance_scope:'leadership',owner_user_id:window.userId,created_by:window.userId,status:'scheduled',source_type:'cepa_initiative',source_id:saved.id,
+        calendar_sync_status:'not_configured',francesco_summary_status:'pending',metadata:{cepa_initiative_id:saved.id}
+      }
+      const{data:agenda,error:agendaError}=await supabase.from('crm_agenda_events').insert(agendaRow).select('id').single()
+      if(!agendaError&&agenda){
+        await supabase.from('cepa_initiatives').update({agenda_event_id:agenda.id,updated_at:new Date().toISOString()}).eq('id',saved.id).eq('organization_id',window.orgId)
+        const cc=window.userEmail&&window.userEmail.toLowerCase()!==ACCESS_APPROVER_EMAIL?[window.userEmail]:[]
+        await supabase.from('crm_communication_outbox').insert({
+          organization_id:window.orgId,actor_user_id:window.userId,communication_type:'event',source_type:'agenda_event',source_id:agenda.id,
+          from_email:'sportclubcolico@gmail.com',to_emails:[ACCESS_APPROVER_EMAIL],cc_emails:cc,
+          subject:'[C.E.P.A.] '+saved.title+' · '+fmtDateTime(planned),
+          body_text:'Evento C.E.P.A.: '+saved.title+'\\nData: '+fmtDateTime(planned)+'\\nLuogo: '+(saved.venue_name||saved.territory||'Da definire')+'\\n\\n'+(saved.public_summary||saved.objective||''),
+          status:'pending',provider:'gmail',metadata:{requires_backend_dispatch:true,cepa_initiative_id:saved.id,calendar_sync_pending:true}
+        })
+      }
+    }else if(planned&&saved.agenda_event_id){
+      await supabase.from('crm_agenda_events').update({
+        title:saved.title,summary:saved.public_summary||saved.objective||null,starts_at:planned,
+        location_name:saved.venue_name||saved.territory||null,updated_at:new Date().toISOString()
+      }).eq('id',saved.agenda_event_id).eq('organization_id',window.orgId)
+    }
+
+    closeModal();await loadAll();openCepaCentral()
+  }
+}
+
 function openNewEntity(){
   if(!isManager())return
   $('modalContent').innerHTML='<div class="eyebrow">SVILUPPO NUOVO</div><h2>Inserisci una realtà da osservare</h2><form id="entityForm" class="form"><label>Hub<select id="eHub" required>'+marketHubs.map(h=>'<option value="'+h.id+'">'+esc(h.city)+'</option>').join('')+'</select></label><label>Tipologia<select id="eType"><option value="company">Impresa</option><option value="professional">Professionista</option><option value="public_entity">Ente</option><option value="school">Scuola</option><option value="association">Associazione</option><option value="partner">Partner</option><option value="sap_candidate">Potenziale SAP</option><option value="insurance_intermediary">Intermediario assicurativo</option><option value="other">Altro</option></select></label><label>Nome<input id="eName" required></label><label>Indirizzo<input id="eAddress"></label><label>Perché la stiamo osservando?<textarea id="eNote"></textarea></label><button class="primary" type="submit">Inserisci</button></form>';$('modal').classList.remove('hidden')
