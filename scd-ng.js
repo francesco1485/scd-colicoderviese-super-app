@@ -695,8 +695,9 @@ async function ensurePrivateDesk(force=false){
 function privateProfileName(p={}){return [p.firstName,p.lastName].filter(Boolean).join(' ')||p.fullName||'Profilo SCD'}
 function privateProfileKey(p={}){return String(p.code||p.playerCode||p.personId||p.id||'')}
 function privateProfileConvocations(p={}){
- const key=privateProfileKey(p),name=privateProfileName(p).toLowerCase();
- return (state.privateData?.convocations||[]).filter(x=>!key||String(x.playerCode||x.personId||x.playerId||'')===key||String(x.player||'').toLowerCase().includes(name)).slice(0,6);
+ const key=privateProfileKey(p);
+ if(!key)return [];
+ return (state.privateData?.convocations||[]).filter(x=>String(x.playerCode||x.personId||x.playerId||'')===key).slice(0,6);
 }
 function privateTeams(){
  const d=state.privateData||{},raw=[...(d.attendance?.teams||[]),...(d.teams||[])],seen=new Set(),out=[];
@@ -740,7 +741,7 @@ async function openPrivateRequests(){
  const add=$('#r54NewPrivateRequest',layer);if(add)add.onclick=()=>openPrivateRequestForm();
 }
 function openPrivateTransport(profile=null){
- const teams=privateTeams(),team=String(profile?.teamName||profile?.group||''),today=new Date().toISOString().slice(0,10);
+ const teams=privateTeams(),team=String(profile?.teamName||profile?.group||''),today=todayKey();
  const layer=openPanel('Pulmino & Trasporti','<form class="join-form r54-private-form" id="r54TransportForm"><span class="eyebrow">LOGISTICA SCD · ROLE/SCOPE</span><h2>Nuova richiesta trasporto</h2><div class="form-grid"><label>Data<input name="date" type="date" value="'+today+'" required></label><label>Ora<input name="time" type="time" required></label><label>Partenza<input name="origin" required maxlength="120"></label><label>Destinazione<input name="destination" required maxlength="120"></label><label>Squadra<select name="team"><option value="">Generale</option>'+teams.map(t=>'<option value="'+esc(t.key)+'" '+(team===t.key||team===t.name?'selected':'')+'>'+esc(t.name)+'</option>').join('')+'</select></label><label>Persone<input name="passengers" type="number" min="1" max="60" value="1"></label><label class="full">Note<textarea name="notes" maxlength="800"></textarea></label></div><button class="btn primary" type="submit">Invia richiesta</button><p id="r54TransportState"></p></form>');
  const form=$('#r54TransportForm',layer);
  form.onsubmit=async e=>{
@@ -766,7 +767,7 @@ function openPrivatePeopleHub(initial=0){
  render(initial);
 }
 function openPrivateAttendance(){
- const teams=privateTeams(),today=new Date().toISOString().slice(0,10);
+ const teams=privateTeams(),today=todayKey();
  if(!teams.length){openPanel('Presenze','<div class="panel-detail"><h2>Dato in aggiornamento</h2><p>Nessuna squadra autorizzata restituita dal gestionale.</p></div>');return}
  const layer=openPanel('Registro presenze','<div class="panel-detail r54-private-panel"><span class="eyebrow">STAFF · ROLE/SCOPE</span><h2>Registro squadra</h2><div class="form-grid"><label>Squadra<select id="r54AttTeam">'+teams.map(t=>'<option value="'+esc(t.key)+'">'+esc(t.name)+'</option>').join('')+'</select></label><label>Data<input id="r54AttDate" type="date" value="'+today+'"></label></div><button class="btn primary" id="r54AttLoad">Carica rosa</button><div id="r54AttRows"></div></div>');
  $('#r54AttLoad',layer).onclick=async()=>{
@@ -779,7 +780,7 @@ function openPrivateAttendance(){
  };
 }
 function openPrivateConvocations(){
- const d=state.privateData||{},teams=privateTeams(),today=new Date().toISOString().slice(0,10);
+ const d=state.privateData||{},teams=privateTeams(),today=todayKey();
  if(!teams.length){openPanel('Convocazioni','<div class="panel-detail"><h2>Dato in aggiornamento</h2><p>Nessuna squadra autorizzata restituita.</p></div>');return}
  const layer=openPanel('Convocazioni','<form class="join-form r54-private-form" id="r54ConvForm"><span class="eyebrow">STAFF · ROLE/SCOPE</span><h2>Nuova convocazione</h2><div class="form-grid"><label>Squadra<select id="r54ConvTeam">'+teams.map(t=>'<option value="'+esc(t.key)+'">'+esc(t.name)+'</option>').join('')+'</select></label><label>Data gara<input id="r54ConvDate" type="date" value="'+today+'" required></label><label>Ritrovo<input id="r54ConvTime" type="time" required></label><label>Luogo<input id="r54ConvPlace" required maxlength="160"></label><label class="full">Note<textarea id="r54ConvNotes" maxlength="800"></textarea></label></div><div id="r54ConvPlayers"></div><button class="btn primary" type="submit">Crea convocazione</button><p id="r54ConvState"></p></form>');
  const renderPlayers=()=>{const key=$('#r54ConvTeam',layer).value,roster=(d.roster&&d.roster[key])||[];$('#r54ConvPlayers',layer).innerHTML=roster.length?'<div class="r54-player-checks">'+roster.map(p=>'<label><input type="checkbox" data-r54-conv-player value="'+esc(p.code||p.personId||'')+'"> '+esc(p.name||privateProfileName(p))+'</label>').join('')+'</div>':'<div class="desk-service-empty"><b>Rosa in aggiornamento</b><span>La convocazione non inventa atleti mancanti.</span></div>'};
