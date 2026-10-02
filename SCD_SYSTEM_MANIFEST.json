@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.16.0",
+    "version": "3.17.0",
     "effective_at": "2026-10-02",
     "status": "BINDING",
     "language": "it-IT",
@@ -2156,11 +2156,13 @@
       "checks": [
         "PAGES_BUILD_VERSION",
         "RENDER_HEALTH_VERSION",
+        "RENDER_EXACT_COMMIT_SHA",
         "RENDER_FEATURE_FLAG_DECLARATION",
         "R20_DATA_FABRIC_CONTRACT_WHEN_FEATURE_ENABLED"
       ],
       "r20_contract_action": "public.datafabric.contract",
-      "failure_semantics": "CORE_LIVE_REQUIRES_ACTIVE_CHECKS_GREEN; GATED_OFF_CAPABILITIES_REMAIN_EXPLICITLY_NOT_LIVE",
+      "failure_semantics": "CORE_LIVE_REQUIRES_ACTIVE_CHECKS_GREEN_AND_RENDER_EXACT_COMMIT_MATCH; GATED_OFF_CAPABILITIES_REMAIN_EXPLICITLY_NOT_LIVE",
+      "commit_identity": "GITHUB_SHA_MUST_EQUAL_RENDER_GIT_COMMIT",
       "feature_gated_checks": {
         "FF-DATAFABRIC-OBSERVABILITY": {
           "when_enabled": [
