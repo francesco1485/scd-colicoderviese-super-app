@@ -300,6 +300,7 @@ const requiredRepoFiles=[
   'docs/SCD_HUMAN_OS_R39.md',
   'docs/adr/ADR-0011-human-centered-cognitive-os.md',
   'docs/adr/ADR-0012-r40-weekly-sport-ai-newsroom.md',
+  'docs/architecture/SCD-AUTONOMOUS-DEVELOPMENT-PROTOCOL.md',
   'docs/SCD_NEWSROOM_R40.md',
   'content/weekly-news.json',
   'ui-r40-weekly.css',
