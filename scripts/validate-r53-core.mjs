@@ -5,6 +5,9 @@ const read=p=>fs.readFileSync(p,'utf8');
 const sql=read('supabase/migrations/20261002_r53_football_social_private_core.sql');
 const manifest=JSON.parse(read('SCD_SYSTEM_MANIFEST.json'));
 const cfg=JSON.parse(read('config/scd-supabase.v1.json'));
+const html=read('index.html');
+const router=read('app-r24-router.js');
+const socialCss=read('ui-r52-social.css');
 
 for(const token of [
   'scd_training_sessions','scd_training_attendance','scd_match_performance','scd_match_callups',
@@ -38,6 +41,11 @@ if(!manifest.product_direction?.social_interactive_core?.rules?.includes('REWARD
 
 if(cfg.release!=='R53') fail('Supabase config release mismatch');
 if(!cfg.domain_core?.migrations?.includes('supabase/migrations/20261002_r53_football_social_private_core.sql')) fail('R53 migration not registered');
+
+for(const token of ['socialInteractiveZone','socialMvpState','socialPointsLogin','socialRewardsState','socialDealsState']) if(!html.includes(token)) fail('Fan Zone surface missing '+token);
+for(const token of ['r53-callup-card','data-r53-conv-reply','private.convocation.reply']) if(!router.includes(token)) fail('athlete callup vertical slice missing '+token);
+if(!socialCss.includes('social-interactive-zone')) fail('R53 social responsive styles missing');
+if(/Mauri Simone|Locatelli Andrea|Nuova Sondrio Calcio|92%|14\/03\/2027/.test(html+router)) fail('sample sports/private data must not ship in R53 surfaces');
 
 if(!process.exitCode)console.log('SCD R53 CORE CONTRACT PASS',{
   footballPrivate:true,
