@@ -19,6 +19,41 @@
         "clip camera principale",
         "frame LED pulito",
         "report erogazione"
+      ],
+      "sceneId": "SCENE-TRIBUNA-LAKE-CONCEPT",
+      "logoAssetPath": null,
+      "simulationLabel": "SIMULAZIONE_CONCETTUALE_NON_DOCUMENTARIA",
+      "motionTimeline": [
+        {
+          "from": 0,
+          "to": 4,
+          "label": "Ingresso",
+          "action": "Linea luminosa orizzontale, pulita e non invasiva."
+        },
+        {
+          "from": 4,
+          "to": 12,
+          "label": "Brand reveal",
+          "action": "Nome/logo partner entra in safe area con permanenza progressiva."
+        },
+        {
+          "from": 12,
+          "to": 25,
+          "label": "Messaggio",
+          "action": "Mobilità & sicurezza, massimo contrasto e nessun microtesto."
+        },
+        {
+          "from": 25,
+          "to": 34,
+          "label": "Camera hold",
+          "action": "Brand fermo nella zona centrale leggibile da tribuna e camera."
+        },
+        {
+          "from": 34,
+          "to": 40,
+          "label": "Uscita SCD",
+          "action": "Transizione azzurro-lago verso il raccordo SCD senza alterare il brand."
+        }
       ]
     },
     {
@@ -37,6 +72,41 @@
         "clip camera principale",
         "frame LED pulito",
         "report erogazione"
+      ],
+      "sceneId": "SCENE-TRIBUNA-LAKE-CONCEPT",
+      "logoAssetPath": null,
+      "simulationLabel": "SIMULAZIONE_CONCETTUALE_NON_DOCUMENTARIA",
+      "motionTimeline": [
+        {
+          "from": 0,
+          "to": 5,
+          "label": "Ingresso",
+          "action": "Wipe ordinato che pulisce la superficie visiva da sinistra a destra."
+        },
+        {
+          "from": 5,
+          "to": 13,
+          "label": "Brand reveal",
+          "action": "Nome/logo partner a grande scala su fondo netto."
+        },
+        {
+          "from": 13,
+          "to": 26,
+          "label": "Messaggio",
+          "action": "Pulizia professionale, gerarchia semplice e lettura dalla tribuna."
+        },
+        {
+          "from": 26,
+          "to": 35,
+          "label": "Camera hold",
+          "action": "Brand stabile, niente lampeggi rapidi, safe area centrale."
+        },
+        {
+          "from": 35,
+          "to": 40,
+          "label": "Uscita SCD",
+          "action": "Chiusura pulita con raccordo blu/azzurro del sistema SCD."
+        }
       ]
     },
     {
@@ -55,6 +125,41 @@
         "clip camera principale",
         "frame LED pulito",
         "report erogazione"
+      ],
+      "sceneId": "SCENE-TRIBUNA-LAKE-CONCEPT",
+      "logoAssetPath": null,
+      "simulationLabel": "SIMULAZIONE_CONCETTUALE_NON_DOCUMENTARIA",
+      "motionTimeline": [
+        {
+          "from": 0,
+          "to": 4,
+          "label": "Ingresso",
+          "action": "Linea morbida in movimento con ritmo sportivo controllato."
+        },
+        {
+          "from": 4,
+          "to": 12,
+          "label": "Brand reveal",
+          "action": "Nome/logo partner emerge con focus centrale progressivo."
+        },
+        {
+          "from": 12,
+          "to": 25,
+          "label": "Messaggio",
+          "action": "Performance & prevenzione con gerarchia forte e leggibile."
+        },
+        {
+          "from": 25,
+          "to": 34,
+          "label": "Camera hold",
+          "action": "Permanenza marchio e messaggio essenziale nella safe area."
+        },
+        {
+          "from": 34,
+          "to": 40,
+          "label": "Uscita SCD",
+          "action": "Accento azzurro-lago e transizione al contenuto successivo."
+        }
       ]
     },
     {
@@ -73,6 +178,41 @@
         "clip camera principale",
         "frame LED pulito",
         "report erogazione"
+      ],
+      "sceneId": "SCENE-TRIBUNA-LAKE-CONCEPT",
+      "logoAssetPath": null,
+      "simulationLabel": "SIMULAZIONE_CONCETTUALE_NON_DOCUMENTARIA",
+      "motionTimeline": [
+        {
+          "from": 0,
+          "to": 4,
+          "label": "Ingresso",
+          "action": "Raccordo SCD e apertura del nuovo sponsor."
+        },
+        {
+          "from": 4,
+          "to": 12,
+          "label": "Brand reveal",
+          "action": "Logo ufficiale protagonista con ingresso progressivo."
+        },
+        {
+          "from": 12,
+          "to": 25,
+          "label": "Messaggio",
+          "action": "Una sola promessa commerciale, massimo 6-8 parole."
+        },
+        {
+          "from": 25,
+          "to": 34,
+          "label": "Camera hold",
+          "action": "Logo fermo e leggibile nel centro della composizione."
+        },
+        {
+          "from": 34,
+          "to": 40,
+          "label": "Uscita",
+          "action": "Chiusura controllata e raccordo verso lo sponsor successivo."
+        }
       ]
     }
   ],
@@ -89,6 +229,17 @@
     "logoRequirement": "OFFICIAL_APPROVED_LOGO_REQUIRED_BEFORE_FINAL_MP4",
     "cameraSafe": true,
     "stadiumReadable": true,
-    "territoryLayer": "SCD_COLICO_LAKE_COMO_TRANSITIONS_ONLY"
+    "territoryLayer": "SCD_COLICO_LAKE_COMO_TRANSITIONS_ONLY",
+    "requiredGates": [
+      "OFFICIAL_APPROVED_LOGO",
+      "NATIVE_LED_RESOLUTION",
+      "STORYBOARD_APPROVAL",
+      "CAMERA_SAFE_REVIEW"
+    ],
+    "previewModes": [
+      "TRIBUNA",
+      "CAMERA"
+    ],
+    "storyboardDurationSeconds": 40
   }
 }
