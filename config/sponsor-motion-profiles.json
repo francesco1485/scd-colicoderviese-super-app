@@ -84,7 +84,8 @@
           "assenza di firma territoriale Lago di Como"
         ],
         "upgradeTarget": "40s · singolo partner protagonista · brand reveal · messaggio · camera hold · raccordo SCD/Lago"
-      }
+      },
+      "crmStakeholderId": "STK-GGLASS"
     },
     {
       "id": "MOTION-TA-CLEANING-01",
@@ -167,7 +168,8 @@
           "assenza di firma territoriale Lago di Como"
         ],
         "upgradeTarget": "40s · singolo partner protagonista · wipe ordinato · messaggio · camera hold · raccordo SCD/Lago"
-      }
+      },
+      "crmStakeholderId": "STK-TA-CLEANING"
     },
     {
       "id": "MOTION-AGC-MEDICAL-01",
@@ -250,7 +252,8 @@
           "assenza di firma territoriale Lago di Como"
         ],
         "upgradeTarget": "40s · singolo partner protagonista · reveal dinamico · messaggio · camera hold · raccordo SCD/Lago"
-      }
+      },
+      "crmStakeholderId": "STK-AGC-MEDICAL"
     },
     {
       "id": "MOTION-GENERIC-SCD-01",
@@ -303,7 +306,8 @@
           "label": "Uscita",
           "action": "Chiusura controllata e raccordo verso lo sponsor successivo."
         }
-      ]
+      ],
+      "crmStakeholderId": null
     }
   ],
   "previewSource": {
@@ -345,5 +349,10 @@
       "proof plan"
     ],
     "rule": "SOURCE_VIDEO_REVIEW_BEFORE_NEW_MASTER"
+  },
+  "crmBinding": {
+    "source": "STAKEHOLDERS_MASTER",
+    "rule": "ONE_PARTNER_ONE_CANONICAL_STAKEHOLDER",
+    "profileKey": "crmStakeholderId"
   }
 }
