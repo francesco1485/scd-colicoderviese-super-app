@@ -4692,3 +4692,14 @@ a:focus-visible{
   .cepa-initiative-admin-row{grid-template-columns:1fr}
   .cepa-initiative-admin-tags{justify-content:flex-start}
 }
+
+
+/* =========================================================
+   MAGLIA 360 · V19 ACCESS AUTH READINESS
+   ========================================================= */
+.access-auth-warning{
+  margin-bottom:10px;padding:12px;border:1px solid #eadcb5;border-radius:11px;background:#fffaf0
+}
+.access-auth-warning strong{display:block;color:#6d5b2b;font-size:9px}
+.access-auth-warning p{margin:5px 0 0;color:#817350;font-size:8px;line-height:1.5}
+.access-auth-warning b{color:#5b4e2d}
