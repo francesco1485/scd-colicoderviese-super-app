@@ -3,8 +3,8 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.11.0",
-    "effective_at": "2026-10-01",
+    "version": "3.12.0",
+    "effective_at": "2026-10-02",
     "status": "BINDING",
     "language": "it-IT",
     "timezone": "Europe/Rome",
@@ -2621,7 +2621,7 @@
         "CR_LOMBARDIA",
         "TUTTOCAMPO"
       ],
-      "contract": "OFFICIAL_CHANNELS_FIRST_PRIVATE_PIXELLOT_AUTH_EXTERNAL_MEDIA_ATTRIBUTED_NO_AUTO_REPUBLISH"
+      "contract": "VIDEO_ARENA_OFFICIAL_CHANNELS_FIRST_PRIVATE_PIXELLOT_AUTH_EXTERNAL_MEDIA_ATTRIBUTED_NO_AUTO_REPUBLISH"
     },
     {
       "id": "CAP-STAFF-ROLE-INGESTION",
@@ -2644,7 +2644,20 @@
         "SCD_SUPABASE",
         "CR_LOMBARDIA"
       ],
-      "contract": "DEDICATED_PUBLIC_TEAMS_DIRECTORY_VERIFIED_METADATA_NEXT_ACTIVITY_NO_PRIVATE_ROSTER"
+      "contract": "PUBLIC_TEAM_DIRECTORY_PLUS_SOURCE_GROUNDED_TEAM_HUB_NEXT_MATCH_VERIFIED_STATS_LOCAL_FOLLOW_NO_PRIVATE_ROSTER"
+    },
+    {
+      "id": "CAP-PUBLIC-MATCHDAY",
+      "domain": "SPORT_PUBLIC",
+      "required": true,
+      "state": "PARTIAL",
+      "sources": [
+        "R20",
+        "SCD_SUPABASE",
+        "CR_LOMBARDIA",
+        "TUTTOCAMPO"
+      ],
+      "contract": "SOURCE_GROUNDED_MATCHDAY_TEAM_OPPONENT_TIME_VENUE_COMPETITION_VERIFIED_STANDINGS_FORM_H2H_FAIL_CLOSED_NO_PREDICTIONS"
     }
   ],
   "known_noncompliance": [
@@ -3046,7 +3059,7 @@
     "visual_principle": "SPATIAL_SPORT_EDITORIAL_HIGH_IMPACT",
     "legacy_home_route": "#/home",
     "no_rewrite_rule": false,
-    "release": "R44",
+    "release": "R48",
     "product_name": "SCD UNIVERSE",
     "audience_fit": [
       "YOUTH",
@@ -3195,8 +3208,8 @@
       ]
     },
     "nextgen_preview": {
-      "release": "NG-0.4.5",
-      "name": "SCD UNIVERSE NOVA",
+      "release": "NG-0.6.0",
+      "name": "SCD ARENA",
       "status": "LIVE",
       "entry": "#/pulse",
       "visual": "SYNTHETIC_SPATIAL_LOW_FATIGUE",
@@ -3272,7 +3285,7 @@
       "role_assignment": "DIRECTION_ONLY"
     },
     "media_and_social_hub": {
-      "state": "SOURCE_REGISTRY_READY_UI_PUBLIC_LINKS",
+      "state": "VIDEO_ARENA_UI_READY_SOURCE_ADAPTER_PARTIAL",
       "official_channels": [
         "SCD_OFFICIAL_SITE",
         "SCD_FACEBOOK",
@@ -3301,7 +3314,18 @@
       "video_policy": "PUBLIC_VIDEO_ONLY_IF_PUBLIC_OR_EXPLICITLY_APPROVED_FOR_PUBLICATION",
       "minors_policy": "NO_PUBLICATION_WITHOUT_REQUIRED_MEDIA_AUTHORIZATION",
       "pixellot_policy": "PRIVATE_BY_DEFAULT_AUTHORIZED_STAFF_ONLY",
-      "no_auto_republish": true
+      "no_auto_republish": true,
+      "video_arena": {
+        "public_surfaces": [
+          "SCD_YOUTUBE",
+          "SCD_INSTAGRAM",
+          "SCD_TIKTOK"
+        ],
+        "pixellot": "PRIVATE_BY_DEFAULT_AUTHORIZED_STAFF_ONLY",
+        "external_media": "ATTRIBUTED_AND_SEPARATE",
+        "auto_embed_private_media": false,
+        "auto_republish": false
+      }
     },
     "staff_role_ingestion": {
       "source": "SCD_ORGANIGRAMMA_2026_27",
@@ -3394,11 +3418,62 @@
           "TEAM_NAME",
           "CATEGORY",
           "NEXT_ACTIVITY",
-          "NEXT_MATCH"
+          "NEXT_MATCH",
+          "VERIFIED_STANDINGS_WHEN_AVAILABLE",
+          "RECENT_FORM_WHEN_AVAILABLE"
         ],
         "people": "PUBLIC_AUTHORIZED_PROFILES_ONLY",
-        "private_roster": false
+        "private_roster": false,
+        "team_hub": "SOURCE_GROUNDED_PUBLIC_DETAIL",
+        "follow_preference": "LOCAL_DEVICE_ONLY"
       }
+    },
+    "public_matchday": {
+      "state": "PUBLIC_SOURCE_GROUNDED_UI_READY",
+      "entry": "MATCH_CENTER_AND_TEAM_HUB",
+      "sources": [
+        "R20",
+        "SCD_SUPABASE",
+        "CR_LOMBARDIA",
+        "TUTTOCAMPO"
+      ],
+      "match_identity": [
+        "TEAM",
+        "OPPONENT",
+        "DATE",
+        "TIME",
+        "VENUE",
+        "COMPETITION"
+      ],
+      "verified_insights": [
+        "STANDINGS",
+        "RECENT_FORM",
+        "HEAD_TO_HEAD"
+      ],
+      "missing_data": "DATO_IN_AGGIORNAMENTO",
+      "no_prediction": true,
+      "no_invented_stats": true,
+      "source_label_required": true,
+      "actions": [
+        "OPEN_TEAM_HUB",
+        "OPEN_PUBLIC_CALENDAR",
+        "OPEN_VIDEO_ARENA"
+      ]
+    },
+    "team_hub": {
+      "state": "PUBLIC_UI_READY_CALENDAR_DERIVED",
+      "source": "VERIFIED_PUBLIC_CALENDAR_AND_PUBLIC_TEAM_METADATA",
+      "surfaces": [
+        "TEAM_IDENTITY",
+        "NEXT_MATCH",
+        "STANDINGS_WHEN_VERIFIED",
+        "RECENT_FORM_WHEN_VERIFIED",
+        "UPCOMING_PUBLIC_EVENTS"
+      ],
+      "followed_team_preference": "LOCAL_DEVICE_ONLY",
+      "roster": "NO_PRIVATE_ROSTER",
+      "people": "PUBLIC_AUTHORIZED_PROFILES_ONLY",
+      "deep_link_calendar": true
     }
   },
   "research_intelligence": {
