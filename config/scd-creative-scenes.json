@@ -1,0 +1,121 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "SCD_CREATIVE_SCENE_LIBRARY",
+  "club": "S.C.D. ColicoDerviese",
+  "rule": "VISIONARY_BUT_GROUNDED",
+  "scenes": [
+    {
+      "id": "SCENE-COLICO-STADIUM-DAY",
+      "label": "Colico · Stadium & Lake",
+      "usage": [
+        "WEB_16_9",
+        "SOCIAL_4_5",
+        "PARTNER_PRESENTATION"
+      ],
+      "realityAnchor": "Centro Sportivo SCD a Colico, identita sportiva locale, Alto Lario e Lago di Como come contesto territoriale.",
+      "fantasyAllowance": "Luce piu cinematografica, profondita, atmosfera premium e composizione piu ordinata.",
+      "forbidden": [
+        "inventare tribune o strutture come gia esistenti",
+        "inventare numeri di pubblico",
+        "alterare loghi ufficiali"
+      ],
+      "visualDirection": "Blu lago, cielo pulito, giallo SCD come accento, campo e territorio nello stesso frame."
+    },
+    {
+      "id": "SCENE-MATCH-NIGHT",
+      "label": "Match Night · International Club",
+      "usage": [
+        "LED_16_3",
+        "STORY_9_16",
+        "SOCIAL_4_5"
+      ],
+      "realityAnchor": "Partita SCD e impianto sportivo reale.",
+      "fantasyAllowance": "Illuminazione match-night, flare controllati, atmosfera internazionale, energia da grande evento.",
+      "forbidden": [
+        "presentare effetti scenici non installati come dotazione reale",
+        "inventare capienza o pubblico"
+      ],
+      "visualDirection": "Navy profondo, azzurro elettrico, giallo club, luce bordo campo."
+    },
+    {
+      "id": "SCENE-TRIBUNA-LAKE-CONCEPT",
+      "label": "Tribuna · Vista Lago Concept",
+      "usage": [
+        "LED_16_3",
+        "WEB_16_9",
+        "PARTNER_PRESENTATION"
+      ],
+      "realityAnchor": "Colico e il Lago di Como come identita territoriale della societa.",
+      "fantasyAllowance": "Composizione concettuale dalla prospettiva del pubblico con lago e montagne percepibili nel racconto visivo.",
+      "forbidden": [
+        "dichiarare la composizione come fotografia documentaria della vista reale senza verifica",
+        "inventare geometrie dell'impianto"
+      ],
+      "visualDirection": "Punto di vista tribuna, LED a bordo campo, campo in primo piano, lago/montagne come firma atmosferica."
+    },
+    {
+      "id": "SCENE-PARTNER-TERRITORY",
+      "label": "Partner · Territorio",
+      "usage": [
+        "SOCIAL_4_5",
+        "WEB_16_9",
+        "PARTNER_PRESENTATION"
+      ],
+      "realityAnchor": "Imprese locali, comunita SCD, Colico e Alto Lario.",
+      "fantasyAllowance": "Rendere piu elegante la relazione tra imprenditore, club e territorio con composizione editoriale premium.",
+      "forbidden": [
+        "inventare sedi aziendali",
+        "inventare testimonial reali",
+        "usare loghi non approvati"
+      ],
+      "visualDirection": "Persona o attivita protagonista, presenza SCD discreta, territorio come secondo livello."
+    },
+    {
+      "id": "SCENE-FAMILY-TOURNAMENT",
+      "label": "Torneo · Family Experience",
+      "usage": [
+        "SOCIAL_4_5",
+        "STORY_9_16",
+        "EVENT_POSTER"
+      ],
+      "realityAnchor": "Tornei, famiglie, settore giovanile e iniziative SCD.",
+      "fantasyAllowance": "Atmosfera festival sportivo, gazebo, premiazioni e luci enfatizzate come concept.",
+      "forbidden": [
+        "presentare sponsor o strutture non confermate come gia contrattualizzate"
+      ],
+      "visualDirection": "Sport, famiglie, food/hospitality e partner corner in una scena leggibile."
+    },
+    {
+      "id": "SCENE-SPONSOR-WALL",
+      "label": "Media · Sponsor Wall",
+      "usage": [
+        "WALL_3_2",
+        "WEB_16_9",
+        "INTERVIEW"
+      ],
+      "realityAnchor": "Backdrop partner per interviste, premiazioni e contenuti media.",
+      "fantasyAllowance": "Set piu premium, luci pulite, profondita da mixed zone professionale.",
+      "forbidden": [
+        "inventare loghi sponsor",
+        "alterare proporzioni dei marchi ufficiali"
+      ],
+      "visualDirection": "Backdrop modulare blu SCD, loghi su griglia, area intervista pulita."
+    },
+    {
+      "id": "SCENE-CARD-LIFESTYLE",
+      "label": "Community · Card Lifestyle",
+      "usage": [
+        "CARD_1_586",
+        "SOCIAL_4_5",
+        "WEB_16_9"
+      ],
+      "realityAnchor": "Supporter Card, Tesserato Card, convenzioni e community.",
+      "fantasyAllowance": "Mockup premium fisico/digitale, smartphone e scene lifestyle coerenti con territorio e sport.",
+      "forbidden": [
+        "mostrare benefit non formalizzati come gia attivi",
+        "confondere Supporter Card con tessere ufficiali FIGC"
+      ],
+      "visualDirection": "Card protagonista, blu/azzurro/giallo, persone e territorio sfocati sullo sfondo."
+    }
+  ]
+}

@@ -3,17 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#04162f">
+  <meta name="theme-color" content="#041c3a">
   <meta name="description" content="SCD ColicoDerviese Universe: sport, community, servizi e club operations in una sola esperienza digitale.">
-  <meta name="scd-build" content="40.0.0">\n  <meta name="scd-release" content="NG-0.4.5">
+  <meta name="scd-build" content="40.0.0">\n  <meta name="scd-release" content="NG-0.6.0">
   <title>SCD Universe · Next Generation</title>
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./assets/logo-scd.png">
   <link rel="apple-touch-icon" href="./assets/logo-scd.png">
-    <link rel="stylesheet" href="./scd-ng.css?v=0.4.5">
+    <link rel="stylesheet" href="./scd-ng.css?v=0.6.0">
   <link rel="stylesheet" href="./scd-synth.css?v=0.4.5">
 </head>
-<body>
+<body data-scd-theme="arena">
   <div class="ambient ambient-a"></div><div class="ambient ambient-b"></div>
   <div class="app" id="app">
     <header class="topbar">
@@ -112,6 +112,32 @@
         </section>
 
         
+        <section class="sport-superbar" id="sportHub" aria-label="SCD Arena">
+          <div class="sport-superbar-title">
+            <span>SCD ARENA · ONE CLUB APP</span>
+            <b>Il centro sportivo digitale del Club.</b>
+            <small>Matchday, squadre, media, community e servizi in una sola esperienza.</small>
+          </div>
+          <button type="button" data-scroll="#matchCenter"><span>01</span><b>Matchday</b><small>Prossima gara e dati verificati</small></button>
+          <button type="button" data-public-action="calendar"><span>02</span><b>Calendario</b><small>Settimana, 30 giorni, tutto</small></button>
+          <button type="button" data-nav="teams"><span>03</span><b>Squadre</b><small>Trova subito la tua categoria</small></button>
+          <button type="button" id="sportFollowTeam"><span>★</span><b>La mia squadra</b><small id="sportFollowTeamLabel">Scegli e segui una squadra</small></button>
+          <button type="button" data-scroll="#mediaHub"><span>04</span><b>Video & Media</b><small>Highlights e canali ufficiali</small></button>
+          <button type="button" data-scroll="#communityPulse"><span>05</span><b>Community</b><small>Sondaggi e partecipazione</small></button>
+        </section>
+
+        <section class="my-team-deck" id="myTeamDeck" hidden aria-live="polite">
+          <div class="my-team-deck-copy">
+            <span class="eyebrow">LA MIA SQUADRA</span>
+            <h2 id="myTeamName">Squadra seguita</h2>
+            <p id="myTeamMeta">Calendario e prossimi impegni verificati.</p>
+          </div>
+          <div class="my-team-deck-actions">
+            <button type="button" class="btn primary" id="openMyTeamHub">Apri Team Hub</button>
+            <button type="button" class="btn glass" id="openMyTeamCalendar">Calendario squadra</button>
+          </div>
+        </section>
+
         <section class="home-practical-grid">
           <article class="match-center" id="matchCenter">
             <div class="match-center-head"><div><span class="eyebrow">MATCH CENTER</span><h2>Prossima partita</h2></div><span class="verified-state" id="matchVerifiedState">DATI VERIFICATI</span></div>
@@ -125,7 +151,7 @@
               <div><small>FORMA RECENTE</small><b id="matchForm">Dato in aggiornamento</b></div>
               <div><small>SCONTRI DIRETTI</small><b id="matchH2H">Dato in aggiornamento</b></div>
             </div>
-            <div class="match-actions"><button class="btn primary" type="button" id="matchAnalyze">Analizza la partita</button><button class="btn glass" type="button" data-public-action="calendar">Vedi calendario</button></div>
+            <div class="match-actions"><button class="btn primary" type="button" id="matchAnalyze">Apri Matchday</button><button class="btn glass" type="button" data-public-action="calendar">Vedi calendario</button></div>
           </article>
           <section class="upcoming-events" id="upcomingEvents">
             <div class="section-head mini"><div><span class="eyebrow">PROSSIMI 30 GIORNI</span><h2>Eventi e appuntamenti</h2></div><button class="text-btn" type="button" data-public-action="calendar">Calendario →</button></div>
@@ -171,6 +197,26 @@
             </div>
             <span class="status-pill">CANALI UFFICIALI</span>
           </div>
+          <div class="video-arena" id="videoArena">
+            <article class="video-arena-featured">
+              <div class="video-arena-visual" aria-hidden="true"><span class="video-play">▶</span><b>SCD</b></div>
+              <div>
+                <span class="eyebrow">SCD VIDEO ARENA</span>
+                <h3>La partita continua anche dopo il fischio.</h3>
+                <p>Highlights, match content e storytelling passano soltanto da canali ufficiali o contenuti esplicitamente autorizzati.</p>
+                <div class="video-arena-actions">
+                  <a class="btn primary" href="https://www.youtube.com/@S.C.D.ColicoDerviese" target="_blank" rel="noopener noreferrer">Apri YouTube SCD</a>
+                  <a class="btn glass" href="https://www.tiktok.com/@s.c.d..colicoderv" target="_blank" rel="noopener noreferrer">Video brevi</a>
+                </div>
+              </div>
+            </article>
+            <div class="video-arena-grid">
+              <a href="https://www.youtube.com/@S.C.D.ColicoDerviese" target="_blank" rel="noopener noreferrer"><span>▶</span><b>Highlights & partite</b><small>YouTube ufficiale</small></a>
+              <a href="https://www.instagram.com/s.c.d.colicoderviese/" target="_blank" rel="noopener noreferrer"><span>◎</span><b>Reel & backstage</b><small>Instagram ufficiale</small></a>
+              <a href="https://www.tiktok.com/@s.c.d..colicoderv" target="_blank" rel="noopener noreferrer"><span>♪</span><b>Short video</b><small>TikTok ufficiale</small></a>
+              <button type="button" class="video-locked" id="pixellotLocked"><span>◉</span><b>Pixellot</b><small>Archivio privato · staff autorizzato</small></button>
+            </div>
+          </div>
           <div class="official-channels">
             <a class="channel-card" href="https://www.colicoderviese.it/" target="_blank" rel="noopener noreferrer"><span>WWW</span><b>Sito ufficiale</b><small>Comunicazioni e servizi pubblici</small></a>
             <a class="channel-card" href="https://www.facebook.com/ColicoDerviese" target="_blank" rel="noopener noreferrer"><span>f</span><b>Facebook</b><small>Pagina ufficiale SCD</small></a>
@@ -206,6 +252,26 @@
           <span>PARTNER SCD</span><div class="partner-marquee" id="verifiedPartners"><b>Partner verificati · sincronizzazione fonte</b></div><button type="button" data-join="PARTNER">Diventa partner →</button>
         </section>
 
+
+        <section class="public-partner-hub" id="partnerCommunityHub">
+          <div class="public-partner-copy">
+            <span class="eyebrow">SCD PARTNER & COMMUNITY HUB</span>
+            <h2>Dal Lago di Como, <em>un Club che connette.</em></h2>
+            <p>Sport, aziende, famiglie e territorio nello stesso ecosistema. Le opportunità commerciali diventano servizi, benefit, eventi, contenuti e relazioni misurabili.</p>
+            <div class="public-partner-actions">
+              <a class="btn primary" href="./sponsor/">Scopri Partner SCD</a>
+              <a class="btn glass" href="./sponsor/#ledwall">LEDWall Matchday</a>
+            </div>
+          </div>
+          <div class="public-partner-modules">
+            <a href="./sponsor/#ledwall"><span>01</span><b>LEDWall</b><small>Spot su misura · bordo campo · camera view</small></a>
+            <a href="./sponsor/#convenzioni"><span>02</span><b>Convenzioni</b><small>Benefit verificati per community e territorio</small></a>
+            <button type="button" data-join="FAN"><span>03</span><b>Supporter Card</b><small>Appartenenza, vantaggi e iniziative SCD</small></button>
+            <button type="button" data-scroll="#mediaHub"><span>04</span><b>Media Hub</b><small>Video, canali ufficiali e match content</small></button>
+            <a href="./sponsor/?login=1"><span>05</span><b>Partner Area</b><small>CRM, materiali, attivazioni e documenti</small></a>
+            <a href="./sponsor/#opportunita"><span>06</span><b>Asset & Eventi</b><small>Tornei, gazebo, strutture e progetti</small></a>
+          </div>
+        </section>
 
         <section class="institutional-strip" id="institutionalStrip">
           <div class="institutional-copy">
@@ -305,6 +371,7 @@
           <div class="teams-toolbar">
             <label class="core-search"><span>⌕</span><input id="teamsSearch" type="search" autocomplete="off" placeholder="Cerca squadra o categoria…"></label>
             <label class="teams-category">Categoria<select id="teamsCategoryFilter"><option value="ALL">Tutte</option></select></label>
+            <div class="follow-team-control"><label for="followTeamSelect">La mia squadra</label><div><select id="followTeamSelect"><option value="">Scegli squadra</option></select><button type="button" id="saveFollowTeam">★ Segui</button></div><small>Preferenza salvata solo su questo dispositivo.</small></div>
           </div>
           <div class="teams-summary"><b id="teamsCount">0 squadre</b><span>Calendario e prossimi impegni pubblici</span></div>
           <div class="public-teams-grid" id="publicTeamsGrid">
@@ -364,14 +431,14 @@
 
       <section class="view" id="view-desk" data-view="desk">
         <section class="desk-hero">
-          <div><span class="eyebrow">PRIVATE DESK</span><h2>Dimmi cosa devi fare.<br>Non dove hai salvato il file.</h2><p>Il sistema deve trasformare Drive, Gmail, fogli e dati federali in azioni, scadenze e decisioni. Il contrario sarebbe troppo semplice da sbagliare.</p></div>
+          <div><span class="eyebrow">PRIVATE DESK</span><h2 id="deskHeroTitle">Dimmi cosa devi fare.<br>Non dove hai salvato il file.</h2><p id="deskHeroCopy">Il sistema deve trasformare Drive, Gmail, fogli e dati federali in azioni, scadenze e decisioni. Il contrario sarebbe troppo semplice da sbagliare.</p></div>
           <button class="btn primary" id="openMirrorDesk">Chiedi a SCD Mirror</button>
         </section>
         <div class="desk-grid">
-          <section class="action-queue"><div class="section-head mini"><div><span class="eyebrow">DA GESTIRE</span><h3>Priorità operative</h3></div><span class="status-pill">ROLE / SCOPE</span></div><div id="actionQueue"><article><span>1</span><div><b>Fonte non ancora collegata</b><small>Le priorità compariranno dopo autenticazione e scope reale.</small></div></article></div></section>
+          <section class="action-queue"><div class="section-head mini"><div><span class="eyebrow">DA GESTIRE</span><h3>Priorità operative</h3></div><span class="status-pill" id="deskScopeStatus">ROLE / SCOPE</span></div><div id="actionQueue"><article><span>1</span><div><b>Fonte non ancora collegata</b><small>Le priorità compariranno dopo autenticazione e scope reale.</small></div></article></div></section>
           <section class="desk-map"><div class="section-head mini"><div><span class="eyebrow">CLUB GRAPH</span><h3>Il club come rete viva</h3></div></div><div class="graph"><span class="node center">SCD</span><span class="node n1">PERSONE</span><span class="node n2">SQUADRE</span><span class="node n3">EVENTI</span><span class="node n4">DOCUMENTI</span><span class="node n5">SPONSOR</span><span class="node n6">TRASPORTI</span></div></section>
         </div>
-        <section class="service-dock">
+        <section class="service-dock" id="deskServiceDock">
           <button><span>▣</span><b>Calendario</b><small>Squadre · gare · attività</small></button>
           <button><span>✓</span><b>Convocazioni</b><small>Invia · raccogli risposte</small></button>
           <button><span>⌁</span><b>Trasporti</b><small>Pulmini · punti · richieste</small></button>
@@ -419,7 +486,7 @@
   <script src="./scd-meta-engine.js?v=40.0.0" defer></script>
   <script src="./scd-experience-engine.js?v=40.0.0" defer></script>
   <script src="./scd-twin.js?v=40.0.0" defer></script>
-  <script src="./scd-ng.js?v=0.4.5" defer></script>
+  <script src="./scd-ng.js?v=0.6.0" defer></script>
   <script src="./scd-interactions.js?v=0.4.5" defer></script>
 </body>
 </html>

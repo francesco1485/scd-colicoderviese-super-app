@@ -1,11 +1,159 @@
 
+const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const initials=n=>n.split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase();
+let sponsorAccess={profile:'NON_AUTORIZZATO',platform:false};
+let sponsorSession={user:null,capabilities:{}};
+let partnerHubCurrent='';
+let campaignFilter='TUTTI';
+let motionProfilesState={profiles:[],previewSource:null,nativeLedStatus:'DA_RILEVARE_ALLA_CONSEGNA'};
+let motionProfileCurrent='';
+let motionConfigPromise=null;
+let creativeSceneState={scenes:[]};
+let creativeScenePromise=null;
+
+function fetchMotionConfig(){
+  if(!motionConfigPromise){
+    motionConfigPromise=fetch('/api/sponsor/motion-profiles',{credentials:'same-origin',cache:'no-store'})
+      .then(async r=>{if(!r.ok)throw new Error('MOTION_PROFILES_HTTP_'+r.status);const d=await r.json();if(!d?.data?.profiles)throw new Error('MOTION_PROFILES_INVALID');return d.data})
+      .catch(e=>{motionConfigPromise=null;throw e});
+  }
+  return motionConfigPromise;
+}
+
+function fetchCreativeScenes(){
+  if(!creativeScenePromise){
+    creativeScenePromise=fetch('/api/sponsor/creative-scenes',{credentials:'same-origin',cache:'no-store'})
+      .then(async r=>{if(!r.ok)throw new Error('CREATIVE_SCENES_HTTP_'+r.status);const d=await r.json();if(!d?.data?.scenes)throw new Error('CREATIVE_SCENES_INVALID');return d.data})
+      .catch(e=>{creativeScenePromise=null;throw e});
+  }
+  return creativeScenePromise;
+}
+function creativeSceneById(id){
+  return (creativeSceneState.scenes||[]).find(x=>x.id===id)||creativeSceneState.scenes?.[0]||null;
+}
+function renderActivationSceneGuide(){
+  const box=$('#activationSceneGuide');if(!box)return;
+  const scene=creativeSceneById(activationValue('#activationScene',''));
+  if(!scene){
+    box.innerHTML='<small>SCENE LIBRARY</small><span>Nessuna scena disponibile.</span>';
+    return;
+  }
+  box.innerHTML=
+    '<small>'+esc(scene.label)+'</small>'+
+    '<strong>'+esc(scene.visualDirection)+'</strong>'+
+    '<span><b>Realtà:</b> '+esc(scene.realityAnchor)+'</span>'+
+    '<span><b>Creatività:</b> '+esc(scene.fantasyAllowance)+'</span>'+
+    '<span><b>Non rappresentare come reale:</b> '+esc((scene.forbidden||[]).join(' · '))+'</span>';
+}
+function renderActivationSceneOptions(){
+  const sel=$('#activationScene');if(!sel)return;
+  const current=sel.value;
+  sel.innerHTML=(creativeSceneState.scenes||[]).map(x=>'<option value="'+esc(x.id)+'">'+esc(x.label)+'</option>').join('');
+  if(current&&[...sel.options].some((o,i)=>o.value===current?(sel.selectedIndex=i,true):false)){}
+  renderActivationSceneGuide();
+}
+async function loadCreativeScenes(){
+  try{
+    creativeSceneState=await fetchCreativeScenes();
+    renderActivationSceneOptions();
+    renderActivationStudio();
+  }catch(e){
+    const box=$('#activationSceneGuide');if(box)box.innerHTML='<small>SCENE LIBRARY</small><span>Scene Library non disponibile: '+esc(e.message||e)+'</span>';
+  }
+}
+
+function applySponsorCapabilities(caps={}){
+  sponsorAccess={...sponsorAccess,...caps};
+  const profile=String(sponsorAccess.profile||'ACCESSO AUTORIZZATO').replaceAll('_',' ');
+  document.documentElement.dataset.sponsorProfile=String(sponsorAccess.profile||'').toLowerCase();
+  const roleEl=$('#sessionRole');
+  if(roleEl)roleEl.dataset.profile=profile;
+  const gates={
+    settings:'settings'
+  };
+  Object.entries(gates).forEach(([view,cap])=>{
+    const allowed=sponsorAccess[cap]===true;
+    $$('[data-view="'+view+'"]').forEach(el=>{el.hidden=!allowed;el.setAttribute('aria-hidden',String(!allowed))});
+    const section=$('#view-'+view);
+    if(section&&!allowed)section.hidden=true;
+  });
+}
+
+function motionStatusLabel(status=''){
+  if(status==='TEMPLATE')return 'TEMPLATE';
+  if(status.includes('DA_RIVEDERE'))return 'DA RIVEDERE';
+  return String(status||'DA VERIFICARE').replaceAll('_',' ');
+}
+function renderMotionInspector(id){
+  const box=$('#motionInspector');if(!box)return;
+  const p=motionProfilesState.profiles.find(x=>x.id===id)||motionProfilesState.profiles[0];
+  if(!p){box.innerHTML='<small>MOTION PROFILE</small><h3>Nessun profilo disponibile</h3>';return}
+  motionProfileCurrent=p.id;
+  const spec=motionProfilesState.previewSource||motionProfilesState.defaultPreview||{};
+  box.innerHTML=
+    '<small>MOTION PROFILE · '+esc(p.id)+'</small>'+
+    '<h3>'+esc(p.partnerName)+'</h3>'+
+    '<div class="motion-inspector-status"><span class="status-badge orange">'+esc(motionStatusLabel(p.productionStatus))+'</span><span class="status-badge '+(p.logoAssetStatus==='MISSING_OFFICIAL_REPO_ASSET'?'red':'blue')+'">'+esc(p.logoAssetStatus.replaceAll('_',' '))+'</span></div>'+
+    '<div class="motion-spec-row"><span><b>'+esc(spec.width||'—')+'×'+esc(spec.height||'—')+'</b><small>preview</small></span><span><b>'+esc(spec.fps||'—')+' fps</b><small>frame rate</small></span><span><b>'+esc(spec.durationSeconds||'—')+' sec</b><small>durata</small></span></div>'+
+    '<dl class="motion-detail-list">'+
+      '<div><dt>Messaggio</dt><dd>'+esc(p.message)+'</dd></div>'+
+      '<div><dt>Movimento</dt><dd>'+esc(p.motionConcept)+'</dd></div>'+
+      '<div><dt>Vista tribuna</dt><dd>'+esc(p.stadiumView)+'</dd></div>'+
+      '<div><dt>Camera-safe</dt><dd>'+esc(p.cameraView)+'</dd></div>'+
+      '<div><dt>Identità SCD / Lago</dt><dd>'+esc(p.lakeIdentity)+'</dd></div>'+
+    '</dl>'+
+    '<div class="motion-proof"><small>PROOF PLAN</small>'+p.proofPlan.map(x=>'<span>'+esc(x)+'</span>').join('')+'</div>'+
+    '<div class="motion-inspector-actions"><button class="btn-yellow" id="motionToActivation">Crea attivazione</button><button class="btn-light" data-view="media">Apri LED</button>'+(p.crmStakeholderId?'<button class="btn-light" id="motionOpenCrm">Apri CRM</button>':'')+'</div>'+
+    '<p class="motion-safety-note">Il master LED definitivo resta bloccato finché non sono disponibili logo ufficiale approvato e specifiche native dell’impianto.</p>';
+  $$('[data-motion-id]').forEach(el=>el.classList.toggle('active',el.dataset.motionId===p.id));
+  const go=$('#motionToActivation');if(go)go.onclick=()=>openView('activationstudio');
+  const mediaBtn=box.querySelector('[data-view="media"]');if(mediaBtn)mediaBtn.onclick=()=>{ledMotionSelected=p.id;openView('media');renderLedProfileList();renderLedProfileDetail();};
+  const crmBtn=$('#motionOpenCrm');if(crmBtn)crmBtn.onclick=()=>{openView('crm');openCrmProfile(p.crmStakeholderId);};
+}
+function renderMotionProfiles(){
+  const grid=$('#motionProfileGrid'),state=$('#motionSystemState');
+  if(!grid)return;
+  const rows=motionProfilesState.profiles||[];
+  if(state)state.textContent=rows.length+' profili · LED nativo '+String(motionProfilesState.nativeLedStatus||'DA RILEVARE').replaceAll('_',' ').toLowerCase();
+  grid.innerHTML=rows.map((p,i)=>
+    '<button class="motion-profile-card '+(i===0?'active':'')+'" data-motion-id="'+esc(p.id)+'" type="button">'+
+      '<div class="motion-card-top"><span>'+String(i+1).padStart(2,'0')+'</span><b>'+esc(p.partnerName)+'</b></div>'+
+      '<div class="motion-card-preview"><i></i><strong>'+esc(p.message)+'</strong><small>'+esc(motionStatusLabel(p.productionStatus))+'</small></div>'+
+      '<div class="motion-card-foot"><span>'+esc(((motionProfilesState.previewSource||motionProfilesState.defaultPreview)?.durationSeconds||'—')+' sec')+'</span><span>'+esc(((motionProfilesState.previewSource||motionProfilesState.defaultPreview)?.fps||'—')+' fps')+'</span></div>'+
+    '</button>'
+  ).join('');
+  $$('[data-motion-id]').forEach(btn=>btn.onclick=()=>renderMotionInspector(btn.dataset.motionId));
+  renderMotionInspector(motionProfileCurrent||rows[0]?.id||'');
+}
+async function loadMotionProfiles(){
+  try{
+    const data=await fetchMotionConfig();
+    motionProfilesState=data;
+    ledMotionConfig=data;
+    renderMotionProfiles();
+    renderLedProductionSpecs();
+    renderLedProfileList();
+    renderLedProfileDetail();
+  }catch(e){
+    const state=$('#motionSystemState');if(state)state.textContent='Motion Lab non disponibile';
+    const grid=$('#motionProfileGrid');if(grid)grid.innerHTML='<div class="motion-load-error">Impossibile caricare i profili motion: '+esc(e.message||e)+'</div>';
+  }
+}
+
 async function loadSponsorSession(){
   try{
     const r=await fetch('/api/sponsor/session',{credentials:'same-origin',cache:'no-store'});
     if(!r.ok)throw new Error('SESSION_REQUIRED');
     const d=await r.json();
+    sponsorSession=d;
     if($('#sessionName'))$('#sessionName').textContent=d.user?.name||d.user?.email||'Area riservata';
-    if($('#sessionRole'))$('#sessionRole').textContent=(d.user?.role||'Accesso autorizzato')+(d.isDirection?' · Direzione':'');
+    applySponsorCapabilities(d.capabilities||{});
+    const profile=String(d.capabilities?.profile||'ACCESSO AUTORIZZATO').replaceAll('_',' ');
+    if($('#sessionRole'))$('#sessionRole').textContent=(d.user?.role||'Accesso autorizzato')+' · '+profile;
+    loadMotionProfiles();
+    loadCreativeScenes();
+    loadConventions();
   }catch(e){
     location.replace('/sponsor/?login=1');
   }
@@ -16,9 +164,6 @@ if($('#sponsorLogout'))$('#sponsorLogout').onclick=async()=>{
 };
 loadSponsorSession();
 
-const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
-const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-const initials=n=>n.split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase();
 
 const ICONS={
 home:'<svg viewBox="0 0 24 24"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>',
@@ -59,16 +204,15 @@ const proposals=[
 {name:'Caffè Teti',area:'Coffee Partner / Club House',status:'Positivo',next:'Sopralluogo + proposta finale',value:'Fornitura / valore da definire'},
 {name:'VIP Immagine',area:'Cartellonistica / sponsor board',status:'Positivo',next:'Telefonare + mappa spazi',value:'Da definire'},
 {name:"McDonald's territoriale",area:'Convenzione tesserati',status:'Da formalizzare',next:'Formalizzare convenzione 10%',value:'Benefit community'},
-{name:'La Roncaiola',area:'Lavanderia tecnica',status:'Interessata',next:'Definire volumi e frequenza',value:'Da definire'},
-{name:'Bonazzi Grafica',area:'Grafica / stampa',status:'Interessata',next:'Fabbisogno annuo + barter',value:'Barter / fornitura'},
+{name:'La Roncaiola',area:'Lavanderia tecnica',status:'SOSPESA · NON INVIARE',next:'Attendere riattivazione Direzione',value:'Da definire'},
+{name:'Bonazzi Grafica',area:'Grafica / stampa',status:'SOSPESA · NON INVIARE',next:'Attendere riattivazione Direzione',value:'Barter / fornitura'},
 {name:'Therabody',area:'Recovery Partner',status:'Instradato B2B',next:'Compilare form partnership',value:'Da definire'}
 ];
 
 
-const conventions=[
-{name:"McDonald's territoriale",status:"IN ATTIVAZIONE",benefit:"10% su tutti i prodotti secondo proposta ricevuta",who:"Tesserati / staff, perimetro finale da confermare",how:"Tessera valida alla cassa",where:"Colico / Villa di Tirano; area franchisee Sondrio-Castione da confermare",contact:"Sebastiano Beccalli",next:"Definire formato tessere, punti vendita e formalizzazione",source:"Gmail 1a0c6d258cbeace6"},
-{name:"La Piadineria",status:"PRONTA PER FORMALIZZAZIONE",benefit:"10% con badge/lettera · 12% con Carta Mondo Piada o app",who:"Community SCD da definire nell'accordo",how:"Badge/lettera oppure Carta Mondo Piada/app",where:"Piantedo · Lecco · Castione Andevenno + punti aderenti online",contact:"Annaclara Rossi",next:"Confermare interesse e ricevere lettera convenzione da firmare",source:"Gmail 1a0c32e969d98f3c"}
-];
+let conventions=[];
+let communityState={sourceMode:'LOADING',sourceTable:'CONVENZIONI_MASTER',generatedAt:'',fallbackReason:''};
+
 
 const suppliers=[
 {name:"Fratelli Trussoni S.r.l.",position:"€695,86",paid:"€0",residual:"€695,86",email:"stefano.libera@trussoni.it",potential:"DA VALUTARE",next:"Ricostruire fatture 2024-2026 e referente commerciale"},
@@ -90,7 +234,14 @@ const commercialInitiatives=[
 {name:"ColicoDerviese Card · Partner",type:"CARD / B2B",status:"DA MODELLARE",target:"Sponsor, partner, aziende",goal:"Hospitality, network e benefit B2B",next:"Definire livelli partner e collegamento dossier sponsor"},
 {name:"Tessera Tifoso / Community",type:"MEMBERSHIP",status:"IDEA DA STRUTTURARE",target:"Tifosi e territorio",goal:"Trasformare pubblico occasionale in community misurabile",next:"Evitare duplicazione con Card Sostenitore"},
 {name:"Spot LED Sponsor 40 secondi",type:"MEDIA / SPONSOR",status:"IN PRODUZIONE",target:"Sponsor attuali e futuri",goal:"Spot dedicato, leggibile, un solo sponsor protagonista",next:"Creare master, sottoporre idea e produrre MP4 dopo approvazione"},
-{name:"Torneo nazionale 2019 · 09/05/2027",type:"EVENTO / SPONSOR",status:"DA CONFERMARE",target:"Squadre, famiglie, aziende, territorio",goal:"Sport, musica, degustazioni e asset commerciali",next:"Definire format, capacità, pacchetti e rete ricettiva"}
+{name:"Torneo nazionale 2019 · 09/05/2027",type:"EVENTO / SPONSOR",status:"DA CONFERMARE",target:"Squadre, famiglie, aziende, territorio",goal:"Sport, musica, degustazioni e asset commerciali",next:"Definire format, capacità, pacchetti e rete ricettiva"},
+{name:"Video Partner / Match Content",type:"MEDIA / VIDEO",status:"IDEA DA STRUTTURARE",target:"Sponsor e partner media",goal:"Valorizzare partite, highlight e clip SCD nel rispetto dei diritti Pixellot",next:"Definire diritti, formati, inventory e proof di delivery"},
+{name:"Merchandising SCD",type:"MERCHANDISING / COMMUNITY",status:"IDEA DA STRUTTURARE",target:"Tifosi, famiglie, tesserati",goal:"Prodotti ufficiali, gadget e capsule partner",next:"Definire gamma, costi, margini, produzione e canale vendita"},
+{name:"Gazebo & Partner Corner",type:"EVENTO / ATTIVAZIONE",status:"IDEA DA VALIDARE",target:"Sponsor, fornitori, convenzioni",goal:"Presenza fisica utile durante tornei, open day e giornate community",next:"Definire spazi, sicurezza, servizi e regole evento"},
+{name:"Strutture brandizzate",type:"IMPIANTO / SPONSOR",status:"IDEA DA STUDIARE",target:"Sponsor pluriennali / territoriali",goal:"Associare partner a spazi reali con presenza continuativa",next:"Censire aree, misure, esclusività, durata e proof fotografico"},
+{name:"Mascotte Partner",type:"FAMILY / ATTIVAZIONE",status:"IDEA DA VALIDARE",target:"Brand family-friendly",goal:"Divisa mascotte, pre-gara, foto, eventi e contenuti community",next:"Definire inventory, frequenza e regole di utilizzo"},
+{name:"Sublimated Kit Partner",type:"KIT / SPONSOR",status:"IDEA DA STUDIARE",target:"Sponsor territoriali / tecnici",goal:"Posizioni integrate su divise sublimatiche e pacchetti multi-canale",next:"Censire posizioni libere e compatibilità tecnica/regolamentare"},
+{name:"Partner Hub Web App SCD",type:"DIGITALE / B2B",status:"IN SVILUPPO",target:"Sponsor, convenzioni e partner",goal:"Schede partner, progetti, benefit, contenuti e proof di delivery",next:"Collegare catalogo pubblico, CRM e stato erogazione"}
 ];
 
 const audience=[
@@ -115,7 +266,17 @@ const assets=[
 ['LED bordo campo','Media','Disponibile','Da definire'],
 ['Divise settore giovanile','Kit tecnico','Parziale','€1.500'],
 ['Sport Tourism Network','Turismo','In sviluppo','Da definire'],
-['Performance & Recovery Center','Performance','Da studiare','Da definire']
+['Performance & Recovery Center','Performance','Da studiare','Da definire'],
+['Divise sublimatiche','Kit / visibilità','Da censire per posizioni','Da definire'],
+['Striscioni & cartellonistica','Impianto','Da censire','Da definire'],
+['Gazebo / Partner Corner','Evento','In sviluppo','Da definire'],
+['Strutture brandizzate','Impianto','In sviluppo','Da definire'],
+['Mascotte Partner','Family / attivazione','In sviluppo','Da definire'],
+['Pixellot & Match Content','Media / video','Da strutturare','Da definire'],
+['Merchandising SCD','Community / retail','Da strutturare','Da definire'],
+['Carta Tifoso / Sostenitore','Membership','Da modellare','Da definire'],
+['Carta Tesserato','Community / servizi','Da modellare','Da definire'],
+['Partner Hub Web App','Digitale','In sviluppo','Da definire']
 ];
 
 const led=[
@@ -144,6 +305,301 @@ const folders=['Contratti','Proposte','Loghi ufficiali','Foto','Video & LED','Em
 const tags=['@Direzione','@Commerciale','@Amministrazione','@Marketing','@Eventi','@Segreteria'];
 const pollOptions=[['led','LED & Media'],['eventi','Tornei & Eventi'],['conv','Convenzioni famiglie'],['club','Club House & Hospitality']];
 
+const campaignModules=[
+  {name:'LEDWall Matchday',channel:'LED',status:'IN PRODUZIONE',visual:'Bordo campo · playlist sponsor',desc:'Spot dedicati, rotazione programmata, camera view e proof di presenza.'},
+  {name:'Social Partner Story',channel:'SOCIAL',status:'DA MODELLARE',visual:'Story · reel · post',desc:'Format coordinati per raccontare il partner senza perdere l’identità SCD.'},
+  {name:'Torneo Brandizzato',channel:'EVENTO',status:'DISPONIBILE SU FORMAT APPROVATI',visual:'Title sponsor · hospitality',desc:'Naming, gazebo, premiazioni, contenuti e presenza fisica durante il torneo.'},
+  {name:'Gazebo & Partner Corner',channel:'EVENTO',status:'IN SVILUPPO',visual:'Attivazione sul territorio',desc:'Spazio azienda per eventi, open day e giornate community.'},
+  {name:'Struttura Brandizzata',channel:'STRUTTURA',status:'IN SVILUPPO',visual:'Club House · dehor · area gioco',desc:'Presenza continuativa collegata a uno spazio reale e approvato.'},
+  {name:'Partner Hub Web App',channel:'DIGITALE',status:'IN SVILUPPO',visual:'Profilo · convenzioni · proof',desc:'Una presenza digitale collegata a progetto, relazione e materiali erogati.'},
+  {name:'Supporter Card Benefit',channel:'DIGITALE',status:'DA MODELLARE',visual:'Card · convenzione · community',desc:'Benefit verificati, riconoscimento digitale e relazione con il territorio.'},
+  {name:'Sponsor Wall / Interview',channel:'STRUTTURA',status:'PROGETTO',visual:'Backdrop · media · premiazioni',desc:'Sistema modulare per interviste, conferenze, premiazioni e contenuti sponsor.'}
+];
+
+const territoryModules={
+  centro:{
+    kicker:'HOME OF SCD',
+    title:'Centro Sportivo · Via Lido · Colico',
+    text:'Il cuore operativo della società: campo, tribuna, Club House, LEDWall, attività sportive e momenti di relazione. Ogni asset commerciale deve partire da uno spazio reale e censito.',
+    facts:['Campo & tribuna','Club House','LEDWall','Eventi SCD'],
+    action:'media',actionLabel:'Apri Matchday & Media'
+  },
+  matchday:{
+    kicker:'MATCHDAY EXPERIENCE',
+    title:'La partita diventa una piattaforma di relazione.',
+    text:'Bordo campo, LED, pubblico, famiglie, hospitality e contenuti possono essere coordinati in un unico progetto sponsor, con proof e report.',
+    facts:['LED playlist','Tribuna','Hospitality','Proof sponsor'],
+    action:'activationstudio',actionLabel:'Crea attivazione Matchday'
+  },
+  community:{
+    kicker:'SCD COMMUNITY',
+    title:'Famiglie, tesserati e sostenitori al centro.',
+    text:'Card, convenzioni, eventi, merchandising e servizi trasformano la partnership in un vantaggio concreto per la community.',
+    facts:['Supporter Card','Tesserato Card','Convenzioni','Eventi'],
+    action:'convenzioni',actionLabel:'Apri Benefit Network'
+  },
+  business:{
+    kicker:'PARTNER NETWORK',
+    title:'Le imprese del territorio dentro un percorso vero.',
+    text:'Prospect, sponsor, fornitori e partner vengono gestiti nel CRM con storico, referente, proposta, attività, documenti e prossima azione.',
+    facts:['CRM 360°','Partner Hub','Follow-up','Rinnovi'],
+    action:'crm',actionLabel:'Apri CRM 360°'
+  },
+  lake:{
+    kicker:'COLICO · ALTO LARIO',
+    title:'Lago di Como, sport e territorio nella stessa storia.',
+    text:'Il contesto di Colico e dell’Alto Lario può dare valore a hospitality, turismo sportivo, eventi e partnership coerenti con il territorio, senza trasformare il lago in una semplice cartolina.',
+    facts:['Colico','Alto Lario','Hospitality','Sport tourism'],
+    action:'campaigns',actionLabel:'Apri Campaign Studio'
+  },
+  media:{
+    kicker:'MEDIA & CAMERA VIEW',
+    title:'Dal campo alle immagini della partita.',
+    text:'LEDWall, sponsor wall, Pixellot e contenuti autorizzati devono essere progettati insieme: leggibilità, camera view, clip e prova della presenza.',
+    facts:['LED camera-safe','Sponsor Wall','Pixellot','Delivery report'],
+    action:'mediahub',actionLabel:'Apri Media Hub'
+  }
+};
+let territoryCurrent='centro';
+
+
+function partnerHubRecords(){
+  const rows=sponsors.map(s=>({...s,crmId:'',source:'DOSSIER'}));
+  const crmRows=Array.isArray(crmState?.rows)?crmState.rows:[];
+  crmRows.forEach(r=>{
+    const hay=[r.type,r.category,r.area,r.tags,r.relationshipStatus].join(' ').toLowerCase();
+    if(!/sponsor|partner|fornitor|azienda|prospect|convenzion|commercial/.test(hay))return;
+    const idx=rows.findIndex(x=>x.name.trim().toLowerCase()===String(r.name||'').trim().toLowerCase());
+    const current=idx>=0?rows[idx]:{};
+    const merged={
+      ...current,
+      name:r.name||current.name||'Profilo CRM',
+      sector:[r.category,r.area].filter(Boolean).join(' · ')||current.sector||'Relazione territoriale',
+      status:r.relationshipStatus||current.status||'CRM',
+      value:r.relationshipValue||current.value||'Da verificare',
+      period:current.period||'Periodo da verificare',
+      asset:current.asset||(Number(r.opportunities||0)>0?String(r.opportunities)+' opportunità collegate':'Asset da collegare'),
+      next:r.nextAction||current.next||'Prossima azione da definire',
+      contact:r.email||r.phone||current.contact||'Referente da verificare',
+      crmId:r.id||'',
+      contactPolicy:r.contactPolicy||'',
+      openTasks:Number(r.openTasks||0),
+      touchpoints:Number(r.touchpoints||0),
+      opportunities:Number(r.opportunities||0),
+      source:'CRM'
+    };
+    if(idx>=0)rows[idx]=merged; else rows.push(merged);
+  });
+  return rows.sort((a,b)=>String(a.name).localeCompare(String(b.name),'it'));
+}
+function syncActivationPartnersFromCrm(){
+  const sel=$('#activationSponsor');if(!sel)return;
+  const existing=new Set([...sel.options].map(o=>o.text.trim().toLowerCase()));
+  partnerHubRecords().forEach(r=>{
+    const key=String(r.name||'').trim().toLowerCase();
+    if(!key||existing.has(key))return;
+    const o=document.createElement('option');o.textContent=r.name;sel.appendChild(o);existing.add(key);
+  });
+}
+
+function partnerJourneyFor(s){
+  const status=String(s.status||'').toUpperCase();
+  const asset=String(s.asset||'');
+  const next=String(s.next||'');
+  const agreementOk=/DOCUMENTATO|PARTNER TECNICO/.test(status);
+  const assetOk=!!asset&&!/DA RICOSTRUIRE|DA VERIFICARE|DA DEFINIRE/i.test(asset);
+  const renewal=/RINNOVO|UPGRADE/.test(next.toUpperCase());
+  return [
+    {n:'01',label:'RELAZIONE',state:'CENSITA',cls:'done'},
+    {n:'02',label:'ACCORDO',state:agreementOk?'DOCUMENTATO':'DA VERIFICARE',cls:agreementOk?'done':'attention'},
+    {n:'03',label:'ASSET',state:assetOk?'IDENTIFICATO':'DA COMPLETARE',cls:assetOk?'done':'attention'},
+    {n:'04',label:'PROOF',state:'DA CARICARE',cls:'pending'},
+    {n:'05',label:'REPORT',state:'DA PRODURRE',cls:'pending'},
+    {n:'06',label:'RINNOVO',state:renewal?'IN PREPARAZIONE':'DA PROGRAMMARE',cls:renewal?'active':'pending'}
+  ];
+}
+async function hydratePartnerHubDetail(record){
+  const bar=$('#partnerHubEvidence');if(!bar)return;
+  if(!record?.crmId){
+    bar.innerHTML='<span><b>'+String(record?.touchpoints||0)+'</b><small>touchpoint</small></span><span><b>'+String(record?.openTasks||0)+'</b><small>attività</small></span><span><b>'+String(record?.opportunities||0)+'</b><small>opportunità</small></span><span><b>—</b><small>accordi</small></span>';
+    return;
+  }
+  const expected=record.name;
+  bar.classList.add('loading');
+  try{
+    const data=await crmApi(record.crmId);
+    if(partnerHubCurrent!==expected)return;
+    const tps=Array.isArray(data.touchpoints)?data.touchpoints:[];
+    const tasks=Array.isArray(data.tasks)?data.tasks:[];
+    const opps=Array.isArray(data.opportunities)?data.opportunities:[];
+    const agreements=Array.isArray(data.agreements)?data.agreements:[];
+    bar.innerHTML=[
+      [tps.length,'touchpoint'],
+      [tasks.filter(t=>String(t.STATO||'').toUpperCase()!=='FATTO').length,'attività aperte'],
+      [opps.length,'opportunità'],
+      [agreements.length,'accordi']
+    ].map(x=>'<span><b>'+esc(x[0])+'</b><small>'+esc(x[1])+'</small></span>').join('');
+    const agreement=agreements[0]||null;
+    if(agreement){
+      const value=agreement['VALORE €'];
+      if((!record.value||/DA VERIFICARE/i.test(record.value))&&value!==''&&value!=null)$('#partnerHubValue').textContent='€ '+String(value);
+      if((!record.asset||/DA RICOSTRUIRE|DA VERIFICARE/i.test(record.asset))&&agreement['ASSET PROMESSI'])$('#partnerHubAsset').textContent=agreement['ASSET PROMESSI'];
+    }
+  }catch(e){
+    if(partnerHubCurrent===expected)bar.innerHTML='<span class="wide"><b>Dati dettaglio non disponibili</b><small>'+esc(e.message||'CRM detail error')+'</small></span>';
+  }finally{
+    bar.classList.remove('loading');
+  }
+}
+
+function renderPartnerHub(){
+  const sel=$('#partnerHubSelect'); if(!sel) return;
+  const records=partnerHubRecords();
+  if(!partnerHubCurrent) partnerHubCurrent=records[0]?.name||'';
+  sel.innerHTML=records.map(s=>'<option value="'+esc(s.name)+'">'+esc(s.name)+(s.source==='CRM'?' · CRM':'')+'</option>').join('');
+  if(!records.some(s=>s.name===partnerHubCurrent)) partnerHubCurrent=records[0]?.name||'';
+  sel.value=partnerHubCurrent;
+  const s=records.find(x=>x.name===partnerHubCurrent);
+  if(!s)return;
+  $('#partnerHubName').textContent=s.name;
+  $('#partnerHubMeta').textContent=[s.sector,s.type,s.source==='CRM'?'Profilo CRM sincronizzato':'Dossier commerciale'].filter(Boolean).join(' · ');
+  $('#partnerHubStatus').textContent=s.status;
+  $('#partnerHubPeriod').textContent=s.period||'Periodo da verificare';
+  $('#partnerHubValue').textContent=s.value||'Da verificare';
+  $('#partnerHubAsset').textContent=s.asset||'Da ricostruire';
+  $('#partnerHubNext').textContent=s.next||'Da definire';
+  $('#partnerHubContact').textContent=s.contact||'Da verificare';
+  const journey=$('#partnerHubJourney');
+  if(journey)journey.innerHTML=partnerJourneyFor(s).map(x=>
+    '<article class="journey-step '+x.cls+'"><span>'+x.n+'</span><div><small>'+x.label+'</small><b>'+esc(x.state)+'</b></div></article>'
+  ).join('');
+  sel.onchange=()=>{partnerHubCurrent=sel.value;renderPartnerHub()};
+  const btn=$('#partnerHubCrmBtn');
+  if(btn)btn.onclick=()=>{
+    if(s.crmId){openView('crm');openCrmProfile(s.crmId)}
+    else openSponsor(s.name);
+  };
+  hydratePartnerHubDetail(s);
+  const activationBtn=$('#partnerActivationBtn');
+  if(activationBtn)activationBtn.onclick=()=>{
+    const target=$('#activationSponsor');
+    if(target){
+      let matched=[...target.options].some((o,i)=>o.text===s.name?(target.selectedIndex=i,true):false);
+      if(!matched){const o=document.createElement('option');o.textContent=s.name;target.appendChild(o);target.selectedIndex=target.options.length-1}
+    }
+    openView('activationstudio');
+    renderActivationStudio();
+  };
+}
+
+function campaignVisualKind(x){
+  if(x.channel==='LED')return 'led';
+  if(x.channel==='SOCIAL')return 'social';
+  if(x.channel==='EVENTO')return 'event';
+  if(x.name.includes('Sponsor Wall'))return 'wall';
+  if(x.name.includes('Struttura'))return 'venue';
+  if(x.name.includes('Card'))return 'card';
+  return 'app';
+}
+function campaignPreview(x){
+  const kind=campaignVisualKind(x);
+  if(kind==='led')return '<div class="cv-led"><b>SCD COLICODERVIESE</b><i>PARTNER MATCHDAY</i><em>LED PLAYLIST</em></div>';
+  if(kind==='social')return '<div class="cv-social"><div><small>SCD PARTNER</small><b>INSIEME PER IL TERRITORIO</b><span>Story · Reel · Post</span></div></div>';
+  if(kind==='event')return '<div class="cv-event"><i>▲</i><b>EVENTO SCD</b><span>GAZEBO · HOSPITALITY · PREMIAZIONI</span></div>';
+  if(kind==='wall')return '<div class="cv-wall">'+['SCD','PARTNER','SCD','MEDIA','PARTNER','SCD','EVENTO','PARTNER','SCD'].map(t=>'<i>'+t+'</i>').join('')+'</div>';
+  if(kind==='venue')return '<div class="cv-venue"><small>VENUE BRANDING</small><b>CLUB HOUSE</b><span>spazio reale · presenza continuativa</span></div>';
+  if(kind==='card')return '<div class="cv-card"><small>SCD SUPPORTER</small><b>COMMUNITY CARD</b><span>Benefit · territorio · esperienze</span></div>';
+  return '<div class="cv-app"><small>PARTNER HUB</small><b>SCD WEB APP</b><span>Profilo · materiali · proof · rinnovo</span></div>';
+}
+function campaignAssetMap(name){
+  if(name==='LEDWall Matchday')return 'LEDWall Matchday';
+  if(name==='Torneo Brandizzato')return 'Torneo brandizzato';
+  if(name==='Gazebo & Partner Corner')return 'Gazebo / Partner Corner';
+  if(name==='Struttura Brandizzata')return 'Struttura brandizzata';
+  if(name==='Supporter Card Benefit')return 'Supporter Card / Convenzione';
+  if(name==='Sponsor Wall / Interview')return 'Sponsor Wall / Interviste';
+  if(name==='Partner Hub Web App')return 'Web App Partner Hub';
+  return '';
+}
+function renderCampaignStudio(){
+  const mount=$('#campaignGrid'); if(!mount)return;
+  const rows=campaignModules.filter(x=>campaignFilter==='TUTTI'||x.channel===campaignFilter);
+  mount.innerHTML=rows.map((x,i)=>
+    '<article class="campaign-item" data-campaign-index="'+campaignModules.indexOf(x)+'">'+
+      '<div class="campaign-visual kind-'+campaignVisualKind(x)+'"><span>'+esc(x.channel)+'</span>'+campaignPreview(x)+'</div>'+
+      '<div class="campaign-body"><h3>'+esc(x.name)+'</h3><p>'+esc(x.desc)+'</p>'+
+      '<div class="campaign-meta"><b>'+esc(x.status)+'</b><span>'+String(i+1).padStart(2,'0')+'</span></div></div>'+
+    '</article>'
+  ).join('');
+  $$('[data-campaign-filter]').forEach(b=>b.classList.toggle('active',b.dataset.campaignFilter===campaignFilter));
+  $$('[data-campaign-index]').forEach(card=>card.onclick=()=>{
+    const x=campaignModules[Number(card.dataset.campaignIndex)];
+    const mapped=campaignAssetMap(x?.name||'');
+    if(mapped){
+      const asset=$('#activationAsset');
+      if(asset)[...asset.options].some((o,i)=>o.text===mapped?(asset.selectedIndex=i,true):false);
+    }
+    openView('activationstudio');
+    renderActivationStudio();
+  });
+}
+
+function renderSponsorWall(){
+  const wall=$('#sponsorWallTiles');if(!wall)return;
+  wall.innerHTML=sponsors.slice(0,9).map(s=>'<span class="wall-tile">'+esc(s.name.replace(/Srl|S\.r\.l\.|S\.p\.A\.|Snc/gi,'').trim())+'</span>').join('');
+}
+
+
+function renderTerritoryHub(key=territoryCurrent){
+  territoryCurrent=territoryModules[key]?key:'centro';
+  const data=territoryModules[territoryCurrent];
+  const box=$('#territoryInspector');if(!box)return;
+  box.innerHTML=
+    '<small>'+esc(data.kicker)+'</small>'+
+    '<h2>'+esc(data.title)+'</h2>'+
+    '<p>'+esc(data.text)+'</p>'+
+    '<div class="territory-facts">'+data.facts.map(x=>'<span>'+esc(x)+'</span>').join('')+'</div>'+
+    '<div class="territory-inspector-actions"><button class="btn-yellow" id="territoryPrimaryAction">'+esc(data.actionLabel)+'</button><button class="btn-light" id="territoryCrmAction">Apri CRM</button></div>';
+  $$('[data-territory-node]').forEach(b=>b.classList.toggle('active',b.dataset.territoryNode===territoryCurrent));
+  $('#territoryPrimaryAction').onclick=()=>openView(data.action);
+  $('#territoryCrmAction').onclick=()=>openView('crm');
+}
+$$('[data-territory-node]').forEach(b=>b.onclick=()=>renderTerritoryHub(b.dataset.territoryNode));
+
+function ensureSponsorOperationsSurface(){
+  const navRoot=$('#mainNav');
+  if(navRoot&&!navRoot.querySelector('[data-view="azioni"]')){
+    const after=navRoot.querySelector('[data-view="crm"]');
+    const navButton=document.createElement('button');
+    navButton.className='nav-link';
+    navButton.dataset.view='azioni';
+    navButton.type='button';
+    navButton.innerHTML='<i data-icon="target"></i><span>Azioni commerciali</span>';
+    after?.insertAdjacentElement('afterend',navButton);
+    const icon=navButton.querySelector('i');if(icon)icon.innerHTML=ICONS.target||'';
+  }
+
+  const main=$('.dashboard-main');
+  if(main&&!$('#homeActionQueue')){
+    const panel=document.createElement('article');
+    panel.className='panel action-queue-panel';
+    panel.setAttribute('aria-labelledby','homeActionQueueTitle');
+    panel.innerHTML='<header><div><i data-action-home-icon></i><h3 id="homeActionQueueTitle">Azioni commerciali da seguire</h3></div><button type="button" data-view="azioni">Apri radar →</button></header><div id="homeActionQueue" class="action-queue-list" aria-live="polite"></div>';
+    main.prepend(panel);
+    const icon=panel.querySelector('[data-action-home-icon]');if(icon)icon.innerHTML=ICONS.target||'';
+  }
+
+  const sponsorView=$('#view-sponsor');
+  if(sponsorView&&!$('#view-azioni')){
+    const section=document.createElement('section');
+    section.className='view';
+    section.id='view-azioni';
+    section.innerHTML='<div class="page-head"><div><small>RADAR OPERATIVO</small><h1>Azioni commerciali</h1><p>Una coda unica per sponsor attuali, prospect, convenzioni, fornitori e iniziative. Mostra soltanto informazioni già censite, senza inventare urgenze, probabilità o stati.</p></div></div><div class="page-tools sponsor-action-tools"><input id="actionSearch" class="filter-input" aria-label="Cerca nelle azioni commerciali" placeholder="Cerca azienda, azione o area…"><select id="actionLane" aria-label="Filtra azioni commerciali per area"><option value="ALL">Tutte le aree</option><option value="CURRENT">Sponsor attuali</option><option value="PROSPECT">Prospect / proposte</option><option value="CONVENTION">Convenzioni</option><option value="SUPPLIER">Fornitori → Sponsor</option><option value="INITIATIVE">Iniziative</option></select></div><div class="action-radar-note"><b>Stato operativo</b><span>Le azioni derivano dai dati censiti nella piattaforma. Nessuna voce viene considerata chiusa, urgente o probabile senza un dato esplicito.</span></div><div class="action-radar-grid" id="actionQueueGrid" aria-live="polite"></div>';
+    sponsorView.insertAdjacentElement('beforebegin',section);
+  }
+}
+ensureSponsorOperationsSurface();
+
 function openView(name){
   $$('.view').forEach(v=>v.classList.remove('active'));
   $('#view-'+name)?.classList.add('active');
@@ -152,6 +608,7 @@ function openView(name){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 $$('[data-view]').forEach(b=>b.addEventListener('click',()=>openView(b.dataset.view)));
+$('#campaignToolbar')?.addEventListener('click',e=>{const b=e.target.closest('[data-campaign-filter]');if(!b)return;campaignFilter=b.dataset.campaignFilter;renderCampaignStudio()});
 $('#mobileMenu').onclick=()=>$('#sidebar').classList.toggle('open');
 
 function renderKpis(){
@@ -232,13 +689,83 @@ function renderProposalGrid(){
   $('#proposalGrid').innerHTML=proposals.map(p=>'<article class="proposal-card"><h3>'+esc(p.name)+'</h3><p>'+esc(p.area)+'</p><div class="card-row"><span>Stato</span><b>'+esc(p.status)+'</b></div><div class="card-row"><span>Valore</span><b>'+esc(p.value)+'</b></div><div class="card-row"><span>Prossima azione</span><b>'+esc(p.next)+'</b></div></article>').join('');
 }
 
+async function loadConventions(){
+  try{
+    const r=await fetch('/api/sponsor/community',{credentials:'same-origin',cache:'no-store'});
+    if(!r.ok)throw new Error('COMMUNITY_HTTP_'+r.status);
+    const payload=await r.json();
+    const data=payload?.data||{};
+    communityState={
+      sourceMode:String(data.sourceMode||'UNKNOWN'),
+      sourceTable:String(data.sourceTable||'CONVENZIONI_MASTER'),
+      generatedAt:String(data.generatedAt||data.snapshotAt||''),
+      fallbackReason:String(data.fallbackReason||'')
+    };
+    conventions=(Array.isArray(data.rows)?data.rows:[]).map(x=>({
+      id:String(x.id||''),
+      name:String(x.name||''),
+      category:String(x.category||''),
+      status:String(x.status||''),
+      benefit:String(x.benefit||''),
+      conditions:String(x.conditions||''),
+      who:String(x.audience||''),
+      how:String(x.recognition||''),
+      where:String(x.territory||''),
+      contact:String(x.contactName||''),
+      email:String(x.contactEmail||''),
+      agreementDocument:String(x.agreementDocument||''),
+      lastActivity:String(x.lastActivity||''),
+      next:String(x.nextAction||''),
+      usageKpi:String(x.usageKpi||''),
+      linkedCard:String(x.linkedCard||''),
+      owner:String(x.owner||''),
+      source:String(x.source||communityState.sourceTable),
+      updatedAt:String(x.updatedAt||'')
+    }));
+    renderConventions();
+    renderActionQueue();
+  }catch(e){
+    communityState={sourceMode:'ERROR',sourceTable:'CONVENZIONI_MASTER',generatedAt:'',fallbackReason:String(e.message||e)};
+    conventions=[];
+    renderConventions();
+    renderActionQueue();
+  }
+}
+
+function conventionStateClass(status=''){
+  const s=String(status).toUpperCase();
+  if(/ATTIVA|FORMALIZZATA|FIRMATA/.test(s))return 'green';
+  if(/ATTIVAZIONE|FORMALIZZAZIONE/.test(s))return 'orange';
+  return 'blue';
+}
 function renderConventions(){
+  const live=communityState.sourceMode==='LIVE_MASTER';
+  const sourceLabel=live?'LIVE MASTER':communityState.sourceMode==='SNAPSHOT_FALLBACK'?'SNAPSHOT VERIFICATO':communityState.sourceMode==='ERROR'?'DATI NON DISPONIBILI':'CARICAMENTO';
+  const cardLinked=conventions.filter(x=>/^SI\b/i.test(x.linkedCard||'')).length;
   if($('#convenzioniKpi'))$('#convenzioniKpi').innerHTML=[
-    ['Convenzioni censite',String(conventions.length),'Registro dedicato 2026/27'],
-    ['Pronte / in attivazione',String(conventions.filter(x=>/PRONTA|ATTIVAZIONE/.test(x.status)).length),'Nessuna pubblicazione prima della formalizzazione'],
-    ['Card collegate','2','McDonald\'s + La Piadineria da integrare']
-  ].map(x=>'<article class="report-card"><h3>'+x[0]+'</h3><div class="report-value">'+x[1]+'</div><p>'+x[2]+'</p></article>').join('');
-  if($('#convenzioniGrid'))$('#convenzioniGrid').innerHTML=conventions.map(x=>'<article class="proposal-card"><h3>'+esc(x.name)+'</h3><p>'+esc(x.benefit)+'</p><div class="card-row"><span>Stato</span><b>'+esc(x.status)+'</b></div><div class="card-row"><span>Destinatari</span><b>'+esc(x.who)+'</b></div><div class="card-row"><span>Come</span><b>'+esc(x.how)+'</b></div><div class="card-row"><span>Dove</span><b>'+esc(x.where)+'</b></div><div class="card-row"><span>Prossima azione</span><b>'+esc(x.next)+'</b></div><small>'+esc(x.source)+'</small></article>').join('');
+    ['Convenzioni censite',String(conventions.length),communityState.sourceTable+' · '+sourceLabel],
+    ['Pronte / in attivazione',String(conventions.filter(x=>/PRONTA|ATTIVAZIONE/.test(x.status)).length),'Nessuna pubblicazione come attiva prima della formalizzazione'],
+    ['Card collegate',String(cardLinked),'Benefit da integrare solo dopo verifica dell’accordo']
+  ].map(x=>'<article class="report-card"><h3>'+esc(x[0])+'</h3><div class="report-value">'+esc(x[1])+'</div><p>'+esc(x[2])+'</p></article>').join('');
+
+  if(!$('#convenzioniGrid'))return;
+  if(!conventions.length){
+    $('#convenzioniGrid').innerHTML='<article class="community-empty"><b>'+esc(sourceLabel)+'</b><p>Nessuna convenzione disponibile dal registro canonico in questo momento.</p><small>'+esc(communityState.fallbackReason||'Riprova con Aggiorna CRM / sessione attiva.')+'</small></article>';
+    return;
+  }
+  $('#convenzioniGrid').innerHTML=conventions.map(x=>
+    '<article class="proposal-card convention-record">'+
+      '<div class="convention-head"><div><small>'+esc(x.category||'CONVENZIONE')+'</small><h3>'+esc(x.name)+'</h3></div><span class="status-badge '+conventionStateClass(x.status)+'">'+esc(x.status)+'</span></div>'+
+      '<p><b>'+esc(x.benefit||'Benefit da definire')+'</b><br>'+esc(x.conditions||'Condizioni da verificare')+'</p>'+
+      '<div class="card-row"><span>Destinatari</span><b>'+esc(x.who||'Da definire')+'</b></div>'+
+      '<div class="card-row"><span>Riconoscimento</span><b>'+esc(x.how||'Da definire')+'</b></div>'+
+      '<div class="card-row"><span>Territorio</span><b>'+esc(x.where||'Da definire')+'</b></div>'+
+      '<div class="card-row"><span>Card</span><b>'+esc(x.linkedCard||'Non collegata')+'</b></div>'+
+      '<div class="card-row"><span>Accordo</span><b>'+esc(x.agreementDocument||'Da verificare')+'</b></div>'+
+      '<div class="convention-next"><small>PROSSIMA AZIONE</small><strong>'+esc(x.next||'Da definire')+'</strong></div>'+
+      '<footer><span>'+esc(x.owner||'Owner da definire')+'</span><em>'+esc(sourceLabel)+'</em></footer>'+
+    '</article>'
+  ).join('');
 }
 function renderSuppliers(){
   if($('#fornitoriKpi'))$('#fornitoriKpi').innerHTML=[
@@ -276,7 +803,8 @@ function renderActionQueue(){
   const home=$('#homeActionQueue');
   if(home)home.innerHTML=all.slice(0,6).map(x=>actionCard(x,true)).join('')||'<div class="compact-item"><small>Nessuna azione censita.</small></div>';
   const mount=$('#actionQueueGrid');if(!mount)return;
-  const term=($('#actionSearch')?.value||'').toLowerCase().trim(),lane=$('#actionLane')?.value||'ALL';
+  const term=($('#actionSearch')?.value||'').toLowerCase().trim();
+  const lane=$('#actionLane')?.value||'ALL';
   const rows=all.filter(x=>(lane==='ALL'||x.lane===lane)&&(!term||[x.name,x.action,x.meta,x.state,x.label].join(' ').toLowerCase().includes(term)));
   mount.innerHTML=rows.length?rows.map(x=>actionCard(x,false)).join(''):'<div class="action-radar-empty"><b>Nessuna azione trovata</b><span>Modifica i filtri oppure verifica i dati disponibili.</span></div>';
   $$('[data-action-view]',mount).forEach(b=>b.onclick=()=>openView(b.dataset.actionView));
@@ -367,8 +895,6 @@ function liaAnswer(q){
   if(t.includes('rinn'))return 'Rinnovi prioritari: Rasero, Noratech e verifica scadenza Pedroncelli.';
   if(t.includes('evento'))return 'In evidenza: torneo nazionale 9 maggio 2027 da confermare, Family & Community Day da definire e sopralluogo Caffè Teti da fissare.';
   if(t.includes('report'))return 'Cash verificato normalizzato: €4.400. Audit prioritari: DECAR, SACO e Bianchi Bazzi.';
-  if(t.includes('conven'))return 'Convenzioni censite: '+conventions.length+'. '+conventions.map(x=>x.name+' · '+x.status).join(' | ')+'. Nessuna viene pubblicata automaticamente.';
-  if(t.includes('fornitor'))return 'Fornitori censiti nel radar: '+suppliers.length+'. Il potenziale non equivale a una sponsorizzazione: serve ricostruire rapporto, volumi e proposta.';
   if(t.includes('sponsor'))return 'Posso cercare nel portafoglio attuale, nella pipeline e negli asset. Per ricerca esterna territoriale serve una fonte web aggiornata.';
   return 'Posso aiutarti su sponsor, proposte, contratti, asset, LED, rinnovi, eventi e report usando i dati presenti nella piattaforma.';
 }
@@ -383,8 +909,8 @@ $('#newSponsorForm').onsubmit=e=>{e.preventDefault();const fd=new FormData(e.tar
 
 $('#promoReviewBtn').onclick=()=>{localStorage.setItem('scd_promo_review','review');$('#promoText').textContent='Promozione messa in revisione interna. Nessuna pubblicazione automatica.'};
 
-renderKpis();renderSponsorStrip();homeContracts();homeProposals();renderAvailability();renderHomeEvents();renderPipeline();renderNews();renderStats();renderPoll();renderTags();
-renderSponsorViews();renderContracts();renderProposalGrid();renderConventions();renderSuppliers();renderCommercialInitiatives();renderAudience();renderActionQueue();renderFolders();renderLed();renderEvents();renderReport();renderAssets();renderScenario();renderSettings();
+renderKpis();renderSponsorStrip();homeContracts();homeProposals();renderAvailability();renderHomeEvents();renderPipeline();renderNews();renderStats();renderPoll();renderTags();renderPartnerHub();renderCampaignStudio();renderSponsorWall();renderTerritoryHub();renderActionQueue();
+renderSponsorViews();renderContracts();renderProposalGrid();renderSuppliers();renderCommercialInitiatives();renderAudience();renderFolders();renderLed();renderEvents();renderReport();renderAssets();renderScenario();renderSettings();
 
 function activateKeyboardCards(){
   document.addEventListener('keydown',e=>{
@@ -412,3 +938,684 @@ function closeSponsorModalAccessible(){
 $('#closeNewSponsor').onclick=closeSponsorModalAccessible;
 $('#cancelNewSponsor').onclick=closeSponsorModalAccessible;
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.hidden)closeSponsorModalAccessible()});
+
+
+/* ===== R40.1 CRM RELAZIONALE ===== */
+const crmState={rows:[],selected:null,loading:false,error:''};
+
+function crmPolicyLabel(value){
+  const v=String(value||'').toUpperCase();
+  if(v==='SOSPESO_NON_INVIARE')return 'SOSPESO · NON INVIARE';
+  if(v==='NO_CONTACT')return 'NO CONTACT';
+  if(v==='AUTO_OK')return 'AUTO OK';
+  if(v==='MANUALE')return 'MANUALE';
+  return v||'DA DEFINIRE';
+}
+function crmBlocked(row){
+  return /SOSPESO|NO_CONTACT/.test(String(row?.contactPolicy||'').toUpperCase());
+}
+async function crmApi(id=''){
+  const url='/api/sponsor/crm'+(id?'?id='+encodeURIComponent(id):'?limit=300');
+  const r=await fetch(url,{credentials:'same-origin',cache:'no-store'});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok||j.ok===false)throw new Error(j.error||'CRM non disponibile');
+  return j.data||{};
+}
+function renderCrmKpis(kpi={}){
+  const el=$('#crmKpis');if(!el)return;
+  const data=[
+    ['Profili CRM',String(kpi.total??crmState.rows.length),'Record canonici persone/aziende'],
+    ['Relazioni aperte',String(kpi.active??'—'),'Escluse chiuse negative/perse'],
+    ['Contatti sospesi',String(kpi.suspended??crmState.rows.filter(crmBlocked).length),'Nessun invio esterno automatico'],
+    ['Prossime azioni',String(kpi.due??crmState.rows.filter(x=>x.nextDeadline).length),'Profili con scadenza valorizzata']
+  ];
+  el.innerHTML=data.map(x=>'<article class="report-card"><h3>'+esc(x[0])+'</h3><div class="report-value">'+esc(x[1])+'</div><p>'+esc(x[2])+'</p></article>').join('');
+}
+function crmFilteredRows(){
+  const q=String($('#crmSearch')?.value||'').trim().toLowerCase();
+  const policy=String($('#crmPolicy')?.value||'').trim().toUpperCase();
+  return crmState.rows.filter(x=>{
+    const hay=[x.name,x.category,x.area,x.location,x.tags,x.email,x.phone,x.owner,x.relationshipStatus].join(' ').toLowerCase();
+    return (!q||hay.includes(q))&&(!policy||String(x.contactPolicy||'').toUpperCase()===policy);
+  });
+}
+function renderCrmTable(){
+  const el=$('#crmTable');if(!el)return;
+  if(crmState.loading){el.innerHTML='<div class="crm-empty">Caricamento CRM…</div>';return}
+  if(crmState.error){el.innerHTML='<div class="crm-empty"><b>CRM non disponibile</b><span>'+esc(crmState.error)+'</span></div>';return}
+  const rows=crmFilteredRows();
+  el.innerHTML='<div class="crm-row crm-head"><span>Profilo</span><span>Relazione</span><span>Ultimo contatto</span><span>Prossima azione</span><span>Policy</span></div>'+
+    (rows.length?rows.map(x=>
+      '<button class="crm-row crm-record" data-crm-id="'+esc(x.id)+'">'+
+      '<span><b>'+esc(x.name)+'</b><small>'+esc(x.category||x.type||'')+'</small></span>'+
+      '<span><b>'+esc(x.relationshipStatus||'—')+'</b><small>'+esc(x.owner||'Owner da definire')+'</small></span>'+
+      '<span><b>'+esc(x.lastContact||x.lastTouchpoint?.timestamp||'—')+'</b><small>'+esc(x.lastTouchpoint?.channel||'')+'</small></span>'+
+      '<span><b>'+esc(x.nextAction||'Nessuna azione registrata')+'</b><small>'+esc(x.nextDeadline||'')+'</small></span>'+
+      '<span><em class="crm-policy '+(crmBlocked(x)?'blocked':'')+'">'+esc(crmPolicyLabel(x.contactPolicy))+'</em><small>'+esc(x.preferredChannel||'')+'</small></span>'+
+      '</button>').join(''):'<div class="crm-empty">Nessun profilo corrisponde ai filtri.</div>');
+  $$('[data-crm-id]').forEach(b=>b.onclick=()=>openCrmProfile(b.dataset.crmId));
+}
+function renderCrmInspector(data){
+  const el=$('#crmInspector');if(!el)return;
+  if(!data){el.innerHTML='<h3>Profilo CRM</h3><p>Seleziona una persona o azienda per vedere il profilo relazionale completo.</p>';return}
+  const s=data.stakeholder||{},blocked=data.safety?.externalContactBlocked;
+  const tps=Array.isArray(data.touchpoints)?data.touchpoints:[];
+  const tasks=Array.isArray(data.tasks)?data.tasks:[];
+  const opps=Array.isArray(data.opportunities)?data.opportunities:[];
+  const agreements=Array.isArray(data.agreements)?data.agreements:[];
+  el.innerHTML=
+    '<div class="crm-profile-head"><small>'+esc(s.TIPO||'PROFILO')+'</small><h2>'+esc(s.NOME||'Profilo')+'</h2><p>'+esc(s.CATEGORIA||'')+'</p></div>'+
+    (blocked?'<div class="crm-alert"><b>CONTATTO BLOCCATO</b><span>Policy '+esc(crmPolicyLabel(data.safety?.contactPolicy))+'. Nessun follow-up esterno deve partire automaticamente.</span></div>':'')+
+    (!blocked&&s.EMAIL?'<div class="crm-primary-actions"><button class="btn-yellow" id="crmEmailAction" type="button">✉ Prepara email istituzionale</button></div>':'')+
+    '<div class="crm-facts">'+
+      '<div><small>STATO</small><b>'+esc(s.STATO_RELAZIONE||'—')+'</b></div>'+
+      '<div><small>OWNER</small><b>'+esc(s.OWNER||'—')+'</b></div>'+
+      '<div><small>CANALE</small><b>'+esc(s.PREFERRED_CHANNEL||'—')+'</b></div>'+
+      '<div><small>PROSSIMA SCADENZA</small><b>'+esc(s.PROSSIMA_SCADENZA||'—')+'</b></div>'+
+    '</div>'+
+    '<section class="crm-section"><h3>Prossima azione</h3><p>'+esc(s.PROSSIMA_AZIONE||'Nessuna azione registrata')+'</p></section>'+
+    '<section class="crm-section"><h3>Contatti</h3><p>'+esc(s.EMAIL||'')+(s.EMAIL&&s.TELEFONO?' · ':'')+esc(s.TELEFONO||'')+'</p><p>'+esc(s.LOCALITA||'')+'</p></section>'+
+    '<section class="crm-section"><h3>Tag</h3><p>'+esc(s.CRM_TAGS||'Nessun tag')+'</p></section>'+
+    '<section class="crm-section"><h3>Timeline recente</h3>'+
+      (tps.length?tps.slice(0,8).map(x=>'<div class="crm-timeline"><time>'+esc(x.TIMESTAMP||'')+'</time><div><b>'+esc(x.OGGETTO||x.CANALE||'Touchpoint')+'</b><p>'+esc(x.SINTESI||'')+'</p><small>'+esc(x.ESITO||'')+'</small></div></div>').join(''):'<p>Nessun touchpoint registrato.</p>')+
+    '</section>'+
+    '<section class="crm-section"><h3>Accordi / contratti</h3>'+
+      (agreements.length?agreements.map(a=>'<div class="crm-agreement"><div><b>'+esc(a.PACCHETTO||a.PARTNER||'Accordo')+'</b><small>'+esc(a.STATO||'')+'</small></div><div><span>Valore</span><strong>'+esc(a['VALORE €']!==''&&a['VALORE €']!=null?'€ '+a['VALORE €']:'Da verificare')+'</strong></div><div><span>Incasso</span><strong>'+esc(a['STATO INCASSO']||'Da verificare')+'</strong></div><p>'+esc(a['ASSET PROMESSI']||'')+'</p><small>'+esc(a['PROSSIMA AZIONE']||'')+'</small></div>').join(''):'<p>Nessun accordo formalizzato collegato.</p>')+
+    '</section>'+
+    '<section class="crm-section"><h3>Attività e opportunità</h3><p>'+tasks.length+' task collegati · '+opps.length+' opportunità collegate · '+agreements.length+' accordi collegati</p></section>';
+  const mailBtn=$('#crmEmailAction');
+  if(mailBtn)mailBtn.onclick=()=>openCrmEmailComposer(data);
+}
+async function loadCrm(){
+  crmState.loading=true;crmState.error='';renderCrmTable();
+  try{
+    const data=await crmApi();
+    crmState.rows=Array.isArray(data.rows)?data.rows:[];
+    renderCrmKpis(data.kpi||{});
+    renderPartnerHub();
+    syncActivationPartnersFromCrm();
+  }catch(e){
+    crmState.error=e.message||'Errore CRM';
+    renderCrmKpis({});
+  }finally{
+    crmState.loading=false;renderCrmTable();
+  }
+}
+async function openCrmProfile(id){
+  const el=$('#crmInspector');if(el)el.innerHTML='<h3>Profilo CRM</h3><p>Caricamento profilo…</p>';
+  try{
+    const data=await crmApi(id);
+    crmState.selected=id;renderCrmInspector(data);
+  }catch(e){
+    if(el)el.innerHTML='<h3>Profilo CRM</h3><p>'+esc(e.message||'Profilo non disponibile')+'</p>';
+  }
+}
+if($('#crmRefresh'))$('#crmRefresh').onclick=loadCrm;
+if($('#crmSearch'))$('#crmSearch').addEventListener('input',renderCrmTable);
+if($('#crmPolicy'))$('#crmPolicy').addEventListener('change',renderCrmTable);
+loadCrm();
+
+
+/* ===== R40.2 COMUNICAZIONI ISTITUZIONALI ===== */
+const crmMailState={templates:[],preview:null,current:null};
+const crmEmailModal=$('#crmEmailModal');
+const crmEmailForm=$('#crmEmailForm');
+
+async function communicationApi(mode,payload={}){
+  if(mode==='templates'){
+    const r=await fetch('/api/sponsor/communication',{credentials:'same-origin',cache:'no-store'});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok||j.ok===false)throw new Error(j.error||'Template email non disponibili');
+    return j.data||[];
+  }
+  const r=await fetch('/api/sponsor/communication',{
+    method:'POST',credentials:'same-origin',
+    headers:{'content-type':'application/json'},
+    body:JSON.stringify({...payload,mode})
+  });
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok||j.ok===false)throw new Error(j.error||'Operazione email non riuscita');
+  return j.data||{};
+}
+async function ensureCrmMailTemplates(){
+  if(crmMailState.templates.length)return crmMailState.templates;
+  const rows=await communicationApi('templates');
+  crmMailState.templates=Array.isArray(rows)?rows:[];
+  const sel=$('#crmEmailTemplate');
+  if(sel)sel.innerHTML='<option value="">Seleziona template…</option>'+crmMailState.templates.map(t=>
+    '<option value="'+esc(t.id)+'">'+esc(t.category+' · '+t.name)+'</option>'
+  ).join('');
+  return crmMailState.templates;
+}
+function resetCrmMailApproval(){
+  crmMailState.preview=null;
+  const p=$('#crmMailPreview');if(p){p.hidden=true;p.innerHTML=''}
+  const chk=$('#crmEmailConfirm');if(chk)chk.checked=false;
+  const send=$('#crmEmailSendBtn');if(send)send.disabled=true;
+}
+async function openCrmEmailComposer(data){
+  const s=data?.stakeholder||{};
+  if(data?.safety?.externalContactBlocked)return;
+  crmMailState.current=data;
+  resetCrmMailApproval();
+  crmEmailModal.hidden=false;
+  try{
+    await ensureCrmMailTemplates();
+  }catch(e){
+    const p=$('#crmMailPreview');p.hidden=false;p.innerHTML='<div class="crm-mail-error">'+esc(e.message)+'</div>';
+  }
+  crmEmailForm.elements.stakeholderId.value=s.STAKEHOLDER_ID||'';
+  crmEmailForm.elements.to.value=s.EMAIL||'';
+  crmEmailForm.elements.project.value=s.CATEGORIA||'';
+  crmEmailForm.elements.subject.value='';
+  crmEmailForm.elements.message.value='';
+  crmEmailForm.elements.cc.value='';
+  crmEmailForm.elements.nextAction.value=s.PROSSIMA_AZIONE||'';
+  crmEmailForm.elements.nextDeadline.value=/^\d{4}-\d{2}-\d{2}$/.test(String(s.PROSSIMA_SCADENZA||''))?s.PROSSIMA_SCADENZA:'';
+  requestAnimationFrame(()=>$('#crmEmailTemplate')?.focus());
+}
+function closeCrmEmailComposer(){
+  crmEmailModal.hidden=true;
+  resetCrmMailApproval();
+  crmMailState.current=null;
+}
+if($('#closeCrmEmail'))$('#closeCrmEmail').onclick=closeCrmEmailComposer;
+crmEmailModal?.addEventListener('click',e=>{if(e.target===crmEmailModal)closeCrmEmailComposer()});
+crmEmailForm?.addEventListener('input',e=>{
+  if(e.target.id==='crmEmailConfirm'){
+    $('#crmEmailSendBtn').disabled=!(crmMailState.preview&&e.target.checked);
+    return;
+  }
+  resetCrmMailApproval();
+});
+function crmMailPayload(){
+  const fd=new FormData(crmEmailForm);
+  return Object.fromEntries(fd.entries());
+}
+if($('#crmEmailPreviewBtn'))$('#crmEmailPreviewBtn').onclick=async()=>{
+  const p=$('#crmMailPreview');
+  try{
+    if(!crmEmailForm.reportValidity())return;
+    p.hidden=false;p.innerHTML='<div class="crm-mail-loading">Generazione anteprima istituzionale…</div>';
+    const data=await communicationApi('preview',crmMailPayload());
+    crmMailState.preview=data;
+    p.innerHTML='<div class="crm-mail-meta"><b>Da:</b> '+esc(data.sender||'')+'<br><b>A:</b> '+esc(data.to||'')+'<br><b>Firma:</b> '+esc((data.signature?.name||'')+' · '+(data.signature?.role||''))+'<br><b>Oggetto:</b> '+esc(data.subject||'')+'</div><div class="crm-mail-render">'+String(data.html||'')+'</div>';
+    const chk=$('#crmEmailConfirm');chk.checked=false;
+    $('#crmEmailSendBtn').disabled=true;
+  }catch(e){
+    crmMailState.preview=null;
+    p.hidden=false;p.innerHTML='<div class="crm-mail-error">'+esc(e.message||'Anteprima non disponibile')+'</div>';
+  }
+};
+if($('#crmEmailConfirm'))$('#crmEmailConfirm').onchange=e=>{
+  $('#crmEmailSendBtn').disabled=!(crmMailState.preview&&e.target.checked);
+};
+crmEmailForm?.addEventListener('submit',async e=>{
+  e.preventDefault();
+  if(!crmMailState.preview||!$('#crmEmailConfirm').checked)return;
+  const send=$('#crmEmailSendBtn'),preview=$('#crmMailPreview');
+  send.disabled=true;send.textContent='Invio in corso…';
+  try{
+    const payload={...crmMailPayload(),confirm:true};
+    const data=await communicationApi('send',payload);
+    preview.hidden=false;
+    preview.innerHTML='<div class="crm-mail-success"><b>Email inviata e registrata nel CRM.</b><span>ID '+esc(data.mailId||'')+'</span></div>';
+    if(crmState.selected)await openCrmProfile(crmState.selected);
+    await loadCrm();
+    $('#crmEmailConfirm').checked=false;
+  }catch(err){
+    preview.hidden=false;preview.innerHTML='<div class="crm-mail-error">'+esc(err.message||'Invio non riuscito')+'</div>';
+    send.disabled=false;
+  }finally{
+    send.textContent='Invia email istituzionale';
+  }
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&crmEmailModal&&!crmEmailModal.hidden)closeCrmEmailComposer()});
+
+
+/* ===== R48 ACTIVATION STUDIO + PARTNER WALL ===== */
+const activationCopy={
+  'LEDWall Matchday':{kicker:'LEDWALL MATCHDAY',title:'Il tuo brand entra nella partita.',text:'Creatività dinamica pensata per campo, tribuna e contenuti autorizzati.'},
+  'Sponsor Wall / Interviste':{kicker:'SPONSOR WALL',title:'Il partner resta visibile anche fuori dal campo.',text:'Backdrop, interviste e contenuti media con presenza ordinata e riconoscibile.'},
+  'Divisa sublimatica':{kicker:'KIT PARTNERSHIP',title:'Il brand vive con la squadra.',text:'Posizionamento integrato nel kit, subordinato a disponibilità, regolamenti ed esclusività.'},
+  'Torneo brandizzato':{kicker:'TITLE PARTNERSHIP',title:'Un evento può portare il nome di un progetto.',text:'Torneo, hospitality, premiazioni e territorio dentro una singola attivazione.'},
+  'Gazebo / Partner Corner':{kicker:'PARTNER CORNER',title:'Dal logo alla relazione diretta.',text:'Uno spazio fisico per incontrare famiglie, pubblico e community durante eventi autorizzati.'},
+  'Struttura brandizzata':{kicker:'VENUE BRANDING',title:'Uno spazio SCD può diventare esperienza di marca.',text:'Club House, area giochi, tendostruttura o altra zona reale, solo dopo verifica tecnica.'},
+  'Pixellot / Match Content':{kicker:'MATCH CONTENT',title:'La visibilità diventa contenuto.',text:'Clip, highlights e proof video utilizzabili soltanto nel perimetro di diritti e autorizzazioni.'},
+  'Supporter Card / Convenzione':{kicker:'SCD BENEFIT NETWORK',title:'Il partner entra nella vita quotidiana della community.',text:'Benefit, convenzioni e Card collegano azienda, persone e territorio.'},
+  'Web App Partner Hub':{kicker:'PARTNER HUB',title:'Una presenza digitale ordinata e misurabile.',text:'Profilo partner, progetto, materiali, proof, richieste e rinnovi nella web app SCD.'}
+};
+
+function activationValue(id,fallback=''){
+  return String($(id)?.value||fallback);
+}
+let activationPreviewMode='DESKTOP';
+
+function activationPayload(){
+  return {
+    sponsor:activationValue('#activationSponsor','Nuova azienda / prospect'),
+    goal:activationValue('#activationGoal','Visibilità territoriale'),
+    asset:activationValue('#activationAsset','LEDWall Matchday'),
+    audience:activationValue('#activationAudience','Famiglie e tesserati'),
+    channel:activationValue('#activationChannel','Centro Sportivo'),
+    territory:activationValue('#activationTerritory','Colico'),
+    headline:activationValue('#activationHeadline','Il tuo brand entra nella partita.').trim(),
+    message:activationValue('#activationMessage','Visibilità costruita per campo, tribuna e contenuti autorizzati.').trim(),
+    cta:activationValue('#activationCta','SCOPRI IL PROGETTO').trim(),
+    format:activationValue('#activationFormat','LED_16_3'),
+    theme:activationValue('#activationTheme','CLUB'),
+    scene:activationValue('#activationScene','SCENE-COLICO-STADIUM-DAY'),
+    logoState:activationValue('#activationLogoState','DA_VERIFICARE'),
+    previewMode:activationPreviewMode
+  };
+}
+function activationLogoLabel(state){
+  if(state==='APPROVATO')return 'Logo ufficiale approvato · file da collegare';
+  if(state==='DISPONIBILE')return 'Logo disponibile · verifica approvazione';
+  return 'Logo ufficiale da verificare';
+}
+function activationBriefText(p){
+  return [
+    'SCD CREATIVE FACTORY',
+    'Partner: '+p.sponsor,
+    'Obiettivo: '+p.goal,
+    'Asset: '+p.asset,
+    'Pubblico: '+p.audience,
+    'Canale: '+p.channel,
+    'Territorio: '+p.territory,
+    'Formato: '+p.format,
+    'Stile: '+p.theme,
+    'Scena: '+p.scene,
+    'Headline: '+p.headline,
+    'Messaggio: '+p.message,
+    'CTA: '+p.cta,
+    'Logo: '+activationLogoLabel(p.logoState),
+    'Governance: concept da verificare prima di produzione/invio esterno.'
+  ].join('\n');
+}
+function renderActivationBrief(p){
+  const el=$('#activationBrief');if(!el)return;
+  el.innerHTML=
+    '<div><small>CREATIVE BRIEF</small><strong>'+esc(p.sponsor)+'</strong><span>'+esc(p.asset)+' · '+esc(p.format)+'</span></div>'+
+    '<div><small>MESSAGGIO</small><strong>'+esc(p.headline||'—')+'</strong><span>'+esc(p.message||'—')+'</span></div>'+
+    '<div><small>GOVERNANCE</small><strong>'+esc(activationLogoLabel(p.logoState))+'</strong><span>Concept · nessuna comunicazione esterna automatica</span></div>';
+}
+function renderActivationStudio(){
+  const p=activationPayload();
+  const copy=activationCopy[p.asset]||activationCopy['LEDWall Matchday'];
+  const headline=p.headline||copy.title;
+  const message=p.message||copy.text;
+
+  if($('#activationPreviewKicker'))$('#activationPreviewKicker').textContent=copy.kicker;
+  if($('#activationPreviewTitle'))$('#activationPreviewTitle').textContent=headline;
+  if($('#activationPreviewText'))$('#activationPreviewText').textContent=message;
+  if($('#activationPreviewTerritory'))$('#activationPreviewTerritory').textContent=p.territory;
+  if($('#activationPreviewCta'))$('#activationPreviewCta').textContent=p.cta||'SCOPRI IL PROGETTO';
+  if($('#activationBrandName'))$('#activationBrandName').textContent=p.sponsor;
+  if($('#activationPreviewChips'))$('#activationPreviewChips').innerHTML=[
+    p.goal,p.audience,p.channel,p.territory
+  ].map(x=>'<span>'+esc(x)+'</span>').join('');
+
+  const brand=$('#activationBrandMark');
+  if(brand){
+    brand.dataset.logoState=p.logoState;
+    brand.title=activationLogoLabel(p.logoState);
+    const badge=brand.querySelector('span');
+    if(badge)badge.textContent=p.logoState==='APPROVATO'?'LOGO APPROVATO':p.logoState==='DISPONIBILE'?'LOGO DISPONIBILE':'PARTNER';
+  }
+
+  const signature=$('.activation-territory-signature');
+  if(signature){
+    const span=signature.querySelector('span');
+    const b=signature.querySelector('b');
+    if(span)span.textContent=p.territory==='Lago di Como'?'LAKE COMO':p.territory.toUpperCase();
+    if(b)b.textContent=p.territory==='Colico'?'ALTO LARIO · LAKE COMO':'SCD TERRITORY';
+  }
+
+  const visual=$('#activationVisual');
+  if(visual){
+    visual.dataset.format=p.format;
+    visual.dataset.theme=p.theme;
+    visual.dataset.scene=p.scene;
+    visual.dataset.previewMode=activationPreviewMode;
+    visual.dataset.asset=p.asset.replace(/[^a-z0-9]+/gi,'-').toLowerCase();
+    visual.style.background='';
+  }
+
+  $$('[data-preview-mode]').forEach(btn=>{
+    const active=btn.dataset.previewMode===activationPreviewMode;
+    btn.classList.toggle('active',active);
+    btn.setAttribute('aria-selected',active?'true':'false');
+  });
+  renderActivationSceneGuide();
+  renderActivationBrief({...p,headline,message});
+}
+function applyActivationAssetDefaults(){
+  const asset=activationValue('#activationAsset','LEDWall Matchday');
+  const copy=activationCopy[asset]||activationCopy['LEDWall Matchday'];
+  const headline=$('#activationHeadline');
+  const message=$('#activationMessage');
+  if(headline)headline.value=copy.title;
+  if(message)message.value=copy.text;
+}
+function applyCreativePreset(name){
+  const presets={
+    impact:{goal:'Brand awareness',theme:'NIGHT',scene:'SCENE-MATCH-NIGHT',format:'LED_16_3',headline:'Il tuo brand entra nella partita.',message:'Una presenza forte, leggibile e costruita per il matchday.',cta:'DIVENTA PARTNER'},
+    territory:{goal:'Visibilità territoriale',theme:'LAKE',scene:'SCENE-TRIBUNA-LAKE-CONCEPT',format:'WEB_16_9',headline:'Il territorio ci unisce.',message:'Sport, Colico e Lago di Como dentro una relazione che crea valore.',cta:'SCOPRI SCD'},
+    community:{goal:'Community e famiglie',theme:'CLUB',scene:'SCENE-CARD-LIFESTYLE',format:'SOCIAL_4_5',headline:'Più vicini al club. Più valore sul territorio.',message:'Benefit, esperienze e relazioni pensate per famiglie, tesserati e sostenitori.',cta:'ENTRA NELLA COMMUNITY'},
+    business:{goal:'Lead e contatti',theme:'GOLD',scene:'SCENE-PARTNER-TERRITORY',format:'WEB_16_9',headline:'Una partnership che lavora.',message:'Asset, relazioni e proof dentro un progetto misurabile e professionale.',cta:'COSTRUIAMO IL PROGETTO'}
+  };
+  const p=presets[name]||presets.impact;
+  const map={activationGoal:p.goal,activationTheme:p.theme,activationScene:p.scene,activationFormat:p.format,activationHeadline:p.headline,activationMessage:p.message,activationCta:p.cta};
+  Object.entries(map).forEach(([id,val])=>{
+    const el=$('#'+id);if(!el)return;
+    if(el.tagName==='SELECT'){
+      [...el.options].some((o,i)=>(o.value===val||o.text===val)?(el.selectedIndex=i,true):false);
+    }else el.value=val;
+  });
+  renderActivationStudio();
+}
+function downloadActivationJson(){
+  const p={...activationPayload(),savedAt:new Date().toISOString(),schema:'SCD_CREATIVE_FACTORY_V1'};
+  const blob=new Blob([JSON.stringify(p,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  const safe=p.sponsor.replace(/[^a-z0-9]+/gi,'-').replace(/^-|-$/g,'').toLowerCase()||'partner';
+  a.href=url;a.download='scd-creative-'+safe+'.json';document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),500);
+}
+async function copyActivationBrief(){
+  const text=activationBriefText(activationPayload());
+  try{
+    if(navigator.clipboard&&window.isSecureContext)await navigator.clipboard.writeText(text);
+    else{
+      const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();
+    }
+    if($('#activationSaved'))$('#activationSaved').textContent='Brief copiato negli appunti.';
+  }catch(e){
+    if($('#activationSaved'))$('#activationSaved').textContent='Copia non disponibile: usa Esporta JSON.';
+  }
+}
+function initActivationStudio(){
+  const sel=$('#activationSponsor');
+  if(!sel)return;
+  const names=['Nuova azienda / prospect',...sponsors.map(x=>x.name),...proposals.map(x=>x.name)];
+  sel.innerHTML=[...new Set(names)].map(x=>'<option>'+esc(x)+'</option>').join('');
+
+  ['#activationSponsor','#activationGoal','#activationAudience','#activationChannel','#activationTerritory','#activationFormat','#activationTheme','#activationScene','#activationLogoState']
+    .forEach(id=>$(id)?.addEventListener('change',renderActivationStudio));
+  ['#activationHeadline','#activationMessage','#activationCta']
+    .forEach(id=>$(id)?.addEventListener('input',renderActivationStudio));
+  $('#activationAsset')?.addEventListener('change',()=>{applyActivationAssetDefaults();renderActivationStudio()});
+
+  $$('[data-preview-mode]').forEach(btn=>btn.addEventListener('click',()=>{
+    activationPreviewMode=btn.dataset.previewMode||'DESKTOP';
+    renderActivationStudio();
+  }));
+  $$('[data-creative-preset]').forEach(btn=>btn.addEventListener('click',()=>applyCreativePreset(btn.dataset.creativePreset)));
+
+  $('#activationReset')?.addEventListener('click',()=>{
+    ['#activationSponsor','#activationGoal','#activationAsset','#activationAudience','#activationChannel','#activationTerritory','#activationFormat','#activationTheme','#activationScene','#activationLogoState'].forEach(id=>{
+      const el=$(id);if(el)el.selectedIndex=0;
+    });
+    activationPreviewMode='DESKTOP';
+    applyActivationAssetDefaults();
+    if($('#activationCta'))$('#activationCta').value='SCOPRI IL PROGETTO';
+    renderActivationStudio();
+    if($('#activationSaved'))$('#activationSaved').textContent='Scenario azzerato. Nessuna modifica ai dati CRM.';
+  });
+  $('#activationCopyBrief')?.addEventListener('click',copyActivationBrief);
+  $('#activationExport')?.addEventListener('click',downloadActivationJson);
+  $('#activationSave')?.addEventListener('click',()=>{
+    const payload={...activationPayload(),savedAt:new Date().toISOString()};
+    localStorage.setItem('scd_activation_scenario_v2',JSON.stringify(payload));
+    if($('#activationSaved'))$('#activationSaved').textContent='Scenario locale salvato alle '+new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'})+'. Nessun invio esterno effettuato.';
+    if($('#activationStatus'))$('#activationStatus').textContent='Scenario salvato';
+  });
+  try{
+    const saved=JSON.parse(localStorage.getItem('scd_activation_scenario_v2')||localStorage.getItem('scd_activation_scenario_v1')||'null');
+    if(saved){
+      const map={
+        activationSponsor:saved.sponsor,activationGoal:saved.goal,activationAsset:saved.asset,activationAudience:saved.audience,
+        activationChannel:saved.channel,activationTerritory:saved.territory,activationFormat:saved.format,activationTheme:saved.theme,activationScene:saved.scene,
+        activationLogoState:saved.logoState,activationHeadline:saved.headline,activationMessage:saved.message,activationCta:saved.cta
+      };
+      Object.entries(map).forEach(([id,val])=>{
+        const el=$('#'+id);if(!el||val==null)return;
+        if(el.tagName==='SELECT')[...el.options].some((o,i)=>(o.value===val||o.text===val)?(el.selectedIndex=i,true):false);
+        else el.value=val;
+      });
+      activationPreviewMode=saved.previewMode||'DESKTOP';
+      if($('#activationSaved'))$('#activationSaved').textContent='Ultimo scenario locale recuperato. Nessun dato è stato inviato all’esterno.';
+      if($('#activationStatus'))$('#activationStatus').textContent='Bozza recuperata';
+    }else{
+      applyActivationAssetDefaults();
+    }
+  }catch(e){applyActivationAssetDefaults()}
+  renderActivationStudio();
+}
+
+let partnerWallOrder=[];
+function renderPartnerWall(shuffle=false){
+  const el=$('#partnerWallGrid');if(!el)return;
+  if(!partnerWallOrder.length){
+    partnerWallOrder=[...new Set([...sponsors.map(x=>x.name),...proposals.filter(x=>!/SOSPESA/.test(x.status)).map(x=>x.name)])].slice(0,12);
+  }
+  if(shuffle)partnerWallOrder=[...partnerWallOrder].sort(()=>Math.random()-.5);
+  el.innerHTML=partnerWallOrder.map((n,i)=>'<span class="'+(i<3?'selected':'')+'">'+esc(n)+'</span>').join('');
+  $$('#partnerWallGrid span').forEach(x=>x.onclick=()=>x.classList.toggle('selected'));
+}
+$('#shufflePartnerWall')?.addEventListener('click',()=>renderPartnerWall(true));
+renderPartnerWall();
+initActivationStudio();
+
+
+
+/* ===== R51 LED PRODUCTION HUB ===== */
+let ledMotionConfig=null;
+let ledMotionSelected='';
+
+function ledStatusLabel(value){
+  const map={
+    MISSING_OFFICIAL_REPO_ASSET:'Logo ufficiale mancante',
+    REQUIRED_BEFORE_PRODUCTION:'Logo ufficiale richiesto',
+    CONCEPT_DA_RIVEDERE_CON_LOGO_UFFICIALE:'Concept da rivedere',
+    TEMPLATE:'Template SCD'
+  };
+  return map[value]||String(value||'Da verificare').replaceAll('_',' ');
+}
+function ledMotionBrief(profile){
+  if(!profile)return '';
+  return [
+    'SCD LED PRODUCTION HUB',
+    'Partner: '+profile.partnerName,
+    'Messaggio: '+profile.message,
+    'Motion concept: '+profile.motionConcept,
+    'Vista tribuna: '+profile.stadiumView,
+    'Camera view: '+profile.cameraView,
+    'Identità territoriale: '+profile.lakeIdentity,
+    'Logo: '+ledStatusLabel(profile.logoAssetStatus),
+    'Produzione: '+ledStatusLabel(profile.productionStatus),
+    'Target: '+String(ledMotionConfig?.productionTarget?.durationSeconds||40)+' secondi',
+    'Risoluzione LED nativa: da rilevare alla consegna',
+    'Proof: '+(profile.proofPlan||[]).join(' · ')
+  ].join('\n');
+}
+function renderLedProductionSpecs(){
+  const el=$('#ledProductionSpecs');if(!el||!ledMotionConfig)return;
+  const preview=ledMotionConfig.previewSource||{};
+  const target=ledMotionConfig.productionTarget||{};
+  el.innerHTML=
+    '<span><small>PREVIEW SORGENTE</small><b>'+esc(preview.width||'—')+'×'+esc(preview.height||'—')+' · '+esc(preview.fps||'—')+' fps · '+esc(preview.durationSeconds||'—')+'s</b></span>'+
+    '<span><small>TARGET PRODUZIONE</small><b>'+esc(target.durationSeconds||40)+'s · master per sponsor</b></span>'+
+    '<span><small>LED NATIVO</small><b>Da rilevare alla consegna</b></span>';
+}
+function renderLedProfileList(){
+  const el=$('#ledProfileList');if(!el||!ledMotionConfig)return;
+  const rows=Array.isArray(ledMotionConfig.profiles)?ledMotionConfig.profiles:[];
+  if(!ledMotionSelected)ledMotionSelected=rows[0]?.id||'';
+  el.innerHTML=rows.map(p=>
+    '<button type="button" class="'+(p.id===ledMotionSelected?'active':'')+'" data-led-profile="'+esc(p.id)+'">'+
+      '<span>'+esc(p.partnerName)+'</span><small>'+esc(ledStatusLabel(p.productionStatus))+'</small>'+
+    '</button>'
+  ).join('');
+  $$('[data-led-profile]').forEach(btn=>btn.onclick=()=>{
+    ledMotionSelected=btn.dataset.ledProfile||'';
+    renderLedProfileList();
+    renderLedProfileDetail();
+  });
+}
+function renderLedProfileDetail(){
+  const el=$('#ledProfileDetail');if(!el||!ledMotionConfig)return;
+  const p=(ledMotionConfig.profiles||[]).find(x=>x.id===ledMotionSelected)||ledMotionConfig.profiles?.[0];
+  if(!p){el.innerHTML='<p>Nessun profilo motion disponibile.</p>';return}
+  const logoReady=p.logoAssetStatus==='APPROVED_OFFICIAL_ASSET'&&p.logoAssetPath;
+  const logoBlocked=!logoReady;
+  const timeline=Array.isArray(p.motionTimeline)?p.motionTimeline:[];
+  const duration=Number(ledMotionConfig?.productionTarget?.storyboardDurationSeconds||ledMotionConfig?.productionTarget?.durationSeconds||40);
+  const partnerMark=logoReady
+    ? '<img src="'+esc(p.logoAssetPath)+'" alt="'+esc(p.partnerName)+'">'
+    : '<strong>'+esc(p.partnerName)+'</strong><small>LOGO UFFICIALE DA COLLEGARE</small>';
+
+  el.innerHTML=
+    '<div class="led-detail-hero">'+
+      '<div><small>'+esc(p.id)+'</small><h3>'+esc(p.partnerName)+'</h3><p>'+esc(p.message||'')+'</p></div>'+
+      '<span class="led-master-state '+(logoBlocked?'blocked':'ready')+'">'+(logoBlocked?'MASTER MP4 BLOCCATO':'PRONTO PER MASTER')+'</span>'+
+    '</div>'+
+    '<section class="led-tribuna-simulator" data-led-sim-view="TRIBUNA" data-led-sim-state="PLAYING">'+
+      '<div class="led-sim-toolbar">'+
+        '<div><small>LIVE CONCEPT PREVIEW</small><b>Vista tribuna / camera · '+duration+'s</b></div>'+
+        '<div class="led-sim-controls" role="group" aria-label="Vista simulazione LED">'+
+          '<button type="button" class="active" data-led-sim-view-btn="TRIBUNA">Tribuna</button>'+
+          '<button type="button" data-led-sim-view-btn="CAMERA">Camera</button>'+
+          '<button type="button" data-led-sim-action="RESTART">↻ Riavvia</button>'+
+          '<button type="button" data-led-sim-action="PAUSE">Pausa</button>'+
+        '</div>'+
+      '</div>'+
+      '<div class="led-sim-scene">'+
+        '<div class="led-sim-sky"></div>'+
+        '<div class="led-sim-mountains"></div>'+
+        '<div class="led-sim-lake"><span>LAGO DI COMO · CONCEPT TERRITORIALE</span></div>'+
+        '<div class="led-sim-pitch"><i></i><i></i><i></i></div>'+
+        '<div class="led-sim-stand"><span>VISTA PUBBLICO</span></div>'+
+        '<div class="led-sim-board">'+
+          '<div class="led-sim-motion-line"></div>'+
+          '<div class="led-sim-brand">'+partnerMark+'</div>'+
+          '<div class="led-sim-message">'+esc(p.message||'')+'</div>'+
+          '<div class="led-sim-scd">SCD COLICODERVIESE · COLICO</div>'+
+        '</div>'+
+        '<div class="led-sim-camera-frame"><span>CAMERA SAFE AREA</span></div>'+
+        '<div class="led-sim-concept-label">SIMULAZIONE CONCETTUALE · NON FOTO DOCUMENTARIA</div>'+
+      '</div>'+
+    '</section>'+
+    (p.sourceVideoReview?
+      '<section class="led-source-review">'+
+        '<div class="led-source-review-head"><div><small>SOURCE VIDEO REVIEW</small><h4>'+esc(p.sourceVideoReview.fileName||'Preview sorgente')+'</h4></div>'+
+        '<span>'+esc(p.sourceVideoReview.width)+'×'+esc(p.sourceVideoReview.height)+' · '+esc(p.sourceVideoReview.fps)+' fps · '+esc(p.sourceVideoReview.durationSeconds)+'s</span></div>'+
+        '<div class="led-review-compare">'+
+          '<article><small>SORGENTE</small><b>'+esc(String(p.sourceVideoReview.layout||'').replaceAll('_',' '))+'</b><p>'+esc(String(p.sourceVideoReview.partnerPlacement||'').replaceAll('_',' '))+'</p><em>'+esc(String(p.sourceVideoReview.otherBrandPresence||'').replaceAll('_',' '))+'</em></article>'+
+          '<article><small>CRITICITÀ OSSERVATE</small><ul>'+(p.sourceVideoReview.findings||[]).map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></article>'+
+          '<article><small>TARGET REVISIONE</small><b>'+esc(p.sourceVideoReview.upgradeTarget||'')+'</b><p>Un solo partner protagonista, più movimento, lettura da tribuna e camera, identità Colico/Lago.</p></article>'+
+        '</div>'+
+      '</section>':'')+
+    '<div class="led-storyboard">'+
+      '<div class="led-storyboard-head"><div><small>STORYBOARD '+duration+' SECONDI</small><h4>Movimento pensato per tribuna e ripresa.</h4></div><span>ONE SPONSOR · ONE STORYBOARD · ONE MASTER</span></div>'+
+      '<div class="led-storyboard-track">'+timeline.map((x,i)=>{
+        const span=Math.max(1,Number(x.to||0)-Number(x.from||0));
+        return '<button type="button" data-led-cue="'+i+'" style="--cue-span:'+span+'" title="'+esc(x.action||'')+'">'+
+          '<b>'+esc(x.label||('Fase '+(i+1)))+'</b><small>'+esc(x.from)+'–'+esc(x.to)+'s</small>'+
+        '</button>';
+      }).join('')+'</div>'+
+      '<div class="led-cue-detail" id="ledCueDetail">'+
+        (timeline[0]?'<small>'+esc(timeline[0].label)+'</small><b>'+esc(timeline[0].from)+'–'+esc(timeline[0].to)+' secondi</b><p>'+esc(timeline[0].action||'')+'</p>':'<p>Timeline da definire.</p>')+
+      '</div>'+
+    '</div>'+
+    '<div class="led-detail-grid">'+
+      '<section><small>MOTION CONCEPT</small><p>'+esc(p.motionConcept||'')+'</p></section>'+
+      '<section><small>VISTA TRIBUNA</small><p>'+esc(p.stadiumView||'')+'</p></section>'+
+      '<section><small>CAMERA SAFE</small><p>'+esc(p.cameraView||'')+'</p></section>'+
+      '<section><small>IDENTITÀ COLICO / LAGO</small><p>'+esc(p.lakeIdentity||'')+'</p></section>'+
+    '</div>'+
+    '<div class="led-proof-plan"><small>PROOF PLAN</small><div>'+(p.proofPlan||[]).map(x=>'<span>'+esc(x)+'</span>').join('')+'</div></div>'+
+    '<div class="led-production-gate"><div><small>GATE PRODUZIONE</small><b>'+esc(ledStatusLabel(p.logoAssetStatus))+'</b><span>'+esc(ledStatusLabel(p.productionStatus))+'</span>'+(p.logoSourceEvidence?'<em class="led-source-evidence">'+esc(p.logoSourceEvidence.title)+' · '+esc(p.logoSourceEvidence.status.replaceAll('_',' '))+'</em>':'')+'</div>'+
+      '<div class="led-detail-actions">'+
+        '<button class="btn-light" type="button" id="ledCopyStoryboard">Copia storyboard</button>'+
+        '<button class="btn-light" type="button" id="ledOpenDocuments">Apri Documenti</button>'+
+        (p.crmStakeholderId?'<button class="btn-light" type="button" id="ledOpenCrm">Apri CRM 360°</button>':'')+
+        '<button class="btn-yellow" type="button" id="ledUseCreativeFactory">Porta in Creative Factory</button>'+
+      '</div>'+
+    '</div>';
+
+  $$('[data-led-sim-view-btn]').forEach(btn=>btn.onclick=()=>{
+    const sim=$('.led-tribuna-simulator');if(!sim)return;
+    sim.dataset.ledSimView=btn.dataset.ledSimViewBtn||'TRIBUNA';
+    $$('[data-led-sim-view-btn]').forEach(b=>b.classList.toggle('active',b===btn));
+  });
+  $$('[data-led-sim-action]').forEach(btn=>btn.onclick=()=>{
+    const sim=$('.led-tribuna-simulator');if(!sim)return;
+    if(btn.dataset.ledSimAction==='RESTART'){
+      sim.dataset.ledSimState='RESET';
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{sim.dataset.ledSimState='PLAYING'}));
+      const pause=$('[data-led-sim-action="PAUSE"]');if(pause)pause.textContent='Pausa';
+    }else{
+      const paused=sim.dataset.ledSimState==='PAUSED';
+      sim.dataset.ledSimState=paused?'PLAYING':'PAUSED';
+      btn.textContent=paused?'Pausa':'Riprendi';
+    }
+  });
+  $$('[data-led-cue]').forEach(btn=>btn.onclick=()=>{
+    const cue=timeline[Number(btn.dataset.ledCue)];
+    const box=$('#ledCueDetail');if(!cue||!box)return;
+    box.innerHTML='<small>'+esc(cue.label||'Fase')+'</small><b>'+esc(cue.from)+'–'+esc(cue.to)+' secondi</b><p>'+esc(cue.action||'')+'</p>';
+    $$('[data-led-cue]').forEach(x=>x.classList.toggle('active',x===btn));
+  });
+  $('[data-led-cue="0"]')?.classList.add('active');
+
+  $('#ledCopyStoryboard')?.addEventListener('click',async()=>{
+    const text=ledMotionBrief(p)+'\nTimeline: '+timeline.map(x=>x.from+'-'+x.to+'s '+x.label+' — '+x.action).join(' | ');
+    try{
+      if(navigator.clipboard&&window.isSecureContext)await navigator.clipboard.writeText(text);
+      else{
+        const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();
+      }
+      $('#ledCopyStoryboard').textContent='Storyboard copiato';
+      setTimeout(()=>{const b=$('#ledCopyStoryboard');if(b)b.textContent='Copia storyboard'},1400);
+    }catch(e){}
+  });
+  $('#ledOpenDocuments')?.addEventListener('click',()=>openView('documenti'));
+  $('#ledOpenCrm')?.addEventListener('click',()=>{openView('crm');openCrmProfile(p.crmStakeholderId);});
+  $('#ledUseCreativeFactory')?.addEventListener('click',()=>{
+    openView('activationstudio');
+    const partner=$('#activationSponsor');
+    if(partner){
+      let matched=[...partner.options].some((o,i)=>o.text===p.partnerName?(partner.selectedIndex=i,true):false);
+      if(!matched){const o=document.createElement('option');o.textContent=p.partnerName;partner.appendChild(o);partner.selectedIndex=partner.options.length-1}
+    }
+    const asset=$('#activationAsset');
+    if(asset)[...asset.options].some((o,i)=>o.text==='LEDWall Matchday'?(asset.selectedIndex=i,true):false);
+    if($('#activationHeadline'))$('#activationHeadline').value=p.message||'Il tuo brand entra nella partita.';
+    if($('#activationMessage'))$('#activationMessage').value=p.stadiumView||p.motionConcept||'';
+    if($('#activationFormat'))$('#activationFormat').value='LED_16_3';
+    if($('#activationTheme'))$('#activationTheme').value='LAKE';
+    if($('#activationScene'))$('#activationScene').value=p.sceneId||'SCENE-TRIBUNA-LAKE-CONCEPT';
+    if($('#activationLogoState'))$('#activationLogoState').value=logoReady?'APPROVATO':'DA_VERIFICARE';
+    activationPreviewMode='LED';
+    renderActivationStudio();
+  });
+}
+async function initLedProductionHub(){
+  const mount=$('#ledProfileList');if(!mount)return;
+  try{
+    const data=await fetchMotionConfig();
+    ledMotionConfig=data;
+    motionProfilesState=data;
+    renderLedProductionSpecs();
+    renderLedProfileList();
+    renderLedProfileDetail();
+    renderMotionProfiles();
+  }catch(e){
+    mount.innerHTML='<div class="led-load-error"><b>Profili motion non disponibili</b><span>'+esc(e.message||'Errore caricamento')+'</span></div>';
+    const detail=$('#ledProfileDetail');if(detail)detail.innerHTML='<p>Il Media Hub resta operativo; il registro motion va verificato nel deployment.</p>';
+  }
+}
+initLedProductionHub();

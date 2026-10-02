@@ -22,6 +22,9 @@ const SUPABASE_RUNTIME = Object.freeze({
 let liveCache = { at: 0, data: null };
 
 const INTAKE_TEMPLATES = JSON.parse(fs.readFileSync(path.join(__dirname,'config','scd-intake-link-templates.v1.json'),'utf8'));
+const SPONSOR_MOTION_PROFILES = JSON.parse(fs.readFileSync(path.join(__dirname,'config','sponsor-motion-profiles.json'),'utf8'));
+const SCD_CREATIVE_SCENES = JSON.parse(fs.readFileSync(path.join(__dirname,'config','scd-creative-scenes.json'),'utf8'));
+const COMMUNITY_BENEFITS_SNAPSHOT = JSON.parse(fs.readFileSync(path.join(__dirname,'config','community-benefits.snapshot.json'),'utf8'));
 const INTAKE_TEMPLATE_MAP = new Map((INTAKE_TEMPLATES.templates||[]).map(x=>[x.slug,x]));
 const INTAKE_SECRET = process.env.SCD_INTAKE_LINK_SECRET || '';
 const INTAKE_PUBLIC_BASE = (process.env.SCD_PUBLIC_BASE_URL || 'https://scd-universe.onrender.com').replace(/\/$/,'');
@@ -49,17 +52,18 @@ function applyCors(req,res){
 
 const READ_ONLY_RETRY_ACTIONS = new Set([
   'public.feed','public.club','public.calendar','public.datafabric.contract',
-  'dashboard.summary','private.dashboard','private.week','account.requests',
+  'dashboard.summary','private.dashboard','private.week','account.requests','private.user.workspace','private.crm.summary','private.crm.detail','private.community.summary','private.communication.templates','private.communication.preview',
   'private.attendance.get','auth.validate','direction.diagnostics',
   'direction.evolution','direction.datafabric.status'
 ]);
 const UPSTREAM_READ_ATTEMPTS = 2;
 const UPSTREAM_RETRY_DELAY_MS = 450;
 const UPSTREAM_TIMEOUT_MS = Math.max(1000,Math.min(15000,Number(process.env.SCD_UPSTREAM_TIMEOUT_MS)||5000));
+const UPSTREAM_WRITE_TIMEOUT_MS = Math.max(5000,Math.min(30000,Number(process.env.SCD_UPSTREAM_WRITE_TIMEOUT_MS)||15000));
 const wait = ms => new Promise(resolve=>setTimeout(resolve,ms));
 
 const allowedActions = new Set([
-  'dashboard.summary','private.dashboard','private.week','account.requests',
+  'dashboard.summary','private.dashboard','private.week','account.requests','private.user.workspace','private.crm.summary','private.crm.detail','private.community.summary','private.communication.templates','private.communication.preview','private.communication.send','private.communication.health',
   'private.request.submit','private.transport.request','private.message.send',
   'private.convocation.create','private.convocation.reply',
   'private.attendance.get','private.attendance.save',
@@ -125,15 +129,31 @@ function sponsorLoginPayload(raw){
     permissions:dash.permissions||d.permissions||{}
   };
 }
-function sponsorStaffAllowed(user){
-  const role=String(user?.role||'').trim().toUpperCase();
+function sponsorRoleKey(user){
+  const email=String(user?.email||'').trim().toLowerCase();
+  const role=String(user?.role||user?.coreRole||'').trim().toUpperCase();
   const type=String(user?.type||'').trim().toUpperCase();
-  return user?.staff===true||role==='DG'||type==='DIREZIONE'||user?.email==='sportclubcolico@gmail.com';
+  if(email==='sportclubcolico@gmail.com'||role==='DG'||role==='DIREZIONE'||type==='DIREZIONE')return 'DIREZIONE';
+  if(/COMMERCIAL|COMMERCIALE|SPONSOR|PARTNER|MARKETING|ACCOUNT/.test(role+' '+type))return 'COMMERCIALE';
+  return 'NON_AUTORIZZATO';
+}
+function sponsorStaffAllowed(user){
+  return sponsorRoleKey(user)!=='NON_AUTORIZZATO';
 }
 function sponsorDirection(user){
-  const role=String(user?.role||'').trim().toUpperCase();
-  const type=String(user?.type||'').trim().toUpperCase();
-  return role==='DG'||type==='DIREZIONE'||user?.email==='sportclubcolico@gmail.com';
+  return sponsorRoleKey(user)==='DIREZIONE';
+}
+function sponsorCapabilities(user){
+  const profile=sponsorRoleKey(user);
+  if(profile==='DIREZIONE')return {
+    profile,platform:true,crm:true,communications:true,contracts:true,finance:true,
+    catalog:true,conventions:true,events:true,media:true,settings:true,admin:true
+  };
+  if(profile==='COMMERCIALE')return {
+    profile,platform:true,crm:true,communications:true,contracts:true,finance:false,
+    catalog:true,conventions:true,events:true,media:true,settings:false,admin:false
+  };
+  return {profile,platform:false};
 }
 async function validateSponsorSession(req){
   const token=sponsorSessionToken(req);
@@ -156,9 +176,10 @@ async function handleSponsorLead(req,res){
       category:String(b.sector||''),
       message:'Azienda: '+company+'\nSettore: '+String(b.sector||'')+'\nInteresse: '+String(b.interest||'')+'\n\n'+String(b.message||'')
     };
-    const {parsed}=await callAppsScript('public.partnerLead',payload,'');
-    const d=unwrapPayload(parsed)||{};
-    return json(res,200,{ok:true,requestId:d.requestId||'',status:d.status||'NUOVA'});
+    const result=await callAppsScript('public.partnerLead',payload,'');
+    const d=requireUpstreamSuccess(result,'Registrazione richiesta sponsor')||{};
+    if(d.notificationSent===false) return json(res,502,{ok:false,stored:true,requestId:d.requestId||'',error:'Richiesta salvata, ma la notifica email alla Direzione non è stata inviata.',mailError:d.notificationError||''});
+    return json(res,200,{ok:true,requestId:d.requestId||'',status:d.status||'NUOVA',notification:d.notificationSent===true?'SENT':'UNVERIFIED'});
   }catch(e){return json(res,400,{ok:false,error:e.message||'Richiesta non registrata'})}
 }
 async function handleSponsorAccessRequest(req,res){
@@ -175,20 +196,27 @@ async function handleSponsorAccessRequest(req,res){
       category:'ACCESSO RISERVATO',
       message:'Rapporto con SCD: '+rel+'\n\nMotivo: '+String(b.message||'')
     };
-    const {parsed}=await callAppsScript('public.ticketSubmit',payload,'');
-    const d=unwrapPayload(parsed)||{};
-    return json(res,200,{ok:true,requestId:d.requestId||'',status:'IN ATTESA DIREZIONE'});
+    const result=await callAppsScript('public.ticketSubmit',payload,'');
+    const d=requireUpstreamSuccess(result,'Registrazione richiesta accesso')||{};
+    if(d.notificationSent===false) return json(res,502,{ok:false,stored:true,requestId:d.requestId||'',error:'Richiesta salvata, ma la notifica email alla Direzione non è stata inviata.',mailError:d.notificationError||''});
+    return json(res,200,{ok:true,requestId:d.requestId||'',status:'IN ATTESA DIREZIONE',notification:d.notificationSent===true?'SENT':'UNVERIFIED'});
   }catch(e){return json(res,400,{ok:false,error:e.message||'Richiesta accesso non registrata'})}
 }
 async function handleSponsorOtp(req,res){
   if(req.method!=='POST')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  let email='';
   try{
     const b=JSON.parse(await readBody(req)||'{}');
-    const email=String(b.email||'').trim();
+    email=String(b.email||'').trim();
     if(!email)return json(res,400,{ok:false,error:'Inserisci la email.'});
-    try{await callAppsScript('auth.request',{email},'')}catch(e){console.warn('[sponsor-auth] otp request',e.message||e)}
-    return json(res,200,{ok:true,message:'Se l’indirizzo è stato approvato, riceverai il codice temporaneo.'});
-  }catch(e){return json(res,400,{ok:false,error:'Richiesta codice non valida'})}
+    const result=await callAppsScript('auth.request',{email},'');
+    const d=requireUpstreamSuccess(result,'Invio codice temporaneo')||{};
+    console.log('[sponsor-auth] otp accepted',email,d.sent===true?'sent':'backend-confirmed');
+    return json(res,200,{ok:true,delivery:d.sent===true?'SENT':'BACKEND_CONFIRMED',message:'Richiesta codice accettata dal servizio email SCD.'});
+  }catch(e){
+    console.error('[sponsor-auth] otp failed',email,e.message||e);
+    return json(res,502,{ok:false,error:'Il codice temporaneo non è stato inviato. '+String(e.message||'Servizio email non disponibile')});
+  }
 }
 async function handleSponsorLogin(req,res){
   if(req.method!=='POST')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
@@ -200,19 +228,111 @@ async function handleSponsorLogin(req,res){
     if(!login.token||!login.user?.email)throw new Error('Accesso non valido.');
     if(!sponsorStaffAllowed(login.user))throw new Error('Questo account non è autorizzato alla Sponsor Platform.');
     res.setHeader('set-cookie',sponsorCookie(req,login.token,21600));
-    return json(res,200,{ok:true,isDirection:sponsorDirection(login.user),user:{name:login.user.name,email:login.user.email,role:login.user.role}});
+    return json(res,200,{ok:true,isDirection:sponsorDirection(login.user),capabilities:sponsorCapabilities(login.user),user:{name:login.user.name,email:login.user.email,role:login.user.role}});
   }catch(e){return json(res,403,{ok:false,error:e.message||'Accesso non autorizzato'})}
 }
-async function handleSponsorSession(req,res){
+async function handleSponsorSession(req,res,u){
   if(req.method!=='GET')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  const probe=String(u?.searchParams?.get('probe')||'')==='1';
   try{
     const s=await validateSponsorSession(req);
-    return json(res,200,{ok:true,isDirection:s.isDirection,user:{name:s.user.name,email:s.user.email,role:s.user.role}});
-  }catch(e){return json(res,401,{ok:false,error:'SESSION_REQUIRED'})}
+    return json(res,200,{ok:true,authenticated:true,isDirection:s.isDirection,capabilities:sponsorCapabilities(s.user),user:{name:s.user.name,email:s.user.email,role:s.user.role}});
+  }catch(e){
+    if(probe)return json(res,200,{ok:true,authenticated:false});
+    return json(res,401,{ok:false,error:'SESSION_REQUIRED'});
+  }
 }
 async function handleSponsorLogout(req,res){
   res.setHeader('set-cookie',sponsorCookie(req,'',0));
   return json(res,200,{ok:true});
+}
+async function handleSponsorCrm(req,res,u){
+  if(req.method!=='GET')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  try{
+    const s=await validateSponsorSession(req);
+    const id=String(u.searchParams.get('id')||'').trim();
+    const action=id?'private.crm.detail':'private.crm.summary';
+    const payload=id?{id}:{limit:Math.max(1,Math.min(500,Number(u.searchParams.get('limit')||250)))};
+    const {parsed}=await callAppsScript(action,payload,s.token);
+    const d=unwrapPayload(parsed);
+    return json(res,200,{ok:true,data:d},{'cache-control':'no-store'});
+  }catch(e){
+    return json(res,403,{ok:false,error:e.message||'CRM_ACCESS_DENIED'});
+  }
+}
+async function handleSponsorMailHealth(req,res){
+  if(req.method!=='GET')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  try{
+    const s=await validateSponsorSession(req);
+    const result=await callAppsScript('private.communication.health',{},s.token);
+    const d=requireUpstreamSuccess(result,'Diagnostica email');
+    return json(res,200,{ok:true,data:d},{'cache-control':'no-store'});
+  }catch(e){
+    const code=e.message==='SESSION_REQUIRED'?401:502;
+    return json(res,code,{ok:false,error:e.message||'MAIL_HEALTH_FAILED'});
+  }
+}
+async function handleSponsorCreativeScenes(req,res){
+  if(req.method!=='GET')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  try{
+    await validateSponsorSession(req);
+    return json(res,200,{ok:true,data:SCD_CREATIVE_SCENES},{'cache-control':'no-store'});
+  }catch(e){
+    return json(res,e.message==='SESSION_REQUIRED'?401:403,{ok:false,error:e.message||'CREATIVE_SCENES_ACCESS_DENIED'});
+  }
+}
+async function handleSponsorCommunity(req,res){
+  if(req.method!=='GET')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  try{
+    const s=await validateSponsorSession(req);
+    try{
+      const result=await callAppsScript('private.community.summary',{},s.token);
+      const d=requireUpstreamSuccess(result,'Community master');
+      return json(res,200,{ok:true,data:d},{'cache-control':'no-store'});
+    }catch(upstreamError){
+      return json(res,200,{
+        ok:true,
+        data:{
+          ...COMMUNITY_BENEFITS_SNAPSHOT,
+          sourceMode:'SNAPSHOT_FALLBACK',
+          fallbackReason:'LIVE_MASTER_BRIDGE_NOT_AVAILABLE'
+        }
+      },{'cache-control':'no-store'});
+    }
+  }catch(e){
+    return json(res,e.message==='SESSION_REQUIRED'?401:403,{ok:false,error:e.message||'COMMUNITY_ACCESS_DENIED'});
+  }
+}
+async function handleSponsorMotionProfiles(req,res){
+  if(req.method!=='GET')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  try{
+    await validateSponsorSession(req);
+    return json(res,200,{ok:true,data:SPONSOR_MOTION_PROFILES},{'cache-control':'no-store'});
+  }catch(e){
+    return json(res,e.message==='SESSION_REQUIRED'?401:403,{ok:false,error:e.message||'MOTION_PROFILES_ACCESS_DENIED'});
+  }
+}
+async function handleSponsorCommunication(req,res){
+  try{
+    const s=await validateSponsorSession(req);
+    if(req.method==='GET'){
+      const {parsed}=await callAppsScript('private.communication.templates',{},s.token);
+      return json(res,200,{ok:true,data:unwrapPayload(parsed)},{'cache-control':'no-store'});
+    }
+    if(req.method!=='POST')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+    const body=JSON.parse(await readBody(req)||'{}');
+    const mode=String(body.mode||'preview').toLowerCase();
+    if(!['preview','send'].includes(mode))return json(res,400,{ok:false,error:'MODE_NOT_ALLOWED'});
+    const action=mode==='send'?'private.communication.send':'private.communication.preview';
+    const payload={...body};delete payload.mode;
+    const {parsed}=await callAppsScript(action,payload,s.token);
+    const d=unwrapPayload(parsed);
+    if(parsed&&parsed.ok===false)return json(res,400,{ok:false,error:parsed.error||'COMMUNICATION_FAILED'});
+    return json(res,200,{ok:true,data:d},{'cache-control':'no-store'});
+  }catch(e){
+    const code=e.message==='SESSION_REQUIRED'?401:400;
+    return json(res,code,{ok:false,error:e.message||'COMMUNICATION_FAILED'});
+  }
 }
 async function serveSponsorPrivate(req,res,u){
   try{
@@ -239,7 +359,7 @@ async function callAppsScript(action,payload={},sessionToken=''){
         method:'POST',
         redirect:'follow',
         headers:{'content-type':'application/json','user-agent':'SCD-ColicoDerviese-Bridge/30.0'},
-        signal:AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
+        signal:AbortSignal.timeout(READ_ONLY_RETRY_ACTIONS.has(action)?UPSTREAM_TIMEOUT_MS:UPSTREAM_WRITE_TIMEOUT_MS),
         body:JSON.stringify({action,payload,sessionToken})
       });
       const text=await upstream.text();
@@ -359,6 +479,13 @@ function unwrapPayload(raw){
   if(raw&&raw.ok===true&&raw.data!=null)return raw.data;
   if(raw&&raw.data!=null&&Object.keys(raw).length<=4)return raw.data;
   return raw;
+}
+function requireUpstreamSuccess(result,label='Operazione'){
+  const status=Number(result?.upstream?.status||0);
+  const parsed=result?.parsed;
+  if(!result?.upstream?.ok) throw new Error(label+' non riuscita: backend HTTP '+(status||'non disponibile'));
+  if(parsed&&parsed.ok===false) throw new Error(parsed.error||label+' non riuscita nel backend SCD');
+  return unwrapPayload(parsed);
 }
 function rowsFrom(raw){
   const data=unwrapPayload(raw);
@@ -670,8 +797,14 @@ http.createServer(async(req,res)=>{
   if(u.pathname==='/api/sponsor/request-access') return handleSponsorAccessRequest(req,res);
   if(u.pathname==='/api/sponsor/otp') return handleSponsorOtp(req,res);
   if(u.pathname==='/api/sponsor/login') return handleSponsorLogin(req,res);
-  if(u.pathname==='/api/sponsor/session') return handleSponsorSession(req,res);
+  if(u.pathname==='/api/sponsor/session') return handleSponsorSession(req,res,u);
   if(u.pathname==='/api/sponsor/logout') return handleSponsorLogout(req,res);
+  if(u.pathname==='/api/sponsor/crm') return handleSponsorCrm(req,res,u);
+  if(u.pathname==='/api/sponsor/mail-health') return handleSponsorMailHealth(req,res);
+  if(u.pathname==='/api/sponsor/motion-profiles') return handleSponsorMotionProfiles(req,res);
+  if(u.pathname==='/api/sponsor/community') return handleSponsorCommunity(req,res);
+  if(u.pathname==='/api/sponsor/creative-scenes') return handleSponsorCreativeScenes(req,res);
+  if(u.pathname==='/api/sponsor/communication') return handleSponsorCommunication(req,res);
   if(['/sponsor/app','/sponsor/app/','/sponsor/app.html','/sponsor/app.js'].includes(u.pathname)) return serveSponsorPrivate(req,res,u);
   if(u.pathname==='/api/scd') return proxyAppsScript(req,res);
   if(u.pathname==='/api/intake/form') return handleIntakeForm(req,res,u);

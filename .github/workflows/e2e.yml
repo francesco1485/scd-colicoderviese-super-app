@@ -37,8 +37,18 @@ jobs:
         run: npm run test:intake-contract
       - name: Intake signed link security gate
         run: npm run test:intake-links
-      - name: Sponsor operations contract gate
-        run: npm run test:sponsor-operations
+      - name: Sponsor CRM and communication contract gate
+        run: npm run test:crm-communication
+      - name: Sponsor vision contract gate
+        run: npm run test:sponsor-vision
+      - name: Sponsor LED production contract gate
+        run: npm run test:led-production
+      - name: Sponsor design system contract gate
+        run: npm run test:design-system
+      - name: Community benefit contract gate
+        run: npm run test:community-benefit
+      - name: Sponsor runtime smoke gate
+        run: npm run test:sponsor-runtime
       - name: Syntax check
         run: |
           node --check app.js
@@ -64,9 +74,6 @@ jobs:
           node --check scd-adaptive-engine.js
           node --check scd-meta-engine.js
           node --check scd-twin.js
-          node --check sponsor/app.js
-          node --check scripts/validate-sponsor-operations.mjs
-          node --check tests/smoke-sponsor.mjs
       - name: API contract gate
         run: npm run test:contract
       - name: Upstream resilience gate
@@ -87,8 +94,6 @@ jobs:
           exit 1
       - name: Smoke test mobile app
         run: npm run test:smoke
-      - name: Sponsor private workbench smoke
-        run: npm run test:sponsor-smoke
       - name: Server logs
         if: always()
         run: cat /tmp/scd-server.log || true
@@ -97,6 +102,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: scd-r24-runtime-visual-qa
-          path: test-output/*.png
+          path: test-output/*
           if-no-files-found: ignore
           retention-days: 14

@@ -607,3 +607,61 @@ Regole vincolanti:
 ### AUTONOMIA
 È consentita autonomia per analisi, ricerca pubblica/autorizzata, inventario, classificazione, prototipi, branch, test, UX reversibile e documentazione.
 Sono sempre soggetti a Direzione: ruoli, permessi, pagamenti, dati personali/sensibili, contratti vincolanti, safeguarding, cancellazioni irreversibili, migrazioni distruttive e nuove spese non approvate.
+
+
+## COMANDO SCD SENIOR PRINCIPAL — VISION-TO-CODE + ZERO-BUG + CONTINUOUS AGENT (2026-10-02)
+
+Questa direttiva e' cumulativa e si integra con SCD:STATE, SCD:EXPERT, SCD:ASSET e il ciclo di evoluzione esistente.
+
+### 1. Reverse Engineering Visivo
+Quando viene fornita un'immagine, uno screenshot, un mockup, uno sketch o un layout:
+- scomporre griglie, proporzioni, spacing, allineamenti, gerarchie e breakpoint;
+- ricavare palette, tipografia, icone, ombre, bordi, radius e motion;
+- identificare componenti interattivi e relativi stati;
+- progettare le varianti responsive mancanti;
+- tradurre la reference in componenti reali, mai in semplice immagine-poster dentro l'app.
+
+### 2. Engine dei dati e delle formule
+Ogni interfaccia deve avere una logica sottostante esplicita:
+- modello dati;
+- formule e algoritmi;
+- validazioni;
+- schema JSON/database;
+- API, eventi, permessi e scope;
+- provenance;
+- loading, empty, error, success e fallback.
+
+### 3. Zero-Bug Build
+Obiettivi obbligatori:
+- codice modulare e completo;
+- accessibilita WCAG/ARIA;
+- semantic markup;
+- performance;
+- responsive reale;
+- test proporzionati al rischio;
+- struttura file esplicita quando cambia l'architettura;
+- nessun placeholder o file troncato al posto dell'implementazione richiesta.
+
+### 4. Loop Autonomo Continuo
+Per ogni blocco:
+`BUILD -> SELF REVIEW -> FIND BUG/GAP -> FIX -> IMPROVE -> NEXT SAFE BLOCK -> TEST -> VISUAL QA -> REPEAT`.
+
+Non fermarsi dopo un singolo file se il lavoro richiede ulteriori componenti coerenti.
+Non chiedere autorizzazione per ogni micro-step sicuro e reversibile gia incluso nel task.
+Fermarsi soltanto in presenza di:
+- task completato e verificato;
+- blocker tecnico reale;
+- decisione critica della Direzione;
+- modifica su ruoli, permessi, pagamenti, tesseramenti, safeguarding, dati personali o altri ambiti riservati.
+
+La continuita' a chat chiusa e' ammessa solo attraverso un'automazione schedulata esplicita. Nessun sistema deve dichiarare lavoro in background in assenza di scheduler.
+
+Se un output testuale raggiunge un limite, interrompere solo alla fine di un file completo e chiudere esattamente con:
+
+`[STATO: IN CORSO - Scrivi 'PROCEDI' per iniettare il blocco successivo]`
+
+### 5. Gerarchia
+Ordine operativo:
+`SCD:STATE -> SCD:EXPERT -> SCD:ARCHITECT -> SCD:ASSET -> SCD:BUILD -> SCD:QA -> SCD:DEPLOY -> SCD:PROVE`.
+
+Questa direttiva non autorizza produzione critica autonoma e non sostituisce i gate di sicurezza esistenti.

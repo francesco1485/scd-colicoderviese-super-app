@@ -148,13 +148,16 @@ assert(m.development_contract?.human_centered_rules?.pleasant_work_is_product_re
 assert(m.product_direction?.weekly_sport_calendar?.scope==='ALL_AGE_GROUPS_ALL_SPORTING_ACTIVITY_CURRENT_WEEK','R40 weekly calendar scope mismatch');
 assert(m.product_direction?.weekly_sport_calendar?.no_hidden_default_slice===true,'R40 weekly calendar must show all by default');
 assert(m.product_direction?.public_core_navigation?.state==='DEDICATED_PUBLIC_VIEWS','public core navigation state missing');
-assert(m.product_direction?.sponsor_operations_radar?.state==='PRIVATE_OPERATIONAL_WORKBENCH','sponsor operations state missing');
-assert((m.capability_map||[]).some(x=>x.id==='CAP-SPONSOR-OPERATIONS'),'CAP-SPONSOR-OPERATIONS missing');
-assert((m.product_direction?.sponsor_operations_radar?.rules||[]).includes('PROSPECT_NEVER_RENDERED_AS_CONFIRMED_SPONSOR'),'sponsor prospect separation rule missing');
-
 assert((m.product_direction?.public_core_navigation?.routes||[]).some(x=>x.id==='CALENDAR'&&x.hash==='#calendar'),'dedicated calendar route missing');
 assert((m.product_direction?.public_core_navigation?.routes||[]).some(x=>x.id==='TEAMS'&&x.hash==='#teams'),'dedicated teams route missing');
 assert((m.capability_map||[]).some(x=>x.id==='CAP-PUBLIC-TEAMS'),'CAP-PUBLIC-TEAMS missing');
+assert((m.capability_map||[]).some(x=>x.id==='CAP-PUBLIC-MATCHDAY'),'CAP-PUBLIC-MATCHDAY missing');
+assert(m.product_direction?.public_matchday?.no_invented_stats===true,'R48 Matchday invented stats must remain forbidden');
+assert(m.product_direction?.public_matchday?.no_prediction===true,'R48 Matchday predictions must remain disabled');
+assert(m.product_direction?.public_matchday?.missing_data==='DATO_IN_AGGIORNAMENTO','R48 Matchday fail-closed state missing');
+assert(m.product_direction?.team_hub?.roster==='NO_PRIVATE_ROSTER','R48 Team Hub private roster guard missing');
+assert(m.product_direction?.team_hub?.followed_team_preference==='LOCAL_DEVICE_ONLY','R48 followed-team preference must remain local');
+assert(m.product_direction?.media_and_social_hub?.video_arena?.pixellot==='PRIVATE_BY_DEFAULT_AUTHORIZED_STAFF_ONLY','R48 Video Arena Pixellot privacy guard missing');
 
 assert(m.product_direction?.ai_newsroom?.policy==='VERIFIED_STRUCTURED_FACTS_ONLY','R40 newsroom policy mismatch');
 assert(m.product_direction?.ai_newsroom?.stale_site_content===false,'R40 newsroom must exclude stale site content');
@@ -214,7 +217,7 @@ assert(stateGate.failure_rule==='NO_STATE_NO_WRITE','NO STATE -> NO WRITE rule m
 includesAll(stateGate.required_before||[],['FILE_WRITE','COMMIT','PUSH','BRANCH_CREATE','MERGE','DEPLOY','DATA_WRITE','CONFIG_CHANGE'],'SCD:STATE write coverage');
 includesAll(stateGate.minimum_evidence||[],['REPOSITORY','CURRENT_MAIN_SHA','CURRENT_WORKING_BRANCH','CI_STATUS','PAGES_STATUS','MANIFEST_VERSION_OR_HASH','RELEASE_DEPENDENCIES','KNOWN_BLOCKERS','SAFE_NEXT_ACTION'],'SCD:STATE evidence');
 includesAll(stateGate.allowed_status_values||[],['VERIFIED','UNVERIFIED','NOT_AVAILABLE','NOT_APPLICABLE'],'SCD:STATE statuses');
-includesAll(m.development_contract?.operating_cycle||[],['SCD:STATE','SCD:EXPERT','SCD:INVENTORY','SCD:GAP','SCD:PLAN','SCD:BUILD','SCD:DATA','SCD:QA','SCD:MERGE','SCD:DEPLOY','SCD:PROVE','SCD:ROLLBACK'],'development operating cycle');
+includesAll(m.development_contract?.operating_cycle||[],['SCD:STATE','SCD:EXPERT','SCD:ARCHITECT','SCD:INVENTORY','SCD:GAP','SCD:PLAN','SCD:BUILD','SCD:DATA','SCD:QA','SCD:MERGE','SCD:DEPLOY','SCD:PROVE','SCD:ROLLBACK'],'development operating cycle');
 const expert=m.development_contract?.global_expert_router||{};
 assert(expert.command==='SCD:EXPERT','SCD:EXPERT command missing');
 assert(expert.mode==='MULTIDISCIPLINARY_SOURCE_AWARE_ROUTER','SCD:EXPERT mode mismatch');
@@ -222,6 +225,18 @@ includesAll(expert.asset_decision_values||[],['KEEP_LOCKED','KEEP_ENHANCE','REBU
 assert(expert.cybersecurity_scope==='DEFENSIVE_AUTHORIZED_OSINT_AND_SECURE_ENGINEERING_ONLY','cybersecurity scope must remain defensive/authorized');
 assert(expert.research_scope==='PUBLIC_AUTHORIZED_SOURCES_ONLY','research scope must remain public/authorized');
 assert(expert.autonomy?.production_rule==='NO_CRITICAL_AUTONOMOUS_PRODUCTION_CHANGE','critical autonomous production change must remain forbidden');
+assert(expert.paired_architect_command==='SCD:ARCHITECT','SCD:ARCHITECT pairing missing');
+const architect=m.development_contract?.senior_principal_architect_protocol||{};
+assert(architect.command==='SCD:ARCHITECT','Senior Principal architect command missing');
+assert(architect.state==='BINDING','Senior Principal architect protocol must be binding');
+assert(architect.level==='SENIOR_PRINCIPAL','Senior Principal level missing');
+assert((architect.phases||[]).map(x=>x.id).join('|')==='VISION_ANALYSIS|ENGINE_DATA|ZERO_BUG_BUILD|AUTONOMOUS_CONTINUOUS_LOOP','Senior Principal four-phase protocol mismatch');
+assert(architect.continuation_rules?.do_not_stop_after_single_file===true,'continuous loop must not stop after a single file');
+assert(architect.continuation_rules?.do_not_request_permission_for_next_safe_step===true,'safe next steps must continue without micro-confirmations');
+assert(architect.continuation_rules?.background_continuation==='ONLY_VIA_EXPLICIT_SCHEDULED_AUTOMATION','background continuation must require explicit scheduler');
+assert(architect.continuation_rules?.truncation_boundary==='END_OF_COMPLETE_FILE_ONLY','truncation boundary must be complete file');
+assert(architect.continuation_rules?.truncation_marker==="[STATO: IN CORSO - Scrivi 'PROCEDI' per iniettare il blocco successivo]",'continuation marker mismatch');
+includesAll(architect.autonomous_guardrails||[],['SCD_STATE_REMAINS_REQUIRED_BEFORE_WRITE','NO_CRITICAL_AUTONOMOUS_PRODUCTION_CHANGE','NO_FAKE_SPORT_DATA','ROLLBACK_REQUIRED'],'Senior Principal autonomous guardrails');
 const assetGate=m.development_contract?.asset_decision_gate||{};
 assert(assetGate.command==='SCD:ASSET','SCD:ASSET command missing');
 assert(assetGate.registry==='config/scd-assets.v1.json','asset registry path mismatch');
@@ -255,7 +270,7 @@ includesAll(caps.map(x=>x.id),[
   'CAP-HOME','CAP-CALENDAR','CAP-ATHLETE','CAP-FAMILY','CAP-STAFF','CAP-COMMS','CAP-RUNTIME-EVIDENCE','CAP-UPSTREAM-RESILIENCE','CAP-R20-RUNTIME-ACTIVATION',
   'CAP-DRIVE-CATALOG','CAP-GMAIL-INGESTION','CAP-DATAFABRIC-OBSERVABILITY','CAP-ENTITY-GRAPH','CAP-COMPLETENESS','CAP-SUPABASE-CORE','CAP-SUPABASE-AUTH-CONTEXT',
   'CAP-CHAT','CAP-CONFIDENCE','CAP-ANCONFIDENCE','CAP-SAFEGUARDING','CAP-SKY','CAP-AVATAR',
-  'CAP-TAMAGOTCHI','CAP-GEO','CAP-R22','CAP-PWA','CAP-ANDROID','CAP-IOS','CAP-MOBILE-SUPABASE-SHELL','CAP-SCD-UNIVERSE','CAP-META-ADAPTIVE','CAP-SCD-TWIN','CAP-SCD-MIRROR','CAP-SOCIAL-RADAR','CAP-HUMAN-OS','CAP-PRIVATE-DESK','CAP-COGNITIVE-ERGONOMICS','CAP-GROWTH-LOOP','CAP-WEEKLY-SPORT-CALENDAR','CAP-AI-NEWSROOM','CAP-MEDIA-SOCIAL-HUB','CAP-STAFF-ROLE-INGESTION'
+  'CAP-TAMAGOTCHI','CAP-GEO','CAP-R22','CAP-PWA','CAP-ANDROID','CAP-IOS','CAP-MOBILE-SUPABASE-SHELL','CAP-SCD-UNIVERSE','CAP-META-ADAPTIVE','CAP-SCD-TWIN','CAP-SCD-MIRROR','CAP-SOCIAL-RADAR','CAP-HUMAN-OS','CAP-PRIVATE-DESK','CAP-COGNITIVE-ERGONOMICS','CAP-GROWTH-LOOP','CAP-WEEKLY-SPORT-CALENDAR','CAP-AI-NEWSROOM','CAP-MEDIA-SOCIAL-HUB','CAP-STAFF-ROLE-INGESTION','CAP-PUBLIC-MATCHDAY'
 ],'capability map');
 
 const gaps=m.known_noncompliance||[];
@@ -285,6 +300,7 @@ const requiredRepoFiles=[
   'docs/SCD_HUMAN_OS_R39.md',
   'docs/adr/ADR-0011-human-centered-cognitive-os.md',
   'docs/adr/ADR-0012-r40-weekly-sport-ai-newsroom.md',
+  'docs/architecture/SCD-AUTONOMOUS-DEVELOPMENT-PROTOCOL.md',
   'docs/SCD_NEWSROOM_R40.md',
   'content/weekly-news.json',
   'ui-r40-weekly.css',
