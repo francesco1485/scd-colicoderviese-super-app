@@ -1,0 +1,118 @@
+{
+  "schema_version": "1.0.0",
+  "updated_at": "2026-10-02",
+  "source": {
+    "id": "SCD_DIRECTION_CURATED_2026-10-02",
+    "label": "Direzione SCD ColicoDerviese",
+    "verified": true,
+    "visibility": "PUBLIC"
+  },
+  "policy": {
+    "no_invented_sport_data": true,
+    "no_private_people": true,
+    "no_minor_profiles": true,
+    "planned_projects_are_not_presented_as_completed": true
+  },
+  "items": [
+    {
+      "id": "club-development-2026",
+      "type": "PROJECT",
+      "status": "IN_PIANIFICAZIONE",
+      "public": true,
+      "title": "Centro Sportivo: prossime iniziative",
+      "summary": "La roadmap del Centro Sportivo punta su servizi, accessibilità, sicurezza e qualità dell’esperienza per atleti, famiglie e territorio.",
+      "details": [
+        "Zona ricarica elettrica",
+        "Zona fitness all’aperto con attrezzature Kompan",
+        "Area giochi bambini vicino alla Club House con soluzioni Kompan",
+        "Nuovo gazebo",
+        "Tribuna del campo 2 piccolo da circa 80 posti",
+        "Infermeria attrezzata con apparecchiature professionali e supporto alla riabilitazione",
+        "Zone protette con sistema di allarme Verisure"
+      ],
+      "cta": {
+        "label": "Scopri il progetto",
+        "action": "development"
+      }
+    },
+    {
+      "id": "future-clubhouse-media",
+      "type": "PROJECT",
+      "status": "ROADMAP",
+      "public": true,
+      "title": "Club House, media e connettività",
+      "summary": "Alcune idee restano nella roadmap strategica e verranno attivate solo dopo verifica tecnica, economica e societaria.",
+      "details": [
+        "Dehor laterale alla Club House per area ludica tesserati",
+        "Area ristoro per tesserati e famiglie",
+        "Sala stampa, registrazione, blog e podcast",
+        "Impianto audio per la tribuna",
+        "Sviluppo dirette e riprese a 360 gradi",
+        "Area fotografica e scoring fissa o mobile per mascotte e atleti",
+        "Rete Wi-Fi gratuita nelle aree abilitate"
+      ],
+      "cta": {
+        "label": "Roadmap SCD",
+        "action": "development"
+      }
+    },
+    {
+      "id": "family-services",
+      "type": "SERVICE",
+      "status": "ATTIVO",
+      "public": true,
+      "title": "Famiglie e atleti: meno passaggi, più servizi",
+      "summary": "Calendario, squadre, richieste, trasporti e stato documentale convergono progressivamente nel Private Desk con accesso basato su ruolo e autorizzazioni.",
+      "details": [
+        "Calendario e prossimi impegni",
+        "Profili collegati autorizzati",
+        "Stato documenti e tesseramento",
+        "Quote e stato amministrativo quando disponibili",
+        "Richieste al Club",
+        "Pulmini e trasporti"
+      ],
+      "cta": {
+        "label": "Apri il profilo",
+        "action": "profile"
+      }
+    },
+    {
+      "id": "privacy-safeguarding",
+      "type": "CLUB",
+      "status": "ATTIVO",
+      "public": true,
+      "title": "Tutela dei minori e privacy by design",
+      "summary": "La Super App non pubblica automaticamente dati personali, immagini o contenuti privati dei minori. Pixellot resta privato per impostazione predefinita.",
+      "details": [
+        "Nessuna pubblicazione automatica di profili di minori",
+        "Contenuti media subordinati alle autorizzazioni reali",
+        "Pixellot privato di default",
+        "Nessun ranking pubblico sul talento dei minori",
+        "Nessuna inferenza sanitaria o psicologica"
+      ],
+      "cta": {
+        "label": "Regole SCD",
+        "action": "safety"
+      }
+    },
+    {
+      "id": "territory-club",
+      "type": "CLUB",
+      "status": "ATTIVO",
+      "public": true,
+      "title": "Colico e Dervio: un Club connesso al territorio",
+      "summary": "La piattaforma nasce per unire attività sportiva, famiglie, partner, eventi e servizi locali in un unico ecosistema digitale SCD.",
+      "details": [
+        "Esperienza pubblica del Club",
+        "Servizi per famiglie e atleti",
+        "Strumenti operativi per staff e segreteria",
+        "Partner e iniziative territoriali",
+        "Media, eventi e Matchday"
+      ],
+      "cta": {
+        "label": "Esplora SCD",
+        "action": "home"
+      }
+    }
+  ]
+}
