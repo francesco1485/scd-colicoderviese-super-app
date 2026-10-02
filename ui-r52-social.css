@@ -115,3 +115,9 @@
   .social-interactive-grid{grid-template-columns:1fr}
   .social-feature-card{min-height:132px}
 }
+
+
+/* R55 — curated Club content in Social */
+.social-card[data-type="CLUB"]{border-color:rgba(13,71,161,.20);background:linear-gradient(145deg,#fff,#f4f8ff)}
+.social-card[data-type="CLUB"] .social-card-type{background:linear-gradient(135deg,#0d47a1,#d32f2f);color:#fff;font-size:10px;font-weight:950}
+.social-card[data-type="CLUB"] .social-card-meta span:first-child{background:#eef5ff;color:#0d47a1}
