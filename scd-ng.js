@@ -2,6 +2,32 @@
 'use strict';
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const API_BASE='';
+const R56_ANALYTICS_COOKIE='scd_analytics_consent';
+function r56CookieGet(name){
+ return document.cookie.split(';').map(x=>x.trim()).filter(Boolean).map(x=>x.split('=')).find(x=>x[0]===name)?.slice(1).join('=')||'';
+}
+function r56CookieSet(name,value,maxAge){
+ document.cookie=name+'='+encodeURIComponent(value)+'; Path=/; Max-Age='+String(maxAge)+'; SameSite=Lax; Secure';
+}
+function r56AnalyticsConsent(){return decodeURIComponent(r56CookieGet(R56_ANALYTICS_COOKIE)||'')}
+async function r56Telemetry(counts,sections={}){
+ if(r56AnalyticsConsent()!=='yes')return;
+ try{await postAction('public.telemetry',{version:'R56',metrics:{counts,sections}})}catch{}
+}
+function r56BindAnalyticsConsent(){
+ const banner=$('#scdCookieBanner');if(!banner)return;
+ const current=r56AnalyticsConsent();
+ banner.hidden=Boolean(current);
+ const accept=$('#scdAnalyticsAccept'),reject=$('#scdAnalyticsReject');
+ if(accept)accept.onclick=async()=>{r56CookieSet(R56_ANALYTICS_COOKIE,'yes',15552000);banner.hidden=true;const seen=localStorage.getItem('scd:analytics:last_seen');await r56Telemetry({page_view:1,...(seen?{return_visit:1}:{})},{entry:'app'});localStorage.setItem('scd:analytics:last_seen',new Date().toISOString())};
+ if(reject)reject.onclick=()=>{r56CookieSet(R56_ANALYTICS_COOKIE,'no',15552000);banner.hidden=true};
+ if(current==='yes'){
+   const seen=localStorage.getItem('scd:analytics:last_seen');
+   r56Telemetry({page_view:1,...(seen?{return_visit:1}:{})},{entry:'app'});
+   localStorage.setItem('scd:analytics:last_seen',new Date().toISOString());
+ }
+}
+
 const PRIVATE_SESSION_KEY='scd:session:v1';
 let deferredInstallPrompt=null;
 if('serviceWorker' in navigator){
@@ -957,7 +983,7 @@ async function hydrate(){
     state.fullCalendar=mergeCalendarRows(state.fullCalendar,state.events,state.upcoming);renderWeek();renderMatchCenter();renderUpcoming();renderPartners();renderMentions();renderSocialHub();if(state.view==='calendar')renderPublicCalendar();if(state.view==='teams')renderPublicTeams();
   }
 }
-loadClubContent();hydrate();$('#refreshData')?.addEventListener('click',()=>{loadClubContent();hydrate();toast('Aggiornamento richiesto')});
+r56BindAnalyticsConsent();loadClubContent();hydrate();$('#refreshData')?.addEventListener('click',()=>{loadClubContent();hydrate();toast('Aggiornamento richiesto')});
 $('#socialRefresh')?.addEventListener('click',async()=>{await Promise.all([loadClubContent(),hydrate()]);renderSocialHub();toast('Feed social aggiornato')});
 $('#installApp')?.addEventListener('click',async()=>{
  if(!deferredInstallPrompt){toast('Installazione disponibile dal menu del browser quando supportata');return}
