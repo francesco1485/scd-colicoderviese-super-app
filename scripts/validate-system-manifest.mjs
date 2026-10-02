@@ -375,8 +375,11 @@ for(const forbiddenKey of ['"password":','"token":','"secret":','"private_key":'
 }
 
 assert(m.product_direction?.sponsor_center_development?.source==='SCD_OPERATIVO_PILOTA/INIZIATIVE_COMMERCIALI','Sponsor Development source mismatch');
-assert(m.product_direction?.sponsor_center_development?.fallback==='FAIL_CLOSED_SHOW_SOURCE_UNAVAILABLE_NO_SYNTHETIC_DATA','Sponsor Development fallback must remain fail-closed');
+assert(m.product_direction?.sponsor_center_development?.fallback==='VERIFIED_SNAPSHOT_ONLY_WITH_SOURCE_TIMESTAMP','Sponsor Development fallback must be verified snapshot only');
+assert(m.product_direction?.sponsor_center_development?.snapshot?.path==='config/sponsor-development.snapshot.json','Sponsor Development snapshot path mismatch');
+assert(m.product_direction?.sponsor_center_development?.snapshot?.must_never_present_as_live===true,'Sponsor Development snapshot cannot present as live');
 assert((m.product_direction?.sponsor_center_development?.rules||[]).includes('NO_INVENTED_COSTS'),'Sponsor Development no-invented-cost rule missing');
+assert((m.product_direction?.sponsor_center_development?.rules||[]).includes('SNAPSHOT_PROVENANCE_REQUIRED'),'Sponsor Development snapshot provenance rule missing');
 
 if(process.exitCode) process.exit(process.exitCode);
 console.log('SCD SYSTEM MANIFEST PASS',{
