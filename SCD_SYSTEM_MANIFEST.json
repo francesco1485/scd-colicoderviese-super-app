@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.14.0",
+    "version": "3.15.0",
     "effective_at": "2026-10-02",
     "status": "BINDING",
     "language": "it-IT",
@@ -2696,6 +2696,16 @@
         "TUTTOCAMPO"
       ],
       "contract": "SOURCE_GROUNDED_MATCHDAY_TEAM_OPPONENT_TIME_VENUE_COMPETITION_VERIFIED_STANDINGS_FORM_H2H_FAIL_CLOSED_NO_PREDICTIONS"
+    },
+    {
+      "id": "CAP-SOLIDARITY-FUND",
+      "domain": "COMMUNITY_SUPPORT",
+      "required": true,
+      "state": "PARTIAL",
+      "sources": [
+        "R20"
+      ],
+      "contract": "PUBLIC_VOLUNTARY_SUPPORT_INTENT_AMOUNT_VALIDATION_NO_CARD_DATA_NO_AUTO_MEMBERSHIP_NO_AUTO_ROLE_NO_PUBLIC_DONOR_NAME_SEPARATE_CONSENT_REQUIRED"
     }
   ],
   "known_noncompliance": [
@@ -3603,6 +3613,43 @@
       "roster": "NO_PRIVATE_ROSTER",
       "people": "PUBLIC_AUTHORIZED_PROFILES_ONLY",
       "deep_link_calendar": true
+    },
+    "solidarity_fund": {
+      "release": "R50.5",
+      "state": "PUBLIC_SUPPORT_INTENT_LIVE_PAYMENT_HANDOFF_NOT_CONFIGURED",
+      "public_surface": "SPONSOR_PUBLIC_FONDO_SOLIDALE",
+      "purpose": "VOLUNTARY_SUPPORT_FOR_SPORT_PARTICIPATION_AND_INCLUSION",
+      "suggested_amounts_eur": [
+        10,
+        25,
+        50,
+        100
+      ],
+      "custom_amount": {
+        "min_eur": 5,
+        "max_eur": 5000
+      },
+      "donor_types": [
+        "PERSONA",
+        "AZIENDA"
+      ],
+      "use_preferences": [
+        "FONDO_GENERALE",
+        "PARTECIPAZIONE",
+        "MATERIALE",
+        "TRASPORTI",
+        "INCLUSIONE"
+      ],
+      "payment_processing": "OUTSIDE_CURRENT_APP",
+      "card_data_collection": false,
+      "intent_endpoint": "/api/sponsor/solidarity-intent",
+      "storage_action": "public.ticketSubmit",
+      "donor_publication_default": false,
+      "publication_requires_separate_consent": true,
+      "accounting_and_receipts": "DIRECTION_AND_APPLICABLE_RULES",
+      "fiscal_claims": "NEVER_AUTOMATIC",
+      "membership_effect": "NONE",
+      "role_effect": "NONE"
     }
   },
   "research_intelligence": {
