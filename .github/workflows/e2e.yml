@@ -37,6 +37,18 @@ jobs:
         run: npm run test:intake-contract
       - name: Intake signed link security gate
         run: npm run test:intake-links
+      - name: Sponsor CRM and communication contract gate
+        run: npm run test:crm-communication
+      - name: Sponsor vision contract gate
+        run: npm run test:sponsor-vision
+      - name: Sponsor LED production contract gate
+        run: npm run test:led-production
+      - name: Sponsor design system contract gate
+        run: npm run test:design-system
+      - name: Community benefit contract gate
+        run: npm run test:community-benefit
+      - name: Sponsor runtime smoke gate
+        run: npm run test:sponsor-runtime
       - name: Syntax check
         run: |
           node --check app.js
