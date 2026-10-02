@@ -61,6 +61,29 @@
         "fileId": "1o2z7yIwkm0omLNvo9SnrovvXsu7YhXw6MMrcQJ6Hf54",
         "title": "GGLASS_LOGO_FONTE_UFFICIALE",
         "approval": "ASSET_BINARY_TO_EXTRACT_AND_APPROVE"
+      },
+      "sourceVideoReview": {
+        "fileName": "GGLASS_02_PREVIEW_CAMPO_GIORNO_V4(1).mp4",
+        "width": 1920,
+        "height": 1080,
+        "fps": 25,
+        "durationSeconds": 20,
+        "audio": false,
+        "layout": "CAMPO_GIORNO_DUE_FASCE_LED",
+        "partnerPlacement": "FASCIA_LED_INFERIORE",
+        "otherBrandPresence": "HDI_MAGLIA_FASCIA_SUPERIORE",
+        "observedMessages": [
+          "GGLASS",
+          "RIPARAZIONE E SOSTITUZIONE",
+          "MOBILITÀ & SICUREZZA"
+        ],
+        "findings": [
+          "logo partner presente ma piccolo nella visione complessiva da tribuna",
+          "movimento prevalente basato sul cambio dei messaggi",
+          "seconda fascia HDI/Maglia compete con il partner protagonista",
+          "assenza di firma territoriale Lago di Como"
+        ],
+        "upgradeTarget": "40s · singolo partner protagonista · brand reveal · messaggio · camera hold · raccordo SCD/Lago"
       }
     },
     {
@@ -121,6 +144,29 @@
         "fileId": "1NpryJd7IuwHljezR4r229unZvTmg7Ue0lF9cQQL4i7M",
         "title": "TMP_ASSET_TA_CLEANING_LED",
         "approval": "OFFICIAL_LOGO_STILL_REQUIRED"
+      },
+      "sourceVideoReview": {
+        "fileName": "TA_CLEANING_02_PREVIEW_CAMPO_GIORNO_V4(1).mp4",
+        "width": 1920,
+        "height": 1080,
+        "fps": 25,
+        "durationSeconds": 20,
+        "audio": false,
+        "layout": "CAMPO_GIORNO_DUE_FASCE_LED",
+        "partnerPlacement": "FASCIA_LED_INFERIORE",
+        "otherBrandPresence": "HDI_MAGLIA_FASCIA_SUPERIORE",
+        "observedMessages": [
+          "TA CLEANING",
+          "HO.RE.CA · FACILITY · INDUSTRIA",
+          "SERVIZIO COMPLETO"
+        ],
+        "findings": [
+          "logo partner presente ma piccolo nella visione complessiva da tribuna",
+          "movimento prevalente basato sul cambio dei messaggi",
+          "seconda fascia HDI/Maglia compete con il partner protagonista",
+          "assenza di firma territoriale Lago di Como"
+        ],
+        "upgradeTarget": "40s · singolo partner protagonista · wipe ordinato · messaggio · camera hold · raccordo SCD/Lago"
       }
     },
     {
@@ -181,6 +227,29 @@
         "fileId": "1uTo4Y6NXMvHmK20-qZScqj2nVFk37c46OuBYs8wsvAc",
         "title": "TMP_ASSET_AGC_MEDICAL_LED",
         "approval": "OFFICIAL_LOGO_STILL_REQUIRED"
+      },
+      "sourceVideoReview": {
+        "fileName": "AGC_MEDICAL_02_PREVIEW_CAMPO_GIORNO_V4(1).mp4",
+        "width": 1920,
+        "height": 1080,
+        "fps": 25,
+        "durationSeconds": 20,
+        "audio": false,
+        "layout": "CAMPO_GIORNO_DUE_FASCE_LED",
+        "partnerPlacement": "FASCIA_LED_INFERIORE",
+        "otherBrandPresence": "HDI_MAGLIA_FASCIA_SUPERIORE",
+        "observedMessages": [
+          "AGC MEDICAL",
+          "SPORT · RECOVERY · SICUREZZA",
+          "PERFORMANCE & PREVENZIONE"
+        ],
+        "findings": [
+          "logo partner presente ma piccolo nella visione complessiva da tribuna",
+          "movimento prevalente basato sul cambio dei messaggi",
+          "seconda fascia HDI/Maglia compete con il partner protagonista",
+          "assenza di firma territoriale Lago di Como"
+        ],
+        "upgradeTarget": "40s · singolo partner protagonista · reveal dinamico · messaggio · camera hold · raccordo SCD/Lago"
       }
     },
     {
@@ -262,5 +331,19 @@
       "CAMERA"
     ],
     "storyboardDurationSeconds": 40
+  },
+  "reviewStandard": {
+    "sourceComparisonRequired": true,
+    "minimumChecks": [
+      "technical metadata",
+      "logo prominence",
+      "tribuna readability",
+      "camera safe",
+      "motion quality",
+      "competing brands",
+      "territorial identity",
+      "proof plan"
+    ],
+    "rule": "SOURCE_VIDEO_REVIEW_BEFORE_NEW_MASTER"
   }
 }
