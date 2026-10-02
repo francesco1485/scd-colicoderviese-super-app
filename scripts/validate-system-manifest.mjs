@@ -384,6 +384,10 @@ assert(developmentSnapshot.sourceMode==='SNAPSHOT_VERIFIED','Sponsor Development
 assert(developmentSnapshot.source?.spreadsheetId==='1jb5Jt1ZYzJA-3oQd85AmwVhAoFQpBPfcsy4HupBzDFA','Sponsor Development snapshot source id mismatch');
 assert((m.product_direction?.sponsor_center_development?.rules||[]).includes('NO_INVENTED_COSTS'),'Sponsor Development no-invented-cost rule missing');
 assert((m.product_direction?.sponsor_center_development?.rules||[]).includes('SNAPSHOT_PROVENANCE_REQUIRED'),'Sponsor Development snapshot provenance rule missing');
+assert(m.product_direction?.sponsor_operational_focus?.state==='PRIVATE_DERIVED_VIEW_READY','Sponsor Operational Focus state mismatch');
+assert((m.product_direction?.sponsor_operational_focus?.rules||[]).includes('NO_INVENTED_DEADLINES'),'Sponsor Operational Focus no-invented-deadlines rule missing');
+assert((m.product_direction?.sponsor_operational_focus?.rules||[]).includes('QUOTE_RECONCILIATION_HAS_PRIORITY'),'Sponsor Operational Focus quote priority missing');
+assert((m.capability_map||[]).some(x=>x.id==='CAP-SPONSOR-OPERATIONAL-FOCUS'),'Sponsor Operational Focus capability missing');
 
 if(process.exitCode) process.exit(process.exitCode);
 console.log('SCD SYSTEM MANIFEST PASS',{
