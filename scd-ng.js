@@ -449,8 +449,15 @@ async function ensureCardBenefits(force=false){
    const data=await r.json().catch(()=>({ok:false,error:'Risposta benefit non valida'}));
    if(!r.ok||data.ok!==true)throw new Error(data.error||'Benefit Network non disponibile');
    state.benefits=data;state.benefitsLoaded=true;
- }catch(err){
-   state.benefits={active:[],pipeline:[]};state.benefitsLoaded=true;state.benefitsError=String(err.message||err);
+ }catch(apiError){
+   try{
+     const fallback=await fetch('./content/community-benefits.public.json',{cache:'no-store'});
+     const data=await fallback.json().catch(()=>({ok:false,error:'Fallback benefit non valido'}));
+     if(!fallback.ok||data.ok!==true)throw new Error(data.error||'Fallback Benefit Network non disponibile');
+     state.benefits={...data,deliveryMode:'STATIC_PAGES_ARTIFACT'};state.benefitsLoaded=true;
+   }catch(fallbackError){
+     state.benefits={active:[],pipeline:[]};state.benefitsLoaded=true;state.benefitsError=String(fallbackError.message||apiError.message||fallbackError||apiError);
+   }
  }finally{
    state.benefitsLoading=false;renderCardBenefits();
  }
