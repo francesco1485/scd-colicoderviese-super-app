@@ -57,8 +57,11 @@ if(!bridge.includes('function r56InviteAccess_'))fail('invite bridge missing');
 if(/firstName.*lastName.*===/i.test(bridge))fail('name-only identity matching forbidden');
 if(!bridge.includes('requestOtp(mail)'))fail('temporary one-time code delivery missing');
 if(!bridge.includes('permanentPasswordEmailed:false'))fail('plaintext permanent password invariant missing');
+for(const token of ['r56CanonicalPeopleSheet_','02 DB PERSONE V2','CANONICAL_EMAIL_EXACT','CANONICAL_PHONE_BIRTHDATE']){
+  if(!bridge.includes(token))fail('canonical people resolver missing '+token);
+}
 
-for(const action of ['public.identity.resolve','auth.identity.resolve','auth.access.log','direction.access.invite']){
+for(const action of ['public.identity.resolve','auth.identity.resolve','auth.access.log','direction.access.invite','direction.access.metrics']){
   if(!server.includes("'"+action+"'"))fail('server action missing '+action);
   if(!http.includes("case '"+action+"'"))fail('R20 route missing '+action);
 }
