@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.21.0",
+    "version": "3.22.0",
     "effective_at": "2026-10-02",
     "status": "BINDING",
     "language": "it-IT",
@@ -2546,7 +2546,7 @@
         "SCD_DRIVE",
         "SCD_GMAIL"
       ],
-      "contract": "ROLE_SCOPE_SHORT_ACTION_QUEUE_NO_ARCHIVE_HUNTING"
+      "contract": "ROLE_SCOPE_SHORT_ACTION_QUEUE_NO_ARCHIVE_HUNTING_PLUS_CALLUP_RESPONSE_VERTICAL_SLICE"
     },
     {
       "id": "CAP-COGNITIVE-ERGONOMICS",
@@ -2782,6 +2782,29 @@
         "SCD_YOUTUBE"
       ],
       "contract": "VERIFIED_PUBLIC_FEED_MATCHDAY_NEWS_EVENTS_MEDIA_LOCAL_FOLLOW_SHARE_FAIL_CLOSED"
+    },
+    {
+      "id": "CAP-FOOTBALL-PRIVATE-CORE",
+      "domain": "SPORT_PRIVATE",
+      "required": true,
+      "state": "PARTIAL",
+      "sources": [
+        "SCD_SUPABASE",
+        "R20"
+      ],
+      "contract": "CANONICAL_MATCH_CALLUPS_TRAINING_ATTENDANCE_INTERNAL_PERFORMANCE_MEDICAL_FIGC_GUARDS"
+    },
+    {
+      "id": "CAP-SOCIAL-ENGAGEMENT",
+      "domain": "COMMUNITY_GAMIFICATION",
+      "required": true,
+      "state": "PARTIAL",
+      "sources": [
+        "SCD_SUPABASE",
+        "SCD_NEWSROOM",
+        "R20"
+      ],
+      "contract": "MVP_POINTS_REWARDS_PARTNER_DEALS_TEAM_CHANNELS_FAIL_CLOSED_MODERATED"
     }
   ],
   "known_noncompliance": [
@@ -3846,8 +3869,8 @@
       "hardcoded_drive_folder_ids": false
     },
     "social_app_mvp": {
-      "release": "R52",
-      "state": "PUBLIC_MVP_UI_READY_SOURCE_GROUNDED",
+      "release": "R53",
+      "state": "PUBLIC_MVP_UI_READY_R53_INTERACTIVE_FOUNDATION_STAGED",
       "route": "#social",
       "purpose": "ONE_FEED_FOR_MATCHDAY_NEWS_EVENTS_OFFICIAL_MEDIA_AND_LOCAL_TEAM_FOLLOW",
       "sources": [
@@ -3879,7 +3902,61 @@
         "FILTERS",
         "FOLLOWING_FEED",
         "MATCHDAY_SHARE",
-        "OFFICIAL_CHANNELS"
+        "OFFICIAL_CHANNELS",
+        "FAN_ZONE_PLACEHOLDER_FAIL_CLOSED",
+        "MVP_GATED",
+        "POINTS_ROSSOBLU_GATED",
+        "TERRITORY_DEALS_GATED"
+      ]
+    },
+    "football_private_core": {
+      "release": "R53",
+      "state": "SCHEMA_READY_RUNTIME_GATED",
+      "purpose": "TRAINING_ATTENDANCE_MATCH_PERFORMANCE_CALLUPS_WITH_CANONICAL_MATCH_AND_MEDICAL_FIGC_GUARDS",
+      "tables": [
+        "scd_training_sessions",
+        "scd_training_attendance",
+        "scd_match_performance",
+        "scd_match_callups"
+      ],
+      "rules": [
+        "MATCH_CALLUP_REQUIRES_CANONICAL_EVENT_DATE",
+        "MEDICAL_EXPIRY_MUST_BE_VALID_ON_MATCH_DATE",
+        "FIGC_REGISTRATION_MUST_BE_APPROVED",
+        "PERFORMANCE_DATA_PRIVATE_STAFF_ONLY",
+        "NO_PUBLIC_MINOR_RANKING",
+        "RPE_NOT_USED_FOR_PSYCHOLOGICAL_INFERENCE"
+      ],
+      "activation": "SERVER_SIDE_COMMANDS_ONLY_UNTIL_USER_PERSON_TEAM_BINDING_VERIFIED"
+    },
+    "social_interactive_core": {
+      "release": "R53",
+      "state": "FOUNDATION_READY_FAIL_CLOSED",
+      "purpose": "FAN_ZONE_MVP_POINTS_REWARDS_PARTNER_DEALS_TEAM_CHANNELS_LIVE_MATCH_FEED",
+      "tables": [
+        "scd_fan_gamification",
+        "scd_fan_points_ledger",
+        "scd_social_mvp_candidates",
+        "scd_social_mvp_votes",
+        "scd_social_sponsor_deals",
+        "scd_social_rewards",
+        "scd_social_reward_redemptions",
+        "scd_team_messages",
+        "scd_live_match_events"
+      ],
+      "rules": [
+        "NO_FAKE_MVP_CANDIDATES_OR_PERCENTAGES",
+        "ONE_VOTE_PER_USER_PER_MATCH",
+        "MVP_CANDIDATE_MUST_BE_PUBLIC_SAFE",
+        "NO_AUTOMATIC_MINOR_PUBLICATION",
+        "TEAM_CHAT_REQUIRES_AUTHORIZED_SCOPE",
+        "NO_UNSUPERVISED_MINOR_1TO1_CHAT",
+        "POINTS_LEDGER_SERVER_AUTHORITATIVE",
+        "REWARD_TOKEN_SERVER_GENERATED_AND_HASHED",
+        "GEOLOCATION_EXPLICIT_OPT_IN_ONLY",
+        "NO_CONTINUOUS_BACKGROUND_GEO_TRACKING",
+        "PARTNER_DEALS_REQUIRE_VERIFIED_SOURCE",
+        "MISSING_DATA_FAILS_CLOSED"
       ]
     }
   },
