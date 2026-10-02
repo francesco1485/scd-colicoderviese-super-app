@@ -183,6 +183,42 @@ async function handleSponsorLead(req,res){
     return json(res,200,{ok:true,requestId:d.requestId||'',status:d.status||'NUOVA',notification:d.notificationSent===true?'SENT':'UNVERIFIED'});
   }catch(e){return json(res,400,{ok:false,error:e.message||'Richiesta non registrata'})}
 }
+async function handleSponsorSolidarityIntent(req,res){
+  if(req.method!=='POST')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  try{
+    const b=JSON.parse(await readBody(req)||'{}');
+    const name=String(b.name||'').trim(),email=String(b.email||'').trim(),phone=String(b.phone||'').trim();
+    const amount=Math.round(Number(b.amount||0)*100)/100;
+    const donorType=String(b.donorType||'PERSONA').toUpperCase();
+    const preference=String(b.preference||'FONDO_GENERALE').toUpperCase();
+    const allowedTypes=new Set(['PERSONA','AZIENDA']);
+    const allowedPreferences=new Set(['FONDO_GENERALE','PARTECIPAZIONE','MATERIALE','TRASPORTI','INCLUSIONE']);
+    if(!name||!email)return json(res,400,{ok:false,error:'Nome e email sono obbligatori.'});
+    if(!Number.isFinite(amount)||amount<5||amount>5000)return json(res,400,{ok:false,error:'Indica un importo compreso tra 5 e 5000 euro.'});
+    if(!allowedTypes.has(donorType))return json(res,400,{ok:false,error:'Tipo donatore non valido.'});
+    if(!allowedPreferences.has(preference))return json(res,400,{ok:false,error:'Preferenza di utilizzo non valida.'});
+    if(b.privacy!==true)return json(res,400,{ok:false,error:'Devi autorizzare il trattamento dei dati per la richiesta.'});
+    const anonymous=b.anonymous!==false;
+    const payload={
+      kind:'contacts',name,email,phone,privacy:true,
+      topic:'FONDO SOLIDALE SCD · DISPONIBILITÀ A CONTRIBUIRE',
+      category:'FONDO SOLIDALE',
+      message:[
+        'Importo indicativo: EUR '+amount.toFixed(2),
+        'Donatore: '+donorType,
+        'Preferenza indicativa: '+preference,
+        'Nome pubblico: '+(anonymous?'NO':'SOLO DOPO CONSENSO SEPARATO'),
+        '',
+        'Nota: questa richiesta registra una disponibilità a contribuire e non certifica alcun versamento.'
+      ].join('\n')
+    };
+    const result=await callAppsScript('public.ticketSubmit',payload,'');
+    const d=requireUpstreamSuccess(result,'Registrazione disponibilità Fondo Solidale')||{};
+    if(d.notificationSent===false)return json(res,502,{ok:false,stored:true,requestId:d.requestId||'',error:'Richiesta salvata, ma la notifica email alla Direzione non è stata inviata.',mailError:d.notificationError||''});
+    return json(res,200,{ok:true,requestId:d.requestId||'',status:d.status||'REGISTRATA',paymentStatus:'NON_EFFETTUATO',notification:d.notificationSent===true?'SENT':'UNVERIFIED'});
+  }catch(e){return json(res,400,{ok:false,error:e.message||'Disponibilità non registrata'})}
+}
+
 async function handleSponsorAccessRequest(req,res){
   if(req.method!=='POST')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
   try{
@@ -815,6 +851,7 @@ http.createServer(async(req,res)=>{
   if(u.pathname==='/api/capabilities') return json(res,200,{ok:true,version:'40.0.0',mode:'GITHUB_PAGES_RENDER_R20_SUPABASE_DUAL_RUN',actions:[...allowedActions].sort(),featureFlags:FEATURE_FLAGS,domainCore:SUPABASE_RUNTIME,isolated:['safeguarding']});
   if(u.pathname==='/api/core-status') return json(res,200,{ok:true,version:'40.0.0',featureFlags:FEATURE_FLAGS,domainCore:SUPABASE_RUNTIME,currentPrimary:'R20',targetPrimary:'SCD_SUPABASE'});
   if(u.pathname==='/api/sponsor/lead') return handleSponsorLead(req,res);
+  if(u.pathname==='/api/sponsor/solidarity-intent') return handleSponsorSolidarityIntent(req,res);
   if(u.pathname==='/api/sponsor/request-access') return handleSponsorAccessRequest(req,res);
   if(u.pathname==='/api/sponsor/otp') return handleSponsorOtp(req,res);
   if(u.pathname==='/api/sponsor/login') return handleSponsorLogin(req,res);
