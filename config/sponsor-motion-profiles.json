@@ -54,7 +54,14 @@
           "label": "Uscita SCD",
           "action": "Transizione azzurro-lago verso il raccordo SCD senza alterare il brand."
         }
-      ]
+      ],
+      "logoSourceEvidence": {
+        "status": "OFFICIAL_SOURCE_FOUND_IN_DRIVE",
+        "sourceType": "GOOGLE_SLIDES_OFFICIAL_SOURCE",
+        "fileId": "1o2z7yIwkm0omLNvo9SnrovvXsu7YhXw6MMrcQJ6Hf54",
+        "title": "GGLASS_LOGO_FONTE_UFFICIALE",
+        "approval": "ASSET_BINARY_TO_EXTRACT_AND_APPROVE"
+      }
     },
     {
       "id": "MOTION-TA-CLEANING-01",
@@ -107,7 +114,14 @@
           "label": "Uscita SCD",
           "action": "Chiusura pulita con raccordo blu/azzurro del sistema SCD."
         }
-      ]
+      ],
+      "logoSourceEvidence": {
+        "status": "TEMP_LED_ASSET_FOUND_IN_DRIVE",
+        "sourceType": "GOOGLE_SLIDES_TEMP_ASSET",
+        "fileId": "1NpryJd7IuwHljezR4r229unZvTmg7Ue0lF9cQQL4i7M",
+        "title": "TMP_ASSET_TA_CLEANING_LED",
+        "approval": "OFFICIAL_LOGO_STILL_REQUIRED"
+      }
     },
     {
       "id": "MOTION-AGC-MEDICAL-01",
@@ -160,7 +174,14 @@
           "label": "Uscita SCD",
           "action": "Accento azzurro-lago e transizione al contenuto successivo."
         }
-      ]
+      ],
+      "logoSourceEvidence": {
+        "status": "TEMP_LED_ASSET_FOUND_IN_DRIVE",
+        "sourceType": "GOOGLE_SLIDES_TEMP_ASSET",
+        "fileId": "1uTo4Y6NXMvHmK20-qZScqj2nVFk37c46OuBYs8wsvAc",
+        "title": "TMP_ASSET_AGC_MEDICAL_LED",
+        "approval": "OFFICIAL_LOGO_STILL_REQUIRED"
+      }
     },
     {
       "id": "MOTION-GENERIC-SCD-01",
