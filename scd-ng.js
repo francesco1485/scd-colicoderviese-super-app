@@ -3,6 +3,21 @@
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const API_BASE='';
 const PRIVATE_SESSION_KEY='scd:session:v1';
+let deferredInstallPrompt=null;
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(err=>console.warn('[pwa] service worker',err)));
+}
+window.addEventListener('beforeinstallprompt',event=>{
+  event.preventDefault();
+  deferredInstallPrompt=event;
+  const button=document.querySelector('#installApp');
+  if(button)button.hidden=false;
+});
+window.addEventListener('appinstalled',()=>{
+  deferredInstallPrompt=null;
+  const button=document.querySelector('#installApp');
+  if(button)button.hidden=true;
+});
 const state={view:'pulse',filter:'ALL',events:[],upcoming:[],fullCalendar:[],calendarLoaded:false,calendarLoading:false,calendarSourceState:'UNVERIFIED',calendarPeriod:'WEEK',calendarTeam:'ALL',calendarCategory:'ALL',calendarType:'ALL',calendarSearch:'',teamsSearch:'',teamsCategory:'ALL',socialFilter:'ALL',socialSearch:'',news:null,sportData:{results:[],standings:[],headToHead:[]},partners:[],publicProfiles:[],nextMatch:null,privateToken:'',privateEmail:'',privateData:null,workspace:null,privateLoading:false,privateError:''};
 const officialChannels=[
  {id:'site',label:'Sito ufficiale',url:'https://www.colicoderviese.it/',terms:'sito web comunicazioni servizi'},
@@ -729,6 +744,14 @@ async function hydrate(){
 }
 hydrate();$('#refreshData')?.addEventListener('click',()=>{hydrate();toast('Aggiornamento richiesto')});
 $('#socialRefresh')?.addEventListener('click',async()=>{await hydrate();renderSocialHub();toast('Feed social aggiornato')});
+$('#installApp')?.addEventListener('click',async()=>{
+ if(!deferredInstallPrompt){toast('Installazione disponibile dal menu del browser quando supportata');return}
+ deferredInstallPrompt.prompt();
+ await deferredInstallPrompt.userChoice.catch(()=>null);
+ deferredInstallPrompt=null;
+ const button=$('#installApp');if(button)button.hidden=true;
+});
+
 $('#socialSearch')?.addEventListener('input',e=>{state.socialSearch=String(e.target.value||'');renderSocialHub()});
 $('#socialFilters')?.addEventListener('click',e=>{
  const b=e.target.closest('[data-social-filter]');if(!b)return;
