@@ -11,9 +11,9 @@
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./assets/logo-scd.png">
   <link rel="apple-touch-icon" href="./assets/logo-scd.png">
-    <link rel="stylesheet" href="./scd-ng.css?v=0.6.1">
+    <link rel="stylesheet" href="./scd-ng.css?v=0.6.2">
   <link rel="stylesheet" href="./scd-synth.css?v=0.4.5">
-  <link rel="stylesheet" href="./ui-r52-social.css?v=0.7.0">
+  <link rel="stylesheet" href="./ui-r52-social.css?v=0.7.1">
 </head>
 <body data-scd-theme="arena">
   <div class="ambient ambient-a"></div><div class="ambient ambient-b"></div>
@@ -159,6 +159,20 @@
             <div class="section-head mini"><div><span class="eyebrow">PROSSIMI 30 GIORNI</span><h2>Eventi e appuntamenti</h2></div><button class="text-btn" type="button" data-public-action="calendar">Calendario →</button></div>
             <div class="event-rail" id="upcomingEventRail"><article class="event-empty"><b>Dati in aggiornamento</b><small>Mostriamo solo appuntamenti pubblici verificati.</small></article></div>
           </section>
+        </section>
+
+        <section class="club-now" id="clubNow" aria-labelledby="clubNowTitle">
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">SCD CLUB NOW</span>
+              <h2 id="clubNowTitle">Cosa stiamo costruendo.</h2>
+              <p>Servizi, strutture e sviluppo del Club raccontati con contenuti curati dalla Direzione. I progetti pianificati restano chiaramente distinti da ciò che è già attivo.</p>
+            </div>
+            <span class="status-pill" id="clubContentStatus">CONTENUTI SCD VERIFICATI</span>
+          </div>
+          <div class="club-now-grid" id="clubContentRail">
+            <article class="club-now-empty"><b>Carico i contenuti del Club</b><span>Nessun dato sportivo viene inventato per riempire questa sezione.</span></article>
+          </div>
         </section>
 
         <section class="ng-constellation">
@@ -426,6 +440,7 @@
                 <button type="button" data-social-filter="MATCHDAY">Matchday</button>
                 <button type="button" data-social-filter="NEWS">News</button>
                 <button type="button" data-social-filter="EVENT">Eventi</button>
+                <button type="button" data-social-filter="CLUB">Club</button>
               </div>
             </div>
             <div class="social-feed" id="socialFeed">
@@ -585,7 +600,7 @@
   <script src="./scd-experience-engine.js?v=40.0.0" defer></script>
   <script src="./scd-twin.js?v=40.0.0" defer></script>
   <script src="./lib/scd-operative-engine.js?v=51.0.0" defer></script>
-  <script src="./scd-ng.js?v=0.7.1" defer></script>
+  <script src="./scd-ng.js?v=0.7.2" defer></script>
   <script src="./scd-interactions.js?v=0.4.5" defer></script>
 </body>
 </html>
