@@ -1,0 +1,12 @@
+⚽️ MATCH DAY - LA NOSTRA TERRA, I NOSTRI COLORI! 🔴🔵
+
+I ragazzi sono pronti a scendere in campo per difendere i colori della SCD COLICODERVIESE! Serve la voce di tutto il territorio, da Colico a Dervio, per spingere la squadra oltre l'ostacolo.
+
+🏆 Campionato: {{campionato_name}}
+🆚 Avversario: {{avversario}}
+⏱️ Fischio d'inizio: Ore {{orario}}
+🏟️ Stadio: {{venue_name}}
+
+Sostieni la squadra seguendo gli aggiornamenti ufficiali oppure raggiungici direttamente al campo attraverso le indicazioni pubblicate nei canali SCD.
+
+#SCDColicoDerviese #Colico #Dervio #CalcioDilettanti #LNDLombardia #MatchDay #CuoreRossoBlu
