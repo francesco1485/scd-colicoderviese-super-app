@@ -29,8 +29,8 @@ function doPost(e) {
         data = r216PublicRequest_(payload, 'TESSERAMENTO');
         break;
       case 'public.identity.resolve':
-        if (typeof r56ResolveIdentity_ !== 'function') throw new Error('Modulo identita R56 non installato');
-        data = r56ResolveIdentity_(payload);
+        if (typeof r56PublicIdentityResolve_ !== 'function') throw new Error('Modulo identita R56 non installato');
+        data = r56PublicIdentityResolve_(payload);
         break;
       case 'public.partnerLead':
         data = r216PublicRequest_(payload, String(payload.kind || '').toLowerCase() === 'product' ? 'FORNITORE' : 'SPONSOR');
@@ -60,6 +60,14 @@ function doPost(e) {
         break;
       case 'auth.validate':
         data = validateSession(token || payload.token);
+        break;
+      case 'auth.identity.resolve':
+        if (typeof r56ResolveMyIdentity_ !== 'function') throw new Error('Modulo identita R56 non installato');
+        data = r56ResolveMyIdentity_(token || payload.token, payload);
+        break;
+      case 'auth.access.log':
+        if (typeof r56RecordAccess_ !== 'function') throw new Error('Modulo accessi R56 non installato');
+        data = r56RecordAccess_(token || payload.token, payload);
         break;
       case 'dashboard.summary':
       case 'private.dashboard':
