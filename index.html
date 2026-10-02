@@ -5,13 +5,14 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#041c3a">
   <meta name="description" content="SCD ColicoDerviese Universe: sport, community, servizi e club operations in una sola esperienza digitale.">
-  <meta name="scd-build" content="40.0.0">\n  <meta name="scd-release" content="NG-0.6.0">
+  <meta name="scd-build" content="40.0.0">\n  <meta name="scd-release" content="NG-0.7.0">
   <title>SCD Universe · Next Generation</title>
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./assets/logo-scd.png">
   <link rel="apple-touch-icon" href="./assets/logo-scd.png">
     <link rel="stylesheet" href="./scd-ng.css?v=0.6.0">
   <link rel="stylesheet" href="./scd-synth.css?v=0.4.5">
+  <link rel="stylesheet" href="./ui-r52-social.css?v=0.7.0">
 </head>
 <body data-scd-theme="arena">
   <div class="ambient ambient-a"></div><div class="ambient ambient-b"></div>
@@ -123,7 +124,7 @@
           <button type="button" data-nav="teams"><span>03</span><b>Squadre</b><small>Trova subito la tua categoria</small></button>
           <button type="button" id="sportFollowTeam"><span>★</span><b>La mia squadra</b><small id="sportFollowTeamLabel">Scegli e segui una squadra</small></button>
           <button type="button" data-scroll="#mediaHub"><span>04</span><b>Video & Media</b><small>Highlights e canali ufficiali</small></button>
-          <button type="button" data-scroll="#communityPulse"><span>05</span><b>Community</b><small>Sondaggi e partecipazione</small></button>
+          <button type="button" data-nav="social"><span>05</span><b>Social</b><small>News, matchday e community</small></button>
         </section>
 
         <section class="my-team-deck" id="myTeamDeck" hidden aria-live="polite">
@@ -394,6 +395,62 @@
         </section>
       </section>
 
+      <section class="view public-core-view social-core-view" id="view-social" data-view="social">
+        <section class="social-hero">
+          <div>
+            <span class="eyebrow">SCD SOCIAL · CLUB LIVE</span>
+            <h1>Il Club, <em>in un solo feed.</em></h1>
+            <p>Matchday, news verificate, attività, media ufficiali e aggiornamenti SCD. Nessuna ripubblicazione automatica di contenuti privati, nessun dato personale esposto per riempire una schermata.</p>
+            <div class="social-hero-actions">
+              <button class="btn primary" type="button" id="socialRefresh">Aggiorna feed</button>
+              <button class="btn glass" type="button" data-nav="calendar">Apri calendario</button>
+              <button class="btn glass" type="button" data-nav="teams">Le squadre</button>
+            </div>
+          </div>
+          <aside class="social-hero-card">
+            <small>LA MIA SQUADRA</small>
+            <b id="socialFollowedTeam">Nessuna squadra seguita</b>
+            <span id="socialFollowedMeta">Scegli una squadra dalla sezione Squadre per personalizzare il feed locale.</span>
+          </aside>
+        </section>
+
+        <section class="social-shell">
+          <div class="social-main">
+            <div class="social-toolbar">
+              <label class="social-search"><span>⌕</span><input id="socialSearch" type="search" autocomplete="off" placeholder="Cerca news, squadra, evento, avversario…"></label>
+              <div class="social-filters" id="socialFilters">
+                <button class="active" type="button" data-social-filter="ALL">Tutto</button>
+                <button type="button" data-social-filter="FOLLOWING">Per te</button>
+                <button type="button" data-social-filter="MATCHDAY">Matchday</button>
+                <button type="button" data-social-filter="NEWS">News</button>
+                <button type="button" data-social-filter="EVENT">Eventi</button>
+              </div>
+            </div>
+            <div class="social-feed" id="socialFeed">
+              <div class="social-empty"><b>Feed in sincronizzazione</b><span>Mostriamo soltanto contenuti derivati da fonti pubbliche verificate.</span></div>
+            </div>
+          </div>
+
+          <aside class="social-side">
+            <div class="social-follow">
+              <small>SCD PERSONAL FEED</small>
+              <b>Segui la tua squadra</b>
+              <span>La preferenza resta sul dispositivo e non espone dati personali.</span>
+              <button class="btn primary" type="button" data-nav="teams">Scegli squadra</button>
+            </div>
+            <h3>Canali ufficiali</h3>
+            <div class="social-channel-grid">
+              <a href="https://www.instagram.com/s.c.d.colicoderviese/" target="_blank" rel="noopener noreferrer"><span>◎</span><b>Instagram</b><small>Ufficiale SCD</small></a>
+              <a href="https://www.facebook.com/ColicoDerviese" target="_blank" rel="noopener noreferrer"><span>f</span><b>Facebook</b><small>Ufficiale SCD</small></a>
+              <a href="https://www.tiktok.com/@s.c.d..colicoderv" target="_blank" rel="noopener noreferrer"><span>♪</span><b>TikTok</b><small>Ufficiale SCD</small></a>
+              <a href="https://www.youtube.com/@S.C.D.ColicoDerviese" target="_blank" rel="noopener noreferrer"><span>▶</span><b>YouTube</b><small>Ufficiale SCD</small></a>
+              <a href="https://www.colicoderviese.it/" target="_blank" rel="noopener noreferrer"><span>WWW</span><b>Sito</b><small>Ufficiale SCD</small></a>
+            </div>
+            <div class="social-safety"><b>Regola editoriale SCD.</b> Il feed usa solo dati pubblici e contenuti autorizzati. Pixellot resta privato; immagini e profili di minori non vengono pubblicati automaticamente.</div>
+          </aside>
+        </section>
+      </section>
+
       <section class="view" id="view-twin" data-view="twin">
         <div class="twin-stage">
           <div class="twin-copy">
@@ -467,7 +524,7 @@
       <button class="active" data-nav="pulse"><span>⌂</span>Home</button>
       <button data-nav="calendar"><span>▦</span>Calendario</button>
       <button data-nav="teams"><span>⚽</span>Squadre</button>
-      <button data-scroll="#communityPulse"><span>◎</span>Community</button>
+      <button data-nav="social"><span>◎</span>Social</button>
       <button data-nav="twin"><span>◉</span>Profilo</button>
     </nav>
 
@@ -500,7 +557,8 @@
   <script src="./scd-meta-engine.js?v=40.0.0" defer></script>
   <script src="./scd-experience-engine.js?v=40.0.0" defer></script>
   <script src="./scd-twin.js?v=40.0.0" defer></script>
-  <script src="./scd-ng.js?v=0.6.0" defer></script>
+  <script src="./lib/scd-operative-engine.js?v=51.0.0" defer></script>
+  <script src="./scd-ng.js?v=0.7.0" defer></script>
   <script src="./scd-interactions.js?v=0.4.5" defer></script>
 </body>
 </html>
