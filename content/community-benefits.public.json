@@ -1,0 +1,46 @@
+{
+  "ok": true,
+  "public": true,
+  "source": "COMMUNITY_BENEFITS_SNAPSHOT",
+  "sourceTable": "CONVENZIONI_MASTER",
+  "sourceMode": "PUBLIC_SAFE_SNAPSHOT",
+  "snapshotAt": "2026-10-01",
+  "policy": "NO_ACTIVE_BENEFIT_WITHOUT_FORMALIZATION_EVIDENCE",
+  "generatedAt": "2026-10-01T00:00:00.000Z",
+  "counts": {
+    "active": 0,
+    "pipeline": 2,
+    "total": 2
+  },
+  "active": [],
+  "pipeline": [
+    {
+      "id": "CONV-MCDONALDS-2026",
+      "name": "McDonald's territoriale",
+      "category": "FOOD / COMMUNITY",
+      "status": "IN ATTIVAZIONE",
+      "benefit": "Sconto community",
+      "conditions": "10% su tutti i prodotti secondo proposta ricevuta",
+      "audience": "Tesserati / staff; perimetro finale da confermare",
+      "recognition": "Tessera valida mostrata alla cassa",
+      "territory": "Colico / Villa di Tirano; area franchisee Sondrio-Castione da confermare in formalizzazione",
+      "updatedAt": "01/10/2026",
+      "formalizationEvidence": false,
+      "usableNow": false
+    },
+    {
+      "id": "CONV-LAPIADINERIA-2026",
+      "name": "La Piadineria",
+      "category": "FOOD / COMMUNITY",
+      "status": "PRONTA PER FORMALIZZAZIONE",
+      "benefit": "Sconto community",
+      "conditions": "10% cassa con badge/lettera; 12% con Carta Mondo Piada o app secondo risposta aziendale",
+      "audience": "Tesserati / community SCD da definire nell'accordo",
+      "recognition": "Badge/lettera convenzione oppure Carta Mondo Piada/app",
+      "territory": "Piantedo C.C. Fuentes; Lecco C.C. La Meridiana; Lecco Via Cavour; Castione Andevenno Centro Iperal; online nei punti aderenti",
+      "updatedAt": "01/10/2026",
+      "formalizationEvidence": false,
+      "usableNow": false
+    }
+  ]
+}
