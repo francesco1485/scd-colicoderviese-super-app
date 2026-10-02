@@ -260,3 +260,31 @@ body{background:linear-gradient(180deg,#f5faff,#eef5fb 52%,#f8fbfe);color:var(--
 .future-conventions span{color:#d7e9f5}
 .partner-call{background:linear-gradient(135deg,#031a35,#0768aa)}
 .public-footer{background:#021426}
+
+
+/* ===== R50.4 CENTER DEVELOPMENT / SOLIDARITY ===== */
+.center-future{position:relative;overflow:hidden}
+.center-future:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 90% 12%,rgba(32,183,230,.13),transparent 34%);pointer-events:none}
+.center-project-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;position:relative}
+.center-project-card{min-height:230px;padding:22px;border:1px solid rgba(3,26,53,.12);border-radius:22px;background:linear-gradient(155deg,#fff,#f4f9fd);box-shadow:0 12px 34px rgba(3,26,53,.07);display:flex;flex-direction:column;align-items:flex-start}
+.center-project-card .project-code{font-size:11px;letter-spacing:.14em;font-weight:900;color:#0870cf}
+.center-project-card h3{margin:12px 0 8px;color:#031a35;font-size:22px;line-height:1.05}
+.center-project-card p{margin:0 0 18px;color:#536b82;line-height:1.55;flex:1}
+.center-project-card button,.center-participation button,.solidarity-fund button{border:0;border-radius:999px;padding:11px 15px;font:inherit;font-weight:850;cursor:pointer;background:#031a35;color:#fff}
+.center-project-card button:hover,.center-participation button:hover,.solidarity-fund button:hover{transform:translateY(-1px)}
+.center-participation{margin-top:18px;padding:24px;border-radius:24px;background:linear-gradient(125deg,#031a35,#052e59);color:#fff;display:grid;grid-template-columns:1.25fr 1fr;gap:24px;align-items:center}
+.center-participation small,.solidarity-copy small{color:#20b7e6;font-weight:900;letter-spacing:.12em}
+.center-participation h3{font-size:28px;margin:7px 0 8px}
+.center-participation p{color:#d9e9f5;margin:0;line-height:1.55}
+.center-participation-actions{display:flex;flex-wrap:wrap;gap:9px;justify-content:flex-end}
+.center-participation button{background:#ffd500;color:#031a35}
+.fiscal-note{font-size:12px;line-height:1.55;color:#61788e;max-width:980px;margin:16px auto 0;text-align:center}
+.solidarity-fund{margin:26px auto;padding:28px;max-width:1180px;border-radius:28px;background:linear-gradient(135deg,#fff8ce,#fff,#eef8ff);border:1px solid rgba(240,185,0,.32);display:grid;grid-template-columns:180px 1fr;gap:30px;align-items:center}
+.solidarity-mark{aspect-ratio:1;border-radius:28px;background:#031a35;color:#fff;display:flex;flex-direction:column;justify-content:center;padding:25px}
+.solidarity-mark span{color:#ffd500;font-weight:950;letter-spacing:.18em;font-size:14px}
+.solidarity-mark strong{font-size:27px;line-height:.98;margin-top:10px}
+.solidarity-copy h2{font-size:32px;line-height:1.04;color:#031a35;margin:8px 0 12px}
+.solidarity-copy p{color:#526b83;line-height:1.62;margin:0 0 18px}
+.solidarity-fund button{background:#f0b900;color:#031a35}
+@media(max-width:900px){.center-project-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.center-participation{grid-template-columns:1fr}.center-participation-actions{justify-content:flex-start}.solidarity-fund{grid-template-columns:120px 1fr}}
+@media(max-width:620px){.center-project-grid{grid-template-columns:1fr}.center-project-card{min-height:0}.solidarity-fund{grid-template-columns:1fr;margin:18px 14px;padding:20px}.solidarity-mark{max-width:140px}.solidarity-copy h2{font-size:26px}}
