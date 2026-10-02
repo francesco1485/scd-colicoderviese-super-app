@@ -1,13 +1,13 @@
 {
   "schema": "SCD_SPONSOR_DEVELOPMENT_SNAPSHOT_V1",
   "sourceMode": "SNAPSHOT_VERIFIED",
-  "generatedAt": "2026-10-02",
+  "generatedAt": "2026-10-02T17:00:00+02:00",
   "source": {
     "spreadsheetId": "1jb5Jt1ZYzJA-3oQd85AmwVhAoFQpBPfcsy4HupBzDFA",
     "spreadsheetName": "00 - SCD OPERATIVO PILOTA 2026-2027",
     "initiativeRange": "INIZIATIVE_COMMERCIALI!A21:Q38",
-    "supplierRange": "FORNITORI_SPONSOR_RADAR!A13:T14",
-    "stakeholderRange": "STAKEHOLDERS_MASTER!A37:V38",
+    "supplierRange": "FORNITORI_SPONSOR_RADAR!A13:T16",
+    "stakeholderRange": "STAKEHOLDERS_MASTER!A37:V40",
     "rule": "Generated only from canonical master ranges; never present as live."
   },
   "sourceTable": "INIZIATIVE_COMMERCIALI",
@@ -42,19 +42,19 @@
       "name": "Area fitness outdoor · KOMPAN",
       "type": "IMPIANTO / FITNESS / COMMUNITY",
       "target": "Tesserati, famiglie, cittadini, aziende",
-      "status": "IN CONFRONTO TECNICO",
+      "status": "IN CONFRONTO TECNICO / OFFERTA ALTERNATIVA RICEVUTA",
       "objective": "Sviluppare un'area fitness outdoor con soluzioni KOMPAN. KOMPAN Italia ha proposto sopralluogo e progettazione gratuita senza impegno, subordinati alla verifica degli spazi e alle autorizzazioni necessarie.",
       "audience": "Community + adulti + famiglie",
       "units": "",
       "unitPrice": "",
       "expectedRevenue": "",
       "realRevenue": "",
-      "partners": "KOMPAN Italia; wellness; medical; banche; imprese territoriali",
+      "partners": "KOMPAN Italia; Skyfitness Srl; wellness; medical; banche; imprese territoriali",
       "channel": "Centro Sportivo",
       "startDate": "",
       "endDate": "",
       "owner": "DIREZIONE / COMMERCIALE",
-      "documents": "GMAIL 21/09/2026 · Nicola Silvestrin / KOMPAN Italia · proposta sopralluogo + progetto gratuito senza impegno",
+      "documents": "KOMPAN: GMAIL 21/09/2026 · sopralluogo + progetto preliminare gratuito proposti. SKYFITNESS: GMAIL 18/06/2026 · proposta economica alternativa verificata: circuito calisthenics 9 + giochi; chiavi in mano €13.150 / €15.500 / €10.850 + IVA secondo configurazione; noleggio operativo disponibile. Confrontare su stesso perimetro tecnico prima di decidere.",
       "isDrawer": false,
       "quoteStatus": "",
       "hasVerifiedCost": false,
@@ -67,7 +67,17 @@
           "relationshipStatus": "CONFRONTO TECNICO / PROGETTO PRELIMINARE PROPOSTO",
           "email": "NicSil@kompan.com",
           "contact": "Nicola Silvestrin",
-          "commercialPosition": "",
+          "commercialPosition": "Produttore da valutare per area fitness outdoor e area gioco; sopralluogo/progetto gratuito proposto",
+          "sponsorPotential": "DA VALUTARE"
+        },
+        {
+          "supplierId": "SUP-SKYFITNESS",
+          "stakeholderId": "STK-SKYFITNESS",
+          "name": "SKYFITNESS SRL",
+          "relationshipStatus": "OFFERTA ECONOMICA RICEVUTA / ALTERNATIVA TECNICA",
+          "email": "servizi@skyfitness.it",
+          "contact": "Alessandro Alfiero",
+          "commercialPosition": "Tre proposte circuito 9 + gioco: chiavi in mano €13.150 / €15.500 / €10.850 + IVA; noleggio operativo e riscatto opzionale disponibili.",
           "sponsorPotential": "DA VALUTARE"
         }
       ]
@@ -77,19 +87,19 @@
       "name": "Area giochi bambini davanti Club House · KOMPAN",
       "type": "IMPIANTO / FAMILY / COMMUNITY",
       "target": "Bambini, famiglie, community",
-      "status": "IN CONFRONTO TECNICO",
+      "status": "IN CONFRONTO TECNICO / OFFERTA ALTERNATIVA RICEVUTA",
       "objective": "Sviluppare una piccola area gioco davanti alla Club House con soluzioni KOMPAN. KOMPAN Italia ha proposto sopralluogo e progettazione gratuita senza impegno, da dimensionare sugli spazi reali e sulle autorizzazioni applicabili.",
       "audience": "Famiglie + bambini",
       "units": "",
       "unitPrice": "",
       "expectedRevenue": "",
       "realRevenue": "",
-      "partners": "KOMPAN Italia; family brand; retail; food; banche",
+      "partners": "KOMPAN Italia; Skyfitness Srl; family brand; retail; food; banche",
       "channel": "Club House / Centro Sportivo",
       "startDate": "",
       "endDate": "",
       "owner": "DIREZIONE / COMMERCIALE",
-      "documents": "GMAIL 21/09/2026 · Nicola Silvestrin / KOMPAN Italia · proposta sopralluogo + progetto gratuito senza impegno",
+      "documents": "KOMPAN: GMAIL 21/09/2026 · sopralluogo + progetto preliminare gratuito proposti. SKYFITNESS: GMAIL 18/06/2026 · proposta alternativa verificata con Altalena Caraibi, Scivolo Classic o Molla Balena abbinati a circuito 9; soluzione Molla Balena chiavi in mano €10.850 + IVA. Valutare spazi/sicurezza e confronto tecnico.",
       "isDrawer": false,
       "quoteStatus": "",
       "hasVerifiedCost": false,
@@ -102,7 +112,17 @@
           "relationshipStatus": "CONFRONTO TECNICO / PROGETTO PRELIMINARE PROPOSTO",
           "email": "NicSil@kompan.com",
           "contact": "Nicola Silvestrin",
-          "commercialPosition": "",
+          "commercialPosition": "Produttore da valutare per area fitness outdoor e area gioco; sopralluogo/progetto gratuito proposto",
+          "sponsorPotential": "DA VALUTARE"
+        },
+        {
+          "supplierId": "SUP-SKYFITNESS",
+          "stakeholderId": "STK-SKYFITNESS",
+          "name": "SKYFITNESS SRL",
+          "relationshipStatus": "OFFERTA ECONOMICA RICEVUTA / ALTERNATIVA TECNICA",
+          "email": "servizi@skyfitness.it",
+          "contact": "Alessandro Alfiero",
+          "commercialPosition": "Tre proposte circuito 9 + gioco: chiavi in mano €13.150 / €15.500 / €10.850 + IVA; noleggio operativo e riscatto opzionale disponibili.",
           "sponsorPotential": "DA VALUTARE"
         }
       ]
@@ -209,7 +229,7 @@
           "relationshipStatus": "CONTRATTUALIZZATO / INSTALLAZIONE REGISTRATA 28/07/2026",
           "email": "",
           "contact": "Canale Verisure",
-          "commercialPosition": "",
+          "commercialPosition": "Rapporto fornitura sicurezza attivo; documenti e canoni da mantenere riconciliati",
           "sponsorPotential": "DA VALUTARE / FORNITORE ATTIVO"
         }
       ]
@@ -315,24 +335,35 @@
       "name": "Dehor laterale Club House · area ludica tesserati",
       "type": "ROADMAP / CLUB HOUSE / COMMUNITY",
       "target": "Tesserati, famiglie, community",
-      "status": "ROADMAP FUTURA / CASSETTO",
+      "status": "PREVENTIVI RICEVUTI / CASSETTO STRATEGICO",
       "objective": "Conservare come progetto futuro una zona laterale alla Club House dedicata a socialità, gioco e permanenza dei tesserati, attivabile quando emergeranno budget, partner o opportunità di finanziamento.",
       "audience": "Tesserati + famiglie",
       "units": "",
       "unitPrice": "",
       "expectedRevenue": "",
       "realRevenue": "",
-      "partners": "Arredo outdoor; edilizia; banca; retail; family brand",
+      "partners": "Vetratex Srl; arredo outdoor; edilizia; banca; retail; family brand",
       "channel": "Club House / Centro Sportivo",
       "startDate": "",
       "endDate": "",
       "owner": "DIREZIONE / ORGANIZZAZIONE / COMMERCIALE",
-      "documents": "INPUT DIREZIONE 02/10/2026 · progetto futuro, non presentare come intervento imminente",
+      "documents": "GMAIL 25/07/2026 · Vetratex Srl · due preventivi verificati per sostituzione intera struttura: soluzione tende Cristal imponibile €87.900 / totale IVA inclusa €107.238; soluzione vetri imponibile €100.900 / totale €123.098. Posa e trasporto indicati omaggio; collegamento elettrico escluso; lattoneria/autoscala e altre voci da definire in sopralluogo. Progetto resta nel cassetto strategico finché non viene deliberato.",
       "isDrawer": true,
-      "quoteStatus": "",
+      "quoteStatus": "RECEIVED_TO_RECONCILE",
       "hasVerifiedCost": false,
-      "requiresReconciliation": false,
-      "relatedSuppliers": []
+      "requiresReconciliation": true,
+      "relatedSuppliers": [
+        {
+          "supplierId": "SUP-VETRATEX",
+          "stakeholderId": "STK-VETRATEX",
+          "name": "VETRATEX SRL",
+          "relationshipStatus": "PREVENTIVI RICEVUTI / DA VALUTARE",
+          "email": "info@vetratex.it",
+          "contact": "Valentina / Responsabile clienti",
+          "commercialPosition": "Offerte verificate per sostituzione struttura: Cristal imponibile €87.900; vetri imponibile €100.900. Sopralluogo richiesto per voci da valutare.",
+          "sponsorPotential": "DA VALUTARE"
+        }
+      ]
     },
     {
       "id": "INIT-FUTURE-RISTORO-FAMILY",
@@ -482,7 +513,7 @@
   "kpi": {
     "total": 18,
     "drawer": 7,
-    "quotesToReview": 1,
+    "quotesToReview": 2,
     "inTechnicalReview": 2,
     "activeOrContracted": 1
   },

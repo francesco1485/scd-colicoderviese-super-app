@@ -370,31 +370,48 @@ function r216DevelopmentSummary_(token, payload) {
   var initiatives = r216CrmTable_('INIZIATIVE_COMMERCIALI');
   var suppliers = r216CrmTable_('FORNITORI_SPONSOR_RADAR');
   var stakeholders = r216CrmTable_('STAKEHOLDERS_MASTER');
-  var supplierByName = {};
+  function developmentAlias_(value){
+    return String(value||'').toUpperCase()
+      .replace(/\b(S\.?R\.?L\.?|S\.?P\.?A\.?|SAS|SNC|ITALIA)\b/g,' ')
+      .replace(/[^A-Z0-9]+/g,' ')
+      .replace(/\s+/g,' ')
+      .trim();
+  }
+  var supplierByAlias = {};
   suppliers.forEach(function(r){
-    var key=String(r.AZIENDA||'').trim().toUpperCase();
-    if(key) supplierByName[key]=r;
+    var key=developmentAlias_(r.AZIENDA||'');
+    if(key && key.length>=4) supplierByAlias[key]=r;
   });
-  var stakeholderByName = {};
+  var stakeholderByAlias = {};
   stakeholders.forEach(function(r){
-    var key=String(r.NOME||'').trim().toUpperCase();
-    if(key) stakeholderByName[key]=r;
+    var key=developmentAlias_(r.NOME||'');
+    if(key && key.length>=4) stakeholderByAlias[key]=r;
   });
-  function supplierRef_(name){
-    var key=String(name||'').trim().toUpperCase();
-    var s=supplierByName[key]||null;
-    var st=stakeholderByName[key]||null;
+  function supplierRefByAlias_(key){
+    var s=supplierByAlias[key]||null;
+    var st=stakeholderByAlias[key]||null;
     if(!s && !st) return null;
     return {
       supplierId:s ? String(s.SUPPLIER_ID||'') : '',
       stakeholderId:st ? String(st.STAKEHOLDER_ID||'') : '',
-      name:String((s&&s.AZIENDA)||(st&&st.NOME)||name||''),
+      name:String((s&&s.AZIENDA)||(st&&st.NOME)||key||''),
       relationshipStatus:String((s&&s.STATO_RAPPORTO)||(st&&st.STATO_RELAZIONE)||''),
       email:String((s&&s.EMAIL)||(st&&st.EMAIL)||''),
       contact:String((s&&s.CONTATTO)||''),
       commercialPosition:String((s&&s.POSIZIONE_COMMERCIALE)||''),
       sponsorPotential:String((s&&s.POTENZIALE_SPONSOR)||'')
     };
+  }
+  function collectRelatedSuppliers_(text){
+    var hay=developmentAlias_(text);
+    var out=[];
+    var seen={};
+    Object.keys(supplierByAlias).forEach(function(key){
+      if(!key || !hay || hay.indexOf(key)<0 || seen[key]) return;
+      var ref=supplierRefByAlias_(key);
+      if(ref){out.push(ref);seen[key]=true;}
+    });
+    return out;
   }
   var rows = initiatives.filter(function(r){
     var id=String(r.INIT_ID||'').trim();
@@ -404,13 +421,7 @@ function r216DevelopmentSummary_(token, payload) {
     var status=String(r.STATO||'').trim();
     var docs=String(r.DOCUMENTI||'').trim();
     var partners=String(r.PARTNER_COLLEGABILI||'').trim();
-    var related=[];
-    if(/KOMPAN/i.test([r.NOME,r.OBIETTIVO,partners,docs].join(' '))){
-      var k=supplierRef_('KOMPAN ITALIA')||supplierRef_('KOMPAN Italia'); if(k)related.push(k);
-    }
-    if(/VERISURE/i.test([r.NOME,r.OBIETTIVO,partners,docs].join(' '))){
-      var v=supplierRef_('VERISURE')||supplierRef_('Verisure'); if(v)related.push(v);
-    }
+    var related=collectRelatedSuppliers_([r.NOME,r.OBIETTIVO,partners,docs].join(' '));
     return {
       id:id,
       name:String(r.NOME||''),
