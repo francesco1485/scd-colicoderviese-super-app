@@ -708,7 +708,12 @@ function bindPrivateDesk(){
      const out=await privatePost('auth.login',{email,pin:code,code},'');
      const token=String(out.token||out.sessionToken||out.accessToken||'');
      if(!token)throw new Error('Sessione non restituita dal gestionale');
-     savePrivateSession(token,email);await ensurePrivateDesk(true);toast('Private Desk attivato');
+     savePrivateSession(token,email);
+     try{await privatePost('auth.access.log',{eventType:'LOGIN_SUCCESS',clientKind:window.matchMedia?.('(display-mode: standalone)')?.matches?'PWA':'WEB'},token)}catch{}
+     try{state.identity=await privatePost('auth.identity.resolve',{},token)}catch{state.identity=null}
+     await ensurePrivateDesk(true);
+     if(out.mustChangePin===true||out.firstAccessRequired===true)toast('Primo accesso: imposta il tuo PIN personale in Sicurezza account');
+     else toast('Private Desk attivato');
    }catch(err){if(st)st.textContent=String(err.message||err)}
    finally{btn.disabled=false}
  };
@@ -940,16 +945,11 @@ function openJoin(kind){
    e.preventDefault();const fd=new FormData(form),firstName=String(fd.get('firstName')||'').trim(),lastName=String(fd.get('lastName')||'').trim(),email=String(fd.get('email')||'').trim(),phone=String(fd.get('phone')||'').trim();
    const btn=$('button[type="submit"]',form),st=$('#joinFormState',form);btn.disabled=true;st.textContent='Invio in corso…';
    try{
-     let identity=null;try{identity=await postAction('public.identity.resolve',{email,phone})}catch{}
-     if(identity?.matched===true&&identity?.matchMethod==='EMAIL_EXACT'&&identity?.active!==false){
-       await postAction('auth.request',{email});
-       st.textContent='Account SCD gia riconosciuto. Ti abbiamo inviato un codice temporaneo per accedere senza creare un duplicato.';
-       btn.textContent='ACCOUNT RICONOSCIUTO';toast('Account SCD riconosciuto');return;
-     }
+     try{await postAction('public.identity.resolve',{email,phone})}catch{}
      const payload={firstName,lastName,name:[firstName,lastName].filter(Boolean).join(' '),email,phone,privacy:true,topic:'SCD Super App · '+label,category:kind,message:'Richiesta percorso '+label+' dalla home pubblica.'};
      const out=await postAction(action,payload);
-     st.textContent='Richiesta registrata'+(out.requestId?' · '+out.requestId:'')+'.';
-     btn.textContent='INVIATA';toast('Richiesta registrata');
+     st.textContent='Percorso avviato'+(out.requestId?' · '+out.requestId:'')+'. Se l’email è già collegata a un account SCD riceverai il codice di accesso; altrimenti la richiesta passa alla verifica della Società.';
+     btn.textContent='CONTROLLA EMAIL';toast('Percorso SCD avviato');
    }catch(err){st.textContent=String(err.message||err);btn.disabled=false}
  };
 }
