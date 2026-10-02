@@ -39,6 +39,9 @@ for(const viewport of viewports){
   await page.waitForSelector('#sportHub');
   await page.waitForSelector('#matchCenter');
   await page.waitForSelector('#upcomingEvents');
+  await page.waitForSelector('#clubNow');
+  await page.waitForSelector('#clubContentRail');
+  await page.waitForFunction(()=>document.querySelectorAll('#clubContentRail .club-now-card').length>=4);
   await page.waitForSelector('#mediaHub');
   await page.waitForSelector('#videoArena');
   await page.waitForSelector('#myTeamDeck',{state:'attached'});
@@ -86,6 +89,10 @@ for(const viewport of viewports){
   if(!/privato/i.test(pixellotLabel))throw new Error('Pixellot must remain visibly private');
   const solidarityCta=await page.locator('#solidarityHome a[href*="fondo-solidale"]').count();
   if(solidarityCta!==1)throw new Error('Solidarity Fund home CTA missing');
+  const clubNowCards=await page.locator('#clubContentRail .club-now-card').count();
+  if(clubNowCards<4)throw new Error('R55 Club Now content too sparse: '+clubNowCards);
+  const clubNowText=String(await page.locator('#clubContentRail').textContent()||'');
+  for(const token of ['Centro Sportivo','Famiglie e atleti','Tutela dei minori'])if(!clubNowText.includes(token))throw new Error('R55 Club Now missing '+token);
     const institutionalLogos=await page.locator('#institutionalStrip img').count();
   if(institutionalLogos!==3)throw new Error('institutional logos mismatch: '+institutionalLogos);
   const skyAsset=await page.locator('#mirrorFab img').getAttribute('src');
@@ -133,11 +140,19 @@ for(const viewport of viewports){
   await page.waitForSelector('#socialFeed');
   await page.waitForSelector('#socialSearch');
   await page.waitForSelector('#socialFilters');
+  if((await page.locator('[data-social-filter="CLUB"]').count())!==1)throw new Error('R55 Club social filter missing');
+  await page.click('[data-social-filter="CLUB"]');
+  await page.waitForFunction(()=>document.querySelectorAll('#socialFeed .social-card[data-type="CLUB"]').length>=4);
+  const socialClubCards=await page.locator('#socialFeed .social-card[data-type="CLUB"]').count();
+  if(socialClubCards<4)throw new Error('R55 Social Club feed too sparse: '+socialClubCards);
   if((await page.locator('.social-channel-grid a').count())!==5)throw new Error('social official channel count mismatch');
   if(await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+3))throw new Error('social view horizontal overflow');
   if([390,1440].includes(viewport.width))await page.screenshot({path:'test-output/social-'+viewport.width+'x'+viewport.height+'.png',fullPage:true});
   await page.fill('#socialSearch','SCD');
   await page.click('[data-social-filter="ALL"]');
+  await page.fill('#socialSearch','Centro Sportivo');
+  await page.waitForFunction(()=>document.querySelectorAll('#socialFeed .social-card[data-type="CLUB"]').length>=1);
+  await page.fill('#socialSearch','');
   await page.evaluate(()=>window.SCDNextGen.setView('teams'));
   await page.waitForSelector('#view-teams.active');
 
