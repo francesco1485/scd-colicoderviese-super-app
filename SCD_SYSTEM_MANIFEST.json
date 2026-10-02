@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.17.0",
+    "version": "3.18.0",
     "effective_at": "2026-10-02",
     "status": "BINDING",
     "language": "it-IT",
@@ -593,8 +593,26 @@
       "migrations": [
         "supabase/migrations/20260929_r33_club_graph_foundation.sql",
         "supabase/migrations/20260929_r34_rls_performance_hardening.sql",
-        "supabase/migrations/20260929_r35_auth_context_rls_normalization.sql"
-      ]
+        "supabase/migrations/20260929_r35_auth_context_rls_normalization.sql",
+        "supabase/migrations/20261002_r51_core_operative_engine.sql"
+      ],
+      "operative_engine": {
+        "state": "SCHEMA_STAGED_RUNTIME_GATED",
+        "people_roles": "scd_person_roles",
+        "registrations": "scd_tesseramenti",
+        "match_extension": "scd_matches",
+        "secretariat_alerts_view": "scd_secretariat_alerts_v",
+        "match_day_view": "scd_match_day_v",
+        "medical_source_of_truth": "scd_athletes.medical_certificate_expires_at",
+        "event_source_of_truth": "scd_events.id",
+        "rules": [
+          "NO_DUPLICATE_EVENT_DATE_SOURCE",
+          "NO_STORED_CURRENT_DATE_MEDICAL_STATUS",
+          "NO_PUBLIC_DIRECT_PII_ENDPOINT",
+          "RLS_REQUIRED",
+          "PROVENANCE_REQUIRED"
+        ]
+      }
     },
     "intake_hub": {
       "state": "LINK_FACTORY_IMPLEMENTED_RUNTIME_UPLOAD_BLOCKED",
@@ -2708,6 +2726,22 @@
         "R20"
       ],
       "contract": "PUBLIC_VOLUNTARY_DONATION_AREA_CONFIG_GATED_OFFICIAL_CHANNELS_NO_CARD_STORAGE_NO_PUBLIC_DONOR_WALL_NO_AUTO_TAX_CLAIMS_NO_ROLE_OR_MEMBERSHIP_SIDE_EFFECTS"
+    },
+    {
+      "id": "CAP-OPERATIVE-CORE",
+      "domain": "OPERATIONS",
+      "required": true,
+      "state": "PARTIAL",
+      "sources": [
+        "SCD_SUPABASE",
+        "R20",
+        "SCD_GMAIL",
+        "SCD_DRIVE",
+        "LND",
+        "FIGC",
+        "TUTTOCAMPO"
+      ],
+      "contract": "PEOPLE_MULTI_ROLE_REGISTRATION_MEDICAL_ALERTS_MATCHDAY_EVENT_ID_MAIL_DRIVE_ROUTING_FAIL_CLOSED"
     }
   ],
   "known_noncompliance": [
@@ -3687,6 +3721,22 @@
         ],
         "privacy_rule": "NO_PERSONAL_DONOR_DATA"
       }
+    },
+    "operative_core_engine": {
+      "release": "R51",
+      "state": "SCHEMA_AND_AUTOMATION_SOURCE_STAGED_RUNTIME_GATED",
+      "ui_module": "lib/scd-operative-engine.js",
+      "gmail_drive_router": "automations/google-apps-script/ScdMailDriveRouter.gs",
+      "match_day_template": "content/templates/match-day.it.txt",
+      "drive_tree": [
+        "01_AMMINISTRAZIONE_FISCO",
+        "02_SEGRETERIA_SPORTIVA",
+        "03_LOGISTICA_CAMPI",
+        "04_MEDIA_GRAFICA",
+        "05_COMUNICAZIONE_SOCIAL"
+      ],
+      "unsafe_public_secretariat_endpoint": false,
+      "hardcoded_drive_folder_ids": false
     }
   },
   "research_intelligence": {
