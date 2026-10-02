@@ -217,7 +217,7 @@ assert(stateGate.failure_rule==='NO_STATE_NO_WRITE','NO STATE -> NO WRITE rule m
 includesAll(stateGate.required_before||[],['FILE_WRITE','COMMIT','PUSH','BRANCH_CREATE','MERGE','DEPLOY','DATA_WRITE','CONFIG_CHANGE'],'SCD:STATE write coverage');
 includesAll(stateGate.minimum_evidence||[],['REPOSITORY','CURRENT_MAIN_SHA','CURRENT_WORKING_BRANCH','CI_STATUS','PAGES_STATUS','MANIFEST_VERSION_OR_HASH','RELEASE_DEPENDENCIES','KNOWN_BLOCKERS','SAFE_NEXT_ACTION'],'SCD:STATE evidence');
 includesAll(stateGate.allowed_status_values||[],['VERIFIED','UNVERIFIED','NOT_AVAILABLE','NOT_APPLICABLE'],'SCD:STATE statuses');
-includesAll(m.development_contract?.operating_cycle||[],['SCD:STATE','SCD:EXPERT','SCD:INVENTORY','SCD:GAP','SCD:PLAN','SCD:BUILD','SCD:DATA','SCD:QA','SCD:MERGE','SCD:DEPLOY','SCD:PROVE','SCD:ROLLBACK'],'development operating cycle');
+includesAll(m.development_contract?.operating_cycle||[],['SCD:STATE','SCD:EXPERT','SCD:ARCHITECT','SCD:INVENTORY','SCD:GAP','SCD:PLAN','SCD:BUILD','SCD:DATA','SCD:QA','SCD:MERGE','SCD:DEPLOY','SCD:PROVE','SCD:ROLLBACK'],'development operating cycle');
 const expert=m.development_contract?.global_expert_router||{};
 assert(expert.command==='SCD:EXPERT','SCD:EXPERT command missing');
 assert(expert.mode==='MULTIDISCIPLINARY_SOURCE_AWARE_ROUTER','SCD:EXPERT mode mismatch');
@@ -225,6 +225,18 @@ includesAll(expert.asset_decision_values||[],['KEEP_LOCKED','KEEP_ENHANCE','REBU
 assert(expert.cybersecurity_scope==='DEFENSIVE_AUTHORIZED_OSINT_AND_SECURE_ENGINEERING_ONLY','cybersecurity scope must remain defensive/authorized');
 assert(expert.research_scope==='PUBLIC_AUTHORIZED_SOURCES_ONLY','research scope must remain public/authorized');
 assert(expert.autonomy?.production_rule==='NO_CRITICAL_AUTONOMOUS_PRODUCTION_CHANGE','critical autonomous production change must remain forbidden');
+assert(expert.paired_architect_command==='SCD:ARCHITECT','SCD:ARCHITECT pairing missing');
+const architect=m.development_contract?.senior_principal_architect_protocol||{};
+assert(architect.command==='SCD:ARCHITECT','Senior Principal architect command missing');
+assert(architect.state==='BINDING','Senior Principal architect protocol must be binding');
+assert(architect.level==='SENIOR_PRINCIPAL','Senior Principal level missing');
+assert((architect.phases||[]).map(x=>x.id).join('|')==='VISION_ANALYSIS|ENGINE_DATA|ZERO_BUG_BUILD|AUTONOMOUS_CONTINUOUS_LOOP','Senior Principal four-phase protocol mismatch');
+assert(architect.continuation_rules?.do_not_stop_after_single_file===true,'continuous loop must not stop after a single file');
+assert(architect.continuation_rules?.do_not_request_permission_for_next_safe_step===true,'safe next steps must continue without micro-confirmations');
+assert(architect.continuation_rules?.background_continuation==='ONLY_VIA_EXPLICIT_SCHEDULED_AUTOMATION','background continuation must require explicit scheduler');
+assert(architect.continuation_rules?.truncation_boundary==='END_OF_COMPLETE_FILE_ONLY','truncation boundary must be complete file');
+assert(architect.continuation_rules?.truncation_marker==="[STATO: IN CORSO - Scrivi 'PROCEDI' per iniettare il blocco successivo]",'continuation marker mismatch');
+includesAll(architect.autonomous_guardrails||[],['SCD_STATE_REMAINS_REQUIRED_BEFORE_WRITE','NO_CRITICAL_AUTONOMOUS_PRODUCTION_CHANGE','NO_FAKE_SPORT_DATA','ROLLBACK_REQUIRED'],'Senior Principal autonomous guardrails');
 const assetGate=m.development_contract?.asset_decision_gate||{};
 assert(assetGate.command==='SCD:ASSET','SCD:ASSET command missing');
 assert(assetGate.registry==='config/scd-assets.v1.json','asset registry path mismatch');
