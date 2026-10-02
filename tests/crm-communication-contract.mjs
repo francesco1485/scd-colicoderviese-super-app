@@ -17,7 +17,9 @@ for(const action of [
   'private.communication.templates',
   'private.communication.preview',
   'private.communication.send',
-  'private.communication.health'
+  'private.communication.health',
+  'private.agenda.summary',
+  'private.agenda.create'
 ]){
   assert(bridge.includes("case '"+action+"'"),'bridge action missing: '+action);
   assert(server.includes("'"+action+"'"),'server action missing: '+action);
@@ -31,6 +33,18 @@ assert(bridge.includes("Session.getEffectiveUser().getEmail()"),'effective sende
 assert(bridge.includes("DEFAULT_FROM_EMAIL"),'canonical institutional sender missing');
 assert(bridge.includes("MAIL_ARCHIVIO"),'outbound audit archive missing');
 assert(bridge.includes("notificationSent"),'public request mail delivery state missing');
+assert(bridge.includes("options.bcc = actorCopy"),'authenticated actor private BCC copy missing');
+assert(bridge.includes("internalCopyTo"),'mail preview actor copy disclosure missing');
+assert(server.includes("u.pathname==='/api/sponsor/agenda'"),'protected Agenda SCD route missing');
+assert(bridge.includes("CalendarApp.getCalendarById"),'Google Calendar write bridge missing');
+assert(bridge.includes("r216AgendaEligibleUsers_"),'Agenda authorized user filter missing');
+assert(bridge.includes("UTENTI"),'Agenda must resolve invitees from canonical users');
+assert(bridge.includes("MailApp.sendEmail(ctx.summaryEmail"),'Agenda institutional summary email missing');
+assert(bridge.includes("event.deleteEvent()"),'Agenda fail-closed rollback when summary mail fails');
+assert(app.includes('id="agendaForm"'),'Agenda SCD builder UI missing');
+assert(app.includes('id="agendaInvitees"'),'Agenda authorized invitee UI missing');
+assert(js.includes("fetch('/api/sponsor/agenda'"),'Agenda SCD frontend API missing');
+assert(js.includes("if(name==='eventi')loadAgenda()"),'Agenda lazy loading missing');
 assert(bridge.includes("remainingDailyQuota"),'mail quota diagnostics missing');
 assert(server.includes("Il codice temporaneo non è stato inviato"),'OTP false-success guard missing');
 assert(server.includes("UPSTREAM_WRITE_TIMEOUT_MS"),'write timeout separation missing');
