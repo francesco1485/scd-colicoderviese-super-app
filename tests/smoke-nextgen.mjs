@@ -197,70 +197,96 @@ for(const viewport of viewports){
   await page.close();
 }
 
-// R54 private journey: synthetic authorized context, real UI clicks, no backend writes.
+// R54 private journey: active SCD Nova Private Desk, real UI clicks, intercepted backend.
 mark('R54_PRIVATE_JOURNEY');
 for(const viewport of [{width:390,height:844},{width:1440,height:900}]){
   const privatePage=await browser.newPage({viewport});
   const privateErrors=[];
   privatePage.on('pageerror',e=>privateErrors.push(String(e)));
   privatePage.on('console',m=>{if(m.type()==='error')privateErrors.push('console: '+m.text())});
-  await privatePage.goto(base+'/#/pulse',{waitUntil:'domcontentloaded',timeout:30000});
-  await privatePage.waitForFunction(()=>Boolean(window.R24?.go&&window.openManagementHome));
-  await privatePage.evaluate(()=>{
-    window.openManagementHome({
-      user:{name:'QA Family',email:'qa-family@example.test',role:'FAMILY',staff:false},
-      permissions:{direction:false},
-      personal:[
-        {personId:'QA-P1',firstName:'Atleta',lastName:'Uno',teamName:'U16 QA',figcStatus:'APPROVATO_QA',certificateStatus:'VALIDO_QA',paymentStatus:'REGOLARE_QA',identityStatus:'VERIFICATO_QA'},
-        {personId:'QA-P2',firstName:'Atleta',lastName:'Due',teamName:'U14 QA',figcStatus:'IN_AGGIORNAMENTO_QA',certificateStatus:'IN_AGGIORNAMENTO_QA',paymentStatus:'IN_AGGIORNAMENTO_QA'}
-      ],
-      convocations:[{id:'QA-C1',personId:'QA-P1',team:'U16 QA',date:'2026-10-04',meetingTime:'13:45',meetingPlace:'Campo QA',response:'DA CONFERMARE'}],
-      teams:[{key:'QA-U16',name:'U16 QA'}],
-      transport:{kpis:{requests:0}}
-    });
-    window.R24.go('family');
+
+  const privateData={
+    user:{name:'QA Family',email:'qa-family@example.test',role:'FAMILY',staff:false},
+    permissions:{direction:false},
+    personal:[
+      {personId:'QA-P1',firstName:'Atleta',lastName:'Uno',teamName:'U16 QA',figcStatus:'APPROVATO_QA',certificateStatus:'VALIDO_QA',paymentStatus:'REGOLARE_QA',identityStatus:'VERIFICATO_QA'},
+      {personId:'QA-P2',firstName:'Atleta',lastName:'Due',teamName:'U14 QA',figcStatus:'IN_AGGIORNAMENTO_QA',certificateStatus:'IN_AGGIORNAMENTO_QA',paymentStatus:'IN_AGGIORNAMENTO_QA'}
+    ],
+    convocations:[{id:'QA-C1',personId:'QA-P1',team:'U16 QA',date:'2026-10-04',meetingTime:'13:45',meetingPlace:'Campo QA',response:'DA CONFERMARE'}],
+    teams:[{key:'QA-U16',name:'U16 QA'}],
+    transport:{kpis:{requests:0}}
+  };
+  const workspace={
+    email:'qa-family@example.test',name:'QA Family',role:'FAMILY',privateDeskProfile:'FAMILY_AUTHORIZED',
+    defaultModules:['TESSERATI','PULMINI','RICHIESTE','CALENDARIO'],
+    communicationScope:[],dataScope:['QA AUTHORIZED PROFILE'],areas:[]
+  };
+
+  await privatePage.route('**/api/scd',async route=>{
+    const req=route.request();
+    if(req.method()!=='POST')return route.continue();
+    let body={};try{body=JSON.parse(req.postData()||'{}')}catch{}
+    const action=String(body.action||'');
+    let data={};
+    if(action==='auth.login')data={token:'qa-private-token'};
+    else if(action==='auth.validate')data={valid:true,userId:'QA-USER'};
+    else if(action==='dashboard.summary')data=privateData;
+    else if(action==='private.user.workspace')data=workspace;
+    else if(action==='account.requests')data={rows:[{id:'QA-R1',type:'DOCUMENTO',subject:'Pratica QA',status:'APERTA',createdAt:'2026-10-02'}]};
+    else if(action==='private.transport.request')data={requestId:'QA-TR-1'};
+    else if(action==='private.request.submit')data={requestId:'QA-REQ-1'};
+    else if(action==='private.convocation.reply')data={ok:true};
+    await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({ok:true,data})});
   });
-  await privatePage.waitForSelector('#appRouteView .r24-family-strip');
-  await privatePage.waitForSelector('.r54-family-services');
-  if((await privatePage.locator('[data-r24-family-action]').count())!==5)throw new Error('R54 family actions mismatch '+viewport.width);
-  if(await privatePage.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+3))throw new Error('R54 family horizontal overflow '+viewport.width);
 
-  await privatePage.click('[data-r24-family-action="docs"]');
-  await privatePage.waitForSelector('#r54FamilyNewRequest');
-  const docsText=String(await privatePage.locator('.modal-card').textContent()||'');
-  if(!docsText.includes('VALIDO_QA')||!docsText.includes('VERIFICATO_QA'))throw new Error('R54 family document status projection missing');
-  if(/sincronizzati dal gestionale/i.test(docsText))throw new Error('R54 family docs must not claim unverified sync');
-  await privatePage.evaluate(()=>window.closeModal?.());
+  await privatePage.goto(base+'/#desk',{waitUntil:'domcontentloaded',timeout:30000});
+  await privatePage.waitForSelector('#privateDeskLoginForm');
+  await privatePage.fill('#privateDeskEmail','qa-family@example.test');
+  await privatePage.fill('#privateDeskCode','123456');
+  await privatePage.click('#privateDeskLoginForm button[type="submit"]');
+  await privatePage.waitForSelector('[data-private-module="TESSERATI"]');
 
-  await privatePage.click('[data-r24-family-action="payments"]');
-  await privatePage.waitForSelector('.r54-status-list');
-  const paymentText=String(await privatePage.locator('.modal-card').textContent()||'');
-  if(!paymentText.includes('REGOLARE_QA'))throw new Error('R54 payment status projection missing');
-  await privatePage.evaluate(()=>window.closeModal?.());
+  await privatePage.click('[data-private-module="TESSERATI"]');
+  await privatePage.waitForSelector('.r54-people-hub');
+  if((await privatePage.locator('.r54-profile-actions button').count())!==6)throw new Error('R54 active profile actions mismatch '+viewport.width);
+  if((await privatePage.locator('[data-r54-callup]').count())!==2)throw new Error('R54 active callup actions missing '+viewport.width);
+  if(await privatePage.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+3))throw new Error('R54 Private Desk horizontal overflow '+viewport.width);
 
-  await privatePage.click('[data-r24-family-action="transport"]');
-  await privatePage.waitForSelector('#transportForm');
-  await privatePage.evaluate(()=>window.closeModal?.());
+  await privatePage.click('[data-r54-action="documents"]');
+  await privatePage.waitForSelector('.r54-live-status-list');
+  const docsText=String(await privatePage.locator('#publicPanelBody').textContent()||'');
+  if(!docsText.includes('VALIDO_QA')||!docsText.includes('VERIFICATO_QA'))throw new Error('R54 document projection missing');
+  if(/sincronizzati dal gestionale/i.test(docsText))throw new Error('R54 must not claim unverified document sync');
+  await privatePage.click('#r54PrivateHelp');
+  await privatePage.waitForSelector('#r54PrivateRequestForm');
+  await privatePage.click('#publicPanelClose');
 
-  await privatePage.click('[data-r24-family-action="requests"]');
-  await privatePage.waitForSelector('#requestHistoryMount');
-  await privatePage.evaluate(()=>window.closeModal?.());
+  await privatePage.click('[data-private-module="TESSERATI"]');
+  await privatePage.waitForSelector('.r54-people-hub');
+  await privatePage.click('[data-r54-action="payments"]');
+  await privatePage.waitForSelector('.r54-live-status-list');
+  const paymentText=String(await privatePage.locator('#publicPanelBody').textContent()||'');
+  if(!paymentText.includes('REGOLARE_QA'))throw new Error('R54 payment projection missing');
+  await privatePage.click('#publicPanelClose');
 
-  if([390,1440].includes(viewport.width))await privatePage.screenshot({path:'test-output/r54-family-'+viewport.width+'x'+viewport.height+'.png',fullPage:true});
+  await privatePage.click('[data-private-module="TESSERATI"]');
+  await privatePage.waitForSelector('.r54-people-hub');
+  await privatePage.click('[data-r54-action="transport"]');
+  await privatePage.waitForSelector('#r54TransportForm');
+  await privatePage.click('#publicPanelClose');
 
-  await privatePage.evaluate(()=>window.R24.go('athlete'));
-  await privatePage.waitForSelector('.r53-callup-card');
-  await privatePage.waitForSelector('.r54-private-actions');
-  if((await privatePage.locator('.r54-private-actions button').count())!==4)throw new Error('R54 athlete actions mismatch');
-  await privatePage.click('#r54AthleteStatus');
-  await privatePage.waitForSelector('.r54-status-list');
-  const athleteText=String(await privatePage.locator('.modal-card').textContent()||'');
-  if(!athleteText.includes('APPROVATO_QA')||!athleteText.includes('VALIDO_QA'))throw new Error('R54 athlete status projection missing');
-  await privatePage.evaluate(()=>window.closeModal?.());
-  if(await privatePage.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+3))throw new Error('R54 athlete horizontal overflow '+viewport.width);
-  if([390,1440].includes(viewport.width))await privatePage.screenshot({path:'test-output/r54-athlete-'+viewport.width+'x'+viewport.height+'.png',fullPage:true});
+  await privatePage.click('[data-private-module="TESSERATI"]');
+  await privatePage.waitForSelector('.r54-people-hub');
+  await privatePage.click('[data-r54-action="requests"]');
+  await privatePage.waitForSelector('#r54PrivateRequests');
+  await privatePage.waitForFunction(()=>document.querySelector('#r54PrivateRequests')?.textContent?.includes('Pratica QA'));
+  await privatePage.click('#publicPanelClose');
 
-  if(privateErrors.length)throw new Error('R54 private browser errors '+viewport.width+'px: '+privateErrors.join(' | '));
+  await privatePage.click('[data-private-module="TESSERATI"]');
+  await privatePage.waitForSelector('.r54-people-hub');
+  if([390,1440].includes(viewport.width))await privatePage.screenshot({path:'test-output/r54-private-desk-'+viewport.width+'x'+viewport.height+'.png',fullPage:true});
+
+  if(privateErrors.length)throw new Error('R54 active Private Desk browser errors '+viewport.width+'px: '+privateErrors.join(' | '));
   await privatePage.close();
 }
 
