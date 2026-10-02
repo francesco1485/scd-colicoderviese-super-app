@@ -688,6 +688,7 @@ const deskModuleMeta={
  PRESENZE:['✓','Presenze','Registro squadra autorizzato'],
  CONVOCAZIONI:['⚽','Convocazioni','Crea e gestisci le convocazioni'],
  ACCESSI:['♙','Utenti & Accessi','Inviti, ruoli e attivazione account'],
+ METRICHE:['▥','Metriche Accessi','Adozione e utilizzo aggregato'],
  SICUREZZA:['⌁','Sicurezza account','PIN personale e sessione'],
  TORNEI_EVENTI:['★','Tornei & Eventi','Organizzazione e calendario'],
  BIGLIETTERIA:['◧','Biglietteria','Accessi e attività evento'],
@@ -744,7 +745,7 @@ function renderPrivateDesk(){
  if(personal.length){moduleSet.add('TESSERATI');moduleSet.add('PULMINI')}
  moduleSet.add('RICHIESTE');moduleSet.add('SICUREZZA');
  if(u.staff||perm.direction||['STAFF','MISTER','MANAGER','SECRETARIAT','REGISTRATION','TOURNAMENTS','DIREZIONE','ADMIN'].includes(String(u.role||'').toUpperCase())){moduleSet.add('PRESENZE');moduleSet.add('CONVOCAZIONI');moduleSet.add('COMUNICAZIONI')}
- if(perm.direction||['DIREZIONE','ADMIN'].includes(String(u.role||'').toUpperCase()))moduleSet.add('ACCESSI');
+ if(perm.direction||['DIREZIONE','ADMIN'].includes(String(u.role||'').toUpperCase())){moduleSet.add('ACCESSI');moduleSet.add('METRICHE')}
  const modules=[...moduleSet];
  if(status)status.textContent=(w.privateDeskProfile||'ROLE / SCOPE').replaceAll('_',' ');
  if(title)title.innerHTML=esc(w.name||'Private Desk')+'<br><em>'+esc(w.role||'Profilo SCD')+'</em>';
@@ -883,6 +884,19 @@ function openPrivateSecurity(){
    catch(err){st.textContent=String(err.message||err);btn.disabled=false}
  };
 }
+async function openPrivateAccessMetrics(){
+ const d=state.privateData||{},u=d.user||{},perm=d.permissions||{},isDirection=perm.direction===true||['DIREZIONE','ADMIN'].includes(String(u.role||'').toUpperCase());
+ if(!isDirection){openPanel('Metriche Accessi','<div class="panel-detail"><h2>Accesso non autorizzato</h2><p>Le metriche aggregate sono riservate alla Direzione.</p></div>');return}
+ const layer=openPanel('Metriche Accessi','<div class="panel-detail r54-private-panel"><span class="eyebrow">DIREZIONE · ANALYTICS PRIVACY-FIRST</span><h2>Utilizzo della Super App</h2><p>Conteggi aggregati. Nessun PIN, documento, messaggio, dato sanitario o posizione grezza entra in questa vista.</p><div id="r56AccessMetrics" class="desk-private-loading"><b>Carico gli ultimi 30 giorni…</b></div></div>');
+ const mount=$('#r56AccessMetrics',layer);
+ try{
+   const out=await privatePost('direction.access.metrics',{days:30});
+   const rows=Array.isArray(out.daily)?out.daily:[];
+   const max=Math.max(1,...rows.map(x=>Number(x.activeUsers||0)));
+   mount.innerHTML='<div class="r56-metric-kpis"><article><small>UTENTI ATTIVI</small><b>'+esc(String(out.activeUsers||0))+'</b><span>ultimi '+esc(String(out.days||30))+' giorni</span></article><article><small>LOGIN</small><b>'+esc(String(out.loginEvents||0))+'</b><span>accessi autenticati</span></article><article><small>PRIVATE DESK</small><b>'+esc(String(out.privateDeskOpens||0))+'</b><span>aperture operative</span></article></div>'+(rows.length?'<div class="r56-access-trend">'+rows.slice(-30).map(x=>'<article><small>'+esc(x.date||'')+'</small><div><span style="width:'+Math.max(3,Math.round(Number(x.activeUsers||0)/max*100))+'%"></span></div><b>'+esc(String(x.activeUsers||0))+'</b></article>').join('')+'</div>':'<div class="desk-service-empty"><b>Nessun accesso registrato</b><span>Le metriche compariranno dopo i primi accessi autenticati.</span></div>');
+ }catch(err){mount.innerHTML='<div class="desk-service-empty"><b>Metriche in aggiornamento</b><span>'+esc(String(err.message||err))+'</span></div>'}
+}
+
 function openPrivateAccessManager(){
  const d=state.privateData||{},u=d.user||{},perm=d.permissions||{},isDirection=perm.direction===true||['DIREZIONE','ADMIN'].includes(String(u.role||'').toUpperCase());
  if(!isDirection){openPanel('Utenti & Accessi','<div class="panel-detail"><h2>Accesso non autorizzato</h2><p>La gestione account e ruoli e riservata alla Direzione.</p></div>');return}
@@ -924,6 +938,7 @@ function openPrivateModule(module){
  if(module==='PRESENZE'){openPrivateAttendance();return}
  if(module==='CONVOCAZIONI'){openPrivateConvocations();return}
  if(module==='ACCESSI'){openPrivateAccessManager();return}
+ if(module==='METRICHE'){openPrivateAccessMetrics();return}
  if(module==='SICUREZZA'){openPrivateSecurity();return}
  openPanel(m[1],'<div class="panel-detail private-module-panel"><span class="eyebrow">PRIVATE DESK</span><h2>'+esc(m[1])+'</h2><p>'+esc(m[2])+'. Modulo assegnato dal profilo '+esc(w.privateDeskProfile||'ROLE/SCOPE')+'.</p></div>');
 }
