@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.22.0",
+    "version": "3.23.0",
     "effective_at": "2026-10-02",
     "status": "BINDING",
     "language": "it-IT",
@@ -2805,6 +2805,19 @@
         "R20"
       ],
       "contract": "MVP_POINTS_REWARDS_PARTNER_DEALS_TEAM_CHANNELS_FAIL_CLOSED_MODERATED"
+    },
+    {
+      "id": "CAP-SPONSOR-OPERATIONAL-FOCUS",
+      "domain": "SPONSOR_PRIVATE",
+      "required": true,
+      "state": "PARTIAL",
+      "screen": "SPONSOR_DASHBOARD",
+      "sources": [
+        "SCD_OPERATIVO_PILOTA",
+        "SCD_GOOGLE_CALENDAR",
+        "R20"
+      ],
+      "contract": "DERIVED_DAILY_ACTIONS_FROM_CANONICAL_PROJECT_STATUS_AND_AGENDA_NO_SYNTHETIC_DEADLINES_QUOTE_RECONCILIATION_PRIORITY"
     }
   ],
   "known_noncompliance": [
@@ -3958,6 +3971,41 @@
         "PARTNER_DEALS_REQUIRE_VERIFIED_SOURCE",
         "MISSING_DATA_FAILS_CLOSED"
       ]
+    },
+    "sponsor_operational_focus": {
+      "state": "PRIVATE_DERIVED_VIEW_READY",
+      "private_surface": "SPONSOR_DASHBOARD_OPERATIONAL_FOCUS",
+      "audience": [
+        "DIREZIONE",
+        "COMMERCIALE",
+        "SPONSOR_AUTHORIZED_USERS"
+      ],
+      "sources": [
+        "SCD_OPERATIVO_PILOTA/INIZIATIVE_COMMERCIALI",
+        "SCD_OPERATIVO_PILOTA/FORNITORI_SPONSOR_RADAR",
+        "SCD_GOOGLE_CALENDAR"
+      ],
+      "dependencies": [
+        "/api/sponsor/development",
+        "/api/sponsor/agenda"
+      ],
+      "rules": [
+        "DERIVE_ACTIONS_FROM_VERIFIED_STATUS_ONLY",
+        "NO_INVENTED_DEADLINES",
+        "NO_INVENTED_COSTS",
+        "DRAWER_PROJECTS_NOT_URGENT",
+        "QUOTE_RECONCILIATION_HAS_PRIORITY",
+        "TECHNICAL_REVIEW_NEXT",
+        "AGENDA_EVENT_NEVER_CREATED_WITHOUT_HUMAN_CONFIRMATION",
+        "SOURCE_MODE_VISIBLE"
+      ],
+      "primary_actions": [
+        "OPEN_PROJECT",
+        "PREPARE_AGENDA_EVENT",
+        "OPEN_LINKED_CRM_STAKEHOLDER"
+      ],
+      "fallback": "SHOW_AVAILABLE_SOURCE_AND_DISCLOSE_UNAVAILABLE_DEPENDENCY",
+      "tracking": "NONE_CLIENT_ANALYTICS_BY_DEFAULT"
     }
   },
   "research_intelligence": {

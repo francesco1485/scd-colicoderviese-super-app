@@ -175,6 +175,27 @@ assert(js.includes("$$('.view').forEach"),'multi-view selector must use $$ helpe
 assert(js.includes("$$('[data-view]').forEach"),'multi-action selector must use $$ helper');
 assert(js.includes("$$('[data-campaign-filter]').forEach"),'campaign filters must use $$ helper');
 assert(!/(^|[^$])\$\('\[data-view\]'\)\.forEach/m.test(js),'single selector incorrectly used for multiple view actions');
+for(const token of [
+  'id="homeOperationalFocus"',
+  'id="focusSourceState"',
+  'id="focusKpis"',
+  'id="focusActions"',
+  'id="focusAgenda"',
+  'Da fare adesso'
+]) assert(app.includes(token),'R53.1 Operational Focus UI missing: '+token);
+for(const token of [
+  'function operationalMeta',
+  'function operationalProjects',
+  'function renderOperationalFocus',
+  'function loadOperationalFocus',
+  'function prepareAgendaForProject',
+  "if(name==='home')loadOperationalFocus()",
+  'Riconcilia documenti, fornitore e importi verificati',
+  'Programma il prossimo sopralluogo o confronto tecnico'
+]) assert(js.includes(token),'R53.1 Operational Focus interaction missing: '+token);
+assert(js.includes("$('[data-focus-project]').forEach"),'Operational Focus project controls must use $ helper');
+assert(js.includes("$('[data-focus-agenda]').forEach"),'Operational Focus agenda controls must use $ helper');
+assert(!/(^|[^$])\$\('\[data-focus-project\]'\)\.forEach/m.test(js),'single selector incorrectly used for Operational Focus project actions');
 assert(js.includes("$('[data-motion-id]').forEach"),'motion profile controls must use $ helper');
 assert(!/(^|[^$])\$\('\[data-motion-id\]'\)\.forEach/m.test(js),'single selector incorrectly used for motion profile collection');
 
