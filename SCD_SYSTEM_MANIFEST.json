@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.19.0",
+    "version": "3.20.0",
     "effective_at": "2026-10-02",
     "status": "BINDING",
     "language": "it-IT",
@@ -2764,14 +2764,32 @@
         "TUTTOCAMPO"
       ],
       "contract": "PEOPLE_MULTI_ROLE_REGISTRATION_MEDICAL_ALERTS_MATCHDAY_EVENT_ID_MAIL_DRIVE_ROUTING_FAIL_CLOSED"
+    },
+    {
+      "id": "CAP-SOCIAL-HUB",
+      "domain": "PUBLIC_SOCIAL",
+      "required": true,
+      "state": "PARTIAL",
+      "screen": "SOCIAL_HUB",
+      "sources": [
+        "SCD_NEWSROOM",
+        "R20",
+        "SCD_SUPABASE",
+        "SCD_OFFICIAL_SITE",
+        "SCD_FACEBOOK",
+        "SCD_INSTAGRAM",
+        "SCD_TIKTOK",
+        "SCD_YOUTUBE"
+      ],
+      "contract": "VERIFIED_PUBLIC_FEED_MATCHDAY_NEWS_EVENTS_MEDIA_LOCAL_FOLLOW_SHARE_FAIL_CLOSED"
     }
   ],
   "known_noncompliance": [
     {
       "id": "GAP-UI-001",
       "severity": "HIGH",
-      "statement": "R44 riallinea Home, Calendario pubblico e Squadre pubbliche alla grammatica SCD Universe; Communications, Services/Profile riservato, Athlete, Family e Staff restano da riallineare progressivamente.",
-      "required_fix": "Applicare il design system R38/R44 a Communications, Services/Profile riservato, Athlete, Family e Staff senza perdere funzionalita."
+      "statement": "R52 riallinea anche la superficie Social/Community al design SCD Universe; Services/Profile riservato, Athlete, Family e Staff restano da riallineare progressivamente.",
+      "required_fix": "Applicare il design system R38/R52 a Services/Profile riservato, Athlete, Family e Staff senza perdere funzionalita."
     },
     {
       "id": "GAP-UI-002",
@@ -3405,8 +3423,8 @@
       ]
     },
     "nextgen_preview": {
-      "release": "NG-0.6.0",
-      "name": "SCD ARENA",
+      "release": "NG-0.7.0",
+      "name": "SCD SOCIAL ARENA",
       "status": "LIVE",
       "entry": "#/pulse",
       "visual": "SYNTHETIC_SPATIAL_LOW_FATIGUE",
@@ -3573,8 +3591,8 @@
         },
         {
           "id": "COMMUNITY",
-          "hash": "#pulse?section=community",
-          "surface": "COMMUNITY_PULSE"
+          "hash": "#social",
+          "surface": "SOCIAL_HUB"
         },
         {
           "id": "PROFILE",
@@ -3815,6 +3833,43 @@
       ],
       "unsafe_public_secretariat_endpoint": false,
       "hardcoded_drive_folder_ids": false
+    },
+    "social_app_mvp": {
+      "release": "R52",
+      "state": "PUBLIC_MVP_UI_READY_SOURCE_GROUNDED",
+      "route": "#social",
+      "purpose": "ONE_FEED_FOR_MATCHDAY_NEWS_EVENTS_OFFICIAL_MEDIA_AND_LOCAL_TEAM_FOLLOW",
+      "sources": [
+        "SCD_NEWSROOM",
+        "R20",
+        "SCD_SUPABASE",
+        "SCD_OFFICIAL_SITE",
+        "SCD_FACEBOOK",
+        "SCD_INSTAGRAM",
+        "SCD_TIKTOK",
+        "SCD_YOUTUBE"
+      ],
+      "personalization": {
+        "followed_team": "LOCAL_DEVICE_ONLY",
+        "no_profile_required": true,
+        "no_personal_data_export": true
+      },
+      "publishing_rules": [
+        "VERIFIED_NEWS_REQUIRES_EVIDENCE",
+        "NO_AUTO_REPUBLISH_PRIVATE_MEDIA",
+        "PIXELLOT_PRIVATE_BY_DEFAULT",
+        "MINORS_REQUIRE_MEDIA_AUTHORIZATION",
+        "MISSING_DATA_FAILS_CLOSED",
+        "WEB_SHARE_OR_CLIPBOARD_ONLY_NO_SERVER_SIDE_AUTO_POST"
+      ],
+      "ui": [
+        "DEDICATED_SOCIAL_ROUTE",
+        "SEARCH",
+        "FILTERS",
+        "FOLLOWING_FEED",
+        "MATCHDAY_SHARE",
+        "OFFICIAL_CHANNELS"
+      ]
     }
   },
   "research_intelligence": {
