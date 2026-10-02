@@ -47,6 +47,25 @@ for(const token of [
 ]) assert(pub.includes(token),'R47 commercial experience missing: '+token);
 
 assert(pub.includes('I loghi ufficiali saranno mostrati solo dopo caricamento'),'official logo governance missing');
+for(const token of [
+  'IL CENTRO SPORTIVO CHE CRESCE',
+  'INIT-CENTRO-RICARICA-EV',
+  'INIT-CENTRO-FITNESS-KOMPAN',
+  'INIT-CENTRO-PLAY-KOMPAN',
+  'INIT-CENTRO-GAZEBO-NUOVO',
+  'INIT-CENTRO-TRIBUNA-C2',
+  'INIT-CENTRO-INFERMERIA',
+  'INIT-CENTRO-SICUREZZA-VERISURE',
+  'INIT-CENTRO-PERCORSO-ACCESSIBILE',
+  'INIT-CENTRO-AREA-SABBIA',
+  'INIT-FONDO-SOLIDALE',
+  'Fondo Solidale SCD',
+  'agevolazioni fiscali dipendono dalla normativa applicabile',
+  'name="project"'
+]) assert(pub.includes(token),'R50.4 Center development public surface missing: '+token);
+assert(pub.includes('KOMPAN è un riferimento progettuale da formalizzare'),'KOMPAN must not be represented as acquired partner');
+assert(pub.includes('Verisure è un riferimento progettuale da formalizzare'),'Verisure must not be represented as acquired partner');
+assert(pubJs.includes('[data-project-interest]'),'Center development lead interaction missing');
 assert(js.includes("SOSPESA · NON INVIARE"),'suspended prospect visibility missing');
 assert(js.includes("Pixellot & Match Content"),'internal video asset missing');
 assert(js.includes("Partner Hub Web App"),'internal web app partner asset missing');
