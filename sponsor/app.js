@@ -1344,7 +1344,7 @@ function renderGrowPipeline(){
       '<span class="grow-stage-badge '+(item.stageVerified?'':'unverified')+'">'+esc(growStageLabel(item.stage))+'</span>'+
     '</button>'
   ).join(''):'<div class="grow-empty"><b>Nessuna prossima azione registrata</b>La fonte CRM è verificata; non genero follow-up sostitutivi.</div>';
-  $('[data-grow-crm-id]').forEach(btn=>btn.onclick=()=>openCrmProfile(btn.dataset.growCrmId));
+  $$('[data-grow-crm-id]').forEach(btn=>btn.onclick=()=>openCrmProfile(btn.dataset.growCrmId));
   const quality=[
     ...model.needsVerification.map(item=>({name:item.name,detail:'Stato relazione non mappato con certezza: '+(item.sourceStatus||'mancante')})),
     ...model.blocked.map(item=>({name:item.name,detail:'Policy contatto: '+(item.contactPolicy||'BLOCCATO')}))
