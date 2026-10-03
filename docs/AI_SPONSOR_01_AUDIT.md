@@ -46,7 +46,7 @@ The project should not be rewritten or given a second CRM/database. First contai
 - `FIXED`: R20 remains authoritative for identity, roles and existing operations; canonical Sheets/Drive/Gmail remain source authorities by domain; no duplicate CRM/database; no invented sponsor facts; production mutations require human approval.
 - `IMPROVABLE`: eliminate embedded duplicate records; enforce each capability on the server; make document/media links source-backed; specify the public/private hosting contract and validate it.
 - `MISSING`: verified production service configuration/health, live source comparison, role-by-role R20 evidence, data-retention/visibility decision, visual-browser QA, and canonical Drive document-link implementation.
-- `SOURCE_PLAN`: use the manifest’s `SPONSOR_MASTER_SHEET`, `SCD_OPERATIVO_PILOTA`, `R20`, `SCD_DRIVE`, `SCD_GMAIL`, and `SCD_GOOGLE_CALENDAR` only; do not add a source.
+- `SOURCE_PLAN`: use the manifest’s `SPONSOR_MASTER_SHEET`, `SCD_OPERATIVO_PILOTA`, `R20`, `SCD_DRIVE`, `SCD_GMAIL`, and `SCD_GOOGLE_CALENDAR` only; use the R57 visual master and its canonical visual-system/gate files for presentation; do not add a source.
 - `TOOLCHAIN`: existing root Node scripts; `npm run check`; static review of the current code and GitHub branch/PR metadata. No new dependencies or test tooling.
 - `RISK`: high for commercial/contact data committed to a public repository; high for role-scope separation until checked at each server/upstream operation; medium for stale/duplicate commercial state and unverified hosting.
 - `TEST`: full existing root check passed at the audited SHA. There is no evidence here of live-source integration, role-matrix, visual/accessibility, or production-runtime tests.
@@ -126,6 +126,25 @@ Public sponsor lead, access-request and OTP routes accept JSON with a generic bo
 - **Accessibility foundations:** skip links, semantic landmarks, visible focus, reduced-motion rules, labeled public forms, status/live regions and dialog roles exist. Some private cards are custom interactive articles and should remain keyboard-tested. No automated accessibility or screen-reader run was found.
 - **Visual QA:** no verified comparison against approved visual masters and no browser capture at the repository’s required viewport matrix was performed. Treat it as pending, not passed.
 - **Performance:** active private source footprint is approximately 121 KB JavaScript and 137 KB CSS before transfer compression/assets; public markup/styles are also substantial. No production waterfall, Core Web Vitals, or device-performance measurement was available. Establish budgets and measure before further feature growth.
+
+### VISUAL_CLASSIFICATION
+
+- `sponsor/index.html` and the legacy public sponsor presentation: `REBUILD_IMPROVE`. Preserve its public partnership purpose, verified content, canonical IDs, endpoints, source provenance, accessibility and public/private separation; improve composition and interaction to the R57 SCD Universe experience rather than retaining a generic brochure treatment.
+- `sponsor/app.html` / `sponsor/app.js` Partner OS presentation: `REBUILD_IMPROVE`. Preserve its private operational purpose, R20 authorization, CRM/project links and real service states; evolve hierarchy toward action/context, not a generic admin dashboard. This classification does not authorize a rewrite or any runtime change in this audit.
+- Canonical person, project, event, document and source models, IDs, R20 security and data provenance: `KEEP_LOCKED`. Do not create a standalone Sponsor app or parallel CRM, and do not replace real data with examples or inferred values.
+- Official SCD/sponsor marks and verified logos: `KEEP_LOCKED`; where an official source asset is missing or unverified, `RESEARCH_REAL_ASSET`. Never redraw or invent sponsor identity.
+- Use `config/scd-visual-system.json` as the sole palette source (mineral/navy, lake/aqua, muted gold, warm white and low-saturation accents); do not infer a new palette from legacy CSS overrides. Keep public presentation distinct from private commercial operations within the single SCD Universe.
+- No Smart Facility/device surface was changed. Any future facility tile must use only verified explicit states (`CONNECTED`, `READY_FOR_ADAPTER`, `NOT_CONNECTED`, `UNVERIFIED`, `MANUAL_CHECK_REQUIRED`); never imply a live sensor, lock, alarm or service without a real adapter.
+
+### VISUAL_QA
+
+- `STATUS: NOT_RUN` for browser/visual QA. This PR changes audit documentation only; the layout and CSS observations above are static source inspection, not proof of compliance with the R57 visual gate.
+- `MASTER_REFERENCES`: `docs/SCD_VISUAL_EXPERIENCE_MASTER.md`, `config/scd-visual-system.json`, and `config/scd-visual-experience-gate.v1.json` from `r57-copilot-control-plane` (visual master blob `5921af1ee3b597ac7ad005759d1af884539c37a4`; machine gate blob `1a71032631007519f0da815139603dfc61a5fc6c`).
+- `VISUAL_COMPARISON`: not performed; no approved-master screenshot comparison is claimed. `VIEWPORTS`: none captured at 360×800, 390×844, 393×852, 430×932, 1280×800, 1440×900, or 1920×1080.
+- `OVERFLOW / KEYBOARD / FOCUS / CONTRAST / REDUCED_MOTION`: no runtime/browser verification. Source contains some focus and reduced-motion provisions, but required interaction checks remain open.
+- `LOADING / EMPTY / ERROR / OFFLINE / SOURCE_FALLBACK`: source states were inspected selectively; no visual-state regression or end-to-end test was performed. Preserve explicit unavailable/stale-source states and never label an unverified service “live”.
+- `SMART_FACILITY`: not applicable to this audit deliverable; no device status is introduced.
+- Before any future Sponsor UI release, satisfy the R57 gate with visual comparison, required viewports, no overflow, keyboard/focus, contrast, reduced-motion, loading/empty/error/offline and provenance/fallback states, asset integrity, and targeted E2E evidence.
 
 ## Tests and verification
 
