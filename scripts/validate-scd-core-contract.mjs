@@ -30,6 +30,9 @@ ok(css.includes('@media(max-width:700px)'),'mobile Control Room composition miss
 ok(css.includes('prefers-reduced-motion:reduce'),'reduced-motion support missing');
 ok(css.includes('.core-item-link'),'mail source link style missing');
 ok(js.includes('Apri fonte Gmail'),'mail action source link missing');
+ok(js.includes('function openCoreSourceStatus('),'source diagnostics drill-down missing');
+ok(js.includes('data-core-source'),'source diagnostic binding missing');
+ok(css.includes('CORE-02 · source diagnostics drill-down'),'source diagnostics styling missing');
 
 await import('../lib/scd-core-control-room.js');
 ok(globalThis.ScdCoreControlRoom?.build,'Control Room engine is not executable');
