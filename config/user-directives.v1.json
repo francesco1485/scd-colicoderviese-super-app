@@ -1,0 +1,225 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "SCD_USER_DIRECTIVES",
+  "effectiveAt": "2026-10-03",
+  "authority": "RECOVERED_FROM_EXPLICIT_USER_CHAT_COMMANDS",
+  "purpose": "Prevent loss, dilution or reinterpretation of the user's original operating commands across branches, agents and sessions.",
+  "precedence": {
+    "rule": "LATEST_EXPLICIT_USER_DIRECTIVE_MUST_NOT_BE_SILENTLY_DROPPED",
+    "repositoryGovernance": "SCD_SYSTEM_MANIFEST.json remains the runtime governance contract; when a new explicit user directive changes architecture or policy, update the manifest/contracts in the same controlled change rather than ignoring the directive.",
+    "assistantSummaries": "NON_AUTHORITATIVE_HELPER_ONLY"
+  },
+  "mandatoryStart": [
+    "RECOVER_RELEVANT_PRIOR_USER_COMMANDS",
+    "RECOVER_RELEVANT_LIBRARY_VISUALS_AND_DOCUMENTS",
+    "VERIFY_CURRENT_REPOSITORY_RUNTIME_AND_DATA_STATE",
+    "MAP_EXISTING_WORK_BEFORE_CREATING_NEW_WORK",
+    "CLASSIFY_KEEP_ENHANCE_FIX_INTEGRATE_COMPLETE_REBUILD_REMOVE_WITH_REASON"
+  ],
+  "directives": [
+    {
+      "id": "UD-001",
+      "name": "SENIOR_PRINCIPAL_VISION_TO_CODE",
+      "sourceDate": "2026-10-01",
+      "sourceTitle": "AI SOFTWARE ARCHITECT, REVERSE ENGINEERING SPECIALIST & AUTONOMOUS AGENT - LIVELLO SENIOR PRINCIPAL",
+      "normalizedCommand": {
+        "phase1": "REVERSE_ENGINEERING_VISIVO: analisi molecolare di layout, griglie, proporzioni, design system, tipografia, icone, stati, componenti e varianti responsive.",
+        "phase2": "ARCHITETTURA_FORMULE_DATI: formule, algoritmi, validazioni, JSON/schema/database, API, eventi, permessi, provenance e fallback.",
+        "phase3": "SVILUPPO_ZERO_BUG: codice completo, modulare, moderno, accessibile, performante; albero file esplicito; niente placeholder usati al posto dell'implementazione.",
+        "phase4": "ESECUZIONE_CONTINUA_AUTONOMA: autovalutare bug/UX, correggere, migliorare proattivamente e continuare frontend/dati/backend/test senza chiedere permesso per ogni step reversibile."
+      }
+    },
+    {
+      "id": "UD-002",
+      "name": "FULL_REALIZATION_LOOP",
+      "sourceDate": "2026-10-03",
+      "verbs": [
+        "STUDIARE",
+        "STUDIARE_DI_NUOVO",
+        "CREARE",
+        "MAPPARE",
+        "SVILUPPARE",
+        "IMMAGINARE",
+        "ANIMARE",
+        "EVOLVERE",
+        "ANALIZZARE",
+        "PROGRAMMARE",
+        "GESTIRE",
+        "REDIGERE",
+        "LOCALIZZARE",
+        "INDICIZZARE",
+        "RENDERE_REALI"
+      ],
+      "rule": "A request is not complete when it is only described. Convert it into architecture, code, workflow, asset, data contract, tested output, preview or other verifiable implementation whenever technically possible."
+    },
+    {
+      "id": "UD-003",
+      "name": "MULTIDISCIPLINARY_WORLD_INTELLIGENCE",
+      "sourceDate": "2026-10-03",
+      "rule": "Use the relevant human knowledge domains together instead of treating software as isolated code.",
+      "domains": [
+        "SOFTWARE_ARCHITECTURE",
+        "COMPUTER_SCIENCE",
+        "DATA",
+        "AI_AGENT_SYSTEMS",
+        "AUTOMATION",
+        "UX_UI",
+        "GRAPHIC_DESIGN",
+        "MOTION",
+        "ACCESSIBILITY",
+        "CYBERSECURITY",
+        "PRIVACY",
+        "SPORT",
+        "FOOTBALL",
+        "SPORTS_OPERATIONS",
+        "SPORTS_SCIENCE",
+        "SOCIAL_COMMUNITY",
+        "PSYCHOLOGY_OF_USE",
+        "COMMUNICATION",
+        "JOURNALISM",
+        "MARKETING",
+        "CRM",
+        "ECONOMICS",
+        "FINANCE",
+        "LAW_REGULATION",
+        "GEOGRAPHY",
+        "TERRITORY",
+        "HISTORY",
+        "CULTURE",
+        "EVENTS",
+        "HOSPITALITY",
+        "LOGISTICS",
+        "SEARCH_INDEXING",
+        "LOCALIZATION"
+      ],
+      "method": "DISTINGUISH_FACT_INFERENCE_HYPOTHESIS_PROPOSAL_AND_USE_CURRENT_AUTHORITATIVE_SOURCES_WHEN_NEEDED"
+    },
+    {
+      "id": "UD-004",
+      "name": "INTERNATIONAL_PRODUCT_BENCHMARKING",
+      "sourceDate": "2026-10-03",
+      "regions": [
+        "CHINA",
+        "USA",
+        "JAPAN",
+        "RUSSIA",
+        "EUROPE",
+        "SOUTH_KOREA",
+        "SINGAPORE_SEA",
+        "INDIA",
+        "GLOBAL_SPORT"
+      ],
+      "rule": "Study advanced digital ecosystems and sports products for patterns in identity, navigation, modular services, native feel, accessibility, community, live state and ecosystem coherence. Never clone proprietary code, layouts, assets or brands."
+    },
+    {
+      "id": "UD-005",
+      "name": "ALL_WEB_APPS_VISUAL_FUNCTIONAL_EVOLUTION",
+      "sourceDate": "2026-10-03",
+      "apps": [
+        "SCD_ONE",
+        "SCD_CORE",
+        "SCD_GROW",
+        "MAGLIA_360_CEPA_OS"
+      ],
+      "preserve": [
+        "REAL_DATA_CONTRACTS",
+        "IDS_RELATIONSHIPS",
+        "BACKEND_API",
+        "AUTH_AUTHORIZATION",
+        "PROVENANCE",
+        "WORKING_BUSINESS_LOGIC"
+      ],
+      "rebuild": [
+        "INFORMATION_ARCHITECTURE",
+        "NAVIGATION",
+        "LAYOUT",
+        "TYPOGRAPHY",
+        "SPACING",
+        "COMPONENT_SYSTEM",
+        "MOBILE",
+        "DESKTOP",
+        "RESPONSIVE",
+        "LOADING_EMPTY_ERROR",
+        "INTERACTIONS",
+        "MOTION",
+        "DASHBOARDS",
+        "PROFILE_DETAIL",
+        "FORMS",
+        "VISUAL_HIERARCHY"
+      ],
+      "target": "MODERN_PREMIUM_INTERNATIONAL_GRADE_FUNCTIONAL_AND_PREVIEWABLE"
+    },
+    {
+      "id": "UD-006",
+      "name": "INTERNAL_LIBRARY_ASSET_RECOVERY",
+      "sourceDate": "2026-10-03",
+      "rule": "Before visual/media/product work, search conversation uploads and the internal Library for official assets, generated boards, screenshots, mockups, documents, photos and previously chosen concepts. Do not start visual work as if those references do not exist.",
+      "classify": [
+        "KEEP_LOCKED",
+        "KEEP_ENHANCE",
+        "REBUILD_IMPROVE",
+        "RESEARCH_REAL_ASSET",
+        "GENERATE_ORIGINAL",
+        "REFERENCE_BOARD"
+      ],
+      "companionRegistry": "config/scd-visual-references.v1.json"
+    },
+    {
+      "id": "UD-007",
+      "name": "EVIDENCE_OVER_CLAIMS",
+      "sourceDate": "2026-10-03",
+      "rule": "Never report work as completed without evidence.",
+      "evidence": [
+        "COMMIT",
+        "CODE_CHANGE",
+        "FILE",
+        "TEST_OUTPUT",
+        "SCREENSHOT",
+        "PREVIEW_URL",
+        "VERIFIED_DATA",
+        "ACTIVE_AUTOMATION"
+      ]
+    },
+    {
+      "id": "UD-008",
+      "name": "ONE_CODEBASE_WEB_PWA_NATIVE_READINESS",
+      "sourceDate": "2026-10-03",
+      "rule": "Maximize web applications as responsive PWA products that can later be distributed to Google Play and Apple App Store from the same canonical codebase, with native adapters isolated from business logic."
+    },
+    {
+      "id": "UD-009",
+      "name": "AUTONOMOUS_SAFE_CONTINUATION",
+      "sourceDate": "2026-10-03",
+      "rule": "Continue through safe, reversible implementation, testing, QA and documentation steps without repeatedly asking permission. Stop at real blockers or critical human-authorized boundaries such as production merge/deploy, paid accounts, signing, irreversible migrations, permissions, sensitive data or safeguarding."
+    },
+    {
+      "id": "UD-010",
+      "name": "NO_DUPLICATION_NO_FAKE_REALITY",
+      "sourceDate": "2026-10-03",
+      "rules": [
+        "NO_DUPLICATE_AUTH",
+        "NO_DUPLICATE_DATABASE",
+        "NO_DUPLICATE_CALENDAR",
+        "NO_DUPLICATE_CRM",
+        "NO_FAKE_DATA",
+        "NO_FAKE_LIVE_STATE",
+        "NO_FAKE_DEVICE_STATE",
+        "NO_UNAUTHORIZED_PRODUCTION_MUTATION"
+      ]
+    }
+  ],
+  "completionGate": {
+    "sequence": [
+      "STUDIED",
+      "MAPPED",
+      "ARCHITECTED",
+      "IMPLEMENTED",
+      "TESTED",
+      "VISUALLY_VERIFIED",
+      "PREVIEWABLE",
+      "HUMAN_REVIEW",
+      "PRODUCTION_ONLY_AFTER_AUTHORIZATION"
+    ],
+    "docsOnly": "NOT_SUFFICIENT_WHEN_IMPLEMENTATION_WAS_REQUESTED"
+  }
+}
