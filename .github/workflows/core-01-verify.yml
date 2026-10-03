@@ -1,0 +1,34 @@
+name: SCD CORE CORE-01 Verification
+
+on:
+  push:
+    branches:
+      - "core-01-direction-control-room"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  core-01-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install dependencies
+        run: npm install
+      - name: Canonical manifest
+        run: npm run test:manifest
+      - name: CORE-01 contract
+        run: npm run test:scd-core-contract
+      - name: Runtime syntax
+        run: |
+          node --check scd-ng.js
+          node --check lib/scd-core-control-room.js
+          node --check scripts/validate-scd-core-contract.mjs
+          node --check tests/scd-core-control-room-contract.mjs
+      - name: Full regression contract
+        run: npm run check
