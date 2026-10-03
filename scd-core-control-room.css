@@ -1,0 +1,234 @@
+/* CORE-01 · Direction Control Room
+   Internal, role-scoped, provenance-first. No data is created by this layer.
+*/
+#coreControlRoom[hidden]{display:none!important}
+#coreControlRoom{
+  margin:16px 28px 0;
+  border:1px solid rgba(124,183,234,.16);
+  border-radius:28px;
+  background:
+    radial-gradient(circle at 90% 0%,rgba(32,183,230,.10),transparent 30%),
+    linear-gradient(155deg,rgba(3,26,53,.98),rgba(2,17,38,.98));
+  box-shadow:0 26px 72px rgba(0,0,0,.28);
+  overflow:hidden;
+}
+.core-control-head{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:18px;
+  align-items:end;
+  padding:28px;
+  border-bottom:1px solid rgba(213,228,240,.11);
+}
+.core-control-head .eyebrow{color:#20B7E6}
+.core-control-head h3{
+  margin:7px 0 7px;
+  font-size:clamp(28px,3vw,44px);
+  letter-spacing:-.045em;
+  line-height:1;
+}
+.core-control-head p{
+  margin:0;
+  max-width:760px;
+  color:#9CB3C8;
+  font-size:13px;
+  line-height:1.55;
+}
+.core-control-actions{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  justify-content:flex-end;
+  flex-wrap:wrap;
+}
+.core-control-actions button{
+  min-height:40px;
+  border:1px solid rgba(213,228,240,.14);
+  border-radius:13px;
+  background:rgba(255,255,255,.05);
+  color:#fff;
+  padding:0 13px;
+  font-weight:850;
+  font-size:10px;
+}
+.core-control-actions button:hover{border-color:rgba(32,183,230,.38)}
+#coreControlStatus{
+  border:1px solid rgba(213,228,240,.14);
+  border-radius:999px;
+  padding:7px 10px;
+  color:#9CB3C8;
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.08em;
+}
+#coreControlStatus[data-state="VERIFIED"]{color:#6BE4A8}
+#coreControlStatus[data-state="PARTIAL"],
+#coreControlStatus[data-state="PENDING"]{color:#FFD500}
+#coreControlStatus[data-state="UNAVAILABLE"],
+#coreControlStatus[data-state="UNVERIFIED"]{color:#FF9EA6}
+
+.core-control-sources{
+  display:flex;
+  gap:7px;
+  padding:12px 28px;
+  overflow:auto;
+  scrollbar-width:thin;
+  border-bottom:1px solid rgba(213,228,240,.08);
+}
+.core-source-chip{
+  flex:0 0 auto;
+  display:grid;
+  gap:2px;
+  min-width:128px;
+  border:1px solid rgba(213,228,240,.11);
+  border-radius:13px;
+  padding:9px 11px;
+  background:rgba(255,255,255,.035);
+}
+.core-source-chip b{font-size:9px;letter-spacing:.07em}
+.core-source-chip span{font-size:9px;color:#9CB3C8}
+.core-source-chip[data-state="VERIFIED"] b{color:#6BE4A8}
+.core-source-chip[data-state="PENDING"] b{color:#FFD500}
+.core-source-chip[data-state="UNAVAILABLE"] b,
+.core-source-chip[data-state="UNVERIFIED"] b{color:#FF9EA6}
+
+.core-control-lanes{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+  padding:18px 28px 28px;
+}
+.core-lane{
+  min-width:0;
+  min-height:220px;
+  border:1px solid rgba(213,228,240,.11);
+  border-radius:20px;
+  background:linear-gradient(180deg,rgba(255,255,255,.044),rgba(255,255,255,.022));
+  overflow:hidden;
+}
+.core-lane-head{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:13px 14px;
+  border-bottom:1px solid rgba(213,228,240,.09);
+}
+.core-lane-head span:first-child{
+  display:grid;
+  place-items:center;
+  width:28px;height:28px;
+  border-radius:10px;
+  background:rgba(8,112,207,.16);
+  color:#20B7E6;
+  font-size:13px;
+}
+.core-lane-head b{font-size:11px;letter-spacing:.04em}
+.core-lane-count{
+  margin-left:auto;
+  min-width:26px;
+  border-radius:999px;
+  padding:4px 7px;
+  background:rgba(255,255,255,.055);
+  color:#D5E4F0;
+  text-align:center;
+  font-size:9px;
+  font-weight:900;
+}
+.core-lane-source-state{
+  display:block;
+  padding:8px 14px 0;
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:.08em;
+  color:#9CB3C8;
+}
+.core-lane-source-state[data-state="VERIFIED"]{color:#6BE4A8}
+.core-lane-source-state[data-state="PENDING"]{color:#FFD500}
+.core-lane-source-state[data-state="UNAVAILABLE"],
+.core-lane-source-state[data-state="UNVERIFIED"]{color:#FF9EA6}
+.core-lane-list{display:grid;gap:7px;padding:10px}
+.core-control-item{
+  border:1px solid rgba(213,228,240,.09);
+  border-radius:14px;
+  padding:11px;
+  background:rgba(255,255,255,.035);
+}
+.core-control-item header{
+  display:flex;
+  align-items:flex-start;
+  gap:7px;
+}
+.core-control-item h4{
+  margin:0;
+  color:#fff;
+  font-size:12px;
+  line-height:1.35;
+}
+.core-control-item .core-item-status{
+  margin-left:auto;
+  flex:0 0 auto;
+  max-width:110px;
+  border-radius:999px;
+  padding:4px 6px;
+  background:rgba(255,255,255,.05);
+  color:#D5E4F0;
+  font-size:7px;
+  font-weight:900;
+  text-transform:uppercase;
+}
+.core-item-meta{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  margin-top:8px;
+}
+.core-item-meta span{
+  border-radius:999px;
+  padding:4px 6px;
+  background:rgba(255,255,255,.045);
+  color:#9CB3C8;
+  font-size:8px;
+}
+.core-item-source{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  margin-top:8px;
+  color:#6F8CA7;
+  font-size:8px;
+}
+.core-item-source:before{
+  content:"";
+  width:6px;height:6px;border-radius:50%;
+  background:#179765;
+}
+.core-lane-empty{
+  padding:18px 12px;
+  color:#9CB3C8;
+  font-size:10px;
+  line-height:1.5;
+}
+.core-lane-empty b{display:block;color:#D5E4F0;margin-bottom:4px}
+
+.core-control-room[data-focus-lane] .core-lane{opacity:.38}
+.core-control-room[data-focus-lane="TODAY"] .core-lane[data-lane="TODAY"],
+.core-control-room[data-focus-lane="PRIORITY"] .core-lane[data-lane="PRIORITY"],
+.core-control-room[data-focus-lane="TODO"] .core-lane[data-lane="TODO"],
+.core-control-room[data-focus-lane="APPROVALS"] .core-lane[data-lane="APPROVALS"],
+.core-control-room[data-focus-lane="DEADLINES"] .core-lane[data-lane="DEADLINES"],
+.core-control-room[data-focus-lane="CHANGES"] .core-lane[data-lane="CHANGES"]{opacity:1;box-shadow:inset 0 0 0 1px rgba(32,183,230,.22)}
+
+@media(max-width:1050px){
+  .core-control-lanes{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:700px){
+  #coreControlRoom{margin:10px 12px 0;border-radius:22px}
+  .core-control-head{grid-template-columns:1fr;padding:20px 16px}
+  .core-control-actions{justify-content:flex-start}
+  .core-control-sources{padding:10px 16px}
+  .core-control-lanes{grid-template-columns:1fr;padding:14px 16px 20px}
+  .core-lane{min-height:0}
+}
+@media(prefers-reduced-motion:reduce){
+  #coreControlRoom *{transition:none!important;scroll-behavior:auto!important}
+}
