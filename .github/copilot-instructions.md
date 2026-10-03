@@ -9,7 +9,11 @@ Before any write:
 If any instruction conflicts with the manifest, the manifest wins.
 
 ## Product doctrine
-This repository is the canonical codebase for the **SCD Digital Club Operating System**.
+This repository is the canonical codebase for the **SCD UNIVERSE / SCD ColicoDerviese Super App / Digital Club Operating System**.
+It is ONE product.
+
+Sponsor, Command Platform, Commercial/Lia, Private Desk, Facility, Social and similar SCD scopes are modules/capabilities/workbenches that converge into the single product unless Direction explicitly approves separation.
+
 Do not create a parallel app, database, authentication system, calendar, private desk, repository, or hosting stack when the existing SCD system can be extended safely.
 
 Classify findings and proposed changes as:
@@ -42,19 +46,34 @@ Before writes, verify and report:
 
 Use `VERIFIED`, `UNVERIFIED`, `NOT_AVAILABLE`, or `NOT_APPLICABLE`.
 
+## Visual & experience gate
+
+For every UI/product task also read:
+- `docs/SCD_VISUAL_EXPERIENCE_MASTER.md`
+- `config/scd-visual-system.json`
+- `config/scd-visual-experience-gate.v1.json`
+
+Run `SCD:VISUAL-GATE` mentally before implementation and in review.
+
+Reject generic SaaS/admin templates, obsolete portal layouts, anonymous grey dashboards, generic card grids, brochure-style hero pages, framed-phone desktop layouts and fake service/live states.
+
+The target is `SPATIAL_SPORT_EDITORIAL_HIGH_IMPACT`: modern sports product, synthetic spatial atmosphere, purposeful motion, real next actions, adaptive responsive composition and unmistakable SCD identity.
+
+A legacy visual may be `REBUILD_IMPROVE`: preserve valid backend/data/security/contracts while rebuilding presentation and interaction. Do not restart the product from zero.
+
 ## Data and security
-- Never invent sports, administrative, commercial, medical, identity, schedule, sponsor, or financial data.
+- Never invent sports, administrative, commercial, medical, identity, schedule, sponsor, facility, device or financial data.
 - Missing verified data must fail closed or be clearly shown as unavailable/pending.
 - Preserve provenance and source authority.
 - Authorization must be enforced server-side. Hidden UI is not authorization.
-- Never expose secrets, passwords, PINs, alarm codes, API credentials, private documents, safeguarding data, or raw sensitive location.
+- Never expose secrets, passwords, PINs, alarm codes, key/access codes, API credentials, private documents, safeguarding data, or raw sensitive location.
 - No autonomous production changes to roles, permissions, payments, registrations, attendance, personal data, documents, safeguarding, DNS, or secrets.
 - No unsupervised adult-minor 1:1 communication features.
 - No public ranking or profiling of minors.
 
 ## Engineering workflow
 Use:
-`STATE -> REQUIREMENTS -> EXISTING SYSTEM CHECK -> DATA CONTRACT -> IMPLEMENT -> TEST -> PR -> REVIEW -> MERGE -> DEPLOY -> PRODUCTION EVIDENCE`.
+`STATE -> REQUIREMENTS -> EXISTING SYSTEM CHECK -> DATA CONTRACT -> VISUAL GATE -> IMPLEMENT -> TEST -> PR -> REVIEW -> MERGE -> DEPLOY -> PRODUCTION EVIDENCE`.
 
 Work on a branch. Do not write directly to `main`.
 Do not merge or deploy production without explicit human authorization.
@@ -67,7 +86,7 @@ At minimum for relevant changes:
 - targeted contract tests for the changed domain
 - `npm run check` before release-candidate status
 - syntax checks and regression checks
-- responsive/accessibility validation for UI changes
+- responsive/accessibility/visual regression validation for UI changes
 - auth/RLS/security verification for private/data changes
 
 A feature is not complete until its status is accurately described:
@@ -77,17 +96,20 @@ A feature is not complete until its status is accurately described:
 Public surfaces prioritize emotion, media, live information, discovery, territory and community.
 Private surfaces prioritize speed, clarity, density, priority, decision, context and control.
 Mobile and desktop are responsive compositions of the same product, not separate products.
-Do not turn desktop into a framed phone, and do not create generic SaaS-card walls.
+
+Smart Facility surfaces must distinguish verified connected services from READY_FOR_ADAPTER / NOT_CONNECTED / UNVERIFIED / MANUAL_CHECK_REQUIRED states. Never simulate a device integration as real.
 
 ## Agent output
 For meaningful engineering work report:
 - CURRENT_STATE
 - AFFECTED_CAPABILITIES
 - CLASSIFICATION
+- VISUAL_CLASSIFICATION
 - DATA_SOURCES
 - SECURITY_IMPACT
 - FILES_CHANGED
 - TESTS_RUN
+- VISUAL_QA
 - RESULT
 - KNOWN_LIMITATIONS
 - ROLLBACK
