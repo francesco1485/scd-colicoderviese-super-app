@@ -8,6 +8,12 @@ Before any write:
 
 If any instruction conflicts with the manifest, the manifest wins.
 
+## Portfolio gate
+Before creating or reclassifying an application, read `config/ai-portfolio.v1.json`.
+The portfolio is exactly 4 apps: 3 SCD + 1 Maglia. Do not create a fifth app without explicit Direction approval.
+For SCD work, route modules to SCD Universe, Sponsor & Partner Platform, or Command Platform R22 according to the registry.
+C.E.P.A. and Maglia 360 are one unified Maglia web app on `ai-maglia360-cepa-unified`.
+
 ## Product doctrine
 This repository is the canonical codebase for the **SCD UNIVERSE / SCD ColicoDerviese Super App / Digital Club Operating System**.
 It is ONE product.
