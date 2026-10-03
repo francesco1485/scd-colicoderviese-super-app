@@ -17,6 +17,18 @@ fs.mkdirSync('test-output/one-01',{recursive:true});
 function assert(condition,message){
   if(!condition)throw new Error(message);
 }
+async function overflowDiagnostics(page){
+  return page.evaluate(()=>{
+    const vw=window.innerWidth;
+    const rows=[...document.querySelectorAll('body *')].map(el=>{
+      const r=el.getBoundingClientRect();
+      return {tag:el.tagName,id:el.id||'',cls:String(el.className||'').slice(0,120),left:Math.round(r.left),right:Math.round(r.right),width:Math.round(r.width)};
+    }).filter(x=>x.width>0&&(x.right>vw+3||x.left< -3))
+      .sort((a,b)=>Math.max(b.right-vw,-b.left)-Math.max(a.right-vw,-a.left))
+      .slice(0,12);
+    return {viewport:vw,scrollWidth:document.documentElement.scrollWidth,rows};
+  });
+}
 
 const browser=await chromium.launch({headless:true});
 for(const viewport of viewports){
@@ -51,7 +63,10 @@ for(const viewport of viewports){
   assert(palette.cyan==='#20B7E6','canonical cyan missing '+JSON.stringify(palette));
 
   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+3);
-  assert(!overflow,'horizontal overflow on '+viewport.width+'x'+viewport.height);
+  if(overflow){
+    const diag=await overflowDiagnostics(page);
+    throw new Error('horizontal overflow on '+viewport.width+'x'+viewport.height+' '+JSON.stringify(diag));
+  }
 
   const navBox=await page.locator('.bottom-nav').boundingBox();
   assert(navBox,'navigation box missing');
@@ -67,7 +82,10 @@ for(const viewport of viewports){
     await page.click('.bottom-nav [data-route="'+route+'"]');
     await page.waitForSelector('#view-'+view+'.active');
     const routeOverflow=await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+3);
-    assert(!routeOverflow,'horizontal overflow in '+route+' at '+viewport.width+'x'+viewport.height);
+    if(routeOverflow){
+      const diag=await overflowDiagnostics(page);
+      throw new Error('horizontal overflow in '+route+' at '+viewport.width+'x'+viewport.height+' '+JSON.stringify(diag));
+    }
   }
 
   await page.click('.bottom-nav [data-route="social"]');
