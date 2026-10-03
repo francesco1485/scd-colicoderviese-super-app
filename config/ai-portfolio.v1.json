@@ -1,0 +1,156 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "SCD_MAGLIA_AI_PORTFOLIO",
+  "updatedAt": "2026-10-03",
+  "totalApps": 4,
+  "ownershipCounts": {
+    "SCD_COLICODERVIESE": 3,
+    "MAGLIA_ASSICURAZIONI": 1
+  },
+  "apps": [
+    {
+      "id": "SCD_UNIVERSE",
+      "owner": "SCD_COLICODERVIESE",
+      "displayName": "SCD Universe / SCD ColicoDerviese Super App",
+      "kind": "PRIMARY_CLUB_WEB_APP",
+      "aiBranch": "r57-copilot-control-plane",
+      "codeRoots": [
+        "/",
+        "lib/",
+        "intake/"
+      ],
+      "canonicalRuntime": "scd-colicoderviese-official-r21",
+      "productionBranch": "main",
+      "purpose": "Public club experience + personal/family/athlete/staff/private operations in one adaptive club app.",
+      "internalModules": [
+        "SEGRETERIA",
+        "FACILITY",
+        "TORNEI",
+        "PRIVATE_DESK",
+        "SCD_WEEK",
+        "CALENDAR",
+        "TEAMS",
+        "MATCHDAY",
+        "SOCIAL",
+        "TWIN",
+        "MIRROR",
+        "MATERIALS",
+        "KIT",
+        "WAREHOUSE",
+        "LAUNDRY",
+        "ACCESS",
+        "GMAIL_DRIVE_CALENDAR_CONNECTORS"
+      ],
+      "mustNotBecomeSeparateApps": [
+        "SEGRETERIA",
+        "FACILITY",
+        "TORNEI",
+        "PRIVATE_DESK",
+        "SCD_WEEK",
+        "SOCIAL",
+        "MATCHDAY"
+      ]
+    },
+    {
+      "id": "SCD_SPONSOR_PLATFORM",
+      "owner": "SCD_COLICODERVIESE",
+      "displayName": "SCD Sponsor & Partner Platform",
+      "kind": "COMPANION_PUBLIC_PRIVATE_WEB_APP",
+      "aiBranch": "ai-scd-sponsor-platform",
+      "codeRoots": [
+        "sponsor/"
+      ],
+      "canonicalRuntime": "scd-sponsor-platform",
+      "protectedRuntimeDependency": "scd-colicoderviese-official-r21",
+      "purpose": "Public partnership experience + protected sponsor/commercial operations.",
+      "includes": [
+        "PARTNER_HUB",
+        "CRM",
+        "COMMERCIAL_PIPELINE",
+        "SPONSOR_OPERATIONS",
+        "LIA_SPONSOR",
+        "LEDWALL",
+        "SPONSOR_WALL",
+        "CONVENZIONI",
+        "SOLIDARITY_FUND",
+        "PROOF_REPORTING"
+      ],
+      "absorbedWorkstreams": [
+        "ai-scd-commercial-lia"
+      ]
+    },
+    {
+      "id": "SCD_COMMAND_R22",
+      "owner": "SCD_COLICODERVIESE",
+      "displayName": "SCD Command Platform R22",
+      "kind": "TECHNICAL_WEB_APPLICATION_ORCHESTRATOR",
+      "aiBranch": "ai-scd-command-r22",
+      "codeRoots": [
+        "platform/"
+      ],
+      "canonicalRuntime": "scd-colicoderviese-command-r22",
+      "purpose": "Command API, plugin registry, jobs, automation, audit/event orchestration and R20 bridge.",
+      "publicWebsite": false,
+      "rules": [
+        "NOT_SECOND_SOURCE_OF_TRUTH",
+        "R20_AUTHORITY_UNTIL_VERIFIED_MIGRATION",
+        "NO_DEV_AUTH_IN_PRODUCTION"
+      ]
+    },
+    {
+      "id": "MAGLIA_360_CEPA",
+      "owner": "MAGLIA_ASSICURAZIONI",
+      "displayName": "Maglia 360 + C.E.P.A.",
+      "kind": "UNIFIED_PUBLIC_PRIVATE_WEB_APP",
+      "canonicalSourceBranch": "cepa-maglia-os-hosting",
+      "historicalReferenceBranch": "maglia360-office-architecture-v2",
+      "aiBranch": "ai-maglia360-cepa-unified",
+      "codeRoots": [
+        "cepa-maglia-os-static/"
+      ],
+      "canonicalRuntime": "cepa-maglia-os",
+      "previewRuntime": "maglia360-office-v2-preview",
+      "purpose": "C.E.P.A. public educational/territorial portal + Maglia 360 private agency operating system.",
+      "includes": [
+        "CEPA_PUBLIC",
+        "CEPA_GOVERNANCE",
+        "SAP_TERRITORIES",
+        "MAGLIA360_CONTROL_ROOM",
+        "PARTNERS_PRODUCTS",
+        "COLLABORATORS",
+        "DOCUMENTS",
+        "LIA_WORKBENCH",
+        "AI_MAIL_CHAT",
+        "NETWORK_RADAR",
+        "ACTIVITIES_DEADLINES",
+        "RECOVERY"
+      ],
+      "absorbedWorkstreams": [
+        "ai-cepa-maglia-os",
+        "ai-maglia360-office"
+      ]
+    }
+  ],
+  "supersededStandaloneWorkstreams": [
+    {
+      "id": "ai-scd-commercial-lia",
+      "reason": "Commercial/Lia belongs inside SCD Sponsor Platform and SCD Command orchestration, not a fifth app."
+    },
+    {
+      "id": "ai-cepa-maglia-os",
+      "reason": "C.E.P.A. public layer belongs to the unified Maglia 360 + C.E.P.A. app."
+    },
+    {
+      "id": "ai-maglia360-office",
+      "reason": "Maglia 360 private layer belongs to the unified Maglia 360 + C.E.P.A. app."
+    }
+  ],
+  "portfolioRules": [
+    "EXACTLY_4_APPS",
+    "EXACTLY_3_SCD_AND_1_MAGLIA",
+    "NO_NEW_APP_WITHOUT_DIRECTION_APPROVAL",
+    "MODULES_STAY_INSIDE_ASSIGNED_APP",
+    "REUSE_EXISTING_CODE_DATA_AUTH_AND_RUNTIMES_BEFORE_CREATING_NEW_SYSTEMS",
+    "NO_PRODUCTION_MUTATION_WITHOUT_EXPLICIT_AUTHORIZATION"
+  ]
+}
