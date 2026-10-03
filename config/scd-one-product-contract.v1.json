@@ -1,0 +1,208 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "SCD_ONE_PRODUCT_CONTRACT",
+  "appId": "SCD_ONE",
+  "name": "SCD ONE — ColicoDerviese Social Super App",
+  "tagline": "Tutto il Club. Una sola app.",
+  "mission": "High-scale public, social and transactional digital club experience.",
+  "audience": [
+    "PUBLIC",
+    "USER_BASE",
+    "FAMILY",
+    "ATHLETE",
+    "STAFF_PUBLIC_CONTEXT",
+    "TEAMS",
+    "SUPPORTERS",
+    "TERRITORY",
+    "PARTNER_VISITORS"
+  ],
+  "boundaries": {
+    "internalAssociationManagement": "SCD_CORE",
+    "sponsorCrmAndGrowth": "SCD_GROW",
+    "orchestration": "SCD_COMMAND_R22"
+  },
+  "navigation": {
+    "mobileBottom": [
+      "HOME",
+      "CALENDAR",
+      "TEAMS",
+      "SOCIAL",
+      "PROFILE"
+    ],
+    "homePermanent": true,
+    "desktopResponsiveSameProduct": true,
+    "sponsorRail": "VISIBLE_OR_ONE_GESTURE_AWAY"
+  },
+  "week": {
+    "model": "FRIDAY_TO_FRIDAY",
+    "weekendPriority": true,
+    "emptyWeekMustNotLookDead": true
+  },
+  "coreSurfaces": [
+    "PULSE",
+    "SCD_WEEK",
+    "NEXT_MATCH",
+    "CALENDAR",
+    "TEAMS",
+    "MATCHDAY",
+    "NEWSROOM",
+    "MEDIA",
+    "SOCIAL",
+    "COMMUNITY",
+    "EVENTS",
+    "TOURNAMENTS",
+    "JOIN",
+    "PROFILE",
+    "FAMILY",
+    "ATHLETE",
+    "FIELD_REQUESTS",
+    "TICKETS",
+    "SCD_CARD",
+    "SERVICES",
+    "PARTNER_VISIBILITY"
+  ],
+  "transactions": [
+    "JOIN_INTEREST",
+    "OPEN_DAY_REGISTRATION",
+    "EVENT_REGISTRATION",
+    "TOURNAMENT_ENTRY",
+    "FIELD_REQUEST",
+    "TICKET_REQUEST_OR_PURCHASE_ADAPTER",
+    "SCD_CARD_SERVICE",
+    "FAMILY_ATHLETE_REQUEST"
+  ],
+  "transactionRequirements": [
+    "IDEMPOTENCY",
+    "STATUS",
+    "VALIDATION",
+    "AUDIT",
+    "PROVENANCE",
+    "FAILURE_RETRY",
+    "NO_DUPLICATE_SUBMISSION"
+  ],
+  "identity": {
+    "canonicalPersonId": true,
+    "baseRole": "USER_BASE",
+    "duplicateAccountsForbidden": true,
+    "roleScopeAuthority": "R20_UNTIL_VERIFIED_MIGRATION"
+  },
+  "eventSpine": [
+    "EVENT_ID",
+    "CALENDAR_FUSION",
+    "SCD_WEEK",
+    "NEXT_MATCH",
+    "MATCHDAY",
+    "TEAM_FAMILY_ATHLETE_PROJECTIONS",
+    "COMMUNICATIONS",
+    "SOCIAL_PUBLIC_PROJECTION",
+    "AUDIT_PROVENANCE"
+  ],
+  "sourceAuthority": [
+    {
+      "source": "FEDERATION_LND_FIGC",
+      "priority": 100
+    },
+    {
+      "source": "DIRECTION_VERIFIED",
+      "priority": 90
+    },
+    {
+      "source": "R20_AUTHORIZED_CLUB",
+      "priority": 85
+    },
+    {
+      "source": "GOOGLE_CALENDAR_VERIFIED",
+      "priority": 75
+    },
+    {
+      "source": "CLUB_EVENT_REGISTRY",
+      "priority": 70
+    },
+    {
+      "source": "TUTTOCAMPO_VERIFIED",
+      "priority": 60
+    }
+  ],
+  "missingDataStates": [
+    "DATO_IN_AGGIORNAMENTO",
+    "DA_VERIFICARE",
+    "NON_DISPONIBILE",
+    "STALE",
+    "OFFLINE"
+  ],
+  "visual": {
+    "paletteSource": "config/scd-visual-system.json",
+    "visualMaster": "docs/SCD_ONE_VISUAL_EXPERIENCE_MASTER.md",
+    "style": "SPATIAL_SPORT_EDITORIAL_HIGH_IMPACT",
+    "gamingEnergyWithoutGambling": true,
+    "realOfficialAssetsRequired": true
+  },
+  "responsive": {
+    "mobile": [
+      "360x800",
+      "390x844",
+      "393x852",
+      "430x932"
+    ],
+    "desktop": [
+      "1280x800",
+      "1440x900",
+      "1920x1080"
+    ],
+    "reducedMotionRequired": true,
+    "keyboardFocusRequired": true,
+    "visualRegressionRequired": true
+  },
+  "socialSafety": [
+    "NO_UNSAFE_ADULT_MINOR_1TO1",
+    "NO_PUBLIC_MINOR_RANKING",
+    "CONSENT_AWARE_MEDIA",
+    "REPORT_MODERATE_PATH"
+  ],
+  "commands": [
+    "SCDONE:MASTER",
+    "SCDONE:STATE",
+    "SCDONE:EXPERT",
+    "SCDONE:ARCHITECT",
+    "SCDONE:VISUAL",
+    "SCDONE:DATA",
+    "SCDONE:SOURCE",
+    "SCDONE:LIVE",
+    "SCDONE:IDENTITY",
+    "SCDONE:CALENDAR",
+    "SCDONE:WEEK",
+    "SCDONE:MATCHDAY",
+    "SCDONE:TEAMS",
+    "SCDONE:SOCIAL",
+    "SCDONE:COMMUNITY",
+    "SCDONE:FAMILY",
+    "SCDONE:ATHLETE",
+    "SCDONE:EVENT",
+    "SCDONE:TOURNAMENT",
+    "SCDONE:FIELDS",
+    "SCDONE:CARD",
+    "SCDONE:TRANSACT",
+    "SCDONE:MEDIA",
+    "SCDONE:NEWSROOM",
+    "SCDONE:NOTIFY",
+    "SCDONE:INTEGRATE",
+    "SCDONE:AUTOMATE",
+    "SCDONE:AI",
+    "SCDONE:PERFORMANCE",
+    "SCDONE:ACCESSIBILITY",
+    "SCDONE:SECURITY",
+    "SCDONE:TEST",
+    "SCDONE:RELEASE",
+    "SCDONE:RECOVER",
+    "SCDONE:NO-DUPLICATE",
+    "SCDONE:RUN"
+  ],
+  "completionStates": [
+    "DESIGNED",
+    "IMPLEMENTED",
+    "TESTED",
+    "DEPLOYED",
+    "PRODUCTION_VERIFIED"
+  ],
+  "productionMutationRequiresExplicitAuthorization": true
+}
