@@ -961,3 +961,123 @@ body[data-scd-theme="arena"] .mention-box input{
   border-color:var(--r57-line)!important;
   background:#021a35!important;
 }
+
+
+/* ONE-02 · My SCD Profile command center */
+body[data-scd-theme="arena"] .profile-command{
+  margin:18px 0 20px;
+  padding:28px;
+  border:1px solid var(--r57-line);
+  border-radius:28px;
+  background:
+    radial-gradient(circle at 90% 4%,rgba(32,183,230,.12),transparent 28%),
+    radial-gradient(circle at 8% 100%,rgba(255,213,0,.07),transparent 22%),
+    linear-gradient(145deg,#031a35,#052e59);
+  box-shadow:0 22px 58px rgba(0,0,0,.27);
+  color:#fff;
+}
+body[data-scd-theme="arena"] .profile-command-head{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:start;
+  gap:18px;
+}
+body[data-scd-theme="arena"] .profile-command-head .eyebrow{color:var(--r57-cyan)!important}
+body[data-scd-theme="arena"] .profile-command-head h1{
+  margin:6px 0 8px;
+  color:#fff;
+  font-size:clamp(30px,4vw,54px);
+  line-height:.98;
+  letter-spacing:-.045em;
+}
+body[data-scd-theme="arena"] .profile-command-head p{
+  max-width:800px;
+  margin:0;
+  color:var(--r57-muted);
+  line-height:1.55;
+}
+body[data-scd-theme="arena"] .profile-command-state{
+  border:1px solid var(--r57-line);
+  border-radius:999px;
+  padding:8px 12px;
+  color:var(--r57-muted);
+  background:rgba(255,255,255,.04);
+  font-size:9px;
+  font-weight:950;
+  letter-spacing:.08em;
+  white-space:nowrap;
+}
+body[data-scd-theme="arena"] .profile-command-state[data-state="VERIFIED"]{
+  color:#6BE4A8;
+  border-color:rgba(107,228,168,.34);
+  background:rgba(107,228,168,.07);
+}
+body[data-scd-theme="arena"] .profile-command-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+  margin-top:20px;
+}
+body[data-scd-theme="arena"] .profile-command-card{
+  display:grid;
+  align-content:start;
+  min-height:188px;
+  padding:17px;
+  border:1px solid var(--r57-line);
+  border-radius:20px;
+  background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.025));
+}
+body[data-scd-theme="arena"] .profile-command-card small{
+  color:var(--r57-cyan);
+  font-size:9px;
+  font-weight:950;
+  letter-spacing:.08em;
+}
+body[data-scd-theme="arena"] .profile-command-card strong{
+  margin-top:12px;
+  color:#fff;
+  font-size:20px;
+  line-height:1.12;
+}
+body[data-scd-theme="arena"] .profile-command-card span{
+  margin-top:8px;
+  color:var(--r57-muted);
+  font-size:11px;
+  line-height:1.5;
+}
+body[data-scd-theme="arena"] .profile-command-card button{
+  justify-self:start;
+  margin-top:auto;
+  padding:0;
+  border:0;
+  background:transparent;
+  color:var(--r57-gold);
+  font-weight:900;
+  cursor:pointer;
+}
+body[data-scd-theme="arena"] .profile-command-card.team{
+  background:linear-gradient(155deg,rgba(8,112,207,.16),rgba(255,255,255,.025));
+}
+body[data-scd-theme="arena"] .profile-command-card.app{
+  background:linear-gradient(155deg,rgba(32,183,230,.11),rgba(255,255,255,.025));
+}
+body[data-scd-theme="arena"] .profile-command-card.access{
+  background:linear-gradient(155deg,rgba(255,213,0,.08),rgba(255,255,255,.025));
+}
+body[data-scd-theme="arena"] .profile-command-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+  margin-top:14px;
+}
+
+@media (max-width:980px){
+  body[data-scd-theme="arena"] .profile-command-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:620px){
+  body[data-scd-theme="arena"] .profile-command{padding:18px;border-radius:22px}
+  body[data-scd-theme="arena"] .profile-command-head{grid-template-columns:1fr}
+  body[data-scd-theme="arena"] .profile-command-grid{grid-template-columns:1fr}
+  body[data-scd-theme="arena"] .profile-command-card{min-height:154px}
+  body[data-scd-theme="arena"] .profile-command-actions{display:grid;grid-template-columns:1fr}
+}
