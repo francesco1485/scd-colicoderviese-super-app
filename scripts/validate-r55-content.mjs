@@ -37,7 +37,7 @@ for(const token of [
 
 for(const token of ['.club-now-grid','.club-now-card','.club-content-details'])if(!css.includes(token))fail('R55 public content style missing '+token);
 if(!socialCss.includes('.social-card[data-type="CLUB"]'))fail('R55 social content style missing');
-if(!/scd-nextgen-0\.7\.(?:[2-9]\d*)-r\d+/.test(sw)||!sw.includes('./content/public-club.v1.json'))fail('R55 PWA cache contract missing');
+if(!sw.includes("const CACHE='scd-one-one-01'")||!sw.includes('./content/public-club.v1.json')||!sw.includes('./lib/scd-one-pulse.js?v=1.0.0'))fail('R55 PWA cache contract missing');
 
 if(!process.exitCode)console.log('SCD R55 CONTENT FILL PASS',{
   items:content.items.length,

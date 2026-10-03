@@ -4,11 +4,24 @@
 Before any write:
 1. Read `SCD_SYSTEM_MANIFEST.json` (machine-readable normative authority).
 2. Read `AGENTS.md` (operating gate and agent rules).
-3. Run/verify `SCD:STATE`. No verified state means read-only analysis only.
+3. Read `config/user-directives.v1.json` (recovered explicit user commands).
+4. For UI/media/product work read `config/scd-visual-references.v1.json`.
+5. Run/verify `SCD:STATE`. No verified state means read-only analysis only.
 
 If any instruction conflicts with the manifest, the manifest wins.
 
-## Portfolio gate
+## Recovered user-command and Library gate
+
+Before substantial implementation:
+- recover relevant original user commands from `config/user-directives.v1.json` and `docs/USER_COMMAND_RECOVERY_LEDGER.md`;
+- inspect relevant internal Library boards/documents registered in `config/scd-visual-references.v1.json`;
+- compare current code against those references before inventing a new direction;
+- treat generated boards as design evidence unless explicit approval evidence exists;
+- never promote sample people, scores, dates, sponsors, prices or statuses from boards into runtime data;
+- when implementation is requested and technically possible, documentation-only completion is insufficient;
+- continue through safe reversible implementation + tests without asking for permission at every file.
+
+
 Before creating or reclassifying an application, read `config/ai-portfolio.v1.json`.
 
 The canonical portfolio is exactly:

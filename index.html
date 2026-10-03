@@ -3,27 +3,28 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#041c3a">
-  <meta name="description" content="SCD ColicoDerviese Universe: sport, community, servizi e club operations in una sola esperienza digitale.">
+  <meta name="theme-color" content="#031A35">
+  <meta name="description" content="SCD ONE: sport, calendario, squadre, social e servizi verificati del Club ColicoDerviese.">
   <meta name="scd-build" content="40.0.0">
-  <meta name="scd-release" content="NG-0.7.0">
-  <title>SCD Universe · Next Generation</title>
+  <meta name="scd-release" content="SCD-ONE-01">
+  <title>SCD ONE · ColicoDerviese</title>
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./assets/logo-scd.png">
   <link rel="apple-touch-icon" href="./assets/logo-scd.png">
     <link rel="stylesheet" href="./scd-ng.css?v=0.6.3">
   <link rel="stylesheet" href="./scd-synth.css?v=0.4.5">
-  <link rel="stylesheet" href="./ui-r52-social.css?v=0.7.1">
+  <link rel="stylesheet" href="./ui-r52-social.css?v=0.7.2">
+  <link rel="stylesheet" href="./scd-one-r57.css?v=1.0.0">
 </head>
 <body data-scd-theme="arena">
   <div class="ambient ambient-a"></div><div class="ambient ambient-b"></div>
   <div class="app" id="app">
     <header class="topbar">
-      <a class="brand" href="#pulse" data-nav="pulse" aria-label="SCD ColicoDerviese">
+      <a class="brand" href="#home" data-nav="pulse" aria-label="SCD ColicoDerviese">
         <img src="./assets/logo-scd.png" alt="SCD ColicoDerviese">
         <span><b>SCD</b><small>COLICODERVIESE</small></span>
       </a>
-      <div class="top-center"><span class="live-dot"></span><span id="clubNow">Europe/Rome · sincronizzazione</span></div>
+      <div class="top-center"><span class="clock-mark" aria-hidden="true">◷</span><span id="clubNow">Europe/Rome · ora locale</span></div>
       <div class="top-actions">
         <button class="top-link" type="button" data-public-action="calendar"><span>▦</span><b>Calendario</b></button>
         <button class="top-link top-link-accent" type="button" data-scroll="#joinClub"><span>＋</span><b>Entra nel Club</b></button>
@@ -31,12 +32,6 @@
         <button class="avatar-mini" data-nav="twin" aria-label="Apri il profilo"><span id="miniInitials">SCD</span></button>
       </div>
     </header>
-
-    <nav class="world-switch" aria-label="Mondi SCD">
-      <button class="active" data-nav="pulse"><span>◉</span><b>PULSE</b><small>Club live</small></button>
-      <button data-nav="twin"><span>✦</span><b>SCD TWIN</b><small>Identità viva</small></button>
-      <button data-nav="desk"><span>⌘</span><b>STAFF & FAMILY</b><small>Private Desk</small></button>
-    </nav>
 
     <div class="experience-dock global-experience-dock" aria-label="Modalità esperienza">
       <button type="button" data-experience-mode="DISCOVER">Scopri</button>
@@ -49,12 +44,41 @@
         <section class="home-first" id="homeWeek">
           <div class="home-first-head">
             <div>
-              <span class="eyebrow">SCD HOME · QUESTA SETTIMANA</span>
-              <h1>La tua settimana <em>SCD.</em></h1>
-              <p id="weekRangeLabel">Partite, eventi e attività pubbliche della settimana corrente</p>
+              <span class="eyebrow">SCD ONE · PULSE</span>
+              <h1>Il Club, <em>adesso.</em></h1>
+              <p id="weekRangeLabel">Stato pubblico del Club · calendario SCD in aggiornamento</p>
             </div>
             <button class="week-calendar-cta" type="button" data-public-action="calendar">Calendario completo →</button>
           </div>
+          <section class="pulse-operational" aria-labelledby="pulseTitle">
+            <header class="pulse-operational-head">
+              <h2 id="pulseTitle">Stato del Club</h2>
+              <span id="pulseSourceState" class="pulse-state" data-pulse-state="PENDING">FONTE · IN ATTESA</span>
+              <small id="pulseChecked">Ultimo controllo verificato non disponibile</small>
+            </header>
+            <div class="pulse-operational-grid">
+              <article class="pulse-signal">
+                <span>OGGI</span>
+                <b id="pulseNow">Agenda pubblica non verificata.</b>
+                <small id="pulseNowState" data-pulse-state="PENDING">PENDING · calendario in aggiornamento</small>
+              </article>
+              <article class="pulse-signal">
+                <span>PROSSIMO</span>
+                <b id="pulseNext">Prossima attività non disponibile.</b>
+                <small id="pulseNextState" data-pulse-state="PENDING">PENDING · in attesa di fonte</small>
+              </article>
+              <article class="pulse-signal">
+                <span>CAMBIAMENTI</span>
+                <b id="pulseChanged">Primo confronto in attesa di dati verificati.</b>
+                <small id="pulseChangedState" data-pulse-state="PENDING">PENDING · confronto non disponibile</small>
+              </article>
+              <article class="pulse-signal">
+                <span>ATTENZIONE</span>
+                <b id="pulseAttention">Stato degli avvisi pubblici non disponibile.</b>
+                <small id="pulseAttentionState" data-pulse-state="UNVERIFIED">UNVERIFIED · nessun feed avvisi collegato</small>
+              </article>
+            </div>
+          </section>
           <div class="public-search-shell" id="publicSearch">
             <span class="search-icon" aria-hidden="true">⌕</span>
             <input id="publicSearchInput" type="search" autocomplete="off" placeholder="Cerca squadra, partita, evento o news…" aria-label="Cerca nei contenuti pubblici SCD">
@@ -83,16 +107,16 @@
           <div class="hero-content">
             <div class="eyebrow">S.D.C. COLICODERVIESE · ALTO LARIO</div>
             <h1>Il Club non si consulta.<br><em>Si vive.</em></h1>
-            <p>Sport, persone, territorio, servizi e community in un unico spazio. Niente labirinti da gestionale del 2008, grazie al cielo.</p>
+            <p>Sport, persone, territorio, servizi e community in un unico spazio operativo, costruito intorno alla vita reale del Club.</p>
             <div class="hero-actions">
-              <button class="btn primary" data-scroll="#radar">Questa settimana</button>
+              <button class="btn primary" data-scroll="#homeWeek">Questa settimana</button>
               <button class="btn glass" data-nav="desk">Apri il mio spazio</button>
             </div>
           </div>
           <aside class="hero-live">
             <div class="label">OGGI NEL CLUB</div>
-            <strong id="todayHeadline">Dato in aggiornamento</strong>
-            <p id="todayDetail">Le attività reali compariranno quando la fonte calendario sarà collegata a questa nuova shell.</p>
+            <strong id="todayHeadline">Agenda non verificata</strong>
+            <p id="todayDetail">Sono mostrati solo appuntamenti restituiti dalle fonti pubbliche SCD.</p>
             <div class="source-chip"><span></span><b>PROVENANCE FIRST</b></div>
           </aside>
         </section>
@@ -110,7 +134,7 @@
           <div><small>PROSSIMA GARA</small><b id="nextMatch">Dato in aggiornamento</b></div>
           <div><small>ATTIVITÀ OGGI</small><b id="todayCount">—</b></div>
           <div><small>SETTIMANA</small><b id="weekCount">—</b></div>
-          <div><small>NEWSROOM</small><b>Verified facts only</b></div>
+          <div><small>NEWSROOM</small><b>Solo dati verificati</b></div>
         </section>
 
         
@@ -142,7 +166,7 @@
 
         <section class="home-practical-grid">
           <article class="match-center" id="matchCenter">
-            <div class="match-center-head"><div><span class="eyebrow">MATCH CENTER</span><h2>Prossima partita</h2></div><span class="verified-state" id="matchVerifiedState">DATI VERIFICATI</span></div>
+            <div class="match-center-head"><div><span class="eyebrow">MATCH CENTER</span><h2>Prossima partita</h2></div><span class="verified-state pending" id="matchVerifiedState">DATO IN AGGIORNAMENTO</span></div>
             <div class="match-main">
               <div class="match-team scd"><img src="./assets/logo-scd.png" alt="SCD ColicoDerviese"><b id="matchTeam">SCD</b></div>
               <div class="match-when"><small id="matchCompetition">Competizione in aggiornamento</small><strong id="matchDate">Dato in aggiornamento</strong><span id="matchTimeVenue">Ora e campo in aggiornamento</span></div>
@@ -494,6 +518,48 @@
       </section>
 
       <section class="view" id="view-twin" data-view="twin">
+        <section class="profile-command" id="profileCommand" aria-labelledby="profileCommandTitle">
+          <header class="profile-command-head">
+            <div>
+              <span class="eyebrow">PROFILE · MY SCD</span>
+              <h1 id="profileCommandTitle">La tua porta d’ingresso nel Club.</h1>
+              <p>Squadra seguita, prossimo impegno verificato, stato app e accesso riservato in una sola vista. Il profilo locale resta separato dai dati federali e dai dati sensibili.</p>
+            </div>
+            <span class="profile-command-state" id="profileCommandState" data-state="PUBLIC">PUBBLICO</span>
+          </header>
+          <div class="profile-command-grid">
+            <article class="profile-command-card identity">
+              <small>IDENTITÀ LOCALE</small>
+              <strong id="profileIdentityName">Il mio Twin</strong>
+              <span id="profileIdentityMeta">Profilo locale · 0% completato</span>
+              <button type="button" data-profile-action="twin">Personalizza profilo →</button>
+            </article>
+            <article class="profile-command-card team">
+              <small>LA MIA SQUADRA</small>
+              <strong id="profileTeamName">Nessuna squadra seguita</strong>
+              <span id="profileTeamNext">Scegli una squadra per creare il tuo punto di accesso sportivo.</span>
+              <button type="button" data-profile-action="team">Apri Team Hub →</button>
+            </article>
+            <article class="profile-command-card app-status">
+              <small>SCD ONE APP</small>
+              <strong id="profileAppState">WEB APP</strong>
+              <span id="profileAppMeta">Esperienza installabile quando il dispositivo lo supporta.</span>
+              <button type="button" data-profile-action="install">Installa / apri app →</button>
+            </article>
+            <article class="profile-command-card access">
+              <small>AREA RISERVATA</small>
+              <strong id="profileAccessState">Esperienza pubblica</strong>
+              <span id="profileAccessMeta">I dati privati richiedono autenticazione e scope autorizzato.</span>
+              <button type="button" data-profile-action="desk">Apri Private Desk →</button>
+            </article>
+          </div>
+          <div class="profile-command-actions">
+            <button type="button" class="btn primary" data-profile-action="calendar">Calendario della mia squadra</button>
+            <button type="button" class="btn glass" data-profile-action="social">Feed Social</button>
+            <button type="button" class="btn glass" data-profile-action="home">Torna alla Home</button>
+          </div>
+        </section>
+
         <div class="twin-stage">
           <div class="twin-copy">
             <span class="eyebrow">SCD TWIN · IDENTITÀ EVOLUTIVA</span>
@@ -544,8 +610,8 @@
 
       <section class="view" id="view-desk" data-view="desk">
         <section class="desk-hero">
-          <div><span class="eyebrow">PRIVATE DESK</span><h2 id="deskHeroTitle">Dimmi cosa devi fare.<br>Non dove hai salvato il file.</h2><p id="deskHeroCopy">Il sistema deve trasformare Drive, Gmail, fogli e dati federali in azioni, scadenze e decisioni. Il contrario sarebbe troppo semplice da sbagliare.</p></div>
-          <button class="btn primary" id="openMirrorDesk">Chiedi a SCD Mirror</button>
+          <div><span class="eyebrow">PRIVATE DESK</span><h2 id="deskHeroTitle">Dimmi cosa devi fare.<br>Non dove hai salvato il file.</h2><p id="deskHeroCopy">Il sistema trasforma Drive, Gmail, fogli e dati federali in azioni, scadenze e decisioni, mantenendo fonte e stato verificabile.</p></div>
+          <button class="btn primary" id="openMirrorDesk">Chiedi a Sky</button>
         </section>
         <div class="desk-grid">
           <section class="action-queue"><div class="section-head mini"><div><span class="eyebrow">DA GESTIRE</span><h3>Priorità operative</h3></div><span class="status-pill" id="deskScopeStatus">ROLE / SCOPE</span></div><div id="actionQueue"><article><span>1</span><div><b>Fonte non ancora collegata</b><small>Le priorità compariranno dopo autenticazione e scope reale.</small></div></article></div></section>
@@ -563,11 +629,11 @@
     </main>
 
     <nav class="bottom-nav" aria-label="Navigazione principale">
-      <button class="active" data-nav="pulse"><span>⌂</span>Home</button>
-      <button data-nav="calendar"><span>▦</span>Calendario</button>
-      <button data-nav="teams"><span>⚽</span>Squadre</button>
-      <button data-nav="social"><span>◎</span>Social</button>
-      <button data-nav="twin"><span>◉</span>Profilo</button>
+      <button class="active" type="button" data-nav="pulse" data-route="home" aria-current="page"><span aria-hidden="true">⌂</span>HOME</button>
+      <button type="button" data-nav="calendar" data-route="calendar"><span aria-hidden="true">▦</span>CALENDAR</button>
+      <button type="button" data-nav="teams" data-route="teams"><span aria-hidden="true">⚽</span>TEAMS</button>
+      <button type="button" data-nav="social" data-route="social"><span aria-hidden="true">◎</span>SOCIAL</button>
+      <button type="button" data-nav="twin" data-route="profile"><span aria-hidden="true">◉</span>PROFILE</button>
     </nav>
 
     <button class="mirror-fab sky-fab" id="mirrorFab" aria-label="Apri Sky, assistente SCD"><img src="./assets/sky.png" alt="" aria-hidden="true"><b>Sky</b></button>
@@ -575,7 +641,7 @@
       <header><div><span class="mirror-mark"><img src="./assets/sky.png" alt="" aria-hidden="true"></span><span><b>SKY</b><small>Assistente SCD · pubblico</small></span></div><button id="closeMirror">×</button></header>
       <div class="mirror-context"><span>CONTESTO</span><b id="mirrorContext">PULSE · PUBBLICO</b></div>
       <div class="mirror-messages" id="mirrorMessages">
-        <div class="msg ai">Sono qui quando servi tu, non quando serve aumentare una metrica. Posso orientarti tra calendario, documenti, trasporti, comunicazioni, sponsor e attività del club. Le azioni riservate restano soggette a ruolo e permessi.</div>
+        <div class="msg ai">Posso orientarti tra calendario, squadre, eventi, documenti, trasporti, comunicazioni e servizi del Club. Le azioni riservate restano soggette a ruolo, scope e permessi.</div>
       </div>
       <div class="quick-prompts"><button>Prossima partita</button><button>Eventi</button><button>Come tesserarsi</button><button>Diventa tifoso</button><button>Sponsor</button><button>Contatta la segreteria</button></div>
       
@@ -600,7 +666,10 @@
   <script src="./scd-experience-engine.js?v=40.0.0" defer></script>
   <script src="./scd-twin.js?v=40.0.0" defer></script>
   <script src="./lib/scd-operative-engine.js?v=51.0.0" defer></script>
-  <script src="./scd-ng.js?v=0.7.3" defer></script>
+  <script src="./lib/scd-one-pulse.js?v=1.0.0" defer></script>
+  <script src="./lib/scd-one-profile.js?v=1.0.0" defer></script>
+  <script src="./lib/scd-native-adapters.js?v=1.0.0" defer></script>
+  <script src="./scd-ng.js?v=0.7.4" defer></script>
   <script src="./scd-interactions.js?v=0.4.5" defer></script>
   <div class="scd-cookie-banner" id="scdCookieBanner" hidden role="dialog" aria-label="Preferenze analytics">
     <div><b>Misurazione accessi SCD</b><span>Possiamo usare un cookie first-party per contare accessi e utilizzo in forma aggregata. Nessun PIN, documento, messaggio privato o dato sanitario entra nelle analytics.</span></div>

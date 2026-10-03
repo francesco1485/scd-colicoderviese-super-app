@@ -38,13 +38,15 @@ window.addEventListener('beforeinstallprompt',event=>{
   deferredInstallPrompt=event;
   const button=document.querySelector('#installApp');
   if(button)button.hidden=false;
+  renderProfileCommand();
 });
 window.addEventListener('appinstalled',()=>{
   deferredInstallPrompt=null;
   const button=document.querySelector('#installApp');
   if(button)button.hidden=true;
+  renderProfileCommand();
 });
-const state={view:'pulse',filter:'ALL',events:[],upcoming:[],fullCalendar:[],calendarLoaded:false,calendarLoading:false,calendarSourceState:'UNVERIFIED',calendarPeriod:'WEEK',calendarTeam:'ALL',calendarCategory:'ALL',calendarType:'ALL',calendarSearch:'',teamsSearch:'',teamsCategory:'ALL',socialFilter:'ALL',socialSearch:'',news:null,clubContent:[],sportData:{results:[],standings:[],headToHead:[]},partners:[],publicProfiles:[],nextMatch:null,privateToken:'',privateEmail:'',privateData:null,workspace:null,privateLoading:false,privateError:''};
+const state={view:'pulse',filter:'ALL',events:[],upcoming:[],fullCalendar:[],pulseEvents:[],calendarLoaded:false,calendarLoading:false,calendarSourceState:'PENDING',calendarSnapshot:null,calendarChanges:null,calendarCheckedAt:null,calendarPeriod:'WEEK',calendarTeam:'ALL',calendarCategory:'ALL',calendarType:'ALL',calendarSearch:'',teamsSearch:'',teamsCategory:'ALL',socialFilter:'ALL',socialSearch:'',news:null,clubContent:[],sportData:{results:[],standings:[],headToHead:[]},partners:[],publicProfiles:[],nextMatch:null,privateToken:'',privateEmail:'',privateData:null,workspace:null,privateLoading:false,privateError:''};
 const officialChannels=[
  {id:'site',label:'Sito ufficiale',url:'https://www.colicoderviese.it/',terms:'sito web comunicazioni servizi'},
  {id:'facebook',label:'Facebook SCD',url:'https://www.facebook.com/ColicoDerviese',terms:'facebook social pagina'},
@@ -106,18 +108,29 @@ const pick=(obj,...keys)=>{for(const k of keys){const v=obj?.[k];if(v!=null&&Str
 const isoClientDate=v=>{const s=String(v||'').trim();if(!s)return '';let m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);if(m)return m[1]+'-'+m[2]+'-'+m[3];m=s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);if(m)return m[3]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[1]).padStart(2,'0');const d=new Date(s);return Number.isFinite(d.getTime())?d.toISOString().slice(0,10):''};
 const clientEventKind=row=>{const t=norm([pick(row,'kind','type','eventType'),pick(row,'title','event','name','subject')].join(' '));if(/allenament|training/.test(t))return 'TRAINING';if(/gara|partita|campionato|coppa|amichevole|match/.test(t))return 'MATCH';if(/torneo|tournament/.test(t))return 'TOURNAMENT';return 'EVENT'};
 
-function setView(view){
+const routeToView={home:'pulse',pulse:'pulse',calendar:'calendar',teams:'teams',social:'social',profile:'twin',twin:'twin',desk:'desk'};
+const viewToRoute={pulse:'home',calendar:'calendar',teams:'teams',social:'social',twin:'profile',desk:'desk'};
+function setView(requested,{historyMode='push'}={}){
+  const view=routeToView[String(requested||'').toLowerCase()];
+  if(!view)return;
+  const changed=state.view!==view;
+  const route=viewToRoute[view];
   state.view=view;
-  $$('[data-view]').forEach(x=>x.classList.toggle('active',x.dataset.view===view));
-  $$('[data-nav]').forEach(x=>x.classList.toggle('active',x.dataset.nav===view));
+  $$('[data-view]').forEach(x=>{const active=x.dataset.view===view;x.classList.toggle('active',active);x.setAttribute('aria-hidden',String(!active))});
+  $$('[data-nav]').forEach(x=>{const active=x.dataset.nav===view;x.classList.toggle('active',active);if(x.closest('.bottom-nav')){if(active)x.setAttribute('aria-current','page');else x.removeAttribute('aria-current')}});
   const ctx=view==='desk'?'PRIVATE DESK · ROLE/SCOPE':view==='twin'?'PROFILO · AVATAR FACOLTATIVO':view==='calendar'?'CALENDARIO · PUBBLICO':view==='teams'?'SQUADRE · PUBBLICO':view==='social'?'SOCIAL · PUBBLICO':'HOME · PUBBLICO';
   const ctxEl=$('#mirrorContext');if(ctxEl)ctxEl.textContent=ctx;
-  history.replaceState(null,'','#'+view);
-  window.scrollTo({top:0,behavior:'smooth'});
+  if(location.hash!=='#'+route){
+    if(historyMode==='push')history.pushState(null,'','#'+route);
+    else if(historyMode==='replace')history.replaceState(null,'','#'+route);
+  }
+  if(changed)window.scrollTo({top:0,behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
   if(view==='calendar')ensurePublicCalendar();
   if(view==='teams')ensurePublicCalendar();
   if(view==='social')renderSocialHub();
+  if(view==='twin')renderProfileCommand();
   if(view==='desk')ensurePrivateDesk();
+  return true;
 }
 $$('[data-nav]').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.nav)));
 $('#modeBtn')?.addEventListener('click',()=>{document.body.classList.toggle('compact');toast(document.body.classList.contains('compact')?'Densità compatta':'Densità comfort')});
@@ -130,12 +143,13 @@ function clubClock(){
 clubClock();setInterval(clubClock,30000);
 
 function currentWeek(){
- const now=new Date(), day=(now.getDay()+6)%7, start=new Date(now);start.setHours(12,0,0,0);start.setDate(start.getDate()-day);
- return Array.from({length:7},(_,i)=>{const d=new Date(start);d.setDate(start.getDate()+i);return d});
+ const {start,end}=window.SCDOnePulse.weekRange(new Date()),first=new Date(start+'T12:00:00Z'),last=new Date(end+'T12:00:00Z'),days=[];
+ for(let time=first.getTime();time<=last.getTime();time+=86400000)days.push(new Date(time));
+ return days;
 }
 function renderWeek(){
  const rail=$('#weekRail');if(!rail)return;
- const names=['LUN','MAR','MER','GIO','VEN','SAB','DOM'], today=todayKey();
+ const names=['VEN','SAB','DOM','LUN','MAR','MER','GIO','VEN'], today=todayKey();
  rail.innerHTML=currentWeek().map((d,i)=>{
    const iso=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome'}).format(d);
    const ev=state.events.filter(x=>x.date===iso&&(state.filter==='ALL'||x.group===state.filter));
@@ -214,16 +228,21 @@ async function ensurePublicCalendar(force=false){
    const rows=normalizeCalendarRows(out);
    const fallback=fallbackCalendarRows();
    state.fullCalendar=mergeCalendarRows(rows,fallback);
-   state.calendarSourceState=rows.length?'VERIFIED_PUBLIC_CALENDAR':'PARTIAL_NEWSROOM_FALLBACK';
+   state.calendarSourceState='VERIFIED_PUBLIC_CALENDAR';
+   state.pulseEvents=mergeCalendarRows(rows);
+   recordPulseSnapshot(state.pulseEvents);
    state.calendarLoaded=true;
  }catch(err){
    state.fullCalendar=fallbackCalendarRows();
-   state.calendarSourceState=state.fullCalendar.length?'PARTIAL_NEWSROOM_FALLBACK':'UNAVAILABLE';
+   state.calendarSourceState='UNAVAILABLE';
+   state.pulseEvents=[];
+   state.calendarChanges=null;
    state.calendarLoaded=true;
  }
  state.calendarLoading=false;
  renderPublicCalendar();
  renderPublicTeams();
+ renderPulseOperational();
 }
 function calendarBounds(period){
  const today=todayKey();
@@ -408,8 +427,8 @@ function socialFeedRows(){
 async function shareSocialText(text,title='SCD ColicoDerviese'){
  const value=String(text||'').trim();if(!value)return;
  try{
-   if(navigator.share){await navigator.share({title,text:value});return}
-   if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(value);toast('Contenuto copiato');return}
+   const result=await window.SCDNativeAdapters.share({title,text:value,url:location.href});
+   if(result!==false){if(result?.method==='clipboard')toast('Contenuto copiato');return}
  }catch(e){if(e?.name==='AbortError')return}
  openPanel('Condividi','<div class="panel-detail"><h2>'+esc(title)+'</h2><p>'+esc(value)+'</p></div>');
 }
@@ -581,6 +600,53 @@ function renderWeekMeta(data){
  const label=$('#weekRangeLabel'),meta=$('#weekSummaryMeta');
  if(label&&data.week)label.textContent=fmtDate(data.week.start)+' → '+fmtDate(data.week.end)+' · Europe/Rome';
  if(meta)meta.textContent=state.events.length?state.events.length+' attività verificate · tutte le annate':'Nessuna attività verificata caricata';
+}
+function recordPulseSnapshot(rows){
+ const normalized=window.SCDOnePulse.normalize(rows);
+ state.calendarChanges=window.SCDOnePulse.compare(state.calendarSnapshot,normalized);
+ state.calendarSnapshot=normalized;
+ state.calendarCheckedAt=new Date().toISOString();
+}
+function pulseSignal(name,text,status){
+ const content=$('#pulse'+name),stateLabel=$('#pulse'+name+'State');
+ if(content)content.textContent=text;
+ if(stateLabel){stateLabel.textContent=status;stateLabel.dataset.pulseState=status.split(' · ')[0]}
+}
+function renderPulseOperational(){
+ const source=$('#pulseSourceState');
+ if(!source)return;
+ const verified=state.calendarSourceState==='VERIFIED_PUBLIC_CALENDAR';
+ const unavailable=state.calendarSourceState==='UNAVAILABLE';
+ const pending=state.calendarSourceState==='PENDING';
+ source.textContent=verified?'VERIFIED · CALENDARIO PUBBLICO':pending?'PENDING · CALENDARIO':unavailable?'UNAVAILABLE · CALENDARIO':'UNVERIFIED · CALENDARIO';
+ source.dataset.pulseState=verified?'VERIFIED':pending?'PENDING':unavailable?'UNAVAILABLE':'UNVERIFIED';
+ const checked=$('#pulseChecked');
+ if(checked)checked.textContent=state.calendarCheckedAt
+   ?'Ultimo controllo verificato · '+new Intl.DateTimeFormat('it-IT',{timeZone:'Europe/Rome',hour:'2-digit',minute:'2-digit'}).format(new Date(state.calendarCheckedAt))
+   :'Ultimo controllo verificato non disponibile';
+ if(!verified){
+   const status=pending?'PENDING':unavailable?'UNAVAILABLE':'UNVERIFIED';
+   pulseSignal('Now','Agenda pubblica di oggi non verificabile.',status+' · fonte calendario');
+   pulseSignal('Next','Prossima attività non verificabile.',status+' · fonte calendario');
+   pulseSignal('Changed','Confronto in attesa di un aggiornamento verificato.','PENDING · confronto non disponibile');
+   pulseSignal('Attention',unavailable?'Fonte calendario non disponibile.':'Avvisi pubblici non verificati.',status+' · nessun feed avvisi collegato');
+   return;
+ }
+ const summary=window.SCDOnePulse.summarize(state.pulseEvents);
+ const today=summary.today;
+ pulseSignal('Now',today.length
+   ?today.length+' attività pubbliche in agenda: '+today.slice(0,3).map(event=>[event.time,event.team||event.title].filter(Boolean).join(' · ')).join(' / ')+(today.length>3?' / +'+(today.length-3):'')
+   :'Nessuna attività pubblica verificata oggi.','VERIFIED · calendario pubblico');
+ const next=summary.next;
+ pulseSignal('Next',next
+   ?[fmtDate(next.date),next.time,next.team||next.title].filter(Boolean).join(' · ')
+   :'Nessuna prossima attività pubblicata.','VERIFIED · calendario pubblico');
+ pulseSignal('Changed',state.calendarChanges===null
+   ?'Prima fotografia verificata salvata; variazioni in attesa del prossimo controllo.'
+   :state.calendarChanges===0?'Nessuna variazione rilevata dall’ultimo controllo.'
+     :state.calendarChanges+' variazioni rilevate dall’ultimo controllo.',
+   state.calendarChanges===null?'PENDING · secondo controllo necessario':'VERIFIED · confronto tra controlli');
+ pulseSignal('Attention','Stato degli avvisi pubblici non disponibile.','UNVERIFIED · nessun feed avvisi collegato');
 }
 
 function buildSearchIndex(){
@@ -992,13 +1058,19 @@ async function hydrate(){
     if($('#todayDetail'))$('#todayDetail').textContent=todayEv.length?todayEv.slice(0,3).map(x=>[x.team,x.time,x.title].filter(Boolean).join(' · ')).join('  |  '):'Nessuna attività verificata disponibile nella fonte collegata.';
     const card=Array.isArray(data.cards)?data.cards.find(c=>c.evidence?.length):null;
     if(card){if($('#storyTitle'))$('#storyTitle').textContent=card.title||'SCD Newsroom';if($('#storyText'))$('#storyText').textContent=card.dek||card.body||'Contenuto verificato'}
-    state.fullCalendar=mergeCalendarRows(state.fullCalendar,state.events,state.upcoming);renderWeek();renderWeekMeta(data);renderMatchCenter();renderUpcoming();renderPartners();renderMentions();renderMyTeamDeck();renderSocialHub();if(state.view==='calendar')renderPublicCalendar();if(state.view==='teams')renderPublicTeams();
+    state.fullCalendar=mergeCalendarRows(state.fullCalendar,state.events,state.upcoming);
+    const calendarVerified=data.sources?.calendar==='OK'&&Array.isArray(data.calendar?.rows);
+    state.calendarSourceState=calendarVerified?'VERIFIED_PUBLIC_CALENDAR':data.sources?.calendar?'UNAVAILABLE':'UNVERIFIED';
+    state.pulseEvents=calendarVerified?mergeCalendarRows(state.events,state.upcoming):[];
+    if(calendarVerified)recordPulseSnapshot(state.pulseEvents);
+    renderPulseOperational();renderWeek();renderWeekMeta(data);renderMatchCenter();renderUpcoming();renderPartners();renderMentions();renderMyTeamDeck();renderSocialHub();if(state.view==='calendar')renderPublicCalendar();if(state.view==='teams')renderPublicTeams();renderProfileCommand();
   }catch(e){
     if($('#weekCount'))$('#weekCount').textContent='—';if($('#todayCount'))$('#todayCount').textContent='—';
-    state.fullCalendar=mergeCalendarRows(state.fullCalendar,state.events,state.upcoming);renderWeek();renderMatchCenter();renderUpcoming();renderPartners();renderMentions();renderSocialHub();if(state.view==='calendar')renderPublicCalendar();if(state.view==='teams')renderPublicTeams();
+    state.calendarSourceState='UNAVAILABLE';state.pulseEvents=[];state.calendarChanges=null;
+    state.fullCalendar=mergeCalendarRows(state.fullCalendar,state.events,state.upcoming);renderPulseOperational();renderWeek();renderMatchCenter();renderUpcoming();renderPartners();renderMentions();renderSocialHub();if(state.view==='calendar')renderPublicCalendar();if(state.view==='teams')renderPublicTeams();
   }
 }
-r56BindAnalyticsConsent();loadClubContent();hydrate();$('#refreshData')?.addEventListener('click',()=>{loadClubContent();hydrate();toast('Aggiornamento richiesto')});
+r56BindAnalyticsConsent();loadClubContent();renderPulseOperational();hydrate();$('#refreshData')?.addEventListener('click',()=>{loadClubContent();hydrate();toast('Aggiornamento richiesto')});
 $('#socialRefresh')?.addEventListener('click',async()=>{await Promise.all([loadClubContent(),hydrate()]);renderSocialHub();toast('Feed social aggiornato')});
 $('#installApp')?.addEventListener('click',async()=>{
  if(!deferredInstallPrompt){toast('Installazione disponibile dal menu del browser quando supportata');return}
@@ -1016,6 +1088,78 @@ $('#socialFilters')?.addEventListener('click',e=>{
  renderSocialHub();
 });
 
+
+
+function profileAppMode(){
+  const standalone=window.matchMedia?.('(display-mode: standalone)')?.matches===true||window.navigator.standalone===true;
+  if(standalone)return 'STANDALONE';
+  if(deferredInstallPrompt)return 'INSTALLABLE';
+  return 'WEB';
+}
+function renderProfileCommand(){
+  const modelBuilder=window.SCDOneProfile?.build;
+  if(!modelBuilder)return;
+  const followed=loadFollowedTeam();
+  const model=modelBuilder({
+    twin:loadTwin(),
+    followedTeam:followed,
+    teamModel:followed?teamModelByName(followed):null,
+    calendarSourceState:state.calendarSourceState,
+    appMode:profileAppMode(),
+    privateVerified:Boolean(state.privateData&&!state.privateError)
+  });
+  const set=(id,value)=>{const el=$(id);if(el)el.textContent=value};
+  set('#profileIdentityName',model.identity.name);
+  set('#profileIdentityMeta',model.identity.role+' · '+model.identity.completeness.percent+'% completato');
+  set('#profileTeamName',model.team.name);
+  if(model.team.next){
+    const next=model.team.next;
+    set('#profileTeamNext',[next.kind==='MATCH'?'Prossima gara':'Prossima attività',fmtDate(next.date),next.time,next.opponent,next.venue].filter(Boolean).join(' · '));
+  }else{
+    set('#profileTeamNext',followed?'Nessun prossimo impegno verificato dalla fonte pubblica.':'Scegli una squadra per creare il tuo punto di accesso sportivo.');
+  }
+  set('#profileAppState',model.app.installed?'APP INSTALLATA':model.app.installable?'APP INSTALLABILE':'WEB APP');
+  set('#profileAppMeta',model.app.installed?'SCD ONE è in esecuzione come app sul dispositivo.':model.app.installable?'Installazione disponibile senza cambiare il codice o creare un secondo account.':'L’installazione comparirà quando browser e dispositivo la renderanno disponibile.');
+  set('#profileAccessState',model.access.label);
+  set('#profileAccessMeta',model.access.state==='VERIFIED'?'Sessione privata verificata. I contenuti restano limitati a ruolo e scope.':'I dati privati richiedono autenticazione e scope autorizzato.');
+  const statePill=$('#profileCommandState');
+  if(statePill){
+    statePill.dataset.state=model.access.state;
+    statePill.textContent=model.access.state==='VERIFIED'?'ACCESSO VERIFICATO':'PROFILO PUBBLICO';
+  }
+}
+async function handleProfileAction(action){
+  const followed=loadFollowedTeam();
+  if(action==='home')return setView('pulse');
+  if(action==='social')return setView('social');
+  if(action==='desk')return setView('desk');
+  if(action==='team'){
+    if(followed)return openTeamHub(followed);
+    setView('teams');setTimeout(()=>$('#followTeamSelect')?.focus(),120);return;
+  }
+  if(action==='calendar'){
+    if(followed)state.calendarTeam=followed;
+    state.calendarPeriod=followed?'ALL':'WEEK';
+    setView('calendar');renderPublicCalendar();return;
+  }
+  if(action==='twin'){
+    document.querySelector('.twin-control')?.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
+    return;
+  }
+  if(action==='install'){
+    if(profileAppMode()==='STANDALONE'){toast('SCD ONE è già aperta come app');return}
+    if(!deferredInstallPrompt){toast('Installazione disponibile dal menu del browser quando supportata');return}
+    deferredInstallPrompt.prompt();
+    await deferredInstallPrompt.userChoice.catch(()=>null);
+    deferredInstallPrompt=null;
+    renderProfileCommand();
+  }
+}
+document.addEventListener('click',e=>{
+  const button=e.target.closest('[data-profile-action]');
+  if(!button)return;
+  handleProfileAction(button.dataset.profileAction);
+});
 
 const avatarCatalog=[
  {id:'field',label:'Campo',terms:'calciatore campo blu',role:'Calciatore',kit:'blue',tone:'t2',hair:'h1'},
@@ -1053,14 +1197,14 @@ function applyTwin(t=loadTwin()){
   if($('#hairInput')&&t.hair)$('#hairInput').value=t.hair;
   const figure=$('#avatarFigure');if(figure){figure.dataset.tone=t.tone||'t2';figure.dataset.hair=t.hair||'h1';if(t.kit)figure.dataset.kit=t.kit}
 }
-applyTwin();updateFollowTeamUi();renderAvatarCatalog();
+applyTwin();updateFollowTeamUi();renderAvatarCatalog();renderProfileCommand();
 
 $('#saveTwin')?.addEventListener('click',()=>{
   const t=loadTwin();t.name=$('#twinNameInput').value.trim().slice(0,24)||'Il mio Twin';t.number=Math.max(1,Math.min(99,Number($('#numberInput').value||10)));t.role=$('#roleInput').value;t.tone=$('#toneInput')?.value||'t2';t.hair=$('#hairInput')?.value||'h1';
-  localStorage.setItem(twinKey,JSON.stringify(t));applyTwin(t);toast('Avatar sintetico salvato sul dispositivo');
+  localStorage.setItem(twinKey,JSON.stringify(t));applyTwin(t);renderProfileCommand();toast('Avatar sintetico salvato sul dispositivo');
 });
 $('#missionBtn')?.addEventListener('click',()=>{
-  const t=loadTwin();t.xp=Number(t.xp||0)+10;localStorage.setItem(twinKey,JSON.stringify(t));applyTwin(t);
+  const t=loadTwin();t.xp=Number(t.xp||0)+10;localStorage.setItem(twinKey,JSON.stringify(t));applyTwin(t);renderProfileCommand();
   $('#avatarFigure')?.animate([{transform:'translateY(0)'},{transform:'translateY(-14px)'},{transform:'translateY(0)'}],{duration:500});toast('+10 XP · missione sicura');
 });
 
@@ -1086,6 +1230,12 @@ function appendMsg(text,kind){const d=document.createElement('div');d.className=
 $('#mirrorForm')?.addEventListener('submit',e=>{e.preventDefault();const q=$('#mirrorInput').value.trim();if(!q)return;appendMsg(q,'user');$('#mirrorInput').value='';setTimeout(()=>appendMsg(mirrorReply(q),'ai'),180)});
 $$('.quick-prompts button').forEach(b=>b.addEventListener('click',()=>{appendMsg(b.textContent,'user');setTimeout(()=>appendMsg(mirrorReply(b.textContent),'ai'),140)}));
 
-const hash=location.hash.replace('#','').split('?')[0];if(['pulse','calendar','teams','social','twin','desk'].includes(hash))setView(hash);
+function syncViewFromLocation(){
+  const hash=location.hash.replace('#','').split('?')[0].toLowerCase(),view=routeToView[hash]||'pulse',canonical='#'+viewToRoute[view];
+  setView(view,{historyMode:location.hash===canonical?'none':'replace'});
+}
+window.addEventListener('popstate',syncViewFromLocation);
+window.addEventListener('hashchange',syncViewFromLocation);
+syncViewFromLocation();
 window.SCDNextGen={setView,hydrate,openMirror,openCalendar:openCalendarPanel,openTeams:openTeamsPanel,openSocial:()=>setView('social'),openTeamHub,openMatchday,loadCalendar:ensurePublicCalendar,search:runSearch,renderSocialHub};
 })();
