@@ -42,6 +42,7 @@ ok(runtime.includes('window.addEventListener(\'popstate\''),'view navigation mus
 ok(runtime.includes('profile:\'twin\''),'Profile route must preserve the existing Twin view');
 ok(html.includes('id="profileCommand"'),'My SCD profile command center missing');
 ok(html.includes('./lib/scd-one-profile.js?v=1.0.0'),'My SCD profile model must be loaded');
+ok(!html.includes('</script>\\n  <script'),'runtime HTML must not contain a literal escaped newline between scripts');
 ok(runtime.includes('renderProfileCommand()'),'My SCD profile renderer must be wired');
 ok(profileModel.includes('Nessuna squadra seguita'),'Profile model must fail closed without a followed team');
 ok(runtime.includes('window.SCDNativeAdapters.share'),'share actions must use the native adapter');
