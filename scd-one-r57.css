@@ -548,6 +548,13 @@ footer{color:#6e8199!important;padding-bottom:110px!important}
 }
 
 @media (max-width:560px){
+  /* PROFILE/TWIN mobile overflow guard */
+  #view-twin{overflow-x:clip}
+  .twin-stage,.twin-control,.ng-twin-locker{box-sizing:border-box;max-width:100%}
+  .twin-avatar-zone{overflow:hidden}
+  .h1{width:min(300px,calc(100vw - 56px));height:min(300px,calc(100vw - 56px))}
+  .h2{width:min(380px,calc(100vw - 32px));height:min(380px,calc(100vw - 32px))}
+  .stage-track{max-width:100%}
   .brand span small{display:none}
   .brand img{width:38px;height:44px}
   .home-first{margin-top:14px}
