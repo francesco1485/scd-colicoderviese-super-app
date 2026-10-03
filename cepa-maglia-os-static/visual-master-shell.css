@@ -1524,3 +1524,35 @@ body{
 @media(prefers-reduced-motion:reduce){
   .login-story::before{animation:none!important}
 }
+
+
+/* CEPA-01 · factual integration readiness */
+.system-readiness-panel{
+  margin:18px 0 22px;padding:22px;border:1px solid rgba(16,74,128,.12);border-radius:24px;
+  background:linear-gradient(145deg,rgba(255,255,255,.98),rgba(243,248,252,.98));
+  box-shadow:0 16px 44px rgba(8,35,62,.07)
+}
+.system-readiness-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start}
+.system-readiness-head h3{margin:4px 0 6px;font-size:clamp(24px,2.4vw,36px);color:#102d49}
+.system-readiness-head p{margin:0;max-width:720px;color:#647b90;line-height:1.5}
+.system-readiness-state{border:1px solid #d4e2ed;border-radius:999px;padding:8px 11px;font-size:9px;font-weight:900;letter-spacing:.07em;color:#59728a;background:#fff;white-space:nowrap}
+.system-readiness-state[data-state="VERIFIED"]{color:#147552;border-color:rgba(20,117,82,.25)}
+.system-readiness-state[data-state="ATTENTION"]{color:#966a00;border-color:rgba(150,106,0,.25);background:#fffaf0}
+.system-readiness-state[data-state="UNAVAILABLE"]{color:#a8424c;border-color:rgba(168,66,76,.25)}
+.system-readiness-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:9px;margin-top:16px}
+.system-readiness-grid article{display:grid;align-content:start;gap:5px;min-height:142px;padding:14px;border:1px solid #dce7ef;border-radius:17px;background:#fff}
+.system-readiness-grid article small{font-size:9px;font-weight:900;letter-spacing:.08em;color:#68829a;text-transform:uppercase}
+.system-readiness-grid article strong{font-size:14px;color:#102d49;line-height:1.25}
+.system-readiness-grid article b{justify-self:start;margin-top:3px;padding:5px 7px;border-radius:999px;background:#eef5fa;color:#42637f;font-size:8px;letter-spacing:.05em}
+.system-readiness-grid article[data-readiness-state="VERIFIED"] b{background:#e9f7f0;color:#147552}
+.system-readiness-grid article[data-readiness-state="PENDING"] b,
+.system-readiness-grid article[data-readiness-state="UNVERIFIED"] b{background:#fff4d7;color:#8d6500}
+.system-readiness-grid article[data-readiness-state="DISABLED"] b{background:#f1f2f4;color:#68717b}
+.system-readiness-grid article span{color:#667d91;font-size:10px;line-height:1.45}
+.system-readiness-grid article em{margin-top:auto;color:#8ca0b2;font-size:8px;font-style:normal}
+@media(max-width:700px){
+  .system-readiness-panel{padding:16px;border-radius:19px}
+  .system-readiness-head{display:block}
+  .system-readiness-state{display:inline-block;margin-top:10px}
+  .system-readiness-grid{grid-template-columns:1fr}
+}
