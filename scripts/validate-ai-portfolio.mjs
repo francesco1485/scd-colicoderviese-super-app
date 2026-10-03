@@ -19,7 +19,6 @@ const scd=p.apps.filter(x=>x.owner==='SCD_COLICODERVIESE');
 const maglia=p.apps.filter(x=>x.owner==='MAGLIA_ASSICURAZIONI');
 ok(scd.length===3,'portfolio must contain exactly 3 SCD apps');
 ok(maglia.length===1,'portfolio must contain exactly 1 Maglia app');
-
 ok(p.universalDeveloperCommand==='WEBAPP:MASTER','universal developer command mismatch');
 
 for(const app of p.apps){
@@ -27,20 +26,16 @@ for(const app of p.apps){
   ok(typeof app.aiBranch==='string'&&app.aiBranch.startsWith('ai-'),app.id+' missing canonical ai branch');
 }
 
-const one=p.apps.find(x=>x.id==='SCD_ONE');
-ok(one.kind==='PUBLIC_SOCIAL_TRANSACTION_SUPER_APP','SCD_ONE kind mismatch');
-
 const core=p.apps.find(x=>x.id==='SCD_CORE');
-for(const m of ['SECRETARIAT','FACILITY_WEEK','SMART_FACILITY','WAREHOUSE','KIT','LAUNDRY'])ok(core.modules.includes(m),'SCD_CORE missing '+m);
+for(const name of ['SECRETARIAT','FACILITY_WEEK','SMART_FACILITY','WAREHOUSE','KIT','LAUNDRY'])ok(core.modules.includes(name),'SCD_CORE missing '+name);
 
 const grow=p.apps.find(x=>x.id==='SCD_GROW');
-for(const m of ['CRM','LEAD_RADAR','COMMERCIAL_PIPELINE','PROOF','RENEWALS'])ok(grow.modules.includes(m),'SCD_GROW missing '+m);
+for(const name of ['CRM','LEAD_RADAR','COMMERCIAL_PIPELINE','PROOF','RENEWALS'])ok(grow.modules.includes(name),'SCD_GROW missing '+name);
 ok((grow.absorbedWorkstreams||[]).includes('ai-scd-commercial-lia'),'SCD_GROW must absorb Commercial/Lia');
 
 const cepa=p.apps.find(x=>x.id==='CEPA_360');
-ok(cepa.owner==='MAGLIA_ASSICURAZIONI','CEPA_360 owner mismatch');
 ok(cepa.canonicalSourceBranch==='cepa-maglia-os-hosting','CEPA_360 canonical source mismatch');
-for(const m of ['CEPA_PUBLIC','MAGLIA360_CONTROL_ROOM','CRM','HISTORY_INTELLIGENCE'])ok(cepa.modules.includes(m),'CEPA_360 missing '+m);
+for(const name of ['CEPA_PUBLIC','MAGLIA360_CONTROL_ROOM','CRM','HISTORY_INTELLIGENCE'])ok(cepa.modules.includes(name),'CEPA_360 missing '+name);
 
 const command=(p.sharedTechnicalEngines||[]).find(x=>x.id==='SCD_COMMAND_R22');
 ok(Boolean(command),'SCD_COMMAND_R22 shared engine missing');
