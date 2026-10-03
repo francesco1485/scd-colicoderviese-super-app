@@ -38,11 +38,13 @@ window.addEventListener('beforeinstallprompt',event=>{
   deferredInstallPrompt=event;
   const button=document.querySelector('#installApp');
   if(button)button.hidden=false;
+  renderProfileCommand();
 });
 window.addEventListener('appinstalled',()=>{
   deferredInstallPrompt=null;
   const button=document.querySelector('#installApp');
   if(button)button.hidden=true;
+  renderProfileCommand();
 });
 const state={view:'pulse',filter:'ALL',events:[],upcoming:[],fullCalendar:[],pulseEvents:[],calendarLoaded:false,calendarLoading:false,calendarSourceState:'PENDING',calendarSnapshot:null,calendarChanges:null,calendarCheckedAt:null,calendarPeriod:'WEEK',calendarTeam:'ALL',calendarCategory:'ALL',calendarType:'ALL',calendarSearch:'',teamsSearch:'',teamsCategory:'ALL',socialFilter:'ALL',socialSearch:'',news:null,clubContent:[],sportData:{results:[],standings:[],headToHead:[]},partners:[],publicProfiles:[],nextMatch:null,privateToken:'',privateEmail:'',privateData:null,workspace:null,privateLoading:false,privateError:''};
 const officialChannels=[
@@ -126,6 +128,7 @@ function setView(requested,{historyMode='push'}={}){
   if(view==='calendar')ensurePublicCalendar();
   if(view==='teams')ensurePublicCalendar();
   if(view==='social')renderSocialHub();
+  if(view==='twin')renderProfileCommand();
   if(view==='desk')ensurePrivateDesk();
   return true;
 }
@@ -1060,7 +1063,7 @@ async function hydrate(){
     state.calendarSourceState=calendarVerified?'VERIFIED_PUBLIC_CALENDAR':data.sources?.calendar?'UNAVAILABLE':'UNVERIFIED';
     state.pulseEvents=calendarVerified?mergeCalendarRows(state.events,state.upcoming):[];
     if(calendarVerified)recordPulseSnapshot(state.pulseEvents);
-    renderPulseOperational();renderWeek();renderWeekMeta(data);renderMatchCenter();renderUpcoming();renderPartners();renderMentions();renderMyTeamDeck();renderSocialHub();if(state.view==='calendar')renderPublicCalendar();if(state.view==='teams')renderPublicTeams();
+    renderPulseOperational();renderWeek();renderWeekMeta(data);renderMatchCenter();renderUpcoming();renderPartners();renderMentions();renderMyTeamDeck();renderSocialHub();if(state.view==='calendar')renderPublicCalendar();if(state.view==='teams')renderPublicTeams();renderProfileCommand();
   }catch(e){
     if($('#weekCount'))$('#weekCount').textContent='—';if($('#todayCount'))$('#todayCount').textContent='—';
     state.calendarSourceState='UNAVAILABLE';state.pulseEvents=[];state.calendarChanges=null;
@@ -1085,6 +1088,78 @@ $('#socialFilters')?.addEventListener('click',e=>{
  renderSocialHub();
 });
 
+
+
+function profileAppMode(){
+  const standalone=window.matchMedia?.('(display-mode: standalone)')?.matches===true||window.navigator.standalone===true;
+  if(standalone)return 'STANDALONE';
+  if(deferredInstallPrompt)return 'INSTALLABLE';
+  return 'WEB';
+}
+function renderProfileCommand(){
+  const modelBuilder=window.SCDOneProfile?.build;
+  if(!modelBuilder)return;
+  const followed=loadFollowedTeam();
+  const model=modelBuilder({
+    twin:loadTwin(),
+    followedTeam:followed,
+    teamModel:followed?teamModelByName(followed):null,
+    calendarSourceState:state.calendarSourceState,
+    appMode:profileAppMode(),
+    privateVerified:Boolean(state.privateData&&!state.privateError)
+  });
+  const set=(id,value)=>{const el=$(id);if(el)el.textContent=value};
+  set('#profileIdentityName',model.identity.name);
+  set('#profileIdentityMeta',model.identity.role+' · '+model.identity.completeness.percent+'% completato');
+  set('#profileTeamName',model.team.name);
+  if(model.team.next){
+    const next=model.team.next;
+    set('#profileTeamNext',[next.kind==='MATCH'?'Prossima gara':'Prossima attività',fmtDate(next.date),next.time,next.opponent,next.venue].filter(Boolean).join(' · '));
+  }else{
+    set('#profileTeamNext',followed?'Nessun prossimo impegno verificato dalla fonte pubblica.':'Scegli una squadra per creare il tuo punto di accesso sportivo.');
+  }
+  set('#profileAppState',model.app.installed?'APP INSTALLATA':model.app.installable?'APP INSTALLABILE':'WEB APP');
+  set('#profileAppMeta',model.app.installed?'SCD ONE è in esecuzione come app sul dispositivo.':model.app.installable?'Installazione disponibile senza cambiare il codice o creare un secondo account.':'L’installazione comparirà quando browser e dispositivo la renderanno disponibile.');
+  set('#profileAccessState',model.access.label);
+  set('#profileAccessMeta',model.access.state==='VERIFIED'?'Sessione privata verificata. I contenuti restano limitati a ruolo e scope.':'I dati privati richiedono autenticazione e scope autorizzato.');
+  const statePill=$('#profileCommandState');
+  if(statePill){
+    statePill.dataset.state=model.access.state;
+    statePill.textContent=model.access.state==='VERIFIED'?'ACCESSO VERIFICATO':'PROFILO PUBBLICO';
+  }
+}
+async function handleProfileAction(action){
+  const followed=loadFollowedTeam();
+  if(action==='home')return setView('pulse');
+  if(action==='social')return setView('social');
+  if(action==='desk')return setView('desk');
+  if(action==='team'){
+    if(followed)return openTeamHub(followed);
+    setView('teams');setTimeout(()=>$('#followTeamSelect')?.focus(),120);return;
+  }
+  if(action==='calendar'){
+    if(followed)state.calendarTeam=followed;
+    state.calendarPeriod=followed?'ALL':'WEEK';
+    setView('calendar');renderPublicCalendar();return;
+  }
+  if(action==='twin'){
+    document.querySelector('.twin-control')?.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
+    return;
+  }
+  if(action==='install'){
+    if(profileAppMode()==='STANDALONE'){toast('SCD ONE è già aperta come app');return}
+    if(!deferredInstallPrompt){toast('Installazione disponibile dal menu del browser quando supportata');return}
+    deferredInstallPrompt.prompt();
+    await deferredInstallPrompt.userChoice.catch(()=>null);
+    deferredInstallPrompt=null;
+    renderProfileCommand();
+  }
+}
+document.addEventListener('click',e=>{
+  const button=e.target.closest('[data-profile-action]');
+  if(!button)return;
+  handleProfileAction(button.dataset.profileAction);
+});
 
 const avatarCatalog=[
  {id:'field',label:'Campo',terms:'calciatore campo blu',role:'Calciatore',kit:'blue',tone:'t2',hair:'h1'},
@@ -1122,14 +1197,14 @@ function applyTwin(t=loadTwin()){
   if($('#hairInput')&&t.hair)$('#hairInput').value=t.hair;
   const figure=$('#avatarFigure');if(figure){figure.dataset.tone=t.tone||'t2';figure.dataset.hair=t.hair||'h1';if(t.kit)figure.dataset.kit=t.kit}
 }
-applyTwin();updateFollowTeamUi();renderAvatarCatalog();
+applyTwin();updateFollowTeamUi();renderAvatarCatalog();renderProfileCommand();
 
 $('#saveTwin')?.addEventListener('click',()=>{
   const t=loadTwin();t.name=$('#twinNameInput').value.trim().slice(0,24)||'Il mio Twin';t.number=Math.max(1,Math.min(99,Number($('#numberInput').value||10)));t.role=$('#roleInput').value;t.tone=$('#toneInput')?.value||'t2';t.hair=$('#hairInput')?.value||'h1';
-  localStorage.setItem(twinKey,JSON.stringify(t));applyTwin(t);toast('Avatar sintetico salvato sul dispositivo');
+  localStorage.setItem(twinKey,JSON.stringify(t));applyTwin(t);renderProfileCommand();toast('Avatar sintetico salvato sul dispositivo');
 });
 $('#missionBtn')?.addEventListener('click',()=>{
-  const t=loadTwin();t.xp=Number(t.xp||0)+10;localStorage.setItem(twinKey,JSON.stringify(t));applyTwin(t);
+  const t=loadTwin();t.xp=Number(t.xp||0)+10;localStorage.setItem(twinKey,JSON.stringify(t));applyTwin(t);renderProfileCommand();
   $('#avatarFigure')?.animate([{transform:'translateY(0)'},{transform:'translateY(-14px)'},{transform:'translateY(0)'}],{duration:500});toast('+10 XP · missione sicura');
 });
 
