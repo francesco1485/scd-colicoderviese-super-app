@@ -643,6 +643,99 @@
       "authority": "INDUSTRY_REFERENCE",
       "status": "REGISTERED_VERIFIED",
       "note": "Verified source. Useful for video analysis, wearables, movement/biomechanics sensors, team management, calendars/presence, athlete-family feedback and tactical analysis. Minor/health data require dedicated privacy governance."
+    },
+    {
+      "id": "SRC-0046",
+      "title": "Cicloweb - App e strumenti mobile per seguire lo sport",
+      "url": "https://www.cicloweb.it/news/326710496774/4-programmi-che-potresti-trovare-utili-sul-tuo-telefono-se-ti-piace-guardare-il-ciclismo-e-altri-sport",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "MOBILE_SPORT_MEDIA_SECURITY",
+      "access": "PUBLIC",
+      "use": "MOBILE_SPORT_EXPERIENCE_REFERENCE",
+      "authority": "SECONDARY_MEDIA",
+      "status": "REGISTERED_VERIFIED_HISTORICAL",
+      "note": "2022 article. Use for mobile/streaming/security patterns only; do not use for circumventing geo-restrictions or distribution rights."
+    },
+    {
+      "id": "SRC-0047",
+      "title": "Il Tuo Consulente Online - App utili per sport e allenamento",
+      "url": "https://www.iltuoconsulenteonline.it/app-utili-per-fare-sport-ed-allenarsi/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "FITNESS_APP_COMMUNITY_COACHING",
+      "access": "PUBLIC",
+      "use": "FITNESS_UX_AND_FEATURE_REFERENCE",
+      "authority": "SECONDARY_REFERENCE",
+      "status": "REGISTERED_VERIFIED_HISTORICAL",
+      "note": "Historical fitness-app reference useful for workout, progress tracking, community, goals, timers and personalized coaching patterns. Not a medical/nutritional authority."
+    },
+    {
+      "id": "SRC-0048",
+      "title": "Fitness & Sport - Digital twin e allenamento personalizzato",
+      "url": "https://www.fitnessesport.it/digital-twin-e-sport-la-nuova-frontiera-dellallenamento-personalizzato/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "DIGITAL_TWIN_SPORT_PERFORMANCE",
+      "access": "PUBLIC",
+      "use": "DIGITAL_TWIN_CONCEPT_RESEARCH_ONLY",
+      "authority": "SECONDARY_REFERENCE",
+      "status": "REGISTERED_VERIFIED_SECONDARY",
+      "sensitive": true,
+      "note": "Useful for Athlete Twin concepts, predictive modeling and performance simulation. Physiological/biometric data require dedicated privacy governance and primary scientific validation."
+    },
+    {
+      "id": "SRC-0049",
+      "title": "Genius Sports",
+      "url": "https://www.geniussports.com/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "COMMON"
+      ],
+      "category": "SPORTS_DATA_AI_FAN_ENGAGEMENT",
+      "access": "PUBLIC",
+      "use": "DATA_AI_FAN_ENGAGEMENT_BENCHMARK",
+      "authority": "INDUSTRY_PROVIDER",
+      "status": "REGISTERED_VERIFIED_PRIORITY",
+      "note": "Use sports data, Perform/Engage, fan activation, analytics and AI insights as benchmark. Sportsbook/betting functionality is out of SCD scope."
+    },
+    {
+      "id": "SRC-0050",
+      "title": "Goal.com - App scommesse sportive 2026",
+      "url": "https://www.goal.com/it/scommesse/migliori-app-scommesse/blt3635ce8f27e17d2d",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "GAMBLING_APP_UX_REFERENCE_RESTRICTED",
+      "access": "PUBLIC",
+      "use": "UX_PATTERN_ONLY_NO_GAMBLING_WORKFLOWS",
+      "authority": "SECONDARY_MEDIA",
+      "status": "REGISTERED_RESTRICTED_REFERENCE",
+      "note": "Gambling-related content. Do not use for recommendations, promotion, monetization, odds or betting flows; only abstract mobile UX/information-architecture benchmarking."
+    },
+    {
+      "id": "SRC-0051",
+      "title": "ITitans - Top 20 Sports App Ideas 2025",
+      "url": "https://ititans.com/blog/top-20-sports-app-ideas-for-startups-in-2025/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "COMMON"
+      ],
+      "category": "SPORT_APP_IDEA_LANDSCAPE",
+      "access": "PUBLIC",
+      "use": "PRODUCT_IDEATION_AND_FEATURE_BENCHMARK",
+      "authority": "COMMERCIAL_REFERENCE",
+      "status": "REGISTERED_VERIFIED",
+      "note": "2025 software-agency ideation source. Useful for coaching, real-time, field availability, RSVP, community, offline, AR, fan engagement and product gap analysis; filter every idea through SCD needs, privacy, security and technical sustainability."
     }
   ]
 }
