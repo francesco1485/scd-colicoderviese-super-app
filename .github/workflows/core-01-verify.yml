@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - "core-01-direction-control-room"
+      - "core-02-source-diagnostics"
   workflow_dispatch:
 
 permissions:
