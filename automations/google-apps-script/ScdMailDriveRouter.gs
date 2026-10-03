@@ -6,6 +6,8 @@
 
 const SCD_ROUTER = Object.freeze({
   labelProcessed: 'SCD/ARCHIVIATO',
+  labelReview: 'SCD/DA_VERIFICARE',
+  labelIgnored: 'SCD/IGNORATO',
   propertyPrefix: 'SCD_MAIL_ROUTED_',
   folderProperties: {
     AMMINISTRAZIONE: 'SCD_DRIVE_01_AMMINISTRAZIONE_FISCO',
@@ -80,9 +82,12 @@ function scdSanitizeFileName_(value) {
     .slice(0, 150);
 }
 
+function scdLabel_(name) {
+  return GmailApp.getUserLabelByName(name) || GmailApp.createLabel(name);
+}
+
 function scdProcessedLabel_() {
-  return GmailApp.getUserLabelByName(SCD_ROUTER.labelProcessed)
-    || GmailApp.createLabel(SCD_ROUTER.labelProcessed);
+  return scdLabel_(SCD_ROUTER.labelProcessed);
 }
 
 function smistaComunicazioniElettroniche() {
@@ -92,12 +97,19 @@ function smistaComunicazioniElettroniche() {
   try {
     const query = [
       'is:unread',
+      'newer_than:30d',
       '-label:' + SCD_ROUTER.labelProcessed,
-      '(from:lnd.it OR from:figc.it OR subject:Iscrizione OR subject:Fattura OR subject:Comunicazione OR subject:Sponsor OR subject:Campo OR subject:Convocazione)'
+      '-label:' + SCD_ROUTER.labelReview,
+      '-label:' + SCD_ROUTER.labelIgnored,
+      '-category:promotions',
+      '-category:social',
+      '-category:forums'
     ].join(' ');
 
     const threads = GmailApp.search(query, 0, 100);
     const processedLabel = scdProcessedLabel_();
+    const reviewLabel = scdLabel_(SCD_ROUTER.labelReview);
+    const ignoredLabel = scdLabel_(SCD_ROUTER.labelIgnored);
     const props = PropertiesService.getScriptProperties();
 
     threads.forEach(thread => {
