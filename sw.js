@@ -1,4 +1,4 @@
-const CACHE='scd-one-one-01-r57-visual';
+const CACHE='scd-one-one-01';
 const CORE=['./','./index.html','./scd-ng.css?v=0.6.3','./scd-synth.css?v=0.4.5','./ui-r52-social.css?v=0.7.2','./scd-one-r57.css?v=1.0.0','./lib/scd-operative-engine.js?v=51.0.0','./lib/scd-one-pulse.js?v=1.0.0','./lib/scd-native-adapters.js?v=1.0.0','./scd-ng.js?v=0.7.4','./scd-interactions.js?v=0.4.5','./scd-adaptive-engine.js?v=40.0.0','./scd-meta-engine.js?v=40.0.0','./scd-twin.js?v=40.0.0','./scd-experience-engine.js?v=40.0.0','./content/public-club.v1.json','./manifest.webmanifest','./assets/logo-scd.png','./assets/icon-192.png','./assets/icon-512.png','./intake/index.html','./intake/admin.html','./intake/intake.css?v=1.1.0','./intake/intake-config.public.json','./intake/intake.js?v=1.1.0','./intake/admin.js?v=1.1.0'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
