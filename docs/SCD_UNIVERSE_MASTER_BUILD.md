@@ -1,170 +1,92 @@
-# SCD UNIVERSE MASTER BUILD — SINGLE SUPER APP
+# SCD UNIVERSE MASTER BUILD — PRIMARY CLUB APP
 
 Status: BINDING DEVELOPMENT DIRECTION
 Date: 2026-10-03
 
-## Product identity
+## Portfolio boundary
 
-The product being built is:
+The wider development portfolio contains 4 applications total, defined in `config/ai-portfolio.v1.json`.
+
+SCD Universe is the **primary club web app**. Its manifest invariant `single_product = true` means the public/personal/operational club experience must remain one product.
+
+Two additional SCD companion applications exist for specialized purposes:
+- SCD Sponsor & Partner Platform
+- SCD Command Platform R22
+
+They must share canonical identity/data/source contracts where applicable, but they are not alternate versions of SCD Universe.
+
+The fourth app is Maglia 360 + C.E.P.A., owned by Maglia Assicurazioni and outside the SCD product identity.
+
+## Product identity
 
 **SCD UNIVERSE / SCD COLICODERVIESE SUPER APP / SCD DIGITAL CLUB OPERATING SYSTEM**
 
-It is ONE adaptive product, not a collection of disconnected websites.
+One adaptive club product across Web/PWA/mobile-oriented channels.
 
-The current repository already contains this identity:
-- page title: `SCD Universe · Next Generation`
-- manifest north star: SCD Universe
-- manifest invariant: `single_product = true`
-- Web/PWA + desktop/mobile responsive composition
-- public and private worlds in one product
-
-## Four product layers
+## Four internal product layers
 
 ### A. SCD EXPERIENCE — PUBLIC
-For supporters, families, athletes, community, territory and discovery.
-
-Core:
-- HOME / PULSE
-- SCD WEEK
-- Calendar
-- Teams
-- Next Match / Matchday
-- News / Media
-- Social / Community
-- Sponsor / Partner visibility
-- Club Now
-- Join / Registration entry points
+HOME/PULSE, SCD Week, Calendar, Teams, Next Match/Matchday, News/Media, Social/Community, sponsor visibility, Club Now, join/registration.
 
 ### B. SCD LIFE — PERSONAL
-The everyday club layer for authenticated people.
-
-Core:
-- one PERSON_ID
-- Family / Athlete / Staff contexts
-- SCD Twin / profile
-- relevant week/events
-- invitations / communications
-- documents and requests
-- personal/team context
-- consent-aware intelligence
+PERSON_ID, Family/Athlete/Staff contexts, Twin/profile, personal week/events, invitations, communications, documents/requests, consent-aware intelligence.
 
 ### C. SCD OPERATING CENTER — PRIVATE DESK
-Operational control for authorized staff.
-
-Core:
-- OGGI
-- PRIORITÀ
-- DA FARE
-- DA VERIFICARE
-- DA APPROVARE
-- IN SCADENZA
-- CAMBIAMENTI
-- EVENTI
-- COMUNICAZIONI
-- ALERT
-- SCD Week / Facility Week
-- training, facilities, spaces, assets
-- materials, kit, warehouse, laundry, keys/access, maintenance, closure
-- registrations / secretariat / tournaments / direction scopes
-- sponsor/commercial operations where authorized
+Today, priorities, actions, approvals, due items, events, communications, alerts, Facility Week, training, fields/spaces, assets, materials, kit, warehouse, laundry, keys/access, maintenance, closure, secretariat, registrations, tournaments and Direction scopes.
 
 ### D. SCD INTELLIGENCE
-Cross-system intelligence built only on verified operational data.
+Source Registry, provenance, Gmail/Drive/Calendar adapters, LND/Tuttocampo adapters, communications, automation and AI after reliable data/process foundations.
 
-Core:
-- source registry
-- provenance / authority / freshness
-- Gmail / Drive / Calendar adapters
-- LND / Tuttocampo adapters
-- communications and follow-up
-- automation
-- AI only after process/data/automation are reliable
-
-## Canonical vertical slice
-
-EVENT is the first integration spine:
+## Canonical integration spine
 
 EVENT_ID
 → Calendar Fusion
 → SCD Week
-→ Next Match / Matchday
+→ Matchday
 → Team/Family/Staff projections
 → Private Desk
-→ Facility/Training occupancy
+→ Facility/Training
 → Communication
 → Social/Public projection
-→ Audit / provenance
+→ Audit/provenance
 
-One event model, many authorized projections. No duplicate calendars.
+No duplicate calendars.
 
-## Current repository evidence
+## Existing work to preserve
 
-The current main line already contains implementation/contract evidence for:
-- SCD Universe
-- Pulse
+- SCD Universe / Pulse
 - SCD Twin
 - Staff & Family / Private Desk
 - weekly SCD home
-- Calendar
-- Teams
-- Social
-- Matchday
+- Calendar / Teams / Social / Matchday
 - PWA
 - R53 football/social/private core
 - R54 private experience
-- R55 verified content/social layer
-- R56 Identity, Calendar Fusion & Club Intelligence
+- R55 verified content/social
+- R56 Identity / Calendar Fusion / Club Intelligence
 - R56.1 Access & Arrival QA
-
-This does NOT mean every capability is production-complete. R57 exists to reconcile runtime, database, auth, CI and production evidence without losing the product direction.
 
 ## Release path
 
 R57 FOUNDATION
-- runtime/database/CI/production reconciliation
-- preserve all R38-R56 product work
-- establish evidence and rollback
-
+R57.UI VISUAL RECONCILIATION
 R58 OPERATING CORE
-- EVENT / TRAINING / FACILITY / SPACE / ASSET / PERSON / TEAM
-
-R59 SCD WEEK
-- team week + facility week
-- fields / locker rooms / conflicts / closure
-
+R59 SCD WEEK + FACILITY WEEK
 R60 PRIVATE DESK
-- action-first operational desk
-
 R61 PUBLIC EXPERIENCE
-- hero / SCD Week / Next Match / Matchday / Club Now / Teams / Social / Sponsor rail
-
 R62 MATERIAL OPERATIONS
-- warehouse / kit / laundry / keys / assets / maintenance
-
 R63 CONNECTED CLUB
-- Gmail / Drive / Calendar / Maps / LND / Tuttocampo / Chat / WhatsApp official
-
 R64 AUTOMATION
-- workflows / alerts / tasks / approvals / follow-up
+R65+ INTELLIGENCE / AI
 
-R65+ INTELLIGENCE / AI / refinement
-- only on verified operational foundations
+## Internal module rule
 
-## Non-negotiable integration rule
+Segreteria, Facility, Tornei, Private Desk, SCD Week, Social, Matchday and material operations remain internal modules of SCD Universe.
 
-Sponsor, Command Platform, Commercial/Lia, Private Desk, Facility, Social and other SCD work are NOT allowed to become separate competing user products.
+Sponsor/commercial specialist workflows that belong to the separate Sponsor & Partner Platform must link/integrate rather than be duplicated.
 
-They may have dedicated engineering branches and temporary runtimes for safe development, but their destination is the single SCD Universe architecture unless the Direction explicitly approves separation.
+Command execution/automation belongs to Command Platform R22 rather than being reimplemented in the UI.
 
-## Completion definition
+## Completion states
 
-A capability is not finished because code exists.
-
-Allowed states:
-DESIGNED
-IMPLEMENTED
-TESTED
-DEPLOYED
-PRODUCTION_VERIFIED
-
-The final target is a coherent, beautiful, responsive and operational SCD Universe with real data, correct permissions, one identity, one event system and evidence-backed production behavior.
+DESIGNED / IMPLEMENTED / TESTED / DEPLOYED / PRODUCTION_VERIFIED.
