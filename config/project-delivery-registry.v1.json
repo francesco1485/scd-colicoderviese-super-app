@@ -76,8 +76,24 @@
         "CORE_WEB_PWA_ACCEPTANCE_PASSED",
         "MOBILE_01_CAN_THEN_PACKAGE_SAME_CODEBASE"
       ],
-      "nextVerticalSlice": "ONE-01_CONSOLIDATE_PR104_COMMAND_MEMORY_VISUAL_LINEAGE_THEN_VERIFY_PREVIEW",
-      "status": "IMPLEMENTATION_ACTIVE"
+      "nextVerticalSlice": "ONE_01_SELECT_NON_PRODUCTION_PREVIEW_PATH_THEN_HUMAN_VISUAL_REVIEW",
+      "status": "TESTED_PREVIEW_HOSTING_BLOCKED",
+      "lastVerifiedEvidence": {
+        "headSha": "1b423222d16f6d996176b2094fa75c2615d193d3",
+        "workflowRunId": 37137303669,
+        "workflowConclusion": "SUCCESS",
+        "visualArtifactId": 11279135297,
+        "visualArtifactDigest": "sha256:b8df322f8a3c8a1f3e39a84cc5f6fd69df4e07004641ff591340180cc3a33ca3",
+        "viewports": [
+          "360x800",
+          "390x844",
+          "393x852",
+          "430x932",
+          "1280x800",
+          "1440x900",
+          "1920x1080"
+        ]
+      }
     },
     {
       "id": "SCD_CORE",
