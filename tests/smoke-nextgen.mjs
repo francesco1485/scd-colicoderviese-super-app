@@ -265,6 +265,10 @@ for(const viewport of [{width:390,height:844},{width:1440,height:900}]){
   });
 
   await privatePage.goto(base+'/#desk',{waitUntil:'domcontentloaded',timeout:30000});
+  if(await privatePage.locator('#scdCookieBanner:not([hidden])').count()){
+    await privatePage.click('#scdAnalyticsReject');
+    await privatePage.waitForSelector('#scdCookieBanner',{state:'hidden'});
+  }
   await privatePage.waitForSelector('#view-desk.active');
   await privatePage.waitForSelector('#privateDeskLoginForm');
   await privatePage.fill('#privateDeskEmail','qa@example.test');
