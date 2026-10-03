@@ -10,15 +10,18 @@ If any instruction conflicts with the manifest, the manifest wins.
 
 ## Portfolio gate
 Before creating or reclassifying an application, read `config/ai-portfolio.v1.json`.
-The portfolio is exactly 4 apps: 3 SCD + 1 Maglia. Do not create a fifth app without explicit Direction approval.
-For SCD work, route modules to SCD Universe, Sponsor & Partner Platform, or Command Platform R22 according to the registry.
-C.E.P.A. and Maglia 360 are one unified Maglia web app on `ai-maglia360-cepa-unified`.
+The canonical portfolio is exactly 4 web apps:
+- SCD ONE
+- SCD CORE
+- SCD GROW
+- C.E.P.A. 360
+
+SCD Command Platform R22 remains a shared technical engine and is not counted as a fifth business/end-user app.
+
+All apps must support `WEBAPP:MASTER` and their app-specific RUN command.
 
 ## Product doctrine
-This repository is the canonical codebase for the **SCD UNIVERSE / SCD ColicoDerviese Super App / Digital Club Operating System**.
-It is ONE product.
-
-Sponsor, Command Platform, Commercial/Lia, Private Desk, Facility, Social and similar SCD scopes are modules/capabilities/workbenches that converge into the single product unless Direction explicitly approves separation.
+This repository contains the shared SCD engineering ecosystem. The SCD portfolio has three coordinated applications: **SCD ONE**, **SCD CORE**, and **SCD GROW**. A fourth application, **C.E.P.A. 360**, belongs to Maglia Assicurazioni. Shared engines such as R22, R20 and SCD PULSE support the portfolio but do not become extra apps.
 
 Do not create a parallel app, database, authentication system, calendar, private desk, repository, or hosting stack when the existing SCD system can be extended safely.
 
@@ -66,6 +69,9 @@ Reject generic SaaS/admin templates, obsolete portal layouts, anonymous grey das
 The target is `SPATIAL_SPORT_EDITORIAL_HIGH_IMPACT`: modern sports product, synthetic spatial atmosphere, purposeful motion, real next actions, adaptive responsive composition and unmistakable SCD identity.
 
 A legacy visual may be `REBUILD_IMPROVE`: preserve valid backend/data/security/contracts while rebuilding presentation and interaction. Do not restart the product from zero.
+
+## Multifunctional developer command
+For every canonical app, read `docs/AI_MULTIFUNCTIONAL_DEVELOPER_COMMAND.md` and apply `WEBAPP:MASTER`. App-specific shortcuts are `SCDONE:RUN`, `SCDCORE:RUN`, `SCDGROW:RUN`, `CEPA360:RUN`.
 
 ## Data and security
 - Never invent sports, administrative, commercial, medical, identity, schedule, sponsor, facility, device or financial data.
