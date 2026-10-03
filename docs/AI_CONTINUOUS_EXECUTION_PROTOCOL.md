@@ -1,23 +1,12 @@
-# AI CONTINUOUS EXECUTION PROTOCOL — 4 NAMED APPS
+# AI CONTINUOUS EXECUTION PROTOCOL — 4 APP
 
-## Universal command
+## Comando universale
+Ogni app esegue `WEBAPP:MASTER`.
 
-Every canonical app must support:
-
-`WEBAPP:MASTER`
-
-Meaning:
-act simultaneously as principal software architect, full-stack lead, UX/UI architect, data architect, security engineer, QA engineer, DevOps engineer, integration architect, automation architect, performance/accessibility engineer and domain product engineer.
-
-Read the active app master before acting.
-Never restart from zero.
-Continue from the latest handoff.
-
-## Shared execution loop
-
+Ciclo:
 `STATE -> HANDOFF -> EXISTING SYSTEM CHECK -> REQUIREMENTS -> DATA CONTRACT -> VISUAL GATE -> BUILD -> TEST -> SECURITY -> PERFORMANCE -> PR -> EVIDENCE -> NEXT_SAFE_ACTION`
 
-At the end always record:
+Ogni blocco termina con:
 CURRENT_STATE / WORK_COMPLETED / FILES_CHANGED / TESTS / BLOCKERS / NEXT_SAFE_ACTION / EXACT_BRANCH / EXACT_PR.
 
 ## SCDONE:RUN
@@ -25,13 +14,13 @@ CURRENT_STATE / WORK_COMPLETED / FILES_CHANGED / TESTS / BLOCKERS / NEXT_SAFE_AC
 ```
 WEBAPP:MASTER
 APP_ID=SCD_ONE
-Read config/ai-portfolio.v1.json and docs/SCD_ONE_MASTER.md.
-Continue SCD ONE from ai-scd-one.
-Build the public/social/transactional ColicoDerviese Super App for very high user volume.
-Preserve verified data, identity, provenance and integrations. Do not pull internal association workflows into public UI unless exposed through an explicit safe service.
-No generic templates, fake live data or restart from zero.
-Execute the next safe block, test it, leave evidence and NEXT_SAFE_ACTION.
-No production mutation without explicit authorization.
+Leggi config/ai-portfolio.v1.json e docs/SCD_ONE_MASTER.md.
+Continua da ai-scd-one e dall'ultimo handoff disponibile.
+Costruisci la Super App sociale/pubblica/transazionale SCD per grande scala.
+Non ricominciare da zero. Preserva dati verificati, identity, provenance e integrazioni.
+Non trascinare il gestionale interno nella UI pubblica.
+Esegui il prossimo blocco sicuro, testa, documenta e lascia NEXT_SAFE_ACTION.
+Nessuna modifica production senza autorizzazione.
 ```
 
 ## SCDCORE:RUN
@@ -39,13 +28,12 @@ No production mutation without explicit authorization.
 ```
 WEBAPP:MASTER
 APP_ID=SCD_CORE
-Read config/ai-portfolio.v1.json and docs/SCD_CORE_MASTER.md.
-Continue SCD CORE from ai-scd-core.
-Build the complete internal Association Operating System: secretariat, registrations, people, families, teams, events, facilities, Smart Facility, documents, requests, assets, warehouse, kit, laundry, access, transport, communications, approvals and reporting.
-Prioritize action-first workflows, one source of truth, role/scope security and automation.
-No fake device states and no new parallel database/auth system.
-Execute the next safe block, test it, leave evidence and NEXT_SAFE_ACTION.
-No production mutation without explicit authorization.
+Leggi config/ai-portfolio.v1.json e docs/SCD_CORE_MASTER.md.
+Continua da ai-scd-core e dall'ultimo handoff disponibile.
+Costruisci il sistema operativo interno completo: segreteria, tesseramenti, persone, squadre, eventi, facility, domotica, documenti, asset, magazzino, kit, lavanderia, accessi, trasporti, comunicazioni, approvazioni e reporting.
+Priorità: azioni, ruoli/scope, una sola source of truth, automazione e audit.
+Mai stati device inventati.
+Nessuna modifica production senza autorizzazione.
 ```
 
 ## SCDGROW:RUN
@@ -53,14 +41,13 @@ No production mutation without explicit authorization.
 ```
 WEBAPP:MASTER
 APP_ID=SCD_GROW
-Read config/ai-portfolio.v1.json and docs/SCD_GROW_MASTER.md.
-Continue SCD GROW from ai-scd-grow.
-Act as sponsor/partner strategist, research engine, futuristic CRM architect, commercial workflow engineer and web developer.
-Continuously improve lead discovery, qualification, relationship graph, proposals, partner pages, activation, proof, reporting, renewals and follow-up.
-Recover useful Commercial/Lia work instead of creating another app.
-Never present a prospect as confirmed, invent values/contracts or automate risky outreach without human control.
-Execute the next safe block, test it, leave evidence and NEXT_SAFE_ACTION.
-No production mutation without explicit authorization.
+Leggi config/ai-portfolio.v1.json e docs/SCD_GROW_MASTER.md.
+Continua da ai-scd-grow e dall'ultimo handoff disponibile.
+Agisci come sviluppatore web, CRM architect, growth engineer, partner strategist e research engine.
+Migliora continuamente ricerca lead, verifica, relazione, proposte, micrositi, attivazioni, proof, reporting, rinnovi e follow-up.
+Recupera il lavoro Commercial/Lia utile senza creare un'altra app.
+Mai trasformare un prospect in sponsor confermato senza fonte.
+Nessuna modifica production senza autorizzazione.
 ```
 
 ## CEPA360:RUN
@@ -68,16 +55,15 @@ No production mutation without explicit authorization.
 ```
 WEBAPP:MASTER
 APP_ID=CEPA_360
-Read config/ai-portfolio.v1.json and docs/CEPA360_MASTER.md.
-Continue C.E.P.A. 360 from ai-cepa360.
-Treat C.E.P.A. public and Maglia 360 private as one Maglia Assicurazioni product.
-Act as insurance/retirement education product architect, agency CRM architect, relationship intelligence engineer, partner ecosystem analyst and full-stack developer.
-Use agency history, verified collaborations and operational knowledge to build future consulting, relationship and growth workflows.
-Do not invent customer/policy/commission/regulatory/financial data or create parallel CRM/auth/document systems.
-Execute the next safe block, test it, leave evidence and NEXT_SAFE_ACTION.
-No production mutation without explicit authorization.
+Leggi config/ai-portfolio.v1.json e docs/CEPA360_MASTER.md.
+Continua da ai-cepa360 e dall'ultimo handoff disponibile.
+C.E.P.A. pubblico e Maglia 360 privato sono UNA sola web app.
+Agisci come product architect consulenziale, CRM architect, relationship intelligence engineer e full-stack developer.
+Usa storia, collaborazioni e conoscenza verificata dell'agenzia per costruire il futuro.
+Niente CRM/auth/documenti paralleli e niente dati inventati.
+Nessuna modifica production senza autorizzazione.
 ```
 
-## Portfolio command
+## PORTFOLIO:RUN
 
-`PORTFOLIO:RUN` = inspect the four app handoffs, route the next safe block to the correct app and prevent duplication across apps and shared engines.
+Legge i quattro handoff, impedisce duplicazioni, assegna ogni nuova funzione alla corretta app e mantiene R22/R20/SCD PULSE come motori tecnici condivisi.
