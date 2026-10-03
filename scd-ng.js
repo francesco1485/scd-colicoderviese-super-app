@@ -809,10 +809,14 @@ function coreItemHtml(item={}){
  if(item.due)meta.push('Scad. '+coreFormatDateTime(item.due));
  if(item.owner)meta.push(item.owner);
  if(item.priority)meta.push('Priorità '+item.priority);
+ if(item.area)meta.push(item.area);
  const status=item.status?'<span class="core-item-status">'+esc(item.status)+'</span>':'';
+ const action=item.nextAction?'<p class="core-item-action">'+esc(item.nextAction)+'</p>':'';
+ const sourceLink=item.gmailUrl?'<a class="core-item-link" href="'+esc(item.gmailUrl)+'" target="_blank" rel="noopener noreferrer">Apri fonte Gmail ↗</a>':'';
  return '<article class="core-control-item"><header><h4>'+esc(item.title||'Voce operativa')+'</h4>'+status+'</header>'+
    (meta.length?'<div class="core-item-meta">'+meta.map(x=>'<span>'+esc(x)+'</span>').join('')+'</div>':'')+
-   '<div class="core-item-source">'+esc(item.source||'FONTE')+' · '+esc(item.sourceState||'VERIFIED')+'</div></article>';
+   action+
+   '<div class="core-item-source">'+esc(item.source||'FONTE')+' · '+esc(item.sourceState||'VERIFIED')+'</div>'+sourceLink+'</article>';
 }
 function renderCoreControlRoom(){
  const room=$('#coreControlRoom'),sourcesEl=$('#coreControlSources'),lanesEl=$('#coreControlLanes'),statusEl=$('#coreControlStatus'),refresh=$('#refreshCoreControlRoom'),reset=$('#resetCoreControlFocus');
