@@ -40,7 +40,13 @@ for(const token of [
   'SCD_DRIVE_01_AMMINISTRAZIONE_FISCO',
   'SCD_DRIVE_05_COMUNICAZIONE_SOCIAL',
   'message.markRead()',
-  'thread.addLabel'
+  'thread.addLabel',
+  'SCD/DA_VERIFICARE',
+  'SCD/IGNORATO',
+  'newer_than:30d',
+  '-category:promotions',
+  '-category:social',
+  '-category:forums'
 ]) if(!router.includes(token)) fail('Gmail/Drive router missing '+token);
 if(/ID_CARTELLA_/i.test(router)) fail('placeholder Drive folder IDs must not ship');
 if(!template.includes('{{campionato_name}}')||!template.includes('{{avversario}}')||!template.includes('{{orario}}')) fail('match-day template placeholders missing');
