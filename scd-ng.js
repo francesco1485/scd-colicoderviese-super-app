@@ -818,6 +818,31 @@ function coreItemHtml(item={}){
    action+
    '<div class="core-item-source">'+esc(item.source||'FONTE')+' · '+esc(item.sourceState||'VERIFIED')+'</div>'+sourceLink+'</article>';
 }
+function coreSourceCount(data){
+ if(Array.isArray(data))return data.length;
+ for(const key of ['rows','items','events','actions','queue']){
+   if(Array.isArray(data?.[key]))return data[key].length;
+ }
+ return null;
+}
+function openCoreSourceStatus(key){
+ const src=state.coreControlSources?.[key];
+ if(!src)return;
+ const count=coreSourceCount(src.data);
+ const detail=[
+   '<div class="panel-detail">',
+   '<span class="eyebrow">CORE SOURCE · '+esc(coreSourceLabel(key))+'</span>',
+   '<h2>'+esc(src.state||'UNVERIFIED')+'</h2>',
+   '<p>'+esc(src.error||'Fonte letta senza errore registrato.')+'</p>',
+   '<div class="core-source-detail-grid">',
+   '<div><small>ULTIMO CONTROLLO</small><b>'+esc(src.checkedAt?coreFormatDateTime(src.checkedAt):'Non registrato')+'</b></div>',
+   '<div><small>RECORD ESPLICITI</small><b>'+esc(count==null?'Non applicabile':String(count))+'</b></div>',
+   '</div>',
+   '<small>La Control Room non modifica questa fonte da questo pannello. Mostra soltanto stato, provenienza e dati già autorizzati.</small>',
+   '</div>'
+ ].join('');
+ openPanel('Fonte operativa · '+coreSourceLabel(key),detail);
+}
 function renderCoreControlRoom(){
  const room=$('#coreControlRoom'),sourcesEl=$('#coreControlSources'),lanesEl=$('#coreControlLanes'),statusEl=$('#coreControlStatus'),refresh=$('#refreshCoreControlRoom'),reset=$('#resetCoreControlFocus');
  if(!room||!sourcesEl||!lanesEl||!statusEl)return;
@@ -831,8 +856,9 @@ function renderCoreControlRoom(){
  sourcesEl.innerHTML=sourceKeys.map(key=>{
    const src=rawSources[key]||{state:state.coreControlLoading?'PENDING':'UNVERIFIED',label:coreSourceLabel(key)};
    const detail=src.error?'Non disponibile':src.checkedAt?coreFormatDateTime(src.checkedAt):'In attesa';
-   return '<div class="core-source-chip" data-state="'+esc(src.state||'UNVERIFIED')+'" title="'+esc(src.error||'')+'"><b>'+esc(src.label||coreSourceLabel(key))+'</b><span>'+esc(src.state||'UNVERIFIED')+' · '+esc(detail)+'</span></div>';
+   return '<button type="button" class="core-source-chip" data-core-source="'+esc(key)+'" data-state="'+esc(src.state||'UNVERIFIED')+'" title="'+esc(src.error||'')+'"><b>'+esc(src.label||coreSourceLabel(key))+'</b><span>'+esc(src.state||'UNVERIFIED')+' · '+esc(detail)+'</span></button>';
  }).join('');
+ $$('[data-core-source]').forEach(button=>button.onclick=()=>openCoreSourceStatus(button.dataset.coreSource));
  const model=state.coreControl;
  const overall=coreOverallState(model);
  statusEl.dataset.state=overall;
