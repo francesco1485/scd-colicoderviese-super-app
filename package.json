@@ -43,6 +43,6 @@
     "test:r56-calendar": "node tests/calendar-fusion-contract.mjs",
     "test:r56-internal": "node scripts/validate-r56-internal.mjs",
     "test:ai-portfolio": "node scripts/validate-ai-portfolio.mjs",
-    "test:scd-one-contract": "node scripts/validate-scd-one-contract.mjs && node tests/scd-one-pulse-contract.mjs && node tests/scd-native-adapters-contract.mjs"
+    "test:scd-one-contract": "node scripts/validate-scd-one-contract.mjs && node tests/scd-one-pulse-contract.mjs && node tests/scd-one-profile-contract.mjs && node tests/scd-native-adapters-contract.mjs"
   }
 }
