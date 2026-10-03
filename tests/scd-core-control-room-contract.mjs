@@ -12,6 +12,7 @@ const model=Core.build({
   sources:{
     agenda:source(),
     evolution:source(),
+    mailactions:source(),
     diagnostics:source(),
     datafabric:source(),
     dashboard:source()
@@ -20,6 +21,12 @@ const model=Core.build({
     upcoming:[
       {id:'EV-TODAY',title:'Riunione tecnica',startAt:'2026-10-03T18:00:00+02:00',endAt:'2026-10-03T19:00:00+02:00',location:'Sede SCD'},
       {id:'EV-DEADLINE',title:'Scadenza documentale',startAt:'2026-10-05T09:00:00+02:00',description:'AGENDA SCD\nTipo: DEADLINE\nCorrelation ID: FLOW-1'}
+    ]
+  },
+  mailactions:{
+    rows:[
+      {id:'MAIL-1',title:'Variazione gara ricevuta',priority:'ALTA',status:'DA LAVORARE',nextAction:'Verificare EVENT_ID e proporre aggiornamento calendario; conferma umana obbligatoria.'},
+      {id:'MAIL-2',title:'Documento da verificare',priority:'MEDIA',status:'NUOVA',nextAction:'Collegare documento amministrativo e sottoporre a verifica contabile.'}
     ]
   },
   evolution:{
@@ -40,11 +47,15 @@ ok(model.lanes.TODO.some(x=>x.id==='EVO-1'),'explicit next action/open status mu
 ok(model.lanes.APPROVALS.some(x=>x.id==='EVO-2'),'explicit approval state must enter approvals lane');
 ok(!model.lanes.APPROVALS.some(x=>x.id==='EVO-4'),'approval must not be inferred from a free-text title');
 ok(model.lanes.CHANGES.some(x=>x.id==='EVO-3'),'explicit change evidence must enter changes lane');
+ok(model.lanes.PRIORITY.some(x=>x.id==='MAIL-1'),'high-priority mail action must enter priority lane');
+ok(model.lanes.TODO.some(x=>x.id==='MAIL-1'),'mail action queue must enter todo lane');
+ok(model.lanes.TODO.some(x=>x.id==='MAIL-2'),'normal verified mail action must remain actionable');
+ok(model.lanes.APPROVALS.some(x=>x.id==='MAIL-1'),'explicit human confirmation mail action must enter approvals lane');
 ok(model.laneStates.TODAY==='VERIFIED','today source state must remain VERIFIED');
 
 const unavailable=Core.build({
   today:'2026-10-03',
-  sources:{agenda:source('UNAVAILABLE'),evolution:source('UNAVAILABLE')}
+  sources:{agenda:source('UNAVAILABLE'),evolution:source('UNAVAILABLE'),mailactions:source('UNAVAILABLE')}
 });
 ok(unavailable.lanes.TODAY.length===0,'unavailable agenda must not generate fake today items');
 ok(unavailable.lanes.PRIORITY.length===0,'unavailable evolution must not generate fake priority items');
