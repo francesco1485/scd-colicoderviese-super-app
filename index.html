@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#041c3a">
+  <meta name="theme-color" content="#031A35">
   <meta name="description" content="SCD ColicoDerviese Universe: sport, community, servizi e club operations in una sola esperienza digitale.">
   <meta name="scd-build" content="40.0.0">
   <meta name="scd-release" content="ONE-01-R57">
@@ -47,30 +47,6 @@
 
     <main>
       <section class="view active" id="view-pulse" data-view="pulse">
-        <section class="home-first" id="homeWeek">
-          <div class="home-first-head">
-            <div>
-              <span class="eyebrow">SCD HOME · QUESTA SETTIMANA</span>
-              <h1>La tua settimana <em>SCD.</em></h1>
-              <p id="weekRangeLabel">Partite, eventi e attività pubbliche della settimana corrente</p>
-            </div>
-            <button class="week-calendar-cta" type="button" data-public-action="calendar">Calendario completo →</button>
-          </div>
-          <div class="public-search-shell" id="publicSearch">
-            <span class="search-icon" aria-hidden="true">⌕</span>
-            <input id="publicSearchInput" type="search" autocomplete="off" placeholder="Cerca squadra, partita, evento o news…" aria-label="Cerca nei contenuti pubblici SCD">
-            <button type="button" id="clearPublicSearch" aria-label="Cancella ricerca">×</button>
-            <div class="public-search-results" id="publicSearchResults" hidden></div>
-          </div>
-          <div class="week-summary">
-            <div class="week-summary-copy"><b id="weekSummaryTitle">La settimana SCD</b><span id="weekSummaryMeta">Attività verificate in sincronizzazione</span></div>
-            <div class="segmented compact" id="radarFilters">
-              <button class="active" data-filter="ALL">Tutto</button><button data-filter="AGONISTICA">Agonistica</button><button data-filter="BASE">Attività di base</button><button data-filter="EVENTI">Eventi</button>
-            </div>
-          </div>
-          <div class="week-rail week-rail-first" id="weekRail"></div>
-        </section>
-
         <section class="hero home-secondary-hero">
           
           <div class="hero-synth" aria-hidden="true">
@@ -86,7 +62,7 @@
             <h1>Il Club non si consulta.<br><em>Si vive.</em></h1>
             <p>Sport, persone, territorio, servizi e community in un unico spazio operativo, costruito intorno alla vita reale del Club.</p>
             <div class="hero-actions">
-              <button class="btn primary" data-scroll="#radar">Questa settimana</button>
+              <button class="btn primary" data-scroll="#homeWeek">Questa settimana</button>
               <button class="btn glass" data-nav="desk">Apri il mio spazio</button>
             </div>
           </div>
@@ -112,6 +88,30 @@
           <div><small>ATTIVITÀ OGGI</small><b id="todayCount">—</b></div>
           <div><small>SETTIMANA</small><b id="weekCount">—</b></div>
           <div><small>NEWSROOM</small><b>Solo dati verificati</b></div>
+        </section>
+
+        <section class="home-first" id="homeWeek">
+          <div class="home-first-head">
+            <div>
+              <span class="eyebrow">SCD HOME · QUESTA SETTIMANA</span>
+              <h1>La tua settimana <em>SCD.</em></h1>
+              <p id="weekRangeLabel">Partite, eventi e attività pubbliche della settimana corrente</p>
+            </div>
+            <button class="week-calendar-cta" type="button" data-public-action="calendar">Calendario completo →</button>
+          </div>
+          <div class="public-search-shell" id="publicSearch">
+            <span class="search-icon" aria-hidden="true">⌕</span>
+            <input id="publicSearchInput" type="search" autocomplete="off" placeholder="Cerca squadra, partita, evento o news…" aria-label="Cerca nei contenuti pubblici SCD">
+            <button type="button" id="clearPublicSearch" aria-label="Cancella ricerca">×</button>
+            <div class="public-search-results" id="publicSearchResults" hidden></div>
+          </div>
+          <div class="week-summary">
+            <div class="week-summary-copy"><b id="weekSummaryTitle">La settimana SCD</b><span id="weekSummaryMeta">Attività verificate in sincronizzazione</span></div>
+            <div class="segmented compact" id="radarFilters">
+              <button class="active" data-filter="ALL">Tutto</button><button data-filter="AGONISTICA">Agonistica</button><button data-filter="BASE">Attività di base</button><button data-filter="EVENTI">Eventi</button>
+            </div>
+          </div>
+          <div class="week-rail week-rail-first" id="weekRail"></div>
         </section>
 
         
