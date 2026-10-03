@@ -1556,3 +1556,80 @@ body{
   .system-readiness-state{display:inline-block;margin-top:10px}
   .system-readiness-grid{grid-template-columns:1fr}
 }
+
+
+/* CEPA-02 · readiness next-safe-actions */
+.system-readiness-actions{
+  display:grid;
+  gap:9px;
+  margin-top:15px;
+  padding-top:15px;
+  border-top:1px solid #dce7ef;
+}
+.readiness-action-title{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:end;
+}
+.readiness-action-title span{
+  color:#0b6f9f;
+  font-size:9px;
+  font-weight:950;
+  letter-spacing:.09em;
+}
+.readiness-action-title strong{
+  color:#526b81;
+  font-size:10px;
+  font-weight:800;
+}
+.system-readiness-actions article{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  gap:12px;
+  align-items:center;
+  padding:12px 13px;
+  border:1px solid #e0e9f0;
+  border-radius:15px;
+  background:rgba(255,255,255,.82);
+}
+.system-readiness-actions article>span{
+  display:grid;
+  place-items:center;
+  width:30px;height:30px;
+  border-radius:10px;
+  background:#edf5fa;
+  color:#0b6f9f;
+  font-size:9px;
+  font-weight:950;
+}
+.system-readiness-actions article strong{display:block;color:#183650;font-size:11px}
+.system-readiness-actions article p{margin:4px 0 0;color:#6b8297;font-size:9px;line-height:1.45}
+.system-readiness-actions article button{
+  border:1px solid #cbdce8;
+  border-radius:999px;
+  padding:8px 10px;
+  background:#fff;
+  color:#0b6f9f;
+  font-size:9px;
+  font-weight:900;
+  cursor:pointer;
+  white-space:nowrap;
+}
+.readiness-action-clear{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  padding:12px 14px;
+  border-radius:14px;
+  background:#edf8f3;
+  color:#147552;
+}
+.readiness-action-clear strong,.readiness-action-clear span{font-size:10px}
+@media(max-width:700px){
+  .readiness-action-title{display:block}
+  .readiness-action-title strong{display:block;margin-top:4px}
+  .system-readiness-actions article{grid-template-columns:auto minmax(0,1fr)}
+  .system-readiness-actions article button{grid-column:1/-1;justify-self:stretch}
+  .readiness-action-clear{display:grid}
+}
