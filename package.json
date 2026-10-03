@@ -41,6 +41,7 @@
     "test:r55-content": "node scripts/validate-r55-content.mjs",
     "test:r56-core": "node scripts/validate-r56-core.mjs",
     "test:r56-calendar": "node tests/calendar-fusion-contract.mjs",
-    "test:r56-internal": "node scripts/validate-r56-internal.mjs"
+    "test:r56-internal": "node scripts/validate-r56-internal.mjs",
+    "test:scd-grow-contract": "node scripts/validate-scd-grow-contract.mjs"
   }
 }
