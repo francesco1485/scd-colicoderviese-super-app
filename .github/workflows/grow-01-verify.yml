@@ -1,0 +1,34 @@
+name: SCD GROW GROW-01 Verification
+
+on:
+  push:
+    branches:
+      - "grow-01-verified-pipeline"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  grow-01-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install dependencies
+        run: npm install
+      - name: Canonical manifest
+        run: npm run test:manifest
+      - name: SCD GROW contract
+        run: npm run test:scd-grow-contract
+      - name: Runtime syntax
+        run: |
+          node --check sponsor/app.js
+          node --check sponsor/grow-pipeline.js
+          node --check scripts/validate-scd-grow-contract.mjs
+          node --check tests/scd-grow-pipeline-contract.mjs
+      - name: Full regression contract
+        run: npm run check
