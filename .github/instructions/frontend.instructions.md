@@ -4,17 +4,110 @@ applyTo: "**/*.html,**/*.css,**/*.js,**/*.jsx,**/*.ts,**/*.tsx"
 
 # SCD frontend instructions
 
-Follow the repository-wide SCD instructions and `SCD_SYSTEM_MANIFEST.json`.
+Follow:
+1. `SCD_SYSTEM_MANIFEST.json`
+2. `AGENTS.md`
+3. `docs/SCD_VISUAL_EXPERIENCE_MASTER.md`
+4. `config/scd-visual-system.json`
+5. `config/scd-visual-experience-gate.v1.json`
 
-For UI changes:
-- preserve one responsive product across mobile, tablet and desktop;
-- do not create generic SaaS card walls;
-- do not invent sports, sponsor, event, identity or operational data;
-- represent missing or unverified data explicitly and fail closed;
-- preserve semantic HTML, keyboard navigation, visible focus, sufficient contrast and meaningful loading/empty/error/offline states;
-- use progressive enhancement and minimize bundle/runtime cost;
+## SCD:VISUAL-GATE — BLOCKING
+
+Before any meaningful UI write classify the existing surface:
+`KEEP_LOCKED / KEEP_ENHANCE / REBUILD_IMPROVE / RESEARCH_REAL_ASSET / GENERATE_ORIGINAL`.
+
+A UI that fails the visual gate must not be declared complete.
+
+Reject:
+- generic SaaS/Bootstrap/admin template appearance;
+- WordPress-theme appearance;
+- anonymous grey dashboards;
+- generic white-card walls;
+- brochure heroes;
+- giant blue navigation bars;
+- desktop rendered as a framed phone;
+- fake services or fake live/device states;
+- static pages with no real primary action;
+- visual drift from the SCD palette and identity.
+
+## Canonical visual identity
+
+Do not invent a new palette. Use `config/scd-visual-system.json`.
+
+Core visual principle:
+`SPATIAL_SPORT_EDITORIAL_HIGH_IMPACT`.
+
+NextGen uses:
+- synthetic/original spatial scenes rather than photo-dependent UI;
+- sport + Colico/Alto Lario/lake/mountain identity;
+- mineral navy / lake aqua / muted gold / warm white;
+- compact shell, live strips, rails, Matchday/event cards, sponsor marquee, quick actions and contextual overlays;
+- purposeful motion and responsive feedback.
+
+Official logos, kits, partner/sponsor wordmarks and opponent crests follow asset-integrity rules and are never regenerated when a verified real asset exists.
+
+## Product composition
+
+Preserve ONE responsive product across mobile, tablet, desktop, wide and ultrawide.
+
+Public experience:
+emotion + sport + territory + discovery + media + community + useful services.
+
+Private experience:
+speed + context + priority + action + control.
+
+Do not mix public spectacle with private operational density.
+
+## Smart Facility
+
+Smart Facility / facility operations are real operational surfaces:
+fields, spaces, locker rooms, opening/closing, keys/access, maintenance, assets, warehouse, kit, laundry and authorized device adapters.
+
+Never show a fake smart switch, sensor, lock, alarm, energy or device state.
+Use explicit status:
+`CONNECTED / READY_FOR_ADAPTER / NOT_CONNECTED / UNVERIFIED / MANUAL_CHECK_REQUIRED`.
+
+## Responsive + accessibility
+
+Required baseline verification:
+- 360x800
+- 390x844
+- 393x852
+- 430x932
+- 1280x800
+- 1440x900
+- 1920x1080
+
+Also verify:
+- feature/container responsive reflow;
+- safe areas and virtual keyboard;
+- keyboard navigation;
+- visible focus;
+- sufficient contrast;
+- text scaling;
+- touch targets;
+- reduced motion;
+- loading / empty / error / offline / denied / stale states;
+- overflow and clipping.
+
+## Data + authorization
+
+- do not invent sports, sponsor, event, identity, facility or operational data;
+- represent missing/unverified data explicitly and fail closed;
+- preserve semantic HTML and provenance;
 - never implement authorization only in the client;
-- preserve the canonical EVENT_ID / PERSON_ID / TEAM_ID relationships where displayed;
-- keep public and private experience goals distinct: public = emotion/media/live/discovery/community; private = speed/clarity/priority/action/control;
-- add or update tests when behavior changes;
-- report both mobile and desktop verification for release-candidate UI work.
+- preserve canonical EVENT_ID / PERSON_ID / TEAM_ID relationships;
+- use real service states, never decorative claims such as “live”, “synced” or “automatic” without evidence.
+
+## Required evidence
+
+For release-candidate UI work report:
+- visual classification;
+- screenshots/visual comparison evidence;
+- mobile and desktop verification;
+- accessibility/reduced-motion checks;
+- runtime source/fallback states;
+- tests changed/run;
+- remaining noncompliance.
+
+No evidence = not ready.
