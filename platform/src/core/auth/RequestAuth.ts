@@ -26,7 +26,10 @@ export class RequestAuth {
       return this.r20.validateSession(session);
     }
 
-    if (process.env.AUTH_MODE !== "development") {
+    if (
+      process.env.AUTH_MODE !== "development" ||
+      process.env.NODE_ENV === "production"
+    ) {
       throw new Error("Authentication required");
     }
 
