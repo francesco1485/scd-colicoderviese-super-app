@@ -129,3 +129,18 @@ For meaningful engineering work report:
 - SAFE_NEXT_ACTION
 
 Never claim success without evidence.
+
+
+## Cumulative project memory
+
+Before substantial planning, implementation or audit work, also read:
+- `docs/SCD_COPILOT_OMNIBUS_DIRECTIVE.md`
+
+This file consolidates the accumulated user directives, operating model, club workflows, portfolio boundaries, engineering doctrine, UX rules, automation priorities, source-of-truth requirements, safeguarding constraints and long-horizon product intent.
+
+Rules:
+- treat it as cumulative context, subordinate to `SCD_SYSTEM_MANIFEST.json`, `AGENTS.md` and `config/ai-portfolio.v1.json`;
+- do not silently drop earlier valid requirements;
+- if historical naming conflicts with the current machine-readable portfolio, document the drift and follow the current portfolio authority;
+- when a broad user command asks to continue or complete development, execute the relevant app-specific RUN under `WEBAPP:MASTER`, using the omnibus directive as persistent project context;
+- never convert archived chat context into operational truth unless it is backed by a canonical repository/data source or clearly labeled as proposal/history.
