@@ -4,7 +4,7 @@
 
 ## Esito sintetico
 
-La Command Platform implementa un livello coerente di orchestrazione sopra i comandi: plugin trusted con schema, autorizzazione applicativa, modalità inline/queue, eventi e adapter verso R20. Il manifest dichiara `CAP-R22` `IMPLEMENTED`; questo audit conferma il codice e i test locali, ma **non** la produzione.
+La Command Platform R22 è un modulo di orchestrazione interno al singolo SCD Universe, non una seconda app/prodotto autonomo né una source of truth. Implementa un livello coerente sopra i comandi: plugin trusted con schema, autorizzazione applicativa, modalità inline/queue, eventi e adapter verso R20. L’`APP_AI_MANIFEST.md` letto dalla ref `ai-scd-command-r22` (commit `e118ad0af300ab24d2b1b14c2fa859e0d774ad02`) la definisce command/orchestration layer e vieta una seconda source of truth; il manifest SCD mantiene R20 autorevole dove richiesto fino a una migrazione verificata. Il nome del servizio Render dichiarato dall’APP AI identifica il runtime atteso, non un prodotto o un’autorità dati separati. Il manifest dichiara `CAP-R22` `IMPLEMENTED`; questo audit conferma il codice e i test locali, ma **non** la produzione.
 
 Sono confermati due difetti di sicurezza:
 
@@ -40,10 +40,10 @@ Il run `SCD Production Evidence` #37112220326 ha verificato Pages e il manifest,
 
 - `TASK_CLASS`: audit tecnico e sicurezza, verifica dei test, pianificazione hardening.
 - `DOMAINS`: API Node/Fastify, identità R20, autorizzazione, plugin, queue Redis/BullMQ, eventi/audit, runtime Render e CI.
-- `FIXED`: R20 rimane autorevole per identità/ruoli; R22 è il livello di orchestrazione, non un gestionale o una fonte dati parallela.
+- `FIXED`: R22 è un modulo/orchestratore del singolo SCD Universe, non una seconda app né una source of truth. R20 resta autorevole dove lo prescrive il manifest fino a migrazione verificata.
 - `IMPROVABLE`: confine auth development/production, autorizzazione lettura job, limiti e gestione errori, timeout R20, retention eventi/job, test della modalità queue.
 - `MISSING`: stato/configurazione Render R22, test con Redis reale, test auth-prod e controllo ownership job, prova runtime della sessione R20.
-- `SOURCE_PLAN`: `SCD_SYSTEM_MANIFEST.json`, `APP_AI_MANIFEST.md` e `.github/copilot-instructions.md` letti sulle branch di task (`APP_AI_MANIFEST.md` dalla branch remota `ai-scd-command-r22`, commit `e118ad0`); `AGENTS.md`, `platform/README.md`, codice, test, workflow GitHub, log CI e probe pubblico non mutativo. Le istruzioni Copilot vincolanti e il manifest sono stati confrontati con lo stato della branch locale.
+- `SOURCE_PLAN`: `SCD_SYSTEM_MANIFEST.json`, `APP_AI_MANIFEST.md` e `.github/copilot-instructions.md` letti sulle branch di task (`APP_AI_MANIFEST.md` dalla ref `ai-scd-command-r22`, commit `e118ad0af300ab24d2b1b14c2fa859e0d774ad02`); `AGENTS.md`, `platform/README.md`, codice, test, workflow GitHub, log CI e probe pubblico non mutativo. Le istruzioni Copilot vincolanti e il manifest sono stati confrontati con lo stato della branch locale.
 - `TOOLCHAIN`: Node/npm, TypeScript, `tsx --test`, validatore manifest e workflow GitHub già presenti. Nessun nuovo tool o pacchetto aggiunto.
 - `RISK`: escalation di ruolo se la modalità development è configurata in produzione; accesso ai risultati di job tramite ID noto; effetti ripetuti/rollback non verificati con queue reale; retention indefinita dello stream eventi.
 - `TEST`: `npm run test:manifest`; `npm run check --prefix platform`; smoke locale HTTP health/commands e prova della configurazione auth development con `NODE_ENV=production`.
