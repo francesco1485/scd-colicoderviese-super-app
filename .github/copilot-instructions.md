@@ -10,7 +10,8 @@ If any instruction conflicts with the manifest, the manifest wins.
 
 ## Portfolio gate
 Before creating or reclassifying an application, read `config/ai-portfolio.v1.json`.
-The canonical portfolio is exactly 4 web apps:
+
+The canonical portfolio is exactly:
 - SCD ONE
 - SCD CORE
 - SCD GROW
@@ -18,7 +19,7 @@ The canonical portfolio is exactly 4 web apps:
 
 SCD Command Platform R22 remains a shared technical engine and is not counted as a fifth business/end-user app.
 
-All apps must support `WEBAPP:MASTER` and their app-specific RUN command.
+All canonical apps must support `WEBAPP:MASTER` and their app-specific RUN command.
 
 ## Product doctrine
 This repository contains the shared SCD engineering ecosystem. The SCD portfolio has three coordinated applications: **SCD ONE**, **SCD CORE**, and **SCD GROW**. A fourth application, **C.E.P.A. 360**, belongs to Maglia Assicurazioni. Shared engines such as R22, R20 and SCD PULSE support the portfolio but do not become extra apps.
