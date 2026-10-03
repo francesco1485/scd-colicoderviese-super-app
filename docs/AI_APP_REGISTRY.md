@@ -1,108 +1,150 @@
-# AI APP REGISTRY — SCD / sportclubcolico development portfolio
+# AI APP REGISTRY — 4 CANONICAL WEB APPLICATIONS
 
-Updated: 2026-10-03
+Updated: 2026-10-03  
+Machine-readable source: `config/ai-portfolio.v1.json`
 
-## Canonical product hierarchy
+## Canonical portfolio
 
-### 1. SCD UNIVERSE / SCD COLICODERVIESE SUPER APP — SINGLE PRODUCT
+There are **4 applications total**.
 
-This is the primary SCD product and the destination of the current development program.
+### SCD-01 — SCD Universe / SCD ColicoDerviese Super App
 
-Canonical repository:
-`francesco1485/scd-colicoderviese-super-app`
+- Owner: SCD ColicoDerviese
+- AI branch: `r57-copilot-control-plane`
+- Production runtime: `scd-colicoderviese-official-r21`
+- Main code: root application + shared runtime
+- Role: primary club application for public, personal and authorized operational experiences.
 
-Current AI control branch:
-`r57-copilot-control-plane`
-
-Current production runtime:
-`scd-colicoderviese-official-r21`
-
-The SCD manifest rule `single_product = true` is binding.
-
-The following are NOT separate competing SCD web apps. They are capabilities, modules, workbenches, adapters or historical runtimes that must converge into the single SCD Universe experience:
-- Sponsor / Partner
-- Command Platform R22
-- Commercial / Lia
+Inside this app, NOT separate apps:
+- Segreteria
+- Facility / Smart Facility
+- Tornei
 - Private Desk
-- Calendar Fusion
 - SCD Week
-- Facility Week
+- Calendar
 - Teams / Matchday
 - Social / Community
-- Identity / Family / Athlete / Staff
-- Club Intelligence
-- Intake / Documents
-- Materials / Kit / Warehouse / Laundry / Access / Closure
-- Gmail / Drive / Calendar / LND / Tuttocampo / WhatsApp connectors
-- Automation and AI
+- Twin / Mirror
+- materials / kit / warehouse / laundry / access
+- connected club services.
 
-Dedicated branches may exist for safe parallel engineering, but they do not create separate SCD products.
+The manifest rule `single_product = true` applies here: these experiences must not be forked into competing club apps.
 
-### 2. Separate non-SCD business products
+### SCD-02 — SCD Sponsor & Partner Platform
 
-These may share the same AI engineering standard but remain separate products because their business identity, users and domain are different:
-- C.E.P.A. Maglia OS
-- Maglia 360 Office
+- Owner: SCD ColicoDerviese
+- AI branch: `ai-scd-sponsor-platform`
+- Code root: `sponsor/`
+- Public runtime: `scd-sponsor-platform`
+- Protected dependency: canonical SCD backend/private runtime.
 
-## Active AI engineering branches
+This is a distinct companion web app in the SCD ecosystem.
 
-| Scope | AI branch | Role |
-|---|---|---|
-| SCD Universe / Super App master | r57-copilot-control-plane | Canonical SCD product and integration authority |
-| Sponsor module | ai-scd-sponsor-platform | Module audit/integration only |
-| Command Platform R22 | ai-scd-command-r22 | Orchestration module audit/integration only |
-| Commercial / Lia | ai-scd-commercial-lia | Recovery/integration line only |
-| C.E.P.A. Maglia OS | ai-cepa-maglia-os | Separate business product |
-| Maglia 360 Office | ai-maglia360-office | Separate business product |
+It contains:
+- public sponsor/partner experience;
+- Partner Hub;
+- commercial pipeline;
+- CRM/stakeholders;
+- Sponsor Operations;
+- Lia Sponsor;
+- LEDWall / Sponsor Wall;
+- convenzioni;
+- Fondo Solidale;
+- proof/reporting.
+
+`ai-scd-commercial-lia` is NOT a fifth app. Its useful work is absorbed here and, for orchestration, in Command R22.
+
+### SCD-03 — SCD Command Platform R22
+
+- Owner: SCD ColicoDerviese
+- AI branch: `ai-scd-command-r22`
+- Code root: `platform/`
+- Runtime: `scd-colicoderviese-command-r22`
+- Role: technical web application / orchestration plane.
+
+It provides:
+- Command API;
+- registry/plugins;
+- jobs/idempotency;
+- event/audit flow;
+- R20 bridge;
+- queue/worker path;
+- controlled automation and future AI commands.
+
+It is not the public Super App and must not become a second source of truth.
+
+### MAGLIA-01 — Maglia 360 + C.E.P.A.
+
+- Owner: Maglia Assicurazioni
+- Canonical source: `cepa-maglia-os-hosting`
+- Historical reference: `maglia360-office-architecture-v2`
+- AI branch: `ai-maglia360-cepa-unified`
+- Code root: `cepa-maglia-os-static/`
+- Canonical runtime: `cepa-maglia-os`
+- Older preview runtime: `maglia360-office-v2-preview`
+
+This is ONE Maglia Assicurazioni web app.
+
+Public world:
+- C.E.P.A.;
+- themes/events;
+- Center C.E.P.A.;
+- SAP and territories;
+- collaboration/partner entry.
+
+Private world:
+- Maglia 360 Control Room;
+- partners/products;
+- collaborators;
+- C.E.P.A. governance;
+- documents/contracts;
+- AI Mail & Chat;
+- Lia Workbench;
+- Network Radar / IVASS;
+- development;
+- activities/deadlines;
+- Recovery.
+
+The current canonical source already contains both worlds. C.E.P.A. and Maglia 360 must not be developed as two competing apps.
+
+## Superseded AI splits
+
+Do not start new sessions from:
+- `ai-scd-commercial-lia`
+- `ai-cepa-maglia-os`
+- `ai-maglia360-office`
+
+Keep their branches temporarily as historical evidence until useful commits are reconciled.
 
 ## Render classification
 
-CANONICAL SCD PRODUCTION:
-- scd-colicoderviese-official-r21
+Canonical/active portfolio runtimes:
+- `scd-colicoderviese-official-r21`
+- `scd-sponsor-platform`
+- `scd-colicoderviese-command-r22`
+- `cepa-maglia-os`
 
-SCD MODULE / SUPPORT RUNTIMES TO RECONCILE, NOT NEW PRODUCTS:
-- scd-sponsor-platform
-- scd-colicoderviese-command-r22
-- scd-commercial-r42-staging
-- scd-lia-r42-staging
+Reference/preview runtime:
+- `maglia360-office-v2-preview`
 
-LEGACY / EXPERIMENTAL SCD RUNTIMES — preserve until audited; do not develop as competing products:
-- scd-universe
-- scd-universe-nova-app
-- scd-universe-nova
-- scd-universe-nova-api
-- scd-universe-ng-api
-- scd-universe-synthetic
-- scd-universe-nextgen
-- scd-colicoderviese-restart
-- scd-colicoderviese-preview-r21
-- scd-colicoderviese-super-app
+Staging/historical runtimes to reconcile, not new apps:
+- `scd-commercial-r42-staging`
+- `scd-lia-r42-staging`
+- `scd-universe`
+- `scd-universe-nova-app`
+- `scd-universe-nova`
+- `scd-universe-nova-api`
+- `scd-universe-ng-api`
+- `scd-universe-synthetic`
+- `scd-universe-nextgen`
+- `scd-colicoderviese-restart`
+- `scd-colicoderviese-preview-r21`
+- `scd-colicoderviese-super-app`
 
-SEPARATE BUSINESS PRODUCT RUNTIMES:
-- cepa-maglia-os
-- maglia360-office-v2-preview
+No runtime is deleted during portfolio correction.
 
-## Common AI operating doctrine
+## Common workflow
 
-Every product uses:
-STATE -> REQUIREMENTS -> REALITY CHECK -> EXISTING SYSTEM CHECK -> DATA CONTRACT -> BUILD -> TEST -> SECURITY -> PR -> REVIEW -> RELEASE -> PRODUCTION EVIDENCE.
+`STATE -> REQUIREMENTS -> EXISTING SYSTEM CHECK -> DATA CONTRACT -> VISUAL GATE -> BUILD -> TEST -> SECURITY -> PR -> REVIEW -> RELEASE -> PRODUCTION EVIDENCE`
 
-Shared commands:
-WEBAPP:STATE
-WEBAPP:EXPERT
-WEBAPP:ARCHITECT
-WEBAPP:NO-DUPLICATE
-WEBAPP:DATA
-WEBAPP:BUILD
-WEBAPP:TEST
-WEBAPP:SECURITY
-WEBAPP:RELEASE
-WEBAPP:RUN
-
-SCD additionally uses the full SCD:* command set and SCD_SYSTEM_MANIFEST.json as binding authority.
-
-## Production rule
-
-No AI branch is a production replacement.
-No SCD module becomes a new standalone product by accident.
-Activation occurs only through the canonical SCD Universe release path after integration, tests, security review, rollback and production evidence.
+No fifth app without explicit Direction approval.
