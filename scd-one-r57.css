@@ -885,3 +885,31 @@ body[data-scd-theme="arena"] .metric{
   body[data-scd-theme="arena"] .newsroom,
   body[data-scd-theme="arena"] .worlds-preview{padding:20px!important}
 }
+
+
+/* R57.2.1 contrast correction after screenshot QA */
+body[data-scd-theme="arena"] .newsroom h2,
+body[data-scd-theme="arena"] .newsroom h3,
+body[data-scd-theme="arena"] .media-hub h2,
+body[data-scd-theme="arena"] .media-hub h3,
+body[data-scd-theme="arena"] .public-partner-hub h2,
+body[data-scd-theme="arena"] .public-partner-hub h3,
+body[data-scd-theme="arena"] .solidarity-home h2,
+body[data-scd-theme="arena"] .institutional-strip h2,
+body[data-scd-theme="arena"] .join-club h2,
+body[data-scd-theme="arena"] .worlds-preview h2,
+body[data-scd-theme="arena"] .world-card h3,
+body[data-scd-theme="arena"] .ng-value-engine h2,
+body[data-scd-theme="arena"] .ng-value-engine h3{
+  color:#fff!important;
+}
+body[data-scd-theme="arena"] .newsroom .eyebrow,
+body[data-scd-theme="arena"] .media-hub .eyebrow,
+body[data-scd-theme="arena"] .public-partner-hub .eyebrow,
+body[data-scd-theme="arena"] .solidarity-home .eyebrow,
+body[data-scd-theme="arena"] .institutional-strip .eyebrow,
+body[data-scd-theme="arena"] .join-club .eyebrow,
+body[data-scd-theme="arena"] .worlds-preview .eyebrow,
+body[data-scd-theme="arena"] .ng-value-engine .eyebrow{
+  color:var(--r57-cyan)!important;
+}
