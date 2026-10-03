@@ -28,6 +28,10 @@ function doPost(e) {
       case 'public.registration':
         data = r216PublicRequest_(payload, 'TESSERAMENTO');
         break;
+      case 'public.identity.resolve':
+        if (typeof r56PublicIdentityResolve_ !== 'function') throw new Error('Modulo identita R56 non installato');
+        data = r56PublicIdentityResolve_(payload);
+        break;
       case 'public.partnerLead':
         data = r216PublicRequest_(payload, String(payload.kind || '').toLowerCase() === 'product' ? 'FORNITORE' : 'SPONSOR');
         break;
@@ -56,6 +60,14 @@ function doPost(e) {
         break;
       case 'auth.validate':
         data = validateSession(token || payload.token);
+        break;
+      case 'auth.identity.resolve':
+        if (typeof r56ResolveMyIdentity_ !== 'function') throw new Error('Modulo identita R56 non installato');
+        data = r56ResolveMyIdentity_(token || payload.token, payload);
+        break;
+      case 'auth.access.log':
+        if (typeof r56RecordAccess_ !== 'function') throw new Error('Modulo accessi R56 non installato');
+        data = r56RecordAccess_(token || payload.token, payload);
         break;
       case 'dashboard.summary':
       case 'private.dashboard':
@@ -144,6 +156,14 @@ function doPost(e) {
         break;
       case 'direction.access.set':
         data = setActorAccess(token, payload);
+        break;
+      case 'direction.access.invite':
+        if (typeof r56InviteAccess_ !== 'function') throw new Error('Modulo inviti R56 non installato');
+        data = r56InviteAccess_(token, payload);
+        break;
+      case 'direction.access.metrics':
+        if (typeof r56AccessMetrics_ !== 'function') throw new Error('Modulo metriche R56 non installato');
+        data = r56AccessMetrics_(token, payload);
         break;
       case 'direction.pin.set':
         data = directionSetUserPin(token, payload.email || '', payload.pin || '');

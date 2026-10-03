@@ -2,6 +2,32 @@
 'use strict';
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const API_BASE='';
+const R56_ANALYTICS_COOKIE='scd_analytics_consent';
+function r56CookieGet(name){
+ return document.cookie.split(';').map(x=>x.trim()).filter(Boolean).map(x=>x.split('=')).find(x=>x[0]===name)?.slice(1).join('=')||'';
+}
+function r56CookieSet(name,value,maxAge){
+ document.cookie=name+'='+encodeURIComponent(value)+'; Path=/; Max-Age='+String(maxAge)+'; SameSite=Lax; Secure';
+}
+function r56AnalyticsConsent(){return decodeURIComponent(r56CookieGet(R56_ANALYTICS_COOKIE)||'')}
+async function r56Telemetry(counts,sections={}){
+ if(r56AnalyticsConsent()!=='yes')return;
+ try{await postAction('public.telemetry',{version:'R56',metrics:{counts,sections}})}catch{}
+}
+function r56BindAnalyticsConsent(){
+ const banner=$('#scdCookieBanner');if(!banner)return;
+ const current=r56AnalyticsConsent();
+ banner.hidden=Boolean(current);
+ const accept=$('#scdAnalyticsAccept'),reject=$('#scdAnalyticsReject');
+ if(accept)accept.onclick=async()=>{r56CookieSet(R56_ANALYTICS_COOKIE,'yes',15552000);banner.hidden=true;const seen=localStorage.getItem('scd:analytics:last_seen');await r56Telemetry({page_view:1,...(seen?{return_visit:1}:{})},{entry:'app'});localStorage.setItem('scd:analytics:last_seen',new Date().toISOString())};
+ if(reject)reject.onclick=()=>{r56CookieSet(R56_ANALYTICS_COOKIE,'no',15552000);banner.hidden=true};
+ if(current==='yes'){
+   const seen=localStorage.getItem('scd:analytics:last_seen');
+   r56Telemetry({page_view:1,...(seen?{return_visit:1}:{})},{entry:'app'});
+   localStorage.setItem('scd:analytics:last_seen',new Date().toISOString());
+ }
+}
+
 const PRIVATE_SESSION_KEY='scd:session:v1';
 let deferredInstallPrompt=null;
 if('serviceWorker' in navigator){
@@ -661,6 +687,9 @@ const deskModuleMeta={
  RICHIESTE:['☑','Richieste','Invii e stato pratiche'],
  PRESENZE:['✓','Presenze','Registro squadra autorizzato'],
  CONVOCAZIONI:['⚽','Convocazioni','Crea e gestisci le convocazioni'],
+ ACCESSI:['♙','Utenti & Accessi','Inviti, ruoli e attivazione account'],
+ METRICHE:['▥','Metriche Accessi','Adozione e utilizzo aggregato'],
+ SICUREZZA:['⌁','Sicurezza account','PIN personale e sessione'],
  TORNEI_EVENTI:['★','Tornei & Eventi','Organizzazione e calendario'],
  BIGLIETTERIA:['◧','Biglietteria','Accessi e attività evento'],
  DRIVE_TORNEI:['□','Drive Tornei','Documenti evento autorizzati'],
@@ -680,7 +709,12 @@ function bindPrivateDesk(){
      const out=await privatePost('auth.login',{email,pin:code,code},'');
      const token=String(out.token||out.sessionToken||out.accessToken||'');
      if(!token)throw new Error('Sessione non restituita dal gestionale');
-     savePrivateSession(token,email);await ensurePrivateDesk(true);toast('Private Desk attivato');
+     savePrivateSession(token,email);
+     try{await privatePost('auth.access.log',{eventType:'LOGIN_SUCCESS',clientKind:window.matchMedia?.('(display-mode: standalone)')?.matches?'PWA':'WEB'},token)}catch{}
+     try{state.identity=await privatePost('auth.identity.resolve',{},token)}catch{state.identity=null}
+     await ensurePrivateDesk(true);
+     if(out.mustChangePin===true||out.firstAccessRequired===true)toast('Primo accesso: imposta il tuo PIN personale in Sicurezza account');
+     else toast('Private Desk attivato');
    }catch(err){if(st)st.textContent=String(err.message||err)}
    finally{btn.disabled=false}
  };
@@ -709,8 +743,9 @@ function renderPrivateDesk(){
  }
  const moduleSet=new Set((w.defaultModules||[]).map(x=>String(x||'').trim().toUpperCase()).filter(Boolean)),u=state.privateData?.user||{},perm=state.privateData?.permissions||{},personal=Array.isArray(state.privateData?.personal)?state.privateData.personal:[];
  if(personal.length){moduleSet.add('TESSERATI');moduleSet.add('PULMINI')}
- moduleSet.add('RICHIESTE');
+ moduleSet.add('RICHIESTE');moduleSet.add('SICUREZZA');
  if(u.staff||perm.direction||['STAFF','MISTER','MANAGER','SECRETARIAT','REGISTRATION','TOURNAMENTS','DIREZIONE','ADMIN'].includes(String(u.role||'').toUpperCase())){moduleSet.add('PRESENZE');moduleSet.add('CONVOCAZIONI');moduleSet.add('COMUNICAZIONI')}
+ if(perm.direction||['DIREZIONE','ADMIN'].includes(String(u.role||'').toUpperCase())){moduleSet.add('ACCESSI');moduleSet.add('METRICHE')}
  const modules=[...moduleSet];
  if(status)status.textContent=(w.privateDeskProfile||'ROLE / SCOPE').replaceAll('_',' ');
  if(title)title.innerHTML=esc(w.name||'Private Desk')+'<br><em>'+esc(w.role||'Profilo SCD')+'</em>';
@@ -837,6 +872,47 @@ function openPrivateTeamMessage(){
  $('#r54MessageForm',layer).onsubmit=async e=>{e.preventDefault();const st=$('#r54MsgState',layer);try{await privatePost('private.message.send',{teamKey:$('#r54MsgTeam',layer).value,subject:$('#r54MsgSubject',layer).value,message:$('#r54MsgBody',layer).value});st.textContent='Messaggio registrato.';toast('Messaggio registrato')}catch(err){st.textContent=String(err.message||err)}};
 }
 
+function openPrivateSecurity(){
+ const layer=openPanel('Sicurezza account','<form class="join-form r54-private-form" id="r56PinForm"><span class="eyebrow">ACCOUNT SCD</span><h2>Imposta il tuo PIN personale</h2><p>Se sei entrato con un codice temporaneo, sostituiscilo con un PIN personale. Non viene mai mostrato o inviato dalla Societa dopo la modifica.</p><label>Codice / PIN attuale<input id="r56OldPin" type="password" inputmode="numeric" autocomplete="current-password" required></label><label>Nuovo PIN<input id="r56NewPin" type="password" inputmode="numeric" autocomplete="new-password" minlength="6" required></label><label>Ripeti nuovo PIN<input id="r56NewPin2" type="password" inputmode="numeric" autocomplete="new-password" minlength="6" required></label><button class="btn primary" type="submit">Aggiorna PIN</button><p id="r56PinState"></p></form>');
+ const form=$('#r56PinForm',layer);
+ form.onsubmit=async e=>{
+   e.preventDefault();const oldPin=$('#r56OldPin',form).value,newPin=$('#r56NewPin',form).value,newPin2=$('#r56NewPin2',form).value,st=$('#r56PinState',form),btn=$('button[type="submit"]',form);
+   if(newPin!==newPin2){st.textContent='I nuovi PIN non coincidono.';return}
+   if(newPin.length<6){st.textContent='Usa almeno 6 cifre.';return}
+   btn.disabled=true;st.textContent='Aggiornamento…';
+   try{await privatePost('auth.pin.change',{oldPin,newPin});st.textContent='PIN personale aggiornato.';toast('PIN aggiornato')}
+   catch(err){st.textContent=String(err.message||err);btn.disabled=false}
+ };
+}
+async function openPrivateAccessMetrics(){
+ const d=state.privateData||{},u=d.user||{},perm=d.permissions||{},isDirection=perm.direction===true||['DIREZIONE','ADMIN'].includes(String(u.role||'').toUpperCase());
+ if(!isDirection){openPanel('Metriche Accessi','<div class="panel-detail"><h2>Accesso non autorizzato</h2><p>Le metriche aggregate sono riservate alla Direzione.</p></div>');return}
+ const layer=openPanel('Metriche Accessi','<div class="panel-detail r54-private-panel"><span class="eyebrow">DIREZIONE · ANALYTICS PRIVACY-FIRST</span><h2>Utilizzo della Super App</h2><p>Conteggi aggregati. Nessun PIN, documento, messaggio, dato sanitario o posizione grezza entra in questa vista.</p><div id="r56AccessMetrics" class="desk-private-loading"><b>Carico gli ultimi 30 giorni…</b></div></div>');
+ const mount=$('#r56AccessMetrics',layer);
+ try{
+   const out=await privatePost('direction.access.metrics',{days:30});
+   const rows=Array.isArray(out.daily)?out.daily:[];
+   const max=Math.max(1,...rows.map(x=>Number(x.activeUsers||0)));
+   mount.innerHTML='<div class="r56-metric-kpis"><article><small>UTENTI ATTIVI</small><b>'+esc(String(out.activeUsers||0))+'</b><span>ultimi '+esc(String(out.days||30))+' giorni</span></article><article><small>LOGIN</small><b>'+esc(String(out.loginEvents||0))+'</b><span>accessi autenticati</span></article><article><small>PRIVATE DESK</small><b>'+esc(String(out.privateDeskOpens||0))+'</b><span>aperture operative</span></article></div>'+(rows.length?'<div class="r56-access-trend">'+rows.slice(-30).map(x=>'<article><small>'+esc(x.date||'')+'</small><div><span style="width:'+Math.max(3,Math.round(Number(x.activeUsers||0)/max*100))+'%"></span></div><b>'+esc(String(x.activeUsers||0))+'</b></article>').join('')+'</div>':'<div class="desk-service-empty"><b>Nessun accesso registrato</b><span>Le metriche compariranno dopo i primi accessi autenticati.</span></div>');
+ }catch(err){mount.innerHTML='<div class="desk-service-empty"><b>Metriche in aggiornamento</b><span>'+esc(String(err.message||err))+'</span></div>'}
+}
+
+function openPrivateAccessManager(){
+ const d=state.privateData||{},u=d.user||{},perm=d.permissions||{},isDirection=perm.direction===true||['DIREZIONE','ADMIN'].includes(String(u.role||'').toUpperCase());
+ if(!isDirection){openPanel('Utenti & Accessi','<div class="panel-detail"><h2>Accesso non autorizzato</h2><p>La gestione account e ruoli e riservata alla Direzione.</p></div>');return}
+ const roles=['USER_BASE','FAMILY','ATHLETE','MISTER','STAFF','MANAGER','SECRETARIAT','REGISTRATION','TOURNAMENTS'];
+ const layer=openPanel('Utenti & Accessi','<form class="join-form r54-private-form" id="r56InviteForm"><span class="eyebrow">DIREZIONE · ACCESSI</span><h2>Invita una persona</h2><p>Il sistema invia un codice temporaneo monouso. Nessuna password permanente viene spedita via email.</p><div class="form-grid"><label>Email<input id="r56InviteEmail" type="email" required autocomplete="email"></label><label>Ruolo<select id="r56InviteRole">'+roles.map(r=>'<option>'+r+'</option>').join('')+'</select></label><label>Telefono facoltativo<input id="r56InvitePhone" inputmode="tel"></label><label>Data di nascita facoltativa<input id="r56InviteBirth" type="date"></label><label class="full">Scope / note operative<textarea id="r56InviteScope" maxlength="500" placeholder="Es. squadra U16, solo calendario, famiglia atleta..."></textarea></label></div><button class="btn primary" type="submit">Invia accesso</button><p id="r56InviteState"></p></form>');
+ const form=$('#r56InviteForm',layer);
+ form.onsubmit=async e=>{
+   e.preventDefault();const st=$('#r56InviteState',form),btn=$('button[type="submit"]',form);btn.disabled=true;st.textContent='Verifico anagrafica e preparo invito…';
+   try{
+     const out=await privatePost('direction.access.invite',{email:$('#r56InviteEmail',form).value,role:$('#r56InviteRole',form).value,phone:$('#r56InvitePhone',form).value,birthDate:$('#r56InviteBirth',form).value,scope:{note:$('#r56InviteScope',form).value}});
+     const label=out?.identity?.matched?'Profilo esistente riconosciuto. ':'';
+     st.textContent=label+'Codice temporaneo inviato a '+String(out.email||'')+'. Al primo accesso deve impostare il PIN personale.';
+     btn.textContent='INVITO INVIATO';toast('Accesso inviato');
+   }catch(err){st.textContent=String(err.message||err);btn.disabled=false}
+ };
+}
 function openPrivateModule(module){
  const w=state.workspace||{},d=state.privateData||{},m=deskMeta(module);
  if(['CALENDARIO','EVENTI','TORNEI_EVENTI','BIGLIETTERIA'].includes(module)){setView('calendar');return}
@@ -861,6 +937,9 @@ function openPrivateModule(module){
  if(module==='RICHIESTE'){openPrivateRequests();return}
  if(module==='PRESENZE'){openPrivateAttendance();return}
  if(module==='CONVOCAZIONI'){openPrivateConvocations();return}
+ if(module==='ACCESSI'){openPrivateAccessManager();return}
+ if(module==='METRICHE'){openPrivateAccessMetrics();return}
+ if(module==='SICUREZZA'){openPrivateSecurity();return}
  openPanel(m[1],'<div class="panel-detail private-module-panel"><span class="eyebrow">PRIVATE DESK</span><h2>'+esc(m[1])+'</h2><p>'+esc(m[2])+'. Modulo assegnato dal profilo '+esc(w.privateDeskProfile||'ROLE/SCOPE')+'.</p></div>');
 }
 
@@ -881,10 +960,11 @@ function openJoin(kind){
    e.preventDefault();const fd=new FormData(form),firstName=String(fd.get('firstName')||'').trim(),lastName=String(fd.get('lastName')||'').trim(),email=String(fd.get('email')||'').trim(),phone=String(fd.get('phone')||'').trim();
    const btn=$('button[type="submit"]',form),st=$('#joinFormState',form);btn.disabled=true;st.textContent='Invio in corso…';
    try{
+     try{await postAction('public.identity.resolve',{email,phone})}catch{}
      const payload={firstName,lastName,name:[firstName,lastName].filter(Boolean).join(' '),email,phone,privacy:true,topic:'SCD Super App · '+label,category:kind,message:'Richiesta percorso '+label+' dalla home pubblica.'};
      const out=await postAction(action,payload);
-     st.textContent='Richiesta registrata'+(out.requestId?' · '+out.requestId:'')+'.';
-     btn.textContent='INVIATA';toast('Richiesta registrata');
+     st.textContent='Percorso avviato'+(out.requestId?' · '+out.requestId:'')+'. Se l’email è già collegata a un account SCD riceverai il codice di accesso; altrimenti la richiesta passa alla verifica della Società.';
+     btn.textContent='CONTROLLA EMAIL';toast('Percorso SCD avviato');
    }catch(err){st.textContent=String(err.message||err);btn.disabled=false}
  };
 }
@@ -918,7 +998,7 @@ async function hydrate(){
     state.fullCalendar=mergeCalendarRows(state.fullCalendar,state.events,state.upcoming);renderWeek();renderMatchCenter();renderUpcoming();renderPartners();renderMentions();renderSocialHub();if(state.view==='calendar')renderPublicCalendar();if(state.view==='teams')renderPublicTeams();
   }
 }
-loadClubContent();hydrate();$('#refreshData')?.addEventListener('click',()=>{loadClubContent();hydrate();toast('Aggiornamento richiesto')});
+r56BindAnalyticsConsent();loadClubContent();hydrate();$('#refreshData')?.addEventListener('click',()=>{loadClubContent();hydrate();toast('Aggiornamento richiesto')});
 $('#socialRefresh')?.addEventListener('click',async()=>{await Promise.all([loadClubContent(),hydrate()]);renderSocialHub();toast('Feed social aggiornato')});
 $('#installApp')?.addEventListener('click',async()=>{
  if(!deferredInstallPrompt){toast('Installazione disponibile dal menu del browser quando supportata');return}

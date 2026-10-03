@@ -55,7 +55,7 @@ function applyCors(req,res){
 const READ_ONLY_RETRY_ACTIONS = new Set([
   'public.feed','public.club','public.calendar','public.datafabric.contract',
   'dashboard.summary','private.dashboard','private.week','account.requests','private.user.workspace','private.crm.summary','private.crm.detail','private.community.summary','private.communication.templates','private.communication.preview',
-  'private.attendance.get','private.agenda.summary','private.development.summary','auth.validate','direction.diagnostics',
+  'private.attendance.get','private.agenda.summary','private.development.summary','auth.validate','auth.identity.resolve','direction.access.metrics','direction.diagnostics',
   'direction.evolution','direction.datafabric.status'
 ]);
 const UPSTREAM_READ_ATTEMPTS = 2;
@@ -70,9 +70,9 @@ const allowedActions = new Set([
   'private.convocation.create','private.convocation.reply',
   'private.attendance.get','private.attendance.save',
   'public.feed','public.club','public.register','public.calendar','public.datafabric.contract',
-  'public.registration','public.partnerLead','public.communitySubmit','public.ticketSubmit','public.telemetry',
-  'auth.request','auth.login','auth.validate','auth.pin.change',
-  'direction.access.set','direction.pin.set','direction.player.approve','direction.player.reject',
+  'public.registration','public.identity.resolve','public.partnerLead','public.communitySubmit','public.ticketSubmit','public.telemetry',
+  'auth.request','auth.login','auth.validate','auth.identity.resolve','auth.access.log','auth.pin.change',
+  'direction.access.set','direction.access.invite','direction.access.metrics','direction.pin.set','direction.player.approve','direction.player.reject',
   'direction.diagnostics','direction.evolution',
   'direction.datafabric.status','direction.datafabric.scan.gmail','direction.datafabric.scan.drive',
 ]);

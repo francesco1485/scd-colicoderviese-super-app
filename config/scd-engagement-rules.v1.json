@@ -1,0 +1,102 @@
+{
+  "schema_version": "1.0.0",
+  "release": "R56",
+  "currency": "PUNTI_ROSSOBLU",
+  "global_rules": {
+    "money_entry": false,
+    "money_prizes": false,
+    "betting": false,
+    "server_authoritative": true,
+    "verified_event_required": true,
+    "verified_stats_required": true,
+    "minor_public_individual_performance_ranking": false
+  },
+  "earning": [
+    {
+      "code": "MATCH_CHECKIN",
+      "audience": "ALL_REGISTERED",
+      "points": 10,
+      "requires": "VERIFIED_EVENT_CHECKIN",
+      "monthly_cap": 60
+    },
+    {
+      "code": "CLUB_EVENT_CHECKIN",
+      "audience": "ALL_REGISTERED",
+      "points": 8,
+      "requires": "VERIFIED_EVENT_CHECKIN",
+      "monthly_cap": 40
+    },
+    {
+      "code": "QUIZ_PARTICIPATION",
+      "audience": "ALL_REGISTERED",
+      "points": 3,
+      "requires": "COMPLETION",
+      "monthly_cap": 30
+    },
+    {
+      "code": "COMMUNITY_ACTION",
+      "audience": "ALL_REGISTERED",
+      "points": 5,
+      "requires": "MODERATED_ACTION",
+      "monthly_cap": 25
+    }
+  ],
+  "adult_sport_challenges": [
+    {
+      "code": "ADULT_GOALS_MONTH",
+      "metric": "GOALS",
+      "mode": "ADULT_COMPETITIVE",
+      "public_leaderboard": true
+    },
+    {
+      "code": "ADULT_ASSISTS_MONTH",
+      "metric": "ASSISTS",
+      "mode": "ADULT_COMPETITIVE",
+      "public_leaderboard": true
+    },
+    {
+      "code": "ADULT_ATTENDANCE_MONTH",
+      "metric": "TRAINING_PARTICIPATION",
+      "mode": "ADULT_COMPETITIVE",
+      "public_leaderboard": true
+    }
+  ],
+  "minor_challenges": [
+    {
+      "code": "TEAM_ATTENDANCE_TARGET",
+      "metric": "TRAINING_PARTICIPATION",
+      "mode": "TEAM_COOPERATIVE",
+      "public_leaderboard": false
+    },
+    {
+      "code": "TEAM_GOALS_TARGET",
+      "metric": "TEAM_GOALS",
+      "mode": "TEAM_COOPERATIVE",
+      "public_leaderboard": false
+    },
+    {
+      "code": "FAIR_PLAY_MONTH",
+      "metric": "COMMUNITY_ACTION",
+      "mode": "MINOR_COOPERATIVE",
+      "public_leaderboard": false
+    }
+  ],
+  "fantasy": {
+    "enabled_state": "DRAFT",
+    "allowed_modes": [
+      "ADULT_REGISTERED",
+      "ALL_AGES_TEAM_GAME",
+      "MINOR_COOPERATIVE"
+    ],
+    "adult_individual_ranking": true,
+    "minor_individual_player_ranking": false,
+    "prizes": "NON_MONETARY_VERIFIED_CATALOG_ONLY",
+    "monthly_cycle": true
+  },
+  "attendance_rewards": {
+    "basis": "VERIFIED_CHECKIN_OR_STAFF_CONFIRMATION",
+    "monthly": true,
+    "public_exact_location": false,
+    "raw_geolocation_storage": false
+  }
+}

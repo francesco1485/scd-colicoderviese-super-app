@@ -40,7 +40,7 @@ if(manifest.product_direction?.social_interactive_core?.state!=='FOUNDATION_READ
 if(!manifest.product_direction?.social_interactive_core?.rules?.includes('NO_CONTINUOUS_BACKGROUND_GEO_TRACKING')) fail('geolocation safety rule missing');
 if(!manifest.product_direction?.social_interactive_core?.rules?.includes('REWARD_TOKEN_SERVER_GENERATED_AND_HASHED')) fail('reward token server authority missing');
 
-if(cfg.release!=='R53') fail('Supabase config release mismatch');
+const cfgReleaseNum=Number(String(cfg.release||'').replace(/^R/i,'')); if(!Number.isFinite(cfgReleaseNum)||cfgReleaseNum<53) fail('Supabase config release regressed below R53');
 if(!cfg.domain_core?.migrations?.includes('supabase/migrations/20261002_r53_football_social_private_core.sql')) fail('R53 migration not registered');
 
 for(const token of ['socialInteractiveZone','socialMvpState','socialPointsLogin','socialRewardsState','socialDealsState']) if(!html.includes(token)) fail('Fan Zone surface missing '+token);
