@@ -57,7 +57,7 @@ const READ_ONLY_RETRY_ACTIONS = new Set([
   'public.feed','public.club','public.calendar','public.datafabric.contract',
   'dashboard.summary','private.dashboard','private.week','account.requests','private.user.workspace','private.crm.summary','private.crm.detail','private.community.summary','private.communication.templates','private.communication.preview',
   'private.attendance.get','private.agenda.summary','private.development.summary','auth.validate','auth.identity.resolve','direction.access.metrics','direction.diagnostics',
-  'direction.evolution','direction.datafabric.status'
+  'direction.evolution','direction.datafabric.status','direction.datafabric.actions'
 ]);
 const UPSTREAM_READ_ATTEMPTS = 2;
 const UPSTREAM_RETRY_DELAY_MS = 450;
@@ -75,7 +75,7 @@ const allowedActions = new Set([
   'auth.request','auth.login','auth.validate','auth.identity.resolve','auth.access.log','auth.pin.change',
   'direction.access.set','direction.access.invite','direction.access.metrics','direction.pin.set','direction.player.approve','direction.player.reject',
   'direction.diagnostics','direction.evolution',
-  'direction.datafabric.status','direction.datafabric.scan.gmail','direction.datafabric.scan.drive',
+  'direction.datafabric.status','direction.datafabric.actions','direction.datafabric.scan.gmail','direction.datafabric.scan.drive',
 ]);
 
 function clubTimePayload(){
