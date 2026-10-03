@@ -858,7 +858,7 @@ function renderCoreControlRoom(){
    const detail=src.error?'Non disponibile':src.checkedAt?coreFormatDateTime(src.checkedAt):'In attesa';
    return '<button type="button" class="core-source-chip" data-core-source="'+esc(key)+'" data-state="'+esc(src.state||'UNVERIFIED')+'" title="'+esc(src.error||'')+'"><b>'+esc(src.label||coreSourceLabel(key))+'</b><span>'+esc(src.state||'UNVERIFIED')+' · '+esc(detail)+'</span></button>';
  }).join('');
- $('[data-core-source]').forEach(button=>button.onclick=()=>openCoreSourceStatus(button.dataset.coreSource));
+ $$('[data-core-source]').forEach(button=>button.onclick=()=>openCoreSourceStatus(button.dataset.coreSource));
  const model=state.coreControl;
  const overall=coreOverallState(model);
  statusEl.dataset.state=overall;
