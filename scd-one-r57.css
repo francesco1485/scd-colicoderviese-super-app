@@ -718,3 +718,170 @@ body[data-scd-theme="arena"] .ambient-b{
 @media (prefers-reduced-motion:reduce){
   *,*:before,*:after{scroll-behavior:auto!important;animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
 }
+
+
+/* R57.2 visual coherence pass
+   Removes the remaining legacy white portal islands from the HOME runtime.
+   This is presentation-only: no data, auth, routing or source contract changes. */
+body[data-scd-theme="arena"] .club-now{
+  color:#fff!important;
+  border-radius:28px!important;
+  padding:26px!important;
+  background:
+    radial-gradient(circle at 88% 0%,rgba(32,183,230,.08),transparent 28%),
+    linear-gradient(180deg,rgba(5,46,89,.68),rgba(3,26,53,.92))!important;
+}
+body[data-scd-theme="arena"] .club-now .section-head p{color:var(--r57-muted)!important}
+body[data-scd-theme="arena"] .club-now-card,
+body[data-scd-theme="arena"] .club-now-empty{
+  color:#fff!important;
+  border:1px solid var(--r57-line)!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.026))!important;
+  box-shadow:none!important;
+}
+body[data-scd-theme="arena"] .club-now-card p,
+body[data-scd-theme="arena"] .club-now-card span,
+body[data-scd-theme="arena"] .club-now-empty span{color:var(--r57-muted)!important}
+
+body[data-scd-theme="arena"] .newsroom{
+  margin-top:18px!important;
+  padding:30px!important;
+  border:1px solid var(--r57-line)!important;
+  border-radius:28px!important;
+  background:
+    radial-gradient(circle at 10% 0%,rgba(8,112,207,.10),transparent 30%),
+    linear-gradient(180deg,rgba(5,46,89,.64),rgba(3,26,53,.90))!important;
+}
+body[data-scd-theme="arena"] .story,
+body[data-scd-theme="arena"] .lead-story,
+body[data-scd-theme="arena"] .story-copy{
+  color:#fff!important;
+}
+body[data-scd-theme="arena"] .story{
+  border:1px solid var(--r57-line)!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.052),rgba(255,255,255,.024))!important;
+}
+body[data-scd-theme="arena"] .story small{color:var(--r57-cyan)!important}
+body[data-scd-theme="arena"] .story h3{color:#fff!important}
+body[data-scd-theme="arena"] .story p{color:var(--r57-muted)!important}
+body[data-scd-theme="arena"] .story .verified{color:#6BE4A8!important}
+
+body[data-scd-theme="arena"] .media-hub,
+body[data-scd-theme="arena"] .public-partner-hub,
+body[data-scd-theme="arena"] .ng-value-engine,
+body[data-scd-theme="arena"] .join-club{
+  color:#fff!important;
+  border:1px solid var(--r57-line)!important;
+  border-radius:28px!important;
+  background:
+    radial-gradient(circle at 92% 8%,rgba(32,183,230,.08),transparent 28%),
+    linear-gradient(180deg,rgba(5,46,89,.62),rgba(3,26,53,.92))!important;
+  box-shadow:0 18px 46px rgba(0,0,0,.24)!important;
+}
+body[data-scd-theme="arena"] .media-hub .section-head p,
+body[data-scd-theme="arena"] .public-partner-hub p,
+body[data-scd-theme="arena"] .ng-value-engine p,
+body[data-scd-theme="arena"] .join-club p{color:var(--r57-muted)!important}
+
+body[data-scd-theme="arena"] .video-arena-featured,
+body[data-scd-theme="arena"] .video-arena-grid>*,
+body[data-scd-theme="arena"] .official-channels>*,
+body[data-scd-theme="arena"] .public-partner-modules>*,
+body[data-scd-theme="arena"] .join-paths>*{
+  color:#fff!important;
+  border:1px solid var(--r57-line)!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.026))!important;
+}
+body[data-scd-theme="arena"] .video-arena-featured p,
+body[data-scd-theme="arena"] .video-arena-grid small,
+body[data-scd-theme="arena"] .official-channels small,
+body[data-scd-theme="arena"] .public-partner-modules small,
+body[data-scd-theme="arena"] .join-paths small{color:var(--r57-muted)!important}
+
+body[data-scd-theme="arena"] .solidarity-home,
+body[data-scd-theme="arena"] .institutional-strip{
+  color:#fff!important;
+  border:1px solid var(--r57-line)!important;
+  border-radius:28px!important;
+  background:
+    radial-gradient(circle at 92% 16%,rgba(255,213,0,.08),transparent 24%),
+    linear-gradient(145deg,#031A35,#052E59)!important;
+}
+body[data-scd-theme="arena"] .solidarity-home p,
+body[data-scd-theme="arena"] .solidarity-home-actions small,
+body[data-scd-theme="arena"] .institutional-copy p{color:var(--r57-muted)!important}
+body[data-scd-theme="arena"] .institutional-logo-card{
+  border:1px solid rgba(213,228,240,.18)!important;
+  background:#f8fbff!important;
+}
+body[data-scd-theme="arena"] .solidarity-home-mark{
+  border-color:rgba(255,213,0,.30)!important;
+  background:rgba(255,213,0,.07)!important;
+}
+
+body[data-scd-theme="arena"] .worlds-preview{
+  margin-top:18px!important;
+  padding:30px!important;
+  border:1px solid var(--r57-line)!important;
+  border-radius:28px!important;
+  background:linear-gradient(180deg,rgba(5,46,89,.46),rgba(3,26,53,.82))!important;
+}
+body[data-scd-theme="arena"] .world-card{
+  color:#fff!important;
+}
+body[data-scd-theme="arena"] .world-card p{color:var(--r57-muted)!important}
+body[data-scd-theme="arena"] .world-card i{color:var(--r57-gold)!important}
+
+body[data-scd-theme="arena"] .ng-value-head,
+body[data-scd-theme="arena"] .ng-value-grid{background:transparent!important}
+body[data-scd-theme="arena"] .ng-value-card{
+  color:#fff!important;
+}
+body[data-scd-theme="arena"] .ng-value-card small{color:var(--r57-cyan)!important}
+body[data-scd-theme="arena"] .ng-value-card h3{color:#fff!important}
+body[data-scd-theme="arena"] .ng-value-card p{color:var(--r57-muted)!important}
+body[data-scd-theme="arena"] .metric{
+  color:#c8d7e5!important;
+  border-color:var(--r57-line)!important;
+  background:rgba(255,255,255,.035)!important;
+}
+
+/* Keep the first screen operational and reduce brochure-like vertical sprawl. */
+@media (min-width:901px){
+  body[data-scd-theme="arena"] .home-first{
+    min-height:unset!important;
+  }
+  body[data-scd-theme="arena"] .home-secondary-hero{
+    min-height:360px!important;
+  }
+  body[data-scd-theme="arena"] .club-now,
+  body[data-scd-theme="arena"] .newsroom,
+  body[data-scd-theme="arena"] .media-hub,
+  body[data-scd-theme="arena"] .community-pulse,
+  body[data-scd-theme="arena"] .public-partner-hub,
+  body[data-scd-theme="arena"] .solidarity-home,
+  body[data-scd-theme="arena"] .institutional-strip,
+  body[data-scd-theme="arena"] .join-club,
+  body[data-scd-theme="arena"] .worlds-preview,
+  body[data-scd-theme="arena"] .ng-value-engine{
+    margin-left:0!important;
+    margin-right:0!important;
+  }
+}
+
+@media (max-width:860px){
+  body[data-scd-theme="arena"] .club-now,
+  body[data-scd-theme="arena"] .newsroom,
+  body[data-scd-theme="arena"] .media-hub,
+  body[data-scd-theme="arena"] .community-pulse,
+  body[data-scd-theme="arena"] .public-partner-hub,
+  body[data-scd-theme="arena"] .solidarity-home,
+  body[data-scd-theme="arena"] .institutional-strip,
+  body[data-scd-theme="arena"] .join-club,
+  body[data-scd-theme="arena"] .worlds-preview,
+  body[data-scd-theme="arena"] .ng-value-engine{
+    border-radius:22px!important;
+  }
+  body[data-scd-theme="arena"] .newsroom,
+  body[data-scd-theme="arena"] .worlds-preview{padding:20px!important}
+}
