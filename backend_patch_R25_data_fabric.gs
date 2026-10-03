@@ -462,6 +462,72 @@ function r25DataFabricStatus_(token) {
   };
 }
 
+function r57DataFabricActions_(token, limit) {
+  r25RequireDirection_(token);
+  var sh = r25BookSheet_(R25_DATA.MAIL_OPS_ID, R25_DATA.ACTION_QUEUE);
+  var headerRow = r25HeaderRow_(sh, 'PRIORITA');
+  var headers = sh.getRange(headerRow, 1, 1, sh.getLastColumn()).getDisplayValues()[0];
+  var map = {};
+  headers.forEach(function(h, i) { map[String(h || '').trim().toUpperCase()] = i; });
+
+  ['PRIORITA','AREA','DATA','OGGETTO','AZIONE','STATO','GMAIL','UID'].forEach(function(key) {
+    if (map[key] == null) throw new Error('Colonna action queue mancante: ' + key);
+  });
+
+  var count = Math.max(0, sh.getLastRow() - headerRow);
+  if (!count) return {
+    ok:true,
+    source:'MAIL_OPERATIONS_SHEET',
+    table:R25_DATA.ACTION_QUEUE,
+    rows:[],
+    count:0,
+    checkedAt:new Date().toISOString()
+  };
+
+  var values = sh.getRange(headerRow + 1, 1, count, sh.getLastColumn()).getDisplayValues();
+  var rows = values.map(function(row) {
+    var uid = r25Clean_(row[map.UID], 120);
+    var status = r25Clean_(row[map.STATO], 80);
+    if (!uid || /CHIUS|DONE|ARCHIVIAT|ANNULLAT/i.test(status)) return null;
+    var gmailUrl = r25Clean_(row[map.GMAIL], 1000);
+    if (!/^https:\/\/mail\.google\.com\//i.test(gmailUrl)) gmailUrl = '';
+    return {
+      id:uid,
+      priority:r25Clean_(row[map.PRIORITA], 40),
+      area:r25Clean_(row[map.AREA], 120),
+      date:r25Clean_(row[map.DATA], 80),
+      title:r25Clean_(row[map.OGGETTO], 500),
+      nextAction:r25Clean_(row[map.AZIONE], 1200),
+      status:status || 'DA VERIFICARE',
+      gmailUrl:gmailUrl,
+      source:'MAIL_OPERATIONS_SHEET/18_ACTION_QUEUE',
+      sourceRecordId:uid
+    };
+  }).filter(Boolean);
+
+  rows.sort(function(a,b) {
+    var rank = {CRITICA:5,URGENTE:4,ALTA:3,MEDIA:2,BASSA:1};
+    var pa = rank[String(a.priority || '').toUpperCase()] || 0;
+    var pb = rank[String(b.priority || '').toUpperCase()] || 0;
+    if (pa !== pb) return pb - pa;
+    var da = Date.parse(a.date || '') || 0;
+    var db = Date.parse(b.date || '') || 0;
+    return db - da;
+  });
+
+  var max = Math.max(1, Math.min(100, Number(limit || 60)));
+  rows = rows.slice(0, max);
+
+  return {
+    ok:true,
+    source:'MAIL_OPERATIONS_SHEET',
+    table:R25_DATA.ACTION_QUEUE,
+    rows:rows,
+    count:rows.length,
+    checkedAt:new Date().toISOString()
+  };
+}
+
 function r25ScanGmail_(token, payload) {
   r25RequireDirection_(token);
   return r25WithLock_(function(){ return r25RunObserved_('gmail', function(){ return r25IngestGmail_(payload || {}); }); });
