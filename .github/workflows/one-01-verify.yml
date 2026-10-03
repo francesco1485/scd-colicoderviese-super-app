@@ -33,3 +33,30 @@ jobs:
           node --check scripts/validate-scd-one-contract.mjs
       - name: Full regression contract
         run: npm run check
+      - name: Install visual QA browser
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Start isolated SCD ONE test server
+        run: |
+          SCD_APPS_SCRIPT_URL=http://127.0.0.1:1 npm start > /tmp/scd-one-server.log 2>&1 &
+          echo $! > /tmp/scd-one-server.pid
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:10000/health >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/scd-one-server.log
+          exit 1
+      - name: Seven viewport visual QA
+        run: node tests/scd-one-visual-qa.mjs
+      - name: Upload ONE-01 visual evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scd-one-one-01-visual-qa
+          path: test-output/one-01/*
+          if-no-files-found: ignore
+          retention-days: 14
+      - name: Server logs
+        if: always()
+        run: cat /tmp/scd-one-server.log || true
