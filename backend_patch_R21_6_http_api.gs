@@ -146,6 +146,10 @@ function doPost(e) {
         if (typeof r25DataFabricStatus_ !== 'function') throw new Error('Modulo R25 Data Fabric non installato');
         data = r25DataFabricStatus_(token);
         break;
+      case 'direction.datafabric.actions':
+        if (typeof r57DataFabricActions_ !== 'function') throw new Error('Modulo R57 Data Fabric Actions non installato');
+        data = r57DataFabricActions_(token, Number(payload.limit || 60));
+        break;
       case 'direction.datafabric.scan.gmail':
         if (typeof r25ScanGmail_ !== 'function') throw new Error('Modulo R25 Data Fabric non installato');
         data = r25ScanGmail_(token, payload);

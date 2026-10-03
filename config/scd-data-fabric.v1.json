@@ -141,6 +141,7 @@
   },
   "target_runtime_actions": [
     "direction.datafabric.status",
+    "direction.datafabric.actions",
     "direction.datafabric.scan.gmail",
     "direction.datafabric.scan.drive"
   ]

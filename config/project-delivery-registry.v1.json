@@ -123,8 +123,21 @@
         "CRITICAL_FLOWS_TESTED_WITH_ROLLBACK",
         "PREVIEW_AND_OPERATOR_QA_COMPLETED"
       ],
-      "nextVerticalSlice": "CORE-01_DIRECTION_CONTROL_ROOM_TODAY_PRIORITY_TASKS_APPROVALS_DEADLINES_CHANGES_FROM_EXISTING_SOURCES",
-      "status": "READY_TO_EXECUTE"
+      "nextVerticalSlice": "CORE_01_AUTHENTICATED_DIRECTION_SOURCE_SHAPE_AND_OPERATOR_QA",
+      "status": "IMPLEMENTED_CONTRACT_TESTED_AUTH_QA_PENDING",
+      "activeImplementationBranch": "core-01-direction-control-room",
+      "lastVerifiedEvidence": {
+        "testedImplementationHead": "6491a5739c5cf40b3409df32054dd26ea60d0aa6",
+        "workflowRunId": 37137960492,
+        "workflowConclusion": "SUCCESS",
+        "gates": [
+          "MANIFEST",
+          "CORE_CONTRACT",
+          "SOURCE_TRUTH_UNIT_CONTRACT",
+          "SYNTAX",
+          "FULL_REGRESSION"
+        ]
+      }
     },
     {
       "id": "SCD_GROW",

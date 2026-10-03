@@ -21,7 +21,7 @@ const required=[
   'dashboard.summary','account.requests','private.user.workspace','private.crm.summary','private.crm.detail','private.communication.templates','private.communication.preview','private.communication.send','private.communication.health','private.request.submit','private.transport.request','private.message.send',
   'private.convocation.create','private.convocation.reply','private.attendance.get','private.attendance.save',
   'direction.access.set','direction.access.invite','direction.access.metrics','direction.pin.set','direction.player.approve','direction.player.reject','direction.diagnostics','direction.evolution',
-  'direction.datafabric.status','direction.datafabric.scan.gmail','direction.datafabric.scan.drive'
+  'direction.datafabric.status','direction.datafabric.actions','direction.datafabric.scan.gmail','direction.datafabric.scan.drive'
 ];
 const missing=required.filter(x=>!serverActions.includes(x));
 if(missing.length){
