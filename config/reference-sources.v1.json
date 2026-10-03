@@ -736,6 +736,132 @@
       "authority": "COMMERCIAL_REFERENCE",
       "status": "REGISTERED_VERIFIED",
       "note": "2025 software-agency ideation source. Useful for coaching, real-time, field availability, RSVP, community, offline, AR, fan engagement and product gap analysis; filter every idea through SCD needs, privacy, security and technical sustainability."
+    },
+    {
+      "id": "SRC-0052",
+      "title": "Dribbble - Sports Web App",
+      "url": "https://dribbble.com/search/sports-web-app",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE",
+        "COMMON"
+      ],
+      "category": "SPORT_UI_UX_VISUAL_INSPIRATION",
+      "access": "PUBLIC_OR_ACCOUNT",
+      "use": "UI_UX_VISUAL_PATTERN_RESEARCH",
+      "authority": "DESIGN_COMMUNITY",
+      "status": "REGISTERED_VERIFIED",
+      "note": "Use for sports dashboard/mobile/web visual patterns, match analytics, booking, cards, community and interaction ideas. Do not copy proprietary layouts/assets; ignore betting/gambling concepts for SCD."
+    },
+    {
+      "id": "SRC-0053",
+      "title": "KMA Studio - Grafica per i Social: 5 strumenti online",
+      "url": "https://www.kmastudio.it/grafica-per-social-5-ottimi-strumenti-online/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE",
+        "COMMON"
+      ],
+      "category": "SOCIAL_GRAPHICS_TOOLS",
+      "access": "PUBLIC",
+      "use": "SOCIAL_GRAPHICS_WORKFLOW_IDEAS",
+      "authority": "SECONDARY_REFERENCE",
+      "status": "REGISTERED_VERIFIED_HISTORICAL",
+      "note": "2015 article. Use for template/workflow concepts, not current tool-market assessment."
+    },
+    {
+      "id": "SRC-0054",
+      "title": "HostingVirtuale - Programmi di grafica per Social Network",
+      "url": "https://www.hostingvirtuale.com/blog/migliori-programmi-di-grafica-per-social-network-8931.html",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE",
+        "COMMON"
+      ],
+      "category": "SOCIAL_GRAPHICS_INFOGRAPHICS_TOOLS",
+      "access": "PUBLIC",
+      "use": "GRAPHICS_TOOL_LANDSCAPE_REFERENCE",
+      "authority": "SECONDARY_REFERENCE",
+      "status": "REGISTERED_VERIFIED",
+      "note": "Reference for social graphics, mockups, collages, infographics and cloud/mobile tools; re-check availability and licensing before adoption."
+    },
+    {
+      "id": "SRC-0055",
+      "title": "VistaCreate - Social Media Graphic",
+      "url": "https://create.vista.com/it/create/social-media-graphic/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE",
+        "COMMON"
+      ],
+      "category": "SOCIAL_GRAPHICS_TEMPLATE_TOOL",
+      "access": "PUBLIC_OR_ACCOUNT",
+      "use": "SOCIAL_CREATIVE_TOOL_REFERENCE_PENDING_VERIFY",
+      "authority": "PROVIDER",
+      "status": "REGISTERED_PARTIAL_VERIFY",
+      "note": "User-provided tool URL. Automated fetch returned 403 in current verification session; keep as social-creative reference without asserting unverified specific features."
+    },
+    {
+      "id": "SRC-0056",
+      "title": "SaGrafica - Piattaforme social per artisti e designer",
+      "url": "https://www.sagrafica.it/le-13-migliori-piattaforme-di-social-media-per-artisti-e-designer/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE",
+        "COMMON"
+      ],
+      "category": "CREATIVE_SOCIAL_CHANNEL_STRATEGY",
+      "access": "PUBLIC",
+      "use": "SOCIAL_CHANNEL_AND_CREATIVE_COMMUNITY_RESEARCH",
+      "authority": "SECONDARY_REFERENCE",
+      "status": "REGISTERED_VERIFIED",
+      "note": "Use for visual-channel, creative-community, streaming, portfolio and networking strategy; verify current platform relevance/policies before acting."
+    },
+    {
+      "id": "SRC-0057",
+      "title": "Figma - Web Design",
+      "url": "https://www.figma.com/it-it/web-design/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE",
+        "COMMON"
+      ],
+      "category": "WEB_APP_UI_UX_DESIGN_SYSTEM",
+      "access": "PUBLIC_OR_ACCOUNT",
+      "use": "PRIMARY_UI_UX_PROTOTYPING_AND_DESIGN_SYSTEM_REFERENCE",
+      "authority": "OFFICIAL_PROVIDER",
+      "status": "REGISTERED_VERIFIED_PRIORITY",
+      "note": "Primary reference for responsive design, components, styles, interactive prototypes, collaboration, design tokens and Dev Mode handoff across the four products."
+    },
+    {
+      "id": "SRC-0058",
+      "title": "MP Quadro - 13 risorse utili per la grafica",
+      "url": "https://mpquadro.it/blog/grafica-blog/13-risorse-utili-per-la-grafica/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE",
+        "COMMON"
+      ],
+      "category": "GRAPHIC_DESIGN_TOOLKIT_TYPOGRAPHY",
+      "access": "PUBLIC",
+      "use": "GRAPHIC_DESIGN_METHOD_AND_TOOL_REFERENCE",
+      "authority": "SECONDARY_REFERENCE",
+      "status": "REGISTERED_VERIFIED_HISTORICAL",
+      "note": "2022 article. Useful for graphic-production workflow, raster/vector, layout and typography; re-check current versions and licenses."
     }
   ]
 }
