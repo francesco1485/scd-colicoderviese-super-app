@@ -21,6 +21,19 @@ SCD Command Platform R22 remains a shared technical engine and is not counted as
 
 All canonical apps must support `WEBAPP:MASTER` and their app-specific RUN command.
 
+## ONE-01 recovered command and visual-memory gate
+
+Before every further SCD ONE implementation commit:
+- read `config/user-directives.v1.json`;
+- read `docs/USER_COMMAND_RECOVERY_LEDGER.md`;
+- read `config/scd-visual-references.v1.json`;
+- run the `SCD:MEMORY-RECOVER` logic from `AGENTS.md`;
+- use VR-001 as high-relevance recovered SCD ONE design evidence while preserving the newer canonical navigation `HOME / CALENDAR / TEAMS / SOCIAL / PROFILE`;
+- do not copy sample people, scores, fixtures, sponsors, prices or statuses from reference boards into runtime;
+- do not call a recovered board approved unless explicit approval evidence exists;
+- when the current UI conflicts with a recovered high-relevance reference or user command, classify and resolve the drift instead of silently ignoring it;
+- documentation alone does not complete ONE-01 when real UI/runtime implementation remains possible.
+
 ## SCD ONE definitive command
 
 For any work on this branch, read and obey:
