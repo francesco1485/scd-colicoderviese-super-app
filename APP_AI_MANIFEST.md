@@ -1,22 +1,55 @@
-# APP AI MANIFEST — SCD Sponsor Platform
+# APP AI MANIFEST — SCD Sponsor & Partner Platform
 
-PROJECT: SCD Sponsor Platform
+APP_ID: SCD_SPONSOR_PLATFORM
+PROJECT: SCD Sponsor & Partner Platform
+OWNER: SCD ColicoDerviese
 AI_BRANCH: ai-scd-sponsor-platform
-SOURCE_BASE: r57-copilot-control-plane
-LIVE_RENDER_SERVICE: scd-sponsor-platform
-LIVE_RENDER_BRANCH: main
-CANONICAL_REPOSITORY: francesco1485/scd-colicoderviese-super-app
 PRIMARY_CODE: sponsor/
+PUBLIC_RUNTIME: scd-sponsor-platform
+PROTECTED_RUNTIME_DEPENDENCY: scd-colicoderviese-official-r21
+CANONICAL_REPOSITORY: francesco1485/scd-colicoderviese-super-app
 
-PRODUCT PURPOSE:
-Public sponsor experience plus private sponsor/commercial operations integrated with the SCD Digital Club Operating System.
+## Portfolio role
 
-HARD RULES:
-- This is an SCD module, not a second SCD application.
-- Reuse canonical person/project/event/document/source models when relevant.
+This is one of the 3 canonical SCD applications.
+
+It is a distinct companion web app for sponsor/partner activity, but it must reuse canonical SCD identity, data, provenance and security contracts where applicable.
+
+It is NOT:
+- a replacement for SCD Universe;
+- a second identity system;
+- a second club calendar;
+- a fifth Commercial/Lia app.
+
+## Public world
+
+- partnership proposition;
+- territory / sport / events;
+- opportunities;
+- LEDWall / Sponsor Wall;
+- conventions / community benefits;
+- solidarity fund;
+- partner entry/contact.
+
+## Private world
+
+- Partner Hub;
+- CRM/stakeholders;
+- commercial pipeline;
+- Sponsor Operations;
+- Lia Sponsor;
+- initiatives/projects;
+- supplier/sponsor radar;
+- assets/media;
+- proof/reporting;
+- renewals/follow-up.
+
+Useful work from `r42-commercial-development-os` or `ai-scd-commercial-lia` must be RECOVERED/INTEGRATED here when appropriate, not developed as a separate application.
+
+## Hard rules
+
 - No invented sponsor names, amounts, deadlines, contracts or commitments.
-- Keep public sponsor presentation separate from private commercial operations.
-- Do not deploy from the AI branch.
-
-FIRST MISSION:
-Audit sponsor public/private code, Render contract, data sources, CRM linkage, project/deal states, document links, responsive UX, accessibility, tests and stale sponsor branches. Produce a consolidation plan before new features.
+- A prospect is never presented as a confirmed sponsor.
+- Public and private data boundaries remain explicit.
+- Modern visual quality is blocking; obsolete admin/portal templates are REBUILD_IMPROVE.
+- No merge/deploy/production mutation from the AI branch.
