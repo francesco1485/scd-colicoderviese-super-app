@@ -1,0 +1,26 @@
+name: CEPA-01 QA Access and Readiness
+
+on:
+  push:
+    branches:
+      - "cepa-01-qa-access-control-room"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cepa-01:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install dependencies
+        run: npm install
+      - name: CEPA-01 readiness contract
+        run: npm run test:cepa01
+      - name: Existing branch checks
+        run: npm run check
