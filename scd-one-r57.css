@@ -693,6 +693,28 @@ footer{color:#6e8199!important;padding-bottom:110px!important}
   .bottom-nav button span{font-size:17px}
 }
 
+
+/* Desktop geometry guard: leave a real gutter for the command rail and content actions. */
+@media (min-width:901px){
+  body[data-scd-theme="arena"] .app{
+    box-sizing:border-box!important;
+    width:min(calc(100vw - 176px),1600px)!important;
+    max-width:none!important;
+    margin-left:max(112px,calc((100vw - 1600px)/2 + 56px))!important;
+    margin-right:auto!important;
+  }
+}
+body[data-scd-theme="arena"] .ambient-a{
+  left:0!important;
+  width:210px!important;
+  opacity:.72;
+}
+body[data-scd-theme="arena"] .ambient-b{
+  right:0!important;
+  width:230px!important;
+  opacity:.62;
+}
+
 @media (prefers-reduced-motion:reduce){
   *,*:before,*:after{scroll-behavior:auto!important;animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
 }
