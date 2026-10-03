@@ -46,7 +46,7 @@
 - `ROLLBACK`: rimuovere il solo documento se la revisione ne contesta contenuto o ambito.
 - `NEXT_ACTION`: mantenere il perimetro documentale, poi aprire la PR richiesta.
 
-`SCD:ARCHITECT` e `SCD:ASSET`: non applicabili; non si modificano software, UI o media.
+Nessuna UI o media viene modificata. `SCD:ARCHITECT` build e l’esecuzione di QA visuale non sono applicabili a questo audit documentale; i criteri visuali vincolanti sono comunque applicati alle classificazioni e ai limiti riportati sotto.
 
 ## ARCHITECTURE_MAP
 
@@ -90,6 +90,25 @@ Android (android/) e client Expo (mobile/) = canali dello stesso prodotto
 - **Command Platform R22:** `platform/src/api/server.ts` crea un runtime distinto con registry/queue e adapter R20. È un modulo/runtime di orchestrazione destinato a integrarsi nel singolo SCD Universe; la sua relazione di deploy con l’app descritta da `render.yaml` non è dimostrata da quel file.
 - **Sponsor / Partner e Commercial/Lia:** workbench o moduli commerciali, non app SCD in competizione con Universe. Gli eventuali runtime dedicati sono supporto temporaneo da riconciliare; i percorsi Pages/Render effettivi vanno valutati con i relativi confini di autorizzazione.
 - **Target architetturale:** Supabase/Postgres + Auth/Storage/Realtime, web React/TypeScript e mobile Expo, transizione `STRANGLER_DUAL_RUN`; non è lo stato runtime da assumere oggi (`SCD_SYSTEM_MANIFEST.json:2085–2113`).
+
+## VISUAL_CLASSIFICATION
+
+Classificazione documentale, non autorizzazione o implementazione UI:
+
+- **`REBUILD_IMPROVE` — superfici legacy indicate dai gap manifest.** Riallineare presentazione, gerarchia, navigazione e interazione al prodotto SCD Universe; preservare dati, ID, backend/runtime e servizi reali, fonti/provenance, permessi e sicurezza. Non equivale a rifare il prodotto da zero (`SCD_SYSTEM_MANIFEST.json:2897–2908`; gate visuale R57, `docs/SCD_VISUAL_EXPERIENCE_MASTER.md` sulla ref `r57-copilot-control-plane`, §12).
+- **`KEEP_LOCKED` — identità SCD, asset ufficiali e palette canonica.** Non ridisegnare stemmi/loghi/wordmark né sostituire i token mineral navy/lake aqua/muted gold/warm white e accenti desaturati definiti in `config/scd-visual-system.json` (ref `r57-copilot-control-plane`). I riferimenti sono subordinati al manifest binding.
+- **`KEEP_ENHANCE` — asset ufficiali esistenti, quando presenti.** Sono ammessi solo miglioramenti tecnici compatibili con policy e provenance; in questo audit non è stato toccato alcun asset.
+- **`RESEARCH_REAL_ASSET` — asset ufficiale non verificato o mancante.** Ricercare una fonte ufficiale/verificabile prima dell’uso; mai inventare stemmi, sponsor, avversari o kit.
+- **`GENERATE_ORIGINAL` — elementi originali non sostitutivi.** Scene sintetiche originali sono ammesse nei limiti del contratto visuale; questo audit non ne genera.
+- **Smart Facility / domotica:** classificare ogni servizio solo come `CONNECTED`, `READY_FOR_ADAPTER`, `NOT_CONNECTED`, `UNVERIFIED` o `MANUAL_CHECK_REQUIRED`. Lo stato concreto di sensori, luci, serrature, allarmi o adapter non è verificato qui; non presentare controlli o stati live simulati (`config/scd-visual-experience-gate.v1.json`, ref `r57-copilot-control-plane`).
+
+## VISUAL_QA
+
+- `STATUS: NOT_RUN — NOT_APPLICABLE_TO_DOCUMENTATION_ONLY_CHANGE`. Non sono state modificate schermate o media: nessuno screenshot, confronto visivo, browser QA o deploy è dichiarato come eseguito.
+- Per ogni successiva modifica UI, il gate R57 richiede visual comparison e responsive QA agli viewport mobile `360x800`, `390x844`, `393x852`, `430x932` e desktop `1280x800`, `1440x900`, `1920x1080`; verificare overflow/clipping, keyboard/focus, contrasto, `prefers-reduced-motion`, loading/empty/error/offline, provenienza/fallback, integrità asset ed E2E mirato.
+- Il risultato deve respingere template SaaS/Admin/WordPress generici, card wall anonime, hero brochure, palette reinventate, feature pubbliche/private confuse e servizi/dati live non verificati. Desktop, tablet e mobile restano composizioni responsive dello stesso prodotto.
+- Smart Facility QA deve coprire esclusivamente stati reali o espliciti sopra elencati; assenza di prova resta `UNVERIFIED`, non “connected”.
+- Fonti della classificazione e del gate (lette sulla ref `r57-copilot-control-plane`, subordinate a `SCD_SYSTEM_MANIFEST.json`): `docs/SCD_VISUAL_EXPERIENCE_MASTER.md`, `config/scd-visual-system.json`, `config/scd-visual-experience-gate.v1.json`.
 
 ## RUNTIME_MAP
 
@@ -146,6 +165,7 @@ Android (android/) e client Expo (mobile/) = canali dello stesso prodotto
 - **La policy PR controlla dichiarazioni testuali.** `manifest-pr-policy.yml` richiede stato, SHA, capability, sorgenti, test e release evidence nel testo PR. È una guardia utile, ma non sostituisce una prova runtime; PR recenti su altri branch hanno avuto tentativi falliti e successivi verdi, quindi l’esito va letto per SHA/tentativo.
 - **Android non segue ogni commit.** Il workflow scatta su dispatch o modifiche in `android/**`/workflow/icon; ultimo successo osservato era su uno SHA precedente, non sullo SHA corrente.
 - **Nessuna verifica completa visibile dei requisiti di qualità dichiarati.** Il manifest elenca responsive E2E desktop/mobile, confronto visual master, safeguarding isolation, provenance, RLS security review e dual-read (`:2131–2175`); i workflow correnti eseguono test di contratto e smoke, ma non tutti quei controlli risultano gate automatici espliciti e per ogni PR.
+- **Visual QA non automatizzata uniformemente per ogni superficie.** Il master/gate R57 richiede screenshot/comparison, viewport desktop/mobile, accessibilità e stati loading/empty/error/offline; il documento non costituisce evidenza di tali prove e nessuna UI è stata verificata in questa modifica.
 - **Stato di `npm run check`:** script esistente e ampio (`package.json:8–44`), ma la copertura dei workflow è selettiva. Non è stato eseguito in questo audit documentale; il controllo richiesto qui è `npm run test:manifest`.
 
 ## PRODUCTION_BLOCKERS
@@ -189,7 +209,7 @@ Questa è una lista di **candidati a verifica/deprecazione**, non autorizzazione
 3. **Riconciliare la release evidence nel manifest** in una PR separata: confrontare manifest binding, HTML, bundle distribuito, Pages/Render, commit e artifact production; cambiare record solo con evidenza verificata.
 4. **Sbloccare dipendenze in sequenza conservativa:** deployment R20 e probe diretto; poi prova end-to-end della capability dietro feature flag. Per Supabase completare RLS/auth/role-scope, dual-read, Web/mobile e rollback prima di qualsiasi cutover; R20 resta primary nel frattempo.
 5. **Completare i contratti evento e upload solo con source/owner approvati.** Gestire conflitti come review pendente; per Drive richiedere adapter server-side, validazioni, audit e rate limiting prima di abilitare submission/upload.
-6. **Ridurre `known_noncompliance` per capability**, verificando master visuali, dati reali, autorizzazioni e test associati. Non dichiarare una capability completa sulla base del solo test tecnico.
+6. **Ridurre `known_noncompliance` per capability**, applicando `VISUAL_CLASSIFICATION` e il gate `VISUAL_QA` R57, verificando master visuali, dati reali, autorizzazioni e test associati. Non dichiarare una capability completa sulla base del solo test tecnico.
 7. **Uniformare i gate CI e le prove release** in un cambiamento dedicato: distinguere check PR da prova post-deploy, coprire i requisiti obbligatori del manifest e pubblicare artifact versionati per SHA.
 8. **Decidere i remove candidates per ultimo.** Inventario delle dipendenze e dei rollback, approvazione del responsabile e rimozioni atomiche; aggiornare il manifest nello stesso PR se si modifica un contratto.
 
@@ -197,6 +217,7 @@ Questa è una lista di **candidati a verifica/deprecazione**, non autorizzazione
 
 - Fonte normativa, capabilities, release truth e debito: `SCD_SYSTEM_MANIFEST.json`.
 - Direzione prodotto canonica e continuità R38–R56 (lette dalla ref `r57-copilot-control-plane`): `docs/SCD_UNIVERSE_MASTER_BUILD.md`, `docs/AI_APP_REGISTRY.md`.
+- Gate visuale/esperienza (letti dalla ref `r57-copilot-control-plane`; subordinati al manifest): `docs/SCD_VISUAL_EXPERIENCE_MASTER.md`, `config/scd-visual-system.json`, `config/scd-visual-experience-gate.v1.json`.
 - Runtime/deploy: `index.html`, `server.js`, `render.yaml`, `scripts/build-pages.mjs`.
 - Release gates: `.github/workflows/pages.yml`, `e2e.yml`, `production-evidence.yml`, `manifest-pr-policy.yml`, `android-build.yml`.
 - Verificatori: `scripts/verify-production.mjs`, `scripts/verify-r20-direct.mjs`, `scripts/validate-r53-core.mjs`, `scripts/validate-r54-private.mjs`, `scripts/validate-r55-content.mjs`, `scripts/validate-r56-core.mjs`, `scripts/validate-r56-internal.mjs`, `tests/calendar-fusion-contract.mjs`.
