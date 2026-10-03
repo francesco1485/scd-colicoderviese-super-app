@@ -42,7 +42,7 @@ body:before{
   background-size:48px 48px;
   mask-image:linear-gradient(to bottom,black,transparent 72%);
 }
-.app{max-width:1560px;padding:0 18px 130px}
+.app{box-sizing:border-box;max-width:1560px;padding:0 18px 130px}
 .ambient{opacity:.7}
 
 /* Global shell */
