@@ -213,6 +213,21 @@ assert(js.includes('data.touchpoints'),'Partner Hub touchpoint hydration missing
 
 assert(pubJs.includes('const $$=s=>Array.from(document.querySelectorAll(s));'),'public multi-selector helper missing');
 assert(!pubJs.includes('const $=s=>Array.from(document.querySelectorAll(s));'),'public selector helper duplicated');
+assert(pubJs.includes('Anteprima concettuale · non mostra dati, partner o attività live'),'public interactive previews must disclose that they are concepts, not live data');
+for(const token of [
+  'Rossi Srl',
+  '80%',
+  'GGLASS',
+  'TA CLEANING',
+  'AGC MEDICAL',
+  'NORATECH',
+  '03:42',
+  '16<small>squadre concept</small>',
+  '1<small>title partner</small>',
+  '4<small>attivazioni core</small>'
+]) assert(!pubJs.includes(token),'fabricated or unverified public preview detail remains: '+token);
+assert(pubJs.includes('Specifiche LED <em>DA VERIFICARE</em>'),'LED preview must not imply unverified production readiness');
+assert(pubJs.includes('Partner aderenti <em>NON MOSTRATI</em>'),'convention preview must not imply unverified partner participation');
 
 
 for(const token of [
