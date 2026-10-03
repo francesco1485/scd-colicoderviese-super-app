@@ -67,9 +67,19 @@ Assegnazione e registrazione esito passano da `assign_recovery_case` e `record_r
 
 ## UX, accessibilità e sicurezza
 
-- **Responsive:** sono presenti sidebar mobile, chiusura con Escape, focus mode e breakpoint multipli in CSS; il codice non costituisce una prova visual QA su dispositivi reali o confrontata con un visual master. Eseguire smoke manuale desktop e mobile sulle viste principali, inclusi tabelle, modal, file picker e stati errore/loading.
-- **Accessibilità:** login con label, vari controlli con `aria-label`, dock Lia con ruolo dialog; non risultano selettori CSS `:focus`/`:focus-visible` né `prefers-reduced-motion` negli stylesheet esaminati. Il modal generico non dichiara `role="dialog"`/`aria-modal`. Non sono stati eseguiti test tastiera, screen reader, contrasto o WCAG; questi sono gap da colmare prima del rilascio, non una certificazione di non conformità completa.
-- **Dati non caricati / errori:** `loadAll()` interrompe il rendering se una delle query fallisce; verificare che gli utenti distinguano dati assenti, dati vuoti e errore di autorizzazione. Il fallback Dashboard (`dashboard-component.js`) usa valori zero/strutture vuote, quindi non confondere una schermata iniziale o non connessa con dati live.
+### Modern Experience Gate e classificazione
+
+- **Presentazione: `REBUILD_IMPROVE` (solo UX/UI, per incrementi).** L’app ha CSS e un visual master propri, colori e naming Maglia 360; dal sorgente esaminato non emerge una dipendenza Bootstrap. Non è però disponibile una preview renderizzata per giudicare in modo affidabile se il risultato visivo sia datato, né provarne la gerarchia. Questa classificazione prescrive un’evoluzione controllata della presentazione per soddisfare il gate, non afferma che ogni schermata sia obsoleta e non autorizza un rewrite.
+- **Identità e asset: `KEEP_LOCKED`.** Conservare identità Maglia 360 e asset/brand ufficiali HDI e C.E.P.A.; nessuna sostituzione o reinterpretazione non autorizzata. Il prodotto resta distinto da SCD: non importare il template SCD né un admin generico.
+- Per ogni futura UI, progettare **composizioni distinte** mobile, tablet e desktop, con gerarchia leggibile e azione primaria evidente; mantenere densità funzionale nelle viste operative e un’impostazione più editoriale soltanto per contenuti pubblici. Non trasformare una schermata desktop in un telefono ingrandito.
+- Il motion deve chiarire feedback e transizioni, rispettando `prefers-reduced-motion`. Esporre stati espliciti `loading`, `empty`, `error`, `offline`, `denied` e `stale`; quando sono mostrati dati o integrazioni, indicare `source`, `state` e `fallback`. Non usare “live”, “automatico” o “sincronizzato” senza evidenza runtime verificata.
+- **Visual QA obbligatoria prima di dichiarare ready:** screenshot reali mobile, tablet e desktop, confronto col visual master Maglia approvato, controllo delle principali viste e stati, tastiera/focus e reduced motion. La preview non verificabile e l’assenza di screenshot impediscono questo audit visuale; non sono stati generati screenshot né eseguito deploy.
+
+### Responsive, accessibilità e dati
+
+- **Responsive:** sono presenti sidebar mobile, chiusura con Escape, focus mode e breakpoint multipli in CSS; questo attesta implementazione responsive, non qualità delle composizioni reali né visual QA su dispositivi. Le tabelle, modal, file picker e viste principali richiedono verifica ai breakpoint mobile/tablet/desktop.
+- **Accessibilità:** login con label, vari controlli con `aria-label`, dock Lia con ruolo dialog; non risultano selettori CSS `:focus`/`:focus-visible` né `prefers-reduced-motion` negli stylesheet esaminati. Il modal generico non dichiara `role="dialog"`/`aria-modal`. Non sono stati eseguiti test tastiera, screen reader, contrasto o WCAG; sono gap da colmare prima del rilascio, non una certificazione di non conformità completa.
+- **Stati dei dati:** `loadAll()` interrompe il rendering se una delle query fallisce; verificare che gli utenti distinguano dati assenti, vuoti, non aggiornati e accesso negato. Il fallback Dashboard (`dashboard-component.js`) usa valori zero/strutture vuote: mostrare fonte, stato e fallback per evitare che zero o schermate iniziali/non connesse vengano scambiati per dati live.
 - **Boundary browser:** il codice client deve essere considerato ispezionabile e manipolabile. Nessuna segretezza o regola di ruolo può basarsi su elementi nascosti, `window.orgId`, campi del payload, mime fornito dal browser o chiave publishable.
 
 ## Test e readiness di rilascio
