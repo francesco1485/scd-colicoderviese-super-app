@@ -29,6 +29,7 @@ jobs:
           node --check server.js
           node --check scd-ng.js
           node --check lib/scd-one-pulse.js
+          node --check lib/scd-one-profile.js
           node --check lib/scd-native-adapters.js
           node --check scripts/validate-scd-one-contract.mjs
       - name: Full regression contract
