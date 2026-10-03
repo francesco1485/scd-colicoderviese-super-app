@@ -11,6 +11,7 @@ const visualStyles=fs.readFileSync('scd-one-r57.css','utf8');
 const responsiveStyles=fs.readFileSync('ui-r52-social.css','utf8')+fs.readFileSync('scd-ng.css','utf8')+visualStyles;
 const nativeAdapters=fs.readFileSync('lib/scd-native-adapters.js','utf8');
 const profileModel=fs.readFileSync('lib/scd-one-profile.js','utf8');
+const routerRuntime=fs.readFileSync('lib/scd-one-router.js','utf8');
 const manifest=JSON.parse(fs.readFileSync('manifest.webmanifest','utf8'));
 const serviceWorker=fs.readFileSync('sw.js','utf8');
 const server=fs.readFileSync('server.js','utf8');
@@ -39,6 +40,12 @@ for(const signal of ['pulseNow','pulseNext','pulseChanged','pulseAttention']){
 }
 ok(runtime.includes('window.SCDOnePulse.summarize'),'Pulse must use the shared public-data contract');
 ok(runtime.includes('window.addEventListener(\'popstate\''),'view navigation must support browser history');
+ok(html.includes('./lib/scd-one-router.js?v=1.0.0'),'canonical deep-link router must be loaded');
+ok(routerRuntime.includes("pulse')return 'home'"),'legacy pulse deep link must canonicalize to home');
+ok(routerRuntime.includes("twin')return 'profile'"),'legacy Twin deep link must canonicalize to profile');
+ok(runtime.includes('router?.parseHash'),'runtime must consume canonical deep-link parser');
+ok(runtime.includes('router?.teamHash'),'Team Hub share must use canonical team deep link');
+ok(runtime.includes('id="teamHubShare"'),'Team Hub share action missing');
 ok(runtime.includes('profile:\'twin\''),'Profile route must preserve the existing Twin view');
 ok(html.includes('id="profileCommand"'),'My SCD profile command center missing');
 ok(html.includes('./lib/scd-one-profile.js?v=1.0.0'),'My SCD profile model must be loaded');
@@ -56,6 +63,7 @@ ok(manifest.start_url.endsWith('#home'),'PWA start URL must open the canonical H
 ok(manifest.shortcuts?.some(x=>String(x.url).endsWith('#profile')),'PWA must expose the Profile shortcut');
 ok(serviceWorker.includes('./lib/scd-one-pulse.js?v=1.0.0'),'offline shell must cache the Pulse runtime');
 ok(serviceWorker.includes('./lib/scd-one-profile.js?v=1.0.0'),'offline shell must cache the Profile runtime');
+ok(serviceWorker.includes('./lib/scd-one-router.js?v=1.0.0'),'offline shell must cache the deep-link router');
 ok(serviceWorker.includes('./scd-one-r57.css?v=1.0.0'),'offline shell must cache the R57 visual layer');
 
 for(const surface of ['PULSE','SCD_WEEK','NEXT_MATCH','CALENDAR','TEAMS','MATCHDAY','SOCIAL','COMMUNITY','EVENTS','TOURNAMENTS','JOIN','PROFILE','FAMILY','ATHLETE','FIELD_REQUESTS','TICKETS','SCD_CARD','SERVICES']){
