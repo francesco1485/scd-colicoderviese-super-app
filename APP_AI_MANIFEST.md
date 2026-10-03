@@ -1,61 +1,35 @@
-# APP AI MANIFEST — MAGLIA 360 + C.E.P.A. UNIFIED
+# APP AI MANIFEST — C.E.P.A. 360
 
-PROJECT: Maglia Assicurazioni Digital Operating System
-APP_ID: MAGLIA_360_CEPA
-AI_BRANCH: ai-maglia360-cepa-unified
+APP_ID: CEPA_360
+NAME: C.E.P.A. 360 by Maglia Assicurazioni
+TAGLINE: Dalla storia della consulenza al futuro della protezione.
+OWNER: Maglia Assicurazioni
+AI_BRANCH: ai-cepa360
+SOURCE_BASE: ai-maglia360-cepa-unified
 CANONICAL_SOURCE_BRANCH: cepa-maglia-os-hosting
 HISTORICAL_REFERENCE_BRANCH: maglia360-office-architecture-v2
+CURRENT_RUNTIME: cepa-maglia-os
+PREVIEW_RUNTIME: maglia360-office-v2-preview
 PRIMARY_CODE: cepa-maglia-os-static/
-CANONICAL_PUBLIC_RUNTIME: cepa-maglia-os
-LEGACY_PREVIEW_RUNTIME: maglia360-office-v2-preview
-CANONICAL_REPOSITORY: francesco1485/scd-colicoderviese-super-app
 
-## One Maglia web app
+## Mission
+Create one innovative web app with C.E.P.A. as the public consulting interface and Maglia 360 as the private agency operating system and super CRM.
 
-This is ONE Maglia Assicurazioni web app with two coordinated worlds:
+## Public world
+C.E.P.A., consulting journey, previdenza, protezione, welfare, salute, tutela, themes, events, Center C.E.P.A., SAP network, territory and collaborations.
 
-1. PUBLIC WORLD — C.E.P.A.
-   - public educational and territorial portal;
-   - people/families, companies, schools, entities, intermediaries;
-   - themes, events, territory, SAP network, collaboration and partner entry;
-   - public content must be verified and never invented.
+## Private world
+Maglia 360 Control Room, customers, partner/products, collaborators, documents/contracts, Lia Workbench, AI Mail/Chat, Network Radar/IVASS, development, activities/deadlines, Recovery, relationship graph and history intelligence.
 
-2. PRIVATE WORLD — MAGLIA 360
-   - reserved operational control room for authorized agency users;
-   - partners/products/collaborators;
-   - C.E.P.A. governance;
-   - documents/contracts;
-   - AI Mail & Chat;
-   - Lia Workbench;
-   - new business development;
-   - Network Radar / IVASS;
-   - activities/deadlines;
-   - customer Recovery;
-   - role-based visibility and office context.
+## Continuity
+The agency's verified history, important collaborations and operating knowledge are structured inputs for future growth.
+Do not split C.E.P.A. and Maglia 360 again.
 
-C.E.P.A. is the public/relational front door.
-MAGLIA 360 is the internal operating engine.
-They are NOT two competing web apps.
+## Command
+CEPA360:RUN -> WEBAPP:MASTER
 
-## Binding rules
-
-- Preserve the existing code and real workflows from `cepa-maglia-os-hosting`.
-- Use `maglia360-office-architecture-v2` only as a historical/reference source for useful private-OS capabilities that are missing from the canonical source.
-- No new CRM/auth/document system before auditing existing implementation.
-- No invented customer, policy, commission, regulatory, financial, event, partner or office data.
-- Preserve exact partner/brand identity and real provenance.
-- Authorization is server-side where private data is involved.
-- Public and private worlds share one coherent product identity but have different density and information hierarchy.
-- Do not deploy from the AI branch.
-- No production mutation without explicit authorization.
-
-## Visual direction
-
-Reject obsolete portal/admin templates.
-Public C.E.P.A.: modern, editorial, cultural, territorial, premium, accessible.
-Private Maglia 360: modern control room, dense but readable, action-first, role-aware, fast.
-No generic card-wall dashboard, no fake live services, no decorative AI claims.
-
-## First mission
-
-Audit the current unified product from `cepa-maglia-os-hosting`, compare only missing capabilities against `maglia360-office-architecture-v2`, then build a single prioritized activation plan without splitting the product.
+## Rules
+No parallel CRM/auth/document systems.
+No invented operational facts.
+Preserve exact partner/brand identity, provenance and role boundaries.
+No production mutation without explicit authorization.
