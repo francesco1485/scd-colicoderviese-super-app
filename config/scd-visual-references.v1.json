@@ -1,0 +1,180 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "SCD_VISUAL_REFERENCE_RECOVERY",
+  "effectiveAt": "2026-10-03",
+  "purpose": "Recovered visual/document references from the user's internal Library. These references must be reviewed before visual work so prior choices are not lost.",
+  "rules": {
+    "libraryReferenceIsNotRuntimeAsset": true,
+    "noAutomaticApprovalInference": true,
+    "officialAssetMustUseCanonicalRepoCopy": true,
+    "generatedBoardIsDesignReferenceNotFactualData": true,
+    "realPhotoRequiresUsageRightsAndPrivacyCheck": true
+  },
+  "references": [
+    {
+      "id": "VR-001",
+      "product": "SCD_ONE",
+      "name": "Immagine ChatGPT 30 set 2026, 10_09_37.png",
+      "libraryFileId": "libfile_6786d03392bc819184c0ccaecfa717ee",
+      "fileId": "file_00000000741881f4a165063a424ab2c8",
+      "type": "REFERENCE_BOARD",
+      "relevance": "HIGH",
+      "observedConcepts": [
+        "PULSE",
+        "SCD_TWIN",
+        "STAFF_AND_FAMILY",
+        "MOBILE_FIRST",
+        "LAKE_MOUNTAIN_TERRITORY",
+        "DARK_NAVY",
+        "SCD_YELLOW",
+        "MATCHDAY",
+        "NEWS",
+        "SPONSORS",
+        "PROFILE",
+        "ASSISTANT"
+      ],
+      "usage": "Use as recovered product/experience evidence when refining SCD ONE. Do not copy invented sample names, scores, dates or sponsor data into runtime."
+    },
+    {
+      "id": "VR-002",
+      "product": "MAGLIA_360_CEPA_OS",
+      "name": "Immagine ChatGPT 30 set 2026, 10_11_19.png",
+      "libraryFileId": "libfile_a692ccb1ab48819183e42c46d100f6d7",
+      "fileId": "file_00000000b804824684596985a6848d95",
+      "type": "REFERENCE_BOARD",
+      "relevance": "HIGH",
+      "observedConcepts": [
+        "MAGLIA_360",
+        "CEPA",
+        "TERRITORY",
+        "COMPANIES_PARTNERS",
+        "PRODUCTS",
+        "COLLABORATORS",
+        "BENCHMARK",
+        "DOCUMENTS",
+        "AI_ASSISTANT",
+        "DASHBOARD"
+      ],
+      "usage": "Reference for Maglia360/CEPA information architecture and visual ambition. Data shown in the board is illustrative unless separately verified."
+    },
+    {
+      "id": "VR-003",
+      "product": "SCD_SHARED",
+      "name": "Immagine ChatGPT 26 set 2026, 18_03_48(1).png",
+      "libraryFileId": "libfile_f6b210c2d1c08191a860dce6cd3256aa",
+      "fileId": "file_00000000c5c8821083d92fde0c46092d",
+      "type": "REFERENCE_BOARD",
+      "relevance": "HIGH",
+      "observedConcepts": [
+        "CARD_TESSERATO",
+        "CARD_SOSTENITORE",
+        "CARD_PARTNER",
+        "QR",
+        "BLUE_YELLOW_WHITE",
+        "TERRITORY",
+        "BENEFITS"
+      ],
+      "usage": "Reference for future SCD Card visual family and benefit surfaces. Codes, discounts and prices are not runtime facts unless verified."
+    },
+    {
+      "id": "VR-004",
+      "product": "SCD_ONE",
+      "name": "Programma settimanale SCD Colicoderviese.png",
+      "libraryFileId": "libfile_3f374b37d5ec8191bb2bc17e23f65a8c",
+      "fileId": "file_00000000360881f48ea569471b2d1518",
+      "type": "EDITORIAL_REFERENCE",
+      "relevance": "HIGH",
+      "observedConcepts": [
+        "SCD_WEEK",
+        "FIXTURES",
+        "CATEGORIES",
+        "HOME_AWAY",
+        "VENUE",
+        "OPPONENT_CRESTS",
+        "OFFICIAL_VARIATIONS",
+        "SPORT_EDITORIAL_ENERGY"
+      ],
+      "usage": "Reference for dense but readable weekly sport presentation and editorial hierarchy. Actual schedules must come from canonical event sources."
+    },
+    {
+      "id": "VR-005",
+      "product": "SCD_ONE",
+      "name": "Giornata aperta SCD Colicoderviese 2026.png",
+      "libraryFileId": "libfile_e7573ba94b608191a40f2c24dbafc5f7",
+      "fileId": "file_000000007a4472469be43a186338c890",
+      "type": "CAMPAIGN_REFERENCE",
+      "relevance": "MEDIUM_HIGH",
+      "observedConcepts": [
+        "DARK_NAVY",
+        "YELLOW_BRUSH",
+        "STADIUM_LIGHT",
+        "SPORT_HERO",
+        "STRONG_CTA",
+        "ELITE_BADGE",
+        "TERRITORY"
+      ],
+      "usage": "Reference for campaign energy and CTA hierarchy, not as a direct app layout."
+    },
+    {
+      "id": "VR-006",
+      "product": "SCD_SHARED",
+      "name": "Logo_SCD_Colicoderviese_originale - Copia.png",
+      "libraryFileId": "libfile_a2338ca185248191818fada83dd0eb5d",
+      "fileId": "file_000000000c5c81f4b96afeb346c185ff",
+      "type": "OFFICIAL_ASSET_REFERENCE",
+      "relevance": "CRITICAL",
+      "observedConcepts": [
+        "OFFICIAL_CLUB_CREST",
+        "BLUE",
+        "YELLOW",
+        "FOOTBALL"
+      ],
+      "usage": "Cross-check only. Runtime must use the canonical locked repo asset assets/logo-scd.png."
+    },
+    {
+      "id": "VR-007",
+      "product": "SCD_SHARED",
+      "name": "campo nuovo 1 (6).jpeg",
+      "libraryFileId": "libfile_c613b5f9d93c81918db9e49769d2a0ff",
+      "fileId": "file_000000004934821084be756726e11452",
+      "type": "REAL_TERRITORY_PHOTO",
+      "relevance": "HIGH",
+      "observedConcepts": [
+        "CENTRO_SPORTIVO",
+        "COLICO",
+        "MOUNTAINS",
+        "TERRITORY",
+        "FIELDS",
+        "FACILITY"
+      ],
+      "usage": "Reference for authentic territory/facility context. Check rights/privacy before public runtime use."
+    },
+    {
+      "id": "VR-008",
+      "product": "MAGLIA_360_CEPA_OS",
+      "name": "Area_Riservata.pdf",
+      "libraryFileId": "libfile_547c03d0cffc8191a5c837a0049c6012",
+      "fileId": "file_0000000015e88210b291c6a25b691cf6",
+      "type": "EXTERNAL_PRODUCT_UX_REFERENCE",
+      "relevance": "MEDIUM",
+      "observedConcepts": [
+        "ACCOUNT_ONBOARDING",
+        "POLICY_OVERVIEW",
+        "DOCUMENTS",
+        "CLAIMS",
+        "EXPIRIES",
+        "INTERMEDIARY_CONTACTS",
+        "PARTNER_CUSTOMER_AREA"
+      ],
+      "usage": "Use only as a functional UX benchmark for insurance customer self-service; do not copy proprietary visual identity."
+    }
+  ],
+  "nextRecoveryTargets": [
+    "Additional ChatGPT-generated boards from September 2026",
+    "Sponsor/partner visual boards",
+    "Tournaments and event visual references",
+    "Monza affiliation approved assets",
+    "SCD social and editorial graphics",
+    "CEPA presentation/brand documents"
+  ]
+}
