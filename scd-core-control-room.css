@@ -202,6 +202,21 @@
   width:6px;height:6px;border-radius:50%;
   background:#179765;
 }
+.core-item-action{
+  margin:8px 0 0;
+  color:#D5E4F0;
+  font-size:9px;
+  line-height:1.45;
+}
+.core-item-link{
+  display:inline-flex;
+  margin-top:8px;
+  color:#20B7E6;
+  font-size:8px;
+  font-weight:900;
+  text-decoration:none;
+}
+.core-item-link:hover{text-decoration:underline}
 .core-lane-empty{
   padding:18px 12px;
   color:#9CB3C8;
