@@ -10,6 +10,9 @@ ok(html.includes('id="growPipeline"'),'GROW pipeline mount missing');
 ok(html.includes('./grow-pipeline.js?v=1.0.0'),'GROW pipeline engine not loaded');
 ok(html.includes('./grow-pipeline.css?v=1.0.0'),'GROW pipeline stylesheet not loaded');
 ok(js.includes('renderGrowPipeline()'),'GROW pipeline renderer not wired');
+ok(js.includes('function crmOpportunityCard('),'canonical CRM evidence renderer missing');
+ok(js.includes('function crmTaskCard('),'canonical CRM task evidence renderer missing');
+ok(js.includes('Nessuna probabilità, valore o scadenza viene dedotta.'),'evidence no-inference disclosure missing');
 ok(js.includes("$('[data-grow-crm-id]').forEach"),'GROW pipeline CRM actions must use multi-selector');
 ok(!/(^|[^$])\$\('\[data-grow-crm-id\]'\)\.forEach/m.test(js),'GROW pipeline must not call forEach on a single-element selector');
 ok(js.includes("crmState.sourceState='VERIFIED'"),'verified CRM source state missing');
@@ -17,6 +20,7 @@ ok(js.includes("crmState.sourceState='UNAVAILABLE'"),'fail-closed CRM source sta
 ok(engine.includes("PROSPECT")&&engine.includes("PROPOSE")&&engine.includes("ACTIVATE"),'relationship stage classifier incomplete');
 ok(engine.includes('NO_CONTACT'),'contact blocking policy missing');
 ok(css.includes('@media(max-width:700px)'),'mobile GROW composition missing');
+ok(css.includes('GROW-02 · canonical CRM evidence'),'GROW-02 evidence styling missing');
 ok(css.includes('prefers-reduced-motion:reduce'),'reduced-motion support missing');
 
 await import('../sponsor/grow-pipeline.js');
