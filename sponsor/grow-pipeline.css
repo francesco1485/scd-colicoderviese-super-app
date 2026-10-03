@@ -1,0 +1,230 @@
+/* GROW-01 · verified relationship pipeline */
+.grow-pipeline{
+  margin:18px 0 22px;
+  border:1px solid rgba(23,67,113,.12);
+  border-radius:26px;
+  background:
+    radial-gradient(circle at 92% 0%,rgba(30,183,230,.09),transparent 28%),
+    linear-gradient(145deg,#f8fbfe,#eef6fc);
+  box-shadow:0 18px 46px rgba(4,28,57,.07);
+  overflow:hidden;
+}
+.grow-pipeline-head{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:18px;
+  align-items:end;
+  padding:24px 24px 18px;
+}
+.grow-pipeline-head small{
+  color:#0870CF;
+  font-weight:900;
+  letter-spacing:.1em;
+}
+.grow-pipeline-head h2{
+  margin:5px 0 7px;
+  color:#031A35;
+  font-size:clamp(25px,3vw,38px);
+  letter-spacing:-.04em;
+}
+.grow-pipeline-head p{
+  max-width:780px;
+  margin:0;
+  color:#627E98;
+  line-height:1.5;
+}
+.grow-source-state{
+  align-self:start;
+  border:1px solid #d5e4f0;
+  border-radius:999px;
+  padding:8px 11px;
+  background:#fff;
+  color:#627E98;
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.07em;
+}
+.grow-source-state[data-state="VERIFIED"]{color:#08795b;border-color:rgba(8,121,91,.22)}
+.grow-source-state[data-state="UNAVAILABLE"],
+.grow-source-state[data-state="UNVERIFIED"]{color:#b84c58;border-color:rgba(184,76,88,.22)}
+.grow-stage-track{
+  display:grid;
+  grid-template-columns:repeat(10,minmax(82px,1fr));
+  gap:6px;
+  overflow-x:auto;
+  padding:0 24px 18px;
+}
+.grow-stage{
+  min-width:82px;
+  border:1px solid #d5e4f0;
+  border-radius:15px;
+  background:#fff;
+  padding:10px;
+}
+.grow-stage span{
+  display:block;
+  color:#0870CF;
+  font-size:8px;
+  font-weight:950;
+  letter-spacing:.08em;
+}
+.grow-stage b{
+  display:block;
+  margin-top:6px;
+  color:#031A35;
+  font-size:22px;
+}
+.grow-stage small{
+  display:block;
+  margin-top:4px;
+  color:#627E98;
+  font-size:8px;
+}
+.grow-pipeline-body{
+  display:grid;
+  grid-template-columns:minmax(0,1.45fr) minmax(260px,.55fr);
+  gap:12px;
+  padding:0 24px 24px;
+}
+.grow-next-actions,
+.grow-verification-panel{
+  border:1px solid #d5e4f0;
+  border-radius:20px;
+  background:#fff;
+  min-width:0;
+}
+.grow-panel-head{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:10px;
+  padding:16px;
+  border-bottom:1px solid #e3edf5;
+}
+.grow-panel-head h3{margin:2px 0 0;color:#031A35}
+.grow-panel-head small{color:#627E98}
+.grow-action-list{display:grid}
+.grow-action{
+  display:grid;
+  grid-template-columns:minmax(170px,1fr) minmax(170px,1.2fr) minmax(105px,.65fr) auto;
+  gap:10px;
+  align-items:center;
+  width:100%;
+  border:0;
+  border-bottom:1px solid #edf3f8;
+  background:transparent;
+  color:#123657;
+  padding:12px 14px;
+  text-align:left;
+  cursor:pointer;
+}
+.grow-action:last-child{border-bottom:0}
+.grow-action:hover{background:#f6faff}
+.grow-action strong{display:block;color:#031A35}
+.grow-action small{display:block;margin-top:3px;color:#627E98}
+.grow-action .grow-action-next{font-size:11px;line-height:1.35}
+.grow-action .grow-action-deadline{
+  color:#123657;
+  font-size:10px;
+  font-weight:850;
+}
+.grow-stage-badge{
+  justify-self:start;
+  border-radius:999px;
+  padding:6px 8px;
+  background:#eaf4fc;
+  color:#0870CF;
+  font-size:8px;
+  font-weight:950;
+  letter-spacing:.06em;
+}
+.grow-stage-badge.unverified{background:#fff5db;color:#8f6a00}
+.grow-action.blocked{background:#fff7f7}
+.grow-action.blocked .grow-stage-badge{background:#fde8ea;color:#a93d49}
+.grow-empty{padding:24px;color:#627E98;font-size:12px}
+.grow-empty b{display:block;color:#031A35;margin-bottom:4px}
+.grow-verification-list{display:grid;gap:8px;padding:12px}
+.grow-verification-item{
+  border:1px solid #e5edf4;
+  border-radius:13px;
+  padding:10px;
+  background:#fbfdff;
+}
+.grow-verification-item b{display:block;color:#031A35;font-size:11px}
+.grow-verification-item span{display:block;margin-top:4px;color:#627E98;font-size:9px}
+.grow-rule{
+  margin:0 12px 12px;
+  border-radius:13px;
+  padding:11px;
+  background:#031A35;
+  color:#d5e4f0;
+  font-size:9px;
+  line-height:1.45;
+}
+.grow-rule b{color:#FFD500}
+
+/* Opportunity/proposal evidence inside CRM inspector */
+.crm-opportunity{
+  margin-top:8px;
+  border:1px solid #e0eaf2;
+  border-radius:14px;
+  padding:11px;
+  background:#fbfdff;
+}
+.crm-opportunity header{display:flex;gap:8px;align-items:start}
+.crm-opportunity header b{color:#031A35}
+.crm-opportunity header small{margin-left:auto;color:#0870CF;font-weight:900}
+.crm-opportunity p{margin:7px 0 0}
+.crm-opportunity .crm-opportunity-meta{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.crm-opportunity .crm-opportunity-meta span{
+  border-radius:999px;
+  padding:5px 7px;
+  background:#edf5fb;
+  color:#486985;
+  font-size:8px;
+}
+@media(max-width:1100px){
+  .grow-pipeline-body{grid-template-columns:1fr}
+  .grow-action{grid-template-columns:minmax(150px,1fr) minmax(150px,1fr) auto}
+  .grow-action .grow-action-deadline{display:none}
+}
+@media(max-width:700px){
+  .grow-pipeline{border-radius:20px}
+  .grow-pipeline-head{grid-template-columns:1fr;padding:18px 15px 14px}
+  .grow-stage-track{padding:0 15px 14px}
+  .grow-pipeline-body{padding:0 15px 15px}
+  .grow-action{grid-template-columns:1fr auto}
+  .grow-action .grow-action-next{grid-column:1/-1}
+}
+@media(prefers-reduced-motion:reduce){
+  .grow-pipeline *{transition:none!important}
+}
+
+
+/* GROW-02 · canonical CRM evidence */
+.crm-evidence-section{display:grid;gap:8px}
+.crm-task-evidence{
+  border:1px solid #e0eaf2;
+  border-radius:14px;
+  padding:11px;
+  background:#fbfdff;
+}
+.crm-task-evidence strong{display:block;color:#031A35;font-size:11px}
+.crm-task-evidence small{display:block;margin-top:4px;color:#627E98;font-size:9px}
+.crm-task-evidence p{margin:7px 0 0;color:#486985;font-size:10px;line-height:1.45}
+.crm-evidence-rule{
+  display:block;
+  margin-top:4px;
+  border-radius:12px;
+  padding:10px;
+  background:#eef6fc;
+  color:#486985;
+  font-size:9px;
+  line-height:1.45;
+}
+.crm-opportunity p strong{color:#031A35}
+@media(max-width:700px){
+  .crm-task-evidence,.crm-opportunity{padding:10px}
+  .crm-opportunity header{display:grid}
+  .crm-opportunity header small{margin-left:0}
+}
