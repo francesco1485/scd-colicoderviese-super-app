@@ -102,6 +102,11 @@ for(const viewport of viewports){
     await page.click('.bottom-nav [data-route="social"]');
     await page.waitForSelector('#view-social.active');
     await page.screenshot({path:'test-output/one-01/social-'+viewport.width+'x'+viewport.height+'.png',fullPage:true});
+
+    await page.click('.bottom-nav [data-route="profile"]');
+    await page.waitForSelector('#view-twin.active');
+    await page.waitForSelector('#profileCommand');
+    await page.screenshot({path:'test-output/one-01/profile-'+viewport.width+'x'+viewport.height+'.png',fullPage:true});
   }
 
   assert(pageErrors.length===0,'page errors '+viewport.width+'x'+viewport.height+': '+pageErrors.join(' | '));
