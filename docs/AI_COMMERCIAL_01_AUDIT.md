@@ -26,6 +26,22 @@
 
 La distinzione tra superfici pubbliche e private o tra hosting GitHub Pages e runtime privato non crea prodotti distinti: sono componenti del singolo SCD UNIVERSE / SCD COLICODERVIESE SUPER APP. In particolare, Pages pubblica solo asset sponsor esplicitamente allowlisted (`scripts/build-pages.mjs:9-13`), mentre `/sponsor/app` è servita da una route privata che valida la sessione (`server.js:475-485,950`). Questo confine tecnico di distribuzione/autorizzazione non autorizza una web app Commercial/Lia autonoma. Tutti i riferimenti R42 in questo audit sono storico comparativo soltanto.
 
+### VISUAL_CLASSIFICATION
+
+- **Deliverable di questo PR:** `NOT_APPLICABLE` — documento di audit, nessuna interfaccia modificata.
+- **UI Commercial/Lia storica R42:** `REBUILD_IMPROVE` come classificazione visuale della superficie legacy, non come autorizzazione a promuovere o ricostruire un prodotto autonomo. Se una capability viene approvata, la presentazione obsoleta va ricostruita dentro il singolo SCD UNIVERSE / SCD COLICODERVIESE SUPER APP, preservando dati validi, ID, contratti backend, provenance, sicurezza, permessi e servizi reali.
+- **Superfici sponsor correnti:** mantenute nel prodotto SCD unico. Questo audit non dichiara un loro redesign o conformità visuale; la classificazione di singoli asset ufficiali non cambia e resta soggetta a `KEEP_LOCKED`/registro canonico.
+- **Identità visiva vincolante:** usare la palette e i token canonici in `config/scd-visual-system.json` e il gate `config/scd-visual-experience-gate.v1.json`: mineral/navy, lake aqua, muted gold, warm white e accenti a bassa saturazione. Vietati template SaaS/admin/WordPress, griglie generiche di card, dati o servizi fittizi. Non si reinventa la palette.
+- **Smart Facility/domotica:** `NOT_APPLICABLE` a questo audit. Se introdotta in un lavoro futuro, esporre solo stati verificati `CONNECTED`, `READY_FOR_ADAPTER`, `NOT_CONNECTED`, `UNVERIFIED` o `MANUAL_CHECK_REQUIRED`; vietati stati simulati di sensori, serrature, allarmi o servizi.
+
+### VISUAL_QA
+
+- **Stato di questo PR:** `NOT_PERFORMED` — `NOT_APPLICABLE` al documento. Nessuna UI è stata modificata o renderizzata; non sono disponibili screenshot/confronti visuali R42. Non si dichiara conformità visuale né responsive.
+- **Gate per qualsiasi successiva modifica UI:** confronto col visual master; viewport mobile `360x800`, `390x844`, `393x852`, `430x932` e desktop `1280x800`, `1440x900`, `1920x1080`; verificare overflow/clipping, focus tastiera, contrasto, reduced motion, stati loading/empty/error/offline, fallback e integrità asset, e targeted E2E. Le superfici mobile e desktop devono restare composizioni responsive dello stesso prodotto.
+- **Deploy:** non eseguito e non autorizzato da questo audit.
+
+Riferimenti del gate visuale letti dalla ref `r57-copilot-control-plane`: [SCD Visual & Experience Master](https://github.com/francesco1485/scd-colicoderviese-super-app/blob/r57-copilot-control-plane/docs/SCD_VISUAL_EXPERIENCE_MASTER.md), [visual system](https://github.com/francesco1485/scd-colicoderviese-super-app/blob/r57-copilot-control-plane/config/scd-visual-system.json) e [visual experience gate](https://github.com/francesco1485/scd-colicoderviese-super-app/blob/r57-copilot-control-plane/config/scd-visual-experience-gate.v1.json).
+
 ### Classificazione SCD:EXPERT
 
 - **TASK_CLASS:** audit architetturale e riconciliazione, senza modifica di runtime o contratto.
@@ -42,7 +58,7 @@ La distinzione tra superfici pubbliche e private o tra hosting GitHub Pages e ru
 
 ### SCD:ARCHITECT / SCD:ASSET
 
-Audit documentale: nessuna schermata, UI, media o asset ufficiale è stato modificato. La UI commerciale R42 è classificata `SUPERSEDED` e non va trasferita; gli asset ufficiali restano `KEEP_LOCKED`, mentre i dati commerciali devono mantenere provenienza e stato di verifica.
+Audit documentale: nessuna schermata, UI, media o asset ufficiale è stato modificato (`VISUAL_QA: NOT_PERFORMED / NOT_APPLICABLE`). La UI commerciale R42 è `REBUILD_IMPROVE` come visual legacy ma `SUPERSEDED` come prodotto/route da promuovere; gli asset ufficiali restano `KEEP_LOCKED`, mentre i dati commerciali devono mantenere provenienza e stato di verifica.
 
 ## 2. Evidenze di storia e decisioni già prese
 
