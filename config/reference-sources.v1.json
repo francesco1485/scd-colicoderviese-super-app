@@ -438,6 +438,72 @@
       "use": "SPORT_SUPPLY_AND_TEAMWEAR_RESEARCH",
       "authority": "COMMERCIAL",
       "note": "Reference for sports equipment, football/teamwear and club-area benchmark; verify current stock and commercial conditions."
+    },
+    {
+      "id": "SRC-0033",
+      "title": "IDCERT Italia",
+      "url": "https://it.idcert.io/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE",
+        "COMMON"
+      ],
+      "category": "FORMAZIONE_CERTIFICAZIONI_COMPETENZE_DIGITALI_AI",
+      "access": "PUBLIC_OR_ACCOUNT",
+      "use": "TRAINING_CERTIFICATION_AND_SKILLS_RESEARCH",
+      "authority": "PROVIDER",
+      "sensitive": true,
+      "note": "Training/certification provider. Validate the current accreditation/recognition of each specific certification before operational use. Never store credentials or identity documents."
+    },
+    {
+      "id": "SRC-0034",
+      "title": "LumiaWeb - Blog Site professionale",
+      "url": "https://www.lumiaweb.com/blog-site-il-tuo-blog-professionale/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE",
+        "COMMON"
+      ],
+      "category": "WEB_DESIGN_BLOG_SEO_UX",
+      "access": "PUBLIC",
+      "use": "WEB_UX_SEO_IDEA_RESEARCH",
+      "authority": "COMMERCIAL_REFERENCE",
+      "note": "Verified canonical URL. Use for web/blog/SEO/UX benchmarking and ideas, not as an obligatory technical standard."
+    },
+    {
+      "id": "SRC-0035",
+      "title": "Facebook - SCD ColicoDerviese",
+      "url": "https://www.facebook.com/ColicoDerviese",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE"
+      ],
+      "category": "SOCIAL_MEDIA_OFFICIAL_CHANNEL",
+      "access": "PUBLIC_OR_LOGIN",
+      "use": "SOCIAL_CONTENT_REFERENCE",
+      "authority": "USER_PROVIDED_OFFICIAL_CHANNEL",
+      "status": "REGISTERED_PENDING_PLATFORM_VERIFY",
+      "sensitive": true,
+      "note": "User-provided SCD social page. Public fetch unavailable in current session; treat as official-channel candidate pending platform verification. Never store credentials or private messages."
+    },
+    {
+      "id": "SRC-0036",
+      "title": "Facebook - Maglia Assicurazioni",
+      "url": "https://www.facebook.com/MagliaAssicurazioni/",
+      "scope": [
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE"
+      ],
+      "category": "SOCIAL_MEDIA_OFFICIAL_CHANNEL",
+      "access": "PUBLIC_OR_LOGIN",
+      "use": "SOCIAL_CONTENT_REFERENCE",
+      "authority": "USER_PROVIDED_OFFICIAL_CHANNEL",
+      "status": "REGISTERED_PENDING_PLATFORM_VERIFY",
+      "sensitive": true,
+      "note": "User-provided Maglia social page. Public fetch unavailable in current session; treat as official-channel candidate pending platform verification. Never store credentials or private messages."
     }
   ]
 }
