@@ -4,9 +4,22 @@
 Before any write:
 1. Read `SCD_SYSTEM_MANIFEST.json` (machine-readable normative authority).
 2. Read `AGENTS.md` (operating gate and agent rules).
-3. Run/verify `SCD:STATE`. No verified state means read-only analysis only.
+3. Read `config/user-directives.v1.json` (recovered explicit user-command requirements).
+4. For UI/media/product work read `config/scd-visual-references.v1.json` and the canonical asset registry.
+5. Run/verify `SCD:STATE`. No verified state means read-only analysis only.
 
 If any instruction conflicts with the manifest, the manifest wins.
+
+## User-command & Library recovery gate
+
+Before substantial planning, coding, UI or product work:
+- execute the `SCD:MEMORY-RECOVER` gate from `AGENTS.md`;
+- start from the user's recovered explicit commands, not from an assistant-created shorthand;
+- inspect relevant internal Library boards, screenshots, graphics, documents and real photos registered in `config/scd-visual-references.v1.json`;
+- compare the current implementation against those references before inventing a new direction;
+- treat recovered generated boards as design references unless explicit approval evidence is available;
+- preserve factual integrity: sample people, fixtures, prices, benefits, sponsors or statuses visible in a board are not runtime facts unless verified separately;
+- when implementation is requested and technically possible, a docs-only result is insufficient.
 
 ## Portfolio gate
 Before creating or reclassifying an application, read `config/ai-portfolio.v1.json`.
@@ -62,6 +75,7 @@ For every UI/product task also read:
 - `docs/SCD_VISUAL_EXPERIENCE_MASTER.md`
 - `config/scd-visual-system.json`
 - `config/scd-visual-experience-gate.v1.json`
+- `config/scd-visual-references.v1.json`
 
 Run `SCD:VISUAL-GATE` mentally before implementation and in review.
 
