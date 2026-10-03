@@ -1058,7 +1058,7 @@ body[data-scd-theme="arena"] .profile-command-card button{
 body[data-scd-theme="arena"] .profile-command-card.team{
   background:linear-gradient(155deg,rgba(8,112,207,.16),rgba(255,255,255,.025));
 }
-body[data-scd-theme="arena"] .profile-command-card.app{
+body[data-scd-theme="arena"] .profile-command-card.app-status{
   background:linear-gradient(155deg,rgba(32,183,230,.11),rgba(255,255,255,.025));
 }
 body[data-scd-theme="arena"] .profile-command-card.access{
