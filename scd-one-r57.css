@@ -913,3 +913,51 @@ body[data-scd-theme="arena"] .worlds-preview .eyebrow,
 body[data-scd-theme="arena"] .ng-value-engine .eyebrow{
   color:var(--r57-cyan)!important;
 }
+
+
+/* R57.2.2 final HOME contrast / community surface QA */
+body[data-scd-theme="arena"] .upcoming-events h2,
+body[data-scd-theme="arena"] .upcoming-events h3,
+body[data-scd-theme="arena"] .community-pulse h2,
+body[data-scd-theme="arena"] .community-pulse h3{
+  color:#fff!important;
+}
+body[data-scd-theme="arena"] .upcoming-events .eyebrow,
+body[data-scd-theme="arena"] .community-pulse .eyebrow{
+  color:var(--r57-cyan)!important;
+}
+body[data-scd-theme="arena"] .community-pulse{
+  color:#fff!important;
+  border:1px solid var(--r57-line)!important;
+  background:
+    radial-gradient(circle at 90% 4%,rgba(32,183,230,.08),transparent 26%),
+    linear-gradient(180deg,rgba(5,46,89,.62),rgba(3,26,53,.92))!important;
+}
+body[data-scd-theme="arena"] .poll-question,
+body[data-scd-theme="arena"] .mention-box{
+  color:#fff!important;
+  border-color:var(--r57-line)!important;
+  background:rgba(255,255,255,.04)!important;
+}
+body[data-scd-theme="arena"] .poll-question h3,
+body[data-scd-theme="arena"] .mention-box h3,
+body[data-scd-theme="arena"] .poll-question b,
+body[data-scd-theme="arena"] .mention-box b{color:#fff!important}
+body[data-scd-theme="arena"] .poll-question p,
+body[data-scd-theme="arena"] .mention-box p,
+body[data-scd-theme="arena"] #pollState{color:var(--r57-muted)!important}
+body[data-scd-theme="arena"] .poll-options button{
+  color:#fff!important;
+  border-color:var(--r57-line)!important;
+  background:rgba(255,255,255,.045)!important;
+}
+body[data-scd-theme="arena"] .poll-options button.selected{
+  color:var(--r57-gold)!important;
+  border-color:rgba(255,213,0,.42)!important;
+  background:rgba(255,213,0,.08)!important;
+}
+body[data-scd-theme="arena"] .mention-box input{
+  color:#fff!important;
+  border-color:var(--r57-line)!important;
+  background:#021a35!important;
+}
