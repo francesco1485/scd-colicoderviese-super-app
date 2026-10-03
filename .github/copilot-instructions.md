@@ -158,3 +158,16 @@ Rules:
 - if historical naming conflicts with the current machine-readable portfolio, document the drift and follow the current portfolio authority;
 - when a broad user command asks to continue or complete development, execute the relevant app-specific RUN under `WEBAPP:MASTER`, using the omnibus directive as persistent project context;
 - never convert archived chat context into operational truth unless it is backed by a canonical repository/data source or clearly labeled as proposal/history.
+
+
+## Specialist agent routing
+
+Read `config/scd-agent-orchestration.v1.json` for cross-domain tasks.
+Use the specialist agents under `.github/agents/` rather than collapsing every discipline into one generic implementation pass.
+
+For architecture planning also read:
+- `docs/SCD_360_ARCHITECTURE_DECISION.md`
+- `docs/SCD_GRAPH_FABRIC_ARCHITECTURE.md`
+- `docs/SCD_AUTOMATION_PLANE.md`
+
+SCD Master coordinates all specialist outputs. No specialist may introduce a parallel database, auth system, calendar, CRM or source of truth.
