@@ -1,0 +1,36 @@
+name: SCD ONE ONE-01 Verification
+
+on:
+  push:
+    branches:
+      - "copilot/ai-scd-one-again"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  one-01-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+      - name: Install dependencies
+        run: npm install
+      - name: Canonical manifest
+        run: npm run test:manifest
+      - name: SCD ONE contract
+        run: npm run test:scd-one-contract
+      - name: Runtime syntax
+        run: |
+          node --check server.js
+          node --check scd-ng.js
+          node --check lib/scd-one-pulse.js
+          node --check lib/scd-native-adapters.js
+          node --check scripts/validate-scd-one-contract.mjs
+      - name: Full regression contract
+        run: npm run check
