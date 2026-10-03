@@ -9,6 +9,7 @@
   <link rel="icon" href="../assets/logo-scd.png">
   <link rel="stylesheet" href="./app.css?v=53.1.0">
   <link rel="stylesheet" href="./scd-design-system.css?v=1.0.0">
+  <link rel="stylesheet" href="./grow-pipeline.css?v=1.0.0">
 </head>
 <body>
 <a class="skip-link" href="#mainContent">Salta al contenuto principale</a>
@@ -362,6 +363,28 @@
 
     <section class="view" id="view-crm">
       <div class="page-head"><div><small>CRM RELAZIONALE SCD</small><h1>Persone, aziende e relazioni</h1><p>Un profilo unico per ogni soggetto, con timeline, touchpoint, opportunità, attività e prossima azione. I dati arrivano dai master canonici.</p></div><button class="btn-yellow" id="crmRefresh">Aggiorna CRM</button></div>
+      <section class="grow-pipeline" id="growPipeline" aria-labelledby="growPipelineTitle">
+        <header class="grow-pipeline-head">
+          <div>
+            <small>SCD GROW · PIPELINE VERIFICATA</small>
+            <h2 id="growPipelineTitle">Relazione → prossima azione</h2>
+            <p>La fase deriva solo dallo stato CRM registrato. Prospect, proposta, accordo e sponsor restano stati distinti finché una fonte canonica non li documenta.</p>
+          </div>
+          <span class="grow-source-state" id="growSourceState" data-state="UNVERIFIED">CRM · DA VERIFICARE</span>
+        </header>
+        <div class="grow-stage-track" id="growStageTrack" aria-label="Ciclo di sviluppo commerciale"></div>
+        <div class="grow-pipeline-body">
+          <section class="grow-next-actions">
+            <header class="grow-panel-head"><div><small>AZIONE OPERATIVA</small><h3>Prossime azioni</h3></div><small id="growQueueMeta">Fonte in verifica</small></header>
+            <div class="grow-action-list" id="growActionList"></div>
+          </section>
+          <aside class="grow-verification-panel">
+            <header class="grow-panel-head"><div><small>DATA QUALITY</small><h3>Da verificare</h3></div></header>
+            <div class="grow-verification-list" id="growVerificationList"></div>
+            <div class="grow-rule"><b>Regola:</b> prospect ≠ sponsor · proposta ≠ contratto · ricerca ≠ fatto.</div>
+          </aside>
+        </div>
+      </section>
       <div class="report-grid" id="crmKpis"></div>
       <div class="page-tools">
         <input class="filter-input" id="crmSearch" placeholder="Cerca persona, azienda, categoria, tag, località…">
@@ -687,6 +710,7 @@
   </div>
 </div>
 
+<script src="./grow-pipeline.js?v=1.0.0"></script>
 <script src="./app.js?v=53.1.0"></script>
 </body>
 </html>
