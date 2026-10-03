@@ -24,17 +24,7 @@
         "intake/"
       ],
       "currentRuntime": "scd-colicoderviese-official-r21",
-      "audience": [
-        "PUBLIC",
-        "FANS",
-        "FAMILIES",
-        "ATHLETES",
-        "STAFF",
-        "TEAMS",
-        "TERRITORY",
-        "PARTNERS"
-      ],
-      "mission": "Mass-scale social and transactional club app for sport, community, services, events, bookings, requests and verified club information.",
+      "mission": "Public, social and transactional club app for sport, community, services, events and verified club information.",
       "modules": [
         "PULSE",
         "SOCIAL",
@@ -79,16 +69,6 @@
         "backend_patch_R21_6_http_api.gs"
       ],
       "currentRuntime": "scd-colicoderviese-official-r21",
-      "audience": [
-        "DIRECTION",
-        "SECRETARIAT",
-        "REGISTRATION",
-        "TOURNAMENTS",
-        "MANAGERS",
-        "COACHES",
-        "STAFF",
-        "AUTHORIZED_FAMILY_WORKFLOWS"
-      ],
       "mission": "Complete internal operating system for association management and scalable club operations.",
       "modules": [
         "PRIVATE_DESK",
@@ -136,13 +116,11 @@
       "aiBranch": "ai-scd-grow",
       "sourceBranch": "ai-scd-sponsor-platform",
       "codeRoots": [
-        "sponsor/",
-        "config/sponsor-development.snapshot.json",
-        "config/sponsor-motion-profiles.json"
+        "sponsor/"
       ],
       "currentRuntime": "scd-sponsor-platform",
       "backendDependency": "scd-colicoderviese-official-r21",
-      "mission": "Continuous partner and sponsor development engine with futuristic CRM, research radar, proposals, activations, proof and renewal loops.",
+      "mission": "Continuous partner and sponsor development engine with CRM, research radar, proposals, activations, proof and renewal loops.",
       "modules": [
         "PUBLIC_PARTNER_EXPERIENCE",
         "PARTNER_HUB",
@@ -191,7 +169,7 @@
       ],
       "currentRuntime": "cepa-maglia-os",
       "previewRuntime": "maglia360-office-v2-preview",
-      "mission": "Innovative CEPA consulting interface plus Maglia 360 agency operating system and super CRM, learning from agency history, partnerships and network to build continuous future development.",
+      "mission": "CEPA consulting interface plus Maglia 360 agency operating system and CRM, using verified agency history and relationships to support future development.",
       "modules": [
         "CEPA_PUBLIC",
         "CONSULTING_JOURNEY",
@@ -225,20 +203,9 @@
   "sharedTechnicalEngines": [
     {
       "id": "SCD_COMMAND_R22",
-      "role": "SHARED_TECHNICAL_ORCHESTRATION_ENGINE_NOT_COUNTED_AS_END_USER_APP",
+      "role": "SHARED_TECHNICAL_ORCHESTRATION_ENGINE_NOT_COUNTED_AS_CANONICAL_APP",
       "branch": "ai-scd-command-r22",
-      "runtime": "scd-colicoderviese-command-r22",
-      "modules": [
-        "COMMAND_API",
-        "PLUGIN_REGISTRY",
-        "JOBS",
-        "IDEMPOTENCY",
-        "EVENT_AUDIT",
-        "R20_BRIDGE",
-        "QUEUE_WORKER",
-        "ROLLBACK",
-        "SAFE_AI_COMMANDS"
-      ]
+      "runtime": "scd-colicoderviese-command-r22"
     },
     {
       "id": "SCD_PULSE",
@@ -250,44 +217,12 @@
       "role": "CURRENT_IDENTITY_ROLE_SCOPE_AUTHORITY_UNTIL_VERIFIED_MIGRATION"
     }
   ],
-  "supersededStandaloneWorkstreams": [
-    {
-      "id": "SCD_UNIVERSE_AS_ALL_IN_ONE",
-      "reason": "Public/social high-scale experience is now SCD ONE; internal operations are explicitly separated into SCD CORE."
-    },
-    {
-      "id": "SCD_SPONSOR_PLATFORM_NAME",
-      "reason": "Renamed and expanded to SCD GROW."
-    },
-    {
-      "id": "SCD_COMMAND_R22_AS_APP_3",
-      "reason": "R22 remains active shared technical infrastructure, not one of the four end-user/business web apps."
-    },
-    {
-      "id": "MAGLIA_360_CEPA_NAME",
-      "reason": "Renamed to C.E.P.A. 360 by Maglia Assicurazioni."
-    },
-    {
-      "id": "ai-scd-commercial-lia",
-      "reason": "Absorbed into SCD GROW and shared command orchestration."
-    },
-    {
-      "id": "ai-cepa-maglia-os",
-      "reason": "Absorbed into C.E.P.A. 360."
-    },
-    {
-      "id": "ai-maglia360-office",
-      "reason": "Absorbed into C.E.P.A. 360."
-    }
-  ],
   "portfolioRules": [
     "EXACTLY_4_CANONICAL_WEB_APPS",
     "EXACTLY_3_SCD_AND_1_MAGLIA",
     "COMMAND_R22_IS_SHARED_ENGINE_NOT_CANONICAL_APP",
     "NO_NEW_APP_WITHOUT_DIRECTION_APPROVAL",
     "MODULES_STAY_INSIDE_ASSIGNED_APP",
-    "SHARED_IDENTITY_DATA_PROVENANCE_WHERE_APPLICABLE",
-    "REUSE_EXISTING_CODE_DATA_AUTH_AND_RUNTIMES_BEFORE_CREATING_NEW_SYSTEMS",
     "ALL_APPS_USE_MULTIFUNCTIONAL_WEB_DEVELOPER_COMMAND",
     "NO_PRODUCTION_MUTATION_WITHOUT_EXPLICIT_AUTHORIZATION"
   ]
