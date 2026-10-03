@@ -6,7 +6,7 @@
 
 ## Executive summary
 
-The Sponsor Platform is a module within the single SCD Universe / SCD Digital Club Operating System, not a separate SCD application. Its public partnership experience and authenticated private Partner OS are distinct surfaces of that same product. It reuses R20/Apps Script for identity and operational reads, connects CRM records to stakeholder IDs, and has a live-master-first development pipeline with a timestamped snapshot fallback. These are worth preserving.
+Sponsor Platform (`APP_ID: SCD_SPONSOR_PLATFORM`) is a distinct public/private companion web app and one of the three canonical SCD applications in the four-app portfolio. It complements SCD Universe; it is neither a replacement for Universe nor a standalone fifth Commercial/Lia app. Its public partnership experience and authenticated private Partner OS remain distinct worlds within this companion app. It reuses canonical SCD identity, data, provenance and security contracts, including R20/Apps Script for identity and operational reads, and connects CRM records to stakeholder IDs. Its development pipeline is live-master-first with a timestamped snapshot fallback. These are worth preserving.
 
 The most urgent issue is data handling: the GitHub repository is public, while tracked client-side and snapshot files include sponsor/prospect/supplier records and commercial/contact fields. The private route guard protects the running web app, but it cannot protect records committed to a public repository. The UI also declares a `finance:false` capability for the Commercial profile without applying that capability to the finance-bearing client bundle or to route-level authorization in this service.
 
@@ -18,33 +18,33 @@ The project should not be rewritten or given a second CRM/database. First contai
 |---|---|---|
 | `REPOSITORY` | `VERIFIED` | `francesco1485/scd-colicoderviese-super-app` |
 | `CURRENT_MAIN_SHA` | `VERIFIED` | `d16a658786b7577af498a3104dc31ebdd17f7613` |
-| `CURRENT_WORKING_BRANCH` | `VERIFIED` | `copilot/ai-scd-sponsor-platform`; the requested `ai-scd-sponsor-platform` also exists remotely, but is not the checked-out branch |
-| `WORKING_TREE` | `VERIFIED` | Clean before the audit document was created |
-| `OPEN_PR` | `VERIFIED` | No PR found for the current or requested AI branch. Historical sponsor PR #55 remains open on `r45-sponsor-operations-radar` |
-| `PR_STATUS` | `VERIFIED` | No PR for this audit at inspection time; #55 reports `mergeable_state: dirty` and is unrelated to this change |
-| `CI_STATUS` | `UNVERIFIED` | Local `npm run check` passed. GitHub had only the Copilot agent run in progress; no PR checks existed for this branch |
+| `CURRENT_WORKING_BRANCH` | `VERIFIED` | `copilot/ai-scd-sponsor-platform`; the requested `ai-scd-sponsor-platform` manifest/config refs were read remotely and are not the checked-out branch |
+| `WORKING_TREE` | `VERIFIED` | Clean before this documentation update |
+| `OPEN_PR` | `VERIFIED` | PR #93 is open for this audit branch; historical sponsor PR #55 remains open on `r45-sponsor-operations-radar` |
+| `PR_STATUS` | `VERIFIED` | PR #93 is open/draft against main `d16a658`; no merge requested or performed |
+| `CI_STATUS` | `VERIFIED` | GitHub showed PR #93's Copilot check `IN_PROGRESS` at 2026-10-03 10:17 UTC; no completed result was available |
 | `PAGES_STATUS` | `UNVERIFIED` | GitHub reports Pages enabled, but the public URL could not be resolved from this environment |
 | `RENDER_STATUS` | `UNVERIFIED` | `APP_AI_MANIFEST.md` declares `scd-sponsor-platform` on Render `main`; the health URL could not be resolved here. The checked-in root `render.yaml` defines only `scd-colicoderviese-super-app` |
 | `MANIFEST_VERSION_OR_HASH` | `VERIFIED` | `SCD_SYSTEM_MANIFEST.json` v3.26.0; SHA-256 `46518c9e5aa258fd5bbc1e80ecf0d1fa7c65b12c6e32a7d721dc4b5ed3205baf` |
-| `RELEASE_DEPENDENCIES` | `NOT_APPLICABLE` | Documentation-only audit; no release or deployment requested |
+| `RELEASE_DEPENDENCIES` | `VERIFIED` | Task manifest declares protected runtime dependency `scd-colicoderviese-official-r21`; live dependency health is unverified. This documentation-only change makes no release/deployment request |
 | `DATA_SOURCES_VERIFIED` | `UNVERIFIED` | Source contracts are present in the manifest and code, but live Google Sheets, Drive, Gmail, Calendar, and R20 contents/access were not queried |
 | `KNOWN_BLOCKERS` | `VERIFIED` | Public-repository data exposure needs data-owner review; actual Render/Pages state and live upstream role enforcement are unavailable; checked-out branch differs from the named AI branch |
-| `SAFE_NEXT_ACTION` | `VERIFIED` | Review this report in a PR. Do not deploy, merge, change production data/roles, or rewrite repository history |
+| `SAFE_NEXT_ACTION` | `VERIFIED` | Review the corrected portfolio scope and audit in PR #93. Do not deploy, merge, change production data/roles, or rewrite repository history |
 
 ### Inputs and AI instructions
 
 - Read `SCD_SYSTEM_MANIFEST.json` v3.26.0 and `AGENTS.md` from the checked-out main snapshot.
-- Read the task-branch `APP_AI_MANIFEST.md` from remote branch `ai-scd-sponsor-platform` (blob `df516dd55a30a56443ce354e207f9e94a3c8d8b3`).
+- Read the updated task-branch `APP_AI_MANIFEST.md` from remote branch `ai-scd-sponsor-platform` (blob `711f116f0b994db154d2f9740b229820cce56579`), `config/ai-portfolio.v1.json` (blob `7c96798fcc257a8a59f2494636109d65378c751f`), and `docs/AI_CONTINUOUS_EXECUTION_PROTOCOL.md` (blob `c91805e1d5dbbef6b52321db4c3cda0d8f8413fb`).
 - The checked-out snapshot does not contain `.github/copilot-instructions.md` or `APP_AI_MANIFEST.md`. Reviewed the repository instructions and frontend/security/Supabase path instructions from the open control-plane PR #82; these files are not part of the checked-out main snapshot. `.github/agents/` was not inspected.
-- The task manifest identifies `sponsor/` as primary code and `scd-sponsor-platform` as the live Render service. Its explicit hard rules are that Sponsor is an SCD module, not a second SCD application; canonical person/project/event/document/source models are reused; sponsor names, amounts, deadlines, contracts and commitments are not invented; public presentation remains separate from private commercial operations; and the AI branch is not deployed.
+- The updated task manifest identifies `APP_ID: SCD_SPONSOR_PLATFORM`, `sponsor/` as primary code, `scd-sponsor-platform` as the public runtime, and `scd-colicoderviese-official-r21` as a protected runtime dependency. It classifies Sponsor as one of the three canonical SCD applications and a distinct companion web app—not a replacement for SCD Universe, a second identity/calendar system, or a fifth Commercial/Lia app. It requires reuse of canonical models and contracts, no invented sponsor facts, explicit public/private boundaries, and no merge, deploy or production mutation from the AI branch.
 
 ## SCD:EXPERT + SCD:ARCHITECT
 
 - `TASK_CLASS`: repository/runtime audit and consolidation plan; documentation-only change.
 - `DOMAINS`: commercial operations, source lineage, CRM, identity/authorization, privacy, public/private UX, media/documents, hosting and QA.
 - `ARCHITECT_STATUS`: applied to audit and recommendations; no implementation, visual redesign, schema change, or deploy in scope.
-- `FIXED`: R20 remains authoritative for identity, roles and existing operations; canonical Sheets/Drive/Gmail remain source authorities by domain; no duplicate CRM/database; no invented sponsor facts; production mutations require human approval.
-- `IMPROVABLE`: eliminate embedded duplicate records; enforce each capability on the server; make document/media links source-backed; specify the public/private hosting contract and validate it.
+- `FIXED`: R20 remains authoritative for identity, roles and existing operations; canonical Sheets/Drive/Gmail remain source authorities by domain; no duplicate CRM/database; no invented sponsor facts; production mutations require human approval. Sponsor is the distinct `SCD_SPONSOR_PLATFORM` companion app in the canonical four-app portfolio, not a fifth Commercial/Lia app.
+- `IMPROVABLE`: eliminate embedded duplicate records; enforce each capability on the server; make document/media links source-backed; specify the public/private hosting contract and validate it; recover useful Commercial/Lia capabilities into the Sponsor scope where verified and appropriate.
 - `MISSING`: verified production service configuration/health, live source comparison, role-by-role R20 evidence, data-retention/visibility decision, visual-browser QA, and canonical Drive document-link implementation.
 - `SOURCE_PLAN`: use the manifest’s `SPONSOR_MASTER_SHEET`, `SCD_OPERATIVO_PILOTA`, `R20`, `SCD_DRIVE`, `SCD_GMAIL`, and `SCD_GOOGLE_CALENDAR` only; use the R57 visual master and its canonical visual-system/gate files for presentation; do not add a source.
 - `TOOLCHAIN`: existing root Node scripts; `npm run check`; static review of the current code and GitHub branch/PR metadata. No new dependencies or test tooling.
@@ -77,11 +77,19 @@ Relevant manifest capability declarations include `CAP-SPONSOR-OPERATIONAL-FOCUS
 - The private development view is stronger: it labels `LIVE_MASTER` versus `SNAPSHOT_VERIFIED`, renders `generatedAt`, fails closed if the expected snapshot contract is invalid, and does not substitute a snapshot when its source provenance is wrong.
 - No live source was queried for this audit. “Verified” describes repository declarations and code paths, not the present truth of individual commercial records.
 
+### Portfolio boundary and Sponsor capability scope
+
+- `config/ai-portfolio.v1.json` on `ai-scd-sponsor-platform` declares exactly four canonical apps: three owned by SCD ColicoDerviese and one by Maglia Assicurazioni. `SCD_SPONSOR_PLATFORM` is one of the three SCD apps, with `sponsor/` as its code root, `scd-sponsor-platform` as its canonical runtime and `scd-colicoderviese-official-r21` as a protected runtime dependency.
+- Sponsor is a distinct companion public/private web app in the SCD portfolio, not an internal module of the SCD Universe app and not a replacement for it. The product portfolio is unified; each canonical app retains its assigned boundaries and runtime.
+- The task manifest assigns public partnership/territory/sport/events/opportunities, LEDWall/Sponsor Wall, convenzioni/community benefits, solidarity fund and partner entry/contact to the public world. It assigns Partner Hub, CRM/stakeholders, commercial pipeline, Sponsor Operations, Lia Sponsor, initiatives/projects, supplier/sponsor radar, assets/media and proof/reporting to the private world.
+- These are the app’s defined ownership boundaries, not a claim that every surface is complete, production-verified or currently wired to live sources. The audit findings and P0–P5 plan below identify observed gaps; no feature implementation or runtime change is included.
+- Useful Commercial/Lia work belongs in Sponsor when it fits these boundaries. Recover and integrate it only after source/contract review; do not create a fifth app, parallel CRM, identity service or data store.
+
 ## KEEP / ENHANCE / FIX / INTEGRATE / COMPLETE / REMOVE_WITH_REASON
 
 | Classification | Area | Audit result and evidence |
 |---|---|---|
-| `KEEP` | Single SCD product and public/private boundary | Sponsor Platform remains one module of the SCD Universe, not a second app. Preserve separate public partnership presentation and private commercial operations within this product. Public layout has responsive breakpoints, skip link, visible keyboard focus, reduced-motion handling and labeled forms |
+| `KEEP` | Canonical app portfolio and public/private boundary | Sponsor Platform is its own companion app (`SCD_SPONSOR_PLATFORM`) within the three-app SCD portfolio; it complements, and does not replace or merge into, SCD Universe. Preserve separate public partnership presentation and protected private commercial operations within Sponsor. Public layout has responsive breakpoints, skip link, visible keyboard focus, reduced-motion handling and labeled forms |
 | `KEEP` | R20 session and route guard | `server.js` validates session before serving private HTML/JS and before CRM, agenda, communication and development handlers; private responses use `no-store` in the reviewed handlers |
 | `KEEP` | Canonical CRM/project bridge | CRM details and operational focus are linked to canonical CRM/stakeholder/project and Calendar endpoints. Preserve existing IDs and master authority |
 | `ENHANCE` | Role and scope authorization | `sponsorCapabilities()` distinguishes Direction and Commercial (including `finance:false` for Commercial), but `applySponsorCapabilities()` only gates Settings in the client. The manifest identity-role list has no dedicated sponsor/commercial role; the service derives a profile from the R20 user’s role/type. Route handlers generally check broad sponsor eligibility and pass the session upstream; no local per-capability enforcement or role matrix is demonstrated. Upstream may add checks, but that was not verifiable. Reconcile the mapping with Direction and the existing R20 roles; do not add a role without the required manifest change and approval. |
@@ -90,6 +98,7 @@ Relevant manifest capability declarations include `CAP-SPONSOR-OPERATIONAL-FOCUS
 | `FIX` | Capability boundary for financial data | Direction/Commercial capabilities are calculated server-side (`server.js:134-158`), but private JS is returned to any broadly sponsor-authorized session (`server.js:160-166`, `475-486`), and client gating currently covers only Settings (`sponsor/app.js:66-80`). Finance-bearing data is embedded in that client file. Enforce role/scope on server responses and minimize the bundle; verify actual commercial versus Direction access before further production use. |
 | `FIX` | Public demo copy | A public interactive preview presents a named sample organization and completion/material/request KPIs without a clear simulation label (`sponsor/sponsor.js:6-14`). Remove or visibly label non-factual examples; public sponsor status and metrics must be verified. |
 | `INTEGRATE` | Stakeholder and project linkage | Keep R20/SCD Operativo IDs as the joining mechanism and reuse canonical person/project/event/document/source models. Define a single field map for sponsor, prospect, supplier, agreement, follow-up and initiative state; avoid name-based matching as canonical identity |
+| `INTEGRATE` | Commercial/Lia workstream | Sponsor scope includes Lia Sponsor and relevant commercial pipeline capabilities. Recover useful work from `r42-commercial-development-os` or `ai-scd-commercial-lia` into this app only after reviewing its code/contracts; do not split Lia/Commercial into a fifth app. No source branch contents were inspected as part of this audit, so no feature parity or recovery is claimed |
 | `COMPLETE` | Document Hub | The UI currently maps fixed folder names to placeholder copy (`sponsor/app.js:291`, `855-856`; `sponsor/app.html:430-433`); the inspected sponsor routes have no Drive file-list/detail endpoint. Add no new storage: use authorized Drive IDs, lineage, version/hash and link permissions |
 | `COMPLETE` | Media delivery/proof | Motion profiles are useful planning records with approval gates, but a concept/proof plan is not a verified delivery artifact. Link official approved assets and actual proof documents from Drive; maintain the asset registry’s exact-wordmark/provenance rules |
 | `FIX` | Service and documentation contract | `sponsor/README.md` calls this a separate free app with external writes disabled, which no longer matches the current API-backed SCD module. The task manifest declares a separate Render service, while root `render.yaml` only describes the main web service. Update the service/ownership/runbook contract only after the actual Render configuration is verified |
@@ -129,11 +138,11 @@ Public sponsor lead, access-request and OTP routes accept JSON with a generic bo
 
 ### VISUAL_CLASSIFICATION
 
-- `sponsor/index.html` and the legacy public sponsor presentation: `REBUILD_IMPROVE`. Preserve its public partnership purpose, verified content, canonical IDs, endpoints, source provenance, accessibility and public/private separation; improve composition and interaction to the R57 SCD Universe experience rather than retaining a generic brochure treatment.
+- `sponsor/index.html` and the legacy public sponsor presentation: `REBUILD_IMPROVE`. Preserve its public partnership purpose, verified content, canonical IDs, endpoints, source provenance, accessibility and public/private separation; improve composition and interaction using the R57 SCD visual system rather than retaining a generic brochure treatment.
 - `sponsor/app.html` / `sponsor/app.js` Partner OS presentation: `REBUILD_IMPROVE`. Preserve its private operational purpose, R20 authorization, CRM/project links and real service states; evolve hierarchy toward action/context, not a generic admin dashboard. This classification does not authorize a rewrite or any runtime change in this audit.
-- Canonical person, project, event, document and source models, IDs, R20 security and data provenance: `KEEP_LOCKED`. Do not create a standalone Sponsor app or parallel CRM, and do not replace real data with examples or inferred values.
+- Canonical person, project, event, document and source models, IDs, R20 security and data provenance: `KEEP_LOCKED`. Preserve this companion app’s assigned boundary; do not create another Sponsor/Commercial application, a parallel CRM, or replace real data with examples or inferred values.
 - Official SCD/sponsor marks and verified logos: `KEEP_LOCKED`; where an official source asset is missing or unverified, `RESEARCH_REAL_ASSET`. Never redraw or invent sponsor identity.
-- Use `config/scd-visual-system.json` as the sole palette source (mineral/navy, lake/aqua, muted gold, warm white and low-saturation accents); do not infer a new palette from legacy CSS overrides. Keep public presentation distinct from private commercial operations within the single SCD Universe.
+- Use `config/scd-visual-system.json` as the sole palette source (mineral/navy, lake/aqua, muted gold, warm white and low-saturation accents); do not infer a new palette from legacy CSS overrides. Keep the Sponsor companion app’s public presentation distinct from its private commercial operations, while retaining its clear identity as part of the SCD portfolio.
 - No Smart Facility/device surface was changed. Any future facility tile must use only verified explicit states (`CONNECTED`, `READY_FOR_ADAPTER`, `NOT_CONNECTED`, `UNVERIFIED`, `MANUAL_CHECK_REQUIRED`); never imply a live sensor, lock, alarm or service without a real adapter.
 
 ### VISUAL_QA
@@ -177,7 +186,7 @@ The existing tests are valuable contract/smoke coverage but do not prove live Ap
 
 ### P2 — Canonical commercial model
 
-1. Map `SPONSOR_MASTER_SHEET`, `SCD_OPERATIVO_PILOTA`, and R20 CRM IDs by domain: company/stakeholder, sponsor agreement, prospect, supplier, opportunity, follow-up, project and source lineage. Reuse the current SCD Universe models; do not create a parallel CRM or standalone sponsor application.
+1. Map `SPONSOR_MASTER_SHEET`, `SCD_OPERATIVO_PILOTA`, and R20 CRM IDs by domain: company/stakeholder, sponsor agreement, prospect, supplier, opportunity, follow-up, project and source lineage. Reuse canonical SCD models; keep this work in the assigned Sponsor companion app and do not create a parallel CRM or fifth Commercial/Lia application.
 2. Make the canonical master/API the single source for all portfolio, contract, proposal, supplier and reporting views. Remove duplicate client arrays only after reconciliation and parity tests.
 3. Preserve canonical status distinctions (prospect vs confirmed sponsor; supplier vs sponsor; concept vs approved; quote received vs reconciled). Unknown amount/date/commitment remains unavailable, not inferred.
 4. Keep operational focus derived from verified project status and the single Calendar event model; any create action remains human-confirmed.
