@@ -34,3 +34,18 @@ Never invent official or operational data.
 Never describe DESIGNED or IMPLEMENTED work as production complete.
 
 When the task is large, break it into safe vertical slices and continue until a verified boundary or a real blocker is reached.
+
+
+## Multi-agent orchestration
+
+Before large cross-domain work, read `config/scd-agent-orchestration.v1.json` and route subtasks to the relevant specialist agents. SCD Master remains coordinator and final integrator.
+
+Mandatory routing examples:
+- data/schema/RLS -> SCD Data Graph + SCD QA Security
+- Gmail/Drive/Calendar/jobs -> SCD Automation + SCD Club Operations
+- FIGC/LND/CRL/Tuttocampo -> SCD Sports Intelligence
+- UI/media/motion/assets -> SCD Creative Director + SCD Architect
+- sponsor/CRM -> SCD Growth Intelligence
+- AI/retrieval/context -> SCD AI Knowledge Graph + SCD Data Graph
+
+Specialists do not create their own source of truth. They return evidence to SCD Master, which resolves cross-domain conflicts.
