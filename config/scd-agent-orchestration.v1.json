@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "SCD_AGENT_ORCHESTRATION",
+  "authority": "SCD_MASTER",
+  "operatingModel": "HIERARCHICAL_MULTI_AGENT_SHARED_SOURCE_OF_TRUTH",
+  "coordinator": "SCD Master",
+  "sharedRules": [
+    "SCD_STATE_BEFORE_WRITE",
+    "NO_DUPLICATE_DB_AUTH_CALENDAR_CRM",
+    "FACT_INFERENCE_PROPOSAL_SEPARATION",
+    "SERVER_SIDE_AUTHORIZATION",
+    "PROVENANCE_REQUIRED",
+    "SAFEGUARDING_ISOLATED",
+    "NO_FAKE_OPERATIONAL_DATA",
+    "PRODUCTION_MUTATION_REQUIRES_HUMAN_AUTHORIZATION"
+  ],
+  "agents": [
+    {"id":"SCD_MASTER","file":".github/agents/scd-master.agent.md","role":"orchestration"},
+    {"id":"SCD_ARCHITECT","file":".github/agents/scd-architect.agent.md","role":"full_stack_architecture"},
+    {"id":"SCD_DATA_GRAPH","file":".github/agents/scd-data-graph.agent.md","role":"data_graph_rls"},
+    {"id":"SCD_AUTOMATION","file":".github/agents/scd-automation.agent.md","role":"automation_integrations"},
+    {"id":"SCD_CREATIVE","file":".github/agents/scd-creative-director.agent.md","role":"ux_ui_motion_assets"},
+    {"id":"SCD_SPORTS_INTELLIGENCE","file":".github/agents/scd-sports-intelligence.agent.md","role":"official_sports_sources"},
+    {"id":"SCD_CLUB_OPERATIONS","file":".github/agents/scd-club-operations.agent.md","role":"association_operations"},
+    {"id":"SCD_GROWTH_INTELLIGENCE","file":".github/agents/scd-growth-intelligence.agent.md","role":"crm_sponsor_growth"},
+    {"id":"SCD_AI_KNOWLEDGE_GRAPH","file":".github/agents/scd-ai-knowledge-graph.agent.md","role":"ai_retrieval_agents"},
+    {"id":"SCD_QA_SECURITY","file":".github/agents/scd-qa-security.agent.md","role":"quality_security"},
+    {"id":"SCD_RELEASE","file":".github/agents/scd-release.agent.md","role":"release_gate"}
+  ],
+  "routing": {
+    "database": ["SCD_DATA_GRAPH","SCD_QA_SECURITY"],
+    "gmail_drive_calendar": ["SCD_AUTOMATION","SCD_CLUB_OPERATIONS","SCD_QA_SECURITY"],
+    "figc_lnd_tuttocampo": ["SCD_SPORTS_INTELLIGENCE","SCD_DATA_GRAPH"],
+    "ui_media": ["SCD_CREATIVE","SCD_ARCHITECT","SCD_QA_SECURITY"],
+    "sponsor_crm": ["SCD_GROWTH_INTELLIGENCE","SCD_DATA_GRAPH","SCD_AUTOMATION"],
+    "ai": ["SCD_AI_KNOWLEDGE_GRAPH","SCD_DATA_GRAPH","SCD_QA_SECURITY"]
+  }
+}
