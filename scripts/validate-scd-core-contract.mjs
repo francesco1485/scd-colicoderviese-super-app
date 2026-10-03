@@ -28,6 +28,8 @@ ok(js.includes("if(['CRM','CONTRATTI','REPORT'].includes(module))"),'commercial 
 ok(!js.includes("if(['CRM','CONTRATTI','REPORT','APPROVAZIONI'].includes(module))"),'approvals must not be routed to Sponsor Platform');
 ok(css.includes('@media(max-width:700px)'),'mobile Control Room composition missing');
 ok(css.includes('prefers-reduced-motion:reduce'),'reduced-motion support missing');
+ok(css.includes('.core-item-link'),'mail source link style missing');
+ok(js.includes('Apri fonte Gmail'),'mail action source link missing');
 
 await import('../lib/scd-core-control-room.js');
 ok(globalThis.ScdCoreControlRoom?.build,'Control Room engine is not executable');
