@@ -1,0 +1,323 @@
+{
+  "version": "1.0",
+  "updated_at": "2026-10-03",
+  "purpose": "Canonical external source and utility registry for the four active AI projects. Store URLs and usage policy only; never credentials, session tokens, personal data, or payment data.",
+  "project_scopes": {
+    "P01_SCD_SUPER_APP": "SCD Super App / Operations",
+    "P02_SCD_SPONSOR_COMMERCIALE": "SCD Sponsor / Commercial",
+    "P03_CEPA_MAGLIA_OS": "CEPA Maglia OS",
+    "P04_MAGLIA360_OFFICE": "Maglia360 Office",
+    "COMMON": "Cross-project research and utility"
+  },
+  "policy": {
+    "public_sources": "May be used by Copilot for research/benchmarking, subject to source verification before production use.",
+    "official_sources": "Prefer over secondary sources for regulatory, fiscal, federation, registry and product facts.",
+    "private_portals": "Metadata/link only by default. Manual or separately authorized authenticated use. Never store credentials in repository, prompts or logs.",
+    "sensitive_sources": "No personal, health, payment or credential data in ordinary AI pipelines.",
+    "unverified_sources": "No automation or factual reliance until manually or programmatically verified."
+  },
+  "sources": [
+    {
+      "id": "SRC-0001",
+      "title": "AGLEA Salus",
+      "url": "https://www.agleasalus.org/",
+      "scope": [
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE"
+      ],
+      "category": "ASSICURAZIONE_SALUTE_WELFARE",
+      "access": "PUBLIC",
+      "use": "RESEARCH_AND_CONTENT_REFERENCE"
+    },
+    {
+      "id": "SRC-0002",
+      "title": "Tuttitalia - Comuni provincia di Lecco",
+      "url": "https://www.tuttitalia.it/lombardia/provincia-di-lecco/18-comuni/",
+      "scope": [
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE",
+        "COMMON"
+      ],
+      "category": "TERRITORIO_DEMOGRAFIA",
+      "access": "PUBLIC",
+      "use": "TERRITORY_RESEARCH"
+    },
+    {
+      "id": "SRC-0003",
+      "title": "Facile.it Collaboratori CBR",
+      "url": "https://collaboratori.facile.it/cbr/login",
+      "scope": [
+        "P04_MAGLIA360_OFFICE"
+      ],
+      "category": "CREDITO_COMMERCIALE",
+      "access": "PRIVATE_LOGIN",
+      "use": "MANUAL_LOGIN_ONLY"
+    },
+    {
+      "id": "SRC-0004",
+      "title": "Segretario Calcio",
+      "url": "https://segretariocalcio.altervista.org/",
+      "scope": [
+        "P01_SCD_SUPER_APP"
+      ],
+      "category": "SEGRETERIA_CALCIO",
+      "access": "PUBLIC",
+      "use": "RESEARCH_REFERENCE",
+      "note": "Secondary reference; verify rules and procedures against FIGC/LND."
+    },
+    {
+      "id": "SRC-0005",
+      "title": "ReportAziende",
+      "url": "https://www.reportaziende.it/",
+      "scope": [
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE"
+      ],
+      "category": "AZIENDE_PROSPECT",
+      "access": "PUBLIC_OR_ACCOUNT",
+      "use": "PROSPECT_RESEARCH"
+    },
+    {
+      "id": "SRC-0006",
+      "title": "ANPR - Anagrafe Nazionale",
+      "url": "https://www.anagrafenazionale.interno.it/",
+      "scope": [
+        "P04_MAGLIA360_OFFICE",
+        "COMMON"
+      ],
+      "category": "SERVIZI_ANAGRAFICI",
+      "access": "PUBLIC_OR_AUTHENTICATED",
+      "use": "PUBLIC_INFO_ONLY",
+      "sensitive": true
+    },
+    {
+      "id": "SRC-0007",
+      "title": "Internxt Temporary Email",
+      "url": "https://internxt.com/it/temporary-email",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "DEV_TEST",
+      "access": "PUBLIC",
+      "use": "TEST_ONLY",
+      "note": "Never use for official or real-data accounts."
+    },
+    {
+      "id": "SRC-0008",
+      "title": "Stipendee",
+      "url": "https://www.stipendee.it/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P04_MAGLIA360_OFFICE",
+        "COMMON"
+      ],
+      "category": "LAVORO_COMPENSI",
+      "access": "PUBLIC",
+      "use": "RESEARCH_REFERENCE"
+    },
+    {
+      "id": "SRC-0009",
+      "title": "Agenzia Entrate - Verifica Partita IVA",
+      "url": "https://telematici.agenziaentrate.gov.it/VerificaPIVA/VerificaPiva.do",
+      "scope": [
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE",
+        "COMMON"
+      ],
+      "category": "VERIFICA_FISCALE",
+      "access": "PUBLIC",
+      "use": "VERIFY_PIVA",
+      "authority": "OFFICIAL"
+    },
+    {
+      "id": "SRC-0010",
+      "title": "AssiEasy - Maglia",
+      "url": "https://maglia.assieasy.com/assieasy/",
+      "scope": [
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE"
+      ],
+      "category": "ASSICURAZIONI_OPERATIVO",
+      "access": "PRIVATE_LOGIN",
+      "use": "MANUAL_LOGIN_ONLY"
+    },
+    {
+      "id": "SRC-0011",
+      "title": "Ufficio Camerale",
+      "url": "https://www.ufficiocamerale.it/",
+      "scope": [
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE"
+      ],
+      "category": "AZIENDE_VISURE",
+      "access": "PUBLIC_OR_ACCOUNT",
+      "use": "COMPANY_RESEARCH"
+    },
+    {
+      "id": "SRC-0012",
+      "title": "Italiaonline",
+      "url": "https://www.italiaonline.it/",
+      "scope": [
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "P04_MAGLIA360_OFFICE"
+      ],
+      "category": "MARKETING_PROSPECTING",
+      "access": "PUBLIC",
+      "use": "IDEA_AND_MARKET_RESEARCH"
+    },
+    {
+      "id": "SRC-0013",
+      "title": "Prexta Compact",
+      "url": "https://www.prexta.it/prestiti-personali/prexta-compact",
+      "scope": [
+        "P04_MAGLIA360_OFFICE"
+      ],
+      "category": "CREDITO_PRODOTTI",
+      "access": "PUBLIC",
+      "use": "PRODUCT_RESEARCH"
+    },
+    {
+      "id": "SRC-0014",
+      "title": "IQM - Corso Telemarketing",
+      "url": "https://www.iqmselezione.it/corso-telemarketing-600008.shtml",
+      "scope": [
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "P04_MAGLIA360_OFFICE",
+        "COMMON"
+      ],
+      "category": "FORMAZIONE_COMMERCIALE",
+      "access": "PUBLIC",
+      "use": "TRAINING_IDEAS"
+    },
+    {
+      "id": "SRC-0015",
+      "title": "CR Lombardia",
+      "url": "https://www.crlombardia.it/",
+      "scope": [
+        "P01_SCD_SUPER_APP"
+      ],
+      "category": "FIGC_LND_CRL",
+      "access": "PUBLIC",
+      "use": "PRIORITY_MONITORING",
+      "authority": "OFFICIAL"
+    },
+    {
+      "id": "SRC-0016",
+      "title": "Squby - Funzionalita",
+      "url": "https://www.squby.it/funzionalita/",
+      "scope": [
+        "P01_SCD_SUPER_APP"
+      ],
+      "category": "GESTIONALE_ASSOCIAZIONI",
+      "access": "PUBLIC",
+      "use": "FEATURE_BENCHMARK"
+    },
+    {
+      "id": "SRC-0017",
+      "title": "SLP",
+      "url": "https://www.slpspa.it/",
+      "scope": [
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE"
+      ],
+      "category": "TUTELA_LEGALE",
+      "access": "PUBLIC",
+      "use": "RESEARCH_AND_CONTENT_REFERENCE"
+    },
+    {
+      "id": "SRC-0018",
+      "title": "HDI Assicurazioni",
+      "url": "https://www.hdiassicurazioni.it/",
+      "scope": [
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE"
+      ],
+      "category": "ASSICURAZIONI",
+      "access": "PUBLIC",
+      "use": "PRIORITY_PRODUCT_RESEARCH",
+      "authority": "OFFICIAL_PROVIDER"
+    },
+    {
+      "id": "SRC-0019",
+      "title": "Athletis Cloud",
+      "url": "https://athletis.cloud/login#",
+      "scope": [
+        "P01_SCD_SUPER_APP"
+      ],
+      "category": "SPORT_MANAGEMENT",
+      "access": "PRIVATE_LOGIN",
+      "use": "MANUAL_LOGIN_ONLY"
+    },
+    {
+      "id": "SRC-0020",
+      "title": "InfoCamere Login",
+      "url": "https://login.infocamere.it/eacologin/login.action",
+      "scope": [
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE"
+      ],
+      "category": "REGISTRO_IMPRESE",
+      "access": "PRIVATE_LOGIN",
+      "use": "MANUAL_LOGIN_ONLY"
+    },
+    {
+      "id": "SRC-0021",
+      "title": "Servizio Telematico",
+      "url": "https://www.serviziotelematico.com/",
+      "scope": [
+        "P04_MAGLIA360_OFFICE",
+        "COMMON"
+      ],
+      "category": "SERVIZI_TELEMATICI",
+      "access": "PUBLIC_OR_ACCOUNT",
+      "use": "NO_AUTOMATION_UNTIL_VERIFIED",
+      "status": "TO_VERIFY"
+    },
+    {
+      "id": "SRC-0022",
+      "title": "CPN - Area Utenti",
+      "url": "https://www.cpn.it/areautenti/index.php",
+      "scope": [
+        "P04_MAGLIA360_OFFICE",
+        "COMMON"
+      ],
+      "category": "PORTALE_UTENTI",
+      "access": "PRIVATE_LOGIN",
+      "use": "MANUAL_ONLY_UNTIL_VERIFIED",
+      "status": "TO_VERIFY"
+    },
+    {
+      "id": "SRC-0023",
+      "title": "Preventivass",
+      "url": "https://www.preventivass.it/dati-principali",
+      "scope": [
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE"
+      ],
+      "category": "ASSICURAZIONI_RC_AUTO",
+      "access": "PUBLIC",
+      "use": "PRODUCT_COMPARISON_REFERENCE",
+      "authority": "OFFICIAL_PUBLIC_TOOL"
+    },
+    {
+      "id": "SRC-0024",
+      "title": "SumUp Italia",
+      "url": "https://www.sumup.com/it-it/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "COMMON"
+      ],
+      "category": "PAGAMENTI_INCASSI",
+      "access": "PUBLIC_OR_ACCOUNT",
+      "use": "PAYMENT_FLOW_REFERENCE",
+      "sensitive": true
+    }
+  ]
+}
