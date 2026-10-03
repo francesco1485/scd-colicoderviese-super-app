@@ -1,62 +1,57 @@
-# AI APP REGISTRY — CANONICAL NAMES
+# AI APP REGISTRY — NOMI CANONICI
 
-Updated: 2026-10-03  
+Updated: 2026-10-03
 Machine source: `config/ai-portfolio.v1.json`
 
-## The 4 web apps
+## 1 — SCD ONE
+**SCD ONE — ColicoDerviese Social Super App**
+**Tagline:** Tutto il Club. Una sola app.
 
-### 1. SCD ONE
-**Long name:** SCD ONE — ColicoDerviese Social Super App  
-**Tagline:** Tutto il Club. Una sola app.  
-**Role:** the high-scale public/social/transactional application that potentially serves everyone around the Club.
+È la web app pubblica/sociale/transazionale destinata a tifosi, famiglie, atleti, staff, squadre, territorio e pubblico esterno.
+Deve poter sostenere un volume molto alto di utenti e interazioni.
 
-It includes sport, calendar, teams, Matchday, social/community, content, events, requests, registrations, tickets, field requests, cards, services, family/athlete personal experiences and public partner visibility.
+Contiene: Pulse, social/community, SCD Week, calendario, squadre, Matchday, media/newsroom, Twin, famiglie/atleti, iscrizioni, eventi, tornei, richieste campi, biglietti, Card SCD e servizi.
 
-It must be fast, memorable, mobile-first and scalable for very high user volume.
+## 2 — SCD CORE
+**SCD CORE — Association Operating System**
+**Tagline:** Il sistema operativo della società.
 
-### 2. SCD CORE
-**Long name:** SCD CORE — Association Operating System  
-**Tagline:** Il sistema operativo della società.  
-**Role:** complete internal management system for SCD and a model that can grow beyond current association workflows.
+È il gestionale interno completo della ColicoDerviese.
+Contiene: segreteria, tesseramenti, persone, famiglie, atleti, staff, squadre, eventi, Calendar Fusion, Facility Week, Smart Facility, campi, spogliatoi, asset, magazzino, kit, lavanderia, chiavi/accessi, manutenzioni, pulmini, documenti, richieste, comunicazioni, approvazioni, scadenze e reporting.
 
-It includes secretariat, registrations, people/families/athletes/staff, events, calendar fusion, facilities, Smart Facility, spaces, changing rooms, assets, warehouse, kit, laundry, keys/access, maintenance, vehicles, documents, requests, approvals, deadlines, communications and reporting.
+## 3 — SCD GROW
+**SCD GROW — Partner & Sponsor Growth Engine**
+**Tagline:** Trova. Connetti. Sviluppa. Rinnova.
 
-### 3. SCD GROW
-**Long name:** SCD GROW — Partner & Sponsor Growth Engine  
-**Tagline:** Trova. Connetti. Sviluppa. Rinnova.  
-**Role:** continuous sponsor/partner development machine and futuristic CRM.
+È il motore continuo per partner e sponsor.
+Contiene: Partner Hub, CRM, stakeholder graph, radar ricerca, pipeline commerciale, Lia Sponsor, proposte, micrositi partner, LEDWall, Sponsor Wall, convenzioni, Fondo Solidale, progetti, fornitori, asset, proof, reporting, rinnovi e follow-up.
 
-It includes public partner experience, Partner Hub, CRM, stakeholders, research radar, commercial pipeline, Lia Sponsor, proposals, partner microsites, LED/Sponsor Wall, conventions, Solidarity Fund, projects, suppliers, proof, reporting, renewals, follow-up and continuous research.
+Il lavoro Commercial/Lia viene recuperato qui. Non crea una quinta app.
 
-Commercial/Lia work belongs here. It is not a fifth app.
+## 4 — C.E.P.A. 360
+**C.E.P.A. 360 by Maglia Assicurazioni**
+**Tagline:** Dalla storia della consulenza al futuro della protezione.
 
-### 4. C.E.P.A. 360
-**Long name:** C.E.P.A. 360 by Maglia Assicurazioni  
-**Tagline:** Dalla storia della consulenza al futuro della protezione.  
-**Role:** innovative public consulting interface plus the private Maglia 360 agency operating system and super CRM.
+È l'unica web app Maglia del portafoglio.
 
-Public: C.E.P.A., consulting journey, topics, events, Center C.E.P.A., SAP network and territories.
+Mondo pubblico: C.E.P.A., percorso consulenziale, temi, eventi, Centro C.E.P.A., rete SAP e territorio.
+Mondo privato: Maglia 360, clienti, partner/prodotti, collaboratori, documenti/contratti, Lia Workbench, AI Mail/Chat, Radar Rete/IVASS, sviluppo, attività/scadenze, Recovery, relationship graph e history intelligence.
 
-Private: Maglia 360 Control Room, customers, partner/products, collaborators, documents/contracts, Lia Workbench, AI Mail/Chat, Network Radar/IVASS, business development, deadlines, Recovery, history intelligence and relationship graph.
+## Motore tecnico condiviso
 
-The agency's history, partnerships and accumulated knowledge are not an archive to admire. They are structured input for future growth.
+**SCD Command Platform R22** rimane attivo come infrastruttura tecnica condivisa, ma NON è una quinta web app.
+Gestisce command API, plugin, job, idempotenza, audit/eventi, R20 bridge, queue/worker, rollback e comandi AI sicuri.
 
-## Shared technical engine
+## Comandi permanenti
 
-### SCD Command Platform R22
-R22 remains active but is **not counted as a fifth app**.
+Universale:
+`WEBAPP:MASTER`
 
-It is shared technical infrastructure:
-command API, plugin registry, auth bridge, jobs, idempotency, event/audit, queue/worker, rollback and safe AI commands.
-
-## Universal developer rule
-
-Every app reads and executes `WEBAPP:MASTER`.
-
-Shortcuts:
+Scorciatoie:
 - `SCDONE:RUN`
 - `SCDCORE:RUN`
 - `SCDGROW:RUN`
 - `CEPA360:RUN`
+- `PORTFOLIO:RUN`
 
-No new canonical app without explicit Direction approval.
+Nessuna nuova app canonica senza approvazione esplicita della Direzione.
