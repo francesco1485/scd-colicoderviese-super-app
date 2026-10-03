@@ -318,6 +318,23 @@
       "access": "PUBLIC_OR_ACCOUNT",
       "use": "PAYMENT_FLOW_REFERENCE",
       "sensitive": true
+    },
+    {
+      "id": "SRC-0025",
+      "title": "LAM Consulting",
+      "url": "https://www.lamconsulting.it/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE",
+        "COMMON"
+      ],
+      "category": "CHANGE_MANAGEMENT_FORMAZIONE_ORGANIZZATIVA",
+      "access": "PUBLIC",
+      "use": "METHOD_AND_ORGANIZATION_RESEARCH",
+      "authority": "PROFESSIONAL_REFERENCE",
+      "note": "Useful cross-project benchmark for change management, sales development, leadership, managerial skills, organizational wellbeing, internal communication and recruiting methods. Not a regulatory source."
     }
   ]
 }
