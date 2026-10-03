@@ -1166,7 +1166,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.hidden)close
 
 
 /* ===== R40.1 CRM RELAZIONALE ===== */
-const crmState={rows:[],selected:null,loading:false,error:''};
+const crmState={rows:[],selected:null,loading:false,error:'',sourceState:'UNVERIFIED',lastLoadedAt:''};
 
 function crmPolicyLabel(value){
   const v=String(value||'').toUpperCase();
@@ -1220,6 +1220,41 @@ function renderCrmTable(){
       '</button>').join(''):'<div class="crm-empty">Nessun profilo corrisponde ai filtri.</div>');
   $$('[data-crm-id]').forEach(b=>b.onclick=()=>openCrmProfile(b.dataset.crmId));
 }
+function crmExplicitValue(row,keys){
+  for(const key of keys){
+    const value=row&&row[key];
+    if(value!==undefined&&value!==null&&String(value).trim()!=='')return String(value).trim();
+  }
+  return '';
+}
+function crmOpportunityCard(row,index){
+  const title=crmExplicitValue(row,['OPPORTUNITA','OPPORTUNITÀ','NOME','OGGETTO','PROGETTO','PACCHETTO','ASSET'])||('Opportunità '+String(index+1));
+  const status=crmExplicitValue(row,['STATO','STATUS','FASE','STAGE']);
+  const type=crmExplicitValue(row,['TIPO','TYPE','CATEGORIA','CATEGORY']);
+  const value=crmExplicitValue(row,['VALORE €','VALORE','IMPORTO','BUDGET']);
+  const next=crmExplicitValue(row,['PROSSIMA_AZIONE','NEXT_ACTION','AZIONE','FOLLOW_UP']);
+  const due=crmExplicitValue(row,['PROSSIMA_SCADENZA','SCADENZA','DEADLINE','DUE_DATE']);
+  const owner=crmExplicitValue(row,['OWNER','RESPONSABILE','ASSEGNATO_A']);
+  const meta=[type,status,owner].filter(Boolean);
+  return '<article class="crm-opportunity">'+
+    '<header><b>'+esc(title)+'</b>'+(status?'<small>'+esc(status)+'</small>':'')+'</header>'+
+    (meta.length?'<div class="crm-opportunity-meta">'+meta.map(x=>'<span>'+esc(x)+'</span>').join('')+'</div>':'')+
+    (value?'<p><strong>Valore registrato:</strong> '+esc(value)+'</p>':'')+
+    (next?'<p><strong>Prossima azione:</strong> '+esc(next)+'</p>':'')+
+    (due?'<p><strong>Scadenza registrata:</strong> '+esc(due)+'</p>':'')+
+  '</article>';
+}
+function crmTaskCard(row,index){
+  const title=crmExplicitValue(row,['TITOLO','TITLE','OGGETTO','TASK','ATTIVITA','ATTIVITÀ'])||('Attività '+String(index+1));
+  const status=crmExplicitValue(row,['STATO','STATUS']);
+  const due=crmExplicitValue(row,['SCADENZA','DEADLINE','DUE_DATE','DUE_AT']);
+  const owner=crmExplicitValue(row,['OWNER','RESPONSABILE','ASSEGNATO_A']);
+  const note=crmExplicitValue(row,['NOTE','DESCRIZIONE','DESCRIPTION','DETTAGLI']);
+  return '<article class="crm-task-evidence">'+
+    '<div><strong>'+esc(title)+'</strong><small>'+esc([status,owner,due].filter(Boolean).join(' · ')||'Metadati non valorizzati')+'</small></div>'+
+    (note?'<p>'+esc(note)+'</p>':'')+
+  '</article>';
+}
 function renderCrmInspector(data){
   const el=$('#crmInspector');if(!el)return;
   if(!data){el.innerHTML='<h3>Profilo CRM</h3><p>Seleziona una persona o azienda per vedere il profilo relazionale completo.</p>';return}
@@ -1247,23 +1282,92 @@ function renderCrmInspector(data){
     '<section class="crm-section"><h3>Accordi / contratti</h3>'+
       (agreements.length?agreements.map(a=>'<div class="crm-agreement"><div><b>'+esc(a.PACCHETTO||a.PARTNER||'Accordo')+'</b><small>'+esc(a.STATO||'')+'</small></div><div><span>Valore</span><strong>'+esc(a['VALORE €']!==''&&a['VALORE €']!=null?'€ '+a['VALORE €']:'Da verificare')+'</strong></div><div><span>Incasso</span><strong>'+esc(a['STATO INCASSO']||'Da verificare')+'</strong></div><p>'+esc(a['ASSET PROMESSI']||'')+'</p><small>'+esc(a['PROSSIMA AZIONE']||'')+'</small></div>').join(''):'<p>Nessun accordo formalizzato collegato.</p>')+
     '</section>'+
-    '<section class="crm-section"><h3>Attività e opportunità</h3><p>'+tasks.length+' task collegati · '+opps.length+' opportunità collegate · '+agreements.length+' accordi collegati</p></section>';
+    '<section class="crm-section crm-evidence-section"><h3>Attività registrate</h3>'+
+      (tasks.length?tasks.slice(0,12).map(crmTaskCard).join(''):'<p>Nessuna attività collegata registrata.</p>')+
+    '</section>'+
+    '<section class="crm-section crm-evidence-section"><h3>Opportunità registrate</h3>'+
+      (opps.length?opps.slice(0,12).map(crmOpportunityCard).join(''):'<p>Nessuna opportunità collegata registrata.</p>')+
+      '<small class="crm-evidence-rule">Sono mostrati soltanto campi valorizzati nel master canonico. Nessuna probabilità, valore o scadenza viene dedotta.</small>'+
+    '</section>';
   const mailBtn=$('#crmEmailAction');
   if(mailBtn)mailBtn.onclick=()=>openCrmEmailComposer(data);
 }
+function growStageLabel(stage){
+  return ({
+    RESEARCH:'RICERCA',VERIFY:'VERIFICA',QUALIFY:'QUALIFICA',CONNECT:'CONTATTO',PROPOSE:'PROPOSTA',
+    ACTIVATE:'ATTIVAZIONE',PROVE:'PROVA',REPORT:'REPORT',RENEW:'RINNOVO',EXPAND:'SVILUPPO'
+  })[stage]||stage;
+}
+function growDateLabel(value){
+  const raw=String(value||'').trim();
+  if(!raw)return 'Nessuna scadenza registrata';
+  const d=new Date(raw);
+  if(!Number.isFinite(d.getTime()))return raw;
+  return new Intl.DateTimeFormat('it-IT',{day:'2-digit',month:'short',year:'numeric'}).format(d);
+}
+function renderGrowPipeline(){
+  const engine=globalThis.ScdGrowPipeline;
+  const stateEl=$('#growSourceState'),track=$('#growStageTrack'),actions=$('#growActionList'),meta=$('#growQueueMeta'),verification=$('#growVerificationList');
+  if(!stateEl||!track||!actions||!verification)return;
+  if(!engine?.build){
+    stateEl.dataset.state='UNAVAILABLE';stateEl.textContent='CRM · MOTORE NON DISPONIBILE';
+    track.innerHTML='';actions.innerHTML='<div class="grow-empty"><b>Pipeline non disponibile</b>Il motore SCD GROW non è stato caricato.</div>';
+    verification.innerHTML='';return;
+  }
+  const model=engine.build(crmState.rows,{
+    sourceState:crmState.sourceState,
+    generatedAt:crmState.lastLoadedAt
+  });
+  stateEl.dataset.state=model.sourceState;
+  stateEl.textContent=model.sourceState==='VERIFIED'
+    ?'CRM · VERIFICATO'
+    :model.sourceState==='PENDING'
+      ?'CRM · IN AGGIORNAMENTO'
+      :'CRM · '+model.sourceState.replaceAll('_',' ');
+  track.innerHTML=engine.STAGES.map(stage=>{
+    const count=model.counts?.[stage];
+    return '<article class="grow-stage"><span>'+esc(growStageLabel(stage))+'</span><b>'+(count==null?'—':esc(count))+'</b><small>'+esc(stage)+'</small></article>';
+  }).join('');
+  if(meta)meta.textContent=model.sourceState==='VERIFIED'
+    ?String(model.queue.length)+' profili con azione/scadenza/task'
+    :'Fonte '+model.sourceState.toLowerCase();
+  if(model.sourceState!=='VERIFIED'){
+    actions.innerHTML='<div class="grow-empty"><b>Dati non verificati</b>La pipeline resta vuota finché il CRM canonico non risponde con esito verificato.</div>';
+    verification.innerHTML='<div class="grow-verification-item"><b>Stato fonte</b><span>'+esc(model.sourceState)+'</span></div>';
+    return;
+  }
+  actions.innerHTML=model.queue.length?model.queue.slice(0,80).map(item=>
+    '<button type="button" class="grow-action '+(item.blocked?'blocked':'')+'" data-grow-crm-id="'+esc(item.id)+'">'+
+      '<span><strong>'+esc(item.name)+'</strong><small>'+esc(item.sourceStatus||'Stato da verificare')+'</small></span>'+
+      '<span class="grow-action-next">'+esc(item.nextAction||'Task aperti: '+String(item.openTasks||0))+'</span>'+
+      '<span class="grow-action-deadline">'+esc(growDateLabel(item.nextDeadline))+'</span>'+
+      '<span class="grow-stage-badge '+(item.stageVerified?'':'unverified')+'">'+esc(growStageLabel(item.stage))+'</span>'+
+    '</button>'
+  ).join(''):'<div class="grow-empty"><b>Nessuna prossima azione registrata</b>La fonte CRM è verificata; non genero follow-up sostitutivi.</div>';
+  $$('[data-grow-crm-id]').forEach(btn=>btn.onclick=()=>openCrmProfile(btn.dataset.growCrmId));
+  const quality=[
+    ...model.needsVerification.map(item=>({name:item.name,detail:'Stato relazione non mappato con certezza: '+(item.sourceStatus||'mancante')})),
+    ...model.blocked.map(item=>({name:item.name,detail:'Policy contatto: '+(item.contactPolicy||'BLOCCATO')}))
+  ];
+  verification.innerHTML=quality.length?quality.slice(0,40).map(item=>
+    '<article class="grow-verification-item"><b>'+esc(item.name)+'</b><span>'+esc(item.detail)+'</span></article>'
+  ).join(''):'<div class="grow-empty"><b>Nessuna anomalia esplicita</b>La pipeline non deduce sponsor, contratti o probabilità mancanti.</div>';
+}
 async function loadCrm(){
-  crmState.loading=true;crmState.error='';renderCrmTable();
+  crmState.loading=true;crmState.error='';crmState.sourceState='PENDING';renderCrmTable();renderGrowPipeline();
   try{
     const data=await crmApi();
     crmState.rows=Array.isArray(data.rows)?data.rows:[];
+    crmState.sourceState='VERIFIED';crmState.lastLoadedAt=new Date().toISOString();
     renderCrmKpis(data.kpi||{});
+    renderGrowPipeline();
     renderPartnerHub();
     syncActivationPartnersFromCrm();
   }catch(e){
-    crmState.error=e.message||'Errore CRM';
-    renderCrmKpis({});
+    crmState.error=e.message||'Errore CRM';crmState.sourceState='UNAVAILABLE';crmState.lastLoadedAt=new Date().toISOString();
+    renderCrmKpis({});renderGrowPipeline();
   }finally{
-    crmState.loading=false;renderCrmTable();
+    crmState.loading=false;renderCrmTable();renderGrowPipeline();
   }
 }
 async function openCrmProfile(id){
