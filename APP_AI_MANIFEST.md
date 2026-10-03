@@ -28,3 +28,30 @@ No fake live data.
 No generic obsolete template.
 Preserve verified data, identity, provenance, security and integrations.
 No production mutation without explicit authorization.
+
+
+## Definitive continuity package
+Read before work:
+- docs/SCD_ONE_PRODUCT_MEMORY.md
+- docs/SCD_ONE_DEFINITIVE_BUILD_COMMAND.md
+- docs/SCD_ONE_VISUAL_EXPERIENCE_MASTER.md
+- config/scd-one-product-contract.v1.json
+- docs/AI_MULTIFUNCTIONAL_DEVELOPER_COMMAND.md
+- docs/APP_HANDOFF.md
+
+Definitive command: SCDONE:MASTER
+Continuous command: SCDONE:RUN
+
+App boundary:
+- internal association management -> SCD CORE
+- sponsor/partner CRM and growth -> SCD GROW
+- technical orchestration -> SCD Command R22
+- identity/role authority -> R20 until verified migration
+
+Product memory rules:
+- preserve and recover valid R38-R56 work before rebuilding;
+- SCD Week is Friday-to-Friday with weekend priority;
+- mobile bottom navigation is HOME / CALENDAR / TEAMS / SOCIAL / PROFILE;
+- no duplicate identity/database/calendar/CRM/source-of-truth;
+- no invented sport/live/transaction facts;
+- no merge/deploy/production mutation without explicit authorization.
