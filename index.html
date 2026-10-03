@@ -518,6 +518,48 @@
       </section>
 
       <section class="view" id="view-twin" data-view="twin">
+        <section class="profile-command" id="profileCommand" aria-labelledby="profileCommandTitle">
+          <header class="profile-command-head">
+            <div>
+              <span class="eyebrow">PROFILE · MY SCD</span>
+              <h1 id="profileCommandTitle">La tua porta d’ingresso nel Club.</h1>
+              <p>Squadra seguita, prossimo impegno verificato, stato app e accesso riservato in una sola vista. Il profilo locale resta separato dai dati federali e dai dati sensibili.</p>
+            </div>
+            <span class="profile-command-state" id="profileCommandState" data-state="PUBLIC">PUBBLICO</span>
+          </header>
+          <div class="profile-command-grid">
+            <article class="profile-command-card identity">
+              <small>IDENTITÀ LOCALE</small>
+              <strong id="profileIdentityName">Il mio Twin</strong>
+              <span id="profileIdentityMeta">Profilo locale · 0% completato</span>
+              <button type="button" data-profile-action="twin">Personalizza profilo →</button>
+            </article>
+            <article class="profile-command-card team">
+              <small>LA MIA SQUADRA</small>
+              <strong id="profileTeamName">Nessuna squadra seguita</strong>
+              <span id="profileTeamNext">Scegli una squadra per creare il tuo punto di accesso sportivo.</span>
+              <button type="button" data-profile-action="team">Apri Team Hub →</button>
+            </article>
+            <article class="profile-command-card app">
+              <small>SCD ONE APP</small>
+              <strong id="profileAppState">WEB APP</strong>
+              <span id="profileAppMeta">Esperienza installabile quando il dispositivo lo supporta.</span>
+              <button type="button" data-profile-action="install">Installa / apri app →</button>
+            </article>
+            <article class="profile-command-card access">
+              <small>AREA RISERVATA</small>
+              <strong id="profileAccessState">Esperienza pubblica</strong>
+              <span id="profileAccessMeta">I dati privati richiedono autenticazione e scope autorizzato.</span>
+              <button type="button" data-profile-action="desk">Apri Private Desk →</button>
+            </article>
+          </div>
+          <div class="profile-command-actions">
+            <button type="button" class="btn primary" data-profile-action="calendar">Calendario della mia squadra</button>
+            <button type="button" class="btn glass" data-profile-action="social">Feed Social</button>
+            <button type="button" class="btn glass" data-profile-action="home">Torna alla Home</button>
+          </div>
+        </section>
+
         <div class="twin-stage">
           <div class="twin-copy">
             <span class="eyebrow">SCD TWIN · IDENTITÀ EVOLUTIVA</span>
@@ -624,7 +666,7 @@
   <script src="./scd-experience-engine.js?v=40.0.0" defer></script>
   <script src="./scd-twin.js?v=40.0.0" defer></script>
   <script src="./lib/scd-operative-engine.js?v=51.0.0" defer></script>
-  <script src="./lib/scd-one-pulse.js?v=1.0.0" defer></script>
+  <script src="./lib/scd-one-pulse.js?v=1.0.0" defer></script>\n  <script src="./lib/scd-one-profile.js?v=1.0.0" defer></script>
   <script src="./lib/scd-native-adapters.js?v=1.0.0" defer></script>
   <script src="./scd-ng.js?v=0.7.4" defer></script>
   <script src="./scd-interactions.js?v=0.4.5" defer></script>
