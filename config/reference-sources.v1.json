@@ -862,6 +862,202 @@
       "authority": "SECONDARY_REFERENCE",
       "status": "REGISTERED_VERIFIED_HISTORICAL",
       "note": "2022 article. Useful for graphic-production workflow, raster/vector, layout and typography; re-check current versions and licenses."
+    },
+    {
+      "id": "SRC-0059",
+      "title": "Tuttocampo - Lombardia Dilettanti",
+      "url": "https://www.tuttocampo.it/Lombardia/Dilettanti",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "LOMBARDIA_FOOTBALL_RESULTS_STANDINGS",
+      "access": "PUBLIC",
+      "use": "SECONDARY_RESULTS_AND_STANDINGS_MONITORING",
+      "authority": "SECONDARY_DATA_SOURCE",
+      "status": "REGISTERED_USER_PROVIDED_403",
+      "note": "Useful operational cross-check for fixtures/results/standings. Current automated fetch returned 403. Never replace CR Lombardia/LND as official source."
+    },
+    {
+      "id": "SRC-0060",
+      "title": "Sprint e Sport - Dilettanti Lombardia",
+      "url": "https://www.sprintesport.it/sezioni/266/dilettanti-lombardia",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "COMMON"
+      ],
+      "category": "LOMBARDIA_DILETTANTI_NEWS_YOUTH_FOOTBALL",
+      "access": "PUBLIC",
+      "use": "NEWS_MONITORING_AND_EDITORIAL_RESEARCH",
+      "authority": "SECONDARY_MEDIA",
+      "status": "REGISTERED_PARTIAL_VERIFY",
+      "note": "Page exists but JS/anti-bot blocked automated inspection. Use as secondary editorial source."
+    },
+    {
+      "id": "SRC-0061",
+      "title": "Lombardia Sport - FIGC LND Lombardia",
+      "url": "https://www.lombardiasport.com/federazioni/figc-lega-nazionale-dilettanti-lombardia/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "LOMBARDIA_SPORT_DIRECTORY_FIGC_LND",
+      "access": "PUBLIC",
+      "use": "INSTITUTIONAL_DIRECTORY_REFERENCE",
+      "authority": "INSTITUTIONAL_REFERENCE",
+      "status": "REGISTERED_VERIFIED",
+      "note": "Regional sports directory in collaboration with CONI Lombardia; useful for contacts/directory. CR Lombardia remains primary for official rules and communications."
+    },
+    {
+      "id": "SRC-0062",
+      "title": "AIA FIGC - Designazioni Lombardia",
+      "url": "https://www.aia-figc.it/designazioni/lombardia/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "REFEREE_APPOINTMENTS_LOMBARDIA",
+      "access": "PUBLIC",
+      "use": "PRIORITY_REFEREE_APPOINTMENTS_MONITORING",
+      "authority": "OFFICIAL",
+      "status": "REGISTERED_VERIFIED_PRIORITY",
+      "note": "Official AIA source for referee appointments by regional category/section. Link to matchday/calendar only after competition and match validation."
+    },
+    {
+      "id": "SRC-0063",
+      "title": "Tuttosport - Dilettanti Lombardia",
+      "url": "https://www.tuttosport.com/calcio-dilettanti/dilettanti-lombardia",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "LOMBARDIA_DILETTANTI_NEWS",
+      "access": "PUBLIC",
+      "use": "NEWS_AND_MEDIA_MONITORING",
+      "authority": "SECONDARY_MEDIA",
+      "status": "REGISTERED_PARTIAL_VERIFY",
+      "note": "Specific section did not open directly in current verification, but domain publishes current LND/amateur football coverage. Editorial, not official."
+    },
+    {
+      "id": "SRC-0064",
+      "title": "LombardiaNotizie Online - Calcio Dilettanti",
+      "url": "https://www.lombardianotizie.online/calcio-dilettanti/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "LOMBARDIA_DILETTANTI_LOCAL_NEWS",
+      "access": "PUBLIC",
+      "use": "LOCAL_NEWS_MONITORING_PENDING_VERIFY",
+      "authority": "SECONDARY_MEDIA",
+      "status": "REGISTERED_PARTIAL_VERIFY_403",
+      "note": "Automated fetch returned 403. Keep as secondary local-news source until re-verified."
+    },
+    {
+      "id": "SRC-0065",
+      "title": "MilanoToday - Dilettanti Calcio Lombardia",
+      "url": "https://www.milanotoday.it/tag/dilettanti-calcio-lombardia/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "LOMBARDIA_DILETTANTI_LOCAL_NEWS",
+      "access": "PUBLIC",
+      "use": "LOCAL_NEWS_MONITORING_PENDING_VERIFY",
+      "authority": "SECONDARY_MEDIA",
+      "status": "REGISTERED_PARTIAL_VERIFY_ROBOTS",
+      "note": "Crawler blocked by robots in current verification. Use as secondary local-news reference only."
+    },
+    {
+      "id": "SRC-0066",
+      "title": "Bergamo e Sport - Format campionati dilettanti Lombardia 2020/21",
+      "url": "https://www.bergamoesport.it/calcio-dilettanti-lombardia-ecco-il-format-dei-campionati/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "HISTORICAL_LOMBARDIA_COMPETITION_FORMAT",
+      "access": "PUBLIC",
+      "use": "HISTORICAL_CONTEXT_ONLY",
+      "authority": "SECONDARY_MEDIA",
+      "status": "REGISTERED_VERIFIED_HISTORICAL",
+      "note": "Article dated 2020-08-10 about 2020/21 competition structure. Historical context only; never use as current format."
+    },
+    {
+      "id": "SRC-0067",
+      "title": "La Prealpina - Mappa gironi calcio dilettanti Lombardia",
+      "url": "https://www.prealpina.it/news/sport/530649/ufficiali-i-gironi-della-lombardia-la-mappa-del-calcio-dilettanti-dall-eccellenza-alla-seconda-categoria.html",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "LOMBARDIA_GIRONI_DILETTANTI_NEWS",
+      "access": "PUBLIC",
+      "use": "GIRONI_CROSS_CHECK_AND_MEDIA_REFERENCE",
+      "authority": "SECONDARY_MEDIA",
+      "status": "REGISTERED_PARTIAL_VERIFY_JS",
+      "note": "Duplicate URL in user batch was de-duplicated. JS/anti-bot blocks direct inspection; use as cross-check only, not official group source."
+    },
+    {
+      "id": "SRC-0068",
+      "title": "Corriere della Sera - Stop calcio dilettanti Lombardia 21/02/2020",
+      "url": "https://www.corriere.it/sport/20_febbraio_21/coronavirus-lombardia-stop-calcio-dilettanti-lodigiano-volley-corse-1dd1bc92-54c7-11ea-9196-da7d305401b7.shtml",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "HISTORICAL_SPORT_DISRUPTION_COVID",
+      "access": "PUBLIC",
+      "use": "HISTORICAL_CONTEXT_ONLY",
+      "authority": "SECONDARY_MEDIA",
+      "status": "REGISTERED_VERIFIED_HISTORICAL",
+      "note": "Article dated 2020-02-21 on emergency match suspensions. Archive/resilience context only, not current monitoring."
+    },
+    {
+      "id": "SRC-0069",
+      "title": "CSI Live - Lombardia Bergamo",
+      "url": "https://live.centrosportivoitaliano.it/25/Lombardia/Bergamo/?j=NEU9REZIJjRGPWtraw==",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "CSI_LIVE_RESULTS_LOMBARDIA_BERGAMO",
+      "access": "PUBLIC",
+      "use": "EXTERNAL_COMPETITION_LIVE_RESULTS_REFERENCE",
+      "authority": "OFFICIAL_CSI_PORTAL",
+      "status": "REGISTERED_VERIFIED",
+      "note": "Official CSI live-results portal covering multiple seasons and sports. Keep clearly separate from FIGC/LND competitions."
+    },
+    {
+      "id": "SRC-0070",
+      "title": "SoloDilettanti",
+      "url": "https://solodilettanti.it/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "DILETTANTI_SPORT_NEWS_PORTAL",
+      "access": "PUBLIC",
+      "use": "SECONDARY_NEWS_MONITORING",
+      "authority": "SECONDARY_MEDIA",
+      "status": "REGISTERED_VERIFIED",
+      "note": "Secondary amateur-sport news source for scouting/rassegna stampa; never replace federation communications."
+    },
+    {
+      "id": "SRC-0071",
+      "title": "Lombardia Calcio - Dilettanti Lombardia",
+      "url": "https://lombardiacalcio.it/dilettanti-lombardia/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "LOMBARDIA_DILETTANTI_NEWS_PORTAL",
+      "access": "PUBLIC",
+      "use": "SECONDARY_NEWS_MONITORING_PENDING_VERIFY",
+      "authority": "SECONDARY_MEDIA",
+      "status": "REGISTERED_PARTIAL_VERIFY",
+      "note": "Page not readable in current automated verification. Keep as candidate secondary source until re-verified."
     }
   ]
 }
