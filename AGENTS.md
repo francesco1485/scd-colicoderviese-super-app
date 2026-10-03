@@ -7,6 +7,12 @@ Prima di modificare codice, dati, UI, workflow, API, ruoli, fonti o infrastruttu
 
 È l'unica fonte normativa machine-readable del progetto.
 
+Prima di qualunque lavoro sostanziale leggere anche:
+- `config/user-directives.v1.json` — registro dei comandi espliciti dell'utente recuperati dalle chat;
+- per UI, grafica, media e product design: `config/scd-visual-references.v1.json` — registro delle tavole, immagini, documenti e riferimenti recuperati dalla Libreria interna.
+
+I comandi espliciti dell'utente sono requisiti di origine. Non possono essere sostituiti, abbreviati fino a perderne il significato o ignorati in favore di un riassunto dell'assistente. Se un comando nuovo modifica un contratto o l'architettura, il contratto/manifest va aggiornato nel normale change process invece di scartare il comando.
+
 ## SCD:STATE — HARD GATE
 Prima di qualsiasi operazione di scrittura sul progetto deve essere completata una fotografia verificata dello stato reale.
 
@@ -43,6 +49,34 @@ Regola vincolante: **NO STATE → NO WRITE**.
 `UNVERIFIED` non equivale a falso, assente o non esistente. Se lo stato necessario non può essere verificato, sono consentite solo lettura, ispezione, diagnostica e proposta del passo successivo.
 
 
+
+## SCD:MEMORY-RECOVER — USER COMMAND + LIBRARY GATE
+Prima di `SCD:EXPERT` per ogni lavoro sostanziale, continuativo o visuale:
+
+1. recuperare i comandi utente rilevanti da `config/user-directives.v1.json`;
+2. recuperare il master/contratto specifico dell'app e l'ultimo handoff;
+3. per UI/media, leggere `config/scd-visual-references.v1.json` e cercare le tavole/immagini/documenti interni pertinenti;
+4. verificare l'implementazione reale corrente prima di progettare una sostituzione;
+5. distinguere sempre:
+   - `USER_COMMAND`;
+   - `CANONICAL_RUNTIME_CONTRACT`;
+   - `LIBRARY_REFERENCE`;
+   - `EXTERNAL_VERIFIED_SOURCE`;
+   - `INFERENCE_OR_PROPOSAL`.
+
+Output minimo:
+- `USER_COMMANDS_RECOVERED`
+- `LIBRARY_REFERENCES_RECOVERED`
+- `CANONICAL_CONTRACTS`
+- `DRIFT_OR_CONFLICTS`
+- `INCORPORATION_PLAN`
+
+Regole:
+- non affidarsi solo a riepiloghi dell'assistente quando esistono comandi originali recuperabili;
+- non dichiarare una tavola `APPROVED` senza una prova di approvazione esplicita: in assenza di prova resta `REFERENCE_BOARD`;
+- una tavola recuperata non autorizza a copiare dati di esempio nel runtime;
+- se una UI attuale ignora una tavola ad alta rilevanza, confrontarla e motivare `KEEP / ENHANCE / REBUILD_IMPROVE / REMOVE_WITH_REASON`;
+- un task di implementazione non è concluso con sola documentazione quando il codice può essere modificato in sicurezza.
 
 ## SCD:EXPERT — ROUTER OPERATIVO OBBLIGATORIO
 Prima di costruire, modificare o ricercare una soluzione complessa, classificare il lavoro con `SCD:EXPERT`.
@@ -113,7 +147,8 @@ Prima di qualunque modifica visuale o media classificare ogni elemento:
 - `RESEARCH_REAL_ASSET`: cercare il file reale da fonte ufficiale o verificata. Mai inventare uno stemma, uno sponsor o un kit esistente.
 - `GENERATE_ORIGINAL`: creare solo elementi originali non sostitutivi di asset ufficiali o fatti reali.
 
-Registro canonico asset: `config/scd-assets.v1.json`.
+Registro canonico asset runtime: `config/scd-assets.v1.json`.
+Registro riferimenti visuali/documentali recuperati: `config/scd-visual-references.v1.json`.
 
 ## Obblighi
 1. Identificare le capability `CAP-*` coinvolte.
