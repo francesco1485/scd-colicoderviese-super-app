@@ -445,6 +445,8 @@ function r57DataFabricActions_(token, limit) {
     var uid = r25Clean_(row[map.UID], 120);
     var status = r25Clean_(row[map.STATO], 80);
     if (!uid || /CHIUS|DONE|ARCHIVIAT|ANNULLAT/i.test(status)) return null;
+    var gmailUrl = r25Clean_(row[map.GMAIL], 1000);
+    if (!/^https:\/\/mail\.google\.com\//i.test(gmailUrl)) gmailUrl = '';
     return {
       id:uid,
       priority:r25Clean_(row[map.PRIORITA], 40),
@@ -453,7 +455,7 @@ function r57DataFabricActions_(token, limit) {
       title:r25Clean_(row[map.OGGETTO], 500),
       nextAction:r25Clean_(row[map.AZIONE], 1200),
       status:status || 'DA VERIFICARE',
-      gmailUrl:r25Clean_(row[map.GMAIL], 1000),
+      gmailUrl:gmailUrl,
       source:'MAIL_OPERATIONS_SHEET/18_ACTION_QUEUE',
       sourceRecordId:uid
     };
