@@ -6,7 +6,7 @@
 
 ## Executive summary
 
-The Sponsor Platform is already an SCD module with a public partnership surface and an authenticated private Partner OS. It reuses R20/Apps Script for identity and operational reads, connects CRM records to stakeholder IDs, and has a live-master-first development pipeline with a timestamped snapshot fallback. These are worth preserving.
+The Sponsor Platform is a module within the single SCD Universe / SCD Digital Club Operating System, not a separate SCD application. Its public partnership experience and authenticated private Partner OS are distinct surfaces of that same product. It reuses R20/Apps Script for identity and operational reads, connects CRM records to stakeholder IDs, and has a live-master-first development pipeline with a timestamped snapshot fallback. These are worth preserving.
 
 The most urgent issue is data handling: the GitHub repository is public, while tracked client-side and snapshot files include sponsor/prospect/supplier records and commercial/contact fields. The private route guard protects the running web app, but it cannot protect records committed to a public repository. The UI also declares a `finance:false` capability for the Commercial profile without applying that capability to the finance-bearing client bundle or to route-level authorization in this service.
 
@@ -36,7 +36,7 @@ The project should not be rewritten or given a second CRM/database. First contai
 - Read `SCD_SYSTEM_MANIFEST.json` v3.26.0 and `AGENTS.md` from the checked-out main snapshot.
 - Read the task-branch `APP_AI_MANIFEST.md` from remote branch `ai-scd-sponsor-platform` (blob `df516dd55a30a56443ce354e207f9e94a3c8d8b3`).
 - The checked-out snapshot does not contain `.github/copilot-instructions.md` or `APP_AI_MANIFEST.md`. Reviewed the repository instructions and frontend/security/Supabase path instructions from the open control-plane PR #82; these files are not part of the checked-out main snapshot. `.github/agents/` was not inspected.
-- The task manifest identifies `sponsor/` as primary code, `scd-sponsor-platform` as the live Render service, and forbids a second app/source of truth, invented commercial data, and deployment from the AI branch.
+- The task manifest identifies `sponsor/` as primary code and `scd-sponsor-platform` as the live Render service. Its explicit hard rules are that Sponsor is an SCD module, not a second SCD application; canonical person/project/event/document/source models are reused; sponsor names, amounts, deadlines, contracts and commitments are not invented; public presentation remains separate from private commercial operations; and the AI branch is not deployed.
 
 ## SCD:EXPERT + SCD:ARCHITECT
 
@@ -81,7 +81,7 @@ Relevant manifest capability declarations include `CAP-SPONSOR-OPERATIONAL-FOCUS
 
 | Classification | Area | Audit result and evidence |
 |---|---|---|
-| `KEEP` | Public partnership experience | Separate public content and private operations are already distinguished; preserve as one SCD module. Public layout has responsive breakpoints, skip link, visible keyboard focus, reduced-motion handling and labeled forms |
+| `KEEP` | Single SCD product and public/private boundary | Sponsor Platform remains one module of the SCD Universe, not a second app. Preserve separate public partnership presentation and private commercial operations within this product. Public layout has responsive breakpoints, skip link, visible keyboard focus, reduced-motion handling and labeled forms |
 | `KEEP` | R20 session and route guard | `server.js` validates session before serving private HTML/JS and before CRM, agenda, communication and development handlers; private responses use `no-store` in the reviewed handlers |
 | `KEEP` | Canonical CRM/project bridge | CRM details and operational focus are linked to canonical CRM/stakeholder/project and Calendar endpoints. Preserve existing IDs and master authority |
 | `ENHANCE` | Role and scope authorization | `sponsorCapabilities()` distinguishes Direction and Commercial (including `finance:false` for Commercial), but `applySponsorCapabilities()` only gates Settings in the client. The manifest identity-role list has no dedicated sponsor/commercial role; the service derives a profile from the R20 user’s role/type. Route handlers generally check broad sponsor eligibility and pass the session upstream; no local per-capability enforcement or role matrix is demonstrated. Upstream may add checks, but that was not verifiable. Reconcile the mapping with Direction and the existing R20 roles; do not add a role without the required manifest change and approval. |
@@ -89,7 +89,7 @@ Relevant manifest capability declarations include `CAP-SPONSOR-OPERATIONAL-FOCUS
 | `FIX` | Duplicate/uncertain client-side records | Multiple screens render inline arrays for portfolio, contracts, proposals, suppliers, assets, events and analytics (`sponsor/app.js:192-303`, `570-645`, `724-731`, `1052-1081`). CRM merging applies only in selected Partner Hub flows (`sponsor/app.js:353-380`). Reconcile each field against the registered master and replace duplicates with server-authorized projections; fail closed on unknown provenance. |
 | `FIX` | Capability boundary for financial data | Direction/Commercial capabilities are calculated server-side (`server.js:134-158`), but private JS is returned to any broadly sponsor-authorized session (`server.js:160-166`, `475-486`), and client gating currently covers only Settings (`sponsor/app.js:66-80`). Finance-bearing data is embedded in that client file. Enforce role/scope on server responses and minimize the bundle; verify actual commercial versus Direction access before further production use. |
 | `FIX` | Public demo copy | A public interactive preview presents a named sample organization and completion/material/request KPIs without a clear simulation label (`sponsor/sponsor.js:6-14`). Remove or visibly label non-factual examples; public sponsor status and metrics must be verified. |
-| `INTEGRATE` | Stakeholder and project linkage | Keep R20/SCD Operativo IDs as the joining mechanism. Define a single field map for sponsor, prospect, supplier, agreement, follow-up and initiative state; avoid name-based matching as canonical identity |
+| `INTEGRATE` | Stakeholder and project linkage | Keep R20/SCD Operativo IDs as the joining mechanism and reuse canonical person/project/event/document/source models. Define a single field map for sponsor, prospect, supplier, agreement, follow-up and initiative state; avoid name-based matching as canonical identity |
 | `COMPLETE` | Document Hub | The UI currently maps fixed folder names to placeholder copy (`sponsor/app.js:291`, `855-856`; `sponsor/app.html:430-433`); the inspected sponsor routes have no Drive file-list/detail endpoint. Add no new storage: use authorized Drive IDs, lineage, version/hash and link permissions |
 | `COMPLETE` | Media delivery/proof | Motion profiles are useful planning records with approval gates, but a concept/proof plan is not a verified delivery artifact. Link official approved assets and actual proof documents from Drive; maintain the asset registry’s exact-wordmark/provenance rules |
 | `FIX` | Service and documentation contract | `sponsor/README.md` calls this a separate free app with external writes disabled, which no longer matches the current API-backed SCD module. The task manifest declares a separate Render service, while root `render.yaml` only describes the main web service. Update the service/ownership/runbook contract only after the actual Render configuration is verified |
@@ -158,7 +158,7 @@ The existing tests are valuable contract/smoke coverage but do not prove live Ap
 
 ### P2 — Canonical commercial model
 
-1. Map `SPONSOR_MASTER_SHEET`, `SCD_OPERATIVO_PILOTA`, and R20 CRM IDs by domain: company/stakeholder, sponsor agreement, prospect, supplier, opportunity, follow-up, project and source lineage.
+1. Map `SPONSOR_MASTER_SHEET`, `SCD_OPERATIVO_PILOTA`, and R20 CRM IDs by domain: company/stakeholder, sponsor agreement, prospect, supplier, opportunity, follow-up, project and source lineage. Reuse the current SCD Universe models; do not create a parallel CRM or standalone sponsor application.
 2. Make the canonical master/API the single source for all portfolio, contract, proposal, supplier and reporting views. Remove duplicate client arrays only after reconciliation and parity tests.
 3. Preserve canonical status distinctions (prospect vs confirmed sponsor; supplier vs sponsor; concept vs approved; quote received vs reconciled). Unknown amount/date/commitment remains unavailable, not inferred.
 4. Keep operational focus derived from verified project status and the single Calendar event model; any create action remains human-confirmed.
