@@ -1,0 +1,1063 @@
+{
+  "version": "1.0",
+  "updated_at": "2026-10-03",
+  "purpose": "Canonical external source and utility registry for the four active AI projects. Store URLs and usage policy only; never credentials, session tokens, personal data, or payment data.",
+  "project_scopes": {
+    "P01_SCD_SUPER_APP": "SCD Super App / Operations",
+    "P02_SCD_SPONSOR_COMMERCIALE": "SCD Sponsor / Commercial",
+    "P03_CEPA_MAGLIA_OS": "CEPA Maglia OS",
+    "P04_MAGLIA360_OFFICE": "Maglia360 Office",
+    "COMMON": "Cross-project research and utility"
+  },
+  "policy": {
+    "public_sources": "May be used by Copilot for research/benchmarking, subject to source verification before production use.",
+    "official_sources": "Prefer over secondary sources for regulatory, fiscal, federation, registry and product facts.",
+    "private_portals": "Metadata/link only by default. Manual or separately authorized authenticated use. Never store credentials in repository, prompts or logs.",
+    "sensitive_sources": "No personal, health, payment or credential data in ordinary AI pipelines.",
+    "unverified_sources": "No automation or factual reliance until manually or programmatically verified."
+  },
+  "sources": [
+    {
+      "id": "SRC-0001",
+      "title": "AGLEA Salus",
+      "url": "https://www.agleasalus.org/",
+      "scope": [
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE"
+      ],
+      "category": "ASSICURAZIONE_SALUTE_WELFARE",
+      "access": "PUBLIC",
+      "use": "RESEARCH_AND_CONTENT_REFERENCE"
+    },
+    {
+      "id": "SRC-0002",
+      "title": "Tuttitalia - Comuni provincia di Lecco",
+      "url": "https://www.tuttitalia.it/lombardia/provincia-di-lecco/18-comuni/",
+      "scope": [
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE",
+        "COMMON"
+      ],
+      "category": "TERRITORIO_DEMOGRAFIA",
+      "access": "PUBLIC",
+      "use": "TERRITORY_RESEARCH"
+    },
+    {
+      "id": "SRC-0003",
+      "title": "Facile.it Collaboratori CBR",
+      "url": "https://collaboratori.facile.it/cbr/login",
+      "scope": [
+        "P04_MAGLIA360_OFFICE"
+      ],
+      "category": "CREDITO_COMMERCIALE",
+      "access": "PRIVATE_LOGIN",
+      "use": "MANUAL_LOGIN_ONLY"
+    },
+    {
+      "id": "SRC-0004",
+      "title": "Segretario Calcio",
+      "url": "https://segretariocalcio.altervista.org/",
+      "scope": [
+        "P01_SCD_SUPER_APP"
+      ],
+      "category": "SEGRETERIA_CALCIO",
+      "access": "PUBLIC",
+      "use": "RESEARCH_REFERENCE",
+      "note": "Secondary reference; verify rules and procedures against FIGC/LND."
+    },
+    {
+      "id": "SRC-0005",
+      "title": "ReportAziende",
+      "url": "https://www.reportaziende.it/",
+      "scope": [
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE"
+      ],
+      "category": "AZIENDE_PROSPECT",
+      "access": "PUBLIC_OR_ACCOUNT",
+      "use": "PROSPECT_RESEARCH"
+    },
+    {
+      "id": "SRC-0006",
+      "title": "ANPR - Anagrafe Nazionale",
+      "url": "https://www.anagrafenazionale.interno.it/",
+      "scope": [
+        "P04_MAGLIA360_OFFICE",
+        "COMMON"
+      ],
+      "category": "SERVIZI_ANAGRAFICI",
+      "access": "PUBLIC_OR_AUTHENTICATED",
+      "use": "PUBLIC_INFO_ONLY",
+      "sensitive": true
+    },
+    {
+      "id": "SRC-0007",
+      "title": "Internxt Temporary Email",
+      "url": "https://internxt.com/it/temporary-email",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "DEV_TEST",
+      "access": "PUBLIC",
+      "use": "TEST_ONLY",
+      "note": "Never use for official or real-data accounts."
+    },
+    {
+      "id": "SRC-0008",
+      "title": "Stipendee",
+      "url": "https://www.stipendee.it/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P04_MAGLIA360_OFFICE",
+        "COMMON"
+      ],
+      "category": "LAVORO_COMPENSI",
+      "access": "PUBLIC",
+      "use": "RESEARCH_REFERENCE"
+    },
+    {
+      "id": "SRC-0009",
+      "title": "Agenzia Entrate - Verifica Partita IVA",
+      "url": "https://telematici.agenziaentrate.gov.it/VerificaPIVA/VerificaPiva.do",
+      "scope": [
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE",
+        "COMMON"
+      ],
+      "category": "VERIFICA_FISCALE",
+      "access": "PUBLIC",
+      "use": "VERIFY_PIVA",
+      "authority": "OFFICIAL"
+    },
+    {
+      "id": "SRC-0010",
+      "title": "AssiEasy - Maglia",
+      "url": "https://maglia.assieasy.com/assieasy/",
+      "scope": [
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE"
+      ],
+      "category": "ASSICURAZIONI_OPERATIVO",
+      "access": "PRIVATE_LOGIN",
+      "use": "MANUAL_LOGIN_ONLY"
+    },
+    {
+      "id": "SRC-0011",
+      "title": "Ufficio Camerale",
+      "url": "https://www.ufficiocamerale.it/",
+      "scope": [
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE"
+      ],
+      "category": "AZIENDE_VISURE",
+      "access": "PUBLIC_OR_ACCOUNT",
+      "use": "COMPANY_RESEARCH"
+    },
+    {
+      "id": "SRC-0012",
+      "title": "Italiaonline",
+      "url": "https://www.italiaonline.it/",
+      "scope": [
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "P04_MAGLIA360_OFFICE"
+      ],
+      "category": "MARKETING_PROSPECTING",
+      "access": "PUBLIC",
+      "use": "IDEA_AND_MARKET_RESEARCH"
+    },
+    {
+      "id": "SRC-0013",
+      "title": "Prexta Compact",
+      "url": "https://www.prexta.it/prestiti-personali/prexta-compact",
+      "scope": [
+        "P04_MAGLIA360_OFFICE"
+      ],
+      "category": "CREDITO_PRODOTTI",
+      "access": "PUBLIC",
+      "use": "PRODUCT_RESEARCH"
+    },
+    {
+      "id": "SRC-0014",
+      "title": "IQM - Corso Telemarketing",
+      "url": "https://www.iqmselezione.it/corso-telemarketing-600008.shtml",
+      "scope": [
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "P04_MAGLIA360_OFFICE",
+        "COMMON"
+      ],
+      "category": "FORMAZIONE_COMMERCIALE",
+      "access": "PUBLIC",
+      "use": "TRAINING_IDEAS"
+    },
+    {
+      "id": "SRC-0015",
+      "title": "CR Lombardia",
+      "url": "https://www.crlombardia.it/",
+      "scope": [
+        "P01_SCD_SUPER_APP"
+      ],
+      "category": "FIGC_LND_CRL",
+      "access": "PUBLIC",
+      "use": "PRIORITY_MONITORING",
+      "authority": "OFFICIAL"
+    },
+    {
+      "id": "SRC-0016",
+      "title": "Squby - Funzionalita",
+      "url": "https://www.squby.it/funzionalita/",
+      "scope": [
+        "P01_SCD_SUPER_APP"
+      ],
+      "category": "GESTIONALE_ASSOCIAZIONI",
+      "access": "PUBLIC",
+      "use": "FEATURE_BENCHMARK"
+    },
+    {
+      "id": "SRC-0017",
+      "title": "SLP",
+      "url": "https://www.slpspa.it/",
+      "scope": [
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE"
+      ],
+      "category": "TUTELA_LEGALE",
+      "access": "PUBLIC",
+      "use": "RESEARCH_AND_CONTENT_REFERENCE"
+    },
+    {
+      "id": "SRC-0018",
+      "title": "HDI Assicurazioni",
+      "url": "https://www.hdiassicurazioni.it/",
+      "scope": [
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE"
+      ],
+      "category": "ASSICURAZIONI",
+      "access": "PUBLIC",
+      "use": "PRIORITY_PRODUCT_RESEARCH",
+      "authority": "OFFICIAL_PROVIDER"
+    },
+    {
+      "id": "SRC-0019",
+      "title": "Athletis Cloud",
+      "url": "https://athletis.cloud/login#",
+      "scope": [
+        "P01_SCD_SUPER_APP"
+      ],
+      "category": "SPORT_MANAGEMENT",
+      "access": "PRIVATE_LOGIN",
+      "use": "MANUAL_LOGIN_ONLY"
+    },
+    {
+      "id": "SRC-0020",
+      "title": "InfoCamere Login",
+      "url": "https://login.infocamere.it/eacologin/login.action",
+      "scope": [
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE"
+      ],
+      "category": "REGISTRO_IMPRESE",
+      "access": "PRIVATE_LOGIN",
+      "use": "MANUAL_LOGIN_ONLY"
+    },
+    {
+      "id": "SRC-0021",
+      "title": "Servizio Telematico",
+      "url": "https://www.serviziotelematico.com/",
+      "scope": [
+        "P04_MAGLIA360_OFFICE",
+        "COMMON"
+      ],
+      "category": "SERVIZI_TELEMATICI",
+      "access": "PUBLIC_OR_ACCOUNT",
+      "use": "NO_AUTOMATION_UNTIL_VERIFIED",
+      "status": "TO_VERIFY"
+    },
+    {
+      "id": "SRC-0022",
+      "title": "CPN - Area Utenti",
+      "url": "https://www.cpn.it/areautenti/index.php",
+      "scope": [
+        "P04_MAGLIA360_OFFICE",
+        "COMMON"
+      ],
+      "category": "PORTALE_UTENTI",
+      "access": "PRIVATE_LOGIN",
+      "use": "MANUAL_ONLY_UNTIL_VERIFIED",
+      "status": "TO_VERIFY"
+    },
+    {
+      "id": "SRC-0023",
+      "title": "Preventivass",
+      "url": "https://www.preventivass.it/dati-principali",
+      "scope": [
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE"
+      ],
+      "category": "ASSICURAZIONI_RC_AUTO",
+      "access": "PUBLIC",
+      "use": "PRODUCT_COMPARISON_REFERENCE",
+      "authority": "OFFICIAL_PUBLIC_TOOL"
+    },
+    {
+      "id": "SRC-0024",
+      "title": "SumUp Italia",
+      "url": "https://www.sumup.com/it-it/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "COMMON"
+      ],
+      "category": "PAGAMENTI_INCASSI",
+      "access": "PUBLIC_OR_ACCOUNT",
+      "use": "PAYMENT_FLOW_REFERENCE",
+      "sensitive": true
+    },
+    {
+      "id": "SRC-0025",
+      "title": "LAM Consulting",
+      "url": "https://www.lamconsulting.it/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE",
+        "COMMON"
+      ],
+      "category": "CHANGE_MANAGEMENT_FORMAZIONE_ORGANIZZATIVA",
+      "access": "PUBLIC",
+      "use": "METHOD_AND_ORGANIZATION_RESEARCH",
+      "authority": "PROFESSIONAL_REFERENCE",
+      "note": "Useful cross-project benchmark for change management, sales development, leadership, managerial skills, organizational wellbeing, internal communication and recruiting methods. Not a regulatory source."
+    },
+    {
+      "id": "SRC-0026",
+      "title": "APRIL Italia",
+      "url": "https://www.aprilitalia.com/",
+      "scope": [
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE"
+      ],
+      "category": "ASSICURAZIONI_BANCASSURANCE_TPA",
+      "access": "PUBLIC",
+      "use": "PRIORITY_PRODUCT_AND_PROCESS_RESEARCH",
+      "authority": "OFFICIAL_PROVIDER",
+      "note": "Official provider reference for insurance, bancassurance, TPA and digital/operational process benchmarking."
+    },
+    {
+      "id": "SRC-0027",
+      "title": "OPES Italia",
+      "url": "https://www.opesitalia.it/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "ENTE_PROMOZIONE_SPORTIVA_TERZO_SETTORE_FORMAZIONE",
+      "access": "PUBLIC",
+      "use": "SPORT_GOVERNANCE_AND_TRAINING_RESEARCH",
+      "authority": "ORGANIZATION_OFFICIAL",
+      "note": "Useful for affiliation, training, services, events and third-sector research; FIGC/LND/RASD obligations still require competent official sources."
+    },
+    {
+      "id": "SRC-0028",
+      "title": "Registro Nazionale Attivita Sportive Dilettantistiche - Sport e Salute",
+      "url": "https://registro.sportesalute.eu/#/login",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "RASD_REGISTRO_SPORTIVO",
+      "access": "PRIVATE_LOGIN",
+      "use": "MANUAL_AUTHENTICATED_USE",
+      "authority": "OFFICIAL",
+      "sensitive": true,
+      "note": "Priority institutional portal. Never store credentials or authenticated personal/company data in repository or ordinary AI logs."
+    },
+    {
+      "id": "SRC-0029",
+      "title": "LinkedIn",
+      "url": "https://www.linkedin.com/feed/",
+      "scope": [
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE",
+        "COMMON"
+      ],
+      "category": "NETWORKING_PROSPECTING_RECRUITING_CONTENT",
+      "access": "PRIVATE_LOGIN",
+      "use": "MANUAL_ACCOUNT_USE",
+      "authority": "PLATFORM",
+      "sensitive": true,
+      "note": "Use public profiles/content as research references where appropriate. Feed, messages and account-specific data require explicit authorized access."
+    },
+    {
+      "id": "SRC-0030",
+      "title": "Indeed Italia",
+      "url": "https://it.indeed.com/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P04_MAGLIA360_OFFICE",
+        "COMMON"
+      ],
+      "category": "LAVORO_RECRUITING_COMPENSI",
+      "access": "PUBLIC_OR_ACCOUNT",
+      "use": "JOB_AND_SKILLS_RESEARCH",
+      "authority": "PLATFORM",
+      "note": "Use for job/skills/recruiting research; verify posting freshness and terms at time of use."
+    },
+    {
+      "id": "SRC-0031",
+      "title": "Internova 2000",
+      "url": "https://internova2000.com/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE"
+      ],
+      "category": "FORNITURE_EVENTI_RISTORAZIONE_MONOUSO",
+      "access": "PUBLIC",
+      "use": "SUPPLIER_AND_COST_RESEARCH",
+      "authority": "COMMERCIAL",
+      "note": "Supplier reference for event, catering, take-away and club-house consumables; prices and availability are time-sensitive."
+    },
+    {
+      "id": "SRC-0032",
+      "title": "Saglio Sport",
+      "url": "https://www.sagliosport.it/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE"
+      ],
+      "category": "FORNITORE_SPORTIVO_TEAMWEAR",
+      "access": "PUBLIC_OR_ACCOUNT",
+      "use": "SPORT_SUPPLY_AND_TEAMWEAR_RESEARCH",
+      "authority": "COMMERCIAL",
+      "note": "Reference for sports equipment, football/teamwear and club-area benchmark; verify current stock and commercial conditions."
+    },
+    {
+      "id": "SRC-0033",
+      "title": "IDCERT Italia",
+      "url": "https://it.idcert.io/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE",
+        "COMMON"
+      ],
+      "category": "FORMAZIONE_CERTIFICAZIONI_COMPETENZE_DIGITALI_AI",
+      "access": "PUBLIC_OR_ACCOUNT",
+      "use": "TRAINING_CERTIFICATION_AND_SKILLS_RESEARCH",
+      "authority": "PROVIDER",
+      "sensitive": true,
+      "note": "Training/certification provider. Validate the current accreditation/recognition of each specific certification before operational use. Never store credentials or identity documents."
+    },
+    {
+      "id": "SRC-0034",
+      "title": "LumiaWeb - Blog Site professionale",
+      "url": "https://www.lumiaweb.com/blog-site-il-tuo-blog-professionale/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE",
+        "COMMON"
+      ],
+      "category": "WEB_DESIGN_BLOG_SEO_UX",
+      "access": "PUBLIC",
+      "use": "WEB_UX_SEO_IDEA_RESEARCH",
+      "authority": "COMMERCIAL_REFERENCE",
+      "note": "Verified canonical URL. Use for web/blog/SEO/UX benchmarking and ideas, not as an obligatory technical standard."
+    },
+    {
+      "id": "SRC-0035",
+      "title": "Facebook - SCD ColicoDerviese",
+      "url": "https://www.facebook.com/ColicoDerviese",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE"
+      ],
+      "category": "SOCIAL_MEDIA_OFFICIAL_CHANNEL",
+      "access": "PUBLIC_OR_LOGIN",
+      "use": "SOCIAL_CONTENT_REFERENCE",
+      "authority": "USER_PROVIDED_OFFICIAL_CHANNEL",
+      "status": "REGISTERED_PENDING_PLATFORM_VERIFY",
+      "sensitive": true,
+      "note": "User-provided SCD social page. Public fetch unavailable in current session; treat as official-channel candidate pending platform verification. Never store credentials or private messages."
+    },
+    {
+      "id": "SRC-0036",
+      "title": "Facebook - Maglia Assicurazioni",
+      "url": "https://www.facebook.com/MagliaAssicurazioni/",
+      "scope": [
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE"
+      ],
+      "category": "SOCIAL_MEDIA_OFFICIAL_CHANNEL",
+      "access": "PUBLIC_OR_LOGIN",
+      "use": "SOCIAL_CONTENT_REFERENCE",
+      "authority": "USER_PROVIDED_OFFICIAL_CHANNEL",
+      "status": "REGISTERED_PENDING_PLATFORM_VERIFY",
+      "sensitive": true,
+      "note": "User-provided Maglia social page. Public fetch unavailable in current session; treat as official-channel candidate pending platform verification. Never store credentials or private messages."
+    },
+    {
+      "id": "SRC-0037",
+      "title": "Instagram - SCD ColicoDerviese",
+      "url": "https://www.instagram.com/s.c.d.colicoderviese/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE"
+      ],
+      "category": "SOCIAL_MEDIA_OFFICIAL_CHANNEL",
+      "access": "PUBLIC_OR_LOGIN",
+      "use": "SOCIAL_CONTENT_REFERENCE",
+      "authority": "USER_PROVIDED_OFFICIAL_CHANNEL",
+      "status": "REGISTERED_PENDING_PLATFORM_VERIFY",
+      "sensitive": true,
+      "note": "User-provided SCD Instagram profile. Treat as official-channel candidate pending platform verification. Never store credentials or private messages."
+    },
+    {
+      "id": "SRC-0038",
+      "title": "TikTok - SCD ColicoDerviese",
+      "url": "https://www.tiktok.com/@s.c.d..colicoderv",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE"
+      ],
+      "category": "SOCIAL_MEDIA_OFFICIAL_CHANNEL",
+      "access": "PUBLIC_OR_LOGIN",
+      "use": "SOCIAL_CONTENT_REFERENCE",
+      "authority": "USER_PROVIDED_OFFICIAL_CHANNEL",
+      "status": "REGISTERED_PENDING_PLATFORM_VERIFY",
+      "sensitive": true,
+      "note": "User-provided SCD TikTok profile. Useful for short-form video, Gen Z/Alpha content, event/sponsor storytelling. Never store credentials or private messages."
+    },
+    {
+      "id": "SRC-0039",
+      "title": "YouTube - SCD ColicoDerviese",
+      "url": "https://www.youtube.com/@S.C.D.ColicoDerviese",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE"
+      ],
+      "category": "SOCIAL_MEDIA_OFFICIAL_CHANNEL",
+      "access": "PUBLIC",
+      "use": "SOCIAL_VIDEO_CONTENT_REFERENCE",
+      "authority": "USER_PROVIDED_OFFICIAL_CHANNEL",
+      "status": "REGISTERED_PENDING_PLATFORM_VERIFY",
+      "note": "User-provided SCD YouTube channel. Useful for highlights, matches, interviews, events, audiovisual archive and sponsor visibility."
+    },
+    {
+      "id": "SRC-0040",
+      "title": "Sporteams - Web app per lo sport e digitalizzazione",
+      "url": "https://www.sporteams.it/blog/digitalizzazione/web-app-per-lo-sport-e-digitalizzazione/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE"
+      ],
+      "category": "SPORT_CLUB_DIGITALIZATION_WEB_APP",
+      "access": "PUBLIC",
+      "use": "PRODUCT_BENCHMARK_AND_FEATURE_INSPIRATION",
+      "authority": "INDUSTRY_PROVIDER",
+      "note": "Verified source. Benchmark club-management flows and feature architecture, not proprietary UI/content."
+    },
+    {
+      "id": "SRC-0041",
+      "title": "Clupik - 101 software innovativi nello sport",
+      "url": "https://clupik.com/it/blog/software-innovadores-deporte/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "COMMON"
+      ],
+      "category": "SPORT_TECH_SOFTWARE_LANDSCAPE",
+      "access": "PUBLIC",
+      "use": "SPORT_TECH_LANDSCAPE_BENCHMARK",
+      "authority": "INDUSTRY_PROVIDER",
+      "note": "Broad historical sport-software landscape. Use for patterns/modules/ideas; verify current products and pricing before decisions."
+    },
+    {
+      "id": "SRC-0042",
+      "title": "Infront - Tecnologie per contenuti sportivi",
+      "url": "https://www.infront.sport/it/blog/migliori-tecnologie-per-contenuti-sportivi-2020",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "COMMON"
+      ],
+      "category": "SPORT_MEDIA_TECH_FAN_ENGAGEMENT",
+      "access": "PUBLIC",
+      "use": "MEDIA_TECH_AND_FAN_ENGAGEMENT_BENCHMARK",
+      "authority": "INDUSTRY_REFERENCE",
+      "status": "REGISTERED_VERIFIED_HISTORICAL",
+      "note": "2020 article. Use concepts for inspiration: AI highlights, data-driven graphics, near-live video, multichannel streaming, fan engagement and content tracking. Re-verify technologies/providers before adoption."
+    },
+    {
+      "id": "SRC-0043",
+      "title": "Runner's World - Innovazione digitale, tecnologia e sport / Touch RaiPlay",
+      "url": "https://www.runnersworld.com/it/news/a43935153/innovazione-digitale-tecnologia-sport-touch-raiplay/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "COMMON"
+      ],
+      "category": "SPORT_INNOVATION_EDITORIAL",
+      "access": "PUBLIC",
+      "use": "IDEA_REFERENCE_PENDING_VERIFY",
+      "authority": "SECONDARY_MEDIA",
+      "status": "REGISTERED_PARTIAL_VERIFY",
+      "note": "Direct page could not be read in the current verification session. Keep as editorial inspiration reference, but do not rely on article-specific details until re-verified."
+    },
+    {
+      "id": "SRC-0044",
+      "title": "Superprof - Applicazioni per il personal training",
+      "url": "https://www.superprof.it/blog/applicazioni-per-il-personal-training/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "FITNESS_COACHING_APPS_PERSONAL_TRAINING",
+      "access": "PUBLIC",
+      "use": "FITNESS_UX_AND_COACHING_IDEA_RESEARCH",
+      "authority": "SECONDARY_REFERENCE",
+      "status": "REGISTERED_VERIFIED_HISTORICAL",
+      "note": "2021 article. Useful for fitness/coaching app patterns such as remote coaching, workout programs, progress tracking and smartphone interaction. Not a medical or current market authority."
+    },
+    {
+      "id": "SRC-0045",
+      "title": "SportMade - Rivoluzione digitale e tecnologie nello sport giovanile",
+      "url": "https://www.sportmade.it/news/rivoluzione-digitale-tecnologie-nello-sport-giovanile/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "COMMON"
+      ],
+      "category": "YOUTH_SPORT_TECH_PERFORMANCE_ANALYTICS",
+      "access": "PUBLIC",
+      "use": "YOUTH_SPORT_TECH_FEATURE_INSPIRATION",
+      "authority": "INDUSTRY_REFERENCE",
+      "status": "REGISTERED_VERIFIED",
+      "note": "Verified source. Useful for video analysis, wearables, movement/biomechanics sensors, team management, calendars/presence, athlete-family feedback and tactical analysis. Minor/health data require dedicated privacy governance."
+    },
+    {
+      "id": "SRC-0046",
+      "title": "Cicloweb - App e strumenti mobile per seguire lo sport",
+      "url": "https://www.cicloweb.it/news/326710496774/4-programmi-che-potresti-trovare-utili-sul-tuo-telefono-se-ti-piace-guardare-il-ciclismo-e-altri-sport",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "MOBILE_SPORT_MEDIA_SECURITY",
+      "access": "PUBLIC",
+      "use": "MOBILE_SPORT_EXPERIENCE_REFERENCE",
+      "authority": "SECONDARY_MEDIA",
+      "status": "REGISTERED_VERIFIED_HISTORICAL",
+      "note": "2022 article. Use for mobile/streaming/security patterns only; do not use for circumventing geo-restrictions or distribution rights."
+    },
+    {
+      "id": "SRC-0047",
+      "title": "Il Tuo Consulente Online - App utili per sport e allenamento",
+      "url": "https://www.iltuoconsulenteonline.it/app-utili-per-fare-sport-ed-allenarsi/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "FITNESS_APP_COMMUNITY_COACHING",
+      "access": "PUBLIC",
+      "use": "FITNESS_UX_AND_FEATURE_REFERENCE",
+      "authority": "SECONDARY_REFERENCE",
+      "status": "REGISTERED_VERIFIED_HISTORICAL",
+      "note": "Historical fitness-app reference useful for workout, progress tracking, community, goals, timers and personalized coaching patterns. Not a medical/nutritional authority."
+    },
+    {
+      "id": "SRC-0048",
+      "title": "Fitness & Sport - Digital twin e allenamento personalizzato",
+      "url": "https://www.fitnessesport.it/digital-twin-e-sport-la-nuova-frontiera-dellallenamento-personalizzato/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "DIGITAL_TWIN_SPORT_PERFORMANCE",
+      "access": "PUBLIC",
+      "use": "DIGITAL_TWIN_CONCEPT_RESEARCH_ONLY",
+      "authority": "SECONDARY_REFERENCE",
+      "status": "REGISTERED_VERIFIED_SECONDARY",
+      "sensitive": true,
+      "note": "Useful for Athlete Twin concepts, predictive modeling and performance simulation. Physiological/biometric data require dedicated privacy governance and primary scientific validation."
+    },
+    {
+      "id": "SRC-0049",
+      "title": "Genius Sports",
+      "url": "https://www.geniussports.com/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "COMMON"
+      ],
+      "category": "SPORTS_DATA_AI_FAN_ENGAGEMENT",
+      "access": "PUBLIC",
+      "use": "DATA_AI_FAN_ENGAGEMENT_BENCHMARK",
+      "authority": "INDUSTRY_PROVIDER",
+      "status": "REGISTERED_VERIFIED_PRIORITY",
+      "note": "Use sports data, Perform/Engage, fan activation, analytics and AI insights as benchmark. Sportsbook/betting functionality is out of SCD scope."
+    },
+    {
+      "id": "SRC-0050",
+      "title": "Goal.com - App scommesse sportive 2026",
+      "url": "https://www.goal.com/it/scommesse/migliori-app-scommesse/blt3635ce8f27e17d2d",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "GAMBLING_APP_UX_REFERENCE_RESTRICTED",
+      "access": "PUBLIC",
+      "use": "UX_PATTERN_ONLY_NO_GAMBLING_WORKFLOWS",
+      "authority": "SECONDARY_MEDIA",
+      "status": "REGISTERED_RESTRICTED_REFERENCE",
+      "note": "Gambling-related content. Do not use for recommendations, promotion, monetization, odds or betting flows; only abstract mobile UX/information-architecture benchmarking."
+    },
+    {
+      "id": "SRC-0051",
+      "title": "ITitans - Top 20 Sports App Ideas 2025",
+      "url": "https://ititans.com/blog/top-20-sports-app-ideas-for-startups-in-2025/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "COMMON"
+      ],
+      "category": "SPORT_APP_IDEA_LANDSCAPE",
+      "access": "PUBLIC",
+      "use": "PRODUCT_IDEATION_AND_FEATURE_BENCHMARK",
+      "authority": "COMMERCIAL_REFERENCE",
+      "status": "REGISTERED_VERIFIED",
+      "note": "2025 software-agency ideation source. Useful for coaching, real-time, field availability, RSVP, community, offline, AR, fan engagement and product gap analysis; filter every idea through SCD needs, privacy, security and technical sustainability."
+    },
+    {
+      "id": "SRC-0052",
+      "title": "Dribbble - Sports Web App",
+      "url": "https://dribbble.com/search/sports-web-app",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE",
+        "COMMON"
+      ],
+      "category": "SPORT_UI_UX_VISUAL_INSPIRATION",
+      "access": "PUBLIC_OR_ACCOUNT",
+      "use": "UI_UX_VISUAL_PATTERN_RESEARCH",
+      "authority": "DESIGN_COMMUNITY",
+      "status": "REGISTERED_VERIFIED",
+      "note": "Use for sports dashboard/mobile/web visual patterns, match analytics, booking, cards, community and interaction ideas. Do not copy proprietary layouts/assets; ignore betting/gambling concepts for SCD."
+    },
+    {
+      "id": "SRC-0053",
+      "title": "KMA Studio - Grafica per i Social: 5 strumenti online",
+      "url": "https://www.kmastudio.it/grafica-per-social-5-ottimi-strumenti-online/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE",
+        "COMMON"
+      ],
+      "category": "SOCIAL_GRAPHICS_TOOLS",
+      "access": "PUBLIC",
+      "use": "SOCIAL_GRAPHICS_WORKFLOW_IDEAS",
+      "authority": "SECONDARY_REFERENCE",
+      "status": "REGISTERED_VERIFIED_HISTORICAL",
+      "note": "2015 article. Use for template/workflow concepts, not current tool-market assessment."
+    },
+    {
+      "id": "SRC-0054",
+      "title": "HostingVirtuale - Programmi di grafica per Social Network",
+      "url": "https://www.hostingvirtuale.com/blog/migliori-programmi-di-grafica-per-social-network-8931.html",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE",
+        "COMMON"
+      ],
+      "category": "SOCIAL_GRAPHICS_INFOGRAPHICS_TOOLS",
+      "access": "PUBLIC",
+      "use": "GRAPHICS_TOOL_LANDSCAPE_REFERENCE",
+      "authority": "SECONDARY_REFERENCE",
+      "status": "REGISTERED_VERIFIED",
+      "note": "Reference for social graphics, mockups, collages, infographics and cloud/mobile tools; re-check availability and licensing before adoption."
+    },
+    {
+      "id": "SRC-0055",
+      "title": "VistaCreate - Social Media Graphic",
+      "url": "https://create.vista.com/it/create/social-media-graphic/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE",
+        "COMMON"
+      ],
+      "category": "SOCIAL_GRAPHICS_TEMPLATE_TOOL",
+      "access": "PUBLIC_OR_ACCOUNT",
+      "use": "SOCIAL_CREATIVE_TOOL_REFERENCE_PENDING_VERIFY",
+      "authority": "PROVIDER",
+      "status": "REGISTERED_PARTIAL_VERIFY",
+      "note": "User-provided tool URL. Automated fetch returned 403 in current verification session; keep as social-creative reference without asserting unverified specific features."
+    },
+    {
+      "id": "SRC-0056",
+      "title": "SaGrafica - Piattaforme social per artisti e designer",
+      "url": "https://www.sagrafica.it/le-13-migliori-piattaforme-di-social-media-per-artisti-e-designer/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE",
+        "COMMON"
+      ],
+      "category": "CREATIVE_SOCIAL_CHANNEL_STRATEGY",
+      "access": "PUBLIC",
+      "use": "SOCIAL_CHANNEL_AND_CREATIVE_COMMUNITY_RESEARCH",
+      "authority": "SECONDARY_REFERENCE",
+      "status": "REGISTERED_VERIFIED",
+      "note": "Use for visual-channel, creative-community, streaming, portfolio and networking strategy; verify current platform relevance/policies before acting."
+    },
+    {
+      "id": "SRC-0057",
+      "title": "Figma - Web Design",
+      "url": "https://www.figma.com/it-it/web-design/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE",
+        "COMMON"
+      ],
+      "category": "WEB_APP_UI_UX_DESIGN_SYSTEM",
+      "access": "PUBLIC_OR_ACCOUNT",
+      "use": "PRIMARY_UI_UX_PROTOTYPING_AND_DESIGN_SYSTEM_REFERENCE",
+      "authority": "OFFICIAL_PROVIDER",
+      "status": "REGISTERED_VERIFIED_PRIORITY",
+      "note": "Primary reference for responsive design, components, styles, interactive prototypes, collaboration, design tokens and Dev Mode handoff across the four products."
+    },
+    {
+      "id": "SRC-0058",
+      "title": "MP Quadro - 13 risorse utili per la grafica",
+      "url": "https://mpquadro.it/blog/grafica-blog/13-risorse-utili-per-la-grafica/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE",
+        "COMMON"
+      ],
+      "category": "GRAPHIC_DESIGN_TOOLKIT_TYPOGRAPHY",
+      "access": "PUBLIC",
+      "use": "GRAPHIC_DESIGN_METHOD_AND_TOOL_REFERENCE",
+      "authority": "SECONDARY_REFERENCE",
+      "status": "REGISTERED_VERIFIED_HISTORICAL",
+      "note": "2022 article. Useful for graphic-production workflow, raster/vector, layout and typography; re-check current versions and licenses."
+    },
+    {
+      "id": "SRC-0059",
+      "title": "Tuttocampo - Lombardia Dilettanti",
+      "url": "https://www.tuttocampo.it/Lombardia/Dilettanti",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "LOMBARDIA_FOOTBALL_RESULTS_STANDINGS",
+      "access": "PUBLIC",
+      "use": "SECONDARY_RESULTS_AND_STANDINGS_MONITORING",
+      "authority": "SECONDARY_DATA_SOURCE",
+      "status": "REGISTERED_USER_PROVIDED_403",
+      "note": "Useful operational cross-check for fixtures/results/standings. Current automated fetch returned 403. Never replace CR Lombardia/LND as official source."
+    },
+    {
+      "id": "SRC-0060",
+      "title": "Sprint e Sport - Dilettanti Lombardia",
+      "url": "https://www.sprintesport.it/sezioni/266/dilettanti-lombardia",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "COMMON"
+      ],
+      "category": "LOMBARDIA_DILETTANTI_NEWS_YOUTH_FOOTBALL",
+      "access": "PUBLIC",
+      "use": "NEWS_MONITORING_AND_EDITORIAL_RESEARCH",
+      "authority": "SECONDARY_MEDIA",
+      "status": "REGISTERED_PARTIAL_VERIFY",
+      "note": "Page exists but JS/anti-bot blocked automated inspection. Use as secondary editorial source."
+    },
+    {
+      "id": "SRC-0061",
+      "title": "Lombardia Sport - FIGC LND Lombardia",
+      "url": "https://www.lombardiasport.com/federazioni/figc-lega-nazionale-dilettanti-lombardia/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "LOMBARDIA_SPORT_DIRECTORY_FIGC_LND",
+      "access": "PUBLIC",
+      "use": "INSTITUTIONAL_DIRECTORY_REFERENCE",
+      "authority": "INSTITUTIONAL_REFERENCE",
+      "status": "REGISTERED_VERIFIED",
+      "note": "Regional sports directory in collaboration with CONI Lombardia; useful for contacts/directory. CR Lombardia remains primary for official rules and communications."
+    },
+    {
+      "id": "SRC-0062",
+      "title": "AIA FIGC - Designazioni Lombardia",
+      "url": "https://www.aia-figc.it/designazioni/lombardia/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "REFEREE_APPOINTMENTS_LOMBARDIA",
+      "access": "PUBLIC",
+      "use": "PRIORITY_REFEREE_APPOINTMENTS_MONITORING",
+      "authority": "OFFICIAL",
+      "status": "REGISTERED_VERIFIED_PRIORITY",
+      "note": "Official AIA source for referee appointments by regional category/section. Link to matchday/calendar only after competition and match validation."
+    },
+    {
+      "id": "SRC-0063",
+      "title": "Tuttosport - Dilettanti Lombardia",
+      "url": "https://www.tuttosport.com/calcio-dilettanti/dilettanti-lombardia",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "LOMBARDIA_DILETTANTI_NEWS",
+      "access": "PUBLIC",
+      "use": "NEWS_AND_MEDIA_MONITORING",
+      "authority": "SECONDARY_MEDIA",
+      "status": "REGISTERED_PARTIAL_VERIFY",
+      "note": "Specific section did not open directly in current verification, but domain publishes current LND/amateur football coverage. Editorial, not official."
+    },
+    {
+      "id": "SRC-0064",
+      "title": "LombardiaNotizie Online - Calcio Dilettanti",
+      "url": "https://www.lombardianotizie.online/calcio-dilettanti/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "LOMBARDIA_DILETTANTI_LOCAL_NEWS",
+      "access": "PUBLIC",
+      "use": "LOCAL_NEWS_MONITORING_PENDING_VERIFY",
+      "authority": "SECONDARY_MEDIA",
+      "status": "REGISTERED_PARTIAL_VERIFY_403",
+      "note": "Automated fetch returned 403. Keep as secondary local-news source until re-verified."
+    },
+    {
+      "id": "SRC-0065",
+      "title": "MilanoToday - Dilettanti Calcio Lombardia",
+      "url": "https://www.milanotoday.it/tag/dilettanti-calcio-lombardia/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "LOMBARDIA_DILETTANTI_LOCAL_NEWS",
+      "access": "PUBLIC",
+      "use": "LOCAL_NEWS_MONITORING_PENDING_VERIFY",
+      "authority": "SECONDARY_MEDIA",
+      "status": "REGISTERED_PARTIAL_VERIFY_ROBOTS",
+      "note": "Crawler blocked by robots in current verification. Use as secondary local-news reference only."
+    },
+    {
+      "id": "SRC-0066",
+      "title": "Bergamo e Sport - Format campionati dilettanti Lombardia 2020/21",
+      "url": "https://www.bergamoesport.it/calcio-dilettanti-lombardia-ecco-il-format-dei-campionati/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "HISTORICAL_LOMBARDIA_COMPETITION_FORMAT",
+      "access": "PUBLIC",
+      "use": "HISTORICAL_CONTEXT_ONLY",
+      "authority": "SECONDARY_MEDIA",
+      "status": "REGISTERED_VERIFIED_HISTORICAL",
+      "note": "Article dated 2020-08-10 about 2020/21 competition structure. Historical context only; never use as current format."
+    },
+    {
+      "id": "SRC-0067",
+      "title": "La Prealpina - Mappa gironi calcio dilettanti Lombardia",
+      "url": "https://www.prealpina.it/news/sport/530649/ufficiali-i-gironi-della-lombardia-la-mappa-del-calcio-dilettanti-dall-eccellenza-alla-seconda-categoria.html",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "LOMBARDIA_GIRONI_DILETTANTI_NEWS",
+      "access": "PUBLIC",
+      "use": "GIRONI_CROSS_CHECK_AND_MEDIA_REFERENCE",
+      "authority": "SECONDARY_MEDIA",
+      "status": "REGISTERED_PARTIAL_VERIFY_JS",
+      "note": "Duplicate URL in user batch was de-duplicated. JS/anti-bot blocks direct inspection; use as cross-check only, not official group source."
+    },
+    {
+      "id": "SRC-0068",
+      "title": "Corriere della Sera - Stop calcio dilettanti Lombardia 21/02/2020",
+      "url": "https://www.corriere.it/sport/20_febbraio_21/coronavirus-lombardia-stop-calcio-dilettanti-lodigiano-volley-corse-1dd1bc92-54c7-11ea-9196-da7d305401b7.shtml",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "HISTORICAL_SPORT_DISRUPTION_COVID",
+      "access": "PUBLIC",
+      "use": "HISTORICAL_CONTEXT_ONLY",
+      "authority": "SECONDARY_MEDIA",
+      "status": "REGISTERED_VERIFIED_HISTORICAL",
+      "note": "Article dated 2020-02-21 on emergency match suspensions. Archive/resilience context only, not current monitoring."
+    },
+    {
+      "id": "SRC-0069",
+      "title": "CSI Live - Lombardia Bergamo",
+      "url": "https://live.centrosportivoitaliano.it/25/Lombardia/Bergamo/?j=NEU9REZIJjRGPWtraw==",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "CSI_LIVE_RESULTS_LOMBARDIA_BERGAMO",
+      "access": "PUBLIC",
+      "use": "EXTERNAL_COMPETITION_LIVE_RESULTS_REFERENCE",
+      "authority": "OFFICIAL_CSI_PORTAL",
+      "status": "REGISTERED_VERIFIED",
+      "note": "Official CSI live-results portal covering multiple seasons and sports. Keep clearly separate from FIGC/LND competitions."
+    },
+    {
+      "id": "SRC-0070",
+      "title": "SoloDilettanti",
+      "url": "https://solodilettanti.it/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "DILETTANTI_SPORT_NEWS_PORTAL",
+      "access": "PUBLIC",
+      "use": "SECONDARY_NEWS_MONITORING",
+      "authority": "SECONDARY_MEDIA",
+      "status": "REGISTERED_VERIFIED",
+      "note": "Secondary amateur-sport news source for scouting/rassegna stampa; never replace federation communications."
+    },
+    {
+      "id": "SRC-0071",
+      "title": "Lombardia Calcio - Dilettanti Lombardia",
+      "url": "https://lombardiacalcio.it/dilettanti-lombardia/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "LOMBARDIA_DILETTANTI_NEWS_PORTAL",
+      "access": "PUBLIC",
+      "use": "SECONDARY_NEWS_MONITORING_PENDING_VERIFY",
+      "authority": "SECONDARY_MEDIA",
+      "status": "REGISTERED_PARTIAL_VERIFY",
+      "note": "Page not readable in current automated verification. Keep as candidate secondary source until re-verified."
+    }
+  ]
+}
