@@ -504,6 +504,53 @@
       "status": "REGISTERED_PENDING_PLATFORM_VERIFY",
       "sensitive": true,
       "note": "User-provided Maglia social page. Public fetch unavailable in current session; treat as official-channel candidate pending platform verification. Never store credentials or private messages."
+    },
+    {
+      "id": "SRC-0037",
+      "title": "Instagram - SCD ColicoDerviese",
+      "url": "https://www.instagram.com/s.c.d.colicoderviese/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE"
+      ],
+      "category": "SOCIAL_MEDIA_OFFICIAL_CHANNEL",
+      "access": "PUBLIC_OR_LOGIN",
+      "use": "SOCIAL_CONTENT_REFERENCE",
+      "authority": "USER_PROVIDED_OFFICIAL_CHANNEL",
+      "status": "REGISTERED_PENDING_PLATFORM_VERIFY",
+      "sensitive": true,
+      "note": "User-provided SCD Instagram profile. Treat as official-channel candidate pending platform verification. Never store credentials or private messages."
+    },
+    {
+      "id": "SRC-0038",
+      "title": "TikTok - SCD ColicoDerviese",
+      "url": "https://www.tiktok.com/@s.c.d..colicoderv",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE"
+      ],
+      "category": "SOCIAL_MEDIA_OFFICIAL_CHANNEL",
+      "access": "PUBLIC_OR_LOGIN",
+      "use": "SOCIAL_CONTENT_REFERENCE",
+      "authority": "USER_PROVIDED_OFFICIAL_CHANNEL",
+      "status": "REGISTERED_PENDING_PLATFORM_VERIFY",
+      "sensitive": true,
+      "note": "User-provided SCD TikTok profile. Useful for short-form video, Gen Z/Alpha content, event/sponsor storytelling. Never store credentials or private messages."
+    },
+    {
+      "id": "SRC-0039",
+      "title": "YouTube - SCD ColicoDerviese",
+      "url": "https://www.youtube.com/@S.C.D.ColicoDerviese",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE"
+      ],
+      "category": "SOCIAL_MEDIA_OFFICIAL_CHANNEL",
+      "access": "PUBLIC",
+      "use": "SOCIAL_VIDEO_CONTENT_REFERENCE",
+      "authority": "USER_PROVIDED_OFFICIAL_CHANNEL",
+      "status": "REGISTERED_PENDING_PLATFORM_VERIFY",
+      "note": "User-provided SCD YouTube channel. Useful for highlights, matches, interviews, events, audiovisual archive and sponsor visibility."
     }
   ]
 }
