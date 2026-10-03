@@ -734,7 +734,7 @@ function coreDirectionUser(workspace=state.workspace,data=state.privateData){
  return data?.permissions?.direction===true||['DG','DIREZIONE','ADMIN'].includes(role);
 }
 function coreSourceLabel(key){
- return ({agenda:'AGENDA SCD',evolution:'EVOLUTION QUEUE',diagnostics:'DIAGNOSTICA',datafabric:'DATA FABRIC',dashboard:'R20 DASHBOARD'})[key]||String(key||'FONTE').toUpperCase();
+ return ({agenda:'AGENDA SCD',evolution:'EVOLUTION QUEUE',mailactions:'POSTA OPERATIVA',diagnostics:'DIAGNOSTICA',datafabric:'DATA FABRIC',dashboard:'R20 DASHBOARD'})[key]||String(key||'FONTE').toUpperCase();
 }
 function coreSourceResult(key,stateName,data=null,error=''){
  return {state:stateName,label:coreSourceLabel(key),data,checkedAt:new Date().toISOString(),error:String(error||'')};
@@ -748,6 +748,7 @@ async function loadCoreControlRoom(force=false){
  const specs=[
    ['agenda','private.agenda.summary',{}],
    ['evolution','direction.evolution',{limit:60}],
+   ['mailactions','direction.datafabric.actions',{limit:60}],
    ['diagnostics','direction.diagnostics',{}],
    ['datafabric','direction.datafabric.status',{}]
  ];
@@ -766,7 +767,8 @@ async function loadCoreControlRoom(force=false){
      today:todayKey(),
      sources,
      agenda:sources.agenda?.data,
-     evolution:sources.evolution?.data
+     evolution:sources.evolution?.data,
+     mailactions:sources.mailactions?.data
    });
  }catch(err){
    state.coreControl=null;state.coreControlError=String(err?.message||err);
@@ -777,11 +779,11 @@ async function loadCoreControlRoom(force=false){
 function coreOverallState(model){
  if(state.coreControlLoading)return 'PENDING';
  if(state.coreControlError)return 'UNAVAILABLE';
- const a=String(model?.sources?.agenda?.state||'UNVERIFIED'),e=String(model?.sources?.evolution?.state||'UNVERIFIED');
- if(a==='VERIFIED'&&e==='VERIFIED')return 'VERIFIED';
- if(a==='VERIFIED'||e==='VERIFIED')return 'PARTIAL';
- if(a==='PENDING'||e==='PENDING')return 'PENDING';
- if(a==='UNAVAILABLE'&&e==='UNAVAILABLE')return 'UNAVAILABLE';
+ const a=String(model?.sources?.agenda?.state||'UNVERIFIED'),e=String(model?.sources?.evolution?.state||'UNVERIFIED'),m=String(model?.sources?.mailactions?.state||'UNVERIFIED');
+ if(a==='VERIFIED'&&e==='VERIFIED'&&m==='VERIFIED')return 'VERIFIED';
+ if(a==='VERIFIED'||e==='VERIFIED'||m==='VERIFIED')return 'PARTIAL';
+ if(a==='PENDING'||e==='PENDING'||m==='PENDING')return 'PENDING';
+ if(a==='UNAVAILABLE'&&e==='UNAVAILABLE'&&m==='UNAVAILABLE')return 'UNAVAILABLE';
  return 'UNVERIFIED';
 }
 function coreLaneMeta(key){
@@ -821,7 +823,7 @@ function renderCoreControlRoom(){
  if(refresh){refresh.disabled=state.coreControlLoading;refresh.textContent=state.coreControlLoading?'Aggiornamento…':'Aggiorna fonti';refresh.onclick=()=>loadCoreControlRoom(true)}
  if(reset){reset.onclick=()=>{room.removeAttribute('data-focus-lane');reset.hidden=true}}
  const rawSources=state.coreControlSources||{};
- const sourceKeys=['agenda','evolution','diagnostics','datafabric','dashboard'];
+ const sourceKeys=['agenda','evolution','mailactions','diagnostics','datafabric','dashboard'];
  sourcesEl.innerHTML=sourceKeys.map(key=>{
    const src=rawSources[key]||{state:state.coreControlLoading?'PENDING':'UNVERIFIED',label:coreSourceLabel(key)};
    const detail=src.error?'Non disponibile':src.checkedAt?coreFormatDateTime(src.checkedAt):'In attesa';
