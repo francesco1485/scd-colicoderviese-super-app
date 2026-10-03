@@ -1,117 +1,97 @@
-# AI-MAGLIA360-01 — Audit e readiness produzione
+# Issue #90 — Maglia 360 Office: audit architettura e readiness
 
-**Issue:** [#90](https://github.com/francesco1485/scd-colicoderviese-super-app/issues/90)
-**Data dell’audit:** 2026-10-03
-**Commit esaminato:** `d16a658786b7577af498a3104dc31ebdd17f7613`
-**Esito:** **NO-GO per la produzione di Maglia360.** Questo audit non effettua deploy, non modifica dati e non certifica l’ufficio SCD Partner OS come prodotto Maglia360.
+**Esito:** `NO-GO produzione` — superfici applicative presenti nel branch sorgente, ma i confini di autorizzazione server-side, le funzioni operative, i test specifici e il preview non sono verificabili con le evidenze disponibili. Questo audit non dichiara il servizio assente e non autorizza un deploy.
 
-## Sintesi esecutiva
+## Stato ed evidenze
 
-Nel repository sono presenti il sito pubblico Sponsor e l’area privata **SCD Partner OS**, con CRM relazionale, Agenda SCD, pipeline sponsor e una Lia locale. Non è invece verificabile un’applicazione dedicata **Maglia360 Office**, né un’integrazione C.E.P.A., né il preview Render `maglia360-office-v2-preview`. La sola occorrenza di Maglia Assicurazioni individuata è nel contenuto statico del sito Sponsor: non prova l’esistenza di una control room assicurativa.
+Fonti primarie richieste:
 
-Perciò l’audit valuta ciò che il codice e le prove disponibili dimostrano, e segnala come non verificato tutto ciò che richiede artefatti, servizi o autorizzazioni non presenti. Non attribuisce a Maglia360 dati, integrazioni o controlli ereditati per supposizione dall’area Sponsor.
+- `ai-maglia360-office` — commit `3c6f979a249af677b8cbd98c0ae43b87d6c93c7e`: `APP_AI_MANIFEST.md`, `.github/copilot-instructions.md`, `.github/agents/webapp-master.agent.md`.
+- `maglia360-office-architecture-v2` — commit `215181e52d4ed0d81740653fdb7420ad8cde8c35`: applicazione in `cepa-maglia-os-static/`.
 
-## Perimetro e limiti delle fonti
+Il manifest identifica il progetto come ambiente operativo privato Maglia 360, nomina il servizio Render `maglia360-office-v2-preview` e `cepa-maglia-os-static` come publish path. Le istruzioni AI impongono autorizzazione server-side, nessun duplicato di CRM/auth/database, provenienza dei dati, test, accessibilità e divieto di mutazioni production senza autorizzazione (`APP_AI_MANIFEST.md:1-17`; istruzioni WebApp:3-8, 24-40).
 
-- La Issue richiede `APP_AI_MANIFEST.md`, `.github/copilot-instructions.md` e `.github/agents/webapp-master.agent.md`. I primi due file non sono presenti nel checkout né risultano nel riferimento `main` esaminato; il terzo non è stato verificabile in questo contesto. Le istruzioni specifiche WebApp AI non possono quindi essere usate come evidenza.
-- La fonte normativa SCD consultata è `SCD_SYSTEM_MANIFEST.json` (versione `3.26.0`). Il manifest registra `SPONSOR_MASTER_SHEET` per sponsor, partner, commerciale, asset e follow-up (riga 991) e la capability `CAP-SPONSOR-OPERATIONAL-FOCUS` come `PARTIAL`, basata su SCD Operativo Pilota, Google Calendar e R20 (righe 2835–2845). Queste fonti non documentano una fonte Maglia360 o C.E.P.A.
-- L’audit è basato sul codice/versione in repository e sui run GitHub Actions disponibili alla data indicata. Non sono state ispezionate credenziali, contenuti di clienti, dati di polizza o fogli di produzione.
-- Il patch Apps Script R21.6 nel repository documenta il comportamento del bridge, ma non prova che quel codice sia distribuito o coincida con il runtime live.
-
-## Risultati per dominio
-
-### 1. Applicazione, autenticazione e ruoli
-
-**FATTO.** `server.js` gestisce OTP e login tramite `auth.request`/`auth.login` Apps Script, rifiuta utenti non ammessi e imposta il cookie `scd_sponsor_session` con `HttpOnly`, `SameSite=Lax`, durata di sei ore e `Secure` in produzione (`server.js:104–166, 300–343`). La pagina e il relativo script dell’area privata vengono serviti solo dopo validazione della sessione (`server.js:475–486`).
-
-**FATTO.** La mappatura locale riconosce profili Direzione e Commerciale tramite email/ruolo/tipo; le capacità includono, tra l’altro, `finance`, `settings` e `admin` (`server.js:134–158`). Nel client è nascosta in base alle capacità solo la vista Impostazioni (`sponsor/app.js:66–81`). Questo è SCD Partner OS, non un modello di identità Maglia360.
-
-**RISCHIO ALTO — scope CRM non dimostrato.** Le route Node del CRM validano la sessione e inoltrano summary/detail a Apps Script (`server.js:344–356`). Nel patch R21.6, `r216CrmActor_` controlla token e presenza dell’email ma non un ruolo o scope (`backend_patch_R21_6_http_api.gs:287–291`); summary e detail leggono gli stakeholder e le relative attività, opportunità e convenzioni senza filtro tenant/cliente esplicito (`:302–354, :544–579`). È quindi necessaria una verifica o una restrizione server-side prima di riusare quel CRM per dati assicurativi. Il controllo di sessione non dimostra isolamento per cliente né autorizzazione granulare.
-
-**DA VERIFICARE.** Non esistono prove di una matrice ruoli Maglia360, di assegnazione collaboratore→cliente o dei test di accesso diretto agli endpoint. Le capacità esposte al client non sostituiscono i controlli server-side.
-
-### 2. Dati, fonti e provenance
-
-**FATTO.** Il Partner Hub combina record locali etichettati `DOSSIER` con record CRM etichettati `CRM`; il merge mantiene valori del dossier quando i dati CRM non li sostituiscono (`sponsor/app.js:192–229, 353–380`). Il CRM espone dati anagrafici e di relazione quali email, telefono, referente, valore relazionale, prossima azione e scadenza (`backend_patch_R21_6_http_api.gs:328–354`).
-
-**FATTO.** Una parte delle informazioni dell’ufficio Sponsor è codificata in array client-side; non va considerata automaticamente aggiornata o canonica. Per i progetti, il backend distingue master live da snapshot verificato e dichiara il fallback (`server.js:452–472`). Tale fallback non costituisce una fonte dati Maglia360.
-
-**NON VERIFICATO.** Non è documentato un modello dati Maglia360 per clienti, polizze, rinnovi assicurativi, sinistri, commissioni o collaboratori, né la provenienza e la freschezza di dati C.E.P.A. Non sono stati inventati esempi o importi per colmare questa lacuna.
-
-**Prerequisito.** Registrare nel manifest le fonti effettivamente autorizzate prima di collegarle; definire identificatori stabili, proprietario, trust, data di aggiornamento, retention e comportamento per dato stale/non disponibile.
-
-### 3. C.E.P.A.
-
-Nessun riferimento, client API, configurazione, contratto o test C.E.P.A. è stato trovato nel codice e nel manifest consultati. Non è possibile stabilire da questa evidenza cosa significhi l’acronimo, quale servizio sia previsto o se esista un rapporto tecnico attivo.
-
-**Bloccante.** Prima dell’integrazione servono identificazione e documentazione ufficiali del servizio, referente autorizzante, ambiente di test, autenticazione, scope, schema e regole di trattamento. Fino ad allora nessun dato C.E.P.A. va simulato o mostrato come connesso.
-
-### 4. Lia
-
-**FATTO.** La Lia visibile in SCD Partner OS è etichettata “Assistente AI locale” (`sponsor/app.html:249–260`), ma `liaAnswer()` seleziona risposte predefinite tramite parole chiave e le mostra nel browser con `textContent`; non effettua chiamate a un modello, a C.E.P.A. o a una fonte assicurativa (`sponsor/app.js:1115–1128`).
-
-**ESITO.** Non è dimostrata la Lia Workbench richiesta per Maglia360. La Lia SCD attuale non può essere presentata come assistente generativa, come interprete di polizze o come fonte di consulenza assicurativa. Se riutilizzata, deve restare esplicita la distinzione tra risposta locale, contenuto documentato e dato non disponibile; ogni azione esterna richiede autorizzazione e conferma umana.
-
-### 5. Documenti, contratti e confidenzialità
-
-**FATTO.** L’interfaccia Sponsor contiene una sezione Document Hub, ma `renderFolders()` costruisce categorie statiche e invita a collegare i file ufficiali: non prova navigazione, permessi o archiviazione Drive (`sponsor/app.html:430–433`; `sponsor/app.js:291, 855–857`). Il CRM può restituire accordi associati a uno stakeholder (`backend_patch_R21_6_http_api.gs:560–579`), ma ciò non certifica un archivio contratti Maglia360.
-
-**RISCHIO ALTO — preview HTML.** La preview email restituita dal bridge viene inserita nel DOM usando `innerHTML` (`sponsor/app.js:1360–1369`). Il bridge codifica le variabili del template, ma compone anche la firma HTML configurata (`backend_patch_R21_6_http_api.gs:589–593, 683–704`). Prima di riutilizzare questa superficie per contenuti riservati occorre definire una allowlist/sanificazione dell’HTML attendibile o un rendering isolato e verificare chi può modificare template e firme.
-
-**PRIVACY — log OTP.** Il server scrive l’indirizzo email richiesto per l’OTP nei log applicativi, sia su accettazione sia su errore (`server.js:309, 312`). Per il perimetro Maglia va stabilito se ciò è necessario, chi può leggere i log e per quanto sono conservati; preferire la minimizzazione o redazione dell’identificativo.
-
-**DA VERIFICARE.** Mancano evidenze di autorizzazioni per file, link privati, audit accessi/download, retention, revoca, versioning e segregazione per cliente. Documenti di identità, polizze, sinistri e dati di terzi devono rimanere fuori da superfici pubbliche, analytics generici e log applicativi.
-
-### 6. Network radar, attività, scadenze e recupero cliente
-
-**FATTO.** Esiste un radar fornitori/partner SCD e una pipeline commerciale nel Partner OS; la capability SCD `CAP-SPONSOR-OPERATIONAL-FOCUS` è dichiarata `PARTIAL`, con contratto che vieta scadenze sintetiche (`SCD_SYSTEM_MANIFEST.json:2835–2845`). Il CRM gestisce task, opportunità, contatti e prossime azioni; Agenda SCD prevede riepilogo e creazione evento via bridge.
-
-**NON VERIFICATO per Maglia360.** Non sono provati un network radar assicurativo, assegnazione dei clienti a collaboratori Maglia, workflow di recupero, SLA, reminder o riconciliazione con C.E.P.A. Le attività SCD esistenti non dimostrano tali funzioni.
-
-### 7. UX, accessibilità e prestazioni
-
-**FATTO.** SCD Partner OS ha navigazione desktop/mobile, stati di caricamento/errore in alcune viste e pattern accessibili presenti nel CSS: focus visibile, target minimi da 44 px e riduzione di alcune animazioni (`sponsor/app.css:226–246, 1165–1167`). Le viste includono CRM, Partner Hub, Document Hub e Agenda (`sponsor/app.html:26–43`).
-
-**DA VERIFICARE.** Non risultano un visual master Maglia360, schermate specifiche, QA visuale sulle viewport richieste, audit completo WCAG/ARIA, test tastiera end-to-end o misure prestazionali del prodotto Maglia360. I controlli CSS presenti non equivalgono a una conformità accessibilità.
-
-### 8. Test e prove di rilascio
-
-- `tests/sponsor-runtime-smoke.mjs` prova le superfici Sponsor e i dinieghi senza sessione, ma non un login positivo, matrice ruoli Maglia360, isolamento cliente o C.E.P.A.
-- `tests/sponsor-vision-contract.mjs` verifica la presenza di stringhe e moduli UI, non screenshot né comportamento accessibile reale.
-- `tests/crm-communication-contract.mjs` verifica contratti statici per CRM, invii con conferma e Agenda; non prova autorizzazione di produzione per ruolo o cliente.
-- Il run E2E main **37112220271** è riuscito e il deploy Pages **37112220325** è riuscito sul commit esaminato.
-- Il run Production Evidence **37112220326** è fallito: Pages e manifest rispondono correttamente, ma la verifica Render ha osservato il commit `fba68f62834f6f2343ddbe4b7507707ca543a83f` invece del commit atteso `d16a658786b7577af498a3104dc31ebdd17f7613` (`RENDER_HEALTH_COMMIT`). Questo è un blocco di readiness SCD corrente e non è stato corretto o aggirato in questo task.
-
-### 9. Preview e readiness di produzione
-
-`render.yaml` dichiara un servizio web `scd-colicoderviese-super-app`, health check `/health` e `autoDeploy: true` (righe 1–14). Non dichiara `maglia360-office-v2-preview`; la presenza e lo stato di tale servizio non sono verificabili dai file o dalle prove consultate.
-
-**NO-GO:** non esiste evidenza verificabile che Maglia360 sia installata, segregata, collegata a fonti autorizzate, testata o pronta al rilascio. Il servizio SCD live non ha superato la prova di commit esatto. Nessun deploy è stato eseguito in questa attività.
-
-## Finding prioritari
-
-| Priorità | Finding | Evidenza / condizione di chiusura |
+| Elemento | Esito | Evidenza / limite |
 |---|---|---|
-| **P0 — Bloccante** | Applicazione, manifest AI e preview Maglia360 non verificabili; integrazione C.E.P.A. assente dall’evidenza repository. | Ottenere artefatti/spec ufficiali, owner e ambiente di test; registrare la capability e le fonti autorizzate prima di implementare. |
-| **P1 — Alto** | Il CRM R21.6 controlla la sessione, ma summary/detail non mostrano filtro Maglia o per-cliente nel codice esaminato. | Definire ACL server-side fail-closed per ogni risorsa e provare accesso diretto, IDOR e isolamento con ruoli diversi. |
-| **P1 — Alto** | Preview di email renderizza HTML restituito dal backend nel DOM; la firma configurata entra nel documento HTML. | Limitare e verificare template/firme; sanificare o isolare il rendering; aggiungere test XSS su contenuti e configurazione. |
-| **P1 — Alto** | Le categorie Document Hub sono statiche e non dimostrano autorizzazioni o storage documentale. | Implementare/validare storage autorizzato, audit, retention, revoca e segregazione prima di usare documenti cliente. |
-| **P2 — Medio** | Il flusso OTP registra l’indirizzo email in chiaro nei log applicativi. | Valutare redazione/minimizzazione e verificare accesso e retention dei log. |
-| **P2 — Medio** | Lia è locale e deterministica; nessun fondamento C.E.P.A. o assurance assicurativa verificabile. | Definire scopo, fonti citate, confini di risposta, fallback e approvazione umana; non usare per consulenza non autorizzata. |
-| **P1 — Alto** | Readiness Render SCD fallisce il controllo sul commit esatto; il servizio preview Maglia non è dimostrato. | Risolvere/verificare separatamente lo stato Render e dimostrare il preview dedicato, senza usare il deploy SCD come prova Maglia. |
+| Branch e commit sorgente | `VERIFIED` | SHA dei due ref riportati sopra. |
+| PR di correzione | `VERIFIED` | PR #95 aperta e draft al momento della verifica. |
+| App Maglia 360 | `VERIFIED` nel repository | HTML, JS, CSS, visual master e prove di provenienza presenti in `cepa-maglia-os-static/`. |
+| Backend, schema, policy e funzioni | `UNVERIFIED` | Non sono inclusi schema/migrazioni/policy Supabase né il codice della Edge Function `lia-workbench` nell’app esaminata. |
+| Render preview | `UNVERIFIED` | Il manifest nomina il servizio. Root e `/health` non hanno risolto via DNS da questo ambiente; `render.yaml` nel ref esaminato non contiene una definizione identificabile del servizio Maglia. Ciò non prova che il servizio non esista. |
+| Test funzionali Maglia / release | `UNVERIFIED` | Non risultano test specifici per l’app né un flusso di release/rollback verificabile per quel preview. |
+| Produzione | `NOT MODIFIED` | Nessun deploy, login con account reale o mutazione di dati production effettuati nell’audit. |
 
-## Sequenza necessaria prima di una decisione di produzione
+## Applicazione e perimetro funzionale
 
-1. **Chiudere i prerequisiti documentali:** fornire `APP_AI_MANIFEST.md` e le istruzioni WebApp AI consultabili; nominare owner di prodotto, sicurezza e dati; chiarire formalmente C.E.P.A. e la relazione con Maglia Assicurazioni.
-2. **Approvare il contratto di sistema:** definire schermate, ruoli e scope, categorie di dato, fonti, retention e operazioni consentite; aggiornare `SCD_SYSTEM_MANIFEST.json` nello stesso PR se si introducono capability, fonti, ruoli, routing o contratti nuovi.
-3. **Definire il modello dati reale:** mappare solo entità e campi autorizzati a fonti ufficiali; includere provenance, identificatore, timestamp, freshness e stati “non disponibile/stale”; nessun fixture con dati cliente reali.
-4. **Implementare identità e autorizzazione server-side:** ruoli nominativi approvati, scope minimo per cliente/collaboratore, controlli su ogni endpoint e file; rifiuto predefinito per identità, scope o fonte mancanti.
-5. **Integrare C.E.P.A. prima in sandbox read-only:** verificare contratto/versione, autenticazione, rate limit e mapping; aggiungere timeout, errori visibili, audit e fixture sintetici. Le scritture e gli invii restano disabilitati fino ad approvazione.
-6. **Definire Lia come assistente circoscritto:** risposte ancorate a fonti visibili, citazioni/provenance, nessun bypass autorizzativo o inferenza non supportata; conferma umana per azioni e messaggi; percorso di escalation per richieste assicurative fuori perimetro.
-7. **Chiudere documenti e privacy:** storage con ACL per cliente, accessi/download auditabili, retention e revoca definite; sanificazione/isolation della preview HTML; minimizzazione dei log (inclusi identificatori email) e revisione privacy/sicurezza.
-8. **Completare UX e QA:** visual master Maglia approvato; test keyboard/screen reader e viewport mobile/desktop; stati loading, vuoto, offline, stale, denied ed errore; verifiche di performance e regressione visuale.
-9. **Aggiungere test bloccanti Maglia360:** login valido/non valido, ruolo e scope, IDOR e cross-client, endpoint/files diretti, sandbox C.E.P.A. (errori inclusi), Lia grounding/fallback, XSS, audit log, dati stale e assenza di dati reali nei fixture.
-10. **Verificare il preview senza dati reali:** dimostrare che `maglia360-office-v2-preview` esiste ed è separato da produzione, con segreti e fonti di test isolati; verificare health, versione e commit esatti, feature flag e report CI. Il blueprint SCD segnala `autoDeploy: true`: chiarire il collegamento/trigger Render prima di qualunque merge o release.
-11. **Raccogliere approvazioni e piano di rollback:** sign-off di owner, sicurezza/privacy e responsabile delle fonti; artefatti di test, limiti noti, commit e PR; procedura di disabilitazione e ripristino. Un deploy futuro richiede un’autorizzazione separata e non è incluso nell’Issue svolta qui.
+La UI implementa viste per ecosistema/partner, prodotti, collaboratori, C.E.P.A. centrale e territoriale, documenti, Lia Workbench, Radar Rete, attività/scadenze e recovery. La struttura è coerente con lo scopo dichiarato nel manifest, non con il Partner OS SCD (`cepa-maglia-os-static/index.html:20-23, 74-89, 231-305, 613-694, 790-806, 860-880, 929-950`).
 
-**Criterio di uscita:** nessuna dichiarazione “live” o “production-ready” finché i finding P0/P1 non sono chiusi, i test Maglia360 non sono verdi e le prove runtime/commit del servizio dedicato non sono verificabili.
+### Autenticazione, ruoli e scope
+
+- L’app usa Supabase Auth dal browser, con `signInWithPassword`, signup, sessione persistente e logout (`app.js:1-2, 34-35, 75-76`). La chiave client pubblica non è una credenziale server; la riservatezza dipende da policy backend corrette.
+- Dopo il login, `boot()` cerca una membership attiva dell’utente e ne prende una sola con `.limit(1).maybeSingle()`. Senza selezione esplicita dell’organizzazione, un account con più membership attive può entrare nello scope non deterministico rispetto alla scelta dell’utente (`app.js:415-430`).
+- Le viste sono mostrate/nascoste tramite `organization_role_views`; `super_admin`, `supervisor` e `manager` vengono trattati come manager (`app.js:8, 218-236`). Assegnazioni ufficio e capability Lia sono caricate dal client. Sono controlli UI, non prova di autorizzazione.
+- Le query principali aggiungono `organization_id` e diverse azioni includono lo stesso filtro o chiamano RPC con ID. Questo è un utile confine applicativo, ma non garantisce isolamento tenant: le policy RLS, permessi RPC, ruolo del proprietario/definer e verifiche server-side non sono nel materiale esaminato.
+- Non è verificabile se un membro può leggere solo assegnazioni/uffici consentiti, o se ruoli client/manipolazione delle richieste possano superare i limiti UI. **Gate bloccante:** fornire e testare RLS, grants, funzioni e policy per tenant, membership, ruoli, uffici e capability.
+
+### Partner, prodotti e collaboratori
+
+Il client legge entità partner (`ecosystem_nodes`, contatti, timeline, documenti e requisiti), prodotti (`agency_products`, conoscenza e confronti) e collaboratori (termini, snapshot e valutazioni) filtrando `organization_id` (`app.js:441-467`). La UI distingue stato dei requisiti, termini economici verificati e confronti con fonte, e dichiara di non inventare punteggi/dati non documentati (`app.js:1768-1771`).
+
+`product-evidence.js` registra tre URL ufficiali HDI — Auto, Globale Casa, Globale PMI — con data fonte `2026-09-30` (righe 1-15). Questo dimostra provenance codificata per quelle schede, non accuratezza o aggiornamento di tutti i record Supabase, condizioni commerciali, prezzi o prodotti in produzione. Non sono stati letti record reali. Prima dell’uso operativo verificare per ogni dato materiale fonte, data, ambito di validità, stato di verifica e responsabile.
+
+### C.E.P.A.
+
+C.E.P.A. è una superficie operativa dell’app: materie, iniziative, contenuti, Academy, relatori, readiness e attività territoriali sono caricate da tabelle Supabase distinte (`app.js:455-459, 473-474, 491`; `index.html:231-305`). Il client separa attività per sede e carica assegnazioni ufficio. Non emerge dal materiale una specifica integrazione con un sistema C.E.P.A. esterno: contratto, qualità, provenance e confini di accesso restano dipendenti dal backend non disponibile. Non considerare le voci UI prova di dati o iniziative live.
+
+### Lia e automazioni
+
+- La Workbench invia comandi e allegati alla funzione Supabase `lia-workbench`; la stessa funzione riceve anche richieste di esecuzione automazioni Radar (`app.js:388-409, 1774-1787, 1948-1960`). Nel branch esaminato non c’è il codice della funzione, perciò autenticazione, verifica membership/scope, policy delle azioni, approvazioni effettive, prompt injection, audit log, idempotenza e chiamate a servizi esterni non sono verificabili.
+- Il client carica capability, catalogo azioni, approvazioni e automazioni per organizzazione/ruolo (`app.js:475-485`). La protezione delle decisioni è almeno in parte presentazionale: il controllo manager in `decideLiaApproval()` è client-side (`app.js:1789-1795`). L’autorizzazione definitiva e il gate di approvazione devono essere applicati lato server.
+- La chat combina Workbench per comandi riconosciuti e risposte locali deterministiche basate sui dati già caricati; non va presentata come prova di un motore LLM generale attivo (`app.js:1948-2008`). Le conversazioni sono scritte in `ai_assistant_messages` con `organization_id`, `user_id` e contesto (`app.js:1942-1946`): verificare accesso, retention, cancellazione e minimizzazione.
+
+### Documenti e allegati
+
+Il Document Studio espone archivio e blueprint, ma il client carica `ecosystem_documents` come metadati; l’upload file osservabile è nella bucket `lia-workspace` per gli allegati di Lia (`app.js:452-454, 359-386`; `index.html:790-806`). Per i file Lia il client limita a 12 selezioni e 25 MB per file e crea URL firmati validi 120 secondi. `accept` HTML e `file.type` non equivalgono a validazione MIME/contenuto affidabile. Bucket policy/RLS, scansione, retention, cifratura, download cross-tenant e autorizzazioni ai signed URL non sono ispezionabili. Il cleanup in caso di errore è tentato, ma non dimostra cancellazione completa.
+
+Prima di usare documenti reali verificare policy Storage per tenant/utente, controlli server-side su tipo e dimensione, autorizzazione del destinatario, retention/cancellazione e log di accesso. Non caricare documenti personali o riservati per validare il preview.
+
+### Radar Rete
+
+La UI descrive RUI IVASS Sezioni B/E, Registro Imprese/CCIAA e fonti pubbliche, con verifica prima del contatto (`index.html:860-880`). Il client legge watchlist, candidati, evidenze, fonti e insight e può invocare una run automatizzata tramite Lia (`app.js:468-470, 480-485, 1774-1787`). Non è presente una fonte di ingestione client-side che provi accesso live ai registri, né la funzione/worker che dovrebbe alimentare queste tabelle. Etichette e schede fonte non provano ingestione, licenza, accuratezza, freschezza o completamento delle ricerche. Verificare con record campione non personali, URL/data/osservazione/provenance e review umana; nessun contatto automatico va considerato autorizzato sulla sola base della UI.
+
+### Attività, scadenze e Recovery
+
+Le attività sono associate a partner/progetti/territori e hanno stato, priorità, scadenza, esito e prossima azione; il client salva modifiche con filtro organizzazione (`app.js:447, 2129-2133`). Recovery interroga le pratiche aperte `pipeline='recovery'` e legge campi dei clienti inclusi email, telefono, città e data di uscita (`app.js:2135-2145`). La query è filtrata per organizzazione, non per assegnatario; quindi la visibilità effettiva dei dati personali dipende da RLS e dai permessi di vista, non dal filtro visuale dei pulsanti.
+
+Assegnazione e registrazione esito passano da `assign_recovery_case` e `record_recovery_outcome` (`app.js:2147-2149`). Non si possono verificare sul solo client autorizzazioni per assegnatario/ruolo, idempotenza, audit o limitazione dati. Verificare inoltre base, interpretabilità e correttezza di `score` prima di usarlo per priorità o contatti; il client ordina per score e mostra la soglia 90, ma non implementa il calcolo.
+
+## UX, accessibilità e sicurezza
+
+- **Responsive:** sono presenti sidebar mobile, chiusura con Escape, focus mode e breakpoint multipli in CSS; il codice non costituisce una prova visual QA su dispositivi reali o confrontata con un visual master. Eseguire smoke manuale desktop e mobile sulle viste principali, inclusi tabelle, modal, file picker e stati errore/loading.
+- **Accessibilità:** login con label, vari controlli con `aria-label`, dock Lia con ruolo dialog; non risultano selettori CSS `:focus`/`:focus-visible` né `prefers-reduced-motion` negli stylesheet esaminati. Il modal generico non dichiara `role="dialog"`/`aria-modal`. Non sono stati eseguiti test tastiera, screen reader, contrasto o WCAG; questi sono gap da colmare prima del rilascio, non una certificazione di non conformità completa.
+- **Dati non caricati / errori:** `loadAll()` interrompe il rendering se una delle query fallisce; verificare che gli utenti distinguano dati assenti, dati vuoti e errore di autorizzazione. Il fallback Dashboard (`dashboard-component.js`) usa valori zero/strutture vuote, quindi non confondere una schermata iniziale o non connessa con dati live.
+- **Boundary browser:** il codice client deve essere considerato ispezionabile e manipolabile. Nessuna segretezza o regola di ruolo può basarsi su elementi nascosti, `window.orgId`, campi del payload, mime fornito dal browser o chiave publishable.
+
+## Test e readiness di rilascio
+
+**Evidenza test:** il controllo `node --check --input-type=module` sull’`app.js` del branch sorgente è passato. L’inventario non mostra test, schema Supabase o test di integrazione specifici per `cepa-maglia-os-static/`; gli script root presenti coprono app SCD, smoke/contract/Pages, non provano le regole runtime Maglia. Testare almeno:
+
+1. accesso anonimo, signup, conferma, logout e utente senza membership;
+2. utente con più membership, ruolo e assegnazione ufficio, accesso diretto a viste e richieste API;
+3. isolamento tra due organizzazioni per ogni tabella, RPC, bucket e signed URL (test negativi inclusi);
+4. policy Lia per ruoli/capability, approvazione lato server, retry e failure/partial state;
+5. permessi e minimizzazione PII Recovery, audit di assegnazione/esiti e `do_not_contact`;
+6. provenienza/freschezza Radar e controlli manuali prima del contatto;
+7. upload di file limite/inattesi, accesso cross-tenant e pulizia; tastiera, screen reader e layout responsive.
+
+**Gate NO-GO** finché non sono disponibili prove versionate/verificabili di schema, RLS/grants, Edge Function, policy Storage, test autorizzativi cross-tenant, test UX/accessibilità e contratto release/rollback del servizio. Il manifest nomina il preview, ma al momento dell’audit non è raggiungibile dall’ambiente di verifica: registrarne separatamente URL, commit servito e health check quando il DNS/runtime è verificabile, senza dedurre assenza dal fallimento DNS.
+
+## Piano di readiness, senza deploy
+
+1. Recuperare nel ref di progetto le migrazioni/policy backend e il codice/versione della Edge Function; verificare ruoli e tenancy con test negativi.
+2. Formalizzare fonti/provenance e validazione dei prodotti, C.E.P.A. e Radar; approvare policy di accesso e retention per documenti, conversazioni e Recovery.
+3. Aggiungere test Maglia specifici e smoke/accessibilità responsive; definire gestione errori e fallback distinguendo chiaramente dati live da assenti.
+4. Verificare il contratto Render del servizio nominato, commit deployato, health check e rollback; mantenere l’ambiente isolato e non usare dati reali durante i test.
+5. Soltanto dopo evidenze e autorizzazione esplicita, valutare un rilascio. Questo audit non effettua né richiede deploy o mutazioni production.
+
+**Conclusione:** l’app Maglia 360 e le sue superfici sono presenti nel ref corretto; il codice browser mostra filtri organizzativi e flussi UI ma non prova enforcement backend o readiness operativa. Stato complessivo: `DESIGNED / IMPLEMENTED IN REPOSITORY`, non `TESTED / DEPLOYED / PRODUCTION_VERIFIED`.
