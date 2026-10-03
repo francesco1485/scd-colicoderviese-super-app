@@ -460,7 +460,7 @@ function r57DataFabricActions_(token, limit) {
   }).filter(Boolean);
 
   rows.sort(function(a,b) {
-    var rank = {CRITICA:4,ALTA:3,MEDIA:2,BASSA:1};
+    var rank = {CRITICA:5,URGENTE:4,ALTA:3,MEDIA:2,BASSA:1};
     var pa = rank[String(a.priority || '').toUpperCase()] || 0;
     var pb = rank[String(b.priority || '').toUpperCase()] || 0;
     if (pa !== pb) return pb - pa;
