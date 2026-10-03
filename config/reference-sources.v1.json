@@ -551,6 +551,67 @@
       "authority": "USER_PROVIDED_OFFICIAL_CHANNEL",
       "status": "REGISTERED_PENDING_PLATFORM_VERIFY",
       "note": "User-provided SCD YouTube channel. Useful for highlights, matches, interviews, events, audiovisual archive and sponsor visibility."
+    },
+    {
+      "id": "SRC-0040",
+      "title": "Sporteams - Web app per lo sport e digitalizzazione",
+      "url": "https://www.sporteams.it/blog/digitalizzazione/web-app-per-lo-sport-e-digitalizzazione/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE"
+      ],
+      "category": "SPORT_CLUB_DIGITALIZATION_WEB_APP",
+      "access": "PUBLIC",
+      "use": "PRODUCT_BENCHMARK_AND_FEATURE_INSPIRATION",
+      "authority": "INDUSTRY_PROVIDER",
+      "note": "Verified source. Benchmark club-management flows and feature architecture, not proprietary UI/content."
+    },
+    {
+      "id": "SRC-0041",
+      "title": "Clupik - 101 software innovativi nello sport",
+      "url": "https://clupik.com/it/blog/software-innovadores-deporte/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "COMMON"
+      ],
+      "category": "SPORT_TECH_SOFTWARE_LANDSCAPE",
+      "access": "PUBLIC",
+      "use": "SPORT_TECH_LANDSCAPE_BENCHMARK",
+      "authority": "INDUSTRY_PROVIDER",
+      "note": "Broad historical sport-software landscape. Use for patterns/modules/ideas; verify current products and pricing before decisions."
+    },
+    {
+      "id": "SRC-0042",
+      "title": "Infront - Tecnologie per contenuti sportivi",
+      "url": "https://www.infront.sport/it/blog/migliori-tecnologie-per-contenuti-sportivi-2020",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "COMMON"
+      ],
+      "category": "SPORT_MEDIA_TECH_FAN_ENGAGEMENT",
+      "access": "PUBLIC",
+      "use": "MEDIA_TECH_AND_FAN_ENGAGEMENT_BENCHMARK",
+      "authority": "INDUSTRY_REFERENCE",
+      "status": "REGISTERED_VERIFIED_HISTORICAL",
+      "note": "2020 article. Use concepts for inspiration: AI highlights, data-driven graphics, near-live video, multichannel streaming, fan engagement and content tracking. Re-verify technologies/providers before adoption."
+    },
+    {
+      "id": "SRC-0043",
+      "title": "Runner's World - Innovazione digitale, tecnologia e sport / Touch RaiPlay",
+      "url": "https://www.runnersworld.com/it/news/a43935153/innovazione-digitale-tecnologia-sport-touch-raiplay/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "COMMON"
+      ],
+      "category": "SPORT_INNOVATION_EDITORIAL",
+      "access": "PUBLIC",
+      "use": "IDEA_REFERENCE_PENDING_VERIFY",
+      "authority": "SECONDARY_MEDIA",
+      "status": "REGISTERED_PARTIAL_VERIFY",
+      "note": "Direct page could not be read in the current verification session. Keep as editorial inspiration reference, but do not rely on article-specific details until re-verified."
     }
   ]
 }
