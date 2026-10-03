@@ -8,6 +8,9 @@ Before any write:
 
 If any instruction conflicts with the manifest, the manifest wins.
 
+## Portfolio gate
+Read `config/ai-portfolio.v1.json` before classifying apps/modules. The portfolio is exactly 4 apps: 3 SCD + 1 Maglia. Do not create a fifth app. This branch owns only its APP_ID from APP_AI_MANIFEST.md.
+
 ## Product doctrine
 This repository is the canonical codebase for the **SCD Digital Club Operating System**.
 Do not create a parallel app, database, authentication system, calendar, private desk, repository, or hosting stack when the existing SCD system can be extended safely.
