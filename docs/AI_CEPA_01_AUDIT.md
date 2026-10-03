@@ -60,7 +60,23 @@ Nel documento: **FATTO** = osservato nel ref e nei file citati; **ANALISI** = im
 **Rilievi UX da decidere/verificare:**
 - `noindex,nofollow,noarchive` è impostato sulla pagina che si definisce pubblica. È un fatto del markup, non prova che sia un errore: il proprietario deve decidere indicizzazione e canonical prima di attivare la comunicazione pubblica.
 - La nav pubblica non espone un `aria-label`; il footer ispezionato non mostra un collegamento a un’informativa privacy. Verificare anche percorso tastiera, gestione focus e annunci/chiusura dei dialog, stati di errore e compatibilità ridotta. Non è una certificazione di non conformità WCAG.
-- Palette blu/navy, carta chiara e accenti verdi/oro, titoli serif e hero a due colonne danno un’identità coerente; la resa reale e le proporzioni mobile non sono state osservate in browser.
+- Il codice definisce palette blu/navy, carta chiara, accenti verdi/oro, titoli serif, hero e griglie. Sono fatti sullo stile sorgente, non una convalida della resa visuale: non sono stati osservati screenshot/browser e non esiste in questa audit un confronto approvato con un visual master.
+
+### Modern Experience Gate — classificazione e criteri di accettazione
+
+**Classificazione WEBAPP:ARCHITECT**
+
+| Elemento | Classe | Trattamento |
+|---|---|---|
+| Identità C.E.P.A./Maglia Assicurazioni e asset ufficiali | `KEEP_LOCKED` | Preservare marchi, proporzioni, colori, scritte e asset verificati. Il simbolo/wordmark visibile non va ridisegnato o sostituito; confermarne la provenienza prima di trattarlo come master ufficiale. |
+| Record, provenance, contratti API, auth, ruoli/scope e policy | `KEEP` | Nessuna riscrittura o spostamento nel client. I controlli server-side restano autoritativi; fonte, stato e fallback devono rimanere verificabili. |
+| Composizione della vetrina pubblica | `REBUILD_IMPROVE` | Il markup attuale organizza una lunga sequenza di sezioni editoriali e griglie (audience, territorio, temi/eventi e collaborazione). Questo giustifica una revisione della gerarchia e della composizione per evitare un effetto brochure/card-wall; non prova da solo che la resa a schermo sia datata. Ricomporre la presentazione, non ricreare prodotto, contenuti o backend da zero. |
+| Shell e workspace riservato MAGLIA 360 | `REBUILD_IMPROVE` | Modernizzare la gerarchia e le composizioni per i task reali, mantenendo moduli, flussi, densità operativa utile, dati e confini di ruolo. Non introdurre un admin template generico né un sistema parallelo. |
+| Stati del servizio e motion | `ENHANCE` | Rendere espliciti stati e provenienza per ciascun servizio e aggiungere motion solo quando comunica un feedback/una transizione utile; rispettare `prefers-reduced-motion`. La presenza della regola reduced-motion nel CSS non dimostra che tutte le animazioni siano utili o accessibili. |
+
+**Gate vincolante per ogni futura UI — FATTO DEL FEEDBACK / criterio di release:** mobile, tablet e desktop devono essere composizioni proprie e non una cornice telefonica; gerarchia forte e azione primaria riconoscibile; esperienza pubblica più editoriale, workspace operativo denso ma scansionabile; componenti coerenti con brand e asset verificati. Ogni servizio deve identificare fonte e stato e prevedere `loading`, `empty`, `error`, `offline`, `denied` e `stale`, con fallback esplicito e senza dichiarare “live”, “automatico” o “sincronizzato” senza prova.
+
+**Visual QA obbligatorio prima di dichiarare `READY`:** screenshot riproducibili e revisione ai viewport 360×800, 390×844, 393×852, 430×932, 1280×800, 1440×900 e 1920×1080; verifiche di overflow, gerarchia/CTA, stati servizio, tastiera/focus, reduced motion e confronto con asset/visual master approvati. Per ora questi screenshot non esistono: lo stato visuale è **UNVERIFIED** e questa audit non dichiara alcuna UI pronta. La futura implementazione deve preservare contenuti e contratti esistenti e passare questi gate prima di ogni release; nessun deploy è autorizzato.
 
 ### 2. ENGINE DATA — fonti, eventi, provenance e confini di accesso
 
@@ -123,7 +139,7 @@ L’avvio cerca un’unica membership attiva con `.limit(1).maybeSingle()` senza
 2. **Hosting riproducibile (P0):** risolvere con l’owner la divergenza `cepa-maglia-os-static/` / root Render / `render.yaml`; scegliere un solo percorso e una sola configurazione approvata. Verificare health/build su staging e impedire un deploy automatico non approvato. Non modificare la config live in questa PR.
 3. **Data/security gate (P1):** ottenere in sola lettura schema, RLS, bucket e sorgenti Edge Functions; documentare fonti, provenance, retention e permessi; testare auth, membership, anonimo, ruoli e isolamento con account/dati sintetici.
 4. **Funzionalità CEPA (P1):** aggiungere test dedicati a vetrina, temi, eventi futuri/passati, form, workflow Center/SAP, errore/empty state e upload in ambiente non-prod. Nessuna pubblicazione o record inventato.
-5. **QA prodotto (P2):** completare verifiche visuali responsive, tastiera/screen reader, contrasto, reduced motion, browser support e prestazioni; risolvere prima i difetti bloccanti.
+5. **QA prodotto (P2):** allegare screenshot e completare la matrice visuale mobile/tablet/desktop e gli stati `loading/empty/error/offline/denied/stale`; verificare gerarchia/azione primaria, asset master, tastiera/screen reader, contrasto, reduced motion, browser support e prestazioni. Non dichiarare `READY` senza evidenza e senza risolvere prima i difetti bloccanti.
 6. **Decisione release separata:** ottenere approvazione umana, commit immutabile, workflow verdi, monitoraggio, owner e rollback provato in staging. Qualsiasi modifica successiva a contratto, ruolo, fonte o dato richiede PR e aggiornamento del manifest pertinente. Nessun deploy è compreso nell’Issue corrente.
 
 ### Rollback per una futura release
