@@ -21,6 +21,20 @@ SCD Command Platform R22 remains a shared technical engine and is not counted as
 
 All canonical apps must support `WEBAPP:MASTER` and their app-specific RUN command.
 
+## SCD ONE definitive command
+
+For any work on this branch, read and obey:
+- `docs/SCD_ONE_PRODUCT_MEMORY.md`
+- `docs/SCD_ONE_MASTER.md`
+- `docs/SCD_ONE_DEFINITIVE_BUILD_COMMAND.md`
+- `docs/SCD_ONE_VISUAL_EXPERIENCE_MASTER.md`
+- `config/scd-one-product-contract.v1.json`
+
+The definitive app command is `SCDONE:MASTER`.
+The continuous next-safe-block command is `SCDONE:RUN`.
+
+Do not restart from zero. Recover and evolve valid R38-R56 work.
+
 ## Product doctrine
 This repository contains the shared SCD engineering ecosystem. The SCD portfolio has three coordinated applications: **SCD ONE**, **SCD CORE**, and **SCD GROW**. A fourth application, **C.E.P.A. 360**, belongs to Maglia Assicurazioni. Shared engines such as R22, R20 and SCD PULSE support the portfolio but do not become extra apps.
 
@@ -106,11 +120,13 @@ A feature is not complete until its status is accurately described:
 `DESIGNED`, `IMPLEMENTED`, `TESTED`, `DEPLOYED`, `PRODUCTION_VERIFIED`.
 
 ## UI / product rules
-Public surfaces prioritize emotion, media, live information, discovery, territory and community.
-Private surfaces prioritize speed, clarity, density, priority, decision, context and control.
-Mobile and desktop are responsive compositions of the same product, not separate products.
+SCD ONE prioritizes public/social/transactional experience: emotion, sport, live verified information, discovery, territory, community, services and safe personal/family/athlete projections.
 
-Smart Facility surfaces must distinguish verified connected services from READY_FOR_ADAPTER / NOT_CONNECTED / UNVERIFIED / MANUAL_CHECK_REQUIRED states. Never simulate a device integration as real.
+Internal association management belongs to SCD CORE.
+Deep sponsor/CRM development belongs to SCD GROW.
+Command orchestration belongs to SCD Command R22.
+
+Mobile and desktop are responsive compositions of SCD ONE, not separate products.
 
 ## Agent output
 For meaningful engineering work report:
