@@ -2,7 +2,8 @@
 
 **Data di verifica:** 2026-10-03  
 **Issue:** [#88](https://github.com/francesco1485/scd-colicoderviese-super-app/issues/88)  
-**Esito:** integrare selettivamente i contratti utili in superfici e servizi SCD già esistenti; non promuovere il prodotto/UI R42 come seconda piattaforma.
+**Allineamento architetturale:** Commercial/Lia non è e non deve diventare una web app SCD separata. L'unico prodotto di destinazione di eventuali capability recuperabili è SCD UNIVERSE / SCD COLICODERVIESE SUPER APP. La branch `r42-commercial-development-os` è esclusivamente una sorgente storica da confrontare con l'architettura SCD corrente; la UI R42 non va promossa come prodotto autonomo.
+**Esito:** integrare selettivamente i contratti utili nel singolo prodotto e nelle superfici/servizi SCD esistenti; nessuna seconda piattaforma.
 
 ## 1. Stato e perimetro verificato
 
@@ -21,11 +22,15 @@
 
 `APP_AI_MANIFEST.md` e `.github/copilot-instructions.md` non sono presenti nel working tree iniziale; entrambi sono stati letti dalla ref GitHub `ai-scd-commercial-lia`. Il manifest di progetto e `AGENTS.md` locali restano le fonti vincolanti. In particolare, il manifest corrente mantiene R20 come autorità per identità, ruoli e funzioni gestionali (`SCD_SYSTEM_MANIFEST.json:73-80`).
 
+### Perimetro prodotto
+
+La distinzione tra superfici pubbliche e private o tra hosting GitHub Pages e runtime privato non crea prodotti distinti: sono componenti del singolo SCD UNIVERSE / SCD COLICODERVIESE SUPER APP. In particolare, Pages pubblica solo asset sponsor esplicitamente allowlisted (`scripts/build-pages.mjs:9-13`), mentre `/sponsor/app` è servita da una route privata che valida la sessione (`server.js:475-485,950`). Questo confine tecnico di distribuzione/autorizzazione non autorizza una web app Commercial/Lia autonoma. Tutti i riferimenti R42 in questo audit sono storico comparativo soltanto.
+
 ### Classificazione SCD:EXPERT
 
 - **TASK_CLASS:** audit architetturale e riconciliazione, senza modifica di runtime o contratto.
 - **DOMAINS:** commerciale/CRM, sponsor, Lia, autenticazione e scope, provenienza dati, hosting e test.
-- **FIXED:** R20 autorevole; un solo prodotto e nessun CRM/database parallelo; provenienza verificabile; nessun dato commerciale inventato; nessun deploy o mutazione di produzione.
+- **FIXED:** SCD UNIVERSE / SCD COLICODERVIESE SUPER APP come unico prodotto; R20 autorevole; nessun CRM/database/web app paralleli; provenienza verificabile; nessun dato commerciale inventato; nessun deploy o mutazione di produzione.
 - **IMPROVABLE:** riuso di workflow e adapter R42 compatibili, una volta verificati in runtime e ricondotti al contratto attuale.
 - **MISSING:** health evidence degli staging, prova dei comandi R20 commerciali live, autorizzazione per eventuali nuove fonti/capability.
 - **SOURCE_PLAN:** Issue #88 e AI manifest; manifest e codice main; branch e PR R42; test/configurazione del repository; nessuna fonte commerciale live.
@@ -146,4 +151,4 @@ Il codice storico è stato letto dalla branch `r42-commercial-development-os` (h
 
 ## 9. Decisione
 
-**Recuperare i contratti, non il prodotto R42.** Sono potenzialmente riusabili il pattern di comando R22, il mapping territoriale con provenienza e copertura esplicite, e il packet di handoff umano solo dopo hardening privacy/sicurezza. Il Commercial Development OS, le sue route/UI, i record e i contatti branch-specific sono superseduti o richiedono nuova riconciliazione; PR #40 non va riaperta né promossa. Nessun deploy, scrittura live o cambio di ruolo è stato effettuato da questo audit.
+**SCD UNIVERSE / SCD COLICODERVIESE SUPER APP è l'unico prodotto. Commercial/Lia non è una web app separata.** Usare `r42-commercial-development-os` solo come sorgente storica di confronto con l'architettura corrente; non promuovere né distribuire la UI/route R42 come prodotto autonomo. Recuperare, se approvati e verificati, soltanto contratti o capability selettivi e integrarli dentro il prodotto SCD esistente. PR #40 non va riaperta né promossa. Nessun deploy, scrittura live o cambio di ruolo è stato effettuato da questo audit.
