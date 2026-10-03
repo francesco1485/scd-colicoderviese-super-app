@@ -30,6 +30,7 @@
 3. **Le release R53–R56 aggiungono contratti e vertical slice, non dimostrano da sole il completamento live.** I test di contratto e gli smoke E2E sono verdi sullo SHA fotografato; il manifest conserva capability `PARTIAL`, `SCHEMA_READY_RUNTIME_GATED` o `CONTRACTED` e gap espliciti.
 4. **Il manifest contiene una discrepanza di release evidence da riconciliare.** `delivery_and_quality.release_truth.current_web_release` riporta manifest `3.4.0`, release `NG-0.4.5` e uno SHA precedente (righe 2198–2209), mentre il workflow production evidence si aspetta manifest `3.26.0`, release `NG-0.7.0` e versione `40.0.0` (`.github/workflows/production-evidence.yml:24–33`); l’HTML dichiara `40.0.0`/`NG-0.7.0` (`index.html:8–9`). Il valore storico nel manifest non è prova dello stato live.
 5. **L’audit non promuove capability a “live”.** R20 deployment/probe, accesso effettivo alle fonti, RLS/cutover Supabase, reconciliation eventi e upload Drive richiedono prove runtime specifiche; alcune erano pendenti o esplicitamente bloccate.
+6. **La direzione di prodotto è una sola SCD Universe.** SCD UNIVERSE / SCD COLICODERVIESE SUPER APP / SCD DIGITAL CLUB OPERATING SYSTEM è un unico prodotto adattivo; Sponsor/Partner, Command Platform R22, Commercial/Lia, Private Desk, Facility, Social e gli altri scope sono moduli, capability o runtime tecnici temporanei, non prodotti SCD concorrenti.
 
 ### SCD:EXPERT — classificazione del task
 
@@ -49,7 +50,26 @@
 
 ## ARCHITECTURE_MAP
 
+### Identità prodotto e continuità R38–R56
+
+L’identità canonica è **SCD UNIVERSE / SCD COLICODERVIESE SUPER APP / SCD DIGITAL CLUB OPERATING SYSTEM — ONE PRODUCT**. Le superfici pubbliche, personali e operative convergono nella stessa esperienza, identità, dati e autorizzazioni; moduli e runtime separati per motivi ingegneristici non costituiscono prodotti separati. Questa direzione è coerente con `north_star.single_product: true` nel manifest (`SCD_SYSTEM_MANIFEST.json:37–54`) ed è esplicitata nei documenti di direzione letti dalla ref `r57-copilot-control-plane` (`docs/SCD_UNIVERSE_MASTER_BUILD.md`, `docs/AI_APP_REGISTRY.md`).
+
+La linea prodotto da preservare e integrare, senza riscrittura o sostituzione generica, comprende:
+
+- **R38–R40:** Pulse / SCD Universe, esperienza umana e SCD Week/Home settimanale.
+- **R41–R52:** integrazione mobile e crescita di Teams/Matchday, Social/Community e superfici partner nel medesimo prodotto.
+- **R53–R56:** football/private core, esperienza Family/Athlete/Staff, contenuti pubblici verificati, SCD Twin e contesto personale, Staff & Family / Private Desk, identità, Calendar Fusion e Club Intelligence.
+
+Questa continuità descrive lavoro prodotto e contratti presenti, non dichiara ogni capability completata o live. Sponsor, Commercial/Lia, Command Platform, Facility e Intake rimangono capability/moduli/workbench del sistema SCD, salvo diversa approvazione esplicita della Direzione.
+
 ```text
+SCD UNIVERSE — UNICO PRODOTTO
+  ├── Esperienza pubblica: Pulse / SCD Week / Calendar / Teams / Matchday / Social
+  ├── Contesto personale: SCD Twin / Identity / Family / Athlete / Staff
+  ├── Operating Center: Private Desk / Facility / Sponsor / Commercial / Intake
+  └── Intelligence & orchestration: Calendar Fusion / Club Intelligence / R22
+
+Runtime tecnico (componenti dello stesso prodotto, non prodotti distinti):
 Client Web/PWA (GitHub Pages; bundle scelto da build-pages.mjs)
         │ same-origin /api
         ▼
@@ -57,9 +77,9 @@ Node.js HTTP server (server.js; Render)
         ├── API pubbliche / sponsor / Intake / newsroom
         └── bridge R20 ──► Google Apps Script / R20 ──► fogli, Drive, Gmail, Calendar
 
-Supabase (migrazioni e adapter mobile/Web in repo) = transizione dual-run staged/dark
-R22 Command Platform (directory platform/) = servizio separato, non il server Render descritto sopra
-Android (android/) e client Expo (mobile/) = superfici distinte dal bundle web Pages
+Supabase = modulo/core di transizione dual-run staged/dark, non un prodotto distinto
+R22 Command Platform (directory platform/) = runtime/modulo di orchestrazione separato dal server Render
+Android (android/) e client Expo (mobile/) = canali dello stesso prodotto
 ```
 
 - **Manifest/architettura normativa:** `SCD_SYSTEM_MANIFEST.json:1994–2129`; sei core experiences in `product.core_experiences`.
@@ -67,7 +87,8 @@ Android (android/) e client Expo (mobile/) = superfici distinte dal bundle web P
 - **API runtime:** `server.js:1–33` definisce HTTP server, upstream Apps Script, feature flag Data Fabric/Supabase e configurazione runtime. `/health`, `/api/capabilities` e `/api/scd` sono route server (`server.js:930–951`); `callAppsScript` e `proxyAppsScript` sono i bridge (`server.js:491–548`).
 - **Interfaccia legacy:** `app.js`/`app-r24-router.js` implementano shell e route legacy (`app-r24-router.js:2–23`). Il builder li include nel bundle solo nel ramo `legacy`; la loro presenza nel repository non prova che siano il bundle attivo.
 - **Prototipo alternativo:** `src/main.jsx` importa React/Vite e `vite.config.js` configura build `dist`, ma `package.json` non espone script Vite e `build-pages.mjs` non copia `src/` o `dist/`. Stato: candidato da verificare, non rimozione approvata.
-- **Command platform:** `platform/src/api/server.ts` crea un runtime distinto con registry/queue e adapter R20. La sua relazione di deploy con l’app descritta da `render.yaml` non è dimostrata da quel file.
+- **Command Platform R22:** `platform/src/api/server.ts` crea un runtime distinto con registry/queue e adapter R20. È un modulo/runtime di orchestrazione destinato a integrarsi nel singolo SCD Universe; la sua relazione di deploy con l’app descritta da `render.yaml` non è dimostrata da quel file.
+- **Sponsor / Partner e Commercial/Lia:** workbench o moduli commerciali, non app SCD in competizione con Universe. Gli eventuali runtime dedicati sono supporto temporaneo da riconciliare; i percorsi Pages/Render effettivi vanno valutati con i relativi confini di autorizzazione.
 - **Target architetturale:** Supabase/Postgres + Auth/Storage/Realtime, web React/TypeScript e mobile Expo, transizione `STRANGLER_DUAL_RUN`; non è lo stato runtime da assumere oggi (`SCD_SYSTEM_MANIFEST.json:2085–2113`).
 
 ## RUNTIME_MAP
@@ -79,7 +100,8 @@ Android (android/) e client Expo (mobile/) = superfici distinte dal bundle web P
 | R20 | Endpoint Apps Script configurato tramite `SCD_APPS_SCRIPT_URL` o fallback nel codice; `backend_patch_R*.gs` contiene patch server-side | Manifest: primary operativo. Il codice bridge non sostituisce prova di deployment dei patch R20. Il controllo dedicato è `npm run verify:r20`. |
 | Supabase | `supabase/migrations/`; adapter mobile in `mobile/src/lib/`; feature flag `SCD_FEATURE_SUPABASE_CORE` in `server.js` | Flag disabilitato per default; manifest dice R20 primary/Supabase dark. Schema o migrazione applicata non equivalgono a cutover Web/mobile verificato. |
 | Android / Expo | `android/`, `mobile/` | Workflow Android manuale o su cambi Android; ultima run trovata verde il 2026-09-28 su SHA precedente. Non è una prova di build/device sull’attuale SHA. |
-| Command Platform | `platform/src/` | Runtime distinto. Workflow di rilascio integrato nel percorso Pages/Render non identificato nella configurazione esaminata: deploy effettivo `UNVERIFIED`. |
+| Command Platform R22 | `platform/src/` | Runtime/modulo di orchestrazione distinto. Workflow di rilascio integrato nel percorso Pages/Render non identificato nella configurazione esaminata: deploy effettivo `UNVERIFIED`; non è un prodotto SCD distinto. |
+| Sponsor / Commercial | Workbench e route di modulo; alcune superfici hanno runtime di supporto dedicati | Moduli del singolo SCD Universe, con autorizzazione e integrazione da verificare; runtime di supporto non definiscono identità prodotto separate. |
 
 `verify:production` confronta versione, commit, manifest e capability su Pages/Render, e interroga R20 per il contratto Data Fabric quando il relativo flag è attivo (`scripts/verify-production.mjs:3–10, 44–117, 147–198`). Il suo workflow carica evidenza come artifact ma, alla fotografia, la run era ancora attiva.
 
@@ -106,6 +128,8 @@ Android (android/) e client Expo (mobile/) = superfici distinte dal bundle web P
 
 | Release | Direzione e implementazione tracciata | Drift / stato non dimostrato |
 |---|---|---|
+| **R38–R40** | Fondazione SCD Universe/Pulse, esperienza umana e SCD Week/Home settimanale. | Base della linea prodotto da mantenere; implementazioni legacy o visual debt non autorizzano una sostituzione con un prodotto generico. |
+| **R41–R52** | Evoluzione dei canali e integrazione di SCD Twin, Community/Social, Teams/Matchday e superfici partner. | I moduli e gli eventuali runtime temporanei convergono nell’unico SCD Universe; il confine d’ingegneria non è un confine di prodotto. |
 | **R53** | Core football/social e prime capability private; validatore `scripts/validate-r53-core.mjs`; migration/contratti legati al core Supabase e R20. | Capability football privata dichiarata `PARTIAL`; schema/contratto e gate CI non attestano un runtime live/cutover. La superficie privata rimane dipendente da ruoli/scope R20. |
 | **R54** | Vertical slice privata Family/Athlete/Staff; `scripts/validate-r54-private.mjs`; Pages workflow esegue il gate R54. | UI/vertical slice e contratto non provano coerenza completa delle schermate legacy né ogni operazione live. Il manifest mantiene gap UI e R20 come primary. |
 | **R55** | Contenuto pubblico curato, provenienza/status e regole anti-invenzione; file `content/public-club.v1.json`, `scripts/validate-r55-content.mjs`; manifest `CONTENT_LAYER_ACTIVE` (`:4110–4129`). | Il layer curated è attivo come contenuto, ma non sostituisce dati sportivi canonici; fonte news del sito è stale/limitata. Newsroom e fonti devono essere aggiornati/verificati. |
@@ -155,12 +179,12 @@ Questa è una lista di **candidati a verifica/deprecazione**, non autorizzazione
 |---|---|---|
 | Prototipo React/Vite `src/main.jsx` + `vite.config.js` | Il builder Pages non copia `src/`/`dist/`; nessuno script Vite è esposto in `package.json`. | Confermare che non esista deploy, consumer o ramo approvato che lo utilizzi prima di archiviare/rimuovere. |
 | Runtime UI legacy scelto dal ramo `legacy` del builder (`app.js`, `app-r24-router.js`, relativi CSS) | La configurazione attuale seleziona il ramo NextGen/Nova; i file legacy restano nel repo e alcuni sono sottoposti a syntax/contract checks. | Non rimuovere finché non sono confermati uso di rollback, cache/service worker, link diretti, test e compatibilità di release. |
-| `platform/` come runtime autonomo | Ha entry point/API, adapter R20 e test propri, ma la relazione di deploy con `server.js`/`render.yaml` non è chiara dalle configurazioni esaminate. | Chiarire se mantenerlo come servizio separato, integrarlo o archiviarlo; non duplicare R20 o introdurre un gestionale parallelo. |
+| `platform/` come runtime autonomo | Ha entry point/API, adapter R20 e test propri, ma la relazione di deploy con `server.js`/`render.yaml` non è chiara dalle configurazioni esaminate. | Chiarire come integrarlo come modulo di orchestrazione nel singolo SCD Universe; solo poi decidere destino del runtime, senza duplicare R20 o creare un prodotto/gestionale parallelo. |
 | Documentazione storica e specifiche pre-manifest | README afferma che i documenti Markdown non sono normativi; manifest dichiara le specifiche di supporto e supersede i documenti indicati come precedenti. | Non cancellare in blocco: preservare runbook/ADR e riferimenti operativi; eliminare solo con verifica di link e obsolescenza. |
 
 ## SAFE_IMPLEMENTATION_PLAN
 
-1. **Chiudere questa PR come documentazione-only.** Nessuna funzionalità prodotto, modifica ai dati, flag, ruolo, deployment o manifest; acquisire revisione e mantenere lo snapshot storico esplicito.
+1. **Chiudere questa PR come documentazione-only e preservare la direzione canonica.** SCD Universe/Super App resta l’unico prodotto: mantenere e integrare il lavoro R38–R56; nessuna funzionalità, modifica ai dati, flag, ruolo, deployment o contratto manifest in questa PR.
 2. **Aggiornare la fotografia prima di ogni intervento successivo.** Verificare main SHA, working tree, PR, CI, Pages, Render, manifest e sorgenti; non riusare questo stato come stato corrente.
 3. **Riconciliare la release evidence nel manifest** in una PR separata: confrontare manifest binding, HTML, bundle distribuito, Pages/Render, commit e artifact production; cambiare record solo con evidenza verificata.
 4. **Sbloccare dipendenze in sequenza conservativa:** deployment R20 e probe diretto; poi prova end-to-end della capability dietro feature flag. Per Supabase completare RLS/auth/role-scope, dual-read, Web/mobile e rollback prima di qualsiasi cutover; R20 resta primary nel frattempo.
@@ -172,6 +196,7 @@ Questa è una lista di **candidati a verifica/deprecazione**, non autorizzazione
 ### Riferimenti principali
 
 - Fonte normativa, capabilities, release truth e debito: `SCD_SYSTEM_MANIFEST.json`.
+- Direzione prodotto canonica e continuità R38–R56 (lette dalla ref `r57-copilot-control-plane`): `docs/SCD_UNIVERSE_MASTER_BUILD.md`, `docs/AI_APP_REGISTRY.md`.
 - Runtime/deploy: `index.html`, `server.js`, `render.yaml`, `scripts/build-pages.mjs`.
 - Release gates: `.github/workflows/pages.yml`, `e2e.yml`, `production-evidence.yml`, `manifest-pr-policy.yml`, `android-build.yml`.
 - Verificatori: `scripts/verify-production.mjs`, `scripts/verify-r20-direct.mjs`, `scripts/validate-r53-core.mjs`, `scripts/validate-r54-private.mjs`, `scripts/validate-r55-content.mjs`, `scripts/validate-r56-core.mjs`, `scripts/validate-r56-internal.mjs`, `tests/calendar-fusion-contract.mjs`.
