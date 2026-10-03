@@ -1081,3 +1081,63 @@ body[data-scd-theme="arena"] .profile-command-actions{
   body[data-scd-theme="arena"] .profile-command-card{min-height:154px}
   body[data-scd-theme="arena"] .profile-command-actions{display:grid;grid-template-columns:1fr}
 }
+
+
+/* ONE-02.1 · mobile Twin composition QA */
+@media (max-width:620px){
+  body[data-scd-theme="arena"] #view-twin .twin-control{
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:12px!important;
+    padding:10px 6px 100px!important;
+  }
+  body[data-scd-theme="arena"] #view-twin .control-panel,
+  body[data-scd-theme="arena"] #view-twin .mission-panel{
+    min-width:0!important;
+    width:100%!important;
+    box-sizing:border-box!important;
+    padding:18px!important;
+    overflow:hidden!important;
+  }
+  body[data-scd-theme="arena"] #view-twin .control-panel .inline-fields{
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:0!important;
+  }
+  body[data-scd-theme="arena"] #view-twin .control-panel label,
+  body[data-scd-theme="arena"] #view-twin .control-panel input,
+  body[data-scd-theme="arena"] #view-twin .control-panel select{
+    min-width:0!important;
+    width:100%!important;
+    max-width:100%!important;
+    box-sizing:border-box!important;
+  }
+  body[data-scd-theme="arena"] #view-twin .avatar-catalog{
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    overflow:visible!important;
+  }
+  body[data-scd-theme="arena"] #view-twin .avatar-catalog button{
+    min-width:0!important;
+    width:100%!important;
+  }
+  body[data-scd-theme="arena"] #view-twin .twin-actions{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+  }
+  body[data-scd-theme="arena"] #view-twin .twin-actions .btn{
+    width:100%!important;
+  }
+  body[data-scd-theme="arena"] #view-twin .mission-panel h3,
+  body[data-scd-theme="arena"] #view-twin .mission-panel p,
+  body[data-scd-theme="arena"] #view-twin .mission-list b{
+    overflow-wrap:anywhere!important;
+    word-break:normal!important;
+  }
+  body[data-scd-theme="arena"] #view-twin .mission-list div{
+    gap:10px!important;
+    align-items:flex-start!important;
+  }
+  body[data-scd-theme="arena"] #view-twin .mission-list span{
+    flex:0 0 auto!important;
+    white-space:nowrap!important;
+  }
+}
