@@ -10,6 +10,8 @@ ok(html.includes('id="growPipeline"'),'GROW pipeline mount missing');
 ok(html.includes('./grow-pipeline.js?v=1.0.0'),'GROW pipeline engine not loaded');
 ok(html.includes('./grow-pipeline.css?v=1.0.0'),'GROW pipeline stylesheet not loaded');
 ok(js.includes('renderGrowPipeline()'),'GROW pipeline renderer not wired');
+ok(js.includes("$('[data-grow-crm-id]').forEach"),'GROW pipeline CRM actions must use multi-selector');
+ok(!js.includes("$('[data-grow-crm-id]').forEach"),'GROW pipeline must not call forEach on a single-element selector');
 ok(js.includes("crmState.sourceState='VERIFIED'"),'verified CRM source state missing');
 ok(js.includes("crmState.sourceState='UNAVAILABLE'"),'fail-closed CRM source state missing');
 ok(engine.includes("PROSPECT")&&engine.includes("PROPOSE")&&engine.includes("ACTIVATE"),'relationship stage classifier incomplete');
