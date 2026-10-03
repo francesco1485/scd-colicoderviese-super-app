@@ -612,6 +612,37 @@
       "authority": "SECONDARY_MEDIA",
       "status": "REGISTERED_PARTIAL_VERIFY",
       "note": "Direct page could not be read in the current verification session. Keep as editorial inspiration reference, but do not rely on article-specific details until re-verified."
+    },
+    {
+      "id": "SRC-0044",
+      "title": "Superprof - Applicazioni per il personal training",
+      "url": "https://www.superprof.it/blog/applicazioni-per-il-personal-training/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "FITNESS_COACHING_APPS_PERSONAL_TRAINING",
+      "access": "PUBLIC",
+      "use": "FITNESS_UX_AND_COACHING_IDEA_RESEARCH",
+      "authority": "SECONDARY_REFERENCE",
+      "status": "REGISTERED_VERIFIED_HISTORICAL",
+      "note": "2021 article. Useful for fitness/coaching app patterns such as remote coaching, workout programs, progress tracking and smartphone interaction. Not a medical or current market authority."
+    },
+    {
+      "id": "SRC-0045",
+      "title": "SportMade - Rivoluzione digitale e tecnologie nello sport giovanile",
+      "url": "https://www.sportmade.it/news/rivoluzione-digitale-tecnologie-nello-sport-giovanile/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "COMMON"
+      ],
+      "category": "YOUTH_SPORT_TECH_PERFORMANCE_ANALYTICS",
+      "access": "PUBLIC",
+      "use": "YOUTH_SPORT_TECH_FEATURE_INSPIRATION",
+      "authority": "INDUSTRY_REFERENCE",
+      "status": "REGISTERED_VERIFIED",
+      "note": "Verified source. Useful for video analysis, wearables, movement/biomechanics sensors, team management, calendars/presence, athlete-family feedback and tactical analysis. Minor/health data require dedicated privacy governance."
     }
   ]
 }
