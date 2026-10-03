@@ -341,11 +341,115 @@ for(const viewport of [{width:390,height:844},{width:1440,height:900}]){
   await privatePage.close();
 }
 
+// R56 Family/Athlete role-scope journeys: synthetic identities, no live user data.
+mark('R56_FAMILY_ATHLETE_ROLE_SCOPE');
+for(const roleCase of [
+  {role:'FAMILY',email:'family.qa@example.test',token:'qa-family-token',person:{personId:'QA-F1',code:'QAF1',firstName:'Famiglia',lastName:'QA',teamName:'U14'}},
+  {role:'ATHLETE',email:'athlete.qa@example.test',token:'qa-athlete-token',person:{personId:'QA-A1',code:'QAA1',firstName:'Atleta',lastName:'QA',teamName:'U18'}}
+]){
+  const rolePage=await browser.newPage({viewport:{width:390,height:844}});
+  const roleErrors=[];
+  rolePage.on('pageerror',e=>roleErrors.push(String(e)));
+  rolePage.on('console',m=>{if(m.type()==='error')roleErrors.push('console: '+m.text())});
+
+  const roleDashboard={
+    user:{name:roleCase.role+' QA',email:roleCase.email,role:roleCase.role,staff:false},
+    permissions:{direction:false},
+    personal:[roleCase.person],
+    teams:[],attendance:{teams:[]},roster:{},convocations:[],transport:{kpis:{requests:0}}
+  };
+  const roleWorkspace={
+    name:roleCase.role+' QA',email:roleCase.email,role:roleCase.role,
+    privateDeskProfile:roleCase.role+'_SELF_SCOPE',defaultModules:[],
+    dataScope:['SELF_ONLY'],communicationScope:[],areas:[]
+  };
+
+  await rolePage.route('**/api/scd',async route=>{
+    const req=route.request();if(req.method()!=='POST')return route.continue();
+    let body={};try{body=JSON.parse(req.postData()||'{}')}catch{}
+    const action=String(body.action||'');let data;
+    if(action==='auth.login')data={token:roleCase.token};
+    else if(action==='auth.validate')data={valid:true};
+    else if(action==='auth.access.log')data={ok:true};
+    else if(action==='auth.identity.resolve')data={matched:true,matchMethod:'QA_SYNTHETIC'};
+    else if(action==='dashboard.summary')data=roleDashboard;
+    else if(action==='private.user.workspace')data=roleWorkspace;
+    else if(action==='account.requests')data={rows:[]};
+    else return route.continue();
+    await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({ok:true,data})});
+  });
+
+  await rolePage.goto(base+'/#desk',{waitUntil:'domcontentloaded',timeout:30000});
+  if(await rolePage.locator('#scdCookieBanner:not([hidden])').count()){
+    await rolePage.click('#scdAnalyticsReject');
+    await rolePage.waitForSelector('#scdCookieBanner',{state:'hidden'});
+  }
+  await rolePage.fill('#privateDeskEmail',roleCase.email);
+  await rolePage.fill('#privateDeskCode','123456');
+  await rolePage.click('#privateDeskLoginForm button[type="submit"]');
+  for(const module of ['TESSERATI','PULMINI','RICHIESTE','SICUREZZA']){
+    await rolePage.waitForSelector('[data-private-module="'+module+'"]');
+  }
+  for(const module of ['ACCESSI','METRICHE','PRESENZE','CONVOCAZIONI','COMUNICAZIONI']){
+    if(await rolePage.locator('[data-private-module="'+module+'"]').count())throw new Error('R56 '+roleCase.role+' received forbidden module '+module);
+  }
+  const scopeText=String(await rolePage.locator('.desk-scope-card').textContent()||'');
+  if(!scopeText.includes('SELF_ONLY'))throw new Error('R56 '+roleCase.role+' self scope missing');
+  await rolePage.click('[data-private-module="TESSERATI"]');
+  await rolePage.waitForSelector('.r54-people-hub');
+  const peopleText=String(await rolePage.locator('.r54-people-hub').textContent()||'');
+  if(!peopleText.includes(roleCase.person.firstName)||!peopleText.includes(roleCase.person.lastName))throw new Error('R56 '+roleCase.role+' authorized profile missing');
+  await rolePage.click('#publicPanelClose');
+  if(await rolePage.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+3))throw new Error('R56 '+roleCase.role+' horizontal overflow');
+  if(roleErrors.length)throw new Error('R56 '+roleCase.role+' browser errors: '+roleErrors.join(' | '));
+  await rolePage.screenshot({path:'test-output/r56-'+roleCase.role.toLowerCase()+'-390x844.png',fullPage:true});
+  await rolePage.close();
+}
+
+// R56 public identity preflight: public request resolves identity before creating registration request,
+// without exposing whether the account exists in user-facing copy.
+mark('R56_PUBLIC_IDENTITY_PREFLIGHT');
+{
+  const joinPage=await browser.newPage({viewport:{width:390,height:844}});
+  const joinErrors=[];let resolveSeen=false,registrationSeen=false;
+  joinPage.on('pageerror',e=>joinErrors.push(String(e)));
+  joinPage.on('console',m=>{if(m.type()==='error')joinErrors.push('console: '+m.text())});
+  await joinPage.route('**/api/scd',async route=>{
+    const req=route.request();if(req.method()!=='POST')return route.continue();
+    let body={};try{body=JSON.parse(req.postData()||'{}')}catch{}
+    const action=String(body.action||'');let data;
+    if(action==='public.identity.resolve'){
+      resolveSeen=true;
+      if(String(body.payload?.email||'')!=='family.preflight@example.test')throw new Error('R56 identity preflight payload mismatch');
+      data={accepted:true};
+    }else if(action==='public.registration'){
+      registrationSeen=true;data={requestId:'QA-REG-001'};
+    }else return route.continue();
+    await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({ok:true,data})});
+  });
+  await joinPage.goto(base+'/#pulse',{waitUntil:'domcontentloaded',timeout:30000});
+  if(await joinPage.locator('#scdCookieBanner:not([hidden])').count())await joinPage.click('#scdAnalyticsReject');
+  await joinPage.click('[data-join="FAMILY"]');
+  await joinPage.waitForSelector('#joinRequestForm');
+  await joinPage.fill('#joinRequestForm input[name="firstName"]','Famiglia');
+  await joinPage.fill('#joinRequestForm input[name="lastName"]','Preflight');
+  await joinPage.fill('#joinRequestForm input[name="email"]','family.preflight@example.test');
+  await joinPage.fill('#joinRequestForm input[name="phone"]','0000000000');
+  await joinPage.check('#joinRequestForm input[name="privacy"]');
+  await joinPage.click('#joinRequestForm button[type="submit"]');
+  await joinPage.waitForFunction(()=>document.querySelector('#joinFormState')?.textContent?.includes('Percorso avviato'));
+  if(!resolveSeen||!registrationSeen)throw new Error('R56 public identity preflight chain incomplete');
+  const stateText=String(await joinPage.locator('#joinFormState').textContent()||'');
+  if(/esiste|non esiste|match|trovato/i.test(stateText))throw new Error('R56 public identity response leaks account existence');
+  if(joinErrors.length)throw new Error('R56 public identity browser errors: '+joinErrors.join(' | '));
+  await joinPage.close();
+}
+
 // R56 Direction onboarding/access journey.
 mark('R56_IDENTITY_ACCESS_JOURNEY');
 {
   const page=await browser.newPage({viewport:{width:390,height:844}});
-  const errors=[];let telemetrySeen=false,inviteSeen=false,pinSeen=false;
+  const errors=[];let telemetrySeen=false,inviteSeen=false,pinSeen=false,metricsSeen=false;
   page.on('pageerror',e=>errors.push(String(e)));
   page.on('console',m=>{if(m.type()==='error')errors.push('console: '+m.text())});
 
@@ -370,6 +474,7 @@ mark('R56_IDENTITY_ACCESS_JOURNEY');
     else if(action==='private.user.workspace')data=directionWorkspace;
     else if(action==='direction.access.invite'){inviteSeen=true;data={ok:true,email:'new.user@example.test',role:'FAMILY',identity:{matched:true,matchMethod:'EMAIL_EXACT'},temporaryCodeSent:true}}
     else if(action==='auth.pin.change'){pinSeen=true;data={ok:true}}
+    else if(action==='direction.access.metrics'){metricsSeen=true;data={days:30,activeUsers:4,loginEvents:9,privateDeskOpens:7,daily:[{date:'2026-10-03',activeUsers:4}]}}
     else return route.continue();
     await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({ok:true,data})});
   });
@@ -395,6 +500,15 @@ mark('R56_IDENTITY_ACCESS_JOURNEY');
   await page.click('#r56InviteForm button[type="submit"]');
   await page.waitForFunction(()=>document.querySelector('#r56InviteState')?.textContent?.includes('Codice temporaneo inviato'));
   if(!inviteSeen)throw new Error('R56 invite action not called');
+  await page.click('#publicPanelClose');
+
+  await page.click('[data-private-module="METRICHE"]');
+  await page.waitForSelector('#r56AccessMetrics');
+  await page.waitForFunction(()=>document.querySelector('#r56AccessMetrics')?.textContent?.includes('UTENTI ATTIVI'));
+  const metricsText=String(await page.locator('#publicPanelBody').textContent()||'');
+  if(!metricsSeen)throw new Error('R56 access metrics action not called');
+  if(!metricsText.includes('4')||!metricsText.includes('9')||!metricsText.includes('7'))throw new Error('R56 aggregated metrics projection missing');
+  if(/123456|654321|new\.user@example\.test|documento qa|posizione grezza/i.test(metricsText))throw new Error('R56 metrics leaked sensitive QA content');
   await page.click('#publicPanelClose');
 
   await page.click('[data-private-module="SICUREZZA"]');
