@@ -1385,6 +1385,74 @@ function renderMiniProductionChart(hubId){
   return '<div class="production-chart">'+months.map(([m,v])=>'<div class="production-bar"><span style="height:'+Math.max(8,Math.round(v/max*74))+'px"></span><small>'+esc(new Intl.DateTimeFormat('it-IT',{month:'short'}).format(new Date(m+'T12:00:00')))+'</small><b>'+esc(fmtMoney(v))+'</b></div>').join('')+'</div>'
 }
 
+function integrationStateMeta(status){
+  const value=String(status||'unknown').toLowerCase()
+  if(value==='active')return {label:'ATTIVO',state:'VERIFIED',detail:'Integrazione marcata attiva nel registro canonico.'}
+  if(value==='connected_chat_only')return {label:'COLLEGATO VIA CHAT',state:'LIMITED',detail:'Disponibile tramite connettore ChatGPT, non come automazione nativa del portale.'}
+  if(value==='pending')return {label:'DA COMPLETARE',state:'PENDING',detail:'Configurazione o collaudo non ancora completati.'}
+  if(value==='disabled')return {label:'DISATTIVATO',state:'DISABLED',detail:'Integrazione esplicitamente disabilitata.'}
+  return {label:String(status||'NON VERIFICATO').replaceAll('_',' ').toUpperCase(),state:'UNVERIFIED',detail:'Stato non riconosciuto: richiede verifica.'}
+}
+function readinessNextAction(row){
+  const code=String(row?.code||'');
+  const status=String(row?.status||'').toLowerCase();
+  if(status==='active')return null;
+  if(code==='cepa_shared_calendar'){
+    return {title:'Calendario condiviso non attivo',detail:'L’Agenda MAGLIA 360 resta la fonte operativa interna finché la sincronizzazione esterna non viene attivata e verificata.',view:'agenda',label:'Apri Agenda'};
+  }
+  if(code==='supabase_auth_email'){
+    return {title:'Email Auth / OTP da completare',detail:'L’accesso con codice resta non disponibile finché configurazione mittente e collaudo non risultano verificati.',view:'accessAdmin',label:'Apri Accessi'};
+  }
+  if(code==='gmail_sportclub_chat'){
+    return {title:'Gmail disponibile solo via connettore',detail:'Il portale non deve dichiarare invio Gmail nativo: le comunicazioni restano instradate tramite il connettore autorizzato.',view:'agenda',label:'Apri comunicazioni'};
+  }
+  if(code==='google_calendar_primary_chat'){
+    return {title:'Google Calendar disponibile solo via connettore',detail:'Gli eventi interni restano nel registro agenda finché la sincronizzazione nativa del portale non è verificata.',view:'agenda',label:'Apri Agenda'};
+  }
+  return {title:row?.purpose||row?.code||'Integrazione da verificare',detail:'Stato '+String(row?.status||'non verificato').replaceAll('_',' ')+'. Nessuna automazione viene considerata attiva finché il registro non lo conferma.',view:null,label:''};
+}
+function renderSystemReadiness(){
+  const grid=$('systemReadinessGrid'),state=$('systemReadinessState')
+  if(!grid||!state)return
+  if(!Array.isArray(integrationRegistry)){
+    state.dataset.state='UNAVAILABLE';state.textContent='REGISTRO NON DISPONIBILE'
+    grid.innerHTML='<article><small>FONTE</small><strong>Non disponibile</strong><span>Il registro integrazioni non è stato caricato.</span></article>'
+    return
+  }
+  const rows=integrationRegistry.slice().sort((a,b)=>String(a.code||'').localeCompare(String(b.code||''),'it'))
+  const counts=rows.reduce((acc,row)=>{
+    const meta=integrationStateMeta(row.status);acc[meta.state]=(acc[meta.state]||0)+1;return acc
+  },{})
+  const unresolved=(counts.PENDING||0)+(counts.UNVERIFIED||0)
+  state.dataset.state=unresolved?'ATTENTION':'VERIFIED'
+  state.textContent=rows.length?(unresolved?unresolved+' DA VERIFICARE':'REGISTRO VERIFICATO'):'NESSUNA INTEGRAZIONE'
+  grid.innerHTML=rows.length?rows.map(row=>{
+    const meta=integrationStateMeta(row.status)
+    const checked=row.last_checked_at?fmtDateTime(row.last_checked_at):'Controllo non registrato'
+    return '<article data-readiness-state="'+esc(meta.state)+'">'+
+      '<small>'+esc(String(row.provider||row.code||'INTEGRAZIONE').replaceAll('_',' '))+'</small>'+
+      '<strong>'+esc(row.purpose||row.code||'Integrazione')+'</strong>'+
+      '<b>'+esc(meta.label)+'</b>'+
+      '<span>'+esc(meta.detail)+'</span>'+
+      '<em>'+esc(checked)+'</em>'+
+    '</article>'
+  }).join(''):'<article><small>REGISTRO</small><strong>Nessuna integrazione censita</strong><span>Non viene simulata alcuna connessione.</span></article>'
+
+  const actionBox=$('systemReadinessActions')
+  if(actionBox){
+    const items=rows.map(readinessNextAction).filter(Boolean)
+    actionBox.innerHTML=items.length
+      ?'<div class="readiness-action-title"><span>NEXT SAFE ACTIONS</span><strong>'+items.length+' punti da chiudere senza simulare connessioni</strong></div>'+
+        items.map((item,index)=>
+          '<article><span>'+String(index+1).padStart(2,'0')+'</span><div><strong>'+esc(item.title)+'</strong><p>'+esc(item.detail)+'</p></div>'+
+          (item.view&&canOpenView(item.view)?'<button type="button" data-readiness-view="'+esc(item.view)+'">'+esc(item.label)+' →</button>':'')+
+          '</article>'
+        ).join('')
+      :'<div class="readiness-action-clear"><strong>Nessun blocco di integrazione registrato.</strong><span>Il registro non mostra stati pending, disabled o limitati.</span></div>'
+    actionBox.querySelectorAll('[data-readiness-view]').forEach(button=>button.onclick=()=>navigate(button.dataset.readinessView))
+  }
+}
+
 function renderHome(){
   const offices=accessibleOffices()
   $('officeEntryRole').textContent='Accesso: '+String(window.userRole||'utente').replaceAll('_',' ')
@@ -1519,6 +1587,7 @@ function renderHome(){
   }
 
   renderHeaderControls()
+  renderSystemReadiness();
 }
 
 function renderCepaHub(){
