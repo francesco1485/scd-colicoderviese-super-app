@@ -221,5 +221,145 @@
       "PRODUCTION_ONLY_AFTER_AUTHORIZATION"
     ],
     "docsOnly": "NOT_SUFFICIENT_WHEN_IMPLEMENTATION_WAS_REQUESTED"
-  }
+  },
+  "recoveryPolicy": {
+    "verbatimRule": "Never label reconstructed or summarized content as verbatim.",
+    "statuses": [
+      "VERBATIM_TITLE",
+      "VERBATIM_FRAGMENT",
+      "PARTIAL_RECOVERY",
+      "NORMALIZED_REQUIREMENT"
+    ],
+    "unresolvedOriginalText": "Keep searching prior chats when exact source text is needed; do not hallucinate missing wording."
+  },
+  "recoveredCommandLedger": [
+    {
+      "id": "CMD-20260928-0717",
+      "timestamp": "2026-09-28T07:17:12Z",
+      "title": "PERMANENT_7_PHASE_ENGINEERING_PROMPT",
+      "recoveryStatus": "PARTIAL_RECOVERY",
+      "recoveredElements": [
+        "flussi e data lineage",
+        "sicurezza",
+        "UX/UI",
+        "backend completo",
+        "AI",
+        "OpenAPI",
+        "deploy e collaudo"
+      ],
+      "recoveredStack": [
+        "Apps Script",
+        "JavaScript",
+        "GCP",
+        "Supabase",
+        "Vercel",
+        "WhatsApp",
+        "AI"
+      ],
+      "incorporation": [
+        "SCD:STATE",
+        "SCD:EXPERT",
+        "SCD:ARCHITECT",
+        "DATA_PROVENANCE",
+        "SECURITY",
+        "API_CONTRACT",
+        "TEST_RELEASE"
+      ]
+    },
+    {
+      "id": "CMD-20260928-0719",
+      "timestamp": "2026-09-28T07:19:26Z",
+      "title": "[SYSTEM_DIRECTIVE: MAX_OVERRIDE_ACTIVE]",
+      "recoveryStatus": "VERBATIM_TITLE",
+      "recoveredElements": [
+        "multi-data/API/webhook",
+        "Google/Email integrations",
+        "precisione algoritmica",
+        "UI/grafica",
+        "codice completo senza placeholder",
+        "architettura file",
+        "mappa interscambi",
+        "Creative Director / Master Communicator"
+      ],
+      "incorporation": [
+        "WEBAPP:MASTER",
+        "INTEGRATION_ARCHITECTURE",
+        "VISUAL_SYSTEM",
+        "ZERO_PLACEHOLDER_BUILD"
+      ]
+    },
+    {
+      "id": "CMD-20260928-1708",
+      "timestamp": "2026-09-28T17:08:35Z",
+      "title": "[SISTEMA OPERATIVO ATTIVATO: CORE ARCHITECT & TECH PHILANTHROPIST - V3.0]",
+      "recoveryStatus": "VERBATIM_TITLE",
+      "recoveredElements": [
+        "open source / free tier / Docker",
+        "cross-platform",
+        "multi-tenant / API / audit",
+        "UI animata",
+        "reverse engineering",
+        "auto-evoluzione",
+        "chatbot / webhook",
+        "analisi strategica",
+        "architettura costo zero",
+        "codice o flusso pronto"
+      ],
+      "incorporation": [
+        "COST_AWARE_ARCHITECTURE",
+        "CROSS_PLATFORM",
+        "AUDITABILITY",
+        "MOTION",
+        "AUTONOMOUS_EVOLUTION"
+      ]
+    },
+    {
+      "id": "CMD-20260930-0832",
+      "timestamp": "2026-09-30T08:32:45Z",
+      "title": "SUPER COMANDO Vision-to-Code/Web-Mobile",
+      "recoveryStatus": "VERBATIM_FRAGMENT",
+      "recoveredElements": [
+        "selezione automatica matrice Web React/Next/Vue/Angular, Vanilla HTML/CSS/ES6, React Native/Expo o Flutter/Dart",
+        "dati isolati in JSON/props",
+        "CSS Grid/Flexbox",
+        "SVG nativo",
+        "accessibilità WCAG 2.1 AA",
+        "componenti isolati",
+        "raster asset solo come placeholder",
+        "output codice puro nel contesto originario"
+      ],
+      "incorporation": [
+        "VISION_TO_CODE",
+        "RESPONSIVE_COMPONENTS",
+        "ACCESSIBILITY",
+        "DATA_SEPARATION",
+        "NATIVE_READINESS"
+      ]
+    },
+    {
+      "id": "CMD-20261001-2022",
+      "timestamp": "2026-10-01T20:22:40Z",
+      "title": "[RUOLO: AI SOFTWARE ARCHITECT, REVERSE ENGINEERING SPECIALIST & AUTONOMOUS AGENT - LIVELLO SENIOR PRINCIPAL]",
+      "recoveryStatus": "VERBATIM_TITLE",
+      "recoveredElements": [
+        "Reverse Engineering Visivo",
+        "Architettura delle Formule e dei Dati",
+        "Sviluppo Zero-Bug",
+        "Protocollo di Esecuzione Continua e Autonoma",
+        "analisi immagini a livello molecolare",
+        "layout/griglie/design system/componenti/responsive",
+        "formule/validazioni/JSON/database",
+        "codice modulare accessibile production-ready con albero file",
+        "autovalutazione bug/UX",
+        "miglioramenti proattivi",
+        "prosecuzione automatica senza chiedere permesso per ogni step"
+      ],
+      "recoveredExactFragment": "[STATO: IN CORSO - Scrivi 'PROCEDI' per iniettare il blocco successivo]",
+      "incorporation": [
+        "SCD:ARCHITECT",
+        "WEBAPP:MASTER",
+        "AUTONOMOUS_SAFE_CONTINUATION"
+      ]
+    }
+  ]
 }
