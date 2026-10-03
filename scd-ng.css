@@ -157,7 +157,7 @@ radial-gradient(circle at 84% 0%,rgba(41,215,255,.12),transparent 31%),
 .segmented.compact{display:flex;gap:6px;flex-wrap:wrap}
 .segmented.compact button{padding:8px 11px;font-size:11px}
 .week-rail-first{margin-top:12px}
-.home-first .week-rail{grid-template-columns:repeat(7,minmax(118px,1fr));overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+.home-first .week-rail{grid-auto-columns:minmax(118px,1fr);grid-template-columns:none;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
 .home-first .day{min-height:170px}
 .home-first .event-pill{border:0;text-align:left;width:100%;cursor:pointer}
 
