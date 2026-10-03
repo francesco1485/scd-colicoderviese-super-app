@@ -1220,6 +1220,41 @@ function renderCrmTable(){
       '</button>').join(''):'<div class="crm-empty">Nessun profilo corrisponde ai filtri.</div>');
   $$('[data-crm-id]').forEach(b=>b.onclick=()=>openCrmProfile(b.dataset.crmId));
 }
+function crmExplicitValue(row,keys){
+  for(const key of keys){
+    const value=row&&row[key];
+    if(value!==undefined&&value!==null&&String(value).trim()!=='')return String(value).trim();
+  }
+  return '';
+}
+function crmOpportunityCard(row,index){
+  const title=crmExplicitValue(row,['OPPORTUNITA','OPPORTUNITÀ','NOME','OGGETTO','PROGETTO','PACCHETTO','ASSET'])||('Opportunità '+String(index+1));
+  const status=crmExplicitValue(row,['STATO','STATUS','FASE','STAGE']);
+  const type=crmExplicitValue(row,['TIPO','TYPE','CATEGORIA','CATEGORY']);
+  const value=crmExplicitValue(row,['VALORE €','VALORE','IMPORTO','BUDGET']);
+  const next=crmExplicitValue(row,['PROSSIMA_AZIONE','NEXT_ACTION','AZIONE','FOLLOW_UP']);
+  const due=crmExplicitValue(row,['PROSSIMA_SCADENZA','SCADENZA','DEADLINE','DUE_DATE']);
+  const owner=crmExplicitValue(row,['OWNER','RESPONSABILE','ASSEGNATO_A']);
+  const meta=[type,status,owner].filter(Boolean);
+  return '<article class="crm-opportunity">'+
+    '<header><b>'+esc(title)+'</b>'+(status?'<small>'+esc(status)+'</small>':'')+'</header>'+
+    (meta.length?'<div class="crm-opportunity-meta">'+meta.map(x=>'<span>'+esc(x)+'</span>').join('')+'</div>':'')+
+    (value?'<p><strong>Valore registrato:</strong> '+esc(value)+'</p>':'')+
+    (next?'<p><strong>Prossima azione:</strong> '+esc(next)+'</p>':'')+
+    (due?'<p><strong>Scadenza registrata:</strong> '+esc(due)+'</p>':'')+
+  '</article>';
+}
+function crmTaskCard(row,index){
+  const title=crmExplicitValue(row,['TITOLO','TITLE','OGGETTO','TASK','ATTIVITA','ATTIVITÀ'])||('Attività '+String(index+1));
+  const status=crmExplicitValue(row,['STATO','STATUS']);
+  const due=crmExplicitValue(row,['SCADENZA','DEADLINE','DUE_DATE','DUE_AT']);
+  const owner=crmExplicitValue(row,['OWNER','RESPONSABILE','ASSEGNATO_A']);
+  const note=crmExplicitValue(row,['NOTE','DESCRIZIONE','DESCRIPTION','DETTAGLI']);
+  return '<article class="crm-task-evidence">'+
+    '<div><strong>'+esc(title)+'</strong><small>'+esc([status,owner,due].filter(Boolean).join(' · ')||'Metadati non valorizzati')+'</small></div>'+
+    (note?'<p>'+esc(note)+'</p>':'')+
+  '</article>';
+}
 function renderCrmInspector(data){
   const el=$('#crmInspector');if(!el)return;
   if(!data){el.innerHTML='<h3>Profilo CRM</h3><p>Seleziona una persona o azienda per vedere il profilo relazionale completo.</p>';return}
@@ -1247,7 +1282,13 @@ function renderCrmInspector(data){
     '<section class="crm-section"><h3>Accordi / contratti</h3>'+
       (agreements.length?agreements.map(a=>'<div class="crm-agreement"><div><b>'+esc(a.PACCHETTO||a.PARTNER||'Accordo')+'</b><small>'+esc(a.STATO||'')+'</small></div><div><span>Valore</span><strong>'+esc(a['VALORE €']!==''&&a['VALORE €']!=null?'€ '+a['VALORE €']:'Da verificare')+'</strong></div><div><span>Incasso</span><strong>'+esc(a['STATO INCASSO']||'Da verificare')+'</strong></div><p>'+esc(a['ASSET PROMESSI']||'')+'</p><small>'+esc(a['PROSSIMA AZIONE']||'')+'</small></div>').join(''):'<p>Nessun accordo formalizzato collegato.</p>')+
     '</section>'+
-    '<section class="crm-section"><h3>Attività e opportunità</h3><p>'+tasks.length+' task collegati · '+opps.length+' opportunità collegate · '+agreements.length+' accordi collegati</p></section>';
+    '<section class="crm-section crm-evidence-section"><h3>Attività registrate</h3>'+
+      (tasks.length?tasks.slice(0,12).map(crmTaskCard).join(''):'<p>Nessuna attività collegata registrata.</p>')+
+    '</section>'+
+    '<section class="crm-section crm-evidence-section"><h3>Opportunità registrate</h3>'+
+      (opps.length?opps.slice(0,12).map(crmOpportunityCard).join(''):'<p>Nessuna opportunità collegata registrata.</p>')+
+      '<small class="crm-evidence-rule">Sono mostrati soltanto campi valorizzati nel master canonico. Nessuna probabilità, valore o scadenza viene dedotta.</small>'+
+    '</section>';
   const mailBtn=$('#crmEmailAction');
   if(mailBtn)mailBtn.onclick=()=>openCrmEmailComposer(data);
 }
