@@ -508,7 +508,7 @@ mark('R56_IDENTITY_ACCESS_JOURNEY');
   const metricsText=String(await page.locator('#publicPanelBody').textContent()||'');
   if(!metricsSeen)throw new Error('R56 access metrics action not called');
   if(!metricsText.includes('4')||!metricsText.includes('9')||!metricsText.includes('7'))throw new Error('R56 aggregated metrics projection missing');
-  if(/123456|654321|new\.user@example\.test|documento qa|posizione grezza/i.test(metricsText))throw new Error('R56 metrics leaked sensitive QA content');
+  if(/123456|654321|new\.user@example\.test|Documento QA|Contenuto QA autorizzato|Colico QA|Dervio QA/i.test(metricsText))throw new Error('R56 metrics leaked concrete sensitive QA values');
   await page.click('#publicPanelClose');
 
   await page.click('[data-private-module="SICUREZZA"]');
