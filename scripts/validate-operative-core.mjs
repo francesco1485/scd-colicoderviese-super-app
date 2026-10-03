@@ -6,6 +6,7 @@ const read=p=>fs.readFileSync(p,'utf8');
 const migration=read('supabase/migrations/20261002_r51_core_operative_engine.sql');
 const engine=read('lib/scd-operative-engine.js');
 const router=read('automations/google-apps-script/ScdMailDriveRouter.gs');
+const dataFabric=read('backend_patch_R25_data_fabric.gs');
 const template=read('content/templates/match-day.it.txt');
 
 for(const token of [
@@ -49,6 +50,19 @@ for(const token of [
   '-category:forums'
 ]) if(!router.includes(token)) fail('Gmail/Drive router missing '+token);
 if(/ID_CARTELLA_/i.test(router)) fail('placeholder Drive folder IDs must not ship');
+
+for(const token of [
+  'r57MailDecision_',
+  'r57MailRetryCount_',
+  'r57MailRetryFail_',
+  'r57MailRetryClear_',
+  'MAIL_MAX_RETRIES: 3',
+  '-category:social',
+  '-category:forums',
+  "STATO_SEMANTICO:decision.state",
+  "if (decision.queue)",
+  'EMAIL_INGEST_RETRY_EXHAUSTED'
+]) if(!dataFabric.includes(token)) fail('R57 Automation Plane missing '+token);
 if(!template.includes('{{campionato_name}}')||!template.includes('{{avversario}}')||!template.includes('{{orario}}')) fail('match-day template placeholders missing');
 
 if(!process.exitCode)console.log('SCD OPERATIVE CORE CONTRACT PASS',{
