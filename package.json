@@ -13,6 +13,7 @@
     "test:contract": "node tests/api-contract.mjs",
     "test": "npm run test:contract && npm run test:smoke",
     "build:pages": "node scripts/build-pages.mjs",
-    "test:pages": "npm run build:pages && SCD_STATIC_DIR=_site npm run test:smoke"
+    "test:pages": "npm run build:pages && SCD_STATIC_DIR=_site npm run test:smoke",
+    "test:cepa01": "node scripts/validate-cepa01-readiness.mjs && node --check cepa-maglia-os-static/app.js && node --check cepa-maglia-os-static/dashboard-component.js"
   }
 }
