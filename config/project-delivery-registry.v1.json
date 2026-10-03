@@ -1,0 +1,223 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "SCD_PROJECT_DELIVERY_REGISTRY",
+  "effectiveAt": "2026-10-03",
+  "purpose": "Single operational map of every started canonical product: what it must do, how it is built, what completion means, current execution stream, next vertical slice and hard stop boundaries.",
+  "governingFiles": [
+    "SCD_SYSTEM_MANIFEST.json",
+    "AGENTS.md",
+    "config/user-directives.v1.json",
+    "config/ai-portfolio.v1.json",
+    "docs/AI_MULTIFUNCTIONAL_DEVELOPER_COMMAND.md"
+  ],
+  "completionModel": [
+    "DESIGNED",
+    "IMPLEMENTED",
+    "TESTED",
+    "PREVIEWABLE",
+    "HUMAN_REVIEWED",
+    "DEPLOYED",
+    "PRODUCTION_VERIFIED"
+  ],
+  "globalRules": [
+    "NO_STARTED_PROJECT_MAY_BE_ABANDONED_WITHOUT_EXPLICIT_CLOSE_OR_SUPERSEDE_REASON",
+    "NO_DOCS_ONLY_COMPLETION_WHEN_IMPLEMENTATION_IS_POSSIBLE",
+    "NO_DUPLICATE_AUTH_DATABASE_CALENDAR_CRM_SOURCE_OF_TRUTH",
+    "NO_FAKE_DATA_OR_FAKE_LIVE_STATE",
+    "SAFE_REVERSIBLE_WORK_CONTINUES_AUTONOMOUSLY",
+    "MERGE_DEPLOY_PRODUCTION_MIGRATION_SIGNING_PAID_ACTIONS_AND_CRITICAL_PERMISSIONS_REQUIRE_EXPLICIT_HUMAN_AUTHORIZATION"
+  ],
+  "projects": [
+    {
+      "id": "SCD_ONE",
+      "issue": 98,
+      "canonicalBranch": "ai-scd-one",
+      "activeImplementationPr": 104,
+      "activeImplementationBranch": "copilot/ai-scd-one-again",
+      "supersededParallelPr": 105,
+      "users": [
+        "PUBLIC",
+        "SUPPORTERS",
+        "FAMILIES",
+        "ATHLETES",
+        "AUTHORIZED_STAFF_PUBLIC_CONTEXT"
+      ],
+      "mission": "One public/social/transactional club product where people understand what is happening now and next, follow teams and Matchday, use services, participate safely and access authorized personal/family/athlete context.",
+      "mustDeliver": [
+        "HOME_PULSE_CURRENT_STATE",
+        "CALENDAR_FRIDAY_TO_FRIDAY_AND_UPCOMING",
+        "TEAMS_DISCOVERY_AND_TEAM_HUB",
+        "MATCHDAY",
+        "SOCIAL_COMMUNITY",
+        "MEDIA_NEWSROOM",
+        "PROFILE_TWIN",
+        "AUTHORIZED_FAMILY_ATHLETE_CONTEXT",
+        "JOIN_OPEN_DAY_EVENTS_TOURNAMENT_ENTRY",
+        "SCD_CARD_TICKETS_SERVICES",
+        "PUBLIC_PARTNER_VISIBILITY",
+        "PWA_OFFLINE_DEEP_LINKS_RESPONSIVE",
+        "NATIVE_DISTRIBUTION_READINESS_AFTER_WEB_ACCEPTANCE"
+      ],
+      "implementationPrinciples": [
+        "CANONICAL_NAV_HOME_CALENDAR_TEAMS_SOCIAL_PROFILE",
+        "PULSE_ANSWERS_NOW_NEXT_CHANGED_ATTENTION",
+        "USE_VERIFIED_SOURCE_STATES",
+        "PRESERVE_R20_SERVER_SIDE_AUTHORIZATION",
+        "PRESERVE_EVENT_ID_AND_EXISTING_DATA_CONTRACTS",
+        "MOBILE_FIRST_DESKTOP_FIRST_CLASS",
+        "RECOVER_LIBRARY_VISUAL_REFERENCES"
+      ],
+      "definitionOfDone": [
+        "PRIMARY_PUBLIC_FLOWS_IMPLEMENTED_AND_TESTED",
+        "ALL_REQUIRED_VIEWPORTS_VISUALLY_VERIFIED",
+        "NO_UNSUPPORTED_LIVE_CLAIMS",
+        "OFFLINE_ERROR_EMPTY_DENIED_STATES_EXIST",
+        "PREVIEW_AVAILABLE_FOR_HUMAN_REVIEW",
+        "CORE_WEB_PWA_ACCEPTANCE_PASSED",
+        "MOBILE_01_CAN_THEN_PACKAGE_SAME_CODEBASE"
+      ],
+      "nextVerticalSlice": "ONE-01_CONSOLIDATE_PR104_COMMAND_MEMORY_VISUAL_LINEAGE_THEN_VERIFY_PREVIEW",
+      "status": "IMPLEMENTATION_ACTIVE"
+    },
+    {
+      "id": "SCD_CORE",
+      "issue": 99,
+      "canonicalBranch": "ai-scd-core",
+      "users": [
+        "DIRECTION",
+        "SECRETARIAT",
+        "STAFF",
+        "AUTHORIZED_OPERATORS"
+      ],
+      "mission": "Internal association operating system connecting people, registrations, events, facilities, logistics, documents, administration and operational decisions without forcing staff to hunt across disconnected tools.",
+      "mustDeliver": [
+        "DIRECTION_CONTROL_ROOM",
+        "SECRETARIAT_AND_REGISTRATIONS",
+        "PEOPLE_FAMILIES_ATHLETES_STAFF",
+        "TEAMS_ROSTERS_ROLES",
+        "EVENT_CALENDAR_FUSION",
+        "CONVOCATIONS_AND_DISTINTE",
+        "MEDICAL_STATUS_GUARDED",
+        "FACILITY_WEEK_SMART_FACILITY_STATES",
+        "FIELDS_SPACES_LOCKER_ROOMS",
+        "TRANSPORT",
+        "KIT_WAREHOUSE_LAUNDRY_ASSETS",
+        "DOCUMENTS_REQUESTS_APPROVALS_DEADLINES",
+        "ADMIN_FINANCE_CONTRACT_WORKER_SUPPORT",
+        "GMAIL_DRIVE_CALENDAR_INTAKE_AUTOMATION",
+        "AUDIT_PROVENANCE_REPORTING"
+      ],
+      "implementationPrinciples": [
+        "ACTION_FIRST_ROLE_AWARE",
+        "ONE_EVENT_ID_MANY_AUTHORIZED_PROJECTIONS",
+        "R20_AUTHORITY_UNTIL_VERIFIED_MIGRATION",
+        "SMART_FACILITY_MUST_NEVER_FAKE_CONNECTED_STATE",
+        "SENSITIVE_DATA_MINIMIZATION",
+        "USE_EXISTING_INTAKE_AND_MASTER_SOURCES"
+      ],
+      "definitionOfDone": [
+        "DAILY_CONTROL_ROOM_IS_USABLE",
+        "CORE_WORKFLOWS_HAVE_REAL_SOURCE_AND_STATUS",
+        "ROLE_AND_SCOPE_ENFORCED_SERVER_SIDE",
+        "MATERIAL_OPERATIONS_LINKED_TO_CANONICAL_ENTITIES",
+        "CRITICAL_FLOWS_TESTED_WITH_ROLLBACK",
+        "PREVIEW_AND_OPERATOR_QA_COMPLETED"
+      ],
+      "nextVerticalSlice": "CORE-01_DIRECTION_CONTROL_ROOM_TODAY_PRIORITY_TASKS_APPROVALS_DEADLINES_CHANGES_FROM_EXISTING_SOURCES",
+      "status": "READY_TO_EXECUTE"
+    },
+    {
+      "id": "SCD_GROW",
+      "issue": 86,
+      "canonicalBranch": "ai-scd-grow",
+      "users": [
+        "DIRECTION",
+        "COMMERCIAL",
+        "AUTHORIZED_SPONSOR_OPERATORS"
+      ],
+      "mission": "Continuous partner and sponsor growth engine that researches, qualifies, develops, activates, proves and renews relationships while preserving factual commercial status.",
+      "mustDeliver": [
+        "PUBLIC_PARTNER_EXPERIENCE",
+        "CRM_STAKEHOLDERS",
+        "LEAD_RADAR",
+        "COMMERCIAL_PIPELINE",
+        "LIA_SPONSOR_WORKBENCH",
+        "PROPOSALS",
+        "PARTNER_MICROSITES",
+        "LED_SPONSOR_WALL",
+        "CONVENTIONS",
+        "SOLIDARITY_FUND",
+        "PROJECTS_AND_ASSETS",
+        "ACTIVATION_PROOF_REPORTING",
+        "RENEWALS_AND_FOLLOW_UP",
+        "AUTOMATED_RESEARCH_WITH_PROVENANCE"
+      ],
+      "implementationPrinciples": [
+        "PROSPECT_IS_NOT_SPONSOR",
+        "PROPOSAL_IS_NOT_CONTRACT",
+        "NO_INVENTED_VALUE_PROBABILITY_OR_COMMITMENT",
+        "RESEARCH_VERIFY_QUALIFY_CONNECT_PROPOSE_ACTIVATE_PROVE_REPORT_RENEW_EXPAND",
+        "ABSORB_EXISTING_COMMERCIAL_LIA_WORK_NO_PARALLEL_CRM"
+      ],
+      "definitionOfDone": [
+        "PIPELINE_HAS_VERIFIED_STATUS_AND_NEXT_ACTION",
+        "PROPOSAL_TO_ACTIVATION_FLOW_IS_TRACEABLE",
+        "PARTNER_VALUE_HAS_EVIDENCE",
+        "RENEWAL_LOOP_IS_OPERATIONAL",
+        "PUBLIC_AND_PRIVATE_SURFACES_ARE_VISUALLY_AND_FUNCTIONALLY_TESTED"
+      ],
+      "nextVerticalSlice": "GROW-01_VERIFIED_PIPELINE_NEXT_ACTION_RELATIONSHIP_AND_PROPOSAL_FLOW",
+      "status": "READY_TO_EXECUTE"
+    },
+    {
+      "id": "CEPA_360",
+      "issue": 102,
+      "canonicalBranch": "cepa-maglia-os-hosting",
+      "appPath": "cepa-maglia-os-static/",
+      "users": [
+        "PUBLIC_CEPA",
+        "MAGLIA_DIRECTION",
+        "AGENCY_OPERATORS",
+        "AUTHORIZED_COLLABORATORS"
+      ],
+      "mission": "One combined CEPA public education/consulting interface and Maglia 360 private agency operating system, CRM and growth environment using verified agency history, products, partners and relationships.",
+      "mustDeliver": [
+        "CEPA_PUBLIC_EDUCATION_AND_CONSULTING",
+        "CENTER_CEPA_GOVERNANCE",
+        "SAP_NETWORK",
+        "TERRITORY_COLICO_MANDELLO_LECCO",
+        "EVENTS_ACADEMY_CONTENT",
+        "MAGLIA360_CONTROL_ROOM",
+        "CLIENTS_POLICIES_PORTFOLIO",
+        "PIPELINE_RENEWALS_CHECKUPS",
+        "COLLABORATORS_AND_TERMS",
+        "PARTNERS_PRODUCTS_KNOWLEDGE",
+        "DOCUMENTS_CONTRACTS",
+        "LIA_AI_WORKBENCH",
+        "AI_MAIL_WITH_HUMAN_REVIEW",
+        "NETWORK_RADAR_IVASS_PUBLIC_PROFESSIONAL_DATA",
+        "DEVELOPMENT_HISTORY_RELATIONSHIP_GRAPH",
+        "ROLE_ADAPTIVE_CRM_WITHOUT_PRIVILEGE_ADAPTATION"
+      ],
+      "implementationPrinciples": [
+        "EDUCARE_PRIMA_DI_VENDERE",
+        "ONE_DATA_SOURCE_MULTIPLE_COORDINATED_USES",
+        "NO_PARALLEL_CRM",
+        "NO_INVENTED_PRODUCTS_PARTNERS_TERMS_OR_REGULATION",
+        "NOINDEX_PUBLIC_CEPA_UNTIL_LEGAL_PRIVACY_ASSETS_CONTENT_SEO_READY",
+        "VERIFY_GITHUB_RENDER_SUPABASE_BEFORE_WRITE"
+      ],
+      "definitionOfDone": [
+        "ACCESS_QA_PASSED",
+        "PUBLIC_CEPA_AND_PRIVATE_MAGLIA360_BOUNDARY_CLEAR",
+        "CORE_CRM_AND_AGENDA_FLOWS_OPERATIONAL",
+        "RLS_SECURITY_AND_EDGE_FUNCTIONS_VERIFIED",
+        "MOBILE_DESKTOP_VISUAL_QA_PASSED",
+        "PREVIEW_OR_RUNTIME_EVIDENCE_AVAILABLE",
+        "PRODUCTION_VERIFIED_ONLY_AFTER_AUTHORIZED_RELEASE"
+      ],
+      "nextVerticalSlice": "CEPA-01_QA_ACCESS_SYSTEM_THEN_CONTROL_ROOM_REAL_DATA",
+      "status": "IMPLEMENTATION_CONTINUATION_REQUIRED"
+    }
+  ]
+}
