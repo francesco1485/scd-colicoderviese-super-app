@@ -13,7 +13,7 @@ ok(js.includes('renderGrowPipeline()'),'GROW pipeline renderer not wired');
 ok(js.includes('function crmOpportunityCard('),'canonical CRM evidence renderer missing');
 ok(js.includes('function crmTaskCard('),'canonical CRM task evidence renderer missing');
 ok(js.includes('Nessuna probabilità, valore o scadenza viene dedotta.'),'evidence no-inference disclosure missing');
-ok(js.includes("$('[data-grow-crm-id]').forEach"),'GROW pipeline CRM actions must use multi-selector');
+ok(js.includes("$$('[data-grow-crm-id]').forEach"),'GROW pipeline CRM actions must use multi-selector');
 ok(!js.split("\n").some(line=>line.trimStart().startsWith("$('[data-grow-crm-id]').forEach")),'GROW pipeline must not call forEach on a single-element selector');
 ok(js.includes("crmState.sourceState='VERIFIED'"),'verified CRM source state missing');
 ok(js.includes("crmState.sourceState='UNAVAILABLE'"),'fail-closed CRM source state missing');
