@@ -1,47 +1,55 @@
 import fs from 'node:fs';
 
 const file='config/ai-portfolio.v1.json';
-const fail=(m)=>{console.error('AI PORTFOLIO CONTRACT FAIL: '+m);process.exitCode=1};
+const fail=m=>{console.error('AI PORTFOLIO CONTRACT FAIL: '+m);process.exitCode=1};
 const ok=(cond,m)=>{if(!cond)fail(m)};
 
 const p=JSON.parse(fs.readFileSync(file,'utf8'));
 ok(p.id==='SCD_MAGLIA_AI_PORTFOLIO','portfolio id mismatch');
-ok(p.totalApps===4,'portfolio must contain exactly 4 apps');
+ok(p.schemaVersion==='2.0.0','portfolio schema version mismatch');
+ok(p.totalApps===4,'portfolio must contain exactly 4 canonical apps');
 ok(Array.isArray(p.apps)&&p.apps.length===4,'apps[] must contain exactly 4 entries');
 
 const ids=p.apps.map(x=>x.id);
-ok(new Set(ids).size===ids.length,'app ids must be unique');
+const expected=['SCD_ONE','SCD_CORE','SCD_GROW','CEPA_360'];
+ok(new Set(ids).size===4,'app ids must be unique');
+for(const id of expected)ok(ids.includes(id),'missing canonical app '+id);
 
 const scd=p.apps.filter(x=>x.owner==='SCD_COLICODERVIESE');
 const maglia=p.apps.filter(x=>x.owner==='MAGLIA_ASSICURAZIONI');
 ok(scd.length===3,'portfolio must contain exactly 3 SCD apps');
 ok(maglia.length===1,'portfolio must contain exactly 1 Maglia app');
 
-for(const required of ['SCD_UNIVERSE','SCD_SPONSOR_PLATFORM','SCD_COMMAND_R22','MAGLIA_360_CEPA']){
-  ok(ids.includes(required),'missing canonical app '+required);
+ok(p.universalDeveloperCommand==='WEBAPP:MASTER','universal developer command mismatch');
+
+for(const app of p.apps){
+  ok(Array.isArray(app.commands)&&app.commands.includes('WEBAPP:MASTER'),app.id+' missing WEBAPP:MASTER');
+  ok(typeof app.aiBranch==='string'&&app.aiBranch.startsWith('ai-'),app.id+' missing canonical ai branch');
 }
 
-const forbiddenStandalone=['SCD_COMMERCIAL_LIA','CEPA_MAGLIA_OS','MAGLIA360_OFFICE'];
-for(const id of forbiddenStandalone) ok(!ids.includes(id),'superseded standalone app present: '+id);
+const one=p.apps.find(x=>x.id==='SCD_ONE');
+ok(one.kind==='PUBLIC_SOCIAL_TRANSACTION_SUPER_APP','SCD_ONE kind mismatch');
 
-const magliaApp=p.apps.find(x=>x.id==='MAGLIA_360_CEPA');
-ok(magliaApp?.canonicalSourceBranch==='cepa-maglia-os-hosting','Maglia canonical source must be cepa-maglia-os-hosting');
-ok(magliaApp?.aiBranch==='ai-maglia360-cepa-unified','Maglia unified AI branch mismatch');
-ok((magliaApp?.includes||[]).includes('CEPA_PUBLIC'),'CEPA public layer missing from unified Maglia app');
-ok((magliaApp?.includes||[]).includes('MAGLIA360_CONTROL_ROOM'),'Maglia360 private layer missing from unified Maglia app');
+const core=p.apps.find(x=>x.id==='SCD_CORE');
+for(const m of ['SECRETARIAT','FACILITY_WEEK','SMART_FACILITY','WAREHOUSE','KIT','LAUNDRY'])ok(core.modules.includes(m),'SCD_CORE missing '+m);
 
-const sponsor=p.apps.find(x=>x.id==='SCD_SPONSOR_PLATFORM');
-ok((sponsor?.includes||[]).includes('COMMERCIAL_PIPELINE'),'Sponsor commercial pipeline missing');
-ok((sponsor?.absorbedWorkstreams||[]).includes('ai-scd-commercial-lia'),'Commercial/Lia split must remain absorbed');
+const grow=p.apps.find(x=>x.id==='SCD_GROW');
+for(const m of ['CRM','LEAD_RADAR','COMMERCIAL_PIPELINE','PROOF','RENEWALS'])ok(grow.modules.includes(m),'SCD_GROW missing '+m);
+ok((grow.absorbedWorkstreams||[]).includes('ai-scd-commercial-lia'),'SCD_GROW must absorb Commercial/Lia');
 
-const universe=p.apps.find(x=>x.id==='SCD_UNIVERSE');
-for(const module of ['SEGRETERIA','FACILITY','TORNEI','PRIVATE_DESK']){
-  ok((universe?.internalModules||[]).includes(module),'SCD Universe module missing: '+module);
-}
+const cepa=p.apps.find(x=>x.id==='CEPA_360');
+ok(cepa.owner==='MAGLIA_ASSICURAZIONI','CEPA_360 owner mismatch');
+ok(cepa.canonicalSourceBranch==='cepa-maglia-os-hosting','CEPA_360 canonical source mismatch');
+for(const m of ['CEPA_PUBLIC','MAGLIA360_CONTROL_ROOM','CRM','HISTORY_INTELLIGENCE'])ok(cepa.modules.includes(m),'CEPA_360 missing '+m);
+
+const command=(p.sharedTechnicalEngines||[]).find(x=>x.id==='SCD_COMMAND_R22');
+ok(Boolean(command),'SCD_COMMAND_R22 shared engine missing');
+ok(!ids.includes('SCD_COMMAND_R22'),'SCD_COMMAND_R22 must not be counted as one of the four apps');
 
 console.log('AI PORTFOLIO CONTRACT OK',{
   total:p.apps.length,
   scd:scd.length,
   maglia:maglia.length,
-  apps:ids
+  apps:p.apps.map(x=>x.displayName),
+  sharedEngine:command?.id
 });
