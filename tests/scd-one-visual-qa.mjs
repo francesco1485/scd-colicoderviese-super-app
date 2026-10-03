@@ -36,6 +36,16 @@ for(const viewport of viewports){
   const pageErrors=[];
   page.on('pageerror',error=>pageErrors.push(String(error)));
 
+  if([390,1440].includes(viewport.width)){
+    await page.goto(base+'/#twin',{waitUntil:'domcontentloaded',timeout:30000});
+    await page.waitForSelector('#view-twin.active');
+    assert(new URL(page.url()).hash==='#profile','legacy deep link must canonicalize to #profile');
+
+    await page.goto(base+'/#teams?team=__SCD_TEST_UNKNOWN__',{waitUntil:'domcontentloaded',timeout:30000});
+    await page.waitForSelector('#view-teams.active');
+    assert(new URL(page.url()).hash==='#teams?team=__SCD_TEST_UNKNOWN__','team deep-link query must remain stable');
+  }
+
   await page.goto(base+'/#home',{waitUntil:'domcontentloaded',timeout:30000});
   const banner=page.locator('#scdCookieBanner:not([hidden])');
   if(await banner.count()){
