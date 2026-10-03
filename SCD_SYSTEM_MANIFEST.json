@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.27.0",
+    "version": "3.27.1",
     "effective_at": "2026-10-03",
     "status": "BINDING",
     "language": "it-IT",
@@ -1323,6 +1323,12 @@
       "MAIL_OPERATIONS_SHEET/17_SMART_CLASSIFIER",
       "MAIL_OPERATIONS_SHEET/18_ACTION_QUEUE",
       "TESSERATI_SHEET/MAIL SPORTCLUB"
+    ],
+    "runtime_actions": [
+      "direction.datafabric.status",
+      "direction.datafabric.actions",
+      "direction.datafabric.scan.gmail",
+      "direction.datafabric.scan.drive"
     ]
   },
   "entity_graph": {
