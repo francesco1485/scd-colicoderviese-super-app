@@ -335,6 +335,109 @@
       "use": "METHOD_AND_ORGANIZATION_RESEARCH",
       "authority": "PROFESSIONAL_REFERENCE",
       "note": "Useful cross-project benchmark for change management, sales development, leadership, managerial skills, organizational wellbeing, internal communication and recruiting methods. Not a regulatory source."
+    },
+    {
+      "id": "SRC-0026",
+      "title": "APRIL Italia",
+      "url": "https://www.aprilitalia.com/",
+      "scope": [
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE"
+      ],
+      "category": "ASSICURAZIONI_BANCASSURANCE_TPA",
+      "access": "PUBLIC",
+      "use": "PRIORITY_PRODUCT_AND_PROCESS_RESEARCH",
+      "authority": "OFFICIAL_PROVIDER",
+      "note": "Official provider reference for insurance, bancassurance, TPA and digital/operational process benchmarking."
+    },
+    {
+      "id": "SRC-0027",
+      "title": "OPES Italia",
+      "url": "https://www.opesitalia.it/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "ENTE_PROMOZIONE_SPORTIVA_TERZO_SETTORE_FORMAZIONE",
+      "access": "PUBLIC",
+      "use": "SPORT_GOVERNANCE_AND_TRAINING_RESEARCH",
+      "authority": "ORGANIZATION_OFFICIAL",
+      "note": "Useful for affiliation, training, services, events and third-sector research; FIGC/LND/RASD obligations still require competent official sources."
+    },
+    {
+      "id": "SRC-0028",
+      "title": "Registro Nazionale Attivita Sportive Dilettantistiche - Sport e Salute",
+      "url": "https://registro.sportesalute.eu/#/login",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "COMMON"
+      ],
+      "category": "RASD_REGISTRO_SPORTIVO",
+      "access": "PRIVATE_LOGIN",
+      "use": "MANUAL_AUTHENTICATED_USE",
+      "authority": "OFFICIAL",
+      "sensitive": true,
+      "note": "Priority institutional portal. Never store credentials or authenticated personal/company data in repository or ordinary AI logs."
+    },
+    {
+      "id": "SRC-0029",
+      "title": "LinkedIn",
+      "url": "https://www.linkedin.com/feed/",
+      "scope": [
+        "P02_SCD_SPONSOR_COMMERCIALE",
+        "P03_CEPA_MAGLIA_OS",
+        "P04_MAGLIA360_OFFICE",
+        "COMMON"
+      ],
+      "category": "NETWORKING_PROSPECTING_RECRUITING_CONTENT",
+      "access": "PRIVATE_LOGIN",
+      "use": "MANUAL_ACCOUNT_USE",
+      "authority": "PLATFORM",
+      "sensitive": true,
+      "note": "Use public profiles/content as research references where appropriate. Feed, messages and account-specific data require explicit authorized access."
+    },
+    {
+      "id": "SRC-0030",
+      "title": "Indeed Italia",
+      "url": "https://it.indeed.com/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P04_MAGLIA360_OFFICE",
+        "COMMON"
+      ],
+      "category": "LAVORO_RECRUITING_COMPENSI",
+      "access": "PUBLIC_OR_ACCOUNT",
+      "use": "JOB_AND_SKILLS_RESEARCH",
+      "authority": "PLATFORM",
+      "note": "Use for job/skills/recruiting research; verify posting freshness and terms at time of use."
+    },
+    {
+      "id": "SRC-0031",
+      "title": "Internova 2000",
+      "url": "https://internova2000.com/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE"
+      ],
+      "category": "FORNITURE_EVENTI_RISTORAZIONE_MONOUSO",
+      "access": "PUBLIC",
+      "use": "SUPPLIER_AND_COST_RESEARCH",
+      "authority": "COMMERCIAL",
+      "note": "Supplier reference for event, catering, take-away and club-house consumables; prices and availability are time-sensitive."
+    },
+    {
+      "id": "SRC-0032",
+      "title": "Saglio Sport",
+      "url": "https://www.sagliosport.it/",
+      "scope": [
+        "P01_SCD_SUPER_APP",
+        "P02_SCD_SPONSOR_COMMERCIALE"
+      ],
+      "category": "FORNITORE_SPORTIVO_TEAMWEAR",
+      "access": "PUBLIC_OR_ACCOUNT",
+      "use": "SPORT_SUPPLY_AND_TEAMWEAR_RESEARCH",
+      "authority": "COMMERCIAL",
+      "note": "Reference for sports equipment, football/teamwear and club-area benchmark; verify current stock and commercial conditions."
     }
   ]
 }
