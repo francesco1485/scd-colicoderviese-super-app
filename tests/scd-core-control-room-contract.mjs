@@ -26,7 +26,8 @@ const model=Core.build({
   mailactions:{
     rows:[
       {id:'MAIL-1',title:'Variazione gara ricevuta',priority:'ALTA',status:'DA LAVORARE',nextAction:'Verificare EVENT_ID e proporre aggiornamento calendario; conferma umana obbligatoria.'},
-      {id:'MAIL-2',title:'Documento da verificare',priority:'MEDIA',status:'NUOVA',nextAction:'Collegare documento amministrativo e sottoporre a verifica contabile.'}
+      {id:'MAIL-2',title:'Documento da verificare',priority:'MEDIA',status:'NUOVA',nextAction:'Collegare documento amministrativo e sottoporre a verifica contabile.',gmailUrl:'javascript:alert(1)'},
+      {id:'MAIL-3',title:'Fonte Gmail verificata',priority:'MEDIA',status:'NUOVA',nextAction:'Verifica messaggio.',gmailUrl:'https://mail.google.com/mail/u/0/#all/abc'}
     ]
   },
   evolution:{
@@ -50,6 +51,8 @@ ok(model.lanes.CHANGES.some(x=>x.id==='EVO-3'),'explicit change evidence must en
 ok(model.lanes.PRIORITY.some(x=>x.id==='MAIL-1'),'high-priority mail action must enter priority lane');
 ok(model.lanes.TODO.some(x=>x.id==='MAIL-1'),'mail action queue must enter todo lane');
 ok(model.lanes.TODO.some(x=>x.id==='MAIL-2'),'normal verified mail action must remain actionable');
+ok(model.lanes.TODO.find(x=>x.id==='MAIL-2')?.gmailUrl==='','unsafe non-Gmail link must be stripped');
+ok(model.lanes.TODO.find(x=>x.id==='MAIL-3')?.gmailUrl.startsWith('https://mail.google.com/'),'verified Gmail link must be preserved');
 ok(model.lanes.APPROVALS.some(x=>x.id==='MAIL-1'),'explicit human confirmation mail action must enter approvals lane');
 ok(model.laneStates.TODAY==='VERIFIED','today source state must remain VERIFIED');
 
