@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="./scd-ng.css?v=0.6.3">
   <link rel="stylesheet" href="./scd-synth.css?v=0.4.5">
   <link rel="stylesheet" href="./ui-r52-social.css?v=0.7.1">
+  <link rel="stylesheet" href="./scd-core-control-room.css?v=1.0.0">
 </head>
 <body data-scd-theme="arena">
   <div class="ambient ambient-a"></div><div class="ambient ambient-b"></div>
@@ -544,9 +545,26 @@
 
       <section class="view" id="view-desk" data-view="desk">
         <section class="desk-hero">
-          <div><span class="eyebrow">PRIVATE DESK</span><h2 id="deskHeroTitle">Dimmi cosa devi fare.<br>Non dove hai salvato il file.</h2><p id="deskHeroCopy">Il sistema deve trasformare Drive, Gmail, fogli e dati federali in azioni, scadenze e decisioni. Il contrario sarebbe troppo semplice da sbagliare.</p></div>
-          <button class="btn primary" id="openMirrorDesk">Chiedi a SCD Mirror</button>
+          <div><span class="eyebrow">PRIVATE DESK</span><h2 id="deskHeroTitle">Dimmi cosa devi fare.<br>Non dove hai salvato il file.</h2><p id="deskHeroCopy">Il sistema trasforma Drive, Gmail, fogli e dati federali in azioni, scadenze e decisioni, mantenendo fonte, stato e responsabilità verificabili.</p></div>
+          <button class="btn primary" id="openMirrorDesk">Chiedi a Sky</button>
         </section>
+        <section class="core-control-room" id="coreControlRoom" hidden aria-labelledby="coreControlTitle">
+          <header class="core-control-head">
+            <div>
+              <span class="eyebrow">SCD CORE · DIREZIONE</span>
+              <h3 id="coreControlTitle">Control Room</h3>
+              <p>Oggi, priorità, attività, approvazioni, scadenze e cambiamenti. Ogni voce resta collegata alla fonte che l'ha generata.</p>
+            </div>
+            <div class="core-control-actions">
+              <span id="coreControlStatus" data-state="PENDING">FONTI · IN ATTESA</span>
+              <button type="button" id="refreshCoreControlRoom">Aggiorna fonti</button>
+              <button type="button" id="resetCoreControlFocus" hidden>Mostra tutto</button>
+            </div>
+          </header>
+          <div class="core-control-sources" id="coreControlSources" aria-label="Stato fonti Control Room"></div>
+          <div class="core-control-lanes" id="coreControlLanes" aria-live="polite"></div>
+        </section>
+
         <div class="desk-grid">
           <section class="action-queue"><div class="section-head mini"><div><span class="eyebrow">DA GESTIRE</span><h3>Priorità operative</h3></div><span class="status-pill" id="deskScopeStatus">ROLE / SCOPE</span></div><div id="actionQueue"><article><span>1</span><div><b>Fonte non ancora collegata</b><small>Le priorità compariranno dopo autenticazione e scope reale.</small></div></article></div></section>
           <section class="desk-map"><div class="section-head mini"><div><span class="eyebrow">CLUB GRAPH</span><h3>Il club come rete viva</h3></div></div><div class="graph"><span class="node center">SCD</span><span class="node n1">PERSONE</span><span class="node n2">SQUADRE</span><span class="node n3">EVENTI</span><span class="node n4">DOCUMENTI</span><span class="node n5">SPONSOR</span><span class="node n6">TRASPORTI</span></div></section>
@@ -600,6 +618,7 @@
   <script src="./scd-experience-engine.js?v=40.0.0" defer></script>
   <script src="./scd-twin.js?v=40.0.0" defer></script>
   <script src="./lib/scd-operative-engine.js?v=51.0.0" defer></script>
+  <script src="./lib/scd-core-control-room.js?v=1.0.0" defer></script>
   <script src="./scd-ng.js?v=0.7.3" defer></script>
   <script src="./scd-interactions.js?v=0.4.5" defer></script>
   <div class="scd-cookie-banner" id="scdCookieBanner" hidden role="dialog" aria-label="Preferenze analytics">
