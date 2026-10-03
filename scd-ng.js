@@ -108,8 +108,8 @@ const pick=(obj,...keys)=>{for(const k of keys){const v=obj?.[k];if(v!=null&&Str
 const isoClientDate=v=>{const s=String(v||'').trim();if(!s)return '';let m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);if(m)return m[1]+'-'+m[2]+'-'+m[3];m=s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);if(m)return m[3]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[1]).padStart(2,'0');const d=new Date(s);return Number.isFinite(d.getTime())?d.toISOString().slice(0,10):''};
 const clientEventKind=row=>{const t=norm([pick(row,'kind','type','eventType'),pick(row,'title','event','name','subject')].join(' '));if(/allenament|training/.test(t))return 'TRAINING';if(/gara|partita|campionato|coppa|amichevole|match/.test(t))return 'MATCH';if(/torneo|tournament/.test(t))return 'TOURNAMENT';return 'EVENT'};
 
-const routeToView={home:'pulse',pulse:'pulse',calendar:'calendar',teams:'teams',social:'social',profile:'twin',twin:'twin',desk:'desk'};
-const viewToRoute={pulse:'home',calendar:'calendar',teams:'teams',social:'social',twin:'profile',desk:'desk'};
+const routeToView=window.SCDOneRouter?.routeToView||{home:'pulse',pulse:'pulse',calendar:'calendar',teams:'teams',social:'social',profile:'twin',twin:'twin',desk:'desk'};
+const viewToRoute=window.SCDOneRouter?.viewToRoute||{pulse:'home',calendar:'calendar',teams:'teams',social:'social',twin:'profile',desk:'desk'};
 function setView(requested,{historyMode='push'}={}){
   const view=routeToView[String(requested||'').toLowerCase()];
   if(!view)return;
@@ -482,7 +482,24 @@ $('#socialPointsLogin')?.addEventListener('click',()=>{
  $('#socialRewardsOpen')?.addEventListener('click',()=>toast('Catalogo premi in aggiornamento.'));
  $('#socialDealsOpen')?.addEventListener('click',()=>toast('Convenzioni territoriali in aggiornamento.'));
  
- async function openTeamHub(name){
+ async function shareTeamHub(model){
+ const router=window.SCDOneRouter;
+ const hash=router?.teamHash?router.teamHash(model?.name||''):'#teams';
+ const url=new URL(hash,location.href).href;
+ const payload={
+   title:'SCD Team Hub · '+String(model?.name||'Squadra'),
+   text:'Segui '+String(model?.name||'la squadra')+' su SCD ONE',
+   url
+ };
+ try{
+   const result=await window.SCDNativeAdapters?.share?.(payload);
+   if(result===false)toast('Condivisione non disponibile su questo dispositivo');
+   else toast(result?.method==='clipboard'?'Link squadra copiato':'Condivisione aperta');
+ }catch(err){
+   toast('Condivisione non disponibile');
+ }
+}
+async function openTeamHub(name){
  if(!state.calendarLoaded)await ensurePublicCalendar();
  const model=teamModelByName(name);
  if(!model){toast('Dati pubblici della squadra in aggiornamento');return}
@@ -490,12 +507,13 @@ $('#socialPointsLogin')?.addEventListener('click',()=>{
  const nextMatch=model.nextMatch;
  const upcoming=model.rows.filter(x=>x.date>=todayKey()).slice(0,6);
  const schedule=upcoming.length?upcoming.map(x=>'<button type="button" class="team-hub-event" data-teamhub-event="'+esc(x.id)+'"><time>'+esc(fmtDate(x.date))+(x.time?' · '+esc(x.time):'')+'</time><b>'+esc(x.kind==='MATCH'?[x.team,x.opponent].filter(Boolean).join(' vs '):(x.title||x.team))+'</b><small>'+esc([x.competition,x.venue].filter(Boolean).join(' · '))+'</small><i>›</i></button>').join(''):'<div class="panel-empty"><b>Nessuna attività futura verificata</b><p>Il Team Hub non inventa appuntamenti mancanti.</p></div>';
- const body='<section class="team-hub-sheet"><div class="team-hub-hero"><div class="team-hub-mark">'+esc(model.name.slice(0,2).toUpperCase())+'</div><div><span class="eyebrow">SCD TEAM HUB</span><h2>'+esc(model.name)+'</h2><p>'+esc(model.categories.join(' · ')||'Categoria in aggiornamento')+'</p></div><button type="button" id="teamHubFollow" class="'+(followed?'is-following':'')+'">'+(followed?'★ SEGUITA':'☆ SEGUI')+'</button></div><div class="team-hub-kpis"><article><small>PROSSIMA GARA</small><b>'+esc(nextMatch?(nextMatch.opponent||nextMatch.title||'Dato verificato'):'Dato in aggiornamento')+'</b><span>'+esc(nextMatch?[fmtDate(nextMatch.date),nextMatch.time].filter(Boolean).join(' · '):'')+'</span></article><article><small>CLASSIFICA</small><b>'+esc(statStandingText(model.name))+'</b></article><article><small>FORMA</small><b>'+esc(statFormText(model.name))+'</b></article></div><div class="team-hub-actions">'+(nextMatch?'<button type="button" class="btn primary" id="teamHubMatchday">Apri Matchday</button>':'')+'<button type="button" class="btn glass" id="teamHubCalendar">Calendario squadra</button></div><div class="team-hub-schedule"><div class="panel-section-title"><span>PROSSIMI IMPEGNI</span><b>Fonte pubblica verificata</b></div>'+schedule+'</div></section>';
+ const body='<section class="team-hub-sheet"><div class="team-hub-hero"><div class="team-hub-mark">'+esc(model.name.slice(0,2).toUpperCase())+'</div><div><span class="eyebrow">SCD TEAM HUB</span><h2>'+esc(model.name)+'</h2><p>'+esc(model.categories.join(' · ')||'Categoria in aggiornamento')+'</p></div><button type="button" id="teamHubFollow" class="'+(followed?'is-following':'')+'">'+(followed?'★ SEGUITA':'☆ SEGUI')+'</button></div><div class="team-hub-kpis"><article><small>PROSSIMA GARA</small><b>'+esc(nextMatch?(nextMatch.opponent||nextMatch.title||'Dato verificato'):'Dato in aggiornamento')+'</b><span>'+esc(nextMatch?[fmtDate(nextMatch.date),nextMatch.time].filter(Boolean).join(' · '):'')+'</span></article><article><small>CLASSIFICA</small><b>'+esc(statStandingText(model.name))+'</b></article><article><small>FORMA</small><b>'+esc(statFormText(model.name))+'</b></article></div><div class="team-hub-actions">'+(nextMatch?'<button type="button" class="btn primary" id="teamHubMatchday">Apri Matchday</button>':'')+'<button type="button" class="btn glass" id="teamHubCalendar">Calendario squadra</button><button type="button" class="btn glass" id="teamHubShare">Condividi Team Hub</button></div><div class="team-hub-schedule"><div class="panel-section-title"><span>PROSSIMI IMPEGNI</span><b>Fonte pubblica verificata</b></div>'+schedule+'</div></section>';
  const layer=openPanel('Team Hub · '+model.name,body);
  $('#teamHubFollow',layer).onclick=()=>{if(followed){saveFollowedTeam('');toast('Squadra rimossa dalle preferenze')}else{saveFollowedTeam(model.name);toast('Ora segui '+model.name)}updateFollowTeamUi();layer.classList.remove('open')};
  if(nextMatch)$('#teamHubMatchday',layer).onclick=()=>openMatchday(nextMatch);
  $('#teamHubCalendar',layer).onclick=()=>{state.calendarTeam=model.name;state.calendarPeriod='ALL';layer.classList.remove('open');setView('calendar');renderPublicCalendar()};
- $$('[data-teamhub-event]',layer).forEach(b=>b.onclick=()=>openEvent(b.dataset.teamhubEvent));
+ $('#teamHubShare',layer).onclick=()=>shareTeamHub(model);
+ $('[data-teamhub-event]',layer).forEach(b=>b.onclick=()=>openEvent(b.dataset.teamhubEvent));
 }
 function openMatchday(match=state.nextMatch){
  if(!match){toast('Partita verificata non ancora disponibile');return}
@@ -1231,8 +1249,21 @@ $('#mirrorForm')?.addEventListener('submit',e=>{e.preventDefault();const q=$('#m
 $$('.quick-prompts button').forEach(b=>b.addEventListener('click',()=>{appendMsg(b.textContent,'user');setTimeout(()=>appendMsg(mirrorReply(b.textContent),'ai'),140)}));
 
 function syncViewFromLocation(){
-  const hash=location.hash.replace('#','').split('?')[0].toLowerCase(),view=routeToView[hash]||'pulse',canonical='#'+viewToRoute[view];
-  setView(view,{historyMode:location.hash===canonical?'none':'replace'});
+  const router=window.SCDOneRouter;
+  const parsed=router?.parseHash
+    ?router.parseHash(location.hash)
+    :{rawRoute:location.hash.replace('#','').split('?')[0].toLowerCase(),route:location.hash.replace('#','').split('?')[0].toLowerCase()||'home',view:routeToView[location.hash.replace('#','').split('?')[0].toLowerCase()]||'pulse',params:{}};
+  const view=parsed.view||routeToView[parsed.route]||'pulse';
+  setView(view,{historyMode:'none'});
+  const canonicalRoute=viewToRoute[view]||'home';
+  if(parsed.rawRoute!==canonicalRoute){
+    const canonicalHash=router?.buildHash?router.buildHash(canonicalRoute,parsed.params):'#'+canonicalRoute;
+    history.replaceState(null,'',canonicalHash);
+  }
+  const team=String(parsed.params?.team||'').trim();
+  if(view==='teams'&&team){
+    Promise.resolve(ensurePublicCalendar()).then(()=>openTeamHub(team)).catch(()=>toast('Team Hub non disponibile'));
+  }
 }
 window.addEventListener('popstate',syncViewFromLocation);
 window.addEventListener('hashchange',syncViewFromLocation);
