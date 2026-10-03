@@ -7,7 +7,7 @@ applyTo: "**/*.html,**/*.css,**/*.js,**/*.jsx,**/*.ts,**/*.tsx"
 Follow:
 1. `SCD_SYSTEM_MANIFEST.json`
 2. `AGENTS.md`
-3. `docs/SCD_VISUAL_EXPERIENCE_MASTER.md`
+3. `docs/SCD_ONE_VISUAL_EXPERIENCE_MASTER.md`
 4. `config/scd-visual-system.json`
 5. `config/scd-visual-experience-gate.v1.json`
 
@@ -48,24 +48,19 @@ Official logos, kits, partner/sponsor wordmarks and opponent crests follow asset
 
 ## Product composition
 
-Preserve ONE responsive product across mobile, tablet, desktop, wide and ultrawide.
+Preserve SCD ONE as one responsive public/social/transactional product across mobile, tablet, desktop, wide and ultrawide.
 
 Public experience:
 emotion + sport + territory + discovery + media + community + useful services.
 
-Private experience:
-speed + context + priority + action + control.
+Internal association-management density belongs to SCD CORE. SCD ONE may expose only authorized personal/family/athlete projections and transactional service entry points.
 
-Do not mix public spectacle with private operational density.
+## Cross-app boundary
 
-## Smart Facility
+Do not implement internal Smart Facility controls, warehouse operations, laundry operations, staff dashboards or internal association administration inside SCD ONE.
+Those belong to SCD CORE.
 
-Smart Facility / facility operations are real operational surfaces:
-fields, spaces, locker rooms, opening/closing, keys/access, maintenance, assets, warehouse, kit, laundry and authorized device adapters.
-
-Never show a fake smart switch, sensor, lock, alarm, energy or device state.
-Use explicit status:
-`CONNECTED / READY_FOR_ADAPTER / NOT_CONNECTED / UNVERIFIED / MANUAL_CHECK_REQUIRED`.
+SCD ONE may expose only safe public/request projections such as verified field/service availability or request status through an explicit API contract.
 
 ## Responsive + accessibility
 
