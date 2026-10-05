@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const { URL } = require('url');
 const { issueIntakeToken, verifyIntakeToken } = require('./lib/intake-links');
+const { weekRange } = require('./lib/scd-one-pulse.js');
 
 const PORT = process.env.PORT || 10000;
 const ROOT = process.env.SCD_STATIC_DIR ? path.resolve(__dirname,process.env.SCD_STATIC_DIR) : __dirname;
@@ -56,7 +57,7 @@ const READ_ONLY_RETRY_ACTIONS = new Set([
   'public.feed','public.club','public.calendar','public.datafabric.contract',
   'dashboard.summary','private.dashboard','private.week','account.requests','private.user.workspace','private.crm.summary','private.crm.detail','private.community.summary','private.communication.templates','private.communication.preview',
   'private.attendance.get','private.agenda.summary','private.development.summary','auth.validate','auth.identity.resolve','direction.access.metrics','direction.diagnostics',
-  'direction.evolution','direction.datafabric.status'
+  'direction.evolution','direction.datafabric.status','direction.datafabric.actions'
 ]);
 const UPSTREAM_READ_ATTEMPTS = 2;
 const UPSTREAM_RETRY_DELAY_MS = 450;
@@ -74,7 +75,7 @@ const allowedActions = new Set([
   'auth.request','auth.login','auth.validate','auth.identity.resolve','auth.access.log','auth.pin.change',
   'direction.access.set','direction.access.invite','direction.access.metrics','direction.pin.set','direction.player.approve','direction.player.reject',
   'direction.diagnostics','direction.evolution',
-  'direction.datafabric.status','direction.datafabric.scan.gmail','direction.datafabric.scan.drive',
+  'direction.datafabric.status','direction.datafabric.actions','direction.datafabric.scan.gmail','direction.datafabric.scan.drive',
 ]);
 
 function clubTimePayload(){
@@ -644,15 +645,7 @@ function romeDateParts(date=new Date()){
   return new Intl.DateTimeFormat('en-CA',{timeZone:CLUB_TIME_ZONE,year:'numeric',month:'2-digit',day:'2-digit',weekday:'short'}).formatToParts(date).reduce((o,p)=>(o[p.type]=p.value,o),{});
 }
 function currentClubWeek(){
-  const now=new Date();
-  const p=romeDateParts(now);
-  const localNoon=new Date(p.year+'-'+p.month+'-'+p.day+'T12:00:00Z');
-  const weekday=new Intl.DateTimeFormat('en-US',{timeZone:CLUB_TIME_ZONE,weekday:'short'}).format(now);
-  const dayIndex={Mon:0,Tue:1,Wed:2,Thu:3,Fri:4,Sat:5,Sun:6}[weekday]??0;
-  const start=new Date(localNoon.getTime()-dayIndex*86400000);
-  const end=new Date(start.getTime()+6*86400000);
-  const fmt=d=>new Intl.DateTimeFormat('en-CA',{timeZone:'UTC',year:'numeric',month:'2-digit',day:'2-digit'}).format(d);
-  return {start:fmt(start),end:fmt(end)};
+  return weekRange(new Date());
 }
 function eventKind(row){
   const text=[pick(row,'type','kind','eventType'),pick(row,'title','event','name','subject')].join(' ');
@@ -724,6 +717,7 @@ async function buildWeeklyNewsroom(){
   const sourceStatus={calendar:'ERROR',feed:'ERROR',officialSite:'DISABLED_FOR_NEWS',webNews:'DISABLED_FOR_NEWS'};
   try{
     const c=await callAppsScript('public.calendar',{rangeKey:'ALL',offset:0},'');
+    if(!c.upstream.ok||c.parsed?.ok===false)throw new Error('PUBLIC_CALENDAR_SOURCE_UNAVAILABLE');
     calendarRaw=c.parsed;sourceStatus.calendar='OK';
   }catch(e){sourceStatus.calendar='ERROR:'+String(e.code||e.message||e)}
   try{
