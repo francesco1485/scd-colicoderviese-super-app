@@ -21,6 +21,8 @@ jobs:
         run: npm run test:manifest
       - name: Supabase Domain Core contract gate
         run: npm run test:supabase-contract
+      - name: R57.D1 graph hardening gate
+        run: npm run test:r57-d1-graph
       - name: Mobile Supabase contract gate
         run: npm run test:mobile-contract
       - name: Operative Core contract gate
