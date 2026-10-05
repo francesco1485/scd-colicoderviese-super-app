@@ -3,8 +3,8 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.26.0",
-    "effective_at": "2026-10-02",
+    "version": "3.27.0",
+    "effective_at": "2026-10-03",
     "status": "BINDING",
     "language": "it-IT",
     "timezone": "Europe/Rome",
@@ -35,8 +35,19 @@
     ]
   },
   "north_star": {
-    "definition": "SCD UNIVERSE: sistema operativo digitale vivo della S.D.C. ColicoDerviese, bello da usare, utile ogni giorno e capace di unire sport, famiglia, tifo, servizi, partner e gestione interna in una sola esperienza adattiva.",
-    "single_product": true,
+    "definition": "SCD DIGITAL ECOSYSTEM: tre web app coordinate — SCD ONE per esperienza pubblica/sociale/transazionale, SCD CORE per gestione interna completa, SCD GROW per sviluppo continuo partner/sponsor — sostenute da identità, dati, provenance e motori tecnici condivisi.",
+    "single_product": false,
+    "ecosystem_model": "THREE_COORDINATED_SCD_WEB_APPS_SHARED_CORE",
+    "canonical_apps": [
+      "SCD_ONE",
+      "SCD_CORE",
+      "SCD_GROW"
+    ],
+    "shared_technical_engines": [
+      "SCD_COMMAND_R22",
+      "R20",
+      "SCD_PULSE"
+    ],
     "channels": [
       "WEB_DESKTOP",
       "WEB_MOBILE",
@@ -56,7 +67,7 @@
   "non_negotiable_invariants": [
     {
       "id": "INV-001",
-      "statement": "La Super App è un'applicazione cross-platform, non una landing page o un sito aziendale generico.",
+      "statement": "L'ecosistema SCD è composto da tre web app coordinate: SCD ONE pubblico/sociale, SCD CORE gestionale interno e SCD GROW sviluppo partner/sponsor; i motori tecnici condivisi non diventano app aggiuntive.",
       "enforcement": "BLOCKING"
     },
     {
@@ -113,6 +124,11 @@
       "id": "INV-012",
       "statement": "La piattaforma deve poter crescere per moduli, adapter, comandi, schema versionato e feature flag senza ricominciare da zero.",
       "enforcement": "BLOCKING_TARGET"
+    },
+    {
+      "id": "INV-013",
+      "statement": "Ogni nuova funzione deve essere assegnata a SCD ONE, SCD CORE o SCD GROW prima dello sviluppo; una quarta applicazione SCD richiede approvazione esplicita della Direzione.",
+      "enforcement": "BLOCKING"
     }
   ],
   "product": {

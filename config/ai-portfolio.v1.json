@@ -1,0 +1,229 @@
+{
+  "schemaVersion": "2.0.0",
+  "id": "SCD_MAGLIA_AI_PORTFOLIO",
+  "updatedAt": "2026-10-03",
+  "totalApps": 4,
+  "ownershipCounts": {
+    "SCD_COLICODERVIESE": 3,
+    "MAGLIA_ASSICURAZIONI": 1
+  },
+  "universalDeveloperCommand": "WEBAPP:MASTER",
+  "apps": [
+    {
+      "id": "SCD_ONE",
+      "owner": "SCD_COLICODERVIESE",
+      "displayName": "SCD ONE",
+      "longName": "SCD ONE — ColicoDerviese Social Super App",
+      "tagline": "Tutto il Club. Una sola app.",
+      "kind": "PUBLIC_SOCIAL_TRANSACTION_SUPER_APP",
+      "aiBranch": "ai-scd-one",
+      "sourceBranch": "r57-copilot-control-plane",
+      "codeRoots": [
+        "/",
+        "lib/",
+        "intake/"
+      ],
+      "currentRuntime": "scd-colicoderviese-official-r21",
+      "mission": "Public, social and transactional club app for sport, community, services, events and verified club information.",
+      "modules": [
+        "PULSE",
+        "SOCIAL",
+        "COMMUNITY",
+        "SCD_WEEK",
+        "CALENDAR",
+        "TEAMS",
+        "MATCHDAY",
+        "MEDIA",
+        "NEWSROOM",
+        "TWIN",
+        "FAMILY",
+        "ATHLETE",
+        "JOIN",
+        "EVENTS",
+        "TOURNAMENT_ENTRY",
+        "FIELD_REQUESTS",
+        "TICKETS",
+        "CARDS",
+        "SERVICES",
+        "PARTNER_VISIBILITY"
+      ],
+      "commands": [
+        "WEBAPP:MASTER",
+        "SCDONE:RUN"
+      ]
+    },
+    {
+      "id": "SCD_CORE",
+      "owner": "SCD_COLICODERVIESE",
+      "displayName": "SCD CORE",
+      "longName": "SCD CORE — Association Operating System",
+      "tagline": "Il sistema operativo della società.",
+      "kind": "INTERNAL_ASSOCIATION_OPERATING_SYSTEM",
+      "aiBranch": "ai-scd-core",
+      "sourceBranch": "r57-copilot-control-plane",
+      "codeRoots": [
+        "server.js",
+        "lib/",
+        "intake/",
+        "supabase/",
+        "backend_patch_R21_6_http_api.gs"
+      ],
+      "currentRuntime": "scd-colicoderviese-official-r21",
+      "mission": "Complete internal operating system for association management and scalable club operations.",
+      "modules": [
+        "PRIVATE_DESK",
+        "SECRETARIAT",
+        "REGISTRATIONS",
+        "PEOPLE",
+        "FAMILIES",
+        "ATHLETES",
+        "STAFF",
+        "TEAMS",
+        "EVENTS",
+        "CALENDAR_FUSION",
+        "FACILITY_WEEK",
+        "SMART_FACILITY",
+        "FIELDS",
+        "SPACES",
+        "LOCKER_ROOMS",
+        "ASSETS",
+        "WAREHOUSE",
+        "KIT",
+        "LAUNDRY",
+        "KEYS_ACCESS",
+        "MAINTENANCE",
+        "TRANSPORT",
+        "DOCUMENTS",
+        "REQUESTS",
+        "COMMUNICATIONS",
+        "APPROVALS",
+        "DEADLINES",
+        "REPORTING",
+        "GMAIL_DRIVE_CALENDAR"
+      ],
+      "commands": [
+        "WEBAPP:MASTER",
+        "SCDCORE:RUN"
+      ]
+    },
+    {
+      "id": "SCD_GROW",
+      "owner": "SCD_COLICODERVIESE",
+      "displayName": "SCD GROW",
+      "longName": "SCD GROW — Partner & Sponsor Growth Engine",
+      "tagline": "Trova. Connetti. Sviluppa. Rinnova.",
+      "kind": "PARTNER_SPONSOR_GROWTH_CRM",
+      "aiBranch": "ai-scd-grow",
+      "sourceBranch": "ai-scd-sponsor-platform",
+      "codeRoots": [
+        "sponsor/"
+      ],
+      "currentRuntime": "scd-sponsor-platform",
+      "backendDependency": "scd-colicoderviese-official-r21",
+      "mission": "Continuous partner and sponsor development engine with CRM, research radar, proposals, activations, proof and renewal loops.",
+      "modules": [
+        "PUBLIC_PARTNER_EXPERIENCE",
+        "PARTNER_HUB",
+        "CRM",
+        "STAKEHOLDERS",
+        "LEAD_RADAR",
+        "COMMERCIAL_PIPELINE",
+        "LIA_SPONSOR",
+        "PROPOSALS",
+        "PARTNER_MICROSITES",
+        "LEDWALL",
+        "SPONSOR_WALL",
+        "CONVENTIONS",
+        "SOLIDARITY_FUND",
+        "PROJECTS",
+        "SUPPLIERS",
+        "ASSETS",
+        "PROOF",
+        "REPORTING",
+        "RENEWALS",
+        "FOLLOW_UP",
+        "AUTOMATED_RESEARCH"
+      ],
+      "absorbedWorkstreams": [
+        "ai-scd-commercial-lia",
+        "r42-commercial-development-os"
+      ],
+      "commands": [
+        "WEBAPP:MASTER",
+        "SCDGROW:RUN"
+      ]
+    },
+    {
+      "id": "CEPA_360",
+      "owner": "MAGLIA_ASSICURAZIONI",
+      "displayName": "C.E.P.A. 360",
+      "longName": "C.E.P.A. 360 by Maglia Assicurazioni",
+      "tagline": "Dalla storia della consulenza al futuro della protezione.",
+      "kind": "CONSULTING_PUBLIC_INTERFACE_AND_AGENCY_SUPER_CRM",
+      "aiBranch": "ai-cepa360",
+      "sourceBranch": "ai-maglia360-cepa-unified",
+      "canonicalSourceBranch": "cepa-maglia-os-hosting",
+      "historicalReferenceBranch": "maglia360-office-architecture-v2",
+      "codeRoots": [
+        "cepa-maglia-os-static/"
+      ],
+      "currentRuntime": "cepa-maglia-os",
+      "previewRuntime": "maglia360-office-v2-preview",
+      "mission": "CEPA consulting interface plus Maglia 360 agency operating system and CRM, using verified agency history and relationships to support future development.",
+      "modules": [
+        "CEPA_PUBLIC",
+        "CONSULTING_JOURNEY",
+        "THEMES",
+        "EVENTS",
+        "CENTER_CEPA",
+        "SAP_NETWORK",
+        "TERRITORIES",
+        "MAGLIA360_CONTROL_ROOM",
+        "CUSTOMERS",
+        "PARTNERS_PRODUCTS",
+        "COLLABORATORS",
+        "DOCUMENTS_CONTRACTS",
+        "LIA_WORKBENCH",
+        "AI_MAIL_CHAT",
+        "NETWORK_RADAR_IVASS",
+        "DEVELOPMENT",
+        "ACTIVITIES_DEADLINES",
+        "RECOVERY",
+        "HISTORY_INTELLIGENCE",
+        "RELATIONSHIP_GRAPH",
+        "CRM",
+        "CONTINUOUS_GROWTH"
+      ],
+      "commands": [
+        "WEBAPP:MASTER",
+        "CEPA360:RUN"
+      ]
+    }
+  ],
+  "sharedTechnicalEngines": [
+    {
+      "id": "SCD_COMMAND_R22",
+      "role": "SHARED_TECHNICAL_ORCHESTRATION_ENGINE_NOT_COUNTED_AS_CANONICAL_APP",
+      "branch": "ai-scd-command-r22",
+      "runtime": "scd-colicoderviese-command-r22"
+    },
+    {
+      "id": "SCD_PULSE",
+      "role": "SHARED_DATA_AUTH_REALTIME_TARGET",
+      "project": "ndevtxxijbcnskgysdit"
+    },
+    {
+      "id": "R20",
+      "role": "CURRENT_IDENTITY_ROLE_SCOPE_AUTHORITY_UNTIL_VERIFIED_MIGRATION"
+    }
+  ],
+  "portfolioRules": [
+    "EXACTLY_4_CANONICAL_WEB_APPS",
+    "EXACTLY_3_SCD_AND_1_MAGLIA",
+    "COMMAND_R22_IS_SHARED_ENGINE_NOT_CANONICAL_APP",
+    "NO_NEW_APP_WITHOUT_DIRECTION_APPROVAL",
+    "MODULES_STAY_INSIDE_ASSIGNED_APP",
+    "ALL_APPS_USE_MULTIFUNCTIONAL_WEB_DEVELOPER_COMMAND",
+    "NO_PRODUCTION_MUTATION_WITHOUT_EXPLICIT_AUTHORIZATION"
+  ]
+}

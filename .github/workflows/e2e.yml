@@ -19,6 +19,8 @@ jobs:
       - run: npm install
       - name: SCD System Manifest gate
         run: npm run test:manifest
+      - name: SCD AI portfolio contract gate
+        run: npm run test:ai-portfolio
       - name: Supabase Domain Core contract gate
         run: npm run test:supabase-contract
       - name: R57.D1 graph hardening gate
@@ -74,6 +76,7 @@ jobs:
           node --check server.js
           node --check scripts/verify-production.mjs
           node --check scripts/verify-r20-direct.mjs
+          node --check scripts/validate-ai-portfolio.mjs
           node --check scripts/validate-supabase-contract.mjs
           node --check scripts/validate-mobile-contract.mjs
           node --check scripts/validate-universe-contract.mjs

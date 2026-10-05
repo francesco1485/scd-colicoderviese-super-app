@@ -255,6 +255,8 @@ for(const viewport of [{width:390,height:844},{width:1440,height:900}]){
     let data;
     if(action==='auth.login')data={token:'qa-private-token'};
     else if(action==='auth.validate')data={valid:true};
+    else if(action==='auth.access.log')data={ok:true};
+    else if(action==='auth.identity.resolve')data={matched:true,matchMethod:'QA_SYNTHETIC'};
     else if(action==='dashboard.summary')data=dashboard;
     else if(action==='private.user.workspace')data=workspace;
     else if(action==='account.requests')data={rows:[{id:'REQ-QA-1',subject:'Documento QA',status:'APERTA',createdAt:'2026-10-02T10:00:00Z'}]};

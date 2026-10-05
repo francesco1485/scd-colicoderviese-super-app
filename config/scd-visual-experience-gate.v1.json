@@ -1,0 +1,122 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "SCD_VISUAL_EXPERIENCE_GATE",
+  "authority": "SCD_SYSTEM_MANIFEST.json",
+  "supportingSpec": "docs/SCD_VISUAL_EXPERIENCE_MASTER.md",
+  "status": "BLOCKING_FOR_UI",
+  "product": "SCD_UNIVERSE_SINGLE_PRODUCT",
+  "canonicalPaletteSource": "config/scd-visual-system.json",
+  "reject": [
+    "GENERIC_SAAS_TEMPLATE",
+    "GENERIC_BOOTSTRAP_ADMIN",
+    "WORDPRESS_THEME_LOOK",
+    "ANONYMOUS_GREY_DASHBOARD",
+    "GENERIC_WHITE_CARD_GRID",
+    "BROCHURE_HERO",
+    "GIANT_BLUE_BAR",
+    "PHONE_FRAME_ON_DESKTOP",
+    "STATIC_PAGE_WITHOUT_PRIMARY_ACTION",
+    "FAKE_SERVICE_OR_LIVE_STATE",
+    "INVENTED_DATA",
+    "UNVERIFIED_OFFICIAL_ASSET",
+    "HIDDEN_SPONSOR_VALUE",
+    "MISSING_REDUCED_MOTION",
+    "MISSING_FOCUS_STATE",
+    "MISSING_MOBILE_DESKTOP_QA"
+  ],
+  "requiredIdentity": [
+    "SPORT",
+    "TERRITORY",
+    "FUTURE",
+    "EDITORIAL_IMPACT",
+    "SPATIAL_DEPTH",
+    "LIVE_STATE",
+    "CLEAR_NEXT_ACTION"
+  ],
+  "publicExperience": [
+    "PULSE",
+    "SCD_WEEK",
+    "NEXT_MATCH",
+    "CALENDAR",
+    "TEAMS",
+    "MATCHDAY",
+    "NEWSROOM",
+    "MEDIA_SOCIAL",
+    "EVENTS",
+    "SPONSOR_RAIL",
+    "COMMUNITY",
+    "JOIN_PROFILE"
+  ],
+  "privateExperience": [
+    "TODAY",
+    "PRIORITY",
+    "TODO",
+    "VERIFY",
+    "APPROVE",
+    "DUE",
+    "CHANGES",
+    "EVENTS",
+    "COMMUNICATIONS",
+    "ALERTS",
+    "FACILITY_WEEK",
+    "MATERIAL_OPERATIONS"
+  ],
+  "smartFacility": {
+    "states": [
+      "CONNECTED",
+      "READY_FOR_ADAPTER",
+      "NOT_CONNECTED",
+      "UNVERIFIED",
+      "MANUAL_CHECK_REQUIRED"
+    ],
+    "domains": [
+      "FIELDS",
+      "SPACES",
+      "LOCKER_ROOMS",
+      "OPEN_CLOSE_CHECKLIST",
+      "KEYS_ACCESS",
+      "ALARM_STATUS_IF_ADAPTER",
+      "LIGHT_ENERGY_IF_ADAPTER",
+      "MAINTENANCE",
+      "ASSETS",
+      "WAREHOUSE",
+      "KIT",
+      "LAUNDRY",
+      "TRANSPORT_READINESS"
+    ],
+    "fakeDeviceStateForbidden": true,
+    "secretsClientExposureForbidden": true
+  },
+  "motion": {
+    "purpose": "STATE_ORIENTATION_FEEDBACK",
+    "microInteractionMs": 180,
+    "panelTransitionMs": 260,
+    "reducedMotionRequired": true
+  },
+  "responsive": {
+    "strategy": "FEATURE_DETECTION_CONTAINER_RESPONSIVE",
+    "requiredMobile": [
+      "360x800",
+      "390x844",
+      "393x852",
+      "430x932"
+    ],
+    "requiredDesktop": [
+      "1280x800",
+      "1440x900",
+      "1920x1080"
+    ],
+    "visualRegressionRequired": true
+  },
+  "releaseEvidence": [
+    "VISUAL_COMPARISON",
+    "NO_OVERFLOW",
+    "KEYBOARD_FOCUS",
+    "CONTRAST",
+    "REDUCED_MOTION",
+    "LOADING_EMPTY_ERROR_OFFLINE",
+    "SOURCE_FALLBACK",
+    "ASSET_INTEGRITY",
+    "TARGETED_E2E"
+  ]
+}
