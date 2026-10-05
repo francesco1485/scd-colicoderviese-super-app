@@ -2,8 +2,11 @@
   'use strict';
 
   const STAGES=['RESEARCH','VERIFY','QUALIFY','CONNECT','PROPOSE','ACTIVATE','PROVE','REPORT','RENEW','EXPAND'];
+  const PROOF_LOCATORS=['PROOF_URL','EVIDENCE_URL','LINK_DOCUMENTO','URL_DOCUMENTO','DRIVE_FILE_ID','DOCUMENT_ID','ID_DOCUMENTO'];
 
   function text(v){return v==null?'':String(v).trim()}
+  function first(row,keys){for(const key of keys){const value=row&&row[key];if(value!==undefined&&value!==null&&text(value)!=='')return value}return ''}
+  function normalizeName(value){return text(value).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim()}
   function upper(v){return text(v).toUpperCase()}
   function isoDate(v){
     const raw=text(v);if(!raw)return '';
@@ -54,6 +57,52 @@
       sourceState:'VERIFIED'
     };
   }
+  function diagnose(rows=[]){
+    const input=Array.isArray(rows)?rows.filter(row=>row&&typeof row==='object'):[];
+    const ids=new Map(),duplicateIds=[],missingId=[];
+    const prospects=new Map();
+    input.forEach((row,index)=>{
+      const id=text(row.id||row.STAKEHOLDER_ID);
+      if(!id)missingId.push({index,name:text(row.name||row.NOME)||'Profilo senza nome'});
+      else if(ids.has(id))duplicateIds.push({id,firstIndex:ids.get(id),duplicateIndex:index});
+      else ids.set(id,index);
+      const prospectLike=/PROSPECT|LEAD/i.test([row.type,row.category,row.relationshipStatus,row.tags].join(' '));
+      if(prospectLike){
+        const key=normalizeName(row.name||row.NOME);
+        if(key){
+          if(!prospects.has(key))prospects.set(key,[]);
+          prospects.get(key).push({id:id||'',name:text(row.name||row.NOME)||'Profilo senza nome'});
+        }
+      }
+    });
+    const possibleDuplicateProspects=[...prospects.entries()]
+      .filter(([,items])=>items.length>1)
+      .map(([normalizedName,items])=>({normalizedName,items}));
+    return {records:input.length,missingId,duplicateIds,possibleDuplicateProspects};
+  }
+  function safeEvidenceUrl(value){
+    try{
+      const url=new URL(text(value));
+      return url.protocol==='https:'||url.protocol==='http:'?url.href:'';
+    }catch{return ''}
+  }
+  function activationProofs(touchpoints=[]){
+    return (Array.isArray(touchpoints)?touchpoints:[]).flatMap(item=>{
+      const kind=text(first(item,['TIPO','TIPO_ATTIVITA','CANALE','OGGETTO'])).toUpperCase();
+      if(!/ATTIVAZION|ACTIVATION|PROOF|VISIBILIT/.test(kind))return [];
+      const locator=first(item,PROOF_LOCATORS);
+      if(!locator)return [];
+      const document=text(locator);
+      return [{
+        kind:text(first(item,['TIPO','TIPO_ATTIVITA','CANALE','OGGETTO']))||'Prova di attivazione',
+        timestamp:text(first(item,['TIMESTAMP','DATA','CREATED_AT'])),
+        actor:text(first(item,['ACTOR','ATTORE','SISTEMA'])),
+        source:text(first(item,['SOURCE','FONTE']))||'R20 · TOUCHPOINTS_MASTER',
+        document,
+        documentUrl:safeEvidenceUrl(document)
+      }];
+    });
+  }
   function sortQueue(a,b){
     const ad=isoDate(a.nextDeadline),bd=isoDate(b.nextDeadline);
     if(ad&&bd&&ad!==bd)return ad.localeCompare(bd);
@@ -72,10 +121,13 @@
         counts:Object.fromEntries(STAGES.map(x=>[x,null])),
         queue:[],
         needsVerification:[],
-        blocked:[]
+        blocked:[],
+        diagnostics:diagnose(rows)
       };
     }
-    const normalized=(Array.isArray(rows)?rows:[]).map(normalize);
+    const sourceRows=Array.isArray(rows)?rows:[];
+    const diagnostics=diagnose(sourceRows);
+    const normalized=sourceRows.map(normalize);
     const stages=Object.fromEntries(STAGES.map(x=>[x,[]]));
     normalized.forEach(item=>stages[item.stage].push(item));
     Object.values(stages).forEach(items=>items.sort(sortQueue));
@@ -87,11 +139,12 @@
       counts:Object.fromEntries(STAGES.map(x=>[x,stages[x].length])),
       queue,
       needsVerification:normalized.filter(item=>!item.stageVerified),
-      blocked:normalized.filter(item=>item.blocked)
+      blocked:normalized.filter(item=>item.blocked),
+      diagnostics
     };
   }
 
-  const api={STAGES,build,classify,isoDate};
+  const api={STAGES,build,classify,isoDate,diagnose,activationProofs,safeEvidenceUrl};
   root.ScdGrowPipeline=api;
   if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(typeof globalThis!=='undefined'?globalThis:this);

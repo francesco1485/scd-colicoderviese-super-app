@@ -1255,6 +1255,28 @@ function crmTaskCard(row,index){
     (note?'<p>'+esc(note)+'</p>':'')+
   '</article>';
 }
+function renderCrmTouchpoint(item){
+  const engine=globalThis.ScdGrowPipeline;
+  const source=String(item?.SOURCE||item?.FONTE||'R20 · TOUCHPOINTS_MASTER');
+  const actor=String(item?.ACTOR||item?.ATTORE||item?.SISTEMA||'Attore non esposto');
+  const documentRef=String(item?.PROOF_URL||item?.EVIDENCE_URL||item?.LINK_DOCUMENTO||item?.URL_DOCUMENTO||item?.DRIVE_FILE_ID||item?.DOCUMENT_ID||item?.ID_DOCUMENTO||'');
+  const href=engine?.safeEvidenceUrl?engine.safeEvidenceUrl(documentRef):'';
+  return '<div class="crm-timeline"><time>'+esc(item?.TIMESTAMP||item?.DATA||'')+'</time><div><b>'+esc(item?.OGGETTO||item?.CANALE||'Touchpoint')+'</b><p>'+esc(item?.SINTESI||'')+'</p><small>'+esc(item?.ESITO||'')+'</small>'+
+    '<small class="grow-evidence-provenance">'+esc(source)+' · '+esc(actor)+'</small>'+
+    (documentRef?'<small class="grow-evidence-document">'+(href?'<a href="'+esc(href)+'" target="_blank" rel="noopener noreferrer">Apri documento collegato</a>':'Riferimento documento '+esc(documentRef))+'</small>':'<small class="grow-evidence-document">Nessun documento collegato nel record</small>')+
+    '</div></div>';
+}
+function renderActivationProofs(touchpoints=[]){
+  const engine=globalThis.ScdGrowPipeline;
+  const proofs=engine?.activationProofs?engine.activationProofs(touchpoints):[];
+  return '<section class="crm-section crm-evidence-section grow-proof-section"><h3>Proof di attivazione</h3>'+
+    (proofs.length?proofs.slice(0,12).map(item=>
+      '<article class="grow-proof"><div><b>'+esc(item.kind)+'</b><small>'+esc([item.timestamp,item.actor,item.source].filter(Boolean).join(' · '))+'</small></div>'+
+      (item.documentUrl?'<a href="'+esc(item.documentUrl)+'" target="_blank" rel="noopener noreferrer">Apri evidenza</a>':'<span>'+esc(item.document)+'</span>')+
+      '</article>'
+    ).join(''):'<p>Nessuna prova di attivazione collegata con riferimento documentale verificabile.</p>')+
+    '<small class="crm-evidence-rule">Proof mostrato solo quando il touchpoint contiene un riferimento documentale esplicito. Nessuna consegna viene dedotta.</small></section>';
+}
 function renderCrmInspector(data){
   const el=$('#crmInspector');if(!el)return;
   if(!data){el.innerHTML='<h3>Profilo CRM</h3><p>Seleziona una persona o azienda per vedere il profilo relazionale completo.</p>';return}
@@ -1277,7 +1299,7 @@ function renderCrmInspector(data){
     '<section class="crm-section"><h3>Contatti</h3><p>'+esc(s.EMAIL||'')+(s.EMAIL&&s.TELEFONO?' · ':'')+esc(s.TELEFONO||'')+'</p><p>'+esc(s.LOCALITA||'')+'</p></section>'+
     '<section class="crm-section"><h3>Tag</h3><p>'+esc(s.CRM_TAGS||'Nessun tag')+'</p></section>'+
     '<section class="crm-section"><h3>Timeline recente</h3>'+
-      (tps.length?tps.slice(0,8).map(x=>'<div class="crm-timeline"><time>'+esc(x.TIMESTAMP||'')+'</time><div><b>'+esc(x.OGGETTO||x.CANALE||'Touchpoint')+'</b><p>'+esc(x.SINTESI||'')+'</p><small>'+esc(x.ESITO||'')+'</small></div></div>').join(''):'<p>Nessun touchpoint registrato.</p>')+
+      (tps.length?tps.slice(0,8).map(renderCrmTouchpoint).join(''):'<p>Nessun touchpoint registrato.</p>')+
     '</section>'+
     '<section class="crm-section"><h3>Accordi / contratti</h3>'+
       (agreements.length?agreements.map(a=>'<div class="crm-agreement"><div><b>'+esc(a.PACCHETTO||a.PARTNER||'Accordo')+'</b><small>'+esc(a.STATO||'')+'</small></div><div><span>Valore</span><strong>'+esc(a['VALORE €']!==''&&a['VALORE €']!=null?'€ '+a['VALORE €']:'Da verificare')+'</strong></div><div><span>Incasso</span><strong>'+esc(a['STATO INCASSO']||'Da verificare')+'</strong></div><p>'+esc(a['ASSET PROMESSI']||'')+'</p><small>'+esc(a['PROSSIMA AZIONE']||'')+'</small></div>').join(''):'<p>Nessun accordo formalizzato collegato.</p>')+
@@ -1288,7 +1310,8 @@ function renderCrmInspector(data){
     '<section class="crm-section crm-evidence-section"><h3>Opportunità registrate</h3>'+
       (opps.length?opps.slice(0,12).map(crmOpportunityCard).join(''):'<p>Nessuna opportunità collegata registrata.</p>')+
       '<small class="crm-evidence-rule">Sono mostrati soltanto campi valorizzati nel master canonico. Nessuna probabilità, valore o scadenza viene dedotta.</small>'+
-    '</section>';
+    '</section>'+
+    renderActivationProofs(tps);
   const mailBtn=$('#crmEmailAction');
   if(mailBtn)mailBtn.onclick=()=>openCrmEmailComposer(data);
 }
@@ -1347,7 +1370,10 @@ function renderGrowPipeline(){
   $$('[data-grow-crm-id]').forEach(btn=>btn.onclick=()=>openCrmProfile(btn.dataset.growCrmId));
   const quality=[
     ...model.needsVerification.map(item=>({name:item.name,detail:'Stato relazione non mappato con certezza: '+(item.sourceStatus||'mancante')})),
-    ...model.blocked.map(item=>({name:item.name,detail:'Policy contatto: '+(item.contactPolicy||'BLOCCATO')}))
+    ...model.blocked.map(item=>({name:item.name,detail:'Policy contatto: '+(item.contactPolicy||'BLOCCATO')})),
+    ...(model.diagnostics?.missingId||[]).map(item=>({name:item.name,detail:'ID canonico mancante · record '+String(item.index+1)})),
+    ...(model.diagnostics?.duplicateIds||[]).map(item=>({name:item.id,detail:'ID duplicato nella fonte canonica'})),
+    ...(model.diagnostics?.possibleDuplicateProspects||[]).map(item=>({name:item.items.map(x=>x.name).join(' / '),detail:'Possibile duplicato prospect · verifica umana richiesta'}))
   ];
   verification.innerHTML=quality.length?quality.slice(0,40).map(item=>
     '<article class="grow-verification-item"><b>'+esc(item.name)+'</b><span>'+esc(item.detail)+'</span></article>'
