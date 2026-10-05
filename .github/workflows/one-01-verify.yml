@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - "copilot/ai-scd-one-again"
+      - "ai-scd-one"
   workflow_dispatch:
 
 permissions:
