@@ -216,8 +216,22 @@
         "PREVIEW_OR_RUNTIME_EVIDENCE_AVAILABLE",
         "PRODUCTION_VERIFIED_ONLY_AFTER_AUTHORIZED_RELEASE"
       ],
-      "nextVerticalSlice": "CEPA-01_QA_ACCESS_SYSTEM_THEN_CONTROL_ROOM_REAL_DATA",
-      "status": "IMPLEMENTATION_CONTINUATION_REQUIRED"
+      "nextVerticalSlice": "CEPA-02_PUBLIC_POINTS_MEDIA_STORAGE_DEPLOY_AND_PRODUCTION_VERIFICATION",
+      "status": "IMPLEMENTATION_ACTIVE",
+      "currentExecutionState": {
+        "updatedAt": "2026-10-05",
+        "githubHead": "c4376bceef98913122460f0ed44e66b26314b77a",
+        "supabase": "ACTIVE_HEALTHY",
+        "publicPoints": [
+          "COLICO",
+          "MANDELLO"
+        ],
+        "publicPointMedia": "SUPABASE_STORAGE_ACTIVE",
+        "noindex": "ENFORCED",
+        "render": "DEPLOY_LAG_PENDING_FINAL_RELEASE",
+        "legalBranding": "FINAL_EVIDENCE_GATE_REMAINS",
+        "productionFiles": "REV08_CATALOGUED_CORE_SET"
+      }
     }
   ]
 }
