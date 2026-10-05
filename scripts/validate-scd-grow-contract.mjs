@@ -16,7 +16,7 @@ ok(js.includes('function renderCrmTouchpoint('),'CRM provenance timeline rendere
 ok(js.includes('function renderActivationProofs('),'activation proof renderer missing');
 ok(js.includes('possibleDuplicateProspects'),'duplicate prospect diagnostics not surfaced');
 ok(js.includes('Nessuna probabilità, valore o scadenza viene dedotta.'),'evidence no-inference disclosure missing');
-ok(js.includes("$('[data-grow-crm-id]').forEach"),'GROW pipeline CRM actions must use multi-selector');
+ok(js.includes("$$('[data-grow-crm-id]').forEach"),'GROW pipeline CRM actions must use multi-selector');
 ok(!js.split("\n").some(line=>line.trimStart().startsWith("$('[data-grow-crm-id]').forEach")),'GROW pipeline must not call forEach on a single-element selector');
 ok(js.includes("crmState.sourceState='VERIFIED'"),'verified CRM source state missing');
 ok(js.includes("crmState.sourceState='UNAVAILABLE'"),'fail-closed CRM source state missing');
