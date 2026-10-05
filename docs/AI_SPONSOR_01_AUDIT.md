@@ -15,9 +15,9 @@ This addendum records a small, read-only Sponsor CRM slice built on the existing
 | `REPOSITORY` | `VERIFIED` | `francesco1485/scd-colicoderviese-super-app` |
 | `CURRENT_MAIN_SHA` | `VERIFIED` | PR #93 base `d16a658786b7577af498a3104dc31ebdd17f7613` |
 | `CURRENT_WORKING_BRANCH` | `VERIFIED` | Local task branch `copilot/copilotai-scd-sponsor-platform`; PR #93 source is `copilot/ai-scd-sponsor-platform`, so they do not match |
-| `WORKING_TREE` | `VERIFIED` | Changes are limited to the GROW slice, its tests and this addendum; code commit `359e152` is on the local task branch and remaining evidence updates are pending |
+| `WORKING_TREE` | `VERIFIED` | GROW implementation and evidence are committed on the local task branch; the tree is clean |
 | `OPEN_PR` | `VERIFIED` | PR #93 is open and draft |
-| `PR_STATUS` | `VERIFIED` | No merge or deployment was requested or performed; current local task branch is not the PR’s reported source ref |
+| `PR_STATUS` | `VERIFIED` | No merge or deployment was requested or performed; PR #93 was not updated because its source ref differs from the current task branch |
 | `CI_STATUS` | `VERIFIED` | Latest queried PR #93 workflows on `7dd24af` ended `action_required`; the PR API returned no check runs. No run is linked to the current task commit |
 | `PAGES_STATUS` | `UNVERIFIED` | No Pages deployment or health request was made |
 | `RENDER_STATUS` | `UNVERIFIED` | No Render configuration/health request was made |
