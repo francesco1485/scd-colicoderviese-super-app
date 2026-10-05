@@ -592,7 +592,7 @@ if(typeof cap.featureFlags?.supabaseCore!=='boolean')throw new Error('supabase f
 const pwaManifest=await api.request.get(base+'/manifest.webmanifest');
 if(!pwaManifest.ok())throw new Error('manifest.webmanifest missing');
 const pwaJson=await pwaManifest.json();
-if(pwaJson.theme_color!=='#041c3a'||pwaJson.background_color!=='#f2f5f9')throw new Error('SCD Arena PWA colors missing');
+if(pwaJson.theme_color!=='#031A35'||pwaJson.background_color!=='#031A35')throw new Error('SCD ONE PWA colors missing');
 for(const resource of ['/sw.js','/robots.txt','/sitemap.xml']){
   const rr=await api.request.get(base+resource);
   if(!rr.ok())throw new Error(resource+' missing');
