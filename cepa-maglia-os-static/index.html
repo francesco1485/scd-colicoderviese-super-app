@@ -871,9 +871,9 @@
             <div class="panel-head wrap">
               <div><div class="eyebrow">ANAGRAFICA OPERATIVA</div><h3>Cerca e apri il cliente</h3></div>
               <div class="filters commerce-filters">
-                <input id="client360Search" type="search" placeholder="Nome, comune, produttore, ramo...">
-                <select id="client360Status"><option value="">Tutti gli stati</option><option value="active">Attivi</option><option value="lost">Persi</option><option value="prospect">Prospect</option><option value="archived">Archiviati</option></select>
-                <select id="client360Producer"><option value="">Tutti i produttori</option></select>
+                <input id="client360Search" type="search" placeholder="Nome, comune, produttore, ramo..." aria-label="Cerca clienti">
+                <select id="client360Status" aria-label="Filtra clienti per stato"><option value="">Tutti gli stati</option><option value="active">Attivi</option><option value="lost">Persi</option><option value="prospect">Prospect</option><option value="archived">Archiviati</option></select>
+                <select id="client360Producer" aria-label="Filtra clienti per produttore"><option value="">Tutti i produttori</option></select>
               </div>
             </div>
             <div class="table-wrap"><table class="table commerce-table"><thead><tr><th>Cliente</th><th>Stato</th><th>Territorio</th><th>Produttore</th><th>Profondità</th><th>Pipeline</th><th>Prossimo passo</th><th></th></tr></thead><tbody id="client360Body"></tbody></table></div>
@@ -906,7 +906,7 @@
         <section data-commerce-panel="pipeline" class="commerce-panel hidden">
           <div class="commerce-panel-head split">
             <div><span>PIPELINE COMMERCIALE</span><h3>Un solo flusso dalla selezione all'esito</h3><p>Acquisizione, sviluppo, retention e recovery condividono stadi, responsabilità, attività e check-up.</p></div>
-            <div class="commerce-pipeline-actions"><select id="pipelineTypeFilter"><option value="">Tutte le pipeline</option><option value="acquisition">Acquisizione</option><option value="development">Sviluppo</option><option value="retention">Retention</option><option value="recovery">Recovery</option></select><button id="newPipelineCaseBtn" type="button" class="primary">+ Opportunità</button></div>
+            <div class="commerce-pipeline-actions"><select id="pipelineTypeFilter" aria-label="Filtra per tipo di pipeline"><option value="">Tutte le pipeline</option><option value="acquisition">Acquisizione</option><option value="development">Sviluppo</option><option value="retention">Retention</option><option value="recovery">Recovery</option></select><button id="newPipelineCaseBtn" type="button" class="primary">+ Opportunità</button></div>
           </div>
           <section class="commerce-kpis">
             <div><span>Casi aperti</span><strong id="pipelineOpenCount">—</strong></div>
@@ -1159,7 +1159,7 @@
         <article class="panel">
           <div class="panel-head wrap">
             <div><div class="eyebrow">AGENDA OPERATIVA</div><h3>Prossimi appuntamenti e attività comuni</h3></div>
-            <select id="agendaTypeFilter">
+            <select id="agendaTypeFilter" aria-label="Filtra attività per tipo">
               <option value="">Tutti i tipi</option>
               <option value="appointment">Appuntamenti</option>
               <option value="cepa_event">Eventi CEPA</option>
@@ -1425,8 +1425,8 @@
         <div class="panel-head wrap">
           <div><div class="eyebrow">CANDIDATI</div><h3>Anagrafica rete potenziale</h3></div>
           <div class="filters">
-            <select id="distKindFilter"><option value="">Tutti</option><option value="rui_b">RUI B</option><option value="rui_e">RUI E</option><option value="company">Impresa</option><option value="professional">Professionista</option><option value="sap_candidate">Candidato SAP</option></select>
-            <select id="distStageFilter"><option value="">Tutti gli stati</option><option value="discovered">Scoperto</option><option value="reviewed">Rivisto</option><option value="qualified">Qualificato</option><option value="contact_planned">Contatto pianificato</option><option value="contacted">Contattato</option><option value="meeting">Incontro</option><option value="proposal">Proposta</option><option value="relationship">Relazione</option><option value="sap_candidate">SAP</option><option value="archived">Archiviato</option></select>
+            <select id="distKindFilter" aria-label="Filtra candidati per tipologia"><option value="">Tutti</option><option value="rui_b">RUI B</option><option value="rui_e">RUI E</option><option value="company">Impresa</option><option value="professional">Professionista</option><option value="sap_candidate">Candidato SAP</option></select>
+            <select id="distStageFilter" aria-label="Filtra candidati per stato"><option value="">Tutti gli stati</option><option value="discovered">Scoperto</option><option value="reviewed">Rivisto</option><option value="qualified">Qualificato</option><option value="contact_planned">Contatto pianificato</option><option value="contacted">Contattato</option><option value="meeting">Incontro</option><option value="proposal">Proposta</option><option value="relationship">Relazione</option><option value="sap_candidate">SAP</option><option value="archived">Archiviato</option></select>
           </div>
         </div>
         <div class="table-wrap"><table class="table"><thead><tr><th>Soggetto</th><th>Fonte</th><th>RUI/P.IVA</th><th>Territorio</th><th>Fit</th><th>Confidenza</th><th>Stato</th><th></th></tr></thead><tbody id="distributionCandidateBody"></tbody></table></div>
@@ -1449,8 +1449,8 @@
         <div class="panel-head wrap">
           <div><div class="eyebrow">MAPPA ZERO</div><h3>Entità territoriali</h3></div>
           <div class="filters">
-            <select id="territoryHubFilter"><option value="">Tutti gli hub</option></select>
-            <select id="territoryStageFilter"><option value="">Tutti gli stati</option><option value="observed">Osservato</option><option value="qualified">Qualificato</option><option value="prospect">Prospect</option><option value="opportunity">Opportunità</option><option value="relationship">Relazione</option><option value="archived">Archiviato</option></select>
+            <select id="territoryHubFilter" aria-label="Filtra entità territoriali per hub"><option value="">Tutti gli hub</option></select>
+            <select id="territoryStageFilter" aria-label="Filtra entità territoriali per stato"><option value="">Tutti gli stati</option><option value="observed">Osservato</option><option value="qualified">Qualificato</option><option value="prospect">Prospect</option><option value="opportunity">Opportunità</option><option value="relationship">Relazione</option><option value="archived">Archiviato</option></select>
           </div>
         </div>
         <div class="table-wrap"><table class="table"><thead><tr><th>Soggetto</th><th>Hub</th><th>Tipologia</th><th>Fonte</th><th>CEPA</th><th>Advisory</th><th>Stato</th><th></th></tr></thead><tbody id="territoryBody"></tbody></table></div>
@@ -1465,7 +1465,7 @@
       <section class="panel">
         <div class="panel-head wrap">
           <div><div class="eyebrow">AZIONI</div><h3>Lavoro aperto</h3></div>
-          <div class="filters"><select id="actionLaneFilter"><option value="">Tutte le corsie</option><option value="existing">Esistente</option><option value="development">Sviluppo</option><option value="shared">Comune</option></select><select id="actionStatusFilter"><option value="">Tutti gli stati</option><option value="open">Aperta</option><option value="in_progress">In corso</option><option value="waiting">In attesa</option><option value="completed">Completata</option><option value="cancelled">Annullata</option></select></div>
+          <div class="filters"><select id="actionLaneFilter" aria-label="Filtra azioni per corsia"><option value="">Tutte le corsie</option><option value="existing">Esistente</option><option value="development">Sviluppo</option><option value="shared">Comune</option></select><select id="actionStatusFilter" aria-label="Filtra azioni per stato"><option value="">Tutti gli stati</option><option value="open">Aperta</option><option value="in_progress">In corso</option><option value="waiting">In attesa</option><option value="completed">Completata</option><option value="cancelled">Annullata</option></select></div>
         </div>
         <div id="actionList" class="list"></div>
       </section>
@@ -1510,7 +1510,7 @@
       <button type="button" data-ai-prompt="Fammi una ricerca ragionata sull'argomento che ti indicherò">Ricerca</button>
     </div>
     <form id="aiChatForm" class="ai-chat-form">
-      <textarea id="aiChatInput" rows="2" placeholder="Chiedi a Lia qualsiasi cosa..." autocomplete="off"></textarea>
+      <textarea id="aiChatInput" rows="2" placeholder="Chiedi a Lia qualsiasi cosa..." autocomplete="off" aria-label="Messaggio per Lia"></textarea>
       <button type="submit" aria-label="Invia">→</button>
     </form>
     <p class="ai-disclaimer">Le azioni operative seguono ruolo, permessi e approvazioni. Le risposte generali sono separate dai dati interni.</p>

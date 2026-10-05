@@ -10,6 +10,9 @@ ok(html.includes('id="systemReadinessPanel"'),'CEPA-01 readiness panel missing')
 ok(html.includes('id="systemReadinessGrid"'),'CEPA-01 readiness grid missing');
 ok(html.includes('id="systemReadinessActions"'),'CEPA-02 readiness action surface missing');
 ok(html.includes('id="publicCepaPointGrid"'),'verified territorial points DOM target missing');
+for(const id of ['client360Search','client360Status','client360Producer','pipelineTypeFilter','agendaTypeFilter','distKindFilter','distStageFilter','territoryHubFilter','territoryStageFilter','actionLaneFilter','actionStatusFilter','aiChatInput']){
+  ok(new RegExp(`id="${id}"[^>]*aria-label="[^"]+"`).test(html),`${id} must have an accessible name`);
+}
 ok(js.includes("supabase.from('integration_registry')"),'canonical integration registry source missing');
 ok(js.includes('publicCepaPoints=cepaResult.data?.points||[]'),'territorial points must come from the public CEPA feed');
 ok(js.includes("if($('publicCepaPointGrid'))"),'territorial points renderer must guard its DOM target');
