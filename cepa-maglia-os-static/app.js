@@ -138,7 +138,7 @@ async function loadPublicPortal(){
     })
   }
   if(cepaResult.error||cepaResult.data?.ok===false){
-    publicCepaSubjects=[];publicCepaEvents=[]
+    publicCepaSubjects=[];publicCepaEvents=[];publicCepaPoints=[]
   }else{
     publicCepaSubjects=cepaResult.data?.subjects||[]
     publicCepaEvents=cepaResult.data?.events||[]
