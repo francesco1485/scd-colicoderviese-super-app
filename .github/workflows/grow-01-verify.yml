@@ -3,6 +3,7 @@ name: SCD GROW Verification
 on:
   push:
     branches:
+      - "ai-scd-grow"
       - "grow-01-verified-pipeline"
       - "grow-02-crm-slice"
   workflow_dispatch:
