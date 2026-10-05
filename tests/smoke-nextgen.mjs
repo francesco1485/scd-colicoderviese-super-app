@@ -210,7 +210,10 @@ for(const viewport of viewports){
   await page.evaluate(()=>window.SCDNextGen.setView('pulse'));
 
   const shellWidth=await page.locator('.app').evaluate(el=>Math.round(el.getBoundingClientRect().width));
-  if(viewport.width>=1280 && shellWidth<1200)throw new Error('desktop shell too narrow: '+shellWidth+'px');
+  if(viewport.width>=1280){
+    const expectedDesktopShell=Math.min(1600,viewport.width-176);
+    if(shellWidth<expectedDesktopShell-4)throw new Error('desktop shell below adaptive target: '+shellWidth+'px < '+expectedDesktopShell+'px');
+  }
 
   if([390,430,1440,1920].includes(viewport.width)){
     await page.screenshot({path:'test-output/nova-'+viewport.width+'x'+viewport.height+'.png',fullPage:true});
