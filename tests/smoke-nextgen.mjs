@@ -102,7 +102,7 @@ for(const viewport of viewports){
   const skyAsset=await page.locator('#mirrorFab img').getAttribute('src');
   if(!/assets\/sky\.png$/.test(String(skyAsset||'')))throw new Error('official Sky mascot missing from chatbot');
     const navLabels=await page.locator('.bottom-nav button').allTextContents();
-  for(const label of ['Home','Calendario','Squadre','Social','Profilo'])if(!navLabels.some(x=>x.includes(label)))throw new Error('mobile nav missing '+label);
+  for(const label of ['HOME','CALENDAR','TEAMS','SOCIAL','PROFILE'])if(!navLabels.some(x=>String(x).toUpperCase().includes(label)))throw new Error('canonical nav missing '+label);
   const visibleLegacy=await page.evaluate(()=>['.home-secondary-hero','.ng-command-ring','.pulse-strip','.ng-constellation','.worlds-preview','.ng-value-engine'].filter(sel=>{const el=document.querySelector(sel);return el&&getComputedStyle(el).display!=='none'}));
   if(visibleLegacy.length)throw new Error('secondary clutter visible on public home: '+visibleLegacy.join(','));
 
