@@ -3,8 +3,8 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.27.0",
-    "effective_at": "2026-10-03",
+    "version": "3.28.0",
+    "effective_at": "2026-10-05",
     "status": "BINDING",
     "language": "it-IT",
     "timezone": "Europe/Rome",
@@ -1323,7 +1323,19 @@
       "MAIL_OPERATIONS_SHEET/17_SMART_CLASSIFIER",
       "MAIL_OPERATIONS_SHEET/18_ACTION_QUEUE",
       "TESSERATI_SHEET/MAIL SPORTCLUB"
-    ]
+    ],
+    "runtime_actions": [
+      "direction.datafabric.status",
+      "direction.datafabric.actions",
+      "direction.datafabric.scan.gmail",
+      "direction.datafabric.scan.drive"
+    ],
+    "product_projection": {
+      "SCD_CORE": "DIRECTION_CONTROL_ROOM",
+      "queue_source": "MAIL_OPERATIONS_SHEET/18_ACTION_QUEUE",
+      "read_only_projection": true,
+      "human_confirmation_for_critical_actions": true
+    }
   },
   "entity_graph": {
     "required_relations": [
@@ -4333,5 +4345,28 @@
       "DOCUMENT_RESEARCH"
     ],
     "high_impact_rule": "VERIFY_JURISDICTION_DATE_SOURCE_AND_ESCALATE_WHEN_PROFESSIONAL_LICENSE_IS_REQUIRED"
+  },
+  "product_convergence": {
+    "release": "R57.PRODUCT_CONVERGENCE",
+    "state": "RELEASE_CANDIDATE",
+    "apps": {
+      "SCD_ONE": "INTEGRATED",
+      "SCD_CORE": "INTEGRATED",
+      "SCD_GROW": "INTEGRATED"
+    },
+    "shared_core": [
+      "R20",
+      "SCD_PULSE",
+      "SCD_COMMAND_R22",
+      "SCD_GMAIL",
+      "SCD_DRIVE",
+      "SCD_GOOGLE_CALENDAR"
+    ],
+    "production_activation_requires": [
+      "CI_GREEN",
+      "RENDER_EXACT_SHA",
+      "SUPABASE_ADVISORS",
+      "R20_RUNTIME_PROBE"
+    ]
   }
 }
