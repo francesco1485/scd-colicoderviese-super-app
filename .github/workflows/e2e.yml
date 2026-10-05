@@ -21,6 +21,12 @@ jobs:
         run: npm run test:manifest
       - name: SCD AI portfolio contract gate
         run: npm run test:ai-portfolio
+      - name: SCD ONE contract gate
+        run: npm run test:scd-one-contract
+      - name: SCD CORE contract gate
+        run: npm run test:scd-core-contract
+      - name: SCD GROW contract gate
+        run: npm run test:scd-grow-contract
       - name: Supabase Domain Core contract gate
         run: npm run test:supabase-contract
       - name: R57.D1 graph hardening gate
@@ -105,6 +111,14 @@ jobs:
           node --check scd-adaptive-engine.js
           node --check scd-meta-engine.js
           node --check scd-twin.js
+          node --check scripts/validate-scd-grow-contract.mjs
+          node --check scripts/validate-scd-core-contract.mjs
+          node --check scripts/validate-scd-one-contract.mjs
+          node --check sponsor/grow-pipeline.js
+          node --check lib/scd-core-control-room.js
+          node --check lib/scd-native-adapters.js
+          node --check lib/scd-one-profile.js
+          node --check lib/scd-one-pulse.js
       - name: API contract gate
         run: npm run test:contract
       - name: Upstream resilience gate
@@ -123,6 +137,8 @@ jobs:
           done
           cat /tmp/scd-server.log
           exit 1
+      - name: SCD ONE seven-viewport visual QA
+        run: node tests/scd-one-visual-qa.mjs
       - name: Smoke test mobile app
         run: npm run test:smoke
       - name: Server logs
