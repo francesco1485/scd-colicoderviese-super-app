@@ -26,9 +26,7 @@ var R25_DATA = {
   ACTION_QUEUE: '18_ACTION_QUEUE',
   DRIVE_CATALOG: 'DRIVE AGGIORNAMENTI',
   SOURCE_REGISTRY: 'REGISTRO FONTI V2',
-  EVENT_KERNEL: 'APP EVENT KERNEL',
-  MAIL_RETRY_PREFIX: 'R57_MAIL_RETRY_',
-  MAIL_MAX_RETRIES: 3
+  EVENT_KERNEL: 'APP EVENT KERNEL'
 };
 
 function r25Clean_(value, max) {
@@ -147,39 +145,6 @@ function r25ClassifyMail_(subject, body, from) {
   return {area:area, priority:priority, action:action};
 }
 
-function r57MailDecision_(cls, subject, body) {
-  var text = [subject, body].join(' ').toLowerCase();
-  var recognized = cls.area !== 'ALTRO';
-  var explicitAction = /rispond|conferm|approv|scaden|pagament|fattur|bonifico|document|tesserament|svincol|convocaz|trasfert|variazione gara|rinvi|annull|sponsor|partner|pulmino|trasporto|fornitore|preventiv/.test(text);
-  var urgent = cls.priority === 'ALTA' || cls.priority === 'CRITICA';
-  var queue = urgent || explicitAction || recognized;
-  return {
-    queue: queue,
-    state: queue ? 'DA VERIFICARE' : 'ARCHIVIATA',
-    reason: urgent ? 'PRIORITA' : (explicitAction ? 'AZIONE_RILEVATA' : (recognized ? 'AREA_OPERATIVA' : 'ARCHIVIO'))
-  };
-}
-
-function r57MailRetryKey_(uid) {
-  return R25_DATA.MAIL_RETRY_PREFIX + String(uid || '');
-}
-
-function r57MailRetryCount_(uid) {
-  return Number(PropertiesService.getScriptProperties().getProperty(r57MailRetryKey_(uid)) || '0');
-}
-
-function r57MailRetryFail_(uid) {
-  var props = PropertiesService.getScriptProperties();
-  var key = r57MailRetryKey_(uid);
-  var attempts = Number(props.getProperty(key) || '0') + 1;
-  props.setProperty(key, String(attempts));
-  return attempts;
-}
-
-function r57MailRetryClear_(uid) {
-  PropertiesService.getScriptProperties().deleteProperty(r57MailRetryKey_(uid));
-}
-
 function r25EmitEvent_(eventType, entityType, entityId, source, status, notes, payloadHash) {
   try {
     r25AppendByHeader_(R25_DATA.CORE_ID, R25_DATA.EVENT_KERNEL, 'EVENT_ID', {
@@ -210,7 +175,7 @@ function r25IngestGmail_(options) {
   options = options || {};
   var days = Math.max(1, Math.min(30, Number(options.days || 7)));
   var limit = Math.max(1, Math.min(100, Number(options.limit || 40)));
-  var query = 'newer_than:' + days + 'd -in:spam -in:trash -category:promotions -category:social -category:forums';
+  var query = 'newer_than:' + days + 'd -in:spam -in:trash -category:promotions';
   var existing = r25ExistingValues_(R25_DATA.MAIL_OPS_ID, R25_DATA.MAIL_ARCHIVE, 'UID', 'UID');
   var threads = GmailApp.search(query, 0, limit);
   var inserted = 0, skipped = 0, queued = 0, errors = [];
@@ -224,7 +189,6 @@ function r25IngestGmail_(options) {
         var msg = messages[mi];
         var uid = String(msg.getId() || '');
         if (!uid || existing[uid]) { skipped++; continue; }
-        if (r57MailRetryCount_(uid) >= R25_DATA.MAIL_MAX_RETRIES) { skipped++; continue; }
 
         var subject = r25Clean_(msg.getSubject(), 500);
         var body = r25Clean_(msg.getPlainBody(), 12000);
@@ -233,7 +197,6 @@ function r25IngestGmail_(options) {
         var attachments = msg.getAttachments({includeInlineImages:false, includeAttachments:true}) || [];
         var attachmentNames = attachments.map(function(a) { return r25Clean_(a.getName(), 240); }).filter(Boolean);
         var cls = r25ClassifyMail_(subject, body, msg.getFrom());
-        var decision = r57MailDecision_(cls, subject, body);
         var gmailUrl = 'https://mail.google.com/mail/u/?authuser=sportclubcolico%40gmail.com#all/' + uid;
         var labels = [];
         try { labels = msg.getThread().getLabels().map(function(l) { return l.getName(); }); } catch (_) {}
@@ -271,7 +234,7 @@ function r25IngestGmail_(options) {
           MITTENTE_REALE_NOME:sender.name,
           MITTENTE_REALE_EMAIL:sender.email,
           AREA_CANONICA:cls.area,
-          STATO_SEMANTICO:decision.state,
+          STATO_SEMANTICO:'DA VERIFICARE',
           PRIORITA_SEMANTICA:cls.priority,
           AZIONE_OPERATIVA:cls.action,
           CONFIDENZA:'RULES_V1',
@@ -293,7 +256,7 @@ function r25IngestGmail_(options) {
           ALLEGATI:attachmentNames.join('; ')
         });
 
-        if (decision.queue) {
+        if (cls.priority === 'ALTA' || cls.priority === 'CRITICA' || cls.action) {
           r25AppendByHeader_(R25_DATA.MAIL_OPS_ID, R25_DATA.ACTION_QUEUE, 'PRIORITA', {
             PRIORITA:cls.priority,
             AREA:cls.area,
@@ -307,18 +270,11 @@ function r25IngestGmail_(options) {
           queued++;
         }
 
-        r25EmitEvent_('EMAIL_INGESTED','EMAIL',uid,'SCD_GMAIL','RECORDED',cls.area + ' · ' + cls.priority + ' · ' + decision.reason,payloadHash);
-        r57MailRetryClear_(uid);
+        r25EmitEvent_('EMAIL_INGESTED','EMAIL',uid,'SCD_GMAIL','RECORDED',cls.area + ' · ' + cls.priority,payloadHash);
         existing[uid] = true;
         inserted++;
       } catch (err) {
-        var failedUid = typeof uid === 'string' ? uid : '';
-        var attempts = failedUid ? r57MailRetryFail_(failedUid) : 1;
-        var message = String(err && err.message ? err.message : err);
-        errors.push('attempt=' + attempts + ' ' + message);
-        if (failedUid && attempts >= R25_DATA.MAIL_MAX_RETRIES) {
-          r25EmitEvent_('EMAIL_INGEST_RETRY_EXHAUSTED','EMAIL',failedUid,'SCD_GMAIL','REVIEW_REQUIRED',message,r25HexDigest_(failedUid + '|' + message));
-        }
+        errors.push(String(err && err.message ? err.message : err));
       }
     }
   }
@@ -458,6 +414,72 @@ function r25DataFabricStatus_(token) {
       gmail:{source:'SCD_GMAIL',table:'01_EMAIL_ARCHIVE / 17_SMART_CLASSIFIER / 18_ACTION_QUEUE',field:'UID',api:'direction.datafabric.scan.gmail',fallback:'NO_WRITE',refresh:'15m'},
       drive:{source:'SCD_DRIVE',table:'DRIVE AGGIORNAMENTI / REGISTRO FONTI V2',field:'ID DRIVE',api:'direction.datafabric.scan.drive',fallback:'NO_WRITE',refresh:'1h'}
     },
+    checkedAt:new Date().toISOString()
+  };
+}
+
+function r57DataFabricActions_(token, limit) {
+  r25RequireDirection_(token);
+  var sh = r25BookSheet_(R25_DATA.MAIL_OPS_ID, R25_DATA.ACTION_QUEUE);
+  var headerRow = r25HeaderRow_(sh, 'PRIORITA');
+  var headers = sh.getRange(headerRow, 1, 1, sh.getLastColumn()).getDisplayValues()[0];
+  var map = {};
+  headers.forEach(function(h, i) { map[String(h || '').trim().toUpperCase()] = i; });
+
+  ['PRIORITA','AREA','DATA','OGGETTO','AZIONE','STATO','GMAIL','UID'].forEach(function(key) {
+    if (map[key] == null) throw new Error('Colonna action queue mancante: ' + key);
+  });
+
+  var count = Math.max(0, sh.getLastRow() - headerRow);
+  if (!count) return {
+    ok:true,
+    source:'MAIL_OPERATIONS_SHEET',
+    table:R25_DATA.ACTION_QUEUE,
+    rows:[],
+    count:0,
+    checkedAt:new Date().toISOString()
+  };
+
+  var values = sh.getRange(headerRow + 1, 1, count, sh.getLastColumn()).getDisplayValues();
+  var rows = values.map(function(row) {
+    var uid = r25Clean_(row[map.UID], 120);
+    var status = r25Clean_(row[map.STATO], 80);
+    if (!uid || /CHIUS|DONE|ARCHIVIAT|ANNULLAT/i.test(status)) return null;
+    var gmailUrl = r25Clean_(row[map.GMAIL], 1000);
+    if (!/^https:\/\/mail\.google\.com\//i.test(gmailUrl)) gmailUrl = '';
+    return {
+      id:uid,
+      priority:r25Clean_(row[map.PRIORITA], 40),
+      area:r25Clean_(row[map.AREA], 120),
+      date:r25Clean_(row[map.DATA], 80),
+      title:r25Clean_(row[map.OGGETTO], 500),
+      nextAction:r25Clean_(row[map.AZIONE], 1200),
+      status:status || 'DA VERIFICARE',
+      gmailUrl:gmailUrl,
+      source:'MAIL_OPERATIONS_SHEET/18_ACTION_QUEUE',
+      sourceRecordId:uid
+    };
+  }).filter(Boolean);
+
+  rows.sort(function(a,b) {
+    var rank = {CRITICA:5,URGENTE:4,ALTA:3,MEDIA:2,BASSA:1};
+    var pa = rank[String(a.priority || '').toUpperCase()] || 0;
+    var pb = rank[String(b.priority || '').toUpperCase()] || 0;
+    if (pa !== pb) return pb - pa;
+    var da = Date.parse(a.date || '') || 0;
+    var db = Date.parse(b.date || '') || 0;
+    return db - da;
+  });
+
+  var max = Math.max(1, Math.min(100, Number(limit || 60)));
+  rows = rows.slice(0, max);
+
+  return {
+    ok:true,
+    source:'MAIL_OPERATIONS_SHEET',
+    table:R25_DATA.ACTION_QUEUE,
+    rows:rows,
+    count:rows.length,
     checkedAt:new Date().toISOString()
   };
 }
