@@ -2,7 +2,72 @@
 
 **Audit date:** 2026-10-03  
 **Scope:** current repository snapshot at `d16a658786b7577af498a3104dc31ebdd17f7613`  
-**Deliverable status:** audit and plan only; no production, data, permission, or hosting changes
+**Deliverable status:** audit/plan plus a read-only GROW-02 CRM slice; no production, data, permission, or hosting changes
+
+## GROW-02 implementation addendum — 2026-10-05
+
+This addendum records a small, read-only Sponsor CRM slice built on the existing protected R20 CRM summary/detail calls. It does not replace the audit’s open findings or claim live-source, role-matrix, or production verification.
+
+### SCD:STATE
+
+| Field | Status | Evidence / limitation |
+|---|---|---|
+| `REPOSITORY` | `VERIFIED` | `francesco1485/scd-colicoderviese-super-app` |
+| `CURRENT_MAIN_SHA` | `VERIFIED` | PR #93 base `d16a658786b7577af498a3104dc31ebdd17f7613` |
+| `CURRENT_WORKING_BRANCH` | `VERIFIED` | Local task branch `copilot/copilotai-scd-sponsor-platform`; PR #93 source is `copilot/ai-scd-sponsor-platform`, so they do not match |
+| `WORKING_TREE` | `VERIFIED` | Changes are limited to the GROW slice, its tests and this addendum; code commit `359e152` is on the local task branch and remaining evidence updates are pending |
+| `OPEN_PR` | `VERIFIED` | PR #93 is open and draft |
+| `PR_STATUS` | `VERIFIED` | No merge or deployment was requested or performed; current local task branch is not the PR’s reported source ref |
+| `CI_STATUS` | `VERIFIED` | Latest queried PR #93 workflows on `7dd24af` ended `action_required`; the PR API returned no check runs. No run is linked to the current task commit |
+| `PAGES_STATUS` | `UNVERIFIED` | No Pages deployment or health request was made |
+| `RENDER_STATUS` | `UNVERIFIED` | No Render configuration/health request was made |
+| `MANIFEST_VERSION_OR_HASH` | `VERIFIED` | `SCD_SYSTEM_MANIFEST.json` SHA-256 `46518c9e5aa258fd5bbc1e80ecf0d1fa7c65b12c6e32a7d721dc4b5ed3205baf` |
+| `RELEASE_DEPENDENCIES` | `VERIFIED` | `APP_AI_MANIFEST.md` identifies protected `scd-colicoderviese-official-r21`; no dependency was added |
+| `DATA_SOURCES_VERIFIED` | `UNVERIFIED` | Repository CRM contracts were inspected; no live R20, Sheet, Drive or contact data was queried |
+| `KNOWN_BLOCKERS` | `VERIFIED` | Working branch and PR #93 head ref differ; the current CRM summary does not return a canonical pipeline-stage field; the touchpoint contract has no verified activation-document schema; public-repository exposure and role scope remain open audit issues |
+| `SAFE_NEXT_ACTION` | `VERIFIED` | Resolve the branch/PR association and obtain owner-approved source-field contracts before claiming complete pipeline mapping or activation proof; keep this work draft-only, with no merge/deploy |
+
+### SCD:EXPERT + SCD:ARCHITECT
+
+- `TASK_CLASS`: isolated read-only Sponsor/Partner CRM operating slice.
+- `DOMAINS`: R20 CRM, commercial workflow, deduplication, provenance, responsive UI and accessibility.
+- `CAPABILITIES`: `CAP-SPONSOR-OPERATIONAL-FOCUS`, `CAP-VALUE-ENGINE`, `CAP-IDENTITY-ACCESS`, `CAP-ASSET-INTEGRITY`.
+- `FIXED`: existing R20 session and CRM APIs, canonical stakeholder IDs, source-of-truth tables, public/private boundary, and the Innovation Harvest lifecycle. No duplicate CRM, new role, source, endpoint, schema, or AI/vendor claim.
+- `IMPROVABLE`: view explicit pipeline stages, next-action/reminder triage, possible prospect-name collisions, evidence lineage and activation proof already linked in CRM.
+- `MISSING`: no stage field in `private.crm.summary`; no verified CRM/Drive activation-proof schema or live data; no production authorization matrix or runtime check.
+- `SOURCE_PLAN`: current authenticated `/api/sponsor/crm` only. The inspected R20 bridge reads `STAKEHOLDERS_MASTER`, `TOUCHPOINTS_MASTER`, `COMMERCIALE_OPPORTUNITA`, `TASKS_MASTER`, and, for details, `SPONSOR_CONTRATTI` and `RELAZIONI_MASTER`. No live source was queried and no new registry source was added.
+- `RISK`: false pipeline-stage inference, accidental sponsor/prospect conflation, unsafe outreach, name-based identity merging, and presenting a plan as delivered proof.
+- `ROLLBACK`: revert the isolated GROW implementation commit(s) and this addendum; there are no data, role, source, migration or production side effects.
+- `NEXT_ACTION`: resolve the branch/PR mismatch, then obtain canonical pipeline-stage and Drive proof-field contracts before expanding beyond the fail-closed view.
+
+### Implemented boundary
+
+- `sponsor/app.html`, `sponsor/app.js` and `sponsor/app.css` add an action-oriented read-only workbench inside the authenticated private CRM.
+- The canonical lifecycle is displayed, but a row enters a stage count only when that exact canonical stage is supplied in a dedicated stage field. `relationshipStatus` is never repurposed as pipeline stage; records without an exposed stage are listed as `NON MAPPATO`.
+- Existing CRM `nextAction` and `nextDeadline` remain clearly marked as recorded source values. A deterministic human-review suggestion is visually separated; the queue does not create tasks, schedule OS notifications, send reminders or contact anyone. Contact-block policies remain visible.
+- Duplicate summary rows are collapsed only by canonical stakeholder ID. Similar prospect display names with different IDs are flagged for human review and are never merged.
+- The profile timeline identifies R20/`TOUCHPOINTS_MASTER`, preserves available timestamp/actor/document references, and rejects non-HTTP(S) evidence links. Activation proof appears only when a touchpoint explicitly describes activation/proof and contains an explicit document locator. No linked locator means “no verified proof”; this view does not query Drive.
+- `lib/sponsor-grow.js` contains pure projection rules and introduces no data store or service. CRM data is still fetched only through the existing authenticated endpoint.
+
+### VISUAL_CLASSIFICATION
+
+- Private CRM workbench: `REBUILD_IMPROVE`, preserving canonical CRM IDs, R20 auth, existing APIs and data provenance.
+- Official club/sponsor assets and source records: `KEEP_LOCKED`; no asset was modified and no sponsor data was added.
+- Visual tokens follow `config/scd-visual-system.json`. The R57 master and machine gate were read from `r57-copilot-control-plane`; no approved visual-board screenshot was available in this checkout for pixel comparison.
+
+### VISUAL_QA
+
+- `STATUS: TARGETED_LOCAL_BROWSER_QA_WITH_SYNTHETIC_FIXTURES`; synthetic records were explicitly labelled `QA SYNTHETIC TEST ONLY` and were never committed.
+- Chromium checked 360×800, 390×844, 393×852, 430×932, 1280×800, 1440×900 and 1920×1080. The workbench and CRM filter controls had no horizontal overflow; the 13-stage rail is internally scrollable. Keyboard focus was verified on a follow-up action; representative text/focus color contrast was measured at 4.86:1 or higher.
+- Reduced-motion emulation disables pipeline snapping; the profile drill-down rendered the proof state and only showed the fixture’s explicit reference.
+- CRM loading, empty and upstream-error states were exercised. Approved visual-board pixel comparison and full keyboard/screen-reader QA remain unverified.
+- Screenshots were kept under `/tmp/sponsor-grow-qa/` and are not release proof for live data or production.
+
+### Targeted verification and rollback
+
+- `npm run test:sponsor-grow`, `npm run test:sponsor-runtime`, `npm run test:crm-communication`, and `npm run test:sponsor-vision` passed.
+- `npm run check` passed, including `npm run test:manifest` and the repository syntax checks.
+- Rollback is a revert of the GROW code/test/package commit(s) and this addendum; no external source or production state is changed.
 
 ## Executive summary
 

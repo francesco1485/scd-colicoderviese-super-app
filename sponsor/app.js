@@ -11,6 +11,7 @@ let motionProfileCurrent='';
 let motionConfigPromise=null;
 let creativeSceneState={scenes:[]};
 let creativeScenePromise=null;
+const crmState={rows:[],selected:null,loading:false,error:'',generatedAt:null};
 
 function fetchMotionConfig(){
   if(!motionConfigPromise){
@@ -1166,7 +1167,6 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.hidden)close
 
 
 /* ===== R40.1 CRM RELAZIONALE ===== */
-const crmState={rows:[],selected:null,loading:false,error:'',generatedAt:null};
 
 function crmPolicyLabel(value){
   const v=String(value||'').toUpperCase();
@@ -1214,7 +1214,12 @@ function renderGrowOperations(){
   pipeline.innerHTML=projection.stages.map(stage=>
     '<article class="grow-stage"><small>'+esc(stage.id)+'</small><strong>'+esc(stage.count)+'</strong><span>stati fonte espliciti</span></article>'
   ).join('')+
-    '<article class="grow-stage unmapped"><small>NON MAPPATO</small><strong>'+esc(projection.unmapped)+'</strong><span>stadio non esposto dal riepilogo</span></article>';
+    '<article class="grow-stage unmapped"><small>NON MAPPATO</small><strong>'+esc(projection.unmapped)+'</strong><span>stadio non esposto dal riepilogo</span></article>'+
+    '<div class="grow-unmapped-list"><small>STADIO CRM NON ESPOSTO</small>'+
+      (projection.unmappedRecords.length?projection.unmappedRecords.slice(0,8).map(item=>
+        '<button type="button" data-grow-profile="'+esc(item.id)+'"><b>'+esc(item.name)+'</b><span>'+esc(item.relationshipStatus||'Relazione non dichiarata')+'</span></button>'
+      ).join(''):'<p>Nessun record senza stage.</p>')+
+    '</div>';
   const pipelineState=$('#growPipelineState');
   if(pipelineState)pipelineState.textContent=projection.unmapped
     ?projection.unmapped+' record senza stage canonico verificabile'
@@ -1224,7 +1229,8 @@ function renderGrowOperations(){
   followups.innerHTML=queue.length?queue.slice(0,8).map(item=>
     '<article class="grow-followup">'+
       '<div><b>'+esc(item.name)+'</b><small>'+esc(item.relationshipStatus||'Relazione non dichiarata')+'</small></div>'+
-      '<p>'+esc(item.action||'Azione CRM non valorizzata')+'</p>'+
+      '<p>'+esc(item.action||item.suggestion)+'</p>'+
+      '<small class="grow-action-origin">'+(item.action?'AZIONE REGISTRATA · CRM':'SUGGERIMENTO · REVISIONE UMANA')+'</small>'+
       '<div class="grow-followup-meta"><span>'+esc(item.deadline||'Nessuna scadenza registrata')+'</span>'+
       '<span class="'+(item.deadlineState==='OVERDUE'?'overdue':'')+'">'+esc(item.deadlineState.replaceAll('_',' '))+'</span></div>'+
       '<small>'+esc(item.owner||'Owner non dichiarato')+' · '+esc(crmPolicyLabel(item.contactPolicy))+'</small>'+
@@ -1291,6 +1297,16 @@ function renderActivationProofs(touchpoints=[]){
     }).join(''):'<p>Nessuna prova di attivazione collegata con riferimento documentale verificabile.</p>')+
     '<small>R20 · private.crm.detail · TOUCHPOINTS_MASTER · SCD_DRIVE non interrogato da questa vista</small></section>';
 }
+function renderCrmTouchpoint(item){
+  const source=item.SOURCE||'R20 · TOUCHPOINTS_MASTER';
+  const actor=item.ACTOR||item.ATTORE||item.SISTEMA||'Attore non esposto';
+  const documentRef=item.PROOF_URL||item.EVIDENCE_URL||item.LINK_DOCUMENTO||item.URL_DOCUMENTO||item.DRIVE_FILE_ID||item.DOCUMENT_ID||item.ID_DOCUMENTO||'';
+  const href=window.SponsorGrow.safeEvidenceUrl(documentRef);
+  return '<div class="crm-timeline"><time>'+esc(item.TIMESTAMP||'')+'</time><div><b>'+esc(item.OGGETTO||item.CANALE||'Touchpoint')+'</b><p>'+esc(item.SINTESI||'')+'</p><small>'+esc(item.ESITO||'')+'</small>'+
+    '<small class="grow-evidence-provenance">'+esc(source)+' · '+esc(actor)+'</small>'+
+    (documentRef?'<small class="grow-evidence-document">'+(href?'<a href="'+esc(href)+'" target="_blank" rel="noopener noreferrer">Apri documento collegato</a>':'Riferimento documento '+esc(documentRef))+'</small>':'<small class="grow-evidence-document">Nessun documento collegato nel record</small>')+
+    '</div></div>';
+}
 function renderCrmInspector(data){
   const el=$('#crmInspector');if(!el)return;
   if(!data){el.innerHTML='<h3>Profilo CRM</h3><p>Seleziona una persona o azienda per vedere il profilo relazionale completo.</p>';return}
@@ -1313,7 +1329,7 @@ function renderCrmInspector(data){
     '<section class="crm-section"><h3>Contatti</h3><p>'+esc(s.EMAIL||'')+(s.EMAIL&&s.TELEFONO?' · ':'')+esc(s.TELEFONO||'')+'</p><p>'+esc(s.LOCALITA||'')+'</p></section>'+
     '<section class="crm-section"><h3>Tag</h3><p>'+esc(s.CRM_TAGS||'Nessun tag')+'</p></section>'+
     '<section class="crm-section"><h3>Timeline recente</h3>'+
-      (tps.length?tps.slice(0,8).map(x=>'<div class="crm-timeline"><time>'+esc(x.TIMESTAMP||'')+'</time><div><b>'+esc(x.OGGETTO||x.CANALE||'Touchpoint')+'</b><p>'+esc(x.SINTESI||'')+'</p><small>'+esc(x.ESITO||'')+'</small></div></div>').join(''):'<p>Nessun touchpoint registrato.</p>')+
+      (tps.length?tps.slice(0,8).map(renderCrmTouchpoint).join(''):'<p>Nessun touchpoint registrato.</p>')+
     '</section>'+
     '<section class="crm-section"><h3>Accordi / contratti</h3>'+
       (agreements.length?agreements.map(a=>'<div class="crm-agreement"><div><b>'+esc(a.PACCHETTO||a.PARTNER||'Accordo')+'</b><small>'+esc(a.STATO||'')+'</small></div><div><span>Valore</span><strong>'+esc(a['VALORE €']!==''&&a['VALORE €']!=null?'€ '+a['VALORE €']:'Da verificare')+'</strong></div><div><span>Incasso</span><strong>'+esc(a['STATO INCASSO']||'Da verificare')+'</strong></div><p>'+esc(a['ASSET PROMESSI']||'')+'</p><small>'+esc(a['PROSSIMA AZIONE']||'')+'</small></div>').join(''):'<p>Nessun accordo formalizzato collegato.</p>')+

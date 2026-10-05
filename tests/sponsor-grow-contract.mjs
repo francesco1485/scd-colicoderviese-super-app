@@ -6,6 +6,7 @@ const require=createRequire(import.meta.url);
 const grow=require('../lib/sponsor-grow.js');
 const app=fs.readFileSync(new URL('../sponsor/app.js',import.meta.url),'utf8');
 const html=fs.readFileSync(new URL('../sponsor/app.html',import.meta.url),'utf8');
+const css=fs.readFileSync(new URL('../sponsor/app.css',import.meta.url),'utf8');
 const pkg=JSON.parse(fs.readFileSync(new URL('../package.json',import.meta.url),'utf8'));
 
 const prospects=[
@@ -26,17 +27,21 @@ const pipeline=grow.pipelineProjection([
 ]);
 assert.equal(pipeline.unmapped,1,'relationship status is not silently mapped to a pipeline stage');
 assert.equal(pipeline.stages.find(stage=>stage.id==='PROPOSAL').count,1,'only an explicit canonical stage is counted');
+assert.equal(pipeline.unmappedRecords[0].relationshipStatus,'PROPOSAL','unmapped CRM relationship status remains visible as source data');
 assert.deepEqual(grow.STAGES,['DISCOVER','VERIFY','QUALIFY','CONTACT','MEETING','PROPOSAL','NEGOTIATION','WON','LOST','ACTIVATE','PROVE','RENEW','EXPAND']);
 
 const queue=grow.followUpQueue([
   {id:'CRM-1',name:'Azienda Lago',nextAction:'Rivedere proposta',nextDeadline:'2026-10-04',contactPolicy:'MANUALE'},
   {id:'CRM-2',name:'Nessuna scadenza',nextAction:'Verificare fonte'},
-  {id:'CRM-3',name:'Nessuna azione'}
+  {id:'CRM-3',name:'Nessuna azione',type:'PARTNER'}
 ],new Date('2026-10-05T12:00:00'));
-assert.equal(queue.length,2,'only CRM-recorded actions or deadlines enter the reminder queue');
+assert.equal(queue.length,3,'relevant CRM records remain visible even when next-action data is missing');
 assert.equal(queue[0].deadlineState,'OVERDUE','deadline state uses a recorded deadline');
-assert.equal(queue[1].deadline,'','no reminder date is invented');
-assert.equal(queue[1].action,'Verificare fonte','action text is preserved as recorded');
+const withAction=queue.find(item=>item.id==='CRM-2'),withoutAction=queue.find(item=>item.id==='CRM-3');
+assert.equal(withAction.deadline,'','no reminder date is invented');
+assert.equal(withAction.action,'Verificare fonte','recorded action text is preserved');
+assert.equal(withAction.suggestion,'Verifica la relazione e definisci una prossima azione nel CRM.','suggestions are explicitly separate from recorded actions');
+assert.equal(withoutAction.action,'','missing CRM actions are not presented as recorded data');
 
 const proof=grow.activationProofs([
   {TIPO:'ATTIVAZIONE',TIMESTAMP:'2026-10-01',ACTOR:'staff',DRIVE_FILE_ID:'file-1'},
@@ -52,8 +57,12 @@ assert.equal(grow.safeEvidenceUrl('https://example.test/proof'),'https://example
 assert(html.includes('id="growPipeline"'),'private CRM pipeline projection is present');
 assert(html.includes('id="growFollowups"'),'private CRM follow-up queue is present');
 assert(html.includes('id="growSourceState"'),'CRM source freshness/provenance state is present');
+assert(css.includes('#view-crm .page-tools>*{width:100%;min-width:0}'),'CRM filter controls fit narrow mobile widths');
+assert(css.includes('color:#526B82')&&css.includes('5px #005fcc!important'),'small text and keyboard focus use contrast-safe SCD colors');
 assert(app.includes("const url='/api/sponsor/crm'"),'slice uses the existing authenticated CRM API');
 assert(app.includes('activationProofs'),'activation proof projection is wired to CRM detail');
+assert(app.includes("R20 · TOUCHPOINTS_MASTER"),'CRM evidence timeline identifies its source');
+assert(app.includes('Attore non esposto'),'missing evidence actor is not invented');
 assert(!app.includes('/api/sponsor/grow'),'slice does not introduce a parallel CRM endpoint');
 assert(pkg.scripts['test:sponsor-grow'],'focused GROW contract test is registered');
 
