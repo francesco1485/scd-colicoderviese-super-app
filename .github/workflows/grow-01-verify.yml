@@ -1,9 +1,10 @@
-name: SCD GROW GROW-01 Verification
+name: SCD GROW Verification
 
 on:
   push:
     branches:
       - "grow-01-verified-pipeline"
+      - "grow-02-crm-slice"
   workflow_dispatch:
 
 permissions:
