@@ -258,6 +258,8 @@ for(const viewport of [{width:390,height:844},{width:1440,height:900}]){
     let data;
     if(action==='auth.login')data={token:'qa-private-token'};
     else if(action==='auth.validate')data={valid:true};
+    else if(action==='auth.access.log')data={ok:true};
+    else if(action==='auth.identity.resolve')data={matched:true,matchMethod:'QA_SYNTHETIC'};
     else if(action==='dashboard.summary')data=dashboard;
     else if(action==='private.user.workspace')data=workspace;
     else if(action==='account.requests')data={rows:[{id:'REQ-QA-1',subject:'Documento QA',status:'APERTA',createdAt:'2026-10-02T10:00:00Z'}]};
@@ -479,11 +481,18 @@ mark('R56_IDENTITY_ACCESS_JOURNEY');
     if(action==='public.telemetry'){telemetrySeen=true;data={accepted:true}}
     else if(action==='auth.login')data={token:'qa-direction-token'};
     else if(action==='auth.validate')data={valid:true};
+    else if(action==='auth.access.log')data={ok:true};
+    else if(action==='auth.identity.resolve')data={matched:true,matchMethod:'QA_SYNTHETIC'};
     else if(action==='dashboard.summary')data=directionDashboard;
     else if(action==='private.user.workspace')data=directionWorkspace;
     else if(action==='direction.access.invite'){inviteSeen=true;data={ok:true,email:'new.user@example.test',role:'FAMILY',identity:{matched:true,matchMethod:'EMAIL_EXACT'},temporaryCodeSent:true}}
     else if(action==='auth.pin.change'){pinSeen=true;data={ok:true}}
     else if(action==='direction.access.metrics'){metricsSeen=true;data={days:30,activeUsers:4,loginEvents:9,privateDeskOpens:7,daily:[{date:'2026-10-03',activeUsers:4}]}}
+    else if(action==='private.agenda.summary')data={rows:[]};
+    else if(action==='direction.evolution')data={rows:[]};
+    else if(action==='direction.datafabric.actions')data={rows:[]};
+    else if(action==='direction.diagnostics')data={};
+    else if(action==='direction.datafabric.status')data={};
     else if(action==='public.calendar')data=[];
     else if(['public.feed','public.club','public.datafabric.contract'].includes(action))data={};
     else return route.continue();
