@@ -143,6 +143,7 @@ includesAll(m.calendar_event_engine.required_event_fields||[],[
 ],'event model');
 
 includesAll(m.gmail_intelligence.existing_runtime_surfaces||[],['MAIL_OPERATIONS_SHEET/01_EMAIL_ARCHIVE','MAIL_OPERATIONS_SHEET/17_SMART_CLASSIFIER','MAIL_OPERATIONS_SHEET/18_ACTION_QUEUE'],'Gmail existing runtime surfaces');
+includesAll(m.gmail_intelligence.runtime_actions||[],['direction.datafabric.status','direction.datafabric.actions','direction.datafabric.scan.gmail','direction.datafabric.scan.drive'],'Gmail runtime actions');
 assert(m.completeness_engine.confidence_required===true,'Completeness Engine confidence required');
 assert(m.product_direction?.default_entry_route==='#/pulse','R26 default entry route must be #/pulse');
 assert(m.product_direction?.experience_model==='ADAPTIVE_CLUB_OS','R38 experience model must be adaptive club OS');
