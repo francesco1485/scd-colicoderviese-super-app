@@ -23,7 +23,7 @@ jobs:
       - name: Full contract regression
         run: npm run check
       - name: API and resilience
-        run: npm test
+        run: npm run test:contract && npm run test:resilience
       - name: Install browser
         run: |
           npm install --no-save playwright
