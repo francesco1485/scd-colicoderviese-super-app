@@ -102,7 +102,7 @@ for(const viewport of viewports){
   const skyAsset=await page.locator('#mirrorFab img').getAttribute('src');
   if(!/assets\/sky\.png$/.test(String(skyAsset||'')))throw new Error('official Sky mascot missing from chatbot');
     const navLabels=await page.locator('.bottom-nav button').allTextContents();
-  for(const label of ['Home','Calendario','Squadre','Social','Profilo'])if(!navLabels.some(x=>x.includes(label)))throw new Error('mobile nav missing '+label);
+  for(const label of ['HOME','CALENDAR','TEAMS','SOCIAL','PROFILE'])if(!navLabels.some(x=>String(x).toUpperCase().includes(label)))throw new Error('canonical nav missing '+label);
   const visibleLegacy=await page.evaluate(()=>['.home-secondary-hero','.ng-command-ring','.pulse-strip','.ng-constellation','.worlds-preview','.ng-value-engine'].filter(sel=>{const el=document.querySelector(sel);return el&&getComputedStyle(el).display!=='none'}));
   if(visibleLegacy.length)throw new Error('secondary clutter visible on public home: '+visibleLegacy.join(','));
 
@@ -210,7 +210,10 @@ for(const viewport of viewports){
   await page.evaluate(()=>window.SCDNextGen.setView('pulse'));
 
   const shellWidth=await page.locator('.app').evaluate(el=>Math.round(el.getBoundingClientRect().width));
-  if(viewport.width>=1280 && shellWidth<1200)throw new Error('desktop shell too narrow: '+shellWidth+'px');
+  if(viewport.width>=1280){
+    const expectedDesktopShell=Math.min(1600,viewport.width-176);
+    if(shellWidth<expectedDesktopShell-4)throw new Error('desktop shell below adaptive target: '+shellWidth+'px < '+expectedDesktopShell+'px');
+  }
 
   if([390,430,1440,1920].includes(viewport.width)){
     await page.screenshot({path:'test-output/nova-'+viewport.width+'x'+viewport.height+'.png',fullPage:true});
@@ -255,8 +258,6 @@ for(const viewport of [{width:390,height:844},{width:1440,height:900}]){
     let data;
     if(action==='auth.login')data={token:'qa-private-token'};
     else if(action==='auth.validate')data={valid:true};
-    else if(action==='auth.access.log')data={ok:true};
-    else if(action==='auth.identity.resolve')data={matched:true,matchMethod:'QA_SYNTHETIC'};
     else if(action==='dashboard.summary')data=dashboard;
     else if(action==='private.user.workspace')data=workspace;
     else if(action==='account.requests')data={rows:[{id:'REQ-QA-1',subject:'Documento QA',status:'APERTA',createdAt:'2026-10-02T10:00:00Z'}]};
@@ -591,7 +592,7 @@ if(typeof cap.featureFlags?.supabaseCore!=='boolean')throw new Error('supabase f
 const pwaManifest=await api.request.get(base+'/manifest.webmanifest');
 if(!pwaManifest.ok())throw new Error('manifest.webmanifest missing');
 const pwaJson=await pwaManifest.json();
-if(pwaJson.theme_color!=='#041c3a'||pwaJson.background_color!=='#f2f5f9')throw new Error('SCD Arena PWA colors missing');
+if(pwaJson.theme_color!=='#031A35'||pwaJson.background_color!=='#031A35')throw new Error('SCD ONE PWA colors missing');
 for(const resource of ['/sw.js','/robots.txt','/sitemap.xml']){
   const rr=await api.request.get(base+resource);
   if(!rr.ok())throw new Error(resource+' missing');

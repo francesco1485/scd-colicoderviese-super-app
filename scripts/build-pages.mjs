@@ -17,8 +17,9 @@ const legacy=[
   'app.js','scd-adaptive-engine.js','scd-meta-engine.js','scd-twin.js','scd-experience-engine.js','app-r24-router.js'
 ];
 const nova=[
-  'scd-ng.css','scd-synth.css','ui-r52-social.css','lib/scd-operative-engine.js','scd-ng.js','scd-interactions.js',
-  'scd-adaptive-engine.js','scd-meta-engine.js','scd-twin.js','scd-experience-engine.js'
+  'scd-ng.css','scd-synth.css','ui-r52-social.css','scd-one-r57.css',
+  'lib/scd-operative-engine.js','lib/scd-one-pulse.js','lib/scd-one-profile.js','lib/scd-native-adapters.js',
+  'scd-ng.js','scd-interactions.js','scd-adaptive-engine.js','scd-meta-engine.js','scd-twin.js','scd-experience-engine.js'
 ];
 const files=[...common,...(nextgen?nova:legacy)];
 
@@ -38,7 +39,7 @@ fs.writeFileSync(path.join(out,'.nojekyll'),'','utf8');
 
 const html=fs.readFileSync(path.join(out,'index.html'),'utf8');
 const htmlRequired=nextgen
-  ?['scd-ng.css','scd-synth.css','ui-r52-social.css','lib/scd-operative-engine.js','scd-ng.js','scd-interactions.js','scd-adaptive-engine.js','scd-meta-engine.js','scd-twin.js','scd-experience-engine.js','manifest.webmanifest']
+  ?['scd-ng.css','scd-synth.css','ui-r52-social.css','scd-one-r57.css','lib/scd-operative-engine.js','lib/scd-one-pulse.js','lib/scd-one-profile.js','lib/scd-native-adapters.js','scd-ng.js','scd-interactions.js','scd-adaptive-engine.js','scd-meta-engine.js','scd-twin.js','scd-experience-engine.js','manifest.webmanifest']
   :['ui-r21-11.css','ui-r24-shell.css','ui-r26-pulse.css','ui-r38-universe.css','ui-r39-human.css','ui-r40-weekly.css','app.js','scd-meta-engine.js','scd-twin.js','scd-experience-engine.js','app-r24-router.js','manifest.webmanifest'];
 for(const required of htmlRequired){
   if(!html.includes(required)) throw new Error('index.html does not reference '+required);
@@ -46,7 +47,7 @@ for(const required of htmlRequired){
 
 const sw=fs.readFileSync(path.join(out,'sw.js'),'utf8');
 const swRequired=nextgen
-  ?['scd-ng.css','scd-synth.css','ui-r52-social.css','lib/scd-operative-engine.js','scd-ng.js','scd-interactions.js','scd-adaptive-engine.js','scd-meta-engine.js','scd-twin.js','scd-experience-engine.js']
+  ?['scd-ng.css','scd-synth.css','ui-r52-social.css','scd-one-r57.css','lib/scd-operative-engine.js','lib/scd-one-pulse.js','lib/scd-one-profile.js','lib/scd-native-adapters.js','scd-ng.js','scd-interactions.js','scd-adaptive-engine.js','scd-meta-engine.js','scd-twin.js','scd-experience-engine.js']
   :['ui-r21-11.css','ui-r24-shell.css','ui-r26-pulse.css','ui-r38-universe.css','ui-r39-human.css','ui-r40-weekly.css','scd-meta-engine.js','scd-twin.js','scd-experience-engine.js','app-r24-router.js','delete-account.html'];
 for(const required of swRequired){
   if(!sw.includes(required)) throw new Error('service worker does not cache '+required);

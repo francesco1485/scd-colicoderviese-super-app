@@ -1,0 +1,65 @@
+name: SCD ONE ONE-01 Verification
+
+on:
+  push:
+    branches:
+      - "release-r57-scd-one-clean"
+      - "copilot/ai-scd-one-again"
+      - "ai-scd-one"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  one-01-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install dependencies
+        run: npm install
+      - name: Canonical manifest
+        run: npm run test:manifest
+      - name: SCD ONE contract
+        run: npm run test:scd-one-contract
+      - name: Runtime syntax
+        run: |
+          node --check server.js
+          node --check scd-ng.js
+          node --check lib/scd-one-pulse.js
+          node --check lib/scd-one-profile.js
+          node --check lib/scd-native-adapters.js
+          node --check scripts/validate-scd-one-contract.mjs
+      - name: Full regression contract
+        run: npm run check
+      - name: Install visual QA browser
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Start isolated SCD ONE test server
+        run: |
+          SCD_APPS_SCRIPT_URL=http://127.0.0.1:1 npm start > /tmp/scd-one-server.log 2>&1 &
+          echo $! > /tmp/scd-one-server.pid
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:10000/health >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/scd-one-server.log
+          exit 1
+      - name: Seven viewport visual QA
+        run: node tests/scd-one-visual-qa.mjs
+      - name: Upload ONE-01 visual evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scd-one-one-01-visual-qa
+          path: test-output/one-01/*
+          if-no-files-found: ignore
+          retention-days: 14
+      - name: Server logs
+        if: always()
+        run: cat /tmp/scd-one-server.log || true
