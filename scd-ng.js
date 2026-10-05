@@ -44,7 +44,7 @@ window.addEventListener('appinstalled',()=>{
   const button=document.querySelector('#installApp');
   if(button)button.hidden=true;
 });
-const state={view:'pulse',filter:'ALL',events:[],upcoming:[],fullCalendar:[],calendarLoaded:false,calendarLoading:false,calendarSourceState:'UNVERIFIED',calendarPeriod:'WEEK',calendarTeam:'ALL',calendarCategory:'ALL',calendarType:'ALL',calendarSearch:'',teamsSearch:'',teamsCategory:'ALL',socialFilter:'ALL',socialSearch:'',news:null,clubContent:[],sportData:{results:[],standings:[],headToHead:[]},partners:[],publicProfiles:[],nextMatch:null,privateToken:'',privateEmail:'',privateData:null,workspace:null,privateLoading:false,privateError:''};
+const state={view:'pulse',filter:'ALL',events:[],upcoming:[],fullCalendar:[],calendarLoaded:false,calendarLoading:false,calendarSourceState:'UNVERIFIED',calendarPeriod:'WEEK',calendarTeam:'ALL',calendarCategory:'ALL',calendarType:'ALL',calendarSearch:'',teamsSearch:'',teamsCategory:'ALL',socialFilter:'ALL',socialSearch:'',news:null,clubContent:[],sportData:{results:[],standings:[],headToHead:[]},partners:[],publicProfiles:[],nextMatch:null,privateToken:'',privateEmail:'',privateData:null,workspace:null,privateLoading:false,privateError:'',coreControl:null,coreControlSources:null,coreControlLoading:false,coreControlError:''};
 const officialChannels=[
  {id:'site',label:'Sito ufficiale',url:'https://www.colicoderviese.it/',terms:'sito web comunicazioni servizi'},
  {id:'facebook',label:'Facebook SCD',url:'https://www.facebook.com/ColicoDerviese',terms:'facebook social pagina'},
@@ -643,7 +643,7 @@ function savePrivateSession(token,email){
  localStorage.setItem(PRIVATE_SESSION_KEY,JSON.stringify({token:state.privateToken,email:state.privateEmail,savedAt:new Date().toISOString()}));
 }
 function clearPrivateSession(){
- state.privateToken='';state.privateEmail='';state.privateData=null;state.workspace=null;state.privateError='';
+ state.privateToken='';state.privateEmail='';state.privateData=null;state.workspace=null;state.privateError='';state.coreControl=null;state.coreControlSources=null;state.coreControlLoading=false;state.coreControlError='';
  localStorage.removeItem(PRIVATE_SESSION_KEY);
 }
 async function privatePost(action,payload={},token=state.privateToken){
@@ -658,7 +658,7 @@ function legacyWorkspace(data={}){
  if(data.transport||Array.isArray(data.personal)&&data.personal.length)mods.push('PULMINI');
  if(Array.isArray(data.personal)&&data.personal.length)mods.push('TESSERATI');
  mods.push('RICHIESTE');
- if(p.direction)mods.push('APPROVAZIONI','DOCUMENTI','CRM');
+ if(p.direction)mods.push('DASHBOARD','APPROVAZIONI','SCADENZE','DOCUMENTI');
  return {email:String(u.email||state.privateEmail||''),name:String(u.name||u.fullName||u.email||'Profilo SCD'),role:String(u.role||u.coreRole||u.type||(p.direction?'DIREZIONE':'STAFF')),privateDeskProfile:'R20_FALLBACK',defaultModules:[...new Set(mods)],communicationScope:[],dataScope:['R20 DASHBOARD'],areas:[]};
 }
 async function loadWorkspaceProfile(){
@@ -729,6 +729,164 @@ function bindPrivateDesk(){
  $('#privateDeskLogout')?.addEventListener('click',()=>{clearPrivateSession();renderPrivateDesk();toast('Sessione privata chiusa')});
  $$('[data-private-module]').forEach(b=>b.onclick=()=>openPrivateModule(b.dataset.privateModule));
 }
+function coreDirectionUser(workspace=state.workspace,data=state.privateData){
+ const role=String(workspace?.role||data?.user?.role||data?.user?.coreRole||data?.user?.type||'').toUpperCase();
+ return data?.permissions?.direction===true||['DG','DIREZIONE','ADMIN'].includes(role);
+}
+function coreSourceLabel(key){
+ return ({agenda:'AGENDA SCD',evolution:'EVOLUTION QUEUE',mailactions:'POSTA OPERATIVA',diagnostics:'DIAGNOSTICA',datafabric:'DATA FABRIC',dashboard:'R20 DASHBOARD'})[key]||String(key||'FONTE').toUpperCase();
+}
+function coreSourceResult(key,stateName,data=null,error=''){
+ return {state:stateName,label:coreSourceLabel(key),data,checkedAt:new Date().toISOString(),error:String(error||'')};
+}
+async function loadCoreControlRoom(force=false){
+ if(!coreDirectionUser())return;
+ if(state.coreControlLoading)return;
+ if(state.coreControl&&!force){renderCoreControlRoom();return}
+ state.coreControlLoading=true;state.coreControlError='';
+ renderCoreControlRoom();
+ const specs=[
+   ['agenda','private.agenda.summary',{}],
+   ['evolution','direction.evolution',{limit:60}],
+   ['mailactions','direction.datafabric.actions',{limit:60}],
+   ['diagnostics','direction.diagnostics',{}],
+   ['datafabric','direction.datafabric.status',{}]
+ ];
+ const sources={dashboard:coreSourceResult('dashboard',state.privateData?'VERIFIED':'UNVERIFIED',state.privateData||null)};
+ const settled=await Promise.allSettled(specs.map(async spec=>({key:spec[0],data:await privatePost(spec[1],spec[2])})));
+ settled.forEach((result,index)=>{
+   const key=specs[index][0];
+   if(result.status==='fulfilled')sources[key]=coreSourceResult(key,'VERIFIED',result.value.data);
+   else sources[key]=coreSourceResult(key,'UNAVAILABLE',null,result.reason?.message||result.reason||'Fonte non disponibile');
+ });
+ state.coreControlSources=sources;
+ try{
+   const engine=globalThis.ScdCoreControlRoom;
+   if(!engine?.build)throw new Error('Motore Control Room non disponibile');
+   state.coreControl=engine.build({
+     today:todayKey(),
+     sources,
+     agenda:sources.agenda?.data,
+     evolution:sources.evolution?.data,
+     mailactions:sources.mailactions?.data
+   });
+ }catch(err){
+   state.coreControl=null;state.coreControlError=String(err?.message||err);
+ }
+ state.coreControlLoading=false;
+ renderCoreControlRoom();
+}
+function coreOverallState(model){
+ if(state.coreControlLoading)return 'PENDING';
+ if(state.coreControlError)return 'UNAVAILABLE';
+ const a=String(model?.sources?.agenda?.state||'UNVERIFIED'),e=String(model?.sources?.evolution?.state||'UNVERIFIED'),m=String(model?.sources?.mailactions?.state||'UNVERIFIED');
+ if(a==='VERIFIED'&&e==='VERIFIED'&&m==='VERIFIED')return 'VERIFIED';
+ if(a==='VERIFIED'||e==='VERIFIED'||m==='VERIFIED')return 'PARTIAL';
+ if(a==='PENDING'||e==='PENDING'||m==='PENDING')return 'PENDING';
+ if(a==='UNAVAILABLE'&&e==='UNAVAILABLE'&&m==='UNAVAILABLE')return 'UNAVAILABLE';
+ return 'UNVERIFIED';
+}
+function coreLaneMeta(key){
+ return ({
+   TODAY:['◷','OGGI'],
+   PRIORITY:['!','PRIORITÀ'],
+   TODO:['✓','DA FARE'],
+   APPROVALS:['◆','DA APPROVARE'],
+   DEADLINES:['⌛','SCADENZE'],
+   CHANGES:['↻','CAMBIAMENTI']
+ })[key]||['•',String(key||'')];
+}
+function coreFormatDateTime(value){
+ if(!value)return '';
+ const d=new Date(value);
+ if(!Number.isFinite(d.getTime()))return String(value);
+ return new Intl.DateTimeFormat('it-IT',{timeZone:'Europe/Rome',day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}).format(d);
+}
+function coreItemHtml(item={}){
+ const meta=[];
+ if(item.time)meta.push(item.time);
+ if(item.location)meta.push(item.location);
+ if(item.due)meta.push('Scad. '+coreFormatDateTime(item.due));
+ if(item.owner)meta.push(item.owner);
+ if(item.priority)meta.push('Priorità '+item.priority);
+ if(item.area)meta.push(item.area);
+ const status=item.status?'<span class="core-item-status">'+esc(item.status)+'</span>':'';
+ const action=item.nextAction?'<p class="core-item-action">'+esc(item.nextAction)+'</p>':'';
+ const sourceLink=item.gmailUrl?'<a class="core-item-link" href="'+esc(item.gmailUrl)+'" target="_blank" rel="noopener noreferrer">Apri fonte Gmail ↗</a>':'';
+ return '<article class="core-control-item"><header><h4>'+esc(item.title||'Voce operativa')+'</h4>'+status+'</header>'+
+   (meta.length?'<div class="core-item-meta">'+meta.map(x=>'<span>'+esc(x)+'</span>').join('')+'</div>':'')+
+   action+
+   '<div class="core-item-source">'+esc(item.source||'FONTE')+' · '+esc(item.sourceState||'VERIFIED')+'</div>'+sourceLink+'</article>';
+}
+function coreSourceCount(data){
+ if(Array.isArray(data))return data.length;
+ for(const key of ['rows','items','events','actions','queue']){
+   if(Array.isArray(data?.[key]))return data[key].length;
+ }
+ return null;
+}
+function openCoreSourceStatus(key){
+ const src=state.coreControlSources?.[key];
+ if(!src)return;
+ const count=coreSourceCount(src.data);
+ const detail=[
+   '<div class="panel-detail">',
+   '<span class="eyebrow">CORE SOURCE · '+esc(coreSourceLabel(key))+'</span>',
+   '<h2>'+esc(src.state||'UNVERIFIED')+'</h2>',
+   '<p>'+esc(src.error||'Fonte letta senza errore registrato.')+'</p>',
+   '<div class="core-source-detail-grid">',
+   '<div><small>ULTIMO CONTROLLO</small><b>'+esc(src.checkedAt?coreFormatDateTime(src.checkedAt):'Non registrato')+'</b></div>',
+   '<div><small>RECORD ESPLICITI</small><b>'+esc(count==null?'Non applicabile':String(count))+'</b></div>',
+   '</div>',
+   '<small>La Control Room non modifica questa fonte da questo pannello. Mostra soltanto stato, provenienza e dati già autorizzati.</small>',
+   '</div>'
+ ].join('');
+ openPanel('Fonte operativa · '+coreSourceLabel(key),detail);
+}
+function renderCoreControlRoom(){
+ const room=$('#coreControlRoom'),sourcesEl=$('#coreControlSources'),lanesEl=$('#coreControlLanes'),statusEl=$('#coreControlStatus'),refresh=$('#refreshCoreControlRoom'),reset=$('#resetCoreControlFocus');
+ if(!room||!sourcesEl||!lanesEl||!statusEl)return;
+ const allowed=coreDirectionUser();
+ room.hidden=!allowed;
+ if(!allowed)return;
+ if(refresh){refresh.disabled=state.coreControlLoading;refresh.textContent=state.coreControlLoading?'Aggiornamento…':'Aggiorna fonti';refresh.onclick=()=>loadCoreControlRoom(true)}
+ if(reset){reset.onclick=()=>{room.removeAttribute('data-focus-lane');reset.hidden=true}}
+ const rawSources=state.coreControlSources||{};
+ const sourceKeys=['agenda','evolution','mailactions','diagnostics','datafabric','dashboard'];
+ sourcesEl.innerHTML=sourceKeys.map(key=>{
+   const src=rawSources[key]||{state:state.coreControlLoading?'PENDING':'UNVERIFIED',label:coreSourceLabel(key)};
+   const detail=src.error?'Non disponibile':src.checkedAt?coreFormatDateTime(src.checkedAt):'In attesa';
+   return '<button type="button" class="core-source-chip" data-core-source="'+esc(key)+'" data-state="'+esc(src.state||'UNVERIFIED')+'" title="'+esc(src.error||'')+'"><b>'+esc(src.label||coreSourceLabel(key))+'</b><span>'+esc(src.state||'UNVERIFIED')+' · '+esc(detail)+'</span></button>';
+ }).join('');
+ $$('[data-core-source]').forEach(button=>button.onclick=()=>openCoreSourceStatus(button.dataset.coreSource));
+ const model=state.coreControl;
+ const overall=coreOverallState(model);
+ statusEl.dataset.state=overall;
+ statusEl.textContent=overall==='VERIFIED'?'FONTI OPERATIVE · VERIFICATE':overall==='PARTIAL'?'FONTI · PARZIALI':overall==='PENDING'?'FONTI · IN AGGIORNAMENTO':overall==='UNAVAILABLE'?'FONTI · NON DISPONIBILI':'FONTI · DA VERIFICARE';
+ if(state.coreControlLoading){
+   lanesEl.innerHTML='<div class="core-lane-empty"><b>Carico la Control Room</b>Leggo soltanto fonti autorizzate dal profilo Direzione.</div>';return;
+ }
+ if(state.coreControlError||!model){
+   lanesEl.innerHTML='<div class="core-lane-empty"><b>Control Room non disponibile</b>'+esc(state.coreControlError||'Nessun dato verificato disponibile.')+'</div>';return;
+ }
+ lanesEl.innerHTML=model.LANE_ORDER?.map?.(()=> '').join('')||'';
+ const order=globalThis.ScdCoreControlRoom?.LANE_ORDER||['TODAY','PRIORITY','TODO','APPROVALS','DEADLINES','CHANGES'];
+ lanesEl.innerHTML=order.map(key=>{
+   const m=coreLaneMeta(key),items=model.lanes?.[key]||[],sourceState=model.laneStates?.[key]||'UNVERIFIED';
+   const empty=sourceState==='VERIFIED'
+     ?'<div class="core-lane-empty"><b>Nessuna voce restituita</b>La fonte è stata letta; non genero attività sostitutive.</div>'
+     :'<div class="core-lane-empty"><b>Fonte '+esc(sourceState)+'</b>Nessun contenuto viene inventato finché la fonte non è verificata.</div>';
+   return '<section class="core-lane" data-lane="'+esc(key)+'"><header class="core-lane-head"><span>'+m[0]+'</span><b>'+m[1]+'</b><span class="core-lane-count">'+(sourceState==='VERIFIED'?String(items.length):'—')+'</span></header><span class="core-lane-source-state" data-state="'+esc(sourceState)+'">'+esc(sourceState)+'</span><div class="core-lane-list">'+(items.length?items.map(coreItemHtml).join(''):empty)+'</div></section>';
+ }).join('');
+}
+function focusCoreControlLane(lane){
+ const room=$('#coreControlRoom'),reset=$('#resetCoreControlFocus');
+ if(!room||room.hidden)return;
+ room.dataset.focusLane=lane;
+ if(reset)reset.hidden=false;
+ room.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
 function renderPrivateDesk(){
  const queue=$('#actionQueue'),dock=$('#deskServiceDock'),status=$('#deskScopeStatus'),title=$('#deskHeroTitle'),copy=$('#deskHeroCopy');
  if(!queue||!dock)return;
@@ -739,13 +897,14 @@ function renderPrivateDesk(){
    if(copy)copy.textContent='Accedi con l’account SCD. Ruolo, moduli e dati vengono assegnati dalla Società.';
    queue.innerHTML='<form class="desk-auth-card" id="privateDeskLoginForm"><span class="eyebrow">ACCOUNT SCD</span><h3>Accedi al Private Desk</h3><p>Email societaria e PIN/codice temporaneo. Nessun ruolo viene scelto manualmente.</p><label>Email<input id="privateDeskEmail" type="email" autocomplete="email" required value="'+esc(saved.email||'')+'"></label><label>PIN / codice<input id="privateDeskCode" type="password" inputmode="numeric" autocomplete="current-password" required></label><div class="desk-auth-actions"><button class="btn primary" type="submit">Accedi</button><button class="btn glass" type="button" id="privateDeskRequestCode">Richiedi codice</button></div><small id="privateDeskLoginState">'+esc(state.privateError||'')+'</small></form>';
    dock.innerHTML='<div class="desk-service-empty"><b>Moduli protetti</b><span>Compaiono dopo autenticazione e verifica dello scope.</span></div>';
+   const coreRoom=$('#coreControlRoom');if(coreRoom)coreRoom.hidden=true;
    bindPrivateDesk();return;
  }
  const moduleSet=new Set((w.defaultModules||[]).map(x=>String(x||'').trim().toUpperCase()).filter(Boolean)),u=state.privateData?.user||{},perm=state.privateData?.permissions||{},personal=Array.isArray(state.privateData?.personal)?state.privateData.personal:[];
  if(personal.length){moduleSet.add('TESSERATI');moduleSet.add('PULMINI')}
  moduleSet.add('RICHIESTE');moduleSet.add('SICUREZZA');
  if(u.staff||perm.direction||['STAFF','MISTER','MANAGER','SECRETARIAT','REGISTRATION','TOURNAMENTS','DIREZIONE','ADMIN'].includes(String(u.role||'').toUpperCase())){moduleSet.add('PRESENZE');moduleSet.add('CONVOCAZIONI');moduleSet.add('COMUNICAZIONI')}
- if(perm.direction||['DIREZIONE','ADMIN'].includes(String(u.role||'').toUpperCase())){moduleSet.add('ACCESSI');moduleSet.add('METRICHE')}
+ if(perm.direction||['DG','DIREZIONE','ADMIN'].includes(String(u.role||'').toUpperCase())){moduleSet.add('DASHBOARD');moduleSet.add('APPROVAZIONI');moduleSet.add('SCADENZE');moduleSet.add('ACCESSI');moduleSet.add('METRICHE')}
  const modules=[...moduleSet];
  if(status)status.textContent=(w.privateDeskProfile||'ROLE / SCOPE').replaceAll('_',' ');
  if(title)title.innerHTML=esc(w.name||'Private Desk')+'<br><em>'+esc(w.role||'Profilo SCD')+'</em>';
@@ -753,6 +912,8 @@ function renderPrivateDesk(){
  queue.innerHTML='<article class="desk-profile-live"><div><span class="eyebrow">PROFILO OPERATIVO</span><h3>'+esc(w.name||w.email||'Utente SCD')+'</h3><p>'+esc(w.role||'')+' · '+esc(w.privateDeskProfile||'ROLE/SCOPE')+'</p></div><button type="button" id="privateDeskLogout">Esci</button></article><article class="desk-scope-card"><b>Scope dati</b><span>'+esc((w.dataScope||[]).join(' · ')||'Scope dal gestionale')+'</span><b>Comunicazioni</b><span>'+esc((w.communicationScope||[]).join(' · ')||'Secondo ruolo')+'</span></article>';
  dock.innerHTML=modules.length?modules.map(module=>{const m=deskMeta(module);return '<button type="button" data-private-module="'+esc(module)+'"><span>'+m[0]+'</span><b>'+esc(m[1])+'</b><small>'+esc(m[2])+'</small></button>'}).join(''):'<div class="desk-service-empty"><b>Nessun modulo assegnato</b><span>Il profilo è autenticato ma non ha moduli attivi.</span></div>';
  bindPrivateDesk();
+ renderCoreControlRoom();
+ if(coreDirectionUser()&&!state.coreControl&&!state.coreControlLoading)loadCoreControlRoom();
 }
 async function ensurePrivateDesk(force=false){
  const saved=readPrivateSession();
@@ -916,7 +1077,8 @@ function openPrivateAccessManager(){
 function openPrivateModule(module){
  const w=state.workspace||{},d=state.privateData||{},m=deskMeta(module);
  if(['CALENDARIO','EVENTI','TORNEI_EVENTI','BIGLIETTERIA'].includes(module)){setView('calendar');return}
- if(['CRM','CONTRATTI','REPORT','APPROVAZIONI'].includes(module)){
+ if(['DASHBOARD','APPROVAZIONI','SCADENZE'].includes(module)){focusCoreControlLane(module==='APPROVAZIONI'?'APPROVALS':module==='SCADENZE'?'DEADLINES':'TODAY');return}
+ if(['CRM','CONTRATTI','REPORT'].includes(module)){
    const layer=openPanel(m[1],'<div class="panel-detail private-module-panel"><span class="eyebrow">AREA COMMERCIALE RISERVATA</span><h2>'+esc(m[1])+'</h2><p>Questa funzione prosegue nella Sponsor Platform protetta.</p><button class="btn primary" id="deskOpenSponsorPortal">Apri Sponsor Platform</button></div>');
    $('#deskOpenSponsorPortal',layer).onclick=()=>{location.href='/sponsor/?login=1'};return;
  }
