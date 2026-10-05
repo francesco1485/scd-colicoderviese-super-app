@@ -3756,10 +3756,10 @@ function openCepaInitiativeEditor(id=null){
         const cc=window.userEmail&&window.userEmail.toLowerCase()!==ACCESS_APPROVER_EMAIL?[window.userEmail]:[]
         await supabase.from('crm_communication_outbox').insert({
           organization_id:window.orgId,actor_user_id:window.userId,communication_type:'event',source_type:'agenda_event',source_id:agenda.id,
-          from_email:'sportclubcolico@gmail.com',to_emails:[ACCESS_APPROVER_EMAIL],cc_emails:cc,
+          from_email:ACCESS_APPROVER_EMAIL,to_emails:[ACCESS_APPROVER_EMAIL],cc_emails:cc,
           subject:'[C.E.P.A.] '+saved.title+' · '+fmtDateTime(planned),
           body_text:'Evento C.E.P.A.: '+saved.title+'\\nData: '+fmtDateTime(planned)+'\\nLuogo: '+(saved.venue_name||saved.territory||'Da definire')+'\\n\\n'+(saved.public_summary||saved.objective||''),
-          status:'pending',provider:'gmail',metadata:{requires_backend_dispatch:true,cepa_initiative_id:saved.id,calendar_sync_pending:true}
+          status:(integrationRegistry.find(x=>x.code==='cepa_email_channel'&&x.status==='active'&&String(x.account_email||'').toLowerCase()===ACCESS_APPROVER_EMAIL)?'pending':'draft'),provider:'gmail',metadata:{requires_backend_dispatch:!!integrationRegistry.find(x=>x.code==='cepa_email_channel'&&x.status==='active'&&String(x.account_email||'').toLowerCase()===ACCESS_APPROVER_EMAIL),email_channel:'cepa_email_channel',required_sender:ACCESS_APPROVER_EMAIL,cepa_initiative_id:saved.id,calendar_sync_pending:true}
         })
       }
     }else if(planned&&saved.agenda_event_id){
