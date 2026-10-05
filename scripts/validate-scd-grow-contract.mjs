@@ -27,7 +27,7 @@ ok(engine.includes('function activationProofs('),'activation proof extraction mi
 ok(engine.includes('function safeEvidenceUrl('),'safe evidence URL guard missing');
 ok(css.includes('@media(max-width:700px)'),'mobile GROW composition missing');
 ok(css.includes('GROW-02 · canonical CRM evidence'),'GROW-02 evidence styling missing');
-ok(css.includes('GROW-03 · proof provenance'),'proof provenance styling missing');
+ok(css.includes('GROW-02 · proof provenance'),'proof provenance styling missing');
 ok(css.includes('prefers-reduced-motion:reduce'),'reduced-motion support missing');
 
 await import('../sponsor/grow-pipeline.js');
