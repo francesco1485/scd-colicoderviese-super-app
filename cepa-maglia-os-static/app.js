@@ -35,7 +35,7 @@ const viewMeta={
 
 let ecosystem=[],projects=[],actions=[],marketHubs=[],marketEntities=[],contacts=[],timeline=[],documents=[],partnerRequirements=[],blueprints=[],subjects=[],initiatives=[],cepaContent=[],cepaAcademy=[],cepaSpeakers=[],products=[],productKnowledge=[],comparisons=[],collaborators=[],collaboratorTerms=[],portfolioSnapshots=[],businessAssessments=[],growthKits=[],distributionWatchlists=[],distributionCandidates=[],distributionEvidence=[],mailTemplates=[],mailDrafts=[],cepaExpansion=[],cepaReadiness=[],assistantMessages=[],recoveryRows=[],members=[],liaCapabilities=[],liaFolders=[],liaOrders=[],liaFiles=[],researchSources=[],researchInsights=[],liaActionRules=[],liaApprovals=[],roleViewAccess=[],liaAutomationRuns=[],assetRegistry=[],expertProtocols=[],uxUsageEvents=[],accessRequests=[],commercialLeads=[],publicShowcase=[],integrationRegistry=[],agendaEvents=[],agendaAttendees=[],communicationOutbox=[],relationshipClaims=[],crmNotifications=[]
 let officeAssignments=[],officeMessages=[],officeSnapshots=[],officeCases=[],officeWorkflow=[],officeCepaActivities=[],officeImports=[]
-let commercialClients=[],pipelineCases=[],clientCheckups=[],clientInteractions=[],clientWorkItems=[],clientPolicies=[],publicCepaSubjects=[],publicCepaEvents=[],publicAuthConfig={otp_enabled:false,sender:'sportclubcolico@gmail.com'}
+let commercialClients=[],pipelineCases=[],clientCheckups=[],clientInteractions=[],clientWorkItems=[],clientPolicies=[],publicCepaSubjects=[],publicCepaEvents=[],publicCepaPoints=[],publicAuthConfig={otp_enabled:false,sender:'sportclubcolico@gmail.com'}
 let crmProfiles=[],crmModules=[],crmRoleTemplates=[],crmRecommendations=[]
 let currentPartnerId=null,currentOfficeId=null,currentOfficeProductId=null,currentCepaHubId=null,currentCommerceTab='clients'
 let currentAgendaMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1)
@@ -142,6 +142,7 @@ async function loadPublicPortal(){
   }else{
     publicCepaSubjects=cepaResult.data?.subjects||[]
     publicCepaEvents=cepaResult.data?.events||[]
+    publicCepaPoints=cepaResult.data?.points||[]
     publicAuthConfig=cepaResult.data?.auth||{otp_enabled:false,sender:'sportclubcolico@gmail.com'}
   }
   if($('otpLoginBtn'))$('otpLoginBtn').classList.toggle('hidden',!publicAuthConfig.otp_enabled)
@@ -151,6 +152,20 @@ function renderPublicCepaFeed(){
   if($('publicCepaThemeGrid'))$('publicCepaThemeGrid').innerHTML=publicCepaSubjects.map(x=>
     '<article class="cepa-theme-card"><span>'+esc(String(x.domain||'educazione').replaceAll('_',' '))+'</span><strong>'+esc(x.title)+'</strong><p>'+esc(x.description||'Contenuto in sviluppo presso il Centro C.E.P.A.')+'</p><small>'+esc((x.target_audiences||[]).join(' · '))+'</small></article>'
   ).join('')||'<div class="empty public-empty-state"><strong>Catalogo in aggiornamento.</strong><p>I temi C.E.P.A. verranno pubblicati man mano che completano il percorso di validazione interna.</p></div>'
+
+  if($('publicCepaPointGrid')){
+    $('publicCepaPointGrid').innerHTML=publicCepaPoints.map(x=>{
+      const visual=x.cover_url?'<div class="cepa-point-visual"><img src="'+esc(x.cover_url)+'" alt="" loading="lazy"></div>':'<div class="cepa-point-visual placeholder"><span>C.E.P.A. / HDI</span></div>'
+      const labels=(x.labels||[]).map(v=>'<span>'+esc(v)+'</span>').join('')
+      const contacts=[x.phone,x.email].filter(Boolean).map(v=>'<small>'+esc(v)+'</small>').join('')
+      return '<article class="cepa-point-card">'+visual+
+        '<div class="cepa-point-content"><div class="cepa-point-tags">'+labels+'</div><h3>'+esc(x.title||x.city)+'</h3>'+
+        '<p>'+esc(x.summary||'Presidio territoriale C.E.P.A. / HDI.')+'</p>'+
+        '<div class="cepa-point-address"><strong>'+esc([x.address,[x.postal_code,x.city,x.province].filter(Boolean).join(' ')].filter(Boolean).join(' · '))+'</strong>'+contacts+'</div>'+
+        (x.contact_url?'<a class="cepa-point-link" href="'+esc(x.contact_url)+'" target="_blank" rel="noopener">Contatti ufficiali →</a>':'')+
+        '</div></article>'
+    }).join('')||'<div class="empty public-empty-state"><strong>Punti territoriali in aggiornamento.</strong><p>Mostriamo soltanto sedi con dati confermati.</p></div>'
+  }
 
   const upcoming=publicCepaEvents.filter(x=>!x.completed_at)
   const past=publicCepaEvents.filter(x=>!!x.completed_at)
