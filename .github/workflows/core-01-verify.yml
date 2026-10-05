@@ -5,6 +5,7 @@ on:
     branches:
       - "core-01-direction-control-room"
       - "core-02-source-diagnostics"
+      - "r57-core-02-reconciled"
   workflow_dispatch:
 
 permissions:
