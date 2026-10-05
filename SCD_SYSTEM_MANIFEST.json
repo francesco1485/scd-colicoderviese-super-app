@@ -2265,6 +2265,29 @@
           "disabled_status": "GATED_OFF_NOT_LIVE"
         }
       }
+    },
+    "product_convergence": {
+      "release": "R57.PRODUCT_CONVERGENCE",
+      "state": "RELEASE_CANDIDATE",
+      "apps": {
+        "SCD_ONE": "INTEGRATED",
+        "SCD_CORE": "INTEGRATED",
+        "SCD_GROW": "INTEGRATED"
+      },
+      "shared_core": [
+        "R20",
+        "SCD_PULSE",
+        "SCD_COMMAND_R22",
+        "SCD_GMAIL",
+        "SCD_DRIVE",
+        "SCD_GOOGLE_CALENDAR"
+      ],
+      "production_activation_requires": [
+        "CI_GREEN",
+        "RENDER_EXACT_SHA",
+        "SUPABASE_ADVISORS",
+        "R20_RUNTIME_PROBE"
+      ]
     }
   },
   "capability_map": [
@@ -4345,28 +4368,5 @@
       "DOCUMENT_RESEARCH"
     ],
     "high_impact_rule": "VERIFY_JURISDICTION_DATE_SOURCE_AND_ESCALATE_WHEN_PROFESSIONAL_LICENSE_IS_REQUIRED"
-  },
-  "product_convergence": {
-    "release": "R57.PRODUCT_CONVERGENCE",
-    "state": "RELEASE_CANDIDATE",
-    "apps": {
-      "SCD_ONE": "INTEGRATED",
-      "SCD_CORE": "INTEGRATED",
-      "SCD_GROW": "INTEGRATED"
-    },
-    "shared_core": [
-      "R20",
-      "SCD_PULSE",
-      "SCD_COMMAND_R22",
-      "SCD_GMAIL",
-      "SCD_DRIVE",
-      "SCD_GOOGLE_CALENDAR"
-    ],
-    "production_activation_requires": [
-      "CI_GREEN",
-      "RENDER_EXACT_SHA",
-      "SUPABASE_ADVISORS",
-      "R20_RUNTIME_PROBE"
-    ]
   }
 }
