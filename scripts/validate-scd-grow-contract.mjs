@@ -1,3 +1,4 @@
+// Canonical SCD GROW branch contract
 import fs from 'node:fs';
 
 function ok(condition,message){if(!condition)throw new Error(message)}
