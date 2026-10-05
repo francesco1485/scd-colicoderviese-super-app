@@ -263,6 +263,8 @@ for(const viewport of [{width:390,height:844},{width:1440,height:900}]){
     else if(action==='account.requests')data={rows:[{id:'REQ-QA-1',subject:'Documento QA',status:'APERTA',createdAt:'2026-10-02T10:00:00Z'}]};
     else if(action==='private.attendance.get')data={statuses:['PRESENTE','ASSENTE','GIUSTIFICATO'],players:[{code:'P001',name:'Atleta Uno',status:'PRESENTE'}]};
     else if(['private.attendance.save','private.convocation.create','private.convocation.reply','private.transport.request','private.message.send','private.request.submit'].includes(action))data={ok:true,id:'QA-WRITE-1'};
+    else if(action==='public.calendar')data=[];
+    else if(['public.feed','public.club','public.datafabric.contract'].includes(action))data={};
     else return route.continue();
     await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({ok:true,data})});
   });
@@ -378,6 +380,8 @@ for(const roleCase of [
     else if(action==='dashboard.summary')data=roleDashboard;
     else if(action==='private.user.workspace')data=roleWorkspace;
     else if(action==='account.requests')data={rows:[]};
+    else if(action==='public.calendar')data=[];
+    else if(['public.feed','public.club','public.datafabric.contract'].includes(action))data={};
     else return route.continue();
     await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({ok:true,data})});
   });
@@ -427,7 +431,9 @@ mark('R56_PUBLIC_IDENTITY_PREFLIGHT');
       data={accepted:true};
     }else if(action==='public.registration'){
       registrationSeen=true;data={requestId:'QA-REG-001'};
-    }else return route.continue();
+    }else if(action==='public.calendar')data=[];
+    else if(['public.feed','public.club','public.datafabric.contract'].includes(action))data={};
+    else return route.continue();
     await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({ok:true,data})});
   });
   await joinPage.goto(base+'/#pulse',{waitUntil:'domcontentloaded',timeout:30000});
@@ -478,6 +484,8 @@ mark('R56_IDENTITY_ACCESS_JOURNEY');
     else if(action==='direction.access.invite'){inviteSeen=true;data={ok:true,email:'new.user@example.test',role:'FAMILY',identity:{matched:true,matchMethod:'EMAIL_EXACT'},temporaryCodeSent:true}}
     else if(action==='auth.pin.change'){pinSeen=true;data={ok:true}}
     else if(action==='direction.access.metrics'){metricsSeen=true;data={days:30,activeUsers:4,loginEvents:9,privateDeskOpens:7,daily:[{date:'2026-10-03',activeUsers:4}]}}
+    else if(action==='public.calendar')data=[];
+    else if(['public.feed','public.club','public.datafabric.contract'].includes(action))data={};
     else return route.continue();
     await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({ok:true,data})});
   });
