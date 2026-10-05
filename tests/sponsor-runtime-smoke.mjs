@@ -94,6 +94,9 @@ try{
 
   const css=await fetch(base+'/sponsor/sponsor.css');
   assert(css.status===200,'sponsor.css status '+css.status);
+  const growCore=await fetch(base+'/lib/sponsor-grow.js');
+  assert(growCore.status===200,'public helper asset route status '+growCore.status);
+  assert((await growCore.text()).includes('pipelineProjection'),'GROW CRM projection helper missing');
 
   console.log('Sponsor runtime smoke PASS',{
     publicStatus:pub.status,

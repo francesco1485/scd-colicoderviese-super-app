@@ -1166,7 +1166,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.hidden)close
 
 
 /* ===== R40.1 CRM RELAZIONALE ===== */
-const crmState={rows:[],selected:null,loading:false,error:''};
+const crmState={rows:[],selected:null,loading:false,error:'',generatedAt:null};
 
 function crmPolicyLabel(value){
   const v=String(value||'').toUpperCase();
@@ -1178,6 +1178,66 @@ function crmPolicyLabel(value){
 }
 function crmBlocked(row){
   return /SOSPESO|NO_CONTACT/.test(String(row?.contactPolicy||'').toUpperCase());
+}
+function crmGrowRows(){
+  return crmState.rows.filter(row=>/sponsor|partner|fornitor|azienda|prospect|convenzion|commercial/i.test(
+    [row.type,row.category,row.area,row.tags,row.relationshipStatus].join(' ')
+  ));
+}
+function renderGrowOperations(){
+  const pipeline=$('#growPipeline'),followups=$('#growFollowups'),dupe=$('#growDedupe');
+  if(!pipeline||!followups||!dupe)return;
+  const source=$('#growSourceState');
+  if(source){
+    if(crmState.loading)source.textContent='R20 CRM · sincronizzazione in corso';
+    else if(crmState.error)source.textContent='R20 CRM · NON DISPONIBILE · '+crmState.error;
+    else{
+      const date=crmState.generatedAt?new Date(crmState.generatedAt):null;
+      const freshness=date&&!Number.isNaN(date.getTime())?date.toLocaleString('it-IT'):'FRESCHEZZA NON DISPONIBILE';
+      source.textContent='R20 · private.crm.summary · generato '+freshness+' · sola lettura';
+    }
+  }
+  if(crmState.loading){
+    pipeline.innerHTML='<p class="grow-empty">Caricamento del riepilogo R20…</p>';
+    followups.innerHTML='<p class="grow-empty">Lettura delle azioni CRM…</p>';
+    dupe.innerHTML='<small>DEDUPLICA PROSPECT</small><p>Verifica dei record canonici…</p>';
+    return;
+  }
+  if(crmState.error){
+    pipeline.innerHTML='<p class="grow-empty">Pipeline non disponibile: i dati non vengono sostituiti con esempi.</p>';
+    followups.innerHTML='<p class="grow-empty">Reminder non disponibili finché il CRM non risponde.</p>';
+    dupe.innerHTML='<small>DEDUPLICA PROSPECT</small><p>Fonte non disponibile; nessun confronto locale.</p>';
+    return;
+  }
+  const rows=crmGrowRows();
+  const projection=window.SponsorGrow.pipelineProjection(rows);
+  pipeline.innerHTML=projection.stages.map(stage=>
+    '<article class="grow-stage"><small>'+esc(stage.id)+'</small><strong>'+esc(stage.count)+'</strong><span>stati fonte espliciti</span></article>'
+  ).join('')+
+    '<article class="grow-stage unmapped"><small>NON MAPPATO</small><strong>'+esc(projection.unmapped)+'</strong><span>stadio non esposto dal riepilogo</span></article>';
+  const pipelineState=$('#growPipelineState');
+  if(pipelineState)pipelineState.textContent=projection.unmapped
+    ?projection.unmapped+' record senza stage canonico verificabile'
+    :'Nessuno stage canonico esposto dalla fonte';
+  const queue=window.SponsorGrow.followUpQueue(rows);
+  const count=$('#growFollowupCount');if(count)count.textContent=String(queue.length);
+  followups.innerHTML=queue.length?queue.slice(0,8).map(item=>
+    '<article class="grow-followup">'+
+      '<div><b>'+esc(item.name)+'</b><small>'+esc(item.relationshipStatus||'Relazione non dichiarata')+'</small></div>'+
+      '<p>'+esc(item.action||'Azione CRM non valorizzata')+'</p>'+
+      '<div class="grow-followup-meta"><span>'+esc(item.deadline||'Nessuna scadenza registrata')+'</span>'+
+      '<span class="'+(item.deadlineState==='OVERDUE'?'overdue':'')+'">'+esc(item.deadlineState.replaceAll('_',' '))+'</span></div>'+
+      '<small>'+esc(item.owner||'Owner non dichiarato')+' · '+esc(crmPolicyLabel(item.contactPolicy))+'</small>'+
+      '<button type="button" data-grow-profile="'+esc(item.id)+'">Apri scheda CRM</button>'+
+    '</article>'
+  ).join(''):'<p class="grow-empty">Nessuna azione o scadenza registrata nella fonte CRM.</p>';
+  $$('[data-grow-profile]').forEach(button=>button.onclick=()=>openCrmProfile(button.dataset.growProfile));
+  const suspected=window.SponsorGrow.deduplicateRows(rows).possibleDuplicates;
+  dupe.innerHTML='<small>DEDUPLICA PROSPECT</small><strong>'+esc(suspected.length)+'</strong>'+
+    (suspected.length
+      ?'<p>Possibili omonimie da verificare. Record distinti e ID preservati; nessun merge automatico.</p>'+
+        suspected.slice(0,3).map(group=>'<div class="grow-duplicate"><b>'+esc(group.records[0].name||'Nome non disponibile')+'</b><small>ID '+esc(group.ids.join(' · '))+'</small></div>').join('')
+      :'<p>Nessuna omonimia prospect rilevata tra i record con ID canonico; non equivale a deduplica verificata su fonti esterne.</p>');
 }
 async function crmApi(id=''){
   const url='/api/sponsor/crm'+(id?'?id='+encodeURIComponent(id):'?limit=300');
@@ -1220,6 +1280,17 @@ function renderCrmTable(){
       '</button>').join(''):'<div class="crm-empty">Nessun profilo corrisponde ai filtri.</div>');
   $$('[data-crm-id]').forEach(b=>b.onclick=()=>openCrmProfile(b.dataset.crmId));
 }
+function renderActivationProofs(touchpoints=[]){
+  const proofs=window.SponsorGrow.activationProofs(touchpoints);
+  return '<section class="crm-section grow-proof-section"><h3>Proof of activation</h3>'+
+    (proofs.length?proofs.map(item=>{
+      const href=window.SponsorGrow.safeEvidenceUrl(item.documentUrl);
+      return '<article class="grow-proof"><div><b>'+esc(item.kind)+'</b><small>'+esc(item.timestamp||'Data non esposta')+' · '+esc(item.actor||'Attore non esposto')+'</small></div>'+
+        '<span>'+ (href?'<a href="'+esc(href)+'" target="_blank" rel="noopener noreferrer">Apri prova</a>':'Riferimento '+esc(item.document))+'</span>'+
+        '<small>R20 · TOUCHPOINTS_MASTER</small></article>';
+    }).join(''):'<p>Nessuna prova di attivazione collegata con riferimento documentale verificabile.</p>')+
+    '<small>R20 · private.crm.detail · TOUCHPOINTS_MASTER · SCD_DRIVE non interrogato da questa vista</small></section>';
+}
 function renderCrmInspector(data){
   const el=$('#crmInspector');if(!el)return;
   if(!data){el.innerHTML='<h3>Profilo CRM</h3><p>Seleziona una persona o azienda per vedere il profilo relazionale completo.</p>';return}
@@ -1247,15 +1318,19 @@ function renderCrmInspector(data){
     '<section class="crm-section"><h3>Accordi / contratti</h3>'+
       (agreements.length?agreements.map(a=>'<div class="crm-agreement"><div><b>'+esc(a.PACCHETTO||a.PARTNER||'Accordo')+'</b><small>'+esc(a.STATO||'')+'</small></div><div><span>Valore</span><strong>'+esc(a['VALORE €']!==''&&a['VALORE €']!=null?'€ '+a['VALORE €']:'Da verificare')+'</strong></div><div><span>Incasso</span><strong>'+esc(a['STATO INCASSO']||'Da verificare')+'</strong></div><p>'+esc(a['ASSET PROMESSI']||'')+'</p><small>'+esc(a['PROSSIMA AZIONE']||'')+'</small></div>').join(''):'<p>Nessun accordo formalizzato collegato.</p>')+
     '</section>'+
-    '<section class="crm-section"><h3>Attività e opportunità</h3><p>'+tasks.length+' task collegati · '+opps.length+' opportunità collegate · '+agreements.length+' accordi collegati</p></section>';
+    '<section class="crm-section"><h3>Attività e opportunità</h3><p>'+tasks.length+' task collegati · '+opps.length+' opportunità collegate · '+agreements.length+' accordi collegati</p>'+
+      '<small>R20 · private.crm.detail · TASKS_MASTER / COMMERCIALE_OPPORTUNITA / SPONSOR_CONTRATTI</small></section>'+
+    renderActivationProofs(tps);
   const mailBtn=$('#crmEmailAction');
   if(mailBtn)mailBtn.onclick=()=>openCrmEmailComposer(data);
 }
 async function loadCrm(){
   crmState.loading=true;crmState.error='';renderCrmTable();
+  renderGrowOperations();
   try{
     const data=await crmApi();
     crmState.rows=Array.isArray(data.rows)?data.rows:[];
+    crmState.generatedAt=data.generatedAt||null;
     renderCrmKpis(data.kpi||{});
     renderPartnerHub();
     syncActivationPartnersFromCrm();
@@ -1263,7 +1338,7 @@ async function loadCrm(){
     crmState.error=e.message||'Errore CRM';
     renderCrmKpis({});
   }finally{
-    crmState.loading=false;renderCrmTable();
+    crmState.loading=false;renderCrmTable();renderGrowOperations();
   }
 }
 async function openCrmProfile(id){

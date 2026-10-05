@@ -362,6 +362,22 @@
 
     <section class="view" id="view-crm">
       <div class="page-head"><div><small>CRM RELAZIONALE SCD</small><h1>Persone, aziende e relazioni</h1><p>Un profilo unico per ogni soggetto, con timeline, touchpoint, opportunità, attività e prossima azione. I dati arrivano dai master canonici.</p></div><button class="btn-yellow" id="crmRefresh">Aggiorna CRM</button></div>
+      <section class="grow-workbench" aria-labelledby="growWorkbenchTitle">
+        <header class="grow-workbench-head">
+          <div><small>SCD GROW · READ-ONLY CRM</small><h2 id="growWorkbenchTitle">Pipeline, priorità e prove</h2><p>Una vista operativa sui record canonici; nessuna modifica o comunicazione parte da qui.</p></div>
+          <div class="grow-source-state" id="growSourceState" role="status" aria-live="polite">Verifica fonte CRM…</div>
+        </header>
+        <div class="grow-pipeline-head"><div><small>PIPELINE CANONICA</small><strong>DISCOVER → VERIFY → QUALIFY → CONTACT → MEETING → PROPOSAL → NEGOTIATION → WON / LOST → ACTIVATE → PROVE → RENEW / EXPAND</strong></div><span id="growPipelineState">Caricamento CRM…</span></div>
+        <div class="grow-pipeline" id="growPipeline" aria-label="Record CRM nelle fasi esplicitamente fornite dalla fonte"></div>
+        <div class="grow-workbench-grid">
+          <section class="grow-followups" aria-labelledby="growFollowupsTitle">
+            <header><div><small>DA FARE · REMINDER</small><h3 id="growFollowupsTitle">Prossime azioni registrate</h3></div><span id="growFollowupCount">—</span></header>
+            <div id="growFollowups"><p>Caricamento CRM…</p></div>
+          </section>
+          <aside class="grow-dedupe" id="growDedupe" aria-live="polite"></aside>
+        </div>
+        <p class="grow-semantics">Prospect ≠ sponsor · proposta ≠ contratto · spesa fornitore ≠ valore sponsor. Gli stati non mappati restano tali; nessuna probabilità o scadenza viene calcolata.</p>
+      </section>
       <div class="report-grid" id="crmKpis"></div>
       <div class="page-tools">
         <input class="filter-input" id="crmSearch" placeholder="Cerca persona, azienda, categoria, tag, località…">
@@ -687,6 +703,7 @@
   </div>
 </div>
 
+<script src="../lib/sponsor-grow.js?v=1"></script>
 <script src="./app.js?v=53.1.0"></script>
 </body>
 </html>
