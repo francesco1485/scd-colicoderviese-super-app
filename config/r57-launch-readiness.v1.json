@@ -2,7 +2,7 @@
   "schema": "SCD_R57_LAUNCH_READINESS_V1",
   "release": "R57.PRODUCT",
   "deadline": "2026-10-09",
-  "evidenceAsOf": "2026-10-06T16:14:07.638Z",
+  "evidenceAsOf": "2026-10-06T16:31:31Z",
   "policy": "FAIL_CLOSED_NO_INFERRED_READINESS",
   "gates": [
     {
@@ -101,7 +101,8 @@
         "MASTER TORNEI & INIZIATIVE live/readable",
         "PROGRAMMA TORNEI ADB 2026-27 and SEMAforo weekend planning present",
         "Operativo Pilota TORNEI_PIPELINE is currently empty",
-        "GET /api/tournaments read-only R20 public.calendar projection and fail-closed contract tests"
+        "GET /api/tournaments read-only R20 public.calendar projection and fail-closed contract tests",
+        "Withdrawn 2026/27 team rows are filtered from public calendar, newsroom, public feed and tournament projections; runtime contract regression test"
       ],
       "limitation": "Read-only calendar projection is implemented; the synchronized tournament pipeline is still empty and live R20 source verification is pending. No tournament manager writes or unverified records are exposed."
     },

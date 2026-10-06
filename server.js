@@ -4,6 +4,7 @@ const path = require('path');
 const { URL } = require('url');
 const { issueIntakeToken, verifyIntakeToken } = require('./lib/intake-links');
 const { weekRange } = require('./lib/scd-one-pulse.js');
+const {filterActiveSCDTeamRows,filterPublicSCDPayload}=require('./lib/scd-season-status.js');
 const {
   tournamentSurface,
   unavailableTournamentSurface,
@@ -524,7 +525,8 @@ async function callAppsScript(action,payload={},sessionToken=''){
         err.httpStatus=upstream.status;
         throw err;
       }
-      return {upstream,parsed,attempt};
+      const publicParsed=/^public\.(calendar|feed)$/.test(action)?filterPublicSCDPayload(parsed):parsed;
+      return {upstream,parsed:publicParsed,attempt};
     }catch(error){
       lastError=error;
       if(attempt>=maxAttempts) break;
@@ -769,7 +771,7 @@ async function buildWeeklyNewsroom(){
     feedRaw=f.parsed;sourceStatus.feed='OK';
   }catch(e){sourceStatus.feed='ERROR:'+String(e.code||e.message||e)}
 
-  const allCalendar=rowsFrom(calendarRaw).map((row,i)=>({
+  const allCalendar=filterActiveSCDTeamRows(rowsFrom(calendarRaw)).map((row,i)=>({
     id:pick(row,'id','eventId','uid')||'CAL-'+i,
     title:String(pick(row,'title','event','name','subject')||'Attività SCD'),
     date:isoDateOnly(pick(row,'date','data','startDate')),

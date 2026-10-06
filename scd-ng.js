@@ -191,7 +191,7 @@ $$('[data-public-action="teams"]').forEach(b=>b.addEventListener('click',openTea
 function normalizeCalendarRows(raw){
  const data=raw?.data||raw||{};
  const rows=Array.isArray(data)?data:(Array.isArray(data.rows)?data.rows:Array.isArray(data.items)?data.items:Array.isArray(data.events)?data.events:Array.isArray(data.calendar?.rows)?data.calendar.rows:[]);
- return rows.filter(row=>!isWithdrawnTeamRecord(row)).map((row,i)=>({
+ return (window.SCDSeasonStatus?.filterActiveSCDTeamRows(rows)||rows.filter(row=>!isWithdrawnTeamRecord(row))).map((row,i)=>({
    id:String(pick(row,'id','eventId','uid')||'PUB-'+i+'-'+isoClientDate(pick(row,'date','data','startDate'))),
    title:String(pick(row,'title','event','name','subject')||'Attività SCD'),
    date:isoClientDate(pick(row,'date','data','startDate')),
