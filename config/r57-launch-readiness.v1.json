@@ -2,7 +2,7 @@
   "schema": "SCD_R57_LAUNCH_READINESS_V1",
   "release": "R57.PRODUCT",
   "deadline": "2026-10-09",
-  "evidenceAsOf": "2026-10-06T12:32:00+02:00",
+  "evidenceAsOf": "2026-10-06T16:14:07.638Z",
   "policy": "FAIL_CLOSED_NO_INFERRED_READINESS",
   "gates": [
     {
@@ -95,37 +95,40 @@
     {
       "id": "TOURNAMENT_MINIMUM",
       "label": "Tournament / event manager minimum",
-      "state": "UNVERIFIED",
+      "state": "IMPLEMENTED",
       "critical": true,
       "evidence": [
         "MASTER TORNEI & INIZIATIVE live/readable",
         "PROGRAMMA TORNEI ADB 2026-27 and SEMAforo weekend planning present",
-        "Operativo Pilota TORNEI_PIPELINE is currently empty"
+        "Operativo Pilota TORNEI_PIPELINE is currently empty",
+        "GET /api/tournaments read-only R20 public.calendar projection and fail-closed contract tests"
       ],
-      "limitation": "Source material exists, but no verified runtime tournament slice or synchronized pipeline exists yet. Keep fail-closed."
+      "limitation": "Read-only calendar projection is implemented; the synchronized tournament pipeline is still empty and live R20 source verification is pending. No tournament manager writes or unverified records are exposed."
     },
     {
       "id": "MEMBERSHIP_SERVICES",
       "label": "Membership / club services",
-      "state": "UNVERIFIED",
+      "state": "IMPLEMENTED",
       "critical": true,
       "evidence": [
         "Operativo Pilota ISCRIZIONI_CONFIG live/readable with active 2026/27 rules",
-        "Supabase scd_memberships contract exists but production table has 0 rows"
+        "Supabase scd_memberships contract exists but production table has 0 rows",
+        "GET /api/membership-services fail-closed source-binding contract tests"
       ],
-      "limitation": "Rules/source contract exists, but no verified operational membership runtime slice exists yet. Keep R20/source-driven and fail-closed."
+      "limitation": "The source binding is not verified in this runtime. No member rows, fees, payment state, documents or eligibility are exposed; R20 remains the identity and scope authority."
     },
     {
       "id": "FACILITY_LOGISTICS",
       "label": "Facility / logistics",
-      "state": "UNVERIFIED",
+      "state": "IMPLEMENTED",
       "critical": true,
       "evidence": [
         "Transport requests exist",
         "IMPIANTI_MASTER and IMPIANTI_SPAZI live/readable",
-        "Colico C1/C2 and Dervio field catalogued with homologation verification still partial"
+        "Colico C1/C2 and Dervio field catalogued with homologation verification still partial",
+        "GET /api/facility-logistics fail-closed status contract tests"
       ],
-      "limitation": "Facility source data exists, but live occupancy/rotation runtime and category-level homologation checks are incomplete. Keep fail-closed."
+      "limitation": "The facility source binding is not verified in this runtime, so the catalogue stays empty and occupancy, rotation, homologation, category eligibility, transport and availability remain UNKNOWN/UNVERIFIED."
     },
     {
       "id": "PROVENANCE_AUDIT",
@@ -146,9 +149,20 @@
       "evidence": [
         "/health",
         "/api/core-status",
+        "GET /api/launch-readiness config-backed runtime contract",
         "SCD PULSE ACTIVE_HEALTHY verified 2026-10-06; migrations stop at R53; advisors remain open"
       ],
-      "limitation": "Health sources are reachable, but launch-readiness endpoint is not yet committed and exact-head preview verification is still pending."
+      "limitation": "Exact-head preview verification is still pending."
+    },
+    {
+      "id": "PREVIEW_EXACT_HEAD",
+      "label": "Exact-head preview verification",
+      "state": "PENDING",
+      "critical": true,
+      "evidence": [
+        "No preview deployment has verified the exact code head from this sprint."
+      ],
+      "limitation": "A separate preview deployment must report and verify this exact branch SHA before the gate can advance."
     },
     {
       "id": "RESPONSIVE_QA",

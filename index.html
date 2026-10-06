@@ -411,6 +411,55 @@
             <div class="core-loading"><b>Calendario in sincronizzazione</b><small>Mostriamo soltanto attività disponibili dalla fonte verificata.</small></div>
           </div>
         </section>
+
+        <nav class="operational-route-links" aria-label="Altri servizi SCD">
+          <button type="button" data-nav="tournaments"><span>EVENTI</span><b>Tornei & manifestazioni</b><small>Solo eventi presenti nella fonte SCD</small></button>
+          <button type="button" data-nav="services"><span>SERVIZI</span><b>Membership & servizi</b><small>Regole e stato della fonte</small></button>
+          <button type="button" data-nav="facilities"><span>IMPIANTI</span><b>Facility & logistica</b><small>Disponibilità non inferita</small></button>
+        </nav>
+      </section>
+
+      <section class="view public-core-view" id="view-tournaments" data-view="tournaments">
+        <section class="public-core-hero">
+          <div>
+            <span class="eyebrow">EVENTI · LETTURA SOLA</span>
+            <h1>Tornei, <em>solo se in fonte.</em></h1>
+            <p>La vista usa il calendario R20 esistente. Non crea iscrizioni, costi, squadre, date o risultati.</p>
+          </div>
+          <button class="btn glass" type="button" data-nav="calendar">← Calendario</button>
+        </section>
+        <section class="calendar-workbench operational-surface" aria-live="polite">
+          <div id="tournamentState" class="core-loading" role="status"><b>Sincronizzazione tornei</b><small>In attesa della fonte R20.</small></div>
+          <div id="tournamentEvents" class="operational-records"></div>
+        </section>
+      </section>
+
+      <section class="view public-core-view" id="view-services" data-view="services">
+        <section class="public-core-hero">
+          <div>
+            <span class="eyebrow">SERVIZI ASSOCIATIVI · 2026/27</span>
+            <h1>La membership, <em>senza supposizioni.</em></h1>
+            <p>Regole e servizi saranno mostrati dopo la verifica del binding operativo. Nessun dato personale o importo viene esposto qui.</p>
+          </div>
+          <button class="btn glass" type="button" data-nav="calendar">← Calendario</button>
+        </section>
+        <section class="calendar-workbench operational-surface" aria-live="polite">
+          <div id="membershipServiceState" class="core-loading" role="status"><b>Verifica della fonte membership</b><small>R20 resta l’autorità per identità e scope.</small></div>
+        </section>
+      </section>
+
+      <section class="view public-core-view" id="view-facilities" data-view="facilities">
+        <section class="public-core-hero">
+          <div>
+            <span class="eyebrow">IMPIANTI & LOGISTICA · STATO FONTE</span>
+            <h1>Spazi reali, <em>stati verificati.</em></h1>
+            <p>Occupazione, rotazione, omologazione, idoneità, trasporto e disponibilità restano non verificati finché la fonte non è collegata.</p>
+          </div>
+          <button class="btn glass" type="button" data-nav="calendar">← Calendario</button>
+        </section>
+        <section class="calendar-workbench operational-surface" aria-live="polite">
+          <div id="facilityLogisticsState" class="core-loading" role="status"><b>Catalogo impianti non verificato</b><small>Nessuna disponibilità o capacità viene presunta.</small></div>
+        </section>
       </section>
 
       <section class="view public-core-view" id="view-teams" data-view="teams">
@@ -688,6 +737,7 @@
   <script src="./lib/scd-one-pulse.js?v=1.0.0" defer></script>
   <script src="./lib/scd-one-profile.js?v=1.0.0" defer></script>
   <script src="./lib/scd-native-adapters.js?v=1.0.0" defer></script>
+  <script src="./lib/scd-season-status.js?v=2026.10.06" defer></script>
   <script src="./scd-ng.js?v=0.7.4" defer></script>
   <script src="./scd-interactions.js?v=0.4.5" defer></script>
   <div class="scd-cookie-banner" id="scdCookieBanner" hidden role="dialog" aria-label="Preferenze analytics">

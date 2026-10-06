@@ -132,6 +132,19 @@ for(const viewport of viewports){
   await page.waitForSelector('#view-calendar.active');
   await page.waitForSelector('#calendarPublicList');
   if(await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+3))throw new Error('calendar view horizontal overflow');
+  for(const [view,selector,expected] of [
+    ['tournaments','#tournamentState','TORNEI IN AGGIORNAMENTO'],
+    ['services','#membershipServiceState','SOURCE_BINDING_UNVERIFIED'],
+    ['facilities','#facilityLogisticsState','UNVERIFIED']
+  ]){
+    mark('R57_'+view.toUpperCase()+'_'+viewport.width);
+    await page.evaluate(next=>window.SCDNextGen.setView(next),view);
+    await page.waitForSelector(`#view-${view}.active`);
+    await page.waitForFunction(({selector,text})=>document.querySelector(selector)?.textContent.includes(text),{selector, text:expected});
+    if(await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+3))throw new Error(view+' view horizontal overflow');
+    if([390,1440].includes(viewport.width))await page.screenshot({path:`test-output/${view}-${viewport.width}x${viewport.height}.png`,fullPage:true});
+  }
+  await page.evaluate(()=>window.SCDNextGen.setView('calendar'));
   mark('TEAMS_'+viewport.width);
   await page.evaluate(()=>window.SCDNextGen.setView('teams'));
   await page.waitForSelector('#view-teams.active');
@@ -221,6 +234,14 @@ for(const viewport of viewports){
 
   if(errors.length)allErrors.push(viewport.width+'x'+viewport.height+': '+errors.join(' | '));
   await page.close();
+  if(viewport.width===390){
+    const routePage=await browser.newPage({viewport});
+    await routePage.goto(base+'/app/tournaments',{waitUntil:'domcontentloaded'});
+    await routePage.waitForSelector('#view-tournaments.active');
+    await routePage.waitForFunction(()=>document.querySelector('#tournamentState')?.textContent.includes('TORNEI IN AGGIORNAMENTO'));
+    if(await routePage.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+3))throw new Error('direct tournaments route horizontal overflow');
+    await routePage.close();
+  }
 }
 
 // R54 private journey: live Nova Private Desk with intercepted authorized R20 responses.
@@ -352,7 +373,7 @@ for(const viewport of [{width:390,height:844},{width:1440,height:900}]){
 mark('R56_FAMILY_ATHLETE_ROLE_SCOPE');
 for(const roleCase of [
   {role:'FAMILY',email:'family.qa@example.test',token:'qa-family-token',person:{personId:'QA-F1',code:'QAF1',firstName:'Famiglia',lastName:'QA',teamName:'U14'}},
-  {role:'ATHLETE',email:'athlete.qa@example.test',token:'qa-athlete-token',person:{personId:'QA-A1',code:'QAA1',firstName:'Atleta',lastName:'QA',teamName:'U18'}}
+  {role:'ATHLETE',email:'athlete.qa@example.test',token:'qa-athlete-token',person:{personId:'QA-A1',code:'QAA1',firstName:'Atleta',lastName:'QA'}}
 ]){
   const rolePage=await browser.newPage({viewport:{width:390,height:844}});
   const roleErrors=[];

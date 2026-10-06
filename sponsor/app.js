@@ -277,7 +277,7 @@ const events=[
 ];
 
 const news=[
-['17/09/2026','Under 18 Élite: ritiro dal campionato 2026/27','SCD ufficiale'],
+['17/09/2026','Under 18 Élite: ritiro dal campionato 2026/27 (WITHDRAWN · HISTORICAL)','SCD ufficiale'],
 ['09/07/2026','Affiliazione SCD ColicoDerviese × AC Monza','SCD ufficiale'],
 ['20/07/2026','Iscrizioni stagione 2026/27 aperte','SCD ufficiale']
 ];
@@ -285,7 +285,7 @@ const news=[
 const stats={
 prima2526:{title:'Prima Squadra · Promozione 2025/26 · Girone B',m:[['Posizione','4ª'],['Punti','59'],['Gare','30'],['Media','1,97']],note:'Dato storico ufficiale. La classifica 2026/27 non viene mostrata finché non è sincronizzata con una fonte ufficiale aggiornata.',source:'CR Lombardia'},
 u16:{title:'U16 · stagione 2025/26',m:[['Esito','Play-off vinti'],['Percorso','Verso Élite'],['Fonte','SCD'],['Stato','Storico']],note:'Percorso storico SCD. Nessun punteggio inventato.',source:'SCD ufficiale'},
-u18:{title:'Under 18 Élite · 2026/27',m:[['Stato','Ritirata'],['Data','17/09/2026'],['Competizione','U18 Élite'],['Fonte','SCD']],note:'Ritiro formalmente comunicato.',source:'SCD ufficiale'}
+u18WithdrawnHistory:{title:'Under 18 Élite · 2026/27 · WITHDRAWN / HISTORICAL',m:[['Stato','WITHDRAWN'],['Periodo','Storico · non attiva nel 2026/27'],['Data comunicazione','17/09/2026'],['Fonte','SCD']],note:'Evidenza storica del ritiro; questa categoria non è attiva nella stagione 2026/27.',source:'SCD ufficiale'}
 };
 
 const folders=['Contratti','Proposte','Loghi ufficiali','Foto','Video & LED','Email & verbali','Fatture','Report sponsor','Eventi','Convenzioni','Rassegna stampa','Altro'];

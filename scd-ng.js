@@ -108,8 +108,9 @@ const pick=(obj,...keys)=>{for(const k of keys){const v=obj?.[k];if(v!=null&&Str
 const isoClientDate=v=>{const s=String(v||'').trim();if(!s)return '';let m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);if(m)return m[1]+'-'+m[2]+'-'+m[3];m=s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);if(m)return m[3]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[1]).padStart(2,'0');const d=new Date(s);return Number.isFinite(d.getTime())?d.toISOString().slice(0,10):''};
 const clientEventKind=row=>{const t=norm([pick(row,'kind','type','eventType'),pick(row,'title','event','name','subject')].join(' '));if(/allenament|training/.test(t))return 'TRAINING';if(/gara|partita|campionato|coppa|amichevole|match/.test(t))return 'MATCH';if(/torneo|tournament/.test(t))return 'TOURNAMENT';return 'EVENT'};
 
-const routeToView={home:'pulse',pulse:'pulse',calendar:'calendar',teams:'teams',social:'social',profile:'twin',twin:'twin',desk:'desk'};
-const viewToRoute={pulse:'home',calendar:'calendar',teams:'teams',social:'social',twin:'profile',desk:'desk'};
+const routeToView={home:'pulse',pulse:'pulse',calendar:'calendar',teams:'teams',social:'social',profile:'twin',twin:'twin',desk:'desk',tournaments:'tournaments',services:'services',fields:'facilities','/app/tournaments':'tournaments','/app/services':'services','/app/fields':'facilities'};
+const viewToRoute={pulse:'home',calendar:'calendar',teams:'teams',social:'social',twin:'profile',desk:'desk',tournaments:'/app/tournaments',services:'/app/services',facilities:'/app/fields'};
+const isWithdrawnTeamRecord=row=>window.SCDSeasonStatus?.isWithdrawnSCDTeamRecord(row)===true;
 function setView(requested,{historyMode='push'}={}){
   const view=routeToView[String(requested||'').toLowerCase()];
   if(!view)return;
@@ -118,11 +119,12 @@ function setView(requested,{historyMode='push'}={}){
   state.view=view;
   $$('[data-view]').forEach(x=>{const active=x.dataset.view===view;x.classList.toggle('active',active);x.setAttribute('aria-hidden',String(!active))});
   $$('[data-nav]').forEach(x=>{const active=x.dataset.nav===view;x.classList.toggle('active',active);if(x.closest('.bottom-nav')){if(active)x.setAttribute('aria-current','page');else x.removeAttribute('aria-current')}});
-  const ctx=view==='desk'?'PRIVATE DESK · ROLE/SCOPE':view==='twin'?'PROFILO · AVATAR FACOLTATIVO':view==='calendar'?'CALENDARIO · PUBBLICO':view==='teams'?'SQUADRE · PUBBLICO':view==='social'?'SOCIAL · PUBBLICO':'HOME · PUBBLICO';
+  const ctx=view==='desk'?'PRIVATE DESK · ROLE/SCOPE':view==='twin'?'PROFILO · AVATAR FACOLTATIVO':view==='calendar'?'CALENDARIO · PUBBLICO':view==='teams'?'SQUADRE · PUBBLICO':view==='social'?'SOCIAL · PUBBLICO':view==='tournaments'?'TORNEI · LETTURA SOLA':view==='services'?'SERVIZI · STATO FONTE':view==='facilities'?'IMPIANTI · STATO FONTE':'HOME · PUBBLICO';
   const ctxEl=$('#mirrorContext');if(ctxEl)ctxEl.textContent=ctx;
-  if(location.hash!=='#'+route){
-    if(historyMode==='push')history.pushState(null,'','#'+route);
-    else if(historyMode==='replace')history.replaceState(null,'','#'+route);
+  const target=route.startsWith('/app/')?route:'#'+route;
+  if(location.pathname+location.hash!==target){
+    if(historyMode==='push')history.pushState(null,'',target);
+    else if(historyMode==='replace')history.replaceState(null,'',target);
   }
   if(changed)window.scrollTo({top:0,behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
   if(view==='calendar')ensurePublicCalendar();
@@ -130,6 +132,7 @@ function setView(requested,{historyMode='push'}={}){
   if(view==='social')renderSocialHub();
   if(view==='twin')renderProfileCommand();
   if(view==='desk')ensurePrivateDesk();
+  if(['tournaments','services','facilities'].includes(view))loadOperationalSurface(view);
   return true;
 }
 $$('[data-nav]').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.nav)));
@@ -188,7 +191,7 @@ $$('[data-public-action="teams"]').forEach(b=>b.addEventListener('click',openTea
 function normalizeCalendarRows(raw){
  const data=raw?.data||raw||{};
  const rows=Array.isArray(data)?data:(Array.isArray(data.rows)?data.rows:Array.isArray(data.items)?data.items:Array.isArray(data.events)?data.events:Array.isArray(data.calendar?.rows)?data.calendar.rows:[]);
- return rows.map((row,i)=>({
+ return rows.filter(row=>!isWithdrawnTeamRecord(row)).map((row,i)=>({
    id:String(pick(row,'id','eventId','uid')||'PUB-'+i+'-'+isoClientDate(pick(row,'date','data','startDate'))),
    title:String(pick(row,'title','event','name','subject')||'Attività SCD'),
    date:isoClientDate(pick(row,'date','data','startDate')),
@@ -206,7 +209,7 @@ function normalizeCalendarRows(raw){
 function mergeCalendarRows(...groups){
  const map=new Map();
  groups.flat().forEach((x,i)=>{
-   if(!x||!x.date)return;
+   if(!x||!x.date||isWithdrawnTeamRecord(x))return;
    const key=String(x.id||'')||[x.date,x.time,x.team,x.title,x.opponent].join('|');
    const prior=map.get(key)||{};
    map.set(key,{...prior,...x,id:x.id||prior.id||'MERGED-'+i});
@@ -293,6 +296,36 @@ function renderPublicCalendar(){
  rows.forEach(x=>{if(!groups.has(x.date))groups.set(x.date,[]);groups.get(x.date).push(x)});
  mount.innerHTML=[...groups.entries()].map(([date,items])=>'<section class="calendar-day-group"><header><time>'+esc(fmtDate(date))+'</time><span>'+items.length+' attività</span></header><div class="calendar-day-events">'+items.map(x=>'<button type="button" class="calendar-event-row" data-calendar-event="'+esc(x.id)+'"><span class="calendar-event-time">'+esc(x.time||'—')+'</span><span class="calendar-event-main"><small>'+esc(x.kind)+'</small><b>'+esc(x.team||x.title||'SCD')+'</b><em>'+esc([x.title,x.opponent?('vs '+x.opponent):'',x.competition].filter(Boolean).join(' · '))+'</em></span><span class="calendar-event-place">'+esc(x.venue||'Sede in aggiornamento')+'</span><span class="calendar-event-arrow">›</span></button>').join('')+'</div></section>').join('');
  $$('[data-calendar-event]',mount).forEach(b=>b.onclick=()=>openEvent(b.dataset.calendarEvent));
+}
+async function loadOperationalSurface(view){
+ const config={
+   tournaments:{url:'/api/tournaments',mount:'#tournamentState'},
+   services:{url:'/api/membership-services',mount:'#membershipServiceState'},
+   facilities:{url:'/api/facility-logistics',mount:'#facilityLogisticsState'}
+ }[view];
+ const mount=$(config.mount);if(!mount)return;
+ mount.innerHTML='<div class="core-loading"><b>Leggo lo stato della fonte</b><small>Nessun dato viene stimato o creato localmente.</small></div>';
+ try{
+   const response=await fetch(config.url,{cache:'no-store'});
+   const data=await response.json();
+   if(!response.ok||data.ok!==true)throw new Error(data.state||'SOURCE_UNAVAILABLE');
+   if(view==='tournaments'){
+     const events=Array.isArray(data.events)?data.events:[];
+     const stateLabel=data.state==='SOURCE_REPORTED'?'EVENTI PRESENTI NEL CALENDARIO R20':'TORNEI IN AGGIORNAMENTO';
+     mount.innerHTML='<b>'+esc(stateLabel)+'</b><small>Fonte: '+esc(data.source?.id||'R20')+' · '+esc(data.source?.contract||'public.calendar')+'</small>'+
+       (events.length?'<div class="operational-records">'+events.map(event=>'<article class="operational-record"><div><h3>'+esc(event.title)+'</h3><p>'+esc([event.team,event.category,event.venue,event.competition].filter(Boolean).join(' · ')||'Dettagli non disponibili')+'</p><small class="operational-provenance">EVENT_ID '+esc(event.eventId)+' · '+esc(event.provenance?.sourceId||'R20')+'</small></div><time>'+esc(event.date)+(event.time?' · '+esc(event.time):'')+'</time></article>').join('')+'</div>':'<p class="operational-provenance">Nessun record torneo verificabile restituito. Non vengono mostrati eventi di esempio.</p>');
+     return;
+   }
+   if(view==='services'){
+     mount.innerHTML='<b>STATO: '+esc(data.state||'UNVERIFIED')+'</b><small>Stagione '+esc(data.season||'2026/27')+' · fonte '+esc(data.source?.id||'SCD_OPERATIVO_PILOTA')+' / '+esc(data.source?.recordSet||'ISCRIZIONI_CONFIG')+'</small><p class="operational-provenance">R20 resta autorità per identità e scope. Regole, quote, pagamenti, documenti, idoneità e profili non sono disponibili finché il binding non è verificato.</p>';
+     return;
+   }
+   const statusLabels={occupancy:'OCCUPAZIONE',rotation:'ROTAZIONE',homologation:'OMOLOGAZIONE',categoryEligibility:'IDONEITÀ CATEGORIA',transport:'TRASPORTO',availability:'DISPONIBILITÀ'};
+   const logistics=data.logistics&&typeof data.logistics==='object'?data.logistics:{};
+   mount.innerHTML='<b>STATO: '+esc(data.state||'UNVERIFIED')+'</b><small>Binding fonte non verificato · '+esc((data.source?.recordSets||['IMPIANTI_MASTER','IMPIANTI_SPAZI']).join(' / '))+'</small><div class="operational-status-grid">'+Object.entries(statusLabels).map(([key,label])=>'<article><small>'+label+'</small><b>'+esc(logistics[key]||'UNKNOWN')+'</b></article>').join('')+'</div><p class="operational-provenance">Il catalogo operativo non è collegato. Capacità, accessi e stato dei dispositivi non sono esposti.</p>';
+ }catch(error){
+   mount.innerHTML='<b>STATO: UNAVAILABLE</b><small>La fonte non è raggiungibile o non ha restituito un contratto valido.</small>';
+ }
 }
 function publicTeamModels(){
  const today=todayKey(),map=new Map();
@@ -1203,9 +1236,9 @@ async function hydrate(){
     const r=await fetch(API_BASE+'/api/newsroom',{cache:'no-store'});
     if(!r.ok)throw new Error('newsroom unavailable');
     const data=await r.json();state.news=data;
-    const rows=Array.isArray(data.calendar?.rows)?data.calendar.rows:[];
+    const rows=(Array.isArray(data.calendar?.rows)?data.calendar.rows:[]).filter(x=>!isWithdrawnTeamRecord(x));
     state.events=rows.map(x=>({...x,group:/torneo|event/i.test(x.kind||'')?'EVENTI':/201[5-9]|2020|pulcin|primi calci|base/i.test((x.team||'')+' '+(x.category||''))?'BASE':'AGONISTICA'}));
-    state.upcoming=Array.isArray(data.upcomingEvents)?data.upcomingEvents:[];
+    state.upcoming=(Array.isArray(data.upcomingEvents)?data.upcomingEvents:[]).filter(x=>!isWithdrawnTeamRecord(x));
     state.sportData=data.sportData||{results:[],standings:[],headToHead:[]};
     state.partners=Array.isArray(data.partners)?data.partners:[];
     state.publicProfiles=Array.isArray(data.publicProfiles)?data.publicProfiles:[];
@@ -1393,8 +1426,10 @@ $('#mirrorForm')?.addEventListener('submit',e=>{e.preventDefault();const q=$('#m
 $$('.quick-prompts button').forEach(b=>b.addEventListener('click',()=>{appendMsg(b.textContent,'user');setTimeout(()=>appendMsg(mirrorReply(b.textContent),'ai'),140)}));
 
 function syncViewFromLocation(){
-  const hash=location.hash.replace('#','').split('?')[0].toLowerCase(),view=routeToView[hash]||'pulse',canonical='#'+viewToRoute[view];
-  setView(view,{historyMode:location.hash===canonical?'none':'replace'});
+  const hash=location.hash.replace('#','').split('?')[0].toLowerCase();
+  const view=hash?(routeToView[hash]||'pulse'):(routeToView[location.pathname.toLowerCase()]||'pulse');
+  const route=viewToRoute[view],isCanonical=route.startsWith('/app/')?location.pathname===route&&!location.hash:location.hash==='#'+route;
+  setView(view,{historyMode:isCanonical?'none':'replace'});
 }
 window.addEventListener('popstate',syncViewFromLocation);
 window.addEventListener('hashchange',syncViewFromLocation);

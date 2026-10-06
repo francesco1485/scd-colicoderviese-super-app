@@ -4,6 +4,13 @@ const path = require('path');
 const { URL } = require('url');
 const { issueIntakeToken, verifyIntakeToken } = require('./lib/intake-links');
 const { weekRange } = require('./lib/scd-one-pulse.js');
+const {
+  tournamentSurface,
+  unavailableTournamentSurface,
+  membershipServicesSurface,
+  facilityLogisticsSurface,
+  launchReadinessSurface
+} = require('./lib/scd-r57-operational-contracts.js');
 
 const PORT = process.env.PORT || 10000;
 const ROOT = process.env.SCD_STATIC_DIR ? path.resolve(__dirname,process.env.SCD_STATIC_DIR) : __dirname;
@@ -29,6 +36,7 @@ const SPONSOR_MOTION_PROFILES = JSON.parse(fs.readFileSync(path.join(__dirname,'
 const SCD_CREATIVE_SCENES = JSON.parse(fs.readFileSync(path.join(__dirname,'config','scd-creative-scenes.json'),'utf8'));
 const COMMUNITY_BENEFITS_SNAPSHOT = JSON.parse(fs.readFileSync(path.join(__dirname,'config','community-benefits.snapshot.json'),'utf8'));
 const SPONSOR_DEVELOPMENT_SNAPSHOT = JSON.parse(fs.readFileSync(path.join(__dirname,'config','sponsor-development.snapshot.json'),'utf8'));
+const R57_LAUNCH_READINESS = JSON.parse(fs.readFileSync(path.join(__dirname,'config','r57-launch-readiness.v1.json'),'utf8'));
 const INTAKE_TEMPLATE_MAP = new Map((INTAKE_TEMPLATES.templates||[]).map(x=>[x.slug,x]));
 const INTAKE_SECRET = process.env.SCD_INTAKE_LINK_SECRET || '';
 const INTAKE_PUBLIC_BASE = (process.env.SCD_PUBLIC_BASE_URL || 'https://scd-universe.onrender.com').replace(/\/$/,'');
@@ -617,6 +625,32 @@ async function fetchPublicFeed(){
     return parsed;
   }catch(e){return {ok:false,error:String(e.message||e)}}
 }
+async function handleTournaments(req,res){
+  if(req.method!=='GET')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  try{
+    const {upstream,parsed}=await callAppsScript('public.calendar',{rangeKey:'ALL',offset:0,limit:500},'');
+    if(!upstream.ok||parsed?.ok===false)throw new Error('PUBLIC_CALENDAR_SOURCE_UNAVAILABLE');
+    return json(res,200,tournamentSurface(parsed),{'cache-control':'no-store'});
+  }catch{
+    return json(res,503,unavailableTournamentSurface(),{'cache-control':'no-store'});
+  }
+}
+function handleMembershipServices(req,res){
+  if(req.method!=='GET')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  return json(res,200,membershipServicesSurface(),{'cache-control':'no-store'});
+}
+function handleFacilityLogistics(req,res){
+  if(req.method!=='GET')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  return json(res,200,facilityLogisticsSurface(),{'cache-control':'no-store'});
+}
+function handleLaunchReadiness(req,res){
+  if(req.method!=='GET')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  try{
+    return json(res,200,launchReadinessSurface(R57_LAUNCH_READINESS),{'cache-control':'no-store'});
+  }catch{
+    return json(res,503,{ok:false,state:'UNAVAILABLE',error:'READINESS_CONFIG_INVALID'},{'cache-control':'no-store'});
+  }
+}
 function pick(obj,...keys){
   for(const key of keys){
     const value=obj?.[key];
@@ -935,6 +969,10 @@ http.createServer(async(req,res)=>{
   if(u.pathname==='/api/time') return json(res,200,clubTimePayload());
   if(u.pathname==='/api/capabilities') return json(res,200,{ok:true,version:'40.0.0',mode:'GITHUB_PAGES_RENDER_R20_SUPABASE_DUAL_RUN',actions:[...allowedActions].sort(),featureFlags:FEATURE_FLAGS,domainCore:SUPABASE_RUNTIME,runtimeSafety:{previewSafeMode:PREVIEW_SAFE_MODE,writePolicy:PREVIEW_SAFE_MODE?'READ_ONLY':'NORMAL'},isolated:['safeguarding']});
   if(u.pathname==='/api/core-status') return json(res,200,{ok:true,version:'40.0.0',featureFlags:FEATURE_FLAGS,domainCore:SUPABASE_RUNTIME,currentPrimary:'R20',targetPrimary:'SCD_SUPABASE',runtimeSafety:{previewSafeMode:PREVIEW_SAFE_MODE,writePolicy:PREVIEW_SAFE_MODE?'READ_ONLY':'NORMAL'}});
+  if(u.pathname==='/api/launch-readiness') return handleLaunchReadiness(req,res);
+  if(u.pathname==='/api/tournaments') return handleTournaments(req,res);
+  if(u.pathname==='/api/membership-services') return handleMembershipServices(req,res);
+  if(u.pathname==='/api/facility-logistics') return handleFacilityLogistics(req,res);
   if(u.pathname==='/api/public/donation-config') return handleDonationConfig(req,res);
   if(u.pathname==='/api/public/donation-intent') return handleDonationIntent(req,res);
   if(u.pathname==='/api/sponsor/lead') return handleSponsorLead(req,res);
@@ -959,5 +997,6 @@ http.createServer(async(req,res)=>{
   if(u.pathname==='/api/public') return json(res,200,await fetchPublicFeed(),{'cache-control':'no-store'});
   if(u.pathname==='/api/newsroom') {try{return json(res,200,await buildWeeklyNewsroom(),{'cache-control':'public, max-age=180'})}catch(e){return json(res,500,{ok:false,error:e.message})}}
   if(u.pathname==='/api/live') {try{return json(res,200,await getLiveRadar(),{'cache-control':'public, max-age=300'})}catch(e){return json(res,500,{ok:false,error:e.message})}}
+  if(['/app/tournaments','/app/services','/app/fields'].includes(u.pathname))return serveStatic(req,res,'/index.html');
   return serveStatic(req,res);
 }).listen(PORT,()=>console.log(`SCD Super App listening on ${PORT}`));
