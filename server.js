@@ -11,6 +11,7 @@ const UPSTREAM = process.env.SCD_APPS_SCRIPT_URL || 'https://script.google.com/m
 const CACHE_TTL = 10 * 60 * 1000;
 const CLUB_TIME_ZONE = 'Europe/Rome';
 const DEPLOY_COMMIT = process.env.RENDER_GIT_COMMIT || process.env.SCD_DEPLOY_COMMIT || null;
+const PREVIEW_SAFE_MODE = process.env.SCD_PREVIEW_SAFE_MODE === 'true';
 const FEATURE_FLAGS = Object.freeze({
   dataFabricObservability: process.env.SCD_FEATURE_DATA_FABRIC_OBSERVABILITY === 'true',
   supabaseCore: process.env.SCD_FEATURE_SUPABASE_CORE === 'true'
@@ -490,6 +491,11 @@ async function serveSponsorPrivate(req,res,u){
 function decodeXml(s=''){return String(s).replace(/<!\[CDATA\[|\]\]>/g,'').replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>')}
 
 async function callAppsScript(action,payload={},sessionToken=''){
+  if(PREVIEW_SAFE_MODE&&!READ_ONLY_RETRY_ACTIONS.has(action)){
+    const error=new Error('Anteprima in sola lettura: azione bloccata');
+    error.code='PREVIEW_READ_ONLY';
+    throw error;
+  }
   const maxAttempts=READ_ONLY_RETRY_ACTIONS.has(action)?UPSTREAM_READ_ATTEMPTS:1;
   let lastError;
   for(let attempt=1;attempt<=maxAttempts;attempt++){
@@ -528,7 +534,11 @@ async function proxyAppsScript(req,res){
     if(!allowedActions.has(action)) return json(res,400,{ok:false,error:'Azione non consentita'});
     const {upstream,parsed,attempt}=await callAppsScript(action,body.payload||{},body.sessionToken||'');
     console.log('[api/scd] upstream',action,upstream.status,(Date.now()-started)+'ms','attempt',attempt); return json(res,upstream.ok?200:400,parsed);
-  }catch(e){console.error('[api/scd] failed',e.message||e);return json(res,502,{ok:false,error:e.message||'Backend SCD non disponibile'})}
+  }catch(e){
+    console.error('[api/scd] failed',e.message||e);
+    if(e.code==='PREVIEW_READ_ONLY')return json(res,403,{ok:false,error:e.message,code:e.code});
+    return json(res,502,{ok:false,error:e.message||'Backend SCD non disponibile'});
+  }
 }
 
 
@@ -921,10 +931,10 @@ function serveStatic(req,res,overridePath){
 http.createServer(async(req,res)=>{
   applyCors(req,res); if(req.method==='OPTIONS'){res.writeHead(204);return res.end()}
   const u=new URL(req.url,'http://localhost');
-  if(u.pathname==='/health') return json(res,200,{...clubTimePayload(),service:'SCD Super App',version:'40.0.0',commit:DEPLOY_COMMIT});
+  if(u.pathname==='/health') return json(res,200,{...clubTimePayload(),service:'SCD Super App',version:'40.0.0',commit:DEPLOY_COMMIT,previewSafeMode:PREVIEW_SAFE_MODE});
   if(u.pathname==='/api/time') return json(res,200,clubTimePayload());
-  if(u.pathname==='/api/capabilities') return json(res,200,{ok:true,version:'40.0.0',mode:'GITHUB_PAGES_RENDER_R20_SUPABASE_DUAL_RUN',actions:[...allowedActions].sort(),featureFlags:FEATURE_FLAGS,domainCore:SUPABASE_RUNTIME,isolated:['safeguarding']});
-  if(u.pathname==='/api/core-status') return json(res,200,{ok:true,version:'40.0.0',featureFlags:FEATURE_FLAGS,domainCore:SUPABASE_RUNTIME,currentPrimary:'R20',targetPrimary:'SCD_SUPABASE'});
+  if(u.pathname==='/api/capabilities') return json(res,200,{ok:true,version:'40.0.0',mode:'GITHUB_PAGES_RENDER_R20_SUPABASE_DUAL_RUN',actions:[...allowedActions].sort(),featureFlags:FEATURE_FLAGS,domainCore:SUPABASE_RUNTIME,runtimeSafety:{previewSafeMode:PREVIEW_SAFE_MODE,writePolicy:PREVIEW_SAFE_MODE?'READ_ONLY':'NORMAL'},isolated:['safeguarding']});
+  if(u.pathname==='/api/core-status') return json(res,200,{ok:true,version:'40.0.0',featureFlags:FEATURE_FLAGS,domainCore:SUPABASE_RUNTIME,currentPrimary:'R20',targetPrimary:'SCD_SUPABASE',runtimeSafety:{previewSafeMode:PREVIEW_SAFE_MODE,writePolicy:PREVIEW_SAFE_MODE?'READ_ONLY':'NORMAL'}});
   if(u.pathname==='/api/public/donation-config') return handleDonationConfig(req,res);
   if(u.pathname==='/api/public/donation-intent') return handleDonationIntent(req,res);
   if(u.pathname==='/api/sponsor/lead') return handleSponsorLead(req,res);
