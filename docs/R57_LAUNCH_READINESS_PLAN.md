@@ -1,0 +1,1 @@
+# R57 Launch Readiness\n\nHard deadline: 9 October 2026.\n\nThis file records the fail-closed launch-readiness workstream for ONE, CORE and GROW.\n
