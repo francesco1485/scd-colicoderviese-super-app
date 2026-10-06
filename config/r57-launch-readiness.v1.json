@@ -1,0 +1,152 @@
+{
+  "schema": "SCD_R57_LAUNCH_READINESS_V1",
+  "release": "R57.PRODUCT",
+  "deadline": "2026-10-09",
+  "evidenceAsOf": "2026-10-06T07:25:00+02:00",
+  "policy": "FAIL_CLOSED_NO_INFERRED_READINESS",
+  "gates": [
+    {
+      "id": "ONE",
+      "label": "SCD ONE",
+      "state": "VERIFIED",
+      "critical": true,
+      "evidence": [
+        "test:scd-one-contract",
+        "seven-viewport visual QA",
+        "mobile smoke"
+      ]
+    },
+    {
+      "id": "CORE",
+      "label": "SCD CORE / Control Room",
+      "state": "VERIFIED",
+      "critical": true,
+      "evidence": [
+        "test:scd-core-contract",
+        "Control Room contract tests"
+      ]
+    },
+    {
+      "id": "GROW",
+      "label": "SCD GROW / Sponsor",
+      "state": "VERIFIED",
+      "critical": true,
+      "evidence": [
+        "test:scd-grow-contract",
+        "Sponsor runtime smoke"
+      ]
+    },
+    {
+      "id": "IDENTITY",
+      "label": "Identity / roles / scope",
+      "state": "LIMITED",
+      "critical": true,
+      "evidence": [
+        "R20 remains current authority",
+        "R56 identity foundation"
+      ],
+      "limitation": "Live R20 authenticated-session verification is still required."
+    },
+    {
+      "id": "CALENDAR_EVENTS",
+      "label": "Calendar / events / matches",
+      "state": "LIMITED",
+      "critical": true,
+      "evidence": [
+        "R56 Calendar Fusion contract",
+        "ONE calendar UI"
+      ],
+      "limitation": "Live R20/calendar-source verification is still required."
+    },
+    {
+      "id": "INTAKE",
+      "label": "Requests / document intake",
+      "state": "LIMITED",
+      "critical": true,
+      "evidence": [
+        "Intake link factory tests",
+        "Intake contract tests"
+      ],
+      "limitation": "Upload adapter is not yet verified ready in runtime."
+    },
+    {
+      "id": "COMMUNICATIONS",
+      "label": "Operational communications",
+      "state": "LIMITED",
+      "critical": true,
+      "evidence": [
+        "CRM communication contract",
+        "R57 Gmail operational intake"
+      ],
+      "limitation": "Live authorized R20/Gmail send path still requires release verification."
+    },
+    {
+      "id": "SPONSOR_CRM",
+      "label": "Sponsor / CRM",
+      "state": "VERIFIED",
+      "critical": true,
+      "evidence": [
+        "SCD GROW pipeline contract",
+        "Sponsor runtime smoke"
+      ]
+    },
+    {
+      "id": "TOURNAMENT_MINIMUM",
+      "label": "Tournament / event manager minimum",
+      "state": "UNVERIFIED",
+      "critical": true,
+      "evidence": [],
+      "limitation": "Minimum operational tournament slice has not yet produced launch evidence."
+    },
+    {
+      "id": "MEMBERSHIP_SERVICES",
+      "label": "Membership / club services",
+      "state": "UNVERIFIED",
+      "critical": true,
+      "evidence": [],
+      "limitation": "Launch-minimum membership service slice has not yet produced launch evidence."
+    },
+    {
+      "id": "FACILITY_LOGISTICS",
+      "label": "Facility / logistics",
+      "state": "UNVERIFIED",
+      "critical": true,
+      "evidence": [
+        "Transport requests exist"
+      ],
+      "limitation": "Facility/logistics launch slice is incomplete beyond existing transport flows."
+    },
+    {
+      "id": "PROVENANCE_AUDIT",
+      "label": "Provenance / audit",
+      "state": "VERIFIED",
+      "critical": true,
+      "evidence": [
+        "R57 data fabric contract",
+        "source diagnostics",
+        "correlation/audit contracts"
+      ]
+    },
+    {
+      "id": "HEALTH_OBSERVABILITY",
+      "label": "Health / observability",
+      "state": "IMPLEMENTED",
+      "critical": true,
+      "evidence": [
+        "/health",
+        "/api/core-status"
+      ],
+      "limitation": "Launch-readiness endpoint is being integrated and must pass CI/preview verification."
+    },
+    {
+      "id": "RESPONSIVE_QA",
+      "label": "Responsive mobile / desktop",
+      "state": "VERIFIED",
+      "critical": true,
+      "evidence": [
+        "seven-viewport visual QA",
+        "mobile smoke"
+      ]
+    }
+  ]
+}
