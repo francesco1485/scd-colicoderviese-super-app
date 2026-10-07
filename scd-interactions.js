@@ -4,6 +4,17 @@
   const twinKey='scd:twin:v1';
   window.SCDExperience?.bind?.(document,'base');
 
+  // R57 launch guard: canonical facilities view remains fail-closed but reachable.
+  if(window.SCDNextGen?.setView){
+    const originalSetView=window.SCDNextGen.setView.bind(window.SCDNextGen);
+    window.SCDNextGen.setView=(view,options)=>originalSetView(view==='facilities'?'fields':view,options);
+    qa('[data-nav="facilities"]').forEach(button=>button.addEventListener('click',event=>{
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      window.SCDNextGen.setView('facilities');
+    },true));
+  }
+
   q('#intakeAdminBtn')?.addEventListener('click',()=>{
     location.href='./intake/admin.html';
   });
