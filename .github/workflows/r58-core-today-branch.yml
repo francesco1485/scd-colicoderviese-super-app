@@ -20,6 +20,8 @@ jobs:
       - name: Today attention contract
         run: |
           if [ -f tests/scd-today-attention-contract.mjs ]; then node tests/scd-today-attention-contract.mjs; fi
+      - name: Legacy SCD CORE contract
+        run: npm run test:scd-core-contract
       - name: Command grammar contract
         run: |
           if [ -f tests/scd-command-grammar-contract.mjs ]; then node tests/scd-command-grammar-contract.mjs; fi
