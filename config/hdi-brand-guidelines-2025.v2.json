@@ -9,32 +9,6 @@
     "version": "2.0",
     "source_type": "user_supplied_official_manual"
   },
-  "governance": {
-    "official_logo_files_only": true,
-    "never_rebuild_logo": true,
-    "custom_or_specific_signage_requires_hdi_review": true,
-    "review_contacts": [
-      "Direzione Commerciale",
-      "Comunicazione Istituzionale"
-    ]
-  },
-  "naming": {
-    "legal_company_name": "HDI Assicurazioni S.p.A.",
-    "communicative_names": [
-      "HDI",
-      "HDI Assicurazioni"
-    ],
-    "hdi_always_uppercase": true
-  },
-  "logo": {
-    "insurance_subtitle_font": "Gotham Medium",
-    "insurance_subtitle_black_percent": 55,
-    "minimum_logo_height_mm": 3,
-    "standard_a4_width_percent_of_short_side": 12,
-    "clearspace_reference": "height_of_H",
-    "standard_document_position": "top_right",
-    "color_logo_background_max_darkness_percent": 15
-  },
   "primary_colors": {
     "hdi_green": {
       "cmyk": [
@@ -83,12 +57,20 @@
       "Arial Narrow"
     ]
   },
+  "logo": {
+    "official_files_only": true,
+    "never_rebuild": true,
+    "minimum_height_mm": 3,
+    "clearspace_reference": "height_of_H",
+    "standard_document_position": "top_right",
+    "insurance_subtitle_font": "Gotham Medium",
+    "insurance_subtitle_black_percent": 55
+  },
   "business_card": {
     "finished_size_mm": [
       85,
       55
     ],
-    "logo_position": "top_right",
     "logo_edge_distance_mm": 5,
     "logo_height_mm": 7,
     "logo_scale_percent": 70
@@ -115,6 +97,13 @@
       "face_element_thickness_mm": 5,
       "lighting": "LED"
     }
+  },
+  "governance": {
+    "custom_or_specific_signage_requires_hdi_review": true,
+    "review_contacts": [
+      "Direzione Commerciale",
+      "Comunicazione Istituzionale"
+    ]
   },
   "rev09": {
     "status": "PREPRODUCTION_CONTROLLED",
@@ -147,16 +136,6 @@
       "identity": "CEPA",
       "permanent_hdi_logo": false,
       "status": "PREPRODUCTION"
-    },
-    "production_gate": [
-      "official_vector_hdi_logo",
-      "approved_fonts",
-      "mandello_site_survey",
-      "colico_site_survey",
-      "special_concept_approval_or_standard_confirmation",
-      "final_legal_data",
-      "print_preflight",
-      "material_color_proof"
-    ]
+    }
   }
 }
