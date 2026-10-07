@@ -998,13 +998,22 @@ function coreBrainActionFromRow(row,channel,index){
   const owner=String(coreBrainPick(row,'owner','responsabile','assignee','referente')||'').trim();
   const source=String(coreBrainPick(row,'source','fonte')||channel).trim();
   const recordId=String(coreBrainPick(row,'id','recordId','taskId','requestId','uid')||channel+'-'+index).trim();
+  const team=String(coreBrainPick(row,'team','teamName','squadra')||'').trim();
+  const category=String(coreBrainPick(row,'category','categoria','ageGroup','annata')||'').trim();
+  const approvalValue=coreBrainPick(row,'approvalRequired','requiresApproval','humanGate','human_gate');
+  const approvalRequired=approvalValue===true||['TRUE','YES','SI','SÌ','1','REQUIRED'].includes(String(approvalValue||'').trim().toUpperCase());
+  const requestedMode=String(coreBrainPick(row,'actionMode','action_mode')||'').trim().toUpperCase();
+  const actionMode=approvalRequired?'HUMAN_GATE':(requestedMode==='READ'?'READ':'HUMAN_GATE');
+  const sourceUrl=cleanPublicHttpsUrl(coreBrainPick(row,'sourceUrl','source_url','url','link')||'')||null;
   if(!title&&!nextAction&&!status&&!due)return null;
   return {
     recordId,channel,title:title||nextAction||status||'Elemento operativo',
     nextAction:nextAction||null,status:status||null,priority:priority||null,
     due:due||null,owner:owner||null,source,
+    team:team||null,category:category||null,approvalRequired,actionMode,sourceUrl,
+    verificationState:'VERIFIED',
     explicitPriorityScore:coreBrainPriorityValue(priority),
-    evidence:{channel,recordId,source}
+    evidence:{channel,recordId,source,sourceUrl}
   };
 }
 async function coreBrainChannel(action,payload,sessionToken){
@@ -1041,7 +1050,8 @@ async function handleCoreBrain(req,res){
   const channels=Object.fromEntries(channelResults);
   const actionQueue=[];
   for(const [channel,result] of channelResults){
-    for(const [index,row] of coreBrainRows(result.data).entries()){
+    const activeRows=filterActiveSCDTeamRows(coreBrainRows(result.data));
+    for(const [index,row] of activeRows.entries()){
       const item=coreBrainActionFromRow(row,channel,index);
       if(item)actionQueue.push(item);
     }
