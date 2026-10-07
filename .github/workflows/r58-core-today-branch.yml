@@ -33,3 +33,4 @@ jobs:
           node --check server.js
           if [ -f lib/scd-today-attention.js ]; then node --check lib/scd-today-attention.js; fi
           if [ -f lib/scd-command-grammar.js ]; then node --check lib/scd-command-grammar.js; fi
+          if [ -f r58/core-today/app.js ]; then node --check r58/core-today/app.js; fi
