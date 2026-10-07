@@ -1,0 +1,965 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "SCD_ACCESSORY_LIBRARY",
+  "status": "DESIGN_FOUNDATION",
+  "sourceClass": "GENERATED_ORIGINAL",
+  "groups": [
+    {
+      "id": "FOOTBALL",
+      "label": "FOOTBALL"
+    },
+    {
+      "id": "PEOPLE",
+      "label": "PEOPLE"
+    },
+    {
+      "id": "LOGISTICS",
+      "label": "LOGISTICS"
+    },
+    {
+      "id": "FACILITY",
+      "label": "FACILITY"
+    },
+    {
+      "id": "WAREHOUSE",
+      "label": "WAREHOUSE"
+    },
+    {
+      "id": "ADMINISTRATION",
+      "label": "ADMINISTRATION"
+    },
+    {
+      "id": "COMMUNICATION",
+      "label": "COMMUNICATION"
+    },
+    {
+      "id": "SPONSOR",
+      "label": "SPONSOR"
+    }
+  ],
+  "states": [
+    "NORMAL",
+    "SELECTED",
+    "ASSIGNED",
+    "AVAILABLE",
+    "BUSY",
+    "WARNING",
+    "ERROR",
+    "LOCKED",
+    "UNVERIFIED"
+  ],
+  "accessories": [
+    {
+      "id": "FOOTBALL_BALL",
+      "group": "FOOTBALL",
+      "masterPath": "assets/ui/accessories/football-ball.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "FOOTBALL_CONE",
+      "group": "FOOTBALL",
+      "masterPath": "assets/ui/accessories/football-cone.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "FOOTBALL_BIB",
+      "group": "FOOTBALL",
+      "masterPath": "assets/ui/accessories/football-bib.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "FOOTBALL_GOAL",
+      "group": "FOOTBALL",
+      "masterPath": "assets/ui/accessories/football-goal.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "FOOTBALL_BAG",
+      "group": "FOOTBALL",
+      "masterPath": "assets/ui/accessories/football-bag.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "TACTICAL_BOARD",
+      "group": "FOOTBALL",
+      "masterPath": "assets/ui/accessories/tactical-board.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "WHISTLE",
+      "group": "FOOTBALL",
+      "masterPath": "assets/ui/accessories/whistle.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "MEDICAL_KIT",
+      "group": "FOOTBALL",
+      "masterPath": "assets/ui/accessories/medical-kit.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "JERSEY",
+      "group": "PEOPLE",
+      "masterPath": "assets/ui/accessories/jersey.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "PLAYER_NUMBER",
+      "group": "PEOPLE",
+      "masterPath": "assets/ui/accessories/player-number.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "CAPTAIN_BADGE",
+      "group": "PEOPLE",
+      "masterPath": "assets/ui/accessories/captain-badge.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "STAFF_BADGE",
+      "group": "PEOPLE",
+      "masterPath": "assets/ui/accessories/staff-badge.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "DIRECTOR_BADGE",
+      "group": "PEOPLE",
+      "masterPath": "assets/ui/accessories/director-badge.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "VAN",
+      "group": "LOGISTICS",
+      "masterPath": "assets/ui/accessories/van.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "CAR",
+      "group": "LOGISTICS",
+      "masterPath": "assets/ui/accessories/car.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "SEAT",
+      "group": "LOGISTICS",
+      "masterPath": "assets/ui/accessories/seat.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "LUGGAGE",
+      "group": "LOGISTICS",
+      "masterPath": "assets/ui/accessories/luggage.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "STOP",
+      "group": "LOGISTICS",
+      "masterPath": "assets/ui/accessories/stop.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "KEY",
+      "group": "LOGISTICS",
+      "masterPath": "assets/ui/accessories/key.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "FIELD",
+      "group": "FACILITY",
+      "masterPath": "assets/ui/accessories/field.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "LOCKER_ROOM",
+      "group": "FACILITY",
+      "masterPath": "assets/ui/accessories/locker-room.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "LOCKER",
+      "group": "FACILITY",
+      "masterPath": "assets/ui/accessories/locker.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "SHOWER",
+      "group": "FACILITY",
+      "masterPath": "assets/ui/accessories/shower.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "GYM",
+      "group": "FACILITY",
+      "masterPath": "assets/ui/accessories/gym.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "CLUBHOUSE",
+      "group": "FACILITY",
+      "masterPath": "assets/ui/accessories/clubhouse.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "WAREHOUSE",
+      "group": "WAREHOUSE",
+      "masterPath": "assets/ui/accessories/warehouse.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "BOX",
+      "group": "WAREHOUSE",
+      "masterPath": "assets/ui/accessories/box.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "SHELF",
+      "group": "WAREHOUSE",
+      "masterPath": "assets/ui/accessories/shelf.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "SIZE",
+      "group": "WAREHOUSE",
+      "masterPath": "assets/ui/accessories/size.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "SKU",
+      "group": "WAREHOUSE",
+      "masterPath": "assets/ui/accessories/sku.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "BARCODE",
+      "group": "WAREHOUSE",
+      "masterPath": "assets/ui/accessories/barcode.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "QR",
+      "group": "WAREHOUSE",
+      "masterPath": "assets/ui/accessories/qr.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "DOCUMENT",
+      "group": "ADMINISTRATION",
+      "masterPath": "assets/ui/accessories/document.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "INVOICE",
+      "group": "ADMINISTRATION",
+      "masterPath": "assets/ui/accessories/invoice.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "PAYMENT",
+      "group": "ADMINISTRATION",
+      "masterPath": "assets/ui/accessories/payment.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "CONTRACT",
+      "group": "ADMINISTRATION",
+      "masterPath": "assets/ui/accessories/contract.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "RECEIPT",
+      "group": "ADMINISTRATION",
+      "masterPath": "assets/ui/accessories/receipt.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "MESSAGE",
+      "group": "COMMUNICATION",
+      "masterPath": "assets/ui/accessories/message.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "EMAIL",
+      "group": "COMMUNICATION",
+      "masterPath": "assets/ui/accessories/email.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "WHATSAPP_CHANNEL",
+      "group": "COMMUNICATION",
+      "masterPath": "assets/ui/accessories/whatsapp-channel.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "PUSH",
+      "group": "COMMUNICATION",
+      "masterPath": "assets/ui/accessories/push.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "ALERT",
+      "group": "COMMUNICATION",
+      "masterPath": "assets/ui/accessories/alert.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "LED_BOARD",
+      "group": "SPONSOR",
+      "masterPath": "assets/ui/accessories/led-board.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "BANNER",
+      "group": "SPONSOR",
+      "masterPath": "assets/ui/accessories/banner.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "SHIRT_PLACEMENT",
+      "group": "SPONSOR",
+      "masterPath": "assets/ui/accessories/shirt-placement.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "STAND",
+      "group": "SPONSOR",
+      "masterPath": "assets/ui/accessories/stand.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "TRIBUNE",
+      "group": "SPONSOR",
+      "masterPath": "assets/ui/accessories/tribune.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    },
+    {
+      "id": "HOSPITALITY",
+      "group": "SPONSOR",
+      "masterPath": "assets/ui/accessories/hospitality.svg",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sourceClass": "GENERATED_ORIGINAL",
+      "renderRule": "CURRENT_COLOR_TOKEN_DRIVEN",
+      "verification": "DESIGN_FOUNDATION"
+    }
+  ]
+}
