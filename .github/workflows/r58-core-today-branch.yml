@@ -1,0 +1,33 @@
+name: R58 Core Today Branch CI
+
+on:
+  push:
+    branches: ["r58-vi-4-core-today-reset"]
+  workflow_dispatch:
+
+jobs:
+  focused:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm install --ignore-scripts
+      - name: Manifest gate
+        run: npm run test:manifest
+      - name: Today attention contract
+        run: |
+          if [ -f tests/scd-today-attention-contract.mjs ]; then node tests/scd-today-attention-contract.mjs; fi
+      - name: Command grammar contract
+        run: |
+          if [ -f tests/scd-command-grammar-contract.mjs ]; then node tests/scd-command-grammar-contract.mjs; fi
+      - name: Core today API contract
+        run: |
+          if [ -f tests/scd-core-today-api.mjs ]; then node tests/scd-core-today-api.mjs; fi
+      - name: Syntax gate
+        run: |
+          node --check server.js
+          if [ -f lib/scd-today-attention.js ]; then node --check lib/scd-today-attention.js; fi
+          if [ -f lib/scd-command-grammar.js ]; then node --check lib/scd-command-grammar.js; fi
