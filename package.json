@@ -52,6 +52,7 @@
     "test:core-today-projection": "node tests/scd-today-attention-contract.mjs",
     "test:command-grammar": "node tests/scd-command-grammar-contract.mjs",
     "test:core-today-api": "node tests/scd-core-today-api.mjs",
-    "test:r58-core-today": "npm run test:core-today-projection && npm run test:command-grammar && npm run test:core-today-api"
+    "test:r58-core-today": "npm run test:core-today-projection && npm run test:command-grammar && npm run test:core-today-api",
+    "test:gestionale-visual-foundation": "node tests/gestionale-visual-foundation-contract.mjs"
   }
 }
