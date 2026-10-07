@@ -2,7 +2,7 @@ name: SCD App End-to-End
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "r58-vi-4-core-today-reset"]
   pull_request:
     branches: ["main"]
   workflow_dispatch:
