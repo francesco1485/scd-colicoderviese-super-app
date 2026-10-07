@@ -25,9 +25,12 @@ for(const token of [
   "state.socialFilter",
   "window.SCDOperativeEngine?.buildMatchDayCaption",
   "navigator.serviceWorker.register('./sw.js')",
-  "beforeinstallprompt",
-  "['pulse','calendar','teams','social','twin','desk']"
+  "beforeinstallprompt"
 ]) if(!js.includes(token))fail('runtime missing '+token);
+const routeMap=js.match(/const routeToView=\{([^}]+)\}/)?.[1]||'';
+for(const route of ["home:'pulse'","pulse:'pulse'","calendar:'calendar'","teams:'teams'","social:'social'","profile:'twin'","twin:'twin'","desk:'desk'"]){
+  if(!routeMap.includes(route))fail('runtime route mapping missing '+route);
+}
 
 if(!js.includes("if(!Array.isArray(x.evidence)||!x.evidence.length)return"))fail('news must fail closed without evidence');
 if(!js.includes("$$('[data-social-open]',mount).forEach")||!js.includes("$$('[data-social-share]',mount).forEach"))fail('Social feed collection bindings missing');

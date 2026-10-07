@@ -1,0 +1,179 @@
+{
+  "schema": "SCD_R57_LAUNCH_READINESS_V1",
+  "release": "R57.PRODUCT",
+  "deadline": "2026-10-09",
+  "evidenceAsOf": "2026-10-06T16:31:31Z",
+  "policy": "FAIL_CLOSED_NO_INFERRED_READINESS",
+  "gates": [
+    {
+      "id": "ONE",
+      "label": "SCD ONE",
+      "state": "VERIFIED",
+      "critical": true,
+      "evidence": [
+        "test:scd-one-contract",
+        "seven-viewport visual QA",
+        "mobile smoke"
+      ]
+    },
+    {
+      "id": "CORE",
+      "label": "SCD CORE / Control Room",
+      "state": "VERIFIED",
+      "critical": true,
+      "evidence": [
+        "test:scd-core-contract",
+        "Control Room contract tests"
+      ]
+    },
+    {
+      "id": "GROW",
+      "label": "SCD GROW / Sponsor",
+      "state": "VERIFIED",
+      "critical": true,
+      "evidence": [
+        "test:scd-grow-contract",
+        "Sponsor runtime smoke"
+      ]
+    },
+    {
+      "id": "IDENTITY",
+      "label": "Identity / roles / scope",
+      "state": "LIMITED",
+      "critical": true,
+      "evidence": [
+        "R20 remains current authority",
+        "R56 identity foundation"
+      ],
+      "limitation": "Live R20 authenticated-session verification is still required."
+    },
+    {
+      "id": "CALENDAR_EVENTS",
+      "label": "Calendar / events / matches",
+      "state": "LIMITED",
+      "critical": true,
+      "evidence": [
+        "R56 Calendar Fusion contract",
+        "ONE calendar UI",
+        "Google Calendar owner read verified 2026-10-06: official 2026/27 calendar reachable with 12 confirmed events in 01-15 Oct window"
+      ],
+      "limitation": "Google Calendar source is live/reachable; direct R20 runtime verification remains required before full VERIFIED status."
+    },
+    {
+      "id": "INTAKE",
+      "label": "Requests / document intake",
+      "state": "LIMITED",
+      "critical": true,
+      "evidence": [
+        "Intake link factory tests",
+        "Intake contract tests"
+      ],
+      "limitation": "Upload adapter is not yet verified ready in runtime."
+    },
+    {
+      "id": "COMMUNICATIONS",
+      "label": "Operational communications",
+      "state": "LIMITED",
+      "critical": true,
+      "evidence": [
+        "CRM communication contract",
+        "R57 Gmail operational intake",
+        "SCD Gmail inbox read verified 2026-10-06 with current operational traffic"
+      ],
+      "limitation": "Inbox/intake is reachable; authorized R20/Gmail send path still requires release verification."
+    },
+    {
+      "id": "SPONSOR_CRM",
+      "label": "Sponsor / CRM",
+      "state": "VERIFIED",
+      "critical": true,
+      "evidence": [
+        "SCD GROW pipeline contract",
+        "Sponsor runtime smoke"
+      ]
+    },
+    {
+      "id": "TOURNAMENT_MINIMUM",
+      "label": "Tournament / event manager minimum",
+      "state": "IMPLEMENTED",
+      "critical": true,
+      "evidence": [
+        "MASTER TORNEI & INIZIATIVE live/readable",
+        "PROGRAMMA TORNEI ADB 2026-27 and SEMAforo weekend planning present",
+        "Operativo Pilota TORNEI_PIPELINE is currently empty",
+        "GET /api/tournaments read-only R20 public.calendar projection and fail-closed contract tests",
+        "Withdrawn 2026/27 team rows are filtered from public calendar, newsroom, public feed and tournament projections; runtime contract regression test"
+      ],
+      "limitation": "Read-only calendar projection is implemented; the synchronized tournament pipeline is still empty and live R20 source verification is pending. No tournament manager writes or unverified records are exposed."
+    },
+    {
+      "id": "MEMBERSHIP_SERVICES",
+      "label": "Membership / club services",
+      "state": "IMPLEMENTED",
+      "critical": true,
+      "evidence": [
+        "Operativo Pilota ISCRIZIONI_CONFIG live/readable with active 2026/27 rules",
+        "Supabase scd_memberships contract exists but production table has 0 rows",
+        "GET /api/membership-services fail-closed source-binding contract tests"
+      ],
+      "limitation": "The source binding is not verified in this runtime. No member rows, fees, payment state, documents or eligibility are exposed; R20 remains the identity and scope authority."
+    },
+    {
+      "id": "FACILITY_LOGISTICS",
+      "label": "Facility / logistics",
+      "state": "IMPLEMENTED",
+      "critical": true,
+      "evidence": [
+        "Transport requests exist",
+        "IMPIANTI_MASTER and IMPIANTI_SPAZI live/readable",
+        "Colico C1/C2 and Dervio field catalogued with homologation verification still partial",
+        "GET /api/facility-logistics fail-closed status contract tests"
+      ],
+      "limitation": "The facility source binding is not verified in this runtime, so the catalogue stays empty and occupancy, rotation, homologation, category eligibility, transport and availability remain UNKNOWN/UNVERIFIED."
+    },
+    {
+      "id": "PROVENANCE_AUDIT",
+      "label": "Provenance / audit",
+      "state": "VERIFIED",
+      "critical": true,
+      "evidence": [
+        "R57 data fabric contract",
+        "source diagnostics",
+        "correlation/audit contracts"
+      ]
+    },
+    {
+      "id": "HEALTH_OBSERVABILITY",
+      "label": "Health / observability",
+      "state": "IMPLEMENTED",
+      "critical": true,
+      "evidence": [
+        "/health",
+        "/api/core-status",
+        "GET /api/launch-readiness config-backed runtime contract",
+        "SCD PULSE ACTIVE_HEALTHY verified 2026-10-06; migrations stop at R53; advisors remain open"
+      ],
+      "limitation": "Exact-head preview verification is still pending."
+    },
+    {
+      "id": "PREVIEW_EXACT_HEAD",
+      "label": "Exact-head preview verification",
+      "state": "PENDING",
+      "critical": true,
+      "evidence": [
+        "No preview deployment has verified the exact code head from this sprint."
+      ],
+      "limitation": "A separate preview deployment must report and verify this exact branch SHA before the gate can advance."
+    },
+    {
+      "id": "RESPONSIVE_QA",
+      "label": "Responsive mobile / desktop",
+      "state": "VERIFIED",
+      "critical": true,
+      "evidence": [
+        "seven-viewport visual QA",
+        "mobile smoke"
+      ]
+    }
+  ]
+}

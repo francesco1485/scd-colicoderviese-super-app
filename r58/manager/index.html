@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b1f3a">
+  <title>SCD Manager · R58</title>
+  <link rel="icon" href="../../assets/logo-scd.png">
+  <link rel="stylesheet" href="./app.css">
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <a class="brand" href="./" aria-label="SCD Manager Home">
+        <img src="../../assets/logo-scd.png" alt="SCD ColicoDerviese">
+        <div><strong>SCD MANAGER</strong><span>ColicoDerviese</span></div>
+      </a>
+      <nav aria-label="Navigazione principale">
+        <button class="nav active" data-view="home">Home</button>
+        <button class="nav" data-view="people">Persone / Fornitori</button>
+        <button class="nav" data-view="roles">Rapporti / Incarichi</button>
+        <button class="nav" data-view="month">Piano mensile</button>
+        <button class="nav" data-view="cash">Movimenti / Tesoreria</button>
+        <button class="nav" data-view="accounting">Contabilita</button>
+        <button class="nav" data-view="deadlines">Scadenze / Documenti</button>
+      </nav>
+      <div class="source-box">
+        <span>FONTE OPERATIVA</span>
+        <b id="sourceState">Verifica...</b>
+        <small id="sourceDetail">R20 · stato in controllo</small>
+      </div>
+    </aside>
+
+    <main>
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">GESTIONALE OPERATIVO</p>
+          <h1 id="pageTitle">Buongiorno. Ecco cosa richiede attenzione.</h1>
+        </div>
+        <div class="top-actions">
+          <span id="todayLabel"></span>
+          <button id="refreshBtn" type="button">Aggiorna</button>
+        </div>
+      </header>
+
+      <section class="brain-login panel" id="brainLoginPanel">
+        <header>
+          <div><span class="section-kicker">ACCESSO DIREZIONE</span><h2>Attiva la centralina</h2></div>
+          <span class="status" id="brainAuthState">NON AUTENTICATO</span>
+        </header>
+        <div class="brain-login-grid">
+          <label><span>Email</span><input id="brainEmail" type="email" autocomplete="email" placeholder="nome@dominio.it"></label>
+          <label><span>Codice / PIN</span><input id="brainCode" type="password" autocomplete="one-time-code" placeholder="Codice o PIN"></label>
+          <button type="button" id="brainRequestCode">Invia codice</button>
+          <button type="button" id="brainLoginBtn">Entra</button>
+        </div>
+        <small id="brainLoginState">La centralina privata richiede un account già autorizzato in R20.</small>
+      </section>
+
+      <section id="view-home" class="view active">
+        <div class="priority-strip">
+          <article><span>URGENTI</span><b id="urgentCount">0</b><small>azioni e anomalie</small></article>
+          <article><span>OGGI</span><b id="todayCount">0</b><small>gare / attivita</small></article>
+          <article><span>SCADENZE</span><b id="deadlineCount">0</b><small>da verificare</small></article>
+          <article><span>DOCUMENTI</span><b id="docCount">0</b><small>stato fonte</small></article>
+        </div>
+
+        <div class="grid two">
+          <section class="panel">
+            <header><div><span class="section-kicker">PRIORITA</span><h2>Da fare adesso</h2></div><span class="status" id="priorityState">LIVE</span></header>
+            <div id="priorityList" class="list"><div class="empty">Carico le priorita dalle fonti verificate.</div></div>
+          </section>
+
+          <section class="panel">
+            <header><div><span class="section-kicker">CALENDARIO</span><h2>Oggi e prossimi impegni</h2></div><span class="status">R20</span></header>
+            <div id="scheduleList" class="list"><div class="empty">Carico gli impegni del Club.</div></div>
+          </section>
+        </div>
+
+        <section class="panel quick-panel">
+          <header><div><span class="section-kicker">LAVORO QUOTIDIANO</span><h2>Vai direttamente a quello che devi fare</h2></div></header>
+          <div class="quick-grid">
+            <button data-open="people"><b>Persone e fornitori</b><span>Chi lavora con SCD e con quale rapporto</span></button>
+            <button data-open="roles"><b>Incarichi</b><span>Ruoli, responsabilita e compensi</span></button>
+            <button data-open="month"><b>Piano mensile</b><span>Cosa deve succedere questo mese</span></button>
+            <button data-open="cash"><b>Tesoreria</b><span>Entrate, uscite, pagamenti, anomalie</span></button>
+            <button data-open="accounting"><b>Contabilita</b><span>Documenti e flussi verso amministrazione</span></button>
+            <button data-open="deadlines"><b>Scadenze</b><span>Documenti mancanti e prossime date</span></button>
+          </div>
+        </section>
+      </section>
+
+      <section id="view-people" class="view">
+        <div class="workspace-head"><div><span class="section-kicker">ANAGRAFICA UNICA</span><h2>Persone / Fornitori</h2><p>Una persona una volta. Rapporti e incarichi separati.</p></div><button type="button" disabled>Nuovo record · preview</button></div>
+        <div class="panel"><div class="empty strong">La nuova struttura e pronta. Il binding operativo verra collegato senza copiare la vecchia UI.</div></div>
+      </section>
+
+      <section id="view-roles" class="view">
+        <div class="workspace-head"><div><span class="section-kicker">RESPONSABILITA</span><h2>Rapporti / Incarichi</h2><p>PSQ, Settore Giovanile, Struttura, Logistica, Amministrativo, Commerciale.</p></div></div>
+        <div class="panel"><div class="empty strong">Ogni incarico avra area, periodo, compenso, stato e documenti collegati.</div></div>
+      </section>
+
+      <section id="view-month" class="view">
+        <div class="workspace-head"><div><span class="section-kicker">PIANIFICAZIONE</span><h2>Piano mensile</h2><p>Attivita, responsabilita, costi previsti e stato di avanzamento.</p></div></div>
+        <div class="panel"><div class="empty strong">Vista mensile costruita per azioni e responsabilita, non per cartelle.</div></div>
+      </section>
+
+      <section id="view-cash" class="view">
+        <div class="workspace-head"><div><span class="section-kicker">FLUSSI ECONOMICI</span><h2>Movimenti / Tesoreria</h2><p>Cosa entra, cosa esce, cosa manca e cosa va autorizzato.</p></div></div>
+        <div class="panel"><div class="empty strong">Nessun importo di esempio. I dati compariranno solo da fonte contabile verificata.</div></div>
+      </section>
+
+      <section id="view-accounting" class="view">
+        <div class="workspace-head"><div><span class="section-kicker">AMMINISTRAZIONE</span><h2>Contabilita</h2><p>Documenti, registrazioni e flussi verso la contabilita ordinaria.</p></div></div>
+        <div class="panel"><div class="empty strong">La struttura resta separata dalla tesoreria per evitare confusione tra pagamento e registrazione contabile.</div></div>
+      </section>
+
+      <section id="view-deadlines" class="view">
+        <div class="workspace-head"><div><span class="section-kicker">CONTROLLO</span><h2>Scadenze / Documenti</h2><p>Scadenze operative, documenti mancanti, certificati e adempimenti.</p></div></div>
+        <div class="panel"><div class="empty strong">Qui confluiranno soltanto scadenze verificabili con fonte e responsabile.</div></div>
+      </section>
+    </main>
+  </div>
+  <script src="./app.js"></script>
+</body>
+</html>

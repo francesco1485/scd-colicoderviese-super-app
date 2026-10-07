@@ -1,0 +1,71 @@
+name: R57 Product Convergence Verification
+
+on:
+  push:
+    branches:
+      - "r57-product-convergence-v2"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install dependencies
+        run: npm install
+      - name: Full contract regression
+        run: npm run check
+      - name: API, resilience and preview safety
+        run: npm run test:contract && npm run test:resilience && npm run test:preview-safe-mode
+      - name: Install browser
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Build Pages artifact
+        run: npm run build:pages
+      - name: Start deterministic CI upstream
+        run: |
+          node tests/ci-upstream-stub.mjs > /tmp/scd-upstream.log 2>&1 &
+          echo $! > /tmp/scd-upstream.pid
+          for i in {1..20}; do
+            if curl -fsS http://127.0.0.1:18080/health >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/scd-upstream.log
+          exit 1
+      - name: Start isolated server
+        run: |
+          SCD_APPS_SCRIPT_URL=http://127.0.0.1:18080/ SCD_STATIC_DIR=_site npm start > /tmp/scd-product.log 2>&1 &
+          echo $! > /tmp/scd-product.pid
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:10000/health >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/scd-product.log
+          exit 1
+      - name: SCD ONE seven viewport visual QA
+        run: node tests/scd-one-visual-qa.mjs
+      - name: Mobile smoke
+        run: npm run test:smoke
+      - name: Logs
+        if: always()
+        run: |
+          echo "=== deterministic CI upstream ==="
+          cat /tmp/scd-upstream.log || true
+          echo "=== SCD product server ==="
+          cat /tmp/scd-product.log || true
+      - name: Upload visual evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r57-product-visual-evidence
+          path: test-output/*
+          if-no-files-found: ignore
+          retention-days: 14

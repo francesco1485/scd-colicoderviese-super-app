@@ -102,7 +102,7 @@ for(const viewport of viewports){
   const skyAsset=await page.locator('#mirrorFab img').getAttribute('src');
   if(!/assets\/sky\.png$/.test(String(skyAsset||'')))throw new Error('official Sky mascot missing from chatbot');
     const navLabels=await page.locator('.bottom-nav button').allTextContents();
-  for(const label of ['Home','Calendario','Squadre','Social','Profilo'])if(!navLabels.some(x=>x.includes(label)))throw new Error('mobile nav missing '+label);
+  for(const label of ['HOME','CALENDAR','TEAMS','SOCIAL','PROFILE'])if(!navLabels.some(x=>String(x).toUpperCase().includes(label)))throw new Error('canonical nav missing '+label);
   const visibleLegacy=await page.evaluate(()=>['.home-secondary-hero','.ng-command-ring','.pulse-strip','.ng-constellation','.worlds-preview','.ng-value-engine'].filter(sel=>{const el=document.querySelector(sel);return el&&getComputedStyle(el).display!=='none'}));
   if(visibleLegacy.length)throw new Error('secondary clutter visible on public home: '+visibleLegacy.join(','));
 
@@ -132,6 +132,19 @@ for(const viewport of viewports){
   await page.waitForSelector('#view-calendar.active');
   await page.waitForSelector('#calendarPublicList');
   if(await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+3))throw new Error('calendar view horizontal overflow');
+  for(const [view,selector,expected] of [
+    ['tournaments','#tournamentState','TORNEI IN AGGIORNAMENTO'],
+    ['services','#membershipServiceState','SOURCE_BINDING_UNVERIFIED'],
+    ['facilities','#facilityLogisticsState','UNVERIFIED']
+  ]){
+    mark('R57_'+view.toUpperCase()+'_'+viewport.width);
+    await page.evaluate(next=>window.SCDNextGen.setView(next),view);
+    await page.waitForSelector(`#view-${view}.active`);
+    await page.waitForFunction(({selector,text})=>document.querySelector(selector)?.textContent.includes(text),{selector, text:expected});
+    if(await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+3))throw new Error(view+' view horizontal overflow');
+    if([390,1440].includes(viewport.width))await page.screenshot({path:`test-output/${view}-${viewport.width}x${viewport.height}.png`,fullPage:true});
+  }
+  await page.evaluate(()=>window.SCDNextGen.setView('calendar'));
   mark('TEAMS_'+viewport.width);
   await page.evaluate(()=>window.SCDNextGen.setView('teams'));
   await page.waitForSelector('#view-teams.active');
@@ -210,7 +223,10 @@ for(const viewport of viewports){
   await page.evaluate(()=>window.SCDNextGen.setView('pulse'));
 
   const shellWidth=await page.locator('.app').evaluate(el=>Math.round(el.getBoundingClientRect().width));
-  if(viewport.width>=1280 && shellWidth<1200)throw new Error('desktop shell too narrow: '+shellWidth+'px');
+  if(viewport.width>=1280){
+    const expectedDesktopShell=Math.min(1600,viewport.width-176);
+    if(shellWidth<expectedDesktopShell-4)throw new Error('desktop shell below adaptive target: '+shellWidth+'px < '+expectedDesktopShell+'px');
+  }
 
   if([390,430,1440,1920].includes(viewport.width)){
     await page.screenshot({path:'test-output/nova-'+viewport.width+'x'+viewport.height+'.png',fullPage:true});
@@ -218,6 +234,14 @@ for(const viewport of viewports){
 
   if(errors.length)allErrors.push(viewport.width+'x'+viewport.height+': '+errors.join(' | '));
   await page.close();
+  if(viewport.width===390){
+    const routePage=await browser.newPage({viewport});
+    await routePage.goto(base+'/app/tournaments',{waitUntil:'domcontentloaded'});
+    await routePage.waitForSelector('#view-tournaments.active');
+    await routePage.waitForFunction(()=>document.querySelector('#tournamentState')?.textContent.includes('TORNEI IN AGGIORNAMENTO'));
+    if(await routePage.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+3))throw new Error('direct tournaments route horizontal overflow');
+    await routePage.close();
+  }
 }
 
 // R54 private journey: live Nova Private Desk with intercepted authorized R20 responses.
@@ -226,7 +250,7 @@ for(const viewport of [{width:390,height:844},{width:1440,height:900}]){
   const privatePage=await browser.newPage({viewport});
   const privateErrors=[];
   privatePage.on('pageerror',e=>privateErrors.push(String(e)));
-  privatePage.on('console',m=>{if(m.type()==='error')privateErrors.push('console: '+m.text())});
+  privatePage.on('console',m=>{if(m.type()==='error'){const loc=m.location();privateErrors.push('console: '+m.text()+(loc?.url?' @ '+loc.url:''))}});
 
   const dashboard={
     user:{name:'QA SCD',email:'qa@example.test',role:'STAFF',area:'U16',staff:true},
@@ -262,6 +286,8 @@ for(const viewport of [{width:390,height:844},{width:1440,height:900}]){
     else if(action==='account.requests')data={rows:[{id:'REQ-QA-1',subject:'Documento QA',status:'APERTA',createdAt:'2026-10-02T10:00:00Z'}]};
     else if(action==='private.attendance.get')data={statuses:['PRESENTE','ASSENTE','GIUSTIFICATO'],players:[{code:'P001',name:'Atleta Uno',status:'PRESENTE'}]};
     else if(['private.attendance.save','private.convocation.create','private.convocation.reply','private.transport.request','private.message.send','private.request.submit'].includes(action))data={ok:true,id:'QA-WRITE-1'};
+    else if(action==='public.calendar')data=[];
+    else if(['public.feed','public.club','public.datafabric.contract'].includes(action))data={};
     else return route.continue();
     await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({ok:true,data})});
   });
@@ -347,7 +373,7 @@ for(const viewport of [{width:390,height:844},{width:1440,height:900}]){
 mark('R56_FAMILY_ATHLETE_ROLE_SCOPE');
 for(const roleCase of [
   {role:'FAMILY',email:'family.qa@example.test',token:'qa-family-token',person:{personId:'QA-F1',code:'QAF1',firstName:'Famiglia',lastName:'QA',teamName:'U14'}},
-  {role:'ATHLETE',email:'athlete.qa@example.test',token:'qa-athlete-token',person:{personId:'QA-A1',code:'QAA1',firstName:'Atleta',lastName:'QA',teamName:'U18'}}
+  {role:'ATHLETE',email:'athlete.qa@example.test',token:'qa-athlete-token',person:{personId:'QA-A1',code:'QAA1',firstName:'Atleta',lastName:'QA'}}
 ]){
   const rolePage=await browser.newPage({viewport:{width:390,height:844}});
   const roleErrors=[];
@@ -377,6 +403,8 @@ for(const roleCase of [
     else if(action==='dashboard.summary')data=roleDashboard;
     else if(action==='private.user.workspace')data=roleWorkspace;
     else if(action==='account.requests')data={rows:[]};
+    else if(action==='public.calendar')data=[];
+    else if(['public.feed','public.club','public.datafabric.contract'].includes(action))data={};
     else return route.continue();
     await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({ok:true,data})});
   });
@@ -426,7 +454,9 @@ mark('R56_PUBLIC_IDENTITY_PREFLIGHT');
       data={accepted:true};
     }else if(action==='public.registration'){
       registrationSeen=true;data={requestId:'QA-REG-001'};
-    }else return route.continue();
+    }else if(action==='public.calendar')data=[];
+    else if(['public.feed','public.club','public.datafabric.contract'].includes(action))data={};
+    else return route.continue();
     await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({ok:true,data})});
   });
   await joinPage.goto(base+'/#pulse',{waitUntil:'domcontentloaded',timeout:30000});
@@ -472,11 +502,20 @@ mark('R56_IDENTITY_ACCESS_JOURNEY');
     if(action==='public.telemetry'){telemetrySeen=true;data={accepted:true}}
     else if(action==='auth.login')data={token:'qa-direction-token'};
     else if(action==='auth.validate')data={valid:true};
+    else if(action==='auth.access.log')data={ok:true};
+    else if(action==='auth.identity.resolve')data={matched:true,matchMethod:'QA_SYNTHETIC'};
     else if(action==='dashboard.summary')data=directionDashboard;
     else if(action==='private.user.workspace')data=directionWorkspace;
     else if(action==='direction.access.invite'){inviteSeen=true;data={ok:true,email:'new.user@example.test',role:'FAMILY',identity:{matched:true,matchMethod:'EMAIL_EXACT'},temporaryCodeSent:true}}
     else if(action==='auth.pin.change'){pinSeen=true;data={ok:true}}
     else if(action==='direction.access.metrics'){metricsSeen=true;data={days:30,activeUsers:4,loginEvents:9,privateDeskOpens:7,daily:[{date:'2026-10-03',activeUsers:4}]}}
+    else if(action==='private.agenda.summary')data={rows:[]};
+    else if(action==='direction.evolution')data={rows:[]};
+    else if(action==='direction.datafabric.actions')data={rows:[]};
+    else if(action==='direction.diagnostics')data={};
+    else if(action==='direction.datafabric.status')data={};
+    else if(action==='public.calendar')data=[];
+    else if(['public.feed','public.club','public.datafabric.contract'].includes(action))data={};
     else return route.continue();
     await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({ok:true,data})});
   });
@@ -591,7 +630,7 @@ if(typeof cap.featureFlags?.supabaseCore!=='boolean')throw new Error('supabase f
 const pwaManifest=await api.request.get(base+'/manifest.webmanifest');
 if(!pwaManifest.ok())throw new Error('manifest.webmanifest missing');
 const pwaJson=await pwaManifest.json();
-if(pwaJson.theme_color!=='#041c3a'||pwaJson.background_color!=='#f2f5f9')throw new Error('SCD Arena PWA colors missing');
+if(pwaJson.theme_color!=='#031A35'||pwaJson.background_color!=='#031A35')throw new Error('SCD ONE PWA colors missing');
 for(const resource of ['/sw.js','/robots.txt','/sitemap.xml']){
   const rr=await api.request.get(base+resource);
   if(!rr.ok())throw new Error(resource+' missing');

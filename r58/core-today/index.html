@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#081a33">
+  <title>SCD CORE · Oggi</title>
+  <link rel="icon" href="../../assets/logo-scd.png">
+  <link rel="stylesheet" href="./app.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Vai al contenuto</a>
+  <div class="app-shell">
+    <aside class="context-rail" aria-label="Contesto operativo">
+      <a class="club-mark" href="./" aria-label="SCD CORE Oggi">
+        <img src="../../assets/logo-scd.png" alt="">
+        <span><b>SCD CORE</b><small>ColicoDerviese</small></span>
+      </a>
+
+      <div class="context-block">
+        <span class="micro">OGGI</span>
+        <strong id="clubDate">Verifica data…</strong>
+        <small>Europe/Rome</small>
+      </div>
+
+      <div class="context-block">
+        <span class="micro">PROFILO</span>
+        <strong id="roleLabel">Non autenticato</strong>
+        <small id="identityLabel">R20 identity</small>
+      </div>
+
+      <div class="source-state" id="sourceBox" data-state="UNVERIFIED">
+        <span class="micro">FONTI</span>
+        <strong id="sourceState">DA VERIFICARE</strong>
+        <small id="sourceDetail">Nessun dato viene stimato.</small>
+      </div>
+
+      <nav class="command-nav" aria-label="Comandi CORE">
+        <button type="button" data-command="/today" class="command active"><span>/today</span><small>Priorità di oggi</small></button>
+        <button type="button" data-command="/attention" class="command"><span>/attention</span><small>Cosa richiede attenzione</small></button>
+      </nav>
+
+      <button class="quiet-button" id="logoutBtn" type="button" hidden>Esci</button>
+    </aside>
+
+    <main id="main">
+      <header class="topline">
+        <div>
+          <span class="micro accent">CENTRALINA OPERATIVA</span>
+          <h1>Una cosa alla volta.<br><span>Quella che conta adesso.</span></h1>
+        </div>
+        <button id="refreshBtn" class="refresh" type="button" aria-label="Aggiorna dati">Aggiorna</button>
+      </header>
+
+      <section class="auth-gate" id="authGate" aria-labelledby="authTitle">
+        <div class="gate-copy">
+          <span class="micro">ACCESSO R20</span>
+          <h2 id="authTitle">Entra nella centralina privata</h2>
+          <p>Usa l’account SCD già autorizzato. Nessun nuovo profilo, nessun secondo sistema di accesso.</p>
+        </div>
+        <div class="auth-form">
+          <label><span>Email</span><input id="emailInput" type="email" autocomplete="email" inputmode="email"></label>
+          <label><span>Codice / PIN</span><input id="codeInput" type="password" autocomplete="one-time-code" inputmode="numeric"></label>
+          <div class="auth-actions">
+            <button type="button" id="requestCodeBtn" class="secondary">Invia codice</button>
+            <button type="button" id="loginBtn" class="primary">Entra</button>
+          </div>
+          <p class="form-state" id="authState" role="status">Accesso richiesto per leggere le fonti operative.</p>
+        </div>
+      </section>
+
+      <section id="workspace" class="workspace" hidden aria-live="polite">
+        <div class="focus-zone">
+          <span class="micro accent" id="focusEyebrow">ATTENZIONE PRINCIPALE</span>
+          <div id="primarySlot" class="primary-slot">
+            <div class="loading-line">Verifico le fonti operative…</div>
+          </div>
+        </div>
+
+        <section class="secondary-zone" aria-labelledby="secondaryTitle">
+          <div class="secondary-heading">
+            <span class="micro" id="secondaryTitle">DOPO</span>
+            <span id="coverageLabel">Copertura fonti in verifica</span>
+          </div>
+          <div id="secondaryList" class="secondary-list"></div>
+        </section>
+
+        <details class="provenance">
+          <summary>Fonti e verificabilità</summary>
+          <div id="provenanceBody"></div>
+        </details>
+      </section>
+    </main>
+  </div>
+  <script src="./app.js" defer></script>
+</body>
+</html>

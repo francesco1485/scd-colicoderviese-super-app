@@ -12,15 +12,15 @@ const manifest=JSON.parse(read('SCD_SYSTEM_MANIFEST.json'));
 
 const all=[html,css,synth,js,interactions].join('\n');
 
-if(!html.includes('SCD Universe · Next Generation')) fail('NextGen title missing');
+if(!html.includes('SCD ONE · ColicoDerviese')) fail('SCD ONE title missing');
 if(!html.includes('scd-synth.css')) fail('synthetic visual layer not mounted');
 if(!html.includes('scd-interactions.js')) fail('interaction layer not mounted');
 if(!html.includes('SCD TWIN')) fail('Twin surface missing');
 if(!html.includes('SCD MIRROR')) fail('Mirror surface missing');
 if(!html.includes('PRIVATE DESK')) fail('Private Desk missing');
-if(!html.includes('SCD HOME · QUESTA SETTIMANA') && !html.includes('SCD WEEKLY RADAR')) fail('current-week surface missing');
+if(!html.includes('SCD ONE · PULSE') && !html.includes('SCD WEEKLY RADAR')) fail('current-week Pulse surface missing');
 if(!html.includes('SCD AI NEWSROOM')) fail('AI Newsroom missing');
-for(const token of ['SCD HOME · QUESTA SETTIMANA','publicSearchInput','matchCenter','upcomingEvents','mediaHub','communityPulse','sponsorRail','partnerCommunityHub','solidarityHome','institutionalStrip','joinClub','view-calendar','calendarPublicList','view-teams','publicTeamsGrid','myTeamDeck','videoArena','data-public-action="calendar"','avatarSearch','SKY','./assets/sky.png']){
+for(const token of ['SCD ONE · PULSE','publicSearchInput','matchCenter','upcomingEvents','mediaHub','communityPulse','sponsorRail','partnerCommunityHub','solidarityHome','institutionalStrip','joinClub','view-calendar','calendarPublicList','view-teams','publicTeamsGrid','myTeamDeck','videoArena','data-public-action="calendar"','avatarSearch','SKY','./assets/sky.png']){
   if(!html.includes(token)) fail('current-week public entry missing '+token);
 }
 

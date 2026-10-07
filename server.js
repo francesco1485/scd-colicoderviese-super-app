@@ -3,6 +3,17 @@ const fs = require('fs');
 const path = require('path');
 const { URL } = require('url');
 const { issueIntakeToken, verifyIntakeToken } = require('./lib/intake-links');
+const { weekRange } = require('./lib/scd-one-pulse.js');
+const {filterActiveSCDTeamRows,filterPublicSCDPayload}=require('./lib/scd-season-status.js');
+const {buildTodayAttentionProjection}=require('./lib/scd-today-attention.js');
+const {resolveCommand,validateCommandInput}=require('./lib/scd-command-grammar.js');
+const {
+  tournamentSurface,
+  unavailableTournamentSurface,
+  membershipServicesSurface,
+  facilityLogisticsSurface,
+  launchReadinessSurface
+} = require('./lib/scd-r57-operational-contracts.js');
 
 const PORT = process.env.PORT || 10000;
 const ROOT = process.env.SCD_STATIC_DIR ? path.resolve(__dirname,process.env.SCD_STATIC_DIR) : __dirname;
@@ -10,6 +21,7 @@ const UPSTREAM = process.env.SCD_APPS_SCRIPT_URL || 'https://script.google.com/m
 const CACHE_TTL = 10 * 60 * 1000;
 const CLUB_TIME_ZONE = 'Europe/Rome';
 const DEPLOY_COMMIT = process.env.RENDER_GIT_COMMIT || process.env.SCD_DEPLOY_COMMIT || null;
+const PREVIEW_SAFE_MODE = process.env.SCD_PREVIEW_SAFE_MODE === 'true';
 const FEATURE_FLAGS = Object.freeze({
   dataFabricObservability: process.env.SCD_FEATURE_DATA_FABRIC_OBSERVABILITY === 'true',
   supabaseCore: process.env.SCD_FEATURE_SUPABASE_CORE === 'true'
@@ -27,6 +39,7 @@ const SPONSOR_MOTION_PROFILES = JSON.parse(fs.readFileSync(path.join(__dirname,'
 const SCD_CREATIVE_SCENES = JSON.parse(fs.readFileSync(path.join(__dirname,'config','scd-creative-scenes.json'),'utf8'));
 const COMMUNITY_BENEFITS_SNAPSHOT = JSON.parse(fs.readFileSync(path.join(__dirname,'config','community-benefits.snapshot.json'),'utf8'));
 const SPONSOR_DEVELOPMENT_SNAPSHOT = JSON.parse(fs.readFileSync(path.join(__dirname,'config','sponsor-development.snapshot.json'),'utf8'));
+const R57_LAUNCH_READINESS = JSON.parse(fs.readFileSync(path.join(__dirname,'config','r57-launch-readiness.v1.json'),'utf8'));
 const INTAKE_TEMPLATE_MAP = new Map((INTAKE_TEMPLATES.templates||[]).map(x=>[x.slug,x]));
 const INTAKE_SECRET = process.env.SCD_INTAKE_LINK_SECRET || '';
 const INTAKE_PUBLIC_BASE = (process.env.SCD_PUBLIC_BASE_URL || 'https://scd-universe.onrender.com').replace(/\/$/,'');
@@ -55,8 +68,8 @@ function applyCors(req,res){
 const READ_ONLY_RETRY_ACTIONS = new Set([
   'public.feed','public.club','public.calendar','public.datafabric.contract',
   'dashboard.summary','private.dashboard','private.week','account.requests','private.user.workspace','private.crm.summary','private.crm.detail','private.community.summary','private.communication.templates','private.communication.preview',
-  'private.attendance.get','private.agenda.summary','private.development.summary','auth.validate','auth.identity.resolve','direction.access.metrics','direction.diagnostics',
-  'direction.evolution','direction.datafabric.status'
+  'private.attendance.get','private.agenda.summary','private.development.summary','auth.request','auth.login','auth.validate','auth.identity.resolve','direction.access.metrics','direction.diagnostics',
+  'direction.evolution','direction.datafabric.status','direction.datafabric.actions'
 ]);
 const UPSTREAM_READ_ATTEMPTS = 2;
 const UPSTREAM_RETRY_DELAY_MS = 450;
@@ -74,7 +87,7 @@ const allowedActions = new Set([
   'auth.request','auth.login','auth.validate','auth.identity.resolve','auth.access.log','auth.pin.change',
   'direction.access.set','direction.access.invite','direction.access.metrics','direction.pin.set','direction.player.approve','direction.player.reject',
   'direction.diagnostics','direction.evolution',
-  'direction.datafabric.status','direction.datafabric.scan.gmail','direction.datafabric.scan.drive',
+  'direction.datafabric.status','direction.datafabric.actions','direction.datafabric.scan.gmail','direction.datafabric.scan.drive',
 ]);
 
 function clubTimePayload(){
@@ -489,6 +502,11 @@ async function serveSponsorPrivate(req,res,u){
 function decodeXml(s=''){return String(s).replace(/<!\[CDATA\[|\]\]>/g,'').replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>')}
 
 async function callAppsScript(action,payload={},sessionToken=''){
+  if(PREVIEW_SAFE_MODE&&!READ_ONLY_RETRY_ACTIONS.has(action)){
+    const error=new Error('Anteprima in sola lettura: azione bloccata');
+    error.code='PREVIEW_READ_ONLY';
+    throw error;
+  }
   const maxAttempts=READ_ONLY_RETRY_ACTIONS.has(action)?UPSTREAM_READ_ATTEMPTS:1;
   let lastError;
   for(let attempt=1;attempt<=maxAttempts;attempt++){
@@ -509,7 +527,8 @@ async function callAppsScript(action,payload={},sessionToken=''){
         err.httpStatus=upstream.status;
         throw err;
       }
-      return {upstream,parsed,attempt};
+      const publicParsed=/^public\.(calendar|feed)$/.test(action)?filterPublicSCDPayload(parsed):parsed;
+      return {upstream,parsed:publicParsed,attempt};
     }catch(error){
       lastError=error;
       if(attempt>=maxAttempts) break;
@@ -527,7 +546,11 @@ async function proxyAppsScript(req,res){
     if(!allowedActions.has(action)) return json(res,400,{ok:false,error:'Azione non consentita'});
     const {upstream,parsed,attempt}=await callAppsScript(action,body.payload||{},body.sessionToken||'');
     console.log('[api/scd] upstream',action,upstream.status,(Date.now()-started)+'ms','attempt',attempt); return json(res,upstream.ok?200:400,parsed);
-  }catch(e){console.error('[api/scd] failed',e.message||e);return json(res,502,{ok:false,error:e.message||'Backend SCD non disponibile'})}
+  }catch(e){
+    console.error('[api/scd] failed',e.message||e);
+    if(e.code==='PREVIEW_READ_ONLY')return json(res,403,{ok:false,error:e.message,code:e.code});
+    return json(res,502,{ok:false,error:e.message||'Backend SCD non disponibile'});
+  }
 }
 
 
@@ -606,6 +629,32 @@ async function fetchPublicFeed(){
     return parsed;
   }catch(e){return {ok:false,error:String(e.message||e)}}
 }
+async function handleTournaments(req,res){
+  if(req.method!=='GET')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  try{
+    const {upstream,parsed}=await callAppsScript('public.calendar',{rangeKey:'ALL',offset:0,limit:500},'');
+    if(!upstream.ok||parsed?.ok===false)throw new Error('PUBLIC_CALENDAR_SOURCE_UNAVAILABLE');
+    return json(res,200,tournamentSurface(parsed),{'cache-control':'no-store'});
+  }catch{
+    return json(res,503,unavailableTournamentSurface(),{'cache-control':'no-store'});
+  }
+}
+function handleMembershipServices(req,res){
+  if(req.method!=='GET')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  return json(res,200,membershipServicesSurface(),{'cache-control':'no-store'});
+}
+function handleFacilityLogistics(req,res){
+  if(req.method!=='GET')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  return json(res,200,facilityLogisticsSurface(),{'cache-control':'no-store'});
+}
+function handleLaunchReadiness(req,res){
+  if(req.method!=='GET')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  try{
+    return json(res,200,launchReadinessSurface(R57_LAUNCH_READINESS),{'cache-control':'no-store'});
+  }catch{
+    return json(res,503,{ok:false,state:'UNAVAILABLE',error:'READINESS_CONFIG_INVALID'},{'cache-control':'no-store'});
+  }
+}
 function pick(obj,...keys){
   for(const key of keys){
     const value=obj?.[key];
@@ -644,15 +693,7 @@ function romeDateParts(date=new Date()){
   return new Intl.DateTimeFormat('en-CA',{timeZone:CLUB_TIME_ZONE,year:'numeric',month:'2-digit',day:'2-digit',weekday:'short'}).formatToParts(date).reduce((o,p)=>(o[p.type]=p.value,o),{});
 }
 function currentClubWeek(){
-  const now=new Date();
-  const p=romeDateParts(now);
-  const localNoon=new Date(p.year+'-'+p.month+'-'+p.day+'T12:00:00Z');
-  const weekday=new Intl.DateTimeFormat('en-US',{timeZone:CLUB_TIME_ZONE,weekday:'short'}).format(now);
-  const dayIndex={Mon:0,Tue:1,Wed:2,Thu:3,Fri:4,Sat:5,Sun:6}[weekday]??0;
-  const start=new Date(localNoon.getTime()-dayIndex*86400000);
-  const end=new Date(start.getTime()+6*86400000);
-  const fmt=d=>new Intl.DateTimeFormat('en-CA',{timeZone:'UTC',year:'numeric',month:'2-digit',day:'2-digit'}).format(d);
-  return {start:fmt(start),end:fmt(end)};
+  return weekRange(new Date());
 }
 function eventKind(row){
   const text=[pick(row,'type','kind','eventType'),pick(row,'title','event','name','subject')].join(' ');
@@ -724,6 +765,7 @@ async function buildWeeklyNewsroom(){
   const sourceStatus={calendar:'ERROR',feed:'ERROR',officialSite:'DISABLED_FOR_NEWS',webNews:'DISABLED_FOR_NEWS'};
   try{
     const c=await callAppsScript('public.calendar',{rangeKey:'ALL',offset:0},'');
+    if(!c.upstream.ok||c.parsed?.ok===false)throw new Error('PUBLIC_CALENDAR_SOURCE_UNAVAILABLE');
     calendarRaw=c.parsed;sourceStatus.calendar='OK';
   }catch(e){sourceStatus.calendar='ERROR:'+String(e.code||e.message||e)}
   try{
@@ -731,7 +773,7 @@ async function buildWeeklyNewsroom(){
     feedRaw=f.parsed;sourceStatus.feed='OK';
   }catch(e){sourceStatus.feed='ERROR:'+String(e.code||e.message||e)}
 
-  const allCalendar=rowsFrom(calendarRaw).map((row,i)=>({
+  const allCalendar=filterActiveSCDTeamRows(rowsFrom(calendarRaw)).map((row,i)=>({
     id:pick(row,'id','eventId','uid')||'CAL-'+i,
     title:String(pick(row,'title','event','name','subject')||'Attività SCD'),
     date:isoDateOnly(pick(row,'date','data','startDate')),
@@ -924,13 +966,241 @@ function serveStatic(req,res,overridePath){
   })
 }
 
+
+function coreBrainPriorityValue(value){
+  const v=String(value||'').trim().toUpperCase();
+  if(['CRITICA','CRITICAL','URGENTE','URGENT','P0'].includes(v))return 4;
+  if(['ALTA','HIGH','P1'].includes(v))return 3;
+  if(['MEDIA','MEDIUM','P2'].includes(v))return 2;
+  if(['BASSA','LOW','P3'].includes(v))return 1;
+  return 0;
+}
+function coreBrainPick(row,...keys){
+  for(const k of keys){
+    const v=row?.[k];
+    if(v!==undefined&&v!==null&&String(v).trim()!=='')return v;
+  }
+  return '';
+}
+function coreBrainRows(raw){
+  const d=unwrapPayload(raw);
+  if(Array.isArray(d))return d;
+  if(!d||typeof d!=='object')return [];
+  const direct=['rows','items','tasks','requests','alerts','priorities','deadlines','activities','events','actions'];
+  for(const k of direct)if(Array.isArray(d[k]))return d[k];
+  return [];
+}
+function coreBrainActionFromRow(row,channel,index){
+  if(!row||typeof row!=='object')return null;
+  const title=String(coreBrainPick(row,'title','subject','name','task','azione','action','descrizione','description')||'').trim();
+  const nextAction=String(coreBrainPick(row,'nextAction','next_action','prossimaAzione','prossima_azione')||'').trim();
+  const status=String(coreBrainPick(row,'status','stato')||'').trim();
+  const priority=String(coreBrainPick(row,'priority','priorita','priorità')||'').trim();
+  const due=String(coreBrainPick(row,'dueDate','deadline','scadenza','date','data')||'').trim();
+  const owner=String(coreBrainPick(row,'owner','responsabile','assignee','referente')||'').trim();
+  const source=String(coreBrainPick(row,'source','fonte')||channel).trim();
+  const recordId=String(coreBrainPick(row,'id','recordId','taskId','requestId','uid')||channel+'-'+index).trim();
+  const team=String(coreBrainPick(row,'team','teamName','squadra')||'').trim();
+  const category=String(coreBrainPick(row,'category','categoria','ageGroup','annata')||'').trim();
+  const approvalValue=coreBrainPick(row,'approvalRequired','requiresApproval','humanGate','human_gate');
+  const approvalRequired=approvalValue===true||['TRUE','YES','SI','SÌ','1','REQUIRED'].includes(String(approvalValue||'').trim().toUpperCase());
+  const requestedMode=String(coreBrainPick(row,'actionMode','action_mode')||'').trim().toUpperCase();
+  const actionMode=approvalRequired?'HUMAN_GATE':(requestedMode==='READ'?'READ':'HUMAN_GATE');
+  const sourceUrl=cleanPublicHttpsUrl(coreBrainPick(row,'sourceUrl','source_url','url','link')||'')||null;
+  const change=String(coreBrainPick(row,'change','delta','recommendation','message')||'').trim();
+  const changedAt=String(coreBrainPick(row,'changedAt','changed_at','updatedAt','updated_at')||'').trim();
+  if(!title&&!nextAction&&!status&&!due&&!change)return null;
+  return {
+    recordId,channel,title:title||nextAction||status||change||'Elemento operativo',
+    nextAction:nextAction||null,status:status||null,priority:priority||null,
+    due:due||null,owner:owner||null,source,
+    team:team||null,category:category||null,approvalRequired,actionMode,sourceUrl,
+    change:change||null,changedAt:changedAt||null,
+    verificationState:'VERIFIED',
+    explicitPriorityScore:coreBrainPriorityValue(priority),
+    evidence:{channel,recordId,source,sourceUrl}
+  };
+}
+async function coreBrainChannel(action,payload,sessionToken){
+  try{
+    const result=await callAppsScript(action,payload||{},sessionToken);
+    if(!result.upstream?.ok||result.parsed?.ok===false){
+      return {action,state:'UNAVAILABLE',error:result.parsed?.error||('HTTP_'+(result.upstream?.status||'UNKNOWN')),data:null};
+    }
+    return {action,state:'VERIFIED',error:null,data:unwrapPayload(result.parsed)};
+  }catch(e){
+    return {action,state:'UNAVAILABLE',error:String(e.code||e.message||e),data:null};
+  }
+}
+async function buildCoreBrain(sessionToken,authResult=null){
+  const auth=authResult||await coreBrainChannel('auth.validate',{token:sessionToken},sessionToken);
+  if(auth.state!=='VERIFIED'){
+    const error=new Error('SESSION_INVALID');
+    error.code='SESSION_INVALID';
+    error.auth=auth;
+    throw error;
+  }
+  const definitions=[
+    ['workspace','private.user.workspace',{}],
+    ['dashboard','private.dashboard',{}],
+    ['week','private.week',{}],
+    ['requests','account.requests',{}],
+    ['agenda','private.agenda.summary',{}],
+    ['mailactions','direction.datafabric.actions',{limit:60}],
+    ['datafabric','direction.datafabric.status',{}],
+    ['diagnostics','direction.diagnostics',{}],
+    ['evolution','direction.evolution',{limit:60}]
+  ];
+  const channelResults=await Promise.all(definitions.map(async([id,action,payload])=>[id,await coreBrainChannel(action,payload,sessionToken)]));
+  const channels=Object.fromEntries(channelResults);
+  const actionQueue=[];
+  for(const [channel,result] of channelResults){
+    const activeRows=filterActiveSCDTeamRows(coreBrainRows(result.data));
+    for(const [index,row] of activeRows.entries()){
+      const item=coreBrainActionFromRow(row,channel,index);
+      if(item)actionQueue.push(item);
+    }
+  }
+  actionQueue.sort((a,b)=>{
+    if(b.explicitPriorityScore!==a.explicitPriorityScore)return b.explicitPriorityScore-a.explicitPriorityScore;
+    if(a.due&&b.due)return String(a.due).localeCompare(String(b.due));
+    if(a.due)return -1;if(b.due)return 1;
+    return String(a.recordId||'').localeCompare(String(b.recordId||''));
+  });
+  const unavailable=Object.entries(channels).filter(([,v])=>v.state!=='VERIFIED').map(([id,v])=>({id,error:v.error}));
+  return {
+    ok:true,
+    brain:'SCD_CORE',
+    contractVersion:'R58-BRAIN-0.2',
+    generatedAt:new Date().toISOString(),
+    clubTime:clubTimePayload(),
+    doctrine:{
+      mode:'ACTION_FIRST_ROLE_AWARE',
+      questions:['WHAT_REQUIRES_ACTION_NOW','WHO_OWNS_IT','WHAT_IS_BLOCKED','WHAT_IS_DUE','WHAT_CHANGED','WHAT_IS_MISSING','WHAT_DECISION_IS_REQUIRED'],
+      noInventedPriority:true,
+      failClosed:true
+    },
+    identity:auth.data,
+    channels,
+    actionQueue,
+    health:{
+      state:unavailable.length?'DEGRADED':'VERIFIED',
+      verifiedChannels:Object.values(channels).filter(x=>x.state==='VERIFIED').length,
+      totalChannels:Object.keys(channels).length,
+      unavailable
+    },
+    provenance:{
+      authority:'R20',
+      orchestration:'SCD_COMMAND_R22',
+      rule:'Every surfaced action preserves source/channel evidence; unavailable channels are never reconstructed from guesses.'
+    }
+  };
+}
+
+async function handleCoreBrain(req,res){
+  if(req.method!=='POST')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  let body={};
+  try{body=JSON.parse(await readBody(req)||'{}')}catch{return json(res,400,{ok:false,error:'INVALID_JSON'})}
+  const sessionToken=String(body.sessionToken||'').trim();
+  if(!sessionToken)return json(res,401,{ok:false,error:'SESSION_REQUIRED'});
+  const auth=await coreBrainChannel('auth.validate',{token:sessionToken},sessionToken);
+  if(auth.state!=='VERIFIED')return json(res,401,{ok:false,error:'SESSION_INVALID',auth});
+  try{
+    return json(res,200,await buildCoreBrain(sessionToken,auth));
+  }catch(e){
+    return json(res,502,{ok:false,error:e.code||e.message||'CORE_BRAIN_UNAVAILABLE'});
+  }
+}
+
+function coreTodayReadAudit(command,projection){
+  const emittedAt=new Date().toISOString();
+  const record={
+    event:String(command?.audit_event||'CORE_TODAY_VIEWED'),
+    mode:'SERVER_LOG_READ_AUDIT',
+    persisted:false,
+    emitted_at:emittedAt,
+    command_id:String(command?.command_id||''),
+    trigger:String(command?.trigger||''),
+    source_state:String(projection?.source_state||'UNVERIFIED'),
+    primary_attention_id:projection?.primary_attention?.id||null
+  };
+  console.info('[core-today:audit] '+JSON.stringify(record));
+  return record;
+}
+
+async function handleCoreToday(req,res){
+  if(req.method!=='POST')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  let body={};
+  try{body=JSON.parse(await readBody(req)||'{}')}catch{return json(res,400,{ok:false,error:'INVALID_JSON'})}
+  const sessionToken=String(body.sessionToken||'').trim();
+  if(!sessionToken)return json(res,401,{ok:false,error:'SESSION_REQUIRED'});
+  if(body.input!==undefined&&(body.input===null||Array.isArray(body.input)||typeof body.input!=='object')){
+    return json(res,400,{ok:false,error:'INVALID_COMMAND_INPUT'});
+  }
+  const auth=await coreBrainChannel('auth.validate',{token:sessionToken},sessionToken);
+  if(auth.state!=='VERIFIED')return json(res,401,{ok:false,error:'SESSION_INVALID'});
+
+  const trigger=String(body.command||'/today').trim().toLowerCase();
+  const resolution=resolveCommand(trigger,auth.data||{});
+  if(!resolution.ok){
+    const status=resolution.reason==='ROLE_SCOPE_DENIED'?403:(resolution.reason==='UNKNOWN_COMMAND'?404:409);
+    return json(res,status,{ok:false,error:resolution.reason,command:trigger});
+  }
+  const inputValidation=validateCommandInput(resolution.command,body.input||{});
+  if(!inputValidation.ok){
+    return json(res,400,{ok:false,error:inputValidation.reason,command:trigger});
+  }
+
+  let brain;
+  try{brain=await buildCoreBrain(sessionToken,auth)}
+  catch(e){return json(res,502,{ok:false,error:e.code||e.message||'CORE_BRAIN_UNAVAILABLE'})}
+
+  const roleScope=[
+    brain.identity?.user?.coreRole,
+    brain.identity?.user?.role,
+    brain.identity?.coreRole,
+    brain.identity?.role
+  ].filter(Boolean);
+  const projection=buildTodayAttentionProjection({
+    brain,
+    roleScope,
+    commandTrigger:resolution.command.trigger,
+    now:brain.generatedAt
+  });
+  const audit=coreTodayReadAudit(resolution.command,projection);
+  return json(res,200,{
+    ok:true,
+    command:{
+      command_id:resolution.command.command_id,
+      trigger:resolution.command.trigger,
+      intent:resolution.command.intent,
+      human_gate:resolution.command.human_gate,
+      audit_event:resolution.command.audit_event
+    },
+    projection,
+    audit,
+    runtime:{
+      previewSafeMode:PREVIEW_SAFE_MODE,
+      writePolicy:PREVIEW_SAFE_MODE?'READ_ONLY':'HUMAN_GATE_ONLY',
+      sourceAuthority:'R20',
+      contractVersion:'R58-CORE-TODAY-1.0'
+    }
+  });
+}
+
 http.createServer(async(req,res)=>{
   applyCors(req,res); if(req.method==='OPTIONS'){res.writeHead(204);return res.end()}
   const u=new URL(req.url,'http://localhost');
-  if(u.pathname==='/health') return json(res,200,{...clubTimePayload(),service:'SCD Super App',version:'40.0.0',commit:DEPLOY_COMMIT});
+  if(u.pathname==='/health') return json(res,200,{...clubTimePayload(),service:'SCD Super App',version:'40.0.0',commit:DEPLOY_COMMIT,previewSafeMode:PREVIEW_SAFE_MODE});
   if(u.pathname==='/api/time') return json(res,200,clubTimePayload());
-  if(u.pathname==='/api/capabilities') return json(res,200,{ok:true,version:'40.0.0',mode:'GITHUB_PAGES_RENDER_R20_SUPABASE_DUAL_RUN',actions:[...allowedActions].sort(),featureFlags:FEATURE_FLAGS,domainCore:SUPABASE_RUNTIME,isolated:['safeguarding']});
-  if(u.pathname==='/api/core-status') return json(res,200,{ok:true,version:'40.0.0',featureFlags:FEATURE_FLAGS,domainCore:SUPABASE_RUNTIME,currentPrimary:'R20',targetPrimary:'SCD_SUPABASE'});
+  if(u.pathname==='/api/capabilities') return json(res,200,{ok:true,version:'40.0.0',mode:'GITHUB_PAGES_RENDER_R20_SUPABASE_DUAL_RUN',actions:[...allowedActions].sort(),featureFlags:FEATURE_FLAGS,domainCore:SUPABASE_RUNTIME,runtimeSafety:{previewSafeMode:PREVIEW_SAFE_MODE,writePolicy:PREVIEW_SAFE_MODE?'READ_ONLY':'NORMAL'},isolated:['safeguarding']});
+  if(u.pathname==='/api/core-status') return json(res,200,{ok:true,version:'40.0.0',featureFlags:FEATURE_FLAGS,domainCore:SUPABASE_RUNTIME,currentPrimary:'R20',targetPrimary:'SCD_SUPABASE',runtimeSafety:{previewSafeMode:PREVIEW_SAFE_MODE,writePolicy:PREVIEW_SAFE_MODE?'READ_ONLY':'NORMAL'}});
+  if(u.pathname==='/api/core-brain') return handleCoreBrain(req,res);
+  if(u.pathname==='/api/core-today') return handleCoreToday(req,res);
+  if(u.pathname==='/api/launch-readiness') return handleLaunchReadiness(req,res);
+  if(u.pathname==='/api/tournaments') return handleTournaments(req,res);
+  if(u.pathname==='/api/membership-services') return handleMembershipServices(req,res);
+  if(u.pathname==='/api/facility-logistics') return handleFacilityLogistics(req,res);
   if(u.pathname==='/api/public/donation-config') return handleDonationConfig(req,res);
   if(u.pathname==='/api/public/donation-intent') return handleDonationIntent(req,res);
   if(u.pathname==='/api/sponsor/lead') return handleSponsorLead(req,res);
@@ -955,5 +1225,7 @@ http.createServer(async(req,res)=>{
   if(u.pathname==='/api/public') return json(res,200,await fetchPublicFeed(),{'cache-control':'no-store'});
   if(u.pathname==='/api/newsroom') {try{return json(res,200,await buildWeeklyNewsroom(),{'cache-control':'public, max-age=180'})}catch(e){return json(res,500,{ok:false,error:e.message})}}
   if(u.pathname==='/api/live') {try{return json(res,200,await getLiveRadar(),{'cache-control':'public, max-age=300'})}catch(e){return json(res,500,{ok:false,error:e.message})}}
+  if(['/app/tournaments','/app/tournaments/','/app/services','/app/services/','/app/fields','/app/fields/'].includes(u.pathname))return serveStatic(req,res,'/index.html');
+  if(u.pathname.startsWith('/app/'))return serveStatic(req,res,u.pathname.slice(4));
   return serveStatic(req,res);
 }).listen(PORT,()=>console.log(`SCD Super App listening on ${PORT}`));

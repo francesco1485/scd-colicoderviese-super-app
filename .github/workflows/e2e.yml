@@ -2,7 +2,7 @@ name: SCD App End-to-End
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "r58-vi-4-core-today-reset"]
   pull_request:
     branches: ["main"]
   workflow_dispatch:
@@ -21,6 +21,14 @@ jobs:
         run: npm run test:manifest
       - name: SCD AI portfolio contract gate
         run: npm run test:ai-portfolio
+      - name: SCD ONE contract gate
+        run: npm run test:scd-one-contract
+      - name: SCD CORE contract gate
+        run: npm run test:scd-core-contract
+      - name: R58 CORE Today contract gate
+        run: npm run test:r58-core-today
+      - name: SCD GROW contract gate
+        run: npm run test:scd-grow-contract
       - name: Supabase Domain Core contract gate
         run: npm run test:supabase-contract
       - name: R57.D1 graph hardening gate
@@ -105,6 +113,17 @@ jobs:
           node --check scd-adaptive-engine.js
           node --check scd-meta-engine.js
           node --check scd-twin.js
+          node --check scripts/validate-scd-grow-contract.mjs
+          node --check scripts/validate-scd-core-contract.mjs
+          node --check scripts/validate-scd-one-contract.mjs
+          node --check sponsor/grow-pipeline.js
+          node --check lib/scd-core-control-room.js
+          node --check lib/scd-native-adapters.js
+          node --check lib/scd-one-profile.js
+          node --check lib/scd-one-pulse.js
+          node --check lib/scd-today-attention.js
+          node --check lib/scd-command-grammar.js
+          node --check r58/core-today/app.js
       - name: API contract gate
         run: npm run test:contract
       - name: Upstream resilience gate
@@ -113,9 +132,19 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - name: Build exact Pages artifact
         run: npm run build:pages
+      - name: Start deterministic CI upstream
+        run: |
+          node tests/ci-upstream-stub.mjs > /tmp/scd-upstream.log 2>&1 &
+          echo $! > /tmp/scd-upstream.pid
+          for i in {1..20}; do
+            if curl -fsS http://127.0.0.1:18080/health >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/scd-upstream.log
+          exit 1
       - name: Start SCD server from Pages artifact
         run: |
-          SCD_STATIC_DIR=_site npm start > /tmp/scd-server.log 2>&1 &
+          SCD_APPS_SCRIPT_URL=http://127.0.0.1:18080 SCD_PREVIEW_SAFE_MODE=true SCD_STATIC_DIR=_site npm start > /tmp/scd-server.log 2>&1 &
           echo $! > /tmp/scd-server.pid
           for i in {1..30}; do
             if curl -fsS http://127.0.0.1:10000/health >/dev/null; then exit 0; fi
@@ -123,11 +152,17 @@ jobs:
           done
           cat /tmp/scd-server.log
           exit 1
+      - name: SCD ONE seven-viewport visual QA
+        run: node tests/scd-one-visual-qa.mjs
+      - name: R58 CORE Today six-viewport visual QA
+        run: node tests/scd-core-today-visual-qa.mjs
       - name: Smoke test mobile app
         run: npm run test:smoke
       - name: Server logs
         if: always()
-        run: cat /tmp/scd-server.log || true
+        run: |
+          cat /tmp/scd-server.log || true
+          cat /tmp/scd-upstream.log || true
       - name: Upload visual QA evidence
         if: always()
         uses: actions/upload-artifact@v4

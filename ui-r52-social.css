@@ -120,4 +120,39 @@
 /* R55 — curated Club content in Social */
 .social-card[data-type="CLUB"]{border-color:rgba(13,71,161,.20);background:linear-gradient(145deg,#fff,#f4f8ff)}
 .social-card[data-type="CLUB"] .social-card-type{background:linear-gradient(135deg,#0d47a1,#d32f2f);color:#fff;font-size:10px;font-weight:950}
+
+.clock-mark{color:#20B7E6;font-size:16px;font-weight:900}
+.pulse-operational{margin:12px 0 16px;padding:14px 0;border-block:1px solid rgba(18,54,87,.12)}
+.pulse-operational-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.pulse-operational-head h2{margin:0;color:#123657;font-size:16px;letter-spacing:-.02em}
+.pulse-operational-head>small{margin-left:auto;color:#627E98;font-size:10px}
+.pulse-state,.pulse-signal small{font-size:9px;font-weight:850;letter-spacing:.06em}
+.pulse-state{border:1px solid rgba(18,54,87,.14);border-radius:999px;padding:6px 9px;color:#627E98;background:#fff}
+.pulse-state[data-pulse-state="VERIFIED"],.pulse-signal small[data-pulse-state="VERIFIED"]{color:#13774f}
+.pulse-state[data-pulse-state="UNAVAILABLE"],.pulse-signal small[data-pulse-state="UNAVAILABLE"]{color:#a04343}
+.pulse-state[data-pulse-state="PENDING"],.pulse-signal small[data-pulse-state="PENDING"]{color:#936411}
+.pulse-operational-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+.pulse-signal{min-width:0;padding:9px 14px;border-left:1px solid rgba(18,54,87,.12)}
+.pulse-signal:first-child{padding-left:0;border-left:0}
+.pulse-signal>span{display:block;margin-bottom:6px;color:#0870CF;font-size:9px;font-weight:950;letter-spacing:.14em}
+.pulse-signal>b{display:block;color:#123657;font-size:13px;line-height:1.35}
+.pulse-signal>small{display:block;margin-top:7px;color:#627E98;line-height:1.4}
+
+@media(min-width:901px){
+  body[data-scd-theme="arena"] .app{width:min(calc(100vw - 148px),1600px);max-width:none;margin:0 auto 0 max(112px,calc((100vw - 1600px)/2 + 56px))}
+  .world-switch{display:none!important}
+  .bottom-nav{position:fixed;z-index:70;left:16px;right:auto;top:50%;bottom:auto;width:82px;height:auto;transform:translateY(-50%);display:grid;grid-template-columns:1fr!important;gap:5px;padding:8px;border:1px solid rgba(255,255,255,.12);border-radius:22px;background:rgba(3,26,53,.96);box-shadow:0 18px 46px rgba(4,28,58,.25)}
+  .bottom-nav button{min-height:58px!important;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:6px 2px;font-size:8px;letter-spacing:.04em}
+  .bottom-nav button span{font-size:19px}
+}
+@media(max-width:900px){
+  .pulse-operational-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pulse-signal:nth-child(3){padding-left:0;border-left:0}
+}
+@media(max-width:420px){
+  .pulse-operational-head>small{width:100%;margin-left:0}
+  .pulse-signal{padding:9px 8px}
+  .pulse-signal>b{font-size:12px}
+  .pulse-signal>small{font-size:8px}
+}
 .social-card[data-type="CLUB"] .social-card-meta span:first-child{background:#eef5ff;color:#0d47a1}

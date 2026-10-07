@@ -3,8 +3,8 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.27.0",
-    "effective_at": "2026-10-03",
+    "version": "3.30.0",
+    "effective_at": "2026-10-06",
     "status": "BINDING",
     "language": "it-IT",
     "timezone": "Europe/Rome",
@@ -128,6 +128,11 @@
     {
       "id": "INV-013",
       "statement": "Ogni nuova funzione deve essere assegnata a SCD ONE, SCD CORE o SCD GROW prima dello sviluppo; una quarta applicazione SCD richiede approvazione esplicita della Direzione.",
+      "enforcement": "BLOCKING"
+    },
+    {
+      "id": "INV-014",
+      "statement": "U18 è ritirata per la stagione 2026/27 e non deve comparire come squadra attiva; ogni evidenza mantenuta deve essere esplicitamente marcata WITHDRAWN o HISTORICAL.",
       "enforcement": "BLOCKING"
     }
   ],
@@ -1223,12 +1228,14 @@
           "RELATIONSHIPS",
           "DECISIONS",
           "DATA_LINEAGE",
-          "RELEASES"
+          "RELEASES",
+          "MEMBERSHIP_SERVICE_RULES"
         ],
         "rules": [
           "ONE_CANONICAL_RECORD_PER_COMPANY",
           "NO_DUPLICATE_INITIATIVES",
-          "SOURCE_LINEAGE_REQUIRED"
+          "SOURCE_LINEAGE_REQUIRED",
+          "RUNTIME_BINDING_MUST_BE_VERIFIED_BEFORE_EXPOSING_OPERATIONAL_ROWS"
         ]
       }
     ],
@@ -1323,7 +1330,19 @@
       "MAIL_OPERATIONS_SHEET/17_SMART_CLASSIFIER",
       "MAIL_OPERATIONS_SHEET/18_ACTION_QUEUE",
       "TESSERATI_SHEET/MAIL SPORTCLUB"
-    ]
+    ],
+    "runtime_actions": [
+      "direction.datafabric.status",
+      "direction.datafabric.actions",
+      "direction.datafabric.scan.gmail",
+      "direction.datafabric.scan.drive"
+    ],
+    "product_projection": {
+      "SCD_CORE": "DIRECTION_CONTROL_ROOM",
+      "queue_source": "MAIL_OPERATIONS_SHEET/18_ACTION_QUEUE",
+      "read_only_projection": true,
+      "human_confirmation_for_critical_actions": true
+    }
   },
   "entity_graph": {
     "required_relations": [
@@ -2253,6 +2272,29 @@
           "disabled_status": "GATED_OFF_NOT_LIVE"
         }
       }
+    },
+    "product_convergence": {
+      "release": "R57.PRODUCT_CONVERGENCE",
+      "state": "RELEASE_CANDIDATE",
+      "apps": {
+        "SCD_ONE": "INTEGRATED",
+        "SCD_CORE": "INTEGRATED",
+        "SCD_GROW": "INTEGRATED"
+      },
+      "shared_core": [
+        "R20",
+        "SCD_PULSE",
+        "SCD_COMMAND_R22",
+        "SCD_GMAIL",
+        "SCD_DRIVE",
+        "SCD_GOOGLE_CALENDAR"
+      ],
+      "production_activation_requires": [
+        "CI_GREEN",
+        "RENDER_EXACT_SHA",
+        "SUPABASE_ADVISORS",
+        "R20_RUNTIME_PROBE"
+      ]
     }
   },
   "capability_map": [
@@ -2278,7 +2320,7 @@
       "required": true,
       "state": "PARTIAL",
       "screen": "CALENDAR_LIVE",
-      "contract": "DEDICATED_PUBLIC_VIEW_CURRENT_WEEK_NEXT_30_ALL_AVAILABLE_TEAM_CATEGORY_TYPE_SEARCH_FAIL_CLOSED",
+      "contract": "DEDICATED_PUBLIC_VIEW_CURRENT_WEEK_NEXT_30_ALL_AVAILABLE_TEAM_CATEGORY_TYPE_SEARCH_FAIL_CLOSED; TOURNAMENTS_READ_ONLY_FROM_R20_PUBLIC_CALENDAR_NO_SYNTHETIC_ROWS",
       "sources": [
         "R20",
         "SCD_SUPABASE"
@@ -2453,7 +2495,7 @@
       "domain": "DELIVERY",
       "required": true,
       "state": "IMPLEMENTED",
-      "contract": "PAGES_RENDER_ACTIVE_CAPABILITIES_PROOF_WITH_EXPLICIT_GATED_DEPENDENCIES"
+      "contract": "PAGES_RENDER_ACTIVE_CAPABILITIES_PROOF_WITH_EXPLICIT_GATED_DEPENDENCIES; READ_ONLY_CONFIG_BACKED_LAUNCH_READINESS_ENDPOINT_EXACT_HEAD_PREVIEW_SEPARATE"
     },
     {
       "id": "CAP-UPSTREAM-RESILIENCE",
@@ -2765,7 +2807,7 @@
         "SCD_SUPABASE",
         "CR_LOMBARDIA"
       ],
-      "contract": "PUBLIC_TEAM_DIRECTORY_PLUS_SOURCE_GROUNDED_TEAM_HUB_NEXT_MATCH_VERIFIED_STATS_LOCAL_FOLLOW_NO_PRIVATE_ROSTER"
+      "contract": "PUBLIC_TEAM_DIRECTORY_PLUS_SOURCE_GROUNDED_TEAM_HUB_NEXT_MATCH_VERIFIED_STATS_LOCAL_FOLLOW_NO_PRIVATE_ROSTER; U18_WITHDRAWN_2026_27_EXCLUDED_FROM_ACTIVE_SURFACES_HISTORICAL_EVIDENCE_MARKED"
     },
     {
       "id": "CAP-PUBLIC-MATCHDAY",
@@ -2800,11 +2842,52 @@
         "R20",
         "SCD_GMAIL",
         "SCD_DRIVE",
+        "SCD_OPERATIVO_PILOTA",
         "LND",
         "FIGC",
         "TUTTOCAMPO"
       ],
-      "contract": "PEOPLE_MULTI_ROLE_REGISTRATION_MEDICAL_ALERTS_MATCHDAY_EVENT_ID_MAIL_DRIVE_ROUTING_FAIL_CLOSED"
+      "contract": "PEOPLE_MULTI_ROLE_REGISTRATION_MEDICAL_ALERTS_MATCHDAY_EVENT_ID_MAIL_DRIVE_ROUTING_FAIL_CLOSED; MEMBERSHIP_SERVICES_AND_FACILITY_LOGISTICS_READ_ONLY_SOURCE_STATE_FAIL_CLOSED"
+    },
+    {
+      "id": "CAP-TOURNAMENT-MINIMUM",
+      "domain": "EVENTS",
+      "required": true,
+      "state": "PARTIAL",
+      "screen": "/app/tournaments",
+      "sources": [
+        "R20",
+        "TOURNAMENTS_MASTER_SHEET"
+      ],
+      "contract": "READ_ONLY_R20_PUBLIC_CALENDAR_PROJECTION_CANONICAL_EVENT_ID_NO_SYNTHETIC_TOURNAMENTS_OR_RESULTS"
+    },
+    {
+      "id": "CAP-MEMBERSHIP-SERVICES",
+      "domain": "MEMBERSHIP",
+      "required": true,
+      "state": "PARTIAL",
+      "screen": "/app/services",
+      "sources": [
+        "SCD_OPERATIVO_PILOTA",
+        "R20"
+      ],
+      "contract": "2026_27_SOURCE_RULES_FAIL_CLOSED_NO_MEMBER_ROWS_FEES_PAYMENT_DOCUMENTS_OR_ELIGIBILITY_UNTIL_SOURCE_BINDING_VERIFIED"
+    },
+    {
+      "id": "CAP-FACILITY-LOGISTICS",
+      "domain": "FACILITIES",
+      "required": true,
+      "state": "PARTIAL",
+      "screen": "/app/fields",
+      "contract": "SOURCE_BINDING_UNVERIFIED; VERIFIED_CATALOGUE_ONLY; OCCUPANCY_ROTATION_HOMOLOGATION_CATEGORY_ELIGIBILITY_TRANSPORT_AND_AVAILABILITY_FAIL_CLOSED"
+    },
+    {
+      "id": "CAP-LAUNCH-READINESS",
+      "domain": "DELIVERY",
+      "required": true,
+      "state": "IMPLEMENTED",
+      "screen": "GET /api/launch-readiness",
+      "contract": "READ_ONLY_CONFIG_BACKED_CRITICAL_GATE_VERDICT_NOT_READY_UNLESS_ALL_CRITICAL_GATES_VERIFIED_EXACT_HEAD_PREVIEW_SEPARATE"
     },
     {
       "id": "CAP-SOCIAL-HUB",
@@ -2908,6 +2991,27 @@
         "SCD_SUPABASE"
       ],
       "contract": "AGGREGATE_ACCESS_METRICS_VERIFIED_SPORT_STATS_CANONICAL_PLAYER_SOURCE_COMMUNICATION_POLICY_FAN_CHECKINS_HEALTHY_GAMIFICATION"
+    },
+    {
+      "id": "CAP-CORE-TODAY-ATTENTION",
+      "domain": "OPERATIONS",
+      "required": true,
+      "state": "PARTIAL",
+      "runtime_state": "IMPLEMENTATION_ACTIVE",
+      "product": "SCD_CORE",
+      "route": "/r58/core-today/",
+      "sources": [
+        "R20",
+        "SCD_GMAIL",
+        "SCD_DRIVE"
+      ],
+      "command_contract": "SCD_COMMAND_GRAMMAR_V1",
+      "contract": "ROLE_AWARE_SOURCE_AWARE_TODAY_ATTENTION_FAIL_CLOSED_READ_ONLY",
+      "visual_acceptance": "ZERO_BASED_R58_VI_4",
+      "rollback_routes": [
+        "/r58/manager/"
+      ],
+      "preview_service": "scd-r58-core-today-preview"
     }
   ],
   "known_noncompliance": [

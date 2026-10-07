@@ -59,7 +59,7 @@ for(const token of [
 ])if(!css.includes(token))fail('R54 responsive style missing '+token);
 
 if(!/\.\/scd-ng\.css\?v=0\.6\.(?:[1-9]\d*)/.test(html)||!/\.\/scd-ng\.js\?v=0\.7\.(?:[1-9]\d*)/.test(html))fail('R54 active assets cache bust missing');
-if(!/const CACHE='scd-nextgen-0\.7\.(?:[1-9]\d*)-r\d+'/.test(sw)||!/\.\/scd-ng\.js\?v=0\.7\.(?:[1-9]\d*)/.test(sw))fail('R54 PWA cache contract missing');
+if(!sw.includes("const CACHE='scd-one-one-01'")||!/\.\/scd-ng\.js\?v=0\.7\.(?:[1-9]\d*)/.test(sw)||!sw.includes('./lib/scd-one-pulse.js?v=1.0.0'))fail('R54 PWA cache contract missing');
 
 const caps=new Map((manifest.capability_map||[]).map(x=>[x.id,x]));
 for(const id of ['CAP-ATHLETE','CAP-FAMILY','CAP-STAFF','CAP-PRIVATE-DESK'])if(!caps.has(id))fail('capability missing '+id);
