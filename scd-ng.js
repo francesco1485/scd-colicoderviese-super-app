@@ -108,7 +108,7 @@ const pick=(obj,...keys)=>{for(const k of keys){const v=obj?.[k];if(v!=null&&Str
 const isoClientDate=v=>{const s=String(v||'').trim();if(!s)return '';let m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);if(m)return m[1]+'-'+m[2]+'-'+m[3];m=s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);if(m)return m[3]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[1]).padStart(2,'0');const d=new Date(s);return Number.isFinite(d.getTime())?d.toISOString().slice(0,10):''};
 const clientEventKind=row=>{const t=norm([pick(row,'kind','type','eventType'),pick(row,'title','event','name','subject')].join(' '));if(/allenament|training/.test(t))return 'TRAINING';if(/gara|partita|campionato|coppa|amichevole|match/.test(t))return 'MATCH';if(/torneo|tournament/.test(t))return 'TOURNAMENT';return 'EVENT'};
 
-const routeToView={home:'pulse',pulse:'pulse',calendar:'calendar',teams:'teams',social:'social',profile:'twin',twin:'twin',desk:'desk',tournaments:'tournaments',services:'services',fields:'facilities','/app/tournaments':'tournaments','/app/services':'services','/app/fields':'facilities'};
+const routeToView={home:'pulse',pulse:'pulse',calendar:'calendar',teams:'teams',social:'social',profile:'twin',twin:'twin',desk:'desk',tournaments:'tournaments',services:'services',facilities:'facilities',fields:'facilities','/app/tournaments':'tournaments','/app/services':'services','/app/fields':'facilities'};
 const viewToRoute={pulse:'home',calendar:'calendar',teams:'teams',social:'social',twin:'profile',desk:'desk',tournaments:'/app/tournaments',services:'/app/services',facilities:'/app/fields'};
 const isWithdrawnTeamRecord=row=>window.SCDSeasonStatus?.isWithdrawnSCDTeamRecord(row)===true;
 function setView(requested,{historyMode='push'}={}){
