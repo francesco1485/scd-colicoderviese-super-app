@@ -964,6 +964,120 @@ function serveStatic(req,res,overridePath){
   })
 }
 
+
+function coreBrainPriorityValue(value){
+  const v=String(value||'').trim().toUpperCase();
+  if(['CRITICA','CRITICAL','URGENTE','URGENT','P0'].includes(v))return 4;
+  if(['ALTA','HIGH','P1'].includes(v))return 3;
+  if(['MEDIA','MEDIUM','P2'].includes(v))return 2;
+  if(['BASSA','LOW','P3'].includes(v))return 1;
+  return 0;
+}
+function coreBrainPick(row,...keys){
+  for(const k of keys){
+    const v=row?.[k];
+    if(v!==undefined&&v!==null&&String(v).trim()!=='')return v;
+  }
+  return '';
+}
+function coreBrainRows(raw){
+  const d=unwrapPayload(raw);
+  if(Array.isArray(d))return d;
+  if(!d||typeof d!=='object')return [];
+  const direct=['rows','items','tasks','requests','alerts','priorities','deadlines','activities','events','actions'];
+  for(const k of direct)if(Array.isArray(d[k]))return d[k];
+  return [];
+}
+function coreBrainActionFromRow(row,channel,index){
+  if(!row||typeof row!=='object')return null;
+  const title=String(coreBrainPick(row,'title','subject','name','task','azione','action','descrizione','description')||'').trim();
+  const nextAction=String(coreBrainPick(row,'nextAction','next_action','prossimaAzione','prossima_azione')||'').trim();
+  const status=String(coreBrainPick(row,'status','stato')||'').trim();
+  const priority=String(coreBrainPick(row,'priority','priorita','priorità')||'').trim();
+  const due=String(coreBrainPick(row,'dueDate','deadline','scadenza','date','data')||'').trim();
+  const owner=String(coreBrainPick(row,'owner','responsabile','assignee','referente')||'').trim();
+  const source=String(coreBrainPick(row,'source','fonte')||channel).trim();
+  const recordId=String(coreBrainPick(row,'id','recordId','taskId','requestId','uid')||channel+'-'+index).trim();
+  if(!title&&!nextAction&&!status&&!due)return null;
+  return {
+    recordId,channel,title:title||nextAction||status||'Elemento operativo',
+    nextAction:nextAction||null,status:status||null,priority:priority||null,
+    due:due||null,owner:owner||null,source,
+    explicitPriorityScore:coreBrainPriorityValue(priority),
+    evidence:{channel,recordId,source}
+  };
+}
+async function coreBrainChannel(action,payload,sessionToken){
+  try{
+    const result=await callAppsScript(action,payload||{},sessionToken);
+    if(!result.upstream?.ok||result.parsed?.ok===false){
+      return {action,state:'UNAVAILABLE',error:result.parsed?.error||('HTTP_'+(result.upstream?.status||'UNKNOWN')),data:null};
+    }
+    return {action,state:'VERIFIED',error:null,data:unwrapPayload(result.parsed)};
+  }catch(e){
+    return {action,state:'UNAVAILABLE',error:String(e.code||e.message||e),data:null};
+  }
+}
+async function handleCoreBrain(req,res){
+  if(req.method!=='POST')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  let body={};
+  try{body=JSON.parse(await readBody(req)||'{}')}catch{return json(res,400,{ok:false,error:'INVALID_JSON'})}
+  const sessionToken=String(body.sessionToken||'').trim();
+  if(!sessionToken)return json(res,401,{ok:false,error:'SESSION_REQUIRED'});
+  const auth=await coreBrainChannel('auth.validate',{token:sessionToken},sessionToken);
+  if(auth.state!=='VERIFIED')return json(res,401,{ok:false,error:'SESSION_INVALID',auth});
+  const definitions=[
+    ['workspace','private.user.workspace',{}],
+    ['dashboard','private.dashboard',{}],
+    ['week','private.week',{}],
+    ['requests','account.requests',{}],
+    ['diagnostics','direction.diagnostics',{}],
+    ['evolution','direction.evolution',{}]
+  ];
+  const channelResults=await Promise.all(definitions.map(async([id,action,payload])=>[id,await coreBrainChannel(action,payload,sessionToken)]));
+  const channels=Object.fromEntries(channelResults);
+  const actionQueue=[];
+  for(const [channel,result] of channelResults){
+    for(const [index,row] of coreBrainRows(result.data).entries()){
+      const item=coreBrainActionFromRow(row,channel,index);
+      if(item)actionQueue.push(item);
+    }
+  }
+  actionQueue.sort((a,b)=>{
+    if(b.explicitPriorityScore!==a.explicitPriorityScore)return b.explicitPriorityScore-a.explicitPriorityScore;
+    if(a.due&&b.due)return String(a.due).localeCompare(String(b.due));
+    if(a.due)return -1;if(b.due)return 1;return 0;
+  });
+  const unavailable=Object.entries(channels).filter(([,v])=>v.state!=='VERIFIED').map(([id,v])=>({id,error:v.error}));
+  return json(res,200,{
+    ok:true,
+    brain:'SCD_CORE',
+    contractVersion:'R58-BRAIN-0.1',
+    generatedAt:new Date().toISOString(),
+    clubTime:clubTimePayload(),
+    doctrine:{
+      mode:'ACTION_FIRST_ROLE_AWARE',
+      questions:['WHAT_REQUIRES_ACTION_NOW','WHO_OWNS_IT','WHAT_IS_BLOCKED','WHAT_IS_DUE','WHAT_CHANGED','WHAT_IS_MISSING','WHAT_DECISION_IS_REQUIRED'],
+      noInventedPriority:true,
+      failClosed:true
+    },
+    identity:auth.data,
+    channels,
+    actionQueue,
+    health:{
+      state:unavailable.length?'DEGRADED':'VERIFIED',
+      verifiedChannels:Object.values(channels).filter(x=>x.state==='VERIFIED').length,
+      totalChannels:Object.keys(channels).length,
+      unavailable
+    },
+    provenance:{
+      authority:'R20',
+      orchestration:'SCD_COMMAND_R22',
+      rule:'Every surfaced action preserves source/channel evidence; unavailable channels are never reconstructed from guesses.'
+    }
+  });
+}
+
 http.createServer(async(req,res)=>{
   applyCors(req,res); if(req.method==='OPTIONS'){res.writeHead(204);return res.end()}
   const u=new URL(req.url,'http://localhost');
@@ -971,6 +1085,7 @@ http.createServer(async(req,res)=>{
   if(u.pathname==='/api/time') return json(res,200,clubTimePayload());
   if(u.pathname==='/api/capabilities') return json(res,200,{ok:true,version:'40.0.0',mode:'GITHUB_PAGES_RENDER_R20_SUPABASE_DUAL_RUN',actions:[...allowedActions].sort(),featureFlags:FEATURE_FLAGS,domainCore:SUPABASE_RUNTIME,runtimeSafety:{previewSafeMode:PREVIEW_SAFE_MODE,writePolicy:PREVIEW_SAFE_MODE?'READ_ONLY':'NORMAL'},isolated:['safeguarding']});
   if(u.pathname==='/api/core-status') return json(res,200,{ok:true,version:'40.0.0',featureFlags:FEATURE_FLAGS,domainCore:SUPABASE_RUNTIME,currentPrimary:'R20',targetPrimary:'SCD_SUPABASE',runtimeSafety:{previewSafeMode:PREVIEW_SAFE_MODE,writePolicy:PREVIEW_SAFE_MODE?'READ_ONLY':'NORMAL'}});
+  if(u.pathname==='/api/core-brain') return handleCoreBrain(req,res);
   if(u.pathname==='/api/launch-readiness') return handleLaunchReadiness(req,res);
   if(u.pathname==='/api/tournaments') return handleTournaments(req,res);
   if(u.pathname==='/api/membership-services') return handleMembershipServices(req,res);
