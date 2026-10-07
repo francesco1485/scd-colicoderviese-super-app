@@ -1,0 +1,963 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "SCD_GESTIONALE_UI_GRAMMAR",
+  "status": "DESIGN_FOUNDATION",
+  "authority": "APPROVED_GESTIONALE_VISUAL_FOUNDATION_SPEC",
+  "hierarchy": [
+    "TOKEN",
+    "PRIMITIVE",
+    "COMPONENT",
+    "MODULE",
+    "TEMPLATE",
+    "SCENE",
+    "APPLICATION"
+  ],
+  "rules": {
+    "rendererIsNotSourceOfTruth": true,
+    "noFakeRuntimeData": true,
+    "publicProjectionPrivacyFiltered": true,
+    "dragOnlyInteractionForbidden": true
+  },
+  "macroTemplates": [
+    {
+      "id": "T01_PUBLIC_EDITORIAL",
+      "purpose": "Public club presentation, news, verified statistics, teams, structures and projects",
+      "allowedPrimitives": [
+        "LOGO_LOCKUP",
+        "TEAM_BADGE",
+        "PLAYER_TOKEN",
+        "STATUS_CHIP",
+        "SOURCE_BADGE",
+        "MEDIA_TILE",
+        "ACTION_BUTTON",
+        "PROVENANCE_TAG"
+      ],
+      "density": "BALANCED",
+      "responsiveMode": "EDITORIAL_REFLOW"
+    },
+    {
+      "id": "T02_OPERATIONAL_HOME",
+      "purpose": "Role-aware operational attention, events, messages, source health and AI actions",
+      "allowedPrimitives": [
+        "PERSON_TOKEN",
+        "TEAM_BADGE",
+        "STATUS_CHIP",
+        "SOURCE_BADGE",
+        "NOTIFICATION_ITEM",
+        "TIMELINE_ITEM",
+        "AI_SUGGESTION",
+        "ACTION_BUTTON",
+        "PROVENANCE_TAG"
+      ],
+      "density": "BALANCED",
+      "responsiveMode": "ROLE_CONTEXT_COMPOSITION"
+    },
+    {
+      "id": "T03_DOMAIN_HUB",
+      "purpose": "Domain overview for people, teams, warehouse, payments, facilities and suppliers",
+      "allowedPrimitives": [
+        "PERSON_TOKEN",
+        "PLAYER_TOKEN",
+        "TEAM_BADGE",
+        "STATUS_CHIP",
+        "AVAILABILITY_INDICATOR",
+        "ASSET_TOKEN",
+        "DOCUMENT_CHIP",
+        "ACTION_BUTTON"
+      ],
+      "density": "COMPACT",
+      "responsiveMode": "DENSE_RESPONSIVE_GRID"
+    },
+    {
+      "id": "T04_ENTITY_DETAIL",
+      "purpose": "Universal detail view for a canonical person, team, supplier, vehicle, field or project",
+      "allowedPrimitives": [
+        "FACE_AVATAR",
+        "PERSON_TOKEN",
+        "PLAYER_TOKEN",
+        "ROLE_BADGE",
+        "STATUS_CHIP",
+        "CONSENT_BADGE",
+        "DOCUMENT_CHIP",
+        "PAYMENT_CHIP",
+        "TIMELINE_ITEM",
+        "PROVENANCE_TAG"
+      ],
+      "density": "BALANCED",
+      "responsiveMode": "DETAIL_SPLIT_TO_STACK"
+    },
+    {
+      "id": "T05_SPATIAL_WORKSPACE",
+      "purpose": "Semantic 2D scenes for formation, transport, locker rooms, facilities, warehouse and events",
+      "allowedPrimitives": [
+        "PLAYER_TOKEN",
+        "VEHICLE_TOKEN",
+        "SEAT_SLOT",
+        "LOCKER_SLOT",
+        "ROOM_SLOT",
+        "FIELD_ZONE",
+        "ASSET_TOKEN",
+        "ASSIGNMENT_HANDLE",
+        "WARNING_BLOCK_STATE",
+        "AVAILABILITY_INDICATOR"
+      ],
+      "density": "COMPACT",
+      "responsiveMode": "SPATIAL_CANVAS_WITH_LIST_FALLBACK"
+    },
+    {
+      "id": "T06_COMMUNICATION_HUB",
+      "purpose": "Contextual omnichannel communication and operational threads",
+      "allowedPrimitives": [
+        "PERSON_TOKEN",
+        "TEAM_BADGE",
+        "MESSAGE_BUBBLE",
+        "NOTIFICATION_ITEM",
+        "SOURCE_BADGE",
+        "ACTION_BUTTON",
+        "PROVENANCE_TAG"
+      ],
+      "density": "BALANCED",
+      "responsiveMode": "THREE_PANE_TO_SINGLE_THREAD"
+    },
+    {
+      "id": "T07_DATA_FINANCE",
+      "purpose": "Role-gated tables and actions for payments, treasury, purchasing, orders and reconciliation",
+      "allowedPrimitives": [
+        "STATUS_CHIP",
+        "SOURCE_BADGE",
+        "DOCUMENT_CHIP",
+        "PAYMENT_CHIP",
+        "TIMELINE_ITEM",
+        "ACTION_BUTTON",
+        "PROVENANCE_TAG",
+        "WARNING_BLOCK_STATE"
+      ],
+      "density": "COMPACT",
+      "responsiveMode": "TABLE_TO_PRIORITY_STACK"
+    },
+    {
+      "id": "T08_PROJECT_DEVELOPMENT",
+      "purpose": "Visual project workspace for facility development, budgets, progress media and suppliers",
+      "allowedPrimitives": [
+        "MEDIA_TILE",
+        "TIMELINE_ITEM",
+        "DOCUMENT_CHIP",
+        "PAYMENT_CHIP",
+        "STATUS_CHIP",
+        "ACTION_BUTTON",
+        "PROVENANCE_TAG",
+        "ASSET_TOKEN"
+      ],
+      "density": "BALANCED",
+      "responsiveMode": "PROJECT_TIMELINE_REFLOW"
+    }
+  ],
+  "microPrimitives": [
+    {
+      "id": "PERSON_TOKEN",
+      "semanticPurpose": "Represent a canonical person in operational context",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sizes": [
+        "COMPACT",
+        "STANDARD",
+        "EXPANDED"
+      ],
+      "accessibility": {
+        "labelRequired": true,
+        "keyboardReachable": true,
+        "colorIsNeverSoleSignal": true,
+        "dragAlternative": "NOT_APPLICABLE"
+      }
+    },
+    {
+      "id": "PLAYER_TOKEN",
+      "semanticPurpose": "Represent an athlete with sport identity and assignment state",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sizes": [
+        "COMPACT",
+        "STANDARD",
+        "EXPANDED"
+      ],
+      "accessibility": {
+        "labelRequired": true,
+        "keyboardReachable": true,
+        "colorIsNeverSoleSignal": true,
+        "dragAlternative": "REQUIRED"
+      }
+    },
+    {
+      "id": "TEAM_BADGE",
+      "semanticPurpose": "Identify one canonical team or category",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sizes": [
+        "COMPACT",
+        "STANDARD",
+        "EXPANDED"
+      ],
+      "accessibility": {
+        "labelRequired": true,
+        "keyboardReachable": true,
+        "colorIsNeverSoleSignal": true,
+        "dragAlternative": "NOT_APPLICABLE"
+      }
+    },
+    {
+      "id": "ROLE_BADGE",
+      "semanticPurpose": "Expose role without leaking unrelated privileges",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sizes": [
+        "COMPACT",
+        "STANDARD",
+        "EXPANDED"
+      ],
+      "accessibility": {
+        "labelRequired": true,
+        "keyboardReachable": true,
+        "colorIsNeverSoleSignal": true,
+        "dragAlternative": "NOT_APPLICABLE"
+      }
+    },
+    {
+      "id": "NUMBER_BADGE",
+      "semanticPurpose": "Show an assigned shirt or sequence number",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sizes": [
+        "COMPACT",
+        "STANDARD",
+        "EXPANDED"
+      ],
+      "accessibility": {
+        "labelRequired": true,
+        "keyboardReachable": true,
+        "colorIsNeverSoleSignal": true,
+        "dragAlternative": "NOT_APPLICABLE"
+      }
+    },
+    {
+      "id": "STATUS_CHIP",
+      "semanticPurpose": "Expose state with text and shape as well as color",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sizes": [
+        "COMPACT",
+        "STANDARD",
+        "EXPANDED"
+      ],
+      "accessibility": {
+        "labelRequired": true,
+        "keyboardReachable": true,
+        "colorIsNeverSoleSignal": true,
+        "dragAlternative": "NOT_APPLICABLE"
+      }
+    },
+    {
+      "id": "SOURCE_BADGE",
+      "semanticPurpose": "Expose source and verification state",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sizes": [
+        "COMPACT",
+        "STANDARD",
+        "EXPANDED"
+      ],
+      "accessibility": {
+        "labelRequired": true,
+        "keyboardReachable": true,
+        "colorIsNeverSoleSignal": true,
+        "dragAlternative": "NOT_APPLICABLE"
+      }
+    },
+    {
+      "id": "CONSENT_BADGE",
+      "semanticPurpose": "Expose media/usage consent state only to authorized contexts",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sizes": [
+        "COMPACT",
+        "STANDARD",
+        "EXPANDED"
+      ],
+      "accessibility": {
+        "labelRequired": true,
+        "keyboardReachable": true,
+        "colorIsNeverSoleSignal": true,
+        "dragAlternative": "NOT_APPLICABLE"
+      }
+    },
+    {
+      "id": "LOGO_LOCKUP",
+      "semanticPurpose": "Render an official verified mark with protected spacing",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sizes": [
+        "COMPACT",
+        "STANDARD",
+        "EXPANDED"
+      ],
+      "accessibility": {
+        "labelRequired": true,
+        "keyboardReachable": true,
+        "colorIsNeverSoleSignal": true,
+        "dragAlternative": "NOT_APPLICABLE"
+      }
+    },
+    {
+      "id": "FACE_AVATAR",
+      "semanticPurpose": "Render the highest permitted face representation for the context",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sizes": [
+        "COMPACT",
+        "STANDARD",
+        "EXPANDED"
+      ],
+      "accessibility": {
+        "labelRequired": true,
+        "keyboardReachable": true,
+        "colorIsNeverSoleSignal": true,
+        "dragAlternative": "NOT_APPLICABLE"
+      }
+    },
+    {
+      "id": "JERSEY_TOKEN",
+      "semanticPurpose": "Represent kit or jersey identity without inventing official artwork",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sizes": [
+        "COMPACT",
+        "STANDARD",
+        "EXPANDED"
+      ],
+      "accessibility": {
+        "labelRequired": true,
+        "keyboardReachable": true,
+        "colorIsNeverSoleSignal": true,
+        "dragAlternative": "NOT_APPLICABLE"
+      }
+    },
+    {
+      "id": "VEHICLE_TOKEN",
+      "semanticPurpose": "Represent a canonical vehicle and occupancy state",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sizes": [
+        "COMPACT",
+        "STANDARD",
+        "EXPANDED"
+      ],
+      "accessibility": {
+        "labelRequired": true,
+        "keyboardReachable": true,
+        "colorIsNeverSoleSignal": true,
+        "dragAlternative": "REQUIRED"
+      }
+    },
+    {
+      "id": "SEAT_SLOT",
+      "semanticPurpose": "Represent a semantic vehicle seat",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sizes": [
+        "COMPACT",
+        "STANDARD",
+        "EXPANDED"
+      ],
+      "accessibility": {
+        "labelRequired": true,
+        "keyboardReachable": true,
+        "colorIsNeverSoleSignal": true,
+        "dragAlternative": "REQUIRED"
+      }
+    },
+    {
+      "id": "LOCKER_SLOT",
+      "semanticPurpose": "Represent a semantic locker or changing slot",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sizes": [
+        "COMPACT",
+        "STANDARD",
+        "EXPANDED"
+      ],
+      "accessibility": {
+        "labelRequired": true,
+        "keyboardReachable": true,
+        "colorIsNeverSoleSignal": true,
+        "dragAlternative": "REQUIRED"
+      }
+    },
+    {
+      "id": "ROOM_SLOT",
+      "semanticPurpose": "Represent a room assignment target",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sizes": [
+        "COMPACT",
+        "STANDARD",
+        "EXPANDED"
+      ],
+      "accessibility": {
+        "labelRequired": true,
+        "keyboardReachable": true,
+        "colorIsNeverSoleSignal": true,
+        "dragAlternative": "REQUIRED"
+      }
+    },
+    {
+      "id": "FIELD_ZONE",
+      "semanticPurpose": "Represent a field or tactical/facility zone",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sizes": [
+        "COMPACT",
+        "STANDARD",
+        "EXPANDED"
+      ],
+      "accessibility": {
+        "labelRequired": true,
+        "keyboardReachable": true,
+        "colorIsNeverSoleSignal": true,
+        "dragAlternative": "REQUIRED"
+      }
+    },
+    {
+      "id": "ASSET_TOKEN",
+      "semanticPurpose": "Represent a canonical physical or commercial asset",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sizes": [
+        "COMPACT",
+        "STANDARD",
+        "EXPANDED"
+      ],
+      "accessibility": {
+        "labelRequired": true,
+        "keyboardReachable": true,
+        "colorIsNeverSoleSignal": true,
+        "dragAlternative": "REQUIRED"
+      }
+    },
+    {
+      "id": "WAREHOUSE_LOCATION",
+      "semanticPurpose": "Represent a stock location hierarchy",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sizes": [
+        "COMPACT",
+        "STANDARD",
+        "EXPANDED"
+      ],
+      "accessibility": {
+        "labelRequired": true,
+        "keyboardReachable": true,
+        "colorIsNeverSoleSignal": true,
+        "dragAlternative": "NOT_APPLICABLE"
+      }
+    },
+    {
+      "id": "DOCUMENT_CHIP",
+      "semanticPurpose": "Represent a document, version and verification state",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sizes": [
+        "COMPACT",
+        "STANDARD",
+        "EXPANDED"
+      ],
+      "accessibility": {
+        "labelRequired": true,
+        "keyboardReachable": true,
+        "colorIsNeverSoleSignal": true,
+        "dragAlternative": "NOT_APPLICABLE"
+      }
+    },
+    {
+      "id": "PAYMENT_CHIP",
+      "semanticPurpose": "Represent a payment or financial status without exposing unauthorized detail",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sizes": [
+        "COMPACT",
+        "STANDARD",
+        "EXPANDED"
+      ],
+      "accessibility": {
+        "labelRequired": true,
+        "keyboardReachable": true,
+        "colorIsNeverSoleSignal": true,
+        "dragAlternative": "NOT_APPLICABLE"
+      }
+    },
+    {
+      "id": "MESSAGE_BUBBLE",
+      "semanticPurpose": "Represent a contextual communication message",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sizes": [
+        "COMPACT",
+        "STANDARD",
+        "EXPANDED"
+      ],
+      "accessibility": {
+        "labelRequired": true,
+        "keyboardReachable": true,
+        "colorIsNeverSoleSignal": true,
+        "dragAlternative": "NOT_APPLICABLE"
+      }
+    },
+    {
+      "id": "NOTIFICATION_ITEM",
+      "semanticPurpose": "Represent an actionable or informational notification",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sizes": [
+        "COMPACT",
+        "STANDARD",
+        "EXPANDED"
+      ],
+      "accessibility": {
+        "labelRequired": true,
+        "keyboardReachable": true,
+        "colorIsNeverSoleSignal": true,
+        "dragAlternative": "NOT_APPLICABLE"
+      }
+    },
+    {
+      "id": "TIMELINE_ITEM",
+      "semanticPurpose": "Represent a dated event or state transition",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sizes": [
+        "COMPACT",
+        "STANDARD",
+        "EXPANDED"
+      ],
+      "accessibility": {
+        "labelRequired": true,
+        "keyboardReachable": true,
+        "colorIsNeverSoleSignal": true,
+        "dragAlternative": "NOT_APPLICABLE"
+      }
+    },
+    {
+      "id": "ACTION_BUTTON",
+      "semanticPurpose": "Invoke one authorized semantic action",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sizes": [
+        "COMPACT",
+        "STANDARD",
+        "EXPANDED"
+      ],
+      "accessibility": {
+        "labelRequired": true,
+        "keyboardReachable": true,
+        "colorIsNeverSoleSignal": true,
+        "dragAlternative": "NOT_APPLICABLE"
+      }
+    },
+    {
+      "id": "AI_SUGGESTION",
+      "semanticPurpose": "Represent an AI proposal distinct from executed state",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sizes": [
+        "COMPACT",
+        "STANDARD",
+        "EXPANDED"
+      ],
+      "accessibility": {
+        "labelRequired": true,
+        "keyboardReachable": true,
+        "colorIsNeverSoleSignal": true,
+        "dragAlternative": "NOT_APPLICABLE"
+      }
+    },
+    {
+      "id": "PROVENANCE_TAG",
+      "semanticPurpose": "Expose source, verification time or evidence",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sizes": [
+        "COMPACT",
+        "STANDARD",
+        "EXPANDED"
+      ],
+      "accessibility": {
+        "labelRequired": true,
+        "keyboardReachable": true,
+        "colorIsNeverSoleSignal": true,
+        "dragAlternative": "NOT_APPLICABLE"
+      }
+    },
+    {
+      "id": "WARNING_BLOCK_STATE",
+      "semanticPurpose": "Represent a warning or hard blocking constraint",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sizes": [
+        "COMPACT",
+        "STANDARD",
+        "EXPANDED"
+      ],
+      "accessibility": {
+        "labelRequired": true,
+        "keyboardReachable": true,
+        "colorIsNeverSoleSignal": true,
+        "dragAlternative": "NOT_APPLICABLE"
+      }
+    },
+    {
+      "id": "AVAILABILITY_INDICATOR",
+      "semanticPurpose": "Expose availability with non-color signal",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sizes": [
+        "COMPACT",
+        "STANDARD",
+        "EXPANDED"
+      ],
+      "accessibility": {
+        "labelRequired": true,
+        "keyboardReachable": true,
+        "colorIsNeverSoleSignal": true,
+        "dragAlternative": "NOT_APPLICABLE"
+      }
+    },
+    {
+      "id": "ASSIGNMENT_HANDLE",
+      "semanticPurpose": "Accessible control for assigning or moving a semantic object",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sizes": [
+        "COMPACT",
+        "STANDARD",
+        "EXPANDED"
+      ],
+      "accessibility": {
+        "labelRequired": true,
+        "keyboardReachable": true,
+        "colorIsNeverSoleSignal": true,
+        "dragAlternative": "REQUIRED"
+      }
+    },
+    {
+      "id": "QR_BARCODE_OBJECT",
+      "semanticPurpose": "Represent a scannable identifier and text fallback",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sizes": [
+        "COMPACT",
+        "STANDARD",
+        "EXPANDED"
+      ],
+      "accessibility": {
+        "labelRequired": true,
+        "keyboardReachable": true,
+        "colorIsNeverSoleSignal": true,
+        "dragAlternative": "NOT_APPLICABLE"
+      }
+    },
+    {
+      "id": "MEDIA_TILE",
+      "semanticPurpose": "Represent governed image/video/media content",
+      "states": [
+        "NORMAL",
+        "SELECTED",
+        "ASSIGNED",
+        "AVAILABLE",
+        "BUSY",
+        "WARNING",
+        "ERROR",
+        "LOCKED",
+        "UNVERIFIED"
+      ],
+      "sizes": [
+        "COMPACT",
+        "STANDARD",
+        "EXPANDED"
+      ],
+      "accessibility": {
+        "labelRequired": true,
+        "keyboardReachable": true,
+        "colorIsNeverSoleSignal": true,
+        "dragAlternative": "NOT_APPLICABLE"
+      }
+    }
+  ]
+}
