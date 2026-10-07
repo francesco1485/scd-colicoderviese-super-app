@@ -124,6 +124,22 @@ run('no_synthetic_item_is_created',()=>{
   assert.deepEqual(projection.next,[]);
 });
 
+run('untrusted_https_source_url_is_withheld',()=>{
+  const projection=buildTodayAttentionProjection({
+    brain:brain({items:[item({recordId:'URL-BAD',sourceUrl:'https://evil.example/phish'})]}),
+    roleScope:['DIRECTION'],commandTrigger:'/today',now
+  });
+  assert.equal(projection.primary_attention.source_url,null);
+});
+
+run('trusted_google_source_url_is_preserved',()=>{
+  const projection=buildTodayAttentionProjection({
+    brain:brain({items:[item({recordId:'URL-GOOD',sourceUrl:'https://drive.google.com/file/d/abc/view'})]}),
+    roleScope:['DIRECTION'],commandTrigger:'/today',now
+  });
+  assert.match(projection.primary_attention.source_url,/^https:\/\/drive\.google\.com\//);
+});
+
 run('next_action_mode_is_read_or_human_gate_only',()=>{
   const projection=buildTodayAttentionProjection({
     brain:brain({items:[item({actionMode:'WRITE',nextAction:'Cancella record'})]}),
