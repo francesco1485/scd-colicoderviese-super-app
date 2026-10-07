@@ -3,8 +3,8 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.30.0",
-    "effective_at": "2026-10-06",
+    "version": "3.31.0",
+    "effective_at": "2026-10-07",
     "status": "BINDING",
     "language": "it-IT",
     "timezone": "Europe/Rome",
@@ -31,7 +31,8 @@
       "EVOLUTION_ENGINE.md",
       "MESSAGING_SECURITY_CONTRACT.md",
       "MEDIA_ASSET_POLICY.md",
-      "PLAY_STORE_SUBMISSION.md"
+      "PLAY_STORE_SUBMISSION.md",
+      "docs/superpowers/specs/2026-10-07-gestionale-visual-foundation-design.md"
     ]
   },
   "north_star": {
@@ -264,6 +265,26 @@
       "desktop_top_or_side_navigation": true,
       "same_routes_across_channels": true,
       "never_create_second_product_for_desktop": true
+    },
+    "user_facing_projects": {
+      "canonical_ids": [
+        "APP_SOCIAL",
+        "GESTIONALE",
+        "SPONSOR"
+      ],
+      "historical_aliases": {
+        "APP_SOCIAL": [
+          "SCD_ONE"
+        ],
+        "GESTIONALE": [
+          "SCD_CORE",
+          "SCD_MANAGER"
+        ],
+        "SPONSOR": [
+          "SCD_GROW"
+        ]
+      },
+      "access_rule": "ONE_ACCOUNT_SHARED_IDENTITY_AUTHORIZED_APP_ACCESS"
     }
   },
   "visual_system": {
@@ -448,6 +469,25 @@
         "OVERLAYS",
         "MEDIA_LOADING",
         "INITIAL_INFORMATION_VOLUME"
+      ]
+    },
+    "macro_template_registry": "config/scd-ui-grammar.v1.json",
+    "micro_primitive_registry": "config/scd-ui-grammar.v1.json",
+    "face_policy": "config/scd-face-policy.v1.json",
+    "accessory_library": "config/scd-accessory-library.v1.json",
+    "spatial_scene_model": {
+      "status": "DESIGN_ONLY",
+      "renderer_independent": true,
+      "canonical_registry": "config/scd-ui-grammar.v1.json",
+      "initial_scene_types": [
+        "PITCH_SCENE",
+        "VEHICLE_SCENE",
+        "LOCKER_ROOM_SCENE",
+        "FACILITY_SCENE",
+        "WAREHOUSE_SCENE",
+        "EVENT_SCENE",
+        "PROJECT_SCENE",
+        "SPONSOR_SCENE"
       ]
     }
   },
@@ -3012,6 +3052,22 @@
         "/r58/manager/"
       ],
       "preview_service": "scd-r58-core-today-preview"
+    },
+    {
+      "id": "CAP-GESTIONALE-VISUAL-FOUNDATION",
+      "domain": "UX_HMI_GRAPHICS",
+      "required": true,
+      "state": "DESIGN_ONLY",
+      "product": "GESTIONALE",
+      "contract": "MACRO_MICRO_GRAMMAR_GOVERNED_ASSETS_RESPONSIVE_ACCESSIBLE_NO_RUNTIME_ADOPTION_WAVE_1"
+    },
+    {
+      "id": "CAP-GESTIONALE-SPATIAL-UI",
+      "domain": "SPATIAL_OPERATIONS",
+      "required": true,
+      "state": "DESIGN_ONLY",
+      "product": "GESTIONALE",
+      "contract": "SEMANTIC_SCENE_MODEL_RENDERER_INDEPENDENT_2D_FIRST_SIMULATION_READY"
     }
   ],
   "known_noncompliance": [
