@@ -81,5 +81,86 @@
     "crm": "DENSO_MA_LEGGIBILE",
     "led": "DINAMICO_CAMERA_SAFE",
     "sponsorWall": "MODULARE_BRAND_SAFE"
+  },
+  "density": {
+    "COMPACT": {
+      "gap": 8,
+      "padding": 10,
+      "rowHeight": 36
+    },
+    "BALANCED": {
+      "gap": 12,
+      "padding": 14,
+      "rowHeight": 44
+    },
+    "COMFORTABLE": {
+      "gap": 16,
+      "padding": 18,
+      "rowHeight": 52
+    }
+  },
+  "elevation": {
+    "LOW": "0 6px 18px rgba(3,35,72,.08)",
+    "MEDIUM": "0 14px 34px rgba(3,35,72,.12)",
+    "HIGH": "0 24px 60px rgba(3,35,72,.18)"
+  },
+  "focus": {
+    "width": 3,
+    "offset": 3,
+    "token": "YELLOW",
+    "rule": "ALWAYS_VISIBLE_FOR_KEYBOARD"
+  },
+  "stateSemantics": {
+    "NORMAL": {
+      "label": "Normale",
+      "signal": "BASE"
+    },
+    "SELECTED": {
+      "label": "Selezionato",
+      "signal": "OUTLINE"
+    },
+    "ASSIGNED": {
+      "label": "Assegnato",
+      "signal": "CHECK"
+    },
+    "AVAILABLE": {
+      "label": "Disponibile",
+      "signal": "CHECK"
+    },
+    "BUSY": {
+      "label": "Occupato",
+      "signal": "DOT"
+    },
+    "WARNING": {
+      "label": "Attenzione",
+      "signal": "TRIANGLE"
+    },
+    "ERROR": {
+      "label": "Errore",
+      "signal": "CROSS"
+    },
+    "LOCKED": {
+      "label": "Bloccato",
+      "signal": "LOCK"
+    },
+    "UNVERIFIED": {
+      "label": "Non verificato",
+      "signal": "QUESTION"
+    }
+  },
+  "surfaceRoles": {
+    "PUBLIC_EDITORIAL": "SPORT_EDITORIAL",
+    "OPERATIONAL": "DENSE_ACTIONABLE",
+    "SPATIAL": "POSITION_AND_ASSIGNMENT",
+    "COMMUNICATION": "THREAD_CONTEXT",
+    "FINANCE": "HIGH_CLARITY_ROLE_GATED",
+    "PROJECT": "TIMELINE_MEDIA_PROGRESS"
+  },
+  "spatialTokens": {
+    "gridUnit": 8,
+    "handleSize": 36,
+    "snapRadius": 12,
+    "minTouchTarget": 44,
+    "rendererIndependent": true
   }
 }
