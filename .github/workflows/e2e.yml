@@ -119,6 +119,9 @@ jobs:
           node --check lib/scd-native-adapters.js
           node --check lib/scd-one-profile.js
           node --check lib/scd-one-pulse.js
+          node --check lib/scd-today-attention.js
+          node --check lib/scd-command-grammar.js
+          node --check r58/core-today/app.js
       - name: API contract gate
         run: npm run test:contract
       - name: Upstream resilience gate
@@ -139,6 +142,8 @@ jobs:
           exit 1
       - name: SCD ONE seven-viewport visual QA
         run: node tests/scd-one-visual-qa.mjs
+      - name: R58 CORE Today six-viewport visual QA
+        run: node tests/scd-core-today-visual-qa.mjs
       - name: Smoke test mobile app
         run: npm run test:smoke
       - name: Server logs
