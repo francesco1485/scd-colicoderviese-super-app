@@ -1,85 +1,401 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "standard_id": "HDI_AGENCY_BRAND_2025_V2",
   "source": {
     "title": "Brand Manual - Normativa per le Agenzie Generali 2025",
     "issuer": "HDI Assicurazioni - Comunicazione Istituzionale",
     "location": "Roma",
     "year": 2025,
-    "version": "2.0"
+    "version": "2.0",
+    "page_count": 32,
+    "mime_type": "application/pdf",
+    "file_size_bytes": 1889409,
+    "sha256": "27c73b836c691a66155b748f7a10ce9062a3627a9fac9937d4b4f979516ce479"
   },
-  "colors": {
-    "green": {
-      "pantone": "349",
-      "cmyk": "100/0/100/40",
-      "rgb": "0/103/41",
-      "hex": "#006729",
-      "ral": "6002"
-    },
-    "red": {
-      "pantone": "485",
-      "cmyk": "0/100/100/0",
-      "rgb": "230/0/24",
-      "hex": "#E60018",
-      "ral": "3020"
-    }
+  "brand_names": {
+    "legal": "HDI Assicurazioni S.p.A.",
+    "communicative": [
+      "HDI",
+      "HDI Assicurazioni"
+    ],
+    "group": "Gruppo HDI Assicurazioni",
+    "hdi_uppercase_required": true
   },
   "logo": {
     "official_files_only": true,
     "never_rebuild": true,
+    "wordmark_font": "Gotham Medium",
+    "assicurazioni_black_percentage": 55,
+    "assicurazioni_alignment": "aligned_with_HDI_and_not_higher_than_red_square",
     "minimum_height_mm": 3,
-    "clearspace_reference": "H-height"
+    "clearspace_reference": "H-height",
+    "standard_position": "top-right",
+    "a4_width_ratio_short_side": 0.12,
+    "color_background_rule": {
+      "color_logo": "white_or_light_background_not_darker_than_15_percent",
+      "dark_background": "white_logo",
+      "light_background": "black_logo",
+      "strong_contrast_required": true,
+      "highly_colored_background_forbidden": true
+    }
   },
-  "business_card": {
-    "size_mm": [
-      85,
-      55
+  "typography": {
+    "primary": {
+      "family": "HDI Sans",
+      "styles": [
+        "HDI Sans Cond Light",
+        "HDI Sans Cond",
+        "HDI Sans",
+        "HDI Sans Bold",
+        "HDI Sans Italic"
+      ],
+      "distribution_restricted": true,
+      "do_not_extract_from_pdf": true
+    },
+    "secondary": {
+      "family": "Arial",
+      "styles": [
+        "Arial Regular",
+        "Arial Bold",
+        "Arial Narrow"
+      ],
+      "fallback_when_primary_unavailable": true,
+      "powerpoint_standard": "Arial Narrow"
+    }
+  },
+  "language": {
+    "principles": [
+      "favor_conciseness",
+      "engage_with_varied_sentence_length_and_structure",
+      "avoid_unnecessary_technical_language",
+      "use_active_voice",
+      "prefer_present_tense",
+      "create_confidence_and_avoid_unclear_qualifiers",
+      "do_not_exaggerate",
+      "avoid_cliches",
+      "use_second_person_and_personal_language"
     ],
-    "logo_height_mm": 7,
-    "edge_distance_mm": 5
+    "quotes": {
+      "citations": "guillemets",
+      "other_cases": "double_quotes"
+    },
+    "currency": {
+      "prose": "Euro",
+      "tables_and_charts_example": "2.000 EUR"
+    },
+    "dates": [
+      "DD.MM.YYYY",
+      "D month YYYY"
+    ],
+    "website": "https://www.hdiassicurazioni.it/",
+    "agency_email_pattern": "agXYZ@hdiarete.it"
+  },
+  "colors": {
+    "primary": {
+      "green": {
+        "name": "HDI Green",
+        "pantone": "349",
+        "cmyk": "100/0/100/40",
+        "rgb": "0/103/41",
+        "hex": "#006729",
+        "ral": "6002"
+      },
+      "red": {
+        "name": "HDI Red",
+        "pantone": "485",
+        "cmyk": "0/100/100/0",
+        "rgb": "230/0/24",
+        "hex": "#E60018",
+        "ral": "3020"
+      },
+      "white_is_primary_supplement": true
+    },
+    "secondary": {
+      "usage": "charts_diagrams_tables_infographics_and_backgrounds_sparingly",
+      "forbidden_for": [
+        "body_text",
+        "captions",
+        "symbols"
+      ],
+      "page_rule": "white_and_HDI_Green_plus_at_most_one_secondary_color_per_page_except_graphics_and_diagrams",
+      "allowed_tints_percent": [
+        60,
+        30,
+        10
+      ],
+      "light_green": {
+        "name": "HDI Light Green",
+        "pantone": "369 U",
+        "cmyk": "60/0/95/0",
+        "rgb": "121/181/48",
+        "hex": "#79B530"
+      },
+      "light_blue": {
+        "name": "HDI Light Blue",
+        "pantone": "7472 U",
+        "cmyk": "75/0/30/0",
+        "rgb": "0/177/183",
+        "hex": "#00B1B7"
+      },
+      "blue": {
+        "name": "HDI Blue",
+        "pantone": "540 U",
+        "cmyk": "100/60/15/50",
+        "rgb": "0/57/96",
+        "hex": "#003960"
+      },
+      "dark_red": {
+        "name": "HDI Dark Red",
+        "pantone": "201 U",
+        "cmyk": "30/100/80/30",
+        "rgb": "141/20/41",
+        "hex": "#8D1429"
+      },
+      "accessibility": {
+        "red_green_color_vision_deficiency_contrast_required": true,
+        "check_deuteranopia_and_protanopia": true
+      }
+    },
+    "tertiary": {
+      "usage_rule": "only_as_ninth_and_tenth_colors_when_graphic_already_uses_eight_colors",
+      "tints_60_30_available": false,
+      "ochre": {
+        "name": "HDI Ochre",
+        "cmyk": "10/70/100/0",
+        "rgb": "219/99/1",
+        "hex": "#DB6301"
+      },
+      "yellow_ochre": {
+        "name": "HDI Yellow Ochre",
+        "cmyk": "0/47/93/0",
+        "rgb": "255/153/0",
+        "hex": "#FF9900"
+      }
+    },
+    "neutral": {
+      "usage": "infographics_diagrams_tables_backgrounds_digital_event_materials_and_business_cards",
+      "grey": {
+        "name": "HDI Grey",
+        "pantone": "424 U",
+        "cmyk": "0/0/0/70",
+        "rgb": "108/111/112",
+        "hex": "#6C6F70",
+        "ral": "7012"
+      },
+      "medium_grey": {
+        "name": "HDI Medium Grey",
+        "cmyk": "0/0/0/50",
+        "rgb": "157/157/156",
+        "hex": "#9D9D9C",
+        "ral": "9023"
+      },
+      "light_grey": {
+        "name": "HDI Light Grey",
+        "pantone": "428 U",
+        "cmyk": "0/0/0/30",
+        "rgb": "198/199/200",
+        "hex": "#C6C7C8",
+        "ral": "7035"
+      },
+      "black": {
+        "pantone": "Process Black",
+        "cmyk": "0/0/0/100",
+        "rgb": "0/0/0",
+        "hex": "#000000"
+      },
+      "white": {
+        "cmyk": "0/0/0/0",
+        "rgb": "255/255/255",
+        "hex": "#FFFFFF"
+      }
+    }
+  },
+  "materials": {
+    "business_card": {
+      "size_mm": [85, 55],
+      "logo_position": "top-right",
+      "logo_edge_distance_mm": 5,
+      "logo_height_mm": 7,
+      "logo_scale_percent": 70,
+      "brand_or_name": {
+        "font": "HDI Sans Cond",
+        "size_pt": 9
+      },
+      "agency_general": {
+        "font": "HDI Sans Cond",
+        "size_pt": 6.5
+      },
+      "person_name": {
+        "font": "HDI Sans Cond Bold",
+        "size_pt": 10
+      },
+      "qualification_and_data": {
+        "font": "HDI Sans Cond",
+        "size_pt": 7.5
+      },
+      "leading_pt": 9,
+      "space_after_pt": 3,
+      "text_color": "HDI Grey"
+    },
+    "letterhead": {
+      "format": "A4",
+      "logo_height_mm": 10,
+      "logo_scale_percent": 100,
+      "brand_or_name": {
+        "font": "Arial Bold",
+        "size_pt": 10,
+        "color": "HDI Grey"
+      },
+      "agency_general": {
+        "font": "Arial Narrow",
+        "size_pt": 7.5,
+        "color": "HDI Grey"
+      },
+      "body": {
+        "font": "Arial",
+        "size_pt": 10,
+        "leading_pt": 12,
+        "color": "Black"
+      },
+      "emphasis": {
+        "font": "Arial Bold",
+        "size_pt": 10,
+        "leading_pt": 12
+      },
+      "sender": {
+        "font": "Arial Narrow",
+        "size_pt": 7.5,
+        "leading_pt": 9
+      }
+    },
+    "envelope": {
+      "size_mm": [230, 110],
+      "front_window": true,
+      "logo_height_mm": 17,
+      "brand_or_name": {
+        "font": "HDI Sans Cond",
+        "size_pt": 12,
+        "leading_pt": 11,
+        "color": "black_55_percent"
+      },
+      "agency_general": {
+        "font": "HDI Sans Cond",
+        "size_pt": 7.5,
+        "leading_pt": 11,
+        "color": "black_55_percent"
+      },
+      "sender": {
+        "font": "HDI Sans Cond",
+        "size_pt": 12,
+        "position": "centered_on_back_flap"
+      }
+    },
+    "stamp": {
+      "size_mm": [41, 19],
+      "brand_or_name": {
+        "font": "HDI Sans Cond",
+        "size_pt": 12,
+        "leading_pt": 11
+      },
+      "agency_general": {
+        "font": "HDI Sans Cond",
+        "size_pt": 7.5,
+        "leading_pt": 11
+      },
+      "sender": {
+        "font": "HDI Sans Cond",
+        "size_pt": 7.5,
+        "leading_pt": 9,
+        "adobe_tracking": 50
+      }
+    },
+    "plaques": {
+      "logo": "official_HDI_Assicurazioni_color",
+      "clearspace_reference": "H-height",
+      "primary_information": {
+        "font": "HDI Sans Cond",
+        "size": "Xpt",
+        "leading": "automatic"
+      },
+      "secondary_information": {
+        "font": "HDI Sans Cond",
+        "size": "Xpt",
+        "leading": "automatic"
+      },
+      "special_cases_require": [
+        "HDI Direzione Commerciale",
+        "HDI Comunicazione Istituzionale"
+      ]
+    },
+    "pylons": {
+      "logo": "official_HDI_Assicurazioni_color",
+      "clearspace_reference": "H-height",
+      "agency_name_color": "Pantone 349",
+      "agency_general_color": "Pantone 349",
+      "font": "HDI Sans Cond",
+      "leading": "automatic"
+    }
   },
   "signage": {
     "canopy": {
+      "type": "external_canopy_sign",
+      "lighting": "LED",
+      "body": "aluminium_press_bent_15_10_prepainted_white_RAL_9003",
       "max_width_mm": 3900,
       "max_height_mm": 500,
-      "depth_mm": [
-        150,
-        200
-      ],
-      "body": "aluminium 15/10 RAL 9003",
+      "depth_mm": [150, 200],
+      "example_width_mm": 2000,
+      "logo_area_example_mm": 650,
+      "front_elements": "official_logo_ASSICURAZIONI_and_naming",
+      "face_material": "satin_solid",
       "face_thickness_mm": 5,
-      "lighting": "LED"
+      "decoration": "translucent_film_from_primary_manufacturers"
     },
     "double_sided": {
+      "type": "external_double_sided_sign",
+      "lighting": "LED",
+      "body": "perforated_aluminium",
       "width_mm": 850,
       "max_height_mm": 500,
       "depth_mm": 90,
-      "lighting": "LED"
+      "logo_area_example_mm": 650,
+      "front_elements": "official_logo_ASSICURAZIONI_and_naming",
+      "face_material": "satin_solid",
+      "face_thickness_mm": 5,
+      "decoration": "translucent_film_from_primary_manufacturers"
+    },
+    "reference_note": "Consult HDI Comunicazione Istituzionale and the complete Talanx manual for additional signage details."
+  },
+  "vehicles": {
+    "materials": [
+      "HDI Special Green",
+      "031 Red",
+      "Matte Black",
+      "Matte White"
+    ],
+    "logo_placement": "any_smooth_vehicle_surface",
+    "text": {
+      "font": "HDI Sans Cond",
+      "colors": [
+        "Black",
+        "White"
+      ]
     }
   },
   "rev09": {
     "status": "PREPRODUCTION_CONTROLLED",
-    "mandello_standard": [
-      3000,
-      450,
-      180
-    ],
+    "official_logo_placeholder": "[INSERIRE LOGO HDI UFFICIALE]",
+    "mandello_standard": [3000, 450, 180],
     "mandello_tank": "APPROVAL_ONLY",
     "colico_standard": {
-      "fascia": [
-        2800,
-        450
-      ],
-      "plaque": [
-        400,
-        300
-      ]
+      "fascia": [2800, 450],
+      "plaque": [400, 300]
     },
     "colico_sail": "APPROVAL_ONLY",
     "crotto": "CEPA_ONLY_NO_PERMANENT_HDI",
     "production_gate": [
       "official_vector_logo",
-      "approved_fonts",
+      "approved_fonts_or_authorized_Arial_fallback",
       "site_surveys",
       "special_concept_approval_or_standard_confirmation",
       "final_legal_data",
