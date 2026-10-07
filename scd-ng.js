@@ -324,6 +324,10 @@ async function loadOperationalSurface(view){
    const logistics=data.logistics&&typeof data.logistics==='object'?data.logistics:{};
    mount.innerHTML='<b>STATO: '+esc(data.state||'UNVERIFIED')+'</b><small>Binding fonte non verificato · '+esc((data.source?.recordSets||['IMPIANTI_MASTER','IMPIANTI_SPAZI']).join(' / '))+'</small><div class="operational-status-grid">'+Object.entries(statusLabels).map(([key,label])=>'<article><small>'+label+'</small><b>'+esc(logistics[key]||'UNKNOWN')+'</b></article>').join('')+'</div><p class="operational-provenance">Il catalogo operativo non è collegato. Capacità, accessi e stato dei dispositivi non sono esposti.</p>';
  }catch(error){
+   if(view==='tournaments'){
+     mount.innerHTML='<b>TORNEI IN AGGIORNAMENTO</b><small>STATO: UNAVAILABLE · La fonte tornei non è raggiungibile o non ha restituito un contratto valido.</small><p class="operational-provenance">Nessun torneo viene inventato o ricostruito localmente. La vista resta fail-closed finché una fonte verificata non torna disponibile.</p>';
+     return;
+   }
    mount.innerHTML='<b>STATO: UNAVAILABLE</b><small>La fonte non è raggiungibile o non ha restituito un contratto valido.</small>';
  }
 }
