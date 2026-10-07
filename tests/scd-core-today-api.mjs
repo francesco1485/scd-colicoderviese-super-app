@@ -122,12 +122,19 @@ try{
   });
 
   await run('preview_mode_blocks_write_actions_and_core_today_remains_read_only',async()=>{
-    const r=await post({sessionToken:'ci-core-session',command:'/today',input:{action:'DELETE'}});
+    const r=await post({sessionToken:'ci-core-session',command:'/today',input:{}});
     assert.equal(r.status,200);
     assert.ok(['READ','HUMAN_GATE'].includes(r.body.projection.primary_attention.next_action.mode));
     assert.notEqual(r.body.projection.primary_attention.next_action.mode,'WRITE');
     assert.equal(r.body.runtime.previewSafeMode,true);
     assert.equal(r.body.runtime.writePolicy,'READ_ONLY');
+  });
+
+  await run('unexpected_input_properties_are_rejected',async()=>{
+    const r=await post({sessionToken:'ci-core-session',command:'/today',input:{action:'DELETE'}});
+    assert.equal(r.status,400);
+    assert.equal(r.body.error,'INVALID_COMMAND_INPUT');
+    assert.equal(Object.hasOwn(r.body,'projection'),false);
   });
 
   await run('unknown_or_contract_only_command_is_rejected_without_fake_output',async()=>{
