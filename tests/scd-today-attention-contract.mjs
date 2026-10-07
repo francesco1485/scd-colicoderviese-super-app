@@ -87,6 +87,17 @@ run('partial_sources_keep_verified_primary',()=>{
   assert.deepEqual(projection.coverage.missing.map(x=>x.id),['agenda']);
 });
 
+run('explicit_change_evidence_appears_in_changed_rail',()=>{
+  const projection=buildTodayAttentionProjection({
+    brain:brain({items:[
+      item({recordId:'PRIMARY',title:'Priorita primaria',explicitPriorityScore:4}),
+      item({recordId:'CHG',title:'Variazione verificata',explicitPriorityScore:2,status:'OPEN',change:'Fonte aggiornata'})
+    ]}),
+    roleScope:['DIRECTION'],commandTrigger:'/attention',now
+  });
+  assert.ok(projection.changed.some(x=>x.id==='CHG'));
+});
+
 run('changed_and_next_are_capped_at_three',()=>{
   const rows=Array.from({length:8},(_,i)=>item({recordId:'A-'+i,title:'Elemento '+i,due:'2026-10-'+String(8+i).padStart(2,'0')}));
   const projection=buildTodayAttentionProjection({brain:brain({items:rows}),roleScope:['DIRECTION'],commandTrigger:'/today',now});
