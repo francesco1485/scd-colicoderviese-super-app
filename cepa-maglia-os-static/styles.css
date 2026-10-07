@@ -4899,3 +4899,22 @@ a:focus-visible{
   .cepa-point-grid{grid-template-columns:1fr}
   .cepa-point-card h3{font-size:22px}
 }
+
+
+/* === HDI Brand Manual 2025 v2.0 tokens === */
+:root{
+  --hdi-green:#006729;
+  --hdi-red:#E60018;
+  --hdi-white:#FFFFFF;
+  --hdi-grey:#6C6F70;
+}
+.cepa-point-visual{
+  background:linear-gradient(135deg,#0b2a43,var(--hdi-green));
+}
+.cepa-point-tags span,
+.cepa-point-link{
+  color:var(--hdi-green);
+}
+.cepa-point-tags span{
+  background:rgba(0,103,41,.08);
+}
