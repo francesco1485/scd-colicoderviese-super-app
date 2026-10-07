@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 
 const require=createRequire(import.meta.url);
-const { registry, resolveCommand, listImplementedCommands }=require('../lib/scd-command-grammar.js');
+const { registry, resolveCommand, listImplementedCommands }=require('../lib/scd-today-attention.js');
 
 function run(name,fn){
   try{fn();console.log('PASS',name)}
