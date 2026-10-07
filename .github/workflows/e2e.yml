@@ -130,9 +130,19 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - name: Build exact Pages artifact
         run: npm run build:pages
+      - name: Start deterministic CI upstream
+        run: |
+          node tests/ci-upstream-stub.mjs > /tmp/scd-upstream.log 2>&1 &
+          echo $! > /tmp/scd-upstream.pid
+          for i in {1..20}; do
+            if curl -fsS http://127.0.0.1:18080/health >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/scd-upstream.log
+          exit 1
       - name: Start SCD server from Pages artifact
         run: |
-          SCD_STATIC_DIR=_site npm start > /tmp/scd-server.log 2>&1 &
+          SCD_APPS_SCRIPT_URL=http://127.0.0.1:18080 SCD_PREVIEW_SAFE_MODE=true SCD_STATIC_DIR=_site npm start > /tmp/scd-server.log 2>&1 &
           echo $! > /tmp/scd-server.pid
           for i in {1..30}; do
             if curl -fsS http://127.0.0.1:10000/health >/dev/null; then exit 0; fi
@@ -148,7 +158,9 @@ jobs:
         run: npm run test:smoke
       - name: Server logs
         if: always()
-        run: cat /tmp/scd-server.log || true
+        run: |
+          cat /tmp/scd-server.log || true
+          cat /tmp/scd-upstream.log || true
       - name: Upload visual QA evidence
         if: always()
         uses: actions/upload-artifact@v4
