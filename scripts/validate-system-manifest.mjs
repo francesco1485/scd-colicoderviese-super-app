@@ -292,6 +292,15 @@ includesAll(caps.map(x=>x.id),[
   'CAP-TAMAGOTCHI','CAP-GEO','CAP-R22','CAP-PWA','CAP-ANDROID','CAP-IOS','CAP-MOBILE-SUPABASE-SHELL','CAP-SCD-UNIVERSE','CAP-META-ADAPTIVE','CAP-SCD-TWIN','CAP-SCD-MIRROR','CAP-SOCIAL-RADAR','CAP-HUMAN-OS','CAP-PRIVATE-DESK','CAP-COGNITIVE-ERGONOMICS','CAP-GROWTH-LOOP','CAP-WEEKLY-SPORT-CALENDAR','CAP-AI-NEWSROOM','CAP-MEDIA-SOCIAL-HUB','CAP-STAFF-ROLE-INGESTION','CAP-PUBLIC-MATCHDAY','CAP-SOLIDARITY-FUND'
 ],'capability map');
 
+
+includesAll(caps.map(x=>x.id),[
+  'CAP-GESTIONALE-VISUAL-FOUNDATION','CAP-GESTIONALE-SPATIAL-UI'
+],'Gestionale Wave 1 capabilities');
+for(const key of ['macro_template_registry','micro_primitive_registry','face_policy','accessory_library','spatial_scene_model']){
+  assert(Boolean(m.visual_system?.[key]),'Gestionale visual contract missing '+key);
+}
+includesAll(m.product?.user_facing_projects?.canonical_ids||[],['APP_SOCIAL','GESTIONALE','SPONSOR'],'canonical user-facing projects');
+assert(m.product?.user_facing_projects?.access_rule==='ONE_ACCOUNT_SHARED_IDENTITY_AUTHORIZED_APP_ACCESS','cross-app access rule missing');
 const gaps=m.known_noncompliance||[];
 includesAll(gaps.map(x=>x.id),['GAP-UI-001','GAP-UI-002','GAP-DATA-001','GAP-EVENT-001','GAP-COMMS-001','GAP-CORE-001'],'known noncompliance');
 
