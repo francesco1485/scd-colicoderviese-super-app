@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "id": "SCD_USER_DIRECTIVES",
-  "effectiveAt": "2026-10-03",
+  "effectiveAt": "2026-10-07",
   "authority": "RECOVERED_FROM_EXPLICIT_USER_CHAT_COMMANDS",
   "purpose": "Prevent loss, dilution or reinterpretation of the user's original operating commands across branches, agents and sessions.",
   "precedence": {
@@ -205,6 +205,21 @@
         "NO_FAKE_LIVE_STATE",
         "NO_FAKE_DEVICE_STATE",
         "NO_UNAUTHORIZED_PRODUCTION_MUTATION"
+      ]
+    },
+    {
+      "id": "UD-011",
+      "name": "GESTIONALE_VISUAL_FOUNDATION_AND_SPATIAL_UI_APPROVED",
+      "sourceDate": "2026-10-07",
+      "approval": "EXPLICIT_USER_APPROVAL",
+      "rules": [
+        "APP_SOCIAL_PUBLIC_EDITORIAL_FRONT_DOOR",
+        "ONE_SCD_ACCOUNT_FUTURE_CROSS_APP_ACCESS_BY_AUTHORIZATION",
+        "MACRO_MICRO_TEMPLATE_GRAMMAR",
+        "LOGOS_FACES_ACCESSORIES_ARE_FIRST_CLASS_GOVERNED_OBJECTS",
+        "2D_SPATIAL_OPERATIONS_FOR_PEOPLE_VEHICLES_FIELDS_LOCKER_ROOMS_WAREHOUSE",
+        "NO_RENDERER_OR_LIBRARY_STACK_FREEZE_BEFORE_TECHNICAL_SPIKES",
+        "NO_GENERIC_SAAS_VISUAL_REGRESSION"
       ]
     }
   ],
