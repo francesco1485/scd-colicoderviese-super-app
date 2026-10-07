@@ -42,4 +42,16 @@ for(const item of accessory.accessories||[]){
 assert(fs.existsSync(new URL('../assets/ui/faces/neutral-person.svg',import.meta.url)),'neutral face master missing');
 assert(assetRegistry.rules?.fallback==='NEUTRAL_PLACEHOLDER_WITH_UNVERIFIED_STATUS','unverified fallback changed');
 assert(Array.isArray(assetRegistry.ui_original_assets)&&assetRegistry.ui_original_assets.length===requiredAccessoryIds.length+1,'ui original asset registry size mismatch');
-console.log('GESTIONALE VISUAL FOUNDATION ASSET GOVERNANCE PASS',{macros:actualMacros.length,micro:actualMicro.length});
+const visual=JSON.parse(fs.readFileSync(new URL('../config/scd-visual-system.json',import.meta.url),'utf8'));
+const css=fs.readFileSync(new URL('../styles/scd-visual-foundation.css',import.meta.url),'utf8');
+const requiredClasses=['.scd-vf-person','.scd-vf-player','.scd-vf-team-badge','.scd-vf-role-badge','.scd-vf-number','.scd-vf-status','.scd-vf-source','.scd-vf-consent','.scd-vf-logo-lockup','.scd-vf-face','.scd-vf-vehicle','.scd-vf-slot','.scd-vf-room','.scd-vf-field-zone','.scd-vf-asset','.scd-vf-document','.scd-vf-payment','.scd-vf-message','.scd-vf-notification','.scd-vf-timeline','.scd-vf-action','.scd-vf-ai-suggestion','.scd-vf-provenance'];
+for(const cls of requiredClasses)assert(css.includes(cls),'CSS class missing '+cls);
+for(const state of ['is-normal','is-selected','is-assigned','is-available','is-busy','is-warning','is-error','is-locked','is-unverified'])assert(css.includes('.'+state),'CSS state missing '+state);
+assert(css.includes(':focus-visible'),'focus-visible contract missing');
+assert(css.includes('@media (prefers-reduced-motion: reduce)'),'reduced motion CSS missing');
+assert(css.includes('@media (prefers-contrast: more)'),'high contrast CSS missing');
+assert(css.includes('@media (pointer: coarse)'),'coarse pointer CSS missing');
+assert(css.includes('min-width:44px')||css.includes('min-width: 44px'),'44px coarse target width missing');
+assert(css.includes('min-height:44px')||css.includes('min-height: 44px'),'44px coarse target height missing');
+for(const k of ['density','elevation','focus','stateSemantics','surfaceRoles','spatialTokens'])assert(visual[k]!==undefined,'visual semantic layer missing '+k);
+console.log('GESTIONALE VISUAL FOUNDATION CSS FOUNDATION PASS',{macros:actualMacros.length,micro:actualMicro.length});
