@@ -250,7 +250,7 @@ for(const viewport of [{width:390,height:844},{width:1440,height:900}]){
   const privatePage=await browser.newPage({viewport});
   const privateErrors=[];
   privatePage.on('pageerror',e=>privateErrors.push(String(e)));
-  privatePage.on('console',m=>{if(m.type()==='error')privateErrors.push('console: '+m.text())});
+  privatePage.on('console',m=>{if(m.type()==='error'){const loc=m.location();privateErrors.push('console: '+m.text()+(loc?.url?' @ '+loc.url:''))}});
 
   const dashboard={
     user:{name:'QA SCD',email:'qa@example.test',role:'STAFF',area:'U16',staff:true},
