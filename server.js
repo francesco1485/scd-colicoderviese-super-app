@@ -1031,8 +1031,11 @@ async function handleCoreBrain(req,res){
     ['dashboard','private.dashboard',{}],
     ['week','private.week',{}],
     ['requests','account.requests',{}],
+    ['agenda','private.agenda.summary',{}],
+    ['mailactions','direction.datafabric.actions',{limit:60}],
+    ['datafabric','direction.datafabric.status',{}],
     ['diagnostics','direction.diagnostics',{}],
-    ['evolution','direction.evolution',{}]
+    ['evolution','direction.evolution',{limit:60}]
   ];
   const channelResults=await Promise.all(definitions.map(async([id,action,payload])=>[id,await coreBrainChannel(action,payload,sessionToken)]));
   const channels=Object.fromEntries(channelResults);
