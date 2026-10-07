@@ -1007,12 +1007,15 @@ function coreBrainActionFromRow(row,channel,index){
   const requestedMode=String(coreBrainPick(row,'actionMode','action_mode')||'').trim().toUpperCase();
   const actionMode=approvalRequired?'HUMAN_GATE':(requestedMode==='READ'?'READ':'HUMAN_GATE');
   const sourceUrl=cleanPublicHttpsUrl(coreBrainPick(row,'sourceUrl','source_url','url','link')||'')||null;
-  if(!title&&!nextAction&&!status&&!due)return null;
+  const change=String(coreBrainPick(row,'change','delta','recommendation','message')||'').trim();
+  const changedAt=String(coreBrainPick(row,'changedAt','changed_at','updatedAt','updated_at')||'').trim();
+  if(!title&&!nextAction&&!status&&!due&&!change)return null;
   return {
-    recordId,channel,title:title||nextAction||status||'Elemento operativo',
+    recordId,channel,title:title||nextAction||status||change||'Elemento operativo',
     nextAction:nextAction||null,status:status||null,priority:priority||null,
     due:due||null,owner:owner||null,source,
     team:team||null,category:category||null,approvalRequired,actionMode,sourceUrl,
+    change:change||null,changedAt:changedAt||null,
     verificationState:'VERIFIED',
     explicitPriorityScore:coreBrainPriorityValue(priority),
     evidence:{channel,recordId,source,sourceUrl}
@@ -1109,6 +1112,22 @@ async function handleCoreBrain(req,res){
   }
 }
 
+function coreTodayReadAudit(command,projection){
+  const emittedAt=new Date().toISOString();
+  const record={
+    event:String(command?.audit_event||'CORE_TODAY_VIEWED'),
+    mode:'SERVER_LOG_READ_AUDIT',
+    persisted:false,
+    emitted_at:emittedAt,
+    command_id:String(command?.command_id||''),
+    trigger:String(command?.trigger||''),
+    source_state:String(projection?.source_state||'UNVERIFIED'),
+    primary_attention_id:projection?.primary_attention?.id||null
+  };
+  console.info('[core-today:audit] '+JSON.stringify(record));
+  return record;
+}
+
 async function handleCoreToday(req,res){
   if(req.method!=='POST')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
   let body={};
@@ -1144,6 +1163,7 @@ async function handleCoreToday(req,res){
     commandTrigger:resolution.command.trigger,
     now:brain.generatedAt
   });
+  const audit=coreTodayReadAudit(resolution.command,projection);
   return json(res,200,{
     ok:true,
     command:{
@@ -1154,6 +1174,7 @@ async function handleCoreToday(req,res){
       audit_event:resolution.command.audit_event
     },
     projection,
+    audit,
     runtime:{
       previewSafeMode:PREVIEW_SAFE_MODE,
       writePolicy:PREVIEW_SAFE_MODE?'READ_ONLY':'HUMAN_GATE_ONLY',
