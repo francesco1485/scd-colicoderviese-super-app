@@ -58,6 +58,7 @@ try{
     });
     await page.goto(base+'/r58/core-today/',{waitUntil:'networkidle'});
     await page.getByRole('heading',{name:/Verifica il documento federale/i}).waitFor();
+    if(await page.locator('#authGate').isVisible())throw new Error('Authenticated auth gate still visible at '+viewport.name);
     const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth+1);
     if(overflow)throw new Error('Horizontal overflow at '+viewport.name);
     const oldCounters=await page.locator('text=URGENTI').count();
