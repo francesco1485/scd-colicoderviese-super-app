@@ -13,7 +13,10 @@
     "kits": "assets/kits/",
     "opponents": "assets/opponents/",
     "sponsors": "assets/sponsors/",
-    "partners": "assets/partners/"
+    "partners": "assets/partners/",
+    "ui": "assets/ui/",
+    "ui_faces": "assets/ui/faces/",
+    "ui_accessories": "assets/ui/accessories/"
   },
   "rules": {
     "official_asset_generation": "FORBIDDEN",
@@ -150,5 +153,447 @@
     ],
     "opponent_logo": "VERIFIED_ONLY",
     "kit": "APPROVED_REAL_REFERENCE_ONLY"
-  }
+  },
+  "ui_original_assets": [
+    {
+      "path": "assets/ui/faces/neutral-person.svg",
+      "class": "FACE_FALLBACK",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07"
+    },
+    {
+      "path": "assets/ui/accessories/football-ball.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "FOOTBALL_BALL"
+    },
+    {
+      "path": "assets/ui/accessories/football-cone.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "FOOTBALL_CONE"
+    },
+    {
+      "path": "assets/ui/accessories/football-bib.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "FOOTBALL_BIB"
+    },
+    {
+      "path": "assets/ui/accessories/football-goal.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "FOOTBALL_GOAL"
+    },
+    {
+      "path": "assets/ui/accessories/football-bag.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "FOOTBALL_BAG"
+    },
+    {
+      "path": "assets/ui/accessories/tactical-board.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "TACTICAL_BOARD"
+    },
+    {
+      "path": "assets/ui/accessories/whistle.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "WHISTLE"
+    },
+    {
+      "path": "assets/ui/accessories/medical-kit.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "MEDICAL_KIT"
+    },
+    {
+      "path": "assets/ui/accessories/jersey.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "JERSEY"
+    },
+    {
+      "path": "assets/ui/accessories/player-number.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "PLAYER_NUMBER"
+    },
+    {
+      "path": "assets/ui/accessories/captain-badge.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "CAPTAIN_BADGE"
+    },
+    {
+      "path": "assets/ui/accessories/staff-badge.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "STAFF_BADGE"
+    },
+    {
+      "path": "assets/ui/accessories/director-badge.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "DIRECTOR_BADGE"
+    },
+    {
+      "path": "assets/ui/accessories/van.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "VAN"
+    },
+    {
+      "path": "assets/ui/accessories/car.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "CAR"
+    },
+    {
+      "path": "assets/ui/accessories/seat.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "SEAT"
+    },
+    {
+      "path": "assets/ui/accessories/luggage.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "LUGGAGE"
+    },
+    {
+      "path": "assets/ui/accessories/stop.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "STOP"
+    },
+    {
+      "path": "assets/ui/accessories/key.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "KEY"
+    },
+    {
+      "path": "assets/ui/accessories/field.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "FIELD"
+    },
+    {
+      "path": "assets/ui/accessories/locker-room.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "LOCKER_ROOM"
+    },
+    {
+      "path": "assets/ui/accessories/locker.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "LOCKER"
+    },
+    {
+      "path": "assets/ui/accessories/shower.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "SHOWER"
+    },
+    {
+      "path": "assets/ui/accessories/gym.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "GYM"
+    },
+    {
+      "path": "assets/ui/accessories/clubhouse.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "CLUBHOUSE"
+    },
+    {
+      "path": "assets/ui/accessories/warehouse.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "WAREHOUSE"
+    },
+    {
+      "path": "assets/ui/accessories/box.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "BOX"
+    },
+    {
+      "path": "assets/ui/accessories/shelf.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "SHELF"
+    },
+    {
+      "path": "assets/ui/accessories/size.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "SIZE"
+    },
+    {
+      "path": "assets/ui/accessories/sku.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "SKU"
+    },
+    {
+      "path": "assets/ui/accessories/barcode.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "BARCODE"
+    },
+    {
+      "path": "assets/ui/accessories/qr.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "QR"
+    },
+    {
+      "path": "assets/ui/accessories/document.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "DOCUMENT"
+    },
+    {
+      "path": "assets/ui/accessories/invoice.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "INVOICE"
+    },
+    {
+      "path": "assets/ui/accessories/payment.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "PAYMENT"
+    },
+    {
+      "path": "assets/ui/accessories/contract.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "CONTRACT"
+    },
+    {
+      "path": "assets/ui/accessories/receipt.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "RECEIPT"
+    },
+    {
+      "path": "assets/ui/accessories/message.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "MESSAGE"
+    },
+    {
+      "path": "assets/ui/accessories/email.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "EMAIL"
+    },
+    {
+      "path": "assets/ui/accessories/whatsapp-channel.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "WHATSAPP_CHANNEL"
+    },
+    {
+      "path": "assets/ui/accessories/push.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "PUSH"
+    },
+    {
+      "path": "assets/ui/accessories/alert.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "ALERT"
+    },
+    {
+      "path": "assets/ui/accessories/led-board.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "LED_BOARD"
+    },
+    {
+      "path": "assets/ui/accessories/banner.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "BANNER"
+    },
+    {
+      "path": "assets/ui/accessories/shirt-placement.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "SHIRT_PLACEMENT"
+    },
+    {
+      "path": "assets/ui/accessories/stand.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "STAND"
+    },
+    {
+      "path": "assets/ui/accessories/tribune.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "TRIBUNE"
+    },
+    {
+      "path": "assets/ui/accessories/hospitality.svg",
+      "class": "UI_ACCESSORY",
+      "status": "VERIFIED",
+      "source": "GENERATED_ORIGINAL",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-07",
+      "accessory_id": "HOSPITALITY"
+    }
+  ]
 }
