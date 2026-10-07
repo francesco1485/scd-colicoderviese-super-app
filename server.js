@@ -5,6 +5,8 @@ const { URL } = require('url');
 const { issueIntakeToken, verifyIntakeToken } = require('./lib/intake-links');
 const { weekRange } = require('./lib/scd-one-pulse.js');
 const {filterActiveSCDTeamRows,filterPublicSCDPayload}=require('./lib/scd-season-status.js');
+const {buildTodayAttentionProjection}=require('./lib/scd-today-attention.js');
+const {resolveCommand}=require('./lib/scd-command-grammar.js');
 const {
   tournamentSurface,
   unavailableTournamentSurface,
@@ -1027,14 +1029,14 @@ async function coreBrainChannel(action,payload,sessionToken){
     return {action,state:'UNAVAILABLE',error:String(e.code||e.message||e),data:null};
   }
 }
-async function handleCoreBrain(req,res){
-  if(req.method!=='POST')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
-  let body={};
-  try{body=JSON.parse(await readBody(req)||'{}')}catch{return json(res,400,{ok:false,error:'INVALID_JSON'})}
-  const sessionToken=String(body.sessionToken||'').trim();
-  if(!sessionToken)return json(res,401,{ok:false,error:'SESSION_REQUIRED'});
-  const auth=await coreBrainChannel('auth.validate',{token:sessionToken},sessionToken);
-  if(auth.state!=='VERIFIED')return json(res,401,{ok:false,error:'SESSION_INVALID',auth});
+async function buildCoreBrain(sessionToken,authResult=null){
+  const auth=authResult||await coreBrainChannel('auth.validate',{token:sessionToken},sessionToken);
+  if(auth.state!=='VERIFIED'){
+    const error=new Error('SESSION_INVALID');
+    error.code='SESSION_INVALID';
+    error.auth=auth;
+    throw error;
+  }
   const definitions=[
     ['workspace','private.user.workspace',{}],
     ['dashboard','private.dashboard',{}],
@@ -1059,13 +1061,14 @@ async function handleCoreBrain(req,res){
   actionQueue.sort((a,b)=>{
     if(b.explicitPriorityScore!==a.explicitPriorityScore)return b.explicitPriorityScore-a.explicitPriorityScore;
     if(a.due&&b.due)return String(a.due).localeCompare(String(b.due));
-    if(a.due)return -1;if(b.due)return 1;return 0;
+    if(a.due)return -1;if(b.due)return 1;
+    return String(a.recordId||'').localeCompare(String(b.recordId||''));
   });
   const unavailable=Object.entries(channels).filter(([,v])=>v.state!=='VERIFIED').map(([id,v])=>({id,error:v.error}));
-  return json(res,200,{
+  return {
     ok:true,
     brain:'SCD_CORE',
-    contractVersion:'R58-BRAIN-0.1',
+    contractVersion:'R58-BRAIN-0.2',
     generatedAt:new Date().toISOString(),
     clubTime:clubTimePayload(),
     doctrine:{
@@ -1088,6 +1091,75 @@ async function handleCoreBrain(req,res){
       orchestration:'SCD_COMMAND_R22',
       rule:'Every surfaced action preserves source/channel evidence; unavailable channels are never reconstructed from guesses.'
     }
+  };
+}
+
+async function handleCoreBrain(req,res){
+  if(req.method!=='POST')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  let body={};
+  try{body=JSON.parse(await readBody(req)||'{}')}catch{return json(res,400,{ok:false,error:'INVALID_JSON'})}
+  const sessionToken=String(body.sessionToken||'').trim();
+  if(!sessionToken)return json(res,401,{ok:false,error:'SESSION_REQUIRED'});
+  const auth=await coreBrainChannel('auth.validate',{token:sessionToken},sessionToken);
+  if(auth.state!=='VERIFIED')return json(res,401,{ok:false,error:'SESSION_INVALID',auth});
+  try{
+    return json(res,200,await buildCoreBrain(sessionToken,auth));
+  }catch(e){
+    return json(res,502,{ok:false,error:e.code||e.message||'CORE_BRAIN_UNAVAILABLE'});
+  }
+}
+
+async function handleCoreToday(req,res){
+  if(req.method!=='POST')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  let body={};
+  try{body=JSON.parse(await readBody(req)||'{}')}catch{return json(res,400,{ok:false,error:'INVALID_JSON'})}
+  const sessionToken=String(body.sessionToken||'').trim();
+  if(!sessionToken)return json(res,401,{ok:false,error:'SESSION_REQUIRED'});
+  if(body.input!==undefined&&(body.input===null||Array.isArray(body.input)||typeof body.input!=='object')){
+    return json(res,400,{ok:false,error:'INVALID_COMMAND_INPUT'});
+  }
+  const auth=await coreBrainChannel('auth.validate',{token:sessionToken},sessionToken);
+  if(auth.state!=='VERIFIED')return json(res,401,{ok:false,error:'SESSION_INVALID'});
+
+  const trigger=String(body.command||'/today').trim().toLowerCase();
+  const resolution=resolveCommand(trigger,auth.data||{});
+  if(!resolution.ok){
+    const status=resolution.reason==='ROLE_SCOPE_DENIED'?403:(resolution.reason==='UNKNOWN_COMMAND'?404:409);
+    return json(res,status,{ok:false,error:resolution.reason,command:trigger});
+  }
+
+  let brain;
+  try{brain=await buildCoreBrain(sessionToken,auth)}
+  catch(e){return json(res,502,{ok:false,error:e.code||e.message||'CORE_BRAIN_UNAVAILABLE'})}
+
+  const roleScope=[
+    brain.identity?.user?.coreRole,
+    brain.identity?.user?.role,
+    brain.identity?.coreRole,
+    brain.identity?.role
+  ].filter(Boolean);
+  const projection=buildTodayAttentionProjection({
+    brain,
+    roleScope,
+    commandTrigger:resolution.command.trigger,
+    now:brain.generatedAt
+  });
+  return json(res,200,{
+    ok:true,
+    command:{
+      command_id:resolution.command.command_id,
+      trigger:resolution.command.trigger,
+      intent:resolution.command.intent,
+      human_gate:resolution.command.human_gate,
+      audit_event:resolution.command.audit_event
+    },
+    projection,
+    runtime:{
+      previewSafeMode:PREVIEW_SAFE_MODE,
+      writePolicy:PREVIEW_SAFE_MODE?'READ_ONLY':'HUMAN_GATE_ONLY',
+      sourceAuthority:'R20',
+      contractVersion:'R58-CORE-TODAY-1.0'
+    }
   });
 }
 
@@ -1099,6 +1171,7 @@ http.createServer(async(req,res)=>{
   if(u.pathname==='/api/capabilities') return json(res,200,{ok:true,version:'40.0.0',mode:'GITHUB_PAGES_RENDER_R20_SUPABASE_DUAL_RUN',actions:[...allowedActions].sort(),featureFlags:FEATURE_FLAGS,domainCore:SUPABASE_RUNTIME,runtimeSafety:{previewSafeMode:PREVIEW_SAFE_MODE,writePolicy:PREVIEW_SAFE_MODE?'READ_ONLY':'NORMAL'},isolated:['safeguarding']});
   if(u.pathname==='/api/core-status') return json(res,200,{ok:true,version:'40.0.0',featureFlags:FEATURE_FLAGS,domainCore:SUPABASE_RUNTIME,currentPrimary:'R20',targetPrimary:'SCD_SUPABASE',runtimeSafety:{previewSafeMode:PREVIEW_SAFE_MODE,writePolicy:PREVIEW_SAFE_MODE?'READ_ONLY':'NORMAL'}});
   if(u.pathname==='/api/core-brain') return handleCoreBrain(req,res);
+  if(u.pathname==='/api/core-today') return handleCoreToday(req,res);
   if(u.pathname==='/api/launch-readiness') return handleLaunchReadiness(req,res);
   if(u.pathname==='/api/tournaments') return handleTournaments(req,res);
   if(u.pathname==='/api/membership-services') return handleMembershipServices(req,res);
