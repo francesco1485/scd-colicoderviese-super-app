@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "SCD_FACE_POLICY",
+  "status": "DESIGN_FOUNDATION",
+  "purpose": "Select the highest permitted face representation without leaking unauthorized media, especially for minors.",
+  "requiredFields": [
+    "PERSON_ID",
+    "PHOTO_ID",
+    "CONSENT_STATE",
+    "USAGE_SCOPE",
+    "PUBLIC_ALLOWED",
+    "INTERNAL_ALLOWED",
+    "COMMERCIAL_ALLOWED",
+    "VALID_FROM",
+    "VALID_TO",
+    "CROP_PROFILE",
+    "SOURCE",
+    "VERIFIED_AT"
+  ],
+  "levels": [
+    {
+      "id": "L0_INITIALS_OR_SILHOUETTE",
+      "rank": 0,
+      "requiresPhoto": false
+    },
+    {
+      "id": "L1_PROFILE_PHOTO",
+      "rank": 1,
+      "requiresPhoto": true
+    },
+    {
+      "id": "L2_SPORT_CUTOUT",
+      "rank": 2,
+      "requiresPhoto": true
+    },
+    {
+      "id": "L3_PREMIUM_EDITORIAL_PORTRAIT",
+      "rank": 3,
+      "requiresPhoto": true
+    }
+  ],
+  "rules": {
+    "unknownConsentFallback": "L0_INITIALS_OR_SILHOUETTE",
+    "expiredConsentFallback": "L0_INITIALS_OR_SILHOUETTE",
+    "missingPhotoFallback": "L0_INITIALS_OR_SILHOUETTE",
+    "minorUnknownConsentFallback": "L0_INITIALS_OR_SILHOUETTE",
+    "highestPermittedLevelOnly": true
+  },
+  "contextRules": {
+    "INTERNAL": {
+      "requiredFlag": "INTERNAL_ALLOWED",
+      "fallback": "L0_INITIALS_OR_SILHOUETTE"
+    },
+    "PUBLIC": {
+      "requiredFlag": "PUBLIC_ALLOWED",
+      "fallback": "L0_INITIALS_OR_SILHOUETTE"
+    },
+    "COMMERCIAL": {
+      "requiredFlag": "COMMERCIAL_ALLOWED",
+      "fallback": "L0_INITIALS_OR_SILHOUETTE"
+    }
+  },
+  "decisionOrder": [
+    "VALIDITY",
+    "CONTEXT_PERMISSION",
+    "PHOTO_AVAILABILITY",
+    "LEVEL_PERMISSION",
+    "FALLBACK_L0"
+  ],
+  "safeguarding": {
+    "ordinaryCrmPropagation": false,
+    "ordinaryAnalyticsPropagation": false
+  }
+}
