@@ -160,7 +160,7 @@ function renderProjection(payload){
   renderProvenance(projection);
   const verified=(projection.coverage?.verified||[]).length;
   const missing=(projection.coverage?.missing||[]).length;
-  $('#coverageLabel').textContent=missing?verified+' fonti verificate · '+missing+' mancanti:verified+' fonti verificate';
+  $('#coverageLabel').textContent=missing?(verified+' fonti verificate · '+missing+' mancanti'):(verified+' fonti verificate');
 }
 function setAuthenticated(identity={}){
   $('#authGate').hidden=true;
@@ -190,7 +190,7 @@ async function loadProjection(command='/today'){
   $('#primarySlot').replaceChildren(element('div','loading-line','Verifico le fonti operative…'));
   try{
     const payload=await fetchJson('/api/core-today',{method:'POST',body:JSON.stringify({sessionToken:session.token,command,input:{}})});
-    setAuthenticated(payload.identity||{});
+    setAuthenticated({role:payload.projection?.role_scope?.[0]||'Profilo autorizzato'});
     renderProjection(payload);
     const now=new Date(payload.projection?.generated_at||Date.now());
     $('#clubDate').textContent=new Intl.DateTimeFormat('it-IT',{timeZone:'Europe/Rome',weekday:'long',day:'2-digit',month:'long'}).format(now);
