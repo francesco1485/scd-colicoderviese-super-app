@@ -20,14 +20,16 @@ const upstream=http.createServer((req,res)=>{
     const action=String(body.action||'');
     const token=String(body.sessionToken||body.token||body.payload?.token||'');
     if(action==='auth.validate'){
-      if(!['ci-core-session','ci-core-degraded','ci-core-public'].includes(token))return send(res,200,{ok:false,error:'INVALID_SESSION'});
+      if(!['ci-core-session','ci-core-degraded','ci-core-unavailable','ci-core-public'].includes(token))return send(res,200,{ok:false,error:'INVALID_SESSION'});
       const role=token==='ci-core-public'?'PUBLIC':'DIRECTION';
       return send(res,200,{ok:true,data:{user:{email:'ci@example.test',name:'CI',role,coreRole:role},permissions:{direction:role==='DIRECTION'}}});
     }
+    if(token==='ci-core-unavailable' && /^(private|direction|account)\./.test(action))return send(res,200,{ok:false,error:'CI_ALL_OPERATIONAL_SOURCES_UNAVAILABLE'});
     if(token==='ci-core-degraded' && action==='private.agenda.summary')return send(res,200,{ok:false,error:'CI_AGENDA_UNAVAILABLE'});
     if(action==='private.dashboard')return send(res,200,{ok:true,data:{items:[{id:'DASH-1',title:'Verifica documento federale',priority:'ALTA',dueDate:'2026-10-08T12:00:00.000Z',owner:'Segreteria',source:'SCD_DRIVE',actionMode:'READ',nextAction:'Apri documento verificato'}]}});
     if(action==='private.agenda.summary')return send(res,200,{ok:true,data:{items:[]}});
     if(action==='direction.datafabric.actions')return send(res,200,{ok:true,data:{items:[{id:'MAIL-1',title:'Risposta istituzionale da verificare',priority:'MEDIA',dueDate:'2026-10-09T12:00:00.000Z',owner:'Direzione',source:'SCD_GMAIL',actionMode:'READ',nextAction:'Apri messaggio verificato'}]}});
+    if(action==='direction.evolution')return send(res,200,{ok:true,data:{items:[{id:'EVO-CHANGE',title:'Fonte operativa aggiornata',priority:'BASSA',status:'OPEN',change:'Fonte aggiornata',owner:'Direzione',source:'R20',actionMode:'READ',nextAction:'Apri variazione verificata'}]}});
     if(/^(private|direction|account)\./.test(action))return send(res,200,{ok:true,data:{items:[]}});
     return send(res,200,{ok:false,error:'DISABLED'});
   });
@@ -92,6 +94,10 @@ try{
     assert.equal(r.body.projection.primary_attention.id,'DASH-1');
     assert.equal(Object.hasOwn(r.body,'channels'),false);
     assert.equal(Object.hasOwn(r.body.projection,'channels'),false);
+    assert.ok(r.body.projection.changed.some(x=>x.id==='EVO-CHANGE'),'explicit changed source record must reach changed rail');
+    assert.equal(r.body.audit.event,'CORE_TODAY_VIEWED');
+    assert.equal(r.body.audit.mode,'SERVER_LOG_READ_AUDIT');
+    assert.equal(r.body.audit.persisted,false);
   });
 
   await run('unavailable_operational_sources_return_200_fail_closed_projection',async()=>{
@@ -100,6 +106,19 @@ try{
     assert.equal(r.body.ok,true);
     assert.equal(r.body.projection.source_state,'PARTIAL');
     assert.ok(r.body.projection.coverage.missing.some(x=>x.id==='agenda'));
+  });
+
+  await run('fully_unavailable_authenticated_sources_return_useful_unverified_fail_closed_projection',async()=>{
+    const r=await post({sessionToken:'ci-core-unavailable',command:'/today',input:{}});
+    assert.equal(r.status,200);
+    assert.equal(r.body.ok,true);
+    assert.equal(r.body.projection.source_state,'UNVERIFIED');
+    assert.equal(r.body.projection.primary_attention,null);
+    assert.ok(r.body.projection.fail_closed);
+    assert.equal(r.body.projection.fail_closed.code,'SOURCE_UNVERIFIED');
+    assert.ok(r.body.projection.fail_closed.next_action?.label);
+    assert.deepEqual(r.body.projection.next,[]);
+    assert.deepEqual(r.body.projection.changed,[]);
   });
 
   await run('preview_mode_blocks_write_actions_and_core_today_remains_read_only',async()=>{
