@@ -6,7 +6,7 @@ const { issueIntakeToken, verifyIntakeToken } = require('./lib/intake-links');
 const { weekRange } = require('./lib/scd-one-pulse.js');
 const {filterActiveSCDTeamRows,filterPublicSCDPayload}=require('./lib/scd-season-status.js');
 const {buildTodayAttentionProjection}=require('./lib/scd-today-attention.js');
-const {resolveCommand}=require('./lib/scd-command-grammar.js');
+const {resolveCommand,validateCommandInput}=require('./lib/scd-command-grammar.js');
 const {
   tournamentSurface,
   unavailableTournamentSurface,
@@ -1145,6 +1145,10 @@ async function handleCoreToday(req,res){
   if(!resolution.ok){
     const status=resolution.reason==='ROLE_SCOPE_DENIED'?403:(resolution.reason==='UNKNOWN_COMMAND'?404:409);
     return json(res,status,{ok:false,error:resolution.reason,command:trigger});
+  }
+  const inputValidation=validateCommandInput(resolution.command,body.input||{});
+  if(!inputValidation.ok){
+    return json(res,400,{ok:false,error:inputValidation.reason,command:trigger});
   }
 
   let brain;
