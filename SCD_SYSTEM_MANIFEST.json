@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.29.0",
+    "version": "3.30.0",
     "effective_at": "2026-10-06",
     "status": "BINDING",
     "language": "it-IT",
@@ -2991,6 +2991,27 @@
         "SCD_SUPABASE"
       ],
       "contract": "AGGREGATE_ACCESS_METRICS_VERIFIED_SPORT_STATS_CANONICAL_PLAYER_SOURCE_COMMUNICATION_POLICY_FAN_CHECKINS_HEALTHY_GAMIFICATION"
+    },
+    {
+      "id": "CAP-CORE-TODAY-ATTENTION",
+      "domain": "OPERATIONS",
+      "required": true,
+      "state": "PARTIAL",
+      "runtime_state": "IMPLEMENTATION_ACTIVE",
+      "product": "SCD_CORE",
+      "route": "/r58/core-today/",
+      "sources": [
+        "R20",
+        "SCD_GMAIL",
+        "SCD_DRIVE"
+      ],
+      "command_contract": "SCD_COMMAND_GRAMMAR_V1",
+      "contract": "ROLE_AWARE_SOURCE_AWARE_TODAY_ATTENTION_FAIL_CLOSED_READ_ONLY",
+      "visual_acceptance": "ZERO_BASED_R58_VI_4",
+      "rollback_routes": [
+        "/r58/manager/"
+      ],
+      "preview_service": "scd-r58-core-today-preview"
     }
   ],
   "known_noncompliance": [
