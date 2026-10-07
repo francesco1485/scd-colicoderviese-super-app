@@ -43,6 +43,20 @@
         </div>
       </header>
 
+      <section class="brain-login panel" id="brainLoginPanel">
+        <header>
+          <div><span class="section-kicker">ACCESSO DIREZIONE</span><h2>Attiva la centralina</h2></div>
+          <span class="status" id="brainAuthState">NON AUTENTICATO</span>
+        </header>
+        <div class="brain-login-grid">
+          <label><span>Email</span><input id="brainEmail" type="email" autocomplete="email" placeholder="nome@dominio.it"></label>
+          <label><span>Codice / PIN</span><input id="brainCode" type="password" autocomplete="one-time-code" placeholder="Codice o PIN"></label>
+          <button type="button" id="brainRequestCode">Invia codice</button>
+          <button type="button" id="brainLoginBtn">Entra</button>
+        </div>
+        <small id="brainLoginState">La centralina privata richiede un account già autorizzato in R20.</small>
+      </section>
+
       <section id="view-home" class="view active">
         <div class="priority-strip">
           <article><span>URGENTI</span><b id="urgentCount">0</b><small>azioni e anomalie</small></article>
