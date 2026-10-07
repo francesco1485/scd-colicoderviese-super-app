@@ -33,6 +33,17 @@ run('today_and_attention_are_implemented_for_authorized_core_roles',()=>{
   }
 });
 
+run('trusted_direction_aliases_are_normalized',()=>{
+  for(const context of [
+    {roles:['DIRETTORE GENERALE']},
+    {roles:['PRESIDENTE']},
+    {permissions:{direction:true}}
+  ]){
+    const out=resolveCommand('/today',context);
+    assert.equal(out.ok,true,JSON.stringify(context));
+  }
+});
+
 run('unauthorized_role_returns_role_scope_denied',()=>{
   const out=resolveCommand('/today',{roles:['PUBLIC']});
   assert.equal(out.ok,false);
