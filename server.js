@@ -66,7 +66,7 @@ function applyCors(req,res){
 const READ_ONLY_RETRY_ACTIONS = new Set([
   'public.feed','public.club','public.calendar','public.datafabric.contract',
   'dashboard.summary','private.dashboard','private.week','account.requests','private.user.workspace','private.crm.summary','private.crm.detail','private.community.summary','private.communication.templates','private.communication.preview',
-  'private.attendance.get','private.agenda.summary','private.development.summary','auth.validate','auth.identity.resolve','direction.access.metrics','direction.diagnostics',
+  'private.attendance.get','private.agenda.summary','private.development.summary','auth.request','auth.login','auth.validate','auth.identity.resolve','direction.access.metrics','direction.diagnostics',
   'direction.evolution','direction.datafabric.status','direction.datafabric.actions'
 ]);
 const UPSTREAM_READ_ATTEMPTS = 2;
