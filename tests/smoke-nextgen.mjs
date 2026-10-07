@@ -251,6 +251,7 @@ for(const viewport of [{width:390,height:844},{width:1440,height:900}]){
   const privateErrors=[];
   privatePage.on('pageerror',e=>privateErrors.push(String(e)));
   privatePage.on('console',m=>{if(m.type()==='error')privateErrors.push('console: '+m.text())});
+  privatePage.on('response',response=>{if(response.status()===404)privateErrors.push('http404: '+response.url())});
 
   const dashboard={
     user:{name:'QA SCD',email:'qa@example.test',role:'STAFF',area:'U16',staff:true},
