@@ -192,6 +192,35 @@
         },
         "navigation": {
           "type": "object"
+        },
+        "user_facing_projects": {
+          "type": "object",
+          "required": [
+            "canonical_ids",
+            "historical_aliases",
+            "access_rule"
+          ],
+          "properties": {
+            "canonical_ids": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "APP_SOCIAL",
+                  "GESTIONALE",
+                  "SPONSOR"
+                ]
+              },
+              "minItems": 3,
+              "maxItems": 3,
+              "uniqueItems": true
+            },
+            "historical_aliases": {
+              "type": "object"
+            },
+            "access_rule": {
+              "const": "ONE_ACCOUNT_SHARED_IDENTITY_AUTHORIZED_APP_ACCESS"
+            }
+          }
         }
       }
     },
@@ -203,8 +232,55 @@
         "component_language",
         "media_policy",
         "responsive_qa",
-        "3d_motion"
-      ]
+        "3d_motion",
+        "macro_template_registry",
+        "micro_primitive_registry",
+        "face_policy",
+        "accessory_library",
+        "spatial_scene_model"
+      ],
+      "properties": {
+        "macro_template_registry": {
+          "const": "config/scd-ui-grammar.v1.json"
+        },
+        "micro_primitive_registry": {
+          "const": "config/scd-ui-grammar.v1.json"
+        },
+        "face_policy": {
+          "const": "config/scd-face-policy.v1.json"
+        },
+        "accessory_library": {
+          "const": "config/scd-accessory-library.v1.json"
+        },
+        "spatial_scene_model": {
+          "type": "object",
+          "required": [
+            "status",
+            "renderer_independent",
+            "canonical_registry",
+            "initial_scene_types"
+          ],
+          "properties": {
+            "status": {
+              "const": "DESIGN_ONLY"
+            },
+            "renderer_independent": {
+              "const": true
+            },
+            "canonical_registry": {
+              "const": "config/scd-ui-grammar.v1.json"
+            },
+            "initial_scene_types": {
+              "type": "array",
+              "minItems": 5,
+              "uniqueItems": true,
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
     },
     "temporal_core": {
       "type": "object",
