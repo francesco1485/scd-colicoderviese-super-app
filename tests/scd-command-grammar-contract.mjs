@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 
 const require=createRequire(import.meta.url);
-const { registry, resolveCommand, listImplementedCommands }=require('../lib/scd-command-grammar.js');
+const { registry, resolveCommand, listImplementedCommands, validateCommandInput }=require('../lib/scd-command-grammar.js');
 
 function run(name,fn){
   try{fn();console.log('PASS',name)}
@@ -42,6 +42,20 @@ run('trusted_direction_aliases_are_normalized',()=>{
     const out=resolveCommand('/today',context);
     assert.equal(out.ok,true,JSON.stringify(context));
   }
+});
+
+run('verified_staff_flag_maps_to_authorized_staff',()=>{
+  const out=resolveCommand('/today',{user:{role:'STAFF',staff:true}});
+  assert.equal(out.ok,true);
+  assert.equal(out.command.trigger,'/today');
+});
+
+run('command_input_schema_rejects_unknown_properties',()=>{
+  const command=registry.find(x=>x.trigger==='/today');
+  assert.equal(validateCommandInput(command,{}).ok,true);
+  const invalid=validateCommandInput(command,{action:'DELETE'});
+  assert.equal(invalid.ok,false);
+  assert.equal(invalid.reason,'INVALID_COMMAND_INPUT');
 });
 
 run('unauthorized_role_returns_role_scope_denied',()=>{
