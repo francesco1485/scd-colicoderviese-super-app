@@ -130,6 +130,8 @@ jobs:
         run: npm run test:resilience
       - run: npm install --no-save playwright
       - run: npx playwright install --with-deps chromium
+      - name: Gestionale Visual Foundation five-viewport QA
+        run: node tests/gestionale-visual-foundation-visual.mjs
       - name: Build exact Pages artifact
         run: npm run build:pages
       - name: Start deterministic CI upstream
