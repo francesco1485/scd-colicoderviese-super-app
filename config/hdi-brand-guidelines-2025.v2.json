@@ -6,153 +6,81 @@
     "issuer": "HDI Assicurazioni - Comunicazione Istituzionale",
     "location": "Roma",
     "year": 2025,
-    "version": "2.0",
-    "source_type": "user_supplied_official_manual"
+    "version": "2.0"
   },
-  "governance": {
-    "official_logo_files_only": true,
-    "never_rebuild_logo": true,
-    "custom_or_specific_signage_requires_hdi_review": true,
-    "review_contacts": [
-      "Direzione Commerciale",
-      "Comunicazione Istituzionale"
-    ]
-  },
-  "naming": {
-    "legal_company_name": "HDI Assicurazioni S.p.A.",
-    "communicative_names": [
-      "HDI",
-      "HDI Assicurazioni"
-    ],
-    "hdi_always_uppercase": true
-  },
-  "logo": {
-    "insurance_subtitle_font": "Gotham Medium",
-    "insurance_subtitle_black_percent": 55,
-    "minimum_logo_height_mm": 3,
-    "standard_a4_width_percent_of_short_side": 12,
-    "clearspace_reference": "height_of_H",
-    "standard_document_position": "top_right",
-    "color_logo_background_max_darkness_percent": 15
-  },
-  "primary_colors": {
-    "hdi_green": {
-      "cmyk": [
-        100,
-        0,
-        100,
-        40
-      ],
+  "colors": {
+    "green": {
       "pantone": "349",
-      "rgb": [
-        0,
-        103,
-        41
-      ],
+      "cmyk": "100/0/100/40",
+      "rgb": "0/103/41",
       "hex": "#006729",
       "ral": "6002"
     },
-    "hdi_red": {
-      "cmyk": [
-        0,
-        100,
-        100,
-        0
-      ],
+    "red": {
       "pantone": "485",
-      "rgb": [
-        230,
-        0,
-        24
-      ],
+      "cmyk": "0/100/100/0",
+      "rgb": "230/0/24",
       "hex": "#E60018",
       "ral": "3020"
     }
   },
-  "typography": {
-    "primary": [
-      "HDI Sans Cond Light",
-      "HDI Sans Cond",
-      "HDI Sans",
-      "HDI Sans Bold",
-      "HDI Sans Italic"
-    ],
-    "secondary": [
-      "Arial Regular",
-      "Arial Bold",
-      "Arial Narrow"
-    ]
+  "logo": {
+    "official_files_only": true,
+    "never_rebuild": true,
+    "minimum_height_mm": 3,
+    "clearspace_reference": "H-height"
   },
   "business_card": {
-    "finished_size_mm": [
+    "size_mm": [
       85,
       55
     ],
-    "logo_position": "top_right",
-    "logo_edge_distance_mm": 5,
     "logo_height_mm": 7,
-    "logo_scale_percent": 70
+    "edge_distance_mm": 5
   },
   "signage": {
     "canopy": {
       "max_width_mm": 3900,
       "max_height_mm": 500,
-      "projection_mm": [
+      "depth_mm": [
         150,
         200
       ],
-      "body_material": "folded_aluminium",
-      "body_thickness_tenths_mm": 15,
-      "body_finish": "RAL 9003",
-      "face_element_thickness_mm": 5,
+      "body": "aluminium 15/10 RAL 9003",
+      "face_thickness_mm": 5,
       "lighting": "LED"
     },
     "double_sided": {
       "width_mm": 850,
       "max_height_mm": 500,
       "depth_mm": 90,
-      "body_material": "perforated_aluminium",
-      "face_element_thickness_mm": 5,
       "lighting": "LED"
     }
   },
   "rev09": {
     "status": "PREPRODUCTION_CONTROLLED",
-    "mandello_standard": {
-      "size_mm": [
-        3000,
-        450,
-        180
-      ],
-      "status": "PREPRODUCTION"
-    },
-    "mandello_tank_concept": {
-      "status": "APPROVAL_ONLY"
-    },
+    "mandello_standard": [
+      3000,
+      450,
+      180
+    ],
+    "mandello_tank": "APPROVAL_ONLY",
     "colico_standard": {
-      "fascia_mm": [
+      "fascia": [
         2800,
         450
       ],
-      "plaque_mm": [
+      "plaque": [
         400,
         300
-      ],
-      "status": "PREPRODUCTION"
+      ]
     },
-    "colico_sail_concept": {
-      "status": "APPROVAL_ONLY"
-    },
-    "crotto": {
-      "identity": "CEPA",
-      "permanent_hdi_logo": false,
-      "status": "PREPRODUCTION"
-    },
+    "colico_sail": "APPROVAL_ONLY",
+    "crotto": "CEPA_ONLY_NO_PERMANENT_HDI",
     "production_gate": [
-      "official_vector_hdi_logo",
+      "official_vector_logo",
       "approved_fonts",
-      "mandello_site_survey",
-      "colico_site_survey",
+      "site_surveys",
       "special_concept_approval_or_standard_confirmation",
       "final_legal_data",
       "print_preflight",
