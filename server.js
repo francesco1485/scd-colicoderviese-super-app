@@ -1221,6 +1221,7 @@ http.createServer(async(req,res)=>{
   if(u.pathname==='/api/public') return json(res,200,await fetchPublicFeed(),{'cache-control':'no-store'});
   if(u.pathname==='/api/newsroom') {try{return json(res,200,await buildWeeklyNewsroom(),{'cache-control':'public, max-age=180'})}catch(e){return json(res,500,{ok:false,error:e.message})}}
   if(u.pathname==='/api/live') {try{return json(res,200,await getLiveRadar(),{'cache-control':'public, max-age=300'})}catch(e){return json(res,500,{ok:false,error:e.message})}}
-  if(['/app/tournaments','/app/services','/app/fields'].includes(u.pathname))return serveStatic(req,res,'/index.html');
+  if(['/app/tournaments','/app/tournaments/','/app/services','/app/services/','/app/fields','/app/fields/'].includes(u.pathname))return serveStatic(req,res,'/index.html');
+  if(u.pathname.startsWith('/app/'))return serveStatic(req,res,u.pathname.slice(4));
   return serveStatic(req,res);
 }).listen(PORT,()=>console.log(`SCD Super App listening on ${PORT}`));
