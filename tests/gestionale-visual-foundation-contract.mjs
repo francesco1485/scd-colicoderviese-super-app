@@ -20,4 +20,26 @@ for(const x of grammar.microPrimitives){
   for(const k of ['semanticPurpose','states','sizes','accessibility'])assert(x[k]!==undefined,'micro '+x.id+' missing '+k);
 }
 assert(!JSON.stringify(grammar).includes('SCD_CORE'),'historical alias SCD_CORE forbidden in grammar');
-console.log('GESTIONALE VISUAL FOUNDATION GRAMMAR PASS',{macros:actualMacros.length,micro:actualMicro.length});
+const face=JSON.parse(fs.readFileSync(new URL('../config/scd-face-policy.v1.json',import.meta.url),'utf8'));
+const accessory=JSON.parse(fs.readFileSync(new URL('../config/scd-accessory-library.v1.json',import.meta.url),'utf8'));
+const assetRegistry=JSON.parse(fs.readFileSync(new URL('../config/scd-assets.v1.json',import.meta.url),'utf8'));
+const requiredFaceLevels=['L0_INITIALS_OR_SILHOUETTE','L1_PROFILE_PHOTO','L2_SPORT_CUTOUT','L3_PREMIUM_EDITORIAL_PORTRAIT'];
+for(const id of requiredFaceLevels)assert(face.levels?.some(x=>x.id===id),'face level missing '+id);
+assert(face.rules?.unknownConsentFallback==='L0_INITIALS_OR_SILHOUETTE','unknown consent must resolve to L0');
+assert(face.rules?.expiredConsentFallback==='L0_INITIALS_OR_SILHOUETTE','expired consent must resolve to L0');
+assert(face.contextRules?.PUBLIC?.requiredFlag==='PUBLIC_ALLOWED','public face requires PUBLIC_ALLOWED');
+assert(face.contextRules?.COMMERCIAL?.requiredFlag==='COMMERCIAL_ALLOWED','commercial face requires COMMERCIAL_ALLOWED');
+const requiredGroups=['FOOTBALL','PEOPLE','LOGISTICS','FACILITY','WAREHOUSE','ADMINISTRATION','COMMUNICATION','SPONSOR'];
+for(const group of requiredGroups)assert(accessory.groups?.some(x=>x.id===group),'accessory group missing '+group);
+const requiredAccessoryIds=['FOOTBALL_BALL','FOOTBALL_CONE','FOOTBALL_BIB','FOOTBALL_GOAL','FOOTBALL_BAG','TACTICAL_BOARD','WHISTLE','MEDICAL_KIT','JERSEY','PLAYER_NUMBER','CAPTAIN_BADGE','STAFF_BADGE','DIRECTOR_BADGE','VAN','CAR','SEAT','LUGGAGE','STOP','KEY','FIELD','LOCKER_ROOM','LOCKER','SHOWER','GYM','CLUBHOUSE','WAREHOUSE','BOX','SHELF','SIZE','SKU','BARCODE','QR','DOCUMENT','INVOICE','PAYMENT','CONTRACT','RECEIPT','MESSAGE','EMAIL','WHATSAPP_CHANNEL','PUSH','ALERT','LED_BOARD','BANNER','SHIRT_PLACEMENT','STAND','TRIBUNE','HOSPITALITY'];
+const accIds=accessory.accessories?.map(x=>x.id)||[];
+for(const id of requiredAccessoryIds)assert(accIds.includes(id),'accessory missing '+id);
+for(const item of accessory.accessories||[]){
+  for(const k of ['id','group','masterPath','states','sourceClass'])assert(item[k]!==undefined,'accessory '+item.id+' missing '+k);
+  assert(fs.existsSync(new URL('../'+item.masterPath,import.meta.url)),'accessory master missing '+item.masterPath);
+  assert(item.sourceClass==='GENERATED_ORIGINAL','accessory source class must be GENERATED_ORIGINAL '+item.id);
+}
+assert(fs.existsSync(new URL('../assets/ui/faces/neutral-person.svg',import.meta.url)),'neutral face master missing');
+assert(assetRegistry.rules?.fallback==='NEUTRAL_PLACEHOLDER_WITH_UNVERIFIED_STATUS','unverified fallback changed');
+assert(Array.isArray(assetRegistry.ui_original_assets)&&assetRegistry.ui_original_assets.length===requiredAccessoryIds.length+1,'ui original asset registry size mismatch');
+console.log('GESTIONALE VISUAL FOUNDATION ASSET GOVERNANCE PASS',{macros:actualMacros.length,micro:actualMicro.length});
