@@ -25,6 +25,8 @@ jobs:
         run: npm run test:scd-one-contract
       - name: SCD CORE contract gate
         run: npm run test:scd-core-contract
+      - name: R58 CORE Today contract gate
+        run: npm run test:r58-core-today
       - name: SCD GROW contract gate
         run: npm run test:scd-grow-contract
       - name: Supabase Domain Core contract gate
