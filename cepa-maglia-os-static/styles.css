@@ -4821,7 +4821,7 @@ a:focus-visible{
   position:relative;
   aspect-ratio:16/9;
   overflow:hidden;
-  background:linear-gradient(135deg,#0b2a43,#0a765b);
+  background:linear-gradient(135deg,#0b2a43,#006729);
 }
 .cepa-point-visual img{
   width:100%;
@@ -4850,7 +4850,7 @@ a:focus-visible{
   padding:5px 8px;
   border-radius:999px;
   background:#edf5f1;
-  color:#08664d;
+  color:#006729;
   font-size:8px;
   font-weight:900;
   letter-spacing:.06em;
@@ -4888,7 +4888,7 @@ a:focus-visible{
 .cepa-point-link{
   display:inline-flex;
   margin-top:14px;
-  color:#087154;
+  color:#006729;
   font-size:10px;
   font-weight:900;
   text-decoration:none;
