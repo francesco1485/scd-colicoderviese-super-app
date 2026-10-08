@@ -4,7 +4,7 @@ import path from 'node:path';
 const root=process.cwd();
 const labPath=path.join(root,'docs/visual-lab/gestionale-foundation.html');
 const outputDir=path.join(root,'test-output/gestionale-visual-foundation');
-const viewports={PHONE_COMPACT:[360,800],PHONE:[390,844],TABLET:[820,1180],DESKTOP:[1440,1000],WIDE:[1920,1080]};
+const viewports={PHONE_COMPACT:[360,800],PHONE:[390,844],PHONE_PLUS:[393,852],PHONE_LARGE:[430,932],TABLET:[820,1180],LAPTOP:[1280,800],DESKTOP:[1440,900],WIDE:[1920,1080]};
 const templates=['T01_PUBLIC_EDITORIAL','T02_OPERATIONAL_HOME','T03_DOMAIN_HUB','T04_ENTITY_DETAIL','T05_SPATIAL_WORKSPACE','T06_COMMUNICATION_HUB','T07_DATA_FINANCE','T08_PROJECT_DEVELOPMENT'];
 const primitives=['PERSON_TOKEN','PLAYER_TOKEN','TEAM_BADGE','ROLE_BADGE','NUMBER_BADGE','STATUS_CHIP','SOURCE_BADGE','CONSENT_BADGE','LOGO_LOCKUP','FACE_AVATAR','JERSEY_TOKEN','VEHICLE_TOKEN','SEAT_SLOT','LOCKER_SLOT','ROOM_SLOT','FIELD_ZONE','ASSET_TOKEN','WAREHOUSE_LOCATION','DOCUMENT_CHIP','PAYMENT_CHIP','MESSAGE_BUBBLE','NOTIFICATION_ITEM','TIMELINE_ITEM','ACTION_BUTTON','AI_SUGGESTION','PROVENANCE_TAG','WARNING_BLOCK_STATE','AVAILABILITY_INDICATOR','ASSIGNMENT_HANDLE','QR_BARCODE_OBJECT','MEDIA_TILE'];
 function assert(c,m){if(!c)throw new Error(m)}
@@ -44,7 +44,7 @@ function inlineLab(){
   return html;
 }
 async function checkVisibleTargets(page,name,width,context){
-  if(width>390)return;
+  if(width>480)return;
   const rows=await page.locator('button,[data-scd-interactive="true"]').evaluateAll(nodes=>nodes.map(n=>{
     const r=n.getBoundingClientRect();
     return {label:(n.getAttribute('aria-label')||n.textContent||'').trim().slice(0,70),w:r.width,h:r.height};
@@ -80,6 +80,7 @@ async function runVisualQA(chromium){
       await page.locator('[data-public-access]').click();
       assert(await page.locator('#labReservedDialog').isVisible(),'reserved dialog failed '+name);
       assert((await page.locator('#labReservedDialog').innerText()).includes('Non chiede credenziali'),'demo must not fake R20 credentials '+name);
+      if(name==='PHONE'||name==='DESKTOP')await page.screenshot({path:path.join(outputDir,name.toLowerCase()+'-reserved-dialog.png'),fullPage:false});
       await page.locator('[data-close-reserved-dialog]').click();
       assert(!(await page.locator('#labReservedDialog').isVisible()),'reserved dialog close failed '+name);
       await page.screenshot({path:path.join(outputDir,name.toLowerCase()+'-public.png'),fullPage:true});
@@ -98,7 +99,7 @@ async function runVisualQA(chromium){
     assert(durations.every(v=>ms(v)<=100),'reduced motion transition >100ms');
     await page.close();
   }finally{await browser.close()}
-  console.log('GESTIONALE VISUAL QA PASS',{engine:'PLAYWRIGHT',publicScreenshots:5,privateLabScreenshots:5,publicFirst:true});
+  console.log('GESTIONALE VISUAL QA PASS',{engine:'PLAYWRIGHT',publicScreenshots:Object.keys(viewports).length,privateLabScreenshots:Object.keys(viewports).length,reservedDialogScreenshots:2,publicFirst:true});
 }
 try{
   const mod=await import('playwright');
