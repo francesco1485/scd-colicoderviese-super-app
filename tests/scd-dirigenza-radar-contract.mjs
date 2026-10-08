@@ -16,6 +16,9 @@ for(const id of ['REGIONE_LOMBARDIA_SPORT_BANDI','DIPARTIMENTO_SPORT_BANDI','SPO
 assert(snapshot.verifiedItems?.some(x=>x.id==='OPP-EVENTI2026'),'verified seed opportunity missing');
 assert(snapshot.verifiedItems?.some(x=>x.territory==='COLICO'),'verified Colico seed missing');
 assert(snapshot.territoryStatus?.some(x=>x.territory==='DERVIO'),'Dervio monitoring status missing');
+assert(snapshot.calendarReconciledAt,'calendar reconciliation timestamp missing');
+assert(snapshot.verifiedItems?.filter(x=>x.category==='TERRITORY').every(x=>x.calendarReconciliation),'territory items must expose calendar reconciliation');
+assert(snapshot.verifiedItems?.some(x=>x.calendarConflict==='SAME_DAY_LOCAL_OVERLAP_REVIEW'),'expected at least one coordination alert');
 assert(visualLab.includes('data-scd-dirigenza-radar="true"'),'Direction radar visual staging missing');
 assert(visualLab.includes('PENDING_VISUAL_APPROVAL'),'visual staging must stay pending human approval');
 assert(visualLab.includes('BANDI &amp; OPPORTUNITÀ'),'opportunity radar visual staging missing');
