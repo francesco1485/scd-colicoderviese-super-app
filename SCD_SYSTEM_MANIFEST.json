@@ -430,7 +430,10 @@
       "sponsor_wordmark_policy": "EXACT_OFFICIAL_ONLY",
       "kit_policy": "APPROVED_REAL_REFERENCE_REQUIRED",
       "fallback": "NEUTRAL_PLACEHOLDER_WITH_UNVERIFIED_STATUS",
-      "admin_override_required": true
+      "admin_override_required": true,
+      "recovery_policy": "config/scd-asset-recovery-policy.v1.json",
+      "no_invention": true,
+      "template_graphic_config_human_approval_required": true
     },
     "adaptive_experience": {
       "strategy": "FEATURE_DETECTION_CONTAINER_RESPONSIVE",
