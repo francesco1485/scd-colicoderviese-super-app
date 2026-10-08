@@ -314,3 +314,80 @@
 @media (prefers-reduced-motion:reduce){
  .public-stage *,.public-auth-dialog *{scroll-behavior:auto!important;animation:none!important;transition:none!important}
 }
+
+
+/* PRIVATE T02 REVIEW: coordinated sporting workspace, never public runtime. */
+#T02_OPERATIONAL_HOME{background:#edf5f8}
+#T02_OPERATIONAL_HOME > .head{
+  background:linear-gradient(120deg,#041e3a,#125674);
+  border-bottom:1px solid #236180;color:#fff;padding-block:25px
+}
+#T02_OPERATIONAL_HOME > .head small{color:#ffe17c}
+#T02_OPERATIONAL_HOME > .head h2{color:#fff;font-size:clamp(1.4rem,2.2vw,2rem)}
+#T02_OPERATIONAL_HOME > .head p{color:#c5e1ef}
+#T02_OPERATIONAL_HOME > .body{background:#edf5f8}
+#T02_OPERATIONAL_HOME .attention{
+  min-height:134px;padding:23px;border-radius:19px;
+  background:radial-gradient(circle at 90% 18%,#1f729463,transparent 39%),
+             linear-gradient(120deg,#061d39,#104462);
+  box-shadow:0 14px 35px #031a3520
+}
+#T02_OPERATIONAL_HOME .attention .mark{
+  width:51px;height:51px;border:1px solid #fff5b05e;
+  border-radius:14px;font-size:1.6rem
+}
+#T02_OPERATIONAL_HOME .attention b{
+  display:block;max-width:31ch;font-size:clamp(1.15rem,2.1vw,1.65rem);
+  letter-spacing:-.025em;line-height:1.2
+}
+#T02_OPERATIONAL_HOME .attention small{
+  display:block;color:#bed9e6;margin-top:8px;font-size:.78rem
+}
+#T02_OPERATIONAL_HOME .attention button{
+  background:#ffd500;color:#06243f;border-color:#ffd500;
+  min-height:44px;border-radius:11px
+}
+#T02_OPERATIONAL_HOME .ops{
+  grid-template-columns:minmax(0,1.48fr) minmax(270px,.75fr);
+  gap:13px;margin-top:13px
+}
+#T02_OPERATIONAL_HOME .stream{
+  grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;
+  align-content:start;padding:14px;background:#fff;
+  border:1px solid #d8e7ee;border-radius:18px;
+  box-shadow:0 12px 30px #0c345515
+}
+#T02_OPERATIONAL_HOME .stream > *{min-width:0}
+#T02_OPERATIONAL_HOME .scd-vf-notification,#T02_OPERATIONAL_HOME .scd-vf-timeline{
+  border-radius:12px;box-shadow:none;background:#f4f8fa;border-color:#d9e8ee;
+}
+#T02_OPERATIONAL_HOME .stream .scd-vf-person{
+  background:#eef7fa;border:1px solid #d5e8ee;
+  border-radius:12px;box-shadow:none
+}
+#T02_OPERATIONAL_HOME .stream .scd-vf-status{
+  justify-content:center;min-height:44px;border-radius:12px;
+  background:#f0f8f5;align-self:start
+}
+#T02_OPERATIONAL_HOME .ai{
+  background:radial-gradient(circle at 95% 0,#16809b50,transparent 50%),#06233e;
+  color:#fff;border-color:#164862;border-radius:18px;padding:19px;
+}
+#T02_OPERATIONAL_HOME .ai h3{font-size:clamp(1.15rem,1.75vw,1.6rem);letter-spacing:-.025em;line-height:1.2;margin:0}
+#T02_OPERATIONAL_HOME .ai .eyebrow{color:#ffdf76}
+#T02_OPERATIONAL_HOME .ai .scd-vf-ai-suggestion{
+  background:#ffffff13;border:1px solid #5586a0;border-left:4px solid #ffd500;
+  color:#fff;box-shadow:none;
+}
+#T02_OPERATIONAL_HOME .ai .scd-vf-ai-suggestion b,#T02_OPERATIONAL_HOME .ai .scd-vf-ai-suggestion small{color:#e7f3f7}
+#T02_OPERATIONAL_HOME .ai button{
+  min-height:44px;border-color:#acd7e7;background:#e4f5fd;color:#082b45
+}
+@media (max-width: 900px){
+ #T02_OPERATIONAL_HOME .ops{grid-template-columns:1fr}
+}
+@media (max-width: 700px){
+ #T02_OPERATIONAL_HOME .attention{grid-template-columns:auto 1fr;padding:17px}
+ #T02_OPERATIONAL_HOME .attention button{grid-column:1/-1}
+ #T02_OPERATIONAL_HOME .stream{grid-template-columns:1fr}
+}
