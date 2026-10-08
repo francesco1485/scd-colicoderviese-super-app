@@ -1269,7 +1269,7 @@ function renderSponsorLeadInbox(){
         '<button type="button" class="btn-yellow" data-grow-proposal="'+esc(row.requestId)+'">Verifica e prepara bozza</button>':'')+
       '</article>';
   }).join('');
-  $('[data-grow-proposal]',mount).forEach(button=>button.onclick=()=>prepareGrowDraft(button.dataset.growProposal));
+  $('[data-grow-proposal]').forEach(button=>button.onclick=()=>prepareGrowDraft(button.dataset.growProposal));
 }
 async function loadSponsorLeads(){
   growLeadState.loading=true;growLeadState.error='';renderSponsorLeadInbox();
