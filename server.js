@@ -328,6 +328,16 @@ async function handleSponsorAccessRequest(req,res){
 }
 async function handleSponsorOtp(req,res){
   if(req.method!=='POST')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  if(ISOLATED_PREVIEW){
+    let input={};
+    try{input=JSON.parse(await readBody(req)||'{}')}catch{return json(res,400,{ok:false,error:'INVALID_REQUEST'})}
+    if(String(input.email||'').trim().toLowerCase()!=='operatore@example.invalid'){
+      return json(res,403,{ok:false,error:'STAGING_TEST_ACCOUNT_ONLY'});
+    }
+    return json(res,200,{ok:true,delivery:'STAGING_TEST_PIN',
+      message:'Nessuna email inviata. Utilizza esclusivamente il PIN di collaudo fornito per la verifica.'});
+  }
+
   let email='';
   try{
     const b=JSON.parse(await readBody(req)||'{}');
@@ -1040,7 +1050,8 @@ function serveStatic(req,res,overridePath){
         return fs.readFile(target,'utf8',(readErr,html)=>{
           if(readErr)return json(res,500,{ok:false,error:'PREVIEW_HTML_UNAVAILABLE'});
           const ribbon='<div role="status" id="scd-preview-banner" style="position:sticky;top:0;z-index:2147483000;text-align:center;background:#1b1b24;color:#ffffff;padding:11px;font:600 13px system-ui">COLLAUDO SCD · DATI SINTETICI · NESSUNA OPERAZIONE REALE</div>';
-          const marked=html.replace(/<body([^>]*)>/i,(matched)=>matched+ribbon);
+          const localLinks=html.replaceAll('https://scd-colicoderviese-official-r21.onrender.com/sponsor/?login=1','/sponsor/?login=1');
+          const marked=localLinks.replace(/<body([^>]*)>/i,(matched)=>matched+ribbon);
           res.writeHead(200,{'content-type':mime[ext],'cache-control':'no-store','x-robots-tag':'noindex, nofollow'});
           return res.end(marked);
         });
