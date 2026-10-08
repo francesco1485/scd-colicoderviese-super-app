@@ -48,3 +48,17 @@ Ogni sponsor deve avere:
 ## Governance
 config/scd-visual-system.json e sponsor/scd-design-system.css sono le fonti canoniche.
 Le pagine possono avere CSS specifici, ma non devono ridefinire una nuova identita cromatica.
+
+## Gestionale Visual Foundation — ownership canonico
+
+Wave 1 introduce la foundation approvata del GESTIONALE senza adottarla ancora nelle pagine runtime pubbliche o riservate.
+
+- `config/scd-visual-system.json` = brand tokens e semantica visuale canonica.
+- `config/scd-ui-grammar.v1.json` = grammatica macro/micro approvata.
+- `config/scd-face-policy.v1.json` = regole facce, consenso e proiezioni pubblico/interno/commerciale.
+- `config/scd-accessory-library.v1.json` = libreria originale di oggetti operativi.
+- `styles/scd-visual-foundation.css` = implementazione condivisa Wave 1.
+- `sponsor/scd-design-system.css` = layer live storico Sponsor finché una futura migrazione viene approvata.
+- `docs/visual-lab/gestionale-foundation.html` = Visual Lab non-runtime per QA e approvazione.
+
+Regola: APP SOCIAL, GESTIONALE e SPONSOR non devono caricare automaticamente la nuova foundation finché la relativa adozione runtime non è stata approvata e verificata.
