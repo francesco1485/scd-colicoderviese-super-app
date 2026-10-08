@@ -98,7 +98,16 @@
       "venue": "Zona Parco Giochi Colico",
       "relevance": "MEDIUM",
       "verification": "WEB_VERIFIED_OFFICIAL_TERRITORIAL",
-      "calendarConflict": "UNVERIFIED"
+      "calendarConflict": "SAME_DAY_LOCAL_OVERLAP_REVIEW",
+      "calendarReconciliation": {
+        "signal": "SAME_DAY_LOCAL_OVERLAP_REVIEW",
+        "level": "HIGH",
+        "note": "Evento territoriale dalle 14:00; il calendario SCD contiene gare interne a Colico alle 15:30 e 16:00. Durata dell'evento esterno non determinata, quindi serve coordinamento umano.",
+        "scdCalendarReferences": [
+          "Prima Squadra casa 15:30",
+          "Esordienti casa 16:00"
+        ]
+      }
     },
     {
       "id": "EVT-COLICO-2026-10-11-CASTAGNATA",
@@ -113,7 +122,18 @@
       "venue": "Piazza Garibaldi, Colico",
       "relevance": "MEDIUM",
       "verification": "WEB_VERIFIED_OFFICIAL_TERRITORIAL",
-      "calendarConflict": "UNVERIFIED"
+      "calendarConflict": "SAME_DAY_SCD_ACTIVITY",
+      "calendarReconciliation": {
+        "signal": "SAME_DAY_SCD_ACTIVITY",
+        "level": "MEDIUM",
+        "note": "Stessa giornata con più attività SCD; nessun conflitto di sede/orario dichiarato automaticamente.",
+        "scdCalendarReferences": [
+          "U15 trasferta 10:00",
+          "U16 trasferta 11:30",
+          "Prima Squadra casa 15:30",
+          "Esordienti casa 16:00"
+        ]
+      }
     },
     {
       "id": "EVT-COLICO-2026-10-14-LASCIAMI-VOLARE",
@@ -128,7 +148,13 @@
       "venue": "Auditorium Ghisla, Colico",
       "relevance": "MEDIUM",
       "verification": "WEB_VERIFIED_OFFICIAL_TERRITORIAL",
-      "calendarConflict": "UNVERIFIED"
+      "calendarConflict": "NO_SCD_EVENT_FOUND_IN_CALENDAR_WINDOW",
+      "calendarReconciliation": {
+        "signal": "NO_SCD_EVENT_FOUND_IN_CALENDAR_WINDOW",
+        "level": "LOW",
+        "note": "Nessun evento SCD trovato nel calendario ufficiale consultato per il 14 ottobre.",
+        "scdCalendarReferences": []
+      }
     },
     {
       "id": "EVT-COLICO-2026-10-15-ALPINISTE",
@@ -143,7 +169,13 @@
       "venue": "Auditorium M. Ghisla, Colico",
       "relevance": "LOW",
       "verification": "WEB_VERIFIED_OFFICIAL_TERRITORIAL",
-      "calendarConflict": "UNVERIFIED"
+      "calendarConflict": "NO_SCD_EVENT_FOUND_IN_CALENDAR_WINDOW",
+      "calendarReconciliation": {
+        "signal": "NO_SCD_EVENT_FOUND_IN_CALENDAR_WINDOW",
+        "level": "LOW",
+        "note": "Nessun evento SCD trovato nel calendario ufficiale consultato per il 15 ottobre.",
+        "scdCalendarReferences": []
+      }
     },
     {
       "id": "EVT-COLICO-2026-10-17-VOLONTARIATO",
@@ -159,7 +191,16 @@
       "relevance": "HIGH",
       "relevanceReason": "Possibile interesse istituzionale e associativo per SCD; partecipazione/collaborazione da valutare.",
       "verification": "WEB_VERIFIED_OFFICIAL_TERRITORIAL",
-      "calendarConflict": "UNVERIFIED"
+      "calendarConflict": "SAME_DAY_LOCAL_OVERLAP_REVIEW",
+      "calendarReconciliation": {
+        "signal": "SAME_DAY_LOCAL_OVERLAP_REVIEW",
+        "level": "HIGH",
+        "note": "Evento territoriale dalle 13:00; il calendario SCD contiene due gare interne a Colico alle 15:00 e 18:00. La gara U19 delle 15:00 è marcata da verificare.",
+        "scdCalendarReferences": [
+          "U19 casa 15:00 · DA VERIFICARE",
+          "U16 casa 18:00"
+        ]
+      }
     },
     {
       "id": "EVT-COLICO-2026-10-18-VIANDANTE",
@@ -174,7 +215,16 @@
       "venue": "Infopoint Colico",
       "relevance": "MEDIUM",
       "verification": "WEB_VERIFIED_OFFICIAL_TERRITORIAL",
-      "calendarConflict": "UNVERIFIED"
+      "calendarConflict": "SAME_DAY_LOCAL_ACTIVITY",
+      "calendarReconciliation": {
+        "signal": "SAME_DAY_LOCAL_ACTIVITY",
+        "level": "MEDIUM",
+        "note": "Evento territoriale dalle 08:30; il calendario SCD contiene U15 in casa a Colico alle 10:30 e Prima Squadra in trasferta alle 15:30.",
+        "scdCalendarReferences": [
+          "U15 casa 10:30",
+          "Prima Squadra trasferta 15:30"
+        ]
+      }
     },
     {
       "id": "EVT-COLICO-2026-10-31-HALLOWEEN",
@@ -189,7 +239,16 @@
       "venue": "Auditorium M. Ghisla, Colico",
       "relevance": "LOW",
       "verification": "WEB_VERIFIED_OFFICIAL_TERRITORIAL",
-      "calendarConflict": "UNVERIFIED"
+      "calendarConflict": "SAME_DAY_LOCAL_OVERLAP_REVIEW",
+      "calendarReconciliation": {
+        "signal": "SAME_DAY_LOCAL_OVERLAP_REVIEW",
+        "level": "HIGH",
+        "note": "Evento territoriale con orario finale non ancora dettagliato; il calendario SCD contiene U19 casa alle 15:00 con conflitto federale da verificare e U16 casa alle 18:00.",
+        "scdCalendarReferences": [
+          "U19 casa 15:00 · BLOCKED_CONFLICT",
+          "U16 casa 18:00"
+        ]
+      }
     }
   ],
   "territoryStatus": [
@@ -202,5 +261,6 @@
     }
   ],
   "sourceHealth": [],
-  "candidates": []
+  "candidates": [],
+  "calendarReconciledAt": "2026-10-08T10:45:00+02:00"
 }
