@@ -63,6 +63,14 @@ test('isolated preview is password-protected and all ONE/GROW/CORE/Sky paths rem
  assert.equal(unauthorized.status,403);
  const blockedLead=await post(base,'/api/sponsor/lead',{name:'Persona reale',email:'real@gmail.com',phone:'123',company:'Azienda Reale',privacy:true});
  assert.notEqual(blockedLead.status,200,'preview must refuse non-synthetic input');
+ const syntheticLead=await post(base,'/api/sponsor/lead',{
+   name:'Referente TEST',email:'nuovo@example.invalid',phone:'00000000',
+   company:'TEST Azienda nuova',interest:'LED',privacy:true
+ });
+ assert.equal(syntheticLead.status,200,'synthetic test leads should be accepted without external writes');
+ const syntheticLeadId=(await syntheticLead.json()).requestId;
+ assert.match(syntheticLeadId,/^QA-REQ-/);
+
 
  const login=await post(base,'/api/sponsor/login',{email:'operatore@example.invalid',code:'qa-demo-pin-2026'});
  assert.equal(login.status,200,'staging test identity only');
@@ -71,7 +79,9 @@ test('isolated preview is password-protected and all ONE/GROW/CORE/Sky paths rem
  const asSponsor={authorization:auth,cookie};
  const inbox=await fetch(base+'/api/sponsor/lead-inbox',{headers:asSponsor});
  assert.equal(inbox.status,200);
- const lead=(await inbox.json()).rows[0];
+ const inboxRows=(await inbox.json()).rows;
+ assert.ok(inboxRows.some(x=>x.requestId===syntheticLeadId),'new synthetic contact appears in the same CRM inbox');
+ const lead=inboxRows[0];
  assert.equal(lead.linkState,'REVIEW_REQUIRED');
  const stakeholderId=lead.candidateStakeholderIds[0];
  const previewDraft=await post(base,'/api/sponsor/proposal-draft',{requestId:lead.requestId,stakeholderId,associationReviewed:true,asset:'LED test'},asSponsor);
