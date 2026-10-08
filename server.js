@@ -24,7 +24,8 @@ const DEPLOY_COMMIT = process.env.RENDER_GIT_COMMIT || process.env.SCD_DEPLOY_CO
 const PREVIEW_SAFE_MODE = process.env.SCD_PREVIEW_SAFE_MODE === 'true';
 const FEATURE_FLAGS = Object.freeze({
   dataFabricObservability: process.env.SCD_FEATURE_DATA_FABRIC_OBSERVABILITY === 'true',
-  supabaseCore: process.env.SCD_FEATURE_SUPABASE_CORE === 'true'
+  supabaseCore: process.env.SCD_FEATURE_SUPABASE_CORE === 'true',
+  directionRadar: process.env.SCD_FEATURE_DIRECTION_RADAR === 'true'
 });
 const SUPABASE_RUNTIME = Object.freeze({
   engine:'SUPABASE_POSTGRESQL',
@@ -601,6 +602,7 @@ function directionRadarProjection(snapshot){
 }
 async function handleDirectionRadar(req,res){
   if(req.method!=='POST')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  if(!FEATURE_FLAGS.directionRadar)return json(res,503,{ok:false,error:'DIRECTION_RADAR_NOT_ENABLED'});
   try{
     const body=JSON.parse(await readBody(req)||'{}');
     await validateDirectionSession(String(body.sessionToken||'').trim());
