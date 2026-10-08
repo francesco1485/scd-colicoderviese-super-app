@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "id": "SCD_DIRIGENZA_RADAR_SNAPSHOT",
-  "generatedAt": "2026-10-08T12:14:47.008Z",
+  "generatedAt": "2026-10-08T12:20:55.637Z",
   "verifiedAt": "2026-10-08",
   "mode": "VERIFIED_SEED_PLUS_DAILY_DISCOVERY",
   "verifiedItems": [
@@ -325,163 +325,163 @@
     {
       "sourceId": "REGIONE_LOMBARDIA_SPORT_BANDI",
       "status": "OK",
-      "checkedAt": "2026-10-08T12:14:47.008Z",
+      "checkedAt": "2026-10-08T12:20:55.637Z",
       "httpStatus": 200,
       "discovered": 9,
       "attempts": 1,
       "effectiveUrl": "https://www.bandi.regione.lombardia.it/servizi/servizio/bandi/eventi-sportivi",
       "fallbackUsed": false,
-      "lastHealthyAt": "2026-10-08T12:14:47.008Z",
+      "lastHealthyAt": "2026-10-08T12:20:55.637Z",
       "consecutiveFailures": 0
     },
     {
       "sourceId": "DIPARTIMENTO_SPORT_BANDI",
       "status": "OK",
-      "checkedAt": "2026-10-08T12:14:47.008Z",
+      "checkedAt": "2026-10-08T12:20:55.637Z",
       "httpStatus": 200,
       "discovered": 0,
       "attempts": 1,
       "effectiveUrl": "https://avvisibandi.sport.governo.it/bandi",
       "fallbackUsed": false,
-      "lastHealthyAt": "2026-10-08T12:14:47.008Z",
+      "lastHealthyAt": "2026-10-08T12:20:55.637Z",
       "consecutiveFailures": 0
     },
     {
       "sourceId": "SPORT_E_SALUTE_BANDI_ALTRI_ENTI",
       "status": "OK",
-      "checkedAt": "2026-10-08T12:14:47.008Z",
+      "checkedAt": "2026-10-08T12:20:55.637Z",
       "httpStatus": 200,
       "discovered": 2,
       "attempts": 1,
       "effectiveUrl": "https://www.sportesalute.eu/?Itemid=1283",
       "fallbackUsed": false,
-      "lastHealthyAt": "2026-10-08T12:14:47.008Z",
+      "lastHealthyAt": "2026-10-08T12:20:55.637Z",
       "consecutiveFailures": 0
     },
     {
       "sourceId": "INVITALIA_INCENTIVI",
       "status": "OK",
-      "checkedAt": "2026-10-08T12:14:47.008Z",
+      "checkedAt": "2026-10-08T12:20:55.637Z",
       "httpStatus": 200,
       "discovered": 35,
       "attempts": 1,
       "effectiveUrl": "https://www.invitalia.it/per-le-imprese/incentivi-e-strumenti",
       "fallbackUsed": false,
-      "lastHealthyAt": "2026-10-08T12:14:47.008Z",
+      "lastHealthyAt": "2026-10-08T12:20:55.637Z",
       "consecutiveFailures": 0
     },
     {
       "sourceId": "EU_SPORT_FUNDING",
       "status": "OK",
-      "checkedAt": "2026-10-08T12:14:47.008Z",
+      "checkedAt": "2026-10-08T12:20:55.637Z",
       "httpStatus": 200,
       "discovered": 2,
       "attempts": 1,
       "effectiveUrl": "https://sport.ec.europa.eu/funding",
       "fallbackUsed": false,
-      "lastHealthyAt": "2026-10-08T12:14:47.008Z",
+      "lastHealthyAt": "2026-10-08T12:20:55.637Z",
       "consecutiveFailures": 0
     },
     {
       "sourceId": "ERASMUS_SPORT_CALLS",
       "status": "OK",
-      "checkedAt": "2026-10-08T12:14:47.008Z",
+      "checkedAt": "2026-10-08T12:20:55.637Z",
       "httpStatus": 200,
       "discovered": 25,
       "attempts": 1,
       "effectiveUrl": "https://erasmus-plus.ec.europa.eu/funding?facets__field_eac_topics=19",
       "fallbackUsed": false,
-      "lastHealthyAt": "2026-10-08T12:14:47.008Z",
+      "lastHealthyAt": "2026-10-08T12:20:55.637Z",
       "consecutiveFailures": 0
     },
     {
       "sourceId": "VISIT_COLICO_EVENTS",
       "status": "OK",
-      "checkedAt": "2026-10-08T12:14:47.008Z",
+      "checkedAt": "2026-10-08T12:20:55.637Z",
       "httpStatus": 200,
       "discovered": 13,
       "attempts": 1,
       "effectiveUrl": "https://visitcolico.it/",
       "fallbackUsed": false,
-      "lastHealthyAt": "2026-10-08T12:14:47.008Z",
+      "lastHealthyAt": "2026-10-08T12:20:55.637Z",
       "consecutiveFailures": 0
     },
     {
       "sourceId": "COMUNE_DERVIO_EVENTS",
       "status": "OK",
-      "checkedAt": "2026-10-08T12:14:47.008Z",
+      "checkedAt": "2026-10-08T12:20:55.637Z",
       "httpStatus": 200,
       "discovered": 2,
-      "attempts": 1,
+      "attempts": 2,
       "effectiveUrl": "https://www.comune.dervio.lc.it/it/eventi",
       "fallbackUsed": false,
-      "lastHealthyAt": "2026-10-08T12:14:47.008Z",
+      "lastHealthyAt": "2026-10-08T12:20:55.637Z",
       "consecutiveFailures": 0
     },
     {
       "sourceId": "REGIONE_LOMBARDIA_ALL_BANDI",
       "status": "OK",
-      "checkedAt": "2026-10-08T12:14:47.008Z",
+      "checkedAt": "2026-10-08T12:20:55.637Z",
       "httpStatus": 200,
       "discovered": 5,
       "attempts": 1,
       "effectiveUrl": "https://www.bandi.regione.lombardia.it/servizi/servizio/bandi/",
       "fallbackUsed": false,
-      "lastHealthyAt": "2026-10-08T12:14:47.008Z",
+      "lastHealthyAt": "2026-10-08T12:20:55.637Z",
       "consecutiveFailures": 0
     },
     {
       "sourceId": "REGIONE_LOMBARDIA_TERZO_SETTORE",
       "status": "OK",
-      "checkedAt": "2026-10-08T12:14:47.008Z",
+      "checkedAt": "2026-10-08T12:20:55.637Z",
       "httpStatus": 200,
       "discovered": 6,
       "attempts": 1,
       "effectiveUrl": "https://www.bandi.regione.lombardia.it/servizi/servizio/bandi/terzo-settore-volontariato",
       "fallbackUsed": false,
-      "lastHealthyAt": "2026-10-08T12:14:47.008Z",
+      "lastHealthyAt": "2026-10-08T12:20:55.637Z",
       "consecutiveFailures": 0
     },
     {
       "sourceId": "CCIAA_COMO_LECCO_BANDI",
       "status": "OK",
-      "checkedAt": "2026-10-08T12:14:47.008Z",
+      "checkedAt": "2026-10-08T12:20:55.637Z",
       "httpStatus": 200,
       "discovered": 9,
       "attempts": 1,
       "effectiveUrl": "https://comolecco.camcom.it/pagina478_bandi-ed-opportunit-aperti.html",
       "fallbackUsed": false,
-      "lastHealthyAt": "2026-10-08T12:14:47.008Z",
+      "lastHealthyAt": "2026-10-08T12:20:55.637Z",
       "consecutiveFailures": 0
     },
     {
       "sourceId": "FONDAZIONE_CARIPLO_BANDI",
       "status": "OK",
-      "checkedAt": "2026-10-08T12:14:47.008Z",
+      "checkedAt": "2026-10-08T12:20:55.637Z",
       "httpStatus": 200,
       "discovered": 7,
       "attempts": 1,
       "effectiveUrl": "https://www.fondazionecariplo.it/contributi/bandi/",
       "fallbackUsed": false,
-      "lastHealthyAt": "2026-10-08T12:14:47.008Z",
+      "lastHealthyAt": "2026-10-08T12:20:55.637Z",
       "consecutiveFailures": 0
     },
     {
       "sourceId": "COMUNE_DERVIO_NEWS_OPPORTUNITIES",
       "status": "OK",
-      "checkedAt": "2026-10-08T12:14:47.008Z",
+      "checkedAt": "2026-10-08T12:20:55.637Z",
       "httpStatus": 200,
       "discovered": 3,
       "attempts": 1,
       "effectiveUrl": "https://www.comune.dervio.lc.it/it/news",
       "fallbackUsed": false,
-      "lastHealthyAt": "2026-10-08T12:14:47.008Z",
+      "lastHealthyAt": "2026-10-08T12:20:55.637Z",
       "consecutiveFailures": 0
     },
     {
       "sourceId": "COMUNE_COLICO_TRANSPARENCY_CONTRIBUTI",
       "status": "ERROR",
-      "checkedAt": "2026-10-08T12:14:47.008Z",
+      "checkedAt": "2026-10-08T12:20:55.637Z",
       "error": "fetch failed",
       "attempts": 6,
       "attemptedEndpoints": 2,
@@ -532,7 +532,7 @@
         }
       ],
       "lastHealthyAt": "2026-10-08T12:09:57.798Z",
-      "consecutiveFailures": 1
+      "consecutiveFailures": 2
     }
   ],
   "candidates": [
@@ -547,7 +547,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-88dafa6c67f2da9fdae4",
@@ -560,7 +560,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-406b21e24bbaf3fab7b0",
@@ -573,7 +573,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-b09f704ee92c5d27b2a4",
@@ -586,7 +586,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-2939a06686aaedc2c9ed",
@@ -599,7 +599,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-c68c790d4141b86dcb59",
@@ -612,7 +612,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-e9799e5053463511dbb4",
@@ -625,7 +625,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-11c38ddc8a6ae970d674",
@@ -638,7 +638,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-d67a1eb28571b309baee",
@@ -651,7 +651,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-2161c5edc62075a84bd8",
@@ -664,7 +664,7 @@
       "trust": "OFFICIAL_PUBLIC_COMPANY",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-fac52f7a94584e19ab7b",
@@ -677,7 +677,7 @@
       "trust": "OFFICIAL_PUBLIC_COMPANY",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-001c8808f6923a19c3d1",
@@ -690,7 +690,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-5737f7e184eb134cfc2f",
@@ -703,7 +703,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-cbe437e617b95e9a6a34",
@@ -716,7 +716,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-76d326438492fdf3985d",
@@ -729,7 +729,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-876e6f72ba7f6dc18c6f",
@@ -742,7 +742,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-57dc40b0672fa1864ece",
@@ -755,7 +755,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-b0bc8ada950c5ae073c3",
@@ -768,7 +768,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-f397aa54538ea89fa17d",
@@ -781,7 +781,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-211ca676168195aaf136",
@@ -794,7 +794,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-b34c3e5b6ede53160391",
@@ -807,7 +807,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-c5fa201a457fdee620e3",
@@ -820,7 +820,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-40bab3104a3b407a7713",
@@ -833,7 +833,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-7713b224294c019e74f3",
@@ -846,7 +846,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-fd75c0684da449b7e40a",
@@ -859,7 +859,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-608ef4a1ae0328a6274b",
@@ -872,7 +872,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-d94ebf46579335c207c3",
@@ -885,7 +885,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-3129c7d07f1ec429bf80",
@@ -898,7 +898,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-1ecfdf9086ac534a9534",
@@ -911,7 +911,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-67f0868b457d76771f5c",
@@ -924,7 +924,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-2ad3d40013702194c408",
@@ -937,7 +937,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-e95921866a02748a7271",
@@ -950,7 +950,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-a13852dc2f0536b9930c",
@@ -963,7 +963,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-6fd41a0f332afee3e15b",
@@ -976,7 +976,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-b8c83e4daf771c5eac96",
@@ -989,7 +989,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-300985a7d5bc581433d1",
@@ -1002,7 +1002,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-69de338a1e32ab2aaff1",
@@ -1015,7 +1015,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-dbc42fefb5c0c19acecd",
@@ -1028,7 +1028,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-4fb9877a53e86937204f",
@@ -1041,7 +1041,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-4e32382fa08a46d94f95",
@@ -1054,7 +1054,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-eed7828d9c130ba0700e",
@@ -1067,7 +1067,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-8c41f5bf36dfaa547f5a",
@@ -1080,7 +1080,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-fb1487428e64bfc2135a",
@@ -1093,7 +1093,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-1ddcd4253dfc65581139",
@@ -1106,7 +1106,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-dc2a6f06d73bebef20e8",
@@ -1119,7 +1119,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-655411b157ca3790a672",
@@ -1132,7 +1132,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-c31ceccb43ee82cc978d",
@@ -1145,7 +1145,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-08e440472e32bc1852bb",
@@ -1158,7 +1158,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-463f524834013e002f2b",
@@ -1171,7 +1171,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-17b86aded26c8ab484ed",
@@ -1184,7 +1184,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-941f7cb4c47315ee3138",
@@ -1197,7 +1197,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-7e2e607b326e26eb5f14",
@@ -1210,7 +1210,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-1f345c90b81ba46a3b8c",
@@ -1223,7 +1223,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-0d839a055844b5fb48c5",
@@ -1236,7 +1236,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-0a47995fa0748a2fd447",
@@ -1249,7 +1249,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-7425d8e68b07d423d757",
@@ -1262,7 +1262,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-fd79d52a78e5d1367797",
@@ -1275,7 +1275,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-1839ea7738c4752840dc",
@@ -1288,7 +1288,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-e69403b86082992434e9",
@@ -1301,7 +1301,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-2ef83c9f87224178b430",
@@ -1314,7 +1314,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-5e1dfb820bec27c25a0e",
@@ -1327,7 +1327,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-2069de3caa833d27300f",
@@ -1340,7 +1340,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-c2bca12ac56065ddb1f2",
@@ -1353,7 +1353,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-d0422476348e3802ec64",
@@ -1366,7 +1366,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-dab87d66121076db63c6",
@@ -1379,7 +1379,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-ba0b8e5798e38fa98848",
@@ -1392,7 +1392,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-6fc6d900b131f8e59ce6",
@@ -1405,7 +1405,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-1260585da3533b012e8b",
@@ -1418,7 +1418,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-d3e7151be543908e2a7d",
@@ -1431,7 +1431,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-af966666431c991e6bf3",
@@ -1444,7 +1444,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-e182ecad7367666f24d6",
@@ -1457,7 +1457,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-0a7d5949e6affaee6341",
@@ -1470,7 +1470,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-351e53206c7e980b63d5",
@@ -1483,7 +1483,7 @@
       "trust": "OFFICIAL_TERRITORIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-f0b9eea57773cf4821dc",
@@ -1496,7 +1496,7 @@
       "trust": "OFFICIAL_TERRITORIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-b63b97514ac0bd9de68b",
@@ -1509,7 +1509,7 @@
       "trust": "OFFICIAL_TERRITORIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-9ab6d4fc3a3190ba77e6",
@@ -1522,7 +1522,7 @@
       "trust": "OFFICIAL_TERRITORIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-500119fcf50818ab4719",
@@ -1535,7 +1535,7 @@
       "trust": "OFFICIAL_TERRITORIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-c5fff77a21070098a9ce",
@@ -1548,7 +1548,7 @@
       "trust": "OFFICIAL_TERRITORIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-345017690784b505fa88",
@@ -1561,7 +1561,7 @@
       "trust": "OFFICIAL_TERRITORIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-2a09688d499bed7e2fc1",
@@ -1574,7 +1574,7 @@
       "trust": "OFFICIAL_TERRITORIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-11fe7811415014d86798",
@@ -1587,7 +1587,7 @@
       "trust": "OFFICIAL_TERRITORIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-9729d8b7d353288f02c6",
@@ -1600,7 +1600,7 @@
       "trust": "OFFICIAL_TERRITORIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-0e3c13801e858f5fe6e8",
@@ -1613,7 +1613,7 @@
       "trust": "OFFICIAL_TERRITORIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-f701c2ef135a1757fcd0",
@@ -1626,7 +1626,7 @@
       "trust": "OFFICIAL_TERRITORIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-8a33e791cee7f33170cc",
@@ -1639,7 +1639,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-6ed43fce2fba01640c64",
@@ -1652,7 +1652,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-7da57ce62a47c1621373",
@@ -1665,7 +1665,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-e904e3d28c0a77d72ee5",
@@ -1678,7 +1678,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-7eec3c2bef120b918721",
@@ -1691,7 +1691,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-92aa956a23b929db46b5",
@@ -1704,7 +1704,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-d1ff9e2479f641d50550",
@@ -1717,7 +1717,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-330dac115eb49c192bbe",
@@ -1730,7 +1730,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-31f129e5d46b832ccc49",
@@ -1743,7 +1743,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-0beb455693a1b127255e",
@@ -1756,7 +1756,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-bb83e5fa448231efb310",
@@ -1769,7 +1769,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-48f5a796d64bbb7e95e2",
@@ -1782,7 +1782,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-64329e8134b7febd6cf8",
@@ -1795,7 +1795,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-ff2fc95d587b2010e2da",
@@ -1808,7 +1808,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-beeb00c459908f5bfde0",
@@ -1821,7 +1821,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-b503b0cefe151f00f085",
@@ -1834,7 +1834,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-a18c7950a9f60ea7019f",
@@ -1847,7 +1847,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-d363b28218bf908ef55d",
@@ -1860,7 +1860,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-bfacbca86344ee68f5a1",
@@ -1873,7 +1873,7 @@
       "trust": "FOUNDATION_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-3bc3083e9327459e4d87",
@@ -1886,7 +1886,7 @@
       "trust": "FOUNDATION_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-d798b5b2ee272b52020a",
@@ -1899,7 +1899,7 @@
       "trust": "FOUNDATION_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-8a2f2cc9bd1aa508135a",
@@ -1912,7 +1912,7 @@
       "trust": "FOUNDATION_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-ac9ce9dae183f63921ed",
@@ -1925,7 +1925,7 @@
       "trust": "FOUNDATION_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-c9a086f978c5f472609c",
@@ -1938,7 +1938,7 @@
       "trust": "FOUNDATION_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-44ef21f78e2acf66f705",
@@ -1951,7 +1951,7 @@
       "trust": "FOUNDATION_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-f6045375a04cd50437d4",
@@ -1964,7 +1964,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-bed8a6ed05e5dbf87ae4",
@@ -1977,7 +1977,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-5e060f05313e2509752b",
@@ -1990,7 +1990,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:04:59.005Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-2e7d6c7a47728b3381bd",
@@ -2003,7 +2003,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:07:09.479Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-91b7dac0a442f760ea40",
@@ -2016,7 +2016,7 @@
       "trust": "PRIMARY_OFFICIAL",
       "verification": "DISCOVERED_NEEDS_REVIEW",
       "firstDetectedAt": "2026-10-08T11:07:09.479Z",
-      "lastDetectedAt": "2026-10-08T12:14:47.008Z"
+      "lastDetectedAt": "2026-10-08T12:20:55.637Z"
     },
     {
       "id": "DISC-f00df3b3e2d708f16a96",
