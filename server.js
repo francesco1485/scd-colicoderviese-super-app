@@ -4,6 +4,7 @@ const path = require('path');
 const { URL } = require('url');
 const { issueIntakeToken, verifyIntakeToken } = require('./lib/intake-links');
 const { projectPublicCalendar } = require('./lib/scd-public-calendar-projection');
+const { answerSky } = require('./lib/scd-sky-assistant');
 const {projectSponsorLeadInbox,prepareSponsorProposalDraft}=require('./lib/scd-sponsor-lead-workflow');
 
 const PORT = process.env.PORT || 10000;
@@ -958,6 +959,27 @@ async function buildWeeklyNewsroom(){
   };
 }
 
+async function handleSkyAsk(req,res){
+  if(req.method!=='POST')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  let input;
+  try{
+    input=JSON.parse(await readBody(req)||'{}');
+    if(!input||typeof input.question!=='string'||input.question.trim().length>500||!input.question.trim()){
+      return json(res,400,{ok:false,error:'SKY_INVALID_QUESTION'});
+    }
+  }catch(e){return json(res,400,{ok:false,error:'SKY_INVALID_REQUEST'})}
+  try{
+    let data=answerSky({question:input.question,app:input.app});
+    if(data.answer.startsWith('DATO_IN_AGGIORNAMENTO')){
+      const news=await buildWeeklyNewsroom();
+      data=answerSky({question:input.question,app:input.app,publicNews:news});
+    }
+    return json(res,200,{ok:true,data,sourcePolicy:'PUBLIC_GROUNDED_R20_ONLY'},{'cache-control':'no-store'});
+  }catch(e){
+    return json(res,503,{ok:false,error:'SKY_TEMPORARILY_UNAVAILABLE'},{'cache-control':'no-store'});
+  }
+}
+
 async function getLiveRadar(){
   return {
     ok:true,
@@ -1021,6 +1043,7 @@ http.createServer(async(req,res)=>{
   if(u.pathname==='/api/intake/admin/templates') return handleIntakeAdminTemplates(req,res);
   if(u.pathname==='/api/intake/admin/link') return handleIntakeAdminLink(req,res);
   if(u.pathname==='/api/public') return json(res,200,await fetchPublicFeed(),{'cache-control':'no-store'});
+  if(u.pathname==='/api/sky/ask') return handleSkyAsk(req,res);
   if(u.pathname==='/api/newsroom') {try{return json(res,200,await buildWeeklyNewsroom(),{'cache-control':'public, max-age=180'})}catch(e){return json(res,500,{ok:false,error:e.message})}}
   if(u.pathname==='/api/live') {try{return json(res,200,await getLiveRadar(),{'cache-control':'public, max-age=300'})}catch(e){return json(res,500,{ok:false,error:e.message})}}
   return serveStatic(req,res);
