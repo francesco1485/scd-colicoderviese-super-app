@@ -79,6 +79,9 @@ function doPost(e) {
       case 'private.user.workspace':
         data = r216UserWorkspace_(token);
         break;
+      case 'private.crm.leadInbox':
+        data = r216SponsorLeadInbox_(token, payload);
+        break;
       case 'private.crm.summary':
         data = r216CrmSummary_(token, payload);
         break;
@@ -299,6 +302,30 @@ function r216CrmDateMs_(value) {
   var d = value instanceof Date ? value : new Date(value);
   return isNaN(d.getTime()) ? 0 : d.getTime();
 }
+/* SCD GROW: read only bridge to canonical sponsor requests and stakeholders. */
+function r216SponsorLeadInbox_(token,payload){
+  var actor=r216CrmActor_(token);
+  var mail=email_(actor.email||'');
+  var user=r216UserRow_(actor);
+  var role=r216Upper_([user.RUOLO||'',user['AREE PREVISTE']||'',user.DEFAULT_MODULES||'',actor.role||''].join(' '));
+  var active=r216Upper_(user.STATO||user.STATUS||'');
+  if(mail!=='sportclubcolico@gmail.com'&&(!user.EMAIL||active!=='ATTIVO'||!/DIREZIONE|ADMIN|COMMERCIALE|SPONSOR|MARKETING/.test(role)))throw new Error('SPONSOR_SCOPE_REQUIRED');
+  payload=payload||{};
+  var limit=Math.max(1,Math.min(250,Number(payload.limit||100)));
+  var requests=r216CrmTable_('APP PUBLIC REQUESTS').filter(function(r){
+    return r216Upper_(r.TYPE||'')==='SPONSOR';
+  }).slice(-limit).map(function(r){
+    return {
+      REQUEST_ID:r.REQUEST_ID,TYPE:r.TYPE,STATUS:r.STATUS,CREATED_AT:r.CREATED_AT,
+      NOME:r.NOME,EMAIL:r.EMAIL,TELEFONO:r.TELEFONO,OGGETTO:r.OGGETTO,CATEGORIA:r.CATEGORIA
+    };
+  });
+  var stakeholders=r216CrmTable_('STAKEHOLDERS_MASTER').map(function(r){
+    return {STAKEHOLDER_ID:r.STAKEHOLDER_ID,EMAIL:r.EMAIL,CONTACT_POLICY:r.CONTACT_POLICY};
+  });
+  return {requests:requests,stakeholders:stakeholders,readOnly:true,source:'R20',generatedAt:new Date()};
+}
+
 function r216CrmSummary_(token, payload) {
   r216CrmActor_(token);
   payload = payload || {};
