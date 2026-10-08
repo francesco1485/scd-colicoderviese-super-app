@@ -47,3 +47,9 @@ test('public calendar rejects additional scope-only flags',()=>{
  const rows=[{...fixture,eventId:'TEAM-1',teamOnly:true},{...fixture,eventId:'STAFF-1',staffOnly:true},{...fixture,eventId:'SAFE-1',safeguarding:true},{...fixture,eventId:'INTERNAL-1',internalOnly:true}];
  assert.deepEqual(projectPublicCalendar(rows),[]);
 });
+
+test('calendar rejects sensitive event categories even if mistakenly labeled public',()=>{
+ const types=['SAFEGUARDING','MEDICAL_CERTIFICATE','PAYMENT','PRIVATE_CONVOCATION','DOCUMENTI_FAMIGLIA','RISERVATO'];
+ const source=types.map((type,i)=>({...fixture,eventId:'PRIVATE-TYPE-'+i,title:'Event record '+i,type,visibility:'PUBLIC'}));
+ assert.deepEqual(projectPublicCalendar(source),[],'privacy-sensitive kinds must never appear in public projection');
+});
