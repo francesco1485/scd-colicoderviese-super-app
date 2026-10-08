@@ -762,9 +762,12 @@ async function ensurePrivateDesk(force=false){
  state.privateLoading=true;state.privateToken=String(saved.token||'');state.privateEmail=String(saved.email||'');state.privateError='';
  const queue=$('#actionQueue');if(queue)queue.innerHTML='<div class="desk-private-loading"><b>Carico il tuo spazio di lavoro…</b><span>Ruolo, scope e moduli arrivano dal gestionale.</span></div>';
  try{
-   await privatePost('auth.validate',{token:state.privateToken},state.privateToken);
+   const validation=await privatePost('auth.validate',{token:state.privateToken},state.privateToken);
+   if(validation?.valid===false||validation?.authenticated===false)throw new Error('R20_SESSION_INVALID');
    state.privateData=await privatePost('dashboard.summary',{},state.privateToken);
    let workspace=null;try{workspace=await loadWorkspaceProfile()}catch(err){console.warn('[private-desk] workspace',err)}
+   const audit=await privatePost('auth.access.log',{eventType:'PRIVATE_DESK_OPEN',clientKind:window.matchMedia?.('(display-mode: standalone)')?.matches?'PWA':'WEB'},state.privateToken);
+   if(audit.stored!==true)throw new Error('ACCESS_AUDIT_UNCONFIRMED');
    state.workspace=workspace||legacyWorkspace(state.privateData);renderPrivateDesk();
  }catch(err){
    const msg=String(err.message||err);clearPrivateSession();state.privateError=msg;renderPrivateDesk();
