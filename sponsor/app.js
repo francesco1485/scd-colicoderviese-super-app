@@ -1298,9 +1298,36 @@ async function prepareGrowDraft(requestId){
     const response=await fetch('/api/sponsor/proposal-draft',{method:'POST',headers:{'content-type':'application/json'},credentials:'same-origin',body:JSON.stringify(input)});
     const data=await response.json().catch(()=>({}));
     if(!response.ok||data.ok!==true)throw new Error(data.error||'Bozza non preparata');
-    preview.textContent='BOZZA NON SALVATA · NON INVIATA. Richiede approvazione e registrazione nel CRM canonico.\n'+JSON.stringify(data.data,null,2);
+    preview.textContent='BOZZA NON SALVATA · NON INVIATA. La registrazione nel CRM richiede una seconda conferma.\n'+JSON.stringify(data.data,null,2);
+    const save=document.createElement('button');
+    save.type='button';
+    save.className='btn-yellow';
+    save.textContent='Registra bozza nel CRM (senza inviare)';
+    save.onclick=()=>saveGrowDraft(input);
+    preview.appendChild(save);
   }catch(error){preview.textContent='Bozza non disponibile: '+String(error.message||'Errore di verifica')}
 }
+async function saveGrowDraft(input){
+  const preview=$('#crmProposalPreview');if(!preview)return;
+  if(!window.confirm('Confermi la registrazione di una nuova opportunità IN BOZZA nel CRM SCD? Nessuna email, fattura o contratto verrà creato.'))return;
+  preview.textContent='Registro la bozza nel CRM canonico R20…';
+  try{
+    const response=await fetch('/api/sponsor/proposal-draft/save',{
+      method:'POST',headers:{'content-type':'application/json'},credentials:'same-origin',cache:'no-store',
+      body:JSON.stringify({...input,associationReviewed:true,confirm:true})
+    });
+    const result=await response.json().catch(()=>({}));
+    if(!response.ok||result.ok!==true||result.data?.persisted!==true){
+      throw new Error(result.error||'Registrazione non confermata dal gestionale');
+    }
+    preview.textContent=(result.data.created?'BOZZA REGISTRATA':'BOZZA GIÀ REGISTRATA')+
+      ' · '+String(result.data.opportunityId||'')+
+      ' · Stato: '+String(result.data.stage||'DA SVILUPPARE')+
+      '. Nessun documento, contratto o messaggio inviato.';
+    await loadCrm();
+  }catch(error){preview.textContent='REGISTRAZIONE NON CONFERMATA: '+String(error.message||'R20 non disponibile')}
+}
+
 $('#crmLeadRefresh')?.addEventListener('click',loadSponsorLeads);
 loadSponsorLeads();
 
