@@ -17,7 +17,9 @@ const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 const maxAttempts=3;
 async function scanOne(source){
   let lastError=null;
+  let attempts=0;
   for(let attempt=1;attempt<=maxAttempts;attempt++){
+    attempts=attempt;
     const controller=new AbortController();
     const timer=setTimeout(()=>controller.abort(),20000);
     try{
@@ -44,7 +46,7 @@ async function scanOne(source){
   }
   return {
     items:[],
-    health:{sourceId:source.id,status:'ERROR',checkedAt:now,error:String(lastError?.message||lastError),attempts:maxAttempts}
+    health:{sourceId:source.id,status:'ERROR',checkedAt:now,error:String(lastError?.message||lastError),attempts}
   };
 }
 async function scanAll(sources,limit=4){
