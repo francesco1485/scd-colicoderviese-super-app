@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import {createRequire} from 'node:module';
 const require=createRequire(import.meta.url);
-const {extractAnchors,scanSourceHtml,mergeCandidates}=require('../lib/scd-dirigenza-radar.js');
+const {extractAnchors,scanSourceHtml,mergeCandidates,diagnoseFetchFailure}=require('../lib/scd-dirigenza-radar.js');
 const fail=m=>{console.error('DIRIGENZA RADAR FAIL:',m);process.exit(1)};
 const assert=(c,m)=>{if(!c)fail(m)};
 const sources=JSON.parse(fs.readFileSync(new URL('../config/scd-dirigenza-radar-sources.v1.json',import.meta.url),'utf8'));
@@ -53,4 +53,11 @@ assert(retained[0].lastDetectedAt==='2026-10-09T10:00:00Z','last detection must 
 assert(retained[0].verification==='DISCOVERED_NEEDS_REVIEW','merge must not promote candidates');
 assert(new Set(sources.sources.map(x=>x.id)).size===sources.sources.length,'source IDs must be unique');
 assert((snapshot.candidates||[]).every(x=>x.verification==='DISCOVERED_NEEDS_REVIEW'),'persisted candidates cannot claim verification');
+const tlsError=Object.assign(new Error('certificate has expired'),{code:'CERT_HAS_EXPIRED'});
+assert(diagnoseFetchFailure(new Error('fetch failed',{cause:tlsError})).category==='TLS_FAILURE','TLS failure must remain explicit');
+const dnsError=Object.assign(new Error('getaddrinfo failed'),{code:'ENOTFOUND'});
+assert(diagnoseFetchFailure(new Error('fetch failed',{cause:dnsError})).category==='DNS_FAILURE','DNS failure must remain explicit');
+assert(diagnoseFetchFailure(Object.assign(new Error('timeout'),{name:'AbortError'})).category==='TIMEOUT','source timeout must be distinct');
+assert(diagnoseFetchFailure(new Error('HTTP_404')).category==='HTTP_CLIENT_ERROR','HTTP client errors must not be labeled network failures');
+assert(diagnoseFetchFailure(new Error('HTTP_503')).category==='HTTP_SERVER_ERROR','HTTP server errors must remain explicit');
 console.log('DIRIGENZA RADAR CONTRACT PASS',{sources:sources.sources.length,verifiedItems:snapshot.verifiedItems.length});
