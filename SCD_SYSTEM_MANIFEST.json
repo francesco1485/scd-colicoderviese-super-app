@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.27.1",
+    "version": "3.27.2",
     "effective_at": "2026-10-03",
     "status": "BINDING",
     "language": "it-IT",
@@ -4250,7 +4250,7 @@
     },
     "sponsor_lead_inbox_content_first": {
       "release": "CONTENT_FIRST_2026_10_08",
-      "state": "STAGED_R20_INSTALLATION_AND_PRODUCTION_AUTH_TEST_REQUIRED",
+      "state": "STAGED_PERSISTED_DRAFT_CODE_R20_RUNTIME_UNVERIFIED",
       "runtime_primary": "R20",
       "source_tables": [
         "APP PUBLIC REQUESTS",
@@ -4260,11 +4260,12 @@
       "existing_auth": "R20_AUTH_VALIDATE_SPONSOR_ROLE",
       "api_routes": [
         "/api/sponsor/lead-inbox",
-        "/api/sponsor/proposal-draft"
+        "/api/sponsor/proposal-draft",
+        "/api/sponsor/proposal-draft/save"
       ],
       "privacy": "PUBLIC_LEADS_READABLE_ONLY_BY_VERIFIED_SPONSOR_OPERATOR",
       "association_policy": "CANDIDATES_BY_EXACT_EMAIL_ONLY_MANUAL_CONFIRMATION_REQUIRED",
-      "draft_policy": "DRAFT_PENDING_APPROVAL_NOT_STORED_NOT_SENT",
+      "draft_policy": "HUMAN_REVIEW_PLUS_SECOND_CONFIRMATION_CANONICAL_OPPORTUNITY_DA_SVILUPPARE_NOT_SENT_NO_CONTRACT",
       "prohibited": [
         "AUTO_CREATE_STAKEHOLDER",
         "AUTO_MERGE_COMPANIES",
@@ -4272,8 +4273,37 @@
         "INVENT_COMMERCIAL_VALUES",
         "DUPLICATE_CRM"
       ],
-      "activation_gate": "R20_BRIDGE_DEPLOYED_AND_AUTHORIZED_STAGING_E2E_WITH_AUDIT",
-      "rollback": "DO_NOT_DEPLOY_OR_REVERT_STAGED_API_AND_R20_BRIDGE"
+      "activation_gate": "EXPLICIT_DIRECTION_APPROVAL_PLUS_R20_R21_AND_R60_DEPLOYED_ON_ISOLATED_STAGING_WITH_CANONICAL_HEADERS_VERIFIED",
+      "rollback": "NO_PRODUCTION_DEPLOY_UNTIL_STAGING_E2E_GREEN; DISABLE_NEW_ROUTE_IF_UPSTREAM_UNAVAILABLE",
+      "bridge_module": "backend_patch_R60_grow_proposal_draft.gs",
+      "source_workbooks": {
+        "public_requests": "CORE_SHEET/APP PUBLIC REQUESTS",
+        "access_audit": "CORE_SHEET/APP AUDIT",
+        "stakeholders": "SCD_OPERATIVO_PILOTA/STAKEHOLDERS_MASTER",
+        "opportunities": "SCD_OPERATIVO_PILOTA/COMMERCIALE_OPPORTUNITA"
+      },
+      "write_policy": {
+        "actor": "R20_AUTHORIZED_SPONSOR_SCOPE",
+        "idempotency": "CORRELATION_ID_BY_REQUEST_ID",
+        "required": [
+          "REQUEST_ID",
+          "STAKEHOLDER_ID",
+          "EXACT_EMAIL",
+          "PRIVACY_CONSENT",
+          "HUMAN_REVIEW",
+          "EXPLICIT_CONFIRM"
+        ],
+        "stage": "DA SVILUPPARE",
+        "status": "APERTO",
+        "financial_values": "UNSET",
+        "audit": "CORE_APP_AUDIT_BEFORE_OPPORTUNITY_WRITE",
+        "side_effects_forbidden": [
+          "EMAIL_SEND",
+          "CONTRACT_CREATE",
+          "PAYMENT_CREATE",
+          "ROLE_ELEVATION"
+        ]
+      }
     }
   },
   "research_intelligence": {
