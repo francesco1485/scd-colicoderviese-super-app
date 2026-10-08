@@ -42,3 +42,8 @@ test('public calendar fails closed on malformed response or array elements',()=>
  assert.deepEqual(projectPublicCalendar({rows:[fixture]}),[]);
  assert.deepEqual(projectPublicCalendar([null,123,'text',{}]),[]);
 });
+
+test('public calendar rejects additional scope-only flags',()=>{
+ const rows=[{...fixture,eventId:'TEAM-1',teamOnly:true},{...fixture,eventId:'STAFF-1',staffOnly:true},{...fixture,eventId:'SAFE-1',safeguarding:true},{...fixture,eventId:'INTERNAL-1',internalOnly:true}];
+ assert.deepEqual(projectPublicCalendar(rows),[]);
+});
