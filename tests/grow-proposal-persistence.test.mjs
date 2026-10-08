@@ -5,7 +5,7 @@ import vm from 'node:vm';
 
 const file=new URL('../backend_patch_R60_grow_proposal_draft.gs',import.meta.url);
 const source=fs.existsSync(file)?fs.readFileSync(file,'utf8'):'';
-function fixture({privacy='SI',policy='MANUALE',duplicates=0,auditFails=false}={}){
+function fixture({privacy='SI',policy='MANUALE',duplicates=0,auditFails=false,writeEnabled=true,targetConfigured=true}={}){
   const request={REQUEST_ID:'REQ-2026-01',TYPE:'SPONSOR',EMAIL:'lead@example.org',NOME:'Referente QA',CONSENSO_PRIVACY:privacy};
   const stakeholder={STAKEHOLDER_ID:'ST-2026-01',NOME:'Azienda QA',EMAIL:'lead@example.org',CONTACT_POLICY:policy};
   const tables={
@@ -17,6 +17,7 @@ function fixture({privacy='SI',policy='MANUALE',duplicates=0,auditFails=false}={
   const writes=[],audits=[];
   const scope={
     LockService:{getScriptLock:()=>({waitLock:()=>{locks++},releaseLock:()=>{releases++}})},
+    PropertiesService:{getScriptProperties:()=>({getProperty:key=>key==='SCD_R60_DRAFT_WRITE_ENABLED'?(writeEnabled?'true':'false'):key==='SCD_OPERATIVO_PILOTA_ID'?(targetConfigured?'qa-operativo-clone':''):''})},
     Utilities:{getUuid:()=> '12345678-aabb-ccdd-eeff-123456789abc'},
     r216SponsorLeadInbox_:(token)=>{if(token!=='good-token')throw new Error('SPONSOR_SCOPE_REQUIRED');return {readOnly:true}},
     r216CrmActor_:(token)=>{if(token!=='good-token')throw new Error('SESSION_REQUIRED');return {email:'operator@example.org'}},
@@ -121,4 +122,13 @@ test('R60 escapes spreadsheet formula injection from untrusted asset fields',()=
   t.make({asset:'=IMPORTDATA("https://example.org")'});
   const row=t.tables['COMMERCIALE_OPPORTUNITA'][0];
   assert.equal(row.OFFERTA.startsWith("'="),true);
+});
+
+test('R60 is disabled by default and requires an explicitly configured writable target',()=>{
+ const disabled=fixture({writeEnabled:false});
+ assert.throws(()=>disabled.make(),/R60_WRITE_DISABLED/);
+ assert.equal(disabled.writes.length,0);
+ const noTarget=fixture({targetConfigured:false});
+ assert.throws(()=>noTarget.make(),/CANONICAL_TARGET_NOT_CONFIGURED/);
+ assert.equal(noTarget.writes.length,0);
 });
