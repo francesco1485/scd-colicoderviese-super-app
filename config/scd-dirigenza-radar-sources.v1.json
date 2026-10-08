@@ -1,0 +1,195 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "SCD_DIRIGENZA_RADAR_SOURCES",
+  "effectiveAt": "2026-10-08",
+  "authority": "DIREZIONE_SCD",
+  "purpose": "Daily discovery of verified public opportunities and territorial events for Direction decision support.",
+  "rules": {
+    "noInvention": true,
+    "discoveredIsNotVerified": true,
+    "officialSourcePreferred": true,
+    "calendarConflictRequiresCalendarComparison": true,
+    "autoApplyForbidden": true,
+    "visualRuntimeAdoptionRequiresHumanApproval": true
+  },
+  "categories": [
+    {
+      "id": "OPPORTUNITIES",
+      "label": "Bandi, contributi e iniziative",
+      "audiences": [
+        "ASD_SSD",
+        "ASSOCIAZIONI",
+        "ETS",
+        "PIVA",
+        "IMPRESE",
+        "ENTI"
+      ]
+    },
+    {
+      "id": "TERRITORY",
+      "label": "Eventi e iniziative territoriali",
+      "territories": [
+        "COLICO",
+        "DERVIO"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "REGIONE_LOMBARDIA_SPORT_BANDI",
+      "category": "OPPORTUNITIES",
+      "authority": "Regione Lombardia - Bandi e Servizi",
+      "url": "https://www.bandi.regione.lombardia.it/servizi/servizio/bandi/eventi-sportivi",
+      "trust": "PRIMARY_OFFICIAL",
+      "scanKeywords": [
+        "bando",
+        "manifestazioni sportive",
+        "associazioni",
+        "società sportive",
+        "contribut",
+        "sport"
+      ],
+      "audienceHints": [
+        "ASD_SSD",
+        "ASSOCIAZIONI",
+        "ENTI"
+      ]
+    },
+    {
+      "id": "DIPARTIMENTO_SPORT_BANDI",
+      "category": "OPPORTUNITIES",
+      "authority": "Presidenza del Consiglio dei Ministri - Dipartimento per lo Sport",
+      "url": "https://avvisibandi.sport.governo.it/bandi",
+      "trust": "PRIMARY_OFFICIAL",
+      "scanKeywords": [
+        "aperto",
+        "avviso",
+        "contribut",
+        "eventi sportivi",
+        "ASD",
+        "SSD",
+        "impianti",
+        "sport"
+      ],
+      "audienceHints": [
+        "ASD_SSD",
+        "ASSOCIAZIONI",
+        "ENTI",
+        "SOCIETA"
+      ]
+    },
+    {
+      "id": "SPORT_E_SALUTE_BANDI_ALTRI_ENTI",
+      "category": "OPPORTUNITIES",
+      "authority": "Sport e Salute S.p.A.",
+      "url": "https://www.sportesalute.eu/?Itemid=1283",
+      "trust": "OFFICIAL_PUBLIC_COMPANY",
+      "scanKeywords": [
+        "avviso in corso",
+        "contribut",
+        "società e associazioni sportive",
+        "enti del terzo settore",
+        "Lombardia"
+      ],
+      "audienceHints": [
+        "ASD_SSD",
+        "ASSOCIAZIONI",
+        "ETS",
+        "IMPRESE"
+      ]
+    },
+    {
+      "id": "INVITALIA_INCENTIVI",
+      "category": "OPPORTUNITIES",
+      "authority": "Invitalia",
+      "url": "https://www.invitalia.it/incentivi-e-strumenti",
+      "trust": "PRIMARY_OFFICIAL",
+      "scanKeywords": [
+        "incentiv",
+        "contribut",
+        "fondo perduto",
+        "impres",
+        "terzo settore",
+        "associazioni",
+        "finanziamento"
+      ],
+      "audienceHints": [
+        "PIVA",
+        "IMPRESE",
+        "ETS",
+        "ASSOCIAZIONI"
+      ]
+    },
+    {
+      "id": "EU_SPORT_FUNDING",
+      "category": "OPPORTUNITIES",
+      "authority": "European Commission - Sport",
+      "url": "https://sport.ec.europa.eu/funding",
+      "trust": "PRIMARY_OFFICIAL",
+      "scanKeywords": [
+        "funding",
+        "Erasmus+",
+        "sport",
+        "call",
+        "funding opportunities"
+      ],
+      "audienceHints": [
+        "ASD_SSD",
+        "ASSOCIAZIONI",
+        "ETS",
+        "ENTI"
+      ]
+    },
+    {
+      "id": "ERASMUS_SPORT_CALLS",
+      "category": "OPPORTUNITIES",
+      "authority": "European Commission - Erasmus+",
+      "url": "https://erasmus-plus.ec.europa.eu/funding?facets__field_eac_topics=19",
+      "trust": "PRIMARY_OFFICIAL",
+      "scanKeywords": [
+        "sport",
+        "open",
+        "deadline",
+        "funding",
+        "call"
+      ],
+      "audienceHints": [
+        "ASD_SSD",
+        "ASSOCIAZIONI",
+        "ETS",
+        "ENTI"
+      ]
+    },
+    {
+      "id": "VISIT_COLICO_EVENTS",
+      "category": "TERRITORY",
+      "authority": "Visit Colico / Pro Loco Colico",
+      "url": "https://visitcolico.it/",
+      "trust": "OFFICIAL_TERRITORIAL",
+      "scanKeywords": [
+        "eventi",
+        "Colico",
+        "ottobre",
+        "novembre",
+        "manifestazione",
+        "iniziativa"
+      ],
+      "territory": "COLICO"
+    },
+    {
+      "id": "COMUNE_DERVIO_EVENTS",
+      "category": "TERRITORY",
+      "authority": "Comune di Dervio",
+      "url": "https://www.comune.dervio.lc.it/it/eventi",
+      "trust": "PRIMARY_OFFICIAL",
+      "scanKeywords": [
+        "eventi",
+        "Dervio",
+        "festival",
+        "manifestazione",
+        "iniziativa"
+      ],
+      "territory": "DERVIO"
+    }
+  ]
+}
