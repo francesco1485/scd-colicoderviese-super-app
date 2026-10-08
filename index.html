@@ -46,6 +46,31 @@
     </div>
 
     <main>
+      <section class="view active" id="view-pulse" data-view="pulse">
+        <section class="home-first" id="homeWeek">
+          <div class="home-first-head">
+            <div>
+              <span class="eyebrow">SCD HOME · QUESTA SETTIMANA</span>
+              <h1>La tua settimana <em>SCD.</em></h1>
+              <p id="weekRangeLabel">Partite, eventi e attività pubbliche della settimana corrente</p>
+            </div>
+            <button class="week-calendar-cta" type="button" data-public-action="calendar">Calendario completo →</button>
+          </div>
+          <div class="public-search-shell" id="publicSearch">
+            <span class="search-icon" aria-hidden="true">⌕</span>
+            <input id="publicSearchInput" type="search" autocomplete="off" placeholder="Cerca squadra, partita, evento o news…" aria-label="Cerca nei contenuti pubblici SCD">
+            <button type="button" id="clearPublicSearch" aria-label="Cancella ricerca">×</button>
+            <div class="public-search-results" id="publicSearchResults" hidden></div>
+          </div>
+          <div class="week-summary">
+            <div class="week-summary-copy"><b id="weekSummaryTitle">La settimana SCD</b><span id="weekSummaryMeta">Attività verificate in sincronizzazione</span></div>
+            <div class="segmented compact" id="radarFilters">
+              <button class="active" data-filter="ALL">Tutto</button><button data-filter="AGONISTICA">Agonistica</button><button data-filter="BASE">Attività di base</button><button data-filter="EVENTI">Eventi</button>
+            </div>
+          </div>
+          <div class="week-rail week-rail-first" id="weekRail"></div>
+        </section>
+
       <section class="scd-control-deck" aria-label="Navigazione principale SCD">
         <header class="scd-control-heading">
           <div><span class="scd-control-eyebrow">SCD COLICODERVIESE / PIATTAFORMA 2026–27</span>
@@ -78,31 +103,6 @@
         </div>
         <div class="scd-control-bottom"><span>STESSA IDENTITÀ SCD, ESPERIENZE DIFFERENTI</span><button type="button" id="scdDeckSky">Chiedi a Sky ✦</button></div>
       </section>
-      <section class="view active" id="view-pulse" data-view="pulse">
-        <section class="home-first" id="homeWeek">
-          <div class="home-first-head">
-            <div>
-              <span class="eyebrow">SCD HOME · QUESTA SETTIMANA</span>
-              <h1>La tua settimana <em>SCD.</em></h1>
-              <p id="weekRangeLabel">Partite, eventi e attività pubbliche della settimana corrente</p>
-            </div>
-            <button class="week-calendar-cta" type="button" data-public-action="calendar">Calendario completo →</button>
-          </div>
-          <div class="public-search-shell" id="publicSearch">
-            <span class="search-icon" aria-hidden="true">⌕</span>
-            <input id="publicSearchInput" type="search" autocomplete="off" placeholder="Cerca squadra, partita, evento o news…" aria-label="Cerca nei contenuti pubblici SCD">
-            <button type="button" id="clearPublicSearch" aria-label="Cancella ricerca">×</button>
-            <div class="public-search-results" id="publicSearchResults" hidden></div>
-          </div>
-          <div class="week-summary">
-            <div class="week-summary-copy"><b id="weekSummaryTitle">La settimana SCD</b><span id="weekSummaryMeta">Attività verificate in sincronizzazione</span></div>
-            <div class="segmented compact" id="radarFilters">
-              <button class="active" data-filter="ALL">Tutto</button><button data-filter="AGONISTICA">Agonistica</button><button data-filter="BASE">Attività di base</button><button data-filter="EVENTI">Eventi</button>
-            </div>
-          </div>
-          <div class="week-rail week-rail-first" id="weekRail"></div>
-        </section>
-
         <section class="hero home-secondary-hero">
           
           <div class="hero-synth" aria-hidden="true">
