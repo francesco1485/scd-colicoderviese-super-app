@@ -53,3 +53,8 @@ test('calendar rejects sensitive event categories even if mistakenly labeled pub
  const source=types.map((type,i)=>({...fixture,eventId:'PRIVATE-TYPE-'+i,title:'Event record '+i,type,visibility:'PUBLIC'}));
  assert.deepEqual(projectPublicCalendar(source),[],'privacy-sensitive kinds must never appear in public projection');
 });
+
+test('PUBLIC_LIMITED calendar events do not appear on the anonymous public site',()=>{
+ const row={...fixture,eventId:'LIMITED-ACCESS-1',visibility:'PUBLIC_LIMITED'};
+ assert.deepEqual(projectPublicCalendar([row]),[]);
+});
