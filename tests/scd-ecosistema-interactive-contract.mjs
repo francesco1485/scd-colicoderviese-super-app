@@ -13,7 +13,7 @@ for(const id of ['universe','sponsor','gestionale']){
 }
 assert(html.includes('../../assets/logo-scd.png'),'use locked official club identity, not generated crest');
 assert(html.includes('../../assets/sky.webp'),'use locked official mascot source, not generated mascot');
-assert(html.includes('../../assets/hero-colico.webp'),'reuse verified official territorial art source');
+assert(css.includes('../../assets/hero-colico.webp'),'reuse official territorial image through CSS, not a fake in-page photo');
 assert((html.match(/id="assistantDialog"/g)||[]).length===1,'one shared assistant shell only');
 assert(html.includes('id="assistantMessages"'),'shared assistant message stream missing');
 assert(html.includes('id="assistantForm"'),'shared assistant input missing');
