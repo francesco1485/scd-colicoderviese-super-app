@@ -44,7 +44,7 @@
     "test:r56-internal": "node scripts/validate-r56-internal.mjs",
     "test:r57-d1-graph": "node scripts/validate-r57-d1-graph.mjs",
     "test:ai-portfolio": "node scripts/validate-ai-portfolio.mjs",
-    "test:grow-leads": "node --test tests/sponsor-lead-workflow.test.mjs tests/grow-lead-inbox-contract.mjs tests/grow-lead-http-integration.test.mjs",
+    "test:grow-leads": "node --test tests/sponsor-lead-workflow.test.mjs tests/grow-lead-inbox-contract.mjs tests/grow-lead-http-integration.test.mjs tests/grow-proposal-persistence.test.mjs",
     "test:r20-routing": "node --test tests/r20-canonical-sheet-routing.test.mjs"
   }
 }
