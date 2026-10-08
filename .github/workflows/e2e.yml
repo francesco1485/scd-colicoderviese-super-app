@@ -63,6 +63,8 @@ jobs:
         run: npm run test:intake-links
       - name: R20 canonical workbook routing regression gate
         run: npm run test:r20-routing
+      - name: New live interface design system gate
+        run: npm run test:reboot-ui
       - name: Three-app ONE / GROW / CORE integration gate
         run: npm run test:cross-app
       - name: Shared SKY grounded assistant permission gate
