@@ -18,8 +18,14 @@ function r60CreateSponsorProposalDraft_(token,payload){
   if(String(props.getProperty('SCD_R60_DRAFT_WRITE_ENABLED')||'').trim().toLowerCase()!=='true'){
     throw new Error('R60_WRITE_DISABLED');
   }
-  if(!String(props.getProperty('SCD_OPERATIVO_PILOTA_ID')||'').trim()){
-    throw new Error('CANONICAL_TARGET_NOT_CONFIGURED');
+  var operativoTarget=String(props.getProperty('SCD_OPERATIVO_PILOTA_ID')||'').trim();
+  if(!operativoTarget)throw new Error('CANONICAL_TARGET_NOT_CONFIGURED');
+  var coreTarget=typeof SCD!=='undefined' && SCD ? String(SCD.CORE_ID||'').trim() : '';
+  if(!coreTarget ||
+     coreTarget==='1p78Kgla_cCjYxCPjksS8lHxmlFQxuvpd1aBXv6-1H1s' ||
+     operativoTarget==='1jb5Jt1ZYzJA-3oQd85AmwVhAoFQpBPfcsy4HupBzDFA' ||
+     coreTarget===operativoTarget){
+    throw new Error('STAGING_ISOLATION_REQUIRED');
   }
   if(typeof r216SponsorLeadInbox_!=='function'||typeof r216CrmActor_!=='function'){
     throw new Error('R20_SPONSOR_MODULE_NOT_INSTALLED');
