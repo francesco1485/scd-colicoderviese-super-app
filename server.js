@@ -394,6 +394,44 @@ async function handleSponsorProposalDraft(req,res){
   }catch(e){return json(res,403,{ok:false,error:String(e.message||'PROPOSAL_DRAFT_DENIED')},{'cache-control':'no-store'})}
 }
 
+async function handleSponsorProposalDraftSave(req,res){
+  if(req.method!=='POST')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  let session;
+  try{session=await validateSponsorSession(req)}
+  catch(e){return json(res,403,{ok:false,error:'SPONSOR_SESSION_REQUIRED'},{'cache-control':'no-store'})}
+  let input;
+  try{input=JSON.parse(await readBody(req)||'{}')}
+  catch{return json(res,400,{ok:false,error:'INVALID_REQUEST'},{'cache-control':'no-store'})}
+  if(input.confirm!==true||input.associationReviewed!==true){
+    return json(res,400,{ok:false,error:'EXPLICIT_REVIEW_AND_CONFIRM_REQUIRED'},{'cache-control':'no-store'});
+  }
+  const requestId=String(input.requestId||'').trim();
+  const stakeholderId=String(input.stakeholderId||'').trim();
+  const asset=String(input.asset||'').trim();
+  if(!requestId||!stakeholderId||!asset){
+    return json(res,400,{ok:false,error:'REQUEST_STAKEHOLDER_ASSET_REQUIRED'},{'cache-control':'no-store'});
+  }
+  try{
+    const lead=(await readSponsorInbox(session.token,250)).find(row=>row.requestId===requestId);
+    if(!lead||lead.linkState!=='REVIEW_REQUIRED'||lead.candidateStakeholderIds.length!==1||lead.candidateStakeholderIds[0]!==stakeholderId){
+      return json(res,409,{ok:false,error:'SOURCE_LINK_REVIEW_REQUIRED'},{'cache-control':'no-store'});
+    }
+    const detail=requireUpstreamSuccess(await callAppsScript('private.crm.detail',{id:stakeholderId},session.token),'Profilo CRM')||{};
+    const stakeholder=detail.stakeholder||{};
+    if(String(stakeholder.STAKEHOLDER_ID||'')!==stakeholderId||/SOSPESO|NO_CONTACT/i.test(String(stakeholder.CONTACT_POLICY||''))){
+      return json(res,409,{ok:false,error:'CRM_LINK_OR_POLICY_BLOCKED'},{'cache-control':'no-store'});
+    }
+    const result=await callAppsScript('private.crm.proposalDraft.create',{
+      requestId,stakeholderId,asset,objective:String(input.objective||''),associationReviewed:true,confirm:true
+    },session.token);
+    const data=requireUpstreamSuccess(result,'Salvataggio bozza sponsor')||{};
+    if(data.persisted!==true||!data.opportunityId)throw new Error('PERSISTENCE_NOT_CONFIRMED');
+    return json(res,200,{ok:true,data,source:'R20_COMMERCIALE_OPPORTUNITA',requiresApproval:true},{'cache-control':'no-store'});
+  }catch(e){
+    return json(res,502,{ok:false,error:String(e.message||'CRM_DRAFT_SAVE_UNAVAILABLE')},{'cache-control':'no-store'});
+  }
+}
+
 async function handleSponsorMailHealth(req,res){
   if(req.method!=='GET')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
   try{
@@ -981,6 +1019,7 @@ http.createServer(async(req,res)=>{
   if(u.pathname==='/api/sponsor/crm') return handleSponsorCrm(req,res,u);
   if(u.pathname==='/api/sponsor/lead-inbox') return handleSponsorLeadInbox(req,res);
   if(u.pathname==='/api/sponsor/proposal-draft') return handleSponsorProposalDraft(req,res);
+  if(u.pathname==='/api/sponsor/proposal-draft/save') return handleSponsorProposalDraftSave(req,res);
   if(u.pathname==='/api/sponsor/mail-health') return handleSponsorMailHealth(req,res);
   if(u.pathname==='/api/sponsor/motion-profiles') return handleSponsorMotionProfiles(req,res);
   if(u.pathname==='/api/sponsor/community') return handleSponsorCommunity(req,res);
