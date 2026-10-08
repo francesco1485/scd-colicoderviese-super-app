@@ -13,8 +13,8 @@ const getPort=()=>new Promise((resolve,reject)=>{
 const start=server=>new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
 const close=server=>new Promise(resolve=>server.close(resolve));
 
-test('GROW public lead -> canonical CRM candidate -> unpersisted review draft via live HTTP server',async()=>{
- const upstreamActions=[];
+test('GROW lead -> CRM -> reviewed proposal -> explicitly persisted draft via HTTP',async()=>{
+ const upstreamActions=[];const writePayloads=[];
  const upstream=http.createServer(async(req,res)=>{
    const chunks=[];for await(const chunk of req)chunks.push(chunk);
    const input=JSON.parse(Buffer.concat(chunks).toString('utf8')||'{}');
@@ -24,6 +24,10 @@ test('GROW public lead -> canonical CRM candidate -> unpersisted review draft vi
    else if(input.action==='auth.validate')data={user:owner};
    else if(input.action==='private.crm.leadInbox')data={requests:[request],stakeholders:[stakeholder]};
    else if(input.action==='private.crm.detail')data={stakeholder};
+   else if(input.action==='private.crm.proposalDraft.create'){
+     writePayloads.push(input.payload||{});
+     data={persisted:true,created:true,opportunityId:'OPP-QA-1',requestId:'REQ-QA-1',stakeholderId:'ST-QA-1',stage:'DA SVILUPPARE',deliveryState:'NOT_SENT',contractCreated:false};
+   }
    else {res.writeHead(400,{'content-type':'application/json'});return res.end(JSON.stringify({ok:false,error:'ACTION_NOT_MOCKED'}));}
    res.writeHead(200,{'content-type':'application/json'});res.end(JSON.stringify({ok:true,data}));
  });
@@ -74,7 +78,31 @@ test('GROW public lead -> canonical CRM candidate -> unpersisted review draft vi
    assert.equal(output.data.deliveryState,'NOT_SENT');
    assert.equal(output.data.stakeholderId,'ST-QA-1');
    assert.equal(output.data.amount,null);
-   assert.ok(upstreamActions.every(x=>['auth.login','auth.validate','private.crm.leadInbox','private.crm.detail'].includes(x)),'unexpected mutating action');
+   assert.ok(upstreamActions.every(x=>['auth.login','auth.validate','private.crm.leadInbox','private.crm.detail'].includes(x)),'preview must not trigger any mutation');
+   const noSessionSave=await fetch(base+'/api/sponsor/proposal-draft/save',{
+     method:'POST',headers:{'content-type':'application/json'},
+     body:JSON.stringify({requestId:'REQ-QA-1',stakeholderId:'ST-QA-1',confirm:true,associationReviewed:true,asset:'LED campo'})
+   });
+   assert.equal(noSessionSave.status,403,'saving requires existing R20 Sponsor session');
+   const unconfirmedSave=await fetch(base+'/api/sponsor/proposal-draft/save',{
+     method:'POST',headers:{...headers,'content-type':'application/json'},
+     body:JSON.stringify({requestId:'REQ-QA-1',stakeholderId:'ST-QA-1',confirm:false,associationReviewed:true,asset:'LED campo'})
+   });
+   assert.equal(unconfirmedSave.status,400,'saving requires explicit confirmation');
+   assert.equal(writePayloads.length,0);
+   const save=await fetch(base+'/api/sponsor/proposal-draft/save',{
+     method:'POST',headers:{...headers,'content-type':'application/json'},
+     body:JSON.stringify({requestId:'REQ-QA-1',stakeholderId:'ST-QA-1',confirm:true,associationReviewed:true,asset:'LED campo'})
+   });
+   assert.equal(save.status,200);
+   const saved=await save.json();
+   assert.equal(saved.data.persisted,true);
+   assert.equal(saved.data.opportunityId,'OPP-QA-1');
+   assert.equal(saved.data.deliveryState,'NOT_SENT');
+   assert.equal(saved.data.contractCreated,false);
+   assert.equal(writePayloads.length,1,'one canonical R20 mutation only');
+   assert.equal(writePayloads[0].confirm,true);
+   assert.equal(writePayloads[0].stakeholderId,'ST-QA-1');
  }finally{
    child.kill('SIGTERM');
    await close(upstream);
