@@ -255,7 +255,7 @@ for(const viewport of [{width:390,height:844},{width:1440,height:900}]){
     let data;
     if(action==='auth.login')data={token:'qa-private-token'};
     else if(action==='auth.validate')data={valid:true};
-    else if(action==='auth.access.log')data={ok:true};
+    else if(action==='auth.access.log')data={stored:true};
     else if(action==='auth.identity.resolve')data={matched:true,matchMethod:'QA_SYNTHETIC'};
     else if(action==='dashboard.summary')data=dashboard;
     else if(action==='private.user.workspace')data=workspace;
@@ -372,7 +372,7 @@ for(const roleCase of [
     const action=String(body.action||'');let data;
     if(action==='auth.login')data={token:roleCase.token};
     else if(action==='auth.validate')data={valid:true};
-    else if(action==='auth.access.log')data={ok:true};
+    else if(action==='auth.access.log')data={stored:true};
     else if(action==='auth.identity.resolve')data={matched:true,matchMethod:'QA_SYNTHETIC'};
     else if(action==='dashboard.summary')data=roleDashboard;
     else if(action==='private.user.workspace')data=roleWorkspace;
