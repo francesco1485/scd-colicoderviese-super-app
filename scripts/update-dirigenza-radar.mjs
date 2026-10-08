@@ -3,7 +3,7 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {createRequire} from 'node:module';
 const require=createRequire(import.meta.url);
-const {scanSourceHtml,mergeCandidates,normalizeSourceUrl}=require('../lib/scd-dirigenza-radar.js');
+const {scanSourceHtml,mergeCandidates,normalizeSourceUrl,diagnoseFetchFailure}=require('../lib/scd-dirigenza-radar.js');
 
 const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const config=JSON.parse(fs.readFileSync(path.join(ROOT,'config','scd-dirigenza-radar-sources.v1.json'),'utf8'));
@@ -18,6 +18,7 @@ const maxAttempts=3;
 async function scanOne(source){
   let lastError=null;
   let attempts=0;
+  const endpointFailures=[];
   const endpoints=[source.url,...(source.fallbackUrls||[])];
   for(const endpoint of [...new Set(endpoints)]){
     for(let attempt=1;attempt<=maxAttempts;attempt++){
@@ -46,7 +47,9 @@ async function scanOne(source){
         };
       }catch(error){
         lastError=error;
-        if(error?.permanent||attempt===maxAttempts)break;
+        const diagnostic=diagnoseFetchFailure(error);
+        endpointFailures.push({host:new URL(endpoint).hostname,attempt,...diagnostic});
+        if(error?.permanent||diagnostic.category==='DNS_FAILURE'||diagnostic.category==='TLS_FAILURE'||attempt===maxAttempts)break;
       }finally{clearTimeout(timer)}
       await wait(700*attempt);
     }
@@ -56,7 +59,10 @@ async function scanOne(source){
     health:{
       sourceId:source.id,status:'ERROR',checkedAt:now,
       error:String(lastError?.message||lastError),attempts,
-      attemptedEndpoints:endpoints.length
+      attemptedEndpoints:endpoints.length,
+      failureKind:diagnoseFetchFailure(lastError).category,
+      failureCode:diagnoseFetchFailure(lastError).code,
+      endpointFailures
     }
   };
 }
