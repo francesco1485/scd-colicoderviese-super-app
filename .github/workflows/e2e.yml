@@ -130,6 +130,12 @@ jobs:
         run: npm run test:resilience
       - run: npm install --no-save playwright
       - run: npx playwright install --with-deps chromium
+      - name: SCD Ecosystem interactive contract
+        run: npm run test:scd-ecosistema-interactive
+      - name: Build standalone SCD ecosystem review
+        run: node scripts/build-scd-ecosistema-preview.mjs
+      - name: Verify three live browser views and shared Sky assistant
+        run: node tests/scd-ecosistema-visual-qa.mjs
       - name: Gestionale Visual Foundation five-viewport QA
         run: node tests/gestionale-visual-foundation-visual.mjs
       - name: Build exact Pages artifact
