@@ -145,3 +145,34 @@ body.scd-reboot .primary-cta{background:var(--r-blue)!important;color:white!impo
  body[data-scd-theme] .home-secondary-hero{min-height:420px}
  body[data-scd-theme] #view-pulse .home-first-head h1{font-size:34px!important}
 }
+
+
+/* V2: a truly new information architecture, not recoloring the previous layout */
+body[data-scd-theme] .scd-control-deck{display:block;position:relative;margin-bottom:36px;padding:0;border:0;background:transparent;color:var(--r-ink)}
+.scd-control-heading{display:flex;justify-content:space-between;align-items:end;gap:28px;margin-bottom:24px}
+.scd-control-eyebrow{display:inline-flex;color:#1b59bf;font-size:11px;font-weight:900;letter-spacing:.17em;margin:0 0 13px}
+.scd-control-heading h1{font-weight:950;font-size:clamp(40px,6vw,88px);line-height:.93;letter-spacing:-.085em;margin:0!important;color:var(--r-deep)!important}
+.scd-control-heading h1 strong{font-weight:950;color:var(--r-blue)}
+.scd-control-heading p{font-size:15px;color:var(--r-muted);margin:17px 0 0}
+.scd-control-seal{display:flex;gap:16px;align-items:center;justify-content:flex-end;border:1px solid var(--r-line);border-radius:16px;padding:12px 18px;background:white;white-space:nowrap;font-size:11px;letter-spacing:.11em;font-weight:850;line-height:1.65}
+.scd-control-seal img{width:48px;height:56px;object-fit:contain}
+.scd-control-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.scd-control-card{display:flex;flex-direction:column;min-height:340px;padding:28px 27px 20px;border-radius:20px;position:relative;overflow:hidden;isolation:isolate;box-shadow:0 15px 36px rgba(16,32,54,.09);transition:transform .2s ease,box-shadow .2s ease}
+.scd-control-card:hover{transform:translateY(-4px);box-shadow:0 20px 45px rgba(16,32,54,.15)}
+.scd-control-card::after{content:"";position:absolute;z-index:-1;right:-60px;top:20px;width:230px;height:230px;opacity:.16;border-radius:100%;border:39px solid currentColor;transform:skew(-19deg)}
+.scd-control-one{background:#142c53;color:white}
+.scd-control-grow{background:#f5c537;color:#172439}
+.scd-control-core{background:#fff;color:#14243c;border:1px solid #d5e0ee}
+.scd-control-index{font-size:10px;font-weight:850;letter-spacing:.18em;opacity:.7}
+.scd-control-card h2{font-size:clamp(30px,3vw,47px);line-height:.99;letter-spacing:-.07em;margin:30px 0 15px;color:inherit!important;font-weight:950}
+.scd-control-card h2 em{font-style:normal;opacity:.68}
+.scd-control-card p{font-size:14px;line-height:1.55;max-width:260px;opacity:.78;margin:0 0 24px;color:inherit!important}
+.scd-control-card a,.scd-control-card button{display:flex;justify-content:space-between;align-items:center;gap:9px;margin-top:auto;width:100%;border-radius:12px;padding:14px 15px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.28);color:inherit!important;font-size:13px;font-weight:850;text-decoration:none;cursor:pointer}
+.scd-control-grow a{background:#142c53;border-color:#142c53;color:#fff!important}
+.scd-control-core button{background:#edf3fc;border-color:#d8e3f2}
+.scd-control-foot{border-top:1px solid currentColor;margin-top:21px;padding-top:13px;opacity:.55;font-size:10px;font-weight:850;letter-spacing:.09em}
+.scd-control-bottom{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:22px 0 0;color:#607188;font-size:11px;font-weight:850;letter-spacing:.09em}
+.scd-control-bottom button{border:0;background:var(--r-deep);color:white;border-radius:999px;padding:12px 18px;font-size:12px;font-weight:850;cursor:pointer}
+body[data-scd-theme] #view-pulse .home-first{margin-top:12px}
+@media(max-width:1150px){.scd-control-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.scd-control-core{grid-column:1/-1;min-height:260px}.scd-control-card{min-height:315px}}
+@media(max-width:720px){.scd-control-heading{align-items:start;flex-direction:column}.scd-control-seal{display:none}.scd-control-grid{grid-template-columns:1fr}.scd-control-core{grid-column:auto}.scd-control-card{min-height:270px;padding:23px}.scd-control-card h2{margin:18px 0 12px;font-size:39px}.scd-control-bottom{align-items:start;flex-direction:column}}
