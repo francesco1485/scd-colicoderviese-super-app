@@ -23,7 +23,8 @@ assert(visualLab.includes('data-scd-dirigenza-radar="true"'),'Direction radar vi
 assert(visualLab.includes('PENDING_VISUAL_APPROVAL'),'visual staging must stay pending human approval');
 assert(visualLab.includes('BANDI &amp; OPPORTUNITÀ'),'opportunity radar visual staging missing');
 assert(visualLab.includes('RADAR TERRITORIO · COLICO / DERVIO'),'territory radar visual staging missing');
-assert(visualLab.includes('CONFLITTO SCD NON VERIFICATO'),'calendar conflict must fail closed');
+assert(visualLab.includes('COORDINAMENTO ALTO')||visualLab.includes('STESSO GIORNO'),'calendar coordination signal missing after reconciliation');
+assert(!visualLab.includes('CONFLITTO SCD NON VERIFICATO'),'stale unreconciled calendar label must not remain after verified reconciliation');
 for(const item of snapshot.verifiedItems||[]){
   assert(item.sourceUrl?.startsWith('https://'),'verified item missing source URL '+item.id);
   assert(String(item.verification||'').startsWith('WEB_VERIFIED'),'verified item lacks verification state '+item.id);
