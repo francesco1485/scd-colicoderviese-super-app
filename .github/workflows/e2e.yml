@@ -37,6 +37,8 @@ jobs:
         run: npm run test:r54-private
       - name: R55 public content gate
         run: npm run test:r55-content
+      - name: CORE R56 fail-closed audit and private desk entry gate
+        run: npm run test:core-audit
       - name: R56 identity/calendar/internal gate
         run: npm run test:r56-internal
       - name: R56 identity/calendar core gate
@@ -47,6 +49,8 @@ jobs:
         run: npm run test:universe-contract
       - name: Human OS contract gate
         run: npm run test:human-os-contract
+      - name: Public calendar privacy and ID projection gate
+        run: node --test tests/public-calendar-projection.test.mjs
       - name: Weekly sport & AI newsroom contract gate
         run: npm run test:newsroom-contract
       - name: NextGen synthetic contract gate
