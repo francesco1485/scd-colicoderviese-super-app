@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const { URL } = require('url');
 const { issueIntakeToken, verifyIntakeToken } = require('./lib/intake-links');
+const {projectSponsorLeadInbox,prepareSponsorProposalDraft}=require('./lib/scd-sponsor-lead-workflow');
 
 const PORT = process.env.PORT || 10000;
 const ROOT = process.env.SCD_STATIC_DIR ? path.resolve(__dirname,process.env.SCD_STATIC_DIR) : __dirname;
@@ -54,7 +55,7 @@ function applyCors(req,res){
 
 const READ_ONLY_RETRY_ACTIONS = new Set([
   'public.feed','public.club','public.calendar','public.datafabric.contract',
-  'dashboard.summary','private.dashboard','private.week','account.requests','private.user.workspace','private.crm.summary','private.crm.detail','private.community.summary','private.communication.templates','private.communication.preview',
+  'dashboard.summary','private.dashboard','private.week','account.requests','private.user.workspace','private.crm.summary','private.crm.detail','private.crm.leadInbox','private.community.summary','private.communication.templates','private.communication.preview',
   'private.attendance.get','private.agenda.summary','private.development.summary','auth.validate','auth.identity.resolve','direction.access.metrics','direction.diagnostics',
   'direction.evolution','direction.datafabric.status'
 ]);
@@ -65,7 +66,7 @@ const UPSTREAM_WRITE_TIMEOUT_MS = Math.max(5000,Math.min(30000,Number(process.en
 const wait = ms => new Promise(resolve=>setTimeout(resolve,ms));
 
 const allowedActions = new Set([
-  'dashboard.summary','private.dashboard','private.week','account.requests','private.user.workspace','private.crm.summary','private.crm.detail','private.community.summary','private.communication.templates','private.communication.preview','private.communication.send','private.communication.health','private.agenda.summary','private.agenda.create','private.development.summary',
+  'dashboard.summary','private.dashboard','private.week','account.requests','private.user.workspace','private.crm.summary','private.crm.detail','private.crm.leadInbox','private.crm.proposalDraft.create','private.community.summary','private.communication.templates','private.communication.preview','private.communication.send','private.communication.health','private.agenda.summary','private.agenda.create','private.development.summary',
   'private.request.submit','private.transport.request','private.message.send',
   'private.convocation.create','private.convocation.reply',
   'private.attendance.get','private.attendance.save',
@@ -355,6 +356,82 @@ async function handleSponsorCrm(req,res,u){
     return json(res,403,{ok:false,error:e.message||'CRM_ACCESS_DENIED'});
   }
 }
+async function readSponsorInbox(token,limit=100){
+  const result=await callAppsScript('private.crm.leadInbox',{limit},token);
+  const data=requireUpstreamSuccess(result,'Richieste sponsor R20')||{};
+  if(!Array.isArray(data.requests)||!Array.isArray(data.stakeholders))throw new Error('CRM_LEAD_SOURCE_INVALID');
+  return projectSponsorLeadInbox(data.requests,data.stakeholders);
+}
+async function handleSponsorLeadInbox(req,res){
+  if(req.method!=='GET')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  try{
+    const session=await validateSponsorSession(req);
+    const rows=await readSponsorInbox(session.token,100);
+    return json(res,200,{ok:true,rows,readOnly:true,source:'R20_APP_PUBLIC_REQUESTS',linkPolicy:'MANUAL_REVIEW'},{'cache-control':'no-store'});
+  }catch(e){return json(res,403,{ok:false,error:String(e.message||'CRM_LEAD_INBOX_UNAVAILABLE')},{'cache-control':'no-store'})}
+}
+async function handleSponsorProposalDraft(req,res){
+  if(req.method!=='POST')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  try{
+    const session=await validateSponsorSession(req);
+    const input=JSON.parse(await readBody(req)||'{}');
+    if(input.associationReviewed!==true)return json(res,400,{ok:false,error:'REVIEW_REQUIRED'});
+    const leadId=String(input.requestId||'').trim();
+    const stakeholderId=String(input.stakeholderId||'').trim();
+    if(!leadId||!stakeholderId)return json(res,400,{ok:false,error:'SOURCE_IDS_REQUIRED'});
+    const leads=await readSponsorInbox(session.token,250);
+    const lead=leads.find(item=>item.requestId===leadId);
+    if(!lead)throw new Error('LEAD_NOT_FOUND');
+    if(!lead.candidateStakeholderIds.includes(stakeholderId))throw new Error('STAKEHOLDER_MISMATCH');
+    const detail=requireUpstreamSuccess(await callAppsScript('private.crm.detail',{id:stakeholderId},session.token),'Profilo CRM')||{};
+    const stakeholder=detail.stakeholder||{};
+    if(String(stakeholder.STAKEHOLDER_ID||'')!==stakeholderId)throw new Error('CRM_ID_MISMATCH');
+    const draft=prepareSponsorProposalDraft({
+      lead,stakeholder:{id:stakeholderId,name:stakeholder.NOME,contactPolicy:stakeholder.CONTACT_POLICY},
+      associationReviewed:true,asset:input.asset,objective:input.objective
+    });
+    return json(res,200,{ok:true,data:draft,message:'Bozza generata, NON salvata e NON inviata. Richiede revisione e registrazione nel CRM canonico.'},{'cache-control':'no-store'});
+  }catch(e){return json(res,403,{ok:false,error:String(e.message||'PROPOSAL_DRAFT_DENIED')},{'cache-control':'no-store'})}
+}
+
+async function handleSponsorProposalDraftSave(req,res){
+  if(req.method!=='POST')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  let session;
+  try{session=await validateSponsorSession(req)}
+  catch(e){return json(res,403,{ok:false,error:'SPONSOR_SESSION_REQUIRED'},{'cache-control':'no-store'})}
+  let input;
+  try{input=JSON.parse(await readBody(req)||'{}')}
+  catch{return json(res,400,{ok:false,error:'INVALID_REQUEST'},{'cache-control':'no-store'})}
+  if(input.confirm!==true||input.associationReviewed!==true){
+    return json(res,400,{ok:false,error:'EXPLICIT_REVIEW_AND_CONFIRM_REQUIRED'},{'cache-control':'no-store'});
+  }
+  const requestId=String(input.requestId||'').trim();
+  const stakeholderId=String(input.stakeholderId||'').trim();
+  const asset=String(input.asset||'').trim();
+  if(!requestId||!stakeholderId||!asset){
+    return json(res,400,{ok:false,error:'REQUEST_STAKEHOLDER_ASSET_REQUIRED'},{'cache-control':'no-store'});
+  }
+  try{
+    const lead=(await readSponsorInbox(session.token,250)).find(row=>row.requestId===requestId);
+    if(!lead||lead.linkState!=='REVIEW_REQUIRED'||lead.candidateStakeholderIds.length!==1||lead.candidateStakeholderIds[0]!==stakeholderId){
+      return json(res,409,{ok:false,error:'SOURCE_LINK_REVIEW_REQUIRED'},{'cache-control':'no-store'});
+    }
+    const detail=requireUpstreamSuccess(await callAppsScript('private.crm.detail',{id:stakeholderId},session.token),'Profilo CRM')||{};
+    const stakeholder=detail.stakeholder||{};
+    if(String(stakeholder.STAKEHOLDER_ID||'')!==stakeholderId||/SOSPESO|NO_CONTACT/i.test(String(stakeholder.CONTACT_POLICY||''))){
+      return json(res,409,{ok:false,error:'CRM_LINK_OR_POLICY_BLOCKED'},{'cache-control':'no-store'});
+    }
+    const result=await callAppsScript('private.crm.proposalDraft.create',{
+      requestId,stakeholderId,asset,objective:String(input.objective||''),associationReviewed:true,confirm:true
+    },session.token);
+    const data=requireUpstreamSuccess(result,'Salvataggio bozza sponsor')||{};
+    if(data.persisted!==true||!data.opportunityId)throw new Error('PERSISTENCE_NOT_CONFIRMED');
+    return json(res,200,{ok:true,data,source:'R20_COMMERCIALE_OPPORTUNITA',requiresApproval:true},{'cache-control':'no-store'});
+  }catch(e){
+    return json(res,502,{ok:false,error:String(e.message||'CRM_DRAFT_SAVE_UNAVAILABLE')},{'cache-control':'no-store'});
+  }
+}
+
 async function handleSponsorMailHealth(req,res){
   if(req.method!=='GET')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
   try{
@@ -940,6 +1017,9 @@ http.createServer(async(req,res)=>{
   if(u.pathname==='/api/sponsor/session') return handleSponsorSession(req,res,u);
   if(u.pathname==='/api/sponsor/logout') return handleSponsorLogout(req,res);
   if(u.pathname==='/api/sponsor/crm') return handleSponsorCrm(req,res,u);
+  if(u.pathname==='/api/sponsor/lead-inbox') return handleSponsorLeadInbox(req,res);
+  if(u.pathname==='/api/sponsor/proposal-draft') return handleSponsorProposalDraft(req,res);
+  if(u.pathname==='/api/sponsor/proposal-draft/save') return handleSponsorProposalDraftSave(req,res);
   if(u.pathname==='/api/sponsor/mail-health') return handleSponsorMailHealth(req,res);
   if(u.pathname==='/api/sponsor/motion-profiles') return handleSponsorMotionProfiles(req,res);
   if(u.pathname==='/api/sponsor/community') return handleSponsorCommunity(req,res);

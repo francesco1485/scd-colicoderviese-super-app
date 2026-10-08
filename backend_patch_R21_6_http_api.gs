@@ -79,6 +79,13 @@ function doPost(e) {
       case 'private.user.workspace':
         data = r216UserWorkspace_(token);
         break;
+      case 'private.crm.leadInbox':
+        data = r216SponsorLeadInbox_(token, payload);
+        break;
+      case 'private.crm.proposalDraft.create':
+        if (typeof r60CreateSponsorProposalDraft_ !== 'function') throw new Error('Modulo proposte R60 non installato');
+        data = r60CreateSponsorProposalDraft_(token, payload);
+        break;
       case 'private.crm.summary':
         data = r216CrmSummary_(token, payload);
         break;
@@ -204,8 +211,32 @@ function r216TypeFromKind_(kind) {
   return map[k] || 'CONTATTO';
 }
 
+/* Workbook authority verified against SCD_SYSTEM_MANIFEST source_registry.
+ * Requests and APP AUDIT belong to R20 Core; relational/commercial masters
+ * belong to SCD Operativo Pilota. Do not use the same-named request tab in Pilota.
+ */
+function r216CanonicalWorkbookId_(sheetName) {
+  var name = String(sheetName || '').trim().toUpperCase();
+  var operationalTabs = [
+    'UTENTI','UTENTI_AREE','STAKEHOLDERS_MASTER','TOUCHPOINTS_MASTER','TASKS_MASTER',
+    'COMMERCIALE_OPPORTUNITA','SPONSOR_CONTRATTI','INIZIATIVE_COMMERCIALI',
+    'FORNITORI_SPONSOR_RADAR','EMAIL_TEMPLATE','FIRME_RUOLI','MAIL_ARCHIVIO',
+    'DATA_LINEAGE','SOCIETA_PROFILE'
+  ];
+  if (operationalTabs.indexOf(name) >= 0) {
+    var configured = '';
+    if(typeof PropertiesService !== 'undefined' && typeof PropertiesService.getScriptProperties === 'function'){
+      configured = String(PropertiesService.getScriptProperties().getProperty('SCD_OPERATIVO_PILOTA_ID') || '').trim();
+    }
+    return configured || '1jb5Jt1ZYzJA-3oQd85AmwVhAoFQpBPfcsy4HupBzDFA';
+  }
+  var coreId = SCD && SCD.CORE_ID ? String(SCD.CORE_ID).trim() : '';
+  if (!coreId) throw new Error('R20 Core workbook non configurato.');
+  return coreId;
+}
+
 function r216AppendByHeader_(sheetName, data) {
-  var ss = SpreadsheetApp.openById(SCD.CORE_ID);
+  var ss = SpreadsheetApp.openById(r216CanonicalWorkbookId_(sheetName));
   var sh = ss.getSheetByName(sheetName);
   if (!sh) throw new Error('Foglio mancante: ' + sheetName);
   var headers = sh.getRange(1,1,1,sh.getLastColumn()).getDisplayValues()[0].map(String);
@@ -291,7 +322,7 @@ function r216CrmActor_(token) {
   return actor;
 }
 function r216CrmTable_(name) {
-  var t = table_(sheet_(SCD.CORE_ID, name));
+  var t = table_(sheet_(r216CanonicalWorkbookId_(name), name));
   return t && t.rows ? t.rows : [];
 }
 function r216CrmDateMs_(value) {
@@ -299,6 +330,30 @@ function r216CrmDateMs_(value) {
   var d = value instanceof Date ? value : new Date(value);
   return isNaN(d.getTime()) ? 0 : d.getTime();
 }
+/* SCD GROW: read only bridge to canonical sponsor requests and stakeholders. */
+function r216SponsorLeadInbox_(token,payload){
+  var actor=r216CrmActor_(token);
+  var mail=email_(actor.email||'');
+  var user=r216UserRow_(actor);
+  var role=r216Upper_([user.RUOLO||'',user['AREE PREVISTE']||'',user.DEFAULT_MODULES||'',actor.role||''].join(' '));
+  var active=r216Upper_(user.STATO||user.STATUS||'');
+  if(mail!=='sportclubcolico@gmail.com'&&(!user.EMAIL||active!=='ATTIVO'||!/DIREZIONE|ADMIN|COMMERCIALE|SPONSOR|MARKETING/.test(role)))throw new Error('SPONSOR_SCOPE_REQUIRED');
+  payload=payload||{};
+  var limit=Math.max(1,Math.min(250,Number(payload.limit||100)));
+  var requests=r216CrmTable_('APP PUBLIC REQUESTS').filter(function(r){
+    return r216Upper_(r.TYPE||'')==='SPONSOR';
+  }).slice(-limit).map(function(r){
+    return {
+      REQUEST_ID:r.REQUEST_ID,TYPE:r.TYPE,STATUS:r.STATUS,CREATED_AT:r.CREATED_AT,
+      NOME:r.NOME,EMAIL:r.EMAIL,TELEFONO:r.TELEFONO,OGGETTO:r.OGGETTO,CATEGORIA:r.CATEGORIA
+    };
+  });
+  var stakeholders=r216CrmTable_('STAKEHOLDERS_MASTER').map(function(r){
+    return {STAKEHOLDER_ID:r.STAKEHOLDER_ID,EMAIL:r.EMAIL,CONTACT_POLICY:r.CONTACT_POLICY};
+  });
+  return {requests:requests,stakeholders:stakeholders,readOnly:true,source:'R20',generatedAt:new Date()};
+}
+
 function r216CrmSummary_(token, payload) {
   r216CrmActor_(token);
   payload = payload || {};
