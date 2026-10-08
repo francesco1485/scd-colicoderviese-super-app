@@ -65,6 +65,8 @@ jobs:
         run: npm run test:r20-routing
       - name: Three-app ONE / GROW / CORE integration gate
         run: npm run test:cross-app
+      - name: Shared SKY grounded assistant permission gate
+        run: npm run test:sky-shared
       - name: Sponsor lead workflow and HTTP integration gate
         run: npm run test:grow-leads
       - name: Sponsor CRM and communication contract gate
