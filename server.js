@@ -6,6 +6,7 @@ const { issueIntakeToken, verifyIntakeToken } = require('./lib/intake-links');
 const { weekRange } = require('./lib/scd-one-pulse.js');
 const {filterActiveSCDTeamRows,filterPublicSCDPayload}=require('./lib/scd-season-status.js');
 const {buildTodayAttentionProjection}=require('./lib/scd-today-attention.js');
+const {buildDirectionHome}=require('./lib/scd-dirigenza-home.js');
 const {resolveCommand,validateCommandInput}=require('./lib/scd-command-grammar.js');
 const {
   tournamentSurface,
@@ -597,7 +598,8 @@ function directionRadarProjection(snapshot){
     verifiedItems:verified,
     candidates:candidates.map(x=>({...x,verification:'DISCOVERED_NEEDS_REVIEW'})),
     sourceHealth,
-    territoryStatus:Array.isArray(snapshot?.territoryStatus)?snapshot.territoryStatus:[]
+    territoryStatus:Array.isArray(snapshot?.territoryStatus)?snapshot.territoryStatus:[],
+    home:buildDirectionHome(snapshot)
   };
 }
 async function handleDirectionRadar(req,res){
