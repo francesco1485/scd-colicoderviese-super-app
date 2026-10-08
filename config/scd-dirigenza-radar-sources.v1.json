@@ -190,6 +190,137 @@
         "iniziativa"
       ],
       "territory": "DERVIO"
+    },
+    {
+      "id": "REGIONE_LOMBARDIA_ALL_BANDI",
+      "category": "OPPORTUNITIES",
+      "authority": "Regione Lombardia - Bandi e Servizi",
+      "url": "https://www.bandi.regione.lombardia.it/servizi/servizio/bandi/",
+      "trust": "PRIMARY_OFFICIAL",
+      "scanKeywords": [
+        "bando",
+        "contribut",
+        "finanziament",
+        "imprese",
+        "enti",
+        "associazioni",
+        "voucher"
+      ],
+      "audienceHints": [
+        "ASD_SSD",
+        "ASSOCIAZIONI",
+        "ETS",
+        "PIVA",
+        "IMPRESE",
+        "ENTI"
+      ]
+    },
+    {
+      "id": "REGIONE_LOMBARDIA_TERZO_SETTORE",
+      "category": "OPPORTUNITIES",
+      "authority": "Regione Lombardia - Terzo settore e volontariato",
+      "url": "https://www.bandi.regione.lombardia.it/servizi/servizio/bandi/terzo-settore-volontariato",
+      "trust": "PRIMARY_OFFICIAL",
+      "scanKeywords": [
+        "terzo settore",
+        "volontariato",
+        "associazioni",
+        "fondazioni",
+        "contribut",
+        "progetti"
+      ],
+      "audienceHints": [
+        "ETS",
+        "ASSOCIAZIONI",
+        "ENTI"
+      ]
+    },
+    {
+      "id": "CCIAA_COMO_LECCO_BANDI",
+      "category": "OPPORTUNITIES",
+      "authority": "Camera di Commercio di Como-Lecco",
+      "url": "https://comolecco.camcom.it/pagina478_bandi-ed-opportunit-aperti.html",
+      "trust": "PRIMARY_OFFICIAL",
+      "scanKeywords": [
+        "bando",
+        "voucher",
+        "contribut",
+        "impresa",
+        "innovazione",
+        "digitale",
+        "turismo",
+        "sostenibilità"
+      ],
+      "audienceHints": [
+        "PIVA",
+        "IMPRESE"
+      ]
+    },
+    {
+      "id": "FONDAZIONE_CARIPLO_BANDI",
+      "category": "OPPORTUNITIES",
+      "authority": "Fondazione Cariplo",
+      "url": "https://www.fondazionecariplo.it/contributi/bandi/",
+      "trust": "FOUNDATION_OFFICIAL",
+      "scanKeywords": [
+        "attivo",
+        "bando",
+        "contribut",
+        "terzo settore",
+        "giovani",
+        "benessere",
+        "cittadinanza",
+        "innovazione",
+        "territori"
+      ],
+      "audienceHints": [
+        "ETS",
+        "ASSOCIAZIONI",
+        "ENTI"
+      ]
+    },
+    {
+      "id": "COMUNE_DERVIO_NEWS_OPPORTUNITIES",
+      "category": "OPPORTUNITIES",
+      "authority": "Comune di Dervio",
+      "url": "https://www.comune.dervio.lc.it/it/news",
+      "trust": "PRIMARY_OFFICIAL",
+      "scanKeywords": [
+        "bando",
+        "contribut",
+        "avviso",
+        "impresa",
+        "associazioni",
+        "opportunità",
+        "manifestazione"
+      ],
+      "audienceHints": [
+        "ASSOCIAZIONI",
+        "PIVA",
+        "IMPRESE",
+        "ENTI"
+      ],
+      "territory": "DERVIO"
+    },
+    {
+      "id": "COMUNE_COLICO_TRANSPARENCY_CONTRIBUTI",
+      "category": "OPPORTUNITIES",
+      "authority": "Comune di Colico - Amministrazione Trasparente",
+      "url": "https://tecuting.halleylombardia.it/c097023/zf/index.php/trasparenza/index/index/categoria/449",
+      "trust": "PRIMARY_OFFICIAL",
+      "scanKeywords": [
+        "contribut",
+        "sovvenzioni",
+        "associazioni",
+        "vantaggi economici",
+        "avviso",
+        "manifestazione"
+      ],
+      "audienceHints": [
+        "ASSOCIAZIONI",
+        "ENTI"
+      ],
+      "territory": "COLICO"
     }
   ],
   "updateCadence": "DAILY",
