@@ -10,6 +10,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: scd-direction-radar-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   radar:
     runs-on: ubuntu-latest
@@ -23,18 +27,27 @@ jobs:
           node-version: 20
       - name: Validate radar contract
         run: npm run test:dirigenza-radar
-      - name: Dry-run discovery on feature branch push
-        if: github.event_name == 'push'
-        run: node scripts/update-dirigenza-radar.mjs --dry-run
-      - name: Update radar discovery snapshot
-        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+      - name: Refresh staged discovery and source health
+        if: >-
+          github.event_name == 'schedule' ||
+          github.event_name == 'workflow_dispatch' ||
+          (github.event_name == 'push' && !startsWith(github.event.head_commit.message, 'data: refresh direction radar discovery'))
         run: node scripts/update-dirigenza-radar.mjs
-      - name: Commit verified discovery delta
-        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+      - name: Validate refreshed radar snapshot
+        if: >-
+          github.event_name == 'schedule' ||
+          github.event_name == 'workflow_dispatch' ||
+          (github.event_name == 'push' && !startsWith(github.event.head_commit.message, 'data: refresh direction radar discovery'))
+        run: npm run test:dirigenza-radar
+      - name: Commit staged discovery delta
+        if: >-
+          github.event_name == 'schedule' ||
+          github.event_name == 'workflow_dispatch' ||
+          (github.event_name == 'push' && !startsWith(github.event.head_commit.message, 'data: refresh direction radar discovery'))
         shell: bash
         run: |
           if git diff --quiet -- data/scd-dirigenza-radar.snapshot.json; then
-            echo "No radar changes"
+            echo "No Radar changes"
             exit 0
           fi
           git config user.name "SCD Direction Radar"
