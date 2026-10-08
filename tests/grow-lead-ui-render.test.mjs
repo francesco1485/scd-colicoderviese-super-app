@@ -23,7 +23,8 @@ test('Sponsor protected CRM inbox binds all proposal buttons without DOM excepti
      {requestId:'REQ-QA-2',contactName:'Referente 2',email:'two@qa.test',topic:'Partnership',status:'NUOVA',companyHint:'Azienda 2',linkState:'REVIEW_REQUIRED',candidateStakeholderIds:['ST-2']}
    ],loading:false,error:''},
    $:selector=>selector==='#crmLeadInbox'?mount:null,
-   $$:selector=>selector==='[data-grow-proposal]'?elements:[],
+   $:selector=>selector==='[data-grow-proposal]'?elements:[],
+   document:{querySelectorAll:selector=>selector==='[data-grow-proposal]'?elements:[]},
    esc:s=>String(s??'').replaceAll('<','&lt;'),
    prepareGrowDraft:id=>{selected=id}
  };
