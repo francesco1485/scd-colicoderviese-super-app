@@ -1,0 +1,30 @@
+name: SCD Direction Home Read Model CI
+
+on:
+  push:
+    branches: ["feat/dirigenza-home-readmodel-v1"]
+  pull_request:
+    branches: ["feat/dirigenza-radar-v1"]
+
+permissions:
+  contents: read
+
+jobs:
+  direction-home:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Validate Home read model
+        run: npm run test:dirigenza-home
+      - name: Validate Radar contracts
+        run: npm run test:dirigenza-radar && npm run test:dirigenza-radar-api
+      - name: Validate system manifest
+        run: npm run test:manifest
+      - name: Full application build
+        run: npm run build
