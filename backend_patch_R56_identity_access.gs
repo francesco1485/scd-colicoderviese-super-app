@@ -246,11 +246,11 @@ function r56RecordAccess_(token, payload) {
   try {
     r216AppendByHeader_('APP AUDIT', {
       TIMESTAMP:new Date(),
+      EMAIL:String(actor.email || ''),
       ACTION:'ACCESS_' + eventType,
-      ACTOR_EMAIL:String(actor.email || ''),
-      RESULT:'RECORDED',
-      SOURCE:'R56',
-      CLIENT:clientKind
+      RESOURCE:'R56_ACCESS',
+      RECORD_ID:'',
+      DETAILS:JSON.stringify({clientKind:clientKind,result:'RECORDED'})
     });
   } catch (auditErr) {
     console.error('[R56 ACCESS AUDIT]', auditErr);
