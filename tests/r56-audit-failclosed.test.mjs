@@ -26,7 +26,14 @@ test('R56 confirms access only after canonical audit append',()=>{
   assert.equal(result.stored,true);
   assert.equal(entry.sheet,'APP AUDIT');
   assert.equal(entry.payload.ACTION,'ACCESS_PRIVATE_DESK_OPEN');
-  assert.equal(entry.payload.ACTOR_EMAIL,'tester@example.org');
+  // Verified against the real R20 Core APP AUDIT A1:J1 header (2026-10-08).
+  const realHeaders=['TIMESTAMP','EMAIL','ACTION','RESOURCE','RECORD_ID','TEAM','PLAYER_ID','OLD_VALUE','NEW_VALUE','DETAILS'];
+  const saved=Object.fromEntries(realHeaders.map(key=>[key,entry.payload[key]??'']));
+  assert.equal(saved.EMAIL,'tester@example.org');
+  assert.equal(saved.RESOURCE,'R56_ACCESS');
+  assert.equal(saved.ACTION,'ACCESS_PRIVATE_DESK_OPEN');
+  assert.equal(JSON.parse(saved.DETAILS).clientKind,'WEB');
+  assert.ok(!String(saved.DETAILS).includes('qa-token'),'never store auth tokens in audit details');
 });
 test('R56 denies unidentified actors and unapproved access event names',()=>{
   assert.throws(()=>runtime({append:()=>{},actor:{}}).call(),/Sessione non valida/);
