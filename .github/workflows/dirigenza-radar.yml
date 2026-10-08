@@ -27,6 +27,8 @@ jobs:
           node-version: 20
       - name: Validate radar contract
         run: npm run test:dirigenza-radar
+      - name: Diagnose official Colico upstream transport
+        run: node scripts/probe-colico-transport.mjs
       - name: Refresh staged discovery and source health
         if: >-
           github.event_name == 'schedule' ||
