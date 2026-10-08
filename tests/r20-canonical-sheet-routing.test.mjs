@@ -11,10 +11,10 @@ const ops=sources.get('SCD_OPERATIVO_PILOTA');
 
 const coreTabs=new Set(['APP PUBLIC REQUESTS','APP AUDIT','APP COMMERCIAL CRM']);
 const opsTabs=new Set(['UTENTI','UTENTI_AREE','STAKEHOLDERS_MASTER','TOUCHPOINTS_MASTER','TASKS_MASTER','COMMERCIALE_OPPORTUNITA','SPONSOR_CONTRATTI','INIZIATIVE_COMMERCIALI','FORNITORI_SPONSOR_RADAR','EMAIL_TEMPLATE','FIRME_RUOLI','MAIL_ARCHIVIO','DATA_LINEAGE','SOCIETA_PROFILE']);
-function runBridge(){
+function runBridge({operativoOverride=''}={}){
   const reads=[],writes=[];
   const tab=(id,name)=>{
-    const allowed=id===core?coreTabs:id===ops?opsTabs:new Set();
+    const allowed=id===core?coreTabs:(id===ops||id===operativoOverride)?opsTabs:new Set();
     if(!allowed.has(name))throw new Error('WRONG_WORKBOOK '+name+' in '+id);
     return {
       marker:id,name,
@@ -25,6 +25,7 @@ function runBridge(){
   };
   const sandbox={
     SCD:{CORE_ID:core},
+    PropertiesService:{getScriptProperties:()=>({getProperty:key=>key==='SCD_OPERATIVO_PILOTA_ID'?operativoOverride:''})},
     sheet_:(id,name)=>{reads.push({id,name});return tab(id,name)},
     table_:sheet=>({rows:[{marker:sheet.marker,name:sheet.name}]}),
     SpreadsheetApp:{openById:id=>({getSheetByName:name=>tab(id,name)})},
@@ -65,4 +66,14 @@ test('R20 keeps authentication audit writes on Core and rejects missing tables',
   assert.equal(writes[0].id,core);
   assert.equal(writes[0].values[3],'ACCESS_PRIVATE_DESK_OPEN');
   assert.throws(()=>sandbox.r216CrmTable_('UNMAPPED_UNKNOWN_TABLE'),/WRONG_WORKBOOK/);
+});
+
+test('R20 can read/write only to explicitly configured staging Operativo workbook override',()=>{
+ const qaId='QA-ISOLATED-OPERATIVO';
+ const {sandbox,writes}=runBridge({operativoOverride:qaId});
+ const result=sandbox.r216CrmTable_('STAKEHOLDERS_MASTER');
+ assert.equal(result[0].marker,qaId);
+ sandbox.r216AppendByHeader_('COMMERCIALE_OPPORTUNITA',{STAGE:'DA SVILUPPARE'});
+ assert.equal(writes[0].id,qaId);
+ assert.equal(sandbox.r216CrmTable_('APP AUDIT')[0].marker,core);
 });
