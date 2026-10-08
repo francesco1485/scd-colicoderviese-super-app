@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import {createRequire} from 'node:module';
 const require=createRequire(import.meta.url);
-const {extractAnchors,scanSourceHtml,mergeCandidates,diagnoseFetchFailure}=require('../lib/scd-dirigenza-radar.js');
+const {extractAnchors,scanSourceHtml,mergeCandidates,diagnoseFetchFailure,reconcileSourceHealth}=require('../lib/scd-dirigenza-radar.js');
 const fail=m=>{console.error('DIRIGENZA RADAR FAIL:',m);process.exit(1)};
 const assert=(c,m)=>{if(!c)fail(m)};
 const sources=JSON.parse(fs.readFileSync(new URL('../config/scd-dirigenza-radar-sources.v1.json',import.meta.url),'utf8'));
@@ -60,4 +60,16 @@ assert(diagnoseFetchFailure(new Error('fetch failed',{cause:dnsError})).category
 assert(diagnoseFetchFailure(Object.assign(new Error('timeout'),{name:'AbortError'})).category==='TIMEOUT','source timeout must be distinct');
 assert(diagnoseFetchFailure(new Error('HTTP_404')).category==='HTTP_CLIENT_ERROR','HTTP client errors must not be labeled network failures');
 assert(diagnoseFetchFailure(new Error('HTTP_503')).category==='HTTP_SERVER_ERROR','HTTP server errors must remain explicit');
+const sourceHealthy=[{sourceId:'COLICO',status:'OK',checkedAt:'2026-10-08T12:00:00Z'}];
+const first=reconcileSourceHealth(sourceHealthy,[]);
+assert(first[0].lastHealthyAt==='2026-10-08T12:00:00Z'&&first[0].consecutiveFailures===0,'health checkpoint must start with measured OK');
+const outage=reconcileSourceHealth([{sourceId:'COLICO',status:'ERROR',checkedAt:'2026-10-09T12:00:00Z',error:'fetch failed'}],first);
+assert(outage[0].status==='ERROR'&&outage[0].lastHealthyAt===first[0].lastHealthyAt,'outage must not masquerade as healthy');
+assert(outage[0].consecutiveFailures===1,'one consecutive failure expected');
+const retryOutage=reconcileSourceHealth([{sourceId:'COLICO',status:'ERROR',checkedAt:'2026-10-10T12:00:00Z'}],outage);
+assert(retryOutage[0].consecutiveFailures===2,'repeated failure must remain observable');
+const recovered=reconcileSourceHealth([{sourceId:'COLICO',status:'OK',checkedAt:'2026-10-11T12:00:00Z'}],retryOutage);
+assert(recovered[0].lastHealthyAt==='2026-10-11T12:00:00Z'&&recovered[0].consecutiveFailures===0,'recovery must reset failures');
+const neverChecked=reconcileSourceHealth([{sourceId:'NEW',status:'ERROR',checkedAt:'2026-10-11T12:00:00Z'}],[]);
+assert(neverChecked[0].lastHealthyAt===null,'do not invent last healthy timestamp');
 console.log('DIRIGENZA RADAR CONTRACT PASS',{sources:sources.sources.length,verifiedItems:snapshot.verifiedItems.length});
