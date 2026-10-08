@@ -18,35 +18,46 @@ const maxAttempts=3;
 async function scanOne(source){
   let lastError=null;
   let attempts=0;
-  for(let attempt=1;attempt<=maxAttempts;attempt++){
-    attempts=attempt;
-    const controller=new AbortController();
-    const timer=setTimeout(()=>controller.abort(),20000);
-    try{
-      const res=await fetch(source.url,{
-        headers:{'user-agent':'SCD-ColicoDerviese-Dirigenza-Radar/1.0 (+https://www.colicoderviese.it/)'},
-        signal:controller.signal
-      });
-      if(!res.ok){
-        const failure=new Error('HTTP_'+res.status);
-        failure.permanent=res.status>=400&&res.status<500&&res.status!==429;
-        throw failure;
-      }
-      const html=await res.text();
-      const items=scanSourceHtml(source,html);
-      return {
-        items,
-        health:{sourceId:source.id,status:'OK',checkedAt:now,httpStatus:res.status,discovered:items.length,attempts:attempt}
-      };
-    }catch(error){
-      lastError=error;
-      if(error?.permanent||attempt===maxAttempts)break;
-    }finally{clearTimeout(timer)}
-    await wait(700*attempt);
+  const endpoints=[source.url,...(source.fallbackUrls||[])];
+  for(const endpoint of [...new Set(endpoints)]){
+    for(let attempt=1;attempt<=maxAttempts;attempt++){
+      attempts++;
+      const controller=new AbortController();
+      const timer=setTimeout(()=>controller.abort(),20000);
+      try{
+        const res=await fetch(endpoint,{
+          headers:{'user-agent':'SCD-ColicoDerviese-Dirigenza-Radar/1.0 (+https://www.colicoderviese.it/)'},
+          signal:controller.signal
+        });
+        if(!res.ok){
+          const failure=new Error('HTTP_'+res.status);
+          failure.permanent=res.status>=400&&res.status<500&&res.status!==429;
+          throw failure;
+        }
+        const html=await res.text();
+        const items=scanSourceHtml({...source,url:endpoint},html);
+        return {
+          items,
+          health:{
+            sourceId:source.id,status:'OK',checkedAt:now,httpStatus:res.status,
+            discovered:items.length,attempts,effectiveUrl:endpoint,
+            fallbackUsed:endpoint!==source.url
+          }
+        };
+      }catch(error){
+        lastError=error;
+        if(error?.permanent||attempt===maxAttempts)break;
+      }finally{clearTimeout(timer)}
+      await wait(700*attempt);
+    }
   }
   return {
     items:[],
-    health:{sourceId:source.id,status:'ERROR',checkedAt:now,error:String(lastError?.message||lastError),attempts}
+    health:{
+      sourceId:source.id,status:'ERROR',checkedAt:now,
+      error:String(lastError?.message||lastError),attempts,
+      attemptedEndpoints:endpoints.length
+    }
   };
 }
 async function scanAll(sources,limit=4){
