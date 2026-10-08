@@ -1,0 +1,36 @@
+name: SCD Direction Radar Daily
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '15 6 * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  update-radar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Validate radar contract
+        run: npm run test:dirigenza-radar
+      - name: Update radar discovery snapshot
+        run: node scripts/update-dirigenza-radar.mjs
+      - name: Commit verified discovery delta
+        shell: bash
+        run: |
+          if git diff --quiet -- data/scd-dirigenza-radar.snapshot.json; then
+            echo "No radar changes"
+            exit 0
+          fi
+          git config user.name "SCD Direction Radar"
+          git config user.email "sportclubcolico@gmail.com"
+          git add data/scd-dirigenza-radar.snapshot.json
+          git commit -m "data: refresh direction radar discovery"
+          git push
