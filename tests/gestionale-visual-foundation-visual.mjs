@@ -54,6 +54,7 @@ async function checkVisibleTargets(page,name,width,context){
 async function runVisualQA(chromium){
   const html=inlineLab();
   fs.mkdirSync(outputDir,{recursive:true});
+  fs.writeFileSync(path.join(outputDir,'scd-universe-public-first-review-offline.html'),html,'utf8');
   const executablePath=process.env.SCD_CHROMIUM_EXECUTABLE||undefined;
   const headless=process.env.SCD_CHROMIUM_HEADED==='1'?false:true;
   const browser=await chromium.launch({headless,...(executablePath?{executablePath}:{}),args:executablePath?['--no-sandbox','--disable-dev-shm-usage','--disable-gpu','--no-first-run']:[]});
