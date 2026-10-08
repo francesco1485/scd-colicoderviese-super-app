@@ -3,7 +3,7 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {createRequire} from 'node:module';
 const require=createRequire(import.meta.url);
-const {scanSourceHtml,mergeCandidates,normalizeSourceUrl,diagnoseFetchFailure}=require('../lib/scd-dirigenza-radar.js');
+const {scanSourceHtml,mergeCandidates,normalizeSourceUrl,diagnoseFetchFailure,reconcileSourceHealth}=require('../lib/scd-dirigenza-radar.js');
 
 const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const config=JSON.parse(fs.readFileSync(path.join(ROOT,'config','scd-dirigenza-radar-sources.v1.json'),'utf8'));
@@ -80,7 +80,7 @@ async function scanAll(sources,limit=4){
 }
 
 const results=await scanAll(config.sources||[]);
-const sourceHealth=results.map(x=>x.health);
+const sourceHealth=reconcileSourceHealth(results.map(x=>x.health),previous.sourceHealth||[]);
 const verifiedUrls=new Set((previous.verifiedItems||[]).map(x=>
   normalizeSourceUrl(x.sourceUrl,{url:x.sourceUrl})||x.sourceUrl
 ));
