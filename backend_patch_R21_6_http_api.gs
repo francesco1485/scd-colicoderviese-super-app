@@ -207,8 +207,28 @@ function r216TypeFromKind_(kind) {
   return map[k] || 'CONTATTO';
 }
 
+/* Workbook authority verified against SCD_SYSTEM_MANIFEST source_registry.
+ * Requests and APP AUDIT belong to R20 Core; relational/commercial masters
+ * belong to SCD Operativo Pilota. Do not use the same-named request tab in Pilota.
+ */
+function r216CanonicalWorkbookId_(sheetName) {
+  var name = String(sheetName || '').trim().toUpperCase();
+  var operationalTabs = [
+    'UTENTI','UTENTI_AREE','STAKEHOLDERS_MASTER','TOUCHPOINTS_MASTER','TASKS_MASTER',
+    'COMMERCIALE_OPPORTUNITA','SPONSOR_CONTRATTI','INIZIATIVE_COMMERCIALI',
+    'FORNITORI_SPONSOR_RADAR','EMAIL_TEMPLATE','FIRME_RUOLI','MAIL_ARCHIVIO',
+    'DATA_LINEAGE','SOCIETA_PROFILE'
+  ];
+  if (operationalTabs.indexOf(name) >= 0) {
+    return '1jb5Jt1ZYzJA-3oQd85AmwVhAoFQpBPfcsy4HupBzDFA';
+  }
+  var coreId = SCD && SCD.CORE_ID ? String(SCD.CORE_ID).trim() : '';
+  if (!coreId) throw new Error('R20 Core workbook non configurato.');
+  return coreId;
+}
+
 function r216AppendByHeader_(sheetName, data) {
-  var ss = SpreadsheetApp.openById(SCD.CORE_ID);
+  var ss = SpreadsheetApp.openById(r216CanonicalWorkbookId_(sheetName));
   var sh = ss.getSheetByName(sheetName);
   if (!sh) throw new Error('Foglio mancante: ' + sheetName);
   var headers = sh.getRange(1,1,1,sh.getLastColumn()).getDisplayValues()[0].map(String);
@@ -294,7 +314,7 @@ function r216CrmActor_(token) {
   return actor;
 }
 function r216CrmTable_(name) {
-  var t = table_(sheet_(SCD.CORE_ID, name));
+  var t = table_(sheet_(r216CanonicalWorkbookId_(name), name));
   return t && t.rows ? t.rows : [];
 }
 function r216CrmDateMs_(value) {
