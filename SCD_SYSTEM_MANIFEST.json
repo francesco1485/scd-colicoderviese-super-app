@@ -3,8 +3,8 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.31.0",
-    "effective_at": "2026-10-07",
+    "version": "3.32.0",
+    "effective_at": "2026-10-08",
     "status": "BINDING",
     "language": "it-IT",
     "timezone": "Europe/Rome",
@@ -3071,6 +3071,34 @@
       "state": "DESIGN_ONLY",
       "product": "GESTIONALE",
       "contract": "SEMANTIC_SCENE_MODEL_RENDERER_INDEPENDENT_2D_FIRST_SIMULATION_READY"
+    },
+    {
+      "id": "CAP-DIRECTION-OPPORTUNITY-RADAR",
+      "domain": "DIRECTION_INTELLIGENCE",
+      "required": true,
+      "state": "PARTIAL",
+      "product": "GESTIONALE",
+      "sources": [
+        "REGIONE_LOMBARDIA",
+        "SPORT_E_SALUTE",
+        "SPORT_GOV_IT",
+        "INVITALIA",
+        "EU_SPORT"
+      ],
+      "contract": "DAILY_DISCOVERY_OFFICIAL_FIRST_DISCOVERED_NEEDS_REVIEW_NO_INVENTION_NO_AUTO_SUBMISSION"
+    },
+    {
+      "id": "CAP-DIRECTION-TERRITORY-RADAR",
+      "domain": "DIRECTION_INTELLIGENCE",
+      "required": true,
+      "state": "PARTIAL",
+      "product": "GESTIONALE",
+      "sources": [
+        "VISIT_COLICO",
+        "COMUNE_DERVIO",
+        "SCD_GOOGLE_CALENDAR"
+      ],
+      "contract": "DAILY_COLICO_DERVIO_EVENTS_OFFICIAL_FIRST_CALENDAR_CONFLICT_UNVERIFIED_UNTIL_RECONCILED"
     }
   ],
   "known_noncompliance": [
