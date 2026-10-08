@@ -6,6 +6,8 @@ assert(server.includes("DIRIGENZA_RADAR_SNAPSHOT"),'snapshot must be loaded by s
 assert(server.includes("async function handleDirectionRadar"),'Direction radar handler missing');
 assert(server.includes("await validateDirectionSession"),'Direction radar must require Direction session');
 assert(server.includes("'/api/direction/radar'"),'Direction radar API route missing');
+assert(server.includes("SCD_FEATURE_DIRECTION_RADAR"),'Direction radar feature flag missing');
+assert(server.includes("DIRECTION_RADAR_NOT_ENABLED"),'Direction radar must fail closed when feature flag is off');
 assert(server.includes("DISCOVERED_NEEDS_REVIEW"),'candidate projection must fail closed');
 assert(server.includes("'cache-control':'no-store'"),'Direction radar response must not be cached');
 assert(!server.includes("handleDirectionRadar(req,res){\n  return json(res,200"),'Direction radar cannot bypass auth');
