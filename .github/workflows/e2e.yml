@@ -47,6 +47,8 @@ jobs:
         run: npm run test:universe-contract
       - name: Human OS contract gate
         run: npm run test:human-os-contract
+      - name: Public calendar privacy and ID projection gate
+        run: node --test tests/public-calendar-projection.test.mjs
       - name: Weekly sport & AI newsroom contract gate
         run: npm run test:newsroom-contract
       - name: NextGen synthetic contract gate
