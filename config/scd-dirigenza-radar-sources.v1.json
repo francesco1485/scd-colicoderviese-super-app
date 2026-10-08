@@ -320,7 +320,10 @@
         "ASSOCIAZIONI",
         "ENTI"
       ],
-      "territory": "COLICO"
+      "territory": "COLICO",
+      "fallbackUrls": [
+        "https://tecuting.halleylombardia.it/c097023/zf/index.php/trasparenza/index/index/categoria/449"
+      ]
     }
   ],
   "updateCadence": "DAILY",
