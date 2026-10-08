@@ -3079,11 +3079,8 @@
       "state": "PARTIAL",
       "product": "GESTIONALE",
       "sources": [
-        "REGIONE_LOMBARDIA",
-        "SPORT_E_SALUTE",
-        "SPORT_GOV_IT",
-        "INVITALIA",
-        "EU_SPORT"
+        "WEB_VERIFIED",
+        "SPORT_E_SALUTE"
       ],
       "contract": "DAILY_DISCOVERY_OFFICIAL_FIRST_DISCOVERED_NEEDS_REVIEW_NO_INVENTION_NO_AUTO_SUBMISSION"
     },
@@ -3094,8 +3091,7 @@
       "state": "PARTIAL",
       "product": "GESTIONALE",
       "sources": [
-        "VISIT_COLICO",
-        "COMUNE_DERVIO",
+        "WEB_VERIFIED",
         "SCD_GOOGLE_CALENDAR"
       ],
       "contract": "DAILY_COLICO_DERVIO_EVENTS_OFFICIAL_FIRST_CALENDAR_CONFLICT_UNVERIFIED_UNTIL_RECONCILED"
