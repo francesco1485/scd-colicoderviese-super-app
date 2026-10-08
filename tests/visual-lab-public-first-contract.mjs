@@ -8,7 +8,7 @@ const js=read('docs/visual-lab/gestionale-foundation.js');
 const directives=JSON.parse(read('config/user-directives.v1.json'));
 const manifest=JSON.parse(read('SCD_SYSTEM_MANIFEST.json'));
 
-const publicStart=lab.indexOf('<section class="template" id="T01_PUBLIC_EDITORIAL"');
+const publicStart=lab.indexOf('id="T01_PUBLIC_EDITORIAL" data-scd-template="T01_PUBLIC_EDITORIAL"');
 const privateStart=lab.indexOf('<section class="template" id="T02_OPERATIONAL_HOME"');
 assert(publicStart>=0&&privateStart>publicStart,'public T01 must precede private T02');
 const publicSection=lab.slice(publicStart,privateStart);
