@@ -66,7 +66,7 @@ const UPSTREAM_WRITE_TIMEOUT_MS = Math.max(5000,Math.min(30000,Number(process.en
 const wait = ms => new Promise(resolve=>setTimeout(resolve,ms));
 
 const allowedActions = new Set([
-  'dashboard.summary','private.dashboard','private.week','account.requests','private.user.workspace','private.crm.summary','private.crm.detail','private.crm.leadInbox','private.community.summary','private.communication.templates','private.communication.preview','private.communication.send','private.communication.health','private.agenda.summary','private.agenda.create','private.development.summary',
+  'dashboard.summary','private.dashboard','private.week','account.requests','private.user.workspace','private.crm.summary','private.crm.detail','private.crm.leadInbox','private.crm.proposalDraft.create','private.community.summary','private.communication.templates','private.communication.preview','private.communication.send','private.communication.health','private.agenda.summary','private.agenda.create','private.development.summary',
   'private.request.submit','private.transport.request','private.message.send',
   'private.convocation.create','private.convocation.reply',
   'private.attendance.get','private.attendance.save',
