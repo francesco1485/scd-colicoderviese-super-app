@@ -1070,7 +1070,7 @@ $('#missionBtn')?.addEventListener('click',()=>{
 const mirror=$('#mirror');
 function openMirror(){mirror.classList.add('open');mirror.setAttribute('aria-hidden','false');const fab=$('#mirrorFab');if(fab)fab.hidden=true;setTimeout(()=>$('#mirrorInput')?.focus(),200)}
 function closeMirror(){mirror.classList.remove('open');mirror.setAttribute('aria-hidden','true');const fab=$('#mirrorFab');if(fab)fab.hidden=false}
-['#mirrorFab','#openMirrorFromCard','#openMirrorDesk','#ngMirrorQuick'].forEach(s=>$(s)?.addEventListener('click',openMirror));$('#closeMirror')?.addEventListener('click',closeMirror);
+['#mirrorFab','#openMirrorFromCard','#openMirrorDesk','#ngMirrorQuick','#scdDeckSky'].forEach(s=>$(s)?.addEventListener('click',openMirror));$('#closeMirror')?.addEventListener('click',closeMirror);
 function mirrorReply(q){
  const x=norm(q);
  if(/prossima partita|gara|match/.test(x)){const m=state.nextMatch;return m?'Prossima gara verificata: '+[m.team,m.opponent,fmtDate(m.date),m.time,m.venue].filter(Boolean).join(' · ')+'.':'La prossima partita non è ancora disponibile da una fonte verificata.'}
