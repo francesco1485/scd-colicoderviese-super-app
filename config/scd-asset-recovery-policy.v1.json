@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "SCD_ASSET_RECOVERY_POLICY",
+  "effectiveAt": "2026-10-08",
+  "authority": "DIREZIONE_SCD",
+  "rule": "NEVER_INVENT_WHEN_A_VERIFIED_OR_RECOVERABLE_ASSET_EXISTS",
+  "sourcePriority": [
+    "REPOSITORY_LOCKED_MASTER",
+    "GOOGLE_DRIVE_VERIFIED_ORIGINAL",
+    "CANVA_BRAND_KIT_OR_EXISTING_SCD_DESIGN_REFERENCE",
+    "GMAIL_ATTACHMENT_FROM_VERIFIED_OR_AUTHORIZED_SENDER",
+    "OFFICIAL_ENTITY_WEBSITE_OR_OFFICIAL_SOCIAL_ACCOUNT",
+    "MANUAL_USER_SUPPLIED_ASSET"
+  ],
+  "scdOfficialLogoRecovery": {
+    "runtimeMaster": [
+      "assets/logo-scd.png",
+      "assets/logo-scd.webp"
+    ],
+    "verifiedDriveCandidates": [
+      "01_LOGO_SCD_COLICODERVIESE_2026_27.png",
+      "SCD_COLICODERVIESE_LOGO_UFFICIALE.png",
+      "SCD ColicoDerviese - LOGO ORIGINALE.png",
+      "Logo_SCD_Colicoderviese_originale - Copia.png"
+    ],
+    "rule": "USE_LOCKED_RUNTIME_MASTER_UNLESS_DIREZIONE_APPROVES_A_NEWER_VERIFIED_MASTER"
+  },
+  "federationAndAffiliationRecovery": {
+    "lnd": [
+      "02_LOGO_LND_FIGC_2026.png",
+      "LND_LOGO_UFFICIALE.png",
+      "lnd_logo ufficiale 2026 - Copia.png"
+    ],
+    "sgs": [
+      "03_LOGO_FIGC_SGS_3_LIVELLO_2026_27.jpg",
+      "logo-3-livello ufficiale.jpg"
+    ],
+    "monza": [
+      "04_LOGO_INSIEME_AL_MONZA_2026_27.png",
+      "MONZA_AFFILIAZIONE_LOGO_UFFICIALE.png",
+      "LOGO DA USARE PER MONZA AFFILIAZIONE SEMPRE.png"
+    ],
+    "rule": "VERIFY_CURRENT_AUTHORIZATION_AND_VALIDITY_BEFORE_PUBLIC_USE"
+  },
+  "sponsorAndThirdPartyRecovery": {
+    "drivePatternExamples": [
+      "*_LOGO_ORIGINALE.*",
+      "*_03_LOGO_IN_USO.*",
+      "elenco sponsor*"
+    ],
+    "gmailPatternExamples": [
+      "subject:logo has:attachment",
+      "subject:sponsor has:attachment"
+    ],
+    "examplesObserved": [
+      "HDI_MAGLIA_LOGO_ORIGINALE.png",
+      "LEGEA_03_LOGO_IN_USO.png",
+      "IPERAL_03_LOGO_IN_USO.png",
+      "nuovo logo ATV outline grigio.pdf",
+      "LOGO_BCC_VALSASSINA_COLORE_CMYK - 2023.pdf"
+    ],
+    "rule": "DO_NOT_PUBLISH_OR_REGISTER_AS_CONFIRMED_UNLESS_SOURCE_AND_COMMERCIAL_STATUS_ARE_VERIFIED"
+  },
+  "canva": {
+    "brandKitObserved": true,
+    "brandKitId": "kAGFVPDPiAE",
+    "use": "VISUAL_REFERENCE_AND_APPROVED_TEMPLATE_SOURCE_ONLY",
+    "rule": "CANVA_DOES_NOT_OVERRIDE_LOCKED_LOGO_MASTERS"
+  },
+  "fallback": "UNVERIFIED_NEUTRAL_PLACEHOLDER_OR_OMIT",
+  "prohibited": [
+    "AI_REDRAW_OF_OFFICIAL_LOGO",
+    "SEARCH_ENGINE_LOGO_AS_MASTER_WHEN_VERIFIED_FILE_EXISTS",
+    "SPONSOR_LOGO_FROM_MEMORY",
+    "UNVERIFIED_PARTNERSHIP_STATUS",
+    "SILENT_ASSET_SUBSTITUTION"
+  ]
+}
