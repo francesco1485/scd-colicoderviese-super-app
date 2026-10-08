@@ -57,6 +57,10 @@ jobs:
         run: npm run test:intake-contract
       - name: Intake signed link security gate
         run: npm run test:intake-links
+      - name: R20 canonical workbook routing regression gate
+        run: npm run test:r20-routing
+      - name: Sponsor lead workflow and HTTP integration gate
+        run: npm run test:grow-leads
       - name: Sponsor CRM and communication contract gate
         run: npm run test:crm-communication
       - name: Sponsor vision contract gate
