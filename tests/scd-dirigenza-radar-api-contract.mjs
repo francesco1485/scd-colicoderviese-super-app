@@ -1,0 +1,12 @@
+import fs from 'node:fs';
+const server=fs.readFileSync(new URL('../server.js',import.meta.url),'utf8');
+const fail=m=>{console.error('DIRECTION RADAR API CONTRACT FAIL:',m);process.exit(1)};
+const assert=(c,m)=>{if(!c)fail(m)};
+assert(server.includes("DIRIGENZA_RADAR_SNAPSHOT"),'snapshot must be loaded by server');
+assert(server.includes("async function handleDirectionRadar"),'Direction radar handler missing');
+assert(server.includes("await validateDirectionSession"),'Direction radar must require Direction session');
+assert(server.includes("'/api/direction/radar'"),'Direction radar API route missing');
+assert(server.includes("DISCOVERED_NEEDS_REVIEW"),'candidate projection must fail closed');
+assert(server.includes("'cache-control':'no-store'"),'Direction radar response must not be cached');
+assert(!server.includes("handleDirectionRadar(req,res){\n  return json(res,200"),'Direction radar cannot bypass auth');
+console.log('DIRECTION RADAR API CONTRACT PASS');
