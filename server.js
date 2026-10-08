@@ -5,6 +5,32 @@ const { URL } = require('url');
 const { issueIntakeToken, verifyIntakeToken } = require('./lib/intake-links');
 const { projectPublicCalendar } = require('./lib/scd-public-calendar-projection');
 const { answerSky } = require('./lib/scd-sky-assistant');
+const {timingSafeEqual}=require('node:crypto');
+const {createIsolatedPreviewR20}=require('./lib/scd-isolated-preview-r20');
+const ISOLATED_PREVIEW=process.env.SCD_ISOLATED_PREVIEW==='true';
+const PREVIEW_PASSWORD=String(process.env.SCD_PREVIEW_PASSWORD||'');
+const PREVIEW_TEST_PIN=String(process.env.SCD_PREVIEW_TEST_PIN||'');
+if(ISOLATED_PREVIEW&&(PREVIEW_PASSWORD.length<20||PREVIEW_TEST_PIN.length<12)){
+  throw new Error('Isolated staging requires an independent preview password and synthetic test PIN');
+}
+const previewR20=ISOLATED_PREVIEW?createIsolatedPreviewR20({pin:PREVIEW_TEST_PIN}):null;
+function previewAuthorized(req){
+  if(!ISOLATED_PREVIEW)return true;
+  const raw=String(req.headers.authorization||'');
+  if(!/^Basic [a-z0-9+/=]+$/i.test(raw))return false;
+  let received='';
+  try{received=Buffer.from(raw.slice(6),'base64').toString('utf8')}catch{return false}
+  const expected=Buffer.from('scd-preview:'+PREVIEW_PASSWORD);
+  const actual=Buffer.from(received);
+  return actual.length===expected.length&&timingSafeEqual(actual,expected);
+}
+const PREVIEW_API_ACTIONS=new Set([
+  '/api/time','/api/core-status','/api/capabilities','/api/preview/status',
+  '/api/public','/api/newsroom','/api/sky/ask','/api/scd',
+  '/api/sponsor/lead','/api/sponsor/login','/api/sponsor/session',
+  '/api/sponsor/logout','/api/sponsor/crm','/api/sponsor/lead-inbox',
+  '/api/sponsor/proposal-draft','/api/sponsor/proposal-draft/save'
+]);
 const {projectSponsorLeadInbox,prepareSponsorProposalDraft}=require('./lib/scd-sponsor-lead-workflow');
 
 const PORT = process.env.PORT || 10000;
@@ -568,6 +594,12 @@ async function serveSponsorPrivate(req,res,u){
 function decodeXml(s=''){return String(s).replace(/<!\[CDATA\[|\]\]>/g,'').replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>')}
 
 async function callAppsScript(action,payload={},sessionToken=''){
+  // In isolated preview this is the *only* upstream: absolutely no network request.
+  if(previewR20){
+    const parsed=previewR20.action(action,payload,sessionToken);
+    const status=parsed.ok===true?200:403;
+    return {upstream:{ok:parsed.ok===true,status},parsed,attempt:1};
+  }
   const maxAttempts=READ_ONLY_RETRY_ACTIONS.has(action)?UPSTREAM_READ_ATTEMPTS:1;
   let lastError;
   for(let attempt=1;attempt<=maxAttempts;attempt++){
@@ -605,7 +637,7 @@ async function proxyAppsScript(req,res){
     const raw = await readBody(req); const body = JSON.parse(raw||'{}'); const action=String(body.action||''); const started=Date.now(); console.log('[api/scd] incoming',action,req.headers.origin||'server');
     if(!allowedActions.has(action)) return json(res,400,{ok:false,error:'Azione non consentita'});
     const {upstream,parsed,attempt}=await callAppsScript(action,body.payload||{},body.sessionToken||'');
-    console.log('[api/scd] upstream',action,upstream.status,(Date.now()-started)+'ms','attempt',attempt); return json(res,upstream.ok?200:400,parsed);
+    console.log('[api/scd] upstream',action,upstream.status,(Date.now()-started)+'ms','attempt',attempt); return json(res,ISOLATED_PREVIEW?upstream.status:(upstream.ok?200:400),parsed);
   }catch(e){console.error('[api/scd] failed',e.message||e);return json(res,502,{ok:false,error:e.message||'Backend SCD non disponibile'})}
 }
 
@@ -1004,6 +1036,15 @@ function serveStatic(req,res,overridePath){
     fs.stat(target,(err2,st2)=>{
       if(err2||!st2.isFile()){res.writeHead(404);return res.end('Not found')}
       const ext=path.extname(target).toLowerCase();
+      if(ISOLATED_PREVIEW&&ext==='.html'){
+        return fs.readFile(target,'utf8',(readErr,html)=>{
+          if(readErr)return json(res,500,{ok:false,error:'PREVIEW_HTML_UNAVAILABLE'});
+          const ribbon='<div role="status" id="scd-preview-banner" style="position:sticky;top:0;z-index:2147483000;text-align:center;background:#1b1b24;color:#ffffff;padding:11px;font:600 13px system-ui">COLLAUDO SCD · DATI SINTETICI · NESSUNA OPERAZIONE REALE</div>';
+          const marked=html.replace(/<body([^>]*)>/i,(matched)=>matched+ribbon);
+          res.writeHead(200,{'content-type':mime[ext],'cache-control':'no-store','x-robots-tag':'noindex, nofollow'});
+          return res.end(marked);
+        });
+      }
       const cache=/\.(png|jpg|jpeg|webp|svg)$/.test(ext)?'public, max-age=86400':'no-store';
       res.writeHead(200,{'content-type':mime[ext]||'application/octet-stream','cache-control':cache});
       fs.createReadStream(target).pipe(res)
@@ -1012,11 +1053,22 @@ function serveStatic(req,res,overridePath){
 }
 
 http.createServer(async(req,res)=>{
-  applyCors(req,res); if(req.method==='OPTIONS'){res.writeHead(204);return res.end()}
+  applyCors(req,res);
   const u=new URL(req.url,'http://localhost');
-  if(u.pathname==='/health') return json(res,200,{...clubTimePayload(),service:'SCD Super App',version:'40.0.0',commit:DEPLOY_COMMIT});
+  if(ISOLATED_PREVIEW&&u.pathname!=='/health'&&!previewAuthorized(req)){
+    res.writeHead(401,{'www-authenticate':'Basic realm="SCD collaudo isolato", charset="UTF-8"','cache-control':'no-store','x-robots-tag':'noindex, nofollow'});
+    return res.end('Accesso collaudo SCD richiesto');
+  }
+  if(req.method==='OPTIONS'){res.writeHead(204);return res.end()}
+  if(ISOLATED_PREVIEW&&u.pathname.startsWith('/api/')&&!PREVIEW_API_ACTIONS.has(u.pathname)){
+    return json(res,403,{ok:false,error:'PREVIEW_OPERATION_DISABLED'});
+  }
+  if(ISOLATED_PREVIEW&&u.pathname==='/api/preview/status'){
+    return json(res,200,{ok:true,...previewR20.status()});
+  }
+  if(u.pathname==='/health') return json(res,200,{...clubTimePayload(),service:'SCD Super App',version:'40.0.0',commit:DEPLOY_COMMIT,isolatedPreview:ISOLATED_PREVIEW});
   if(u.pathname==='/api/time') return json(res,200,clubTimePayload());
-  if(u.pathname==='/api/capabilities') return json(res,200,{ok:true,version:'40.0.0',mode:'GITHUB_PAGES_RENDER_R20_SUPABASE_DUAL_RUN',actions:[...allowedActions].sort(),featureFlags:FEATURE_FLAGS,domainCore:SUPABASE_RUNTIME,isolated:['safeguarding']});
+  if(u.pathname==='/api/capabilities') return json(res,200,{ok:true,version:'40.0.0',mode:ISOLATED_PREVIEW?'ISOLATED_STAGING_SYNTHETIC':'GITHUB_PAGES_RENDER_R20_SUPABASE_DUAL_RUN',actions:ISOLATED_PREVIEW?['public.calendar','public.feed','dashboard.summary','auth.login','auth.validate','auth.access.log','private.crm.summary','private.crm.detail','private.crm.leadInbox','private.crm.proposalDraft.create']:[...allowedActions].sort(),featureFlags:FEATURE_FLAGS,domainCore:SUPABASE_RUNTIME,isolated:['safeguarding']});
   if(u.pathname==='/api/core-status') return json(res,200,{ok:true,version:'40.0.0',featureFlags:FEATURE_FLAGS,domainCore:SUPABASE_RUNTIME,currentPrimary:'R20',targetPrimary:'SCD_SUPABASE'});
   if(u.pathname==='/api/public/donation-config') return handleDonationConfig(req,res);
   if(u.pathname==='/api/public/donation-intent') return handleDonationIntent(req,res);
