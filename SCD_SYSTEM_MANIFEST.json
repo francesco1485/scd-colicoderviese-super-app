@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.27.0",
+    "version": "3.27.1",
     "effective_at": "2026-10-03",
     "status": "BINDING",
     "language": "it-IT",
@@ -4247,6 +4247,33 @@
         "minor_rule": "NO_UNSUPERVISED_1TO1",
         "transport": "EXISTING_R20_TEAM_MESSAGE_INFRASTRUCTURE"
       }
+    },
+    "sponsor_lead_inbox_content_first": {
+      "release": "CONTENT_FIRST_2026_10_08",
+      "state": "STAGED_R20_INSTALLATION_AND_PRODUCTION_AUTH_TEST_REQUIRED",
+      "runtime_primary": "R20",
+      "source_tables": [
+        "APP PUBLIC REQUESTS",
+        "STAKEHOLDERS_MASTER"
+      ],
+      "source_action": "private.crm.leadInbox",
+      "existing_auth": "R20_AUTH_VALIDATE_SPONSOR_ROLE",
+      "api_routes": [
+        "/api/sponsor/lead-inbox",
+        "/api/sponsor/proposal-draft"
+      ],
+      "privacy": "PUBLIC_LEADS_READABLE_ONLY_BY_VERIFIED_SPONSOR_OPERATOR",
+      "association_policy": "CANDIDATES_BY_EXACT_EMAIL_ONLY_MANUAL_CONFIRMATION_REQUIRED",
+      "draft_policy": "DRAFT_PENDING_APPROVAL_NOT_STORED_NOT_SENT",
+      "prohibited": [
+        "AUTO_CREATE_STAKEHOLDER",
+        "AUTO_MERGE_COMPANIES",
+        "AUTO_SEND_PROPOSAL",
+        "INVENT_COMMERCIAL_VALUES",
+        "DUPLICATE_CRM"
+      ],
+      "activation_gate": "R20_BRIDGE_DEPLOYED_AND_AUTHORIZED_STAGING_E2E_WITH_AUDIT",
+      "rollback": "DO_NOT_DEPLOY_OR_REVERT_STAGED_API_AND_R20_BRIDGE"
     }
   },
   "research_intelligence": {
