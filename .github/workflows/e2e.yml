@@ -39,6 +39,8 @@ jobs:
         run: npm run test:r55-content
       - name: R56 identity/calendar/internal gate
         run: npm run test:r56-internal
+      - name: CORE R56 fail-closed audit and private desk entry gate
+        run: npm run test:core-audit
       - name: R56 identity/calendar core gate
         run: npm run test:r56-core
       - name: R56 calendar fusion gate

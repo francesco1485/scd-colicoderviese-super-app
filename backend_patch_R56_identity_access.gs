@@ -242,19 +242,19 @@ function r56RecordAccess_(token, payload) {
   if (allowedEvents.indexOf(eventType) < 0) throw new Error('Evento accesso non ammesso');
   var clientKind = String(payload.clientKind || 'WEB').toUpperCase();
   if (['WEB','PWA','ANDROID','IOS','UNKNOWN'].indexOf(clientKind) < 0) clientKind = 'UNKNOWN';
+  if (typeof r216AppendByHeader_ !== 'function') throw new Error('AUDIT_STORE_UNAVAILABLE');
   try {
-    if (typeof r216AppendByHeader_ === 'function') {
-      r216AppendByHeader_('APP AUDIT', {
-        TIMESTAMP:new Date(),
-        ACTION:'ACCESS_' + eventType,
-        ACTOR_EMAIL:String(actor.email || ''),
-        RESULT:'RECORDED',
-        SOURCE:'R56',
-        CLIENT:clientKind
-      });
-    }
+    r216AppendByHeader_('APP AUDIT', {
+      TIMESTAMP:new Date(),
+      EMAIL:String(actor.email || ''),
+      ACTION:'ACCESS_' + eventType,
+      RESOURCE:'R56_ACCESS',
+      RECORD_ID:'',
+      DETAILS:JSON.stringify({clientKind:clientKind,result:'RECORDED'})
+    });
   } catch (auditErr) {
     console.error('[R56 ACCESS AUDIT]', auditErr);
+    throw new Error('AUDIT_WRITE_FAILED');
   }
   return {stored:true,eventType:eventType,clientKind:clientKind};
 }
