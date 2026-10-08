@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "id": "SCD_DIRIGENZA_RADAR_SNAPSHOT",
-  "generatedAt": "2026-10-08T09:30:00Z",
+  "generatedAt": "2026-10-08T11:00:00Z",
   "verifiedAt": "2026-10-08",
   "mode": "VERIFIED_SEED_PLUS_DAILY_DISCOVERY",
   "verifiedItems": [
@@ -249,6 +249,67 @@
           "U16 casa 18:00"
         ]
       }
+    },
+    {
+      "id": "OPP-RL-TERZO-SETTORE-2026-2028",
+      "category": "OPPORTUNITIES",
+      "title": "Terzo settore Triennio 2026-2028",
+      "authority": "Regione Lombardia",
+      "sourceId": "REGIONE_LOMBARDIA_TERZO_SETTORE",
+      "sourceUrl": "https://www.bandi.regione.lombardia.it/servizi/servizio/bandi/dettaglio/politiche-sociali/terzo-settore-volontariato/terzo-settore-triennio-2026-2028-RLJ12026054688",
+      "status": "OPEN",
+      "closesAt": "2026-10-16T17:00:00+02:00",
+      "code": "RLJ12026054688",
+      "audiences": [
+        "ETS",
+        "ODV",
+        "APS",
+        "FONDAZIONI_TERZO_SETTORE"
+      ],
+      "relevance": "MEDIUM",
+      "relevanceReason": "Opportunità territoriale per soggetti del Terzo Settore; SCD non va considerata automaticamente ammissibile senza verifica della propria qualifica giuridica/RUNTS o di un partenariato ammissibile.",
+      "verification": "WEB_VERIFIED_PRIMARY_SOURCE",
+      "calendarConflict": "NOT_APPLICABLE"
+    },
+    {
+      "id": "OPP-RL-VOLONTARIATO-TERRITORIO",
+      "category": "OPPORTUNITIES",
+      "title": "Volontariato e Territorio - sviluppo e trasformazione per il Terzo settore in Lombardia",
+      "authority": "Regione Lombardia",
+      "sourceId": "REGIONE_LOMBARDIA_TERZO_SETTORE",
+      "sourceUrl": "https://www.bandi.regione.lombardia.it/servizi/servizio/bandi/dettaglio/politiche-sociali/terzo-settore-volontariato/avviso-pubblico-volontariato-territorio-sviluppo-trasformazione-l-empowerment-promozione-terzo-settore-lombardia-RLD12025048623",
+      "status": "OPEN",
+      "closesAt": "2027-04-23T12:00:00+02:00",
+      "resourcesEur": 7000000,
+      "supportType": "GRANT",
+      "audiences": [
+        "ETS",
+        "NON_PROFIT_ASSOCIATIONS",
+        "FOUNDATIONS"
+      ],
+      "relevance": "MEDIUM",
+      "relevanceReason": "Potenziale interesse per innovazione organizzativa, digitale e reti non profit; ammissibilità SCD da verificare formalmente prima di qualsiasi candidatura.",
+      "verification": "WEB_VERIFIED_PRIMARY_SOURCE",
+      "calendarConflict": "NOT_APPLICABLE"
+    },
+    {
+      "id": "OPP-CCIAA-COMO-LECCO-AI-2026",
+      "category": "OPPORTUNITIES",
+      "title": "Bando Voucher AI - Edizione 2026",
+      "authority": "Camera di Commercio di Como-Lecco",
+      "sourceId": "CCIAA_COMO_LECCO_BANDI",
+      "sourceUrl": "https://www.comolecco.camcom.it/archivio27_bandi-opportunita_0_189.html",
+      "status": "OPEN",
+      "opensAt": "2026-04-15T09:00:00+02:00",
+      "closesAt": "2026-12-31T23:59:00+01:00",
+      "resourcesEur": 200000,
+      "audiences": [
+        "MPMI_COMO_LECCO"
+      ],
+      "relevance": "MEDIUM",
+      "relevanceReason": "Pertinente a eventuali imprese/partner del territorio e progetti di digitalizzazione; non è automaticamente un bando per ASD.",
+      "verification": "WEB_VERIFIED_PRIMARY_SOURCE",
+      "calendarConflict": "NOT_APPLICABLE"
     }
   ],
   "territoryStatus": [
