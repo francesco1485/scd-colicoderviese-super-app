@@ -173,3 +173,7 @@ jobs:
           path: test-output/*
           if-no-files-found: ignore
           retention-days: 14
+
+      - name: Gestionale Visual Foundation contract gate
+        run: npm run test:gestionale-visual-foundation
+
