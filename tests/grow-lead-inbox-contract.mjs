@@ -31,3 +31,11 @@ test('GROW proposal preview verifies CRM record and never persists/sends',()=>{
  assert.match(client,/window\.confirm/);
  assert.match(client,/BOZZA NON SALVATA/);
 });
+
+test('GROW UI saves only by a second explicit user action, never as a side-effect of preview',()=>{
+ assert.match(client,/async function saveGrowDraft\(/);
+ assert.match(client,/\/api\/sponsor\/proposal-draft\/save/);
+ assert.match(client,/window\.confirm/);
+ assert.match(client,/await loadCrm\(\)/);
+ assert.match(server,/function handleSponsorProposalDraftSave|async function handleSponsorProposalDraftSave/);
+});
