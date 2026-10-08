@@ -178,4 +178,6 @@ jobs:
         run: npm run test:gestionale-visual-foundation
       - name: Direction Radar contract gate
         run: npm run test:dirigenza-radar
+      - name: Direction Radar API contract gate
+        run: npm run test:dirigenza-radar-api
 
