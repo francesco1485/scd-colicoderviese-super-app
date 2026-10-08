@@ -191,5 +191,8 @@
       ],
       "territory": "DERVIO"
     }
-  ]
+  ],
+  "updateCadence": "DAILY",
+  "outputSnapshot": "data/scd-dirigenza-radar.snapshot.json",
+  "runtimeAdoption": "BLOCKED_PENDING_HUMAN_VISUAL_APPROVAL"
 }
