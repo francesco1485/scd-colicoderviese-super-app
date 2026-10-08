@@ -176,3 +176,20 @@ body[data-scd-theme] .scd-control-deck{display:block;position:relative;margin-bo
 body[data-scd-theme] #view-pulse .home-first{margin-top:12px}
 @media(max-width:1150px){.scd-control-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.scd-control-core{grid-column:1/-1;min-height:260px}.scd-control-card{min-height:315px}}
 @media(max-width:720px){.scd-control-heading{align-items:start;flex-direction:column}.scd-control-seal{display:none}.scd-control-grid{grid-template-columns:1fr}.scd-control-core{grid-column:auto}.scd-control-card{min-height:270px;padding:23px}.scd-control-card h2{margin:18px 0 12px;font-size:39px}.scd-control-bottom{align-items:start;flex-direction:column}}
+
+/* Narrow screens: preserve the early weekly calendar while keeping the new three-product portal. */
+@media(max-width:600px){
+ .scd-control-heading{margin-bottom:12px;gap:8px}
+ .scd-control-heading h1{font-size:34px!important;line-height:.94}
+ .scd-control-heading p{margin:6px 0 0;font-size:12px}
+ .scd-control-eyebrow{font-size:9px;margin-bottom:6px}
+ .scd-control-grid{display:grid;grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:minmax(240px,79vw);gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;overscroll-behavior-inline:contain;padding:2px 0 10px}
+ .scd-control-card{height:198px;min-height:198px;padding:15px;scroll-snap-align:start}
+ .scd-control-card h2{font-size:27px;margin:9px 0 6px}
+ .scd-control-card p{font-size:11px;line-height:1.3;margin:0 0 5px}
+ .scd-control-card a,.scd-control-card button{padding:8px 10px;font-size:11px}
+ .scd-control-foot{margin-top:8px;padding-top:6px;font-size:8px}
+ .scd-control-bottom{padding:5px 0 0;flex-direction:row;font-size:8px}
+ .scd-control-bottom button{padding:9px 11px;flex-shrink:0}
+ body[data-scd-theme] .scd-control-deck{margin-bottom:10px}
+}
