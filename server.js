@@ -27,7 +27,7 @@ function previewAuthorized(req){
 const PREVIEW_API_ACTIONS=new Set([
   '/api/time','/api/core-status','/api/capabilities','/api/preview/status',
   '/api/public','/api/newsroom','/api/sky/ask','/api/scd',
-  '/api/sponsor/lead','/api/sponsor/login','/api/sponsor/session',
+  '/api/sponsor/lead','/api/sponsor/otp','/api/sponsor/login','/api/sponsor/session',
   '/api/sponsor/logout','/api/sponsor/crm','/api/sponsor/lead-inbox',
   '/api/sponsor/proposal-draft','/api/sponsor/proposal-draft/save'
 ]);
