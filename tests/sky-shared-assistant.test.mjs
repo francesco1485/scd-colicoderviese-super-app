@@ -68,3 +68,10 @@ test('one shared SKY endpoint exists; no direct AI provider or private token is 
  assert.match(mirror,/\/api\/sky\/ask/);
  assert.doesNotMatch(mirror,/window\.skyAnswer\(q\)/,'old local dialogue engine must not override shared policy');
 });
+
+test('legacy public SKY entry points also delegate to the shared endpoint, without made-up opponents',()=>{
+ const client=read('app.js');
+ assert.match(client,/async function skyAnswer\(q\)/);
+ assert.match(client,/\/api\/sky\/ask/);
+ assert.doesNotMatch(client,/Prossima gara:.*avversario/);
+});
