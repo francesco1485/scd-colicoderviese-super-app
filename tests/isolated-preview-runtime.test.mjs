@@ -46,6 +46,12 @@ test('isolated preview is password-protected and all ONE/GROW/CORE/Sky paths rem
  assert.equal(page.status,200);
  const html=await page.text();
  assert.match(html,/DATI SINTETICI/,'preview must show explicit non-production indicator');
+ const sponsorHome=await fetch(base+'/sponsor/',{headers:{authorization:auth}});
+ assert.equal(sponsorHome.status,200);
+ const sponsorMarkup=await sponsorHome.text();
+ assert.match(sponsorMarkup,/href="\/sponsor\/\?login=1"/,'the staging login link must stay on the staging origin');
+ assert.doesNotMatch(sponsorMarkup,/href="https:\/\/scd-colicoderviese-official-r21\.onrender\.com\/sponsor\/\?login=1"/);
+
  const newsroomResponse=await fetch(base+'/api/newsroom',{headers:{authorization:auth}});
  assert.equal(newsroomResponse.status,200);
  const newsroom=await newsroomResponse.json();
@@ -72,6 +78,11 @@ test('isolated preview is password-protected and all ONE/GROW/CORE/Sky paths rem
  assert.match(syntheticLeadId,/^QA-REQ-/);
 
 
+ const otp=await post(base,'/api/sponsor/otp',{email:'operatore@example.invalid'});
+ assert.equal(otp.status,200,'staging login flow must work without sending real email');
+ const otpData=await otp.json();
+ assert.equal(otpData.delivery,'STAGING_TEST_PIN');
+ assert.doesNotMatch(otpData.message,/inviat[oa] per email|email inviat[oa]/i);
  const login=await post(base,'/api/sponsor/login',{email:'operatore@example.invalid',code:'qa-demo-pin-2026'});
  assert.equal(login.status,200,'staging test identity only');
  const cookie=(login.headers.get('set-cookie')||'').split(';')[0];
