@@ -57,13 +57,23 @@
 
     root.querySelectorAll('[data-mirror-form]').forEach(form=>{
       if(form.dataset.bound)return;form.dataset.bound='1';
-      form.addEventListener('submit',e=>{
+      form.addEventListener('submit',async e=>{
         e.preventDefault();
         const input=form.querySelector('input'),feed=form.closest('.r38-mirror')?.querySelector('.r38-mirror-feed');
         const q=(input?.value||'').trim();if(!q||!feed)return;
         const u=document.createElement('div');u.className='r38-mirror-bubble user';u.textContent=q;feed.appendChild(u);
-        let answer='Apri Sky per continuare con il collaboratore SCD.';
-        try{if(typeof window.skyAnswer==='function')answer=window.skyAnswer(q)}catch{}
+        let answer='Sky informativo temporaneamente non disponibile. Per assistenza contatta sportclubcolico@gmail.com.';
+        try{
+          const response=await fetch('/api/sky/ask',{
+            method:'POST',headers:{'content-type':'application/json'},
+            credentials:'same-origin',cache:'no-store',
+            body:JSON.stringify({question:q,app:'ONE'})
+          });
+          const result=await response.json();
+          if(response.ok&&result.ok===true&&typeof result.data?.answer==='string'){
+            answer=result.data.answer;
+          }
+        }catch{} 
         const a=document.createElement('div');a.className='r38-mirror-bubble';a.textContent=answer;feed.appendChild(a);
         input.value='';feed.scrollTop=feed.scrollHeight;add(2,'dialogo Mirror');
       });
