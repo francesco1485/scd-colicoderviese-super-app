@@ -4,7 +4,10 @@ import fs from 'node:fs';
 const read=p=>fs.readFileSync(new URL('../'+p,import.meta.url),'utf8');
 test('SCD ONE displays new sidebar-led editorial interface, not legacy centered screen',()=>{
  const html=read('index.html'),css=read('scd-reboot-2026.css');
- assert.match(html,/scd-reboot-2026\.css\?v=1\.0\.0/);
+ assert.match(html,/scd-reboot-2026\.css\?v=2\.0\.0/);
+ assert.match(html,/class="scd-control-deck"/);
+ assert.match(html,/href="\/sponsor\/"/);
+ assert.match(html,/id="scdDeckSky"/);
  assert.match(html,/data-design-system="scd-reboot-2026"/);
  assert.match(css,/grid-template-columns:242px minmax\(0,1fr\)/);
  assert.match(css,/\.world-switch\{/);
