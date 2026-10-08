@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.27.2",
+    "version": "3.27.3",
     "effective_at": "2026-10-03",
     "status": "BINDING",
     "language": "it-IT",
@@ -1544,7 +1544,9 @@
         "AUTHORIZED_EVENTS",
         "AUTHORIZED_DOCUMENT_STATUS"
       ],
-      "must_not_bypass_permissions": true
+      "must_not_bypass_permissions": true,
+      "runtime_status": "STAGED_PUBLIC_RULES_ONLY_NOT_LLM_CONNECTED",
+      "verified_source_policy": "R20_PUBLIC_CALENDAR_AND_CANONICAL_PUBLIC_CONTACTS_ONLY"
     },
     "personal_avatar": {
       "photo_or_generated": false,
@@ -4304,6 +4306,41 @@
           "ROLE_ELEVATION"
         ]
       }
+    },
+    "sky_shared_assistant_content_first": {
+      "release": "2026-10-08_CONTENT_FIRST",
+      "state": "STAGED_PUBLIC_RULES_ONLY_AI_NOT_CONNECTED",
+      "engine": "ONE_SERVER_SIDE_RULES_ENGINE",
+      "endpoint": "/api/sky/ask",
+      "sourceIds": [
+        "R20"
+      ],
+      "publicDataPolicy": "PUBLIC_PROJECTION_ONLY_NO_SYNTHETIC_SPORT_RESULTS",
+      "entryPoints": [
+        "scd-twin.js",
+        "app.js"
+      ],
+      "routing": [
+        "PUBLIC_INFORMATION",
+        "PRIVATE_AUTH_REQUIRED",
+        "SAFEGUARDING_ONLY"
+      ],
+      "securityConstraints": [
+        "NO_PRIVATE_RECORDS",
+        "NO_CLIENT_PROVIDED_ROLE_AUTHORITY",
+        "NO_SAFEGUARDING_CONTENT_IN_GENERAL_ASSISTANT",
+        "NO_AI_PROVIDER_CLAIM",
+        "NO_QUESTION_RETENTION"
+      ],
+      "deploymentGate": "AUTHORIZED_R20_STAGING_E2E_AND_HUMAN_REVIEW",
+      "missingCapabilities": [
+        "AUTHORIZED_PRIVATE_QUERY_CONTEXT",
+        "VERIFIED_LLM_PROVIDER",
+        "SPONSOR_PRIVATE_UI_SKY",
+        "CORE_PRIVATE_UI_SKY",
+        "SAFEGUARDING_SEPARATE_HUMAN_CHANNEL"
+      ],
+      "rollback": "REVERT_ISOLATED_BRANCH_AND_DISABLE_PUBLIC_SKY_ENDPOINT"
     }
   },
   "research_intelligence": {
