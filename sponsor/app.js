@@ -1251,6 +1251,59 @@ function renderCrmInspector(data){
   const mailBtn=$('#crmEmailAction');
   if(mailBtn)mailBtn.onclick=()=>openCrmEmailComposer(data);
 }
+const growLeadState={rows:[],error:'',loading:false};
+function renderSponsorLeadInbox(){
+  const mount=$('#crmLeadInbox');if(!mount)return;
+  if(growLeadState.loading){mount.textContent='Caricamento richieste partnership R20…';return}
+  if(growLeadState.error){mount.textContent='Richieste non disponibili: '+growLeadState.error;return}
+  if(!growLeadState.rows.length){mount.textContent='Nessuna richiesta sponsor disponibile nella fonte R20.';return}
+  mount.innerHTML=growLeadState.rows.map(row=>{
+    const candidate=row.candidateStakeholderIds||[];
+    const canPrepare=row.linkState==='REVIEW_REQUIRED'&&candidate.length===1;
+    return '<article class="crm-timeline" data-lead-card="'+esc(row.requestId)+'">'+
+      '<div><b>'+esc(row.companyHint||'Azienda da verificare')+'</b><small> · '+esc(row.requestId)+' · '+esc(row.status)+'</small></div>'+
+      '<p>'+esc(row.contactName)+' · '+esc(row.email)+' · '+esc(row.topic)+'</p>'+
+      '<p>Collegamento CRM: '+esc(row.linkState)+'. '+(canPrepare?'Richiede conferma esplicita.':'Verifica manuale necessaria prima di preparare una proposta.')+'</p>'+
+      (canPrepare?'<label>Asset da proporre <input class="filter-input" data-grow-asset="'+esc(row.requestId)+'" placeholder="Descrizione reale verificata"></label>'+
+        '<label>Obiettivo <input class="filter-input" data-grow-objective="'+esc(row.requestId)+'" placeholder="Obiettivo concordato o da verificare"></label>'+
+        '<button type="button" class="btn-yellow" data-grow-proposal="'+esc(row.requestId)+'">Verifica e prepara bozza</button>':'')+
+      '</article>';
+  }).join('');
+  $('[data-grow-proposal]',mount).forEach(button=>button.onclick=()=>prepareGrowDraft(button.dataset.growProposal));
+}
+async function loadSponsorLeads(){
+  growLeadState.loading=true;growLeadState.error='';renderSponsorLeadInbox();
+  try{
+    const response=await fetch('/api/sponsor/lead-inbox',{credentials:'same-origin',cache:'no-store'});
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok||data.ok!==true)throw new Error(data.error||'Fonte R20 non disponibile');
+    growLeadState.rows=Array.isArray(data.rows)?data.rows:[];
+  }catch(error){
+    growLeadState.rows=[];growLeadState.error=String(error.message||'Errore fonte');
+  }finally{growLeadState.loading=false;renderSponsorLeadInbox()}
+}
+async function prepareGrowDraft(requestId){
+  const row=growLeadState.rows.find(item=>item.requestId===requestId);
+  if(!row||row.linkState!=='REVIEW_REQUIRED'||row.candidateStakeholderIds?.length!==1)return;
+  const stakeholderId=row.candidateStakeholderIds[0];
+  if(!window.confirm('Confermi di aver verificato manualmente l abbinamento fra la richiesta '+requestId+' e il profilo CRM '+stakeholderId+'? Nessun documento sara inviato o salvato.'))return;
+  const preview=$('#crmProposalPreview');if(!preview)return;
+  preview.hidden=false;preview.textContent='Preparazione bozza R20 in corso…';
+  try{
+    const input={
+      requestId,stakeholderId,associationReviewed:true,
+      asset:$('[data-grow-asset="'+requestId+'"]')?.value||'',
+      objective:$('[data-grow-objective="'+requestId+'"]')?.value||''
+    };
+    const response=await fetch('/api/sponsor/proposal-draft',{method:'POST',headers:{'content-type':'application/json'},credentials:'same-origin',body:JSON.stringify(input)});
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok||data.ok!==true)throw new Error(data.error||'Bozza non preparata');
+    preview.textContent='BOZZA NON SALVATA · NON INVIATA. Richiede approvazione e registrazione nel CRM canonico.\n'+JSON.stringify(data.data,null,2);
+  }catch(error){preview.textContent='Bozza non disponibile: '+String(error.message||'Errore di verifica')}
+}
+$('#crmLeadRefresh')?.addEventListener('click',loadSponsorLeads);
+loadSponsorLeads();
+
 async function loadCrm(){
   crmState.loading=true;crmState.error='';renderCrmTable();
   try{
