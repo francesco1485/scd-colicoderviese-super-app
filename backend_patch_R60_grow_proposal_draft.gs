@@ -10,6 +10,17 @@ function r60CreateSponsorProposalDraft_(token,payload){
   payload=payload||{};
   if(payload.confirm!==true)throw new Error('CONFIRM_REQUIRED');
   if(payload.associationReviewed!==true)throw new Error('REVIEW_REQUIRED');
+  // Feature OFF by default. An explicit staging target is mandatory for writes.
+  if(typeof PropertiesService==='undefined'||typeof PropertiesService.getScriptProperties!=='function'){
+    throw new Error('R60_WRITE_DISABLED');
+  }
+  var props=PropertiesService.getScriptProperties();
+  if(String(props.getProperty('SCD_R60_DRAFT_WRITE_ENABLED')||'').trim().toLowerCase()!=='true'){
+    throw new Error('R60_WRITE_DISABLED');
+  }
+  if(!String(props.getProperty('SCD_OPERATIVO_PILOTA_ID')||'').trim()){
+    throw new Error('CANONICAL_TARGET_NOT_CONFIGURED');
+  }
   if(typeof r216SponsorLeadInbox_!=='function'||typeof r216CrmActor_!=='function'){
     throw new Error('R20_SPONSOR_MODULE_NOT_INSTALLED');
   }
