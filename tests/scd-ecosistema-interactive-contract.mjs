@@ -25,7 +25,7 @@ assert(js.includes('function setPlatform'),'navigation must change real visible 
 assert(js.includes('function respondTo'),'shared FAQ prototype must work for input');
 assert(js.includes('aria-current'),'platform nav must expose active state to assistive tech');
 assert(js.includes('scrollIntoView'),'switch must reset scroll for mobile navigation');
-assert(css.includes('@media (max-width: 740px)'),'mobile layout missing');
+assert(/@media\s*\(max-width:\s*740px\)/.test(css),'mobile layout missing');
 assert(css.includes('prefers-reduced-motion'),'reduced motion missing');
 assert(css.includes(':focus-visible'),'keyboard focus missing');
 assert(css.includes('min-height:44px'),'touch targets missing');
