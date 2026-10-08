@@ -82,7 +82,8 @@ test('isolated preview is password-protected and all ONE/GROW/CORE/Sky paths rem
  assert.equal(otp.status,200,'staging login flow must work without sending real email');
  const otpData=await otp.json();
  assert.equal(otpData.delivery,'STAGING_TEST_PIN');
- assert.doesNotMatch(otpData.message,/inviat[oa] per email|email inviat[oa]/i);
+ assert.match(otpData.message,/Nessuna email inviata/i,'the UI must explicitly state that no message was sent');
+ assert.doesNotMatch(otpData.message,/codice inviato con successo/i);
  const login=await post(base,'/api/sponsor/login',{email:'operatore@example.invalid',code:'qa-demo-pin-2026'});
  assert.equal(login.status,200,'staging test identity only');
  const cookie=(login.headers.get('set-cookie')||'').split(';')[0];
