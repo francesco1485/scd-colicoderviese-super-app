@@ -109,6 +109,8 @@ Response contains:
 
 No public endpoint exposes Direction Radar data.
 
+The endpoint is fail-closed behind the environment feature flag `SCD_FEATURE_DIRECTION_RADAR=true`. Without explicit activation it returns `DIRECTION_RADAR_NOT_ENABLED`.
+
 ## Daily execution
 
 The GitHub workflow is scheduled for 06:15 UTC (08:15 CEST / 07:15 CET depending on daylight saving).
