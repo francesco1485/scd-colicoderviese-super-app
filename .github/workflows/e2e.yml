@@ -176,4 +176,6 @@ jobs:
 
       - name: Gestionale Visual Foundation contract gate
         run: npm run test:gestionale-visual-foundation
+      - name: SCD Universe public-first Visual Lab contract gate
+        run: npm run test:visual-lab-public-first
 
