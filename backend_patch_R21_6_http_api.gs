@@ -224,7 +224,11 @@ function r216CanonicalWorkbookId_(sheetName) {
     'DATA_LINEAGE','SOCIETA_PROFILE'
   ];
   if (operationalTabs.indexOf(name) >= 0) {
-    return '1jb5Jt1ZYzJA-3oQd85AmwVhAoFQpBPfcsy4HupBzDFA';
+    var configured = '';
+    if(typeof PropertiesService !== 'undefined' && typeof PropertiesService.getScriptProperties === 'function'){
+      configured = String(PropertiesService.getScriptProperties().getProperty('SCD_OPERATIVO_PILOTA_ID') || '').trim();
+    }
+    return configured || '1jb5Jt1ZYzJA-3oQd85AmwVhAoFQpBPfcsy4HupBzDFA';
   }
   var coreId = SCD && SCD.CORE_ID ? String(SCD.CORE_ID).trim() : '';
   if (!coreId) throw new Error('R20 Core workbook non configurato.');
