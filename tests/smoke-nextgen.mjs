@@ -472,6 +472,10 @@ mark('R56_IDENTITY_ACCESS_JOURNEY');
     if(action==='public.telemetry'){telemetrySeen=true;data={accepted:true}}
     else if(action==='auth.login')data={token:'qa-direction-token'};
     else if(action==='auth.validate')data={valid:true};
+    else if(action==='auth.access.log')data={stored:true};
+    else if(action==='auth.identity.resolve')data={matched:true,matchMethod:'QA_SYNTHETIC'};
+    else if(action==='public.calendar')data={rows:[]};
+    else if(action==='public.feed')data={items:[]};
     else if(action==='dashboard.summary')data=directionDashboard;
     else if(action==='private.user.workspace')data=directionWorkspace;
     else if(action==='direction.access.invite'){inviteSeen=true;data={ok:true,email:'new.user@example.test',role:'FAMILY',identity:{matched:true,matchMethod:'EMAIL_EXACT'},temporaryCodeSent:true}}

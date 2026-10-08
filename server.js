@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const { URL } = require('url');
 const { issueIntakeToken, verifyIntakeToken } = require('./lib/intake-links');
+const { projectPublicCalendar } = require('./lib/scd-public-calendar-projection');
 
 const PORT = process.env.PORT || 10000;
 const ROOT = process.env.SCD_STATIC_DIR ? path.resolve(__dirname,process.env.SCD_STATIC_DIR) : __dirname;
@@ -724,27 +725,14 @@ async function buildWeeklyNewsroom(){
   const sourceStatus={calendar:'ERROR',feed:'ERROR',officialSite:'DISABLED_FOR_NEWS',webNews:'DISABLED_FOR_NEWS'};
   try{
     const c=await callAppsScript('public.calendar',{rangeKey:'ALL',offset:0},'');
-    calendarRaw=c.parsed;sourceStatus.calendar='OK';
+    calendarRaw=requireUpstreamSuccess(c,'Calendario pubblico');sourceStatus.calendar='OK';
   }catch(e){sourceStatus.calendar='ERROR:'+String(e.code||e.message||e)}
   try{
     const f=await callAppsScript('public.feed',{limit:80},'');
     feedRaw=f.parsed;sourceStatus.feed='OK';
   }catch(e){sourceStatus.feed='ERROR:'+String(e.code||e.message||e)}
 
-  const allCalendar=rowsFrom(calendarRaw).map((row,i)=>({
-    id:pick(row,'id','eventId','uid')||'CAL-'+i,
-    title:String(pick(row,'title','event','name','subject')||'Attività SCD'),
-    date:isoDateOnly(pick(row,'date','data','startDate')),
-    time:String(pick(row,'time','ora','startTime')||''),
-    endTime:String(pick(row,'endTime','fine')||''),
-    team:teamLabel(row),
-    category:String(pick(row,'category','categoria','ageGroup','annata')||''),
-    opponent:String(pick(row,'opponent','opponentName','avversario')||''),
-    competition:String(pick(row,'competition','campionato','league')||''),
-    venue:String(pick(row,'venue','luogo','field','location')||''),
-    kind:eventKind(row),
-    source:String(pick(row,'source','fonte')||'R20_CALENDAR')
-  })).filter(x=>x.date);
+  const allCalendar=projectPublicCalendar(rowsFrom(calendarRaw));
 
   const calendar=allCalendar.filter(x=>x.date>=week.start&&x.date<=week.end);
   const nowParts=romeDateParts();
