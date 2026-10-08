@@ -82,6 +82,10 @@ function doPost(e) {
       case 'private.crm.leadInbox':
         data = r216SponsorLeadInbox_(token, payload);
         break;
+      case 'private.crm.proposalDraft.create':
+        if (typeof r60CreateSponsorProposalDraft_ !== 'function') throw new Error('Modulo proposte R60 non installato');
+        data = r60CreateSponsorProposalDraft_(token, payload);
+        break;
       case 'private.crm.summary':
         data = r216CrmSummary_(token, payload);
         break;
