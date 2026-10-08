@@ -5,7 +5,7 @@ import vm from 'node:vm';
 
 const file=new URL('../backend_patch_R60_grow_proposal_draft.gs',import.meta.url);
 const source=fs.existsSync(file)?fs.readFileSync(file,'utf8'):'';
-function fixture({privacy='SI',policy='MANUALE',duplicates=0,auditFails=false,writeEnabled=true,targetConfigured=true}={}){
+function fixture({privacy='SI',policy='MANUALE',duplicates=0,auditFails=false,writeEnabled=true,targetConfigured=true,coreWorkbook='qa-core-clone',operativoWorkbook='qa-operativo-clone'}={}){
   const request={REQUEST_ID:'REQ-2026-01',TYPE:'SPONSOR',EMAIL:'lead@example.org',NOME:'Referente QA',CONSENSO_PRIVACY:privacy};
   const stakeholder={STAKEHOLDER_ID:'ST-2026-01',NOME:'Azienda QA',EMAIL:'lead@example.org',CONTACT_POLICY:policy};
   const tables={
@@ -16,8 +16,9 @@ function fixture({privacy='SI',policy='MANUALE',duplicates=0,auditFails=false,wr
   let locks=0,releases=0;
   const writes=[],audits=[];
   const scope={
+    SCD:{CORE_ID:coreWorkbook},
     LockService:{getScriptLock:()=>({waitLock:()=>{locks++},releaseLock:()=>{releases++}})},
-    PropertiesService:{getScriptProperties:()=>({getProperty:key=>key==='SCD_R60_DRAFT_WRITE_ENABLED'?(writeEnabled?'true':'false'):key==='SCD_OPERATIVO_PILOTA_ID'?(targetConfigured?'qa-operativo-clone':''):''})},
+    PropertiesService:{getScriptProperties:()=>({getProperty:key=>key==='SCD_R60_DRAFT_WRITE_ENABLED'?(writeEnabled?'true':'false'):key==='SCD_OPERATIVO_PILOTA_ID'?(targetConfigured?operativoWorkbook:''):''})},
     Utilities:{getUuid:()=> '12345678-aabb-ccdd-eeff-123456789abc'},
     r216SponsorLeadInbox_:(token)=>{if(token!=='good-token')throw new Error('SPONSOR_SCOPE_REQUIRED');return {readOnly:true}},
     r216CrmActor_:(token)=>{if(token!=='good-token')throw new Error('SESSION_REQUIRED');return {email:'operator@example.org'}},
@@ -131,4 +132,15 @@ test('R60 is disabled by default and requires an explicitly configured writable 
  const noTarget=fixture({targetConfigured:false});
  assert.throws(()=>noTarget.make(),/CANONICAL_TARGET_NOT_CONFIGURED/);
  assert.equal(noTarget.writes.length,0);
+});
+
+test('R60 rejects either production workbook even when feature flag is accidentally enabled',()=>{
+ const realCore='1p78Kgla_cCjYxCPjksS8lHxmlFQxuvpd1aBXv6-1H1s';
+ const realOperativo='1jb5Jt1ZYzJA-3oQd85AmwVhAoFQpBPfcsy4HupBzDFA';
+ const a=fixture({coreWorkbook:realCore});
+ assert.throws(()=>a.make(),/STAGING_ISOLATION_REQUIRED/);
+ assert.equal(a.writes.length,0);
+ const b=fixture({operativoWorkbook:realOperativo});
+ assert.throws(()=>b.make(),/STAGING_ISOLATION_REQUIRED/);
+ assert.equal(b.writes.length,0);
 });
