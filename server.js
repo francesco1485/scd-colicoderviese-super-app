@@ -40,6 +40,7 @@ const SCD_CREATIVE_SCENES = JSON.parse(fs.readFileSync(path.join(__dirname,'conf
 const COMMUNITY_BENEFITS_SNAPSHOT = JSON.parse(fs.readFileSync(path.join(__dirname,'config','community-benefits.snapshot.json'),'utf8'));
 const SPONSOR_DEVELOPMENT_SNAPSHOT = JSON.parse(fs.readFileSync(path.join(__dirname,'config','sponsor-development.snapshot.json'),'utf8'));
 const R57_LAUNCH_READINESS = JSON.parse(fs.readFileSync(path.join(__dirname,'config','r57-launch-readiness.v1.json'),'utf8'));
+const DIRIGENZA_RADAR_SNAPSHOT = JSON.parse(fs.readFileSync(path.join(__dirname,'data','scd-dirigenza-radar.snapshot.json'),'utf8'));
 const INTAKE_TEMPLATE_MAP = new Map((INTAKE_TEMPLATES.templates||[]).map(x=>[x.slug,x]));
 const INTAKE_SECRET = process.env.SCD_INTAKE_LINK_SECRET || '';
 const INTAKE_PUBLIC_BASE = (process.env.SCD_PUBLIC_BASE_URL || 'https://scd-universe.onrender.com').replace(/\/$/,'');
@@ -573,6 +574,41 @@ async function validateDirectionSession(token){
   const {parsed}=await callAppsScript('auth.validate',{token},token);
   if(!intakeRoleAllowed(parsed))throw new Error('DIRECTION_SCOPE_REQUIRED');
   return unwrapPayload(parsed);
+}
+
+function directionRadarProjection(snapshot){
+  const verified=Array.isArray(snapshot?.verifiedItems)?snapshot.verifiedItems:[];
+  const candidates=Array.isArray(snapshot?.candidates)?snapshot.candidates:[];
+  const sourceHealth=Array.isArray(snapshot?.sourceHealth)?snapshot.sourceHealth:[];
+  return {
+    schemaVersion:snapshot?.schemaVersion||'1.0.0',
+    id:snapshot?.id||'SCD_DIRIGENZA_RADAR_SNAPSHOT',
+    generatedAt:snapshot?.generatedAt||null,
+    verifiedAt:snapshot?.verifiedAt||null,
+    calendarReconciledAt:snapshot?.calendarReconciledAt||null,
+    mode:snapshot?.mode||'VERIFIED_SEED_PLUS_DAILY_DISCOVERY',
+    summary:{
+      verifiedOpportunities:verified.filter(x=>x.category==='OPPORTUNITIES').length,
+      verifiedTerritoryEvents:verified.filter(x=>x.category==='TERRITORY').length,
+      reviewCandidates:candidates.length,
+      sourceErrors:sourceHealth.filter(x=>x.status==='ERROR').length
+    },
+    verifiedItems:verified,
+    candidates:candidates.map(x=>({...x,verification:'DISCOVERED_NEEDS_REVIEW'})),
+    sourceHealth,
+    territoryStatus:Array.isArray(snapshot?.territoryStatus)?snapshot.territoryStatus:[]
+  };
+}
+async function handleDirectionRadar(req,res){
+  if(req.method!=='POST')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  try{
+    const body=JSON.parse(await readBody(req)||'{}');
+    await validateDirectionSession(String(body.sessionToken||'').trim());
+    return json(res,200,{ok:true,data:directionRadarProjection(DIRIGENZA_RADAR_SNAPSHOT)},{'cache-control':'no-store'});
+  }catch(e){
+    const status=e.message==='SESSION_REQUIRED'?401:(e.message==='DIRECTION_SCOPE_REQUIRED'?403:400);
+    return json(res,status,{ok:false,error:e.message||'DIRECTION_RADAR_FAILED'});
+  }
 }
 async function bestEffortIntakeAudit(event,payload={}){
   try{
@@ -1197,6 +1233,7 @@ http.createServer(async(req,res)=>{
   if(u.pathname==='/api/core-status') return json(res,200,{ok:true,version:'40.0.0',featureFlags:FEATURE_FLAGS,domainCore:SUPABASE_RUNTIME,currentPrimary:'R20',targetPrimary:'SCD_SUPABASE',runtimeSafety:{previewSafeMode:PREVIEW_SAFE_MODE,writePolicy:PREVIEW_SAFE_MODE?'READ_ONLY':'NORMAL'}});
   if(u.pathname==='/api/core-brain') return handleCoreBrain(req,res);
   if(u.pathname==='/api/core-today') return handleCoreToday(req,res);
+  if(u.pathname==='/api/direction/radar') return handleDirectionRadar(req,res);
   if(u.pathname==='/api/launch-readiness') return handleLaunchReadiness(req,res);
   if(u.pathname==='/api/tournaments') return handleTournaments(req,res);
   if(u.pathname==='/api/membership-services') return handleMembershipServices(req,res);
