@@ -1,3 +1,4 @@
+import { SCDOneExperience } from './SCDOneExperience';
 /**
  * Riferimento grafico utente: tavola madre “Sistema grafico definitivo / struttura app in tempo reale”,
  * descritta nel mandato UI SCD 2026/27 del 9 ottobre 2026; originali non caricati in Lovable.
@@ -19,7 +20,7 @@ import { ScreenPreview, TerritoryPlaceholder } from './ScreenPreview';
 import { visionScreens, visionData, type VisionScreenId } from './screens';
 import './vision.css';
 
-export function Vision2026() {
+function VisionGallery() {
   const [selected, setSelected] = useState<VisionScreenId>('home');
   const [assistant, setAssistant] = useState(false);
   const current = visionScreens.find(s => s.id === selected) ?? visionScreens[0];
@@ -46,3 +47,10 @@ export function Vision2026() {
 }
 
 function ArrowUpMark() { return <ArrowRight size={24} aria-hidden="true" />; }
+/** Default route is the actual full-page SCD ONE staging UI. The original six-screen
+ *  visual lab is explicitly preserved for side-by-side review, without data access. */
+export function Vision2026() {
+  const [galleryOpen, setGalleryOpen] = useState(false);
+  if (galleryOpen) return <div><button type="button" onClick={() => setGalleryOpen(false)} style={{position:'sticky',top:0,zIndex:120,width:'100%',background:'#ffdf13',color:'#09264d',fontWeight:800,padding:14,minHeight:48}}>← Torna alla Home SCD ONE</button><VisionGallery /></div>;
+  return <SCDOneExperience onOpenGallery={() => setGalleryOpen(true)} />;
+}

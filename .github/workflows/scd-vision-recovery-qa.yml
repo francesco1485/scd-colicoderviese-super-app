@@ -18,30 +18,27 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Install
+      - name: Install recovered app
         run: npm install --no-audit --no-fund
       - name: Test staging contracts
         run: npm run test:vision
       - name: Typecheck
         run: npm run typecheck
-      - name: Build existing Lovable application
+      - name: Build app
         run: npm run build
       - name: Install browser
-        run: npx --yes playwright@1.56.1 install --with-deps chromium
-      - name: Start and check route
+        run: npx playwright install --with-deps chromium
+      - name: Start staging route
         run: |
           npm run dev -- --host 127.0.0.1 --port 4173 > /tmp/scd-vision.log 2>&1 &
-          for n in $(seq 1 30); do if curl -fsS http://127.0.0.1:4173/vision-2026 >/dev/null; then break; fi; sleep 2; done
-          curl -fsS http://127.0.0.1:4173/vision-2026 > /dev/null
-      - name: Real Chromium screenshots
-        run: |
-          mkdir -p test-output
-          npx --yes playwright@1.56.1 screenshot --browser chromium --viewport-size='390,844' --wait-for-timeout=1500 http://127.0.0.1:4173/vision-2026 test-output/vision-mobile-390x844.png
-          npx --yes playwright@1.56.1 screenshot --browser chromium --viewport-size='1440,900' --wait-for-timeout=1500 http://127.0.0.1:4173/vision-2026 test-output/vision-desktop-1440x900.png
-      - name: Upload screenshots
+          for n in $(seq 1 45); do if curl -fsS http://127.0.0.1:4173/vision-2026 >/dev/null; then break; fi; sleep 2; done
+          curl -fsS http://127.0.0.1:4173/vision-2026 >/dev/null
+      - name: Browser interaction and screenshot QA
+        run: npm run test:browser
+      - name: Upload real Chromium screenshots
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: scd-vision-2026-browser-screenshots
+          name: scd-one-vision-home-browser-screenshots
           path: staging/lovable-vision-2026/test-output/*.png
           if-no-files-found: ignore
