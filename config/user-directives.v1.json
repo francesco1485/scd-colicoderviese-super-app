@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "id": "SCD_USER_DIRECTIVES",
-  "effectiveAt": "2026-10-03",
+  "effectiveAt": "2026-10-09",
   "authority": "RECOVERED_FROM_EXPLICIT_USER_CHAT_COMMANDS",
   "purpose": "Prevent loss, dilution or reinterpretation of the user's original operating commands across branches, agents and sessions.",
   "precedence": {
@@ -206,6 +206,113 @@
         "NO_FAKE_DEVICE_STATE",
         "NO_UNAUTHORIZED_PRODUCTION_MUTATION"
       ]
+    },
+    {
+      "id": "UD-011",
+      "name": "GRAPHICS_FIRST_TOTAL_VISUAL_SCD_2026",
+      "sourceDate": "2026-10-09",
+      "sourceStatus": "USER_COMMAND",
+      "sourceQuoteFragments": [
+        "ma deve essere soprattutto la grafica che mi interessa quella da analisi e ricerca e sviluppo",
+        "Non solo quella ma le grafiche complete",
+        "Voglio quella grafica e basta"
+      ],
+      "normalizedCommand": {
+        "priority": "VISUAL_ANALYSIS_RESEARCH_DEVELOPMENT_BEFORE_FUNCTIONAL_REBUILD",
+        "reference": "SCD_TAVOLA_MADRE_SEI_APP_2026_AND_USER_SUPPLIED_FAMILY_BOARDS",
+        "screens": [
+          "HOME_PUBBLICA",
+          "CALENDARIO_LIVE",
+          "AREA_ATLETA",
+          "AREA_FAMIGLIA",
+          "AREA_STAFF_DIREZIONE",
+          "COMUNICAZIONI"
+        ],
+        "apps": [
+          "SCD_ONE_UNIVERSE_SOCIAL",
+          "SCD_CORE_GESTIONALE",
+          "SCD_GROW_SPONSOR"
+        ],
+        "expectation": "VISUALLY_FAITHFUL_INTERACTIVE_RESPONSIVE_IMPLEMENTATION_NOT_COLOR_RESTYLE_OR_POSTER",
+        "canonicalBrief": "docs/SCD_DNA_GRAFICO_OPERATIVO_2026-10-09.md",
+        "validation": [
+          "IMAGE_TO_UI_COMPOSITION_COMPARISON",
+          "MOBILE_DESKTOP_SCREENSHOTS",
+          "NAVIGATION_AND_STATE_TESTS",
+          "NO_FAKE_DATA"
+        ]
+      }
+    },
+    {
+      "id": "UD-012",
+      "name": "DRIVE_CANVA_PERMANENT_MEMORY_2026_FORWARD",
+      "sourceDate": "2026-10-09",
+      "sourceStatus": "USER_COMMAND",
+      "sourceQuoteFragments": [
+        "il drive deve essere il per sempre il tuo contenitore di memoria",
+        "il drive non è solo home ma anche i file condivisi",
+        "partendo da una data importante anno 2026 e a seguire verso il futuro"
+      ],
+      "normalizedCommand": {
+        "archiveBackbone": "GOOGLE_DRIVE_ALL_AUTHORIZED_SCOPES",
+        "catalog": "SCD_INTAKE_LOG",
+        "sourcePriority": [
+          "OFFICIAL_ORIGINAL_ASSETS",
+          "GOOGLE_DRIVE_OWNED_AND_SHARED",
+          "SCD_PRESS_OFFICE_DRIVE",
+          "SCD_TOURNAMENTS_DRIVE",
+          "CANVA_PROJECTS_AND_ASSETS"
+        ],
+        "startSeason": "2026_2027",
+        "pre2026": "HISTORICAL_CONTEXT_NOT_AUTOMATICALLY_CURRENT",
+        "indexing": "PROVENANCE_VERSION_TIMESTAMP_ACL_SOURCE_ID_REQUIRED",
+        "privacy": "NO_PUBLIC_OR_CROSS_ROLE_EXPOSURE_OF_PERSONAL_HEALTH_MINOR_OR_SAFEGUARDING_DATA",
+        "memoryModel": "PERSISTENT_STORAGE_AND_RETRIEVAL_IN_AUTHORIZED_TOOLS_NOT_MAGIC_CHAT_MEMORY",
+        "canonicalBrief": "docs/SCD_DNA_GRAFICO_OPERATIVO_2026-10-09.md"
+      }
+    },
+    {
+      "id": "UD-013",
+      "name": "DYNAMIC_3D_AUTOMATION_SKY_ENGINE_AFTER_VISUAL_FOUNDATION",
+      "sourceDate": "2026-10-09",
+      "sourceStatus": "USER_COMMAND",
+      "normalizedCommand": {
+        "orderedPhases": [
+          "GRAPHIC_RESEARCH_ASSET_RECOVERY",
+          "VISUAL_SYSTEM_ALL_SCREENS",
+          "INTERACTIVE_MOBILE_DESKTOP_BUILD",
+          "MOTION_2D_3D_WHERE_USABLE",
+          "INDEXING_AUTOMATION_AND_IOT_ONLY_WHEN_REAL_DEVICES_VERIFIED",
+          "ROLE_SCOPED_AI_KNOWLEDGE_MEMORY_SKY",
+          "QA_AND_CONTROLLED_PRODUCTION"
+        ],
+        "integration": "PRESERVE_EXISTING_R20_GITHUB_API_AND_REAL_FEATURES",
+        "security": "NO_PRIVATE_PERMISSIONS_PAYMENT_SAFEGUARDING_CHANGES_WITHOUT_DIRECTION_APPROVAL"
+      }
+    },
+    {
+      "id": "UD-014",
+      "name": "PRECISE_AGENTS_WITH_VERIFIED_CONTINUITY",
+      "sourceDate": "2026-10-09",
+      "sourceStatus": "USER_COMMAND",
+      "normalizedCommand": {
+        "taskSpec": [
+          "INPUT_SOURCES",
+          "FIXED_CONSTRAINTS",
+          "EXPECTED_CODE_AND_ASSET_OUTPUTS",
+          "ACCEPTANCE_TESTS",
+          "SECURITY_PRIVACY",
+          "ROLLBACK",
+          "CHECKPOINT"
+        ],
+        "orchestration": "EXISTING_SKILLS_AND_PLUGINS_SPECIFIC_TASKS",
+        "continuity": "WORK_NOW_AND_PERSIST_RESUMABLE_STATE_NO_INVISIBLE_BACKGROUND_CLAIM_WITHOUT_ACTIVE_AUTOMATION",
+        "currentAgent": "LOVABLE_SCD_COMMAND_CENTER_VISUAL_STAGING",
+        "currentBlockingIssue": "LOVABLE_CREDITS_EXHAUSTED_AND_BUILD_FAILURE_AS_OF_2026_10_09",
+        "fallback": "GITHUB_BRANCH_AND_CODE_QA",
+        "nonDuplication": "NO_NEW_PARALLEL_APP_DB_OR_CRM",
+        "canonicalBrief": "docs/SCD_DNA_GRAFICO_OPERATIVO_2026-10-09.md"
+      }
     }
   ],
   "completionGate": {
@@ -360,6 +467,28 @@
         "WEBAPP:MASTER",
         "AUTONOMOUS_SAFE_CONTINUATION"
       ]
+    },
+    {
+      "id": "CMD-20261009-VISUAL-DNA",
+      "date": "2026-10-09",
+      "title": "Direzione SCD: grafiche complete come priorita; archivio Drive+Condivisi+Canva; motore e memoria; agenti precisi",
+      "recoveryStatus": "VERBATIM_FRAGMENT",
+      "recoveredElements": [
+        "grafica come analisi/ricerca/sviluppo prima di tutto",
+        "tavola madre e sei schermi",
+        "tre piattaforme unica identita",
+        "Drive archivio memoria stabile incluso condivisi",
+        "2026 e futuro",
+        "AI Sky e motore interno dopo la parte visuale",
+        "comandi precisi per agenti e continuita verificabile"
+      ],
+      "incorporation": [
+        "UD-011",
+        "UD-012",
+        "UD-013",
+        "UD-014"
+      ],
+      "canonicalBrief": "docs/SCD_DNA_GRAFICO_OPERATIVO_2026-10-09.md"
     }
   ]
 }
