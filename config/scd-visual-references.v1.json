@@ -1,14 +1,17 @@
 {
   "schemaVersion": "1.0.0",
   "id": "SCD_VISUAL_REFERENCE_RECOVERY",
-  "effectiveAt": "2026-10-03",
+  "effectiveAt": "2026-10-09",
   "purpose": "Recovered visual/document references from the user's internal Library. These references must be reviewed before visual work so prior choices are not lost.",
   "rules": {
     "libraryReferenceIsNotRuntimeAsset": true,
     "noAutomaticApprovalInference": true,
     "officialAssetMustUseCanonicalRepoCopy": true,
     "generatedBoardIsDesignReferenceNotFactualData": true,
-    "realPhotoRequiresUsageRightsAndPrivacyCheck": true
+    "realPhotoRequiresUsageRightsAndPrivacyCheck": true,
+    "currentUserTargetBoardsDefineVisualDirection": true,
+    "visualDirectionDoesNotOverrideOfficialAssetIdentity": true,
+    "referenceFileIdIsNotPermanentBinaryStorage": true
   },
   "references": [
     {
@@ -167,6 +170,162 @@
         "PARTNER_CUSTOMER_AREA"
       ],
       "usage": "Use only as a functional UX benchmark for insurance customer self-service; do not copy proprietary visual identity."
+    },
+    {
+      "id": "VR-009",
+      "product": "SCD_SHARED",
+      "name": "SCD_TAVOLA_MADRE_SEI_APP(1).png",
+      "fileId": "file_000000004fe4824390aaf7e23fd649f4",
+      "type": "USER_SUPPLIED_PRIMARY_MASTER_BOARD",
+      "relevance": "CRITICAL",
+      "sourceKind": "USER_CONVERSATION_UPLOAD_2026_10_09",
+      "sourceStatus": "USER_SUPPLIED_VISUAL_TARGET_NOT_RUNTIME_ASSET",
+      "canonicalAttachmentUriVerified": false,
+      "usage": "Sei schermate: home, calendario, atleta, famiglia, staff, comunicazioni; matrice compositiva da trasformare in UI funzionante."
+    },
+    {
+      "id": "VR-010",
+      "product": "SCD_ONE",
+      "name": "01_HOME_PUBBLICA(1).png",
+      "fileId": "file_00000000106c82469af3a722e990982c",
+      "type": "USER_SUPPLIED_SCREEN_REFERENCE",
+      "relevance": "CRITICAL",
+      "sourceKind": "USER_CONVERSATION_UPLOAD_2026_10_09",
+      "sourceStatus": "USER_SUPPLIED_VISUAL_TARGET_NOT_RUNTIME_ASSET",
+      "canonicalAttachmentUriVerified": false,
+      "usage": "Home pubblica: hero SCD/Sky/Lario, quick actions, prossima gara, sponsor, territorio e bottom nav."
+    },
+    {
+      "id": "VR-011",
+      "product": "SCD_ONE",
+      "name": "02_CALENDARIO_LIVE(1).png",
+      "fileId": "file_00000000869082108e403424ecd758b2",
+      "type": "USER_SUPPLIED_SCREEN_REFERENCE",
+      "relevance": "CRITICAL",
+      "sourceKind": "USER_CONVERSATION_UPLOAD_2026_10_09",
+      "sourceStatus": "USER_SUPPLIED_VISUAL_TARGET_NOT_RUNTIME_ASSET",
+      "canonicalAttachmentUriVerified": false,
+      "usage": "Calendario: period selector, attività sportive, prossime gare, dettagli e filtri con dati realmente verificati."
+    },
+    {
+      "id": "VR-012",
+      "product": "SCD_CORE",
+      "name": "03_AREA_ATLETA(1).png",
+      "fileId": "file_000000009c3481f480a5a76b82844056",
+      "type": "USER_SUPPLIED_SCREEN_REFERENCE",
+      "relevance": "CRITICAL",
+      "sourceKind": "USER_CONVERSATION_UPLOAD_2026_10_09",
+      "sourceStatus": "USER_SUPPLIED_VISUAL_TARGET_NOT_RUNTIME_ASSET",
+      "canonicalAttachmentUriVerified": false,
+      "usage": "Profilo, convocazioni, pagamento/documenti, prossime attività; solo dati autorizzati."
+    },
+    {
+      "id": "VR-013",
+      "product": "SCD_CORE",
+      "name": "04_AREA_FAMIGLIA(1).png",
+      "fileId": "file_00000000135882469ca0299edfe82fa9",
+      "type": "USER_SUPPLIED_SCREEN_REFERENCE",
+      "relevance": "CRITICAL",
+      "sourceKind": "USER_CONVERSATION_UPLOAD_2026_10_09",
+      "sourceStatus": "USER_SUPPLIED_VISUAL_TARGET_NOT_RUNTIME_ASSET",
+      "canonicalAttachmentUriVerified": false,
+      "usage": "Profili figli, quote, documenti e impegni con accesso parentale reale."
+    },
+    {
+      "id": "VR-014",
+      "product": "SCD_CORE",
+      "name": "05_AREA_STAFF(1).png",
+      "fileId": "file_000000005330820aab7b7e174c3ae436",
+      "type": "USER_SUPPLIED_SCREEN_REFERENCE",
+      "relevance": "CRITICAL",
+      "sourceKind": "USER_CONVERSATION_UPLOAD_2026_10_09",
+      "sourceStatus": "USER_SUPPLIED_VISUAL_TARGET_NOT_RUNTIME_ASSET",
+      "canonicalAttachmentUriVerified": false,
+      "usage": "Staff/direzione: metriche verificabili, operatività, comunicazioni e attività del giorno."
+    },
+    {
+      "id": "VR-015",
+      "product": "SCD_ONE",
+      "name": "06_COMUNICAZIONI(1).png",
+      "fileId": "file_00000000e30881f4a53c2d2c5e44eb63",
+      "type": "USER_SUPPLIED_SCREEN_REFERENCE",
+      "relevance": "CRITICAL",
+      "sourceKind": "USER_CONVERSATION_UPLOAD_2026_10_09",
+      "sourceStatus": "USER_SUPPLIED_VISUAL_TARGET_NOT_RUNTIME_ASSET",
+      "canonicalAttachmentUriVerified": false,
+      "usage": "Notizie, avvisi, comunicazioni ufficiali e social hub; mai inventare aggiornamenti."
+    },
+    {
+      "id": "VR-016",
+      "product": "SCD_SHARED",
+      "name": "Poster cinematografico dell’app S.C.D. Colicoderviese(1).png",
+      "fileId": "file_00000000818081f4b22b0bb898c9d958",
+      "type": "USER_SUPPLIED_CINEMATIC_REFERENCE",
+      "relevance": "HIGH",
+      "sourceKind": "USER_CONVERSATION_UPLOAD_2026_10_09",
+      "sourceStatus": "USER_SUPPLIED_VISUAL_TARGET_NOT_RUNTIME_ASSET",
+      "canonicalAttachmentUriVerified": false,
+      "usage": "Atmosfera sportiva, brush navy/yellow, stemma, Sky, tifosi e paesaggio; non sfondo statico dell'app."
+    },
+    {
+      "id": "VR-017",
+      "product": "SCD_SHARED",
+      "name": "Ecosistema SCD ColicoDerviese_ sport, persone e territorio.png",
+      "fileId": "file_00000000b02c81f4b1499ba4d39d6063",
+      "type": "USER_SUPPLIED_THREE_APP_REFERENCE",
+      "relevance": "HIGH",
+      "sourceKind": "USER_CONVERSATION_UPLOAD_2026_10_09",
+      "sourceStatus": "USER_SUPPLIED_VISUAL_TARGET_NOT_RUNTIME_ASSET",
+      "canonicalAttachmentUriVerified": false,
+      "usage": "Stessa identità per SCD Universe, Gestionale e Direzione/Sponsor."
+    },
+    {
+      "id": "VR-018",
+      "product": "SCD_ONE",
+      "name": "image-gen-2(20261008-125627)(1).png",
+      "fileId": "file_000000004cbc81f4bab7beb5f7a5bb33",
+      "type": "USER_SUPPLIED_ECOSYSTEM_BOARD",
+      "relevance": "HIGH",
+      "sourceKind": "USER_CONVERSATION_UPLOAD_2026_10_09",
+      "sourceStatus": "USER_SUPPLIED_VISUAL_TARGET_NOT_RUNTIME_ASSET",
+      "canonicalAttachmentUriVerified": false,
+      "usage": "Tavola Universe Social e media: community, news, eventi, territorio, chatbot."
+    },
+    {
+      "id": "VR-019",
+      "product": "SCD_CORE",
+      "name": "image-gen-1(20261008-125622)(1).png",
+      "fileId": "file_000000007ccc81f489d19c1375862d70",
+      "type": "USER_SUPPLIED_ECOSYSTEM_BOARD",
+      "relevance": "HIGH",
+      "sourceKind": "USER_CONVERSATION_UPLOAD_2026_10_09",
+      "sourceStatus": "USER_SUPPLIED_VISUAL_TARGET_NOT_RUNTIME_ASSET",
+      "canonicalAttachmentUriVerified": false,
+      "usage": "Tavola Gestionale: convocation, documenti, staff, famiglia e tablet responsivo."
+    },
+    {
+      "id": "VR-020",
+      "product": "SCD_GROW",
+      "name": "image-gen-3(20261008-125632)(1).png",
+      "fileId": "file_00000000eb4881f58686ccbec7404c04",
+      "type": "USER_SUPPLIED_ECOSYSTEM_BOARD",
+      "relevance": "HIGH",
+      "sourceKind": "USER_CONVERSATION_UPLOAD_2026_10_09",
+      "sourceStatus": "USER_SUPPLIED_VISUAL_TARGET_NOT_RUNTIME_ASSET",
+      "canonicalAttachmentUriVerified": false,
+      "usage": "Tavola Sponsor: moduli partnership, attivazioni, CRM e dashboard."
+    },
+    {
+      "id": "VR-021",
+      "product": "SCD_SHARED",
+      "name": "Identità sportiva tra lago e montagne(1).png",
+      "fileId": "file_00000000ca18821083c0a2afbc665436",
+      "type": "USER_SUPPLIED_VISUAL_IDENTITY_REFERENCE",
+      "relevance": "HIGH",
+      "sourceKind": "USER_CONVERSATION_UPLOAD_2026_10_09",
+      "sourceStatus": "USER_SUPPLIED_VISUAL_TARGET_NOT_RUNTIME_ASSET",
+      "canonicalAttachmentUriVerified": false,
+      "usage": "Identità SCD: lago e montagne, Sky e uso di divise come esempi visivi; nessun kit non approvato nel runtime."
     }
   ],
   "nextRecoveryTargets": [
@@ -175,6 +334,8 @@
     "Tournaments and event visual references",
     "Monza affiliation approved assets",
     "SCD social and editorial graphics",
-    "CEPA presentation/brand documents"
+    "CEPA presentation/brand documents",
+    "Resolve current-chat reference boards to persistent approved Drive/Canva source assets (binary bytes not yet archived)",
+    "Current 2026 visual-system target comparison and visual regression screenshots"
   ]
 }
