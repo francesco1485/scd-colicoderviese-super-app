@@ -135,7 +135,7 @@ function AthleteScreen({onAction,onNotice,onSelect}:{onAction:DemoAction;onNotic
    <div className="scd6-called-date"><small>DOM</small><strong>10</strong><span>NOV</span><b>15:30</b></div><Crest size="small"/><div><strong>ColicoDerviese U15</strong><small>Stadio Comunale · Colico</small><span><CheckCircle2 size={14}/> CONVOCATO</span></div><span className="scd6-called-away">U15</span>
   </button>
   <div className="scd6-minor-header"><h2>I miei documenti</h2><button type="button" onClick={()=>onAction('Documenti')}>Vedi tutti <ChevronRight size={15}/></button></div>
-  <div className="scd6-doclist">{[['Certificato medico','Valido fino al 30/06/2026'],['Tesseramento FIGC','Stagione 2025/2026'],['Documento identità','Caricato il 12/06/2024']].map(v=><button type="button" key={v[0]} onClick={()=>onAction(v[0])}><FileText size={25}/><div><strong>{v[0]}</strong><small>{v[1]}</small></div><CheckCircle2 size={23}/></button>)}</div>
+  <div className="scd6-doclist">{[['Certificato medico','Valido fino al 30/06/2026'],['Tesseramento FIGC','Stagione 2025/2026'],['Documento identità','Caricato il 12/06/2024']].map(v=><button type="button" key={v[0]} onClick={()=>onAction(v[0] ?? 'Documento')}><FileText size={25}/><div><strong>{v[0]}</strong><small>{v[1]}</small></div><CheckCircle2 size={23}/></button>)}</div>
  </div></>;
 }
 function CircularProgress(){return <div className="scd6-progress-circle"><strong>70%</strong></div>;}
