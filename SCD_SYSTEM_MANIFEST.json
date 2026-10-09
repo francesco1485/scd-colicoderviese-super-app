@@ -3,8 +3,8 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.27.3",
-    "effective_at": "2026-10-03",
+    "version": "3.27.4",
+    "effective_at": "2026-10-09",
     "status": "BINDING",
     "language": "it-IT",
     "timezone": "Europe/Rome",
@@ -282,7 +282,10 @@
         "LAKE_AQUA",
         "MUTED_GOLD",
         "WARM_WHITE",
-        "LOW_SATURATION_ACCENTS"
+        "LOW_SATURATION_ACCENTS",
+        "SCD_NAVY",
+        "SCD_YELLOW",
+        "CLEAN_WHITE"
       ],
       "territory": [
         "COLICO",
@@ -301,7 +304,6 @@
         "schermate_vuote",
         "card_senza_azione",
         "sponsor_nascosti",
-        "REAL_PHOTOGRAPHY_IN_NEXTGEN_UI",
         "HIGH_SATURATION_FULL_SCREEN_COLOR",
         "BROCHURE_HERO",
         "GENERIC_WHITE_CARD_GRID",
@@ -339,13 +341,16 @@
         "AVIF"
       ],
       "no_foreign_rectangular_background_around_logos": true,
-      "nextgen_real_photography_in_ui": false,
+      "nextgen_real_photography_in_ui": true,
       "allowed_real_media": [
         "OFFICIAL_LOGOS",
         "FUNCTIONAL_DOCUMENTS",
-        "USER_MEDIA_WHEN_REQUIRED_BY_SERVICE_AND_AUTHORIZED"
+        "USER_MEDIA_WHEN_REQUIRED_BY_SERVICE_AND_AUTHORIZED",
+        "APPROVED_TERRITORY_PHOTOGRAPHY_WITH_DOCUMENTED_RIGHTS",
+        "AUTHORIZED_SPORT_AND_TEAM_PHOTOGRAPHY_WITH_CONSENT",
+        "OFFICIAL_CLUB_MASCOT_ASSET"
       ],
-      "synthetic_scene_rule": "SPORT_TERRITORY_STADIUM_AND_EDITORIAL_ATMOSPHERE_MUST_BE_ORIGINAL_SYNTHETIC_RENDERING",
+      "synthetic_scene_rule": "Use original synthetic scenes when verified authorized photos are unavailable. Use authorized real SCD/territory photos when approved and accessible; never synthesize factual-looking athlete/team/venue scenes as real evidence.",
       "no_raster_layout_patches": true,
       "no_raw_user_photo_render_in_twin": true
     },
@@ -444,6 +449,58 @@
         "MEDIA_LOADING",
         "INITIAL_INFORMATION_VOLUME"
       ]
+    },
+    "current_user_visual_directive": {
+      "effective_at": "2026-10-09",
+      "authority": "DIREZIONE_SCD",
+      "user_directive": "UD-011",
+      "scope": "GRAPHIC_FIRST_FULL_SYSTEM_THREE_APPS",
+      "canonical_brief": "docs/SCD_DNA_GRAFICO_OPERATIVO_2026-10-09.md",
+      "reference_registry": "config/scd-visual-references.v1.json",
+      "primary_board": "VR-009",
+      "six_screen_reference_ids": [
+        "VR-010",
+        "VR-011",
+        "VR-012",
+        "VR-013",
+        "VR-014",
+        "VR-015"
+      ],
+      "ecosystem_reference_ids": [
+        "VR-016",
+        "VR-017",
+        "VR-018",
+        "VR-019",
+        "VR-020",
+        "VR-021"
+      ],
+      "status": "USER_SUPPLIED_VISUAL_TARGET_IMPLEMENTATION_NOT_YET_APPROVED",
+      "priority_order": [
+        "VISUAL_RESEARCH_ASSET_RECOVERY",
+        "COMPLETE_VISUAL_DESIGN_SYSTEM",
+        "INTERACTIVE_RESPONSIVE_UI_ALL_SCOPES",
+        "REAL_DATA_ADAPTERS_AND_DYNAMIC_INTERACTIONS",
+        "MOTION_SPATIAL_3D_WITH_USABILITY",
+        "INDEXING_AND_AUTOMATION",
+        "ROLE_SCOPED_SKY_MEMORY_ENGINE"
+      ],
+      "visual_acceptance": "COMPARE_RENDERED_DESKTOP_MOBILE_SCREENSHOTS_TO_USER_SUPPLIED_BOARDS",
+      "design_rules": [
+        "SPORT_EDITORIAL_PREMIUM_SCD_NOT_GENERIC_SAAS",
+        "NAVY_YELLOW_WHITE_BRUSH_MOUNTAINS_LAKE_SKY",
+        "SIX_REFERENCE_SCREENS_NOT_FAKE_PHONE_POSTER",
+        "THREE_COORDINATED_REAL_APPS_ONE_IDENTITY",
+        "DRIVE_CANVA_PRESS_OFFICE_ASSET_RECOVERY_FIRST",
+        "NO_FAKE_SPORT_EVENTS_PEOPLE_SPONSORS_OR_PAYMENTS",
+        "PHOTO_RIGHTS_PRIVACY_OF_MINORS_AND_APPROVAL_REQUIRED",
+        "NO_PUBLIC_PRODUCTION_MUTATIONS_WITHOUT_AUTHORIZATION"
+      ],
+      "status_source": "USER_COMMAND_2026_10_09"
+    },
+    "user_master_source_override_legacy_restrictions": {
+      "effective_at": "2026-10-09",
+      "rule": "Recent explicitly user-directed visual references and authorized original photographs govern new 2026/27 visual design. Older synthetic-only/legacy snapshot flags document old builds and are not future prohibitions. Keep fallback independent of images.",
+      "older_snapshots_not_runtime_approval": true
     }
   },
   "temporal_core": {
