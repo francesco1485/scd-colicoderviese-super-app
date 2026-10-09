@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import {
  ArrowRight, Bell, Calendar, CalendarDays, CheckCircle2, ChevronLeft, ChevronRight,
@@ -189,8 +189,8 @@ function CommunicationsScreen({onAction,onNotice}:{onAction:DemoAction;onNotice:
   </div></>;
 }
 export function SCDFidelitySix({onOpenGallery}:{onOpenGallery?:()=>void}){
- const getInitial=():Screen=>{if(typeof window==='undefined')return 'home';const q=new URLSearchParams(window.location.search).get('screen');return allScreens.some(s=>s.id===q)?q as Screen:'home';};
- const [screen,setScreen]=useState<Screen>(getInitial);
+ const [screen,setScreen]=useState<Screen>('home');
+ useEffect(()=>{const q=new URLSearchParams(window.location.search).get('screen');if(allScreens.some(s=>s.id===q))setScreen(q as Screen);},[]);
  const [dialog,setDialog]=useState<string|null>(null);
  const to=(s:Screen)=>{setScreen(s);if(typeof window!=='undefined'){const u=new URL(window.location.href);u.searchParams.set('screen',s);window.history.replaceState(null,'',u.toString());}};
  const onAction=(name:string)=>setDialog(name);
