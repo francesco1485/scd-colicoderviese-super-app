@@ -3,7 +3,7 @@ import * as Dialog from '@radix-ui/react-dialog';
 import {
   ArrowRight, Bell, CalendarDays, CalendarRange, Check, ChevronLeft, ChevronRight,
   CircleHelp, ClipboardList, House, LockKeyhole, MapPin, Megaphone, MessageCircle,
-  Search, ShieldCheck, Shirt, TrafficCone, Trophy, UserRound, UsersRound, X
+  Search, ShieldCheck, Shirt, TrafficCone, Trophy, UserRound, UsersRound, Volleyball, X
 } from 'lucide-react';
 import logo from '@/assets/logo-scd.png.asset.json';
 import { OfficialAsset } from './OfficialAsset';
@@ -20,7 +20,7 @@ const nav = [
   {id:'profile',label:'Profilo',Icon:UserRound},
 ] as const;
 const quick = [
-  {id:'Gare',Icon:Trophy,tone:'blue'},
+  {id:'Gare',Icon:Volleyball,tone:'blue'},
   {id:'Allenamenti',Icon:TrafficCone,tone:'orange'},
   {id:'Eventi',Icon:CalendarDays,tone:'navy'},
   {id:'Iniziative',Icon:UsersRound,tone:'green'},

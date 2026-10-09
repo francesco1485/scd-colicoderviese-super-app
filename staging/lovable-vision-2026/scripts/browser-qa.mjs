@@ -25,6 +25,7 @@ for (const [name,width,height] of [['mobile',390,844],['desktop',1440,900]]) {
   assert.ok(measurements.overflow<=2,'Horizontal scroll '+name+' '+measurements.overflow);
   measurements.regions.forEach((e,i)=>assert.ok(e.height>20,'Missing/flattened '+e.name));
   console.log('BOARD_GEOMETRY '+name+' '+JSON.stringify(measurements.regions));
+  await page.screenshot({path:'test-output/scd-one-viewport-'+name+'-'+width+'x'+height+'.png',fullPage:false});
   await page.screenshot({path:'test-output/scd-one-home-'+name+'-'+width+'x'+height+'.png',fullPage:true});
   if(name==='mobile') {
     const a=measurements.regions;

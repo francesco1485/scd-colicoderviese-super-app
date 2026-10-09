@@ -102,3 +102,6 @@
 @media(prefers-reduced-motion:reduce){.scd-fidelity *{transition:none!important;animation:none!important}}
 
 .scd-f-pageheading h1{font-size:24px;margin:0;font-weight:900}
+
+/* Original source board uses a visually substantial double promo rail. */
+.scd-f-promo{min-height:79px}
