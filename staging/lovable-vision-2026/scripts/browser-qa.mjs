@@ -18,6 +18,12 @@ for (const [name,width,height] of [['mobile',390,844],['desktop',1440,900]]) {
  assert.ok(await page.locator('.scd-one-brand img').evaluate(x=>x.naturalWidth>0),'Official crest must load');
  const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
  assert.ok(overflow<=2,`Horizontal overflow at ${width}px: ${overflow}px`);
+ const quickToContentGap=await page.evaluate(()=>{
+   const quick=document.querySelector('.scd-one-quick-section').getBoundingClientRect();
+   const content=document.querySelector('.scd-one-content-grid').getBoundingClientRect();
+   return Math.round(content.top-quick.bottom);
+ });
+ assert.ok(quickToContentGap<=50,`Unexpected vertical whitespace after quick actions at ${width}px: ${quickToContentGap}px`);
  await page.screenshot({path:`test-output/scd-one-home-${name}-${width}x${height}.png`,fullPage:true});
  await page.locator('[data-testid="quick-allenamenti"]').click();
  await page.locator('[data-testid="activity-panel"]').getByText(/Allenamenti · In aggiornamento/).waitFor();

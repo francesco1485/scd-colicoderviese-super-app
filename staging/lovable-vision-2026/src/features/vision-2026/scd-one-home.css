@@ -1,3 +1,5 @@
+/* The inherited Lovable foundation sets global section {min-height:520px}. SCD ONE owns its layout. */
+.scd-one section{min-height:0!important}
 /* SCD ONE full-size vision. Original SCD locked assets and transparent official Sky. */
 .scd-one{--scd-blue:#0655a7;--scd-deep:#051f4b;--scd-navy:#072d65;--scd-gold:#ffdf16;--scd-text:#0a2549;--scd-muted:#526886;--scd-line:#d9e4f0;background:#eff4fa;min-height:100vh;color:var(--scd-text);font-family:Arial,"Helvetica Neue",sans-serif}
 .scd-one *{box-sizing:border-box}.scd-one button{cursor:pointer;font:inherit}.scd-one button:focus-visible,.scd-one input:focus-visible{outline:3px solid var(--scd-gold);outline-offset:3px}.scd-one a:focus-visible{outline:3px solid var(--scd-gold);outline-offset:3px}.scd-one-skip{position:absolute;left:-9999px;top:10px;background:#fff;color:#05295d;padding:10px;z-index:100}.scd-one-skip:focus{left:15px}
