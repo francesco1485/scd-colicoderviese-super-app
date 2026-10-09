@@ -31,6 +31,10 @@ for(const [label,width,height] of [['mobile',390,844],['desktop',1440,900]]){
  await fakeAPI(page);
  const result=await page.goto(base+'/?scdVision=1#pulse',{waitUntil:'networkidle',timeout:30000});
  assert.equal(result.status(),200,label+' HTTP 200');
+ await page.waitForTimeout(1700);
+ const diag=await page.evaluate(()=>({url:location.href,ready:document.readyState,flag:new URLSearchParams(location.search).get('scdVision'),api:!!window.SCDNextGen,adapter:typeof window.SCDNextGen?.publicSnapshot,home:!!document.getElementById('scdOneHome'),root:!!document.getElementById('view-pulse'),scripts:[...document.scripts].map(x=>x.src.split('/').pop()).filter(x=>/scd|native/.test(x))}));
+ console.log('NATIVE BOOT DIAGNOSTIC '+label+': '+JSON.stringify(diag)+' | errors='+JSON.stringify(errors));
+ if(!diag.home){await page.screenshot({path:'test-output/scd-one-native-debug-'+label+'.png',fullPage:true,animations:'disabled'});throw new Error('SCD native mount unavailable: '+JSON.stringify(diag)+' '+errors.join('; '));}
  await page.locator('[data-testid="one-home"]').waitFor();
  await page.getByText('Avversario CI').first().waitFor({timeout:20000});
  assert.ok((await page.getByText('Partner CI autorizzato').count())>=1,'Partner from public newsroom absent');
