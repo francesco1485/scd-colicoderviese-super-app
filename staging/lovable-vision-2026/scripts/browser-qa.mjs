@@ -24,6 +24,8 @@ for (const [name,width,height] of [['mobile',390,844],['desktop',1440,900]]) {
   });
   assert.ok(measurements.overflow<=2,'Horizontal scroll '+name+' '+measurements.overflow);
   measurements.regions.forEach((e,i)=>assert.ok(e.height>20,'Missing/flattened '+e.name));
+  console.log('BOARD_GEOMETRY '+name+' '+JSON.stringify(measurements.regions));
+  await page.screenshot({path:'test-output/scd-one-home-'+name+'-'+width+'x'+height+'.png',fullPage:true});
   if(name==='mobile') {
     const a=measurements.regions;
     for(let i=1;i<a.length;i++)assert.ok(a[i].top>=a[i-1].top-1,'Wrong mobile board order '+a[i].name);
@@ -34,7 +36,7 @@ for (const [name,width,height] of [['mobile',390,844],['desktop',1440,900]]) {
     assert.ok(a[4].height>=85&&a[4].height<=155,'Sponsor bar proportions out of range');
     assert.ok(a[5].height>=110&&a[5].height<=240,'Territory module proportions out of range');
   }
-  await page.screenshot({path:'test-output/scd-one-home-'+name+'-'+width+'x'+height+'.png',fullPage:true});
+
   await page.locator('[data-testid="quick-allenamenti"]').click();
   await page.locator('[data-testid="activity-panel"]').getByText('Allenamenti · In aggiornamento').waitFor();
   await page.locator('[data-testid="quick-allenamenti"]').click();

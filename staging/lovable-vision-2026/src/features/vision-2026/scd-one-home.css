@@ -100,3 +100,5 @@
 }
 @media(max-width:390px){.scd-f-brand img{width:51px;height:61px}.scd-f-brand strong{font-size:21px}.scd-f-sky{right:-34px;width:237px}.scd-f-headline h1{font-size:25px}.scd-f-match-ribbon{font-size:13px;min-width:61%}.scd-f-club b{font-size:9.4px}.scd-f-promo-icon{min-width:55px;height:57px}}
 @media(prefers-reduced-motion:reduce){.scd-fidelity *{transition:none!important;animation:none!important}}
+
+.scd-f-pageheading h1{font-size:24px;margin:0;font-weight:900}
