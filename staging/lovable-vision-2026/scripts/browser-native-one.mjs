@@ -31,6 +31,9 @@ for(const [label,width,height] of [['mobile',390,844],['desktop',1440,900]]){
  await fakeAPI(page);
  const result=await page.goto(base+'/?scdVision=1#pulse',{waitUntil:'networkidle',timeout:30000});
  assert.equal(result.status(),200,label+' HTTP 200');
+ const consentBanner=page.locator('#scdCookieBanner');
+ if(await consentBanner.isVisible()){await page.getByRole('button',{name:'Solo necessari'}).click();await consentBanner.waitFor({state:'hidden'});}
+ assert.equal(await consentBanner.isVisible(),false,'Analytics consent must be manageable without obstructing UI');
  await page.waitForTimeout(1700);
  const diag=await page.evaluate(()=>({url:location.href,ready:document.readyState,flag:new URLSearchParams(location.search).get('scdVision'),api:!!window.SCDNextGen,adapter:typeof window.SCDNextGen?.publicSnapshot,home:!!document.getElementById('scdOneHome'),root:!!document.getElementById('view-pulse'),scripts:[...document.scripts].map(x=>x.src.split('/').pop()).filter(x=>/scd|native/.test(x))}));
  console.log('NATIVE BOOT DIAGNOSTIC '+label+': '+JSON.stringify(diag)+' | errors='+JSON.stringify(errors));
