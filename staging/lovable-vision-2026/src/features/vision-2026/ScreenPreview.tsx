@@ -24,13 +24,21 @@ export function ScreenPreview({ screen, selected, onSelect }: { screen: VisionSc
   const Icon = screen.icon;
   const tabEmpty = active === 'Quote' ? 'Quote e pagamenti non disponibili' : active === 'Documenti' ? 'Nessun documento disponibile' : active === 'Convocazioni' ? 'Nessuna convocazione collegata' : active === 'Presenze' ? 'Presenze non disponibili' : active === 'Social Hub' ? 'Canali social non collegati' : active === 'Avvisi' ? 'Nessun avviso collegato' : screen.empty;
 
-  return <article className={`vision-preview ${selected ? 'is-selected' : ''}`} aria-label={screen.title}>
+  return <article data-screen={screen.id} className={`vision-preview ${selected ? 'is-selected' : ''}`} aria-label={screen.title}>
     <div className="vision-preview-caption"><span>{screen.family}</span><Button variant="quiet" className="vision-select" aria-pressed={selected} aria-label={`Seleziona ${screen.title}`} onClick={onSelect}><ArrowUpRight size={16} /><span>{selected ? 'Selezionata' : 'Esplora'}</span></Button></div>
     <div className="vision-phone">
       <header className="vision-phone-header"><OfficialAsset src={logo.url} alt="Stemma SCD" /><div><small>S.C.D. COLICODERVIESE</small><h2>{screen.title}</h2></div><Icon size={20} aria-hidden="true" /></header>
       <div className="vision-phone-body">
         <span className="vision-demo">{visionData.status}</span>
-        {screen.id === 'home' ? <><TerritoryPlaceholder compact /><h3 className="vision-home-title">IL NOSTRO CLUB.<br /><em>IL NOSTRO LARIO.</em></h3></> : <div className="vision-screen-intro"><Icon size={26} aria-hidden="true" /><h3>{screen.subtitle}</h3></div>}
+        {screen.id === 'home' ? <>
+          <div className="vision-home-cover">
+            <TerritoryPlaceholder compact />
+            <div className="vision-home-cover-text"><span>SPORT · PERSONE · TERRITORIO</span><h3>Questa settimana</h3><p>Il calcio nel cuore dell'Alto Lario.</p></div>
+          </div>
+          <div className="vision-home-quicklinks" aria-label="Accessi rapidi">{['Gare', 'Allenamenti', 'Eventi', 'Iniziative'].map((item,i)=><Button key={item} variant="quiet" aria-pressed={active===item} onClick={()=>setActive(item)}><span aria-hidden="true">{['⚽','▲','▦','●'][i]}</span><strong>{item}</strong></Button>)}</div>
+          <div className="vision-home-match"><div className="vision-home-sectionhead"><strong>PROSSIMA GARA</strong><small>DATI DA FONTE VERIFICATA</small></div><div className="vision-home-match-empty"><CalendarDays size={22}/><div><strong>Gara in aggiornamento</strong><span>Squadra, avversario, luogo e orario non ancora collegati.</span></div></div></div>
+          <div className="vision-home-community"><strong>Il nostro territorio</strong><p>Colico, Dervio e l'Alto Lario. Un club che cresce con la comunità.</p></div>
+        </> : <div className="vision-screen-intro"><Icon size={26} aria-hidden="true" /><h3>{screen.subtitle}</h3></div>}
         <div className="vision-widget-tabs" role="group" aria-label={`Viste ${screen.title}`}>{screen.tabs.map(tab => <Button key={tab} variant="quiet" aria-pressed={active === tab} onClick={() => setActive(tab)}>{tab}</Button>)}</div>
         <div className="vision-widget-heading"><h4>{screen.id === 'home' ? screen.widget : active}</h4><span>NON COLLEGATO</span></div>
         <EmptyState title={tabEmpty} icon={screen.id === 'calendar' || screen.id === 'home' ? CalendarDays : screen.id === 'athlete' || screen.id === 'family' ? FileText : Link2Off} />
