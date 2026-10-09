@@ -62,7 +62,7 @@ function HomeScreen({to,onAction,onNotice}:{to:(x:Screen)=>void;onAction:DemoAct
   <div className="scd6-homehero">
    <Top brand onNotice={onNotice} onAction={onAction}/>
    <div className="scd6-homehero-photo"/>
-   <button type="button" className="scd6-hero-sky" onClick={()=>onAction('Sky, assistente virtuale')} aria-label="Apri Sky"><img src="/assets/sky-mascotte-ufficiale.png" alt="Mascotte Sky originale"/></button>
+   <button type="button" className="scd6-hero-sky" onClick={()=>onAction('Sky, assistente virtuale')} aria-label="Apri Sky"><img src="/assets/sky-dalla-tavola.png" alt="Mascotte Sky originale"/></button>
    <div className="scd6-homehero-copy"><h1>Questa settimana</h1><p>Sport, crescita e comunità<br/>nel cuore dell'Alto Lario.</p></div>
   </div>
   <div className="scd6-homebody">
@@ -158,7 +158,7 @@ function FamilyScreen({onAction,onNotice,onSelect}:{onAction:DemoAction;onNotice
 function StaffScreen({onAction,onNotice}:{onAction:DemoAction;onNotice:()=>void}){
  const stats=[{n:'12',text:'Squadre',Icon:Users,c:'blue'},{n:'256',text:'Atleti',Icon:Users,c:'green'},{n:'28',text:'Staff',Icon:UserRound,c:'yellow'},{n:'94',text:'Documenti',Icon:FileText,c:'blue'}];
  const actions=[{n:'Convocazioni e presenze',Icon:CalendarDays,b:'3'},{n:'Comunicazioni',Icon:Megaphone,b:'3'},{n:'Persone e staff',Icon:Users},{n:'Documenti e scadenze',Icon:ClipboardList,b:'1'}];
- return <><div className="scd6-staffhero"><Top brand settings onNotice={onNotice} onAction={onAction}/><img src="/assets/sky-mascotte-ufficiale.png" alt="Sky mascotte originale"/><div><h1>Area Staff</h1><p>Statistiche, squadre, atleti<br/>e gestione del club.</p></div></div><div className="scd6-page scd6-staff">
+ return <><div className="scd6-staffhero"><Top brand settings onNotice={onNotice} onAction={onAction}/><img src="/assets/sky-dalla-tavola.png" alt="Sky mascotte originale"/><div><h1>Area Staff</h1><p>Statistiche, squadre, atleti<br/>e gestione del club.</p></div></div><div className="scd6-page scd6-staff">
   <div className="scd6-statsrow">{stats.map(s=><button type="button" key={s.text} onClick={()=>onAction(s.text)}><s.Icon className={'scd6-icon-'+s.c} size={25}/><b>{s.n}</b><strong>{s.text}</strong></button>)}</div>
   <div className="scd6-staffactions">{actions.map(a=><button type="button" key={a.n} onClick={()=>onAction(a.n)}><a.Icon size={29}/><strong>{a.n}</strong>{a.b&&<i>{a.b}</i>}</button>)}</div>
   <Bar text="Prossime attività di oggi" other="Vedi calendario" onClick={()=>onAction('Calendario staff')}/>
