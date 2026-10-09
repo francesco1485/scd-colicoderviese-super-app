@@ -41,6 +41,7 @@ for(const [screen,title] of scenarios){
  if(screen==='calendar'){
   await page.getByRole('button',{name:'Settimana successiva'}).click();
   assert.ok((await page.locator('.scd6-weekpicker').innerText()).includes('Settimana successiva'));
+  await page.getByRole('button',{name:'Settimana precedente'}).click();
   await page.getByRole('button',{name:'Mese',exact:true}).click();
   assert.equal(await page.locator('.scd6-calendar-month').count(),1);
  }
