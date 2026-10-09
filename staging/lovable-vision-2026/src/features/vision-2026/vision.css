@@ -64,3 +64,30 @@
  .vision-page .vision-workspace{background:#edf2f8}
  .vision-page .vision-widget-tabs{background:#f7f9fc}
 }
+
+
+/* HOME_PUBBLICA_SOURCE_BOARD: cinematic cover, four tactile destinations, match status.
+   No invented event, sponsor, result or private media. */
+.vision-preview[data-screen=home] .vision-home-cover{position:relative;border-radius:8px;overflow:hidden;margin-top:0}
+.vision-preview[data-screen=home] .vision-home-cover .vision-territory-compact{height:220px;border-radius:0;background-position:center 48%}
+.vision-preview[data-screen=home] .vision-home-cover .vision-territory-compact>span{display:none}
+.vision-home-cover-text{position:absolute;inset:auto 0 0;padding:48px 17px 15px;color:#fff;background:linear-gradient(transparent,rgba(3,25,60,.94));text-shadow:0 2px 7px rgba(0,0,0,.35)}
+.vision-home-cover-text>span{font-size:9px;letter-spacing:.12em;color:#ffdf13;font-weight:900}
+.vision-home-cover-text h3{font-weight:950;font-size:26px;line-height:1.1;margin:7px 0!important;color:#fff}
+.vision-home-cover-text p{font-weight:700;font-size:11px}
+.vision-home-quicklinks{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin:11px 0 17px}
+.vision-home-quicklinks button{padding:9px 1px!important;min-height:68px;display:flex;flex-direction:column;gap:5px;border:1px solid #dde5ee;border-radius:9px;background:#fff;color:#052858;box-shadow:0 3px 8px rgba(3,35,70,.06);font-size:9px}
+.vision-home-quicklinks button>span{font-size:20px;line-height:1;color:#0059ac}
+.vision-home-quicklinks button strong{font-size:9px}
+.vision-home-quicklinks button[aria-pressed=true]{border-color:#f3ca00;box-shadow:inset 0 -4px 0 #ffdf13}
+.vision-home-match{border:1px solid #d8e2ef;border-radius:9px;background:#fff;overflow:hidden;margin-bottom:12px}
+.vision-home-sectionhead{display:flex;justify-content:space-between;align-items:center;gap:8px;background:#0754a0;color:white;padding:11px 13px}
+.vision-home-sectionhead strong{font-size:11px}.vision-home-sectionhead small{font-size:8px;color:#fff0a5}
+.vision-home-match-empty{padding:14px;display:flex;gap:11px;align-items:center;color:#0754a0}
+.vision-home-match-empty>div{display:grid;gap:3px}.vision-home-match-empty strong{font-size:12px}
+.vision-home-match-empty span{font-size:10px;color:#596d84;line-height:1.5}
+.vision-home-community{padding:13px;background:#eaf2fb;border-left:4px solid #ffdf13;margin-bottom:14px}
+.vision-home-community strong{font-size:12px}.vision-home-community p{font-size:10px;color:#455c75;margin-top:4px!important}
+.vision-preview[data-screen=home]>.vision-phone .vision-widget-tabs{display:none}
+.vision-preview[data-screen=home] .vision-widget-heading{margin-top:10px}
+@media(max-width:599px){.vision-preview[data-screen=home] .vision-home-cover .vision-territory-compact{height:210px}.vision-home-cover-text h3{font-size:29px}}
