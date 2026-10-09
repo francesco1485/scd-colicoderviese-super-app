@@ -501,6 +501,31 @@
       "effective_at": "2026-10-09",
       "rule": "Recent explicitly user-directed visual references and authorized original photographs govern new 2026/27 visual design. Older synthetic-only/legacy snapshot flags document old builds and are not future prohibitions. Keep fallback independent of images.",
       "older_snapshots_not_runtime_approval": true
+    },
+    "native_one_preview": {
+      "state": "ISOLATED_FEATURE_FLAG",
+      "flag": "?scdVision=1",
+      "audience": "PUBLIC_READ_ONLY",
+      "views": [
+        "HOME_PUBLIC",
+        "CALENDAR_LIVE"
+      ],
+      "user_visual_masters": [
+        "01_HOME_PUBBLICA (1).png",
+        "02_CALENDARIO_LIVE (1).png"
+      ],
+      "render_type": "NATIVE_DOM_CSS_COMPONENTS_NOT_PNG_OVERLAY",
+      "data_source": "EXISTING_R20_PUBLIC_CALENDAR_VIA_SCD_NEXTGEN",
+      "scope": "existing index.html, same-origin API and existing SCDNextGen router",
+      "invariant": "NO_SECOND_DATABASE_NO_SYNTHETIC_MATCH_NO_PRIVATE_DATA",
+      "original_assets": [
+        "assets/logo-scd.png",
+        "assets/sky.png",
+        "assets/hero-colico.webp"
+      ],
+      "production_default_unchanged": true,
+      "reviewed_at": "2026-10-09",
+      "next_gate": "BROWSER_SCREENSHOT_VISUAL_PARITY_AND_USER_APPROVAL_BEFORE_DEFAULT_ENABLE"
     }
   },
   "temporal_core": {
