@@ -30,6 +30,7 @@ jobs:
           node --check scd-one-native.js
           npm run test:manifest
           node --test tests/public-calendar-projection.test.mjs
+          node --test tests/scd-native-router-selector.test.mjs
       - name: Build published root output
         run: npm run build:pages
       - name: Install existing visual QA dependencies
