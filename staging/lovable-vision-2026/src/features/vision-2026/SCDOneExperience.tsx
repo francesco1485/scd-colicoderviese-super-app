@@ -1,188 +1,183 @@
-import { useMemo, useState, type FormEvent } from 'react';
+import { useMemo, useState } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import {
-  ArrowRight, ArrowUpRight, Bell, CalendarDays, CalendarRange, Check,
-  ChevronLeft, ChevronRight, CircleHelp, Clock3, Compass, FileText, Flag,
-  House, LockKeyhole, MapPin, Megaphone, Menu, MessageCircle, Mountain,
-  Search, ShieldCheck, Shirt, Ticket, Trophy, UsersRound, Volleyball, X,
+  ArrowRight, Bell, CalendarDays, CalendarRange, Check, ChevronLeft, ChevronRight,
+  CircleHelp, ClipboardList, House, LockKeyhole, MapPin, Megaphone, MessageCircle,
+  Search, ShieldCheck, Shirt, TrafficCone, Trophy, UserRound, UsersRound, X
 } from 'lucide-react';
 import logo from '@/assets/logo-scd.png.asset.json';
 import { OfficialAsset } from './OfficialAsset';
 import './scd-one-home.css';
 
-type PublicArea = 'home' | 'calendar' | 'teams' | 'events' | 'communications';
-type Activity = 'Gare' | 'Allenamenti' | 'Eventi' | 'Iniziative';
-const publicNav: { id: PublicArea; text: string; Icon: typeof House }[] = [
-  { id: 'home', text: 'Home', Icon: House },
-  { id: 'calendar', text: 'Calendario', Icon: CalendarDays },
-  { id: 'teams', text: 'Squadre', Icon: Shirt },
-  { id: 'events', text: 'Eventi', Icon: Ticket },
-  { id: 'communications', text: 'Notizie', Icon: Megaphone },
-];
-const quickActions: { id: Activity; Icon: typeof House; description: string }[] = [
-  { id: 'Gare', Icon: Volleyball, description: 'Campionati e partite' },
-  { id: 'Allenamenti', Icon: Flag, description: 'Attività sul campo' },
-  { id: 'Eventi', Icon: CalendarRange, description: 'Incontri e tornei' },
-  { id: 'Iniziative', Icon: UsersRound, description: 'Club e comunità' },
-];
-const emptyMessages: Record<Activity, string> = {
-  Gare: 'Il calendario ufficiale delle gare non è ancora collegato a questa anteprima.',
-  Allenamenti: 'Le attività sportive non sono ancora collegate a questa anteprima.',
-  Eventi: 'Il registro degli eventi non è ancora collegato a questa anteprima.',
-  Iniziative: 'Le iniziative della comunità non sono ancora collegate a questa anteprima.',
-};
-const SKY_SRC = '/assets/sky-mascotte-ufficiale.png';
+type Area = 'home'|'calendar'|'teams'|'events'|'profile'|'communications'|'partners'|'territory';
+type Activity = 'Gare'|'Allenamenti'|'Eventi'|'Iniziative';
+const skyImage='/assets/sky-mascotte-ufficiale.png';
+const nav = [
+  {id:'home',label:'Home',Icon:House},
+  {id:'calendar',label:'Calendario',Icon:CalendarDays},
+  {id:'teams',label:'Squadre',Icon:UsersRound},
+  {id:'events',label:'Eventi',Icon:CalendarRange},
+  {id:'profile',label:'Profilo',Icon:UserRound},
+] as const;
+const quick = [
+  {id:'Gare',Icon:Trophy,tone:'blue'},
+  {id:'Allenamenti',Icon:TrafficCone,tone:'orange'},
+  {id:'Eventi',Icon:CalendarDays,tone:'navy'},
+  {id:'Iniziative',Icon:UsersRound,tone:'green'},
+] as const;
 
-function getWeekLabel(shift: number) {
-  const today = new Date();
-  const monday = new Date(today);
-  monday.setHours(12, 0, 0, 0);
-  monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7) + shift * 7);
-  const sunday = new Date(monday);
-  sunday.setDate(sunday.getDate() + 6);
-  const short = new Intl.DateTimeFormat('it-IT', { day: 'numeric', month: 'short', timeZone: 'Europe/Rome' });
-  const year = new Intl.DateTimeFormat('it-IT', { year: 'numeric', timeZone: 'Europe/Rome' }).format(sunday);
-  return `${short.format(monday)} – ${short.format(sunday)} ${year}`;
+function weekText(offset:number) {
+  const now=new Date();
+  const monday=new Date(now);
+  monday.setHours(12,0,0,0);
+  monday.setDate(now.getDate()-(now.getDay()+6)%7+offset*7);
+  const sunday=new Date(monday);
+  sunday.setDate(monday.getDate()+6);
+  const format=new Intl.DateTimeFormat('it-IT',{day:'numeric',month:'short',year:'numeric'});
+  return format.format(monday)+' – '+format.format(sunday);
 }
-function Status({ label = 'DATO_IN_AGGIORNAMENTO' }: { label?: string }) {
-  return <span className="scd-one-status"><span aria-hidden="true" className="scd-one-status-dot"/>{label}</span>;
+function Nav({current,go,mobile=false}:{current:Area;go:(a:Area)=>void;mobile?:boolean}) {
+  return <nav className={mobile?'scd-f-nav scd-f-nav-mobile':'scd-f-nav scd-f-nav-desktop'} aria-label={mobile?'Navigazione mobile':'Navigazione SCD ONE'}>
+    {nav.map(({id,label,Icon})=><button key={id} type="button" data-testid={(mobile?'mobile-nav-':'nav-')+id}
+      aria-current={current===id?'page':undefined} onClick={()=>go(id)} className={current===id?'current':''}>
+      <Icon size={20} strokeWidth={current===id?2.8:1.9}/><span>{label}</span>
+    </button>)}
+  </nav>;
 }
-function NavButton({ id, text, Icon, selected, onSelect, testid }: {
-  id: PublicArea; text: string; Icon: typeof House; selected: boolean;
-  onSelect: (id: PublicArea) => void; testid?: string;
-}) {
-  return <button type="button" data-testid={testid || `nav-${id}`} aria-current={selected ? 'page' : undefined}
-    className={`scd-one-navbtn ${selected ? 'active' : ''}`} onClick={() => onSelect(id)}>
-    <Icon size={20} strokeWidth={selected ? 2.8 : 2} aria-hidden="true"/><span>{text}</span>
-  </button>;
-}
-export function SCDOneExperience({ onOpenGallery }: { onOpenGallery: () => void }) {
-  const [area, setArea] = useState<PublicArea>('home');
-  const [activity, setActivity] = useState<Activity>('Gare');
-  const [weekShift, setWeekShift] = useState(0);
-  const [skyOpen, setSkyOpen] = useState(false);
-  const [search, setSearch] = useState('');
-  const [searchNotice, setSearchNotice] = useState('');
-  const [territoryOpen, setTerritoryOpen] = useState(false);
-  const [mobileMenu, setMobileMenu] = useState(false);
-  const weekLabel = useMemo(() => getWeekLabel(weekShift), [weekShift]);
-  const selectArea = (next: PublicArea) => { setArea(next); setMobileMenu(false); setSearchNotice(''); };
-  const searchSubmit = (ev: FormEvent<HTMLFormElement>) => {
-    ev.preventDefault();
-    const value = search.trim();
-    setSearchNotice(value ? `Ricerca per “${value}”: servizio non collegato al laboratorio visivo.` : 'Inserisci un termine da cercare.');
-  };
-  const currentTitle: Record<PublicArea, string> = {
-    home: 'Questa settimana', calendar: 'Calendario Live',
-    teams: 'Le nostre squadre', events: 'Eventi e tornei', communications: 'La voce del club',
-  };
-  const categoryText: Record<PublicArea, string> = {
-    home: '', calendar: 'Gare, allenamenti, trasferte e iniziative in un unico calendario autorizzato.',
-    teams: 'Tutte le squadre del club, per categoria e stagione.',
-    events: 'Le iniziative che uniscono sport, famiglie e territorio.',
-    communications: 'Notizie, aggiornamenti e comunicazioni ufficiali.',
-  };
-  return <div className="scd-one" data-testid="scd-one-app">
-    <a className="scd-one-skip" href="#scd-one-main">Vai al contenuto</a>
-    <div className="scd-one-stage"><span><ShieldCheck size={13}/> SCD ONE · VISION 2026/27</span><span>LABORATORIO NON PUBBLICATO · DATI NON COLLEGATI</span></div>
-    <header className="scd-one-header">
-      <div className="scd-one-header-inner">
-        <button className="scd-one-brand" type="button" onClick={() => selectArea('home')} aria-label="SCD ColicoDerviese, torna alla Home">
-          <OfficialAsset src={logo.url} alt="Stemma ufficiale SCD ColicoDerviese"/>
-          <span className="scd-one-brand-text"><small>S.C.D.</small><strong>COLICO<span>DERVIESE</span></strong><em>SPORT · PERSONE · TERRITORIO</em></span>
-        </button>
-        <nav className="scd-one-desktop-nav" aria-label="Navigazione SCD ONE">
-          {publicNav.map(x => <NavButton key={x.id} {...x} selected={area === x.id} onSelect={selectArea}/>)}
-        </nav>
-        <div className="scd-one-header-actions">
-          <button type="button" className="scd-one-header-search" onClick={() => document.getElementById('scd-one-search')?.focus()} aria-label="Cerca nel club"><Search size={20}/></button>
-          <button type="button" className="scd-one-bell" onClick={() => selectArea('communications')} aria-label="Vai alle comunicazioni"><Bell size={20}/><span/></button>
-          <button type="button" className="scd-one-login" onClick={() => setSkyOpen(true)}><LockKeyhole size={16}/> Area personale</button>
-          <button type="button" className="scd-one-menu" aria-expanded={mobileMenu} aria-label="Apri menu" onClick={() => setMobileMenu(v => !v)}>{mobileMenu ? <X size={22}/> : <Menu size={22}/>}</button>
-        </div>
-      </div>
-      {mobileMenu && <nav className="scd-one-mobile-drawer" aria-label="Menu di navigazione">{publicNav.map(x => <NavButton key={x.id} {...x} selected={area === x.id} onSelect={selectArea}/>)}</nav>}
-    </header>
-    <main id="scd-one-main" className="scd-one-main">
-      <div className="scd-one-toolbar">
-        <div className="scd-one-toolbar-kicker"><span className="scd-one-live-dot" aria-hidden="true"/> STAGIONE 2026/27 <span className="scd-one-mid-dot">·</span> COLICO & DERVIO</div>
-        <form onSubmit={searchSubmit} className="scd-one-search" role="search">
-          <Search size={18} aria-hidden="true"/><input id="scd-one-search" value={search} onChange={e => setSearch(e.target.value)} placeholder="Cerca squadre, gare, notizie..." aria-label="Cerca nell'universo SCD"/>
-          <button type="submit">Cerca <ArrowRight size={15}/></button>
-        </form>
-      </div>
-      {searchNotice && <div role="status" className="scd-one-search-notice">{searchNotice}<button type="button" onClick={() => setSearchNotice('')} aria-label="Chiudi avviso ricerca"><X size={16}/></button></div>}
-      {area === 'home' ? <>
-        <section className="scd-one-home-head" aria-label="Questa settimana alla SCD">
-          <div className="scd-one-hero">
-            <span className="scd-one-hero-stroke" aria-hidden="true"/>
-            <div className="scd-one-hero-copy">
-              <span className="scd-one-eyebrow"><span aria-hidden="true"/> IL CLUB SI VIVE, OGNI GIORNO</span>
-              <h1>Questa<br/><mark>settimana.</mark></h1>
-              <p>Sport, crescita e comunità<br/>nel cuore dell'Alto Lario.</p>
-              <button type="button" onClick={() => selectArea('calendar')} className="scd-one-hero-cta">Esplora il calendario <ArrowRight size={19}/></button>
-            </div>
-            <button type="button" data-testid="sky-open" className="scd-one-sky-hero" onClick={() => setSkyOpen(true)} aria-label="Apri Sky, mascotte ufficiale SCD">
-              <img data-testid="sky-original" src={SKY_SRC} alt="Sky, mascotte ufficiale originale SCD ColicoDerviese"/>
-              <span className="scd-one-sky-bubble"><MessageCircle size={16}/> Ciao, sono Sky!</span>
-            </button>
-            <div className="scd-one-hero-location"><MapPin size={14}/> COLICO · DERVIO · ALTO LARIO</div>
-          </div>
-          <aside className="scd-one-match" aria-label="Prossima gara">
-            <div className="scd-one-match-title"><Trophy size={20}/><span>PROSSIMA GARA</span><ArrowUpRight size={18}/></div>
-            <div className="scd-one-match-main">
-              <div className="scd-one-match-ident"><OfficialAsset src={logo.url} alt="Stemma SCD"/><strong>COLICODERVIESE</strong></div>
-              <span className="scd-one-match-vs">VS</span>
-              <div className="scd-one-match-ident"><span className="scd-one-opponent-empty"><CircleHelp size={30}/></span><strong>DA CONFERMARE</strong></div>
-            </div>
-            <Status/>
-            <p>Avversario, categoria, orario e campo saranno mostrati soltanto dopo una conferma ufficiale.</p>
-            <button type="button" className="scd-one-match-link" onClick={() => selectArea('calendar')}>Apri il calendario <ArrowRight size={18}/></button>
-          </aside>
-        </section>
-        <section className="scd-one-quick-section" aria-label="Servizi del club">
-          <div className="scd-one-section-title"><div><span>IL TUO CLUB IN UN TOCCO</span><h2>Vivi la SCD.</h2></div><span className="scd-one-mini-subtitle">Dall'allenamento alla tribuna.</span></div>
-          <div className="scd-one-quicklinks" role="group" aria-label="Seleziona tipo di attività">
-            {quickActions.map(({id,Icon,description}) => <button type="button" key={id} data-testid={`quick-${id.toLowerCase()}`} aria-pressed={activity===id} onClick={() => setActivity(id)} className={`scd-one-quickcard ${activity===id ? 'selected' : ''}`}>
-              <span className="scd-one-quickicon"><Icon size={27} strokeWidth={2.3}/></span><span><strong>{id}</strong><small>{description}</small></span><ArrowUpRight className="scd-one-quickarrow" size={16}/>
-            </button>)}
-          </div>
-        </section>
-        <div className="scd-one-content-grid">
-          <section className="scd-one-week card" aria-label="Attività settimanali">
-            <div className="scd-one-card-top">
-              <div><span className="scd-one-card-kicker">AGENDA DEL CLUB</span><h2>La settimana SCD</h2></div>
-              <button type="button" onClick={() => selectArea('calendar')} className="scd-one-text-link">Calendario <ArrowRight size={16}/></button>
-            </div>
-            <div className="scd-one-week-picker"><button type="button" aria-label="Settimana precedente" onClick={() => setWeekShift(x=>x-1)}><ChevronLeft size={20}/></button><span data-testid="week-label"><CalendarDays size={18}/>{weekLabel}</span><button type="button" aria-label="Settimana successiva" onClick={() => setWeekShift(x=>x+1)}><ChevronRight size={20}/></button></div>
-            <div className="scd-one-activity-empty" data-testid="activity-panel" role="status"><span className="scd-one-empty-icon"><CalendarRange size={23}/></span><div><strong>{activity} · In aggiornamento</strong><p>{emptyMessages[activity]}</p></div></div>
-            <div className="scd-one-week-bottom"><Status/><button type="button" onClick={() => {setWeekShift(0);setArea('calendar');}}>Tutti gli appuntamenti <ArrowRight size={17}/></button></div>
-          </section>
-          <section className="scd-one-stories card" aria-label="News e comunità">
-            <div className="scd-one-card-top"><div><span className="scd-one-card-kicker">IL CLUB RACCONTA</span><h2>Notizie e comunità</h2></div><button type="button" onClick={() => selectArea('communications')} className="scd-one-text-link">Notizie <ArrowRight size={16}/></button></div>
-            <div className="scd-one-story-body"><span><Megaphone size={26}/></span><div><strong>La voce della SCD</strong><p>Comunicazioni, novità e storie ufficiali arriveranno qui dopo la verifica della redazione.</p></div></div>
-            <button type="button" onClick={() => selectArea('communications')} className="scd-one-story-link">Vai alle comunicazioni <ArrowRight size={17}/></button>
-          </section>
-        </div>
-        <section className="scd-one-bottom-grid" aria-label="Territorio e partnership">
-          <div className="scd-one-territory">
-            <div className="scd-one-territory-photo" aria-hidden="true"><span>ALTO LARIO</span></div>
-            <div className="scd-one-territory-copy"><span className="scd-one-card-kicker">MONDO COLICO</span><h2>Le nostre radici.<br/>Il nostro futuro.</h2><p>Colico, Dervio, il lago e le montagne: lo sport incontra il territorio.</p><button type="button" onClick={() => setTerritoryOpen(v => !v)} aria-expanded={territoryOpen} data-testid="territory-details">Scopri il territorio <ArrowRight size={17}/></button>{territoryOpen && <p role="status" className="scd-one-territory-detail">Una comunità sportiva tra lago e montagne. Nessun itinerario o evento viene pubblicato senza una fonte verificata.</p>}</div>
-          </div>
-          <div className="scd-one-sponsors card"><div><span className="scd-one-card-kicker">INSIEME SI CRESCE</span><h2>Partner del club</h2></div><div className="scd-one-sponsor-placeholder"><UsersRound size={25}/><div><strong>Partner in aggiornamento</strong><p>Pubblicheremo soltanto marchi e accordi autorizzati.</p></div></div><Status label="NESSUN LOGO NON VERIFICATO"/></div>
-        </section>
-      </> : <section className="scd-one-subpage" data-testid={`page-${area}`}>
-        <div className="scd-one-subpage-hero"><span className="scd-one-eyebrow">SCD COLICODERVIESE · 2026/27</span><h1>{currentTitle[area]}</h1><p>{categoryText[area]}</p></div>
-        <div className="scd-one-subpage-panel card">
-          <div className="scd-one-card-top"><div><span className="scd-one-card-kicker">VERIFICA DELLE FONTI</span><h2>Dati in aggiornamento</h2></div><Status/></div>
-          {area === 'calendar' && <div className="scd-one-week-picker"><button aria-label="Settimana precedente" onClick={()=>setWeekShift(x=>x-1)}><ChevronLeft size={18}/></button><span>{weekLabel}</span><button aria-label="Settimana successiva" onClick={()=>setWeekShift(x=>x+1)}><ChevronRight size={18}/></button></div>}
-          <div className="scd-one-subpage-empty"><CalendarRange size={34}/><strong>Nessun contenuto ufficiale collegato</strong><p>La navigazione è attiva. Nessuna gara, squadra, notizia o attività viene inventata per riempire l'interfaccia.</p></div>
-          <button type="button" className="scd-one-return" onClick={() => selectArea('home')}><ChevronLeft size={18}/> Torna alla Home</button>
-        </div>
-      </section>}
-    </main>
-    <footer className="scd-one-footer"><div><OfficialAsset src={logo.url} alt="Stemma SCD"/><span>S.C.D. COLICODERVIESE<br/><small>SPORT · PERSONE · TERRITORIO</small></span></div><span>Stagione 2026/27 · Demo visiva senza dati personali</span><button type="button" onClick={onOpenGallery}>Apri confronto delle sei schermate <ArrowRight size={17}/></button></footer>
-    <nav className="scd-one-bottomnav" aria-label="Navigazione mobile SCD ONE">{publicNav.map(x=><NavButton key={x.id} {...x} selected={area===x.id} onSelect={selectArea} testid={`mobile-nav-${x.id}`}/>)}</nav>
-    <Dialog.Root open={skyOpen} onOpenChange={setSkyOpen}><Dialog.Portal><Dialog.Overlay className="scd-one-dialog-overlay"/><Dialog.Content className="scd-one-dialog" aria-describedby="scd-one-sky-description"><img src={SKY_SRC} alt="Sky, mascotte ufficiale" /><div><span className="scd-one-card-kicker">SKY · ASSISTENTE DEL CLUB</span><Dialog.Title>Ciao! Sono Sky.</Dialog.Title><Dialog.Description id="scd-one-sky-description">L'assistente e l'accesso personale non sono collegati in questa demo. Non vengono elaborati dati o conversazioni.</Dialog.Description><Status label="DEMO_NON_COLLEGATA"/><Dialog.Close asChild><button type="button" className="scd-one-modal-close"><Check size={18}/> Ho capito</button></Dialog.Close></div><Dialog.Close className="scd-one-dialog-x" aria-label="Chiudi"><X size={20}/></Dialog.Close></Dialog.Content></Dialog.Portal></Dialog.Root>
+function Brand({go,notify}:{go:()=>void;notify:()=>void}) {
+  return <div className="scd-f-brandrow">
+    <button type="button" className="scd-f-brand" aria-label="Home S.C.D. Colicoderviese" onClick={go}>
+      <OfficialAsset src={logo.url} alt="Stemma ufficiale della S.C.D. Colicoderviese"/>
+      <span><small>S.C.D.</small><strong>COLICO<span>DERVIESE</span></strong><i/></span>
+    </button>
+    <button type="button" className="scd-f-notify" onClick={notify} aria-label="Apri le comunicazioni">
+      <Bell size={24} strokeWidth={2.3}/><span aria-hidden="true"/>
+    </button>
   </div>;
+}
+function HomeCover({go,sky,notify}:{go:(a:Area)=>void;sky:()=>void;notify:()=>void}) {
+  return <section className="scd-f-cover" aria-label="Home pubblica SCD">
+    <Brand go={()=>go('home')} notify={notify}/>
+    <div className="scd-f-landscape" aria-hidden="true"/>
+    <button type="button" className="scd-f-sky" data-testid="sky-open" onClick={sky} aria-label="Apri Sky, mascotte ufficiale della SCD">
+      <img data-testid="sky-original" src={skyImage} alt="Sky, mascotte ufficiale originale SCD"/>
+    </button>
+    <div className="scd-f-headline"><h1>Questa settimana</h1><p>Sport, crescita e comunità<br/>nel cuore dell'Alto Lario.</p></div>
+  </section>;
+}
+function QuickAccess({selection,onSelect}:{selection:Activity|null;onSelect:(a:Activity)=>void}) {
+  return <section className="scd-f-quick" aria-label="Accessi rapidi">
+    <div className="scd-f-quickgrid">
+      {quick.map(({id,Icon,tone})=><button type="button" key={id} onClick={()=>onSelect(id)} data-testid={'quick-'+id.toLowerCase()}
+        aria-pressed={selection===id} className={'scd-f-quickitem tone-'+tone+(selection===id?' selected':'')}>
+        <Icon size={32} strokeWidth={2.4}/><span>{id}</span>
+      </button>)}
+    </div>
+    {selection!==null && <div role="status" data-testid="activity-panel" className="scd-f-quick-feedback">
+      <strong>{selection} · In aggiornamento</strong>
+      <span>Le informazioni ufficiali saranno visibili quando collegate e verificate.</span>
+      <button type="button" aria-label="Chiudi filtro" onClick={()=>onSelect(selection)}><X size={15}/></button>
+    </div>}
+  </section>;
+}
+function MatchPreview({openCalendar}:{openCalendar:()=>void}) {
+  return <section className="scd-f-match" aria-label="Prossima gara">
+    <div className="scd-f-match-heading">
+      <div className="scd-f-match-ribbon"><Trophy size={17}/><strong>PROSSIMA GARA</strong></div>
+      <button type="button" onClick={openCalendar}>Vedi tutti <ChevronRight size={16}/></button>
+    </div>
+    <div className="scd-f-match-inner">
+      <div className="scd-f-date"><span>DATA</span><strong>DA<br/>DEFINIRE</strong><small>ORA DA CONFERMARE</small></div>
+      <div className="scd-f-club"><OfficialAsset src={logo.url} alt="Stemma SCD"/><b>ColicoDerviese</b><small>Categoria da verificare</small></div>
+      <span className="scd-f-vs">VS</span>
+      <div className="scd-f-club"><div className="scd-f-opponent" aria-label="Stemma avversario non disponibile"><CircleHelp size={27}/></div><b>Avversario</b><small>Da confermare</small></div>
+    </div>
+    <div className="scd-f-venue"><MapPin size={15}/><span>Campo, data e orario in attesa di fonte ufficiale</span></div>
+  </section>;
+}
+function Promos({go}:{go:(a:Area)=>void}) {
+  return <section className="scd-f-promos" aria-label="Allenamenti e iniziative">
+    <button type="button" onClick={()=>go('calendar')} className="scd-f-promo">
+      <span className="scd-f-promo-icon scd-f-green"><TrafficCone size={34}/></span>
+      <span><strong>Allenamenti</strong><small>Orari e attività<br/>per tutte le categorie</small></span>
+    </button>
+    <button type="button" onClick={()=>go('events')} className="scd-f-promo">
+      <span className="scd-f-promo-icon scd-f-gold"><UsersRound size={34}/></span>
+      <span><strong>Open Day</strong><small>Scopri le iniziative<br/>per i nuovi atleti</small></span>
+    </button>
+  </section>;
+}
+function SponsorStrip({go}:{go:()=>void}) {
+  return <section className="scd-f-sponsors" aria-label="I nostri sponsor">
+    <div className="scd-f-bluebar"><h2>I nostri sponsor</h2><button onClick={go} type="button">Vedi tutti <ChevronRight size={16}/></button></div>
+    <div className="scd-f-sponsorlist">{['01','02','03'].map(x=><div key={x} className="scd-f-sponsor-slot"><span className="scd-f-sponsor-badge">SCD</span><small>Partner da confermare</small></div>)}</div>
+  </section>;
+}
+function Territory({go}:{go:()=>void}) {
+  return <section className="scd-f-territory" aria-label="Mondo Colico">
+    <h2>Mondo Colico</h2>
+    <div className="scd-f-territorycard">
+      <div className="scd-f-territoryphoto" role="img" aria-label="Panorama del territorio dell'Alto Lario"/>
+      <div className="scd-f-territorytext"><strong>Mondo Colico</strong><p>Notizie, storie, eventi e territorio sempre con noi.</p>
+        <button type="button" onClick={go}>Scopri <ArrowRight size={15}/></button>
+      </div>
+    </div>
+  </section>;
+}
+function EmptyArea({area,go,week,nextWeek}:{area:Area;go:(a:Area)=>void;week:string;nextWeek:(v:number)=>void}) {
+ const title:Record<Area,string>={home:'Home',calendar:'Calendario',teams:'Squadre',events:'Eventi',profile:'Il mio profilo',communications:'Comunicazioni',partners:'Sponsor del club',territory:'Mondo Colico'};
+ return <main className="scd-f-subpage">
+   <div className="scd-f-pageheading"><strong>{title[area]}</strong><span>STAGIONE 2026/27</span></div>
+   {area==='calendar'&&<>
+     <div className="scd-f-tabs"><button className="current">Settimana</button><button onClick={()=>nextWeek(0)}>Mese</button><button onClick={()=>nextWeek(0)}>Squadra</button></div>
+     <div className="scd-f-week-nav"><button aria-label="Settimana precedente" onClick={()=>nextWeek(-1)}><ChevronLeft size={20}/></button>
+       <span data-testid="week-label"><CalendarDays size={17}/> {week}</span><button aria-label="Settimana successiva" onClick={()=>nextWeek(1)}><ChevronRight size={20}/></button></div>
+   </>}
+   <div className="scd-f-emptyarea" role="status"><CalendarRange size={33}/><strong>Informazioni in aggiornamento</strong><p>Nessun dato viene pubblicato senza una fonte ufficiale e verificata.</p></div>
+   <button type="button" className="scd-f-back" onClick={()=>go('home')}><ChevronLeft size={18}/> Torna alla Home</button>
+ </main>;
+}
+export function SCDOneExperience({onOpenGallery}:{onOpenGallery:()=>void}) {
+ const [area,setArea]=useState<Area>('home');
+ const [activity,setActivity]=useState<Activity|null>(null);
+ const [skyOpen,setSkyOpen]=useState(false);
+ const [notifyOpen,setNotifyOpen]=useState(false);
+ const [weekOffset,setWeekOffset]=useState(0);
+ const week=useMemo(()=>weekText(weekOffset),[weekOffset]);
+ const go=(a:Area)=>{setArea(a);setActivity(null);window.scrollTo?.({top:0,behavior:'instant'});};
+ const changeActivity=(a:Activity)=>setActivity(prev=>prev===a?null:a);
+ return <div className="scd-fidelity" data-testid="scd-one-app">
+  <a className="scd-f-skip" href="#scd-f-content">Vai ai contenuti</a>
+  <div className="scd-f-layout">
+    {area==='home'?<>
+      <HomeCover go={go} sky={()=>setSkyOpen(true)} notify={()=>setNotifyOpen(true)}/>
+      <main className="scd-f-content" id="scd-f-content">
+        <QuickAccess selection={activity} onSelect={changeActivity}/>
+        <div className="scd-f-primary-grid"><MatchPreview openCalendar={()=>go('calendar')}/><Promos go={go}/></div>
+        <div className="scd-f-secondary-grid"><SponsorStrip go={()=>go('partners')}/><Territory go={()=>go('territory')}/></div>
+      </main>
+    </>:<>
+      <div className="scd-f-subheader"><Brand go={()=>go('home')} notify={()=>setNotifyOpen(true)}/></div>
+      <EmptyArea area={area} go={go} week={week} nextWeek={n=>setWeekOffset(n===0?0:prev=>prev+n)}/>
+    </>}
+    <div className="scd-f-devnote"><ShieldCheck size={12}/> ANTEPRIMA GRAFICA · DATI DIMOSTRATIVI <button type="button" onClick={onOpenGallery}>Confronto sei schermate</button></div>
+    <Nav mobile current={area} go={go}/>
+    <Nav current={area} go={go}/>
+  </div>
+  <Dialog.Root open={skyOpen} onOpenChange={setSkyOpen}>
+    <Dialog.Portal><Dialog.Overlay className="scd-f-overlay"/><Dialog.Content className="scd-f-modal">
+      <Dialog.Close className="scd-f-modal-x" aria-label="Chiudi Sky"><X size={18}/></Dialog.Close>
+      <img src={skyImage} alt="Sky originale SCD"/><div><Dialog.Title>Ciao, sono Sky!</Dialog.Title>
+       <Dialog.Description>La mascotte è originale. L'assistente digitale non è collegato in questa anteprima grafica.</Dialog.Description>
+       <button type="button" onClick={()=>setSkyOpen(false)}><Check size={18}/> Ho capito</button></div>
+    </Dialog.Content></Dialog.Portal>
+  </Dialog.Root>
+  <Dialog.Root open={notifyOpen} onOpenChange={setNotifyOpen}><Dialog.Portal>
+    <Dialog.Overlay className="scd-f-overlay"/><Dialog.Content className="scd-f-modal scd-f-modal-notice">
+      <Dialog.Close className="scd-f-modal-x" aria-label="Chiudi comunicazioni"><X size={18}/></Dialog.Close>
+      <Megaphone size={42}/><div><Dialog.Title>Comunicazioni SCD</Dialog.Title><Dialog.Description>Le comunicazioni ufficiali verranno visualizzate soltanto dopo il collegamento alle fonti autorizzate.</Dialog.Description>
+      <button type="button" onClick={()=>{setNotifyOpen(false);go('communications');}}>Apri comunicazioni <ArrowRight size={16}/></button></div>
+    </Dialog.Content>
+  </Dialog.Portal></Dialog.Root>
+ </div>;
 }
