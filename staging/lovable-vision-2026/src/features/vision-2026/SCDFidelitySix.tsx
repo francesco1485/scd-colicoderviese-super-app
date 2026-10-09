@@ -190,6 +190,8 @@ function CommunicationsScreen({onAction,onNotice}:{onAction:DemoAction;onNotice:
 }
 export function SCDFidelitySix({onOpenGallery}:{onOpenGallery?:()=>void}){
  const [screen,setScreen]=useState<Screen>('home');
+ const [phoneScale,setPhoneScale]=useState(1);
+ useEffect(()=>{const update=()=>setPhoneScale(Math.max(.55,Math.min(1,(window.innerWidth-24)/466)));update();window.addEventListener('resize',update);return()=>window.removeEventListener('resize',update);},[]);
  useEffect(()=>{const q=new URLSearchParams(window.location.search).get('screen');if(allScreens.some(s=>s.id===q))setScreen(q as Screen);},[]);
  const [dialog,setDialog]=useState<string|null>(null);
  const to=(s:Screen)=>{setScreen(s);if(typeof window!=='undefined'){const u=new URL(window.location.href);u.searchParams.set('screen',s);window.history.replaceState(null,'',u.toString());}};
@@ -197,7 +199,7 @@ export function SCDFidelitySix({onOpenGallery}:{onOpenGallery?:()=>void}){
  return <div className="scd6-stage" data-testid="scd-six-app">
   <div className="scd6-stage-toolbar"><div><Crest size="small"/><strong>SCD · TAVOLE ORIGINALI IN SOFTWARE</strong><span>ANTEPRIMA DI SVILUPPO ISOLATA</span></div><div className="scd6-screen-picker" role="group" aria-label="Scegli schermata da controllare">{allScreens.map(x=><button key={x.id} className={screen===x.id?'selected':''} type="button" onClick={()=>to(x.id)} data-testid={'pick-'+x.id}>{x.title}</button>)}</div></div>
   <div className="scd6-stage-content">
-   <div className="scd6-phone" data-testid="phone"><div className="scd6-phone-screen">
+   <div className="scd6-phone-wrap" style={{width:466*phoneScale,height:1136*phoneScale,flexShrink:0}}><div className="scd6-phone" data-testid="phone" style={{width:466,maxWidth:"none",transform:"scale("+phoneScale+")",transformOrigin:"top left"}}><div className="scd6-phone-screen">
     {screen==='home'&&<HomeScreen to={to} onAction={onAction} onNotice={()=>to('communications')}/>}
     {screen==='calendar'&&<CalendarScreen onAction={onAction} onNotice={()=>to('communications')}/>}
     {screen==='athlete'&&<AthleteScreen onAction={onAction} onNotice={()=>to('communications')} onSelect={to}/>}
@@ -205,7 +207,7 @@ export function SCDFidelitySix({onOpenGallery}:{onOpenGallery?:()=>void}){
     {screen==='staff'&&<StaffScreen onAction={onAction} onNotice={()=>to('communications')}/>}
     {screen==='communications'&&<CommunicationsScreen onAction={onAction} onNotice={()=>to('communications')}/>}
     <Nav active={screen} onSelect={to}/>
-   </div></div>
+   </div></div></div>
    <div className="scd6-screen-meta"><span className="scd6-meta-app">{allScreens.find(x=>x.id===screen)?.app}</span><strong>{allScreens.find(x=>x.id===screen)?.title}</strong><p>Da tavola originale SCD 2026/27. Navigazione e componenti React; informazioni di esempio non collegate ai dati reali.</p>{onOpenGallery&&<button onClick={onOpenGallery} type="button">Archivio visual precedente <ArrowRight size={14}/></button>}</div>
   </div>
   <div className="scd6-demofoot">SCD · ANTEPRIMA GRAFICA · DATI DIMOSTRATIVI · NON PUBBLICATA</div>
