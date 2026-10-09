@@ -20,3 +20,47 @@
 @media(min-width:600px) and (max-width:1023px){.vision-header{padding:0 22px}.vision-hero-content{padding-left:22px;gap:16px}.vision-hero-crest{width:95px;height:140px}.vision-hero h1{font-size:46px}.vision-sky{right:15px;width:170px}.vision-sky img{width:160px;height:200px}.vision-families{gap:10px;font-size:8px}.vision-workspace{padding:24px 22px}.vision-panorama{grid-template-columns:1fr}.vision-screen-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.vision-context{position:static;display:none}.vision-review{padding:10px 22px}.vision-review>span:last-child{font-size:8px}.vision-navigation button{flex-direction:column;font-size:10px;gap:3px}.vision-phone{min-height:500px}}
 @media(max-width:599px){.vision-header{height:65px;padding:0 14px;gap:9px;grid-template-columns:34px minmax(0,1fr) auto}.vision-back{width:30px;height:44px;border:0}.vision-brand{gap:8px}.vision-brand img{width:31px;height:39px}.vision-brand strong{font-size:10px;white-space:normal}.vision-brand span{font-size:7px}.vision-header-status{font-size:0}.vision-header-status svg{width:15px}.vision-hero{height:211px}.vision-hero-content{padding:20px 16px;gap:12px;align-items:start}.vision-hero-crest{height:80px;width:60px;margin-top:20px}.vision-hero .vision-kicker{font-size:7px;margin-top:13px}.vision-hero h1{font-size:32px;margin-top:8px}.vision-hero p{font-size:12px;margin-top:7px}.vision-families{position:absolute;left:16px;bottom:49px;font-size:7px;gap:12px;max-width:calc(100% - 32px)}.vision-hero>.vision-territory>span{left:16px;bottom:12px;font-size:7px;max-width:245px}.vision-hero::after{width:60%;height:33px;right:-60px;top:100px}.vision-sky{right:4px;width:98px;height:122px;bottom:42px}.vision-sky img{width:96px;height:90px}.vision-sky>span{min-height:30px;font-size:7px;gap:4px}.vision-sky>span>svg{width:12px}.vision-sky>span>svg:last-child{display:none}.vision-review{padding:8px 16px;gap:9px;min-height:47px;flex-wrap:wrap;font-size:8px}.vision-review>span:last-child{width:100%;margin-left:0;font-size:7px}.vision-workspace{padding:20px 0 10px}.vision-workspace-heading{padding:0 16px;margin-bottom:14px}.vision-workspace-heading h2{font-size:20px}.vision-workspace-heading .vision-kicker{font-size:8px}.vision-slice{display:none}.vision-navigation{position:fixed;bottom:0;left:0;right:0;z-index:80;margin:0;height:calc(66px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);border:0;border-top:1px solid var(--vision-line);box-shadow:var(--vision-shadow)}.vision-navigation button{height:66px;flex-direction:column;gap:5px;padding:0!important;font-size:8px}.vision-navigation button[data-state=active]{background:var(--vision-paper);color:var(--vision-blue);box-shadow:inset 0 3px var(--vision-yellow)}.vision-screen-grid{display:block}.vision-screen-slot[data-state=inactive]{display:none!important}.vision-panorama{display:block}.vision-context{display:none}.vision-preview-caption{display:none}.vision-phone{border:0;border-radius:0;box-shadow:none;min-height:530px}.is-selected .vision-phone{outline:0}.vision-phone-header{padding:15px 18px;grid-template-columns:35px minmax(0,1fr) 24px;min-height:73px}.vision-phone-header h2{font-size:20px}.vision-phone-header small{font-size:8px}.vision-phone-body{padding:16px 18px}.vision-demo{font-size:9px}.vision-territory-compact{height:132px}.vision-home-title{font-size:28px;margin:16px 0!important}.vision-widget-tabs button{font-size:11px!important}.vision-widget-heading h4{font-size:14px}.vision-widget-heading span{font-size:8px}.vision-empty{min-height:126px}.vision-empty strong{font-size:13px}.vision-empty span{font-size:10px}.vision-expand{font-size:13px!important}.vision-screen-intro{min-height:138px}.vision-screen-intro h3{font-size:30px;max-width:none}.vision-phone-foot{font-size:8px;min-height:40px}.vision-footer{padding:10px 18px 86px;flex-direction:column;gap:8px}.vision-widget-expanded{font-size:13px}}
 @media(prefers-reduced-motion:reduce){.vision-page *,.vision-dialog *{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+
+/* SCD 2026 visual source recovery: tokens were defined only inside legacy foundation,
+   not /vision-2026, making its blue/gold layout effectively transparent. */
+.vision-page {
+ --vision-navy:#08264e;
+ --vision-blue:#0754a0;
+ --vision-water:#0d6db6;
+ --vision-yellow:#ffdf13;
+ --vision-paper:#ffffff;
+ --vision-ground:#edf2f8;
+ --vision-ink:#092449;
+ --vision-subtle:#50627a;
+ --vision-line:#d4dfeb;
+ --vision-shadow:0 12px 28px rgba(3,29,70,.16);
+}
+.vision-page .vision-hero {
+ background:linear-gradient(100deg,rgba(4,29,69,.96),rgba(0,58,115,.84) 52%,rgba(8,41,88,.45)),url('/assets/hero-colico.webp') center 46% / cover no-repeat;
+}
+.vision-page .vision-hero>.vision-territory{background:transparent;z-index:-1;border:none}
+.vision-page .vision-hero>.vision-territory .vision-mountain,
+.vision-page .vision-hero>.vision-territory .vision-water{display:none}
+.vision-page .vision-territory-compact{
+ background:linear-gradient(0deg,rgba(1,32,71,.7),rgba(3,56,113,.1)),url('/assets/hero-colico.webp') center/cover no-repeat;
+ border-radius:6px;
+}
+.vision-page .vision-territory-compact .vision-mountain,
+.vision-page .vision-territory-compact .vision-water{display:none}
+.vision-page .vision-territory-compact>span{background:rgba(0,27,60,.75);padding:4px 7px;border-radius:4px}
+.vision-page .vision-hero h1{color:#fff;text-shadow:0 3px 12px rgba(0,12,40,.25)}
+.vision-page .vision-hero h1 em{color:var(--vision-yellow)}
+.vision-page .vision-review{background:var(--vision-navy)}
+.vision-page .vision-phone-header{background:var(--vision-navy)}
+.vision-page .vision-navigation button[data-state=active]{background:var(--vision-navy);color:#fff}
+.vision-page .vision-sky img{object-fit:contain}
+@media(max-width:599px) {
+ .vision-page .vision-hero{background-position:60% center}
+ .vision-page .vision-hero-content{position:relative;z-index:1;background:linear-gradient(90deg,rgba(4,30,72,.65),transparent)}
+ .vision-page .vision-hero-crest{filter:drop-shadow(0 4px 7px rgba(0,0,0,.5))}
+ .vision-page .vision-territory-compact{height:145px}
+ .vision-page .vision-phone{background:#fff}
+ .vision-page .vision-phone-body{background:#fff}
+ .vision-page .vision-workspace{background:#edf2f8}
+ .vision-page .vision-widget-tabs{background:#f7f9fc}
+}
