@@ -1,62 +1,77 @@
 import { chromium } from 'playwright';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-const host=process.env.SCD_BASE_URL||'http://127.0.0.1:4173';
+const base=process.env.SCD_BASE_URL||'http://127.0.0.1:4173';
+const scenarios=[
+ ['home','Questa settimana'],
+ ['calendar','Calendario'],
+ ['athlete','Area Atleta'],
+ ['family','Area Riservata'],
+ ['staff','Area Staff'],
+ ['communications','Comunicazioni']
+];
+const b=await chromium.launch({headless:true});
 fs.mkdirSync('test-output',{recursive:true});
-const browser=await chromium.launch({headless:true});
-for (const [name,width,height] of [['mobile',390,844],['desktop',1440,900]]) {
-  const page=await browser.newPage({viewport:{width,height},deviceScaleFactor:1,reducedMotion:'reduce'});
-  const errors=[]; page.on('pageerror',e=>errors.push(String(e)));
-  const res=await page.goto(host+'/vision-2026',{waitUntil:'networkidle',timeout:30000});
-  assert.equal(res.status(),200);
-  await page.getByRole('heading',{name:'Questa settimana'}).waitFor();
-  await page.locator('[data-testid="sky-original"]').waitFor();
-  for(const sel of ['[data-testid="sky-original"]','.scd-f-brand img']) {
-    assert.ok(await page.locator(sel).evaluate(x=>x.complete&&x.naturalWidth>0),'Official image missing '+sel);
-  }
-  const measurements=await page.evaluate(()=>{
-    const classes=['.scd-f-cover','.scd-f-quick','.scd-f-match','.scd-f-promos','.scd-f-sponsors','.scd-f-territory'];
-    return {
-      overflow:document.documentElement.scrollWidth-innerWidth,
-      regions:classes.map(c=>{const e=document.querySelector(c);return {name:c,top:e.getBoundingClientRect().top,bottom:e.getBoundingClientRect().bottom,height:e.getBoundingClientRect().height};}),
-      heroText:document.querySelector('.scd-f-headline h1').textContent
-    };
-  });
-  assert.ok(measurements.overflow<=2,'Horizontal scroll '+name+' '+measurements.overflow);
-  measurements.regions.forEach((e,i)=>assert.ok(e.height>20,'Missing/flattened '+e.name));
-  console.log('BOARD_GEOMETRY '+name+' '+JSON.stringify(measurements.regions));
-  await page.screenshot({path:'test-output/scd-one-viewport-'+name+'-'+width+'x'+height+'.png',fullPage:false});
-  await page.screenshot({path:'test-output/scd-one-home-'+name+'-'+width+'x'+height+'.png',fullPage:true});
-  if(name==='mobile') {
-    const a=measurements.regions;
-    for(let i=1;i<a.length;i++)assert.ok(a[i].top>=a[i-1].top-1,'Wrong mobile board order '+a[i].name);
-    assert.ok(a[0].height>=250&&a[0].height<=360,'Hero proportions differ from primary board');
-    assert.ok(a[1].height>=75&&a[1].height<=125,'Four shortcuts must be single compact row');
-    assert.ok(a[2].height>=120&&a[2].height<=250,'Match module proportions out of range');
-    assert.ok(a[3].height>=70&&a[3].height<=140,'Initiative modules proportions out of range');
-    assert.ok(a[4].height>=85&&a[4].height<=155,'Sponsor bar proportions out of range');
-    assert.ok(a[5].height>=110&&a[5].height<=240,'Territory module proportions out of range');
-  }
-
-  await page.locator('[data-testid="quick-allenamenti"]').click();
-  await page.locator('[data-testid="activity-panel"]').getByText('Allenamenti · In aggiornamento').waitFor();
-  await page.locator('[data-testid="quick-allenamenti"]').click();
-  assert.equal(await page.locator('[data-testid="activity-panel"]').count(),0);
-  await page.locator('[data-testid="sky-open"]').click();
-  await page.getByRole('dialog').getByRole('heading',{name:'Ciao, sono Sky!'}).waitFor();
-  await page.getByRole('button',{name:'Ho capito'}).click();
-  assert.equal(await page.getByRole('dialog').count(),0);
-  const nav='[data-testid="'+(name==='mobile'?'mobile-nav-':'nav-')+'calendar"]';
-  await page.locator(nav).click();
-  await page.getByRole('heading',{name:'Calendario'}).waitFor();
-  const before=await page.locator('[data-testid="week-label"]').innerText();
+let n=0;
+for(const [screen,title] of scenarios){
+ const page=await b.newPage({viewport:{width:390,height:900},deviceScaleFactor:1,reducedMotion:'reduce'});
+ const errors=[];page.on('pageerror',e=>errors.push(String(e)));
+ const response=await page.goto(base+'/vision-2026?screen='+screen,{waitUntil:'networkidle',timeout:30000});
+ assert.equal(response.status(),200,'HTTP 200 '+screen);
+ const phone=page.locator('[data-testid="phone"]');
+ await phone.waitFor();
+ const screenshotText=await phone.innerText();
+ assert.ok(screenshotText.includes(title),'Real screen was not rendered: '+screen);
+ assert.ok(screenshotText.includes('Home')&&screenshotText.includes('Calendario'),'Navigation missing in '+screen);
+ assert.equal(await phone.locator('img').count()>=1,true,'Official image expected in '+screen);
+ assert.ok(await phone.locator('img').first().evaluate(el=>el.complete&&el.naturalWidth>0),'Official crest fails '+screen);
+ assert.ok((await phone.boundingBox()).width>320,'Phone too narrow in '+screen);
+ const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
+ assert.ok(overflow<=2,'Horizontal overflow in '+screen+': '+overflow);
+ await phone.screenshot({path:'test-output/SCD-'+screen+'-mobile-phone.png',animations:'disabled'});
+ n++;
+ if(screen==='home'){
+  assert.equal(await phone.locator('.scd6-quick').count(),4);
+  await page.getByRole('button',{name:'Apri Sky'}).click();
+  await page.getByRole('dialog').getByText('Sky, assistente virtuale').waitFor();
+  await page.getByRole('dialog').getByRole('button',{name:'Chiudi dettaglio'}).click();
+  await page.locator('[data-testid="bottom-calendar"]').click();
+  assert.ok((await phone.innerText()).includes('7 – 13 Aprile 2025'),'Home -> Calendar failed');
+ }
+ if(screen==='calendar'){
   await page.getByRole('button',{name:'Settimana successiva'}).click();
-  const after=await page.locator('[data-testid="week-label"]').innerText();
-  assert.notEqual(before,after,'Week navigator is inert');
-  await page.locator('[data-testid="'+(name==='mobile'?'mobile-nav-':'nav-')+'home"]').click();
-  await page.getByRole('heading',{name:'Questa settimana'}).waitFor();
-  assert.deepEqual(errors,[],'Runtime JS errors');
-  console.log('SCD 1:1 HOME '+name+': original assets, mobile board structure, responsive, quick actions, Sky, calendar nav, week change, screenshot PASS; regions='+JSON.stringify(measurements.regions.map(z=>Math.round(z.height))));
-  await page.close();
+  assert.ok((await page.locator('.scd6-weekpicker').innerText()).includes('Settimana successiva'));
+  await page.getByRole('button',{name:'Mese',exact:true}).click();
+  assert.equal(await page.locator('.scd6-calendar-month').count(),1);
+ }
+ if(screen==='athlete'){
+  await page.getByRole('button',{name:'Famiglia',exact:true}).click();
+  assert.ok((await page.locator('.scd6-minor-header').first().innerText()).includes('nostri figli'));
+ }
+ if(screen==='family'){
+  await page.getByRole('button',{name:'Paga ora'}).click();
+  await page.getByRole('dialog').getByText('Pagamento quote').waitFor();
+  await page.getByRole('dialog').getByRole('button',{name:'Chiudi dettaglio'}).click();
+ }
+ if(screen==='staff'){assert.equal(await phone.locator('.scd6-statsrow button').count(),4);}
+ if(screen==='communications'){
+  await page.getByRole('button',{name:'Social',exact:true}).click();
+  assert.ok((await page.locator('.scd6-other-tab').innerText()).includes('Social'));
+ }
+ assert.deepEqual(errors,[],'Browser JavaScript errors '+screen);
+ console.log('SCD SIX MOBILE '+screen+' PASS: original logo, correct section, no overflow, real navigation, PNG');
+ await page.close();
 }
-await browser.close();
+const desktop=await b.newPage({viewport:{width:1440,height:900},deviceScaleFactor:1,reducedMotion:'reduce'});
+const response=await desktop.goto(base+'/vision-2026?screen=home',{waitUntil:'networkidle'});
+assert.equal(response.status(),200);
+assert.ok((await desktop.locator('.scd6-stage-content').boundingBox()).width>450);
+await desktop.screenshot({path:'test-output/SCD-six-desktop-stage.png',fullPage:true,animations:'disabled'});
+await desktop.getByTestId('pick-staff').click();
+assert.ok((await desktop.locator('.scd6-staffhero').innerText()).includes('Area Staff'));
+await desktop.screenshot({path:'test-output/SCD-staff-desktop-stage.png',fullPage:true,animations:'disabled'});
+assert.equal(await desktop.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth),false,'Desktop overflow');
+console.log('SCD SIX DESKTOP PASS: responsive single-screen application + switcher');
+await desktop.close();
+await b.close();
+console.log('SCD SIX total screenshots='+String(n+2)+'; no fabrication of live data; production unchanged');

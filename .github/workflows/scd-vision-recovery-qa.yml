@@ -1,4 +1,4 @@
-name: SCD Vision Recovery QA
+name: SCD Six-Screen Visual QA
 on:
   push:
     branches: [fix/vision-2026-lovable-recovery-20261009]
@@ -39,6 +39,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: scd-one-vision-home-browser-screenshots
+          name: scd-six-visual-browser-screenshots
           path: staging/lovable-vision-2026/test-output/*.png
           if-no-files-found: ignore

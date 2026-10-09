@@ -1,4 +1,4 @@
-import { SCDOneExperience } from './SCDOneExperience';
+import { SCDFidelitySix } from './SCDFidelitySix';
 /**
  * Riferimento grafico utente: tavola madre “Sistema grafico definitivo / struttura app in tempo reale”,
  * descritta nel mandato UI SCD 2026/27 del 9 ottobre 2026; originali non caricati in Lovable.
@@ -52,5 +52,5 @@ function ArrowUpMark() { return <ArrowRight size={24} aria-hidden="true" />; }
 export function Vision2026() {
   const [galleryOpen, setGalleryOpen] = useState(false);
   if (galleryOpen) return <div><button type="button" onClick={() => setGalleryOpen(false)} style={{position:'sticky',top:0,zIndex:120,width:'100%',background:'#ffdf13',color:'#09264d',fontWeight:800,padding:14,minHeight:48}}>← Torna alla Home SCD ONE</button><VisionGallery /></div>;
-  return <SCDOneExperience onOpenGallery={() => setGalleryOpen(true)} />;
+  return <SCDFidelitySix onOpenGallery={() => setGalleryOpen(true)} />;
 }
