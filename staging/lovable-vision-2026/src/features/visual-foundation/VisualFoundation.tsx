@@ -161,7 +161,7 @@ export function VisualFoundation() {
   const [active, setActive] = useState<TemplateId>("T02");
   const [menuOpen, setMenuOpen] = useState(false);
   const [drawer, setDrawer] = useState<string | null>(null);
-  const current = templates.find(item => item.id === active) ?? templates[0];
+  const current = templates.find(item => item.id === active) ?? templates[0]!;
   const selectTemplate = (id: TemplateId) => { setActive(id); setMenuOpen(false); window.scrollTo({ top: 0, behavior: "smooth" }); };
   return (
     <div className="app-shell">
