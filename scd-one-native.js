@@ -120,7 +120,7 @@
  window.addEventListener('scd:public:update',()=>{snapshot=app.publicSnapshot();updateHome();updateCalendar()});
  window.addEventListener('scd:public:view',()=>{queueMicrotask(syncVisible)});
  const click=e=>{
-  const target=e.target.closest('button[data-scd-go],button[data-scd-filter],button[data-scd-sky],button[data-scd-event],button[data-scd-tab],button[data-scd-week],button[data-scd-all],button[data-scd-match-filter]');
+  const target=e.target.closest('button[data-scd-go],button[data-scd-filter],button[data-scd-sky],button[data-scd-event],button[data-scd-tab],button[data-scd-week],button[data-scd-all],button[data-scd-match-filter],button[data-scd-clear-filter]');
   if(!target)return;
   if(target.hasAttribute('data-scd-go')){navigate(target.dataset.scdGo);return}
   if(target.hasAttribute('data-scd-filter')){mode='MONTH';term='';team='ALL';kindFilter=target.dataset.scdFilter;navigate('calendar');updateCalendar();return}
