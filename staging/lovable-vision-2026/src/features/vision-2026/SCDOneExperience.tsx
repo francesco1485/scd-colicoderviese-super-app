@@ -127,7 +127,7 @@ function Territory({go}:{go:()=>void}) {
 function EmptyArea({area,go,week,nextWeek}:{area:Area;go:(a:Area)=>void;week:string;nextWeek:(v:number)=>void}) {
  const title:Record<Area,string>={home:'Home',calendar:'Calendario',teams:'Squadre',events:'Eventi',profile:'Il mio profilo',communications:'Comunicazioni',partners:'Sponsor del club',territory:'Mondo Colico'};
  return <main className="scd-f-subpage">
-   <div className="scd-f-pageheading"><strong>{title[area]}</strong><span>STAGIONE 2026/27</span></div>
+   <div className="scd-f-pageheading"><h1>{title[area]}</h1><span>STAGIONE 2026/27</span></div>
    {area==='calendar'&&<>
      <div className="scd-f-tabs"><button className="current">Settimana</button><button onClick={()=>nextWeek(0)}>Mese</button><button onClick={()=>nextWeek(0)}>Squadra</button></div>
      <div className="scd-f-week-nav"><button aria-label="Settimana precedente" onClick={()=>nextWeek(-1)}><ChevronLeft size={20}/></button>
