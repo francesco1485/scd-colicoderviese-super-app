@@ -22,7 +22,7 @@ for(const [screen,title] of scenarios){
  await phone.waitFor();
  const screenshotText=await phone.innerText();
  assert.ok(screenshotText.includes(title),'Real screen was not rendered: '+screen);
- assert.ok(screenshotText.includes('Home')&&screenshotText.includes('Calendario'),'Navigation missing in '+screen);
+ assert.ok(screenshotText.includes(screen==='staff'?'Dashboard':'Home')&&screenshotText.includes(screen==='staff'?'Comunicazioni':'Calendario'),'Navigation missing in '+screen);
  assert.equal(await phone.locator('img').count()>=1,true,'Official image expected in '+screen);
  assert.ok(await phone.locator('img').first().evaluate(el=>el.complete&&el.naturalWidth>0),'Official crest fails '+screen);
  assert.ok((await phone.boundingBox()).width>320,'Phone too narrow in '+screen);
