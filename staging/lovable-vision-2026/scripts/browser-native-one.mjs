@@ -57,7 +57,7 @@ for(const [label,width,height] of [['mobile',390,844],['desktop',1440,900]]){
  await page.locator('#scdOneCalendar').getByRole('button',{name:'Mese',exact:true}).click();
  await page.locator('[data-scd-tab="MONTH"][aria-pressed="true"]').waitFor();
  await page.screenshot({path:'test-output/scd-one-native-calendar-'+label+'.png',fullPage:true,animations:'disabled'});
- await page.locator('[data-scd-go="desk"]').first().click();
+ await page.locator('#scdOneCalendar [data-scd-go="desk"]').click();
  assert.equal(await page.locator('body').evaluate(x=>x.classList.contains('scd-one-public-view')),false,'Private route inherited public chrome');
  assert.equal(await page.locator('#scdOneHome img').count()>0,true,'Original runtime should remain mounted, not destroyed');
  assert.deepEqual(errors,[],'JavaScript errors '+label+': '+errors.join('\n'));
