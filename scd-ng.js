@@ -172,10 +172,11 @@ function openTeamsPanel(){setView('teams')}
 $$('[data-public-action="calendar"]').forEach(b=>b.addEventListener('click',openCalendarPanel));
 $$('[data-public-action="teams"]').forEach(b=>b.addEventListener('click',openTeamsPanel));
 
+const blockedPublicCalendarType=/(?:SAFEGUARD|MEDIC|CERTIFIC|PAGAMENT|PAYMENT|PRIVATE|RISERVAT|CONVOCAZ|DOCUMENT|FAMIGLIA|FINANZ)/;
 function normalizeCalendarRows(raw){
  const data=raw?.data||raw||{};
  const rows=Array.isArray(data)?data:(Array.isArray(data.rows)?data.rows:Array.isArray(data.items)?data.items:Array.isArray(data.events)?data.events:Array.isArray(data.calendar?.rows)?data.calendar.rows:[]);
- return rows.filter(row=>row&&typeof row==='object'&&row.private!==true&&row.isPublic!==false&&row.public!==false&&row.teamOnly!==true&&row.staffOnly!==true&&row.internalOnly!==true&&row.safeguarding!==true&&['','PUBLIC','PUBBLICO','ALL','OPEN'].includes(String(row.visibility||row.audience||'').toUpperCase())).map((row,i)=>({
+ return rows.filter(row=>row&&typeof row==='object'&&row.private!==true&&row.isPublic!==false&&row.public!==false&&row.teamOnly!==true&&row.staffOnly!==true&&row.internalOnly!==true&&row.safeguarding!==true&&['','PUBLIC','PUBBLICO','ALL','OPEN'].includes(String(row.visibility||row.audience||'').toUpperCase())&&!blockedPublicCalendarType.test(String(pick(row,'type','kind','eventType','TYPE','KIND')||'').toUpperCase())).map((row,i)=>({
    id:String(pick(row,'id','eventId','uid')||'PUB-'+i+'-'+isoClientDate(pick(row,'date','data','startDate'))),
    title:String(pick(row,'title','event','name','subject')||'Attività SCD'),
    date:isoClientDate(pick(row,'date','data','startDate')),
