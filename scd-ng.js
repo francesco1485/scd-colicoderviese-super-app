@@ -109,7 +109,7 @@ const clientEventKind=row=>{const t=norm([pick(row,'kind','type','eventType'),pi
 function setView(view){
   state.view=view;
   window.dispatchEvent(new CustomEvent('scd:public:view',{detail:{view}}));
-  $('[data-view]').forEach(x=>x.classList.toggle('active',x.dataset.view===view));
+  $$('[data-view]').forEach(x=>x.classList.toggle('active',x.dataset.view===view));
   $$('[data-nav]').forEach(x=>x.classList.toggle('active',x.dataset.nav===view));
   const ctx=view==='desk'?'PRIVATE DESK · ROLE/SCOPE':view==='twin'?'PROFILO · AVATAR FACOLTATIVO':view==='calendar'?'CALENDARIO · PUBBLICO':view==='teams'?'SQUADRE · PUBBLICO':view==='social'?'SOCIAL · PUBBLICO':'HOME · PUBBLICO';
   const ctxEl=$('#mirrorContext');if(ctxEl)ctxEl.textContent=ctx;
