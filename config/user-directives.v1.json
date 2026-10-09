@@ -313,6 +313,33 @@
         "nonDuplication": "NO_NEW_PARALLEL_APP_DB_OR_CRM",
         "canonicalBrief": "docs/SCD_DNA_GRAFICO_OPERATIVO_2026-10-09.md"
       }
+    },
+    {
+      "id": "UD-015",
+      "name": "SCD_HOME_GRAPHIC_AND_TERRITORY_IDENTITY_BINDING_FOR_ALL_ROUTES",
+      "sourceDate": "2026-10-09",
+      "sourceStatus": "LATEST_EXPLICIT_USER_COMMAND",
+      "sourceQuoteFragments": [
+        "Non solo la home ma tutto deve essere come la home e con la stessa impostazione e stile e geografica"
+      ],
+      "normalizedCommand": {
+        "homeIsVisualReferenceNotLimit": true,
+        "scope": "ALL_SIX_USER_SUPPLIED_SCREENS_PLUS_ALL_FUNCTIONAL_SCREENS_OF_SCD_ONE_CORE_GROW",
+        "crossAppIdentity": "SAME_BLUE_YELLOW_WHITE_SPORT_TYPOGRAPHY_SKY_OFFICIAL_CREST_LAKE_MOUNTAINS_COLICO_DERVIO_ALTO_LARIO",
+        "implementation": "CONSISTENT_COMPONENTS_LAYOUT_GRIDS_CARDS_NAVIGATION_MOBILE_DESKTOP_AND_TRUE_INTERACTIONS",
+        "adaptation": "DENser_CORE_GROW_OPERATIONAL_CONTENT_REMains_readable_no_forced_identical_home_layout",
+        "completion": "NOT_DONE_UNTIL_ALL_THREE_REAL_APPS_SHARE_GRAPHIC_FAMILY_WITH_SCREENSHOT_PARITY_TESTS",
+        "agentScope": "FIRST_HOME_PILOT_ONLY_AS_QUALIFICATION_NEVER_FINAL_SCOPE",
+        "canonicalManifestSection": "visual_system.cross_app_graphic_geographic_identity",
+        "canonicalScreens": [
+          "HOME_PUBBLICA",
+          "CALENDARIO_LIVE",
+          "AREA_ATLETA",
+          "AREA_FAMIGLIA",
+          "AREA_STAFF_DIREZIONE",
+          "COMUNICAZIONI"
+        ]
+      }
     }
   ],
   "completionGate": {
