@@ -26,6 +26,8 @@ for(const [label,width,height] of [['mobile',390,844],['desktop',1440,900]]){
  assert.equal(await page.locator('#view-athlete').count(),1);
  assert.equal(await page.locator('#view-grow').count(),1);
  await page.screenshot({path:'test-output/SCD-three-worlds-home-'+label+'.png',fullPage:true,animations:'disabled'});
+ const consent=page.locator('#scdCookieBanner:not([hidden])');
+ if(await consent.count()&&await consent.isVisible())await page.locator('#scdAnalyticsReject').click();
  await page.locator('.scde-world-toggle').click();
  await page.locator('#scde-world-drawer [data-scd-route="athlete"]').click();
  await page.locator('#view-athlete.view.active').waitFor();
