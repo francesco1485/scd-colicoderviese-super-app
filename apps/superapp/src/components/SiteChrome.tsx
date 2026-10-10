@@ -6,6 +6,7 @@ import {
 import { useEffect, useState } from "react";
 
 import crest from "@/assets/brand/logo-scd.png.asset.json";
+import { openCookiePrefs } from "./CookieConsent";
 
 /** Nome ufficiale della società (sigla S.C.D., non invertire le lettere). */
 export const CLUB_NAME = "S.C.D. ColicoDerviese";
@@ -34,6 +35,7 @@ const menuGroups: readonly { title: string; app: string; items: readonly NavItem
       { to: "/allenamenti", label: "Allenamenti" },
       { to: "/comunicazioni", label: "Comunicazioni" },
       { to: "/eventi", label: "Eventi" },
+      { to: "/eventi/christmas-lario-cup", label: "Christmas Lario Cup" },
       { to: "/community", label: "Tifosi" },
       { to: "/entra", label: "Gioca con noi" },
       { to: "/societa", label: "Società avversarie" },
@@ -216,26 +218,26 @@ export function tabsFor(pathname: string): TabDef[] {
   return PUBLIC_TABS;
 }
 
-/** Barra inferiore delle tavole (smartphone/tablet): bianca, voce attiva blu. */
+/** Barra inferiore (smartphone/tablet): blu notte della tavola, voce attiva gialla. */
 export function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const tabs = tabsFor(pathname);
   return (
     <nav
       aria-label="Navigazione Super App"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-[#e3e6eb] bg-white pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_16px_-8px_rgb(14_27_51/0.18)] lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 bg-[var(--uv-night)] pb-[env(safe-area-inset-bottom)] lg:hidden"
     >
       <div className="mx-auto grid h-[62px] max-w-xl grid-cols-5">
         {tabs.map((t) => {
           const active = t.match(pathname);
-          const color = active ? (t.tone === "yellow" ? "text-[#e9b300]" : "text-[#1559cd]") : "text-[#3d4a63]";
+          const color = active ? "text-[var(--uv-gold)]" : "text-[#b9cdf0]";
           const inner = (
             <>
               <t.icon className="size-[25px]" strokeWidth={active ? 2.4 : 1.8} fill={active && t.icon === House ? "currentColor" : "none"} aria-hidden="true" />
               <span className={`text-[11.5px] leading-none ${active ? "font-bold" : "font-medium"}`}>{t.label}</span>
             </>
           );
-          const cls = `flex flex-col items-center justify-center gap-[5px] ${color}`;
+          const cls = `relative flex flex-col items-center justify-center gap-[5px] ${color} ${active ? "before:absolute before:inset-x-[22%] before:top-0 before:h-1 before:rounded-b before:bg-[var(--uv-gold)]" : ""}`;
           return t.menu
             ? <button key={t.label} type="button" onClick={openMenu} className={cls} aria-label="Altro: menu completo">{inner}</button>
             : <Link key={t.label} to={t.to!} search={t.search as never} aria-current={active ? "page" : undefined} className={cls}>{inner}</Link>;
@@ -259,6 +261,7 @@ export function SiteFooter() {
             <Link key={n.to + n.label} to={n.to} className="opacity-80 hover:opacity-100">{n.label}</Link>
           ))}
         </nav>
+        <button type="button" onClick={openCookiePrefs} className="self-start text-sm underline opacity-80 hover:opacity-100">Preferenze cookie</button>
         <p className="text-xs opacity-60">
           © {new Date().getFullYear()} {CLUB_NAME} — Super App ufficiale · anteprima locale.
         </p>

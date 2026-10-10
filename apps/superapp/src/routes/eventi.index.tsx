@@ -1,9 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { PageHero, SyncPlaceholder } from "@/components/ui-kit";
 import { getPublicFeed } from "@/lib/club.functions";
 
-export const Route = createFileRoute("/eventi")({
+export const Route = createFileRoute("/eventi/")({
   loader: () => getPublicFeed(),
   head: () => ({
     meta: [
@@ -22,7 +22,18 @@ function Eventi() {
   return (
     <main>
       <PageHero eyebrow="Vivere il club" title="Eventi">Iscrizioni gratuite oggi; eventuali quote future saranno indicate su ogni evento.</PageHero>
-      <section className="mx-auto -mt-8 grid max-w-6xl gap-5 px-4 md:grid-cols-3">
+      <section className="mx-auto -mt-8 max-w-6xl px-4 pb-5">
+        <Link to="/eventi/christmas-lario-cup" className="relative flex min-h-[220px] items-end overflow-hidden rounded-[20px] bg-[#021f4f] text-white shadow-premium" data-testid="eventi-clc">
+          <img src="/media/eventi/christmas-lario-cup-2026-maschile.webp" alt="" className="absolute inset-0 size-full object-cover object-top opacity-75" loading="lazy" />
+          <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-b from-transparent to-[rgb(2_31_79/0.95)]" />
+          <span className="relative grid gap-1 p-5">
+            <span className="text-sm font-bold uppercase tracking-wider text-[#ffd21f]">Torneo protetto · 8 dicembre 2026</span>
+            <b className="font-uv text-[34px] uppercase leading-[0.92]">Christmas Lario Cup</b>
+            <span className="text-[15px] text-[#dbe7ff]">1ª edizione a Colico e Dervio, iscrizioni aperte.</span>
+          </span>
+        </Link>
+      </section>
+      <section className="mx-auto grid max-w-6xl gap-5 px-4 md:grid-cols-3">
         {eventi.length === 0 ? (
           <>
             <SyncPlaceholder label="Prossimi eventi" />

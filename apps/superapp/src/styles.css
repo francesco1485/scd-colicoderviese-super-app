@@ -233,3 +233,58 @@
 }
 .scd-scroll-x { scrollbar-width: none; }
 .scd-scroll-x::-webkit-scrollbar { display: none; }
+
+/* ---------- SCD Universe: stile "esplosivo" della tavola (pennellate, luci, notch gialli) ---------- */
+:root {
+  --uv-night: #021f4f;
+  --uv-page: #03265e;
+  --uv-royal: #1556c4;
+  --uv-gold: #ffd21f;
+  --font-uv: "Big Shoulders Display", "Anton", Impact, sans-serif;
+  --font-uv-script: "Kaushan Script", cursive;
+}
+@utility font-uv { font-family: var(--font-uv); font-weight: 900; letter-spacing: 0; }
+@utility font-uv-script { font-family: var(--font-uv-script); font-weight: 400; }
+.uv-page {
+  background:
+    radial-gradient(120% 50% at 50% 0%, #0d4fb3 0%, transparent 60%),
+    radial-gradient(80% 40% at 110% 55%, #0a3d8f 0%, transparent 60%),
+    linear-gradient(180deg, #03307a 0%, var(--uv-page) 45%, #021f4f 100%);
+}
+.uv-hero-photo { background-position: center 38%; background-size: cover; }
+.uv-hero-photo::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgb(2 31 79 / .35) 0%, rgb(3 48 122 / .6) 50%, var(--uv-page) 100%), linear-gradient(90deg, rgb(2 31 79 / .8) 0%, rgb(2 31 79 / .1) 75%);
+}
+.uv-lights i { position: absolute; top: 24px; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle, rgb(255 250 215 / .5) 0%, rgb(255 240 170 / .16) 30%, transparent 65%); animation: uv-on 1.4s .1s steps(1) both, uv-flick 6s 1.6s ease-in-out infinite; }
+.uv-lights i:first-child { left: -120px; } .uv-lights i:last-child { right: -130px; }
+@keyframes uv-on { 0% { opacity: 0 } 20% { opacity: 1 } 28% { opacity: .2 } 40% { opacity: 1 } 48% { opacity: .4 } 60%, 100% { opacity: 1 } }
+@keyframes uv-flick { 50% { opacity: .75 } }
+.uv-brush { position: absolute; overflow: visible; animation: uv-paint .9s cubic-bezier(.6, 0, .2, 1) both; }
+@keyframes uv-paint { from { clip-path: inset(0 100% 0 0) } to { clip-path: inset(0 0 0 0) } }
+.uv-slam { animation: uv-slam .55s cubic-bezier(.2, 1.3, .4, 1) both; }
+@keyframes uv-slam { from { opacity: 0; transform: translateX(-30px) skewX(-12deg) } }
+.uv-pop { animation: uv-pop .7s cubic-bezier(.2, 1.4, .4, 1) both; }
+@keyframes uv-pop { from { opacity: 0; transform: scale(.4) rotate(-14deg) } }
+.uv-drop { animation: uv-drop .7s .8s cubic-bezier(.2, 1.3, .4, 1) both; }
+@keyframes uv-drop { from { opacity: 0; transform: translateY(-30px) } }
+.uv-float { animation: uv-float 4s ease-in-out infinite; }
+@keyframes uv-float { 50% { transform: translateY(-6px) rotate(3deg) } }
+.uv-blink { animation: uv-blink 1s steps(2) infinite; }
+@keyframes uv-blink { 50% { opacity: .25 } }
+.uv-marquee { animation: uv-marquee 28s linear infinite; }
+@keyframes uv-marquee { to { transform: translateX(-50%) } }
+.uv-thump { animation: uv-thump .45s cubic-bezier(.3, 1.6, .5, 1) both; }
+@keyframes uv-thump { from { transform: scale(2.4) rotate(-18deg); opacity: 0 } to { transform: scale(1) rotate(-10deg); opacity: 1 } }
+.uv-notch { clip-path: polygon(0 0, 100% 0, calc(100% - 12px) 100%, 0 100%); }
+.uv-code { clip-path: polygon(12% 0, 100% 0, 88% 100%, 0 100%); box-shadow: inset 0 -3px 0 rgb(0 0 0 / .25); }
+.uv-underline { position: relative; isolation: isolate; }
+.uv-underline::after {
+  content: ""; position: absolute; left: -4px; bottom: -4px; width: calc(100% + 14px); height: 12px; z-index: -1;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 14' preserveAspectRatio='none'%3E%3Cpath d='M2 9C40 3 120 2 198 5L196 10C130 12 60 13 4 13Z' fill='%23ffd21f'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat;
+}
+@media (prefers-reduced-motion: reduce) {
+  .uv-lights i, .uv-brush, .uv-slam, .uv-pop, .uv-drop, .uv-float, .uv-blink, .uv-marquee, .uv-thump { animation: none !important; }
+}
+/* "Testo grande" (volto Nonni): ingrandisce l'intera interfaccia in modo uniforme. */
+html.uv-big .sa-shell { zoom: 1.12; }

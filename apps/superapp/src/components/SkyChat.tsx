@@ -71,7 +71,7 @@ export function SkyChat() {
 
   // Super App: su smartphone il widget resta sopra la barra di navigazione inferiore.
   return (
-    <div data-sky-widget className={`fixed bottom-[calc(4.75rem+env(safe-area-inset-bottom))] right-4 z-50 flex max-w-[calc(100vw-2rem)] flex-col items-end gap-3 lg:bottom-4 ${onCalendario && !open ? "max-[640px]:hidden" : ""}`}>
+    <div data-sky-widget className={`fixed bottom-[calc(4.75rem+46px+env(safe-area-inset-bottom))] right-4 z-50 flex max-w-[calc(100vw-2rem)] flex-col items-end gap-3 lg:bottom-[62px] ${onCalendario && !open ? "max-[640px]:hidden" : ""}`}>
       {open && (
         <div role="dialog" aria-label="Chat con CROVI" className="sky-panel flex max-h-[calc(100dvh-11rem)] w-[min(21rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-premium lg:max-h-[calc(100dvh-6rem)]">
           <div className="surface-deep flex items-center gap-3 px-4 py-3">

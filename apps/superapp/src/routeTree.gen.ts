@@ -16,7 +16,6 @@ import { Route as CommunityRouteImport } from './routes/community'
 import { Route as ComunicazioniRouteImport } from './routes/comunicazioni'
 import { Route as ContattiRouteImport } from './routes/contatti'
 import { Route as EntraRouteImport } from './routes/entra'
-import { Route as EventiRouteImport } from './routes/eventi'
 import { Route as FornitoriRouteImport } from './routes/fornitori'
 import { Route as GrowRouteImport } from './routes/grow'
 import { Route as SafeguardingRouteImport } from './routes/safeguarding'
@@ -30,6 +29,8 @@ import { Route as CoreAtletaRouteImport } from './routes/core.atleta'
 import { Route as CoreFamigliaRouteImport } from './routes/core.famiglia'
 import { Route as CoreImpiantiCalendariRouteImport } from './routes/core.impianti-calendari'
 import { Route as CoreStaffRouteImport } from './routes/core.staff'
+import { Route as EventiIndexRouteImport } from './routes/eventi.index'
+import { Route as EventiChristmasLarioCupRouteImport } from './routes/eventi.christmas-lario-cup'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -64,11 +65,6 @@ const ContattiRoute = ContattiRouteImport.update({
 const EntraRoute = EntraRouteImport.update({
   id: '/entra',
   path: '/entra',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EventiRoute = EventiRouteImport.update({
-  id: '/eventi',
-  path: '/eventi',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FornitoriRoute = FornitoriRouteImport.update({
@@ -136,6 +132,16 @@ const CoreStaffRoute = CoreStaffRouteImport.update({
   path: '/core/staff',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EventiIndexRoute = EventiIndexRouteImport.update({
+  id: '/eventi/',
+  path: '/eventi/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventiChristmasLarioCupRoute = EventiChristmasLarioCupRouteImport.update({
+  id: '/eventi/christmas-lario-cup',
+  path: '/eventi/christmas-lario-cup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -145,7 +151,6 @@ export interface FileRoutesByFullPath {
   '/comunicazioni': typeof ComunicazioniRoute
   '/contatti': typeof ContattiRoute
   '/entra': typeof EntraRoute
-  '/eventi': typeof EventiRoute
   '/fornitori': typeof FornitoriRoute
   '/grow': typeof GrowRoute
   '/safeguarding': typeof SafeguardingRoute
@@ -157,8 +162,10 @@ export interface FileRoutesByFullPath {
   '/core/famiglia': typeof CoreFamigliaRoute
   '/core/impianti-calendari': typeof CoreImpiantiCalendariRoute
   '/core/staff': typeof CoreStaffRoute
+  '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
   '/aree/': typeof AreeIndexRoute
   '/core/': typeof CoreIndexRoute
+  '/eventi/': typeof EventiIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -168,7 +175,6 @@ export interface FileRoutesByTo {
   '/comunicazioni': typeof ComunicazioniRoute
   '/contatti': typeof ContattiRoute
   '/entra': typeof EntraRoute
-  '/eventi': typeof EventiRoute
   '/fornitori': typeof FornitoriRoute
   '/grow': typeof GrowRoute
   '/safeguarding': typeof SafeguardingRoute
@@ -180,8 +186,10 @@ export interface FileRoutesByTo {
   '/core/famiglia': typeof CoreFamigliaRoute
   '/core/impianti-calendari': typeof CoreImpiantiCalendariRoute
   '/core/staff': typeof CoreStaffRoute
+  '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
   '/aree': typeof AreeIndexRoute
   '/core': typeof CoreIndexRoute
+  '/eventi': typeof EventiIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -192,7 +200,6 @@ export interface FileRoutesById {
   '/comunicazioni': typeof ComunicazioniRoute
   '/contatti': typeof ContattiRoute
   '/entra': typeof EntraRoute
-  '/eventi': typeof EventiRoute
   '/fornitori': typeof FornitoriRoute
   '/grow': typeof GrowRoute
   '/safeguarding': typeof SafeguardingRoute
@@ -204,8 +211,10 @@ export interface FileRoutesById {
   '/core/famiglia': typeof CoreFamigliaRoute
   '/core/impianti-calendari': typeof CoreImpiantiCalendariRoute
   '/core/staff': typeof CoreStaffRoute
+  '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
   '/aree/': typeof AreeIndexRoute
   '/core/': typeof CoreIndexRoute
+  '/eventi/': typeof EventiIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -217,7 +226,6 @@ export interface FileRouteTypes {
     | '/comunicazioni'
     | '/contatti'
     | '/entra'
-    | '/eventi'
     | '/fornitori'
     | '/grow'
     | '/safeguarding'
@@ -229,8 +237,10 @@ export interface FileRouteTypes {
     | '/core/famiglia'
     | '/core/impianti-calendari'
     | '/core/staff'
+    | '/eventi/christmas-lario-cup'
     | '/aree/'
     | '/core/'
+    | '/eventi/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -240,7 +250,6 @@ export interface FileRouteTypes {
     | '/comunicazioni'
     | '/contatti'
     | '/entra'
-    | '/eventi'
     | '/fornitori'
     | '/grow'
     | '/safeguarding'
@@ -252,8 +261,10 @@ export interface FileRouteTypes {
     | '/core/famiglia'
     | '/core/impianti-calendari'
     | '/core/staff'
+    | '/eventi/christmas-lario-cup'
     | '/aree'
     | '/core'
+    | '/eventi'
   id:
     | '__root__'
     | '/'
@@ -263,7 +274,6 @@ export interface FileRouteTypes {
     | '/comunicazioni'
     | '/contatti'
     | '/entra'
-    | '/eventi'
     | '/fornitori'
     | '/grow'
     | '/safeguarding'
@@ -275,8 +285,10 @@ export interface FileRouteTypes {
     | '/core/famiglia'
     | '/core/impianti-calendari'
     | '/core/staff'
+    | '/eventi/christmas-lario-cup'
     | '/aree/'
     | '/core/'
+    | '/eventi/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -287,7 +299,6 @@ export interface RootRouteChildren {
   ComunicazioniRoute: typeof ComunicazioniRoute
   ContattiRoute: typeof ContattiRoute
   EntraRoute: typeof EntraRoute
-  EventiRoute: typeof EventiRoute
   FornitoriRoute: typeof FornitoriRoute
   GrowRoute: typeof GrowRoute
   SafeguardingRoute: typeof SafeguardingRoute
@@ -299,8 +310,10 @@ export interface RootRouteChildren {
   CoreFamigliaRoute: typeof CoreFamigliaRoute
   CoreImpiantiCalendariRoute: typeof CoreImpiantiCalendariRoute
   CoreStaffRoute: typeof CoreStaffRoute
+  EventiChristmasLarioCupRoute: typeof EventiChristmasLarioCupRoute
   AreeIndexRoute: typeof AreeIndexRoute
   CoreIndexRoute: typeof CoreIndexRoute
+  EventiIndexRoute: typeof EventiIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -352,13 +365,6 @@ declare module '@tanstack/react-router' {
       path: '/entra'
       fullPath: '/entra'
       preLoaderRoute: typeof EntraRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/eventi': {
-      id: '/eventi'
-      path: '/eventi'
-      fullPath: '/eventi'
-      preLoaderRoute: typeof EventiRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/fornitori': {
@@ -452,6 +458,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CoreStaffRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/eventi/': {
+      id: '/eventi/'
+      path: '/eventi'
+      fullPath: '/eventi/'
+      preLoaderRoute: typeof EventiIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/eventi/christmas-lario-cup': {
+      id: '/eventi/christmas-lario-cup'
+      path: '/eventi/christmas-lario-cup'
+      fullPath: '/eventi/christmas-lario-cup'
+      preLoaderRoute: typeof EventiChristmasLarioCupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -463,7 +483,6 @@ const rootRouteChildren: RootRouteChildren = {
   ComunicazioniRoute: ComunicazioniRoute,
   ContattiRoute: ContattiRoute,
   EntraRoute: EntraRoute,
-  EventiRoute: EventiRoute,
   FornitoriRoute: FornitoriRoute,
   GrowRoute: GrowRoute,
   SafeguardingRoute: SafeguardingRoute,
@@ -475,8 +494,10 @@ const rootRouteChildren: RootRouteChildren = {
   CoreFamigliaRoute: CoreFamigliaRoute,
   CoreImpiantiCalendariRoute: CoreImpiantiCalendariRoute,
   CoreStaffRoute: CoreStaffRoute,
+  EventiChristmasLarioCupRoute: EventiChristmasLarioCupRoute,
   AreeIndexRoute: AreeIndexRoute,
   CoreIndexRoute: CoreIndexRoute,
+  EventiIndexRoute: EventiIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
