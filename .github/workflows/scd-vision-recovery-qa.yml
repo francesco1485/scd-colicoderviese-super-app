@@ -1,0 +1,44 @@
+name: SCD Six-Screen Visual QA
+on:
+  push:
+    branches: [fix/vision-2026-lovable-recovery-20261009]
+    paths:
+      - 'staging/lovable-vision-2026/**'
+      - '.github/workflows/scd-vision-recovery-qa.yml'
+  workflow_dispatch:
+jobs:
+  build-and-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: staging/lovable-vision-2026
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install recovered app
+        run: npm install --no-audit --no-fund
+      - name: Test staging contracts
+        run: npm run test:vision
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Build app
+        run: npm run build
+      - name: Install browser
+        run: npx playwright install --with-deps chromium
+      - name: Start staging route
+        run: |
+          npm run dev -- --host 127.0.0.1 --port 4173 > /tmp/scd-vision.log 2>&1 &
+          for n in $(seq 1 45); do if curl -fsS http://127.0.0.1:4173/vision-2026 >/dev/null; then break; fi; sleep 2; done
+          curl -fsS http://127.0.0.1:4173/vision-2026 >/dev/null
+      - name: Browser interaction and screenshot QA
+        run: npm run test:browser
+      - name: Upload real Chromium screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scd-six-visual-browser-screenshots
+          path: staging/lovable-vision-2026/test-output/*.png
+          if-no-files-found: ignore
