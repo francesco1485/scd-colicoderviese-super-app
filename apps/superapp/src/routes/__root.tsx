@@ -6,6 +6,7 @@ import {
   useRouter,
   HeadContent,
   Scripts,
+  type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
@@ -37,12 +38,15 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function ErrorComponent({ error: raw, reset }: ErrorComponentProps) {
+  // TanStack Router >= 1.170.4x types `error` as unknown; normalise it once here.
+  const error = raw instanceof Error ? raw : new Error(String(raw));
   console.error(error);
   const router = useRouter();
   useEffect(() => {
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
-  }, [error]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- `error` is derived from `raw` each render
+  }, [raw]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
