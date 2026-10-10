@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 
 import { DirectionPanel } from "@/components/DirectionPanel";
 import { SafeSummary } from "@/components/SafeSummary";
+import { ImpiantiCalendari } from "@/features/impianti/ImpiantiCalendari";
 
 import { getDashboard, validateAccess } from "@/lib/private.functions";
 
@@ -133,6 +134,11 @@ function AreaPage() {
           </div>
           <SafeSummary summary={summary} />
           {area === "direzione" && <DirectionPanel token={token} />}
+          {(area === "staff" || area === "direzione") && (
+            <section className="mt-8" aria-label="SCD CORE · Impianti e Calendari">
+              <ImpiantiCalendari />
+            </section>
+          )}
         </>
       ) : (
         <div className="mt-8 grid gap-6 md:grid-cols-2">
