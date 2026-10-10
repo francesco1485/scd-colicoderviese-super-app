@@ -1,0 +1,44 @@
+{
+  "name": "SCD ColicoDerviese Super App",
+  "short_name": "ColicoDerviese",
+  "description": "App ufficiale della S.D.C. ColicoDerviese: gare, risultati, eventi e aree riservate.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0d1b3e",
+  "theme_color": "#0d1b3e",
+  "icons": [
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "id": "/",
+  "lang": "it",
+  "orientation": "portrait",
+  "categories": [
+    "sports"
+  ],
+  "shortcuts": [
+    {
+      "name": "Gioca con noi",
+      "url": "/entra"
+    },
+    {
+      "name": "Diventa sponsor",
+      "url": "/sponsor"
+    },
+    {
+      "name": "Area tifosi",
+      "url": "/community"
+    }
+  ]
+}

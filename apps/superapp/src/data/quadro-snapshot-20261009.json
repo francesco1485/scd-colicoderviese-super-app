@@ -1,0 +1,1316 @@
+{
+  "schema":"scd.quadro-allenamenti.public.v1",
+  "audience":"PUBLIC_ONLY",
+  "generatedUTC":"2026-10-09T13:40:06Z",
+  "source":{
+    "name":"Quadro settimanale allenamenti SCD 2026/27",
+    "sha256":"4c70b452e673650672dca611a6c121ee0d6afef506631200cd1707b2570b8c97",
+    "modifiedUTC":null,
+    "sync":"DATI_ESTRATTI_DA_XLSM",
+    "building":"COLICO",
+    "sourceSheets":[
+      "QUADRO ALLENAMENTI",
+      "ROTAZIONE CAMPI",
+      "SPOGLIATOI SETT",
+      "RIFERIMENTO 2D"
+    ]
+  },
+  "days":[
+    "LUNEDÌ",
+    "MARTEDÌ",
+    "MERCOLEDÌ",
+    "GIOVEDÌ",
+    "VENERDÌ"
+  ],
+  "slots":[
+    {
+      "sourceRow":5,
+      "day":"LUNEDÌ",
+      "start":1040,
+      "end":1130,
+      "timeLabel":"17:20–18:50",
+      "fields":{
+        "C1":"U15 2012/2013 + U12 2015 + U11 2016/2017",
+        "C2":"Primi Calci 2018-2019 + Piccoli Amici 2020-2021\nDue zone"
+      },
+      "rooms":{
+        "SP1":"U15",
+        "SP2":"2016 + 2017",
+        "SP3":"2015",
+        "SP4":"2018 + 2019"
+      }
+    },
+    {
+      "sourceRow":6,
+      "day":"LUNEDÌ",
+      "start":1140,
+      "end":1220,
+      "timeLabel":"19:00–20:20",
+      "fields":{
+        "C1":"Juniores Élite U19 (+ atleti ex U18 integrati)",
+        "C2":""
+      },
+      "rooms":{
+        "SP1":"Juniores U19 / ex U18",
+        "SP2":"—",
+        "SP3":"",
+        "SP4":"—"
+      }
+    },
+    {
+      "sourceRow":7,
+      "day":"LUNEDÌ",
+      "start":1210,
+      "end":1280,
+      "timeLabel":"20:10–21:20",
+      "fields":{
+        "C1":"Under 16",
+        "C2":""
+      },
+      "rooms":{
+        "SP1":"",
+        "SP2":"",
+        "SP3":"",
+        "SP4":"U16"
+      }
+    },
+    {
+      "sourceRow":8,
+      "day":"MARTEDÌ",
+      "start":1040,
+      "end":1130,
+      "timeLabel":"17:20–18:50",
+      "fields":{
+        "C1":"PICCOLI AMICI",
+        "C2":""
+      },
+      "rooms":{
+        "SP1":"PICCOLI AMICI 2020 + 2021",
+        "SP2":"—",
+        "SP3":"",
+        "SP4":"—"
+      }
+    },
+    {
+      "sourceRow":9,
+      "day":"MARTEDÌ",
+      "start":1080,
+      "end":1160,
+      "timeLabel":"18:00–19:20",
+      "fields":{
+        "C1":"",
+        "C2":"Under 13"
+      },
+      "rooms":{
+        "SP1":"—",
+        "SP2":"U13",
+        "SP3":"—",
+        "SP4":""
+      }
+    },
+    {
+      "sourceRow":10,
+      "day":"MARTEDÌ",
+      "start":1140,
+      "end":1260,
+      "timeLabel":"19:00–21:00",
+      "fields":{
+        "C1":"INTERO — Prima Squadra • Promozione",
+        "C2":""
+      },
+      "rooms":{
+        "SP1":"—",
+        "SP2":"—",
+        "SP3":"Prima Squadra",
+        "SP4":"—"
+      }
+    },
+    {
+      "sourceRow":11,
+      "day":"MERCOLEDÌ",
+      "start":1040,
+      "end":1130,
+      "timeLabel":"17:20–18:50",
+      "fields":{
+        "C1":"U15 2012/2013 + U12 2015 + U11 2016/2017",
+        "C2":"Primi Calci 2018-2019 + Piccoli Amici 2020-2021\nDue zone"
+      },
+      "rooms":{
+        "SP1":"U15",
+        "SP2":"2016 + 2017",
+        "SP3":"2015",
+        "SP4":"2018 + 2019 + 2020 + 2021"
+      }
+    },
+    {
+      "sourceRow":12,
+      "day":"MERCOLEDÌ",
+      "start":1140,
+      "end":1220,
+      "timeLabel":"19:00–20:20",
+      "fields":{
+        "C1":"Juniores Élite U19 (+ atleti ex U18 integrati)",
+        "C2":""
+      },
+      "rooms":{
+        "SP1":"Juniores U19 / ex U18",
+        "SP2":"—",
+        "SP3":"",
+        "SP4":"—"
+      }
+    },
+    {
+      "sourceRow":13,
+      "day":"MERCOLEDÌ",
+      "start":1210,
+      "end":1280,
+      "timeLabel":"20:10–21:20",
+      "fields":{
+        "C1":"Under 16",
+        "C2":""
+      },
+      "rooms":{
+        "SP1":"",
+        "SP2":"",
+        "SP3":"",
+        "SP4":"U16"
+      }
+    },
+    {
+      "sourceRow":14,
+      "day":"GIOVEDÌ",
+      "start":1040,
+      "end":1130,
+      "timeLabel":"17:20–18:50",
+      "fields":{
+        "C1":"PICCOLI AMICI",
+        "C2":""
+      },
+      "rooms":{
+        "SP1":"",
+        "SP2":"",
+        "SP3":"",
+        "SP4":"PICCOLI AMICI 2020 + 2021"
+      }
+    },
+    {
+      "sourceRow":15,
+      "day":"GIOVEDÌ",
+      "start":1080,
+      "end":1170,
+      "timeLabel":"18:00–19:30",
+      "fields":{
+        "C1":"Under 13",
+        "C2":""
+      },
+      "rooms":{
+        "SP1":"",
+        "SP2":"U13",
+        "SP3":"—",
+        "SP4":""
+      }
+    },
+    {
+      "sourceRow":16,
+      "day":"GIOVEDÌ",
+      "start":1140,
+      "end":1260,
+      "timeLabel":"19:00–21:00",
+      "fields":{
+        "C1":"Prima Squadra",
+        "C2":"Juniores Élite U19 (+ atleti ex U18 integrati)"
+      },
+      "rooms":{
+        "SP1":"Juniores U19 / ex U18",
+        "SP2":"—",
+        "SP3":"Prima Squadra",
+        "SP4":"—"
+      }
+    },
+    {
+      "sourceRow":17,
+      "day":"VENERDÌ",
+      "start":1040,
+      "end":1130,
+      "timeLabel":"17:20–18:50",
+      "fields":{
+        "C1":"",
+        "C2":"Under 15 2012/2013"
+      },
+      "rooms":{
+        "SP1":"",
+        "SP2":"U15",
+        "SP3":"—",
+        "SP4":""
+      }
+    },
+    {
+      "sourceRow":18,
+      "day":"VENERDÌ",
+      "start":1140,
+      "end":1230,
+      "timeLabel":"19:00–20:30",
+      "fields":{
+        "C1":"INTERO — Prima Squadra • Promozione",
+        "C2":""
+      },
+      "rooms":{
+        "SP1":"",
+        "SP2":"",
+        "SP3":"Prima Squadra",
+        "SP4":""
+      }
+    },
+    {
+      "sourceRow":19,
+      "day":"VENERDÌ",
+      "start":1210,
+      "end":1280,
+      "timeLabel":"20:10–21:20",
+      "fields":{
+        "C1":"",
+        "C2":"Under 16"
+      },
+      "rooms":{
+        "SP1":"U16",
+        "SP2":"—",
+        "SP3":"",
+        "SP4":"—"
+      }
+    }
+  ],
+  "rotations":[
+    {
+      "sourceRow":5,
+      "week":"A",
+      "days":[
+        "LUNEDÌ"
+      ],
+      "start":1040,
+      "end":1130,
+      "timeLabel":"Lun 17:20–18:50",
+      "zones":{
+        "C1_A":"U15 2012/13",
+        "C1_B":"U12 2015",
+        "C1_C":"U11 2016/17",
+        "C2_A":"Primi Calci 2018/19",
+        "C2_B":"Piccoli Amici 2020/21"
+      }
+    },
+    {
+      "sourceRow":6,
+      "week":"B",
+      "days":[
+        "LUNEDÌ"
+      ],
+      "start":1040,
+      "end":1130,
+      "timeLabel":"Lun 17:20–18:50",
+      "zones":{
+        "C1_A":"U15 2012/13",
+        "C1_B":"U11 2016/17",
+        "C1_C":"U12 2015",
+        "C2_A":"Piccoli Amici 2020/21",
+        "C2_B":"Primi Calci 2018/19"
+      }
+    },
+    {
+      "sourceRow":7,
+      "week":"A",
+      "days":[
+        "MERCOLEDÌ"
+      ],
+      "start":1040,
+      "end":1130,
+      "timeLabel":"Mer 17:20–18:50",
+      "zones":{
+        "C1_A":"U15 2012/13",
+        "C1_B":"U11 2016/17",
+        "C1_C":"U12 2015",
+        "C2_A":"Piccoli Amici 2020/21",
+        "C2_B":"Primi Calci 2018/19"
+      }
+    },
+    {
+      "sourceRow":8,
+      "week":"B",
+      "days":[
+        "MERCOLEDÌ"
+      ],
+      "start":1040,
+      "end":1130,
+      "timeLabel":"Mer 17:20–18:50",
+      "zones":{
+        "C1_A":"U15 2012/13",
+        "C1_B":"U12 2015",
+        "C1_C":"U11 2016/17",
+        "C2_A":"Primi Calci 2018/19",
+        "C2_B":"Piccoli Amici 2020/21"
+      }
+    },
+    {
+      "sourceRow":9,
+      "week":"A",
+      "days":[
+        "LUNEDÌ",
+        "MERCOLEDÌ"
+      ],
+      "start":1140,
+      "end":1210,
+      "timeLabel":"Lun/Mer 19:00–20:10",
+      "zones":{
+        "C1_A":"Juniores U19 (+ ex U18)",
+        "C1_B":"Juniores U19 (+ ex U18)",
+        "C1_C":"Juniores U19 (+ ex U18)",
+        "C2_A":"—",
+        "C2_B":"—"
+      }
+    },
+    {
+      "sourceRow":10,
+      "week":"A",
+      "days":[
+        "LUNEDÌ",
+        "MERCOLEDÌ"
+      ],
+      "start":1210,
+      "end":1220,
+      "timeLabel":"Lun/Mer 20:10–20:20",
+      "zones":{
+        "C1_A":"Juniores U19 (+ ex U18)",
+        "C1_B":"Juniores U19 (+ ex U18)",
+        "C1_C":"U16 — attivazione",
+        "C2_A":"—",
+        "C2_B":"—"
+      }
+    },
+    {
+      "sourceRow":11,
+      "week":"B",
+      "days":[
+        "LUNEDÌ",
+        "MERCOLEDÌ"
+      ],
+      "start":1210,
+      "end":1220,
+      "timeLabel":"Lun/Mer 20:10–20:20",
+      "zones":{
+        "C1_A":"U16 — attivazione",
+        "C1_B":"Juniores U19 (+ ex U18)",
+        "C1_C":"Juniores U19 (+ ex U18)",
+        "C2_A":"—",
+        "C2_B":"—"
+      }
+    },
+    {
+      "sourceRow":12,
+      "week":"A/B",
+      "days":[
+        "LUNEDÌ",
+        "MERCOLEDÌ"
+      ],
+      "start":1220,
+      "end":1280,
+      "timeLabel":"Lun/Mer 20:20–21:20",
+      "zones":{
+        "C1_A":"U16",
+        "C1_B":"U16",
+        "C1_C":"U16",
+        "C2_A":"—",
+        "C2_B":"—"
+      }
+    },
+    {
+      "sourceRow":13,
+      "week":"A/B",
+      "days":[
+        "MARTEDÌ"
+      ],
+      "start":1040,
+      "end":1130,
+      "timeLabel":"Mar 17:20–18:50",
+      "zones":{
+        "C1_A":"Piccoli Amici 2020/21",
+        "C1_B":"Piccoli Amici 2020/21",
+        "C1_C":"Piccoli Amici 2020/21",
+        "C2_A":"—",
+        "C2_B":"—"
+      }
+    },
+    {
+      "sourceRow":14,
+      "week":"A/B",
+      "days":[
+        "MARTEDÌ"
+      ],
+      "start":1080,
+      "end":1160,
+      "timeLabel":"Mar 18:00–19:20",
+      "zones":{
+        "C1_A":"Piccoli Amici fino 19:00",
+        "C1_B":"Piccoli Amici fino 19:00",
+        "C1_C":"Piccoli Amici fino 19:00",
+        "C2_A":"U13",
+        "C2_B":"U13"
+      }
+    },
+    {
+      "sourceRow":15,
+      "week":"A/B",
+      "days":[
+        "MARTEDÌ"
+      ],
+      "start":1140,
+      "end":1260,
+      "timeLabel":"Mar 19:00–21:00",
+      "zones":{
+        "C1_A":"Prima Squadra",
+        "C1_B":"Prima Squadra",
+        "C1_C":"Prima Squadra",
+        "C2_A":"U13 fino 19:30",
+        "C2_B":"U13 fino 19:30"
+      }
+    },
+    {
+      "sourceRow":16,
+      "week":"A",
+      "days":[
+        "GIOVEDÌ"
+      ],
+      "start":1040,
+      "end":1130,
+      "timeLabel":"Gio 17:20–18:50",
+      "zones":{
+        "C1_A":"Piccoli Amici",
+        "C1_B":"U13",
+        "C1_C":"U13",
+        "C2_A":"—",
+        "C2_B":"—"
+      }
+    },
+    {
+      "sourceRow":17,
+      "week":"B",
+      "days":[
+        "GIOVEDÌ"
+      ],
+      "start":1080,
+      "end":1170,
+      "timeLabel":"Gio 18:00–19:30",
+      "zones":{
+        "C1_A":"U13",
+        "C1_B":"U13",
+        "C1_C":"Piccoli Amici",
+        "C2_A":"—",
+        "C2_B":"—"
+      }
+    },
+    {
+      "sourceRow":18,
+      "week":"A",
+      "days":[
+        "GIOVEDÌ"
+      ],
+      "start":1140,
+      "end":1170,
+      "timeLabel":"Gio 19:00–19:30",
+      "zones":{
+        "C1_A":"Prima Squadra",
+        "C1_B":"Prima Squadra",
+        "C1_C":"U13 — chiusura",
+        "C2_A":"Juniores U19 (+ ex U18)",
+        "C2_B":"Juniores U19 (+ ex U18)"
+      }
+    },
+    {
+      "sourceRow":19,
+      "week":"B",
+      "days":[
+        "GIOVEDÌ"
+      ],
+      "start":1140,
+      "end":1170,
+      "timeLabel":"Gio 19:00–19:30",
+      "zones":{
+        "C1_A":"U13 — chiusura",
+        "C1_B":"Prima Squadra",
+        "C1_C":"Prima Squadra",
+        "C2_A":"Juniores U19 (+ ex U18)",
+        "C2_B":"Juniores U19 (+ ex U18)"
+      }
+    },
+    {
+      "sourceRow":20,
+      "week":"A/B",
+      "days":[
+        "GIOVEDÌ"
+      ],
+      "start":1170,
+      "end":1260,
+      "timeLabel":"Gio 19:30–21:00",
+      "zones":{
+        "C1_A":"Prima Squadra",
+        "C1_B":"Prima Squadra",
+        "C1_C":"Prima Squadra",
+        "C2_A":"Juniores U19 (+ ex U18)",
+        "C2_B":"Juniores U19 (+ ex U18)"
+      }
+    },
+    {
+      "sourceRow":21,
+      "week":"A/B",
+      "days":[
+        "VENERDÌ"
+      ],
+      "start":1040,
+      "end":1130,
+      "timeLabel":"Ven 17:20–18:50",
+      "zones":{
+        "C1_A":"—",
+        "C1_B":"—",
+        "C1_C":"—",
+        "C2_A":"U15 2012/13",
+        "C2_B":"U15 2012/13"
+      }
+    },
+    {
+      "sourceRow":22,
+      "week":"A/B",
+      "days":[
+        "VENERDÌ"
+      ],
+      "start":1140,
+      "end":1230,
+      "timeLabel":"Ven 19:00–20:30",
+      "zones":{
+        "C1_A":"Prima Squadra",
+        "C1_B":"Prima Squadra",
+        "C1_C":"Prima Squadra",
+        "C2_A":"—",
+        "C2_B":"—"
+      }
+    },
+    {
+      "sourceRow":23,
+      "week":"A/B",
+      "days":[
+        "VENERDÌ"
+      ],
+      "start":1210,
+      "end":1280,
+      "timeLabel":"Ven 20:10–21:20",
+      "zones":{
+        "C1_A":"Prima Squadra fino 20:30",
+        "C1_B":"Prima Squadra fino 20:30",
+        "C1_C":"Prima Squadra fino 20:30",
+        "C2_A":"U16",
+        "C2_B":"U16"
+      }
+    }
+  ],
+  "rooms":[
+    {
+      "sourceRow":5,
+      "week":"A",
+      "day":"LUNEDÌ",
+      "id":"SP1",
+      "start":1040,
+      "end":1130,
+      "group":"U15"
+    },
+    {
+      "sourceRow":6,
+      "week":"A",
+      "day":"LUNEDÌ",
+      "id":"SP2",
+      "start":1040,
+      "end":1130,
+      "group":"2016 + 2017"
+    },
+    {
+      "sourceRow":7,
+      "week":"A",
+      "day":"LUNEDÌ",
+      "id":"SP3",
+      "start":1040,
+      "end":1130,
+      "group":"2015"
+    },
+    {
+      "sourceRow":8,
+      "week":"A",
+      "day":"LUNEDÌ",
+      "id":"SP4",
+      "start":1040,
+      "end":1130,
+      "group":"2018 + 2019"
+    },
+    {
+      "sourceRow":9,
+      "week":"A",
+      "day":"MERCOLEDÌ",
+      "id":"SP1",
+      "start":1040,
+      "end":1130,
+      "group":"U15"
+    },
+    {
+      "sourceRow":10,
+      "week":"A",
+      "day":"MERCOLEDÌ",
+      "id":"SP2",
+      "start":1040,
+      "end":1130,
+      "group":"2016 + 2017"
+    },
+    {
+      "sourceRow":11,
+      "week":"A",
+      "day":"MERCOLEDÌ",
+      "id":"SP3",
+      "start":1040,
+      "end":1130,
+      "group":"2015"
+    },
+    {
+      "sourceRow":12,
+      "week":"A",
+      "day":"MERCOLEDÌ",
+      "id":"SP4",
+      "start":1040,
+      "end":1130,
+      "group":"2018 + 2019 + 2020 + 2021"
+    },
+    {
+      "sourceRow":13,
+      "week":"A",
+      "day":"LUNEDÌ",
+      "id":"SP1",
+      "start":1140,
+      "end":1210,
+      "group":"Juniores U19 / ex U18"
+    },
+    {
+      "sourceRow":14,
+      "week":"A",
+      "day":"MERCOLEDÌ",
+      "id":"SP1",
+      "start":1140,
+      "end":1210,
+      "group":"Juniores U19 / ex U18"
+    },
+    {
+      "sourceRow":15,
+      "week":"A",
+      "day":"LUNEDÌ",
+      "id":"SP1",
+      "start":1210,
+      "end":1220,
+      "group":"Juniores U19 / ex U18"
+    },
+    {
+      "sourceRow":16,
+      "week":"A",
+      "day":"LUNEDÌ",
+      "id":"SP4",
+      "start":1210,
+      "end":1220,
+      "group":"U16"
+    },
+    {
+      "sourceRow":17,
+      "week":"A",
+      "day":"MERCOLEDÌ",
+      "id":"SP1",
+      "start":1210,
+      "end":1220,
+      "group":"Juniores U19 / ex U18"
+    },
+    {
+      "sourceRow":18,
+      "week":"A",
+      "day":"MERCOLEDÌ",
+      "id":"SP4",
+      "start":1210,
+      "end":1220,
+      "group":"U16"
+    },
+    {
+      "sourceRow":19,
+      "week":"A",
+      "day":"LUNEDÌ",
+      "id":"SP4",
+      "start":1220,
+      "end":1280,
+      "group":"U16"
+    },
+    {
+      "sourceRow":20,
+      "week":"A",
+      "day":"MERCOLEDÌ",
+      "id":"SP4",
+      "start":1220,
+      "end":1280,
+      "group":"U16"
+    },
+    {
+      "sourceRow":21,
+      "week":"A",
+      "day":"MARTEDÌ",
+      "id":"SP1",
+      "start":1040,
+      "end":1130,
+      "group":"PICCOLI AMICI 2020 + 2021"
+    },
+    {
+      "sourceRow":22,
+      "week":"A",
+      "day":"MARTEDÌ",
+      "id":"SP2",
+      "start":1040,
+      "end":1130,
+      "group":"U13"
+    },
+    {
+      "sourceRow":23,
+      "week":"A",
+      "day":"MARTEDÌ",
+      "id":"SP1",
+      "start":1080,
+      "end":1160,
+      "group":"PICCOLI AMICI 2020 + 2021"
+    },
+    {
+      "sourceRow":24,
+      "week":"A",
+      "day":"MARTEDÌ",
+      "id":"SP2",
+      "start":1080,
+      "end":1160,
+      "group":"U13"
+    },
+    {
+      "sourceRow":25,
+      "week":"A",
+      "day":"MARTEDÌ",
+      "id":"SP3",
+      "start":1080,
+      "end":1160,
+      "group":"Prima Squadra"
+    },
+    {
+      "sourceRow":26,
+      "week":"A",
+      "day":"MARTEDÌ",
+      "id":"SP2",
+      "start":1140,
+      "end":1260,
+      "group":"U13"
+    },
+    {
+      "sourceRow":27,
+      "week":"A",
+      "day":"MARTEDÌ",
+      "id":"SP3",
+      "start":1140,
+      "end":1260,
+      "group":"Prima Squadra"
+    },
+    {
+      "sourceRow":28,
+      "week":"A",
+      "day":"GIOVEDÌ",
+      "id":"SP2",
+      "start":1040,
+      "end":1130,
+      "group":"U13"
+    },
+    {
+      "sourceRow":29,
+      "week":"A",
+      "day":"GIOVEDÌ",
+      "id":"SP4",
+      "start":1040,
+      "end":1130,
+      "group":"PICCOLI AMICI 2020 + 2021"
+    },
+    {
+      "sourceRow":30,
+      "week":"A",
+      "day":"GIOVEDÌ",
+      "id":"SP1",
+      "start":1080,
+      "end":1170,
+      "group":"Juniores U19 / ex U18"
+    },
+    {
+      "sourceRow":31,
+      "week":"A",
+      "day":"GIOVEDÌ",
+      "id":"SP2",
+      "start":1080,
+      "end":1170,
+      "group":"U13"
+    },
+    {
+      "sourceRow":32,
+      "week":"A",
+      "day":"GIOVEDÌ",
+      "id":"SP3",
+      "start":1080,
+      "end":1170,
+      "group":"Prima Squadra"
+    },
+    {
+      "sourceRow":33,
+      "week":"A",
+      "day":"GIOVEDÌ",
+      "id":"SP4",
+      "start":1080,
+      "end":1170,
+      "group":"PICCOLI AMICI 2020 + 2021"
+    },
+    {
+      "sourceRow":34,
+      "week":"A",
+      "day":"GIOVEDÌ",
+      "id":"SP1",
+      "start":1140,
+      "end":1170,
+      "group":"Juniores U19 / ex U18"
+    },
+    {
+      "sourceRow":35,
+      "week":"A",
+      "day":"GIOVEDÌ",
+      "id":"SP2",
+      "start":1140,
+      "end":1170,
+      "group":"U13"
+    },
+    {
+      "sourceRow":36,
+      "week":"A",
+      "day":"GIOVEDÌ",
+      "id":"SP3",
+      "start":1140,
+      "end":1170,
+      "group":"Prima Squadra"
+    },
+    {
+      "sourceRow":37,
+      "week":"A",
+      "day":"GIOVEDÌ",
+      "id":"SP1",
+      "start":1170,
+      "end":1260,
+      "group":"Juniores U19 / ex U18"
+    },
+    {
+      "sourceRow":38,
+      "week":"A",
+      "day":"GIOVEDÌ",
+      "id":"SP3",
+      "start":1170,
+      "end":1260,
+      "group":"Prima Squadra"
+    },
+    {
+      "sourceRow":39,
+      "week":"A",
+      "day":"VENERDÌ",
+      "id":"SP2",
+      "start":1040,
+      "end":1130,
+      "group":"U15"
+    },
+    {
+      "sourceRow":40,
+      "week":"A",
+      "day":"VENERDÌ",
+      "id":"SP1",
+      "start":1140,
+      "end":1230,
+      "group":"U16"
+    },
+    {
+      "sourceRow":41,
+      "week":"A",
+      "day":"VENERDÌ",
+      "id":"SP3",
+      "start":1140,
+      "end":1230,
+      "group":"Prima Squadra"
+    },
+    {
+      "sourceRow":42,
+      "week":"A",
+      "day":"VENERDÌ",
+      "id":"SP1",
+      "start":1210,
+      "end":1280,
+      "group":"U16"
+    },
+    {
+      "sourceRow":43,
+      "week":"A",
+      "day":"VENERDÌ",
+      "id":"SP3",
+      "start":1210,
+      "end":1280,
+      "group":"Prima Squadra"
+    },
+    {
+      "sourceRow":44,
+      "week":"B",
+      "day":"LUNEDÌ",
+      "id":"SP1",
+      "start":1040,
+      "end":1130,
+      "group":"U15"
+    },
+    {
+      "sourceRow":45,
+      "week":"B",
+      "day":"LUNEDÌ",
+      "id":"SP2",
+      "start":1040,
+      "end":1130,
+      "group":"2016 + 2017"
+    },
+    {
+      "sourceRow":46,
+      "week":"B",
+      "day":"LUNEDÌ",
+      "id":"SP3",
+      "start":1040,
+      "end":1130,
+      "group":"2015"
+    },
+    {
+      "sourceRow":47,
+      "week":"B",
+      "day":"LUNEDÌ",
+      "id":"SP4",
+      "start":1040,
+      "end":1130,
+      "group":"2018 + 2019"
+    },
+    {
+      "sourceRow":48,
+      "week":"B",
+      "day":"MERCOLEDÌ",
+      "id":"SP1",
+      "start":1040,
+      "end":1130,
+      "group":"U15"
+    },
+    {
+      "sourceRow":49,
+      "week":"B",
+      "day":"MERCOLEDÌ",
+      "id":"SP2",
+      "start":1040,
+      "end":1130,
+      "group":"2016 + 2017"
+    },
+    {
+      "sourceRow":50,
+      "week":"B",
+      "day":"MERCOLEDÌ",
+      "id":"SP3",
+      "start":1040,
+      "end":1130,
+      "group":"2015"
+    },
+    {
+      "sourceRow":51,
+      "week":"B",
+      "day":"MERCOLEDÌ",
+      "id":"SP4",
+      "start":1040,
+      "end":1130,
+      "group":"2018 + 2019 + 2020 + 2021"
+    },
+    {
+      "sourceRow":52,
+      "week":"B",
+      "day":"LUNEDÌ",
+      "id":"SP1",
+      "start":1140,
+      "end":1210,
+      "group":"Juniores U19 / ex U18"
+    },
+    {
+      "sourceRow":53,
+      "week":"B",
+      "day":"MERCOLEDÌ",
+      "id":"SP1",
+      "start":1140,
+      "end":1210,
+      "group":"Juniores U19 / ex U18"
+    },
+    {
+      "sourceRow":54,
+      "week":"B",
+      "day":"LUNEDÌ",
+      "id":"SP1",
+      "start":1210,
+      "end":1220,
+      "group":"Juniores U19 / ex U18"
+    },
+    {
+      "sourceRow":55,
+      "week":"B",
+      "day":"LUNEDÌ",
+      "id":"SP4",
+      "start":1210,
+      "end":1220,
+      "group":"U16"
+    },
+    {
+      "sourceRow":56,
+      "week":"B",
+      "day":"MERCOLEDÌ",
+      "id":"SP1",
+      "start":1210,
+      "end":1220,
+      "group":"Juniores U19 / ex U18"
+    },
+    {
+      "sourceRow":57,
+      "week":"B",
+      "day":"MERCOLEDÌ",
+      "id":"SP4",
+      "start":1210,
+      "end":1220,
+      "group":"U16"
+    },
+    {
+      "sourceRow":58,
+      "week":"B",
+      "day":"LUNEDÌ",
+      "id":"SP4",
+      "start":1220,
+      "end":1280,
+      "group":"U16"
+    },
+    {
+      "sourceRow":59,
+      "week":"B",
+      "day":"MERCOLEDÌ",
+      "id":"SP4",
+      "start":1220,
+      "end":1280,
+      "group":"U16"
+    },
+    {
+      "sourceRow":60,
+      "week":"B",
+      "day":"MARTEDÌ",
+      "id":"SP1",
+      "start":1040,
+      "end":1130,
+      "group":"PICCOLI AMICI 2020 + 2021"
+    },
+    {
+      "sourceRow":61,
+      "week":"B",
+      "day":"MARTEDÌ",
+      "id":"SP2",
+      "start":1040,
+      "end":1130,
+      "group":"U13"
+    },
+    {
+      "sourceRow":62,
+      "week":"B",
+      "day":"MARTEDÌ",
+      "id":"SP1",
+      "start":1080,
+      "end":1160,
+      "group":"PICCOLI AMICI 2020 + 2021"
+    },
+    {
+      "sourceRow":63,
+      "week":"B",
+      "day":"MARTEDÌ",
+      "id":"SP2",
+      "start":1080,
+      "end":1160,
+      "group":"U13"
+    },
+    {
+      "sourceRow":64,
+      "week":"B",
+      "day":"MARTEDÌ",
+      "id":"SP3",
+      "start":1080,
+      "end":1160,
+      "group":"Prima Squadra"
+    },
+    {
+      "sourceRow":65,
+      "week":"B",
+      "day":"MARTEDÌ",
+      "id":"SP2",
+      "start":1140,
+      "end":1260,
+      "group":"U13"
+    },
+    {
+      "sourceRow":66,
+      "week":"B",
+      "day":"MARTEDÌ",
+      "id":"SP3",
+      "start":1140,
+      "end":1260,
+      "group":"Prima Squadra"
+    },
+    {
+      "sourceRow":67,
+      "week":"B",
+      "day":"GIOVEDÌ",
+      "id":"SP2",
+      "start":1040,
+      "end":1130,
+      "group":"U13"
+    },
+    {
+      "sourceRow":68,
+      "week":"B",
+      "day":"GIOVEDÌ",
+      "id":"SP4",
+      "start":1040,
+      "end":1130,
+      "group":"PICCOLI AMICI 2020 + 2021"
+    },
+    {
+      "sourceRow":69,
+      "week":"B",
+      "day":"GIOVEDÌ",
+      "id":"SP1",
+      "start":1080,
+      "end":1170,
+      "group":"Juniores U19 / ex U18"
+    },
+    {
+      "sourceRow":70,
+      "week":"B",
+      "day":"GIOVEDÌ",
+      "id":"SP2",
+      "start":1080,
+      "end":1170,
+      "group":"U13"
+    },
+    {
+      "sourceRow":71,
+      "week":"B",
+      "day":"GIOVEDÌ",
+      "id":"SP3",
+      "start":1080,
+      "end":1170,
+      "group":"Prima Squadra"
+    },
+    {
+      "sourceRow":72,
+      "week":"B",
+      "day":"GIOVEDÌ",
+      "id":"SP4",
+      "start":1080,
+      "end":1170,
+      "group":"PICCOLI AMICI 2020 + 2021"
+    },
+    {
+      "sourceRow":73,
+      "week":"B",
+      "day":"GIOVEDÌ",
+      "id":"SP1",
+      "start":1140,
+      "end":1170,
+      "group":"Juniores U19 / ex U18"
+    },
+    {
+      "sourceRow":74,
+      "week":"B",
+      "day":"GIOVEDÌ",
+      "id":"SP2",
+      "start":1140,
+      "end":1170,
+      "group":"U13"
+    },
+    {
+      "sourceRow":75,
+      "week":"B",
+      "day":"GIOVEDÌ",
+      "id":"SP3",
+      "start":1140,
+      "end":1170,
+      "group":"Prima Squadra"
+    },
+    {
+      "sourceRow":76,
+      "week":"B",
+      "day":"GIOVEDÌ",
+      "id":"SP1",
+      "start":1170,
+      "end":1260,
+      "group":"Juniores U19 / ex U18"
+    },
+    {
+      "sourceRow":77,
+      "week":"B",
+      "day":"GIOVEDÌ",
+      "id":"SP3",
+      "start":1170,
+      "end":1260,
+      "group":"Prima Squadra"
+    },
+    {
+      "sourceRow":78,
+      "week":"B",
+      "day":"VENERDÌ",
+      "id":"SP2",
+      "start":1040,
+      "end":1130,
+      "group":"U15"
+    },
+    {
+      "sourceRow":79,
+      "week":"B",
+      "day":"VENERDÌ",
+      "id":"SP1",
+      "start":1140,
+      "end":1230,
+      "group":"U16"
+    },
+    {
+      "sourceRow":80,
+      "week":"B",
+      "day":"VENERDÌ",
+      "id":"SP3",
+      "start":1140,
+      "end":1230,
+      "group":"Prima Squadra"
+    },
+    {
+      "sourceRow":81,
+      "week":"B",
+      "day":"VENERDÌ",
+      "id":"SP1",
+      "start":1210,
+      "end":1280,
+      "group":"U16"
+    },
+    {
+      "sourceRow":82,
+      "week":"B",
+      "day":"VENERDÌ",
+      "id":"SP3",
+      "start":1210,
+      "end":1280,
+      "group":"Prima Squadra"
+    }
+  ],
+  "note":"Settimana A/B non determinabile automaticamente. Confini dei settori tecnici NON certificati sulla planimetria."
+}
