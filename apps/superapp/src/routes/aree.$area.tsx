@@ -1,77 +1,29 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Lock } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Database, Lock, Timer } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { DirectionPanel } from "@/components/DirectionPanel";
 import { SafeSummary } from "@/components/SafeSummary";
-
+import { SATELLITE_TONE } from "@/components/scd/satellite-tone";
 import { getDashboard, validateAccess } from "@/lib/private.functions";
-
-const AREE = {
-  famiglia: {
-    nome: "Area Famiglia",
-    claim: "Tutto quello che serve ai genitori biancoblù.",
-    voci: [
-      "Comunicazioni della società e del mister",
-      "Quote, ricevute e stato pagamenti",
-      "Convocazioni e trasferte",
-      "Documenti e certificati medici",
-    ],
-  },
-  atleta: {
-    nome: "Area Atleta",
-    claim: "Il tuo percorso, partita dopo partita.",
-    voci: [
-      "Profilo e scheda personale",
-      "Presenze e minuti giocati",
-      "Obiettivi tecnici concordati",
-      "Programma individuale (visibile solo qui)",
-    ],
-  },
-  staff: {
-    nome: "Area Staff",
-    claim: "Gestione squadra e sedute, fuori dalla vista pubblica.",
-    voci: [
-      "Rosa e disponibilità giocatori",
-      "Pianificazione sedute e campi",
-      "Report partita e valutazioni",
-      "Comunicazioni interne",
-    ],
-  },
-  direzione: {
-    nome: "Area Direzione",
-    claim: "La società in un colpo d'occhio.",
-    voci: [
-      "Tesseramenti e affiliazioni",
-      "Quadro economico e sponsor",
-      "Indicatori di società e settore giovanile",
-      "Gestione utenti e ruoli",
-    ],
-  },
-} as const;
-
-type AreaKey = keyof typeof AREE;
+import { STATUS_LABEL, canEnter, findSatellite, type Satellite } from "@/lib/satellites";
 
 export const Route = createFileRoute("/aree/$area")({
   loader: ({ params }) => {
-    if (!(params.area in AREE)) throw notFound();
-    return { area: params.area as AreaKey };
+    const s = findSatellite(params.area);
+    if (!s) throw notFound();
+    return { slug: s.slug };
   },
   head: ({ params }) => {
-    const nome = AREE[params.area as AreaKey]?.nome ?? "Area riservata";
+    const s = findSatellite(params.area);
+    const nome = s ? `Area ${s.name}` : "Area riservata";
     return {
       meta: [
         { title: `${nome} — S.C.D. ColicoDerviese` },
-        {
-          name: "description",
-          content: `${nome} della Super App ufficiale S.C.D. ColicoDerviese: accesso riservato ai tesserati.`,
-        },
+        { name: "description", content: s ? `${s.promise} ${nome} della Super App S.C.D. ColicoDerviese.` : "Area riservata della Super App S.C.D. ColicoDerviese." },
         { property: "og:title", content: `${nome} — S.C.D. ColicoDerviese` },
-        {
-          property: "og:description",
-          content: "Accesso riservato ai tesserati della S.C.D. ColicoDerviese.",
-        },
+        { property: "og:description", content: s?.promise ?? "Accesso riservato." },
         { name: "robots", content: "noindex" },
       ],
     };
@@ -80,8 +32,71 @@ export const Route = createFileRoute("/aree/$area")({
 });
 
 function AreaPage() {
-  const { area } = Route.useLoaderData();
-  const info = AREE[area];
+  const { slug } = Route.useLoaderData();
+  const s = findSatellite(slug) as Satellite;
+  const tone = SATELLITE_TONE[s.tone];
+  const open = canEnter(s);
+
+  return (
+    <main data-screen="area" data-area={s.slug} className="bg-[var(--scd-page)] pb-12">
+      <header className="relative isolate overflow-hidden bg-[var(--scd-navy)] text-white">
+        <div aria-hidden="true" className="scd-kit-stripes absolute inset-0 -z-10" />
+        <div className="mx-auto max-w-5xl px-4 pb-9 pt-5 sm:px-6 lg:pb-12">
+          <Link to="/aree" className="inline-flex h-10 items-center gap-1 rounded-full pr-3 text-[15px] font-semibold text-white/90 hover:text-white"><ArrowLeft className="size-5" aria-hidden="true" />Tutte le aree</Link>
+          <p className="mt-6 inline-flex items-center gap-2 text-[14px] font-semibold text-white/85">
+            <span aria-hidden="true" className="h-[10px] w-[28px] rounded-full ring-2 ring-white/80" style={{ background: tone.bar }} />
+            {s.who}
+          </p>
+          <h1 className="font-brand mt-2 text-[44px] uppercase leading-[0.95] sm:text-[60px]">Area {s.name}</h1>
+          <p className="mt-2 max-w-[40ch] text-[18px] leading-snug text-white/90">{s.promise}</p>
+        </div>
+      </header>
+
+      <div className="mx-auto grid max-w-5xl gap-4 px-4 pt-5 sm:px-6 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
+        <section aria-labelledby="dentro" className="scd-card p-5">
+          <h2 id="dentro" className="text-[19px] font-bold text-[var(--scd-ink)]">Cosa trovi dentro</h2>
+          <ul className="mt-3 space-y-[10px]">
+            {s.inside.map((v) => (
+              <li key={v} className="flex gap-3 text-[15.5px] leading-snug text-[#26324a]">
+                <Check className="mt-[2px] size-5 shrink-0 text-[var(--scd-green)]" aria-hidden="true" />{v}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-4 flex gap-2 border-t border-[var(--scd-line)] pt-3 text-[13px] text-[var(--scd-sub)]">
+            <Database className="mt-[1px] size-4 shrink-0" aria-hidden="true" />
+            <span>I dati arrivano da: {s.source}. Nessun registro parallelo.</span>
+          </p>
+        </section>
+
+        {open ? <LoginBox satellite={s} /> : <PendingBox satellite={s} />}
+      </div>
+    </main>
+  );
+}
+
+function PendingBox({ satellite: s }: { satellite: Satellite }) {
+  const tone = SATELLITE_TONE[s.tone];
+  return (
+    <section aria-labelledby="accesso" className="scd-card flex flex-col p-5" data-testid="area-pending">
+      <span className={`self-start rounded-full px-2 py-[2px] text-[12px] font-semibold ${tone.chip}`}>{STATUS_LABEL[s.status]}</span>
+      <h2 id="accesso" className="mt-3 flex items-center gap-2 text-[19px] font-bold text-[var(--scd-ink)]"><Timer className="size-5 text-[var(--scd-blue)]" aria-hidden="true" />Accesso personale</h2>
+      <p className="mt-2 text-[15px] leading-snug text-[#33405a]">
+        {s.status === "in-progettazione"
+          ? "Quest'area è in progettazione. Quando sarà pronta la troverai qui, con lo stesso accesso di tutta la Super App."
+          : "L'accesso si sta attivando sul gestionale della società. Quando sarà pronto riceverai un invito via email dalla società."}
+      </p>
+      <p className="mt-2 text-[13px] text-[var(--scd-sub)]">Ruoli e permessi li assegna solo la società: nessuno può darsi un accesso da solo.</p>
+      {s.preview && (
+        <Link to={s.preview.to} className="mt-5 inline-flex h-[48px] items-center justify-center gap-2 rounded-[10px] bg-[var(--scd-blue)] px-4 text-[16px] font-semibold text-white">
+          {s.preview.label}<ArrowRight className="size-5" aria-hidden="true" />
+        </Link>
+      )}
+    </section>
+  );
+}
+
+function LoginBox({ satellite: s }: { satellite: Satellite }) {
+  const area = s.login as NonNullable<Satellite["login"]>;
   const login = useServerFn(validateAccess);
   const dash = useServerFn(getDashboard);
   const [email, setEmail] = useState("");
@@ -118,42 +133,30 @@ function AreaPage() {
     }
   }
 
-  return (
-    <main className="mx-auto max-w-5xl px-4 py-10">
-      <Link to="/aree" className="text-xs uppercase tracking-widest text-muted-foreground">← Tutte le aree</Link>
-      <p className="eyebrow mt-4">Accesso riservato</p>
-      <h1 className="mt-2 text-3xl font-bold">{info.nome}</h1>
-      <p className="mt-2 text-sm text-muted-foreground">{info.claim}</p>
-
-      {token ? (
-        <>
-          <div className="mt-6 flex items-center justify-between rounded-xl bg-muted px-4 py-3 text-sm">
-            <span>Sessione attiva (verificata dal gestionale)</span>
-            <button className="font-semibold underline" onClick={() => { sessionStorage.removeItem(key); setToken(null); }}>Esci</button>
-          </div>
-          <SafeSummary summary={summary} />
-          {area === "direzione" && <DirectionPanel token={token} />}
-        </>
-      ) : (
-        <div className="mt-8 grid gap-6 md:grid-cols-2">
-          <section className="p-6 card-premium">
-            <h2 className="text-lg font-bold">Cosa trovi dentro</h2>
-            <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-              {info.voci.map((v) => (
-                <li key={v} className="flex gap-2"><span className="text-accent">•</span>{v}</li>
-              ))}
-            </ul>
-          </section>
-          <form onSubmit={submit} className="space-y-3 p-6 card-premium">
-            <div className="flex items-center gap-2"><Lock className="size-4 text-accent" /><h2 className="text-lg font-bold">Accedi</h2></div>
-            <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email tesserato" className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring" />
-            <input type="password" inputMode="numeric" required value={pin} onChange={(e) => setPin(e.target.value)} placeholder="PIN" className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring" />
-            <button type="submit" disabled={busy} className="surface-sun w-full rounded-lg px-4 py-2.5 text-sm font-semibold disabled:opacity-60">{busy ? "Verifica in corso…" : "Entra nell'area"}</button>
-            {stato && <p className="text-xs text-muted-foreground">{stato}</p>}
-            <p className="text-[0.7rem] text-muted-foreground">PIN verificato lato server (auth.validate). I permessi sono controllati dal gestionale su ogni richiesta.</p>
-          </form>
+  if (token) {
+    return (
+      <section className="scd-card p-5 md:col-span-2">
+        <div className="flex items-center justify-between rounded-xl bg-[var(--scd-page)] px-4 py-3 text-sm">
+          <span>Sessione attiva (verificata dal gestionale)</span>
+          <button className="font-semibold underline" onClick={() => { sessionStorage.removeItem(key); setToken(null); }}>Esci</button>
         </div>
-      )}
-    </main>
+        <SafeSummary summary={summary} />
+        {area === "direzione" && <DirectionPanel token={token} />}
+      </section>
+    );
+  }
+
+  return (
+    <form onSubmit={submit} className="scd-card space-y-3 p-5">
+      <h2 className="flex items-center gap-2 text-[19px] font-bold text-[var(--scd-ink)]"><Lock className="size-5 text-[var(--scd-blue)]" aria-hidden="true" />Accedi</h2>
+      <label className="block text-[14px] font-semibold text-[var(--scd-ink)]">Email
+        <input type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} className="mt-1 h-12 w-full rounded-lg border border-[var(--scd-line)] bg-white px-3 text-[16px] outline-none focus:ring-2 focus:ring-[var(--scd-blue)]" />
+      </label>
+      <label className="block text-[14px] font-semibold text-[var(--scd-ink)]">PIN
+        <input type="password" inputMode="numeric" required autoComplete="one-time-code" value={pin} onChange={(e) => setPin(e.target.value)} className="mt-1 h-12 w-full rounded-lg border border-[var(--scd-line)] bg-white px-3 text-[16px] outline-none focus:ring-2 focus:ring-[var(--scd-blue)]" />
+      </label>
+      <button type="submit" disabled={busy} className="h-12 w-full rounded-[10px] bg-[var(--scd-yellow)] text-[16px] font-bold text-[var(--scd-ink)] disabled:opacity-60">{busy ? "Verifica in corso…" : "Entra nell'area"}</button>
+      {stato && <p className="text-[13px] text-[var(--scd-sub)]" role="alert">{stato}</p>}
+    </form>
   );
 }

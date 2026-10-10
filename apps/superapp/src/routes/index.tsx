@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, ChevronLeft, ChevronRight, MapPin, ShieldCheck, TrafficCone, Trophy } from "lucide-react";
 
+import skyKit from "@/assets/brand/sky-divisa-gara.webp.asset.json";
 import lario from "@/assets/scd/lario-header.webp.asset.json";
 import {
   BellAction, Crest, DateBlock, HeroHeader, IconTile, ListRow, OpponentShield, SectionHead, Sheet, TabCard, Venue,
@@ -103,6 +104,18 @@ function Home() {
               <Promo to="/allenamenti" tone="green" icon={<TrafficCone className="size-[40px] text-white" strokeWidth={1.9} />} title="Allenamenti" text={`Quadro lun–ven, ${QUADRO.slots.length} fasce orarie`} />
               <Promo to="/entra" tone="yellow" icon={<PeopleIcon size={40} className="text-[#141a2a]" />} title="Open Day" text="Date in arrivo: chiedi una prova" />
             </div>
+
+            <Link to="/aree" className="group relative isolate mt-[14px] grid grid-cols-[minmax(0,1fr)_104px] items-end overflow-hidden rounded-[14px] bg-[var(--scd-navy)] text-white shadow-[var(--scd-card-shadow)]" data-testid="home-gateway">
+              <span aria-hidden="true" className="scd-kit-stripes absolute inset-0 -z-10" />
+              <span className="px-4 py-4">
+                <span className="font-brand block text-[30px] uppercase leading-[0.95]">Il tuo ingresso</span>
+                <span className="mt-[6px] block text-[14.5px] leading-snug text-white/90">Atleta, famiglia, tifoso, staff, segreteria, tesoreria, pulmini, direzione, sponsor: un solo accesso.</span>
+                <span className="mt-3 inline-flex h-[40px] items-center gap-2 rounded-[9px] bg-[var(--scd-yellow)] px-3 text-[15px] font-bold text-[var(--scd-ink)]">Scegli la tua area<ArrowRight className="size-[18px] transition-transform group-hover:translate-x-1 motion-reduce:transition-none" aria-hidden="true" /></span>
+              </span>
+              <span className="mr-3 rounded-t-[18px] bg-white px-1 pt-2">
+                <img src={skyKit.url} width={skyKit.width} height={skyKit.height} alt="" aria-hidden="true" className="h-auto w-full" loading="lazy" decoding="async" />
+              </span>
+            </Link>
           </div>
 
           <div>

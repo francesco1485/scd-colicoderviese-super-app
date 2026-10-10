@@ -219,6 +219,14 @@
     radial-gradient(120% 90% at 85% 0%, rgb(27 149 211 / 0.22), transparent 60%),
     linear-gradient(180deg, #08397a 0%, #022d66 55%, #01245a 100%);
 }
+/* Righe verticali dello stemma (blu/azzurro) con lo spicchio giallo: fondo delle testate "ingresso". */
+.scd-kit-stripes {
+  background:
+    linear-gradient(105deg, transparent 0 82%, rgb(255 216 42 / 0.95) 82% 84.5%, transparent 84.5%),
+    radial-gradient(90% 120% at 0% 100%, rgb(27 149 211 / 0.35), transparent 60%),
+    repeating-linear-gradient(90deg, rgb(4 87 175 / 0.55) 0 22px, rgb(2 45 102 / 0) 22px 44px),
+    linear-gradient(180deg, #063a80 0%, #022d66 60%, #01224f 100%);
+}
 /* Linguetta blu con taglio obliquo ("PROSSIMA GARA", "Prossime attività di oggi"). */
 .scd-notch {
   clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 100%, 0 100%);

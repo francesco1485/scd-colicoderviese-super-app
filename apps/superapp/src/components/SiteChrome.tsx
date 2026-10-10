@@ -50,7 +50,7 @@ const menuGroups: readonly { title: string; app: string; items: readonly NavItem
       { to: "/core/atleta", label: "Area atleta (anteprima)" },
       { to: "/core/famiglia", label: "Area famiglia (anteprima)" },
       { to: "/core/staff", label: "Area staff (anteprima)" },
-      { to: "/aree", label: "Aree riservate (accesso R20)" },
+      { to: "/aree", label: "Il tuo ingresso (tutte le aree)" },
     ],
   },
   {

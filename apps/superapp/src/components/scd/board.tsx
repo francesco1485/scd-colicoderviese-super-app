@@ -360,8 +360,8 @@ export function R20Note({ area }: { area: "atleta" | "famiglia" | "staff" }) {
     <div role="note" className="mt-[14px] flex items-start gap-[10px] rounded-[12px] border border-[#f1d77a] bg-[#fff7d6] px-[12px] py-[10px] text-[13px] font-medium leading-snug text-[var(--scd-ink)]">
       <Lock className="mt-[2px] size-4 shrink-0 text-[var(--scd-blue)]" aria-hidden="true" />
       <span>
-        <b>Accesso riservato: in arrivo con R20.</b> Le informazioni personali (atleti, famiglie, quote, documenti) compariranno solo dopo la verifica dell'identità sul gestionale R20. Qui solo contenuti dimostrativi, nessun salvataggio.{" "}
-        <Link to="/aree/$area" params={{ area }} className="font-bold text-[var(--scd-blue)] underline">Area riservata (email + PIN R20)</Link>
+        <b>Accesso riservato: in attivazione.</b> Le informazioni personali (atleti, famiglie, quote, documenti) compariranno solo dopo la verifica dell'identità sul gestionale R20. Qui solo contenuti dimostrativi, nessun salvataggio.{" "}
+        <Link to="/aree/$area" params={{ area }} className="font-bold text-[var(--scd-blue)] underline">Stato dell&apos;accesso</Link>
       </span>
     </div>
   );
