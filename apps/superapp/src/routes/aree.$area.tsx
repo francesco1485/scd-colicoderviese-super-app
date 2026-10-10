@@ -1,54 +1,21 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Lock } from "lucide-react";
+import { ArrowLeft, Lock, LogOut } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { DirectionPanel } from "@/components/DirectionPanel";
-
-import { getDashboard, validateAccess } from "@/lib/private.functions";
+import { ImpiantiCalendari } from "@/features/impianti/ImpiantiCalendari";
+import { DOORS, areaAllowed, type DoorId } from "@/lib/doors";
+import { getDashboard } from "@/lib/private.functions";
+import { clearSession, useSession } from "@/lib/session";
 
 const AREE = {
-  famiglia: {
-    nome: "Area Famiglia",
-    claim: "Tutto quello che serve ai genitori biancoblù.",
-    voci: [
-      "Comunicazioni della società e del mister",
-      "Quote, ricevute e stato pagamenti",
-      "Convocazioni e trasferte",
-      "Documenti e certificati medici",
-    ],
-  },
-  atleta: {
-    nome: "Area Atleta",
-    claim: "Il tuo percorso, partita dopo partita.",
-    voci: [
-      "Profilo e scheda personale",
-      "Presenze e minuti giocati",
-      "Obiettivi tecnici concordati",
-      "Programma individuale (visibile solo qui)",
-    ],
-  },
-  staff: {
-    nome: "Area Staff",
-    claim: "Gestione squadra e sedute, fuori dalla vista pubblica.",
-    voci: [
-      "Rosa e disponibilità giocatori",
-      "Pianificazione sedute e campi",
-      "Report partita e valutazioni",
-      "Comunicazioni interne",
-    ],
-  },
-  direzione: {
-    nome: "Area Direzione",
-    claim: "La società in un colpo d'occhio.",
-    voci: [
-      "Tesseramenti e affiliazioni",
-      "Quadro economico e sponsor",
-      "Indicatori di società e settore giovanile",
-      "Gestione utenti e ruoli",
-    ],
-  },
-} as const;
+  famiglia: { nome: "Famiglie", door: "famiglie", claim: "Tutto quello che serve ai genitori biancoblù, solo per la tua famiglia." },
+  atleta: { nome: "Atleta", door: "famiglie", claim: "Il tuo percorso, partita dopo partita." },
+  staff: { nome: "Direzione e staff", door: "direzione", claim: "Campi, calendari e organizzazione della stagione." },
+  direzione: { nome: "Direzione", door: "direzione", claim: "La società in un colpo d'occhio." },
+  commerciale: { nome: "Commerciale", door: "commerciale", claim: "Sponsor e partner: contratti, rinnovi, listino e proposte." },
+} as const satisfies Record<string, { nome: string; door: DoorId; claim: string }>;
 
 type AreaKey = keyof typeof AREE;
 
@@ -61,16 +28,8 @@ export const Route = createFileRoute("/aree/$area")({
     const nome = AREE[params.area as AreaKey]?.nome ?? "Area riservata";
     return {
       meta: [
-        { title: `${nome} — S.D.C. ColicoDerviese` },
-        {
-          name: "description",
-          content: `${nome} della Super App ufficiale S.D.C. ColicoDerviese: accesso riservato ai tesserati.`,
-        },
-        { property: "og:title", content: `${nome} — S.D.C. ColicoDerviese` },
-        {
-          property: "og:description",
-          content: "Accesso riservato ai tesserati della S.D.C. ColicoDerviese.",
-        },
+        { title: `${nome} — Super App S.D.C. ColicoDerviese` },
+        { name: "description", content: `${nome}: area riservata della Super App S.D.C. ColicoDerviese.` },
         { name: "robots", content: "noindex" },
       ],
     };
@@ -78,119 +37,159 @@ export const Route = createFileRoute("/aree/$area")({
   component: AreaPage,
 });
 
-/**
- * Privacy guard: the R20 dashboard payload has no field allowlist yet and may
- * contain personal data (including minors'). Only aggregate shapes are shown:
- * numbers, booleans and list sizes. Free text is never rendered here.
- */
-function SafeSummary({ summary }: { summary: unknown }) {
-  if (!summary || typeof summary !== "object" || Array.isArray(summary)) {
-    return (
-      <p className="mt-4 rounded-xl border border-border bg-card p-4 text-sm text-muted-foreground">
-        Dati in sincronizzazione…
-      </p>
-    );
-  }
-  const rows = Object.entries(summary as Record<string, unknown>).flatMap(([k, v]) => {
-    if (typeof v === "number" || typeof v === "boolean") return [[k, String(v)] as const];
-    if (Array.isArray(v)) return [[k, `${v.length} elementi`] as const];
-    if (v && typeof v === "object") return [[k, "disponibile"] as const];
-    return [];
-  });
-  if (rows.length === 0) {
-    return (
-      <p className="mt-4 rounded-xl border border-border bg-card p-4 text-sm text-muted-foreground">
-        Dati in sincronizzazione…
-      </p>
-    );
-  }
-  return (
-    <dl className="mt-4 grid gap-2 rounded-xl border border-border bg-card p-4 text-sm sm:grid-cols-2">
-      {rows.map(([k, v]) => (
-        <div key={k} className="flex justify-between gap-4 border-b border-border py-1">
-          <dt className="text-muted-foreground">{k}</dt>
-          <dd className="font-semibold">{v}</dd>
-        </div>
-      ))}
-    </dl>
-  );
-}
-
 function AreaPage() {
   const { area } = Route.useLoaderData();
   const info = AREE[area];
-  const login = useServerFn(validateAccess);
-  const dash = useServerFn(getDashboard);
-  const [email, setEmail] = useState("");
-  const [pin, setPin] = useState("");
-  const [stato, setStato] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
-  const [token, setToken] = useState<string | null>(null);
-  const [summary, setSummary] = useState<unknown>(null);
-  const key = `scd-session-${area}`;
+  const session = useSession();
+  const door = DOORS.find((d) => d.id === info.door);
 
-  useEffect(() => {
-    const t = sessionStorage.getItem(key);
-    if (t) setToken(t);
-  }, [key]);
-  useEffect(() => {
-    if (!token) return;
-    dash({ data: { token } }).then((r) => setSummary(r)).catch(() => setSummary(null));
-  }, [token, dash]);
+  if (session === undefined) {
+    return <main className="mx-auto max-w-5xl px-4 py-16 text-sm text-muted-foreground">Verifico la sessione…</main>;
+  }
 
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    setBusy(true);
-    setStato(null);
-    try {
-      const res = await login({ data: { email, pin, area } });
-      if (res.ok) {
-        sessionStorage.setItem(key, res.token);
-        setToken(res.token);
-      } else setStato(res.message);
-    } catch {
-      setStato("Controlla email e PIN.");
-    } finally {
-      setBusy(false);
-    }
+  if (session === null) {
+    return (
+      <main className="mx-auto max-w-3xl px-4 py-16">
+        <Back />
+        <p className="eyebrow mt-6 text-primary">Porta chiusa</p>
+        <h1 className="mt-2 text-4xl font-bold uppercase">{info.nome}</h1>
+        <p className="mt-3 text-sm text-muted-foreground">
+          Per aprire questa porta entra una volta sola dall'ingresso della Super App: il gestionale riconosce il tuo
+          ruolo e ti apre le porte giuste.
+        </p>
+        <Link to="/aree" hash="accedi" className="mt-6 inline-flex items-center gap-2 rounded-full bg-accent px-6 py-2.5 text-sm font-bold text-accent-foreground">
+          <Lock className="size-4" /> Vai all'ingresso
+        </Link>
+      </main>
+    );
+  }
+
+  if (!areaAllowed(area, session.profile)) {
+    return (
+      <main className="mx-auto max-w-3xl px-4 py-16">
+        <Back />
+        <p className="eyebrow mt-6 text-primary">Non nel tuo profilo</p>
+        <h1 className="mt-2 text-4xl font-bold uppercase">{info.nome}</h1>
+        <p className="mt-3 text-sm text-muted-foreground">
+          Il gestionale non ti abilita a questa porta. Se pensi sia un errore, chiedi l'abilitazione alla segreteria.
+        </p>
+      </main>
+    );
   }
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-10">
-      <Link to="/aree" className="text-xs uppercase tracking-widest text-muted-foreground">← Tutte le aree</Link>
-      <p className="eyebrow mt-4">Accesso riservato</p>
-      <h1 className="mt-2 text-3xl font-bold">{info.nome}</h1>
-      <p className="mt-2 text-sm text-muted-foreground">{info.claim}</p>
+    <main className="mx-auto max-w-6xl px-4 py-10">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Back />
+        <button type="button" onClick={() => clearSession()} className="inline-flex items-center gap-2 text-sm font-semibold underline">
+          <LogOut className="size-4" /> Esci
+        </button>
+      </div>
+      <p className="eyebrow mt-6 text-primary">{door?.era ?? "Area riservata"}</p>
+      <h1 className="mt-2 text-4xl font-bold uppercase md:text-5xl">{info.nome}</h1>
+      <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{info.claim}</p>
 
-      {token ? (
-        <>
-          <div className="mt-6 flex items-center justify-between rounded-xl bg-muted px-4 py-3 text-sm">
-            <span>Sessione attiva (verificata dal gestionale)</span>
-            <button className="font-semibold underline" onClick={() => { sessionStorage.removeItem(key); setToken(null); }}>Esci</button>
-          </div>
-          <SafeSummary summary={summary} />
-          {area === "direzione" && <DirectionPanel token={token} />}
-        </>
-      ) : (
-        <div className="mt-8 grid gap-6 md:grid-cols-2">
-          <section className="p-6 card-premium">
-            <h2 className="text-lg font-bold">Cosa trovi dentro</h2>
-            <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-              {info.voci.map((v) => (
-                <li key={v} className="flex gap-2"><span className="text-accent">•</span>{v}</li>
+      {(area === "famiglia" || area === "atleta") && <FamilySummary token={session.token} />}
+
+      {(area === "staff" || area === "direzione") && (
+        <section className="mt-8" aria-label="Impianti e calendari">
+          <ImpiantiCalendari />
+        </section>
+      )}
+
+      {(area === "direzione" || area === "commerciale") && <DirectionPanel token={session.token} />}
+
+      {door && (
+        <section className="mt-10 border-t border-border pt-6" aria-labelledby="moduli-porta">
+          <h2 id="moduli-porta" className="font-display text-xl font-bold uppercase">Cosa arriva in questa porta</h2>
+          <ul className="mt-3 grid gap-x-8 gap-y-2 text-sm md:grid-cols-2">
+            {door.moduli
+              .filter((m) => m.status !== "attivo")
+              .map((m) => (
+                <li key={m.id} className="flex items-baseline justify-between gap-3 border-b border-border py-2">
+                  <span>
+                    <strong>{m.nome}</strong> <span className="text-muted-foreground">· {m.origine}</span>
+                  </span>
+                  <span className="shrink-0 text-[0.65rem] font-bold uppercase text-muted-foreground">
+                    {m.status === "bloccato" ? "Bloccato" : "In arrivo"}
+                  </span>
+                </li>
               ))}
-            </ul>
-          </section>
-          <form onSubmit={submit} className="space-y-3 p-6 card-premium">
-            <div className="flex items-center gap-2"><Lock className="size-4 text-accent" /><h2 className="text-lg font-bold">Accedi</h2></div>
-            <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email tesserato" className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring" />
-            <input type="password" inputMode="numeric" required value={pin} onChange={(e) => setPin(e.target.value)} placeholder="PIN" className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring" />
-            <button type="submit" disabled={busy} className="surface-sun w-full rounded-lg px-4 py-2.5 text-sm font-semibold disabled:opacity-60">{busy ? "Verifica in corso…" : "Entra nell'area"}</button>
-            {stato && <p className="text-xs text-muted-foreground">{stato}</p>}
-            <p className="text-[0.7rem] text-muted-foreground">PIN verificato lato server (auth.validate). I permessi sono controllati dal gestionale su ogni richiesta.</p>
-          </form>
-        </div>
+          </ul>
+        </section>
       )}
     </main>
+  );
+}
+
+function Back() {
+  return (
+    <Link to="/aree" className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+      <ArrowLeft className="size-4" /> Ingresso Super App
+    </Link>
+  );
+}
+
+function FamilySummary({ token }: { token: string }) {
+  const dash = useServerFn(getDashboard);
+  const [summary, setSummary] = useState<unknown>(undefined);
+  useEffect(() => {
+    dash({ data: { token } })
+      .then((r) => {
+        try {
+          setSummary(r.summary ? (JSON.parse(r.summary) as unknown) : null);
+        } catch {
+          setSummary(null);
+        }
+      })
+      .catch(() => setSummary(null));
+  }, [token, dash]);
+  return (
+    <section className="mt-8" aria-label="Il mio riepilogo">
+      <h2 className="font-display text-xl font-bold uppercase">Il mio riepilogo</h2>
+      <SafeSummary summary={summary} />
+    </section>
+  );
+}
+
+/**
+ * Privacy guard: il riepilogo di R20 non ha ancora un elenco di campi ammessi e può
+ * contenere dati personali, anche di minori. Si mostrano solo numeri, sì/no e conteggi:
+ * il testo libero non viene mai stampato.
+ */
+function SafeSummary({ summary }: { summary: unknown }) {
+  if (summary === undefined) {
+    return <p className="mt-4 rounded-xl border border-border bg-card p-4 text-sm text-muted-foreground">Carico i dati dal gestionale…</p>;
+  }
+  const body =
+    summary && typeof summary === "object" && !Array.isArray(summary)
+      ? ((summary as Record<string, unknown>)["data"] && typeof (summary as Record<string, unknown>)["data"] === "object"
+          ? ((summary as Record<string, unknown>)["data"] as Record<string, unknown>)
+          : (summary as Record<string, unknown>))
+      : null;
+  const rows = body
+    ? Object.entries(body).flatMap(([k, v]) => {
+        if (k === "ok" || /token|pin|password|email|telefono|phone|iban|fiscal|isee/i.test(k)) return [];
+        if (typeof v === "number" || typeof v === "boolean") return [[k, typeof v === "boolean" ? (v ? "Sì" : "No") : v.toLocaleString("it-IT")] as const];
+        if (Array.isArray(v)) return [[k, `${v.length} elementi`] as const];
+        return [];
+      })
+    : [];
+  if (rows.length === 0) {
+    return (
+      <p className="mt-4 rounded-xl border border-border bg-card p-4 text-sm text-muted-foreground">
+        DA SINCRONIZZARE: il gestionale non ha ancora restituito indicatori per questo profilo.
+      </p>
+    );
+  }
+  return (
+    <dl className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      {rows.map(([k, v]) => (
+        <div key={k} className="rounded-xl border border-border bg-card p-4">
+          <dt className="text-xs uppercase tracking-wider text-muted-foreground">{k.replace(/[_-]+/g, " ")}</dt>
+          <dd className="mt-1 text-lg font-semibold">{v}</dd>
+        </div>
+      ))}
+    </dl>
   );
 }

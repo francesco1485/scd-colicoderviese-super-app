@@ -11,7 +11,7 @@ const nav = [
   { to: "/community", label: "Tifosi" },
   { to: "/eventi", label: "Eventi" },
   { to: "/contatti", label: "Contatti" },
-  { to: "/aree", label: "Aree riservate" },
+  { to: "/aree", label: "Entra" },
 ] as const;
 
 const footerLinks = [

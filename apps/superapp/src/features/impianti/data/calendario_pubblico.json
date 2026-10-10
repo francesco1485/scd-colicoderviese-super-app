@@ -1,0 +1,3613 @@
+{
+  "schema": "scd-calendar-public-v3",
+  "source_modified_at": "2026-10-09T16:27:46.092Z",
+  "source_file_id": "1eXS-kY5PCHFg4CXiAErNAKtIVEMIKgWs",
+  "source_sha256": "e8b02fe0400551a5a5af66bb01621061a70e502af162986b09301053929a58a7",
+  "season": "2026/27",
+  "snapshot_status": "ANTEPRIMA_NON_LIVE",
+  "groups": {
+    "prima": {
+      "label": "Prima Squadra",
+      "color": "#AD7616",
+      "logo": "SCD_PRIMA_SQUADRA.png"
+    },
+    "u19": {
+      "label": "Juniores U19 Elite",
+      "color": "#375B89",
+      "logo": "SCD_JUNIORES_2008_2009.png"
+    },
+    "u16": {
+      "label": "U16 Elite · 2011",
+      "color": "#C85D22",
+      "logo": "SCD_U16_2011.png"
+    },
+    "u15": {
+      "label": "U15 · Giovanissimi",
+      "color": "#C23C3F",
+      "logo": "SCD_U15_2012_2013.png"
+    },
+    "2014": {
+      "label": "Esordienti · 2014",
+      "color": "#7654B8",
+      "logo": null
+    },
+    "2015": {
+      "label": "Esordienti · 2015",
+      "color": "#148B99",
+      "logo": "SCD_U12_2015.png"
+    },
+    "pulcini": {
+      "label": "Pulcini",
+      "color": "#3269BC",
+      "logo": null
+    },
+    "primicalci": {
+      "label": "Primi Calci",
+      "color": "#568C23",
+      "logo": "SCD_PRIMI_2018_2019.png"
+    },
+    "piccoli": {
+      "label": "Piccoli Amici",
+      "color": "#2A9CB7",
+      "logo": "SCD_PICCOLI_2020_2021.png"
+    },
+    "esordienti": {
+      "label": "Esordienti · annata da verificare",
+      "color": "#7E8799",
+      "logo": null
+    },
+    "other": {
+      "label": "Altre categorie",
+      "color": "#668196",
+      "logo": null
+    }
+  },
+  "events": [
+    {
+      "id": "EVT-U19E-1A-NUOVASONDRIOCALCIO-FUORI",
+      "date": "2026-09-05",
+      "time": "19:00",
+      "end": "",
+      "category": "Juniores U19 Élite",
+      "group": "u19",
+      "type": "COPPA",
+      "home_away": "FUORI",
+      "venue": "Sondrio - CONI \"CASTELLINA 3\" (E.A.)",
+      "opponent": "NUOVA SONDRIO CALCIO",
+      "round": "1A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U15-20260906-NUOVASONDRIOCALCIO-FUORI",
+      "date": "2026-09-06",
+      "time": "10:15",
+      "end": "",
+      "category": "Giovanissimi U15",
+      "group": "u15",
+      "type": "COPPA",
+      "home_away": "FUORI",
+      "venue": "Sondrio - CONI \"CASTELLINA 3\" (E.A.)",
+      "opponent": "NUOVA SONDRIO CALCIO",
+      "round": "",
+      "source": "SCD",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U19E-1A-LESMOSSDARL-FUORI",
+      "date": "2026-09-12",
+      "time": "18:15",
+      "end": "",
+      "category": "Juniores U19 Élite",
+      "group": "u19",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Lesmo - C.S. COMUNALE \"B. CITTERIO\" (E.A.)",
+      "opponent": "LESMO SSD ARL",
+      "round": "1A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U16E-20260913-VARESEFOOTBALLCLUB-FUORI",
+      "date": "2026-09-13",
+      "time": "10:00",
+      "end": "",
+      "category": "U16 Élite",
+      "group": "u16",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Varese - C.S. LE BUSTECCHE CAMPO (E.A.)",
+      "opponent": "VARESE FOOTBALL CLUB",
+      "round": "",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PRIMA-1A-ACASATICALCIOARCOR-CASA",
+      "date": "2026-09-13",
+      "time": "15:30",
+      "end": "",
+      "category": "Prima Squadra",
+      "group": "prima",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "A. CASATI CALCIO ARCORE",
+      "round": "1A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U19E-2A-CISANESEASD-CASA",
+      "date": "2026-09-15",
+      "time": "20:00",
+      "end": "",
+      "category": "Juniores U19 Élite",
+      "group": "u19",
+      "type": "COPPA",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "CISANESE A.S.D.",
+      "round": "2A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-ES-20260919-2MEMORIALMARINABRI-FUORI",
+      "date": "2026-09-19",
+      "time": "08:00",
+      "end": "",
+      "category": "Esordienti 2014",
+      "group": "2014",
+      "type": "TORNEO",
+      "home_away": "FUORI",
+      "venue": "",
+      "opponent": "2 ° MEMORIAL MARINA BRIGATTI",
+      "round": "",
+      "source": "SCD",
+      "notice": [],
+      "match_status": "CLUB_EVENT",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PUL-20260919-6MEMORIALMAZZITELL-FUORI",
+      "date": "2026-09-19",
+      "time": "10:00",
+      "end": "",
+      "category": "Pulcini 2016/17",
+      "group": "pulcini",
+      "type": "TORNEO",
+      "home_away": "FUORI",
+      "venue": "",
+      "opponent": "6° MEMORIAL MAZZITELLI",
+      "round": "",
+      "source": "SCD",
+      "notice": [],
+      "match_status": "CLUB_EVENT",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-ES-20260919-ALTOLARIOCALCIO-CASA",
+      "date": "2026-09-19",
+      "time": "15:00",
+      "end": "",
+      "category": "Esordienti 2015",
+      "group": "2015",
+      "type": "AMICHEVOLE",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 2",
+      "opponent": "ALTO LARIO CALCIO",
+      "round": "",
+      "source": "SCD",
+      "notice": [],
+      "match_status": "CLUB_EVENT",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U19E-2A-NUOVASONDRIOCALCIO-CASA",
+      "date": "2026-09-19",
+      "time": "15:00",
+      "end": "",
+      "category": "Juniores U19 Élite",
+      "group": "u19",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "NUOVA SONDRIO CALCIO",
+      "round": "2A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U16E-2A-LADOMINANTE-CASA",
+      "date": "2026-09-19",
+      "time": "18:00",
+      "end": "",
+      "category": "U16 Élite",
+      "group": "u16",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "LA DOMINANTE",
+      "round": "2A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U15-1A-COSIOVALTELLINO-FUORI",
+      "date": "2026-09-20",
+      "time": "10:00",
+      "end": "",
+      "category": "Giovanissimi U15",
+      "group": "u15",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Cosio Valtellino - Comunale \"Alla Colonia\"",
+      "opponent": "COSIO VALTELLINO",
+      "round": "1A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PRIMA-2A-LESMOSSDARL-FUORI",
+      "date": "2026-09-20",
+      "time": "15:30",
+      "end": "",
+      "category": "Prima Squadra",
+      "group": "prima",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Lesmo - C.S. COMUNALE \"B. CITTERIO\" (E.A.)",
+      "opponent": "LESMO SSD ARL",
+      "round": "2A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PRIMA-20260923-OLYMPICMORBEGNO-FUORI",
+      "date": "2026-09-23",
+      "time": "20:00",
+      "end": "",
+      "category": "Prima Squadra",
+      "group": "prima",
+      "type": "COPPA",
+      "home_away": "FUORI",
+      "venue": "Morbegno - C.S. COMUNALE \"AMANZIO TOCCALLI\"",
+      "opponent": "OLYMPIC MORBEGNO",
+      "round": "",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U19E-3A-VISNOVAGIUSSANO-FUORI",
+      "date": "2026-09-26",
+      "time": "17:30",
+      "end": "",
+      "category": "Juniores U19 Élite",
+      "group": "u19",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Giussano - \"STEFANO BORGONOVO\" N.2 (E.A.)",
+      "opponent": "VIS NOVA GIUSSANO",
+      "round": "3A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U16E-20260926-BULGARO-FUORI",
+      "date": "2026-09-26",
+      "time": "17:45",
+      "end": "",
+      "category": "U16 Élite",
+      "group": "u16",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Bulgarograsso - CENTRO SPORTIVO COMUNALE (E.A.)",
+      "opponent": "BULGARO",
+      "round": "",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U15-2A-ACADEMYCASATESEMER-CASA",
+      "date": "2026-09-27",
+      "time": "10:30",
+      "end": "",
+      "category": "Giovanissimi U15",
+      "group": "u15",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "ACADEMY CASATESE MERATE",
+      "round": "2A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PRIMA-3A-OLYMPICMORBEGNO-CASA",
+      "date": "2026-09-27",
+      "time": "15:30",
+      "end": "",
+      "category": "Prima Squadra",
+      "group": "prima",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "OLYMPIC MORBEGNO",
+      "round": "3A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U19E-4A-LENTATESE-CASA",
+      "date": "2026-10-03",
+      "time": "15:00",
+      "end": "",
+      "category": "Juniores U19 Élite",
+      "group": "u19",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "LENTATESE",
+      "round": "4A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U16E-4A-ACADEMYCASATESEMER-CASA",
+      "date": "2026-10-03",
+      "time": "18:00",
+      "end": "",
+      "category": "U16 Élite",
+      "group": "u16",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "ACADEMY CASATESE MERATE",
+      "round": "4A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U15-3A-DUBINOASD-FUORI",
+      "date": "2026-10-04",
+      "time": "10:00",
+      "end": "",
+      "category": "Giovanissimi U15",
+      "group": "u15",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Dubino - C.S. Comunale \"Prati Moreno\"",
+      "opponent": "DUBINO ASD",
+      "round": "3A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PRIMA-4A-LISSONECALCIOSSDAR-FUORI",
+      "date": "2026-10-04",
+      "time": "17:00",
+      "end": "",
+      "category": "Prima Squadra",
+      "group": "prima",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Bresso - C.S. COMUNALE A (E.A.)",
+      "opponent": "LISSONE CALCIO SSDARL",
+      "round": "4A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PRIMA-20261007-COSTAMASNAGA-CASA",
+      "date": "2026-10-07",
+      "time": "20:00",
+      "end": "21:45",
+      "category": "Prima Squadra",
+      "group": "prima",
+      "type": "COPPA",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "COSTAMASNAGA",
+      "round": "",
+      "source": "FIGC/LND",
+      "notice": [
+        "Utilizzo struttura da verificare"
+      ],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": true
+      }
+    },
+    {
+      "id": "EVT-U15-20261008-NUOVASONDRIOCALCIO-CASA",
+      "date": "2026-10-08",
+      "time": "20:00",
+      "end": "21:45",
+      "category": "Giovanissimi U15",
+      "group": "u15",
+      "type": "COPPA",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "NUOVA SONDRIO CALCIO",
+      "round": "",
+      "source": "SCD",
+      "notice": [
+        "Utilizzo struttura da verificare"
+      ],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": true
+      }
+    },
+    {
+      "id": "EVT-PULMIX-1A-GSOMISSAGLIAASD-CASA",
+      "date": "2026-10-10",
+      "time": "15:00",
+      "end": "16:00",
+      "category": "Pulcini Misti 7v7",
+      "group": "pulcini",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "G.S.O. MISSAGLIA A.S.D.",
+      "round": "1A",
+      "source": "FIGC/LND",
+      "notice": [
+        "Orario o sede da verificare",
+        "Utilizzo struttura da verificare"
+      ],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": false,
+        "venue_confirmed": false,
+        "facility_review_required": true
+      }
+    },
+    {
+      "id": "EVT-PC78-1A-POLMANDELLODELLARI-CASA",
+      "date": "2026-10-10",
+      "time": "16:00",
+      "end": "17:00",
+      "category": "Primi Calci 7-8 anni",
+      "group": "primicalci",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 2",
+      "opponent": "POL. MANDELLO DEL LARIO",
+      "round": "1A",
+      "source": "FIGC/LND",
+      "notice": [
+        "Orario o sede da verificare",
+        "Attesa verifica"
+      ],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": false,
+        "venue_confirmed": false,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U19E-5A-MEDA1913-FUORI",
+      "date": "2026-10-10",
+      "time": "17:00",
+      "end": "18:45",
+      "category": "Juniores U19 Élite",
+      "group": "u19",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Meda - COMUNALE \"BUSNELLI\"",
+      "opponent": "MEDA 1913",
+      "round": "5A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-ES12-1A-COSTAMASNAGA-FUORI",
+      "date": "2026-10-11",
+      "time": "09:30",
+      "end": "10:45",
+      "category": "Esordienti 12 anni (2014)",
+      "group": "2014",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Costa Masnaga - C.S. PARROCCHIALE N.1 (E.A.), Via Diaz 3",
+      "opponent": "COSTAMASNAGA",
+      "round": "1A",
+      "source": "FIGC/LND",
+      "notice": [
+        "Orario o sede da verificare",
+        "Attesa verifica"
+      ],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": false,
+        "venue_confirmed": false,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U15-4A-GRENTARCADIA-FUORI",
+      "date": "2026-10-11",
+      "time": "10:00",
+      "end": "11:45",
+      "category": "Giovanissimi U15",
+      "group": "u15",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Valgreghentino - C.S. Comunale \"Ugo Crippa n.1\"",
+      "opponent": "GRENTARCADIA",
+      "round": "4A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U16E-20261011-CASTELLANZESE1921-FUORI",
+      "date": "2026-10-11",
+      "time": "11:30",
+      "end": "13:15",
+      "category": "U16 Élite",
+      "group": "u16",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Castellanza - C.S.C. LA MADONNINA (E.A.)",
+      "opponent": "CASTELLANZESE 1921",
+      "round": "",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-ES-20261011-PENTAPIATEDA-CASA",
+      "date": "2026-10-11",
+      "time": "14:30",
+      "end": "17:15",
+      "category": "Esordienti 11 anni (2015)",
+      "group": "2015",
+      "type": "AMICHEVOLE",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 2",
+      "opponent": "PENTA PIATEDA",
+      "round": "",
+      "source": "SCD",
+      "notice": [],
+      "match_status": "CLUB_EVENT",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PRIMA-5A-ALTABRIANZATAVERNE-CASA",
+      "date": "2026-10-11",
+      "time": "15:30",
+      "end": "17:15",
+      "category": "Prima Squadra",
+      "group": "prima",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "ALTA BRIANZA TAVERNERIO",
+      "round": "5A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PC78-2A-VERCURAGOSQB-FUORI",
+      "date": "2026-10-17",
+      "time": "10:30",
+      "end": "11:30",
+      "category": "Primi Calci 7-8 anni",
+      "group": "primicalci",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Vercurago - C.S. COMUNALE \"A. MORETTI\" CAMPO 1, Via Adda 1",
+      "opponent": "VERCURAGO SQ.B",
+      "round": "2A",
+      "source": "FIGC/LND",
+      "notice": [
+        "Orario o sede da verificare",
+        "Attesa verifica"
+      ],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": false,
+        "venue_confirmed": false,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-ES11-2A-SALAGALBIATE1974AS-FUORI",
+      "date": "2026-10-17",
+      "time": "14:15",
+      "end": "15:30",
+      "category": "Esordienti 11 anni (2015)",
+      "group": "2015",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "GALBIATE - C.S. DEL MARE, Fraz. Sala al Barro, Via Monte Oliveto 4",
+      "opponent": "SALA GALBIATE 1974 ASD",
+      "round": "2A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-ES12-2A-ROVINATA-CASA",
+      "date": "2026-10-17",
+      "time": "15:00",
+      "end": "16:15",
+      "category": "Esordienti 12 anni (2014)",
+      "group": "2014",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "ROVINATA",
+      "round": "2A",
+      "source": "FIGC/LND",
+      "notice": [
+        "Orario o sede da verificare",
+        "Utilizzo struttura da verificare"
+      ],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": false,
+        "venue_confirmed": false,
+        "facility_review_required": true
+      }
+    },
+    {
+      "id": "EVT-U19E-6A-ARDORLAZZATE-CASA",
+      "date": "2026-10-17",
+      "time": "15:00",
+      "end": "16:45",
+      "category": "Juniores U19 Élite",
+      "group": "u19",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "ARDOR LAZZATE",
+      "round": "6A",
+      "source": "FIGC/LND",
+      "notice": [
+        "Utilizzo struttura da verificare"
+      ],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": true
+      }
+    },
+    {
+      "id": "EVT-PULMIX-2A-ROGENOASD-FUORI",
+      "date": "2026-10-17",
+      "time": "15:15",
+      "end": "16:15",
+      "category": "Pulcini Misti 7v7",
+      "group": "pulcini",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Rogeno - C.S. ORATORIO \"PIO XI\", Via Ratti 8",
+      "opponent": "ROGENO A.S.D.",
+      "round": "2A",
+      "source": "FIGC/LND",
+      "notice": [
+        "Orario o sede da verificare",
+        "Attesa verifica"
+      ],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": false,
+        "venue_confirmed": false,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U16E-6A-VISNOVAGIUSSANO-CASA",
+      "date": "2026-10-17",
+      "time": "18:00",
+      "end": "19:45",
+      "category": "U16 Élite",
+      "group": "u16",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "VIS NOVA GIUSSANO",
+      "round": "6A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U15-5A-PIANTEDO-CASA",
+      "date": "2026-10-18",
+      "time": "10:30",
+      "end": "12:15",
+      "category": "Giovanissimi U15",
+      "group": "u15",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "PIANTEDO",
+      "round": "5A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PRIMA-6A-ARSROVAGNATE-FUORI",
+      "date": "2026-10-18",
+      "time": "15:30",
+      "end": "17:15",
+      "category": "Prima Squadra",
+      "group": "prima",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "La Valletta Brianza - C.S. COMUNALE \"STADIO IDEALITA'\"",
+      "opponent": "ARS ROVAGNATE",
+      "round": "6A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-ES12-3A-OLGINATESESQB-FUORI",
+      "date": "2026-10-24",
+      "time": "14:00",
+      "end": "15:15",
+      "category": "Esordienti 12 anni (2014)",
+      "group": "2014",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Olginate - C.S. COMUNALE N.2, Via dell'Industria",
+      "opponent": "OLGINATESE SQ.B",
+      "round": "3A",
+      "source": "FIGC/LND",
+      "notice": [
+        "Orario o sede da verificare",
+        "Attesa verifica"
+      ],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": false,
+        "venue_confirmed": false,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-ES11-3A-ACADEMYCASATESEMER-FUORI",
+      "date": "2026-10-24",
+      "time": "14:30",
+      "end": "15:45",
+      "category": "Esordienti 11 anni (2015)",
+      "group": "2015",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Merate - C.S. COMUNALE FERRARIO CAMPO 2, Via Bergamo 12",
+      "opponent": "ACADEMY CASATESE MERATE",
+      "round": "3A",
+      "source": "FIGC/LND",
+      "notice": [
+        "Orario o sede da verificare",
+        "Attesa verifica"
+      ],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": false,
+        "venue_confirmed": false,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PULMIX-3A-SANGIORGIO-CASA",
+      "date": "2026-10-24",
+      "time": "15:00",
+      "end": "16:00",
+      "category": "Pulcini Misti 7v7",
+      "group": "pulcini",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "SAN GIORGIO",
+      "round": "3A",
+      "source": "FIGC/LND",
+      "notice": [
+        "Orario o sede da verificare",
+        "Attesa verifica"
+      ],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": false,
+        "venue_confirmed": false,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PC78-3A-COSTAMASNAGASQB-CASA",
+      "date": "2026-10-24",
+      "time": "16:00",
+      "end": "17:00",
+      "category": "Primi Calci 7-8 anni",
+      "group": "primicalci",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 2",
+      "opponent": "COSTAMASNAGA SQ.B",
+      "round": "3A",
+      "source": "FIGC/LND",
+      "notice": [
+        "Orario o sede da verificare",
+        "Attesa verifica"
+      ],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": false,
+        "venue_confirmed": false,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U19E-7A-FUCINADIMUGGIOASD-FUORI",
+      "date": "2026-10-24",
+      "time": "16:00",
+      "end": "17:45",
+      "category": "Juniores U19 Élite",
+      "group": "u19",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Muggiò - STADIO \"SUPERGA 1949\" N.1",
+      "opponent": "FUCINA DI MUGGIO ASD",
+      "round": "7A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U15-6A-CHIAVENNESE-FUORI",
+      "date": "2026-10-24",
+      "time": "18:15",
+      "end": "20:00",
+      "category": "Giovanissimi U15",
+      "group": "u15",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Chiavenna - Campo Comunale \"Chiavenna 1\"",
+      "opponent": "CHIAVENNESE",
+      "round": "6A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U16E-20261025-ARDORLAZZATE-FUORI",
+      "date": "2026-10-25",
+      "time": "09:30",
+      "end": "11:15",
+      "category": "U16 Élite",
+      "group": "u16",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Lazzate - COMUNALE \"GIANNI BRERA\" (E.A.)",
+      "opponent": "ARDOR LAZZATE",
+      "round": "",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PRIMA-7A-COSTAMASNAGA-FUORI",
+      "date": "2026-10-25",
+      "time": "14:30",
+      "end": "16:15",
+      "category": "Prima Squadra",
+      "group": "prima",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Costa Masnaga - C.S. PARROCCHIALE N.1 (E.A.)",
+      "opponent": "COSTAMASNAGA",
+      "round": "7A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-ES12-4A-LUCIANOMANARA-CASA",
+      "date": "2026-10-31",
+      "time": "15:00",
+      "end": "16:15",
+      "category": "Esordienti 12 anni (2014)",
+      "group": "2014",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "LUCIANO MANARA",
+      "round": "4A",
+      "source": "FIGC/LND",
+      "notice": [
+        "Orario o sede da verificare",
+        "Utilizzo struttura da verificare"
+      ],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": false,
+        "venue_confirmed": false,
+        "facility_review_required": true
+      }
+    },
+    {
+      "id": "EVT-PULMIX-4A-ARSROVAGNATE-CASA",
+      "date": "2026-10-31",
+      "time": "15:00",
+      "end": "16:00",
+      "category": "Pulcini Misti 7v7",
+      "group": "pulcini",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "ARS ROVAGNATE",
+      "round": "4A",
+      "source": "FIGC/LND",
+      "notice": [
+        "Orario o sede da verificare",
+        "Utilizzo struttura da verificare"
+      ],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": false,
+        "venue_confirmed": false,
+        "facility_review_required": true
+      }
+    },
+    {
+      "id": "EVT-U19E-8A-CINISELLO-CASA",
+      "date": "2026-10-31",
+      "time": "15:00",
+      "end": "16:45",
+      "category": "Juniores U19 Élite",
+      "group": "u19",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "CINISELLO",
+      "round": "8A",
+      "source": "FIGC/LND",
+      "notice": [
+        "Utilizzo struttura da verificare"
+      ],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": true
+      }
+    },
+    {
+      "id": "EVT-ES11-4A-SANGIORGIOSQB-CASA",
+      "date": "2026-10-31",
+      "time": "16:00",
+      "end": "17:15",
+      "category": "Esordienti 11 anni (2015)",
+      "group": "2015",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "SAN GIORGIO SQ.B",
+      "round": "4A",
+      "source": "FIGC/LND",
+      "notice": [
+        "Orario o sede da verificare",
+        "Utilizzo struttura da verificare"
+      ],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": false,
+        "venue_confirmed": false,
+        "facility_review_required": true
+      }
+    },
+    {
+      "id": "EVT-PC78-4A-OLGINATESE-CASA",
+      "date": "2026-10-31",
+      "time": "16:00",
+      "end": "17:00",
+      "category": "Primi Calci 7-8 anni",
+      "group": "primicalci",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 2",
+      "opponent": "OLGINATESE",
+      "round": "4A",
+      "source": "FIGC/LND",
+      "notice": [
+        "Orario o sede da verificare",
+        "Attesa verifica"
+      ],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": false,
+        "venue_confirmed": false,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U16E-8A-CALCIOCANEGRATE-CASA",
+      "date": "2026-10-31",
+      "time": "18:00",
+      "end": "19:45",
+      "category": "U16 Élite",
+      "group": "u16",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "CALCIO CANEGRATE",
+      "round": "8A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U15-7A-DELEBIO-CASA",
+      "date": "2026-11-01",
+      "time": "10:30",
+      "end": "12:15",
+      "category": "Giovanissimi U15",
+      "group": "u15",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "DELEBIO",
+      "round": "7A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PRIMA-8A-DIPOASD-CASA",
+      "date": "2026-11-01",
+      "time": "14:30",
+      "end": "16:15",
+      "category": "Prima Squadra",
+      "group": "prima",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "DI.PO A.S.D.",
+      "round": "8A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PC78-5A-AURORASANFRANCESCO-FUORI",
+      "date": "2026-11-07",
+      "time": "11:00",
+      "end": "12:00",
+      "category": "Primi Calci 7-8 anni",
+      "group": "primicalci",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Lecco - C.S. \"AURORA SAN FRANCESCO\" 2, Via Santo Stefano",
+      "opponent": "AURORA SAN FRANCESCO G.S.",
+      "round": "5A",
+      "source": "FIGC/LND",
+      "notice": [
+        "Orario o sede da verificare",
+        "Attesa verifica"
+      ],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": false,
+        "venue_confirmed": false,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-ES11-5A-CASATESEMERATEASDS-FUORI",
+      "date": "2026-11-07",
+      "time": "14:00",
+      "end": "15:15",
+      "category": "Esordienti 11 anni (2015)",
+      "group": "2015",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Casatenovo fraz. Rogoredo - C.S. COMUNALE N.2 (E.A.), Via Volta",
+      "opponent": "CASATESE MERATE A.S.DSQ.B",
+      "round": "5A",
+      "source": "FIGC/LND",
+      "notice": [
+        "Orario o sede da verificare",
+        "Attesa verifica"
+      ],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": false,
+        "venue_confirmed": false,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PULMIX-5A-SIRTORESE-FUORI",
+      "date": "2026-11-07",
+      "time": "14:00",
+      "end": "15:00",
+      "category": "Pulcini Misti 7v7",
+      "group": "pulcini",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Sirtori - C.S. COMUNALE SIRTORI, Via Ceregallo 2",
+      "opponent": "SIRTORESE",
+      "round": "5A",
+      "source": "FIGC/LND",
+      "notice": [
+        "Orario o sede da verificare",
+        "Attesa verifica"
+      ],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": false,
+        "venue_confirmed": false,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U19E-9A-ARSROVAGNATE-CASA",
+      "date": "2026-11-07",
+      "time": "15:00",
+      "end": "16:45",
+      "category": "Juniores U19 Élite",
+      "group": "u19",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "ARS ROVAGNATE",
+      "round": "9A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-ES12-5A-ACADEMYCASATESEMER-FUORI",
+      "date": "2026-11-07",
+      "time": "16:00",
+      "end": "17:15",
+      "category": "Esordienti 12 anni (2014)",
+      "group": "2014",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Merate - C.S. COMUNALE FERRARIO CAMPO 2, Via Bergamo 12",
+      "opponent": "ACADEMY CASATESE MERASQ.B",
+      "round": "5A",
+      "source": "FIGC/LND",
+      "notice": [
+        "Orario o sede da verificare",
+        "Attesa verifica"
+      ],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": false,
+        "venue_confirmed": false,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U16E-9A-OLGINATESE-CASA",
+      "date": "2026-11-07",
+      "time": "18:00",
+      "end": "19:45",
+      "category": "U16 Élite",
+      "group": "u16",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "OLGINATESE",
+      "round": "9A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U15-8A-MESE-FUORI",
+      "date": "2026-11-08",
+      "time": "10:30",
+      "end": "12:15",
+      "category": "Giovanissimi U15",
+      "group": "u15",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Mese - C.S. Comunale",
+      "opponent": "MESE",
+      "round": "8A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PRIMA-9A-PONTELAMBRESEASD-FUORI",
+      "date": "2026-11-08",
+      "time": "14:30",
+      "end": "16:15",
+      "category": "Prima Squadra",
+      "group": "prima",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Ponte Lambro - C.S. COMUNALE \"C. TAVECCHIO\" E.A.",
+      "opponent": "PONTELAMBRESE A.S.D.",
+      "round": "9A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-ES12-6A-SANGIORGIOSQB-CASA",
+      "date": "2026-11-14",
+      "time": "15:00",
+      "end": "16:15",
+      "category": "Esordienti 12 anni (2014)",
+      "group": "2014",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "SAN GIORGIO SQ.B",
+      "round": "6A",
+      "source": "FIGC/LND",
+      "notice": [
+        "Orario o sede da verificare",
+        "Utilizzo struttura da verificare"
+      ],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": false,
+        "venue_confirmed": false,
+        "facility_review_required": true
+      }
+    },
+    {
+      "id": "EVT-PULMIX-6A-COSTAMASNAGA-CASA",
+      "date": "2026-11-14",
+      "time": "15:00",
+      "end": "16:00",
+      "category": "Pulcini Misti 7v7",
+      "group": "pulcini",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "COSTAMASNAGA",
+      "round": "6A",
+      "source": "FIGC/LND",
+      "notice": [
+        "Orario o sede da verificare",
+        "Utilizzo struttura da verificare"
+      ],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": false,
+        "venue_confirmed": false,
+        "facility_review_required": true
+      }
+    },
+    {
+      "id": "EVT-U19E-10A-ARCELLASCOCITTADIE-FUORI",
+      "date": "2026-11-14",
+      "time": "15:00",
+      "end": "16:45",
+      "category": "Juniores U19 Élite",
+      "group": "u19",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Erba - C.S. COMUNALE LAMBRONE 1 (E.A.)",
+      "opponent": "ARCELLASCO CITTA DI ERBA",
+      "round": "10A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-ES11-6A-CALCIOLECCO1912SRL-CASA",
+      "date": "2026-11-14",
+      "time": "16:00",
+      "end": "17:15",
+      "category": "Esordienti 11 anni (2015)",
+      "group": "2015",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "CALCIO LECCO 1912 S.R.L.",
+      "round": "6A",
+      "source": "FIGC/LND",
+      "notice": [
+        "Orario o sede da verificare",
+        "Utilizzo struttura da verificare"
+      ],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": false,
+        "venue_confirmed": false,
+        "facility_review_required": true
+      }
+    },
+    {
+      "id": "EVT-PC78-6A-GSOBALLABIOASD-CASA",
+      "date": "2026-11-14",
+      "time": "16:00",
+      "end": "17:00",
+      "category": "Primi Calci 7-8 anni",
+      "group": "primicalci",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 2",
+      "opponent": "GSO BALLABIO - ASD",
+      "round": "6A",
+      "source": "FIGC/LND",
+      "notice": [
+        "Orario o sede da verificare",
+        "Attesa verifica"
+      ],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": false,
+        "venue_confirmed": false,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U16E-20261115-ACCADEMIAVARESINA-FUORI",
+      "date": "2026-11-15",
+      "time": "09:30",
+      "end": "11:15",
+      "category": "U16 Élite",
+      "group": "u16",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Vedano Olona - C.S. COMUNALE MARIO PORTA (E.A.)",
+      "opponent": "ACCADEMIA VARESINA",
+      "round": "",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U15-9A-VALMADRERA-CASA",
+      "date": "2026-11-15",
+      "time": "10:30",
+      "end": "12:15",
+      "category": "Giovanissimi U15",
+      "group": "u15",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "VALMADRERA",
+      "round": "9A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PRIMA-10A-COB91-CASA",
+      "date": "2026-11-15",
+      "time": "14:30",
+      "end": "16:15",
+      "category": "Prima Squadra",
+      "group": "prima",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "C.O.B. 91",
+      "round": "10A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PULMIX-7A-OSGBMERATE-FUORI",
+      "date": "2026-11-21",
+      "time": "09:30",
+      "end": "10:30",
+      "category": "Pulcini Misti 7v7",
+      "group": "pulcini",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Merate - PARROCCHIALE S.G. BOSCO (E.A.), Via Trieste 24",
+      "opponent": "O.S.G.B. MERATE",
+      "round": "7A",
+      "source": "FIGC/LND",
+      "notice": [
+        "Orario o sede da verificare",
+        "Attesa verifica"
+      ],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": false,
+        "venue_confirmed": false,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PC78-7A-BELLAGINAAD-FUORI",
+      "date": "2026-11-21",
+      "time": "10:00",
+      "end": "11:00",
+      "category": "Primi Calci 7-8 anni",
+      "group": "primicalci",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Bellagio - COMUNALE \"GENERAL C. MONTU\" (E.A.), Via D. Vitali 7",
+      "opponent": "BELLAGINA A.D.",
+      "round": "7A",
+      "source": "FIGC/LND",
+      "notice": [
+        "Orario o sede da verificare",
+        "Attesa verifica"
+      ],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": false,
+        "venue_confirmed": false,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U19E-11A-CASTELLOCITTADICAN-CASA",
+      "date": "2026-11-21",
+      "time": "15:00",
+      "end": "16:45",
+      "category": "Juniores U19 Élite",
+      "group": "u19",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "CASTELLO CITTA DI CANTU",
+      "round": "11A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U16E-11A-VARESINASPORT-CASA",
+      "date": "2026-11-21",
+      "time": "18:00",
+      "end": "19:45",
+      "category": "U16 Élite",
+      "group": "u16",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "VARESINA SPORT",
+      "round": "11A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-ES11-7A-COSTAMASNAGA-FUORI",
+      "date": "2026-11-22",
+      "time": "09:30",
+      "end": "10:45",
+      "category": "Esordienti 11 anni (2015)",
+      "group": "2015",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Costa Masnaga - C.S. PARROCCHIALE N.1 (E.A.), Via Diaz 3",
+      "opponent": "COSTAMASNAGA",
+      "round": "7A",
+      "source": "FIGC/LND",
+      "notice": [
+        "Orario o sede da verificare",
+        "Attesa verifica"
+      ],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": false,
+        "venue_confirmed": false,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PRIMA-11A-VIBERONCHESE-FUORI",
+      "date": "2026-11-22",
+      "time": "14:30",
+      "end": "16:15",
+      "category": "Prima Squadra",
+      "group": "prima",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Bernareggio - CONSORZIO TEMPO LIBERO - CTL3",
+      "opponent": "VIBE RONCHESE",
+      "round": "11A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U19E-12A-CASSINARIZZARDI-FUORI",
+      "date": "2026-11-28",
+      "time": "15:00",
+      "end": "16:45",
+      "category": "Juniores U19 Élite",
+      "group": "u19",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Cassina Rizzardi - CENTRO SPORTIVO COMUNALE",
+      "opponent": "CASSINA RIZZARDI",
+      "round": "12A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-ES12-8A-ARSROVAGNATE-FUORI",
+      "date": "2026-11-28",
+      "time": "15:30",
+      "end": "16:45",
+      "category": "Esordienti 12 anni (2014)",
+      "group": "2014",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "La Valletta Brianza - C.S. COMUNALE \"STADIO IDEALITA'\", Via Statale Briantea 29",
+      "opponent": "ARS ROVAGNATE",
+      "round": "8A",
+      "source": "FIGC/LND",
+      "notice": [
+        "Orario o sede da verificare",
+        "Attesa verifica"
+      ],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": false,
+        "venue_confirmed": false,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-ES11-8A-VALMADRERACGPOL-CASA",
+      "date": "2026-11-28",
+      "time": "16:00",
+      "end": "17:15",
+      "category": "Esordienti 11 anni (2015)",
+      "group": "2015",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "VALMADRERA C.G. POL.",
+      "round": "8A",
+      "source": "FIGC/LND",
+      "notice": [
+        "Orario o sede da verificare",
+        "Attesa verifica"
+      ],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": false,
+        "venue_confirmed": false,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PC78-8A-CORTENOVAASD-CASA",
+      "date": "2026-11-28",
+      "time": "16:00",
+      "end": "17:00",
+      "category": "Primi Calci 7-8 anni",
+      "group": "primicalci",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 2",
+      "opponent": "CORTENOVA A.S.D.",
+      "round": "8A",
+      "source": "FIGC/LND",
+      "notice": [
+        "Orario o sede da verificare",
+        "Attesa verifica"
+      ],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": false,
+        "venue_confirmed": false,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U15-11A-GSOBALLABIO-CASA",
+      "date": "2026-11-29",
+      "time": "10:30",
+      "end": "12:15",
+      "category": "Giovanissimi U15",
+      "group": "u15",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "GSO BALLABIO",
+      "round": "11A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U16E-20261129-CASATESEMERATEASD-FUORI",
+      "date": "2026-11-29",
+      "time": "11:30",
+      "end": "13:15",
+      "category": "U16 Élite",
+      "group": "u16",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Casatenovo - fraz. Rogoredo - C.S. COMUNALE N.2 (E.A.)",
+      "opponent": "CASATESE MERATE A.S.D.",
+      "round": "",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PRIMA-12A-BIASSONO-CASA",
+      "date": "2026-11-29",
+      "time": "14:30",
+      "end": "16:15",
+      "category": "Prima Squadra",
+      "group": "prima",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "BIASSONO",
+      "round": "12A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PC78-9A-FUTURAZANETTIASD-FUORI",
+      "date": "2026-12-05",
+      "time": "09:30",
+      "end": "10:30",
+      "category": "Primi Calci 7-8 anni",
+      "group": "primicalci",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Lecco - C.S. ORATORIO SAN CARLO ACQUATE, Via Renzo - Quartiere Acquate",
+      "opponent": "FUTURA ZANETTI A.S.D.",
+      "round": "9A",
+      "source": "FIGC/LND",
+      "notice": [
+        "Orario o sede da verificare",
+        "Attesa verifica"
+      ],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": false,
+        "venue_confirmed": false,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-ES12-9A-CASATESEMERATEASD-CASA",
+      "date": "2026-12-05",
+      "time": "15:00",
+      "end": "16:15",
+      "category": "Esordienti 12 anni (2014)",
+      "group": "2014",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "CASATESE MERATE A.S.D.",
+      "round": "9A",
+      "source": "FIGC/LND",
+      "notice": [
+        "Orario o sede da verificare",
+        "Utilizzo struttura da verificare"
+      ],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": false,
+        "venue_confirmed": false,
+        "facility_review_required": true
+      }
+    },
+    {
+      "id": "EVT-U19E-13A-LUCIANOMANARA-CASA",
+      "date": "2026-12-05",
+      "time": "15:00",
+      "end": "16:45",
+      "category": "Juniores U19 Élite",
+      "group": "u19",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "LUCIANO MANARA",
+      "round": "13A",
+      "source": "FIGC/LND",
+      "notice": [
+        "Utilizzo struttura da verificare"
+      ],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": true
+      }
+    },
+    {
+      "id": "EVT-U16E-13A-LEON-CASA",
+      "date": "2026-12-05",
+      "time": "18:00",
+      "end": "19:45",
+      "category": "U16 Élite",
+      "group": "u16",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "LEON",
+      "round": "13A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-ES11-9A-LUCIANOMANARASQB-FUORI",
+      "date": "2026-12-06",
+      "time": "09:00",
+      "end": "10:15",
+      "category": "Esordienti 11 anni (2015)",
+      "group": "2015",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Barzanò - COMUNALE \"FIGLIODONI\" (E.A.), Via Figliodoni 5",
+      "opponent": "LUCIANO MANARA SQ.B",
+      "round": "9A",
+      "source": "FIGC/LND",
+      "notice": [
+        "Orario o sede da verificare",
+        "Attesa verifica"
+      ],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": false,
+        "venue_confirmed": false,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PRIMA-13A-ARDITACITTADELLA19-FUORI",
+      "date": "2026-12-06",
+      "time": "15:30",
+      "end": "17:15",
+      "category": "Prima Squadra",
+      "group": "prima",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Tavernerio - C.S. COMUNALE \"A. BORELLA\" - CAMPO 2",
+      "opponent": "ARDITA CITTADELLA 1934",
+      "round": "13A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U19E-14A-VIBERONCHESE-FUORI",
+      "date": "2026-12-12",
+      "time": "17:30",
+      "end": "19:15",
+      "category": "Juniores U19 Élite",
+      "group": "u19",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Ronco Briantino - C.S. COMUNALE (E.A.)",
+      "opponent": "VIBE RONCHESE",
+      "round": "14A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U15-13A-BELLAGINA-CASA",
+      "date": "2026-12-13",
+      "time": "10:30",
+      "end": "12:15",
+      "category": "Giovanissimi U15",
+      "group": "u15",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "BELLAGINA",
+      "round": "13A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PRIMA-14A-CANTUSANPAOLOASD-CASA",
+      "date": "2026-12-13",
+      "time": "14:30",
+      "end": "16:15",
+      "category": "Prima Squadra",
+      "group": "prima",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "CANTU SAN PAOLO A.S.D.",
+      "round": "14A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U16E-20261213-VIGORMILANO-FUORI",
+      "date": "2026-12-13",
+      "time": "16:00",
+      "end": "17:45",
+      "category": "U16 Élite",
+      "group": "u16",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Paderno Dugnano - C.S. COMUNALE \"ENRICO TOTI\"",
+      "opponent": "VIGOR MILANO",
+      "round": "",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U19E-15A-REALMILANOSSDARL-CASA",
+      "date": "2026-12-19",
+      "time": "15:00",
+      "end": "16:45",
+      "category": "Juniores U19 Élite",
+      "group": "u19",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "REAL MILANO SSD A RL",
+      "round": "15A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U15-12A-ALTOLARIOCALCIO-FUORI",
+      "date": "2026-12-19",
+      "time": "18:00",
+      "end": "19:45",
+      "category": "Giovanissimi U15",
+      "group": "u15",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Dongo - Centro Sportivo Comunale",
+      "opponent": "ALTO LARIO CALCIO",
+      "round": "12A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U16E-15A-AURORAPROPATRIA191-CASA",
+      "date": "2026-12-19",
+      "time": "18:00",
+      "end": "19:45",
+      "category": "U16 Élite",
+      "group": "u16",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "AURORA PRO PATRIA 1919",
+      "round": "15A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PRIMA-15A-MARIANOCALCIO-FUORI",
+      "date": "2026-12-20",
+      "time": "14:30",
+      "end": "16:15",
+      "category": "Prima Squadra",
+      "group": "prima",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Mariano Comense - C.S. \"GILBERTO CITTERIO\" N.1 (E.A.)",
+      "opponent": "MARIANO CALCIO",
+      "round": "15A",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U19E-1R-LESMOSSDARL-CASA",
+      "date": "2027-01-09",
+      "time": "15:00",
+      "end": "16:45",
+      "category": "Juniores U19 Élite",
+      "group": "u19",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "LESMO SSD ARL",
+      "round": "1R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U16E-1R-VARESEFOOTBALLCLUB-CASA",
+      "date": "2027-01-09",
+      "time": "18:00",
+      "end": "19:45",
+      "category": "U16 Élite",
+      "group": "u16",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "VARESE FOOTBALL CLUB",
+      "round": "1R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PRIMA-1R-ACASATICALCIOARCOR-FUORI",
+      "date": "2027-01-10",
+      "time": "14:30",
+      "end": "16:15",
+      "category": "Prima Squadra",
+      "group": "prima",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Arcore - C.S. COMUNALE - CAMPO N.1",
+      "opponent": "A. CASATI CALCIO ARCORE",
+      "round": "1R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U19E-2R-NUOVASONDRIOCALCIO-FUORI",
+      "date": "2027-01-16",
+      "time": "15:00",
+      "end": "16:45",
+      "category": "Juniores U19 Élite",
+      "group": "u19",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Sondrio - CONI \"CASTELLINA 3\" (E.A.)",
+      "opponent": "NUOVA SONDRIO CALCIO",
+      "round": "2R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U16E-20270117-LADOMINANTE-FUORI",
+      "date": "2027-01-17",
+      "time": "11:00",
+      "end": "12:45",
+      "category": "U16 Élite",
+      "group": "u16",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Monza - CAMPO \"LA DOMINANTE\" N.2 (E.A.)",
+      "opponent": "LA DOMINANTE",
+      "round": "",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PRIMA-2R-LESMOSSDARL-CASA",
+      "date": "2027-01-17",
+      "time": "14:30",
+      "end": "16:15",
+      "category": "Prima Squadra",
+      "group": "prima",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "LESMO SSD ARL",
+      "round": "2R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U19E-3R-VISNOVAGIUSSANO-CASA",
+      "date": "2027-01-23",
+      "time": "15:00",
+      "end": "16:45",
+      "category": "Juniores U19 Élite",
+      "group": "u19",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "VIS NOVA GIUSSANO",
+      "round": "3R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U16E-3R-BULGARO-CASA",
+      "date": "2027-01-23",
+      "time": "18:00",
+      "end": "19:45",
+      "category": "U16 Élite",
+      "group": "u16",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "BULGARO",
+      "round": "3R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PRIMA-3R-OLYMPICMORBEGNO-FUORI",
+      "date": "2027-01-24",
+      "time": "14:30",
+      "end": "16:15",
+      "category": "Prima Squadra",
+      "group": "prima",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Morbegno - C.S. COMUNALE \"AMANZIO TOCCALLI\"",
+      "opponent": "OLYMPIC MORBEGNO",
+      "round": "3R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U19E-4R-LENTATESE-FUORI",
+      "date": "2027-01-30",
+      "time": "14:45",
+      "end": "16:30",
+      "category": "Juniores U19 Élite",
+      "group": "u19",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Lentate sul Seveso - C.S. COMUNALE - CAMPO N.1",
+      "opponent": "LENTATESE",
+      "round": "4R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U16E-20270131-ACADEMYCASATESEMER-FUORI",
+      "date": "2027-01-31",
+      "time": "09:00",
+      "end": "10:45",
+      "category": "U16 Élite",
+      "group": "u16",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Cernusco Lombardone - C.S. COMUNALE CAMPO 1",
+      "opponent": "ACADEMY CASATESE MERATE",
+      "round": "",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U15-3R-DUBINOASD-CASA",
+      "date": "2027-01-31",
+      "time": "10:30",
+      "end": "12:15",
+      "category": "Giovanissimi U15",
+      "group": "u15",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "DUBINO ASD",
+      "round": "3R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PRIMA-4R-LISSONECALCIOSSDAR-CASA",
+      "date": "2027-01-31",
+      "time": "14:30",
+      "end": "16:15",
+      "category": "Prima Squadra",
+      "group": "prima",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "LISSONE CALCIO SSDARL",
+      "round": "4R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U19E-5R-MEDA1913-CASA",
+      "date": "2027-02-06",
+      "time": "15:00",
+      "end": "16:45",
+      "category": "Juniores U19 Élite",
+      "group": "u19",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "MEDA 1913",
+      "round": "5R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U16E-5R-CASTELLANZESE1921-CASA",
+      "date": "2027-02-06",
+      "time": "18:00",
+      "end": "19:45",
+      "category": "U16 Élite",
+      "group": "u16",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "CASTELLANZESE 1921",
+      "round": "5R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PRIMA-5R-ALTABRIANZATAVERNE-FUORI",
+      "date": "2027-02-07",
+      "time": "15:30",
+      "end": "17:15",
+      "category": "Prima Squadra",
+      "group": "prima",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Tavernerio - C.S. COMUNALE \"A. BORELLA\" - CAMPO 2",
+      "opponent": "ALTA BRIANZA TAVERNERIO",
+      "round": "5R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U19E-6R-ARDORLAZZATE-FUORI",
+      "date": "2027-02-13",
+      "time": "17:45",
+      "end": "19:30",
+      "category": "Juniores U19 Élite",
+      "group": "u19",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Lazzate - COMUNALE \"GIANNI BRERA\" (E.A.)",
+      "opponent": "ARDOR LAZZATE",
+      "round": "6R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U15-5R-PIANTEDO-FUORI",
+      "date": "2027-02-14",
+      "time": "10:30",
+      "end": "12:15",
+      "category": "Giovanissimi U15",
+      "group": "u15",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Piantedo - C.S. Comunale Piantedo",
+      "opponent": "PIANTEDO",
+      "round": "5R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U16E-20270214-VISNOVAGIUSSANO-FUORI",
+      "date": "2027-02-14",
+      "time": "11:00",
+      "end": "12:45",
+      "category": "U16 Élite",
+      "group": "u16",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Giussano - \"STEFANO BORGONOVO\" N.2 (E.A.)",
+      "opponent": "VIS NOVA GIUSSANO",
+      "round": "",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PRIMA-6R-ARSROVAGNATE-CASA",
+      "date": "2027-02-14",
+      "time": "14:30",
+      "end": "16:15",
+      "category": "Prima Squadra",
+      "group": "prima",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "ARS ROVAGNATE",
+      "round": "6R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U19E-7R-FUCINADIMUGGIOASD-CASA",
+      "date": "2027-02-16",
+      "time": "20:00",
+      "end": "21:45",
+      "category": "Juniores U19 Élite",
+      "group": "u19",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "FUCINA DI MUGGIO ASD",
+      "round": "7R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U19E-8R-CINISELLO-FUORI",
+      "date": "2027-02-20",
+      "time": "17:30",
+      "end": "19:15",
+      "category": "Juniores U19 Élite",
+      "group": "u19",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Cinisello Balsamo - C.S. \"GAETANO SCIREA\" - CAMPO A",
+      "opponent": "CINISELLO",
+      "round": "8R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U16E-7R-ARDORLAZZATE-CASA",
+      "date": "2027-02-20",
+      "time": "18:00",
+      "end": "19:45",
+      "category": "U16 Élite",
+      "group": "u16",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "ARDOR LAZZATE",
+      "round": "7R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U15-6R-CHIAVENNESE-CASA",
+      "date": "2027-02-21",
+      "time": "10:30",
+      "end": "12:15",
+      "category": "Giovanissimi U15",
+      "group": "u15",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "CHIAVENNESE",
+      "round": "6R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PRIMA-7R-COSTAMASNAGA-CASA",
+      "date": "2027-02-21",
+      "time": "14:30",
+      "end": "16:15",
+      "category": "Prima Squadra",
+      "group": "prima",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "COSTAMASNAGA",
+      "round": "7R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U19E-9R-ARSROVAGNATE-FUORI",
+      "date": "2027-02-27",
+      "time": "17:30",
+      "end": "19:15",
+      "category": "Juniores U19 Élite",
+      "group": "u19",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "La Valletta Brianza - C.S. COMUNALE \"STADIO IDEALITA'\"",
+      "opponent": "ARS ROVAGNATE",
+      "round": "9R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U15-7R-DELEBIO-FUORI",
+      "date": "2027-02-28",
+      "time": "10:30",
+      "end": "12:15",
+      "category": "Giovanissimi U15",
+      "group": "u15",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Novate Mezzola - C.S. Comunale Novate",
+      "opponent": "DELEBIO",
+      "round": "7R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U16E-20270228-CALCIOCANEGRATE-FUORI",
+      "date": "2027-02-28",
+      "time": "10:30",
+      "end": "12:15",
+      "category": "U16 Élite",
+      "group": "u16",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Canegrate - COMUNALE \"S. PERTINI\" - CAMPO B",
+      "opponent": "CALCIO CANEGRATE",
+      "round": "",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PRIMA-8R-DIPOASD-FUORI",
+      "date": "2027-02-28",
+      "time": "14:30",
+      "end": "16:15",
+      "category": "Prima Squadra",
+      "group": "prima",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Vimercate - C.S. COMUNALE",
+      "opponent": "DI.PO A.S.D.",
+      "round": "8R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U19E-10R-ARCELLASCOCITTADIE-CASA",
+      "date": "2027-03-02",
+      "time": "20:00",
+      "end": "21:45",
+      "category": "Juniores U19 Élite",
+      "group": "u19",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "ARCELLASCO CITTA DI ERBA",
+      "round": "10R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U16E-20270306-OLGINATESE-FUORI",
+      "date": "2027-03-06",
+      "time": "18:00",
+      "end": "19:45",
+      "category": "U16 Élite",
+      "group": "u16",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Olginate - COMUNALE N.1 (E.A.)",
+      "opponent": "OLGINATESE",
+      "round": "",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U19E-11R-CASTELLOCITTADICAN-FUORI",
+      "date": "2027-03-06",
+      "time": "18:30",
+      "end": "20:15",
+      "category": "Juniores U19 Élite",
+      "group": "u19",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Cantù - fraz. Vighizzolo - COMUNALE \"TOTO' CAIMI\" (E.A.)",
+      "opponent": "CASTELLO CITTA DI CANTU",
+      "round": "11R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U15-8R-MESE-CASA",
+      "date": "2027-03-07",
+      "time": "10:30",
+      "end": "12:15",
+      "category": "Giovanissimi U15",
+      "group": "u15",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "MESE",
+      "round": "8R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PRIMA-9R-PONTELAMBRESEASD-CASA",
+      "date": "2027-03-07",
+      "time": "14:30",
+      "end": "16:15",
+      "category": "Prima Squadra",
+      "group": "prima",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "PONTELAMBRESE A.S.D.",
+      "round": "9R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U19E-12R-CASSINARIZZARDI-CASA",
+      "date": "2027-03-13",
+      "time": "15:00",
+      "end": "16:45",
+      "category": "Juniores U19 Élite",
+      "group": "u19",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "CASSINA RIZZARDI",
+      "round": "12R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U16E-10R-ACCADEMIAVARESINA-CASA",
+      "date": "2027-03-13",
+      "time": "18:00",
+      "end": "19:45",
+      "category": "U16 Élite",
+      "group": "u16",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "ACCADEMIA VARESINA",
+      "round": "10R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U15-9R-VALMADRERA-FUORI",
+      "date": "2027-03-14",
+      "time": "10:00",
+      "end": "11:45",
+      "category": "Giovanissimi U15",
+      "group": "u15",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Valmadrera - C.S. Intercomunale Campo n.2",
+      "opponent": "VALMADRERA",
+      "round": "9R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PRIMA-10R-COB91-FUORI",
+      "date": "2027-03-14",
+      "time": "14:30",
+      "end": "16:15",
+      "category": "Prima Squadra",
+      "group": "prima",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Cormano - C.S. COMUNALE (E.A.)",
+      "opponent": "C.O.B. 91",
+      "round": "10R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U19E-13R-LUCIANOMANARA-FUORI",
+      "date": "2027-03-20",
+      "time": "15:00",
+      "end": "16:45",
+      "category": "Juniores U19 Élite",
+      "group": "u19",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Barzanò - COMUNALE \"FIGLIODONI\" (E.A.)",
+      "opponent": "LUCIANO MANARA",
+      "round": "13R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U16E-20270321-VARESINASPORT-FUORI",
+      "date": "2027-03-21",
+      "time": "11:30",
+      "end": "13:15",
+      "category": "U16 Élite",
+      "group": "u16",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Vedano Olona - C.S. COMUNALE MARIO PORTA (E.A.)",
+      "opponent": "VARESINA SPORT",
+      "round": "",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PRIMA-11R-VIBERONCHESE-CASA",
+      "date": "2027-03-21",
+      "time": "14:30",
+      "end": "16:15",
+      "category": "Prima Squadra",
+      "group": "prima",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "VIBE RONCHESE",
+      "round": "11R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U19E-14R-VIBERONCHESE-CASA",
+      "date": "2027-04-03",
+      "time": "15:00",
+      "end": "16:45",
+      "category": "Juniores U19 Élite",
+      "group": "u19",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "VIBE RONCHESE",
+      "round": "14R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U15-11R-GSOBALLABIO-FUORI",
+      "date": "2027-04-03",
+      "time": "17:30",
+      "end": "19:15",
+      "category": "Giovanissimi U15",
+      "group": "u15",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Calolziocorte - Comunale \"Lavello\" Campo n.5",
+      "opponent": "GSO BALLABIO",
+      "round": "11R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U16E-12R-CASATESEMERATEASD-CASA",
+      "date": "2027-04-03",
+      "time": "18:00",
+      "end": "19:45",
+      "category": "U16 Élite",
+      "group": "u16",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "CASATESE MERATE A.S.D.",
+      "round": "12R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PRIMA-12R-BIASSONO-FUORI",
+      "date": "2027-04-04",
+      "time": "15:30",
+      "end": "17:15",
+      "category": "Prima Squadra",
+      "group": "prima",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Biassono - STADIO PARCO N.2 (E.A.)",
+      "opponent": "BIASSONO",
+      "round": "12R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U19E-15R-REALMILANOSSDARL-FUORI",
+      "date": "2027-04-10",
+      "time": "18:00",
+      "end": "19:45",
+      "category": "Juniores U19 Élite",
+      "group": "u19",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Vimodrone - C.S. COMUNALE VIMODRONE (E.A.)",
+      "opponent": "REAL MILANO SSD A RL",
+      "round": "15R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U15-12R-ALTOLARIOCALCIO-CASA",
+      "date": "2027-04-11",
+      "time": "10:30",
+      "end": "12:15",
+      "category": "Giovanissimi U15",
+      "group": "u15",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "ALTO LARIO CALCIO",
+      "round": "12R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U16E-20270411-LEON-FUORI",
+      "date": "2027-04-11",
+      "time": "11:15",
+      "end": "13:00",
+      "category": "U16 Élite",
+      "group": "u16",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Vimercate - C.S. COMUNALE N.1 (E.A.)",
+      "opponent": "LEON",
+      "round": "",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PRIMA-13R-ARDITACITTADELLA19-CASA",
+      "date": "2027-04-11",
+      "time": "15:30",
+      "end": "17:15",
+      "category": "Prima Squadra",
+      "group": "prima",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "ARDITA CITTADELLA 1934",
+      "round": "13R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U16E-14R-VIGORMILANO-CASA",
+      "date": "2027-04-17",
+      "time": "18:00",
+      "end": "19:45",
+      "category": "U16 Élite",
+      "group": "u16",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "VIGOR MILANO",
+      "round": "14R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U15-13R-BELLAGINA-FUORI",
+      "date": "2027-04-18",
+      "time": "10:00",
+      "end": "11:45",
+      "category": "Giovanissimi U15",
+      "group": "u15",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Bellagio - Comunale \"General C. Montù\" (E.A.)",
+      "opponent": "BELLAGINA",
+      "round": "13R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PRIMA-14R-CANTUSANPAOLOASD-FUORI",
+      "date": "2027-04-18",
+      "time": "15:30",
+      "end": "17:15",
+      "category": "Prima Squadra",
+      "group": "prima",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Cantù - C.S. COMUNALE CAMPO 1",
+      "opponent": "CANTU SAN PAOLO A.S.D.",
+      "round": "14R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U15-1R-COSIOVALTELLINO-CASA",
+      "date": "2027-04-25",
+      "time": "10:30",
+      "end": "12:15",
+      "category": "Giovanissimi U15",
+      "group": "u15",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "COSIO VALTELLINO",
+      "round": "1R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-PRIMA-15R-MARIANOCALCIO-CASA",
+      "date": "2027-04-25",
+      "time": "15:30",
+      "end": "17:15",
+      "category": "Prima Squadra",
+      "group": "prima",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "MARIANO CALCIO",
+      "round": "15R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": true,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U16E-20270425-AURORAPROPATRIA191-FUORI",
+      "date": "2027-04-25",
+      "time": "15:30",
+      "end": "17:15",
+      "category": "U16 Élite",
+      "group": "u16",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Samarate - fraz. San Macario - C.S. COMUNALE E.A.",
+      "opponent": "AURORA PRO PATRIA 1919",
+      "round": "",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U15-2R-ACADEMYCASATESEMER-FUORI",
+      "date": "2027-05-02",
+      "time": "09:00",
+      "end": "10:45",
+      "category": "Giovanissimi U15",
+      "group": "u15",
+      "type": "CAMPIONATO",
+      "home_away": "FUORI",
+      "venue": "Cernusco Lombardone - C.S. Comunale Campo 2",
+      "opponent": "ACADEMY CASATESE MERATE",
+      "round": "2R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    },
+    {
+      "id": "EVT-U15-4R-GRENTARCADIA-CASA",
+      "date": "2027-05-09",
+      "time": "10:30",
+      "end": "12:15",
+      "category": "Giovanissimi U15",
+      "group": "u15",
+      "type": "CAMPIONATO",
+      "home_away": "CASA",
+      "venue": "COLICO - CAMPO 1",
+      "opponent": "GRENTARCADIA",
+      "round": "4R",
+      "source": "FIGC/LND",
+      "notice": [],
+      "match_status": "OFFICIAL_CALENDAR",
+      "is_variation": false,
+      "verification": {
+        "time_confirmed": true,
+        "venue_confirmed": true,
+        "facility_review_required": false
+      }
+    }
+  ],
+  "transport": {
+    "confirmed_trips": 0,
+    "status": "NESSUNA_CORSA_ASSEGNATA_NEL_MASTER_FLOTTA",
+    "caption": "Iscrizioni pulmini e corse pianificate sono fonti separate."
+  },
+  "facilities": {
+    "reference": "Rotazione Campi Annuale, distinta dal Calendario",
+    "allocations": "DA_VERIFICARE"
+  },
+  "projection_revision": "RC3_MOBILE_20261009",
+  "audience": "PUBLIC_READ_ONLY_SNAPSHOT"
+}
