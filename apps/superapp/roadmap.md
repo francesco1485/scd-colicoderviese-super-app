@@ -1,0 +1,4 @@
+- [x] /calendario e /allenamenti da fotografie Drive 09/10/2026 (solo anteprima, non live).
+- [ ] Ripensare home pubblica settimanale (bloccato: solo accessi di navigazione autorizzati).
+- [ ] Sostituire fotografie con lettura dai master tramite adapter esistente (bloccato: riconciliazione e autorizzazione Direzione).
+- [ ] Loghi categoria (bloccato: file ufficiali non accessibili).
