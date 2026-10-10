@@ -1,0 +1,45 @@
+{
+  "schema": "scd.superapp-areas.v1",
+  "status": "PROPOSED_DESIGN_REGISTRY",
+  "updated": "2026-10-10",
+  "purpose": "Single extensible registry of Super App areas and sub-areas, each with its own direct path. One login and one database behind every path. Adding an area means adding an entry here, then a route, then a test.",
+  "rules": [
+    "One shared identity (R20 until verified migration); no per-area login.",
+    "Every value shown comes from the listed source or is rendered as unknown, never zero.",
+    "Minors: no faces in public views, no individual rankings, health data limited to service/day/time.",
+    "Games use points and club prizes only: no money, no betting.",
+    "Production exposure of any area requires explicit club approval."
+  ],
+  "areas": [
+    { "id": "home-oggi", "path": "/oggi", "audience": "public", "board": "Home-oggi.dc.html", "sources": ["Open-Meteo (to connect)", "licensed news feed (to choose)", "Master Tornei & Iniziative"], "status": "design" },
+    { "id": "calendario", "path": "/calendario", "audience": "public", "board": "Calendario.dc.html", "sources": ["Master Calendario"], "status": "design",
+      "children": [
+        { "id": "rotazione-campi", "path": "/calendario/rotazione-campi", "audience": "staff", "roles": ["responsabile-campi", "direzione"], "board": "Rotazione-campi.dc.html", "sources": ["ROTAZIONE_CAMPI_SCD_COLICODERVIESE_17OTT2026_31GEN2027"], "status": "design",
+          "rules": { "pitch_colico_c1": "100x60 m synthetic", "capacity": { "11v11": 1, "9v9": 2, "7v7": 2, "5v5": 3 } } }
+      ] },
+    { "id": "quadro", "path": "/quadro", "audience": "staff", "board": "Quadro-responsabili.dc.html", "sources": ["Quadro settimanale allenamenti 2026/27"], "status": "design",
+      "children": [ { "id": "quadro-rotazione-campi", "path": "/quadro/rotazione-campi", "alias_of": "rotazione-campi", "status": "design" } ] },
+    { "id": "gestionale", "path": "/gestionale", "audience": "staff", "board": "Gestionale.dc.html", "sources": ["R20", "Master Calendario", "Quadro settimanale"], "status": "design",
+      "children": [ { "id": "mister", "path": "/gestionale/mister", "roles": ["mister", "dirigente-annata"], "board": "Mister.dc.html", "features": ["convocazioni con conferma lettura", "lavagna e moduli", "video", "chiamata di squadra (Teams/Meet da collegare)"], "status": "design" } ] },
+    { "id": "partita-live", "path": "/partite/:id/live", "audience": "public", "board": "Partita-live.dc.html", "features": ["aggiornamento da dirigente via Sky o Crovi", "pubblicazione dopo conferma di una seconda persona", "nomi solo Prima Squadra", "statistiche a scomparsa", "loghi avversari da fonte ufficiale"], "status": "design" },
+    { "id": "pulmini", "path": "/pulmini", "audience": "staff", "roles": ["responsabile-trasporti", "autista", "direzione"], "board": "Pulmini.dc.html", "sources": ["Master Flotta"], "status": "design" },
+    { "id": "magazzino", "path": "/magazzino", "audience": "staff", "board": "Magazzino.dc.html", "sources": ["inventario kit (to load)"], "status": "design" },
+    { "id": "infermeria", "path": "/infermeria", "audience": "public+family", "board": "Infermeria.dc.html", "status": "design" },
+    { "id": "segreteria", "path": "/segreteria", "audience": "staff", "board": "Segreteria.dc.html", "status": "design",
+      "children": [ { "id": "iscrizioni", "path": "/iscrizioni", "audience": "public", "flows_to": "segreteria", "status": "planned" } ] },
+    { "id": "tesoreria", "path": "/tesoreria", "audience": "staff", "board": "Tesoreria.dc.html", "status": "design",
+      "children": [
+        { "id": "club-house", "path": "/tesoreria/club-house", "roles": ["responsabile-club-house"], "board": "Tesoreria-sottoaree.dc.html", "status": "design" },
+        { "id": "biglietteria", "path": "/tesoreria/biglietteria", "roles": ["addetto-biglietteria"], "blocker": "tariff source to confirm", "status": "design" },
+        { "id": "magazzino-cassa", "path": "/tesoreria/magazzino", "roles": ["responsabile-magazzino"], "status": "design" }
+      ] },
+    { "id": "direzione", "path": "/direzione", "audience": "staff", "board": "Plancia-direzione.dc.html", "status": "design",
+      "children": [ { "id": "acquisti", "path": "/direzione/acquisti", "roles": ["dirigenza"], "flow": ["richiesta", "approvazione", "ordine", "fattura", "pagamento"], "status": "design" } ] },
+    { "id": "crm", "path": "/crm", "audience": "staff", "board": "CRM.dc.html", "sources": ["MASTER CONTATTI"], "used_by": ["sponsor", "tornei", "segreteria"], "status": "design" },
+    { "id": "sponsor", "path": "/sponsor", "audience": "public", "board": "LED-sponsor.dc.html", "features": ["LED a bordo campo", "pacchetti", "Anche tu qui"], "status": "design" },
+    { "id": "sky-club", "path": "/sky-club", "audience": "public+members", "board": "Sky-Club.dc.html", "tiers": ["tifoso", "tesserato", "familiare"], "status": "design" },
+    { "id": "tornei", "path": "/eventi", "audience": "public", "board": "Eventi.dc.html", "children": [ { "id": "christmas-lario-cup", "path": "/eventi/christmas-lario-cup", "board": "Evento-CLC.dc.html", "status": "design" } ], "status": "design" },
+    { "id": "foto", "path": "/foto", "audience": "public+family", "board": "Foto.dc.html", "rules": { "youth_albums": "visible to verified families of that team only" }, "status": "design" },
+    { "id": "gioca", "path": "/gioca", "audience": "members", "board": "Gioca.dc.html", "features": ["campione (avatar che cresce)", "pronostici a punti", "FantaSCD delle annate"], "rules": { "photo_avatar": "adults with consent only", "fanta_subjects": "consenting adults only", "scoring": "team-level, no minor rankings" }, "status": "design" }
+  ]
+}
