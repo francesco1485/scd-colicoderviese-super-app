@@ -11,7 +11,10 @@
     "realPhotoRequiresUsageRightsAndPrivacyCheck": true,
     "currentUserTargetBoardsDefineVisualDirection": true,
     "visualDirectionDoesNotOverrideOfficialAssetIdentity": true,
-    "referenceFileIdIsNotPermanentBinaryStorage": true
+    "referenceFileIdIsNotPermanentBinaryStorage": true,
+    "homeVisualDNAAppliesToEveryScreenAndApp": true,
+    "sixScreenAndThreeAppFamilyMustRemainConsistent": true,
+    "geographicTerritorialContextMustRemainVisibleWhereUseful": true
   },
   "references": [
     {
@@ -337,5 +340,33 @@
     "CEPA presentation/brand documents",
     "Resolve current-chat reference boards to persistent approved Drive/Canva source assets (binary bytes not yet archived)",
     "Current 2026 visual-system target comparison and visual regression screenshots"
-  ]
+  ],
+  "crossAppGraphicalGeographicContract": {
+    "authority": "DIREZIONE_SCD_2026_10_09",
+    "masterBoardIds": [
+      "VR-009",
+      "VR-010",
+      "VR-011",
+      "VR-012",
+      "VR-013",
+      "VR-014",
+      "VR-015",
+      "VR-016",
+      "VR-017",
+      "VR-018",
+      "VR-019",
+      "VR-020",
+      "VR-021"
+    ],
+    "allApps": [
+      "SCD_ONE",
+      "SCD_CORE",
+      "SCD_GROW"
+    ],
+    "rule": "The approved HOME visual grammar is compulsory across ALL user experience routes; six master screens plus all extensions, not just a Home task.",
+    "geography": "Lake Como/Alto Lario, Colico, Dervio, mountain landscape, official club venues and authorized real sports imagery",
+    "visualConsistency": "Use official SCD crest, official Sky asset, shared blue navy yellow white typography, design tokens, modular cards and navigation, actions and sports imagery without duplicating the same Home layout on every screen.",
+    "operationalConstraint": "CORE and GROW protected workflows remain accessible, dense, legible and role-scoped, still visibly SCD.",
+    "acceptance": "Real screenshot comparison for EVERY master screen + representative screens across three apps; fix all mismatches before human approval."
+  }
 }

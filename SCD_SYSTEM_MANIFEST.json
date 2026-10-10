@@ -484,7 +484,7 @@
         "INDEXING_AND_AUTOMATION",
         "ROLE_SCOPED_SKY_MEMORY_ENGINE"
       ],
-      "visual_acceptance": "COMPARE_RENDERED_DESKTOP_MOBILE_SCREENSHOTS_TO_USER_SUPPLIED_BOARDS",
+      "visual_acceptance": "MOBILE_DESKTOP_RENDER_COMPARISON_ALL_SIX_SCREENS_AND_ONE_CORE_GROW_REPRESENTATIVE_ROUTES",
       "design_rules": [
         "SPORT_EDITORIAL_PREMIUM_SCD_NOT_GENERIC_SAAS",
         "NAVY_YELLOW_WHITE_BRUSH_MOUNTAINS_LAKE_SKY",
@@ -495,12 +495,141 @@
         "PHOTO_RIGHTS_PRIVACY_OF_MINORS_AND_APPROVAL_REQUIRED",
         "NO_PUBLIC_PRODUCTION_MUTATIONS_WITHOUT_AUTHORIZATION"
       ],
-      "status_source": "USER_COMMAND_2026_10_09"
+      "status_source": "USER_COMMAND_2026_10_09",
+      "home_reference_is": "SHARED_VISUAL_DNA_FOR_ALL_SIX_AND_ALL_THREE_APPS_NOT_SINGLE_SCREEN_SCOPE",
+      "cross_app_contract": "visual_system.cross_app_graphic_geographic_identity"
     },
     "user_master_source_override_legacy_restrictions": {
       "effective_at": "2026-10-09",
       "rule": "Recent explicitly user-directed visual references and authorized original photographs govern new 2026/27 visual design. Older synthetic-only/legacy snapshot flags document old builds and are not future prohibitions. Keep fallback independent of images.",
       "older_snapshots_not_runtime_approval": true
+    },
+    "native_one_preview": {
+      "state": "ISOLATED_FEATURE_FLAG",
+      "flag": "?scdVision=1",
+      "audience": "PUBLIC_READ_ONLY",
+      "views": [
+        "HOME_PUBLIC",
+        "CALENDAR_LIVE",
+        "COMMUNICATIONS_PUBLIC",
+        "ATHLETE_PROTECTED_PREVIEW",
+        "FAMILY_PROTECTED_PREVIEW",
+        "STAFF_PROTECTED_PREVIEW",
+        "GROW_PARTNERSHIP_PREVIEW"
+      ],
+      "user_visual_masters": [
+        "01_HOME_PUBBLICA (1).png",
+        "02_CALENDARIO_LIVE (1).png"
+      ],
+      "render_type": "NATIVE_DOM_CSS_COMPONENTS_NOT_PNG_OVERLAY",
+      "data_source": "EXISTING_R20_PUBLIC_CALENDAR_VIA_SCD_NEXTGEN",
+      "scope": "existing index.html, same-origin API and existing SCDNextGen router",
+      "invariant": "NO_SECOND_DATABASE_NO_SYNTHETIC_MATCH_NO_PRIVATE_DATA",
+      "original_assets": [
+        "assets/logo-scd.png",
+        "assets/sky.png",
+        "assets/hero-colico.webp"
+      ],
+      "production_default_unchanged": true,
+      "reviewed_at": "2026-10-10",
+      "next_gate": "THREE_WORLDS_BROWSER_QA_THEN_USER_GRAPHIC_APPROVAL"
+    },
+    "native_three_worlds_preview": {
+      "state": "ISOLATED_FEATURE_FLAG",
+      "flag": "?scdVision=1",
+      "reference": "UD-015 / visual_system.cross_app_graphic_geographic_identity",
+      "scope": [
+        "ONE_PUBLIC_HOME_CALENDAR_COMMUNICATIONS",
+        "CORE_ATLETA_FAMIGLIA_STAFF",
+        "GROW_PARTNERSHIP_PROPOSALS"
+      ],
+      "implementation": "NATIVE_DOM_CSS_IN_CANONICAL_RUNTIME_NOT_SCREENSHOT_OVERLAY",
+      "source_files": [
+        "scd-three-worlds-native.js",
+        "scd-three-worlds-native.css"
+      ],
+      "browser_test": "staging/lovable-vision-2026/scripts/browser-three-worlds.mjs",
+      "real_data_source": "EXISTING_VERIFIED_PUBLIC_CALENDAR_R20_ADAPTER",
+      "authenticated_operations": "EXISTING_R20_PRIVATE_DESK_UNCHANGED",
+      "sponsor_operations": "EXISTING_SPONSOR_APP_LINKED_NO_SECOND_CRM",
+      "sponsor_draft": "LOCAL_NON_PERSISTED_NON_SENT_FILE_EXPORT_ONLY",
+      "minors_and_sensitive_data": "NEVER_RENDER_PUBLIC",
+      "screenshot_master_check_required_before_graphic_approval": true,
+      "human_approval_before_public_release": true,
+      "production_default_unchanged": true,
+      "date": "2026-10-10",
+      "delivery_status": "INTERACTIVE_STAGING_NOT_PRODUCTION_COMPLETE",
+      "staging_service": "scd-content-first-stage-20261008",
+      "staging_source_branch": "feat/content-first-three-app-integration-20261008",
+      "staging_purpose": "EXPLICIT_USER_REVIEW_NO_PRODUCTION_CUTOVER"
+    },
+    "cross_app_graphic_geographic_identity": {
+      "effective_at": "2026-10-09",
+      "authority": "DIREZIONE_SCD_LATEST_EXPLICIT_CORRECTION",
+      "reference": "VR-009 Home plus VR-010..VR-021 user-supplied graphics",
+      "principle": "ALL_SCREENS_IN_THREE_APPS_MUST_INHERIT_HOME_VISUAL_DNA; HOME_IS_NOT_ONLY_DELIVERABLE",
+      "applications": [
+        "SCD_ONE_UNIVERSE_SOCIAL",
+        "SCD_CORE_GESTIONALE",
+        "SCD_GROW_SPONSOR"
+      ],
+      "applies_to": [
+        "HOME_PUBLIC",
+        "CALENDAR_LIVE",
+        "NEWS",
+        "COMMUNITY",
+        "EVENTS",
+        "MEDIA",
+        "COMMUNICATIONS",
+        "ATHLETE",
+        "FAMILY",
+        "DOCUMENTS",
+        "PAYMENTS",
+        "STAFF",
+        "DIRECTION",
+        "TRAINING",
+        "VENUES_TRANSPORT",
+        "SPONSOR_OFFERS",
+        "PARTNERS",
+        "SPONSOR_CRM",
+        "SPONSOR_ANALYTICS"
+      ],
+      "common_visual_grammar": [
+        "SCD_OFFICIAL_CREST_ASSET",
+        "SCD_YELLOW_BLUE_NAVY_WHITE",
+        "SPORT_TYPOGRAPHY_CLEAR_HIERARCHY",
+        "ALTO_LARIO_AUTHENTIC_LAKE_MOUNTAIN_IMAGERY",
+        "COLICO_DERVIO_TERRITORIAL_PHOTOGRAPHY_WHERE_APPROPRIATE_AND_AUTHORIZED",
+        "OFFICIAL_SKY_MASCOT_IN_RELEVANT_CONTEXTS",
+        "NAVIGATION_TABS_QUICK_ACTIONS_ROLE_CARDS_UNIFIED",
+        "MATCH_CALENDAR_NEWS_SPONSOR_MODULES_SHARED",
+        "BRAND_TEXTURES_BRUSHES_AND_SPORT_VISUAL_RHYTHM",
+        "MOBILE_FIRST_AND_INDEPENDENT_DESKTOP_RESPONSIVE"
+      ],
+      "territory": [
+        "COLICO",
+        "DERVIO",
+        "ALTO_LARIO",
+        "LAGO_DI_COMO",
+        "MONTAGNE",
+        "CAMPI_E_CENTRI_SPORTIVI",
+        "COMUNITA_LOCALE"
+      ],
+      "geography_rule": "Territory is a consistent identity element through verified photos, approved illustrations and spatial context; do not invent exact stadium/venue identity or reuse one photograph irrespective of screen context.",
+      "consistency_rule": "All routes must look like ONE coordinated SCD product family. Same visual components and tokens; screens may differ in information density and layout for their real job. Not six identical Home clones.",
+      "internal_ux_rule": "CORE/GROW operational pages primarily blue and white with yellow accents; authenticated documents, payments, tables and protected data stay readable and do not use distracting cinematic backgrounds over forms.",
+      "implementation_rule": "Functional HTML/CSS/React components on existing applications, preserve APIs/data permissions; whole-screen PNG/clickable overlay is not a compliant final UI.",
+      "validation_rule": "For every approved visual screen and each representative section of ONE, CORE and GROW, compare actual mobile/desktop browser renders with the user-supplied source board and document differences, route actions and tests. Passing build alone is insufficient.",
+      "candidate_agent_gate": "Home may be the FIRST agent qualification sample, but passing Home does NOT complete the mandate or release GROW/CORE. Gate requires expansion to every relevant route across all three apps and human final review.",
+      "forbidden": [
+        "HOME_ONLY_SCOPE",
+        "HOME_REDESIGN_AS_GENERIC_SAAS",
+        "ONLY_RECOLOR_OTHER_APPS",
+        "SECOND_APP_DATABASE_OR_CRM",
+        "INVENTED_SPORT_FACTS_OR_SPONSOR_MARKS",
+        "PUBLIC_PII_MINORS_SAFEGUARDING",
+        "PRODUCTION_PUBLISH_WITHOUT_APPROVAL"
+      ]
     }
   },
   "temporal_core": {
