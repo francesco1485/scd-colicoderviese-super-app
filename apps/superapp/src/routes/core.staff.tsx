@@ -102,7 +102,7 @@ function AreaStaff() {
             <BandCard title="Andamento squadre" more={{ label: "Vedi tutti", target: { to: "/calendario", search: { vista: "prossime" } } }} bodyClassName="grid grid-cols-4 gap-[6px] p-[8px]" testId="staff-trend">
               {trend.map((g) => (
                 <Link key={g.id} to="/calendario" search={{ annata: g.years[0] ?? g.id, vista: "prossime" }} className="flex h-[112px] flex-col items-center justify-between rounded-[10px] bg-white py-[10px] text-center shadow-[var(--scd-card-shadow)]">
-                  <span className="text-[14.5px] font-bold leading-tight text-[var(--scd-ink)]">{groupShort(g)}</span>
+                  <span className="text-[14px] font-bold leading-tight tracking-[-0.02em] text-[var(--scd-ink)]">{groupShort(g)}</span>
                   <MoveRight className="size-[34px] text-[#b4bccb]" strokeWidth={2.4} aria-hidden="true" />
                   <span className="text-[11.5px] font-semibold leading-tight text-[var(--scd-sub)]">Risultati<br />in arrivo</span>
                 </Link>

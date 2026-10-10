@@ -79,7 +79,7 @@ function Home() {
         subtitle={<>Sport, crescita e comunità<br />nel cuore dell'Alto Lario.</>}
         action={<BellAction dot={bellDot} />}
         sky="home"
-        titleGap={88}
+        titleGap={83}
         bottomGap={22}
         testId="home-hero"
       />
@@ -100,7 +100,7 @@ function Home() {
             </TabCard>
 
             <div className="mt-[14px] grid grid-cols-2 gap-[10px]">
-              <Promo to="/allenamenti" tone="green" icon={<TrafficCone className="size-[40px] text-white" strokeWidth={1.9} />} title="Allenamenti" text={`Quadro lun–ven: ${QUADRO.slots.length} fasce orarie`} />
+              <Promo to="/allenamenti" tone="green" icon={<TrafficCone className="size-[40px] text-white" strokeWidth={1.9} />} title="Allenamenti" text={`Quadro lun–ven, ${QUADRO.slots.length} fasce orarie`} />
               <Promo to="/entra" tone="yellow" icon={<PeopleIcon size={40} className="text-[#141a2a]" />} title="Open Day" text="Date in arrivo: chiedi una prova" />
             </div>
           </div>
@@ -218,7 +218,10 @@ function NextMatch({ item, opponent }: { item: WeekItem; opponent: string }) {
   return (
     <div className="grid grid-cols-[92px_minmax(0,1fr)] items-stretch py-[12px] pr-[6px]">
       <div className="flex items-center justify-center border-r border-[var(--scd-line)] pr-[2px]">
-        <DateBlock weekday={d.weekday} day={d.day} month={d.month} time={item.time || "--:--"} size="lg" />
+        <span className="flex flex-col items-center">
+          <DateBlock weekday={d.weekday} day={d.day} month={d.month} time={item.time || "--:--"} size="lg" />
+          {!item.certain && <span className="mt-[4px] rounded-[4px] bg-[#fff3c4] px-[5px] py-[1px] text-[10.5px] font-bold uppercase leading-tight text-[#7a5200]" title="Orario o sede da confermare">da conf.</span>}
+        </span>
       </div>
       <div className="min-w-0 pl-[8px]">
         <div className="grid grid-cols-[minmax(0,1fr)_34px_minmax(0,1fr)] items-start gap-[2px]">
@@ -230,7 +233,6 @@ function NextMatch({ item, opponent }: { item: WeekItem; opponent: string }) {
           <MapPin className="size-[19px] shrink-0 fill-[#1d2b66] text-white" strokeWidth={2} aria-hidden="true" />
           <span className="min-w-0 truncate">{venueCase(item.venue) || "Sede da definire"}</span>
         </p>
-        {!item.certain && <p className="mt-[2px] text-center text-[12px] font-semibold text-[#9a6b00]">Orario/sede da confermare</p>}
       </div>
     </div>
   );
@@ -242,7 +244,7 @@ function Promo({ to, tone, icon, title, text }: { to: "/allenamenti" | "/entra";
       <span className={`flex size-[68px] shrink-0 items-center justify-center rounded-[9px] ${tone === "green" ? "bg-[#0a8a35]" : "bg-[var(--scd-yellow)]"}`}>{icon}</span>
       <span className="min-w-0">
         <span className="block text-[17px] font-bold leading-tight tracking-[-0.01em] text-[var(--scd-ink)]">{title}</span>
-        <span className="mt-[2px] block text-[12.5px] leading-[1.2] text-[#3a4456]">{text}</span>
+        <span className="mt-[2px] block text-[12px] leading-[1.18] text-[#3a4456]">{text}</span>
       </span>
     </Link>
   );

@@ -30,20 +30,20 @@ function AreaFamiglia() {
           <ul className="grid grid-cols-3 gap-[6px] px-[4px]" aria-label="Figli (dimostrativo)">
             {f.children.map((c) => (
               <li key={c.initials} className="flex flex-col items-center text-center">
-                <InitialsAvatar initials={c.initials} size={96} ring="#e3e7ee" />
+                <InitialsAvatar initials={c.initials} size={90} ring="#dfe3ea" />
                 <span className="mt-[10px] text-[17px] font-bold leading-tight text-[var(--scd-ink)]">{c.name}</span>
                 <span className="text-[16px] text-[var(--scd-ink)]">{c.category}</span>
               </li>
             ))}
             <li className="flex flex-col items-center text-center">
-              <Link {...area} aria-label="Aggiungi atleta (accesso R20)" className="flex size-[96px] items-center justify-center rounded-full bg-white text-[var(--scd-ink)] shadow-[0_0_0_4px_#e3e7ee,0_4px_10px_rgb(0_0_0/0.12)]"><Plus className="size-[44px]" strokeWidth={2.2} /></Link>
+              <Link {...area} aria-label="Aggiungi atleta (accesso R20)" className="flex size-[90px] items-center justify-center rounded-full bg-white text-[var(--scd-ink)] shadow-[0_0_0_4px_#e3e7ee,0_4px_10px_rgb(0_0_0/0.12)]"><Plus className="size-[44px]" strokeWidth={2.2} /></Link>
               <span className="mt-[10px] text-[16px] leading-tight text-[var(--scd-ink)]">Aggiungi<br />atleta</span>
             </li>
           </ul>
 
           <SectionHead title="Stato pagamenti" more={{ label: "Vedi dettagli", target: area }} />
           <div className="flex items-center gap-[14px] px-[4px]">
-            <RingProgress value={f.payments.percent} size={124} label={`Quote versate ${f.payments.percent}% (dato dimostrativo)`} />
+            <RingProgress value={f.payments.percent} size={114} label={`Quote versate ${f.payments.percent}% (dato dimostrativo)`} />
             <div className="min-w-0 flex-1">
               <p className="text-[17px] font-bold leading-tight text-[var(--scd-ink)]">{f.payments.title}</p>
               <p className="mt-[2px] text-[15.5px] text-[var(--scd-ink)]">{f.payments.detail}</p>

@@ -44,7 +44,7 @@ export const Route = createFileRoute("/comunicazioni")({
   component: Comunicazioni,
 });
 
-type Row = { id: string; icon: LucideIcon | "calendar"; title: string; sub: string; to: string; search?: Record<string, string>; href?: string };
+type Row = { id: string; icon: LucideIcon | "calendar"; title: string; sub: string; to?: string; search?: Record<string, string>; href?: string };
 
 function Comunicazioni() {
   const { feed, calendar, fresh, today, clock } = Route.useLoaderData();
@@ -55,12 +55,12 @@ function Comunicazioni() {
 
   // Avvisi reali derivati dalle fonti già collegate (nessun testo dimostrativo).
   const rows = ([
-    ...news.slice(0, 2).map((n): Row => ({ id: n.id, icon: Newspaper, title: n.title, sub: n.source || "S.C.D. ColicoDerviese", to: "/comunicazioni", ...(n.link ? { href: n.link } : {}) })),
+    ...news.slice(0, 2).map((n): Row => ({ id: n.id, icon: Newspaper, title: n.title, sub: n.source || "S.C.D. ColicoDerviese", ...(n.link ? { href: n.link } : {}) })),
     { id: "cal", icon: "calendar", title: fresh ? "Nuovo calendario partite disponibile" : "Calendario partite 2026/27", sub: `Aggiornato il ${freshnessLabel(calendar.sourceModifiedAt)} · ${calendar.events.length} gare`, to: "/calendario" },
     { id: "quadro", icon: ClipboardList, title: "Quadro allenamenti lun–ven", sub: `Fotografia del 09/10/2026 · ${QUADRO.slots.length} fasce orarie`, to: "/allenamenti" },
     { id: "pulmini", icon: Bus, title: "Organizzazione pulmini", sub: "Nessuna corsa confermata al momento", to: "/core/impianti-calendari", search: { sezione: "dervio" } },
     { id: "safe", icon: ShieldCheck, title: "Safeguarding e tutela dei minori", sub: "Segnalazioni riservate, canale dedicato", to: "/safeguarding" },
-  ] satisfies Row[] as Row[]).slice(0, 5);
+  ] satisfies Row[] as Row[]).slice(0, 4);
   const upcoming = upcomingMatches(calendar.events, today, clock);
   const teams = calendar.groups.filter((g) => g.count > 0 && g.id !== "other").map((g) => ({ g, next: upcoming.find((e) => e.group === g.id) }));
 
@@ -97,7 +97,7 @@ function Comunicazioni() {
                     <span className="flex size-[54px] shrink-0 items-center justify-center rounded-full bg-[var(--scd-yellow)] shadow-[inset_0_0_0_2px_rgb(0_0_0/0.06)]"><Megaphone className="size-[28px] text-[#141a2a]" strokeWidth={2.2} aria-hidden="true" /></span>
                     <div className="min-w-0">
                       <h2 id="avviso" className="text-[18px] font-bold leading-tight text-[var(--scd-ink)]">{alert ? alert.title : "Nessun avviso urgente in corso"}</h2>
-                      <p className="mt-[4px] text-[14.5px] leading-[1.25] text-[#2b3445]">{alert ? (alert.body ?? "Dettagli dal club in aggiornamento.") : "Sospensioni, rinvii e variazioni urgenti compaiono qui appena pubblicati dal club."}</p>
+                      <p className="mt-[4px] text-[14.5px] leading-[1.25] text-[#2b3445]">{alert ? (alert.body ?? "Dettagli dal club in aggiornamento.") : "Sospensioni e variazioni urgenti compaiono qui appena pubblicate."}</p>
                       <p className="mt-[8px] flex items-center gap-[6px] text-[13px] font-medium text-[#2b3445]"><CalendarClock className="size-[16px]" aria-hidden="true" />Controllato oggi alle {clock}</p>
                     </div>
                   </div>
@@ -157,11 +157,12 @@ function CommsRow({ row }: { row: Row }) {
         <span className="block text-[15.5px] font-bold leading-[1.2] text-[var(--scd-ink)]">{row.title}</span>
         <span className="mt-[3px] block text-[13.5px] leading-[1.2] text-[var(--scd-sub)]">{row.sub}</span>
       </span>
-      <ChevronRight className="size-[22px] shrink-0 text-[var(--scd-ink)]" strokeWidth={2.4} aria-hidden="true" />
+      {(row.href || row.to) && <ChevronRight className="size-[22px] shrink-0 text-[var(--scd-ink)]" strokeWidth={2.4} aria-hidden="true" />}
     </>
   );
   const cls = "flex items-center gap-[12px] border-b border-[var(--scd-line)] py-[13px] last:border-0";
   if (row.href) return <a href={row.href} target="_blank" rel="noopener noreferrer" className={cls}>{body}</a>;
+  if (!row.to) return <div className={cls}>{body}</div>;
   return <Link to={row.to} search={row.search as never} className={cls}>{body}</Link>;
 }
 

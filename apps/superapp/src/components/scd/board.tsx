@@ -74,8 +74,8 @@ export function GearAction({ onClick }: { onClick?: () => void }) {
 
 /** Posizione di Sky nelle due testate della tavola che la mostrano (Home grande, Staff più raccolta). */
 const SKY_POS = {
-  home: "top-[80px] right-[-66px] w-[272px] sm:top-auto sm:bottom-[-28px] sm:right-[16%] sm:w-[300px]",
-  staff: "top-[86px] right-[-26px] w-[214px] sm:top-auto sm:bottom-[-24px] sm:right-[16%] sm:w-[250px]",
+  home: "top-[68px] right-[-60px] w-[276px] sm:top-auto sm:bottom-[-28px] sm:right-[16%] sm:w-[300px]",
+  staff: "top-[76px] right-[-38px] w-[240px] sm:top-auto sm:bottom-[-24px] sm:right-[16%] sm:w-[250px]",
 } as const;
 
 /**
@@ -91,7 +91,7 @@ export function HeroHeader({
     <header className={cx("relative isolate overflow-hidden text-white", plain ? "scd-hero-plain" : "bg-[var(--scd-navy)]", className)} data-testid={testId}>
       {!plain && (
         <>
-          <img src={lario.url} alt="" aria-hidden="true" className="absolute inset-0 -z-20 h-full w-full object-cover object-[50%_42%] [filter:saturate(1.35)_contrast(1.08)_brightness(1.04)]" />
+          <img src={lario.url} alt="" aria-hidden="true" className="absolute inset-0 -z-20 h-full w-full object-cover object-[50%_42%] [filter:saturate(1.4)_contrast(1.1)_brightness(1.1)]" />
           <div className="scd-hero-shade absolute inset-0 -z-10" aria-hidden="true" />
         </>
       )}
@@ -133,7 +133,7 @@ export function PageHeader({ title, action, testId }: { title: string; action?: 
           <Crest height={80} />
         </Link>
         <div className="flex h-[76px] w-full items-center gap-3 pl-[86px]">
-          <h1 className="min-w-0 flex-1 truncate text-[28px] font-bold leading-none tracking-[-0.01em]">{title}</h1>
+          <h1 className={cx("min-w-0 flex-1 truncate font-bold leading-none tracking-[-0.01em]", title.length > 16 ? "text-[23px] sm:text-[28px]" : title.length > 13 ? "text-[25px] sm:text-[28px]" : "text-[28px]")}>{title}</h1>
           <div className="-mr-2 shrink-0">{action}</div>
         </div>
       </div>
@@ -164,7 +164,7 @@ function MoreLink({ label, target, light = false }: { label: string; target: Lin
 export function SectionHead({ title, more, id }: { title: string; more?: { label: string; target: LinkTarget }; id?: string }) {
   return (
     <div className="flex items-center justify-between gap-3 px-[6px] pb-[8px] pt-[14px]">
-      <h2 id={id} className="text-[20px] font-bold leading-tight text-[var(--scd-ink)]">{title}</h2>
+      <h2 id={id} className="text-[21px] font-bold leading-tight tracking-[-0.01em] text-[var(--scd-ink)]">{title}</h2>
       {more && <MoreLink label={more.label} target={more.target} />}
     </div>
   );
