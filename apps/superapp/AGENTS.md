@@ -1,3 +1,8 @@
+> [!NOTE]
+> This copy lives in `francesco1485/scd-colicoderviese-super-app` under `apps/superapp` and is
+> **not** connected to Lovable. The repository rules in the root `AGENTS.md` and
+> `SCD_SYSTEM_MANIFEST.json` apply. The Lovable note below is kept for provenance only.
+
 <!-- LOVABLE:BEGIN -->
 > [!IMPORTANT]
 > This project is connected to [Lovable](https://lovable.dev). Avoid rewriting

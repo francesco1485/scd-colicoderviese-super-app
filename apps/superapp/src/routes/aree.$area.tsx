@@ -78,6 +78,44 @@ export const Route = createFileRoute("/aree/$area")({
   component: AreaPage,
 });
 
+/**
+ * Privacy guard: the R20 dashboard payload has no field allowlist yet and may
+ * contain personal data (including minors'). Only aggregate shapes are shown:
+ * numbers, booleans and list sizes. Free text is never rendered here.
+ */
+function SafeSummary({ summary }: { summary: unknown }) {
+  if (!summary || typeof summary !== "object" || Array.isArray(summary)) {
+    return (
+      <p className="mt-4 rounded-xl border border-border bg-card p-4 text-sm text-muted-foreground">
+        Dati in sincronizzazione…
+      </p>
+    );
+  }
+  const rows = Object.entries(summary as Record<string, unknown>).flatMap(([k, v]) => {
+    if (typeof v === "number" || typeof v === "boolean") return [[k, String(v)] as const];
+    if (Array.isArray(v)) return [[k, `${v.length} elementi`] as const];
+    if (v && typeof v === "object") return [[k, "disponibile"] as const];
+    return [];
+  });
+  if (rows.length === 0) {
+    return (
+      <p className="mt-4 rounded-xl border border-border bg-card p-4 text-sm text-muted-foreground">
+        Dati in sincronizzazione…
+      </p>
+    );
+  }
+  return (
+    <dl className="mt-4 grid gap-2 rounded-xl border border-border bg-card p-4 text-sm sm:grid-cols-2">
+      {rows.map(([k, v]) => (
+        <div key={k} className="flex justify-between gap-4 border-b border-border py-1">
+          <dt className="text-muted-foreground">{k}</dt>
+          <dd className="font-semibold">{v}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
 function AreaPage() {
   const { area } = Route.useLoaderData();
   const info = AREE[area];
@@ -130,7 +168,7 @@ function AreaPage() {
             <span>Sessione attiva (verificata dal gestionale)</span>
             <button className="font-semibold underline" onClick={() => { sessionStorage.removeItem(key); setToken(null); }}>Esci</button>
           </div>
-          <pre className="mt-4 max-h-64 overflow-auto rounded-xl border border-border bg-card p-4 text-xs">{summary ? JSON.stringify(summary, null, 2) : "Dati in sincronizzazione…"}</pre>
+          <SafeSummary summary={summary} />
           {area === "direzione" && <DirectionPanel token={token} />}
         </>
       ) : (

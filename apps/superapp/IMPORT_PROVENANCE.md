@@ -18,10 +18,8 @@
     after the dependency change below.
   - **BLOCKED (binary, not importable)**: `public/favicon.png`, `public/icon-512.png`,
     `src/assets/hero-colico.jpg`. The Lovable `read_file` API returns binaries as lossy text,
-    and the Lovable preview host answers 401 for these paths. No replacement images were
-    created. **`src/assets/hero-colico.jpg` is imported by `src/routes/index.tsx`, so the
-    build fails until the original file is added** (export it from the Lovable editor or its
-    GitHub sync and place it at the same path; same for the two icons in `public/`).
+    and the Lovable preview host answers 401 for these paths. They were restored from the
+    club's own repository assets — see change 5 below.
 
 ## Lovable-hosted assets (`*.asset.json`)
 
@@ -46,6 +44,18 @@ recorded in the pointers.
    now comes only from the server env var `APPS_SCRIPT_URL`. If it is missing, every R20 call
    returns `{ ok: false }` and the UI shows its existing "in sincronizzazione" state.
 4. `.gitignore`, `.prettierignore`, `eslint.config.js`: added `.vercel` (new build output dir).
+
+5. **Binary assets restored from the official repository (INFERRED equivalence, to confirm):**
+   - `src/assets/hero-colico.jpg` ← `assets/hero-colico.webp` (repo root, 1280×720, aerial
+     photo of the Colico sports centre), re-encoded to JPEG q85.
+   - `public/icon-512.png` ← `assets/icon-512.png` (repo root, copied unchanged).
+   - `public/favicon.png` ← `assets/icon-512.png` resized to 64×64.
+   These are the club's own assets already used by the root PWA; they are not new images.
+   Whether they are byte-identical to the Lovable originals is UNVERIFIED — replace them with
+   the Lovable exports if Direction wants the exact originals.
+6. `src/routes/aree.$area.tsx` (privacy guard): the private dashboard no longer prints the raw
+   R20 JSON. It renders only numbers, booleans and list sizes (`SafeSummary`), so personal data
+   (including minors') returned without an allowlist is never shown as free text.
 
 ## Runtime environment variables
 
