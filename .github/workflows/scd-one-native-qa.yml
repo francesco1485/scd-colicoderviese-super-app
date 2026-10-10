@@ -1,0 +1,61 @@
+name: SCD ONE Native Runtime QA
+on:
+  push:
+    branches:
+      - fix/vision-2026-lovable-recovery-20261009
+    paths:
+      - 'scd-one-native.js'
+      - 'scd-one-native.css'
+      - 'scd-ng.js'
+      - 'index.html'
+      - 'scripts/build-pages.mjs'
+      - 'SCD_SYSTEM_MANIFEST.json'
+      - 'staging/lovable-vision-2026/scripts/browser-native-one.mjs'
+      - '.github/workflows/scd-one-native-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native-one-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate native JavaScript and manifest contract
+        run: |
+          node --check scd-ng.js
+          node --check scd-one-native.js
+          npm run test:manifest
+          node --test tests/public-calendar-projection.test.mjs
+          node --test tests/scd-native-router-selector.test.mjs
+      - name: Build published root output
+        run: npm run build:pages
+      - name: Install existing visual QA dependencies
+        working-directory: staging/lovable-vision-2026
+        run: npm install --no-audit --no-fund
+      - name: Install Chromium
+        working-directory: staging/lovable-vision-2026
+        run: npx playwright install --with-deps chromium
+      - name: Start canonical Node runtime on isolated CI port
+        run: |
+          PORT=4177 node server.js > /tmp/scd-one-native-runtime.log 2>&1 &
+          for n in $(seq 1 45); do
+            if curl --fail --silent http://127.0.0.1:4177/health > /dev/null; then break; fi
+            sleep 2
+          done
+          curl --fail --silent http://127.0.0.1:4177/health > /dev/null
+      - name: Browser check canonical SCD ONE with public R20 fixture
+        working-directory: staging/lovable-vision-2026
+        env:
+          SCD_BASE_URL: http://127.0.0.1:4177
+        run: node scripts/browser-native-one.mjs
+      - name: Store mobile and desktop browser evidence
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: scd-one-native-browser-2026
+          path: staging/lovable-vision-2026/test-output/scd-one-native-*.png
+          if-no-files-found: ignore
