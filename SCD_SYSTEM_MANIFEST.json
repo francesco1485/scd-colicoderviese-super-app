@@ -510,7 +510,12 @@
       "audience": "PUBLIC_READ_ONLY",
       "views": [
         "HOME_PUBLIC",
-        "CALENDAR_LIVE"
+        "CALENDAR_LIVE",
+        "COMMUNICATIONS_PUBLIC",
+        "ATHLETE_PROTECTED_PREVIEW",
+        "FAMILY_PROTECTED_PREVIEW",
+        "STAFF_PROTECTED_PREVIEW",
+        "GROW_PARTNERSHIP_PREVIEW"
       ],
       "user_visual_masters": [
         "01_HOME_PUBBLICA (1).png",
@@ -526,8 +531,8 @@
         "assets/hero-colico.webp"
       ],
       "production_default_unchanged": true,
-      "reviewed_at": "2026-10-09",
-      "next_gate": "BROWSER_SCREENSHOT_VISUAL_PARITY_AND_USER_APPROVAL_BEFORE_DEFAULT_ENABLE"
+      "reviewed_at": "2026-10-10",
+      "next_gate": "THREE_WORLDS_BROWSER_QA_THEN_USER_GRAPHIC_APPROVAL"
     },
     "cross_app_graphic_geographic_identity": {
       "effective_at": "2026-10-09",
@@ -596,6 +601,32 @@
         "PUBLIC_PII_MINORS_SAFEGUARDING",
         "PRODUCTION_PUBLISH_WITHOUT_APPROVAL"
       ]
+    },
+    "native_three_worlds_preview": {
+      "state": "ISOLATED_FEATURE_FLAG",
+      "flag": "?scdVision=1",
+      "reference": "UD-015 / visual_system.cross_app_graphic_geographic_identity",
+      "scope": [
+        "ONE_PUBLIC_HOME_CALENDAR_COMMUNICATIONS",
+        "CORE_ATLETA_FAMIGLIA_STAFF",
+        "GROW_PARTNERSHIP_PROPOSALS"
+      ],
+      "implementation": "NATIVE_DOM_CSS_IN_CANONICAL_RUNTIME_NOT_SCREENSHOT_OVERLAY",
+      "source_files": [
+        "scd-three-worlds-native.js",
+        "scd-three-worlds-native.css"
+      ],
+      "browser_test": "staging/lovable-vision-2026/scripts/browser-three-worlds.mjs",
+      "real_data_source": "EXISTING_VERIFIED_PUBLIC_CALENDAR_R20_ADAPTER",
+      "authenticated_operations": "EXISTING_R20_PRIVATE_DESK_UNCHANGED",
+      "sponsor_operations": "EXISTING_SPONSOR_APP_LINKED_NO_SECOND_CRM",
+      "sponsor_draft": "LOCAL_NON_PERSISTED_NON_SENT_FILE_EXPORT_ONLY",
+      "minors_and_sensitive_data": "NEVER_RENDER_PUBLIC",
+      "screenshot_master_check_required_before_graphic_approval": true,
+      "human_approval_before_public_release": true,
+      "production_default_unchanged": true,
+      "date": "2026-10-10",
+      "delivery_status": "INTERACTIVE_STAGING_NOT_PRODUCTION_COMPLETE"
     }
   },
   "temporal_core": {

@@ -7,7 +7,7 @@ const manifest=JSON.parse(fs.readFileSync(path.join(root,'SCD_SYSTEM_MANIFEST.js
 const nextgen=manifest.architecture?.nextgen_preview?.visual_mode==='SYNTHETIC_NO_REAL_PHOTOGRAPHY';
 
 const common=[
-  'index.html','scd-reboot-2026.css','scd-one-native.css','scd-one-native.js','manifest.webmanifest','SCD_SYSTEM_MANIFEST.json','sw.js','delete-account.html',
+  'index.html','scd-reboot-2026.css','scd-one-native.css','scd-one-native.js','scd-three-worlds-native.css','scd-three-worlds-native.js','manifest.webmanifest','SCD_SYSTEM_MANIFEST.json','sw.js','delete-account.html',
   'content/weekly-news.json','content/public-club.v1.json','robots.txt','sitemap.xml','intake/index.html','intake/admin.html','intake/intake.css','intake/intake-config.public.json','intake/intake.js','intake/admin.js',
   'sponsor/index.html','sponsor/sponsor.css','sponsor/scd-design-system.css','sponsor/sponsor.js'
 ];
