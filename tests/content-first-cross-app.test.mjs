@@ -36,7 +36,9 @@ test('SCD GROW remains the one canonical CRM after cross-app integration',()=>{
  const manifest=JSON.parse(read('SCD_SYSTEM_MANIFEST.json'));
  assert.match(server,/handleSponsorProposalDraftSave/);
  assert.match(server,/handleSponsorLeadInbox/);
- assert.equal(manifest.manifest.version,'3.27.3');
+ assert.equal(manifest.manifest.version,'3.27.4','test follows the current schema-controlled manifest');
+ assert.equal(manifest.visual_system?.cross_app_graphic_geographic_identity?.principle,'ALL_SCREENS_IN_THREE_APPS_MUST_INHERIT_HOME_VISUAL_DNA; HOME_IS_NOT_ONLY_DELIVERABLE');
+ assert.equal(manifest.visual_system?.native_three_worlds_preview?.authenticated_operations,'EXISTING_R20_PRIVATE_DESK_UNCHANGED');
  assert.ok(exists('backend_patch_R60_grow_proposal_draft.gs'));
  const r60=read('backend_patch_R60_grow_proposal_draft.gs');
  assert.match(r60,/R60_WRITE_DISABLED/,'writing must be disabled unless explicitly configured');
