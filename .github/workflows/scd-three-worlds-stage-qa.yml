@@ -33,6 +33,7 @@ jobs:
           node --check scd-one-native.js
           node --check scd-three-worlds-native.js
           npm run test:manifest
+          npm run test:freefirst
           node --test tests/public-calendar-projection.test.mjs
           node --test tests/scd-native-router-selector.test.mjs
       - name: Build static runtime

@@ -14,7 +14,7 @@
     "test": "npm run test:contract && npm run test:resilience && npm run test:smoke",
     "build:pages": "node scripts/build-pages.mjs",
     "test:pages": "npm run build:pages && SCD_STATIC_DIR=_site npm run test:smoke",
-    "test:manifest": "node scripts/validate-system-manifest.mjs && npm run test:freefirst",
+    "test:manifest": "node scripts/validate-system-manifest.mjs",
     "verify:production": "node scripts/verify-production.mjs",
     "test:resilience": "node tests/upstream-resilience.mjs",
     "verify:r20": "node scripts/verify-r20-direct.mjs",
