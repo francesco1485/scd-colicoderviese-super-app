@@ -3,6 +3,35 @@ const fs = require('fs');
 const path = require('path');
 const { URL } = require('url');
 const { issueIntakeToken, verifyIntakeToken } = require('./lib/intake-links');
+const { projectPublicCalendar } = require('./lib/scd-public-calendar-projection');
+const { answerSky } = require('./lib/scd-sky-assistant');
+const {timingSafeEqual}=require('node:crypto');
+const {createIsolatedPreviewR20}=require('./lib/scd-isolated-preview-r20');
+const ISOLATED_PREVIEW=process.env.SCD_ISOLATED_PREVIEW==='true';
+const PREVIEW_PASSWORD=String(process.env.SCD_PREVIEW_PASSWORD||'');
+const PREVIEW_TEST_PIN=String(process.env.SCD_PREVIEW_TEST_PIN||'');
+if(ISOLATED_PREVIEW&&(PREVIEW_PASSWORD.length<20||PREVIEW_TEST_PIN.length<12)){
+  throw new Error('Isolated staging requires an independent preview password and synthetic test PIN');
+}
+const previewR20=ISOLATED_PREVIEW?createIsolatedPreviewR20({pin:PREVIEW_TEST_PIN}):null;
+function previewAuthorized(req){
+  if(!ISOLATED_PREVIEW)return true;
+  const raw=String(req.headers.authorization||'');
+  if(!/^Basic [a-z0-9+/=]+$/i.test(raw))return false;
+  let received='';
+  try{received=Buffer.from(raw.slice(6),'base64').toString('utf8')}catch{return false}
+  const expected=Buffer.from('scd-preview:'+PREVIEW_PASSWORD);
+  const actual=Buffer.from(received);
+  return actual.length===expected.length&&timingSafeEqual(actual,expected);
+}
+const PREVIEW_API_ACTIONS=new Set([
+  '/api/time','/api/core-status','/api/capabilities','/api/preview/status',
+  '/api/public','/api/newsroom','/api/sky/ask','/api/scd',
+  '/api/sponsor/lead','/api/sponsor/otp','/api/sponsor/login','/api/sponsor/session',
+  '/api/sponsor/logout','/api/sponsor/crm','/api/sponsor/lead-inbox',
+  '/api/sponsor/proposal-draft','/api/sponsor/proposal-draft/save'
+]);
+const {projectSponsorLeadInbox,prepareSponsorProposalDraft}=require('./lib/scd-sponsor-lead-workflow');
 
 const PORT = process.env.PORT || 10000;
 const ROOT = process.env.SCD_STATIC_DIR ? path.resolve(__dirname,process.env.SCD_STATIC_DIR) : __dirname;
@@ -54,7 +83,7 @@ function applyCors(req,res){
 
 const READ_ONLY_RETRY_ACTIONS = new Set([
   'public.feed','public.club','public.calendar','public.datafabric.contract',
-  'dashboard.summary','private.dashboard','private.week','account.requests','private.user.workspace','private.crm.summary','private.crm.detail','private.community.summary','private.communication.templates','private.communication.preview',
+  'dashboard.summary','private.dashboard','private.week','account.requests','private.user.workspace','private.crm.summary','private.crm.detail','private.crm.leadInbox','private.community.summary','private.communication.templates','private.communication.preview',
   'private.attendance.get','private.agenda.summary','private.development.summary','auth.validate','auth.identity.resolve','direction.access.metrics','direction.diagnostics',
   'direction.evolution','direction.datafabric.status'
 ]);
@@ -65,7 +94,7 @@ const UPSTREAM_WRITE_TIMEOUT_MS = Math.max(5000,Math.min(30000,Number(process.en
 const wait = ms => new Promise(resolve=>setTimeout(resolve,ms));
 
 const allowedActions = new Set([
-  'dashboard.summary','private.dashboard','private.week','account.requests','private.user.workspace','private.crm.summary','private.crm.detail','private.community.summary','private.communication.templates','private.communication.preview','private.communication.send','private.communication.health','private.agenda.summary','private.agenda.create','private.development.summary',
+  'dashboard.summary','private.dashboard','private.week','account.requests','private.user.workspace','private.crm.summary','private.crm.detail','private.crm.leadInbox','private.crm.proposalDraft.create','private.community.summary','private.communication.templates','private.communication.preview','private.communication.send','private.communication.health','private.agenda.summary','private.agenda.create','private.development.summary',
   'private.request.submit','private.transport.request','private.message.send',
   'private.convocation.create','private.convocation.reply',
   'private.attendance.get','private.attendance.save',
@@ -299,6 +328,16 @@ async function handleSponsorAccessRequest(req,res){
 }
 async function handleSponsorOtp(req,res){
   if(req.method!=='POST')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  if(ISOLATED_PREVIEW){
+    let input={};
+    try{input=JSON.parse(await readBody(req)||'{}')}catch{return json(res,400,{ok:false,error:'INVALID_REQUEST'})}
+    if(String(input.email||'').trim().toLowerCase()!=='operatore@example.invalid'){
+      return json(res,403,{ok:false,error:'STAGING_TEST_ACCOUNT_ONLY'});
+    }
+    return json(res,200,{ok:true,delivery:'STAGING_TEST_PIN',
+      message:'Nessuna email inviata. Utilizza esclusivamente il PIN di collaudo fornito per la verifica.'});
+  }
+
   let email='';
   try{
     const b=JSON.parse(await readBody(req)||'{}');
@@ -355,6 +394,82 @@ async function handleSponsorCrm(req,res,u){
     return json(res,403,{ok:false,error:e.message||'CRM_ACCESS_DENIED'});
   }
 }
+async function readSponsorInbox(token,limit=100){
+  const result=await callAppsScript('private.crm.leadInbox',{limit},token);
+  const data=requireUpstreamSuccess(result,'Richieste sponsor R20')||{};
+  if(!Array.isArray(data.requests)||!Array.isArray(data.stakeholders))throw new Error('CRM_LEAD_SOURCE_INVALID');
+  return projectSponsorLeadInbox(data.requests,data.stakeholders);
+}
+async function handleSponsorLeadInbox(req,res){
+  if(req.method!=='GET')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  try{
+    const session=await validateSponsorSession(req);
+    const rows=await readSponsorInbox(session.token,100);
+    return json(res,200,{ok:true,rows,readOnly:true,source:'R20_APP_PUBLIC_REQUESTS',linkPolicy:'MANUAL_REVIEW'},{'cache-control':'no-store'});
+  }catch(e){return json(res,403,{ok:false,error:String(e.message||'CRM_LEAD_INBOX_UNAVAILABLE')},{'cache-control':'no-store'})}
+}
+async function handleSponsorProposalDraft(req,res){
+  if(req.method!=='POST')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  try{
+    const session=await validateSponsorSession(req);
+    const input=JSON.parse(await readBody(req)||'{}');
+    if(input.associationReviewed!==true)return json(res,400,{ok:false,error:'REVIEW_REQUIRED'});
+    const leadId=String(input.requestId||'').trim();
+    const stakeholderId=String(input.stakeholderId||'').trim();
+    if(!leadId||!stakeholderId)return json(res,400,{ok:false,error:'SOURCE_IDS_REQUIRED'});
+    const leads=await readSponsorInbox(session.token,250);
+    const lead=leads.find(item=>item.requestId===leadId);
+    if(!lead)throw new Error('LEAD_NOT_FOUND');
+    if(!lead.candidateStakeholderIds.includes(stakeholderId))throw new Error('STAKEHOLDER_MISMATCH');
+    const detail=requireUpstreamSuccess(await callAppsScript('private.crm.detail',{id:stakeholderId},session.token),'Profilo CRM')||{};
+    const stakeholder=detail.stakeholder||{};
+    if(String(stakeholder.STAKEHOLDER_ID||'')!==stakeholderId)throw new Error('CRM_ID_MISMATCH');
+    const draft=prepareSponsorProposalDraft({
+      lead,stakeholder:{id:stakeholderId,name:stakeholder.NOME,contactPolicy:stakeholder.CONTACT_POLICY},
+      associationReviewed:true,asset:input.asset,objective:input.objective
+    });
+    return json(res,200,{ok:true,data:draft,message:'Bozza generata, NON salvata e NON inviata. Richiede revisione e registrazione nel CRM canonico.'},{'cache-control':'no-store'});
+  }catch(e){return json(res,403,{ok:false,error:String(e.message||'PROPOSAL_DRAFT_DENIED')},{'cache-control':'no-store'})}
+}
+
+async function handleSponsorProposalDraftSave(req,res){
+  if(req.method!=='POST')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  let session;
+  try{session=await validateSponsorSession(req)}
+  catch(e){return json(res,403,{ok:false,error:'SPONSOR_SESSION_REQUIRED'},{'cache-control':'no-store'})}
+  let input;
+  try{input=JSON.parse(await readBody(req)||'{}')}
+  catch{return json(res,400,{ok:false,error:'INVALID_REQUEST'},{'cache-control':'no-store'})}
+  if(input.confirm!==true||input.associationReviewed!==true){
+    return json(res,400,{ok:false,error:'EXPLICIT_REVIEW_AND_CONFIRM_REQUIRED'},{'cache-control':'no-store'});
+  }
+  const requestId=String(input.requestId||'').trim();
+  const stakeholderId=String(input.stakeholderId||'').trim();
+  const asset=String(input.asset||'').trim();
+  if(!requestId||!stakeholderId||!asset){
+    return json(res,400,{ok:false,error:'REQUEST_STAKEHOLDER_ASSET_REQUIRED'},{'cache-control':'no-store'});
+  }
+  try{
+    const lead=(await readSponsorInbox(session.token,250)).find(row=>row.requestId===requestId);
+    if(!lead||lead.linkState!=='REVIEW_REQUIRED'||lead.candidateStakeholderIds.length!==1||lead.candidateStakeholderIds[0]!==stakeholderId){
+      return json(res,409,{ok:false,error:'SOURCE_LINK_REVIEW_REQUIRED'},{'cache-control':'no-store'});
+    }
+    const detail=requireUpstreamSuccess(await callAppsScript('private.crm.detail',{id:stakeholderId},session.token),'Profilo CRM')||{};
+    const stakeholder=detail.stakeholder||{};
+    if(String(stakeholder.STAKEHOLDER_ID||'')!==stakeholderId||/SOSPESO|NO_CONTACT/i.test(String(stakeholder.CONTACT_POLICY||''))){
+      return json(res,409,{ok:false,error:'CRM_LINK_OR_POLICY_BLOCKED'},{'cache-control':'no-store'});
+    }
+    const result=await callAppsScript('private.crm.proposalDraft.create',{
+      requestId,stakeholderId,asset,objective:String(input.objective||''),associationReviewed:true,confirm:true
+    },session.token);
+    const data=requireUpstreamSuccess(result,'Salvataggio bozza sponsor')||{};
+    if(data.persisted!==true||!data.opportunityId)throw new Error('PERSISTENCE_NOT_CONFIRMED');
+    return json(res,200,{ok:true,data,source:'R20_COMMERCIALE_OPPORTUNITA',requiresApproval:true},{'cache-control':'no-store'});
+  }catch(e){
+    return json(res,502,{ok:false,error:String(e.message||'CRM_DRAFT_SAVE_UNAVAILABLE')},{'cache-control':'no-store'});
+  }
+}
+
 async function handleSponsorMailHealth(req,res){
   if(req.method!=='GET')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
   try{
@@ -489,6 +604,12 @@ async function serveSponsorPrivate(req,res,u){
 function decodeXml(s=''){return String(s).replace(/<!\[CDATA\[|\]\]>/g,'').replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>')}
 
 async function callAppsScript(action,payload={},sessionToken=''){
+  // In isolated preview this is the *only* upstream: absolutely no network request.
+  if(previewR20){
+    const parsed=previewR20.action(action,payload,sessionToken);
+    const status=parsed.ok===true?200:403;
+    return {upstream:{ok:parsed.ok===true,status},parsed,attempt:1};
+  }
   const maxAttempts=READ_ONLY_RETRY_ACTIONS.has(action)?UPSTREAM_READ_ATTEMPTS:1;
   let lastError;
   for(let attempt=1;attempt<=maxAttempts;attempt++){
@@ -526,7 +647,7 @@ async function proxyAppsScript(req,res){
     const raw = await readBody(req); const body = JSON.parse(raw||'{}'); const action=String(body.action||''); const started=Date.now(); console.log('[api/scd] incoming',action,req.headers.origin||'server');
     if(!allowedActions.has(action)) return json(res,400,{ok:false,error:'Azione non consentita'});
     const {upstream,parsed,attempt}=await callAppsScript(action,body.payload||{},body.sessionToken||'');
-    console.log('[api/scd] upstream',action,upstream.status,(Date.now()-started)+'ms','attempt',attempt); return json(res,upstream.ok?200:400,parsed);
+    console.log('[api/scd] upstream',action,upstream.status,(Date.now()-started)+'ms','attempt',attempt); return json(res,ISOLATED_PREVIEW?upstream.status:(upstream.ok?200:400),parsed);
   }catch(e){console.error('[api/scd] failed',e.message||e);return json(res,502,{ok:false,error:e.message||'Backend SCD non disponibile'})}
 }
 
@@ -724,27 +845,14 @@ async function buildWeeklyNewsroom(){
   const sourceStatus={calendar:'ERROR',feed:'ERROR',officialSite:'DISABLED_FOR_NEWS',webNews:'DISABLED_FOR_NEWS'};
   try{
     const c=await callAppsScript('public.calendar',{rangeKey:'ALL',offset:0},'');
-    calendarRaw=c.parsed;sourceStatus.calendar='OK';
+    calendarRaw=requireUpstreamSuccess(c,'Calendario pubblico');sourceStatus.calendar='OK';
   }catch(e){sourceStatus.calendar='ERROR:'+String(e.code||e.message||e)}
   try{
     const f=await callAppsScript('public.feed',{limit:80},'');
     feedRaw=f.parsed;sourceStatus.feed='OK';
   }catch(e){sourceStatus.feed='ERROR:'+String(e.code||e.message||e)}
 
-  const allCalendar=rowsFrom(calendarRaw).map((row,i)=>({
-    id:pick(row,'id','eventId','uid')||'CAL-'+i,
-    title:String(pick(row,'title','event','name','subject')||'Attività SCD'),
-    date:isoDateOnly(pick(row,'date','data','startDate')),
-    time:String(pick(row,'time','ora','startTime')||''),
-    endTime:String(pick(row,'endTime','fine')||''),
-    team:teamLabel(row),
-    category:String(pick(row,'category','categoria','ageGroup','annata')||''),
-    opponent:String(pick(row,'opponent','opponentName','avversario')||''),
-    competition:String(pick(row,'competition','campionato','league')||''),
-    venue:String(pick(row,'venue','luogo','field','location')||''),
-    kind:eventKind(row),
-    source:String(pick(row,'source','fonte')||'R20_CALENDAR')
-  })).filter(x=>x.date);
+  const allCalendar=projectPublicCalendar(rowsFrom(calendarRaw));
 
   const calendar=allCalendar.filter(x=>x.date>=week.start&&x.date<=week.end);
   const nowParts=romeDateParts();
@@ -893,6 +1001,27 @@ async function buildWeeklyNewsroom(){
   };
 }
 
+async function handleSkyAsk(req,res){
+  if(req.method!=='POST')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  let input;
+  try{
+    input=JSON.parse(await readBody(req)||'{}');
+    if(!input||typeof input.question!=='string'||input.question.trim().length>500||!input.question.trim()){
+      return json(res,400,{ok:false,error:'SKY_INVALID_QUESTION'});
+    }
+  }catch(e){return json(res,400,{ok:false,error:'SKY_INVALID_REQUEST'})}
+  try{
+    let data=answerSky({question:input.question,app:input.app});
+    if(data.answer.startsWith('DATO_IN_AGGIORNAMENTO')){
+      const news=await buildWeeklyNewsroom();
+      data=answerSky({question:input.question,app:input.app,publicNews:news});
+    }
+    return json(res,200,{ok:true,data,sourcePolicy:'PUBLIC_GROUNDED_R20_ONLY'},{'cache-control':'no-store'});
+  }catch(e){
+    return json(res,503,{ok:false,error:'SKY_TEMPORARILY_UNAVAILABLE'},{'cache-control':'no-store'});
+  }
+}
+
 async function getLiveRadar(){
   return {
     ok:true,
@@ -917,6 +1046,16 @@ function serveStatic(req,res,overridePath){
     fs.stat(target,(err2,st2)=>{
       if(err2||!st2.isFile()){res.writeHead(404);return res.end('Not found')}
       const ext=path.extname(target).toLowerCase();
+      if(ISOLATED_PREVIEW&&ext==='.html'){
+        return fs.readFile(target,'utf8',(readErr,html)=>{
+          if(readErr)return json(res,500,{ok:false,error:'PREVIEW_HTML_UNAVAILABLE'});
+          const ribbon='<div role="status" id="scd-preview-banner" style="position:sticky;top:0;z-index:2147483000;text-align:center;background:#1b1b24;color:#ffffff;padding:11px;font:600 13px system-ui">COLLAUDO SCD · DATI SINTETICI · NESSUNA OPERAZIONE REALE</div>';
+          const localLinks=html.replaceAll('https://scd-colicoderviese-official-r21.onrender.com/sponsor/?login=1','/sponsor/?login=1');
+          const marked=localLinks.replace(/<body([^>]*)>/i,(matched)=>matched+ribbon);
+          res.writeHead(200,{'content-type':mime[ext],'cache-control':'no-store','x-robots-tag':'noindex, nofollow'});
+          return res.end(marked);
+        });
+      }
       const cache=/\.(png|jpg|jpeg|webp|svg)$/.test(ext)?'public, max-age=86400':'no-store';
       res.writeHead(200,{'content-type':mime[ext]||'application/octet-stream','cache-control':cache});
       fs.createReadStream(target).pipe(res)
@@ -925,11 +1064,22 @@ function serveStatic(req,res,overridePath){
 }
 
 http.createServer(async(req,res)=>{
-  applyCors(req,res); if(req.method==='OPTIONS'){res.writeHead(204);return res.end()}
+  applyCors(req,res);
   const u=new URL(req.url,'http://localhost');
-  if(u.pathname==='/health') return json(res,200,{...clubTimePayload(),service:'SCD Super App',version:'40.0.0',commit:DEPLOY_COMMIT});
+  if(ISOLATED_PREVIEW&&u.pathname!=='/health'&&!previewAuthorized(req)){
+    res.writeHead(401,{'www-authenticate':'Basic realm="SCD collaudo isolato", charset="UTF-8"','cache-control':'no-store','x-robots-tag':'noindex, nofollow'});
+    return res.end('Accesso collaudo SCD richiesto');
+  }
+  if(req.method==='OPTIONS'){res.writeHead(204);return res.end()}
+  if(ISOLATED_PREVIEW&&u.pathname.startsWith('/api/')&&!PREVIEW_API_ACTIONS.has(u.pathname)){
+    return json(res,403,{ok:false,error:'PREVIEW_OPERATION_DISABLED'});
+  }
+  if(ISOLATED_PREVIEW&&u.pathname==='/api/preview/status'){
+    return json(res,200,{ok:true,...previewR20.status()});
+  }
+  if(u.pathname==='/health') return json(res,200,{...clubTimePayload(),service:'SCD Super App',version:'40.0.0',commit:DEPLOY_COMMIT,isolatedPreview:ISOLATED_PREVIEW});
   if(u.pathname==='/api/time') return json(res,200,clubTimePayload());
-  if(u.pathname==='/api/capabilities') return json(res,200,{ok:true,version:'40.0.0',mode:'GITHUB_PAGES_RENDER_R20_SUPABASE_DUAL_RUN',actions:[...allowedActions].sort(),featureFlags:FEATURE_FLAGS,domainCore:SUPABASE_RUNTIME,isolated:['safeguarding']});
+  if(u.pathname==='/api/capabilities') return json(res,200,{ok:true,version:'40.0.0',mode:ISOLATED_PREVIEW?'ISOLATED_STAGING_SYNTHETIC':'GITHUB_PAGES_RENDER_R20_SUPABASE_DUAL_RUN',actions:ISOLATED_PREVIEW?['public.calendar','public.feed','dashboard.summary','auth.login','auth.validate','auth.access.log','private.crm.summary','private.crm.detail','private.crm.leadInbox','private.crm.proposalDraft.create']:[...allowedActions].sort(),featureFlags:FEATURE_FLAGS,domainCore:SUPABASE_RUNTIME,isolated:['safeguarding']});
   if(u.pathname==='/api/core-status') return json(res,200,{ok:true,version:'40.0.0',featureFlags:FEATURE_FLAGS,domainCore:SUPABASE_RUNTIME,currentPrimary:'R20',targetPrimary:'SCD_SUPABASE'});
   if(u.pathname==='/api/public/donation-config') return handleDonationConfig(req,res);
   if(u.pathname==='/api/public/donation-intent') return handleDonationIntent(req,res);
@@ -940,6 +1090,9 @@ http.createServer(async(req,res)=>{
   if(u.pathname==='/api/sponsor/session') return handleSponsorSession(req,res,u);
   if(u.pathname==='/api/sponsor/logout') return handleSponsorLogout(req,res);
   if(u.pathname==='/api/sponsor/crm') return handleSponsorCrm(req,res,u);
+  if(u.pathname==='/api/sponsor/lead-inbox') return handleSponsorLeadInbox(req,res);
+  if(u.pathname==='/api/sponsor/proposal-draft') return handleSponsorProposalDraft(req,res);
+  if(u.pathname==='/api/sponsor/proposal-draft/save') return handleSponsorProposalDraftSave(req,res);
   if(u.pathname==='/api/sponsor/mail-health') return handleSponsorMailHealth(req,res);
   if(u.pathname==='/api/sponsor/motion-profiles') return handleSponsorMotionProfiles(req,res);
   if(u.pathname==='/api/sponsor/community') return handleSponsorCommunity(req,res);
@@ -953,6 +1106,7 @@ http.createServer(async(req,res)=>{
   if(u.pathname==='/api/intake/admin/templates') return handleIntakeAdminTemplates(req,res);
   if(u.pathname==='/api/intake/admin/link') return handleIntakeAdminLink(req,res);
   if(u.pathname==='/api/public') return json(res,200,await fetchPublicFeed(),{'cache-control':'no-store'});
+  if(u.pathname==='/api/sky/ask') return handleSkyAsk(req,res);
   if(u.pathname==='/api/newsroom') {try{return json(res,200,await buildWeeklyNewsroom(),{'cache-control':'public, max-age=180'})}catch(e){return json(res,500,{ok:false,error:e.message})}}
   if(u.pathname==='/api/live') {try{return json(res,200,await getLiveRadar(),{'cache-control':'public, max-age=300'})}catch(e){return json(res,500,{ok:false,error:e.message})}}
   return serveStatic(req,res);

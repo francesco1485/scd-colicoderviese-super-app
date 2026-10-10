@@ -3,8 +3,8 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.27.0",
-    "effective_at": "2026-10-03",
+    "version": "3.27.5",
+    "effective_at": "2026-10-10",
     "status": "BINDING",
     "language": "it-IT",
     "timezone": "Europe/Rome",
@@ -128,6 +128,11 @@
     {
       "id": "INV-013",
       "statement": "Ogni nuova funzione deve essere assegnata a SCD ONE, SCD CORE o SCD GROW prima dello sviluppo; una quarta applicazione SCD richiede approvazione esplicita della Direzione.",
+      "enforcement": "BLOCKING"
+    },
+    {
+      "id": "INV-014",
+      "statement": "Riutilizzare prima strumenti gratuiti o inclusi e skill già installate; vietate duplicazioni, offerte non verificate, saldi crediti inventati, pagamenti o azioni esterne non autorizzate.",
       "enforcement": "BLOCKING"
     }
   ],
@@ -282,7 +287,10 @@
         "LAKE_AQUA",
         "MUTED_GOLD",
         "WARM_WHITE",
-        "LOW_SATURATION_ACCENTS"
+        "LOW_SATURATION_ACCENTS",
+        "SCD_NAVY",
+        "SCD_YELLOW",
+        "CLEAN_WHITE"
       ],
       "territory": [
         "COLICO",
@@ -301,7 +309,6 @@
         "schermate_vuote",
         "card_senza_azione",
         "sponsor_nascosti",
-        "REAL_PHOTOGRAPHY_IN_NEXTGEN_UI",
         "HIGH_SATURATION_FULL_SCREEN_COLOR",
         "BROCHURE_HERO",
         "GENERIC_WHITE_CARD_GRID",
@@ -339,13 +346,16 @@
         "AVIF"
       ],
       "no_foreign_rectangular_background_around_logos": true,
-      "nextgen_real_photography_in_ui": false,
+      "nextgen_real_photography_in_ui": true,
       "allowed_real_media": [
         "OFFICIAL_LOGOS",
         "FUNCTIONAL_DOCUMENTS",
-        "USER_MEDIA_WHEN_REQUIRED_BY_SERVICE_AND_AUTHORIZED"
+        "USER_MEDIA_WHEN_REQUIRED_BY_SERVICE_AND_AUTHORIZED",
+        "APPROVED_TERRITORY_PHOTOGRAPHY_WITH_DOCUMENTED_RIGHTS",
+        "AUTHORIZED_SPORT_AND_TEAM_PHOTOGRAPHY_WITH_CONSENT",
+        "OFFICIAL_CLUB_MASCOT_ASSET"
       ],
-      "synthetic_scene_rule": "SPORT_TERRITORY_STADIUM_AND_EDITORIAL_ATMOSPHERE_MUST_BE_ORIGINAL_SYNTHETIC_RENDERING",
+      "synthetic_scene_rule": "Use original synthetic scenes when verified authorized photos are unavailable. Use authorized real SCD/territory photos when approved and accessible; never synthesize factual-looking athlete/team/venue scenes as real evidence.",
       "no_raster_layout_patches": true,
       "no_raw_user_photo_render_in_twin": true
     },
@@ -443,6 +453,187 @@
         "OVERLAYS",
         "MEDIA_LOADING",
         "INITIAL_INFORMATION_VOLUME"
+      ]
+    },
+    "current_user_visual_directive": {
+      "effective_at": "2026-10-09",
+      "authority": "DIREZIONE_SCD",
+      "user_directive": "UD-011",
+      "scope": "GRAPHIC_FIRST_FULL_SYSTEM_THREE_APPS",
+      "canonical_brief": "docs/SCD_DNA_GRAFICO_OPERATIVO_2026-10-09.md",
+      "reference_registry": "config/scd-visual-references.v1.json",
+      "primary_board": "VR-009",
+      "six_screen_reference_ids": [
+        "VR-010",
+        "VR-011",
+        "VR-012",
+        "VR-013",
+        "VR-014",
+        "VR-015"
+      ],
+      "ecosystem_reference_ids": [
+        "VR-016",
+        "VR-017",
+        "VR-018",
+        "VR-019",
+        "VR-020",
+        "VR-021"
+      ],
+      "status": "USER_SUPPLIED_VISUAL_TARGET_IMPLEMENTATION_NOT_YET_APPROVED",
+      "priority_order": [
+        "VISUAL_RESEARCH_ASSET_RECOVERY",
+        "COMPLETE_VISUAL_DESIGN_SYSTEM",
+        "INTERACTIVE_RESPONSIVE_UI_ALL_SCOPES",
+        "REAL_DATA_ADAPTERS_AND_DYNAMIC_INTERACTIONS",
+        "MOTION_SPATIAL_3D_WITH_USABILITY",
+        "INDEXING_AND_AUTOMATION",
+        "ROLE_SCOPED_SKY_MEMORY_ENGINE"
+      ],
+      "visual_acceptance": "MOBILE_DESKTOP_RENDER_COMPARISON_ALL_SIX_SCREENS_AND_ONE_CORE_GROW_REPRESENTATIVE_ROUTES",
+      "design_rules": [
+        "SPORT_EDITORIAL_PREMIUM_SCD_NOT_GENERIC_SAAS",
+        "NAVY_YELLOW_WHITE_BRUSH_MOUNTAINS_LAKE_SKY",
+        "SIX_REFERENCE_SCREENS_NOT_FAKE_PHONE_POSTER",
+        "THREE_COORDINATED_REAL_APPS_ONE_IDENTITY",
+        "DRIVE_CANVA_PRESS_OFFICE_ASSET_RECOVERY_FIRST",
+        "NO_FAKE_SPORT_EVENTS_PEOPLE_SPONSORS_OR_PAYMENTS",
+        "PHOTO_RIGHTS_PRIVACY_OF_MINORS_AND_APPROVAL_REQUIRED",
+        "NO_PUBLIC_PRODUCTION_MUTATIONS_WITHOUT_AUTHORIZATION"
+      ],
+      "status_source": "USER_COMMAND_2026_10_09",
+      "home_reference_is": "SHARED_VISUAL_DNA_FOR_ALL_SIX_AND_ALL_THREE_APPS_NOT_SINGLE_SCREEN_SCOPE",
+      "cross_app_contract": "visual_system.cross_app_graphic_geographic_identity"
+    },
+    "user_master_source_override_legacy_restrictions": {
+      "effective_at": "2026-10-09",
+      "rule": "Recent explicitly user-directed visual references and authorized original photographs govern new 2026/27 visual design. Older synthetic-only/legacy snapshot flags document old builds and are not future prohibitions. Keep fallback independent of images.",
+      "older_snapshots_not_runtime_approval": true
+    },
+    "native_one_preview": {
+      "state": "ISOLATED_FEATURE_FLAG",
+      "flag": "?scdVision=1",
+      "audience": "PUBLIC_READ_ONLY",
+      "views": [
+        "HOME_PUBLIC",
+        "CALENDAR_LIVE",
+        "COMMUNICATIONS_PUBLIC",
+        "ATHLETE_PROTECTED_PREVIEW",
+        "FAMILY_PROTECTED_PREVIEW",
+        "STAFF_PROTECTED_PREVIEW",
+        "GROW_PARTNERSHIP_PREVIEW"
+      ],
+      "user_visual_masters": [
+        "01_HOME_PUBBLICA (1).png",
+        "02_CALENDARIO_LIVE (1).png"
+      ],
+      "render_type": "NATIVE_DOM_CSS_COMPONENTS_NOT_PNG_OVERLAY",
+      "data_source": "EXISTING_R20_PUBLIC_CALENDAR_VIA_SCD_NEXTGEN",
+      "scope": "existing index.html, same-origin API and existing SCDNextGen router",
+      "invariant": "NO_SECOND_DATABASE_NO_SYNTHETIC_MATCH_NO_PRIVATE_DATA",
+      "original_assets": [
+        "assets/logo-scd.png",
+        "assets/sky.png",
+        "assets/hero-colico.webp"
+      ],
+      "production_default_unchanged": true,
+      "reviewed_at": "2026-10-10",
+      "next_gate": "THREE_WORLDS_BROWSER_QA_THEN_USER_GRAPHIC_APPROVAL"
+    },
+    "native_three_worlds_preview": {
+      "state": "ISOLATED_FEATURE_FLAG",
+      "flag": "?scdVision=1",
+      "reference": "UD-015 / visual_system.cross_app_graphic_geographic_identity",
+      "scope": [
+        "ONE_PUBLIC_HOME_CALENDAR_COMMUNICATIONS",
+        "CORE_ATLETA_FAMIGLIA_STAFF",
+        "GROW_PARTNERSHIP_PROPOSALS"
+      ],
+      "implementation": "NATIVE_DOM_CSS_IN_CANONICAL_RUNTIME_NOT_SCREENSHOT_OVERLAY",
+      "source_files": [
+        "scd-three-worlds-native.js",
+        "scd-three-worlds-native.css"
+      ],
+      "browser_test": "staging/lovable-vision-2026/scripts/browser-three-worlds.mjs",
+      "real_data_source": "EXISTING_VERIFIED_PUBLIC_CALENDAR_R20_ADAPTER",
+      "authenticated_operations": "EXISTING_R20_PRIVATE_DESK_UNCHANGED",
+      "sponsor_operations": "EXISTING_SPONSOR_APP_LINKED_NO_SECOND_CRM",
+      "sponsor_draft": "LOCAL_NON_PERSISTED_NON_SENT_FILE_EXPORT_ONLY",
+      "minors_and_sensitive_data": "NEVER_RENDER_PUBLIC",
+      "screenshot_master_check_required_before_graphic_approval": true,
+      "human_approval_before_public_release": true,
+      "production_default_unchanged": true,
+      "date": "2026-10-10",
+      "delivery_status": "INTERACTIVE_STAGING_NOT_PRODUCTION_COMPLETE",
+      "staging_service": "scd-content-first-stage-20261008",
+      "staging_source_branch": "feat/content-first-three-app-integration-20261008",
+      "staging_purpose": "EXPLICIT_USER_REVIEW_NO_PRODUCTION_CUTOVER"
+    },
+    "cross_app_graphic_geographic_identity": {
+      "effective_at": "2026-10-09",
+      "authority": "DIREZIONE_SCD_LATEST_EXPLICIT_CORRECTION",
+      "reference": "VR-009 Home plus VR-010..VR-021 user-supplied graphics",
+      "principle": "ALL_SCREENS_IN_THREE_APPS_MUST_INHERIT_HOME_VISUAL_DNA; HOME_IS_NOT_ONLY_DELIVERABLE",
+      "applications": [
+        "SCD_ONE_UNIVERSE_SOCIAL",
+        "SCD_CORE_GESTIONALE",
+        "SCD_GROW_SPONSOR"
+      ],
+      "applies_to": [
+        "HOME_PUBLIC",
+        "CALENDAR_LIVE",
+        "NEWS",
+        "COMMUNITY",
+        "EVENTS",
+        "MEDIA",
+        "COMMUNICATIONS",
+        "ATHLETE",
+        "FAMILY",
+        "DOCUMENTS",
+        "PAYMENTS",
+        "STAFF",
+        "DIRECTION",
+        "TRAINING",
+        "VENUES_TRANSPORT",
+        "SPONSOR_OFFERS",
+        "PARTNERS",
+        "SPONSOR_CRM",
+        "SPONSOR_ANALYTICS"
+      ],
+      "common_visual_grammar": [
+        "SCD_OFFICIAL_CREST_ASSET",
+        "SCD_YELLOW_BLUE_NAVY_WHITE",
+        "SPORT_TYPOGRAPHY_CLEAR_HIERARCHY",
+        "ALTO_LARIO_AUTHENTIC_LAKE_MOUNTAIN_IMAGERY",
+        "COLICO_DERVIO_TERRITORIAL_PHOTOGRAPHY_WHERE_APPROPRIATE_AND_AUTHORIZED",
+        "OFFICIAL_SKY_MASCOT_IN_RELEVANT_CONTEXTS",
+        "NAVIGATION_TABS_QUICK_ACTIONS_ROLE_CARDS_UNIFIED",
+        "MATCH_CALENDAR_NEWS_SPONSOR_MODULES_SHARED",
+        "BRAND_TEXTURES_BRUSHES_AND_SPORT_VISUAL_RHYTHM",
+        "MOBILE_FIRST_AND_INDEPENDENT_DESKTOP_RESPONSIVE"
+      ],
+      "territory": [
+        "COLICO",
+        "DERVIO",
+        "ALTO_LARIO",
+        "LAGO_DI_COMO",
+        "MONTAGNE",
+        "CAMPI_E_CENTRI_SPORTIVI",
+        "COMUNITA_LOCALE"
+      ],
+      "geography_rule": "Territory is a consistent identity element through verified photos, approved illustrations and spatial context; do not invent exact stadium/venue identity or reuse one photograph irrespective of screen context.",
+      "consistency_rule": "All routes must look like ONE coordinated SCD product family. Same visual components and tokens; screens may differ in information density and layout for their real job. Not six identical Home clones.",
+      "internal_ux_rule": "CORE/GROW operational pages primarily blue and white with yellow accents; authenticated documents, payments, tables and protected data stay readable and do not use distracting cinematic backgrounds over forms.",
+      "implementation_rule": "Functional HTML/CSS/React components on existing applications, preserve APIs/data permissions; whole-screen PNG/clickable overlay is not a compliant final UI.",
+      "validation_rule": "For every approved visual screen and each representative section of ONE, CORE and GROW, compare actual mobile/desktop browser renders with the user-supplied source board and document differences, route actions and tests. Passing build alone is insufficient.",
+      "candidate_agent_gate": "Home may be the FIRST agent qualification sample, but passing Home does NOT complete the mandate or release GROW/CORE. Gate requires expansion to every relevant route across all three apps and human final review.",
+      "forbidden": [
+        "HOME_ONLY_SCOPE",
+        "HOME_REDESIGN_AS_GENERIC_SAAS",
+        "ONLY_RECOLOR_OTHER_APPS",
+        "SECOND_APP_DATABASE_OR_CRM",
+        "INVENTED_SPORT_FACTS_OR_SPONSOR_MARKS",
+        "PUBLIC_PII_MINORS_SAFEGUARDING",
+        "PRODUCTION_PUBLISH_WITHOUT_APPROVAL"
       ]
     }
   },
@@ -1544,7 +1735,9 @@
         "AUTHORIZED_EVENTS",
         "AUTHORIZED_DOCUMENT_STATUS"
       ],
-      "must_not_bypass_permissions": true
+      "must_not_bypass_permissions": true,
+      "runtime_status": "STAGED_PUBLIC_RULES_ONLY_NOT_LLM_CONNECTED",
+      "verified_source_policy": "R20_PUBLIC_CALENDAR_AND_CANONICAL_PUBLIC_CONTACTS_ONLY"
     },
     "personal_avatar": {
       "photo_or_generated": false,
@@ -3385,6 +3578,42 @@
         "ROLLBACK_REQUIRED"
       ],
       "completion_rule": "A block is complete only after code/data logic, responsive/accessibility, automated tests, browser or equivalent smoke, visual QA where relevant, release evidence and rollback are present."
+    },
+    "scd_free_first": {
+      "id": "SCD_FREE_FIRST",
+      "source": "DIREZIONE_SCD_2026_10_10",
+      "status": "BINDING",
+      "config": "config/scd-free-first.v1.json",
+      "commands": [
+        "/credits",
+        "/freefirst",
+        "/nonprofit",
+        "/trialgate",
+        "/toolscore",
+        "/skillreuse",
+        "/creditbudget",
+        "/sourcecheck"
+      ],
+      "rules": {
+        "duplicate_tools": "DENY",
+        "unofficial_claims": "VERIFY_FIRST",
+        "credits_balance": "UNKNOWN_UNTIL_CHECKED",
+        "payments": "HUMAN_APPROVAL",
+        "external_actions": "HUMAN_APPROVAL"
+      },
+      "required_before": [
+        "NEW_AI_TOOL",
+        "NEW_PLUGIN_OR_SKILL",
+        "NEW_PROVIDER",
+        "START_TRIAL",
+        "ADD_CREDITS",
+        "PAID_SERVICE",
+        "REPLACE_EXISTING_LICENSE",
+        "NEW_MARKETING_OR_DESIGN_TOOL"
+      ],
+      "lifecycle": "INVENTORY_EXISTING->OFFICIAL_VERIFY->DEDUPE->TRIAL_NONPROFIT_BUDGET->TOOL_SCORE->HUMAN_GATE",
+      "execution": "npm run scd:freefirst -- /freefirst",
+      "gate": "NO_AUTOMATIC_SPEND_NO_EXTERNAL_SIDE_EFFECTS"
     }
   },
   "product_direction": {
@@ -4247,6 +4476,98 @@
         "minor_rule": "NO_UNSUPERVISED_1TO1",
         "transport": "EXISTING_R20_TEAM_MESSAGE_INFRASTRUCTURE"
       }
+    },
+    "sponsor_lead_inbox_content_first": {
+      "release": "CONTENT_FIRST_2026_10_08",
+      "state": "STAGED_PERSISTED_DRAFT_CODE_R20_RUNTIME_UNVERIFIED",
+      "runtime_primary": "R20",
+      "source_tables": [
+        "APP PUBLIC REQUESTS",
+        "STAKEHOLDERS_MASTER"
+      ],
+      "source_action": "private.crm.leadInbox",
+      "existing_auth": "R20_AUTH_VALIDATE_SPONSOR_ROLE",
+      "api_routes": [
+        "/api/sponsor/lead-inbox",
+        "/api/sponsor/proposal-draft",
+        "/api/sponsor/proposal-draft/save"
+      ],
+      "privacy": "PUBLIC_LEADS_READABLE_ONLY_BY_VERIFIED_SPONSOR_OPERATOR",
+      "association_policy": "CANDIDATES_BY_EXACT_EMAIL_ONLY_MANUAL_CONFIRMATION_REQUIRED",
+      "draft_policy": "HUMAN_REVIEW_PLUS_SECOND_CONFIRMATION_CANONICAL_OPPORTUNITY_DA_SVILUPPARE_NOT_SENT_NO_CONTRACT",
+      "prohibited": [
+        "AUTO_CREATE_STAKEHOLDER",
+        "AUTO_MERGE_COMPANIES",
+        "AUTO_SEND_PROPOSAL",
+        "INVENT_COMMERCIAL_VALUES",
+        "DUPLICATE_CRM"
+      ],
+      "activation_gate": "EXPLICIT_DIRECTION_APPROVAL_PLUS_R20_R21_AND_R60_DEPLOYED_ON_ISOLATED_STAGING_WITH_CANONICAL_HEADERS_VERIFIED",
+      "rollback": "NO_PRODUCTION_DEPLOY_UNTIL_STAGING_E2E_GREEN; DISABLE_NEW_ROUTE_IF_UPSTREAM_UNAVAILABLE",
+      "bridge_module": "backend_patch_R60_grow_proposal_draft.gs",
+      "source_workbooks": {
+        "public_requests": "CORE_SHEET/APP PUBLIC REQUESTS",
+        "access_audit": "CORE_SHEET/APP AUDIT",
+        "stakeholders": "SCD_OPERATIVO_PILOTA/STAKEHOLDERS_MASTER",
+        "opportunities": "SCD_OPERATIVO_PILOTA/COMMERCIALE_OPPORTUNITA"
+      },
+      "write_policy": {
+        "actor": "R20_AUTHORIZED_SPONSOR_SCOPE",
+        "idempotency": "CORRELATION_ID_BY_REQUEST_ID",
+        "required": [
+          "REQUEST_ID",
+          "STAKEHOLDER_ID",
+          "EXACT_EMAIL",
+          "PRIVACY_CONSENT",
+          "HUMAN_REVIEW",
+          "EXPLICIT_CONFIRM"
+        ],
+        "stage": "DA SVILUPPARE",
+        "status": "APERTO",
+        "financial_values": "UNSET",
+        "audit": "CORE_APP_AUDIT_BEFORE_OPPORTUNITY_WRITE",
+        "side_effects_forbidden": [
+          "EMAIL_SEND",
+          "CONTRACT_CREATE",
+          "PAYMENT_CREATE",
+          "ROLE_ELEVATION"
+        ]
+      }
+    },
+    "sky_shared_assistant_content_first": {
+      "release": "2026-10-08_CONTENT_FIRST",
+      "state": "STAGED_PUBLIC_RULES_ONLY_AI_NOT_CONNECTED",
+      "engine": "ONE_SERVER_SIDE_RULES_ENGINE",
+      "endpoint": "/api/sky/ask",
+      "sourceIds": [
+        "R20"
+      ],
+      "publicDataPolicy": "PUBLIC_PROJECTION_ONLY_NO_SYNTHETIC_SPORT_RESULTS",
+      "entryPoints": [
+        "scd-twin.js",
+        "app.js"
+      ],
+      "routing": [
+        "PUBLIC_INFORMATION",
+        "PRIVATE_AUTH_REQUIRED",
+        "SAFEGUARDING_ONLY"
+      ],
+      "securityConstraints": [
+        "NO_PRIVATE_RECORDS",
+        "NO_CLIENT_PROVIDED_ROLE_AUTHORITY",
+        "NO_SAFEGUARDING_CONTENT_IN_GENERAL_ASSISTANT",
+        "NO_AI_PROVIDER_CLAIM",
+        "NO_QUESTION_RETENTION"
+      ],
+      "deploymentGate": "AUTHORIZED_R20_STAGING_E2E_AND_HUMAN_REVIEW",
+      "missingCapabilities": [
+        "AUTHORIZED_PRIVATE_QUERY_CONTEXT",
+        "VERIFIED_LLM_PROVIDER",
+        "SPONSOR_PRIVATE_UI_SKY",
+        "CORE_PRIVATE_UI_SKY",
+        "SAFEGUARDING_SEPARATE_HUMAN_CHANNEL"
+      ],
+      "rollback": "REVERT_ISOLATED_BRANCH_AND_DISABLE_PUBLIC_SKY_ENDPOINT"
     }
   },
   "research_intelligence": {

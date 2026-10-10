@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "id": "SCD_USER_DIRECTIVES",
-  "effectiveAt": "2026-10-03",
+  "effectiveAt": "2026-10-09",
   "authority": "RECOVERED_FROM_EXPLICIT_USER_CHAT_COMMANDS",
   "purpose": "Prevent loss, dilution or reinterpretation of the user's original operating commands across branches, agents and sessions.",
   "precedence": {
@@ -206,6 +206,261 @@
         "NO_FAKE_DEVICE_STATE",
         "NO_UNAUTHORIZED_PRODUCTION_MUTATION"
       ]
+    },
+    {
+      "id": "UD-011",
+      "name": "GRAPHICS_FIRST_TOTAL_VISUAL_SCD_2026",
+      "sourceDate": "2026-10-09",
+      "sourceStatus": "USER_COMMAND",
+      "sourceQuoteFragments": [
+        "ma deve essere soprattutto la grafica che mi interessa quella da analisi e ricerca e sviluppo",
+        "Non solo quella ma le grafiche complete",
+        "Voglio quella grafica e basta"
+      ],
+      "normalizedCommand": {
+        "priority": "VISUAL_ANALYSIS_RESEARCH_DEVELOPMENT_BEFORE_FUNCTIONAL_REBUILD",
+        "reference": "SCD_TAVOLA_MADRE_SEI_APP_2026_AND_USER_SUPPLIED_FAMILY_BOARDS",
+        "screens": [
+          "HOME_PUBBLICA",
+          "CALENDARIO_LIVE",
+          "AREA_ATLETA",
+          "AREA_FAMIGLIA",
+          "AREA_STAFF_DIREZIONE",
+          "COMUNICAZIONI"
+        ],
+        "apps": [
+          "SCD_ONE_UNIVERSE_SOCIAL",
+          "SCD_CORE_GESTIONALE",
+          "SCD_GROW_SPONSOR"
+        ],
+        "expectation": "VISUALLY_FAITHFUL_INTERACTIVE_RESPONSIVE_IMPLEMENTATION_NOT_COLOR_RESTYLE_OR_POSTER",
+        "canonicalBrief": "docs/SCD_DNA_GRAFICO_OPERATIVO_2026-10-09.md",
+        "validation": [
+          "IMAGE_TO_UI_COMPOSITION_COMPARISON",
+          "MOBILE_DESKTOP_SCREENSHOTS",
+          "NAVIGATION_AND_STATE_TESTS",
+          "NO_FAKE_DATA"
+        ]
+      }
+    },
+    {
+      "id": "UD-012",
+      "name": "DRIVE_CANVA_PERMANENT_MEMORY_2026_FORWARD",
+      "sourceDate": "2026-10-09",
+      "sourceStatus": "USER_COMMAND",
+      "sourceQuoteFragments": [
+        "il drive deve essere il per sempre il tuo contenitore di memoria",
+        "il drive non è solo home ma anche i file condivisi",
+        "partendo da una data importante anno 2026 e a seguire verso il futuro"
+      ],
+      "normalizedCommand": {
+        "archiveBackbone": "GOOGLE_DRIVE_ALL_AUTHORIZED_SCOPES",
+        "catalog": "SCD_INTAKE_LOG",
+        "sourcePriority": [
+          "OFFICIAL_ORIGINAL_ASSETS",
+          "GOOGLE_DRIVE_OWNED_AND_SHARED",
+          "SCD_PRESS_OFFICE_DRIVE",
+          "SCD_TOURNAMENTS_DRIVE",
+          "CANVA_PROJECTS_AND_ASSETS"
+        ],
+        "startSeason": "2026_2027",
+        "pre2026": "HISTORICAL_CONTEXT_NOT_AUTOMATICALLY_CURRENT",
+        "indexing": "PROVENANCE_VERSION_TIMESTAMP_ACL_SOURCE_ID_REQUIRED",
+        "privacy": "NO_PUBLIC_OR_CROSS_ROLE_EXPOSURE_OF_PERSONAL_HEALTH_MINOR_OR_SAFEGUARDING_DATA",
+        "memoryModel": "PERSISTENT_STORAGE_AND_RETRIEVAL_IN_AUTHORIZED_TOOLS_NOT_MAGIC_CHAT_MEMORY",
+        "canonicalBrief": "docs/SCD_DNA_GRAFICO_OPERATIVO_2026-10-09.md"
+      }
+    },
+    {
+      "id": "UD-013",
+      "name": "DYNAMIC_3D_AUTOMATION_SKY_ENGINE_AFTER_VISUAL_FOUNDATION",
+      "sourceDate": "2026-10-09",
+      "sourceStatus": "USER_COMMAND",
+      "normalizedCommand": {
+        "orderedPhases": [
+          "GRAPHIC_RESEARCH_ASSET_RECOVERY",
+          "VISUAL_SYSTEM_ALL_SCREENS",
+          "INTERACTIVE_MOBILE_DESKTOP_BUILD",
+          "MOTION_2D_3D_WHERE_USABLE",
+          "INDEXING_AUTOMATION_AND_IOT_ONLY_WHEN_REAL_DEVICES_VERIFIED",
+          "ROLE_SCOPED_AI_KNOWLEDGE_MEMORY_SKY",
+          "QA_AND_CONTROLLED_PRODUCTION"
+        ],
+        "integration": "PRESERVE_EXISTING_R20_GITHUB_API_AND_REAL_FEATURES",
+        "security": "NO_PRIVATE_PERMISSIONS_PAYMENT_SAFEGUARDING_CHANGES_WITHOUT_DIRECTION_APPROVAL"
+      }
+    },
+    {
+      "id": "UD-014",
+      "name": "PRECISE_AGENTS_WITH_VERIFIED_CONTINUITY",
+      "sourceDate": "2026-10-09",
+      "sourceStatus": "USER_COMMAND",
+      "normalizedCommand": {
+        "taskSpec": [
+          "INPUT_SOURCES",
+          "FIXED_CONSTRAINTS",
+          "EXPECTED_CODE_AND_ASSET_OUTPUTS",
+          "ACCEPTANCE_TESTS",
+          "SECURITY_PRIVACY",
+          "ROLLBACK",
+          "CHECKPOINT"
+        ],
+        "orchestration": "EXISTING_SKILLS_AND_PLUGINS_SPECIFIC_TASKS",
+        "continuity": "WORK_NOW_AND_PERSIST_RESUMABLE_STATE_NO_INVISIBLE_BACKGROUND_CLAIM_WITHOUT_ACTIVE_AUTOMATION",
+        "currentAgent": "LOVABLE_SCD_COMMAND_CENTER_VISUAL_STAGING",
+        "currentBlockingIssue": "LOVABLE_CREDITS_EXHAUSTED_AND_BUILD_FAILURE_AS_OF_2026_10_09",
+        "fallback": "GITHUB_BRANCH_AND_CODE_QA",
+        "nonDuplication": "NO_NEW_PARALLEL_APP_DB_OR_CRM",
+        "canonicalBrief": "docs/SCD_DNA_GRAFICO_OPERATIVO_2026-10-09.md"
+      }
+    },
+    {
+      "id": "UD-015",
+      "name": "SCD_HOME_GRAPHIC_AND_TERRITORY_IDENTITY_BINDING_FOR_ALL_ROUTES",
+      "sourceDate": "2026-10-09",
+      "sourceStatus": "LATEST_EXPLICIT_USER_COMMAND",
+      "sourceQuoteFragments": [
+        "Non solo la home ma tutto deve essere come la home e con la stessa impostazione e stile e geografica"
+      ],
+      "normalizedCommand": {
+        "homeIsVisualReferenceNotLimit": true,
+        "scope": "ALL_SIX_USER_SUPPLIED_SCREENS_PLUS_ALL_FUNCTIONAL_SCREENS_OF_SCD_ONE_CORE_GROW",
+        "crossAppIdentity": "SAME_BLUE_YELLOW_WHITE_SPORT_TYPOGRAPHY_SKY_OFFICIAL_CREST_LAKE_MOUNTAINS_COLICO_DERVIO_ALTO_LARIO",
+        "implementation": "CONSISTENT_COMPONENTS_LAYOUT_GRIDS_CARDS_NAVIGATION_MOBILE_DESKTOP_AND_TRUE_INTERACTIONS",
+        "adaptation": "DENser_CORE_GROW_OPERATIONAL_CONTENT_REMains_readable_no_forced_identical_home_layout",
+        "completion": "NOT_DONE_UNTIL_ALL_THREE_REAL_APPS_SHARE_GRAPHIC_FAMILY_WITH_SCREENSHOT_PARITY_TESTS",
+        "agentScope": "FIRST_HOME_PILOT_ONLY_AS_QUALIFICATION_NEVER_FINAL_SCOPE",
+        "canonicalManifestSection": "visual_system.cross_app_graphic_geographic_identity",
+        "canonicalScreens": [
+          "HOME_PUBBLICA",
+          "CALENDARIO_LIVE",
+          "AREA_ATLETA",
+          "AREA_FAMIGLIA",
+          "AREA_STAFF_DIREZIONE",
+          "COMUNICAZIONI"
+        ]
+      }
+    },
+    {
+      "id": "UD-016",
+      "name": "SCD_OPERATIONAL_SOURCE_OF_TRUTH_AND_CONTINUOUS_CONTROL_FROM_2026_07_01",
+      "sourceDate": "2026-10-10",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "Bisogna avere tutto sotto controllo non dormire ... non sapere avvitare un bullone",
+        "Devi monitorare ogni ora la situazione e anche cancellare ciò che superato e memorizzare per sempre e andare avanti",
+        "La mail sportclubcolico@gmail.com deve essere monitorato sempre ... 1 luglio 2026 data di inizio",
+        "File dati ... nel drive con stesse diciture vanno monitorati ... iscrizioni ancora aperte ma quelle che arrivano sono confermate",
+        "si aggiornati da soli tu li tieni controllati senza modificare nulla e niente dentro",
+        "svincoli, cancellazioni o altro ... ufficializzate sui comunicati Figc e tramite mail",
+        "Anche fornitori o altri usano la mail per comunicare"
+      ],
+      "normalizedCommand": {
+        "initialSeasonAnchor": "2026-07-01",
+        "domains": [
+          "SPORT",
+          "FOOTBALL_FIGC",
+          "ACCOUNTING",
+          "FISCAL",
+          "REGISTRATIONS",
+          "MEMBERSHIP",
+          "ECONOMICS",
+          "SUPPLIERS",
+          "PERSONNEL",
+          "SPONSORS",
+          "COMMUNICATIONS"
+        ],
+        "canonicalMailbox": "sportclubcolico@gmail.com",
+        "otherAuthorizedMailboxes": [
+          "tesseramenti.scdcolicoderviese@gmail.com",
+          "segreteria.scdcolicoderviese@gmail.com"
+        ],
+        "cadence": "ONE_HOURLY_CHECK_ITERATION_MAX_SUPPORTED_WITH_RESUMABLE_CHECKPOINT_NOT_24_7_PROCESS",
+        "onboardingInterpretation": "NEW_USER_SUBMITTED_FORM_COUNTS_AS_VERBALLY_CONFIRMED_INTEREST; NOT PROOF_OF_FIGC_REGISTRATION_PAYMENT_MEMBERSHIP_OR_COMPLETE_DOCUMENTATION",
+        "sourceOfTruth": "READ_ONLY_EXISTING_GMAIL_AND_DRIVE_WITH_IDS_AND_MODIFIED_TIMES",
+        "systems": [
+          "DATABASE_ISCRIZIONI_2026_27_WITH_UNIQUE_SUBMISSION_ID",
+          "MASTER_GESTIONALE_2026_27_ANAGRAFICA_UNICA",
+          "MASTER_TESSERATI_2026_27_FIGC_STATUS",
+          "MAIL_OPERATIONS_APP_2026_EXISTING",
+          "CALENDARIO_MASTER_2026_27",
+          "SCD_INTAKE_LOG_EXISTING"
+        ],
+        "userDataContract": "DO_NOT_WRITE_IN_MODIFY_REFORMAT_RENAME_REORDER_DELETE_OR_MOVE_ANY_CANONICAL_SPREADSHEET_GMAIL_DRIVE_DOCUMENT_OR_FIGC_RECORD",
+        "continuousVerification": {
+          "mail": "INBOX_AND_SENT_ATTACHMENTS_DELIVERY_FAIL_AND_DELAY_THREAD_ID",
+          "drive": "MODIFIED_TIME_VERSION_ID_CHECK_FILES_WITH_IDENTICAL_NAMES_DEDUP_BY_CANONICAL_FILE_ID",
+          "registration": "SUBMISSION_ID_DUPLICATES_FORM_CONFIRMATION_PARENTAL_CONTACT_DOCS_FIGC_QUOTE_KIT_BUS_FAMILY_RELATION",
+          "official": "FIGC_LND_CRL_CU_NUMBER_DATE_DOCUMENT_LINK_AND_GMAIL_EVIDENCE",
+          "financial": "ECONOMIC_COMMUNICATION_NOT_EQUAL_SENT_DELIVERED_RECONCILED_PAID",
+          "suppliers": "OPEN_QUOTES_CONTRACTS_INVOICES_DUE_DATES_APPROVALS_FROM_MAIL",
+          "privacy": "NO_PUBLIC_MINOR_SAFEGUARDING_ISEE_HEALTH_OR_PRIVATE_FINANCIAL_INFORMATION"
+        },
+        "hierarchy": "FIGC_OFFICIAL_CU_OR_PORTAL_DECISION_FOR_FEDERAL_STATUS; MAIL_REQUEST_OR_PEC_NOT_AN_ACCEPTED_RELEASE",
+        "uncertainOrContradictory": "OPEN_CONFLICT_WITH_SOURCE_PROVENANCE_REQUIRE_VERIFICATION_NEVER_SILENTLY_MERGE_173_174_233_COUNTS",
+        "monitoringRegistry": "USE_EXISTING_SCD_INTAKE_LOG_OR_EXISTING_OPERATIONAL_CONTROL_LOG_IF_AUTHORIZED_AND_SEPARATE_FROM_CANONICAL_SOURCES; OTHERWISE_COMMIT_NON_PII_CHECKPOINT_TO_EXISTING_GITHUB_ISSUE_107",
+        "lifecycle": [
+          "RECEIVED",
+          "VERIFIED",
+          "ACTION_REQUIRED",
+          "WAITING_SOURCE",
+          "CLOSED",
+          "SUPERSEDED"
+        ],
+        "deletion": "LOGICAL_SUPERSEDED_ONLY_IN_CONTROL_LAYER_PRESERVE_AUDIT_HISTORY_AND_SOURCE",
+        "alerts": "ONLY_VERIFIED_MATERIAL_NEW_ACTIONS_OR_BLOCKERS_NO_UNCHANGED_REPEATS",
+        "securityGates": "NO_AUTO_MAIL_SEND_OR_FIGC_CHANGES_OR_MONEY_CHANGES_OR_DRIVE_ACL_MODIFICATIONS",
+        "automationName": "SCD Presidio Operativo",
+        "orchestrationRule": "REAL_CHECK_EACH_SCHEDULED_RUN; NEVER_CLAIM_FOREVER_MEMORY_OR_ALWAYS_RUNNING_WITHOUT_PERSISTED_CHECKPOINT"
+      }
+    },
+    {
+      "id": "UD-017",
+      "name": "SCD_FREE_FIRST_EVIDENCE_GATED_CREDITS_TOOLS_SKILLS_NONPROFIT_TRIALS",
+      "sourceDate": "2026-10-10",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "SCD_FREE_FIRST:",
+        "/credits: Cerca crediti e offerte ufficiali",
+        "/freefirst: Usa prima strumenti gratuiti già disponibili",
+        "/nonprofit: Verifica agevolazioni per SCD",
+        "/trialgate: Controlla scadenze e rinnovi delle prove",
+        "/toolscore: Confronta costo, vantaggi e rischi",
+        "/skillreuse: Riutilizza le skill già installate",
+        "/creditbudget: Controlla disponibilità e consumi",
+        "/sourcecheck: Verifica offerte viste sui social",
+        "duplicate_tools: DENY",
+        "unofficial_claims: VERIFY_FIRST",
+        "credits_balance: UNKNOWN_UNTIL_CHECKED",
+        "payments: HUMAN_APPROVAL",
+        "external_actions: HUMAN_APPROVAL"
+      ],
+      "normalizedCommand": {
+        "id": "SCD_FREE_FIRST",
+        "scope": "ALL_SCD_APPS_AND_AGENTS_AND_TOOLING",
+        "subcommands": [
+          "/credits",
+          "/freefirst",
+          "/nonprofit",
+          "/trialgate",
+          "/toolscore",
+          "/skillreuse",
+          "/creditbudget",
+          "/sourcecheck"
+        ],
+        "reuseBeforeProcurement": true,
+        "verifyOffersFromOfficialProvider": true,
+        "statusForUnverifiedBalance": "UNKNOWN_UNTIL_CHECKED",
+        "rejectToolDuplicates": true,
+        "requireHumanApprovalForPaymentsAndExternalSideEffects": true,
+        "noAutomaticTrialStart": true,
+        "noAutomaticProviderAccountChanges": true,
+        "canonicalManifestSection": "development_contract.scd_free_first",
+        "executionConfig": "config/scd-free-first.v1.json",
+        "internalCommand": "npm run scd:freefirst -- /credits"
+      }
     }
   ],
   "completionGate": {
@@ -360,6 +615,28 @@
         "WEBAPP:MASTER",
         "AUTONOMOUS_SAFE_CONTINUATION"
       ]
+    },
+    {
+      "id": "CMD-20261009-VISUAL-DNA",
+      "date": "2026-10-09",
+      "title": "Direzione SCD: grafiche complete come priorita; archivio Drive+Condivisi+Canva; motore e memoria; agenti precisi",
+      "recoveryStatus": "VERBATIM_FRAGMENT",
+      "recoveredElements": [
+        "grafica come analisi/ricerca/sviluppo prima di tutto",
+        "tavola madre e sei schermi",
+        "tre piattaforme unica identita",
+        "Drive archivio memoria stabile incluso condivisi",
+        "2026 e futuro",
+        "AI Sky e motore interno dopo la parte visuale",
+        "comandi precisi per agenti e continuita verificabile"
+      ],
+      "incorporation": [
+        "UD-011",
+        "UD-012",
+        "UD-013",
+        "UD-014"
+      ],
+      "canonicalBrief": "docs/SCD_DNA_GRAFICO_OPERATIVO_2026-10-09.md"
     }
   ]
 }

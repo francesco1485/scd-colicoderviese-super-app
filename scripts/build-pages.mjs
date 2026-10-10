@@ -7,7 +7,7 @@ const manifest=JSON.parse(fs.readFileSync(path.join(root,'SCD_SYSTEM_MANIFEST.js
 const nextgen=manifest.architecture?.nextgen_preview?.visual_mode==='SYNTHETIC_NO_REAL_PHOTOGRAPHY';
 
 const common=[
-  'index.html','manifest.webmanifest','SCD_SYSTEM_MANIFEST.json','sw.js','delete-account.html',
+  'index.html','scd-reboot-2026.css','scd-one-native.css','scd-one-native.js','scd-three-worlds-native.css','scd-three-worlds-native.js','manifest.webmanifest','SCD_SYSTEM_MANIFEST.json','sw.js','delete-account.html',
   'content/weekly-news.json','content/public-club.v1.json','robots.txt','sitemap.xml','intake/index.html','intake/admin.html','intake/intake.css','intake/intake-config.public.json','intake/intake.js','intake/admin.js',
   'sponsor/index.html','sponsor/sponsor.css','sponsor/scd-design-system.css','sponsor/sponsor.js'
 ];
@@ -38,8 +38,8 @@ fs.writeFileSync(path.join(out,'.nojekyll'),'','utf8');
 
 const html=fs.readFileSync(path.join(out,'index.html'),'utf8');
 const htmlRequired=nextgen
-  ?['scd-ng.css','scd-synth.css','ui-r52-social.css','lib/scd-operative-engine.js','scd-ng.js','scd-interactions.js','scd-adaptive-engine.js','scd-meta-engine.js','scd-twin.js','scd-experience-engine.js','manifest.webmanifest']
-  :['ui-r21-11.css','ui-r24-shell.css','ui-r26-pulse.css','ui-r38-universe.css','ui-r39-human.css','ui-r40-weekly.css','app.js','scd-meta-engine.js','scd-twin.js','scd-experience-engine.js','app-r24-router.js','manifest.webmanifest'];
+  ?['scd-reboot-2026.css','scd-ng.css','scd-synth.css','ui-r52-social.css','lib/scd-operative-engine.js','scd-ng.js','scd-interactions.js','scd-adaptive-engine.js','scd-meta-engine.js','scd-twin.js','scd-experience-engine.js','manifest.webmanifest']
+  :['scd-reboot-2026.css','ui-r21-11.css','ui-r24-shell.css','ui-r26-pulse.css','ui-r38-universe.css','ui-r39-human.css','ui-r40-weekly.css','app.js','scd-meta-engine.js','scd-twin.js','scd-experience-engine.js','app-r24-router.js','manifest.webmanifest'];
 for(const required of htmlRequired){
   if(!html.includes(required)) throw new Error('index.html does not reference '+required);
 }

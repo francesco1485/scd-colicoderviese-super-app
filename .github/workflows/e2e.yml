@@ -19,6 +19,8 @@ jobs:
       - run: npm install
       - name: SCD System Manifest gate
         run: npm run test:manifest
+      - name: Free-first no-duplicate no-spend gate
+        run: npm run test:freefirst
       - name: SCD AI portfolio contract gate
         run: npm run test:ai-portfolio
       - name: Supabase Domain Core contract gate
@@ -37,6 +39,8 @@ jobs:
         run: npm run test:r54-private
       - name: R55 public content gate
         run: npm run test:r55-content
+      - name: CORE R56 fail-closed audit and private desk entry gate
+        run: npm run test:core-audit
       - name: R56 identity/calendar/internal gate
         run: npm run test:r56-internal
       - name: R56 identity/calendar core gate
@@ -47,6 +51,8 @@ jobs:
         run: npm run test:universe-contract
       - name: Human OS contract gate
         run: npm run test:human-os-contract
+      - name: Public calendar privacy and ID projection gate
+        run: node --test tests/public-calendar-projection.test.mjs
       - name: Weekly sport & AI newsroom contract gate
         run: npm run test:newsroom-contract
       - name: NextGen synthetic contract gate
@@ -57,6 +63,18 @@ jobs:
         run: npm run test:intake-contract
       - name: Intake signed link security gate
         run: npm run test:intake-links
+      - name: R20 canonical workbook routing regression gate
+        run: npm run test:r20-routing
+      - name: New live interface design system gate
+        run: npm run test:reboot-ui
+      - name: Three-app ONE / GROW / CORE integration gate
+        run: npm run test:cross-app
+      - name: Shared SKY grounded assistant permission gate
+        run: npm run test:sky-shared
+      - name: Isolated three-app preview no-production integration gate
+        run: npm run test:isolated-preview
+      - name: Sponsor lead workflow and HTTP integration gate
+        run: npm run test:grow-leads
       - name: Sponsor CRM and communication contract gate
         run: npm run test:crm-communication
       - name: Sponsor vision contract gate

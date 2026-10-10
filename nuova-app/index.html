@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#071a30">
+  <meta name="description" content="SCD Colicoderviese: sport, persone, territorio. Home, calendario, atleta, famiglia, staff e comunicazioni.">
+  <title>SCD Colicoderviese | App 2026/27</title>
+  <link rel="icon" href="../assets/logo-scd.png">
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <svg xmlns="http://www.w3.org/2000/svg" class="svg-library" aria-hidden="true">
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 2v6M17 2v6M3 10h18M8 15h3m2 0h3"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-5 3-7 8-7s8 2 8 7"/></symbol>
+    <symbol id="i-family" viewBox="0 0 24 24"><circle cx="8" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M2 21v-3c0-4 3-6 6-6 2 0 4 .8 5 2M13 21v-2c0-3 2-5 5-5s4 2 4 5v2"/></symbol>
+    <symbol id="i-staff" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3M4.9 4.9 7 7m10 10 2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"/></symbol>
+    <symbol id="i-news" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h3m3 0h4M7 16h10"/></symbol>
+    <symbol id="i-ball" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m12 8 3 2-1 4h-4l-1-4 3-2M9 10 5 9m10 1 4-1m-9 5-1 5m5-5 1 5"/></symbol>
+    <symbol id="i-training" viewBox="0 0 24 24"><path d="m12 3 8 17H4zM8 12h8M6 17h12"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 2 2.2 7.8L22 12l-7.8 2.2L12 22l-2.2-7.8L2 12l7.8-2.2z"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v12H9l-5 4zM8 9h8m-8 4h5"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M5 18h14l-2-3V9a5 5 0 1 0-10 0v6zM10 21h4"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m4 12 5 5L20 6"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M5 2h10l4 4v16H5zM15 2v5h4M8 12h8M8 16h7"/></symbol>
+    <symbol id="i-euro" viewBox="0 0 24 24"><path d="M20 5a8 8 0 1 0 0 14M3 10h12M3 14h12"/></symbol>
+    <symbol id="i-shirt" viewBox="0 0 24 24"><path d="m7 3-5 4 3 5 3-2v11h8V10l3 2 3-5-5-4h-3c0 4-4 4-4 0z"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 22s8-8 8-13a8 8 0 0 0-16 0c0 5 8 13 8 13z"/><circle cx="12" cy="9" r="2"/></symbol>
+  </svg>
+  <div class="stage">
+    <aside class="stage-intro" aria-label="Identita e panoramica SCD">
+      <div class="stage-landscape lago-backdrop">
+        <img class="stage-crest" src="../assets/logo-scd.png" alt="Logo ufficiale SCD Colicoderviese">
+        <span class="stage-edition">ESPERIENZA DIGITALE 2026/27</span>
+        <h1>S.C.D.<br><strong>COLICO<span>DERVIESE</span></strong></h1>
+        <p>Sport. Persone. Territorio.<br><em>Sempre insieme.</em></p>
+        <img class="stage-fox" src="assets/sky.svg" alt="Sky, mascotte illustrata della schermata">
+      </div>
+      <div class="stage-guide">
+        <h2>Un Club.<br>Sei spazi connessi.</h2>
+        <p>La struttura che hai indicato nella fotografia, trasformata in schermate navigabili.</p>
+        <nav class="stage-links" id="desktopNav" aria-label="Schermate desktop"></nav>
+        <div class="stage-caption"><span class="live-mark"></span> Dati pubblici verificati, informazioni private protette</div>
+      </div>
+    </aside>
+    <div class="phone" id="phone">
+      <header class="top-clubbar">
+        <button type="button" class="brand-trigger" data-screen="home" aria-label="Vai alla Home SCD">
+          <img src="../assets/logo-scd.png" alt="Stemma SCD Colicoderviese">
+          <span><small>S.C.D. / ALTO LARIO</small><strong>COLICO<span>DERVIESE</span></strong></span>
+        </button>
+        <div class="top-actions"><span class="season-badge">26 / 27</span><button class="top-icon-button" type="button" data-screen="comunicazioni" aria-label="Apri comunicazioni"><svg><use href="#i-bell"></use></svg><i></i></button></div>
+      </header>
+      <div class="top-accent"></div>
+      <main id="main" class="phone-body" tabindex="-1">
+        <!-- HOME: photographic mountain/lake setting, fox mascot and immediately useful club data. -->
+        <section class="screen active" id="screen-home" data-page="home" aria-labelledby="h-home">
+          <div class="hero home-hero lago-backdrop">
+            <div class="hero-copy"><span class="micro-title">IL CLUB, OGNI GIORNO</span><h2 id="h-home">Questa<br><em>settimana.</em></h2><p>Sport, crescita e comunit&agrave; nel cuore dell'Alto Lario.</p></div>
+            <img src="assets/sky.svg" class="sky-mascot" alt="Sky, mascotte illustrata SCD">
+            <span class="hero-sky-tag">CIAO!<br><strong>SONO SKY</strong></span>
+          </div>
+          <div class="source-status" id="sourceMessage" role="status">Verifica delle fonti pubbliche in corso.</div>
+          <div class="home-shortcuts">
+            <button type="button" data-screen="calendario" data-filter="MATCH"><span class="shortcut-icon soccer"><svg><use href="#i-ball"></use></svg></span><b>Gare</b></button>
+            <button type="button" data-screen="calendario" data-filter="TRAINING"><span class="shortcut-icon cone"><svg><use href="#i-training"></use></svg></span><b>Allenamenti</b></button>
+            <button type="button" data-screen="comunicazioni" data-news-filter="EVENT"><span class="shortcut-icon yellow"><svg><use href="#i-calendar"></use></svg></span><b>Eventi</b></button>
+            <button type="button" data-screen="comunicazioni"><span class="shortcut-icon green"><svg><use href="#i-spark"></use></svg></span><b>Iniziative</b></button>
+          </div>
+          <article class="card match-card">
+            <div class="card-heading"><span class="kicker">PROSSIMA GARA</span><span class="chip-verified" id="matchSourceChip">IN AGGIORNAMENTO</span></div>
+            <div id="nextMatchContent"><div class="no-data">Nessuna prossima gara verificata disponibile.</div></div>
+            <button type="button" class="link-row" data-screen="calendario">Vedi tutte le gare <svg><use href="#i-arrow"></use></svg></button>
+          </article>
+          <div class="featured-small-grid">
+            <button class="activity-feature training-feature" type="button" data-screen="calendario" data-filter="TRAINING"><span class="feature-emoji">&#x26bd;</span><div><b>Allenamenti</b><small>Il programma delle squadre</small></div><span class="chevron">&rarr;</span></button>
+            <button class="activity-feature open-feature" type="button" data-screen="comunicazioni"><span class="feature-emoji">&#x2600;</span><div><b>Eventi e Open Day</b><small>Le iniziative ufficiali</small></div><span class="chevron">&rarr;</span></button>
+          </div>
+          <article class="card tight-card"><div class="card-heading"><span class="kicker">DAL CLUB</span><button type="button" class="text-button" data-screen="comunicazioni">Tutte le notizie &rarr;</button></div><div id="homeNews" class="news-feed"><p class="no-data">Notizie ufficiali in aggiornamento.</p></div></article>
+          <article class="card sponsor-card"><div class="card-heading"><span class="kicker">INSIEME ALLE IMPRESE</span><span class="tiny-tag">TERRITORIO</span></div><div id="sponsorList" class="sponsor-list"><p class="no-data">Elenco partner in verifica.</p></div><a class="sponsor-action" href="/sponsor/">Scopri il progetto Sponsor <svg><use href="#i-arrow"></use></svg></a></article>
+          <button type="button" class="club-territory lago-backdrop" data-screen="comunicazioni"><span>MONDO COLICO</span><strong>La nostra casa,<br>la nostra gente.</strong><small>Squadre, lago, montagna, comunit&agrave; &rarr;</small></button>
+        </section>
+        <!-- CALENDARIO: source-backed public week. -->
+        <section class="screen" id="screen-calendario" data-page="calendario" aria-labelledby="h-cal">
+          <div class="screen-title"><span class="overline">AGENDA SPORTIVA / 2026-27</span><h2 id="h-cal">Calendario <em>live</em></h2><p>Gare, allenamenti ed eventi pubblici. Tutto in un posto.</p></div>
+          <div class="week-toolbar"><button type="button" id="weekPrev" aria-label="Settimana precedente">&larr;</button><strong id="weekLabel">Settimana corrente</strong><button type="button" id="weekNext" aria-label="Settimana successiva">&rarr;</button></div>
+          <div class="week-days" id="weekDays" aria-label="Seleziona giorno"></div>
+          <div class="filter-tabs" role="group" aria-label="Filtri calendario"><button type="button" class="active" data-event-type="ALL">Tutti</button><button type="button" data-event-type="MATCH">Gare</button><button type="button" data-event-type="TRAINING">Allenamenti</button><button type="button" data-event-type="EVENT">Eventi</button></div>
+          <div class="agenda-list" id="calendarEvents"><p class="no-data">Calendario in aggiornamento.</p></div>
+          <div class="privacy-note"><svg><use href="#i-lock"></use></svg><span>Le convocazioni, le riunioni riservate e i dati sanitari non compaiono nel calendario pubblico.</span></div>
+        </section>
+        <!-- ATLETA: no invented name, roster or health data. -->
+        <section class="screen" id="screen-atleta" data-page="atleta" aria-labelledby="h-atleta">
+          <div class="section-identity athlete-cover lago-backdrop"><span class="overline white">IL TUO PERCORSO SPORTIVO</span><h2 id="h-atleta">Area <em>Atleta.</em></h2><p>Convocazioni, allenamenti e documenti nel tuo spazio personale.</p><div class="profile-row"><div class="player-avatar"><svg><use href="#i-user"></use></svg></div><div><strong>Il mio profilo</strong><small>Accesso protetto &middot; Dati riservati</small></div><span class="lock-pill"><svg><use href="#i-lock"></use></svg></span></div></div>
+          <div class="module-grid"><button type="button" data-private="convocazioni"><span class="module-icon yellow"><svg><use href="#i-calendar"></use></svg></span><strong>Convocazioni</strong><small>Agenda personale</small></button><button type="button" data-private="pagamenti"><span class="module-icon warm"><svg><use href="#i-euro"></use></svg></span><strong>Pagamenti</strong><small>Situazione riservata</small></button><button type="button" data-private="documenti"><span class="module-icon blue"><svg><use href="#i-file"></use></svg></span><strong>Documenti</strong><small>Certificati e tessera</small></button><button type="button" data-private="messaggi"><span class="module-icon pink"><svg><use href="#i-chat"></use></svg></span><strong>Messaggi</strong><small>Segreteria e staff</small></button><button type="button" data-private="trasferte"><span class="module-icon green"><svg><use href="#i-pin"></use></svg></span><strong>Trasferte</strong><small>Informazioni utili</small></button><button type="button" data-private="profilo"><span class="module-icon blue"><svg><use href="#i-user"></use></svg></span><strong>Il mio profilo</strong><small>Dati e autorizzazioni</small></button></div>
+          <article class="card"><div class="card-heading"><span class="kicker">PROSSIMA CONVOCAZIONE</span><span class="private-badge"><svg><use href="#i-lock"></use></svg> RISERVATA</span></div><div class="no-data">Effettua l'accesso per visualizzare soltanto le tue convocazioni.</div><button class="button-primary" type="button" data-private="convocazioni">Accedi alla tua area &rarr;</button></article>
+          <article class="card"><div class="card-heading"><span class="kicker">I MIEI DOCUMENTI</span></div><div class="privacy-list"><div><svg><use href="#i-file"></use></svg><span>Certificato medico</span><span class="status-muted">PROTETTO</span></div><div><svg><use href="#i-shirt"></use></svg><span>Tesseramento FIGC</span><span class="status-muted">PROTETTO</span></div></div></article>
+        </section>
+        <!-- FAMIGLIA: children and financial information never fabricated. -->
+        <section class="screen" id="screen-famiglia" data-page="famiglia" aria-labelledby="h-family">
+          <div class="screen-title"><span class="overline">SCD / FAMILY HUB</span><h2 id="h-family">Area <em>Famiglia.</em></h2><p>Ogni famiglia, un punto di riferimento sicuro.</p></div>
+          <div class="family-switch" role="group" aria-label="Selezione tipologia area"><span>Atleta</span><strong>Famiglia</strong><span>Staff</span></div>
+          <article class="card children-card"><div class="card-heading"><span class="kicker">I MIEI FIGLI</span><span class="private-badge"><svg><use href="#i-lock"></use></svg> PRIVATO</span></div><div class="children-profiles"><div class="child-silhouette"><svg><use href="#i-user"></use></svg><span>Profili collegati<br><small>Solo dopo accesso</small></span></div><button type="button" data-private="figli" class="add-profile" aria-label="Accedi ai profili dei figli">+</button></div></article>
+          <article class="card fees-card"><div class="card-heading"><span class="kicker">STATO PAGAMENTI</span><button type="button" class="text-button" data-private="quote">Dettagli &rarr;</button></div><div class="fee-body"><div class="fee-ring"><svg><use href="#i-lock"></use></svg></div><div><strong>Quote riservate</strong><p>Nessun importo o stato di pagamento viene mostrato senza autenticazione.</p></div></div><button type="button" class="button-primary" data-private="quote">Accedi alle tue quote &rarr;</button></article>
+          <div class="module-grid"><button type="button" data-private="certificati"><span class="module-icon green"><svg><use href="#i-file"></use></svg></span><strong>Certificati</strong><small>Solo i tuoi atleti</small></button><button type="button" data-private="kit"><span class="module-icon yellow"><svg><use href="#i-shirt"></use></svg></span><strong>Kit e divise</strong><small>Dotazione personale</small></button><button type="button" data-private="documenti"><span class="module-icon blue"><svg><use href="#i-file"></use></svg></span><strong>Documenti</strong><small>Autorizzazioni</small></button><button type="button" data-private="tesseramento"><span class="module-icon warm"><svg><use href="#i-user"></use></svg></span><strong>Tesseramento</strong><small>Stato personale</small></button></div>
+          <article class="card"><div class="card-heading"><span class="kicker">PROSSIMI IMPEGNI PUBBLICI</span></div><div id="familyEvents" class="agenda-list compact"><p class="no-data">Attivit&agrave; pubbliche in aggiornamento.</p></div></article>
+        </section>
+        <!-- STAFF: role-specific data must be authenticated by CORE R20. -->
+        <section class="screen" id="screen-staff" data-page="staff" aria-labelledby="h-staff"><div class="staff-hero lago-backdrop"><div><span class="overline white">SCD CORE / CONTROL ROOM</span><h2 id="h-staff">Area <em>Staff.</em></h2><p>Squadre, atleti e attivit&agrave;. Sempre con i permessi corretti.</p></div><img src="assets/sky.svg" alt="Sky, mascotte illustrata" class="staff-fox"></div>
+          <div class="staff-metrics"><button type="button" data-private="squadre"><svg><use href="#i-family"></use></svg><strong>&mdash;</strong><small>Squadre</small></button><button type="button" data-private="atleti"><svg><use href="#i-user"></use></svg><strong>&mdash;</strong><small>Atleti</small></button><button type="button" data-private="staff"><svg><use href="#i-staff"></use></svg><strong>&mdash;</strong><small>Staff</small></button><button type="button" data-private="documenti"><svg><use href="#i-file"></use></svg><strong>&mdash;</strong><small>Documenti</small></button></div>
+          <article class="card"><div class="card-heading"><span class="kicker">OPERAZIONI DI CLUB</span><span class="tiny-tag">PER RUOLO</span></div><div class="operations-grid"><button data-private="convocazioni" type="button"><svg><use href="#i-calendar"></use></svg> Convocazioni</button><button data-private="comunicazioni" type="button"><svg><use href="#i-chat"></use></svg> Comunicazioni</button><button data-private="presenze" type="button"><svg><use href="#i-check"></use></svg> Presenze</button><button data-private="documenti" type="button"><svg><use href="#i-file"></use></svg> Documenti</button></div></article>
+          <article class="card"><div class="card-heading"><span class="kicker">ATTIVIT&Agrave; PUBBLICHE</span><button class="text-button" data-screen="calendario">Calendario &rarr;</button></div><div id="staffEvents" class="agenda-list compact"><p class="no-data">Attivit&agrave; pubbliche in aggiornamento.</p></div></article>
+          <article class="card"><div class="card-heading"><span class="kicker">ANDAMENTO SQUADRE</span></div><div class="privacy-note inside"><svg><use href="#i-lock"></use></svg> Statistiche, presenze e organici sono visibili solo agli operatori autorizzati.</div><button class="button-primary" type="button" data-private="dashboard">Apri SCD CORE &rarr;</button></article>
+          <div class="safeguarding-strip"><svg><use href="#i-lock"></use></svg><span><strong>Safeguarding</strong><small>Percorso separato, riservato agli incaricati abilitati.</small></span></div>
+        </section>
+        <!-- COMUNICAZIONI: source-backed and editorially controlled. -->
+        <section class="screen" id="screen-comunicazioni" data-page="comunicazioni" aria-labelledby="h-news"><div class="screen-title dark-heading"><span class="overline white">COMUNICAZIONE SCD</span><h2 id="h-news">Il Club <em>racconta.</em></h2><p>Notizie, aggiornamenti e contenuti verificati.</p></div>
+          <div class="news-tabs" role="group" aria-label="Filtri comunicazioni"><button class="active" type="button" data-news-filter="ALL">Club</button><button type="button" data-news-filter="NEWS">News</button><button type="button" data-news-filter="EVENT">Eventi</button></div>
+          <div class="news-feed expanded" id="communicationsList"><p class="no-data">Nessuna notizia verificata disponibile al momento.</p></div>
+          <article class="card"><div class="card-heading"><span class="kicker">SEGUI LA COMMUNITY SCD</span></div><div class="social-board"><a href="https://www.instagram.com/s.c.d.colicoderviese/" target="_blank" rel="noopener noreferrer"><span>IG</span><b>Instagram</b><small>Canale ufficiale</small></a><a href="https://www.facebook.com/ColicoDerviese" target="_blank" rel="noopener noreferrer"><span>f</span><b>Facebook</b><small>Pagina ufficiale</small></a><a href="https://www.youtube.com/@S.C.D.ColicoDerviese" target="_blank" rel="noopener noreferrer"><span>&#9654;</span><b>YouTube</b><small>Video del Club</small></a></div></article>
+          <a class="contact-card" href="mailto:sportclubcolico@gmail.com"><span class="contact-icon"><svg><use href="#i-chat"></use></svg></span><span><strong>Parla con la segreteria</strong><small>sportclubcolico@gmail.com</small></span><svg class="contact-arrow"><use href="#i-arrow"></use></svg></a>
+        </section>
+      </main>
+      <nav class="bottom-nav" aria-label="Navigazione app" id="bottomNav"></nav>
+    </div>
+  </div>
+  <button type="button" class="sky-launch" id="skyLaunch" aria-label="Apri Sky, assistente pubblico"><img src="assets/sky.svg" alt=""><span>SKY</span></button>
+  <div id="privateDialog" class="dialog-backdrop" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="privateTitle"><button class="close-dialog" type="button" data-close-dialog aria-label="Chiudi">&times;</button><div class="modal-lock"><svg><use href="#i-lock"></use></svg></div><span class="overline">AREA RISERVATA</span><h2 id="privateTitle">Accesso autorizzato</h2><p>Le informazioni di atleti, famiglie e staff richiedono identit&agrave;, ruolo e autorizzazioni verificati dal gestionale SCD. Qui non sono disponibili dati personali.</p><a href="/#desk" class="button-primary">Vai al gestionale protetto &rarr;</a><button type="button" class="button-quiet" data-close-dialog>Resta nell'app</button></div></div>
+  <div id="skyDialog" class="dialog-backdrop" hidden><div class="modal sky-modal" role="dialog" aria-modal="true" aria-labelledby="skyTitle"><button type="button" class="close-dialog" data-close-dialog aria-label="Chiudi Sky">&times;</button><div class="sky-modal-head"><img src="assets/sky.svg" alt=""><div><span class="overline">ASSISTENTE PUBBLICO</span><h2 id="skyTitle">Chiedi a Sky.</h2></div></div><p>Posso orientarti nelle informazioni pubbliche della societ&agrave;. Le funzioni riservate richiedono l'accesso autorizzato. Motore informativo, nessuna AI esterna attiva.</p><div class="sky-ideas"><button type="button" data-sky-suggestion="Qual e la prossima gara?">Prossima gara</button><button type="button" data-sky-suggestion="Come contattare la segreteria?">Segreteria</button><button type="button" data-sky-suggestion="Come diventare sponsor?">Sponsor</button></div><label class="sky-input-label" for="skyQuestion">La tua domanda</label><textarea id="skyQuestion" maxlength="500" rows="3" placeholder="Scrivi qui..."></textarea><button type="button" id="skyAsk" class="button-primary">Chiedi a Sky &rarr;</button><div id="skyResult" role="status" class="sky-result">Le risposte provengono dal percorso pubblico del Club.</div></div></div>
+</body>
+</html>

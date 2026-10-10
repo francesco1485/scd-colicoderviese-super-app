@@ -14,8 +14,11 @@
     <link rel="stylesheet" href="./scd-ng.css?v=0.6.3">
   <link rel="stylesheet" href="./scd-synth.css?v=0.4.5">
   <link rel="stylesheet" href="./ui-r52-social.css?v=0.7.1">
+  <link rel="stylesheet" href="./scd-reboot-2026.css?v=2.0.0">
+  <link rel="stylesheet" href="./scd-one-native.css?v=20261009-1">
+  <link rel="stylesheet" href="./scd-three-worlds-native.css?v=20261010-1">
 </head>
-<body data-scd-theme="arena">
+<body data-scd-theme="arena" data-design-system="scd-reboot-2026">
   <div class="ambient ambient-a"></div><div class="ambient ambient-b"></div>
   <div class="app" id="app">
     <header class="topbar">
@@ -70,6 +73,38 @@
           <div class="week-rail week-rail-first" id="weekRail"></div>
         </section>
 
+      <section class="scd-control-deck" aria-label="Navigazione principale SCD">
+        <header class="scd-control-heading">
+          <div><span class="scd-control-eyebrow">SCD COLICODERVIESE / PIATTAFORMA 2026–27</span>
+            <h1>Un Club.<br><strong>Tre mondi.</strong></h1>
+            <p>Sport, relazioni e organizzazione. Scegli dove entrare.</p></div>
+          <div class="scd-control-seal"><img src="./assets/logo-scd.png" alt="Stemma ufficiale SCD"><span>COLICO · DERVIO<br>ALTO LARIO</span></div>
+        </header>
+        <div class="scd-control-grid">
+          <article class="scd-control-card scd-control-one">
+            <span class="scd-control-index">01 / PUBBLICO</span>
+            <h2>UNIVERSE<br><em>SOCIAL</em></h2>
+            <p>Il campo, le squadre, le gare, il territorio e le notizie.</p>
+            <button type="button" data-scroll="#homeWeek">Esplora la settimana <span aria-hidden="true">↗</span></button>
+            <div class="scd-control-foot">CALENDARIO · NEWS · COMMUNITY</div>
+          </article>
+          <article class="scd-control-card scd-control-grow">
+            <span class="scd-control-index">02 / PARTNERSHIP</span>
+            <h2>SPONSOR<br><em>GROW</em></h2>
+            <p>Opportunità, aziende e progetti a sostegno del Club.</p>
+            <a href="/sponsor/">Entra nell'area Sponsor <span aria-hidden="true">↗</span></a>
+            <div class="scd-control-foot">PARTNER · EVENTI · TERRITORIO</div>
+          </article>
+          <article class="scd-control-card scd-control-core">
+            <span class="scd-control-index">03 / RISERVATO</span>
+            <h2>GESTIONALE<br><em>CORE</em></h2>
+            <p>La casa operativa di famiglie, atleti, staff e segreteria.</p>
+            <button type="button" data-nav="desk">Accedi al gestionale <span aria-hidden="true">↗</span></button>
+            <div class="scd-control-foot">RUOLI · DOCUMENTI · ATTIVITÀ</div>
+          </article>
+        </div>
+        <div class="scd-control-bottom"><span>STESSA IDENTITÀ SCD, ESPERIENZE DIFFERENTI</span><button type="button" id="scdDeckSky">Chiedi a Sky ✦</button></div>
+      </section>
         <section class="hero home-secondary-hero">
           
           <div class="hero-synth" aria-hidden="true">
@@ -601,6 +636,8 @@
   <script src="./scd-twin.js?v=40.0.0" defer></script>
   <script src="./lib/scd-operative-engine.js?v=51.0.0" defer></script>
   <script src="./scd-ng.js?v=0.7.3" defer></script>
+  <script src="./scd-one-native.js?v=20261009-1" defer></script>
+  <script src="./scd-three-worlds-native.js?v=20261010-1" defer></script>
   <script src="./scd-interactions.js?v=0.4.5" defer></script>
   <div class="scd-cookie-banner" id="scdCookieBanner" hidden role="dialog" aria-label="Preferenze analytics">
     <div><b>Misurazione accessi SCD</b><span>Possiamo usare un cookie first-party per contare accessi e utilizzo in forma aggregata. Nessun PIN, documento, messaggio privato o dato sanitario entra nelle analytics.</span></div>
