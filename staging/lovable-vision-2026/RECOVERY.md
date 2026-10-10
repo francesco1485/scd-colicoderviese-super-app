@@ -1,0 +1,6 @@
+# SCD ONE /vision-2026 home recovery
+Source: Lovable existing project 5c6eac53-092e-4a6d-a7fe-54d82d6369ad. Original six-screen gallery remains accessible through the review link. New default route is a full-size, responsive SCD ONE Home, not a six-phone gallery.
+Authoritative design board: ChatGPT Library 01_HOME_PUBBLICA(1).png and SCD_TAVOLA_MADRE_SEI_APP(1).png. No invented match schedule, athlete, minors, or sponsor logo.
+Brand: repository LOCKED /assets/logo-scd.png, original transparent mascot recovered from SCD-owned Google Drive SKY_MASCOTTE_UFFICIALE.png (Drive file 15vZDTSzowLrCU81bMUHIiZyEsX4e3ioc, owner sportclubcolico@gmail.com); binary added only under staging/public/assets/sky-mascotte-ufficiale.png, without replacing locked repo assets. Existing repo assets/hero-colico.webp reused as visual stage background pending usage-rights review.
+Build: npm install && npm run typecheck && npm run test:vision && npm run build; real Chromium interaction QA: npm run test:browser after starting Vite dev at :4173.
+Data sources intentionally not connected in visual laboratory. Public Home uses null/empty states, dynamic week navigation, feedback for unconnected search, accessible full-page mobile + desktop layout, modal Sky disconnected. Not production, not Lovable preview, not R20 integration. No new app, no new DB, no role changes.

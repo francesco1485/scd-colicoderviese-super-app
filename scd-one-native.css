@@ -1,0 +1,146 @@
+/* SCD ONE NATIVE – original six-board visual contract, 2026/27.
+   Scoped to ?scdVision=1, existing SCD app and R20 APIs; never style private CORE/GROW.
+   Original photography and LOCKED logo/mascot assets, no screenshot-as-UI. */
+body.scd-one-public-view{background:#eaf1f8!important;color:#102b51}
+body.scd-one-public-view .app{max-width:none!important;min-height:100vh}
+body.scd-one-public-view .app>main{display:block!important;max-width:none!important;padding:0!important;margin:0!important}
+body.scd-one-public-view .topbar,body.scd-one-public-view .world-switch,body.scd-one-public-view .global-experience-dock,body.scd-one-public-view .bottom-nav,body.scd-one-public-view .mirror-fab,body.scd-one-public-view .ambient{display:none!important}
+body.scd-one-native-ready #view-pulse>:not(#scdOneHome),body.scd-one-native-ready #view-calendar>:not(#scdOneCalendar){display:none!important}
+body.scd-one-public-view #view-pulse,body.scd-one-public-view #view-calendar{margin:0!important;padding:0!important;max-width:none!important}
+.scd-one-screen{--scd-blue:#004d9e;--scd-deep:#032c63;--scd-yellow:#ffdb09;--scd-ink:#102b51;--scd-green:#058840;--scd-border:#d9e3ef;font-family:Inter,"Segoe UI",Arial,sans-serif;color:var(--scd-ink);margin:0 auto;max-width:1500px;min-height:100dvh;background:#f8fbff;position:relative;padding-bottom:91px;overflow:hidden}
+.scd-one-screen *{box-sizing:border-box}.scd-one-screen section{min-height:0!important}
+.scd-one-screen button,.scd-one-screen a,.scd-one-screen select,.scd-one-screen input{font:inherit}
+.scd-one-screen button{cursor:pointer}.scd-one-screen a{text-decoration:none}.scd-one-screen button:focus-visible,.scd-one-screen a:focus-visible,.scd-one-screen input:focus-visible,.scd-one-screen select:focus-visible{outline:3px solid var(--scd-yellow);outline-offset:2px}
+.scd-one-screen h1,.scd-one-screen h2,.scd-one-screen p{margin:0;line-height:1.2}
+.scd-one-hero{position:relative;height:318px;color:white;overflow:hidden;isolation:isolate;background:#063d82}
+.scd-one-hero:before{content:"";position:absolute;inset:0;z-index:-2;background:url('./assets/hero-colico.webp') center 44%/cover no-repeat}
+.scd-one-hero:after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(1,44,105,.95) 0,rgba(0,49,109,.08) 44%,rgba(0,17,41,.2) 58%,rgba(0,24,55,.9) 100%)}
+.scd-one-header{height:111px;padding:33px 18px 9px;display:flex;align-items:center;justify-content:space-between;gap:8px;position:relative;z-index:3}
+.scd-one-brand{display:flex;align-items:center;gap:10px;color:#fff;border:0;background:transparent;text-align:left;min-width:0;padding:0}
+.scd-one-brand img{width:65px;height:73px;object-fit:contain;filter:drop-shadow(0 3px 3px #001e4d8c);flex-shrink:0}
+.scd-one-brand span{min-width:0;display:flex;flex-direction:column;gap:1px}
+.scd-one-brand small{font-weight:900;font-size:12px;line-height:1;color:white;letter-spacing:.05em}
+.scd-one-brand strong{font-family:Impact,"Arial Narrow","Arial Black",Arial,sans-serif;font-size:25px;letter-spacing:-.02em;line-height:1;color:#fff;font-style:normal;text-shadow:0 2px 4px #001b45}
+.scd-one-brand em{font-style:normal;color:#ffdc00}
+.scd-one-bell{border:0;color:white;background:transparent;position:relative;min-height:48px;min-width:46px;display:grid;place-items:center;z-index:4}
+.scd-one-bell i{position:absolute;width:14px;height:14px;border:2px solid #1253a3;border-radius:100%;background:#ffde03;top:3px;right:4px}
+.scd-one-sky{position:absolute;right:-5px;bottom:-21px;border:0;background:none;padding:0;width:47%;max-width:247px;height:265px;z-index:2;filter:drop-shadow(0 6px 7px #0214329c)}
+.scd-one-sky img{width:100%;height:100%;object-fit:contain;object-position:bottom}
+.scd-one-hero-copy{position:absolute;left:22px;bottom:28px;z-index:3;text-shadow:0 3px 6px #00152f;max-width:75%}
+.scd-one-hero-copy h1{font-weight:1000;font-size:clamp(23px,6.2vw,33px);letter-spacing:-.043em;line-height:1.03;white-space:nowrap}
+.scd-one-hero-copy p{font-weight:850;font-size:clamp(13px,3vw,16px);line-height:1.2;margin-top:7px}
+.scd-one-home-content{padding:0 12px 18px;background:#f9fbfd!important;display:block!important;margin:0!important}
+.scd-one-shortcuts{position:relative;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:stretch;gap:6px;margin:-4px -2px 13px;padding:8px 2px;background:white;border-radius:17px;box-shadow:0 4px 11px #092d5824;z-index:4}
+.scd-one-shortcuts button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-width:0;min-height:91px;background:white;border:1px solid #edf0f4;border-radius:12px;box-shadow:0 3px 8px #082c5b18;color:#022c69;padding:8px 1px}
+.scd-one-shortcuts button span{font-size:12px;font-weight:900;white-space:nowrap}
+.scd-one-shortcuts button:nth-child(2){color:#f36304}.scd-one-shortcuts button:nth-child(4){color:#00863b}
+.scd-one-shortcuts button:hover{background:#eff6ff}
+.scd-one-desktop-columns{display:grid;gap:12px}
+.scd-one-match{border:1px solid #dbe7f0;background:#fff;border-radius:9px;box-shadow:0 3px 9px #00326e18;overflow:hidden}
+.scd-one-section-title{display:flex;align-items:center;justify-content:space-between;gap:5px;min-height:37px;font-weight:950}
+.scd-one-match-title{color:#004b98}
+.scd-one-match-title b{display:flex;align-items:center;gap:6px;background:linear-gradient(125deg,#0055a9,#003984);clip-path:polygon(0 0,91% 0,100% 100%,0 100%);color:white;padding:7px 24px 7px 9px;width:65%;font-size:14px;letter-spacing:.015em}
+.scd-one-match-title button{display:flex;align-items:center;gap:1px;color:#004b9e;font-size:12px;font-weight:950;border:0;background:transparent;padding:7px}
+.scd-one-match-empty{display:flex;align-items:center;justify-content:center;flex-direction:column;min-height:162px;gap:9px;padding:15px;text-align:center;color:#0b417a}
+.scd-one-match-empty strong{font-size:15px}.scd-one-match-empty span{color:#667e92;font-size:11px}
+.scd-one-match-row{border:0;background:white;width:100%;display:grid;align-items:center;grid-template-columns:21% 30% 13% 30%;justify-content:space-between;text-align:center;min-height:129px;padding:7px 9px;color:#092850}
+.scd-one-match-date{border-left:5px solid #005bb3;border-right:1px solid #dfebf4;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.03;min-height:115px;justify-content:center;font-weight:900}
+.scd-one-match-date strong{font-size:35px;color:#081d43;font-weight:1000}.scd-one-match-date small{font-size:11px}.scd-one-match-date span{font-size:15px}
+.scd-one-team{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:6px;min-width:0}
+.scd-one-team img,.scd-one-opponent{width:56px;height:59px;object-fit:contain}
+.scd-one-team b{font-size:12px;line-height:1.15;overflow-wrap:anywhere}
+.scd-one-opponent{display:grid;place-items:center;background:#eff4fa;color:#52718e;border-radius:10px;border:2px dashed #bcd1e5;font-size:23px;font-weight:900}
+.scd-one-versus{font-size:19px}
+.scd-one-match-venue{display:flex;align-items:center;justify-content:center;gap:6px;padding:5px 9px 11px;font-size:12px;color:#174c89;flex-wrap:wrap}
+.scd-one-match-venue small{width:100%;text-align:center;color:#778ca3;font-size:10px}
+.scd-one-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:11px 0}
+.scd-one-actions button{border:0;background:transparent;display:flex;align-items:center;gap:7px;text-align:left;padding:4px 0;color:#103052;min-width:0}
+.scd-one-actions button>span:last-child{display:flex;flex-direction:column;gap:4px;min-width:0}
+.scd-one-actions b{font-size:13px}.scd-one-actions small{font-size:10px;line-height:1.25;color:#4f6780}
+.scd-one-promo-icon{min-width:63px;height:63px;color:white;border-radius:11px;display:grid;place-items:center}
+.scd-one-promo-icon.green{background:#058640}.scd-one-promo-icon.yellow{background:#ffdb09;color:#082342}
+.scd-one-sponsors{border:3px solid #0051a3;border-radius:10px;background:#00448c;padding:0 5px 6px;overflow:hidden}
+.scd-one-bluebar{display:flex;justify-content:space-between;align-items:center;gap:5px;min-height:38px;color:#fff}
+.scd-one-bluebar h2{font-size:16px;font-weight:950;color:#fff}
+.scd-one-bluebar a{display:flex;gap:3px;align-items:center;color:white;font-size:12px;font-weight:900}
+.scd-one-sponsor-cells{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;min-height:72px}
+.scd-one-sponsor-name,.scd-one-sponsor-pending{display:grid;place-items:center;background:white;border-radius:10px;padding:9px 5px;text-align:center;color:#00448b;font-size:13px;font-weight:900;box-shadow:inset 0 0 0 1px #ebf0f5;overflow-wrap:anywhere}
+.scd-one-sponsor-pending{grid-column:1/-1;font-size:12px;color:#617891}
+.scd-one-territory{padding:11px 4px 5px}.scd-one-territory h2{font-size:18px;margin-bottom:8px;font-weight:950;color:#101e35}
+.scd-one-territory-grid{display:grid;grid-template-columns:49% 1fr;gap:12px}
+.scd-one-territory-img{border-radius:9px;background:url('./assets/hero-colico.webp') center/cover;min-height:111px}
+.scd-one-territory-grid>div:last-child{display:flex;flex-direction:column;gap:6px;align-items:flex-start;justify-content:space-between}
+.scd-one-territory-grid b{font-size:13px}.scd-one-territory-grid p{font-size:11px;line-height:1.3;color:#465f7e}
+.scd-one-territory-grid button{border:0;color:white;background:#0055ab;border-radius:7px;min-height:35px;padding:8px 18px;display:flex;gap:7px;align-items:center;font-size:12px;font-weight:900}
+.scd-one-source-note{display:flex;align-items:center;justify-content:center;gap:5px;color:#42668e;font-size:10px;padding:17px 6px 7px;text-align:center}
+.scd-one-bottom{position:fixed;left:0;right:0;bottom:0;z-index:70;height:calc(71px + env(safe-area-inset-bottom));background:white;border-top:1px solid #dbe4ed;box-shadow:0 -5px 18px #0b31551a;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));padding:3px max(7px,env(safe-area-inset-left)) env(safe-area-inset-bottom) max(7px,env(safe-area-inset-right))}
+.scd-one-bottom button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;background:transparent;border:0;color:#1b4571;min-width:0;font-size:10px;font-weight:800;padding:4px 1px}
+.scd-one-bottom button.is-active{color:#0059b4}.scd-one-bottom button.is-active svg{fill:#0059b416}
+.scd-one-calendar{background:white}
+.scd-one-calendar-header{background:linear-gradient(135deg,#003678,#0052a3);color:white;padding-bottom:11px}
+.scd-one-calendar-header h1{font-size:25px;line-height:1.05;font-weight:950;margin:0 18px 4px}
+.scd-one-calendar-header p{font-size:12px;margin:0 18px;color:#dceafa}
+.scd-one-calendar-content{border-radius:17px 17px 0 0;margin:-1px 0 0!important;padding:12px 12px 30px!important;background:white!important;display:block!important;position:relative}
+.scd-one-tabs{background:#f3f5f7;border-radius:12px;padding:4px;display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:12px}
+.scd-one-tabs button{border:0;border-radius:9px;min-height:42px;color:#19477d;background:#e9edf1;font-size:12px;font-weight:900}
+.scd-one-tabs button.active{color:white;background:linear-gradient(120deg,#065bbb,#003d88)}
+.scd-one-weekselect{display:flex;align-items:center;justify-content:space-between;min-height:52px;gap:7px;color:#0d2750}
+.scd-one-weekselect button{border:0;background:transparent;color:#092b61;width:40px;height:43px;display:grid;place-items:center}
+.scd-one-weekselect strong{display:flex;gap:7px;align-items:center;font-size:14px;font-weight:950;text-align:center}
+.scd-one-calendar-filters{display:grid;gap:9px;margin:5px 0 8px}
+.scd-one-calendar-filters label{display:flex;align-items:center;gap:8px;font-weight:800;font-size:12px;color:#315780}
+.scd-one-calendar-filters select{background:#f6f9fd;border:1px solid #dce8f2;border-radius:8px;min-height:36px;color:#003d87;padding:7px;flex:1;max-width:320px}
+.scd-one-search{border:1px solid #dce8f2;border-radius:9px;padding:0 9px;color:#6485a5}
+.scd-one-search input{min-height:42px;outline:0;border:0;background:none;flex:1;font-size:12px;min-width:0;color:#0f376a}
+.scd-one-search:focus-within{outline:2px solid #e1b100}
+.scd-one-day h2{font-size:13px;text-transform:capitalize;border-bottom:1px solid #e9eef4;padding:13px 3px 8px;color:#153b6a;font-weight:900}
+.scd-one-event{width:100%;min-height:84px;background:white;border:0;border-bottom:1px solid #e6edf4;display:grid;grid-template-columns:62px 39px 1fr 20px;gap:6px;align-items:center;padding:7px 4px;text-align:left;color:#062a61;position:relative}
+.scd-one-event:before{content:"";position:absolute;top:10px;bottom:10px;left:0;width:4px;border-radius:6px;background:#0054aa}
+.scd-one-event.training:before{background:#008540}.scd-one-event.other:before{background:#ffce08}
+.scd-one-event-time{padding-left:7px;font-weight:950;font-size:12px}
+.scd-one-event-icon{color:#004d9e}.scd-one-event.training .scd-one-event-icon{color:#e65e03}.scd-one-event.other .scd-one-event-icon{color:#029448}
+.scd-one-event-description{display:flex;flex-direction:column;gap:5px;min-width:0}.scd-one-event-description strong{font-size:13px;line-height:1.12}.scd-one-event-description small{color:#496887;font-size:10.5px;line-height:1.27}
+.scd-one-no-events{min-height:184px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:30px 12px;text-align:center;color:#2a5081}
+.scd-one-no-events strong{font-size:15px}.scd-one-no-events p{font-size:12px;color:#5b7695}.scd-one-no-events small{font-size:10px;color:#8b9db1}
+.scd-one-all-events{width:100%;min-height:48px;border:0;border-radius:9px;background:linear-gradient(135deg,#0263ba,#00418e);color:white;font-size:15px;font-weight:900;display:flex;align-items:center;justify-content:center;gap:8px;margin:16px 0}
+.scd-one-upcoming-head{display:flex;align-items:center;justify-content:space-between;gap:5px;margin:7px 0}.scd-one-upcoming-head h2{font-size:17px;font-weight:950}
+.scd-one-upcoming-head button{display:flex;align-items:center;gap:3px;color:#0055ab;border:0;background:transparent;font-size:12px;font-weight:900}
+.scd-one-future-card{border:0;background:#fff;display:grid;grid-template-columns:51px 55px 1fr 17px;gap:9px;align-items:center;min-height:102px;width:100%;border-bottom:1px solid #e4eaf2;text-align:left;color:#123e74}
+.scd-one-future-date{display:flex;align-items:center;flex-direction:column;gap:3px;border-left:5px solid #0056a9}.scd-one-future-date small{font-size:10px;text-transform:uppercase}.scd-one-future-date strong{font-size:27px}
+.scd-one-future-card img{width:53px;height:60px;object-fit:contain}
+.scd-one-future-card>span:nth-child(3){display:flex;flex-direction:column;gap:5px}.scd-one-future-card>span b{font-size:12px}.scd-one-future-card>span strong{font-size:12px}.scd-one-future-card>span small{font-size:10px;color:#657f9a}
+.scd-one-future-empty{font-size:12px;color:#577590;padding:20px 7px}
+@media(min-width:770px){
+ body.scd-one-public-view{background:linear-gradient(110deg,#00214b,#063c78)}
+ .scd-one-screen{max-width:1390px;box-shadow:0 15px 70px #00142ca1;padding-bottom:100px}
+ .scd-one-hero{height:390px}
+ .scd-one-header{height:108px;padding:15px 38px}
+ .scd-one-brand img{width:80px;height:93px}.scd-one-brand strong{font-size:33px}.scd-one-brand small{font-size:15px}
+ .scd-one-hero-copy{left:54px;bottom:54px}.scd-one-hero-copy h1{font-size:47px}.scd-one-hero-copy p{font-size:19px}
+ .scd-one-sky{max-width:325px;width:30%;height:345px;bottom:-28px;right:5%}
+ .scd-one-home-content{padding:0 36px 32px}
+ .scd-one-shortcuts{margin:-18px 0 24px;padding:12px;gap:12px;border-radius:17px}
+ .scd-one-shortcuts button{min-height:105px;flex-direction:row;gap:17px;font-size:17px}
+ .scd-one-shortcuts button span{font-size:17px}
+ .scd-one-desktop-columns{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:20px}
+ .scd-one-match-title b{font-size:18px}
+ .scd-one-match-row{min-height:192px}
+ .scd-one-match-date{min-height:140px}.scd-one-match-date strong{font-size:44px}
+ .scd-one-team img,.scd-one-opponent{width:76px;height:82px}.scd-one-team b{font-size:14px}.scd-one-versus{font-size:26px}
+ .scd-one-actions{gap:20px}.scd-one-actions button{padding:12px 0}.scd-one-promo-icon{height:75px;min-width:75px}.scd-one-actions b{font-size:17px}.scd-one-actions small{font-size:13px}
+ .scd-one-sponsor-cells{min-height:110px}.scd-one-sponsor-name{font-size:16px}.scd-one-territory{padding-top:18px}.scd-one-territory-grid{min-height:163px}
+ .scd-one-territory-img{min-height:163px}.scd-one-territory-grid b{font-size:16px}.scd-one-territory-grid p{font-size:14px}
+ .scd-one-bottom{max-width:1390px;left:50%;right:auto;transform:translateX(-50%);bottom:0;width:100%;height:75px;border-radius:12px 12px 0 0;box-shadow:0 -5px 14px #001e4917}
+ .scd-one-bottom button{flex-direction:row;font-size:14px;gap:9px}
+ .scd-one-calendar-header{padding-bottom:36px}
+ .scd-one-calendar-header h1{font-size:36px;margin:4px 43px}.scd-one-calendar-header p{font-size:16px;margin:3px 43px}
+ .scd-one-calendar-content{max-width:1100px;margin:-15px auto 0!important;padding:28px 35px 32px!important;border-radius:20px 20px 0 0}
+ .scd-one-tabs button{font-size:15px}.scd-one-weekselect strong{font-size:20px}
+ .scd-one-calendar-filters{grid-template-columns:1fr 1fr;gap:22px}
+ .scd-one-event{grid-template-columns:95px 54px 1fr 28px;min-height:98px}.scd-one-event-time{font-size:14px}.scd-one-event-description strong{font-size:16px}.scd-one-event-description small{font-size:13px}
+ .scd-one-upcoming{max-width:980px;margin:0 auto}
+}
+@media(max-width:380px){.scd-one-brand img{width:56px;height:64px}.scd-one-brand strong{font-size:22px}.scd-one-hero-copy h1{font-size:22px}.scd-one-hero-copy p{font-size:12px}.scd-one-sky{right:-25px;width:49%}.scd-one-shortcuts button span{font-size:10px}.scd-one-promo-icon{min-width:54px;height:55px}.scd-one-actions b{font-size:12px}.scd-one-actions small{font-size:9px}.scd-one-bluebar h2{font-size:14px}}
+@media(prefers-reduced-motion:reduce){.scd-one-screen *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+.scd-one-calendar-filters .scd-one-clear-filter{border:1px solid #f0d259;border-radius:8px;background:#fff9d8;color:#103e75;font-size:12px;font-weight:900;justify-self:start;min-height:34px;padding:6px 12px}
