@@ -1,0 +1,156 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * S.D.C. COLICODERVIESE — design system
+ * Blu profondo lago / giallo montagna / bianco.
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-lake: var(--lake);
+  --color-lake-deep: var(--lake-deep);
+  --color-sun: var(--sun);
+  --color-sun-soft: var(--sun-soft);
+  --font-display: "Barlow Condensed", system-ui, sans-serif;
+  --font-sans: "Barlow", system-ui, sans-serif;
+  --shadow-premium: 0 20px 60px -20px oklch(0.2 0.09 258 / 0.55);
+  --shadow-glow: 0 0 40px -6px oklch(0.84 0.17 92 / 0.45);
+}
+
+:root {
+  --radius: 0.9rem;
+  --background: oklch(0.985 0.005 250);
+  --foreground: oklch(0.19 0.06 258);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.19 0.06 258);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.19 0.06 258);
+  --primary: oklch(0.32 0.12 258);
+  --primary-foreground: oklch(0.99 0.01 250);
+  --secondary: oklch(0.95 0.02 250);
+  --secondary-foreground: oklch(0.25 0.08 258);
+  --muted: oklch(0.955 0.012 250);
+  --muted-foreground: oklch(0.5 0.03 255);
+  --accent: oklch(0.84 0.17 92);
+  --accent-foreground: oklch(0.2 0.07 258);
+  --destructive: oklch(0.58 0.22 27);
+  --destructive-foreground: oklch(0.99 0.01 250);
+  --border: oklch(0.9 0.02 253);
+  --input: oklch(0.9 0.02 253);
+  --ring: oklch(0.84 0.17 92);
+  --lake: oklch(0.42 0.13 250);
+  --lake-deep: oklch(0.21 0.09 259);
+  --sun: oklch(0.84 0.17 92);
+  --sun-soft: oklch(0.93 0.11 96);
+}
+
+.dark {
+  --background: oklch(0.17 0.06 259);
+  --foreground: oklch(0.97 0.01 250);
+  --card: oklch(0.22 0.07 259);
+  --card-foreground: oklch(0.97 0.01 250);
+  --popover: oklch(0.22 0.07 259);
+  --popover-foreground: oklch(0.97 0.01 250);
+  --primary: oklch(0.84 0.17 92);
+  --primary-foreground: oklch(0.2 0.07 258);
+  --secondary: oklch(0.27 0.07 259);
+  --secondary-foreground: oklch(0.97 0.01 250);
+  --muted: oklch(0.27 0.07 259);
+  --muted-foreground: oklch(0.72 0.03 255);
+  --accent: oklch(0.84 0.17 92);
+  --accent-foreground: oklch(0.2 0.07 258);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 16%);
+  --ring: oklch(0.84 0.17 92);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+  }
+}
+
+@utility surface-deep {
+  background: linear-gradient(160deg, var(--lake-deep), var(--lake));
+  color: oklch(0.98 0.01 250);
+}
+
+@utility surface-sun {
+  background: linear-gradient(120deg, var(--sun), var(--sun-soft));
+  color: var(--lake-deep);
+}
+
+@utility card-premium {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 12px 34px -24px oklch(0.2 0.09 258 / 0.6);
+}
+
+@utility eyebrow {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--sun);
+}
+
+@utility ring-sun {
+  box-shadow: var(--shadow-glow);
+}
+
+/* Sky mascot micro-animations */
+@keyframes sky-idle { 0%,100% { transform: translateY(0) rotate(0) } 50% { transform: translateY(-3px) rotate(-3deg) } }
+@keyframes sky-bounce { 0%,100% { transform: translateY(0) } 30% { transform: translateY(-12px) } 50% { transform: translateY(0) } 65% { transform: translateY(-5px) } }
+@keyframes sky-pop { from { opacity: 0; transform: translateY(12px) scale(.96) } to { opacity: 1; transform: none } }
+.sky-idle { animation: sky-idle 4s ease-in-out infinite; }
+.sky-bounce { animation: sky-bounce 1.2s ease-in-out infinite; }
+.sky-panel { animation: sky-pop .22s ease-out; transform-origin: bottom right; }
+@media (prefers-reduced-motion: reduce) {
+  .sky-idle, .sky-bounce, .sky-panel { animation: none; }
+}
