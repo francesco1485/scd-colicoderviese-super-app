@@ -1,0 +1,50 @@
+name: SCD Super App CI
+on:
+  push:
+    branches:
+      - staging/superapp
+    paths:
+      - 'apps/superapp/**'
+      - '.github/workflows/superapp-ci.yml'
+  pull_request:
+    paths:
+      - 'apps/superapp/**'
+      - '.github/workflows/superapp-ci.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: apps/superapp
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/superapp/package-lock.json
+      - name: Install
+        run: npm ci --no-audit --no-fund
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Unit tests
+        run: npm test
+      - name: Build (Nitro node-server)
+        run: npm run build
+      - name: Smoke test protected staging gateway
+        env:
+          SCD_STAGING_PASSWORD: ci-only-staging-password-0123456789
+          PORT: '4400'
+          SCD_INTERNAL_PORT: '4401'
+        run: |
+          node scripts/staging-gateway.mjs > /tmp/gateway.log 2>&1 &
+          for n in $(seq 1 30); do curl --silent --fail http://127.0.0.1:4400/healthz > /dev/null && break; sleep 1; done
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:4400/)" = "401"
+          for n in $(seq 1 30); do code=$(curl -s -o /dev/null -w '%{http_code}' -u "scd-staging:$SCD_STAGING_PASSWORD" http://127.0.0.1:4400/calendario); [ "$code" = "200" ] && break; sleep 1; done
+          test "$code" = "200"
+          grep -q "S.D.C." <(curl -s -u "scd-staging:$SCD_STAGING_PASSWORD" http://127.0.0.1:4400/) && { echo "Found S.D.C."; exit 1; } || true
+          cat /tmp/gateway.log

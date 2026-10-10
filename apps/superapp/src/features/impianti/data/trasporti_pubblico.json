@@ -1,0 +1,12 @@
+{
+  "schema":"scd.quadro.transport.public.v1",
+  "audience":"PUBLIC_ONLY",
+  "checkedUTC":"2026-10-09T13:40:06Z",
+  "sourceSpreadsheetId":"1eBhjOymnJF6GfE-6-GRuo7UYgkE82ad24_VnY097n9Q",
+  "sourceSheets":[
+    "routes",
+    "fleet"
+  ],
+  "services":[],
+  "note":"Solo corse ALLENAMENTO confermate. Nessun nome, passeggero, autista, recapito o targa. Capienze soltanto se verificate."
+}
