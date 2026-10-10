@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Eventi e tornei SCD</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Barlow:wght@400;500;600;700&family=Kaushan+Script&family=Rye&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#062a52}
+a{color:#F8D000}a:hover{color:#fff1a8}
+.uv-stars{position:absolute;inset:0;background-image:radial-gradient(1.2px 1.2px at 14px 22px,#fff 60%,transparent),radial-gradient(1px 1px at 78px 64px,#cfe6ff 60%,transparent),radial-gradient(1.6px 1.6px at 130px 18px,#fff 60%,transparent),radial-gradient(1px 1px at 170px 92px,#fff 60%,transparent);background-size:200px 140px;opacity:.8}
+</style>
+</helmet>
+<div style="width:390px;height:1960px;position:relative;overflow:hidden;background:linear-gradient(180deg,#062a52 0%,#0860A8 45%,#062a52 100%);font-family:'Barlow',sans-serif;color:#ffffff">
+
+<header style="position:relative;height:200px;overflow:hidden;background:linear-gradient(180deg,#041f3f 0%,#05427c 100%)">
+<div class="uv-stars"></div>
+<div style="position:absolute;right:-40px;top:-40px;width:200px;height:200px;border-radius:100px;background:radial-gradient(circle,rgba(255,250,225,.9) 0%,rgba(255,236,160,.35) 28%,rgba(255,236,160,0) 70%)"></div>
+<svg viewBox="0 0 390 70" width="390" height="70" style="position:absolute;left:0;bottom:0" aria-hidden="true"><path d="M0 40 L50 18 L90 32 L140 6 L190 30 L240 12 L300 34 L350 16 L390 28 L390 70 L0 70 Z" fill="#05427c"/><path d="M-6 58 C 120 44, 260 48, 396 36 L 396 52 C 260 62, 120 64, -6 70 Z" fill="#F8D000" opacity=".9"/></svg>
+<div style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:14px 16px 0">
+<a href="Main.dc.html" aria-label="Torna alla home" style="width:44px;height:44px;border-radius:22px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;color:#ffffff"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></a>
+<span style="font-size:14px;color:#cfe6ff">Stagione 2026/27</span>
+<span style="width:44px"></span>
+</div>
+<h1 style="position:relative;margin:10px 16px 0;font-family:'Rye',serif;font-weight:400;font-size:40px;line-height:1.02;text-shadow:0 4px 0 #062a52">Eventi<br><span style="color:#F8D000">e tornei</span></h1>
+</header>
+
+<!-- featured -->
+<a href="Evento-CLC.dc.html" style="position:relative;display:flex;gap:14px;margin:18px 16px 0;padding:14px;border-radius:22px;background:linear-gradient(160deg,#05427c,#05427c);border:1px solid rgba(248,208,0,.5);box-shadow:0 20px 40px rgba(0,0,0,.45);text-decoration:none;color:#ffffff">
+<img src="/_blob/668fdd13fd705ef5a9249aecffc6bfb3" alt="Locandina ufficiale Christmas Lario Cup" style="width:110px;height:138px;flex:none;object-fit:cover;border-radius:10px;transform:rotate(-3deg);box-shadow:0 12px 20px rgba(0,0,0,.5)">
+<div style="min-width:0;display:flex;flex-direction:column">
+<span style="align-self:flex-start;padding:4px 10px;border-radius:999px;background:#F8D000;color:#062a52;font-size:12px;font-weight:700">Confermato</span>
+<div style="margin-top:8px;font-family:'Rye',serif;font-size:22px;line-height:1.05">Christmas Lario Cup</div>
+<div style="margin-top:6px;font-size:14px;color:#cfe6ff">Martedì 8 dicembre · Colico e Dervio</div>
+<div style="margin-top:auto;display:flex;align-items:baseline;gap:6px"><span style="font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:40px;color:#F8D000;line-height:1">58</span><span style="font-size:14px;color:#cfe6ff">giorni</span></div>
+</div>
+</a>
+
+<!-- season timeline -->
+<section style="margin:26px 16px 0">
+<h2 style="margin:0;font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:30px">Il calendario degli eventi</h2>
+<div style="margin-top:10px;display:flex;gap:14px;font-size:12px;color:#cfe6ff">
+<span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:6px;background:#F8D000;display:block"></span>Confermato</span>
+<span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:6px;background:#1898D8;display:block"></span>In programma</span>
+<span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:6px;border:2px solid #9fb6d9;display:block;box-sizing:border-box"></span>Da confermare</span>
+</div>
+<div style="position:relative;margin-top:16px;padding-left:30px">
+<div style="position:absolute;left:9px;top:8px;bottom:8px;width:2px;background:linear-gradient(180deg,#F8D000,#1898D8,#9fb6d9)"></div>
+<sc-for list="{{events}}" as="e" hint-placeholder-count="6">
+<div style="position:relative;margin-bottom:14px;padding:14px;border-radius:16px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12)">
+<span style="position:absolute;left:-28px;top:18px;width:16px;height:16px;border-radius:8px;box-sizing:border-box;background:{{e.dot}};border:{{e.ring}}"></span>
+<div style="font-size:13px;font-weight:700;color:{{e.dateColor}}">{{e.when}}</div>
+<div style="margin-top:4px;font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:22px;line-height:1.1">{{e.name}}</div>
+<div style="margin-top:4px;font-size:14px;line-height:1.4;color:#cfe6ff">{{e.what}}</div>
+</div>
+</sc-for>
+</div>
+</section>
+
+<!-- past -->
+<section style="margin:16px 16px 0;padding:16px;border-radius:20px;background:#041f3f;border:1px solid rgba(70,180,255,.25)">
+<h2 style="margin:0;font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:24px">Dove abbiamo giocato</h2>
+<div style="margin-top:10px;display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;align-items:center;gap:12px"><span style="width:40px;height:40px;flex:none;border-radius:9px;transform:skewX(-8deg);background:#7654B8;display:flex;align-items:center;justify-content:center;font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:15px">E14</span><div><div style="font-weight:700;font-size:15px">2° Memorial Marina Brigatti</div><div style="font-size:13px;color:#9fb6d9">Sabato 19 settembre</div></div></div>
+<div style="display:flex;align-items:center;gap:12px"><span style="width:40px;height:40px;flex:none;border-radius:9px;transform:skewX(-8deg);background:#3269BC;display:flex;align-items:center;justify-content:center;font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:15px">PUL</span><div><div style="font-weight:700;font-size:15px">6° Memorial Mazzitelli</div><div style="font-size:13px;color:#9fb6d9">Sabato 19 settembre</div></div></div>
+</div>
+</section>
+
+<!-- CTA clubs -->
+<section style="margin:20px 16px 0;padding:20px;border-radius:22px;background:#F8D000;color:#062a52">
+<div style="font-family:'Rye',serif;font-size:24px;line-height:1.1">Porta la tua squadra sul lago</div>
+<p style="margin:8px 0 0;font-size:15px;line-height:1.4;font-weight:500">Società che vogliono partecipare ai nostri tornei: scrivete all'organizzazione e ricevete il regolamento.</p>
+<div style="margin-top:14px;display:flex;gap:10px">
+<a href="Evento-CLC.dc.html" style="flex:1.2;height:50px;border-radius:14px;background:#062a52;color:#F8D000;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;text-decoration:none">Iscrivi la squadra</a>
+<a href="Sponsor.dc.html" style="flex:1;height:50px;border-radius:14px;border:2px solid #062a52;color:#062a52;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;text-decoration:none">Partner evento</a>
+</div>
+</section>
+<p style="margin:14px 16px 0;font-size:13px;line-height:1.45;color:#9fb6d9">Fonte: Master Tornei e Iniziative SCD e locandine ufficiali. Gli eventi "da confermare" non sono prenotazioni: date e campi possono cambiare.</p>
+
+<nav aria-label="Navigazione principale" style="position:absolute;left:0;right:0;bottom:0;height:72px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));background:#041f3f;border-top:1px solid rgba(248,208,0,.3)">
+<a href="Main.dc.html" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#c9d7ef;text-decoration:none;font-size:12px;font-weight:600"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>Home</a>
+<a href="Calendario.dc.html" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#c9d7ef;text-decoration:none;font-size:12px;font-weight:600"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Gare</a>
+<a href="Eventi.dc.html" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#F8D000;text-decoration:none;font-size:12px;font-weight:700"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/></svg>Eventi</a>
+<a href="Sponsor.dc.html" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#c9d7ef;text-decoration:none;font-size:12px;font-weight:600"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l3 6.5 7 .9-5.1 4.8 1.3 7L12 17.8 5.8 21.2l1.3-7L2 9.4l7-.9z"/></svg>Partner</a>
+<a href="Tessera.dc.html" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#c9d7ef;text-decoration:none;font-size:12px;font-weight:600"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Io</a>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1960}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const ok = { dot: '#F8D000', ring: '0', dateColor: '#F8D000' };
+    const plan = { dot: '#1898D8', ring: '0', dateColor: '#9fd0f1' };
+    const tbd = { dot: 'transparent', ring: '2px solid #9fb6d9', dateColor: '#9fb6d9' };
+    return { events: [
+      { when: 'Martedì 8 dicembre 2026', name: 'Christmas Lario Cup', what: 'Maschile a Colico, Female Edition a Dervio. 1ª edizione.', ...ok },
+      { when: '15 dicembre – 6 gennaio', name: 'Natale SCD', what: 'Un mese di vita del club: sport, famiglie, cene e tombolate. Programma in preparazione.', ...plan },
+      { when: 'Mercoledì 6 gennaio 2027', name: 'Befana dello Sport', what: 'Festa per i più piccoli.', ...tbd },
+      { when: 'Febbraio 2027', name: 'Carnevale Cup', what: 'Date in valutazione per non sovrapporsi alle gare in casa.', ...tbd },
+      { when: '1 – 16 maggio 2027', name: '2° Memorial Sandro Guattini', what: 'Tre weekend, uno per annata: 2019, 2018, 2017.', ...plan },
+      { when: '22 – 23 maggio 2027', name: '7° Memorial José Nasazzi', what: 'Maschile e femminile, locandine ufficiali pronte.', ...ok }
+    ] };
+  }
+}
+</script>
+</body>
+</html>

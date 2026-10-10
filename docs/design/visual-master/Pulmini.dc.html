@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Pulmini</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ground:#F2F7FC;--surface:#ffffff;--ink:#062a52;--sub:#3b5683;--line:#d5e4f5;--blue:#0860A8;--sky:#1898D8;--yellow:#F8D000;--night:#062a52;
+--ok:#16683f;--okbg:#e3f4ea;--warn:#8a5300;--warnbg:#fff3c4;--crit:#a3241b;--critbg:#fde7e4;--info:#0860A8;--infobg:#e6f3fc;
+--ease:cubic-bezier(0.23,1,0.32,1)}
+body{margin:0;background:var(--ground)}
+*{box-sizing:border-box}
+::selection{background:#F8D000;color:#062a52}
+.app{display:flex;overflow:hidden;background:var(--ground);font-family:'Barlow',sans-serif;color:var(--ink);font-variant-numeric:tabular-nums}
+.rail{width:236px;flex:none;background:var(--blue);color:#fff;display:flex;flex-direction:column;padding:18px 14px}
+.brand{display:flex;align-items:center;gap:10px;padding:2px 8px 18px}
+.brand b{font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:22px;letter-spacing:.01em;display:block;line-height:1}
+.brand small{font-size:13px;color:#d6ebfb}
+.rail .grp{margin:14px 10px 6px;font-size:13px;font-weight:600;color:#cfe6fa}
+.nav{display:flex;align-items:center;gap:10px;height:40px;padding:0 10px;border-radius:10px;color:#fff;text-decoration:none;font-weight:600;font-size:15px;transition:background-color 160ms ease}
+.nav:hover{background:rgba(255,255,255,.12)}
+.nav[aria-current=page]{background:var(--yellow);color:var(--ink)}
+.nav svg{flex:none}
+.who{margin-top:auto;padding:12px 10px;border-top:1px solid rgba(255,255,255,.22);font-size:14px;color:#e6f3fc}
+.who b{display:block;color:#fff;font-size:15px}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.top{height:72px;flex:none;display:flex;align-items:center;gap:16px;padding:0 28px;background:var(--surface);border-bottom:1px solid var(--line)}
+.top h1{margin:0;font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:34px;line-height:1}
+.path{display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 12px;border-radius:999px;background:var(--infobg);color:var(--blue);font-weight:600;font-size:14px;border:0}
+.search{margin-left:auto;display:flex;align-items:center;gap:8px;width:300px;height:40px;padding:0 12px;border:1px solid var(--line);border-radius:10px;color:var(--sub);font-size:15px;background:#fff}
+.led{height:66px;flex:none;display:flex;align-items:stretch;background-color:var(--night);background-image:radial-gradient(rgba(248,208,0,.13) 1px,transparent 1.3px);background-size:6px 6px;color:#fff}
+.led .day{display:flex;flex-direction:column;justify-content:center;padding:0 22px 0 28px;font-size:13px;color:#bcdcf5;min-width:150px}
+.led .day b{font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:20px;color:#fff}
+.led .it{display:flex;align-items:center;gap:12px;padding:0 24px;border-right:1px solid rgba(255,255,255,.14)}
+.led .it:first-child{padding-left:28px}
+.led .n.z{color:#9fc3e6}
+.led .n{font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:36px;line-height:1;color:var(--yellow)}
+.led .t{font-size:14px;line-height:1.25;color:#eaf4fd;max-width:22ch}
+.body{flex:1;min-height:0;padding:22px 28px;display:grid;gap:18px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:0 1px 2px rgba(6,42,82,.05),0 8px 24px -12px rgba(6,42,82,.18)}
+.card > header{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:16px 18px 10px}
+.card h2,.card h3{margin:0;font-size:19px;font-weight:700}
+.card p.s{margin:2px 0 0;font-size:14px;color:var(--sub);line-height:1.4}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 16px;border-radius:10px;font:600 15px 'Barlow',sans-serif;cursor:pointer;border:1px solid transparent;transition:transform 160ms var(--ease),background-color 160ms ease;white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.btn.p{background:var(--yellow);color:var(--ink)}
+.btn.p:hover{background:#ffdc2e}
+.btn.s{background:#fff;color:var(--blue);border-color:#b9d5ef}
+.btn.s:hover{background:var(--infobg)}
+.btn:focus-visible,.nav:focus-visible,.path:focus-visible,a:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
+.chip{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:999px;font-size:13px;font-weight:600;white-space:nowrap}
+.chip.ok{background:var(--okbg);color:var(--ok)}.chip.warn{background:var(--warnbg);color:var(--warn)}.chip.crit{background:var(--critbg);color:var(--crit)}.chip.info{background:var(--infobg);color:var(--info)}.chip.mute{background:#eef3f9;color:var(--sub)}
+.tag{display:inline-flex;align-items:center;justify-content:center;min-width:38px;height:26px;padding:0 7px;border-radius:7px;transform:skewX(-8deg);color:#fff;font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:14px}
+.tag > span{transform:skewX(8deg)}
+.empty{margin:4px 18px 18px;padding:18px;border:1.5px dashed #b9d5ef;border-radius:14px;background:#f8fbfe}
+.empty b{display:block;font-size:16px}
+.empty p{margin:4px 0 12px;font-size:14px;color:var(--sub);line-height:1.4}
+.row{display:flex;align-items:center;gap:14px;padding:12px 18px;border-top:1px solid var(--line)}
+.src{font-size:13px;color:var(--sub);display:flex;align-items:center;gap:6px}
+.big{font-family:'Big Shoulders Display',sans-serif;font-weight:900}
+table{border-collapse:collapse;width:100%}
+th{font-size:13px;font-weight:600;color:var(--sub);text-align:left;padding:10px 18px;border-bottom:1px solid var(--line)}
+td{padding:12px 18px;border-bottom:1px solid var(--line);font-size:15px}
+
+body{background:#F2F7FC}
+</style>
+</helmet>
+<div class="app" style="width:1440px;height:960px">
+<aside class="rail" aria-label="Aree di lavoro">
+<div class="brand"><img src="/_blob/d831a969f86523cc4ee06edd9c2e77e8" alt="Stemma S.C.D. ColicoDerviese" style="width:34px;height:44px;object-fit:contain"><div><b>SCD Dentro</b><small>Un account, tutte le aree</small></div></div>
+<nav><p class="grp">Sport</p><a class="nav" href="Quadro-settimanale.dc.html"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 9v11M15 9v11"/></svg>Quadro settimanale</a><a class="nav" href="Calendario.dc.html"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Calendario annuale</a><a class="nav" href="Pulmini.dc.html" aria-current="page"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="3"/><path d="M3 11h18M7 17v3M17 17v3"/><circle cx="7.5" cy="14" r=".6"/><circle cx="16.5" cy="14" r=".6"/></svg>Pulmini</a></nav>
+<div class="who"><b>Responsabile trasporti</b>Vedi le aree del tuo ruolo</div>
+</aside>
+<div class="main">
+<header class="top">
+<h1>Pulmini</h1>
+<button class="path" type="button" aria-label="Copia il link diretto /pulmini"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>/pulmini</button>
+<span style="margin-left:auto;font-size:15px;color:var(--sub);white-space:nowrap">Sabato 10 ottobre</span>
+<div class="search" role="search" style="margin-left:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><span>Cerca in tutta la SCD</span></div>
+</header>
+<section class="led" aria-label="In evidenza">
+<div class="it"><span class="n">4</span><span class="t">trasferte sabato 17 e domenica 18</span></div><div class="it"><span class="n z">0</span><span class="t">corse create nel Master Pulmini</span></div><div class="it"><span class="n">4</span><span class="t">mezzi, posti da confermare</span></div>
+</section>
+<div class="body" style="grid-template-columns:minmax(0,1fr) 340px">
+<section class="card" style="overflow:hidden">
+<header><div><h2>Trasferte del prossimo weekend</h2><p class="s">Partite fuori casa di sabato 17 e domenica 18 ottobre, dal calendario ufficiale. Decidi tu quali hanno bisogno del pulmino.</p></div><span class="chip mute">4 trasferte</span></header>
+<div class="row" style="align-items:stretch;gap:18px;padding:16px 18px">
+<div style="width:62px;flex:none;text-align:center;border-radius:12px;background:var(--infobg);padding:8px 0"><div style="font-size:12px;font-weight:700;color:var(--blue)">SAB</div><div class="big" style="font-size:30px;line-height:1">17</div></div>
+<div style="flex:1;min-width:0">
+<div style="display:flex;align-items:center;gap:10px"><span class="tag" style="background:#4f8020" title="Primi Calci"><span>PC</span></span><b style="font-size:17px;line-height:1.2">Primi Calci <span style="font-weight:600">a Vercurago Sq.B</span></b></div>
+<div style="margin-top:4px;font-size:14px;color:var(--sub);display:flex;gap:6px;align-items:center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>Vercurago · C.S. Comunale A. Moretti, campo 1</div>
+<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap"><span class="chip warn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.01"/></svg>Orario o sede da verificare</span></div>
+</div>
+<div style="width:330px;flex:none;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;align-content:center">
+<div style="padding:8px;border-radius:10px;background:#f6f9fd"><div style="font-size:12px;color:var(--sub)">Fischio</div><b style="font-size:15px">10:30</b></div>
+<div style="padding:8px;border-radius:10px;border:1.5px dashed #c6dbf0"><div style="font-size:12px;color:var(--sub)">Partenza</div><b style="font-size:14px;color:var(--sub)">—</b></div>
+<div style="padding:8px;border-radius:10px;border:1.5px dashed #c6dbf0"><div style="font-size:12px;color:var(--sub)">Autista</div><b style="font-size:14px;color:var(--sub)">—</b></div>
+<div style="padding:8px;border-radius:10px;border:1.5px dashed #c6dbf0"><div style="font-size:12px;color:var(--sub)">Mezzo</div><b style="font-size:14px;color:var(--sub)">—</b></div>
+</div>
+<div style="display:flex;align-items:center"><button class="btn p" type="button" aria-label="Organizza la corsa">Organizza</button></div>
+</div><div class="row" style="align-items:stretch;gap:18px;padding:16px 18px">
+<div style="width:62px;flex:none;text-align:center;border-radius:12px;background:var(--infobg);padding:8px 0"><div style="font-size:12px;font-weight:700;color:var(--blue)">SAB</div><div class="big" style="font-size:30px;line-height:1">17</div></div>
+<div style="flex:1;min-width:0">
+<div style="display:flex;align-items:center;gap:10px"><span class="tag" style="background:#127f8c" title="Esordienti 2015"><span>E15</span></span><b style="font-size:17px;line-height:1.2">Esordienti 2015 <span style="font-weight:600">a Sala Galbiate 1974</span></b></div>
+<div style="margin-top:4px;font-size:14px;color:var(--sub);display:flex;gap:6px;align-items:center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>Galbiate · C.S. del Mare, Sala al Barro</div>
+<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap"><span class="chip ok">Confermata FIGC/LND</span></div>
+</div>
+<div style="width:330px;flex:none;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;align-content:center">
+<div style="padding:8px;border-radius:10px;background:#f6f9fd"><div style="font-size:12px;color:var(--sub)">Fischio</div><b style="font-size:15px">14:15</b></div>
+<div style="padding:8px;border-radius:10px;border:1.5px dashed #c6dbf0"><div style="font-size:12px;color:var(--sub)">Partenza</div><b style="font-size:14px;color:var(--sub)">—</b></div>
+<div style="padding:8px;border-radius:10px;border:1.5px dashed #c6dbf0"><div style="font-size:12px;color:var(--sub)">Autista</div><b style="font-size:14px;color:var(--sub)">—</b></div>
+<div style="padding:8px;border-radius:10px;border:1.5px dashed #c6dbf0"><div style="font-size:12px;color:var(--sub)">Mezzo</div><b style="font-size:14px;color:var(--sub)">—</b></div>
+</div>
+<div style="display:flex;align-items:center"><button class="btn p" type="button" aria-label="Organizza la corsa">Organizza</button></div>
+</div><div class="row" style="align-items:stretch;gap:18px;padding:16px 18px">
+<div style="width:62px;flex:none;text-align:center;border-radius:12px;background:var(--infobg);padding:8px 0"><div style="font-size:12px;font-weight:700;color:var(--blue)">SAB</div><div class="big" style="font-size:30px;line-height:1">17</div></div>
+<div style="flex:1;min-width:0">
+<div style="display:flex;align-items:center;gap:10px"><span class="tag" style="background:#3269bc" title="Pulcini"><span>PUL</span></span><b style="font-size:17px;line-height:1.2">Pulcini <span style="font-weight:600">a Rogeno</span></b></div>
+<div style="margin-top:4px;font-size:14px;color:var(--sub);display:flex;gap:6px;align-items:center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>Rogeno · C.S. Oratorio Pio XI</div>
+<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap"><span class="chip warn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.01"/></svg>Orario o sede da verificare</span></div>
+</div>
+<div style="width:330px;flex:none;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;align-content:center">
+<div style="padding:8px;border-radius:10px;background:#f6f9fd"><div style="font-size:12px;color:var(--sub)">Fischio</div><b style="font-size:15px">15:15</b></div>
+<div style="padding:8px;border-radius:10px;border:1.5px dashed #c6dbf0"><div style="font-size:12px;color:var(--sub)">Partenza</div><b style="font-size:14px;color:var(--sub)">—</b></div>
+<div style="padding:8px;border-radius:10px;border:1.5px dashed #c6dbf0"><div style="font-size:12px;color:var(--sub)">Autista</div><b style="font-size:14px;color:var(--sub)">—</b></div>
+<div style="padding:8px;border-radius:10px;border:1.5px dashed #c6dbf0"><div style="font-size:12px;color:var(--sub)">Mezzo</div><b style="font-size:14px;color:var(--sub)">—</b></div>
+</div>
+<div style="display:flex;align-items:center"><button class="btn p" type="button" aria-label="Organizza la corsa">Organizza</button></div>
+</div><div class="row" style="align-items:stretch;gap:18px;padding:16px 18px">
+<div style="width:62px;flex:none;text-align:center;border-radius:12px;background:var(--infobg);padding:8px 0"><div style="font-size:12px;font-weight:700;color:var(--blue)">DOM</div><div class="big" style="font-size:30px;line-height:1">18</div></div>
+<div style="flex:1;min-width:0">
+<div style="display:flex;align-items:center;gap:10px"><span class="tag" style="background:#9b6a13" title="Prima Squadra"><span>1ª</span></span><b style="font-size:17px;line-height:1.2">Prima Squadra <span style="font-weight:600">a Ars Rovagnate</span></b></div>
+<div style="margin-top:4px;font-size:14px;color:var(--sub);display:flex;gap:6px;align-items:center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>La Valletta Brianza · Stadio Idealità</div>
+<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap"><span class="chip ok">Confermata FIGC/LND</span></div>
+</div>
+<div style="width:330px;flex:none;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;align-content:center">
+<div style="padding:8px;border-radius:10px;background:#f6f9fd"><div style="font-size:12px;color:var(--sub)">Fischio</div><b style="font-size:15px">15:30</b></div>
+<div style="padding:8px;border-radius:10px;border:1.5px dashed #c6dbf0"><div style="font-size:12px;color:var(--sub)">Partenza</div><b style="font-size:14px;color:var(--sub)">—</b></div>
+<div style="padding:8px;border-radius:10px;border:1.5px dashed #c6dbf0"><div style="font-size:12px;color:var(--sub)">Autista</div><b style="font-size:14px;color:var(--sub)">—</b></div>
+<div style="padding:8px;border-radius:10px;border:1.5px dashed #c6dbf0"><div style="font-size:12px;color:var(--sub)">Mezzo</div><b style="font-size:14px;color:var(--sub)">—</b></div>
+</div>
+<div style="display:flex;align-items:center"><button class="btn p" type="button" aria-label="Organizza la corsa">Organizza</button></div>
+</div>
+<div class="row src" style="padding:12px 18px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Calendario ufficiale FIGC/LND, copia del 10/10. Le corse si salvano nel Master Pulmini.</div>
+</section>
+<div style="display:flex;flex-direction:column;gap:18px;min-height:0">
+<section class="card" style="overflow:hidden">
+<header><div><h2>Flotta</h2><p class="s">Dal Master Flotta: i posti non sono ancora confermati.</p></div></header>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 18px 14px">
+<div style="padding:10px;border-radius:12px;background:#f6f9fd"><div class="big" style="font-size:30px;line-height:1">4</div><div style="font-size:13px;color:var(--sub)">mezzi</div></div>
+<div style="padding:10px;border-radius:12px;background:#f6f9fd"><div class="big" style="font-size:30px;line-height:1">3<span style="font-size:18px;color:var(--sub)">/6</span></div><div style="font-size:13px;color:var(--sub)">autisti attivi</div></div>
+<div style="padding:10px;border-radius:12px;background:#f6f9fd"><div class="big" style="font-size:30px;line-height:1">50<span style="font-size:18px;color:var(--sub)">/61</span></div><div style="font-size:13px;color:var(--sub)">iscritti attivi</div></div>
+</div>
+<div style="margin:0 18px 16px;padding:14px;border-radius:14px;border:1.5px dashed #b9d5ef;display:flex;gap:14px;align-items:center">
+<svg width="74" height="120" viewBox="0 0 74 120" aria-hidden="true"><rect x="3" y="3" width="68" height="114" rx="16" fill="#e6f3fc" stroke="#0860A8" stroke-width="2"/><rect x="12" y="10" width="50" height="16" rx="5" fill="#0860A8"/><text x="37" y="22" text-anchor="middle" font-size="9" font-family="Barlow" font-weight="700" fill="#fff">AUTISTA</text><text x="37" y="72" text-anchor="middle" font-size="9" font-family="Barlow" fill="#3b5683">posti</text><text x="37" y="84" text-anchor="middle" font-size="9" font-family="Barlow" fill="#3b5683">da configurare</text></svg>
+<p style="margin:0;font-size:14px;line-height:1.4;color:var(--sub)"><b style="color:var(--ink)">Vista dall'alto del pulmino.</b> Si accende con cognome e anno dei ragazzi e con l'autista solo dopo la verifica dei posti e dei permessi privacy.</p>
+</div>
+</section>
+<section class="card">
+<header><h2>Corse e passeggeri</h2></header>
+<div class="empty"><b>Nessuna corsa registrata</b><p>I 50 iscritti attivi non sono ancora legati a nessuna corsa. Crea la corsa da una trasferta qui a sinistra.</p></div>
+</section>
+<section class="card" style="padding:16px 18px;display:flex;gap:12px;align-items:flex-start">
+<span style="color:var(--blue)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg></span><p style="margin:0;font-size:14px;line-height:1.45;color:var(--sub)">L'elenco passeggeri di una corsa lo vedono solo l'autista assegnato e il responsabile trasporti.</p>
+</section>
+</div>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":960}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

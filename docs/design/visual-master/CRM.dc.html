@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>CRM contatti</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ground:#F2F7FC;--surface:#ffffff;--ink:#062a52;--sub:#3b5683;--line:#d5e4f5;--blue:#0860A8;--sky:#1898D8;--yellow:#F8D000;--night:#062a52;
+--ok:#16683f;--okbg:#e3f4ea;--warn:#8a5300;--warnbg:#fff3c4;--crit:#a3241b;--critbg:#fde7e4;--info:#0860A8;--infobg:#e6f3fc;
+--ease:cubic-bezier(0.23,1,0.32,1)}
+body{margin:0;background:var(--ground)}
+*{box-sizing:border-box}
+::selection{background:#F8D000;color:#062a52}
+.app{display:flex;overflow:hidden;background:var(--ground);font-family:'Barlow',sans-serif;color:var(--ink);font-variant-numeric:tabular-nums}
+.rail{width:236px;flex:none;background:var(--blue);color:#fff;display:flex;flex-direction:column;padding:18px 14px}
+.brand{display:flex;align-items:center;gap:10px;padding:2px 8px 18px}
+.brand b{font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:22px;letter-spacing:.01em;display:block;line-height:1}
+.brand small{font-size:13px;color:#d6ebfb}
+.rail .grp{margin:14px 10px 6px;font-size:13px;font-weight:600;color:#cfe6fa}
+.nav{display:flex;align-items:center;gap:10px;height:40px;padding:0 10px;border-radius:10px;color:#fff;text-decoration:none;font-weight:600;font-size:15px;transition:background-color 160ms ease}
+.nav:hover{background:rgba(255,255,255,.12)}
+.nav[aria-current=page]{background:var(--yellow);color:var(--ink)}
+.nav svg{flex:none}
+.who{margin-top:auto;padding:12px 10px;border-top:1px solid rgba(255,255,255,.22);font-size:14px;color:#e6f3fc}
+.who b{display:block;color:#fff;font-size:15px}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.top{height:72px;flex:none;display:flex;align-items:center;gap:16px;padding:0 28px;background:var(--surface);border-bottom:1px solid var(--line)}
+.top h1{margin:0;font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:34px;line-height:1}
+.path{display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 12px;border-radius:999px;background:var(--infobg);color:var(--blue);font-weight:600;font-size:14px;border:0}
+.search{margin-left:auto;display:flex;align-items:center;gap:8px;width:300px;height:40px;padding:0 12px;border:1px solid var(--line);border-radius:10px;color:var(--sub);font-size:15px;background:#fff}
+.led{height:66px;flex:none;display:flex;align-items:stretch;background-color:var(--night);background-image:radial-gradient(rgba(248,208,0,.13) 1px,transparent 1.3px);background-size:6px 6px;color:#fff}
+.led .day{display:flex;flex-direction:column;justify-content:center;padding:0 22px 0 28px;font-size:13px;color:#bcdcf5;min-width:150px}
+.led .day b{font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:20px;color:#fff}
+.led .it{display:flex;align-items:center;gap:12px;padding:0 24px;border-right:1px solid rgba(255,255,255,.14)}
+.led .it:first-child{padding-left:28px}
+.led .n.z{color:#9fc3e6}
+.led .n{font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:36px;line-height:1;color:var(--yellow)}
+.led .t{font-size:14px;line-height:1.25;color:#eaf4fd;max-width:22ch}
+.body{flex:1;min-height:0;padding:22px 28px;display:grid;gap:18px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:0 1px 2px rgba(6,42,82,.05),0 8px 24px -12px rgba(6,42,82,.18)}
+.card > header{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:16px 18px 10px}
+.card h2,.card h3{margin:0;font-size:19px;font-weight:700}
+.card p.s{margin:2px 0 0;font-size:14px;color:var(--sub);line-height:1.4}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 16px;border-radius:10px;font:600 15px 'Barlow',sans-serif;cursor:pointer;border:1px solid transparent;transition:transform 160ms var(--ease),background-color 160ms ease;white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.btn.p{background:var(--yellow);color:var(--ink)}
+.btn.p:hover{background:#ffdc2e}
+.btn.s{background:#fff;color:var(--blue);border-color:#b9d5ef}
+.btn.s:hover{background:var(--infobg)}
+.btn:focus-visible,.nav:focus-visible,.path:focus-visible,a:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
+.chip{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:999px;font-size:13px;font-weight:600;white-space:nowrap}
+.chip.ok{background:var(--okbg);color:var(--ok)}.chip.warn{background:var(--warnbg);color:var(--warn)}.chip.crit{background:var(--critbg);color:var(--crit)}.chip.info{background:var(--infobg);color:var(--info)}.chip.mute{background:#eef3f9;color:var(--sub)}
+.tag{display:inline-flex;align-items:center;justify-content:center;min-width:38px;height:26px;padding:0 7px;border-radius:7px;transform:skewX(-8deg);color:#fff;font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:14px}
+.tag > span{transform:skewX(8deg)}
+.empty{margin:4px 18px 18px;padding:18px;border:1.5px dashed #b9d5ef;border-radius:14px;background:#f8fbfe}
+.empty b{display:block;font-size:16px}
+.empty p{margin:4px 0 12px;font-size:14px;color:var(--sub);line-height:1.4}
+.row{display:flex;align-items:center;gap:14px;padding:12px 18px;border-top:1px solid var(--line)}
+.src{font-size:13px;color:var(--sub);display:flex;align-items:center;gap:6px}
+.big{font-family:'Big Shoulders Display',sans-serif;font-weight:900}
+table{border-collapse:collapse;width:100%}
+th{font-size:13px;font-weight:600;color:var(--sub);text-align:left;padding:10px 18px;border-bottom:1px solid var(--line)}
+td{padding:12px 18px;border-bottom:1px solid var(--line);font-size:15px}
+
+body{background:#F2F7FC}
+</style>
+</helmet>
+<div class="app" style="width:1440px;height:960px">
+<aside class="rail" aria-label="Aree di lavoro">
+<div class="brand"><img src="/_blob/d831a969f86523cc4ee06edd9c2e77e8" alt="Stemma S.C.D. ColicoDerviese" style="width:34px;height:44px;object-fit:contain"><div><b>SCD Dentro</b><small>Un account, tutte le aree</small></div></div>
+<nav><p class="grp">Sport</p><a class="nav" href="Calendario.dc.html"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Calendario annuale</a><p class="grp">Ufficio</p><a class="nav" href="Segreteria.dc.html"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 13h6M9 17h6"/></svg>Segreteria</a><a class="nav" href="CRM.dc.html" aria-current="page"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0M17 11a3 3 0 1 0 0-6M22 21a6 6 0 0 0-4-5.6"/></svg>CRM contatti</a><p class="grp">Fuori</p><a class="nav" href="Sponsor.dc.html"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>Sponsor</a><a class="nav" href="Eventi.dc.html"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4M12 14v4M8 21h8"/></svg>Tornei ed eventi</a></nav>
+<div class="who"><b>Segreteria e commerciale</b>Vedi le aree del tuo ruolo</div>
+</aside>
+<div class="main">
+<header class="top">
+<h1>CRM contatti</h1>
+<button class="path" type="button" aria-label="Copia il link diretto /crm"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>/crm</button>
+<span style="margin-left:auto;font-size:15px;color:var(--sub);white-space:nowrap">Sabato 10 ottobre</span>
+<div class="search" role="search" style="margin-left:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><span>Cerca in tutta la SCD</span></div>
+</header>
+<section class="led" aria-label="In evidenza">
+<div class="it"><span class="n">3</span><span class="t">partner attivi</span></div><div class="it"><span class="n">9</span><span class="t">club confermati al torneo</span></div><div class="it"><span class="n z">—</span><span class="t">trattative: registro da importare</span></div>
+</section>
+<div class="body" style="grid-template-columns:minmax(0,1fr) 360px">
+<div style="display:flex;flex-direction:column;gap:14px;min-height:0">
+<div role="tablist" aria-label="Vista del registro" style="display:flex;gap:6px;padding:5px;border-radius:12px;background:#e2edf8;width:max-content">
+<button role="tab" aria-selected="true" class="btn" type="button" style="background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(6,42,82,.15)">Sponsor e partner</button>
+<button role="tab" aria-selected="false" class="btn" type="button" style="background:transparent;color:var(--sub)">Tornei</button>
+<button role="tab" aria-selected="false" class="btn" type="button" style="background:transparent;color:var(--sub)">Contatti di segreteria</button>
+</div>
+<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;align-items:start"><div style="display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:16px;background:#e9f2fb;min-height:0">
+<div style="display:flex;justify-content:space-between;align-items:center;padding:2px 4px"><b style="font-size:15px">Da contattare</b><span class="chip mute" style="background:#fff">—</span></div>
+<div class="empty" style="margin:0;padding:14px"><p style="margin:0 0 10px">Importa i contatti dal foglio MASTER CONTATTI.</p><button class="btn s" type="button">Importa</button></div>
+</div><div style="display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:16px;background:#e9f2fb;min-height:0">
+<div style="display:flex;justify-content:space-between;align-items:center;padding:2px 4px"><b style="font-size:15px">In trattativa</b><span class="chip mute" style="background:#fff">—</span></div>
+<div style="padding:10px 4px;font-size:14px;color:var(--sub)">Registro non ancora importato.</div>
+</div><div style="display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:16px;background:#e9f2fb;min-height:0">
+<div style="display:flex;justify-content:space-between;align-items:center;padding:2px 4px"><b style="font-size:15px">Partner attivi</b><span class="chip mute" style="background:#fff">3</span></div>
+<article style="padding:12px;border-radius:14px;background:#fff;border:1px solid var(--line);box-shadow:0 4px 12px -8px rgba(6,42,82,.25)">
+<div style="display:flex;gap:10px;align-items:center"><img src="/_blob/fbbb95481159cf6c0732c2af08c7193b" alt="Logo HDI" style="width:44px;height:44px;object-fit:contain;border-radius:10px;background:#fff;border:1px solid var(--line);padding:4px"><div><b style="font-size:16px">HDI</b><div style="font-size:13px;color:var(--sub)">Sponsor</div></div></div>
+<div style="margin-top:10px;font-size:13px;color:var(--sub)">Rinnovo: da registrare</div>
+</article><article style="padding:12px;border-radius:14px;background:#fff;border:1px solid var(--line);box-shadow:0 4px 12px -8px rgba(6,42,82,.25)">
+<div style="display:flex;gap:10px;align-items:center"><img src="/_blob/696fd3fe2af450aeb010044a5c1ac7d6" alt="Logo Saglio" style="width:44px;height:44px;object-fit:contain;border-radius:10px;background:#fff;border:1px solid var(--line);padding:4px"><div><b style="font-size:16px">Saglio</b><div style="font-size:13px;color:var(--sub)">Sponsor</div></div></div>
+<div style="margin-top:10px;font-size:13px;color:var(--sub)">Rinnovo: da registrare</div>
+</article><article style="padding:12px;border-radius:14px;background:#fff;border:1px solid var(--line);box-shadow:0 4px 12px -8px rgba(6,42,82,.25)">
+<div style="display:flex;gap:10px;align-items:center"><img src="/_blob/f32eacadad6e75d2255abf5269b1d575" alt="Logo Legea" style="width:44px;height:44px;object-fit:contain;border-radius:10px;background:#fff;border:1px solid var(--line);padding:4px"><div><b style="font-size:16px">Legea</b><div style="font-size:13px;color:var(--sub)">Sponsor tecnico</div></div></div>
+<div style="margin-top:10px;font-size:13px;color:var(--sub)">Kit ufficiale del club</div>
+</article>
+</div><div style="display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:16px;background:#e9f2fb;min-height:0">
+<div style="display:flex;justify-content:space-between;align-items:center;padding:2px 4px"><b style="font-size:15px">Federazioni e club</b><span class="chip mute" style="background:#fff">3</span></div>
+<article style="padding:12px;border-radius:14px;background:#fff;border:1px solid var(--line);box-shadow:0 4px 12px -8px rgba(6,42,82,.25)">
+<div style="display:flex;gap:10px;align-items:center"><img src="/_blob/e3ae8c12c19424256d803d56542d35ea" alt="Logo LND" style="width:44px;height:44px;object-fit:contain;border-radius:10px;background:#fff;border:1px solid var(--line);padding:4px"><div><b style="font-size:16px">LND</b><div style="font-size:13px;color:var(--sub)">Lega Nazionale Dilettanti</div></div></div>
+<div style="margin-top:10px;font-size:13px;color:var(--sub)">Campionati e calendari</div>
+</article><article style="padding:12px;border-radius:14px;background:#fff;border:1px solid var(--line);box-shadow:0 4px 12px -8px rgba(6,42,82,.25)">
+<div style="display:flex;gap:10px;align-items:center"><img src="/_blob/cad14989a9de7b76307a64b68c3802c7" alt="Logo FIGC SGS" style="width:44px;height:44px;object-fit:contain;border-radius:10px;background:#fff;border:1px solid var(--line);padding:4px"><div><b style="font-size:16px">FIGC SGS</b><div style="font-size:13px;color:var(--sub)">Settore Giovanile e Scolastico</div></div></div>
+<div style="margin-top:10px;font-size:13px;color:var(--sub)">Autorizzazioni tornei</div>
+</article><article style="padding:12px;border-radius:14px;background:#fff;border:1px solid var(--line);box-shadow:0 4px 12px -8px rgba(6,42,82,.25)">
+<div style="display:flex;gap:10px;align-items:center"><img src="/_blob/b5130954ea1e66824c49c4be1faa0de7" alt="Logo AC Monza" style="width:44px;height:44px;object-fit:contain;border-radius:10px;background:#fff;border:1px solid var(--line);padding:4px"><div><b style="font-size:16px">AC Monza</b><div style="font-size:13px;color:var(--sub)">Club affiliato</div></div></div>
+<div style="margin-top:10px;font-size:13px;color:var(--sub)">Rapporto settore giovanile</div>
+</article>
+</div></div>
+<p class="src" style="margin:0"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0M17 11a3 3 0 1 0 0-6M22 21a6 6 0 0 0-4-5.6"/></svg>Un solo registro: sponsor, tornei e segreteria leggono e scrivono lo stesso MASTER CONTATTI. Nessun secondo CRM.</p>
+</div>
+<section class="card" style="overflow:hidden;align-self:start">
+<header><div><h2>Christmas Lario Cup</h2><p class="s">Club confermati verso l'obiettivo di 32 squadre.</p></div></header>
+<div style="padding:0 18px 14px"><div style="display:flex;align-items:baseline;gap:8px"><span class="big" style="font-size:44px;line-height:1;color:var(--blue)">9</span><span style="font-size:15px;color:var(--sub)">di 32</span></div>
+<div style="margin-top:8px;height:10px;border-radius:999px;background:#e2edf8;overflow:hidden"><div style="width:28%;height:100%;background:var(--yellow)"></div></div></div>
+<div class="row" style="padding:9px 18px"><span style="flex:1;font-size:15px;font-weight:600">Renate</span><span class="chip info">Colico · maschile</span></div><div class="row" style="padding:9px 18px"><span style="flex:1;font-size:15px;font-weight:600">Sampdoria</span><span class="chip info">Colico · maschile</span></div><div class="row" style="padding:9px 18px"><span style="flex:1;font-size:15px;font-weight:600">AlbinoLeffe</span><span class="chip info">Colico · maschile</span></div><div class="row" style="padding:9px 18px"><span style="flex:1;font-size:15px;font-weight:600">Calcio Lecco</span><span class="chip info">Colico · maschile</span></div><div class="row" style="padding:9px 18px"><span style="flex:1;font-size:15px;font-weight:600">Folgore Caratese</span><span class="chip info">Colico · maschile</span></div><div class="row" style="padding:9px 18px"><span style="flex:1;font-size:15px;font-weight:600">Spezia</span><span class="chip info">Colico · maschile</span></div><div class="row" style="padding:9px 18px"><span style="flex:1;font-size:15px;font-weight:600">Calcio Lecco</span><span class="chip warn">Dervio · femminile</span></div><div class="row" style="padding:9px 18px"><span style="flex:1;font-size:15px;font-weight:600">Pro Sesto Women</span><span class="chip warn">Dervio · femminile</span></div><div class="row" style="padding:9px 18px"><span style="flex:1;font-size:15px;font-weight:600">Hibernians F.C. Paola · Malta</span><span class="chip warn">Dervio · femminile</span></div>
+</section>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":960}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

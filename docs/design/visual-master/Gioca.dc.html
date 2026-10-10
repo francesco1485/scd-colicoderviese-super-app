@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Gioca</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ground:#F2F7FC;--surface:#ffffff;--ink:#062a52;--sub:#3b5683;--line:#d5e4f5;--blue:#0860A8;--sky:#1898D8;--yellow:#F8D000;--night:#062a52;
+--ok:#16683f;--okbg:#e3f4ea;--warn:#8a5300;--warnbg:#fff3c4;--crit:#a3241b;--critbg:#fde7e4;--info:#0860A8;--infobg:#e6f3fc;
+--ease:cubic-bezier(0.23,1,0.32,1)}
+body{margin:0;background:var(--ground)}
+*{box-sizing:border-box}
+::selection{background:#F8D000;color:#062a52}
+.app{display:flex;overflow:hidden;background:var(--ground);font-family:'Barlow',sans-serif;color:var(--ink);font-variant-numeric:tabular-nums}
+.rail{width:236px;flex:none;background:var(--blue);color:#fff;display:flex;flex-direction:column;padding:18px 14px}
+.brand{display:flex;align-items:center;gap:10px;padding:2px 8px 18px}
+.brand b{font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:22px;letter-spacing:.01em;display:block;line-height:1}
+.brand small{font-size:13px;color:#d6ebfb}
+.rail .grp{margin:14px 10px 6px;font-size:13px;font-weight:600;color:#cfe6fa}
+.nav{display:flex;align-items:center;gap:10px;height:40px;padding:0 10px;border-radius:10px;color:#fff;text-decoration:none;font-weight:600;font-size:15px;transition:background-color 160ms ease}
+.nav:hover{background:rgba(255,255,255,.12)}
+.nav[aria-current=page]{background:var(--yellow);color:var(--ink)}
+.nav svg{flex:none}
+.who{margin-top:auto;padding:12px 10px;border-top:1px solid rgba(255,255,255,.22);font-size:14px;color:#e6f3fc}
+.who b{display:block;color:#fff;font-size:15px}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.top{height:72px;flex:none;display:flex;align-items:center;gap:16px;padding:0 28px;background:var(--surface);border-bottom:1px solid var(--line)}
+.top h1{margin:0;font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:34px;line-height:1}
+.path{display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 12px;border-radius:999px;background:var(--infobg);color:var(--blue);font-weight:600;font-size:14px;border:0}
+.search{margin-left:auto;display:flex;align-items:center;gap:8px;width:300px;height:40px;padding:0 12px;border:1px solid var(--line);border-radius:10px;color:var(--sub);font-size:15px;background:#fff}
+.led{height:66px;flex:none;display:flex;align-items:stretch;background-color:var(--night);background-image:radial-gradient(rgba(248,208,0,.13) 1px,transparent 1.3px);background-size:6px 6px;color:#fff}
+.led .day{display:flex;flex-direction:column;justify-content:center;padding:0 22px 0 28px;font-size:13px;color:#bcdcf5;min-width:150px}
+.led .day b{font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:20px;color:#fff}
+.led .it{display:flex;align-items:center;gap:12px;padding:0 24px;border-right:1px solid rgba(255,255,255,.14)}
+.led .it:first-child{padding-left:28px}
+.led .n.z{color:#9fc3e6}
+.led .n{font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:36px;line-height:1;color:var(--yellow)}
+.led .t{font-size:14px;line-height:1.25;color:#eaf4fd;max-width:22ch}
+.body{flex:1;min-height:0;padding:22px 28px;display:grid;gap:18px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:0 1px 2px rgba(6,42,82,.05),0 8px 24px -12px rgba(6,42,82,.18)}
+.card > header{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:16px 18px 10px}
+.card h2,.card h3{margin:0;font-size:19px;font-weight:700}
+.card p.s{margin:2px 0 0;font-size:14px;color:var(--sub);line-height:1.4}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 16px;border-radius:10px;font:600 15px 'Barlow',sans-serif;cursor:pointer;border:1px solid transparent;transition:transform 160ms var(--ease),background-color 160ms ease;white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.btn.p{background:var(--yellow);color:var(--ink)}
+.btn.p:hover{background:#ffdc2e}
+.btn.s{background:#fff;color:var(--blue);border-color:#b9d5ef}
+.btn.s:hover{background:var(--infobg)}
+.btn:focus-visible,.nav:focus-visible,.path:focus-visible,a:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
+.chip{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:999px;font-size:13px;font-weight:600;white-space:nowrap}
+.chip.ok{background:var(--okbg);color:var(--ok)}.chip.warn{background:var(--warnbg);color:var(--warn)}.chip.crit{background:var(--critbg);color:var(--crit)}.chip.info{background:var(--infobg);color:var(--info)}.chip.mute{background:#eef3f9;color:var(--sub)}
+.tag{display:inline-flex;align-items:center;justify-content:center;min-width:38px;height:26px;padding:0 7px;border-radius:7px;transform:skewX(-8deg);color:#fff;font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:14px}
+.tag > span{transform:skewX(8deg)}
+.empty{margin:4px 18px 18px;padding:18px;border:1.5px dashed #b9d5ef;border-radius:14px;background:#f8fbfe}
+.empty b{display:block;font-size:16px}
+.empty p{margin:4px 0 12px;font-size:14px;color:var(--sub);line-height:1.4}
+.row{display:flex;align-items:center;gap:14px;padding:12px 18px;border-top:1px solid var(--line)}
+.src{font-size:13px;color:var(--sub);display:flex;align-items:center;gap:6px}
+.big{font-family:'Big Shoulders Display',sans-serif;font-weight:900}
+table{border-collapse:collapse;width:100%}
+th{font-size:13px;font-weight:600;color:var(--sub);text-align:left;padding:10px 18px;border-bottom:1px solid var(--line)}
+td{padding:12px 18px;border-bottom:1px solid var(--line);font-size:15px}
+
+.pub{font-family:'Barlow',sans-serif;color:#fff;background:#062a52}
+.pnav{color:#e6f3fc;text-decoration:none;font-weight:600;font-size:16px;padding:8px 4px}
+.mega a{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border-radius:12px;color:var(--ink);text-decoration:none;transition:background-color 160ms ease}
+.mega a:hover{background:#eef6fd}
+.mega h2{margin:0 12px 6px;font-size:14px;font-weight:700;color:var(--blue)}
+.mega .ic{width:36px;height:36px;flex:none;border-radius:10px;background:var(--infobg);color:var(--blue);display:flex;align-items:center;justify-content:center}
+.mega b{font-size:15.5px;display:flex;align-items:center;gap:6px}
+.mega small{display:block;font-size:13px;color:var(--sub);margin-top:1px}
+.mega code{font:600 12.5px 'Barlow',sans-serif;color:var(--blue)}
+
+body{background:#062a52}
+</style>
+</helmet>
+<div class="pub" style="width:390px;height:1900px;position:relative;overflow:hidden;background:linear-gradient(180deg,#062a52 0%,#0860A8 45%,#062a52 100%)">
+<header style="padding:16px 20px;display:flex;justify-content:space-between;align-items:center"><b class="big" style="font-size:24px">Gioca</b><button class="path" type="button" aria-label="Copia il link diretto /gioca" style="background:rgba(255,255,255,.14);color:#fff"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>/gioca</button></header>
+
+<section style="margin:0 16px;padding:18px;border-radius:22px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16)">
+<h1 style="margin:0;font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:40px;line-height:.95">Il tuo campione</h1>
+<p style="margin:6px 0 14px;font-size:15px;color:#cfe6fa;line-height:1.4">Nasce piccolo e cresce con te: più partecipi alla vita del club, più diventa forte. Se lo lasci solo per un po' si riposa in panchina e torna in forma quando ritorni.</p>
+<div style="display:flex;gap:16px;align-items:center">
+<div style="width:132px;height:176px;flex:none;border-radius:18px;background:radial-gradient(circle at 50% 30%,#0b5aa0,#062a52);display:flex;align-items:flex-end;justify-content:center;position:relative;overflow:hidden">
+<svg width="110" height="160" viewBox="0 0 110 160" aria-hidden="true"><circle cx="55" cy="40" r="24" fill="rgba(255,255,255,.22)"/><path d="M15 160 C 15 100, 95 100, 95 160 Z" fill="rgba(255,255,255,.22)"/></svg>
+<span class="big" style="position:absolute;top:96px;font-size:34px;color:#F8D000">10</span>
+<span style="position:absolute;bottom:8px;font-size:12px;color:#cfe6fa">avatar 3D realistico</span>
+</div>
+<div style="flex:1;display:grid;gap:10px"><div><div style="display:flex;justify-content:space-between;font-size:13.5px"><span>Allenamento</span><span style="color:#cfe6fa">esempio</span></div><div style="margin-top:4px;height:10px;border-radius:999px;background:rgba(255,255,255,.12);overflow:hidden"><div style="width:72%;height:100%;background:#F8D000"></div></div></div><div><div style="display:flex;justify-content:space-between;font-size:13.5px"><span>Riposo</span><span style="color:#cfe6fa">esempio</span></div><div style="margin-top:4px;height:10px;border-radius:999px;background:rgba(255,255,255,.12);overflow:hidden"><div style="width:55%;height:100%;background:#1898D8"></div></div></div><div><div style="display:flex;justify-content:space-between;font-size:13.5px"><span>Spirito di squadra</span><span style="color:#cfe6fa">esempio</span></div><div style="margin-top:4px;height:10px;border-radius:999px;background:rgba(255,255,255,.12);overflow:hidden"><div style="width:88%;height:100%;background:#5fd08a"></div></div></div></div>
+</div>
+<div style="margin-top:14px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+<button class="btn s" type="button" style="height:44px">Divisa</button><button class="btn s" type="button" style="height:44px">Numero</button><button class="btn s" type="button" style="height:44px">Nome</button></div>
+<p style="margin:12px 0 0;padding:12px;border-radius:12px;background:rgba(248,208,0,.12);font-size:13.5px;line-height:1.45;color:#ffe9a3">Crea il volto dalla tua foto solo se sei maggiorenne e dai il consenso. I ragazzi scelgono tra volti già pronti.</p>
+</section>
+
+<section style="margin:16px 16px 0;padding:18px;border-radius:22px;background:#fff;color:#062a52">
+<div style="display:flex;justify-content:space-between;align-items:baseline"><h2 style="margin:0;font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:26px">Pronostico della domenica</h2><span class="chip info">a punti</span></div>
+<p style="margin:4px 0 12px;font-size:14px;color:#3b5683">ColicoDerviese contro Alta Brianza Tavernerio, domenica 11 alle 15:30</p>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px"><button class="btn s" type="button">Vinciamo</button><button class="btn s" type="button">Pari</button><button class="btn s" type="button">Perdiamo</button></div>
+<p style="margin:10px 0 0;font-size:13px;color:#3b5683">Si gioca solo a punti e premi del club. Niente soldi, niente scommesse.</p>
+</section>
+
+<section style="margin:16px 16px 0;padding:18px;border-radius:22px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16)">
+<h2 style="margin:0;font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:34px;line-height:1">FantaSCD delle annate</h2>
+<p style="margin:6px 0 10px;font-size:14.5px;line-height:1.45;color:#cfe6fa">Si gioca tra tesserati: ogni annata è una squadra con bambini, mister e dirigenti insieme. I punti sono sempre di squadra. Premio finale: festa per l'annata che vince.</p>
+<div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:15px">Classifica delle annate</b><span class="chip warn">esempio</span></div>
+<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid rgba(255,255,255,.12)"><span class="big" style="width:22px;font-size:18px;color:#F8D000">1</span><span class="tag" style="background:#c23c3f" title="Under 15"><span>U15</span></span><span style="flex:1;font-weight:600">Under 15</span><span style="font-size:13px;color:#9fc3e6;width:62px;text-align:right">— punti</span></div><div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid rgba(255,255,255,.12)"><span class="big" style="width:22px;font-size:18px;color:#F8D000">2</span><span class="tag" style="background:#127f8c" title="Esordienti 2015"><span>E15</span></span><span style="flex:1;font-weight:600">Esordienti 2015</span><span style="font-size:13px;color:#9fc3e6;width:62px;text-align:right">— punti</span></div><div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid rgba(255,255,255,.12)"><span class="big" style="width:22px;font-size:18px;color:#F8D000">3</span><span class="tag" style="background:#9b6a13" title="Prima Squadra"><span>1ª</span></span><span style="flex:1;font-weight:600">Prima Squadra</span><span style="font-size:13px;color:#9fc3e6;width:62px;text-align:right">— punti</span></div><div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid rgba(255,255,255,.12)"><span class="big" style="width:22px;font-size:18px;color:#F8D000">4</span><span class="tag" style="background:#3269bc" title="Pulcini"><span>PUL</span></span><span style="flex:1;font-weight:600">Pulcini</span><span style="font-size:13px;color:#9fc3e6;width:62px;text-align:right">— punti</span></div><div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid rgba(255,255,255,.12)"><span class="big" style="width:22px;font-size:18px;color:#F8D000">5</span><span class="tag" style="background:#375b89" title="Juniores U19"><span>U19</span></span><span style="flex:1;font-weight:600">Juniores U19</span><span style="font-size:13px;color:#9fc3e6;width:62px;text-align:right">— punti</span></div>
+<h3 style="margin:16px 0 4px;font-size:17px">Bonus e malus della settimana</h3>
+<p style="margin:0 0 4px;font-size:13px;color:#9fc3e6">Valgono solo per gli adulti che accettano di giocare. Li conferma un dirigente.</p>
+<div style="display:flex;gap:10px;align-items:center;padding:8px 0"><span class="big" style="width:40px;font-size:22px;color:#5fd08a">+3</span><span style="font-size:14.5px">Crovi chiude la biglietteria e scappa prima del fischio</span></div><div style="display:flex;gap:10px;align-items:center;padding:8px 0"><span class="big" style="width:40px;font-size:22px;color:#5fd08a">+2</span><span style="font-size:14.5px">Il mister indovina il modulo dell'avversario</span></div><div style="display:flex;gap:10px;align-items:center;padding:8px 0"><span class="big" style="width:40px;font-size:22px;color:#5fd08a">+1</span><span style="font-size:14.5px">Un dirigente porta la torta</span></div><div style="display:flex;gap:10px;align-items:center;padding:8px 0"><span class="big" style="width:40px;font-size:22px;color:#ff9d8c">−1</span><span style="font-size:14.5px">Il dirigente dimentica i palloni</span></div>
+<p style="margin:12px 0 0;padding:12px;border-radius:12px;background:rgba(255,255,255,.08);font-size:13.5px;line-height:1.45;color:#cfe6fa">Nessun voto ai singoli ragazzi e nessuna classifica individuale dei minori. I fantagiocatori sono solo adulti che hanno accettato.</p>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1900}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

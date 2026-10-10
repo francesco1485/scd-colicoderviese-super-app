@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Sistema visivo SCD</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Barlow:wght@400;500;600;700&family=Kaushan+Script&family=Rye&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#062a52}
+a{color:#F8D000}
+</style>
+</helmet>
+<div style="width:1440px;height:1040px;box-sizing:border-box;padding:48px;overflow:hidden;background:linear-gradient(135deg,#062a52 0%,#0860A8 55%,#062a52 100%);font-family:'Barlow',sans-serif;color:#ffffff;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:28px;align-content:start">
+
+<div style="grid-column:1 / 13;display:flex;justify-content:space-between;align-items:flex-end">
+<div><div style="font-family:'Kaushan Script',cursive;font-size:30px;color:#F8D000">S.C.D. ColicoDerviese</div><h1 style="margin:0;font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:64px;line-height:1">Sistema visivo</h1></div>
+<div style="font-size:16px;color:#cfe6ff;max-width:420px;line-height:1.45">Fuori esplode, dentro è una Rolls-Royce. Stesso stemma, stessi colori, due temperature.</div>
+</div>
+
+<!-- FUORI PALETTE -->
+<section style="grid-column:1 / 7">
+<h2 style="margin:0 0 12px;font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:26px">Fuori · esplosiva</h2>
+<div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px">
+<sc-for list="{{outside}}" as="c" hint-placeholder-count="6">
+<div><div style="height:96px;border-radius:14px;background:{{c.hex}};border:1px solid rgba(255,255,255,.18)"></div><div style="margin-top:8px;font-weight:700;font-size:14px">{{c.name}}</div><div style="font-size:13px;color:#9fb6d9">{{c.hex}}</div><div style="font-size:12px;color:#cfe6ff;margin-top:2px;line-height:1.3">{{c.role}}</div></div>
+</sc-for>
+</div>
+</section>
+
+<!-- DENTRO PALETTE -->
+<section style="grid-column:7 / 13">
+<h2 style="margin:0 0 12px;font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:26px">Dentro · Rolls-Royce</h2>
+<div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px">
+<sc-for list="{{inside}}" as="c" hint-placeholder-count="5">
+<div><div style="height:96px;border-radius:14px;background:{{c.hex}};border:1px solid rgba(248,208,0,.35)"></div><div style="margin-top:8px;font-weight:700;font-size:14px">{{c.name}}</div><div style="font-size:13px;color:#9fb6d9">{{c.hex}}</div><div style="font-size:12px;color:#cfe6ff;margin-top:2px;line-height:1.3">{{c.role}}</div></div>
+</sc-for>
+</div>
+</section>
+
+<!-- TYPE -->
+<section style="grid-column:1 / 8;padding:24px;border-radius:20px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px">
+<div><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:64px;line-height:.9">COLICO</div><div style="font-size:14px;color:#cfe6ff;margin-top:6px">Big Shoulders Display 900 · titoli, numeri, tabellone</div></div>
+<div><div style="font-family:'Kaushan Script',cursive;font-size:44px;color:#F8D000;line-height:1.1">Sempre insieme</div><div style="font-size:14px;color:#cfe6ff;margin-top:6px">Kaushan Script · firma e motto, poche parole</div></div>
+<div><div style="font-family:'Rye',serif;font-size:40px;line-height:1">CERCASI PARTNER</div><div style="font-size:14px;color:#cfe6ff;margin-top:6px">Rye · manifesto western, solo Eventi e Sponsor</div></div>
+<div><div style="font-size:20px;line-height:1.45;font-weight:500">Domenica alle 15:30 la Prima gioca in casa a Colico.</div><div style="font-size:14px;color:#cfe6ff;margin-top:6px">Barlow · testo, minimo 16 px</div></div>
+</section>
+
+<!-- LIGHT -->
+<section style="grid-column:8 / 13;position:relative;border-radius:20px;overflow:hidden;background:radial-gradient(70% 80% at 50% 40%,#0860A8 0%,#05427c 55%,#062a52 100%);border:1px solid rgba(248,208,0,.35);min-height:260px">
+<img src="/_blob/d831a969f86523cc4ee06edd9c2e77e8" alt="Stemma ufficiale con luce da studio" style="position:absolute;left:36px;top:30px;width:150px;height:196px;object-fit:contain;filter:drop-shadow(0 0 1px #fff7cf) drop-shadow(0 0 22px rgba(248,208,0,.55)) drop-shadow(0 20px 26px rgba(0,0,0,.55))">
+<div style="position:absolute;left:220px;top:36px;right:24px">
+<div style="font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:24px">Luce da studio</div>
+<div style="margin-top:10px;font-size:15px;line-height:1.5;color:#e8f1ff">Contorno luminoso giallo, ombra morbida in basso, fondale sfumato senza stacchi. Sempre su asset ufficiali scontornati, mai ridisegnati.</div>
+</div>
+</section>
+
+<!-- TEAM COLORS -->
+<section style="grid-column:1 / 8">
+<h2 style="margin:0 0 12px;font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:26px">Annate · colori ufficiali del calendario</h2>
+<div style="display:flex;flex-wrap:wrap;gap:10px">
+<sc-for list="{{teams}}" as="t" hint-placeholder-count="9">
+<div style="display:flex;align-items:center;gap:10px;padding:8px 14px 8px 8px;border-radius:14px;background:rgba(255,255,255,.06)"><span style="width:44px;height:44px;border-radius:10px;transform:skewX(-8deg);background:{{t.c}};display:flex;align-items:center;justify-content:center;font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:17px">{{t.code}}</span><span style="font-weight:600;font-size:15px">{{t.name}}</span></div>
+</sc-for>
+</div>
+</section>
+
+<!-- COMPONENTS -->
+<section style="grid-column:8 / 13;display:flex;flex-direction:column;gap:12px">
+<h2 style="margin:0;font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:26px">Pezzi chiave</h2>
+<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+<button style="height:52px;padding:0 22px;border-radius:14px;border:0;background:#F8D000;color:#062a52;font-weight:700;font-size:17px">Ci sarò</button>
+<button style="height:52px;padding:0 22px;border-radius:14px;border:1.5px solid rgba(255,255,255,.55);background:transparent;color:#ffffff;font-weight:700;font-size:17px">Condividi</button>
+<button style="height:52px;padding:0 22px;border-radius:14px;border:0;background:#F8D000;color:#062a52;font-weight:700;font-size:17px">Proponi variazione</button>
+</div>
+<div style="display:flex;gap:10px;align-items:center">
+<span style="padding:5px 12px;border-radius:8px;background:#0860A8;font-weight:700;font-size:14px;letter-spacing:1px;border:2px solid #ffffff;transform:rotate(-4deg)">CASA</span>
+<span style="padding:5px 12px;border-radius:8px;background:#F8D000;color:#062a52;font-weight:700;font-size:14px;letter-spacing:1px;transform:rotate(3deg)">FUORI</span>
+<span style="font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:34px;color:#F8D000;padding:0 10px;border-radius:10px;background:#041f3f;text-shadow:0 0 12px rgba(248,208,0,.6)">15:30</span>
+</div>
+</section>
+
+<!-- RULES -->
+<section style="grid-column:1 / 13;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px">
+<div style="padding:16px;border-radius:16px;background:rgba(255,255,255,.05);border-top:3px solid #F8D000"><div style="font-weight:700;font-size:16px">Giallo solo per agire</div><div style="font-size:14px;color:#cfe6ff;margin-top:6px;line-height:1.4">Se è giallo si tocca. Il resto parla in blu e bianco.</div></div>
+<div style="padding:16px;border-radius:16px;background:rgba(255,255,255,.05);border-top:3px solid #1898D8"><div style="font-weight:700;font-size:16px">Dati veri o niente</div><div style="font-size:14px;color:#cfe6ff;margin-top:6px;line-height:1.4">Ogni orario ha una fonte. Quello che non c'è resta tra parentesi quadre.</div></div>
+<div style="padding:16px;border-radius:16px;background:rgba(255,255,255,.05);border-top:3px solid #F8D000"><div style="font-weight:700;font-size:16px">Tutte le annate alla pari</div><div style="font-size:14px;color:#cfe6ff;margin-top:6px;line-height:1.4">Ordine per calcio d'inizio, colore per riconoscerle.</div></div>
+<div style="padding:16px;border-radius:16px;background:rgba(255,255,255,.05);border-top:3px solid #ffffff"><div style="font-weight:700;font-size:16px">Personaggi reali</div><div style="font-size:14px;color:#cfe6ff;margin-top:6px;line-height:1.4">Sky e Crovi come avatar 3D realistici, compaiono solo quando servono.</div></div>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1040}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      outside: [
+        { name: 'Notte', hex: '#062a52', role: 'fondo, cielo' },
+        { name: 'Blu stemma', hex: '#0860A8', role: 'superfici, CASA' },
+        { name: 'Azzurro', hex: '#1898D8', role: 'informazioni' },
+        { name: 'Giallo stemma', hex: '#F8D000', role: 'solo azioni' },
+        { name: 'Bianco', hex: '#ffffff', role: 'testo' }
+      ],
+      inside: [
+        { name: 'Fondo lago', hex: '#F2F7FC', role: 'fondo aree di lavoro' },
+        { name: 'Barra blu', hex: '#0860A8', role: 'menu laterale' },
+        { name: 'Inchiostro', hex: '#062a52', role: 'testo e striscia in evidenza' },
+        { name: 'Giallo stemma', hex: '#F8D000', role: 'azione principale' },
+        { name: 'Rosso stato', hex: '#a3241b', role: 'solo conflitti e urgenze' }
+      ],
+      teams: [
+        { code: '1ª', name: 'Prima', c: '#AD7616' },
+        { code: 'U19', name: 'Juniores', c: '#375B89' },
+        { code: 'U16', name: 'Under 16', c: '#C85D22' },
+        { code: 'U15', name: 'Under 15', c: '#C23C3F' },
+        { code: 'E14', name: 'Esordienti 2014', c: '#7654B8' },
+        { code: 'E15', name: 'Esordienti 2015', c: '#148B99' },
+        { code: 'PUL', name: 'Pulcini', c: '#3269BC' },
+        { code: 'PC', name: 'Primi Calci', c: '#568C23' },
+        { code: 'PA', name: 'Piccoli Amici', c: '#2A9CB7' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

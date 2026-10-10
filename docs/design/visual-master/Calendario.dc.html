@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Calendario SCD</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Barlow:wght@400;500;600;700&family=Kaushan+Script&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#062a52}
+a{color:#F8D000}a:hover{color:#fff1a8}
+.uv-stars{position:absolute;inset:0;background-image:radial-gradient(1.2px 1.2px at 14px 22px,#fff 60%,transparent),radial-gradient(1px 1px at 78px 64px,#cfe6ff 60%,transparent),radial-gradient(1.6px 1.6px at 130px 18px,#fff 60%,transparent),radial-gradient(1px 1px at 170px 92px,#fff 60%,transparent);background-size:200px 120px;opacity:.8}
+.uv-led{background-image:radial-gradient(rgba(255,255,255,.06) 1px,transparent 1.4px);background-size:6px 6px}
+</style>
+</helmet>
+<div style="width:390px;height:1960px;position:relative;overflow:hidden;background:linear-gradient(180deg,#062a52 0%,#0860A8 40%,#062a52 100%);font-family:'Barlow',sans-serif;color:#ffffff">
+
+<!-- compact header band -->
+<header style="position:relative;height:170px;overflow:hidden;background:linear-gradient(180deg,#041f3f 0%,#05427c 100%)">
+<div class="uv-stars"></div>
+<svg viewBox="0 0 390 70" width="390" height="70" style="position:absolute;left:0;bottom:0" aria-hidden="true"><path d="M0 40 L50 18 L90 32 L140 6 L190 30 L240 12 L300 34 L350 16 L390 28 L390 70 L0 70 Z" fill="#05427c"/><path d="M0 56 L70 36 L130 50 L200 30 L270 52 L330 38 L390 50 L390 70 L0 70 Z" fill="#03163a"/><path d="M-6 62 C 120 48, 260 52, 396 40 L 396 54 C 260 64, 120 66, -6 72 Z" fill="#F8D000" opacity=".9"/></svg>
+<div style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:14px 16px 0">
+<a href="Main.dc.html" aria-label="Torna alla home" style="width:44px;height:44px;border-radius:22px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;color:#ffffff"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></a>
+<img src="/_blob/d831a969f86523cc4ee06edd9c2e77e8" alt="Stemma S.C.D. ColicoDerviese" style="width:30px;height:39px;object-fit:contain;filter:drop-shadow(0 0 10px rgba(248,208,0,.5))">
+<button aria-label="Aggiungi al mio calendario" style="width:44px;height:44px;border-radius:22px;border:0;background:#F8D000;color:#062a52;display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M12 14v4M10 16h4"/></svg></button>
+</div>
+<div style="position:relative;padding:6px 16px 0">
+<h1 style="margin:0;font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:46px;line-height:1;text-shadow:0 4px 0 #062a52">Calendario</h1>
+<div style="font-size:14px;color:#cfe6ff;margin-top:2px">Stagione 2026/27 · tutte le annate</div>
+</div>
+</header>
+
+<!-- view switch -->
+<div role="tablist" aria-label="Vista" style="margin:18px 16px 0;padding:4px;border-radius:16px;background:rgba(255,255,255,.08);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px">
+<button role="tab" aria-selected="true" style="height:44px;border-radius:12px;border:0;background:#ffffff;color:#062a52;font-weight:700;font-size:15px">Settimana</button>
+<button role="tab" aria-selected="false" style="height:44px;border-radius:12px;border:0;background:transparent;color:#ffffff;font-weight:600;font-size:15px">Mese</button>
+<button role="tab" aria-selected="false" style="height:44px;border-radius:12px;border:0;background:transparent;color:#ffffff;font-weight:600;font-size:15px">Stagione</button>
+</div>
+
+<!-- filters -->
+<div style="margin:12px 16px 0;display:flex;gap:8px;overflow:hidden">
+<button style="flex:none;height:40px;padding:0 14px;border-radius:20px;border:1px solid #F8D000;background:rgba(248,208,0,.12);color:#F8D000;font-weight:700;font-size:14px">Tutte le annate</button>
+<button style="flex:none;height:40px;padding:0 14px;border-radius:20px;border:1px solid rgba(255,255,255,.22);background:transparent;color:#ffffff;font-weight:600;font-size:14px">In casa</button>
+<button style="flex:none;height:40px;padding:0 14px;border-radius:20px;border:1px solid rgba(255,255,255,.22);background:transparent;color:#ffffff;font-weight:600;font-size:14px">In trasferta</button>
+<button style="flex:none;height:40px;padding:0 14px;border-radius:20px;border:1px solid rgba(255,255,255,.22);background:transparent;color:#ffffff;font-weight:600;font-size:14px">Prossimi 15 giorni</button>
+</div>
+
+<!-- week strip -->
+<section style="margin:16px 16px 0;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;text-align:center">
+<sc-for list="{{week}}" as="d" hint-placeholder-count="7">
+<div style="padding:8px 0 10px;border-radius:14px;background:{{d.bg}};border:1px solid {{d.border}}">
+<div style="font-size:12px;color:{{d.sub}}">{{d.dow}}</div>
+<div style="font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:22px;color:{{d.fg}}">{{d.n}}</div>
+<div style="font-size:12px;font-weight:700;color:{{d.dot}}">{{d.games}}</div>
+</div>
+</sc-for>
+</section>
+
+<!-- day lists -->
+<sc-for list="{{days}}" as="day" hint-placeholder-count="2">
+<section style="margin:22px 16px 0;border-radius:20px;background:#041f3f;border:1px solid rgba(70,180,255,.22);overflow:hidden">
+<div class="uv-led" style="display:flex;justify-content:space-between;align-items:baseline;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.08)">
+<h2 style="margin:0;font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:26px">{{day.label}}</h2>
+<span style="font-size:14px;color:#9fd0f1">{{day.count}}</span>
+</div>
+<sc-for list="{{day.rows}}" as="r" hint-placeholder-count="4">
+<div style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.06)">
+<div style="display:flex;align-items:center;gap:12px">
+<div style="width:52px;flex:none;font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:22px;color:#F8D000">{{r.time}}</div>
+<div style="width:42px;height:42px;flex:none;border-radius:10px;transform:skewX(-8deg);display:flex;align-items:center;justify-content:center;font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:16px;background:{{r.color}}">{{r.code}}</div>
+<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{r.opp}}</div><div style="font-size:13px;color:#9fb6d9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{r.where}}</div></div>
+<span style="flex:none;padding:4px 8px;border-radius:7px;font-weight:700;font-size:12px;background:{{r.stampBg}};color:{{r.stampFg}}">{{r.stamp}}</span>
+</div>
+<sc-if value="{{r.flag}}" hint-placeholder-val="{{false}}"><div style="margin:8px 0 0 64px;display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;border:1px dashed rgba(248,208,0,.6);font-size:12px;font-weight:600;color:#ffe680">{{r.flag}}</div></sc-if>
+</div>
+</sc-for>
+</section>
+</sc-for>
+
+<!-- month at a glance -->
+<section style="margin:26px 16px 0;padding:16px;border-radius:20px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12)">
+<div style="display:flex;justify-content:space-between;align-items:baseline"><h2 style="margin:0;font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:26px">Ottobre a colpo d'occhio</h2><span style="font-size:13px;color:#9fd0f1">36 gare</span></div>
+<div style="margin-top:12px;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;text-align:center;font-size:12px;color:#9fb6d9"><span>L</span><span>M</span><span>M</span><span>G</span><span>V</span><span>S</span><span>D</span></div>
+<div style="margin-top:6px;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px">
+<sc-for list="{{month}}" as="c" hint-placeholder-count="35">
+<div style="height:40px;border-radius:9px;background:{{c.bg}};border:{{c.ring}};display:flex;flex-direction:column;align-items:center;justify-content:center;color:{{c.fg}}"><span style="font-size:13px;font-weight:700">{{c.n}}</span><span style="font-size:10.5px;font-weight:700">{{c.k}}</span></div>
+</sc-for>
+</div>
+<div style="margin-top:10px;display:flex;gap:14px;font-size:12px;color:#cfe6ff"><span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:3px;background:rgba(248,208,0,.35);display:block"></span>1–2 gare</span><span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:3px;background:#F8D000;display:block"></span>5 o più</span></div>
+</section>
+
+<p style="margin:16px 16px 0;font-size:13px;line-height:1.45;color:#9fb6d9">Fonte: calendario ufficiale FIGC/LND e Master Calendario SCD, aggiornato al 10/10. Le gare segnate "da confermare" possono cambiare: ti avvisiamo noi.</p>
+
+<nav aria-label="Navigazione principale" style="position:absolute;left:0;right:0;bottom:0;height:72px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));background:#041f3f;border-top:1px solid rgba(248,208,0,.3)">
+<a href="Main.dc.html" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#c9d7ef;text-decoration:none;font-size:12px;font-weight:600"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>Home</a>
+<a href="Calendario.dc.html" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#F8D000;text-decoration:none;font-size:12px;font-weight:700"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Gare</a>
+<a href="Eventi.dc.html" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#c9d7ef;text-decoration:none;font-size:12px;font-weight:600"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/></svg>Eventi</a>
+<a href="Sponsor.dc.html" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#c9d7ef;text-decoration:none;font-size:12px;font-weight:600"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l3 6.5 7 .9-5.1 4.8 1.3 7L12 17.8 5.8 21.2l1.3-7L2 9.4l7-.9z"/></svg>Partner</a>
+<a href="Tessera.dc.html" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#c9d7ef;text-decoration:none;font-size:12px;font-weight:600"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Io</a>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1960}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const T = { prima: ['1ª', '#AD7616'], u19: ['U19', '#375B89'], u16: ['U16', '#C85D22'], u15: ['U15', '#C23C3F'], e14: ['E14', '#7654B8'], e15: ['E15', '#148B99'], pul: ['PUL', '#3269BC'], pc: ['PC', '#568C23'] };
+    const casa = { stampBg: '#0860A8', stampFg: '#ffffff', stamp: 'CASA' };
+    const fuori = { stampBg: '#F8D000', stampFg: '#062a52', stamp: 'FUORI' };
+    const r = (time, t, opp, where, side, flag) => ({ time, code: T[t][0], color: T[t][1], opp, where, flag: flag || '', ...(side === 'C' ? casa : fuori) });
+    const days = [
+      { label: 'Sabato 17 ottobre', rows: [
+        r('10:30', 'pc', 'Vercurago sq. B', 'Vercurago · C.S. Comunale A. Moretti', 'F', 'Orario e campo da confermare'),
+        r('14:15', 'e15', 'Sala Galbiate 1974', 'Galbiate · C.S. del Mare', 'F'),
+        r('15:00', 'e14', 'Rovinata', 'Colico · Campo 1', 'C', 'Orario da confermare · campo da verificare'),
+        r('15:00', 'u19', 'Ardor Lazzate', 'Colico · Campo 1', 'C', 'Campo da verificare'),
+        r('15:15', 'pul', 'Rogeno', 'Rogeno · C.S. Oratorio Pio XI', 'F', 'Orario e campo da confermare'),
+        r('18:00', 'u16', 'Vis Nova Giussano', 'Colico · Campo 1', 'C')
+      ] },
+      { label: 'Domenica 18 ottobre', rows: [
+        r('10:30', 'u15', 'Piantedo', 'Colico · Campo 1', 'C'),
+        r('15:30', 'prima', 'Ars Rovagnate', 'La Valletta Brianza · Stadio Ideali', 'F')
+      ] }
+    ].map((d) => ({ ...d, count: d.rows.length + (d.rows.length === 1 ? ' gara' : ' gare') }));
+    const wk = [['Lun', 12, 0], ['Mar', 13, 0], ['Mer', 14, 0], ['Gio', 15, 0], ['Ven', 16, 0], ['Sab', 17, 6], ['Dom', 18, 2]];
+    const week = wk.map(([dow, n, g]) => ({ dow, n, games: g ? g + ' gare' : '·', bg: g ? 'rgba(248,208,0,.12)' : 'rgba(255,255,255,.05)', border: g ? 'rgba(248,208,0,.55)' : 'rgba(255,255,255,.1)', fg: '#ffffff', sub: '#9fb6d9', dot: g ? '#F8D000' : '#5b6f92' }));
+    const counts = { 3: 2, 4: 2, 7: 1, 8: 1, 10: 3, 11: 5, 17: 6, 18: 2, 24: 6, 25: 2, 31: 6 };
+    const month = [];
+    for (let i = 0; i < 3; i++) month.push({ n: '', k: '', bg: 'transparent', ring: '0', fg: '#ffffff' });
+    for (let d = 1; d <= 31; d++) {
+      const k = counts[d] || 0;
+      const bg = k >= 5 ? '#F8D000' : k > 0 ? 'rgba(248,208,0,.35)' : 'rgba(255,255,255,.05)';
+      month.push({ n: d, k: k ? k : '', bg, ring: d === 10 ? '2px solid #ffffff' : '0', fg: k >= 5 ? '#062a52' : '#ffffff' });
+    }
+    month.push({ n: '', k: '', bg: 'transparent', ring: '0', fg: '#ffffff' });
+    return { days, week, month };
+  }
+}
+</script>
+</body>
+</html>

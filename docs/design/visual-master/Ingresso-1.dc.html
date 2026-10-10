@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Primo ingresso, consenso cookie</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Barlow:wght@400;500;600;700&family=Kaushan+Script&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#062a52}
+a{color:#0860A8}
+.uv-stars{position:absolute;inset:0;background-image:radial-gradient(1.2px 1.2px at 14px 22px,#fff 60%,transparent),radial-gradient(1px 1px at 78px 64px,#cfe6ff 60%,transparent),radial-gradient(1.6px 1.6px at 130px 18px,#fff 60%,transparent),radial-gradient(1px 1px at 170px 92px,#fff 60%,transparent);background-size:200px 150px;opacity:.85}
+</style>
+</helmet>
+<div style="width:390px;height:844px;position:relative;overflow:hidden;background:linear-gradient(180deg,#041f3f 0%,#05427c 60%,#062a52 100%);font-family:'Barlow',sans-serif;color:#ffffff">
+<div class="uv-stars"></div>
+<svg viewBox="0 0 390 200" width="390" height="200" style="position:absolute;left:0;top:300px" aria-hidden="true"><path d="M0 90 L60 50 L110 76 L170 20 L230 70 L290 36 L350 74 L390 56 L390 200 L0 200 Z" fill="#05427c"/><path d="M-6 150 C 120 128, 260 134, 396 116 L 396 140 C 260 156, 120 160, -6 168 Z" fill="#F8D000" opacity=".9"/></svg>
+<div style="position:relative;display:flex;flex-direction:column;align-items:center;padding-top:80px">
+<img src="/_blob/d831a969f86523cc4ee06edd9c2e77e8" alt="Stemma S.C.D. ColicoDerviese" style="width:110px;height:144px;object-fit:contain;filter:drop-shadow(0 0 20px rgba(248,208,0,.55)) drop-shadow(0 16px 20px rgba(0,0,0,.5))">
+<div style="margin-top:10px;font-family:'Kaushan Script',cursive;font-size:30px">Benvenuto nella SCD</div>
+</div>
+
+<!-- consent sheet -->
+<section aria-labelledby="ck-title" style="position:absolute;left:0;right:0;bottom:0;padding:22px 20px 26px;border-radius:26px 26px 0 0;background:#ffffff;color:#062a52;box-shadow:0 -20px 40px rgba(0,0,0,.4)">
+<div style="width:44px;height:5px;border-radius:3px;background:#c3d2ea;margin:0 auto 14px"></div>
+<h2 id="ck-title" style="margin:0;font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:28px">Prima di entrare</h2>
+<p style="margin:8px 0 0;font-size:15px;line-height:1.45;color:#2b4470">Usiamo i cookie necessari per far funzionare l'app. Con il tuo permesso usiamo anche statistiche anonime e pubblicità sui social per far conoscere il club. Puoi cambiare idea quando vuoi.</p>
+<div style="margin-top:14px;display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-radius:14px;background:#f2f6fc"><div><div style="font-weight:700;font-size:15px">Necessari</div><div style="font-size:13px;color:#3b5683">Accesso e preferenze</div></div><span style="font-size:13px;font-weight:700;color:#3b5683">Sempre attivi</span></div>
+<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-radius:14px;background:#f2f6fc"><div><div style="font-weight:700;font-size:15px">Statistiche</div><div style="font-size:13px;color:#3b5683">Capire cosa usate di più</div></div><span style="width:46px;height:28px;border-radius:14px;background:#c3d2ea;position:relative;display:block"><span style="position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:11px;background:#ffffff;display:block"></span></span></div>
+<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-radius:14px;background:#f2f6fc"><div><div style="font-weight:700;font-size:15px">Social e pubblicità</div><div style="font-size:13px;color:#3b5683">Meta e TikTok, mai nelle aree riservate</div></div><span style="width:46px;height:28px;border-radius:14px;background:#c3d2ea;position:relative;display:block"><span style="position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:11px;background:#ffffff;display:block"></span></span></div>
+</div>
+<div style="margin-top:16px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
+<button style="height:52px;border-radius:14px;border:2px solid #062a52;background:#ffffff;color:#062a52;font-weight:700;font-size:16px">Rifiuta</button>
+<button style="height:52px;border-radius:14px;border:2px solid #062a52;background:#062a52;color:#ffffff;font-weight:700;font-size:16px">Accetta tutti</button>
+</div>
+<div style="margin-top:12px;display:flex;justify-content:space-between;font-size:14px"><a href="Ingresso-1.dc.html">Salva le mie scelte</a><a href="Ingresso-1.dc.html">Privacy e cookie</a></div>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

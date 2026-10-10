@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Allenamenti della mia annata</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#062a52}
+a{color:#F8D000}a:hover{color:#fff1a8}
+.uv-stars{position:absolute;inset:0;background-image:radial-gradient(1.2px 1.2px at 14px 22px,#fff 60%,transparent),radial-gradient(1px 1px at 78px 64px,#cfe6ff 60%,transparent),radial-gradient(1.6px 1.6px at 130px 18px,#fff 60%,transparent);background-size:200px 120px;opacity:.8}
+</style>
+</helmet>
+<div style="width:390px;height:1560px;position:relative;overflow:hidden;background:linear-gradient(180deg,#062a52 0%,#0860A8 45%,#062a52 100%);font-family:'Barlow',sans-serif;color:#ffffff">
+
+<header style="position:relative;height:150px;overflow:hidden;background:linear-gradient(180deg,#041f3f 0%,#05427c 100%)">
+<div class="uv-stars"></div>
+<svg viewBox="0 0 390 60" width="390" height="60" style="position:absolute;left:0;bottom:0" aria-hidden="true"><path d="M0 34 L60 12 L110 28 L170 4 L230 26 L290 10 L350 30 L390 18 L390 60 L0 60 Z" fill="#05427c"/><path d="M-6 50 C 120 38, 260 42, 396 30 L 396 44 C 260 54, 120 56, -6 62 Z" fill="#F8D000" opacity=".9"/></svg>
+<div style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:14px 16px 0">
+<a href="Main.dc.html" aria-label="Torna alla home" style="width:44px;height:44px;border-radius:22px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;color:#ffffff"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></a>
+<span style="font-size:14px;color:#cfe6ff">Centro sportivo di Colico</span>
+<span style="width:44px"></span>
+</div>
+<h1 style="position:relative;margin:4px 16px 0;font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:44px;line-height:1;text-shadow:0 4px 0 #062a52">Allenamenti</h1>
+</header>
+
+<!-- my team -->
+<section style="margin:18px 16px 0;display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:16px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14)">
+<div style="display:flex;align-items:center;gap:12px">
+<span style="width:46px;height:46px;border-radius:10px;background:#C23C3F;transform:skewX(-8deg);display:flex;align-items:center;justify-content:center;font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:18px">U15</span>
+<div><div style="font-size:13px;color:#9fb6d9">La mia annata</div><div style="font-weight:700;font-size:17px">Under 15 · 2012–2013</div></div>
+</div>
+<button style="height:44px;padding:0 14px;border-radius:12px;border:1px solid rgba(255,255,255,.3);background:transparent;color:#ffffff;font-weight:600;font-size:14px">Cambia</button>
+</section>
+
+<!-- next training ticket -->
+<section style="position:relative;margin:16px 16px 0;border-radius:22px;background:linear-gradient(160deg,#05427c 0%,#05427c 55%,#05427c 100%);border:1px solid rgba(248,208,0,.45);box-shadow:0 24px 44px rgba(0,0,0,.45);overflow:hidden">
+<div style="padding:18px 18px 0;display:flex;justify-content:space-between;align-items:center"><span style="font-size:14px;font-weight:600;color:#9fd0f1">Prossimo allenamento</span><span style="font-size:13px;color:#cfe6ff">Lunedì 12 ottobre</span></div>
+<div style="padding:6px 18px 0;font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:48px;line-height:1;color:#F8D000;text-shadow:0 0 14px rgba(248,208,0,.45)">17:20 – 18:50</div>
+<div style="padding:14px 18px 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+<div style="padding:10px;border-radius:12px;background:rgba(6,42,82,.55)"><div style="font-size:12px;color:#9fd0f1">Campo</div><div style="font-weight:700;font-size:17px;margin-top:2px">Campo 1</div></div>
+<div style="padding:10px;border-radius:12px;background:rgba(6,42,82,.55)"><div style="font-size:12px;color:#9fd0f1">Spogliatoio</div><div style="font-weight:700;font-size:17px;margin-top:2px">SP1</div></div>
+<div style="padding:10px;border-radius:12px;background:rgba(6,42,82,.55)"><div style="font-size:12px;color:#9fd0f1">Zona</div><div style="font-weight:700;font-size:17px;margin-top:2px">A</div></div>
+</div>
+
+<!-- pitch mini map -->
+<div style="margin:16px 18px 0;position:relative;height:150px;border-radius:12px;background:repeating-linear-gradient(90deg,#1f7a3e 0 30px,#1b6e37 30px 60px);border:2px solid rgba(255,255,255,.75);overflow:hidden" role="img" aria-label="Campo 1 diviso in tre zone: A Under 15, B Under 12, C Under 11">
+<div style="position:absolute;left:50%;top:0;bottom:0;width:2px;background:rgba(255,255,255,.7)"></div>
+<div style="position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:23px;border:2px solid rgba(255,255,255,.7)"></div>
+<div style="position:absolute;left:0;top:0;bottom:0;width:50%;background:rgba(194,60,63,.55);display:flex;align-items:center;justify-content:center;flex-direction:column;border-right:2px dashed #F8D000"><span style="font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:28px">A</span><span style="font-size:13px;font-weight:700">Under 15</span></div>
+<div style="position:absolute;left:50%;top:0;width:50%;height:50%;background:rgba(20,139,153,.45);display:flex;align-items:center;justify-content:center;gap:6px;border-bottom:2px dashed rgba(255,255,255,.6)"><span style="font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:20px">B</span><span style="font-size:12px;font-weight:700">Under 12</span></div>
+<div style="position:absolute;left:50%;top:50%;width:50%;height:50%;background:rgba(50,105,188,.45);display:flex;align-items:center;justify-content:center;gap:6px"><span style="font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:20px">C</span><span style="font-size:12px;font-weight:700">Under 11</span></div>
+</div>
+<p style="margin:8px 18px 0;font-size:12px;line-height:1.4;color:#cfe6ff">Schema indicativo, non in scala. Le zone B e C si scambiano a settimane alterne.</p>
+<div style="padding:16px 18px 18px;display:flex;gap:10px">
+<button style="flex:1.3;height:50px;border-radius:14px;border:0;background:#F8D000;color:#062a52;font-weight:700;font-size:16px">Avvisami se cambia</button>
+<button style="flex:1;height:50px;border-radius:14px;border:1.5px solid rgba(255,255,255,.55);background:transparent;color:#ffffff;font-weight:700;font-size:16px">Portami lì</button>
+</div>
+</section>
+
+<!-- week -->
+<section style="margin:24px 16px 0">
+<h2 style="margin:0;font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:28px">La settimana della U15</h2>
+<div style="margin-top:12px;display:flex;flex-direction:column;gap:8px">
+<div style="display:grid;grid-template-columns:62px 1fr auto;gap:12px;align-items:center;padding:14px;border-radius:16px;background:rgba(248,208,0,.1);border:1px solid rgba(248,208,0,.5)"><span style="font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:20px;color:#F8D000">Lun</span><span style="font-size:15px">17:20 – 18:50 · Campo 1</span><span style="font-size:14px;font-weight:700">SP1</span></div>
+<div style="display:grid;grid-template-columns:62px 1fr auto;gap:12px;align-items:center;padding:14px;border-radius:16px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12)"><span style="font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:20px">Mer</span><span style="font-size:15px">17:20 – 18:50 · Campo 1</span><span style="font-size:14px;font-weight:700">SP1</span></div>
+<div style="display:grid;grid-template-columns:62px 1fr auto;gap:12px;align-items:center;padding:14px;border-radius:16px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12)"><span style="font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:20px">Ven</span><span style="font-size:15px">17:20 – 18:50 · Campo 2</span><span style="font-size:14px;font-weight:700">SP2</span></div>
+<a href="Calendario.dc.html" style="display:grid;grid-template-columns:62px 1fr auto;gap:12px;align-items:center;padding:14px;border-radius:16px;background:#041f3f;border:1px solid rgba(70,180,255,.3);text-decoration:none;color:#ffffff"><span style="font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:20px;color:#9fd0f1">Dom</span><span style="font-size:15px">Gara · Piantedo, in casa</span><span style="font-size:14px;font-weight:700;color:#F8D000">10:30</span></a>
+</div>
+</section>
+
+<!-- all teams today -->
+<section style="margin:24px 16px 0;border-radius:20px;background:#041f3f;border:1px solid rgba(255,255,255,.1);overflow:hidden">
+<div style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-between;align-items:baseline"><h2 style="margin:0;font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:24px">Lunedì, tutte le annate</h2><span style="font-size:13px;color:#9fd0f1">3 turni</span></div>
+<div style="display:grid;grid-template-columns:96px 1fr;gap:10px;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="font-weight:700;color:#F8D000">17:20–18:50</span><span style="font-size:14px;line-height:1.4">Campo 1: U15, U12, U11<br>Campo 2: Primi Calci, Piccoli Amici</span></div>
+<div style="display:grid;grid-template-columns:96px 1fr;gap:10px;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="font-weight:700;color:#F8D000">19:00–20:20</span><span style="font-size:14px">Campo 1: Juniores U19</span></div>
+<div style="display:grid;grid-template-columns:96px 1fr;gap:10px;padding:12px 16px"><span style="font-weight:700;color:#F8D000">20:10–21:20</span><span style="font-size:14px">Campo 1: Under 16</span></div>
+</section>
+
+<p style="margin:16px 16px 0;font-size:13px;line-height:1.45;color:#9fb6d9">Fonte: Quadro allenamenti 2026/27, estratto il 09/10. La settimana A o B e i confini delle zone non sono ancora certificati: in caso di dubbio chiedi al tuo mister.</p>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1560}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

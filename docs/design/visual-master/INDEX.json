@@ -1,0 +1,272 @@
+{
+  "approved": "2026-10-11",
+  "approvedBy": "Francesco (explicit message: \"Approvo\", 2026-10-11 01:08 Europe/Rome)",
+  "source": "private Visual Master canvas artifact",
+  "note": "Image src values /_blob/... are canvas asset ids; in the app use the official files in apps/superapp/public/media. Direzione and Tesoreria boards stay in the private canvas because they describe open security items.",
+  "boards": [
+    {
+      "file": "Main.dc.html",
+      "title": "Universe · Home telefono",
+      "size": [
+        390,
+        3120
+      ]
+    },
+    {
+      "file": "Home-desktop.dc.html",
+      "title": "Universe · Home desktop",
+      "size": [
+        1440,
+        1720
+      ]
+    },
+    {
+      "file": "Evento-CLC.dc.html",
+      "title": "Eventi · Christmas Lario Cup",
+      "size": [
+        390,
+        2060
+      ]
+    },
+    {
+      "file": "Sponsor.dc.html",
+      "title": "Sponsor · vetrina",
+      "size": [
+        390,
+        2160
+      ]
+    },
+    {
+      "file": "Tessera.dc.html",
+      "title": "Iscriviti · Tessera e Crovi",
+      "size": [
+        390,
+        1560
+      ]
+    },
+    {
+      "file": "Mister-Oggi.dc.html",
+      "title": "Dentro · Oggi del mister",
+      "size": [
+        390,
+        1400
+      ]
+    },
+    {
+      "file": "Quadro-settimanale.dc.html",
+      "title": "Dentro · Quadro settimanale /quadro",
+      "size": [
+        1440,
+        960
+      ]
+    },
+    {
+      "file": "Sistema-visivo.dc.html",
+      "title": "Sistema visivo",
+      "size": [
+        1440,
+        1040
+      ]
+    },
+    {
+      "file": "Calendario.dc.html",
+      "title": "Seconda marcia · Calendario completo",
+      "size": [
+        390,
+        1960
+      ]
+    },
+    {
+      "file": "Allenamenti.dc.html",
+      "title": "Seconda marcia · Allenamenti della mia annata",
+      "size": [
+        390,
+        1560
+      ]
+    },
+    {
+      "file": "Eventi.dc.html",
+      "title": "Seconda marcia · Eventi e tornei",
+      "size": [
+        390,
+        1960
+      ]
+    },
+    {
+      "file": "Mappa-centro.dc.html",
+      "title": "Seconda marcia · Mappa del centro",
+      "size": [
+        390,
+        1560
+      ]
+    },
+    {
+      "file": "Ingresso-1.dc.html",
+      "title": "Seconda marcia · Primo ingresso 1 di 2",
+      "size": [
+        390,
+        844
+      ]
+    },
+    {
+      "file": "Ingresso-2.dc.html",
+      "title": "Seconda marcia · Primo ingresso 2 di 2",
+      "size": [
+        390,
+        844
+      ]
+    },
+    {
+      "file": "Colori-stemma.dc.html",
+      "title": "Colori · tre direzioni dallo stemma",
+      "size": [
+        1440,
+        1120
+      ]
+    },
+    {
+      "file": "Accesso-aree.dc.html",
+      "title": "Fuori · Accesso alle aree (un link per area)",
+      "size": [
+        1440,
+        900
+      ]
+    },
+    {
+      "file": "Accesso-area.dc.html",
+      "title": "Fuori · Schermata di accesso /pulmini",
+      "size": [
+        390,
+        844
+      ]
+    },
+    {
+      "file": "Infermeria.dc.html",
+      "title": "Famiglie · Infermeria, servizi e appuntamenti",
+      "size": [
+        390,
+        1440
+      ]
+    },
+    {
+      "file": "Gestionale.dc.html",
+      "title": "Dentro · Gestionale sportivo /gestionale",
+      "size": [
+        1440,
+        960
+      ]
+    },
+    {
+      "file": "Pulmini.dc.html",
+      "title": "Dentro · Pulmini /pulmini",
+      "size": [
+        1440,
+        960
+      ]
+    },
+    {
+      "file": "Segreteria.dc.html",
+      "title": "Dentro · Segreteria /segreteria",
+      "size": [
+        1440,
+        960
+      ]
+    },
+    {
+      "file": "CRM.dc.html",
+      "title": "Dentro · CRM condiviso /crm",
+      "size": [
+        1440,
+        960
+      ]
+    },
+    {
+      "file": "Magazzino.dc.html",
+      "title": "Dentro · Magazzino /magazzino",
+      "size": [
+        1440,
+        960
+      ]
+    },
+    {
+      "file": "Rotazione-campi.dc.html",
+      "title": "Dentro · Rotazione campi e mappa 2D /calendario/rotazione-campi",
+      "size": [
+        1440,
+        960
+      ]
+    },
+    {
+      "file": "Mister.dc.html",
+      "title": "Dentro · Mister: convocazione, lavagna, chiamata",
+      "size": [
+        1440,
+        960
+      ]
+    },
+    {
+      "file": "Tesoreria-sottoaree.dc.html",
+      "title": "Dentro · Tesoreria: sottoaree e cassa Club House",
+      "size": [
+        1440,
+        960
+      ]
+    },
+    {
+      "file": "LED-sponsor.dc.html",
+      "title": "Fuori · LED a bordo campo e pacchetti sponsor",
+      "size": [
+        1440,
+        960
+      ]
+    },
+    {
+      "file": "Partita-live.dc.html",
+      "title": "Fuori · Partita in diretta con Sky e Crovi",
+      "size": [
+        390,
+        1100
+      ]
+    },
+    {
+      "file": "Sky-Club.dc.html",
+      "title": "Fuori · Carta Sky Club ColicoDerviese",
+      "size": [
+        390,
+        1260
+      ]
+    },
+    {
+      "file": "Home-oggi.dc.html",
+      "title": "Fuori · Oggi: meteo, vetrina, torneo, notizie",
+      "size": [
+        390,
+        1010
+      ]
+    },
+    {
+      "file": "Foto.dc.html",
+      "title": "Fuori · Foto da acquistare",
+      "size": [
+        390,
+        1000
+      ]
+    },
+    {
+      "file": "Gioca.dc.html",
+      "title": "Fuori · Gioca: campione e FantaSCD delle annate",
+      "size": [
+        390,
+        1900
+      ]
+    },
+    {
+      "file": "Rotazione-Dervio.dc.html",
+      "title": "Dentro · Rotazione campi: Dervio",
+      "size": [
+        1440,
+        960
+      ]
+    }
+  ]
+}

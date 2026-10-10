@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>LED a bordo campo</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ground:#F2F7FC;--surface:#ffffff;--ink:#062a52;--sub:#3b5683;--line:#d5e4f5;--blue:#0860A8;--sky:#1898D8;--yellow:#F8D000;--night:#062a52;
+--ok:#16683f;--okbg:#e3f4ea;--warn:#8a5300;--warnbg:#fff3c4;--crit:#a3241b;--critbg:#fde7e4;--info:#0860A8;--infobg:#e6f3fc;
+--ease:cubic-bezier(0.23,1,0.32,1)}
+body{margin:0;background:var(--ground)}
+*{box-sizing:border-box}
+::selection{background:#F8D000;color:#062a52}
+.app{display:flex;overflow:hidden;background:var(--ground);font-family:'Barlow',sans-serif;color:var(--ink);font-variant-numeric:tabular-nums}
+.rail{width:236px;flex:none;background:var(--blue);color:#fff;display:flex;flex-direction:column;padding:18px 14px}
+.brand{display:flex;align-items:center;gap:10px;padding:2px 8px 18px}
+.brand b{font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:22px;letter-spacing:.01em;display:block;line-height:1}
+.brand small{font-size:13px;color:#d6ebfb}
+.rail .grp{margin:14px 10px 6px;font-size:13px;font-weight:600;color:#cfe6fa}
+.nav{display:flex;align-items:center;gap:10px;height:40px;padding:0 10px;border-radius:10px;color:#fff;text-decoration:none;font-weight:600;font-size:15px;transition:background-color 160ms ease}
+.nav:hover{background:rgba(255,255,255,.12)}
+.nav[aria-current=page]{background:var(--yellow);color:var(--ink)}
+.nav svg{flex:none}
+.who{margin-top:auto;padding:12px 10px;border-top:1px solid rgba(255,255,255,.22);font-size:14px;color:#e6f3fc}
+.who b{display:block;color:#fff;font-size:15px}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.top{height:72px;flex:none;display:flex;align-items:center;gap:16px;padding:0 28px;background:var(--surface);border-bottom:1px solid var(--line)}
+.top h1{margin:0;font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:34px;line-height:1}
+.path{display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 12px;border-radius:999px;background:var(--infobg);color:var(--blue);font-weight:600;font-size:14px;border:0}
+.search{margin-left:auto;display:flex;align-items:center;gap:8px;width:300px;height:40px;padding:0 12px;border:1px solid var(--line);border-radius:10px;color:var(--sub);font-size:15px;background:#fff}
+.led{height:66px;flex:none;display:flex;align-items:stretch;background-color:var(--night);background-image:radial-gradient(rgba(248,208,0,.13) 1px,transparent 1.3px);background-size:6px 6px;color:#fff}
+.led .day{display:flex;flex-direction:column;justify-content:center;padding:0 22px 0 28px;font-size:13px;color:#bcdcf5;min-width:150px}
+.led .day b{font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:20px;color:#fff}
+.led .it{display:flex;align-items:center;gap:12px;padding:0 24px;border-right:1px solid rgba(255,255,255,.14)}
+.led .it:first-child{padding-left:28px}
+.led .n.z{color:#9fc3e6}
+.led .n{font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:36px;line-height:1;color:var(--yellow)}
+.led .t{font-size:14px;line-height:1.25;color:#eaf4fd;max-width:22ch}
+.body{flex:1;min-height:0;padding:22px 28px;display:grid;gap:18px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:0 1px 2px rgba(6,42,82,.05),0 8px 24px -12px rgba(6,42,82,.18)}
+.card > header{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:16px 18px 10px}
+.card h2,.card h3{margin:0;font-size:19px;font-weight:700}
+.card p.s{margin:2px 0 0;font-size:14px;color:var(--sub);line-height:1.4}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 16px;border-radius:10px;font:600 15px 'Barlow',sans-serif;cursor:pointer;border:1px solid transparent;transition:transform 160ms var(--ease),background-color 160ms ease;white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.btn.p{background:var(--yellow);color:var(--ink)}
+.btn.p:hover{background:#ffdc2e}
+.btn.s{background:#fff;color:var(--blue);border-color:#b9d5ef}
+.btn.s:hover{background:var(--infobg)}
+.btn:focus-visible,.nav:focus-visible,.path:focus-visible,a:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
+.chip{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:999px;font-size:13px;font-weight:600;white-space:nowrap}
+.chip.ok{background:var(--okbg);color:var(--ok)}.chip.warn{background:var(--warnbg);color:var(--warn)}.chip.crit{background:var(--critbg);color:var(--crit)}.chip.info{background:var(--infobg);color:var(--info)}.chip.mute{background:#eef3f9;color:var(--sub)}
+.tag{display:inline-flex;align-items:center;justify-content:center;min-width:38px;height:26px;padding:0 7px;border-radius:7px;transform:skewX(-8deg);color:#fff;font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:14px}
+.tag > span{transform:skewX(8deg)}
+.empty{margin:4px 18px 18px;padding:18px;border:1.5px dashed #b9d5ef;border-radius:14px;background:#f8fbfe}
+.empty b{display:block;font-size:16px}
+.empty p{margin:4px 0 12px;font-size:14px;color:var(--sub);line-height:1.4}
+.row{display:flex;align-items:center;gap:14px;padding:12px 18px;border-top:1px solid var(--line)}
+.src{font-size:13px;color:var(--sub);display:flex;align-items:center;gap:6px}
+.big{font-family:'Big Shoulders Display',sans-serif;font-weight:900}
+table{border-collapse:collapse;width:100%}
+th{font-size:13px;font-weight:600;color:var(--sub);text-align:left;padding:10px 18px;border-bottom:1px solid var(--line)}
+td{padding:12px 18px;border-bottom:1px solid var(--line);font-size:15px}
+
+.pub{font-family:'Barlow',sans-serif;color:#fff;background:#062a52}
+.pnav{color:#e6f3fc;text-decoration:none;font-weight:600;font-size:16px;padding:8px 4px}
+.mega a{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border-radius:12px;color:var(--ink);text-decoration:none;transition:background-color 160ms ease}
+.mega a:hover{background:#eef6fd}
+.mega h2{margin:0 12px 6px;font-size:14px;font-weight:700;color:var(--blue)}
+.mega .ic{width:36px;height:36px;flex:none;border-radius:10px;background:var(--infobg);color:var(--blue);display:flex;align-items:center;justify-content:center}
+.mega b{font-size:15.5px;display:flex;align-items:center;gap:6px}
+.mega small{display:block;font-size:13px;color:var(--sub);margin-top:1px}
+.mega code{font:600 12.5px 'Barlow',sans-serif;color:var(--blue)}
+
+body{background:#062a52}
+</style>
+</helmet>
+<div class="pub" style="width:1440px;height:960px;position:relative;overflow:hidden;background:radial-gradient(900px 500px at 50% -10%,#1898D8 0%,#0860A8 30%,#062a52 70%)">
+<header style="height:84px;display:flex;align-items:center;gap:16px;padding:0 40px"><img src="/_blob/d831a969f86523cc4ee06edd9c2e77e8" alt="Stemma S.C.D. ColicoDerviese" style="width:42px;height:54px;object-fit:contain"><span style="font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:26px">Sponsor e partner</span><a class="btn p" href="#" style="margin-left:auto;text-decoration:none">Diventa partner</a></header>
+<div style="padding:10px 40px 0;max-width:760px"><h1 style="margin:0;font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:72px;line-height:.92">Il tuo nome a bordo campo</h1>
+<p style="margin:12px 0 0;font-size:19px;line-height:1.45;color:#d6ebfb">La nuova striscia LED gira durante partite e tornei, a Colico e a Dervio. Qui sotto vedi come appare.</p></div>
+<section aria-label="Anteprima della striscia LED" style="margin:34px 40px 0;height:150px;border-radius:12px;padding:10px;background:#0b1424;box-shadow:0 30px 60px -20px rgba(1,8,22,.8)">
+<div style="height:100%;border-radius:6px;overflow:hidden;display:flex;background-color:#050d1c;background-image:radial-gradient(rgba(255,255,255,.07) 1.2px,transparent 1.6px);background-size:7px 7px"><div style="width:300px;flex:none;height:100%;display:flex;align-items:center;justify-content:center;gap:16px;border-right:2px solid #0a1730"><img src="/_blob/fbbb95481159cf6c0732c2af08c7193b" alt="HDI" style="height:64px;background:#fff;border-radius:8px;padding:6px 12px"></div><div style="width:560px;flex:none;height:100%;display:flex;align-items:center;justify-content:center;gap:16px;border-right:2px solid #0a1730"><span class="big" style="font-size:66px;line-height:1;color:#F8D000;letter-spacing:.02em">ANCHE TU QUI</span></div><div style="width:300px;flex:none;height:100%;display:flex;align-items:center;justify-content:center;gap:16px;border-right:2px solid #0a1730"><img src="/_blob/696fd3fe2af450aeb010044a5c1ac7d6" alt="Saglio" style="height:64px;background:#fff;border-radius:8px;padding:6px 12px"></div><div style="width:220px;flex:none;height:100%;display:flex;align-items:center;justify-content:center;gap:16px;border-right:2px solid #0a1730"><img src="/_blob/f32eacadad6e75d2255abf5269b1d575" alt="Legea" style="height:64px;background:#fff;border-radius:8px;padding:6px 12px"></div></div>
+</section>
+<p style="margin:10px 40px 0;font-size:13px;color:#9fc3e6">Anteprima. Modello, misure e numero di passaggi della striscia LED da confermare.</p>
+<div style="display:flex;gap:10px;margin:18px 40px 0"><div style="flex:1;min-width:0;padding:12px;border-radius:12px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14)"><div style="font-size:12px;color:#9fc3e6">Passaggio 1 · 8 s</div><b style="font-size:15px">HDI</b></div><div style="flex:1;min-width:0;padding:12px;border-radius:12px;background:rgba(248,208,0,.16);border:1px solid rgba(248,208,0,.5)"><div style="font-size:12px;color:#9fc3e6">Passaggio 2 · 8 s</div><b style="font-size:15px">ANCHE TU QUI</b></div><div style="flex:1;min-width:0;padding:12px;border-radius:12px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14)"><div style="font-size:12px;color:#9fc3e6">Passaggio 3 · 8 s</div><b style="font-size:15px">Saglio</b></div><div style="flex:1;min-width:0;padding:12px;border-radius:12px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14)"><div style="font-size:12px;color:#9fc3e6">Passaggio 4 · 8 s</div><b style="font-size:15px">Legea</b></div><div style="flex:1;min-width:0;padding:12px;border-radius:12px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14)"><div style="font-size:12px;color:#9fc3e6">Passaggio 5 · 8 s</div><b style="font-size:15px">Christmas Lario Cup</b></div><div style="flex:1;min-width:0;padding:12px;border-radius:12px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14)"><div style="font-size:12px;color:#9fc3e6">Passaggio 6 · quando c'è</div><b style="font-size:15px">Risultato live</b></div></div>
+<section style="margin:30px 40px 0"><h2 style="margin:0 0 12px;font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:32px">Pacchetti</h2>
+<div style="display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:stretch"><div style="border-radius:16px;background:#fff;color:#062a52;overflow:hidden"><div style="display:flex;align-items:center;gap:16px;padding:14px 18px;border-top:0"><b style="width:220px;flex:none;font-size:17px">LED a bordo campo</b><span style="flex:1;font-size:15px;color:#3b5683">Il tuo marchio nella rotazione durante partite e tornei</span><span class="chip mute">[PREZZO]</span></div><div style="display:flex;align-items:center;gap:16px;padding:14px 18px;border-top:1px solid #d5e4f5"><b style="width:220px;flex:none;font-size:17px">Vetrina nell'app</b><span style="flex:1;font-size:15px;color:#3b5683">Scheda partner, convenzione per i soci Sky Club, notizie</span><span class="chip mute">[PREZZO]</span></div><div style="display:flex;align-items:center;gap:16px;padding:14px 18px;border-top:1px solid #d5e4f5"><b style="width:220px;flex:none;font-size:17px">Maglia e kit</b><span style="flex:1;font-size:15px;color:#3b5683">Spazio sul materiale ufficiale, d'accordo con il fornitore tecnico</span><span class="chip mute">[PREZZO]</span></div><div style="display:flex;align-items:center;gap:16px;padding:14px 18px;border-top:1px solid #d5e4f5"><b style="width:220px;flex:none;font-size:17px">Torneo</b><span style="flex:1;font-size:15px;color:#3b5683">Christmas Lario Cup: titolo, premiazioni, LED e social</span><span class="chip mute">[PREZZO]</span></div></div><div style="border-radius:16px;padding:20px;background:#F8D000;color:#062a52;display:flex;flex-direction:column;gap:10px"><b class="big" style="font-size:32px;line-height:1">Anche tu qui</b><span style="font-size:15px;line-height:1.4">Scrivici: prepariamo il pacchetto su misura per la tua azienda.</span><a class="btn" href="#" style="margin-top:auto;background:#062a52;color:#fff;text-decoration:none">Diventa partner</a></div></div></section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":960}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Mappa dei centri sportivi</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#062a52}
+a{color:#F8D000}a:hover{color:#fff1a8}
+</style>
+</helmet>
+<div style="width:390px;height:1560px;position:relative;overflow:hidden;background:linear-gradient(180deg,#062a52 0%,#0860A8 50%,#062a52 100%);font-family:'Barlow',sans-serif;color:#ffffff">
+
+<header style="padding:14px 16px 0;display:flex;align-items:center;justify-content:space-between">
+<a href="Main.dc.html" aria-label="Torna alla home" style="width:44px;height:44px;border-radius:22px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;color:#ffffff"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></a>
+<span style="font-size:14px;color:#cfe6ff">Come arrivare e dove andare</span>
+<span style="width:44px"></span>
+</header>
+<h1 style="margin:8px 16px 0;font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:42px;line-height:1">I nostri campi</h1>
+
+<div role="tablist" aria-label="Centro sportivo" style="margin:16px 16px 0;padding:4px;border-radius:16px;background:rgba(255,255,255,.08);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px">
+<button role="tab" aria-selected="{{isColico}}" onClick="{{pickColico}}" style="height:46px;border-radius:12px;border:0;background:{{colicoBg}};color:{{colicoFg}};font-weight:700;font-size:16px;cursor:pointer">Colico</button>
+<button role="tab" aria-selected="{{isDervio}}" onClick="{{pickDervio}}" style="height:46px;border-radius:12px;border:0;background:{{dervioBg}};color:{{dervioFg}};font-weight:700;font-size:16px;cursor:pointer">Dervio</button>
+</div>
+
+<sc-if value="{{isColico}}" hint-placeholder-val="{{true}}">
+<section style="margin:16px 16px 0">
+<div style="font-size:14px;color:#cfe6ff">Centro sportivo di Via Lido · casa di tutte le annate</div>
+<div style="position:relative;margin-top:12px;height:560px;border-radius:20px;background:#0b2a1a;border:1px solid rgba(255,255,255,.18);overflow:hidden" role="img" aria-label="Schema del centro di Colico: Campo 1 e Campo 2, spogliatoi, tribuna, Club House, biglietteria e tre ingressi">
+<div style="position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,rgba(255,255,255,.08),transparent 60%)"></div>
+<!-- campo 1 -->
+<div style="position:absolute;left:30px;top:24px;width:200px;height:300px;border-radius:8px;background:repeating-linear-gradient(0deg,#1f7a3e 0 30px,#1b6e37 30px 60px);border:2px solid rgba(255,255,255,.85)">
+<div style="position:absolute;left:0;right:0;top:50%;height:2px;background:rgba(255,255,255,.7)"></div>
+<div style="position:absolute;left:50%;top:50%;width:50px;height:50px;margin:-25px 0 0 -25px;border-radius:25px;border:2px solid rgba(255,255,255,.7)"></div>
+<div style="position:absolute;left:12px;top:12px;padding:4px 10px;border-radius:8px;background:rgba(6,42,82,.8);font-weight:700;font-size:14px">Campo 1</div>
+<div style="position:absolute;left:12px;bottom:12px;font-size:12px;color:#e8f1ff">Sintetico · gare ufficiali</div>
+</div>
+<!-- campo 2 -->
+<div style="position:absolute;left:250px;top:24px;width:100px;height:180px;border-radius:8px;background:repeating-linear-gradient(0deg,#1f7a3e 0 22px,#1b6e37 22px 44px);border:2px solid rgba(255,255,255,.85)">
+<div style="position:absolute;left:0;right:0;top:50%;height:2px;background:rgba(255,255,255,.7)"></div>
+<div style="position:absolute;left:8px;top:8px;padding:3px 8px;border-radius:7px;background:rgba(6,42,82,.8);font-weight:700;font-size:13px">Campo 2</div>
+</div>
+<!-- buildings -->
+<div style="position:absolute;left:250px;top:220px;width:100px;height:104px;border-radius:10px;background:#05427c;border:1px solid rgba(143,208,255,.5);padding:8px;box-sizing:border-box"><div style="font-weight:700;font-size:13px">Spogliatoi</div><div style="font-size:12px;color:#cfe6ff;margin-top:4px;line-height:1.35">SP1 · SP2 · SP3 · SP4<br>Arbitri</div></div>
+<div style="position:absolute;left:30px;top:340px;width:200px;height:44px;border-radius:10px;background:#05427c;border:1px solid rgba(143,208,255,.5);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px">Tribuna</div>
+<div style="position:absolute;left:250px;top:340px;width:100px;height:44px;border-radius:10px;background:#F8D000;color:#062a52;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px">Club House</div>
+<div style="position:absolute;left:250px;top:398px;width:100px;height:36px;border-radius:10px;background:rgba(181,31,42,.35);border:1px solid #B51F2A;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px">Biglietteria</div>
+<div style="position:absolute;left:30px;top:398px;width:120px;height:56px;border-radius:10px;border:1.5px dashed rgba(20,122,61,.95);display:flex;align-items:center;justify-content:center;text-align:center;font-weight:600;font-size:12px;color:#bff0cf">Parcheggio pulmini</div>
+<!-- routes -->
+<svg viewBox="0 0 358 560" width="358" height="560" style="position:absolute;inset:0" aria-hidden="true">
+<g fill="none" stroke-width="4" stroke-linecap="round" stroke-dasharray="2 9">
+<path d="M40 545 L40 470 L80 456" stroke="#2fbf6a"/>
+<path d="M179 545 L179 470 L240 470 L300 440 L300 330" stroke="#1898D8"/>
+<path d="M318 545 L318 446 L300 420 L200 392 L140 384" stroke="#ff5a66"/>
+</g>
+</svg>
+<!-- entrances -->
+<div style="position:absolute;left:8px;bottom:10px;padding:5px 9px;border-radius:9px;background:#147A3D;font-size:12px;font-weight:700">Ingresso pulmini</div>
+<div style="position:absolute;left:132px;bottom:10px;padding:5px 9px;border-radius:9px;background:#0963AD;font-size:12px;font-weight:700">Ingresso atleti</div>
+<div style="position:absolute;right:8px;bottom:10px;padding:5px 9px;border-radius:9px;background:#B51F2A;font-size:12px;font-weight:700">Visitatori</div>
+</div>
+<p style="margin:8px 0 0;font-size:12px;line-height:1.4;color:#cfe6ff">Schema indicativo, non in scala: serve per orientarsi, non è un rilievo.</p>
+</section>
+
+<section style="margin:18px 16px 0;display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;gap:12px;align-items:flex-start;padding:14px;border-radius:16px;background:rgba(255,255,255,.06)"><span style="width:14px;height:14px;flex:none;margin-top:3px;border-radius:7px;background:#2fbf6a;display:block"></span><div><div style="font-weight:700;font-size:15px">Pulmini</div><div style="font-size:14px;color:#cfe6ff;margin-top:2px">Ingresso a sinistra, parcheggio interno dedicato</div></div></div>
+<div style="display:flex;gap:12px;align-items:flex-start;padding:14px;border-radius:16px;background:rgba(255,255,255,.06)"><span style="width:14px;height:14px;flex:none;margin-top:3px;border-radius:7px;background:#1898D8;display:block"></span><div><div style="font-weight:700;font-size:15px">Atleti</div><div style="font-size:14px;color:#cfe6ff;margin-top:2px">Ingresso centrale, poi spogliatoi e campo. SP3 è riservato alle squadre SCD</div></div></div>
+<div style="display:flex;gap:12px;align-items:flex-start;padding:14px;border-radius:16px;background:rgba(255,255,255,.06)"><span style="width:14px;height:14px;flex:none;margin-top:3px;border-radius:7px;background:#ff5a66;display:block"></span><div><div style="font-weight:700;font-size:15px">Visitatori e tifosi</div><div style="font-size:14px;color:#cfe6ff;margin-top:2px">Ingresso a destra, biglietteria, poi tribuna e Club House</div></div></div>
+</section>
+</sc-if>
+
+<sc-if value="{{isDervio}}" hint-placeholder-val="{{false}}">
+<section style="margin:16px 16px 0">
+<div style="font-size:14px;color:#cfe6ff">Centro sportivo comunale · lo usiamo per gare ed eventi</div>
+<div style="position:relative;margin-top:12px;height:560px;border-radius:20px;background:#0b2a1a;border:1px solid rgba(255,255,255,.18);overflow:hidden" role="img" aria-label="Schema del centro di Dervio: campo centrale con anello di atletica, campo di allenamento, beach volley, tribuna coperta e spogliatoi">
+<div style="position:absolute;left:24px;top:24px;width:310px;height:250px;border-radius:125px;background:#9c4a2c;border:2px solid rgba(255,255,255,.6)"></div>
+<div style="position:absolute;left:70px;top:58px;width:218px;height:182px;border-radius:8px;background:repeating-linear-gradient(90deg,#2a8a46 0 26px,#247b3e 26px 52px);border:2px solid rgba(255,255,255,.85)">
+<div style="position:absolute;top:0;bottom:0;left:50%;width:2px;background:rgba(255,255,255,.7)"></div>
+<div style="position:absolute;left:10px;top:10px;padding:4px 10px;border-radius:8px;background:rgba(6,42,82,.8);font-weight:700;font-size:14px">Campo centrale</div>
+<div style="position:absolute;left:10px;bottom:10px;font-size:12px;color:#e8f1ff">Erba naturale</div>
+</div>
+<div style="position:absolute;left:24px;top:290px;width:180px;height:44px;border-radius:10px;background:#05427c;border:1px solid rgba(143,208,255,.5);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px">Tribuna coperta</div>
+<div style="position:absolute;left:216px;top:290px;width:118px;height:80px;border-radius:10px;background:#05427c;border:1px solid rgba(143,208,255,.5);padding:8px;box-sizing:border-box"><div style="font-weight:700;font-size:13px">Spogliatoi</div><div style="font-size:12px;color:#cfe6ff;margin-top:4px">SP1–SP4 · Arbitri</div></div>
+<div style="position:absolute;left:24px;top:350px;width:180px;height:110px;border-radius:8px;background:repeating-linear-gradient(90deg,#1f7a3e 0 22px,#1b6e37 22px 44px);border:2px solid rgba(255,255,255,.75);display:flex;align-items:flex-start;padding:8px;box-sizing:border-box"><span style="padding:3px 8px;border-radius:7px;background:rgba(6,42,82,.8);font-weight:700;font-size:13px">Campo allenamento</span></div>
+<div style="position:absolute;left:216px;top:386px;width:54px;height:74px;border-radius:6px;background:#d8b46a;border:1.5px solid rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;color:#062a52;font-size:11.5px;font-weight:700;text-align:center">Beach 1</div>
+<div style="position:absolute;left:280px;top:386px;width:54px;height:74px;border-radius:6px;background:#d8b46a;border:1.5px solid rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;color:#062a52;font-size:11.5px;font-weight:700;text-align:center">Beach 2</div>
+<div style="position:absolute;left:24px;top:476px;width:310px;height:56px;border-radius:10px;border:1.5px dashed rgba(248,208,0,.8);display:flex;align-items:center;justify-content:center;text-align:center;padding:0 10px;font-size:12.5px;font-weight:600;color:#ffe680">Club House e biglietteria: posizione da confermare</div>
+</div>
+<p style="margin:8px 0 0;font-size:12px;line-height:1.4;color:#cfe6ff">Schema indicativo, non in scala. Le misure ufficiali sono quelle del verbale di omologazione.</p>
+</section>
+<section style="margin:18px 16px 0;padding:16px;border-radius:16px;background:rgba(248,208,0,.1);border:1px solid rgba(248,208,0,.45)">
+<div style="font-weight:700;font-size:15px">Quando si gioca a Dervio</div>
+<div style="font-size:14px;color:#e8f1ff;margin-top:6px;line-height:1.45">Solo gare ed eventi SCD comunicati al Comune con un mese di anticipo. Le date compaiono qui quando sono confermate.</div>
+</section>
+</sc-if>
+
+<section style="margin:18px 16px 0;display:flex;gap:10px">
+<button style="flex:1.3;height:52px;border-radius:14px;border:0;background:#F8D000;color:#062a52;font-weight:700;font-size:16px">Portami lì</button>
+<a href="Calendario.dc.html" style="flex:1;height:52px;border-radius:14px;border:1.5px solid rgba(255,255,255,.55);color:#ffffff;font-weight:700;font-size:16px;display:flex;align-items:center;justify-content:center;text-decoration:none">Gare qui</a>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1560}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { site: 'colico' }; }
+  renderVals() {
+    const colico = this.state.site === 'colico';
+    const on = '#ffffff', off = 'transparent';
+    return {
+      isColico: colico,
+      isDervio: !colico,
+      colicoBg: colico ? on : off, colicoFg: colico ? '#062a52' : '#ffffff',
+      dervioBg: colico ? off : on, dervioFg: colico ? '#ffffff' : '#062a52',
+      pickColico: () => this.setState({ site: 'colico' }),
+      pickDervio: () => this.setState({ site: 'dervio' })
+    };
+  }
+}
+</script>
+</body>
+</html>

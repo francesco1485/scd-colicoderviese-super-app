@@ -329,6 +329,30 @@
       "sourceStatus": "USER_SUPPLIED_VISUAL_TARGET_NOT_RUNTIME_ASSET",
       "canonicalAttachmentUriVerified": false,
       "usage": "Identità SCD: lago e montagne, Sky e uso di divise come esempi visivi; nessun kit non approvato nel runtime."
+    },
+    {
+      "id": "VR-022",
+      "product": "SCD_SUPER_APP",
+      "name": "SCD Super App — Visual Master (35 boards)",
+      "path": "docs/design/visual-master/",
+      "type": "APPROVED_BOARD",
+      "approval": {
+        "by": "Francesco",
+        "date": "2026-10-11",
+        "evidence": "Explicit user message \"Approvo\" in the Claude session of 2026-10-11 01:08 Europe/Rome, after review of the published Visual Master"
+      },
+      "relevance": "HIGH",
+      "observedConcepts": [
+        "CREST_PALETTE_B_OUTSIDE_C_INSIDE",
+        "DIRECT_AREA_LINKS",
+        "SINGLE_IDENTITY_ACCESS",
+        "ROLE_FILTERED_RAIL",
+        "FIELD_ROTATION_2D",
+        "LED_SPONSOR",
+        "SKY_CLUB",
+        "FANTASCD_TEAM_LEVEL"
+      ],
+      "usage": "Source of truth for layout, palette and component language of the Super App. Data shown on boards is real snapshot data or explicit placeholders; never copy placeholders into runtime as values."
     }
   ],
   "nextRecoveryTargets": [

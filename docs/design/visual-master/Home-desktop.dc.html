@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>SCD Universe, home desktop</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Barlow:wght@400;500;600;700&family=Kaushan+Script&family=Rye&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#062a52}
+a{color:#F8D000}a:hover{color:#fff1a8}
+.uv-stars{position:absolute;inset:0;background-image:radial-gradient(1.3px 1.3px at 20px 30px,#fff 60%,transparent),radial-gradient(1px 1px at 110px 80px,#cfe6ff 60%,transparent),radial-gradient(1.8px 1.8px at 190px 24px,#fff 60%,transparent),radial-gradient(1px 1px at 250px 130px,#fff 60%,transparent),radial-gradient(1.2px 1.2px at 60px 160px,#ffe9a0 60%,transparent);background-size:280px 200px;opacity:.85;animation:uvTwinkle 5s ease-in-out infinite alternate}
+.uv-stars.b{background-size:360px 260px;background-position:90px 40px;opacity:.5;animation-duration:8s}
+@keyframes uvTwinkle{from{opacity:.35}to{opacity:.95}}
+.uv-beam{position:absolute;top:-60px;width:260px;height:760px;background:linear-gradient(180deg,rgba(255,244,200,.5),rgba(255,244,200,0) 80%);filter:blur(16px);transform-origin:top center}
+.uv-pulse{animation:uvPulse 1.4s ease-in-out infinite}
+@keyframes uvPulse{0%,100%{opacity:1}50%{opacity:.25}}
+.uv-float{animation:uvFloat 6s ease-in-out infinite}
+@keyframes uvFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.uv-led{background-image:radial-gradient(rgba(255,255,255,.06) 1px,transparent 1.4px);background-size:6px 6px}
+@media (prefers-reduced-motion:reduce){.uv-stars,.uv-pulse,.uv-float{animation:none}}
+</style>
+</helmet>
+<div style="width:1440px;height:1720px;position:relative;overflow:hidden;background:linear-gradient(180deg,#062a52 0%,#0860A8 45%,#062a52 100%);font-family:'Barlow',sans-serif;color:#ffffff">
+
+<header style="position:relative;z-index:5;height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 48px;background:rgba(6,42,82,.75);border-bottom:1px solid rgba(248,208,0,.22)">
+<a href="Home-desktop.dc.html" style="display:flex;align-items:center;gap:12px;text-decoration:none;color:#ffffff">
+<img src="/_blob/d831a969f86523cc4ee06edd9c2e77e8" alt="Stemma S.C.D. ColicoDerviese" style="width:36px;height:47px;object-fit:contain">
+<span style="font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:26px">SCD Universe</span>
+</a>
+<nav aria-label="Sezioni" style="display:flex;gap:6px">
+<a href="Home-desktop.dc.html" style="padding:10px 16px;border-radius:12px;background:rgba(248,208,0,.14);color:#F8D000;font-weight:700;font-size:16px;text-decoration:none">Home</a>
+<a href="Home-desktop.dc.html" style="padding:10px 16px;border-radius:12px;color:#e8f1ff;font-weight:600;font-size:16px;text-decoration:none">Gare</a>
+<a href="Home-desktop.dc.html" style="padding:10px 16px;border-radius:12px;color:#e8f1ff;font-weight:600;font-size:16px;text-decoration:none">Allenamenti</a>
+<a href="Evento-CLC.dc.html" style="padding:10px 16px;border-radius:12px;color:#e8f1ff;font-weight:600;font-size:16px;text-decoration:none">Eventi</a>
+<a href="Sponsor.dc.html" style="padding:10px 16px;border-radius:12px;color:#e8f1ff;font-weight:600;font-size:16px;text-decoration:none">Partner</a>
+<a href="Home-desktop.dc.html" style="padding:10px 16px;border-radius:12px;color:#e8f1ff;font-weight:600;font-size:16px;text-decoration:none">Club</a>
+</nav>
+<div style="display:flex;gap:10px">
+<a href="Tessera.dc.html" style="height:46px;padding:0 18px;border-radius:23px;border:1px solid rgba(255,255,255,.3);color:#ffffff;font-weight:600;font-size:16px;display:flex;align-items:center;text-decoration:none">Chiedi a Crovi</a>
+<a href="Tessera.dc.html" style="height:46px;padding:0 22px;border-radius:23px;background:#F8D000;color:#062a52;font-weight:700;font-size:16px;display:flex;align-items:center;text-decoration:none">Entra</a>
+</div>
+</header>
+
+<!-- HERO -->
+<section style="position:relative;height:720px;overflow:hidden;background:linear-gradient(180deg,#041f3f 0%,#021a45 40%,#05427c 72%,#0d4aa3 80%,#062a52 100%)">
+<div class="uv-stars"></div>
+<div class="uv-stars b"></div>
+<div class="uv-beam" style="left:40px;transform:rotate(-22deg)"></div>
+<div class="uv-beam" style="left:260px;transform:rotate(14deg);opacity:.6"></div>
+<div class="uv-beam" style="right:40px;transform:rotate(22deg)"></div>
+<div style="position:absolute;left:-60px;top:-60px;width:300px;height:300px;border-radius:150px;background:radial-gradient(circle,rgba(255,250,225,.95) 0%,rgba(255,236,160,.4) 25%,rgba(255,236,160,0) 70%)"></div>
+<div style="position:absolute;right:-60px;top:-60px;width:300px;height:300px;border-radius:150px;background:radial-gradient(circle,rgba(255,250,225,.95) 0%,rgba(255,236,160,.4) 25%,rgba(255,236,160,0) 70%)"></div>
+<svg viewBox="0 0 1440 300" width="1440" height="300" style="position:absolute;left:0;bottom:0" aria-hidden="true">
+<defs>
+<linearGradient id="dFar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d4f9e"/><stop offset="1" stop-color="#05427c"/></linearGradient>
+<linearGradient id="dNear" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0a2457"/><stop offset="1" stop-color="#03163a"/></linearGradient>
+<linearGradient id="dLake" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a6fd0"/><stop offset=".5" stop-color="#0c3b84"/><stop offset="1" stop-color="#062a52"/></linearGradient>
+</defs>
+<path d="M0 130 L120 80 L210 110 L330 40 L460 100 L560 60 L700 112 L820 30 L960 96 L1080 58 L1220 104 L1320 70 L1440 100 L1440 190 L0 190 Z" fill="url(#dFar)"/>
+<path d="M790 50 L820 30 L850 52 L832 48 L820 58 Z" fill="#e8f1ff" opacity=".6"/>
+<path d="M310 52 L330 40 L352 58 L334 54 Z" fill="#e8f1ff" opacity=".55"/>
+<path d="M0 166 L170 120 L300 150 L460 112 L640 160 L800 124 L980 164 L1120 130 L1280 160 L1440 136 L1440 200 L0 200 Z" fill="url(#dNear)"/>
+<rect x="0" y="194" width="1440" height="106" fill="url(#dLake)"/>
+<g stroke="#F8D000" stroke-linecap="round" opacity=".7"><line x1="560" y1="212" x2="880" y2="212" stroke-width="2.4"/><line x1="620" y1="228" x2="820" y2="228" stroke-width="1.8"/><line x1="680" y1="244" x2="760" y2="244" stroke-width="1.4"/></g>
+<g stroke="#9fd0f1" stroke-linecap="round" opacity=".5"><line x1="80" y1="222" x2="300" y2="222" stroke-width="1.4"/><line x1="1100" y1="232" x2="1360" y2="232" stroke-width="1.4"/></g>
+</svg>
+<svg viewBox="0 0 1440 720" width="1440" height="720" style="position:absolute;inset:0" aria-hidden="true">
+<defs><filter id="dRough" x="-10%" y="-30%" width="120%" height="160%"><feTurbulence type="fractalNoise" baseFrequency=".02 .45" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale="12"/></filter></defs>
+<path d="M40 470 C 220 432, 480 440, 760 420 L 764 494 C 500 508, 240 516, 36 528 Z" fill="#F8D000" filter="url(#dRough)" opacity=".95"/>
+<path d="M120 548 C 300 530, 520 534, 700 520 L 698 540 C 520 554, 310 558, 124 566 Z" fill="#F8D000" filter="url(#dRough)" opacity=".7"/>
+<g fill="#F8D000"><circle cx="780" cy="410" r="7"/><circle cx="800" cy="390" r="3"/><circle cx="60" cy="440" r="5"/><circle cx="40" cy="424" r="2.5"/><circle cx="720" cy="580" r="4"/></g>
+</svg>
+
+<div style="position:relative;z-index:2;display:grid;grid-template-columns:7fr 5fr;gap:48px;padding:48px 48px 0;align-items:start">
+<div style="display:flex;gap:28px;align-items:center">
+<img class="uv-float" src="/_blob/d831a969f86523cc4ee06edd9c2e77e8" alt="Stemma ufficiale S.C.D. ColicoDerviese" style="width:220px;height:288px;object-fit:contain;filter:drop-shadow(0 0 1px #fff7cf) drop-shadow(0 0 24px rgba(248,208,0,.55)) drop-shadow(0 24px 30px rgba(0,0,0,.55))">
+<div>
+<div style="display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:rgba(6,42,82,.6);border:1px solid rgba(248,208,0,.5);font-size:15px;font-weight:600"><span class="uv-pulse" style="width:8px;height:8px;border-radius:4px;background:#F8D000;display:block"></span>Vigilia di gara · domani alle 15:30</div>
+<div style="margin-top:14px;font-family:'Kaushan Script',cursive;font-size:52px;transform:rotate(-5deg);transform-origin:left;text-shadow:0 3px 0 #062a52,0 0 18px rgba(70,180,255,.6)">S.C.D.</div>
+<div style="font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:150px;line-height:.8;text-shadow:0 6px 0 #062a52,0 14px 36px rgba(0,0,0,.5)">COLICO</div>
+<div style="font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:132px;line-height:.86;color:#F8D000;text-shadow:0 6px 0 #062a52,-3px 0 0 #062a52,3px 0 0 #062a52,0 14px 36px rgba(0,0,0,.5)">DERVIESE</div>
+<div style="margin-top:18px;font-size:20px;font-weight:600;letter-spacing:.5px;color:#e8f1ff">Sport • Persone • Territorio</div>
+</div>
+</div>
+
+<!-- ticket -->
+<div style="position:relative;margin-top:24px;border-radius:24px;background:linear-gradient(160deg,#05427c 0%,#05427c 55%,#05427c 100%);border:1px solid rgba(248,208,0,.45);box-shadow:0 30px 60px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.18);overflow:hidden">
+<div style="padding:22px 24px 0;display:flex;justify-content:space-between;align-items:center">
+<span style="font-size:15px;font-weight:600;color:#9fd0f1">Prossima gara</span>
+<span style="padding:4px 12px;border-radius:8px;background:#0860A8;font-weight:700;font-size:14px;letter-spacing:1px;transform:rotate(-4deg);border:2px solid #ffffff">CASA</span>
+</div>
+<div style="padding:12px 24px 0;display:flex;gap:16px;align-items:center">
+<div style="width:68px;height:68px;border-radius:14px;background:#AD7616;transform:skewX(-8deg);display:flex;align-items:center;justify-content:center;font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:32px">1ª</div>
+<div>
+<div style="font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:38px;line-height:1">Prima Squadra</div>
+<div style="font-size:18px;color:#d7e6ff;margin-top:4px">contro <strong style="color:#ffffff">Alta Brianza Tavernerio</strong></div>
+</div>
+</div>
+<div style="padding:18px 24px 0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">
+<div style="padding:12px 14px;border-radius:14px;background:rgba(6,42,82,.55)"><div style="font-size:14px;color:#9fd0f1">Domenica 11 ottobre</div><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:30px;color:#F8D000">15:30</div></div>
+<div style="padding:12px 14px;border-radius:14px;background:rgba(6,42,82,.55)"><div style="font-size:14px;color:#9fd0f1">Dove</div><div style="font-weight:700;font-size:18px;margin-top:6px">Colico · Campo 1</div></div>
+</div>
+<div style="padding:18px 24px 0;display:flex;align-items:center;justify-content:space-between">
+<span style="font-size:15px;color:#d7e6ff">Mancano</span>
+<span class="uv-led" style="font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:48px;letter-spacing:2px;color:#F8D000;padding:2px 12px;border-radius:12px;background-color:#041f3f;text-shadow:0 0 14px rgba(248,208,0,.6)">18:24:51</span>
+</div>
+<div style="padding:18px 24px 22px;display:flex;gap:12px">
+<button style="flex:1.2;height:54px;border-radius:14px;border:0;background:#F8D000;color:#062a52;font-weight:700;font-size:18px;cursor:pointer">Ci sarò</button>
+<button style="flex:1;height:54px;border-radius:14px;border:1.5px solid rgba(255,255,255,.55);background:transparent;color:#ffffff;font-weight:700;font-size:18px;cursor:pointer">Condividi</button>
+</div>
+<a href="Sponsor.dc.html" style="display:block;text-align:center;padding:12px;background:rgba(248,208,0,.1);border-top:1px solid rgba(248,208,0,.25);font-size:15px;color:#ffe680;text-decoration:none">Gara presentata da · <strong>spazio partner disponibile</strong></a>
+</div>
+</div>
+</section>
+
+<!-- BODY GRID -->
+<div style="display:grid;grid-template-columns:7fr 5fr;gap:32px;padding:40px 48px 0">
+<section style="border-radius:24px;background:#041f3f;border:1px solid rgba(70,180,255,.25);overflow:hidden">
+<div class="uv-led" style="padding:20px 24px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,.08)">
+<div><h2 style="margin:0;font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:36px;line-height:1">Tabellone</h2><div style="font-size:15px;color:#9fd0f1;margin-top:4px">Domenica 11 ottobre · tutte le annate alla pari</div></div>
+<div style="display:flex;gap:8px">
+<button style="height:44px;padding:0 16px;border-radius:22px;border:0;background:#ffffff;color:#062a52;font-weight:700;font-size:15px">Tutte</button>
+<button style="height:44px;padding:0 16px;border-radius:22px;border:1px solid rgba(255,255,255,.25);background:transparent;color:#ffffff;font-weight:600;font-size:15px">In casa</button>
+<button style="height:44px;padding:0 16px;border-radius:22px;border:1px solid rgba(255,255,255,.25);background:transparent;color:#ffffff;font-weight:600;font-size:15px">Le mie</button>
+</div>
+</div>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="5">
+<div style="display:grid;grid-template-columns:90px 56px 1fr 1fr 90px;gap:16px;align-items:center;padding:16px 24px;border-bottom:1px solid rgba(255,255,255,.06)">
+<div style="font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:30px;color:#F8D000;text-shadow:0 0 10px rgba(248,208,0,.45)">{{r.time}}</div>
+<div style="width:50px;height:50px;border-radius:11px;transform:skewX(-8deg);display:flex;align-items:center;justify-content:center;font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:20px;background:{{r.color}}">{{r.code}}</div>
+<div style="font-weight:700;font-size:18px">{{r.opp}}</div>
+<div style="font-size:15px;color:#9fb6d9">{{r.where}}</div>
+<span style="justify-self:end;padding:5px 10px;border-radius:8px;font-weight:700;font-size:13px;letter-spacing:.5px;background:{{r.stampBg}};color:{{r.stampFg}}">{{r.stamp}}</span>
+</div>
+</sc-for>
+<div style="padding:16px 24px;font-size:14px;color:#9fb6d9">Fonte: calendario ufficiale FIGC/LND e Master Calendario SCD · aggiornato al 10/10</div>
+</section>
+
+<div style="display:flex;flex-direction:column;gap:24px">
+<section style="position:relative;padding:22px 22px 22px 170px;min-height:200px;border-radius:24px;background:radial-gradient(120% 140% at 0% 100%,#0860A8 0%,#05427c 55%,#05427c 100%);border:1px solid rgba(143,208,255,.3);overflow:hidden">
+<img src="/_blob/42e43fdca0fa2c31382b9791fab34724" alt="Crovi, l'assistente della SCD" style="position:absolute;left:8px;bottom:0;width:160px;height:193px;object-fit:contain;filter:drop-shadow(-2px -2px 0 rgba(255,236,170,.55)) drop-shadow(0 14px 18px rgba(0,0,0,.5))">
+<div style="font-family:'Kaushan Script',cursive;font-size:24px;color:#F8D000">Crovi</div>
+<p style="margin:6px 0 0;font-size:17px;line-height:1.4">Chiedimi dove gioca la tua annata, gli orari degli allenamenti o come iscriverti.</p>
+<a href="Tessera.dc.html" style="margin-top:14px;display:inline-flex;height:46px;padding:0 18px;border-radius:12px;background:#F8D000;color:#062a52;font-weight:700;font-size:16px;align-items:center;text-decoration:none">Scrivi a Crovi</a>
+</section>
+<section style="position:relative;padding:24px 190px 24px 24px;min-height:230px;border-radius:24px;background:linear-gradient(150deg,#F8D000 0%,#ffc400 60%,#f5a800 100%);color:#062a52;overflow:hidden">
+<img src="/_blob/3bb384cee837ffee6889b56381703f76" alt="Sky, la mascotte della SCD, in divisa da gara" style="position:absolute;right:16px;bottom:-40px;width:150px;height:310px;object-fit:contain;filter:drop-shadow(0 16px 20px rgba(6,42,82,.45))">
+<h2 style="margin:0;font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:42px;line-height:.95">Entra nella SCD</h2>
+<p style="margin:10px 0 0;font-size:17px;line-height:1.35;font-weight:500">Profilo gratis: Sky ti regala un coupon per la Club House. Porta un amico e la partita è offerta.</p>
+<a href="Tessera.dc.html" style="margin-top:16px;display:inline-flex;height:52px;padding:0 22px;border-radius:14px;background:#062a52;color:#F8D000;font-weight:700;font-size:17px;align-items:center;text-decoration:none">Crea il tuo profilo</a>
+</section>
+<a href="Evento-CLC.dc.html" style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:22px 24px;border-radius:24px;overflow:hidden;background:linear-gradient(180deg,#0a1e4a 0%,#0e2f73 100%);border:1px solid rgba(255,255,255,.2);text-decoration:none;color:#ffffff">
+<div class="uv-stars" style="opacity:.6"></div>
+<div style="position:relative"><div style="font-size:15px;color:#9fd0f1;font-weight:600">Martedì 8 dicembre</div><div style="font-family:'Rye',serif;font-size:32px;line-height:1.05">Christmas Lario Cup</div></div>
+<div style="position:relative;text-align:right"><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:60px;line-height:.9;color:#F8D000">58</div><div style="font-size:14px;color:#d7e6ff">giorni</div></div>
+</a>
+</div>
+</div>
+
+<section style="position:absolute;left:0;right:0;bottom:0;height:150px;background:#ffffff;color:#062a52;display:flex;align-items:center;justify-content:space-between;padding:0 48px">
+<div style="display:flex;align-items:center;gap:36px">
+<span style="font-size:15px;font-weight:600;color:#3b5683">Con noi in campo</span>
+<img src="/_blob/fbbb95481159cf6c0732c2af08c7193b" alt="HDI Maglia Assicurazioni" style="height:32px;width:auto;object-fit:contain">
+<img src="/_blob/696fd3fe2af450aeb010044a5c1ac7d6" alt="Saglio Sport" style="height:30px;width:auto;object-fit:contain">
+<img src="/_blob/f32eacadad6e75d2255abf5269b1d575" alt="Legea" style="height:24px;width:auto;object-fit:contain">
+<a href="Sponsor.dc.html" style="color:#0860A8;font-weight:700;font-size:16px">Diventa partner</a>
+</div>
+<div style="display:flex;align-items:center;gap:28px">
+<img src="/_blob/e3ae8c12c19424256d803d56542d35ea" alt="LND" style="height:48px;width:auto;object-fit:contain">
+<img src="/_blob/cad14989a9de7b76307a64b68c3802c7" alt="FIGC SGS Club 3° livello" style="height:44px;width:auto;object-fit:contain">
+<img src="/_blob/b5130954ea1e66824c49c4be1faa0de7" alt="Insieme al Monza" style="height:42px;width:auto;object-fit:contain">
+</div>
+</section>
+<div style="position:absolute;left:0;right:0;bottom:150px;padding:18px;text-align:center;font-family:'Kaushan Script',cursive;font-size:36px;color:#F8D000;text-shadow:0 3px 0 #041f3f">Sempre insieme più lontano</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1720}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const casa = { stampBg: '#0860A8', stampFg: '#ffffff', stamp: 'CASA' };
+    const fuori = { stampBg: '#F8D000', stampFg: '#062a52', stamp: 'FUORI' };
+    return { rows: [
+      { time: '09:30', code: 'E14', color: '#7654B8', opp: 'Costamasnaga', where: 'Costa Masnaga · C.S. Parrocchiale n.1', ...fuori },
+      { time: '10:00', code: 'U15', color: '#C23C3F', opp: 'Grentarcadia', where: 'Valgreghentino · C.S. Comunale', ...fuori },
+      { time: '11:30', code: 'U16', color: '#C85D22', opp: 'Castellanzese 1921', where: 'Castellanza · C.S.C. La Madonnina', ...fuori },
+      { time: '15:00', code: 'E15', color: '#148B99', opp: 'Penta Piateda · amichevole', where: 'Colico · Campo 2', ...casa },
+      { time: '15:30', code: '1ª', color: '#AD7616', opp: 'Alta Brianza Tavernerio', where: 'Colico · Campo 1', ...casa }
+    ] };
+  }
+}
+</script>
+</body>
+</html>
