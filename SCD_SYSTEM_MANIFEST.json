@@ -3,8 +3,8 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.27.4",
-    "effective_at": "2026-10-09",
+    "version": "3.27.5",
+    "effective_at": "2026-10-10",
     "status": "BINDING",
     "language": "it-IT",
     "timezone": "Europe/Rome",
@@ -128,6 +128,11 @@
     {
       "id": "INV-013",
       "statement": "Ogni nuova funzione deve essere assegnata a SCD ONE, SCD CORE o SCD GROW prima dello sviluppo; una quarta applicazione SCD richiede approvazione esplicita della Direzione.",
+      "enforcement": "BLOCKING"
+    },
+    {
+      "id": "INV-014",
+      "statement": "Riutilizzare prima strumenti gratuiti o inclusi e skill già installate; vietate duplicazioni, offerte non verificate, saldi crediti inventati, pagamenti o azioni esterne non autorizzate.",
       "enforcement": "BLOCKING"
     }
   ],
@@ -3573,6 +3578,42 @@
         "ROLLBACK_REQUIRED"
       ],
       "completion_rule": "A block is complete only after code/data logic, responsive/accessibility, automated tests, browser or equivalent smoke, visual QA where relevant, release evidence and rollback are present."
+    },
+    "scd_free_first": {
+      "id": "SCD_FREE_FIRST",
+      "source": "DIREZIONE_SCD_2026_10_10",
+      "status": "BINDING",
+      "config": "config/scd-free-first.v1.json",
+      "commands": [
+        "/credits",
+        "/freefirst",
+        "/nonprofit",
+        "/trialgate",
+        "/toolscore",
+        "/skillreuse",
+        "/creditbudget",
+        "/sourcecheck"
+      ],
+      "rules": {
+        "duplicate_tools": "DENY",
+        "unofficial_claims": "VERIFY_FIRST",
+        "credits_balance": "UNKNOWN_UNTIL_CHECKED",
+        "payments": "HUMAN_APPROVAL",
+        "external_actions": "HUMAN_APPROVAL"
+      },
+      "required_before": [
+        "NEW_AI_TOOL",
+        "NEW_PLUGIN_OR_SKILL",
+        "NEW_PROVIDER",
+        "START_TRIAL",
+        "ADD_CREDITS",
+        "PAID_SERVICE",
+        "REPLACE_EXISTING_LICENSE",
+        "NEW_MARKETING_OR_DESIGN_TOOL"
+      ],
+      "lifecycle": "INVENTORY_EXISTING->OFFICIAL_VERIFY->DEDUPE->TRIAL_NONPROFIT_BUDGET->TOOL_SCORE->HUMAN_GATE",
+      "execution": "npm run scd:freefirst -- /freefirst",
+      "gate": "NO_AUTOMATIC_SPEND_NO_EXTERNAL_SIDE_EFFECTS"
     }
   },
   "product_direction": {

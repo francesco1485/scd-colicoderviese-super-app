@@ -170,3 +170,15 @@ Le voci `known_noncompliance` del manifest sono debito esplicito da ridurre. Non
 
 ## Produzione
 Nessun agente o automazione può auto-modificare in produzione ruoli, permessi, pagamenti, tesseramenti, presenze, documenti sensibili o safeguarding.
+
+## SCD:FREE-FIRST — COSTO ZERO PRIMA DI ACQUISTI (UD-017)
+
+Prima di suggerire, installare, sostituire o collegare agenti, servizi AI, skill, plugin, piani, editor grafici, CRM o hosting:
+1. leggere `SCD_SYSTEM_MANIFEST.json.development_contract.scd_free_first` e `config/scd-free-first.v1.json`;
+2. eseguire inventario delle capacità già operative/incluse e delle skill disponibili; scegliere prima riuso e strumenti realmente gratuiti se adeguati;
+3. verificare prezzi, crediti, limiti, prove gratuite, rinnovi e agevolazioni **su fonti ufficiali attuali** prima di qualunque raccomandazione a pagamento;
+4. segnare saldi e condizioni non leggibili come `UNKNOWN_UNTIL_CHECKED`, mai dedurli dal nome del piano o da offerte social;
+5. confrontare beneficio, rischio e costo e respingere duplicati funzionali;
+6. fermarsi **prima di ogni azione esterna con effetto**, installazione, connessione, avvio trial, modifica abbonamento, pagamento o invio domanda: `HUMAN_APPROVAL`.
+
+Comandi interni: `/credits`, `/freefirst`, `/nonprofit`, `/trialgate`, `/toolscore`, `/skillreuse`, `/creditbudget`, `/sourcecheck`. Audit locale reversibile: `npm run scd:freefirst -- /freefirst`. Il comando CLI NON effettua verifiche live delle fatture del provider e non abilita in alcun modo spese. È una disciplina del sistema interno SCD, **non un comando da esporre alla Sky pubblica o ai dati dei minori**.

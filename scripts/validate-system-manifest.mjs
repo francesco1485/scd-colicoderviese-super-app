@@ -389,6 +389,34 @@ assert((m.product_direction?.sponsor_operational_focus?.rules||[]).includes('NO_
 assert((m.product_direction?.sponsor_operational_focus?.rules||[]).includes('QUOTE_RECONCILIATION_HAS_PRIORITY'),'Sponsor Operational Focus quote priority missing');
 assert((m.capability_map||[]).some(x=>x.id==='CAP-SPONSOR-OPERATIONAL-FOCUS'),'Sponsor Operational Focus capability missing');
 
+
+const freefirstPath=path.join(root,'config/scd-free-first.v1.json');
+assert(fs.existsSync(freefirstPath),'SCD_FREE_FIRST binding policy missing');
+const freefirst=fs.existsSync(freefirstPath)?readJson(freefirstPath):null;
+const freefirstContract=m.development_contract?.scd_free_first||{};
+assert(freefirstContract.id==='SCD_FREE_FIRST','missing SCD_FREE_FIRST manifest governance');
+assert(freefirstContract.config==='config/scd-free-first.v1.json','SCD_FREE_FIRST manifest config path mismatch');
+assert(freefirst?.id==='SCD_FREE_FIRST','wrong free-first policy id');
+const freefirstCmds=['/credits','/freefirst','/nonprofit','/trialgate','/toolscore','/skillreuse','/creditbudget','/sourcecheck'];
+includesAll(Object.keys(freefirst?.commands||{}),freefirstCmds,'free-first commands');
+assert(Object.keys(freefirst?.commands||{}).length===freefirstCmds.length,'free-first unexpected command');
+includesAll(freefirstContract.commands||[],freefirstCmds,'manifest free-first commands');
+for(const [name,value] of Object.entries({
+ duplicate_tools:'DENY',
+ unofficial_claims:'VERIFY_FIRST',
+ credits_balance:'UNKNOWN_UNTIL_CHECKED',
+ payments:'HUMAN_APPROVAL',
+ external_actions:'HUMAN_APPROVAL'
+})){
+ assert(freefirst?.rules?.[name]===value,'free-first rule conflict: '+name);
+ assert(freefirstContract.rules?.[name]===value,'manifest free-first rule conflict: '+name);
+}
+assert(freefirst?.execution?.noNewInfrastructure===true,'free-first must reuse existing infrastructure');
+assert(freefirst?.execution?.noAutomaticPurchases===true,'free-first must prohibit automatic purchases');
+assert(fs.existsSync(path.join(root,'scripts/scd-free-first.mjs')),'missing free-first runnable command');
+assert(fs.existsSync(path.join(root,'tests/scd-free-first.test.mjs')),'missing free-first contract tests');
+assert((m.non_negotiable_invariants||[]).some(x=>x.id==='INV-014'),'SCD_FREE_FIRST invariant missing');
+
 if(process.exitCode) process.exit(process.exitCode);
 console.log('SCD SYSTEM MANIFEST PASS',{
   version:m.manifest.version,

@@ -1,0 +1,172 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "SCD_FREE_FIRST",
+  "authority": "DIREZIONE_SCD",
+  "effectiveAt": "2026-10-10",
+  "seasonAnchor": "2026-07-01",
+  "applicability": [
+    "SCD_ONE",
+    "SCD_CORE",
+    "SCD_GROW",
+    "SCD_AUTOMATIONS",
+    "SCD_MEDIA",
+    "SCD_WORKSPACE",
+    "SCD_AI_AGENTS"
+  ],
+  "defaultMode": "READ_ONLY_DISCOVER_COMPARE",
+  "commands": {
+    "/credits": {
+      "label": "Cerca crediti e offerte ufficiali",
+      "intent": "OFFICIAL_PROVIDER_CREDITS_AND_OFFERS",
+      "requires": [
+        "OFFICIAL_PROVIDER_TERMS",
+        "COUNTRY_APPLICABILITY",
+        "PLAN_AND_USAGE_EVIDENCE"
+      ],
+      "outcome": "OFFERS_VERIFIED_OR_UNKNOWN"
+    },
+    "/freefirst": {
+      "label": "Usa prima strumenti gratuiti già disponibili",
+      "intent": "REUSE_EXISTING_FREE_OR_INCLUDED_CAPABILITY",
+      "requires": [
+        "EXISTING_CONNECTED_TOOLS_INVENTORY",
+        "NEEDED_CAPABILITY",
+        "VERIFIED_COST"
+      ],
+      "outcome": "EXISTING_TOOL_OR_NO_SAFE_MATCH"
+    },
+    "/nonprofit": {
+      "label": "Verifica agevolazioni per SCD",
+      "intent": "OFFICIAL_NONPROFIT_OR_SPORTS_CLUB_ELIGIBILITY",
+      "requires": [
+        "PROVIDER_OFFICIAL_PROGRAM",
+        "SCD_LEGAL_STATUS_DOCUMENTED",
+        "ITALY_ELIGIBILITY_AND_APPLICATION_TERMS"
+      ],
+      "outcome": "ELIGIBLE_ONLY_WHEN_PROVED"
+    },
+    "/trialgate": {
+      "label": "Controlla scadenze e rinnovi delle prove",
+      "intent": "TRIAL_RENEWAL_AND_CANCELLATION_REVIEW",
+      "requires": [
+        "PROVIDER_BILLING_EVIDENCE",
+        "TRIAL_END_AT",
+        "RENEWAL_TERMS"
+      ],
+      "outcome": "RENEWAL_RISK_OR_UNKNOWN"
+    },
+    "/toolscore": {
+      "label": "Confronta costo, vantaggi e rischi",
+      "intent": "EVIDENCE_GATED_TOOL_COMPARISON",
+      "requires": [
+        "BENEFIT_EVIDENCE",
+        "TOTAL_COST",
+        "RISKS_AND_LIMITATIONS",
+        "EXISTING_CAPABILITY_OVERLAP"
+      ],
+      "outcome": "VERIFIED_RANKING_OR_INSUFFICIENT_EVIDENCE"
+    },
+    "/skillreuse": {
+      "label": "Riutilizza le skill già installate",
+      "intent": "DYNAMIC_EXISTING_SKILLS_INVENTORY_AND_REUSE",
+      "requires": [
+        "AVAILABLE_SKILLS_LIST",
+        "MATCHING_SPECIALIST_SKILL",
+        "NO_NEW_SKILL_WITHOUT_GAP"
+      ],
+      "outcome": "ROUTE_EXISTING_SKILL_OR_GAP"
+    },
+    "/creditbudget": {
+      "label": "Controlla disponibilità e consumi",
+      "intent": "PROVIDER_BILLING_USAGE_RECONCILIATION",
+      "requires": [
+        "PROVIDER_AUTHORIZED_READ_ONLY_USAGE",
+        "CREDIT_BALANCE",
+        "MEASUREMENT_TIME",
+        "RENEWAL_DATE"
+      ],
+      "outcome": "VERIFIED_USAGE_OR_UNKNOWN"
+    },
+    "/sourcecheck": {
+      "label": "Verifica offerte viste sui social",
+      "intent": "VERIFY_SOCIAL_CLAIM_AT_OFFICIAL_PROVIDER",
+      "requires": [
+        "CLAIM_AND_ORIGINAL_SOURCE",
+        "OFFICIAL_PROVIDER_COUNTERPART",
+        "MATCHED_ELIGIBILITY_DATES_AND_PRICES"
+      ],
+      "outcome": "VERIFIED_OR_UNVERIFIED"
+    }
+  },
+  "rules": {
+    "duplicate_tools": "DENY",
+    "unofficial_claims": "VERIFY_FIRST",
+    "credits_balance": "UNKNOWN_UNTIL_CHECKED",
+    "payments": "HUMAN_APPROVAL",
+    "external_actions": "HUMAN_APPROVAL"
+  },
+  "execution": {
+    "sourcePriority": [
+      "OFFICIAL_PROVIDER_ACCOUNT_WITH_READ_ONLY_PERMISSION",
+      "OFFICIAL_PROVIDER_TERMS_AND_OFFERS",
+      "EXISTING_PROJECT_LICENSE_AND_SERVICE_INVENTORY",
+      "PUBLIC_PROVIDER_DOCS",
+      "INDEPENDENT_RESEARCH_SECONDARY_ONLY",
+      "SOCIAL_PROMOTION_UNVERIFIED_UNTIL_OFFICIAL_CROSSCHECK"
+    ],
+    "order": [
+      "INVENTORY_EXISTING_SKILLS_AND_TOOLS",
+      "DEFINE_REQUIRED_CAPABILITY",
+      "DETECT_DUPLICATES",
+      "CHECK_FREE_OR_ALREADY_INCLUDED_PATH",
+      "GET_OFFICIAL_FRESH_COST_CREDITS_AND_LIMITS",
+      "CHECK_NONPROFIT_TRIAL_RENEWAL_APPLICABILITY",
+      "SCORE_ONLY_VERIFIED_ALTERNATIVES",
+      "PRESENT_RECOMMENDATION_WITH_EVIDENCE",
+      "WAIT_FOR_HUMAN_APPROVAL_BEFORE_EXTERNAL_SIDE_EFFECT"
+    ],
+    "whenCreditsUnavailable": "UNKNOWN_UNTIL_CHECKED_NOT_ZERO_NOT_AVAILABLE",
+    "readOnlyResearchPermittedOnUserRequest": true,
+    "noAutoActions": [
+      "CREATE_PROVIDER_ACCOUNT",
+      "INSTALL_TOOL",
+      "CONNECT_EXTERNAL_ACCOUNT",
+      "START_FREE_TRIAL",
+      "CHANGE_OR_CANCEL_SUBSCRIPTION",
+      "BUY_CREDITS",
+      "USE_PAID_UPGRADE",
+      "PAYMENT",
+      "APPLY_FOR_DISCOUNT",
+      "ALTER_BILLING",
+      "SEND_APPLICATION",
+      "DELETE_OR_ARCHIVE_SOURCE_DATA"
+    ],
+    "note": "Read-only public source retrieval and inspection of already authorized connections are separate from account-changing external actions. The latter require explicit human approval.",
+    "dataPrivacy": "Never expose invoices, payment cards, user credentials, personnel data or minors in public outputs.",
+    "budgetProof": "A workspace plan name is not a current credit balance or consumption report. Never assume free allowances are available.",
+    "skillScope": "Discover installed skills dynamically through the available skill registry; do not install, clone or invent additional skills merely to satisfy a command.",
+    "evidenceTags": [
+      "OFFICIAL_VERIFIED",
+      "UNOFFICIAL_UNVERIFIED",
+      "REPORTED_NOT_INDEPENDENTLY_VERIFIED",
+      "UNKNOWN_UNTIL_CHECKED",
+      "EXPIRED",
+      "CONFLICTING"
+    ],
+    "defaultDecision": "HOLD_EXTERNAL_SIDE_EFFECTS",
+    "noNewInfrastructure": true,
+    "noDuplicateAppsOrCrm": true,
+    "noAutomaticPurchases": true
+  },
+  "commandAccess": "INTERNAL_DIRECTION_AND_AUTHORIZED_AI_OPERATIONS_ONLY_NOT_PUBLIC_SKY_CHAT_OR_MINOR_DATA",
+  "canonicalSource": "SCD_SYSTEM_MANIFEST.json#development_contract.scd_free_first",
+  "executable": "scripts/scd-free-first.mjs",
+  "requiredAcceptance": [
+    "EIGHT_COMMANDS_PRESENT",
+    "STRICT_GUARDS_PRESENT",
+    "DUPLICATE_DENIED",
+    "UNKNOWN_NOT_ZERO",
+    "NO_AUTOMATED_EXTERNAL_ACTIONS",
+    "CLI_SAFE_INPUT"
+  ]
+}

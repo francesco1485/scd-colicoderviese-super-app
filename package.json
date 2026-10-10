@@ -14,7 +14,7 @@
     "test": "npm run test:contract && npm run test:resilience && npm run test:smoke",
     "build:pages": "node scripts/build-pages.mjs",
     "test:pages": "npm run build:pages && SCD_STATIC_DIR=_site npm run test:smoke",
-    "test:manifest": "node scripts/validate-system-manifest.mjs",
+    "test:manifest": "node scripts/validate-system-manifest.mjs && npm run test:freefirst",
     "verify:production": "node scripts/verify-production.mjs",
     "test:resilience": "node tests/upstream-resilience.mjs",
     "verify:r20": "node scripts/verify-r20-direct.mjs",
@@ -50,6 +50,8 @@
     "test:core-audit": "node --test tests/r56-audit-failclosed.test.mjs tests/core-private-entry-contract.mjs",
     "test:sky-shared": "node --test tests/sky-shared-assistant.test.mjs",
     "test:isolated-preview": "node --test tests/isolated-preview-runtime.test.mjs",
-    "test:reboot-ui": "node --test tests/scd-reboot-ui.test.mjs"
+    "test:reboot-ui": "node --test tests/scd-reboot-ui.test.mjs",
+    "scd:freefirst": "node scripts/scd-free-first.mjs",
+    "test:freefirst": "node --test tests/scd-free-first.test.mjs"
   }
 }

@@ -414,6 +414,53 @@
         "automationName": "SCD Presidio Operativo",
         "orchestrationRule": "REAL_CHECK_EACH_SCHEDULED_RUN; NEVER_CLAIM_FOREVER_MEMORY_OR_ALWAYS_RUNNING_WITHOUT_PERSISTED_CHECKPOINT"
       }
+    },
+    {
+      "id": "UD-017",
+      "name": "SCD_FREE_FIRST_EVIDENCE_GATED_CREDITS_TOOLS_SKILLS_NONPROFIT_TRIALS",
+      "sourceDate": "2026-10-10",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "SCD_FREE_FIRST:",
+        "/credits: Cerca crediti e offerte ufficiali",
+        "/freefirst: Usa prima strumenti gratuiti già disponibili",
+        "/nonprofit: Verifica agevolazioni per SCD",
+        "/trialgate: Controlla scadenze e rinnovi delle prove",
+        "/toolscore: Confronta costo, vantaggi e rischi",
+        "/skillreuse: Riutilizza le skill già installate",
+        "/creditbudget: Controlla disponibilità e consumi",
+        "/sourcecheck: Verifica offerte viste sui social",
+        "duplicate_tools: DENY",
+        "unofficial_claims: VERIFY_FIRST",
+        "credits_balance: UNKNOWN_UNTIL_CHECKED",
+        "payments: HUMAN_APPROVAL",
+        "external_actions: HUMAN_APPROVAL"
+      ],
+      "normalizedCommand": {
+        "id": "SCD_FREE_FIRST",
+        "scope": "ALL_SCD_APPS_AND_AGENTS_AND_TOOLING",
+        "subcommands": [
+          "/credits",
+          "/freefirst",
+          "/nonprofit",
+          "/trialgate",
+          "/toolscore",
+          "/skillreuse",
+          "/creditbudget",
+          "/sourcecheck"
+        ],
+        "reuseBeforeProcurement": true,
+        "verifyOffersFromOfficialProvider": true,
+        "statusForUnverifiedBalance": "UNKNOWN_UNTIL_CHECKED",
+        "rejectToolDuplicates": true,
+        "requireHumanApprovalForPaymentsAndExternalSideEffects": true,
+        "noAutomaticTrialStart": true,
+        "noAutomaticProviderAccountChanges": true,
+        "canonicalManifestSection": "development_contract.scd_free_first",
+        "executionConfig": "config/scd-free-first.v1.json",
+        "internalCommand": "npm run scd:freefirst -- /credits"
+      }
     }
   ],
   "completionGate": {
