@@ -4,6 +4,7 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&
 const initials=n=>n.split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase();
 let sponsorAccess={profile:'NON_AUTORIZZATO',platform:false};
 let sponsorSession={user:null,capabilities:{}};
+const crmState={rows:[],selected:null,loading:false,error:''};
 let partnerHubCurrent='';
 let campaignFilter='TUTTI';
 let motionProfilesState={profiles:[],previewSource:null,nativeLedStatus:'DA_RILEVARE_ALLA_CONSEGNA'};
@@ -154,6 +155,7 @@ async function loadSponsorSession(){
     loadMotionProfiles();
     loadCreativeScenes();
     loadConventions();
+    loadSponsorDossier();
   }catch(e){
     location.replace('/sponsor/?login=1');
   }
@@ -189,57 +191,94 @@ poll:'<svg viewBox="0 0 24 24"><path d="M5 20v-5M12 20V8M19 20V4"/></svg>'
 };
 $$('[data-icon]').forEach(el=>el.innerHTML=ICONS[el.dataset.icon]||'');
 
-const sponsors=[
-{name:'Noratech Srl',sector:'Tecnologia / corporate',status:'DOCUMENTATO',value:'€400 + IVA',period:'17/07/2026 - 30/12/2026',asset:'Social + Centro Sportivo',next:'Sponsor Report 2026 e proposta upgrade 2027',since:'2022',type:'Sponsor',contact:'Lucia Cappelletti'},
-{name:'Coperture Rasero Srl',sector:'Edilizia / impianto',status:'DOCUMENTATO',value:'€500 + IVA',period:'15/04/2026 - 15/04/2027',asset:'Striscione bordo campo + sito',next:'Preparare rinnovo',since:'2026',type:'Sponsor',contact:'copertureraserosrl@gmail.com'},
-{name:'Officine Pedroncelli Srl',sector:'Mobility / officina',status:'DOCUMENTATO',value:'€500 + IVA / anno',period:'Rapporto pluriennale',asset:'Logo sui vetri laterali del pulmino',next:'Verificare scadenza e pagamento',since:'2024',type:'Sponsor',contact:'Sonia'},
-{name:'DECAR Srl',sector:'Automotive',status:'ECONOMICAMENTE DOCUMENTATO',value:'€1.500 + IVA',period:'2026',asset:'Asset 2026 da ricostruire',next:'Recuperare accordo e asset',since:'2026',type:'Sponsor',contact:'Ufficio amministrativo'},
-{name:'SACO Multiservizi',sector:'Servizi territoriali',status:'ECONOMICAMENTE DOCUMENTATO',value:'Rapporto ibrido',period:'2026',asset:'Sponsor + fornitura / protezioni',next:'Separare cash, fornitura e barter',since:'2026',type:'Ibrido',contact:'Da verificare'},
-{name:'Bianchi Bazzi Angelo Srl',sector:'Corporate / territorio',status:'ECONOMICAMENTE DOCUMENTATO',value:'€1.500 + IVA',period:'2026',asset:'Asset 2026 da ricostruire',next:'Recuperare accordo e materiali',since:'Storico',type:'Sponsor',contact:'Da verificare'},
-{name:'Saglio Sport / LEGEA',sector:'Sportswear / partner tecnico',status:'PARTNER TECNICO',value:'DA VERIFICARE',period:'2026/27 da verificare',asset:'Fornitura tecnica, kit e abbigliamento',next:'Ricostruire accordo, valore ed esclusiva',since:'2023',type:'Partner tecnico',contact:'sagliosport@libero.it'}
-];
+/* R58 privacy: sponsor, proposte, fornitori e audience non sono più nel sorgente pubblico.
+   Arrivano solo da /api/sponsor/dossier dopo una sessione Sponsor valida (vedi loadSponsorDossier). */
+let sponsors=[];
 
-const proposals=[
-{name:'Iperal',area:'Family & Community Partner',status:'In valutazione',next:'Follow-up leggero',value:'€5.000 / stagione proposto'},
-{name:'Caffè Teti',area:'Coffee Partner / Club House',status:'Positivo',next:'Sopralluogo + proposta finale',value:'Fornitura / valore da definire'},
-{name:'VIP Immagine',area:'Cartellonistica / sponsor board',status:'Positivo',next:'Telefonare + mappa spazi',value:'Da definire'},
-{name:"McDonald's territoriale",area:'Convenzione tesserati',status:'Da formalizzare',next:'Formalizzare convenzione 10%',value:'Benefit community'},
-{name:'La Roncaiola',area:'Lavanderia tecnica',status:'SOSPESA · NON INVIARE',next:'Attendere riattivazione Direzione',value:'Da definire'},
-{name:'Bonazzi Grafica',area:'Grafica / stampa',status:'SOSPESA · NON INVIARE',next:'Attendere riattivazione Direzione',value:'Barter / fornitura'},
-{name:'Therabody',area:'Recovery Partner',status:'Instradato B2B',next:'Compilare form partnership',value:'Da definire'}
-];
+let proposals=[];
 
 
 let conventions=[];
 let communityState={sourceMode:'LOADING',sourceTable:'CONVENZIONI_MASTER',generatedAt:'',fallbackReason:''};
 
 
-const suppliers=[
-{name:"Fratelli Trussoni S.r.l.",position:"€695,86",paid:"€0",residual:"€695,86",email:"stefano.libera@trussoni.it",potential:"DA VALUTARE",next:"Ricostruire fatture 2024-2026 e referente commerciale"},
-{name:"Nuova Food Italy S.r.l.s.",position:"€327,65",paid:"€0",residual:"€327,65",email:"nuovafooditaly@hotmail.com",potential:"DA VALUTARE",next:"Ricostruire fatture e condizioni commerciali"},
-{name:"Dott.ssa Monica Castagna",position:"€780",paid:"€260",residual:"€520",email:"monica.castagna@outlook.com",potential:"BASSO",next:"Separare saldo pregresso dalla scelta futura"},
-{name:"Fun Food Italia S.r.l.",position:"€1.093,28",paid:"€273,32",residual:"€819,96",email:"direzione@funfooditalia.com",potential:"DA VALUTARE",next:"Ricostruire volumi e margini per categoria"},
-{name:"Sagim S.r.l.",position:"€471,02",paid:"€157,01",residual:"€314,01",email:"amministrazione@sagimsrl.it",potential:"DA VALUTARE",next:"Analizzare acquisti e prezzi unitari"},
-{name:"Olimpiadi Duemila S.n.c.",position:"€497,76",paid:"€165,92",residual:"€331,84",email:"olimpiadi.2000@virgilio.it",potential:"DA VALUTARE",next:"Capire settore reale e storico acquisti"},
-{name:"Gruppo Gimoka S.p.A.",position:"€999,67",paid:"€249,92",residual:"€749,75",email:"fulvia.bozzini@gruppogimoka.com",potential:"ALTO",next:"Collegare spesa storica alla proposta Coffee Partner"},
-{name:"Panizza Natale S.n.c.",position:"€1.012,72",paid:"€253,18",residual:"€759,54",email:"panizza@dolcitalia.com",potential:"DA VALUTARE",next:"Creare paniere prodotti e ricostruire spesa storica"},
-{name:"Nuova Alimentaria S.r.l.",position:"€1.341,46",paid:"€0",residual:"€1.341,46",email:"nuovaali1@nuovalimentaria.191.it",potential:"DA VALUTARE",next:"Ricostruire fatture 2024-2026 e prima rata"},
-{name:"Erbagel di Sala Pietro S.n.c.",position:"€1.502",paid:"€0",residual:"€1.502",email:"marco.castelnuovo@erbagel.it",potential:"DA VALUTARE",next:"Chiudere condizioni e ricostruire storico acquisti"},
-{name:"Saco Antincendio S.r.l.",position:"€122",paid:"€0",residual:"€122",email:"sacoantincendio@gmail.com",potential:"MEDIO",next:"Ricostruire servizi pluriennali e benchmark"}
-];
+let suppliers=[];
 
 /* R50.8: le iniziative di sviluppo arrivano esclusivamente dalla Source of Truth tramite /api/sponsor/development. */
 
 
-const audience=[
-{segment:"Persone attive censite",value:"268",unit:"persone",source:"00 CONTROL ROOM",note:"KPI canonico. Non sommare automaticamente con atleti e staff."},
-{segment:"Atleti attivi",value:"221",unit:"atleti",source:"00 CONTROL ROOM",note:"Sottoinsieme della base persone."},
-{segment:"Staff attivo",value:"53",unit:"persone",source:"00 CONTROL ROOM",note:"Può sovrapporsi alla base persone."},
-{segment:"Atleti operativi",value:"233",unit:"atleti",source:"00 DASH TESSERAMENTI",note:"Definizione diversa da Atleti attivi."},
-{segment:"Atleti FIGC ufficiali",value:"134",unit:"atleti",source:"00 DASH TESSERAMENTI",note:"Sottoinsieme degli atleti operativi."},
-{segment:"Copertura FIGC",value:"57,9%",unit:"copertura",source:"Dashboard tesseramenti",note:"Indicatore qualità dati, non reach commerciale."},
-{segment:"Tessere richieste stampa McDonald's",value:"250",unit:"tessere",source:"Gmail 1a0c6d258cbeace6",note:"Dato logistico, NON KPI audience."}
-];
+let audience=[];
+
+/* ===== R58 DOSSIER PRIVATO (sessione Sponsor obbligatoria) ===== */
+let sponsorDossierState={sourceMode:'LOADING',generatedAt:'',error:''};
+const DOSSIER_FIELDS={
+  sponsors:['name','sector','status','value','period','asset','next','since','type','contact'],
+  proposals:['name','area','status','next','value'],
+  suppliers:['name','position','paid','residual','email','potential','next'],
+  audience:['segment','value','unit','source','note']
+};
+function dossierReady(){return sponsorDossierState.sourceMode==='PRIVATE_DOSSIER'}
+function dossierStateLabel(){
+  const m=sponsorDossierState.sourceMode;
+  if(m==='PRIVATE_DOSSIER')return 'DOSSIER PRIVATO';
+  if(m==='LOADING')return 'CARICAMENTO';
+  if(m==='ERROR')return 'DATI NON DISPONIBILI';
+  return 'DA SINCRONIZZARE';
+}
+/* Valore numerico mostrato solo se il dossier è caricato: altrimenti etichetta di stato, mai uno zero inventato. */
+function dossierCount(rows){return dossierReady()?String(rows.length):dossierStateLabel()}
+function dossierEmptyHtml(text){
+  const extra=sponsorDossierState.error?'<small>'+esc(sponsorDossierState.error)+'</small>':'';
+  return '<article class="community-empty"><b>'+esc(dossierStateLabel())+'</b><p>'+esc(text)+'</p>'+extra+'</article>';
+}
+/* Le proposte sospese restano sempre visibili come tali: mai trattate come pipeline attiva o contattabile. */
+const PROPOSAL_SUSPENDED_LABEL='SOSPESA · NON INVIARE';
+function proposalSuspended(p){return /SOSPES/i.test(String(p?.status||''))}
+function proposalStatusBadge(p){
+  if(proposalSuspended(p))return '<span class="status-badge red">'+esc(PROPOSAL_SUSPENDED_LABEL)+'</span>';
+  return '<span class="status-badge '+(/Positivo|valutazione/.test(p.status)?'blue':'orange')+'">'+esc(p.status)+'</span>';
+}
+function normalizeDossierRows(rows,fields){
+  return (Array.isArray(rows)?rows:[])
+    .filter(x=>x&&typeof x==='object'&&!Array.isArray(x))
+    .map(x=>Object.fromEntries(fields.map(f=>[f,String(x[f]??'')])))
+    .filter(x=>x[fields[0]].trim());
+}
+/* Cash verificato: somma dei soli rapporti DOCUMENTATI con importo esplicito in euro (esclusi ibridi / da verificare). */
+function dossierVerifiedCash(){
+  if(!dossierReady())return null;
+  let total=0,found=false;
+  sponsors.forEach(s=>{
+    if(!/DOCUMENTATO/i.test(s.status))return;
+    const m=/^€\s*([\d.]+(?:,\d+)?)/.exec(String(s.value).trim());
+    if(!m)return;
+    const n=Number(m[1].replace(/\./g,'').replace(',','.'));
+    if(Number.isFinite(n)){total+=n;found=true}
+  });
+  return found?total:null;
+}
+function renderDossierViews(){
+  const steps=[renderKpis,renderSponsorStrip,homeContracts,homeProposals,renderPipeline,renderPartnerHub,renderSponsorWall,
+    renderSponsorViews,renderContracts,renderProposalGrid,renderSuppliers,renderAudience,renderReport,renderScenario,
+    refreshActivationSponsorOptions,()=>{partnerWallOrder=[];renderPartnerWall()}];
+  steps.forEach(fn=>{try{fn()}catch(e){console.warn('SCD dossier render',fn.name||'step',e&&e.message)}});
+}
+async function loadSponsorDossier(){
+  try{
+    const r=await fetch('/api/sponsor/dossier',{credentials:'same-origin',cache:'no-store'});
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok||d.ok===false)throw new Error(d.error||('DOSSIER_HTTP_'+r.status));
+    sponsors=normalizeDossierRows(d.sponsors,DOSSIER_FIELDS.sponsors);
+    proposals=normalizeDossierRows(d.proposals,DOSSIER_FIELDS.proposals);
+    suppliers=normalizeDossierRows(d.suppliers,DOSSIER_FIELDS.suppliers);
+    audience=normalizeDossierRows(d.audience,DOSSIER_FIELDS.audience);
+    sponsorDossierState={sourceMode:String(d.sourceMode||'DA_SINCRONIZZARE'),generatedAt:String(d.generatedAt||''),error:''};
+  }catch(e){
+    sponsors=[];proposals=[];suppliers=[];audience=[];
+    sponsorDossierState={sourceMode:'ERROR',generatedAt:'',error:String(e.message||e)};
+  }
+  renderDossierViews();
+}
 
 const assets=[
 ['Family & Community Partner','Community','Disponibile','€5.000'],
@@ -568,14 +607,15 @@ $('#campaignToolbar')?.addEventListener('click',e=>{const b=e.target.closest('[d
 $('#mobileMenu').onclick=()=>$('#sidebar').classList.toggle('open');
 
 function renderKpis(){
+  const cash=dossierVerifiedCash();
   const data=[
-    ['users','7','Sponsor / partner','rapporti documentati'],
-    ['proposal','7','Proposte vive','pipeline corrente'],
-    ['file','€4,4K','Cash verificato','dato prudenziale'],
+    ['users',dossierCount(sponsors),'Sponsor / partner','rapporti documentati'],
+    ['proposal',dossierCount(proposals),'Proposte vive','pipeline corrente'],
+    ['file',cash==null?dossierStateLabel():'€'+cash.toLocaleString('it-IT'),'Cash verificato','dato prudenziale'],
     ['calendar','3','Eventi / attivazioni','in evidenza'],
     ['target','4','Asset disponibili','da sviluppare']
   ];
-  $('#homeKpis').innerHTML=data.map(x=>'<article class="kpi-card"><span class="kpi-icon">'+(ICONS[x[0]]||'')+'</span><div><strong>'+x[1]+'</strong><small>'+x[2]+'</small></div><em>'+x[3]+'</em></article>').join('');
+  $('#homeKpis').innerHTML=data.map(x=>'<article class="kpi-card"><span class="kpi-icon">'+(ICONS[x[0]]||'')+'</span><div><strong>'+esc(x[1])+'</strong><small>'+x[2]+'</small></div><em>'+x[3]+'</em></article>').join('');
 }
 
 function renderSponsorStrip(){
@@ -586,11 +626,11 @@ function renderSponsorStrip(){
 
 function homeContracts(){
   $('#homeContracts').innerHTML='<table class="table-mini"><thead><tr><th>Sponsor</th><th>Tipologia</th><th>Validità</th><th>Stato</th></tr></thead><tbody>'+
-  sponsors.slice(0,4).map(s=>'<tr onclick="openSponsor(\''+s.name.replace(/'/g,"\\'")+'\')"><td><b>'+esc(s.name)+'</b></td><td>'+esc(s.type)+'</td><td>'+esc(s.period)+'</td><td><span class="status-badge">Attivo</span></td></tr>').join('')+'</tbody></table>';
+  (sponsors.length?sponsors.slice(0,4).map(s=>'<tr onclick="openSponsor(\''+s.name.replace(/'/g,"\\'")+'\')"><td><b>'+esc(s.name)+'</b></td><td>'+esc(s.type)+'</td><td>'+esc(s.period)+'</td><td><span class="status-badge">Attivo</span></td></tr>').join(''):'<tr><td colspan="4">'+esc(dossierStateLabel())+'</td></tr>')+'</tbody></table>';
 }
 function homeProposals(){
   $('#homeProposals').innerHTML='<table class="table-mini"><thead><tr><th>Azienda</th><th>Area</th><th>Stato</th><th>Valore</th></tr></thead><tbody>'+
-  proposals.slice(0,4).map(p=>'<tr><td><b>'+esc(p.name)+'</b></td><td>'+esc(p.area)+'</td><td><span class="status-badge '+(/Positivo|valutazione/.test(p.status)?'blue':'orange')+'">'+esc(p.status)+'</span></td><td>'+esc(p.value)+'</td></tr>').join('')+'</tbody></table>';
+  (proposals.length?proposals.slice(0,4).map(p=>'<tr><td><b>'+esc(p.name)+'</b></td><td>'+esc(p.area)+'</td><td>'+proposalStatusBadge(p)+'</td><td>'+esc(p.value)+'</td></tr>').join(''):'<tr><td colspan="4">'+esc(dossierStateLabel())+'</td></tr>')+'</tbody></table>';
 }
 function renderAvailability(q=''){
   const rows=assets.filter(a=>(a.join(' ')).toLowerCase().includes(q.toLowerCase())).slice(0,5);
@@ -602,7 +642,7 @@ function renderHomeEvents(){
   $('#homeEvents').innerHTML=events.map(e=>'<div class="event-row"><time>'+esc(e[0])+'</time><div><b>'+esc(e[1])+'</b><span>'+esc(e[2])+'</span></div><em>'+esc(e[3])+'</em></div>').join('');
 }
 function renderPipeline(){
-  $('#homePipeline').innerHTML=proposals.slice(0,5).map(p=>'<div class="pipeline-row"><div><b>'+esc(p.name)+'</b><span>'+esc(p.area)+'</span></div><em>'+esc(p.status)+'</em></div>').join('');
+  $('#homePipeline').innerHTML=proposals.slice(0,5).map(p=>'<div class="pipeline-row"><div><b>'+esc(p.name)+'</b><span>'+esc(p.area)+'</span></div><em>'+esc(p.status)+'</em></div>').join('')||'<div class="pipeline-row"><div><b>'+esc(dossierStateLabel())+'</b><span>Pipeline proposte disponibile solo dal dossier privato.</span></div></div>';
 }
 function renderNews(){
   $('#weeklyNews').innerHTML='<div class="news-status">Nessuna nuova pubblicazione ufficiale censita negli ultimi 7 giorni. Mostro gli ultimi aggiornamenti verificati.</div>'+
@@ -631,18 +671,20 @@ function sponsorCard(s){
   return '<article class="sponsor-card" onclick="openSponsor(\''+s.name.replace(/'/g,"\\'")+'\')"><div class="sponsor-cover"></div><div class="sponsor-body"><div class="sponsor-head"><div class="brand-tile">'+esc(initials(s.name))+'</div><div><h3>'+esc(s.name)+'</h3><p>'+esc(s.sector)+'</p></div><span class="sponsor-tag">'+esc(s.status)+'</span></div><div class="sponsor-data"><div><small>VALORE</small><b>'+esc(s.value)+'</b></div><div><small>PERIODO</small><b>'+esc(s.period)+'</b></div><div><small>ASSET</small><b>'+esc(s.asset)+'</b></div><div><small>PROSSIMO PASSO</small><b>'+esc(s.next)+'</b></div></div></div></article>';
 }
 function renderSponsorViews(){
-  $('#sponsorGrid').innerHTML=sponsors.map(sponsorCard).join('');
-  $('#storiciGrid').innerHTML=sponsors.filter(s=>['Noratech Srl','Officine Pedroncelli Srl','Saglio Sport / LEGEA','Bianchi Bazzi Angelo Srl'].includes(s.name)).map(sponsorCard).join('');
+  $('#sponsorGrid').innerHTML=sponsors.map(sponsorCard).join('')||dossierEmptyHtml('Portafoglio sponsor non ancora sincronizzato dal dossier privato.');
+  /* Storici: rapporti con anno di inizio documentato precedente alla stagione corrente (nessun nome cablato nel sorgente). */
+  const storici=sponsors.filter(s=>/^\d{4}$/.test(String(s.since).trim())&&Number(s.since)<2026||/storico/i.test(s.since));
+  $('#storiciGrid').innerHTML=storici.map(sponsorCard).join('')||dossierEmptyHtml('Nessun rapporto storico disponibile.');
 }
-$('#sponsorFilter').addEventListener('input',e=>{const q=e.target.value.toLowerCase();$('#sponsorGrid').querySelectorAll('.sponsor-card').forEach((el,i)=>el.hidden=!sponsors[i].name.toLowerCase().includes(q))});
-$('#sponsorStatus').addEventListener('change',e=>{const q=e.target.value;$('#sponsorGrid').querySelectorAll('.sponsor-card').forEach((el,i)=>el.hidden=q&&!sponsors[i].status.includes(q))});
+$('#sponsorFilter').addEventListener('input',e=>{const q=e.target.value.toLowerCase();$('#sponsorGrid').querySelectorAll('.sponsor-card').forEach((el,i)=>el.hidden=!String(sponsors[i]?.name||'').toLowerCase().includes(q))});
+$('#sponsorStatus').addEventListener('change',e=>{const q=e.target.value;$('#sponsorGrid').querySelectorAll('.sponsor-card').forEach((el,i)=>el.hidden=!!q&&!String(sponsors[i]?.status||'').includes(q))});
 
 function renderContracts(){
   $('#contractsTable').innerHTML='<div class="data-row header"><span>Sponsor</span><span>Tipologia</span><span>Validità</span><span>Valore</span><span>Prossima azione</span></div>'+
-  sponsors.map(s=>'<div class="data-row" onclick="openSponsor(\''+s.name.replace(/'/g,"\\'")+'\')"><b>'+esc(s.name)+'</b><span>'+esc(s.type)+'</span><span>'+esc(s.period)+'</span><span>'+esc(s.value)+'</span><span>'+esc(s.next)+'</span></div>').join('');
+  (sponsors.map(s=>'<div class="data-row" onclick="openSponsor(\''+s.name.replace(/'/g,"\\'")+'\')"><b>'+esc(s.name)+'</b><span>'+esc(s.type)+'</span><span>'+esc(s.period)+'</span><span>'+esc(s.value)+'</span><span>'+esc(s.next)+'</span></div>').join('')||'<div class="crm-empty"><b>'+esc(dossierStateLabel())+'</b><span>Contratti disponibili solo dal dossier privato.</span></div>');
 }
 function renderProposalGrid(){
-  $('#proposalGrid').innerHTML=proposals.map(p=>'<article class="proposal-card"><h3>'+esc(p.name)+'</h3><p>'+esc(p.area)+'</p><div class="card-row"><span>Stato</span><b>'+esc(p.status)+'</b></div><div class="card-row"><span>Valore</span><b>'+esc(p.value)+'</b></div><div class="card-row"><span>Prossima azione</span><b>'+esc(p.next)+'</b></div></article>').join('');
+  $('#proposalGrid').innerHTML=proposals.map(p=>'<article class="proposal-card"><h3>'+esc(p.name)+'</h3><p>'+esc(p.area)+'</p><div class="card-row"><span>Stato</span><b>'+(proposalSuspended(p)?proposalStatusBadge(p):esc(p.status))+'</b></div><div class="card-row"><span>Valore</span><b>'+esc(p.value)+'</b></div><div class="card-row"><span>Prossima azione</span><b>'+esc(p.next)+'</b></div></article>').join('')||dossierEmptyHtml('Proposte non ancora sincronizzate dal dossier privato.');
 }
 
 async function loadConventions(){
@@ -723,11 +765,11 @@ function renderConventions(){
 }
 function renderSuppliers(){
   if($('#fornitoriKpi'))$('#fornitoriKpi').innerHTML=[
-    ['Fornitori censiti',String(suppliers.length),'Posizioni economiche documentate'],
-    ['Radar alto',String(suppliers.filter(x=>x.potential==='ALTO').length),'Da trasformare in proposta mirata'],
+    ['Fornitori censiti',dossierCount(suppliers),'Posizioni economiche documentate'],
+    ['Radar alto',dossierReady()?String(suppliers.filter(x=>x.potential==='ALTO').length):dossierStateLabel(),'Da trasformare in proposta mirata'],
     ['Volumi storici','IN RICOSTRUZIONE','Le posizioni correnti non sono spesa annua']
-  ].map(x=>'<article class="report-card"><h3>'+x[0]+'</h3><div class="report-value">'+x[1]+'</div><p>'+x[2]+'</p></article>').join('');
-  if($('#fornitoriTable'))$('#fornitoriTable').innerHTML='<div class="data-row header"><span>Fornitore</span><span>Posizione 2026</span><span>Residuo</span><span>Potenziale</span><span>Prossima azione</span></div>'+suppliers.map(x=>'<div class="data-row"><b>'+esc(x.name)+'</b><span>'+esc(x.position)+'</span><span>'+esc(x.residual)+'</span><span>'+esc(x.potential)+'</span><span>'+esc(x.next)+'</span></div>').join('');
+  ].map(x=>'<article class="report-card"><h3>'+esc(x[0])+'</h3><div class="report-value">'+esc(x[1])+'</div><p>'+esc(x[2])+'</p></article>').join('');
+  if($('#fornitoriTable'))$('#fornitoriTable').innerHTML='<div class="data-row header"><span>Fornitore</span><span>Posizione 2026</span><span>Residuo</span><span>Potenziale</span><span>Prossima azione</span></div>'+(suppliers.map(x=>'<div class="data-row"><b>'+esc(x.name)+'</b><span>'+esc(x.position)+'</span><span>'+esc(x.residual)+'</span><span>'+esc(x.potential)+'</span><span>'+esc(x.next)+'</span></div>').join('')||'<div class="crm-empty"><b>'+esc(dossierStateLabel())+'</b><span>Posizioni fornitori disponibili solo dal dossier privato.</span></div>');
 }
 const developmentState={rows:[],loading:false,loaded:false,error:'',sourceMode:'',sourceTable:'',generatedAt:'',kpi:{}};
 let developmentScope='ALL';
@@ -848,7 +890,7 @@ $('#developmentRefresh')?.addEventListener('click',()=>loadDevelopment(true));
 $('#developmentSearch')?.addEventListener('input',e=>{developmentQuery=e.target.value||'';renderCommercialInitiatives()});
 $('#developmentScope')?.addEventListener('change',e=>{developmentScope=e.target.value||'ALL';renderCommercialInitiatives()});
 function renderAudience(){
-  if($('#audienceGrid'))$('#audienceGrid').innerHTML=audience.map(x=>'<article class="report-card"><h3>'+esc(x.segment)+'</h3><div class="report-value">'+esc(x.value)+'</div><p>'+esc(x.unit)+' · '+esc(x.source)+'</p><p>'+esc(x.note)+'</p></article>').join('');
+  if($('#audienceGrid'))$('#audienceGrid').innerHTML=audience.map(x=>'<article class="report-card"><h3>'+esc(x.segment)+'</h3><div class="report-value">'+esc(x.value)+'</div><p>'+esc(x.unit)+' · '+esc(x.source)+'</p><p>'+esc(x.note)+'</p></article>').join('')||dossierEmptyHtml('KPI audience interni non ancora sincronizzati dal dossier privato.');
   $$('[data-public-link]').forEach(b=>b.onclick=()=>location.href='/sponsor/');
 }
 
@@ -1050,15 +1092,16 @@ $('#agendaForm')?.addEventListener('submit',async e=>{
 });
 
 function renderReport(){
-  const cash=4400;
+  const cash=dossierVerifiedCash();
+  const audit=sponsors.filter(s=>/ECONOMICAMENTE DOCUMENTATO/i.test(s.status)||/ibrid/i.test(s.type));
   $('#reportGrid').innerHTML=[
-    ['Cash verificato','€'+cash.toLocaleString('it-IT'),'Esclusi rapporti ibridi/non verificati'],
-    ['Rapporti documentati',String(sponsors.length),'Sponsor, partner e ibridi censiti'],
-    ['Proposte vive',String(proposals.length),'Pipeline da seguire'],
+    ['Cash verificato',cash==null?dossierStateLabel():'€'+cash.toLocaleString('it-IT'),'Esclusi rapporti ibridi/non verificati'],
+    ['Rapporti documentati',dossierCount(sponsors),'Sponsor, partner e ibridi censiti'],
+    ['Proposte vive',dossierCount(proposals),'Pipeline da seguire'],
     ['LED censiti',String(led.length),'Stato produzione / approvazione'],
     ['Asset disponibili',String(assets.filter(a=>a[2]==='Disponibile').length),'Da verificare sempre esclusiva'],
-    ['Audit prioritari','3','DECAR · SACO · Bianchi Bazzi']
-  ].map(x=>'<article class="report-card"><h3>'+x[0]+'</h3><div class="report-value">'+x[1]+'</div><p>'+x[2]+'</p></article>').join('');
+    ['Audit prioritari',dossierCount(audit),dossierReady()?(audit.map(s=>s.name.replace(/\s+(Srl|S\.r\.l\.|Multiservizi)$/i,'')).join(' · ')||'Nessun audit aperto'):'Dossier privato da sincronizzare']
+  ].map(x=>'<article class="report-card"><h3>'+esc(x[0])+'</h3><div class="report-value">'+esc(x[1])+'</div><p>'+esc(x[2])+'</p></article>').join('');
 }
 function renderAssets(){
   $('#assetGrid').innerHTML=assets.map(a=>'<article class="asset-card"><h3>'+esc(a[0])+'</h3><p>'+esc(a[1])+'</p><div class="card-row"><span>Stato</span><b>'+esc(a[2])+'</b></div><div class="card-row"><span>Valore</span><b>'+esc(a[3])+'</b></div></article>').join('');
@@ -1075,6 +1118,7 @@ function fit(s,a){
 }
 function renderScenario(){
   const ss=sponsors.slice(0,5),aa=assets.filter(a=>a[2]==='Disponibile'||a[2]==='Parziale').slice(0,5);
+  if(!ss.length){$('#fitMatrix').innerHTML=dossierEmptyHtml('Matrice sponsor × asset disponibile dopo la sincronizzazione del dossier privato.');return}
   let html='<div class="fit-grid"><div class="fit-cell head">SPONSOR / ASSET</div>'+aa.map(a=>'<div class="fit-cell head">'+esc(a[0])+'</div>').join('');
   ss.forEach((s,si)=>{html+='<div class="fit-cell head">'+esc(s.name)+'</div>';aa.forEach((a,ai)=>{const f=fit(s,a);html+='<button class="fit-cell '+f.level+'" data-fit="'+si+':'+ai+'">'+(f.level==='high'?'FORTE':f.level==='mid'?'VALUTARE':'DEBOLE')+'</button>'})});
   html+='</div>';$('#fitMatrix').innerHTML=html;
@@ -1095,8 +1139,8 @@ function renderSettings(){
 }
 
 window.openSponsor=function(name){
-  const s=sponsors.find(x=>x.name===name);if(!s)return;
-  $('#sponsorDetail').innerHTML='<button class="btn-light" id="detailBack">← Sponsor</button><section class="detail-hero"><div><small>'+esc(s.sector.toUpperCase())+'</small><h1>'+esc(s.name)+'</h1><p>'+esc(s.asset)+'</p></div></section><section class="detail-summary"><div><small>DAL</small><b>'+esc(s.since)+'</b></div><div><small>TIPO</small><b>'+esc(s.type)+'</b></div><div><small>VALORE</small><b>'+esc(s.value)+'</b></div><div><small>PERIODO</small><b>'+esc(s.period)+'</b></div><div><small>STATO</small><b>'+esc(s.status)+'</b></div></section><section class="detail-layout"><article class="detail-panel"><h3>Contratto / rapporto corrente</h3><p>'+esc(s.asset)+'</p><p><b>Prossima azione:</b> '+esc(s.next)+'</p></article><article class="detail-panel"><h3>Contatto / referente</h3><p>'+esc(s.contact)+'</p><p>Qui andranno collegati documenti, logo ufficiale, foto, video, fatture e storico.</p></article></section>';
+  const s=sponsors.find(x=>x&&x.name===name);if(!s)return;
+  $('#sponsorDetail').innerHTML='<button class="btn-light" id="detailBack">← Sponsor</button><section class="detail-hero"><div><small>'+esc(String(s.sector||'').toUpperCase())+'</small><h1>'+esc(s.name)+'</h1><p>'+esc(s.asset)+'</p></div></section><section class="detail-summary"><div><small>DAL</small><b>'+esc(s.since)+'</b></div><div><small>TIPO</small><b>'+esc(s.type)+'</b></div><div><small>VALORE</small><b>'+esc(s.value)+'</b></div><div><small>PERIODO</small><b>'+esc(s.period)+'</b></div><div><small>STATO</small><b>'+esc(s.status)+'</b></div></section><section class="detail-layout"><article class="detail-panel"><h3>Contratto / rapporto corrente</h3><p>'+esc(s.asset)+'</p><p><b>Prossima azione:</b> '+esc(s.next)+'</p></article><article class="detail-panel"><h3>Contatto / referente</h3><p>'+esc(s.contact)+'</p><p>Qui andranno collegati documenti, logo ufficiale, foto, video, fatture e storico.</p></article></section>';
   $('#detailBack').onclick=()=>openView('sponsor');openView('detail');
 };
 
@@ -1116,10 +1160,19 @@ function liaAnswer(q){
   const t=q.toLowerCase();
   if(t.includes('led'))return 'LED: HDI Maglia, Dell’Oca e Carcano sono in attesa approvazione; DEGO, ATV, Iperal, LEGEA, NBC e Saglio sono in revisione.';
   if(t.includes('asset'))return 'Asset segnati disponibili: Family & Community Partner, Torneo Title Sponsor, Club House e LED bordo campo. Prima di proporre va verificata l’esclusiva.';
-  if(t.includes('rinn'))return 'Rinnovi prioritari: Rasero, Noratech e verifica scadenza Pedroncelli.';
+  if(t.includes('rinn')){
+    if(!dossierReady())return 'Rinnovi: dossier commerciale privato '+dossierStateLabel().toLowerCase()+'. Nessun dato mostrato finché non è sincronizzato.';
+    const r=sponsors.filter(s=>/rinnovo|upgrade|scadenza/i.test(s.next));
+    return r.length?'Rinnovi prioritari: '+r.map(s=>s.name).join(', ')+'.':'Nessun rinnovo prioritario registrato nel dossier.';
+  }
   if(t.includes('evento'))return 'In evidenza: torneo nazionale 9 maggio 2027 da confermare, Family & Community Day da definire e sopralluogo Caffè Teti da fissare.';
   if(/centro|progett|tribuna|kompan|verisure|cassetto/.test(t)){const r=developmentState.rows;if(!r.length)return 'La pipeline sviluppo non è disponibile dalla fonte canonica in questo momento.';return 'Development Pipeline: '+r.length+' progetti censiti, '+r.filter(x=>x.isDrawer).length+' nel cassetto strategico e '+r.filter(x=>x.quoteStatus==='RECEIVED_TO_RECONCILE').length+' con preventivi da riconciliare.';}
-  if(t.includes('report'))return 'Cash verificato normalizzato: €4.400. Audit prioritari: DECAR, SACO e Bianchi Bazzi.';
+  if(t.includes('report')){
+    const cash=dossierVerifiedCash();
+    if(cash==null)return 'Report: dossier commerciale privato '+dossierStateLabel().toLowerCase()+'. Cash verificato NON VERIFICATO finché non è sincronizzato.';
+    const audit=sponsors.filter(s=>/ECONOMICAMENTE DOCUMENTATO/i.test(s.status)||/ibrid/i.test(s.type)).map(s=>s.name);
+    return 'Cash verificato normalizzato: €'+cash.toLocaleString('it-IT')+'.'+(audit.length?' Audit prioritari: '+audit.join(', ')+'.':'');
+  }
   if(t.includes('sponsor'))return 'Posso cercare nel portafoglio attuale, nella pipeline e negli asset. Per ricerca esterna territoriale serve una fonte web aggiornata.';
   return 'Posso aiutarti su sponsor, proposte, contratti, asset, LED, rinnovi, eventi e report usando i dati presenti nella piattaforma.';
 }
@@ -1166,7 +1219,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.hidden)close
 
 
 /* ===== R40.1 CRM RELAZIONALE ===== */
-const crmState={rows:[],selected:null,loading:false,error:''};
+/* crmState è dichiarato in testa (vedi R58) per evitare la TDZ nel primo render del Partner Hub. */
 
 function crmPolicyLabel(value){
   const v=String(value||'').toUpperCase();
@@ -1561,11 +1614,19 @@ async function copyActivationBrief(){
     if($('#activationSaved'))$('#activationSaved').textContent='Copia non disponibile: usa Esporta JSON.';
   }
 }
+function refreshActivationSponsorOptions(){
+  const sel=$('#activationSponsor');
+  if(!sel)return;
+  const current=sel.value;
+  const names=['Nuova azienda / prospect',...sponsors.map(x=>x.name),...proposals.map(x=>x.name)];
+  sel.innerHTML=[...new Set(names)].map(x=>'<option>'+esc(x)+'</option>').join('');
+  if(current)[...sel.options].some((o,i)=>o.text===current?(sel.selectedIndex=i,true):false);
+  syncActivationPartnersFromCrm();
+}
 function initActivationStudio(){
   const sel=$('#activationSponsor');
   if(!sel)return;
-  const names=['Nuova azienda / prospect',...sponsors.map(x=>x.name),...proposals.map(x=>x.name)];
-  sel.innerHTML=[...new Set(names)].map(x=>'<option>'+esc(x)+'</option>').join('');
+  refreshActivationSponsorOptions();
 
   ['#activationSponsor','#activationGoal','#activationAudience','#activationChannel','#activationTerritory','#activationFormat','#activationTheme','#activationScene','#activationLogoState']
     .forEach(id=>$(id)?.addEventListener('change',renderActivationStudio));
@@ -1624,7 +1685,7 @@ let partnerWallOrder=[];
 function renderPartnerWall(shuffle=false){
   const el=$('#partnerWallGrid');if(!el)return;
   if(!partnerWallOrder.length){
-    partnerWallOrder=[...new Set([...sponsors.map(x=>x.name),...proposals.filter(x=>!/SOSPESA/.test(x.status)).map(x=>x.name)])].slice(0,12);
+    partnerWallOrder=[...new Set([...sponsors.map(x=>x.name),...proposals.filter(x=>!proposalSuspended(x)).map(x=>x.name)])].slice(0,12);
   }
   if(shuffle)partnerWallOrder=[...partnerWallOrder].sort(()=>Math.random()-.5);
   el.innerHTML=partnerWallOrder.map((n,i)=>'<span class="'+(i<3?'selected':'')+'">'+esc(n)+'</span>').join('');

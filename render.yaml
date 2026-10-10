@@ -12,3 +12,7 @@ services:
         value: 20
       - key: SCD_APPS_SCRIPT_URL
         value: https://script.google.com/macros/s/AKfycbwYQ_3yLYsp-6jX3FIgufBjpmaZb9uO1AklF9hdG-CuLII9J4ITUX1EA-EKuWXBMEc/exec
+      # Dossier commerciale riservato (sponsor/proposte/fornitori/audience) servito solo a sessioni Sponsor via /api/sponsor/dossier.
+      # Valore JSON impostato SOLO nella dashboard Render: mai nel repository.
+      - key: SCD_SPONSOR_DOSSIER_JSON
+        sync: false
