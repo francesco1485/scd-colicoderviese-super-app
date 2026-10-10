@@ -45,7 +45,28 @@ const preview=manifest.architecture?.nextgen_preview;
 if(!['PREVIEW_NOT_PRODUCTION_PRIMARY','PRODUCTION_PRIMARY'].includes(preview?.state)) fail('invalid NextGen runtime state');
 if(preview?.frontend_api_topology!=='SAME_ORIGIN') fail('same-origin topology missing');
 if(preview?.visual_mode!=='SYNTHETIC_NO_REAL_PHOTOGRAPHY') fail('synthetic visual mode missing');
-if(manifest.visual_system?.media_policy?.nextgen_real_photography_in_ui!==false) fail('real photography must be disabled in NextGen UI');
+// Historical NextGen surfaces remain synthetic-only. The separately flagged
+// SCD 2026/27 three-world preview may show verified, approved geographic photos
+// under explicit user directive UD-015. The exception MUST NOT apply to default
+// production, the authenticated Desk, personal avatars, or unapproved media.
+const mediaPolicy=manifest.visual_system?.media_policy||{};
+const photoInIsolatedPreview=mediaPolicy.nextgen_real_photography_in_ui===true;
+if(photoInIsolatedPreview){
+  const visualOverride=manifest.visual_system?.user_master_source_override_legacy_restrictions;
+  const feature=manifest.visual_system?.native_three_worlds_preview;
+  const visualRefs=JSON.parse(read('config/scd-visual-references.v1.json'));
+  if(visualOverride?.effective_at!=='2026-10-09') fail('approved photography requires dated user override');
+  if(feature?.state!=='ISOLATED_FEATURE_FLAG' || feature?.flag!=='?scdVision=1' || feature?.production_default_unchanged!==true) fail('photos require isolated, default-off feature gate');
+  if(feature?.human_approval_before_public_release!==true || feature?.screenshot_master_check_required_before_graphic_approval!==true) fail('photos require real graphic review and human release gate');
+  if(!mediaPolicy.allowed_real_media?.includes('APPROVED_TERRITORY_PHOTOGRAPHY_WITH_DOCUMENTED_RIGHTS')) fail('real photo rights policy missing');
+  if(visualRefs.rules?.realPhotoRequiresUsageRightsAndPrivacyCheck!==true || visualRefs.rules?.homeVisualDNAAppliesToEveryScreenAndApp!==true) fail('SCD geographic photo rights and cross-app visual directive missing');
+  if(!html.includes('scd-three-worlds-native.js') || !html.includes('scd-one-native.js')) fail('isolated visual runtime not mounted');
+  const newRuntime=read('scd-three-worlds-native.js');
+  if(!newRuntime.includes("get('scdVision')!=='1'")) fail('new runtime must exit without explicit preview flag');
+  if(!newRuntime.includes('NATIVE_COMPONENTS')) fail('rasterized screenshot is not an approved runtime');
+}else if(mediaPolicy.nextgen_real_photography_in_ui!==false){
+  fail('real photography policy requires explicit approved user scope');
+}
 if(manifest.sky_and_avatar?.personal_avatar?.rendering_mode!=='SYNTHETIC_ONLY') fail('Twin rendering must be synthetic-only');
 if(manifest.sky_and_avatar?.mirror?.separate_from_twin!==true) fail('Mirror and Twin must remain separate');
 
@@ -71,6 +92,7 @@ console.log(JSON.stringify({
   manifestVersion:manifest.manifest.version,
   preview:preview?.canonical_preview_url,
   realPhotoRuntime:false,
+  approvedIsolatedPhotoPreview:photoInIsolatedPreview,
   sameOriginApi:true,
   twinSynthetic:true,
   mirrorSeparate:true,
