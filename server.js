@@ -355,6 +355,43 @@ async function handleSponsorCrm(req,res,u){
     return json(res,403,{ok:false,error:e.message||'CRM_ACCESS_DENIED'});
   }
 }
+/* Dossier commerciale riservato (sponsor, proposte, fornitori, audience).
+   Non è più nel sorgente pubblico: arriva solo da SCD_SPONSOR_DOSSIER_JSON lato server
+   ed è servito esclusivamente a sessioni Sponsor valide. Il contenuto non viene mai loggato. */
+const SPONSOR_DOSSIER_KEYS=['sponsors','proposals','suppliers','audience'];
+function sponsorDossierFromEnv(){
+  const raw=String(process.env.SCD_SPONSOR_DOSSIER_JSON||'').trim();
+  if(!raw)return null;
+  let parsed;
+  try{parsed=JSON.parse(raw)}catch{return null}
+  if(!parsed||typeof parsed!=='object'||Array.isArray(parsed))return null;
+  for(const key of SPONSOR_DOSSIER_KEYS){
+    if(!Array.isArray(parsed[key]))return null;
+    if(!parsed[key].every(x=>x&&typeof x==='object'&&!Array.isArray(x)))return null;
+  }
+  return parsed;
+}
+async function handleSponsorDossier(req,res){
+  if(req.method!=='GET')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
+  try{
+    await validateSponsorSession(req);
+  }catch(e){
+    return json(res,e.message==='SESSION_REQUIRED'?401:403,{ok:false,error:e.message||'DOSSIER_ACCESS_DENIED'});
+  }
+  const dossier=sponsorDossierFromEnv();
+  if(!dossier){
+    return json(res,200,{ok:true,sourceMode:'DA_SINCRONIZZARE',sponsors:[],proposals:[],suppliers:[],audience:[]},{'cache-control':'no-store'});
+  }
+  return json(res,200,{
+    ok:true,
+    sourceMode:'PRIVATE_DOSSIER',
+    generatedAt:String(dossier.generatedAt||''),
+    sponsors:dossier.sponsors,
+    proposals:dossier.proposals,
+    suppliers:dossier.suppliers,
+    audience:dossier.audience
+  },{'cache-control':'no-store'});
+}
 async function handleSponsorMailHealth(req,res){
   if(req.method!=='GET')return json(res,405,{ok:false,error:'METHOD_NOT_ALLOWED'});
   try{
@@ -940,6 +977,7 @@ http.createServer(async(req,res)=>{
   if(u.pathname==='/api/sponsor/session') return handleSponsorSession(req,res,u);
   if(u.pathname==='/api/sponsor/logout') return handleSponsorLogout(req,res);
   if(u.pathname==='/api/sponsor/crm') return handleSponsorCrm(req,res,u);
+  if(u.pathname==='/api/sponsor/dossier') return handleSponsorDossier(req,res);
   if(u.pathname==='/api/sponsor/mail-health') return handleSponsorMailHealth(req,res);
   if(u.pathname==='/api/sponsor/motion-profiles') return handleSponsorMotionProfiles(req,res);
   if(u.pathname==='/api/sponsor/community') return handleSponsorCommunity(req,res);
