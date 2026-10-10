@@ -4,6 +4,7 @@ import { Lock } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { DirectionPanel } from "@/components/DirectionPanel";
+import { SafeSummary } from "@/components/SafeSummary";
 
 import { getDashboard, validateAccess } from "@/lib/private.functions";
 
@@ -130,7 +131,7 @@ function AreaPage() {
             <span>Sessione attiva (verificata dal gestionale)</span>
             <button className="font-semibold underline" onClick={() => { sessionStorage.removeItem(key); setToken(null); }}>Esci</button>
           </div>
-          <pre className="mt-4 max-h-64 overflow-auto rounded-xl border border-border bg-card p-4 text-xs">{summary ? JSON.stringify(summary, null, 2) : "Dati in sincronizzazione…"}</pre>
+          <SafeSummary summary={summary} />
           {area === "direzione" && <DirectionPanel token={token} />}
         </>
       ) : (
