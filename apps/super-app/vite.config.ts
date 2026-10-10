@@ -43,6 +43,8 @@ export default defineConfig(async ({ command }) => {
       injectRegister: null,
       devOptions: { enabled: false },
       filename: "sw.js",
+      // nitro writes the client bundle to .output/public: precache from there
+      outDir: ".output/public",
       manifest: false, // static manifest in public/manifest.webmanifest
       includeAssets: ["offline.html", "favicon.png", "icon-512.png"],
       workbox: {
