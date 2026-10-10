@@ -340,6 +340,80 @@
           "COMUNICAZIONI"
         ]
       }
+    },
+    {
+      "id": "UD-016",
+      "name": "SCD_OPERATIONAL_SOURCE_OF_TRUTH_AND_CONTINUOUS_CONTROL_FROM_2026_07_01",
+      "sourceDate": "2026-10-10",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "Bisogna avere tutto sotto controllo non dormire ... non sapere avvitare un bullone",
+        "Devi monitorare ogni ora la situazione e anche cancellare ciò che superato e memorizzare per sempre e andare avanti",
+        "La mail sportclubcolico@gmail.com deve essere monitorato sempre ... 1 luglio 2026 data di inizio",
+        "File dati ... nel drive con stesse diciture vanno monitorati ... iscrizioni ancora aperte ma quelle che arrivano sono confermate",
+        "si aggiornati da soli tu li tieni controllati senza modificare nulla e niente dentro",
+        "svincoli, cancellazioni o altro ... ufficializzate sui comunicati Figc e tramite mail",
+        "Anche fornitori o altri usano la mail per comunicare"
+      ],
+      "normalizedCommand": {
+        "initialSeasonAnchor": "2026-07-01",
+        "domains": [
+          "SPORT",
+          "FOOTBALL_FIGC",
+          "ACCOUNTING",
+          "FISCAL",
+          "REGISTRATIONS",
+          "MEMBERSHIP",
+          "ECONOMICS",
+          "SUPPLIERS",
+          "PERSONNEL",
+          "SPONSORS",
+          "COMMUNICATIONS"
+        ],
+        "canonicalMailbox": "sportclubcolico@gmail.com",
+        "otherAuthorizedMailboxes": [
+          "tesseramenti.scdcolicoderviese@gmail.com",
+          "segreteria.scdcolicoderviese@gmail.com"
+        ],
+        "cadence": "ONE_HOURLY_CHECK_ITERATION_MAX_SUPPORTED_WITH_RESUMABLE_CHECKPOINT_NOT_24_7_PROCESS",
+        "onboardingInterpretation": "NEW_USER_SUBMITTED_FORM_COUNTS_AS_VERBALLY_CONFIRMED_INTEREST; NOT PROOF_OF_FIGC_REGISTRATION_PAYMENT_MEMBERSHIP_OR_COMPLETE_DOCUMENTATION",
+        "sourceOfTruth": "READ_ONLY_EXISTING_GMAIL_AND_DRIVE_WITH_IDS_AND_MODIFIED_TIMES",
+        "systems": [
+          "DATABASE_ISCRIZIONI_2026_27_WITH_UNIQUE_SUBMISSION_ID",
+          "MASTER_GESTIONALE_2026_27_ANAGRAFICA_UNICA",
+          "MASTER_TESSERATI_2026_27_FIGC_STATUS",
+          "MAIL_OPERATIONS_APP_2026_EXISTING",
+          "CALENDARIO_MASTER_2026_27",
+          "SCD_INTAKE_LOG_EXISTING"
+        ],
+        "userDataContract": "DO_NOT_WRITE_IN_MODIFY_REFORMAT_RENAME_REORDER_DELETE_OR_MOVE_ANY_CANONICAL_SPREADSHEET_GMAIL_DRIVE_DOCUMENT_OR_FIGC_RECORD",
+        "continuousVerification": {
+          "mail": "INBOX_AND_SENT_ATTACHMENTS_DELIVERY_FAIL_AND_DELAY_THREAD_ID",
+          "drive": "MODIFIED_TIME_VERSION_ID_CHECK_FILES_WITH_IDENTICAL_NAMES_DEDUP_BY_CANONICAL_FILE_ID",
+          "registration": "SUBMISSION_ID_DUPLICATES_FORM_CONFIRMATION_PARENTAL_CONTACT_DOCS_FIGC_QUOTE_KIT_BUS_FAMILY_RELATION",
+          "official": "FIGC_LND_CRL_CU_NUMBER_DATE_DOCUMENT_LINK_AND_GMAIL_EVIDENCE",
+          "financial": "ECONOMIC_COMMUNICATION_NOT_EQUAL_SENT_DELIVERED_RECONCILED_PAID",
+          "suppliers": "OPEN_QUOTES_CONTRACTS_INVOICES_DUE_DATES_APPROVALS_FROM_MAIL",
+          "privacy": "NO_PUBLIC_MINOR_SAFEGUARDING_ISEE_HEALTH_OR_PRIVATE_FINANCIAL_INFORMATION"
+        },
+        "hierarchy": "FIGC_OFFICIAL_CU_OR_PORTAL_DECISION_FOR_FEDERAL_STATUS; MAIL_REQUEST_OR_PEC_NOT_AN_ACCEPTED_RELEASE",
+        "uncertainOrContradictory": "OPEN_CONFLICT_WITH_SOURCE_PROVENANCE_REQUIRE_VERIFICATION_NEVER_SILENTLY_MERGE_173_174_233_COUNTS",
+        "monitoringRegistry": "USE_EXISTING_SCD_INTAKE_LOG_OR_EXISTING_OPERATIONAL_CONTROL_LOG_IF_AUTHORIZED_AND_SEPARATE_FROM_CANONICAL_SOURCES; OTHERWISE_COMMIT_NON_PII_CHECKPOINT_TO_EXISTING_GITHUB_ISSUE_107",
+        "lifecycle": [
+          "RECEIVED",
+          "VERIFIED",
+          "ACTION_REQUIRED",
+          "WAITING_SOURCE",
+          "CLOSED",
+          "SUPERSEDED"
+        ],
+        "deletion": "LOGICAL_SUPERSEDED_ONLY_IN_CONTROL_LAYER_PRESERVE_AUDIT_HISTORY_AND_SOURCE",
+        "alerts": "ONLY_VERIFIED_MATERIAL_NEW_ACTIONS_OR_BLOCKERS_NO_UNCHANGED_REPEATS",
+        "securityGates": "NO_AUTO_MAIL_SEND_OR_FIGC_CHANGES_OR_MONEY_CHANGES_OR_DRIVE_ACL_MODIFICATIONS",
+        "automationName": "SCD Presidio Operativo",
+        "orchestrationRule": "REAL_CHECK_EACH_SCHEDULED_RUN; NEVER_CLAIM_FOREVER_MEMORY_OR_ALWAYS_RUNNING_WITHOUT_PERSISTED_CHECKPOINT"
+      }
     }
   ],
   "completionGate": {
