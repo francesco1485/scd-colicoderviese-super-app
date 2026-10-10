@@ -1,5 +1,8 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { CalendarDays, Handshake, House, Menu, ShieldCheck, X } from "lucide-react";
+import {
+  CalendarCheck, CalendarDays, Circle, Ellipsis, House, Menu, Newspaper, Shirt, ShieldCheck, UserRound, UsersRound, X,
+  type LucideIcon,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 
 import crest from "@/assets/brand/logo-scd.png.asset.json";
@@ -14,13 +17,13 @@ const desktopNav: readonly NavItem[] = [
   { to: "/", label: "Home" },
   { to: "/calendario", label: "Calendario" },
   { to: "/allenamenti", label: "Allenamenti" },
-  { to: "/eventi", label: "Eventi" },
+  { to: "/comunicazioni", label: "Comunicazioni" },
   { to: "/core", label: "Area club" },
   { to: "/grow", label: "Sponsor" },
   { to: "/contatti", label: "Contatti" },
 ];
 
-/** Menu completo (drawer mobile e voce "Altro" desktop), raggruppato per app. */
+/** Menu completo (drawer mobile e voce "Altro"), raggruppato per app. */
 const menuGroups: readonly { title: string; app: string; items: readonly NavItem[] }[] = [
   {
     title: "Il Club",
@@ -29,6 +32,7 @@ const menuGroups: readonly { title: string; app: string; items: readonly NavItem
       { to: "/", label: "Home" },
       { to: "/calendario", label: "Calendario gare" },
       { to: "/allenamenti", label: "Allenamenti" },
+      { to: "/comunicazioni", label: "Comunicazioni" },
       { to: "/eventi", label: "Eventi" },
       { to: "/community", label: "Tifosi" },
       { to: "/entra", label: "Gioca con noi" },
@@ -45,7 +49,7 @@ const menuGroups: readonly { title: string; app: string; items: readonly NavItem
       { to: "/core/impianti-calendari", label: "Impianti e calendari" },
       { to: "/core/atleta", label: "Area atleta (anteprima)" },
       { to: "/core/famiglia", label: "Area famiglia (anteprima)" },
-      { to: "/core/staff", label: "Staff (anteprima)" },
+      { to: "/core/staff", label: "Area staff (anteprima)" },
       { to: "/aree", label: "Aree riservate (accesso R20)" },
     ],
   },
@@ -67,15 +71,17 @@ const footerLinks: readonly NavItem[] = [
   { to: "/safeguarding", label: "Safeguarding" },
 ];
 
-/** Barra inferiore mobile: 4 ingressi. Ogni voce è attiva anche sulle sue sotto-pagine. */
-const bottomNav = [
-  { to: "/", label: "Home", icon: House, match: (p: string) => p === "/" },
-  { to: "/calendario", label: "Calendario", icon: CalendarDays, match: (p: string) => p.startsWith("/calendario") || p.startsWith("/allenamenti") },
-  { to: "/core", label: "Area club", icon: ShieldCheck, match: (p: string) => p.startsWith("/core") || p.startsWith("/aree") },
-  { to: "/grow", label: "Sponsor", icon: Handshake, match: (p: string) => p.startsWith("/grow") || p.startsWith("/sponsor") || p.startsWith("/fornitori") },
-] as const;
+/**
+ * Schermate costruite sulle tavole: hanno la propria testata (stemma + wordmark/titolo), quindi su
+ * smartphone la barra superiore generica non viene mostrata. Su desktop resta la navigazione completa.
+ */
+const BOARD_ROUTES = ["/", "/calendario", "/allenamenti", "/comunicazioni", "/core", "/core/atleta", "/core/famiglia", "/core/staff", "/core/impianti-calendari", "/grow"];
+export const isBoardRoute = (p: string) => BOARD_ROUTES.includes(p.replace(/\/$/, "") || "/");
 
 const isActive = (pathname: string, to: string) => (to === "/" ? pathname === "/" : pathname === to || pathname.startsWith(`${to}/`));
+
+/** Apre il menu completo da qualunque punto (voce "Altro", ingranaggio Staff, pulsante menu). */
+export const openMenu = () => window.dispatchEvent(new CustomEvent("scd:menu"));
 
 export function ClubCrestOfficial({ size = 34, className = "" }: { size?: number; className?: string }) {
   // Stemma ufficiale (480×628): larghezza proporzionale all'altezza richiesta.
@@ -92,23 +98,16 @@ export function ClubCrestOfficial({ size = 34, className = "" }: { size?: number
 }
 
 export function SiteHeader() {
-  const [open, setOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  useEffect(() => setOpen(false), [pathname]);
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
+  const board = isBoardRoute(pathname);
   return (
-    <header className="sticky top-0 z-40 h-[57px] border-b border-white/10 surface-deep">
+    <header className={`sticky top-0 z-40 h-[57px] border-b border-white/10 surface-deep ${board ? "hidden lg:block" : ""}`} data-site-header>
       <div className="mx-auto flex h-full max-w-7xl items-center justify-between gap-3 px-4 sm:px-6">
         <Link to="/" className="flex min-w-0 items-center gap-2.5" aria-label={`${CLUB_NAME} · Super App, vai alla Home`}>
           <ClubCrestOfficial size={38} />
           <span className="min-w-0 leading-tight">
-            <span className="block truncate font-display text-[15px] font-bold tracking-wide">{CLUB_NAME}</span>
-            <span className="block text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-accent">Super App · 2026/27</span>
+            <span className="block truncate font-brand text-[18px] leading-none tracking-[0.01em]"><span className="text-[#ffd600]">COLICO</span>DERVIESE</span>
+            <span className="block text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-white/80">S.C.D. · Super App 2026/27</span>
           </span>
         </Link>
         <nav className="hidden items-center gap-1 lg:flex" aria-label="Navigazione principale">
@@ -125,74 +124,121 @@ export function SiteHeader() {
         </nav>
         <button
           className="flex size-11 shrink-0 items-center justify-center rounded-lg border border-white/20"
-          aria-label={open ? "Chiudi menu" : "Apri menu completo"}
-          aria-expanded={open}
+          aria-label="Apri menu completo"
           aria-controls="sa-menu"
-          onClick={() => setOpen((o) => !o)}
+          onClick={openMenu}
         >
-          {open ? <X className="size-5" /> : <Menu className="size-5" />}
+          <Menu className="size-5" />
         </button>
       </div>
-      {open && (
-        <>
-          <button aria-label="Chiudi menu" className="fixed inset-0 top-[57px] z-30 cursor-default bg-lake-deep/60" onClick={() => setOpen(false)} />
-          <nav
-            id="sa-menu"
-            aria-label="Menu completo"
-            className="absolute inset-x-0 top-[57px] z-40 max-h-[calc(100dvh-57px)] overflow-y-auto border-t border-white/10 surface-deep px-4 pb-24 pt-3 shadow-premium lg:left-auto lg:right-4 lg:w-[380px] lg:rounded-b-2xl lg:pb-4"
-          >
-            {menuGroups.map((g) => (
-              <div key={g.app} className="border-b border-white/10 py-2 last:border-0">
-                <p className="flex items-center gap-2 px-2 py-1 text-[0.68rem] font-bold uppercase tracking-[0.18em] text-accent">
-                  {g.title} <span className="rounded bg-white/10 px-1.5 py-0.5 text-[0.6rem] tracking-wider text-primary-foreground">{g.app}</span>
-                </p>
-                <div className="grid grid-cols-2 gap-x-2">
-                  {g.items.map((n) => (
-                    <Link
-                      key={n.to}
-                      to={n.to}
-                      onClick={() => setOpen(false)}
-                      className={`rounded-lg px-2 py-2.5 text-sm font-medium ${isActive(pathname, n.to) ? "text-accent" : "opacity-90"}`}
-                    >
-                      {n.label}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            ))}
-            <Link to="/safeguarding" onClick={() => setOpen(false)} className="mt-2 flex items-center gap-2 px-2 py-2 text-sm font-semibold text-accent">
-              <ShieldCheck className="size-4" /> Safeguarding · segnalazioni riservate
-            </Link>
-          </nav>
-        </>
-      )}
     </header>
   );
 }
 
-/** Barra di navigazione inferiore (solo smartphone/tablet). */
+/** Menu completo, aperto dall'evento "scd:menu". */
+export function MenuDrawer() {
+  const [open, setOpen] = useState(false);
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  useEffect(() => setOpen(false), [pathname]);
+  useEffect(() => {
+    const onOpen = () => setOpen((o) => !o);
+    window.addEventListener("scd:menu", onOpen);
+    return () => window.removeEventListener("scd:menu", onOpen);
+  }, []);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+  if (!open) return null;
+  return (
+    <>
+      <button aria-label="Chiudi menu" className="fixed inset-0 z-[60] cursor-default bg-[#01224f]/60" onClick={() => setOpen(false)} />
+      <nav
+        id="sa-menu"
+        aria-label="Menu completo"
+        className="fixed inset-x-0 bottom-0 z-[61] max-h-[85dvh] overflow-y-auto rounded-t-[20px] bg-white px-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-3 text-[var(--scd-ink)] shadow-[0_-12px_40px_rgb(1_34_79/0.35)] lg:inset-x-auto lg:bottom-auto lg:right-4 lg:top-[64px] lg:w-[400px] lg:rounded-2xl"
+      >
+        <div className="flex items-center justify-between pb-1">
+          <span className="flex items-center gap-2"><ClubCrestOfficial size={30} /><b className="text-[15px]">Menu</b></span>
+          <button aria-label="Chiudi menu" onClick={() => setOpen(false)} className="flex size-11 items-center justify-center rounded-lg"><X className="size-5" /></button>
+        </div>
+        {menuGroups.map((g) => (
+          <div key={g.app} className="border-b border-[var(--scd-line)] py-2 last:border-0">
+            <p className="flex items-center gap-2 px-2 py-1 text-[0.7rem] font-bold uppercase tracking-[0.16em] text-[var(--scd-blue)]">
+              {g.title} <span className="rounded bg-[var(--scd-yellow)] px-1.5 py-0.5 text-[0.6rem] tracking-wider text-[var(--scd-ink)]">{g.app}</span>
+            </p>
+            <div className="grid grid-cols-2 gap-x-2">
+              {g.items.map((n) => (
+                <Link key={n.to} to={n.to} onClick={() => setOpen(false)} className={`rounded-lg px-2 py-2.5 text-[15px] font-medium ${isActive(pathname, n.to) ? "font-bold text-[var(--scd-blue)]" : ""}`}>
+                  {n.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+        ))}
+        <Link to="/safeguarding" onClick={() => setOpen(false)} className="mt-2 flex items-center gap-2 px-2 py-2 text-sm font-semibold text-[var(--scd-blue)]">
+          <ShieldCheck className="size-4" /> Safeguarding · segnalazioni riservate
+        </Link>
+      </nav>
+    </>
+  );
+}
+
+type TabDef = { label: string; icon: LucideIcon; to?: string; search?: Record<string, string>; menu?: true; match: (p: string) => boolean; tone?: "yellow" };
+
+const PUBLIC_TABS: TabDef[] = [
+  { label: "Home", icon: House, to: "/", match: (p) => p === "/" },
+  { label: "Calendario", icon: CalendarDays, to: "/calendario", match: (p) => p.startsWith("/calendario") },
+  { label: "Squadre", icon: UsersRound, to: "/allenamenti", match: (p) => p.startsWith("/allenamenti") },
+  { label: "Eventi", icon: CalendarCheck, to: "/eventi", match: (p) => p.startsWith("/eventi") || p.startsWith("/community") },
+  { label: "Profilo", icon: UserRound, to: "/core/atleta", match: (p) => p.startsWith("/core/atleta") || p.startsWith("/core/famiglia") || p.startsWith("/aree") },
+];
+const STAFF_TABS: TabDef[] = [
+  { label: "Dashboard", icon: House, to: "/core/staff", match: (p) => p.startsWith("/core/staff") || p === "/core" || p === "/core/" },
+  { label: "Squadre", icon: UsersRound, to: "/core/impianti-calendari", search: { sezione: "squadra" }, match: (p) => p.startsWith("/core/impianti-calendari") },
+  { label: "Atleti", icon: Shirt, to: "/core/atleta", match: (p) => p.startsWith("/core/atleta") },
+  { label: "Comunicazioni", icon: Newspaper, to: "/comunicazioni", match: (p) => p.startsWith("/comunicazioni") },
+  { label: "Altro", icon: Ellipsis, menu: true, match: () => false },
+];
+const COMMS_TABS: TabDef[] = [
+  { label: "Home", icon: House, to: "/", match: (p) => p === "/" },
+  { label: "Calendario", icon: CalendarDays, to: "/calendario", match: (p) => p.startsWith("/calendario") },
+  { label: "Comunicazioni", icon: Circle, to: "/comunicazioni", match: (p) => p.startsWith("/comunicazioni"), tone: "yellow" },
+  { label: "Squadre", icon: UsersRound, to: "/allenamenti", match: (p) => p.startsWith("/allenamenti") },
+  { label: "Altro", icon: Ellipsis, menu: true, match: () => false },
+];
+
+export function tabsFor(pathname: string): TabDef[] {
+  if (pathname.startsWith("/comunicazioni")) return COMMS_TABS;
+  if (pathname === "/core" || pathname === "/core/" || pathname.startsWith("/core/staff") || pathname.startsWith("/core/impianti-calendari")) return STAFF_TABS;
+  return PUBLIC_TABS;
+}
+
+/** Barra inferiore delle tavole (smartphone/tablet): bianca, voce attiva blu. */
 export function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const tabs = tabsFor(pathname);
   return (
     <nav
       aria-label="Navigazione Super App"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-lake-deep pb-[env(safe-area-inset-bottom)] text-primary-foreground shadow-[0_-8px_24px_-12px_oklch(0.2_0.09_258/0.6)] lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-[#e3e6eb] bg-white pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_16px_-8px_rgb(14_27_51/0.18)] lg:hidden"
     >
-      <div className="mx-auto grid h-16 max-w-xl grid-cols-4">
-        {bottomNav.map((n) => {
-          const active = n.match(pathname);
-          return (
-            <Link
-              key={n.to}
-              to={n.to}
-              aria-current={active ? "page" : undefined}
-              className={`relative flex flex-col items-center justify-center gap-1 text-[0.7rem] font-bold uppercase tracking-wide ${active ? "text-accent" : "text-primary-foreground/75"}`}
-            >
-              {active && <span className="absolute inset-x-5 top-0 h-[3px] rounded-b bg-accent" aria-hidden="true" />}
-              <n.icon className="size-[22px]" aria-hidden="true" />
-              {n.label}
-            </Link>
+      <div className="mx-auto grid h-[62px] max-w-xl grid-cols-5">
+        {tabs.map((t) => {
+          const active = t.match(pathname);
+          const color = active ? (t.tone === "yellow" ? "text-[#e9b300]" : "text-[#1559cd]") : "text-[#3d4a63]";
+          const inner = (
+            <>
+              <t.icon className="size-[25px]" strokeWidth={active ? 2.4 : 1.8} fill={active && t.icon === House ? "currentColor" : "none"} aria-hidden="true" />
+              <span className={`text-[11.5px] leading-none ${active ? "font-bold" : "font-medium"}`}>{t.label}</span>
+            </>
           );
+          const cls = `flex flex-col items-center justify-center gap-[5px] ${color}`;
+          return t.menu
+            ? <button key={t.label} type="button" onClick={openMenu} className={cls} aria-label="Altro: menu completo">{inner}</button>
+            : <Link key={t.label} to={t.to!} search={t.search as never} aria-current={active ? "page" : undefined} className={cls}>{inner}</Link>;
         })}
       </div>
     </nav>
@@ -201,13 +247,13 @@ export function BottomNav() {
 
 export function SiteFooter() {
   return (
-    <footer className="surface-deep mt-16 px-4 py-10">
+    <footer className="surface-deep mt-10 px-4 py-10">
       <div className="mx-auto flex max-w-6xl flex-col gap-4 text-sm">
         <div className="flex items-center gap-3">
           <ClubCrestOfficial size={44} />
-          <p className="font-display text-lg font-bold">{CLUB_NAME}</p>
+          <p className="font-brand text-xl leading-none"><span className="text-[#ffd600]">COLICO</span>DERVIESE</p>
         </div>
-        <p className="opacity-75">Colico (LC) · Alto Lago di Como · PEC calciocolicoderviese@pec.it</p>
+        <p className="opacity-75">{CLUB_NAME} · Colico (LC) · Alto Lago di Como · PEC calciocolicoderviese@pec.it</p>
         <nav className="flex flex-wrap gap-x-5 gap-y-2" aria-label="Link a piè di pagina">
           {[...desktopNav.slice(1), ...footerLinks].map((n) => (
             <Link key={n.to + n.label} to={n.to} className="opacity-80 hover:opacity-100">{n.label}</Link>

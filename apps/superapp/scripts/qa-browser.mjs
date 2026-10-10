@@ -20,6 +20,7 @@ const PAGES = [
   { slug: "core-atleta", path: "/core/atleta" },
   { slug: "core-famiglia", path: "/core/famiglia" },
   { slug: "core-staff", path: "/core/staff" },
+  { slug: "comunicazioni", path: "/comunicazioni" },
   { slug: "grow", path: "/grow" },
   { slug: "sponsor", path: "/sponsor" },
 ];
@@ -46,7 +47,10 @@ for (const vp of VIEWPORTS) {
     await page.waitForTimeout(600);
     const m = await page.evaluate(() => ({
       overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
-      crest: (() => { const i = document.querySelector('header img[alt^="Stemma ufficiale"]'); if (!i) return false; const r = i.getBoundingClientRect(); return r.width > 10 && r.height > 10 && i.complete && i.naturalWidth > 0; })(),
+      crest: [...document.querySelectorAll('header img[alt^="Stemma ufficiale"]')].some((i) => { const r = i.getBoundingClientRect(); return r.width > 10 && r.height > 10 && i.complete && i.naturalWidth > 0; }),
+      sky: [...document.querySelectorAll('img[alt^="Sky"]')].filter((i) => i.getBoundingClientRect().width > 10).length,
+      tabs: document.querySelectorAll('nav[aria-label="Navigazione Super App"] a, nav[aria-label="Navigazione Super App"] button').length,
+      screen: document.querySelector("[data-screen]")?.getAttribute("data-screen") ?? null,
       sdc: (document.body.innerText.match(/S\.D\.C\./g) ?? []).length,
       scd: (document.body.innerText.match(/S\.C\.D\. ColicoDerviese/g) ?? []).length,
       demo: document.body.innerText.includes("DEMO · ANTEPRIMA"),
@@ -71,6 +75,12 @@ for (const vp of VIEWPORTS) {
     if (vp.name === "mobile" && !m.bottomNav) fail(`mobile ${pg.path} bottom nav missing`);
     if (vp.name === "desktop" && m.bottomNav) fail(`desktop ${pg.path} bottom nav visible`);
     if (pg.path.startsWith("/core") || pg.path === "/grow") { if (!m.demo) fail(`${pg.path} missing DEMO · ANTEPRIMA`); }
+    // Tavole: Sky solo dove la tavola la mostra (Home e Area Staff); barra a 5 voci su smartphone.
+    const skyExpected = pg.path === "/" || pg.path === "/core/staff" ? 1 : 0;
+    if (m.sky !== skyExpected) fail(`${vp.name} ${pg.path} Sky visible ${m.sky} != ${skyExpected}`);
+    if (vp.name === "mobile" && m.tabs !== 5) fail(`mobile ${pg.path} bottom nav has ${m.tabs} items != 5`);
+    if (["/core/atleta", "/core/famiglia", "/core/staff"].includes(pg.path) && !m.text.includes("DATI DIMOSTRATIVI")) fail(`${pg.path} missing DATI DIMOSTRATIVI strip`);
+    if (pg.slug === "comunicazioni" && !/Importante/i.test(m.text)) fail("comunicazioni missing IMPORTANTE card");
     if (pg.path.startsWith("/core/") && pg.path !== "/core/impianti-calendari" && !m.reserved) fail(`${pg.path} missing R20 reserved note`);
     if (pg.slug === "home") {
       row.week = m.week; row.today = m.today; row.next = m.next;

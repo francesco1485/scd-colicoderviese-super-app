@@ -4,7 +4,7 @@ Un'unica web app, un solo ingresso, in cui confluiscono le tre app SCD:
 
 | App | Dove | Contenuto |
 |---|---|---|
-| **SCD ONE** (pubblico) | `/`, `/calendario`, `/allenamenti`, `/eventi`, `/community`, `/entra`, `/contatti`, `/safeguarding`, `/societa`, `/shop`, `/aree`, `/aree/$area` | Hub Lovable `06cb3ee4…` @ `0259f50` |
+| **SCD ONE** (pubblico) | `/`, `/calendario`, `/allenamenti`, `/comunicazioni`, `/eventi`, `/community`, `/entra`, `/contatti`, `/safeguarding`, `/societa`, `/shop`, `/aree`, `/aree/$area` | Hub Lovable `06cb3ee4…` @ `0259f50` |
 | **SCD CORE** (gestione) | `/core`, `/core/impianti-calendari`, `/core/atleta`, `/core/famiglia`, `/core/staff` | Command Center Lovable `5c6eac53…` @ `ed6cd65` (modulo `features/impianti`, schermate Vision 2026) — **DEMO · ANTEPRIMA** |
 | **SCD GROW** (sponsor) | `/grow`, `/sponsor`, `/fornitori` | Catalogo sponsor dell'Hub + slot GROW della Vision 2026 — nessun marchio non confermato |
 
@@ -40,4 +40,15 @@ QA browser (Chromium esistente, nessun `playwright install`):
 
 ## Asset
 
-Stemma ufficiale: `public/media/brand/logo-scd.png` (= `assets/logo-scd.png` del repo canonico). Loghi categoria, planimetria e avatar CROVI scaricati dal sito pubblico dell'Hub (stesse dimensioni degli `*.asset.json`), in `public/media/`. Nessuna immagine della mascotte Sky.
+Stemma ufficiale: `public/media/brand/logo-scd.png` (= `assets/logo-scd.png` del repo canonico). Loghi categoria, planimetria e avatar CROVI scaricati dal sito pubblico dell'Hub (stesse dimensioni degli `*.asset.json`), in `public/media/`.
+
+- **Sky** (mascotte ufficiale, versione pollice alzato con pallone confermata dal proprietario il 10/10/2026): `public/media/brand/sky-scd.png` da `staging/lovable-vision-2026/public/assets/sky-dalla-tavola.png`, solo pulizia dei residui di sfondo nel canale alpha (KEEP_ENHANCE). Compare solo nelle testate di Home e Area Staff, come nelle tavole.
+- **Lago e montagne**: `public/media/scd/lario-header.webp` = `assets/hero-colico.webp` ritagliata alla parte alta (1280×330): il campo da calcio non compare nelle testate.
+
+## Sistema grafico delle tavole
+
+Le sei schermate approvate ("SISTEMA GRAFICO DEFINITIVO") sono riprodotte come React reale: `/` Home pubblica, `/calendario` Calendario live, `/core/atleta` Area Atleta, `/core/famiglia` Area Famiglia, `/core/staff` Area Staff, `/comunicazioni` Comunicazioni. Primitive in `src/components/scd/board.tsx` (testate, foglio, linguette, tessere, segmentati, righe con barra, blocco data, anello, pill, striscia DEMO), glifi in `src/components/scd/icons.tsx`, dati derivati in `src/lib/board-data.ts` (solo calendario validato e quadro allenamenti; `null` = "—", mai zero). Font: Anton (wordmark) e Fira Sans / Fira Sans Condensed (interfaccia) da Google Fonts.
+
+- Schermate pubbliche: solo dati reali; dove manca la fonte (follower social, open day, sponsor) il blocco resta con contenuto "in arrivo".
+- Atleta, Famiglia, Staff: anteprima con contenuti dimostrativi (`src/features/superapp/demo-content.ts`) e striscia "ANTEPRIMA GRAFICA · DATI DIMOSTRATIVI" fino all'accesso R20; nello Staff i numeri derivabili (squadre in calendario, attività di oggi) sono reali.
+- Avversarie: scudo neutro con iniziali (nessuno stemma inventato). Nessuna foto di persone o minori: avatar a iniziali.

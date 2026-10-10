@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Bus } from "lucide-react";
 
-import { SnapshotBanner } from "@/components/SnapshotBanner";
+import { BellAction, PageHeader } from "@/components/scd/board";
+import { SNAPSHOT_BANNER } from "@/lib/public-snapshots";
 import { EMPTY_MESSAGE, appliesToWeek, fieldMatches, findSessions, loadQuadro, logoKeysFor } from "@/lib/public-snapshots";
 import juniores from "@/assets/scd/SCD_JUNIORES_2008_2009.png.asset.json";
 import piccoli from "@/assets/scd/SCD_PICCOLI_2020_2021.png.asset.json";
@@ -60,22 +61,22 @@ function Allenamenti() {
   const roomsAt = (start: number) => rooms.filter((r) => appliesToWeek(r.week, week) && r.day === day && r.start <= start && r.end > start);
 
   return (
-    <main className="pb-12">
-      <SnapshotBanner />
-      <section className="surface-deep px-4 py-6 sm:px-6">
+    <main className="pb-12" data-screen="allenamenti">
+      <PageHeader title="Allenamenti" action={<BellAction dot={false} />} testId="allenamenti-header" />
+      <div className="relative z-[5] -mt-[14px] rounded-t-[18px] bg-[var(--scd-page)] px-4 pt-[14px] sm:px-6">
         <div className="mx-auto max-w-7xl">
-          <p className="eyebrow text-accent">Centro sportivo Colico · lunedì–venerdì</p>
-          <h1 className="mt-1 text-3xl font-bold sm:text-4xl">Quadro allenamenti</h1>
-          <p className="mt-2 text-sm opacity-80">Fotografia del quadro settimanale: {slots.length} fasce orarie. Sola consultazione.</p>
+          <p className="text-[15px] font-semibold text-[var(--scd-ink)]">Centro sportivo Colico · lunedì–venerdì</p>
+          <p className="mt-[2px] text-[13px] text-[var(--scd-sub)]">Fotografia del quadro settimanale: {slots.length} fasce orarie. Sola consultazione.</p>
+          <p role="note" className="mt-[8px] inline-block rounded-[7px] bg-[#fff3c4] px-[8px] py-[3px] text-[11.5px] font-bold uppercase tracking-[0.03em] text-[#7a5200]">{SNAPSHOT_BANNER}</p>
         </div>
-      </section>
+      </div>
 
-      <div className="sticky top-[57px] z-30 border-b border-border bg-background/95 px-4 py-3 backdrop-blur sm:px-6">
+      <div className="sticky top-0 z-30 border-b border-[var(--scd-line)] bg-[var(--scd-page)]/95 px-4 py-3 backdrop-blur sm:px-6 lg:top-[57px]">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-2">
-          <div className="-mx-1 flex w-full gap-1 overflow-x-auto px-1 sm:w-auto" role="group" aria-label="Giorno">
-            {days.map((d) => <button key={d} onClick={() => setDay(d)} className={`h-10 shrink-0 rounded-md border border-border px-3 text-xs font-bold uppercase ${day === d ? "bg-primary text-primary-foreground" : "bg-card"}`}>{d.slice(0, 3)}</button>)}
+          <div className="scd-scroll-x -mx-1 flex w-full gap-[6px] overflow-x-auto px-1 sm:w-auto" role="group" aria-label="Giorno">
+            {days.map((d) => <button key={d} onClick={() => setDay(d)} aria-pressed={day === d} className={`h-[40px] min-w-[56px] shrink-0 rounded-[9px] px-3 text-[14px] font-bold capitalize ${day === d ? "bg-[var(--scd-blue)] text-white shadow-[0_2px_5px_rgb(4_87_175/0.35)]" : "bg-white text-[var(--scd-ink)] shadow-[var(--scd-card-shadow)]"}`}>{d.slice(0, 3).toLowerCase()}</button>)}
           </div>
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Cerca annata (es. 2015, U15)" aria-label="Cerca annata" className="h-10 min-w-0 flex-1 rounded-md border border-border bg-card px-3 text-sm sm:max-w-xs" />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Cerca annata (es. 2015, U15)" aria-label="Cerca annata" className="h-[42px] min-w-0 flex-1 rounded-[9px] border border-[#cfd5df] bg-white px-3 text-[15px] sm:max-w-xs" />
         </div>
       </div>
 
@@ -86,7 +87,7 @@ function Allenamenti() {
             {days.map((d) => {
               const list = sessions.filter((x) => x.day === d).sort((a, b) => a.start - b.start);
               return (
-                <button key={d} onClick={() => setDay(d)} className={`rounded-md border p-3 text-left ${day === d ? "border-primary bg-primary/5" : "border-border bg-card"}`}>
+                <button key={d} onClick={() => setDay(d)} className={`rounded-[12px] border p-3 text-left ${day === d ? "border-[var(--scd-blue)] bg-[#eaf2fc]" : "border-transparent bg-white shadow-[var(--scd-card-shadow)]"}`}>
                   <p className="text-xs font-bold uppercase text-primary">{d}</p>
                   {list.length === 0 ? <p className="mt-1 text-sm text-muted-foreground">Nessun allenamento</p> : list.map((x) => (
                     <div key={x.timeLabel + x.field} className="mt-1 flex items-center gap-2">
@@ -109,8 +110,8 @@ function Allenamenti() {
             : daySlots.length === 0 ? <p className="text-muted-foreground">Nessuna fascia per questa ricerca.</p>
             : <div className="grid gap-3">
               {daySlots.map((s) => (
-                <article key={s.timeLabel + s.start} className="rounded-md border border-border bg-card">
-                  <header className="flex items-center justify-between bg-primary px-3 py-2 text-primary-foreground"><strong className="font-display text-lg">{s.timeLabel}</strong></header>
+                <article key={s.timeLabel + s.start} className="scd-card overflow-hidden">
+                  <header className="flex items-center justify-between bg-[var(--scd-blue)] px-3 py-2 text-white"><strong className="text-[17px] font-bold">{s.timeLabel}</strong></header>
                   <div className="grid gap-px bg-border sm:grid-cols-2">
                     {(["C1", "C2"] as const).map((c) => <div key={c} className="bg-card p-3"><p className="text-[0.65rem] font-bold uppercase text-primary">Campo {c.slice(1)}</p><div className="flex items-start gap-2"><Logos text={s.fields[c]} /><p className="whitespace-pre-line text-sm font-semibold">{s.fields[c] || "Nessun allenamento in quadro"}</p></div></div>)}
                   </div>
@@ -123,7 +124,7 @@ function Allenamenti() {
         </div>
 
         <aside className="grid content-start gap-5">
-          <div className="rounded-md border border-border bg-card p-4">
+          <div className="scd-card p-4">
             <div className="flex items-center justify-between gap-2">
               <h2 className="text-lg font-bold">Zone campi · indicative</h2>
               <div className="flex rounded-md border border-border" role="group" aria-label="Settimana">
@@ -150,12 +151,12 @@ function Allenamenti() {
             ))}
             <p className="mt-3 text-[0.65rem] text-muted-foreground">{note || "Confini delle zone non certificati sulla planimetria."}</p>
           </div>
-          <figure className="rounded-md border border-border bg-card p-4">
+          <figure className="scd-card p-4">
             <figcaption className="mb-2 text-lg font-bold">Planimetria Colico</figcaption>
             <img src={planimetria.url} alt="Planimetria fotografica del centro sportivo di Colico" loading="lazy" className="w-full rounded" />
             <p className="mt-2 text-[0.65rem] text-muted-foreground">Foto di riferimento, separata dallo schema: le zone non sono riportate sulla planimetria.</p>
           </figure>
-          <div className="flex gap-3 rounded-md border border-border bg-card p-4">
+          <div className="scd-card flex gap-3 p-4">
             <Bus className="size-6 shrink-0 text-primary" />
             <div><h2 className="font-bold">Pulmini</h2><p className="text-sm text-muted-foreground">Nessuna corsa di allenamento confermata.</p></div>
           </div>

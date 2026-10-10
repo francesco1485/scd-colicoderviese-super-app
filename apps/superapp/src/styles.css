@@ -39,36 +39,63 @@
   --color-lake-deep: var(--lake-deep);
   --color-sun: var(--sun);
   --color-sun-soft: var(--sun-soft);
-  --font-display: "Barlow Condensed", system-ui, sans-serif;
-  --font-sans: "Barlow", system-ui, sans-serif;
+  --font-display: "Fira Sans Condensed", "Fira Sans", system-ui, sans-serif;
+  --font-sans: "Fira Sans", system-ui, sans-serif;
+  --font-brand: "Anton", "Fira Sans Condensed", Impact, sans-serif;
+  /* Tavole SCD (sistema grafico definitivo): colori campionati sulle sei schermate. */
+  --color-scd-navy: var(--scd-navy);
+  --color-scd-blue: var(--scd-blue);
+  --color-scd-sky: var(--scd-sky);
+  --color-scd-yellow: var(--scd-yellow);
+  --color-scd-ink: var(--scd-ink);
+  --color-scd-sub: var(--scd-sub);
+  --color-scd-page: var(--scd-page);
+  --color-scd-line: var(--scd-line);
+  --color-scd-green: var(--scd-green);
+  --color-scd-red: var(--scd-red);
+  --color-scd-orange: var(--scd-orange);
   --shadow-premium: 0 20px 60px -20px oklch(0.2 0.09 258 / 0.55);
   --shadow-glow: 0 0 40px -6px oklch(0.84 0.17 92 / 0.45);
 }
 
 :root {
   --radius: 0.9rem;
-  --background: oklch(0.985 0.005 250);
-  --foreground: oklch(0.19 0.06 258);
+  /* Palette dalle tavole approvate (stemma ufficiale: blu #0861AB, azzurro #1B95D3, giallo #FFD600). */
+  --scd-navy: #022d66;
+  --scd-navy-2: #01224f;
+  --scd-blue: #0457af;
+  --scd-sky: #1b95d3;
+  --scd-yellow: #ffd82a;
+  --scd-ink: #0e1b33;
+  --scd-sub: #4a5568;
+  --scd-page: #f4f5f7;
+  --scd-line: #e6e8ec;
+  --scd-green: #12922e;
+  --scd-red: #f0261b;
+  --scd-orange: #fb5414;
+  --scd-card-shadow: 0 1px 2px rgb(14 27 51 / 0.06), 0 4px 14px -6px rgb(14 27 51 / 0.14);
+  --background: #f4f5f7;
+  --foreground: #0e1b33;
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.19 0.06 258);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.19 0.06 258);
-  --primary: oklch(0.32 0.12 258);
+  --primary: #0457af;
   --primary-foreground: oklch(0.99 0.01 250);
   --secondary: oklch(0.95 0.02 250);
   --secondary-foreground: oklch(0.25 0.08 258);
   --muted: oklch(0.955 0.012 250);
   --muted-foreground: oklch(0.5 0.03 255);
-  --accent: oklch(0.84 0.17 92);
-  --accent-foreground: oklch(0.2 0.07 258);
+  --accent: #ffd82a;
+  --accent-foreground: #0e1b33;
   --destructive: oklch(0.58 0.22 27);
   --destructive-foreground: oklch(0.99 0.01 250);
   --border: oklch(0.9 0.02 253);
   --input: oklch(0.9 0.02 253);
   --ring: oklch(0.84 0.17 92);
-  --lake: oklch(0.42 0.13 250);
-  --lake-deep: oklch(0.21 0.09 259);
-  --sun: oklch(0.84 0.17 92);
+  --lake: #0457af;
+  --lake-deep: #022d66;
+  --sun: #ffd82a;
   --sun-soft: oklch(0.93 0.11 96);
 
   /* Token dei moduli CORE (Command Center, Lovable ed6cd65): stessa palette blu/giallo/bianco. */
@@ -115,9 +142,8 @@
   h2,
   h3,
   h4 {
-    font-family: var(--font-display);
+    font-family: var(--font-sans);
     letter-spacing: -0.01em;
-    text-transform: uppercase;
   }
 }
 
@@ -164,15 +190,38 @@
 
 /* ---------- Super App: integrazione moduli CORE/GROW nella shell unica ---------- */
 /* Le schermate Vision vivono dentro la shell: niente altezza piena né sfondo proprio. */
-.vision-page.core-vision { min-height: 0; background: transparent; }
-.vision-page.core-vision .vision-preview { max-width: 420px; margin-inline: auto; }
-@media (max-width: 599px) {
-  .vision-page.core-vision .vision-phone { min-height: 0; }
-}
 /* Modulo Impianti: menu sezioni sotto l'intestazione fissa (57px) e senza altezza piena. */
-.sa-core .imp { min-height: 0; }
-.sa-core .imp-side-nav { top: 57px; }
-@media (max-width: 900px) { .sa-core .imp-side-nav { top: 57px; } }
+/* Stessa palette delle tavole; la testata del modulo è sostituita dalla PageHeader della Super App. */
+.sa-core .imp { min-height: 0; --i-navy: #022d66; --i-blue: #0457af; --i-yellow: #ffd82a; --i-ground: var(--scd-page); --i-ink: var(--scd-ink); border-radius: 18px 18px 0 0; overflow: clip; }
+.sa-core .imp-head { display: none; }
+.sa-core .imp-side-nav { top: 0; }
+@media (min-width: 1024px) { .sa-core .imp-side-nav { top: 57px; } }
 /* Fonti Google citate solo per nome: nessun link nel bundle pubblico. */
 .imp-src-locked { cursor: default; }
 .imp-src-lock { display: inline-flex; align-items: center; gap: .3rem; flex-shrink: 0; font-size: .68rem; font-weight: 700; color: var(--i-sub, #44506a); text-align: right; }
+
+/* ---------- Sistema grafico delle tavole SCD (Super App, 6 schermate) ---------- */
+@utility scd-card {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: var(--scd-card-shadow);
+}
+@utility font-brand {
+  font-family: var(--font-brand);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.scd-hero-shade {
+  background: linear-gradient(180deg, rgb(2 45 102 / 0.88) 0%, rgb(2 45 102 / 0.5) 26%, rgb(2 45 102 / 0.08) 46%, rgb(2 40 92 / 0.25) 62%, rgb(1 34 79 / 0.82) 100%);
+}
+.scd-hero-plain {
+  background:
+    radial-gradient(120% 90% at 85% 0%, rgb(27 149 211 / 0.22), transparent 60%),
+    linear-gradient(180deg, #08397a 0%, #022d66 55%, #01245a 100%);
+}
+/* Linguetta blu con taglio obliquo ("PROSSIMA GARA", "Prossime attività di oggi"). */
+.scd-notch {
+  clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 100%, 0 100%);
+}
+.scd-scroll-x { scrollbar-width: none; }
+.scd-scroll-x::-webkit-scrollbar { display: none; }

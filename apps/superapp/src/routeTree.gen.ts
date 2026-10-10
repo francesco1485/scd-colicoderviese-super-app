@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AllenamentiRouteImport } from './routes/allenamenti'
 import { Route as CalendarioRouteImport } from './routes/calendario'
 import { Route as CommunityRouteImport } from './routes/community'
+import { Route as ComunicazioniRouteImport } from './routes/comunicazioni'
 import { Route as ContattiRouteImport } from './routes/contatti'
 import { Route as EntraRouteImport } from './routes/entra'
 import { Route as EventiRouteImport } from './routes/eventi'
@@ -48,6 +49,11 @@ const CalendarioRoute = CalendarioRouteImport.update({
 const CommunityRoute = CommunityRouteImport.update({
   id: '/community',
   path: '/community',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComunicazioniRoute = ComunicazioniRouteImport.update({
+  id: '/comunicazioni',
+  path: '/comunicazioni',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContattiRoute = ContattiRouteImport.update({
@@ -136,6 +142,7 @@ export interface FileRoutesByFullPath {
   '/allenamenti': typeof AllenamentiRoute
   '/calendario': typeof CalendarioRoute
   '/community': typeof CommunityRoute
+  '/comunicazioni': typeof ComunicazioniRoute
   '/contatti': typeof ContattiRoute
   '/entra': typeof EntraRoute
   '/eventi': typeof EventiRoute
@@ -158,6 +165,7 @@ export interface FileRoutesByTo {
   '/allenamenti': typeof AllenamentiRoute
   '/calendario': typeof CalendarioRoute
   '/community': typeof CommunityRoute
+  '/comunicazioni': typeof ComunicazioniRoute
   '/contatti': typeof ContattiRoute
   '/entra': typeof EntraRoute
   '/eventi': typeof EventiRoute
@@ -181,6 +189,7 @@ export interface FileRoutesById {
   '/allenamenti': typeof AllenamentiRoute
   '/calendario': typeof CalendarioRoute
   '/community': typeof CommunityRoute
+  '/comunicazioni': typeof ComunicazioniRoute
   '/contatti': typeof ContattiRoute
   '/entra': typeof EntraRoute
   '/eventi': typeof EventiRoute
@@ -205,6 +214,7 @@ export interface FileRouteTypes {
     | '/allenamenti'
     | '/calendario'
     | '/community'
+    | '/comunicazioni'
     | '/contatti'
     | '/entra'
     | '/eventi'
@@ -227,6 +237,7 @@ export interface FileRouteTypes {
     | '/allenamenti'
     | '/calendario'
     | '/community'
+    | '/comunicazioni'
     | '/contatti'
     | '/entra'
     | '/eventi'
@@ -249,6 +260,7 @@ export interface FileRouteTypes {
     | '/allenamenti'
     | '/calendario'
     | '/community'
+    | '/comunicazioni'
     | '/contatti'
     | '/entra'
     | '/eventi'
@@ -272,6 +284,7 @@ export interface RootRouteChildren {
   AllenamentiRoute: typeof AllenamentiRoute
   CalendarioRoute: typeof CalendarioRoute
   CommunityRoute: typeof CommunityRoute
+  ComunicazioniRoute: typeof ComunicazioniRoute
   ContattiRoute: typeof ContattiRoute
   EntraRoute: typeof EntraRoute
   EventiRoute: typeof EventiRoute
@@ -318,6 +331,13 @@ declare module '@tanstack/react-router' {
       path: '/community'
       fullPath: '/community'
       preLoaderRoute: typeof CommunityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/comunicazioni': {
+      id: '/comunicazioni'
+      path: '/comunicazioni'
+      fullPath: '/comunicazioni'
+      preLoaderRoute: typeof ComunicazioniRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contatti': {
@@ -440,6 +460,7 @@ const rootRouteChildren: RootRouteChildren = {
   AllenamentiRoute: AllenamentiRoute,
   CalendarioRoute: CalendarioRoute,
   CommunityRoute: CommunityRoute,
+  ComunicazioniRoute: ComunicazioniRoute,
   ContattiRoute: ContattiRoute,
   EntraRoute: EntraRoute,
   EventiRoute: EventiRoute,

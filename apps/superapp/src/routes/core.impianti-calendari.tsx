@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { BellAction, PageHeader } from "@/components/scd/board";
 import { ImpiantiCalendari, SECTION_IDS, type SectionId } from "@/features/impianti/ImpiantiCalendari";
 
 type Search = { sezione?: SectionId | undefined };
@@ -20,5 +21,10 @@ export const Route = createFileRoute("/core/impianti-calendari")({
 function ImpiantiRoute() {
   const { sezione } = Route.useSearch();
   // key: cambiando ?sezione= dal menu Area club la vista riparte dalla sezione richiesta.
-  return <div className="sa-core"><ImpiantiCalendari key={sezione ?? "quadro"} initialSection={sezione ?? "quadro"} /></div>;
+  return (
+    <main data-screen="impianti">
+      <PageHeader title="Impianti e calendari" action={<BellAction dot={false} />} testId="impianti-header" />
+      <div className="sa-core relative z-[5] -mt-[14px]"><ImpiantiCalendari key={sezione ?? "quadro"} initialSection={sezione ?? "quadro"} /></div>
+    </main>
+  );
 }

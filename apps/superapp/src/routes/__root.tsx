@@ -10,7 +10,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import { BottomNav, SiteFooter, SiteHeader } from "../components/SiteChrome";
+import { BottomNav, MenuDrawer, SiteFooter, SiteHeader } from "../components/SiteChrome";
 import { SkyChat } from "../components/SkyChat";
 import { PwaManager } from "../components/PwaManager";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -87,7 +87,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "Super App ufficiale della S.C.D. ColicoDerviese: il club (ONE), l'area club (CORE) e sponsor & partner (GROW) in un'unica app.",
       },
       { name: "author", content: "S.C.D. ColicoDerviese" },
-      { name: "theme-color", content: "#0d1b3e" },
+      { name: "theme-color", content: "#022d66" },
       { property: "og:title", content: "S.C.D. ColicoDerviese — Super App" },
       {
         property: "og:description",
@@ -105,7 +105,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700;800&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Anton&family=Fira+Sans:wght@400;500;600;700;800&family=Fira+Sans+Condensed:wght@500;600;700&display=swap",
       },
       { rel: "manifest", href: "/manifest.webmanifest" },
       { rel: "icon", type: "image/png", href: "/favicon.png" },
@@ -144,6 +144,7 @@ function RootComponent() {
         <SiteFooter />
       </div>
       <BottomNav />
+      <MenuDrawer />
       <SkyChat />
       <PwaManager />
     </QueryClientProvider>

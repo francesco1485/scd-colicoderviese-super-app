@@ -2,7 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, BarChart3, Briefcase, Lock, MonitorSmartphone, Trees } from "lucide-react";
 
 import crest from "@/assets/brand/logo-scd.png.asset.json";
-import { DemoBadge, ReservedNote, SectionHero } from "@/features/superapp/DemoBadge";
+import { BellAction, PageHeader } from "@/components/scd/board";
+import { DemoBadge, ReservedNote } from "@/features/superapp/DemoBadge";
 import { appFamilies, HERO_PHOTO, visionData } from "@/features/vision-2026/screens";
 import { CRM_STAGES, REVENUE_MODULES, SPONSOR_ASSETS, SPONSOR_PACKAGES } from "@/lib/catalog";
 import "@/features/vision-2026/vision.css";
@@ -22,19 +23,19 @@ const grow = appFamilies.find((a) => a.id === "grow")!;
 function Grow() {
   const digitali = SPONSOR_ASSETS.filter((a) => a.digitale).length;
   return (
-    <main className="pb-10">
-      <SectionHero app="GROW" title="Sponsor & Partner">
-        Sviluppo commerciale del club e del territorio: pacchetti, asset in campo e in app, richieste di partnership.
-      </SectionHero>
-
-      <div className="mx-auto max-w-6xl px-4 pt-4 sm:px-6">
+    <main className="pb-10" data-screen="grow">
+      <PageHeader title="Sponsor & Partner" action={<BellAction dot={false} />} testId="grow-header" />
+      <div className="relative z-[5] -mt-[14px] rounded-t-[18px] bg-[var(--scd-page)]">
+      <div className="mx-auto max-w-6xl px-4 pt-[14px] sm:px-6">
+        <div className="flex flex-wrap items-center gap-2"><span className="rounded-[6px] bg-[var(--scd-blue)] px-2 py-0.5 text-[0.72rem] font-bold tracking-wider text-white">SCD GROW</span><DemoBadge /></div>
+        <p className="mb-4 mt-2 text-[14px] text-[var(--scd-sub)]">Sviluppo commerciale del club e del territorio: pacchetti, asset in campo e in app, richieste di partnership.</p>
         <div className="grid grid-cols-3 gap-2">
           {[
             { icon: MonitorSmartphone, t: "App & digitale", d: `${digitali} asset digitali` },
             { icon: Trees, t: "Campo & territorio", d: `${SPONSOR_ASSETS.length - digitali} asset fisici` },
             { icon: BarChart3, t: "Misurabile", d: "Impression, click e lead" },
           ].map((x) => (
-            <div key={x.t} className="card-premium p-3">
+            <div key={x.t} className="scd-card p-3">
               <x.icon className="size-5 text-primary" aria-hidden="true" />
               <p className="mt-1.5 font-display text-sm font-bold uppercase leading-tight">{x.t}</p>
               <p className="text-xs text-muted-foreground">{x.d}</p>
@@ -59,7 +60,7 @@ function Grow() {
         </div>
         <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {SPONSOR_PACKAGES.map((p) => (
-            <li key={p.id} className={`rounded-xl p-4 ${p.tier === "Top" ? "surface-deep" : "card-premium"}`}>
+            <li key={p.id} className={`rounded-[14px] p-4 ${p.tier === "Top" ? "surface-deep" : "scd-card"}`}>
               <p className="eyebrow">{p.tier}</p>
               <h3 className="mt-0.5 text-xl font-bold">{p.nome}</h3>
               <p className="mt-1 text-sm opacity-80">{p.pitch}</p>
@@ -86,6 +87,7 @@ function Grow() {
           <Link to="/sponsor" className="flex items-center justify-between gap-3 rounded-xl surface-sun p-4 font-display text-lg font-bold uppercase">Diventa sponsor <ArrowRight className="size-5" /></Link>
           <Link to="/fornitori" className="flex items-center justify-between gap-3 rounded-xl border-2 border-primary p-4 font-display text-lg font-bold uppercase text-primary">Proponiti come fornitore <ArrowRight className="size-5" /></Link>
         </div>
+      </div>
       </div>
     </main>
   );
