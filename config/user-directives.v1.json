@@ -1434,6 +1434,67 @@
         "implementationStatus": "RECORDED",
         "duplicate_work": "DENY"
       }
+    },
+    {
+      "id": "UD-060",
+      "name": "SPORTS_COORDINATOR_TUTTOROSA",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "Mister Tuttorosa Giuseppe",
+        "E anche coordinatore attività sportive della società"
+      ],
+      "normalizedCommand": {
+        "rule": "First pilot login for a mister: the person in the master with MISTER roles is linked to his own login (e-mail from the organigramma). He is also the club's sports coordinator: structure role RESPONSABILE, area coordinamento-sportivo, which shows every team's roster (r61_1).",
+        "scope": "IDENTITY | ROSTER",
+        "constraints": [
+          "roster functions return minimum columns only",
+          "role recorded with source_id USER_COMMAND_2026_10_11 until the master carries it"
+        ],
+        "implementationStatus": "IMPLEMENTED",
+        "duplicate_work": "DENY"
+      }
+    },
+    {
+      "id": "UD-061",
+      "name": "ATHLETE_REGISTRATION_FORM_IS_FAMILY_SOURCE",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "Modulo iscrizione atleti"
+      ],
+      "normalizedCommand": {
+        "rule": "Guardian-child links come from the athlete registration form responses (ISCRIZIONI_ATLETI_2026_27). Import only name, e-mail and relationship of guardians; certificate expiry dates fill empty values and stay 'declared' until the secretariat checks them.",
+        "scope": "FAMILY | CERTIFICATES",
+        "constraints": [
+          "no IBAN, fiscal codes, documents, addresses, ISEE",
+          "match on name + birth date, never name only"
+        ],
+        "implementationStatus": "IMPLEMENTED_PARTIAL",
+        "duplicate_work": "DENY"
+      }
+    },
+    {
+      "id": "UD-062",
+      "name": "CALLUPS_WITH_CI_SARO",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "Ci sarò"
+      ],
+      "normalizedCommand": {
+        "rule": "Next block: call-ups from the mister page with the family/athlete answer 'Ci sarò' / 'Non ci sarò', visible to the team staff.",
+        "scope": "MISTER | FAMILY | EVENTS",
+        "constraints": [
+          "answers only by the athlete or a linked guardian",
+          "minors' names never public"
+        ],
+        "implementationStatus": "IN_PROGRESS",
+        "duplicate_work": "DENY"
+      }
     }
   ],
   "completionGate": {

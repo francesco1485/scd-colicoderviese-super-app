@@ -3,8 +3,8 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.27.5",
-    "effective_at": "2026-10-10",
+    "version": "3.27.6",
+    "effective_at": "2026-10-11",
     "status": "BINDING",
     "language": "it-IT",
     "timezone": "Europe/Rome",
@@ -1435,7 +1435,10 @@
         "status": "ACTIVE_MASTER",
         "title": "17 - PRENOTAZIONI IMPIANTI 2026-27 (master)",
         "resource_id": "14Idop9OuCWGMaxVgiQgGSpM5E7mNaO6SL6kt_i_lSVY",
-        "owner": ["Direzione", "Responsabile attività di base"],
+        "owner": [
+          "Direzione",
+          "Responsabile attività di base"
+        ],
         "approved_by": "Francesco, 2026-10-11",
         "authority_domains": [
           "FACILITY_BOOKINGS",
@@ -1443,8 +1446,31 @@
           "FACILITY_EVENTS",
           "COUNCIL_NOTICES"
         ],
-        "columns": ["ID", "Data", "Ora inizio", "Ora fine", "Sede", "ID spazio", "Zona", "Tipo", "Squadra o soggetto", "Formato", "Spogliatoi", "Ingresso", "Stato", "Richiesto da", "Approvato da", "Importo affitto", "Contratto o link", "Avviso Comune", "Note", "Origine"],
-        "consumers": ["/gestionale/impianti"],
+        "columns": [
+          "ID",
+          "Data",
+          "Ora inizio",
+          "Ora fine",
+          "Sede",
+          "ID spazio",
+          "Zona",
+          "Tipo",
+          "Squadra o soggetto",
+          "Formato",
+          "Spogliatoi",
+          "Ingresso",
+          "Stato",
+          "Richiesto da",
+          "Approvato da",
+          "Importo affitto",
+          "Contratto o link",
+          "Avviso Comune",
+          "Note",
+          "Origine"
+        ],
+        "consumers": [
+          "/gestionale/impianti"
+        ],
         "rules": [
           "APP_COPIES_ROWS_ONLY_NO_SERVER_WRITES",
           "STATUS_PROPOSTA_UNTIL_DIRECTION_APPROVAL",
@@ -1465,7 +1491,9 @@
           "YOUTH_STAFF_REQUIREMENTS",
           "SGS_DEADLINES"
         ],
-        "consumers": ["/gestionale/organigramma"],
+        "consumers": [
+          "/gestionale/organigramma"
+        ],
         "rules": [
           "RULES_ONLY_NO_CLUB_STATUS_IN_REPO",
           "CLUB_STATUS_FROM_SERVER_ENV_SCD_SGS_STATUS_JSON_NO_NAMES",
@@ -1503,6 +1531,63 @@
         "used_by": [
           "CAP-HOME-MATCH-EXTRAS"
         ]
+      },
+      {
+        "id": "TESSERATI_MASTER_2026_27",
+        "kind": "INTERNAL_VERIFIED_DOCUMENT",
+        "trust": "INTERNAL_VERIFIED",
+        "status": "ACTIVE",
+        "title": "04_TESSERATI - Master Operativo SCD ColicoDerviese 2026-27",
+        "account": "sportclubcolico@gmail.com",
+        "resource_id": "1mcOVkFRK7igxk87jGE-VqI49PHjNa6OmMu7xd0QYUl8",
+        "authority_domains": [
+          "PEOPLE",
+          "ATHLETES",
+          "TEAM_ROSTERS",
+          "SPORTS_STAFF_ROLES",
+          "TEAM_STAFF_ASSIGNMENTS"
+        ],
+        "consumers": [
+          "SCD_SUPABASE.scd_people",
+          "SCD_SUPABASE.scd_athletes",
+          "SCD_SUPABASE.scd_team_memberships",
+          "SCD_SUPABASE.scd_structure_roles"
+        ],
+        "rules": [
+          "PROVENANCE_SOURCE_ID_AND_CODICE_PERSONA",
+          "MINORS_NAME_BIRTHDATE_TEAM_ONLY",
+          "NO_FISCAL_CODE_NO_CONTACTS_FOR_MINORS",
+          "REIMPORT_IS_IDEMPOTENT_ON_SOURCE_RECORD_ID",
+          "SOURCE_ROLE_DOES_NOT_AUTO_GRANT_APP_PERMISSION"
+        ],
+        "imported_at": "2026-10-11"
+      },
+      {
+        "id": "ISCRIZIONI_ATLETI_2026_27",
+        "kind": "INTERNAL_FORM_RESPONSES",
+        "trust": "INTERNAL_SELF_DECLARED",
+        "status": "ACTIVE",
+        "title": "Database Iscrizioni Atleti 2026/2027 (risposte al modulo d'iscrizione)",
+        "account": "tesseramenti.scdcolicoderviese@gmail.com",
+        "resource_id": "1Sfc59KKLmHHb8yxqk_gX-cN0kdy6nzWgGTIziBZN-KE",
+        "authority_domains": [
+          "FAMILY_LINKS",
+          "GUARDIANS",
+          "MEDICAL_CERTIFICATE_EXPIRY_DECLARED"
+        ],
+        "consumers": [
+          "SCD_SUPABASE.scd_families",
+          "SCD_SUPABASE.scd_family_members",
+          "SCD_SUPABASE.scd_athletes.medical_certificate_expires_at"
+        ],
+        "rules": [
+          "MATCH_ON_NAME_AND_BIRTHDATE_NEVER_NAME_ONLY",
+          "GUARDIAN_STORED_AS_NAME_EMAIL_RELATIONSHIP_ONLY",
+          "NEVER_IMPORT_IBAN_FISCAL_CODE_DOCUMENTS_ISEE_ADDRESSES",
+          "CERTIFICATE_DATE_IS_DECLARED_UNTIL_SECRETARIAT_CHECKS",
+          "ONLY_FILL_EMPTY_CERTIFICATE_DATES"
+        ],
+        "imported_at": "2026-10-11"
       }
     ],
     "conflict_resolution": [
