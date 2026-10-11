@@ -24,7 +24,7 @@ const manifestHash = existsSync(manifestPath)
 const v = (val) => (val === null ? 'NOT_AVAILABLE' : `VERIFIED ${val}`);
 const lines = [
   'SCD:STATE (local snapshot at session start, refresh before any write)',
-  `REPOSITORY: ${v(git('config', '--get', 'remote.origin.url'))}`,
+  `REPOSITORY: ${v((git('config', '--get', 'remote.origin.url') || '').replace(/\/\/[^@/]+@/, '//') || null)}`,
   `CURRENT_MAIN_SHA: ${mainSha ? `VERIFIED ${mainSha} (last fetch)` : 'UNVERIFIED'}`,
   `CURRENT_WORKING_BRANCH: ${v(branch && head ? `${branch} @ ${head}` : null)}`,
   `WORKING_TREE: ${dirty === null ? 'NOT_AVAILABLE' : dirty ? `VERIFIED dirty (${dirty.split('\n').length} files)` : 'VERIFIED clean'}`,
