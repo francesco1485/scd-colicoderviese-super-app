@@ -11,6 +11,7 @@ export const DB_ROLES = ["USER_BASE", "FAMILY", "ATHLETE", "MISTER", "STAFF", "M
 export type DbRole = (typeof DB_ROLES)[number];
 
 export interface Membership {
+  organization_id: string;
   organization_slug: string;
   role: string;
   scope: unknown;

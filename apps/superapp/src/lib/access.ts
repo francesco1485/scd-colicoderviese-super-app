@@ -16,6 +16,7 @@ const SUB_AREA_COPY: Readonly<Record<string, { label: string; icon: AreaIcon }>>
   biglietteria: { label: "Biglietteria", icon: "file" },
   "magazzino-cassa": { label: "Magazzino · cassa", icon: "box" },
   acquisti: { label: "Acquisti", icon: "file" },
+  persone: { label: "Persone", icon: "users" },
 };
 
 /** Plain Italian for the role ids used in the registry. */
@@ -32,6 +33,7 @@ const ROLE_LABEL: Readonly<Record<string, string>> = {
   "responsabile-campi": "responsabile campi",
   mister: "mister",
   "dirigente-annata": "dirigenti di annata",
+  segreteria: "Segreteria",
 };
 
 /** Registry notes written in technical English, shown in Italian. */

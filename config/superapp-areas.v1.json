@@ -43,7 +43,11 @@
     { "id": "magazzino", "path": "/magazzino", "audience": "staff", "board": "Magazzino.dc.html", "sources": ["inventario kit (to load)"], "status": "design" },
     { "id": "infermeria", "path": "/infermeria", "audience": "public+family", "board": "Infermeria.dc.html", "status": "design" },
     { "id": "segreteria", "path": "/segreteria", "audience": "staff", "board": "Segreteria.dc.html", "status": "design",
-      "children": [ { "id": "iscrizioni", "path": "/iscrizioni", "audience": "public", "flows_to": "segreteria", "status": "planned" } ] },
+      "children": [
+        { "id": "iscrizioni", "path": "/iscrizioni", "audience": "public", "flows_to": "segreteria", "status": "planned" },
+        { "id": "persone", "path": "/segreteria/persone", "audience": "staff", "roles": ["direzione", "segreteria"], "role_map": { "direzione": "DIRECTION", "segreteria": "SECRETARIAT" },
+          "sources": ["SUPABASE_SCD (scd_people, scd_structure_roles, scd_person_events, scd_person_consents — migration r59)"],
+          "features": ["elenco persone attive con ruolo, squadra e stato documenti", "scheda con storico entrate/uscite", "Inserisci persona (Direzione, Segreteria)", "Segna uscito con motivo: resta nello storico, sparisce dalle viste"], "status": "design" } ] },
     { "id": "tesoreria", "path": "/tesoreria", "audience": "staff", "board": "Tesoreria.dc.html", "status": "design",
       "children": [
         { "id": "club-house", "path": "/tesoreria/club-house", "roles": ["responsabile-club-house"], "board": "Tesoreria-sottoaree.dc.html", "status": "design" },

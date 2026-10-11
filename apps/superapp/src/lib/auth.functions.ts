@@ -20,7 +20,7 @@ export interface SessionView {
   /** Where this person lands when no `next` is asked (session.ts landingFor). */
   landing: string;
   badge: string | null;
-  memberships: Array<{ organization: string; role: string }>;
+  memberships: Array<{ organizationId: string; organization: string; role: string }>;
 }
 
 const ANON: SessionView = { configured: false, user: null, roles: [], landing: "/aree", badge: null, memberships: [] };
@@ -35,6 +35,7 @@ export async function sessionView(): Promise<SessionView> {
   const ctx = await sb.rpc("scd_my_context");
   const memberships: Membership[] = Array.isArray(ctx.data)
     ? (ctx.data as Array<Record<string, unknown>>).map((m) => ({
+        organization_id: String(m["organization_id"] ?? ""),
         organization_slug: String(m["organization_slug"] ?? ""),
         role: String(m["role"] ?? ""),
         scope: m["scope"],
@@ -48,7 +49,7 @@ export async function sessionView(): Promise<SessionView> {
     roles: [...roles],
     landing: landingFor(roles),
     badge: sessionBadge(roles),
-    memberships: memberships.filter((m) => m.active).map((m) => ({ organization: m.organization_slug, role: m.role })),
+    memberships: memberships.filter((m) => m.active).map((m) => ({ organizationId: m.organization_id, organization: m.organization_slug, role: m.role })),
   };
 }
 

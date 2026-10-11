@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { FileText } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { FileText, Users } from "lucide-react";
 import { useMemo } from "react";
 
 import { Card, Chip, SourceLine, TeamTag, useRomeNow } from "@/components/scd/interior-ui";
@@ -93,7 +93,17 @@ function SegreteriaPage({ groups, events, sourceModifiedAt, preview }: { groups:
         </Card>
 
         <div className="flex min-w-0 flex-col gap-[18px] lg:col-span-2 xl:col-span-1">
-          <Card id="seg-tesseramenti" title="Tesseramenti" sub={`Dal Master Tesserati, solo conteggi, dato al ${itDate(TESSERATI.asOf)}.`}>
+          <Card
+            id="seg-tesseramenti"
+            title="Tesseramenti"
+            sub={`Dal Master Tesserati, solo conteggi, dato al ${itDate(TESSERATI.asOf)}.`}
+            aside={
+              <Link to="/segreteria/persone" className="scd-focus inline-flex h-10 items-center gap-2 rounded-[10px] bg-[var(--in-info)] px-3.5 text-[14.5px] font-bold text-white" data-testid="seg-persone-link">
+                <Users className="size-4" aria-hidden="true" />
+                Persone
+              </Link>
+            }
+          >
             <div className="grid grid-cols-3 gap-2 px-4 pb-3 sm:px-[18px]" data-testid="tesseramenti-tiles">
               <StatTile value={TESSERATI.byStatus["ATTIVO"] ?? 0} of={TESSERATI.records} label="atleti attivi su record" />
               <StatTile value={TESSERATI.figcPractice["COMPLETA"] ?? 0} of={TESSERATI.records} label="pratiche FIGC complete" />

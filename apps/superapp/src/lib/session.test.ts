@@ -5,12 +5,12 @@ import { isStaffSession, landingFor, safeNext, sessionBadge, sessionRolesFrom } 
 describe("session positions", () => {
   it("turns memberships into registry positions, ignoring inactive ones and unknown scope entries", () => {
     const roles = sessionRolesFrom([
-      { organization_slug: "scd", role: "DIRECTION", scope: {}, active: true },
-      { organization_slug: "scd", role: "MISTER", scope: { positions: ["responsabile-trasporti", "root", 3] }, active: true },
-      { organization_slug: "old", role: "SECRETARIAT", scope: {}, active: false },
+      { organization_id: "o1", organization_slug: "scd", role: "DIRECTION", scope: {}, active: true },
+      { organization_id: "o1", organization_slug: "scd", role: "MISTER", scope: { positions: ["responsabile-trasporti", "root", 3] }, active: true },
+      { organization_id: "o2", organization_slug: "old", role: "SECRETARIAT", scope: {}, active: false },
     ]);
     expect([...roles].sort()).toEqual(["direzione", "dirigenza", "mister", "responsabile-trasporti"]);
-    expect(sessionRolesFrom([{ organization_slug: "scd", role: "WHATEVER", scope: null, active: true }]).size).toBe(0);
+    expect(sessionRolesFrom([{ organization_id: "o1", organization_slug: "scd", role: "WHATEVER", scope: null, active: true }]).size).toBe(0);
   });
 
   it("knows staff from families and names the badge", () => {

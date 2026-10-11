@@ -126,7 +126,7 @@ describe("access screen content from the registry", () => {
 
 describe("work areas: real read-only pages behind the same access gate", () => {
   const routeFile = (path: string) =>
-    fileURLToPath(new URL(`../routes/${path.slice(1).replace(/^tesoreria\//, "tesoreria_.").replace(/\//g, ".")}.tsx`, import.meta.url));
+    fileURLToPath(new URL(`../routes/${path.slice(1).replace(/^(tesoreria|segreteria)\//, "$1_.").replace(/\//g, ".")}.tsx`, import.meta.url));
 
   it("are registry areas, distinct from the access-only list", () => {
     expect(new Set(WORK_AREA_IDS).size).toBe(WORK_AREA_IDS.length);
@@ -134,7 +134,7 @@ describe("work areas: real read-only pages behind the same access gate", () => {
       expect(findArea(id), id).toBeDefined();
       expect(ACCESS_SCREEN_IDS, id).not.toContain(id);
     }
-    expect([...WORK_AREA_IDS].sort()).toEqual(["biglietteria", "club-house", "crm", "infermeria", "magazzino", "magazzino-cassa", "mister", "organigramma", "pulmini", "segreteria", "tesoreria"]);
+    expect([...WORK_AREA_IDS].sort()).toEqual(["biglietteria", "club-house", "crm", "infermeria", "magazzino", "magazzino-cassa", "mister", "organigramma", "persone", "pulmini", "segreteria", "tesoreria"]);
   });
 
   it("each has a real route at its canonical path and is marked 'page', not 'access screen'", () => {

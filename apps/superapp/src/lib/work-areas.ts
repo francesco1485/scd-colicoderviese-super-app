@@ -23,7 +23,8 @@ export type WorkAreaId =
   | "magazzino-cassa"
   | "infermeria"
   | "mister"
-  | "organigramma";
+  | "organigramma"
+  | "persone";
 
 export interface DriveMaster {
   key: string;
@@ -54,6 +55,7 @@ export const DRIVE_MASTERS = {
   sgsManuale: { key: "sgsManuale", name: "C.U. n.18 SGS · Manuale Sistema di Qualità 2026", fileId: null, note: "regole in config/sgs-quality-system.v1.json" },
   organigrammaFigc: { key: "organigrammaFigc", name: "Organigramma FIGC (Portale Servizi)", fileId: null, note: "estratto del 24/09, privato" },
   elencoRuoli: { key: "elencoRuoli", name: "Elenco dirigenti e ruoli 2026/27", fileId: null, note: "privato, solo Direzione" },
+  supabase: { key: "supabase", name: "Supabase SCD · persone, ruoli e storico", fileId: null, note: "database del club (r59)" },
 } as const satisfies Record<string, DriveMaster>;
 
 export type MasterKey = keyof typeof DRIVE_MASTERS;
@@ -98,6 +100,12 @@ export const WORK_AREAS: Readonly<Record<WorkAreaId, WorkAreaConfig>> = {
     description: "Trasferte del weekend dal calendario ufficiale e flotta dal Master Flotta e Trasporti. Sola lettura.",
     sources: ["pulmini", "calendario", "inserimenti"],
     insertRoles: uniq([...registryRoles("pulmini"), "Segreteria"]),
+  },
+  persone: {
+    id: "persone", label: "Persone", path: pathOf("persone"), railId: "segreteria",
+    description: "Tesserati, staff e dirigenti del club con ruolo, squadra e storico: chi entra e chi esce resta scritto. Direzione e Segreteria.",
+    sources: ["supabase", "iscrizioni", "elencoRuoli", "r20", "inserimenti"],
+    insertRoles: ["Direzione", "Segreteria"],
   },
   segreteria: {
     id: "segreteria", label: "Segreteria", path: pathOf("segreteria"), railId: "segreteria",

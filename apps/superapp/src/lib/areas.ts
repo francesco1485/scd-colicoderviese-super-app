@@ -177,6 +177,7 @@ export const WORK_AREA_IDS: readonly string[] = [
   "infermeria",
   "mister",
   "organigramma",
+  "persone",
 ];
 
 /**
