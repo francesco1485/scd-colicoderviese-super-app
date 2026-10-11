@@ -13,6 +13,9 @@ import { ridersTotal, runsByEvent, runsByTraining, trainingKey, type PulminoRun 
 import { loadQuadro, type TrainingSlot } from "@/lib/public-snapshots";
 import { defaultDay, weekdayKey } from "@/lib/training-view";
 import { VanSeatMap, type TeamColor } from "@/components/scd/VanSeatMap";
+import { PeoplePins } from "@/components/scd/PeoplePins";
+import { peopleForArea, type StaffPerson } from "@/lib/staff-roster";
+import { getStaffEmails, getStaffRoster } from "@/lib/staff-roster.functions";
 import { PULMINI_FLEET, factStamp, nextWeekend, weekendMatches } from "@/lib/work-areas";
 
 /** Pulmini (board Pulmini.dc.html): away trips of the coming weekend and the Master Flotta facts. */
@@ -23,7 +26,8 @@ export const Route = createFileRoute("/pulmini")({
     const cal = loadCalendar();
     const runs = await getPulminiRuns();
     const quadro = loadQuadro();
-    return { gate, interior: true as const, groups: cal.groups, events: cal.events, sourceModifiedAt: cal.sourceModifiedAt, runs: runs.runs, runsAsOf: runs.asOf, quadroDays: quadro.days, quadroSlots: quadro.slots };
+    const [roster, emails] = await Promise.all([getStaffRoster(), getStaffEmails()]);
+    return { gate, interior: true as const, groups: cal.groups, events: cal.events, sourceModifiedAt: cal.sourceModifiedAt, runs: runs.runs, runsAsOf: runs.asOf, quadroDays: quadro.days, quadroSlots: quadro.slots, people: roster.people, emails };
   },
   head: ({ loaderData }) => workAreaHead("pulmini", loaderData?.gate),
   component: PulminiRoute,
@@ -33,14 +37,15 @@ function PulminiRoute() {
   const data = Route.useLoaderData();
   return (
     <WorkAreaGateView id="pulmini" gate={data.gate}>
-      {data.interior && <PulminiPage groups={data.groups} events={data.events} sourceModifiedAt={data.sourceModifiedAt} preview={data.gate.preview} runs={data.runs} runsAsOf={data.runsAsOf} quadroDays={data.quadroDays} quadroSlots={data.quadroSlots} />}
+      {data.interior && <PulminiPage groups={data.groups} events={data.events} sourceModifiedAt={data.sourceModifiedAt} preview={data.gate.preview} runs={data.runs} runsAsOf={data.runsAsOf} quadroDays={data.quadroDays} quadroSlots={data.quadroSlots} people={data.people} emails={data.emails} />}
     </WorkAreaGateView>
   );
 }
 
 const F = PULMINI_FLEET;
 
-function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf, quadroDays, quadroSlots }: { groups: PublicGroup[]; events: PublicEvent[]; sourceModifiedAt: string; preview: boolean; runs: PulminoRun[]; runsAsOf: string | null; quadroDays: string[]; quadroSlots: TrainingSlot[] }) {
+function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf, quadroDays, quadroSlots, people, emails }: { groups: PublicGroup[]; events: PublicEvent[]; sourceModifiedAt: string; preview: boolean; runs: PulminoRun[]; runsAsOf: string | null; quadroDays: string[]; quadroSlots: TrainingSlot[]; people: StaffPerson[]; emails: Record<string, string> }) {
+  const transportManagers = peopleForArea(people, "pulmini");
   const now = useRomeNow();
   const trips = useMemo(() => weekendMatches(events, now.date, true), [events, now.date]);
   const { sat, sun } = nextWeekend(now.date);
@@ -161,6 +166,11 @@ function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf
               <dt className="text-[var(--in-sub)]">Corse registrate</dt>
               <dd className="m-0 font-semibold">{runs.length === 0 ? "nessuna" : `${runs.length} (${weekdayRuns} in settimana, ${runs.length - weekdayRuns} trasferte)`}</dd>
             </dl>
+            {transportManagers.length > 0 && (
+              <div className="border-t border-[var(--in-line)] px-4 py-3 sm:px-[18px]">
+                <PeoplePins people={transportManagers} emails={emails} label="Responsabile trasporti" />
+              </div>
+            )}
             <SourceLine>{factStamp(F)}. Sul pulmino compare il nome dell'autista; i ragazzi sono figure senza nome.</SourceLine>
           </Card>
 

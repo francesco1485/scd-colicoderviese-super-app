@@ -1118,6 +1118,32 @@
         "implementationStatus": "ENGINE_STAGING",
         "duplicate_work": "DENY"
       }
+    },
+    {
+      "id": "UD-046",
+      "name": "OMINI_STAFF_PRESENCE_AND_ROSTER_TAP",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "negli allenamenti o a video fosse sempre possibile vedere un organigramma",
+        "omini visibili a tutti stile piramide o altro stile carino, se premi puoi accedere con credenziali per comunicare e vedere telefono e mail",
+        "sul pulmino nome autista per ogni pulmino e vicino il responsabile sempre a omino",
+        "vicino al campo o spogliatoio omino con nome dirigente e mister presenti, a loro solo mail",
+        "se si preme sullo stemma esce elenco ragazzi solo nome, se ha creato avatar uscirà suo avatar"
+      ],
+      "normalizedCommand": {
+        "rule": "Staff figures ('omini') with name and role are visible to everyone next to pitches, changing rooms and vans (driver on the van, transport manager beside it, team managers and coaches at the pitch). Tapping a figure shows contacts only after login: e-mail for coaches and managers, phone only where the role allows. Tapping the team crest lists the players by first name (avatar when created).",
+        "scope": "SUPER_APP",
+        "torreFloor": "0_HALL (allenamenti) + -2 (pulmini) + 1 (identità)",
+        "constraints": [
+          "adults only in the figures; the players' list (first names, avatars) opens only for logged-in members of that team or family, never on public pages",
+          "contacts come from the club list, shown only inside an open area; phones never on public pages",
+          "staff names come from ELENCO DIRIGENTI E RUOLI copied to the server env, no new register"
+        ],
+        "implementationStatus": "STAGING (figures with name and role on allenamenti and pulmini; contacts and players' list wait for the identity elevator)",
+        "duplicate_work": "DENY"
+      }
     }
   ],
   "completionGate": {

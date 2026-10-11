@@ -6,6 +6,9 @@ import { useRomeNow } from "@/components/scd/interior-ui";
 import { SNAPSHOT_BANNER } from "@/lib/public-snapshots";
 import { EMPTY_MESSAGE, fieldMatches, findSessions, loadQuadro, logoKeysFor, type TrainingSlot } from "@/lib/public-snapshots";
 import { defaultDay, isFree, minutesOf, pitchZones, slotStates, weekdayKey, type PitchZone, type SlotState } from "@/lib/training-view";
+import { peopleOnPitch, type StaffPerson } from "@/lib/staff-roster";
+import { getStaffEmails, getStaffRoster } from "@/lib/staff-roster.functions";
+import { PeoplePins } from "@/components/scd/PeoplePins";
 import juniores from "@/assets/scd/SCD_JUNIORES_2008_2009.png.asset.json";
 import piccoli from "@/assets/scd/SCD_PICCOLI_2020_2021.png.asset.json";
 import prima from "@/assets/scd/SCD_PRIMA_SQUADRA.png.asset.json";
@@ -36,7 +39,10 @@ export const Route = createFileRoute("/allenamenti")({
     const v = s["annata"];
     return typeof v === "string" || typeof v === "number" ? { annata: String(v).slice(0, 40) } : {};
   },
-  loader: () => loadQuadro(),
+  loader: async () => {
+    const [roster, emails] = await Promise.all([getStaffRoster(), getStaffEmails()]);
+    return { ...loadQuadro(), people: roster.people, emails };
+  },
   head: () => ({
     meta: [
       { title: "Allenamenti lun-ven — S.C.D. ColicoDerviese" },
@@ -55,7 +61,7 @@ const SHORT: Record<string, string> = { "LUNEDÌ": "Lun", "MARTEDÌ": "Mar", "ME
 const nice = (d: string) => d.charAt(0) + d.slice(1).toLowerCase();
 
 function Allenamenti() {
-  const { days, slots, rotations, note } = Route.useLoaderData();
+  const { days, slots, rotations, note, people, emails } = Route.useLoaderData();
   const now = useRomeNow();
   const [day, setDay] = useState(days[0] ?? "");
   const chosen = useRef(false);
@@ -193,7 +199,7 @@ function Allenamenti() {
           ) : (
             <ol className="m-0 mt-4 grid list-none gap-4 p-0">
               {daySlots.map((s, i) => (
-                <SlotCard key={s.timeLabel + s.start} slot={s} state={states[i] ?? "later"} zones1={pitchZones(rotations, day, week, s.start, "C1")} zones2={pitchZones(rotations, day, week, s.start, "C2")} />
+                <SlotCard key={s.timeLabel + s.start} slot={s} state={states[i] ?? "later"} zones1={pitchZones(rotations, day, week, s.start, "C1")} zones2={pitchZones(rotations, day, week, s.start, "C2")} people={peopleOnPitch(people, [s.fields.C1, s.fields.C2])} emails={emails} />
               ))}
             </ol>
           )}
@@ -224,6 +230,9 @@ function Allenamenti() {
               <li className="flex items-center gap-2">
                 <span className="inline-block h-4 w-6 rounded-[4px] border border-dashed border-white/60" /> zona, campo o spogliatoio libero
               </li>
+              <li className="flex items-center gap-2">
+                <span className="inline-block size-4 rounded-full bg-[#eef4ff] ring-2 ring-[#0457af]" /> omino: dirigente o mister presente; toccalo per i riferimenti
+              </li>
             </ul>
           </div>
         </aside>
@@ -239,7 +248,7 @@ const STATE_CHIP: Record<SlotState, { text: string; cls: string } | null> = {
   later: null,
 };
 
-function SlotCard({ slot, state, zones1, zones2 }: { slot: TrainingSlot; state: SlotState; zones1: PitchZone[] | null; zones2: PitchZone[] | null }) {
+function SlotCard({ slot, state, zones1, zones2, people, emails }: { slot: TrainingSlot; state: SlotState; zones1: PitchZone[] | null; zones2: PitchZone[] | null; people: StaffPerson[]; emails: Record<string, string> }) {
   const [from, to] = slot.timeLabel.split(/[–-]/);
   const chip = STATE_CHIP[state];
   return (
@@ -256,6 +265,11 @@ function SlotCard({ slot, state, zones1, zones2 }: { slot: TrainingSlot; state: 
         <Pitch name="Campo 1" text={slot.fields.C1} zones={zones1} />
         <Pitch name="Campo 2" text={slot.fields.C2} zones={zones2} small />
       </div>
+      {people.length > 0 && (
+        <div className="border-t border-[var(--scd-line)] px-3 pb-3">
+          <PeoplePins people={people} emails={emails} label="Dirigenti e mister in campo" />
+        </div>
+      )}
       <div className="grid grid-cols-4 gap-1.5 border-t border-[var(--scd-line)] bg-[#f5f9ff] p-3" aria-label="Spogliatoi">
         {ROOMS.map((r) => {
           const who = slot.rooms[r];
