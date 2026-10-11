@@ -95,16 +95,18 @@ function Allenamenti() {
 
   return (
     <main className="uv-page min-h-dvh pb-12 text-white" data-screen="allenamenti">
-      <header className="mx-auto max-w-[1200px] px-4 pt-6 lg:px-6" data-testid="allenamenti-header">
-        <p className="text-[14px] font-bold text-[var(--uv-gold)]">Centro sportivo Colico · lunedì–venerdì</p>
-        <h1 className="uv-underline mt-1 inline-block pb-[6px] font-uv text-[clamp(40px,11vw,64px)] uppercase leading-[0.88]">Allenamenti</h1>
-        <p className="mt-3 max-w-[60ch] text-[15px] leading-[1.4] text-[#cfe0ff]">Chi si allena, su quale campo e in che spogliatoio. Tocca un giorno o cerca la tua annata.</p>
-        <p role="note" className="mt-3 inline-block rounded-full bg-[#fff3c4] px-3 py-1 text-[12px] font-bold text-[#7a5200]">
+      <header className="mx-auto max-w-[1200px] px-4 pt-3 lg:px-6 lg:pt-6" data-testid="allenamenti-header">
+        <div className="flex flex-wrap items-end justify-between gap-x-3 gap-y-1">
+          <h1 className="font-uv text-[32px] uppercase leading-[0.9] lg:text-[64px]">Allenamenti</h1>
+          <p className="text-[13px] font-bold text-[var(--uv-gold)] lg:text-[14px]">Centro sportivo Colico · lun–ven</p>
+        </div>
+        <p className="mt-1.5 hidden max-w-[60ch] text-[15px] leading-[1.4] text-[#cfe0ff] lg:block">Chi si allena, su quale campo e in che spogliatoio. Tocca un giorno o cerca la tua annata.</p>
+        <p role="note" className="mt-2 inline-block rounded-full bg-[#fff3c4] px-2.5 py-[3px] text-[11.5px] font-bold text-[#7a5200]">
           {SNAPSHOT_BANNER}
         </p>
       </header>
 
-      <div className="sticky top-0 z-30 mt-4 bg-[var(--uv-night)]/95 px-4 py-3 backdrop-blur lg:top-[var(--pub-header-h)] lg:px-6">
+      <div className="sticky top-0 z-30 mt-2 bg-[var(--uv-night)]/95 px-4 py-3 backdrop-blur lg:top-[var(--pub-header-h)] lg:px-6">
         <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-2">
           <div className="grid w-full grid-cols-5 gap-1.5 sm:flex sm:w-auto" role="group" aria-label="Giorno">
             {days.map((d) => {

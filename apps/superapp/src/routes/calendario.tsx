@@ -117,9 +117,10 @@ function Calendario() {
   const visible = events.filter((e) => matchesFilter(e) && e.date >= from && e.date <= to);
   const trainingKey = useMemo(() => (selected ? trainingKeyFor(selected, QUADRO_SLOTS) : null), [selected]);
 
-  // Allenamenti dal quadro lun–ven: solo nella settimana corrente (fotografia 09/10/2026), sede Colico.
+  // Calendario = partite ed eventi; il quadro allenamenti è distinto (decisione Direzione, export 10/10).
+  // Gli allenamenti entrano qui solo per la PROPRIA annata scelta, settimana corrente, sede Colico.
   const trainingRows: Row[] = useMemo(() => {
-    if (view !== "settimana" || offset !== 0 || place === "fuori" || (selected && !trainingKey)) return [];
+    if (view !== "settimana" || offset !== 0 || place === "fuori" || !selected || !trainingKey) return [];
     return Array.from({ length: 7 }, (_, i) => addDaysIso(from, i)).flatMap((date): Row[] => {
       const list = trainingRowsFor(date, QUADRO_SLOTS, trainingKey ?? undefined);
       if (!list.length) return [];
@@ -260,6 +261,16 @@ function Calendario() {
               </button>
             )}
             {trainingRows.length > 0 && <p className="pt-[4px] text-[12px] text-[var(--scd-sub)]">Allenamenti dal quadro settimanale lun–ven (fotografia 09/10/2026, non live).</p>}
+            {!selected && (
+              <Link to="/allenamenti" className="mt-3 flex items-center gap-3 rounded-[12px] border border-[var(--scd-line)] bg-white px-3 py-2.5 text-[var(--scd-ink)]" data-testid="cal-training-link">
+                <ConeIcon size={24} className="shrink-0 text-[var(--scd-orange)]" />
+                <span className="min-w-0 flex-1">
+                  <b className="block text-[15px] leading-tight">Allenamenti della settimana</b>
+                  <small className="block text-[13px] text-[var(--scd-sub)]">Campi, orari e spogliatoi di tutte le annate</small>
+                </span>
+                <span aria-hidden="true" className="text-[18px] text-[var(--scd-blue)]">›</span>
+              </Link>
+            )}
           </section>
 
           {tab !== "Squadra" && (
