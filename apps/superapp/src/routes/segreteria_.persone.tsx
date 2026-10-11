@@ -76,6 +76,7 @@ function PersonePage({ initial, preview }: { initial: PeopleData; preview: boole
     <WorkAreaShell
       id="persone"
       preview={preview}
+      editable
       highlights={[
         { value: data.connected ? counts.active : null, label: "persone attive" },
         { value: data.connected ? counts.athletes : null, label: "atleti" },

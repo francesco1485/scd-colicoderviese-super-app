@@ -98,10 +98,15 @@ function SegreteriaPage({ groups, events, sourceModifiedAt, preview }: { groups:
             title="Tesseramenti"
             sub={`Dal Master Tesserati, solo conteggi, dato al ${itDate(TESSERATI.asOf)}.`}
             aside={
-              <Link to="/segreteria/persone" className="scd-focus inline-flex h-10 items-center gap-2 rounded-[10px] bg-[var(--in-info)] px-3.5 text-[14.5px] font-bold text-white" data-testid="seg-persone-link">
-                <Users className="size-4" aria-hidden="true" />
-                Persone
-              </Link>
+              <span className="flex flex-wrap gap-2">
+                <Link to="/segreteria/persone" className="scd-focus inline-flex h-10 items-center gap-2 rounded-[10px] bg-[var(--in-info)] px-3.5 text-[14.5px] font-bold text-white" data-testid="seg-persone-link">
+                  <Users className="size-4" aria-hidden="true" />
+                  Persone
+                </Link>
+                <Link to="/direzione/accessi" className="scd-focus inline-flex h-10 items-center gap-2 rounded-[10px] border border-[var(--in-info)] bg-white px-3.5 text-[14.5px] font-bold text-[var(--in-info)]" data-testid="seg-accessi-link">
+                  Accessi
+                </Link>
+              </span>
             }
           >
             <div className="grid grid-cols-3 gap-2 px-4 pb-3 sm:px-[18px]" data-testid="tesseramenti-tiles">

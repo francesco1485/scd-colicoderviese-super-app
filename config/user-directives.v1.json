@@ -1519,6 +1519,27 @@
         "implementationStatus": "IMPLEMENTED_STAGING",
         "duplicate_work": "DENY"
       }
+    },
+    {
+      "id": "UD-064",
+      "name": "PERSONALISED_ACCESS_ADMIN",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "lavori fino a quando c'è tutto per dare accessi e autorizzazioni personalizzati con già il 90 % del motore dentro"
+      ],
+      "normalizedCommand": {
+        "rule": "Direzione/Segreteria manage every login from /direzione/accessi: role, extra area positions, suspend/reactivate, give access to a person, revoke a person link, audit trail. Office roles/positions only by Direzione; no self-edit; at least one Direzione.",
+        "scope": "IDENTITY | PERMISSIONS",
+        "constraints": [
+          "database-enforced rules (scd_access_admin_guard)",
+          "links revoked, never deleted",
+          "every change audited"
+        ],
+        "implementationStatus": "IMPLEMENTED_STAGING",
+        "duplicate_work": "DENY"
+      }
     }
   ],
   "completionGate": {

@@ -57,12 +57,15 @@ export function WorkAreaShell({
   preview,
   highlights,
   note,
+  editable = false,
   children,
 }: {
   id: WorkAreaId;
   title?: string;
   preview: boolean;
   highlights?: readonly StripItem[];
+  /** True when the page writes to the club database itself: no "Sola lettura" chip, no Inserisci-to-sheet action. */
+  editable?: boolean;
   /** Short line next to the Inserisci action (snapshot dates, "sola lettura"). */
   note?: ReactNode;
   children: ReactNode;
@@ -82,10 +85,10 @@ export function WorkAreaShell({
         <MemberServicesBar area={id} />
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="m-0 flex min-w-0 flex-1 flex-wrap items-center gap-2 text-[14px] leading-snug text-[var(--in-sub)]">
-            <Chip tone="info">Sola lettura</Chip>
+            {editable ? <Chip tone="ok">Modifiche salvate nel database del club</Chip> : <Chip tone="info">Sola lettura</Chip>}
             {note && <span className="min-w-0">{note}</span>}
           </p>
-          <InsertAction id={id} />
+          {!editable && <InsertAction id={id} />}
         </div>
         {children}
       </div>

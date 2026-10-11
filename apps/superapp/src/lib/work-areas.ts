@@ -24,7 +24,8 @@ export type WorkAreaId =
   | "infermeria"
   | "mister"
   | "organigramma"
-  | "persone";
+  | "persone"
+  | "accessi";
 
 export interface DriveMaster {
   key: string;
@@ -105,6 +106,12 @@ export const WORK_AREAS: Readonly<Record<WorkAreaId, WorkAreaConfig>> = {
     id: "persone", label: "Persone", path: pathOf("persone"), railId: "segreteria",
     description: "Tesserati, staff e dirigenti del club con ruolo, squadra e storico: chi entra e chi esce resta scritto. Direzione e Segreteria.",
     sources: ["supabase", "iscrizioni", "elencoRuoli", "r20", "inserimenti"],
+    insertRoles: ["Direzione", "Segreteria"],
+  },
+  accessi: {
+    id: "accessi", label: "Accessi", path: pathOf("accessi"), railId: "direzione",
+    description: "Chi entra nell'app e cosa può fare: ruolo, aree su misura, sospensioni e storico delle modifiche. Direzione e Segreteria.",
+    sources: ["supabase", "inserimenti"],
     insertRoles: ["Direzione", "Segreteria"],
   },
   segreteria: {

@@ -77,6 +77,7 @@ function MisterPage({ data }: { data: Loaded }) {
       id="mister"
       title={team ? `Mister · ${team.tag}` : "Mister"}
       preview={data.gate.preview}
+      editable={data.roster.state === "ok"}
       highlights={[
         { value: team?.weeklySessions ?? null, label: `allenamenti ${team?.tag ?? ""} in settimana`.replace(/\s+/g, " ") },
         { value: squadKnown ? squad.length : null, label: squadKnown ? `in rosa ${team?.tag ?? ""}`.trim() : "rosa visibile dopo l'accesso" },
