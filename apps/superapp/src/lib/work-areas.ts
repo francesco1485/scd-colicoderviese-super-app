@@ -25,7 +25,8 @@ export type WorkAreaId =
   | "mister"
   | "organigramma"
   | "persone"
-  | "accessi";
+  | "accessi"
+  | "certificati";
 
 export interface DriveMaster {
   key: string;
@@ -106,6 +107,12 @@ export const WORK_AREAS: Readonly<Record<WorkAreaId, WorkAreaConfig>> = {
     id: "persone", label: "Persone", path: pathOf("persone"), railId: "segreteria",
     description: "Tesserati, staff e dirigenti del club con ruolo, squadra e storico: chi entra e chi esce resta scritto. Direzione e Segreteria.",
     sources: ["supabase", "iscrizioni", "elencoRuoli", "r20", "inserimenti"],
+    insertRoles: ["Direzione", "Segreteria"],
+  },
+  certificati: {
+    id: "certificati", label: "Certificati medici", path: pathOf("certificati"), railId: "segreteria",
+    description: "Scadenze dei certificati medici di ogni atleta, squadra per squadra: chi manca, chi è scaduto, chi è da controllare. Direzione e Segreteria.",
+    sources: ["supabase", "iscrizioni", "inserimenti"],
     insertRoles: ["Direzione", "Segreteria"],
   },
   accessi: {

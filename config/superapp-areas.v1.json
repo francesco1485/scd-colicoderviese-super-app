@@ -47,7 +47,10 @@
         { "id": "iscrizioni", "path": "/iscrizioni", "audience": "public", "flows_to": "segreteria", "status": "planned" },
         { "id": "persone", "path": "/segreteria/persone", "audience": "staff", "roles": ["direzione", "segreteria"], "role_map": { "direzione": "DIRECTION", "segreteria": "SECRETARIAT" },
           "sources": ["SUPABASE_SCD (scd_people, scd_structure_roles, scd_person_events, scd_person_consents — migration r59)"],
-          "features": ["elenco persone attive con ruolo, squadra e stato documenti", "scheda con storico entrate/uscite", "Inserisci persona (Direzione, Segreteria)", "Segna uscito con motivo: resta nello storico, sparisce dalle viste"], "status": "design" } ] },
+          "features": ["elenco persone attive con ruolo, squadra e stato documenti", "scheda con storico entrate/uscite", "Inserisci persona (Direzione, Segreteria)", "Segna uscito con motivo: resta nello storico, sparisce dalle viste"], "status": "design" },
+        { "id": "certificati", "path": "/segreteria/certificati", "audience": "staff", "roles": ["direzione", "segreteria"], "role_map": { "direzione": "DIRECTION", "segreteria": "SECRETARIAT" },
+          "sources": ["SUPABASE_SCD (scd_athletes.medical_certificate_* , scd_audit_events — migration r66)", "ISCRIZIONI_ATLETI_2026_27 (declared dates)"],
+          "features": ["elenco atleti per squadra con scadenza del certificato", "filtri: manca, scaduto, in scadenza, da controllare", "inserisci o correggi la data, tipo agonistico/non agonistico", "segna come controllato sul certificato cartaceo", "ogni modifica nello storico"], "status": "design" } ] },
     { "id": "tesoreria", "path": "/tesoreria", "audience": "staff", "board": "Tesoreria.dc.html", "status": "design",
       "children": [
         { "id": "club-house", "path": "/tesoreria/club-house", "roles": ["responsabile-club-house"], "board": "Tesoreria-sottoaree.dc.html", "status": "design" },

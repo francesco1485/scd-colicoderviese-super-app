@@ -103,6 +103,9 @@ function SegreteriaPage({ groups, events, sourceModifiedAt, preview }: { groups:
                   <Users className="size-4" aria-hidden="true" />
                   Persone
                 </Link>
+                <Link to="/segreteria/certificati" className="scd-focus inline-flex h-10 items-center gap-2 rounded-[10px] border border-[var(--in-info)] bg-white px-3.5 text-[14.5px] font-bold text-[var(--in-info)]" data-testid="seg-certificati-link">
+                  Certificati
+                </Link>
                 <Link to="/direzione/accessi" className="scd-focus inline-flex h-10 items-center gap-2 rounded-[10px] border border-[var(--in-info)] bg-white px-3.5 text-[14.5px] font-bold text-[var(--in-info)]" data-testid="seg-accessi-link">
                   Accessi
                 </Link>

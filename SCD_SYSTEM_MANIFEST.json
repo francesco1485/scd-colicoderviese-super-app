@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.27.6",
+    "version": "3.27.7",
     "effective_at": "2026-10-11",
     "status": "BINDING",
     "language": "it-IT",
@@ -818,6 +818,7 @@
         "secretariat_alerts_view": "scd_secretariat_alerts_v",
         "match_day_view": "scd_match_day_v",
         "medical_source_of_truth": "scd_athletes.medical_certificate_expires_at",
+        "medical_provenance": "scd_athletes.medical_certificate_status (DECLARED | VERIFIED), medical_certificate_checked_at/_by; office writes only via scd_set_certificate (audited in scd_audit_events) — supabase/migrations/20261011_r66_certificate_register.sql",
         "event_source_of_truth": "scd_events.id",
         "index_hardening": "supabase/migrations/20261002_r51_1_operative_index_hardening.sql",
         "rules": [

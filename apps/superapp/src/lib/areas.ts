@@ -179,6 +179,7 @@ export const WORK_AREA_IDS: readonly string[] = [
   "organigramma",
   "persone",
   "accessi",
+  "certificati",
 ];
 
 /**

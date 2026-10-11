@@ -200,3 +200,19 @@ prossimi impegni e "ci sarò" in primo piano). Desktop invariato.
   entrano nel perimetro di rosa e convocazioni (`scd_my_team_ids`); `scd_admin_account_teams`, `scd_admin_set_teams` (con storico).
   Prova annullata: utente senza ruoli in organigramma 0 → U15 + 2015 dopo l'assegnazione; con l'area coordinatore 10 squadre;
   squadra inesistente rifiutata. Scheda accesso: "Squadre in più". Visual QA telefono.
+
+## Registro certificati medici · 2026-10-11 sera (UD-065)
+
+- `VERIFIED` r66 (`20261011_r66_certificate_register.sql`): la data resta solo in `scd_athletes.medical_certificate_expires_at`;
+  nuove colonne di provenienza `medical_certificate_status` (DECLARED dal modulo d'iscrizione, VERIFIED se la segreteria ha visto il
+  cartaceo), `medical_certificate_kind` (agonistico / non agonistico), `medical_certificate_checked_at/_by`. Le 22 date della Prima
+  prese dal modulo diventano DECLARED. `scd_certificate_register` (lettura ufficio, niente recapiti) e `scd_set_certificate`
+  (solo Direzione/Segreteria, finestra da 3 anni fa a 2 anni avanti, storico in `scd_audit_events`).
+  Prova in transazione annullata: Direzione scrive e lo storico registra prima/dopo; Mister 0 righe e scrittura rifiutata;
+  anonimo senza permesso di esecuzione.
+- App: area registro `certificati` (`/segreteria/certificati`): filtri Da fare / Scaduti / Senza data / In scadenza / Da controllare,
+  avanzamento per squadra ("possono giocare oggi"), inserimento in riga con data, tipo e "Ho visto il certificato"; dopo il
+  salvataggio si apre l'atleta successivo. Link "Certificati" in Segreteria. Visual QA telefono e desktop con dati di prova
+  (nessun nome reale), nessuno scorrimento orizzontale.
+- Stato reale al 11/10: settore giovanile 0 date su 194 atleti; Prima 22 su 27 (13 scadute). Le convocazioni dei ragazzi
+  restano bloccate finché la segreteria non inserisce le date.

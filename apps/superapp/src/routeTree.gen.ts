@@ -55,6 +55,7 @@ import { Route as GestionaleOrganigrammaRouteImport } from './routes/gestionale.
 import { Route as GestionaleImpiantiRouteImport } from './routes/gestionale_.impianti'
 import { Route as QuadroIndexRouteImport } from './routes/quadro.index'
 import { Route as QuadroRotazioneCampiRouteImport } from './routes/quadro.rotazione-campi'
+import { Route as SegreteriaCertificatiRouteImport } from './routes/segreteria_.certificati'
 import { Route as SegreteriaPersoneRouteImport } from './routes/segreteria_.persone'
 import { Route as TesoreriaBiglietteriaRouteImport } from './routes/tesoreria_.biglietteria'
 import { Route as TesoreriaClubHouseRouteImport } from './routes/tesoreria_.club-house'
@@ -297,6 +298,11 @@ const QuadroRotazioneCampiRoute = QuadroRotazioneCampiRouteImport.update({
   path: '/quadro/rotazione-campi',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SegreteriaCertificatiRoute = SegreteriaCertificatiRouteImport.update({
+  id: '/segreteria_/certificati',
+  path: '/segreteria/certificati',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SegreteriaPersoneRoute = SegreteriaPersoneRouteImport.update({
   id: '/segreteria_/persone',
   path: '/segreteria/persone',
@@ -393,6 +399,7 @@ export interface FileRoutesByFullPath {
   '/gestionale/organigramma': typeof GestionaleOrganigrammaRoute
   '/gestionale/impianti': typeof GestionaleImpiantiRouteWithChildren
   '/quadro/rotazione-campi': typeof QuadroRotazioneCampiRoute
+  '/segreteria/certificati': typeof SegreteriaCertificatiRoute
   '/segreteria/persone': typeof SegreteriaPersoneRoute
   '/tesoreria/biglietteria': typeof TesoreriaBiglietteriaRoute
   '/tesoreria/club-house': typeof TesoreriaClubHouseRoute
@@ -450,6 +457,7 @@ export interface FileRoutesByTo {
   '/gestionale/mister': typeof GestionaleMisterRoute
   '/gestionale/organigramma': typeof GestionaleOrganigrammaRoute
   '/quadro/rotazione-campi': typeof QuadroRotazioneCampiRoute
+  '/segreteria/certificati': typeof SegreteriaCertificatiRoute
   '/segreteria/persone': typeof SegreteriaPersoneRoute
   '/tesoreria/biglietteria': typeof TesoreriaBiglietteriaRoute
   '/tesoreria/club-house': typeof TesoreriaClubHouseRoute
@@ -509,6 +517,7 @@ export interface FileRoutesById {
   '/gestionale/organigramma': typeof GestionaleOrganigrammaRoute
   '/gestionale_/impianti': typeof GestionaleImpiantiRouteWithChildren
   '/quadro/rotazione-campi': typeof QuadroRotazioneCampiRoute
+  '/segreteria_/certificati': typeof SegreteriaCertificatiRoute
   '/segreteria_/persone': typeof SegreteriaPersoneRoute
   '/tesoreria_/biglietteria': typeof TesoreriaBiglietteriaRoute
   '/tesoreria_/club-house': typeof TesoreriaClubHouseRoute
@@ -569,6 +578,7 @@ export interface FileRouteTypes {
     | '/gestionale/organigramma'
     | '/gestionale/impianti'
     | '/quadro/rotazione-campi'
+    | '/segreteria/certificati'
     | '/segreteria/persone'
     | '/tesoreria/biglietteria'
     | '/tesoreria/club-house'
@@ -626,6 +636,7 @@ export interface FileRouteTypes {
     | '/gestionale/mister'
     | '/gestionale/organigramma'
     | '/quadro/rotazione-campi'
+    | '/segreteria/certificati'
     | '/segreteria/persone'
     | '/tesoreria/biglietteria'
     | '/tesoreria/club-house'
@@ -684,6 +695,7 @@ export interface FileRouteTypes {
     | '/gestionale/organigramma'
     | '/gestionale_/impianti'
     | '/quadro/rotazione-campi'
+    | '/segreteria_/certificati'
     | '/segreteria_/persone'
     | '/tesoreria_/biglietteria'
     | '/tesoreria_/club-house'
@@ -743,6 +755,7 @@ export interface RootRouteChildren {
   GestionaleOrganigrammaRoute: typeof GestionaleOrganigrammaRoute
   GestionaleImpiantiRoute: typeof GestionaleImpiantiRouteWithChildren
   QuadroRotazioneCampiRoute: typeof QuadroRotazioneCampiRoute
+  SegreteriaCertificatiRoute: typeof SegreteriaCertificatiRoute
   SegreteriaPersoneRoute: typeof SegreteriaPersoneRoute
   TesoreriaBiglietteriaRoute: typeof TesoreriaBiglietteriaRoute
   TesoreriaClubHouseRoute: typeof TesoreriaClubHouseRoute
@@ -1079,6 +1092,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof QuadroRotazioneCampiRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/segreteria_/certificati': {
+      id: '/segreteria_/certificati'
+      path: '/segreteria/certificati'
+      fullPath: '/segreteria/certificati'
+      preLoaderRoute: typeof SegreteriaCertificatiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/segreteria_/persone': {
       id: '/segreteria_/persone'
       path: '/segreteria/persone'
@@ -1214,6 +1234,7 @@ const rootRouteChildren: RootRouteChildren = {
   GestionaleOrganigrammaRoute: GestionaleOrganigrammaRoute,
   GestionaleImpiantiRoute: GestionaleImpiantiRouteWithChildren,
   QuadroRotazioneCampiRoute: QuadroRotazioneCampiRoute,
+  SegreteriaCertificatiRoute: SegreteriaCertificatiRoute,
   SegreteriaPersoneRoute: SegreteriaPersoneRoute,
   TesoreriaBiglietteriaRoute: TesoreriaBiglietteriaRoute,
   TesoreriaClubHouseRoute: TesoreriaClubHouseRoute,

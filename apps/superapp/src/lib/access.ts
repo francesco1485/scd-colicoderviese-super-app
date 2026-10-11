@@ -17,6 +17,7 @@ const SUB_AREA_COPY: Readonly<Record<string, { label: string; icon: AreaIcon }>>
   "magazzino-cassa": { label: "Magazzino · cassa", icon: "box" },
   acquisti: { label: "Acquisti", icon: "file" },
   persone: { label: "Persone", icon: "users" },
+  certificati: { label: "Certificati medici", icon: "file" },
 };
 
 /** Plain Italian for the role ids used in the registry. */

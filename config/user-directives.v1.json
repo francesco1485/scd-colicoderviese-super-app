@@ -1540,6 +1540,28 @@
         "implementationStatus": "IMPLEMENTED_STAGING",
         "duplicate_work": "DENY"
       }
+    },
+    {
+      "id": "UD-065",
+      "name": "SECRETARIAT_CERTIFICATE_REGISTER",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "Allora cosa facciamo"
+      ],
+      "normalizedCommand": {
+        "rule": "User accepted the proposed plan (certificate dates for the youth sector first, so youth call-ups unlock). Direzione/Segreteria enter and check medical certificate expiry per athlete from /segreteria/certificati; dates from the registration form stay DECLARED until checked on paper.",
+        "scope": "SECRETARIAT | MEDICAL_CERTIFICATE_DATES",
+        "constraints": [
+          "single source scd_athletes.medical_certificate_expires_at",
+          "no certificate files or diagnoses stored",
+          "office-only audited writes",
+          "no phones, e-mails or fiscal codes in the list"
+        ],
+        "implementationStatus": "IMPLEMENTED_STAGING",
+        "duplicate_work": "DENY"
+      }
     }
   ],
   "completionGate": {
