@@ -1076,6 +1076,48 @@
         "implementationStatus": "RECORDED_DESIGN_PENDING",
         "duplicate_work": "DENY"
       }
+    },
+    {
+      "id": "UD-044",
+      "name": "CLEANING_LAUNDRY_MANAGER_REQUESTS",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "responsabile pulizie e lavanderia può fare richieste materiali e comunicare problematiche o disservizi, e gestire cose interne"
+      ],
+      "normalizedCommand": {
+        "rule": "The cleaning and laundry manager (Club House) can request materials, report problems and outages, and manage internal matters of the area from the app.",
+        "scope": "SUPER_APP",
+        "torreFloor": "-2_SERVIZI_INTERNI (club-house)",
+        "constraints": [
+          "requests are routed by the requests engine; stored and notified once the identity elevator is live"
+        ],
+        "implementationStatus": "ENGINE_STAGING",
+        "duplicate_work": "DENY"
+      }
+    },
+    {
+      "id": "UD-045",
+      "name": "EVERYONE_REQUESTS_VIA_FORM_OR_CHAT",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "tutti possono fare richieste dedicate alla loro area di competenza con semplici indicazioni o facoltà di scrivere liberamente a chatbot e lui interloquisce per loro e risolve la problematica"
+      ],
+      "normalizedCommand": {
+        "rule": "Anyone can make requests for their own area through simple guided forms or by writing freely to the chatbot, which converses, asks what is missing and routes the request to the right handler.",
+        "scope": "SUPER_APP",
+        "torreFloor": "0_HALL (chat) + all internal floors",
+        "constraints": [
+          "the chatbot routes and prepares, people act: it never promises a resolution it cannot verify",
+          "safeguarding never goes through requests: separate isolated channel",
+          "role scope server-side (communication matrix); until then the engine only prepares a ready-to-send message"
+        ],
+        "implementationStatus": "ENGINE_STAGING",
+        "duplicate_work": "DENY"
+      }
     }
   ],
   "completionGate": {

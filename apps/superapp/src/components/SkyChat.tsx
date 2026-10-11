@@ -30,7 +30,7 @@ export function SkyChat() {
   const [mood, setMood] = useState<Mood>("info");
   const [notify, setNotify] = useState(false);
   const [msgs, setMsgs] = useState<Msg[]>([
-    { role: "sky", text: "Ciao, sono Crovi, quello della biglietteria e della segreteria. Ti indirizzo su calendario, iscrizioni, sponsor, eventi o contatti." },
+    { role: "sky", text: "Ciao, sono Crovi, quello della biglietteria e della segreteria. Ti indirizzo su calendario, iscrizioni, sponsor, eventi o contatti. Se qualcosa manca o non funziona, scrivimelo in due parole: lo giro a chi se ne occupa." },
   ]);
   const ask = useServerFn(askSky);
   const endRef = useRef<HTMLDivElement>(null);
@@ -113,7 +113,7 @@ export function SkyChat() {
           </div>
           <div className="min-h-0 flex-1 space-y-2 overflow-y-auto bg-background p-3 sm:max-h-72">
             {msgs.map((m, i) => (
-              <div key={i} className={m.role === "user" ? "ml-auto w-fit max-w-[85%] rounded-xl bg-primary px-3 py-2 text-xs text-primary-foreground" : "w-fit max-w-[92%] rounded-xl bg-muted px-3 py-2 text-xs text-foreground"}>
+              <div key={i} className={m.role === "user" ? "ml-auto w-fit max-w-[85%] rounded-xl bg-primary px-3 py-2 text-xs text-primary-foreground" : "w-fit max-w-[92%] whitespace-pre-line rounded-xl bg-muted px-3 py-2 text-xs text-foreground"}>
                 {m.text}
                 {m.links && (
                   <div className="mt-2 flex flex-wrap gap-1">

@@ -3,6 +3,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { CLUB_CONTACTS } from "./catalog";
+import { KIND_LABEL, areaPath, classifyRequest, requestMessage } from "./requests";
 
 type M = { casa?: string; ospite?: string; golCasa?: number; golOspite?: number; dataLabel?: string; data?: string };
 
@@ -11,6 +12,9 @@ export type SkyReply = {
   mood: "info" | "success" | "alert";
   links?: { label: string; to: string }[];
 };
+
+/** Plain-words needs and problems (UD-045): routed by the requests engine before the public intents. */
+const REQUEST_RE = /\b(manca|mancano|finit[oaie]|servono|serve (un|una|altro|altra|il|la|più)|rott[oaie]|guast[oaie]|non funziona|senza (acqua|luce|corrente|riscaldamento)|disservizi|segnal[oa]|propong[oa]|proporre|richiesta|richiedo|vorrei (chiedere|proporre|segnalare)|aggiung(ere|ete)|spost(are|iamo)|cambi(are|amo)|sporc[oaie])\b/i;
 
 const INTENTS: { id: string; re: RegExp }[] = [
   { id: "safeguarding", re: /safeguard|abus|molest|violen|bullism|riservat/i },
@@ -31,6 +35,17 @@ export const askSky = createServerFn({ method: "POST" })
   .inputValidator((d: { message: string }) => z.object({ message: z.string().trim().min(1).max(400) }).parse(d))
   .handler(async ({ data }): Promise<SkyReply> => {
     const intent = INTENTS.find((i) => i.re.test(data.message))?.id;
+    if (intent !== "safeguarding" && REQUEST_RE.test(data.message)) {
+      const r = classifyRequest(data.message);
+      if (r.unclear) return { text: "Dimmi in due parole cosa serve e dove (per esempio: \"manca il sapone in lavanderia\" oppure \"spogliatoio 2 senza acqua calda\").", mood: "info" };
+      const ask = r.missing.length ? ` Per sistemarla mi manca: ${r.missing.join("; ")}.` : "";
+      const urgent = r.urgency === "alta" ? " La segno come urgente." : "";
+      return {
+        text: `Ho capito: ${KIND_LABEL[r.kind]} per ${r.handler}.${urgent}${ask} Finché l'accesso con il tuo ruolo non è attivo, copia questo testo e mandalo alla segreteria:\n\n${requestMessage(r)}`,
+        mood: r.urgency === "alta" ? "alert" : "success",
+        links: [{ label: "Area di competenza", to: areaPath(r.area) }, { label: "Contatti segreteria", to: "/contatti" }],
+      };
+    }
     const syncing = "Il dato non è ancora sincronizzato dal gestionale: appena disponibile lo trovi in Home.";
 
     if (intent === "allenamenti") {
