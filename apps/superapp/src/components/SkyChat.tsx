@@ -4,6 +4,7 @@ import { Send, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import croviAvatar from "@/assets/crovi/crovi-avatar-256.webp.asset.json";
+import { CAMEO_SEEN_KEY, CAMEO_VISIBLE_MS, cameoDelayMs, cameoLine, type CameoLine } from "@/lib/crovi-cameo";
 import { askSky, type SkyReply } from "@/lib/sky.functions";
 
 type Mood = SkyReply["mood"];
@@ -17,14 +18,18 @@ export function SkyMascot({ size = 52 }: { mood?: Mood; size?: number }) {
 const QUICK = ["Prossima partita", "Calendario", "Come mi iscrivo?", "Diventare sponsor", "Dove siete?"];
 
 export function SkyChat() {
-  const onCalendario = useRouterState({ select: (s) => s.location.pathname }) === "/calendario";
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const onCalendario = pathname === "/calendario";
+  const [cameo, setCameo] = useState<CameoLine | null>(null);
+  const pathRef = useRef(pathname);
+  pathRef.current = pathname;
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [mood, setMood] = useState<Mood>("info");
   const [notify, setNotify] = useState(false);
   const [msgs, setMsgs] = useState<Msg[]>([
-    { role: "sky", text: "Ciao, sono CROVI, l'assistente della SCD. Ti indirizzo su calendario, iscrizioni, sponsor, eventi o contatti." },
+    { role: "sky", text: "Ciao, sono Crovi, quello della biglietteria e della segreteria. Ti indirizzo su calendario, iscrizioni, sponsor, eventi o contatti." },
   ]);
   const ask = useServerFn(askSky);
   const endRef = useRef<HTMLDivElement>(null);
@@ -49,6 +54,26 @@ export function SkyChat() {
     const t = setTimeout(() => setNotify(true), 4000); // saluto iniziale = una notifica
     return () => clearTimeout(t);
   }, []);
+
+  // Crovi cameo (UD-026): una volta per visita sbuca accanto alla chat e dice una frase sulla pagina.
+  useEffect(() => {
+    let seen = false;
+    try { seen = sessionStorage.getItem(CAMEO_SEEN_KEY) === "1"; } catch { /* storage off: show once per page load */ }
+    if (seen) return;
+    const t = setTimeout(() => {
+      const line = cameoLine(pathRef.current);
+      if (!line) return;
+      setCameo(line);
+      try { sessionStorage.setItem(CAMEO_SEEN_KEY, "1"); } catch { /* ignore */ }
+    }, cameoDelayMs(Math.random()));
+    return () => clearTimeout(t);
+  }, []);
+  useEffect(() => {
+    if (!cameo) return;
+    const t = setTimeout(() => setCameo(null), CAMEO_VISIBLE_MS);
+    return () => clearTimeout(t);
+  }, [cameo]);
+  useEffect(() => { if (open) setCameo(null); }, [open]);
   useEffect(() => endRef.current?.scrollIntoView({ block: "end" }), [msgs, open]);
 
   async function send(text?: string) {
@@ -78,7 +103,7 @@ export function SkyChat() {
             <SkyMascot mood={mood} size={32} />
             <div className="flex-1">
               <p className="font-display text-sm font-bold uppercase">CROVI</p>
-              <p className="text-[0.7rem] opacity-80">assistente SCD · risposte guidate</p>
+              <p className="text-[0.7rem] opacity-80">biglietteria e segreteria SCD · risposte guidate</p>
             </div>
             <button aria-label="Chiudi CROVI" onClick={() => { setOpen(false); toggleRef.current?.focus(); }} className="flex size-11 items-center justify-center rounded-md">
               <X className="size-4" />
@@ -117,6 +142,25 @@ export function SkyChat() {
               <Send className="size-4" />
             </button>
           </div>
+        </div>
+      )}
+      {cameo && !open && (
+        <div role="status" aria-live="polite" className="crovi-cameo flex items-end gap-1" data-testid="crovi-cameo">
+          <div className="mb-10 max-w-[13.5rem] rounded-2xl rounded-br-sm border border-border bg-card px-3 py-2.5 text-[0.8rem] leading-snug text-foreground shadow-premium">
+            <p className="m-0">{cameo.text}</p>
+            <div className="mt-2 flex items-center gap-2">
+              <button
+                onClick={() => { const q = cameo.ask; setCameo(null); setOpen(true); setNotify(false); void send(q); }}
+                className="rounded-full bg-accent px-3 py-1 text-[0.75rem] font-semibold text-accent-foreground"
+              >
+                Chiedi a Crovi
+              </button>
+              <button onClick={() => setCameo(null)} aria-label="Chiudi il messaggio di Crovi" className="flex size-8 items-center justify-center rounded-full text-muted-foreground">
+                <X className="size-3.5" />
+              </button>
+            </div>
+          </div>
+          <img src="/media/crovi/crovi-peek.webp" alt="Crovi saluta" width={112} height={148} className="crovi-peek-img h-[148px] w-auto select-none" draggable={false} />
         </div>
       )}
       <button

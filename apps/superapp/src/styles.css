@@ -184,8 +184,13 @@
 .sky-idle { animation: sky-idle 4s ease-in-out infinite; }
 .sky-bounce { animation: sky-bounce 1.2s ease-in-out infinite; }
 .sky-panel { animation: sky-pop .22s ease-out; transform-origin: bottom right; }
+/* Crovi cameo: sbuca dal bordo, saluta, poi resta fermo */
+@keyframes crovi-in { 0% { opacity: 0; transform: translateX(60px) } 60% { opacity: 1; transform: translateX(-6px) } 100% { opacity: 1; transform: none } }
+@keyframes crovi-wave { 0%,100% { transform: rotate(0) } 25% { transform: rotate(-4deg) } 50% { transform: rotate(2deg) } 75% { transform: rotate(-2deg) } }
+.crovi-cameo { animation: crovi-in .6s cubic-bezier(.2,.8,.2,1) both; }
+.crovi-peek-img { transform-origin: bottom center; animation: crovi-wave 1.4s ease-in-out .6s 2; }
 @media (prefers-reduced-motion: reduce) {
-  .sky-idle, .sky-bounce, .sky-panel { animation: none; }
+  .sky-idle, .sky-bounce, .sky-panel, .crovi-cameo, .crovi-peek-img { animation: none; }
 }
 
 /* ---------- Super App: integrazione moduli CORE/GROW nella shell unica ---------- */
