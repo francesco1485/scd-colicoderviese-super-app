@@ -1427,6 +1427,30 @@
           "NO_DUPLICATE_INITIATIVES",
           "SOURCE_LINEAGE_REQUIRED"
         ]
+      },
+      {
+        "id": "PRENOTAZIONI_IMPIANTI_SHEET",
+        "kind": "GOOGLE_SHEET",
+        "trust": "INTERNAL_VERIFIED",
+        "status": "ACTIVE_MASTER",
+        "title": "17 - PRENOTAZIONI IMPIANTI 2026-27 (master)",
+        "resource_id": "14Idop9OuCWGMaxVgiQgGSpM5E7mNaO6SL6kt_i_lSVY",
+        "owner": ["Direzione", "Responsabile attività di base"],
+        "approved_by": "Francesco, 2026-10-11",
+        "authority_domains": [
+          "FACILITY_BOOKINGS",
+          "PITCH_RENTALS",
+          "FACILITY_EVENTS",
+          "COUNCIL_NOTICES"
+        ],
+        "columns": ["ID", "Data", "Ora inizio", "Ora fine", "Sede", "ID spazio", "Zona", "Tipo", "Squadra o soggetto", "Formato", "Spogliatoi", "Ingresso", "Stato", "Richiesto da", "Approvato da", "Importo affitto", "Contratto o link", "Avviso Comune", "Note", "Origine"],
+        "consumers": ["/gestionale/impianti"],
+        "rules": [
+          "APP_COPIES_ROWS_ONLY_NO_SERVER_WRITES",
+          "STATUS_PROPOSTA_UNTIL_DIRECTION_APPROVAL",
+          "NO_PERSONAL_DATA_IN_SUBJECT_FIELD",
+          "SPACE_IDS_FROM_SEDI_E_IMPIANTI_MASTER"
+        ]
       }
     ],
     "conflict_resolution": [

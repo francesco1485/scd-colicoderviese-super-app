@@ -28,8 +28,13 @@ describe("access screens: one per reserved area without a page", () => {
     for (const id of ACCESS_SCREEN_IDS) expect(ownedByParallel(findArea(id)!.path), id).toBe(false);
     // /quadro and /gestionale are now real pages (item 4); access screens still never claim them.
     for (const id of ACCESS_SCREEN_IDS) expect(["/quadro", "/gestionale"]).not.toContain(findArea(id)!.path);
-    expect(deferredOwner("/gestionale/impianti")).toMatch(/item 4/);
-    expect(deferredOwner("/quadro/rotazione-campi")).toMatch(/item 4/);
+    // Item 3 is live: /gestionale/impianti and its two aliases are pages, no longer deferred.
+    for (const p of ["/gestionale/impianti", "/calendario/rotazione-campi", "/quadro/rotazione-campi"]) {
+      expect(deferredOwner(p), p).toBeNull();
+      expect(routePaths.has(p), p).toBe(true);
+    }
+    expect(areaLink("impianti-campi")).toMatchObject({ href: "/gestionale/impianti", direct: true, access: false });
+    expect(deferredOwner("/gestionale/mister")).toMatch(/item 4/);
   });
 
   it("resolves every registry area to a page, an access screen or a declared owner", () => {

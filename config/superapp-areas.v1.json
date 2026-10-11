@@ -14,13 +14,18 @@
     { "id": "home-oggi", "path": "/oggi", "audience": "public", "board": "Home-oggi.dc.html", "sources": ["Open-Meteo (to connect)", "licensed news feed (to choose)", "Master Tornei & Iniziative"], "status": "design" },
     { "id": "calendario", "path": "/calendario", "audience": "public", "board": "Calendario.dc.html", "sources": ["Master Calendario"], "status": "design",
       "children": [
-        { "id": "rotazione-campi", "path": "/calendario/rotazione-campi", "audience": "staff", "roles": ["responsabile-campi", "direzione"], "board": "Rotazione-campi.dc.html", "sources": ["ROTAZIONE_CAMPI_SCD_COLICODERVIESE_17OTT2026_31GEN2027"], "status": "design",
-          "rules": { "pitch_colico_c1": "100x60 m synthetic", "capacity": { "11v11": 1, "9v9": 2, "7v7": 2, "5v5": 3 } } }
+        { "id": "rotazione-campi", "path": "/calendario/rotazione-campi", "alias_of": "impianti-campi", "status": "design" }
       ] },
     { "id": "quadro", "path": "/quadro", "audience": "staff", "board": "Quadro-settimanale.dc.html", "sources": ["Quadro settimanale allenamenti 2026/27"], "status": "design",
-      "children": [ { "id": "quadro-rotazione-campi", "path": "/quadro/rotazione-campi", "alias_of": "rotazione-campi", "status": "design" } ] },
+      "children": [ { "id": "quadro-rotazione-campi", "path": "/quadro/rotazione-campi", "alias_of": "impianti-campi", "status": "design" } ] },
     { "id": "gestionale", "path": "/gestionale", "audience": "staff", "board": "Gestionale.dc.html", "sources": ["R20", "Master Calendario", "Quadro settimanale"], "status": "design",
       "children": [
+        { "id": "impianti-campi", "path": "/gestionale/impianti", "audience": "staff", "roles": ["presidente", "direttore-generale", "responsabile-attivita-base", "coordinatore-attivita-sportiva"],
+          "role_map": { "presidente": "DIRECTION", "direttore-generale": "DIRECTION", "responsabile-attivita-base": "MANAGER", "coordinatore-attivita-sportiva": "MANAGER" },
+          "access_note": "positions decided by Francesco 2026-10-11; enforced only when the R20 login is live",
+          "board": "Rotazione-campi.dc.html", "sources": ["Master Calendario", "Quadro settimanale allenamenti 2026/27", "ROTAZIONE_CAMPI_SCD_COLICODERVIESE_17OTT2026_31GEN2027 (to connect)"],
+          "features": ["mappa Colico e Dervio", "simulazione rotazioni (nessuna gara spostata davvero)", "ipotesi di prenotazione solo nel browser", "Chiedi a Sky deterministico"], "status": "design",
+          "rules": { "pitch_colico_c1": "100x60 m synthetic", "capacity": { "11v11": 1, "9v9": 2, "7v7": 2, "5v5": 3 } } },
         { "id": "mister", "path": "/gestionale/mister", "roles": ["mister", "dirigente-annata"], "board": "Mister.dc.html", "features": ["convocazioni con conferma lettura", "lavagna e moduli", "video", "chiamata di squadra (Teams/Meet da collegare)"], "status": "design" },
         { "id": "mappa", "path": "/gestionale/mappa", "audience": "staff", "board": "Mappa-centro.dc.html", "sources": ["16 - SEDI E IMPIANTI", "Quadro settimanale allenamenti 2026/27", "config/scd-facilities.v1.json"], "features": ["mappa 2D di Colico e Dervio", "aperto o chiuso adesso", "ingressi e chi può entrare", "campi e spogliatoi in uso per fascia oraria", "proposta di correzione per il registro INSERIMENTI"], "status": "design" }
       ] },

@@ -8,6 +8,7 @@ import {
   AREA_REGISTRY,
   CURRENT_HREF,
   INTERIOR_RAIL,
+  MANIFEST_ROLES,
   areaLink,
   canSeeArea,
   findArea,
@@ -74,6 +75,33 @@ describe("area registry (config/superapp-areas.v1.json)", () => {
   });
 });
 
+describe("impianti: club positions mapped to manifest roles", () => {
+  const manifest = JSON.parse(readFileSync(repo("SCD_SYSTEM_MANIFEST.json"), "utf8")) as { identity_and_access: { roles: string[] } };
+
+  it("keeps MANIFEST_ROLES equal to the manifest roles (no new roles)", () => {
+    expect([...MANIFEST_ROLES]).toEqual(manifest.identity_and_access.roles);
+  });
+
+  it("lists the four positions decided on 2026-10-11, each mapped to an existing role", () => {
+    const imp = findArea("impianti-campi")!;
+    expect(imp.path).toBe("/gestionale/impianti");
+    expect(imp.parentId).toBe("gestionale");
+    expect(imp.roles).toEqual(["presidente", "direttore-generale", "responsabile-attivita-base", "coordinatore-attivita-sportiva"]);
+    expect(imp.role_map).toEqual({ presidente: "DIRECTION", "direttore-generale": "DIRECTION", "responsabile-attivita-base": "MANAGER", "coordinatore-attivita-sportiva": "MANAGER" });
+    expect(imp.access_note).toMatch(/R20 login is live/);
+    expect(findArea("rotazione-campi")?.alias_of).toBe("impianti-campi");
+    expect(findArea("quadro-rotazione-campi")?.alias_of).toBe("impianti-campi");
+  });
+
+  it("rejects unmapped positions and unknown manifest roles", () => {
+    const bad: AreaNode[] = [{ id: "x", path: "/x", status: "design", roles: ["a", "b"], role_map: { a: "BOSS", c: "MANAGER" } }];
+    const problems = validateAreas(bad);
+    expect(problems.some((p) => p.includes('not a manifest role'))).toBe(true);
+    expect(problems.some((p) => p.includes('"c" that is not in its roles'))).toBe(true);
+    expect(problems.some((p) => p.includes('role "b" without a manifest mapping'))).toBe(true);
+  });
+});
+
 describe("links that work today", () => {
   it("points every current link to a real route (no 404 from the menu)", () => {
     for (const [id, href] of Object.entries(CURRENT_HREF)) {
@@ -134,6 +162,7 @@ describe("interior rail filtered by role", () => {
     expect(mister).toContain("quadro");
     expect(mister).not.toContain("pulmini");
     expect(mister).not.toContain("rotazione-campi");
+    expect(mister).not.toContain("impianti-campi");
     const autista = railFor(new Set(["autista"]));
     expect(autista.flatMap((g) => g.items.map((i) => i.id))).toContain("pulmini");
     expect(railFor(new Set(), [{ title: "Solo", items: [{ id: "pulmini", label: "Pulmini", icon: "bus" }] }])).toEqual([]);

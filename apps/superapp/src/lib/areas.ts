@@ -31,8 +31,18 @@ export interface AreaNode {
   blocker?: string;
   /** Ordered steps of a workflow area (e.g. acquisti). */
   flow?: readonly string[];
+  /**
+   * Club positions (ABAC attribute) mapped onto the coarse roles of
+   * SCD_SYSTEM_MANIFEST.json `identity_and_access.roles`. No new manifest roles.
+   */
+  role_map?: Readonly<Record<string, string>>;
+  /** Plain note on how and when the access rule is enforced. */
+  access_note?: string;
   children?: readonly AreaNode[];
 }
+
+/** Coarse roles of SCD_SYSTEM_MANIFEST.json (checked against the manifest in areas.test.ts). */
+export const MANIFEST_ROLES: readonly string[] = ["USER_BASE", "FAMILY", "ATHLETE", "MISTER", "STAFF", "MANAGER", "SECRETARIAT", "REGISTRATION", "TOURNAMENTS", "DIRECTION", "ADMIN", "SYSTEM"];
 
 export interface AreaRegistry {
   schema: string;
@@ -93,6 +103,13 @@ export function validateAreas(nodes: readonly AreaNode[] = AREA_REGISTRY.areas, 
     if (a.alias_of && !flat.some((p) => p.id === a.alias_of && !p.alias_of)) problems.push(`"${a.id}" is an alias of a missing area "${a.alias_of}"`);
     if (a.flows_to && !flat.some((p) => p.id === a.flows_to)) problems.push(`"${a.id}" flows to a missing area "${a.flows_to}"`);
     if (a.used_by) for (const u of a.used_by) if (!flat.some((p) => p.id === u)) problems.push(`"${a.id}" is used by a missing area "${u}"`);
+    if (a.role_map) {
+      for (const [pos, role] of Object.entries(a.role_map)) {
+        if (!a.roles?.includes(pos)) problems.push(`"${a.id}" maps position "${pos}" that is not in its roles`);
+        if (!MANIFEST_ROLES.includes(role)) problems.push(`"${a.id}" maps "${pos}" to "${role}", not a manifest role`);
+      }
+      for (const r of a.roles ?? []) if (!(r in a.role_map)) problems.push(`"${a.id}" has role "${r}" without a manifest mapping`);
+    }
     if (boards && a.board && !boards.includes(a.board) && !PRIVATE_BOARDS.includes(a.board)) problems.push(`board "${a.board}" of "${a.id}" is not in the Visual Master`);
   }
   for (const [id, n] of ids) if (n > 1) problems.push(`id "${id}" is used ${n} times`);
@@ -117,6 +134,9 @@ const EXPLICIT_HREF: Readonly<Record<string, string>> = {
   quadro: "/quadro",
   mappa: "/gestionale/mappa",
   impianti: "/impianti",
+  "impianti-campi": "/gestionale/impianti",
+  "rotazione-campi": "/gestionale/impianti",
+  "quadro-rotazione-campi": "/gestionale/impianti",
 };
 
 /**
@@ -149,7 +169,6 @@ export const ACCESS_SCREEN_IDS: readonly string[] = [
  * covers the sub-paths too, so children added by the owning branch stay owned.
  */
 export const DEFERRED_PATHS: Readonly<Record<string, string>> = {
-  "/calendario/rotazione-campi": "item 3 · rotazione campi",
   "/quadro": "item 4 · quadro settimanale",
   "/gestionale": "item 4 · gestionale",
   "/oggi": "item 5 · public today",
@@ -161,6 +180,9 @@ export const DEFERRED_PATHS: Readonly<Record<string, string>> = {
 
 /** Owner of a deferred path (exact match or parent prefix), or null. */
 export function deferredOwner(path: string): string | null {
+  // A path with a live page today is not deferred, even under an owned prefix.
+  const area = findAreaByPath(path);
+  if (area && CURRENT_HREF[area.id]) return null;
   for (const [prefix, owner] of Object.entries(DEFERRED_PATHS)) {
     if (path === prefix || path.startsWith(`${prefix}/`)) return owner;
   }
@@ -283,7 +305,7 @@ export const INTERIOR_RAIL: readonly RailGroup[] = [
       { id: "gestionale", label: "Gestionale sportivo", icon: "grid" },
       { id: "quadro", label: "Quadro settimanale", icon: "table" },
       { id: "calendario", label: "Calendario annuale", icon: "calendar" },
-      { id: "rotazione-campi", label: "Rotazione campi", icon: "grid" },
+      { id: "impianti-campi", label: "Impianti e campi", icon: "grid" },
       { id: "mappa", label: "Mappa impianti", icon: "map" },
       { id: "pulmini", label: "Pulmini", icon: "bus" },
     ],

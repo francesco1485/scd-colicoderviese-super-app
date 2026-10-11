@@ -34,6 +34,7 @@ import { Route as SponsorRouteImport } from './routes/sponsor'
 import { Route as TesoreriaRouteImport } from './routes/tesoreria'
 import { Route as AreeIndexRouteImport } from './routes/aree.index'
 import { Route as AreeAreaRouteImport } from './routes/aree.$area'
+import { Route as CalendarioRotazioneCampiRouteImport } from './routes/calendario_.rotazione-campi'
 import { Route as CoreIndexRouteImport } from './routes/core.index'
 import { Route as CoreAtletaRouteImport } from './routes/core.atleta'
 import { Route as CoreFamigliaRouteImport } from './routes/core.famiglia'
@@ -44,7 +45,9 @@ import { Route as EventiIndexRouteImport } from './routes/eventi.index'
 import { Route as EventiChristmasLarioCupRouteImport } from './routes/eventi.christmas-lario-cup'
 import { Route as GestionaleIndexRouteImport } from './routes/gestionale.index'
 import { Route as GestionaleMappaRouteImport } from './routes/gestionale.mappa'
+import { Route as GestionaleImpiantiRouteImport } from './routes/gestionale_.impianti'
 import { Route as QuadroIndexRouteImport } from './routes/quadro.index'
+import { Route as QuadroRotazioneCampiRouteImport } from './routes/quadro.rotazione-campi'
 import { Route as TesoreriaBiglietteriaRouteImport } from './routes/tesoreria_.biglietteria'
 import { Route as TesoreriaClubHouseRouteImport } from './routes/tesoreria_.club-house'
 import { Route as TesoreriaMagazzinoRouteImport } from './routes/tesoreria_.magazzino'
@@ -174,6 +177,12 @@ const AreeAreaRoute = AreeAreaRouteImport.update({
   path: '/aree/$area',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CalendarioRotazioneCampiRoute =
+  CalendarioRotazioneCampiRouteImport.update({
+    id: '/calendario_/rotazione-campi',
+    path: '/calendario/rotazione-campi',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const CoreIndexRoute = CoreIndexRouteImport.update({
   id: '/core/',
   path: '/core/',
@@ -224,9 +233,19 @@ const GestionaleMappaRoute = GestionaleMappaRouteImport.update({
   path: '/gestionale/mappa',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GestionaleImpiantiRoute = GestionaleImpiantiRouteImport.update({
+  id: '/gestionale_/impianti',
+  path: '/gestionale/impianti',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const QuadroIndexRoute = QuadroIndexRouteImport.update({
   id: '/quadro/',
   path: '/quadro/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QuadroRotazioneCampiRoute = QuadroRotazioneCampiRouteImport.update({
+  id: '/quadro/rotazione-campi',
+  path: '/quadro/rotazione-campi',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TesoreriaBiglietteriaRoute = TesoreriaBiglietteriaRouteImport.update({
@@ -270,6 +289,7 @@ export interface FileRoutesByFullPath {
   '/sponsor': typeof SponsorRoute
   '/tesoreria': typeof TesoreriaRoute
   '/aree/$area': typeof AreeAreaRoute
+  '/calendario/rotazione-campi': typeof CalendarioRotazioneCampiRoute
   '/core/atleta': typeof CoreAtletaRoute
   '/core/famiglia': typeof CoreFamigliaRoute
   '/core/impianti-calendari': typeof CoreImpiantiCalendariRoute
@@ -277,6 +297,8 @@ export interface FileRoutesByFullPath {
   '/direzione/acquisti': typeof DirezioneAcquistiRoute
   '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
   '/gestionale/mappa': typeof GestionaleMappaRoute
+  '/gestionale/impianti': typeof GestionaleImpiantiRoute
+  '/quadro/rotazione-campi': typeof QuadroRotazioneCampiRoute
   '/tesoreria/biglietteria': typeof TesoreriaBiglietteriaRoute
   '/tesoreria/club-house': typeof TesoreriaClubHouseRoute
   '/tesoreria/magazzino': typeof TesoreriaMagazzinoRoute
@@ -311,6 +333,7 @@ export interface FileRoutesByTo {
   '/sponsor': typeof SponsorRoute
   '/tesoreria': typeof TesoreriaRoute
   '/aree/$area': typeof AreeAreaRoute
+  '/calendario/rotazione-campi': typeof CalendarioRotazioneCampiRoute
   '/core/atleta': typeof CoreAtletaRoute
   '/core/famiglia': typeof CoreFamigliaRoute
   '/core/impianti-calendari': typeof CoreImpiantiCalendariRoute
@@ -318,6 +341,8 @@ export interface FileRoutesByTo {
   '/direzione/acquisti': typeof DirezioneAcquistiRoute
   '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
   '/gestionale/mappa': typeof GestionaleMappaRoute
+  '/gestionale/impianti': typeof GestionaleImpiantiRoute
+  '/quadro/rotazione-campi': typeof QuadroRotazioneCampiRoute
   '/tesoreria/biglietteria': typeof TesoreriaBiglietteriaRoute
   '/tesoreria/club-house': typeof TesoreriaClubHouseRoute
   '/tesoreria/magazzino': typeof TesoreriaMagazzinoRoute
@@ -353,6 +378,7 @@ export interface FileRoutesById {
   '/sponsor': typeof SponsorRoute
   '/tesoreria': typeof TesoreriaRoute
   '/aree/$area': typeof AreeAreaRoute
+  '/calendario_/rotazione-campi': typeof CalendarioRotazioneCampiRoute
   '/core/atleta': typeof CoreAtletaRoute
   '/core/famiglia': typeof CoreFamigliaRoute
   '/core/impianti-calendari': typeof CoreImpiantiCalendariRoute
@@ -360,6 +386,8 @@ export interface FileRoutesById {
   '/direzione_/acquisti': typeof DirezioneAcquistiRoute
   '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
   '/gestionale/mappa': typeof GestionaleMappaRoute
+  '/gestionale_/impianti': typeof GestionaleImpiantiRoute
+  '/quadro/rotazione-campi': typeof QuadroRotazioneCampiRoute
   '/tesoreria_/biglietteria': typeof TesoreriaBiglietteriaRoute
   '/tesoreria_/club-house': typeof TesoreriaClubHouseRoute
   '/tesoreria_/magazzino': typeof TesoreriaMagazzinoRoute
@@ -396,6 +424,7 @@ export interface FileRouteTypes {
     | '/sponsor'
     | '/tesoreria'
     | '/aree/$area'
+    | '/calendario/rotazione-campi'
     | '/core/atleta'
     | '/core/famiglia'
     | '/core/impianti-calendari'
@@ -403,6 +432,8 @@ export interface FileRouteTypes {
     | '/direzione/acquisti'
     | '/eventi/christmas-lario-cup'
     | '/gestionale/mappa'
+    | '/gestionale/impianti'
+    | '/quadro/rotazione-campi'
     | '/tesoreria/biglietteria'
     | '/tesoreria/club-house'
     | '/tesoreria/magazzino'
@@ -437,6 +468,7 @@ export interface FileRouteTypes {
     | '/sponsor'
     | '/tesoreria'
     | '/aree/$area'
+    | '/calendario/rotazione-campi'
     | '/core/atleta'
     | '/core/famiglia'
     | '/core/impianti-calendari'
@@ -444,6 +476,8 @@ export interface FileRouteTypes {
     | '/direzione/acquisti'
     | '/eventi/christmas-lario-cup'
     | '/gestionale/mappa'
+    | '/gestionale/impianti'
+    | '/quadro/rotazione-campi'
     | '/tesoreria/biglietteria'
     | '/tesoreria/club-house'
     | '/tesoreria/magazzino'
@@ -478,6 +512,7 @@ export interface FileRouteTypes {
     | '/sponsor'
     | '/tesoreria'
     | '/aree/$area'
+    | '/calendario_/rotazione-campi'
     | '/core/atleta'
     | '/core/famiglia'
     | '/core/impianti-calendari'
@@ -485,6 +520,8 @@ export interface FileRouteTypes {
     | '/direzione_/acquisti'
     | '/eventi/christmas-lario-cup'
     | '/gestionale/mappa'
+    | '/gestionale_/impianti'
+    | '/quadro/rotazione-campi'
     | '/tesoreria_/biglietteria'
     | '/tesoreria_/club-house'
     | '/tesoreria_/magazzino'
@@ -520,6 +557,7 @@ export interface RootRouteChildren {
   SponsorRoute: typeof SponsorRoute
   TesoreriaRoute: typeof TesoreriaRoute
   AreeAreaRoute: typeof AreeAreaRoute
+  CalendarioRotazioneCampiRoute: typeof CalendarioRotazioneCampiRoute
   CoreAtletaRoute: typeof CoreAtletaRoute
   CoreFamigliaRoute: typeof CoreFamigliaRoute
   CoreImpiantiCalendariRoute: typeof CoreImpiantiCalendariRoute
@@ -527,6 +565,8 @@ export interface RootRouteChildren {
   DirezioneAcquistiRoute: typeof DirezioneAcquistiRoute
   EventiChristmasLarioCupRoute: typeof EventiChristmasLarioCupRoute
   GestionaleMappaRoute: typeof GestionaleMappaRoute
+  GestionaleImpiantiRoute: typeof GestionaleImpiantiRoute
+  QuadroRotazioneCampiRoute: typeof QuadroRotazioneCampiRoute
   TesoreriaBiglietteriaRoute: typeof TesoreriaBiglietteriaRoute
   TesoreriaClubHouseRoute: typeof TesoreriaClubHouseRoute
   TesoreriaMagazzinoRoute: typeof TesoreriaMagazzinoRoute
@@ -714,6 +754,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AreeAreaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/calendario_/rotazione-campi': {
+      id: '/calendario_/rotazione-campi'
+      path: '/calendario/rotazione-campi'
+      fullPath: '/calendario/rotazione-campi'
+      preLoaderRoute: typeof CalendarioRotazioneCampiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/core/': {
       id: '/core/'
       path: '/core'
@@ -784,11 +831,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GestionaleMappaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/gestionale_/impianti': {
+      id: '/gestionale_/impianti'
+      path: '/gestionale/impianti'
+      fullPath: '/gestionale/impianti'
+      preLoaderRoute: typeof GestionaleImpiantiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/quadro/': {
       id: '/quadro/'
       path: '/quadro'
       fullPath: '/quadro/'
       preLoaderRoute: typeof QuadroIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/quadro/rotazione-campi': {
+      id: '/quadro/rotazione-campi'
+      path: '/quadro/rotazione-campi'
+      fullPath: '/quadro/rotazione-campi'
+      preLoaderRoute: typeof QuadroRotazioneCampiRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tesoreria_/biglietteria': {
@@ -840,6 +901,7 @@ const rootRouteChildren: RootRouteChildren = {
   SponsorRoute: SponsorRoute,
   TesoreriaRoute: TesoreriaRoute,
   AreeAreaRoute: AreeAreaRoute,
+  CalendarioRotazioneCampiRoute: CalendarioRotazioneCampiRoute,
   CoreAtletaRoute: CoreAtletaRoute,
   CoreFamigliaRoute: CoreFamigliaRoute,
   CoreImpiantiCalendariRoute: CoreImpiantiCalendariRoute,
@@ -847,6 +909,8 @@ const rootRouteChildren: RootRouteChildren = {
   DirezioneAcquistiRoute: DirezioneAcquistiRoute,
   EventiChristmasLarioCupRoute: EventiChristmasLarioCupRoute,
   GestionaleMappaRoute: GestionaleMappaRoute,
+  GestionaleImpiantiRoute: GestionaleImpiantiRoute,
+  QuadroRotazioneCampiRoute: QuadroRotazioneCampiRoute,
   TesoreriaBiglietteriaRoute: TesoreriaBiglietteriaRoute,
   TesoreriaClubHouseRoute: TesoreriaClubHouseRoute,
   TesoreriaMagazzinoRoute: TesoreriaMagazzinoRoute,
