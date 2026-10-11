@@ -68,3 +68,41 @@ export function stagingPreviewEnabled(
   if (!isProductionBuild) return true;
   return (env["SCD_STAGING_PASSWORD"] ?? "").length >= 20;
 }
+
+/** Positions that decide on booking proposals (registry area `impianti-approvazioni`). */
+export const APPROVER_POSITIONS: readonly string[] =
+  findArea("impianti-approvazioni")?.roles ?? [];
+
+/**
+ * Approvals page: only Presidente and Direttore generale with a verified
+ * session; the staging preview shows it with the banner.
+ */
+export function approvalsAccess(
+  session: VerifiedSession | null,
+  stagingPreview: boolean,
+): ImpiantiAccess {
+  if (session?.position && APPROVER_POSITIONS.includes(session.position))
+    return { mode: "tool", position: session.position };
+  if (stagingPreview) return { mode: "preview" };
+  return { mode: "access", reason: session ? "position" : "no-session" };
+}
+
+/**
+ * Published-CSV URL of the bookings master (env SCD_BOOKINGS_CSV_URL). Only
+ * https Google Sheets "publish to web" addresses are accepted.
+ */
+export function bookingsCsvUrl(
+  env: Readonly<Record<string, string | undefined>>,
+): string | null {
+  const raw = (env["SCD_BOOKINGS_CSV_URL"] ?? "").trim();
+  if (!raw) return null;
+  try {
+    const u = new URL(raw);
+    if (u.protocol !== "https:" || u.hostname !== "docs.google.com")
+      return null;
+    if (!u.pathname.startsWith("/spreadsheets/")) return null;
+    return u.toString();
+  } catch {
+    return null;
+  }
+}

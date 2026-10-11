@@ -12,6 +12,8 @@
  * Board sources: Visual Master VR-022 `Rotazione-campi.dc.html`, `Rotazione-Dervio.dc.html`.
  */
 
+import { spacesOf } from "./facilities";
+
 export type MatchFormat = 11 | 9 | 7 | 5 | 3;
 export type PitchId = "C1" | "C2" | "DV";
 export type MovableGroup = "u15" | "u16" | "u19";
@@ -657,18 +659,37 @@ export interface Booking {
   title: string;
   /** Colico changing rooms the booking would use (master "16 - SEDI E IMPIANTI"). */
   rooms?: readonly RoomId[];
+  /** Entrance to use (free text, e.g. "cancello principale"). */
+  entrance?: string;
+  /** Rental amount in euro as typed (only for "affitto"), e.g. "150" or "150,00". */
+  amount?: string;
 }
 
 /** Colico changing rooms: SPA-COL-SP1..SP4 and the dedicated referees' room SPA-COL-ARB. */
 export type RoomId = "SP1" | "SP2" | "SP3" | "SP4" | "ARB";
-export const ROOMS: readonly { id: RoomId; label: string; spaceId: string }[] =
-  [
-    { id: "SP1", label: "SP1", spaceId: "SPA-COL-SP1" },
-    { id: "SP2", label: "SP2", spaceId: "SPA-COL-SP2" },
-    { id: "SP3", label: "SP3", spaceId: "SPA-COL-SP3" },
-    { id: "SP4", label: "SP4", spaceId: "SPA-COL-SP4" },
-    { id: "ARB", label: "Arbitri", spaceId: "SPA-COL-ARB" },
-  ];
+/**
+ * Colico changing rooms from the facility register (config/scd-facilities.v1.json,
+ * master "16 - SEDI E IMPIANTI"): SPA-COL-SP1..SP4 and the referees' room SPA-COL-ARB.
+ */
+export const ROOMS: readonly {
+  id: RoomId;
+  label: string;
+  spaceId: string;
+  name: string;
+}[] = spacesOf("SED-COL")
+  .filter((sp) => sp.type === "changing_room" || sp.type === "referee_room")
+  .map((sp) => {
+    const id: RoomId =
+      sp.type === "referee_room"
+        ? "ARB"
+        : ((sp.quadro_key ?? sp.id.replace("SPA-COL-", "")) as RoomId);
+    return {
+      id,
+      label: id === "ARB" ? "Arbitri" : id,
+      spaceId: sp.id,
+      name: sp.name,
+    };
+  });
 
 export const BOOKING_KIND_LABEL: Readonly<Record<BookingKind, string>> = {
   allenamento: "Allenamento extra",
@@ -717,6 +738,15 @@ export function validateBooking(b: Omit<Booking, "id">): string[] {
     out.push("Spogliatoio non valido.");
   if (rooms.length && b.pitch === "DV")
     out.push("Gli spogliatoi di Dervio non sono ancora assegnabili qui.");
+  const entrance = (b.entrance ?? "").trim();
+  if (entrance.length > 40) out.push("Ingresso: massimo 40 caratteri.");
+  if (/@|\+?\d[\d\s.-]{6,}\d/.test(entrance))
+    out.push("Ingresso: niente email o numeri di telefono.");
+  const amount = (b.amount ?? "").trim();
+  if (amount && !/^\d{1,5}([.,]\d{1,2})?$/.test(amount))
+    out.push("Importo: solo cifre, per esempio 150 o 150,00.");
+  if (amount && b.kind !== "affitto")
+    out.push("L'importo si indica solo per un affitto a terzi.");
   const title = (b.title ?? "").trim();
   if (title.length > BOOKING_TITLE_MAX)
     out.push(
@@ -1032,85 +1062,6 @@ export function roomGuidance(kind: BookingKind): RoomGuidance[] {
         },
       ];
   }
-}
-
-/** Column order of "17 - PRENOTAZIONI IMPIANTI 2026-27 (master)". */
-export const REGISTRY_COLUMNS = [
-  "ID",
-  "Data",
-  "Ora inizio",
-  "Ora fine",
-  "Sede",
-  "ID spazio",
-  "Zona",
-  "Tipo",
-  "Squadra o soggetto",
-  "Formato",
-  "Spogliatoi",
-  "Ingresso",
-  "Stato",
-  "Richiesto da",
-  "Approvato da",
-  "Importo affitto",
-  "Contratto o link",
-  "Avviso Comune",
-  "Note",
-  "Origine",
-] as const;
-
-export const REGISTRY_URL =
-  "https://docs.google.com/spreadsheets/d/14Idop9OuCWGMaxVgiQgGSpM5E7mNaO6SL6kt_i_lSVY/edit";
-
-const zoneOf = (pitch: PitchId, format: PitchFormat): string => {
-  const w = pitchUnits(pitch, format);
-  return w >= 0.999
-    ? "Campo intero"
-    : w >= 0.49
-      ? "Metà campo"
-      : w >= 0.33
-        ? "Un terzo"
-        : "Un quarto";
-};
-const itDate = (iso: string) =>
-  `${iso.slice(8, 10)}/${iso.slice(5, 7)}/${iso.slice(0, 4)}`;
-const cell = (v: string) => v.replace(/[\t\r\n]+/g, " ").trim();
-
-/**
- * One TSV row for the bookings master, in REGISTRY_COLUMNS order. Status is
- * always PROPOSTA: approval happens in the sheet. Unknown cells stay empty for
- * the manager to fill (who asked, who approves, amount, contract, entrance).
- */
-export function bookingToRegistryRow(b: Booking): string {
-  const start = toMinutes(b.start) ?? 0;
-  const p = PITCHES[b.pitch];
-  const roomIds = (b.rooms ?? []).map(
-    (r) => ROOMS.find((x) => x.id === r)?.spaceId ?? r,
-  );
-  const values: string[] = [
-    `IPO-${b.id}`,
-    itDate(b.date),
-    hhmm(start),
-    hhmm(start + b.duration),
-    p.siteId,
-    p.spaceId,
-    zoneOf(b.pitch, b.format),
-    BOOKING_KIND_LABEL[b.kind],
-    b.title,
-    b.format === "full" ? "Campo intero" : `${b.format} contro ${b.format}`,
-    roomIds.join(", "),
-    "",
-    "PROPOSTA",
-    "",
-    "",
-    "",
-    "",
-    b.pitch === "DV"
-      ? `Entro il ${itDate(minusDays(b.date, NOTICE_DAYS))}`
-      : "Non serve",
-    "",
-    "Super App /gestionale/impianti (ipotesi)",
-  ];
-  return values.map(cell).join("\t");
 }
 
 /* ------------------------------------------------------------------ */

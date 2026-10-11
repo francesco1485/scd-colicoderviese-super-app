@@ -26,7 +26,7 @@ import { SATELLITES, findSatellite } from "./satellites";
 const repo = (p: string) => fileURLToPath(new URL(`../../../../${p}`, import.meta.url));
 const boards = readdirSync(repo("docs/design/visual-master")).filter((f) => f.endsWith(".dc.html"));
 const routeTree = readFileSync(fileURLToPath(new URL("../routeTree.gen.ts", import.meta.url)), "utf8");
-const routePaths = new Set([...routeTree.matchAll(/\bpath: '([^']+)'/g)].map((m) => (m[1]!.length > 1 ? m[1]!.replace(/\/$/, "") : m[1]!)));
+const routePaths = new Set([...routeTree.matchAll(/\b(?:path|fullPath): '([^']+)'/g)].map((m) => (m[1]!.length > 1 ? m[1]!.replace(/\/$/, "") : m[1]!)));
 
 describe("area registry (config/superapp-areas.v1.json)", () => {
   it("is the file at the repository root, not a copy", () => {

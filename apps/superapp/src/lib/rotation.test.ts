@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import snapshot from "@/data/calendario-snapshot-20261010.json";
+import { spaceById } from "./facilities";
 import {
   DEFAULT_OPTIONS,
   analyse,
@@ -23,8 +24,7 @@ import {
   GROUP_FORMAT,
   PITCHES,
   PRESETS,
-  REGISTRY_COLUMNS,
-  bookingToRegistryRow,
+  ROOMS,
   roomClashes,
   roomGuidance,
   type Booking,
@@ -685,50 +685,21 @@ describe("changing rooms and the bookings register", () => {
     ] as const)
       expect(roomGuidance(k).length).toBeGreaterThan(0);
   });
+});
 
-  it("builds a TSV row in the master's column order", () => {
-    const b: Booking = {
-      id: "abc",
-      kind: "affitto",
-      pitch: "C2",
-      date: "2026-10-18",
-      start: "18:00",
-      duration: 90,
-      format: "full",
-      title: "ASD\tEsempio",
-      rooms: ["SP3", "ARB"],
-    };
-    const cells = bookingToRegistryRow(b).split("\t");
-    expect(cells).toHaveLength(REGISTRY_COLUMNS.length);
-    const row = Object.fromEntries(
-      REGISTRY_COLUMNS.map((c, i) => [c, cells[i]]),
-    );
-    expect(row).toMatchObject({
-      ID: "IPO-abc",
-      Data: "18/10/2026",
-      "Ora inizio": "18:00",
-      "Ora fine": "19:30",
-      Sede: "SED-COL",
-      "ID spazio": "SPA-COL-C2",
-      Zona: "Campo intero",
-      Tipo: "Affitto a terzi",
-      "Squadra o soggetto": "ASD Esempio",
-      Formato: "Campo intero",
-      Spogliatoi: "SPA-COL-SP3, SPA-COL-ARB",
-      Stato: "PROPOSTA",
-      "Avviso Comune": "Non serve",
-      "Importo affitto": "",
-    });
-    const dv = bookingToRegistryRow({
-      ...b,
-      pitch: "DV",
-      rooms: [],
-      date: "2026-12-13",
-      format: 7,
-    }).split("\t");
-    expect(dv[4]).toBe("SED-DER");
-    expect(dv[5]).toBe("SPA-DER-C1");
-    expect(dv[6]).toBe("Metà campo");
-    expect(dv[17]).toBe("Entro il 13/11/2026");
+describe("facility register ids", () => {
+  it("takes changing rooms and pitch space ids from config/scd-facilities.v1.json", () => {
+    expect(ROOMS.map((r) => [r.id, r.spaceId])).toEqual([
+      ["SP1", "SPA-COL-SP1"],
+      ["SP2", "SPA-COL-SP2"],
+      ["SP3", "SPA-COL-SP3"],
+      ["SP4", "SPA-COL-SP4"],
+      ["ARB", "SPA-COL-ARB"],
+    ]);
+    for (const p of Object.values(PITCHES)) {
+      const sp = spaceById(p.spaceId);
+      expect(sp, p.spaceId).toBeDefined();
+      expect(sp!.site).toBe(p.siteId);
+    }
   });
 });

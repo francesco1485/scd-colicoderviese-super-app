@@ -53,7 +53,7 @@ export interface ImpiantiModel {
   applyPreset: (id: ScenarioPreset["id"]) => void;
   setOptions: (patch: Partial<ScenarioOptions>) => void;
   setLightsVerified: (v: boolean) => void;
-  addBooking: (b: Omit<Booking, "id">) => void;
+  addBooking: (b: Omit<Booking, "id">) => Booking;
   removeBooking: (id: string) => void;
   storageOk: boolean;
 }
@@ -102,9 +102,11 @@ export function useImpiantiModel(): ImpiantiModel {
     }));
   }, []);
 
-  const addBooking = useCallback((b: Omit<Booking, "id">) => {
+  const addBooking = useCallback((b: Omit<Booking, "id">): Booking => {
     const id = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
-    setBookings((list) => [...list, { ...b, id }]);
+    const created = { ...b, id };
+    setBookings((list) => [...list, created]);
+    return created;
   }, []);
   const removeBooking = useCallback(
     (id: string) => setBookings((list) => list.filter((b) => b.id !== id)),

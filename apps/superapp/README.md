@@ -38,6 +38,15 @@ QA browser (Chromium esistente, nessun `playwright install`):
 - **CORE/GROW**: solo dati dimostrativi o snapshot pubblici già presenti nel codice Lovable; i link ai master Google non sono inclusi nel bundle pubblico ("Link riservato · disponibile con accesso R20").
 - Nessun database, nessuna nuova autenticazione, nessun Supabase.
 
+## Impianti e campi (`/gestionale/impianti`)
+
+Ambienti 2D con link diretto: `/gestionale/impianti` (panoramica), `/colico`, `/dervio`, `/simulazione`, `/nuova` (nuova prenotazione con anteprima 2D e «Invia alla Direzione»), `/approvazioni` (solo Presidente e Direttore generale). `/calendario/rotazione-campi` e `/quadro/rotazione-campi` reindirizzano qui. Motore puro in `src/lib/rotation.ts`, registro prenotazioni in `src/lib/bookings-register.ts`, «Chiedi a Sky» deterministico in `src/lib/facility-assistant.ts`. Tutto è simulazione: nessuna gara spostata, nessuna scrittura dal server; le righe per il registro «17 - PRENOTAZIONI IMPIANTI 2026-27» si copiano e incollano.
+
+Variabili d'ambiente (lette solo dal server):
+
+- `SCD_STAGING_PREVIEW=1`: mostra lo strumento senza login con la striscia «Anteprima staging». Attiva solo su dev server o dietro lo staging gateway (serve `SCD_STAGING_PASSWORD` di almeno 20 caratteri); `SCD_ENV=production` la spegne sempre. Senza flag e senza sessione R20 verificata si vede la schermata di accesso.
+- `SCD_BOOKINGS_CSV_URL`: indirizzo «Pubblica sul web» in formato CSV della scheda prenotazioni del registro (solo `https://docs.google.com/spreadsheets/...`; il foglio non contiene dati personali). Abilita la lettura delle proposte in `/approvazioni`; senza, la pagina spiega come attivarla e mostra solo le ipotesi del browser.
+
 ## Asset
 
 Stemma ufficiale: `public/media/brand/logo-scd.png` (= `assets/logo-scd.png` del repo canonico). Loghi categoria, planimetria e avatar CROVI scaricati dal sito pubblico dell'Hub (stesse dimensioni degli `*.asset.json`), in `public/media/`.

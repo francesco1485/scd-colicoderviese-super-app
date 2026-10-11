@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { ImpiantiPage } from "@/components/impianti-campi/ImpiantiPage";
+import { ImpiantiLayout } from "@/components/impianti-campi/ImpiantiPage";
 import { getImpiantiAccess } from "@/lib/impianti.functions";
 
-// `gestionale_` keeps this page out of a future /gestionale layout: it renders on its own.
+// `gestionale_` keeps this area out of the /gestionale page: it renders on its own.
+// Child routes (index, colico, dervio, simulazione, nuova, approvazioni) render inside it.
 export const Route = createFileRoute("/gestionale_/impianti")({
   staticData: { interior: true },
   loader: () => getImpiantiAccess(),
@@ -13,7 +14,7 @@ export const Route = createFileRoute("/gestionale_/impianti")({
       {
         name: "description",
         content:
-          "Campi di Colico e Dervio, rotazioni e simulazioni. Area riservata della S.C.D. ColicoDerviese.",
+          "Campi di Colico e Dervio, rotazioni, simulazioni e prenotazioni. Area riservata della S.C.D. ColicoDerviese.",
       },
       { name: "robots", content: "noindex, nofollow" },
     ],
@@ -23,5 +24,5 @@ export const Route = createFileRoute("/gestionale_/impianti")({
 
 function ImpiantiRoute() {
   const access = Route.useLoaderData();
-  return <ImpiantiPage access={access} />;
+  return <ImpiantiLayout access={access} />;
 }

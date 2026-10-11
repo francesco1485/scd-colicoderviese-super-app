@@ -51,6 +51,12 @@ import { Route as QuadroRotazioneCampiRouteImport } from './routes/quadro.rotazi
 import { Route as TesoreriaBiglietteriaRouteImport } from './routes/tesoreria_.biglietteria'
 import { Route as TesoreriaClubHouseRouteImport } from './routes/tesoreria_.club-house'
 import { Route as TesoreriaMagazzinoRouteImport } from './routes/tesoreria_.magazzino'
+import { Route as GestionaleImpiantiIndexRouteImport } from './routes/gestionale_.impianti.index'
+import { Route as GestionaleImpiantiApprovazioniRouteImport } from './routes/gestionale_.impianti.approvazioni'
+import { Route as GestionaleImpiantiColicoRouteImport } from './routes/gestionale_.impianti.colico'
+import { Route as GestionaleImpiantiDervioRouteImport } from './routes/gestionale_.impianti.dervio'
+import { Route as GestionaleImpiantiNuovaRouteImport } from './routes/gestionale_.impianti.nuova'
+import { Route as GestionaleImpiantiSimulazioneRouteImport } from './routes/gestionale_.impianti.simulazione'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -263,6 +269,40 @@ const TesoreriaMagazzinoRoute = TesoreriaMagazzinoRouteImport.update({
   path: '/tesoreria/magazzino',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GestionaleImpiantiIndexRoute = GestionaleImpiantiIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => GestionaleImpiantiRoute,
+} as any)
+const GestionaleImpiantiApprovazioniRoute =
+  GestionaleImpiantiApprovazioniRouteImport.update({
+    id: '/approvazioni',
+    path: '/approvazioni',
+    getParentRoute: () => GestionaleImpiantiRoute,
+  } as any)
+const GestionaleImpiantiColicoRoute =
+  GestionaleImpiantiColicoRouteImport.update({
+    id: '/colico',
+    path: '/colico',
+    getParentRoute: () => GestionaleImpiantiRoute,
+  } as any)
+const GestionaleImpiantiDervioRoute =
+  GestionaleImpiantiDervioRouteImport.update({
+    id: '/dervio',
+    path: '/dervio',
+    getParentRoute: () => GestionaleImpiantiRoute,
+  } as any)
+const GestionaleImpiantiNuovaRoute = GestionaleImpiantiNuovaRouteImport.update({
+  id: '/nuova',
+  path: '/nuova',
+  getParentRoute: () => GestionaleImpiantiRoute,
+} as any)
+const GestionaleImpiantiSimulazioneRoute =
+  GestionaleImpiantiSimulazioneRouteImport.update({
+    id: '/simulazione',
+    path: '/simulazione',
+    getParentRoute: () => GestionaleImpiantiRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -297,7 +337,7 @@ export interface FileRoutesByFullPath {
   '/direzione/acquisti': typeof DirezioneAcquistiRoute
   '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
   '/gestionale/mappa': typeof GestionaleMappaRoute
-  '/gestionale/impianti': typeof GestionaleImpiantiRoute
+  '/gestionale/impianti': typeof GestionaleImpiantiRouteWithChildren
   '/quadro/rotazione-campi': typeof QuadroRotazioneCampiRoute
   '/tesoreria/biglietteria': typeof TesoreriaBiglietteriaRoute
   '/tesoreria/club-house': typeof TesoreriaClubHouseRoute
@@ -307,6 +347,12 @@ export interface FileRoutesByFullPath {
   '/eventi/': typeof EventiIndexRoute
   '/gestionale/': typeof GestionaleIndexRoute
   '/quadro/': typeof QuadroIndexRoute
+  '/gestionale/impianti/approvazioni': typeof GestionaleImpiantiApprovazioniRoute
+  '/gestionale/impianti/colico': typeof GestionaleImpiantiColicoRoute
+  '/gestionale/impianti/dervio': typeof GestionaleImpiantiDervioRoute
+  '/gestionale/impianti/nuova': typeof GestionaleImpiantiNuovaRoute
+  '/gestionale/impianti/simulazione': typeof GestionaleImpiantiSimulazioneRoute
+  '/gestionale/impianti/': typeof GestionaleImpiantiIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -341,7 +387,6 @@ export interface FileRoutesByTo {
   '/direzione/acquisti': typeof DirezioneAcquistiRoute
   '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
   '/gestionale/mappa': typeof GestionaleMappaRoute
-  '/gestionale/impianti': typeof GestionaleImpiantiRoute
   '/quadro/rotazione-campi': typeof QuadroRotazioneCampiRoute
   '/tesoreria/biglietteria': typeof TesoreriaBiglietteriaRoute
   '/tesoreria/club-house': typeof TesoreriaClubHouseRoute
@@ -351,6 +396,12 @@ export interface FileRoutesByTo {
   '/eventi': typeof EventiIndexRoute
   '/gestionale': typeof GestionaleIndexRoute
   '/quadro': typeof QuadroIndexRoute
+  '/gestionale/impianti/approvazioni': typeof GestionaleImpiantiApprovazioniRoute
+  '/gestionale/impianti/colico': typeof GestionaleImpiantiColicoRoute
+  '/gestionale/impianti/dervio': typeof GestionaleImpiantiDervioRoute
+  '/gestionale/impianti/nuova': typeof GestionaleImpiantiNuovaRoute
+  '/gestionale/impianti/simulazione': typeof GestionaleImpiantiSimulazioneRoute
+  '/gestionale/impianti': typeof GestionaleImpiantiIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -386,7 +437,7 @@ export interface FileRoutesById {
   '/direzione_/acquisti': typeof DirezioneAcquistiRoute
   '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
   '/gestionale/mappa': typeof GestionaleMappaRoute
-  '/gestionale_/impianti': typeof GestionaleImpiantiRoute
+  '/gestionale_/impianti': typeof GestionaleImpiantiRouteWithChildren
   '/quadro/rotazione-campi': typeof QuadroRotazioneCampiRoute
   '/tesoreria_/biglietteria': typeof TesoreriaBiglietteriaRoute
   '/tesoreria_/club-house': typeof TesoreriaClubHouseRoute
@@ -396,6 +447,12 @@ export interface FileRoutesById {
   '/eventi/': typeof EventiIndexRoute
   '/gestionale/': typeof GestionaleIndexRoute
   '/quadro/': typeof QuadroIndexRoute
+  '/gestionale_/impianti/approvazioni': typeof GestionaleImpiantiApprovazioniRoute
+  '/gestionale_/impianti/colico': typeof GestionaleImpiantiColicoRoute
+  '/gestionale_/impianti/dervio': typeof GestionaleImpiantiDervioRoute
+  '/gestionale_/impianti/nuova': typeof GestionaleImpiantiNuovaRoute
+  '/gestionale_/impianti/simulazione': typeof GestionaleImpiantiSimulazioneRoute
+  '/gestionale_/impianti/': typeof GestionaleImpiantiIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -442,6 +499,12 @@ export interface FileRouteTypes {
     | '/eventi/'
     | '/gestionale/'
     | '/quadro/'
+    | '/gestionale/impianti/approvazioni'
+    | '/gestionale/impianti/colico'
+    | '/gestionale/impianti/dervio'
+    | '/gestionale/impianti/nuova'
+    | '/gestionale/impianti/simulazione'
+    | '/gestionale/impianti/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -476,7 +539,6 @@ export interface FileRouteTypes {
     | '/direzione/acquisti'
     | '/eventi/christmas-lario-cup'
     | '/gestionale/mappa'
-    | '/gestionale/impianti'
     | '/quadro/rotazione-campi'
     | '/tesoreria/biglietteria'
     | '/tesoreria/club-house'
@@ -486,6 +548,12 @@ export interface FileRouteTypes {
     | '/eventi'
     | '/gestionale'
     | '/quadro'
+    | '/gestionale/impianti/approvazioni'
+    | '/gestionale/impianti/colico'
+    | '/gestionale/impianti/dervio'
+    | '/gestionale/impianti/nuova'
+    | '/gestionale/impianti/simulazione'
+    | '/gestionale/impianti'
   id:
     | '__root__'
     | '/'
@@ -530,6 +598,12 @@ export interface FileRouteTypes {
     | '/eventi/'
     | '/gestionale/'
     | '/quadro/'
+    | '/gestionale_/impianti/approvazioni'
+    | '/gestionale_/impianti/colico'
+    | '/gestionale_/impianti/dervio'
+    | '/gestionale_/impianti/nuova'
+    | '/gestionale_/impianti/simulazione'
+    | '/gestionale_/impianti/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -565,7 +639,7 @@ export interface RootRouteChildren {
   DirezioneAcquistiRoute: typeof DirezioneAcquistiRoute
   EventiChristmasLarioCupRoute: typeof EventiChristmasLarioCupRoute
   GestionaleMappaRoute: typeof GestionaleMappaRoute
-  GestionaleImpiantiRoute: typeof GestionaleImpiantiRoute
+  GestionaleImpiantiRoute: typeof GestionaleImpiantiRouteWithChildren
   QuadroRotazioneCampiRoute: typeof QuadroRotazioneCampiRoute
   TesoreriaBiglietteriaRoute: typeof TesoreriaBiglietteriaRoute
   TesoreriaClubHouseRoute: typeof TesoreriaClubHouseRoute
@@ -873,8 +947,71 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TesoreriaMagazzinoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/gestionale_/impianti/': {
+      id: '/gestionale_/impianti/'
+      path: '/'
+      fullPath: '/gestionale/impianti/'
+      preLoaderRoute: typeof GestionaleImpiantiIndexRouteImport
+      parentRoute: typeof GestionaleImpiantiRoute
+    }
+    '/gestionale_/impianti/approvazioni': {
+      id: '/gestionale_/impianti/approvazioni'
+      path: '/approvazioni'
+      fullPath: '/gestionale/impianti/approvazioni'
+      preLoaderRoute: typeof GestionaleImpiantiApprovazioniRouteImport
+      parentRoute: typeof GestionaleImpiantiRoute
+    }
+    '/gestionale_/impianti/colico': {
+      id: '/gestionale_/impianti/colico'
+      path: '/colico'
+      fullPath: '/gestionale/impianti/colico'
+      preLoaderRoute: typeof GestionaleImpiantiColicoRouteImport
+      parentRoute: typeof GestionaleImpiantiRoute
+    }
+    '/gestionale_/impianti/dervio': {
+      id: '/gestionale_/impianti/dervio'
+      path: '/dervio'
+      fullPath: '/gestionale/impianti/dervio'
+      preLoaderRoute: typeof GestionaleImpiantiDervioRouteImport
+      parentRoute: typeof GestionaleImpiantiRoute
+    }
+    '/gestionale_/impianti/nuova': {
+      id: '/gestionale_/impianti/nuova'
+      path: '/nuova'
+      fullPath: '/gestionale/impianti/nuova'
+      preLoaderRoute: typeof GestionaleImpiantiNuovaRouteImport
+      parentRoute: typeof GestionaleImpiantiRoute
+    }
+    '/gestionale_/impianti/simulazione': {
+      id: '/gestionale_/impianti/simulazione'
+      path: '/simulazione'
+      fullPath: '/gestionale/impianti/simulazione'
+      preLoaderRoute: typeof GestionaleImpiantiSimulazioneRouteImport
+      parentRoute: typeof GestionaleImpiantiRoute
+    }
   }
 }
+
+interface GestionaleImpiantiRouteChildren {
+  GestionaleImpiantiApprovazioniRoute: typeof GestionaleImpiantiApprovazioniRoute
+  GestionaleImpiantiColicoRoute: typeof GestionaleImpiantiColicoRoute
+  GestionaleImpiantiDervioRoute: typeof GestionaleImpiantiDervioRoute
+  GestionaleImpiantiNuovaRoute: typeof GestionaleImpiantiNuovaRoute
+  GestionaleImpiantiSimulazioneRoute: typeof GestionaleImpiantiSimulazioneRoute
+  GestionaleImpiantiIndexRoute: typeof GestionaleImpiantiIndexRoute
+}
+
+const GestionaleImpiantiRouteChildren: GestionaleImpiantiRouteChildren = {
+  GestionaleImpiantiApprovazioniRoute: GestionaleImpiantiApprovazioniRoute,
+  GestionaleImpiantiColicoRoute: GestionaleImpiantiColicoRoute,
+  GestionaleImpiantiDervioRoute: GestionaleImpiantiDervioRoute,
+  GestionaleImpiantiNuovaRoute: GestionaleImpiantiNuovaRoute,
+  GestionaleImpiantiSimulazioneRoute: GestionaleImpiantiSimulazioneRoute,
+  GestionaleImpiantiIndexRoute: GestionaleImpiantiIndexRoute,
+}
+
+const GestionaleImpiantiRouteWithChildren =
+  GestionaleImpiantiRoute._addFileChildren(GestionaleImpiantiRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -909,7 +1046,7 @@ const rootRouteChildren: RootRouteChildren = {
   DirezioneAcquistiRoute: DirezioneAcquistiRoute,
   EventiChristmasLarioCupRoute: EventiChristmasLarioCupRoute,
   GestionaleMappaRoute: GestionaleMappaRoute,
-  GestionaleImpiantiRoute: GestionaleImpiantiRoute,
+  GestionaleImpiantiRoute: GestionaleImpiantiRouteWithChildren,
   QuadroRotazioneCampiRoute: QuadroRotazioneCampiRoute,
   TesoreriaBiglietteriaRoute: TesoreriaBiglietteriaRoute,
   TesoreriaClubHouseRoute: TesoreriaClubHouseRoute,

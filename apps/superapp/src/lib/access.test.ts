@@ -8,7 +8,7 @@ import { R20_LOGIN_LIVE, findSatellite } from "./satellites";
 import { marketingAllowed } from "./universe";
 
 const routeTree = readFileSync(fileURLToPath(new URL("../routeTree.gen.ts", import.meta.url)), "utf8");
-const routePaths = new Set([...routeTree.matchAll(/\bpath: '([^']+)'/g)].map((m) => (m[1]!.length > 1 ? m[1]!.replace(/\/$/, "") : m[1]!)));
+const routePaths = new Set([...routeTree.matchAll(/\b(?:path|fullPath): '([^']+)'/g)].map((m) => (m[1]!.length > 1 ? m[1]!.replace(/\/$/, "") : m[1]!)));
 
 /** Paths owned by branches built in parallel: no access screen may claim them. */
 const PARALLEL_OWNED = ["/calendario/rotazione-campi", "/quadro", "/gestionale"];

@@ -1,24 +1,27 @@
 /**
- * Facility planner: hypothetical bookings ("ipotesi") with a live 2D preview of
- * the chosen pitch, changing-room check and a TSV row for the bookings master
- * "17 - PRENOTAZIONI IMPIANTI 2026-27". Browser only: nothing is written to a
- * server; the manager pastes the row into the master.
- * The pitch SVG is self-contained here so it can later merge into the shared
- * facility map component.
+ * New booking (/gestionale/impianti/nuova): hypothetical bookings ("ipotesi")
+ * with a live 2D preview of the chosen pitch, changing-room check, and
+ * "Invia alla Direzione": the master row (Stato PROPOSTA) plus a pre-filled
+ * summary for the Direzione, both copied by the manager. Browser only: no
+ * server writes. The pitch SVG is self-contained here so it can later merge
+ * into the shared facility map component.
  */
-import { Check, ClipboardCopy, ExternalLink, Trash2 } from "lucide-react";
+import { Check, ClipboardCopy, ExternalLink, Send, Trash2 } from "lucide-react";
 import { useEffect, useId, useMemo, useState, type FormEvent } from "react";
 
 import quadro from "@/data/quadro-snapshot-20261009.json";
+import {
+  REGISTRY_URL,
+  bookingToRegistryRow,
+  directionBrief,
+} from "@/lib/bookings-register";
 import {
   BOOKING_DEFAULTS,
   BOOKING_KIND_LABEL,
   BOOKING_TITLE_MAX,
   PITCHES,
-  REGISTRY_URL,
   ROOMS,
   bookingToItem,
-  bookingToRegistryRow,
   checkSlot,
   ddmm,
   groupByDay,
@@ -54,6 +57,8 @@ const emptyDraft = (date: string): BookingDraft => ({
   format: BOOKING_DEFAULTS.allenamento.format,
   title: "",
   rooms: [],
+  entrance: "",
+  amount: "",
 });
 
 const fmtText = (f: PitchFormat) =>
@@ -69,43 +74,51 @@ const shareText = (w: number) =>
 
 /* ---------------- Live 2D pitch ---------------- */
 
-interface Preview {
+export interface Preview {
   fits: boolean;
   others: RotationMatch[];
   probe: RotationMatch | null;
 }
 
-function usePreview(model: ImpiantiModel, d: BookingDraft): Preview {
-  return useMemo(() => {
-    const start = toMinutes(d.start);
-    if (start === null || !Number.isFinite(d.duration) || d.duration < 15)
-      return { fits: false, others: [], probe: null };
-    const dayItems = groupByDay(model.items).get(d.date) ?? [];
-    const check = checkSlot(
-      dayItems,
-      d.pitch,
-      start,
-      d.duration,
-      d.format,
-      model.options.buffer,
-    );
-    const probe = bookingToItem({
-      ...d,
-      id: "__draft__",
-      title: d.title || "Nuova ipotesi",
-    });
-    return { fits: check.fits, others: check.sharing, probe };
-  }, [model.items, model.options.buffer, d]);
+/** Preview of a use of `pitch` against the items of that day (pure). */
+export function previewFor(
+  items: readonly RotationMatch[],
+  buffer: number,
+  d: BookingDraft,
+  excludeId?: string,
+): Preview {
+  const start = toMinutes(d.start);
+  if (start === null || !Number.isFinite(d.duration) || d.duration < 15)
+    return { fits: false, others: [], probe: null };
+  const dayItems = (groupByDay(items).get(d.date) ?? []).filter(
+    (m) => m.id !== excludeId,
+  );
+  const check = checkSlot(
+    dayItems,
+    d.pitch,
+    start,
+    d.duration,
+    d.format,
+    buffer,
+  );
+  const probe = bookingToItem({
+    ...d,
+    id: "__draft__",
+    title: d.title || "Nuova ipotesi",
+  });
+  return { fits: check.fits, others: check.sharing, probe };
 }
 
-function PitchPreview({
+export function PitchPreview({
   pitch,
   format,
   preview,
+  title = "Nuova ipotesi",
 }: {
   pitch: PitchId;
   format: PitchFormat;
   preview: Preview;
+  title?: string;
 }) {
   const big = pitch === "C1";
   const W = 600;
@@ -120,13 +133,16 @@ function PitchPreview({
     : layoutPitch(preview.others, pitch);
   const probeSlot = slots.find((s) => s.match.id === preview.probe?.id);
   const p = PITCHES[pitch];
+  const hatchId = useId().replace(/:/g, "");
   const label = `${p.site} ${p.name.toLowerCase()}, ${p.size ?? "misure —"}: ${
     preview.probe
       ? preview.fits
-        ? `l'ipotesi ci sta e occupa ${shareText(share)}`
-        : "l'ipotesi non ci sta"
+        ? `ci sta e occupa ${shareText(share)}`
+        : "non ci sta"
       : "orario non valido"
   }${preview.others.length ? `; già in campo: ${preview.others.map((m) => m.label).join(", ")}` : "; nessun altro uso nell'orario"}`;
+  const px = (s: { x: number; overflow: boolean }) =>
+    pad + (s.overflow ? 0 : s.x) * iw + 3;
   return (
     <figure className="m-0 grid gap-2">
       <svg
@@ -138,7 +154,7 @@ function PitchPreview({
       >
         <defs>
           <pattern
-            id="pv-hatch"
+            id={hatchId}
             width="12"
             height="12"
             patternUnits="userSpaceOnUse"
@@ -147,12 +163,7 @@ function PitchPreview({
             <rect width="6" height="12" fill="#a3241b" fillOpacity=".35" />
           </pattern>
         </defs>
-        <rect
-          width={W}
-          height={H}
-          rx="12"
-          fill={pitch === "DV" ? "#2f8a4f" : "#2e8550"}
-        />
+        <rect width={W} height={H} rx="12" fill="#2e8550" />
         {slots
           .filter((s) => !s.overflow && s.match.id !== preview.probe?.id)
           .map((s) => (
@@ -218,7 +229,7 @@ function PitchPreview({
         {probeSlot && (
           <g>
             <rect
-              x={pad + (probeSlot.overflow ? 0 : probeSlot.x) * iw + 3}
+              x={px(probeSlot)}
               y={pad + (probeSlot.overflow ? ih * 0.62 : 0) + 3}
               width={probeSlot.w * iw - 6}
               height={(probeSlot.overflow ? ih * 0.38 : ih) - 6}
@@ -230,19 +241,15 @@ function PitchPreview({
             />
             {!preview.fits && (
               <rect
-                x={pad + (probeSlot.overflow ? 0 : probeSlot.x) * iw + 3}
+                x={px(probeSlot)}
                 y={pad + (probeSlot.overflow ? ih * 0.62 : 0) + 3}
                 width={probeSlot.w * iw - 6}
                 height={(probeSlot.overflow ? ih * 0.38 : ih) - 6}
-                fill="url(#pv-hatch)"
+                fill={`url(#${hatchId})`}
               />
             )}
             <text
-              x={
-                pad +
-                (probeSlot.overflow ? 0 : probeSlot.x) * iw +
-                (probeSlot.w * iw) / 2
-              }
+              x={px(probeSlot) - 3 + (probeSlot.w * iw) / 2}
               y={pad + (probeSlot.overflow ? ih * 0.81 : ih / 2) + 8}
               textAnchor="middle"
               fontFamily="Barlow"
@@ -250,7 +257,7 @@ function PitchPreview({
               fontSize="22"
               fill={preview.fits ? "#062a52" : "#a3241b"}
             >
-              {preview.fits ? "Nuova ipotesi" : "Non ci sta"}
+              {preview.fits ? title : "Non ci sta"}
             </text>
           </g>
         )}
@@ -287,8 +294,10 @@ function PitchPreview({
       </svg>
       <figcaption className="text-[13px] text-[var(--in-sub)]">
         {p.site} {p.name.toLowerCase()} · {p.surface} · {p.size ?? "—"}. Schema
-        non in scala. Allenamenti del Quadro non inclusi nel controllo del
-        campo.
+        non in scala. Il campo intero blocca metà, terzi e quarti, e una parte
+        occupata blocca il campo intero: il controllo avviene prima dell'invio,
+        cambio campo compreso. Allenamenti del Quadro non inclusi nel controllo
+        del campo.
       </figcaption>
     </figure>
   );
@@ -296,7 +305,7 @@ function PitchPreview({
 
 /* ---------------- Copy to clipboard ---------------- */
 
-async function copyText(text: string): Promise<boolean> {
+export async function copyText(text: string): Promise<boolean> {
   try {
     await navigator.clipboard.writeText(text);
     return true;
@@ -318,40 +327,182 @@ async function copyText(text: string): Promise<boolean> {
   }
 }
 
+function CopyBlock({
+  label,
+  text,
+  rows,
+}: {
+  label: string;
+  text: string;
+  rows: number;
+}) {
+  const [state, setState] = useState<"idle" | "ok" | "ko">("idle");
+  const id = useId();
+  useEffect(() => {
+    if (state === "idle") return;
+    const t = window.setTimeout(() => setState("idle"), 4000);
+    return () => window.clearTimeout(t);
+  }, [state]);
+  return (
+    <div className="grid gap-1.5">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <label htmlFor={id} className="text-[14px] font-semibold">
+          {label}
+        </label>
+        <button
+          type="button"
+          className={btnSecondary}
+          onClick={async () => setState((await copyText(text)) ? "ok" : "ko")}
+        >
+          {state === "ok" ? (
+            <Check className="size-4" aria-hidden="true" />
+          ) : (
+            <ClipboardCopy className="size-4" aria-hidden="true" />
+          )}
+          Copia
+        </button>
+      </div>
+      <textarea
+        id={id}
+        readOnly
+        rows={rows}
+        value={text}
+        className="scd-focus w-full resize-y rounded-lg border border-[var(--in-line)] bg-[var(--in-ground)] p-2.5 font-mono text-[12.5px] leading-snug"
+        onFocus={(e) => e.currentTarget.select()}
+      />
+      <span
+        role="status"
+        aria-live="polite"
+        className="text-[13px] text-[var(--in-sub)]"
+      >
+        {state === "ok"
+          ? "Copiato."
+          : state === "ko"
+            ? "Copia non riuscita: seleziona il testo e copialo a mano."
+            : ""}
+      </span>
+    </div>
+  );
+}
+
+function SendPanel({
+  booking,
+  model,
+  requestedBy,
+  onClose,
+}: {
+  booking: Booking;
+  model: ImpiantiModel;
+  requestedBy: string;
+  onClose: () => void;
+}) {
+  const row = bookingToRegistryRow(booking, requestedBy);
+  const brief = directionBrief(booking, {
+    items: model.items,
+    others: model.bookings,
+    quadroRooms: QUADRO_ROOMS,
+    buffer: model.options.buffer,
+    today: model.today,
+    requestedBy,
+  });
+  return (
+    <section
+      aria-labelledby="h-send"
+      className="grid gap-3 rounded-2xl border-2 border-[var(--in-info)] bg-[var(--in-info-bg)] p-4"
+      tabIndex={-1}
+      id="invio-direzione"
+    >
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h3 id="h-send" className="m-0 text-[18px] font-bold">
+          Invia alla Direzione · IPO-{booking.id}
+        </h3>
+        <button
+          type="button"
+          onClick={onClose}
+          className="scd-focus min-h-10 rounded-lg px-3 text-[14px] font-semibold text-[var(--in-info)] hover:bg-white"
+        >
+          Chiudi
+        </button>
+      </div>
+      <ol className="m-0 grid gap-1 pl-5 text-[14px]">
+        <li>
+          Copia la riga e incollala nella prima riga libera del registro,
+          colonna ID (Stato PROPOSTA).
+        </li>
+        <li>
+          Copia la scheda e mandala a Presidente o Direttore generale (mail o
+          messaggio del club).
+        </li>
+        <li>
+          La Direzione mette IN VALUTAZIONE e poi CONFERMATA o RESPINTA con il
+          motivo, anche da «Approvazioni».
+        </li>
+      </ol>
+      {!requestedBy && (
+        <p className="m-0 text-[13px] text-[var(--in-warn)]">
+          «Richiesto da» resta vuoto finché il login SCD non verifica il tuo
+          ruolo: compilalo nel registro.
+        </p>
+      )}
+      <CopyBlock
+        label="Riga per il registro prenotazioni"
+        text={row}
+        rows={2}
+      />
+      <CopyBlock label="Scheda per la Direzione" text={brief} rows={10} />
+      <div>
+        <a
+          href={REGISTRY_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={btnPrimary}
+        >
+          Apri il registro prenotazioni
+          <ExternalLink className="size-4" aria-hidden="true" />
+          <span className="sr-only">(si apre in una nuova scheda)</span>
+        </a>
+      </div>
+    </section>
+  );
+}
+
 /* ---------------- Planner ---------------- */
 
 export function BookingPlanner({
   model,
   draftIn,
+  requestedBy,
 }: {
   model: ImpiantiModel;
   draftIn: BookingDraft | null;
+  requestedBy: string;
 }) {
-  const [d, setD] = useState<BookingDraft>(
-    () => draftIn ?? emptyDraft(model.today),
+  const [d, setD] = useState<BookingDraft>(() =>
+    draftIn
+      ? { ...emptyDraft(model.today), ...draftIn }
+      : emptyDraft(model.today),
   );
   const [errors, setErrors] = useState<string[]>([]);
   const [done, setDone] = useState<string | null>(null);
-  const [copied, setCopied] = useState<{ id: string; ok: boolean } | null>(
-    null,
-  );
+  const [sending, setSending] = useState<Booking | null>(null);
   const fid = useId();
   useEffect(() => {
     if (draftIn) {
-      setD({ rooms: [], ...draftIn });
+      setD({ ...emptyDraft(model.today), ...draftIn });
       setErrors([]);
       setDone(null);
     }
-  }, [draftIn]);
+  }, [draftIn, model.today]);
   useEffect(() => {
-    if (!copied) return;
-    const t = window.setTimeout(() => setCopied(null), 4000);
-    return () => window.clearTimeout(t);
-  }, [copied]);
+    if (sending) document.getElementById("invio-direzione")?.focus();
+  }, [sending]);
 
   const set = <K extends keyof BookingDraft>(k: K, v: BookingDraft[K]) =>
     setD((x) => ({ ...x, [k]: v }));
-  const preview = usePreview(model, d);
+  const preview = useMemo(
+    () => previewFor(model.items, model.options.buffer, d),
+    [model.items, model.options.buffer, d],
+  );
   const clashes = useMemo(
     () => roomClashes(d, model.bookings, QUADRO_ROOMS, model.options.buffer),
     [d, model.bookings, model.options.buffer],
@@ -366,24 +517,31 @@ export function BookingPlanner({
         : [...(x.rooms ?? []), r],
     }));
 
-  const submit = (e: FormEvent) => {
-    e.preventDefault();
+  const create = (): Booking | null => {
     const clean: BookingDraft = {
       ...d,
       title: d.title.trim(),
       rooms: colico ? (d.rooms ?? []) : [],
+      entrance: (d.entrance ?? "").trim(),
+      amount: d.kind === "affitto" ? (d.amount ?? "").trim() : "",
     };
     const errs = validateBooking(clean);
     setErrors(errs);
-    if (errs.length) return;
-    model.addBooking(clean);
+    if (errs.length) return null;
+    const b = model.addBooking(clean);
     setDone(
       `Ipotesi aggiunta: ${BOOKING_KIND_LABEL[d.kind]}, ${longDay(d.date)} alle ${d.start}.`,
     );
+    return b;
   };
-
-  const copyRow = async (b: Booking) =>
-    setCopied({ id: b.id, ok: await copyText(bookingToRegistryRow(b)) });
+  const submit = (e: FormEvent) => {
+    e.preventDefault();
+    create();
+  };
+  const sendNow = () => {
+    const b = create();
+    if (b) setSending(b);
+  };
 
   return (
     <section
@@ -392,7 +550,7 @@ export function BookingPlanner({
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 id="h-ip" className="m-0 text-[19px] font-bold">
-          Ipotesi di uso dei campi
+          Nuova prenotazione
         </h2>
         <div className="flex flex-wrap items-center gap-2">
           <Chip tone="warn">non salvato nel gestionale</Chip>
@@ -410,9 +568,9 @@ export function BookingPlanner({
       </div>
       <p className="m-0 text-[14px] text-[var(--in-sub)]">
         Allenamenti extra, amichevoli, tornei, affitti a terzi o chiusure: il
-        controllo è lo stesso delle gare. Quando l'ipotesi va bene, copia la
-        riga e incollala nel registro «17 - PRENOTAZIONI IMPIANTI 2026-27»: lo
-        stato resta PROPOSTA finché la Direzione non approva.
+        controllo è lo stesso delle gare. «Invia alla Direzione» prepara la riga
+        per il registro «17 - PRENOTAZIONI IMPIANTI 2026-27» e la scheda da
+        mandare: lo stato resta PROPOSTA finché la Direzione non decide.
       </p>
 
       <div className="grid gap-4 @[900px]:grid-cols-[minmax(0,1fr)_minmax(0,420px)]">
@@ -534,6 +692,31 @@ export function BookingPlanner({
                 }
               />
             </label>
+            <label className="grid gap-1">
+              <span className={labelCls}>Ingresso</span>
+              <input
+                type="text"
+                className={inputCls}
+                maxLength={40}
+                value={d.entrance ?? ""}
+                onChange={(e) => set("entrance", e.target.value)}
+                placeholder="facoltativo"
+              />
+            </label>
+            {d.kind === "affitto" && (
+              <label className="grid gap-1">
+                <span className={labelCls}>Importo affitto (€)</span>
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  className={inputCls}
+                  maxLength={8}
+                  value={d.amount ?? ""}
+                  onChange={(e) => set("amount", e.target.value)}
+                  placeholder="da concordare"
+                />
+              </label>
+            )}
           </div>
 
           <fieldset className="m-0 grid gap-2 rounded-xl border border-[var(--in-line)] p-3">
@@ -625,8 +808,12 @@ export function BookingPlanner({
             </ul>
           )}
           <div className="flex flex-wrap items-center gap-3">
-            <button type="submit" className={btnPrimary}>
-              Aggiungi ipotesi
+            <button type="button" className={btnPrimary} onClick={sendNow}>
+              <Send className="size-4" aria-hidden="true" />
+              Invia alla Direzione
+            </button>
+            <button type="submit" className={btnSecondary}>
+              Salva solo come ipotesi
             </button>
             <span
               role="status"
@@ -673,6 +860,15 @@ export function BookingPlanner({
         </div>
       </div>
 
+      {sending && (
+        <SendPanel
+          booking={sending}
+          model={model}
+          requestedBy={requestedBy}
+          onClose={() => setSending(null)}
+        />
+      )}
+
       {!model.storageOk && (
         <p role="alert" className="m-0 text-[14px] text-[var(--in-warn)]">
           Questo browser non salva le ipotesi: spariranno chiudendo la pagina.
@@ -687,7 +883,6 @@ export function BookingPlanner({
             const bad = model.analysis.bookingConflicts.includes(
               `ipotesi-${b.id}`,
             );
-            const c = copied?.id === b.id ? copied : null;
             return (
               <li
                 key={b.id}
@@ -714,16 +909,12 @@ export function BookingPlanner({
                 <span className="ml-auto flex flex-wrap items-center gap-1">
                   <button
                     type="button"
-                    onClick={() => void copyRow(b)}
+                    onClick={() => setSending(b)}
                     className="scd-focus inline-flex min-h-10 items-center gap-1.5 rounded-lg px-2.5 font-semibold text-[var(--in-info)] hover:bg-[var(--in-info-bg)]"
-                    aria-label={`Copia la riga per il registro: ${BOOKING_KIND_LABEL[b.kind]} del ${ddmm(b.date)}`}
+                    aria-label={`Invia alla Direzione: ${BOOKING_KIND_LABEL[b.kind]} del ${ddmm(b.date)}`}
                   >
-                    {c?.ok ? (
-                      <Check className="size-4" aria-hidden="true" />
-                    ) : (
-                      <ClipboardCopy className="size-4" aria-hidden="true" />
-                    )}
-                    Copia riga per il registro
+                    <Send className="size-4" aria-hidden="true" />
+                    Invia alla Direzione
                   </button>
                   <button
                     type="button"
@@ -735,22 +926,6 @@ export function BookingPlanner({
                     Togli
                   </button>
                 </span>
-                <span
-                  role="status"
-                  aria-live="polite"
-                  className="basis-full text-[13px] empty:hidden"
-                >
-                  {c
-                    ? c.ok
-                      ? "Riga copiata: incollala nella prima riga libera del registro (colonna ID)."
-                      : "Copia non riuscita: seleziona e copia a mano la riga qui sotto."
-                    : ""}
-                </span>
-                {c && !c.ok && (
-                  <code className="block basis-full overflow-x-auto whitespace-pre rounded bg-white p-2 text-[12px]">
-                    {bookingToRegistryRow(b)}
-                  </code>
-                )}
               </li>
             );
           })}

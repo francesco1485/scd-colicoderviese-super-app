@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  APPROVER_POSITIONS,
   IMPIANTI_POSITIONS,
+  approvalsAccess,
+  bookingsCsvUrl,
   POSITION_LABEL,
   impiantiAccess,
   stagingPreviewEnabled,
@@ -87,5 +90,43 @@ describe("impianti access gate", () => {
         true,
       ),
     ).toBe(false);
+  });
+});
+
+describe("approvals gate and CSV source", () => {
+  it("lets only Presidente and Direttore generale decide", () => {
+    expect(APPROVER_POSITIONS).toEqual(["presidente", "direttore-generale"]);
+    expect(
+      approvalsAccess(
+        { position: "direttore-generale", role: "DIRECTION" },
+        false,
+      ).mode,
+    ).toBe("tool");
+    expect(
+      approvalsAccess(
+        { position: "responsabile-attivita-base", role: "MANAGER" },
+        false,
+      ),
+    ).toEqual({ mode: "access", reason: "position" });
+    expect(approvalsAccess(null, true).mode).toBe("preview");
+    expect(approvalsAccess(null, false).mode).toBe("access");
+  });
+
+  it("accepts only an https Google Sheets URL for SCD_BOOKINGS_CSV_URL", () => {
+    const ok =
+      "https://docs.google.com/spreadsheets/d/e/2PACX-abc/pub?gid=0&single=true&output=csv";
+    expect(bookingsCsvUrl({ SCD_BOOKINGS_CSV_URL: ok })).toBe(ok);
+    expect(bookingsCsvUrl({})).toBeNull();
+    expect(
+      bookingsCsvUrl({
+        SCD_BOOKINGS_CSV_URL: "http://docs.google.com/spreadsheets/x",
+      }),
+    ).toBeNull();
+    expect(
+      bookingsCsvUrl({
+        SCD_BOOKINGS_CSV_URL: "https://evil.example/spreadsheets/x",
+      }),
+    ).toBeNull();
+    expect(bookingsCsvUrl({ SCD_BOOKINGS_CSV_URL: "not a url" })).toBeNull();
   });
 });

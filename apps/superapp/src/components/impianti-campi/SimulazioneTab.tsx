@@ -17,9 +17,9 @@ import {
   type PitchId,
   type TeamMode,
 } from "@/lib/rotation";
-import { BookingPlanner, type BookingDraft } from "./BookingPlanner";
+import { Link } from "@tanstack/react-router";
 import { teamColor, type ImpiantiModel } from "./model";
-import { Chip, SimulationNote, inputCls, labelCls } from "./ui";
+import { Chip, SimulationNote, btnPrimary, inputCls, labelCls } from "./ui";
 
 const TEAM_NAME: Record<MovableGroup, string> = {
   u15: "U15",
@@ -220,11 +220,9 @@ function DayCard({
 export function SimulazioneTab({
   model,
   focusDate,
-  draft,
 }: {
   model: ImpiantiModel;
   focusDate: string | null;
-  draft: BookingDraft | null;
 }) {
   const { options, analysis: r } = model;
   const [onlyBad, setOnlyBad] = useState(true);
@@ -243,12 +241,6 @@ export function SimulazioneTab({
     }, 60);
     return () => window.clearTimeout(t);
   }, [focusDate]);
-  useEffect(() => {
-    if (!draft) return;
-    document
-      .getElementById("ipotesi-form")
-      ?.scrollIntoView({ block: "center" });
-  }, [draft]);
 
   const shown = useMemo(
     () =>
@@ -450,7 +442,24 @@ export function SimulazioneTab({
         </div>
       </section>
 
-      <BookingPlanner model={model} draftIn={draft} />
+      <section
+        aria-labelledby="h-ip"
+        className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[var(--in-line)] bg-white p-4 shadow-[var(--in-card-shadow)]"
+      >
+        <div className="grid gap-1">
+          <h2 id="h-ip" className="m-0 text-[19px] font-bold">
+            Ipotesi di uso dei campi
+          </h2>
+          <p className="m-0 text-[14px] text-[var(--in-sub)]">
+            {model.bookings.length
+              ? `${model.bookings.length} ${model.bookings.length === 1 ? "ipotesi" : "ipotesi"} in questo browser, ${model.analysis.bookingConflicts.length} non ci stanno. Le vedi nelle linee del tempo qui sotto.`
+              : "Nessuna ipotesi: allenamenti extra, amichevoli, tornei, affitti o chiusure si aggiungono con l'anteprima 2D."}
+          </p>
+        </div>
+        <Link to="/gestionale/impianti/nuova" className={btnPrimary}>
+          Nuova prenotazione
+        </Link>
+      </section>
 
       <section aria-labelledby="h-days" className="grid gap-2.5">
         <div className="flex flex-wrap items-center justify-between gap-3">
