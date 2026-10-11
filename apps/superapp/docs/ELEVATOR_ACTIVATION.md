@@ -31,6 +31,12 @@ Il salvataggio ridistribuisce il servizio. La chiave *service role* NON serve al
 3. Atterraggio automatico su `/direzione`; menu "Accesso aree" mostra e-mail e badge **Direzione**.
 4. `/segreteria/persone`: elenco (vuoto finché non si importa), **Inserisci**, scheda, **Segna uscito/a**.
 
+## Stato al 11/10/2026 sera
+- `VERIFIED`: utente Direttore creato e ruolo DIRECTION assegnato; accesso riuscito su staging con atterraggio su `/direzione`.
+- `VERIFIED`: r60 applicata (letture minimizzate, vedi migrazione); import anagrafica 2026/27 completato (363 persone, 315 atleti, 221 iscrizioni a rosa).
+- `VERIFIED`: Direzione vede tutto; utente estraneo e anonimo vedono 0 righe.
+- `PENDING`: r61 accesso per squadra e per famiglia; account personali al posto della casella condivisa.
+
 ## Stato al 11/10/2026 ore 16:10
 - `VERIFIED`: connettore Supabase autorizzato sull'organizzazione della società (accesso del Direttore come membro del team).
 - `VERIFIED`: progetto SCD PULSE (`ndevtxxijbcnskgysdit`) con r33, r34, r35, r51, r51_1, r53 + **r59** e **r59_1** applicate; 0 persone, 0 utenti.
