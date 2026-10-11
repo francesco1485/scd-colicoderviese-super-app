@@ -47,7 +47,7 @@ function FamilyHome({ roles, badge, members, callups, failed }: { roles: string[
   const today = todayRome();
   return (
     <InteriorShell
-      title="La mia famiglia"
+      title={kids.length ? "La mia famiglia" : "Le mie convocazioni"}
       path="/famiglia"
       activeAreaId="famiglia"
       roles={new Set(roles)}
@@ -71,7 +71,7 @@ function FamilyHome({ roles, badge, members, callups, failed }: { roles: string[
           </div>
         </Card>
 
-        <Card id="fam-ragazzi" title="I miei ragazzi" sub="Dati della segreteria: tesseramento e certificato medico.">
+        <Card id="fam-ragazzi" title={kids.length ? "I miei ragazzi" : "La mia scheda"} sub="Dati della segreteria: tesseramento e certificato medico.">
           {members.length === 0 ? (
             <div className="px-4 pb-4 sm:px-[18px]">
               <EmptyState title="Nessun ragazzo collegato">

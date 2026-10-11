@@ -125,7 +125,7 @@ export function landingFor(roles: ReadonlySet<string>): string {
     ["dirigente-annata", "/gestionale/mister"],
     ["mister", "/gestionale/mister"],
     ["famiglia", "/famiglia"],
-    ["atleta", "/core/atleta"],
+    ["atleta", "/famiglia"],
     ["partner", "/partner"],
   ];
   for (const [id, path] of order) if (roles.has(id)) return path;
