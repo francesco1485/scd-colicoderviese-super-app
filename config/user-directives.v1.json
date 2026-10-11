@@ -1386,6 +1386,54 @@
         "implementationStatus": "STAGING (home, gateway); other pages to review",
         "duplicate_work": "DENY"
       }
+    },
+    {
+      "id": "UD-058",
+      "name": "OFFICIAL_CHANNEL_AND_ROLE_CONTRIBUTIONS",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "1 da quando siamo pronti",
+        "2 tutti nelle loro responsabilità possono contribuire"
+      ],
+      "context": "Answers to: (1) does the Super App become the single official channel for call-ups, schedules and minibuses, and from when? (2) who keeps it updated for each team?",
+      "normalizedCommand": {
+        "rule": "The Super App becomes the single official channel for call-ups, schedules, field changes and minibuses as soon as it passes the readiness gate (launch criteria in the Torre v8). Everyone contributes within their own responsibility: each role can insert and update only what belongs to its area and teams, through the same account.",
+        "scope": "SUPER_APP | ORGANIZATION",
+        "torreFloor": "Struttura portante (people and governance)",
+        "constraints": [
+          "readiness is a checklist, not a date: identity live, real data in the database, call-ups and minibuses working end to end, push notifications, privacy for minors verified, Direzione approval",
+          "contributions follow role and scope (RBAC + ABAC): mister and dirigenti on their teams, transport manager on minibuses, secretariat on documents, families on confirmations",
+          "no publication without Direzione approval remains valid"
+        ],
+        "implementationStatus": "RECORDED (gate and matrix in Torre v8)",
+        "duplicate_work": "DENY"
+      }
+    },
+    {
+      "id": "UD-059",
+      "name": "WEB_PRESENCE_TRANSITION_AND_GOLEE",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "Golee: No, profilo inattivo",
+        "Al momento il sito è datato ci sono cose vecchie e cose nuove non lo userei per il futuro solo per iniziare"
+      ],
+      "context": "Web research 2026-10-11: colicoderviese.it (WordPress, Ad Web) shows results and fixtures stopped at 2024/25, news about monthly; a Golee club profile exists.",
+      "normalizedCommand": {
+        "rule": "Golee is not used: no integration, no data from it. The current website colicoderviese.it is only a starting bridge (it can link to the Super App); the Super App becomes the club's official web presence for the future. Nothing is migrated from the site without checking it is current.",
+        "scope": "SUPER_APP | WEB_PRESENCE",
+        "torreFloor": "Facciata",
+        "constraints": [
+          "no duplicate publishing on two sites once the Super App is official",
+          "old site content treated as UNVERIFIED (mix of old and new)",
+          "domain switch only with Direzione approval when the readiness gate is green"
+        ],
+        "implementationStatus": "RECORDED",
+        "duplicate_work": "DENY"
+      }
     }
   ],
   "completionGate": {
