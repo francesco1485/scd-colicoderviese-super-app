@@ -144,8 +144,11 @@ function Accedi() {
                 </p>
               )}
               <p className="text-[13.5px] leading-snug text-[var(--scd-sub)]">
-                Il link vale pochi minuti e si usa una volta sola. Entra solo chi la società ha registrato: se la tua e-mail non è tra quelle, scrivi alla segreteria.
+                Il link vale pochi minuti e si usa una volta sola. Entra solo chi la società ha registrato.
               </p>
+              <Link to="/registrati" className="scd-focus inline-flex h-11 items-center justify-center rounded-[10px] border border-[#b9d5ef] bg-white text-[15px] font-semibold text-[var(--scd-blue)]" data-testid="login-register">
+                Non hai ancora l'accesso? Registrati
+              </Link>
             </form>
           )}
         </section>

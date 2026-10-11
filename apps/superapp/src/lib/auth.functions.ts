@@ -83,7 +83,7 @@ export const requestMagicLink = createServerFn({ method: "POST" })
       const notFound = /signups not allowed|user not found|otp_disabled/i.test(error.message);
       return {
         sent: false,
-        message: notFound ? "Questa e-mail non è registrata: chiedi alla segreteria di attivarla." : "Invio non riuscito, riprova tra un minuto.",
+        message: notFound ? "Questa e-mail non è ancora attiva: chiedi l'accesso dal pulsante qui sotto." : "Invio non riuscito, riprova tra un minuto.",
       };
     }
     return { sent: true, message: "Ti abbiamo mandato un link: aprilo da questo telefono o computer per entrare." };

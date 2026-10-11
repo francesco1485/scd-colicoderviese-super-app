@@ -29,6 +29,7 @@ import {
 } from "@/lib/people";
 import { getPeople, getPerson, insertPerson, markPersonLeft, type PeopleData, type WriteOutcome } from "@/lib/people.functions";
 import { getWorkAreaGate } from "@/lib/work-areas.functions";
+import { AccessRequestsCard } from "@/components/scd/AccessRequestsCard";
 
 export const Route = createFileRoute("/segreteria_/persone")({
   loader: async () => {
@@ -85,6 +86,7 @@ function PersonePage({ initial, preview }: { initial: PeopleData; preview: boole
     >
       <div className="grid grid-cols-1 gap-[18px] lg:grid-cols-[minmax(0,1fr)_380px]">
         <div className="flex min-w-0 flex-col gap-[18px]">
+          {data.connected && <AccessRequestsCard people={data.people} today={data.today} canWrite={data.canWrite} onChanged={refresh} />}
           <Card
             id="persone-elenco"
             title="Elenco"

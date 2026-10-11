@@ -1495,6 +1495,30 @@
         "implementationStatus": "IMPLEMENTED_STAGING",
         "duplicate_work": "DENY"
       }
+    },
+    {
+      "id": "UD-063",
+      "name": "SELF_REGISTRATION_WITH_OFFICE_APPROVAL",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "Ognuno può accedere registrandosi o registrandolo noi poi quando registrati noi lo autorizziamo",
+        "noi poi lo autorizzo dopo aver verificato chi è",
+        "Semplice Nome cognome data nascita Mail e tel"
+      ],
+      "normalizedCommand": {
+        "rule": "Public /registrati form with exactly first name, last name, birth date, e-mail, phone (+ mandatory privacy consent). Requests queue for Direzione/Segreteria in /segreteria/persone; approval links or creates the person, creates the login, assigns a non-office role and, for a parent, the child's family. Staff may fill the form on behalf of someone.",
+        "scope": "IDENTITY | ONBOARDING",
+        "constraints": [
+          "under 14: a parent registers",
+          "14-17: office verifies family consent",
+          "office roles never granted from a request",
+          "no account enumeration in the public answer"
+        ],
+        "implementationStatus": "IMPLEMENTED_STAGING",
+        "duplicate_work": "DENY"
+      }
     }
   ],
   "completionGate": {
