@@ -7,12 +7,15 @@ One backlog item per night, finished to a verifiable boundary. Status: `done`, `
 | # | Item | Status | Commit | Date |
 |---|------|--------|--------|------|
 | 1 | Foundations: tokens, area registry, interior shell, public chrome | done | see 2026-10-11 entry | 2026-10-11 |
-| 2 | Access: "Accesso alle aree" menu + one access screen per area path | todo | | |
-| 3 | Field rotation `/calendario/rotazione-campi` | todo | | |
-| 4 | `/quadro` and `/gestionale` read-only | todo | | |
+| 2 | Access: "Accesso alle aree" menu + one access screen per area path | done | 446e1e4 | 2026-10-11 |
+| 3 | Field rotation → `/gestionale/impianti` (+ colico, dervio, simulazione, nuova, approvazioni) | done | 191ed97, bf401a4 | 2026-10-11 |
+| 4 | `/quadro` and `/gestionale` read-only | done | 8ba2516 | 2026-10-11 |
 | 5 | Public: `/oggi`, match live page, LED sponsor, Sky Club, Foto | todo | | |
-| 6 | Work areas read-only with honest empty states | todo | | |
+| 6 | Work areas read-only with honest empty states | done | 678d4e3 | 2026-10-11 |
 | 7 | Gioca "in arrivo" teaser | todo | | |
+| 2b | Facility map `/impianti` + `/gestionale/mappa` | done | 06da5f2 | 2026-10-11 |
+| 5a | Public hall (chi siamo, squadre, official results links, contatti) | in-progress (branch feat/r2-hall) | | |
+| 8 | Impianti follow-ups from benchmark: one request for pitch+rooms+lights, state history (who/when), day view prenotato/disponibile/rilasciato, quadro trainings in pitch capacity check | todo | | |
 
 ## 2026-10-11 · Item 1 · Foundations · done
 
@@ -33,3 +36,11 @@ Notes / open points for Francesco:
 - The registry has no role list for `segreteria`, `tesoreria`, `crm`, `magazzino`, `direzione`: the interior rail shows them to every staff role until roles are defined (navigation only; access stays with R20). Board Quadro-settimanale suggests a quadro manager should only see the Sport group.
 - On phone board routes (Home), the public top bar is hidden by design: "Accesso aree" is reachable from the full menu and the Home "Il tuo ingresso" band. Item 2 should add a direct entry point on the phone Home header (board Main shows a yellow "Entra").
 - Pre-existing: Vercel status "scd-superapp" fails on this branch (not used by staging; Render is the staging host).
+
+## 2026-10-11 · Daytime parallel build (integrator session) · items 2, 3, 4, 6 and facility map · done
+
+Built in parallel branches and merged into `staging/superapp` after build + vitest (309) + test:manifest + test:claude-hooks:
+- item 2 access screens (`feat/r2-access`), item 4 quadro/gestionale (`feat/r2-quadro-gestionale`), facility map (`feat/r2-facility-map`), item 3 impianti e campi with deep links, booking hand-off and Direzione approvals (`feat/r2-rotation`), item 6 work areas (`feat/r2-work-areas`).
+- Staging env: `SCD_STAGING_PREVIEW=1` set on the Render staging service (preview banner, never in production). `SCD_BOOKINGS_CSV_URL` not set yet (waits for the published CSV link of "17 - PRENOTAZIONI IMPIANTI 2026-27").
+- Authorised positions for impianti: presidente, direttore-generale, responsabile-attivita-base, coordinatore-attivita-sportiva (approvals: first two), decided by Francesco 2026-10-11, mapped to manifest roles DIRECTION/MANAGER.
+- Facts verified on 2026-10-11: Colico campo 2 synthetic 96x48 (master 16 - SEDI E IMPIANTI); first team in Promozione Lombardia girone D, Juniores Regionale U19 Élite girone C (gare.lnd.it).
