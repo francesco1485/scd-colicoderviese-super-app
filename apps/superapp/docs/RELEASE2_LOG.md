@@ -171,3 +171,5 @@ prossimi impegni e "ci sarò" in primo piano). Desktop invariato.
   Prova per profilo: famiglia 2 persone (sé + figlio), atleta 1, mister/dirigente rosa della propria squadra + elenco staff,
   nessun contatto altrui; Direzione tutto.
 - App: l'atleta maggiorenne atterra su /famiglia ("Le mie convocazioni").
+- `VERIFIED` ruoli d'ufficio approvati dalla Direzione ("Come proposto"): Presidente, VP, Consigliere, DG, DS → DIRECTION (4 accessi);
+  Segreteria, Segreteria remoto → SECRETARIAT (2 accessi). Messa online: prima gruppo pilota sullo staging, poi pubblicazione per tutti.
