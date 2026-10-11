@@ -45,7 +45,7 @@ export default defineConfig({
               handler: "NetworkFirst",
               options: {
                 cacheName: "scd-pages",
-                networkTimeoutSeconds: 4,
+                networkTimeoutSeconds: 10,
                 precacheFallback: { fallbackURL: "offline.html" },
               },
             },

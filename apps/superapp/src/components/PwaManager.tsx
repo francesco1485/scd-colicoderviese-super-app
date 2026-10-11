@@ -9,13 +9,36 @@ function refusedContext() {
   if (h.startsWith("id-preview--") || h.startsWith("preview--")) return true;
   if (/(^|\.)lovableproject(-dev)?\.com$/.test(h)) return true;
   if (/(^|\.)beta\.lovable\.dev$/.test(h)) return true;
+  // Staging/review hosts: always the latest deploy, never an offline copy.
+  if (h.endsWith(".onrender.com") || h === "localhost" || h === "127.0.0.1") return true;
   if (new URLSearchParams(window.location.search).get("sw") === "off") return true;
   return false;
 }
 
 async function unregisterAppSw() {
   const regs = await navigator.serviceWorker.getRegistrations();
-  await Promise.all(regs.filter((r) => r.active?.scriptURL.endsWith("/sw.js")).map((r) => r.unregister()));
+  const ours = regs.filter((r) => (r.active ?? r.waiting ?? r.installing)?.scriptURL.endsWith("/sw.js"));
+  await Promise.all(ours.map((r) => r.unregister()));
+  let cleared = 0;
+  try {
+    const keys = await caches.keys();
+    const old = keys.filter((k) => k === "scd-pages" || k.startsWith("workbox-precache"));
+    await Promise.all(old.map((k) => caches.delete(k)));
+    cleared = old.length;
+  } catch {
+    /* Cache API unavailable: nothing to clear */
+  }
+  // The page was served by the old offline copy: reload once to get the live version.
+  if (ours.length > 0 || cleared > 0) {
+    try {
+      if (sessionStorage.getItem("scd-sw-cleared") !== "1") {
+        sessionStorage.setItem("scd-sw-cleared", "1");
+        window.location.reload();
+      }
+    } catch {
+      /* storage blocked: skip the reload rather than risk a loop */
+    }
+  }
 }
 
 export function PwaManager() {
