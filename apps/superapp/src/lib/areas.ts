@@ -115,6 +115,8 @@ const EXPLICIT_HREF: Readonly<Record<string, string>> = {
   sponsor: "/sponsor",
   gestionale: "/gestionale",
   quadro: "/quadro",
+  mappa: "/gestionale/mappa",
+  impianti: "/impianti",
 };
 
 /**
@@ -205,7 +207,7 @@ export function areaLink(id: string): AreaLink {
 
 export type AreaIcon =
   | "calendar" | "trophy" | "plus" | "home" | "grid" | "table" | "bus" | "box"
-  | "file" | "coin" | "users" | "gauge" | "star" | "handshake";
+  | "file" | "coin" | "users" | "gauge" | "star" | "handshake" | "map";
 
 export interface MenuEntry {
   id: string;
@@ -282,6 +284,7 @@ export const INTERIOR_RAIL: readonly RailGroup[] = [
       { id: "quadro", label: "Quadro settimanale", icon: "table" },
       { id: "calendario", label: "Calendario annuale", icon: "calendar" },
       { id: "rotazione-campi", label: "Rotazione campi", icon: "grid" },
+      { id: "mappa", label: "Mappa impianti", icon: "map" },
       { id: "pulmini", label: "Pulmini", icon: "bus" },
     ],
   },

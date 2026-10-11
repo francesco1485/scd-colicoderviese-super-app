@@ -1,0 +1,281 @@
+{
+  "schema": "scd.facilities.v1",
+  "status": "PROPOSED_DATA_CONTRACT",
+  "updated": "2026-10-11",
+  "purpose": "Facility map contract of the Super App (public /impianti, staff /gestionale/mappa). Sites, spaces, entrances and routes of the club, with the provenance of every value. Unknown values are null and render as 'da inserire', never invented.",
+  "source_registry_id": "SCD_DRIVE",
+  "sources": {
+    "master": {
+      "label": "16 - SEDI E IMPIANTI (master Drive)",
+      "drive_file_id": "1vcEMucnKtoJ9ICE4FwB5tDwMW16msSATZetxWGwU-2I",
+      "sheets": ["SEDI", "SPAZI"],
+      "read_on": "2026-10-11",
+      "verification": "VERIFIED"
+    },
+    "board_colico": {
+      "label": "Visual Master boards Rotazione-campi and Mappa-centro (docs/design/visual-master)",
+      "verification": "REFERENCE_BOARD"
+    },
+    "board_dervio": {
+      "label": "Visual Master board Rotazione-Dervio (from 'navigatore Dervio V01' and 'rapporto tecnico 2025')",
+      "verification": "REFERENCE_BOARD"
+    },
+    "quadro": {
+      "label": "Quadro settimanale allenamenti 2026/27 (apps/superapp/src/data/quadro-snapshot-20261009.json)",
+      "verification": "SNAPSHOT"
+    },
+    "corrections_register": {
+      "label": "00 - SCD INSERIMENTI E RICHIESTE A SKY (master)",
+      "url": "https://docs.google.com/spreadsheets/d/15Dew9ankJXHsZMVD426BHwYD-u9TKVtQWVMOWcSLnwk/edit",
+      "columns": ["Data", "Inserito da (ruolo)", "Tipo", "Area", "Descrizione", "Scadenza", "Link o allegato", "Stato", "Esito", "Lavorato il"]
+    }
+  },
+  "rules": [
+    "Facts come from the master 16 - SEDI E IMPIANTI. Board positions are schematic and say so.",
+    "Unknown is null: hours, entrances, responsible role. The UI renders 'da inserire', never zero or a guess.",
+    "Access lists and usage rules that are not in a document carry source 'regola proposta' until the club confirms them.",
+    "Public view shows spaces, hours, public entrances and the ticket office only: no team or changing-room assignments.",
+    "No personal data: roles only."
+  ],
+  "sites": [
+    {
+      "id": "SED-COL",
+      "name": "Centro Sportivo Colico",
+      "short": "Colico",
+      "type": "CENTRO SPORTIVO",
+      "address": "Via Lido SNC",
+      "municipality": "Colico (LC)",
+      "status": "ATTIVO",
+      "managed_by_scd": true,
+      "responsible_role": null,
+      "notes": "Campo 1, Campo 2 e servizi societari",
+      "board_label": null,
+      "provenance": { "source": "master", "verified": true },
+      "plan": { "width": 980, "height": 600, "positions": "schematic", "note": "Schema non in scala, posizioni dai board Rotazione-campi e Mappa-centro: serve a orientarsi, non è un rilievo." },
+      "entrances": [
+        { "id": "ING-COL-PUL", "label": "Ingresso pulmini", "audience": "teams", "x": 70, "y": 584, "provenance": { "source": "board", "ref": "Mappa-centro", "verified": false } },
+        { "id": "ING-COL-ATL", "label": "Ingresso atleti", "audience": "teams", "x": 340, "y": 584, "provenance": { "source": "board", "ref": "Mappa-centro", "verified": false } },
+        { "id": "ING-COL-VIS", "label": "Ingresso visitatori", "audience": "public", "x": 900, "y": 584, "provenance": { "source": "board", "ref": "Mappa-centro", "verified": false } }
+      ],
+      "routes": [
+        { "id": "PER-COL-ATL", "label": "Percorso atleti: ingresso centrale, spogliatoi, campo", "audience": "teams", "points": [[340, 584], [340, 470], [664, 470], [664, 312]], "provenance": { "source": "board", "ref": "Mappa-centro", "verified": false } },
+        { "id": "PER-COL-VIS", "label": "Percorso visitatori: ingresso a destra, biglietteria, Club House", "audience": "public", "points": [[900, 584], [900, 470], [886, 446]], "provenance": { "source": "board", "ref": "Mappa-centro", "verified": false } }
+      ]
+    },
+    {
+      "id": "SED-DER",
+      "name": "Impianto Dervio",
+      "short": "Dervio",
+      "type": "IMPIANTO SPORTIVO",
+      "address": null,
+      "municipality": "Dervio (LC)",
+      "status": "ATTIVO",
+      "managed_by_scd": false,
+      "responsible_role": null,
+      "notes": "Indirizzo da verificare; SCD non gestisce l'impianto.",
+      "board_label": "Centro sportivo Azzurri d'Italia",
+      "provenance": { "source": "master", "verified": true },
+      "plan": { "width": 980, "height": 560, "positions": "schematic", "note": "Schema non in scala e non orientato, dal board Rotazione-Dervio (navigatore Dervio V01, rapporto tecnico 2025). Non è un rilievo né un'omologazione." },
+      "entrances": null,
+      "routes": null
+    }
+  ],
+  "spaces": [
+    {
+      "id": "SPA-COL-C1", "site": "SED-COL", "name": "Campo 1", "type": "field", "layer": "campi",
+      "surface": "Sintetico", "size": { "text": "100 x 60 m", "length_m": 100, "width_m": 60 },
+      "layout": { "x": 30, "y": 60, "w": 620, "h": 380 },
+      "hours": null, "entrances": null, "responsible_role": null,
+      "access": { "audiences": ["teams", "referees"], "source": "regola proposta" },
+      "rules": [ { "text": "Gare della Prima Squadra e altre attività.", "source": "master 16 - SEDI E IMPIANTI (nota)" } ],
+      "quadro_key": "C1",
+      "provenance": { "source": "master", "verified": true }
+    },
+    {
+      "id": "SPA-COL-C2", "site": "SED-COL", "name": "Campo 2", "type": "field", "layer": "campi",
+      "surface": "Sintetico", "size": { "text": "96 x 48 m", "length_m": 96, "width_m": 48 },
+      "layout": { "x": 680, "y": 60, "w": 270, "h": 170 },
+      "hours": null, "entrances": null, "responsible_role": null,
+      "access": { "audiences": ["teams"], "source": "regola proposta" },
+      "rules": [ { "text": "Attività del settore giovanile e di base.", "source": "master 16 - SEDI E IMPIANTI (nota)" } ],
+      "quadro_key": "C2",
+      "provenance": { "source": "master", "verified": true }
+    },
+    {
+      "id": "SPA-COL-SEG", "site": "SED-COL", "name": "Segreteria", "type": "office", "layer": "servizi",
+      "surface": null, "size": null, "layout": null,
+      "hours": null, "entrances": null, "responsible_role": null,
+      "access": { "audiences": ["staff", "authorised_roles"], "source": "regola proposta" },
+      "rules": [],
+      "quadro_key": null,
+      "provenance": { "source": "master", "verified": true }
+    },
+    {
+      "id": "SPA-COL-CH", "site": "SED-COL", "name": "Club House", "type": "clubhouse", "layer": "servizi",
+      "surface": null, "size": null,
+      "layout": { "x": 680, "y": 384, "w": 128, "h": 56 },
+      "hours": null, "entrances": ["ING-COL-VIS"], "responsible_role": null,
+      "access": { "audiences": ["public"], "source": "regola proposta" },
+      "rules": [],
+      "quadro_key": null,
+      "provenance": { "source": "master", "verified": true }
+    },
+    {
+      "id": "SPA-COL-BAR", "site": "SED-COL", "name": "Baretto", "type": "food", "layer": "servizi",
+      "surface": null, "size": null, "layout": null,
+      "hours": null, "entrances": null, "responsible_role": null,
+      "access": { "audiences": ["public"], "source": "regola proposta" },
+      "rules": [],
+      "quadro_key": null,
+      "provenance": { "source": "master", "verified": true }
+    },
+    {
+      "id": "SPA-COL-MAG", "site": "SED-COL", "name": "Magazzino", "type": "storage", "layer": "servizi",
+      "surface": null, "size": null, "layout": null,
+      "hours": null, "entrances": null, "responsible_role": null,
+      "access": { "audiences": ["authorised_roles"], "roles": ["responsabile-magazzino"], "source": "regola proposta" },
+      "rules": [],
+      "quadro_key": null,
+      "provenance": { "source": "master", "verified": true }
+    },
+    {
+      "id": "SPA-COL-INF", "site": "SED-COL", "name": "Infermeria", "type": "first_aid", "layer": "servizi",
+      "surface": null, "size": null, "layout": null,
+      "hours": null, "entrances": null, "responsible_role": null,
+      "access": { "audiences": ["staff", "authorised_roles"], "source": "regola proposta" },
+      "rules": [ { "text": "Nessuna diagnosi o nota clinica nell'app: solo servizio, giorno e orario.", "source": "PRODUCT.md (Infermeria)" } ],
+      "quadro_key": null,
+      "provenance": { "source": "master", "verified": true }
+    },
+    {
+      "id": "SPA-COL-BIG", "site": "SED-COL", "name": "Biglietteria", "type": "ticket_office", "layer": "servizi",
+      "surface": null, "size": null,
+      "layout": { "x": 822, "y": 384, "w": 128, "h": 56 },
+      "hours": null, "entrances": ["ING-COL-VIS"], "responsible_role": null,
+      "access": { "audiences": ["public"], "source": "regola proposta" },
+      "rules": [ { "text": "Tariffe: fonte da confermare.", "source": "config/superapp-areas.v1.json (biglietteria, blocker)" } ],
+      "quadro_key": null,
+      "provenance": { "source": "master", "verified": true }
+    },
+    {
+      "id": "SPA-COL-SP1", "site": "SED-COL", "name": "Spogliatoio 1", "type": "changing_room", "layer": "spogliatoi",
+      "surface": null, "size": null,
+      "layout": { "x": 680, "y": 250, "w": 128, "h": 56 },
+      "hours": null, "entrances": ["ING-COL-ATL"], "responsible_role": null,
+      "access": { "audiences": ["teams"], "source": "regola proposta" },
+      "rules": [ { "text": "Assegnazione per fascia oraria dal quadro settimanale.", "source": "Quadro settimanale allenamenti 2026/27" } ],
+      "quadro_key": "SP1",
+      "provenance": { "source": "master", "verified": true }
+    },
+    {
+      "id": "SPA-COL-SP2", "site": "SED-COL", "name": "Spogliatoio 2", "type": "changing_room", "layer": "spogliatoi",
+      "surface": null, "size": null,
+      "layout": { "x": 822, "y": 250, "w": 128, "h": 56 },
+      "hours": null, "entrances": ["ING-COL-ATL"], "responsible_role": null,
+      "access": { "audiences": ["teams"], "source": "regola proposta" },
+      "rules": [ { "text": "Assegnazione per fascia oraria dal quadro settimanale.", "source": "Quadro settimanale allenamenti 2026/27" } ],
+      "quadro_key": "SP2",
+      "provenance": { "source": "master", "verified": true }
+    },
+    {
+      "id": "SPA-COL-SP3", "site": "SED-COL", "name": "Spogliatoio 3", "type": "changing_room", "layer": "spogliatoi",
+      "surface": null, "size": null,
+      "layout": { "x": 680, "y": 316, "w": 128, "h": 56 },
+      "hours": null, "entrances": ["ING-COL-ATL"], "responsible_role": null,
+      "access": { "audiences": ["teams"], "source": "regola proposta" },
+      "rules": [ { "text": "Assegnazione per fascia oraria dal quadro settimanale.", "source": "Quadro settimanale allenamenti 2026/27" } ],
+      "quadro_key": "SP3",
+      "provenance": { "source": "master", "verified": true }
+    },
+    {
+      "id": "SPA-COL-SP4", "site": "SED-COL", "name": "Spogliatoio 4", "type": "changing_room", "layer": "spogliatoi",
+      "surface": null, "size": null,
+      "layout": { "x": 822, "y": 316, "w": 128, "h": 56 },
+      "hours": null, "entrances": ["ING-COL-ATL"], "responsible_role": null,
+      "access": { "audiences": ["teams"], "source": "regola proposta" },
+      "rules": [ { "text": "Assegnazione per fascia oraria dal quadro settimanale.", "source": "Quadro settimanale allenamenti 2026/27" } ],
+      "quadro_key": "SP4",
+      "provenance": { "source": "master", "verified": true }
+    },
+    {
+      "id": "SPA-COL-ARB", "site": "SED-COL", "name": "Spogliatoio arbitri", "type": "referee_room", "layer": "spogliatoi",
+      "surface": null, "size": null,
+      "layout": { "x": 680, "y": 452, "w": 270, "h": 44 },
+      "hours": null, "entrances": null, "responsible_role": null,
+      "access": { "audiences": ["referees"], "source": "master 16 - SEDI E IMPIANTI (nota 'Dedicato')" },
+      "rules": [ { "text": "Spogliatoio dedicato agli arbitri.", "source": "master 16 - SEDI E IMPIANTI (nota)" } ],
+      "quadro_key": null,
+      "provenance": { "source": "master", "verified": true }
+    },
+    {
+      "id": "SPA-DER-C1", "site": "SED-DER", "name": "Campo Dervio", "type": "field", "layer": "campi",
+      "surface": "Erba", "size": { "text": "96 x 48 m", "length_m": 96, "width_m": 48 },
+      "layout": { "x": 150, "y": 150, "w": 440, "h": 220 },
+      "hours": null, "entrances": null, "responsible_role": null,
+      "access": { "audiences": ["teams", "referees"], "source": "regola proposta" },
+      "rules": [
+        { "text": "Solo gare ed eventi SCD comunicati al Comune con un mese di anticipo.", "source": "board Mappa-centro / Rotazione-Dervio (da verificare)" },
+        { "text": "Erba naturale: niente tornei invernali, controllo di meteo e fondo prima di confermare una gara.", "source": "board Rotazione-Dervio (da verificare)" }
+      ],
+      "quadro_key": null,
+      "board_code": "C1",
+      "provenance": { "source": "master", "verified": true }
+    },
+    {
+      "id": "DER-Z-AT1", "site": "SED-DER", "name": "Atletica 1", "type": "athletics", "layer": "campi",
+      "surface": null, "size": null,
+      "layout": { "x": 60, "y": 20, "w": 300, "h": 42 },
+      "hours": null, "entrances": null, "responsible_role": null, "access": null, "rules": [],
+      "quadro_key": null, "board_code": "AT1",
+      "provenance": { "source": "board", "ref": "Rotazione-Dervio", "verified": false }
+    },
+    {
+      "id": "DER-Z-AT2", "site": "SED-DER", "name": "Atletica 2", "type": "athletics", "layer": "campi",
+      "surface": null, "size": null,
+      "layout": { "x": 380, "y": 20, "w": 300, "h": 42 },
+      "hours": null, "entrances": null, "responsible_role": null, "access": null, "rules": [],
+      "quadro_key": null, "board_code": "AT2",
+      "provenance": { "source": "board", "ref": "Rotazione-Dervio", "verified": false }
+    },
+    {
+      "id": "DER-Z-TR", "site": "SED-DER", "name": "Tribuna coperta", "type": "stand", "layer": "servizi",
+      "surface": null, "size": { "text": "190 posti (dato 2024, da verificare)", "length_m": null, "width_m": null },
+      "layout": { "x": 200, "y": 470, "w": 340, "h": 72 },
+      "hours": null, "entrances": null, "responsible_role": null, "access": null, "rules": [],
+      "quadro_key": null, "board_code": "TR",
+      "provenance": { "source": "board", "ref": "Rotazione-Dervio", "verified": false }
+    },
+    {
+      "id": "DER-Z-C2", "site": "SED-DER", "name": "Campo allenamento", "type": "field", "layer": "campi",
+      "surface": null, "size": null,
+      "layout": { "x": 720, "y": 70, "w": 230, "h": 150 },
+      "hours": null, "entrances": null, "responsible_role": null, "access": null, "rules": [],
+      "quadro_key": null, "board_code": "C2",
+      "provenance": { "source": "board", "ref": "Rotazione-Dervio", "verified": false }
+    },
+    {
+      "id": "DER-Z-BV1", "site": "SED-DER", "name": "Beach volley 1", "type": "beach_volley", "layer": "campi",
+      "surface": null, "size": null,
+      "layout": { "x": 720, "y": 240, "w": 110, "h": 100 },
+      "hours": null, "entrances": null, "responsible_role": null, "access": null, "rules": [],
+      "quadro_key": null, "board_code": "BV1",
+      "provenance": { "source": "board", "ref": "Rotazione-Dervio", "verified": false }
+    },
+    {
+      "id": "DER-Z-BV2", "site": "SED-DER", "name": "Beach volley 2", "type": "beach_volley", "layer": "campi",
+      "surface": null, "size": null,
+      "layout": { "x": 840, "y": 240, "w": 110, "h": 100 },
+      "hours": null, "entrances": null, "responsible_role": null, "access": null, "rules": [],
+      "quadro_key": null, "board_code": "BV2",
+      "provenance": { "source": "board", "ref": "Rotazione-Dervio", "verified": false }
+    },
+    {
+      "id": "DER-Z-SP1", "site": "SED-DER", "name": "Spogliatoi", "type": "changing_room", "layer": "spogliatoi",
+      "surface": null, "size": { "text": "4 squadre + arbitri (da board, da verificare)", "length_m": null, "width_m": null },
+      "layout": { "x": 720, "y": 360, "w": 230, "h": 110 },
+      "hours": null, "entrances": null, "responsible_role": null, "access": null, "rules": [],
+      "quadro_key": null, "board_code": "SP1",
+      "provenance": { "source": "board", "ref": "Rotazione-Dervio", "verified": false }
+    }
+  ]
+}

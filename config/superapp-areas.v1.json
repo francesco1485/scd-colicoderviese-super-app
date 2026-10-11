@@ -20,7 +20,11 @@
     { "id": "quadro", "path": "/quadro", "audience": "staff", "board": "Quadro-settimanale.dc.html", "sources": ["Quadro settimanale allenamenti 2026/27"], "status": "design",
       "children": [ { "id": "quadro-rotazione-campi", "path": "/quadro/rotazione-campi", "alias_of": "rotazione-campi", "status": "design" } ] },
     { "id": "gestionale", "path": "/gestionale", "audience": "staff", "board": "Gestionale.dc.html", "sources": ["R20", "Master Calendario", "Quadro settimanale"], "status": "design",
-      "children": [ { "id": "mister", "path": "/gestionale/mister", "roles": ["mister", "dirigente-annata"], "board": "Mister.dc.html", "features": ["convocazioni con conferma lettura", "lavagna e moduli", "video", "chiamata di squadra (Teams/Meet da collegare)"], "status": "design" } ] },
+      "children": [
+        { "id": "mister", "path": "/gestionale/mister", "roles": ["mister", "dirigente-annata"], "board": "Mister.dc.html", "features": ["convocazioni con conferma lettura", "lavagna e moduli", "video", "chiamata di squadra (Teams/Meet da collegare)"], "status": "design" },
+        { "id": "mappa", "path": "/gestionale/mappa", "audience": "staff", "board": "Mappa-centro.dc.html", "sources": ["16 - SEDI E IMPIANTI", "Quadro settimanale allenamenti 2026/27", "config/scd-facilities.v1.json"], "features": ["mappa 2D di Colico e Dervio", "aperto o chiuso adesso", "ingressi e chi può entrare", "campi e spogliatoi in uso per fascia oraria", "proposta di correzione per il registro INSERIMENTI"], "status": "design" }
+      ] },
+    { "id": "impianti", "path": "/impianti", "audience": "public", "board": "Mappa-centro.dc.html", "sources": ["16 - SEDI E IMPIANTI", "config/scd-facilities.v1.json"], "features": ["mappa dei campi di Colico e Dervio", "orari", "ingresso per il pubblico", "biglietteria"], "status": "design" },
     { "id": "partita-live", "path": "/partite/:id/live", "audience": "public", "board": "Partita-live.dc.html", "features": ["aggiornamento da dirigente via Sky o Crovi", "pubblicazione dopo conferma di una seconda persona", "nomi solo Prima Squadra", "statistiche a scomparsa", "loghi avversari da fonte ufficiale"], "status": "design" },
     { "id": "pulmini", "path": "/pulmini", "audience": "staff", "roles": ["responsabile-trasporti", "autista", "direzione"], "board": "Pulmini.dc.html", "sources": ["Master Flotta"], "status": "design" },
     { "id": "magazzino", "path": "/magazzino", "audience": "staff", "board": "Magazzino.dc.html", "sources": ["inventario kit (to load)"], "status": "design" },

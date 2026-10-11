@@ -21,6 +21,7 @@ import { Route as EntraRouteImport } from './routes/entra'
 import { Route as FamigliaRouteImport } from './routes/famiglia'
 import { Route as FornitoriRouteImport } from './routes/fornitori'
 import { Route as GrowRouteImport } from './routes/grow'
+import { Route as ImpiantiRouteImport } from './routes/impianti'
 import { Route as InfermeriaRouteImport } from './routes/infermeria'
 import { Route as MagazzinoRouteImport } from './routes/magazzino'
 import { Route as PartnerRouteImport } from './routes/partner'
@@ -42,6 +43,7 @@ import { Route as DirezioneAcquistiRouteImport } from './routes/direzione_.acqui
 import { Route as EventiIndexRouteImport } from './routes/eventi.index'
 import { Route as EventiChristmasLarioCupRouteImport } from './routes/eventi.christmas-lario-cup'
 import { Route as GestionaleIndexRouteImport } from './routes/gestionale.index'
+import { Route as GestionaleMappaRouteImport } from './routes/gestionale.mappa'
 import { Route as QuadroIndexRouteImport } from './routes/quadro.index'
 import { Route as TesoreriaBiglietteriaRouteImport } from './routes/tesoreria_.biglietteria'
 import { Route as TesoreriaClubHouseRouteImport } from './routes/tesoreria_.club-house'
@@ -105,6 +107,11 @@ const FornitoriRoute = FornitoriRouteImport.update({
 const GrowRoute = GrowRouteImport.update({
   id: '/grow',
   path: '/grow',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ImpiantiRoute = ImpiantiRouteImport.update({
+  id: '/impianti',
+  path: '/impianti',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InfermeriaRoute = InfermeriaRouteImport.update({
@@ -212,6 +219,11 @@ const GestionaleIndexRoute = GestionaleIndexRouteImport.update({
   path: '/gestionale/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GestionaleMappaRoute = GestionaleMappaRouteImport.update({
+  id: '/gestionale/mappa',
+  path: '/gestionale/mappa',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const QuadroIndexRoute = QuadroIndexRouteImport.update({
   id: '/quadro/',
   path: '/quadro/',
@@ -246,6 +258,7 @@ export interface FileRoutesByFullPath {
   '/famiglia': typeof FamigliaRoute
   '/fornitori': typeof FornitoriRoute
   '/grow': typeof GrowRoute
+  '/impianti': typeof ImpiantiRoute
   '/infermeria': typeof InfermeriaRoute
   '/magazzino': typeof MagazzinoRoute
   '/partner': typeof PartnerRoute
@@ -263,6 +276,7 @@ export interface FileRoutesByFullPath {
   '/core/staff': typeof CoreStaffRoute
   '/direzione/acquisti': typeof DirezioneAcquistiRoute
   '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
+  '/gestionale/mappa': typeof GestionaleMappaRoute
   '/tesoreria/biglietteria': typeof TesoreriaBiglietteriaRoute
   '/tesoreria/club-house': typeof TesoreriaClubHouseRoute
   '/tesoreria/magazzino': typeof TesoreriaMagazzinoRoute
@@ -285,6 +299,7 @@ export interface FileRoutesByTo {
   '/famiglia': typeof FamigliaRoute
   '/fornitori': typeof FornitoriRoute
   '/grow': typeof GrowRoute
+  '/impianti': typeof ImpiantiRoute
   '/infermeria': typeof InfermeriaRoute
   '/magazzino': typeof MagazzinoRoute
   '/partner': typeof PartnerRoute
@@ -302,6 +317,7 @@ export interface FileRoutesByTo {
   '/core/staff': typeof CoreStaffRoute
   '/direzione/acquisti': typeof DirezioneAcquistiRoute
   '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
+  '/gestionale/mappa': typeof GestionaleMappaRoute
   '/tesoreria/biglietteria': typeof TesoreriaBiglietteriaRoute
   '/tesoreria/club-house': typeof TesoreriaClubHouseRoute
   '/tesoreria/magazzino': typeof TesoreriaMagazzinoRoute
@@ -325,6 +341,7 @@ export interface FileRoutesById {
   '/famiglia': typeof FamigliaRoute
   '/fornitori': typeof FornitoriRoute
   '/grow': typeof GrowRoute
+  '/impianti': typeof ImpiantiRoute
   '/infermeria': typeof InfermeriaRoute
   '/magazzino': typeof MagazzinoRoute
   '/partner': typeof PartnerRoute
@@ -342,6 +359,7 @@ export interface FileRoutesById {
   '/core/staff': typeof CoreStaffRoute
   '/direzione_/acquisti': typeof DirezioneAcquistiRoute
   '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
+  '/gestionale/mappa': typeof GestionaleMappaRoute
   '/tesoreria_/biglietteria': typeof TesoreriaBiglietteriaRoute
   '/tesoreria_/club-house': typeof TesoreriaClubHouseRoute
   '/tesoreria_/magazzino': typeof TesoreriaMagazzinoRoute
@@ -366,6 +384,7 @@ export interface FileRouteTypes {
     | '/famiglia'
     | '/fornitori'
     | '/grow'
+    | '/impianti'
     | '/infermeria'
     | '/magazzino'
     | '/partner'
@@ -383,6 +402,7 @@ export interface FileRouteTypes {
     | '/core/staff'
     | '/direzione/acquisti'
     | '/eventi/christmas-lario-cup'
+    | '/gestionale/mappa'
     | '/tesoreria/biglietteria'
     | '/tesoreria/club-house'
     | '/tesoreria/magazzino'
@@ -405,6 +425,7 @@ export interface FileRouteTypes {
     | '/famiglia'
     | '/fornitori'
     | '/grow'
+    | '/impianti'
     | '/infermeria'
     | '/magazzino'
     | '/partner'
@@ -422,6 +443,7 @@ export interface FileRouteTypes {
     | '/core/staff'
     | '/direzione/acquisti'
     | '/eventi/christmas-lario-cup'
+    | '/gestionale/mappa'
     | '/tesoreria/biglietteria'
     | '/tesoreria/club-house'
     | '/tesoreria/magazzino'
@@ -444,6 +466,7 @@ export interface FileRouteTypes {
     | '/famiglia'
     | '/fornitori'
     | '/grow'
+    | '/impianti'
     | '/infermeria'
     | '/magazzino'
     | '/partner'
@@ -461,6 +484,7 @@ export interface FileRouteTypes {
     | '/core/staff'
     | '/direzione_/acquisti'
     | '/eventi/christmas-lario-cup'
+    | '/gestionale/mappa'
     | '/tesoreria_/biglietteria'
     | '/tesoreria_/club-house'
     | '/tesoreria_/magazzino'
@@ -484,6 +508,7 @@ export interface RootRouteChildren {
   FamigliaRoute: typeof FamigliaRoute
   FornitoriRoute: typeof FornitoriRoute
   GrowRoute: typeof GrowRoute
+  ImpiantiRoute: typeof ImpiantiRoute
   InfermeriaRoute: typeof InfermeriaRoute
   MagazzinoRoute: typeof MagazzinoRoute
   PartnerRoute: typeof PartnerRoute
@@ -501,6 +526,7 @@ export interface RootRouteChildren {
   CoreStaffRoute: typeof CoreStaffRoute
   DirezioneAcquistiRoute: typeof DirezioneAcquistiRoute
   EventiChristmasLarioCupRoute: typeof EventiChristmasLarioCupRoute
+  GestionaleMappaRoute: typeof GestionaleMappaRoute
   TesoreriaBiglietteriaRoute: typeof TesoreriaBiglietteriaRoute
   TesoreriaClubHouseRoute: typeof TesoreriaClubHouseRoute
   TesoreriaMagazzinoRoute: typeof TesoreriaMagazzinoRoute
@@ -595,6 +621,13 @@ declare module '@tanstack/react-router' {
       path: '/grow'
       fullPath: '/grow'
       preLoaderRoute: typeof GrowRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/impianti': {
+      id: '/impianti'
+      path: '/impianti'
+      fullPath: '/impianti'
+      preLoaderRoute: typeof ImpiantiRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/infermeria': {
@@ -744,6 +777,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GestionaleIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/gestionale/mappa': {
+      id: '/gestionale/mappa'
+      path: '/gestionale/mappa'
+      fullPath: '/gestionale/mappa'
+      preLoaderRoute: typeof GestionaleMappaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/quadro/': {
       id: '/quadro/'
       path: '/quadro'
@@ -788,6 +828,7 @@ const rootRouteChildren: RootRouteChildren = {
   FamigliaRoute: FamigliaRoute,
   FornitoriRoute: FornitoriRoute,
   GrowRoute: GrowRoute,
+  ImpiantiRoute: ImpiantiRoute,
   InfermeriaRoute: InfermeriaRoute,
   MagazzinoRoute: MagazzinoRoute,
   PartnerRoute: PartnerRoute,
@@ -805,6 +846,7 @@ const rootRouteChildren: RootRouteChildren = {
   CoreStaffRoute: CoreStaffRoute,
   DirezioneAcquistiRoute: DirezioneAcquistiRoute,
   EventiChristmasLarioCupRoute: EventiChristmasLarioCupRoute,
+  GestionaleMappaRoute: GestionaleMappaRoute,
   TesoreriaBiglietteriaRoute: TesoreriaBiglietteriaRoute,
   TesoreriaClubHouseRoute: TesoreriaClubHouseRoute,
   TesoreriaMagazzinoRoute: TesoreriaMagazzinoRoute,

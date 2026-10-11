@@ -1,5 +1,5 @@
 import {
-  Bus, CalendarDays, CircleDollarSign, FileText, Gauge, Handshake, House, LayoutGrid, Package, SquarePlus, Star, Table, Trophy, Users,
+  Bus, CalendarDays, CircleDollarSign, FileText, Gauge, Handshake, House, LayoutGrid, MapPinned, Package, SquarePlus, Star, Table, Trophy, Users,
   type LucideIcon,
 } from "lucide-react";
 
@@ -21,4 +21,5 @@ export const AREA_ICON: Record<AreaIcon, LucideIcon> = {
   gauge: Gauge,
   star: Star,
   handshake: Handshake,
+  map: MapPinned,
 };
