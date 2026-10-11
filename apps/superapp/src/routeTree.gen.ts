@@ -26,6 +26,7 @@ import { Route as InfermeriaRouteImport } from './routes/infermeria'
 import { Route as MagazzinoRouteImport } from './routes/magazzino'
 import { Route as PartnerRouteImport } from './routes/partner'
 import { Route as PulminiRouteImport } from './routes/pulmini'
+import { Route as RegistratiRouteImport } from './routes/registrati'
 import { Route as SafeguardingRouteImport } from './routes/safeguarding'
 import { Route as SegreteriaRouteImport } from './routes/segreteria'
 import { Route as ShopRouteImport } from './routes/shop'
@@ -43,6 +44,7 @@ import { Route as CoreAtletaRouteImport } from './routes/core.atleta'
 import { Route as CoreFamigliaRouteImport } from './routes/core.famiglia'
 import { Route as CoreImpiantiCalendariRouteImport } from './routes/core.impianti-calendari'
 import { Route as CoreStaffRouteImport } from './routes/core.staff'
+import { Route as DirezioneAccessiRouteImport } from './routes/direzione_.accessi'
 import { Route as DirezioneAcquistiRouteImport } from './routes/direzione_.acquisti'
 import { Route as EventiIndexRouteImport } from './routes/eventi.index'
 import { Route as EventiChristmasLarioCupRouteImport } from './routes/eventi.christmas-lario-cup'
@@ -149,6 +151,11 @@ const PulminiRoute = PulminiRouteImport.update({
   path: '/pulmini',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RegistratiRoute = RegistratiRouteImport.update({
+  id: '/registrati',
+  path: '/registrati',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SafeguardingRoute = SafeguardingRouteImport.update({
   id: '/safeguarding',
   path: '/safeguarding',
@@ -233,6 +240,11 @@ const CoreImpiantiCalendariRoute = CoreImpiantiCalendariRouteImport.update({
 const CoreStaffRoute = CoreStaffRouteImport.update({
   id: '/core/staff',
   path: '/core/staff',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DirezioneAccessiRoute = DirezioneAccessiRouteImport.update({
+  id: '/direzione_/accessi',
+  path: '/direzione/accessi',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DirezioneAcquistiRoute = DirezioneAcquistiRouteImport.update({
@@ -358,6 +370,7 @@ export interface FileRoutesByFullPath {
   '/magazzino': typeof MagazzinoRoute
   '/partner': typeof PartnerRoute
   '/pulmini': typeof PulminiRoute
+  '/registrati': typeof RegistratiRoute
   '/safeguarding': typeof SafeguardingRoute
   '/segreteria': typeof SegreteriaRoute
   '/shop': typeof ShopRoute
@@ -372,6 +385,7 @@ export interface FileRoutesByFullPath {
   '/core/famiglia': typeof CoreFamigliaRoute
   '/core/impianti-calendari': typeof CoreImpiantiCalendariRoute
   '/core/staff': typeof CoreStaffRoute
+  '/direzione/accessi': typeof DirezioneAccessiRoute
   '/direzione/acquisti': typeof DirezioneAcquistiRoute
   '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
   '/gestionale/mappa': typeof GestionaleMappaRoute
@@ -414,6 +428,7 @@ export interface FileRoutesByTo {
   '/magazzino': typeof MagazzinoRoute
   '/partner': typeof PartnerRoute
   '/pulmini': typeof PulminiRoute
+  '/registrati': typeof RegistratiRoute
   '/safeguarding': typeof SafeguardingRoute
   '/segreteria': typeof SegreteriaRoute
   '/shop': typeof ShopRoute
@@ -428,6 +443,7 @@ export interface FileRoutesByTo {
   '/core/famiglia': typeof CoreFamigliaRoute
   '/core/impianti-calendari': typeof CoreImpiantiCalendariRoute
   '/core/staff': typeof CoreStaffRoute
+  '/direzione/accessi': typeof DirezioneAccessiRoute
   '/direzione/acquisti': typeof DirezioneAcquistiRoute
   '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
   '/gestionale/mappa': typeof GestionaleMappaRoute
@@ -470,6 +486,7 @@ export interface FileRoutesById {
   '/magazzino': typeof MagazzinoRoute
   '/partner': typeof PartnerRoute
   '/pulmini': typeof PulminiRoute
+  '/registrati': typeof RegistratiRoute
   '/safeguarding': typeof SafeguardingRoute
   '/segreteria': typeof SegreteriaRoute
   '/shop': typeof ShopRoute
@@ -484,6 +501,7 @@ export interface FileRoutesById {
   '/core/famiglia': typeof CoreFamigliaRoute
   '/core/impianti-calendari': typeof CoreImpiantiCalendariRoute
   '/core/staff': typeof CoreStaffRoute
+  '/direzione_/accessi': typeof DirezioneAccessiRoute
   '/direzione_/acquisti': typeof DirezioneAcquistiRoute
   '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
   '/gestionale/mappa': typeof GestionaleMappaRoute
@@ -528,6 +546,7 @@ export interface FileRouteTypes {
     | '/magazzino'
     | '/partner'
     | '/pulmini'
+    | '/registrati'
     | '/safeguarding'
     | '/segreteria'
     | '/shop'
@@ -542,6 +561,7 @@ export interface FileRouteTypes {
     | '/core/famiglia'
     | '/core/impianti-calendari'
     | '/core/staff'
+    | '/direzione/accessi'
     | '/direzione/acquisti'
     | '/eventi/christmas-lario-cup'
     | '/gestionale/mappa'
@@ -584,6 +604,7 @@ export interface FileRouteTypes {
     | '/magazzino'
     | '/partner'
     | '/pulmini'
+    | '/registrati'
     | '/safeguarding'
     | '/segreteria'
     | '/shop'
@@ -598,6 +619,7 @@ export interface FileRouteTypes {
     | '/core/famiglia'
     | '/core/impianti-calendari'
     | '/core/staff'
+    | '/direzione/accessi'
     | '/direzione/acquisti'
     | '/eventi/christmas-lario-cup'
     | '/gestionale/mappa'
@@ -639,6 +661,7 @@ export interface FileRouteTypes {
     | '/magazzino'
     | '/partner'
     | '/pulmini'
+    | '/registrati'
     | '/safeguarding'
     | '/segreteria'
     | '/shop'
@@ -653,6 +676,7 @@ export interface FileRouteTypes {
     | '/core/famiglia'
     | '/core/impianti-calendari'
     | '/core/staff'
+    | '/direzione_/accessi'
     | '/direzione_/acquisti'
     | '/eventi/christmas-lario-cup'
     | '/gestionale/mappa'
@@ -696,6 +720,7 @@ export interface RootRouteChildren {
   MagazzinoRoute: typeof MagazzinoRoute
   PartnerRoute: typeof PartnerRoute
   PulminiRoute: typeof PulminiRoute
+  RegistratiRoute: typeof RegistratiRoute
   SafeguardingRoute: typeof SafeguardingRoute
   SegreteriaRoute: typeof SegreteriaRoute
   ShopRoute: typeof ShopRoute
@@ -710,6 +735,7 @@ export interface RootRouteChildren {
   CoreFamigliaRoute: typeof CoreFamigliaRoute
   CoreImpiantiCalendariRoute: typeof CoreImpiantiCalendariRoute
   CoreStaffRoute: typeof CoreStaffRoute
+  DirezioneAccessiRoute: typeof DirezioneAccessiRoute
   DirezioneAcquistiRoute: typeof DirezioneAcquistiRoute
   EventiChristmasLarioCupRoute: typeof EventiChristmasLarioCupRoute
   GestionaleMappaRoute: typeof GestionaleMappaRoute
@@ -850,6 +876,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PulminiRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/registrati': {
+      id: '/registrati'
+      path: '/registrati'
+      fullPath: '/registrati'
+      preLoaderRoute: typeof RegistratiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/safeguarding': {
       id: '/safeguarding'
       path: '/safeguarding'
@@ -967,6 +1000,13 @@ declare module '@tanstack/react-router' {
       path: '/core/staff'
       fullPath: '/core/staff'
       preLoaderRoute: typeof CoreStaffRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/direzione_/accessi': {
+      id: '/direzione_/accessi'
+      path: '/direzione/accessi'
+      fullPath: '/direzione/accessi'
+      preLoaderRoute: typeof DirezioneAccessiRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/direzione_/acquisti': {
@@ -1151,6 +1191,7 @@ const rootRouteChildren: RootRouteChildren = {
   MagazzinoRoute: MagazzinoRoute,
   PartnerRoute: PartnerRoute,
   PulminiRoute: PulminiRoute,
+  RegistratiRoute: RegistratiRoute,
   SafeguardingRoute: SafeguardingRoute,
   SegreteriaRoute: SegreteriaRoute,
   ShopRoute: ShopRoute,
@@ -1165,6 +1206,7 @@ const rootRouteChildren: RootRouteChildren = {
   CoreFamigliaRoute: CoreFamigliaRoute,
   CoreImpiantiCalendariRoute: CoreImpiantiCalendariRoute,
   CoreStaffRoute: CoreStaffRoute,
+  DirezioneAccessiRoute: DirezioneAccessiRoute,
   DirezioneAcquistiRoute: DirezioneAcquistiRoute,
   EventiChristmasLarioCupRoute: EventiChristmasLarioCupRoute,
   GestionaleMappaRoute: GestionaleMappaRoute,
