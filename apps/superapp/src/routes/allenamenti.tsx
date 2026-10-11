@@ -71,7 +71,7 @@ function Allenamenti() {
         </div>
       </div>
 
-      <div className="sticky top-0 z-30 border-b border-[var(--scd-line)] bg-[var(--scd-page)]/95 px-4 py-3 backdrop-blur sm:px-6 lg:top-[57px]">
+      <div className="sticky top-0 z-30 border-b border-[var(--scd-line)] bg-[var(--scd-page)]/95 px-4 py-3 backdrop-blur sm:px-6 lg:top-[var(--pub-header-h)]">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-2">
           <div className="scd-scroll-x -mx-1 flex w-full gap-[6px] overflow-x-auto px-1 sm:w-auto" role="group" aria-label="Giorno">
             {days.map((d) => <button key={d} onClick={() => setDay(d)} aria-pressed={day === d} className={`h-[40px] min-w-[56px] shrink-0 rounded-[9px] px-3 text-[14px] font-bold capitalize ${day === d ? "bg-[var(--scd-blue)] text-white shadow-[0_2px_5px_rgb(4_87_175/0.35)]" : "bg-white text-[var(--scd-ink)] shadow-[var(--scd-card-shadow)]"}`}>{d.slice(0, 3).toLowerCase()}</button>)}

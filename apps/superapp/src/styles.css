@@ -190,12 +190,12 @@
 
 /* ---------- Super App: integrazione moduli CORE/GROW nella shell unica ---------- */
 /* Le schermate Vision vivono dentro la shell: niente altezza piena né sfondo proprio. */
-/* Modulo Impianti: menu sezioni sotto l'intestazione fissa (57px) e senza altezza piena. */
+/* Modulo Impianti: menu sezioni sotto l'intestazione fissa (--pub-header-h) e senza altezza piena. */
 /* Stessa palette delle tavole; la testata del modulo è sostituita dalla PageHeader della Super App. */
 .sa-core .imp { min-height: 0; --i-navy: #022d66; --i-blue: #0457af; --i-yellow: #ffd82a; --i-ground: var(--scd-page); --i-ink: var(--scd-ink); border-radius: 18px 18px 0 0; overflow: clip; }
 .sa-core .imp-head { display: none; }
 .sa-core .imp-side-nav { top: 0; }
-@media (min-width: 1024px) { .sa-core .imp-side-nav { top: 57px; } }
+@media (min-width: 1024px) { .sa-core .imp-side-nav { top: var(--pub-header-h); } }
 /* Fonti Google citate solo per nome: nessun link nel bundle pubblico. */
 .imp-src-locked { cursor: default; }
 .imp-src-lock { display: inline-flex; align-items: center; gap: .3rem; flex-shrink: 0; font-size: .68rem; font-weight: 700; color: var(--i-sub, #44506a); text-align: right; }
@@ -288,3 +288,96 @@
 }
 /* "Testo grande" (volto Nonni): ingrandisce l'intera interfaccia in modo uniforme. */
 html.uv-big .sa-shell { zoom: 1.12; }
+
+/* ---------- Release 2 · Visual Master VR-022 (approvato 11/10/2026): due temperature, stesso stemma ---------- */
+/* Fuori (pubblico): esplosivo. Dentro (aree di lavoro): strumento di precisione. Giallo solo per agire. */
+:root {
+  --out-night: #062a52;
+  --out-blue: #0860a8;
+  --out-sky: #1898d8;
+  --out-yellow: #f8d000;
+  --out-yellow-hover: #ffdc2e;
+  --out-white: #ffffff;
+  --out-text-soft: #d6ebfb;
+  --out-line: rgb(255 255 255 / 0.14);
+
+  --in-ground: #f2f7fc;
+  --in-surface: #ffffff;
+  --in-ink: #062a52;
+  --in-sub: #3b5683;
+  --in-line: #d5e4f5;
+  --in-rail: #0860a8;
+  --in-rail-soft: #cfe6fa;
+  --in-action: #f8d000;
+  --in-focus: #1898d8;
+  --in-info: #0860a8;
+  --in-info-bg: #e6f3fc;
+  --in-ok: #16683f;
+  --in-ok-bg: #e3f4ea;
+  --in-warn: #8a5300;
+  --in-warn-bg: #fff3c4;
+  --in-crit: #a3241b;
+  --in-crit-bg: #fde7e4;
+  --in-strip-muted: #9fc3e6;
+  --in-card-shadow: 0 1px 2px rgb(6 42 82 / 0.05), 0 8px 24px -12px rgb(6 42 82 / 0.18);
+
+  --font-title: "Big Shoulders Display", "Barlow Condensed", "Barlow", sans-serif;
+  --font-text: "Barlow", system-ui, sans-serif;
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+  --pub-header-h: 64px;
+}
+@media (min-width: 1024px) {
+  :root { --pub-header-h: 72px; }
+}
+
+@theme inline {
+  --color-out-night: var(--out-night);
+  --color-out-blue: var(--out-blue);
+  --color-out-sky: var(--out-sky);
+  --color-out-yellow: var(--out-yellow);
+  --color-in-ground: var(--in-ground);
+  --color-in-surface: var(--in-surface);
+  --color-in-ink: var(--in-ink);
+  --color-in-sub: var(--in-sub);
+  --color-in-line: var(--in-line);
+  --color-in-rail: var(--in-rail);
+  --color-in-action: var(--in-action);
+  --color-in-info: var(--in-info);
+  --color-in-info-bg: var(--in-info-bg);
+  --font-title: "Big Shoulders Display", "Barlow Condensed", "Barlow", sans-serif;
+  --font-text: "Barlow", system-ui, sans-serif;
+}
+
+/* Pulsante giallo: l'unica cosa gialla è ciò che si tocca. Pressione scale(.97), sotto i 300 ms. */
+.scd-action {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 44px; padding: 0 18px; border-radius: 10px;
+  background: var(--out-yellow); color: var(--in-ink);
+  font: 600 15px/1 var(--font-text); white-space: nowrap; cursor: pointer;
+  transition: transform 160ms var(--ease-out-strong), background-color 160ms ease-out;
+}
+.scd-action:hover { background: var(--out-yellow-hover); }
+.scd-action:active { transform: scale(0.97); }
+.scd-action:focus-visible, .scd-focus:focus-visible { outline: 3px solid var(--in-focus); outline-offset: 2px; }
+
+/* Menu "Accesso aree": comparsa dal pulsante, solo opacità e traslazione brevi. */
+@keyframes scd-pop-in { from { opacity: 0; transform: translateY(-6px) scale(0.985); } to { opacity: 1; transform: none; } }
+@keyframes scd-sheet-in { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+.scd-access-panel { animation: scd-sheet-in 240ms var(--ease-out-strong) both; transform-origin: top right; }
+@media (min-width: 1024px) { .scd-access-panel { animation: scd-pop-in 200ms var(--ease-out-strong) both; } }
+
+/* Aree di lavoro: striscia "in evidenza" a puntini LED. */
+.scd-led-strip {
+  background-color: var(--in-ink);
+  background-image: radial-gradient(rgb(248 208 0 / 0.13) 1px, transparent 1.3px);
+  background-size: 6px 6px;
+}
+.scd-interior { font-family: var(--font-text); color: var(--in-ink); font-variant-numeric: tabular-nums; }
+.scd-interior ::selection, .scd-pub ::selection { background: var(--out-yellow); color: var(--in-ink); }
+.scd-interior input::placeholder { color: var(--in-sub); opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .scd-access-panel { animation: none !important; }
+  .scd-action { transition: none; }
+  .scd-action:active { transform: none; }
+}

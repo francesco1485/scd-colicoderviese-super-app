@@ -1,7 +1,7 @@
 {
   "schema": "scd.superapp-areas.v1",
   "status": "PROPOSED_DESIGN_REGISTRY",
-  "updated": "2026-10-10",
+  "updated": "2026-10-11",
   "purpose": "Single extensible registry of Super App areas and sub-areas, each with its own direct path. One login and one database behind every path. Adding an area means adding an entry here, then a route, then a test.",
   "rules": [
     "One shared identity (R20 until verified migration); no per-area login.",
@@ -17,7 +17,7 @@
         { "id": "rotazione-campi", "path": "/calendario/rotazione-campi", "audience": "staff", "roles": ["responsabile-campi", "direzione"], "board": "Rotazione-campi.dc.html", "sources": ["ROTAZIONE_CAMPI_SCD_COLICODERVIESE_17OTT2026_31GEN2027"], "status": "design",
           "rules": { "pitch_colico_c1": "100x60 m synthetic", "capacity": { "11v11": 1, "9v9": 2, "7v7": 2, "5v5": 3 } } }
       ] },
-    { "id": "quadro", "path": "/quadro", "audience": "staff", "board": "Quadro-responsabili.dc.html", "sources": ["Quadro settimanale allenamenti 2026/27"], "status": "design",
+    { "id": "quadro", "path": "/quadro", "audience": "staff", "board": "Quadro-settimanale.dc.html", "sources": ["Quadro settimanale allenamenti 2026/27"], "status": "design",
       "children": [ { "id": "quadro-rotazione-campi", "path": "/quadro/rotazione-campi", "alias_of": "rotazione-campi", "status": "design" } ] },
     { "id": "gestionale", "path": "/gestionale", "audience": "staff", "board": "Gestionale.dc.html", "sources": ["R20", "Master Calendario", "Quadro settimanale"], "status": "design",
       "children": [ { "id": "mister", "path": "/gestionale/mister", "roles": ["mister", "dirigente-annata"], "board": "Mister.dc.html", "features": ["convocazioni con conferma lettura", "lavagna e moduli", "video", "chiamata di squadra (Teams/Meet da collegare)"], "status": "design" } ] },
@@ -35,6 +35,8 @@
       ] },
     { "id": "direzione", "path": "/direzione", "audience": "staff", "board": "Plancia-direzione.dc.html", "status": "design",
       "children": [ { "id": "acquisti", "path": "/direzione/acquisti", "roles": ["dirigenza"], "flow": ["richiesta", "approvazione", "ordine", "fattura", "pagamento"], "status": "design" } ] },
+    { "id": "famiglia", "path": "/famiglia", "audience": "family", "roles": ["famiglia"], "board": "Accesso-aree.dc.html", "sources": ["R20"], "status": "design" },
+    { "id": "partner", "path": "/partner", "audience": "partner", "roles": ["partner"], "board": "Accesso-aree.dc.html", "sources": ["MASTER CONTATTI", "Master Sponsor"], "status": "design" },
     { "id": "crm", "path": "/crm", "audience": "staff", "board": "CRM.dc.html", "sources": ["MASTER CONTATTI"], "used_by": ["sponsor", "tornei", "segreteria"], "status": "design" },
     { "id": "sponsor", "path": "/sponsor", "audience": "public", "board": "LED-sponsor.dc.html", "features": ["LED a bordo campo", "pacchetti", "Anche tu qui"], "status": "design" },
     { "id": "sky-club", "path": "/sky-club", "audience": "public+members", "board": "Sky-Club.dc.html", "tiers": ["tifoso", "tesserato", "familiare"], "status": "design" },

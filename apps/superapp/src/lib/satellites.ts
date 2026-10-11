@@ -39,6 +39,11 @@ export interface Satellite {
   /** R20 login area, or null when the login for this role is not active yet. */
   login: R20Area | null;
   status: SatelliteStatus;
+  /**
+   * Area of the Super App registry (config/superapp-areas.v1.json) this landing
+   * stands in for until the area's own direct path is built (src/lib/areas.ts).
+   */
+  areaId?: string;
   /** Visual accent token for the tile. */
   tone: "blue" | "sky" | "yellow" | "navy" | "green" | "orange";
   /** Public preview already available without login. */
@@ -60,6 +65,7 @@ export const SATELLITES: readonly Satellite[] = [
   },
   {
     slug: "famiglia",
+    areaId: "famiglia",
     name: "Famiglia",
     who: "Genitori e tutori registrati all'iscrizione",
     promise: "Quello che vede tuo figlio, più lo stato dei pagamenti.",
@@ -72,6 +78,7 @@ export const SATELLITES: readonly Satellite[] = [
   },
   {
     slug: "tifoso",
+    areaId: "sky-club",
     name: "Tifoso",
     who: "Sostenitori, ex giocatori, chi ama la SCD",
     promise: "Il club da vicino: partite, sfide, eventi, community.",
@@ -84,6 +91,7 @@ export const SATELLITES: readonly Satellite[] = [
   },
   {
     slug: "staff",
+    areaId: "gestionale",
     name: "Staff tecnico",
     who: "Responsabili, mister, dirigenti accompagnatori",
     promise: "La tua squadra, il quadro allenamenti, le richieste.",
@@ -96,6 +104,7 @@ export const SATELLITES: readonly Satellite[] = [
   },
   {
     slug: "segreteria",
+    areaId: "segreteria",
     name: "Segreteria",
     who: "Segreteria sportiva e tesseramenti",
     promise: "Tesseramenti, distinte, modulistica e scadenze.",
@@ -107,6 +116,7 @@ export const SATELLITES: readonly Satellite[] = [
   },
   {
     slug: "tesoreria",
+    areaId: "tesoreria",
     name: "Tesoreria",
     who: "Tesoreria della società",
     promise: "Quote, Fondo, kit, pulmini, Club House: un solo quadro.",
@@ -118,6 +128,7 @@ export const SATELLITES: readonly Satellite[] = [
   },
   {
     slug: "pulmini",
+    areaId: "pulmini",
     name: "Pulmini",
     who: "Responsabile trasporti e autisti",
     promise: "Mezzi, autisti, corse e posti a sedere.",
@@ -129,6 +140,7 @@ export const SATELLITES: readonly Satellite[] = [
   },
   {
     slug: "direzione",
+    areaId: "direzione",
     name: "Direzione",
     who: "Direttore generale e presidente",
     promise: "La società in un colpo d'occhio: gestionale, calendario, sponsor.",
@@ -141,6 +153,7 @@ export const SATELLITES: readonly Satellite[] = [
   },
   {
     slug: "sponsor",
+    areaId: "partner",
     name: "Sponsor e partner",
     who: "Aziende partner e chi vuole diventarlo",
     promise: "Visibilità sul territorio, LED, maglie, eventi.",

@@ -3,6 +3,7 @@ import {
   Outlet,
   Link,
   createRootRouteWithContext,
+  useMatches,
   useRouter,
   HeadContent,
   Scripts,
@@ -107,7 +108,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Anton&family=Fira+Sans:wght@400;500;600;700;800&family=Fira+Sans+Condensed:wght@500;600;700&family=Big+Shoulders+Display:wght@800;900&family=Kaushan+Script&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Anton&family=Fira+Sans:wght@400;500;600;700;800&family=Fira+Sans+Condensed:wght@500;600;700&family=Big+Shoulders+Display:wght@700;800;900&family=Barlow:wght@400;500;600;700&family=Kaushan+Script&display=swap",
       },
       { rel: "manifest", href: "/manifest.webmanifest" },
       { rel: "icon", type: "image/png", href: "/favicon.png" },
@@ -136,6 +137,18 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  // Work areas (staticData.interior) bring their own shell: no public chrome around them.
+  const interior = useMatches({ select: (ms) => ms.some((m) => m.staticData?.interior === true) });
+
+  if (interior) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <Outlet />
+        <CookieConsent />
+        <PwaManager />
+      </QueryClientProvider>
+    );
+  }
 
   return (
     <QueryClientProvider client={queryClient}>

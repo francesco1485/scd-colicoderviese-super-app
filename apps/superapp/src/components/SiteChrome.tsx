@@ -1,24 +1,34 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
-  CalendarCheck, CalendarDays, Circle, Ellipsis, House, Menu, Newspaper, Shirt, ShieldCheck, UserRound, UsersRound, X,
+  CalendarCheck, CalendarDays, Circle, Ellipsis, House, Lock, Menu, Newspaper, Shirt, ShieldCheck, UserRound, UsersRound, X,
   type LucideIcon,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import crest from "@/assets/brand/logo-scd.png.asset.json";
 import { openCookiePrefs } from "./CookieConsent";
+import { AccessMenu, openAccessMenu } from "./scd/AccessMenu";
 
 /** Nome ufficiale della società (sigla S.C.D., non invertire le lettere). */
 export const CLUB_NAME = "S.C.D. ColicoDerviese";
 
 type NavItem = { to: string; label: string };
 
-/** Navigazione desktop: le tre app (ONE, CORE, GROW) in un'unica barra. */
+/** Navigazione desktop della barra pubblica (tavola Accesso-aree, VR-022). Le altre pagine restano nel menu completo. */
 const desktopNav: readonly NavItem[] = [
-  { to: "/", label: "Home" },
+  { to: "/allenamenti", label: "Squadre" },
+  { to: "/calendario", label: "Calendario" },
+  { to: "/eventi", label: "Eventi" },
+  { to: "/grow", label: "Sponsor" },
+  { to: "/contatti", label: "Contatti" },
+];
+
+/** Link a piè di pagina: tutte le pagine pubbliche principali. */
+const footerNav: readonly NavItem[] = [
   { to: "/calendario", label: "Calendario" },
   { to: "/allenamenti", label: "Allenamenti" },
   { to: "/comunicazioni", label: "Comunicazioni" },
+  { to: "/eventi", label: "Eventi" },
   { to: "/core", label: "Area club" },
   { to: "/grow", label: "Sponsor" },
   { to: "/contatti", label: "Contatti" },
@@ -103,35 +113,39 @@ export function SiteHeader() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const board = isBoardRoute(pathname);
   return (
-    <header className={`sticky top-0 z-40 h-[57px] border-b border-white/10 surface-deep ${board ? "hidden lg:block" : ""}`} data-site-header>
-      <div className="mx-auto flex h-full max-w-7xl items-center justify-between gap-3 px-4 sm:px-6">
-        <Link to="/" className="flex min-w-0 items-center gap-2.5" aria-label={`${CLUB_NAME} · Super App, vai alla Home`}>
-          <ClubCrestOfficial size={38} />
-          <span className="min-w-0 leading-tight">
-            <span className="block truncate font-brand text-[18px] leading-none tracking-[0.01em]"><span className="text-[#ffd600]">COLICO</span>DERVIESE</span>
-            <span className="block text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-white/80">S.C.D. · Super App 2026/27</span>
-          </span>
+    <header
+      className={`scd-pub sticky top-0 z-40 h-[var(--pub-header-h)] border-b border-[var(--out-line)] bg-[var(--out-night)] font-text text-white ${board ? "hidden lg:block" : ""}`}
+      data-site-header
+    >
+      <div className="mx-auto flex h-full max-w-[1440px] items-center gap-3 px-4 sm:px-6 lg:gap-7 lg:px-10">
+        <Link to="/" className="scd-focus flex min-w-0 items-center gap-2.5 rounded-md lg:gap-3" aria-label={`${CLUB_NAME}, vai alla Home`}>
+          <ClubCrestOfficial size={46} className="lg:hidden" />
+          <ClubCrestOfficial size={54} className="hidden lg:block" />
+          <span className="font-title text-[21px] font-black leading-[0.95] lg:text-[26px]">COLICO<br />DERVIESE</span>
         </Link>
-        <nav className="hidden items-center gap-1 lg:flex" aria-label="Navigazione principale">
+        <nav className="ml-4 hidden items-center gap-[22px] lg:flex" aria-label="Principale">
           {desktopNav.map((n) => (
             <Link
               key={n.to}
               to={n.to}
               aria-current={isActive(pathname, n.to) ? "page" : undefined}
-              className={`rounded-md px-3 py-2 text-sm font-semibold transition-colors ${isActive(pathname, n.to) ? "bg-white/10 text-accent" : "opacity-85 hover:bg-white/5 hover:opacity-100"}`}
+              className={`scd-focus relative rounded-md px-1 py-2 text-[16px] font-semibold transition-colors duration-150 ${isActive(pathname, n.to) ? "text-white after:absolute after:inset-x-1 after:-bottom-0.5 after:h-[3px] after:rounded-full after:bg-[var(--out-yellow)]" : "text-[#e6f3fc] hover:text-white"}`}
             >
               {n.label}
             </Link>
           ))}
         </nav>
-        <button
-          className="flex size-11 shrink-0 items-center justify-center rounded-lg border border-white/20"
-          aria-label="Apri menu completo"
-          aria-controls="sa-menu"
-          onClick={openMenu}
-        >
-          <Menu className="size-5" />
-        </button>
+        <div className="ml-auto flex items-center gap-2 lg:gap-3">
+          <AccessMenu />
+          <button
+            className="scd-focus flex size-11 shrink-0 items-center justify-center rounded-[10px] border border-white/25 text-white transition-colors duration-150 hover:bg-white/10"
+            aria-label="Apri menu completo"
+            aria-controls="sa-menu"
+            onClick={openMenu}
+          >
+            <Menu className="size-5" aria-hidden="true" />
+          </button>
+        </div>
       </div>
     </header>
   );
@@ -166,6 +180,14 @@ export function MenuDrawer() {
           <span className="flex items-center gap-2"><ClubCrestOfficial size={30} /><b className="text-[15px]">Menu</b></span>
           <button aria-label="Chiudi menu" onClick={() => setOpen(false)} className="flex size-11 items-center justify-center rounded-lg"><X className="size-5" /></button>
         </div>
+        <button
+          type="button"
+          onClick={() => { setOpen(false); openAccessMenu(); }}
+          className="scd-action mb-1 w-full justify-between"
+        >
+          <span className="inline-flex items-center gap-2"><Lock className="size-[18px]" strokeWidth={1.8} aria-hidden="true" />Accesso aree</span>
+          <span className="text-[13px] font-medium">un link per area</span>
+        </button>
         {menuGroups.map((g) => (
           <div key={g.app} className="border-b border-[var(--scd-line)] py-2 last:border-0">
             <p className="flex items-center gap-2 px-2 py-1 text-[0.7rem] font-bold uppercase tracking-[0.16em] text-[var(--scd-blue)]">
@@ -257,7 +279,7 @@ export function SiteFooter() {
         </div>
         <p className="opacity-75">{CLUB_NAME} · Colico (LC) · Alto Lago di Como · PEC calciocolicoderviese@pec.it</p>
         <nav className="flex flex-wrap gap-x-5 gap-y-2" aria-label="Link a piè di pagina">
-          {[...desktopNav.slice(1), ...footerLinks].map((n) => (
+          {[...footerNav, ...footerLinks].map((n) => (
             <Link key={n.to + n.label} to={n.to} className="opacity-80 hover:opacity-100">{n.label}</Link>
           ))}
         </nav>

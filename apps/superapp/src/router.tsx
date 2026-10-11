@@ -14,3 +14,12 @@ export const getRouter = () => {
 
   return router;
 };
+declare module "@tanstack/react-router" {
+  interface StaticDataRouteOption {
+    /**
+     * Work-area route rendered inside <InteriorShell>: the public chrome
+     * (top bar, footer, sponsor band, bottom nav, Sky chat) is not shown.
+     */
+    interior?: boolean;
+  }
+}

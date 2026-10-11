@@ -153,7 +153,7 @@ function ChristmasLarioCup() {
     >
       <section
         aria-labelledby="clc-t"
-        className="relative isolate flex min-h-[calc(100svh-57px)] items-end overflow-hidden px-4 pb-9 pt-10 lg:px-6 lg:pb-16"
+        className="relative isolate flex min-h-[calc(100svh-var(--pub-header-h))] items-end overflow-hidden px-4 pb-9 pt-10 lg:px-6 lg:pb-16"
       >
         <div
           aria-hidden="true"

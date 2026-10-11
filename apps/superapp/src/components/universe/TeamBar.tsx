@@ -62,7 +62,7 @@ export function TeamBar({
     <nav
       aria-label="Scegli la squadra"
       data-testid="team-bar"
-      className="sticky top-0 z-30 h-14 border-b-[3px] border-[var(--uv-gold)] bg-[rgb(2_31_79/0.86)] shadow-[0_8px_18px_rgb(0_8_30/0.35)] backdrop-blur-md lg:top-[57px]"
+      className="sticky top-0 z-30 h-14 border-b-[3px] border-[var(--uv-gold)] bg-[rgb(2_31_79/0.86)] shadow-[0_8px_18px_rgb(0_8_30/0.35)] backdrop-blur-md lg:top-[var(--pub-header-h)]"
     >
       <div className="relative mx-auto flex h-full max-w-[1200px] items-center">
         <div
