@@ -1435,7 +1435,10 @@
         "status": "ACTIVE_MASTER",
         "title": "17 - PRENOTAZIONI IMPIANTI 2026-27 (master)",
         "resource_id": "14Idop9OuCWGMaxVgiQgGSpM5E7mNaO6SL6kt_i_lSVY",
-        "owner": ["Direzione", "Responsabile attività di base"],
+        "owner": [
+          "Direzione",
+          "Responsabile attività di base"
+        ],
         "approved_by": "Francesco, 2026-10-11",
         "authority_domains": [
           "FACILITY_BOOKINGS",
@@ -1443,8 +1446,31 @@
           "FACILITY_EVENTS",
           "COUNCIL_NOTICES"
         ],
-        "columns": ["ID", "Data", "Ora inizio", "Ora fine", "Sede", "ID spazio", "Zona", "Tipo", "Squadra o soggetto", "Formato", "Spogliatoi", "Ingresso", "Stato", "Richiesto da", "Approvato da", "Importo affitto", "Contratto o link", "Avviso Comune", "Note", "Origine"],
-        "consumers": ["/gestionale/impianti"],
+        "columns": [
+          "ID",
+          "Data",
+          "Ora inizio",
+          "Ora fine",
+          "Sede",
+          "ID spazio",
+          "Zona",
+          "Tipo",
+          "Squadra o soggetto",
+          "Formato",
+          "Spogliatoi",
+          "Ingresso",
+          "Stato",
+          "Richiesto da",
+          "Approvato da",
+          "Importo affitto",
+          "Contratto o link",
+          "Avviso Comune",
+          "Note",
+          "Origine"
+        ],
+        "consumers": [
+          "/gestionale/impianti"
+        ],
         "rules": [
           "APP_COPIES_ROWS_ONLY_NO_SERVER_WRITES",
           "STATUS_PROPOSTA_UNTIL_DIRECTION_APPROVAL",
@@ -1465,12 +1491,45 @@
           "YOUTH_STAFF_REQUIREMENTS",
           "SGS_DEADLINES"
         ],
-        "consumers": ["/gestionale/organigramma"],
+        "consumers": [
+          "/gestionale/organigramma"
+        ],
         "rules": [
           "RULES_ONLY_NO_CLUB_STATUS_IN_REPO",
           "CLUB_STATUS_FROM_SERVER_ENV_SCD_SGS_STATUS_JSON_NO_NAMES",
           "UNKNOWN_IS_NOT_COVERED",
           "REREAD_EACH_SEASON"
+        ]
+      },
+      {
+        "id": "OPEN_METEO_WEATHER",
+        "kind": "OFFICIAL_DOCUMENT",
+        "trust": "EXTERNAL_OFFICIAL",
+        "status": "ACTIVE",
+        "title": "C.U. n.18 SGS 11/08/2026 - Manuale del Sistema di Qualità dei Club Giovanili, Edizione 2026",
+        "url": "https://open-meteo.com",
+        "encoded_in": "config/sgs-quality-system.v1.json",
+        "authority_domains": [
+          "YOUTH_CLUB_QUALITY_LEVEL",
+          "YOUTH_STAFF_REQUIREMENTS",
+          "SGS_DEADLINES"
+        ],
+        "consumers": [
+          "/gestionale/organigramma"
+        ],
+        "rules": [
+          "RULES_ONLY_NO_CLUB_STATUS_IN_REPO",
+          "CLUB_STATUS_FROM_SERVER_ENV_SCD_SGS_STATUS_JSON_NO_NAMES",
+          "UNKNOWN_IS_NOT_COVERED",
+          "REREAD_EACH_SEASON"
+        ],
+        "name": "Open-Meteo (meteo e geocodifica)",
+        "type": "EXTERNAL_API",
+        "owner": "Open-Meteo (CC BY 4.0)",
+        "description": "Previsioni orarie e condizioni attuali per il luogo della gara; geocodifica del comune dal campo FIGC. Gratuito, senza chiave, nessun dato personale inviato.",
+        "verification": "PUBLIC_API",
+        "used_by": [
+          "CAP-HOME-MATCH-EXTRAS"
         ]
       }
     ],

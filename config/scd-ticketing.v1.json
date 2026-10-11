@@ -1,0 +1,14 @@
+{
+  "status": "PRICES_TO_CONFIRM",
+  "asOf": "2026-10-11",
+  "where": "Biglietteria all'ingresso visitatori del Centro Sportivo Colico, Via Lido (lato Club House).",
+  "howToPay": ["Contanti alla biglietteria"],
+  "opensBefore": "Apre prima del calcio d'inizio della Prima Squadra.",
+  "prices": [
+    { "label": "Intero", "price": null },
+    { "label": "Ridotto", "price": null, "note": "categorie da confermare" },
+    { "label": "Abbonamento stagionale", "price": null }
+  ],
+  "freeEntry": ["Gare del Settore Giovanile: ingresso libero", "Tesserati SCD con tessera"],
+  "note": "I documenti sulle tariffe non coincidono tra loro: i prezzi compaiono qui solo quando la Direzione li conferma. Niente numeri inventati."
+}

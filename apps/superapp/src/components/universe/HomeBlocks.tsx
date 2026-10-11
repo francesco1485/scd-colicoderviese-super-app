@@ -22,6 +22,7 @@ import {
 } from "@/lib/universe";
 
 import { TeamCode } from "./TeamBar";
+import { ColicoNowChip, MapButton, TicketButton, WeatherChip } from "./MatchExtras";
 
 const CREST = "/media/brand/logo-scd.png";
 
@@ -156,6 +157,9 @@ export function HeroBand({
             />
             {MODE_TEXT[mode](upcoming)}
           </p>
+          <div className="mt-2 lg:mt-3">
+            <ColicoNowChip />
+          </div>
         </div>
         {children}
       </div>
@@ -288,6 +292,11 @@ export function NextTicket({
             orario o sede da confermare
           </span>
         )}
+        <WeatherChip item={item} />
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <MapButton venue={item.venue} />
+        <TicketButton item={item} />
       </div>
       <div className="grid grid-cols-[1fr_auto] gap-2">
         <button
@@ -519,6 +528,7 @@ export function Fixtures({
                       {titleCase(i.title)}
                       <br />
                       {venueCase(i.venue)}
+                      {i.venue && <span className="ml-2 inline-block align-middle"><MapButton venue={i.venue} compact /></span>}
                     </span>
                   </span>
                   {i.homeAway && (

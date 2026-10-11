@@ -1314,6 +1314,29 @@
         "implementationStatus": "MIGRATION_R59_WRITTEN_AND_TESTED_LOCALLY_NOT_YET_APPLIED",
         "duplicate_work": "DENY"
       }
+    },
+    {
+      "id": "UD-055",
+      "name": "HOME_MATCH_WEATHER_MAP_TICKETING",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "ora e tempo che fa, maps per indicare dove si gioca, alle nostre gare indicare biglietteria dove si paga e quanto; recupera i costi e solo al bottone si apre scheda; tutto dinamico",
+        "durante la settimana il meteo è quello di Colico; quando la partita va in live, 30 minuti o un'ora prima o il giorno stesso, si geolocalizza il luogo dove si gioca e vicino alla partita esce che tempo sta facendo in quel momento: freddo, neve, vento"
+      ],
+      "normalizedCommand": {
+        "rule": "On the home: kick-off time with weather; during the week the weather of Colico; from 3 hours before kick-off (and during the match) the live conditions at the venue, geolocated from the FIGC venue, with cold, snow and wind flagged; a Map button to the venue; at home matches a Biglietteria button that opens a sheet with where to pay and prices (first team), or 'Ingresso libero' (youth).",
+        "scope": "SUPER_APP",
+        "torreFloor": "0_HALL (home)",
+        "constraints": [
+          "weather from Open-Meteo (free, no key); nothing shown beyond the 16-day horizon or when the venue cannot be located",
+          "prices only when confirmed by the Direzione: the tariff documents differ, so the sheet shows 'da confermare' until then",
+          "map opens Google Maps with the official venue text"
+        ],
+        "implementationStatus": "STAGING",
+        "duplicate_work": "DENY"
+      }
     }
   ],
   "completionGate": {
