@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { CalendarDays, CircleCheck, Clapperboard, MapPin, Presentation, TriangleAlert, UsersRound } from "lucide-react";
 import { useMemo } from "react";
 
@@ -9,10 +9,14 @@ import type { WorkAreaGate } from "@/lib/access";
 import { findSessions, freshnessLabel, loadCalendar, loadQuadro, type PublicEvent, type PublicGroup, type TrainingSlot } from "@/lib/public-snapshots";
 import { dayLabel, teamSummaries, type TeamSummary } from "@/lib/quadro";
 import { getWorkAreaGate } from "@/lib/work-areas.functions";
+import { certificateState, type CertState } from "@/lib/people";
+import { groupForTeamCode, registrationLabel, rosterOf, rosterSummary, rosterTeams, teamCodeForGroup, type RosterRow } from "@/lib/roster";
+import { getMyRoster, type MyRoster } from "@/lib/roster.functions";
 
 /**
  * Mister (boards Mister.dc.html + Mister-Oggi.dc.html): today panel of one team from the calendar
- * and training-board snapshots. No athlete names: the squad comes from R20 after login.
+ * and training-board snapshots. The squad comes from the database after login (r61): only the
+ * teams of the caller's own structure roles, only name, birth year, registration and certificate.
  */
 export const Route = createFileRoute("/gestionale/mister")({
   validateSearch: (s: Record<string, unknown>): { squadra?: string } =>
@@ -22,7 +26,8 @@ export const Route = createFileRoute("/gestionale/mister")({
     if (gate.view !== "page") return { gate, interior: false as const };
     const cal = loadCalendar();
     const q = loadQuadro();
-    return { gate, interior: true as const, groups: cal.groups, events: cal.events, sourceModifiedAt: cal.sourceModifiedAt, slots: q.slots, quadroUTC: q.generatedUTC };
+    const roster = await getMyRoster();
+    return { gate, interior: true as const, roster, groups: cal.groups, events: cal.events, sourceModifiedAt: cal.sourceModifiedAt, slots: q.slots, quadroUTC: q.generatedUTC };
   },
   head: ({ loaderData }) => workAreaHead("mister", loaderData?.gate),
   component: MisterRoute,
@@ -30,6 +35,7 @@ export const Route = createFileRoute("/gestionale/mister")({
 
 interface Loaded {
   gate: WorkAreaGate;
+  roster: MyRoster;
   groups: PublicGroup[];
   events: PublicEvent[];
   sourceModifiedAt: string;
@@ -54,7 +60,10 @@ function MisterPage({ data }: { data: Loaded }) {
     () => teamSummaries(data.groups, data.events, data.slots, now.date, now.time).filter((t) => t.id !== "other"),
     [data.groups, data.events, data.slots, now.date, now.time],
   );
-  const team: TeamSummary | undefined = teams.find((t) => t.id === squadra) ?? teams[0];
+  const own = useMemo(() => rosterTeams(data.roster.rows).map((t) => groupForTeamCode(t.code)), [data.roster.rows]);
+  const team: TeamSummary | undefined = teams.find((t) => t.id === squadra) ?? teams.find((t) => own.includes(t.id)) ?? teams[0];
+  const squad = useMemo(() => (team ? rosterOf(data.roster.rows, teamCodeForGroup(team.id)) : []), [team, data.roster.rows]);
+  const squadKnown = data.roster.state === "ok" && team !== undefined && own.includes(team.id);
   const sessions = useMemo(() => (team?.trainingKey ? findSessions([...data.slots], team.trainingKey) : []), [team, data.slots]);
   const upcoming = useMemo(
     () => (team ? data.events.filter((e) => e.group === team.id && (e.date > now.date || (e.date === now.date && (e.time === "" || e.time >= now.time)))).slice(0, 4) : []),
@@ -69,7 +78,7 @@ function MisterPage({ data }: { data: Loaded }) {
       preview={data.gate.preview}
       highlights={[
         { value: team?.weeklySessions ?? null, label: `allenamenti ${team?.tag ?? ""} in settimana`.replace(/\s+/g, " ") },
-        { value: null, label: "convocati inviati: rosa da R20" },
+        { value: squadKnown ? squad.length : null, label: squadKnown ? `in rosa ${team?.tag ?? ""}`.trim() : "rosa visibile dopo l'accesso" },
         { value: team ? team.split.total : null, label: "gare in calendario nella stagione" },
       ]}
       note={<>Calendario: copia del {freshnessLabel(data.sourceModifiedAt)} · Quadro: copia del {freshnessLabel(data.quadroUTC)}. Nessun nome di atleti.</>}
@@ -108,12 +117,10 @@ function MisterPage({ data }: { data: Loaded }) {
                 <div className="grid grid-cols-3 gap-2 px-4 pb-4 sm:px-[18px]">
                   <Fact label="Ritrovo" value="da fissare" tone="warn" />
                   <Fact label="Spogliatoio" value="da assegnare" />
-                  <Fact label="Convocati" value="—" />
+                  <Fact label="In rosa" value={squadKnown ? String(squad.length) : "—"} />
                 </div>
                 <div className="px-4 pb-4 sm:px-[18px]">
-                  <EmptyState title={`Rosa ${team.tag} da R20`}>
-                    Dopo l'accesso compariranno i ragazzi dell'annata per la convocazione. I nomi li vedranno solo il mister e i dirigenti dell'annata.
-                  </EmptyState>
+                  <SquadPanel roster={data.roster} squad={squad} known={squadKnown} tag={team.tag} today={now.date} />
                 </div>
                 <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--in-line)] px-4 py-3 sm:px-[18px]">
                   <span className="text-[14px] text-[var(--in-sub)]">Convocazioni con conferma di lettura delle famiglie: in arrivo.</span>
@@ -208,4 +215,56 @@ function Fact({ label, value, tone }: { label: string; value: string; tone?: "wa
 function longDate(iso: string): string {
   const s = new Intl.DateTimeFormat("it-IT", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" }).format(new Date(`${iso}T12:00:00Z`));
   return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+/** Short chip text; the unknown state is counted once in the summary instead of on every row. */
+const CERT_SHORT: Readonly<Record<CertState, string>> = { scaduto: "Certificato scaduto", "in-scadenza": "Certificato in scadenza", ok: "Certificato valido", sconosciuto: "" };
+const CERT_TONE: Readonly<Record<CertState, "ok" | "warn" | "mute" | "info">> = { scaduto: "warn", "in-scadenza": "warn", ok: "ok", sconosciuto: "mute" };
+
+/** Squad of the selected team, or the reason it is not shown. Names stay inside the reserved area. */
+function SquadPanel({ roster, squad, known, tag, today }: { roster: MyRoster; squad: RosterRow[]; known: boolean; tag: string; today: string }) {
+  if (roster.state === "signed-out" || roster.state === "unconfigured") {
+    return (
+      <EmptyState
+        title={`Rosa ${tag}`}
+        action={<Link to="/accedi" search={{ next: "/gestionale/mister" }} className="scd-focus inline-flex h-11 items-center rounded-[10px] bg-[var(--scd-blue)] px-4 text-[15px] font-semibold text-white">Accedi con la tua e-mail</Link>}
+      >
+        I nomi dei ragazzi li vedono solo il mister e i dirigenti della squadra, dopo l'accesso.
+      </EmptyState>
+    );
+  }
+  if (roster.state === "error") return <EmptyState title="Rosa non disponibile">Lettura dal database non riuscita. Riprova tra poco.</EmptyState>;
+  if (roster.state === "no-organization" || !known) {
+    return (
+      <EmptyState title={`Non sei collegato alla ${tag}`}>
+        Vedi la rosa delle squadre in cui hai un ruolo nell'organigramma. Se manca la tua, scrivi alla segreteria: collega il tuo accesso alla tua scheda.
+      </EmptyState>
+    );
+  }
+  if (squad.length === 0) return <EmptyState title={`Rosa ${tag} vuota`}>Nessun atleta iscritto a questa squadra per la stagione.</EmptyState>;
+  const sum = rosterSummary(squad, today);
+  return (
+    <div className="flex flex-col gap-2">
+      <p className="m-0 flex flex-wrap gap-2 text-[14px]">
+        <Chip tone="info">{sum.total} in rosa</Chip>
+        {sum.registrationToCheck > 0 && <Chip tone="mute">{sum.registrationToCheck} tesseramenti da verificare</Chip>}
+        {sum.certificate.scaduto + sum.certificate["in-scadenza"] > 0 && <Chip tone="warn">{sum.certificate.scaduto + sum.certificate["in-scadenza"]} certificati da rinnovare</Chip>}
+        {sum.certificate.sconosciuto > 0 && <Chip tone="mute">{sum.certificate.sconosciuto} certificati senza data</Chip>}
+      </p>
+      <ul className="m-0 list-none overflow-hidden rounded-xl border border-[var(--in-line)] p-0" aria-label={`Rosa ${tag}`}>
+        {squad.map((p) => {
+          const cert = certificateState(p.certificateExpiresAt, today);
+          return (
+            <li key={p.personId} className="flex min-h-12 items-center gap-3 border-t border-[var(--in-line)] px-3 py-2 text-[15px] first:border-t-0">
+              <span className="min-w-0 flex-1">
+                <b className="block truncate font-semibold">{p.displayName}</b>
+                <span className="block text-[13px] text-[var(--in-sub)]">{p.birthYear ?? "anno non indicato"} · {registrationLabel(p.registrationStatus)}</span>
+              </span>
+              {cert !== "sconosciuto" && <Chip tone={CERT_TONE[cert]}>{CERT_SHORT[cert]}</Chip>}
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
 }
