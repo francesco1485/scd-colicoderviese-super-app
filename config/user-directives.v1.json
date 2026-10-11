@@ -848,6 +848,118 @@
           "DECIDED 2026-10-11: reminders to the person (or parent) at 30 and 7 days before expiry; on expiry day also to the secretariat; then weekly until delivered"
         ]
       }
+    },
+    {
+      "id": "UD-034",
+      "name": "LOGIC_AND_CRITERIA_FIRST",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "tutto va fatto con un criterio e un senso logico sempre ricordalo",
+        "tutte cose da pensare man mano da operare attraverso le idee"
+      ],
+      "normalizedCommand": {
+        "rule": "Every idea is recorded, placed on its floor, given a feasibility verdict and built in a logical order, one verifiable block at a time.",
+        "scope": "SUPER_APP",
+        "torreFloor": "ALL",
+        "constraints": [
+          "no half-open sites: finish a block before opening the next"
+        ],
+        "implementationStatus": "STANDING_RULE",
+        "duplicate_work": "DENY"
+      }
+    },
+    {
+      "id": "UD-035",
+      "name": "SKY_LIVE_MATCH_REACTIONS",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "se qualcuno live scrive che abbiamo segnato lui esulta e fa arrivare notifica a chi autorizza con coriandoli",
+        "se prendiamo gol è deluso",
+        "chiede commento a caldo a fine partita in chatbot a chi ha messo i risultati"
+      ],
+      "normalizedCommand": {
+        "rule": "When an authorised reporter enters a live goal, Sky celebrates (confetti) and a push goes to users who opted in; on a conceded goal Sky looks disappointed; at full time Sky asks the reporter for a short hot comment.",
+        "scope": "SUPER_APP",
+        "torreFloor": "0_HALL (live) + 1_SERVIZI (notifiche)",
+        "constraints": [
+          "only authorised reporters can enter live events",
+          "notifications only to users who opted in",
+          "no names of minor scorers in public; youth teams show the event without names",
+          "final score always reconciled with FIGC/LND official result"
+        ],
+        "implementationStatus": "RECORDED_DESIGN_PENDING",
+        "duplicate_work": "DENY"
+      }
+    },
+    {
+      "id": "UD-036",
+      "name": "REMOTE_LINEUPS_LIVE",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "se si inseriscono le distinte da remoto mette in diretta i calciatori e i ruoli così da creare attenzione"
+      ],
+      "normalizedCommand": {
+        "rule": "Team sheets entered remotely by the manager show the line-up live with roles to build attention.",
+        "scope": "SUPER_APP",
+        "torreFloor": "0_HALL (live) + 1_SERVIZI (gestionale)",
+        "constraints": [
+          "adult teams (Prima Squadra) may show names and roles",
+          "youth teams show roles/shirt numbers or consenting avatars only, never names of minors in public",
+          "the official team sheet remains the FIGC one: the app shows, it does not replace"
+        ],
+        "implementationStatus": "RECORDED_DESIGN_PENDING",
+        "duplicate_work": "DENY"
+      }
+    },
+    {
+      "id": "UD-037",
+      "name": "SPONSOR_WELCOME_AND_INVITATIONS",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "se entra un nuovo sponsor va fatta presentazione e annuncio con festa e per una settimana va pubblicizzato",
+        "mandare mail agli sponsor per venire allo stadio con invito personalizzato, anche ad autorità ed enti come fanno le grandi società"
+      ],
+      "normalizedCommand": {
+        "rule": "A new sponsor gets a welcome announcement with a celebration and one week of promotion; personalised stadium invitations are prepared for sponsors, authorities and public bodies.",
+        "scope": "SUPER_APP",
+        "torreFloor": "1_SERVIZI (SCD GROW)",
+        "constraints": [
+          "official sponsor logos only",
+          "invitation emails are drafts: a person reviews and sends",
+          "contacts come from the existing CRM / Sponsor master, no new register"
+        ],
+        "implementationStatus": "RECORDED_DESIGN_PENDING",
+        "duplicate_work": "DENY"
+      }
+    },
+    {
+      "id": "UD-038",
+      "name": "ANNUAL_CALENDAR_INITIATIVE_PLANNING",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "analizzare il calendario annuale per vedere planning iniziative da sottoporre"
+      ],
+      "normalizedCommand": {
+        "rule": "Analyse the season calendar and propose a plan of initiatives (sponsor days, authority days, family days, youth days) for Direzione approval.",
+        "scope": "SUPER_APP",
+        "torreFloor": "1_SERVIZI (eventi) + -1_MOTORE (calendario)",
+        "constraints": [
+          "proposals are labelled PROPOSED until Direzione approves",
+          "based only on the official calendar; unpublished phases are UNKNOWN, not empty"
+        ],
+        "implementationStatus": "ANALYSIS_STARTED",
+        "duplicate_work": "DENY"
+      }
     }
   ],
   "completionGate": {
