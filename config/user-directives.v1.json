@@ -1361,6 +1361,31 @@
         "implementationStatus": "PARTIAL (smart routing after login on staging; the rest registered)",
         "duplicate_work": "DENY"
       }
+    },
+    {
+      "id": "UD-057",
+      "name": "MOBILE_FIRST_PROPORTIONS",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "poca attenzione nei particolari, poca attenzione ai dettagli, poca attenzione nelle grafiche e proporzioni",
+        "una barra troppo grande si fa difficoltà ad avere il calendario settimanale gare in uno schermo telefono o tablet",
+        "oggi il 99% delle persone non possiede un pc ma lavora e usa solo telefoni e tablet"
+      ],
+      "normalizedCommand": {
+        "rule": "Every screen is designed and checked on phone and tablet first; desktop follows. No block (hero, mascot, wordmark, sponsor band, status bars) may push the useful content (today's matches, the week's fixtures, the area's data) below the first screen on a phone. Proportions and details are reviewed on real viewports (390 and 820 px) before publishing.",
+        "scope": "SUPER_APP (all pages)",
+        "torreFloor": "0_HALL and every floor",
+        "constraints": [
+          "the header already carries the crest: no second oversized wordmark on phones",
+          "fixed bars (sponsor, navigation) stay slim on phones",
+          "same-day matches (in contemporanea) are all visible in the day ticket",
+          "visual QA with phone and tablet screenshots is part of the done criteria"
+        ],
+        "implementationStatus": "STAGING (home, gateway); other pages to review",
+        "duplicate_work": "DENY"
+      }
     }
   ],
   "completionGate": {
