@@ -104,3 +104,23 @@ export function rosterTeams(rows: readonly RosterRow[]): Array<{ code: string; n
   for (const r of rows) if (!seen.has(r.teamCode)) seen.set(r.teamCode, { code: r.teamCode, name: r.teamName, status: r.teamStatus });
   return [...seen.values()];
 }
+
+/**
+ * Athletes the mister can add to a call-up from his other teams (UD-068: "la convocazione è per tutti… di quell'annata
+ * o di più annate che può convocare"). One entry per athlete, never someone already in the match's squad.
+ */
+export function otherAnnate(rows: readonly RosterRow[], teamCode: string): Array<{ teamCode: string; teamName: string; rows: RosterRow[] }> {
+  const inSquad = new Set(rows.filter((r) => r.teamCode === teamCode && r.athleteId).map((r) => r.athleteId));
+  const seen = new Set<string>();
+  const groups = new Map<string, { teamCode: string; teamName: string; rows: RosterRow[] }>();
+  for (const r of rows) {
+    if (r.teamCode === teamCode || !r.athleteId || inSquad.has(r.athleteId) || seen.has(r.athleteId)) continue;
+    seen.add(r.athleteId);
+    const g = groups.get(r.teamCode) ?? { teamCode: r.teamCode, teamName: r.teamName, rows: [] };
+    g.rows.push(r);
+    groups.set(r.teamCode, g);
+  }
+  const fold = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  for (const g of groups.values()) g.rows.sort((a, b) => fold(a.displayName).localeCompare(fold(b.displayName), "it"));
+  return [...groups.values()];
+}

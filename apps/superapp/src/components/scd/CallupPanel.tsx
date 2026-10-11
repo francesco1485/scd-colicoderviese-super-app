@@ -1,5 +1,5 @@
 import { useServerFn } from "@tanstack/react-start";
-import { Check, CircleAlert, Send } from "lucide-react";
+import { Check, ChevronDown, CircleAlert, Send } from "lucide-react";
 import { useEffect, useId, useMemo, useState } from "react";
 
 import { Chip, type ChipTone } from "@/components/scd/interior-ui";
@@ -16,7 +16,22 @@ const RESPONSE_TONE: Readonly<Record<CallupResponse, ChipTone>> = { CONFIRMED: "
  * Eligibility (certificate valid on match day, FIGC registration) is enforced by the database:
  * the hints below only warn before sending.
  */
-export function CallupPanel({ eventId, eventDate, defaultPlace, squad, tag }: { eventId: string; eventDate: string; defaultPlace: string; squad: RosterRow[]; tag: string }) {
+export function CallupPanel({
+  eventId,
+  eventDate,
+  defaultPlace,
+  squad,
+  others = [],
+  tag,
+}: {
+  eventId: string;
+  eventDate: string;
+  defaultPlace: string;
+  squad: RosterRow[];
+  /** Athletes of the mister's other teams (UD-068), grouped by team. */
+  others?: ReadonlyArray<{ teamCode: string; teamName: string; rows: RosterRow[] }>;
+  tag: string;
+}) {
   const load = useServerFn(getEventCallups);
   const send = useServerFn(sendCallups);
   const withdraw = useServerFn(withdrawCallups);
@@ -26,6 +41,7 @@ export function CallupPanel({ eventId, eventDate, defaultPlace, squad, tag }: { 
   const [meetingPlace, setMeetingPlace] = useState(defaultPlace);
   const [kitNote, setKitNote] = useState("");
   const [busy, setBusy] = useState(false);
+  const [othersOpen, setOthersOpen] = useState(false);
   const [message, setMessage] = useState<{ ok: boolean; text: string; blocked: Array<{ name: string; outcome: SendOutcome }> } | null>(null);
   const formId = useId();
 
@@ -36,6 +52,9 @@ export function CallupPanel({ eventId, eventDate, defaultPlace, squad, tag }: { 
       setCallups(rows);
       // Merge: ticks made while the saved call-ups were loading must survive.
       setPicked((prev) => new Set([...prev, ...rows.map((r) => r.athleteId)]));
+      // Already called up from another annata: show that section open.
+      const fromOthers = new Set(others.flatMap((g) => g.rows.map((p) => p.athleteId)));
+      if (rows.some((r) => fromOthers.has(r.athleteId))) setOthersOpen(true);
       const first = rows[0];
       if (first?.meetingAt) setMeetingTime(romeTime(first.meetingAt));
       if (first?.meetingPlace) setMeetingPlace(first.meetingPlace);
@@ -79,7 +98,7 @@ export function CallupPanel({ eventId, eventDate, defaultPlace, squad, tag }: { 
       }
       if (picked.size > 0) {
         const res = await send({ data: { eventId, athleteIds: [...picked], meetingTime, meetingPlace, kitNote } });
-        const nameOf = new Map(squad.map((p) => [p.athleteId, p.displayName]));
+        const nameOf = new Map([...squad, ...others.flatMap((g) => g.rows)].map((p) => [p.athleteId, p.displayName]));
         blocked = res.outcomes.filter((o) => o.outcome !== "SENT").map((o) => ({ name: nameOf.get(o.athleteId) ?? "Atleta", outcome: o.outcome }));
         const c = outcomeCounts(res.outcomes);
         parts.unshift(res.ok && blocked.length ? `${c.SENT} convocati, ${blocked.length} non convocabili.` : res.message);
@@ -99,6 +118,35 @@ export function CallupPanel({ eventId, eventDate, defaultPlace, squad, tag }: { 
     }
   };
 
+  const othersCount = others.reduce((n, g) => n + g.rows.length, 0);
+  const othersPicked = others.reduce((n, g) => n + g.rows.filter((p) => picked.has(p.athleteId)).length, 0);
+
+  const renderRow = (p: RosterRow) => {
+    const aid = p.athleteId;
+    if (!aid) return null;
+    const call = byAthlete.get(aid);
+    const cert = certificateState(p.certificateExpiresAt, eventDate);
+    const certWarn = cert === "scaduto" || cert === "sconosciuto";
+    const figcWarn = p.registrationStatus !== "VERIFIED";
+    const checked = picked.has(aid);
+    return (
+      <li key={p.personId} className="border-t border-[var(--in-line)] first:border-t-0">
+        <label className="flex min-h-12 cursor-pointer items-center gap-3 px-3 py-2 text-[15px]">
+          <input type="checkbox" checked={checked} onChange={() => toggle(aid)} className="scd-focus size-5 flex-none accent-[var(--scd-blue)]" />
+          <span className="min-w-0 flex-1">
+            <b className="block truncate font-semibold">{p.displayName}</b>
+            <span className="block text-[13px] text-[var(--in-sub)]">
+              {p.birthYear ?? "anno non indicato"}
+              {certWarn && " · certificato da verificare"}
+              {figcWarn && " · tesseramento FIGC da verificare"}
+            </span>
+          </span>
+          {call && !checked ? <Chip tone="warn">Da togliere</Chip> : call ? <Chip tone={RESPONSE_TONE[call.response]}>{RESPONSE_LABEL[call.response]}</Chip> : (certWarn || figcWarn) && <CircleAlert className="size-[18px] flex-none text-[var(--in-warn,#b45309)]" aria-label="Potrebbe non essere convocabile" />}
+        </label>
+      </li>
+    );
+  };
+
   return (
     <div className="flex flex-col gap-3">
       {callups && callups.length > 0 && (
@@ -113,32 +161,25 @@ export function CallupPanel({ eventId, eventDate, defaultPlace, squad, tag }: { 
       <fieldset className="m-0 min-w-0 border-0 p-0">
         <legend className="mb-2 text-[15px] font-semibold">Rosa {tag}: scegli i convocati</legend>
         <ul className="m-0 list-none overflow-hidden rounded-xl border border-[var(--in-line)] p-0">
-          {squad.map((p) => {
-            const aid = p.athleteId;
-            if (!aid) return null;
-            const call = byAthlete.get(aid);
-            const cert = certificateState(p.certificateExpiresAt, eventDate);
-            const certWarn = cert === "scaduto" || cert === "sconosciuto";
-            const figcWarn = p.registrationStatus !== "VERIFIED";
-            const checked = picked.has(aid);
-            return (
-              <li key={p.personId} className="border-t border-[var(--in-line)] first:border-t-0">
-                <label className="flex min-h-12 cursor-pointer items-center gap-3 px-3 py-2 text-[15px]">
-                  <input type="checkbox" checked={checked} onChange={() => toggle(aid)} className="scd-focus size-5 flex-none accent-[var(--scd-blue)]" />
-                  <span className="min-w-0 flex-1">
-                    <b className="block truncate font-semibold">{p.displayName}</b>
-                    <span className="block text-[13px] text-[var(--in-sub)]">
-                      {p.birthYear ?? "anno non indicato"}
-                      {certWarn && " · certificato da verificare"}
-                      {figcWarn && " · tesseramento FIGC da verificare"}
-                    </span>
-                  </span>
-                  {call && !checked ? <Chip tone="warn">Da togliere</Chip> : call ? <Chip tone={RESPONSE_TONE[call.response]}>{RESPONSE_LABEL[call.response]}</Chip> : (certWarn || figcWarn) && <CircleAlert className="size-[18px] flex-none text-[var(--in-warn,#b45309)]" aria-label="Potrebbe non essere convocabile" />}
-                </label>
-              </li>
-            );
-          })}
+          {squad.map((p) => renderRow(p))}
         </ul>
+        {others.length > 0 && (
+          <details className="mt-3 rounded-xl border border-[var(--in-line)]" open={othersOpen} onToggle={(e) => setOthersOpen(e.currentTarget.open)} data-testid="callup-others">
+            <summary className="scd-focus flex min-h-12 cursor-pointer list-none items-center [&::-webkit-details-marker]:hidden justify-between gap-2 px-3 text-[15px] font-semibold">
+              <span>Da altre annate</span>
+              <span className="flex items-center gap-2 text-[13.5px] font-normal text-[var(--in-sub)]">
+                {othersPicked > 0 ? `${othersPicked} ${othersPicked === 1 ? "scelto" : "scelti"} · ` : ""}{othersCount} ragazzi
+                <ChevronDown className={`size-4 transition-transform ${othersOpen ? "rotate-180" : ""}`} aria-hidden="true" />
+              </span>
+            </summary>
+            {others.map((g) => (
+              <div key={g.teamCode} className="border-t border-[var(--in-line)]">
+                <p className="m-0 bg-[#f6f9fd] px-3 py-1.5 text-[13px] font-semibold text-[var(--in-sub)]">{g.teamName}</p>
+                <ul className="m-0 list-none p-0">{g.rows.map((p) => renderRow(p))}</ul>
+              </div>
+            ))}
+          </details>
+        )}
       </fieldset>
 
       <form

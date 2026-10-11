@@ -244,3 +244,14 @@ prossimi impegni e "ci sarò" in primo piano). Desktop invariato.
 - App: nel pannello convocazione basta togliere la spunta a un convocato ("Da togliere") e premere il pulsante, che dice cosa
   succede ("Invia convocazione (2) · togli 1" / "Togli 1 dalla convocazione"). Visual QA telefono.
 - Correzione: in chat il tasto era stato descritto come "la famiglia annulla Ci sarò"; le famiglie potevano già cambiare risposta.
+
+## Convocazione da più annate · 2026-10-11 sera (UD-068)
+
+- Regola della Direzione: la convocazione non è la distinta. Il mister convoca 1-2 giorni prima chi vuole, anche da altre annate
+  che può convocare; tutti i convocati si presentano; la distinta (chi scende in campo) si fa alla gara.
+- `VERIFIED` r69 (`20261011_r69_callup_multi_annata.sql`): `scd_staff_send_callups` accetta atleti di tutte le squadre del
+  perimetro di chi convoca (`scd_my_team_ids`), non solo della squadra della gara. Certificato e tesseramento restano obbligatori.
+  Prova annullata: Direzione convoca un 2015 nella gara U15 → SENT; staff della Prima senza il 2015 nel perimetro → NOT_IN_TEAM.
+- App: nel pannello convocazione, sotto la rosa, la sezione "Da altre annate" (chiusa, si apre da sola se ci sono già convocati
+  da lì) con i ragazzi delle altre squadre del mister, raggruppati per squadra. Visual QA telefono.
+- Distinta: da decidere con la Direzione (in app o portale FIGC).

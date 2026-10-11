@@ -1606,6 +1606,31 @@
         "implementationStatus": "IMPLEMENTED_STAGING",
         "duplicate_work": "DENY"
       }
+    },
+    {
+      "id": "UD-068",
+      "name": "CALLUP_IS_NOT_MATCH_SHEET",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "la convocazione non è la distinta",
+        "il MIS convoca due giorni prima o un giorno prima",
+        "tutti i ragazzi convocati devono presentarsi",
+        "nella distinta metterà quelli là che scendono in campo",
+        "convoca tutti i ragazzi che vuole di quell'annata o di più annate che può convocare"
+      ],
+      "normalizedCommand": {
+        "rule": "Call-up = everyone who must show up, sent 1-2 days before, from the match's annata or from other annate the mister may call up. Match sheet (distinta) = who plays, decided at the match; a called-up athlete not on the distinta does not play.",
+        "scope": "CALLUPS | MATCH_SHEET",
+        "constraints": [
+          "call-up scope = teams assigned to the staff member (organigramma, Accessi, coordinator)",
+          "eligibility checks unchanged",
+          "distinta is a separate step — format to confirm with Direzione (in-app vs FIGC portal)"
+        ],
+        "implementationStatus": "CALLUP_SCOPE_IMPLEMENTED_STAGING; DISTINTA_PENDING_DECISION",
+        "duplicate_work": "DENY"
+      }
     }
   ],
   "completionGate": {

@@ -10,7 +10,7 @@ import { findSessions, freshnessLabel, loadCalendar, loadQuadro, type PublicEven
 import { dayLabel, teamSummaries, type TeamSummary } from "@/lib/quadro";
 import { getWorkAreaGate } from "@/lib/work-areas.functions";
 import { certificateState, type CertState } from "@/lib/people";
-import { groupForTeamCode, registrationLabel, rosterOf, rosterSummary, rosterTeams, teamCodeForGroup, type RosterRow } from "@/lib/roster";
+import { groupForTeamCode, otherAnnate, registrationLabel, rosterOf, rosterSummary, rosterTeams, teamCodeForGroup, type RosterRow } from "@/lib/roster";
 import { getMyRoster, type MyRoster } from "@/lib/roster.functions";
 import { CallupPanel } from "@/components/scd/CallupPanel";
 
@@ -65,6 +65,7 @@ function MisterPage({ data }: { data: Loaded }) {
   const team: TeamSummary | undefined = teams.find((t) => t.id === squadra) ?? teams.find((t) => own.includes(t.id)) ?? teams[0];
   const squad = useMemo(() => (team ? rosterOf(data.roster.rows, teamCodeForGroup(team.id)) : []), [team, data.roster.rows]);
   const squadKnown = data.roster.state === "ok" && team !== undefined && own.includes(team.id);
+  const others = useMemo(() => (team && squadKnown ? otherAnnate(data.roster.rows, teamCodeForGroup(team.id)) : []), [team, squadKnown, data.roster.rows]);
   const sessions = useMemo(() => (team?.trainingKey ? findSessions([...data.slots], team.trainingKey) : []), [team, data.slots]);
   const upcoming = useMemo(
     () => (team ? data.events.filter((e) => e.group === team.id && (e.date > now.date || (e.date === now.date && (e.time === "" || e.time >= now.time)))).slice(0, 4) : []),
@@ -123,7 +124,7 @@ function MisterPage({ data }: { data: Loaded }) {
                 </div>
                 <div className="px-4 pb-4 sm:px-[18px]">
                   {squadKnown && next && squad.length > 0 ? (
-                    <CallupPanel key={next.id} eventId={next.id} eventDate={next.date} defaultPlace={next.homeAway === "CASA" ? venueCase(titleCase(next.venue.split(",")[0] ?? "")) : ""} squad={squad} tag={team.tag} />
+                    <CallupPanel key={next.id} eventId={next.id} eventDate={next.date} defaultPlace={next.homeAway === "CASA" ? venueCase(titleCase(next.venue.split(",")[0] ?? "")) : ""} squad={squad} others={others} tag={team.tag} />
                   ) : (
                     <SquadPanel roster={data.roster} squad={squad} known={squadKnown} tag={team.tag} today={now.date} />
                   )}

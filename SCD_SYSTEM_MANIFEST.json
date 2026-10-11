@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.27.9",
+    "version": "3.27.10",
     "effective_at": "2026-10-11",
     "status": "BINDING",
     "language": "it-IT",
@@ -818,6 +818,7 @@
         "secretariat_alerts_view": "scd_secretariat_alerts_v",
         "match_day_view": "scd_match_day_v",
         "medical_source_of_truth": "scd_athletes.medical_certificate_expires_at",
+        "callup_scope": "A call-up (convocazione) is not the match sheet (distinta): staff call up 1-2 days before any athlete of the teams in their scope (scd_my_team_ids), not only the match team; everyone called up must show up; the distinta is a separate step at the match — supabase/migrations/20261011_r69_callup_multi_annata.sql",
         "callup_withdraw": "Team staff withdraw a sent call-up before kick-off via scd_staff_withdraw_callups: scd_match_callups.withdrawn_at/_by, row kept; withdrawn call-ups hidden from staff, family, answers and push; re-calling resets answer and notification — supabase/migrations/20261011_r68_callup_withdraw.sql (supersedes unapplied r62_1)",
         "callup_push": "Web Push for new call-ups: scd_push_subscriptions (RLS, no policies), scd_match_callups.notified_at (notify once), edge function supabase/functions/callup-push (caller JWT + team scope check), VAPID pair generated server-side and kept only in Supabase Vault — migrations 20261011_r67_callup_push.sql, 20261011_r67_1_push_keys_in_vault.sql; payload = first name, match, date, meeting time only",
         "medical_provenance": "scd_athletes.medical_certificate_status (DECLARED | VERIFIED), medical_certificate_checked_at/_by; office writes only via scd_set_certificate (audited in scd_audit_events) — supabase/migrations/20261011_r66_certificate_register.sql",

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { groupForTeamCode, registrationLabel, rosterOf, rosterSummary, rosterTeams, teamCodeForGroup, toRosterRow, type RosterDbRow } from "./roster";
+import { groupForTeamCode, otherAnnate, registrationLabel, rosterOf, rosterSummary, rosterTeams, teamCodeForGroup, toRosterRow, type RosterDbRow } from "./roster";
 
 const db = (o: Partial<RosterDbRow>): RosterDbRow => ({
   team_id: "t1",
@@ -51,5 +51,17 @@ describe("roster", () => {
   it("labels unknown registration states as to be checked", () => {
     expect(registrationLabel("VERIFIED")).toBe("Tesserato");
     expect(registrationLabel("WHATEVER")).toBe("Tesseramento da verificare");
+  });
+});
+
+describe("call-up from other annate (UD-068)", () => {
+  const r = (athleteId: string, teamCode: string, displayName: string) =>
+    ({ teamId: teamCode, teamCode, teamName: teamCode.toUpperCase(), teamStatus: "ACTIVE", personId: athleteId, athleteId, displayName, birthYear: 2012, minor: true, registrationStatus: "VERIFIED", certificateExpiresAt: null });
+  it("groups the other teams, skips squad members, duplicates and rows without athlete id", () => {
+    const rows = [r("a1", "u15", "Zeta"), r("a2", "2015", "Bruno"), r("a1", "2015", "Zeta"), r("a3", "2015", "Aldo"), r("a3", "u16", "Aldo"), r("", "u16", "Senza id")];
+    const out = otherAnnate(rows, "u15");
+    expect(out.map((g) => g.teamCode)).toEqual(["2015"]);
+    expect(out[0]?.rows.map((x) => x.displayName)).toEqual(["Aldo", "Bruno"]);
+    expect(otherAnnate([r("a1", "u15", "Zeta")], "u15")).toEqual([]);
   });
 });
