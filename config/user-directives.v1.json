@@ -1144,6 +1144,109 @@
         "implementationStatus": "STAGING (figures with name and role on allenamenti and pulmini; contacts and players' list wait for the identity elevator)",
         "duplicate_work": "DENY"
       }
+    },
+    {
+      "id": "UD-047",
+      "name": "DOTTORESSA_RUBRICA_AND_INFERMERIA_PRICING",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "la dottoressa deve essere di sprone, sappiamo che non è così ma possiamo fare stile rubrica: metti i tuoi dati e il tuo stile di nutrizione e io ti consiglio al meglio",
+        "per massaggi o tecar invece chiedere a Gabriele, deve uscire e poi costi anche per i tesserati in esclusiva, non per non tesserati; i servizi sono solo per tesserati"
+      ],
+      "normalizedCommand": {
+        "rule": "The 'dottoressa' is an encouraging weekly column: members enter their data and eating style and get motivating general advice. Massages and tecar are requested from the infermeria manager (Gabriele), with prices shown once communicated; all these services are for members only.",
+        "scope": "SUPER_APP",
+        "torreFloor": "-2 (infermeria) + 1",
+        "constraints": [
+          "column, not a clinician: states she is not a doctor; no diets, calories or weight targets for minors; data stays private to the person/parent and the club doctor",
+          "prices only when communicated by Direzione, otherwise 'chiedi al responsabile infermeria'"
+        ],
+        "implementationStatus": "REGISTRY_STAGING",
+        "duplicate_work": "DENY"
+      }
+    },
+    {
+      "id": "UD-048",
+      "name": "LAUNDRY_TRAINING_KIT_SERVICE",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "in lavanderia c'è anche servizio lavaggio indumenti di allenamento su richiesta, costa 25 € al mese e va pubblicizzato internamente al gestionale"
+      ],
+      "normalizedCommand": {
+        "rule": "Training-kit laundry service on request, 25 € per month, promoted internally in the gestionale.",
+        "scope": "SUPER_APP",
+        "torreFloor": "-2 (club-house)",
+        "constraints": [
+          "members only; price as communicated 2026-10-11"
+        ],
+        "implementationStatus": "STAGING (bar Per i tesserati)",
+        "duplicate_work": "DENY"
+      }
+    },
+    {
+      "id": "UD-049",
+      "name": "MEMBER_INITIATIVES_BAR",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "una barra dove loro vedono iniziative dedicate a tesserati così possiamo veicolare acquisti di ogni genere e anche per muovere le club house o altre cose che vogliamo veicolare"
+      ],
+      "normalizedCommand": {
+        "rule": "A bar inside the work areas showing initiatives and services reserved to members, to steer purchases and Club House activity.",
+        "scope": "SUPER_APP",
+        "torreFloor": "-1/-2 (all work areas)",
+        "constraints": [
+          "internal only, never on public pages",
+          "content from config/scd-member-services.v1.json, prices never invented"
+        ],
+        "implementationStatus": "STAGING",
+        "duplicate_work": "DENY"
+      }
+    },
+    {
+      "id": "UD-050",
+      "name": "FAN_CARDS_THREE_TIERS",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "le tre tessere tifoso: ti scrivo cosa abbiamo comunicato e cosa poi tu mi dici di impostare"
+      ],
+      "normalizedCommand": {
+        "rule": "Three fan card tiers: to be set up once the Direzione sends what was communicated.",
+        "scope": "SUPER_APP",
+        "torreFloor": "1 (servizi) + 3 (partner)",
+        "constraints": [
+          "wait for the text of the communication; no prices or benefits invented"
+        ],
+        "implementationStatus": "WAITING_FOR_INPUT",
+        "duplicate_work": "DENY"
+      }
+    },
+    {
+      "id": "UD-051",
+      "name": "PULMINI_SERVICE_RULES_2026-10-05",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "comunicazione generale servizio pulmini (allegato 2026-10-11)"
+      ],
+      "normalizedCommand": {
+        "rule": "Pulmini service as communicated from 5/10: 3 vans; weekday training service for annate 2019–2012; not provided for U16 Élite and Juniores Élite; 2020–2021 case by case; modes A/R, A, R kept; away trips for all categories with monthly planning; requests through responsabili/dirigenti/allenatori to the transport manager; pickup rules.",
+        "scope": "SUPER_APP",
+        "torreFloor": "-2 (pulmini)",
+        "constraints": [
+          "rules shown in the app and used to flag slots where the service is not provided; the Master Pulmini remains the source for actual runs"
+        ],
+        "implementationStatus": "STAGING",
+        "duplicate_work": "DENY"
+      }
     }
   ],
   "completionGate": {

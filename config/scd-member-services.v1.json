@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "id": "SCD_MEMBER_SERVICES_V1",
+  "effectiveAt": "2026-10-11",
+  "audience": "TESSERATI_ONLY",
+  "note": "Servizi e iniziative riservati ai tesserati SCD, mostrati nella barra interna del gestionale (UD-048, UD-049). Prezzi solo se comunicati dalla Direzione; mai inventati.",
+  "services": [
+    {
+      "id": "lavanderia-allenamento",
+      "area": "club-house",
+      "title": "Lavaggio indumenti di allenamento",
+      "text": "Su richiesta, il Club House lava gli indumenti di allenamento dei tesserati.",
+      "price": "25 € al mese",
+      "priceStatus": "COMMUNICATED_BY_DIRECTION_2026-10-11",
+      "contactRole": "Responsabile club house",
+      "memberOnly": true,
+      "status": "ACTIVE"
+    },
+    {
+      "id": "massaggi-tecar",
+      "area": "infermeria",
+      "title": "Massaggi e tecar",
+      "text": "Trattamenti in infermeria, riservati ai tesserati. Costi e disponibilità: chiedi a Gabriele.",
+      "price": null,
+      "priceStatus": "TO_BE_COMMUNICATED",
+      "contactRole": "Responsabile infermeria",
+      "memberOnly": true,
+      "status": "ACTIVE"
+    },
+    {
+      "id": "nutrizione-rubrica",
+      "area": "infermeria",
+      "title": "La rubrica della dottoressa",
+      "text": "Metti i tuoi dati e il tuo stile di alimentazione: ogni settimana un consiglio di sprone, in base a tempo e allenamenti. Non sostituisce il medico.",
+      "price": null,
+      "priceStatus": "FREE",
+      "contactRole": "Responsabile infermeria",
+      "memberOnly": true,
+      "status": "PLANNED"
+    }
+  ],
+  "pulminiService": {
+    "source": "Comunicazione generale servizio pulmini, in vigore dal 2026-10-05",
+    "vehiclesInService": 3,
+    "trainingAnnate": ["2019", "2018", "2017", "2016", "2015", "2014", "2013", "2012"],
+    "trainingNotServed": ["U16 Élite", "Juniores Élite"],
+    "evaluatedCaseByCase": ["2020", "2021"],
+    "modes": ["andata e ritorno", "solo andata", "solo ritorno"],
+    "awayTrips": "Tutte le categorie, con programmazione mensile tramite responsabili, dirigenti e staff; subordinata a mezzi e persone disponibili.",
+    "requestFlow": "Nuove esigenze o variazioni passano da responsabili, dirigenti o allenatori al Responsabile del servizio pulmini, che valuta in autonomia; attendere sempre la conferma.",
+    "pickupRules": ["almeno un maggiorenne ai punti di raccolta", "rispetto degli orari", "nessuna discussione organizzativa durante il trasporto, salvo urgenze"]
+  }
+}

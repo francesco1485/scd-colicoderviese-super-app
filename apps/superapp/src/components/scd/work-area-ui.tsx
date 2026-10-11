@@ -3,6 +3,7 @@
  * banner, the "Fonti" box with the Drive masters, the "Inserisci" row builder for the
  * "Inserimenti a Sky" sheet and the honest empty state. Read-only: nothing is written anywhere.
  */
+import { MemberServicesBar } from "@/components/scd/MemberServicesBar";
 import { Check, ClipboardCopy, ExternalLink, FileSpreadsheet, Info, Plus, X } from "lucide-react";
 import { useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from "react";
 
@@ -78,6 +79,7 @@ export function WorkAreaShell({
     >
       <div className="flex flex-col gap-[18px]" data-work-area={id}>
         {preview && <StagingBanner />}
+        <MemberServicesBar area={id} />
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="m-0 flex min-w-0 flex-1 flex-wrap items-center gap-2 text-[14px] leading-snug text-[var(--in-sub)]">
             <Chip tone="info">Sola lettura</Chip>

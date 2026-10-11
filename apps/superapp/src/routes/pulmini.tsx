@@ -14,6 +14,7 @@ import { loadQuadro, type TrainingSlot } from "@/lib/public-snapshots";
 import { defaultDay, weekdayKey } from "@/lib/training-view";
 import { VanSeatMap, type TeamColor } from "@/components/scd/VanSeatMap";
 import { PeoplePins } from "@/components/scd/PeoplePins";
+import { PULMINI_SERVICE, trainingServiceFor } from "@/lib/member-services";
 import { peopleForArea, type StaffPerson } from "@/lib/staff-roster";
 import { getStaffEmails, getStaffRoster } from "@/lib/staff-roster.functions";
 import { PULMINI_FLEET, factStamp, nextWeekend, weekendMatches } from "@/lib/work-areas";
@@ -69,7 +70,7 @@ function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf
         { value: trips.length, label: `trasferte ${weekendLabel}` },
         { value: weekendRuns, label: "pulmini assegnati nel weekend" },
         { value: weekdayRuns, label: "corse di allenamento in settimana" },
-        { value: F.vehicles, label: "mezzi, posti da confermare" },
+        { value: PULMINI_SERVICE.vehiclesInService, label: "pulmini in servizio (comunicazione del 5/10)" },
       ]}
       note={<>Calendario ufficiale: copia del {freshnessLabel(sourceModifiedAt)} · Flotta: {factStamp(F)}.</>}
     >
@@ -104,14 +105,17 @@ function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf
                 const vans = trainingRuns.get(trainingKey(slot.day, slot.start)) ?? [];
                 const kids = vans.reduce((a, r) => a + ridersTotal(r), 0);
                 const who = [slot.fields.C1, slot.fields.C2].filter((t) => t && t.trim() && t.trim() !== "—").join(" · ");
+                const served = trainingServiceFor(who);
                 return (
                   <li key={slot.timeLabel + slot.start} className="grid gap-3 border-t border-[var(--in-line)] px-4 py-4 sm:px-[18px]" data-testid="training-run">
                     <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                       <span className="font-title text-[24px] font-black leading-none tabular-nums">{slot.timeLabel.split(/[–-]/)[0]}</span>
                       <span className="text-[14px] text-[var(--in-sub)]">{slot.timeLabel}</span>
                       <span className="min-w-0 flex-1 truncate text-[14px] font-semibold" title={who}>{who || "Campi liberi"}</span>
-                      {vans.length === 0 ? (
-                        <Chip tone="warn">nessun pulmino</Chip>
+                      {served === "no" ? (
+                        <Chip tone="info">servizio non previsto per questa fascia</Chip>
+                      ) : vans.length === 0 ? (
+                        <Chip tone="warn">nessun pulmino registrato</Chip>
                       ) : (
                         <Chip tone="ok">{vans.length} {vans.length === 1 ? "pulmino" : "pulmini"} · {kids} ragazzi</Chip>
                       )}
@@ -154,9 +158,20 @@ function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf
 
         </div>
         <div className="flex min-w-0 flex-col gap-[18px]">
+          <Card id="pul-regole" title="Regole del servizio" sub={PULMINI_SERVICE.source}>
+            <dl className="m-0 grid gap-2 px-4 pb-4 text-[14px] leading-snug sm:px-[18px]">
+              <div><dt className="font-bold">Allenamenti: annate servite</dt><dd className="m-0 text-[var(--in-sub)]">{PULMINI_SERVICE.trainingAnnate.join(", ")}</dd></div>
+              <div><dt className="font-bold">Allenamenti: non previsto</dt><dd className="m-0 text-[var(--in-sub)]">{PULMINI_SERVICE.trainingNotServed.join(", ")} · {PULMINI_SERVICE.evaluatedCaseByCase.join(" e ")}: valutate caso per caso</dd></div>
+              <div><dt className="font-bold">Modalità</dt><dd className="m-0 text-[var(--in-sub)]">{PULMINI_SERVICE.modes.join(" · ")}; le richieste già definite restano valide</dd></div>
+              <div><dt className="font-bold">Trasferte</dt><dd className="m-0 text-[var(--in-sub)]">{PULMINI_SERVICE.awayTrips}</dd></div>
+              <div><dt className="font-bold">Richieste e variazioni</dt><dd className="m-0 text-[var(--in-sub)]">{PULMINI_SERVICE.requestFlow}</dd></div>
+              <div><dt className="font-bold">Ai punti di raccolta</dt><dd className="m-0 text-[var(--in-sub)]">{PULMINI_SERVICE.pickupRules.join("; ")}</dd></div>
+            </dl>
+          </Card>
+
           <Card id="pul-flotta" title="Flotta" sub="Dal Master Flotta e Trasporti: i posti non sono ancora confermati.">
             <div className="grid grid-cols-3 gap-2 px-4 pb-4 sm:px-[18px]" data-testid="fleet">
-              <StatTile value={F.vehicles} label="mezzi" />
+              <StatTile value={PULMINI_SERVICE.vehiclesInService} of={F.vehicles} label="in servizio su mezzi in flotta" />
               <StatTile value={F.driversActive} of={F.driversRegistered} label="autisti attivi in anagrafica" />
               <StatTile value={F.membersActive} of={F.membersTotal} label="iscritti attivi" />
             </div>
