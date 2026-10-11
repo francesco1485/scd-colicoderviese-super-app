@@ -13,7 +13,7 @@ export function MemberServicesBar({ area }: { area?: string }) {
   if (!items.length) return null;
   return (
     <section aria-label="Iniziative per i tesserati" className="scd-scroll-x -mx-1 flex gap-2 overflow-x-auto px-1 pb-1" data-testid="member-services-bar">
-      <span className="sticky left-0 z-[1] flex shrink-0 items-center gap-1.5 rounded-full bg-[var(--in-ink)] px-3 py-1.5 text-[12.5px] font-extrabold uppercase tracking-[0.05em] text-white">
+      <span className="sticky left-0 z-[1] flex shrink-0 items-center gap-1.5 self-center rounded-full bg-[var(--in-ink)] px-3 py-1.5 text-[12.5px] font-extrabold uppercase tracking-[0.05em] text-white">
         <Sparkles className="size-3.5" strokeWidth={2.2} aria-hidden="true" />
         Per i tesserati
       </span>
@@ -23,7 +23,7 @@ export function MemberServicesBar({ area }: { area?: string }) {
           <Link
             key={s.id}
             to={s.area === "club-house" ? "/tesoreria/club-house" : s.area === "infermeria" ? "/infermeria" : s.area === "magazzino" ? "/magazzino" : "/aree"}
-            className={`flex min-w-[230px] max-w-[280px] shrink-0 flex-col gap-0.5 rounded-[14px] border px-3 py-2 text-left ${here ? "border-[var(--in-ink)] bg-white" : "border-[var(--in-line)] bg-white/80"}`}
+            className={`flex min-w-[200px] max-w-[260px] shrink-0 lg:min-w-[230px] lg:max-w-[280px] flex-col gap-0.5 rounded-[14px] border px-3 py-2 text-left ${here ? "border-[var(--in-ink)] bg-white" : "border-[var(--in-line)] bg-white/80"}`}
           >
             <span className="flex items-center justify-between gap-2">
               <b className="truncate text-[14px]">{s.title}</b>

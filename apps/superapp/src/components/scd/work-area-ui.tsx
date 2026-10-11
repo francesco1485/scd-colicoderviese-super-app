@@ -40,7 +40,7 @@ export function WorkAreaGateView({ id, gate, children }: { id: WorkAreaId; gate:
 
 export function StagingBanner() {
   return (
-    <div role="note" data-testid="staging-banner" className="flex items-start gap-2.5 rounded-xl border border-[#f1dc7a] bg-[#fffbe6] px-4 py-2.5 text-[14.5px] font-semibold leading-snug text-[var(--in-ink)]">
+    <div role="note" data-testid="staging-banner" className="flex items-start gap-2 rounded-xl border border-[#f1dc7a] bg-[#fffbe6] px-3 py-1.5 text-[13px] font-semibold leading-snug text-[var(--in-ink)] lg:gap-2.5 lg:px-4 lg:py-2.5 lg:text-[14.5px]">
       <Info className="mt-[1px] size-[18px] flex-none text-[var(--in-warn)]" strokeWidth={2} aria-hidden="true" />
       <span>Anteprima staging — accesso reale da attivare con il login</span>
     </div>
@@ -77,7 +77,7 @@ export function WorkAreaShell({
       roleLabel={preview ? "Anteprima staging" : "Area di lavoro"}
       {...(highlights ? { highlights } : {})}
     >
-      <div className="flex flex-col gap-[18px]" data-work-area={id}>
+      <div className="flex flex-col gap-3 lg:gap-[18px]" data-work-area={id}>
         {preview && <StagingBanner />}
         <MemberServicesBar area={id} />
         <div className="flex flex-wrap items-center justify-between gap-3">

@@ -177,17 +177,17 @@ export function HighlightStrip({ items }: { items: readonly StripItem[] }) {
   return (
     <section
       aria-label="In evidenza"
-      className="scd-led-strip grid flex-none grid-cols-[repeat(auto-fit,minmax(150px,1fr))] text-white lg:flex lg:min-h-[66px] lg:items-stretch"
+      className="scd-led-strip grid flex-none grid-cols-2 text-white sm:grid-cols-[repeat(auto-fit,minmax(150px,1fr))] lg:flex lg:min-h-[66px] lg:items-stretch"
     >
       {items.map((it) => {
         const v = stripValue(it.value);
         return (
-          <div key={it.label} className="flex items-center gap-3 border-b border-r border-white/14 px-4 py-3 lg:border-b-0 lg:px-6 lg:py-2.5 lg:first:pl-7">
-            <span className={`font-title text-[30px] font-black leading-none lg:text-[36px] ${v.muted ? "text-[var(--in-strip-muted)]" : "text-[var(--in-action)]"}`}>
+          <div key={it.label} className="flex items-center gap-2 border-b border-r border-white/14 px-3 py-2 lg:gap-3 lg:border-b-0 lg:px-6 lg:py-2.5 lg:first:pl-7">
+            <span className={`font-title text-[22px] font-black leading-none lg:text-[36px] ${v.muted ? "text-[var(--in-strip-muted)]" : "text-[var(--in-action)]"}`}>
               {v.text}
               {!v.known && <span className="sr-only"> (dato non disponibile)</span>}
             </span>
-            <span className="max-w-[22ch] text-[14px] leading-tight text-[#eaf4fd]">{it.label}</span>
+            <span className="max-w-[22ch] text-[12.5px] leading-tight text-[#eaf4fd] lg:text-[14px]">{it.label}</span>
           </div>
         );
       })}
@@ -242,16 +242,19 @@ export function InteriorShell({ title, path, activeAreaId, roles, roleLabel, hig
           <b className="font-title text-[20px] font-extrabold">SCD Dentro</b>
         </div>
 
-        <header className="flex flex-wrap items-center gap-x-4 gap-y-3 border-b border-[var(--in-line)] bg-white px-4 py-3.5 sm:px-7 lg:min-h-[72px] lg:flex-nowrap lg:py-0">
-          <h1 className="m-0 font-title text-[30px] font-extrabold leading-none lg:text-[34px]">{title}</h1>
-          <PathChip path={path} />
-          <span className="whitespace-nowrap text-[15px] text-[var(--in-sub)] lg:ml-auto" suppressHydrationWarning>{day}</span>
-          <AreaSearch />
+        {/* Phones: title only (UD-057); path chip, date and search are desktop furniture. */}
+        <header className="flex flex-wrap items-center gap-x-4 gap-y-3 border-b border-[var(--in-line)] bg-white px-4 py-2.5 sm:px-7 lg:min-h-[72px] lg:flex-nowrap lg:py-0">
+          <h1 className="m-0 font-title text-[24px] font-extrabold leading-none lg:text-[34px]">{title}</h1>
+          <span className="hidden lg:contents">
+            <PathChip path={path} />
+            <span className="whitespace-nowrap text-[15px] text-[var(--in-sub)] lg:ml-auto" suppressHydrationWarning>{day}</span>
+            <AreaSearch />
+          </span>
         </header>
 
         {highlights && highlights.length > 0 && <HighlightStrip items={highlights} />}
 
-        <main className="flex-1 px-4 py-5 sm:px-7 lg:py-[22px]">{children}</main>
+        <main className="flex-1 px-4 py-4 sm:px-7 lg:py-[22px]">{children}</main>
       </div>
     </div>
   );
