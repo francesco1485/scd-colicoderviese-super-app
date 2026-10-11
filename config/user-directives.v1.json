@@ -492,6 +492,95 @@
         ],
         "duplicate_work": "DENY"
       }
+    },
+    {
+      "id": "UD-019",
+      "name": "SPONSOR_LED_DEMO_AND_PORTFOLIO_IN_GESTIONALE",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "Per sponsor andare a creare brevi video dimostrativi per sottoporre poi con calma la proposta dei ledwal a bordo campo",
+        "per i già sponsor creare dentro al gestionale tutto quello che si sa su contratti scadenze , link web, contatti , loghi e idee da poter sottoporre",
+        "Ti allego video consegna per dimostrazione e riprodurre agli altri, capendo bene i loro siti e quelli che deve passare sulla macchina"
+      ],
+      "normalizedCommand": {
+        "rule": "Produce short LED-wall demo videos per sponsor/prospect, following the delivered reference (HDI Maglia, 20 s loop: logo, claim, services, territory, website) and the Drive standard 00_STANDARD_V4_LED_PRONTO_FLUSSO. Each current sponsor gets one sheet inside the gestionale with contract, deadlines, website, contacts, official logo and proposal ideas, read from MASTER SPONSOR INTELLIGENCE.",
+        "scope": "SPONSOR",
+        "torreFloor": "3_PARTNER + -1_REGIA (/crm)",
+        "sources": [
+          "SPONSOR_MASTER_SHEET",
+          "DRIVE_LEDWALL_SPONSOR_2026-27",
+          "OFFICIAL_SPONSOR_WEBSITES"
+        ],
+        "constraints": [
+          "official logos only",
+          "contacts verified on official sources",
+          "demo is internal until sponsor approval"
+        ],
+        "duplicate_work": "DENY"
+      }
+    },
+    {
+      "id": "UD-020",
+      "name": "TERRITORIAL_REGISTRY_BUSINESSES_AND_ORGANISATIONS",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "iniziare ad anagrafare altri partendo dalle piccole e grandi attività di colico",
+        "riempire CRM , con anagrafe e dettagli creando qualcosa di ragionato per lo sport e non , serve anche anagrafare associazioni, fondazioni ,enti e altro tipo di attività"
+      ],
+      "normalizedCommand": {
+        "rule": "Register businesses (small and large, starting from Colico, then the 15 km and 30 km circles) and associations, foundations, public bodies and other organisations in the existing CRM, classified with the Metodo SCD (sector, economic tier, distance circle, primary product, 5-vote score). Public business data only.",
+        "scope": "CRM",
+        "torreFloor": "-1_REGIA (/crm)",
+        "sources": [
+          "SPONSOR_MASTER_SHEET:CRM SPONSOR",
+          "08 - Classificazione Attivita Prospect Sponsor",
+          "07 - Mappa Prospect 30 km"
+        ],
+        "duplicate_work": "DENY"
+      }
+    },
+    {
+      "id": "UD-021",
+      "name": "PARTNERS_BEYOND_LED_KIT_SOCIAL_TOURNAMENTS_CONVENTIONS",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "spingere anche per trovare azienda che facciano anche altro come mettere sponsor su divisa , e anche social o altro durante tornei",
+        "Per pubblicizzare convenzioni anche fatte come spingere e rendere virale"
+      ],
+      "normalizedCommand": {
+        "rule": "Prospect partners for kit sponsorship, social and tournament activations, and promote member conventions with shareable content.",
+        "scope": "SPONSOR+SOCIAL+EVENTI",
+        "torreFloor": "3_PARTNER + 2_EVENTI",
+        "duplicate_work": "DENY"
+      }
+    },
+    {
+      "id": "UD-022",
+      "name": "TOURNAMENT_CLUBS_CRM_AND_EDITABLE_EVENT_FORMS",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "Per tornei ed eventi idem creare CRM dedicato con quante più società da anagrafare sul territorio vicino e lontano da colico e pronti per inviare inviti o altro",
+        "Moduli pronti editabili per pasti , costi , e altro sia come chiesto da Figc e come chiesto diversamente"
+      ],
+      "normalizedCommand": {
+        "rule": "Register as many football clubs as possible, near and far from Colico, ready for tournament invitations, inside the existing MASTER TORNEI (RETE CLUB TARGET, CONTATTI CLUB, INVITI). Provide editable forms for meals, costs and logistics in both the FIGC/SGS format and the SCD format, on letterhead.",
+        "scope": "EVENTI",
+        "torreFloor": "2_EVENTI",
+        "sources": [
+          "MASTER TORNEI & INIZIATIVE 2026-2028",
+          "RETE AFFILIATE AC MONZA",
+          "LND/CRL official club lists"
+        ],
+        "duplicate_work": "DENY"
+      }
     }
   ],
   "completionGate": {
