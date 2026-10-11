@@ -461,6 +461,37 @@
         "executionConfig": "config/scd-free-first.v1.json",
         "internalCommand": "npm run scd:freefirst -- /credits"
       }
+    },
+    {
+      "id": "UD-018",
+      "name": "SCD_PAST_AND_PRESENT_BEFORE_FUTURE",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "Il presente e passato devono sempre essere presti per comprendere e rappresentare bene il futuro",
+        "Bisogna Prima cosa recuperare tutte le fonti storiche e sapere a menadito associazione, personaggi, fonti e storia",
+        "file excel che analizzerei molto dettagliatamente per capire tutti i lavori fatti",
+        "la mail altra fonte di comprensione e allineamento idee e lavoro che deve essere rastrellata catalogata e monitorata",
+        "Sono informazioni per tutti il lavoro non solo sponsor"
+      ],
+      "normalizedCommand": {
+        "rule": "Before designing or building any area, recover and read the past and present sources for it (Drive spreadsheets and folders, the shared Iscrizioni folder, Gmail since 2026-07-01, existing masters and decisions). Reuse existing work; mark superseded files; never redo what exists. Applies to every area, not only sponsors.",
+        "scope": "ALL_AREAS",
+        "order": [
+          "RECOVER_PAST",
+          "VERIFY_PRESENT",
+          "DESIGN_FUTURE"
+        ],
+        "sources": [
+          "DRIVE_SPREADSHEETS",
+          "DRIVE_FOLDERS",
+          "SHARED_ISCRIZIONI_FOLDER",
+          "GMAIL_SINCE_2026-07-01",
+          "EXISTING_MASTERS"
+        ],
+        "duplicate_work": "DENY"
+      }
     }
   ],
   "completionGate": {

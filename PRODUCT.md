@@ -56,6 +56,7 @@ The only place where the club's real master calendar, training board, events and
 3. Real data with its source, or an honest empty state. Unknown is never zero.
 4. Minors are protected first: no children's faces, no individual rankings of minors, health data kept to the minimum.
 5. Nothing reaches production without the club's approval.
+6. Past and present before the future: every area starts from the club's existing sources (Drive masters, the shared Iscrizioni folder, season mail) and reuses work already done.
 
 ## Accessibility & Inclusion
 
