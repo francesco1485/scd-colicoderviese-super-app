@@ -1,9 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ExternalLink, Globe, Mail, MapPin, ShieldCheck } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 
 import { Field, OutcomeBox, PageHero, SafeguardingStrip, inputCls } from "@/components/ui-kit";
 import { TICKET_CATEGORIES } from "@/lib/catalog";
+import { CLUB_PROFILE } from "@/lib/club-profile";
 import { submitTicket } from "@/lib/club.functions";
 import type { SubmitOutcome } from "@/lib/club.types";
 
@@ -11,7 +13,7 @@ export const Route = createFileRoute("/contatti")({
   head: () => ({
     meta: [
       { title: "Parla con noi — Centro contatti SCD ColicoDerviese" },
-      { name: "description", content: "Segnala una notizia, invia foto, correggi un risultato, proponi un evento o una collaborazione: ogni richiesta diventa un ticket seguito dalla società." },
+      { name: "description", content: "Canali ufficiali della S.C.D. ColicoDerviese (mail, PEC, sito, sede in Via Lido SNC a Colico). Segnala una notizia, invia foto, correggi un risultato, proponi un evento o una collaborazione: ogni richiesta diventa un ticket seguito dalla società." },
       { property: "og:title", content: "Parla con noi — SCD ColicoDerviese" },
       { property: "og:description", content: "Centro contatti con ticket per categoria." },
     ],
@@ -53,7 +55,8 @@ function Contatti() {
       <PageHero eyebrow="Centro contatti" title={<>Parla <span className="text-accent">con noi</span></>}>
         Scegli la categoria: ogni invio diventa un ticket con stato, assegnato alla persona giusta.
       </PageHero>
-      <section className="mx-auto -mt-8 max-w-4xl space-y-4 px-4">
+      <section className="relative z-10 mx-auto -mt-8 max-w-4xl space-y-4 px-4">
+        <OfficialChannels />
         <div className="card-premium p-5">
           <p className="eyebrow">Categoria</p>
           <div className="mt-3 grid grid-cols-2 gap-2 md:grid-cols-4">
@@ -83,5 +86,41 @@ function Contatti() {
         <p className="text-xs text-muted-foreground">Le segnalazioni safeguarding hanno un canale separato e non entrano in questa coda.</p>
       </section>
     </main>
+  );
+}
+
+/** Official channels from the club profile: selectable text, plain links, no form needed. */
+function OfficialChannels() {
+  const c = CLUB_PROFILE.contacts;
+  const row = "flex items-start gap-3 rounded-xl bg-[var(--scd-page)] p-3";
+  const label = "block text-[12px] font-bold uppercase tracking-[0.08em] text-[var(--scd-sub)]";
+  const value = "block select-text break-all text-[16px] font-semibold text-[var(--scd-ink)]";
+  return (
+    <section aria-labelledby="canali-t" className="card-premium p-5" data-testid="official-channels">
+      <h2 id="canali-t" className="font-title text-[26px] font-black uppercase leading-none text-[var(--scd-ink)]">Canali ufficiali</h2>
+      <ul className="mt-3 grid list-none gap-2 p-0 sm:grid-cols-2">
+        <li className={row}>
+          <Mail className="mt-1 size-5 shrink-0 text-[var(--scd-blue)]" aria-hidden="true" />
+          <span className="min-w-0"><span className={label}>Email</span><a href={`mailto:${c.email}`} className={`${value} underline decoration-[var(--scd-blue)]/40`}>{c.email}</a></span>
+        </li>
+        <li className={row}>
+          <ShieldCheck className="mt-1 size-5 shrink-0 text-[var(--scd-blue)]" aria-hidden="true" />
+          <span className="min-w-0"><span className={label}>PEC</span><a href={`mailto:${c.pec}`} className={`${value} underline decoration-[var(--scd-blue)]/40`}>{c.pec}</a></span>
+        </li>
+        <li className={row}>
+          <Globe className="mt-1 size-5 shrink-0 text-[var(--scd-blue)]" aria-hidden="true" />
+          <span className="min-w-0"><span className={label}>Sito</span>
+            <a href={c.site} target="_blank" rel="noopener noreferrer" className={`${value} inline-flex items-center gap-1 underline decoration-[var(--scd-blue)]/40`}>{c.siteLabel}<ExternalLink className="size-3.5 shrink-0" aria-hidden="true" /></a>
+          </span>
+        </li>
+        <li className={row}>
+          <MapPin className="mt-1 size-5 shrink-0 text-[var(--scd-blue)]" aria-hidden="true" />
+          <span className="min-w-0"><span className={label}>Sede e centro sportivo</span>
+            <span className={value}>{c.address}</span>
+            <Link to="/impianti" className="mt-1 inline-block text-[14px] font-bold text-[var(--scd-blue)] underline">Mappa dei campi e ingressi</Link>
+          </span>
+        </li>
+      </ul>
+    </section>
   );
 }

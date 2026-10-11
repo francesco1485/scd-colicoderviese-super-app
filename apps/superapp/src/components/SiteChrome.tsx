@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 
 import crest from "@/assets/brand/logo-scd.png.asset.json";
 import { ACCESS_SCREEN_IDS, WORK_AREA_IDS, findArea } from "@/lib/areas";
+import { CLUB_PROFILE } from "@/lib/club-profile";
 import { openCookiePrefs } from "./CookieConsent";
 import { AccessMenu, openAccessMenu } from "./scd/AccessMenu";
 
@@ -17,7 +18,7 @@ type NavItem = { to: string; label: string };
 
 /** Navigazione desktop della barra pubblica (tavola Accesso-aree, VR-022). Le altre pagine restano nel menu completo. */
 const desktopNav: readonly NavItem[] = [
-  { to: "/allenamenti", label: "Squadre" },
+  { to: "/squadre", label: "Squadre" },
   { to: "/calendario", label: "Calendario" },
   { to: "/eventi", label: "Eventi" },
   { to: "/grow", label: "Sponsor" },
@@ -26,7 +27,10 @@ const desktopNav: readonly NavItem[] = [
 
 /** Link a piè di pagina: tutte le pagine pubbliche principali. */
 const footerNav: readonly NavItem[] = [
+  { to: "/societa", label: "Chi siamo" },
+  { to: "/squadre", label: "Squadre" },
   { to: "/calendario", label: "Calendario" },
+  { to: "/impianti", label: "Mappa campi" },
   { to: "/allenamenti", label: "Allenamenti" },
   { to: "/comunicazioni", label: "Comunicazioni" },
   { to: "/eventi", label: "Eventi" },
@@ -42,14 +46,16 @@ const menuGroups: readonly { title: string; app: string; items: readonly NavItem
     app: "ONE",
     items: [
       { to: "/", label: "Home" },
+      { to: "/societa", label: "Chi siamo" },
+      { to: "/squadre", label: "Squadre" },
       { to: "/calendario", label: "Calendario gare" },
+      { to: "/impianti", label: "Mappa campi" },
       { to: "/allenamenti", label: "Allenamenti" },
       { to: "/comunicazioni", label: "Comunicazioni" },
       { to: "/eventi", label: "Eventi" },
       { to: "/eventi/christmas-lario-cup", label: "Christmas Lario Cup" },
       { to: "/community", label: "Tifosi" },
       { to: "/entra", label: "Gioca con noi" },
-      { to: "/societa", label: "Società avversarie" },
       { to: "/shop", label: "Shop & membership" },
       { to: "/contatti", label: "Contatti" },
     ],
@@ -78,7 +84,6 @@ const menuGroups: readonly { title: string; app: string; items: readonly NavItem
 ];
 
 const footerLinks: readonly NavItem[] = [
-  { to: "/societa", label: "Società avversarie" },
   { to: "/shop", label: "Shop & membership" },
   { to: "/fornitori", label: "Fornitori" },
   { to: "/safeguarding", label: "Safeguarding" },
@@ -218,7 +223,7 @@ type TabDef = { label: string; icon: LucideIcon; to?: string; search?: Record<st
 const PUBLIC_TABS: TabDef[] = [
   { label: "Home", icon: House, to: "/", match: (p) => p === "/" },
   { label: "Calendario", icon: CalendarDays, to: "/calendario", match: (p) => p.startsWith("/calendario") },
-  { label: "Squadre", icon: UsersRound, to: "/allenamenti", match: (p) => p.startsWith("/allenamenti") },
+  { label: "Squadre", icon: UsersRound, to: "/squadre", match: (p) => p.startsWith("/squadre") || p.startsWith("/allenamenti") },
   { label: "Eventi", icon: CalendarCheck, to: "/eventi", match: (p) => p.startsWith("/eventi") || p.startsWith("/community") },
   { label: "Profilo", icon: UserRound, to: "/core/atleta", match: (p) => p.startsWith("/core/atleta") || p.startsWith("/core/famiglia") || p.startsWith("/aree") },
 ];
@@ -233,7 +238,7 @@ const COMMS_TABS: TabDef[] = [
   { label: "Home", icon: House, to: "/", match: (p) => p === "/" },
   { label: "Calendario", icon: CalendarDays, to: "/calendario", match: (p) => p.startsWith("/calendario") },
   { label: "Comunicazioni", icon: Circle, to: "/comunicazioni", match: (p) => p.startsWith("/comunicazioni"), tone: "yellow" },
-  { label: "Squadre", icon: UsersRound, to: "/allenamenti", match: (p) => p.startsWith("/allenamenti") },
+  { label: "Squadre", icon: UsersRound, to: "/squadre", match: (p) => p.startsWith("/squadre") || p.startsWith("/allenamenti") },
   { label: "Altro", icon: Ellipsis, menu: true, match: () => false },
 ];
 
@@ -280,7 +285,11 @@ export function SiteFooter() {
           <ClubCrestOfficial size={44} />
           <p className="font-brand text-xl leading-none"><span className="text-[#ffd600]">COLICO</span>DERVIESE</p>
         </div>
-        <p className="opacity-75">{CLUB_NAME} · Colico (LC) · Alto Lago di Como · PEC calciocolicoderviese@pec.it</p>
+        <p className="opacity-75">
+          {CLUB_NAME} · {CLUB_PROFILE.contacts.address} · Alto Lago di Como
+          <br />
+          <span className="select-text">{CLUB_PROFILE.contacts.email}</span> · PEC <span className="select-text">{CLUB_PROFILE.contacts.pec}</span>
+        </p>
         <nav className="flex flex-wrap gap-x-5 gap-y-2" aria-label="Link a piè di pagina">
           {[...footerNav, ...footerLinks].map((n) => (
             <Link key={n.to + n.label} to={n.to} className="opacity-80 hover:opacity-100">{n.label}</Link>

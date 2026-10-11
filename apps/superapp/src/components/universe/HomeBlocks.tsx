@@ -561,7 +561,7 @@ export function Shortcuts() {
         </span>
         Allenamenti
       </Link>
-      <Link to="/core/impianti-calendari" className={item}>
+      <Link to="/impianti" className={item}>
         <span className={ring}>
           <MapPin className="size-[26px]" aria-hidden="true" />
         </span>

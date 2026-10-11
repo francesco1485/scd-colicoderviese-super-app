@@ -79,7 +79,7 @@ const AGES: { key: string; label: string; see: Act[]; doo: Act[] }[] = [
       {
         icon: "📍",
         text: "Campi e indicazioni",
-        to: "/core/impianti-calendari",
+        to: "/impianti",
       },
     ],
     doo: [

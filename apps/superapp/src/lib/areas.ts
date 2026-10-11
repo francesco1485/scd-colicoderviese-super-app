@@ -134,6 +134,7 @@ const EXPLICIT_HREF: Readonly<Record<string, string>> = {
   quadro: "/quadro",
   mappa: "/gestionale/mappa",
   impianti: "/impianti",
+  squadre: "/squadre",
   "impianti-campi": "/gestionale/impianti",
   "impianti-colico": "/gestionale/impianti/colico",
   "impianti-dervio": "/gestionale/impianti/dervio",

@@ -20,6 +20,7 @@ import {
 import { TeamBar, TeamPicker } from "@/components/universe/TeamBar";
 import { ClubCrestOfficial } from "@/components/SiteChrome";
 import { openAccessMenu } from "@/components/scd/AccessMenu";
+import { HallDoors } from "@/components/scd/hall";
 import { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 import { getPublicFeed, getPublicSchedule } from "@/lib/club.functions";
 import { addDays } from "@/lib/board-data";
@@ -359,6 +360,8 @@ function Home() {
       </HeroBand>
 
       <div className="mx-auto max-w-[1200px] px-4 lg:px-6">
+        {/* Hall: the ground floor doors (chi siamo, squadre, calendario, campi, eventi, contatti). */}
+        <HallDoors title="Il club in un tocco" compact className="mt-[26px]" />
         <div className="lg:grid lg:grid-cols-[7fr_5fr] lg:items-start lg:gap-6">
           <div>
             <SectionTitle

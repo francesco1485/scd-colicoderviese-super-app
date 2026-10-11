@@ -5,6 +5,7 @@ import { ArrowRight, CalendarDays, ChevronLeft, ChevronRight, Clock3, Link2, Map
 import { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 import { Crest, DateBlock, PageHeader, PrimaryButton, SectionHead, Segmented, Sheet } from "@/components/scd/board";
 import { BallIcon, ConeIcon } from "@/components/scd/icons";
+import { GroupResultsLink, OfficialResults } from "@/components/scd/OfficialResults";
 import { dateParts, groupShort, matchTitle, monthRange, titleCase, trainingRowsFor, upcomingMatches, venueCase, weekRange } from "@/lib/board-data";
 import { romeParts } from "@/lib/home-week";
 import { EMPTY_MESSAGE, WINDOWS, freshnessLabel, resolveAnnata, windowEnd, loadQuadro, trainingKeyFor, type WindowDays, type PublicEvent, type PublicGroup } from "@/lib/public-snapshots";
@@ -292,6 +293,11 @@ function Calendario() {
             </div>
             <p role="status" aria-live="polite" className="mt-[4px] min-h-0 text-[13px] font-semibold text-[var(--scd-blue)]">{refreshMsg ?? copied}</p>
           </div>
+
+          <OfficialResults className="mt-[18px]" />
+          <p className="mt-[12px] text-[13px] text-[var(--scd-sub)]">
+            Dove si gioca: <Link to="/impianti" className="font-bold text-[var(--scd-blue)] underline">mappa dei campi di Colico e Dervio</Link> · <Link to="/squadre" className="font-bold text-[var(--scd-blue)] underline">tutte le squadre</Link>
+          </p>
         </div>
       </Sheet>
     </main>
@@ -361,6 +367,7 @@ function EventRow({ e, g, open, toggle }: { e: PublicEvent; g: PublicGroup | und
           <div><dt className="inline text-[var(--scd-sub)]">Provenienza: </dt><dd className="inline">{e.source || "Calendario SCD"} · {e.status === "OFFICIAL_CALENDAR" ? "calendario ufficiale" : e.status === "CLUB_EVENT" ? "evento organizzato dalla società (non certificato FIGC)" : e.status} · fotografia non live</dd></div>
           {e.facilityReview && <div className="font-semibold text-[var(--scd-sub)]">Disponibilità impianto da verificare</div>}
           {e.notice.map((n) => <div key={n} className="font-semibold">⚠ {n}</div>)}
+          <div><GroupResultsLink group={e.group} /></div>
         </dl>
       )}
     </li>

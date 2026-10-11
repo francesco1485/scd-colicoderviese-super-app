@@ -31,6 +31,7 @@ import { Route as SegreteriaRouteImport } from './routes/segreteria'
 import { Route as ShopRouteImport } from './routes/shop'
 import { Route as SocietaRouteImport } from './routes/societa'
 import { Route as SponsorRouteImport } from './routes/sponsor'
+import { Route as SquadreRouteImport } from './routes/squadre'
 import { Route as TesoreriaRouteImport } from './routes/tesoreria'
 import { Route as AreeIndexRouteImport } from './routes/aree.index'
 import { Route as AreeAreaRouteImport } from './routes/aree.$area'
@@ -167,6 +168,11 @@ const SocietaRoute = SocietaRouteImport.update({
 const SponsorRoute = SponsorRouteImport.update({
   id: '/sponsor',
   path: '/sponsor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SquadreRoute = SquadreRouteImport.update({
+  id: '/squadre',
+  path: '/squadre',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TesoreriaRoute = TesoreriaRouteImport.update({
@@ -333,6 +339,7 @@ export interface FileRoutesByFullPath {
   '/shop': typeof ShopRoute
   '/societa': typeof SocietaRoute
   '/sponsor': typeof SponsorRoute
+  '/squadre': typeof SquadreRoute
   '/tesoreria': typeof TesoreriaRoute
   '/aree/$area': typeof AreeAreaRoute
   '/calendario/rotazione-campi': typeof CalendarioRotazioneCampiRoute
@@ -384,6 +391,7 @@ export interface FileRoutesByTo {
   '/shop': typeof ShopRoute
   '/societa': typeof SocietaRoute
   '/sponsor': typeof SponsorRoute
+  '/squadre': typeof SquadreRoute
   '/tesoreria': typeof TesoreriaRoute
   '/aree/$area': typeof AreeAreaRoute
   '/calendario/rotazione-campi': typeof CalendarioRotazioneCampiRoute
@@ -435,6 +443,7 @@ export interface FileRoutesById {
   '/shop': typeof ShopRoute
   '/societa': typeof SocietaRoute
   '/sponsor': typeof SponsorRoute
+  '/squadre': typeof SquadreRoute
   '/tesoreria': typeof TesoreriaRoute
   '/aree/$area': typeof AreeAreaRoute
   '/calendario_/rotazione-campi': typeof CalendarioRotazioneCampiRoute
@@ -488,6 +497,7 @@ export interface FileRouteTypes {
     | '/shop'
     | '/societa'
     | '/sponsor'
+    | '/squadre'
     | '/tesoreria'
     | '/aree/$area'
     | '/calendario/rotazione-campi'
@@ -539,6 +549,7 @@ export interface FileRouteTypes {
     | '/shop'
     | '/societa'
     | '/sponsor'
+    | '/squadre'
     | '/tesoreria'
     | '/aree/$area'
     | '/calendario/rotazione-campi'
@@ -589,6 +600,7 @@ export interface FileRouteTypes {
     | '/shop'
     | '/societa'
     | '/sponsor'
+    | '/squadre'
     | '/tesoreria'
     | '/aree/$area'
     | '/calendario_/rotazione-campi'
@@ -641,6 +653,7 @@ export interface RootRouteChildren {
   ShopRoute: typeof ShopRoute
   SocietaRoute: typeof SocietaRoute
   SponsorRoute: typeof SponsorRoute
+  SquadreRoute: typeof SquadreRoute
   TesoreriaRoute: typeof TesoreriaRoute
   AreeAreaRoute: typeof AreeAreaRoute
   CalendarioRotazioneCampiRoute: typeof CalendarioRotazioneCampiRoute
@@ -818,6 +831,13 @@ declare module '@tanstack/react-router' {
       path: '/sponsor'
       fullPath: '/sponsor'
       preLoaderRoute: typeof SponsorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/squadre': {
+      id: '/squadre'
+      path: '/squadre'
+      fullPath: '/squadre'
+      preLoaderRoute: typeof SquadreRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tesoreria': {
@@ -1056,6 +1076,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShopRoute: ShopRoute,
   SocietaRoute: SocietaRoute,
   SponsorRoute: SponsorRoute,
+  SquadreRoute: SquadreRoute,
   TesoreriaRoute: TesoreriaRoute,
   AreeAreaRoute: AreeAreaRoute,
   CalendarioRotazioneCampiRoute: CalendarioRotazioneCampiRoute,
