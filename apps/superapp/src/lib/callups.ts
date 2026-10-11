@@ -107,3 +107,15 @@ export function romeDay(iso: string): string {
   const d = new Date(iso);
   return Number.isNaN(d.getTime()) ? "" : ROME_DAY.format(d);
 }
+
+/** Call-ups already sent whose athlete the mister has unticked: they are withdrawn on "Invia" (r68). */
+export function callupsToWithdraw(sent: ReadonlyArray<{ callupId: string; athleteId: string }>, picked: ReadonlySet<string>): string[] {
+  return sent.filter((c) => !picked.has(c.athleteId)).map((c) => c.callupId);
+}
+
+/** Label of the send button: what will happen when the mister presses it. */
+export function sendButtonLabel(toSend: number, toWithdraw: number): string {
+  if (toSend === 0 && toWithdraw === 0) return "Invia convocazione";
+  if (toSend === 0) return `Togli ${toWithdraw} dalla convocazione`;
+  return toWithdraw > 0 ? `Invia convocazione (${toSend}) · togli ${toWithdraw}` : `Invia convocazione (${toSend})`;
+}

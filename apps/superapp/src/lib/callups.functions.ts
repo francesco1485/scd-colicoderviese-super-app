@@ -122,6 +122,20 @@ export const sendCallups = createServerFn({ method: "POST" })
     return { ok: true, message: `${n} convocati.${deliveryNote(delivery)}`, outcomes };
   });
 
+const WithdrawInput = z.object({ callupIds: z.array(z.string().uuid()).min(1).max(40) });
+
+/** The mister takes athletes out of a call-up already sent (r68): marked withdrawn, never removed. */
+export const withdrawCallups = createServerFn({ method: "POST" })
+  .inputValidator((d: z.input<typeof WithdrawInput>) => WithdrawInput.parse(d))
+  .handler(async ({ data }): Promise<{ ok: boolean; message: string; count: number }> => {
+    const c = await scope();
+    if (!c) return { ok: false, message: "Accedi per modificare la convocazione.", count: 0 };
+    const { data: n, error } = await c.sb.rpc("scd_staff_withdraw_callups", { p_organization_id: c.org.organizationId, p_callup_ids: data.callupIds });
+    if (error) return { ok: false, message: error.code === "42501" ? "Puoi togliere solo convocati delle tue squadre, prima dell'inizio della gara." : "Modifica non riuscita, riprova.", count: 0 };
+    const count = typeof n === "number" ? n : 0;
+    return { ok: true, message: count === 1 ? "1 tolto dalla convocazione." : `${count} tolti dalla convocazione.`, count };
+  });
+
 export const getMyCallups = createServerFn({ method: "GET" }).handler(async (): Promise<MyCallup[]> => {
   const c = await scope();
   if (!c) return [];

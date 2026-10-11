@@ -1585,6 +1585,27 @@
         "implementationStatus": "IMPLEMENTED_STAGING",
         "duplicate_work": "DENY"
       }
+    },
+    {
+      "id": "UD-067",
+      "name": "CALLUP_WITHDRAW_BY_STAFF",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "Si"
+      ],
+      "normalizedCommand": {
+        "rule": "Direzione confirmed the pending call-up withdrawal. Implemented without removing rows: the mister unticks a called-up athlete and presses send; the call-up is marked withdrawn and kept in history. Note: the assistant had first described it as a family 'cancel Ci sarò' button; families could already switch their answer before kick-off.",
+        "scope": "CALLUPS",
+        "constraints": [
+          "team staff only, before kick-off",
+          "no row removal",
+          "withdrawn hidden from family and push"
+        ],
+        "implementationStatus": "IMPLEMENTED_STAGING",
+        "duplicate_work": "DENY"
+      }
     }
   ],
   "completionGate": {

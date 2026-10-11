@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { asOutcome, asResponse, matchTitle, meetingAtLiteral, outcomeCounts, responseCounts, romeDay, romeTime, validateCallupInput } from "./callups";
+import { asOutcome, asResponse, callupsToWithdraw, matchTitle, meetingAtLiteral, outcomeCounts, responseCounts, romeDay, romeTime, sendButtonLabel, validateCallupInput } from "./callups";
 
 describe("callups", () => {
   it("builds the title from SCD's side", () => {
@@ -37,5 +37,28 @@ describe("callups", () => {
     expect(romeTime("2026-10-18T11:45:00Z")).toBe("13:45");
     expect(romeTime(null)).toBe("");
     expect(romeDay("2026-10-18T11:45:00Z")).toBe("domenica 18 ottobre");
+  });
+});
+
+describe("withdrawing call-ups (r68)", () => {
+  it("withdraws only call-ups whose athlete was unticked", () => {
+    const sent = [{ callupId: "c1", athleteId: "a1" }, { callupId: "c2", athleteId: "a2" }];
+    expect(callupsToWithdraw(sent, new Set(["a1", "a3"]))).toEqual(["c2"]);
+    expect(callupsToWithdraw(sent, new Set(["a1", "a2"]))).toEqual([]);
+    expect(callupsToWithdraw([], new Set())).toEqual([]);
+  });
+
+  it("says on the button what will happen", () => {
+    expect(sendButtonLabel(5, 0)).toBe("Invia convocazione (5)");
+    expect(sendButtonLabel(4, 1)).toBe("Invia convocazione (4) · togli 1");
+    expect(sendButtonLabel(0, 2)).toBe("Togli 2 dalla convocazione");
+  });
+
+  it("never removes call-up rows (history kept)", async () => {
+    const { readFileSync } = await import("node:fs");
+    const { fileURLToPath } = await import("node:url");
+    const sql = readFileSync(fileURLToPath(new URL("../../../../supabase/migrations/20261011_r68_callup_withdraw.sql", import.meta.url)), "utf8");
+    expect(sql).not.toMatch(/\bdelete\s+from\b/i);
+    expect(sql).toContain("withdrawn_at = now()");
   });
 });

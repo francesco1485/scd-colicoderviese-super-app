@@ -3,8 +3,8 @@ import { Check, CircleAlert, Send } from "lucide-react";
 import { useEffect, useId, useMemo, useState } from "react";
 
 import { Chip, type ChipTone } from "@/components/scd/interior-ui";
-import { OUTCOME_LABEL, RESPONSE_LABEL, outcomeCounts, responseCounts, romeTime, validateCallupInput, type CallupResponse, type SendOutcome } from "@/lib/callups";
-import { getEventCallups, sendCallups, type TeamCallup } from "@/lib/callups.functions";
+import { OUTCOME_LABEL, RESPONSE_LABEL, callupsToWithdraw, outcomeCounts, responseCounts, romeTime, sendButtonLabel, validateCallupInput, type CallupResponse, type SendOutcome } from "@/lib/callups";
+import { getEventCallups, sendCallups, withdrawCallups, type TeamCallup } from "@/lib/callups.functions";
 import { certificateState } from "@/lib/people";
 import type { RosterRow } from "@/lib/roster";
 
@@ -19,6 +19,7 @@ const RESPONSE_TONE: Readonly<Record<CallupResponse, ChipTone>> = { CONFIRMED: "
 export function CallupPanel({ eventId, eventDate, defaultPlace, squad, tag }: { eventId: string; eventDate: string; defaultPlace: string; squad: RosterRow[]; tag: string }) {
   const load = useServerFn(getEventCallups);
   const send = useServerFn(sendCallups);
+  const withdraw = useServerFn(withdrawCallups);
   const [callups, setCallups] = useState<TeamCallup[] | null>(null);
   const [picked, setPicked] = useState<Set<string>>(new Set());
   const [meetingTime, setMeetingTime] = useState("");
@@ -47,7 +48,8 @@ export function CallupPanel({ eventId, eventDate, defaultPlace, squad, tag }: { 
 
   const byAthlete = useMemo(() => new Map((callups ?? []).map((c) => [c.athleteId, c])), [callups]);
   const counts = responseCounts((callups ?? []).map((c) => ({ response: c.response })));
-  const errors = validateCallupInput({ date: eventDate, meetingTime, meetingPlace, kitNote, athleteIds: [...picked] });
+  const toWithdraw = useMemo(() => callupsToWithdraw(callups ?? [], picked), [callups, picked]);
+  const errors = picked.size > 0 ? validateCallupInput({ date: eventDate, meetingTime, meetingPlace, kitNote, athleteIds: [...picked] }) : [];
 
   const toggle = (athleteId: string) =>
     setPicked((prev) => {
@@ -65,12 +67,27 @@ export function CallupPanel({ eventId, eventDate, defaultPlace, squad, tag }: { 
     setBusy(true);
     setMessage(null);
     try {
-      const res = await send({ data: { eventId, athleteIds: [...picked], meetingTime, meetingPlace, kitNote } });
-      const nameOf = new Map(squad.map((p) => [p.athleteId, p.displayName]));
-      const blocked = res.outcomes.filter((o) => o.outcome !== "SENT").map((o) => ({ name: nameOf.get(o.athleteId) ?? "Atleta", outcome: o.outcome }));
-      const c = outcomeCounts(res.outcomes);
-      setMessage({ ok: res.ok, text: res.ok && blocked.length ? `${c.SENT} convocati, ${blocked.length} non convocabili.` : res.message, blocked });
-      if (res.outcomes.length > 0) {
+      const parts: string[] = [];
+      let ok = true;
+      let blocked: Array<{ name: string; outcome: SendOutcome }> = [];
+      let changed = false;
+      if (toWithdraw.length > 0) {
+        const w = await withdraw({ data: { callupIds: toWithdraw } });
+        parts.push(w.message);
+        ok = ok && w.ok;
+        changed = changed || w.count > 0;
+      }
+      if (picked.size > 0) {
+        const res = await send({ data: { eventId, athleteIds: [...picked], meetingTime, meetingPlace, kitNote } });
+        const nameOf = new Map(squad.map((p) => [p.athleteId, p.displayName]));
+        blocked = res.outcomes.filter((o) => o.outcome !== "SENT").map((o) => ({ name: nameOf.get(o.athleteId) ?? "Atleta", outcome: o.outcome }));
+        const c = outcomeCounts(res.outcomes);
+        parts.unshift(res.ok && blocked.length ? `${c.SENT} convocati, ${blocked.length} non convocabili.` : res.message);
+        ok = ok && res.ok;
+        changed = changed || res.outcomes.length > 0;
+      }
+      setMessage({ ok, text: parts.join(" "), blocked });
+      if (changed) {
         const rows = await load({ data: { eventId } });
         setCallups(rows);
         setPicked(new Set(rows.map((r) => r.athleteId)));
@@ -116,7 +133,7 @@ export function CallupPanel({ eventId, eventDate, defaultPlace, squad, tag }: { 
                       {figcWarn && " · tesseramento FIGC da verificare"}
                     </span>
                   </span>
-                  {call ? <Chip tone={RESPONSE_TONE[call.response]}>{RESPONSE_LABEL[call.response]}</Chip> : (certWarn || figcWarn) && <CircleAlert className="size-[18px] flex-none text-[var(--in-warn,#b45309)]" aria-label="Potrebbe non essere convocabile" />}
+                  {call && !checked ? <Chip tone="warn">Da togliere</Chip> : call ? <Chip tone={RESPONSE_TONE[call.response]}>{RESPONSE_LABEL[call.response]}</Chip> : (certWarn || figcWarn) && <CircleAlert className="size-[18px] flex-none text-[var(--in-warn,#b45309)]" aria-label="Potrebbe non essere convocabile" />}
                 </label>
               </li>
             );
@@ -145,11 +162,11 @@ export function CallupPanel({ eventId, eventDate, defaultPlace, squad, tag }: { 
           <input type="text" value={kitNote} maxLength={300} onChange={(e) => setKitNote(e.target.value)} placeholder="Es. divisa blu, documento d'identità" className="scd-focus h-11 rounded-[10px] border border-[var(--in-line)] bg-white px-3 text-[15px] font-normal" />
         </label>
         <div className="flex flex-wrap items-center gap-3 sm:col-span-2">
-          <button type="submit" disabled={busy || picked.size === 0} className="scd-focus inline-flex h-12 items-center gap-2 rounded-[10px] bg-[var(--scd-blue)] px-5 text-[16px] font-semibold text-white disabled:opacity-50">
+          <button type="submit" disabled={busy || (picked.size === 0 && toWithdraw.length === 0)} className="scd-focus inline-flex h-12 items-center gap-2 rounded-[10px] bg-[var(--scd-blue)] px-5 text-[16px] font-semibold text-white disabled:opacity-50" data-testid="callup-send">
             <Send className="size-[18px]" strokeWidth={2} aria-hidden="true" />
-            {busy ? "Invio…" : `Invia convocazione (${picked.size})`}
+            {busy ? "Invio…" : sendButtonLabel(picked.size, toWithdraw.length)}
           </button>
-          <span className="text-[13.5px] text-[var(--in-sub)]">Le famiglie rispondono "Ci sarò" dalla loro pagina.</span>
+          <span className="text-[13.5px] text-[var(--in-sub)]">{toWithdraw.length > 0 ? "Chi hai tolto sparisce dalla pagina della famiglia; resta nello storico." : "Le famiglie rispondono \"Ci sarò\" dalla loro pagina."}</span>
         </div>
       </form>
 

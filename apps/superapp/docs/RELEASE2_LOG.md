@@ -233,3 +233,14 @@ prossimi impegni e "ci sarò" in primo piano). Desktop invariato.
   supportato); worker separato `/push-sw.js` (scope `/push/`, nessuna cache, apre `/famiglia` al tocco). Dopo "Invia
   convocazione" il mister vede quanti avvisi sono partiti. Visual QA telefono (Android e iPhone simulati).
 - Da verificare su telefono vero: il primo invio reale (serve una gara nel calendario e una famiglia che abbia attivato).
+
+## Togliere un ragazzo da una convocazione · 2026-10-11 sera (UD-067)
+
+- `VERIFIED` r68 (`20261011_r68_callup_withdraw.sql`, sostituisce r62_1 mai applicata): `scd_match_callups.withdrawn_at/_by`;
+  `scd_staff_withdraw_callups` (staff della squadra, prima dell'inizio, nessuna riga cancellata). Le convocazioni ritirate spariscono
+  da vista mister, pagina famiglia, risposte e notifiche; riconvocando, la risposta torna "in attesa" e la notifica riparte.
+  Prova annullata: convoca → famiglia "Ci sarò" → la famiglia non può ritirare → il mister ritira → 0 righe per mister e famiglia,
+  risposta rifiutata → riconvoca → PENDING.
+- App: nel pannello convocazione basta togliere la spunta a un convocato ("Da togliere") e premere il pulsante, che dice cosa
+  succede ("Invia convocazione (2) · togli 1" / "Togli 1 dalla convocazione"). Visual QA telefono.
+- Correzione: in chat il tasto era stato descritto come "la famiglia annulla Ci sarò"; le famiglie potevano già cambiare risposta.
