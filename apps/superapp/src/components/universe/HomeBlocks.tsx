@@ -11,6 +11,7 @@ import {
 import type { ReactNode } from "react";
 
 import { titleCase, venueCase } from "@/lib/board-data";
+import { CROVI_AVATAR } from "@/lib/crovi-cameo";
 import type { WeekItem } from "@/lib/home-week";
 import {
   countdown,
@@ -574,7 +575,7 @@ export function Shortcuts() {
       >
         <span className={ring}>
           <img
-            src="/media/crovi/crovi-cut.webp"
+            src={CROVI_AVATAR}
             alt=""
             className="size-full object-cover object-[50%_20%]"
           />

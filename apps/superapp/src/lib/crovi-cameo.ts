@@ -46,3 +46,56 @@ export function cameoDelayMs(random: number): number {
 export const CAMEO_SEEN_KEY = "scd-crovi-cameo";
 /** How long the cameo stays before leaving on its own. */
 export const CAMEO_VISIBLE_MS = 9_000;
+
+/* ------------------------------------------------------------------ poses */
+
+/** Crovi is animated by switching between four photographed poses of the same original character. */
+export const CROVI_POSES = ["wave", "point", "thumbs", "laugh"] as const;
+export type CroviPose = (typeof CROVI_POSES)[number];
+
+/** Media live under a versioned folder so phones never keep showing an older face from cache. */
+const CROVI_MEDIA = "/media/crovi/v2";
+export const CROVI_AVATAR = `${CROVI_MEDIA}/crovi-avatar-256.webp`;
+/** Width / height of every pose frame (all frames share one canvas and one baseline). */
+export const CROVI_FRAME_RATIO = 645 / 1374;
+
+export function croviFrame(pose: CroviPose, size: 440 | 900 = 440): string {
+  return `${CROVI_MEDIA}/crovi-${pose}-${size}.webp`;
+}
+
+export interface PoseStep {
+  pose: CroviPose;
+  ms: number;
+}
+
+/** Cameo choreography: says hello, points at the chat, thumbs up, laughs, waves goodbye. */
+export const CAMEO_SEQUENCE: ReadonlyArray<PoseStep> = [
+  { pose: "wave", ms: 1_500 },
+  { pose: "point", ms: 1_700 },
+  { pose: "thumbs", ms: 1_300 },
+  { pose: "laugh", ms: 1_600 },
+  { pose: "wave", ms: 1_400 },
+];
+
+/** Total length of one pass through a sequence. */
+export function sequenceLength(seq: ReadonlyArray<PoseStep>): number {
+  return seq.reduce((t, s) => t + Math.max(0, s.ms), 0);
+}
+
+/**
+ * Pose shown `elapsedMs` after the start. Without `loop` the last pose is held;
+ * with `loop` the sequence repeats. Negative or invalid times show the first pose.
+ */
+export function poseAt(elapsedMs: number, seq: ReadonlyArray<PoseStep> = CAMEO_SEQUENCE, loop = false): CroviPose {
+  const first = seq[0];
+  const lastStep = seq[seq.length - 1];
+  if (!first || !lastStep) return "wave";
+  const total = sequenceLength(seq);
+  if (!Number.isFinite(elapsedMs) || elapsedMs <= 0 || total === 0) return first.pose;
+  let t = loop ? elapsedMs % total : Math.min(elapsedMs, total - 1);
+  for (const step of seq) {
+    if (t < step.ms) return step.pose;
+    t -= step.ms;
+  }
+  return lastStep.pose;
+}

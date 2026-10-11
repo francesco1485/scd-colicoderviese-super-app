@@ -2,13 +2,13 @@
   "version": 1,
   "asset_id": "03022b63-a50b-4761-af56-b6d2ba878561",
   "project_id": "06cb3ee4-cd83-4848-804b-61fc94708fbe",
-  "url": "/media/crovi/crovi-avatar-256.webp",
+  "url": "/media/crovi/v2/crovi-avatar-256.webp",
   "r2_key": "a/v1/06cb3ee4-cd83-4848-804b-61fc94708fbe/03022b63-a50b-4761-af56-b6d2ba878561/crovi-avatar-256.webp",
   "original_filename": "crovi-avatar-256.webp",
-  "size": 15350,
+  "size": 10034,
   "content_type": "image/webp",
   "created_at": "2026-10-09T17:46:45Z",
   "source_url_lovable": "https://scd-colicoderviese-super-app.lovable.app/__l5e/assets-v1/03022b63-a50b-4761-af56-b6d2ba878561/crovi-avatar-256.webp",
-  "updated_at": "2026-10-11T08:45:00Z",
-  "note": "Original fictional character (no real-person likeness), generated 2026-10-11, approved direction by Francesco: realistic, friendly, no moustache, purple cap without logo."
+  "updated_at": "2026-10-11T09:05:00Z",
+  "note": "Original fictional character (no real-person likeness), v2 generated 2026-10-11: short chubby jolly man about 70, no moustache, plain purple cap without logo, royal-blue track jacket with yellow trim. Versioned path so browsers fetch the new face."
 }

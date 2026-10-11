@@ -4,6 +4,7 @@ import { Send, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import croviAvatar from "@/assets/crovi/crovi-avatar-256.webp.asset.json";
+import { CroviActor } from "@/components/CroviActor";
 import { CAMEO_SEEN_KEY, CAMEO_VISIBLE_MS, cameoDelayMs, cameoLine, type CameoLine } from "@/lib/crovi-cameo";
 import { askSky, type SkyReply } from "@/lib/sky.functions";
 
@@ -146,7 +147,7 @@ export function SkyChat() {
       )}
       {cameo && !open && (
         <div role="status" aria-live="polite" className="crovi-cameo flex items-end gap-1" data-testid="crovi-cameo">
-          <div className="mb-10 max-w-[13.5rem] rounded-2xl rounded-br-sm border border-border bg-card px-3 py-2.5 text-[0.8rem] leading-snug text-foreground shadow-premium">
+          <div className="mb-12 min-w-0 max-w-[min(13.5rem,calc(100vw-10.5rem))] rounded-2xl rounded-br-sm border border-border bg-card px-3 py-2.5 text-[0.8rem] leading-snug text-foreground shadow-premium">
             <p className="m-0">{cameo.text}</p>
             <div className="mt-2 flex items-center gap-2">
               <button
@@ -160,7 +161,7 @@ export function SkyChat() {
               </button>
             </div>
           </div>
-          <img src="/media/crovi/crovi-peek.webp" alt="Crovi saluta" width={112} height={148} className="crovi-peek-img h-[148px] w-auto select-none" draggable={false} />
+          <CroviActor className="h-[clamp(150px,24svh,190px)] shrink-0 drop-shadow-[0_10px_14px_rgb(0_10_40/0.35)] lg:h-[210px]" label="Crovi saluta e indica la chat" />
         </div>
       )}
       <button

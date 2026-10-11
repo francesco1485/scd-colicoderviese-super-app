@@ -310,14 +310,14 @@ export function SocialHub() {
 export function JoinCard() {
   return (
     <section
-      className="relative overflow-hidden rounded-[18px] bg-gradient-to-br from-[var(--uv-royal)] to-[var(--uv-night)] p-5 pr-[120px] text-white shadow-[0_14px_28px_rgb(0_10_40/0.28)]"
+      className="relative overflow-hidden rounded-[18px] bg-gradient-to-br from-[var(--uv-royal)] to-[var(--uv-night)] p-5 pr-[clamp(92px,28vw,128px)] text-white shadow-[0_14px_28px_rgb(0_10_40/0.28)]"
       aria-labelledby="join-t"
       data-testid="join-card"
     >
       <img
         src="/media/brand/sky-atv-cut.webp"
         alt=""
-        className="pointer-events-none absolute -right-[14px] top-[18px] w-[132px] drop-shadow-[0_10px_16px_rgb(0_0_0/0.4)]"
+        className="sky-float pointer-events-none absolute -right-[14px] top-[18px] w-[clamp(100px,31vw,136px)] drop-shadow-[0_10px_16px_rgb(0_0_0/0.4)]"
         loading="lazy"
       />
       <h3 id="join-t" className="font-uv text-[30px] uppercase leading-[0.92]">
@@ -443,7 +443,7 @@ export function SkyCameo({
         <button
           type="button"
           onClick={onClose}
-          className="pointer-events-auto mb-[96px] -mr-2 max-w-[190px] rounded-[18px_18px_4px_18px] border-[3px] border-[var(--uv-night)] bg-white px-[13px] py-[11px] text-left text-[14.5px] font-extrabold leading-[1.3] text-[var(--uv-night)] shadow-[5px_5px_0_var(--uv-gold)]"
+          className="pointer-events-auto mb-[clamp(80px,24vw,104px)] -mr-2 min-w-0 max-w-[min(200px,calc(100vw-8.5rem))] rounded-[18px_18px_4px_18px] border-[3px] border-[var(--uv-night)] bg-white px-[13px] py-[11px] text-left text-[14.5px] font-extrabold leading-[1.3] text-[var(--uv-night)] shadow-[5px_5px_0_var(--uv-gold)]"
         >
           <b className="mb-[3px] block font-uv text-[18px] uppercase text-[var(--uv-royal)]">
             {message.title}
@@ -451,11 +451,14 @@ export function SkyCameo({
           {message.text}
         </button>
       )}
-      <img
-        src="/media/brand/sky-atv-cut.webp"
-        alt=""
-        className="w-[86px] drop-shadow-[0_10px_16px_rgb(0_0_0/0.45)] lg:w-[118px]"
-      />
+      {message && (
+        <img
+          key={`${message.title}|${message.text}`}
+          src="/media/brand/sky-atv-cut.webp"
+          alt=""
+          className="sky-hop-in w-[clamp(74px,22vw,100px)] drop-shadow-[0_10px_16px_rgb(0_0_0/0.45)] lg:w-[124px]"
+        />
+      )}
     </div>
   );
 }
