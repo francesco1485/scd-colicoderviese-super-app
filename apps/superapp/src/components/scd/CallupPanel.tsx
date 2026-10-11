@@ -23,6 +23,7 @@ export function CallupPanel({
   squad,
   others = [],
   tag,
+  onChanged,
 }: {
   eventId: string;
   eventDate: string;
@@ -31,6 +32,8 @@ export function CallupPanel({
   /** Athletes of the mister's other teams (UD-068), grouped by team. */
   others?: ReadonlyArray<{ teamCode: string; teamName: string; rows: RosterRow[] }>;
   tag: string;
+  /** Called after call-ups were sent or withdrawn (the pre-distinta reloads its list). */
+  onChanged?: () => void;
 }) {
   const load = useServerFn(getEventCallups);
   const send = useServerFn(sendCallups);
@@ -110,6 +113,7 @@ export function CallupPanel({
         const rows = await load({ data: { eventId } });
         setCallups(rows);
         setPicked(new Set(rows.map((r) => r.athleteId)));
+        onChanged?.();
       }
     } catch {
       setMessage({ ok: false, text: "Convocazione non inviata, riprova.", blocked: [] });

@@ -255,3 +255,17 @@ prossimi impegni e "ci sarò" in primo piano). Desktop invariato.
 - App: nel pannello convocazione, sotto la rosa, la sezione "Da altre annate" (chiusa, si apre da sola se ci sono già convocati
   da lì) con i ragazzi delle altre squadre del mister, raggruppati per squadra. Visual QA telefono.
 - Distinta: da decidere con la Direzione (in app o portale FIGC).
+
+## Pre-distinta dalla convocazione · 2026-10-11 sera (UD-069)
+
+- Decisione della Direzione: pre-distinta nell'app, formato FIGC/LND. Verificato che per Allievi e Giovanissimi il CRL Lombardia
+  obbliga la "lista di presentazione" sul portale LND: l'app prepara, il dirigente ricopia (niente doppione del portale).
+- Fonti: LND CRL Lombardia, Regolamento competizioni dilettantistiche 26-27 (art. 19.1 capitano e vice tra i titolari, art. 26.2
+  max 9 riserve); CRL Lombardia, Regolamenti SGS Campionato (art. 6 max 20 in lista, 7 sostituzioni; art. 19-20 portieri 1/12/22).
+- `VERIFIED` r70 (`20261011_r70_match_sheet_draft.sql`): `scd_match_sheets`, regole per squadra, candidati in panchina (staff della
+  squadra + dirigenti di società), lettura e salvataggio con tutti i controlli e storico. Prova annullata: troppi titolari, maglie
+  doppie, non convocato, capitano in riserva, persona fuori staff, "pronta" senza dirigente o senza capitano → rifiutati; bozza e
+  pronta salvate; dopo il ritiro di un convocato in lista il nuovo salvataggio è rifiutato finché non lo si toglie.
+- App: card "Distinta" nella pagina Mister: spunta tra i convocati, numero (proposto quello dell'ultima gara), titolare/riserva,
+  C/VC, panchina, "Salva bozza" / "Segna pronta", testo da copiare e stampa con colonna tessera/documento vuota da verificare sul
+  portale. Visual QA telefono.

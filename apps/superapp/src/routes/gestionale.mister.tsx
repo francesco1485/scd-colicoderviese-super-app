@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { CalendarDays, CircleCheck, Clapperboard, MapPin, Presentation, TriangleAlert, UsersRound } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import { Card, Chip, SourceLine, TeamTag, useRomeNow } from "@/components/scd/interior-ui";
 import { EmptyState, SourcesBox, WorkAreaGateView, WorkAreaShell, workAreaHead } from "@/components/scd/work-area-ui";
@@ -13,6 +13,7 @@ import { certificateState, type CertState } from "@/lib/people";
 import { groupForTeamCode, otherAnnate, registrationLabel, rosterOf, rosterSummary, rosterTeams, teamCodeForGroup, type RosterRow } from "@/lib/roster";
 import { getMyRoster, type MyRoster } from "@/lib/roster.functions";
 import { CallupPanel } from "@/components/scd/CallupPanel";
+import { MatchSheetPanel } from "@/components/scd/MatchSheetPanel";
 
 /**
  * Mister (boards Mister.dc.html + Mister-Oggi.dc.html): today panel of one team from the calendar
@@ -72,6 +73,7 @@ function MisterPage({ data }: { data: Loaded }) {
     [team, data.events, now.date, now.time],
   );
   const next = team?.next ?? null;
+  const [sheetKey, setSheetKey] = useState(0);
 
   return (
     <WorkAreaShell
@@ -124,7 +126,7 @@ function MisterPage({ data }: { data: Loaded }) {
                 </div>
                 <div className="px-4 pb-4 sm:px-[18px]">
                   {squadKnown && next && squad.length > 0 ? (
-                    <CallupPanel key={next.id} eventId={next.id} eventDate={next.date} defaultPlace={next.homeAway === "CASA" ? venueCase(titleCase(next.venue.split(",")[0] ?? "")) : ""} squad={squad} others={others} tag={team.tag} />
+                    <CallupPanel key={next.id} eventId={next.id} eventDate={next.date} defaultPlace={next.homeAway === "CASA" ? venueCase(titleCase(next.venue.split(",")[0] ?? "")) : ""} squad={squad} others={others} tag={team.tag} onChanged={() => setSheetKey((k) => k + 1)} />
                   ) : (
                     <SquadPanel roster={data.roster} squad={squad} known={squadKnown} tag={team.tag} today={now.date} />
                   )}
@@ -135,6 +137,14 @@ function MisterPage({ data }: { data: Loaded }) {
                   </div>
                 )}
               </Card>
+
+              {squadKnown && next && squad.length > 0 && (
+                <Card id="mis-distinta" title="Distinta" sub="Alla gara scegli tra i convocati chi va in lista. Poi il dirigente la ricopia sul portale LND.">
+                  <div className="px-4 pb-4 sm:px-[18px]">
+                    <MatchSheetPanel key={next.id} eventId={next.id} refreshKey={sheetKey} heading={`${team.tag} – ${titleCase(next.opponent || "avversario da definire")} · ${longDate(next.date)}${next.time ? `, ${next.time}` : ""}`} />
+                  </div>
+                </Card>
+              )}
 
               <Card id="mis-settimana" title="Allenamenti della settimana" sub="Dal quadro allenamenti, solo se la squadra vi compare con lo stesso nome o anno.">
                 {sessions.length === 0 ? (

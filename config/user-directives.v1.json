@@ -1631,6 +1631,31 @@
         "implementationStatus": "CALLUP_SCOPE_IMPLEMENTED_STAGING; DISTINTA_PENDING_DECISION",
         "duplicate_work": "DENY"
       }
+    },
+    {
+      "id": "UD-069",
+      "name": "MATCH_SHEET_DRAFT_IN_APP",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "Sì, nell'app",
+        "Usa il modello FIGC/LND",
+        "Pre-distinta nell'app"
+      ],
+      "normalizedCommand": {
+        "rule": "At the match the mister builds a pre-distinta from the called-up athletes (shirt numbers, starters/reserves, captain/vice, bench adults); the club officer copies it into the LND portal (mandatory for SGS youth championships per CRL Lombardia) or prints it where paper is allowed.",
+        "scope": "MATCH_SHEET",
+        "constraints": [
+          "only called-up, non-withdrawn athletes",
+          "official limits per category",
+          "no document/tessera numbers stored",
+          "editable until kick-off",
+          "not presented as the official sheet"
+        ],
+        "implementationStatus": "IMPLEMENTED_STAGING",
+        "duplicate_work": "DENY"
+      }
     }
   ],
   "completionGate": {
