@@ -21,6 +21,7 @@ import { Route as EntraRouteImport } from './routes/entra'
 import { Route as FamigliaRouteImport } from './routes/famiglia'
 import { Route as FornitoriRouteImport } from './routes/fornitori'
 import { Route as GrowRouteImport } from './routes/grow'
+import { Route as GuidaRouteImport } from './routes/guida'
 import { Route as ImpiantiRouteImport } from './routes/impianti'
 import { Route as InfermeriaRouteImport } from './routes/infermeria'
 import { Route as MagazzinoRouteImport } from './routes/magazzino'
@@ -126,6 +127,11 @@ const FornitoriRoute = FornitoriRouteImport.update({
 const GrowRoute = GrowRouteImport.update({
   id: '/grow',
   path: '/grow',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuidaRoute = GuidaRouteImport.update({
+  id: '/guida',
+  path: '/guida',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ImpiantiRoute = ImpiantiRouteImport.update({
@@ -377,6 +383,7 @@ export interface FileRoutesByFullPath {
   '/famiglia': typeof FamigliaRoute
   '/fornitori': typeof FornitoriRoute
   '/grow': typeof GrowRoute
+  '/guida': typeof GuidaRoute
   '/impianti': typeof ImpiantiRoute
   '/infermeria': typeof InfermeriaRoute
   '/magazzino': typeof MagazzinoRoute
@@ -437,6 +444,7 @@ export interface FileRoutesByTo {
   '/famiglia': typeof FamigliaRoute
   '/fornitori': typeof FornitoriRoute
   '/grow': typeof GrowRoute
+  '/guida': typeof GuidaRoute
   '/impianti': typeof ImpiantiRoute
   '/infermeria': typeof InfermeriaRoute
   '/magazzino': typeof MagazzinoRoute
@@ -497,6 +505,7 @@ export interface FileRoutesById {
   '/famiglia': typeof FamigliaRoute
   '/fornitori': typeof FornitoriRoute
   '/grow': typeof GrowRoute
+  '/guida': typeof GuidaRoute
   '/impianti': typeof ImpiantiRoute
   '/infermeria': typeof InfermeriaRoute
   '/magazzino': typeof MagazzinoRoute
@@ -559,6 +568,7 @@ export interface FileRouteTypes {
     | '/famiglia'
     | '/fornitori'
     | '/grow'
+    | '/guida'
     | '/impianti'
     | '/infermeria'
     | '/magazzino'
@@ -619,6 +629,7 @@ export interface FileRouteTypes {
     | '/famiglia'
     | '/fornitori'
     | '/grow'
+    | '/guida'
     | '/impianti'
     | '/infermeria'
     | '/magazzino'
@@ -678,6 +689,7 @@ export interface FileRouteTypes {
     | '/famiglia'
     | '/fornitori'
     | '/grow'
+    | '/guida'
     | '/impianti'
     | '/infermeria'
     | '/magazzino'
@@ -739,6 +751,7 @@ export interface RootRouteChildren {
   FamigliaRoute: typeof FamigliaRoute
   FornitoriRoute: typeof FornitoriRoute
   GrowRoute: typeof GrowRoute
+  GuidaRoute: typeof GuidaRoute
   ImpiantiRoute: typeof ImpiantiRoute
   InfermeriaRoute: typeof InfermeriaRoute
   MagazzinoRoute: typeof MagazzinoRoute
@@ -865,6 +878,13 @@ declare module '@tanstack/react-router' {
       path: '/grow'
       fullPath: '/grow'
       preLoaderRoute: typeof GrowRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guida': {
+      id: '/guida'
+      path: '/guida'
+      fullPath: '/guida'
+      preLoaderRoute: typeof GuidaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/impianti': {
@@ -1226,6 +1246,7 @@ const rootRouteChildren: RootRouteChildren = {
   FamigliaRoute: FamigliaRoute,
   FornitoriRoute: FornitoriRoute,
   GrowRoute: GrowRoute,
+  GuidaRoute: GuidaRoute,
   ImpiantiRoute: ImpiantiRoute,
   InfermeriaRoute: InfermeriaRoute,
   MagazzinoRoute: MagazzinoRoute,

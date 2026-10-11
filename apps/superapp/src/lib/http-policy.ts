@@ -15,6 +15,7 @@ export const PUBLIC_PREFIXES: readonly string[] = [
   "/contatti",
   "/eventi",
   "/fornitori",
+  "/guida",
   "/impianti",
   "/partner",
   "/privacy",

@@ -162,6 +162,9 @@ function Accedi() {
               <Link to="/registrati" className="scd-focus inline-flex h-11 items-center justify-center rounded-[10px] border border-[#b9d5ef] bg-white text-[15px] font-semibold text-[var(--scd-blue)]" data-testid="login-register">
                 Non hai ancora l'accesso? Registrati
               </Link>
+              <Link to="/guida" className="text-center text-[14px] font-semibold text-[var(--scd-blue)] underline" data-testid="login-guide">
+                Come funziona l'app
+              </Link>
             </form>
           )}
         </section>

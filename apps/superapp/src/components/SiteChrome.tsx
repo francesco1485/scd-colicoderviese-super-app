@@ -85,6 +85,7 @@ const menuGroups: readonly { title: string; app: string; items: readonly NavItem
 ];
 
 const footerLinks: readonly NavItem[] = [
+  { to: "/guida", label: "Come funziona l'app" },
   { to: "/shop", label: "Shop & membership" },
   { to: "/fornitori", label: "Fornitori" },
   { to: "/safeguarding", label: "Safeguarding" },
