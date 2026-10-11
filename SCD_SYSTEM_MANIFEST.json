@@ -986,8 +986,36 @@
         "authority_domains": [
           "ATHLETES",
           "TESSERAMENTI",
-          "TEAM_MEMBERSHIP"
-        ]
+          "TEAM_MEMBERSHIP",
+          "PEOPLE",
+          "SPORTS_STAFF_ROLES",
+          "TEAM_STAFF_ASSIGNMENTS",
+          "FIGC_OFFICIAL_REGISTRATIONS"
+        ],
+        "title": "04_TESSERATI - Master Operativo SCD ColicoDerviese 2026-27",
+        "account": "sportclubcolico@gmail.com",
+        "db_source_ids": {
+          "TESSERATI_MASTER_2026_27": "people, athletes, team memberships, structure roles (sheet 01 PERSONE / STRUTTURA)",
+          "FIGC_TABULATI_2026_10_09": "scd_tesseramenti APPROVATO_FIGC from sheet FIGC_09OTT_2026_UFFICIALI (FIGC/LND tabulati, read 2026-10-09)"
+        },
+        "consumers": [
+          "SCD_SUPABASE.scd_people",
+          "SCD_SUPABASE.scd_athletes",
+          "SCD_SUPABASE.scd_team_memberships",
+          "SCD_SUPABASE.scd_structure_roles",
+          "SCD_SUPABASE.scd_tesseramenti"
+        ],
+        "rules": [
+          "PROVENANCE_SOURCE_ID_AND_CODICE_PERSONA",
+          "MINORS_NAME_BIRTHDATE_TEAM_ONLY",
+          "NO_FISCAL_CODE_NO_CONTACTS_FOR_MINORS",
+          "REIMPORT_IS_IDEMPOTENT_ON_SOURCE_RECORD_ID",
+          "SOURCE_ROLE_DOES_NOT_AUTO_GRANT_APP_PERMISSION",
+          "FIGC_MATCH_ON_NAME_AND_BIRTHDATE_HASH",
+          "LOANED_OUT_PLAYERS_EXCLUDED",
+          "NO_FISCAL_CODE_STORED"
+        ],
+        "imported_at": "2026-10-11"
       },
       {
         "id": "PULMINI_SHEET",
@@ -1533,36 +1561,6 @@
         ]
       },
       {
-        "id": "TESSERATI_MASTER_2026_27",
-        "kind": "INTERNAL_VERIFIED_DOCUMENT",
-        "trust": "INTERNAL_VERIFIED",
-        "status": "ACTIVE",
-        "title": "04_TESSERATI - Master Operativo SCD ColicoDerviese 2026-27",
-        "account": "sportclubcolico@gmail.com",
-        "resource_id": "1mcOVkFRK7igxk87jGE-VqI49PHjNa6OmMu7xd0QYUl8",
-        "authority_domains": [
-          "PEOPLE",
-          "ATHLETES",
-          "TEAM_ROSTERS",
-          "SPORTS_STAFF_ROLES",
-          "TEAM_STAFF_ASSIGNMENTS"
-        ],
-        "consumers": [
-          "SCD_SUPABASE.scd_people",
-          "SCD_SUPABASE.scd_athletes",
-          "SCD_SUPABASE.scd_team_memberships",
-          "SCD_SUPABASE.scd_structure_roles"
-        ],
-        "rules": [
-          "PROVENANCE_SOURCE_ID_AND_CODICE_PERSONA",
-          "MINORS_NAME_BIRTHDATE_TEAM_ONLY",
-          "NO_FISCAL_CODE_NO_CONTACTS_FOR_MINORS",
-          "REIMPORT_IS_IDEMPOTENT_ON_SOURCE_RECORD_ID",
-          "SOURCE_ROLE_DOES_NOT_AUTO_GRANT_APP_PERMISSION"
-        ],
-        "imported_at": "2026-10-11"
-      },
-      {
         "id": "ISCRIZIONI_ATLETI_2026_27",
         "kind": "INTERNAL_FORM_RESPONSES",
         "trust": "INTERNAL_SELF_DECLARED",
@@ -1588,6 +1586,32 @@
           "ONLY_FILL_EMPTY_CERTIFICATE_DATES"
         ],
         "imported_at": "2026-10-11"
+      },
+      {
+        "id": "MASTER_CALENDARIO_2026_27",
+        "kind": "INTERNAL_VERIFIED_DOCUMENT",
+        "trust": "INTERNAL_VERIFIED",
+        "status": "ACTIVE",
+        "title": "SCD Master Calendario 2026/27 (proiezione pubblica scd-calendar-public-v3)",
+        "account": "sportclubcolico@gmail.com",
+        "resource_id": "1eXS-kY5PCHFg4CXiAErNAKtIVEMIKgWs",
+        "authority_domains": [
+          "MATCH_FIXTURES",
+          "MATCH_TIMES",
+          "MATCH_VENUES"
+        ],
+        "consumers": [
+          "apps/superapp/src/lib/calendar-mirror.ts",
+          "apps/superapp/src/data/calendario-snapshot-*.json",
+          "SCD_SUPABASE.scd_events (on demand, convocazioni)",
+          "SCD_SUPABASE.scd_matches"
+        ],
+        "rules": [
+          "EVENT_ID_FROM_CALENDAR_IS_SOURCE_RECORD_ID",
+          "DB_MATCH_CREATED_ONLY_WHEN_STAFF_CALLS_UP",
+          "NO_PARALLEL_CALENDAR_EDITING_IN_DB",
+          "FIGC_LND_OFFICIAL_FIXTURES_WIN"
+        ]
       }
     ],
     "conflict_resolution": [

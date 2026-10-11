@@ -34,7 +34,7 @@ describe("roster", () => {
       db({ medical_certificate_expires_at: "2026-10-20", registration_status: "VERIFIED" }),
       db({ medical_certificate_expires_at: "2027-06-30", is_minor: false }),
       db({}),
-    ].map(toRosterRow);
+    ].map((r) => toRosterRow(r));
     const s = rosterSummary(rows, "2026-10-11");
     expect(s.total).toBe(4);
     expect(s.minors).toBe(3);
@@ -43,7 +43,7 @@ describe("roster", () => {
   });
 
   it("filters one team and sorts with accents folded", () => {
-    const rows = [db({ display_name: "Zanetti Luca" }), db({ display_name: "Èrba Paolo" }), db({ display_name: "Bianchi Ugo", team_code: "u16" })].map(toRosterRow);
+    const rows = [db({ display_name: "Zanetti Luca" }), db({ display_name: "Èrba Paolo" }), db({ display_name: "Bianchi Ugo", team_code: "u16" })].map((r) => toRosterRow(r));
     expect(rosterOf(rows, "u15").map((r) => r.displayName)).toEqual(["Èrba Paolo", "Zanetti Luca"]);
     expect(rosterTeams(rows).map((t) => t.code)).toEqual(["u15", "u16"]);
   });

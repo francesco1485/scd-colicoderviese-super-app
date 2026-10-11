@@ -59,9 +59,13 @@ async function scope() {
 export const getMyRoster = createServerFn({ method: "GET" }).handler(async (): Promise<MyRoster> => {
   const c = await scope();
   if (c.state !== "ok") return { state: c.state, rows: [] };
-  const { data, error } = await c.sb.rpc("scd_my_team_roster", { p_organization_id: c.org.organizationId });
-  if (error) return { state: "error", rows: [] };
-  return { state: "ok", rows: ((data ?? []) as RosterDbRow[]).map(toRosterRow) };
+  const [roster, ids] = await Promise.all([
+    c.sb.rpc("scd_my_team_roster", { p_organization_id: c.org.organizationId }),
+    c.sb.rpc("scd_my_team_athlete_ids", { p_organization_id: c.org.organizationId }),
+  ]);
+  if (roster.error) return { state: "error", rows: [] };
+  const athleteIdOf = new Map(((ids.data ?? []) as Array<{ person_id: string; athlete_id: string }>).map((r) => [r.person_id, r.athlete_id]));
+  return { state: "ok", rows: ((roster.data ?? []) as RosterDbRow[]).map((r) => toRosterRow(r, athleteIdOf)) };
 });
 
 export const getMyFamily = createServerFn({ method: "GET" }).handler(async (): Promise<MyFamily> => {

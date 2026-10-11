@@ -12,6 +12,8 @@ export interface RosterRow {
   teamName: string;
   teamStatus: string;
   personId: string;
+  /** Athlete record id ("" when the server could not read it from scd_my_team_athlete_ids). */
+  athleteId: string;
   displayName: string;
   birthYear: number | null;
   minor: boolean | null;
@@ -32,13 +34,14 @@ export interface RosterDbRow {
   medical_certificate_expires_at: string | null;
 }
 
-export function toRosterRow(r: RosterDbRow): RosterRow {
+export function toRosterRow(r: RosterDbRow, athleteIdOf: ReadonlyMap<string, string> = new Map()): RosterRow {
   return {
     teamId: r.team_id,
     teamCode: r.team_code,
     teamName: r.team_name,
     teamStatus: r.team_status,
     personId: r.person_id,
+    athleteId: athleteIdOf.get(r.person_id) ?? "",
     displayName: r.display_name.trim() || "Nome non indicato",
     birthYear: r.birth_year,
     minor: r.is_minor,

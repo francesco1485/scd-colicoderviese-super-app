@@ -3,7 +3,7 @@ import { CalendarDays, CircleCheck, Clapperboard, MapPin, Presentation, Triangle
 import { useMemo } from "react";
 
 import { Card, Chip, SourceLine, TeamTag, useRomeNow } from "@/components/scd/interior-ui";
-import { EmptyState, PendingButton, SourcesBox, WorkAreaGateView, WorkAreaShell, workAreaHead } from "@/components/scd/work-area-ui";
+import { EmptyState, SourcesBox, WorkAreaGateView, WorkAreaShell, workAreaHead } from "@/components/scd/work-area-ui";
 import { dateParts, titleCase, venueCase } from "@/lib/board-data";
 import type { WorkAreaGate } from "@/lib/access";
 import { findSessions, freshnessLabel, loadCalendar, loadQuadro, type PublicEvent, type PublicGroup, type TrainingSlot } from "@/lib/public-snapshots";
@@ -12,6 +12,7 @@ import { getWorkAreaGate } from "@/lib/work-areas.functions";
 import { certificateState, type CertState } from "@/lib/people";
 import { groupForTeamCode, registrationLabel, rosterOf, rosterSummary, rosterTeams, teamCodeForGroup, type RosterRow } from "@/lib/roster";
 import { getMyRoster, type MyRoster } from "@/lib/roster.functions";
+import { CallupPanel } from "@/components/scd/CallupPanel";
 
 /**
  * Mister (boards Mister.dc.html + Mister-Oggi.dc.html): today panel of one team from the calendar
@@ -120,12 +121,17 @@ function MisterPage({ data }: { data: Loaded }) {
                   <Fact label="In rosa" value={squadKnown ? String(squad.length) : "—"} />
                 </div>
                 <div className="px-4 pb-4 sm:px-[18px]">
-                  <SquadPanel roster={data.roster} squad={squad} known={squadKnown} tag={team.tag} today={now.date} />
+                  {squadKnown && next && squad.length > 0 ? (
+                    <CallupPanel key={next.id} eventId={next.id} eventDate={next.date} defaultPlace={next.homeAway === "CASA" ? venueCase(titleCase(next.venue.split(",")[0] ?? "")) : ""} squad={squad} tag={team.tag} />
+                  ) : (
+                    <SquadPanel roster={data.roster} squad={squad} known={squadKnown} tag={team.tag} today={now.date} />
+                  )}
                 </div>
-                <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--in-line)] px-4 py-3 sm:px-[18px]">
-                  <span className="text-[14px] text-[var(--in-sub)]">Convocazioni con conferma di lettura delle famiglie: in arrivo.</span>
-                  <PendingButton reason="Le convocazioni si attivano con il login e la rosa da R20">Invia alle famiglie</PendingButton>
-                </div>
+                {!(squadKnown && next) && (
+                  <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--in-line)] px-4 py-3 sm:px-[18px]">
+                    <span className="text-[14px] text-[var(--in-sub)]">Le convocazioni si inviano dalla rosa della tua squadra, dopo l'accesso.</span>
+                  </div>
+                )}
               </Card>
 
               <Card id="mis-settimana" title="Allenamenti della settimana" sub="Dal quadro allenamenti, solo se la squadra vi compare con lo stesso nome o anno.">
