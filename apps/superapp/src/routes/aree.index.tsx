@@ -33,18 +33,16 @@ function Gateway() {
     <main data-screen="gateway" className="bg-[var(--scd-page)] pb-12">
       <header className="relative isolate overflow-hidden bg-[var(--scd-navy)] text-white" data-testid="gateway-hero">
         <div aria-hidden="true" className="scd-kit-stripes absolute inset-0 -z-10" />
-        <div className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-end gap-4 px-4 pt-5 sm:px-6 lg:pt-10">
-          <div className="pb-8 lg:pb-14">
-            <h1 className="font-brand mt-6 text-[46px] uppercase leading-[0.92] sm:text-[64px] lg:text-[84px]">
-              Il tuo<br />ingresso
-            </h1>
-            <p className="mt-3 max-w-[34ch] text-[17px] leading-snug text-white/90 sm:text-[19px]">
-              Un solo accesso alla Super App. Ognuno entra nella sua area e vede solo quello che gli serve.
+        <div className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-end gap-4 px-4 pt-4 sm:px-6 lg:pt-6">
+          <div className="pb-6 lg:pb-8">
+            <h1 className="font-brand mt-3 text-[36px] uppercase leading-[0.92] sm:text-[44px] lg:text-[52px]">Il tuo ingresso</h1>
+            <p className="mt-2 max-w-[48ch] text-[16px] leading-snug text-white/90 sm:text-[17px]">
+              Un solo accesso alla Super App: ognuno entra nella sua area e vede solo quello che gli serve.
             </p>
           </div>
-          <figure className="relative -mb-px w-[128px] self-end sm:w-[190px] lg:w-[250px]">
-            <div className="rounded-t-[28px] bg-white px-2 pt-3 shadow-[0_-12px_40px_-12px_rgb(0_0_0/0.5)]">
-              <img src={skyKit.url} width={skyKit.width} height={skyKit.height} alt="Sky, la mascotte del club, in divisa ufficiale da gara" className="mx-auto h-auto w-full" loading="eager" decoding="async" />
+          <figure className="relative -mb-px hidden w-[96px] self-end sm:block lg:w-[120px]" aria-hidden="true">
+            <div className="rounded-t-[18px] bg-white px-1.5 pt-2 shadow-[0_-10px_30px_-12px_rgb(0_0_0/0.5)]">
+              <img src={skyKit.url} width={skyKit.width} height={skyKit.height} alt="" className="mx-auto h-auto w-full" loading="eager" decoding="async" />
             </div>
           </figure>
         </div>
@@ -54,7 +52,9 @@ function Gateway() {
         {!R20_LOGIN_LIVE && (
           <p role="status" className="mt-4 flex gap-3 rounded-[12px] border border-[#f2d675] bg-[#fffbea] p-3 text-[14.5px] leading-snug text-[#5a4500]" data-testid="gateway-login-status">
             <Info className="mt-[2px] size-5 shrink-0" aria-hidden="true" />
-            <span>Gli accessi personali si stanno attivando. Oggi puoi aprire ogni area per vedere cosa conterrà e le anteprime già pronte. Nessun dato personale è visibile senza accesso.</span>
+            <span>
+              Chi è registrato dalla società entra con la propria e-mail da <Link to="/accedi" search={{ next: undefined }} className="font-bold underline underline-offset-2">Accedi</Link>. Senza accesso ogni area mostra solo cosa conterrà e le anteprime pubbliche: nessun dato personale.
+            </span>
           </p>
         )}
 
