@@ -22,7 +22,8 @@ import {
 } from "@/lib/universe";
 
 import { TeamCode } from "./TeamBar";
-import { ColicoNowChip, MapButton, TicketButton, WeatherChip } from "./MatchExtras";
+import { ColicoNowChip, MapButton, TicketButton, TicketLine, WeatherChip } from "./MatchExtras";
+import { mapsUrl, venueTown } from "@/lib/match-extras";
 
 const CREST = "/media/brand/logo-scd.png";
 
@@ -74,7 +75,7 @@ export function HeroBand({
   return (
     <section
       aria-labelledby="club-t"
-      className="relative isolate overflow-hidden px-4 pb-6 pt-6 text-white lg:px-6 lg:pb-11 lg:pt-10"
+      className="relative isolate overflow-hidden px-4 pb-5 pt-4 text-white lg:px-6 lg:pb-11 lg:pt-10"
       data-testid="home-hero"
       data-mode={mode}
     >
@@ -104,8 +105,22 @@ export function HeroBand({
           delay=".65s"
         />
       </div>
-      <div className="mx-auto grid max-w-[1200px] gap-[18px] lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-10">
-        <div>
+      <div className="mx-auto grid max-w-[1200px] gap-[14px] lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-10">
+        {/* Phones and tablets: the header already carries the crest, so only the status line stays above the ticket. */}
+        <div className="flex flex-wrap items-center gap-2 lg:hidden" data-testid="home-status-row">
+          <p
+            role="status"
+            className="inline-flex items-center gap-2 rounded-full border-[1.5px] border-white/30 bg-white/10 py-[6px] pl-[10px] pr-[12px] text-[13.5px] font-extrabold backdrop-blur-md"
+          >
+            <i
+              aria-hidden="true"
+              className={`size-[9px] rounded-full ${mode === "live" ? "uv-blink bg-[var(--scd-red)]" : mode === "settimana" ? "bg-[#8fd3ff]" : "bg-[var(--uv-gold)]"}`}
+            />
+            {MODE_TEXT[mode](upcoming)}
+          </p>
+          <ColicoNowChip />
+        </div>
+        <div className="hidden lg:block">
           <div className="flex items-center gap-3">
             <img
               src={CREST}
@@ -167,7 +182,24 @@ export function HeroBand({
   );
 }
 
+/** "Costa Masnaga · C.S. Parrocchiale N.1" — town and ground, without the street (the map has it). */
+function venueShort(venue: string): string {
+  const town = venueTown(venue);
+  const rest = venue.split(/\s+-\s+/).slice(1).join(" - ").split(",")[0]?.trim() ?? "";
+  return town ? (rest ? `${venueCase(town)} · ${venueCase(rest)}` : venueCase(town)) : venueCase(venue);
+}
+
 /* ---------------------------------------------------------------- ticket */
+
+/** "Oggi in campo" / "Domani in campo" / "Sab 17 in campo" for the ticket notch. */
+function countdownLabelOf(date: string, nowMs: number): string {
+  const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Rome", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(nowMs));
+  const diff = Math.round((Date.parse(`${date}T12:00:00Z`) - Date.parse(`${today}T12:00:00Z`)) / 86_400_000);
+  if (diff === 0) return "Oggi in campo";
+  if (diff === 1) return "Domani in campo";
+  const d = new Intl.DateTimeFormat("it-IT", { timeZone: "UTC", weekday: "short", day: "numeric" }).format(new Date(`${date}T12:00:00Z`));
+  return `${d} in campo`;
+}
 
 type TicketProps = {
   item: WeekItem | null;
@@ -177,6 +209,10 @@ type TicketProps = {
   onGoing: () => void;
   onShare: () => void;
   emptyTeam?: Team | undefined;
+  /** The other matches of the same day (in contemporanea): tapping one brings it in front. */
+  others?: WeekItem[];
+  onPick?: (id: string) => void;
+  teamOf?: (i: WeekItem) => Team | undefined;
 };
 
 export function NextTicket({
@@ -187,9 +223,12 @@ export function NextTicket({
   onGoing,
   onShare,
   emptyTeam,
+  others = [],
+  onPick,
+  teamOf,
 }: TicketProps) {
   const shell =
-    "uv-drop relative grid gap-3 rounded-[20px] bg-white px-4 pb-4 pt-[26px] text-[var(--scd-ink)] shadow-[0_20px_40px_rgb(0_8_30/0.45),6px_6px_0_var(--uv-gold)] lg:-rotate-[1.5deg] lg:justify-self-end lg:w-full lg:max-w-[460px]";
+    "uv-drop relative grid gap-2.5 rounded-[18px] bg-white px-3.5 pb-3.5 pt-[24px] text-[var(--scd-ink)] shadow-[0_20px_40px_rgb(0_8_30/0.45),5px_5px_0_var(--uv-gold)] lg:gap-3 lg:rounded-[20px] lg:px-4 lg:pb-4 lg:pt-[26px] lg:-rotate-[1.5deg] lg:justify-self-end lg:w-full lg:max-w-[460px]";
   if (!item) {
     return (
       <article className={shell} data-testid="next-match">
@@ -239,22 +278,22 @@ export function NextTicket({
             className="uv-blink size-[9px] rounded-full bg-white"
           />
         )}
-        {live ? "In campo ora" : "Prossima gara"}
+        {live ? "In campo ora" : others.length ? `${countdownLabelOf(item.date, nowMs)} · ${others.length + 1} gare` : "Prossima gara"}
       </span>
       <img
         src={CREST}
         alt=""
-        className="uv-float absolute -top-[30px] right-[6px] w-[62px] drop-shadow-[0_10px_14px_rgb(0_0_0/0.35)] lg:-top-10 lg:w-[78px]"
+        className="uv-float absolute -top-[22px] right-[8px] w-[48px] drop-shadow-[0_10px_14px_rgb(0_0_0/0.35)] lg:-top-10 lg:w-[78px]"
       />
-      <div className="pr-14">
-        <b className="flex items-center gap-2 font-uv text-[30px] uppercase leading-[0.92]">
+      <div className="pr-12">
+        <b className="flex items-center gap-2 font-uv text-[24px] uppercase leading-[0.92] lg:text-[30px]">
           {team && <TeamCode team={team} size="sm" />}
           <span>
             {item.groupLabel.replace(/\s·\s/g, " ") || "S.C.D. ColicoDerviese"}
           </span>
         </b>
       </div>
-      <div className="text-[17px] font-black leading-[1.25]">
+      <div className="text-[16px] font-black leading-[1.25] lg:text-[17px]">
         {titleCase(item.title)}
         <small className="mt-[2px] flex items-center gap-1 text-[14px] font-medium text-[var(--scd-sub)]">
           <MapPin className="size-4 shrink-0" aria-hidden="true" />
@@ -262,15 +301,15 @@ export function NextTicket({
         </small>
       </div>
       <div className="flex flex-wrap items-center gap-[14px]">
-        <div className="min-w-[92px] rounded-[12px] bg-[var(--uv-night)] px-3 py-[7px] text-center text-white">
-          <small className="block font-uv text-[13px] uppercase tracking-[0.12em] text-[#a9c8ff]">
+        <div className="min-w-[84px] rounded-[12px] bg-[var(--uv-night)] px-3 py-[6px] text-center text-white">
+          <small className="block font-uv text-[12px] uppercase tracking-[0.12em] text-[#a9c8ff]">
             {day}
           </small>
-          <b className="block font-uv text-[36px] leading-[0.95] text-[var(--uv-gold)]">
+          <b className="block font-uv text-[30px] leading-[0.95] text-[var(--uv-gold)] lg:text-[36px]">
             {item.time || "--:--"}
           </b>
         </div>
-        <div className="font-uv text-[30px] leading-none tabular-nums">
+        <div className="font-uv text-[26px] leading-none tabular-nums lg:text-[30px]">
           {live ? "Live" : (cd ?? "—")}
           <small className="mt-[2px] block font-sans text-[12.5px] font-bold text-[var(--scd-sub)]">
             {live
@@ -298,6 +337,35 @@ export function NextTicket({
         <MapButton venue={item.venue} />
         <TicketButton item={item} />
       </div>
+      <TicketLine item={item} />
+      {others.length > 0 && (
+        <ul className="m-0 grid list-none gap-1 border-t border-[var(--scd-line)] p-0 pt-2" aria-label="Le altre gare dello stesso giorno" data-testid="same-day">
+          {others.map((o) => {
+            const oh = o.homeAway === "CASA";
+            const ost = itemState(o, nowMs);
+            return (
+              <li key={o.id}>
+                <button
+                  type="button"
+                  onClick={() => onPick?.(o.id)}
+                  className="grid w-full grid-cols-[52px_minmax(0,1fr)_auto] items-center gap-2 rounded-[10px] px-1.5 py-1.5 text-left hover:bg-[#f3f7fc]"
+                  aria-label={`Metti in evidenza: ${o.groupLabel} ${o.title}`}
+                >
+                  <b className={`font-uv text-[20px] leading-none tabular-nums ${ost === "live" ? "text-[var(--scd-red)]" : ""}`}>{o.time || "--:--"}</b>
+                  <span className="min-w-0">
+                    <span className="flex items-center gap-1.5 text-[14px] font-extrabold leading-tight">
+                      {teamOf?.(o) && <TeamCode team={teamOf(o)!} size="sm" />}
+                      <span className="truncate">{o.groupLabel.replace(/\s·\s/g, " ")}</span>
+                    </span>
+                    <span className="block truncate text-[12.5px] text-[var(--scd-sub)]">{titleCase(o.title)}{ost === "live" ? " · in corso" : ost === "done" ? " · finita" : ""}</span>
+                  </span>
+                  <span className={`rounded-[5px] border-2 px-[6px] py-[2px] font-uv text-[11px] uppercase tracking-[0.08em] ${oh ? "border-[#0b8a43] text-[#0b8a43]" : "border-[var(--uv-royal)] text-[var(--uv-royal)]"}`}>{oh ? "Casa" : "Fuori"}</span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
       <div className="grid grid-cols-[1fr_auto] gap-2">
         <button
           type="button"
@@ -526,10 +594,15 @@ export function Fixtures({
                     </b>
                     <span className="mt-[2px] block text-[13.5px] leading-tight text-[var(--scd-sub)]">
                       {titleCase(i.title)}
-                      <br />
-                      {venueCase(i.venue)}
-                      {i.venue && <span className="ml-2 inline-block align-middle"><MapButton venue={i.venue} compact /></span>}
                     </span>
+                    {i.venue && (
+                      <span className="mt-[3px] flex items-center gap-1 text-[12.5px] leading-tight text-[var(--scd-sub)]">
+                        <MapPin className="size-3.5 shrink-0" aria-hidden="true" />
+                        <a href={mapsUrl(i.venue) ?? undefined} target="_blank" rel="noopener noreferrer" className="truncate underline decoration-[var(--scd-line)] underline-offset-2" aria-label={`Apri la mappa: ${i.venue}`}>
+                          {venueShort(i.venue)}
+                        </a>
+                      </span>
+                    )}
                   </span>
                   {i.homeAway && (
                     <span

@@ -117,6 +117,25 @@ export function MapButton({ venue, compact = false }: { venue: string; compact?:
 
 /* ------------------------------------------------------------- ticket office */
 
+/** One line under the buttons: where the ticket office is (first team at home) or free entry (youth). */
+export function TicketLine({ item }: { item: WeekItem }) {
+  const kind = ticketingFor(item);
+  if (!kind) return null;
+  return (
+    <p className="m-0 flex items-start gap-1.5 text-[13.5px] leading-snug text-[var(--scd-sub)]" data-testid="ticket-line">
+      <Ticket className="mt-[2px] size-4 shrink-0" aria-hidden="true" />
+      {kind === "free" ? (
+        <span>Ingresso libero alle gare del settore giovanile.</span>
+      ) : (
+        <span>
+          <b className="text-[var(--scd-ink)]">Biglietteria:</b> {TICKETING.where} · {TICKETING.howToPay.join(", ").toLowerCase()} · {TICKETING.opensBefore}
+          {TICKETING.status !== "CONFIRMED" && " · prezzi da confermare"}
+        </span>
+      )}
+    </p>
+  );
+}
+
 /** "Biglietteria" opens a sheet with where to pay and prices; prices appear only when confirmed. */
 export function TicketButton({ item }: { item: WeekItem }) {
   const kind = ticketingFor(item);

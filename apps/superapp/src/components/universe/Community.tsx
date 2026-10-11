@@ -479,7 +479,7 @@ export function SkyCameo({
   return (
     <div
       aria-live="polite"
-      className={`pointer-events-none fixed bottom-[calc(4.75rem+46px+72px+env(safe-area-inset-bottom))] right-0 z-[45] flex items-end transition-transform duration-500 ease-[cubic-bezier(.22,1.35,.4,1)] motion-reduce:transition-none lg:bottom-[140px] ${message ? "translate-x-[18px]" : "translate-x-[115%]"}`}
+      className={`pointer-events-none fixed bottom-[calc(4.75rem+34px+72px+env(safe-area-inset-bottom))] right-0 z-[45] flex items-end transition-transform duration-500 ease-[cubic-bezier(.22,1.35,.4,1)] motion-reduce:transition-none lg:bottom-[140px] ${message ? "translate-x-[18px]" : "translate-x-[115%]"}`}
     >
       {message && (
         <button

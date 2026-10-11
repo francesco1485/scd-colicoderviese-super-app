@@ -194,13 +194,18 @@ function Home() {
       ),
     [merged, selection, follow],
   );
-  const next =
+  const auto =
     games.find((i) => itemState(i, nowMs) === "live") ??
     games.find(
       (i) =>
         ["next", "unknown"].includes(itemState(i, nowMs)) && i.date >= today,
     ) ??
     null;
+  // Same-day matches (in contemporanea): all of them belong to the ticket; a tap picks the one in front.
+  const [pickId, setPickId] = useState<string | null>(null);
+  const sameDay = useMemo(() => (auto ? games.filter((g) => g.date === auto.date) : []), [games, auto]);
+  const next = sameDay.find((g) => g.id === pickId) ?? auto;
+  const others = next ? sameDay.filter((g) => g.id !== next.id) : [];
   const live = useMemo(
     () =>
       new Set(
@@ -356,12 +361,15 @@ function Home() {
           onGoing={toggleGoing}
           onShare={share}
           emptyTeam={emptyTeam}
+          others={others}
+          onPick={setPickId}
+          teamOf={teamOf}
         />
       </HeroBand>
 
       <div className="mx-auto max-w-[1200px] px-4 lg:px-6">
         {/* Hall: the ground floor doors (chi siamo, squadre, calendario, campi, eventi, contatti). */}
-        <HallDoors title="Il club in un tocco" compact className="mt-[26px]" />
+        <HallDoors title="Il club in un tocco" compact className="mt-[26px] hidden lg:block" />
         <div className="lg:grid lg:grid-cols-[7fr_5fr] lg:items-start lg:gap-6">
           <div>
             <SectionTitle
@@ -394,6 +402,8 @@ function Home() {
               confermati dal club.
             </p>
             <Shortcuts />
+            {/* Phones and tablets: the club doors come after the week's fixtures, not before. */}
+            <HallDoors title="Il club in un tocco" compact className="mt-[22px] lg:hidden" />
             {/* On phones the avatar card comes right after the fixtures; on desktop it heads the side column. */}
             <div className="mt-[22px] lg:hidden">
               <IdentityCard />
