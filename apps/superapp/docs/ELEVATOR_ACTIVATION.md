@@ -31,7 +31,15 @@ Il salvataggio ridistribuisce il servizio. La chiave *service role* NON serve al
 3. Atterraggio automatico su `/direzione`; menu "Accesso aree" mostra e-mail e badge **Direzione**.
 4. `/segreteria/persone`: elenco (vuoto finché non si importa), **Inserisci**, scheda, **Segna uscito/a**.
 
-## Stato
+## Stato al 11/10/2026 ore 16:10
+- `VERIFIED`: connettore Supabase autorizzato sull'organizzazione della società (accesso del Direttore come membro del team).
+- `VERIFIED`: progetto SCD PULSE (`ndevtxxijbcnskgysdit`) con r33, r34, r35, r51, r51_1, r53 + **r59** e **r59_1** applicate; 0 persone, 0 utenti.
+- `VERIFIED`: anon senza accesso alle tabelle persone e alla funzione "segna uscito"; RLS attiva con 5 regole.
+- `VERIFIED`: `SCD_SUPABASE_URL` e `VITE_SCD_SUPABASE_PUBLISHABLE_KEY` impostate su Render (chiave publishable, pubblica per natura).
+- `PENDING`: r56 (inviti, consensi d'uso, fonti calendario, gamification) e r57_1 (indici) non applicate: non servono all'ascensore.
+- `TODO (Direzione)`: impostazioni Auth (punto 2) e creazione utente Direttore (punto 1.2); poi ruolo DIRECTION assegnato via SQL.
+
+## Stato precedente
 - `VERIFIED`: codice, test (399), build, smoke locale, deploy staging.
 - `UNVERIFIED`: migrazioni r33–r57 applicate sul progetto reale; r59 non ancora applicata.
 - `BLOCKER`: il connettore Supabase di questa chat è collegato a un account senza progetti → i passi 1–3 restano manuali

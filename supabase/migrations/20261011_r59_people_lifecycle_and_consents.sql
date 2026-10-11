@@ -1,3 +1,7 @@
+-- APPLIED to project ndevtxxijbcnskgysdit (SCD PULSE) on 2026-10-11 as migration
+-- "r59_people_lifecycle_and_consents" in an additive form (create/add only, no drop statements:
+-- the tables were new and scd_people had no status check). The idempotent text below is kept for
+-- local and fresh environments; both produce the same schema. Hardening follows in r59_1.
 -- R59 · People lifecycle, structure roles, guardian consents (UD-028, UD-040, UD-046, decision 2026-10-11)
 --
 -- Purpose
@@ -37,6 +41,7 @@ create or replace function public.scd_is_minor(p_birth_date date)
 returns boolean
 language sql
 stable
+set search_path = public
 as $$ select case when p_birth_date is null then null else p_birth_date > (current_date - interval '18 years') end $$;
 
 alter table public.scd_people
@@ -251,7 +256,7 @@ revoke all on public.scd_structure_roles, public.scd_person_events, public.scd_p
 
 -- updated_at maintenance
 create or replace function public.scd_touch_updated_at()
-returns trigger language plpgsql as $$
+returns trigger language plpgsql set search_path = public as $$
 begin new.updated_at = now(); return new; end; $$;
 drop trigger if exists scd_structure_roles_touch on public.scd_structure_roles;
 create trigger scd_structure_roles_touch before update on public.scd_structure_roles
