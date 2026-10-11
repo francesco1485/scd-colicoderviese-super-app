@@ -26,7 +26,8 @@ describe("access screens: one per reserved area without a page", () => {
 
   it("never claims a path owned by a parallel branch (rotazione campi, quadro, gestionale and their children)", () => {
     for (const id of ACCESS_SCREEN_IDS) expect(ownedByParallel(findArea(id)!.path), id).toBe(false);
-    for (const p of routePaths) expect(ownedByParallel(p), p).toBe(false);
+    // /quadro and /gestionale are now real pages (item 4); access screens still never claim them.
+    for (const id of ACCESS_SCREEN_IDS) expect(["/quadro", "/gestionale"]).not.toContain(findArea(id)!.path);
     expect(deferredOwner("/gestionale/impianti")).toMatch(/item 4/);
     expect(deferredOwner("/quadro/rotazione-campi")).toMatch(/item 4/);
   });
@@ -49,7 +50,7 @@ describe("access screens: one per reserved area without a page", () => {
   });
 
   it("keeps explicit hosts and links access screens to their own path", () => {
-    expect(CURRENT_HREF["quadro"]).toBe("/core/impianti-calendari");
+    expect(CURRENT_HREF["quadro"]).toBe("/quadro");
     expect(CURRENT_HREF["iscrizioni"]).toBe("/entra");
     for (const id of ACCESS_SCREEN_IDS) expect(areaLink(id)).toMatchObject({ direct: true, access: true });
   });

@@ -113,8 +113,8 @@ const EXPLICIT_HREF: Readonly<Record<string, string>> = {
   tornei: "/eventi",
   "christmas-lario-cup": "/eventi/christmas-lario-cup",
   sponsor: "/sponsor",
-  gestionale: "/core",
-  quadro: "/core/impianti-calendari",
+  gestionale: "/gestionale",
+  quadro: "/quadro",
 };
 
 /**

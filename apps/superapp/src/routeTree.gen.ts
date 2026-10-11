@@ -41,6 +41,8 @@ import { Route as CoreStaffRouteImport } from './routes/core.staff'
 import { Route as DirezioneAcquistiRouteImport } from './routes/direzione_.acquisti'
 import { Route as EventiIndexRouteImport } from './routes/eventi.index'
 import { Route as EventiChristmasLarioCupRouteImport } from './routes/eventi.christmas-lario-cup'
+import { Route as GestionaleIndexRouteImport } from './routes/gestionale.index'
+import { Route as QuadroIndexRouteImport } from './routes/quadro.index'
 import { Route as TesoreriaBiglietteriaRouteImport } from './routes/tesoreria_.biglietteria'
 import { Route as TesoreriaClubHouseRouteImport } from './routes/tesoreria_.club-house'
 import { Route as TesoreriaMagazzinoRouteImport } from './routes/tesoreria_.magazzino'
@@ -205,6 +207,16 @@ const EventiChristmasLarioCupRoute = EventiChristmasLarioCupRouteImport.update({
   path: '/eventi/christmas-lario-cup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GestionaleIndexRoute = GestionaleIndexRouteImport.update({
+  id: '/gestionale/',
+  path: '/gestionale/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QuadroIndexRoute = QuadroIndexRouteImport.update({
+  id: '/quadro/',
+  path: '/quadro/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TesoreriaBiglietteriaRoute = TesoreriaBiglietteriaRouteImport.update({
   id: '/tesoreria_/biglietteria',
   path: '/tesoreria/biglietteria',
@@ -257,6 +269,8 @@ export interface FileRoutesByFullPath {
   '/aree/': typeof AreeIndexRoute
   '/core/': typeof CoreIndexRoute
   '/eventi/': typeof EventiIndexRoute
+  '/gestionale/': typeof GestionaleIndexRoute
+  '/quadro/': typeof QuadroIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -294,6 +308,8 @@ export interface FileRoutesByTo {
   '/aree': typeof AreeIndexRoute
   '/core': typeof CoreIndexRoute
   '/eventi': typeof EventiIndexRoute
+  '/gestionale': typeof GestionaleIndexRoute
+  '/quadro': typeof QuadroIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -332,6 +348,8 @@ export interface FileRoutesById {
   '/aree/': typeof AreeIndexRoute
   '/core/': typeof CoreIndexRoute
   '/eventi/': typeof EventiIndexRoute
+  '/gestionale/': typeof GestionaleIndexRoute
+  '/quadro/': typeof QuadroIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -371,6 +389,8 @@ export interface FileRouteTypes {
     | '/aree/'
     | '/core/'
     | '/eventi/'
+    | '/gestionale/'
+    | '/quadro/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -408,6 +428,8 @@ export interface FileRouteTypes {
     | '/aree'
     | '/core'
     | '/eventi'
+    | '/gestionale'
+    | '/quadro'
   id:
     | '__root__'
     | '/'
@@ -445,6 +467,8 @@ export interface FileRouteTypes {
     | '/aree/'
     | '/core/'
     | '/eventi/'
+    | '/gestionale/'
+    | '/quadro/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -483,6 +507,8 @@ export interface RootRouteChildren {
   AreeIndexRoute: typeof AreeIndexRoute
   CoreIndexRoute: typeof CoreIndexRoute
   EventiIndexRoute: typeof EventiIndexRoute
+  GestionaleIndexRoute: typeof GestionaleIndexRoute
+  QuadroIndexRoute: typeof QuadroIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -711,6 +737,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventiChristmasLarioCupRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/gestionale/': {
+      id: '/gestionale/'
+      path: '/gestionale'
+      fullPath: '/gestionale/'
+      preLoaderRoute: typeof GestionaleIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/quadro/': {
+      id: '/quadro/'
+      path: '/quadro'
+      fullPath: '/quadro/'
+      preLoaderRoute: typeof QuadroIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tesoreria_/biglietteria': {
       id: '/tesoreria_/biglietteria'
       path: '/tesoreria/biglietteria'
@@ -771,6 +811,8 @@ const rootRouteChildren: RootRouteChildren = {
   AreeIndexRoute: AreeIndexRoute,
   CoreIndexRoute: CoreIndexRoute,
   EventiIndexRoute: EventiIndexRoute,
+  GestionaleIndexRoute: GestionaleIndexRoute,
+  QuadroIndexRoute: QuadroIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
