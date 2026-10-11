@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "id": "SCD_ROSTER_AGGREGATES_SNAPSHOT",
+  "note": "Counts only, read on 2026-10-11 from the private masters. No names, no contacts, no documents. UNKNOWN is reported as such, never as zero.",
+  "tesserati": {
+    "source": "04_TESSERATI - Master Operativo SCD ColicoDerviese 2026-27 (foglio ATLETI, export del 2026-10-11)",
+    "asOf": "2026-10-11",
+    "records": 315,
+    "byStatus": { "ATTIVO": 221, "IN ATTESA": 61, "USCITO": 17, "TRASFERITO": 8, "ARCHIVIATO": 7, "PRESTITO OUT": 1 },
+    "minors": 245,
+    "adults": 70,
+    "byGroup": {
+      "PRIMA SQUADRA": 28, "JUNIORES 2007-2009": 20, "U18 2009-2010": 9, "U16 ELITE 2011": 19, "U15 2012-2013": 50,
+      "U13 2014": 27, "U12 2015": 30, "PULCINI 2016-2017": 31, "PRIMI CALCI 2018-2019": 22, "PICCOLI AMICI 2020-2021": 14, "DA VERIFICARE": 65
+    },
+    "figcPractice": { "COMPLETA": 134, "DA CONTATTARE": 126, "DA VERIFICARE": 27, "IN LAVORAZIONE": 16, "NON RICHIESTA": 12 },
+    "signature": { "FIRMATO": 3, "DA VERIFICARE": 300, "NON RICHIESTA": 12 },
+    "medicalCertificate": { "status": "UNKNOWN", "note": "Colonna presente ma vuota per tutti i 315 record: nessuna scadenza caricata." },
+    "fees": { "status": "UNKNOWN", "note": "Quote 2026/27 da definire per tutti i gruppi; stato pagamento 'da verificare' per tutti." },
+    "secretariatQueue": { "VERIFICARE FIRMA": 213, "COMPLETARE PRATICA FIGC": 2, "COMPLETARE RECAPITI": 2, "ATTENDERE PASSAGGIO IN SEGRETERIA": 2, "NESSUNA - RECORD NON ATTIVO": 94 },
+    "controlRoom": { "personeAttive": 268, "atletiAttivi": 221, "staffAttivo": 53, "coperturaFigcPct": 57.9, "firmeDaVerificare": 218, "praticheNonComplete": 93, "certDateDaGestire": 221, "kitDaDefinire": 9, "integrazioniAperte": 3 }
+  },
+  "pulminiDemand": {
+    "source": "05_PULMINI - Master Flotta e Trasporti SCD 2026-27 (foglio 02 UTENTI SERVIZIO, export del 2026-10-11)",
+    "asOf": "2026-10-11",
+    "users": 61,
+    "byStatus": { "ATTIVO": 50, "NON ATTIVO": 9, "PROVVISORIO": 1, "DA FORMALIZZARE": 1 },
+    "byMode": { "A/R": 28, "SOLO ANDATA": 22, "PROVVISORIO SOLO ANDATA": 1, "A/R DA FORMALIZZARE": 1, "NON ATTIVO": 9 },
+    "byGroup": {
+      "U15 2012-2013": 12, "U16 ELITE 2011": 11, "U12 2015": 11, "PULCINI 2016-2017": 7, "JUNIORES 2007-2009": 6,
+      "U13 2014": 6, "U18 2009-2010": 5, "PICCOLI AMICI 2020-2021": 2, "PRIMI CALCI 2018-2019": 1
+    },
+    "byLine": { "LAGO/LECCO": 25, "NORD/VALCHIAVENNA": 16, "VALTELLINA": 9, "COLICO": 3, "ALTO LARIO": 1, "DA VERIFICARE": 7 },
+    "weekdayConfirmation": { "status": "UNKNOWN", "note": "Per ogni giorno lun-ven l'andata è 'da confermare' per 52 utenti e il ritorno per 29: nessuna corsa settimanale è ancora pianificata." },
+    "plannedRuns": 0,
+    "fleet": { "vehiclesInMaster": 4, "vehiclesInService": 3, "seatsConfirmed": false, "driversActive": 3, "driversRegistered": 6 },
+    "lines": ["LAGO/LECCO", "NORD/VALCHIAVENNA", "VALTELLINA", "COLICO", "ALTO LARIO"],
+    "stopsRegistered": 18
+  }
+}

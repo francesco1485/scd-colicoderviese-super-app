@@ -9,6 +9,8 @@ import { freshnessLabel, loadCalendar, type PublicEvent, type PublicGroup } from
 import { readableOnWhite, teamTag } from "@/lib/quadro";
 import { getWorkAreaGate } from "@/lib/work-areas.functions";
 import { weekendMatches } from "@/lib/work-areas";
+import { StatTile } from "@/components/scd/work-area-ui";
+import { TESSERATI, itDate, sortedCounts } from "@/lib/roster-aggregates";
 
 /** Segreteria (board Segreteria.dc.html): work queues as honest empty states, weekend matches, masters. */
 export const Route = createFileRoute("/segreteria")({
@@ -91,16 +93,30 @@ function SegreteriaPage({ groups, events, sourceModifiedAt, preview }: { groups:
         </Card>
 
         <div className="flex min-w-0 flex-col gap-[18px] lg:col-span-2 xl:col-span-1">
+          <Card id="seg-tesseramenti" title="Tesseramenti" sub={`Dal Master Tesserati, solo conteggi, dato al ${itDate(TESSERATI.asOf)}.`}>
+            <div className="grid grid-cols-3 gap-2 px-4 pb-3 sm:px-[18px]" data-testid="tesseramenti-tiles">
+              <StatTile value={TESSERATI.byStatus["ATTIVO"] ?? 0} of={TESSERATI.records} label="atleti attivi su record" />
+              <StatTile value={TESSERATI.figcPractice["COMPLETA"] ?? 0} of={TESSERATI.records} label="pratiche FIGC complete" />
+              <StatTile value={TESSERATI.minors} label="minorenni" />
+            </div>
+            <dl className="m-0 grid gap-1.5 border-t border-[var(--in-line)] px-4 py-3 text-[14px] sm:px-[18px]">
+              <div className="flex items-baseline justify-between gap-3"><dt className="text-[var(--in-sub)]">Firme da verificare</dt><dd className="m-0 font-semibold">{TESSERATI.signature["DA VERIFICARE"] ?? 0}</dd></div>
+              <div className="flex items-baseline justify-between gap-3"><dt className="text-[var(--in-sub)]">Da contattare per la pratica FIGC</dt><dd className="m-0 font-semibold">{TESSERATI.figcPractice["DA CONTATTARE"] ?? 0}</dd></div>
+              <div className="flex items-baseline justify-between gap-3"><dt className="text-[var(--in-sub)]">Annata da verificare</dt><dd className="m-0 font-semibold">{TESSERATI.byGroup["DA VERIFICARE"] ?? 0}</dd></div>
+              <div className="flex items-baseline justify-between gap-3"><dt className="text-[var(--in-sub)]">In attesa</dt><dd className="m-0 font-semibold">{TESSERATI.byStatus["IN ATTESA"] ?? 0}</dd></div>
+            </dl>
+            <div className="flex flex-wrap gap-1.5 border-t border-[var(--in-line)] px-4 py-3 sm:px-[18px]" aria-label="Atleti per gruppo">
+              {sortedCounts(TESSERATI.byGroup).filter(([g]) => g !== "DA VERIFICARE").map(([g, n]) => (
+                <Chip key={g} tone="info">{g.replace(/ \d{4}(-\d{4})?$/, "")} · {n}</Chip>
+              ))}
+            </div>
+            <SourceLine>{TESSERATI.source}. Nomi, recapiti e codici restano nel master: qui solo i numeri.</SourceLine>
+          </Card>
           <Card id="seg-certificati" title="Certificati medici">
             <div className="px-4 pb-4 sm:px-[18px]">
-              <EmptyState title="Registro non collegato">
-                Finché il registro certificati non è collegato non mostriamo scadenze. Sconosciuto non vuol dire zero. Qui compariranno solo le date di scadenza, mai dati sanitari.
+              <EmptyState title="Scadenze non ancora caricate">
+                {TESSERATI.medicalCertificate.note} Sconosciuto non vuol dire zero. Quando le date saranno nel master, qui compariranno solo le scadenze e partiranno gli avvisi a 30 e 7 giorni, mai dati sanitari.
               </EmptyState>
-            </div>
-          </Card>
-          <Card id="seg-tesseramenti" title="Tesseramenti">
-            <div className="px-4 pb-4 sm:px-[18px]">
-              <EmptyState title="Database Iscrizioni da collegare">Matricole e stati arriveranno dal foglio esistente, senza copiarli altrove.</EmptyState>
             </div>
           </Card>
           <Card id="seg-moduli" title="Modulistica">

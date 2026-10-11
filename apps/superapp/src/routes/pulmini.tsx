@@ -15,6 +15,7 @@ import { defaultDay, weekdayKey } from "@/lib/training-view";
 import { VanSeatMap, type TeamColor } from "@/components/scd/VanSeatMap";
 import { PeoplePins } from "@/components/scd/PeoplePins";
 import { PULMINI_SERVICE, trainingServiceFor } from "@/lib/member-services";
+import { PULMINI_DEMAND, itDate, sortedCounts } from "@/lib/roster-aggregates";
 import { peopleForArea, type StaffPerson } from "@/lib/staff-roster";
 import { getStaffEmails, getStaffRoster } from "@/lib/staff-roster.functions";
 import { PULMINI_FLEET, factStamp, nextWeekend, weekendMatches } from "@/lib/work-areas";
@@ -158,6 +159,28 @@ function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf
 
         </div>
         <div className="flex min-w-0 flex-col gap-[18px]">
+          <Card id="pul-domanda" title="Chi ha chiesto il servizio" sub={`Dal Master Pulmini, solo conteggi, dato al ${itDate(PULMINI_DEMAND.asOf)}.`}>
+            <div className="grid grid-cols-3 gap-2 px-4 pb-3 sm:px-[18px]" data-testid="pulmini-demand">
+              <StatTile value={PULMINI_DEMAND.byStatus["ATTIVO"] ?? 0} of={PULMINI_DEMAND.users} label="iscritti attivi" />
+              <StatTile value={PULMINI_DEMAND.byMode["A/R"] ?? 0} label="andata e ritorno" />
+              <StatTile value={PULMINI_DEMAND.byMode["SOLO ANDATA"] ?? 0} label="solo andata" />
+            </div>
+            <div className="border-t border-[var(--in-line)] px-4 py-3 sm:px-[18px]">
+              <p className="m-0 mb-1.5 text-[12.5px] font-extrabold uppercase tracking-[0.05em] text-[var(--in-sub)]">Per squadra</p>
+              <div className="flex flex-wrap gap-1.5">
+                {sortedCounts(PULMINI_DEMAND.byGroup).map(([g, n]) => {
+                  const off = /U16|U18|JUNIORES/.test(g);
+                  return <Chip key={g} tone={off ? "warn" : "info"}>{g.replace(/ \d{4}(-\d{4})?$/, "")} · {n}{off ? " · allenamenti non previsti" : ""}</Chip>;
+                })}
+              </div>
+              <p className="m-0 mb-1.5 mt-3 text-[12.5px] font-extrabold uppercase tracking-[0.05em] text-[var(--in-sub)]">Per linea</p>
+              <div className="flex flex-wrap gap-1.5">
+                {sortedCounts(PULMINI_DEMAND.byLine).map(([l, n]) => <Chip key={l} tone={l === "DA VERIFICARE" ? "warn" : "info"}>{l} · {n}</Chip>)}
+              </div>
+            </div>
+            <SourceLine>{PULMINI_DEMAND.weekdayConfirmation.note} {PULMINI_DEMAND.stopsRegistered} fermate registrate su {PULMINI_DEMAND.lines.length} linee.</SourceLine>
+          </Card>
+
           <Card id="pul-regole" title="Regole del servizio" sub={PULMINI_SERVICE.source}>
             <dl className="m-0 grid gap-2 px-4 pb-4 text-[14px] leading-snug sm:px-[18px]">
               <div><dt className="font-bold">Allenamenti: annate servite</dt><dd className="m-0 text-[var(--in-sub)]">{PULMINI_SERVICE.trainingAnnate.join(", ")}</dd></div>
