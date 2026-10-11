@@ -29,6 +29,8 @@ export interface AreaNode {
   alias_of?: string;
   flows_to?: string;
   blocker?: string;
+  /** Ordered steps of a workflow area (e.g. acquisti). */
+  flow?: readonly string[];
   children?: readonly AreaNode[];
 }
 
@@ -115,10 +117,71 @@ const EXPLICIT_HREF: Readonly<Record<string, string>> = {
   quadro: "/core/impianti-calendari",
 };
 
+/**
+ * Reserved areas whose canonical direct path already answers with an access
+ * screen (board Accesso-area): what is inside, who enters, one yellow "Entra"
+ * towards the existing entry flow. Each id has a thin route at its own path
+ * (src/routes/<path>.tsx) rendering src/components/scd/AccessScreen.tsx.
+ * When the real page of an area is built it replaces the thin route and the
+ * id leaves this list.
+ */
+export const ACCESS_SCREEN_IDS: readonly string[] = [
+  "infermeria",
+  "famiglia",
+  "pulmini",
+  "magazzino",
+  "segreteria",
+  "tesoreria",
+  "club-house",
+  "biglietteria",
+  "magazzino-cassa",
+  "direzione",
+  "acquisti",
+  "crm",
+  "partner",
+];
+
+/**
+ * Registry paths that intentionally have neither a page nor an access screen
+ * yet, with the backlog item that owns them (docs/RELEASE2_LOG.md). A prefix
+ * covers the sub-paths too, so children added by the owning branch stay owned.
+ */
+export const DEFERRED_PATHS: Readonly<Record<string, string>> = {
+  "/calendario/rotazione-campi": "item 3 · rotazione campi",
+  "/quadro": "item 4 · quadro settimanale",
+  "/gestionale": "item 4 · gestionale",
+  "/oggi": "item 5 · public today",
+  "/partite": "item 5 · match live page",
+  "/sky-club": "item 5 · Sky Club",
+  "/foto": "item 5 · Foto",
+  "/gioca": "item 7 · Gioca teaser",
+};
+
+/** Owner of a deferred path (exact match or parent prefix), or null. */
+export function deferredOwner(path: string): string | null {
+  for (const [prefix, owner] of Object.entries(DEFERRED_PATHS)) {
+    if (path === prefix || path.startsWith(`${prefix}/`)) return owner;
+  }
+  return null;
+}
+
+export function hasAccessScreen(id: string): boolean {
+  return ACCESS_SCREEN_IDS.includes(id);
+}
+
+/** Areas served today by an existing page that already hosts the same function. */
+const HOSTED_HREF: Readonly<Record<string, string>> = {
+  iscrizioni: "/entra",
+};
+
 export const CURRENT_HREF: Readonly<Record<string, string>> = (() => {
   const out: Record<string, string> = {};
   for (const s of SATELLITES) if (s.areaId) out[s.areaId] = `/aree/${s.slug}`;
-  return { ...out, ...EXPLICIT_HREF };
+  for (const id of ACCESS_SCREEN_IDS) {
+    const area = findArea(id);
+    if (area) out[id] = area.path;
+  }
+  return { ...out, ...HOSTED_HREF, ...EXPLICIT_HREF };
 })();
 
 export interface AreaLink {
@@ -129,13 +192,15 @@ export interface AreaLink {
   href: string | null;
   /** True when the canonical direct path itself is the live route. */
   direct: boolean;
+  /** True when that route is the area's access screen, not its full page yet. */
+  access: boolean;
 }
 
 export function areaLink(id: string): AreaLink {
   const area = findArea(id);
   if (!area) throw new Error(`Unknown area "${id}"`);
   const href = CURRENT_HREF[id] ?? null;
-  return { id, path: area.path, href, direct: href === area.path };
+  return { id, path: area.path, href, direct: href === area.path, access: href === area.path && hasAccessScreen(id) };
 }
 
 export type AreaIcon =
@@ -253,7 +318,7 @@ export function railFor(roles: ReadonlySet<string>, rail: readonly RailGroup[] =
 }
 
 /** Labels for every area id that appears in a menu or rail (used by search). */
-function labelIndex(): Map<string, string> {
+export function labelIndex(): Map<string, string> {
   const m = new Map<string, string>();
   for (const g of ACCESS_MENU) for (const e of g.entries) m.set(e.id, e.label);
   for (const g of INTERIOR_RAIL) for (const it of g.items) if (!m.has(it.id)) m.set(it.id, it.label);

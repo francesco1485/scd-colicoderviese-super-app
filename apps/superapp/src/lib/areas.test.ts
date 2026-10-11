@@ -89,9 +89,12 @@ describe("links that work today", () => {
   });
 
   it("marks a link direct only when the canonical path is the live route", () => {
-    expect(areaLink("calendario")).toEqual({ id: "calendario", path: "/calendario", href: "/calendario", direct: true });
-    expect(areaLink("pulmini")).toEqual({ id: "pulmini", path: "/pulmini", href: "/aree/pulmini", direct: false });
-    expect(areaLink("crm")).toEqual({ id: "crm", path: "/crm", href: null, direct: false });
+    expect(areaLink("calendario")).toEqual({ id: "calendario", path: "/calendario", href: "/calendario", direct: true, access: false });
+    expect(areaLink("pulmini")).toEqual({ id: "pulmini", path: "/pulmini", href: "/pulmini", direct: true, access: true });
+    expect(areaLink("crm")).toEqual({ id: "crm", path: "/crm", href: "/crm", direct: true, access: true });
+    expect(areaLink("gestionale")).toEqual({ id: "gestionale", path: "/gestionale", href: "/core", direct: false, access: false });
+    expect(areaLink("sky-club")).toEqual({ id: "sky-club", path: "/sky-club", href: "/aree/tifoso", direct: false, access: false });
+    expect(areaLink("gioca")).toEqual({ id: "gioca", path: "/gioca", href: null, direct: false, access: false });
     expect(() => areaLink("nope")).toThrow();
   });
 });

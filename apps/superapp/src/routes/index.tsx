@@ -18,6 +18,8 @@ import {
   type FixtureFilter,
 } from "@/components/universe/HomeBlocks";
 import { TeamBar, TeamPicker } from "@/components/universe/TeamBar";
+import { ClubCrestOfficial } from "@/components/SiteChrome";
+import { openAccessMenu } from "@/components/scd/AccessMenu";
 import { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 import { getPublicFeed, getPublicSchedule } from "@/lib/club.functions";
 import { addDays } from "@/lib/board-data";
@@ -317,6 +319,25 @@ function Home() {
 
   return (
     <main data-screen="home" className="uv-page min-h-dvh pb-10">
+      {/* Phone top bar of board Main: the generic public bar is hidden here, the yellow "Entra" opens "Accesso aree". */}
+      <header
+        className="scd-pub flex h-14 items-center justify-between gap-3 border-b border-[rgb(248_208_0/0.22)] bg-[rgb(6_42_82/0.72)] px-4 font-text text-white lg:hidden"
+        data-testid="home-phone-header"
+      >
+        <Link to="/" className="scd-focus flex min-w-0 items-center gap-2.5 rounded-md" aria-label="S.C.D. ColicoDerviese, Home">
+          <ClubCrestOfficial size={39} />
+          <span className="font-title text-[22px] font-extrabold tracking-[0.02em]">SCD Universe</span>
+        </Link>
+        <button
+          type="button"
+          onClick={openAccessMenu}
+          className="scd-action h-11 rounded-[22px] px-4 text-[15px] font-bold"
+          aria-label="Entra nelle aree: accesso alle aree della società"
+          data-testid="home-enter"
+        >
+          Entra
+        </button>
+      </header>
       <TeamBar
         teams={teams}
         follow={follow}
