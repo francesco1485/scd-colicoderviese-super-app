@@ -31,6 +31,7 @@ export interface AccessAdminData {
   actorEmail: string | null;
   accounts: Account[];
   audit: AuditEntry[];
+  teams: Array<{ code: string; name: string; status: string }>;
 }
 
 async function context() {
@@ -48,13 +49,16 @@ type AuditRow = { id: number; created_at: string; action: string; actor_email: s
 
 export const getAccessAdmin = createServerFn({ method: "GET" }).handler(async (): Promise<AccessAdminData> => {
   const { gate, org, actorRole, actorEmail, sb } = await context();
-  const base: AccessAdminData = { gate, connected: false, actorRole, actorEmail, accounts: [], audit: [] };
+  const base: AccessAdminData = { gate, connected: false, actorRole, actorEmail, accounts: [], audit: [], teams: [] };
   if (gate.view !== "page" || !sb || !org) return base;
-  const [acc, aud] = await Promise.all([
+  const [acc, aud, accTeams, teams] = await Promise.all([
     sb.rpc("scd_admin_accounts", { p_organization_id: org.organizationId }),
     sb.rpc("scd_admin_audit", { p_organization_id: org.organizationId, p_limit: 60 }),
+    sb.rpc("scd_admin_account_teams", { p_organization_id: org.organizationId }),
+    sb.from("scd_teams").select("code,name,status").eq("organization_id", org.organizationId).order("code"),
   ]);
   if (acc.error) return base;
+  const teamsOf = new Map(((accTeams.data ?? []) as Array<{ user_id: string; teams: string[] | null }>).map((r) => [r.user_id, r.teams ?? []]));
   return {
     ...base,
     connected: true,
@@ -63,6 +67,7 @@ export const getAccessAdmin = createServerFn({ method: "GET" }).handler(async ()
       email: r.email,
       role: isDbRoleValue(r.role) ? r.role : "USER_BASE",
       positions: r.positions ?? [],
+      teams: teamsOf.get(r.user_id) ?? [],
       active: r.active,
       lastSignInAt: r.last_sign_in_at,
       createdAt: r.created_at,
@@ -78,6 +83,7 @@ export const getAccessAdmin = createServerFn({ method: "GET" }).handler(async ()
       summary: auditSummary(r.action, r.detail ?? {}),
       note: typeof r.detail?.["note"] === "string" ? (r.detail["note"] as string) : "",
     })),
+    teams: ((teams.data ?? []) as Array<{ code: string; name: string; status: string }>),
   };
 });
 
@@ -89,6 +95,7 @@ function explain(error: { code?: string; message: string }): string {
   if (m.includes("Direzione only")) return "Solo la Direzione può dare o togliere ruoli e aree d'ufficio, o modificare un account d'ufficio.";
   if (m.includes("last Direzione")) return "Deve restare almeno un accesso Direzione attivo.";
   if (m.includes("unknown position")) return "Area non riconosciuta.";
+  if (m.includes("unknown team")) return "Squadra non riconosciuta.";
   if (m.includes("invalid email")) return "E-mail non valida.";
   if (error.code === "42501") return "Non hai i permessi per questa modifica.";
   return "Modifica non riuscita, riprova.";
@@ -139,4 +146,15 @@ export const revokeLink = createServerFn({ method: "POST" })
     const { error } = await sb.rpc("scd_admin_revoke_link", { p_organization_id: org.organizationId, p_user_id: data.userId, p_person_id: data.personId, p_note: data.note.trim() || null });
     if (error) return { ok: false, message: explain(error) };
     return { ok: true, message: "Collegamento revocato: quell'accesso non vede più questa persona." };
+  });
+
+export const setTeams = createServerFn({ method: "POST" })
+  .inputValidator((d: { userId: string; teams: string[]; note: string }) =>
+    z.object({ userId: z.string().uuid(), teams: z.array(z.string().regex(/^[a-z0-9-]{1,32}$/)).max(20), note: z.string().max(300) }).parse(d))
+  .handler(async ({ data }): Promise<{ ok: boolean; message: string }> => {
+    const { gate, org, sb } = await context();
+    if (gate.view !== "page" || !sb || !org) return { ok: false, message: "Accesso non valido." };
+    const { error } = await sb.rpc("scd_admin_set_teams", { p_organization_id: org.organizationId, p_user_id: data.userId, p_team_codes: data.teams, p_note: data.note.trim() || null });
+    if (error) return { ok: false, message: explain(error) };
+    return { ok: true, message: "Squadre aggiornate." };
   });

@@ -99,6 +99,8 @@ export interface Account {
   email: string;
   role: DbRole;
   positions: string[];
+  /** Team codes assigned by hand (scope.teams, r65_1), on top of the organigramma. */
+  teams: string[];
   active: boolean;
   lastSignInAt: string | null;
   createdAt: string;
@@ -122,7 +124,7 @@ export function filterAccounts(list: readonly Account[], f: AccountFilter): Acco
     if (status === "attivi" && !a.active) return false;
     if (status === "sospesi" && a.active) return false;
     if (status === "mai-entrati" && (a.lastSignInAt || !a.active)) return false;
-    if (q && !fold([a.email, ...a.persons.map((p) => p.name), ...a.positions.map(positionLabel), roleLabelOf(a.role)].join(" ")).includes(q)) return false;
+    if (q && !fold([a.email, ...a.persons.map((p) => p.name), ...a.positions.map(positionLabel), ...a.teams, roleLabelOf(a.role)].join(" ")).includes(q)) return false;
     return true;
   });
 }
@@ -171,9 +173,10 @@ export function auditSummary(action: string, detail: Record<string, unknown>): s
     const b = (detail["before"] ?? {}) as Record<string, unknown>;
     const a = (detail["after"] ?? {}) as Record<string, unknown>;
     const parts: string[] = [];
-    if (b["role"] !== a["role"]) parts.push(`ruolo ${roleOf(b["role"])} → ${roleOf(a["role"])}`);
-    if (pos(b["positions"]) !== pos(a["positions"])) parts.push(`aree: ${pos(a["positions"]) || "nessuna"}`);
-    if (b["active"] !== a["active"]) parts.push(a["active"] ? "riattivato" : "sospeso");
+    if ("role" in a && b["role"] !== a["role"]) parts.push(`ruolo ${roleOf(b["role"])} → ${roleOf(a["role"])}`);
+    if ("positions" in a && pos(b["positions"]) !== pos(a["positions"])) parts.push(`aree: ${pos(a["positions"]) || "nessuna"}`);
+    if ("teams" in a) parts.push(`squadre: ${Array.isArray(a["teams"]) && a["teams"].length ? (a["teams"] as string[]).join(", ") : "nessuna"}`);
+    if ("active" in a && b["active"] !== a["active"]) parts.push(a["active"] ? "riattivato" : "sospeso");
     return parts.join(" · ") || "nessun cambiamento";
   }
   if (action === "GRANT_PERSON" || action === "APPROVE_REQUEST") {

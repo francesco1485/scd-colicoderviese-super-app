@@ -22,6 +22,7 @@ const acc = (o: Partial<Account>): Account => ({
   email: "x@example.it",
   role: "FAMILY",
   positions: [],
+  teams: [],
   active: true,
   lastSignInAt: null,
   createdAt: "2026-10-11T10:00:00Z",

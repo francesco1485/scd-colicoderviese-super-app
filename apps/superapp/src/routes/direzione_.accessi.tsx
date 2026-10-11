@@ -21,7 +21,7 @@ import {
   type Account,
   type AccountFilter,
 } from "@/lib/access-admin";
-import { getAccessAdmin, grantPersonAccess, revokeLink, setAccess, type AccessAdminData } from "@/lib/access-admin.functions";
+import { getAccessAdmin, grantPersonAccess, revokeLink, setAccess, setTeams, type AccessAdminData } from "@/lib/access-admin.functions";
 import { getPeople, type PeopleData } from "@/lib/people.functions";
 import type { DbRole } from "@/lib/session";
 import { getWorkAreaGate } from "@/lib/work-areas.functions";
@@ -134,6 +134,7 @@ function AccessiPage({ initial, people, preview }: { initial: AccessAdminData; p
                                 <small className="mt-0.5 block truncate text-[13px] text-[var(--in-sub)]">
                                   {a.email} · {lastSeen(a.lastSignInAt)}
                                   {a.positions.length ? ` · ${a.positions.map(positionLabel).join(", ")}` : ""}
+                                  {a.teams.length ? ` · squadre ${a.teams.join(", ")}` : ""}
                                 </small>
                               </span>
                               <span className="flex flex-wrap justify-end gap-1">
@@ -174,6 +175,7 @@ function AccessiPage({ initial, people, preview }: { initial: AccessAdminData; p
       {open && (
         <AccountDialog
           account={open}
+          teams={data.teams}
           actorRole={data.actorRole}
           isSelf={Boolean(data.actorEmail && open.email.toLowerCase() === data.actorEmail)}
           onClose={() => setOpen(null)}
@@ -253,8 +255,31 @@ function Sheet({ title, onClose, children }: { title: string; onClose: () => voi
   );
 }
 
-function AccountDialog({ account, actorRole, isSelf, onClose, onDone }: { account: Account; actorRole: DbRole | null; isSelf: boolean; onClose: () => void; onDone: () => Promise<void> }) {
+function TeamsPicker({ value, onChange, teams, disabled }: { value: string[]; onChange: (v: string[]) => void; teams: AccessAdminData["teams"]; disabled: boolean }) {
+  const toggle = (c: string) => onChange(value.includes(c) ? value.filter((x) => x !== c) : [...value, c]);
+  return (
+    <fieldset className="m-0 min-w-0 border-0 p-0">
+      <legend className="mb-1 text-[15px] font-semibold">Squadre in più</legend>
+      <p className="m-0 mb-2 text-[13px] text-[var(--in-sub)]">Rosa e convocazioni di queste squadre, oltre a quelle del suo ruolo nell'organigramma.</p>
+      <div className="flex flex-wrap gap-2">
+        {teams.filter((t) => t.status !== "WITHDRAWN" || value.includes(t.code)).map((t) => {
+          const on = value.includes(t.code);
+          return (
+            <label key={t.code} className={`inline-flex min-h-10 items-center gap-2 rounded-full border px-3 text-[14px] ${on ? "border-[var(--in-info)] bg-[var(--in-info-bg)]" : "border-[var(--in-line)] bg-white"} ${disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}>
+              <input type="checkbox" checked={on} disabled={disabled} onChange={() => toggle(t.code)} className="size-4 accent-[var(--scd-blue)]" />
+              {t.name}
+            </label>
+          );
+        })}
+      </div>
+    </fieldset>
+  );
+}
+
+function AccountDialog({ account, teams, actorRole, isSelf, onClose, onDone }: { account: Account; teams: AccessAdminData["teams"]; actorRole: DbRole | null; isSelf: boolean; onClose: () => void; onDone: () => Promise<void> }) {
   const save = useServerFn(setAccess);
+  const saveTeams = useServerFn(setTeams);
+  const [teamCodes, setTeamCodes] = useState<string[]>(account.teams);
   const revoke = useServerFn(revokeLink);
   const [role, setRole] = useState<DbRole>(account.role);
   const [positions, setPositions] = useState<string[]>(account.positions);
@@ -265,15 +290,25 @@ function AccountDialog({ account, actorRole, isSelf, onClose, onDone }: { accoun
   const editable = canEditAccount(actorRole, account.role, isSelf);
   const roles = grantableRoles(actorRole);
   const allowed = grantablePositions(actorRole);
-  const changed = role !== account.role || active !== account.active || [...positions].sort().join() !== [...account.positions].sort().join();
+  const accessChanged = role !== account.role || active !== account.active || [...positions].sort().join() !== [...account.positions].sort().join();
+  const teamsChanged = [...teamCodes].sort().join() !== [...account.teams].sort().join();
+  const changed = accessChanged || teamsChanged;
 
   async function submit() {
     setBusy(true);
     setMessage(null);
     try {
-      const res = await save({ data: { userId: account.userId, role, positions, active, note } });
-      setMessage(res.message);
-      if (res.ok) await onDone();
+      if (accessChanged) {
+        const res = await save({ data: { userId: account.userId, role, positions, active, note } });
+        setMessage(res.message);
+        if (!res.ok) return;
+      }
+      if (teamsChanged) {
+        const res = await saveTeams({ data: { userId: account.userId, teams: teamCodes, note } });
+        setMessage(res.message);
+        if (!res.ok) return;
+      }
+      await onDone();
     } catch {
       setMessage("Modifica non riuscita, riprova.");
     } finally {
@@ -325,6 +360,8 @@ function AccountDialog({ account, actorRole, isSelf, onClose, onDone }: { accoun
       </label>
 
       <div className="mt-4"><PositionsPicker value={positions} onChange={setPositions} allowed={editable ? allowed : []} /></div>
+
+      {teams.length > 0 && <div className="mt-4"><TeamsPicker value={teamCodes} onChange={setTeamCodes} teams={teams} disabled={!editable} /></div>}
 
       <label className="mt-4 flex min-h-11 items-center gap-3 text-[15px] font-semibold">
         <input type="checkbox" checked={!active} disabled={!editable} onChange={(e) => setActive(!e.target.checked)} className="size-5 accent-[#b42318]" />
