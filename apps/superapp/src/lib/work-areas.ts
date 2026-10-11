@@ -22,7 +22,8 @@ export type WorkAreaId =
   | "biglietteria"
   | "magazzino-cassa"
   | "infermeria"
-  | "mister";
+  | "mister"
+  | "organigramma";
 
 export interface DriveMaster {
   key: string;
@@ -50,6 +51,9 @@ export const DRIVE_MASTERS = {
   listino: { key: "listino", name: "Listino Club House", fileId: null, note: "da caricare" },
   tariffe: { key: "tariffe", name: "Tariffario biglietteria", fileId: null, note: "da confermare" },
   sanitario: { key: "sanitario", name: "Servizi e orari dello staff sanitario", fileId: null, note: "da definire" },
+  sgsManuale: { key: "sgsManuale", name: "C.U. n.18 SGS · Manuale Sistema di Qualità 2026", fileId: null, note: "regole in config/sgs-quality-system.v1.json" },
+  organigrammaFigc: { key: "organigrammaFigc", name: "Organigramma FIGC (Portale Servizi)", fileId: null, note: "estratto del 24/09, privato" },
+  elencoRuoli: { key: "elencoRuoli", name: "Elenco dirigenti e ruoli 2026/27", fileId: null, note: "privato, solo Direzione" },
 } as const satisfies Record<string, DriveMaster>;
 
 export type MasterKey = keyof typeof DRIVE_MASTERS;
@@ -148,6 +152,12 @@ export const WORK_AREAS: Readonly<Record<WorkAreaId, WorkAreaConfig>> = {
     description: "Oggi del mister: prossima gara e allenamenti della squadra dal calendario e dal quadro. Nessun nome di atleti.",
     sources: ["calendario", "quadro", "r20", "impianti", "inserimenti"],
     insertRoles: uniq([...registryRoles("mister"), "Direzione"]),
+  },
+  organigramma: {
+    id: "organigramma", label: "Organigramma e 3° livello SGS", path: pathOf("organigramma"), railId: "gestionale",
+    description: "Ruoli, allenatori e scadenze richiesti dal Sistema di Qualità SGS per il livello scelto. Nessun nome: lo stato arriva dal server.",
+    sources: ["sgsManuale", "organigrammaFigc", "elencoRuoli", "inserimenti"],
+    insertRoles: ["Direzione", "Segreteria", "Responsabile attività di base"],
   },
 };
 

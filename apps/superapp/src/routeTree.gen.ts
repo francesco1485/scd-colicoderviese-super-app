@@ -47,6 +47,7 @@ import { Route as EventiChristmasLarioCupRouteImport } from './routes/eventi.chr
 import { Route as GestionaleIndexRouteImport } from './routes/gestionale.index'
 import { Route as GestionaleMappaRouteImport } from './routes/gestionale.mappa'
 import { Route as GestionaleMisterRouteImport } from './routes/gestionale.mister'
+import { Route as GestionaleOrganigrammaRouteImport } from './routes/gestionale.organigramma'
 import { Route as GestionaleImpiantiRouteImport } from './routes/gestionale_.impianti'
 import { Route as QuadroIndexRouteImport } from './routes/quadro.index'
 import { Route as QuadroRotazioneCampiRouteImport } from './routes/quadro.rotazione-campi'
@@ -251,6 +252,11 @@ const GestionaleMisterRoute = GestionaleMisterRouteImport.update({
   path: '/gestionale/mister',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GestionaleOrganigrammaRoute = GestionaleOrganigrammaRouteImport.update({
+  id: '/gestionale/organigramma',
+  path: '/gestionale/organigramma',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GestionaleImpiantiRoute = GestionaleImpiantiRouteImport.update({
   id: '/gestionale_/impianti',
   path: '/gestionale/impianti',
@@ -351,6 +357,7 @@ export interface FileRoutesByFullPath {
   '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
   '/gestionale/mappa': typeof GestionaleMappaRoute
   '/gestionale/mister': typeof GestionaleMisterRoute
+  '/gestionale/organigramma': typeof GestionaleOrganigrammaRoute
   '/gestionale/impianti': typeof GestionaleImpiantiRouteWithChildren
   '/quadro/rotazione-campi': typeof QuadroRotazioneCampiRoute
   '/tesoreria/biglietteria': typeof TesoreriaBiglietteriaRoute
@@ -403,6 +410,7 @@ export interface FileRoutesByTo {
   '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
   '/gestionale/mappa': typeof GestionaleMappaRoute
   '/gestionale/mister': typeof GestionaleMisterRoute
+  '/gestionale/organigramma': typeof GestionaleOrganigrammaRoute
   '/quadro/rotazione-campi': typeof QuadroRotazioneCampiRoute
   '/tesoreria/biglietteria': typeof TesoreriaBiglietteriaRoute
   '/tesoreria/club-house': typeof TesoreriaClubHouseRoute
@@ -455,6 +463,7 @@ export interface FileRoutesById {
   '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
   '/gestionale/mappa': typeof GestionaleMappaRoute
   '/gestionale/mister': typeof GestionaleMisterRoute
+  '/gestionale/organigramma': typeof GestionaleOrganigrammaRoute
   '/gestionale_/impianti': typeof GestionaleImpiantiRouteWithChildren
   '/quadro/rotazione-campi': typeof QuadroRotazioneCampiRoute
   '/tesoreria_/biglietteria': typeof TesoreriaBiglietteriaRoute
@@ -509,6 +518,7 @@ export interface FileRouteTypes {
     | '/eventi/christmas-lario-cup'
     | '/gestionale/mappa'
     | '/gestionale/mister'
+    | '/gestionale/organigramma'
     | '/gestionale/impianti'
     | '/quadro/rotazione-campi'
     | '/tesoreria/biglietteria'
@@ -561,6 +571,7 @@ export interface FileRouteTypes {
     | '/eventi/christmas-lario-cup'
     | '/gestionale/mappa'
     | '/gestionale/mister'
+    | '/gestionale/organigramma'
     | '/quadro/rotazione-campi'
     | '/tesoreria/biglietteria'
     | '/tesoreria/club-house'
@@ -612,6 +623,7 @@ export interface FileRouteTypes {
     | '/eventi/christmas-lario-cup'
     | '/gestionale/mappa'
     | '/gestionale/mister'
+    | '/gestionale/organigramma'
     | '/gestionale_/impianti'
     | '/quadro/rotazione-campi'
     | '/tesoreria_/biglietteria'
@@ -665,6 +677,7 @@ export interface RootRouteChildren {
   EventiChristmasLarioCupRoute: typeof EventiChristmasLarioCupRoute
   GestionaleMappaRoute: typeof GestionaleMappaRoute
   GestionaleMisterRoute: typeof GestionaleMisterRoute
+  GestionaleOrganigrammaRoute: typeof GestionaleOrganigrammaRoute
   GestionaleImpiantiRoute: typeof GestionaleImpiantiRouteWithChildren
   QuadroRotazioneCampiRoute: typeof QuadroRotazioneCampiRoute
   TesoreriaBiglietteriaRoute: typeof TesoreriaBiglietteriaRoute
@@ -945,6 +958,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GestionaleMisterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/gestionale/organigramma': {
+      id: '/gestionale/organigramma'
+      path: '/gestionale/organigramma'
+      fullPath: '/gestionale/organigramma'
+      preLoaderRoute: typeof GestionaleOrganigrammaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/gestionale_/impianti': {
       id: '/gestionale_/impianti'
       path: '/gestionale/impianti'
@@ -1088,6 +1108,7 @@ const rootRouteChildren: RootRouteChildren = {
   EventiChristmasLarioCupRoute: EventiChristmasLarioCupRoute,
   GestionaleMappaRoute: GestionaleMappaRoute,
   GestionaleMisterRoute: GestionaleMisterRoute,
+  GestionaleOrganigrammaRoute: GestionaleOrganigrammaRoute,
   GestionaleImpiantiRoute: GestionaleImpiantiRouteWithChildren,
   QuadroRotazioneCampiRoute: QuadroRotazioneCampiRoute,
   TesoreriaBiglietteriaRoute: TesoreriaBiglietteriaRoute,

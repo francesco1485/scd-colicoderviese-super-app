@@ -1451,6 +1451,27 @@
           "NO_PERSONAL_DATA_IN_SUBJECT_FIELD",
           "SPACE_IDS_FROM_SEDI_E_IMPIANTI_MASTER"
         ]
+      },
+      {
+        "id": "SGS_QUALITY_MANUAL_2026",
+        "kind": "OFFICIAL_DOCUMENT",
+        "trust": "EXTERNAL_OFFICIAL",
+        "status": "ACTIVE_REFERENCE",
+        "title": "C.U. n.18 SGS 11/08/2026 - Manuale del Sistema di Qualità dei Club Giovanili, Edizione 2026",
+        "url": "https://piemontevda.lnd.it/wp-content/uploads/2026/08/CU-18-SGS.pdf",
+        "encoded_in": "config/sgs-quality-system.v1.json",
+        "authority_domains": [
+          "YOUTH_CLUB_QUALITY_LEVEL",
+          "YOUTH_STAFF_REQUIREMENTS",
+          "SGS_DEADLINES"
+        ],
+        "consumers": ["/gestionale/organigramma"],
+        "rules": [
+          "RULES_ONLY_NO_CLUB_STATUS_IN_REPO",
+          "CLUB_STATUS_FROM_SERVER_ENV_SCD_SGS_STATUS_JSON_NO_NAMES",
+          "UNKNOWN_IS_NOT_COVERED",
+          "REREAD_EACH_SEASON"
+        ]
       }
     ],
     "conflict_resolution": [

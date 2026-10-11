@@ -10,6 +10,7 @@ import { R20_LOGIN_LIVE, SATELLITES, type Satellite } from "./satellites";
 /** Sub-areas that are not in the access menu or rail: label and icon only. */
 const SUB_AREA_COPY: Readonly<Record<string, { label: string; icon: AreaIcon }>> = {
   mister: { label: "Mister", icon: "users" },
+  organigramma: { label: "Organigramma e 3° livello SGS", icon: "users" },
   "club-house": { label: "Club House", icon: "home" },
   biglietteria: { label: "Biglietteria", icon: "file" },
   "magazzino-cassa": { label: "Magazzino · cassa", icon: "box" },
