@@ -3,7 +3,7 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { classifyBash, findSecrets } from './scd-guard-lib.mjs';
+import { classifyBash, findSecrets, isBarePush } from './scd-guard-lib.mjs';
 
 const input = JSON.parse(await new Response(process.stdin).text() || '{}');
 const command = input?.tool_input?.command || '';
@@ -12,6 +12,16 @@ const verdict = classifyBash(command);
 if (verdict.block) {
   process.stderr.write(`SCD guard: ${verdict.reason}\n`);
   process.exit(2);
+}
+
+if (isBarePush(command)) {
+  const cwdRoot = gitRoot(input.cwd) || gitRoot(process.env.CLAUDE_PROJECT_DIR);
+  let branch = '';
+  try { branch = cwdRoot ? execFileSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { cwd: cwdRoot, encoding: 'utf8' }).trim() : ''; } catch { branch = ''; }
+  if (/^(main|master|production)$/.test(branch)) {
+    process.stderr.write(`SCD guard: you are on ${branch}; a bare git push would publish it. Pushing to main/production needs explicit approval from Francesco.\n`);
+    process.exit(2);
+  }
 }
 
 if (verdict.runManifest || verdict.scanStaged) {

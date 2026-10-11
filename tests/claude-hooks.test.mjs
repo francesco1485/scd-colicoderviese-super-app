@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { classifyBash, findSecrets, checkPath } from '../.claude/hooks/scd-guard-lib.mjs';
+import { classifyBash, findSecrets, checkPath, isBarePush } from '../.claude/hooks/scd-guard-lib.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const fakeIban = ['IT', '60', 'X', '0542811101', '000000123456'].join('');
@@ -83,4 +83,12 @@ test('session-state hook prints the SCD:STATE fields', () => {
   for (const field of ['REPOSITORY', 'CURRENT_WORKING_BRANCH', 'WORKING_TREE', 'MANIFEST_VERSION_OR_HASH', 'NO STATE -> NO WRITE']) {
     assert.match(r.stdout, new RegExp(field));
   }
+});
+
+test('detects pushes whose target depends on the current branch', () => {
+  assert.equal(isBarePush('git push'), true);
+  assert.equal(isBarePush('git push origin'), true);
+  assert.equal(isBarePush('git push -u origin'), true);
+  assert.equal(isBarePush('git push origin staging/superapp'), false);
+  assert.equal(isBarePush('npm test'), false);
 });

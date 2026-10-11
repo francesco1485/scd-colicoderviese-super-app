@@ -30,6 +30,14 @@ export function checkPath(filePath) {
   return FORBIDDEN_PATHS.filter(({ re, allow }) => re.test(p) && !(allow && allow.test(p))).map(({ id }) => id);
 }
 
+// True when `git push` names no refspec, so the target depends on the current branch.
+export function isBarePush(command) {
+  const m = (command || '').match(/\bgit push\b([^;&|]*)/);
+  if (!m) return false;
+  const args = m[1].trim().split(/\s+/).filter((a) => a && !a.startsWith('-'));
+  return args.length <= 1; // nothing, or only the remote name
+}
+
 // Returns { block: boolean, reason?: string, runManifest?: boolean, scanStaged?: boolean }
 export function classifyBash(command) {
   const cmd = (command || '').replace(/\s+/g, ' ').trim();
