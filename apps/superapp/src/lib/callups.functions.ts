@@ -8,6 +8,8 @@ import { z } from "zod";
 
 import { sessionView } from "./auth.functions";
 import { asOutcome, asResponse, matchTitle, meetingAtLiteral, validateCallupInput, type CallupResponse, type SendOutcome } from "./callups";
+import { deliveryNote } from "./push";
+import { notifyCallups } from "./push.server";
 import { teamCodeForGroup } from "./roster";
 import { serverSupabase } from "./supabase.server";
 
@@ -115,7 +117,9 @@ export const sendCallups = createServerFn({ method: "POST" })
     if (sent.error) return { ok: false, message: sent.error.message.includes("already played") ? "La gara è già stata giocata." : "Convocazione non inviata, riprova.", outcomes: [] };
     const outcomes = ((sent.data ?? []) as Array<{ athlete_id: string; outcome: string }>).map((r) => ({ athleteId: r.athlete_id, outcome: asOutcome(r.outcome) }));
     const n = outcomes.filter((o) => o.outcome === "SENT").length;
-    return { ok: n > 0, message: n > 0 ? `${n} convocati.` : "Nessun convocato: controlla certificati e tesseramenti.", outcomes };
+    if (n === 0) return { ok: false, message: "Nessun convocato: controlla certificati e tesseramenti.", outcomes };
+    const delivery = await notifyCallups(c.sb, ensured.data);
+    return { ok: true, message: `${n} convocati.${deliveryNote(delivery)}`, outcomes };
   });
 
 export const getMyCallups = createServerFn({ method: "GET" }).handler(async (): Promise<MyCallup[]> => {

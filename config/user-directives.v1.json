@@ -1562,6 +1562,29 @@
         "implementationStatus": "IMPLEMENTED_STAGING",
         "duplicate_work": "DENY"
       }
+    },
+    {
+      "id": "UD-066",
+      "name": "CALLUP_PHONE_NOTIFICATIONS",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "Allora cosa facciamo"
+      ],
+      "normalizedCommand": {
+        "rule": "User accepted the proposed plan item 'Notifiche sul telefono quando arriva una convocazione': families/athletes opt in from /famiglia; a phone notification is sent once per new call-up when the mister sends it.",
+        "scope": "FAMILY | CALLUPS | NOTIFICATIONS",
+        "constraints": [
+          "opt-in per device, can be switched off",
+          "no marketing",
+          "payload without phones, e-mails or health data",
+          "private key never in repo, Render or chat",
+          "separate push worker, offline worker untouched"
+        ],
+        "implementationStatus": "IMPLEMENTED_STAGING",
+        "duplicate_work": "DENY"
+      }
     }
   ],
   "completionGate": {

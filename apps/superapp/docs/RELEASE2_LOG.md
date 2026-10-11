@@ -216,3 +216,20 @@ prossimi impegni e "ci sarò" in primo piano). Desktop invariato.
   (nessun nome reale), nessuno scorrimento orizzontale.
 - Stato reale al 11/10: settore giovanile 0 date su 194 atleti; Prima 22 su 27 (13 scadute). Le convocazioni dei ragazzi
   restano bloccate finché la segreteria non inserisce le date.
+
+## Notifiche sul telefono per le convocazioni · 2026-10-11 sera (UD-066)
+
+- `VERIFIED` r67 (`20261011_r67_callup_push.sql`): `scd_push_subscriptions` (RLS attivo senza policy: nessun accesso diretto da
+  app o browser), `scd_push_subscribe` / `scd_push_unsubscribe` (disattiva, non cancella) / `scd_push_my_devices` per il proprio
+  telefono; `scd_push_callup_targets` e `scd_push_mark_sent` solo per il ruolo di servizio; `scd_match_callups.notified_at` = un
+  avviso per convocazione. Destinatari = account verificati dell'atleta o dei genitori/tutori della sua famiglia.
+  Prova annullata: convocazione di prova U15 → 1 telefono del genitore trovato; permessi: anonimo e utenti non leggono iscrizioni
+  né chiavi.
+- `VERIFIED` r67_1 (`20261011_r67_1_push_keys_in_vault.sql`): le chiavi VAPID nascono dentro la funzione e stanno solo in
+  Supabase Vault; l'app legge solo la chiave pubblica. Nessuna chiave nel repository, su Render o in chat.
+- Edge function `callup-push` (verify_jwt): verifica l'utente e che possa gestire la squadra della gara, invia, segna gli avvisi,
+  disattiva i telefoni non più validi (404/410).
+- App: card "Ricevi le convocazioni sul telefono" in `/famiglia` (stati: iPhone da aggiungere alla Home, attiva, bloccate, non
+  supportato); worker separato `/push-sw.js` (scope `/push/`, nessuna cache, apre `/famiglia` al tocco). Dopo "Invia
+  convocazione" il mister vede quanti avvisi sono partiti. Visual QA telefono (Android e iPhone simulati).
+- Da verificare su telefono vero: il primo invio reale (serve una gara nel calendario e una famiglia che abbia attivato).

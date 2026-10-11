@@ -6,6 +6,7 @@ import { useState } from "react";
 import { AccessScreenPage, accessHead } from "@/components/scd/AccessScreen";
 import { Card, Chip, type ChipTone } from "@/components/scd/interior-ui";
 import { InteriorShell } from "@/components/scd/InteriorShell";
+import { PushCard } from "@/components/scd/PushCard";
 import { EmptyState } from "@/components/scd/work-area-ui";
 import { getSession } from "@/lib/auth.functions";
 import { MY_RESPONSE_LABEL, romeDay, romeTime, type CallupResponse } from "@/lib/callups";
@@ -59,6 +60,7 @@ function FamilyHome({ roles, badge, members, callups, failed }: { roles: string[
       ]}
     >
       <div className="flex flex-col gap-[18px]">
+        <PushCard />
         <Card id="fam-convocazioni" title="Convocazioni" sub="Rispondi per ogni gara: il mister vede subito la risposta.">
           <div className="flex flex-col gap-3 px-4 pb-4 sm:px-[18px]">
             {failed ? (
