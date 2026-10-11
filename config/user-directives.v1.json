@@ -626,6 +626,51 @@
         ],
         "duplicate_work": "DENY"
       }
+    },
+    {
+      "id": "UD-025",
+      "name": "HOME_MULTI_MATCH_AND_OPPONENT_CRESTS",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "dal link a primo impatto mancano loghi squadre avversarie , e tanto altro ancora",
+        "se giocano 3 squadre in contemporanea serve vedere le tre squadre di impatto e poi il clandario si ottimo . va migliorato un po la grafica"
+      ],
+      "normalizedCommand": {
+        "rule": "The home hero shows every SCD match being played at the same time (not only one), and every match shows the opponent's official crest. Crests come only from official sources and are registered in config/scd-assets.v1.json; missing crests show a neutral placeholder, never a redrawn logo. Keep the calendar as it is and polish the overall graphics.",
+        "scope": "HALL",
+        "torreFloor": "0_HALL (/, /calendario)",
+        "constraints": [
+          "official crests only",
+          "no invented logos"
+        ],
+        "duplicate_work": "DENY"
+      }
+    },
+    {
+      "id": "UD-026",
+      "name": "CROVI_REALISTIC_IDOL_IN_CHAT",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "la situazione complessiva di chat e crovi che dovrebbe diventare idolo quindi renderlo reale in biglietteria",
+        "trovare il modo che diventi realistico all'improvviso si muove dentro ala chat e va a dire anche qualcosa",
+        "è altro 1,60 cm ha circa 70 anni , simparicone , bello paffuto , e tuttologo del calcio dilettanti e non solo , figura mitologica di segreteria"
+      ],
+      "normalizedCommand": {
+        "rule": "Crovi becomes the club's realistic mascot-idol: a realistic (never cartoon) figure about 1.60 m, around 70, friendly and chubby, know-it-all of amateur football, the mythical secretariat figure; present at the ticket office and in the chat, where he occasionally appears with a short movement and says something relevant. The archetype may recall classic warm Italian comic figures, but the likeness must not copy any real celebrity; a likeness of the real club member requires his written consent.",
+        "scope": "CHAT+BIGLIETTERIA",
+        "torreFloor": "0_HALL (chat) + 1_SERVIZI (biglietteria)",
+        "constraints": [
+          "realistic 3D, never cartoon",
+          "no celebrity likeness",
+          "consent of the real person before using his likeness",
+          "Fiorentina cap per previous instruction is a third-party brand: use a generic cap unless approved"
+        ],
+        "duplicate_work": "DENY"
+      }
     }
   ],
   "completionGate": {
