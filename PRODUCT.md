@@ -45,7 +45,8 @@ The only place where the club's real master calendar, training board, events and
 ## Evidence on Hand
 
 - Real calendar snapshot (156 events) and training board snapshot (16 slots) in `apps/superapp/src/data/`.
-- Official assets in `config/scd-assets.v1.json`. Partners on hand: HDI, Saglio, Legea, LND, FIGC SGS, AC Monza.
+- Official assets in `config/scd-assets.v1.json`. Logo files on hand: HDI, Saglio, Legea, LND, FIGC SGS, AC Monza (a logo file is not proof of an active contract).
+- Active sponsor contracts documented on 2026-10-11 (Master Sponsor + contracts PDF): ATV, ATL, New Generation, EdilMelos, Officine Pedroncelli, Coperture Rasero, Noratech. HDI expired 31/12/2025. Their official logos are still to be collected.
 - Missing and not to be invented: minibus routes and drivers, kit stock, fee amounts, sponsor package prices, first-aid service schedule.
 
 ## Product Principles
