@@ -95,17 +95,18 @@ function InsideCard({ s }: { s: AccessScreen }) {
         </p>
       )}
 
-      <Link to={s.enter.href as never} className="scd-action mt-5 h-[52px] w-full text-[17px] font-bold" data-testid="access-enter">
-        Entra
+      <Link to="/accedi" search={{ next: s.path }} className="scd-action mt-5 h-[52px] w-full text-[17px] font-bold" data-testid="access-enter">
+        Accedi con la tua e-mail
         <ArrowRight className="size-5" strokeWidth={2} aria-hidden="true" />
+      </Link>
+      <Link to={s.enter.href as never} className="scd-focus mt-2.5 inline-flex h-11 w-full items-center justify-center gap-2 rounded-[10px] border border-[#b9d5ef] bg-white text-[15px] font-semibold text-[var(--in-info)] transition-colors duration-150 hover:bg-[var(--in-info-bg)]" data-testid="access-landing">
+        Cosa c'è nell'area
       </Link>
       <button type="button" onClick={openAccessMenu} className="scd-focus mt-2.5 inline-flex h-11 w-full items-center justify-center gap-2 rounded-[10px] border border-[#b9d5ef] bg-white text-[15px] font-semibold text-[var(--in-info)] transition-colors duration-150 hover:bg-[var(--in-info-bg)]">
         Torna alle aree
       </button>
       <p className="mt-3 text-[14px] leading-snug text-[var(--in-sub)]">
-        {s.loginLive
-          ? "Lo stesso account SCD apre tutte le aree a cui hai accesso."
-          : "Gli accessi personali si stanno attivando: «Entra» apre l'ingresso dell'area con lo stato aggiornato. Lo stesso account SCD aprirà tutte le aree a cui hai accesso."}
+        Ricevi un link via e-mail, senza password. Lo stesso account apre tutte le aree del ruolo che la società ti ha assegnato.
       </p>
     </section>
   );

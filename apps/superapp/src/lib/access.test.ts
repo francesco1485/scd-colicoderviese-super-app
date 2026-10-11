@@ -161,12 +161,20 @@ describe("work areas: real read-only pages behind the same access gate", () => {
     expect(whoEnters(accessScreen("mister"))).toBe("mister, dirigenti di annata");
   });
 
-  it("shows the access screen without a verified session, whatever the roles claimed", () => {
+  it("shows the access screen without a verified session; a verified session opens only its areas", () => {
     for (const id of WORK_AREA_IDS) {
       expect(workAreaView(id, { preview: false, sessionRoles: null }), id).toEqual({ view: "access", preview: false });
-      // R20 login is not live: no client-provided role can open a page today.
-      expect(workAreaView(id, { preview: false, sessionRoles: new Set(["direzione"]) }).view, id).toBe(R20_LOGIN_LIVE ? "page" : "access");
+      expect(workAreaView(id, { preview: false, sessionRoles: new Set() }), id).toEqual({ view: "access", preview: false });
+      // Direzione sees every area.
+      expect(workAreaView(id, { preview: false, sessionRoles: new Set(["direzione"]) }), id).toEqual({ view: "page", preview: false });
+      // A family session is not staff: areas whose roles are still "to define" stay closed to it.
+      const area = findArea(id)!;
+      const family = workAreaView(id, { preview: false, sessionRoles: new Set(["famiglia"]) }).view;
+      expect(family, id).toBe(area.roles?.includes("famiglia") ? "page" : "access");
     }
+    expect(workAreaView("pulmini", { preview: false, sessionRoles: new Set(["autista"]) }).view).toBe("page");
+    expect(workAreaView("pulmini", { preview: false, sessionRoles: new Set(["mister"]) }).view).toBe("access");
+    expect(R20_LOGIN_LIVE).toBe(false);
   });
 
   it("opens the page only with the staging preview, flagged for the banner", () => {

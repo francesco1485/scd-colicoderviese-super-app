@@ -1337,6 +1337,30 @@
         "implementationStatus": "STAGING",
         "duplicate_work": "DENY"
       }
+    },
+    {
+      "id": "UD-056",
+      "name": "CRM_PROMPT_LIBRARY_AND_SMART_ROUTING",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "ora ti ho dato tutto per lavorare e completare al massimo il lavoro",
+        "questi comandi lasciali nella memoria anche di futuri progetti che andremo a sviluppare o future chat"
+      ],
+      "normalizedCommand": {
+        "rule": "The 14 prompt templates, role instructions and automation payloads supplied on 2026-10-11 (data-entry CRM table, inside-sales emails, sales-director report, HubSpot note, Meta Lead Ads qualification, inbox triage JSON, Make.com/Claude payloads, system prompts V5.0 commercial MEDDIC+BANT, V5.1 sport/wellness compliance, V6.0 sponsorship + smart links) are working material to keep for this and future projects and to incorporate into the Super App: Sky's commercial competences (GROW), secretariat compliance logic, post-login smart routing by role/state.",
+        "scope": "SUPER_APP | SCD_GROW | SKY",
+        "torreFloor": "-1 (Sky/automazioni), 2 (segreteria), 4 (sponsor)",
+        "constraints": [
+          "verbatim texts in config/scd-prompt-library.v1.json; index in project memory",
+          "templates arrived with placeholders only: never fill them with invented data",
+          "sample requests describe a different organization (SSD arl with SPA/SRL): only the patterns transfer",
+          "Sky is rule-based today: templates needing a language model stay SPEC_ONLY until that step exists"
+        ],
+        "implementationStatus": "PARTIAL (smart routing after login on staging; the rest registered)",
+        "duplicate_work": "DENY"
+      }
     }
   ],
   "completionGate": {

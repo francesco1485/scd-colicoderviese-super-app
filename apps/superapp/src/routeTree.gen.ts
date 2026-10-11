@@ -33,6 +33,8 @@ import { Route as SocietaRouteImport } from './routes/societa'
 import { Route as SponsorRouteImport } from './routes/sponsor'
 import { Route as SquadreRouteImport } from './routes/squadre'
 import { Route as TesoreriaRouteImport } from './routes/tesoreria'
+import { Route as AccediIndexRouteImport } from './routes/accedi.index'
+import { Route as AccediConfermaRouteImport } from './routes/accedi.conferma'
 import { Route as AreeIndexRouteImport } from './routes/aree.index'
 import { Route as AreeAreaRouteImport } from './routes/aree.$area'
 import { Route as CalendarioRotazioneCampiRouteImport } from './routes/calendario_.rotazione-campi'
@@ -179,6 +181,16 @@ const SquadreRoute = SquadreRouteImport.update({
 const TesoreriaRoute = TesoreriaRouteImport.update({
   id: '/tesoreria',
   path: '/tesoreria',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccediIndexRoute = AccediIndexRouteImport.update({
+  id: '/accedi/',
+  path: '/accedi/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccediConfermaRoute = AccediConfermaRouteImport.update({
+  id: '/accedi/conferma',
+  path: '/accedi/conferma',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AreeIndexRoute = AreeIndexRouteImport.update({
@@ -347,6 +359,7 @@ export interface FileRoutesByFullPath {
   '/sponsor': typeof SponsorRoute
   '/squadre': typeof SquadreRoute
   '/tesoreria': typeof TesoreriaRoute
+  '/accedi/conferma': typeof AccediConfermaRoute
   '/aree/$area': typeof AreeAreaRoute
   '/calendario/rotazione-campi': typeof CalendarioRotazioneCampiRoute
   '/core/atleta': typeof CoreAtletaRoute
@@ -363,6 +376,7 @@ export interface FileRoutesByFullPath {
   '/tesoreria/biglietteria': typeof TesoreriaBiglietteriaRoute
   '/tesoreria/club-house': typeof TesoreriaClubHouseRoute
   '/tesoreria/magazzino': typeof TesoreriaMagazzinoRoute
+  '/accedi/': typeof AccediIndexRoute
   '/aree/': typeof AreeIndexRoute
   '/core/': typeof CoreIndexRoute
   '/eventi/': typeof EventiIndexRoute
@@ -400,6 +414,7 @@ export interface FileRoutesByTo {
   '/sponsor': typeof SponsorRoute
   '/squadre': typeof SquadreRoute
   '/tesoreria': typeof TesoreriaRoute
+  '/accedi/conferma': typeof AccediConfermaRoute
   '/aree/$area': typeof AreeAreaRoute
   '/calendario/rotazione-campi': typeof CalendarioRotazioneCampiRoute
   '/core/atleta': typeof CoreAtletaRoute
@@ -415,6 +430,7 @@ export interface FileRoutesByTo {
   '/tesoreria/biglietteria': typeof TesoreriaBiglietteriaRoute
   '/tesoreria/club-house': typeof TesoreriaClubHouseRoute
   '/tesoreria/magazzino': typeof TesoreriaMagazzinoRoute
+  '/accedi': typeof AccediIndexRoute
   '/aree': typeof AreeIndexRoute
   '/core': typeof CoreIndexRoute
   '/eventi': typeof EventiIndexRoute
@@ -453,6 +469,7 @@ export interface FileRoutesById {
   '/sponsor': typeof SponsorRoute
   '/squadre': typeof SquadreRoute
   '/tesoreria': typeof TesoreriaRoute
+  '/accedi/conferma': typeof AccediConfermaRoute
   '/aree/$area': typeof AreeAreaRoute
   '/calendario_/rotazione-campi': typeof CalendarioRotazioneCampiRoute
   '/core/atleta': typeof CoreAtletaRoute
@@ -469,6 +486,7 @@ export interface FileRoutesById {
   '/tesoreria_/biglietteria': typeof TesoreriaBiglietteriaRoute
   '/tesoreria_/club-house': typeof TesoreriaClubHouseRoute
   '/tesoreria_/magazzino': typeof TesoreriaMagazzinoRoute
+  '/accedi/': typeof AccediIndexRoute
   '/aree/': typeof AreeIndexRoute
   '/core/': typeof CoreIndexRoute
   '/eventi/': typeof EventiIndexRoute
@@ -508,6 +526,7 @@ export interface FileRouteTypes {
     | '/sponsor'
     | '/squadre'
     | '/tesoreria'
+    | '/accedi/conferma'
     | '/aree/$area'
     | '/calendario/rotazione-campi'
     | '/core/atleta'
@@ -524,6 +543,7 @@ export interface FileRouteTypes {
     | '/tesoreria/biglietteria'
     | '/tesoreria/club-house'
     | '/tesoreria/magazzino'
+    | '/accedi/'
     | '/aree/'
     | '/core/'
     | '/eventi/'
@@ -561,6 +581,7 @@ export interface FileRouteTypes {
     | '/sponsor'
     | '/squadre'
     | '/tesoreria'
+    | '/accedi/conferma'
     | '/aree/$area'
     | '/calendario/rotazione-campi'
     | '/core/atleta'
@@ -576,6 +597,7 @@ export interface FileRouteTypes {
     | '/tesoreria/biglietteria'
     | '/tesoreria/club-house'
     | '/tesoreria/magazzino'
+    | '/accedi'
     | '/aree'
     | '/core'
     | '/eventi'
@@ -613,6 +635,7 @@ export interface FileRouteTypes {
     | '/sponsor'
     | '/squadre'
     | '/tesoreria'
+    | '/accedi/conferma'
     | '/aree/$area'
     | '/calendario_/rotazione-campi'
     | '/core/atleta'
@@ -629,6 +652,7 @@ export interface FileRouteTypes {
     | '/tesoreria_/biglietteria'
     | '/tesoreria_/club-house'
     | '/tesoreria_/magazzino'
+    | '/accedi/'
     | '/aree/'
     | '/core/'
     | '/eventi/'
@@ -667,6 +691,7 @@ export interface RootRouteChildren {
   SponsorRoute: typeof SponsorRoute
   SquadreRoute: typeof SquadreRoute
   TesoreriaRoute: typeof TesoreriaRoute
+  AccediConfermaRoute: typeof AccediConfermaRoute
   AreeAreaRoute: typeof AreeAreaRoute
   CalendarioRotazioneCampiRoute: typeof CalendarioRotazioneCampiRoute
   CoreAtletaRoute: typeof CoreAtletaRoute
@@ -683,6 +708,7 @@ export interface RootRouteChildren {
   TesoreriaBiglietteriaRoute: typeof TesoreriaBiglietteriaRoute
   TesoreriaClubHouseRoute: typeof TesoreriaClubHouseRoute
   TesoreriaMagazzinoRoute: typeof TesoreriaMagazzinoRoute
+  AccediIndexRoute: typeof AccediIndexRoute
   AreeIndexRoute: typeof AreeIndexRoute
   CoreIndexRoute: typeof CoreIndexRoute
   EventiIndexRoute: typeof EventiIndexRoute
@@ -858,6 +884,20 @@ declare module '@tanstack/react-router' {
       path: '/tesoreria'
       fullPath: '/tesoreria'
       preLoaderRoute: typeof TesoreriaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/accedi/': {
+      id: '/accedi/'
+      path: '/accedi'
+      fullPath: '/accedi/'
+      preLoaderRoute: typeof AccediIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/accedi/conferma': {
+      id: '/accedi/conferma'
+      path: '/accedi/conferma'
+      fullPath: '/accedi/conferma'
+      preLoaderRoute: typeof AccediConfermaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/aree/': {
@@ -1098,6 +1138,7 @@ const rootRouteChildren: RootRouteChildren = {
   SponsorRoute: SponsorRoute,
   SquadreRoute: SquadreRoute,
   TesoreriaRoute: TesoreriaRoute,
+  AccediConfermaRoute: AccediConfermaRoute,
   AreeAreaRoute: AreeAreaRoute,
   CalendarioRotazioneCampiRoute: CalendarioRotazioneCampiRoute,
   CoreAtletaRoute: CoreAtletaRoute,
@@ -1114,6 +1155,7 @@ const rootRouteChildren: RootRouteChildren = {
   TesoreriaBiglietteriaRoute: TesoreriaBiglietteriaRoute,
   TesoreriaClubHouseRoute: TesoreriaClubHouseRoute,
   TesoreriaMagazzinoRoute: TesoreriaMagazzinoRoute,
+  AccediIndexRoute: AccediIndexRoute,
   AreeIndexRoute: AreeIndexRoute,
   CoreIndexRoute: CoreIndexRoute,
   EventiIndexRoute: EventiIndexRoute,

@@ -9,6 +9,7 @@
 import { createServerFn } from "@tanstack/react-start";
 
 import { workAreaView, type WorkAreaGate } from "./access";
+import { sessionRoles } from "./auth.functions";
 import { stagingPreviewEnabled } from "./impianti-access";
 import { SGS_RULES, emptyStatus, parseStatus, type ClubStatus, type Level } from "./sgs-quality";
 
@@ -21,8 +22,8 @@ export interface OrganigrammaData {
   statusConfigured: boolean;
 }
 
-export function organigrammaData(env: Readonly<Record<string, string | undefined>>, isProd: boolean): OrganigrammaData {
-  const gate = workAreaView("organigramma", { preview: stagingPreviewEnabled(env, isProd), sessionRoles: null });
+export function organigrammaData(env: Readonly<Record<string, string | undefined>>, isProd: boolean, roles: ReadonlySet<string> | null = null): OrganigrammaData {
+  const gate = workAreaView("organigramma", { preview: stagingPreviewEnabled(env, isProd), sessionRoles: roles });
   const target = Math.min(5, Math.max(1, SGS_RULES.targetLevel)) as Level;
   if (gate.view !== "page") return { gate, status: emptyStatus(), level: target, statusConfigured: false };
   const raw = env["SCD_SGS_STATUS_JSON"];
@@ -38,7 +39,7 @@ export function organigrammaData(env: Readonly<Record<string, string | undefined
  */
 export const getSgsStatus = createServerFn({ method: "GET" }).handler(
   async (): Promise<Omit<OrganigrammaData, "gate">> => {
-    const { gate: _gate, ...rest } = organigrammaData(process.env, import.meta.env.PROD);
+    const { gate: _gate, ...rest } = organigrammaData(process.env, import.meta.env.PROD, await sessionRoles());
     return rest;
   },
 );

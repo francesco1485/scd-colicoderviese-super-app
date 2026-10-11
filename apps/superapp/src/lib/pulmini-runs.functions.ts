@@ -5,6 +5,7 @@
 import { createServerFn } from "@tanstack/react-start";
 
 import { workAreaView, type WorkAreaGate } from "./access";
+import { sessionRoles } from "./auth.functions";
 import { stagingPreviewEnabled } from "./impianti-access";
 import { parseRuns, type PulminiRuns } from "./pulmini-runs";
 
@@ -13,14 +14,14 @@ export interface PulminiRunsData extends PulminiRuns {
   configured: boolean;
 }
 
-export function pulminiRunsData(env: Readonly<Record<string, string | undefined>>, isProd: boolean): PulminiRunsData {
-  const gate = workAreaView("pulmini", { preview: stagingPreviewEnabled(env, isProd), sessionRoles: null });
+export function pulminiRunsData(env: Readonly<Record<string, string | undefined>>, isProd: boolean, roles: ReadonlySet<string> | null = null): PulminiRunsData {
+  const gate = workAreaView("pulmini", { preview: stagingPreviewEnabled(env, isProd), sessionRoles: roles });
   if (gate.view !== "page") return { gate, asOf: null, runs: [], configured: false };
   const raw = env["SCD_PULMINI_RUNS_JSON"];
   return { gate, ...parseRuns(raw), configured: Boolean(raw && raw.trim()) };
 }
 
 export const getPulminiRuns = createServerFn({ method: "GET" }).handler(async (): Promise<Omit<PulminiRunsData, "gate">> => {
-  const { gate: _gate, ...rest } = pulminiRunsData(process.env, import.meta.env.PROD);
+  const { gate: _gate, ...rest } = pulminiRunsData(process.env, import.meta.env.PROD, await sessionRoles());
   return rest;
 });

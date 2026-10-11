@@ -1,9 +1,10 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { ChevronDown, Lock, X } from "lucide-react";
+import { ChevronDown, Lock, LogIn, ShieldCheck, X } from "lucide-react";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { ACCESS_MENU, areaLink, type MenuEntry, type MenuGroup } from "@/lib/areas";
+import { getSession, type SessionView } from "@/lib/auth.functions";
 import { AREA_ICON } from "./area-icons";
 
 /** Opens the "Accesso aree" menu from anywhere (e.g. a CTA on a page). */
@@ -41,6 +42,41 @@ function Entry({ entry, onNavigate }: { entry: MenuEntry; onNavigate: () => void
   return (
     <Link to={link.href as never} onClick={onNavigate} className={`${cls} scd-focus transition-colors duration-150 hover:bg-[#eef6fd]`}>
       {body}
+    </Link>
+  );
+}
+
+/** Who is logged in (verified on the server), or the way in. Loaded when the panel opens. */
+function SessionStrip({ pathname, onNavigate }: { pathname: string; onNavigate: () => void }) {
+  const [s, setS] = useState<SessionView | null | undefined>(undefined);
+  useEffect(() => {
+    let alive = true;
+    getSession()
+      .then((v) => alive && setS(v))
+      .catch(() => alive && setS(null));
+    return () => {
+      alive = false;
+    };
+  }, []);
+  if (s === undefined) return <p className="px-3 py-2 text-[13.5px] text-[var(--in-sub)]" role="status">Controllo l'accesso…</p>;
+  if (s?.user) {
+    return (
+      <Link to="/accedi" search={{ next: undefined }} onClick={onNavigate} className="scd-focus mx-1 flex items-center gap-3 rounded-xl bg-[#e3f3e9] px-3 py-2.5 text-[var(--in-ink)]" data-testid="menu-session">
+        <ShieldCheck className="size-5 shrink-0 text-[#0b8a43]" strokeWidth={2} aria-hidden="true" />
+        <span className="min-w-0">
+          <b className="block truncate text-[15px] leading-tight">{s.user.email}</b>
+          <small className="block text-[13px] text-[#14532d]">{s.badge} · gestisci l'accesso</small>
+        </span>
+      </Link>
+    );
+  }
+  return (
+    <Link to="/accedi" search={{ next: pathname.startsWith("/accedi") ? undefined : pathname }} onClick={onNavigate} className="scd-focus mx-1 flex items-center gap-3 rounded-xl bg-[var(--in-info-bg)] px-3 py-2.5 text-[var(--in-ink)]" data-testid="menu-login">
+      <LogIn className="size-5 shrink-0 text-[var(--in-info)]" strokeWidth={2} aria-hidden="true" />
+      <span className="min-w-0">
+        <b className="block text-[15px] leading-tight">Accedi con la tua e-mail</b>
+        <small className="block text-[13px] text-[var(--in-sub)]">{s && !s.configured ? "Accesso in attivazione su questo server" : "Un link, nessuna password: entri nelle aree del tuo ruolo"}</small>
+      </span>
     </Link>
   );
 }
@@ -136,6 +172,7 @@ export function AccessMenu() {
                 <X className="size-5" aria-hidden="true" />
               </button>
             </div>
+            <div className="mb-3"><SessionStrip pathname={pathname} onNavigate={navigate} /></div>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-1.5 lg:gap-y-3.5">
               <div className="grid content-start gap-4 lg:gap-3.5">
                 <Group group={famiglie} onNavigate={navigate} />

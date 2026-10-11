@@ -6,6 +6,7 @@
  */
 import { ACCESS_MENU, ACCESS_SCREEN_IDS, WORK_AREA_IDS, canSeeArea, findArea, labelIndex, type AreaIcon, type FlatArea } from "./areas";
 import { R20_LOGIN_LIVE, SATELLITES, type Satellite } from "./satellites";
+import { isStaffSession } from "./session";
 
 /** Sub-areas that are not in the access menu or rail: label and icon only. */
 const SUB_AREA_COPY: Readonly<Record<string, { label: string; icon: AreaIcon }>> = {
@@ -140,8 +141,8 @@ export interface WorkAreaGateInput {
   /** Staging-only preview (stagingPreviewEnabled, src/lib/impianti-access.ts), decided on the server. */
   preview: boolean;
   /**
-   * Roles of a session verified on the server by R20, or null when there is none.
-   * Today R20 exposes no login action (satellites.ts R20_LOGIN_LIVE), so callers pass null.
+   * Positions of a session verified on the server (Supabase SCD, src/lib/auth.functions.ts →
+   * src/lib/session.ts), or null when there is none. The client-side token is never trusted.
    */
   sessionRoles: ReadonlySet<string> | null;
 }
@@ -153,14 +154,16 @@ export interface WorkAreaGate {
 }
 
 /**
- * Gate of a work area: the read-only page for a verified session with an allowed role
- * (registry roles, Direzione sees all), otherwise the area's access screen. The staging
- * preview opens the page with a banner. Grants nothing: it only picks what to render.
+ * Gate of a work area: the page for a verified session with an allowed position (registry
+ * roles, Direzione sees all; areas whose roles are still "to define" open only to staff
+ * positions), otherwise the area's access screen. The staging preview opens the page with a
+ * banner. Grants nothing: it only picks what to render.
  */
 export function workAreaView(id: string, { preview, sessionRoles }: WorkAreaGateInput): WorkAreaGate {
   if (!WORK_AREA_IDS.includes(id)) throw new Error(`Area "${id}" is not a work area`);
   const area = findArea(id)!;
-  const allowed = R20_LOGIN_LIVE && sessionRoles !== null && sessionRoles.size > 0 && canSeeArea(area, sessionRoles);
+  const staffOnly = !area.roles || area.roles.length === 0;
+  const allowed = sessionRoles !== null && sessionRoles.size > 0 && canSeeArea(area, sessionRoles) && (!staffOnly || isStaffSession(sessionRoles));
   if (allowed) return { view: "page", preview: false };
   if (preview) return { view: "page", preview: true };
   return { view: "access", preview: false };
