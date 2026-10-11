@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 
 import croviAvatar from "@/assets/crovi/crovi-avatar-256.webp.asset.json";
 import { CroviActor } from "@/components/CroviActor";
-import { CAMEO_SEEN_KEY, CAMEO_VISIBLE_MS, cameoDelayMs, cameoLine, type CameoLine } from "@/lib/crovi-cameo";
+import { CAMEO_SEEN_KEY, CAMEO_VISIBLE_MS, FORCED_CAMEO_DELAY_MS, cameoDelayMs, cameoLine, forceCameo, type CameoLine } from "@/lib/crovi-cameo";
 import { askSky, type SkyReply } from "@/lib/sky.functions";
 
 type Mood = SkyReply["mood"];
@@ -58,15 +58,16 @@ export function SkyChat() {
 
   // Crovi cameo (UD-026): una volta per visita sbuca accanto alla chat e dice una frase sulla pagina.
   useEffect(() => {
+    const forced = forceCameo(window.location.search);
     let seen = false;
     try { seen = sessionStorage.getItem(CAMEO_SEEN_KEY) === "1"; } catch { /* storage off: show once per page load */ }
-    if (seen) return;
+    if (seen && !forced) return;
     const t = setTimeout(() => {
       const line = cameoLine(pathRef.current);
       if (!line) return;
       setCameo(line);
       try { sessionStorage.setItem(CAMEO_SEEN_KEY, "1"); } catch { /* ignore */ }
-    }, cameoDelayMs(Math.random()));
+    }, forced ? FORCED_CAMEO_DELAY_MS : cameoDelayMs(Math.random()));
     return () => clearTimeout(t);
   }, []);
   useEffect(() => {
@@ -147,7 +148,7 @@ export function SkyChat() {
       )}
       {cameo && !open && (
         <div role="status" aria-live="polite" className="crovi-cameo flex items-end gap-1" data-testid="crovi-cameo">
-          <div className="mb-12 min-w-0 max-w-[min(13.5rem,calc(100vw-10.5rem))] rounded-2xl rounded-br-sm border border-border bg-card px-3 py-2.5 text-[0.8rem] leading-snug text-foreground shadow-premium">
+          <div className="mb-12 min-w-0 max-w-[min(13.5rem,calc(100vw-12.5rem))] rounded-2xl rounded-br-sm border border-border bg-card px-3 py-2.5 text-[0.8rem] leading-snug text-foreground shadow-premium">
             <p className="m-0">{cameo.text}</p>
             <div className="mt-2 flex items-center gap-2">
               <button

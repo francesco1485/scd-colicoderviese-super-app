@@ -6,6 +6,7 @@ import {
   CROVI_AVATAR,
   CROVI_POSES,
   cameoDelayMs,
+  forceCameo,
   cameoLine,
   croviFrame,
   isInterior,
@@ -58,9 +59,16 @@ describe("Crovi cameo", () => {
   });
 
   it("serves every pose and the avatar from the versioned folder", () => {
-    for (const p of CROVI_POSES) expect(croviFrame(p)).toMatch(/^\/media\/crovi\/v2\/crovi-[a-z]+-440\.webp$/);
+    for (const p of CROVI_POSES) expect(croviFrame(p)).toMatch(/^\/media\/crovi\/v3\/crovi-[a-z]+-440\.webp$/);
     expect(croviFrame("laugh", 900)).toContain("-900.webp");
-    expect(CROVI_AVATAR).toBe("/media/crovi/v2/crovi-avatar-256.webp");
+    expect(CROVI_AVATAR).toBe("/media/crovi/v3/crovi-avatar-256.webp");
+  });
+
+  it("shows at once with ?crovi in the address", () => {
+    expect(forceCameo("?crovi")).toBe(true);
+    expect(forceCameo("?squadra=u16&crovi=1")).toBe(true);
+    expect(forceCameo("")).toBe(false);
+    expect(forceCameo("?croviX=1")).toBe(false);
   });
 
   it("never states scores, times or names", () => {

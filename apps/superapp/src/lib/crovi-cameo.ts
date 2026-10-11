@@ -44,6 +44,16 @@ export function cameoDelayMs(random: number): number {
 }
 
 export const CAMEO_SEEN_KEY = "scd-crovi-cameo";
+
+/** "?crovi" in the address shows the cameo straight away, even if already seen (demo link). */
+export function forceCameo(search: string): boolean {
+  try {
+    return new URLSearchParams(search).has("crovi");
+  } catch {
+    return false;
+  }
+}
+export const FORCED_CAMEO_DELAY_MS = 1_500;
 /** How long the cameo stays before leaving on its own. */
 export const CAMEO_VISIBLE_MS = 9_000;
 
@@ -54,10 +64,10 @@ export const CROVI_POSES = ["wave", "point", "thumbs", "laugh"] as const;
 export type CroviPose = (typeof CROVI_POSES)[number];
 
 /** Media live under a versioned folder so phones never keep showing an older face from cache. */
-const CROVI_MEDIA = "/media/crovi/v2";
+const CROVI_MEDIA = "/media/crovi/v3";
 export const CROVI_AVATAR = `${CROVI_MEDIA}/crovi-avatar-256.webp`;
 /** Width / height of every pose frame (all frames share one canvas and one baseline). */
-export const CROVI_FRAME_RATIO = 645 / 1374;
+export const CROVI_FRAME_RATIO = 618 / 900;
 
 export function croviFrame(pose: CroviPose, size: 440 | 900 = 440): string {
   return `${CROVI_MEDIA}/crovi-${pose}-${size}.webp`;
