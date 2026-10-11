@@ -1,4 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
+import { BUILD_STAMP } from "@/lib/build-stamp";
 import {
   CalendarCheck, CalendarDays, Circle, Ellipsis, House, Lock, Menu, Newspaper, Shirt, ShieldCheck, UserRound, UsersRound, X,
   type LucideIcon,
@@ -297,7 +298,7 @@ export function SiteFooter() {
         </nav>
         <button type="button" onClick={openCookiePrefs} className="self-start text-sm underline opacity-80 hover:opacity-100">Preferenze cookie</button>
         <p className="text-xs opacity-60">
-          © {new Date().getFullYear()} {CLUB_NAME} — Super App ufficiale · anteprima locale.
+          © {new Date().getFullYear()} {CLUB_NAME} — Super App ufficiale · versione di prova del {BUILD_STAMP}.
         </p>
       </div>
     </footer>

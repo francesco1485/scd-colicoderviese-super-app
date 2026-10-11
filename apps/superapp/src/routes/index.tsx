@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { BUILD_STAMP } from "@/lib/build-stamp";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
@@ -443,6 +444,9 @@ function Home() {
           <span className="inline-block -rotate-[4deg]">
             Colico Derviese Sempre!
           </span>
+        </p>
+        <p className="mt-3 text-center text-[11.5px] text-[#a9bfe3]">
+          Versione di prova del {BUILD_STAMP}
         </p>
       </div>
 

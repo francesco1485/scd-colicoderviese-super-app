@@ -10,6 +10,19 @@ import { VitePWA } from "vite-plugin-pwa";
 
 const NITRO_PRESET = process.env["NITRO_PRESET"] || "node-server";
 
+/** Visible build stamp ("versione del 11/10 11:55 · abc1234") so reviewers know which deploy they see. */
+const BUILD_STAMP = (() => {
+  const when = new Intl.DateTimeFormat("it-IT", {
+    timeZone: "Europe/Rome",
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date()).replace(",", "");
+  const sha = (process.env["RENDER_GIT_COMMIT"] || process.env["GITHUB_SHA"] || "").slice(0, 7);
+  return sha ? `${when} · ${sha}` : when;
+})();
+
 export default defineConfig({
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
@@ -20,6 +33,7 @@ export default defineConfig({
     preset: NITRO_PRESET,
   },
   vite: {
+    define: { __SCD_BUILD__: JSON.stringify(BUILD_STAMP) },
     plugins: [
       VitePWA({
         // Update prompt richiesto: l'utente conferma l'aggiornamento.
