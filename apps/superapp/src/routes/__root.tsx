@@ -137,8 +137,11 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  // Work areas (staticData.interior) bring their own shell: no public chrome around them.
-  const interior = useMatches({ select: (ms) => ms.some((m) => m.staticData?.interior === true) });
+  // Work areas (staticData.interior, or a gated work area whose loader opened the page) bring
+  // their own shell: no public chrome around them. A gated area showing its access screen keeps it.
+  const interior = useMatches({
+    select: (ms) => ms.some((m) => m.staticData?.interior === true || (m.loaderData as { interior?: unknown } | undefined)?.interior === true),
+  });
 
   if (interior) {
     return (

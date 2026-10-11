@@ -6,7 +6,7 @@ import {
 import { useEffect, useState } from "react";
 
 import crest from "@/assets/brand/logo-scd.png.asset.json";
-import { ACCESS_SCREEN_IDS, findArea } from "@/lib/areas";
+import { ACCESS_SCREEN_IDS, WORK_AREA_IDS, findArea } from "@/lib/areas";
 import { openCookiePrefs } from "./CookieConsent";
 import { AccessMenu, openAccessMenu } from "./scd/AccessMenu";
 
@@ -88,7 +88,8 @@ const footerLinks: readonly NavItem[] = [
  * Schermate costruite sulle tavole: hanno la propria testata (stemma + wordmark/titolo), quindi su
  * smartphone la barra superiore generica non viene mostrata. Su desktop resta la navigazione completa.
  */
-const ACCESS_SCREEN_PATHS = ACCESS_SCREEN_IDS.map((id) => findArea(id)?.path).filter((p): p is string => !!p);
+// Gated work areas render their access screen without a session: same board header.
+const ACCESS_SCREEN_PATHS = [...ACCESS_SCREEN_IDS, ...WORK_AREA_IDS].map((id) => findArea(id)?.path).filter((p): p is string => !!p);
 const BOARD_ROUTES = ["/", "/calendario", "/allenamenti", "/comunicazioni", "/core", "/core/atleta", "/core/famiglia", "/core/staff", "/core/impianti-calendari", "/grow", ...ACCESS_SCREEN_PATHS];
 export const isBoardRoute = (p: string) => BOARD_ROUTES.includes(p.replace(/\/$/, "") || "/");
 

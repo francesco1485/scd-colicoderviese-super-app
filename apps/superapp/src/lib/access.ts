@@ -4,11 +4,12 @@
  * (src/lib/satellites.ts). Pure data: no login, no roles granted, no session.
  * Every line shown comes from those two files or is rendered as "to define".
  */
-import { ACCESS_MENU, ACCESS_SCREEN_IDS, findArea, labelIndex, type AreaIcon, type FlatArea } from "./areas";
+import { ACCESS_MENU, ACCESS_SCREEN_IDS, WORK_AREA_IDS, canSeeArea, findArea, labelIndex, type AreaIcon, type FlatArea } from "./areas";
 import { R20_LOGIN_LIVE, SATELLITES, type Satellite } from "./satellites";
 
 /** Sub-areas that are not in the access menu or rail: label and icon only. */
 const SUB_AREA_COPY: Readonly<Record<string, { label: string; icon: AreaIcon }>> = {
+  mister: { label: "Mister", icon: "users" },
   "club-house": { label: "Club House", icon: "home" },
   biglietteria: { label: "Biglietteria", icon: "file" },
   "magazzino-cassa": { label: "Magazzino · cassa", icon: "box" },
@@ -92,7 +93,7 @@ function landingFor(area: FlatArea): Satellite | undefined {
 }
 
 export function accessScreen(id: string): AccessScreen {
-  if (!ACCESS_SCREEN_IDS.includes(id)) throw new Error(`Area "${id}" has no access screen`);
+  if (!ACCESS_SCREEN_IDS.includes(id) && !WORK_AREA_IDS.includes(id)) throw new Error(`Area "${id}" has no access screen`);
   const area = findArea(id);
   if (!area) throw new Error(`Unknown area "${id}"`);
   const { label, icon } = labelFor(area);
@@ -132,6 +133,36 @@ export function accessScreen(id: string): AccessScreen {
     enter: landing ? { href: `/aree/${landing.slug}`, via: "landing" } : { href: "/aree", via: "gateway" },
     loginLive: R20_LOGIN_LIVE,
   };
+}
+
+export interface WorkAreaGateInput {
+  /** Staging-only preview (stagingPreviewEnabled, src/lib/impianti-access.ts), decided on the server. */
+  preview: boolean;
+  /**
+   * Roles of a session verified on the server by R20, or null when there is none.
+   * Today R20 exposes no login action (satellites.ts R20_LOGIN_LIVE), so callers pass null.
+   */
+  sessionRoles: ReadonlySet<string> | null;
+}
+
+export interface WorkAreaGate {
+  view: "page" | "access";
+  /** True when the page is shown only because of the staging preview (banner required). */
+  preview: boolean;
+}
+
+/**
+ * Gate of a work area: the read-only page for a verified session with an allowed role
+ * (registry roles, Direzione sees all), otherwise the area's access screen. The staging
+ * preview opens the page with a banner. Grants nothing: it only picks what to render.
+ */
+export function workAreaView(id: string, { preview, sessionRoles }: WorkAreaGateInput): WorkAreaGate {
+  if (!WORK_AREA_IDS.includes(id)) throw new Error(`Area "${id}" is not a work area`);
+  const area = findArea(id)!;
+  const allowed = R20_LOGIN_LIVE && sessionRoles !== null && sessionRoles.size > 0 && canSeeArea(area, sessionRoles);
+  if (allowed) return { view: "page", preview: false };
+  if (preview) return { view: "page", preview: true };
+  return { view: "access", preview: false };
 }
 
 /** "responsabile trasporti, autisti, Direzione" or the honest fallback. */

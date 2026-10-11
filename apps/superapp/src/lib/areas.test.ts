@@ -117,12 +117,14 @@ describe("links that work today", () => {
   });
 
   it("marks a link direct only when the canonical path is the live route", () => {
-    expect(areaLink("calendario")).toEqual({ id: "calendario", path: "/calendario", href: "/calendario", direct: true, access: false });
-    expect(areaLink("pulmini")).toEqual({ id: "pulmini", path: "/pulmini", href: "/pulmini", direct: true, access: true });
-    expect(areaLink("crm")).toEqual({ id: "crm", path: "/crm", href: "/crm", direct: true, access: true });
-    expect(areaLink("gestionale")).toEqual({ id: "gestionale", path: "/gestionale", href: "/gestionale", direct: true, access: false });
-    expect(areaLink("sky-club")).toEqual({ id: "sky-club", path: "/sky-club", href: "/aree/tifoso", direct: false, access: false });
-    expect(areaLink("gioca")).toEqual({ id: "gioca", path: "/gioca", href: null, direct: false, access: false });
+    expect(areaLink("calendario")).toEqual({ id: "calendario", path: "/calendario", href: "/calendario", direct: true, access: false, page: false });
+    expect(areaLink("pulmini")).toEqual({ id: "pulmini", path: "/pulmini", href: "/pulmini", direct: true, access: false, page: true });
+    expect(areaLink("crm")).toEqual({ id: "crm", path: "/crm", href: "/crm", direct: true, access: false, page: true });
+    expect(areaLink("mister")).toEqual({ id: "mister", path: "/gestionale/mister", href: "/gestionale/mister", direct: true, access: false, page: true });
+    expect(areaLink("direzione")).toEqual({ id: "direzione", path: "/direzione", href: "/direzione", direct: true, access: true, page: false });
+    expect(areaLink("gestionale")).toEqual({ id: "gestionale", path: "/gestionale", href: "/gestionale", direct: true, access: false, page: false });
+    expect(areaLink("sky-club")).toEqual({ id: "sky-club", path: "/sky-club", href: "/aree/tifoso", direct: false, access: false, page: false });
+    expect(areaLink("gioca")).toEqual({ id: "gioca", path: "/gioca", href: null, direct: false, access: false, page: false });
     expect(() => areaLink("nope")).toThrow();
   });
 });

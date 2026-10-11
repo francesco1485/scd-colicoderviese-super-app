@@ -145,27 +145,36 @@ const EXPLICIT_HREF: Readonly<Record<string, string>> = {
 };
 
 /**
- * Reserved areas whose canonical direct path already answers with an access
- * screen (board Accesso-area): what is inside, who enters, one yellow "Entra"
- * towards the existing entry flow. Each id has a thin route at its own path
+ * Reserved areas whose canonical direct path answers ONLY with an access screen
+ * (board Accesso-area): what is inside, who enters, one yellow "Entra" towards
+ * the existing entry flow. Each id has a thin route at its own path
  * (src/routes/<path>.tsx) rendering src/components/scd/AccessScreen.tsx.
- * When the real page of an area is built it replaces the thin route and the
- * id leaves this list.
+ * When the real page of an area is built the id moves to WORK_AREA_IDS.
  */
 export const ACCESS_SCREEN_IDS: readonly string[] = [
-  "infermeria",
   "famiglia",
+  "direzione",
+  "acquisti",
+  "partner",
+];
+
+/**
+ * Reserved areas whose canonical direct path is a real read-only work page
+ * (release 2 item 6). The page stays behind the same gate: without a verified
+ * session with an allowed role (or the staging-only preview, stagingPreviewEnabled in src/lib/impianti-access.ts)
+ * the route still renders the area's access screen (src/lib/access.ts workAreaView).
+ */
+export const WORK_AREA_IDS: readonly string[] = [
   "pulmini",
-  "magazzino",
   "segreteria",
+  "crm",
+  "magazzino",
   "tesoreria",
   "club-house",
   "biglietteria",
   "magazzino-cassa",
-  "direzione",
-  "acquisti",
-  "crm",
-  "partner",
+  "infermeria",
+  "mister",
 ];
 
 /**
@@ -194,8 +203,14 @@ export function deferredOwner(path: string): string | null {
   return null;
 }
 
+/** True when the area's own path is only an access screen (no page yet). */
 export function hasAccessScreen(id: string): boolean {
   return ACCESS_SCREEN_IDS.includes(id);
+}
+
+/** True when the area's own path is a real work page (kept behind the access gate). */
+export function isWorkArea(id: string): boolean {
+  return WORK_AREA_IDS.includes(id);
 }
 
 /** Areas served today by an existing page that already hosts the same function. */
@@ -206,7 +221,7 @@ const HOSTED_HREF: Readonly<Record<string, string>> = {
 export const CURRENT_HREF: Readonly<Record<string, string>> = (() => {
   const out: Record<string, string> = {};
   for (const s of SATELLITES) if (s.areaId) out[s.areaId] = `/aree/${s.slug}`;
-  for (const id of ACCESS_SCREEN_IDS) {
+  for (const id of [...ACCESS_SCREEN_IDS, ...WORK_AREA_IDS]) {
     const area = findArea(id);
     if (area) out[id] = area.path;
   }
@@ -223,13 +238,16 @@ export interface AreaLink {
   direct: boolean;
   /** True when that route is the area's access screen, not its full page yet. */
   access: boolean;
+  /** True when that route is the area's real work page (behind the same access gate). */
+  page: boolean;
 }
 
 export function areaLink(id: string): AreaLink {
   const area = findArea(id);
   if (!area) throw new Error(`Unknown area "${id}"`);
   const href = CURRENT_HREF[id] ?? null;
-  return { id, path: area.path, href, direct: href === area.path, access: href === area.path && hasAccessScreen(id) };
+  const direct = href === area.path;
+  return { id, path: area.path, href, direct, access: direct && hasAccessScreen(id), page: direct && isWorkArea(id) };
 }
 
 export type AreaIcon =
