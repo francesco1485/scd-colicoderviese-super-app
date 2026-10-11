@@ -19,6 +19,18 @@ export const Route = createFileRoute("/accedi/")({
   component: Accedi,
 });
 
+/** After sign-out nothing of the session may stay on the device (audit 2026-10-12). */
+async function clearOfflineCopies() {
+  try {
+    if ("caches" in window) {
+      const keys = await caches.keys();
+      await Promise.all(keys.filter((k) => k === "scd-pages" || k.startsWith("workbox-runtime")).map((k) => caches.delete(k)));
+    }
+  } catch {
+    /* Cache API unavailable: nothing stored */
+  }
+}
+
 function Accedi() {
   const { next } = Route.useSearch();
   const navigate = useNavigate();
@@ -58,6 +70,7 @@ function Accedi() {
     setBusy(true);
     try {
       await logout();
+      await clearOfflineCopies();
       setSession((s) => (s ? { ...s, user: null, roles: [], landing: "/aree", badge: null, memberships: [] } : s));
       setOutcome(null);
     } finally {

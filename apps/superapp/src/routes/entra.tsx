@@ -6,6 +6,8 @@ import { Field, OutcomeBox, PageHero, inputCls } from "@/components/ui-kit";
 import { INTERESSI_ATLETA, REQUEST_STATUS_LABEL } from "@/lib/catalog";
 import { submitRegistration } from "@/lib/club.functions";
 import type { SubmitOutcome } from "@/lib/club.types";
+import { FormsPausedNotice } from "@/components/scd/FormsPausedNotice";
+import { PUBLIC_FORMS_LIVE } from "@/lib/public-forms";
 
 export const Route = createFileRoute("/entra")({
   head: () => ({
@@ -53,7 +55,8 @@ function Entra() {
       </PageHero>
 
       <section className="mx-auto -mt-8 grid max-w-6xl gap-6 px-4 md:grid-cols-[1fr_20rem]">
-        <form onSubmit={submit} className="grid gap-4 p-6 card-premium sm:grid-cols-2">
+        {PUBLIC_FORMS_LIVE ? (
+          <form onSubmit={submit} className="grid gap-4 p-6 card-premium sm:grid-cols-2">
           <Field label="Interesse / categoria">
             <select className={inputCls} value={f.interesse} onChange={set("interesse")}>
               {INTERESSI_ATLETA.map((i) => <option key={i}>{i}</option>)}
@@ -89,6 +92,9 @@ function Entra() {
           {err && <p className="text-sm text-destructive sm:col-span-2">{err}</p>}
           <div className="sm:col-span-2"><OutcomeBox outcome={outcome} /></div>
         </form>
+        ) : (
+          <FormsPausedNotice kind="iscrizione" />
+        )}
 
         <aside className="space-y-4">
           <div className="surface-deep rounded-2xl p-5">

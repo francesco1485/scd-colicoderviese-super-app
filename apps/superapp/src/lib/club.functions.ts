@@ -166,6 +166,8 @@ async function submitPlanned(
   payload: Record<string, unknown>,
   initialStatus: string,
 ): Promise<SubmitOutcome> {
+  const { PUBLIC_FORMS_LIVE, PAUSED_OUTCOME } = await import("./public-forms");
+  if (!PUBLIC_FORMS_LIVE) return PAUSED_OUTCOME;
   const { r20 } = await import("./appsscript.server");
   const res = await r20.planned<{ id?: string; reference?: string; status?: string }>(action, payload);
   if (res.ok) {

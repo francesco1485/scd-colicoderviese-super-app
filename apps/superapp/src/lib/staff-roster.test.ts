@@ -66,6 +66,6 @@ describe("staff roster on the server", () => {
   it("names are public, e-mails only inside an open area", () => {
     expect(staffRosterPublic({ SCD_STAFF_ROSTER_JSON: raw }).people).toHaveLength(5);
     expect(staffEmails({ SCD_STAFF_ROSTER_JSON: raw }, true)).toEqual({});
-    expect(staffEmails({ SCD_STAFF_ROSTER_JSON: raw, SCD_STAGING_PREVIEW: "1", SCD_STAGING_PASSWORD: "x".repeat(24) }, true)).toEqual({ "d-u15": "d@example.org" });
+    expect(staffEmails({ SCD_STAFF_ROSTER_JSON: raw, SCD_STAGING_PREVIEW: "1", SCD_STAGING_GATEWAY: "1", SCD_STAGING_PASSWORD: "x".repeat(24) }, true)).toEqual({ "d-u15": "d@example.org" });
   });
 });

@@ -1656,6 +1656,29 @@
         "implementationStatus": "IMPLEMENTED_STAGING",
         "duplicate_work": "DENY"
       }
+    },
+    {
+      "id": "UD-070",
+      "name": "OFFICIAL_LAUNCH_PREPARATION",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "Mettiti a lavorare e cerchiamo di arrivare alla presentazione ufficiale della super app",
+        "Gmail della società"
+      ],
+      "normalizedCommand": {
+        "rule": "Prepare the Super App for its official presentation: independent readiness audit, fix every blocker that does not need a human decision, auth e-mails from the club Gmail (SMTP configured by Direzione), launch plan with open decisions; production publish only with explicit OK.",
+        "scope": "LAUNCH",
+        "constraints": [
+          "no production deploy without OK",
+          "no purchases",
+          "secrets entered only by Direzione",
+          "privacy notice approved by Direzione"
+        ],
+        "implementationStatus": "IN_PROGRESS",
+        "duplicate_work": "DENY"
+      }
     }
   ],
   "completionGate": {

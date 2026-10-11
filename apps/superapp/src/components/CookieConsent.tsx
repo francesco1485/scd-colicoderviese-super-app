@@ -14,6 +14,9 @@ import {
  * Nessun pixel è configurato oggi: quando la società fornirà gli ID, si caricheranno solo se
  * marketingAllowed() è vero (consenso marketing e pagina pubblica, mai aree riservate o minori).
  */
+/** No statistics or marketing tool is configured today (audit 2026-10-12): the banner says so and asks nothing. */
+export const OPTIONAL_TOOLS_ACTIVE = false;
+
 export const openCookiePrefs = () =>
   window.dispatchEvent(new CustomEvent("scd:cookie-prefs"));
 
@@ -101,11 +104,18 @@ export function CookieConsent() {
             id="ck-d"
             className="mb-3 mt-[6px] text-[14px] leading-[1.4] text-[var(--scd-sub)]"
           >
-            Usiamo cookie tecnici per far funzionare l'app. Con il tuo consenso
-            usiamo anche statistiche anonime e strumenti di Meta e TikTok per
-            misurare le campagne. Nelle aree riservate e nei profili dei minori
-            non usiamo mai cookie di marketing.
+            {OPTIONAL_TOOLS_ACTIVE ? (
+              <>Usiamo cookie tecnici per far funzionare l'app. Con il tuo consenso usiamo anche statistiche e strumenti di misura delle campagne. Nelle aree riservate e nei profili dei minori non usiamo mai cookie di marketing.</>
+            ) : (
+              <>Usiamo solo cookie tecnici, necessari per l'accesso e per ricordare le tue scelte. Nessuna statistica, nessuna pubblicità. </>
+            )}
+            <a href="/privacy" className="font-semibold text-[var(--scd-blue)] underline">Informativa privacy</a>
           </p>
+          {!OPTIONAL_TOOLS_ACTIVE ? (
+            <button type="button" onClick={() => save(false, false)} className="min-h-12 w-full rounded-[12px] bg-[var(--uv-night)] text-[15px] font-extrabold text-white" data-testid="cookie-ok">
+              Ho capito
+            </button>
+          ) : (
           <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
@@ -133,6 +143,7 @@ export function CookieConsent() {
               Personalizza
             </button>
           </div>
+          )}
         </div>
       )}
       {prefs && (
@@ -170,18 +181,24 @@ export function CookieConsent() {
               checked
               disabled
             />
-            <Toggle
+            {!OPTIONAL_TOOLS_ACTIVE && (
+              <p className="m-0 py-3 text-[14px] leading-snug text-[var(--scd-sub)]">
+                Oggi l'app non usa statistiche né strumenti di marketing: non c'è niente da attivare.{" "}
+                <a href="/privacy" className="font-semibold text-[var(--scd-blue)] underline">Informativa privacy</a>
+              </p>
+            )}
+            {OPTIONAL_TOOLS_ACTIVE && <Toggle
               title="Statistiche"
               text="Conteggi anonimi di visite e tocchi: servono a migliorare l'app e a dare numeri veri agli sponsor."
               checked={stats}
               onChange={setStats}
-            />
-            <Toggle
+            />}
+            {OPTIONAL_TOOLS_ACTIVE && <Toggle
               title="Marketing"
-              text="Meta Pixel e TikTok Pixel per misurare le campagne social. Mai nelle aree riservate né nei profili dei minori."
+              text="Strumenti di misura delle campagne social, solo dopo che la società li avrà configurati. Mai nelle aree riservate né nei profili dei minori."
               checked={mkt}
               onChange={setMkt}
-            />
+            />}
             <button
               type="button"
               onClick={() => save(stats, mkt)}

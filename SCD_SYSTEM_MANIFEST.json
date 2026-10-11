@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.28.0",
+    "version": "3.28.1",
     "effective_at": "2026-10-11",
     "status": "BINDING",
     "language": "it-IT",
@@ -818,6 +818,7 @@
         "secretariat_alerts_view": "scd_secretariat_alerts_v",
         "match_day_view": "scd_match_day_v",
         "medical_source_of_truth": "scd_athletes.medical_certificate_expires_at",
+        "launch_hardening": "Audit 2026-10-12: no-store on private pages and server functions, offline cache public pages only and cleared on sign-out, security headers, /healthz, robots/sitemap, magic link from SCD_SITE_URL, neutral sign-in answer, demo routes redirected in production, staging preview only behind the gateway (SCD_STAGING_GATEWAY), public forms paused (official e-mail/PEC), /privacy notice, pending access request never overwritten, anon without table privileges — supabase/migrations/20261012_r71_launch_hardening.sql, apps/superapp/src/lib/http-policy.ts, docs/PRODUCTION_LAUNCH.md",
         "match_sheet_draft": "Pre-distinta from the call-up: scd_match_sheets (RLS, no policies), scd_staff_match_sheet / scd_staff_save_match_sheet / scd_match_sheet_staff_candidates; limits per team (LND CRL Lombardia 26-27 art. 19.1, 26.2; CRL Lombardia SGS art. 6); NOT the official sheet — SGS youth must use the LND portal lista di presentazione; no document numbers stored — supabase/migrations/20261011_r70_match_sheet_draft.sql",
         "callup_scope": "A call-up (convocazione) is not the match sheet (distinta): staff call up 1-2 days before any athlete of the teams in their scope (scd_my_team_ids), not only the match team; everyone called up must show up; the distinta is a separate step at the match — supabase/migrations/20261011_r69_callup_multi_annata.sql",
         "callup_withdraw": "Team staff withdraw a sent call-up before kick-off via scd_staff_withdraw_callups: scd_match_callups.withdrawn_at/_by, row kept; withdrawn call-ups hidden from staff, family, answers and push; re-calling resets answer and notification — supabase/migrations/20261011_r68_callup_withdraw.sql (supersedes unapplied r62_1)",

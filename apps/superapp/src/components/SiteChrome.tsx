@@ -296,9 +296,12 @@ export function SiteFooter() {
             <Link key={n.to + n.label} to={n.to} className="opacity-80 hover:opacity-100">{n.label}</Link>
           ))}
         </nav>
-        <button type="button" onClick={openCookiePrefs} className="self-start text-sm underline opacity-80 hover:opacity-100">Preferenze cookie</button>
+        <span className="flex flex-wrap gap-4">
+          <a href="/privacy" className="text-sm underline opacity-80 hover:opacity-100">Privacy</a>
+          <button type="button" onClick={openCookiePrefs} className="text-sm underline opacity-80 hover:opacity-100">Preferenze cookie</button>
+        </span>
         <p className="text-xs opacity-60">
-          © {new Date().getFullYear()} {CLUB_NAME} — Super App ufficiale · versione di prova del {BUILD_STAMP}.
+          © {new Date().getFullYear()} {CLUB_NAME} — Super App ufficiale · versione del {BUILD_STAMP}.
         </p>
       </div>
     </footer>

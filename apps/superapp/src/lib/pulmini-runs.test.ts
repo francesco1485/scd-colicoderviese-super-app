@@ -72,7 +72,7 @@ describe("pulmini runs on the server", () => {
   });
 
   it("returns the runs in the staging preview", () => {
-    const d = pulminiRunsData({ SCD_PULMINI_RUNS_JSON: raw, SCD_STAGING_PREVIEW: "1", SCD_STAGING_PASSWORD: "x".repeat(24) }, true);
+    const d = pulminiRunsData({ SCD_PULMINI_RUNS_JSON: raw, SCD_STAGING_PREVIEW: "1", SCD_STAGING_GATEWAY: "1", SCD_STAGING_PASSWORD: "x".repeat(24) }, true);
     expect(d.gate.view).toBe("page");
     expect(d.runs).toHaveLength(3);
     expect(d.configured).toBe(true);

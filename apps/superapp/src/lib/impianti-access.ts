@@ -66,6 +66,8 @@ export function stagingPreviewEnabled(
   if (env["SCD_STAGING_PREVIEW"] !== "1") return false;
   if ((env["SCD_ENV"] ?? "").toLowerCase() === "production") return false;
   if (!isProductionBuild) return true;
+  // Audit 2026-10-12: env flags alone are not enough; the gateway marks the child process it spawns.
+  if (env["SCD_STAGING_GATEWAY"] !== "1") return false;
   return (env["SCD_STAGING_PASSWORD"] ?? "").length >= 20;
 }
 

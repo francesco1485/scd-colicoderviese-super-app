@@ -8,6 +8,8 @@ import { TICKET_CATEGORIES } from "@/lib/catalog";
 import { CLUB_PROFILE } from "@/lib/club-profile";
 import { submitTicket } from "@/lib/club.functions";
 import type { SubmitOutcome } from "@/lib/club.types";
+import { FormsPausedNotice } from "@/components/scd/FormsPausedNotice";
+import { PUBLIC_FORMS_LIVE } from "@/lib/public-forms";
 
 export const Route = createFileRoute("/contatti")({
   head: () => ({
@@ -67,7 +69,8 @@ function Contatti() {
             ))}
           </div>
         </div>
-        <form onSubmit={submit} className="grid gap-4 p-6 card-premium sm:grid-cols-2">
+        {PUBLIC_FORMS_LIVE ? (
+          <form onSubmit={submit} className="grid gap-4 p-6 card-premium sm:grid-cols-2">
           <Field label="Nome"><input required className={inputCls} value={f.nome} onChange={set("nome")} /></Field>
           <Field label="Email"><input required type="email" className={inputCls} value={f.email} onChange={set("email")} /></Field>
           <div className="sm:col-span-2"><Field label="Oggetto"><input required className={inputCls} value={f.oggetto} onChange={set("oggetto")} /></Field></div>
@@ -82,6 +85,9 @@ function Contatti() {
           {err && <p className="text-sm text-destructive sm:col-span-2">{err}</p>}
           <div className="sm:col-span-2"><OutcomeBox outcome={outcome} /></div>
         </form>
+        ) : (
+          <FormsPausedNotice kind="contatti" />
+        )}
         <SafeguardingStrip />
         <p className="text-xs text-muted-foreground">Le segnalazioni safeguarding hanno un canale separato e non entrano in questa coda.</p>
       </section>

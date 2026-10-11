@@ -73,12 +73,19 @@ describe("impianti access gate", () => {
         { SCD_STAGING_PREVIEW: "1", SCD_STAGING_PASSWORD: pw },
         true,
       ),
+    ).toBe(false);
+    expect(
+      stagingPreviewEnabled(
+        { SCD_STAGING_PREVIEW: "1", SCD_STAGING_PASSWORD: pw, SCD_STAGING_GATEWAY: "1" },
+        true,
+      ),
     ).toBe(true);
     expect(
       stagingPreviewEnabled(
         {
           SCD_STAGING_PREVIEW: "1",
           SCD_STAGING_PASSWORD: pw,
+          SCD_STAGING_GATEWAY: "1",
           SCD_ENV: "production",
         },
         true,

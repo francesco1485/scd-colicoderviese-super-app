@@ -9,6 +9,7 @@ import { getRequestUrl } from "@tanstack/react-start/server";
 import { z } from "zod";
 
 import { landingFor, safeNext, sessionBadge, sessionRolesFrom, type Membership } from "./session";
+import { configuredSiteUrl } from "./http-policy";
 import { serverSupabase } from "./supabase.server";
 
 export interface SessionView {
@@ -72,21 +73,22 @@ export const requestMagicLink = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<MagicLinkOutcome> => {
     const sb = serverSupabase();
     if (!sb) return { sent: false, message: "L'accesso non è ancora configurato su questo server." };
-    const origin = getRequestUrl().origin;
+    // Audit 2026-10-12: the link points to the configured public URL, never to whatever Host header arrived.
+    const origin = configuredSiteUrl(process.env) ?? getRequestUrl().origin;
     // Only carry a destination when one was asked; otherwise the confirm step lands by role (session.ts landingFor).
     const redirect = data.next ? `${origin}/accedi/conferma?next=${encodeURIComponent(safeNext(data.next))}` : `${origin}/accedi/conferma`;
     const { error } = await sb.auth.signInWithOtp({
       email: data.email,
       options: { emailRedirectTo: redirect, shouldCreateUser: false },
     });
+    // Same answer whether or not the address has an account (no account enumeration, audit 2026-10-12).
+    const neutral = "Se questa e-mail è abilitata, entro un minuto ricevi il link: aprilo da questo stesso telefono o computer. Se non arriva, controlla lo spam o chiedi l'accesso dal pulsante qui sotto.";
     if (error) {
       const notFound = /signups not allowed|user not found|otp_disabled/i.test(error.message);
-      return {
-        sent: false,
-        message: notFound ? "Questa e-mail non è ancora attiva: chiedi l'accesso dal pulsante qui sotto." : "Invio non riuscito, riprova tra un minuto.",
-      };
+      if (notFound) return { sent: true, message: neutral };
+      return { sent: false, message: "Invio non riuscito, riprova tra un minuto." };
     }
-    return { sent: true, message: "Ti abbiamo mandato un link: aprilo da questo telefono o computer per entrare." };
+    return { sent: true, message: neutral };
   });
 
 export const confirmMagicLink = createServerFn({ method: "POST" })

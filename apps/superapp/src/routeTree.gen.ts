@@ -25,6 +25,7 @@ import { Route as ImpiantiRouteImport } from './routes/impianti'
 import { Route as InfermeriaRouteImport } from './routes/infermeria'
 import { Route as MagazzinoRouteImport } from './routes/magazzino'
 import { Route as PartnerRouteImport } from './routes/partner'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PulminiRouteImport } from './routes/pulmini'
 import { Route as RegistratiRouteImport } from './routes/registrati'
 import { Route as SafeguardingRouteImport } from './routes/safeguarding'
@@ -145,6 +146,11 @@ const MagazzinoRoute = MagazzinoRouteImport.update({
 const PartnerRoute = PartnerRouteImport.update({
   id: '/partner',
   path: '/partner',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PulminiRoute = PulminiRouteImport.update({
@@ -375,6 +381,7 @@ export interface FileRoutesByFullPath {
   '/infermeria': typeof InfermeriaRoute
   '/magazzino': typeof MagazzinoRoute
   '/partner': typeof PartnerRoute
+  '/privacy': typeof PrivacyRoute
   '/pulmini': typeof PulminiRoute
   '/registrati': typeof RegistratiRoute
   '/safeguarding': typeof SafeguardingRoute
@@ -434,6 +441,7 @@ export interface FileRoutesByTo {
   '/infermeria': typeof InfermeriaRoute
   '/magazzino': typeof MagazzinoRoute
   '/partner': typeof PartnerRoute
+  '/privacy': typeof PrivacyRoute
   '/pulmini': typeof PulminiRoute
   '/registrati': typeof RegistratiRoute
   '/safeguarding': typeof SafeguardingRoute
@@ -493,6 +501,7 @@ export interface FileRoutesById {
   '/infermeria': typeof InfermeriaRoute
   '/magazzino': typeof MagazzinoRoute
   '/partner': typeof PartnerRoute
+  '/privacy': typeof PrivacyRoute
   '/pulmini': typeof PulminiRoute
   '/registrati': typeof RegistratiRoute
   '/safeguarding': typeof SafeguardingRoute
@@ -554,6 +563,7 @@ export interface FileRouteTypes {
     | '/infermeria'
     | '/magazzino'
     | '/partner'
+    | '/privacy'
     | '/pulmini'
     | '/registrati'
     | '/safeguarding'
@@ -613,6 +623,7 @@ export interface FileRouteTypes {
     | '/infermeria'
     | '/magazzino'
     | '/partner'
+    | '/privacy'
     | '/pulmini'
     | '/registrati'
     | '/safeguarding'
@@ -671,6 +682,7 @@ export interface FileRouteTypes {
     | '/infermeria'
     | '/magazzino'
     | '/partner'
+    | '/privacy'
     | '/pulmini'
     | '/registrati'
     | '/safeguarding'
@@ -731,6 +743,7 @@ export interface RootRouteChildren {
   InfermeriaRoute: typeof InfermeriaRoute
   MagazzinoRoute: typeof MagazzinoRoute
   PartnerRoute: typeof PartnerRoute
+  PrivacyRoute: typeof PrivacyRoute
   PulminiRoute: typeof PulminiRoute
   RegistratiRoute: typeof RegistratiRoute
   SafeguardingRoute: typeof SafeguardingRoute
@@ -880,6 +893,13 @@ declare module '@tanstack/react-router' {
       path: '/partner'
       fullPath: '/partner'
       preLoaderRoute: typeof PartnerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pulmini': {
@@ -1210,6 +1230,7 @@ const rootRouteChildren: RootRouteChildren = {
   InfermeriaRoute: InfermeriaRoute,
   MagazzinoRoute: MagazzinoRoute,
   PartnerRoute: PartnerRoute,
+  PrivacyRoute: PrivacyRoute,
   PulminiRoute: PulminiRoute,
   RegistratiRoute: RegistratiRoute,
   SafeguardingRoute: SafeguardingRoute,

@@ -13,7 +13,7 @@ describe("organigramma server data", () => {
   });
 
   it("returns it in the staging preview and evaluates the declared level", () => {
-    const d = organigrammaData({ SCD_SGS_STATUS_JSON: status, SCD_STAGING_PREVIEW: "1", SCD_STAGING_PASSWORD: "x".repeat(24) }, true);
+    const d = organigrammaData({ SCD_SGS_STATUS_JSON: status, SCD_STAGING_PREVIEW: "1", SCD_STAGING_GATEWAY: "1", SCD_STAGING_PASSWORD: "x".repeat(24) }, true);
     expect(d.gate).toMatchObject({ view: "page", preview: true });
     expect(d.statusConfigured).toBe(true);
     expect(d.level).toBe(1);

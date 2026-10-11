@@ -54,8 +54,15 @@ export default defineConfig({
           cleanupOutdatedCaches: true,
           runtimeCaching: [
             {
+              // Only public pages are kept offline: private pages carry personal data (audit 2026-10-12).
+              // Inlined on purpose: workbox serialises this function into sw.js, imports would not exist there.
+              // Keep the list equal to PUBLIC_PREFIXES in src/lib/http-policy.ts (checked by a test).
               urlPattern: ({ request, url }) =>
-                request.mode === "navigate" && !url.pathname.startsWith("/~oauth"),
+                request.mode === "navigate" &&
+                (url.pathname === "/" ||
+                  ["/allenamenti", "/calendario", "/community", "/comunicazioni", "/contatti", "/eventi", "/fornitori", "/impianti", "/partner", "/privacy", "/safeguarding", "/shop", "/societa", "/sponsor", "/squadre"].some(
+                    (p) => url.pathname === p || url.pathname.startsWith(p + "/"),
+                  )),
               handler: "NetworkFirst",
               options: {
                 cacheName: "scd-pages",

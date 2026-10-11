@@ -5,6 +5,8 @@ import { Field, OutcomeBox, inputCls } from "@/components/ui-kit";
 import { BUDGET, SETTORI, SPONSOR_ASSETS, SPONSOR_PACKAGES } from "@/lib/catalog";
 import { submitPartnerLead } from "@/lib/club.functions";
 import type { SubmitOutcome } from "@/lib/club.types";
+import { FormsPausedNotice } from "@/components/scd/FormsPausedNotice";
+import { PUBLIC_FORMS_LIVE } from "@/lib/public-forms";
 
 export function PartnerForm({ tipo, preselect }: { tipo: "sponsor" | "fornitore"; preselect?: string | undefined }) {
   const send = useServerFn(submitPartnerLead);
@@ -36,7 +38,8 @@ export function PartnerForm({ tipo, preselect }: { tipo: "sponsor" | "fornitore"
   }
 
   return (
-    <form onSubmit={submit} className="grid gap-4 p-6 card-premium sm:grid-cols-2">
+    <>{PUBLIC_FORMS_LIVE ? (
+      <form onSubmit={submit} className="grid gap-4 p-6 card-premium sm:grid-cols-2">
       <Field label="Azienda"><input required className={inputCls} value={f.azienda} onChange={set("azienda")} /></Field>
       <Field label="Referente"><input required className={inputCls} value={f.referente} onChange={set("referente")} /></Field>
       <Field label="Email"><input required type="email" className={inputCls} value={f.email} onChange={set("email")} /></Field>
@@ -75,5 +78,8 @@ export function PartnerForm({ tipo, preselect }: { tipo: "sponsor" | "fornitore"
       {err && <p className="text-sm text-destructive sm:col-span-2">{err}</p>}
       <div className="sm:col-span-2"><OutcomeBox outcome={outcome} /></div>
     </form>
+    ) : (
+      <FormsPausedNotice kind="partner" />
+    )}</>
   );
 }

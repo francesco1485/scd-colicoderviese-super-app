@@ -7,6 +7,8 @@ import { Field, OutcomeBox, inputCls } from "@/components/ui-kit";
 import { CLUB_CONTACTS } from "@/lib/catalog";
 import type { SubmitOutcome } from "@/lib/club.types";
 import { submitSafeguarding } from "@/lib/safeguarding.functions";
+import { FormsPausedNotice } from "@/components/scd/FormsPausedNotice";
+import { PUBLIC_FORMS_LIVE } from "@/lib/public-forms";
 
 export const Route = createFileRoute("/safeguarding")({
   head: () => ({
@@ -66,7 +68,8 @@ function Safeguarding() {
         </div>
       </div>
 
-      <form onSubmit={submit} className="mt-8 grid gap-4 rounded-2xl border border-border bg-card p-6 sm:grid-cols-2">
+      {PUBLIC_FORMS_LIVE ? (
+        <form onSubmit={submit} className="mt-8 grid gap-4 rounded-2xl border border-border bg-card p-6 sm:grid-cols-2">
         <Field label="Chi segnala">
           <select className={inputCls} value={f.ruolo} onChange={set("ruolo")}>
             <option value="coinvolto">Persona coinvolta</option>
@@ -97,6 +100,9 @@ function Safeguarding() {
         {err && <p className="text-sm text-destructive sm:col-span-2">{err}</p>}
         <div className="sm:col-span-2"><OutcomeBox outcome={outcome} /></div>
       </form>
+      ) : (
+        <FormsPausedNotice kind="safeguarding" />
+      )}
     </main>
   );
 }

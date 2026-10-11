@@ -28,6 +28,9 @@ const schema = z
 export const submitSafeguarding = createServerFn({ method: "POST" })
   .inputValidator((d: z.input<typeof schema>) => schema.parse(d))
   .handler(async ({ data }): Promise<SubmitOutcome> => {
+    // Nothing sensitive is posted to R20 until a dedicated, verified safeguarding channel exists (audit 2026-10-12).
+    const { PUBLIC_FORMS_LIVE, PAUSED_OUTCOME } = await import("./public-forms");
+    if (!PUBLIC_FORMS_LIVE) return PAUSED_OUTCOME;
     const { r20 } = await import("./appsscript.server");
     const payload = data.anonimo ? { ...data, nome: "", contatto: "" } : data;
     const res = await r20.planned<{ reference?: string }>("safeguarding.submit", {

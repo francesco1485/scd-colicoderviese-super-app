@@ -2,6 +2,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
+import { R20_LOGIN_LIVE } from "./satellites";
+
+/** Legacy e-mail + PIN login stays closed until R20_LOGIN_LIVE (audit 2026-10-12: no unthrottled PIN guessing). */
+const CLOSED = { ok: false as const, message: "Accesso con PIN non attivo: entra con la tua e-mail da Accedi." };
+
 const area = z.enum(["famiglia", "atleta", "staff", "direzione"]);
 
 export const validateAccess = createServerFn({ method: "POST" })
@@ -9,6 +14,7 @@ export const validateAccess = createServerFn({ method: "POST" })
     z.object({ email: z.string().trim().email(), pin: z.string().trim().min(3).max(12), area }).parse(d),
   )
   .handler(async ({ data }) => {
+    if (!R20_LOGIN_LIVE) return CLOSED;
     const { r20 } = await import("./appsscript.server");
     const res = await r20.call<{ sessionToken?: string; token?: string; role?: string; ruolo?: string; name?: string }>(
       "auth.validate",
@@ -29,6 +35,7 @@ const tokenInput = (d: { token: string }) => z.object({ token: z.string().min(8)
 export const getDashboard = createServerFn({ method: "POST" })
   .inputValidator(tokenInput)
   .handler(async ({ data }) => {
+    if (!R20_LOGIN_LIVE) return { summary: null, training: null, error: CLOSED.message };
     const { r20 } = await import("./appsscript.server");
     const [summary, training] = await Promise.all([
       r20.call<unknown>("dashboard.summary", {}, data.token),
@@ -45,6 +52,7 @@ export const getDashboard = createServerFn({ method: "POST" })
 export const getDirectionData = createServerFn({ method: "POST" })
   .inputValidator(tokenInput)
   .handler(async ({ data }) => {
+    if (!R20_LOGIN_LIVE) return { leads: null, moderation: null, leadsActive: false, moderationActive: false };
     const { r20 } = await import("./appsscript.server");
     const [leads, moderation] = await Promise.all([
       r20.planned<unknown>("direction.leads", {}, data.token),

@@ -2,6 +2,7 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
+import { SECURITY_HEADERS, cacheControlFor, configuredSiteUrl, demoRedirect, isProductionEnv, robotsTxt, sitemapXml } from "./lib/http-policy";
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -44,18 +45,46 @@ function isH3SwallowedErrorBody(body: string): boolean {
   }
 }
 
+/** Security headers + cache policy on every response (launch audit 2026-10-12). */
+function withPolicy(response: Response, pathname: string): Response {
+  const headers = new Headers(response.headers);
+  for (const [k, v] of Object.entries(SECURITY_HEADERS)) if (!headers.has(k)) headers.set(k, v);
+  const cc = cacheControlFor(pathname);
+  if (cc) headers.set("cache-control", cc);
+  return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+}
+
+function plain(body: string, type: string): Response {
+  return new Response(body, { status: 200, headers: { "content-type": `${type}; charset=utf-8`, "cache-control": "no-store" } });
+}
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
+    const url = new URL(request.url);
+    const production = isProductionEnv(process.env);
+    if (url.pathname === "/healthz") {
+      return withPolicy(plain(JSON.stringify({ ok: true, service: "scd-superapp", production, commit: process.env["RENDER_GIT_COMMIT"] ?? null }), "application/json"), url.pathname);
+    }
+    const demo = demoRedirect(url.pathname, production);
+    if (demo) return withPolicy(new Response(null, { status: 302, headers: { location: demo } }), url.pathname);
+    if (url.pathname === "/robots.txt") return withPolicy(plain(robotsTxt(production, configuredSiteUrl(process.env)), "text/plain"), url.pathname);
+    if (url.pathname === "/sitemap.xml") {
+      const site = configuredSiteUrl(process.env);
+      if (production && site) return withPolicy(plain(sitemapXml(site), "application/xml"), url.pathname);
+    }
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
-      return await normalizeCatastrophicSsrResponse(response);
+      return withPolicy(await normalizeCatastrophicSsrResponse(response), url.pathname);
     } catch (error) {
       console.error(error);
-      return new Response(renderErrorPage(), {
-        status: 500,
-        headers: { "content-type": "text/html; charset=utf-8" },
-      });
+      return withPolicy(
+        new Response(renderErrorPage(), {
+          status: 500,
+          headers: { "content-type": "text/html; charset=utf-8" },
+        }),
+        url.pathname,
+      );
     }
   },
 };

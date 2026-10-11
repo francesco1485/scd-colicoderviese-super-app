@@ -46,7 +46,7 @@ function authorized(req) {
 
 const child = spawn(process.execPath, [serverEntry], {
   cwd: appRoot,
-  env: { ...process.env, PORT: String(INTERNAL_PORT), NITRO_PORT: String(INTERNAL_PORT), HOST: "127.0.0.1", NITRO_HOST: "127.0.0.1" },
+  env: { ...process.env, SCD_STAGING_GATEWAY: "1", PORT: String(INTERNAL_PORT), NITRO_PORT: String(INTERNAL_PORT), HOST: "127.0.0.1", NITRO_HOST: "127.0.0.1" },
   stdio: "inherit",
 });
 child.on("exit", (code, signal) => {

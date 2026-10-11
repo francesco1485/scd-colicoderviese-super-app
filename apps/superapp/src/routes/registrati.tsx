@@ -114,7 +114,7 @@ function Registrati() {
               <label className="flex items-start gap-3 rounded-[12px] bg-[#f4f8fd] p-3 text-[14.5px] leading-snug text-[var(--scd-ink)]">
                 <input type="checkbox" checked={form.consent} onChange={(e) => set("consent", e.target.checked)} aria-invalid={Boolean(show("consent"))} className="scd-focus mt-0.5 size-5 flex-none accent-[var(--scd-blue)]" />
                 <span>
-                  Acconsento al trattamento dei dati da parte della S.C.D. ColicoDerviese per verificare la mia identità e attivare l'accesso.
+                  Ho letto l'<a href="/privacy" target="_blank" rel="noopener" className="font-semibold text-[var(--scd-blue)] underline">informativa privacy</a> e acconsento al trattamento dei dati da parte della S.C.D. ColicoDerviese per verificare la mia identità e attivare l'accesso.
                   {show("consent") && <b className="mt-1 block text-[#9a3412]">{show("consent")}</b>}
                 </span>
               </label>

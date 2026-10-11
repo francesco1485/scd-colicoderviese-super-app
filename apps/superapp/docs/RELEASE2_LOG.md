@@ -269,3 +269,19 @@ prossimi impegni e "ci sarò" in primo piano). Desktop invariato.
 - App: card "Distinta" nella pagina Mister: spunta tra i convocati, numero (proposto quello dell'ultima gara), titolare/riserva,
   C/VC, panchina, "Salva bozza" / "Segna pronta", testo da copiare e stampa con colonna tessera/documento vuota da verificare sul
   portale. Visual QA telefono.
+
+## Preparazione al lancio: controllo indipendente e correzioni · 2026-10-12 (UD-070)
+
+- Controllo indipendente (agente separato, sola lettura): build, test, link e pagine ok; 5 blocchi e 6 punti alti trovati.
+- `VERIFIED` corretti nel codice: pagine private e funzioni server `no-store`; copia offline solo per le pagine pubbliche e cancellata
+  all'uscita; intestazioni di sicurezza (HSTS, frame-ancestors, nosniff, referrer, permissions); `/healthz`, `robots.txt`
+  (staging escluso), `sitemap.xml` in produzione; link di accesso da `SCD_SITE_URL`; risposta di "Accedi" uguale per e-mail
+  registrate e non; `/core` e `/grow` portano alle pagine vere in produzione; vecchie funzioni PIN chiuse lato server;
+  anteprima staging solo dietro il gateway (`SCD_STAGING_GATEWAY`, prova: senza gateway niente anteprima); moduli pubblici
+  sospesi con contatti ufficiali (nulla viene inviato, safeguarding solo PEC con oggetto riservato); pagina `/privacy`
+  (stato bozza) collegata da registrazione, banner e piè di pagina; banner cookie veritiero (solo cookie tecnici);
+  limitatore registrazioni sull'IP del proxy.
+- `VERIFIED` r71 (`20261012_r71_launch_hardening.sql`): una seconda richiesta di accesso per la stessa e-mail non sovrascrive
+  quella in attesa; anon senza alcun privilegio sulle tabelle (prova: 0 tabelle leggibili, registrazione funzionante).
+- Pronti per la Direzione: `docs/EMAIL_GMAIL_SMTP.md` (Gmail della società) con testi italiani in
+  `supabase/setup/email-templates/`, `docs/PRODUCTION_LAUNCH.md` con le decisioni aperte.

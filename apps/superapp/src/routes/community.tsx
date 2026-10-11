@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { Field, OutcomeBox, PageHero, SyncPlaceholder, inputCls } from "@/components/ui-kit";
 import { getPublicFeed, submitCommunity } from "@/lib/club.functions";
 import type { SubmitOutcome } from "@/lib/club.types";
+import { FormsPausedNotice } from "@/components/scd/FormsPausedNotice";
+import { PUBLIC_FORMS_LIVE } from "@/lib/public-forms";
 
 export const Route = createFileRoute("/community")({
   loader: () => getPublicFeed(),
@@ -109,7 +111,8 @@ function CommunityForm({ tipo, matchLabel }: { tipo: Tipo; matchLabel: string | 
   }
 
   return (
-    <form onSubmit={submit} className="mt-4 grid gap-3">
+    <>{PUBLIC_FORMS_LIVE ? (
+      <form onSubmit={submit} className="mt-4 grid gap-3">
       {tipo === "pronostico" && <p className="text-sm font-semibold">{matchLabel} · <span className="text-muted-foreground">solo per divertimento, nessun premio</span></p>}
       <Field label="Il tuo nome o nickname"><input required minLength={2} className={inputCls} value={nome} onChange={(e) => setNome(e.target.value)} /></Field>
       <Field label={tipo === "pronostico" ? "Il tuo risultato (es. 2-1)" : tipo === "foto" ? "Didascalia" : "Messaggio"}>
@@ -121,6 +124,9 @@ function CommunityForm({ tipo, matchLabel }: { tipo: Tipo; matchLabel: string | 
       <button disabled={busy} className="surface-sun rounded-xl px-5 py-3 text-sm font-bold uppercase disabled:opacity-60">{busy ? "Invio…" : "Invia in moderazione"}</button>
       <OutcomeBox outcome={outcome} />
     </form>
+    ) : (
+      <FormsPausedNotice kind="community" />
+    )}</>
   );
 }
 
