@@ -671,6 +671,171 @@
         ],
         "duplicate_work": "DENY"
       }
+    },
+    {
+      "id": "UD-027",
+      "name": "HOME_IDENTITY_FIRST",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "sistemerei meglio anche sulla prima pagina , i canali ufficiali , invita un amico , e entra in squadra",
+        "cercherei di essere piu spinto su crea il tuo avatar e la tua identità per partecipare al tuo campionato"
+      ],
+      "normalizedCommand": {
+        "rule": "Home pushes the personal SCD identity first: one strong 'Crea il tuo avatar' card (right after the fixtures on phones), with invite-a-friend and official channels merged into one compact card.",
+        "scope": "SUPER_APP",
+        "torreFloor": "0_HALL",
+        "constraints": [
+          "no promise of features not yet live: label them 'in arrivo'",
+          "calendar and results stay open to everyone"
+        ],
+        "implementationStatus": "IMPLEMENTED_STAGING",
+        "duplicate_work": "DENY"
+      }
+    },
+    {
+      "id": "UD-028",
+      "name": "AVATAR_SELF_ENROLLMENT_AND_MATCH_PHOTOS",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "così i ragazzi si fanno foto e si iscrivono da soli",
+        "chi risulta come atleta poi va dentro alla sua squadra e puo inserire sua foto delle partite max 1 a partita",
+        "chi è dirigente potrebbe fare lo stesso o se non lo fa deve essere spinto così tutti sanno riconoscere le persone",
+        "il volto sarà sempre fotorealistico quasi vicino alla realtà ma non reale perché bisogna restare nell'anonimato",
+        "uno si può agganciare il suo profilo instagram per essere relazionale e virale"
+      ],
+      "normalizedCommand": {
+        "rule": "Self-enrolment with a photorealistic but non-real avatar; registered athletes are matched to their team (R20 identity) and may upload at most 1 photo per match; managers get an avatar too and are nudged until they create it; optional Instagram link for sharing.",
+        "scope": "SUPER_APP",
+        "torreFloor": "1_SERVIZI (identità) + 0_HALL (squadre)",
+        "constraints": [
+          "athletes are mostly minors: no real faces or names of minors in public pages",
+          "under 14 the parent/guardian activates the account and avatar (digital consent age in Italy)",
+          "avatar is photorealistic but synthetic and not identifying; the source selfie is not stored after generation",
+          "no DB migration, role or permission change without Direzione approval",
+          "match photos showing other minors need team-level consent and moderation before they are visible",
+          "Instagram link only for users 14+ and only as an outbound share, no reading of private data"
+        ],
+        "implementationStatus": "RECORDED_DESIGN_PENDING",
+        "duplicate_work": "DENY"
+      }
+    },
+    {
+      "id": "UD-029",
+      "name": "SKY_MATCH_REPORT_WEEKLY_DIGEST",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "Dirigenti in autonomia dalla loro app possono mettere foto a chatbot o appena finita partita lui entra sky gli chiede spiegami la partita di oggi",
+        "sky sintetizza e raccoglie 3 foto max e poi lunedi o martedi si pubblica in automatico la settimana colicoderviese"
+      ],
+      "normalizedCommand": {
+        "rule": "After each match the team manager tells Sky how it went; Sky writes a short report and collects up to 3 photos; on Monday/Tuesday the 'Settimana ColicoDerviese' is assembled automatically.",
+        "scope": "SUPER_APP",
+        "torreFloor": "1_SERVIZI (comunicazione)",
+        "constraints": [
+          "only facts provided by the manager or official sources: Sky never invents scores or scorers",
+          "photos of minors only from consenting families, no names of minors",
+          "publication goes through the approval rule decided by Direzione"
+        ],
+        "implementationStatus": "RECORDED_DESIGN_PENDING",
+        "duplicate_work": "DENY"
+      }
+    },
+    {
+      "id": "UD-030",
+      "name": "ROTATING_PODCAST_WEDNESDAY",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "a rotazione invece all atleta e ai dirigenti deve arrivare una richiesta dove devono dire e essere obbligati a parlare di loro e cosa pensano della società stile podcast",
+        "poi si rende pubblico il mercoledì con podcast virtuale sulla pagina"
+      ],
+      "normalizedCommand": {
+        "rule": "On a rotation, athletes and managers receive a request to talk about themselves and the club (podcast style); the result is published as a virtual podcast on Wednesday.",
+        "scope": "SUPER_APP",
+        "torreFloor": "1_SERVIZI (comunicazione)",
+        "constraints": [
+          "minors cannot be obliged: for athletes the request is an invitation and needs parental consent",
+          "voice/likeness rendered through the avatar, never the real voice of a minor without consent",
+          "human review before publishing"
+        ],
+        "implementationStatus": "RECORDED_DESIGN_PENDING",
+        "duplicate_work": "DENY"
+      }
+    },
+    {
+      "id": "UD-031",
+      "name": "WEEKLY_EDITORIAL_RHYTHM",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "lunedi o martedi si pubblica in automatico la settimana colicoderviese",
+        "il mercoledi con podcast virtuale",
+        "il giovedi e venerdi tanta pubblicità per eventi e altro"
+      ],
+      "normalizedCommand": {
+        "rule": "Weekly rhythm: Mon/Tue 'Settimana ColicoDerviese', Wed podcast, Thu/Fri events and promotions.",
+        "scope": "SUPER_APP",
+        "torreFloor": "1_SERVIZI (comunicazione)",
+        "constraints": [
+          "reuse the existing Canva Content Reservoir / Weekly Social Queue, no parallel publishing tool"
+        ],
+        "implementationStatus": "RECORDED_DESIGN_PENDING",
+        "duplicate_work": "DENY"
+      }
+    },
+    {
+      "id": "UD-032",
+      "name": "CLUBHOUSE_AND_SEGRETERIA_POSTER_REQUESTS",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "il responsabile club house può fare invece offerte e iniziative e chiedere di creare locandine per pubblicizzare attività",
+        "resta sulla pagina per una settimana",
+        "idem per la segreteria può chiedere di creare locandine di comunicazione e farle girare sia internamente che esternamente"
+      ],
+      "normalizedCommand": {
+        "rule": "Club House manager and secretariat can request posters for offers, initiatives and notices; approved posters stay on the page for one week and can be shared internally and externally.",
+        "scope": "SUPER_APP",
+        "torreFloor": "1_SERVIZI (Club House CHC + segreteria)",
+        "constraints": [
+          "official logos only, never redrawn",
+          "prices and offers come from the requester, never invented"
+        ],
+        "implementationStatus": "RECORDED_DESIGN_PENDING",
+        "duplicate_work": "DENY"
+      }
+    },
+    {
+      "id": "UD-033",
+      "name": "DOCUMENT_EXPIRY_REMINDERS",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "per chi ha documenti scaduti e certificati o deve consegnare documenti la segreteria o tu in automatico devi far partire comunicazione interna",
+        "se non lo fa entro una tempistica"
+      ],
+      "normalizedCommand": {
+        "rule": "Automatic internal reminders for expired or missing documents and certificates, with escalation if not resolved within a set time.",
+        "scope": "SUPER_APP",
+        "torreFloor": "-1_MOTORE (scadenze) + 1_SERVIZI (segreteria)",
+        "constraints": [
+          "medical certificates are health data: reminders state only 'document to renew', never the content",
+          "reminders go to the person (or parent) and to the secretariat in-app; email automation only notifies, humans decide",
+          "source of expiry dates is R20 / existing master sheets, no new register"
+        ],
+        "implementationStatus": "RECORDED_DESIGN_PENDING",
+        "duplicate_work": "DENY"
+      }
     }
   ],
   "completionGate": {

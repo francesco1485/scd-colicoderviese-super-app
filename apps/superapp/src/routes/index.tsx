@@ -4,10 +4,9 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   AgeGuide,
   Affiliations,
-  InviteCard,
-  JoinCard,
+  IdentityCard,
   SkyCameo,
-  SocialHub,
+  ShareCard,
 } from "@/components/universe/Community";
 import {
   Fixtures,
@@ -394,14 +393,19 @@ function Home() {
               confermati dal club.
             </p>
             <Shortcuts />
+            {/* On phones the avatar card comes right after the fixtures; on desktop it heads the side column. */}
+            <div className="mt-[22px] lg:hidden">
+              <IdentityCard />
+            </div>
             <SectionTitle id="eta-t">Per ogni età</SectionTitle>
             <AgeGuide />
           </div>
           <div>
             <SectionTitle id="tua-t">La tua SCD</SectionTitle>
             <div className="grid gap-[14px]">
-              <JoinCard />
-              <InviteCard />
+              <div className="hidden lg:block">
+                <IdentityCard />
+              </div>
               <Link
                 to="/eventi/christmas-lario-cup"
                 className="relative flex min-h-[200px] items-end overflow-hidden rounded-[18px] bg-[var(--uv-night)] text-white shadow-[0_14px_28px_rgb(0_10_40/0.28)]"
@@ -430,9 +434,7 @@ function Home() {
                   </span>
                 </span>
               </Link>
-              <div id="seguici">
-                <SocialHub />
-              </div>
+              <ShareCard />
             </div>
           </div>
         </div>

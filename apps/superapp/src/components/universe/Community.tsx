@@ -1,6 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Check } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 
 /* ------------------------------------------------------- per ogni età */
 
@@ -265,125 +264,168 @@ const CHANNELS = [
   },
 ] as const;
 
-export function SocialHub() {
+/* ------------------------------------------------ identità e avatar */
+
+const AVATAR_STEPS = [
+  {
+    title: "Un selfie, il tuo avatar",
+    text: "L'app crea un volto realistico che ti somiglia ma non è una tua foto: in pubblico resti anonimo.",
+  },
+  {
+    title: "Entri nella tua squadra",
+    text: "Chi risulta tesserato trova la sua squadra e carica 1 foto per ogni partita. Dirigenti e staff hanno il loro avatar, così tutti li riconoscono.",
+  },
+  {
+    title: "Se vuoi, colleghi Instagram",
+    text: "Condividi i momenti della tua squadra con i tuoi amici, direttamente dall'app.",
+  },
+] as const;
+
+/** Carta giocatore dimostrativa: sagoma generica, mai il volto di una persona reale. */
+function AvatarCardDemo() {
   return (
-    <section
-      className="rounded-[18px] bg-white p-4 text-[var(--scd-ink)] shadow-[0_14px_28px_rgb(0_10_40/0.28)]"
-      aria-labelledby="soc-t"
-      data-testid="social-hub"
+    <div
+      aria-hidden="true"
+      className="avatar-card relative mx-auto grid w-[clamp(112px,32vw,140px)] shrink-0 justify-items-center rounded-[16px] border-[3px] border-[var(--uv-gold)] bg-gradient-to-b from-[#1f74d1] to-[var(--uv-night)] px-2 pb-2 pt-3 shadow-[0_10px_20px_rgb(0_0_0/0.35)]"
     >
-      <h3
-        id="soc-t"
-        className="mb-[10px] font-uv text-[26px] uppercase leading-none"
-      >
-        I canali ufficiali SCD
-      </h3>
-      <div className="grid grid-cols-3 gap-2">
-        {CHANNELS.map((c) => (
-          <a
-            key={c.name}
-            href={c.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex min-h-[84px] flex-col items-center justify-center gap-[6px] rounded-[14px] bg-[#eef4ff] px-1 py-2 text-center text-[13.5px] font-extrabold leading-[1.15]"
-          >
-            <span
-              aria-hidden="true"
-              className="grid size-[38px] place-items-center rounded-[12px] text-[18px] font-black text-white"
-              style={{ background: c.bg }}
-            >
-              {c.mark}
-            </span>
-            {c.name}
-            <small className="text-[11.5px] font-semibold text-[var(--scd-sub)]">
-              {c.sub}
-            </small>
-          </a>
-        ))}
-      </div>
-    </section>
+      <span className="absolute left-2 top-2 rounded-[6px] bg-[var(--uv-gold)] px-[6px] py-[1px] font-uv text-[13px] uppercase text-[var(--uv-night)]">
+        U16
+      </span>
+      <img src="/media/brand/logo-scd.png" alt="" className="absolute right-2 top-2 size-[22px] object-contain" />
+      <svg viewBox="0 0 100 100" className="mt-3 size-[clamp(64px,19vw,84px)]">
+        <circle cx="50" cy="36" r="20" fill="#cfe0ff" />
+        <path d="M14 98c3-24 18-36 36-36s33 12 36 36z" fill="#cfe0ff" />
+        <circle cx="50" cy="36" r="20" fill="none" stroke="#ffd82a" strokeWidth="3" strokeDasharray="6 5" />
+      </svg>
+      <b className="mt-1 font-uv text-[17px] uppercase leading-none text-white">Il tuo nome</b>
+      <span className="mt-[3px] text-[11.5px] font-semibold text-[#cfe0ff]">Avatar realistico</span>
+      <span className="mt-2 flex w-full justify-between gap-1 rounded-[8px] bg-white/10 px-2 py-1 text-[10.5px] font-bold text-white">
+        <span>📸 1 a gara</span>
+        <span>IG</span>
+      </span>
+    </div>
   );
 }
 
-/* --------------------------------------------------- iscrizione e inviti */
-
-export function JoinCard() {
+export function IdentityCard() {
+  const [open, setOpen] = useState(false);
+  const uid = useId();
+  const titleId = `${uid}-t`;
+  const stepsId = `${uid}-steps`;
   return (
     <section
-      className="relative overflow-hidden rounded-[18px] bg-gradient-to-br from-[var(--uv-royal)] to-[var(--uv-night)] p-5 pr-[clamp(92px,28vw,128px)] text-white shadow-[0_14px_28px_rgb(0_10_40/0.28)]"
-      aria-labelledby="join-t"
-      data-testid="join-card"
+      className="relative overflow-hidden rounded-[18px] bg-gradient-to-br from-[var(--uv-royal)] to-[var(--uv-night)] p-5 text-white shadow-[0_14px_28px_rgb(0_10_40/0.28)]"
+      aria-labelledby={titleId}
+      data-testid="identity-card"
     >
-      <img
-        src="/media/brand/sky-atv-cut.webp"
-        alt=""
-        className="sky-float pointer-events-none absolute -right-[14px] top-[18px] w-[clamp(100px,31vw,136px)] drop-shadow-[0_10px_16px_rgb(0_0_0/0.4)]"
-        loading="lazy"
-      />
-      <h3 id="join-t" className="font-uv text-[30px] uppercase leading-[0.92]">
-        Entra in <span className="text-[var(--uv-gold)]">squadra</span>
-      </h3>
-      <ul className="my-[14px] grid gap-[9px]">
-        {[
-          "Avvisi su orari, campi e cambi della tua annata",
-          '"Ci sarò" e la tua agenda della settimana',
-          "Un solo accesso per famiglia, atleta, staff",
-          "In arrivo: coupon di benvenuto Club House con Sky",
-        ].map((t) => (
-          <li
-            key={t}
-            className="flex items-start gap-[10px] text-[15.5px] leading-[1.35]"
-          >
-            <Check
-              className="mt-[1px] size-[22px] shrink-0 text-[var(--uv-gold)]"
-              strokeWidth={2.6}
-              aria-hidden="true"
-            />
-            {t}
-          </li>
-        ))}
-      </ul>
+      <div className="flex items-start gap-4">
+        <div className="min-w-0 flex-1">
+          <span className="inline-block rounded-full bg-white/15 px-[10px] py-[3px] text-[12.5px] font-bold text-[var(--uv-gold)]">
+            Stagione 2026/27
+          </span>
+          <h3 id={titleId} className="mt-2 font-uv text-[clamp(30px,8.4vw,38px)] uppercase leading-[0.9]">
+            Crea il tuo <span className="text-[var(--uv-gold)]">avatar</span> e gioca il tuo campionato
+          </h3>
+          <p className="mt-2 text-[15px] leading-[1.4] text-[#dbe7ff]">
+            La tua identità SCD: avviso dei cambi, "Ci sarò", la tua squadra e le tue foto partita.
+          </p>
+        </div>
+        <AvatarCardDemo />
+      </div>
+
       <Link
         to="/aree"
-        className="flex min-h-[50px] items-center justify-center rounded-[14px] bg-[var(--uv-gold)] font-uv text-[20px] uppercase tracking-[0.06em] text-[var(--uv-night)] shadow-[0_4px_0_#b38f00]"
+        className="mt-4 flex min-h-[54px] items-center justify-center rounded-[14px] bg-[var(--uv-gold)] font-uv text-[21px] uppercase tracking-[0.06em] text-[var(--uv-night)] shadow-[0_4px_0_#b38f00] active:translate-y-[2px] active:shadow-[0_2px_0_#b38f00]"
       >
-        Scegli il tuo ingresso
+        Crea il tuo avatar
       </Link>
-      <small className="mt-[10px] block text-center text-[13px] text-[#c5d6f5]">
-        Calendario e risultati restano aperti a tutti. Valore e regole del
-        coupon li decide la società.
+
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-controls={stepsId}
+        onClick={() => setOpen((o) => !o)}
+        className="mt-3 flex w-full items-center justify-center gap-2 rounded-[12px] py-2 text-[14.5px] font-bold text-[#cfe0ff] underline-offset-4 hover:underline"
+      >
+        {open ? "Chiudi" : "Come funziona"}
+      </button>
+      <ol id={stepsId} hidden={!open} className="mt-1 grid gap-[10px]">
+        {AVATAR_STEPS.map((step, i) => (
+          <li key={step.title} className="flex items-start gap-3 rounded-[14px] bg-white/10 p-3">
+            <span className="grid size-[28px] shrink-0 place-items-center rounded-full bg-[var(--uv-gold)] font-uv text-[17px] text-[var(--uv-night)]">
+              {i + 1}
+            </span>
+            <span className="min-w-0">
+              <b className="block text-[15.5px]">{step.title}</b>
+              <span className="text-[14px] leading-[1.35] text-[#dbe7ff]">{step.text}</span>
+            </span>
+          </li>
+        ))}
+      </ol>
+      <small className="mt-3 block text-center text-[12.5px] leading-[1.35] text-[#c5d6f5]">
+        In arrivo con l'accesso unico. Sotto i 14 anni l'avatar lo attiva un genitore. Calendario e risultati restano aperti a tutti.
       </small>
     </section>
   );
 }
 
-export function InviteCard() {
+/* ------------------------------------------ inviti e canali ufficiali */
+
+export function ShareCard() {
   const text = encodeURIComponent(
     "Vieni con me a vedere la ColicoDerviese! Gare e allenamenti di tutte le squadre: https://www.colicoderviese.it/",
   );
   return (
     <section
-      className="rounded-[18px] bg-white p-[18px] text-[var(--scd-ink)] shadow-[0_14px_28px_rgb(0_10_40/0.28)]"
-      aria-labelledby="inv-t"
-      data-testid="invite-card"
+      id="seguici"
+      className="relative overflow-hidden rounded-[18px] bg-white p-[18px] text-[var(--scd-ink)] shadow-[0_14px_28px_rgb(0_10_40/0.28)]"
+      aria-labelledby="share-t"
+      data-testid="share-card"
     >
-      <h3 id="inv-t" className="font-uv text-[26px] uppercase leading-none">
-        Porta un amico al campo
+      <img
+        src="/media/brand/sky-atv-cut.webp"
+        alt=""
+        className="sky-float pointer-events-none absolute -right-[6px] top-[4px] w-[clamp(58px,16vw,74px)] drop-shadow-[0_8px_12px_rgb(0_0_0/0.25)]"
+        loading="lazy"
+      />
+      <h3 id="share-t" className="pr-[clamp(56px,17vw,76px)] font-uv text-[clamp(26px,7.4vw,30px)] uppercase leading-[0.92]">
+        Fai girare la <span className="text-[var(--uv-royal)]">SCD</span>
       </h3>
-      <p className="my-2 text-[15px] text-[var(--scd-sub)]">
-        Mandagli il calendario su WhatsApp. Il premio "partita gratis" per chi
-        invita arriverà con l'accesso, alle regole decise dalla società.
+      <p className="mt-1 pr-[clamp(56px,17vw,76px)] text-[14.5px] text-[var(--scd-sub)]">
+        Porta un amico al campo e seguici sui canali ufficiali.
       </p>
       <a
         href={`https://wa.me/?text=${text}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex min-h-[52px] items-center justify-center rounded-[14px] bg-[#1fa855] font-uv text-[19px] uppercase tracking-[0.05em] text-white shadow-[0_4px_0_#11713a]"
+        className="relative z-[1] mt-3 flex min-h-[50px] items-center justify-center rounded-[14px] bg-[#1fa855] font-uv text-[19px] uppercase tracking-[0.05em] text-white shadow-[0_4px_0_#11713a]"
       >
-        Invita su WhatsApp
+        Invita un amico
       </a>
-      <small className="mt-2 block text-[13px] text-[var(--scd-sub)]">
-        Nessun numero viene salvato dall'app.
+      <ul className="mt-4 grid grid-cols-6 gap-1" aria-label="Canali ufficiali SCD">
+        {CHANNELS.map((c) => (
+          <li key={c.name}>
+            <a
+              href={c.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex min-w-0 flex-col items-center gap-1 rounded-[12px] py-1 text-center text-[10.5px] font-bold leading-tight tracking-[-0.01em] sm:text-[11.5px]"
+              aria-label={`${c.name}: ${c.sub}`}
+            >
+              <span
+                aria-hidden="true"
+                className="grid size-[clamp(38px,11vw,46px)] place-items-center rounded-full text-[15px] font-black text-white shadow-[0_3px_8px_rgb(0_10_40/0.25)]"
+                style={{ background: c.bg }}
+              >
+                {c.mark}
+              </span>
+              {c.name}
+            </a>
+          </li>
+        ))}
+      </ul>
+      <small className="mt-2 block text-[12.5px] text-[var(--scd-sub)]">
+        Nessun numero viene salvato dall'app. Il premio "partita gratis" per chi invita arriverà con l'accesso, alle regole decise dalla società.
       </small>
     </section>
   );
