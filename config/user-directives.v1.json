@@ -581,6 +581,51 @@
         ],
         "duplicate_work": "DENY"
       }
+    },
+    {
+      "id": "UD-023",
+      "name": "FRIENDLY_OR_TOURNAMENT_ENTRY_FORCES_MANDATORY_FORMS",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "Per calendario poi e quadro settimana Se si inserisce un amichevole o un torneo in automatico il sistema deve obbligare a compilare i moduli e poi darli da stampare per invio",
+        "perché e obbligatorio fare delle cose quando si è società 3 livello elite"
+      ],
+      "normalizedCommand": {
+        "rule": "When a friendly match or a tournament is entered in the calendar or the weekly quadro, the system blocks completion until the mandatory forms are filled (authorisation requests, regulations, staff, safeguarding, medical), then produces them on letterhead ready to print and send. Rules come from the current FIGC/LND/SGS comunicati for a 3rd-level youth club; the event stays PROPOSTA until forms are complete.",
+        "scope": "CALENDARIO+QUADRO+EVENTI",
+        "torreFloor": "-1_REGIA (/calendario, /quadro) + 2_EVENTI",
+        "sources": [
+          "C.U. n.1 SGS 2026/27",
+          "C.U. SGS guida organizzazione tornei",
+          "Reg. LND artt. 37-38",
+          "MODULISTICA SU CARTA INTESTATA"
+        ],
+        "duplicate_work": "DENY"
+      }
+    },
+    {
+      "id": "UD-024",
+      "name": "SPORTS_ORGANIGRAM_THIRD_LEVEL_COMPLIANCE_TRACKER",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "Idem anche per organigramma sportivo c'è bisogno di prepararlo in funzione di 3 livello elite con nuove normative e tenere aggiornato cosa manca per essere in linea",
+        "Allenatori e altro .... Importante vedere e sapere tutto di tutti in figc lnd e anche sport e salute"
+      ],
+      "normalizedCommand": {
+        "rule": "Build the sports organigram against the SGS Sistema di Qualita dei Club Giovanili requirements for the 3rd level (current manual edition), showing per role and per team what is covered and what is missing (coach licences, technical manager, doctor, safeguarding, training meetings, deadlines), and keep it updated. Cross-check each person's status on FIGC/LND (Portale Servizi) and Sport e Salute / RASD. Personal data of minors and certificates stay in reserved areas only.",
+        "scope": "ORGANIGRAMMA+SEGRETERIA",
+        "torreFloor": "-1_REGIA (/gestionale/mappa, organigramma)",
+        "sources": [
+          "C.U. n.18 SGS 2026/27 Manuale Sistema di Qualita 2026",
+          "FIGC Portale Servizi organigramma export",
+          "RASD Sport e Salute"
+        ],
+        "duplicate_work": "DENY"
+      }
     }
   ],
   "completionGate": {
