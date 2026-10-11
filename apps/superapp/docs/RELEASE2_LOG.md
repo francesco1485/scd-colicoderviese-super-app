@@ -14,7 +14,7 @@ One backlog item per night, finished to a verifiable boundary. Status: `done`, `
 | 6 | Work areas read-only with honest empty states | done | 678d4e3 | 2026-10-11 |
 | 7 | Gioca "in arrivo" teaser | todo | | |
 | 2b | Facility map `/impianti` + `/gestionale/mappa` | done | 06da5f2 | 2026-10-11 |
-| 5a | Public hall (chi siamo, squadre, official results links, contatti) | in-progress (branch feat/r2-hall) | | |
+| 5a | Public hall (chi siamo, squadre, official results links, contatti) | done | 8ffd491 | 2026-10-11 |
 | 8 | Impianti follow-ups from benchmark: one request for pitch+rooms+lights, state history (who/when), day view prenotato/disponibile/rilasciato, quadro trainings in pitch capacity check | todo | | |
 
 ## 2026-10-11 · Item 1 · Foundations · done
