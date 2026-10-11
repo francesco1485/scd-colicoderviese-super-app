@@ -29,6 +29,8 @@ export type WeekItem = {
   isVariation: boolean;
   /** Chiave di deduplica: data + avversario normalizzato. */
   dedupeKey: string;
+  /** "CAMPIONATO" | "COPPA" | "TORNEO" | "AMICHEVOLE" | "" (calendario SCD); vuoto per le voci R20. */
+  competition?: string;
 };
 
 const norm = (t: string) => t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "");
@@ -55,6 +57,7 @@ export function calendarToWeekItems(events: readonly PublicEvent[], groups: read
       group: e.group,
       groupLabel: g?.label ?? e.category,
       certain: e.timeConfirmed && e.venueConfirmed,
+      competition: e.type,
       facilityReview: e.facilityReview,
       isVariation: e.isVariation,
       dedupeKey: `${e.date}|${norm(e.opponent)}`,

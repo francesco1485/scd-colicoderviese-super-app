@@ -42,13 +42,15 @@ describe("match extras", () => {
     expect(pickNow({ time: "2026-10-11T15:45", temperature_2m: 11.4, weather_code: 73, wind_speed_10m: 31.2, apparent_temperature: 6.8 }, "Sondrio")).toMatchObject({ mode: "now", temp: 11, feelsLike: 7, wind: 31, label: "Neve", kind: "snow", place: "Sondrio" });
   });
 
-  it("ticket office only at home first-team matches; youth is free; prices honest", () => {
-    expect(ticketingFor({ homeAway: "CASA", group: "prima" })).toBe("office");
-    expect(ticketingFor({ homeAway: "CASA", group: "u15" })).toBe("free");
+  it("ticket office at home matches of the paid championships; youth free; prices from the board", () => {
+    expect(ticketingFor({ homeAway: "CASA", group: "prima", competition: "CAMPIONATO" })).toMatchObject({ kind: "office", cup: false, tariff: { intero: 10, ridotto: 5 } });
+    expect(ticketingFor({ homeAway: "CASA", group: "u19", competition: "COPPA" })).toMatchObject({ kind: "office", cup: true, tariff: { intero: 7, ridotto: 4 } });
+    expect(ticketingFor({ homeAway: "CASA", group: "u16" })).toMatchObject({ kind: "office", tariff: { label: "Campionato U16 Élite" } });
+    expect(ticketingFor({ homeAway: "CASA", group: "u15" })).toEqual({ kind: "free" });
+    expect(ticketingFor({ homeAway: "CASA", group: "pulcini" })).toEqual({ kind: "free" });
     expect(ticketingFor({ homeAway: "FUORI", group: "prima" })).toBeNull();
-    expect(TICKETING.status).toBe("PRICES_TO_CONFIRM");
-    expect(TICKETING.prices.every((p) => p.price === null)).toBe(true);
-    expect(euro(5)).toBe("5 €");
-    expect(euro(7.5)).toBe("7,50 €");
+    expect(TICKETING.status).toBe("CONFIRMED");
+    expect(euro(5)).toBe("5\u00a0€");
+    expect(euro(7.5)).toBe("7,50\u00a0€");
   });
 });

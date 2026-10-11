@@ -106,7 +106,7 @@ export function MapButton({ venue, compact = false }: { venue: string; compact?:
       href={url}
       target="_blank"
       rel="noopener noreferrer"
-      className={`inline-flex items-center gap-1.5 rounded-[12px] border-2 border-[var(--scd-line)] font-extrabold text-[var(--scd-ink)] ${compact ? "min-h-[36px] px-2.5 text-[13px]" : "min-h-[46px] px-3.5 text-[15px]"}`}
+      className={`inline-flex items-center gap-1.5 rounded-[12px] border-2 border-[var(--scd-line)] font-extrabold text-[var(--scd-ink)] ${compact ? "min-h-[36px] px-2.5 text-[13px]" : "min-h-[44px] px-3 text-[14.5px]"}`}
       aria-label={`Apri la mappa: ${venue}`}
     >
       <MapPin className={compact ? "size-4" : "size-5"} aria-hidden="true" />
@@ -117,28 +117,42 @@ export function MapButton({ venue, compact = false }: { venue: string; compact?:
 
 /* ------------------------------------------------------------- ticket office */
 
-/** One line under the buttons: where the ticket office is (first team at home) or free entry (youth). */
+/** One line under the buttons: real prices for paid home matches, free entry for the youth. */
 export function TicketLine({ item }: { item: WeekItem }) {
-  const kind = ticketingFor(item);
-  if (!kind) return null;
+  const t = ticketingFor(item);
+  if (!t) return null;
   return (
     <p className="m-0 flex items-start gap-1.5 text-[13.5px] leading-snug text-[var(--scd-sub)]" data-testid="ticket-line">
       <Ticket className="mt-[2px] size-4 shrink-0" aria-hidden="true" />
-      {kind === "free" ? (
-        <span>Ingresso libero alle gare del settore giovanile.</span>
+      {t.kind === "free" ? (
+        <span>Ingresso gratuito per tutti.</span>
       ) : (
         <span>
-          <b className="text-[var(--scd-ink)]">Biglietteria:</b> {TICKETING.where} · {TICKETING.howToPay.join(", ").toLowerCase()} · {TICKETING.opensBefore}
-          {TICKETING.status !== "CONFIRMED" && " · prezzi da confermare"}
+          <b className="text-[var(--scd-ink)]">Biglietteria</b> ingresso visitatori, Via Lido · intero {euro(t.tariff.intero)} · ridotto {euro(t.tariff.ridotto)} · bambini fino a 12 anni gratis · tesserati gratis
+          {t.cup ? " (in coppa pagano gli accompagnatori)" : " con 1 accompagnatore"}
         </span>
       )}
     </p>
   );
 }
 
-/** "Biglietteria" opens a sheet with where to pay and prices; prices appear only when confirmed. */
+function Row({ label, note, value, tone = "red" }: { label: string; note?: string; value: string; tone?: "red" | "green" }) {
+  return (
+    <tr className="border-t border-[var(--scd-line)]">
+      <td className="py-2 pr-2 font-semibold">
+        {label}
+        {note && <span className="block text-[12.5px] font-medium text-[var(--scd-sub)]">{note}</span>}
+      </td>
+      <td className="py-2 text-right">
+        <span className={`inline-block min-w-[64px] rounded-[8px] px-2 py-[2px] text-center font-uv text-[22px] text-white ${tone === "red" ? "bg-[#c8102e]" : "bg-[#0b8a43]"}`}>{value}</span>
+      </td>
+    </tr>
+  );
+}
+
+/** "Biglietteria" opens a sheet with the board's prices and rules; "Ingresso gratuito" for the free categories. */
 export function TicketButton({ item }: { item: WeekItem }) {
-  const kind = ticketingFor(item);
+  const t = ticketingFor(item);
   const [open, setOpen] = useState(false);
   const id = useId();
   useEffect(() => {
@@ -147,8 +161,8 @@ export function TicketButton({ item }: { item: WeekItem }) {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
-  if (!kind) return null;
-  const free = kind === "free";
+  if (!t) return null;
+  const free = t.kind === "free";
   return (
     <>
       <button
@@ -156,25 +170,25 @@ export function TicketButton({ item }: { item: WeekItem }) {
         onClick={() => setOpen(true)}
         aria-haspopup="dialog"
         aria-expanded={open}
-        className={`inline-flex min-h-[46px] items-center gap-1.5 rounded-[12px] px-3.5 text-[15px] font-extrabold ${free ? "border-2 border-[#0b8a43] text-[#0b8a43]" : "bg-[var(--uv-gold)] text-[var(--uv-night)] shadow-[0_3px_0_#b38f00]"}`}
+        className={`inline-flex min-h-[44px] items-center gap-1.5 rounded-[12px] px-3 text-[14.5px] font-extrabold ${free ? "border-2 border-[#0b8a43] text-[#0b8a43]" : "bg-[var(--uv-gold)] text-[var(--uv-night)] shadow-[0_3px_0_#b38f00]"}`}
         data-testid="ticket-button"
       >
         <Ticket className="size-5" aria-hidden="true" />
-        {free ? "Ingresso libero" : "Biglietteria"}
+        {free ? "Ingresso gratuito" : "Biglietteria"}
       </button>
       {open && (
-        <div className="fixed inset-0 z-[60] flex items-end justify-center bg-[rgb(2_15_40/0.6)] p-3 sm:items-center" onClick={() => setOpen(false)}>
+        <div className="fixed inset-0 z-[70] flex items-end justify-center bg-[rgb(2_15_40/0.6)] p-3 pb-[calc(74px+env(safe-area-inset-bottom))] sm:items-center lg:pb-3" onClick={() => setOpen(false)}>
           <section
             role="dialog"
             aria-modal="true"
             aria-labelledby={`${id}-t`}
             onClick={(e) => e.stopPropagation()}
-            className="sky-panel w-full max-w-[440px] rounded-[20px] bg-white p-5 text-[var(--scd-ink)] shadow-[0_24px_48px_rgb(0_8_30/0.5)]"
+            className="sky-panel max-h-[calc(100dvh-110px)] w-full max-w-[460px] overflow-y-auto rounded-[20px] bg-white p-5 text-[var(--scd-ink)] shadow-[0_24px_48px_rgb(0_8_30/0.5)]"
             data-testid="ticket-sheet"
           >
             <div className="flex items-start justify-between gap-3">
               <h2 id={`${id}-t`} className="m-0 font-uv text-[30px] uppercase leading-[0.92]">
-                {free ? "Ingresso libero" : "Biglietteria"}
+                {free ? "Ingresso gratuito" : "Biglietteria"}
               </h2>
               <button type="button" onClick={() => setOpen(false)} aria-label="Chiudi" className="grid size-10 place-items-center rounded-full bg-[#eef4ff]">
                 <X className="size-5" />
@@ -182,42 +196,31 @@ export function TicketButton({ item }: { item: WeekItem }) {
             </div>
             <p className="mt-2 text-[15px] leading-snug text-[var(--scd-sub)]">{item.groupLabel.replace(/\s·\s/g, " ")}: {item.title}</p>
             {free ? (
-              <ul className="m-0 mt-3 grid list-none gap-2 p-0 text-[15px]">
-                {TICKETING.freeEntry.map((t) => (
-                  <li key={t} className="rounded-[12px] bg-[#e3f3e9] px-3 py-2 font-semibold text-[#1f7a45]">{t}</li>
-                ))}
-              </ul>
+              <>
+                <p className="mt-3 rounded-[12px] bg-[#e3f3e9] px-3 py-2 text-[15px] font-semibold text-[#1f7a45]">{TICKETING.freeCompetitions}.</p>
+                <p className="mt-3 text-[14px] leading-snug text-[var(--scd-sub)]">{TICKETING.members}.</p>
+              </>
             ) : (
               <>
-                <dl className="m-0 mt-3 grid gap-2 text-[15px]">
-                  <div className="rounded-[12px] bg-[#eaf2fc] px-3 py-2">
-                    <dt className="text-[12px] font-extrabold uppercase tracking-[0.06em] text-[var(--scd-sub)]">Dove si paga</dt>
-                    <dd className="m-0 font-semibold">{TICKETING.where}</dd>
-                  </div>
-                  <div className="rounded-[12px] bg-[#eaf2fc] px-3 py-2">
-                    <dt className="text-[12px] font-extrabold uppercase tracking-[0.06em] text-[var(--scd-sub)]">Come</dt>
-                    <dd className="m-0 font-semibold">{TICKETING.howToPay.join(" · ")} · {TICKETING.opensBefore}</dd>
-                  </div>
-                </dl>
+                <p className="mt-3 rounded-[12px] bg-[#eaf2fc] px-3 py-2 text-[14.5px] leading-snug">
+                  <b className="block text-[12px] font-extrabold uppercase tracking-[0.06em] text-[var(--scd-sub)]">{t.tariff.label}</b>
+                  {TICKETING.where} {TICKETING.howToPay.join(", ")}. {TICKETING.opensBefore}
+                </p>
                 <table className="mt-3 w-full border-collapse text-[15px]">
                   <tbody>
-                    {TICKETING.prices.map((p) => (
-                      <tr key={p.label} className="border-t border-[var(--scd-line)]">
-                        <td className="py-2 font-semibold">
-                          {p.label}
-                          {p.note && <span className="block text-[12.5px] font-medium text-[var(--scd-sub)]">{p.note}</span>}
-                        </td>
-                        <td className="py-2 text-right font-uv text-[22px] tabular-nums">{p.price === null ? <span className="rounded-[6px] bg-[#fff3c4] px-2 text-[12px] font-sans font-bold uppercase text-[#7a5200]">da confermare</span> : euro(p.price)}</td>
-                      </tr>
-                    ))}
+                    <Row label="Intero" value={euro(t.tariff.intero)} />
+                    <Row label="Ridotto" note={TICKETING.ridottoNote} value={euro(t.tariff.ridotto)} />
+                    <Row label="Bambini" note="fino a 12 anni" value="Gratis" tone="green" />
                   </tbody>
                 </table>
+                <p className="mt-3 rounded-[12px] bg-[#fff3c4] px-3 py-2 text-[14px] leading-snug text-[#5a4500]">
+                  <b>Tesserati S.C.D.</b> {t.cup ? TICKETING.cup.replace(/^Coppa Italia, play off e play out: /, "In coppa, play off e play out ") : "ingresso gratuito per il tesserato e 1 familiare accompagnatore (campionato ufficiale, tutte le squadre)"}.
+                </p>
                 <ul className="m-0 mt-3 grid list-none gap-1.5 p-0 text-[14px] text-[var(--scd-sub)]">
-                  {TICKETING.freeEntry.map((t) => (
-                    <li key={t}>• {t}</li>
+                  {TICKETING.info.slice(2).map((i) => (
+                    <li key={i}>• {i}</li>
                   ))}
                 </ul>
-                {TICKETING.status !== "CONFIRMED" && <p className="mt-3 rounded-[12px] bg-[#fff3c4] px-3 py-2 text-[13px] leading-snug text-[#7a5200]">{TICKETING.note}</p>}
               </>
             )}
           </section>

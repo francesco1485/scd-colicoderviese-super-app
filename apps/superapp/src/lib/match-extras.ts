@@ -153,25 +153,52 @@ export function weatherMode(nowRomeIso: string, dateIso: string, time: string): 
 
 /* --------------------------------------------------------------- ticketing */
 
-export interface TicketPrice { label: string; price: number | null; note?: string }
+export interface Tariff { label: string; groups: string[]; intero: number; ridotto: number }
 export interface Ticketing {
   status: "CONFIRMED" | "PRICES_TO_CONFIRM";
   asOf: string;
+  source: string;
   where: string;
   howToPay: string[];
   opensBefore: string;
-  prices: TicketPrice[];
-  freeEntry: string[];
+  tariffs: Record<string, Tariff>;
+  ridottoNote: string;
+  bambiniNote: string;
+  freeCompetitions: string;
+  members: string;
+  cup: string;
+  info: string[];
   note: string;
 }
 export const TICKETING: Ticketing = raw as unknown as Ticketing;
 
-/** Ticket office applies to our home matches of the first team; youth matches are free. */
-export function ticketingFor(item: { homeAway?: string | null; group?: string }): "office" | "free" | null {
+export type TicketKind =
+  /** Paid championship match at home: a tariff applies. */
+  | { kind: "office"; tariff: Tariff; cup: boolean }
+  /** Home match of a free category. */
+  | { kind: "free" }
+  | null;
+
+/** Tariff of a calendar group ("prima" → Promozione), or null when the category is free. */
+export function tariffFor(group: string | undefined): Tariff | null {
+  if (!group) return null;
+  for (const t of Object.values(TICKETING.tariffs)) if (t.groups.includes(group)) return t;
+  return null;
+}
+
+/**
+ * Ticket office applies to OUR home matches of the paid championships (Promozione, Juniores Élite,
+ * U16 Élite); every other home match is free. Cup, play-off and play-out follow the same tariff
+ * with the members' rule of the board (member free, companions pay). Away matches: nothing to say.
+ */
+export function ticketingFor(item: { homeAway?: string | null; group?: string; competition?: string | undefined }): TicketKind {
   if (item.homeAway !== "CASA") return null;
-  return item.group === "prima" ? "office" : "free";
+  const tariff = tariffFor(item.group);
+  if (!tariff) return { kind: "free" };
+  const cup = /COPPA|PLAY/i.test(item.competition ?? "");
+  return { kind: "office", tariff, cup };
 }
 
 export function euro(n: number): string {
-  return `${n.toFixed(2).replace(".", ",").replace(",00", "")} €`;
+  return `${n.toFixed(2).replace(".", ",").replace(",00", "")}\u00a0€`;
 }
