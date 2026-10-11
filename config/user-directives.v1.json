@@ -720,7 +720,10 @@
           "Instagram link only for users 14+ and only as an outbound share, no reading of private data"
         ],
         "implementationStatus": "RECORDED_DESIGN_PENDING",
-        "duplicate_work": "DENY"
+        "duplicate_work": "DENY",
+        "decisions": [
+          "DECIDED 2026-10-11: from 14 the athlete enrols alone; under 14 the parent activates account and avatar from their own phone"
+        ]
       }
     },
     {
@@ -743,7 +746,10 @@
           "publication goes through the approval rule decided by Direzione"
         ],
         "implementationStatus": "RECORDED_DESIGN_PENDING",
-        "duplicate_work": "DENY"
+        "duplicate_work": "DENY",
+        "decisions": [
+          "DECIDED 2026-10-11: Sky prepares the weekly digest automatically; the communications manager approves with one click before it goes public"
+        ]
       }
     },
     {
@@ -766,7 +772,10 @@
           "human review before publishing"
         ],
         "implementationStatus": "RECORDED_DESIGN_PENDING",
-        "duplicate_work": "DENY"
+        "duplicate_work": "DENY",
+        "decisions": [
+          "DECIDED 2026-10-11: mandatory for managers and staff; invitation only for minor athletes, with parental consent; one-click approval before publishing"
+        ]
       }
     },
     {
@@ -834,7 +843,10 @@
           "source of expiry dates is R20 / existing master sheets, no new register"
         ],
         "implementationStatus": "RECORDED_DESIGN_PENDING",
-        "duplicate_work": "DENY"
+        "duplicate_work": "DENY",
+        "decisions": [
+          "DECIDED 2026-10-11: reminders to the person (or parent) at 30 and 7 days before expiry; on expiry day also to the secretariat; then weekly until delivered"
+        ]
       }
     }
   ],
