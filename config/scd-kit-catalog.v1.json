@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "id": "SCD_KIT_CATALOG_2026_27",
+  "season": "2026/27",
+  "asOf": "2026-10-11",
+  "note": "Kit ufficiali 2026/27 dalle tavole del fornitore (Saglio Sport Cantù / Legea) e dal kit di rappresentanza Nike 'Insieme al Monza'. Prezzi come stampati sulle tavole; le tavole sono asset KEEP_LOCKED.",
+  "suppliers": [
+    { "id": "saglio-sport", "name": "Saglio Sport Cantù", "brand": "Legea", "phone": "031 207 0488", "mobile": "392 004 7509", "email": "sagliosport@libero.it", "address": "Via Milano 38, Cantù" },
+    { "id": "nike-monza", "name": "Kit rappresentanza Nike · Insieme al Monza", "brand": "Nike", "phone": null, "mobile": null, "email": null, "address": null }
+  ],
+  "kits": [
+    {
+      "id": "atleti-completo",
+      "title": "Kit atleti completo",
+      "audience": "Tutti gli atleti (salvo Primi Calci)",
+      "supplier": "saglio-sport",
+      "total": 200.0,
+      "mandatory": false,
+      "board": "/media/kit/kit-legea-atleti.webp",
+      "items": [
+        { "name": "Giubbotto", "price": 34.0 }, { "name": "Felpa rappresentanza", "price": 38.0 }, { "name": "Felpa allenamento", "price": 20.0 },
+        { "name": "Maglia tecnica azzurra profili bianchi", "price": 11.0 }, { "name": "Polo di rappresentanza", "price": 15.0 }, { "name": "K-way", "price": 17.0 },
+        { "name": "Panta allenamento", "price": 19.0 }, { "name": "Pantaloncino", "price": 7.0 }, { "name": "Bermuda", "price": 13.0 }, { "name": "Calza", "price": 4.0 }, { "name": "Zaino", "price": 22.0 }
+      ]
+    },
+    {
+      "id": "atleti-obbligatorio",
+      "title": "Kit obbligatorio atleti (chi ha già il kit 2025/26)",
+      "audience": "Tutti gli atleti che possiedono già il kit 2025/26",
+      "supplier": "saglio-sport",
+      "total": 60.0,
+      "mandatory": true,
+      "board": "/media/kit/kit-legea-atleti-obbligatorio.webp",
+      "items": [ { "name": "Felpa rappresentanza", "price": 38.0 }, { "name": "Zaino", "price": 22.0 } ]
+    },
+    {
+      "id": "primi-calci-completo",
+      "title": "Kit Primi Calci completo",
+      "audience": "Primi Calci",
+      "supplier": "saglio-sport",
+      "total": 121.0,
+      "mandatory": false,
+      "board": "/media/kit/kit-legea-primi-calci.webp",
+      "items": [
+        { "name": "Felpa rappresentanza", "price": 38.0 }, { "name": "Felpa allenamento", "price": 20.0 }, { "name": "Maglia tecnica azzurra profili bianchi", "price": 11.0 },
+        { "name": "Panta allenamento", "price": 19.0 }, { "name": "Pantaloncino", "price": 7.0 }, { "name": "Calza", "price": 4.0 }, { "name": "Zaino", "price": 22.0 }
+      ]
+    },
+    {
+      "id": "primi-calci-obbligatorio",
+      "title": "Kit obbligatorio Primi Calci (chi ha già il kit 2025/26)",
+      "audience": "Primi Calci che possiedono già il kit 2025/26",
+      "supplier": "saglio-sport",
+      "total": 60.0,
+      "mandatory": true,
+      "board": "/media/kit/kit-legea-primi-calci-obbligatorio.webp",
+      "items": [ { "name": "Felpa rappresentanza", "price": 38.0 }, { "name": "Zaino", "price": 22.0 } ]
+    },
+    {
+      "id": "rappresentanza-nike-2019-2014",
+      "title": "Kit giocatori rappresentanza Nike · Insieme al Monza",
+      "audience": "Atleti dal 2019 al 2014",
+      "supplier": "nike-monza",
+      "total": 235.55,
+      "mandatory": false,
+      "board": "/media/kit/kit-nike-monza-2019-2014.webp",
+      "items": [
+        { "name": "Felpa rappresentanza", "price": 23.6 }, { "name": "Pantalone rappresentanza", "price": 18.66 }, { "name": "Giacca invernale", "price": 64.04 },
+        { "name": "T-shirt cotone personalizzabile", "price": 14.85 }, { "name": "Bermuda rappresentanza", "price": 12.44 }, { "name": "Borsa (unisex)", "price": 27.02 },
+        { "name": "T-shirt allenamento", "price": 11.19 }, { "name": "Short allenamento", "price": 9.33 }, { "name": "Calzettone allenamento (unisex)", "price": 3.63 },
+        { "name": "Felpa allenamento", "price": 18.66 }, { "name": "Pantalone allenamento", "price": 18.66 }, { "name": "Anti-pioggia no brand (unisex)", "price": 13.47 }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "SCD_CLUB_DOCUMENTS_2026_27",
+  "asOf": "2026-10-11",
+  "note": "Documenti societari allegati al modulo di registrazione 2026/27, in sola lettura. Le scelte e i consensi si esprimono solo nel modulo online.",
+  "documents": [
+    { "id": "regolamento-generale", "title": "Regolamento generale, Carta dei valori e utilizzo degli impianti", "file": "/media/documenti/regolamento-generale-scd-2026-27.pdf", "pages": 7, "audience": "Tutti" },
+    { "id": "codice-condotta", "title": "Codice unico di condotta", "file": "/media/documenti/codice-unico-condotta-scd-2026-27.pdf", "pages": 3, "audience": "Atleti, famiglie, tecnici, dirigenti e collaboratori" },
+    { "id": "trasferte-minori", "title": "Regolamento trasferte, trasporti, affidamento e gestione dei minori", "file": "/media/documenti/regolamento-trasferte-trasporti-gestione-minori-scd-2026-27.pdf", "pages": 4, "audience": "Famiglie, accompagnatori, autisti" },
+    { "id": "safeguarding", "title": "Modello organizzativo Safeguarding", "file": "/media/documenti/modello-organizzativo-safeguarding-scd-2026-27.pdf", "pages": 4, "audience": "Tutti" },
+    { "id": "privacy", "title": "Informativa sul trattamento dei dati personali", "file": "/media/documenti/informativa-privacy-scd-2026-27.pdf", "pages": 5, "audience": "Tutti" },
+    { "id": "liberatoria", "title": "Liberatoria per immagini, video e audio", "file": "/media/documenti/liberatoria-immagini-marketing-scd-2026-27.pdf", "pages": 4, "audience": "Atleti e famiglie (consensi facoltativi)" }
+  ],
+  "appRulesDerived": [
+    "Foto e video di minori nell'app solo con la liberatoria espressa nel modulo dal genitore; la Società tiene conto della volontà del minore.",
+    "La liberatoria istituzionale non consente di cedere l'immagine a sponsor: le foto partita non vanno nei contenuti sponsor.",
+    "Pulmini: il servizio si attiva solo dopo conferma della Società; ai punti di raccolta serve un maggiorenne o una delega valida con nome, rapporto e telefono.",
+    "Safeguarding: le segnalazioni vanno al Responsabile Safeguarding tramite canale riservato, mai in chat o nei gruppi."
+  ]
+}

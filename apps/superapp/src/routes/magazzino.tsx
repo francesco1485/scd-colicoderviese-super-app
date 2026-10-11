@@ -1,6 +1,7 @@
+import { KITS, KIT_AS_OF, KIT_SEASON, euro, supplierOf } from "@/lib/kit-catalog";
 import { createFileRoute } from "@tanstack/react-router";
 
-import { Card, SourceLine, TeamTag } from "@/components/scd/interior-ui";
+import { Card, Chip, SourceLine, TeamTag } from "@/components/scd/interior-ui";
 import { EmptyState, PendingButton, SourcesBox, WorkAreaGateView, WorkAreaShell, workAreaHead } from "@/components/scd/work-area-ui";
 import { freshnessLabel, loadCalendar, type PublicGroup } from "@/lib/public-snapshots";
 import { readableOnWhite, teamTag } from "@/lib/quadro";
@@ -81,12 +82,31 @@ function MagazzinoPage({ teams, sourceModifiedAt, preview }: { teams: PublicGrou
         </div>
 
         <div className="flex min-w-0 flex-col gap-[18px]">
-          <Card id="mag-kit" title="Kit ufficiale" sub="Articoli e listino dal fornitore tecnico.">
-            <div className="px-4 pb-4 sm:px-[18px]">
-              <EmptyState title="Ordine kit: file da indicare">
-                L'ordine al fornitore tecnico non è ancora collegato. Gli incassi del kit passano dalla Tesoreria (sottoarea Magazzino), con il Gestionale economico.
-              </EmptyState>
-            </div>
+          <Card id="mag-kit" title={`Kit ufficiale ${KIT_SEASON}`} sub={`Dalle tavole dei fornitori, prezzi come stampati, dato al ${KIT_AS_OF.split("-").reverse().join("/")}.`}>
+            <ul className="m-0 grid list-none gap-3 px-4 pb-4 sm:px-[18px]" data-testid="kit-catalog">
+              {KITS.map((k) => {
+                const sup = supplierOf(k);
+                return (
+                  <li key={k.id} className="grid gap-2 rounded-2xl border border-[var(--in-line)] p-3 sm:grid-cols-[150px_minmax(0,1fr)]">
+                    <a href={k.board} target="_blank" rel="noopener noreferrer" className="block overflow-hidden rounded-xl border border-[var(--in-line)] bg-white">
+                      <img src={k.board} alt={`Tavola ${k.title}`} loading="lazy" className="block w-full" />
+                    </a>
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <b className="text-[15px]">{k.title}</b>
+                        {k.mandatory && <Chip tone="warn">obbligatorio</Chip>}
+                        <Chip tone="info">{euro(k.total)}</Chip>
+                      </div>
+                      <p className="m-0 mt-0.5 text-[13.5px] text-[var(--in-sub)]">{k.audience} · {sup?.name}{sup?.brand ? ` (${sup.brand})` : ""}</p>
+                      <p className="m-0 mt-1.5 text-[13px] leading-snug">
+                        {k.items.map((i) => `${i.name} ${euro(i.price)}`).join(" · ")}
+                      </p>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+            <SourceLine>Ordini e taglie restano nel foglio SCD_ORDINE_KIT; gli incassi passano dalla Tesoreria. Le tavole sono dei fornitori: non si ridisegnano.</SourceLine>
           </Card>
           <SourcesBox id="magazzino" />
         </div>

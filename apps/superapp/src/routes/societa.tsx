@@ -1,5 +1,6 @@
+import { CLUB_DOCUMENTS } from "@/lib/club-documents";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, ExternalLink, MapPin } from "lucide-react";
+import { ArrowRight, ExternalLink, FileText, MapPin } from "lucide-react";
 
 import { ClubCrestOfficial } from "@/components/SiteChrome";
 import { HallDoors, HallHero } from "@/components/scd/hall";
@@ -126,6 +127,26 @@ function Societa() {
                   {t.label.replace(/\s·\s/g, " ")}
                   {t.championship && <span className="text-[13px] font-medium text-[var(--out-text-soft)]">· {t.championship.name.replace(" Lombardia", "")}</span>}
                 </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section aria-labelledby="documenti-t" className="mt-12" data-testid="club-documents">
+          <h2 id="documenti-t" className="m-0 font-title text-[26px] font-black uppercase leading-none">
+            Regolamenti e documenti
+          </h2>
+          <p className="m-0 mt-1 text-[14px] text-[var(--out-text-soft)]">I documenti allegati al modulo di registrazione 2026/27, in sola lettura. Le scelte e i consensi si esprimono solo nel modulo online.</p>
+          <ul className="m-0 mt-4 grid list-none gap-2 p-0 sm:grid-cols-2 lg:grid-cols-3">
+            {CLUB_DOCUMENTS.map((d) => (
+              <li key={d.id}>
+                <a href={d.file} target="_blank" rel="noopener noreferrer" className="flex min-h-[72px] items-start gap-3 rounded-[14px] border border-[var(--out-line,#d3e0ee)] bg-white px-3 py-2.5 text-[var(--scd-ink,#062a52)]">
+                  <FileText className="mt-0.5 size-5 shrink-0 text-[var(--scd-blue,#0457af)]" strokeWidth={1.8} aria-hidden="true" />
+                  <span className="min-w-0">
+                    <b className="block text-[14.5px] leading-tight">{d.title}</b>
+                    <span className="block text-[12.5px] text-[var(--out-text-soft,#46617f)]">{d.audience} · PDF, {d.pages} pagine</span>
+                  </span>
+                </a>
               </li>
             ))}
           </ul>

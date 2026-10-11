@@ -22,7 +22,7 @@ export function MemberServicesBar({ area }: { area?: string }) {
         return (
           <Link
             key={s.id}
-            to={s.area === "club-house" ? "/tesoreria/club-house" : s.area === "infermeria" ? "/infermeria" : "/aree"}
+            to={s.area === "club-house" ? "/tesoreria/club-house" : s.area === "infermeria" ? "/infermeria" : s.area === "magazzino" ? "/magazzino" : "/aree"}
             className={`flex min-w-[230px] max-w-[280px] shrink-0 flex-col gap-0.5 rounded-[14px] border px-3 py-2 text-left ${here ? "border-[var(--in-ink)] bg-white" : "border-[var(--in-line)] bg-white/80"}`}
           >
             <span className="flex items-center justify-between gap-2">

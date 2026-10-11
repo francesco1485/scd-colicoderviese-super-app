@@ -17,6 +17,17 @@
       "status": "ACTIVE"
     },
     {
+      "id": "kit-2026-27",
+      "area": "magazzino",
+      "title": "Kit ufficiale 2026/27",
+      "text": "Kit completo atleti 200 €, Primi Calci 121 €; per chi ha già il kit 2025/26 è obbligatorio felpa + zaino, 60 €.",
+      "price": "da 60 €",
+      "priceStatus": "SUPPLIER_BOARDS_2026-10-11",
+      "contactRole": "Responsabile magazzino",
+      "memberOnly": true,
+      "status": "ACTIVE"
+    },
+    {
       "id": "massaggi-tecar",
       "area": "infermeria",
       "title": "Massaggi e tecar",
@@ -42,12 +53,35 @@
   "pulminiService": {
     "source": "Comunicazione generale servizio pulmini, in vigore dal 2026-10-05",
     "vehiclesInService": 3,
-    "trainingAnnate": ["2019", "2018", "2017", "2016", "2015", "2014", "2013", "2012"],
-    "trainingNotServed": ["U16 Élite", "Juniores Élite"],
-    "evaluatedCaseByCase": ["2020", "2021"],
-    "modes": ["andata e ritorno", "solo andata", "solo ritorno"],
+    "trainingAnnate": [
+      "2019",
+      "2018",
+      "2017",
+      "2016",
+      "2015",
+      "2014",
+      "2013",
+      "2012"
+    ],
+    "trainingNotServed": [
+      "U16 Élite",
+      "Juniores Élite"
+    ],
+    "evaluatedCaseByCase": [
+      "2020",
+      "2021"
+    ],
+    "modes": [
+      "andata e ritorno",
+      "solo andata",
+      "solo ritorno"
+    ],
     "awayTrips": "Tutte le categorie, con programmazione mensile tramite responsabili, dirigenti e staff; subordinata a mezzi e persone disponibili.",
     "requestFlow": "Nuove esigenze o variazioni passano da responsabili, dirigenti o allenatori al Responsabile del servizio pulmini, che valuta in autonomia; attendere sempre la conferma.",
-    "pickupRules": ["almeno un maggiorenne ai punti di raccolta", "rispetto degli orari", "nessuna discussione organizzativa durante il trasporto, salvo urgenze"]
+    "pickupRules": [
+      "almeno un maggiorenne ai punti di raccolta",
+      "rispetto degli orari",
+      "nessuna discussione organizzativa durante il trasporto, salvo urgenze"
+    ]
   }
 }

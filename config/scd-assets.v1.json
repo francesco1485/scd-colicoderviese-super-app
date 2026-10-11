@@ -112,6 +112,132 @@
       "source": "SCD_INTERNAL_APPROVED",
       "confidence": "HIGH",
       "verified_at": "2026-10-01"
+    },
+    {
+      "path": "apps/superapp/public/media/kit/kit-nike-monza-2019-2014.webp",
+      "class": "SUPPLIER_KIT_BOARD",
+      "status": "LOCKED",
+      "git_blob_sha": "3a332e3c2f4c7a3c7d51eff4ee44b3a9d4479937",
+      "source": "SUPPLIER_BOARD_PROVIDED_BY_DIRECTION_2026-10-11",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-11"
+    },
+    {
+      "path": "apps/superapp/public/media/kit/kit-legea-atleti.webp",
+      "class": "SUPPLIER_KIT_BOARD",
+      "status": "LOCKED",
+      "git_blob_sha": "cff30e551e83ed23af14360fd6b8aa9595d0aa47",
+      "source": "SUPPLIER_BOARD_PROVIDED_BY_DIRECTION_2026-10-11",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-11"
+    },
+    {
+      "path": "apps/superapp/public/media/kit/kit-legea-atleti-obbligatorio.webp",
+      "class": "SUPPLIER_KIT_BOARD",
+      "status": "LOCKED",
+      "git_blob_sha": "74d7f4833c2d824e696813cddba0903ef0717af7",
+      "source": "SUPPLIER_BOARD_PROVIDED_BY_DIRECTION_2026-10-11",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-11"
+    },
+    {
+      "path": "apps/superapp/public/media/kit/kit-legea-primi-calci.webp",
+      "class": "SUPPLIER_KIT_BOARD",
+      "status": "LOCKED",
+      "git_blob_sha": "a0b20eb7378077f39b5303bd106ce1e8ec2dd992",
+      "source": "SUPPLIER_BOARD_PROVIDED_BY_DIRECTION_2026-10-11",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-11"
+    },
+    {
+      "path": "apps/superapp/public/media/kit/kit-legea-primi-calci-obbligatorio.webp",
+      "class": "SUPPLIER_KIT_BOARD",
+      "status": "LOCKED",
+      "git_blob_sha": "714bbfac1c8ba06b516a062a7065f79c8adddbb7",
+      "source": "SUPPLIER_BOARD_PROVIDED_BY_DIRECTION_2026-10-11",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-11"
+    },
+    {
+      "path": "apps/superapp/public/media/affiliazioni/insieme-al-monza.webp",
+      "class": "OFFICIAL_AFFILIATION_LOGO",
+      "status": "LOCKED",
+      "git_blob_sha": "aea92a170d89a90fa9cd2094eb7f07f907a6b76c",
+      "source": "OFFICIAL_FILE_PROVIDED_BY_DIRECTION_2026-10-11",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-11"
+    },
+    {
+      "path": "apps/superapp/public/media/affiliazioni/lnd.webp",
+      "class": "OFFICIAL_AFFILIATION_LOGO",
+      "status": "LOCKED",
+      "git_blob_sha": "fa156e415ac629a028c89b58b3f5a2bf96aa92a5",
+      "source": "OFFICIAL_FILE_PROVIDED_BY_DIRECTION_2026-10-11",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-11"
+    },
+    {
+      "path": "apps/superapp/public/media/affiliazioni/figc-sgs-3-livello.webp",
+      "class": "OFFICIAL_AFFILIATION_LOGO",
+      "status": "LOCKED",
+      "git_blob_sha": "17443a9110ba306a116e9efde3cf6fe302a7b91e",
+      "source": "OFFICIAL_FILE_PROVIDED_BY_DIRECTION_2026-10-11",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-11"
+    },
+    {
+      "path": "apps/superapp/public/media/documenti/codice-unico-condotta-scd-2026-27.pdf",
+      "class": "OFFICIAL_CLUB_DOCUMENT",
+      "status": "LOCKED",
+      "git_blob_sha": "3ede9e64e90b71e3cb0d7e7aa80ebfc03e6abecb",
+      "source": "CLUB_DOCUMENT_PROVIDED_BY_DIRECTION_2026-10-11",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-11"
+    },
+    {
+      "path": "apps/superapp/public/media/documenti/informativa-privacy-scd-2026-27.pdf",
+      "class": "OFFICIAL_CLUB_DOCUMENT",
+      "status": "LOCKED",
+      "git_blob_sha": "91c439d3748eda7e53302efbac167c28d92dc7e9",
+      "source": "CLUB_DOCUMENT_PROVIDED_BY_DIRECTION_2026-10-11",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-11"
+    },
+    {
+      "path": "apps/superapp/public/media/documenti/liberatoria-immagini-marketing-scd-2026-27.pdf",
+      "class": "OFFICIAL_CLUB_DOCUMENT",
+      "status": "LOCKED",
+      "git_blob_sha": "c3d9158c9272cf4e1c057ed51086a0efbcd833eb",
+      "source": "CLUB_DOCUMENT_PROVIDED_BY_DIRECTION_2026-10-11",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-11"
+    },
+    {
+      "path": "apps/superapp/public/media/documenti/modello-organizzativo-safeguarding-scd-2026-27.pdf",
+      "class": "OFFICIAL_CLUB_DOCUMENT",
+      "status": "LOCKED",
+      "git_blob_sha": "6f4a55b061a6e5626d3846a30c9e68fcb169896a",
+      "source": "CLUB_DOCUMENT_PROVIDED_BY_DIRECTION_2026-10-11",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-11"
+    },
+    {
+      "path": "apps/superapp/public/media/documenti/regolamento-generale-scd-2026-27.pdf",
+      "class": "OFFICIAL_CLUB_DOCUMENT",
+      "status": "LOCKED",
+      "git_blob_sha": "5be2fd07382674ea3e75810405e84809aa02966e",
+      "source": "CLUB_DOCUMENT_PROVIDED_BY_DIRECTION_2026-10-11",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-11"
+    },
+    {
+      "path": "apps/superapp/public/media/documenti/regolamento-trasferte-trasporti-gestione-minori-scd-2026-27.pdf",
+      "class": "OFFICIAL_CLUB_DOCUMENT",
+      "status": "LOCKED",
+      "git_blob_sha": "43c2d10de9eae1658dd07cb2edab58392f21dca2",
+      "source": "CLUB_DOCUMENT_PROVIDED_BY_DIRECTION_2026-10-11",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-11"
     }
   ],
   "provenance_required": [

@@ -1247,6 +1247,49 @@
         "implementationStatus": "STAGING",
         "duplicate_work": "DENY"
       }
+    },
+    {
+      "id": "UD-052",
+      "name": "KIT_CATALOG_2026_27_FROM_SUPPLIER_BOARDS",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "tavole kit Saglio Sport / Legea e kit rappresentanza Nike Insieme al Monza (immagini 2026-10-11)"
+      ],
+      "normalizedCommand": {
+        "rule": "Official kits 2026/27 with prices as printed on the supplier boards: athletes 200 €, Primi Calci 121 €, mandatory 60 € (felpa + zaino) for those who already own the 2025/26 kit, Nike representation kit 235,55 € for 2019–2014.",
+        "scope": "SUPER_APP",
+        "torreFloor": "-2 (magazzino) + 1 (per i tesserati)",
+        "constraints": [
+          "prices only from the boards; boards are locked supplier assets",
+          "orders and sizes stay in SCD_ORDINE_KIT; payments in tesoreria"
+        ],
+        "implementationStatus": "STAGING",
+        "duplicate_work": "DENY"
+      }
+    },
+    {
+      "id": "UD-053",
+      "name": "CLUB_DOCUMENTS_READ_ONLY_IN_APP",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "Codice unico di condotta, Informativa privacy, Liberatoria immagini, Modello organizzativo Safeguarding, Regolamento generale, Regolamento trasferte e minori (PDF 2026-10-11)"
+      ],
+      "normalizedCommand": {
+        "rule": "The six club documents attached to the registration form are available read-only in the app (Chi siamo); the app's rules on photos, transport and safeguarding derive from them.",
+        "scope": "SUPER_APP",
+        "torreFloor": "0_HALL (societa)",
+        "constraints": [
+          "consents are given only in the online form, never in the app's public pages",
+          "photos of minors only with the family's consent from the form; never ceded to sponsors",
+          "safeguarding reports only through the reserved channel"
+        ],
+        "implementationStatus": "STAGING",
+        "duplicate_work": "DENY"
+      }
     }
   ],
   "completionGate": {
