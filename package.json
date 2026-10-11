@@ -52,6 +52,7 @@
     "test:isolated-preview": "node --test tests/isolated-preview-runtime.test.mjs",
     "test:reboot-ui": "node --test tests/scd-reboot-ui.test.mjs",
     "scd:freefirst": "node scripts/scd-free-first.mjs",
-    "test:freefirst": "node --test tests/scd-free-first.test.mjs"
+    "test:freefirst": "node --test tests/scd-free-first.test.mjs",
+    "test:claude-hooks": "node --test tests/claude-hooks.test.mjs"
   }
 }

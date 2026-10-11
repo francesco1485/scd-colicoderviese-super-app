@@ -182,3 +182,10 @@ Prima di suggerire, installare, sostituire o collegare agenti, servizi AI, skill
 6. fermarsi **prima di ogni azione esterna con effetto**, installazione, connessione, avvio trial, modifica abbonamento, pagamento o invio domanda: `HUMAN_APPROVAL`.
 
 Comandi interni: `/credits`, `/freefirst`, `/nonprofit`, `/trialgate`, `/toolscore`, `/skillreuse`, `/creditbudget`, `/sourcecheck`. Audit locale reversibile: `npm run scd:freefirst -- /freefirst`. Il comando CLI NON effettua verifiche live delle fatture del provider e non abilita in alcun modo spese. È una disciplina del sistema interno SCD, **non un comando da esporre alla Sky pubblica o ai dati dei minori**.
+
+## Guardrail automatici (Claude Code hooks)
+`.claude/settings.json` attiva tre hook verificati da `npm run test:claude-hooks`:
+- `SessionStart` → stampa la fotografia locale SCD:STATE (branch, SHA, working tree, hash manifest); i campi remoti restano `UNVERIFIED` finché non controllati.
+- `PreToolUse Bash` → blocca force push, push su main/production, merge di PR, `reset --hard`, `clean -f`, `commit --no-verify`; prima di ogni commit esegue `test:manifest` e cerca IBAN, codici fiscali, chiavi e token nelle modifiche in stage.
+- `PreToolUse Write/Edit` → blocca file `.env`, export di fogli di calcolo fuori da `apps/*/src/data` e `tests/fixtures`, file di credenziali e contenuti con dati sensibili.
+Gli hook non sostituiscono i gate: li rendono obbligatori.
