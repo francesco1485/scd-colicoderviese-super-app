@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { CircleCheck, MapPin, ShieldCheck, TriangleAlert } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import { Card, Chip, SourceLine, TeamTag, useRomeNow } from "@/components/scd/interior-ui";
 import { EmptyState, PendingButton, SourcesBox, StatTile, WorkAreaGateView, WorkAreaShell, workAreaHead } from "@/components/scd/work-area-ui";
@@ -9,7 +9,9 @@ import { freshnessLabel, loadCalendar, type PublicEvent, type PublicGroup } from
 import { readableOnWhite, teamTag } from "@/lib/quadro";
 import { getWorkAreaGate } from "@/lib/work-areas.functions";
 import { getPulminiRuns } from "@/lib/pulmini-runs.functions";
-import { ridersTotal, runsByEvent, type PulminoRun } from "@/lib/pulmini-runs";
+import { ridersTotal, runsByEvent, runsByTraining, trainingKey, type PulminoRun } from "@/lib/pulmini-runs";
+import { loadQuadro, type TrainingSlot } from "@/lib/public-snapshots";
+import { defaultDay, weekdayKey } from "@/lib/training-view";
 import { VanSeatMap, type TeamColor } from "@/components/scd/VanSeatMap";
 import { PULMINI_FLEET, factStamp, nextWeekend, weekendMatches } from "@/lib/work-areas";
 
@@ -20,7 +22,8 @@ export const Route = createFileRoute("/pulmini")({
     if (gate.view !== "page") return { gate, interior: false as const };
     const cal = loadCalendar();
     const runs = await getPulminiRuns();
-    return { gate, interior: true as const, groups: cal.groups, events: cal.events, sourceModifiedAt: cal.sourceModifiedAt, runs: runs.runs, runsAsOf: runs.asOf };
+    const quadro = loadQuadro();
+    return { gate, interior: true as const, groups: cal.groups, events: cal.events, sourceModifiedAt: cal.sourceModifiedAt, runs: runs.runs, runsAsOf: runs.asOf, quadroDays: quadro.days, quadroSlots: quadro.slots };
   },
   head: ({ loaderData }) => workAreaHead("pulmini", loaderData?.gate),
   component: PulminiRoute,
@@ -30,14 +33,14 @@ function PulminiRoute() {
   const data = Route.useLoaderData();
   return (
     <WorkAreaGateView id="pulmini" gate={data.gate}>
-      {data.interior && <PulminiPage groups={data.groups} events={data.events} sourceModifiedAt={data.sourceModifiedAt} preview={data.gate.preview} runs={data.runs} runsAsOf={data.runsAsOf} />}
+      {data.interior && <PulminiPage groups={data.groups} events={data.events} sourceModifiedAt={data.sourceModifiedAt} preview={data.gate.preview} runs={data.runs} runsAsOf={data.runsAsOf} quadroDays={data.quadroDays} quadroSlots={data.quadroSlots} />}
     </WorkAreaGateView>
   );
 }
 
 const F = PULMINI_FLEET;
 
-function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf }: { groups: PublicGroup[]; events: PublicEvent[]; sourceModifiedAt: string; preview: boolean; runs: PulminoRun[]; runsAsOf: string | null }) {
+function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf, quadroDays, quadroSlots }: { groups: PublicGroup[]; events: PublicEvent[]; sourceModifiedAt: string; preview: boolean; runs: PulminoRun[]; runsAsOf: string | null; quadroDays: string[]; quadroSlots: TrainingSlot[] }) {
   const now = useRomeNow();
   const trips = useMemo(() => weekendMatches(events, now.date, true), [events, now.date]);
   const { sat, sun } = nextWeekend(now.date);
@@ -46,6 +49,11 @@ function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf
   const vansByEvent = useMemo(() => runsByEvent(runs), [runs]);
   const weekendRuns = trips.reduce((n, e) => n + (vansByEvent.get(e.id)?.length ?? 0), 0);
   const weekendKids = trips.reduce((n, e) => n + (vansByEvent.get(e.id) ?? []).reduce((a, r) => a + ridersTotal(r), 0), 0);
+  const trainingRuns = useMemo(() => runsByTraining(runs), [runs]);
+  const weekdayRuns = runs.filter((r) => r.training).length;
+  const [trainDay, setTrainDay] = useState(() => defaultDay(quadroDays, now.date));
+  const trainSlots = useMemo(() => quadroSlots.filter((s) => s.day === trainDay).sort((a, b) => a.start - b.start), [quadroSlots, trainDay]);
+  const todayKey = weekdayKey(now.date);
   const weekendLabel = `sabato ${Number(sat.slice(8))} e domenica ${Number(sun.slice(8))}`;
 
   return (
@@ -55,11 +63,69 @@ function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf
       highlights={[
         { value: trips.length, label: `trasferte ${weekendLabel}` },
         { value: weekendRuns, label: "pulmini assegnati nel weekend" },
+        { value: weekdayRuns, label: "corse di allenamento in settimana" },
         { value: F.vehicles, label: "mezzi, posti da confermare" },
       ]}
       note={<>Calendario ufficiale: copia del {freshnessLabel(sourceModifiedAt)} · Flotta: {factStamp(F)}.</>}
     >
       <div className="grid grid-cols-1 gap-[18px] lg:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="flex min-w-0 flex-col gap-[18px]">
+        <Card
+          id="pul-settimana"
+          title="In settimana: i pulmini degli allenamenti"
+          sub="Per ogni fascia del quadro, quanti pulmini si muovono e chi c'è a bordo. Le corse arrivano dal Master Pulmini."
+          aside={<Chip tone="info">{weekdayRuns} {weekdayRuns === 1 ? "corsa" : "corse"}</Chip>}
+          className="lg:self-start"
+        >
+          <div className="flex flex-wrap gap-1.5 px-4 pb-3 sm:px-[18px]" role="group" aria-label="Giorno">
+            {quadroDays.map((d) => {
+              const on = d === trainDay;
+              const today = d === todayKey;
+              return (
+                <button key={d} type="button" onClick={() => setTrainDay(d)} aria-pressed={on} className={`h-9 rounded-full px-3.5 text-[14px] font-bold ${on ? "bg-[var(--in-ink)] text-white" : "bg-[var(--in-info-bg)] text-[var(--in-ink)]"}`}>
+                  {d.charAt(0) + d.slice(1, 3).toLowerCase()}
+                  {today && <span className="ml-1 text-[11px] font-extrabold opacity-80">oggi</span>}
+                </button>
+              );
+            })}
+          </div>
+          {trainSlots.length === 0 ? (
+            <div className="px-4 pb-4 sm:px-[18px]">
+              <EmptyState title="Nessuna fascia nel quadro">Il quadro settimanale non ha allenamenti per questo giorno.</EmptyState>
+            </div>
+          ) : (
+            <ol className="m-0 list-none p-0">
+              {trainSlots.map((slot) => {
+                const vans = trainingRuns.get(trainingKey(slot.day, slot.start)) ?? [];
+                const kids = vans.reduce((a, r) => a + ridersTotal(r), 0);
+                const who = [slot.fields.C1, slot.fields.C2].filter((t) => t && t.trim() && t.trim() !== "—").join(" · ");
+                return (
+                  <li key={slot.timeLabel + slot.start} className="grid gap-3 border-t border-[var(--in-line)] px-4 py-4 sm:px-[18px]" data-testid="training-run">
+                    <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                      <span className="font-title text-[24px] font-black leading-none tabular-nums">{slot.timeLabel.split(/[–-]/)[0]}</span>
+                      <span className="text-[14px] text-[var(--in-sub)]">{slot.timeLabel}</span>
+                      <span className="min-w-0 flex-1 truncate text-[14px] font-semibold" title={who}>{who || "Campi liberi"}</span>
+                      {vans.length === 0 ? (
+                        <Chip tone="warn">nessun pulmino</Chip>
+                      ) : (
+                        <Chip tone="ok">{vans.length} {vans.length === 1 ? "pulmino" : "pulmini"} · {kids} ragazzi</Chip>
+                      )}
+                    </div>
+                    {vans.length > 0 && (
+                      <div className="grid gap-4 rounded-2xl bg-[#f5f9ff] p-3 md:grid-cols-2">
+                        {vans.map((run, i) => (
+                          <VanSeatMap key={`${run.vehicle}-${i}`} run={run} teams={teamColors} destination="Centro sportivo Colico" />
+                        ))}
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
+            </ol>
+          )}
+          <SourceLine>Fasce dal quadro settimanale; corse dal Master Pulmini{runsAsOf ? ` (dato al ${runsAsOf.split("-").reverse().join("/")})` : ""}. Aggiungere autisti, corse e variazioni d'orario dall'app arriverà con l'accesso del responsabile trasporti.</SourceLine>
+        </Card>
+
         <Card
           id="pul-trasferte"
           title="Trasferte del prossimo weekend"
@@ -81,6 +147,7 @@ function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf
           <SourceLine>Calendario ufficiale FIGC/LND, copia del {freshnessLabel(sourceModifiedAt)}. Le corse si salvano nel Master Pulmini: da qui non si crea nulla.</SourceLine>
         </Card>
 
+        </div>
         <div className="flex min-w-0 flex-col gap-[18px]">
           <Card id="pul-flotta" title="Flotta" sub="Dal Master Flotta e Trasporti: i posti non sono ancora confermati.">
             <div className="grid grid-cols-3 gap-2 px-4 pb-4 sm:px-[18px]" data-testid="fleet">
@@ -91,8 +158,8 @@ function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf
             <dl className="m-0 grid grid-cols-[1fr_auto] gap-x-3 gap-y-1.5 border-t border-[var(--in-line)] px-4 py-3 text-[14.5px] sm:px-[18px]">
               <dt className="text-[var(--in-sub)]">Posti per mezzo</dt>
               <dd className="m-0 font-semibold">— <Chip tone="warn" className="ml-1">da confermare</Chip></dd>
-              <dt className="text-[var(--in-sub)]">Corse pianificate</dt>
-              <dd className="m-0 font-semibold">nessuna</dd>
+              <dt className="text-[var(--in-sub)]">Corse registrate</dt>
+              <dd className="m-0 font-semibold">{runs.length === 0 ? "nessuna" : `${runs.length} (${weekdayRuns} in settimana, ${runs.length - weekdayRuns} trasferte)`}</dd>
             </dl>
             <SourceLine>{factStamp(F)}. Sul pulmino compare il nome dell'autista; i ragazzi sono figure senza nome.</SourceLine>
           </Card>

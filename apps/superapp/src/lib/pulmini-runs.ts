@@ -8,9 +8,18 @@
  * know, so names pasted by mistake are discarded before reaching the page.
  */
 
+export interface TrainingRef {
+  /** Weekday key as in the quadro ("LUNEDÌ"). */
+  day: string;
+  /** Slot start in minutes from midnight (e.g. 1040 = 17:20). */
+  start: number;
+}
+
 export interface PulminoRun {
-  /** Calendar event id served by this run (EVT-...). */
+  /** Calendar event id served by this run (EVT-...), or "" for a weekday training run. */
   eventId: string;
+  /** Set for weekday training runs: which slot the van serves. */
+  training: TrainingRef | null;
   /** Vehicle label as written in the Master Flotta (e.g. "Pulmino 1"). */
   vehicle: string;
   /** Driver display name, adult volunteer ("Mario R."). Null when not yet assigned. */
@@ -36,6 +45,16 @@ export interface PulminiRuns {
 export const DEFAULT_PASSENGER_SEATS = 8;
 
 const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
+const DAYS = new Set(["LUNEDÌ", "MARTEDÌ", "MERCOLEDÌ", "GIOVEDÌ", "VENERDÌ", "SABATO", "DOMENICA"]);
+
+function parseTraining(v: unknown): TrainingRef | null {
+  if (!v || typeof v !== "object") return null;
+  const o = v as Record<string, unknown>;
+  const day = typeof o["day"] === "string" ? o["day"].trim().toUpperCase() : "";
+  const start = typeof o["start"] === "number" ? o["start"] : Number.NaN;
+  if (!DAYS.has(day) || !Number.isInteger(start) || start < 0 || start >= 1440) return null;
+  return { day, start };
+}
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 
 function text(v: unknown, max: number): string | null {
@@ -52,9 +71,10 @@ function count(v: unknown, max: number): number {
 function parseRun(v: unknown): PulminoRun | null {
   if (!v || typeof v !== "object") return null;
   const o = v as Record<string, unknown>;
-  const eventId = text(o["eventId"], 120);
+  const eventId = text(o["eventId"], 120) ?? "";
+  const training = parseTraining(o["training"]);
   const vehicle = text(o["vehicle"], 40);
-  if (!eventId || !vehicle) return null;
+  if ((!eventId && !training) || !vehicle) return null;
   const departure = text(o["departure"], 5);
   const seatsRaw = o["seats"];
   const seats = typeof seatsRaw === "number" && Number.isInteger(seatsRaw) && seatsRaw > 0 && seatsRaw <= 20 ? seatsRaw : null;
@@ -70,6 +90,7 @@ function parseRun(v: unknown): PulminoRun | null {
   }
   return {
     eventId,
+    training,
     vehicle,
     driver: text(o["driver"], 40),
     departure: departure && TIME.test(departure) ? departure : null,
@@ -128,9 +149,25 @@ export function seatPlan(run: PulminoRun | null): SeatPlan {
   return { seats, confirmed: run?.seats != null, occupancy, overflow: Math.max(0, people.length - seats) };
 }
 
-/** Runs indexed by calendar event, keeping all vans of a trip. */
+/** Runs indexed by calendar event, keeping all vans of a trip (training runs excluded). */
 export function runsByEvent(runs: readonly PulminoRun[]): Map<string, PulminoRun[]> {
   const m = new Map<string, PulminoRun[]>();
-  for (const r of runs) m.set(r.eventId, [...(m.get(r.eventId) ?? []), r]);
+  for (const r of runs) if (r.eventId) m.set(r.eventId, [...(m.get(r.eventId) ?? []), r]);
+  return m;
+}
+
+/** Key of a training slot, shared by runs and the quadro. */
+export function trainingKey(day: string, start: number): string {
+  return `${day}@${start}`;
+}
+
+/** Weekday training runs indexed by slot key. */
+export function runsByTraining(runs: readonly PulminoRun[]): Map<string, PulminoRun[]> {
+  const m = new Map<string, PulminoRun[]>();
+  for (const r of runs) {
+    if (!r.training) continue;
+    const k = trainingKey(r.training.day, r.training.start);
+    m.set(k, [...(m.get(k) ?? []), r]);
+  }
   return m;
 }

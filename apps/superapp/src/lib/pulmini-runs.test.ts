@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { DEFAULT_PASSENGER_SEATS, parseRuns, ridersTotal, runsByEvent, seatPlan } from "./pulmini-runs";
+import { DEFAULT_PASSENGER_SEATS, parseRuns, ridersTotal, runsByEvent, runsByTraining, seatPlan, trainingKey } from "./pulmini-runs";
 import { pulminiRunsData } from "./pulmini-runs.functions";
 
 const raw = JSON.stringify({
@@ -19,6 +19,8 @@ const raw = JSON.stringify({
     },
     { eventId: "EVT-PUL-1", vehicle: "Pulmino 2", riders: { pulcini: 3 } },
     { vehicle: "senza evento" },
+    { training: { day: "lunedì", start: 1040 }, vehicle: "Pulmino 1", driver: "Anna B.", departure: "16:45", riders: { u15: 4, "2015": 3 } },
+    { training: { day: "lunedì", start: 2000 }, vehicle: "Pulmino 4" },
   ],
 });
 
@@ -26,7 +28,7 @@ describe("pulmini runs parser", () => {
   it("keeps known fields, cleans text and drops children's names", () => {
     const p = parseRuns(raw);
     expect(p.asOf).toBe("2026-10-11");
-    expect(p.runs).toHaveLength(2);
+    expect(p.runs).toHaveLength(3);
     const r = p.runs[0]!;
     expect(r).toMatchObject({ driver: "Mario R.", departure: "13:45", seats: 8, riders: { pulcini: 6 }, adults: 1 });
     expect(JSON.stringify(p)).not.toContain("Luca");
@@ -51,8 +53,13 @@ describe("pulmini runs parser", () => {
     expect(full.overflow).toBe(3);
   });
 
-  it("groups vans by trip", () => {
-    expect(runsByEvent(parseRuns(raw).runs).get("EVT-PUL-1")).toHaveLength(2);
+  it("groups vans by trip and by training slot", () => {
+    const runs = parseRuns(raw).runs;
+    expect(runsByEvent(runs).get("EVT-PUL-1")).toHaveLength(2);
+    expect(runsByEvent(runs).has("")).toBe(false);
+    const t = runsByTraining(runs);
+    expect([...t.keys()]).toEqual([trainingKey("LUNEDÌ", 1040)]);
+    expect(t.get("LUNEDÌ@1040")?.[0]).toMatchObject({ training: { day: "LUNEDÌ", start: 1040 }, driver: "Anna B.", riders: { u15: 4, "2015": 3 } });
   });
 });
 
@@ -67,7 +74,7 @@ describe("pulmini runs on the server", () => {
   it("returns the runs in the staging preview", () => {
     const d = pulminiRunsData({ SCD_PULMINI_RUNS_JSON: raw, SCD_STAGING_PREVIEW: "1", SCD_STAGING_PASSWORD: "x".repeat(24) }, true);
     expect(d.gate.view).toBe("page");
-    expect(d.runs).toHaveLength(2);
+    expect(d.runs).toHaveLength(3);
     expect(d.configured).toBe(true);
   });
 });

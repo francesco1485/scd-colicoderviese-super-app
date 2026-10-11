@@ -960,6 +960,122 @@
         "implementationStatus": "ANALYSIS_STARTED",
         "duplicate_work": "DENY"
       }
+    },
+    {
+      "id": "UD-039",
+      "name": "PULMINI_WEEKDAY_TRAINING_RUNS_AND_MANAGER_EDITS",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "il servizio pulmini c'è durante la settimana e lì bisogna mostrare in base agli orari di allenamento quanti pulmini si muovono e chi c'è dentro",
+        "il responsabile dalla sua area può inserire altro autista, aggiungere corsa se è stata tolta o fare variazioni di orari che comunicano con gruppi whatsapp"
+      ],
+      "normalizedCommand": {
+        "rule": "Pulmini run on weekdays too: for each training slot show how many vans move and who is on board (figurative, by team). The transport manager can, from his area, assign another driver, add or restore a run and change times; each change produces a notice for the WhatsApp groups.",
+        "scope": "SUPER_APP",
+        "torreFloor": "-2_SERVIZI_INTERNI (pulmini)",
+        "constraints": [
+          "children shown as figures by team, never names in the shared view; the named list only to the assigned driver and the transport manager",
+          "edits write to the Master Pulmini (single source), never to a parallel register; writing needs the role and the identity elevator (UD step 3)",
+          "WhatsApp: the app prepares the message and a person sends it; group automation only if the club adopts WhatsApp Business API (paid, needs approval)"
+        ],
+        "implementationStatus": "PARTIAL_STAGING",
+        "duplicate_work": "DENY"
+      }
+    },
+    {
+      "id": "UD-040",
+      "name": "ROLES_ATTENDANCE_AND_DISCIPLINE",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "capire bene il funzionamento e ruolo di dirigenti e mister",
+        "possibilità di inserire presenze durante allenamenti perché lo chiede federazione per invio mensile a dirigenza e sapere per pagamenti",
+        "idem per ammonizioni, espulsioni o altro"
+      ],
+      "normalizedCommand": {
+        "rule": "Define clearly what managers (dirigenti) and coaches (mister) can do; let them record training attendance (for the federation's monthly report to the board and for fee tracking) and disciplinary events (cautions, expulsions, other).",
+        "scope": "SUPER_APP",
+        "torreFloor": "-1_REGIA (gestionale/mister)",
+        "constraints": [
+          "attendance of minors is personal data: internal only, visible to the team's staff, secretariat and board",
+          "disciplinary facts come from official FIGC/LND communications; the app records and reconciles, it does not judge",
+          "fee status stays in tesoreria; attendance only informs it",
+          "roles and permissions change only with Direzione approval"
+        ],
+        "implementationStatus": "RECORDED_DESIGN_PENDING",
+        "duplicate_work": "DENY"
+      }
+    },
+    {
+      "id": "UD-041",
+      "name": "VARIATION_REQUESTS_TO_SECRETARIAT",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "una richiesta variazione o se si deve fare variazioni i ds e responsabili possono fare richiesta a segreteria"
+      ],
+      "normalizedCommand": {
+        "rule": "Sporting directors and team managers can send a variation request (time, pitch, match) to the secretariat from the app; the secretariat handles it and the answer is tracked.",
+        "scope": "SUPER_APP",
+        "torreFloor": "-1_REGIA (segreteria) + notifiche",
+        "constraints": [
+          "requests are tracked in-app with status; the official variation to FIGC/LND is still done by the secretariat"
+        ],
+        "implementationStatus": "RECORDED_DESIGN_PENDING",
+        "duplicate_work": "DENY"
+      }
+    },
+    {
+      "id": "UD-042",
+      "name": "CALLUPS_AND_TEAM_SHEET",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "modulo o stile di convocazioni entro il giovedì o venerdì obbligatorio che poi arriva nei gruppi",
+        "per la distinta possibilità di compilarla internamente per poi velocizzare la cosa e averla dentro anche loro"
+      ],
+      "normalizedCommand": {
+        "rule": "Mandatory call-up form by Thursday/Friday for each weekend match, sent to the team groups; the team sheet (distinta) can be prepared inside the app to speed up match day and keep a copy.",
+        "scope": "SUPER_APP",
+        "torreFloor": "-1_REGIA (gestionale/mister) + 0_HALL (gruppi)",
+        "constraints": [
+          "the official team sheet remains the FIGC one: the app prepares and prints, it does not replace",
+          "call-ups with minors' names go only to the team's private channel, never public",
+          "requires the identity elevator and the roster from R20"
+        ],
+        "implementationStatus": "RECORDED_DESIGN_PENDING",
+        "duplicate_work": "DENY"
+      }
+    },
+    {
+      "id": "UD-043",
+      "name": "INFERMERIA_HEALTH_NUTRITION_BOOKINGS",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "una zona infermeria dove si mettono i dati fisici e valori peso e altro",
+        "proposte alimentari con un ai donna bella stile dottoressa che cerca di aiutare sulla nutrizione tutti anche piccoli, stile consigli della settimana in base a tempo, allenamenti e quello che deve sapere un esperto nutrizionista serio",
+        "nella zona infermeria si possono prenotare appuntamenti e pagare anticipare appuntamenti e inserire convenzioni"
+      ],
+      "normalizedCommand": {
+        "rule": "Infermeria area: physical data and measurements, weekly nutrition tips from an original female 'doctor' character tuned to weather and training load, appointment booking with optional prepayment, and partner conventions.",
+        "scope": "SUPER_APP",
+        "torreFloor": "-2_SERVIZI_INTERNI (infermeria) + 1_SERVIZI",
+        "constraints": [
+          "physical and health data are special-category data: explicit consent, parent consent for minors, access only to the person/parent and the club doctor, encrypted, never in public or team views",
+          "the character is an original figure and must say she is not a doctor; tips are general education, never diets, calories or weight targets for minors; anything individual goes to the club doctor or a registered nutritionist",
+          "no weight-based rankings or comparisons, especially for children",
+          "payments and conventions need Direzione approval and a payment provider decision; bookings can start without payments"
+        ],
+        "implementationStatus": "RECORDED_DESIGN_PENDING",
+        "duplicate_work": "DENY"
+      }
     }
   ],
   "completionGate": {
