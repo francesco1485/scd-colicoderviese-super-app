@@ -73,10 +73,11 @@ export const requestMagicLink = createServerFn({ method: "POST" })
     const sb = serverSupabase();
     if (!sb) return { sent: false, message: "L'accesso non è ancora configurato su questo server." };
     const origin = getRequestUrl().origin;
-    const next = safeNext(data.next);
+    // Only carry a destination when one was asked; otherwise the confirm step lands by role (session.ts landingFor).
+    const redirect = data.next ? `${origin}/accedi/conferma?next=${encodeURIComponent(safeNext(data.next))}` : `${origin}/accedi/conferma`;
     const { error } = await sb.auth.signInWithOtp({
       email: data.email,
-      options: { emailRedirectTo: `${origin}/accedi/conferma?next=${encodeURIComponent(next)}`, shouldCreateUser: false },
+      options: { emailRedirectTo: redirect, shouldCreateUser: false },
     });
     if (error) {
       const notFound = /signups not allowed|user not found|otp_disabled/i.test(error.message);
