@@ -1290,6 +1290,30 @@
         "implementationStatus": "STAGING",
         "duplicate_work": "DENY"
       }
+    },
+    {
+      "id": "UD-054",
+      "name": "PEOPLE_GESTIONALE_DIRECTOR_PROFILE",
+      "sourceDate": "2026-10-11",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "io col mio profilo da direttore andrò ad inserire altre figure o altri calciatori e chi è andato via o chi non c'è più lo comunico e lo mettiamo scritto, come un gestionale che si rispetti",
+        "DECISION 2026-10-11: build on the existing Supabase SCD project; a person who leaves stays in history and disappears from the views"
+      ],
+      "normalizedCommand": {
+        "rule": "The Director (and the Secretariat) manage people from the app: enter athletes and staff, mark who left with date and reason, every change written to an append-only history; left people disappear from teams, vans and figures but the record stays for federal and accounting duties.",
+        "scope": "SUPER_APP",
+        "torreFloor": "-1_REGIA (persone) on the Supabase elevator",
+        "constraints": [
+          "built on the existing Supabase SCD project and migrations (r33–r57), no parallel database",
+          "authorization server-side: DIRECTION / SECRETARIAT write, members read, anon only the public projection without minors or contacts",
+          "history append-only; audit row for every exit",
+          "minors' consents given by a guardian; no personal data of minors on public pages"
+        ],
+        "implementationStatus": "MIGRATION_R59_WRITTEN_AND_TESTED_LOCALLY_NOT_YET_APPLIED",
+        "duplicate_work": "DENY"
+      }
     }
   ],
   "completionGate": {
