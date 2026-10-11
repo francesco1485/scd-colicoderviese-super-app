@@ -51,7 +51,7 @@ export function loadCalendar(input: unknown = calendarRaw) {
 }
 
 export type TrainingSlot = {
-  day: string; timeLabel: string; start: number;
+  day: string; timeLabel: string; start: number; end?: number;
   fields: { C1: string; C2: string }; rooms: Record<"SP1" | "SP2" | "SP3" | "SP4", string>;
 };
 export type TrainingRotation = { week: string; days: string[]; start: number; timeLabel: string; zones: Record<string, string> };
@@ -75,6 +75,7 @@ export function loadQuadro() {
   const raw = quadroRaw as any;
   const slots: TrainingSlot[] = (Array.isArray(raw.slots) ? raw.slots : []).map((s: any) => ({
     day: str(s.day), timeLabel: str(s.timeLabel), start: Number(s.start) || 0,
+    ...(Number(s.end) > (Number(s.start) || 0) ? { end: Number(s.end) } : {}),
     fields: { C1: str(s.fields?.C1), C2: str(s.fields?.C2) },
     rooms: { SP1: str(s.rooms?.SP1), SP2: str(s.rooms?.SP2), SP3: str(s.rooms?.SP3), SP4: str(s.rooms?.SP4) },
   }));

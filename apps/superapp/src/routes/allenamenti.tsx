@@ -1,10 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { Bus } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Search, X } from "lucide-react";
 
-import { BellAction, PageHeader } from "@/components/scd/board";
+import { useRomeNow } from "@/components/scd/interior-ui";
 import { SNAPSHOT_BANNER } from "@/lib/public-snapshots";
-import { EMPTY_MESSAGE, appliesToWeek, fieldMatches, findSessions, loadQuadro, logoKeysFor } from "@/lib/public-snapshots";
+import { EMPTY_MESSAGE, fieldMatches, findSessions, loadQuadro, logoKeysFor, type TrainingSlot } from "@/lib/public-snapshots";
+import { defaultDay, isFree, minutesOf, pitchZones, slotStates, weekdayKey, type PitchZone, type SlotState } from "@/lib/training-view";
 import juniores from "@/assets/scd/SCD_JUNIORES_2008_2009.png.asset.json";
 import piccoli from "@/assets/scd/SCD_PICCOLI_2020_2021.png.asset.json";
 import prima from "@/assets/scd/SCD_PRIMA_SQUADRA.png.asset.json";
@@ -17,10 +18,17 @@ import u16 from "@/assets/scd/SCD_U16_2011.png.asset.json";
 import planimetria from "@/assets/scd/planimetria_colico.webp.asset.json";
 
 const LOGOS: Record<string, string> = { JUNIORES: juniores.url, PICCOLI: piccoli.url, PRIMA: prima.url, PRIMI: primi.url, PULCINI: pulcini.url, U12: u12.url, U13: u13.url, U15: u15.url, U16: u16.url };
-function Logos({ text, size = 22 }: { text: string; size?: number }) {
+
+function Logos({ text, size = 24 }: { text: string; size?: number }) {
   const keys = logoKeysFor(text);
   if (!keys.length) return null;
-  return <span className="inline-flex shrink-0 gap-0.5">{keys.map((k) => <img key={k} src={LOGOS[k]} alt={`Logo ${k}`} width={size} height={size} loading="lazy" className="rounded-full object-contain" style={{ width: size, height: size }} />)}</span>;
+  return (
+    <span className="inline-flex shrink-0 -space-x-1.5">
+      {keys.map((k) => (
+        <img key={k} src={LOGOS[k]} alt="" width={size} height={size} loading="lazy" className="rounded-full bg-white object-contain ring-2 ring-white" style={{ width: size, height: size }} />
+      ))}
+    </span>
+  );
 }
 
 export const Route = createFileRoute("/allenamenti")({
@@ -31,9 +39,9 @@ export const Route = createFileRoute("/allenamenti")({
   loader: () => loadQuadro(),
   head: () => ({
     meta: [
-      { title: "Quadro allenamenti lun-ven — S.C.D. ColicoDerviese" },
-      { name: "description", content: "Quadro settimanale degli allenamenti SCD dal lunedì al venerdì: campi, zone e spogliatoi per annata (anteprima non live)." },
-      { property: "og:title", content: "Quadro allenamenti — S.C.D. ColicoDerviese" },
+      { title: "Allenamenti lun-ven — S.C.D. ColicoDerviese" },
+      { name: "description", content: "Allenamenti SCD dal lunedì al venerdì al centro sportivo di Colico: orari, campi, zone e spogliatoi per annata." },
+      { property: "og:title", content: "Allenamenti — S.C.D. ColicoDerviese" },
       { property: "og:description", content: "Orari, campi e spogliatoi per annata, dal lunedì al venerdì." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -43,125 +51,272 @@ export const Route = createFileRoute("/allenamenti")({
 });
 
 const ROOMS = ["SP1", "SP2", "SP3", "SP4"] as const;
+const SHORT: Record<string, string> = { "LUNEDÌ": "Lun", "MARTEDÌ": "Mar", "MERCOLEDÌ": "Mer", "GIOVEDÌ": "Gio", "VENERDÌ": "Ven" };
+const nice = (d: string) => d.charAt(0) + d.slice(1).toLowerCase();
 
 function Allenamenti() {
-  const { days, slots, rotations, rooms, note } = Route.useLoaderData();
+  const { days, slots, rotations, note } = Route.useLoaderData();
+  const now = useRomeNow();
   const [day, setDay] = useState(days[0] ?? "");
+  const chosen = useRef(false);
   const [week, setWeek] = useState<"A" | "B">("A");
+  // Clock-dependent UI ("oggi", in corso) only after hydration, so server and client HTML match.
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => setHydrated(true), []);
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
-  // Filtro annata nell'URL (?annata=), niente storage: link condivisibile e reload stabile.
   const q = search.annata ?? "";
   const setQ = (v: string) => navigate({ search: v.trim() ? { annata: v } : {}, replace: true, resetScroll: false });
   const query = q.trim();
-  // Fonte della fascia: solo Campo 1/Campo 2 del master; spogliatoi e rotazioni non includono sessioni.
-  const daySlots = slots.filter((s) => s.day === day && (!query || fieldMatches(s.fields.C1, query) || fieldMatches(s.fields.C2, query)));
+
+  // Open on today's training day (Rome time) unless the visitor already picked one.
+  useEffect(() => {
+    if (hydrated && !chosen.current) setDay(defaultDay(days, now.date));
+  }, [days, now.date, hydrated]);
+  const pick = (d: string) => {
+    chosen.current = true;
+    setDay(d);
+  };
+  const todayKey = hydrated ? weekdayKey(now.date) : null;
+  const isToday = todayKey !== null && day === todayKey;
+
+  const daySlots = useMemo(
+    () => slots.filter((s) => s.day === day && (!query || fieldMatches(s.fields.C1, query) || fieldMatches(s.fields.C2, query))).sort((a, b) => a.start - b.start),
+    [slots, day, query],
+  );
+  const states = slotStates(daySlots, isToday, hydrated ? minutesOf(now.time) : Number.NaN);
   const sessions = query ? findSessions(slots, query) : [];
-  const dayRot = rotations.filter((r) => appliesToWeek(r.week, week) && r.days.includes(day)).sort((a, b) => a.start - b.start);
-  const roomsAt = (start: number) => rooms.filter((r) => appliesToWeek(r.week, week) && r.day === day && r.start <= start && r.end > start);
 
   return (
-    <main className="pb-12" data-screen="allenamenti">
-      <PageHeader title="Allenamenti" action={<BellAction dot={false} />} testId="allenamenti-header" />
-      <div className="relative z-[5] -mt-[14px] rounded-t-[18px] bg-[var(--scd-page)] px-4 pt-[14px] sm:px-6">
-        <div className="mx-auto max-w-7xl">
-          <p className="text-[15px] font-semibold text-[var(--scd-ink)]">Centro sportivo Colico · lunedì–venerdì</p>
-          <p className="mt-[2px] text-[13px] text-[var(--scd-sub)]">Fotografia del quadro settimanale: {slots.length} fasce orarie. Sola consultazione.</p>
-          <p role="note" className="mt-[8px] inline-block rounded-[7px] bg-[#fff3c4] px-[8px] py-[3px] text-[11.5px] font-bold uppercase tracking-[0.03em] text-[#7a5200]">{SNAPSHOT_BANNER}</p>
-        </div>
-      </div>
+    <main className="uv-page min-h-dvh pb-12 text-white" data-screen="allenamenti">
+      <header className="mx-auto max-w-[1200px] px-4 pt-6 lg:px-6" data-testid="allenamenti-header">
+        <p className="text-[14px] font-bold text-[var(--uv-gold)]">Centro sportivo Colico · lunedì–venerdì</p>
+        <h1 className="uv-underline mt-1 inline-block pb-[6px] font-uv text-[clamp(40px,11vw,64px)] uppercase leading-[0.88]">Allenamenti</h1>
+        <p className="mt-3 max-w-[60ch] text-[15px] leading-[1.4] text-[#cfe0ff]">Chi si allena, su quale campo e in che spogliatoio. Tocca un giorno o cerca la tua annata.</p>
+        <p role="note" className="mt-3 inline-block rounded-full bg-[#fff3c4] px-3 py-1 text-[12px] font-bold text-[#7a5200]">
+          {SNAPSHOT_BANNER}
+        </p>
+      </header>
 
-      <div className="sticky top-0 z-30 border-b border-[var(--scd-line)] bg-[var(--scd-page)]/95 px-4 py-3 backdrop-blur sm:px-6 lg:top-[var(--pub-header-h)]">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-2">
-          <div className="scd-scroll-x -mx-1 flex w-full gap-[6px] overflow-x-auto px-1 sm:w-auto" role="group" aria-label="Giorno">
-            {days.map((d) => <button key={d} onClick={() => setDay(d)} aria-pressed={day === d} className={`h-[40px] min-w-[56px] shrink-0 rounded-[9px] px-3 text-[14px] font-bold capitalize ${day === d ? "bg-[var(--scd-blue)] text-white shadow-[0_2px_5px_rgb(4_87_175/0.35)]" : "bg-white text-[var(--scd-ink)] shadow-[var(--scd-card-shadow)]"}`}>{d.slice(0, 3).toLowerCase()}</button>)}
-          </div>
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Cerca annata (es. 2015, U15)" aria-label="Cerca annata" className="h-[42px] min-w-0 flex-1 rounded-[9px] border border-[#cfd5df] bg-white px-3 text-[15px] sm:max-w-xs" />
-        </div>
-      </div>
-
-      {query && (
-        <section aria-label="Settimana dell'annata" className="mx-auto max-w-7xl px-4 pt-5 sm:px-6">
-          <h2 className="mb-2 text-xl font-bold">Settimana lun–ven · “{query}”</h2>
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-5">
+      <div className="sticky top-0 z-30 mt-4 bg-[var(--uv-night)]/95 px-4 py-3 backdrop-blur lg:top-[var(--pub-header-h)] lg:px-6">
+        <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-2">
+          <div className="grid w-full grid-cols-5 gap-1.5 sm:flex sm:w-auto" role="group" aria-label="Giorno">
             {days.map((d) => {
-              const list = sessions.filter((x) => x.day === d).sort((a, b) => a.start - b.start);
+              const on = day === d;
+              const today = d === todayKey;
               return (
-                <button key={d} onClick={() => setDay(d)} className={`rounded-[12px] border p-3 text-left ${day === d ? "border-[var(--scd-blue)] bg-[#eaf2fc]" : "border-transparent bg-white shadow-[var(--scd-card-shadow)]"}`}>
-                  <p className="text-xs font-bold uppercase text-primary">{d}</p>
-                  {list.length === 0 ? <p className="mt-1 text-sm text-muted-foreground">Nessun allenamento</p> : list.map((x) => (
-                    <div key={x.timeLabel + x.field} className="mt-1 flex items-center gap-2">
-                      <Logos text={x.text} size={20} />
-                      <span className="text-sm"><strong className="font-display">{x.timeLabel}</strong> · Campo {x.field.slice(1)}</span>
-                    </div>
-                  ))}
+                <button
+                  key={d}
+                  onClick={() => pick(d)}
+                  aria-pressed={on}
+                  aria-label={`${nice(d)}${today ? ", oggi" : ""}`}
+                  className={`relative h-[46px] rounded-[12px] px-3 font-uv text-[19px] uppercase tracking-[0.04em] sm:min-w-[64px] ${on ? "bg-[var(--uv-gold)] text-[var(--uv-night)] shadow-[0_3px_0_#b38f00]" : "bg-white/10 text-white"}`}
+                >
+                  {SHORT[d] ?? d.slice(0, 3)}
+                  {today && (
+                    <span className={`absolute -top-1.5 left-1/2 -translate-x-1/2 rounded-full px-1.5 text-[10px] font-extrabold normal-case tracking-normal ${on ? "bg-[var(--uv-night)] text-[var(--uv-gold)]" : "bg-[var(--uv-gold)] text-[var(--uv-night)]"}`}>
+                      oggi
+                    </span>
+                  )}
                 </button>
               );
             })}
           </div>
-          {sessions.length === 0 && <p className="mt-2 text-sm text-muted-foreground">Nessuna annata o categoria corrispondente nel quadro.</p>}
+          <label className="relative flex min-w-0 flex-1 items-center sm:max-w-xs">
+            <Search className="pointer-events-none absolute left-3 size-4 text-[#9db6dc]" aria-hidden="true" />
+            <input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Cerca annata (es. 2015, U15)"
+              aria-label="Cerca annata"
+              className="h-[46px] w-full min-w-0 rounded-[12px] border border-white/15 bg-white/10 pl-9 pr-10 text-[15px] text-white placeholder:text-[#9db6dc] focus:outline-none focus:ring-2 focus:ring-[var(--uv-gold)]"
+            />
+            {q && (
+              <button type="button" onClick={() => setQ("")} aria-label="Cancella ricerca" className="absolute right-1 grid size-10 place-items-center rounded-full text-[#cfe0ff]">
+                <X className="size-4" />
+              </button>
+            )}
+          </label>
+        </div>
+      </div>
+
+      {query && (
+        <section aria-label="Settimana dell'annata" className="mx-auto max-w-[1200px] px-4 pt-5 lg:px-6">
+          <h2 className="font-uv text-[26px] uppercase leading-none">La settimana di “{query}”</h2>
+          <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-5">
+            {days.map((d) => {
+              const list = sessions.filter((x) => x.day === d).sort((a, b) => a.start - b.start);
+              return (
+                <button key={d} onClick={() => pick(d)} className={`rounded-[14px] p-3 text-left ${day === d ? "bg-white text-[var(--scd-ink)]" : "bg-white/10"}`}>
+                  <p className="font-uv text-[17px] uppercase">{nice(d)}</p>
+                  {list.length === 0 ? (
+                    <p className="mt-1 text-[13.5px] opacity-75">Nessun allenamento</p>
+                  ) : (
+                    list.map((x) => (
+                      <div key={x.timeLabel + x.field} className="mt-1.5 flex items-center gap-2">
+                        <Logos text={x.text} size={20} />
+                        <span className="text-[14px]">
+                          <b>{x.timeLabel}</b> · Campo {x.field.slice(1)}
+                        </span>
+                      </div>
+                    ))
+                  )}
+                </button>
+              );
+            })}
+          </div>
+          {sessions.length === 0 && <p className="mt-2 text-[14px] text-[#cfe0ff]">Nessuna annata o categoria corrispondente nel quadro.</p>}
         </section>
       )}
 
-      <section className="mx-auto grid max-w-7xl gap-6 px-4 pt-5 sm:px-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(300px,1fr)]">
+      <section className="mx-auto grid max-w-[1200px] gap-6 px-4 pt-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:px-6">
         <div className="min-w-0">
-          <h2 className="mb-3 text-xl font-bold">{day.charAt(0) + day.slice(1).toLowerCase()} · orari e campi</h2>
-          {slots.length === 0 ? <p className="text-muted-foreground">{EMPTY_MESSAGE}</p>
-            : daySlots.length === 0 ? <p className="text-muted-foreground">Nessuna fascia per questa ricerca.</p>
-            : <div className="grid gap-3">
-              {daySlots.map((s) => (
-                <article key={s.timeLabel + s.start} className="scd-card overflow-hidden">
-                  <header className="flex items-center justify-between bg-[var(--scd-blue)] px-3 py-2 text-white"><strong className="text-[17px] font-bold">{s.timeLabel}</strong></header>
-                  <div className="grid gap-px bg-border sm:grid-cols-2">
-                    {(["C1", "C2"] as const).map((c) => <div key={c} className="bg-card p-3"><p className="text-[0.65rem] font-bold uppercase text-primary">Campo {c.slice(1)}</p><div className="flex items-start gap-2"><Logos text={s.fields[c]} /><p className="whitespace-pre-line text-sm font-semibold">{s.fields[c] || "Nessun allenamento in quadro"}</p></div></div>)}
-                  </div>
-                  <div className="grid grid-cols-2 gap-px border-t border-border bg-border sm:grid-cols-4">
-                    {ROOMS.map((r) => <div key={r} className="bg-secondary p-2"><p className="text-[0.65rem] font-bold text-muted-foreground">{r}</p><p className="text-xs font-semibold">{s.rooms[r] && s.rooms[r] !== "—" ? s.rooms[r] : "—"}</p></div>)}
-                  </div>
-                </article>
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <h2 className="font-uv text-[30px] uppercase leading-none">
+              {nice(day)}
+              {isToday && <span className="ml-2 align-middle text-[15px] font-bold normal-case text-[var(--uv-gold)] [font-family:inherit]">oggi</span>}
+            </h2>
+            <div className="flex rounded-[10px] bg-white/10 p-1" role="group" aria-label="Settimana delle zone">
+              {(["A", "B"] as const).map((w) => (
+                <button key={w} onClick={() => setWeek(w)} aria-pressed={week === w} className={`h-9 rounded-[8px] px-3 text-[13.5px] font-bold ${week === w ? "bg-white text-[var(--uv-night)]" : "text-[#cfe0ff]"}`}>
+                  Settimana {w}
+                </button>
               ))}
-            </div>}
+            </div>
+          </div>
+          <p className="mt-1 text-[13px] text-[#a9bfe3]">Le zone cambiano tra settimana A e B: la data d'inizio della settimana A non è ancora verificata.</p>
+
+          {slots.length === 0 ? (
+            <p className="mt-4 text-[#cfe0ff]">{EMPTY_MESSAGE}</p>
+          ) : daySlots.length === 0 ? (
+            <p className="mt-4 text-[#cfe0ff]">Nessuna fascia per questa ricerca.</p>
+          ) : (
+            <ol className="m-0 mt-4 grid list-none gap-4 p-0">
+              {daySlots.map((s, i) => (
+                <SlotCard key={s.timeLabel + s.start} slot={s} state={states[i] ?? "later"} zones1={pitchZones(rotations, day, week, s.start, "C1")} zones2={pitchZones(rotations, day, week, s.start, "C2")} />
+              ))}
+            </ol>
+          )}
         </div>
 
-        <aside className="grid content-start gap-5">
-          <div className="scd-card p-4">
-            <div className="flex items-center justify-between gap-2">
-              <h2 className="text-lg font-bold">Zone campi · indicative</h2>
-              <div className="flex rounded-md border border-border" role="group" aria-label="Settimana">
-                {(["A", "B"] as const).map((w) => <button key={w} onClick={() => setWeek(w)} className={`h-9 px-3 text-xs font-bold ${week === w ? "surface-sun" : ""}`}>Sett. {w}</button>)}
-              </div>
-            </div>
-            <p className="mt-1 text-xs text-muted-foreground">Scelta manuale: la data di inizio della settimana A non è ancora verificata.</p>
-            {dayRot.length === 0 ? <p className="mt-3 text-sm text-muted-foreground">Nessuna rotazione a zone per questo giorno.</p> : dayRot.map((r) => (
-              <figure key={r.timeLabel + r.week} className="mt-4">
-                <figcaption className="flex items-center justify-between text-xs font-bold uppercase text-primary"><span>{r.timeLabel}{r.week === "A/B" ? " · A e B" : ""}</span><span className="rounded bg-secondary px-1.5 py-0.5 text-[0.6rem] text-muted-foreground">NON IN SCALA</span></figcaption>
-                <div className="mt-2 grid gap-2">
-                  {(["C2", "C1"] as const).map((c) => {
-                    const zones = Object.entries(r.zones).filter(([k]) => k.startsWith(c));
-                    return <div key={c} className="rounded border-2 border-primary/60 bg-primary/10 p-1">
-                      <p className="text-center text-[0.6rem] font-bold uppercase text-primary">Campo {c.slice(1)}</p>
-                      <div className="mt-1 grid gap-1" style={{ gridTemplateColumns: `repeat(${Math.max(zones.length, 1)}, minmax(0, 1fr))` }}>{zones.length ? zones.map(([k, v]) => <div key={k} className="flex min-w-0 flex-col items-center gap-1 rounded-sm border border-dashed border-primary/50 bg-card px-1 py-1.5 text-center text-[0.65rem] font-semibold"><Logos text={v} size={26} /><span className="break-words"><span className="text-muted-foreground">{k.slice(-1)} · </span>{v || "—"}</span></div>) : <div className="py-2 text-center text-[0.65rem] text-muted-foreground">—</div>}</div>
-                    </div>;
-                  })}
-                  <div className="grid grid-cols-4 gap-1">
-                    {ROOMS.map((id) => { const g = roomsAt(r.start).find((x) => x.id === id)?.group; return <div key={id} className="flex min-w-0 flex-col items-center gap-0.5 rounded-sm border border-border bg-secondary p-1 text-center"><span className="text-[0.6rem] font-bold text-muted-foreground">{id}</span>{g && <Logos text={g} size={18} />}<span className="break-words text-[0.6rem] font-semibold">{g && g !== "—" ? g : "—"}</span></div>; })}
-                  </div>
-                </div>
-              </figure>
-            ))}
-            <p className="mt-3 text-[0.65rem] text-muted-foreground">{note || "Confini delle zone non certificati sulla planimetria."}</p>
-          </div>
-          <figure className="scd-card p-4">
-            <figcaption className="mb-2 text-lg font-bold">Planimetria Colico</figcaption>
-            <img src={planimetria.url} alt="Planimetria fotografica del centro sportivo di Colico" loading="lazy" className="w-full rounded" />
-            <p className="mt-2 text-[0.65rem] text-muted-foreground">Foto di riferimento, separata dallo schema: le zone non sono riportate sulla planimetria.</p>
+        <aside className="grid content-start gap-4">
+          <figure className="m-0 overflow-hidden rounded-[18px] bg-white text-[var(--scd-ink)] shadow-[0_14px_28px_rgb(0_10_40/0.28)]">
+            <img src={planimetria.url} alt="Planimetria fotografica del centro sportivo di Colico" loading="lazy" className="w-full" />
+            <figcaption className="p-4">
+              <b className="font-uv text-[22px] uppercase leading-none">Il centro di Colico</b>
+              <p className="mt-1 text-[13.5px] text-[var(--scd-sub)]">
+                Foto di riferimento: Campo 1 è il campo grande, Campo 2 quello piccolo, SP1–SP4 sono gli spogliatoi. {note || "Confini delle zone non certificati sulla planimetria."}
+              </p>
+              <Link to="/impianti" className="mt-3 inline-flex min-h-[44px] items-center rounded-[12px] bg-[var(--uv-royal)] px-4 font-uv text-[17px] uppercase tracking-[0.04em] text-white">
+                Mappa dei campi
+              </Link>
+            </figcaption>
           </figure>
-          <div className="scd-card flex gap-3 p-4">
-            <Bus className="size-6 shrink-0 text-primary" />
-            <div><h2 className="font-bold">Pulmini</h2><p className="text-sm text-muted-foreground">Nessuna corsa di allenamento confermata.</p></div>
+          <div className="rounded-[18px] bg-white/10 p-4">
+            <b className="font-uv text-[20px] uppercase">Legenda</b>
+            <ul className="m-0 mt-2 grid list-none gap-2 p-0 text-[14px] text-[#dbe7ff]">
+              <li className="flex items-center gap-2">
+                <span className="rounded-full bg-[#22c55e] px-2 text-[12px] font-extrabold text-[#052e16]">IN CORSO</span> la fascia di adesso
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="rounded-full bg-[var(--uv-gold)] px-2 text-[12px] font-extrabold text-[var(--uv-night)]">PROSSIMA</span> la prossima di oggi
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="inline-block h-4 w-6 rounded-[4px] border border-dashed border-white/60" /> zona, campo o spogliatoio libero
+              </li>
+            </ul>
           </div>
         </aside>
       </section>
     </main>
+  );
+}
+
+const STATE_CHIP: Record<SlotState, { text: string; cls: string } | null> = {
+  live: { text: "In corso", cls: "bg-[#22c55e] text-[#052e16]" },
+  next: { text: "Prossima", cls: "bg-[var(--uv-gold)] text-[var(--uv-night)]" },
+  done: { text: "Finita", cls: "bg-white/15 text-[#cfe0ff]" },
+  later: null,
+};
+
+function SlotCard({ slot, state, zones1, zones2 }: { slot: TrainingSlot; state: SlotState; zones1: PitchZone[] | null; zones2: PitchZone[] | null }) {
+  const [from, to] = slot.timeLabel.split(/[–-]/);
+  const chip = STATE_CHIP[state];
+  return (
+    <li
+      className={`overflow-hidden rounded-[18px] bg-white text-[var(--scd-ink)] shadow-[0_14px_28px_rgb(0_10_40/0.28)] ${state === "live" ? "ring-4 ring-[#22c55e]" : state === "next" ? "ring-4 ring-[var(--uv-gold)]" : ""} ${state === "done" ? "opacity-70" : ""}`}
+      data-state={state}
+    >
+      <div className="flex items-center gap-3 bg-[var(--uv-night)] px-4 py-2.5 text-white">
+        <span className="font-uv text-[28px] leading-none tabular-nums">{from}</span>
+        <span className="text-[14px] text-[#9db6dc]">fino alle {to}</span>
+        {chip && <span className={`ml-auto rounded-full px-2.5 py-0.5 text-[12px] font-extrabold uppercase ${chip.cls}`}>{chip.text}</span>}
+      </div>
+      <div className="grid gap-3 p-3 sm:grid-cols-[3fr_2fr]">
+        <Pitch name="Campo 1" text={slot.fields.C1} zones={zones1} />
+        <Pitch name="Campo 2" text={slot.fields.C2} zones={zones2} small />
+      </div>
+      <div className="grid grid-cols-4 gap-1.5 border-t border-[var(--scd-line)] bg-[#f5f9ff] p-3" aria-label="Spogliatoi">
+        {ROOMS.map((r) => {
+          const who = slot.rooms[r];
+          const free = isFree(who);
+          return (
+            <div key={r} className={`flex min-w-0 flex-col items-center gap-1 rounded-[10px] px-1 py-1.5 text-center ${free ? "border border-dashed border-[#b9cfe6]" : "bg-white shadow-[0_2px_6px_rgb(0_20_60/0.08)]"}`}>
+              <span className="text-[11px] font-extrabold text-[var(--scd-sub)]">{r}</span>
+              {!free && <Logos text={who} size={20} />}
+              <span className="w-full break-words text-[11.5px] font-semibold leading-tight">{free ? "libero" : who}</span>
+            </div>
+          );
+        })}
+      </div>
+    </li>
+  );
+}
+
+/** Pitch seen from above: green stripes, white lines; zones split it in halves or thirds. */
+function Pitch({ name, text, zones, small = false }: { name: string; text: string; zones: PitchZone[] | null; small?: boolean }) {
+  const free = isFree(text) && !(zones ?? []).some((z) => z.label);
+  return (
+    <figure className="m-0 min-w-0">
+      <figcaption className="mb-1 flex items-center justify-between text-[12px] font-extrabold uppercase tracking-[0.06em] text-[var(--scd-sub)]">
+        <span>{name}</span>
+        {zones && <span className="font-semibold normal-case tracking-normal">{zones.length} zone</span>}
+      </figcaption>
+      <div
+        className={`relative grid overflow-hidden rounded-[12px] border-[3px] border-white shadow-[0_0_0_1px_#cfe0d2] ${small ? "min-h-[118px]" : "min-h-[132px]"} ${free ? "bg-[#dfe7df]" : ""}`}
+        style={free ? undefined : { background: "repeating-linear-gradient(90deg,#2f9e4f 0 24px,#38ad59 24px 48px)" }}
+      >
+        <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-1/2 w-[2px] -translate-x-1/2 bg-white/60" />
+        <span aria-hidden="true" className="pointer-events-none absolute left-1/2 top-1/2 size-[44px] -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white/60" />
+        {zones ? (
+          <div className="relative grid" style={{ gridTemplateColumns: `repeat(${zones.length}, minmax(0,1fr))` }}>
+            {zones.map((z, i) => (
+              <div key={z.key} className={`flex min-w-0 flex-col items-center justify-center gap-1 p-1.5 text-center ${i > 0 ? "border-l-2 border-dashed border-white/80" : ""}`}>
+                <span className="rounded-full bg-white/85 px-1.5 text-[10.5px] font-extrabold text-[#14532d]">{z.key}</span>
+                {z.label ? (
+                  <>
+                    <Logos text={z.label} size={26} />
+                    <span className="w-full break-words rounded-[6px] bg-white/90 px-1 py-0.5 text-[11.5px] font-bold leading-tight">{z.label}</span>
+                  </>
+                ) : (
+                  <span className="text-[11.5px] font-bold text-white/90">libera</span>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="relative flex flex-col items-center justify-center gap-1.5 p-3 text-center">
+            {free ? (
+              <span className="text-[14px] font-bold text-[#3f5d4a]">Nessun allenamento</span>
+            ) : (
+              <>
+                <Logos text={text} size={30} />
+                <span className="max-w-full whitespace-pre-line break-words rounded-[8px] bg-white/90 px-2 py-1 text-[13.5px] font-bold leading-tight">{text}</span>
+              </>
+            )}
+          </div>
+        )}
+      </div>
+    </figure>
   );
 }
