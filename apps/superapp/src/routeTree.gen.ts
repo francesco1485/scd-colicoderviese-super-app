@@ -15,6 +15,7 @@ import { Route as CalendarioRouteImport } from './routes/calendario'
 import { Route as CommunityRouteImport } from './routes/community'
 import { Route as ComunicazioniRouteImport } from './routes/comunicazioni'
 import { Route as ContattiRouteImport } from './routes/contatti'
+import { Route as CreaRouteImport } from './routes/crea'
 import { Route as CrmRouteImport } from './routes/crm'
 import { Route as DirezioneRouteImport } from './routes/direzione'
 import { Route as DocumentiRouteImport } from './routes/documenti'
@@ -26,6 +27,7 @@ import { Route as GuidaRouteImport } from './routes/guida'
 import { Route as ImpiantiRouteImport } from './routes/impianti'
 import { Route as InfermeriaRouteImport } from './routes/infermeria'
 import { Route as InstallaRouteImport } from './routes/installa'
+import { Route as LaMiaScdRouteImport } from './routes/la-mia-scd'
 import { Route as MagazzinoRouteImport } from './routes/magazzino'
 import { Route as PartnerRouteImport } from './routes/partner'
 import { Route as PrivacyRouteImport } from './routes/privacy'
@@ -51,6 +53,7 @@ import { Route as CoreStaffRouteImport } from './routes/core.staff'
 import { Route as DirezioneAccessiRouteImport } from './routes/direzione_.accessi'
 import { Route as DirezioneAcquistiRouteImport } from './routes/direzione_.acquisti'
 import { Route as DirezioneCervelloneRouteImport } from './routes/direzione_.cervellone'
+import { Route as DirezioneContenutiRouteImport } from './routes/direzione_.contenuti'
 import { Route as EventiIndexRouteImport } from './routes/eventi.index'
 import { Route as EventiChristmasLarioCupRouteImport } from './routes/eventi.christmas-lario-cup'
 import { Route as GestionaleIndexRouteImport } from './routes/gestionale.index'
@@ -63,6 +66,7 @@ import { Route as QuadroIndexRouteImport } from './routes/quadro.index'
 import { Route as QuadroRotazioneCampiRouteImport } from './routes/quadro.rotazione-campi'
 import { Route as SegreteriaCertificatiRouteImport } from './routes/segreteria_.certificati'
 import { Route as SegreteriaPersoneRouteImport } from './routes/segreteria_.persone'
+import { Route as SquadreTeamRouteImport } from './routes/squadre_.$team'
 import { Route as TesoreriaBiglietteriaRouteImport } from './routes/tesoreria_.biglietteria'
 import { Route as TesoreriaClubHouseRouteImport } from './routes/tesoreria_.club-house'
 import { Route as TesoreriaCompensiRouteImport } from './routes/tesoreria_.compensi'
@@ -105,6 +109,11 @@ const ComunicazioniRoute = ComunicazioniRouteImport.update({
 const ContattiRoute = ContattiRouteImport.update({
   id: '/contatti',
   path: '/contatti',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreaRoute = CreaRouteImport.update({
+  id: '/crea',
+  path: '/crea',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CrmRoute = CrmRouteImport.update({
@@ -160,6 +169,11 @@ const InfermeriaRoute = InfermeriaRouteImport.update({
 const InstallaRoute = InstallaRouteImport.update({
   id: '/installa',
   path: '/installa',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LaMiaScdRoute = LaMiaScdRouteImport.update({
+  id: '/la-mia-scd',
+  path: '/la-mia-scd',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MagazzinoRoute = MagazzinoRouteImport.update({
@@ -288,6 +302,11 @@ const DirezioneCervelloneRoute = DirezioneCervelloneRouteImport.update({
   path: '/direzione/cervellone',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DirezioneContenutiRoute = DirezioneContenutiRouteImport.update({
+  id: '/direzione_/contenuti',
+  path: '/direzione/contenuti',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EventiIndexRoute = EventiIndexRouteImport.update({
   id: '/eventi/',
   path: '/eventi/',
@@ -346,6 +365,11 @@ const SegreteriaCertificatiRoute = SegreteriaCertificatiRouteImport.update({
 const SegreteriaPersoneRoute = SegreteriaPersoneRouteImport.update({
   id: '/segreteria_/persone',
   path: '/segreteria/persone',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SquadreTeamRoute = SquadreTeamRouteImport.update({
+  id: '/squadre_/$team',
+  path: '/squadre/$team',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TesoreriaBiglietteriaRoute = TesoreriaBiglietteriaRouteImport.update({
@@ -425,6 +449,7 @@ export interface FileRoutesByFullPath {
   '/community': typeof CommunityRoute
   '/comunicazioni': typeof ComunicazioniRoute
   '/contatti': typeof ContattiRoute
+  '/crea': typeof CreaRoute
   '/crm': typeof CrmRoute
   '/direzione': typeof DirezioneRoute
   '/documenti': typeof DocumentiRoute
@@ -436,6 +461,7 @@ export interface FileRoutesByFullPath {
   '/impianti': typeof ImpiantiRoute
   '/infermeria': typeof InfermeriaRoute
   '/installa': typeof InstallaRoute
+  '/la-mia-scd': typeof LaMiaScdRoute
   '/magazzino': typeof MagazzinoRoute
   '/partner': typeof PartnerRoute
   '/privacy': typeof PrivacyRoute
@@ -458,6 +484,7 @@ export interface FileRoutesByFullPath {
   '/direzione/accessi': typeof DirezioneAccessiRoute
   '/direzione/acquisti': typeof DirezioneAcquistiRoute
   '/direzione/cervellone': typeof DirezioneCervelloneRoute
+  '/direzione/contenuti': typeof DirezioneContenutiRoute
   '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
   '/gestionale/coda': typeof GestionaleCodaRoute
   '/gestionale/mappa': typeof GestionaleMappaRoute
@@ -467,6 +494,7 @@ export interface FileRoutesByFullPath {
   '/quadro/rotazione-campi': typeof QuadroRotazioneCampiRoute
   '/segreteria/certificati': typeof SegreteriaCertificatiRoute
   '/segreteria/persone': typeof SegreteriaPersoneRoute
+  '/squadre/$team': typeof SquadreTeamRoute
   '/tesoreria/biglietteria': typeof TesoreriaBiglietteriaRoute
   '/tesoreria/club-house': typeof TesoreriaClubHouseRoute
   '/tesoreria/compensi': typeof TesoreriaCompensiRoute
@@ -494,6 +522,7 @@ export interface FileRoutesByTo {
   '/community': typeof CommunityRoute
   '/comunicazioni': typeof ComunicazioniRoute
   '/contatti': typeof ContattiRoute
+  '/crea': typeof CreaRoute
   '/crm': typeof CrmRoute
   '/direzione': typeof DirezioneRoute
   '/documenti': typeof DocumentiRoute
@@ -505,6 +534,7 @@ export interface FileRoutesByTo {
   '/impianti': typeof ImpiantiRoute
   '/infermeria': typeof InfermeriaRoute
   '/installa': typeof InstallaRoute
+  '/la-mia-scd': typeof LaMiaScdRoute
   '/magazzino': typeof MagazzinoRoute
   '/partner': typeof PartnerRoute
   '/privacy': typeof PrivacyRoute
@@ -527,6 +557,7 @@ export interface FileRoutesByTo {
   '/direzione/accessi': typeof DirezioneAccessiRoute
   '/direzione/acquisti': typeof DirezioneAcquistiRoute
   '/direzione/cervellone': typeof DirezioneCervelloneRoute
+  '/direzione/contenuti': typeof DirezioneContenutiRoute
   '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
   '/gestionale/coda': typeof GestionaleCodaRoute
   '/gestionale/mappa': typeof GestionaleMappaRoute
@@ -535,6 +566,7 @@ export interface FileRoutesByTo {
   '/quadro/rotazione-campi': typeof QuadroRotazioneCampiRoute
   '/segreteria/certificati': typeof SegreteriaCertificatiRoute
   '/segreteria/persone': typeof SegreteriaPersoneRoute
+  '/squadre/$team': typeof SquadreTeamRoute
   '/tesoreria/biglietteria': typeof TesoreriaBiglietteriaRoute
   '/tesoreria/club-house': typeof TesoreriaClubHouseRoute
   '/tesoreria/compensi': typeof TesoreriaCompensiRoute
@@ -563,6 +595,7 @@ export interface FileRoutesById {
   '/community': typeof CommunityRoute
   '/comunicazioni': typeof ComunicazioniRoute
   '/contatti': typeof ContattiRoute
+  '/crea': typeof CreaRoute
   '/crm': typeof CrmRoute
   '/direzione': typeof DirezioneRoute
   '/documenti': typeof DocumentiRoute
@@ -574,6 +607,7 @@ export interface FileRoutesById {
   '/impianti': typeof ImpiantiRoute
   '/infermeria': typeof InfermeriaRoute
   '/installa': typeof InstallaRoute
+  '/la-mia-scd': typeof LaMiaScdRoute
   '/magazzino': typeof MagazzinoRoute
   '/partner': typeof PartnerRoute
   '/privacy': typeof PrivacyRoute
@@ -596,6 +630,7 @@ export interface FileRoutesById {
   '/direzione_/accessi': typeof DirezioneAccessiRoute
   '/direzione_/acquisti': typeof DirezioneAcquistiRoute
   '/direzione_/cervellone': typeof DirezioneCervelloneRoute
+  '/direzione_/contenuti': typeof DirezioneContenutiRoute
   '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
   '/gestionale/coda': typeof GestionaleCodaRoute
   '/gestionale/mappa': typeof GestionaleMappaRoute
@@ -605,6 +640,7 @@ export interface FileRoutesById {
   '/quadro/rotazione-campi': typeof QuadroRotazioneCampiRoute
   '/segreteria_/certificati': typeof SegreteriaCertificatiRoute
   '/segreteria_/persone': typeof SegreteriaPersoneRoute
+  '/squadre_/$team': typeof SquadreTeamRoute
   '/tesoreria_/biglietteria': typeof TesoreriaBiglietteriaRoute
   '/tesoreria_/club-house': typeof TesoreriaClubHouseRoute
   '/tesoreria_/compensi': typeof TesoreriaCompensiRoute
@@ -634,6 +670,7 @@ export interface FileRouteTypes {
     | '/community'
     | '/comunicazioni'
     | '/contatti'
+    | '/crea'
     | '/crm'
     | '/direzione'
     | '/documenti'
@@ -645,6 +682,7 @@ export interface FileRouteTypes {
     | '/impianti'
     | '/infermeria'
     | '/installa'
+    | '/la-mia-scd'
     | '/magazzino'
     | '/partner'
     | '/privacy'
@@ -667,6 +705,7 @@ export interface FileRouteTypes {
     | '/direzione/accessi'
     | '/direzione/acquisti'
     | '/direzione/cervellone'
+    | '/direzione/contenuti'
     | '/eventi/christmas-lario-cup'
     | '/gestionale/coda'
     | '/gestionale/mappa'
@@ -676,6 +715,7 @@ export interface FileRouteTypes {
     | '/quadro/rotazione-campi'
     | '/segreteria/certificati'
     | '/segreteria/persone'
+    | '/squadre/$team'
     | '/tesoreria/biglietteria'
     | '/tesoreria/club-house'
     | '/tesoreria/compensi'
@@ -703,6 +743,7 @@ export interface FileRouteTypes {
     | '/community'
     | '/comunicazioni'
     | '/contatti'
+    | '/crea'
     | '/crm'
     | '/direzione'
     | '/documenti'
@@ -714,6 +755,7 @@ export interface FileRouteTypes {
     | '/impianti'
     | '/infermeria'
     | '/installa'
+    | '/la-mia-scd'
     | '/magazzino'
     | '/partner'
     | '/privacy'
@@ -736,6 +778,7 @@ export interface FileRouteTypes {
     | '/direzione/accessi'
     | '/direzione/acquisti'
     | '/direzione/cervellone'
+    | '/direzione/contenuti'
     | '/eventi/christmas-lario-cup'
     | '/gestionale/coda'
     | '/gestionale/mappa'
@@ -744,6 +787,7 @@ export interface FileRouteTypes {
     | '/quadro/rotazione-campi'
     | '/segreteria/certificati'
     | '/segreteria/persone'
+    | '/squadre/$team'
     | '/tesoreria/biglietteria'
     | '/tesoreria/club-house'
     | '/tesoreria/compensi'
@@ -771,6 +815,7 @@ export interface FileRouteTypes {
     | '/community'
     | '/comunicazioni'
     | '/contatti'
+    | '/crea'
     | '/crm'
     | '/direzione'
     | '/documenti'
@@ -782,6 +827,7 @@ export interface FileRouteTypes {
     | '/impianti'
     | '/infermeria'
     | '/installa'
+    | '/la-mia-scd'
     | '/magazzino'
     | '/partner'
     | '/privacy'
@@ -804,6 +850,7 @@ export interface FileRouteTypes {
     | '/direzione_/accessi'
     | '/direzione_/acquisti'
     | '/direzione_/cervellone'
+    | '/direzione_/contenuti'
     | '/eventi/christmas-lario-cup'
     | '/gestionale/coda'
     | '/gestionale/mappa'
@@ -813,6 +860,7 @@ export interface FileRouteTypes {
     | '/quadro/rotazione-campi'
     | '/segreteria_/certificati'
     | '/segreteria_/persone'
+    | '/squadre_/$team'
     | '/tesoreria_/biglietteria'
     | '/tesoreria_/club-house'
     | '/tesoreria_/compensi'
@@ -841,6 +889,7 @@ export interface RootRouteChildren {
   CommunityRoute: typeof CommunityRoute
   ComunicazioniRoute: typeof ComunicazioniRoute
   ContattiRoute: typeof ContattiRoute
+  CreaRoute: typeof CreaRoute
   CrmRoute: typeof CrmRoute
   DirezioneRoute: typeof DirezioneRoute
   DocumentiRoute: typeof DocumentiRoute
@@ -852,6 +901,7 @@ export interface RootRouteChildren {
   ImpiantiRoute: typeof ImpiantiRoute
   InfermeriaRoute: typeof InfermeriaRoute
   InstallaRoute: typeof InstallaRoute
+  LaMiaScdRoute: typeof LaMiaScdRoute
   MagazzinoRoute: typeof MagazzinoRoute
   PartnerRoute: typeof PartnerRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -874,6 +924,7 @@ export interface RootRouteChildren {
   DirezioneAccessiRoute: typeof DirezioneAccessiRoute
   DirezioneAcquistiRoute: typeof DirezioneAcquistiRoute
   DirezioneCervelloneRoute: typeof DirezioneCervelloneRoute
+  DirezioneContenutiRoute: typeof DirezioneContenutiRoute
   EventiChristmasLarioCupRoute: typeof EventiChristmasLarioCupRoute
   GestionaleCodaRoute: typeof GestionaleCodaRoute
   GestionaleMappaRoute: typeof GestionaleMappaRoute
@@ -883,6 +934,7 @@ export interface RootRouteChildren {
   QuadroRotazioneCampiRoute: typeof QuadroRotazioneCampiRoute
   SegreteriaCertificatiRoute: typeof SegreteriaCertificatiRoute
   SegreteriaPersoneRoute: typeof SegreteriaPersoneRoute
+  SquadreTeamRoute: typeof SquadreTeamRoute
   TesoreriaBiglietteriaRoute: typeof TesoreriaBiglietteriaRoute
   TesoreriaClubHouseRoute: typeof TesoreriaClubHouseRoute
   TesoreriaCompensiRoute: typeof TesoreriaCompensiRoute
@@ -940,6 +992,13 @@ declare module '@tanstack/react-router' {
       path: '/contatti'
       fullPath: '/contatti'
       preLoaderRoute: typeof ContattiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/crea': {
+      id: '/crea'
+      path: '/crea'
+      fullPath: '/crea'
+      preLoaderRoute: typeof CreaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/crm': {
@@ -1017,6 +1076,13 @@ declare module '@tanstack/react-router' {
       path: '/installa'
       fullPath: '/installa'
       preLoaderRoute: typeof InstallaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/la-mia-scd': {
+      id: '/la-mia-scd'
+      path: '/la-mia-scd'
+      fullPath: '/la-mia-scd'
+      preLoaderRoute: typeof LaMiaScdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/magazzino': {
@@ -1194,6 +1260,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DirezioneCervelloneRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/direzione_/contenuti': {
+      id: '/direzione_/contenuti'
+      path: '/direzione/contenuti'
+      fullPath: '/direzione/contenuti'
+      preLoaderRoute: typeof DirezioneContenutiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/eventi/': {
       id: '/eventi/'
       path: '/eventi'
@@ -1276,6 +1349,13 @@ declare module '@tanstack/react-router' {
       path: '/segreteria/persone'
       fullPath: '/segreteria/persone'
       preLoaderRoute: typeof SegreteriaPersoneRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/squadre_/$team': {
+      id: '/squadre_/$team'
+      path: '/squadre/$team'
+      fullPath: '/squadre/$team'
+      preLoaderRoute: typeof SquadreTeamRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tesoreria_/biglietteria': {
@@ -1400,6 +1480,7 @@ const rootRouteChildren: RootRouteChildren = {
   CommunityRoute: CommunityRoute,
   ComunicazioniRoute: ComunicazioniRoute,
   ContattiRoute: ContattiRoute,
+  CreaRoute: CreaRoute,
   CrmRoute: CrmRoute,
   DirezioneRoute: DirezioneRoute,
   DocumentiRoute: DocumentiRoute,
@@ -1411,6 +1492,7 @@ const rootRouteChildren: RootRouteChildren = {
   ImpiantiRoute: ImpiantiRoute,
   InfermeriaRoute: InfermeriaRoute,
   InstallaRoute: InstallaRoute,
+  LaMiaScdRoute: LaMiaScdRoute,
   MagazzinoRoute: MagazzinoRoute,
   PartnerRoute: PartnerRoute,
   PrivacyRoute: PrivacyRoute,
@@ -1433,6 +1515,7 @@ const rootRouteChildren: RootRouteChildren = {
   DirezioneAccessiRoute: DirezioneAccessiRoute,
   DirezioneAcquistiRoute: DirezioneAcquistiRoute,
   DirezioneCervelloneRoute: DirezioneCervelloneRoute,
+  DirezioneContenutiRoute: DirezioneContenutiRoute,
   EventiChristmasLarioCupRoute: EventiChristmasLarioCupRoute,
   GestionaleCodaRoute: GestionaleCodaRoute,
   GestionaleMappaRoute: GestionaleMappaRoute,
@@ -1442,6 +1525,7 @@ const rootRouteChildren: RootRouteChildren = {
   QuadroRotazioneCampiRoute: QuadroRotazioneCampiRoute,
   SegreteriaCertificatiRoute: SegreteriaCertificatiRoute,
   SegreteriaPersoneRoute: SegreteriaPersoneRoute,
+  SquadreTeamRoute: SquadreTeamRoute,
   TesoreriaBiglietteriaRoute: TesoreriaBiglietteriaRoute,
   TesoreriaClubHouseRoute: TesoreriaClubHouseRoute,
   TesoreriaCompensiRoute: TesoreriaCompensiRoute,
