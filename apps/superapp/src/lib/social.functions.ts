@@ -462,3 +462,134 @@ export const uploadFeedImage = createServerFn({ method: "POST" })
       };
     },
   );
+
+/* ------------------------------------------------------------ Top 11 (r90) */
+
+export interface VoteCandidate {
+  athleteId: string;
+  team: string;
+  name: string;
+  adult: boolean;
+}
+export interface Top11 {
+  weekStart: string;
+  closed: boolean;
+  voters: number;
+  top: { athleteId: string; team: string; name: string; votes: number }[];
+}
+export interface WeekVoteData {
+  signedIn: boolean;
+  candidates: VoteCandidate[];
+  mine: string[];
+  last: Top11;
+}
+
+function parseCandidates(raw: unknown): VoteCandidate[] {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map((r) =>
+      r && typeof r === "object" ? (r as Record<string, unknown>) : null,
+    )
+    .filter(
+      (r): r is Record<string, unknown> =>
+        !!r &&
+        typeof r["athleteId"] === "string" &&
+        typeof r["name"] === "string" &&
+        typeof r["team"] === "string",
+    )
+    .map((r) => ({
+      athleteId: r["athleteId"] as string,
+      team: r["team"] as string,
+      name: r["name"] as string,
+      adult: r["adult"] === true,
+    }));
+}
+
+function parseTop11(raw: unknown): Top11 {
+  const r =
+    raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
+  const top = Array.isArray(r["top"])
+    ? (r["top"] as unknown[])
+        .map((x) =>
+          x && typeof x === "object" ? (x as Record<string, unknown>) : null,
+        )
+        .filter(
+          (x): x is Record<string, unknown> =>
+            !!x && typeof x["athleteId"] === "string",
+        )
+        .map((x) => ({
+          athleteId: x["athleteId"] as string,
+          team: String(x["team"] ?? ""),
+          name: String(x["name"] ?? ""),
+          votes: Number(x["votes"] ?? 0) || 0,
+        }))
+    : [];
+  return {
+    weekStart: typeof r["weekStart"] === "string" ? r["weekStart"] : "",
+    closed: r["closed"] === true,
+    voters: Number(r["voters"] ?? 0) || 0,
+    top,
+  };
+}
+
+export const getWeekVote = createServerFn({ method: "GET" }).handler(
+  async (): Promise<WeekVoteData> => {
+    const sb = serverSupabase();
+    const empty: Top11 = { weekStart: "", closed: true, voters: 0, top: [] };
+    if (!sb) return { signedIn: false, candidates: [], mine: [], last: empty };
+    const s = await sessionView();
+    const org = s.memberships[0] ?? null;
+    const [last, cand, mine] = await Promise.all([
+      sb.rpc("scd_top11", { p_org_slug: ORG_SLUG }),
+      org
+        ? sb.rpc("scd_vote_candidates", {
+            p_organization_id: org.organizationId,
+          })
+        : Promise.resolve({ data: [], error: null }),
+      org
+        ? sb.rpc("scd_my_week_votes", { p_organization_id: org.organizationId })
+        : Promise.resolve({ data: [], error: null }),
+    ]);
+    return {
+      signedIn: !!s.user,
+      candidates: cand.error ? [] : parseCandidates(cand.data),
+      mine:
+        mine.error || !Array.isArray(mine.data)
+          ? []
+          : mine.data.filter((x): x is string => typeof x === "string"),
+      last: last.error ? empty : parseTop11(last.data),
+    };
+  },
+);
+
+export const castWeekVote = createServerFn({ method: "POST" })
+  .inputValidator((d: { athleteId: string; on: boolean }) =>
+    z.object({ athleteId: z.string().uuid(), on: z.boolean() }).parse(d),
+  )
+  .handler(async ({ data }): Promise<SocialOutcome> => {
+    const { org, sb } = await context();
+    if (!sb || !org)
+      return { ok: false, message: "Iscriviti o entra per votare." };
+    const { data: out, error } = await sb.rpc("scd_cast_week_vote", {
+      p_organization_id: org.organizationId,
+      p_athlete_id: data.athleteId,
+      p_on: data.on,
+    });
+    if (error) return { ok: false, message: postError(null) };
+    const r = (out ?? {}) as { ok?: boolean; code?: string; on?: boolean };
+    if (!r.ok)
+      return {
+        ok: false,
+        message:
+          r.code === "limit"
+            ? "Hai già dato i tuoi 3 voti di questa settimana: togline uno per cambiare."
+            : r.code === "candidate"
+              ? "Questo giocatore non è votabile."
+              : postError(r.code),
+      };
+    return {
+      ok: true,
+      on: r.on === true,
+      message: r.on ? "Voto registrato." : "Voto tolto.",
+    };
+  });

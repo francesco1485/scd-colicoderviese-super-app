@@ -40,6 +40,7 @@ import { Route as SocietaRouteImport } from './routes/societa'
 import { Route as SponsorRouteImport } from './routes/sponsor'
 import { Route as SquadreRouteImport } from './routes/squadre'
 import { Route as TesoreriaRouteImport } from './routes/tesoreria'
+import { Route as Top11RouteImport } from './routes/top11'
 import { Route as AccediIndexRouteImport } from './routes/accedi.index'
 import { Route as AccediConfermaRouteImport } from './routes/accedi.conferma'
 import { Route as AreeIndexRouteImport } from './routes/aree.index'
@@ -234,6 +235,11 @@ const SquadreRoute = SquadreRouteImport.update({
 const TesoreriaRoute = TesoreriaRouteImport.update({
   id: '/tesoreria',
   path: '/tesoreria',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Top11Route = Top11RouteImport.update({
+  id: '/top11',
+  path: '/top11',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AccediIndexRoute = AccediIndexRouteImport.update({
@@ -474,6 +480,7 @@ export interface FileRoutesByFullPath {
   '/sponsor': typeof SponsorRoute
   '/squadre': typeof SquadreRoute
   '/tesoreria': typeof TesoreriaRoute
+  '/top11': typeof Top11Route
   '/accedi/conferma': typeof AccediConfermaRoute
   '/aree/$area': typeof AreeAreaRoute
   '/calendario/rotazione-campi': typeof CalendarioRotazioneCampiRoute
@@ -547,6 +554,7 @@ export interface FileRoutesByTo {
   '/sponsor': typeof SponsorRoute
   '/squadre': typeof SquadreRoute
   '/tesoreria': typeof TesoreriaRoute
+  '/top11': typeof Top11Route
   '/accedi/conferma': typeof AccediConfermaRoute
   '/aree/$area': typeof AreeAreaRoute
   '/calendario/rotazione-campi': typeof CalendarioRotazioneCampiRoute
@@ -620,6 +628,7 @@ export interface FileRoutesById {
   '/sponsor': typeof SponsorRoute
   '/squadre': typeof SquadreRoute
   '/tesoreria': typeof TesoreriaRoute
+  '/top11': typeof Top11Route
   '/accedi/conferma': typeof AccediConfermaRoute
   '/aree/$area': typeof AreeAreaRoute
   '/calendario_/rotazione-campi': typeof CalendarioRotazioneCampiRoute
@@ -695,6 +704,7 @@ export interface FileRouteTypes {
     | '/sponsor'
     | '/squadre'
     | '/tesoreria'
+    | '/top11'
     | '/accedi/conferma'
     | '/aree/$area'
     | '/calendario/rotazione-campi'
@@ -768,6 +778,7 @@ export interface FileRouteTypes {
     | '/sponsor'
     | '/squadre'
     | '/tesoreria'
+    | '/top11'
     | '/accedi/conferma'
     | '/aree/$area'
     | '/calendario/rotazione-campi'
@@ -840,6 +851,7 @@ export interface FileRouteTypes {
     | '/sponsor'
     | '/squadre'
     | '/tesoreria'
+    | '/top11'
     | '/accedi/conferma'
     | '/aree/$area'
     | '/calendario_/rotazione-campi'
@@ -914,6 +926,7 @@ export interface RootRouteChildren {
   SponsorRoute: typeof SponsorRoute
   SquadreRoute: typeof SquadreRoute
   TesoreriaRoute: typeof TesoreriaRoute
+  Top11Route: typeof Top11Route
   AccediConfermaRoute: typeof AccediConfermaRoute
   AreeAreaRoute: typeof AreeAreaRoute
   CalendarioRotazioneCampiRoute: typeof CalendarioRotazioneCampiRoute
@@ -1167,6 +1180,13 @@ declare module '@tanstack/react-router' {
       path: '/tesoreria'
       fullPath: '/tesoreria'
       preLoaderRoute: typeof TesoreriaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/top11': {
+      id: '/top11'
+      path: '/top11'
+      fullPath: '/top11'
+      preLoaderRoute: typeof Top11RouteImport
       parentRoute: typeof rootRouteImport
     }
     '/accedi/': {
@@ -1505,6 +1525,7 @@ const rootRouteChildren: RootRouteChildren = {
   SponsorRoute: SponsorRoute,
   SquadreRoute: SquadreRoute,
   TesoreriaRoute: TesoreriaRoute,
+  Top11Route: Top11Route,
   AccediConfermaRoute: AccediConfermaRoute,
   AreeAreaRoute: AreeAreaRoute,
   CalendarioRotazioneCampiRoute: CalendarioRotazioneCampiRoute,

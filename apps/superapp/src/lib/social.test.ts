@@ -210,10 +210,11 @@ describe("social", () => {
       "match",
       "sponsor",
       "event",
+      "top11",
     ]);
     expect(
       composeFeed([], ["m1"], false, null, "perte").map((n) => n.k),
-    ).toEqual(["week", "match", "empty"]);
+    ).toEqual(["week", "match", "top11", "empty"]);
     expect(composeFeed([], [], false, null, "dirette").map((n) => n.k)).toEqual(
       ["empty"],
     );

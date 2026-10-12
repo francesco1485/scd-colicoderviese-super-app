@@ -8,6 +8,7 @@ import {
   Gamepad2,
   Inbox,
   PenSquare,
+  Trophy,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
@@ -372,6 +373,20 @@ function Inside({
             </span>
           </span>
         </section>
+        <Link
+          to="/top11"
+          className="scd-focus flex items-center gap-3 rounded-[20px] bg-white p-4 shadow-[0_2px_10px_rgb(11_42_91/0.08)]"
+        >
+          <span className="grid size-11 shrink-0 place-items-center rounded-[12px] bg-[var(--uv-gold)] text-[#0b1e3a]">
+            <Trophy className="size-6" aria-hidden="true" />
+          </span>
+          <span className="grid gap-0.5">
+            <b className="text-[15px]">Top 11 della settimana</b>
+            <span className="text-[13px] text-[#5a6b85]">
+              Dai i tuoi 3 voti ai giocatori di tutte le squadre agonistiche.
+            </span>
+          </span>
+        </Link>
       </div>
     </main>
   );

@@ -261,6 +261,7 @@ export type FeedNode<M, E> =
   | { k: "match"; match: M }
   | { k: "sponsor" }
   | { k: "event"; event: E }
+  | { k: "top11" }
   | { k: "empty" };
 
 /**
@@ -284,6 +285,7 @@ export function composeFeed<M, E>(
     ...matches.map((match) => ({ k: "match" as const, match })),
     ...(hasSponsor ? [{ k: "sponsor" as const }] : []),
     ...(event ? [{ k: "event" as const, event }] : []),
+    { k: "top11" as const },
   ];
   let e = 0;
   posts.forEach((post, i) => {

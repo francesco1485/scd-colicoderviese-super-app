@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
+import { Trophy } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { BUILD_STAMP } from "@/lib/build-stamp";
@@ -589,6 +590,27 @@ function Home() {
                   />
                 );
               }
+              case "top11":
+                return (
+                  <Link
+                    key="top11"
+                    to="/top11"
+                    className="scd-focus flex items-center gap-3 rounded-[20px] bg-[#0b2a5b] p-4 text-white shadow-[0_2px_10px_rgb(11_42_91/0.08)]"
+                  >
+                    <span className="grid size-12 shrink-0 place-items-center rounded-[14px] bg-[var(--uv-gold)] text-[#0b1e3a]">
+                      <Trophy className="size-6" aria-hidden="true" />
+                    </span>
+                    <span className="grid gap-0.5">
+                      <b className="font-uv text-[22px] leading-none">
+                        TOP 11 DELLA SETTIMANA
+                      </b>
+                      <span className="text-[13px] text-[#c8d8ee]">
+                        Vota i giocatori di tutte le squadre: 3 voti a testa,
+                        esce il lunedì.
+                      </span>
+                    </span>
+                  </Link>
+                );
               case "empty":
                 return (
                   <EmptyFeed
