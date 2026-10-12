@@ -33,7 +33,16 @@ import { assignTeam, getPeople, getPerson, insertPerson, markPersonLeft, type Pe
 import { getWorkAreaGate } from "@/lib/work-areas.functions";
 import { AccessRequestsCard } from "@/components/scd/AccessRequestsCard";
 
+/** Pre-selected filters from the desk links: ?squadra=nessuna, ?stato=pending. */
+function validateSearch(raw: Record<string, unknown>): { squadra?: string; stato?: "pending" } {
+  const out: { squadra?: string; stato?: "pending" } = {};
+  if (typeof raw["squadra"] === "string" && raw["squadra"]) out.squadra = raw["squadra"];
+  if (raw["stato"] === "pending") out.stato = "pending";
+  return out;
+}
+
 export const Route = createFileRoute("/segreteria_/persone")({
+  validateSearch,
   loader: async () => {
     const gate = await getWorkAreaGate({ data: { area: "persone" } });
     if (gate.view !== "page") return { gate, interior: false as const };
@@ -46,9 +55,10 @@ export const Route = createFileRoute("/segreteria_/persone")({
 
 function PersoneRoute() {
   const d = Route.useLoaderData();
+  const search = Route.useSearch();
   return (
     <WorkAreaGateView id="persone" gate={d.gate}>
-      {d.interior && <PersonePage initial={d.data} preview={d.gate.preview} />}
+      {d.interior && <PersonePage initial={d.data} preview={d.gate.preview} initialFilter={{ kind: "tutti", team: search.squadra, status: search.stato === "pending" ? "PENDING" : undefined }} />}
     </WorkAreaGateView>
   );
 }
@@ -56,9 +66,9 @@ function PersoneRoute() {
 const CERT_TONE: Record<CertState, ChipTone> = { scaduto: "crit", "in-scadenza": "warn", ok: "ok", sconosciuto: "mute" };
 const inputCls = "h-11 w-full rounded-[10px] border border-[var(--in-line)] bg-white px-3 text-[15px] text-[var(--in-ink)] outline-none focus:border-[var(--in-info)]";
 
-function PersonePage({ initial, preview }: { initial: PeopleData; preview: boolean }) {
+function PersonePage({ initial, preview, initialFilter }: { initial: PeopleData; preview: boolean; initialFilter: PeopleFilter }) {
   const [data, setData] = useState(initial);
-  const [filter, setFilter] = useState<PeopleFilter>({ kind: "tutti" });
+  const [filter, setFilter] = useState<PeopleFilter>(initialFilter);
   const [selected, setSelected] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
   const reload = useServerFn(getPeople);

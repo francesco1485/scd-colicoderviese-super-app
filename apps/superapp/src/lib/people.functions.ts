@@ -12,6 +12,7 @@ import { workAreaView, type WorkAreaGate } from "./access";
 import { sessionView } from "./auth.functions";
 import { stagingPreviewEnabled } from "./impianti-access";
 import { birthYear, isMinor, personKind, type PersonDetail, type PersonRole, type PersonRow, type PersonTeam, type RoleKind } from "./people";
+import { parseDeskCounts, type DeskCounts } from "./secretariat-desk";
 import { serverSupabase } from "./supabase.server";
 
 export interface PeopleData {
@@ -268,3 +269,15 @@ export const assignTeam = createServerFn({ method: "POST" })
     return { ok: true, message: `Fatto: ${parts.join(", ")}. Resta nello storico.` };
   });
 
+
+export type DeskData = { connected: boolean; counts: DeskCounts | null; error: string | null };
+
+/** r73: the secretariat's day as counts only (scd_secretariat_desk). Direzione/Segreteria; null counts when not allowed. */
+export const getSecretariatDesk = createServerFn({ method: "GET" }).handler(async (): Promise<DeskData> => {
+  const { org, canWrite, sb } = await context();
+  if (!sb || !org) return { connected: false, counts: null, error: null };
+  if (!canWrite) return { connected: true, counts: null, error: null };
+  const { data, error } = await sb.rpc("scd_secretariat_desk", { p_organization_id: org.organizationId });
+  if (error) return { connected: true, counts: null, error: "Scrivania non disponibile: lettura non riuscita." };
+  return { connected: true, counts: parseDeskCounts(data), error: null };
+});

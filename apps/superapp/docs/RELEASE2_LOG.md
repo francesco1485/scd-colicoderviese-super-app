@@ -314,3 +314,7 @@ prossimi impegni e "ci sarò" in primo piano). Desktop invariato.
 - Direzione rejected the phone home with the Sky hero and stacked bars: "era migliore quella di prima".
 - The phone/tablet fork (HomeMobile.tsx, da79f09/bec299b) is removed; the SCD Universe page (crest, wordmark, ticket, fixtures) is the single responsive home again. Sky stays a side helper (SkyCameo) only.
 - Checks: tsc, build, vitest 467, test:manifest, test:claude-hooks.
+
+## 2026-10-12 — r73 Scrivania del giorno (Segreteria)
+- `scd_secretariat_desk(org)` (applied on SCD PULSE) returns the day's queue as counts only; `/segreteria` opens on "Scrivania del giorno": each line links to Persone (pre-filtered `?squadra=nessuna`, `?stato=pending`), Certificati or Accessi. Manifest 3.28.3.
+- Real counts verified on staging data (13 expired certificates, 61 people pending, 84 registrations to verify, 354 accounts never signed in). Tests: 472 (5 new).

@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { FileText, Users } from "lucide-react";
+import { ChevronRight, FileText, Users } from "lucide-react";
 import { useMemo } from "react";
 
 import { Card, Chip, SourceLine, TeamTag, useRomeNow } from "@/components/scd/interior-ui";
@@ -7,6 +7,8 @@ import { EmptyState, PendingButton, SourcesBox, WorkAreaGateView, WorkAreaShell,
 import { dateParts, titleCase } from "@/lib/board-data";
 import { freshnessLabel, loadCalendar, type PublicEvent, type PublicGroup } from "@/lib/public-snapshots";
 import { readableOnWhite, teamTag } from "@/lib/quadro";
+import { getSecretariatDesk, type DeskData } from "@/lib/people.functions";
+import { deskHeadline, deskLines, type DeskTone } from "@/lib/secretariat-desk";
 import { getWorkAreaGate } from "@/lib/work-areas.functions";
 import { weekendMatches } from "@/lib/work-areas";
 import { StatTile } from "@/components/scd/work-area-ui";
@@ -18,7 +20,8 @@ export const Route = createFileRoute("/segreteria")({
     const gate = await getWorkAreaGate({ data: { area: "segreteria" } });
     if (gate.view !== "page") return { gate, interior: false as const };
     const cal = loadCalendar();
-    return { gate, interior: true as const, groups: cal.groups, events: cal.events, sourceModifiedAt: cal.sourceModifiedAt };
+    const desk = await getSecretariatDesk();
+    return { gate, interior: true as const, groups: cal.groups, events: cal.events, sourceModifiedAt: cal.sourceModifiedAt, desk };
   },
   head: ({ loaderData }) => workAreaHead("segreteria", loaderData?.gate),
   component: SegreteriaRoute,
@@ -28,30 +31,68 @@ function SegreteriaRoute() {
   const data = Route.useLoaderData();
   return (
     <WorkAreaGateView id="segreteria" gate={data.gate}>
-      {data.interior && <SegreteriaPage groups={data.groups} events={data.events} sourceModifiedAt={data.sourceModifiedAt} preview={data.gate.preview} />}
+      {data.interior && <SegreteriaPage groups={data.groups} events={data.events} sourceModifiedAt={data.sourceModifiedAt} preview={data.gate.preview} desk={data.desk} />}
     </WorkAreaGateView>
   );
 }
 
 const FORMS = ["Lettera di preavviso al Comune", "Richiesta variazione gara LND", "Distinta di gara"];
 
-function SegreteriaPage({ groups, events, sourceModifiedAt, preview }: { groups: PublicGroup[]; events: PublicEvent[]; sourceModifiedAt: string; preview: boolean }) {
+const TONE_CLS: Record<DeskTone, string> = {
+  urgent: "bg-[var(--in-crit-bg,#fdecec)] text-[var(--in-crit,#b3261e)]",
+  todo: "bg-[var(--in-warn-bg,#fff3c4)] text-[var(--in-warn,#7a5200)]",
+  info: "bg-[var(--in-info-bg)] text-[var(--in-info)]",
+};
+
+/** r73: the day's queue as counts with a link each — no names on this page. */
+function DeskCard({ desk }: { desk: DeskData }) {
+  const lines = desk.counts ? deskLines(desk.counts) : [];
+  const asOf = desk.counts?.as_of ? new Date(desk.counts.as_of) : null;
+  return (
+    <Card id="seg-scrivania" title="Scrivania del giorno" sub={desk.counts ? deskHeadline(lines) : desk.connected ? "Solo Direzione e Segreteria vedono le code." : "Database del club non collegato su questo server."} className="lg:self-start">
+      {desk.error && <p className="px-4 pb-3 text-[14px] text-[var(--in-crit,#b3261e)] sm:px-[18px]">{desk.error}</p>}
+      {desk.counts && lines.length === 0 && (
+        <div className="px-4 pb-4 sm:px-[18px]">
+          <EmptyState title="Nessuna coda aperta">Richieste, tesseramenti, certificati e convocazioni sono tutti a posto per oggi.</EmptyState>
+        </div>
+      )}
+      {lines.length > 0 && (
+        <ul className="m-0 list-none p-0" data-testid="desk-lines">
+          {lines.map((l) => (
+            <li key={l.id}>
+              <Link to={l.href as never} className="scd-focus grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 border-t border-[var(--in-line)] px-4 py-3 text-[15px] sm:px-[18px]">
+                <span className={`grid min-w-[44px] place-items-center rounded-[10px] px-2 py-1 font-title text-[20px] font-black tabular-nums ${TONE_CLS[l.tone]}`}>{l.count}</span>
+                <span className="min-w-0">{l.label.replace(/^\d+\s/, "")}</span>
+                <ChevronRight className="size-5 text-[var(--in-sub)]" aria-hidden="true" />
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+      <SourceLine>Database del club, solo conteggi{asOf ? `, alle ${asOf.toLocaleTimeString("it-IT", { timeZone: "Europe/Rome", hour: "2-digit", minute: "2-digit" })}` : ""}. I nomi stanno in Persone, Certificati e Accessi.</SourceLine>
+    </Card>
+  );
+}
+
+function SegreteriaPage({ groups, events, sourceModifiedAt, preview, desk }: { groups: PublicGroup[]; events: PublicEvent[]; sourceModifiedAt: string; preview: boolean; desk: DeskData }) {
   const now = useRomeNow();
   const matches = useMemo(() => weekendMatches(events, now.date), [events, now.date]);
   const byId = useMemo(() => new Map(groups.map((g) => [g.id, g])), [groups]);
+  const deskLinesN = desk.counts ? deskLines(desk.counts).length : null;
 
   return (
     <WorkAreaShell
       id="segreteria"
       preview={preview}
       highlights={[
-        { value: null, label: "scadenze: collegare a R20" },
+        { value: deskLinesN, label: "code aperte oggi" },
         { value: matches.length, label: "distinte per il weekend" },
-        { value: null, label: "tesseramenti: Database Iscrizioni da collegare" },
+        { value: desk.counts ? desk.counts.athletes_without_team : null, label: "atleti senza squadra" },
       ]}
-      note={<>Partite: calendario ufficiale, copia del {freshnessLabel(sourceModifiedAt)}. Scadenze e tesseramenti in attesa delle fonti.</>}
+      note={<>Partite: calendario ufficiale, copia del {freshnessLabel(sourceModifiedAt)}. Code dal database del club; scadenze R20 ancora da collegare.</>}
     >
       <div className="grid grid-cols-1 gap-[18px] lg:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_340px]">
+        <DeskCard desk={desk} />
         <Card id="seg-scadenze" title="Scadenze" sub="In ordine di data. Urgente sotto i 7 giorni." className="lg:self-start">
           <div className="px-4 pb-4 sm:px-[18px]">
             <EmptyState title="Scadenze da collegare a R20">
