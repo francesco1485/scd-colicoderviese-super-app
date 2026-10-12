@@ -92,18 +92,29 @@ def plan_group(status: str | None, residual: float | None) -> str:
         return "CONTESTATO"
     if "CHIUS" in s or "SALDAT" in s or (residual is not None and residual <= 0 and "ACCETT" not in s):
         return "CHIUSO"
-    if "ACCETT" in s or "ATTIV" in s or "IN CORSO" in s:
+    if "ACCETT" in s or "ATTIV" in s or "IN CORSO" in s or "DOCUMENTAT" in s or s.startswith("RATA"):
         return "PIANO_ATTIVO"
     return "DA_DEFINIRE"
 
 
-def link_of(cell) -> str | None:
-    """GMAIL column: a URL as value, or a hyperlink on the cell text."""
+HYPERLINK = re.compile(r'^=\s*HYPERLINK\(\s*"([^"]+)"', re.IGNORECASE)
+
+
+def link_of(cell, formulas=None) -> str | None:
+    """GMAIL column: a URL as value, a hyperlink on the cell text, or a =HYPERLINK("url", "label") formula
+    (read from the same cell of the formula workbook `formulas`, since data_only drops formulas)."""
     v = text(cell.value, 500)
     if v and GMAIL.match(v):
         return v
     target = getattr(getattr(cell, "hyperlink", None), "target", None)
-    return target if target and GMAIL.match(target) else None
+    if target and GMAIL.match(target):
+        return target
+    if formulas is not None and getattr(cell, "coordinate", None):
+        f = formulas[cell.coordinate].value
+        m = HYPERLINK.match(f) if isinstance(f, str) else None
+        if m and GMAIL.match(m[1]):
+            return m[1]
+    return None
 
 
 def sheet_rows(ws) -> tuple[list[str], list[tuple], str | None]:
@@ -131,6 +142,7 @@ def col(head: list[str], row: tuple, name: str):
 
 def build(path: str, source_modified: str | None) -> dict:
     wb = openpyxl.load_workbook(path, data_only=True)
+    wbf = openpyxl.load_workbook(path, data_only=False)
     head, body, aligned = sheet_rows(wb["FORNITORI"])
     suppliers = []
     for r in body:
@@ -156,7 +168,7 @@ def build(path: str, source_modified: str | None) -> dict:
             "nextAction": clean(v("PROSSIMA AZIONE")),
             "commercialPosition": clean(v("POSIZIONE COMMERCIALE"), 120),
             "strategy": clean(v("STRATEGIA")),
-            "mailUrl": link_of(gm) if gm is not None else None,
+            "mailUrl": link_of(gm, wbf["FORNITORI"]) if gm is not None else None,
         })
 
     phead, pbody, paligned = sheet_rows(wb["PAGAMENTI"])
@@ -182,7 +194,7 @@ def build(path: str, source_modified: str | None) -> dict:
             "planStatus": text(v("STATO PIANO"), 80),
             "urgency": text(v("URGENZA"), 40),
             "todo": clean(v("COSA FARE")),
-            "mailUrl": link_of(gm) if gm is not None else None,
+            "mailUrl": link_of(gm, wbf["PAGAMENTI"]) if gm is not None else None,
         })
     return {
         "source": "SCD - TESORERIA FORNITORI | SCADENZE E CHIUSURE 2026-2027",
@@ -209,6 +221,8 @@ def self_test() -> None:
     ws.append(["Fornitore Alfa Srl", "PIANO ACCETTATO", "1.000,00", 250, 750, 4, 250, dt.datetime(2026, 10, 31),
                "31/12/2026", "Mario Rossi 333 1234567", "Bonifico rata 2 entro 31/10/2026, scrivere a amm@alfa.it", "Attivo", "Rientro", "x", "nota privata"])
     ws["N5"].hyperlink = "https://mail.google.com/mail/u/0/#all/abc"
+    ws.append(["Fornitore Gamma", "RATA 1 DOCUMENTATA", 500, 125, 375, 4, 125, "15/11/2026", None, None, None, None, None,
+               '=HYPERLINK("https://mail.google.com/mail/u/0/#all/def","Apri")', None])
     ws.append(["Fornitore Beta", "CHIUSO", 300, 300, 0, 1, None, None, None, None, None, None, None, None, None])
     ws.append([None] * 15)
     p = wb.create_sheet("PAGAMENTI")
@@ -229,11 +243,12 @@ def self_test() -> None:
         os.unlink(path)
     s = out["suppliers"]
     assert out["alignedOn"] == "2026-09-30", out["alignedOn"]
-    assert [x["key"] for x in s] == ["fornitore-alfa-srl", "fornitore-beta"]
+    assert [x["key"] for x in s] == ["fornitore-alfa-srl", "fornitore-gamma", "fornitore-beta"]
+    assert s[1]["planGroup"] == "PIANO_ATTIVO" and s[1]["mailUrl"] == "https://mail.google.com/mail/u/0/#all/def"
     a = s[0]
     assert a["balance"] == 1000.0 and a["residual"] == 750 and a["instalments"] == 4
     assert a["nextDue"] == "2026-10-31" and a["closingExpected"] == "2026-12-31"
-    assert a["planGroup"] == "PIANO_ATTIVO" and s[1]["planGroup"] == "CHIUSO"
+    assert a["planGroup"] == "PIANO_ATTIVO" and s[2]["planGroup"] == "CHIUSO"
     assert a["mailUrl"] == "https://mail.google.com/mail/u/0/#all/abc"
     assert a["nextAction"] == "Bonifico rata 2 entro 31/10/2026, scrivere a [mail]", a["nextAction"]
     assert "amm@alfa.it" not in json.dumps(out) and "Mario" not in json.dumps(out) and "nota privata" not in json.dumps(out)

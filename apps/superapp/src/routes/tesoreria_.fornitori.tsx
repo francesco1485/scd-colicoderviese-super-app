@@ -16,6 +16,7 @@ import {
   dueState,
   filterSuppliers,
   instalmentsOf,
+  needsCheck,
   staleDays,
   supplierFilterCount,
   supplierTotals,
@@ -102,7 +103,7 @@ function SuppliersPage({ initial, today, preview }: { initial: SupplierData; tod
         { value: board ? t.overdue : null, label: "rate scadute" },
         { value: board ? t.within5 : null, label: "rate entro 5 giorni" },
         { value: board ? t.month : null, label: "rate entro 30 giorni" },
-        { value: board ? t.groups.DA_DEFINIRE + t.groups.CONTESTATO : null, label: "piani da definire o contestati" },
+        { value: board ? suppliers.filter(needsCheck).length : null, label: "da verificare (prova non trovata)" },
       ]}
       note={<>Copia di sola lettura di TESORERIA FORNITORI: le correzioni si fanno nel foglio. L'app non paga e non conserva IBAN né contatti personali.</>}
     >
@@ -224,7 +225,10 @@ function SupplierRow({ s, today, onOpen }: { s: Supplier; today: string; onOpen:
           </span>
         </span>
         <span className="flex flex-none flex-col items-end gap-1 text-right">
-          <Chip tone={s.planGroup !== "CHIUSO" && st === "scaduta" ? "crit" : PLAN_TONE[s.planGroup]}>{s.planGroup !== "CHIUSO" && st === "scaduta" ? "Rata scaduta" : PLAN_LABEL[s.planGroup]}</Chip>
+          <span className="flex flex-wrap justify-end gap-1">
+            {needsCheck(s) && <Chip tone="warn">Da verificare</Chip>}
+            <Chip tone={s.planGroup !== "CHIUSO" && st === "scaduta" ? "crit" : PLAN_TONE[s.planGroup]}>{s.planGroup !== "CHIUSO" && st === "scaduta" ? "Rata scaduta" : PLAN_LABEL[s.planGroup]}</Chip>
+          </span>
           <span className="text-[13px] tabular-nums text-[var(--in-sub)]">residuo {euro(s.residual)}</span>
         </span>
       </button>
@@ -263,6 +267,7 @@ function SupplierDialog({ s, rates, today, onClose }: { s: Supplier; rates: Inst
       <div className="mt-3 flex flex-col gap-3 text-[14.5px]">
         <div className="flex flex-wrap items-center gap-2">
           <Chip tone={PLAN_TONE[s.planGroup]}>{PLAN_LABEL[s.planGroup]}</Chip>
+          {needsCheck(s) && <Chip tone="warn">Da verificare</Chip>}
           {s.nextDue && s.planGroup !== "CHIUSO" && <span className="text-[var(--in-sub)]">Prossima rata {euro(s.nextAmount)} · {dueText(s.nextDue, today)}</span>}
         </div>
         <div className="grid grid-cols-3 gap-2">

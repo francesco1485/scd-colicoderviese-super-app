@@ -6,6 +6,7 @@ import {
   dueState,
   filterSuppliers,
   instalmentsOf,
+  needsCheck,
   parseSupplierBoard,
   staleDays,
   supplierFilterCount,
@@ -60,6 +61,15 @@ describe("parseSupplierBoard", () => {
     expect(b?.suppliers[1]?.mailUrl).toBe("https://mail.google.com/mail/u/0/#all/1");
     expect(b?.instalments).toHaveLength(1);
     expect(parseSupplierBoard(null)).toBeNull();
+  });
+});
+
+describe("needsCheck", () => {
+  it("flags open plans whose proof was not found", () => {
+    expect(needsCheck({ planStatus: "ACCETTATO - PROVA PAGAMENTO NON TROVATA", planGroup: "PIANO_ATTIVO" })).toBe(true);
+    expect(needsCheck({ planStatus: "PROPOSTA INVIATA - RISPOSTA NON TROVATA", planGroup: "DA_DEFINIRE" })).toBe(true);
+    expect(needsCheck({ planStatus: "RATA 1 DOCUMENTATA", planGroup: "PIANO_ATTIVO" })).toBe(false);
+    expect(needsCheck({ planStatus: "NON TROVATA", planGroup: "CHIUSO" })).toBe(false);
   });
 });
 

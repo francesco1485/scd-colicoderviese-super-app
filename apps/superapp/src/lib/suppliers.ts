@@ -256,6 +256,11 @@ export function supplierFilterCount(items: readonly Supplier[], f: SupplierFilte
   return filterSuppliers(items, f).length;
 }
 
+/** The master flags plans whose payment or answer was not found ("... NON TROVATA"): the Tesoreria must check. */
+export function needsCheck(s: Pick<Supplier, "planStatus" | "planGroup">): boolean {
+  return s.planGroup !== "CHIUSO" && /NON TROVAT/i.test(s.planStatus ?? "");
+}
+
 /** Instalments of one supplier, by due date. */
 export function instalmentsOf(instalments: readonly Instalment[], key: string): Instalment[] {
   return instalments.filter((i) => i.supplierKey === key).sort((a, b) => (a.due ?? "9").localeCompare(b.due ?? "9"));
