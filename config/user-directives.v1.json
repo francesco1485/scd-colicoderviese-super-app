@@ -2078,6 +2078,50 @@
           "Sky is optional decoration, not the focus"
         ]
       }
+    },
+    {
+      "sourceDate": "2026-10-12",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-089",
+      "name": "SOCIAL_FEED_APP_SCD_FIRST_NATIONAL_LATER",
+      "sourceQuoteFragments": [
+        "avviamo l'app web link nostra e poi andiamo con calma a capire come intercettarli",
+        "pagina iniziale dove quando ti iscrivi accedi al tuo account poi ci sono le notizie di tutti come Istagram e poi tu vai a seguire chi ti interessa e vai nella pagina dedicata",
+        "routine stile facebook e Istagram a scrollo e poi accedere ad area privata interna per vedere le tue cose e creare i tuoi contenuti mentre la società ha area interna gestionale",
+        "non pensare ora mettiamo in moto la nostra app ci penseremo dopo a creare qualcosa di nazionale"
+      ],
+      "normalizedCommand": {
+        "rule": "Launch the SCD web app on our own link first. Structure: entry (sign-up/login) -> scrolling social feed (Instagram/Facebook style, 'Per te' followed first, 'Tutti') -> follow clubs/teams/sponsors/events and open their dedicated pages -> private area (my things, create content) -> club internal management area. A national/multi-club platform is explicitly deferred: do not spend effort on it now, only avoid choices that block it later (org-scoped data).",
+        "scope": "PRODUCT_ARCHITECTURE",
+        "constraints": [
+          "first team and youth sector equal visibility",
+          "minors protection rules apply to every post",
+          "user content only with moderation/approval",
+          "design sheets agreed before code (UD-088 look)"
+        ]
+      }
+    },
+    {
+      "sourceDate": "2026-10-12",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-090",
+      "name": "NO_PRIZE_CONTESTS_PARTNER_COUPONS_FREE_AMATEUR_LIVE",
+      "sourceQuoteFragments": [
+        "Concorsi togli da mezzo solo coupon di bonus partner che troveremo",
+        "le dirette solo gratis per dilettanti si possono fare"
+      ],
+      "normalizedCommand": {
+        "rule": "No prize contests (concorsi a premio) in the app. Games/quizzes/pronostici give points only. Rewards are only partner bonus coupons (discounts offered by partners), not tied to chance or ranking. Live streams: only free amateur streams, i.e. the club's own matches on its official channels, linked/embedded in the app; no paid or third-party live without LND rights.",
+        "scope": "ENGAGEMENT_AND_MEDIA",
+        "constraints": [
+          "coupon = same discount available to eligible users, never drawn or ranked (keeps it outside DPR 430/2001)",
+          "no gambling mechanics, no odds, no money",
+          "LND rules on home-match streaming apply",
+          "no minors' faces in promotional clips without liberatoria"
+        ]
+      }
     }
   ],
   "completionGate": {
