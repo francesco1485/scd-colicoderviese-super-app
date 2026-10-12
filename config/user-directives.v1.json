@@ -1751,6 +1751,81 @@
         "implementation": "apps/superapp/src/routes/index.tsx (mobile fork removed), apps/superapp/src/components/universe/HomeBlocks.tsx (wordmark on all screens), HomeMobile.tsx deleted",
         "status": "IMPLEMENTED_STAGING"
       }
+    },
+    {
+      "sourceDate": "2026-10-12",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-074",
+      "name": "RECOVER_EXISTING_WORK_NO_REWRITE",
+      "sourceQuoteFragments": [
+        "manca tutto il lavoro preparato di tesoreria , di abbigliammento , di magazzino , di tornei , di sponsor come faccio io a riscrivere tutto se gia stato fatto",
+        "manca tutto il lavoro fatto di anagrafiche , di storia, di classifiche , di calendari , settimana, di gestione complessiva , struttura fatta"
+      ],
+      "normalizedCommand": {
+        "rule": "Work already prepared in Drive masters, Lovable apps and old repo branches must be recovered into the Super App, never rewritten by the user. Sheets stay the master; the app keeps an automatic copy refreshed several times a day (decision 12/10: copia automatica).",
+        "scope": "DATA_RECOVERY",
+        "order": [
+          "compensi (deadline 15/10)",
+          "pulmini",
+          "struttura club e ruoli",
+          "documenti",
+          "quote",
+          "kit e magazzino",
+          "tornei e calendari",
+          "sponsor e CRM"
+        ],
+        "inventories": "scratchpad/recupero/*.md (read-only, no personal data)"
+      }
+    },
+    {
+      "sourceDate": "2026-10-12",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-075",
+      "name": "MONTHLY_COMPENSATION_CYCLE",
+      "sourceQuoteFragments": [
+        "entro il 15 di questo mese devo pagare stipendi e compensi",
+        "devo fare tutta la parte di verifica in base agli accordi , devo poter modificare , e inserire",
+        "farlo visualizzare alla tesoreria per verificare eprocedere ai pagamenti",
+        "importante avere delle scadenze mensili da rispettare",
+        "acconti , accordi , goal fatti , altre cose date ai singoli la direzione o tesoreria deve poter appuntare e archiviarre con dovumetno tracciato"
+      ],
+      "normalizedCommand": {
+        "rule": "Compensation module: Direction edits agreements and monthly entries (advances, goals, bonuses, tournaments, documented expenses, aids) with attached documents and authorizes the month; Treasury sees authorized amounts, verifies and records payment. Monthly deadline (day 15 of the following month). Payable only if active and not ceased, IBAN confirmed, contract/RASD OK, Direction authorization, net > 0. The app never executes payments.",
+        "scope": "TREASURY",
+        "constraints": [
+          "IBAN stays in the protected sheet; app shows only confirmed yes/no",
+          "Direction and Treasury only",
+          "every entry audited with author and document"
+        ]
+      }
+    },
+    {
+      "sourceDate": "2026-10-12",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-076",
+      "name": "OPERATIONS_ROLES_DOCUMENTS_FEES_KIT_TAX",
+      "sourceQuoteFragments": [
+        "se arrivano soldi da quote la segreteria e tesoreria deve monitorare giornaliermente o nelle date prossime alle scadenze",
+        "se devono misurare kit monza la segreteria deve sapere orario di lavoro della segretaria",
+        "in automatico si prepara file ordine al fornitore dettagliato e con qualche 10 pezzi sempre in piu",
+        "mancano gli accessi a responsabilie lavanderia e collaboratori lavanderia e pulizia , responsabile infermeria , responsabile magazzino e collaboratorie",
+        "responsabile segreteria da remoto e segreteria in presenza , responsabile struttura , responsabile struttura dervio e struttura colico",
+        "si devono poter creare semore nuove anagrafiche e dove servono documenti si devono poter semptre allegare",
+        "se una ragazzo , o familiare o altro scade o è scaduto il documento in automatico deve essere inviata mail",
+        "nelle date di 730 o altre richieste per dote scuola o altro il sistema le prepara come da legge e le sottopone alla segreteria",
+        "tutto deve essere uin orologio svizzero altrimenti la struttura non regge"
+      ],
+      "normalizedCommand": {
+        "rule": "Add club positions (laundry and cleaning, infirmary, warehouse manager and helpers, tournaments, remote and on-site secretariat, Colico and Dervio facility managers, parent-manager paid or volunteer); create registries for non-members; attach documents anywhere; automatic expiry reminders with personal upload link; daily fee monitoring near deadlines; Monza kit fitting flow with secretary schedule, live size entry, deposit request, automatic supplier order file with +10 stock pieces, current warehouse inventory; payment receipts archived per person; tax documents (730, Dote Scuola) prepared and submitted to the Secretariat for review before sending.",
+        "scope": "OPERATIONS",
+        "constraints": [
+          "automatic emails only after the flow is approved by Direction (UD gate on external communications)",
+          "no minors' data in notification text"
+        ]
+      }
     }
   ],
   "completionGate": {
