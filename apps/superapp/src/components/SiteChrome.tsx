@@ -132,7 +132,7 @@ export function SiteHeader() {
         <Link to="/" className="scd-focus flex min-w-0 items-center gap-2.5 rounded-md lg:gap-3" aria-label={`${CLUB_NAME}, vai alla Home`}>
           <ClubCrestOfficial size={46} className="lg:hidden" />
           <ClubCrestOfficial size={54} className="hidden lg:block" />
-          <span className="font-title text-[21px] font-black leading-[0.95] lg:text-[26px]">COLICO<br />DERVIESE</span>
+          <span className="whitespace-nowrap font-title text-[20px] font-black leading-none lg:text-[24px]">COLICO<span className="text-[#ffd600]">DERVIESE</span></span>
         </Link>
         <nav className="ml-4 hidden items-center gap-[22px] lg:flex" aria-label="Principale">
           {desktopNav.map((n) => (

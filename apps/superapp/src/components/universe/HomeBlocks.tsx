@@ -121,16 +121,10 @@ export function HeroBand({
               </span>
               <h1
                 id="club-t"
-                className="font-uv uv-slam text-[40px] uppercase leading-[0.84] [text-shadow:0_3px_0_rgb(0_0_0/0.28)] md:text-[64px] lg:text-[88px]"
+                className="font-uv uv-slam whitespace-nowrap text-[clamp(30px,9vw,40px)] uppercase leading-[0.9] [text-shadow:0_3px_0_rgb(0_0_0/0.28)] md:text-[56px] lg:text-[72px]"
                 style={{ animationDelay: ".35s" }}
               >
-                Colico
-                <span
-                  className="uv-slam block text-[var(--uv-gold)] [text-shadow:0_0_2px_var(--uv-night),0_3px_0_var(--uv-night)]"
-                  style={{ animationDelay: ".55s" }}
-                >
-                  Derviese
-                </span>
+                Colico<span className="text-[var(--uv-gold)] [text-shadow:0_0_2px_var(--uv-night),0_3px_0_var(--uv-night)]">derviese</span>
               </h1>
             </div>
           </div>
