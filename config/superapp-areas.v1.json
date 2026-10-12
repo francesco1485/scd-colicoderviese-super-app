@@ -56,7 +56,7 @@
         { "id": "certificati", "path": "/segreteria/certificati", "audience": "staff", "roles": ["direzione", "segreteria"], "role_map": { "direzione": "DIRECTION", "segreteria": "SECRETARIAT" },
           "sources": ["SUPABASE_SCD (scd_athletes.medical_certificate_* , scd_audit_events — migration r66)", "ISCRIZIONI_ATLETI_2026_27 (declared dates)"],
           "features": ["elenco atleti per squadra con scadenza del certificato", "filtri: manca, scaduto, in scadenza, da controllare", "inserisci o correggi la data, tipo agonistico/non agonistico", "segna come controllato sul certificato cartaceo", "ogni modifica nello storico"], "status": "live" } ] },
-    { "id": "tesoreria", "path": "/tesoreria", "audience": "staff", "board": "Tesoreria.dc.html", "status": "design",
+    { "id": "tesoreria", "path": "/tesoreria", "audience": "staff", "board": "Tesoreria.dc.html", "status": "live",
       "children": [
         { "id": "club-house", "path": "/tesoreria/club-house", "roles": ["responsabile-club-house"], "board": "Tesoreria-sottoaree.dc.html", "status": "design" },
         { "id": "biglietteria", "path": "/tesoreria/biglietteria", "roles": ["addetto-biglietteria"], "blocker": "tariff source to confirm", "status": "live" },

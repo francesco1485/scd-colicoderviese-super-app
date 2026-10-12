@@ -555,8 +555,8 @@ export function SimulazioneTab({
             gara a 11 (misure da verificare) o a 9, oppure 2 a 7, 3 a 5.
           </li>
           <li>
-            Dervio campo 1, erba 96×48: 1 gara a 11, oppure 1 a 9 (da verificare
-            sulle misure), 2 a 7, 3 a 5.
+            Dervio campo 1, erba 97,80 × 50 (verbale di omologazione LND; il master
+            riporta ancora 96 × 48): 1 gara a 11, oppure 1 a 9, 2 a 7, 3 a 5.
           </li>
           <li>
             Durata quando il calendario non dà l'orario di fine: 11 contro 11

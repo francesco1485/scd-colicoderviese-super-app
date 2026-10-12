@@ -3,12 +3,9 @@ import { useRouterState } from "@tanstack/react-router";
 /**
  * Fascia sponsor sempre visibile sopra la barra di navigazione (su desktop in fondo alla pagina).
  * Loghi dalla libreria asset ufficiale caricata dalla società (scontornati, colori originali).
+ * Solo sponsor con rapporto in corso: HDI/Maglia tolto il 12/10/2026 (contratto scaduto, mappa A-Z §7).
  */
 const SPONSORS = [
-  {
-    name: "HDI Assicurazioni, Maglia Assicurazioni",
-    src: "/media/sponsor/hdi-maglia-assicurazioni.webp",
-  },
   { name: "ATV", src: null },
   { name: "Saglio Sport Cantù", src: "/media/sponsor/saglio-sport.webp" },
   { name: "Legea", src: "/media/sponsor/legea.webp" },

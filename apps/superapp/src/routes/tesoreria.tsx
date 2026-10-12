@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Receipt, Wallet } from "lucide-react";
+import { CalendarClock, Receipt, Wallet } from "lucide-react";
 
 import { Card } from "@/components/scd/interior-ui";
 
@@ -26,11 +26,11 @@ function TesoreriaRoute() {
         title="Tesoreria · sottoaree"
         preview={gate.preview}
         highlights={[
-          { value: 5, label: "sottoaree con accesso dedicato" },
+          { value: 7, label: "sottoaree con accesso dedicato" },
+          { value: 3, label: "con dati reali: compensi, quote, fornitori" },
           { value: null, label: "incassi di oggi: casse da collegare" },
-          { value: 1, label: "tariffario da confermare" },
         ]}
-        note="Nessun importo mostrato: casse e listini non sono ancora collegati."
+        note="Compensi, quote e fornitori leggono i dati reali; casse e listini non sono ancora collegati. L'app non paga e non incassa."
       >
         <div className="grid grid-cols-1 gap-[18px] lg:grid-cols-[minmax(0,1fr)_420px]">
           <div className="flex min-w-0 flex-col gap-[18px]">
@@ -45,6 +45,13 @@ function TesoreriaRoute() {
               <div className="px-4 pb-4 sm:px-[18px]">
                 <Link to="/tesoreria/quote" className="scd-focus inline-flex h-11 items-center gap-2 rounded-[10px] bg-[var(--in-info)] px-4 text-[15px] font-bold text-white" data-testid="tes-quote-link">
                   <Receipt className="size-4" aria-hidden="true" /> Apri quote della stagione
+                </Link>
+              </div>
+            </Card>
+            <Card id="tes-fornitori" title="Fornitori e scadenze" sub="Direzione e Tesoreria: debiti, piani di rientro e agenda dei pagamenti, copiati da TESORERIA FORNITORI.">
+              <div className="px-4 pb-4 sm:px-[18px]">
+                <Link to="/tesoreria/fornitori" className="scd-focus inline-flex h-11 items-center gap-2 rounded-[10px] bg-[var(--in-info)] px-4 text-[15px] font-bold text-white" data-testid="tes-fornitori-link">
+                  <CalendarClock className="size-4" aria-hidden="true" /> Apri agenda pagamenti
                 </Link>
               </div>
             </Card>

@@ -1,7 +1,7 @@
 /** Zone del Navigatore Dervio V01 (Drive 1nfybIxk5ZZIvs2rAaMdMjurR8tcCrkhc). Solo fatti presenti nel testo della fonte. */
 export const DERVIO_ZONES = [
   { id: 'AT1', label: 'Anello atletica', facts: ['Ovale pista', '4 corsie, interno 320 m'] },
-  { id: 'C1', label: 'Campo A 11', facts: ['96 x 48 m (fonte 2025)', 'Erba naturale'] },
+  { id: 'C1', label: 'Campo A 11', facts: ['96 x 48 m (fonte 2025)', 'Verbale omologazione LND: 97,80 x 50 m', 'Erba naturale'] },
   { id: 'AT2', label: 'Rettilineo 100 m', facts: ['Lato tribuna'] },
   { id: 'TR', label: 'Tribuna coperta', facts: ['Capienza 190: dato 2024'] },
   { id: 'C2', label: 'Zona allenamento', facts: ['Area di allenamento'] },
