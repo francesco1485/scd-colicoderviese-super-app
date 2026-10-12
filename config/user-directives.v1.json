@@ -2020,6 +2020,24 @@
           "no subscriptions or paid messaging without approval and a monthly cap"
         ]
       }
+    },
+    {
+      "sourceDate": "2026-10-12",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-086",
+      "name": "ORGANIZATIONAL_DECISION_TOWER",
+      "sourceQuoteFragments": [
+        "Obbiettivo creare la torre Excelsior e torre americana di grande struttura organizzativa e decisionale"
+      ],
+      "normalizedCommand": {
+        "rule": "Goal: one organizational and decision tower. 'American' face: decision structure modelled on US pro club front offices (assembly and board on top, general management, two separate pillars sport and business/management, independent safeguarding function, one owner per decision, spending thresholds set by the board, written decision log, 48h escalation, fixed cadence). 'Excelsior' face: a growth ladder with measurable goals per floor rising each season. Interpretation recorded as PROPOSED pending confirmation. Canonical: project doc claude/SCD_MACCHINE_v1.md section 14.",
+        "scope": "GOVERNANCE",
+        "constraints": [
+          "thresholds and appointments decided by the Direzione/Consiglio, never invented",
+          "no autonomous changes to roles and permissions in production"
+        ]
+      }
     }
   ],
   "completionGate": {
