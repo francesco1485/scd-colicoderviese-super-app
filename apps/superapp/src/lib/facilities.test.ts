@@ -42,7 +42,7 @@ describe("facilities contract (config/scd-facilities.v1.json)", () => {
     const col = siteById("SED-COL")!;
     expect(col).toMatchObject({ name: "Centro Sportivo Colico", address: "Via Lido SNC", municipality: "Colico (LC)", managed_by_scd: true });
     const der = siteById("SED-DER")!;
-    expect(der).toMatchObject({ name: "Impianto Dervio", address: null, municipality: "Dervio (LC)", managed_by_scd: false });
+    expect(der).toMatchObject({ name: "Impianto Dervio", address: "Via Guglielmo Marconi 1", municipality: "Dervio (LC)", managed_by_scd: false });
   });
 
   it("holds the 14 master spaces with the master ids, surfaces and sizes", () => {
@@ -55,6 +55,17 @@ describe("facilities contract (config/scd-facilities.v1.json)", () => {
     expect(spaceById("SPA-COL-C2")).toMatchObject({ surface: "Sintetico", size: { text: "96 x 48 m" } });
     expect(spaceById("SPA-DER-C1")).toMatchObject({ surface: "Erba", size: { text: "96 x 48 m" } });
     expect(spaceById("SPA-COL-ARB")?.access?.audiences).toEqual(["referees"]);
+  });
+
+  it("keeps the official homologation facts next to the master values, with their source", () => {
+    const raw = FACILITIES as unknown as { technical: Record<string, { provenance: string }>; drawing_standard: { units: string; layers: string[] } };
+    const der = spaceById("SPA-DER-C1") as unknown as { official: { size: { length_m: number; width_m: number }; valid_until: string; source: string } };
+    expect(der.official.size).toMatchObject({ length_m: 97.8, width_m: 50 });
+    expect(der.official.valid_until).toBe("2028-09-28");
+    expect(der.official.source).toContain("omologazione");
+    for (const [site, t] of Object.entries(raw.technical)) expect(t.provenance.length, site).toBeGreaterThan(0);
+    expect(raw.drawing_standard.units).toContain("metri");
+    expect(raw.drawing_standard.layers.length).toBeGreaterThanOrEqual(8);
   });
 
   it("marks the Dervio board zones as unverified board data", () => {

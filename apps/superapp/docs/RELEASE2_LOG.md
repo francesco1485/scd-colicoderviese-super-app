@@ -324,3 +324,7 @@ prossimi impegni e "ci sarò" in primo piano). Desktop invariato.
 - App: `/tesoreria/compensi` — mese di competenza con scadenza il 15 del mese dopo, totali, filtri (da sistemare, pronti, da pagare, pagati, bloccati), scheda persona con calcolo fisso + voci − acconti, verifiche IBAN/contratto (solo stato), "usa importo storico", voci con allegato e annullamento motivato, autorizza/blocca (Direzione), segna pagato con data, metodo, CRO e contabile (Tesoreria), documenti apribili con link a 2 minuti, "Elenco bonifici" copiabile senza IBAN.
 - Test: compensation.test.ts (9), suite 493; build, tsc, test:manifest, test:claude-hooks.
 - Aperto: ogni persona va verificata (IBAN e contratto) dalla Direzione prima di autorizzare; la posizione "tesoreria" va assegnata da /direzione/accessi.
+
+## 2026-10-12 — Impianti: dati ufficiali dai documenti agli atti (UD-077)
+- `config/scd-facilities.v1.json`: blocco `technical` per Colico (catasto D/6 f.10 p.21081, tribuna 250 posti, spogliatoi, 6 estintori e piano emergenza 2019, illuminazione e progetti torri, club house 2017, rilievo area retro campi) e Dervio (verbale omologazione LND CRL campo 0865 del 28/09/2024: 97,80 x 50,00 m, 1ª categoria fino al 28/09/2028, 190 posti, spogliatoi e prescrizioni); `official` su SPA-DER-C1 accanto al valore del master (96 x 48, da correggere sul master); `drawing_standard` per piante 2D, mappa e rendering.
+- Test facilities aggiornati (indirizzo Dervio verificato, fatti ufficiali con fonte). Suite 494.
