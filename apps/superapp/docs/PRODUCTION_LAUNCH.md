@@ -41,5 +41,6 @@ Nessun passo di questo file si esegue senza l'ok esplicito della Direzione.
 ## Giorno del lancio
 1. Merge approvato su `main` → servizio di produzione attivo → `/healthz` risponde.
 2. Accesso di prova: Direzione, un mister, una famiglia.
-3. Inviti a gruppi (circa 60 all'ora) partendo dalle squadre con i certificati già inseriti.
-4. Presentazione ufficiale.
+3. Conferma dei 61 tesseramenti in corso da Segreteria → Persone (filtro "Senza squadra", azione "Conferma e assegna").
+4. Inviti a gruppi (circa 60 all'ora) partendo dalle squadre con i certificati già inseriti.
+5. Presentazione ufficiale.

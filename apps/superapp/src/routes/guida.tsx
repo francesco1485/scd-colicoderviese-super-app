@@ -97,7 +97,10 @@ function Guida() {
         <Step n={2} icon={<UserPlus className="size-5" />} title="Richieste di accesso">
           Segreteria → Persone → Richieste: controlla chi è la persona, collegala alla scheda giusta e autorizza.
         </Step>
-        <Step n={3} icon={<ShieldCheck className="size-5" />} title="Permessi su misura">
+        <Step n={3} icon={<Users className="size-5" />} title="Tesseramenti e squadre">
+          Segreteria → Persone, filtro "Senza squadra": apri la scheda e tocca "Conferma e assegna". Da lì sposti un atleta di squadra o lo aggiungi a una seconda annata: il mister lo vede subito nella rosa, lo storico resta.
+        </Step>
+        <Step n={4} icon={<ShieldCheck className="size-5" />} title="Permessi su misura">
           Direzione → Accessi: ruolo, aree in più, squadre in più, sospensione. Ogni modifica resta nello storico.
         </Step>
       </Section>
