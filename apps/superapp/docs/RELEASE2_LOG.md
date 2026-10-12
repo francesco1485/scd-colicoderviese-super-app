@@ -291,3 +291,8 @@ prossimi impegni e "ci sarò" in primo piano). Desktop invariato.
 - Stato: DONE su staging/superapp.
 - Decisione: indirizzo definitivo app.colicoderviese.it (passi DNS e store in `docs/DOMINIO_E_STORE.md`).
 - Fatto: icone dallo stemma ufficiale (192/512/maskable/apple-touch/favicon; rimosso lo stemma non ufficiale "SDC"), manifest aggiornato, pagina pubblica `/installa` con QR e condivisione, link in footer e guida, route `/.well-known/assetlinks.json` (attiva solo con SCD_ANDROID_PACKAGE + SCD_ANDROID_SHA256), test (manifest icone, assetlinks, install-link).
+
+## r72 — Segreteria: conferma tesseramento e assegnazione squadra (2026-10-12)
+- Stato: DONE su staging/superapp. Migrazione `20261012_r72_team_assignment.sql` applicata a SCD PULSE (+ r72.1 spostamento nello stesso giorno), provata in transazione annullata come Direzione.
+- Dato reale: i 94 "senza squadra" sono 61 persone PENDING (tesseramento in corso) + 33 ARCHIVED; tutti gli atleti attivi hanno squadra.
+- App: squadre degli atleti ora lette da scd_team_memberships e mostrate in elenco e scheda; filtro "Senza squadra"; contatore "atleti da assegnare"; azione "Conferma e assegna" / "Cambia o aggiungi" (sposta = chiude la precedente, aggiungi = più annate); spunta "ho verificato il tesseramento FIGC"; tutto nello storico e in audit.

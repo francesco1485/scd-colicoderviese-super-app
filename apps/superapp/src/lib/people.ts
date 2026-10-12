@@ -35,7 +35,22 @@ export interface PersonRow {
   roles: PersonRole[];
   /** Athlete record, when the person is one. */
   athlete: { registrationStatus: string; certificateExpiresAt: string | null } | null;
+  /** Teams the athlete belongs to today (scd_team_memberships), empty for staff. */
+  teams: PersonTeam[];
   sourceId: string;
+}
+
+export interface PersonTeam {
+  code: string;
+  name: string;
+}
+
+/** Every team a person is tied to: athlete memberships first, then staff roles with a team. */
+export function personTeams(p: Pick<PersonRow, "teams" | "roles">): PersonTeam[] {
+  const m = new Map<string, string>();
+  for (const t of p.teams) m.set(t.code, t.name);
+  for (const r of p.roles) if (r.teamCode && !m.has(r.teamCode)) m.set(r.teamCode, r.teamName ?? r.teamCode);
+  return [...m].map(([code, name]) => ({ code, name }));
 }
 
 export interface PersonEvent {
@@ -159,9 +174,10 @@ export function filterPeople(list: readonly PersonRow[], f: PeopleFilter): Perso
     if (f.status && f.status !== "tutti" && p.status !== f.status) return false;
     if (!f.status && p.status === "LEFT") return false;
     if (f.kind && f.kind !== "tutti" && p.kind !== f.kind) return false;
-    if (f.team && !p.roles.some((r) => r.teamCode === f.team)) return false;
+    if (f.team === "nessuna" && (p.kind !== "atleta" || personTeams(p).length > 0)) return false;
+    if (f.team && f.team !== "nessuna" && !personTeams(p).some((t) => t.code === f.team)) return false;
     if (q) {
-      const hay = fold(`${p.displayName} ${p.roles.map((r) => `${r.label} ${r.teamCode ?? ""} ${r.teamName ?? ""}`).join(" ")}`);
+      const hay = fold(`${p.displayName} ${p.roles.map((r) => `${r.label} ${r.teamCode ?? ""} ${r.teamName ?? ""}`).join(" ")} ${p.teams.map((t) => `${t.code} ${t.name}`).join(" ")}`);
       if (!hay.includes(q)) return false;
     }
     return true;
@@ -197,7 +213,7 @@ export function sortPeople(list: readonly PersonRow[]): PersonRow[] {
 /** Teams seen in the roles, for the filter chips. */
 export function teamsOf(list: readonly PersonRow[]): Array<{ code: string; name: string }> {
   const m = new Map<string, string>();
-  for (const p of list) for (const r of p.roles) if (r.teamCode) m.set(r.teamCode, r.teamName ?? r.teamCode);
+  for (const p of list) for (const t of personTeams(p)) m.set(t.code, t.name);
   return [...m].map(([code, name]) => ({ code, name })).sort((a, b) => a.code.localeCompare(b.code, "it"));
 }
 

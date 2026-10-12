@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.28.1",
+    "version": "3.28.2",
     "effective_at": "2026-10-11",
     "status": "BINDING",
     "language": "it-IT",
@@ -832,7 +832,9 @@
           "NO_PUBLIC_DIRECT_PII_ENDPOINT",
           "RLS_REQUIRED",
           "PROVENANCE_REQUIRED"
-        ]
+        ],
+        "team_assignment": "r72 (2026-10-12): Segreteria/Direzione confirm a PENDING athlete and assign a team, add a second team (multi-annata call-ups) or move (previous membership closed with valid_to, never removed); registration_status VERIFIED only when the Secretariat declares it saw the FIGC registration; history in scd_person_events (ENTRATA / CAMBIO_SQUADRA with from/to team) and scd_audit_events TEAM_ASSIGN — supabase/migrations/20261012_r72_team_assignment.sql, scd_staff_assign_team, /segreteria/persone (teams of athletes now listed and filterable, 'senza squadra')",
+        "distribution": "UD-071 (2026-10-12): one permanent address app.colicoderviese.it (club domain); public /installa page with QR; icons from the official crest for stores; /.well-known/assetlinks.json served only with SCD_ANDROID_PACKAGE + SCD_ANDROID_SHA256; Play Store (TWA) then App Store wrapper after internal operational work — apps/superapp/docs/DOMINIO_E_STORE.md"
       }
     },
     "intake_hub": {

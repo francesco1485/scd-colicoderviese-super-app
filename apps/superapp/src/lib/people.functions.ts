@@ -11,11 +11,13 @@ import { z } from "zod";
 import { workAreaView, type WorkAreaGate } from "./access";
 import { sessionView } from "./auth.functions";
 import { stagingPreviewEnabled } from "./impianti-access";
-import { birthYear, isMinor, personKind, type PersonDetail, type PersonRole, type PersonRow, type RoleKind } from "./people";
+import { birthYear, isMinor, personKind, type PersonDetail, type PersonRole, type PersonRow, type PersonTeam, type RoleKind } from "./people";
 import { serverSupabase } from "./supabase.server";
 
 export interface PeopleData {
   gate: WorkAreaGate;
+  /** Active teams of the club, for the "assign team" action (code + name, no counts). */
+  teams: PersonTeam[];
   /** False when the server has no Supabase keys or the caller has no organization. */
   connected: boolean;
   organization: string | null;
@@ -30,7 +32,8 @@ function todayRome(): string {
 }
 
 type RoleRow = { id: string; role_label: string; role_kind: RoleKind; area_id: string | null; active: boolean; valid_to: string | null; scd_teams: { code: string; name: string } | null };
-type AthleteRow = { registration_status: string; medical_certificate_expires_at: string | null };
+type MembershipRow = { valid_to: string | null; scd_teams: { code: string; name: string; status: string } | null };
+type AthleteRow = { registration_status: string; medical_certificate_expires_at: string | null; scd_team_memberships: MembershipRow[] | null };
 type PersonDbRow = {
   id: string;
   first_name: string;
@@ -47,12 +50,21 @@ type PersonDbRow = {
   scd_athletes: AthleteRow[] | null;
 };
 
-const PERSON_SELECT = "id,first_name,last_name,display_name,birth_date,email,phone,status,left_at,left_reason,source_id,scd_structure_roles(id,role_label,role_kind,area_id,active,valid_to,scd_teams(code,name)),scd_athletes(registration_status,medical_certificate_expires_at)";
+const PERSON_SELECT = "id,first_name,last_name,display_name,birth_date,email,phone,status,left_at,left_reason,source_id,scd_structure_roles(id,role_label,role_kind,area_id,active,valid_to,scd_teams(code,name)),scd_athletes(registration_status,medical_certificate_expires_at,scd_team_memberships(valid_to,scd_teams(code,name,status)))";
 
 function toRoles(rows: RoleRow[] | null, today: string): PersonRole[] {
   return (rows ?? [])
     .filter((r) => r.active && (!r.valid_to || r.valid_to >= today))
     .map((r) => ({ id: r.id, label: r.role_label, kind: r.role_kind, teamCode: r.scd_teams?.code ?? null, teamName: r.scd_teams?.name ?? null, areaId: r.area_id, validTo: r.valid_to }));
+}
+
+function toTeams(rows: MembershipRow[] | null, today: string): PersonTeam[] {
+  const m = new Map<string, string>();
+  for (const r of rows ?? []) {
+    if (!r.scd_teams || (r.valid_to && r.valid_to < today)) continue;
+    m.set(r.scd_teams.code, r.scd_teams.name);
+  }
+  return [...m].map(([code, name]) => ({ code, name })).sort((a, b) => a.code.localeCompare(b.code, "it"));
 }
 
 function toRow(p: PersonDbRow, today: string): PersonRow {
@@ -71,6 +83,7 @@ function toRow(p: PersonDbRow, today: string): PersonRow {
     kind: personKind(Boolean(ath), roles),
     roles,
     athlete: ath ? { registrationStatus: ath.registration_status, certificateExpiresAt: ath.medical_certificate_expires_at } : null,
+    teams: ath ? toTeams(ath.scd_team_memberships, today) : [],
     sourceId: p.source_id,
   };
 }
@@ -88,12 +101,22 @@ async function context() {
 export const getPeople = createServerFn({ method: "GET" }).handler(async (): Promise<PeopleData> => {
   const today = todayRome();
   const { gate, org, canWrite, sb } = await context();
-  const base: PeopleData = { gate, connected: false, organization: null, canWrite: false, today, people: [], error: null };
+  const base: PeopleData = { gate, teams: [], connected: false, organization: null, canWrite: false, today, people: [], error: null };
   if (gate.view !== "page") return base;
   if (!sb || !org) return base;
-  const { data, error } = await sb.from("scd_people").select(PERSON_SELECT).eq("organization_id", org.organizationId).order("last_name").order("first_name").limit(2000);
+  const [{ data, error }, teams] = await Promise.all([
+    sb.from("scd_people").select(PERSON_SELECT).eq("organization_id", org.organizationId).order("last_name").order("first_name").limit(2000),
+    sb.from("scd_teams").select("code,name").eq("organization_id", org.organizationId).eq("status", "ACTIVE").order("code"),
+  ]);
   if (error) return { ...base, connected: true, organization: org.organization, error: "Lettura non riuscita dal database." };
-  return { ...base, connected: true, organization: org.organization, canWrite, people: ((data ?? []) as unknown as PersonDbRow[]).map((p) => toRow(p, today)) };
+  return {
+    ...base,
+    connected: true,
+    organization: org.organization,
+    canWrite,
+    teams: ((teams.data ?? []) as PersonTeam[]).map((t) => ({ code: t.code, name: t.name })),
+    people: ((data ?? []) as unknown as PersonDbRow[]).map((p) => toRow(p, today)),
+  };
 });
 
 export const getPerson = createServerFn({ method: "GET" })
@@ -203,3 +226,45 @@ export const insertPerson = createServerFn({ method: "POST" })
     }
     return { ok: true, message: "Persona inserita e registrata nello storico.", id };
   });
+
+/** Confirm a pending athlete and put them in a team, or add / move an active one (r72, audited). */
+export const assignTeam = createServerFn({ method: "POST" })
+  .inputValidator((d: { id: string; teamCode: string; mode: "ADD" | "MOVE"; registrationSeen: boolean; note?: string | undefined }) =>
+    z
+      .object({
+        id: z.string().uuid(),
+        teamCode: z.string().trim().min(1).max(40),
+        mode: z.enum(["ADD", "MOVE"]),
+        registrationSeen: z.boolean(),
+        note: z.string().trim().max(300).optional(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data }): Promise<WriteOutcome> => {
+    const { gate, org, canWrite, sb } = await context();
+    if (gate.view !== "page" || !sb || !org) return { ok: false, message: "Accesso non valido." };
+    if (!canWrite) return { ok: false, message: "Solo Direzione e Segreteria possono assegnare le squadre." };
+    const { data: out, error } = await sb.rpc("scd_staff_assign_team", {
+      p_organization_id: org.organizationId,
+      p_person_id: data.id,
+      p_team_code: data.teamCode,
+      p_mode: data.mode,
+      p_registration_seen: data.registrationSeen,
+      p_note: data.note ?? null,
+    });
+    if (error) {
+      if (/not an athlete/i.test(error.message)) return { ok: false, message: "Questa persona non è un atleta." };
+      if (/team not found/i.test(error.message)) return { ok: false, message: "Squadra non trovata o non attiva." };
+      if (/not active/i.test(error.message)) return { ok: false, message: "La persona non è attiva né in attesa." };
+      return { ok: false, message: "Assegnazione non riuscita." };
+    }
+    const r = (out ?? {}) as { added?: boolean; closed?: number; activated?: boolean; verified?: boolean; team?: string };
+    const parts: string[] = [];
+    if (r.activated) parts.push("tesseramento confermato");
+    if (r.added) parts.push(`in ${r.team ?? data.teamCode}`);
+    else parts.push(`già in ${r.team ?? data.teamCode}`);
+    if (r.closed) parts.push(`${r.closed === 1 ? "squadra precedente chiusa" : `${r.closed} squadre precedenti chiuse`}`);
+    if (r.verified) parts.push("tesseramento FIGC segnato come visto");
+    return { ok: true, message: `Fatto: ${parts.join(", ")}. Resta nello storico.` };
+  });
+

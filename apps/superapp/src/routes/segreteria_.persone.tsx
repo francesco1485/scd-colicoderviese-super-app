@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Database, LogOut, Search, UserPlus, X } from "lucide-react";
+import { Database, LogOut, Search, UserPlus, Users, X } from "lucide-react";
 import { useEffect, useId, useMemo, useState } from "react";
 
 import { Card, Chip, type ChipTone } from "@/components/scd/interior-ui";
@@ -24,10 +24,12 @@ import {
   type NewPersonInput,
   type PeopleFilter,
   type PersonDetail,
+  type PersonTeam,
+  personTeams,
   type PersonRow,
   type RoleKind,
 } from "@/lib/people";
-import { getPeople, getPerson, insertPerson, markPersonLeft, type PeopleData, type WriteOutcome } from "@/lib/people.functions";
+import { assignTeam, getPeople, getPerson, insertPerson, markPersonLeft, type PeopleData, type WriteOutcome } from "@/lib/people.functions";
 import { getWorkAreaGate } from "@/lib/work-areas.functions";
 import { AccessRequestsCard } from "@/components/scd/AccessRequestsCard";
 
@@ -63,6 +65,7 @@ function PersonePage({ initial, preview }: { initial: PeopleData; preview: boole
   const counts = useMemo(() => peopleCounts(data.people, data.today), [data]);
   const teams = useMemo(() => teamsOf(data.people), [data]);
   const shown = useMemo(() => sortPeople(filterPeople(data.people, filter)), [data, filter]);
+  const unassigned = useMemo(() => data.people.filter((p) => p.kind === "atleta" && p.status !== "LEFT" && p.status !== "ARCHIVED" && personTeams(p).length === 0).length, [data]);
 
   async function refresh() {
     try {
@@ -82,6 +85,7 @@ function PersonePage({ initial, preview }: { initial: PeopleData; preview: boole
         { value: data.connected ? counts.athletes : null, label: "atleti" },
         { value: data.connected ? counts.staff : null, label: "staff e dirigenti" },
         { value: data.connected ? counts.certificateIssues : null, label: "certificati da sistemare" },
+        { value: data.connected ? unassigned : null, label: "atleti da assegnare" },
       ]}
       note={data.connected ? <>Database del club{data.organization ? ` · ${data.organization}` : ""}: chi esce resta nello storico e sparisce dalle viste.</> : <>Database del club non collegato su questo server: la pagina è pronta, i dati arrivano quando la Direzione attiva il collegamento.</>}
     >
@@ -91,7 +95,7 @@ function PersonePage({ initial, preview }: { initial: PeopleData; preview: boole
           <Card
             id="persone-elenco"
             title="Elenco"
-            sub={data.connected ? `${shown.length} di ${counts.active} persone attive${counts.left ? ` · ${counts.left} uscite nello storico` : ""}` : "Persone, ruoli e stato documenti."}
+            sub={data.connected ? `${shown.length} mostrate · ${counts.active} attive${unassigned ? ` · ${unassigned} atleti da assegnare` : ""}${counts.left ? ` · ${counts.left} uscite nello storico` : ""}` : "Persone, ruoli e stato documenti."}
             aside={
               data.canWrite ? (
                 <button type="button" onClick={() => setAdding(true)} className="scd-focus inline-flex h-10 items-center gap-2 rounded-[10px] bg-[var(--in-info)] px-3.5 text-[14.5px] font-bold text-white" data-testid="persone-add">
@@ -128,6 +132,7 @@ function PersonePage({ initial, preview }: { initial: PeopleData; preview: boole
                     {teams.length > 0 && (
                       <select value={filter.team ?? ""} onChange={(e) => setFilter({ ...filter, ...(e.target.value ? { team: e.target.value } : { team: undefined }) })} className="h-10 rounded-[10px] border border-[var(--in-line)] bg-white px-2 text-[14.5px]" aria-label="Squadra">
                         <option value="">Tutte le squadre</option>
+                        <option value="nessuna">Senza squadra</option>
                         {teams.map((t) => (
                           <option key={t.code} value={t.code}>{t.name}</option>
                         ))}
@@ -157,9 +162,10 @@ function PersonePage({ initial, preview }: { initial: PeopleData; preview: boole
                               </small>
                             </span>
                             <span className="flex flex-wrap justify-end gap-1">
-                              {p.roles.filter((r) => r.teamCode).slice(0, 2).map((r) => (
-                                <Chip key={r.id} tone="info">{r.teamCode}</Chip>
+                              {personTeams(p).slice(0, 2).map((t) => (
+                                <Chip key={t.code} tone="info">{t.code}</Chip>
                               ))}
+                              {p.kind === "atleta" && p.status !== "LEFT" && personTeams(p).length === 0 && <Chip tone="warn">senza squadra</Chip>}
                               {p.athlete && p.status === "ACTIVE" && <Chip tone={CERT_TONE[certificateState(p.athlete.certificateExpiresAt, data.today)]}>{certificateState(p.athlete.certificateExpiresAt, data.today) === "sconosciuto" ? "cert. —" : certificateState(p.athlete.certificateExpiresAt, data.today) === "ok" ? "cert. ok" : "cert. " + certificateState(p.athlete.certificateExpiresAt, data.today)}</Chip>}
                               {p.status !== "ACTIVE" && <Chip tone="mute">{STATUS_LABEL[p.status]}</Chip>}
                             </span>
@@ -176,7 +182,7 @@ function PersonePage({ initial, preview }: { initial: PeopleData; preview: boole
 
         <div className="flex min-w-0 flex-col gap-[18px]">
           {selected ? (
-            <PersonCard id={selected} today={data.today} canWrite={data.canWrite} onClose={() => setSelected(null)} onChanged={refresh} />
+            <PersonCard id={selected} today={data.today} canWrite={data.canWrite} clubTeams={data.teams} onClose={() => setSelected(null)} onChanged={refresh} />
           ) : (
             <Card title="Scheda" sub="Tocca una persona per aprirla.">
               <p className="px-4 pb-4 text-[14.5px] leading-snug text-[var(--in-sub)] sm:px-[18px]">
@@ -193,10 +199,11 @@ function PersonePage({ initial, preview }: { initial: PeopleData; preview: boole
   );
 }
 
-function PersonCard({ id, today, canWrite, onClose, onChanged }: { id: string; today: string; canWrite: boolean; onClose: () => void; onChanged: () => Promise<void> }) {
+function PersonCard({ id, today, canWrite, clubTeams, onClose, onChanged }: { id: string; today: string; canWrite: boolean; clubTeams: PersonTeam[]; onClose: () => void; onChanged: () => Promise<void> }) {
   const load = useServerFn(getPerson);
   const [p, setP] = useState<PersonDetail | null | undefined>(undefined);
   const [leaving, setLeaving] = useState(false);
+  const [assigning, setAssigning] = useState(false);
   useEffect(() => {
     let alive = true;
     setP(undefined);
@@ -240,6 +247,18 @@ function PersonCard({ id, today, canWrite, onClose, onChanged }: { id: string; t
             </ul>
           ) : (
             <p className="m-0 mt-1 text-[var(--in-sub)]">{p.kind === "atleta" ? "Atleta" : "Nessun ruolo attivo."}</p>
+          )}
+          {p.athlete && (
+            <p className="m-0 mt-1 flex flex-wrap items-center gap-1.5" data-testid="persona-squadre">
+              <span className="text-[var(--in-sub)]">Squadra:</span>
+              {p.teams.length ? p.teams.map((t) => <Chip key={t.code} tone="info">{t.name}</Chip>) : <Chip tone="warn">nessuna</Chip>}
+              {canWrite && p.status !== "LEFT" && p.status !== "ARCHIVED" && (
+                <button type="button" onClick={() => setAssigning(true)} className="scd-focus inline-flex h-8 items-center gap-1 rounded-[8px] bg-[var(--in-info)] px-2.5 text-[13px] font-bold text-white" data-testid="persona-assegna">
+                  <Users className="size-3.5" aria-hidden="true" />
+                  {p.teams.length ? "Cambia o aggiungi" : p.status === "PENDING" ? "Conferma e assegna" : "Assegna"}
+                </button>
+              )}
+            </p>
           )}
           {p.athlete && cert && (
             <p className="m-0 mt-2 flex flex-wrap items-center gap-2">
@@ -295,6 +314,19 @@ function PersonCard({ id, today, canWrite, onClose, onChanged }: { id: string; t
           </button>
         )}
       </div>
+      {assigning && (
+        <AssignTeamDialog
+          person={p}
+          clubTeams={clubTeams}
+          onClose={() => setAssigning(false)}
+          onDone={async () => {
+            setAssigning(false);
+            await onChanged();
+            const r = await load({ data: { id } });
+            setP(r);
+          }}
+        />
+      )}
       {leaving && (
         <LeaveDialog
           person={p}
@@ -331,6 +363,76 @@ function Dialog({ title, onClose, children, testId }: { title: string; onClose: 
         {children}
       </section>
     </div>
+  );
+}
+
+function AssignTeamDialog({ person, clubTeams, onClose, onDone }: { person: PersonDetail; clubTeams: PersonTeam[]; onClose: () => void; onDone: () => Promise<void> }) {
+  const send = useServerFn(assignTeam);
+  const current = person.teams.map((t) => t.code);
+  const choices = clubTeams.filter((t) => !current.includes(t.code));
+  const [team, setTeam] = useState(choices[0]?.code ?? "");
+  const [mode, setMode] = useState<"ADD" | "MOVE">(current.length ? "MOVE" : "ADD");
+  const [seen, setSeen] = useState(false);
+  const [note, setNote] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [out, setOut] = useState<WriteOutcome | null>(null);
+  const confirming = person.status === "PENDING";
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!team || busy) return;
+    setBusy(true);
+    try {
+      const r = await send({ data: { id: person.id, teamCode: team, mode, registrationSeen: seen, ...(note.trim() ? { note: note.trim() } : {}) } });
+      setOut(r);
+      if (r.ok) await onDone();
+    } catch {
+      setOut({ ok: false, message: "Assegnazione non riuscita." });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <Dialog title={confirming ? `Conferma ${person.displayName}` : `Squadra di ${person.displayName}`} onClose={onClose} testId="assign-dialog">
+      <form onSubmit={submit} className="grid gap-3 text-[14.5px]">
+        {confirming && <p className="m-0 rounded-[10px] bg-[var(--in-info-bg)] px-3 py-2">Tesseramento in corso: confermando, la persona diventa attiva e il mister la vede nella rosa.</p>}
+        {current.length > 0 && <p className="m-0 text-[var(--in-sub)]">Oggi in: {person.teams.map((t) => t.name).join(", ")}.</p>}
+        <label className="grid gap-1">
+          <span className="font-semibold">Squadra</span>
+          <select value={team} onChange={(e) => setTeam(e.target.value)} className="h-11 rounded-[10px] border border-[var(--in-line)] bg-white px-2" aria-label="Squadra" data-testid="assign-team" required>
+            {choices.length === 0 && <option value="">Nessun'altra squadra disponibile</option>}
+            {choices.map((t) => (
+              <option key={t.code} value={t.code}>{t.name}</option>
+            ))}
+          </select>
+        </label>
+        {current.length > 0 && (
+          <fieldset className="m-0 grid gap-1.5 border-0 p-0">
+            <legend className="mb-1 font-semibold">Come</legend>
+            <label className="flex items-center gap-2"><input type="radio" name="mode" checked={mode === "MOVE"} onChange={() => setMode("MOVE")} /> Sposta: chiude la squadra attuale</label>
+            <label className="flex items-center gap-2"><input type="radio" name="mode" checked={mode === "ADD"} onChange={() => setMode("ADD")} /> Aggiungi: resta anche nella squadra attuale (convocabile da più annate)</label>
+          </fieldset>
+        )}
+        {person.athlete?.registrationStatus !== "VERIFIED" && (
+          <label className="flex items-start gap-2">
+            <input type="checkbox" checked={seen} onChange={(e) => setSeen(e.target.checked)} className="mt-1" data-testid="assign-seen" />
+            <span>Ho verificato il tesseramento FIGC di questa persona</span>
+          </label>
+        )}
+        <label className="grid gap-1">
+          <span className="font-semibold">Nota (facoltativa)</span>
+          <input value={note} onChange={(e) => setNote(e.target.value)} maxLength={300} className="h-11 rounded-[10px] border border-[var(--in-line)] bg-white px-3" placeholder="Es. richiesta del mister, accordo con la famiglia" />
+        </label>
+        {out && <p role="status" className={`m-0 rounded-[10px] px-3 py-2 ${out.ok ? "bg-[var(--in-ok-bg)]" : "bg-[#fff1f0] text-[var(--in-crit)]"}`}>{out.message}</p>}
+        <div className="flex flex-wrap justify-end gap-2">
+          <button type="button" onClick={onClose} className="scd-focus h-11 rounded-[10px] border border-[var(--in-line)] px-4 font-semibold">Chiudi</button>
+          <button type="submit" disabled={busy || !team} className="scd-focus h-11 rounded-[10px] bg-[var(--in-info)] px-4 font-bold text-white disabled:opacity-50" data-testid="assign-submit">
+            {busy ? "Salvo…" : confirming ? "Conferma e assegna" : mode === "MOVE" ? "Sposta" : "Aggiungi"}
+          </button>
+        </div>
+      </form>
+    </Dialog>
   );
 }
 

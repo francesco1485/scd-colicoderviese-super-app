@@ -5,10 +5,10 @@ import { birthYear, certificateState, filterPeople, isMinor, itDate, peopleCount
 const role = (label: string, teamCode: string | null = null): PersonRow["roles"][number] => ({ id: label, label, kind: "DIRIGENTE", teamCode, teamName: teamCode ? `Under ${teamCode.slice(1)}` : null, areaId: null, validTo: null });
 
 const rows: PersonRow[] = [
-  { id: "1", displayName: "Anna Rossi", firstName: "Anna", lastName: "Rossi", birthYear: 2012, minor: true, status: "ACTIVE", leftAt: null, leftReason: null, kind: "atleta", roles: [], athlete: { registrationStatus: "VERIFIED", certificateExpiresAt: "2026-10-20" }, sourceId: "ISCRIZIONI" },
-  { id: "2", displayName: "Marco Bianchi", firstName: "Marco", lastName: "Bianchi", birthYear: 1980, minor: false, status: "ACTIVE", leftAt: null, leftReason: null, kind: "staff", roles: [role("Dirigente U15", "U15")], athlete: null, sourceId: "ELENCO_RUOLI" },
-  { id: "3", displayName: "Luca Verdi", firstName: "Luca", lastName: "Verdi", birthYear: 2010, minor: true, status: "LEFT", leftAt: "2026-09-30", leftReason: "Cambio società", kind: "atleta", roles: [], athlete: { registrationStatus: "VERIFIED", certificateExpiresAt: "2026-01-01" }, sourceId: "ISCRIZIONI" },
-  { id: "4", displayName: "Élodie Neri", firstName: "Élodie", lastName: "Neri", birthYear: null, minor: null, status: "ACTIVE", leftAt: null, leftReason: null, kind: "altro", roles: [], athlete: null, sourceId: "UNVERIFIED" },
+  { id: "1", displayName: "Anna Rossi", firstName: "Anna", lastName: "Rossi", birthYear: 2012, minor: true, status: "ACTIVE", leftAt: null, leftReason: null, kind: "atleta", roles: [], athlete: { registrationStatus: "VERIFIED", certificateExpiresAt: "2026-10-20" }, teams: [{ code: "u15", name: "U15 Giovanissimi" }], sourceId: "ISCRIZIONI" },
+  { id: "2", displayName: "Marco Bianchi", firstName: "Marco", lastName: "Bianchi", birthYear: 1980, minor: false, status: "ACTIVE", leftAt: null, leftReason: null, kind: "staff", roles: [role("Dirigente U15", "U15")], athlete: null, teams: [], sourceId: "ELENCO_RUOLI" },
+  { id: "3", displayName: "Luca Verdi", firstName: "Luca", lastName: "Verdi", birthYear: 2010, minor: true, status: "LEFT", leftAt: "2026-09-30", leftReason: "Cambio società", kind: "atleta", roles: [], athlete: { registrationStatus: "VERIFIED", certificateExpiresAt: "2026-01-01" }, teams: [], sourceId: "ISCRIZIONI" },
+  { id: "4", displayName: "Élodie Neri", firstName: "Élodie", lastName: "Neri", birthYear: null, minor: null, status: "ACTIVE", leftAt: null, leftReason: null, kind: "altro", roles: [], athlete: null, teams: [], sourceId: "UNVERIFIED" },
 ];
 
 describe("people rules", () => {
@@ -46,7 +46,7 @@ describe("people rules", () => {
 
   it("sorts by last name and lists teams", () => {
     expect(sortPeople(rows).map((p) => p.lastName)).toEqual(["Bianchi", "Neri", "Rossi", "Verdi"]);
-    expect(teamsOf(rows)).toEqual([{ code: "U15", name: "Under 15" }]);
+    expect(teamsOf(rows)).toEqual([{ code: "u15", name: "U15 Giovanissimi" }, { code: "U15", name: "Under 15" }]);
     expect(itDate("2026-09-30")).toBe("30/09/2026");
     expect(itDate(null)).toBe("—");
   });
@@ -56,5 +56,18 @@ describe("people rules", () => {
     expect(validateNewPerson(base)).toEqual([]);
     expect(validateNewPerson({ ...base, firstName: "G", email: "nope", birthDate: "12/03/2012" })).toEqual(["Nome mancante.", "Data di nascita non valida.", "E-mail non valida."]);
     expect(validateNewPerson({ ...base, kind: "staff" })).toEqual(["Per lo staff serve il ruolo (come lo scrive la società).", "Per lo staff serve il tipo di ruolo."]);
+  });
+});
+
+describe("athlete teams (r72)", () => {
+  it("lists athlete memberships and staff teams together, and filters by team or 'nessuna'", () => {
+    const codes = teamsOf(rows).map((t) => t.code);
+    expect(codes).toEqual(["u15", "U15"]);
+    expect(filterPeople(rows, { team: "u15" }).map((p) => p.id)).toEqual(["1"]);
+    expect(filterPeople(rows, { team: "U15" }).map((p) => p.id)).toEqual(["2"]);
+    const noTeam: PersonRow = { ...rows[0]!, id: "9", displayName: "Zoe Neri", status: "PENDING", teams: [] };
+    expect(filterPeople([...rows, noTeam], { team: "nessuna", status: "PENDING" }).map((p) => p.id)).toEqual(["9"]);
+    expect(filterPeople([...rows, noTeam], { team: "nessuna" }).map((p) => p.id)).toEqual(["9"]);
+    expect(filterPeople(rows, { q: "giovanissimi" }).map((p) => p.id)).toEqual(["1"]);
   });
 });
