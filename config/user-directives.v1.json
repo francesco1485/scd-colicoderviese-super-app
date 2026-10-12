@@ -2122,6 +2122,28 @@
           "no minors' faces in promotional clips without liberatoria"
         ]
       }
+    },
+    {
+      "sourceDate": "2026-10-12",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-091",
+      "name": "ASSISTANT_CAST_ERA_GENNY_ACANFORA",
+      "sourceQuoteFragments": [
+        "Era deve sembrare una venere stile moglie di Paride presente nell'iliade e odissea",
+        "Dottoressa Genny e l'aiuto nutrizionista che consiglia ai ragazzi",
+        "poi c'è infermeria fatta da il magico dottor acanfora figura mitologica medica"
+      ],
+      "normalizedCommand": {
+        "rule": "Assistant cast in the app. Era: assistant for users 15+, a classical Greek-myth beauty (Venus / Helen of Troy inspiration), elegant and professional. Dottoressa Genny: nutrition helper giving young athletes general healthy-eating guidance. Dottor Acanfora: the 'infermeria' (first-aid corner), a mythological medical figure. All characters realistic 3D, original, never cartoon (existing rule).",
+        "scope": "ASSISTANTS_AND_CHARACTERS",
+        "constraints": [
+          "Era never sexualized: the app is used by minors",
+          "Genny: general education only, no diets, calories, weight targets or body judgments; refers to family and doctor",
+          "Acanfora: first aid and 'who to call' only, no diagnosis; emergencies always 112; health data never in ordinary flows",
+          "no likeness of real people without written consent"
+        ]
+      }
     }
   ],
   "completionGate": {
