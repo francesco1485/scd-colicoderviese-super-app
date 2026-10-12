@@ -3,6 +3,7 @@ import { ChevronRight, Info } from "lucide-react";
 
 import skyKit from "@/assets/brand/sky-divisa-gara.webp.asset.json";
 import { SATELLITE_TONE } from "@/components/scd/satellite-tone";
+import { DOORS, LOGIN_LABEL } from "@/lib/audiences";
 import { R20_LOGIN_LIVE, SATELLITES, STATUS_LABEL } from "@/lib/satellites";
 
 export const Route = createFileRoute("/aree/")({
@@ -21,11 +22,6 @@ export const Route = createFileRoute("/aree/")({
   component: Gateway,
 });
 
-const GROUPS: { id: string; title: string; text: string; slugs: string[] }[] = [
-  { id: "vive", title: "Per chi vive il club", text: "Ragazzi, famiglie e tifosi.", slugs: ["atleta", "famiglia", "tifoso"] },
-  { id: "funziona", title: "Per chi lo fa funzionare", text: "Ogni ruolo ha il suo cruscotto.", slugs: ["staff", "segreteria", "tesoreria", "pulmini", "direzione"] },
-  { id: "sostiene", title: "Per chi lo sostiene", text: "Aziende e partner del territorio.", slugs: ["sponsor"] },
-];
 
 function Gateway() {
   const bySlug = new Map(SATELLITES.map((s) => [s.slug, s]));
@@ -58,13 +54,30 @@ function Gateway() {
           </p>
         )}
 
-        <div className="lg:grid lg:grid-cols-3 lg:gap-x-8">
-          {GROUPS.map((g) => (
-            <section key={g.id} aria-labelledby={`grp-${g.id}`} className="mt-7">
-              <h2 id={`grp-${g.id}`} className="text-[21px] font-bold text-[var(--scd-ink)]">{g.title}</h2>
-              <p className="text-[14px] text-[var(--scd-sub)]">{g.text}</p>
+        <div className="lg:grid lg:grid-cols-2 lg:gap-x-8">
+          {DOORS.map((g) => (
+            <section key={g.id} aria-labelledby={`grp-${g.id}`} className="mt-7" data-door={g.id}>
+              <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+                <h2 id={`grp-${g.id}`} className="text-[21px] font-bold text-[var(--scd-ink)]">{g.label}</h2>
+                <span className="rounded-full bg-[#eef4ff] px-2.5 py-[2px] text-[12px] font-semibold text-[var(--scd-blue)]">{LOGIN_LABEL[g.login]}</span>
+              </div>
+              <p className="text-[14.5px] leading-snug text-[#33405a]">{g.promise}</p>
+              <p className="text-[12.5px] text-[var(--scd-sub)]">{g.who}</p>
+              <ul className="mt-3 grid list-none grid-cols-1 gap-1.5 p-0 sm:grid-cols-2" data-testid={`gateway-tasks-${g.id}`}>
+                {g.tasks.map((t) => (
+                  <li key={t.to + t.label}>
+                    <Link to={t.to as never} className="group flex h-full min-h-[52px] items-center gap-2 rounded-[12px] border border-[var(--scd-line)] bg-white px-3 py-2 transition-colors hover:border-[var(--scd-blue)] focus-visible:border-[var(--scd-blue)]">
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-[15px] font-semibold leading-tight text-[var(--scd-ink)]">{t.label}</span>
+                        <span className="block text-[12.5px] leading-snug text-[var(--scd-sub)]">{t.hint}{t.login ? " · con accesso" : ""}</span>
+                      </span>
+                      <ChevronRight aria-hidden="true" className="size-4 flex-none text-[var(--scd-blue)]" />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
               <ul className="scd-card mt-3 overflow-hidden" data-testid={`gateway-${g.id}`}>
-                {g.slugs.map((slug) => {
+                {g.satellites.map((slug) => {
                   const s = bySlug.get(slug);
                   if (!s) return null;
                   const tone = SATELLITE_TONE[s.tone];

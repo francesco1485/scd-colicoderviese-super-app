@@ -1851,6 +1851,25 @@
           "continuity only through an explicit scheduled task"
         ]
       }
+    },
+    {
+      "sourceDate": "2026-10-12",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-078",
+      "name": "FOUR_DOORS_WORK_ASSOCIATION_FANS",
+      "sourceQuoteFragments": [
+        "ora puoi continuare a lavorare al progetto strutturandolo ancora migliore e ragionato per utilzzo sia lavorativo che associativo che da tifoso o simpatizzande"
+      ],
+      "normalizedCommand": {
+        "rule": "Structure the Super App around who uses it: fans and supporters (no account, no personal data), members/athletes/families (personal account), people who work in the club (positions given by the Direzione) and partners. The contract config/superapp-audiences.v1.json drives the /aree gateway and the /guida sections; every task points to an existing route and every role landing belongs to exactly one door.",
+        "scope": "INFORMATION_ARCHITECTURE",
+        "constraints": [
+          "no new core experience and no new auth: doors group existing pages and satellites",
+          "fans never need an account and never see minors' names or faces",
+          "future pages enter a door only when they ship"
+        ]
+      }
     }
   ],
   "completionGate": {

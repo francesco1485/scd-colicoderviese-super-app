@@ -333,3 +333,9 @@ prossimi impegni e "ci sarò" in primo piano). Desktop invariato.
 - DB: `scd_kb_items` + `scd_kb_search` / `scd_kb_upsert` (applicata su SCD PULSE). Caricamento dal catalogo del Drive: documenti agli atti, indice file, indice posta, economia enti 2026/27, storia, impianti.
 - App: `/direzione/cervellone` con ricerca libera, filtri area/stagione/tipo e "Scadenze in vista"; link da /direzione (anche a Compensi). Solo link https verso gli originali.
 - Test: knowledge.test.ts; suite 497.
+
+## 2026-10-12 — Quattro porte: lavoro, associazione, tifosi, partner (UD-078)
+- `config/superapp-audiences.v1.json`: tifosi e simpatizzanti (senza account), soci/atleti/famiglie (account personale), chi lavora nel club (ruolo dato dalla Direzione), aziende e partner. Ogni compito punta a una pagina esistente; ogni satellite sta in una sola porta.
+- App: `/aree` riorganizzata nelle quattro porte con i compiti più usati in evidenza; `/guida` con le sezioni "Tifosi e simpatizzanti" e "Soci e volontari" e i passi Compensi e Cervellone per Segreteria e Direzione.
+- Test: audiences.test.ts (contratto, ordine porte, errori rilevati); suite 500.
+- Aperto: regola gratuità familiari in biglietteria da confermare (master 06/10 "fino a 2 familiari" contro tavola 11/10 "1 familiare").

@@ -1,0 +1,81 @@
+{
+  "schema": "scd.audiences.v1",
+  "status": "PROPOSED_STRUCTURE",
+  "updated": "2026-10-12",
+  "purpose": "The four doors of the Super App (UD-078): who enters, what they come to do, what they may see. Drives the /aree gateway, the /guida sections and the assistant's routing. Every task points to an existing route; every role landing (satellite) belongs to exactly one door.",
+  "rules": [
+    "Tifosi e simpatizzanti never need an account and never see personal data: youth teams by team name only.",
+    "Soci, atleti e famiglie see their own family and their own teams after the personal login; association documents are public, personal data never is.",
+    "Chi lavora nel club sees only the areas of the positions given by the Direzione; sensitive data stays in the role's area.",
+    "Aziende e partner see public sponsor offers; the partner area opens with the partner's account.",
+    "Every task links to a page that exists today; future pages are added here only when they ship."
+  ],
+  "doors": [
+    {
+      "id": "tifosi",
+      "label": "Tifosi e simpatizzanti",
+      "promise": "Partite, biglietti, eventi e la vita biancoblù, senza registrarti.",
+      "who": "Chi segue la squadra, i paesi di Colico e Dervio, gli amici della SCD.",
+      "login": "none",
+      "satellites": ["tifoso"],
+      "tasks": [
+        { "label": "Prossime partite", "to": "/calendario", "hint": "Tutte le squadre, con orari e campi." },
+        { "label": "Biglietti e ingresso", "to": "/impianti", "hint": "Prezzi, gratuità e dove si entra." },
+        { "label": "Le squadre", "to": "/squadre", "hint": "Dalla Prima Squadra ai Piccoli Amici." },
+        { "label": "Tornei ed eventi", "to": "/eventi", "hint": "Christmas Lario Cup, Memorial e feste." },
+        { "label": "La community", "to": "/community", "hint": "Il muro biancoblù dei tifosi." },
+        { "label": "Lo shop", "to": "/shop", "hint": "Maglie e prodotti del club." },
+        { "label": "Metti l'app sul telefono", "to": "/installa", "hint": "Un tocco e la trovi tra le app." }
+      ]
+    },
+    {
+      "id": "associati",
+      "label": "Soci, atleti e famiglie",
+      "promise": "La tua squadra, le convocazioni e la vita dell'associazione.",
+      "who": "Atleti, genitori e tutori, soci e volontari della S.C.D. ColicoDerviese.",
+      "login": "account",
+      "satellites": ["atleta", "famiglia"],
+      "tasks": [
+        { "label": "Convocazioni e \"Ci sarò\"", "to": "/famiglia", "hint": "Rispondi in un tocco.", "login": true },
+        { "label": "Allenamenti della settimana", "to": "/allenamenti", "hint": "Orari e campi della tua squadra." },
+        { "label": "Iscriviti alla SCD", "to": "/entra", "hint": "Modulo di iscrizione e documenti." },
+        { "label": "Comunicazioni del club", "to": "/comunicazioni", "hint": "Avvisi e novità." },
+        { "label": "Infermeria", "to": "/infermeria", "hint": "Servizi e prenotazioni.", "login": true },
+        { "label": "Regole e documenti", "to": "/societa", "hint": "Regolamento, carta dei valori, codice di condotta." },
+        { "label": "Tutela dei minori", "to": "/safeguarding", "hint": "Regole, referenti e come segnalare." },
+        { "label": "Come funziona l'app", "to": "/guida", "hint": "Accesso, notifiche, convocazioni." }
+      ]
+    },
+    {
+      "id": "lavoro",
+      "label": "Chi lavora nel club",
+      "promise": "Ogni ruolo ha il suo cruscotto: lavoro di squadra, niente fogli sparsi.",
+      "who": "Mister, dirigenti, segreteria, tesoreria, autisti, magazzino, struttura e Direzione.",
+      "login": "role",
+      "satellites": ["staff", "segreteria", "tesoreria", "pulmini", "direzione"],
+      "tasks": [
+        { "label": "Rosa, convocazioni e distinta", "to": "/gestionale/mister", "hint": "Per mister e dirigenti di squadra.", "login": true },
+        { "label": "Quadro allenamenti e campi", "to": "/quadro", "hint": "Chi usa quale campo e quando.", "login": true },
+        { "label": "Impianti e prenotazioni", "to": "/gestionale/impianti", "hint": "Campi, spogliatoi, luci, richieste.", "login": true },
+        { "label": "Segreteria e scadenze", "to": "/segreteria", "hint": "Persone, certificati, tesseramenti.", "login": true },
+        { "label": "Compensi e stipendi", "to": "/tesoreria/compensi", "hint": "Direzione autorizza, Tesoreria paga.", "login": true },
+        { "label": "Pulmini", "to": "/pulmini", "hint": "Mezzi, autisti e corse.", "login": true },
+        { "label": "Cervellone", "to": "/direzione/cervellone", "hint": "Cerca in documenti, posta, economia e storia.", "login": true },
+        { "label": "Direzione e accessi", "to": "/direzione", "hint": "La società in un colpo d'occhio.", "login": true }
+      ]
+    },
+    {
+      "id": "partner",
+      "label": "Aziende e partner",
+      "promise": "Sostieni lo sport del territorio e fatti vedere da chi lo vive.",
+      "who": "Aziende, commercianti e partner di Colico, Dervio e dell'Alto Lario.",
+      "login": "none",
+      "satellites": ["sponsor"],
+      "tasks": [
+        { "label": "Diventa partner", "to": "/sponsor", "hint": "Spazi, visibilità e progetti." },
+        { "label": "Area partner", "to": "/partner", "hint": "La tua scheda e i materiali.", "login": true },
+        { "label": "Contatti", "to": "/contatti", "hint": "Scrivi o chiama la società." }
+      ]
+    }
+  ]
+}

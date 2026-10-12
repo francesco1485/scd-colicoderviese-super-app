@@ -1,22 +1,25 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { BellRing, ClipboardCheck, ClipboardList, HeartPulse, KeyRound, ShieldCheck, Smartphone, UserPlus, Users } from "lucide-react";
+import { BellRing, Brain, CalendarDays, ClipboardCheck, ClipboardList, FileText, HeartPulse, KeyRound, Megaphone, PartyPopper, ShieldCheck, Smartphone, Ticket, UserPlus, Users, Wallet } from "lucide-react";
 import type { ReactNode } from "react";
 
 /**
  * "Come funziona": quick guide for the launch, public so families can read it before signing in.
- * Plain steps per role, matching what the app does today (UD-062…UD-069). No personal data.
+ * Plain steps per role, matching what the app does today (UD-062…UD-069) and the four doors of
+ * config/superapp-audiences.v1.json (UD-078). No personal data.
  */
 export const Route = createFileRoute("/guida")({
   head: () => ({
     meta: [
       { title: "Come funziona l'app | S.C.D. ColicoDerviese" },
-      { name: "description", content: "Guida rapida all'app della S.C.D. ColicoDerviese per famiglie, atleti, mister e segreteria: accesso, convocazioni, Ci sarò, notifiche, certificati e distinta." },
+      { name: "description", content: "Guida rapida all'app della S.C.D. ColicoDerviese per tifosi, soci, famiglie, atleti, mister e segreteria: accesso, convocazioni, Ci sarò, notifiche, certificati e distinta." },
     ],
   }),
   component: Guida,
 });
 
 const ROLES = [
+  { id: "tifosi", label: "Tifosi e simpatizzanti" },
+  { id: "soci", label: "Soci e volontari" },
   { id: "famiglie", label: "Famiglie e atleti" },
   { id: "mister", label: "Mister e dirigenti" },
   { id: "segreteria", label: "Segreteria e Direzione" },
@@ -49,13 +52,43 @@ function Guida() {
     <main className="mx-auto flex max-w-3xl flex-col gap-6 px-4 py-10" data-testid="guida">
       <header>
         <h1 className="m-0 text-[34px] font-bold leading-tight">Come funziona l'app</h1>
-        <p className="mt-2 text-[16px] leading-relaxed">Tre minuti per capire cosa fai tu e cosa fa l'app. Si entra con la propria e-mail, senza password.</p>
+        <p className="mt-2 text-[16px] leading-relaxed">Tre minuti per capire cosa fai tu e cosa fa l'app. Per seguire la squadra non serve nessun account; chi ha un ruolo nel club entra con la propria e-mail, senza password.</p>
         <nav aria-label="Scegli il tuo ruolo" className="mt-4 flex flex-wrap gap-2">
           {ROLES.map((r) => (
             <a key={r.id} href={`#${r.id}`} className="inline-flex h-11 items-center rounded-full border border-border bg-white px-4 text-[15px] font-semibold">{r.label}</a>
           ))}
         </nav>
       </header>
+
+      <Section id="tifosi" title="Tifosi e simpatizzanti" intro="Per chi segue la squadra: niente registrazione, niente dati personali.">
+        <Step n={1} icon={<CalendarDays className="size-5" />} title="Le partite di tutte le squadre">
+          Apri <Link to="/calendario" className="font-semibold text-[var(--scd-blue)] underline">Calendario</Link>: giorno, ora e campo di ogni gara, dalla Prima Squadra ai più piccoli. Le squadre giovanili compaiono solo con il nome della squadra.
+        </Step>
+        <Step n={2} icon={<Ticket className="size-5" />} title="Biglietti e ingresso">
+          In <Link to="/impianti" className="font-semibold text-[var(--scd-blue)] underline">Impianti</Link> trovi i campi di Colico e Dervio, dove si entra, gli orari della biglietteria e le gratuità previste dalla società.
+        </Step>
+        <Step n={3} icon={<PartyPopper className="size-5" />} title="Tornei, feste ed eventi">
+          In <Link to="/eventi" className="font-semibold text-[var(--scd-blue)] underline">Eventi</Link> ci sono i tornei e le serate del club. Le foto pubblicate non mostrano il volto dei minori senza la liberatoria firmata dalla famiglia.
+        </Step>
+        <Step n={4} icon={<Smartphone className="size-5" />} title="Tienila sul telefono">
+          Con <Link to="/installa" className="font-semibold text-[var(--scd-blue)] underline">Installa l'app</Link> la metti tra le app del telefono in un tocco, e puoi passare il codice QR agli amici.
+        </Step>
+      </Section>
+
+      <Section id="soci" title="Soci e volontari" intro="Per chi fa parte dell'associazione o vuole dare una mano.">
+        <Step n={1} icon={<UserPlus className="size-5" />} title="Iscriversi alla SCD">
+          Da <Link to="/entra" className="font-semibold text-[var(--scd-blue)] underline">Iscriviti</Link> parti con il modulo: la segreteria ti richiama per documenti e tesseramento. La quota si paga solo nei modi indicati dalla società: l'app non incassa nulla.
+        </Step>
+        <Step n={2} icon={<FileText className="size-5" />} title="Regole e documenti dell'associazione">
+          In <Link to="/societa" className="font-semibold text-[var(--scd-blue)] underline">Società</Link> ci sono regolamento e carta dei valori, codice di condotta, regole per trasferte e minori, privacy e liberatoria immagini: sono pubblici, i dati delle persone no.
+        </Step>
+        <Step n={3} icon={<Megaphone className="size-5" />} title="Avvisi del club">
+          In <Link to="/comunicazioni" className="font-semibold text-[var(--scd-blue)] underline">Comunicazioni</Link> trovi gli avvisi e le novità della stagione.
+        </Step>
+        <Step n={4} icon={<ShieldCheck className="size-5" />} title="Tutela dei minori">
+          Chi lavora con i ragazzi segue le regole in <Link to="/safeguarding" className="font-semibold text-[var(--scd-blue)] underline">Tutela dei minori</Link>, dove trovi anche come segnalare un problema in modo riservato.
+        </Step>
+      </Section>
 
       <Section id="famiglie" title="Famiglie e atleti" intro="Per genitori, tutori e atleti maggiorenni.">
         <Step n={1} icon={<KeyRound className="size-5" />} title="Entra con la tua e-mail">
@@ -102,6 +135,12 @@ function Guida() {
         </Step>
         <Step n={4} icon={<ShieldCheck className="size-5" />} title="Permessi su misura">
           Direzione → Accessi: ruolo, aree in più, squadre in più, sospensione. Ogni modifica resta nello storico.
+        </Step>
+        <Step n={5} icon={<Wallet className="size-5" />} title="Compensi e stipendi">
+          Tesoreria → Compensi: la Direzione fissa l'accordo, la Tesoreria segna presenze e rimborsi, chiude il mese e prepara la lista dei pagamenti. I bonifici si fanno in banca: l'app non paga e non conserva IBAN.
+        </Step>
+        <Step n={6} icon={<Brain className="size-5" />} title="Cervellone">
+          Direzione → Cervellone: cerca in documenti, posta catalogata, economia e storia del club, con le scadenze in vista. Ognuno vede solo il livello del proprio ruolo.
         </Step>
       </Section>
 
