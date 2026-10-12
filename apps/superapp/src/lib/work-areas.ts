@@ -21,6 +21,7 @@ export type WorkAreaId =
   | "club-house"
   | "biglietteria"
   | "magazzino-cassa"
+  | "compensi"
   | "infermeria"
   | "mister"
   | "organigramma"
@@ -57,6 +58,7 @@ export const DRIVE_MASTERS = {
   sgsManuale: { key: "sgsManuale", name: "C.U. n.18 SGS · Manuale Sistema di Qualità 2026", fileId: null, note: "regole in config/sgs-quality-system.v1.json" },
   organigrammaFigc: { key: "organigrammaFigc", name: "Organigramma FIGC (Portale Servizi)", fileId: null, note: "estratto del 24/09, privato" },
   elencoRuoli: { key: "elencoRuoli", name: "Elenco dirigenti e ruoli 2026/27", fileId: null, note: "privato, solo Direzione" },
+  controlTower: { key: "controlTower", name: "SCD Control Tower 2026/27 · rapporti economici", fileId: null, note: "import iniziale del 12/10, privato" },
   supabase: { key: "supabase", name: "Supabase SCD · persone, ruoli e storico", fileId: null, note: "database del club (r59)" },
 } as const satisfies Record<string, DriveMaster>;
 
@@ -162,6 +164,12 @@ export const WORK_AREAS: Readonly<Record<WorkAreaId, WorkAreaConfig>> = {
     description: "Ordini e incassi del kit: cassa da collegare, nessun importo mostrato.",
     sources: ["inventario", "economico", "inserimenti"],
     insertRoles: uniq([...registryRoles("magazzino-cassa"), "Tesoreria"]),
+  },
+  compensi: {
+    id: "compensi", label: "Tesoreria · Compensi e stipendi", path: pathOf("compensi"), railId: "tesoreria",
+    description: "Compensi del mese: la Direzione verifica e autorizza, la Tesoreria paga. Riservato.",
+    sources: ["controlTower", "supabase", "inserimenti"],
+    insertRoles: ["Direzione", "Tesoreria"],
   },
   infermeria: {
     id: "infermeria", label: "Infermeria", path: pathOf("infermeria"), railId: "infermeria",

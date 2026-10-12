@@ -318,3 +318,9 @@ prossimi impegni e "ci sarò" in primo piano). Desktop invariato.
 ## 2026-10-12 — r73 Scrivania del giorno (Segreteria)
 - `scd_secretariat_desk(org)` (applied on SCD PULSE) returns the day's queue as counts only; `/segreteria` opens on "Scrivania del giorno": each line links to Persone (pre-filtered `?squadra=nessuna`, `?stato=pending`), Certificati or Accessi. Manifest 3.28.3.
 - Real counts verified on staging data (13 expired certificates, 61 people pending, 84 registrations to verify, 354 accounts never signed in). Tests: 472 (5 new).
+
+## 2026-10-12 — r75/r76 Compensi e stipendi (UD-075) + nuove posizioni (UD-076)
+- DB (SCD PULSE): r75 tabelle e funzioni `scd_comp_*`, bucket privato `scd-private` (`<org>/comp/`); import di 36 accordi dalla Control Tower 2026/27 (senza IBAN). r76: nuove posizioni assegnabili (tesoreria solo Direzione; lavanderia, pulizia, infermeria, magazzino, tornei, struttura Colico/Dervio, segreteria in presenza/da remoto, dirigente collaboratore).
+- App: `/tesoreria/compensi` — mese di competenza con scadenza il 15 del mese dopo, totali, filtri (da sistemare, pronti, da pagare, pagati, bloccati), scheda persona con calcolo fisso + voci − acconti, verifiche IBAN/contratto (solo stato), "usa importo storico", voci con allegato e annullamento motivato, autorizza/blocca (Direzione), segna pagato con data, metodo, CRO e contabile (Tesoreria), documenti apribili con link a 2 minuti, "Elenco bonifici" copiabile senza IBAN.
+- Test: compensation.test.ts (9), suite 493; build, tsc, test:manifest, test:claude-hooks.
+- Aperto: ogni persona va verificata (IBAN e contratto) dalla Direzione prima di autorizzare; la posizione "tesoreria" va assegnata da /direzione/accessi.

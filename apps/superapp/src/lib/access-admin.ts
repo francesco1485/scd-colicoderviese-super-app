@@ -5,7 +5,7 @@
 import { DB_ROLES, KNOWN_POSITIONS, type DbRole } from "./session";
 
 export const OFFICE_ROLES: readonly DbRole[] = ["DIRECTION", "SECRETARIAT", "REGISTRATION", "TOURNAMENTS"];
-export const OFFICE_POSITIONS: readonly string[] = ["direzione", "presidente", "direttore-generale", "dirigenza", "segreteria"];
+export const OFFICE_POSITIONS: readonly string[] = ["direzione", "presidente", "direttore-generale", "dirigenza", "segreteria", "tesoreria"];
 
 /** Positions that come only from the coarse role (never assigned by hand). */
 export const ROLE_ONLY_POSITIONS: readonly string[] = ["famiglia", "atleta"];
@@ -45,13 +45,27 @@ export const POSITION_LABEL: Readonly<Record<string, string>> = {
   "responsabile-magazzino": "Magazzino",
   "responsabile-campi": "Campi e impianti",
   segreteria: "Segreteria",
+  tesoreria: "Tesoreria (compensi e pagamenti)",
+  "segreteria-presenza": "Segreteria in presenza",
+  "segreteria-remoto": "Segreteria da remoto",
+  "responsabile-tornei": "Responsabile tornei",
+  "responsabile-struttura": "Responsabile struttura",
+  "responsabile-struttura-colico": "Responsabile struttura Colico",
+  "responsabile-struttura-dervio": "Responsabile struttura Dervio",
+  "responsabile-lavanderia": "Responsabile lavanderia",
+  "collaboratore-lavanderia-pulizia": "Collaboratore lavanderia e pulizia",
+  "responsabile-infermeria": "Responsabile infermeria",
+  "collaboratore-magazzino": "Collaboratore magazzino",
+  "dirigente-collaboratore": "Dirigente collaboratore (anche genitore)",
   partner: "Partner / sponsor",
 };
 
 export const POSITION_GROUPS: ReadonlyArray<{ label: string; ids: readonly string[] }> = [
   { label: "Squadre", ids: ["mister", "dirigente-annata", "coordinatore-attivita-sportiva", "responsabile-attivita-base"] },
-  { label: "Servizi", ids: ["responsabile-trasporti", "autista", "responsabile-magazzino", "responsabile-campi", "responsabile-club-house", "addetto-biglietteria"] },
-  { label: "Ufficio (solo Direzione)", ids: ["segreteria", "dirigenza", "direttore-generale", "presidente", "direzione"] },
+  { label: "Servizi", ids: ["responsabile-trasporti", "autista", "responsabile-magazzino", "collaboratore-magazzino", "responsabile-campi", "responsabile-club-house", "addetto-biglietteria", "responsabile-tornei", "dirigente-collaboratore"] },
+  { label: "Struttura e cura", ids: ["responsabile-struttura", "responsabile-struttura-colico", "responsabile-struttura-dervio", "responsabile-lavanderia", "collaboratore-lavanderia-pulizia", "responsabile-infermeria"] },
+  { label: "Segreteria", ids: ["segreteria-presenza", "segreteria-remoto"] },
+  { label: "Ufficio (solo Direzione)", ids: ["segreteria", "tesoreria", "dirigenza", "direttore-generale", "presidente", "direzione"] },
   { label: "Esterni", ids: ["partner"] },
 ];
 

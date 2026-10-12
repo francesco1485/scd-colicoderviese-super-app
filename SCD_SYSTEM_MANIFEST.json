@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.28.3",
+    "version": "3.29.0",
     "effective_at": "2026-10-11",
     "status": "BINDING",
     "language": "it-IT",
@@ -835,6 +835,9 @@
         ],
         "team_assignment": "r72 (2026-10-12): Segreteria/Direzione confirm a PENDING athlete and assign a team, add a second team (multi-annata call-ups) or move (previous membership closed with valid_to, never removed); registration_status VERIFIED only when the Secretariat declares it saw the FIGC registration; history in scd_person_events (ENTRATA / CAMBIO_SQUADRA with from/to team) and scd_audit_events TEAM_ASSIGN — supabase/migrations/20261012_r72_team_assignment.sql, scd_staff_assign_team, /segreteria/persone (teams of athletes now listed and filterable, 'senza squadra')",
         "secretariat_desk": "r73 (2026-10-12): read-only function scd_secretariat_desk(org) returns the day's queue as COUNTS only (access requests pending, people pending, athletes without team, registration unverified, certificates missing/expired/expiring 30d/declared, call-ups pending in 72h, accounts never signed in); Direzione/Segreteria only; shown as 'Scrivania del giorno' on /segreteria with a link per line (Persone with ?squadra=nessuna / ?stato=pending, Certificati, Accessi) — supabase/migrations/20261012_r73_secretariat_desk.sql, src/lib/secretariat-desk.ts",
+        "transport_board": "r74 (2026-10-12): Pulmini in Supabase (scd_transport_vehicles/drivers/stops/riders/runs); scd_transport_sync(org,payload) copies the 05_PULMINI master (sheet stays master, rows missing are deactivated, no rider names); scd_transport_board for responsabile-trasporti/Direzione/Segreteria (autista read without phones); scd_transport_plan_run refuses double bookings and is audited",
+        "compensation": "r75 (2026-10-12, UD-075): scd_comp_agreements/entries/periods/documents; competence month due on day 15 of the next month; Direzione (DIRECTION or positions direzione/presidente/direttore-generale) edits agreements, records entries, authorizes only without blockers (relationship ATTIVO, IBAN CONFERMATO, contract/RASD OK, net > 0) and locks the month; Tesoreria (position tesoreria) records entries and marks paid with date/method/reference; documents in private bucket scd-private under <org>/comp/; IBAN never stored (status only); app never executes payments; all writes in scd_audit_events; initial import of 36 agreements from SCD Control Tower 2026/27 (tools/sync/compensation_control_tower.py); page /tesoreria/compensi",
+        "operations_positions": "r76 (2026-10-12, UD-076): assignable positions extended with tesoreria (office, Direzione only), segreteria-presenza, segreteria-remoto, responsabile-tornei, responsabile-struttura(-colico/-dervio), responsabile-lavanderia, collaboratore-lavanderia-pulizia, responsabile-infermeria, collaboratore-magazzino, dirigente-collaboratore; people need not be tesserati",
         "distribution": "UD-071 (2026-10-12): one permanent address app.colicoderviese.it (club domain); public /installa page with QR; icons from the official crest for stores; /.well-known/assetlinks.json served only with SCD_ANDROID_PACKAGE + SCD_ANDROID_SHA256; Play Store (TWA) then App Store wrapper after internal operational work — apps/superapp/docs/DOMINIO_E_STORE.md"
       }
     },

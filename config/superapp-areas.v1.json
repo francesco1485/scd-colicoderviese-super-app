@@ -55,7 +55,9 @@
       "children": [
         { "id": "club-house", "path": "/tesoreria/club-house", "roles": ["responsabile-club-house"], "board": "Tesoreria-sottoaree.dc.html", "status": "design" },
         { "id": "biglietteria", "path": "/tesoreria/biglietteria", "roles": ["addetto-biglietteria"], "blocker": "tariff source to confirm", "status": "design" },
-        { "id": "magazzino-cassa", "path": "/tesoreria/magazzino", "roles": ["responsabile-magazzino"], "status": "design" }
+        { "id": "magazzino-cassa", "path": "/tesoreria/magazzino", "roles": ["responsabile-magazzino"], "status": "design" },
+        { "id": "compensi", "path": "/tesoreria/compensi", "audience": "staff", "roles": ["direzione", "presidente", "direttore-generale", "tesoreria"], "role_map": { "direzione": "DIRECTION", "presidente": "DIRECTION", "direttore-generale": "DIRECTION", "tesoreria": "STAFF" },
+          "sources": ["SCD Control Tower 2026/27 (initial import)", "Supabase scd_comp_*"], "flow": ["accordo", "voci del mese", "autorizzazione Direzione", "pagamento Tesoreria"], "status": "live" }
       ] },
     { "id": "direzione", "path": "/direzione", "audience": "staff", "board": "Plancia-direzione.dc.html", "status": "design",
       "children": [ { "id": "acquisti", "path": "/direzione/acquisti", "roles": ["dirigenza"], "flow": ["richiesta", "approvazione", "ordine", "fattura", "pagamento"], "status": "design" },
