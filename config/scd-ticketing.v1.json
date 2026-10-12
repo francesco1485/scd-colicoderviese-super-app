@@ -1,21 +1,43 @@
 {
   "status": "CONFIRMED",
-  "asOf": "2026-10-11",
-  "source": "Tavola 'BIGLIETTERIA — Prezzi e modalità di ingresso' S.D.C. ColicoDerviese Centro Sportivo, inviata dalla Direzione il 2026-10-11 (UD-055)",
+  "asOf": "2026-10-12",
+  "source": "Tavola 'BIGLIETTERIA — Prezzi e modalità di ingresso' S.D.C. ColicoDerviese Centro Sportivo, inviata dalla Direzione il 2026-10-11 (UD-055); regola tesserati e familiari confermata dalla Direzione il 2026-10-12 (UD-079): campionato tesserato + 2 familiari gratis, coppa solo il tesserato",
   "where": "Biglietteria all'ingresso visitatori del Centro Sportivo Colico, Via Lido (lato Club House).",
-  "howToPay": ["Contanti alla biglietteria"],
+  "howToPay": [
+    "Contanti alla biglietteria"
+  ],
   "opensBefore": "Apre prima del calcio d'inizio.",
   "tariffs": {
-    "PROMOZIONE": { "label": "Campionato Promozione", "groups": ["prima"], "intero": 10, "ridotto": 5 },
-    "JUNIORES_ELITE": { "label": "Campionato Juniores Élite", "groups": ["u19"], "intero": 7, "ridotto": 4 },
-    "U18_ELITE": { "label": "Campionato U18 Élite", "groups": ["u18"], "intero": 7, "ridotto": 4 },
-    "U16_ELITE": { "label": "Campionato U16 Élite", "groups": ["u16"], "intero": 7, "ridotto": 4 }
+    "PROMOZIONE": {
+      "label": "Campionato Promozione",
+      "groups": [
+        "prima"
+      ],
+      "intero": 10,
+      "ridotto": 5
+    },
+    "JUNIORES_ELITE": {
+      "label": "Campionato Juniores Élite",
+      "groups": [
+        "u19"
+      ],
+      "intero": 7,
+      "ridotto": 4
+    },
+    "U16_ELITE": {
+      "label": "Campionato U16 Élite",
+      "groups": [
+        "u16"
+      ],
+      "intero": 7,
+      "ridotto": 4
+    }
   },
   "ridottoNote": "da 12 a 18 anni e Over 65",
   "bambiniNote": "Bambini fino a 12 anni: ingresso gratuito",
   "freeCompetitions": "Altri campionati (Attività di Base, U15, U13, Pulcini, Primi Calci, Piccoli Amici): ingresso gratuito per tutti",
-  "members": "Tesserati S.C.D. ColicoDerviese: ingresso gratuito per il tesserato e 1 familiare accompagnatore, valido per le partite di campionato ufficiale (tutte le squadre)",
-  "cup": "Coppa Italia, play off e play out: il tesserato non paga, familiari o accompagnatori pagano il biglietto (tutte le squadre e categorie)",
+  "members": "Tesserati S.C.D. ColicoDerviese: ingresso gratuito per il tesserato e fino a 2 familiari, valido per le partite di campionato ufficiale (tutte le squadre); dal terzo familiare si paga il ridotto",
+  "cup": "Coppa Italia, play off e play out: solo il tesserato non paga, tutti gli altri pagano il biglietto, familiari compresi (tutte le squadre e categorie)",
   "info": [
     "Bambini fino a 12 anni: ingresso gratuito",
     "Ridotto da 12 a 18 anni e Over 65",
@@ -24,5 +46,6 @@
     "Rispettiamo il lavoro di tutti e sosteniamo i nostri ragazzi",
     "Fair play dentro e fuori dal campo"
   ],
-  "note": "Prezzi e regole dalla tavola ufficiale 2026/27. Il campionato U18 Élite non è attivo in questa stagione (squadra ritirata): la tariffa resta registrata per completezza."
+  "note": "Prezzi dalla tavola ufficiale 2026/27 (11/10); regola familiari confermata dalla Direzione il 12/10. Il campionato U18 Élite non è attivo in questa stagione (squadra ritirata): nessuna tariffa U18.",
+  "membersShort": "ingresso gratuito per il tesserato e fino a 2 familiari (campionato ufficiale, tutte le squadre); dal terzo familiare si paga il ridotto"
 }

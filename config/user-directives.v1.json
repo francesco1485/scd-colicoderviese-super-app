@@ -1870,6 +1870,26 @@
           "future pages enter a door only when they ship"
         ]
       }
+    },
+    {
+      "sourceDate": "2026-10-12",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-079",
+      "name": "TICKET_MEMBER_FAMILY_RULE",
+      "sourceQuoteFragments": [
+        "coppa solo il tesserato non paga il resto pagano tutti",
+        "2 si va bene",
+        "3. si"
+      ],
+      "normalizedCommand": {
+        "rule": "Ticket office rule for S.C.D. members: in official league matches the member and up to 2 relatives enter free (from the third relative the reduced ticket applies, per the canonical master of 2026-10-06); in Coppa Italia, play-off and play-out only the member is free and everyone else pays. No U18 tariff is shown (team withdrawn, rule R012). Resolves the conflict between the canonical master (06/10) and the board of 11/10 (UD-055).",
+        "scope": "TICKETING",
+        "constraints": [
+          "prices stay those of the official board 2026/27",
+          "the app shows rules only; it never sells or collects tickets"
+        ]
+      }
     }
   ],
   "completionGate": {

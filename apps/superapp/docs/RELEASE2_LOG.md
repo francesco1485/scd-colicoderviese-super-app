@@ -339,3 +339,7 @@ prossimi impegni e "ci sarò" in primo piano). Desktop invariato.
 - App: `/aree` riorganizzata nelle quattro porte con i compiti più usati in evidenza; `/guida` con le sezioni "Tifosi e simpatizzanti" e "Soci e volontari" e i passi Compensi e Cervellone per Segreteria e Direzione.
 - Test: audiences.test.ts (contratto, ordine porte, errori rilevati); suite 500.
 - Aperto: regola gratuità familiari in biglietteria da confermare (master 06/10 "fino a 2 familiari" contro tavola 11/10 "1 familiare").
+
+## 2026-10-12 — Biglietteria: regola tesserati e familiari confermata (UD-079)
+- `config/scd-ticketing.v1.json`: campionato = tesserato + fino a 2 familiari gratis (dal terzo ridotto); coppa, play off e play out = gratis solo il tesserato, pagano tutti gli altri. Tolta la tariffa U18 Élite (squadra ritirata).
+- Scheda partita: testo tesserati letto dalla configurazione (`membersShort`), non più scritto nel codice. Test match-extras estesi.

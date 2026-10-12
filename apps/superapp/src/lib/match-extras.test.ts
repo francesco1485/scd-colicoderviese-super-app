@@ -50,6 +50,12 @@ describe("match extras", () => {
     expect(ticketingFor({ homeAway: "CASA", group: "pulcini" })).toEqual({ kind: "free" });
     expect(ticketingFor({ homeAway: "FUORI", group: "prima" })).toBeNull();
     expect(TICKETING.status).toBe("CONFIRMED");
+    // Direzione 2026-10-12 (UD-079): league = member + 2 relatives free; cup = only the member; no U18 tariff (team withdrawn).
+    expect(TICKETING.members).toContain("fino a 2 familiari");
+    expect(TICKETING.membersShort).toContain("fino a 2 familiari");
+    expect(TICKETING.cup).toContain("solo il tesserato non paga");
+    expect(Object.values(TICKETING.tariffs).some((t) => t.groups.includes("u18") || /U18/.test(t.label))).toBe(false);
+    expect(ticketingFor({ homeAway: "CASA", group: "u18" })).not.toMatchObject({ kind: "office" });
     expect(euro(5)).toBe("5\u00a0€");
     expect(euro(7.5)).toBe("7,50\u00a0€");
   });

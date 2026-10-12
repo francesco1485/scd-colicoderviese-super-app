@@ -214,7 +214,7 @@ export function TicketButton({ item }: { item: WeekItem }) {
                   </tbody>
                 </table>
                 <p className="mt-3 rounded-[12px] bg-[#fff3c4] px-3 py-2 text-[14px] leading-snug text-[#5a4500]">
-                  <b>Tesserati S.C.D.</b> {t.cup ? TICKETING.cup.replace(/^Coppa Italia, play off e play out: /, "In coppa, play off e play out ") : "ingresso gratuito per il tesserato e 1 familiare accompagnatore (campionato ufficiale, tutte le squadre)"}.
+                  <b>Tesserati S.C.D.</b> {t.cup ? TICKETING.cup.replace(/^Coppa Italia, play off e play out: /, "In coppa, play off e play out ") : TICKETING.membersShort}.
                 </p>
                 <ul className="m-0 mt-3 grid list-none gap-1.5 p-0 text-[14px] text-[var(--scd-sub)]">
                   {TICKETING.info.slice(2).map((i) => (

@@ -166,6 +166,8 @@ export interface Ticketing {
   bambiniNote: string;
   freeCompetitions: string;
   members: string;
+  /** Same rule, phrased to follow "Tesserati S.C.D." on the match card. */
+  membersShort: string;
   cup: string;
   info: string[];
   note: string;
