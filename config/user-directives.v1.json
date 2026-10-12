@@ -1890,6 +1890,26 @@
           "the app shows rules only; it never sells or collects tickets"
         ]
       }
+    },
+    {
+      "sourceDate": "2026-10-12",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-080",
+      "name": "EVERYTHING_IN_SUPERAPP_DEDICATED_LINKS",
+      "sourceQuoteFragments": [
+        "tutto quello che è in drive e mail e quello che poi faremo deve stare nella super app e nelle varie web app link dedicate così da gestire tutti e tutti",
+        "Si come hai detto e cerca di lavorare"
+      ],
+      "normalizedCommand": {
+        "rule": "Everything in the club Drive and mailbox, and everything built from now on, is managed from the single Super App: each work area is a page with its own shareable link (e.g. /pulmini for drivers), not a separate app with its own login. Drive and mail stay archive and source; masters stay the source until the Direzione moves the work into the app, and meanwhile the app reads an automatic copy. The Cervellone is the shared memory every area reads from.",
+        "scope": "INFORMATION_ARCHITECTURE",
+        "constraints": [
+          "one app, one login (R20 identity), roles decide what each link shows",
+          "no parallel registers; never move or delete originals",
+          "no minors' data where it is not needed"
+        ]
+      }
     }
   ],
   "completionGate": {

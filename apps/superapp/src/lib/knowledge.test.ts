@@ -38,6 +38,8 @@ describe("helpers", () => {
     expect(dueTone(10)).toBe("crit");
     expect(dueTone(40)).toBe("warn");
     expect(dueTone(400)).toBe("info");
+    expect(dueText(200)).toBe("tra 7 mesi");
+    expect(dueText(717)).toBe("tra 2 anni");
     expect(dueText(0)).toBe("scade oggi");
     expect(dueText(-5)).toBe("scaduto da 5 giorni");
     expect(dueText(17)).toBe("tra 17 giorni");

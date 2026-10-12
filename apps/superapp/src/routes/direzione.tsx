@@ -6,6 +6,10 @@ import { Card, Chip } from "@/components/scd/interior-ui";
 import { InteriorShell } from "@/components/scd/InteriorShell";
 import { getAccessRequests } from "@/lib/access-requests.functions";
 import { getSession } from "@/lib/auth.functions";
+import { ClubDeadlinesCard } from "@/components/scd/ClubDeadlines";
+import { ShareLink } from "@/components/scd/ShareLink";
+import { useRomeNow } from "@/components/scd/interior-ui";
+import { searchKnowledge } from "@/lib/knowledge.functions";
 
 /**
  * Direzione landing. Signed in with an office position: shortcuts to the working pages and the pending access
@@ -15,8 +19,10 @@ export const Route = createFileRoute("/direzione")({
   loader: async () => {
     const session = await getSession();
     const office = session.roles.includes("direzione") || session.roles.includes("dirigenza");
-    const requests = office ? await getAccessRequests() : [];
-    return { office, roles: session.roles, badge: session.badge, email: session.user?.email ?? null, pending: requests.filter((r) => r.status === "PENDING").length };
+    const [requests, due] = office
+      ? await Promise.all([getAccessRequests(), searchKnowledge({ data: { onlyDue: true, limit: 8 } })])
+      : [[], null];
+    return { due, office, roles: session.roles, badge: session.badge, email: session.user?.email ?? null, pending: requests.filter((r) => r.status === "PENDING").length };
   },
   head: () => accessHead("direzione"),
   component: DirezioneRoute,
@@ -35,6 +41,7 @@ const LINKS = [
 
 function DirezioneRoute() {
   const d = Route.useLoaderData();
+  const now = useRomeNow();
   if (!d.office) return <AccessScreenPage id="direzione" />;
   return (
     <InteriorShell
@@ -45,7 +52,8 @@ function DirezioneRoute() {
       roleLabel={d.badge ?? "Direzione"}
       highlights={[{ value: d.pending, label: "richieste di accesso da verificare" }]}
     >
-      <Card id="dir-scorciatoie" title="Da qui governi l'app" sub={d.email ? `Sei entrato come ${d.email}.` : undefined}>
+      <div className="grid grid-cols-1 gap-[18px] xl:grid-cols-[minmax(0,1fr)_400px]">
+      <Card id="dir-scorciatoie" title="Da qui governi l'app" sub={d.email ? `Sei entrato come ${d.email}.` : undefined} aside={<ShareLink path="/direzione" />} className="xl:self-start">
         <ul className="m-0 list-none p-0">
           {LINKS.map((l) => (
             <li key={l.to}>
@@ -62,6 +70,8 @@ function DirezioneRoute() {
           ))}
         </ul>
       </Card>
+      {d.due && <ClubDeadlinesCard id="dir-scadenze" due={d.due} today={now.date} className="xl:self-start" />}
+      </div>
     </InteriorShell>
   );
 }

@@ -349,3 +349,8 @@ prossimi impegni e "ci sarò" in primo piano). Desktop invariato.
 - Organizza una corsa: dalla trasferta del weekend ("Organizza" la compila con data, squadra e destinazione) o "Nuova corsa"; pulmino, autista, orari, passeggeri (solo numero), stato, nota; avvisi su doppia prenotazione, disponibilità autista e posti; salvataggio con `scd_transport_plan_run` (controllo ruolo e doppioni nel database, storico con autore). Gli autisti vedono le corse senza poterle modificare.
 - Copia automatica: attività programmata "SCD Pulmini · copia del Master" (06:59, 12:59, 18:59) con `tools/sync/pulmini_master_payload.py` e `scd_transport_sync`; scrive solo se il foglio è cambiato e solo dopo i controlli (nessun nome degli utenti, nessun crollo dei conteggi). Copia attuale verificata: 4 mezzi, 6 autisti, 8 regole, 17 fermate, 61 utenti (foglio modificato il 26/09).
 - Test: transport.test.ts (+5), TransportDesk.test.tsx (render lato server: coda, scadenze, telefoni, form, vista autista); vitest include anche i test .tsx.
+
+## 2026-10-12 — Tutto nella Super App, un link per area (UD-080) + scadenze del club
+- Ogni area di lavoro ha il pulsante "Copia link" (indirizzo della pagina da mandare a chi la usa; cosa vede dipende dal ruolo). Anche su /direzione.
+- Scadenze del club dal Cervellone (`ClubDeadlinesCard`): in /segreteria sostituisce il riquadro vuoto "da collegare a R20"; in /direzione accanto alle scorciatoie. Aggiunte al Cervellone le scadenze note: bando RL Area Sportiva Giovani 29/10 ore 12, istanza SUAP Colico 30/10, bando Manifestazioni 5/11, Delegato tutela minori 15/11.
+- Test: ClubDeadlines.test.tsx (3).

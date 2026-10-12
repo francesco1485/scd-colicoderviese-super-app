@@ -13,6 +13,8 @@ import { getWorkAreaGate } from "@/lib/work-areas.functions";
 import { weekendMatches } from "@/lib/work-areas";
 import { StatTile } from "@/components/scd/work-area-ui";
 import { TESSERATI, itDate, sortedCounts } from "@/lib/roster-aggregates";
+import { ClubDeadlinesCard } from "@/components/scd/ClubDeadlines";
+import { searchKnowledge, type KbData } from "@/lib/knowledge.functions";
 
 /** Segreteria (board Segreteria.dc.html): work queues as honest empty states, weekend matches, masters. */
 export const Route = createFileRoute("/segreteria")({
@@ -20,8 +22,8 @@ export const Route = createFileRoute("/segreteria")({
     const gate = await getWorkAreaGate({ data: { area: "segreteria" } });
     if (gate.view !== "page") return { gate, interior: false as const };
     const cal = loadCalendar();
-    const desk = await getSecretariatDesk();
-    return { gate, interior: true as const, groups: cal.groups, events: cal.events, sourceModifiedAt: cal.sourceModifiedAt, desk };
+    const [desk, due] = await Promise.all([getSecretariatDesk(), searchKnowledge({ data: { onlyDue: true, limit: 12 } })]);
+    return { gate, interior: true as const, groups: cal.groups, events: cal.events, sourceModifiedAt: cal.sourceModifiedAt, desk, due };
   },
   head: ({ loaderData }) => workAreaHead("segreteria", loaderData?.gate),
   component: SegreteriaRoute,
@@ -31,7 +33,7 @@ function SegreteriaRoute() {
   const data = Route.useLoaderData();
   return (
     <WorkAreaGateView id="segreteria" gate={data.gate}>
-      {data.interior && <SegreteriaPage groups={data.groups} events={data.events} sourceModifiedAt={data.sourceModifiedAt} preview={data.gate.preview} desk={data.desk} />}
+      {data.interior && <SegreteriaPage groups={data.groups} events={data.events} sourceModifiedAt={data.sourceModifiedAt} preview={data.gate.preview} desk={data.desk} due={data.due} />}
     </WorkAreaGateView>
   );
 }
@@ -74,7 +76,7 @@ function DeskCard({ desk }: { desk: DeskData }) {
   );
 }
 
-function SegreteriaPage({ groups, events, sourceModifiedAt, preview, desk }: { groups: PublicGroup[]; events: PublicEvent[]; sourceModifiedAt: string; preview: boolean; desk: DeskData }) {
+function SegreteriaPage({ groups, events, sourceModifiedAt, preview, desk, due }: { groups: PublicGroup[]; events: PublicEvent[]; sourceModifiedAt: string; preview: boolean; desk: DeskData; due: KbData }) {
   const now = useRomeNow();
   const matches = useMemo(() => weekendMatches(events, now.date), [events, now.date]);
   const byId = useMemo(() => new Map(groups.map((g) => [g.id, g])), [groups]);
@@ -89,18 +91,11 @@ function SegreteriaPage({ groups, events, sourceModifiedAt, preview, desk }: { g
         { value: matches.length, label: "distinte per il weekend" },
         { value: desk.counts ? desk.counts.athletes_without_team : null, label: "atleti senza squadra" },
       ]}
-      note={<>Partite: calendario ufficiale, copia del {freshnessLabel(sourceModifiedAt)}. Code dal database del club; scadenze R20 ancora da collegare.</>}
+      note={<>Partite: calendario ufficiale, copia del {freshnessLabel(sourceModifiedAt)}. Code dal database del club; scadenze dal Cervellone.</>}
     >
       <div className="grid grid-cols-1 gap-[18px] lg:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_340px]">
         <DeskCard desk={desk} />
-        <Card id="seg-scadenze" title="Scadenze" sub="In ordine di data. Urgente sotto i 7 giorni." className="lg:self-start">
-          <div className="px-4 pb-4 sm:px-[18px]">
-            <EmptyState title="Scadenze da collegare a R20">
-              Preavvisi al Comune, autorizzazioni FIGC-SGS e delibere arriveranno da R20 e dal Database Iscrizioni, con la loro data: niente scadenze scritte a mano qui.
-            </EmptyState>
-          </div>
-          <SourceLine>Fonte: R20 · gestionale operativo (da collegare). Per segnalare una scadenza usa «Inserisci».</SourceLine>
-        </Card>
+        <ClubDeadlinesCard id="seg-scadenze" due={due} today={now.date} title="Scadenze" sub="In ordine di data: documenti, bandi, obblighi federali e comunali. Rosso entro 15 giorni." className="lg:self-start" />
 
         <Card id="seg-weekend" title="Partite del weekend" sub={`${matches.length} ${matches.length === 1 ? "gara" : "gare"} tra sabato e domenica. La distinta si prepara in R20.`} className="lg:self-start">
           {matches.length === 0 ? (

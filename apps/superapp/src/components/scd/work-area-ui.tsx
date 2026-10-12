@@ -14,6 +14,7 @@ import { DRIVE_MASTERS, WORK_AREAS, areaSources, driveUrl, type WorkAreaId } fro
 import { AccessScreenPage, accessHead } from "./AccessScreen";
 import { InteriorShell } from "./InteriorShell";
 import { Card, Chip, SourceLine } from "./interior-ui";
+import { ShareLink } from "@/components/scd/ShareLink";
 
 /** Rail of the staging preview: every area (navigation only; access control stays with R20). */
 const PREVIEW_RAIL_ROLES: ReadonlySet<string> = new Set(ALL_AREAS_ROLES);
@@ -88,7 +89,10 @@ export function WorkAreaShell({
             {editable ? <Chip tone="ok">Modifiche salvate nel database del club</Chip> : <Chip tone="info">Sola lettura</Chip>}
             {note && <span className="min-w-0">{note}</span>}
           </p>
-          {!editable && <InsertAction id={id} />}
+          <span className="flex flex-wrap items-center gap-2">
+            <ShareLink path={a.path} />
+            {!editable && <InsertAction id={id} />}
+          </span>
         </div>
         {children}
       </div>

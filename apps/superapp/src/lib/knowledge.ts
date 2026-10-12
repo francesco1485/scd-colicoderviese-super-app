@@ -144,6 +144,10 @@ export function dueText(days: number): string {
   if (days === -1) return "scaduto ieri";
   if (days === 0) return "scade oggi";
   if (days === 1) return "scade domani";
+  if (days > 120) {
+    const months = Math.round(days / 30.4);
+    return months >= 24 ? `tra ${Math.round(months / 12)} anni` : `tra ${months} mesi`;
+  }
   return `tra ${days} giorni`;
 }
 
