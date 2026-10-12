@@ -7,8 +7,17 @@
 // cloudflare-module). Override with NITRO_PRESET=<preset> if another runtime is chosen.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 import { VitePWA } from "vite-plugin-pwa";
+import { STATIC_CACHE_RULES } from "./src/lib/static-cache";
 
 const NITRO_PRESET = process.env["NITRO_PRESET"] || "node-server";
+
+/**
+ * Nitro options. Launch L1 (2026-10-12): non-hashed public files (official media, PWA icons) get a short browser
+ * cache with background revalidation, so repeat visits stop re-downloading images; hashed /assets keep Nitro's
+ * immutable year. Declared as a variable because the Lovable config type lists only some Nitro keys; Nitro
+ * receives the whole object (checked on the built server: /media responses carry the header).
+ */
+const NITRO_OPTIONS = { preset: NITRO_PRESET, routeRules: STATIC_CACHE_RULES };
 
 /** Visible build stamp ("versione del 11/10 11:55 · abc1234") so reviewers know which deploy they see. */
 const BUILD_STAMP = (() => {
@@ -29,9 +38,7 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
-  nitro: {
-    preset: NITRO_PRESET,
-  },
+  nitro: NITRO_OPTIONS,
   vite: {
     define: { __SCD_BUILD__: JSON.stringify(BUILD_STAMP) },
     plugins: [
@@ -48,8 +55,8 @@ export default defineConfig({
         workbox: {
           navigateFallback: null,
           globPatterns: ["**/*.{js,css,png,jpg,svg,woff2}", "offline.html"],
-          // Le immagini grandi in /media (loghi categoria) restano fuori dal precache.
-          globIgnores: ["media/**"],
+          // Le immagini grandi in /media (loghi categoria) e i font (cache HTTP immutabile) restano fuori dal precache.
+          globIgnores: ["media/**", "**/*.woff", "**/*.woff2"],
           maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
           cleanupOutdatedCaches: true,
           runtimeCaching: [

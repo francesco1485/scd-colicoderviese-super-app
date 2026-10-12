@@ -8,10 +8,9 @@
  */
 import { createServerFn } from "@tanstack/react-start";
 
-import { workAreaView, type WorkAreaGate } from "./access";
+import type { WorkAreaGate } from "./access";
 import { sessionRoles } from "./auth.functions";
-import { stagingPreviewEnabled } from "./impianti-access";
-import { SGS_RULES, emptyStatus, parseStatus, type ClubStatus, type Level } from "./sgs-quality";
+import type { ClubStatus, Level } from "./sgs-quality";
 
 export interface OrganigrammaData {
   gate: WorkAreaGate;
@@ -22,23 +21,15 @@ export interface OrganigrammaData {
   statusConfigured: boolean;
 }
 
-export function organigrammaData(env: Readonly<Record<string, string | undefined>>, isProd: boolean, roles: ReadonlySet<string> | null = null): OrganigrammaData {
-  const gate = workAreaView("organigramma", { preview: stagingPreviewEnabled(env, isProd), sessionRoles: roles });
-  const target = Math.min(5, Math.max(1, SGS_RULES.targetLevel)) as Level;
-  if (gate.view !== "page") return { gate, status: emptyStatus(), level: target, statusConfigured: false };
-  const raw = env["SCD_SGS_STATUS_JSON"];
-  const status = parseStatus(raw);
-  const declared = status.declaration.level;
-  const level = (declared && declared >= 1 && declared <= 5 ? declared : target) as Level;
-  return { gate, status, level, statusConfigured: Boolean(raw && raw.trim()) };
-}
-
 /**
  * Private status for the page. The route asks getWorkAreaGate first; this function re-checks the
  * gate on the server so the status never leaves it for a closed area.
+ * The rules engine is loaded inside the handler (launch L1): the route loader runs in the main
+ * client bundle and must not carry the full SGS rule set.
  */
 export const getSgsStatus = createServerFn({ method: "GET" }).handler(
   async (): Promise<Omit<OrganigrammaData, "gate">> => {
+    const { organigrammaData } = await import("./sgs-quality.data");
     const { gate: _gate, ...rest } = organigrammaData(process.env, import.meta.env.PROD, await sessionRoles());
     return rest;
   },

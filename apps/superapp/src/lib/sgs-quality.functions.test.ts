@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { organigrammaData } from "./sgs-quality.functions";
+import { organigrammaData } from "./sgs-quality.data";
 
 const status = JSON.stringify({ asOf: "2026-10-11", declaration: { sent: "YES", level: 1 }, roles: { "medico-sg": "MISSING" } });
 

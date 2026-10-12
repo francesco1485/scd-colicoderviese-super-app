@@ -37,6 +37,7 @@ Nessun passo di questo file si esegue senza l'ok esplicito della Direzione.
 - `robots.txt` apre solo le pagine pubbliche; staging resta escluso dai motori di ricerca.
 - Le aree riservate non vengono mai salvate offline; all'uscita la copia sul telefono viene cancellata.
 - Intestazioni di sicurezza su ogni risposta.
+- Caratteri serviti dal nostro dominio (nessuna chiamata a Google Fonts), cache breve per immagini e letture pubbliche: misure in `docs/LAUNCH_QUALITY.md`.
 
 ## Giorno del lancio
 1. Merge approvato su `main` → servizio di produzione attivo → `/healthz` risponde.

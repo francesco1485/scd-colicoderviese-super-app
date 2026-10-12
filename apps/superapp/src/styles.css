@@ -1,6 +1,26 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
+/* Self-hosted fonts (launch L1, 2026-10-12): same families and weights the app used from Google Fonts,
+ * served from our own origin with hashed, immutable files: no render-blocking third-party CSS and no visitor
+ * IP sent to Google. Latin subset covers Italian. Keep in sync with the font tokens below. */
+@import "@fontsource/fira-sans/latin-400";
+@import "@fontsource/fira-sans/latin-500";
+@import "@fontsource/fira-sans/latin-600";
+@import "@fontsource/fira-sans/latin-700";
+@import "@fontsource/fira-sans/latin-800";
+@import "@fontsource/fira-sans-condensed/latin-500";
+@import "@fontsource/fira-sans-condensed/latin-600";
+@import "@fontsource/fira-sans-condensed/latin-700";
+@import "@fontsource/anton/latin-400";
+@import "@fontsource/big-shoulders-display/latin-700";
+@import "@fontsource/big-shoulders-display/latin-800";
+@import "@fontsource/big-shoulders-display/latin-900";
+@import "@fontsource/barlow/latin-400";
+@import "@fontsource/barlow/latin-500";
+@import "@fontsource/barlow/latin-600";
+@import "@fontsource/barlow/latin-700";
+@import "@fontsource/kaushan-script/latin-400";
 
 @custom-variant dark (&:is(.dark *));
 

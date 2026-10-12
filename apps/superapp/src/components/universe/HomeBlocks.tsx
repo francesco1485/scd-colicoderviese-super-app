@@ -25,7 +25,7 @@ import { TeamCode } from "./TeamBar";
 import { ColicoNowChip, MapButton, TicketButton, TicketLine, WeatherChip } from "./MatchExtras";
 import { mapsUrl, venueTown } from "@/lib/match-extras";
 
-const CREST = "/media/brand/logo-scd.png";
+const CREST = "/media/brand/logo-scd.webp";
 
 /* ------------------------------------------------------------------ hero */
 

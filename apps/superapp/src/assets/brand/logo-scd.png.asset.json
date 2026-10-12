@@ -1,8 +1,10 @@
 {
   "version": 1,
-  "url": "/media/brand/logo-scd.png",
+  "url": "/media/brand/logo-scd.webp",
   "original_filename": "logo-scd.png",
-  "size": 69187,
-  "content_type": "image/png",
-  "source": "github.com/francesco1485/scd-colicoderviese-super-app@main:assets/logo-scd.png (stemma ufficiale S.C.D. ColicoDerviese)"
+  "size": 34584,
+  "content_type": "image/webp",
+  "source": "github.com/francesco1485/scd-colicoderviese-super-app@main:assets/logo-scd.png (stemma ufficiale S.C.D. ColicoDerviese)",
+  "derived_from": "/media/brand/logo-scd.png",
+  "transform": "lossless WebP, pixel-identical to the official PNG (launch L1, 2026-10-12)"
 }

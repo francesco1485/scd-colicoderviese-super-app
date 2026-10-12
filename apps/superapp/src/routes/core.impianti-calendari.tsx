@@ -1,13 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { BellAction, PageHeader } from "@/components/scd/board";
-import { ImpiantiCalendari, SECTION_IDS, type SectionId } from "@/features/impianti/ImpiantiCalendari";
+import { ImpiantiCalendari } from "@/features/impianti/ImpiantiCalendari";
+import { isSectionId, type SectionId } from "@/features/impianti/section-ids";
 
 type Search = { sezione?: SectionId | undefined };
 
 export const Route = createFileRoute("/core/impianti-calendari")({
-  validateSearch: (s: Record<string, unknown>): Search =>
-    SECTION_IDS.includes(s["sezione"] as SectionId) ? { sezione: s["sezione"] as SectionId } : {},
+  validateSearch: (s: Record<string, unknown>): Search => (isSectionId(s["sezione"]) ? { sezione: s["sezione"] } : {}),
   head: () => ({ meta: [
     { title: "Impianti e Calendari — SCD CORE · S.C.D. ColicoDerviese" },
     { name: "description", content: "Consultazione read-only di campi Colico e Dervio, quadro allenamenti, calendario annuale e rotazione: anteprima, nessun dato live." },

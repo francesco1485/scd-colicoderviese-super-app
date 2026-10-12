@@ -2,7 +2,12 @@
  * Adapter server-side verso il backend Apps Script R20.
  * Contratto: POST JSON { action, payload, sessionToken }.
  * Nessun segreto nel browser: il client chiama solo server function.
+ * Letture pubbliche anonime: cache breve in memoria (src/lib/public-read-cache.ts, launch L1).
  */
+
+import { createPublicReadCache, isPublicCacheable } from "./public-read-cache";
+
+const publicReads = createPublicReadCache();
 
 const DEFAULT_ENDPOINT =
   "https://script.google.com/macros/s/AKfycbwYQ_3yLYsp-6jX3FIgufBjpmaZb9uO1AklF9hdG-CuLII9J4ITUX1EA-EKuWXBMEc/exec";
@@ -79,14 +84,20 @@ async function call<T>(
   }
 }
 
+/** Public, session-less reads go through the short shared cache; everything else goes straight to R20. */
+function callMaybeCached<T>(action: R20Action | R20PlannedAction, payload: Record<string, unknown> | undefined, token: string | null): Promise<R20Result<T>> {
+  if (isPublicCacheable(action, payload, token)) return publicReads.read(action, () => call<T>(action, payload, null));
+  return call<T>(action, payload, token);
+}
+
 export const r20 = {
   /** Azioni disponibili. */
   call: <T>(action: R20Action, payload?: Record<string, unknown>, token?: string | null) =>
-    call<T>(action, payload, token ?? null),
+    callMaybeCached<T>(action, payload, token ?? null),
   /**
    * Azioni pianificate: vengono tentate, ma se R20 non le conosce l'esito è
    * esplicitamente "non ancora attivo". Nessuna finta conferma.
    */
   planned: <T>(action: R20PlannedAction, payload?: Record<string, unknown>, token?: string | null) =>
-    call<T>(action, payload, token ?? null),
+    callMaybeCached<T>(action, payload, token ?? null),
 };

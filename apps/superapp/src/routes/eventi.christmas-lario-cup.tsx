@@ -169,7 +169,7 @@ function ChristmasLarioCup() {
           <div className="grid gap-4">
             <div className="flex items-center gap-[10px]">
               <img
-                src="/media/brand/logo-scd.png"
+                src="/media/brand/logo-scd.webp"
                 alt="S.C.D. ColicoDerviese"
                 className="h-[60px] w-auto"
               />

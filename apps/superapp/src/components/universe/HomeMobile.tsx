@@ -19,7 +19,7 @@ import { itemState, startMs, countdown, type Team } from "@/lib/universe";
 import { ColicoNowChip, MapButton, TicketButton, TicketLine, WeatherChip } from "./MatchExtras";
 import { TeamCode } from "./TeamBar";
 
-const CREST = "/media/brand/logo-scd.png";
+const CREST = "/media/brand/logo-scd.webp";
 
 /* ------------------------------------------------------------------ header */
 

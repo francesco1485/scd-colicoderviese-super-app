@@ -42,6 +42,17 @@
       "verified_at": "2026-10-01"
     },
     {
+      "path": "apps/superapp/public/media/brand/logo-scd.webp",
+      "class": "OFFICIAL_CLUB_LOGO_OPTIMIZED",
+      "status": "LOCKED",
+      "git_blob_sha": "0dedc320201dbdd01a715dc0c0729a6d25a10372",
+      "source": "SCD_INTERNAL_APPROVED",
+      "derived_from": "assets/logo-scd.png",
+      "transform": "Lossless WebP re-encode of the official crest, same 480x628 size, alpha kept, pixel-identical RGBA (checked with Pillow on 2026-10-12). Weight 69187 -> 34584 bytes. Runtime crest for the Super App (launch L1).",
+      "confidence": "HIGH",
+      "verified_at": "2026-10-12"
+    },
+    {
       "path": "assets/logo-lnd.png",
       "class": "FEDERATION_LOGO",
       "status": "LOCKED",

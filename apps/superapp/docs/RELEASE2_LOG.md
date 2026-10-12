@@ -16,6 +16,7 @@ One backlog item per night, finished to a verifiable boundary. Status: `done`, `
 | 2b | Facility map `/impianti` + `/gestionale/mappa` | done | 06da5f2 | 2026-10-11 |
 | 5a | Public hall (chi siamo, squadre, official results links, contatti) | done | 8ffd491 | 2026-10-11 |
 | 8 | Impianti follow-ups from benchmark: one request for pitch+rooms+lights, state history (who/when), day view prenotato/disponibile/rilasciato, quadro trainings in pitch capacity check | todo | | |
+| L1 | Launch performance: Lighthouse mobile/desktop on /, /guida, /accedi, /calendario, /squadre; fixes; `docs/LAUNCH_QUALITY.md` | done | see L1 entry | 2026-10-12 |
 
 ## 2026-10-11 · Item 1 · Foundations · done
 
@@ -296,3 +297,15 @@ prossimi impegni e "ci sarò" in primo piano). Desktop invariato.
 - Stato: DONE su staging/superapp. Migrazione `20261012_r72_team_assignment.sql` applicata a SCD PULSE (+ r72.1 spostamento nello stesso giorno), provata in transazione annullata come Direzione.
 - Dato reale: i 94 "senza squadra" sono 61 persone PENDING (tesseramento in corso) + 33 ARCHIVED; tutti gli atleti attivi hanno squadra.
 - App: squadre degli atleti ora lette da scd_team_memberships e mostrate in elenco e scheda; filtro "Senza squadra"; contatore "atleti da assegnare"; azione "Conferma e assegna" / "Cambia o aggiungi" (sposta = chiude la precedente, aggiungi = più annate); spunta "ho verificato il tesseramento FIGC"; tutto nello storico e in audit.
+
+## L1 — Prestazioni per il lancio (Lighthouse) · 2026-10-12
+- Stato: DONE su staging/superapp. Numeri prima/dopo (mediana di 3, mobile e desktop, build di produzione con compressione
+  come Render) in `docs/LAUNCH_QUALITY.md`.
+- Fatto: font self-hosted (`@fontsource`, stesse famiglie e pesi; niente più Google Fonts né IP verso Google; il blocco
+  "Design tokens" sopra che cita Google Fonts è superato); bundle principale 578 → 348 KB (planimetria Dervio, istantanea
+  impianti e regole SGS fuori dal codice comune); stemma ufficiale in WebP senza perdita (pixel identici, 69 → 35 KB,
+  registrato in `config/scd-assets.v1.json`); cache browser 1 giorno per `/media` e icone; letture pubbliche R20 in cache
+  60 s (errori 15 s) con richieste condivise — home da 1,2–2,8 s a ~0,07 s al primo byte.
+- Test: `launch-performance.test.ts`, `public-read-cache.test.ts`, `section-ids.test.ts`; test SGS spostato su `sgs-quality.data.ts`.
+- Aperto: CLS mobile /calendario 0.092 e /squadre 0.062 (sotto 0.1) per lo scambio di carattere; idratazione della home;
+  loghi categoria PNG da 330 KB; HDI scaduto ancora nel nastro sponsor (decisione Direzione).

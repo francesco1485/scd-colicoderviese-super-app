@@ -291,7 +291,7 @@ function AvatarCardDemo() {
       <span className="absolute left-2 top-2 rounded-[6px] bg-[var(--uv-gold)] px-[6px] py-[1px] font-uv text-[13px] uppercase text-[var(--uv-night)]">
         U16
       </span>
-      <img src="/media/brand/logo-scd.png" alt="" className="absolute right-2 top-2 size-[22px] object-contain" />
+      <img src="/media/brand/logo-scd.webp" alt="" className="absolute right-2 top-2 size-[22px] object-contain" />
       <svg viewBox="0 0 100 100" className="mt-3 size-[clamp(64px,19vw,84px)]">
         <circle cx="50" cy="36" r="20" fill="#cfe0ff" />
         <path d="M14 98c3-24 18-36 36-36s33 12 36 36z" fill="#cfe0ff" />

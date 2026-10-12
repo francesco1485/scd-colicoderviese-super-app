@@ -7,6 +7,7 @@ import { QuadroAllenamenti } from './QuadroAllenamenti';
 import { CalendarioAnnuale } from './CalendarioAnnuale';
 import { LaMiaSquadra, IlMioSettore, DervioPulmini } from './TeamSectorViews';
 import { RotazioneAnnuale, Responsabili } from './RotazioneResponsabili';
+import { SECTION_IDS, type SectionId } from './section-ids';
 import './impianti.css';
 
 /** Ordine action-first: allenamenti e calendario prima di impianti e organigramma. */
@@ -19,9 +20,8 @@ const sections = [
   { id: 'impianti', label: 'Impianti', icon: MapPin },
   { id: 'responsabili', label: 'Piramide referenti', icon: Users },
   { id: 'dervio', label: 'Dervio e Pulmini', icon: Bus },
-] as const;
-export type SectionId = (typeof sections)[number]['id'];
-export const SECTION_IDS = sections.map(s => s.id) as readonly SectionId[];
+] as const satisfies readonly { id: SectionId; label: string; icon: unknown }[];
+export { SECTION_IDS, type SectionId };
 export const IMPIANTI_SECTIONS = sections;
 
 export function ImpiantiCalendari({ initialSection = 'quadro' }: { initialSection?: SectionId }) {
