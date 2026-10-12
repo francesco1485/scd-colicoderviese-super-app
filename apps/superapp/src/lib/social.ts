@@ -262,6 +262,7 @@ export type FeedNode<M, E> =
   | { k: "sponsor" }
   | { k: "event"; event: E }
   | { k: "top11" }
+  | { k: "press" }
   | { k: "empty" };
 
 /**
@@ -286,6 +287,7 @@ export function composeFeed<M, E>(
     ...(hasSponsor ? [{ k: "sponsor" as const }] : []),
     ...(event ? [{ k: "event" as const, event }] : []),
     { k: "top11" as const },
+    { k: "press" as const },
   ];
   let e = 0;
   posts.forEach((post, i) => {

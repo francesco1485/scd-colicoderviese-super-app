@@ -477,11 +477,49 @@ export interface Top11 {
   voters: number;
   top: { athleteId: string; team: string; name: string; votes: number }[];
 }
+export interface MonthAward {
+  team: string;
+  athleteId: string;
+  name: string;
+  votes: number;
+}
+export interface MonthAwards {
+  month: string;
+  closed: boolean;
+  awards: MonthAward[];
+}
 export interface WeekVoteData {
   signedIn: boolean;
   candidates: VoteCandidate[];
   mine: string[];
   last: Top11;
+  month: MonthAwards;
+}
+
+function parseMonthAwards(raw: unknown): MonthAwards {
+  const r =
+    raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
+  const awards = Array.isArray(r["awards"])
+    ? (r["awards"] as unknown[])
+        .map((x) =>
+          x && typeof x === "object" ? (x as Record<string, unknown>) : null,
+        )
+        .filter(
+          (x): x is Record<string, unknown> =>
+            !!x && typeof x["athleteId"] === "string",
+        )
+        .map((x) => ({
+          team: String(x["team"] ?? ""),
+          athleteId: x["athleteId"] as string,
+          name: String(x["name"] ?? ""),
+          votes: Number(x["votes"] ?? 0) || 0,
+        }))
+    : [];
+  return {
+    month: typeof r["month"] === "string" ? r["month"] : "",
+    closed: r["closed"] === true,
+    awards,
+  };
 }
 
 function parseCandidates(raw: unknown): VoteCandidate[] {
@@ -536,11 +574,20 @@ export const getWeekVote = createServerFn({ method: "GET" }).handler(
   async (): Promise<WeekVoteData> => {
     const sb = serverSupabase();
     const empty: Top11 = { weekStart: "", closed: true, voters: 0, top: [] };
-    if (!sb) return { signedIn: false, candidates: [], mine: [], last: empty };
+    const noMonth: MonthAwards = { month: "", closed: true, awards: [] };
+    if (!sb)
+      return {
+        signedIn: false,
+        candidates: [],
+        mine: [],
+        last: empty,
+        month: noMonth,
+      };
     const s = await sessionView();
     const org = s.memberships[0] ?? null;
-    const [last, cand, mine] = await Promise.all([
+    const [last, cand, mine, month] = await Promise.all([
       sb.rpc("scd_top11", { p_org_slug: ORG_SLUG }),
+      sb.rpc("scd_month_awards", { p_org_slug: ORG_SLUG }),
       org
         ? sb.rpc("scd_vote_candidates", {
             p_organization_id: org.organizationId,
@@ -558,6 +605,7 @@ export const getWeekVote = createServerFn({ method: "GET" }).handler(
           ? []
           : mine.data.filter((x): x is string => typeof x === "string"),
       last: last.error ? empty : parseTop11(last.data),
+      month: month.error ? noMonth : parseMonthAwards(month.data),
     };
   },
 );

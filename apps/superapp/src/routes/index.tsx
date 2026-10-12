@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Trophy } from "lucide-react";
+import { Newspaper, Trophy } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { BUILD_STAMP } from "@/lib/build-stamp";
@@ -607,6 +607,26 @@ function Home() {
                       <span className="text-[13px] text-[#c8d8ee]">
                         Vota i giocatori di tutte le squadre: 3 voti a testa,
                         esce il lunedì.
+                      </span>
+                    </span>
+                  </Link>
+                );
+              case "press":
+                return (
+                  <Link
+                    key="press"
+                    to="/rassegna"
+                    className="scd-focus flex items-center gap-3 rounded-[20px] bg-white p-4 shadow-[0_2px_10px_rgb(11_42_91/0.08)]"
+                  >
+                    <span className="grid size-12 shrink-0 place-items-center rounded-[14px] bg-[#e3eefb] text-[#0b2a5b]">
+                      <Newspaper className="size-6" aria-hidden="true" />
+                    </span>
+                    <span className="grid gap-0.5">
+                      <b className="font-uv text-[22px] leading-none text-[#0b1e3a]">
+                        DICONO DI NOI
+                      </b>
+                      <span className="text-[13px] text-[#5a6b85]">
+                        I titoli delle testate su società, Colico e Dervio.
                       </span>
                     </span>
                   </Link>

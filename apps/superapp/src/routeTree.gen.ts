@@ -32,6 +32,7 @@ import { Route as MagazzinoRouteImport } from './routes/magazzino'
 import { Route as PartnerRouteImport } from './routes/partner'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PulminiRouteImport } from './routes/pulmini'
+import { Route as RassegnaRouteImport } from './routes/rassegna'
 import { Route as RegistratiRouteImport } from './routes/registrati'
 import { Route as SafeguardingRouteImport } from './routes/safeguarding'
 import { Route as SegreteriaRouteImport } from './routes/segreteria'
@@ -195,6 +196,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const PulminiRoute = PulminiRouteImport.update({
   id: '/pulmini',
   path: '/pulmini',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RassegnaRoute = RassegnaRouteImport.update({
+  id: '/rassegna',
+  path: '/rassegna',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RegistratiRoute = RegistratiRouteImport.update({
@@ -472,6 +478,7 @@ export interface FileRoutesByFullPath {
   '/partner': typeof PartnerRoute
   '/privacy': typeof PrivacyRoute
   '/pulmini': typeof PulminiRoute
+  '/rassegna': typeof RassegnaRoute
   '/registrati': typeof RegistratiRoute
   '/safeguarding': typeof SafeguardingRoute
   '/segreteria': typeof SegreteriaRoute
@@ -546,6 +553,7 @@ export interface FileRoutesByTo {
   '/partner': typeof PartnerRoute
   '/privacy': typeof PrivacyRoute
   '/pulmini': typeof PulminiRoute
+  '/rassegna': typeof RassegnaRoute
   '/registrati': typeof RegistratiRoute
   '/safeguarding': typeof SafeguardingRoute
   '/segreteria': typeof SegreteriaRoute
@@ -620,6 +628,7 @@ export interface FileRoutesById {
   '/partner': typeof PartnerRoute
   '/privacy': typeof PrivacyRoute
   '/pulmini': typeof PulminiRoute
+  '/rassegna': typeof RassegnaRoute
   '/registrati': typeof RegistratiRoute
   '/safeguarding': typeof SafeguardingRoute
   '/segreteria': typeof SegreteriaRoute
@@ -696,6 +705,7 @@ export interface FileRouteTypes {
     | '/partner'
     | '/privacy'
     | '/pulmini'
+    | '/rassegna'
     | '/registrati'
     | '/safeguarding'
     | '/segreteria'
@@ -770,6 +780,7 @@ export interface FileRouteTypes {
     | '/partner'
     | '/privacy'
     | '/pulmini'
+    | '/rassegna'
     | '/registrati'
     | '/safeguarding'
     | '/segreteria'
@@ -843,6 +854,7 @@ export interface FileRouteTypes {
     | '/partner'
     | '/privacy'
     | '/pulmini'
+    | '/rassegna'
     | '/registrati'
     | '/safeguarding'
     | '/segreteria'
@@ -918,6 +930,7 @@ export interface RootRouteChildren {
   PartnerRoute: typeof PartnerRoute
   PrivacyRoute: typeof PrivacyRoute
   PulminiRoute: typeof PulminiRoute
+  RassegnaRoute: typeof RassegnaRoute
   RegistratiRoute: typeof RegistratiRoute
   SafeguardingRoute: typeof SafeguardingRoute
   SegreteriaRoute: typeof SegreteriaRoute
@@ -1124,6 +1137,13 @@ declare module '@tanstack/react-router' {
       path: '/pulmini'
       fullPath: '/pulmini'
       preLoaderRoute: typeof PulminiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rassegna': {
+      id: '/rassegna'
+      path: '/rassegna'
+      fullPath: '/rassegna'
+      preLoaderRoute: typeof RassegnaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/registrati': {
@@ -1517,6 +1537,7 @@ const rootRouteChildren: RootRouteChildren = {
   PartnerRoute: PartnerRoute,
   PrivacyRoute: PrivacyRoute,
   PulminiRoute: PulminiRoute,
+  RassegnaRoute: RassegnaRoute,
   RegistratiRoute: RegistratiRoute,
   SafeguardingRoute: SafeguardingRoute,
   SegreteriaRoute: SegreteriaRoute,

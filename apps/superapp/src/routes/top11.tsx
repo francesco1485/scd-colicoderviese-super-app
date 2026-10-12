@@ -44,6 +44,15 @@ const TEAM_COLOR: Readonly<Record<string, string>> = {
   u15: "#C23C3F",
 };
 
+const fmtMonth = (d: string) =>
+  d
+    ? new Intl.DateTimeFormat("it-IT", {
+        timeZone: "UTC",
+        month: "long",
+        year: "numeric",
+      }).format(new Date(`${d}T12:00:00Z`))
+    : "";
+
 const fmtWeek = (d: string) => {
   if (!d) return "";
   const a = new Date(`${d}T12:00:00Z`);
@@ -162,6 +171,46 @@ function Top11Page() {
               {data.last.voters
                 ? "Risultati in arrivo lunedì."
                 : "Nessun voto la scorsa settimana: la prima Top 11 esce lunedì prossimo."}
+            </p>
+          )}
+        </section>
+
+        <section className="rounded-[20px] bg-[#0b2a5b] p-4 text-white">
+          <h2 className="mb-2 mt-0 text-[13px] font-bold tracking-[0.04em] text-[var(--uv-gold)]">
+            PREMI DEL MESE
+            {data.month.month
+              ? ` · ${fmtMonth(data.month.month).toUpperCase()}`
+              : ""}
+          </h2>
+          {data.month.awards.length ? (
+            <ul className="m-0 grid list-none gap-2 p-0 sm:grid-cols-2">
+              {data.month.awards.map((a) => (
+                <li
+                  key={a.athleteId}
+                  className="flex items-center gap-3 rounded-[14px] bg-white/10 px-3 py-2.5"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="grid size-9 shrink-0 place-items-center rounded-full font-uv text-[12px] text-white"
+                    style={{ background: TEAM_COLOR[a.team] ?? "#5a6b85" }}
+                  >
+                    {a.team === "prima" ? "1ª" : a.team.toUpperCase()}
+                  </span>
+                  <span className="grid min-w-0">
+                    <b className="truncate text-[15px]">{a.name}</b>
+                    <span className="text-[12.5px] text-[#c8d8ee]">
+                      Giocatore del mese {TEAM_LABEL[a.team] ?? a.team} ·{" "}
+                      {a.votes} {a.votes === 1 ? "voto" : "voti"}
+                    </span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="m-0 text-[14px] text-[#c8d8ee]">
+              Il giocatore del mese di ogni squadra esce il primo giorno del
+              mese dopo, dalla somma dei voti delle settimane. La premiazione si
+              fa una volta al mese in club house: onore e premi non in denaro.
             </p>
           )}
         </section>
