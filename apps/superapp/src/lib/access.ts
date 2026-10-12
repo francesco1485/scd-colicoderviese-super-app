@@ -20,6 +20,7 @@ const SUB_AREA_COPY: Readonly<Record<string, { label: string; icon: AreaIcon }>>
   certificati: { label: "Certificati medici", icon: "file" },
   compensi: { label: "Compensi e stipendi", icon: "coin" },
   quote: { label: "Quote e Fondo", icon: "coin" },
+  coda: { label: "Coda di lavoro", icon: "file" },
   cervellone: { label: "Cervellone", icon: "file" },
 };
 

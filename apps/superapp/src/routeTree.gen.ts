@@ -53,6 +53,7 @@ import { Route as DirezioneCervelloneRouteImport } from './routes/direzione_.cer
 import { Route as EventiIndexRouteImport } from './routes/eventi.index'
 import { Route as EventiChristmasLarioCupRouteImport } from './routes/eventi.christmas-lario-cup'
 import { Route as GestionaleIndexRouteImport } from './routes/gestionale.index'
+import { Route as GestionaleCodaRouteImport } from './routes/gestionale.coda'
 import { Route as GestionaleMappaRouteImport } from './routes/gestionale.mappa'
 import { Route as GestionaleMisterRouteImport } from './routes/gestionale.mister'
 import { Route as GestionaleOrganigrammaRouteImport } from './routes/gestionale.organigramma'
@@ -294,6 +295,11 @@ const GestionaleIndexRoute = GestionaleIndexRouteImport.update({
   path: '/gestionale/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GestionaleCodaRoute = GestionaleCodaRouteImport.update({
+  id: '/gestionale/coda',
+  path: '/gestionale/coda',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GestionaleMappaRoute = GestionaleMappaRouteImport.update({
   id: '/gestionale/mappa',
   path: '/gestionale/mappa',
@@ -434,6 +440,7 @@ export interface FileRoutesByFullPath {
   '/direzione/acquisti': typeof DirezioneAcquistiRoute
   '/direzione/cervellone': typeof DirezioneCervelloneRoute
   '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
+  '/gestionale/coda': typeof GestionaleCodaRoute
   '/gestionale/mappa': typeof GestionaleMappaRoute
   '/gestionale/mister': typeof GestionaleMisterRoute
   '/gestionale/organigramma': typeof GestionaleOrganigrammaRoute
@@ -499,6 +506,7 @@ export interface FileRoutesByTo {
   '/direzione/acquisti': typeof DirezioneAcquistiRoute
   '/direzione/cervellone': typeof DirezioneCervelloneRoute
   '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
+  '/gestionale/coda': typeof GestionaleCodaRoute
   '/gestionale/mappa': typeof GestionaleMappaRoute
   '/gestionale/mister': typeof GestionaleMisterRoute
   '/gestionale/organigramma': typeof GestionaleOrganigrammaRoute
@@ -564,6 +572,7 @@ export interface FileRoutesById {
   '/direzione_/acquisti': typeof DirezioneAcquistiRoute
   '/direzione_/cervellone': typeof DirezioneCervelloneRoute
   '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
+  '/gestionale/coda': typeof GestionaleCodaRoute
   '/gestionale/mappa': typeof GestionaleMappaRoute
   '/gestionale/mister': typeof GestionaleMisterRoute
   '/gestionale/organigramma': typeof GestionaleOrganigrammaRoute
@@ -631,6 +640,7 @@ export interface FileRouteTypes {
     | '/direzione/acquisti'
     | '/direzione/cervellone'
     | '/eventi/christmas-lario-cup'
+    | '/gestionale/coda'
     | '/gestionale/mappa'
     | '/gestionale/mister'
     | '/gestionale/organigramma'
@@ -696,6 +706,7 @@ export interface FileRouteTypes {
     | '/direzione/acquisti'
     | '/direzione/cervellone'
     | '/eventi/christmas-lario-cup'
+    | '/gestionale/coda'
     | '/gestionale/mappa'
     | '/gestionale/mister'
     | '/gestionale/organigramma'
@@ -760,6 +771,7 @@ export interface FileRouteTypes {
     | '/direzione_/acquisti'
     | '/direzione_/cervellone'
     | '/eventi/christmas-lario-cup'
+    | '/gestionale/coda'
     | '/gestionale/mappa'
     | '/gestionale/mister'
     | '/gestionale/organigramma'
@@ -826,6 +838,7 @@ export interface RootRouteChildren {
   DirezioneAcquistiRoute: typeof DirezioneAcquistiRoute
   DirezioneCervelloneRoute: typeof DirezioneCervelloneRoute
   EventiChristmasLarioCupRoute: typeof EventiChristmasLarioCupRoute
+  GestionaleCodaRoute: typeof GestionaleCodaRoute
   GestionaleMappaRoute: typeof GestionaleMappaRoute
   GestionaleMisterRoute: typeof GestionaleMisterRoute
   GestionaleOrganigrammaRoute: typeof GestionaleOrganigrammaRoute
@@ -1156,6 +1169,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GestionaleIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/gestionale/coda': {
+      id: '/gestionale/coda'
+      path: '/gestionale/coda'
+      fullPath: '/gestionale/coda'
+      preLoaderRoute: typeof GestionaleCodaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/gestionale/mappa': {
       id: '/gestionale/mappa'
       path: '/gestionale/mappa'
@@ -1353,6 +1373,7 @@ const rootRouteChildren: RootRouteChildren = {
   DirezioneAcquistiRoute: DirezioneAcquistiRoute,
   DirezioneCervelloneRoute: DirezioneCervelloneRoute,
   EventiChristmasLarioCupRoute: EventiChristmasLarioCupRoute,
+  GestionaleCodaRoute: GestionaleCodaRoute,
   GestionaleMappaRoute: GestionaleMappaRoute,
   GestionaleMisterRoute: GestionaleMisterRoute,
   GestionaleOrganigrammaRoute: GestionaleOrganigrammaRoute,

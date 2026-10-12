@@ -23,6 +23,7 @@ export type WorkAreaId =
   | "magazzino-cassa"
   | "compensi"
   | "quote"
+  | "coda"
   | "infermeria"
   | "mister"
   | "organigramma"
@@ -185,6 +186,12 @@ export const WORK_AREAS: Readonly<Record<WorkAreaId, WorkAreaConfig>> = {
     description: "Quote della stagione dal Gestionale: dovuto, pagato, scaduto, rate e lista di lavoro. Riservato.",
     sources: ["economico", "supabase", "inserimenti"],
     insertRoles: ["Segreteria", "Tesoreria"],
+  },
+  coda: {
+    id: "coda", label: "Gestionale · Coda di lavoro", path: pathOf("coda"), railId: "gestionale",
+    description: "Proposte arrivate da mail e copie dei master: una persona conferma, scarta o rinvia. Ogni decisione resta registrata.",
+    sources: ["supabase", "inserimenti"],
+    insertRoles: ["Direzione", "Segreteria", "Tesoreria"],
   },
   infermeria: {
     id: "infermeria", label: "Infermeria", path: pathOf("infermeria"), railId: "infermeria",
