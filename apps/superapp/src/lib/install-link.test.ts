@@ -8,8 +8,8 @@ describe("install link (UD-071)", () => {
     expect(installUrl("https://app.colicoderviese.it", "https://x.onrender.com")).toBe("https://app.colicoderviese.it/installa");
   });
   it("falls back to the current origin, then to the planned address", () => {
-    expect(displayAddress(null, "https://colicoderviese.onrender.com")).toBe("colicoderviese.onrender.com");
-    expect(installUrl(null, "https://colicoderviese.onrender.com/")).toBe("https://colicoderviese.onrender.com/installa");
+    expect(displayAddress(null, "https://scd-superapp-staging.onrender.com")).toBe("scd-superapp-staging.onrender.com");
+    expect(installUrl(null, "https://scd-superapp-staging.onrender.com/")).toBe("https://scd-superapp-staging.onrender.com/installa");
     expect(displayAddress(null, null)).toBe(PLANNED_ADDRESS);
     expect(displayAddress("not a url", null)).toBe(PLANNED_ADDRESS);
     expect(installUrl(null, null)).toBe(`https://${PLANNED_ADDRESS}/installa`);
