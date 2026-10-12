@@ -75,3 +75,57 @@ Tempo di risposta del server sulla home (misura `curl`, `VERIFIED`): prima ogni 
 2. Proxy di compressione davanti al server (Brotli qualità 5) e Lighthouse 12 con
    `CHROME_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome`, `--chrome-flags="--headless=new --no-sandbox"`,
    preset mobile e `--preset=desktop`, 3 esecuzioni per pagina, mediana. Non usare `playwright install`.
+
+## L2 · Accessibilità (axe-core + bersagli da 44 px) · 2026-10-12
+
+### Come è stato misurato (`VERIFIED`)
+- `scripts/a11y-audit.mjs` (nuovo, ripetibile): axe-core 4.10.3 con le regole WCAG 2.0/2.1/2.2 livello A e AA, più la regola
+  del club "bersagli toccabili di almeno 44×44 px" (PRODUCT.md) su ogni elemento interattivo visibile; i link dentro una frase
+  sono esclusi come prevede la WCAG; un campo dentro (o collegato a) un'etichetta conta l'area dell'etichetta.
+- Build di produzione locale, Chromium preinstallato, 390×844 (telefono) e 1440×900 (desktop). Pagine: `/guida`, `/accedi`,
+  `/registrati`, `/privacy`, `/famiglia`, `/gestionale/mister` (convocazione e distinta), `/segreteria/certificati`.
+- Pagine riservate: aperte con navigazione interna mentre lo script risponde a ogni funzione server con **dati di prova
+  inventati** (nomi adulti di fantasia, solo Juniores e Prima Squadra, nessun minore, nessuna persona reale). Nessuna lettura
+  o scrittura su database; le chiamate di scrittura vengono bloccate.
+
+### Risultati
+
+| Pagina | Formato | Violazioni axe prima → dopo | Bersagli < 44 px prima → dopo |
+|---|---|---|---|
+| `/guida` | 390 / 1440 | 1 / 1 → 0 / 0 | 28 / 33 → 0 / 0 |
+| `/accedi` | 390 / 1440 | 1 / 1 → 0 / 0 | 18 / 23 → 0 / 0 |
+| `/registrati` | 390 / 1440 | 1 / 1 → 0 / 0 | 17 / 22 → 0 / 0 |
+| `/privacy` | 390 / 1440 | 1 / 1 → 0 / 0 | 17 / 22 → 0 / 0 |
+| `/famiglia` | 390 / 1440 | 1 / 2 → 0 / 0 | 17 / 33 → 0 / 0 |
+| `/gestionale/mister` | 390 / 1440 | 0 / 0 → 0 / 0 | 86 / 99 → 0 / 0 |
+| `/segreteria/certificati` | 390 / 1440 | 0 / 0 → 0 / 0 | 9 / 22 → 0 / 0 |
+
+Nessuno scorrimento orizzontale su nessuna pagina. Nessuna violazione su etichette, punti di riferimento (landmark), nomi
+accessibili o ordine dei titoli.
+
+### Cosa è stato corretto
+1. **`aria-controls` non valido** (tutte le pagine pubbliche): il pulsante del menu puntava a `#sa-menu`, che esiste solo a
+   menu aperto. Tolto l'attributo.
+2. **Contrasto** del pulsante "Ci sarò" scelto (`/famiglia`): verde `#128a2e` con testo bianco 4,46:1 → `#0f7a28` 5,48:1.
+3. **Piè di pagina**: link e "Preferenze cookie" alti 20 px → 44 px; testi su sfondo sfumato da opacità 60–80% a 90%
+   (l'indirizzo e le righe piccole erano ~4:1 nel punto più chiaro dello sfondo, ora ≥ 5,7:1).
+4. **Barra in alto e menu**: voci del menu principale desktop 40 → 44 px; voci del menu completo e "Safeguarding" 44 px.
+5. **Area interna** (tutte le aree di lavoro): voci della barra laterale 40 → 44 px, ricerca 40 → 44 px, pulsante
+   "Copia link" 34 → 44 px, "Apri il file" delle fonti 36 → 44 px.
+6. **Distinta** (`/gestionale/mister`): Titolare/Riserva, C e VC 32 → 44 px; casella "in distinta" con area di tocco 44×44;
+   numero di maglia, "Ricarica", "Aggiungi in panchina", "Copia testo", "Stampa" 44 px.
+7. **Certificati**: filtri 36 → 44 px, ricerca e scelta squadra 44 px. **Accedi**: "Torna alle aree" 44 px. **Notifiche**:
+   "Disattiva" 44 px.
+- Test: `src/lib/touch-targets.test.ts` (nessun controllo sotto 44 px nei file corretti, menu senza riferimento rotto,
+  verde "Ci sarò" con contrasto AA).
+
+### Aperto (non bloccante)
+- axe non sa calcolare il contrasto dei testi su sfondi sfumati (piè di pagina, fascia numeri delle aree interne): verificati
+  a mano sul colore più chiaro della sfumatura; ricontrollare se cambiano i colori.
+- Pagine non incluse in questo giro (home, calendario, squadre, impianti): stessi componenti di testata e piè di pagina già
+  corretti; vanno aggiunte allo script in un prossimo passaggio.
+
+### Ripetere la verifica
+`cd apps/superapp && npm run build && PORT=4173 node .output/server/index.mjs &` poi
+`A11Y_BASE_URL=http://localhost:4173 A11Y_OUT=/tmp/a11y node scripts/a11y-audit.mjs` (`A11Y_SHOTS=1` salva le schermate,
+`A11Y_ONLY=famiglia,mister` limita le pagine). Esce con errore se trova violazioni.

@@ -140,7 +140,7 @@ export function SiteHeader() {
               key={n.to}
               to={n.to}
               aria-current={isActive(pathname, n.to) ? "page" : undefined}
-              className={`scd-focus relative rounded-md px-1 py-2 text-[16px] font-semibold transition-colors duration-150 ${isActive(pathname, n.to) ? "text-white after:absolute after:inset-x-1 after:-bottom-0.5 after:h-[3px] after:rounded-full after:bg-[var(--out-yellow)]" : "text-[#e6f3fc] hover:text-white"}`}
+              className={`scd-focus relative inline-flex min-h-11 items-center rounded-md px-1 text-[16px] font-semibold transition-colors duration-150 ${isActive(pathname, n.to) ? "text-white after:absolute after:inset-x-1 after:bottom-0.5 after:h-[3px] after:rounded-full after:bg-[var(--out-yellow)]" : "text-[#e6f3fc] hover:text-white"}`}
             >
               {n.label}
             </Link>
@@ -151,7 +151,6 @@ export function SiteHeader() {
           <button
             className="scd-focus flex size-11 shrink-0 items-center justify-center rounded-[10px] border border-white/25 text-white transition-colors duration-150 hover:bg-white/10"
             aria-label="Apri menu completo"
-            aria-controls="sa-menu"
             onClick={openMenu}
           >
             <Menu className="size-5" aria-hidden="true" />
@@ -206,14 +205,14 @@ export function MenuDrawer() {
             </p>
             <div className="grid grid-cols-2 gap-x-2">
               {g.items.map((n) => (
-                <Link key={n.to} to={n.to} onClick={() => setOpen(false)} className={`rounded-lg px-2 py-2.5 text-[15px] font-medium ${isActive(pathname, n.to) ? "font-bold text-[var(--scd-blue)]" : ""}`}>
+                <Link key={n.to} to={n.to} onClick={() => setOpen(false)} className={`flex min-h-11 items-center rounded-lg px-2 py-2 text-[15px] font-medium ${isActive(pathname, n.to) ? "font-bold text-[var(--scd-blue)]" : ""}`}>
                   {n.label}
                 </Link>
               ))}
             </div>
           </div>
         ))}
-        <Link to="/safeguarding" onClick={() => setOpen(false)} className="mt-2 flex items-center gap-2 px-2 py-2 text-sm font-semibold text-[var(--scd-blue)]">
+        <Link to="/safeguarding" onClick={() => setOpen(false)} className="mt-2 flex min-h-11 items-center gap-2 px-2 py-2 text-sm font-semibold text-[var(--scd-blue)]">
           <ShieldCheck className="size-4" /> Safeguarding · segnalazioni riservate
         </Link>
       </nav>
@@ -288,24 +287,24 @@ export function SiteFooter() {
           <ClubCrestOfficial size={44} />
           <p className="font-brand text-xl leading-none"><span className="text-[#ffd600]">COLICO</span>DERVIESE</p>
         </div>
-        <p className="opacity-75">
+        <p className="opacity-90">
           {CLUB_NAME} · {CLUB_PROFILE.contacts.address} · Alto Lago di Como
           <br />
           <span className="select-text">{CLUB_PROFILE.contacts.email}</span> · PEC <span className="select-text">{CLUB_PROFILE.contacts.pec}</span>
         </p>
-        <nav className="flex flex-wrap gap-x-5 gap-y-2" aria-label="Link a piè di pagina">
+        <nav className="flex flex-wrap gap-x-5" aria-label="Link a piè di pagina">
           {[...footerNav, ...footerLinks].map((n) => (
-            <Link key={n.to + n.label} to={n.to} className="opacity-80 hover:opacity-100">{n.label}</Link>
+            <Link key={n.to + n.label} to={n.to} className="scd-focus inline-flex min-h-11 min-w-11 items-center justify-center opacity-90 hover:opacity-100">{n.label}</Link>
           ))}
         </nav>
-        <span className="flex flex-wrap gap-4">
-          <a href="/privacy" className="text-sm underline opacity-80 hover:opacity-100">Privacy</a>
-          <button type="button" onClick={openCookiePrefs} className="text-sm underline opacity-80 hover:opacity-100">Preferenze cookie</button>
+        <span className="flex flex-wrap gap-x-5">
+          <a href="/privacy" className="scd-focus inline-flex min-h-11 items-center text-sm underline opacity-90 hover:opacity-100">Privacy</a>
+          <button type="button" onClick={openCookiePrefs} className="scd-focus inline-flex min-h-11 items-center text-sm underline opacity-90 hover:opacity-100">Preferenze cookie</button>
         </span>
-        <p className="text-xs opacity-60">
+        <p className="text-xs opacity-90">
           Super App ufficiale della {CLUB_NAME} · versione del {BUILD_STAMP}.
         </p>
-        <p className="text-xs opacity-60">
+        <p className="text-xs opacity-90">
           © {new Date().getFullYear()} Francesco Coppola · ideato e creato da Francesco Coppola, concesso in uso gratuito alla {CLUB_NAME}. Stemma, loghi e marchi appartengono ai rispettivi titolari.
         </p>
       </div>

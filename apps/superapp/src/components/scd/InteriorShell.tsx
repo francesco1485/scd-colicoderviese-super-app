@@ -46,7 +46,7 @@ function Rail({ groups, activeAreaId, roleLabel, onNavigate }: { groups: RailGro
               const link = areaLink(it.id);
               const Icon = AREA_ICON[it.icon];
               const active = it.id === activeAreaId;
-              const cls = "flex h-10 items-center gap-2.5 rounded-[10px] px-2.5 text-[15px] font-semibold";
+              const cls = "flex h-11 items-center gap-2.5 rounded-[10px] px-2.5 text-[15px] font-semibold";
               if (!link.href) {
                 return (
                   <div key={it.id} className={`${cls} text-white/65`} aria-disabled="true">
@@ -103,7 +103,7 @@ function PathChip({ path }: { path: string }) {
         type="button"
         onClick={copy}
         aria-label={`Copia il link diretto ${path}`}
-        className="scd-focus inline-flex h-[34px] flex-none items-center gap-2 rounded-full bg-[var(--in-info-bg)] px-3 text-[14px] font-semibold text-[var(--in-info)] transition-transform duration-150 active:scale-[0.97]"
+        className="scd-focus inline-flex h-11 flex-none items-center gap-2 rounded-full bg-[var(--in-info-bg)] px-3 text-[14px] font-semibold text-[var(--in-info)] transition-transform duration-150 active:scale-[0.97]"
       >
         {state === "copied" ? <Check className="size-4" strokeWidth={2} aria-hidden="true" /> : <Link2 className="size-4" strokeWidth={1.8} aria-hidden="true" />}
         {path}
@@ -133,7 +133,7 @@ function AreaSearch() {
         if (firstLive?.href) void navigate({ to: firstLive.href as never });
       }}
     >
-      <label className="flex h-10 items-center gap-2 rounded-[10px] border border-[var(--in-line)] bg-white px-3 text-[var(--in-sub)] focus-within:border-[var(--in-focus)] focus-within:ring-2 focus-within:ring-[var(--in-focus)]/30">
+      <label className="flex h-11 items-center gap-2 rounded-[10px] border border-[var(--in-line)] bg-white px-3 text-[var(--in-sub)] focus-within:border-[var(--in-focus)] focus-within:ring-2 focus-within:ring-[var(--in-focus)]/30">
         <Search className="size-[18px] flex-none" strokeWidth={1.8} aria-hidden="true" />
         <span className="sr-only">Cerca in tutta la SCD</span>
         <input

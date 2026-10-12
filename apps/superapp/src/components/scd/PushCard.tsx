@@ -113,7 +113,7 @@ export function PushCard() {
             </button>
           )}
           {state === "on" && (
-            <button type="button" onClick={turnOff} className="scd-focus mt-2 h-10 text-[14px] font-semibold text-[var(--in-sub)] underline" data-testid="push-off">
+            <button type="button" onClick={turnOff} className="scd-focus mt-2 h-11 text-[14px] font-semibold text-[var(--in-sub)] underline" data-testid="push-off">
               Disattiva su questo telefono
             </button>
           )}

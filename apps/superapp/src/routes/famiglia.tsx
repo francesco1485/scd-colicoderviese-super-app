@@ -140,7 +140,7 @@ function CallupCard({ c, onAnswered }: { c: MyCallup; onAnswered: (r: CallupResp
       </ul>
       <div className="mt-3 grid grid-cols-2 gap-2">
         <button type="button" disabled={busy} aria-pressed={c.response === "CONFIRMED"} onClick={() => void send("CONFIRMED")}
-          className={`scd-focus inline-flex h-12 items-center justify-center gap-2 rounded-[10px] text-[16px] font-semibold disabled:opacity-60 ${c.response === "CONFIRMED" ? "bg-[#128a2e] text-white" : "border border-[#128a2e] bg-white text-[#0e6b24]"}`}>
+          className={`scd-focus inline-flex h-12 items-center justify-center gap-2 rounded-[10px] text-[16px] font-semibold disabled:opacity-60 ${c.response === "CONFIRMED" ? "bg-[#0f7a28] text-white" : "border border-[#0f7a28] bg-white text-[#0e6b24]"}`}>
           <Check className="size-[18px]" strokeWidth={2.4} aria-hidden="true" />Ci sarò
         </button>
         <button type="button" disabled={busy} aria-pressed={c.response === "DECLINED"} onClick={() => void send("DECLINED")}

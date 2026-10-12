@@ -118,7 +118,7 @@ export function SourcesBox({ id, className = "" }: { id: WorkAreaId; className?:
                 href={s.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="scd-focus inline-flex h-9 items-center gap-1.5 rounded-[10px] border border-[#b9d5ef] bg-white px-3 text-[14px] font-semibold text-[var(--in-info)] transition-colors duration-150 hover:bg-[var(--in-info-bg)]"
+                className="scd-focus inline-flex h-11 items-center gap-1.5 rounded-[10px] border border-[#b9d5ef] bg-white px-3 text-[14px] font-semibold text-[var(--in-info)] transition-colors duration-150 hover:bg-[var(--in-info-bg)]"
               >
                 Apri il file
                 <ExternalLink className="size-4" strokeWidth={1.8} aria-hidden="true" />

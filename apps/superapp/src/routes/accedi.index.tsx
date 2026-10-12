@@ -179,7 +179,7 @@ function Accedi() {
             I ragazzi sotto i 14 anni entrano tramite l'account del genitore o tutore; dai 14 anni possono avere il proprio accesso con il consenso della famiglia.
           </p>
           {next && <p className="px-1 text-[13px]">Dopo l'accesso torni a <code className="rounded bg-[#eaf2fc] px-1">{next}</code>.</p>}
-          <button type="button" onClick={() => void navigate({ to: "/aree" })} className="scd-focus justify-self-start text-[14px] font-semibold text-[var(--scd-blue)] underline-offset-2 hover:underline">
+          <button type="button" onClick={() => void navigate({ to: "/aree" })} className="scd-focus inline-flex min-h-11 items-center justify-self-start text-[14px] font-semibold text-[var(--scd-blue)] underline-offset-2 hover:underline">
             Torna alle aree
           </button>
         </aside>

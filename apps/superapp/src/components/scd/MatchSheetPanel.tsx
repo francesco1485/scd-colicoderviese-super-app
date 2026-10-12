@@ -144,7 +144,7 @@ export function MatchSheetPanel({ eventId, heading, refreshKey }: { eventId: str
         <Chip tone={data.status === "READY" ? "ok" : data.status === "DRAFT" ? "warn" : "mute"}>{data.status === "READY" ? "Pronta" : data.status === "DRAFT" ? "Bozza" : "Da preparare"}</Chip>
         <Chip tone={draft.players.length > rules.maxListed ? "crit" : "info"}>In lista {draft.players.length}{rules.maxListed < 40 ? `/${rules.maxListed}` : ""}</Chip>
         {hasStarters && <Chip tone={starters > (rules.maxStarters ?? 0) ? "crit" : "info"}>Titolari {starters}/{rules.maxStarters}</Chip>}
-        <button type="button" onClick={() => void reload()} className="scd-focus ml-auto inline-flex h-9 items-center gap-1.5 rounded-[10px] px-2 text-[13.5px] font-semibold text-[var(--in-sub)]" aria-label="Ricarica convocati e distinta">
+        <button type="button" onClick={() => void reload()} className="scd-focus ml-auto inline-flex h-11 items-center gap-1.5 rounded-[10px] px-2 text-[13.5px] font-semibold text-[var(--in-sub)]" aria-label="Ricarica convocati e distinta">
           <RefreshCw className="size-4" aria-hidden="true" />
           Ricarica
         </button>
@@ -159,7 +159,9 @@ export function MatchSheetPanel({ eventId, heading, refreshKey }: { eventId: str
             return (
               <li key={c.athleteId} className={`border-t border-[var(--in-line)] px-3 py-2 first:border-t-0 ${p ? "" : "bg-[#fbfcfe]"}`}>
                 <div className="flex min-h-11 items-center gap-3">
-                  <input type="checkbox" checked={Boolean(p)} disabled={locked} onChange={() => toggleListed(c.athleteId, c.lastShirt)} className="scd-focus size-5 flex-none accent-[var(--scd-blue)]" aria-label={`${c.displayName} in distinta`} />
+                  <label className="-ml-3 flex size-11 flex-none cursor-pointer items-center justify-center">
+                    <input type="checkbox" checked={Boolean(p)} disabled={locked} onChange={() => toggleListed(c.athleteId, c.lastShirt)} className="scd-focus size-5 accent-[var(--scd-blue)]" aria-label={`${c.displayName} in distinta`} />
+                  </label>
                   <span className="min-w-0 flex-1">
                     <b className="block truncate text-[15px] font-semibold">{c.displayName}</b>
                     <span className="block text-[13px] text-[var(--in-sub)]">{c.birthYear ?? "anno non indicato"} · {RESPONSE_LABEL[c.response]}</span>
@@ -167,7 +169,7 @@ export function MatchSheetPanel({ eventId, heading, refreshKey }: { eventId: str
                   {p && (
                     <label className="flex items-center gap-1 text-[13px] font-semibold text-[var(--in-sub)]">
                       N°
-                      <input type="number" inputMode="numeric" min={1} max={99} value={p.shirt} disabled={locked} onChange={(e) => patchPlayer(c.athleteId, { shirt: Number(e.target.value) })} className="scd-focus h-10 w-14 rounded-[8px] border border-[var(--in-line)] bg-white px-2 text-center text-[15px] font-semibold text-[var(--in-ink)] tabular-nums" />
+                      <input type="number" inputMode="numeric" min={1} max={99} value={p.shirt} disabled={locked} onChange={(e) => patchPlayer(c.athleteId, { shirt: Number(e.target.value) })} className="scd-focus h-11 w-14 rounded-[8px] border border-[var(--in-line)] bg-white px-2 text-center text-[15px] font-semibold text-[var(--in-ink)] tabular-nums" />
                     </label>
                   )}
                 </div>
@@ -176,14 +178,14 @@ export function MatchSheetPanel({ eventId, heading, refreshKey }: { eventId: str
                     {hasStarters && (
                       <span className="inline-flex overflow-hidden rounded-[8px] border border-[var(--in-line)]" role="group" aria-label="Titolare o riserva">
                         {([true, false] as const).map((st) => (
-                          <button key={String(st)} type="button" disabled={locked} aria-pressed={p.starter === st} onClick={() => patchPlayer(c.athleteId, { starter: st })} className={`h-8 px-2.5 text-[13px] font-semibold ${p.starter === st ? "bg-[var(--in-info)] text-white" : "bg-white text-[var(--in-ink)]"}`}>
+                          <button key={String(st)} type="button" disabled={locked} aria-pressed={p.starter === st} onClick={() => patchPlayer(c.athleteId, { starter: st })} className={`scd-focus h-11 px-3 text-[13px] font-semibold ${p.starter === st ? "bg-[var(--in-info)] text-white" : "bg-white text-[var(--in-ink)]"}`}>
                             {st ? "Titolare" : "Riserva"}
                           </button>
                         ))}
                       </span>
                     )}
                     {(["captain", "vice"] as const).map((k) => (
-                      <button key={k} type="button" disabled={locked} aria-pressed={draft[k] === c.athleteId} onClick={() => setDraft((d) => ({ ...d, [k]: d[k] === c.athleteId ? null : c.athleteId, ...(k === "captain" && d.vice === c.athleteId ? { vice: null } : {}), ...(k === "vice" && d.captain === c.athleteId ? { captain: null } : {}) }))} className={`h-8 rounded-[8px] border px-2.5 text-[13px] font-bold ${draft[k] === c.athleteId ? "border-[var(--scd-yellow,#f5c400)] bg-[var(--scd-yellow,#f5c400)] text-[#0d1b3e]" : "border-[var(--in-line)] bg-white text-[var(--in-sub)]"}`}>
+                      <button key={k} type="button" disabled={locked} aria-pressed={draft[k] === c.athleteId} onClick={() => setDraft((d) => ({ ...d, [k]: d[k] === c.athleteId ? null : c.athleteId, ...(k === "captain" && d.vice === c.athleteId ? { vice: null } : {}), ...(k === "vice" && d.captain === c.athleteId ? { captain: null } : {}) }))} className={`scd-focus h-11 min-w-11 rounded-[8px] border px-2.5 text-[13px] font-bold ${draft[k] === c.athleteId ? "border-[var(--scd-yellow,#f5c400)] bg-[var(--scd-yellow,#f5c400)] text-[#0d1b3e]" : "border-[var(--in-line)] bg-white text-[var(--in-sub)]"}`}>
                         {k === "captain" ? "C" : "VC"}
                       </button>
                     ))}
@@ -217,7 +219,7 @@ export function MatchSheetPanel({ eventId, heading, refreshKey }: { eventId: str
           <button
             type="button"
             onClick={() => setDraft((d) => ({ ...d, staff: [...d.staff, { role: d.staff.some((x) => x.role === "DIRIGENTE_ACCOMPAGNATORE") ? "ALLENATORE" : "DIRIGENTE_ACCOMPAGNATORE", personId: data.candidates[0]?.personId ?? "" }] }))}
-            className="scd-focus mt-2 inline-flex h-10 items-center gap-1.5 rounded-[10px] px-2 text-[14px] font-semibold text-[var(--in-info)]"
+            className="scd-focus mt-2 inline-flex h-11 items-center gap-1.5 rounded-[10px] px-2 text-[14px] font-semibold text-[var(--in-info)]"
           >
             <Plus className="size-4" aria-hidden="true" />
             Aggiungi in panchina
@@ -260,11 +262,11 @@ export function MatchSheetPanel({ eventId, heading, refreshKey }: { eventId: str
           <div className="flex flex-col gap-2 border-t border-[var(--in-line)] p-3">
             <pre className="m-0 max-h-72 overflow-auto whitespace-pre-wrap rounded-[10px] bg-[#f6f9fd] p-3 text-[13.5px] leading-relaxed">{text}</pre>
             <div className="flex flex-wrap gap-2">
-              <button type="button" onClick={() => void copy()} className="scd-focus inline-flex h-10 items-center gap-2 rounded-[10px] border border-[var(--in-line)] bg-white px-3 text-[14px] font-semibold">
+              <button type="button" onClick={() => void copy()} className="scd-focus inline-flex h-11 items-center gap-2 rounded-[10px] border border-[var(--in-line)] bg-white px-3 text-[14px] font-semibold">
                 <ClipboardCopy className="size-4" aria-hidden="true" />
                 Copia testo
               </button>
-              <button type="button" onClick={print} className="scd-focus inline-flex h-10 items-center gap-2 rounded-[10px] border border-[var(--in-line)] bg-white px-3 text-[14px] font-semibold">
+              <button type="button" onClick={print} className="scd-focus inline-flex h-11 items-center gap-2 rounded-[10px] border border-[var(--in-line)] bg-white px-3 text-[14px] font-semibold">
                 <Printer className="size-4" aria-hidden="true" />
                 Stampa
               </button>

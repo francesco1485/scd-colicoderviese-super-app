@@ -99,9 +99,9 @@ function CertificatiPage({ initial, preview }: { initial: CertificatesData; prev
                   <div className="flex flex-wrap items-center gap-2">
                     <label className="flex min-w-[200px] flex-1 items-center gap-2 rounded-[10px] border border-[var(--in-line)] bg-white px-3">
                       <Search className="size-4 text-[var(--in-sub)]" aria-hidden="true" />
-                      <input type="search" placeholder="Cerca nome o anno" value={filter.q ?? ""} onChange={(e) => setFilter({ ...filter, q: e.target.value })} className="h-10 w-full bg-transparent text-[15px] outline-none" aria-label="Cerca atleta" />
+                      <input type="search" placeholder="Cerca nome o anno" value={filter.q ?? ""} onChange={(e) => setFilter({ ...filter, q: e.target.value })} className="h-11 w-full bg-transparent text-[15px] outline-none" aria-label="Cerca atleta" />
                     </label>
-                    <select value={filter.team ?? ""} onChange={(e) => setFilter({ ...filter, team: e.target.value || undefined })} className="h-10 rounded-[10px] border border-[var(--in-line)] bg-white px-2 text-[14.5px]" aria-label="Squadra">
+                    <select value={filter.team ?? ""} onChange={(e) => setFilter({ ...filter, team: e.target.value || undefined })} className="scd-focus h-11 rounded-[10px] border border-[var(--in-line)] bg-white px-2 text-[14.5px]" aria-label="Squadra">
                       <option value="">Tutte le squadre</option>
                       {teams.map((t) => (
                         <option key={t.code} value={t.code}>{t.name}</option>
@@ -113,7 +113,7 @@ function CertificatiPage({ initial, preview }: { initial: CertificatesData; prev
                       const n = f.id === "da-fare" ? counts.total - counts["a-posto"] : f.id === "tutti" ? counts.total : counts[f.id];
                       const on = (filter.todo ?? "da-fare") === f.id;
                       return (
-                        <button key={f.id} type="button" aria-pressed={on} onClick={() => setFilter({ ...filter, todo: f.id })} className={`scd-focus h-9 shrink-0 rounded-full px-3 text-[14px] font-semibold ${on ? "bg-[var(--in-info)] text-white" : "bg-[#eef3f9] text-[var(--in-ink)]"}`}>
+                        <button key={f.id} type="button" aria-pressed={on} onClick={() => setFilter({ ...filter, todo: f.id })} className={`scd-focus h-11 shrink-0 rounded-full px-3.5 text-[14px] font-semibold ${on ? "bg-[var(--in-info)] text-white" : "bg-[#eef3f9] text-[var(--in-ink)]"}`}>
                           {f.label} <span className="tabular-nums opacity-80">{n}</span>
                         </button>
                       );

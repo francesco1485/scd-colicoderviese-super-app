@@ -361,3 +361,14 @@ prossimi impegni e "ci sarò" in primo piano). Desktop invariato.
 - `/segreteria`: la distinta non è più "in R20": il pulsante porta a /gestionale/mister dove si prepara.
 - `config/superapp-areas.v1.json`: stato "live" per le aree che funzionano con dati reali in staging; significato degli stati scritto nel registro.
 - `PRODUCT.md`: decisioni su indirizzo e login aggiornate; aperti N1 (identità) e N2 (master per dominio).
+
+## L2 — Accessibilità per il lancio (axe-core, bersagli 44 px) · 2026-10-12
+- Stato: DONE su staging/superapp. Dettaglio e numeri prima/dopo in `docs/LAUNCH_QUALITY.md` (sezione L2).
+- Nuovo `scripts/a11y-audit.mjs`: axe-core (WCAG 2.2 A/AA) + controllo bersagli ≥ 44 px a 390×844 e 1440×900; pagine riservate con
+  dati di prova inventati intercettando le funzioni server (nessun database, scritture bloccate). `axe-core` in devDependencies.
+- Pagine: /guida, /accedi, /registrati, /privacy, /famiglia, /gestionale/mister, /segreteria/certificati — da 8 violazioni axe e
+  ~450 bersagli piccoli a 0 e 0.
+- Corretti: `aria-controls` rotto del menu, contrasto "Ci sarò", piè di pagina (altezza link, opacità testi), barra laterale e
+  ricerca delle aree interne, "Copia link", fonti, distinta (Titolare/Riserva/C/VC, casella, maglia), filtri certificati.
+- Test: `touch-targets.test.ts` (8). Suite 521.
+- Aperto: estendere lo script a home, calendario, squadre, impianti.
