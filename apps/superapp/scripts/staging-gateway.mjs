@@ -25,6 +25,18 @@ const USER = String(process.env.SCD_STAGING_USER || "scd-staging");
 const PASSWORD = String(process.env.SCD_STAGING_PASSWORD || "");
 const COMMIT = process.env.RENDER_GIT_COMMIT || process.env.SCD_DEPLOY_COMMIT || null;
 
+// Public launch switch (2026-10-12, Direzione): with SCD_PUBLIC=1 the gateway steps aside and the built server
+// answers directly on the public port, no password, no noindex. Everything else stays as it is.
+if (process.env.SCD_PUBLIC === "1") {
+  const open = spawn(process.execPath, [serverEntry], {
+    cwd: appRoot,
+    env: { ...process.env, PORT: String(PUBLIC_PORT), NITRO_PORT: String(PUBLIC_PORT) },
+    stdio: "inherit",
+  });
+  open.on("exit", (code) => process.exit(code ?? 1));
+  for (const sig of ["SIGTERM", "SIGINT"]) process.on(sig, () => open.kill(sig));
+  console.log(`[staging-gateway] SCD_PUBLIC=1: serving openly on :${PUBLIC_PORT}`);
+} else {
 if (PASSWORD.length < 20) {
   console.error("[staging-gateway] SCD_STAGING_PASSWORD missing or shorter than 20 characters: refusing to start.");
   process.exit(1);
@@ -100,3 +112,4 @@ const server = http.createServer((req, res) => {
 server.listen(PUBLIC_PORT, () => {
   console.log(`[staging-gateway] protected staging on :${PUBLIC_PORT} -> 127.0.0.1:${INTERNAL_PORT}`);
 });
+}
