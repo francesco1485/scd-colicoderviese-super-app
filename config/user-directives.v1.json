@@ -1997,6 +1997,29 @@
           "sensitive areas (safeguarding, health, payments, minors) follow the reserved rules"
         ]
       }
+    },
+    {
+      "sourceDate": "2026-10-12",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-085",
+      "name": "DOCUMENTS_BY_AUDIENCE_DEDICATED_CRMS_WHATSAPP",
+      "sourceQuoteFragments": [
+        "Queste web app a supporto della super app da poter gestire al meglio i momenti",
+        "io voglio che i documenti vengono catalogati e a disposizione delle persone che sono famiglie, atleti e staff, dirigenti e gestione complessiva",
+        "Bisogna capire come fare anche a gestire e creare dei CRM dedicati e interni per ogni cosa",
+        "Poi vedere come agganciare anche whatsapp business e altro"
+      ],
+      "normalizedCommand": {
+        "rule": "Documents are catalogued once and published by audience (public, all members, own family, team staff, area managers, Direzione, safeguarding-reserved) through a documents web app on the Cervellone catalogue; files stay on Drive/Gmail. Dedicated CRMs per domain (families/athletes, sponsors, suppliers, public bodies, sports clubs, staff/volunteers, fans/cards, media) are pipelines and views on one shared base of people and organizations, never separate registries. Channels: in-app and push first, club e-mail, WhatsApp Business Platform for reach-critical notices (doorbell only, data in the app, adults with recorded consent), SMS as fallback; other integrations: Google Calendar, Gmail, Canva, bank weekly file, SumUp exports, FIGC/LND via exports. Canonical: project doc claude/SCD_MACCHINE_v1.md section 13.",
+        "scope": "PRODUCT_ARCHITECTURE",
+        "constraints": [
+          "no minors' names or personal data in WhatsApp/SMS/push texts",
+          "no document becomes public without a person's confirmation",
+          "Meta business verification and credentials handled only by the Direzione",
+          "no subscriptions or paid messaging without approval and a monthly cap"
+        ]
+      }
     }
   ],
   "completionGate": {
