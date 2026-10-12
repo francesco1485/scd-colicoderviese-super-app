@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { dayCode, demandSummary, driverWarnings, parseBoard, planErrorMessage, runClash, runsForEvent, workQueue, type DriverRule, type TransportBoard, type TransportRun } from "./transport";
+import { dayCode, demandSummary, draftErrors, draftFromEvent, draftFromRun, draftPayload, draftWarnings, driverWarnings, emptyDraft, expiryTone, parseBoard, planErrorMessage, runClash, runsForEvent, upcomingRuns, workQueue, type DriverRule, type TransportBoard, type TransportRun } from "./transport";
 
 const rules: DriverRule[] = [
   { code: "DISP-001", driver: "DRV-001", days: "TUTTI", from: null, to: "20:00", status: "DISPONIBILE FINO A", kind: "ORDINARIA", reason: "Limite massimo indicato", validFrom: "2026-09-26", validTo: "2027-07-30" },
@@ -122,5 +122,48 @@ describe("runsForEvent and messages", () => {
     expect(planErrorMessage("vehicle_busy")).toContain("già su un'altra corsa");
     expect(planErrorMessage("forbidden")).toContain("responsabile trasporti");
     expect(planErrorMessage(undefined)).toContain("Riprova");
+  });
+});
+
+describe("planner desk", () => {
+  it("drafts an away trip from the official calendar without inventing times", () => {
+    const d = draftFromEvent({ id: "EVT-9", date: "2026-10-18", opponent: "Real Lecco", teamLabel: "U16 Élite", place: "Lecco · Campo Bione" });
+    expect(d).toMatchObject({ id: null, eventId: "EVT-9", date: "2026-10-18", title: "U16 Élite a Real Lecco", destination: "Lecco · Campo Bione", departure: "", kind: "TRASFERTA", status: "PIANIFICATA" });
+    expect(draftFromEvent({ id: "E", date: "2026-10-18", opponent: " ", teamLabel: "U15", place: "" }).title).toBe("U15 a avversario da definire");
+  });
+
+  it("blocks drafts without date, departure or title and wrong times", () => {
+    expect(draftErrors(emptyDraft("2026-10-17"))).toEqual(["Scrivi l'orario di partenza (es. 13:30).", "Dai un titolo alla corsa."]);
+    const ok = { ...emptyDraft("2026-10-17"), departure: "13:30", title: "U16" };
+    expect(draftErrors(ok)).toEqual([]);
+    expect(draftErrors({ ...ok, returnEstimate: "12:00" })).toContain("Il rientro deve essere dopo la partenza.");
+    expect(draftErrors({ ...ok, passengers: "abc" })).toContain("I passeggeri sono un numero da 0 a 60.");
+  });
+
+  it("warns on clashes, unconfirmed seats and seat overflow, never on cancelled drafts", () => {
+    const d = { ...emptyDraft("2026-10-17"), departure: "10:00", title: "U15", vehicleId: "v1", passengers: "6" };
+    const b = { ...board, runs: [run({})] };
+    const w = draftWarnings(b, d);
+    expect(w).toContain("Quel pulmino è già su un'altra corsa nella stessa fascia oraria.");
+    expect(w.some((x) => x.includes("non sono confermati"))).toBe(true);
+    expect(draftWarnings(b, { ...d, date: "2026-10-18", vehicleId: "v2", passengers: "9" })).toEqual(["BUS-02 ha 8 posti passeggeri: ne servono 9."]);
+    expect(draftWarnings(b, { ...d, status: "ANNULLATA" })).toEqual([]);
+  });
+
+  it("round-trips a saved trip and sends nulls for empty fields", () => {
+    const r = board.runs[0]!;
+    const d = draftFromRun(r);
+    expect(d).toMatchObject({ id: "r1", departure: "08:00", vehicleId: "", passengers: "" });
+    expect(draftPayload(d)).toMatchObject({ id: "r1", returnEstimate: null, vehicleId: null, passengers: null, title: "U16" });
+    expect(draftPayload({ ...d, passengers: "7", note: "  ritrovo davanti alla Club House " })).toMatchObject({ passengers: 7, note: "ritrovo davanti alla Club House" });
+  });
+
+  it("colours vehicle deadlines and lists upcoming live trips", () => {
+    expect(expiryTone(null, "2026-10-12")).toBe("mute");
+    expect(expiryTone("2026-10-01", "2026-10-12")).toBe("crit");
+    expect(expiryTone("2026-10-30", "2026-10-12")).toBe("warn");
+    expect(expiryTone("2027-01-31", "2026-10-12")).toBe("ok");
+    const runs = [run({ id: "a", date: "2026-10-18", departure: "09:00" }), run({ id: "b", date: "2026-10-17", departure: "14:00" }), run({ id: "c", date: "2026-10-10" }), run({ id: "d", status: "ANNULLATA" })];
+    expect(upcomingRuns(runs, "2026-10-12").map((r) => r.id)).toEqual(["b", "a"]);
   });
 });

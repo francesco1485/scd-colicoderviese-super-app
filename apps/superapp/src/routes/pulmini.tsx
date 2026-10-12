@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { CircleCheck, MapPin, ShieldCheck, TriangleAlert } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -19,6 +19,9 @@ import { PULMINI_DEMAND, itDate, sortedCounts } from "@/lib/roster-aggregates";
 import { peopleForArea, type StaffPerson } from "@/lib/staff-roster";
 import { getStaffEmails, getStaffRoster } from "@/lib/staff-roster.functions";
 import { PULMINI_FLEET, factStamp, nextWeekend, weekendMatches } from "@/lib/work-areas";
+import { TransportFleetCard, TransportPlanner, TransportQueueCard } from "@/components/scd/TransportDesk";
+import { getTransportBoard, type TransportData } from "@/lib/transport.functions";
+import { draftFromEvent, runsForEvent, type RunDraft, type TransportBoard, type TransportRun } from "@/lib/transport";
 
 /** Pulmini (board Pulmini.dc.html): away trips of the coming weekend and the Master Flotta facts. */
 export const Route = createFileRoute("/pulmini")({
@@ -28,8 +31,8 @@ export const Route = createFileRoute("/pulmini")({
     const cal = loadCalendar();
     const runs = await getPulminiRuns();
     const quadro = loadQuadro();
-    const [roster, emails] = await Promise.all([getStaffRoster(), getStaffEmails()]);
-    return { gate, interior: true as const, groups: cal.groups, events: cal.events, sourceModifiedAt: cal.sourceModifiedAt, runs: runs.runs, runsAsOf: runs.asOf, quadroDays: quadro.days, quadroSlots: quadro.slots, people: roster.people, emails };
+    const [roster, emails, transport] = await Promise.all([getStaffRoster(), getStaffEmails(), getTransportBoard()]);
+    return { gate, interior: true as const, transport, groups: cal.groups, events: cal.events, sourceModifiedAt: cal.sourceModifiedAt, runs: runs.runs, runsAsOf: runs.asOf, quadroDays: quadro.days, quadroSlots: quadro.slots, people: roster.people, emails };
   },
   head: ({ loaderData }) => workAreaHead("pulmini", loaderData?.gate),
   component: PulminiRoute,
@@ -39,14 +42,17 @@ function PulminiRoute() {
   const data = Route.useLoaderData();
   return (
     <WorkAreaGateView id="pulmini" gate={data.gate}>
-      {data.interior && <PulminiPage groups={data.groups} events={data.events} sourceModifiedAt={data.sourceModifiedAt} preview={data.gate.preview} runs={data.runs} runsAsOf={data.runsAsOf} quadroDays={data.quadroDays} quadroSlots={data.quadroSlots} people={data.people} emails={data.emails} />}
+      {data.interior && <PulminiPage groups={data.groups} events={data.events} sourceModifiedAt={data.sourceModifiedAt} preview={data.gate.preview} runs={data.runs} runsAsOf={data.runsAsOf} quadroDays={data.quadroDays} quadroSlots={data.quadroSlots} people={data.people} emails={data.emails} transport={data.transport} />}
     </WorkAreaGateView>
   );
 }
 
 const F = PULMINI_FLEET;
 
-function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf, quadroDays, quadroSlots, people, emails }: { groups: PublicGroup[]; events: PublicEvent[]; sourceModifiedAt: string; preview: boolean; runs: PulminoRun[]; runsAsOf: string | null; quadroDays: string[]; quadroSlots: TrainingSlot[]; people: StaffPerson[]; emails: Record<string, string> }) {
+function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf, quadroDays, quadroSlots, people, emails, transport }: { groups: PublicGroup[]; events: PublicEvent[]; sourceModifiedAt: string; preview: boolean; runs: PulminoRun[]; runsAsOf: string | null; quadroDays: string[]; quadroSlots: TrainingSlot[]; people: StaffPerson[]; emails: Record<string, string>; transport: TransportData }) {
+  const board: TransportBoard | null = transport.board;
+  const [draft, setDraft] = useState<RunDraft | null>(null);
+  const router = useRouter();
   const transportManagers = peopleForArea(people, "pulmini");
   const now = useRomeNow();
   const trips = useMemo(() => weekendMatches(events, now.date, true), [events, now.date]);
@@ -54,7 +60,11 @@ function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf
   const byId = useMemo(() => new Map(groups.map((g) => [g.id, g])), [groups]);
   const teamColors = useMemo(() => new Map<string, TeamColor>(groups.map((g) => [g.id, { label: g.label, color: readableOnWhite(g.color ?? "#3b5683") }])), [groups]);
   const vansByEvent = useMemo(() => runsByEvent(runs), [runs]);
-  const weekendRuns = trips.reduce((n, e) => n + (vansByEvent.get(e.id)?.length ?? 0), 0);
+  const weekendRuns = trips.reduce((n, e) => n + (vansByEvent.get(e.id)?.length ?? 0) + (board ? runsForEvent(board.runs, e.id).length : 0), 0);
+  const organize = (e: PublicEvent, teamLabel: string, place: string) => {
+    setDraft(draftFromEvent({ id: e.id, date: e.date, opponent: titleCase(e.opponent || ""), teamLabel, place }));
+    requestAnimationFrame(() => document.getElementById("pul-organizza")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+  };
   const weekendKids = trips.reduce((n, e) => n + (vansByEvent.get(e.id) ?? []).reduce((a, r) => a + ridersTotal(r), 0), 0);
   const trainingRuns = useMemo(() => runsByTraining(runs), [runs]);
   const weekdayRuns = runs.filter((r) => r.training).length;
@@ -150,15 +160,21 @@ function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf
           ) : (
             <ol className="m-0 list-none p-0">
               {trips.map((e) => (
-                <TripRow key={e.id} e={e} group={byId.get(e.group)} vans={vansByEvent.get(e.id) ?? []} teams={teamColors} />
+                <TripRow key={e.id} e={e} group={byId.get(e.group)} vans={vansByEvent.get(e.id) ?? []} teams={teamColors} board={board} onOrganize={board?.canManage ? organize : null} />
               ))}
             </ol>
           )}
-          <SourceLine>Calendario ufficiale FIGC/LND, copia del {freshnessLabel(sourceModifiedAt)}. Le corse si salvano nel Master Pulmini: da qui non si crea nulla.</SourceLine>
+          <SourceLine>Calendario ufficiale FIGC/LND, copia del {freshnessLabel(sourceModifiedAt)}. {board?.canManage ? "\"Organizza\" apre la corsa già compilata con data, squadra e destinazione." : "Le corse le organizzano Direzione, Segreteria e responsabile trasporti."}</SourceLine>
         </Card>
+
+        {board && <TransportPlanner board={board} today={now.date} draft={draft} setDraft={setDraft} onSaved={() => router.invalidate()} />}
+        {transport.connected && !board && transport.error && (
+          <EmptyState title="Corse non disponibili">{transport.error} Riprova tra poco.</EmptyState>
+        )}
 
         </div>
         <div className="flex min-w-0 flex-col gap-[18px]">
+          {board && <TransportQueueCard board={board} now={new Date(`${now.date}T12:00:00Z`)} />}
           <Card id="pul-domanda" title="Chi ha chiesto il servizio" sub={`Dal Master Pulmini, solo conteggi, dato al ${itDate(PULMINI_DEMAND.asOf)}.`}>
             <div className="grid grid-cols-3 gap-2 px-4 pb-3 sm:px-[18px]" data-testid="pulmini-demand">
               <StatTile value={PULMINI_DEMAND.byStatus["ATTIVO"] ?? 0} of={PULMINI_DEMAND.users} label="iscritti attivi" />
@@ -192,6 +208,17 @@ function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf
             </dl>
           </Card>
 
+          {board ? (
+            <TransportFleetCard
+              board={board}
+              today={now.date}
+              managers={transportManagers.length > 0 ? (
+                <div className="border-t border-[var(--in-line)] px-4 py-3 sm:px-[18px]">
+                  <PeoplePins people={transportManagers} emails={emails} label="Responsabile trasporti" />
+                </div>
+              ) : null}
+            />
+          ) : (
           <Card id="pul-flotta" title="Flotta" sub="Dal Master Flotta e Trasporti: i posti non sono ancora confermati.">
             <div className="grid grid-cols-3 gap-2 px-4 pb-4 sm:px-[18px]" data-testid="fleet">
               <StatTile value={PULMINI_SERVICE.vehiclesInService} of={F.vehicles} label="in servizio su mezzi in flotta" />
@@ -211,6 +238,7 @@ function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf
             )}
             <SourceLine>{factStamp(F)}. Sul pulmino compare il nome dell'autista; i ragazzi sono figure senza nome.</SourceLine>
           </Card>
+          )}
 
           <Card id="pul-corse" title="Corse e passeggeri" sub={runsAsOf ? `Dal Master Pulmini, dato al ${runsAsOf.split("-").reverse().join("/")}.` : undefined}>
             <div className="px-4 pb-4 sm:px-[18px]">
@@ -239,7 +267,11 @@ function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf
   );
 }
 
-function TripRow({ e, group, vans, teams }: { e: PublicEvent; group: PublicGroup | undefined; vans: PulminoRun[]; teams: ReadonlyMap<string, TeamColor> }) {
+function TripRow({ e, group, vans, teams, board, onOrganize }: { e: PublicEvent; group: PublicGroup | undefined; vans: PulminoRun[]; teams: ReadonlyMap<string, TeamColor>; board: TransportBoard | null; onOrganize: ((e: PublicEvent, teamLabel: string, place: string) => void) | null }) {
+  const planned: TransportRun[] = board ? runsForEvent(board.runs, e.id) : [];
+  const first = planned[0];
+  const vehicleOf = (id: string | null) => board?.vehicles.find((v) => v.id === id)?.label;
+  const driverOf = (id: string | null) => board?.drivers.find((d) => d.id === id)?.name;
   const p = dateParts(e.date);
   const label = group?.label ?? "Squadra";
   const confirmed = e.timeConfirmed && e.venueConfirmed;
@@ -277,9 +309,9 @@ function TripRow({ e, group, vans, teams }: { e: PublicEvent; group: PublicGroup
         </div>
         {(
           [
-            ["Partenza", vans[0]?.departure],
-            ["Autista", vans[0]?.driver],
-            ["Mezzo", vans.length > 1 ? `${vans.length} pulmini` : vans[0]?.vehicle],
+            ["Partenza", vans[0]?.departure ?? first?.departure.slice(0, 5)],
+            ["Autista", vans[0]?.driver ?? (first ? driverOf(first.driverId) : undefined)],
+            ["Mezzo", vans.length + planned.length > 1 ? `${vans.length + planned.length} pulmini` : vans[0]?.vehicle ?? (first ? vehicleOf(first.vehicleId) : undefined)],
           ] as const
         ).map(([k, v]) => (
           <div key={k} className={`min-w-0 rounded-lg px-2.5 py-1.5 ${v ? "bg-[var(--in-info-bg)]" : "border border-dashed border-[#b9d5ef]"}`}>
@@ -295,7 +327,13 @@ function TripRow({ e, group, vans, teams }: { e: PublicEvent; group: PublicGroup
         ))}
       </dl>
       <div className="col-span-2 sm:col-span-1 sm:col-start-3 sm:row-start-1 sm:self-start">
-        <PendingButton reason="Le corse si creano nel Master Pulmini: collegamento in arrivo">Organizza</PendingButton>
+        {onOrganize ? (
+          <button type="button" onClick={() => onOrganize(e, label, place || titleCase(e.opponent || ""))} className="inline-flex h-11 items-center rounded-full bg-[var(--in-ink)] px-4 text-[14.5px] font-bold text-white" data-testid="organize-trip">
+            {planned.length ? "Aggiungi pulmino" : "Organizza"}
+          </button>
+        ) : (
+          <PendingButton reason="Le corse le organizzano Direzione, Segreteria e responsabile trasporti">Organizza</PendingButton>
+        )}
       </div>
       <div className="col-span-2 grid gap-4 rounded-2xl bg-[#f5f9ff] p-3 sm:col-span-3 md:grid-cols-2" data-testid="van-seat-maps">
         {(vans.length ? vans : [null]).map((run, i) => (

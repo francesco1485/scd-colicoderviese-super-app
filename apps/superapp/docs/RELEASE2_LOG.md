@@ -343,3 +343,9 @@ prossimi impegni e "ci sarò" in primo piano). Desktop invariato.
 ## 2026-10-12 — Biglietteria: regola tesserati e familiari confermata (UD-079)
 - `config/scd-ticketing.v1.json`: campionato = tesserato + fino a 2 familiari gratis (dal terzo ridotto); coppa, play off e play out = gratis solo il tesserato, pagano tutti gli altri. Tolta la tariffa U18 Élite (squadra ritirata).
 - Scheda partita: testo tesserati letto dalla configurazione (`membersShort`), non più scritto nel codice. Test match-extras estesi.
+
+## 2026-10-12 — Pulmini: copia del Master collegata e corse organizzabili dall'app (r74, UD-076)
+- `/pulmini` legge la copia del Master Flotta e Trasporti (`getTransportBoard`): "Da sistemare nel Master" (scadenze, posti, targhe, autisti, fermate, utenti, con la scheda del foglio), "Flotta e autisti" con scadenze assicurazione/revisione/bollo e patenti (telefoni solo a Direzione, Segreteria, responsabile trasporti), "Corse organizzate".
+- Organizza una corsa: dalla trasferta del weekend ("Organizza" la compila con data, squadra e destinazione) o "Nuova corsa"; pulmino, autista, orari, passeggeri (solo numero), stato, nota; avvisi su doppia prenotazione, disponibilità autista e posti; salvataggio con `scd_transport_plan_run` (controllo ruolo e doppioni nel database, storico con autore). Gli autisti vedono le corse senza poterle modificare.
+- Copia automatica: attività programmata "SCD Pulmini · copia del Master" (06:59, 12:59, 18:59) con `tools/sync/pulmini_master_payload.py` e `scd_transport_sync`; scrive solo se il foglio è cambiato e solo dopo i controlli (nessun nome degli utenti, nessun crollo dei conteggi). Copia attuale verificata: 4 mezzi, 6 autisti, 8 regole, 17 fermate, 61 utenti (foglio modificato il 26/09).
+- Test: transport.test.ts (+5), TransportDesk.test.tsx (render lato server: coda, scadenze, telefoni, form, vista autista); vitest include anche i test .tsx.

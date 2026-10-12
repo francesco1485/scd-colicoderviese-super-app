@@ -429,3 +429,119 @@ export function planErrorMessage(code: string | null | undefined): string {
       return "Salvataggio non riuscito. Riprova tra poco.";
   }
 }
+
+/* ------------------------------------------------------------ planner desk */
+
+/** What the "Organizza una corsa" form edits; strings so inputs stay controlled. */
+export interface RunDraft {
+  id: string | null;
+  date: string;
+  departure: string;
+  returnEstimate: string;
+  kind: RunKind;
+  eventId: string | null;
+  title: string;
+  destination: string;
+  meetingPoint: string;
+  vehicleId: string;
+  driverId: string;
+  passengers: string;
+  status: RunStatus;
+  note: string;
+}
+
+export function emptyDraft(date: string): RunDraft {
+  return { id: null, date, departure: "", returnEstimate: "", kind: "TRASFERTA", eventId: null, title: "", destination: "", meetingPoint: "", vehicleId: "", driverId: "", passengers: "", status: "PIANIFICATA", note: "" };
+}
+
+/** A new trip for an away match: date, title and destination from the official calendar; times stay to the manager. */
+export function draftFromEvent(e: { id: string; date: string; opponent: string; teamLabel: string; place: string }): RunDraft {
+  const opp = e.opponent.trim() || "avversario da definire";
+  return { ...emptyDraft(e.date), eventId: e.id, title: `${e.teamLabel} a ${opp}`.slice(0, 160), destination: e.place.slice(0, 200) };
+}
+
+export function draftFromRun(r: TransportRun): RunDraft {
+  return {
+    id: r.id,
+    date: r.date,
+    departure: r.departure.slice(0, 5),
+    returnEstimate: (r.returnEstimate ?? "").slice(0, 5),
+    kind: r.kind,
+    eventId: r.eventId,
+    title: r.title,
+    destination: r.destination ?? "",
+    meetingPoint: r.meetingPoint ?? "",
+    vehicleId: r.vehicleId ?? "",
+    driverId: r.driverId ?? "",
+    passengers: r.passengers === null ? "" : String(r.passengers),
+    status: r.status,
+    note: r.note ?? "",
+  };
+}
+
+const HHMM_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
+
+/** Blocking problems of a draft (empty = it can be sent). The database checks again. */
+export function draftErrors(d: RunDraft): string[] {
+  const out: string[] = [];
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(d.date)) out.push("Scegli la data della corsa.");
+  if (!HHMM_RE.test(d.departure)) out.push("Scrivi l'orario di partenza (es. 13:30).");
+  if (d.returnEstimate && !HHMM_RE.test(d.returnEstimate)) out.push("L'orario di rientro va scritto come 19:00.");
+  if (HHMM_RE.test(d.departure) && HHMM_RE.test(d.returnEstimate) && d.returnEstimate <= d.departure) out.push("Il rientro deve essere dopo la partenza.");
+  if (!d.title.trim()) out.push("Dai un titolo alla corsa.");
+  if (d.passengers && !/^\d{1,2}$/.test(d.passengers)) out.push("I passeggeri sono un numero da 0 a 60.");
+  return out;
+}
+
+/** Advice that does not block: clashes, driver availability, seats. The manager decides. */
+export function draftWarnings(b: TransportBoard, d: RunDraft): string[] {
+  if (d.status === "ANNULLATA" || !HHMM_RE.test(d.departure) || !/^\d{4}-\d{2}-\d{2}$/.test(d.date)) return [];
+  const out: string[] = [];
+  const clash = runClash(b.runs, { id: d.id, date: d.date, departure: d.departure, returnEstimate: d.returnEstimate || null, vehicleId: d.vehicleId || null, driverId: d.driverId || null });
+  if (clash === "vehicle") out.push("Quel pulmino è già su un'altra corsa nella stessa fascia oraria.");
+  if (clash === "driver") out.push("Quell'autista è già su un'altra corsa nella stessa fascia oraria.");
+  const driver = b.drivers.find((x) => x.id === d.driverId);
+  if (driver) out.push(...driverWarnings(b.rules, driver.code, d.date, d.departure, d.returnEstimate || null));
+  const vehicle = b.vehicles.find((x) => x.id === d.vehicleId);
+  const pax = d.passengers ? Number(d.passengers) : null;
+  if (vehicle && pax !== null) {
+    if (vehicle.seatsPassengers === null) out.push(`I posti di ${vehicle.label} non sono confermati nel Master: controlla prima di partire.`);
+    else if (pax > vehicle.seatsPassengers) out.push(`${vehicle.label} ha ${vehicle.seatsPassengers} posti passeggeri: ne servono ${pax}.`);
+  }
+  return out;
+}
+
+/** Payload for planTransportRun (empty strings become null). */
+export function draftPayload(d: RunDraft) {
+  const n = (s: string) => (s.trim() ? s.trim() : null);
+  return {
+    id: d.id,
+    date: d.date,
+    departure: d.departure,
+    returnEstimate: n(d.returnEstimate),
+    kind: d.kind,
+    eventId: d.eventId,
+    title: d.title.trim(),
+    destination: n(d.destination),
+    meetingPoint: n(d.meetingPoint),
+    vehicleId: n(d.vehicleId),
+    driverId: n(d.driverId),
+    passengers: d.passengers ? Number(d.passengers) : null,
+    status: d.status,
+    note: n(d.note),
+  };
+}
+
+export type ExpiryTone = "crit" | "warn" | "ok" | "mute";
+
+/** One vehicle deadline: past = crit, within 30 days = warn, later = ok, missing = mute ("da inserire"). */
+export function expiryTone(due: string | null, today: string): ExpiryTone {
+  if (!due) return "mute";
+  if (due < today) return "crit";
+  return due <= addDays(today, 30) ? "warn" : "ok";
+}
+
+/** Live trips from today on, in date and departure order. */
+export function upcomingRuns(runs: readonly TransportRun[], today: string): TransportRun[] {
+  return runs.filter((r) => r.date >= today && r.status !== "ANNULLATA").sort((a, b) => (a.date + a.departure).localeCompare(b.date + b.departure));
+}
