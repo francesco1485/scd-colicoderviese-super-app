@@ -1910,6 +1910,32 @@
           "no minors' data where it is not needed"
         ]
       }
+    },
+    {
+      "sourceDate": "2026-10-12",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-081",
+      "name": "ONE_IDENTITY_SUPABASE_R20_BRIDGE",
+      "sourceQuoteFragments": ["Ok procedi e fai"],
+      "normalizedCommand": {
+        "rule": "Approves map decision N1 (SCD_MAPPA_A_Z_v1): the Super App database SCD PULSE is the single identity and role register; R20 stays only as a read bridge to the master sheets until retired. Supersedes the 'R20 identity until verified migration' wording for the Super App.",
+        "scope": "IDENTITY",
+        "constraints": ["no second login", "roles and positions only from the Direzione", "R20 never written by the app"]
+      }
+    },
+    {
+      "sourceDate": "2026-10-12",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-082",
+      "name": "ONE_MASTER_PER_DOMAIN_PILOTA_ARCHIVE",
+      "sourceQuoteFragments": ["Ok procedi e fai"],
+      "normalizedCommand": {
+        "rule": "Approves map decision N2: one master sheet per domain (people 04_TESSERATI; fees and kit Gestionale 2026-27; fund Fondo Solidale riservato; events Master Calendario; rotation ROTAZIONE_CAMPI; training Quadro; minibuses 05_PULMINI; accounting Master economico-finanziario; suppliers TESORERIA FORNITORI; sponsors Master Sponsor Intelligence; tournaments Master Tornei; ticketing Master canonico). The Pilota becomes archive; duplicate tabs are superseded. The app reads automatic copies and work then follows the map order: fees and fund first.",
+        "scope": "DATA_SOURCES",
+        "constraints": ["never move or delete original files", "no parallel registers", "minors' and family payment data never in public views"]
+      }
     }
   ],
   "completionGate": {
