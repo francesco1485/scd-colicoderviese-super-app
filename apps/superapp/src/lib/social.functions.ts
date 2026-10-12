@@ -16,6 +16,11 @@ import {
   POST_KINDS,
   type Post,
 } from "./social";
+import {
+  FEED_IMAGE_MAX_BYTES,
+  feedImageExtension,
+  stripJpegMetadata,
+} from "./image-privacy";
 import { REPORT_REASONS, RULE_REASON_LABEL } from "./moderation";
 import { moderate, moderationEnv } from "./moderation.server";
 import { serverSupabase } from "./supabase.server";
@@ -362,3 +367,57 @@ export const decidePost = createServerFn({ method: "POST" })
       ...(r.status ? { status: r.status } : {}),
     };
   });
+
+/**
+ * Foto dal telefono (r88): multipart con `file`. JPEG senza metadati (niente GPS, fotocamera, data), immagini soltanto,
+ * 8 MB. Sale nel bucket pubblico scd-media con la sessione di chi pubblica (le policy del bucket decidono chi può).
+ */
+export const uploadFeedImage = createServerFn({ method: "POST" })
+  .inputValidator((d: FormData) => {
+    if (!(d instanceof FormData)) throw new Error("form");
+    const file = d.get("file");
+    if (!(file instanceof File)) throw new Error("file");
+    return { file };
+  })
+  .handler(
+    async ({
+      data,
+    }): Promise<{ ok: boolean; url?: string; message: string }> => {
+      const { org, sb } = await context();
+      if (!sb || !org)
+        return {
+          ok: false,
+          message: "Entra con il tuo account per caricare una foto.",
+        };
+      const { file } = data;
+      const ext = feedImageExtension(file.type);
+      if (!ext)
+        return {
+          ok: false,
+          message: "Formato non accettato: carica una foto JPG, PNG o WEBP.",
+        };
+      if (file.size <= 0 || file.size > FEED_IMAGE_MAX_BYTES)
+        return { ok: false, message: "La foto deve pesare meno di 8 MB." };
+      const raw = new Uint8Array(await file.arrayBuffer());
+      const bytes = file.type === "image/jpeg" ? stripJpegMetadata(raw) : raw;
+      const buffer = new ArrayBuffer(bytes.byteLength);
+      new Uint8Array(buffer).set(bytes);
+      const body = new Blob([buffer], { type: file.type });
+      const path = `${org.organizationId}/feed/${new Date().getUTCFullYear()}/${crypto.randomUUID()}.${ext}`;
+      const up = await sb.storage
+        .from("scd-media")
+        .upload(path, body, { contentType: file.type, upsert: false });
+      if (up.error)
+        return {
+          ok: false,
+          message:
+            "Caricamento non riuscito: il tuo accesso non permette di pubblicare foto.",
+        };
+      const { data: pub } = sb.storage.from("scd-media").getPublicUrl(path);
+      return {
+        ok: true,
+        url: pub.publicUrl,
+        message: "Foto caricata senza dati di posizione.",
+      };
+    },
+  );

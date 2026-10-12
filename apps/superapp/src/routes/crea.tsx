@@ -14,7 +14,11 @@ import {
   postableChannels,
   type PostKind,
 } from "@/lib/social";
-import { createPost, getPublicSocial } from "@/lib/social.functions";
+import {
+  createPost,
+  getPublicSocial,
+  uploadFeedImage,
+} from "@/lib/social.functions";
 import type { PublicGroup } from "@/lib/public-snapshots";
 import { orderTeams } from "@/lib/universe";
 
@@ -117,6 +121,8 @@ function CreaForm({
 }) {
   const navigate = useNavigate();
   const send = useServerFn(createPost);
+  const upload = useServerFn(uploadFeedImage);
+  const [uploading, setUploading] = useState(false);
   const teams = useMemo(
     () =>
       orderTeams(
@@ -155,6 +161,26 @@ function CreaForm({
     noNamesOk &&
     (!base || noResultOk) &&
     (kind !== "LIVE" || /^https:\/\//.test(liveUrl.trim()));
+
+  async function pickPhoto(file: File | null) {
+    if (!file || uploading) return;
+    setUploading(true);
+    setMsg(null);
+    try {
+      const fd = new FormData();
+      fd.set("file", file);
+      const r = await upload({ data: fd });
+      if (r.ok && r.url) setMediaUrl(r.url);
+      else setMsg({ ok: false, text: r.message });
+    } catch {
+      setMsg({
+        ok: false,
+        text: "Caricamento non riuscito. Riprova tra poco.",
+      });
+    } finally {
+      setUploading(false);
+    }
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -268,24 +294,44 @@ function CreaForm({
             placeholder="Cosa vuoi dire a chi segue la squadra?"
           />
         </label>
-        <label className="grid gap-1.5 text-[14px] font-bold">
+        <div className="grid gap-1.5 text-[14px] font-bold">
           <span className="flex items-center gap-2">
             <ImagePlus className="size-5 text-[#1e7fd8]" aria-hidden="true" />
-            Foto o video (link, facoltativo)
+            Foto (facoltativa)
           </span>
-          <input
-            value={mediaUrl}
-            onChange={(e) => setMediaUrl(e.target.value)}
-            maxLength={500}
-            inputMode="url"
-            className={`${inputCls} h-12 font-normal`}
-            placeholder="https://..."
-          />
+          {mediaUrl ? (
+            <div className="relative overflow-hidden rounded-[14px] border border-[#c9d6e6] bg-white">
+              <img
+                src={mediaUrl}
+                alt=""
+                className="block max-h-[260px] w-full object-cover"
+              />
+              <button
+                type="button"
+                onClick={() => setMediaUrl("")}
+                aria-label="Togli la foto"
+                className="scd-focus absolute right-2 top-2 grid size-10 place-items-center rounded-full bg-[#0b2a5b]/85 text-white"
+              >
+                <X className="size-5" aria-hidden="true" />
+              </button>
+            </div>
+          ) : (
+            <label className="scd-focus grid h-[112px] cursor-pointer place-items-center rounded-[16px] border-2 border-dashed border-[#8fb3dd] bg-white text-[15px] font-bold text-[#1e7fd8]">
+              {uploading ? "Caricamento..." : "Scegli una foto dal telefono"}
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="sr-only"
+                disabled={uploading}
+                onChange={(e) => void pickPhoto(e.target.files?.[0] ?? null)}
+              />
+            </label>
+          )}
           <span className="text-[12.5px] font-normal text-[#5a6b85]">
-            Il caricamento diretto dal telefono arriva con il prossimo passo:
-            per ora un link (Drive della società, canale ufficiale).
+            JPG, PNG o WEBP fino a 8 MB. La posizione e gli altri dati della
+            foto vengono tolti prima di salvarla.
           </span>
-        </label>
+        </div>
         {kind === "LIVE" && (
           <label className="grid gap-1.5 text-[14px] font-bold">
             Link della diretta (canale ufficiale SCD)
