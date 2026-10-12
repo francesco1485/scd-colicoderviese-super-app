@@ -21,6 +21,9 @@ import { getStaffEmails, getStaffRoster } from "@/lib/staff-roster.functions";
 import { PULMINI_FLEET, factStamp, nextWeekend, weekendMatches } from "@/lib/work-areas";
 import { TransportFleetCard, TransportPlanner, TransportQueueCard } from "@/components/scd/TransportDesk";
 import { getTransportBoard, type TransportData } from "@/lib/transport.functions";
+import { TransportRequestsOffice } from "@/components/scd/TransportRequestsOffice";
+import { getTransportRequests } from "@/lib/transport-requests.functions";
+import type { OfficeRequest } from "@/lib/transport-requests";
 import { draftFromEvent, runsForEvent, type RunDraft, type TransportBoard, type TransportRun } from "@/lib/transport";
 
 /** Pulmini (board Pulmini.dc.html): away trips of the coming weekend and the Master Flotta facts. */
@@ -31,8 +34,8 @@ export const Route = createFileRoute("/pulmini")({
     const cal = loadCalendar();
     const runs = await getPulminiRuns();
     const quadro = loadQuadro();
-    const [roster, emails, transport] = await Promise.all([getStaffRoster(), getStaffEmails(), getTransportBoard()]);
-    return { gate, interior: true as const, transport, groups: cal.groups, events: cal.events, sourceModifiedAt: cal.sourceModifiedAt, runs: runs.runs, runsAsOf: runs.asOf, quadroDays: quadro.days, quadroSlots: quadro.slots, people: roster.people, emails };
+    const [roster, emails, transport, requests] = await Promise.all([getStaffRoster(), getStaffEmails(), getTransportBoard(), getTransportRequests()]);
+    return { gate, interior: true as const, transport, groups: cal.groups, events: cal.events, sourceModifiedAt: cal.sourceModifiedAt, runs: runs.runs, runsAsOf: runs.asOf, quadroDays: quadro.days, quadroSlots: quadro.slots, people: roster.people, emails, requests };
   },
   head: ({ loaderData }) => workAreaHead("pulmini", loaderData?.gate),
   component: PulminiRoute,
@@ -42,14 +45,14 @@ function PulminiRoute() {
   const data = Route.useLoaderData();
   return (
     <WorkAreaGateView id="pulmini" gate={data.gate}>
-      {data.interior && <PulminiPage groups={data.groups} events={data.events} sourceModifiedAt={data.sourceModifiedAt} preview={data.gate.preview} runs={data.runs} runsAsOf={data.runsAsOf} quadroDays={data.quadroDays} quadroSlots={data.quadroSlots} people={data.people} emails={data.emails} transport={data.transport} />}
+      {data.interior && <PulminiPage groups={data.groups} events={data.events} sourceModifiedAt={data.sourceModifiedAt} preview={data.gate.preview} runs={data.runs} runsAsOf={data.runsAsOf} quadroDays={data.quadroDays} quadroSlots={data.quadroSlots} people={data.people} emails={data.emails} transport={data.transport} requests={data.requests} />}
     </WorkAreaGateView>
   );
 }
 
 const F = PULMINI_FLEET;
 
-function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf, quadroDays, quadroSlots, people, emails, transport }: { groups: PublicGroup[]; events: PublicEvent[]; sourceModifiedAt: string; preview: boolean; runs: PulminoRun[]; runsAsOf: string | null; quadroDays: string[]; quadroSlots: TrainingSlot[]; people: StaffPerson[]; emails: Record<string, string>; transport: TransportData }) {
+function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf, quadroDays, quadroSlots, people, emails, transport, requests }: { groups: PublicGroup[]; events: PublicEvent[]; sourceModifiedAt: string; preview: boolean; runs: PulminoRun[]; runsAsOf: string | null; quadroDays: string[]; quadroSlots: TrainingSlot[]; people: StaffPerson[]; emails: Record<string, string>; transport: TransportData; requests: OfficeRequest[] | null }) {
   const board: TransportBoard | null = transport.board;
   const [draft, setDraft] = useState<RunDraft | null>(null);
   const router = useRouter();
@@ -145,6 +148,8 @@ function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf
           )}
           <SourceLine>Fasce dal quadro settimanale; corse dal Master Pulmini{runsAsOf ? ` (dato al ${runsAsOf.split("-").reverse().join("/")})` : ""}. Aggiungere autisti, corse e variazioni d'orario dall'app arriverà con l'accesso del responsabile trasporti.</SourceLine>
         </Card>
+
+        {requests && <TransportRequestsOffice initial={requests} />}
 
         <Card
           id="pul-trasferte"

@@ -7,6 +7,7 @@ import { AccessScreenPage, accessHead } from "@/components/scd/AccessScreen";
 import { Card, Chip, type ChipTone } from "@/components/scd/interior-ui";
 import { InteriorShell } from "@/components/scd/InteriorShell";
 import { PushCard } from "@/components/scd/PushCard";
+import { TransportRequestCard } from "@/components/scd/TransportRequestCard";
 import { EmptyState } from "@/components/scd/work-area-ui";
 import { getSession } from "@/lib/auth.functions";
 import { MY_RESPONSE_LABEL, romeDay, romeTime, type CallupResponse } from "@/lib/callups";
@@ -16,6 +17,9 @@ import { registrationLabel } from "@/lib/roster";
 import { getMyFamily, type FamilyMember } from "@/lib/roster.functions";
 import { FAMILY_GROUP_LABEL, euro, familyNext, type FeeGroup, type MyFee } from "@/lib/fees";
 import { getMyFees } from "@/lib/fees.functions";
+import { loadCalendar } from "@/lib/public-snapshots";
+import { awayMatchesFor, type AwayMatch } from "@/lib/transport-requests";
+import { getFamilyTransport, type FamilyTransport } from "@/lib/transport-requests.functions";
 
 /**
  * Family area (UD-061, UD-062). Signed out: the access screen of the registry. Signed in: the caller's
@@ -24,8 +28,11 @@ import { getMyFees } from "@/lib/fees.functions";
  */
 export const Route = createFileRoute("/famiglia")({
   loader: async () => {
-    const [session, family, callups, fees] = await Promise.all([getSession(), getMyFamily(), getMyCallups(), getMyFees()]);
-    return { roles: session.roles, badge: session.badge, family, callups, fees: fees.state === "ok" ? fees.fees : [] };
+    const [session, family, callups, fees, transport] = await Promise.all([getSession(), getMyFamily(), getMyCallups(), getMyFees(), getFamilyTransport()]);
+    // Away matches of the family's teams from the official calendar copy (only what the family can ask a seat for).
+    const teamCodes = family.state === "ok" ? [...new Set(family.members.flatMap((m) => m.teamCodes))] : [];
+    const awayMatches: AwayMatch[] = teamCodes.length ? awayMatchesFor(loadCalendar().events, teamCodes, todayRome()) : [];
+    return { roles: session.roles, badge: session.badge, family, callups, fees: fees.state === "ok" ? fees.fees : [], transport, awayMatches };
   },
   head: () => accessHead("famiglia"),
   component: FamigliaRoute,
@@ -34,7 +41,7 @@ export const Route = createFileRoute("/famiglia")({
 function FamigliaRoute() {
   const data = Route.useLoaderData();
   if (data.family.state !== "ok" && data.family.state !== "error") return <AccessScreenPage id="famiglia" />;
-  return <FamilyHome roles={data.roles} badge={data.badge} members={data.family.members} callups={data.callups} fees={data.fees} failed={data.family.state === "error"} />;
+  return <FamilyHome roles={data.roles} badge={data.badge} members={data.family.members} callups={data.callups} fees={data.fees} failed={data.family.state === "error"} transport={data.transport} awayMatches={data.awayMatches} />;
 }
 
 const TONE: Readonly<Record<CallupResponse, ChipTone>> = { CONFIRMED: "ok", DECLINED: "crit", PENDING: "warn" };
@@ -43,7 +50,7 @@ function todayRome(): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Rome", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
 }
 
-function FamilyHome({ roles, badge, members, callups, fees, failed }: { roles: string[]; badge: string | null; members: FamilyMember[]; callups: MyCallup[]; fees: MyFee[]; failed: boolean }) {
+function FamilyHome({ roles, badge, members, callups, fees, failed, transport, awayMatches }: { roles: string[]; badge: string | null; members: FamilyMember[]; callups: MyCallup[]; fees: MyFee[]; failed: boolean; transport: FamilyTransport; awayMatches: AwayMatch[] }) {
   const [items, setItems] = useState(callups);
   const pending = items.filter((c) => c.response === "PENDING").length;
   const kids = members.filter((m) => m.relationship !== "SELF");
@@ -101,6 +108,8 @@ function FamilyHome({ roles, badge, members, callups, fees, failed }: { roles: s
             </ul>
           )}
         </Card>
+
+        {members.length > 0 && <TransportRequestCard members={members} matches={awayMatches} requests={transport.requests} stops={transport.stops} />}
 
         {fees.length > 0 && <FeesCard fees={fees} today={today} />}
         <Card id="fam-documenti" title="Documenti del club" sub="Regolamenti, codice di condotta, privacy e trasferte: quelli che riguardano la tua famiglia.">
