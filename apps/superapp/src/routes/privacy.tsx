@@ -90,6 +90,10 @@ function Privacy() {
       <p>
         L'app usa solo strumenti tecnici: un cookie di sessione per tenerti dentro dopo l'accesso, la memoria del browser per ricordare le tue scelte e una copia offline delle sole pagine pubbliche. Non usiamo statistiche né cookie di marketing. Le aree riservate non vengono mai salvate offline e, quando esci, la copia sul telefono viene cancellata.
       </p>
+      <H2>Crediti e proprietà intellettuale</H2>
+      <p>
+        L'app è ideata e creata da <b>Francesco Coppola</b>, che ne detiene il diritto d'autore (© 2026) e la concede in uso gratuito alla {CLUB_PROFILE.name}. Stemma della società, loghi degli sponsor e marchi federali appartengono ai rispettivi titolari.
+      </p>
       <button type="button" onClick={openCookiePrefs} className="mt-3 inline-flex h-11 items-center rounded-[10px] border border-border px-4 text-[15px] font-semibold">
         Preferenze cookie
       </button>

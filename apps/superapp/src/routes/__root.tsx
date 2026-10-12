@@ -89,7 +89,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "Super App ufficiale della S.C.D. ColicoDerviese: il club (ONE), l'area club (CORE) e sponsor & partner (GROW) in un'unica app.",
       },
-      { name: "author", content: "S.C.D. ColicoDerviese" },
+      { name: "author", content: "Francesco Coppola" },
+      { name: "copyright", content: "© 2026 Francesco Coppola · concesso in uso gratuito alla S.C.D. ColicoDerviese" },
       { name: "theme-color", content: "#062a52" },
       { property: "og:title", content: "S.C.D. ColicoDerviese — Super App" },
       {

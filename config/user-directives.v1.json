@@ -1703,6 +1703,30 @@
         "implementationStatus": "IN_PROGRESS",
         "duplicate_work": "DENY"
       }
+    },
+    {
+      "id": "UD-072",
+      "name": "AUTHORSHIP_CREDIT",
+      "sourceDate": "2026-10-12",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "Vorrei mettere la mia firma su tutto. Creato e ideato da francesco coppola",
+        "copyright è mio",
+        "non deve destare visibilità ma se qualcuno va a vedere trova i miei riferimenti",
+        "dato gratuitamente alla Scd Colicoderviese",
+        "Non deve essere scritto nella presentazione solo in app e dove si mette per legge"
+      ],
+      "normalizedCommand": {
+        "rule": "Francesco Coppola is the author and copyright holder of the Super App; it is granted free of charge to S.C.D. ColicoDerviese. The credit is discreet but findable: app footer, /privacy credits, HTML author/copyright meta, web manifest, LICENSE and NOTICE in the repository, package.json author. It never appears in presentations, films or public marketing material.",
+        "scope": "LEGAL",
+        "constraints": [
+          "crest, sponsor logos and federal marks belong to their owners",
+          "no credit in slides or videos"
+        ],
+        "implementationStatus": "DONE",
+        "duplicate_work": "DENY"
+      }
     }
   ],
   "completionGate": {

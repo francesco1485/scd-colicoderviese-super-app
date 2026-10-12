@@ -303,7 +303,10 @@ export function SiteFooter() {
           <button type="button" onClick={openCookiePrefs} className="text-sm underline opacity-80 hover:opacity-100">Preferenze cookie</button>
         </span>
         <p className="text-xs opacity-60">
-          © {new Date().getFullYear()} {CLUB_NAME} — Super App ufficiale · versione del {BUILD_STAMP}.
+          Super App ufficiale della {CLUB_NAME} · versione del {BUILD_STAMP}.
+        </p>
+        <p className="text-xs opacity-60">
+          © {new Date().getFullYear()} Francesco Coppola · ideato e creato da Francesco Coppola, concesso in uso gratuito alla {CLUB_NAME}. Stemma, loghi e marchi appartengono ai rispettivi titolari.
         </p>
       </div>
     </footer>

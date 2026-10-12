@@ -1,7 +1,7 @@
 {
   "name": "S.C.D. ColicoDerviese",
   "short_name": "ColicoDerviese",
-  "description": "App ufficiale della S.C.D. ColicoDerviese: calendario, convocazioni, area famiglie, staff e sponsor.",
+  "description": "App ufficiale della S.C.D. ColicoDerviese: calendario, convocazioni, area famiglie, staff e sponsor. Ideata e creata da Francesco Coppola.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

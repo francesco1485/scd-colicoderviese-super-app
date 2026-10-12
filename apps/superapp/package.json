@@ -104,5 +104,7 @@
   },
   "engines": {
     "node": ">=22"
-  }
+  },
+  "author": "Francesco Coppola",
+  "license": "SEE LICENSE IN ../../LICENSE"
 }
