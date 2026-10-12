@@ -11,6 +11,7 @@ import { getSession } from "@/lib/auth.functions";
 import { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 import { CLUB_EVENTS } from "@/lib/club-events";
 import {
+  AUTHOR_LABEL,
   channelsFrom,
   isBaseActivityChannel,
   KIND_LABEL,
@@ -19,6 +20,7 @@ import {
   type Post,
   type PostStatus,
 } from "@/lib/social";
+import { RULE_REASON_LABEL } from "@/lib/moderation";
 import { decidePost, getPostsQueue } from "@/lib/social.functions";
 import type { PublicGroup } from "@/lib/public-snapshots";
 import { orderTeams } from "@/lib/universe";
@@ -147,7 +149,7 @@ function Queue({
         <Card
           id="coda"
           title="Da approvare"
-          sub="Post dello staff: escono nel feed solo con il tuo ok. Controlla minori e, per l'attività di base, che non ci sia il risultato."
+          sub="Qui arrivano solo i post che il moderatore automatico non ha deciso da solo: primo post di un autore, dubbi, segnalazioni. Controlla minori e, per l'attività di base, che non ci sia il risultato."
         >
           <div className="flex flex-col gap-3 px-4 pb-4 sm:px-[18px]">
             {pending.length === 0 ? (
@@ -260,10 +262,26 @@ function Head({
   label: string;
   serverNow: number;
 }) {
+  const auto =
+    p.verdict === "CHECKING"
+      ? "in controllo automatico"
+      : p.verdict === "REPORTED"
+        ? `nascosto: ${p.reports} segnalazioni`
+        : p.verdict === "REVIEW"
+          ? `il moderatore automatico chiede un controllo${p.reasons.length ? ": " + p.reasons.map((r) => RULE_REASON_LABEL[r] ?? r).join(", ") : ""}`
+          : p.verdict === "BLOCK"
+            ? "bloccato dal moderatore automatico"
+            : p.verdict === "ALLOW" && p.authorKind !== "OFFICE"
+              ? "approvato dal moderatore automatico"
+              : null;
   return (
     <div className="flex flex-wrap items-center gap-2 text-[13px] text-[var(--in-sub)]">
       <b className="text-[15px] text-[var(--in-ink)]">{label}</b>·{" "}
-      {KIND_LABEL[p.kind]} · {timeAgo(p.createdAt, serverNow)}
+      {AUTHOR_LABEL[p.authorKind]} · {KIND_LABEL[p.kind]} ·{" "}
+      {timeAgo(p.createdAt, serverNow)}
+      {auto && (
+        <span className="basis-full text-[12.5px] text-[#6b5400]">{auto}</span>
+      )}
       <span className="ml-auto">
         <Chip tone={TONE[p.status]}>{STATUS_LABEL[p.status]}</Chip>
       </span>

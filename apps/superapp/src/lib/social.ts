@@ -23,7 +23,19 @@ export interface Post {
   forza: number;
   mine: boolean;
   own: boolean;
+  authorKind: AuthorKind;
+  verdict: string | null;
+  reasons: string[];
+  reports: number;
 }
+
+export type AuthorKind = "OFFICE" | "STAFF" | "ATHLETE" | "FAMILY";
+export const AUTHOR_LABEL: Readonly<Record<AuthorKind, string>> = {
+  OFFICE: "Ufficiale",
+  STAFF: "Staff",
+  ATHLETE: "Atleta",
+  FAMILY: "Famiglia",
+};
 
 export const POST_KINDS: readonly PostKind[] = ["NEWS", "MATCH", "LIVE"];
 export const POST_STATUSES: readonly PostStatus[] = [
@@ -181,6 +193,18 @@ export function parsePost(raw: unknown): Post | null {
         : Number(r["forza"] ?? 0) || 0,
     mine: r["mine"] === true,
     own: r["own"] === true,
+    authorKind:
+      (["OFFICE", "STAFF", "ATHLETE", "FAMILY"] as const).find(
+        (k) => k === r["authorKind"],
+      ) ?? "STAFF",
+    verdict: str(r["verdict"]),
+    reasons: Array.isArray(r["reasons"])
+      ? r["reasons"].filter((x): x is string => typeof x === "string")
+      : [],
+    reports:
+      typeof r["reports"] === "number"
+        ? r["reports"]
+        : Number(r["reports"] ?? 0) || 0,
   };
 }
 

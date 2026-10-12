@@ -7,7 +7,18 @@
  * Direction assigned (only ids the registry knows). Nothing here grants anything on its own.
  */
 
-export const DB_ROLES = ["USER_BASE", "FAMILY", "ATHLETE", "MISTER", "STAFF", "MANAGER", "SECRETARIAT", "REGISTRATION", "TOURNAMENTS", "DIRECTION"] as const;
+export const DB_ROLES = [
+  "USER_BASE",
+  "FAMILY",
+  "ATHLETE",
+  "MISTER",
+  "STAFF",
+  "MANAGER",
+  "SECRETARIAT",
+  "REGISTRATION",
+  "TOURNAMENTS",
+  "DIRECTION",
+] as const;
 export type DbRole = (typeof DB_ROLES)[number];
 
 export interface Membership {
@@ -45,6 +56,7 @@ export const KNOWN_POSITIONS: readonly string[] = [
   "responsabile-lavanderia",
   "collaboratore-lavanderia-pulizia",
   "responsabile-infermeria",
+  "moderatore",
   "collaboratore-magazzino",
   "dirigente-collaboratore",
   "famiglia",
@@ -67,7 +79,11 @@ export const ROLE_POSITIONS: Readonly<Record<DbRole, readonly string[]>> = {
 };
 
 /** Positions that open no staff area by themselves (families, athletes and partners are not staff). */
-export const NON_STAFF_POSITIONS: readonly string[] = ["famiglia", "atleta", "partner"];
+export const NON_STAFF_POSITIONS: readonly string[] = [
+  "famiglia",
+  "atleta",
+  "partner",
+];
 
 export function isDbRole(x: unknown): x is DbRole {
   return typeof x === "string" && (DB_ROLES as readonly string[]).includes(x);
@@ -77,11 +93,15 @@ function scopePositions(scope: unknown): string[] {
   if (!scope || typeof scope !== "object") return [];
   const raw = (scope as { positions?: unknown }).positions;
   if (!Array.isArray(raw)) return [];
-  return raw.filter((p): p is string => typeof p === "string" && KNOWN_POSITIONS.includes(p));
+  return raw.filter(
+    (p): p is string => typeof p === "string" && KNOWN_POSITIONS.includes(p),
+  );
 }
 
 /** Positions of a verified session, from its active memberships. Empty set when none. */
-export function sessionRolesFrom(memberships: readonly Membership[]): Set<string> {
+export function sessionRolesFrom(
+  memberships: readonly Membership[],
+): Set<string> {
   const out = new Set<string>();
   for (const m of memberships) {
     if (!m.active) continue;
@@ -118,7 +138,13 @@ export function sessionBadge(roles: ReadonlySet<string>): string {
 /** Keep the "next" path on our own site (no open redirects through the magic link). */
 export function safeNext(next: unknown, fallback = "/aree"): string {
   if (typeof next !== "string") return fallback;
-  if (!next.startsWith("/") || next.startsWith("//") || next.includes("\\") || next.includes("\n")) return fallback;
+  if (
+    !next.startsWith("/") ||
+    next.startsWith("//") ||
+    next.includes("\\") ||
+    next.includes("\n")
+  )
+    return fallback;
   return next;
 }
 

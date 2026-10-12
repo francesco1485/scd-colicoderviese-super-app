@@ -2174,6 +2174,52 @@
           "provider, cost and data location verified and approved by Francesco before activation"
         ]
       }
+    },
+    {
+      "sourceDate": "2026-10-12",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-093",
+      "name": "AUTO_MODERATION_NOT_MANUAL_APPROVAL",
+      "sourceQuoteFragments": [
+        "Non posso stare ad accettare continui post o altro deve essere un criterio interno di auto verifica fatto con regole nazionali e internazionali",
+        "Gli atleti devono essere inseriti perché hanno autorizzato il trattamento dei dati personali tramite il link pre iscrizione",
+        "Troviamo un moderatore e lo inseriamo nel sistema così garantisce regole automatiche",
+        "E gli altri potrebbero anche segnare e andrebbe sotto valutazione come fa facebook"
+      ],
+      "normalizedCommand": {
+        "rule": "Publishing is governed by an automatic moderator, not by manual approval of every post: database rules (minors' names, contact data, external links, base-activity scores, abusive words) + author trust + AI verdict against SCD/FIGC/SGS/Italian/EU rules. Athletes and families linked via the pre-registration consent can post on their own team channels. Members can report a post; two reports hide it pending human review (notice-and-action). A human 'moderatore' position handles only what the system escalates.",
+        "scope": "CONTENT_MODERATION",
+        "constraints": [
+          "under 14 never publish (art. 2-quinquies Codice privacy)",
+          "a failure of the AI never auto-publishes: it escalates to a person",
+          "every automatic verdict is logged on the post"
+        ]
+      }
+    },
+    {
+      "sourceDate": "2026-10-12",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-094",
+      "name": "ENGAGEMENT_IDEAS_TOP11_AWARDS_GAMES_MEDIA",
+      "sourceQuoteFragments": [
+        "votare i top 11 della settimana tra tutti i ragazzi non solo la prima",
+        "migliore portiere, migliore attaccante, o altro e poi una volta al mese la premiazione",
+        "Zona podcast virtuale, zona social o simile, le prime pagine il lunedì di testate sportive che parlano di noi, anche news dal territorio",
+        "Un gioco gratuito del calcio anche tra iscritti con concorso a premi per maggiori punti vinci premi in club house o a casa ..... No soldi",
+        "Altra idea fantacalcio e lo va studio quale e come"
+      ],
+      "normalizedCommand": {
+        "rule": "Backlog of engagement features to design: weekly Top 11 voted by members across all teams; monthly awards (best goalkeeper, best striker, ...) with a ceremony; virtual podcast zone; social zone; Monday press review (front pages of sports papers mentioning SCD) and local news; a free football game among members with points and non-cash prizes (club house or home); a fantacalcio to be studied (which format, how).",
+        "scope": "ENGAGEMENT_BACKLOG",
+        "status": "TO_DESIGN",
+        "constraints": [
+          "minors: no public individual rankings for attivita di base; votes on under-18 only with liberatoria and only for agonistic teams, or team-level awards",
+          "prizes: non-cash only; legal check on DPR 430/2001 (non-promotional internal game by an ASD) before launch; partner-branded prizes change the picture",
+          "press review: headlines and links only, never scanned pages (copyright)"
+        ]
+      }
     }
   ],
   "completionGate": {

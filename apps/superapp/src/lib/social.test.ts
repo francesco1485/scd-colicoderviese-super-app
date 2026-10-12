@@ -45,6 +45,10 @@ const post = (
   forza: 0,
   mine: false,
   own: false,
+  authorKind: "STAFF",
+  verdict: null,
+  reasons: [],
+  reports: 0,
   ...extra,
 });
 

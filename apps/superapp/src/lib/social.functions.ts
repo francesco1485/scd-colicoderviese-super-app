@@ -16,6 +16,8 @@ import {
   POST_KINDS,
   type Post,
 } from "./social";
+import { REPORT_REASONS, RULE_REASON_LABEL } from "./moderation";
+import { moderate, moderationEnv } from "./moderation.server";
 import { serverSupabase } from "./supabase.server";
 
 const ORG_SLUG = "scd-colicoderviese";
@@ -210,16 +212,97 @@ export const createPost = createServerFn({ method: "POST" })
       code?: string;
       id?: string;
       status?: string;
+      checking?: boolean;
+      reasons?: unknown;
     };
+    if (!r.ok) return { ok: false, message: postError(r.code) };
+    let status = r.status ?? "PENDING";
+    let reason = "";
+    if (r.status === "REJECTED") {
+      const reasons = Array.isArray(r.reasons)
+        ? r.reasons.filter((x): x is string => typeof x === "string")
+        : [];
+      reason = reasons.map((x) => RULE_REASON_LABEL[x] ?? x).join(", ");
+    } else if (r.checking && r.id) {
+      // Second layer: the AI moderator (or the trust rule) decides; the database applies it with the secret token.
+      const { token } = moderationEnv();
+      const trusted = await sb
+        .rpc("scd_author_trusted", {
+          p_organization_id: org.organizationId,
+          p_user: await viewerId(sb),
+        })
+        .then(
+          (x) => x.data === true,
+          () => false,
+        );
+      const verdict = await moderate({
+        channelLabel: data.channel,
+        baseActivity: data.baseActivity,
+        authorKind: "STAFF",
+        title: data.title || null,
+        body: data.body,
+        trusted,
+      });
+      if (token) {
+        const applied = await sb.rpc("scd_apply_auto_moderation", {
+          p_organization_id: org.organizationId,
+          p_post_id: r.id,
+          p_token: token,
+          p_verdict: verdict,
+        });
+        const a = (applied.data ?? {}) as { ok?: boolean; status?: string };
+        if (a.ok && a.status) status = a.status;
+        if (status === "REJECTED") reason = verdict.reason;
+      }
+    }
+    const message =
+      status === "APPROVED"
+        ? "Pubblicato: è già nel feed."
+        : status === "REJECTED"
+          ? `Non pubblicato. Il moderatore automatico ha trovato: ${reason || "contenuto non adatto"}. Correggi e riprova.`
+          : "Inviato al moderatore: esce nel feed dopo il controllo.";
+    return {
+      ok: status !== "REJECTED",
+      message,
+      ...(r.id ? { id: r.id } : {}),
+      status,
+    };
+  });
+
+async function viewerId(
+  sb: NonNullable<ReturnType<typeof serverSupabase>>,
+): Promise<string | null> {
+  const { data } = await sb.auth.getUser();
+  return data.user?.id ?? null;
+}
+
+const reportSchema = z.object({
+  id: z.string().uuid(),
+  reason: z.enum(REPORT_REASONS),
+  note: z.string().trim().max(300).optional(),
+});
+
+/** "Segnala": any member; two reports hide the post until the office looks (DSA-style notice and action). */
+export const reportPost = createServerFn({ method: "POST" })
+  .inputValidator((d: z.input<typeof reportSchema>) => reportSchema.parse(d))
+  .handler(async ({ data }): Promise<SocialOutcome> => {
+    const { org, sb } = await context();
+    if (!sb || !org)
+      return { ok: false, message: "Iscriviti o entra per segnalare un post." };
+    const { data: out, error } = await sb.rpc("scd_report_post", {
+      p_organization_id: org.organizationId,
+      p_post_id: data.id,
+      p_reason: data.reason,
+      p_note: data.note ?? null,
+    });
+    if (error) return { ok: false, message: postError(null) };
+    const r = (out ?? {}) as { ok?: boolean; code?: string; hidden?: boolean };
     if (!r.ok) return { ok: false, message: postError(r.code) };
     return {
       ok: true,
-      message:
-        r.status === "APPROVED"
-          ? "Pubblicato: è già nel feed."
-          : "Inviato alla Direzione: esce nel feed dopo l'ok.",
-      ...(r.id ? { id: r.id } : {}),
-      ...(r.status ? { status: r.status } : {}),
+      message: r.hidden
+        ? "Segnalazione ricevuta: il post è stato nascosto e lo controlla una persona."
+        : "Segnalazione ricevuta: la controlla una persona.",
     };
   });
 

@@ -23,10 +23,12 @@ import {
   FollowButton,
   MatchBlock,
   PostCard,
+  ReportSheet,
   SponsorPost,
   WeekPost,
 } from "@/components/universe/Feed";
 import { StoriesRow } from "@/components/universe/Stories";
+import type { ReportReason } from "@/lib/moderation";
 import { TeamPicker } from "@/components/universe/TeamBar";
 import { ClubCrestOfficial } from "@/components/SiteChrome";
 import { addDays } from "@/lib/board-data";
@@ -55,6 +57,7 @@ import {
 } from "@/lib/social";
 import {
   getPublicSocial,
+  reportPost,
   setFollow,
   toggleForza,
 } from "@/lib/social.functions";
@@ -151,6 +154,8 @@ function Home() {
   const closeSky = useCallback(() => setSky(null), []);
   const doFollow = useServerFn(setFollow);
   const doForza = useServerFn(toggleForza);
+  const doReport = useServerFn(reportPost);
+  const [reporting, setReporting] = useState<Post | null>(null);
 
   useEffect(() => {
     setNowMs(Date.now());
@@ -353,6 +358,13 @@ function Home() {
       );
     else setSky({ title: "Non salvato", text: r.message });
   };
+  const report = async (reason: ReportReason) => {
+    const p = reporting;
+    setReporting(null);
+    if (!p) return;
+    const r = await doReport({ data: { id: p.id, reason } });
+    setSky({ title: r.ok ? "Grazie" : "Non inviata", text: r.message });
+  };
   const share = async (text: string, path = "/") => {
     try {
       const url = `${location.origin}${path}`;
@@ -492,6 +504,9 @@ function Home() {
                     channel={ch}
                     nowMs={nowMs}
                     onForza={() => forza(n.post)}
+                    onReport={
+                      social.signedIn ? () => setReporting(n.post) : undefined
+                    }
                     onShare={() =>
                       share(
                         `${ch.label}: ${n.post.title ?? n.post.body.slice(0, 80)}`,
@@ -663,6 +678,9 @@ function Home() {
           onDone={donePicker}
           onClose={closePicker}
         />
+      )}
+      {reporting && (
+        <ReportSheet onPick={report} onClose={() => setReporting(null)} />
       )}
       <SkyCameo message={sky} onClose={closeSky} />
     </main>

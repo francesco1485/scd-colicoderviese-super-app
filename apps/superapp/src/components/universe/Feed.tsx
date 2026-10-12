@@ -7,6 +7,7 @@ import { Link } from "@tanstack/react-router";
 import {
   BadgeCheck,
   Bell,
+  Flag,
   Flame,
   MapPin,
   Radio,
@@ -19,6 +20,12 @@ import { ClubCrestOfficial } from "@/components/SiteChrome";
 import { venueCase } from "@/lib/board-data";
 import type { WeekItem } from "@/lib/home-week";
 import {
+  REPORT_LABEL,
+  REPORT_REASONS,
+  type ReportReason,
+} from "@/lib/moderation";
+import {
+  AUTHOR_LABEL,
   timeAgo,
   type ChannelInfo,
   type FeedMode,
@@ -213,12 +220,14 @@ export function CardActions({
   mine,
   onForza,
   onShare,
+  onReport,
   more,
 }: {
   forza: number;
   mine: boolean;
   onForza: () => void;
   onShare: () => void;
+  onReport?: (() => void) | undefined;
   more?: { href: string; label: string };
 }) {
   return (
@@ -247,6 +256,16 @@ export function CardActions({
         <Share2 className="size-[22px]" aria-hidden="true" />
         Condividi
       </button>
+      {onReport && (
+        <button
+          type="button"
+          onClick={onReport}
+          aria-label="Segnala questo post"
+          className="scd-focus ml-auto grid size-11 place-items-center rounded-md text-[#5a6b85]"
+        >
+          <Flag className="size-5" aria-hidden="true" />
+        </button>
+      )}
       {more && (
         <Link
           to={more.href}
@@ -392,6 +411,7 @@ export function PostCard({
   match,
   onForza,
   onShare,
+  onReport,
 }: {
   post: Post;
   channel: ChannelInfo;
@@ -399,8 +419,13 @@ export function PostCard({
   match?: WeekItem | undefined;
   onForza: () => void;
   onShare: () => void;
+  onReport?: (() => void) | undefined;
 }) {
-  const meta = `${post.kind === "LIVE" ? "Diretta" : post.kind === "MATCH" ? "Gara" : channel.kind === "club" ? "Ufficiale" : "Staff · approvato dalla Direzione"} · ${timeAgo(post.publishedAt ?? post.createdAt, nowMs)}`;
+  const who =
+    post.authorKind === "OFFICE" || channel.kind === "club"
+      ? "Ufficiale"
+      : `${AUTHOR_LABEL[post.authorKind]} · verificato`;
+  const meta = `${post.kind === "LIVE" ? "Diretta" : post.kind === "MATCH" ? "Gara" : who} · ${timeAgo(post.publishedAt ?? post.createdAt, nowMs)}`;
   return (
     <FeedCard testid="feed-post">
       <CardHead
@@ -449,8 +474,56 @@ export function PostCard({
         mine={post.mine}
         onForza={onForza}
         onShare={onShare}
+        onReport={onReport}
       />
     </FeedCard>
+  );
+}
+
+/** Foglio "Segnala": motivo con un tocco, come su ogni social. Due segnalazioni nascondono il post. */
+export function ReportSheet({
+  onPick,
+  onClose,
+}: {
+  onPick: (reason: ReportReason) => void;
+  onClose: () => void;
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-50 grid items-end lg:items-center"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Segnala il post"
+    >
+      <button
+        type="button"
+        aria-label="Chiudi"
+        onClick={onClose}
+        className="absolute inset-0 bg-[#021433]/55"
+      />
+      <div className="relative mx-auto w-full max-w-[480px] rounded-t-[22px] bg-white p-4 pb-[max(16px,env(safe-area-inset-bottom))] lg:rounded-[22px]">
+        <h2 className="m-0 font-uv text-[24px] text-[#0b1e3a]">
+          PERCHÉ LO SEGNALI?
+        </h2>
+        <p className="mb-3 mt-1 text-[13px] text-[#5a6b85]">
+          La segnalazione arriva al moderatore. Con due segnalazioni il post
+          viene nascosto subito.
+        </p>
+        <ul className="m-0 grid list-none gap-2 p-0">
+          {REPORT_REASONS.map((r) => (
+            <li key={r}>
+              <button
+                type="button"
+                onClick={() => onPick(r)}
+                className="scd-focus flex min-h-12 w-full items-center rounded-[12px] border border-[#dce5f0] px-3.5 text-left text-[15px] font-semibold text-[#0b1e3a]"
+              >
+                {REPORT_LABEL[r]}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
   );
 }
 

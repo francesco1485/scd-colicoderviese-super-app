@@ -4,14 +4,28 @@
  */
 import { DB_ROLES, KNOWN_POSITIONS, type DbRole } from "./session";
 
-export const OFFICE_ROLES: readonly DbRole[] = ["DIRECTION", "SECRETARIAT", "REGISTRATION", "TOURNAMENTS"];
-export const OFFICE_POSITIONS: readonly string[] = ["direzione", "presidente", "direttore-generale", "dirigenza", "segreteria", "tesoreria"];
+export const OFFICE_ROLES: readonly DbRole[] = [
+  "DIRECTION",
+  "SECRETARIAT",
+  "REGISTRATION",
+  "TOURNAMENTS",
+];
+export const OFFICE_POSITIONS: readonly string[] = [
+  "direzione",
+  "presidente",
+  "direttore-generale",
+  "dirigenza",
+  "segreteria",
+  "tesoreria",
+];
 
 /** Positions that come only from the coarse role (never assigned by hand). */
 export const ROLE_ONLY_POSITIONS: readonly string[] = ["famiglia", "atleta"];
 
 /** Area positions that can be added to an account (kept equal to the SQL `assignable` list in r65). */
-export const ASSIGNABLE_POSITIONS: readonly string[] = KNOWN_POSITIONS.filter((p) => !ROLE_ONLY_POSITIONS.includes(p));
+export const ASSIGNABLE_POSITIONS: readonly string[] = KNOWN_POSITIONS.filter(
+  (p) => !ROLE_ONLY_POSITIONS.includes(p),
+);
 
 export const ROLE_LABEL: Readonly<Record<DbRole, string>> = {
   DIRECTION: "Direzione",
@@ -27,7 +41,17 @@ export const ROLE_LABEL: Readonly<Record<DbRole, string>> = {
 };
 
 /** Roles offered in the role picker, most powerful last. */
-export const ROLE_ORDER: readonly DbRole[] = ["FAMILY", "ATHLETE", "STAFF", "MANAGER", "MISTER", "TOURNAMENTS", "REGISTRATION", "SECRETARIAT", "DIRECTION"];
+export const ROLE_ORDER: readonly DbRole[] = [
+  "FAMILY",
+  "ATHLETE",
+  "STAFF",
+  "MANAGER",
+  "MISTER",
+  "TOURNAMENTS",
+  "REGISTRATION",
+  "SECRETARIAT",
+  "DIRECTION",
+];
 
 export const POSITION_LABEL: Readonly<Record<string, string>> = {
   direzione: "Direzione",
@@ -55,17 +79,65 @@ export const POSITION_LABEL: Readonly<Record<string, string>> = {
   "responsabile-lavanderia": "Responsabile lavanderia",
   "collaboratore-lavanderia-pulizia": "Collaboratore lavanderia e pulizia",
   "responsabile-infermeria": "Responsabile infermeria",
+  moderatore: "Moderatore contenuti",
   "collaboratore-magazzino": "Collaboratore magazzino",
   "dirigente-collaboratore": "Dirigente collaboratore (anche genitore)",
   partner: "Partner / sponsor",
 };
 
-export const POSITION_GROUPS: ReadonlyArray<{ label: string; ids: readonly string[] }> = [
-  { label: "Squadre", ids: ["mister", "dirigente-annata", "coordinatore-attivita-sportiva", "responsabile-attivita-base"] },
-  { label: "Servizi", ids: ["responsabile-trasporti", "autista", "responsabile-magazzino", "collaboratore-magazzino", "responsabile-campi", "responsabile-club-house", "addetto-biglietteria", "responsabile-tornei", "dirigente-collaboratore"] },
-  { label: "Struttura e cura", ids: ["responsabile-struttura", "responsabile-struttura-colico", "responsabile-struttura-dervio", "responsabile-lavanderia", "collaboratore-lavanderia-pulizia", "responsabile-infermeria"] },
-  { label: "Segreteria", ids: ["segreteria-presenza", "segreteria-remoto"] },
-  { label: "Ufficio (solo Direzione)", ids: ["segreteria", "tesoreria", "dirigenza", "direttore-generale", "presidente", "direzione"] },
+export const POSITION_GROUPS: ReadonlyArray<{
+  label: string;
+  ids: readonly string[];
+}> = [
+  {
+    label: "Squadre",
+    ids: [
+      "mister",
+      "dirigente-annata",
+      "coordinatore-attivita-sportiva",
+      "responsabile-attivita-base",
+    ],
+  },
+  {
+    label: "Servizi",
+    ids: [
+      "responsabile-trasporti",
+      "autista",
+      "responsabile-magazzino",
+      "collaboratore-magazzino",
+      "responsabile-campi",
+      "responsabile-club-house",
+      "addetto-biglietteria",
+      "responsabile-tornei",
+      "dirigente-collaboratore",
+    ],
+  },
+  {
+    label: "Struttura e cura",
+    ids: [
+      "responsabile-struttura",
+      "responsabile-struttura-colico",
+      "responsabile-struttura-dervio",
+      "responsabile-lavanderia",
+      "collaboratore-lavanderia-pulizia",
+      "responsabile-infermeria",
+    ],
+  },
+  {
+    label: "Segreteria",
+    ids: ["segreteria-presenza", "segreteria-remoto", "moderatore"],
+  },
+  {
+    label: "Ufficio (solo Direzione)",
+    ids: [
+      "segreteria",
+      "tesoreria",
+      "dirigenza",
+      "direttore-generale",
+      "presidente",
+      "direzione",
+    ],
+  },
   { label: "Esterni", ids: ["partner"] },
 ];
 
@@ -82,7 +154,11 @@ export function positionLabel(p: string): string {
 }
 
 /** Can this actor edit that account at all? */
-export function canEditAccount(actor: DbRole | null, target: DbRole, isSelf: boolean): boolean {
+export function canEditAccount(
+  actor: DbRole | null,
+  target: DbRole,
+  isSelf: boolean,
+): boolean {
   if (isSelf || !actor) return false;
   if (actor === "DIRECTION") return true;
   if (actor === "SECRETARIAT") return !OFFICE_ROLES.includes(target);
@@ -91,13 +167,15 @@ export function canEditAccount(actor: DbRole | null, target: DbRole, isSelf: boo
 
 export function grantableRoles(actor: DbRole | null): DbRole[] {
   if (actor === "DIRECTION") return [...ROLE_ORDER];
-  if (actor === "SECRETARIAT") return ROLE_ORDER.filter((r) => !OFFICE_ROLES.includes(r));
+  if (actor === "SECRETARIAT")
+    return ROLE_ORDER.filter((r) => !OFFICE_ROLES.includes(r));
   return [];
 }
 
 export function grantablePositions(actor: DbRole | null): string[] {
   if (actor === "DIRECTION") return [...ASSIGNABLE_POSITIONS];
-  if (actor === "SECRETARIAT") return ASSIGNABLE_POSITIONS.filter((p) => !OFFICE_POSITIONS.includes(p));
+  if (actor === "SECRETARIAT")
+    return ASSIGNABLE_POSITIONS.filter((p) => !OFFICE_POSITIONS.includes(p));
   return [];
 }
 
@@ -127,18 +205,40 @@ export interface AccountFilter {
   status?: "attivi" | "sospesi" | "mai-entrati" | "tutti" | undefined;
 }
 
-const fold = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+const fold = (s: string) =>
+  s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
-export function filterAccounts(list: readonly Account[], f: AccountFilter): Account[] {
+export function filterAccounts(
+  list: readonly Account[],
+  f: AccountFilter,
+): Account[] {
   const q = fold((f.q ?? "").trim());
   return list.filter((a) => {
     if (f.role === "ufficio" && !OFFICE_ROLES.includes(a.role)) return false;
-    if (f.role && f.role !== "tutti" && f.role !== "ufficio" && a.role !== f.role) return false;
+    if (
+      f.role &&
+      f.role !== "tutti" &&
+      f.role !== "ufficio" &&
+      a.role !== f.role
+    )
+      return false;
     const status = f.status ?? "attivi";
     if (status === "attivi" && !a.active) return false;
     if (status === "sospesi" && a.active) return false;
     if (status === "mai-entrati" && (a.lastSignInAt || !a.active)) return false;
-    if (q && !fold([a.email, ...a.persons.map((p) => p.name), ...a.positions.map(positionLabel), ...a.teams, roleLabelOf(a.role)].join(" ")).includes(q)) return false;
+    if (
+      q &&
+      !fold(
+        [
+          a.email,
+          ...a.persons.map((p) => p.name),
+          ...a.positions.map(positionLabel),
+          ...a.teams,
+          roleLabelOf(a.role),
+        ].join(" "),
+      ).includes(q)
+    )
+      return false;
     return true;
   });
 }
@@ -163,12 +263,19 @@ export function accountCounts(list: readonly Account[]): AccountCounts {
   };
 }
 
-const ROME_DAY = new Intl.DateTimeFormat("it-IT", { timeZone: "Europe/Rome", day: "numeric", month: "short", year: "numeric" });
+const ROME_DAY = new Intl.DateTimeFormat("it-IT", {
+  timeZone: "Europe/Rome",
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+});
 
 export function lastSeen(iso: string | null): string {
   if (!iso) return "mai entrato";
   const d = new Date(iso);
-  return Number.isNaN(d.getTime()) ? "—" : `ultimo accesso ${ROME_DAY.format(d)}`;
+  return Number.isNaN(d.getTime())
+    ? "—"
+    : `ultimo accesso ${ROME_DAY.format(d)}`;
 }
 
 export const AUDIT_LABEL: Readonly<Record<string, string>> = {
@@ -180,17 +287,32 @@ export const AUDIT_LABEL: Readonly<Record<string, string>> = {
 };
 
 /** One-line Italian summary of an audit entry's detail. */
-export function auditSummary(action: string, detail: Record<string, unknown>): string {
+export function auditSummary(
+  action: string,
+  detail: Record<string, unknown>,
+): string {
   const roleOf = (v: unknown) => (typeof v === "string" ? roleLabelOf(v) : "");
-  const pos = (v: unknown) => (Array.isArray(v) ? v.filter((x): x is string => typeof x === "string").map(positionLabel).join(", ") : "");
+  const pos = (v: unknown) =>
+    Array.isArray(v)
+      ? v
+          .filter((x): x is string => typeof x === "string")
+          .map(positionLabel)
+          .join(", ")
+      : "";
   if (action === "SET_ACCESS") {
     const b = (detail["before"] ?? {}) as Record<string, unknown>;
     const a = (detail["after"] ?? {}) as Record<string, unknown>;
     const parts: string[] = [];
-    if ("role" in a && b["role"] !== a["role"]) parts.push(`ruolo ${roleOf(b["role"])} → ${roleOf(a["role"])}`);
-    if ("positions" in a && pos(b["positions"]) !== pos(a["positions"])) parts.push(`aree: ${pos(a["positions"]) || "nessuna"}`);
-    if ("teams" in a) parts.push(`squadre: ${Array.isArray(a["teams"]) && a["teams"].length ? (a["teams"] as string[]).join(", ") : "nessuna"}`);
-    if ("active" in a && b["active"] !== a["active"]) parts.push(a["active"] ? "riattivato" : "sospeso");
+    if ("role" in a && b["role"] !== a["role"])
+      parts.push(`ruolo ${roleOf(b["role"])} → ${roleOf(a["role"])}`);
+    if ("positions" in a && pos(b["positions"]) !== pos(a["positions"]))
+      parts.push(`aree: ${pos(a["positions"]) || "nessuna"}`);
+    if ("teams" in a)
+      parts.push(
+        `squadre: ${Array.isArray(a["teams"]) && a["teams"].length ? (a["teams"] as string[]).join(", ") : "nessuna"}`,
+      );
+    if ("active" in a && b["active"] !== a["active"])
+      parts.push(a["active"] ? "riattivato" : "sospeso");
     return parts.join(" · ") || "nessun cambiamento";
   }
   if (action === "GRANT_PERSON" || action === "APPROVE_REQUEST") {
