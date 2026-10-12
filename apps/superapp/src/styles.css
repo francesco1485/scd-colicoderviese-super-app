@@ -414,3 +414,5 @@ html.uv-big .sa-shell { zoom: 1.12; }
   .scd-action { transition: none; }
   .scd-action:active { transform: none; }
 }
+
+@keyframes scd-story-in { from { opacity: 0; transform: translateY(14px) scale(0.98); } to { opacity: 1; transform: none; } }

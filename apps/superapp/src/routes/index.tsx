@@ -18,6 +18,9 @@ import {
   type FixtureFilter,
 } from "@/components/universe/HomeBlocks";
 import { TeamBar, TeamPicker } from "@/components/universe/TeamBar";
+import { StoriesRow } from "@/components/universe/Stories";
+import { SPONSORS } from "@/lib/sponsors";
+import { buildStories, type ClubEvent } from "@/lib/stories";
 import { ClubCrestOfficial } from "@/components/SiteChrome";
 import { openAccessMenu } from "@/components/scd/AccessMenu";
 import { HallDoors } from "@/components/scd/hall";
@@ -83,6 +86,11 @@ export const Route = createFileRoute("/")({
   }),
   component: Home,
 });
+
+/** Club events already published in the app (real pages), offered in the club story. */
+const CLUB_EVENTS: readonly ClubEvent[] = [
+  { id: "christmas-lario-cup-2026", title: "Christmas Lario Cup", when: "8 dicembre", date: "2026-12-08", text: "1ª edizione a Colico e Dervio: iscrizioni aperte, squadre di prestigio, villaggio di Natale.", href: "/eventi/christmas-lario-cup", image: "/media/eventi/christmas-lario-cup-2026-maschile.webp" },
+];
 
 function readList(key: string): string[] {
   try {
@@ -181,6 +189,12 @@ function Home() {
   const teamOf = useCallback(
     (i: WeekItem): Team | undefined => teamById.get(i.group),
     [teamById],
+  );
+
+  const minute = Math.floor(nowMs / 60_000);
+  const stories = useMemo(
+    () => buildStories({ items: merged, teams, today, nowMs: minute * 60_000, sponsors: SPONSORS, events: CLUB_EVENTS }),
+    [merged, teams, today, minute],
   );
 
   const tomorrow = addDays(today, 1);
@@ -363,6 +377,9 @@ function Home() {
         onSelect={select}
         onOpenPicker={() => setPicker(true)}
       />
+      <div className="bg-[var(--uv-night)]">
+        <StoriesRow stories={stories} nowMs={nowMs} />
+      </div>
       <HeroBand mode={mode} upcoming={upcoming}>
         <NextTicket
           item={next}
