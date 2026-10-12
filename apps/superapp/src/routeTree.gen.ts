@@ -49,6 +49,7 @@ import { Route as CoreImpiantiCalendariRouteImport } from './routes/core.impiant
 import { Route as CoreStaffRouteImport } from './routes/core.staff'
 import { Route as DirezioneAccessiRouteImport } from './routes/direzione_.accessi'
 import { Route as DirezioneAcquistiRouteImport } from './routes/direzione_.acquisti'
+import { Route as DirezioneCervelloneRouteImport } from './routes/direzione_.cervellone'
 import { Route as EventiIndexRouteImport } from './routes/eventi.index'
 import { Route as EventiChristmasLarioCupRouteImport } from './routes/eventi.christmas-lario-cup'
 import { Route as GestionaleIndexRouteImport } from './routes/gestionale.index'
@@ -272,6 +273,11 @@ const DirezioneAcquistiRoute = DirezioneAcquistiRouteImport.update({
   path: '/direzione/acquisti',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DirezioneCervelloneRoute = DirezioneCervelloneRouteImport.update({
+  id: '/direzione_/cervellone',
+  path: '/direzione/cervellone',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EventiIndexRoute = EventiIndexRouteImport.update({
   id: '/eventi/',
   path: '/eventi/',
@@ -420,6 +426,7 @@ export interface FileRoutesByFullPath {
   '/core/staff': typeof CoreStaffRoute
   '/direzione/accessi': typeof DirezioneAccessiRoute
   '/direzione/acquisti': typeof DirezioneAcquistiRoute
+  '/direzione/cervellone': typeof DirezioneCervelloneRoute
   '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
   '/gestionale/mappa': typeof GestionaleMappaRoute
   '/gestionale/mister': typeof GestionaleMisterRoute
@@ -483,6 +490,7 @@ export interface FileRoutesByTo {
   '/core/staff': typeof CoreStaffRoute
   '/direzione/accessi': typeof DirezioneAccessiRoute
   '/direzione/acquisti': typeof DirezioneAcquistiRoute
+  '/direzione/cervellone': typeof DirezioneCervelloneRoute
   '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
   '/gestionale/mappa': typeof GestionaleMappaRoute
   '/gestionale/mister': typeof GestionaleMisterRoute
@@ -546,6 +554,7 @@ export interface FileRoutesById {
   '/core/staff': typeof CoreStaffRoute
   '/direzione_/accessi': typeof DirezioneAccessiRoute
   '/direzione_/acquisti': typeof DirezioneAcquistiRoute
+  '/direzione_/cervellone': typeof DirezioneCervelloneRoute
   '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
   '/gestionale/mappa': typeof GestionaleMappaRoute
   '/gestionale/mister': typeof GestionaleMisterRoute
@@ -611,6 +620,7 @@ export interface FileRouteTypes {
     | '/core/staff'
     | '/direzione/accessi'
     | '/direzione/acquisti'
+    | '/direzione/cervellone'
     | '/eventi/christmas-lario-cup'
     | '/gestionale/mappa'
     | '/gestionale/mister'
@@ -674,6 +684,7 @@ export interface FileRouteTypes {
     | '/core/staff'
     | '/direzione/accessi'
     | '/direzione/acquisti'
+    | '/direzione/cervellone'
     | '/eventi/christmas-lario-cup'
     | '/gestionale/mappa'
     | '/gestionale/mister'
@@ -736,6 +747,7 @@ export interface FileRouteTypes {
     | '/core/staff'
     | '/direzione_/accessi'
     | '/direzione_/acquisti'
+    | '/direzione_/cervellone'
     | '/eventi/christmas-lario-cup'
     | '/gestionale/mappa'
     | '/gestionale/mister'
@@ -800,6 +812,7 @@ export interface RootRouteChildren {
   CoreStaffRoute: typeof CoreStaffRoute
   DirezioneAccessiRoute: typeof DirezioneAccessiRoute
   DirezioneAcquistiRoute: typeof DirezioneAcquistiRoute
+  DirezioneCervelloneRoute: typeof DirezioneCervelloneRoute
   EventiChristmasLarioCupRoute: typeof EventiChristmasLarioCupRoute
   GestionaleMappaRoute: typeof GestionaleMappaRoute
   GestionaleMisterRoute: typeof GestionaleMisterRoute
@@ -1102,6 +1115,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DirezioneAcquistiRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/direzione_/cervellone': {
+      id: '/direzione_/cervellone'
+      path: '/direzione/cervellone'
+      fullPath: '/direzione/cervellone'
+      preLoaderRoute: typeof DirezioneCervelloneRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/eventi/': {
       id: '/eventi/'
       path: '/eventi'
@@ -1311,6 +1331,7 @@ const rootRouteChildren: RootRouteChildren = {
   CoreStaffRoute: CoreStaffRoute,
   DirezioneAccessiRoute: DirezioneAccessiRoute,
   DirezioneAcquistiRoute: DirezioneAcquistiRoute,
+  DirezioneCervelloneRoute: DirezioneCervelloneRoute,
   EventiChristmasLarioCupRoute: EventiChristmasLarioCupRoute,
   GestionaleMappaRoute: GestionaleMappaRoute,
   GestionaleMisterRoute: GestionaleMisterRoute,

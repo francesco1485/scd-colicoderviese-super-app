@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CalendarDays, ChevronRight, ClipboardList, KeyRound, Shirt, UserCheck, Users } from "lucide-react";
+import { Brain, CalendarDays, ChevronRight, ClipboardList, KeyRound, Shirt, UserCheck, Users, Wallet } from "lucide-react";
 
 import { AccessScreenPage, accessHead } from "@/components/scd/AccessScreen";
 import { Card, Chip } from "@/components/scd/interior-ui";
@@ -23,6 +23,8 @@ export const Route = createFileRoute("/direzione")({
 });
 
 const LINKS = [
+  { to: "/tesoreria/compensi", icon: Wallet, title: "Compensi e stipendi", sub: "Verifica, autorizza e passa alla Tesoreria entro il 15 del mese." },
+  { to: "/direzione/cervellone", icon: Brain, title: "Cervellone", sub: "Cerca in documenti, file, posta, economia, storia e impianti. Scadenze in vista." },
   { to: "/direzione/accessi", icon: KeyRound, title: "Accessi e permessi", sub: "Chi entra, con quale ruolo e quali aree in più. Sospendi, riattiva, storico." },
   { to: "/segreteria/persone", icon: UserCheck, title: "Persone e richieste di accesso", sub: "Anagrafica del club e registrazioni da verificare." },
   { to: "/gestionale/mister", icon: Shirt, title: "Rose e convocazioni", sub: "Rosa di ogni squadra, convocazioni con \"Ci sarò\"." },

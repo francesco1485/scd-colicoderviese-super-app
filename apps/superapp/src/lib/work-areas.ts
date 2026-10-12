@@ -27,6 +27,7 @@ export type WorkAreaId =
   | "organigramma"
   | "persone"
   | "accessi"
+  | "cervellone"
   | "certificati";
 
 export interface DriveMaster {
@@ -59,6 +60,7 @@ export const DRIVE_MASTERS = {
   organigrammaFigc: { key: "organigrammaFigc", name: "Organigramma FIGC (Portale Servizi)", fileId: null, note: "estratto del 24/09, privato" },
   elencoRuoli: { key: "elencoRuoli", name: "Elenco dirigenti e ruoli 2026/27", fileId: null, note: "privato, solo Direzione" },
   controlTower: { key: "controlTower", name: "SCD Control Tower 2026/27 · rapporti economici", fileId: null, note: "import iniziale del 12/10, privato" },
+  cervelloneDrive: { key: "cervelloneDrive", name: "SCD CERVELLONE · Catalogo e Memoria (Drive)", fileId: null, note: "cartella privata della società" },
   supabase: { key: "supabase", name: "Supabase SCD · persone, ruoli e storico", fileId: null, note: "database del club (r59)" },
 } as const satisfies Record<string, DriveMaster>;
 
@@ -116,6 +118,12 @@ export const WORK_AREAS: Readonly<Record<WorkAreaId, WorkAreaConfig>> = {
     description: "Scadenze dei certificati medici di ogni atleta, squadra per squadra: chi manca, chi è scaduto, chi è da controllare. Direzione e Segreteria.",
     sources: ["supabase", "iscrizioni", "inserimenti"],
     insertRoles: ["Direzione", "Segreteria"],
+  },
+  cervellone: {
+    id: "cervellone", label: "Cervellone · catalogo e memoria", path: pathOf("cervellone"), railId: "direzione",
+    description: "Ricerca in tutto ciò che la società ha catalogato: documenti agli atti, file, posta, economia, storia e impianti.",
+    sources: ["supabase", "cervelloneDrive", "inserimenti"],
+    insertRoles: ["Direzione"],
   },
   accessi: {
     id: "accessi", label: "Accessi", path: pathOf("accessi"), railId: "direzione",

@@ -19,6 +19,7 @@ const SUB_AREA_COPY: Readonly<Record<string, { label: string; icon: AreaIcon }>>
   persone: { label: "Persone", icon: "users" },
   certificati: { label: "Certificati medici", icon: "file" },
   compensi: { label: "Compensi e stipendi", icon: "coin" },
+  cervellone: { label: "Cervellone", icon: "file" },
 };
 
 /** Plain Italian for the role ids used in the registry. */

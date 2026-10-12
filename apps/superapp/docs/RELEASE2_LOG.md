@@ -328,3 +328,8 @@ prossimi impegni e "ci sarò" in primo piano). Desktop invariato.
 ## 2026-10-12 — Impianti: dati ufficiali dai documenti agli atti (UD-077)
 - `config/scd-facilities.v1.json`: blocco `technical` per Colico (catasto D/6 f.10 p.21081, tribuna 250 posti, spogliatoi, 6 estintori e piano emergenza 2019, illuminazione e progetti torri, club house 2017, rilievo area retro campi) e Dervio (verbale omologazione LND CRL campo 0865 del 28/09/2024: 97,80 x 50,00 m, 1ª categoria fino al 28/09/2028, 190 posti, spogliatoi e prescrizioni); `official` su SPA-DER-C1 accanto al valore del master (96 x 48, da correggere sul master); `drawing_standard` per piante 2D, mappa e rendering.
 - Test facilities aggiornati (indirizzo Dervio verificato, fatti ufficiali con fonte). Suite 494.
+
+## 2026-10-12 — r77 Cervellone in app (UD-077)
+- DB: `scd_kb_items` + `scd_kb_search` / `scd_kb_upsert` (applicata su SCD PULSE). Caricamento dal catalogo del Drive: documenti agli atti, indice file, indice posta, economia enti 2026/27, storia, impianti.
+- App: `/direzione/cervellone` con ricerca libera, filtri area/stagione/tipo e "Scadenze in vista"; link da /direzione (anche a Compensi). Solo link https verso gli originali.
+- Test: knowledge.test.ts; suite 497.
