@@ -58,6 +58,7 @@ export const DRIVE_MASTERS = {
   iscrizioni: { key: "iscrizioni", name: "Database Iscrizioni", fileId: null, note: "da collegare" },
   certificati: { key: "certificati", name: "Registro certificati", fileId: null, note: "da collegare" },
   inventario: { key: "inventario", name: "Inventario kit", fileId: null, note: "da caricare" },
+  ordineKit: { key: "ordineKit", name: "SCD_ORDINE_KIT · ordine kit pre campionato 2026/27", fileId: null, note: "copia automatica, solo numeri per squadra e taglia" },
   listino: { key: "listino", name: "Listino Club House", fileId: null, note: "da caricare" },
   tariffe: { key: "tariffe", name: "Tariffario biglietteria", fileId: null, note: "da confermare" },
   sanitario: { key: "sanitario", name: "Servizi e orari dello staff sanitario", fileId: null, note: "da definire" },
@@ -151,8 +152,8 @@ export const WORK_AREAS: Readonly<Record<WorkAreaId, WorkAreaConfig>> = {
   },
   magazzino: {
     id: "magazzino", label: "Magazzino", path: pathOf("magazzino"), railId: "magazzino",
-    description: "Kit, taglie e consegne per annata: inventario da caricare. Sola lettura.",
-    sources: ["inventario", "economico", "inserimenti"],
+    description: "Ordine kit per squadra e taglia dalla copia del foglio SCD_ORDINE_KIT; consegne segnate per taglia, senza nomi.",
+    sources: ["ordineKit", "inventario", "economico", "inserimenti"],
     insertRoles: ["Responsabile magazzino", "Segreteria", "Direzione"],
   },
   tesoreria: {

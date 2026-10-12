@@ -1685,6 +1685,30 @@
           "APP_NEVER_PAYS"
         ],
         "imported_at": "2026-10-12"
+      },
+      {
+        "id": "KIT_ORDER_SHEET",
+        "kind": "GOOGLE_DRIVE_XLSX",
+        "trust": "INTERNAL_VERIFIED",
+        "status": "ACTIVE",
+        "title": "SCD_ORDINE_KIT_SEMPLICE_TAGLIA_UNICA_2026-27 (ordine kit pre campionato)",
+        "resource_id": "1snVt5hOc11K6UHjo1B72gAKPvIZLW3Dm",
+        "authority_domains": [
+          "KIT_SIZES_PER_GROUP",
+          "KIT_ORDER_QUANTITIES"
+        ],
+        "consumers": [
+          "SCD_SUPABASE.scd_kit_order_groups",
+          "apps/superapp/src/routes/magazzino.tsx",
+          "tools/sync/kit_order_payload.py"
+        ],
+        "rules": [
+          "SHEET_IS_MASTER_FOR_SIZES",
+          "COPY_STORES_COUNTS_ONLY_NO_NAMES",
+          "DELIVERIES_RECORDED_IN_APP_LOGGED",
+          "READERS_WAREHOUSE_SECRETARIAT_TREASURY_DIRECTION"
+        ],
+        "imported_at": "2026-10-12"
       }
     ],
     "conflict_resolution": [

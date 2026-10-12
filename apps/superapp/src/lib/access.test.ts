@@ -76,13 +76,15 @@ describe("access screen content from the registry", () => {
   });
 
   it("says 'ruoli da definire' when the registry has no roles", () => {
-    const s = accessScreen("magazzino");
+    const s = accessScreen("infermeria");
     expect(s.roles).toEqual([]);
     expect(whoEnters(s)).toBe("ruoli da definire");
-    expect(s.sources).toEqual(["inventario kit (da caricare)"]);
-    expect(s.enter).toEqual({ href: "/aree", via: "gateway" });
-    expect(s.inside).toEqual([]);
-    expect(s.insideFrom).toBe("none");
+  });
+
+  it("lists the warehouse office and the kit order source for Magazzino (r83)", () => {
+    const s = accessScreen("magazzino");
+    expect(whoEnters(s)).toBe("responsabile magazzino, Segreteria, Tesoreria, Direzione");
+    expect(s.sources).toEqual(["SCD_ORDINE_KIT (KIT_ORDER_SHEET, r83)", "inventario kit (da caricare)"]);
   });
 
   it("sub-areas inherit the parent landing and show registry blockers and flows in Italian", () => {
