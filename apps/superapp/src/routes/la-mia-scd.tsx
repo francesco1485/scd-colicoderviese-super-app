@@ -5,7 +5,7 @@ import {
   Bus,
   CalendarDays,
   FileText,
-  Gamepad2,
+  Cake,
   Inbox,
   PenSquare,
   Shirt,
@@ -27,6 +27,8 @@ import {
   type Post,
 } from "@/lib/social";
 import {
+  getBirthdays,
+  type Birthday,
   getMyPosts,
   getPublicSocial,
   setFollow,
@@ -42,11 +44,12 @@ import { itemState, orderTeams } from "@/lib/universe";
  */
 export const Route = createFileRoute("/la-mia-scd")({
   loader: async () => {
-    const [session, social, calendar, myPosts] = await Promise.all([
+    const [session, social, calendar, myPosts, birthdays] = await Promise.all([
       getSession(),
       getPublicSocial(),
       getPublicCalendarSnapshot(),
       getMyPosts(),
+      getBirthdays(),
     ]);
     const serverNow = Date.now();
     const today =
@@ -58,6 +61,7 @@ export const Route = createFileRoute("/la-mia-scd")({
       groups: calendar.groups,
       events: calendar.events,
       myPosts,
+      birthdays,
       serverNow,
       today,
     };
@@ -84,8 +88,16 @@ const MAIN_TEAMS = [
 ];
 
 function MyPage() {
-  const { session, social, groups, events, myPosts, serverNow, today } =
-    Route.useLoaderData();
+  const {
+    session,
+    social,
+    groups,
+    events,
+    myPosts,
+    birthdays,
+    serverNow,
+    today,
+  } = Route.useLoaderData();
   if (!session.user) {
     return (
       <main
@@ -123,6 +135,7 @@ function MyPage() {
       groups={groups}
       events={events}
       myPosts={myPosts}
+      birthdays={birthdays}
       serverNow={serverNow}
       today={today}
     />
@@ -135,6 +148,7 @@ function Inside({
   groups,
   events,
   myPosts,
+  birthdays,
   serverNow,
   today,
 }: {
@@ -143,6 +157,7 @@ function Inside({
   groups: PublicGroup[];
   events: PublicEvent[];
   myPosts: Post[];
+  birthdays: Birthday[];
   serverNow: number;
   today: string;
 }) {
@@ -362,18 +377,34 @@ function Inside({
           </section>
         )}
 
-        <section className="flex items-center gap-3 rounded-[20px] bg-[#0b2a5b] p-4 text-white">
-          <span className="grid size-11 shrink-0 place-items-center rounded-[12px] bg-white/12">
-            <Gamepad2 className="size-6" aria-hidden="true" />
-          </span>
-          <span className="grid gap-0.5">
-            <b className="text-[15px]">Gioca e coupon partner</b>
-            <span className="text-[13px] text-[#c8d8ee]">
-              Quiz a soli punti e sconti dei partner: arrivano qui quando
-              saranno attivi. Niente estrazioni, niente premi in denaro.
-            </span>
-          </span>
-        </section>
+        {birthdays.length > 0 && (
+          <section
+            aria-label="Auguri di oggi"
+            className="rounded-[20px] bg-[linear-gradient(135deg,#ffd600,#ffb800)] p-4 text-[#0b1e3a] shadow-[0_2px_10px_rgb(11_42_91/0.12)]"
+          >
+            <h2 className="m-0 flex items-center gap-2 font-uv text-[24px] leading-none">
+              <Cake className="size-6" aria-hidden="true" /> BUON COMPLEANNO!
+            </h2>
+            <p className="mb-2 mt-1 text-[14px] font-semibold">
+              Oggi la famiglia ColicoDerviese fa gli auguri a:
+            </p>
+            <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
+              {birthdays.map((b) => (
+                <li
+                  key={b.id}
+                  className="rounded-full bg-white/80 px-3 py-1.5 text-[14.5px] font-bold"
+                >
+                  {b.name}
+                  {b.staff
+                    ? " · staff"
+                    : b.team
+                      ? ` · ${b.team === "prima" ? "Prima" : b.team.toUpperCase()}`
+                      : ""}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
         <Link
           to="/fantacalcio"
           className="scd-focus flex items-center gap-3 rounded-[20px] bg-[#0b2a5b] p-4 text-white shadow-[0_2px_10px_rgb(11_42_91/0.08)]"

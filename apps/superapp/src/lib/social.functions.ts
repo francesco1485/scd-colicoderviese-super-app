@@ -641,3 +641,38 @@ export const castWeekVote = createServerFn({ method: "POST" })
       message: r.on ? "Voto registrato." : "Voto tolto.",
     };
   });
+
+export interface Birthday {
+  id: string;
+  name: string;
+  team: string;
+  staff: boolean;
+}
+
+/**
+ * Today's birthdays (r93), only for signed-in members: adults full name, minors first name + initial, no age or date.
+ * Anonymous visitors get an empty list.
+ */
+export const getBirthdays = createServerFn({ method: "GET" }).handler(
+  async (): Promise<Birthday[]> => {
+    const { org, sb } = await context();
+    if (!org || !sb) return [];
+    const { data, error } = await sb.rpc("scd_birthdays_today", {
+      p_organization_id: org.organizationId,
+    });
+    if (error || !Array.isArray(data)) return [];
+    return data
+      .map((x: unknown) => {
+        const r = x as Record<string, unknown>;
+        return typeof r["id"] === "string" && typeof r["name"] === "string"
+          ? {
+              id: r["id"],
+              name: r["name"].trim(),
+              team: typeof r["team"] === "string" ? r["team"] : "",
+              staff: r["staff"] === true,
+            }
+          : null;
+      })
+      .filter((b): b is Birthday => b !== null && b.name.length > 0);
+  },
+);
