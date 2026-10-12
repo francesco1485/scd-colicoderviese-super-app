@@ -1727,6 +1727,30 @@
         "implementationStatus": "DONE",
         "duplicate_work": "DENY"
       }
+    },
+    {
+      "id": "UD-073",
+      "name": "HOME_LOOK_UNIVERSE_NO_MASCOT_HERO",
+      "sourceDate": "2026-10-12",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "non va bene era migliore quella di prima",
+        "non voglio vedere Sky li deve essere di contorno e di lavoro soprattutto dentro e sui bambini o iniziative",
+        "barre grandi e di sfondi così sono fuori luogo",
+        "App deve essere vissuta e deve diventare virale"
+      ],
+      "normalizedCommand": {
+        "rule": "The public home is one responsive SCD Universe page on every screen: crest and wordmark, then the match ticket, then the week's fixtures. Sky never appears as a hero or foreground figure on the home: side helper only, used inside the app and for kids and initiatives. No stacked large bars and no heavy photo backgrounds on the home. The app must feel lived-in and shareable.",
+        "scope": "UI_HOME",
+        "constraints": [
+          "no phone-only fork that changes the look",
+          "Sky cut-out never above the fold of the home",
+          "matches remain on the first screen"
+        ],
+        "implementation": "apps/superapp/src/routes/index.tsx (mobile fork removed), apps/superapp/src/components/universe/HomeBlocks.tsx (wordmark on all screens), HomeMobile.tsx deleted",
+        "status": "IMPLEMENTED_STAGING"
+      }
     }
   ],
   "completionGate": {

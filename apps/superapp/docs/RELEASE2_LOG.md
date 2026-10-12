@@ -309,3 +309,8 @@ prossimi impegni e "ci sarò" in primo piano). Desktop invariato.
 - Test: `launch-performance.test.ts`, `public-read-cache.test.ts`, `section-ids.test.ts`; test SGS spostato su `sgs-quality.data.ts`.
 - Aperto: CLS mobile /calendario 0.092 e /squadre 0.062 (sotto 0.1) per lo scambio di carattere; idratazione della home;
   loghi categoria PNG da 330 KB; HDI scaduto ancora nel nastro sponsor (decisione Direzione).
+
+## 2026-10-12 — UD-073 home look restored (SCD Universe on every screen)
+- Direzione rejected the phone home with the Sky hero and stacked bars: "era migliore quella di prima".
+- The phone/tablet fork (HomeMobile.tsx, da79f09/bec299b) is removed; the SCD Universe page (crest, wordmark, ticket, fixtures) is the single responsive home again. Sky stays a side helper (SkyCameo) only.
+- Checks: tsc, build, vitest 467, test:manifest, test:claude-hooks.

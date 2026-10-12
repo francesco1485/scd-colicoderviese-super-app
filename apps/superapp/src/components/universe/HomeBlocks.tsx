@@ -106,21 +106,8 @@ export function HeroBand({
         />
       </div>
       <div className="mx-auto grid max-w-[1200px] gap-[14px] lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-10">
-        {/* Phones and tablets: the header already carries the crest, so only the status line stays above the ticket. */}
-        <div className="flex flex-wrap items-center gap-2 lg:hidden" data-testid="home-status-row">
-          <p
-            role="status"
-            className="inline-flex items-center gap-2 rounded-full border-[1.5px] border-white/30 bg-white/10 py-[6px] pl-[10px] pr-[12px] text-[13.5px] font-extrabold backdrop-blur-md"
-          >
-            <i
-              aria-hidden="true"
-              className={`size-[9px] rounded-full ${mode === "live" ? "uv-blink bg-[var(--scd-red)]" : mode === "settimana" ? "bg-[#8fd3ff]" : "bg-[var(--uv-gold)]"}`}
-            />
-            {MODE_TEXT[mode](upcoming)}
-          </p>
-          <ColicoNowChip />
-        </div>
-        <div className="hidden lg:block">
+        {/* UD-073: the crest, wordmark and tagline open the page on every screen (compact on phones), as on the first SCD Universe home. */}
+        <div>
           <div className="flex items-center gap-3">
             <img
               src={CREST}

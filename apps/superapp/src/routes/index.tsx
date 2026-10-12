@@ -21,8 +21,6 @@ import { TeamBar, TeamPicker } from "@/components/universe/TeamBar";
 import { ClubCrestOfficial } from "@/components/SiteChrome";
 import { openAccessMenu } from "@/components/scd/AccessMenu";
 import { HallDoors } from "@/components/scd/hall";
-import { MobileHeader, MobileHero, MobileMatchCard, MobileSection, MobileSponsors, MobileTiles, QuickActions } from "@/components/universe/HomeMobile";
-import { ColicoNowChip } from "@/components/universe/MatchExtras";
 import type { Club } from "@/lib/club.types";
 import { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 import { getPublicFeed, getPublicSchedule } from "@/lib/club.functions";
@@ -336,64 +334,8 @@ function Home() {
 
   return (
     <main data-screen="home" className="min-h-dvh bg-[#eef3f9]">
-      {/* Phones and tablets: board SCD_HOME_PUBBLICA_ORIGINALE (VR-010) — light page, white cards, matches first (UD-057). */}
-      <div className="bg-[#eef3f9] pb-6 text-[var(--scd-ink)] lg:hidden" data-testid="home-mobile">
-        <MobileHeader />
-        <TeamBar
-          teams={teams}
-          follow={follow}
-          selection={selection}
-          live={live}
-          onSelect={select}
-          onOpenPicker={() => setPicker(true)}
-        />
-        <MobileHero
-          title={mode === "live" ? "In campo adesso" : upcoming > 0 ? "Questa settimana" : "Questa settimana"}
-          text="Sport, crescita e comunità nel cuore dell'Alto Lario."
-        >
-          <ColicoNowChip />
-        </MobileHero>
-        <div className="relative z-[1] mx-auto grid max-w-[760px] gap-4">
-          <QuickActions />
-          <MobileMatchCard
-            item={next}
-            team={next ? teamOf(next) : undefined}
-            others={others}
-            onPick={setPickId}
-            teamOf={teamOf}
-            clubOf={clubOf}
-            nowMs={nowMs}
-            going={!!next && going.includes(next.id)}
-            onGoing={toggleGoing}
-            onShare={share}
-          />
-          <MobileSection id="gare" title="Gare della settimana" more={{ label: "Calendario", href: "/calendario" }}>
-            <Fixtures
-              items={selected}
-              days={days}
-              today={today}
-              tomorrow={tomorrow}
-              nowMs={nowMs}
-              filter={filter}
-              day={day}
-              teamOf={teamOf}
-              onFilter={setFilter}
-              onDay={setDay}
-            />
-            <p className="px-1 pt-1.5 text-[12px] text-[var(--scd-sub)]">{sourceNote}.</p>
-          </MobileSection>
-          <MobileTiles />
-          <MobileSponsors />
-          <div className="mx-4">
-            <IdentityCard />
-          </div>
-          <div className="mx-4 rounded-[18px] bg-[var(--scd-navy)] px-3 pb-3 pt-1">
-            <HallDoors title="Il club in un tocco" compact />
-          </div>
-          <p className="text-center text-[11.5px] text-[var(--scd-sub)]">Versione di prova del {BUILD_STAMP}</p>
-        </div>
-      </div>
-      <div className="uv-page hidden pb-10 lg:block">
+      {/* One responsive page for every screen (UD-073): the SCD Universe home — no mascot hero, no stacked bars. */}
+      <div className="uv-page pb-10">
       {/* Phone top bar of board Main: the generic public bar is hidden here, the yellow "Entra" opens "Accesso aree". */}
       <header
         className="scd-pub flex h-14 items-center justify-between gap-3 border-b border-[rgb(248_208_0/0.22)] bg-[rgb(6_42_82/0.72)] px-4 font-text text-white lg:hidden"
