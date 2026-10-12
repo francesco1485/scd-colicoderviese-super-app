@@ -1826,6 +1826,31 @@
           "no minors' data in notification text"
         ]
       }
+    },
+    {
+      "sourceDate": "2026-10-12",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-077",
+      "name": "FULL_DRIVE_MAIL_CATALOG_CERVELLONE",
+      "sourceQuoteFragments": [
+        "leggere intero drive sportclubcolico@gmail.com sia nella home che nei file condivisi e analizzarli singolarmente e nel dettaglio tutti dal primo a ultimo",
+        "anche la mail sportclubcolico@gmail.com idem dal giorno di apertura mail fino ad oggi",
+        "come struttura economice e rifarla dal 1 luglio 2026 ad andare avanti , mentre la storia serve per avere un catalogo e una memoria",
+        "la posta mail va letta in tutto e per tutto , posta inviata , ricevuta , cartelle e tutuo",
+        "crearti nel drive una tua nuova cartella dove fai tu e a modo tuo la catalogazione di tutto e tutti",
+        "Ti autorizzo a non spostare documenti ma prendere i fiele e ricopiarli come meglio chredi"
+      ],
+      "normalizedCommand": {
+        "rule": "Catalogue every file (owned and shared) of the sportclubcolico@gmail.com Drive and every Gmail thread (inbox, sent, archived, all labels) from the mailbox opening to today, then read them in detail; rebuild the economic structure from 2026-07-01 onwards; keep earlier seasons as history/memory. The catalogue lives in a new Drive folder 'SCD CERVELLONE · Catalogo e Memoria' (id 1XG59Y1AWe9PApzEmfNMzuhX4) and is kept up to date continuously.",
+        "scope": "KNOWLEDGE_BASE",
+        "constraints": [
+          "never move or delete originals; copies allowed",
+          "key documents copied, everything else linked (storage quota shared with Gmail)",
+          "folder private; no IBAN, fiscal codes, health data or minors' names in summaries",
+          "continuity only through an explicit scheduled task"
+        ]
+      }
     }
   ],
   "completionGate": {
