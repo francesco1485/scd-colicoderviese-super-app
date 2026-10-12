@@ -145,5 +145,6 @@ export function landingFor(roles: ReadonlySet<string>): string {
     ["partner", "/partner"],
   ];
   for (const [id, path] of order) if (roles.has(id)) return path;
-  return "/aree";
+  // Base access (r85): everyone who signs up sees calendar and activities until Direzione enables more.
+  return "/calendario";
 }

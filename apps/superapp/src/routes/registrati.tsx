@@ -66,7 +66,7 @@ function Registrati() {
           <ClubCrestOfficial size={64} />
           <div>
             <h1 className="font-brand text-[42px] uppercase leading-[0.92] sm:text-[60px]">Registrati</h1>
-            <p className="mt-2 max-w-[38ch] text-[16px] leading-snug text-white/90 sm:text-[18px]">Cinque dati e la segreteria ti attiva, dopo aver verificato chi sei.</p>
+            <p className="mt-2 max-w-[38ch] text-[16px] leading-snug text-white/90 sm:text-[18px]">Un solo link per tutti: cinque dati e sei dentro. Poi la Direzione ti abilita quello che ti serve.</p>
           </div>
         </div>
       </section>
@@ -77,7 +77,7 @@ function Registrati() {
             <div role="status" className="grid gap-3">
               <h2 id={`${id}-h`} className="flex items-center gap-2 text-[22px] font-bold text-[var(--scd-ink)]">
                 <CircleCheck className="size-6 text-[#15803d]" aria-hidden="true" />
-                Richiesta ricevuta
+                Iscrizione fatta
               </h2>
               <p className="text-[15.5px] leading-snug text-[var(--scd-ink)]">{OUTCOME_MESSAGE.RECEIVED}</p>
               <Link to="/accedi" search={{ next: undefined }} className="scd-action h-[52px] w-full text-[17px] font-bold">
@@ -114,12 +114,12 @@ function Registrati() {
               <label className="flex items-start gap-3 rounded-[12px] bg-[#f4f8fd] p-3 text-[14.5px] leading-snug text-[var(--scd-ink)]">
                 <input type="checkbox" checked={form.consent} onChange={(e) => set("consent", e.target.checked)} aria-invalid={Boolean(show("consent"))} className="scd-focus mt-0.5 size-5 flex-none accent-[var(--scd-blue)]" />
                 <span>
-                  Ho letto l'<a href="/privacy" target="_blank" rel="noopener" className="font-semibold text-[var(--scd-blue)] underline">informativa privacy</a> e acconsento al trattamento dei dati da parte della S.C.D. ColicoDerviese per verificare la mia identità e attivare l'accesso.
+                  Ho letto l'<a href="/privacy" target="_blank" rel="noopener" className="font-semibold text-[var(--scd-blue)] underline">informativa privacy</a> e acconsento al trattamento dei dati da parte della S.C.D. ColicoDerviese per creare il mio accesso e verificare la mia identità.
                   {show("consent") && <b className="mt-1 block text-[#9a3412]">{show("consent")}</b>}
                 </span>
               </label>
               <button type="submit" disabled={busy} className="scd-action h-[52px] w-full text-[17px] font-bold disabled:opacity-60">
-                {busy ? "Invio…" : "Invia la richiesta"}
+                {busy ? "Invio…" : "Iscriviti"}
                 <ArrowRight className="size-5" aria-hidden="true" />
               </button>
               {outcome && (
@@ -135,15 +135,15 @@ function Registrati() {
         <aside className="grid content-start gap-3 text-[14.5px] leading-snug text-[var(--scd-sub)]">
           <p className="rounded-[14px] bg-white p-4 shadow-[0_6px_18px_-12px_rgb(2_20_51/0.4)]">
             <b className="block text-[15.5px] text-[var(--scd-ink)]">Cosa succede dopo</b>
-            La segreteria controlla i dati, ti collega alla tua scheda e, se sei un genitore, a tuo figlio. Poi entri da "Accedi" con la tua e-mail: niente password.
+            Entri subito da "Accedi" con la tua e-mail, niente password, e vedi calendario e attività del club. La Direzione controlla i dati, ti collega alla tua scheda (e, se sei un genitore, a tuo figlio) e ti abilita le funzioni del tuo ruolo. Può anche sospendere un accesso in qualsiasi momento.
           </p>
           <p className="rounded-[14px] bg-white p-4 shadow-[0_6px_18px_-12px_rgb(2_20_51/0.4)]">
             <b className="block text-[15.5px] text-[var(--scd-ink)]">Ragazzi</b>
-            Sotto i 14 anni registra un genitore o tutore, con i suoi dati. Dai 14 ai 17 anni puoi chiedere il tuo accesso: la segreteria verifica il consenso della famiglia.
+            Sotto i 14 anni registra un genitore o tutore, con i suoi dati. Dai 14 ai 17 anni puoi iscriverti: vedi solo calendario e attività finché la Direzione non verifica il consenso della famiglia.
           </p>
           <p className="rounded-[14px] bg-white p-4 shadow-[0_6px_18px_-12px_rgb(2_20_51/0.4)]">
             <b className="block text-[15.5px] text-[var(--scd-ink)]">Registri qualcun altro?</b>
-            Dirigenti e segreteria possono compilare il modulo per conto di una persona, con la sua e-mail: l'attivazione resta comunque una verifica della segreteria.
+            Dirigenti e segreteria possono compilare il modulo per conto di una persona, con la sua e-mail: le funzioni oltre al calendario le abilita comunque la Direzione.
           </p>
         </aside>
       </div>

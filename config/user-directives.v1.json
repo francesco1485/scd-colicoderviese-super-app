@@ -2038,6 +2038,26 @@
           "no autonomous changes to roles and permissions in production"
         ]
       }
+    },
+    {
+      "sourceDate": "2026-10-12",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-087",
+      "name": "ONE_LINK_SIGNUP_BASE_ACCESS",
+      "sourceQuoteFragments": [
+        "io non voglio invitare per ruolo, voglio dare a tutti lo stesso link e chiedere di iscriversi tutti vedranno la stessa cosa solo il calendario e le attivita, poi io dalla direzione autorizzero cosa possono fare cosi siamo certi che posso abilitare o disabilitare da remoto."
+      ],
+      "normalizedCommand": {
+        "rule": "No role-based invitations. One public sign-up link for everyone (/registrati). A valid sign-up (14+, consent) gets a login at once with base access only (USER_BASE: calendar and activities, no personal data, no person link). Direzione/Segreteria then enable role, areas and family links, or suspend, remotely from /direzione/accessi; every change audited. Implemented in r85.",
+        "scope": "IDENTITY_AND_ACCESS",
+        "constraints": [
+          "under 14 signs up through a parent or guardian",
+          "base access never reads personal or minors' data",
+          "enabling more than base is a Direzione/Segreteria decision, never automatic",
+          "same answer for every e-mail (no enumeration)"
+        ]
+      }
     }
   ],
   "completionGate": {

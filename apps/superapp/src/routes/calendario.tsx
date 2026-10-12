@@ -2,6 +2,7 @@ import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, CalendarDays, ChevronLeft, ChevronRight, Clock3, Link2, MapPin, RefreshCw, Search, Share2 } from "lucide-react";
 
+import { getSession } from "@/lib/auth.functions";
 import { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 import { Crest, DateBlock, PageHeader, PrimaryButton, SectionHead, Segmented, Sheet } from "@/components/scd/board";
 import { BallIcon, ConeIcon } from "@/components/scd/icons";
@@ -46,7 +47,10 @@ export const Route = createFileRoute("/calendario")({
     if ((WINDOWS as readonly number[]).includes(en)) out.entro = en as WindowDays;
     return out;
   },
-  loader: () => getPublicCalendarSnapshot(),
+  loader: async () => {
+    const [cal, session] = await Promise.all([getPublicCalendarSnapshot(), getSession()]);
+    return { ...cal, access: accessState(session) };
+  },
   head: () => ({
     meta: [
       { title: "Calendario 2026/27 — S.C.D. ColicoDerviese" },
@@ -60,6 +64,29 @@ export const Route = createFileRoute("/calendario")({
   component: Calendario,
 });
 
+/**
+ * Base access (r85): a signed-in person with no enabled area sees calendar and activities; a suspended or not yet
+ * active login is told so. Nothing personal is shown either way.
+ */
+type AccessState = "base" | "suspended" | null;
+function accessState(s: { user: { email: string } | null; roles: string[]; memberships: unknown[] }): AccessState {
+  if (!s.user) return null;
+  if (s.memberships.length === 0) return "suspended";
+  return s.roles.length === 0 ? "base" : null;
+}
+
+function BaseAccessNotice({ state }: { state: Exclude<AccessState, null> }) {
+  return (
+    <p role="status" className="mt-[12px] rounded-[12px] border border-[#f2d675] bg-[#fffbea] px-3 py-2.5 text-[14.5px] leading-snug text-[#5a4500]" data-testid="base-access-notice">
+      {state === "base" ? (
+        <>Sei dentro. Per ora vedi calendario e <Link to="/eventi" className="font-bold underline underline-offset-2">attività</Link> del club: la Direzione abilita le funzioni del tuo ruolo (la tua squadra, i tuoi figli, il tuo lavoro) dopo aver verificato i tuoi dati.</>
+      ) : (
+        <>Il tuo accesso non è attivo in questo momento. Puoi consultare il calendario; per riattivarlo scrivi alla segreteria del club.</>
+      )}
+    </p>
+  );
+}
+
 const fmt = (iso: string, o: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat("it-IT", { timeZone: "UTC", ...o }).format(new Date(`${iso}T12:00:00Z`));
 const romeNow = () => romeParts(new Date().toISOString()) ?? { date: new Date().toISOString().slice(0, 10), time: "00:00" };
 
@@ -68,7 +95,7 @@ type Row =
   | { kind: "allenamento"; id: string; date: string; time: string; title: string; sub: string; teams?: string };
 
 function Calendario() {
-  const { season, sourceModifiedAt, groups, events, origin } = Route.useLoaderData();
+  const { season, sourceModifiedAt, groups, events, origin, access } = Route.useLoaderData();
   const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
   const [refreshMsg, setRefreshMsg] = useState<string | null>(null);
@@ -186,6 +213,8 @@ function Calendario() {
               { label: "Squadra", active: tab === "Squadra", onClick: () => set({ vista: "prossime", p: undefined }) },
             ]}
           />
+
+          {access && <BaseAccessNotice state={access} />}
 
           {(filtersOpen || (tab !== "Squadra" && filtersActive)) && (
             <div id="cal-filtri" className="mt-[12px] grid gap-[8px] rounded-[12px] bg-[var(--scd-page)] p-[10px]">

@@ -25,7 +25,7 @@ describe("session positions", () => {
     expect(landingFor(new Set(["direzione", "mister"]))).toBe("/direzione");
     expect(landingFor(new Set(["autista"]))).toBe("/pulmini");
     expect(landingFor(new Set(["famiglia"]))).toBe("/famiglia");
-    expect(landingFor(new Set())).toBe("/aree");
+    expect(landingFor(new Set())).toBe("/calendario");
   });
 
   it("keeps the next path on our site", () => {
