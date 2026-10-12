@@ -34,7 +34,7 @@ const desktopNav: readonly NavItem[] = [
   { to: "/squadre", label: "Squadre" },
   { to: "/calendario", label: "Calendario" },
   { to: "/eventi", label: "Eventi" },
-  { to: "/grow", label: "Sponsor" },
+  { to: "/sponsor", label: "Sponsor" },
   { to: "/contatti", label: "Contatti" },
 ];
 
@@ -47,8 +47,8 @@ const footerNav: readonly NavItem[] = [
   { to: "/allenamenti", label: "Allenamenti" },
   { to: "/comunicazioni", label: "Comunicazioni" },
   { to: "/eventi", label: "Eventi" },
-  { to: "/core", label: "Area club" },
-  { to: "/grow", label: "Sponsor" },
+  { to: "/aree", label: "Area club" },
+  { to: "/sponsor", label: "Sponsor" },
   { to: "/contatti", label: "Contatti" },
 ];
 
@@ -73,7 +73,6 @@ const menuGroups: readonly {
       { to: "/eventi/christmas-lario-cup", label: "Christmas Lario Cup" },
       { to: "/community", label: "Tifosi" },
       { to: "/entra", label: "Gioca con noi" },
-      { to: "/shop", label: "Shop & membership" },
       { to: "/contatti", label: "Contatti" },
     ],
   },
@@ -81,11 +80,10 @@ const menuGroups: readonly {
     title: "Area club",
     app: "CORE",
     items: [
-      { to: "/core", label: "Area club · panoramica" },
-      { to: "/core/impianti-calendari", label: "Impianti e calendari" },
-      { to: "/core/atleta", label: "Area atleta (anteprima)" },
-      { to: "/core/famiglia", label: "Area famiglia (anteprima)" },
-      { to: "/core/staff", label: "Area staff (anteprima)" },
+      { to: "/la-mia-scd", label: "La mia SCD" },
+      { to: "/fantacalcio", label: "Fantacalcio SCD" },
+      { to: "/top11", label: "Top 11 della settimana" },
+      { to: "/rassegna", label: "Dicono di noi" },
       { to: "/aree", label: "Il tuo ingresso (tutte le aree)" },
     ],
   },
@@ -93,8 +91,7 @@ const menuGroups: readonly {
     title: "Sponsor & Partner",
     app: "GROW",
     items: [
-      { to: "/grow", label: "Sponsor & Partner" },
-      { to: "/sponsor", label: "Diventa sponsor" },
+      { to: "/sponsor", label: "Sponsor & Partner" },
       { to: "/fornitori", label: "Fornitori" },
     ],
   },
@@ -103,7 +100,6 @@ const menuGroups: readonly {
 const footerLinks: readonly NavItem[] = [
   { to: "/installa", label: "Installa l'app" },
   { to: "/guida", label: "Come funziona l'app" },
-  { to: "/shop", label: "Shop & membership" },
   { to: "/fornitori", label: "Fornitori" },
   { to: "/safeguarding", label: "Safeguarding" },
 ];

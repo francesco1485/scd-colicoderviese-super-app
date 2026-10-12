@@ -14,17 +14,19 @@ export const PUBLIC_PREFIXES: readonly string[] = [
   "/comunicazioni",
   "/contatti",
   "/eventi",
+  "/fantacalcio",
   "/fornitori",
   "/guida",
   "/impianti",
   "/installa",
   "/partner",
   "/privacy",
+  "/rassegna",
   "/safeguarding",
-  "/shop",
   "/societa",
   "/sponsor",
   "/squadre",
+  "/top11",
 ];
 
 export function isPublicPath(pathname: string): boolean {
@@ -90,6 +92,8 @@ export function demoRedirect(pathname: string, production: boolean): string | nu
   if (!production) return null;
   if (pathname === "/core" || pathname.startsWith("/core/")) return "/aree";
   if (pathname === "/grow" || pathname.startsWith("/grow/")) return "/sponsor";
+  // Shop not open yet (nothing can be bought): the public link lands on the sponsor page.
+  if (pathname === "/shop" || pathname.startsWith("/shop/")) return "/sponsor";
   return null;
 }
 

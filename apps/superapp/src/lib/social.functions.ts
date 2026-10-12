@@ -585,7 +585,7 @@ export const getWeekVote = createServerFn({ method: "GET" }).handler(
       };
     const s = await sessionView();
     const org = s.memberships[0] ?? null;
-    const [last, cand, mine, month] = await Promise.all([
+    const [last, month, cand, mine] = await Promise.all([
       sb.rpc("scd_top11", { p_org_slug: ORG_SLUG }),
       sb.rpc("scd_month_awards", { p_org_slug: ORG_SLUG }),
       org
