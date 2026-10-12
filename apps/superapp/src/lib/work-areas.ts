@@ -25,6 +25,7 @@ export type WorkAreaId =
   | "quote"
   | "coda"
   | "scadenzario"
+  | "movimenti"
   | "infermeria"
   | "mister"
   | "organigramma"
@@ -65,6 +66,7 @@ export const DRIVE_MASTERS = {
   elencoRuoli: { key: "elencoRuoli", name: "Elenco dirigenti e ruoli 2026/27", fileId: null, note: "privato, solo Direzione" },
   controlTower: { key: "controlTower", name: "SCD Control Tower 2026/27 · rapporti economici", fileId: null, note: "import iniziale del 12/10, privato" },
   cervelloneDrive: { key: "cervelloneDrive", name: "SCD CERVELLONE · Catalogo e Memoria (Drive)", fileId: null, note: "cartella privata della società" },
+  contoSumup: { key: "contoSumup", name: "Conto SumUp della società · estratto movimenti", fileId: null, note: "estratto caricato da Direzione/Tesoreria, privato" },
   supabase: { key: "supabase", name: "Supabase SCD · persone, ruoli e storico", fileId: null, note: "database del club (r59)" },
 } as const satisfies Record<string, DriveMaster>;
 
@@ -199,6 +201,12 @@ export const WORK_AREAS: Readonly<Record<WorkAreaId, WorkAreaConfig>> = {
     id: "scadenzario", label: "Tesoreria · Fornitori e scadenze", path: pathOf("scadenzario"), railId: "tesoreria",
     description: "Debiti verso fornitori, piani di rientro e agenda dei pagamenti dal foglio TESORERIA FORNITORI. Riservato.",
     sources: ["fornitori", "supabase", "inserimenti"],
+    insertRoles: ["Direzione", "Tesoreria"],
+  },
+  movimenti: {
+    id: "movimenti", label: "Tesoreria · Movimenti del conto", path: pathOf("movimenti"), railId: "tesoreria",
+    description: "Registro dei movimenti del conto SumUp della società e riscontro dei pagamenti delle famiglie con le quote. Riservato.",
+    sources: ["contoSumup", "economico", "supabase", "inserimenti"],
     insertRoles: ["Direzione", "Tesoreria"],
   },
   infermeria: {

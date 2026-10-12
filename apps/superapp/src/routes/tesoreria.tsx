@@ -26,8 +26,8 @@ function TesoreriaRoute() {
         title="Tesoreria · sottoaree"
         preview={gate.preview}
         highlights={[
-          { value: 7, label: "sottoaree con accesso dedicato" },
-          { value: 3, label: "con dati reali: compensi, quote, fornitori" },
+          { value: 8, label: "sottoaree con accesso dedicato" },
+          { value: 4, label: "con dati reali: compensi, quote, fornitori, movimenti" },
           { value: null, label: "incassi di oggi: casse da collegare" },
         ]}
         note="Compensi, quote e fornitori leggono i dati reali; casse e listini non sono ancora collegati. L'app non paga e non incassa."
@@ -52,6 +52,13 @@ function TesoreriaRoute() {
               <div className="px-4 pb-4 sm:px-[18px]">
                 <Link to="/tesoreria/fornitori" className="scd-focus inline-flex h-11 items-center gap-2 rounded-[10px] bg-[var(--in-info)] px-4 text-[15px] font-bold text-white" data-testid="tes-fornitori-link">
                   <CalendarClock className="size-4" aria-hidden="true" /> Apri agenda pagamenti
+                </Link>
+              </div>
+            </Card>
+            <Card id="tes-movimenti" title="Movimenti del conto" sub="Direzione e Tesoreria: registro del conto SumUp, riscontro dei bonifici delle famiglie con le quote del Gestionale.">
+              <div className="px-4 pb-4 sm:px-[18px]">
+                <Link to="/tesoreria/movimenti" className="scd-focus inline-flex h-11 items-center gap-2 rounded-[10px] bg-[var(--in-info)] px-4 text-[15px] font-bold text-white" data-testid="tes-movimenti-link">
+                  <Wallet className="size-4" aria-hidden="true" /> Apri movimenti
                 </Link>
               </div>
             </Card>

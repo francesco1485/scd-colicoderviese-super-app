@@ -1660,6 +1660,31 @@
           "APP_NEVER_PAYS"
         ],
         "imported_at": "2026-10-12"
+      },
+      {
+        "id": "SUMUP_BUSINESS_ACCOUNT",
+        "kind": "BANK_STATEMENT_EXPORT",
+        "trust": "INTERNAL_VERIFIED",
+        "status": "ACTIVE",
+        "title": "Conto SumUp della società (estratto movimenti, CSV)",
+        "account": "SumUp MYYM50MA (aperto 10/07/2026)",
+        "authority_domains": [
+          "ACCOUNT_MOVEMENTS",
+          "FAMILY_PAYMENTS_RECEIVED",
+          "ACCOUNT_BALANCE"
+        ],
+        "consumers": [
+          "SCD_SUPABASE.scd_ledger_entries",
+          "apps/superapp/src/routes/tesoreria_.movimenti.tsx"
+        ],
+        "rules": [
+          "IMMUTABLE_MOVEMENTS",
+          "NEVER_STORE_IBAN",
+          "NEVER_STORE_FAMILY_NAMES_LINK_BY_TRANSIENT_HINT",
+          "READERS_DIRECTION_AND_TREASURY_ONLY",
+          "APP_NEVER_PAYS"
+        ],
+        "imported_at": "2026-10-12"
       }
     ],
     "conflict_resolution": [

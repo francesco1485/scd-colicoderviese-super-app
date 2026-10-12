@@ -68,7 +68,11 @@
           "features": ["dovuto, pagato, residuo e scaduto della stagione", "quadro per categoria", "lista di lavoro: in ritardo, da comunicare, da verificare", "calendario rate 15/10 · 31/10 · 30/11", "famiglie: solo le proprie quote in /famiglia"], "status": "live" },
         { "id": "scadenzario", "path": "/tesoreria/fornitori", "audience": "staff", "roles": ["direzione", "presidente", "direttore-generale", "tesoreria"], "role_map": { "direzione": "DIRECTION", "presidente": "DIRECTION", "direttore-generale": "DIRECTION", "tesoreria": "STAFF" },
           "sources": ["SCD - TESORERIA FORNITORI | SCADENZE E CHIUSURE 2026-2027 (FORNITORI, PAGAMENTI — copy by scheduled job)", "Supabase scd_supplier_* (migration r80)"],
-          "features": ["debito concordato, pagato e residuo per fornitore", "agenda pagamenti per settimana con promemoria a 5 giorni", "piani attivi, da definire, contestati, chiusi", "link alla conversazione con il fornitore", "nessun contatto personale né IBAN"], "status": "live" }
+          "features": ["debito concordato, pagato e residuo per fornitore", "agenda pagamenti per settimana con promemoria a 5 giorni", "piani attivi, da definire, contestati, chiusi", "link alla conversazione con il fornitore", "nessun contatto personale né IBAN"], "status": "live" },
+        { "id": "movimenti", "path": "/tesoreria/movimenti", "audience": "staff", "roles": ["direzione", "presidente", "direttore-generale", "tesoreria"], "role_map": { "direzione": "DIRECTION", "presidente": "DIRECTION", "direttore-generale": "DIRECTION", "tesoreria": "STAFF" },
+          "sources": ["SumUp business account statement (CSV export, account MYYM50MA)", "Supabase scd_ledger_entries (migration r82)"],
+          "flow": ["movimento registrato", "abbinato in automatico alla posizione quote", "verificato dalla Tesoreria"],
+          "features": ["saldo, entrate, uscite e commissioni", "saldi progressivi verificati", "quote: banca e Gestionale a confronto", "per mese e per categoria", "niente IBAN e niente nomi delle famiglie nel registro"], "status": "live" }
       ] },
     { "id": "direzione", "path": "/direzione", "audience": "staff", "board": "Plancia-direzione.dc.html", "status": "live",
       "children": [ { "id": "acquisti", "path": "/direzione/acquisti", "roles": ["dirigenza"], "flow": ["richiesta", "approvazione", "ordine", "fattura", "pagamento"], "status": "design" },
