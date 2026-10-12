@@ -23,6 +23,11 @@ EMAIL = re.compile(r"[\w.+-]+@[\w-]+(\.[\w-]+)+")
 IBAN = re.compile(r"\bIT\s?\d{2}\s?[A-Z](\s?[0-9A-Z]){22}\b", re.IGNORECASE)
 PHONE = re.compile(r"(\+?\d[\d\s./-]{7,}\d)")
 GMAIL = re.compile(r"^https://mail\.google\.com/")
+# Contact people named in free text ("tramite responsabile di zona Mario Rossi", "Ricontattare Mario Rossi"):
+# the person's name is dropped, the role stays. Supplier company names live in their own column.
+PERSON_AFTER_ROLE = re.compile(
+    r"\b((?:[Rr]icontattare|[Cc]ontattare|[Ss]entire|[Rr]esponsabile(?: di zona)?|[Rr]eferente(?: commerciale)?|[Aa]gente|sig\.?(?:ra)?|dott\.?(?:ssa)?))\s+"
+    r"[A-ZÀ-Ý][a-zà-ÿ']+(?:\s+[A-ZÀ-Ý][a-zà-ÿ']+){1,2}")
 
 
 def text(v, limit: int = 200) -> str | None:
@@ -39,6 +44,7 @@ def clean(v, limit: int = 200) -> str | None:
     s = EMAIL.sub("[mail]", s)
     s = IBAN.sub("[iban]", s)
     s = PHONE.sub(lambda m: "[tel]" if len(re.sub(r"\D", "", m[0])) >= 9 else m[0], s)
+    s = PERSON_AFTER_ROLE.sub(lambda m: m[1] + (" il referente" if m[1].lower() in ("ricontattare", "contattare", "sentire") else ""), s)
     return s[:limit].strip() or None
 
 
@@ -207,6 +213,9 @@ def build(path: str, source_modified: str | None) -> dict:
 
 
 def self_test() -> None:
+    assert clean("Da riattivare tramite responsabile di zona Franco Bianchi") == "Da riattivare tramite responsabile di zona", clean("Da riattivare tramite responsabile di zona Franco Bianchi")
+    assert clean("Ricontattare Marco Verdi e chiudere accordo") == "Ricontattare il referente e chiudere accordo"
+    assert clean("Verificare prima rata") == "Verificare prima rata"
     import os
     import tempfile
 
