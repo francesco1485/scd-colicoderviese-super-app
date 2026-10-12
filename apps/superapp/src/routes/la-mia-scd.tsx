@@ -8,6 +8,7 @@ import {
   Gamepad2,
   Inbox,
   PenSquare,
+  Shirt,
   Trophy,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -373,6 +374,20 @@ function Inside({
             </span>
           </span>
         </section>
+        <Link
+          to="/fantacalcio"
+          className="scd-focus flex items-center gap-3 rounded-[20px] bg-[#0b2a5b] p-4 text-white shadow-[0_2px_10px_rgb(11_42_91/0.08)]"
+        >
+          <span className="grid size-11 shrink-0 place-items-center rounded-[12px] bg-[#2f8f4e] text-white">
+            <Shirt className="size-6" aria-hidden="true" />
+          </span>
+          <span className="grid gap-0.5">
+            <b className="text-[15px]">Fantacalcio SCD</b>
+            <span className="text-[13px] text-[#c8d8ee]">
+              Scegli i tuoi 11 e fai punti con le partite vere. Gratis.
+            </span>
+          </span>
+        </Link>
         <Link
           to="/top11"
           className="scd-focus flex items-center gap-3 rounded-[20px] bg-white p-4 shadow-[0_2px_10px_rgb(11_42_91/0.08)]"

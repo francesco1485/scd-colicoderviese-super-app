@@ -14,6 +14,7 @@ import { groupForTeamCode, otherAnnate, registrationLabel, rosterOf, rosterSumma
 import { getMyRoster, type MyRoster } from "@/lib/roster.functions";
 import { CallupPanel } from "@/components/scd/CallupPanel";
 import { MatchSheetPanel } from "@/components/scd/MatchSheetPanel";
+import { MatchReportPanel } from "@/components/scd/MatchReportPanel";
 
 /**
  * Mister (boards Mister.dc.html + Mister-Oggi.dc.html): today panel of one team from the calendar
@@ -73,6 +74,10 @@ function MisterPage({ data }: { data: Loaded }) {
     [team, data.events, now.date, now.time],
   );
   const next = team?.next ?? null;
+  const lastPlayed = useMemo(
+    () => (team ? [...data.events].filter((e) => e.group === team.id && (e.date < now.date || (e.date === now.date && e.time !== "" && e.time <= now.time))).pop() ?? null : null),
+    [team, data.events, now.date, now.time],
+  );
   const [sheetKey, setSheetKey] = useState(0);
 
   return (
@@ -142,6 +147,14 @@ function MisterPage({ data }: { data: Loaded }) {
                 <Card id="mis-distinta" title="Distinta" sub="Alla gara scegli tra i convocati chi va in lista. Poi il dirigente la ricopia sul portale LND.">
                   <div className="px-4 pb-4 sm:px-[18px]">
                     <MatchSheetPanel key={next.id} eventId={next.id} refreshKey={sheetKey} heading={`${team.tag} – ${titleCase(next.opponent || "avversario da definire")} · ${longDate(next.date)}${next.time ? `, ${next.time}` : ""}`} />
+                  </div>
+                </Card>
+              )}
+
+              {squadKnown && lastPlayed && (
+                <Card id="mis-tabellino" title="Tabellino" sub="Dopo la gara: risultato, minuti, gol, assist e cartellini. Aggiorna i punti del Fantacalcio SCD.">
+                  <div className="px-4 pb-4 sm:px-[18px]">
+                    <MatchReportPanel key={lastPlayed.id} eventId={lastPlayed.id} heading={`${team?.tag ?? ""} – ${titleCase(lastPlayed.opponent || "avversario")} · ${longDate(lastPlayed.date)}`} />
                   </div>
                 </Card>
               )}

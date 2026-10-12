@@ -21,6 +21,7 @@ import { Route as DirezioneRouteImport } from './routes/direzione'
 import { Route as DocumentiRouteImport } from './routes/documenti'
 import { Route as EntraRouteImport } from './routes/entra'
 import { Route as FamigliaRouteImport } from './routes/famiglia'
+import { Route as FantacalcioRouteImport } from './routes/fantacalcio'
 import { Route as FornitoriRouteImport } from './routes/fornitori'
 import { Route as GrowRouteImport } from './routes/grow'
 import { Route as GuidaRouteImport } from './routes/guida'
@@ -141,6 +142,11 @@ const EntraRoute = EntraRouteImport.update({
 const FamigliaRoute = FamigliaRouteImport.update({
   id: '/famiglia',
   path: '/famiglia',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FantacalcioRoute = FantacalcioRouteImport.update({
+  id: '/fantacalcio',
+  path: '/fantacalcio',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FornitoriRoute = FornitoriRouteImport.update({
@@ -467,6 +473,7 @@ export interface FileRoutesByFullPath {
   '/documenti': typeof DocumentiRoute
   '/entra': typeof EntraRoute
   '/famiglia': typeof FamigliaRoute
+  '/fantacalcio': typeof FantacalcioRoute
   '/fornitori': typeof FornitoriRoute
   '/grow': typeof GrowRoute
   '/guida': typeof GuidaRoute
@@ -542,6 +549,7 @@ export interface FileRoutesByTo {
   '/documenti': typeof DocumentiRoute
   '/entra': typeof EntraRoute
   '/famiglia': typeof FamigliaRoute
+  '/fantacalcio': typeof FantacalcioRoute
   '/fornitori': typeof FornitoriRoute
   '/grow': typeof GrowRoute
   '/guida': typeof GuidaRoute
@@ -617,6 +625,7 @@ export interface FileRoutesById {
   '/documenti': typeof DocumentiRoute
   '/entra': typeof EntraRoute
   '/famiglia': typeof FamigliaRoute
+  '/fantacalcio': typeof FantacalcioRoute
   '/fornitori': typeof FornitoriRoute
   '/grow': typeof GrowRoute
   '/guida': typeof GuidaRoute
@@ -694,6 +703,7 @@ export interface FileRouteTypes {
     | '/documenti'
     | '/entra'
     | '/famiglia'
+    | '/fantacalcio'
     | '/fornitori'
     | '/grow'
     | '/guida'
@@ -769,6 +779,7 @@ export interface FileRouteTypes {
     | '/documenti'
     | '/entra'
     | '/famiglia'
+    | '/fantacalcio'
     | '/fornitori'
     | '/grow'
     | '/guida'
@@ -843,6 +854,7 @@ export interface FileRouteTypes {
     | '/documenti'
     | '/entra'
     | '/famiglia'
+    | '/fantacalcio'
     | '/fornitori'
     | '/grow'
     | '/guida'
@@ -919,6 +931,7 @@ export interface RootRouteChildren {
   DocumentiRoute: typeof DocumentiRoute
   EntraRoute: typeof EntraRoute
   FamigliaRoute: typeof FamigliaRoute
+  FantacalcioRoute: typeof FantacalcioRoute
   FornitoriRoute: typeof FornitoriRoute
   GrowRoute: typeof GrowRoute
   GuidaRoute: typeof GuidaRoute
@@ -1060,6 +1073,13 @@ declare module '@tanstack/react-router' {
       path: '/famiglia'
       fullPath: '/famiglia'
       preLoaderRoute: typeof FamigliaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fantacalcio': {
+      id: '/fantacalcio'
+      path: '/fantacalcio'
+      fullPath: '/fantacalcio'
+      preLoaderRoute: typeof FantacalcioRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/fornitori': {
@@ -1526,6 +1546,7 @@ const rootRouteChildren: RootRouteChildren = {
   DocumentiRoute: DocumentiRoute,
   EntraRoute: EntraRoute,
   FamigliaRoute: FamigliaRoute,
+  FantacalcioRoute: FantacalcioRoute,
   FornitoriRoute: FornitoriRoute,
   GrowRoute: GrowRoute,
   GuidaRoute: GuidaRoute,
