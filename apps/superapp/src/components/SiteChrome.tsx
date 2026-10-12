@@ -98,7 +98,7 @@ const footerLinks: readonly NavItem[] = [
  */
 // Gated work areas render their access screen without a session: same board header.
 const ACCESS_SCREEN_PATHS = [...ACCESS_SCREEN_IDS, ...WORK_AREA_IDS].map((id) => findArea(id)?.path).filter((p): p is string => !!p);
-const BOARD_ROUTES = ["/", "/calendario", "/allenamenti", "/comunicazioni", "/core", "/core/atleta", "/core/famiglia", "/core/staff", "/core/impianti-calendari", "/grow", ...ACCESS_SCREEN_PATHS];
+const BOARD_ROUTES = ["/", "/calendario", "/allenamenti", "/comunicazioni", "/core", "/core/atleta", "/core/famiglia", "/core/staff", "/core/impianti-calendari", "/grow", "/documenti", ...ACCESS_SCREEN_PATHS];
 export const isBoardRoute = (p: string) => BOARD_ROUTES.includes(p.replace(/\/$/, "") || "/");
 
 const isActive = (pathname: string, to: string) => (to === "/" ? pathname === "/" : pathname === to || pathname.startsWith(`${to}/`));

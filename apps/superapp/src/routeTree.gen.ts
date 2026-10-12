@@ -17,6 +17,7 @@ import { Route as ComunicazioniRouteImport } from './routes/comunicazioni'
 import { Route as ContattiRouteImport } from './routes/contatti'
 import { Route as CrmRouteImport } from './routes/crm'
 import { Route as DirezioneRouteImport } from './routes/direzione'
+import { Route as DocumentiRouteImport } from './routes/documenti'
 import { Route as EntraRouteImport } from './routes/entra'
 import { Route as FamigliaRouteImport } from './routes/famiglia'
 import { Route as FornitoriRouteImport } from './routes/fornitori'
@@ -113,6 +114,11 @@ const CrmRoute = CrmRouteImport.update({
 const DirezioneRoute = DirezioneRouteImport.update({
   id: '/direzione',
   path: '/direzione',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocumentiRoute = DocumentiRouteImport.update({
+  id: '/documenti',
+  path: '/documenti',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EntraRoute = EntraRouteImport.update({
@@ -415,6 +421,7 @@ export interface FileRoutesByFullPath {
   '/contatti': typeof ContattiRoute
   '/crm': typeof CrmRoute
   '/direzione': typeof DirezioneRoute
+  '/documenti': typeof DocumentiRoute
   '/entra': typeof EntraRoute
   '/famiglia': typeof FamigliaRoute
   '/fornitori': typeof FornitoriRoute
@@ -482,6 +489,7 @@ export interface FileRoutesByTo {
   '/contatti': typeof ContattiRoute
   '/crm': typeof CrmRoute
   '/direzione': typeof DirezioneRoute
+  '/documenti': typeof DocumentiRoute
   '/entra': typeof EntraRoute
   '/famiglia': typeof FamigliaRoute
   '/fornitori': typeof FornitoriRoute
@@ -549,6 +557,7 @@ export interface FileRoutesById {
   '/contatti': typeof ContattiRoute
   '/crm': typeof CrmRoute
   '/direzione': typeof DirezioneRoute
+  '/documenti': typeof DocumentiRoute
   '/entra': typeof EntraRoute
   '/famiglia': typeof FamigliaRoute
   '/fornitori': typeof FornitoriRoute
@@ -618,6 +627,7 @@ export interface FileRouteTypes {
     | '/contatti'
     | '/crm'
     | '/direzione'
+    | '/documenti'
     | '/entra'
     | '/famiglia'
     | '/fornitori'
@@ -685,6 +695,7 @@ export interface FileRouteTypes {
     | '/contatti'
     | '/crm'
     | '/direzione'
+    | '/documenti'
     | '/entra'
     | '/famiglia'
     | '/fornitori'
@@ -751,6 +762,7 @@ export interface FileRouteTypes {
     | '/contatti'
     | '/crm'
     | '/direzione'
+    | '/documenti'
     | '/entra'
     | '/famiglia'
     | '/fornitori'
@@ -819,6 +831,7 @@ export interface RootRouteChildren {
   ContattiRoute: typeof ContattiRoute
   CrmRoute: typeof CrmRoute
   DirezioneRoute: typeof DirezioneRoute
+  DocumentiRoute: typeof DocumentiRoute
   EntraRoute: typeof EntraRoute
   FamigliaRoute: typeof FamigliaRoute
   FornitoriRoute: typeof FornitoriRoute
@@ -928,6 +941,13 @@ declare module '@tanstack/react-router' {
       path: '/direzione'
       fullPath: '/direzione'
       preLoaderRoute: typeof DirezioneRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/documenti': {
+      id: '/documenti'
+      path: '/documenti'
+      fullPath: '/documenti'
+      preLoaderRoute: typeof DocumentiRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/entra': {
@@ -1362,6 +1382,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContattiRoute: ContattiRoute,
   CrmRoute: CrmRoute,
   DirezioneRoute: DirezioneRoute,
+  DocumentiRoute: DocumentiRoute,
   EntraRoute: EntraRoute,
   FamigliaRoute: FamigliaRoute,
   FornitoriRoute: FornitoriRoute,

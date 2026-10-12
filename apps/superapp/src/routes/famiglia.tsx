@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { CalendarDays, Check, MapPin, Shirt, X } from "lucide-react";
 import { useState } from "react";
@@ -103,6 +103,11 @@ function FamilyHome({ roles, badge, members, callups, fees, failed }: { roles: s
         </Card>
 
         {fees.length > 0 && <FeesCard fees={fees} today={today} />}
+        <Card id="fam-documenti" title="Documenti del club" sub="Regolamenti, codice di condotta, privacy e trasferte: quelli che riguardano la tua famiglia.">
+          <div className="px-4 pb-4 sm:px-[18px]">
+            <Link to="/documenti" className="scd-focus inline-flex h-11 items-center rounded-[10px] border border-[var(--in-line)] bg-white px-4 text-[15px] font-semibold" data-testid="fam-documenti-link">Apri i documenti</Link>
+          </div>
+        </Card>
       </div>
     </InteriorShell>
   );
