@@ -431,10 +431,10 @@ export function ShareCard() {
   );
 }
 
-export function Affiliations() {
+export function Affiliations({ tone = "dark" }: { tone?: "dark" | "light" } = {}) {
   return (
-    <section aria-label="Affiliazioni" className="mt-6">
-      <div className="flex items-center justify-around gap-3 rounded-[18px] bg-white p-[14px] shadow-[0_14px_28px_rgb(0_10_40/0.28)]">
+    <section aria-label="Affiliazioni" className={tone === "light" ? "" : "mt-6"}>
+      <div className="flex items-center justify-around gap-3 rounded-[18px] bg-white p-[14px] shadow-[0_6px_20px_-10px_rgb(6_42_99/0.35)]">
         <img
           src="/media/affiliazioni/figc-sgs-3-livello.webp"
           alt="FIGC Settore Giovanile e Scolastico, Club 3° livello"
@@ -454,7 +454,7 @@ export function Affiliations() {
           loading="lazy"
         />
       </div>
-      <span className="mt-2 block text-center text-[13px] font-bold text-[#cfe0ff]">
+      <span className={`mt-2 block text-center text-[13px] font-bold ${tone === "light" ? "text-[#3a4d6b]" : "text-[#cfe0ff]"}`}>
         Club FIGC SGS di 3° livello, affiliato AC Monza, iscritto LND
       </span>
     </section>

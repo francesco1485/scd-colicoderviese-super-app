@@ -179,12 +179,17 @@
       "product": "SCD_SHARED",
       "name": "SCD_TAVOLA_MADRE_SEI_APP(1).png",
       "fileId": "file_000000004fe4824390aaf7e23fd649f4",
-      "type": "USER_SUPPLIED_PRIMARY_MASTER_BOARD",
+      "type": "APPROVED_BOARD",
       "relevance": "CRITICAL",
       "sourceKind": "USER_CONVERSATION_UPLOAD_2026_10_09",
       "sourceStatus": "USER_SUPPLIED_VISUAL_TARGET_NOT_RUNTIME_ASSET",
       "canonicalAttachmentUriVerified": false,
-      "usage": "Sei schermate: home, calendario, atleta, famiglia, staff, comunicazioni; matrice compositiva da trasformare in UI funzionante."
+      "usage": "Sei schermate: home, calendario, atleta, famiglia, staff, comunicazioni; matrice compositiva da trasformare in UI funzionante.",
+      "approval": {
+        "by": "Francesco",
+        "date": "2026-10-12",
+        "evidence": "Explicit user message in the Claude session of 2026-10-12 20:30 Europe/Rome, with a photo of the printed board: 'mai abbandonare quella grafica che a me piace tanto ... non pensare a Sky ma alla grafica dentro' (UD-088)"
+      }
     },
     {
       "id": "VR-010",

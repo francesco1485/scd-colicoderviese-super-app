@@ -1,29 +1,24 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { BUILD_STAMP } from "@/lib/build-stamp";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import {
-  AgeGuide,
-  Affiliations,
-  IdentityCard,
-  SkyCameo,
-  ShareCard,
-} from "@/components/universe/Community";
-import {
-  Fixtures,
-  HeroBand,
-  NextTicket,
-  SectionTitle,
-  Shortcuts,
-  type FixtureFilter,
-} from "@/components/universe/HomeBlocks";
-import { TeamBar, TeamPicker } from "@/components/universe/TeamBar";
+import { Affiliations, SkyCameo } from "@/components/universe/Community";
+import { type FixtureFilter } from "@/components/universe/HomeBlocks";
+import { TeamPicker } from "@/components/universe/TeamBar";
 import { StoriesRow } from "@/components/universe/Stories";
 import { SPONSORS } from "@/lib/sponsors";
-import { buildStories, type ClubEvent } from "@/lib/stories";
-import { ClubCrestOfficial } from "@/components/SiteChrome";
+import { buildStories, sponsorOfTheDay, type ClubEvent } from "@/lib/stories";
+import {
+  LarioHeader,
+  MondoColico,
+  NextMatchCard,
+  QuickTiles,
+  SideTiles,
+  SponsorCards,
+  UpcomingGames,
+  WeekHero,
+} from "@/components/universe/BoardHome";
 import { openAccessMenu } from "@/components/scd/AccessMenu";
-import { HallDoors } from "@/components/scd/hall";
 import type { Club } from "@/lib/club.types";
 import { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 import { getPublicFeed, getPublicSchedule } from "@/lib/club.functions";
@@ -38,7 +33,6 @@ import {
 } from "@/lib/home-week";
 import { freshnessLabel } from "@/lib/public-snapshots";
 import {
-  homeMode,
   inSelection,
   itemState,
   orderTeams,
@@ -89,7 +83,15 @@ export const Route = createFileRoute("/")({
 
 /** Club events already published in the app (real pages), offered in the club story. */
 const CLUB_EVENTS: readonly ClubEvent[] = [
-  { id: "christmas-lario-cup-2026", title: "Christmas Lario Cup", when: "8 dicembre", date: "2026-12-08", text: "1ª edizione a Colico e Dervio: iscrizioni aperte, squadre di prestigio, villaggio di Natale.", href: "/eventi/christmas-lario-cup", image: "/media/eventi/christmas-lario-cup-2026-maschile.webp" },
+  {
+    id: "christmas-lario-cup-2026",
+    title: "Christmas Lario Cup",
+    when: "8 dicembre",
+    date: "2026-12-08",
+    text: "1ª edizione a Colico e Dervio: iscrizioni aperte, squadre di prestigio, villaggio di Natale.",
+    href: "/eventi/christmas-lario-cup",
+    image: "/media/eventi/christmas-lario-cup-2026-maschile.webp",
+  },
 ];
 
 function readList(key: string): string[] {
@@ -158,10 +160,17 @@ function Home() {
   // Opponents' crests: only from the club database (R20), never drawn or guessed.
   const clubByName = useMemo(() => {
     const m = new Map<string, Club>();
-    for (const x of [...schedule.matches, ...(feed.nextMatch ? [feed.nextMatch] : [])]) if (x.avversario) m.set(x.avversario.nome.toLowerCase(), x.avversario);
+    for (const x of [
+      ...schedule.matches,
+      ...(feed.nextMatch ? [feed.nextMatch] : []),
+    ])
+      if (x.avversario) m.set(x.avversario.nome.toLowerCase(), x.avversario);
     return m;
   }, [schedule, feed]);
-  const clubOf = useCallback((name: string) => clubByName.get(name.toLowerCase()), [clubByName]);
+  const clubOf = useCallback(
+    (name: string) => clubByName.get(name.toLowerCase()),
+    [clubByName],
+  );
 
   const teams = useMemo(
     () =>
@@ -193,7 +202,15 @@ function Home() {
 
   const minute = Math.floor(nowMs / 60_000);
   const stories = useMemo(
-    () => buildStories({ items: merged, teams, today, nowMs: minute * 60_000, sponsors: SPONSORS, events: CLUB_EVENTS }),
+    () =>
+      buildStories({
+        items: merged,
+        teams,
+        today,
+        nowMs: minute * 60_000,
+        sponsors: SPONSORS,
+        events: CLUB_EVENTS,
+      }),
     [merged, teams, today, minute],
   );
 
@@ -226,7 +243,10 @@ function Home() {
     null;
   // Same-day matches (in contemporanea): all of them belong to the ticket; a tap picks the one in front.
   const [pickId, setPickId] = useState<string | null>(null);
-  const sameDay = useMemo(() => (auto ? games.filter((g) => g.date === auto.date) : []), [games, auto]);
+  const sameDay = useMemo(
+    () => (auto ? games.filter((g) => g.date === auto.date) : []),
+    [games, auto],
+  );
   const next = sameDay.find((g) => g.id === pickId) ?? auto;
   const others = next ? sameDay.filter((g) => g.id !== next.id) : [];
   const live = useMemo(
@@ -238,7 +258,17 @@ function Home() {
       ),
     [windowItems, nowMs],
   );
-  const mode = homeMode(windowItems, nowMs);
+  const weekGames = useMemo(
+    () =>
+      windowItems
+        .filter((i) => i.kind === "Gara" && itemState(i, nowMs) !== "done")
+        .sort((a, b) =>
+          (a.date + (a.time || "99:99")).localeCompare(
+            b.date + (b.time || "99:99"),
+          ),
+        ),
+    [windowItems, nowMs],
+  );
   const upcoming = windowItems.filter(
     (i) =>
       i.kind === "Gara" && itemState(i, nowMs) === "next" && i.date <= tomorrow,
@@ -346,148 +376,70 @@ function Home() {
       ? teamById.get(selection)
       : undefined;
 
-  return (
-    <main data-screen="home" className="min-h-dvh bg-[#eef3f9]">
-      {/* One responsive page for every screen (UD-073): the SCD Universe home — no mascot hero, no stacked bars. */}
-      <div className="uv-page pb-10">
-      {/* Phone top bar of board Main: the generic public bar is hidden here, the yellow "Entra" opens "Accesso aree". */}
-      <header
-        className="scd-pub flex h-14 items-center justify-between gap-3 border-b border-[rgb(248_208_0/0.22)] bg-[rgb(6_42_82/0.72)] px-4 font-text text-white lg:hidden"
-        data-testid="home-phone-header"
-      >
-        <Link to="/" className="scd-focus flex min-w-0 items-center gap-2.5 rounded-md" aria-label="S.C.D. ColicoDerviese, Home">
-          <ClubCrestOfficial size={39} />
-          <span className="font-title text-[22px] font-extrabold tracking-[0.02em]">SCD Universe</span>
-        </Link>
-        <button
-          type="button"
-          onClick={openAccessMenu}
-          className="scd-action h-11 rounded-[22px] px-4 text-[15px] font-bold"
-          aria-label="Entra nelle aree: accesso alle aree della società"
-          data-testid="home-enter"
-        >
-          Entra
-        </button>
-      </header>
-      <TeamBar
-        teams={teams}
-        follow={follow}
-        selection={selection}
-        live={live}
-        onSelect={select}
-        onOpenPicker={() => setPicker(true)}
-      />
-      <div className="bg-[var(--uv-night)]">
-        <StoriesRow stories={stories} nowMs={nowMs} />
-      </div>
-      <HeroBand mode={mode} upcoming={upcoming}>
-        <NextTicket
-          item={next}
-          team={next ? teamOf(next) : undefined}
-          nowMs={nowMs}
-          going={!!next && going.includes(next.id)}
-          onGoing={toggleGoing}
-          onShare={share}
-          emptyTeam={emptyTeam}
-          others={others}
-          onPick={setPickId}
-          teamOf={teamOf}
-        />
-      </HeroBand>
+  const homeGames = weekGames.filter((g) => g.homeAway === "CASA").length;
+  const dailySponsors = useMemo(() => {
+    const list = SPONSORS.filter((x) => x.nameVerified && x.name);
+    const first = sponsorOfTheDay(SPONSORS, today);
+    const at = first ? list.indexOf(first) : 0;
+    return Array.from(
+      { length: Math.min(6, list.length) },
+      (_, k) => list[(at + k) % list.length]!,
+    );
+  }, [today]);
+  const nextEvent = CLUB_EVENTS.find((e) => e.date >= today) ?? null;
 
-      <div className="mx-auto max-w-[1200px] px-4 lg:px-6">
-        {/* Hall: the ground floor doors (chi siamo, squadre, calendario, campi, eventi, contatti). */}
-        <HallDoors title="Il club in un tocco" compact className="mt-[26px] hidden lg:block" />
-        <div className="lg:grid lg:grid-cols-[7fr_5fr] lg:items-start lg:gap-6">
-          <div>
-            <SectionTitle
-              id="gare-t"
-              more={
-                <Link
-                  to="/calendario"
-                  className="py-[10px] text-[15px] font-extrabold text-[var(--uv-gold)]"
-                >
-                  Calendario completo
-                </Link>
-              }
-            >
-              Gare
-            </SectionTitle>
-            <Fixtures
-              items={selected}
-              days={days}
-              today={today}
-              tomorrow={tomorrow}
-              nowMs={nowMs}
-              filter={filter}
-              day={day}
-              teamOf={teamOf}
-              onFilter={setFilter}
-              onDay={setDay}
-            />
-            <p className="px-[6px] pt-[6px] text-[12px] text-[#a9bfe3]">
-              {sourceNote}. Orari e campi segnati "da conf." non sono ancora
-              confermati dal club.
-            </p>
-            <Shortcuts />
-            {/* Phones and tablets: the club doors come after the week's fixtures, not before. */}
-            <HallDoors title="Il club in un tocco" compact className="mt-[22px] lg:hidden" />
-            {/* On phones the avatar card comes right after the fixtures; on desktop it heads the side column. */}
-            <div className="mt-[22px] lg:hidden">
-              <IdentityCard />
-            </div>
-            <SectionTitle id="eta-t">Per ogni età</SectionTitle>
-            <AgeGuide />
-          </div>
-          <div>
-            <SectionTitle id="tua-t">La tua SCD</SectionTitle>
-            <div className="grid gap-[14px]">
-              <div className="hidden lg:block">
-                <IdentityCard />
-              </div>
-              <Link
-                to="/eventi/christmas-lario-cup"
-                className="relative flex min-h-[200px] items-end overflow-hidden rounded-[18px] bg-[var(--uv-night)] text-white shadow-[0_14px_28px_rgb(0_10_40/0.28)]"
-                data-testid="home-clc"
-              >
-                <img
-                  src="/media/eventi/christmas-lario-cup-2026-maschile.webp"
-                  alt=""
-                  className="absolute inset-0 size-full object-cover object-top opacity-70"
-                  loading="lazy"
-                />
-                <span
-                  aria-hidden="true"
-                  className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[rgb(2_31_79/0.95)]"
-                />
-                <span className="uv-notch absolute left-[14px] top-[14px] rounded-l-[6px] bg-[var(--scd-red)] py-2 pl-3 pr-[14px] font-uv text-[15px] uppercase tracking-[0.06em]">
-                  8 dicembre
-                </span>
-                <span className="relative grid gap-[6px] p-4">
-                  <b className="font-uv text-[30px] uppercase leading-[0.92]">
-                    Christmas Lario Cup
-                  </b>
-                  <span className="text-[15px] text-[#dbe7ff]">
-                    1ª edizione a Colico e Dervio: iscrizioni aperte, squadre di
-                    prestigio, villaggio di Natale.
-                  </span>
-                </span>
-              </Link>
-              <ShareCard />
-            </div>
-          </div>
+  return (
+    <main data-screen="home" className="min-h-dvh bg-[#eef3f9] pb-10">
+      {/* Tavola madre approvata (VR-009, UD-088): testata Lario, schede bianche, dati reali. */}
+      <LarioHeader onEnter={openAccessMenu}>
+        <StoriesRow stories={stories} nowMs={nowMs} />
+      </LarioHeader>
+
+      <div className="mx-auto grid max-w-[1200px] grid-cols-[minmax(0,1fr)] gap-4 px-4 pt-4 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start lg:gap-6 lg:px-6 lg:pt-6">
+        <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-4">
+          <WeekHero games={weekGames.length} home={homeGames} />
+          <QuickTiles
+            games={weekGames.length}
+            events={CLUB_EVENTS.filter((e) => e.date >= today).length}
+          />
+          <NextMatchCard
+            item={next}
+            team={next ? teamOf(next) : undefined}
+            nowMs={nowMs}
+            going={!!next && going.includes(next.id)}
+            onGoing={toggleGoing}
+            onShare={share}
+            others={others}
+          />
+          <UpcomingGames
+            items={weekGames.filter((g) => g.id !== next?.id).slice(0, 6)}
+            teamOf={teamOf}
+          />
+          <p className="m-0 px-1 text-[12.5px] text-[#5a6b85]">
+            {sourceNote}. Orari e campi segnati "da confermare" non sono ancora
+            confermati dal club.
+          </p>
         </div>
-        <Affiliations />
-        <p className="font-uv-script mt-8 text-center text-[38px] leading-none text-[var(--uv-gold)] [text-shadow:0_4px_0_rgb(0_0_0/0.3)]">
-          <span className="inline-block -rotate-[4deg]">
-            Colico Derviese Sempre!
-          </span>
-        </p>
-        <p className="mt-3 text-center text-[11.5px] text-[#a9bfe3]">
-          Versione di prova del {BUILD_STAMP}
-        </p>
+        <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-4">
+          <SideTiles
+            event={
+              nextEvent
+                ? {
+                    title: nextEvent.title,
+                    when: nextEvent.when,
+                    href: nextEvent.href,
+                  }
+                : null
+            }
+          />
+          <SponsorCards sponsors={dailySponsors} />
+          <MondoColico />
+          <Affiliations tone="light" />
+        </div>
       </div>
-      </div>
+      <p className="mt-6 text-center text-[11.5px] text-[#7a8aa3]">
+        Versione di prova del {BUILD_STAMP}
+      </p>
 
       {picker && (
         <TeamPicker

@@ -2058,6 +2058,26 @@
           "same answer for every e-mail (no enumeration)"
         ]
       }
+    },
+    {
+      "sourceDate": "2026-10-12",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-088",
+      "name": "MASTER_BOARD_SIX_APPS_IS_THE_LOOK",
+      "sourceQuoteFragments": [
+        "Io dico che importante capire come impostare ma mai abbandonare quella grafica che a me piace tanto non pensare a Sky ma alla grafica dentro",
+        "Colicoderviese dovrebbe essere scritta insieme su stessa riga"
+      ],
+      "normalizedCommand": {
+        "rule": "The six-screen master board (VR-009 SCD_TAVOLA_MADRE_SEI_APP, 'Sistema grafico definitivo - struttura app in tempo reale') is the visual system to follow and never abandon: navy header with Lario lake/mountain scenery, crest always visible, the name COLICODERVIESE written as one word on one line (COLICO white, DERVIESE yellow), white rounded modular cards on a light page, colourful icon tiles with counters, 'Prossima gara' card with date block, sponsor logo cards, bottom navigation. Focus on the inner UI, not on the mascot.",
+        "scope": "VISUAL_SYSTEM",
+        "constraints": [
+          "real data only: board sample data (names, numbers, photos of minors) never copied into the runtime",
+          "official assets only; no opponent crests unless from the club database",
+          "Sky is optional decoration, not the focus"
+        ]
+      }
     }
   ],
   "completionGate": {
