@@ -162,15 +162,19 @@ export function homeMode(
   return "settimana";
 }
 
-/** Conto alla rovescia "hh:mm:ss" (ore oltre 24 comprese); null se già iniziata. */
+/**
+ * Conto alla rovescia leggibile da una famiglia: "hh:mm:ss" sotto le 24 ore, altrimenti giorni e ore
+ * ("5 g 3 h", "1 g 0 h"); null se già iniziata.
+ */
 export function countdown(targetMs: number, nowMs: number): string | null {
   const dt = targetMs - nowMs;
   if (dt <= 0) return null;
-  const h = Math.floor(dt / 3_600_000),
-    m = Math.floor((dt % 3_600_000) / 60_000),
+  const totalH = Math.floor(dt / 3_600_000);
+  if (totalH >= 24) return `${Math.floor(totalH / 24)} g ${totalH % 24} h`;
+  const m = Math.floor((dt % 3_600_000) / 60_000),
     s = Math.floor((dt % 60_000) / 1000);
   const p = (n: number) => String(n).padStart(2, "0");
-  return `${p(h)}:${p(m)}:${p(s)}`;
+  return `${p(totalH)}:${p(m)}:${p(s)}`;
 }
 
 /* ----------------------------------------------------------- consenso cookie */

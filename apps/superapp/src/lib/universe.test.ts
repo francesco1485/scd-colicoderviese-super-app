@@ -99,10 +99,16 @@ describe("stato della giornata", () => {
     ).toBe("settimana");
   });
 
-  it("conto alla rovescia oltre le 24 ore", () => {
+  it("conto alla rovescia: ore:minuti:secondi sotto le 24 ore, giorni e ore oltre", () => {
     expect(
       countdown(at("2026-10-11T08:00:00Z"), at("2026-10-10T07:59:58Z")),
-    ).toBe("24:00:02");
+    ).toBe("1 g 0 h");
+    expect(
+      countdown(at("2026-10-16T13:00:00Z"), at("2026-10-11T10:00:00Z")),
+    ).toBe("5 g 3 h");
+    expect(
+      countdown(at("2026-10-11T08:00:00Z"), at("2026-10-10T08:00:02Z")),
+    ).toBe("23:59:58");
     expect(
       countdown(at("2026-10-11T08:00:00Z"), at("2026-10-11T08:00:00Z")),
     ).toBeNull();
