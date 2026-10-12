@@ -101,7 +101,12 @@ function Queue({
       return;
     }
     const r = await decide({
-      data: { id: p.id, decision, ...(n ? { note: n } : {}) },
+      data: {
+        id: p.id,
+        channel: p.channel,
+        decision,
+        ...(n ? { note: n } : {}),
+      },
     });
     setMsg(r.message);
     if (r.ok)

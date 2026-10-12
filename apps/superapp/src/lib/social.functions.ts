@@ -23,6 +23,7 @@ import {
 } from "./image-privacy";
 import { REPORT_REASONS, RULE_REASON_LABEL } from "./moderation";
 import { moderate, moderationEnv } from "./moderation.server";
+import { notifyPostFollowers } from "./push.server";
 import { serverSupabase } from "./supabase.server";
 
 const ORG_SLUG = "scd-colicoderviese";
@@ -260,9 +261,18 @@ export const createPost = createServerFn({ method: "POST" })
         if (status === "REJECTED") reason = verdict.reason;
       }
     }
+    let devices: number | null = null;
+    if (status === "APPROVED" && r.id)
+      devices = await notifyPostFollowers(
+        sb,
+        r.id,
+        channelLabelOf(data.channel),
+      );
     const message =
       status === "APPROVED"
-        ? "Pubblicato: è già nel feed."
+        ? devices
+          ? `Pubblicato: è già nel feed e ${devices === 1 ? "1 telefono ha ricevuto" : `${devices} telefoni hanno ricevuto`} l'avviso.`
+          : "Pubblicato: è già nel feed."
         : status === "REJECTED"
           ? `Non pubblicato. Il moderatore automatico ha trovato: ${reason || "contenuto non adatto"}. Correggi e riprova.`
           : "Inviato al moderatore: esce nel feed dopo il controllo.";
@@ -273,6 +283,30 @@ export const createPost = createServerFn({ method: "POST" })
       status,
     };
   });
+
+/** Short label for the push title: 'SCD ColicoDerviese', 'U15', 'Christmas Lario Cup' (keys only, no lookup needed). */
+function channelLabelOf(key: string): string {
+  if (key === "club") return "SCD ColicoDerviese";
+  const id = key.slice(key.indexOf(":") + 1);
+  if (key.startsWith("event:"))
+    return id
+      .replace(/-\d{4}$/, "")
+      .split("-")
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ");
+  const map: Record<string, string> = {
+    prima: "Prima Squadra",
+    u19: "Juniores U19",
+    u16: "U16",
+    u15: "U15",
+    pulcini: "Pulcini",
+    primicalci: "Primi Calci",
+    piccoli: "Piccoli Amici",
+    "2014": "Esordienti 2014",
+    "2015": "Esordienti 2015",
+  };
+  return map[id] ?? id.toUpperCase();
+}
 
 async function viewerId(
   sb: NonNullable<ReturnType<typeof serverSupabase>>,
@@ -337,6 +371,7 @@ export const getPostsQueue = createServerFn({ method: "GET" }).handler(
 
 const decideSchema = z.object({
   id: z.string().uuid(),
+  channel: z.string().regex(CHANNEL_RE).optional(),
   decision: z.enum(["APPROVED", "REJECTED", "ARCHIVED"]),
   note: z.string().trim().max(300).optional(),
 });
@@ -355,6 +390,12 @@ export const decidePost = createServerFn({ method: "POST" })
     if (error) return { ok: false, message: postError(null) };
     const r = (out ?? {}) as { ok?: boolean; code?: string; status?: string };
     if (!r.ok) return { ok: false, message: postError(r.code) };
+    if (data.decision === "APPROVED")
+      await notifyPostFollowers(
+        sb,
+        data.id,
+        channelLabelOf(data.channel ?? "club"),
+      );
     const msg =
       data.decision === "APPROVED"
         ? "Pubblicato nel feed."

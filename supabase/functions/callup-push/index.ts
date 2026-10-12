@@ -1,6 +1,8 @@
 // callup-push (r67): Web Push for SCD call-ups.
 //   POST {"action":"init"}                      -> ensures the VAPID pair exists in Vault, returns the public key
 //   POST {"action":"callup","match_id":"<uuid>"} -> notifies the families of the not-yet-notified call-ups of a match
+//   POST {"action":"post","post_id":"<uuid>","label":"<channel label>"} -> notifies the followers of a channel of a new
+//       approved post (r89); allowed to the author or the content office; once per post (notified_at).
 // The caller's JWT is verified by the platform (verify_jwt) and again here; the caller must be allowed to manage the
 // match's team (scd_my_team_ids with the caller's own session). The private key never leaves Vault + this function.
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
@@ -58,6 +60,60 @@ function message(t: Target) {
   };
 }
 
+type PostTarget = {
+  post_id: string;
+  channel_key: string;
+  title: string | null;
+  body: string;
+  subscription_id: string;
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+};
+
+async function notifyPost(
+  user: ReturnType<typeof createClient>,
+  admin: ReturnType<typeof createClient>,
+  keys: Keys,
+  body: { post_id?: string; label?: string },
+): Promise<Response> {
+  if (!body.post_id || !UUID.test(body.post_id)) return json(400, { error: "invalid request" });
+  const allowed = await user.rpc("scd_push_post_allowed", { p_post_id: body.post_id });
+  if (allowed.error || allowed.data !== true) return json(403, { error: "not allowed" });
+  const targets = await admin.rpc("scd_push_post_targets", { p_post_id: body.post_id });
+  if (targets.error) return json(500, { error: "targets failed" });
+  const list = (targets.data ?? []) as PostTarget[];
+  const label = (body.label ?? "").toString().slice(0, 60) || "SCD ColicoDerviese";
+  webpush.setVapidDetails(keys.subject, keys.publicKey, keys.privateKey);
+  const sentSubs = new Set<string>();
+  const goneSubs = new Set<string>();
+  let failed = 0;
+  await Promise.all(
+    list.map(async (t) => {
+      try {
+        const text = (t.title ?? t.body).replace(/\s+/g, " ").trim();
+        await webpush.sendNotification(
+          { endpoint: t.endpoint, keys: { p256dh: t.p256dh, auth: t.auth } },
+          JSON.stringify({ title: `Novità da ${label}`, body: text.length > 110 ? `${text.slice(0, 107)}...` : text, url: "/", tag: `post-${t.post_id}` }),
+          { TTL: 24 * 3600, urgency: "normal", topic: t.post_id.replace(/-/g, "").slice(0, 32) },
+        );
+        sentSubs.add(t.subscription_id);
+      } catch (e) {
+        const code = (e as { statusCode?: number }).statusCode;
+        if (code === 404 || code === 410) goneSubs.add(t.subscription_id);
+        else failed += 1;
+      }
+    }),
+  );
+  const mark = await admin.rpc("scd_push_mark_post_sent", {
+    p_post_id: body.post_id,
+    p_sent_subscription_ids: [...sentSubs],
+    p_gone_subscription_ids: [...goneSubs],
+  });
+  if (mark.error) return json(500, { error: "mark failed" });
+  return json(200, { devices: sentSubs.size, gone: goneSubs.size, failed });
+}
+
 Deno.serve(async (req) => {
   if (req.method !== "POST") return json(405, { error: "POST only" });
   const authHeader = req.headers.get("Authorization") ?? "";
@@ -67,7 +123,7 @@ Deno.serve(async (req) => {
   const who = await user.auth.getUser();
   if (who.error || !who.data.user) return json(401, { error: "invalid token" });
 
-  let body: { action?: string; match_id?: string };
+  let body: { action?: string; match_id?: string; post_id?: string; label?: string };
   try {
     body = await req.json();
   } catch {
@@ -77,6 +133,7 @@ Deno.serve(async (req) => {
   try {
     const keys = await ensureKeys(admin);
     if (body.action === "init") return json(200, { publicKey: keys.publicKey });
+    if (body.action === "post") return await notifyPost(user, admin, keys, body);
     if (body.action !== "callup" || !body.match_id || !UUID.test(body.match_id)) return json(400, { error: "invalid request" });
 
     const match = await admin.from("scd_matches").select("organization_id").eq("id", body.match_id).maybeSingle();
