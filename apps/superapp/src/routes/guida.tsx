@@ -65,7 +65,7 @@ function Guida() {
           Usa <Link to="/registrati" className="font-semibold text-[var(--scd-blue)] underline">Registrati</Link>: nome, cognome, data di nascita, e-mail e telefono. La segreteria controlla chi sei e ti attiva.
         </Step>
         <Step n={3} icon={<Smartphone className="size-5" />} title="Mettila sul telefono">
-          Su iPhone: Condividi → "Aggiungi alla schermata Home". Su Android: menu del browser → "Installa app". Si apre come un'app vera.
+          Su iPhone: Condividi → "Aggiungi alla schermata Home". Su Android: menu del browser → "Installa app". Si apre come un'app vera. Passo passo, con il codice QR da condividere: <Link to="/installa" className="font-semibold text-[var(--scd-blue)] underline">Installa l'app</Link>.
         </Step>
         <Step n={4} icon={<BellRing className="size-5" />} title="Attiva le notifiche">
           Nella pagina Famiglia tocca "Attiva le notifiche": ti arriva un avviso quando il mister convoca. Solo convocazioni, niente pubblicità.

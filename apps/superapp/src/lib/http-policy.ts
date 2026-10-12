@@ -17,6 +17,7 @@ export const PUBLIC_PREFIXES: readonly string[] = [
   "/fornitori",
   "/guida",
   "/impianti",
+  "/installa",
   "/partner",
   "/privacy",
   "/safeguarding",
@@ -90,4 +91,27 @@ export function demoRedirect(pathname: string, production: boolean): string | nu
   if (pathname === "/core" || pathname.startsWith("/core/")) return "/aree";
   if (pathname === "/grow" || pathname.startsWith("/grow/")) return "/sponsor";
   return null;
+}
+
+/**
+ * Digital Asset Links for the future Play Store app (Trusted Web Activity wrapping this PWA).
+ * Served only when the Direzione has set SCD_ANDROID_PACKAGE (e.g. it.colicoderviese.app) and
+ * SCD_ANDROID_SHA256 (one or more comma-separated signing-certificate fingerprints, AA:BB:... format).
+ * Returns null when not configured or invalid, so the route answers 404 instead of a wrong claim.
+ */
+const ANDROID_PACKAGE_RE = /^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$/;
+const SHA256_FINGERPRINT_RE = /^([0-9A-F]{2}:){31}[0-9A-F]{2}$/;
+
+export function assetLinksJson(env: Readonly<Record<string, string | undefined>>): string | null {
+  const pkg = env["SCD_ANDROID_PACKAGE"]?.trim();
+  const raw = env["SCD_ANDROID_SHA256"]?.trim();
+  if (!pkg || !raw || !ANDROID_PACKAGE_RE.test(pkg)) return null;
+  const fingerprints = raw.split(",").map((f) => f.trim().toUpperCase()).filter(Boolean);
+  if (fingerprints.length === 0 || !fingerprints.every((f) => SHA256_FINGERPRINT_RE.test(f))) return null;
+  return JSON.stringify([
+    {
+      relation: ["delegate_permission/common.handle_all_urls"],
+      target: { namespace: "android_app", package_name: pkg, sha256_cert_fingerprints: fingerprints },
+    },
+  ]);
 }

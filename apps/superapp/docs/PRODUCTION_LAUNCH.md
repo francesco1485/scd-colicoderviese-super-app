@@ -6,12 +6,13 @@ Nessun passo di questo file si esegue senza l'ok esplicito della Direzione.
 | Decisione | Opzioni | Stato |
 |---|---|---|
 | Server di produzione | Render Starter (sempre acceso, circa 7 $/mese) oppure piano gratuito (si spegne dopo 15 minuti, la prima apertura impiega circa un minuto) | da decidere |
-| Indirizzo | `app.colicoderviese.it` (la società ha già il dominio colicoderviese.it) oppure `scd-superapp.onrender.com` | da decidere |
+| Indirizzo | `app.colicoderviese.it` (dominio della società, record DNS) — passi in `DOMINIO_E_STORE.md` | deciso 12/10, da configurare |
 | E-mail di accesso | Gmail della società — vedi `EMAIL_GMAIL_SMTP.md` | deciso 12/10, da configurare |
 | Informativa privacy | testo pronto su `/privacy` (stato "bozza"): conferma e tempi di conservazione | da approvare |
 | Segnalazioni safeguarding | oggi PEC con oggetto "RISERVATO - SAFEGUARDING": confermare chi la legge | da confermare |
 | Consensi foto e dati | da raccogliere prima di pubblicare nomi o immagini | da organizzare |
 | Registrazione 14-17 anni | oggi possibile con e-mail e telefono propri; in alternativa solo tramite genitore | da decidere |
+| App negli store | Play Store poi App Store, stesso indirizzo — `DOMINIO_E_STORE.md` | dopo il lavoro operativo interno |
 | Vecchi siti di prova su Render | circa 15 servizi ancora pubblici: sospenderli tutti tranne staging e produzione | da approvare |
 
 ## Servizio di produzione (Render)

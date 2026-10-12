@@ -2,7 +2,7 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
-import { SECURITY_HEADERS, cacheControlFor, configuredSiteUrl, demoRedirect, isProductionEnv, robotsTxt, sitemapXml } from "./lib/http-policy";
+import { SECURITY_HEADERS, assetLinksJson, cacheControlFor, configuredSiteUrl, demoRedirect, isProductionEnv, robotsTxt, sitemapXml } from "./lib/http-policy";
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -68,6 +68,11 @@ export default {
     const demo = demoRedirect(url.pathname, production);
     if (demo) return withPolicy(new Response(null, { status: 302, headers: { location: demo } }), url.pathname);
     if (url.pathname === "/robots.txt") return withPolicy(plain(robotsTxt(production, configuredSiteUrl(process.env)), "text/plain"), url.pathname);
+    if (url.pathname === "/.well-known/assetlinks.json") {
+      const links = assetLinksJson(process.env);
+      if (links) return withPolicy(plain(links, "application/json"), url.pathname);
+      return withPolicy(new Response("Not found", { status: 404, headers: { "content-type": "text/plain; charset=utf-8" } }), url.pathname);
+    }
     if (url.pathname === "/sitemap.xml") {
       const site = configuredSiteUrl(process.env);
       if (production && site) return withPolicy(plain(sitemapXml(site), "application/xml"), url.pathname);

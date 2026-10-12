@@ -11,7 +11,7 @@ self.addEventListener("push", (event) => {
   }
   const title = typeof data.title === "string" && data.title ? data.title : "S.C.D. ColicoDerviese";
   const url = typeof data.url === "string" && data.url.startsWith("/") ? data.url : "/famiglia";
-  const options = { body: typeof data.body === "string" ? data.body : "", icon: "/icon-512.png", badge: "/favicon.png", lang: "it", data: { url } };
+  const options = { body: typeof data.body === "string" ? data.body : "", icon: "/icon-192.png", badge: "/favicon.png", lang: "it", data: { url } };
   // renotify is only valid together with a tag.
   if (typeof data.tag === "string" && data.tag) {
     options.tag = data.tag;

@@ -44,7 +44,7 @@ export default defineConfig({
         // Node server: i file statici serviti da Nitro stanno in .output/public (sw.js incluso).
         ...(NITRO_PRESET === "node-server" ? { outDir: ".output/public" } : {}),
         manifest: false, // manifest statico in public/manifest.webmanifest
-        includeAssets: ["offline.html", "favicon.png", "icon-512.png"],
+        includeAssets: ["offline.html", "favicon.png", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png"],
         workbox: {
           navigateFallback: null,
           globPatterns: ["**/*.{js,css,png,jpg,svg,woff2}", "offline.html"],
@@ -60,7 +60,7 @@ export default defineConfig({
               urlPattern: ({ request, url }) =>
                 request.mode === "navigate" &&
                 (url.pathname === "/" ||
-                  ["/allenamenti", "/calendario", "/community", "/comunicazioni", "/contatti", "/eventi", "/fornitori", "/guida", "/impianti", "/partner", "/privacy", "/safeguarding", "/shop", "/societa", "/sponsor", "/squadre"].some(
+                  ["/allenamenti", "/calendario", "/community", "/comunicazioni", "/contatti", "/eventi", "/fornitori", "/guida", "/impianti", "/installa", "/partner", "/privacy", "/safeguarding", "/shop", "/societa", "/sponsor", "/squadre"].some(
                     (p) => url.pathname === p || url.pathname.startsWith(p + "/"),
                   )),
               handler: "NetworkFirst",

@@ -286,3 +286,8 @@ prossimi impegni e "ci sarò" in primo piano). Desktop invariato.
 - Pronti per la Direzione: `docs/EMAIL_GMAIL_SMTP.md` (Gmail della società) con testi italiani in
   `supabase/setup/email-templates/`, `docs/PRODUCTION_LAUNCH.md` con le decisioni aperte.
 - App: pagina pubblica `/guida` "Come funziona l'app" (famiglie, mister, segreteria), collegata da Accedi e dal piè di pagina.
+
+## UD-071 — Indirizzo fisso, pagina /installa, icone store (2026-10-12)
+- Stato: DONE su staging/superapp.
+- Decisione: indirizzo definitivo app.colicoderviese.it (passi DNS e store in `docs/DOMINIO_E_STORE.md`).
+- Fatto: icone dallo stemma ufficiale (192/512/maskable/apple-touch/favicon; rimosso lo stemma non ufficiale "SDC"), manifest aggiornato, pagina pubblica `/installa` con QR e condivisione, link in footer e guida, route `/.well-known/assetlinks.json` (attiva solo con SCD_ANDROID_PACKAGE + SCD_ANDROID_SHA256), test (manifest icone, assetlinks, install-link).

@@ -24,6 +24,7 @@ import { Route as GrowRouteImport } from './routes/grow'
 import { Route as GuidaRouteImport } from './routes/guida'
 import { Route as ImpiantiRouteImport } from './routes/impianti'
 import { Route as InfermeriaRouteImport } from './routes/infermeria'
+import { Route as InstallaRouteImport } from './routes/installa'
 import { Route as MagazzinoRouteImport } from './routes/magazzino'
 import { Route as PartnerRouteImport } from './routes/partner'
 import { Route as PrivacyRouteImport } from './routes/privacy'
@@ -142,6 +143,11 @@ const ImpiantiRoute = ImpiantiRouteImport.update({
 const InfermeriaRoute = InfermeriaRouteImport.update({
   id: '/infermeria',
   path: '/infermeria',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InstallaRoute = InstallaRouteImport.update({
+  id: '/installa',
+  path: '/installa',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MagazzinoRoute = MagazzinoRouteImport.update({
@@ -386,6 +392,7 @@ export interface FileRoutesByFullPath {
   '/guida': typeof GuidaRoute
   '/impianti': typeof ImpiantiRoute
   '/infermeria': typeof InfermeriaRoute
+  '/installa': typeof InstallaRoute
   '/magazzino': typeof MagazzinoRoute
   '/partner': typeof PartnerRoute
   '/privacy': typeof PrivacyRoute
@@ -447,6 +454,7 @@ export interface FileRoutesByTo {
   '/guida': typeof GuidaRoute
   '/impianti': typeof ImpiantiRoute
   '/infermeria': typeof InfermeriaRoute
+  '/installa': typeof InstallaRoute
   '/magazzino': typeof MagazzinoRoute
   '/partner': typeof PartnerRoute
   '/privacy': typeof PrivacyRoute
@@ -508,6 +516,7 @@ export interface FileRoutesById {
   '/guida': typeof GuidaRoute
   '/impianti': typeof ImpiantiRoute
   '/infermeria': typeof InfermeriaRoute
+  '/installa': typeof InstallaRoute
   '/magazzino': typeof MagazzinoRoute
   '/partner': typeof PartnerRoute
   '/privacy': typeof PrivacyRoute
@@ -571,6 +580,7 @@ export interface FileRouteTypes {
     | '/guida'
     | '/impianti'
     | '/infermeria'
+    | '/installa'
     | '/magazzino'
     | '/partner'
     | '/privacy'
@@ -632,6 +642,7 @@ export interface FileRouteTypes {
     | '/guida'
     | '/impianti'
     | '/infermeria'
+    | '/installa'
     | '/magazzino'
     | '/partner'
     | '/privacy'
@@ -692,6 +703,7 @@ export interface FileRouteTypes {
     | '/guida'
     | '/impianti'
     | '/infermeria'
+    | '/installa'
     | '/magazzino'
     | '/partner'
     | '/privacy'
@@ -754,6 +766,7 @@ export interface RootRouteChildren {
   GuidaRoute: typeof GuidaRoute
   ImpiantiRoute: typeof ImpiantiRoute
   InfermeriaRoute: typeof InfermeriaRoute
+  InstallaRoute: typeof InstallaRoute
   MagazzinoRoute: typeof MagazzinoRoute
   PartnerRoute: typeof PartnerRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -899,6 +912,13 @@ declare module '@tanstack/react-router' {
       path: '/infermeria'
       fullPath: '/infermeria'
       preLoaderRoute: typeof InfermeriaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/installa': {
+      id: '/installa'
+      path: '/installa'
+      fullPath: '/installa'
+      preLoaderRoute: typeof InstallaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/magazzino': {
@@ -1249,6 +1269,7 @@ const rootRouteChildren: RootRouteChildren = {
   GuidaRoute: GuidaRoute,
   ImpiantiRoute: ImpiantiRoute,
   InfermeriaRoute: InfermeriaRoute,
+  InstallaRoute: InstallaRoute,
   MagazzinoRoute: MagazzinoRoute,
   PartnerRoute: PartnerRoute,
   PrivacyRoute: PrivacyRoute,

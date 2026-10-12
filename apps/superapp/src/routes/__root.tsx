@@ -90,7 +90,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "Super App ufficiale della S.C.D. ColicoDerviese: il club (ONE), l'area club (CORE) e sponsor & partner (GROW) in un'unica app.",
       },
       { name: "author", content: "S.C.D. ColicoDerviese" },
-      { name: "theme-color", content: "#022d66" },
+      { name: "theme-color", content: "#062a52" },
       { property: "og:title", content: "S.C.D. ColicoDerviese — Super App" },
       {
         property: "og:description",
@@ -112,7 +112,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { rel: "manifest", href: "/manifest.webmanifest" },
       { rel: "icon", type: "image/png", href: "/favicon.png" },
-      { rel: "apple-touch-icon", href: "/icon-512.png" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
     ],
   }),
   shellComponent: RootShell,

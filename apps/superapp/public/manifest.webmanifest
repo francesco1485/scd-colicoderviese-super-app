@@ -1,13 +1,19 @@
 {
-  "name": "S.C.D. ColicoDerviese Super App",
+  "name": "S.C.D. ColicoDerviese",
   "short_name": "ColicoDerviese",
-  "description": "App ufficiale della S.C.D. ColicoDerviese: gare, risultati, eventi, area club e sponsor.",
+  "description": "App ufficiale della S.C.D. ColicoDerviese: calendario, convocazioni, area famiglie, staff e sponsor.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#0d1b3e",
-  "theme_color": "#0d1b3e",
+  "background_color": "#062a52",
+  "theme_color": "#062a52",
   "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
     {
       "src": "/icon-512.png",
       "sizes": "512x512",
@@ -15,7 +21,7 @@
       "purpose": "any"
     },
     {
-      "src": "/icon-512.png",
+      "src": "/icon-maskable-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
@@ -33,12 +39,12 @@
       "url": "/calendario"
     },
     {
-      "name": "Area club",
-      "url": "/core"
+      "name": "Famiglia",
+      "url": "/famiglia"
     },
     {
-      "name": "Diventa sponsor",
-      "url": "/sponsor"
+      "name": "Come funziona",
+      "url": "/guida"
     }
   ]
 }

@@ -1679,6 +1679,30 @@
         "implementationStatus": "IN_PROGRESS",
         "duplicate_work": "DENY"
       }
+    },
+    {
+      "id": "UD-071",
+      "name": "STORE_APPS_AND_FIXED_ADDRESS",
+      "sourceDate": "2026-10-12",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "sourceQuoteFragments": [
+        "Bisogna prepara per fare scaricare tramite play store e Apple store",
+        "trovare modo per fissare link ovunque mentre non diventa app",
+        "app.colicoderviese.it Se si può lo facciamo"
+      ],
+      "normalizedCommand": {
+        "rule": "One permanent address for the app, app.colicoderviese.it (club domain), shared everywhere through the public /installa page with QR code until the store apps exist; then publish the same PWA on Google Play (Trusted Web Activity, Digital Asset Links) and on the App Store (native wrapper with push), after the internal operational work is complete.",
+        "scope": "DISTRIBUTION",
+        "constraints": [
+          "official crest only for icons",
+          "no store account purchase without Direzione approval",
+          "no production deploy without OK",
+          "DNS and store accounts handled by Direzione"
+        ],
+        "implementationStatus": "IN_PROGRESS",
+        "duplicate_work": "DENY"
+      }
     }
   ],
   "completionGate": {
