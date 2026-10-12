@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Wallet } from "lucide-react";
+import { Receipt, Wallet } from "lucide-react";
 
 import { Card } from "@/components/scd/interior-ui";
 
@@ -26,7 +26,7 @@ function TesoreriaRoute() {
         title="Tesoreria · sottoaree"
         preview={gate.preview}
         highlights={[
-          { value: 4, label: "sottoaree con accesso dedicato" },
+          { value: 5, label: "sottoaree con accesso dedicato" },
           { value: null, label: "incassi di oggi: casse da collegare" },
           { value: 1, label: "tariffario da confermare" },
         ]}
@@ -38,6 +38,13 @@ function TesoreriaRoute() {
               <div className="px-4 pb-4 sm:px-[18px]">
                 <Link to="/tesoreria/compensi" className="scd-focus inline-flex h-11 items-center gap-2 rounded-[10px] bg-[var(--in-info)] px-4 text-[15px] font-bold text-white" data-testid="tes-compensi-link">
                   <Wallet className="size-4" aria-hidden="true" /> Apri compensi del mese
+                </Link>
+              </div>
+            </Card>
+            <Card id="tes-quote" title="Quote e Fondo" sub="Direzione, Segreteria e Tesoreria: dovuto, pagato e scaduto della stagione, rate e lista di lavoro, copiati dal Gestionale.">
+              <div className="px-4 pb-4 sm:px-[18px]">
+                <Link to="/tesoreria/quote" className="scd-focus inline-flex h-11 items-center gap-2 rounded-[10px] bg-[var(--in-info)] px-4 text-[15px] font-bold text-white" data-testid="tes-quote-link">
+                  <Receipt className="size-4" aria-hidden="true" /> Apri quote della stagione
                 </Link>
               </div>
             </Card>

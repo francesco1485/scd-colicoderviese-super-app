@@ -58,7 +58,10 @@
         { "id": "biglietteria", "path": "/tesoreria/biglietteria", "roles": ["addetto-biglietteria"], "blocker": "tariff source to confirm", "status": "live" },
         { "id": "magazzino-cassa", "path": "/tesoreria/magazzino", "roles": ["responsabile-magazzino"], "status": "design" },
         { "id": "compensi", "path": "/tesoreria/compensi", "audience": "staff", "roles": ["direzione", "presidente", "direttore-generale", "tesoreria"], "role_map": { "direzione": "DIRECTION", "presidente": "DIRECTION", "direttore-generale": "DIRECTION", "tesoreria": "STAFF" },
-          "sources": ["SCD Control Tower 2026/27 (initial import)", "Supabase scd_comp_*"], "flow": ["accordo", "voci del mese", "autorizzazione Direzione", "pagamento Tesoreria"], "status": "live" }
+          "sources": ["SCD Control Tower 2026/27 (initial import)", "Supabase scd_comp_*"], "flow": ["accordo", "voci del mese", "autorizzazione Direzione", "pagamento Tesoreria"], "status": "live" },
+        { "id": "quote", "path": "/tesoreria/quote", "audience": "staff", "roles": ["direzione", "presidente", "direttore-generale", "segreteria", "tesoreria"], "role_map": { "direzione": "DIRECTION", "presidente": "DIRECTION", "direttore-generale": "DIRECTION", "segreteria": "SECRETARIAT", "tesoreria": "STAFF" },
+          "sources": ["SCD_MASTER_GESTIONALE_2026-27 (32_QUOTE_OPERATIVE, 17_CONTROLLO_QUOTE — copy by scheduled job)", "Supabase scd_fee_positions (migration r78)"],
+          "features": ["dovuto, pagato, residuo e scaduto della stagione", "quadro per categoria", "lista di lavoro: in ritardo, da comunicare, da verificare", "calendario rate 15/10 · 31/10 · 30/11", "famiglie: solo le proprie quote in /famiglia"], "status": "live" }
       ] },
     { "id": "direzione", "path": "/direzione", "audience": "staff", "board": "Plancia-direzione.dc.html", "status": "live",
       "children": [ { "id": "acquisti", "path": "/direzione/acquisti", "roles": ["dirigenza"], "flow": ["richiesta", "approvazione", "ordine", "fattura", "pagamento"], "status": "design" },

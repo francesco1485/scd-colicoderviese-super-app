@@ -175,6 +175,7 @@ export const WORK_AREA_IDS: readonly string[] = [
   "biglietteria",
   "magazzino-cassa",
   "compensi",
+  "quote",
   "infermeria",
   "mister",
   "organigramma",

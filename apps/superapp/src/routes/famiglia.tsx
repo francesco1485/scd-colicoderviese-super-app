@@ -14,6 +14,8 @@ import { getMyCallups, respondCallup, type MyCallup } from "@/lib/callups.functi
 import { CERT_LABEL, certificateState } from "@/lib/people";
 import { registrationLabel } from "@/lib/roster";
 import { getMyFamily, type FamilyMember } from "@/lib/roster.functions";
+import { FAMILY_GROUP_LABEL, euro, familyNext, type FeeGroup, type MyFee } from "@/lib/fees";
+import { getMyFees } from "@/lib/fees.functions";
 
 /**
  * Family area (UD-061, UD-062). Signed out: the access screen of the registry. Signed in: the caller's
@@ -22,8 +24,8 @@ import { getMyFamily, type FamilyMember } from "@/lib/roster.functions";
  */
 export const Route = createFileRoute("/famiglia")({
   loader: async () => {
-    const [session, family, callups] = await Promise.all([getSession(), getMyFamily(), getMyCallups()]);
-    return { roles: session.roles, badge: session.badge, family, callups };
+    const [session, family, callups, fees] = await Promise.all([getSession(), getMyFamily(), getMyCallups(), getMyFees()]);
+    return { roles: session.roles, badge: session.badge, family, callups, fees: fees.state === "ok" ? fees.fees : [] };
   },
   head: () => accessHead("famiglia"),
   component: FamigliaRoute,
@@ -32,7 +34,7 @@ export const Route = createFileRoute("/famiglia")({
 function FamigliaRoute() {
   const data = Route.useLoaderData();
   if (data.family.state !== "ok" && data.family.state !== "error") return <AccessScreenPage id="famiglia" />;
-  return <FamilyHome roles={data.roles} badge={data.badge} members={data.family.members} callups={data.callups} failed={data.family.state === "error"} />;
+  return <FamilyHome roles={data.roles} badge={data.badge} members={data.family.members} callups={data.callups} fees={data.fees} failed={data.family.state === "error"} />;
 }
 
 const TONE: Readonly<Record<CallupResponse, ChipTone>> = { CONFIRMED: "ok", DECLINED: "crit", PENDING: "warn" };
@@ -41,7 +43,7 @@ function todayRome(): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Rome", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
 }
 
-function FamilyHome({ roles, badge, members, callups, failed }: { roles: string[]; badge: string | null; members: FamilyMember[]; callups: MyCallup[]; failed: boolean }) {
+function FamilyHome({ roles, badge, members, callups, fees, failed }: { roles: string[]; badge: string | null; members: FamilyMember[]; callups: MyCallup[]; fees: MyFee[]; failed: boolean }) {
   const [items, setItems] = useState(callups);
   const pending = items.filter((c) => c.response === "PENDING").length;
   const kids = members.filter((m) => m.relationship !== "SELF");
@@ -99,6 +101,8 @@ function FamilyHome({ roles, badge, members, callups, failed }: { roles: string[
             </ul>
           )}
         </Card>
+
+        {fees.length > 0 && <FeesCard fees={fees} today={today} />}
       </div>
     </InteriorShell>
   );
@@ -150,5 +154,32 @@ function CallupCard({ c, onAnswered }: { c: MyCallup; onAnswered: (r: CallupResp
       </div>
       <p role="status" aria-live="polite" className="m-0 mt-2 min-h-[1.2em] text-[13.5px] text-[var(--in-sub)]">{note}</p>
     </article>
+  );
+}
+
+const FEE_TONE: Readonly<Record<FeeGroup, ChipTone>> = { IN_RITARDO: "warn", DA_COMUNICARE: "mute", DA_VERIFICARE: "mute", REGOLARE: "info", SALDATO: "ok", ESCLUSO: "mute" };
+
+/** Quote of the caller's own circle (scd_my_fees): amounts and next instalment only, no internal notes. */
+function FeesCard({ fees, today }: { fees: MyFee[]; today: string }) {
+  return (
+    <Card id="fam-quote" title="Quote 2026/27" sub="Dal Gestionale della società. Per dubbi o per una ricevuta scrivi alla segreteria.">
+      <ul className="m-0 list-none p-0" data-testid="fam-fees">
+        {fees.map((f) => (
+          <li key={f.personId} className="flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-[var(--in-line)] px-4 py-3 text-[15px] sm:px-[18px]">
+            <span className="min-w-0 flex-1">
+              <b className="block truncate font-semibold">{f.name}</b>
+              <span className="block text-[13.5px] text-[var(--in-sub)]">{familyNext(f, "2026/27", today)}</span>
+            </span>
+            <span className="flex flex-none flex-col items-end gap-1 text-right">
+              <Chip tone={FEE_TONE[f.group]}>{FAMILY_GROUP_LABEL[f.group]}</Chip>
+              <span className="text-[13px] tabular-nums text-[var(--in-sub)]">pagato {euro(f.paid)} su {euro(f.feeTotal)}</span>
+            </span>
+          </li>
+        ))}
+      </ul>
+      <p className="m-0 border-t border-[var(--in-line)] px-4 py-3 text-[13px] text-[var(--in-sub)] sm:px-[18px]">
+        L'app non incassa: il pagamento si fa con bonifico o in segreteria, come indicato nella mail della quota.
+      </p>
+    </Card>
   );
 }
