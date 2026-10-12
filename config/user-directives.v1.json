@@ -2132,16 +2132,20 @@
       "sourceQuoteFragments": [
         "Era deve sembrare una venere stile moglie di Paride presente nell'iliade e odissea",
         "Dottoressa Genny e l'aiuto nutrizionista che consiglia ai ragazzi",
-        "poi c'è infermeria fatta da il magico dottor acanfora figura mitologica medica"
+        "poi c'è infermeria fatta da il magico dottor acanfora figura mitologica medica",
+        "Potrebbero essere un po' più realistiche",
+        "manca il dottore che deve essere uno di 45 anni bello stile attore americano",
+        "Ci siamo"
       ],
       "normalizedCommand": {
-        "rule": "Assistant cast in the app. Era: assistant for users 15+, a classical Greek-myth beauty (Venus / Helen of Troy inspiration), elegant and professional. Dottoressa Genny: nutrition helper giving young athletes general healthy-eating guidance. Dottor Acanfora: the 'infermeria' (first-aid corner), a mythological medical figure. All characters realistic 3D, original, never cartoon (existing rule).",
+        "rule": "Assistant cast in the app. Era: assistant for users 15+, a classical Greek-myth beauty (Venus / Helen of Troy inspiration), elegant and professional. Dottoressa Genny: nutrition helper giving young athletes general healthy-eating guidance. Dottor Acanfora: the 'infermeria' (first-aid corner), a mythological medical figure. All characters realistic 3D, original, never cartoon (existing rule). Update 2026-10-12: style = photorealistic with light 3D polish, charismatic and cheeky expressions. Dottor Acanfora = original handsome doctor about 45, salt-and-pepper, American-actor charm (no real-actor likeness). Direction approved by Francesco ('Ci siamo') on the round-4 Canva images: Acanfora MAHX1M4GK7g, Era MAHX1G12gBc, ragazza/Genny MAHX1KTH6yk, Crovi MAHX1PgXFCY. Sky stays the official lucky mascot from the existing asset.",
         "scope": "ASSISTANTS_AND_CHARACTERS",
         "constraints": [
           "Era never sexualized: the app is used by minors",
           "Genny: general education only, no diets, calories, weight targets or body judgments; refers to family and doctor",
           "Acanfora: first aid and 'who to call' only, no diagnosis; emergencies always 112; health data never in ordinary flows",
-          "no likeness of real people without written consent"
+          "no likeness of real people without written consent",
+          "no sexualized curves or poses; attention comes from charisma, expression and light"
         ]
       }
     }
