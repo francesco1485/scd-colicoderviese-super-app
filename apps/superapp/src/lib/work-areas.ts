@@ -24,6 +24,7 @@ export type WorkAreaId =
   | "compensi"
   | "quote"
   | "coda"
+  | "scadenzario"
   | "infermeria"
   | "mister"
   | "organigramma"
@@ -48,6 +49,7 @@ export const DRIVE_MASTERS = {
   sponsor: { key: "sponsor", name: "Master Sponsor", fileId: "1-5-MUnrrAltflJSATe6bKkjm_3SItO0gvadi_PXPoAQ" },
   contatti: { key: "contatti", name: "MASTER CONTATTI", fileId: "1RacFticU85AWw4Sgkz60hqUfsXRGcCpd5heKH6Tkqak" },
   economico: { key: "economico", name: "Gestionale economico", fileId: "1N2MisMPM79Uboj70A7PPMdCGNf043-GX6WjBrAyT3rg" },
+  fornitori: { key: "fornitori", name: "SCD - TESORERIA FORNITORI | Scadenze e chiusure 2026-2027", fileId: "1l9_mmmo9zuALF2IrQvevhBFaNYFCWzOOjjyDuphQGsY" },
   impianti: { key: "impianti", name: "Sedi e impianti", fileId: "1vcEMucnKtoJ9ICE4FwB5tDwMW16msSATZetxWGwU-2I" },
   inserimenti: { key: "inserimenti", name: "Inserimenti a Sky", fileId: "15Dew9ankJXHsZMVD426BHwYD-u9TKVtQWVMOWcSLnwk" },
   quadro: { key: "quadro", name: "Quadro settimanale allenamenti 2026/27", fileId: null, note: "copia di sola lettura del 09/10" },
@@ -192,6 +194,12 @@ export const WORK_AREAS: Readonly<Record<WorkAreaId, WorkAreaConfig>> = {
     description: "Proposte arrivate da mail e copie dei master: una persona conferma, scarta o rinvia. Ogni decisione resta registrata.",
     sources: ["supabase", "inserimenti"],
     insertRoles: ["Direzione", "Segreteria", "Tesoreria"],
+  },
+  scadenzario: {
+    id: "scadenzario", label: "Tesoreria · Fornitori e scadenze", path: pathOf("scadenzario"), railId: "tesoreria",
+    description: "Debiti verso fornitori, piani di rientro e agenda dei pagamenti dal foglio TESORERIA FORNITORI. Riservato.",
+    sources: ["fornitori", "supabase", "inserimenti"],
+    insertRoles: ["Direzione", "Tesoreria"],
   },
   infermeria: {
     id: "infermeria", label: "Infermeria", path: pathOf("infermeria"), railId: "infermeria",

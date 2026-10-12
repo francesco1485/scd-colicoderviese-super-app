@@ -1634,6 +1634,32 @@
           "NO_PARALLEL_CALENDAR_EDITING_IN_DB",
           "FIGC_LND_OFFICIAL_FIXTURES_WIN"
         ]
+      },
+      {
+        "id": "SUPPLIERS_TREASURY_SHEET",
+        "kind": "GOOGLE_SHEET",
+        "trust": "INTERNAL_VERIFIED",
+        "status": "ACTIVE",
+        "title": "SCD - TESORERIA FORNITORI | SCADENZE E CHIUSURE 2026-2027",
+        "account": "sportclubcolico@gmail.com",
+        "resource_id": "1l9_mmmo9zuALF2IrQvevhBFaNYFCWzOOjjyDuphQGsY",
+        "authority_domains": [
+          "SUPPLIER_DEBTS",
+          "SUPPLIER_PAYMENT_PLANS",
+          "SUPPLIER_DEADLINES"
+        ],
+        "consumers": [
+          "SCD_SUPABASE.scd_supplier_positions",
+          "SCD_SUPABASE.scd_supplier_instalments",
+          "apps/superapp/src/routes/tesoreria_.fornitori.tsx"
+        ],
+        "rules": [
+          "SHEET_IS_MASTER_APP_READS_COPY",
+          "NEVER_COPY_CONTACTS_NOTES_IBAN",
+          "READERS_DIRECTION_AND_TREASURY_ONLY",
+          "APP_NEVER_PAYS"
+        ],
+        "imported_at": "2026-10-12"
       }
     ],
     "conflict_resolution": [

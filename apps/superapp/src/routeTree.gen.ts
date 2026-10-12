@@ -65,6 +65,7 @@ import { Route as SegreteriaPersoneRouteImport } from './routes/segreteria_.pers
 import { Route as TesoreriaBiglietteriaRouteImport } from './routes/tesoreria_.biglietteria'
 import { Route as TesoreriaClubHouseRouteImport } from './routes/tesoreria_.club-house'
 import { Route as TesoreriaCompensiRouteImport } from './routes/tesoreria_.compensi'
+import { Route as TesoreriaFornitoriRouteImport } from './routes/tesoreria_.fornitori'
 import { Route as TesoreriaMagazzinoRouteImport } from './routes/tesoreria_.magazzino'
 import { Route as TesoreriaQuoteRouteImport } from './routes/tesoreria_.quote'
 import { Route as GestionaleImpiantiIndexRouteImport } from './routes/gestionale_.impianti.index'
@@ -355,6 +356,11 @@ const TesoreriaCompensiRoute = TesoreriaCompensiRouteImport.update({
   path: '/tesoreria/compensi',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TesoreriaFornitoriRoute = TesoreriaFornitoriRouteImport.update({
+  id: '/tesoreria_/fornitori',
+  path: '/tesoreria/fornitori',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TesoreriaMagazzinoRoute = TesoreriaMagazzinoRouteImport.update({
   id: '/tesoreria_/magazzino',
   path: '/tesoreria/magazzino',
@@ -451,6 +457,7 @@ export interface FileRoutesByFullPath {
   '/tesoreria/biglietteria': typeof TesoreriaBiglietteriaRoute
   '/tesoreria/club-house': typeof TesoreriaClubHouseRoute
   '/tesoreria/compensi': typeof TesoreriaCompensiRoute
+  '/tesoreria/fornitori': typeof TesoreriaFornitoriRoute
   '/tesoreria/magazzino': typeof TesoreriaMagazzinoRoute
   '/tesoreria/quote': typeof TesoreriaQuoteRoute
   '/accedi/': typeof AccediIndexRoute
@@ -516,6 +523,7 @@ export interface FileRoutesByTo {
   '/tesoreria/biglietteria': typeof TesoreriaBiglietteriaRoute
   '/tesoreria/club-house': typeof TesoreriaClubHouseRoute
   '/tesoreria/compensi': typeof TesoreriaCompensiRoute
+  '/tesoreria/fornitori': typeof TesoreriaFornitoriRoute
   '/tesoreria/magazzino': typeof TesoreriaMagazzinoRoute
   '/tesoreria/quote': typeof TesoreriaQuoteRoute
   '/accedi': typeof AccediIndexRoute
@@ -583,6 +591,7 @@ export interface FileRoutesById {
   '/tesoreria_/biglietteria': typeof TesoreriaBiglietteriaRoute
   '/tesoreria_/club-house': typeof TesoreriaClubHouseRoute
   '/tesoreria_/compensi': typeof TesoreriaCompensiRoute
+  '/tesoreria_/fornitori': typeof TesoreriaFornitoriRoute
   '/tesoreria_/magazzino': typeof TesoreriaMagazzinoRoute
   '/tesoreria_/quote': typeof TesoreriaQuoteRoute
   '/accedi/': typeof AccediIndexRoute
@@ -651,6 +660,7 @@ export interface FileRouteTypes {
     | '/tesoreria/biglietteria'
     | '/tesoreria/club-house'
     | '/tesoreria/compensi'
+    | '/tesoreria/fornitori'
     | '/tesoreria/magazzino'
     | '/tesoreria/quote'
     | '/accedi/'
@@ -716,6 +726,7 @@ export interface FileRouteTypes {
     | '/tesoreria/biglietteria'
     | '/tesoreria/club-house'
     | '/tesoreria/compensi'
+    | '/tesoreria/fornitori'
     | '/tesoreria/magazzino'
     | '/tesoreria/quote'
     | '/accedi'
@@ -782,6 +793,7 @@ export interface FileRouteTypes {
     | '/tesoreria_/biglietteria'
     | '/tesoreria_/club-house'
     | '/tesoreria_/compensi'
+    | '/tesoreria_/fornitori'
     | '/tesoreria_/magazzino'
     | '/tesoreria_/quote'
     | '/accedi/'
@@ -849,6 +861,7 @@ export interface RootRouteChildren {
   TesoreriaBiglietteriaRoute: typeof TesoreriaBiglietteriaRoute
   TesoreriaClubHouseRoute: typeof TesoreriaClubHouseRoute
   TesoreriaCompensiRoute: typeof TesoreriaCompensiRoute
+  TesoreriaFornitoriRoute: typeof TesoreriaFornitoriRoute
   TesoreriaMagazzinoRoute: typeof TesoreriaMagazzinoRoute
   TesoreriaQuoteRoute: typeof TesoreriaQuoteRoute
   AccediIndexRoute: typeof AccediIndexRoute
@@ -1253,6 +1266,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TesoreriaCompensiRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tesoreria_/fornitori': {
+      id: '/tesoreria_/fornitori'
+      path: '/tesoreria/fornitori'
+      fullPath: '/tesoreria/fornitori'
+      preLoaderRoute: typeof TesoreriaFornitoriRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tesoreria_/magazzino': {
       id: '/tesoreria_/magazzino'
       path: '/tesoreria/magazzino'
@@ -1384,6 +1404,7 @@ const rootRouteChildren: RootRouteChildren = {
   TesoreriaBiglietteriaRoute: TesoreriaBiglietteriaRoute,
   TesoreriaClubHouseRoute: TesoreriaClubHouseRoute,
   TesoreriaCompensiRoute: TesoreriaCompensiRoute,
+  TesoreriaFornitoriRoute: TesoreriaFornitoriRoute,
   TesoreriaMagazzinoRoute: TesoreriaMagazzinoRoute,
   TesoreriaQuoteRoute: TesoreriaQuoteRoute,
   AccediIndexRoute: AccediIndexRoute,

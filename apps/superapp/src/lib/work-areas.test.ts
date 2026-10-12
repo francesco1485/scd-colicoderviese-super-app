@@ -24,6 +24,8 @@ const GIVEN_IDS = [
   "1N2MisMPM79Uboj70A7PPMdCGNf043-GX6WjBrAyT3rg",
   "1vcEMucnKtoJ9ICE4FwB5tDwMW16msSATZetxWGwU-2I",
   "15Dew9ankJXHsZMVD426BHwYD-u9TKVtQWVMOWcSLnwk",
+  // Suppliers master, approved by Direzione as the suppliers source (decision N2, UD-082).
+  "1l9_mmmo9zuALF2IrQvevhBFaNYFCWzOOjjyDuphQGsY",
 ];
 
 describe("work area contract", () => {
