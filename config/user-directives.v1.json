@@ -2213,11 +2213,14 @@
       "normalizedCommand": {
         "rule": "Backlog of engagement features to design: weekly Top 11 voted by members across all teams; monthly awards (best goalkeeper, best striker, ...) with a ceremony; virtual podcast zone; social zone; Monday press review (front pages of sports papers mentioning SCD) and local news; a free football game among members with points and non-cash prizes (club house or home); a fantacalcio to be studied (which format, how).",
         "scope": "ENGAGEMENT_BACKLOG",
-        "status": "TO_DESIGN",
+        "status": "IN_PROGRESS",
         "constraints": [
           "minors: no public individual rankings for attivita di base; votes on under-18 only with liberatoria and only for agonistic teams, or team-level awards",
           "prizes: non-cash only; legal check on DPR 430/2001 (non-promotional internal game by an ASD) before launch; partner-branded prizes change the picture",
           "press review: headlines and links only, never scanned pages (copyright)"
+        ],
+        "delivered": [
+          "r90 Top 11 della settimana: 3 votes per member per week, agonistic teams only, minors only with IMMAGINE_NOME consent and name+initial, results published on Monday (2026-10-12)"
         ]
       }
     }
