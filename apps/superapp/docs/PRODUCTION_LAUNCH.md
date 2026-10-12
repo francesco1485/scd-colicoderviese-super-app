@@ -42,6 +42,9 @@ Nessun passo di questo file si esegue senza l'ok esplicito della Direzione.
 ## Giorno del lancio
 1. Merge approvato su `main` → servizio di produzione attivo → `/healthz` risponde.
 2. Accesso di prova: Direzione, un mister, una famiglia.
-3. Conferma dei 61 tesseramenti in corso da Segreteria → Persone (filtro "Senza squadra", azione "Conferma e assegna").
+3. Conferma dei 61 tesseramenti in corso da Segreteria → **Scrivania del giorno** → "persone in attesa di conferma" (apre Persone già filtrata; azione "Conferma e assegna").
 4. Inviti a gruppi (circa 60 all'ora) partendo dalle squadre con i certificati già inseriti.
 5. Presentazione ufficiale.
+
+## Uso interno prima della presentazione (dal 12/10/2026)
+Staging: `scd-superapp-staging.onrender.com` (Basic Auth di staging + login reale). Giro quotidiano della Segreteria: Scrivania del giorno → code in ordine di urgenza (certificati scaduti, persone da confermare, certificati in scadenza, tesseramenti da verificare, account mai entrati). Ogni riga apre la lista giusta. Le cose che la Direzione trova sbagliate si segnalano in chat e si correggono sullo staging prima di qualunque pubblicazione.
