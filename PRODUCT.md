@@ -33,7 +33,7 @@ The only place where the club's real master calendar, training board, events and
 - Infermeria: list of services offered and appointment booking. It does not store diagnoses or clinical notes. Any injury log needs separate approval and a privacy review.
 - CRM is one shared register used by Sponsor, Tornei and Segreteria, built on the existing MASTER CONTATTI sheet, not a second CRM.
 - Magazzino covers kits, sizes and equipment; Tesoreria covers fees, instalments, the solidarity fund, kits, minibuses and the Club House.
-- Open decisions: the final URL scheme (paths on one domain are the working default) and the login method.
+- Decided: paths on one domain, app.colicoderviese.it (UD-071, DNS still to configure); login by e-mail link without password (Supabase Auth, in use on staging since 11/10). Open: which system is the identity of record, R20 or the Super App database (map N1, 12/10), and one master sheet per domain (map N2).
 
 ## Brand Commitments
 

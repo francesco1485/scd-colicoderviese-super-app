@@ -204,3 +204,10 @@ export function ticketingFor(item: { homeAway?: string | null; group?: string; c
 export function euro(n: number): string {
   return `${n.toFixed(2).replace(".", ",").replace(",00", "")}\u00a0€`;
 }
+
+/** Home matches from today with the ticket office open (paid championships and cups), in date and time order. */
+export function ticketedHomeMatches<E extends { date: string; time: string; homeAway: string; group: string; type: string }>(events: readonly E[], today: string): E[] {
+  return events
+    .filter((e) => e.date >= today && ticketingFor({ homeAway: e.homeAway, group: e.group, competition: e.type })?.kind === "office")
+    .sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+}

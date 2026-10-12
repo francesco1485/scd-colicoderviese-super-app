@@ -72,11 +72,12 @@ export function PurchaseSteps() {
   );
 }
 
+/** Ticket rules are confirmed (config/scd-ticketing.v1.json, UD-055/UD-079); the app shows rules, it never sells. */
 export function TariffWarning() {
   return (
-    <p role="note" className="m-0 flex gap-2 rounded-xl bg-[var(--in-warn-bg)] px-4 py-3 text-[14.5px] font-semibold leading-snug text-[var(--in-warn)]">
+    <p role="note" className="m-0 flex gap-2 rounded-xl bg-[var(--in-info-bg)] px-4 py-3 text-[14.5px] font-semibold leading-snug text-[var(--in-info)]">
       <TriangleAlert className="mt-[1px] size-[18px] flex-none" strokeWidth={1.8} aria-hidden="true" />
-      Biglietteria: fonte delle tariffe da confermare. Conferma il tariffario prima di vendere.
+      Biglietteria: tariffe e gratuità confermate dalla Direzione. L'app mostra le regole; i biglietti si pagano alla biglietteria del campo.
     </p>
   );
 }

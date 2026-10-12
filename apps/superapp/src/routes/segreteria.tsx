@@ -3,7 +3,7 @@ import { ChevronRight, FileText, Users } from "lucide-react";
 import { useMemo } from "react";
 
 import { Card, Chip, SourceLine, TeamTag, useRomeNow } from "@/components/scd/interior-ui";
-import { EmptyState, PendingButton, SourcesBox, WorkAreaGateView, WorkAreaShell, workAreaHead } from "@/components/scd/work-area-ui";
+import { EmptyState, SourcesBox, WorkAreaGateView, WorkAreaShell, workAreaHead } from "@/components/scd/work-area-ui";
 import { dateParts, titleCase } from "@/lib/board-data";
 import { freshnessLabel, loadCalendar, type PublicEvent, type PublicGroup } from "@/lib/public-snapshots";
 import { readableOnWhite, teamTag } from "@/lib/quadro";
@@ -97,7 +97,7 @@ function SegreteriaPage({ groups, events, sourceModifiedAt, preview, desk, due }
         <DeskCard desk={desk} />
         <ClubDeadlinesCard id="seg-scadenze" due={due} today={now.date} title="Scadenze" sub="In ordine di data: documenti, bandi, obblighi federali e comunali. Rosso entro 15 giorni." className="lg:self-start" />
 
-        <Card id="seg-weekend" title="Partite del weekend" sub={`${matches.length} ${matches.length === 1 ? "gara" : "gare"} tra sabato e domenica. La distinta si prepara in R20.`} className="lg:self-start">
+        <Card id="seg-weekend" title="Partite del weekend" sub={`${matches.length} ${matches.length === 1 ? "gara" : "gare"} tra sabato e domenica. Mister e dirigenti preparano convocazione e distinta nell'app; la segreteria la ricopia sul portale LND.`} className="lg:self-start">
           {matches.length === 0 ? (
             <div className="px-4 pb-4 sm:px-[18px]">
               <EmptyState title="Nessuna gara nel prossimo weekend">Il calendario ufficiale di questa copia non ha gare per sabato e domenica.</EmptyState>
@@ -119,7 +119,7 @@ function SegreteriaPage({ groups, events, sourceModifiedAt, preview, desk, due }
                         <span className="block text-[13px] text-[var(--in-sub)]">{e.homeAway === "CASA" ? "In casa" : e.homeAway === "FUORI" ? "Trasferta" : "—"}</span>
                       </span>
                     </span>
-                    <PendingButton reason="La distinta si prepara in R20: collegamento in arrivo">Distinta</PendingButton>
+                    <Link to="/gestionale/mister" className="scd-focus inline-flex h-11 items-center rounded-full border border-[var(--in-line)] bg-white px-3.5 text-[14px] font-semibold">Distinta</Link>
                   </li>
                 );
               })}

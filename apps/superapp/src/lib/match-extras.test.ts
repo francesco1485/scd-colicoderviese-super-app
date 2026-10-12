@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { TICKETING, describeWeather, euro, forecastAvailable, kickoffHour, mapsUrl, pickHour, pickNow, ticketingFor, venueTown, weatherMode } from "./match-extras";
+import { TICKETING, describeWeather, ticketedHomeMatches, euro, forecastAvailable, kickoffHour, mapsUrl, pickHour, pickNow, ticketingFor, venueTown, weatherMode } from "./match-extras";
 
 describe("match extras", () => {
   it("reads the town from a FIGC venue and builds a maps link", () => {
@@ -58,5 +58,20 @@ describe("match extras", () => {
     expect(ticketingFor({ homeAway: "CASA", group: "u18" })).not.toMatchObject({ kind: "office" });
     expect(euro(5)).toBe("5\u00a0€");
     expect(euro(7.5)).toBe("7,50\u00a0€");
+  });
+});
+
+describe("ticketedHomeMatches", () => {
+  it("keeps future home matches of paid groups, cup included, in order", () => {
+    const ev = (o: Partial<{ date: string; time: string; homeAway: string; group: string; type: string }>) => ({ date: "2026-10-18", time: "15:30", homeAway: "CASA", group: "prima", type: "CAMPIONATO", ...o });
+    const out = ticketedHomeMatches([
+      ev({ date: "2026-10-25" }),
+      ev({ date: "2026-10-18", group: "u16", time: "10:00" }),
+      ev({ group: "u15" }),
+      ev({ homeAway: "FUORI" }),
+      ev({ date: "2026-10-01" }),
+      ev({ date: "2026-10-21", type: "COPPA ITALIA" }),
+    ], "2026-10-12");
+    expect(out.map((e) => `${e.date} ${e.group} ${e.type}`)).toEqual(["2026-10-18 u16 CAMPIONATO", "2026-10-21 prima COPPA ITALIA", "2026-10-25 prima CAMPIONATO"]);
   });
 });

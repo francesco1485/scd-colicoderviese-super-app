@@ -354,3 +354,10 @@ prossimi impegni e "ci sarò" in primo piano). Desktop invariato.
 - Ogni area di lavoro ha il pulsante "Copia link" (indirizzo della pagina da mandare a chi la usa; cosa vede dipende dal ruolo). Anche su /direzione.
 - Scadenze del club dal Cervellone (`ClubDeadlinesCard`): in /segreteria sostituisce il riquadro vuoto "da collegare a R20"; in /direzione accanto alle scorciatoie. Aggiunte al Cervellone le scadenze note: bando RL Area Sportiva Giovani 29/10 ore 12, istanza SUAP Colico 30/10, bando Manifestazioni 5/11, Delegato tutela minori 15/11.
 - Test: ClubDeadlines.test.tsx (3).
+
+## 2026-10-12 — Mappa A–Z (progetto) e parte A1: incoerenze corrette
+- Mappa unica del progetto salvata nel Project claude.ai (`claude/SCD_MAPPA_A_Z_v1.md`, non nel repo pubblico): sistemi, 18 processi con master, pagina e stato verificato, nodi N1–N5, decisioni, ordine di lavoro.
+- `/tesoreria/biglietteria`: mostra le tariffe e le gratuità confermate (UD-079) e le partite in casa con biglietteria dal calendario; tolto "Tariffario da confermare" e il finto "Vendi biglietto" (l'app non vende). `ticketedHomeMatches` in match-extras con test.
+- `/segreteria`: la distinta non è più "in R20": il pulsante porta a /gestionale/mister dove si prepara.
+- `config/superapp-areas.v1.json`: stato "live" per le aree che funzionano con dati reali in staging; significato degli stati scritto nel registro.
+- `PRODUCT.md`: decisioni su indirizzo e login aggiornate; aperti N1 (identità) e N2 (master per dominio).
