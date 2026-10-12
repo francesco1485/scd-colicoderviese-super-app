@@ -2148,6 +2148,32 @@
           "no sexualized curves or poses; attention comes from charisma, expression and light"
         ]
       }
+    },
+    {
+      "sourceDate": "2026-10-12",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-092",
+      "name": "ASSISTANTS_3D_AND_VOICE_LATER",
+      "sourceQuoteFragments": [
+        "Cerchiamo di crearti anche in 3d al momento giusto se abilitiamo anche voce così posso parlare e chiedere o interloquire con le voci fai tu"
+      ],
+      "normalizedCommand": {
+        "rule": "At the right time (after text chat is live), the assistant cast (Era, Genny, segretaria, Acanfora, Crovi; Sky mascot) gets 3D/animated talking avatars and voice: users can speak, ask and converse. Voice choice delegated to Claude: original synthetic voices per character, no cloning of real people's voices.",
+        "scope": "ASSISTANTS_AND_CHARACTERS",
+        "phases": [
+          "P1 text chat in app",
+          "P2 voice: push-to-talk speech-to-text -> assistant -> text-to-speech",
+          "P3 talking animated avatars from approved images with lip-sync",
+          "P4 full 3D avatars"
+        ],
+        "constraints": [
+          "voice only with explicit consent; no audio stored by default",
+          "under 14: no voice chat with assistants, parent account only",
+          "no private adult-minor channels via voice",
+          "provider, cost and data location verified and approved by Francesco before activation"
+        ]
+      }
     }
   ],
   "completionGate": {
