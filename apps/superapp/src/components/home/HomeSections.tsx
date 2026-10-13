@@ -342,7 +342,7 @@ const WHY: ReadonlyArray<{
 }> = [
   {
     who: "Famiglia",
-    text: "Convocazioni con conferma, impegni della settimana, pulmini, documenti e certificato medico in un posto solo.",
+    text: "Convocazioni da prendere in visione, impegni della settimana, pulmini, documenti e certificato medico in un posto solo.",
     to: "/registrati",
   },
   {

@@ -54,7 +54,7 @@ function message(t: Target) {
   if (t.meeting_at) parts.push(`ritrovo ${TIME.format(new Date(t.meeting_at))}`);
   return {
     title: `Convocazione per ${(t.first_name ?? "").trim() || "tuo figlio/a"}`,
-    body: `${parts.join(" · ")}. Rispondi "Ci sarò" nell'app.`,
+    body: `${parts.join(" · ")}. Apri l'app per prenderne visione.`,
     url: "/famiglia",
     tag: `callup-${t.callup_id}`,
   };
