@@ -58,6 +58,27 @@ function plain(body: string, type: string): Response {
   return new Response(body, { status: 200, headers: { "content-type": `${type}; charset=utf-8`, "cache-control": "no-store" } });
 }
 
+/**
+ * Posta del club sync (r95), for the Render cron: POST with "Authorization: Bearer <SCD_COMM_SYNC_SECRET>".
+ * Answers 404 when the secret is not configured, 401 on a wrong secret. The body carries counts only.
+ */
+async function commSync(request: Request): Promise<Response> {
+  const json = (status: number, body: unknown) =>
+    new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" } });
+  if ((process.env["SCD_COMM_SYNC_SECRET"] ?? "").trim().length < 32) return json(404, { ok: false });
+  if (request.method !== "POST") return json(405, { ok: false });
+  const { runCommSync, serviceSupabase, syncSecretMatches } = await import("./lib/comm/sync.server");
+  if (!syncSecretMatches(request.headers.get("authorization"))) return json(401, { ok: false });
+  const sb = serviceSupabase();
+  if (!sb) return json(503, { ok: false, code: "NO_SERVICE_KEY" });
+  try {
+    const results = await runCommSync(sb);
+    return json(200, { ok: true, results });
+  } catch {
+    return json(500, { ok: false, code: "SYNC_FAILED" });
+  }
+}
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     const url = new URL(request.url);
@@ -65,6 +86,7 @@ export default {
     if (url.pathname === "/healthz") {
       return withPolicy(plain(JSON.stringify({ ok: true, service: "scd-superapp", production, commit: process.env["RENDER_GIT_COMMIT"] ?? null }), "application/json"), url.pathname);
     }
+    if (url.pathname === "/internal/comm-sync") return withPolicy(await commSync(request), url.pathname);
     const demo = demoRedirect(url.pathname, production);
     if (demo) return withPolicy(new Response(null, { status: 302, headers: { location: demo } }), url.pathname);
     if (url.pathname === "/robots.txt") return withPolicy(plain(robotsTxt(production, configuredSiteUrl(process.env)), "text/plain"), url.pathname);

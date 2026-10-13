@@ -962,7 +962,37 @@
           "extract_entities",
           "archive_relevant_attachments_to_drive",
           "critical_changes_require_validation"
-        ]
+        ],
+        "consumers": [
+          "SCD_SUPABASE.scd_comm_threads",
+          "SCD_SUPABASE.scd_comm_messages",
+          "SCD_SUPABASE.scd_comm_recipients",
+          "apps/superapp/src/lib/comm/sync.server.ts",
+          "apps/superapp/src/routes/gestionale.posta.tsx"
+        ],
+        "comm_hub": {
+          "directive": "UD-101",
+          "migration": "supabase/migrations/20261013_r95_comm_hub.sql",
+          "use": "Posta del club: outbound e-mail from the club mailbox on behalf of Direzione/Segreteria/Tesoreria (one e-mail per recipient, Reply-To the club mailbox, sender recorded) and inbound replies/new mails imported into threads.",
+          "transport": "Gmail REST API (users.messages.send, users.history.list, users.messages.get) with OAuth refresh token",
+          "scopes": [
+            "https://www.googleapis.com/auth/gmail.send",
+            "https://www.googleapis.com/auth/gmail.readonly"
+          ],
+          "credentials": "Render env only: SCD_GMAIL_CLIENT_ID, SCD_GMAIL_CLIENT_SECRET, SCD_GMAIL_REFRESH_TOKEN; job auth SCD_SUPABASE_SECRET_KEY + SCD_COMM_SYNC_SECRET; never in repo, chat, database or browser",
+          "activation": "INACTIVE_UNTIL_DIRECTION_CONNECTS_OAUTH_AND_ENABLES_SENDING",
+          "daily_cap_default": 400,
+          "rules": [
+            "MINORS_RULE_IN_DATABASE",
+            "NO_RECIPIENT_UNDER_14",
+            "U18_TO_GUARDIANS",
+            "14_17_WITH_GUARDIANS_IN_COPY",
+            "RISERVATO_DIRECTION_PLUS_OWNING_OFFICE",
+            "SAFEGUARDING_EXCLUDED",
+            "AUDIT_EVERY_WRITE_NO_BODIES",
+            "UNKNOWN_SENDER_PROPOSED_HUMAN_DECIDES"
+          ]
+        }
       },
       {
         "id": "R20",
@@ -2062,6 +2092,58 @@
       "actor_private_copy": "BCC_AUTHENTICATED_ACTOR_IF_DIFFERENT_FROM_CLUB",
       "archive_required": true,
       "touchpoint_required": true
+    },
+    "comm_hub": {
+      "status": "IN_PROGRESS",
+      "directive": "UD-101",
+      "screen": "/gestionale/posta",
+      "setup_screen": "/direzione/posta/collega",
+      "offices": [
+        "DIREZIONE",
+        "SEGRETERIA",
+        "TESORERIA"
+      ],
+      "office_role_map": {
+        "DIREZIONE": "DIRECTION or positions direzione/presidente/direttore-generale",
+        "SEGRETERIA": "SECRETARIAT or positions segreteria/segreteria-presenza/segreteria-remoto",
+        "TESORERIA": "position tesoreria"
+      },
+      "channels": [
+        "EMAIL",
+        "APP",
+        "WHATSAPP_FUTURE"
+      ],
+      "confidentiality": {
+        "ORDINARIO": "three offices",
+        "RISERVATO": "Direzione + owning office"
+      },
+      "tables": [
+        "scd_comm_threads",
+        "scd_comm_messages",
+        "scd_comm_recipients",
+        "scd_comm_external_contacts",
+        "scd_comm_settings"
+      ],
+      "from_account": "sportclubcolico@gmail.com",
+      "reply_to": "sportclubcolico@gmail.com",
+      "actor_private_copy": "BCC to the authenticated staff user on the first envelope of each message (crm_outbound_policy)",
+      "minors": {
+        "under_14": "never a recipient, address never used",
+        "under_18": "guardians",
+        "14_17_with_own_address": "athlete with guardians in copy",
+        "unknown_birth_date": "treated as minor"
+      },
+      "sending_gate": [
+        "gmail_connected (verified token exchange + mailbox match)",
+        "sending_enabled (Direzione switch)"
+      ],
+      "daily_cap": {
+        "default": 400,
+        "max": 500,
+        "overflow": "next day"
+      },
+      "no_parallel_crm": true,
+      "safeguarding_excluded": true
     }
   },
   "sky_and_avatar": {

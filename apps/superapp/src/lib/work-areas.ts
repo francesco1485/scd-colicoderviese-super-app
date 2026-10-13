@@ -32,7 +32,9 @@ export type WorkAreaId =
   | "persone"
   | "accessi"
   | "cervellone"
-  | "certificati";
+  | "certificati"
+  | "posta"
+  | "posta-collega";
 
 export interface DriveMaster {
   key: string;
@@ -69,6 +71,7 @@ export const DRIVE_MASTERS = {
   cervelloneDrive: { key: "cervelloneDrive", name: "SCD CERVELLONE · Catalogo e Memoria (Drive)", fileId: null, note: "cartella privata della società" },
   contoSumup: { key: "contoSumup", name: "Conto SumUp della società · estratto movimenti", fileId: null, note: "estratto caricato da Direzione/Tesoreria, privato" },
   supabase: { key: "supabase", name: "Supabase SCD · persone, ruoli e storico", fileId: null, note: "database del club (r59)" },
+  posta: { key: "posta", name: "Casella sportclubcolico@gmail.com", fileId: null, note: "collegamento Gmail da attivare dalla Direzione" },
 } as const satisfies Record<string, DriveMaster>;
 
 export type MasterKey = keyof typeof DRIVE_MASTERS;
@@ -227,6 +230,18 @@ export const WORK_AREAS: Readonly<Record<WorkAreaId, WorkAreaConfig>> = {
     description: "Ruoli, allenatori e scadenze richiesti dal Sistema di Qualità SGS per il livello scelto. Nessun nome: lo stato arriva dal server.",
     sources: ["sgsManuale", "organigrammaFigc", "elencoRuoli", "inserimenti"],
     insertRoles: ["Direzione", "Segreteria", "Responsabile attività di base"],
+  },
+  posta: {
+    id: "posta", label: "Posta del club", path: pathOf("posta"), railId: "gestionale",
+    description: "Mail e messaggi della società da sportclubcolico@gmail.com: chi scrive resta registrato, le risposte tornano qui. Direzione, Segreteria e Tesoreria.",
+    sources: ["posta", "supabase", "inserimenti"],
+    insertRoles: ["Direzione", "Segreteria", "Tesoreria"],
+  },
+  "posta-collega": {
+    id: "posta-collega", label: "Collega la casella della società", path: pathOf("posta-collega"), railId: "direzione",
+    description: "Collegamento di sportclubcolico@gmail.com alla Posta del club con Google OAuth e interruttore dell'invio. Solo Direzione.",
+    sources: ["posta", "supabase", "inserimenti"],
+    insertRoles: ["Direzione"],
   },
 };
 

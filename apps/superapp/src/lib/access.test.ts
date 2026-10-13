@@ -136,7 +136,7 @@ describe("work areas: real read-only pages behind the same access gate", () => {
       expect(findArea(id), id).toBeDefined();
       expect(ACCESS_SCREEN_IDS, id).not.toContain(id);
     }
-    expect([...WORK_AREA_IDS].sort()).toEqual(["accessi", "biglietteria", "certificati", "cervellone", "club-house", "coda", "compensi", "crm", "infermeria", "magazzino", "magazzino-cassa", "mister", "movimenti", "organigramma", "persone", "pulmini", "quote", "scadenzario", "segreteria", "tesoreria"]);
+    expect([...WORK_AREA_IDS].sort()).toEqual(["accessi", "biglietteria", "certificati", "cervellone", "club-house", "coda", "compensi", "crm", "infermeria", "magazzino", "magazzino-cassa", "mister", "movimenti", "organigramma", "persone", "posta", "posta-collega", "pulmini", "quote", "scadenzario", "segreteria", "tesoreria"]);
   });
 
   it("each has a real route at its canonical path and is marked 'page', not 'access screen'", () => {

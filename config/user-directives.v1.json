@@ -2378,6 +2378,27 @@
       "sourceDate": "2026-10-13",
       "sourceStatus": "EXPLICIT_USER_COMMAND",
       "authority": "DIREZIONE_SCD",
+      "id": "UD-101",
+      "name": "CLUB_COMMUNICATION_HUB",
+      "sourceQuoteFragments": [
+        "La tesoreria e la segreteria e la direzione deve poter inviare mail a tutti i tesserati per richieste che devono poi partire da sportclubcolico@gmail.com ma essere anagrafate da chi le ha mandate, e quindi al ritorno devono ritornare nel gestionale. Idem messaggi e idem interazioni con sponsor, fornitori e chiunque transiti e autorizzi o fornisca comunicazione, o eventualmente anche persone e mail nuove, così non devono lavorare più da mail ma restano sulla web app conservate, e nel frattempo si relazionano in confidenza e non confidenza."
+      ],
+      "normalizedCommand": {
+        "rule": "Direzione, Segreteria and Tesoreria work from the web app, not from Gmail. One message to a group (all members, a team, families of a birth year, sponsors, suppliers, a single person/family/organization, a free address) becomes one individual e-mail per recipient sent FROM sportclubcolico@gmail.com with Reply-To the same mailbox, recorded with the staff user and office who sent it, delivery status per recipient. Replies and new mails come back into the same thread, matched to the person or contact by address; unknown senders become PROPOSTO contacts that a person accepts, links or discards. Every thread is ORDINARIO (three offices) or RISERVATO (Direzione + owning office). Minors: never e-mail anyone under 14; under 18 the guardians receive it; 14-17 athletes only with guardians in copy; enforced in the database. Gmail daily cap: default 400, rest next day. Sending stays off until the Direzione connects Gmail with its own OAuth client (secrets only in Render env) and switches 'Invio attivo' on. Safeguarding never transits here. No parallel CRM: people/families from scd_people/scd_families, external contacts only in scd_comm_external_contacts.",
+        "scope": "COMMUNICATIONS",
+        "status": "IN_PROGRESS",
+        "delivered": [
+          "supabase/migrations/20261013_r95_comm_hub.sql: scd_comm_threads/messages/recipients/external_contacts/settings with RLS (offices only, RISERVATO for Direzione + owning office), minors rule in scd_comm_resolve_core/scd_comm_resolve_envelopes, drafts, queue (SENDING_DISABLED until connected and enabled), outbox claim within the daily cap, delivery marks, inbound record with contact proposals, audit of every write",
+          "apps/superapp/src/lib/comm/: rules (TS mirror of the minors rule, inbound matching, daily cap), RFC 2822 builder and Gmail parser, Gmail REST transport and comm-sync job (service key, inactive until configured)",
+          "apps/superapp/src/routes/gestionale.posta.tsx (inbox, thread, composer, new contacts) and direzione_.posta.collega.tsx (5 OAuth steps, Invio attivo switch); POST /internal/comm-sync for the Render cron",
+          "pending: Direzione OAuth client and Render env vars, Render cron job, WhatsApp channel (Meta Business verification), attachments, resend of failed envelopes"
+        ]
+      }
+    },
+    {
+      "sourceDate": "2026-10-13",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
       "id": "UD-102",
       "name": "AVATAR_FROM_PHOTO_OR_TEXT_AND_MEMBER_CARDS_WITH_CREDITS",
       "sourceQuoteFragments": [

@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CalendarClock, Receipt, Wallet } from "lucide-react";
+import { CalendarClock, Mail, Receipt, Wallet } from "lucide-react";
 
 import { CONTABILITA_PAGES } from "@/components/scd/contabilita";
 
@@ -78,6 +78,13 @@ function TesoreriaRoute() {
                   );
                 })}
               </ul>
+            </Card>
+            <Card id="tes-posta" title="Posta del club" sub="Richieste e solleciti a famiglie e fornitori da sportclubcolico@gmail.com, con il tuo nome; le risposte tornano qui. Le conversazioni riservate le vedono solo Direzione e Tesoreria.">
+              <div className="px-4 pb-4 sm:px-[18px]">
+                <Link to="/gestionale/posta" className="scd-focus inline-flex h-11 items-center gap-2 rounded-[10px] bg-[var(--in-info)] px-4 text-[15px] font-bold text-white" data-testid="tes-posta-link">
+                  <Mail className="size-4" aria-hidden="true" /> Apri la posta
+                </Link>
+              </div>
             </Card>
             <SubAreaList />
             <PurchaseSteps />

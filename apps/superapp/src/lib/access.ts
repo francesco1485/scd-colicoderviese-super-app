@@ -24,6 +24,8 @@ const SUB_AREA_COPY: Readonly<Record<string, { label: string; icon: AreaIcon }>>
   scadenzario: { label: "Fornitori e scadenze", icon: "coin" },
   movimenti: { label: "Movimenti del conto", icon: "coin" },
   cervellone: { label: "Cervellone", icon: "file" },
+  posta: { label: "Posta del club", icon: "file" },
+  "posta-collega": { label: "Collega la casella", icon: "file" },
 };
 
 /** Plain Italian for the role ids used in the registry. */

@@ -64,6 +64,7 @@ import { Route as GestionaleCodaRouteImport } from './routes/gestionale.coda'
 import { Route as GestionaleMappaRouteImport } from './routes/gestionale.mappa'
 import { Route as GestionaleMisterRouteImport } from './routes/gestionale.mister'
 import { Route as GestionaleOrganigrammaRouteImport } from './routes/gestionale.organigramma'
+import { Route as GestionalePostaRouteImport } from './routes/gestionale.posta'
 import { Route as GestionaleImpiantiRouteImport } from './routes/gestionale_.impianti'
 import { Route as QuadroIndexRouteImport } from './routes/quadro.index'
 import { Route as QuadroRotazioneCampiRouteImport } from './routes/quadro.rotazione-campi'
@@ -80,6 +81,7 @@ import { Route as TesoreriaMagazzinoRouteImport } from './routes/tesoreria_.maga
 import { Route as TesoreriaMovimentiRouteImport } from './routes/tesoreria_.movimenti'
 import { Route as TesoreriaPrimaNotaRouteImport } from './routes/tesoreria_.prima-nota'
 import { Route as TesoreriaQuoteRouteImport } from './routes/tesoreria_.quote'
+import { Route as DirezionePostaCollegaRouteImport } from './routes/direzione_.posta.collega'
 import { Route as GestionaleImpiantiIndexRouteImport } from './routes/gestionale_.impianti.index'
 import { Route as GestionaleImpiantiApprovazioniRouteImport } from './routes/gestionale_.impianti.approvazioni'
 import { Route as GestionaleImpiantiColicoRouteImport } from './routes/gestionale_.impianti.colico'
@@ -364,6 +366,11 @@ const GestionaleOrganigrammaRoute = GestionaleOrganigrammaRouteImport.update({
   path: '/gestionale/organigramma',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GestionalePostaRoute = GestionalePostaRouteImport.update({
+  id: '/gestionale/posta',
+  path: '/gestionale/posta',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GestionaleImpiantiRoute = GestionaleImpiantiRouteImport.update({
   id: '/gestionale_/impianti',
   path: '/gestionale/impianti',
@@ -443,6 +450,11 @@ const TesoreriaPrimaNotaRoute = TesoreriaPrimaNotaRouteImport.update({
 const TesoreriaQuoteRoute = TesoreriaQuoteRouteImport.update({
   id: '/tesoreria_/quote',
   path: '/tesoreria/quote',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DirezionePostaCollegaRoute = DirezionePostaCollegaRouteImport.update({
+  id: '/direzione_/posta/collega',
+  path: '/direzione/posta/collega',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GestionaleImpiantiIndexRoute = GestionaleImpiantiIndexRouteImport.update({
@@ -537,6 +549,7 @@ export interface FileRoutesByFullPath {
   '/gestionale/mappa': typeof GestionaleMappaRoute
   '/gestionale/mister': typeof GestionaleMisterRoute
   '/gestionale/organigramma': typeof GestionaleOrganigrammaRoute
+  '/gestionale/posta': typeof GestionalePostaRoute
   '/gestionale/impianti': typeof GestionaleImpiantiRouteWithChildren
   '/quadro/rotazione-campi': typeof QuadroRotazioneCampiRoute
   '/segreteria/certificati': typeof SegreteriaCertificatiRoute
@@ -558,6 +571,7 @@ export interface FileRoutesByFullPath {
   '/eventi/': typeof EventiIndexRoute
   '/gestionale/': typeof GestionaleIndexRoute
   '/quadro/': typeof QuadroIndexRoute
+  '/direzione/posta/collega': typeof DirezionePostaCollegaRoute
   '/gestionale/impianti/approvazioni': typeof GestionaleImpiantiApprovazioniRoute
   '/gestionale/impianti/colico': typeof GestionaleImpiantiColicoRoute
   '/gestionale/impianti/dervio': typeof GestionaleImpiantiDervioRoute
@@ -617,6 +631,7 @@ export interface FileRoutesByTo {
   '/gestionale/mappa': typeof GestionaleMappaRoute
   '/gestionale/mister': typeof GestionaleMisterRoute
   '/gestionale/organigramma': typeof GestionaleOrganigrammaRoute
+  '/gestionale/posta': typeof GestionalePostaRoute
   '/quadro/rotazione-campi': typeof QuadroRotazioneCampiRoute
   '/segreteria/certificati': typeof SegreteriaCertificatiRoute
   '/segreteria/persone': typeof SegreteriaPersoneRoute
@@ -637,6 +652,7 @@ export interface FileRoutesByTo {
   '/eventi': typeof EventiIndexRoute
   '/gestionale': typeof GestionaleIndexRoute
   '/quadro': typeof QuadroIndexRoute
+  '/direzione/posta/collega': typeof DirezionePostaCollegaRoute
   '/gestionale/impianti/approvazioni': typeof GestionaleImpiantiApprovazioniRoute
   '/gestionale/impianti/colico': typeof GestionaleImpiantiColicoRoute
   '/gestionale/impianti/dervio': typeof GestionaleImpiantiDervioRoute
@@ -697,6 +713,7 @@ export interface FileRoutesById {
   '/gestionale/mappa': typeof GestionaleMappaRoute
   '/gestionale/mister': typeof GestionaleMisterRoute
   '/gestionale/organigramma': typeof GestionaleOrganigrammaRoute
+  '/gestionale/posta': typeof GestionalePostaRoute
   '/gestionale_/impianti': typeof GestionaleImpiantiRouteWithChildren
   '/quadro/rotazione-campi': typeof QuadroRotazioneCampiRoute
   '/segreteria_/certificati': typeof SegreteriaCertificatiRoute
@@ -718,6 +735,7 @@ export interface FileRoutesById {
   '/eventi/': typeof EventiIndexRoute
   '/gestionale/': typeof GestionaleIndexRoute
   '/quadro/': typeof QuadroIndexRoute
+  '/direzione_/posta/collega': typeof DirezionePostaCollegaRoute
   '/gestionale_/impianti/approvazioni': typeof GestionaleImpiantiApprovazioniRoute
   '/gestionale_/impianti/colico': typeof GestionaleImpiantiColicoRoute
   '/gestionale_/impianti/dervio': typeof GestionaleImpiantiDervioRoute
@@ -779,6 +797,7 @@ export interface FileRouteTypes {
     | '/gestionale/mappa'
     | '/gestionale/mister'
     | '/gestionale/organigramma'
+    | '/gestionale/posta'
     | '/gestionale/impianti'
     | '/quadro/rotazione-campi'
     | '/segreteria/certificati'
@@ -800,6 +819,7 @@ export interface FileRouteTypes {
     | '/eventi/'
     | '/gestionale/'
     | '/quadro/'
+    | '/direzione/posta/collega'
     | '/gestionale/impianti/approvazioni'
     | '/gestionale/impianti/colico'
     | '/gestionale/impianti/dervio'
@@ -859,6 +879,7 @@ export interface FileRouteTypes {
     | '/gestionale/mappa'
     | '/gestionale/mister'
     | '/gestionale/organigramma'
+    | '/gestionale/posta'
     | '/quadro/rotazione-campi'
     | '/segreteria/certificati'
     | '/segreteria/persone'
@@ -879,6 +900,7 @@ export interface FileRouteTypes {
     | '/eventi'
     | '/gestionale'
     | '/quadro'
+    | '/direzione/posta/collega'
     | '/gestionale/impianti/approvazioni'
     | '/gestionale/impianti/colico'
     | '/gestionale/impianti/dervio'
@@ -938,6 +960,7 @@ export interface FileRouteTypes {
     | '/gestionale/mappa'
     | '/gestionale/mister'
     | '/gestionale/organigramma'
+    | '/gestionale/posta'
     | '/gestionale_/impianti'
     | '/quadro/rotazione-campi'
     | '/segreteria_/certificati'
@@ -959,6 +982,7 @@ export interface FileRouteTypes {
     | '/eventi/'
     | '/gestionale/'
     | '/quadro/'
+    | '/direzione_/posta/collega'
     | '/gestionale_/impianti/approvazioni'
     | '/gestionale_/impianti/colico'
     | '/gestionale_/impianti/dervio'
@@ -1019,6 +1043,7 @@ export interface RootRouteChildren {
   GestionaleMappaRoute: typeof GestionaleMappaRoute
   GestionaleMisterRoute: typeof GestionaleMisterRoute
   GestionaleOrganigrammaRoute: typeof GestionaleOrganigrammaRoute
+  GestionalePostaRoute: typeof GestionalePostaRoute
   GestionaleImpiantiRoute: typeof GestionaleImpiantiRouteWithChildren
   QuadroRotazioneCampiRoute: typeof QuadroRotazioneCampiRoute
   SegreteriaCertificatiRoute: typeof SegreteriaCertificatiRoute
@@ -1040,6 +1065,7 @@ export interface RootRouteChildren {
   EventiIndexRoute: typeof EventiIndexRoute
   GestionaleIndexRoute: typeof GestionaleIndexRoute
   QuadroIndexRoute: typeof QuadroIndexRoute
+  DirezionePostaCollegaRoute: typeof DirezionePostaCollegaRoute
   GestionaleDistintaEventIdSpettatoriRoute: typeof GestionaleDistintaEventIdSpettatoriRoute
 }
 
@@ -1430,6 +1456,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GestionaleOrganigrammaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/gestionale/posta': {
+      id: '/gestionale/posta'
+      path: '/gestionale/posta'
+      fullPath: '/gestionale/posta'
+      preLoaderRoute: typeof GestionalePostaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/gestionale_/impianti': {
       id: '/gestionale_/impianti'
       path: '/gestionale/impianti'
@@ -1540,6 +1573,13 @@ declare module '@tanstack/react-router' {
       path: '/tesoreria/quote'
       fullPath: '/tesoreria/quote'
       preLoaderRoute: typeof TesoreriaQuoteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/direzione_/posta/collega': {
+      id: '/direzione_/posta/collega'
+      path: '/direzione/posta/collega'
+      fullPath: '/direzione/posta/collega'
+      preLoaderRoute: typeof DirezionePostaCollegaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/gestionale_/impianti/': {
@@ -1666,6 +1706,7 @@ const rootRouteChildren: RootRouteChildren = {
   GestionaleMappaRoute: GestionaleMappaRoute,
   GestionaleMisterRoute: GestionaleMisterRoute,
   GestionaleOrganigrammaRoute: GestionaleOrganigrammaRoute,
+  GestionalePostaRoute: GestionalePostaRoute,
   GestionaleImpiantiRoute: GestionaleImpiantiRouteWithChildren,
   QuadroRotazioneCampiRoute: QuadroRotazioneCampiRoute,
   SegreteriaCertificatiRoute: SegreteriaCertificatiRoute,
@@ -1687,6 +1728,7 @@ const rootRouteChildren: RootRouteChildren = {
   EventiIndexRoute: EventiIndexRoute,
   GestionaleIndexRoute: GestionaleIndexRoute,
   QuadroIndexRoute: QuadroIndexRoute,
+  DirezionePostaCollegaRoute: DirezionePostaCollegaRoute,
   GestionaleDistintaEventIdSpettatoriRoute:
     GestionaleDistintaEventIdSpettatoriRoute,
 }
