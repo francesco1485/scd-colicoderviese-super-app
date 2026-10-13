@@ -33,6 +33,14 @@ export const PUBLIC_PREFIXES: readonly string[] = [
   "/top11",
 ];
 
+/**
+ * Members-only pages served with public chrome (documentation + tests): never public, never cached by browsers or the
+ * offline worker, never in robots.txt or the sitemap. Everything outside PUBLIC_PREFIXES is already private; this list
+ * pins the ones a future edit must not open by mistake. /la-mia-scd/campione: "Crea il tuo campione" and member cards
+ * (UD-102, first version inside the members area, not published).
+ */
+export const MEMBERS_ONLY_PREFIXES: readonly string[] = ["/la-mia-scd", "/la-mia-scd/campione", "/squadre"];
+
 export function isPublicPath(pathname: string): boolean {
   if (pathname === "/" || pathname === "") return true;
   return PUBLIC_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));

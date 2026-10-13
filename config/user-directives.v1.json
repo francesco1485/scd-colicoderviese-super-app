@@ -2410,8 +2410,16 @@
       "normalizedCommand": {
         "rule": "Avatar creation has three paths: (1) from a face photo (consent-based; adults directly, minors only through the family account with guardian consent; photo used to generate and then deleted, no biometric template kept), (2) from a written description, (3) from ready-made realistic bases. Digital membership cards — Card Tifoso, Card Tesserato, Card Famiglia — carry discounts and benefits (partners, ticketing, club house) and earn/spend virtual credits that unlock avatar items and other rewards. Credits are never money and never convertible.",
         "scope": "AVATAR_CARDS_CREDITS",
-        "status": "PROPOSED",
-        "delivered": []
+        "status": "IN_PROGRESS",
+        "delivered": [
+          "apps/superapp/src/routes/la-mia-scd_.campione.tsx: members-only /la-mia-scd/campione (redirect to sign-in, private no-store, out of robots/sitemap), entry from La mia SCD",
+          "path A Basi pronte working: 6 realistic AI-generated original bases (apps/superapp/public/media/avatar/bases/, GENERATE_ORIGINAL / REFERENCE_PROTOTYPE pending Direzione approval), nickname (2-14, moderated) and number 1-99, official crest overlaid; minors and unknown ages back-view bases only",
+          "path B Descrizione scritta: form + quick choices, IT/EN moderation, caps 3/day 10/month, Vertex AI Imagen 4 Fast EU only with SCD_AVATAR_GEN_ENABLED=true and credentials (off by default: 'Generazione non ancora attiva'), label 'Creato con IA · non è una foto'",
+          "path C Foto del volto: visible and locked (consent + DPIA), minors routed to Famiglia, no upload code",
+          "Card Tifoso/Tesserato/Famiglia from membership roles, read-only credits from scd_fan_points_ledger (0 with explanation when not connected), Direzione earning list labelled 'Valori in definizione dalla Direzione'",
+          "supabase/migrations/20261013_r97_member_avatar.sql written, NOT applied (scd_member_avatars owner-only, scd_avatar_generation_log, scd_my_age_band, scd_my_member_profile, scd_set_my_avatar, generation reserve/close); until applied the page runs in preview mode and says saving is not active",
+          "pending: Direzione approval of r97 and of the base images (D8, D9), credit values (D3), DPIA + consent type AVATAR_FOTO_APP for path C, QR card codes, storage of AI-generated images"
+        ]
       }
     }
   ],

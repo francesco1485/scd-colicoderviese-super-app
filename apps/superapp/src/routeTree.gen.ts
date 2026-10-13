@@ -67,6 +67,7 @@ import { Route as GestionaleMisterRouteImport } from './routes/gestionale.mister
 import { Route as GestionaleOrganigrammaRouteImport } from './routes/gestionale.organigramma'
 import { Route as GestionalePostaRouteImport } from './routes/gestionale.posta'
 import { Route as GestionaleImpiantiRouteImport } from './routes/gestionale_.impianti'
+import { Route as LaMiaScdCampioneRouteImport } from './routes/la-mia-scd_.campione'
 import { Route as QuadroIndexRouteImport } from './routes/quadro.index'
 import { Route as QuadroRotazioneCampiRouteImport } from './routes/quadro.rotazione-campi'
 import { Route as SegreteriaCertificatiRouteImport } from './routes/segreteria_.certificati'
@@ -382,6 +383,11 @@ const GestionaleImpiantiRoute = GestionaleImpiantiRouteImport.update({
   path: '/gestionale/impianti',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LaMiaScdCampioneRoute = LaMiaScdCampioneRouteImport.update({
+  id: '/la-mia-scd_/campione',
+  path: '/la-mia-scd/campione',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const QuadroIndexRoute = QuadroIndexRouteImport.update({
   id: '/quadro/',
   path: '/quadro/',
@@ -558,6 +564,7 @@ export interface FileRoutesByFullPath {
   '/gestionale/organigramma': typeof GestionaleOrganigrammaRoute
   '/gestionale/posta': typeof GestionalePostaRoute
   '/gestionale/impianti': typeof GestionaleImpiantiRouteWithChildren
+  '/la-mia-scd/campione': typeof LaMiaScdCampioneRoute
   '/quadro/rotazione-campi': typeof QuadroRotazioneCampiRoute
   '/segreteria/certificati': typeof SegreteriaCertificatiRoute
   '/segreteria/persone': typeof SegreteriaPersoneRoute
@@ -640,6 +647,7 @@ export interface FileRoutesByTo {
   '/gestionale/mister': typeof GestionaleMisterRoute
   '/gestionale/organigramma': typeof GestionaleOrganigrammaRoute
   '/gestionale/posta': typeof GestionalePostaRoute
+  '/la-mia-scd/campione': typeof LaMiaScdCampioneRoute
   '/quadro/rotazione-campi': typeof QuadroRotazioneCampiRoute
   '/segreteria/certificati': typeof SegreteriaCertificatiRoute
   '/segreteria/persone': typeof SegreteriaPersoneRoute
@@ -724,6 +732,7 @@ export interface FileRoutesById {
   '/gestionale/organigramma': typeof GestionaleOrganigrammaRoute
   '/gestionale/posta': typeof GestionalePostaRoute
   '/gestionale_/impianti': typeof GestionaleImpiantiRouteWithChildren
+  '/la-mia-scd_/campione': typeof LaMiaScdCampioneRoute
   '/quadro/rotazione-campi': typeof QuadroRotazioneCampiRoute
   '/segreteria_/certificati': typeof SegreteriaCertificatiRoute
   '/segreteria_/persone': typeof SegreteriaPersoneRoute
@@ -809,6 +818,7 @@ export interface FileRouteTypes {
     | '/gestionale/organigramma'
     | '/gestionale/posta'
     | '/gestionale/impianti'
+    | '/la-mia-scd/campione'
     | '/quadro/rotazione-campi'
     | '/segreteria/certificati'
     | '/segreteria/persone'
@@ -891,6 +901,7 @@ export interface FileRouteTypes {
     | '/gestionale/mister'
     | '/gestionale/organigramma'
     | '/gestionale/posta'
+    | '/la-mia-scd/campione'
     | '/quadro/rotazione-campi'
     | '/segreteria/certificati'
     | '/segreteria/persone'
@@ -974,6 +985,7 @@ export interface FileRouteTypes {
     | '/gestionale/organigramma'
     | '/gestionale/posta'
     | '/gestionale_/impianti'
+    | '/la-mia-scd_/campione'
     | '/quadro/rotazione-campi'
     | '/segreteria_/certificati'
     | '/segreteria_/persone'
@@ -1058,6 +1070,7 @@ export interface RootRouteChildren {
   GestionaleOrganigrammaRoute: typeof GestionaleOrganigrammaRoute
   GestionalePostaRoute: typeof GestionalePostaRoute
   GestionaleImpiantiRoute: typeof GestionaleImpiantiRouteWithChildren
+  LaMiaScdCampioneRoute: typeof LaMiaScdCampioneRoute
   QuadroRotazioneCampiRoute: typeof QuadroRotazioneCampiRoute
   SegreteriaCertificatiRoute: typeof SegreteriaCertificatiRoute
   SegreteriaPersoneRoute: typeof SegreteriaPersoneRoute
@@ -1490,6 +1503,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GestionaleImpiantiRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/la-mia-scd_/campione': {
+      id: '/la-mia-scd_/campione'
+      path: '/la-mia-scd/campione'
+      fullPath: '/la-mia-scd/campione'
+      preLoaderRoute: typeof LaMiaScdCampioneRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/quadro/': {
       id: '/quadro/'
       path: '/quadro'
@@ -1729,6 +1749,7 @@ const rootRouteChildren: RootRouteChildren = {
   GestionaleOrganigrammaRoute: GestionaleOrganigrammaRoute,
   GestionalePostaRoute: GestionalePostaRoute,
   GestionaleImpiantiRoute: GestionaleImpiantiRouteWithChildren,
+  LaMiaScdCampioneRoute: LaMiaScdCampioneRoute,
   QuadroRotazioneCampiRoute: QuadroRotazioneCampiRoute,
   SegreteriaCertificatiRoute: SegreteriaCertificatiRoute,
   SegreteriaPersoneRoute: SegreteriaPersoneRoute,

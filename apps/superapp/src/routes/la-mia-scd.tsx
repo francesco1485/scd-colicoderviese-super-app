@@ -9,6 +9,7 @@ import {
   Inbox,
   PenSquare,
   Shirt,
+  Sparkles,
   Trophy,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -406,6 +407,21 @@ function Inside({
             </ul>
           </section>
         )}
+        <Link
+          to="/la-mia-scd/campione"
+          className="scd-focus flex items-center gap-3 rounded-[20px] bg-[linear-gradient(135deg,#0b2a5b,#1556c4)] p-4 text-white shadow-[0_2px_10px_rgb(11_42_91/0.12)]"
+          data-testid="campione-entry"
+        >
+          <span className="grid size-11 shrink-0 place-items-center rounded-[12px] bg-[#ffd600] text-[#0b2a5b]">
+            <Sparkles className="size-6" aria-hidden="true" />
+          </span>
+          <span className="grid gap-0.5">
+            <b className="text-[15px]">Crea il tuo campione · Le mie card</b>
+            <span className="text-[13px] text-[#dbe6f5]">
+              Il tuo avatar realistico, la card Tifoso, Tesserato o Famiglia e i crediti.
+            </span>
+          </span>
+        </Link>
         <Link
           to="/fantacalcio"
           className="scd-focus flex items-center gap-3 rounded-[20px] bg-[#0b2a5b] p-4 text-white shadow-[0_2px_10px_rgb(11_42_91/0.08)]"

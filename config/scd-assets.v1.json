@@ -6,7 +6,8 @@
     "LOCKED",
     "VERIFIED",
     "PENDING_VERIFICATION",
-    "RETIRED"
+    "RETIRED",
+    "REFERENCE_PROTOTYPE"
   ],
   "folders": {
     "canonical_existing": "assets/",
@@ -382,7 +383,8 @@
       "FACILITY_PLAN": "PHOTO",
       "OFFICIAL_CLUB_DOCUMENT": "DOCUMENT",
       "APP_ICON": "APP_ICON",
-      "OPPONENT_CREST": "VECTOR_MARK"
+      "OPPONENT_CREST": "VECTOR_MARK",
+      "GENERATE_ORIGINAL": "PHOTO"
     },
     "runtime_roots": [
       "apps/superapp/public/media/",
@@ -1265,6 +1267,48 @@
       "derived_from": "https://www.facebook.com/ASVISNOVA (original sha256 d63c852a8aee1845)",
       "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
       "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/avatar/bases/lampo-7.webp",
+      "class": "GENERATE_ORIGINAL",
+      "status": "REFERENCE_PROTOTYPE",
+      "source": "Crea il tuo campione, base avatar realistica 'lampo-7' (prototype sheet avatar-01-lampo7.png, 13/10/2026), 640 px WebP q80, metadata stripped",
+      "note": "AI-generated original, not a photo, pending Direzione approval (plan D9). Fictitious person, no crest, no sponsor, no real kit. Members area only (UD-102)."
+    },
+    {
+      "path": "apps/superapp/public/media/avatar/bases/roccia-10.webp",
+      "class": "GENERATE_ORIGINAL",
+      "status": "REFERENCE_PROTOTYPE",
+      "source": "Crea il tuo campione, base avatar realistica 'roccia-10' (prototype sheet avatar-02-roccia10.png, 13/10/2026), 640 px WebP q80, metadata stripped",
+      "note": "AI-generated original, not a photo, pending Direzione approval (plan D9). Fictitious person, no crest, no sponsor, no real kit. Members area only (UD-102)."
+    },
+    {
+      "path": "apps/superapp/public/media/avatar/bases/falco-9.webp",
+      "class": "GENERATE_ORIGINAL",
+      "status": "REFERENCE_PROTOTYPE",
+      "source": "Crea il tuo campione, base avatar realistica 'falco-9' (prototype sheet avatar-03-falco9.png, 13/10/2026), 640 px WebP q80, metadata stripped",
+      "note": "AI-generated original, not a photo, pending Direzione approval (plan D9). Fictitious person, no crest, no sponsor, no real kit. Members area only (UD-102)."
+    },
+    {
+      "path": "apps/superapp/public/media/avatar/bases/muro-1.webp",
+      "class": "GENERATE_ORIGINAL",
+      "status": "REFERENCE_PROTOTYPE",
+      "source": "Crea il tuo campione, base avatar realistica 'muro-1' (prototype sheet avatar-04-muro1.png, 13/10/2026), 640 px WebP q80, metadata stripped",
+      "note": "AI-generated original, not a photo, pending Direzione approval (plan D9). Fictitious person, no crest, no sponsor, no real kit. Members area only (UD-102)."
+    },
+    {
+      "path": "apps/superapp/public/media/avatar/bases/mister.webp",
+      "class": "GENERATE_ORIGINAL",
+      "status": "REFERENCE_PROTOTYPE",
+      "source": "Crea il tuo campione, base avatar realistica 'mister' (prototype sheet avatar-05-adulto-mister.png, 13/10/2026), 640 px WebP q80, metadata stripped",
+      "note": "AI-generated original, not a photo, pending Direzione approval (plan D9). Fictitious person, no crest, no sponsor, no real kit. Members area only (UD-102)."
+    },
+    {
+      "path": "apps/superapp/public/media/avatar/bases/tifosa.webp",
+      "class": "GENERATE_ORIGINAL",
+      "status": "REFERENCE_PROTOTYPE",
+      "source": "Crea il tuo campione, base avatar realistica 'tifosa' (prototype sheet avatar-06-adulta-tifosa.png, 13/10/2026), 640 px WebP q80, metadata stripped",
+      "note": "AI-generated original, not a photo, pending Direzione approval (plan D9). Fictitious person, no crest, no sponsor, no real kit. Members area only (UD-102)."
     }
   ],
   "vector_research": [
