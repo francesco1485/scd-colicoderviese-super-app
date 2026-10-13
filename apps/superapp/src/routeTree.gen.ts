@@ -50,6 +50,8 @@ import { Route as AccediPasswordRouteImport } from './routes/accedi.password'
 import { Route as AreeIndexRouteImport } from './routes/aree.index'
 import { Route as AreeAreaRouteImport } from './routes/aree.$area'
 import { Route as CalendarioRotazioneCampiRouteImport } from './routes/calendario_.rotazione-campi'
+import { Route as CardIndexRouteImport } from './routes/card.index'
+import { Route as CardTipoRouteImport } from './routes/card.$tipo'
 import { Route as CoreIndexRouteImport } from './routes/core.index'
 import { Route as CoreAtletaRouteImport } from './routes/core.atleta'
 import { Route as CoreFamigliaRouteImport } from './routes/core.famiglia'
@@ -299,6 +301,16 @@ const CalendarioRotazioneCampiRoute =
     path: '/calendario/rotazione-campi',
     getParentRoute: () => rootRouteImport,
   } as any)
+const CardIndexRoute = CardIndexRouteImport.update({
+  id: '/card/',
+  path: '/card/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CardTipoRoute = CardTipoRouteImport.update({
+  id: '/card/$tipo',
+  path: '/card/$tipo',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CoreIndexRoute = CoreIndexRouteImport.update({
   id: '/core/',
   path: '/core/',
@@ -556,6 +568,7 @@ export interface FileRoutesByFullPath {
   '/accedi/password': typeof AccediPasswordRoute
   '/aree/$area': typeof AreeAreaRoute
   '/calendario/rotazione-campi': typeof CalendarioRotazioneCampiRoute
+  '/card/$tipo': typeof CardTipoRoute
   '/core/atleta': typeof CoreAtletaRoute
   '/core/famiglia': typeof CoreFamigliaRoute
   '/core/impianti-calendari': typeof CoreImpiantiCalendariRoute
@@ -588,6 +601,7 @@ export interface FileRoutesByFullPath {
   '/tesoreria/quote': typeof TesoreriaQuoteRoute
   '/accedi/': typeof AccediIndexRoute
   '/aree/': typeof AreeIndexRoute
+  '/card/': typeof CardIndexRoute
   '/core/': typeof CoreIndexRoute
   '/eventi/': typeof EventiIndexRoute
   '/gestionale/': typeof GestionaleIndexRoute
@@ -641,6 +655,7 @@ export interface FileRoutesByTo {
   '/accedi/password': typeof AccediPasswordRoute
   '/aree/$area': typeof AreeAreaRoute
   '/calendario/rotazione-campi': typeof CalendarioRotazioneCampiRoute
+  '/card/$tipo': typeof CardTipoRoute
   '/core/atleta': typeof CoreAtletaRoute
   '/core/famiglia': typeof CoreFamigliaRoute
   '/core/impianti-calendari': typeof CoreImpiantiCalendariRoute
@@ -672,6 +687,7 @@ export interface FileRoutesByTo {
   '/tesoreria/quote': typeof TesoreriaQuoteRoute
   '/accedi': typeof AccediIndexRoute
   '/aree': typeof AreeIndexRoute
+  '/card': typeof CardIndexRoute
   '/core': typeof CoreIndexRoute
   '/eventi': typeof EventiIndexRoute
   '/gestionale': typeof GestionaleIndexRoute
@@ -726,6 +742,7 @@ export interface FileRoutesById {
   '/accedi/password': typeof AccediPasswordRoute
   '/aree/$area': typeof AreeAreaRoute
   '/calendario_/rotazione-campi': typeof CalendarioRotazioneCampiRoute
+  '/card/$tipo': typeof CardTipoRoute
   '/core/atleta': typeof CoreAtletaRoute
   '/core/famiglia': typeof CoreFamigliaRoute
   '/core/impianti-calendari': typeof CoreImpiantiCalendariRoute
@@ -758,6 +775,7 @@ export interface FileRoutesById {
   '/tesoreria_/quote': typeof TesoreriaQuoteRoute
   '/accedi/': typeof AccediIndexRoute
   '/aree/': typeof AreeIndexRoute
+  '/card/': typeof CardIndexRoute
   '/core/': typeof CoreIndexRoute
   '/eventi/': typeof EventiIndexRoute
   '/gestionale/': typeof GestionaleIndexRoute
@@ -813,6 +831,7 @@ export interface FileRouteTypes {
     | '/accedi/password'
     | '/aree/$area'
     | '/calendario/rotazione-campi'
+    | '/card/$tipo'
     | '/core/atleta'
     | '/core/famiglia'
     | '/core/impianti-calendari'
@@ -845,6 +864,7 @@ export interface FileRouteTypes {
     | '/tesoreria/quote'
     | '/accedi/'
     | '/aree/'
+    | '/card/'
     | '/core/'
     | '/eventi/'
     | '/gestionale/'
@@ -898,6 +918,7 @@ export interface FileRouteTypes {
     | '/accedi/password'
     | '/aree/$area'
     | '/calendario/rotazione-campi'
+    | '/card/$tipo'
     | '/core/atleta'
     | '/core/famiglia'
     | '/core/impianti-calendari'
@@ -929,6 +950,7 @@ export interface FileRouteTypes {
     | '/tesoreria/quote'
     | '/accedi'
     | '/aree'
+    | '/card'
     | '/core'
     | '/eventi'
     | '/gestionale'
@@ -982,6 +1004,7 @@ export interface FileRouteTypes {
     | '/accedi/password'
     | '/aree/$area'
     | '/calendario_/rotazione-campi'
+    | '/card/$tipo'
     | '/core/atleta'
     | '/core/famiglia'
     | '/core/impianti-calendari'
@@ -1014,6 +1037,7 @@ export interface FileRouteTypes {
     | '/tesoreria_/quote'
     | '/accedi/'
     | '/aree/'
+    | '/card/'
     | '/core/'
     | '/eventi/'
     | '/gestionale/'
@@ -1068,6 +1092,7 @@ export interface RootRouteChildren {
   AccediPasswordRoute: typeof AccediPasswordRoute
   AreeAreaRoute: typeof AreeAreaRoute
   CalendarioRotazioneCampiRoute: typeof CalendarioRotazioneCampiRoute
+  CardTipoRoute: typeof CardTipoRoute
   CoreAtletaRoute: typeof CoreAtletaRoute
   CoreFamigliaRoute: typeof CoreFamigliaRoute
   CoreImpiantiCalendariRoute: typeof CoreImpiantiCalendariRoute
@@ -1100,6 +1125,7 @@ export interface RootRouteChildren {
   TesoreriaQuoteRoute: typeof TesoreriaQuoteRoute
   AccediIndexRoute: typeof AccediIndexRoute
   AreeIndexRoute: typeof AreeIndexRoute
+  CardIndexRoute: typeof CardIndexRoute
   CoreIndexRoute: typeof CoreIndexRoute
   EventiIndexRoute: typeof EventiIndexRoute
   GestionaleIndexRoute: typeof GestionaleIndexRoute
@@ -1395,6 +1421,20 @@ declare module '@tanstack/react-router' {
       path: '/calendario/rotazione-campi'
       fullPath: '/calendario/rotazione-campi'
       preLoaderRoute: typeof CalendarioRotazioneCampiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/card/': {
+      id: '/card/'
+      path: '/card'
+      fullPath: '/card/'
+      preLoaderRoute: typeof CardIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/card/$tipo': {
+      id: '/card/$tipo'
+      path: '/card/$tipo'
+      fullPath: '/card/$tipo'
+      preLoaderRoute: typeof CardTipoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/core/': {
@@ -1755,6 +1795,7 @@ const rootRouteChildren: RootRouteChildren = {
   AccediPasswordRoute: AccediPasswordRoute,
   AreeAreaRoute: AreeAreaRoute,
   CalendarioRotazioneCampiRoute: CalendarioRotazioneCampiRoute,
+  CardTipoRoute: CardTipoRoute,
   CoreAtletaRoute: CoreAtletaRoute,
   CoreFamigliaRoute: CoreFamigliaRoute,
   CoreImpiantiCalendariRoute: CoreImpiantiCalendariRoute,
@@ -1787,6 +1828,7 @@ const rootRouteChildren: RootRouteChildren = {
   TesoreriaQuoteRoute: TesoreriaQuoteRoute,
   AccediIndexRoute: AccediIndexRoute,
   AreeIndexRoute: AreeIndexRoute,
+  CardIndexRoute: CardIndexRoute,
   CoreIndexRoute: CoreIndexRoute,
   EventiIndexRoute: EventiIndexRoute,
   GestionaleIndexRoute: GestionaleIndexRoute,

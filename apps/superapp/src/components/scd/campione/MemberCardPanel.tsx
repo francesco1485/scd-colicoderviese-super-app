@@ -138,7 +138,7 @@ export function MemberCardPanel({
             <p className="m-0 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12.5px] font-semibold text-white/90">
               <span className="inline-flex items-center gap-1.5">
                 <CalendarDays className="size-4 text-[#ffd600]" aria-hidden="true" />
-                Valida fino al 30.06.2027
+                Valida per la stagione 2026/27
               </span>
               <span aria-hidden="true" className="hidden h-3.5 w-px bg-white/40 min-[400px]:inline-block" />
               <span className="inline-flex items-center gap-1.5">

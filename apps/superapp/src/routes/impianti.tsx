@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CalendarDays, Ticket } from "lucide-react";
+import { CalendarDays, CreditCard, Ticket } from "lucide-react";
 
 import { FacilityMap } from "@/components/scd/FacilityMap";
 import { TicketRules } from "@/components/scd/TicketRules";
@@ -43,6 +43,10 @@ function ImpiantiPage() {
             <Link to="/calendario" className="scd-action inline-flex h-12 items-center gap-2 rounded-[12px] px-5 text-[16px] font-bold">
               <CalendarDays className="size-5" strokeWidth={2} aria-hidden="true" />
               Gare in casa
+            </Link>
+            <Link to="/card" className="inline-flex h-12 items-center gap-2 rounded-[12px] border border-white/40 px-4 text-[15px] font-semibold hover:bg-white/10">
+              <CreditCard className="size-5" strokeWidth={1.8} aria-hidden="true" />
+              Le card 2026/27
             </Link>
             <span className="inline-flex min-h-12 items-center gap-2 rounded-[12px] border border-white/40 px-4 text-[15px] font-semibold">
               <Ticket className="size-5" strokeWidth={1.8} aria-hidden="true" />

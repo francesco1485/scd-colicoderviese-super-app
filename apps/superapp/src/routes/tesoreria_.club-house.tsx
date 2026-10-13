@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { ClubCardsDesk } from "@/components/scd/ClubCardsDesk";
 import { SubAreaList, TillPreview } from "@/components/scd/tesoreria";
 import { EmptyState, SourcesBox, WorkAreaGateView, WorkAreaShell, workAreaHead } from "@/components/scd/work-area-ui";
 import { Card } from "@/components/scd/interior-ui";
 import { getWorkAreaGate } from "@/lib/work-areas.functions";
 
-/** Tesoreria · Club House: bar till with an unloaded price list. No amounts. */
+/** Tesoreria · Club House: bar till with an unloaded price list, and the card desk (web links + SQUBY). No amounts. */
 export const Route = createFileRoute("/tesoreria_/club-house")({
   loader: async () => {
     const gate = await getWorkAreaGate({ data: { area: "club-house" } });
@@ -46,6 +47,7 @@ function ClubHouseRoute() {
             </Card>
           </div>
           <div className="flex min-w-0 flex-col gap-[18px]">
+            <ClubCardsDesk />
             <SubAreaList current="club-house" />
             <SourcesBox id="club-house" />
           </div>

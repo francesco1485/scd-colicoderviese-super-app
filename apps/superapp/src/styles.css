@@ -317,6 +317,12 @@
   height: 1.2em;
   opacity: 1;
 }
+/* Pennellata blu (card Sostenitore: titolo giallo su pennellata blu), stessa forma della gialla. */
+.scd-brush--navy::before {
+  background: #0b2a5b;
+  -webkit-mask: url("/media/brand/tex/brush-yellow.svg") center / 100% 100% no-repeat;
+  mask: url("/media/brand/tex/brush-yellow.svg") center / 100% 100% no-repeat;
+}
 /* Motto in corsivo delle tavole ("Insieme più lontano"). */
 .scd-motto {
   font-family: var(--font-uv-script);

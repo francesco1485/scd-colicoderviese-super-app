@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 1,
+  "id": "SCD_CLUB_CARDS_V1",
+  "asOf": "2026-10-13",
+  "status": "PILOT",
+  "directive": "UD-050 (three fan card tiers) + Direzione 13/10/2026: card material lives in the Super App; one web link per card, managed at the Club House with SQUBY.",
+  "sources": [
+    {
+      "id": "POLICY_CARD_V1_2",
+      "label": "Policy DG V1.2 del 27/09/2026 (credito, cauzione, Partner)",
+      "drive": "1RebUYCxvxt8vEX9D4QwJy7Vm3NP5EkVB"
+    },
+    {
+      "id": "POLICY_CARD_V1_4",
+      "label": "Policy V1.4 del 27/09/2026 (supporto SQUBY verificato, badge QR)",
+      "drive": "11J2Qqty6cHhtWVwqY7ABC5SE9qSgQFT0"
+    },
+    {
+      "id": "PROMPT_MASTER_CARD_SQUBY",
+      "label": "Brief operativo Card SQUBY 2026/27 (codici, listini, sequenza di configurazione)",
+      "drive": "1dn23I1XWSVceEGQPBf0FKwDXZqvqB9oF"
+    },
+    {
+      "id": "SCD_TICKETING_V1",
+      "label": "config/scd-ticketing.v1.json (regola tesserati e familiari confermata il 12/10/2026)",
+      "drive": null
+    }
+  ],
+  "validity": {
+    "label": "Stagione 2026/27",
+    "endDate": null,
+    "endDateStatus": "DA_CONFERMARE"
+  },
+  "tiers": [
+    {
+      "id": "tesserato",
+      "label": "Tesserato",
+      "who": "Atleti, mister, dirigenti e staff tesserati con la società.",
+      "theme": "navy",
+      "activation": { "total": 25, "credit": 20, "deposit": 5 },
+      "clubHouseDiscountRef": 30,
+      "benefits": [
+        "Listino dedicato alla Club House (riferimento -30%, prezzi finali in cassa)",
+        "Ingresso gratuito alle gare di campionato in casa, con 2 familiari",
+        "Vantaggi nelle attività convenzionate"
+      ],
+      "ticketing": "MEMBER_RULE",
+      "codeRule": "Codice societario personale assegnato dalla segreteria"
+    },
+    {
+      "id": "sostenitore",
+      "label": "Sostenitore",
+      "who": "Tifosi, famiglie e amici che sostengono la società.",
+      "theme": "yellow",
+      "activation": { "total": 25, "credit": 20, "deposit": 5 },
+      "clubHouseDiscountRef": 20,
+      "benefits": [
+        "Listino dedicato alla Club House (riferimento -20%, prezzi finali in cassa)",
+        "Biglietto agevolato alle gare di campionato in casa",
+        "Vantaggi nelle attività convenzionate"
+      ],
+      "ticketing": "SUPPORTER_PRICES",
+      "supporterPrices": [
+        { "competition": "PROMOZIONE", "intero": 8, "ridotto": 4 },
+        { "competition": "JUNIORES_ELITE", "intero": 5, "ridotto": 3 },
+        { "competition": "U16_ELITE", "intero": 5, "ridotto": 3 }
+      ],
+      "codeRange": { "prefix": "020974201", "from": 1, "to": 200 }
+    },
+    {
+      "id": "partner",
+      "label": "Partner",
+      "who": "Aziende e attività partner della società.",
+      "theme": "white",
+      "activation": { "total": 0, "credit": 20, "deposit": 0, "creditIsGift": true },
+      "clubHouseDiscountRef": 20,
+      "benefits": [
+        "Card in omaggio, senza cauzione",
+        "20 € di credito in omaggio",
+        "Listino dedicato alla Club House (riferimento -20%, prezzi finali in cassa)"
+      ],
+      "ticketing": "NONE_UNTIL_DECIDED",
+      "codeRange": { "prefix": "020974201", "from": 201, "to": 400 }
+    }
+  ],
+  "rules": {
+    "topUp": "Ricarica solo alla Club House, di persona. Niente ricariche online in questa fase.",
+    "credit": "Il credito vale per la stagione. A fine stagione il residuo rimborsabile si restituisce con procedura tracciata.",
+    "deposit": "La cauzione di 5 € è separata dal credito e si restituisce quando riconsegni la card.",
+    "partnerGift": "Il credito omaggio Partner non si converte in denaro senza una decisione della Direzione.",
+    "personal": "La card è personale e non cedibile.",
+    "affiliates": "Ogni attività convenzionata decide i propri vantaggi: mostra la card alla cassa."
+  },
+  "squby": {
+    "role": "WALLET_AUTHORITY",
+    "entity": "SCD COLICODERVIESE (SQ681)",
+    "adminUrl": "https://live.squby.it/admin/dashboard_admin.aspx",
+    "enrollmentUrl": "https://live.squby.it/iscrizione.aspx?grest=e801fac8-3cbd-4ba5-a0f9-8130b2a1e8d1&usertype=4",
+    "enrollmentPublic": false,
+    "badge": "Badge SQUBY con QR (ISO 7810 ID-1), leggibile da lettore e da smartphone o tablet",
+    "license": {
+      "participantsUsed": 1,
+      "participantsMax": 100,
+      "expires": "2027-09-30",
+      "checkedAt": "2026-10-13",
+      "source": "Dashboard SQUBY (lettura di sola consultazione)"
+    },
+    "groups": ["CARD - TESSERATO", "CARD - SOSTENITORE", "CARD - PARTNER", "CARD - PILOT"],
+    "pilot": { "tesserato": 2, "sostenitore": 2, "partner": 2 }
+  },
+  "clubHouseProcedure": [
+    "Riconosci il titolare e scegli il tipo di card (Tesserato, Sostenitore, Partner).",
+    "Incassa l'attivazione: nel wallet SQUBY carichi solo il credito, mai la cauzione.",
+    "Registra a parte la cauzione: importo, metodo, data e operatore.",
+    "Associa il badge QR SQUBY all'anagrafica giusta, nel gruppo CARD corretto.",
+    "In cassa usa sempre i prezzi finali del listino: niente sconti calcolati a mente.",
+    "Card persa: blocca e sostituisci il badge sulla stessa anagrafica, senza crearne una nuova."
+  ],
+  "privacy": [
+    "Il codice fiscale non compare mai sulla card né nella Super App.",
+    "Il codice card societario non è il QR tecnico SQUBY.",
+    "Nessun codice revocato viene riutilizzato."
+  ]
+}
