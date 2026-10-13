@@ -1,3 +1,4 @@
+import { getTrainingQuadro } from "@/lib/quadro.functions";
 import { createFileRoute } from "@tanstack/react-router";
 import { AlertTriangle, Clock3, Info } from "lucide-react";
 import { useMemo } from "react";
@@ -15,7 +16,6 @@ import {
 import {
   freshnessLabel,
   loadCalendar,
-  loadQuadro,
 } from "@/lib/public-snapshots";
 import {
   FIELD_LABEL,
@@ -50,8 +50,8 @@ export const Route = createFileRoute("/quadro/")({
     s["settimana"] === "A" || s["settimana"] === "B"
       ? { settimana: s["settimana"] }
       : {},
-  loader: () => {
-    const q = loadQuadro();
+  loader: async () => {
+    const { quadro: q } = await getTrainingQuadro();
     const cal = loadCalendar();
     return { ...q, groups: cal.groups };
   },

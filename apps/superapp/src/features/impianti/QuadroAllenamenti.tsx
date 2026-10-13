@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
-import { quadro, trasporti, slotsForDay, segmentSlots, type ZoneCell, logoFor, ROOMS, SNAPSHOT_WATERMARK, annateFrom, matchesAnnata, slotHasAnnata, type Annata, type Day, type Week, type ZoneKey } from './snapshot';
+import { trasporti, slotsForDay, segmentSlots, type ZoneCell, logoFor, ROOMS, SNAPSHOT_WATERMARK, annateFrom, matchesAnnata, slotHasAnnata, type Annata, type Day, type Week, type ZoneKey } from './snapshot';
 import { SourceLink, Watermark } from './SourceLink';
+import { useQuadro } from './quadro-context';
 
 function Tag({ label, hit }: { label?: string | undefined; hit?: boolean }) {
   if (!label) return <span className="imp-zone-empty">Libero / non indicato</span>;
@@ -16,7 +17,8 @@ function Cell({ c, hit }: { c: ZoneCell; hit: (t: string | undefined) => boolean
 const Z = (k: ZoneKey) => k.split('_')[1];
 
 export function QuadroAllenamenti() {
-  const annate = useMemo(() => annateFrom(quadro), []);
+  const quadro = useQuadro();
+  const annate = useMemo(() => annateFrom(quadro), [quadro]);
   const [day, setDay] = useState<Day>(quadro.days[0] ?? 'LUNEDÌ');
   const [week, setWeek] = useState<Week>('A');
   const [annataId, setAnnataId] = useState('tutte');

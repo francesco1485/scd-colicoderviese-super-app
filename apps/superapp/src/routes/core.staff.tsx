@@ -8,15 +8,14 @@ import { openMenu } from "@/components/SiteChrome";
 import { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 import { groupShort, homeMatchesOn, quadroDay, staffCounters, titleCase, trainingRowsFor, venueCase } from "@/lib/board-data";
 import { romeParts } from "@/lib/home-week";
-import { loadQuadro } from "@/lib/public-snapshots";
+import { getTrainingQuadro } from "@/lib/quadro.functions";
 
-const QUADRO = loadQuadro();
 
 export const Route = createFileRoute("/core/staff")({
   loader: async () => {
-    const calendar = await getPublicCalendarSnapshot();
+    const [calendar, training] = await Promise.all([getPublicCalendarSnapshot(), getTrainingQuadro()]);
     const now = romeParts(new Date().toISOString());
-    return { calendar, today: now?.date ?? new Date().toISOString().slice(0, 10) };
+    return { calendar, slots: training.quadro.slots, today: now?.date ?? new Date().toISOString().slice(0, 10) };
   },
   head: () => ({ meta: [
     { title: "Area Staff (anteprima) — SCD CORE · S.C.D. ColicoDerviese" },
@@ -33,11 +32,11 @@ const BARS = ["#0a3a9a", "var(--scd-yellow)", "var(--scd-green)"];
 type Activity = { id: string; start: string; end: string; kind: "allenamento" | "gara"; title: string; place: string; chip: string };
 
 function AreaStaff() {
-  const { calendar, today } = Route.useLoaderData();
+  const { calendar, slots, today } = Route.useLoaderData();
   const counters = staffCounters(calendar.groups, calendar.events);
   const weekday = quadroDay(today);
   const activities: Activity[] = [
-    ...trainingRowsFor(today, QUADRO.slots).map((t): Activity => ({ id: t.id, start: t.time, end: t.end, kind: "allenamento", title: `Allenamento ${t.teams}`, place: `Centro Sportivo - Colico · Campo ${t.field.slice(1)}`, chip: t.teams.split(" + ")[0]! })),
+    ...trainingRowsFor(today, slots).map((t): Activity => ({ id: t.id, start: t.time, end: t.end, kind: "allenamento", title: `Allenamento ${t.teams}`, place: `Centro Sportivo - Colico · Campo ${t.field.slice(1)}`, chip: t.teams.split(" + ")[0]! })),
     ...homeMatchesOn(calendar.events, today).map((e): Activity => {
       const g = calendar.groups.find((x) => x.id === e.group);
       return { id: e.id, start: e.time || "--:--", end: "", kind: "gara", title: `${groupShort(g, e.category)} vs ${titleCase(e.opponent || "Avversario da definire")}`, place: venueCase(e.venue), chip: groupShort(g, e.category) };

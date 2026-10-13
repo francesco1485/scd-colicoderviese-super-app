@@ -1,5 +1,5 @@
 /** Logica pura per "La mia squadra" / "Il mio settore". Solo snapshot PUBLIC_SAFE, nessun dato personale. */
-import { activeEvents, quadro, type CalEvent, type QuadroSnapshot, type QuadroSlot } from './snapshot';
+import { activeEvents, type CalEvent, type QuadroSnapshot, type QuadroSlot } from './snapshot';
 
 /** Data odierna nel fuso Europe/Rome (YYYY-MM-DD). */
 export function romeToday(now: Date = new Date()): string {
@@ -37,7 +37,6 @@ export function trainingsFor(q: QuadroSnapshot, group: string): QuadroSlot[] | n
   return q.slots.filter(s => re.test(s.fields.C1) || re.test(s.fields.C2));
 }
 export function fieldOf(s: QuadroSlot, group: string) { const re = QUADRO_MATCH[group]; if (!re) return ''; return [re.test(s.fields.C1) ? 'Campo 1' : '', re.test(s.fields.C2) ? 'Campo 2' : ''].filter(Boolean).join(' + '); }
-export const trainingsForGroup = (group: string) => trainingsFor(quadro, group);
 
 /** Anno di annata solo se esplicito nell'etichetta del gruppo. */
 export const yearOf = (label: string) => label.match(/\b(20\d{2})\b/)?.[1] ?? null;

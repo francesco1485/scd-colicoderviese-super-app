@@ -10,7 +10,8 @@ import { readableOnWhite, teamTag } from "@/lib/quadro";
 import { getWorkAreaGate } from "@/lib/work-areas.functions";
 import { getPulminiRuns } from "@/lib/pulmini-runs.functions";
 import { ridersTotal, runsByEvent, runsByTraining, trainingKey, type PulminoRun } from "@/lib/pulmini-runs";
-import { loadQuadro, type TrainingSlot } from "@/lib/public-snapshots";
+import type { TrainingSlot } from "@/lib/public-snapshots";
+import { getTrainingQuadro } from "@/lib/quadro.functions";
 import { defaultDay, weekdayKey } from "@/lib/training-view";
 import { VanSeatMap, type TeamColor } from "@/components/scd/VanSeatMap";
 import { PeoplePins } from "@/components/scd/PeoplePins";
@@ -33,7 +34,7 @@ export const Route = createFileRoute("/pulmini")({
     if (gate.view !== "page") return { gate, interior: false as const };
     const cal = loadCalendar();
     const runs = await getPulminiRuns();
-    const quadro = loadQuadro();
+    const { quadro } = await getTrainingQuadro();
     const [roster, emails, transport, requests] = await Promise.all([getStaffRoster(), getStaffEmails(), getTransportBoard(), getTransportRequests()]);
     return { gate, interior: true as const, transport, groups: cal.groups, events: cal.events, sourceModifiedAt: cal.sourceModifiedAt, runs: runs.runs, runsAsOf: runs.asOf, quadroDays: quadro.days, quadroSlots: quadro.slots, people: roster.people, emails, requests };
   },

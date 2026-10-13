@@ -1,10 +1,11 @@
+import { loadQuadro } from "./quadro-data.server";
 import { describe, expect, test } from "vitest";
 
 import {
   addDays, dateParts, groupShort, homeMatchesOn, matchTitle, monthRange, quadroDay, recentlyUpdated, shortTeams,
   staffCounters, titleCase, trainingRowsFor, upcomingMatches, venueCase, weekRange,
 } from "./board-data";
-import { loadCalendar, loadQuadro } from "./public-snapshots";
+import { loadCalendar } from "./public-snapshots";
 
 const cal = loadCalendar();
 const quadro = loadQuadro();

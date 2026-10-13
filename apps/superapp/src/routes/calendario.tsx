@@ -4,13 +4,14 @@ import { ArrowRight, CalendarDays, ChevronLeft, ChevronRight, Clock3, Link2, Loc
 
 import { getSession } from "@/lib/auth.functions";
 import { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
+import { getTrainingQuadro } from "@/lib/quadro.functions";
 import { Crest, DateBlock, PageHeader, PrimaryButton, SectionHead, Segmented, Sheet } from "@/components/scd/board";
 import { ConeIcon } from "@/components/scd/icons";
 import { OpponentCrest, opponentLabel } from "@/lib/crests";
 import { GroupResultsLink, OfficialResults } from "@/components/scd/OfficialResults";
 import { dateParts, groupShort, matchTitle, monthRange, trainingRowsFor, upcomingMatches, venueCase, weekRange } from "@/lib/board-data";
 import { romeParts } from "@/lib/home-week";
-import { EMPTY_MESSAGE, WINDOWS, freshnessLabel, resolveAnnata, windowEnd, loadQuadro, trainingKeyFor, type WindowDays, type PublicEvent, type PublicGroup } from "@/lib/public-snapshots";
+import { EMPTY_MESSAGE, WINDOWS, freshnessLabel, resolveAnnata, windowEnd, trainingKeyFor, type WindowDays, type PublicEvent, type PublicGroup } from "@/lib/public-snapshots";
 import crovi from "@/assets/crovi/crovi-avatar-256.webp.asset.json";
 
 /*
@@ -41,7 +42,7 @@ export const Route = createFileRoute("/calendario")({
   loader: async () => {
     const [cal, session] = await Promise.all([getPublicCalendarSnapshot(), getSession()]);
     // Training board only for members: anonymous visitors never receive the slots in the loader data.
-    const trainingSlots = cal.audience === "member" ? loadQuadro().slots : [];
+    const trainingSlots = cal.audience === "member" ? (await getTrainingQuadro()).quadro.slots : [];
     return { ...cal, trainingSlots, access: accessState(session) };
   },
   head: () => ({
