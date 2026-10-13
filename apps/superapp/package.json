@@ -14,7 +14,12 @@
     "test": "vitest run",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "start:staging": "node scripts/staging-gateway.mjs"
+    "start:staging": "node scripts/staging-gateway.mjs",
+    "cap:shell": "mkdir -p .output/native-shell && cp public/offline.html .output/native-shell/index.html && cp public/favicon.png public/icon-512.png .output/native-shell/",
+    "cap:add:ios": "npm run cap:shell && cap add ios",
+    "cap:sync": "npm run cap:shell && cap sync",
+    "cap:icons:ios": "mkdir -p .output/native-assets && cp ../../docs/app-store/app-icon-1024.png .output/native-assets/icon-only.png && npx --yes @capacitor/assets@3.0.5 generate --ios --assetPath .output/native-assets",
+    "cap:open:ios": "cap open ios"
   },
   "dependencies": {
     "@fontsource/anton": "^5.3.0",
@@ -80,6 +85,10 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@capacitor/android": "8.5.2",
+    "@capacitor/cli": "8.5.2",
+    "@capacitor/core": "8.5.2",
+    "@capacitor/ios": "8.5.2",
     "@eslint/js": "^9.32.0",
     "@lovable.dev/vite-tanstack-config": "2.25.3",
     "@types/node": "^22.16.5",
