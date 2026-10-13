@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 
 import { describe, expect, it } from "vitest";
 
-import { PUBLIC_PREFIXES, SECURITY_HEADERS, assetLinksJson, cacheControlFor, configuredSiteUrl, demoRedirect, isProductionEnv, isPublicPath, robotsTxt, sitemapXml } from "./http-policy";
+import { MEMBERS_ONLY_PREFIXES, PUBLIC_PREFIXES, SECURITY_HEADERS, assetLinksJson, cacheControlFor, configuredSiteUrl, demoRedirect, isProductionEnv, isPublicPath, robotsTxt, sitemapXml } from "./http-policy";
 
 describe("http policy (launch audit 2026-10-12)", () => {
   it("never lets browsers keep private pages or server functions", () => {
@@ -20,11 +20,29 @@ describe("http policy (launch audit 2026-10-12)", () => {
     expect(isPublicPath("/squadre/u15")).toBe(false);
     expect(cacheControlFor("/squadre")).toContain("no-store");
     expect(cacheControlFor("/squadre/prima")).toContain("no-store");
+    // Training schedules are inside too (UD-100): members only, never stored.
+    expect(isPublicPath("/allenamenti")).toBe(false);
+    expect(isPublicPath("/allenamenti?annata=2014")).toBe(false);
+    expect(cacheControlFor("/allenamenti")).toContain("no-store");
+    expect(MEMBERS_ONLY_PREFIXES).toContain("/allenamenti");
+    for (const p of MEMBERS_ONLY_PREFIXES) expect(isPublicPath(p), p).toBe(false);
+  });
+
+  it("keeps members-only pages out of robots.txt and the sitemap (UD-100)", () => {
+    const robots = robotsTxt(true, "https://app.example.it");
+    const sitemap = sitemapXml("https://app.example.it");
+    for (const p of MEMBERS_ONLY_PREFIXES) {
+      expect(robots, p).not.toContain(`Allow: ${p}`);
+      expect(sitemap, p).not.toContain(`https://app.example.it${p}<`);
+    }
+    expect(sitemap).not.toContain("/allenamenti");
+    expect(robots).not.toContain("/allenamenti");
+    expect(PUBLIC_PREFIXES).not.toContain("/allenamenti");
   });
 
   it("keeps the offline worker list equal to the public list", () => {
     const vite = readFileSync(fileURLToPath(new URL("../../vite.config.ts", import.meta.url)), "utf8");
-    const m = /\[("\/allenamenti"[^\]]+)\]\.some/.exec(vite);
+    const m = /\[("\/calendario"[^\]]+)\]\.some/.exec(vite);
     expect(m).not.toBeNull();
     const list = (m?.[1] ?? "").match(/"([^"]+)"/g)?.map((x) => x.slice(1, -1)) ?? [];
     expect(list).toEqual([...PUBLIC_PREFIXES]);

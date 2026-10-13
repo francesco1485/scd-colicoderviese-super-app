@@ -2375,7 +2375,9 @@
         "rule": "The public (signed-out) experience is creative, communicative and commercial (club identity, news, video, events, partners and offers, joining) — not team lists or fixtures; teams, rosters and team calendars live inside after sign-in, because teams change. Do not use the aerial photo of the Colico sports centre as a hero. The personal avatar is realistic from the start (photorealistic/3D, original, never a drawing and never built from a minor's photo). UI reference for the public layout: the Eurobet website (desktop/web), not the Eurobet app.",
         "scope": "PUBLIC_UI_AVATAR",
         "status": "ACTIVE",
-        "delivered": []
+        "delivered": [
+          "public places closed (agent/inside, 2026-10-13): /societa without team section (members link only), /allenamenti members-only and out of robots/sitemap, Comunicazioni teams tab members-only, anonymous calendar = fixtures only (no trainings, notes, people, annata crests), getPublicRoster and getStaffRoster require a signed-in member; guarded by public-access.test.ts"
+        ]
       }
     },
     {

@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, CalendarDays, ChevronLeft, ChevronRight, Clock3, Link2, MapPin, RefreshCw, Search, Share2 } from "lucide-react";
+import { ArrowRight, CalendarDays, ChevronLeft, ChevronRight, Clock3, Link2, Lock, MapPin, RefreshCw, Search, Share2 } from "lucide-react";
 
 import { getSession } from "@/lib/auth.functions";
 import { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
@@ -16,9 +16,10 @@ import crovi from "@/assets/crovi/crovi-avatar-256.webp.asset.json";
 /*
  * Public page: our side is the official club crest + "ColicoDerviese <team>"; annata crests stay internal
  * (Direzione, 13/10/2026). The team chips use the master's team colour, not a crest.
+ * UD-100 ("Le squadre sono dentro non fuori"): anonymous visitors get the games only (the server strips trainings,
+ * notes and annata crest files) plus an "Entra per allenamenti e dettagli" hint; training rows, training links and
+ * the teams link exist only for signed-in members (calendar audience "member").
  */
-
-const QUADRO_SLOTS = loadQuadro().slots;
 const VIEWS = ["prossime", "settimana", "mese", "stagione"] as const;
 const PLACES = ["tutte", "casa", "fuori"] as const;
 type View = (typeof VIEWS)[number];
@@ -39,12 +40,14 @@ export const Route = createFileRoute("/calendario")({
   },
   loader: async () => {
     const [cal, session] = await Promise.all([getPublicCalendarSnapshot(), getSession()]);
-    return { ...cal, access: accessState(session) };
+    // Training board only for members: anonymous visitors never receive the slots in the loader data.
+    const trainingSlots = cal.audience === "member" ? loadQuadro().slots : [];
+    return { ...cal, trainingSlots, access: accessState(session) };
   },
   head: () => ({
     meta: [
       { title: "Calendario 2026/27 — S.C.D. ColicoDerviese" },
-      { name: "description", content: "Gare e allenamenti della settimana, del mese e della tua squadra SCD: casa e trasferta, stagione 2026/27. Dati da riconfermare in caso di variazioni." },
+      { name: "description", content: "Le gare SCD della settimana e del mese: casa e trasferta, stagione 2026/27. Dati da riconfermare in caso di variazioni." },
       { property: "og:title", content: "Calendario 2026/27 — S.C.D. ColicoDerviese" },
       { property: "og:description", content: "Le gare SCD della stagione 2026/27 per settimana, mese e squadra." },
       { property: "og:type", content: "website" },
@@ -85,7 +88,8 @@ type Row =
   | { kind: "allenamento"; id: string; date: string; time: string; title: string; sub: string; teams?: string };
 
 function Calendario() {
-  const { season, sourceModifiedAt, groups, events, origin, access } = Route.useLoaderData();
+  const { season, sourceModifiedAt, groups, events, origin, access, audience, trainingSlots } = Route.useLoaderData();
+  const member = audience === "member";
   const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
   const [refreshMsg, setRefreshMsg] = useState<string | null>(null);
@@ -132,20 +136,20 @@ function Calendario() {
 
   const matchesFilter = (e: PublicEvent) => (!selected || e.group === selected.id) && (place === "tutte" || (place === "casa" ? e.homeAway === "CASA" : e.homeAway === "FUORI"));
   const visible = events.filter((e) => matchesFilter(e) && e.date >= from && e.date <= to);
-  const trainingKey = useMemo(() => (selected ? trainingKeyFor(selected, QUADRO_SLOTS) : null), [selected]);
+  const trainingKey = useMemo(() => (member && selected ? trainingKeyFor(selected, trainingSlots) : null), [member, selected, trainingSlots]);
 
   // Calendario = partite ed eventi; il quadro allenamenti è distinto (decisione Direzione, export 10/10).
   // Gli allenamenti entrano qui solo per la PROPRIA annata scelta, settimana corrente, sede Colico.
   const trainingRows: Row[] = useMemo(() => {
-    if (view !== "settimana" || offset !== 0 || place === "fuori" || !selected || !trainingKey) return [];
+    if (!member || view !== "settimana" || offset !== 0 || place === "fuori" || !selected || !trainingKey) return [];
     return Array.from({ length: 7 }, (_, i) => addDaysIso(from, i)).flatMap((date): Row[] => {
-      const list = trainingRowsFor(date, QUADRO_SLOTS, trainingKey ?? undefined);
+      const list = trainingRowsFor(date, trainingSlots, trainingKey ?? undefined);
       if (!list.length) return [];
       if (trainingKey) return list.map((t) => ({ kind: "allenamento", id: t.id, date, time: t.time, title: `Allenamento ${t.teams}`, sub: `Centro Sportivo - Colico · Campo ${t.field.slice(1)}`, teams: `${t.time}–${t.end}` }));
       const teams = [...new Set(list.flatMap((t) => t.teams.split(" + ")))];
       return [{ kind: "allenamento", id: `all-${date}`, date, time: list[0]!.time, title: `Allenamenti · ${teams.length} ${teams.length === 1 ? "gruppo" : "gruppi"}`, sub: "Centro Sportivo - Colico", teams: `${list[0]!.time}–${list.reduce((m, t) => (t.end > m ? t.end : m), "")} · ${teams.join(", ")}` }];
     });
-  }, [view, offset, place, selected, trainingKey, from]);
+  }, [member, view, offset, place, selected, trainingKey, from, trainingSlots]);
 
   const firstBlock = selected ? 6 : 8;
   const [extra, setExtra] = useState(0);
@@ -249,7 +253,7 @@ function Calendario() {
                   className={`h-[36px] rounded-[8px] text-[13px] font-bold ${view === "stagione" ? "bg-[var(--scd-blue)] text-white" : "bg-[#eef0f3] text-[var(--scd-ink)]"}`}>Stagione</button>
               </div>
               <p className="text-[14px] font-semibold text-[var(--scd-ink)]">{label} · {view === "prossime" ? `${shown.length} di ${visible.length}` : visible.length} {visible.length === 1 ? "gara" : "gare"}{selected ? ` · ${selected.label}` : ""}</p>
-              {selected && (trainingKey
+              {member && selected && (trainingKey
                 ? <Link to="/allenamenti" search={{ annata: trainingKey }} className="inline-flex h-[42px] w-fit items-center gap-2 rounded-[9px] border-2 border-[var(--scd-blue)] px-[12px] text-[14px] font-bold text-[var(--scd-blue)]"><ConeIcon size={20} className="text-[var(--scd-orange)]" />Allenamenti della mia annata ({trainingKey})</Link>
                 : <p className="text-[13px] text-[var(--scd-sub)]">Allenamenti: categoria non trovata automaticamente nel <Link to="/allenamenti" className="font-bold text-[var(--scd-blue)] underline">quadro settimanale</Link>.</p>)}
             </div>
@@ -280,7 +284,17 @@ function Calendario() {
               </button>
             )}
             {trainingRows.length > 0 && <p className="pt-[4px] text-[12px] text-[var(--scd-sub)]">Allenamenti dal quadro settimanale lun–ven (fotografia 09/10/2026, non live).</p>}
-            {!selected && (
+            {!member && (
+              <Link to="/accedi" search={{ next: "/calendario" }} className="mt-3 flex items-center gap-3 rounded-[12px] border border-[var(--scd-line)] bg-white px-3 py-2.5 text-[var(--scd-ink)]" data-testid="cal-members-hint">
+                <Lock className="size-5 shrink-0 text-[var(--scd-blue)]" aria-hidden="true" />
+                <span className="min-w-0 flex-1">
+                  <b className="block text-[15px] leading-tight">Entra per allenamenti e dettagli</b>
+                  <small className="block text-[13px] text-[var(--scd-sub)]">Qui vedi le gare; squadre e allenamenti sono nell'area soci</small>
+                </span>
+                <span aria-hidden="true" className="text-[18px] text-[var(--scd-blue)]">›</span>
+              </Link>
+            )}
+            {member && !selected && (
               <Link to="/allenamenti" className="mt-3 flex items-center gap-3 rounded-[12px] border border-[var(--scd-line)] bg-white px-3 py-2.5 text-[var(--scd-ink)]" data-testid="cal-training-link">
                 <ConeIcon size={24} className="shrink-0 text-[var(--scd-orange)]" />
                 <span className="min-w-0 flex-1">
@@ -326,7 +340,8 @@ function Calendario() {
 
           <OfficialResults className="mt-[18px]" />
           <p className="mt-[12px] text-[13px] text-[var(--scd-sub)]">
-            Dove si gioca: <Link to="/impianti" className="font-bold text-[var(--scd-blue)] underline">mappa dei campi di Colico e Dervio</Link> · <Link to="/squadre" className="font-bold text-[var(--scd-blue)] underline">tutte le squadre</Link>
+            Dove si gioca: <Link to="/impianti" className="font-bold text-[var(--scd-blue)] underline">mappa dei campi di Colico e Dervio</Link>
+            {member && <> · <Link to="/squadre" className="font-bold text-[var(--scd-blue)] underline">tutte le squadre</Link></>}
           </p>
         </div>
       </Sheet>

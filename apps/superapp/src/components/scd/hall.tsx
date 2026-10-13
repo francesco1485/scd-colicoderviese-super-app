@@ -4,7 +4,7 @@
  * night #062a52, crest blue, light blue, yellow reserved to actions, white.
  */
 import { Link } from "@tanstack/react-router";
-import { CalendarDays, CalendarCheck, Info, Mail, MapPin, UsersRound, type LucideIcon } from "lucide-react";
+import { CalendarDays, CalendarCheck, Handshake, Info, Mail, MapPin, type LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
 export function HallHero({ kicker, title, children, actions }: { kicker: string; title: ReactNode; children?: ReactNode; actions?: ReactNode }) {
@@ -23,10 +23,13 @@ export function HallHero({ kicker, title, children, actions }: { kicker: string;
 
 type Door = { to: string; label: string; sub: string; icon: LucideIcon; hash?: string };
 
-/** The hall doors, in the order a visitor looks for them. */
+/**
+ * The hall doors, in the order a visitor looks for them. Public pages only: teams are inside (UD-100, Direzione
+ * 13/10/2026), so the public door is the partner offer instead of the teams.
+ */
 export const HALL_DOORS: readonly Door[] = [
   { to: "/societa", label: "Chi siamo", sub: "Colico e Dervio, un solo club", icon: Info },
-  { to: "/squadre", label: "Squadre", sub: "Dalla Prima ai Piccoli Amici", icon: UsersRound },
+  { to: "/sponsor", label: "Partner", sub: "Il territorio che ci sostiene", icon: Handshake },
   { to: "/calendario", label: "Calendario", sub: "Gare e risultati ufficiali", icon: CalendarDays },
   { to: "/impianti", label: "Mappa campi", sub: "Dove si gioca, da dove si entra", icon: MapPin },
   { to: "/eventi", label: "Eventi", sub: "Tornei e serate", icon: CalendarCheck },

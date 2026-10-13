@@ -3,8 +3,8 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.32.0",
-    "effective_at": "2026-10-11",
+    "version": "3.33.0",
+    "effective_at": "2026-10-13",
     "status": "BINDING",
     "language": "it-IT",
     "timezone": "Europe/Rome",
@@ -164,7 +164,7 @@
           "PUBLIC_LIMITED",
           "AUTHORIZED_USERS"
         ],
-        "purpose": "Calendario societario multi-squadra, multi-annata, multi-evento e personalizzato per ruolo/scope.",
+        "purpose": "Calendario societario multi-squadra, multi-annata, multi-evento e personalizzato per ruolo/scope. Senza accesso (PUBLIC_LIMITED) solo le gare: data, ora, casa/fuori, campo, squadra, avversario; allenamenti, note, persone e stemmi d'annata solo per i soci collegati (UD-100).",
         "visual_master": "CALENDARIO_LIVE_APPROVED_BOARD"
       },
       {
@@ -212,7 +212,7 @@
           "PUBLIC_LIMITED",
           "AUTHORIZED_USERS"
         ],
-        "purpose": "Comunicazioni Club, Squadre e Social, avvisi urgenti, feed, newsletter e strumenti di pubblicazione autorizzati.",
+        "purpose": "Comunicazioni Club e Social, avvisi urgenti, feed, newsletter e strumenti di pubblicazione autorizzati. La sezione Squadre e il quadro allenamenti sono visibili solo ai soci collegati (UD-100).",
         "visual_master": "COMUNICAZIONI_APPROVED_BOARD"
       }
     ],
@@ -3397,7 +3397,7 @@
         "SCD_SUPABASE",
         "CR_LOMBARDIA"
       ],
-      "contract": "PUBLIC_TEAM_DIRECTORY_PLUS_SOURCE_GROUNDED_TEAM_HUB_NEXT_MATCH_VERIFIED_STATS_LOCAL_FOLLOW_NO_PRIVATE_ROSTER"
+      "contract": "TEAMS_INSIDE_UD100_MEMBERS_ONLY_TEAM_DIRECTORY_ROSTER_TRAINING_STAFF_PEOPLE_ANONYMOUS_FIXTURES_ONLY_NO_ANNATA_CREST_NO_PRIVATE_ROSTER"
     },
     {
       "id": "CAP-PUBLIC-MATCHDAY",
@@ -4400,7 +4400,8 @@
         "TEAMS_DERIVE_FROM_VERIFIED_PUBLIC_SPORT_DATA",
         "SEARCH_AND_FILTERS_MUST_WORK_ON_MOBILE_AND_DESKTOP",
         "MISSING_DATA_FAILS_CLOSED_WITH_CLEAR_STATE",
-        "NO_PRIVATE_ROSTER_OR_CONTACTS_IN_PUBLIC_TEAMS"
+        "NO_PRIVATE_ROSTER_OR_CONTACTS_IN_PUBLIC_TEAMS",
+        "TEAMS_ROSTERS_TRAINING_PEOPLE_INSIDE_AFTER_SIGN_IN_UD100"
       ],
       "calendar": {
         "default_period": "CURRENT_WEEK",
@@ -4482,7 +4483,10 @@
       "followed_team_preference": "LOCAL_DEVICE_ONLY",
       "roster": "NO_PRIVATE_ROSTER",
       "people": "PUBLIC_AUTHORIZED_PROFILES_ONLY",
-      "deep_link_calendar": true
+      "deep_link_calendar": true,
+      "audience": "SIGNED_IN_MEMBERS_ONLY",
+      "public_exposure": "NONE_TEAMS_INSIDE_UD100_PUBLIC_GETS_FIXTURES_ONLY",
+      "training_schedule": "SIGNED_IN_MEMBERS_ONLY"
     },
     "solidarity_fund": {
       "state": "PUBLIC_DONATION_REPORTING_UI_READY_SOURCE_ADAPTER_BLOCKED",

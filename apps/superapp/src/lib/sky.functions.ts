@@ -49,14 +49,14 @@ export const askSky = createServerFn({ method: "POST" })
     const syncing = "Il dato non è ancora sincronizzato dal gestionale: appena disponibile lo trovi in Home.";
 
     if (intent === "allenamenti") {
-      // Solo indirizzamento al quadro pubblico: nessun orario affermato in chat.
+      // Solo indirizzamento al quadro allenamenti, che è nell'area soci (UD-100): nessun orario affermato in chat.
       const { loadQuadro, findSessions, normalizeGroupText } = await import("./public-snapshots");
       const { slots } = loadQuadro();
       const year = data.message.match(/(?<!\d)20[0-2]\d(?!\d)/)?.[0];
       const cat = normalizeGroupText(data.message).match(/\bu\d{2}\b|prima squadra|juniores/)?.[0];
       const key = year ?? cat;
-      if (key && findSessions(slots, key).length) return { text: `Orari e campi lun–ven per "${key.toUpperCase()}" sono nel quadro allenamenti pubblico.`, mood: "info", links: [{ label: `Allenamenti ${key.toUpperCase()}`, to: `/allenamenti?annata=${encodeURIComponent(key)}` }] };
-      return { text: key ? `Non trovo "${key}" nel quadro allenamenti: cerca la tua categoria nella pagina.` : "Il quadro allenamenti lun–ven è consultabile per annata o categoria.", mood: "info", links: [{ label: "Quadro allenamenti", to: "/allenamenti" }] };
+      if (key && findSessions(slots, key).length) return { text: `Orari e campi lun–ven per "${key.toUpperCase()}" sono nel quadro allenamenti dell'area soci: entra con il tuo account.`, mood: "info", links: [{ label: `Allenamenti ${key.toUpperCase()}`, to: `/allenamenti?annata=${encodeURIComponent(key)}` }] };
+      return { text: key ? `Non trovo "${key}" nel quadro allenamenti: cerca la tua categoria nella pagina.` : "Il quadro allenamenti lun–ven è nell'area soci: entra e cerca la tua annata o categoria.", mood: "info", links: [{ label: "Quadro allenamenti", to: "/allenamenti" }] };
     }
     if (intent === "prossima" || intent === "calendario") {
       // Il calendario pubblico esiste: indirizza lì, senza affermare orari o avversari non letti.

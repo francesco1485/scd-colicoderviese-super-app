@@ -6,13 +6,14 @@
  * public/media/scd/annate/) are internal only. Public pages show our side with the official club crest
  * (publicTeamCrest() / ClubCrestOfficial) and "ColicoDerviese" plus the team label as text.
  */
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 import { describe, expect, it } from "vitest";
 
 import clubCrest from "@/assets/brand/logo-scd.png.asset.json";
 
+import { isPublicPath } from "./http-policy";
 import { publicTeamCrest } from "./team-crest";
 
 const APP = resolve(__dirname, "../..");
@@ -31,7 +32,21 @@ const PUBLIC_FILES = [
   "src/routes/allenamenti.tsx",
   "src/routes/comunicazioni.tsx",
   "src/components/universe/Feed.tsx",
+  "src/components/scd/hall.tsx",
+  "src/routes/societa.tsx",
 ] as const;
+
+/** Every route file whose page is public (http-policy PUBLIC_PREFIXES), found from src/routes: new public pages are
+ * covered without editing this list. */
+const PUBLIC_ROUTE_FILES = readdirSync(resolve(APP, "src/routes"))
+  .filter((f) => f.endsWith(".tsx") && !f.startsWith("__"))
+  .filter((f) => {
+    const segs = f.replace(/\.tsx$/, "").split(".").filter((s) => s !== "index").map((s) => s.replace(/_$/, "")).filter(Boolean);
+    return isPublicPath(`/${segs.join("/")}`);
+  })
+  .map((f) => `src/routes/${f}`);
+
+const SCANNED = [...new Set([...PUBLIC_FILES, ...PUBLIC_ROUTE_FILES])].sort();
 
 const FORBIDDEN: readonly { label: string; re: RegExp }[] = [
   {
@@ -57,7 +72,12 @@ describe("public crest policy (Direzione 13/10/2026)", () => {
     expect(publicTeamCrest()).toBe("/media/brand/logo-scd.webp");
   });
 
-  it.each(PUBLIC_FILES)("%s shows no annata crest", (file) => {
+  it("scans every public route file", () => {
+    expect(PUBLIC_ROUTE_FILES.length).toBeGreaterThan(10);
+    expect(PUBLIC_ROUTE_FILES).toEqual(expect.arrayContaining(["src/routes/societa.tsx", "src/routes/calendario.tsx", "src/routes/eventi.index.tsx"]));
+  });
+
+  it.each(SCANNED)("%s shows no annata crest", (file) => {
     const src = readFileSync(resolve(APP, file), "utf8");
     const hits = FORBIDDEN.filter(({ re }) => re.test(src)).map(
       ({ label }) => label,
