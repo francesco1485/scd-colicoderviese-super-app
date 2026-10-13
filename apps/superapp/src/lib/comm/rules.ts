@@ -11,6 +11,8 @@
  *   - an address that belongs only to children under 14 is never used, whatever audience produced it.
  */
 
+import { isSponsorThread } from "./sponsor";
+
 export type Office = "DIREZIONE" | "SEGRETERIA" | "TESORERIA";
 export type Confidentiality = "ORDINARIO" | "RISERVATO";
 export type Channel = "EMAIL" | "APP" | "WHATSAPP";
@@ -733,7 +735,7 @@ export function parseDirectory(v: unknown): Directory | null {
 
 // ------------------------------------------------------------------ inbox filters
 
-export type InboxFilter = "tutte" | "non-lette" | "aperte" | "riservate" | "ordinarie" | "bozze" | "nuovi-contatti";
+export type InboxFilter = "tutte" | "non-lette" | "aperte" | "riservate" | "ordinarie" | "sponsor" | "bozze" | "nuovi-contatti";
 
 export const INBOX_FILTERS: ReadonlyArray<{ id: InboxFilter; label: string }> = [
   { id: "tutte", label: "Tutte" },
@@ -741,6 +743,7 @@ export const INBOX_FILTERS: ReadonlyArray<{ id: InboxFilter; label: string }> = 
   { id: "aperte", label: "Aperte" },
   { id: "riservate", label: "Riservate" },
   { id: "ordinarie", label: "Ordinarie" },
+  { id: "sponsor", label: "Sponsor" },
   { id: "bozze", label: "Bozze" },
   { id: "nuovi-contatti", label: "Nuovi contatti" },
 ];
@@ -753,6 +756,7 @@ export function filterThreads(threads: readonly ThreadSummary[], filter: InboxFi
     if (filter === "aperte" && t.status !== "APERTO") return false;
     if (filter === "riservate" && t.confidentiality !== "RISERVATO") return false;
     if (filter === "ordinarie" && t.confidentiality !== "ORDINARIO") return false;
+    if (filter === "sponsor" && !isSponsorThread(t)) return false;
     if (filter === "bozze" && t.drafts === 0) return false;
     if (filter === "nuovi-contatti") return false;
     if (needle && !`${t.subject} ${t.counterpartLabel ?? ""} ${t.last?.snippet ?? ""}`.toLowerCase().includes(needle)) return false;

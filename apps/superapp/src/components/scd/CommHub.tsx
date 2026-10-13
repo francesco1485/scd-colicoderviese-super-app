@@ -5,7 +5,7 @@
  */
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { AlertTriangle, ArrowLeft, Check, Inbox as InboxIcon, Lock, LockOpen, Mail, MailPlus, Paperclip, RefreshCw, Reply, Search, Send, Undo2, UserPlus, Users, X } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Briefcase, Check, Inbox as InboxIcon, Lock, LockOpen, Mail, MailPlus, Paperclip, RefreshCw, Reply, Search, Send, Undo2, UserPlus, Users, X } from "lucide-react";
 import { useEffect, useId, useMemo, useState, type ReactNode } from "react";
 
 import { Card, Chip, type ChipTone } from "@/components/scd/interior-ui";
@@ -13,13 +13,16 @@ import { EmptyState } from "@/components/scd/work-area-ui";
 import {
   getCommInbox,
   getCommThread,
+  getSponsorComposeSeed,
   linkCommContact,
   queueCommMessage,
+  refreshCommMailbox,
   resolveCommAudience,
   saveCommDraft,
   searchCommDirectory,
   setCommConfidentiality,
   setCommThreadStatus,
+  upsertCommContact,
   type CommOutcome,
   type InboxData,
 } from "@/lib/comm.functions";
@@ -54,6 +57,7 @@ import {
   type ThreadMessage,
   type ThreadSummary,
 } from "@/lib/comm/rules";
+import { isSponsorThread, type PostaComposeSearch } from "@/lib/comm/sponsor";
 import { itDateTime } from "@/lib/fees";
 
 const btn = "scd-focus inline-flex min-h-11 items-center justify-center gap-2 rounded-[10px] px-4 text-[15px] font-semibold disabled:cursor-not-allowed disabled:opacity-50";
@@ -85,7 +89,7 @@ function Notice({ tone, children }: { tone: "ok" | "warn" | "crit"; children: Re
 
 // ------------------------------------------------------------------ page
 
-export function CommHubPage({ initial }: { initial: InboxData }) {
+export function CommHubPage({ initial, compose = null, onComposeOpened }: { initial: InboxData; compose?: PostaComposeSearch | null; onComposeOpened?: () => void }) {
   const [data, setData] = useState(initial);
   const [filter, setFilter] = useState<InboxFilter>("tutte");
   const [office, setOffice] = useState<Office | "TUTTI">("TUTTI");
@@ -98,6 +102,48 @@ export function CommHubPage({ initial }: { initial: InboxData }) {
   const [busy, setBusy] = useState(false);
   const reloadInbox = useServerFn(getCommInbox);
   const loadThread = useServerFn(getCommThread);
+  const refreshMailbox = useServerFn(refreshCommMailbox);
+  const sponsorSeed = useServerFn(getSponsorComposeSeed);
+  const canWork = !!initial.inbox;
+
+  /** Bring the mailbox up to date (at most every two minutes, server-side), then show what arrived or left. */
+  async function syncMailbox() {
+    try {
+      const r = await refreshMailbox();
+      if (r.ran && (r.received > 0 || r.sent > 0)) setData(await reloadInbox());
+    } catch {
+      // The cron or the next visit will do it: nothing to tell the user.
+    }
+  }
+
+  useEffect(() => {
+    if (canWork) void syncMailbox();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canWork]);
+
+  const composeKey = compose?.scrivi ? `${compose.scrivi}:${compose.nome ?? ""}` : "";
+  useEffect(() => {
+    if (!composeKey || !canWork) return;
+    let alive = true;
+    void sponsorSeed({ data: { name: compose?.nome ?? null } })
+      .then((seed) => {
+        if (!alive || !seed) return;
+        setComposer({
+          mode: "new",
+          office: seed.office,
+          audience: seed.audience,
+          note: seed.note,
+          sponsorName: seed.sponsorName,
+          subject: compose?.nome ? `S.C.D. ColicoDerviese · ${compose.nome}` : "S.C.D. ColicoDerviese · comunicazione ai partner",
+        });
+        onComposeOpened?.();
+      })
+      .catch(() => setToast({ ok: false, message: "Non riesco ad aprire il messaggio allo sponsor. Usa «Nuovo» e scegli «Sponsor»." }));
+    return () => {
+      alive = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [composeKey, canWork]);
 
   const inbox = data.inbox;
   const counts = inboxCounts(inbox);
@@ -129,6 +175,7 @@ export function CommHubPage({ initial }: { initial: InboxData }) {
 
   async function after(o: CommOutcome, threadId?: string | null) {
     setToast(o);
+    if (o.ok && typeof o.recipients === "number") await syncMailbox();
     const next = await reloadInbox();
     setData(next);
     const id = threadId ?? openId;
@@ -361,6 +408,7 @@ function ThreadList({ threads, openId, onOpen }: { threads: readonly ThreadSumma
               </span>
               <span className="mt-1.5 flex flex-wrap gap-1.5">
                 <Chip tone="info">{OFFICE_LABEL[t.office]}</Chip>
+                {isSponsorThread(t) && <Chip tone="ok"><Briefcase className="size-3.5" aria-hidden="true" /> Sponsor</Chip>}
                 {t.confidentiality === "RISERVATO" && <Chip tone="warn"><Lock className="size-3.5" aria-hidden="true" /> Riservato</Chip>}
                 {t.drafts > 0 && <Chip tone="mute">{t.drafts === 1 ? "1 bozza" : `${t.drafts} bozze`}</Chip>}
                 {t.queued > 0 && <Chip tone="warn">In coda</Chip>}
@@ -635,6 +683,10 @@ export interface ComposerSeed {
   subject?: string;
   body?: string;
   audience?: Audience | null;
+  /** Shown at the top of the composer (e.g. from the sponsor pages). */
+  note?: string | null;
+  /** Sponsor without a linked address: the composer offers to link one (scd_comm_upsert_contact, kind SPONSOR). */
+  sponsorName?: string | null;
 }
 
 function Composer({ seed, inbox, onClose, onDone }: { seed: ComposerSeed; inbox: Inbox; onClose: () => void; onDone: (o: CommOutcome) => void }) {
@@ -760,6 +812,9 @@ function Composer({ seed, inbox, onClose, onDone }: { seed: ComposerSeed; inbox:
             </fieldset>
           </div>
 
+          {seed.note && <Notice tone="warn">{seed.note}</Notice>}
+          {seed.sponsorName && !audience && <SponsorAddress name={seed.sponsorName} onLinked={(contactId) => setAudience({ kind: "CONTACT", contactId, label: seed.sponsorName ?? "" })} />}
+
           <AudiencePicker value={audience} onChange={setAudience} locked={seed.mode === "reply" && !!seed.audience} />
 
           <div className="rounded-xl border border-[var(--in-line)] bg-[#f7fbff] p-3">
@@ -807,6 +862,43 @@ function Composer({ seed, inbox, onClose, onDone }: { seed: ComposerSeed; inbox:
           </button>
         </footer>
       </section>
+    </div>
+  );
+}
+
+/** Links the address of a sponsor that has none yet: one contact in scd_comm_external_contacts, kind SPONSOR. */
+function SponsorAddress({ name, onLinked }: { name: string; onLinked: (contactId: string) => void }) {
+  const upsert = useServerFn(upsertCommContact);
+  const id = useId();
+  const [email, setEmail] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const valid = parseEmailList(email).length === 1;
+
+  async function link() {
+    setBusy(true);
+    setError(null);
+    try {
+      const r = await upsert({ data: { email: parseEmailList(email)[0] ?? "", kind: "SPONSOR", orgName: name, displayName: name } });
+      if (r.ok && r.contactId) onLinked(r.contactId);
+      else setError(r.message);
+    } catch {
+      setError("Salvataggio non riuscito. Riprova tra poco.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="flex flex-col gap-1.5 rounded-xl border border-[var(--in-line)] bg-[#f7fbff] p-3" data-testid="comm-sponsor-address">
+      <label htmlFor={`${id}-mail`} className="text-[14px] font-bold">E-mail di {name}</label>
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <input id={`${id}-mail`} type="email" inputMode="email" autoComplete="off" className={input} value={email} onChange={(e) => setEmail(e.target.value)} placeholder="nome@azienda.it" />
+        <button type="button" className={btnGhost} disabled={!valid || busy} onClick={() => void link()}>
+          <UserPlus className="size-4" aria-hidden="true" /> Collega come sponsor
+        </button>
+      </div>
+      {error && <p className="m-0 text-[13px] font-semibold text-[var(--in-crit)]">{error}</p>}
     </div>
   );
 }
@@ -990,6 +1082,7 @@ function AudiencePicker({ value, onChange, locked }: { value: Audience | null; o
       {value?.kind === "CONTACT" && (
         <select aria-label="Contatto" className={input} value={value.contactId ?? ""} onChange={(e) => onChange({ kind: "CONTACT", contactId: e.target.value, label: dir?.contacts.find((c) => c.id === e.target.value)?.label ?? "" })}>
           <option value="">Scegli il contatto</option>
+          {value.contactId && !(dir?.contacts ?? []).some((c) => c.id === value.contactId) && <option value={value.contactId}>{value.label || "Contatto scelto"}</option>}
           {(dir?.contacts ?? []).map((c) => (
             <option key={c.id} value={c.id}>{c.label} · {CONTACT_KIND_LABEL[c.kind as ContactKind] ?? c.kind}</option>
           ))}

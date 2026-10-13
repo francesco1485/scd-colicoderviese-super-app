@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { simpleParser } from "mailparser";
 import { describe, expect, it } from "vitest";
 
 import { fromBase64Url } from "./rfc2822";
@@ -155,15 +156,16 @@ describe("comm-sync", () => {
     expect(calls.at(-1)?.args).toMatchObject({ p_connected: true, p_history_id: "5000" });
   });
 
-  it("signs each envelope with the staff member's name and office", () => {
+  it("signs each envelope with the staff member's name and office, in plain text and HTML", async () => {
     const raw = envelopeMessage(
-      { recipientId: "r9", messageId: "m9", to: "a@b.it", cc: [], bcc: [], subject: "Ciao", body: "Testo", office: "SEGRETERIA", senderName: "Davide Conti", gmailThreadId: null, inReplyTo: null },
+      { recipientId: "r9", messageId: "m9", threadId: null, to: "a@b.it", cc: [], bcc: [], subject: "Ciao", body: "Testo", office: "SEGRETERIA", senderName: "Davide Conti", gmailThreadId: null, inReplyTo: null },
       "sportclubcolico@gmail.com",
       new Date("2026-10-13T10:00:00Z"),
     );
-    const body = Buffer.from((raw.split("\r\n\r\n")[1] ?? "").replace(/\r\n/g, ""), "base64").toString("utf8");
-    expect(body).toContain("Davide Conti · Segreteria");
-    expect(body).toContain("la risposta arriva alla società");
+    const parsed = await simpleParser(Buffer.from(raw, "utf8"));
+    expect(parsed.text).toContain("Davide Conti · Segreteria");
+    expect(parsed.text).toContain("la risposta arriva alla società");
+    expect(String(parsed.html)).toContain("Davide Conti · Segreteria");
   });
 });
 
