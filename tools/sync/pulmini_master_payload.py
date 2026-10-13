@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """Master Pulmini (xlsx export) -> JSON payload for public.scd_transport_sync (r74).
 
-Usage: python3 -I tools/sync/pulmini_master_payload.py master.xlsx [source_modified_iso] > payload.json
+Usage: python3 -I tools/sync/pulmini_master_payload.py master.xlsx [source_modified_iso] [--no-names] > payload.json
 
 Source: Google Sheet "05_PULMINI - Master Flotta e Trasporti SCD 2026-27", exported as xlsx.
-Privacy: service users (tab 02) leave WITHOUT names — only the sheet codes (USR-, AT-), team group,
-line, stops and weekday flags. Drivers leave as "First L." plus phone (adult volunteers; the database
+Privacy: service users (tab 02) leave with the sheet codes (USR-, AT-), team group, line, stops and weekday
+flags. UD-108 (Direzione 13/10/2026): first and last name (NOME / COGNOME) and the van (MEZZO / PULMINO) also
+leave, for public.scd_transport_sync_rider_names (migration r99); the database returns them only to the
+transport staff and the app shows first name + surname initial. Pass --no-names to keep the r74 shape. Drivers leave as "First L." plus phone (adult volunteers; the database
 returns phones only to Direzione, Segreteria and the transport manager).
 """
 from __future__ import annotations
@@ -91,7 +93,22 @@ def short_name(first, last) -> str | None:
     return (f or l).title()
 
 
-def build(path: str, source_modified: str | None) -> dict:
+def first_of(r: dict, *keys: str):
+    for k in keys:
+        if k in r and r[k] not in (None, ""):
+            return r[k]
+    return None
+
+
+def person_name(v) -> str | None:
+    s = text(v, 40)
+    # Names only: values with digits or "@" (phones, codes, e-mails) are dropped.
+    if not s or re.search(r"[0-9@]", s):
+        return None
+    return s
+
+
+def build(path: str, source_modified: str | None, with_names: bool = True) -> dict:
     wb = openpyxl.load_workbook(path, data_only=True, read_only=True)
     vehicles = [
         {
@@ -173,6 +190,15 @@ def build(path: str, source_modified: str | None) -> dict:
             "stopStatus": text(r.get("STATO_FERMATA"), 40),
             "days": {k: text(r.get(k), 30) for k in DAY_KEYS},
             "weekendExtra": text(r.get("WEEKEND_EXTRA"), 40),
+            **(
+                {
+                    "firstName": person_name(first_of(r, "NOME", "NOME_ATLETA")),
+                    "lastName": person_name(first_of(r, "COGNOME", "COGNOME_ATLETA")),
+                    "vehicle": text(first_of(r, "MEZZO_ID", "MEZZO", "PULMINO"), 20),
+                }
+                if with_names
+                else {}
+            ),
         }
         for r in table(wb, "02 UTENTI SERVIZIO")
         if text(r.get("UTENTE_SERVIZIO_ID"))
@@ -189,6 +215,8 @@ def build(path: str, source_modified: str | None) -> dict:
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        sys.exit("usage: pulmini_master_payload.py master.xlsx [source_modified_iso]")
-    print(json.dumps(build(sys.argv[1], sys.argv[2] if len(sys.argv) > 2 else None), ensure_ascii=False))
+    args = [a for a in sys.argv[1:] if a != "--no-names"]
+    if not args:
+        sys.exit("usage: pulmini_master_payload.py master.xlsx [source_modified_iso] [--no-names]")
+    payload = build(args[0], args[1] if len(args) > 1 else None, with_names="--no-names" not in sys.argv)
+    print(json.dumps(payload, ensure_ascii=False))

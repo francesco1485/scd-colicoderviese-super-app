@@ -2554,6 +2554,38 @@
           "config/scd-assets.v1.json (INTERNAL_BADGE, LED_DEMO_VIDEO, VIDEO_POSTER, rule VIDEO)"
         ]
       }
+    },
+    {
+      "sourceDate": "2026-10-13",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-108",
+      "name": "PULMINI_RIDER_NAMES_UNDER_TRAININGS_AND_VAN_DETAIL",
+      "sourceQuoteFragments": [
+        "devi mettere i pulmini con i ragazzi solo i nomi sotto agli allenamenti e devo sapere in ogni pulmino chi c'è sempre e dove va e che percorso fa se premo sul pulmino",
+        "la divisione linea resta"
+      ],
+      "context": "Direzione, 13/10/2026 17:52-17:53, on the internal page /pulmini (weekly training board showed 'nessun pulmino registrato' and only counts from 05_PULMINI).",
+      "normalizedCommand": {
+        "rule": "Under each training slot of the week the vans that serve it are listed (andata/ritorno), each a tappable card with its line badge and the riders' names only; tapping a van shows who is always on board across the week, where it goes, its ordered route, driver role (no phone) and capacity (8 + autista). The four vans stay four separate units: Pulmino 1 Lago, 2 Lecco, 3 Valtellina, 4 Chiavenna.",
+        "scope": "INTERNAL_AREA_PULMINI",
+        "constraints": [
+          "names only: first name + surname initial (RIDER_NAME_FORMAT, single switch for the Direzione); no phones, parents, addresses, stops of a single child or notes",
+          "names served only server-side to a session the database confirms for the Pulmini board (Direzione, Segreteria, responsabile trasporti, Presidente, DG, autisti); never in the staging preview, client bundle, logs, notifications, Crovi/Era context, KB or public pages",
+          "same source: 05_PULMINI - Master Flotta e Trasporti (copy job + scd_transport_*), no parallel registry",
+          "placement by vehicle written in the Master, otherwise by exact line; the combined line LAGO/LECCO and lines without a van are reported as 'da collocare', never guessed",
+          "route from the Master stops; the club line board 2026/27 only as labelled fallback 'da confermare'; times never invented",
+          "no new roles or permissions; migration r99 written, applied only with Direzione approval"
+        ],
+        "status": "IMPLEMENTED_BRANCH_AGENT_PULMINI",
+        "delivered": [
+          "apps/superapp/src/lib/pulmini-vans.ts, pulmini-vans.functions.ts (+ pulmini-vans.test.tsx)",
+          "apps/superapp/src/components/scd/PulminiVans.tsx, routes/pulmini.tsx",
+          "supabase/migrations/20261013_r99_transport_rider_names.sql (NOT applied)",
+          "tools/sync/pulmini_master_payload.py (firstName, lastName, vehicle)",
+          "apps/superapp/src/lib/client-bundle.test.ts (roster RPC and fixtures out of the public bundle)"
+        ]
+      }
     }
   ],
   "completionGate": {

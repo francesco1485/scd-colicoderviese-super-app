@@ -80,3 +80,24 @@ describe.skipIf(!built)("client bundle keeps time-limited initiatives out (Direz
     expect(hits).toEqual([]);
   });
 });
+
+describe.skipIf(!built)("client bundle keeps the riders' roster on the server (UD-108)", () => {
+  // The roster RPC and the name-gating notes live only in pulmini-vans.functions.ts (server function body).
+  const serverOnly = ["scd_transport_rider_roster", "scd_transport_board"];
+  // Invented fixture names of the tests: they must never be bundled anywhere.
+  const fixtures = ["Fintolini", "FINTOLINI", "Esempietti", "Campionetti"];
+
+  it("finds the roster RPC in the server build (control)", () => {
+    const server = files(SERVER_DIR).map((f) => readFileSync(f, "utf8")).join("\n");
+    expect(server.includes("scd_transport_rider_roster")).toBe(true);
+  });
+
+  it("finds no roster RPC and no fixture name in .output/public", () => {
+    const hits: string[] = [];
+    for (const f of files(PUBLIC_DIR)) {
+      const src = readFileSync(f, "utf8");
+      for (const p of [...serverOnly, ...fixtures]) if (src.includes(p)) hits.push(`${f.slice(PUBLIC_DIR.length)}: ${p}`);
+    }
+    expect(hits).toEqual([]);
+  });
+});
