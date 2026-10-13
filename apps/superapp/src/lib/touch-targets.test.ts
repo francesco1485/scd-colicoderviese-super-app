@@ -36,7 +36,7 @@ describe("touch targets of audited controls", () => {
     expect(read("../components/SiteChrome.tsx")).not.toMatch(/aria-controls="sa-menu"/);
   });
 
-  it("the 'Ci sarò' green keeps AA contrast with white text", () => {
+  it("the 'Presa visione' green keeps AA contrast with white text", () => {
     const src = read("../routes/famiglia.tsx");
     expect(src).not.toContain("#128a2e");
     expect(src).toContain("bg-[#0f7a28] text-white");

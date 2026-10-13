@@ -49,7 +49,7 @@ function Privacy() {
         <li><b>Accesso</b>: l'indirizzo e-mail con cui entri. Non usiamo password.</li>
         <li><b>Anagrafica sportiva</b>: nome, cognome, data di nascita, squadra e stato del tesseramento di atleti, genitori, staff e dirigenti, presi dai moduli d'iscrizione e dall'elenco tesserati della società.</li>
         <li><b>Certificato medico</b>: solo la data di scadenza e il tipo (agonistico o non agonistico). Il certificato vero resta in segreteria: l'app non conserva documenti né diagnosi.</li>
-        <li><b>Attività di squadra</b>: convocazioni, risposte "Ci sarò", distinte preparate dal mister.</li>
+        <li><b>Attività di squadra</b>: convocazioni, prese visione e impedimenti segnalati, distinte preparate dal mister.</li>
         <li><b>Richiesta di accesso</b>: nome, cognome, data di nascita, e-mail e telefono di chi si registra, finché la segreteria non verifica.</li>
         <li><b>Notifiche</b>: se le attivi, un identificativo tecnico del tuo telefono per mandarti l'avviso delle convocazioni.</li>
         <li><b>Storico delle modifiche</b>: chi ha cambiato un accesso, un certificato o una distinta, e quando.</li>

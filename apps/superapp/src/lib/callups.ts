@@ -1,24 +1,55 @@
 /**
- * Call-ups with "Ci sarò" (UD-062, r62). Pure helpers shared by the mister page (send, see answers)
- * and the family page (answer). The database decides who may send or answer; these helpers only
- * shape input and output.
+ * Call-ups (UD-062 r62, corrected by UD-099 on 13/10/2026). In a 3rd-level Élite club a call-up of a
+ * competitive team is mandatory: the athlete is called up, full stop. It is NOT an RSVP and the family
+ * does not choose. The family only (a) acknowledges it ("Presa visione") or (b) reports an impediment
+ * to the mister, who decides. Pure helpers shared by the mister page (send, see who has seen it) and
+ * the family page (acknowledge / report). The database decides who may send or answer; these helpers
+ * only shape input and output.
+ *
+ * Database mapping (unchanged, scd_respond_callup): PENDING = not seen yet, CONFIRMED = seen
+ * ("presa visione"), DECLINED = impediment reported (a justified absence communicated to the mister).
  */
 
 export type CallupResponse = "PENDING" | "CONFIRMED" | "DECLINED";
 export type SendOutcome = "SENT" | "CERTIFICATE" | "REGISTRATION" | "NOT_IN_TEAM" | "ERROR";
 
+/** What the mister sees next to each called-up athlete. */
 export const RESPONSE_LABEL: Readonly<Record<CallupResponse, string>> = {
-  PENDING: "In attesa",
-  CONFIRMED: "Ci sarà",
-  DECLINED: "Non ci sarà",
+  PENDING: "Non ancora vista",
+  CONFIRMED: "Vista",
+  DECLINED: "Impedimento segnalato",
 };
 
-/** Same words seen by the family when they answer. */
+/** What the family / athlete sees on their call-up card. */
 export const MY_RESPONSE_LABEL: Readonly<Record<CallupResponse, string>> = {
-  PENDING: "Da confermare",
-  CONFIRMED: "Ci sarò",
-  DECLINED: "Non ci sarò",
+  PENDING: "Convocato · da prendere visione",
+  CONFIRMED: "Presa visione",
+  DECLINED: "Impedimento segnalato",
 };
+
+/** Words of the family card: one acknowledgement, one way to report an impediment. Never "Ci sarò". */
+export const FAMILY_CALLUP_COPY = {
+  acknowledge: "Presa visione",
+  report: "Segnala un impedimento",
+  reportNote:
+    "La convocazione resta valida: il mister riceve la segnalazione e decide. Per motivi di salute non scrivere dettagli: parlane con il mister o con la segreteria.",
+  reportConfirm: "Conferma segnalazione",
+  reportCancel: "Annulla",
+  cardSub: "Per ogni convocazione tocca \"Presa visione\". Se c'è un impedimento, segnalalo: decide il mister.",
+} as const;
+
+/** Copy of the mister panel. */
+export const MISTER_CALLUP_COPY = {
+  familiesHint: "Le famiglie prendono visione dalla loro pagina.",
+} as const;
+
+/** Text of the push notification for a new call-up. */
+export const CALLUP_PUSH_TEXT = "Nuova convocazione: apri l'app per prenderne visione";
+
+/** Message shown to the family after the database saved their action. */
+export function respondedMessage(response: "CONFIRMED" | "DECLINED"): string {
+  return response === "CONFIRMED" ? "Presa visione registrata: il mister la vede." : "Impedimento segnalato al mister: la convocazione resta valida, decide lui.";
+}
 
 export const OUTCOME_LABEL: Readonly<Record<SendOutcome, string>> = {
   SENT: "Convocato",
@@ -41,6 +72,11 @@ export interface ResponseCounts {
   confirmed: number;
   declined: number;
   pending: number;
+}
+
+/** "Viste X · Da vedere Y · Impedimenti Z": the three numbers of the mister panel. */
+export function responseSummary(c: ResponseCounts): { seen: string; toSee: string; impediments: string } {
+  return { seen: `Viste ${c.confirmed}`, toSee: `Da vedere ${c.pending}`, impediments: `Impedimenti ${c.declined}` };
 }
 
 export function responseCounts(rows: ReadonlyArray<{ response: CallupResponse }>): ResponseCounts {

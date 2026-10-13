@@ -1,7 +1,7 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { CalendarDays, Check, MapPin, Shirt, X } from "lucide-react";
-import { useState } from "react";
+import { CalendarDays, Check, MapPin, Shirt } from "lucide-react";
+import { useId, useState } from "react";
 
 import { AccessScreenPage, accessHead } from "@/components/scd/AccessScreen";
 import { Card, Chip, type ChipTone } from "@/components/scd/interior-ui";
@@ -10,7 +10,7 @@ import { PushCard } from "@/components/scd/PushCard";
 import { TransportRequestCard } from "@/components/scd/TransportRequestCard";
 import { EmptyState } from "@/components/scd/work-area-ui";
 import { getSession } from "@/lib/auth.functions";
-import { MY_RESPONSE_LABEL, romeDay, romeTime, type CallupResponse } from "@/lib/callups";
+import { FAMILY_CALLUP_COPY, MY_RESPONSE_LABEL, romeDay, romeTime, type CallupResponse } from "@/lib/callups";
 import { getMyCallups, respondCallup, type MyCallup } from "@/lib/callups.functions";
 import { CERT_LABEL, certificateState } from "@/lib/people";
 import { registrationLabel } from "@/lib/roster";
@@ -23,8 +23,9 @@ import { getFamilyTransport, type FamilyTransport } from "@/lib/transport-reques
 
 /**
  * Family area (UD-061, UD-062). Signed out: the access screen of the registry. Signed in: the caller's
- * own circle (themself + people of families where they are a guardian, r61) and their call-ups with
- * "Ci sarò" / "Non ci sarò" (r62). Only what the database functions return is shown.
+ * own circle (themself + people of families where they are a guardian, r61) and their call-ups (r62,
+ * UD-099): a call-up is mandatory, the family only takes notice ("Presa visione") or reports an
+ * impediment the mister decides on. Only what the database functions return is shown.
  */
 export const Route = createFileRoute("/famiglia")({
   loader: async () => {
@@ -44,7 +45,7 @@ function FamigliaRoute() {
   return <FamilyHome roles={data.roles} badge={data.badge} members={data.family.members} callups={data.callups} fees={data.fees} failed={data.family.state === "error"} transport={data.transport} awayMatches={data.awayMatches} />;
 }
 
-const TONE: Readonly<Record<CallupResponse, ChipTone>> = { CONFIRMED: "ok", DECLINED: "crit", PENDING: "warn" };
+const TONE: Readonly<Record<CallupResponse, ChipTone>> = { CONFIRMED: "ok", DECLINED: "warn", PENDING: "info" };
 
 function todayRome(): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Rome", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
@@ -64,13 +65,13 @@ function FamilyHome({ roles, badge, members, callups, fees, failed, transport, a
       roleLabel={badge ?? "Famiglia"}
       highlights={[
         { value: items.length, label: "convocazioni in arrivo" },
-        { value: pending, label: "da confermare" },
+        { value: pending, label: "da prendere visione" },
         { value: kids.length || null, label: "ragazzi collegati" },
       ]}
     >
       <div className="flex flex-col gap-[18px]">
         <PushCard />
-        <Card id="fam-convocazioni" title="Convocazioni" sub="Rispondi per ogni gara: il mister vede subito la risposta.">
+        <Card id="fam-convocazioni" title="Convocazioni" sub={FAMILY_CALLUP_COPY.cardSub}>
           <div className="flex flex-col gap-3 px-4 pb-4 sm:px-[18px]">
             {failed ? (
               <EmptyState title="Dati non disponibili">Lettura dal database non riuscita. Riprova tra poco.</EmptyState>
@@ -126,15 +127,20 @@ function CallupCard({ c, onAnswered }: { c: MyCallup; onAnswered: (r: CallupResp
   const answer = useServerFn(respondCallup);
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<string | null>(null);
+  const [reporting, setReporting] = useState(false);
+  const noteId = useId();
   const send = async (response: "CONFIRMED" | "DECLINED") => {
     setBusy(true);
     setNote(null);
     try {
       const res = await answer({ data: { callupId: c.callupId, response } });
       setNote(res.message);
-      if (res.ok) onAnswered(response);
+      if (res.ok) {
+        onAnswered(response);
+        setReporting(false);
+      }
     } catch {
-      setNote("Risposta non salvata, riprova.");
+      setNote("Non salvato, riprova.");
     } finally {
       setBusy(false);
     }
@@ -156,15 +162,33 @@ function CallupCard({ c, onAnswered }: { c: MyCallup; onAnswered: (r: CallupResp
         )}
         {c.kitNote && <li className="flex items-center gap-2"><Shirt className="size-4 flex-none text-[var(--in-info)]" aria-hidden="true" />{c.kitNote}</li>}
       </ul>
-      <div className="mt-3 grid grid-cols-2 gap-2">
-        <button type="button" disabled={busy} aria-pressed={c.response === "CONFIRMED"} onClick={() => void send("CONFIRMED")}
-          className={`scd-focus inline-flex h-12 items-center justify-center gap-2 rounded-[10px] text-[16px] font-semibold disabled:opacity-60 ${c.response === "CONFIRMED" ? "bg-[#0f7a28] text-white" : "border border-[#0f7a28] bg-white text-[#0e6b24]"}`}>
-          <Check className="size-[18px]" strokeWidth={2.4} aria-hidden="true" />Ci sarò
-        </button>
-        <button type="button" disabled={busy} aria-pressed={c.response === "DECLINED"} onClick={() => void send("DECLINED")}
-          className={`scd-focus inline-flex h-12 items-center justify-center gap-2 rounded-[10px] text-[16px] font-semibold disabled:opacity-60 ${c.response === "DECLINED" ? "bg-[#b42318] text-white" : "border border-[#b42318] bg-white text-[#9a1d14]"}`}>
-          <X className="size-[18px]" strokeWidth={2.4} aria-hidden="true" />Non ci sarò
-        </button>
+      <div className="mt-3 flex flex-col gap-1">
+        {c.response === "PENDING" && (
+          <button type="button" disabled={busy} onClick={() => void send("CONFIRMED")}
+            className="scd-focus inline-flex h-12 w-full items-center justify-center gap-2 rounded-[10px] bg-[#0f7a28] text-white text-[16px] font-semibold disabled:opacity-60" data-testid="callup-ack">
+            <Check className="size-[18px]" strokeWidth={2.4} aria-hidden="true" />{FAMILY_CALLUP_COPY.acknowledge}
+          </button>
+        )}
+        {reporting ? (
+          <div className="mt-1 rounded-[10px] border border-[var(--in-line)] bg-[#fff8ec] p-3" role="group" aria-labelledby={noteId}>
+            <p id={noteId} className="m-0 text-[14px] leading-snug">{FAMILY_CALLUP_COPY.reportNote}</p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <button type="button" disabled={busy} onClick={() => void send("DECLINED")}
+                className="scd-focus inline-flex h-11 items-center justify-center rounded-[10px] bg-[#9a1d14] px-4 text-[15px] font-semibold text-white disabled:opacity-60" data-testid="callup-report-confirm">
+                {FAMILY_CALLUP_COPY.reportConfirm}
+              </button>
+              <button type="button" disabled={busy} onClick={() => setReporting(false)}
+                className="scd-focus inline-flex h-11 items-center justify-center rounded-[10px] px-3 text-[15px] font-semibold text-[var(--in-sub)] disabled:opacity-60">
+                {FAMILY_CALLUP_COPY.reportCancel}
+              </button>
+            </div>
+          </div>
+        ) : c.response !== "DECLINED" ? (
+          <button type="button" disabled={busy} onClick={() => setReporting(true)}
+            className="scd-focus inline-flex h-11 items-center self-start rounded-[10px] px-1 text-[14.5px] font-semibold text-[var(--scd-blue)] underline underline-offset-2 disabled:opacity-60" data-testid="callup-report">
+            {FAMILY_CALLUP_COPY.report}
+          </button>
+        ) : null}
       </div>
       <p role="status" aria-live="polite" className="m-0 mt-2 min-h-[1.2em] text-[13.5px] text-[var(--in-sub)]">{note}</p>
     </article>

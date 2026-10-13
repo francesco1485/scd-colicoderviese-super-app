@@ -2330,6 +2330,28 @@
           "public pages use club crest only, guarded by public-crest-policy test (b5e6418, 2026-10-13)"
         ]
       }
+    },
+    {
+      "sourceDate": "2026-10-13",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-099",
+      "name": "CONVOCATION_IS_MANDATORY_NOT_RSVP",
+      "sourceQuoteFragments": [
+        "Le convocazioni delle squadre agonistiche non possono scegliere: sono convocati e basta. Devi conoscere queste cose, come funziona una società di 3° livello Élite, se no parti già con errori."
+      ],
+      "normalizedCommand": {
+        "rule": "A call-up of a competitive team in a 3rd-level Élite club is mandatory: the athlete is called up, full stop. It is never an RSVP and the family or athlete does not choose. The app offers only 'Presa visione' (acknowledgement) and 'Segnala un impedimento' (a justified absence communicated to the mister, who decides; the call-up stays valid; no health details in the app). The words 'Ci sarò' / 'Non ci sarò' are never used for call-ups; the fan button for attending a match as a spectator is 'Vengo a vedere'. Database unchanged: response_status PENDING = not seen yet, CONFIRMED = presa visione, DECLINED = impedimento segnalato (scd_respond_callup). Supersedes the RSVP wording of UD-062 (r62).",
+        "scope": "CONVOCAZIONI",
+        "status": "DELIVERED",
+        "delivered": [
+          "apps/superapp/src/lib/callups.ts: labels family (Convocato · da prendere visione / Presa visione / Impedimento segnalato) and mister (Non ancora vista / Vista / Impedimento segnalato), FAMILY_CALLUP_COPY, MISTER_CALLUP_COPY, responseSummary, respondedMessage, CALLUP_PUSH_TEXT; tests in callups.test.ts (no 'Ci sarò' in any call-up copy)",
+          "apps/superapp/src/routes/famiglia.tsx: one full-width 'Presa visione' button plus 'Segnala un impedimento' with a confirm step ('Conferma segnalazione'); the impediment link stays available after presa visione",
+          "apps/superapp/src/components/scd/CallupPanel.tsx: counts 'Viste X · Da vedere Y · Impedimenti Z', hint 'Le famiglie prendono visione dalla loro pagina.'",
+          "copy aligned in guida, direzione, privacy, secretariat desk ('convocazioni non ancora viste'), superapp-audiences config, a11y audit; fan button renamed 'Vengo a vedere' in HomeBlocks and Community",
+          "pending outside app scope: supabase/functions/callup-push body still says 'Rispondi \"Ci sarò\" nell'app' and must become CALLUP_PUSH_TEXT"
+        ]
+      }
     }
   ],
   "completionGate": {

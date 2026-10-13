@@ -66,7 +66,7 @@ function plural(n: number, one: string, many: string): string {
 export function deskLines(c: DeskCounts): DeskLine[] {
   const all: DeskLine[] = [
     { id: "cert_expired", count: c.cert_expired, tone: "urgent", href: "/segreteria/certificati", label: `${c.cert_expired} ${plural(c.cert_expired, "certificato scaduto", "certificati scaduti")}` },
-    { id: "callups_pending", count: c.callups_pending_72h, tone: "urgent", href: "/segreteria/persone", label: `${c.callups_pending_72h} ${plural(c.callups_pending_72h, "convocazione senza risposta", "convocazioni senza risposta")} per le gare delle prossime 72 ore` },
+    { id: "callups_pending", count: c.callups_pending_72h, tone: "urgent", href: "/segreteria/persone", label: `${c.callups_pending_72h} ${plural(c.callups_pending_72h, "convocazione non ancora vista", "convocazioni non ancora viste")} per le gare delle prossime 72 ore` },
     { id: "access_requests", count: c.access_requests_pending, tone: "todo", href: "/direzione/accessi", label: `${c.access_requests_pending} ${plural(c.access_requests_pending, "richiesta di accesso da esaminare", "richieste di accesso da esaminare")}` },
     { id: "people_pending", count: c.people_pending, tone: "todo", href: "/segreteria/persone?stato=pending", label: `${c.people_pending} ${plural(c.people_pending, "persona in attesa di conferma", "persone in attesa di conferma")}` },
     { id: "no_team", count: c.athletes_without_team, tone: "todo", href: "/segreteria/persone?squadra=nessuna", label: `${c.athletes_without_team} ${plural(c.athletes_without_team, "atleta senza squadra", "atleti senza squadra")}` },

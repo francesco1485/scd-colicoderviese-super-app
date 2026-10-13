@@ -38,7 +38,11 @@ const AGES: { key: string; label: string; see: Act[]; doo: Act[] }[] = [
       { icon: "🏟️", text: "La Prima Squadra al Campo 1", to: "/calendario" },
     ],
     doo: [
-      { icon: "✅", text: 'Premi "Ci sarò" sulla prossima gara', to: "/" },
+      {
+        icon: "✅",
+        text: 'Premi "Vengo a vedere" su una gara del club',
+        to: "/",
+      },
       { icon: "🏆", text: "Tornei ed eventi", to: "/eventi" },
     ],
   },
@@ -347,8 +351,8 @@ export function IdentityCard() {
             gioca il tuo campionato
           </h3>
           <p className="mt-2 text-[15px] leading-[1.4] text-[#dbe7ff]">
-            La tua identità SCD: avviso dei cambi, "Ci sarò", la tua squadra e
-            le tue foto partita.
+            La tua identità SCD: avviso dei cambi, "Vengo a vedere", la tua
+            squadra e le tue foto partita.
           </p>
         </div>
         <AvatarCardDemo />

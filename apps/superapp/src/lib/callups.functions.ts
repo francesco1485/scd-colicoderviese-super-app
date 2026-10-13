@@ -7,7 +7,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { sessionView } from "./auth.functions";
-import { asOutcome, asResponse, matchTitle, meetingAtLiteral, validateCallupInput, type CallupResponse, type SendOutcome } from "./callups";
+import { asOutcome, asResponse, matchTitle, meetingAtLiteral, respondedMessage, validateCallupInput, type CallupResponse, type SendOutcome } from "./callups";
 import { deliveryNote } from "./push";
 import { notifyCallups } from "./push.server";
 import { teamCodeForGroup } from "./roster";
@@ -166,8 +166,8 @@ export const respondCallup = createServerFn({ method: "POST" })
     z.object({ callupId: z.string().uuid(), response: z.enum(["CONFIRMED", "DECLINED"]) }).parse(d))
   .handler(async ({ data }): Promise<{ ok: boolean; message: string }> => {
     const c = await scope();
-    if (!c) return { ok: false, message: "Accedi per rispondere." };
+    if (!c) return { ok: false, message: "Accedi per prendere visione." };
     const { error } = await c.sb.rpc("scd_respond_callup", { p_organization_id: c.org.organizationId, p_callup_id: data.callupId, p_response: data.response });
-    if (error) return { ok: false, message: error.message.includes("already started") ? "La gara è già iniziata." : "Risposta non salvata, riprova." };
-    return { ok: true, message: data.response === "CONFIRMED" ? "Risposta inviata: ci sarò." : "Risposta inviata: non ci sarò." };
+    if (error) return { ok: false, message: error.message.includes("already started") ? "La gara è già iniziata." : "Non salvato, riprova." };
+    return { ok: true, message: respondedMessage(data.response) };
   });

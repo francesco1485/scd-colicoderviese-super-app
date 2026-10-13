@@ -11,7 +11,7 @@ export const Route = createFileRoute("/guida")({
   head: () => ({
     meta: [
       { title: "Come funziona l'app | S.C.D. ColicoDerviese" },
-      { name: "description", content: "Guida rapida all'app della S.C.D. ColicoDerviese per tifosi, soci, famiglie, atleti, mister e segreteria: accesso, convocazioni, Ci sarò, notifiche, certificati e distinta." },
+      { name: "description", content: "Guida rapida all'app della S.C.D. ColicoDerviese per tifosi, soci, famiglie, atleti, mister e segreteria: accesso, convocazioni e presa visione, notifiche, certificati e distinta." },
     ],
   }),
   component: Guida,
@@ -103,8 +103,8 @@ function Guida() {
         <Step n={4} icon={<BellRing className="size-5" />} title="Attiva le notifiche">
           Nella pagina Famiglia tocca "Attiva le notifiche": ti arriva un avviso quando il mister convoca. Solo convocazioni, niente pubblicità.
         </Step>
-        <Step n={5} icon={<ClipboardCheck className="size-5" />} title="Rispondi alla convocazione">
-          Tocca "Ci sarò" o "Non ci sarò". Puoi cambiare idea fino all'inizio della gara. Il mister vede subito la risposta.
+        <Step n={5} icon={<ClipboardCheck className="size-5" />} title="Prendi visione della convocazione">
+          La convocazione delle squadre agonistiche è un impegno: chi è convocato c'è. Tocca "Presa visione" per dire al mister che l'hai letta. Se c'è un impedimento vero, tocca "Segnala un impedimento" fino all'inizio della gara: la convocazione resta valida, il mister riceve la segnalazione e decide. Per motivi di salute non scrivere dettagli: parlane con il mister o con la segreteria.
         </Step>
       </Section>
 

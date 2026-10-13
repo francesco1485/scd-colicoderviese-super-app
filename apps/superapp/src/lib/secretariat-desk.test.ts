@@ -47,6 +47,6 @@ describe("deskLines", () => {
   });
   it("counts call-ups only when pending", () => {
     expect(deskLines({ ...zero, callups_total_72h: 12 })).toEqual([]);
-    expect(deskLines({ ...zero, callups_total_72h: 12, callups_pending_72h: 5 })[0]?.label).toContain("5 convocazioni senza risposta");
+    expect(deskLines({ ...zero, callups_total_72h: 12, callups_pending_72h: 5 })[0]?.label).toContain("5 convocazioni non ancora viste");
   });
 });
