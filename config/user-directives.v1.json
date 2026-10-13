@@ -2225,6 +2225,28 @@
           "r92 Fantacalcio SCD (/fantacalcio) + tabellino on Gestionale > Mister; decisions 2026-10-12: fantacalcio now, club prizes, free app rated 6+, no separate consents (account + automatic age rules, under 14 via family account), birthday wishes next (2026-10-12)"
         ]
       }
+    },
+    {
+      "sourceDate": "2026-10-13",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-095",
+      "name": "HOME_IS_THE_MASTER_BOARD_WITH_APP_PURPOSE",
+      "sourceQuoteFragments": [
+        "No assolutamente molto brutta la prima pagina di tutto",
+        "O fai qualcosa di buono o lasci come prima era che meglio",
+        "Manca proprio idea generale, manca importanza di una app che ha la funzione per cui è nata",
+        "Devi creare e avere come idea la mia poi la migliori"
+      ],
+      "normalizedCommand": {
+        "rule": "The public home must follow the printed master board (VR-009) as the base idea and then improve it: big club header (official crest, S.C.D. COLICODERVIESE, Lario, Sky), the app's purpose stated up front, quick icons, next match, weekly tiles, area entries, upcoming games, sponsors, Mondo Colico; the social feed goes below, never replaces the board. Same rule for the presentation cover.",
+        "scope": "HOME_AND_PRESENTATION",
+        "status": "DELIVERED",
+        "delivered": [
+          "home rebuilt on the board with purpose sentence and Entra nella tua area (ce750e1, 2026-10-13)",
+          "presentation cover on the board graphics (2026-10-13)"
+        ]
+      }
     }
   ],
   "completionGate": {
