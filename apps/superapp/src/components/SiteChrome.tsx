@@ -685,7 +685,7 @@ export function SiteFooter() {
               <p className="m-0">
                 <a
                   href={`mailto:${CLUB_PROFILE.contacts.email}`}
-                  className="scd-focus select-text underline decoration-white/30 underline-offset-4 hover:decoration-white"
+                  className="scd-focus inline-flex min-h-11 select-text items-center underline decoration-white/30 underline-offset-4 hover:decoration-white"
                 >
                   {CLUB_PROFILE.contacts.email}
                 </a>
@@ -704,7 +704,7 @@ export function SiteFooter() {
                   <li key={n.to + n.label}>
                     <Link
                       to={n.to}
-                      className="scd-focus inline-flex min-h-11 items-center text-[14px] text-white/85 hover:text-white"
+                      className="scd-focus inline-flex min-h-11 min-w-11 items-center text-[14px] text-white/85 hover:text-white"
                     >
                       {n.label}
                     </Link>
@@ -747,7 +747,7 @@ export function SiteFooter() {
             <span className="flex flex-wrap gap-x-5">
               <a
                 href="/privacy"
-                className="scd-focus inline-flex min-h-11 items-center underline decoration-white/30 underline-offset-4 hover:text-white"
+                className="scd-focus inline-flex min-h-11 min-w-11 items-center underline decoration-white/30 underline-offset-4 hover:text-white"
               >
                 Privacy
               </a>

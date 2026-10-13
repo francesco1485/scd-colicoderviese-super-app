@@ -36,6 +36,15 @@ describe("touch targets of audited controls", () => {
     expect(read("../components/SiteChrome.tsx")).not.toMatch(/aria-controls="sa-menu"/);
   });
 
+  it("footer links stay at least 44 px tall and wide (short labels such as 'Eventi', 'Privacy', the club e-mail)", () => {
+    const src = read("../components/SiteChrome.tsx");
+    const footer = src.slice(src.indexOf('data-testid="site-footer"'));
+    const mail = footer.match(/href=\{`mailto:[^`]*`\}\s*className="([^"]*)"/);
+    expect(mail?.[1]).toMatch(/\binline-flex\b.*\bmin-h-11\b/);
+    expect(footer).toMatch(/className="scd-focus inline-flex min-h-11 min-w-11 items-center text-\[14px\]/);
+    expect(footer).toMatch(/href="\/privacy"\s*className="scd-focus inline-flex min-h-11 min-w-11 /);
+  });
+
   it("the 'Presa visione' green keeps AA contrast with white text", () => {
     const src = read("../routes/famiglia.tsx");
     expect(src).not.toContain("#128a2e");

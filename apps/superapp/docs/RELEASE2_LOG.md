@@ -17,6 +17,7 @@ One backlog item per night, finished to a verifiable boundary. Status: `done`, `
 | 5a | Public hall (chi siamo, squadre, official results links, contatti) | done | 8ffd491 | 2026-10-11 |
 | 8 | Impianti follow-ups from benchmark: one request for pitch+rooms+lights, state history (who/when), day view prenotato/disponibile/rilasciato, quadro trainings in pitch capacity check | todo | | |
 | L1 | Launch performance: Lighthouse mobile/desktop on /, /guida, /accedi, /calendario, /squadre; fixes; `docs/LAUNCH_QUALITY.md` | done | see L1 entry | 2026-10-12 |
+| L4 | Presentation screenshots 390×844 / 1440×900 of the main flows, fixture data only, `docs/presentation/` | done | see L4 entry | 2026-10-13 |
 
 ## 2026-10-11 · Item 1 · Foundations · done
 
@@ -383,3 +384,17 @@ prossimi impegni e "ci sarò" in primo piano). Desktop invariato.
 - Badge annate: resa 96 px WebP senza perdita servita al posto dei PNG 512 px (asset.json con `derived_from`), ~2,9 MB → ~163 KB;
   originali invariati. Schermate 390×844 e 1440×900 di /allenamenti e /core/impianti-calendari: badge nitidi, nessuno scorrimento orizzontale.
 - Aperto (Direzione): stato ufficiale dei badge annate (PENDING_VERIFICATION); file vettoriali ufficiali di stemma e sponsor da recuperare.
+
+## L4 — Schermate per la presentazione ufficiale · 2026-10-13
+- Stato: DONE su staging/superapp (SHA nel commit che aggiunge questa voce). Prima cattura il 12/10 (fc5a220, 3b2fc8c) senza voce
+  nel registro e senza distinta: completata oggi.
+- Nuovo `scripts/presentation-shots.mjs`: 10 flussi × 2 formati (390×844, 1440×900) in `docs/presentation/`, risposta cookie
+  "solo tecnici" preimpostata, sezione portata in vista, uscita con errore se un flusso non si apre o scorre in orizzontale.
+- Nuove: `mister-distinta-{m,d}`, `mister-convocazione-d`. Ricatturate: home, installa, guida, accedi (ora e-mail + password
+  "Ricordami", come a database collegato), calendario, squadre, famiglia ("Presa visione"), mister, certificati.
+- Dati di prova spostati in `scripts/lib/private-fixtures.mjs`, condivisi con `scripts/a11y-audit.mjs` (nomi inventati,
+  solo adulti, scritture bloccate); aggiunta la sessione "non entrato a database collegato" per /accedi.
+- Regressione L2 trovata rifacendo l'audit: 3 bersagli sotto 44 px nel piè di pagina (e-mail della società 17 px, "Eventi"
+  39 px, "Privacy" 40 px) → `SiteChrome.tsx` min-h-11/min-w-11, guardia in `touch-targets.test.ts` (9 test). Audit di
+  nuovo a 0 violazioni axe e 0 bersagli piccoli. Suite 977.
+- Aperto: `installa-*` va ricatturata sul dominio definitivo; `persone-*` restano del 12/10 (nessun dato di prova nello script).

@@ -125,6 +125,10 @@ accessibili o ordine dei titoli.
 - Pagine non incluse in questo giro (home, calendario, squadre, impianti): stessi componenti di testata e piè di pagina già
   corretti; vanno aggiunte allo script in un prossimo passaggio.
 
+- 13/10/2026: rifatto l'audit durante L4, 3 bersagli del piè di pagina erano tornati sotto 44 px (e-mail della società,
+  "Eventi", "Privacy"); corretti in `SiteChrome.tsx`, di nuovo 0 violazioni e 0 bersagli piccoli. I dati di prova ora stanno
+  in `scripts/lib/private-fixtures.mjs`.
+
 ### Ripetere la verifica
 `cd apps/superapp && npm run build && PORT=4173 node .output/server/index.mjs &` poi
 `A11Y_BASE_URL=http://localhost:4173 A11Y_OUT=/tmp/a11y node scripts/a11y-audit.mjs` (`A11Y_SHOTS=1` salva le schermate,
