@@ -403,7 +403,8 @@
       "KIT_TEXTURE": "TEXTURE",
       "INTERNAL_BADGE": "CUTOUT",
       "LED_DEMO_VIDEO": "VIDEO",
-      "VIDEO_POSTER": "PHOTO"
+      "VIDEO_POSTER": "PHOTO",
+      "LED_BOARD_STILL": "PHOTO"
     },
     "runtime_roots": [
       "apps/superapp/public/media/",
@@ -2065,6 +2066,30 @@
       "transform": "frame at 6.6 s (full message on the board), 1280x720 Lanczos, WebP q80",
       "use": "/sponsor section 'Il tuo marchio sul ledwall del campo' (src/components/LedwallFacsimile.tsx)",
       "note": "demo, not a contract claim: the example sponsor shown on the LED board is HDI Maglia Assicurazioni; the page labels it 'Fac-simile · esempio di rotazione' and never states it is a club sponsor",
+      "verified_at": "2026-10-13"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/ledwall-board-empty-1280.webp",
+      "class": "LED_BOARD_STILL",
+      "status": "VERIFIED",
+      "asset_decision": "KEEP_ENHANCE",
+      "source": "pitch still from the Direzione LED material of 2026-10-13 (same camera and framing as 'SFONDO_UFFICIALE_CAMPO_PREVIEW.mp4', the fac-simile video): 1920x1080 frame with the pitch-side LED board shown empty (plain white), prepared in session for the in-app LED wall preview",
+      "git_blob_sha": "e0d30139a1c128a40f50d562ee2e5c0dd83cea42",
+      "transform": "Lanczos resize of the 1920x1080 master to 1280x720, WebP lossy",
+      "use": "LED wall preview (src/components/LedwallRotator.tsx): /sponsor every day, compact on the public home on LEDWALL_HOME_DAYS; board rectangle x 246-1718, y 422-540 of the 1920x1080 frame (LEDWALL_BOARD_PX)",
+      "note": "composite preview, not footage: the partner logos are overlaid in the app on the empty board and the page labels it 'Anteprima ledwall · i partner a rotazione'; no claim about the real board schedule",
+      "verified_at": "2026-10-13"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/ledwall-board-empty-1920.webp",
+      "class": "LED_BOARD_STILL",
+      "status": "VERIFIED",
+      "asset_decision": "KEEP_ENHANCE",
+      "source": "pitch still from the Direzione LED material of 2026-10-13 (same camera and framing as 'SFONDO_UFFICIALE_CAMPO_PREVIEW.mp4', the fac-simile video): 1920x1080 frame with the pitch-side LED board shown empty (plain white), prepared in session for the in-app LED wall preview",
+      "git_blob_sha": "248c93787f45ad225e3f53a3745d665ecf39dc98",
+      "transform": "1920x1080 master, WebP lossy (no logo or mark in the frame)",
+      "use": "LED wall preview (src/components/LedwallRotator.tsx): /sponsor every day, compact on the public home on LEDWALL_HOME_DAYS; board rectangle x 246-1718, y 422-540 of the 1920x1080 frame (LEDWALL_BOARD_PX)",
+      "note": "composite preview, not footage: the partner logos are overlaid in the app on the empty board and the page labels it 'Anteprima ledwall · i partner a rotazione'; no claim about the real board schedule",
       "verified_at": "2026-10-13"
     }
   ],

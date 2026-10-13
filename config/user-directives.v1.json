@@ -2554,6 +2554,38 @@
           "config/scd-assets.v1.json (INTERNAL_BADGE, LED_DEMO_VIDEO, VIDEO_POSTER, rule VIDEO)"
         ]
       }
+    },
+    {
+      "sourceDate": "2026-10-13",
+      "sourceTime": "17:38",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-107",
+      "name": "LEDWALL_ALL_PARTNERS_ROTATION",
+      "sourceQuoteFragments": [
+        "si dovrebbero preparare a tutti i nostri partner e a rotazione farli girare sulla pagina vetrina e eventualmente qualche volta anche su pagina iniziale"
+      ],
+      "normalizedCommand": {
+        "rule": "Every current club partner (SPONSORS) rotates on the real pitch-side LED board in an in-app LED wall preview: always on the sponsor showcase page /sponsor ('pagina vetrina'), and on some days also on the public home ('pagina iniziale'). Daily order seeded by the Rome date (same order for everybody on a day, each partner opens the rotation once every SPONSORS.length days, every partner once per cycle), 4 s per slot, a club slot 'PARTNER UFFICIALE · S.C.D. COLICODERVIESE 2026/27' every 6 partners. Home days are one config constant (LEDWALL_HOME_DAYS: Monday, Thursday and days with a home game in the public calendar), changeable by the Direzione.",
+        "scope": "SPONSOR_SHOWCASE_AND_PUBLIC_HOME",
+        "constraints": [
+          "never an invented partner name: alt text and announcements use sponsorLabel (neutral label when the name is unverified)",
+          "honest visible label 'Anteprima ledwall · i partner a rotazione' (composite preview, not footage)",
+          "pause on hover/focus, pause button, no auto-advance with prefers-reduced-motion; aria-live only after manual previous/next",
+          "home: below the first screen, next to the partner area, with 'Diventa partner' to /sponsor; never in internal pages",
+          "the UD-106 fac-simile video stays on /sponsor as secondary 'Guarda il video fac-simile', loaded only on click",
+          "same graphic settings as the public pages (Direzione: 'stesse impostazioni grafiche da per tutto')"
+        ],
+        "status": "IMPLEMENTED_BRANCH_AGENT_LEDROT",
+        "delivered": [
+          "apps/superapp/src/lib/ledwall-rotation.ts (+ tests)",
+          "apps/superapp/src/components/LedwallRotator.tsx (+ tests), LedwallFacsimile.tsx, routes/sponsor.tsx",
+          "apps/superapp/src/components/home/PublicHome.tsx (HomeLedwall), routes/index.tsx (ledwallDay)",
+          "apps/superapp/src/styles.css (.scd-ledrot)",
+          "apps/superapp/public/media/sponsor/ledwall-board-empty-1280.webp, -1920.webp",
+          "config/scd-assets.v1.json (LED_BOARD_STILL)"
+        ]
+      }
     }
   ],
   "completionGate": {

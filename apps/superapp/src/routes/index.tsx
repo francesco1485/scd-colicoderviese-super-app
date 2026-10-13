@@ -55,6 +55,8 @@ export const Route = createFileRoute("/")({
         press: press.items,
         calendar,
         initiatives: initiatives.items,
+        // Server Rome day (QA day honoured only outside production): decides the LED wall days on the home.
+        ledwallDay: initiatives.today,
         serverNow,
         today,
       };
@@ -105,6 +107,7 @@ function Home() {
       press={data.press}
       calendar={data.calendar}
       initiatives={data.initiatives}
+      ledwallDay={data.ledwallDay}
       nowMs={data.serverNow}
       today={data.today}
     />

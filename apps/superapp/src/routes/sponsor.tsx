@@ -6,8 +6,14 @@ import { LedwallFacsimile } from "@/components/LedwallFacsimile";
 import { PartnerForm } from "@/components/PartnerForm";
 import { PageHero, heroOverlapCls } from "@/components/ui-kit";
 import { SPONSOR_ASSETS, SPONSOR_PACKAGES } from "@/lib/catalog";
+import { romeDay } from "@/lib/public-window";
 
 export const Route = createFileRoute("/sponsor")({
+  // Server time and Rome day for the LED wall preview: rendered on the server, reused on hydration (same first slot).
+  loader: () => {
+    const nowMs = Date.now();
+    return { nowMs, day: romeDay(nowMs) };
+  },
   head: () => ({
     meta: [
       { title: "Diventa Sponsor — Commercial Hub | SCD ColicoDerviese" },
@@ -20,6 +26,7 @@ export const Route = createFileRoute("/sponsor")({
 });
 
 function Sponsor() {
+  const { nowMs, day } = Route.useLoaderData();
   const [pick, setPick] = useState<string | undefined>();
   return (
     <main>
@@ -41,7 +48,7 @@ function Sponsor() {
         ))}
       </section>
 
-      <LedwallFacsimile onRequest={() => setPick("led")} />
+      <LedwallFacsimile onRequest={() => setPick("led")} day={day} nowMs={nowMs} />
 
       <section className="mx-auto mt-14 max-w-6xl px-4">
         <p className="eyebrow">Pacchetti</p>

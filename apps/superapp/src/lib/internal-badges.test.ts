@@ -2,7 +2,8 @@ import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
-import { LEDWALL_FACSIMILE, mayAutoplay } from "@/components/LedwallFacsimile";
+import { LEDWALL_FACSIMILE } from "@/components/LedwallFacsimile";
+import { mayAnimate } from "./ledwall-rotation";
 import { findArea } from "./areas";
 import { readImageInfo, type AssetRegistry } from "./asset-format";
 import { BADGED_AREAS, INTERNAL_BADGES, areaBadgeFor, lineBadgeFor, normaliseLine } from "./internal-badges";
@@ -176,10 +177,15 @@ describe("ledwall fac-simile (sponsor web link)", () => {
     expect(section).toContain('preload="metadata"');
   });
 
-  it("autoplay only without prefers-reduced-motion", () => {
+  it("motion only without prefers-reduced-motion (LED wall preview; the video waits for a click)", () => {
     const win = (reduce: boolean) => ({ matchMedia: (q: string) => ({ matches: reduce && q.includes("reduce") }) as MediaQueryList });
-    expect(mayAutoplay(win(false))).toBe(true);
-    expect(mayAutoplay(win(true))).toBe(false);
-    expect(mayAutoplay(undefined)).toBe(false);
+    expect(mayAnimate(win(false))).toBe(true);
+    expect(mayAnimate(win(true))).toBe(false);
+    expect(mayAnimate(undefined)).toBe(false);
+    const section = readFileSync(resolve(APP, "src/components/LedwallFacsimile.tsx"), "utf8");
+    expect(section).not.toMatch(/autoPlay/);
+    // The <video> (and so any download) exists only after the visitor opens it.
+    expect(section).toMatch(/open \? \(\s*<video/);
+    expect(section).toContain("Guarda il video fac-simile");
   });
 });

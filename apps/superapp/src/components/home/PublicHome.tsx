@@ -39,6 +39,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 
+import { LedwallRotator } from "@/components/LedwallRotator";
 import { ClubCrestOfficial } from "@/components/SiteChrome";
 import { KitTexture } from "@/components/scd/kit-texture";
 import { ClubCredentials, LogoTile, SponsorLogo } from "@/components/scd/Logos";
@@ -72,6 +73,7 @@ import { publicTeamCrest } from "@/lib/team-crest";
 import { addDays } from "@/lib/board-data";
 import type { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 import { calendarToWeekItems, type WeekItem } from "@/lib/home-week";
+import { hasHomeMatch, showLedwallOnHome } from "@/lib/ledwall-rotation";
 import { itemState, orderTeams, startMs, type Team } from "@/lib/universe";
 
 type PublicCalendar = Awaited<ReturnType<typeof getPublicCalendarSnapshot>>;
@@ -723,6 +725,48 @@ function Partners({ today }: { today: string }) {
   );
 }
 
+/* ------------------------------------------------------ LED wall (UD-107) */
+
+/**
+ * Compact LED wall on the home, only on the LED wall days (LEDWALL_HOME_DAYS: Monday, Thursday and home-game days).
+ * Placed with the partners, far below the first screen; the sponsor page shows it every day.
+ */
+function HomeLedwall({ day, nowMs }: { day: string; nowMs: number }) {
+  return (
+    <section
+      aria-labelledby="ledwall-home-t"
+      className={`${WRAP} pt-8 lg:pt-12`}
+      data-testid="home-ledwall"
+    >
+      <div className="grid items-center gap-4 rounded-[16px] bg-white p-4 shadow-[0_1px_2px_rgb(11_42_91/0.06),0_8px_24px_-12px_rgb(11_42_91/0.25)] lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-6 lg:p-5">
+        <LedwallRotator day={day} nowMs={nowMs} variant="compact" />
+        <div className="grid gap-2 lg:pr-2">
+          <span className="w-fit rounded-full bg-[#0b2a5b] px-2.5 py-1 text-[11px] font-extrabold uppercase leading-none tracking-[0.06em] text-[#ffd600]">
+            Oggi sul ledwall
+          </span>
+          <h2
+            id="ledwall-home-t"
+            className="m-0 font-uv text-[24px] uppercase leading-[0.95] text-[#0b2a5b] sm:text-[26px] lg:text-[30px]"
+          >
+            I nostri partner in campo
+          </h2>
+          <p className="m-0 text-[14.5px] leading-snug text-[#4a5d7a]">
+            Tutti i partner della stagione 2026/27 a rotazione sul ledwall a bordo campo.
+          </p>
+          <Link
+            to="/sponsor"
+            className="scd-focus mt-1 inline-flex min-h-11 w-fit items-center gap-1 rounded-md text-[15px] font-bold text-[#1556c4]"
+            data-testid="home-ledwall-cta"
+          >
+            Diventa partner
+            <ArrowRight className="size-4" aria-hidden="true" />
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ------------------------------------------------------- link accordions */
 
 function LinkGroups() {
@@ -1145,15 +1189,29 @@ export function PublicHome({
   press,
   calendar,
   initiatives = [],
+  ledwallDay,
   nowMs,
   today,
 }: {
   press: readonly PressItem[];
   calendar: PublicCalendar;
   initiatives?: readonly Initiative[];
+  /** Server Rome day for the LED wall days (defaults to today). */
+  ledwallDay?: string;
   nowMs: number;
   today: string;
 }) {
+  const ledDay = ledwallDay ?? today;
+  const ledOnHome = useMemo(
+    () =>
+      showLedwallOnHome(ledDay, {
+        homeMatch: hasHomeMatch(
+          calendarToWeekItems(calendar.events, calendar.groups),
+          ledDay,
+        ),
+      }),
+    [calendar, ledDay],
+  );
   return (
     <main
       data-screen="home"
@@ -1171,6 +1229,7 @@ export function PublicHome({
       <JoinBanner />
       <Trust />
       <WeekNews press={press} nowMs={nowMs} today={today} />
+      {ledOnHome && <HomeLedwall day={ledDay} nowMs={nowMs} />}
       <Partners today={today} />
       <LinkGroups />
     </main>
