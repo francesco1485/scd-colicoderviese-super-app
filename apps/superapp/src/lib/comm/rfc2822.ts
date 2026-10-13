@@ -1,6 +1,7 @@
 /**
  * RFC 2822 / 5322 message builder and Gmail message parser for the Posta del club (r95). Pure: no network.
- * Outgoing: text/plain UTF-8, base64 body, RFC 2047 encoded headers, Reply-To on the club mailbox, X-SCD-Message-Id.
+ * Outgoing: text/plain UTF-8 (or multipart/alternative plain + HTML), base64 bodies, RFC 2047 encoded headers, Reply-To
+ * on the club mailbox, X-SCD-* headers. The same bytes go through either transport (Gmail REST or SMTP).
  * Incoming: Gmail API `users.messages.get?format=full` JSON → the payload of scd_comm_record_inbound.
  */
 
@@ -24,6 +25,12 @@ export interface OutgoingMail {
   date?: Date;
   /** Extra X- headers, e.g. X-SCD-Message-Id. */
   headers?: Record<string, string>;
+  /** Optional HTML alternative of `body`: the message becomes multipart/alternative (plain first, HTML second). */
+  html?: string | null;
+  /** SMTP hands the message over as-is, so Bcc must live only in the envelope, never in the headers. */
+  omitBccHeader?: boolean;
+  /** Fixed MIME boundary (tests); random otherwise. */
+  boundary?: string;
 }
 
 const CRLF = "\r\n";
@@ -80,14 +87,18 @@ export function rfcDate(d: Date): string {
   return `${days[d.getUTCDay()]}, ${p(d.getUTCDate())} ${months[d.getUTCMonth()]} ${d.getUTCFullYear()} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}:${p(d.getUTCSeconds())} +0000`;
 }
 
-/** The full message with CRLF line ends. Body: UTF-8, base64 in 76-character lines. */
+function base64Lines(text: string): string {
+  return utf8Base64(text.replace(/\r?\n/g, CRLF)).replace(/.{1,76}/g, (l) => `${l}${CRLF}`);
+}
+
+/** The full message with CRLF line ends. Bodies: UTF-8, base64 in 76-character lines. */
 export function buildRawMessage(m: OutgoingMail): string {
   if (m.to.length === 0) throw new Error("no recipient");
   const headers: string[] = [];
   headers.push(`From: ${formatAddress(m.from)}`);
   headers.push(`To: ${m.to.map((e) => formatAddress({ email: e })).join(", ")}`);
   if (m.cc && m.cc.length) headers.push(`Cc: ${m.cc.map((e) => formatAddress({ email: e })).join(", ")}`);
-  if (m.bcc && m.bcc.length) headers.push(`Bcc: ${m.bcc.map((e) => formatAddress({ email: e })).join(", ")}`);
+  if (m.bcc && m.bcc.length && !m.omitBccHeader) headers.push(`Bcc: ${m.bcc.map((e) => formatAddress({ email: e })).join(", ")}`);
   if (m.replyTo) headers.push(`Reply-To: ${formatAddress(m.replyTo)}`);
   headers.push(`Subject: ${encodeHeaderWord(m.subject)}`);
   headers.push(`Date: ${rfcDate(m.date ?? new Date())}`);
@@ -100,10 +111,16 @@ export function buildRawMessage(m: OutgoingMail): string {
     headers.push(`${k}: ${sanitizeHeader(v)}`);
   }
   headers.push("MIME-Version: 1.0");
-  headers.push('Content-Type: text/plain; charset="UTF-8"');
-  headers.push("Content-Transfer-Encoding: base64");
-  const body = utf8Base64(m.body.replace(/\r?\n/g, CRLF)).replace(/.{1,76}/g, (l) => `${l}${CRLF}`);
-  return `${headers.join(CRLF)}${CRLF}${CRLF}${body}`;
+  if (!m.html) {
+    headers.push('Content-Type: text/plain; charset="UTF-8"');
+    headers.push("Content-Transfer-Encoding: base64");
+    return `${headers.join(CRLF)}${CRLF}${CRLF}${base64Lines(m.body)}`;
+  }
+  const boundary = sanitizeHeader(m.boundary ?? `scd-alt-${globalThis.crypto.randomUUID()}`).replace(/[^A-Za-z0-9'()+_,./:=?-]/g, "");
+  headers.push(`Content-Type: multipart/alternative; boundary="${boundary}"`);
+  const part = (type: string, text: string) =>
+    `--${boundary}${CRLF}Content-Type: ${type}; charset="UTF-8"${CRLF}Content-Transfer-Encoding: base64${CRLF}${CRLF}${base64Lines(text)}`;
+  return `${headers.join(CRLF)}${CRLF}${CRLF}${part("text/plain", m.body)}${part("text/html", m.html)}--${boundary}--${CRLF}`;
 }
 
 /** Gmail `raw` field: base64url without padding. */
@@ -199,6 +216,8 @@ export interface InboundPayload {
   attachments: number;
   receivedAt: string | null;
   labels: string[];
+  /** Message-IDs of the References header (used to match replies; never stored). */
+  references?: string[];
 }
 
 function header(part: GmailPart | undefined, name: string): string | null {
@@ -267,6 +286,7 @@ export function parseGmailMessage(msg: GmailMessageJson): InboundPayload | null 
     gmailThreadId: msg.threadId ?? null,
     rfcMessageId: clean(header(p, "Message-ID") ?? header(p, "Message-Id")),
     inReplyTo: clean(header(p, "In-Reply-To")),
+    references: (header(p, "References") ?? "").match(/<[^<>\s]+>/g)?.map((x) => x.slice(1, -1)) ?? [],
     from: from.email,
     fromName: from.name ?? null,
     to: parseAddressList(header(p, "To")).map((a) => a.email),

@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { UsersRound } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Mail, MailPlus, UsersRound } from "lucide-react";
 import { useState, type ReactNode } from "react";
 
 import { Card, SourceLine } from "@/components/scd/interior-ui";
@@ -59,6 +59,15 @@ function NameList({ names, tone }: { names: readonly string[]; tone: "ok" | "war
           <span className={`mt-0.5 block text-[13px] ${tone === "ok" ? "text-[var(--in-ok)]" : "text-[var(--in-warn)]"}`}>
             {tone === "ok" ? "Contratto attivo" : "Scaduto, da rinnovare"}
           </span>
+          <Link
+            to="/gestionale/posta"
+            search={{ scrivi: "sponsor", nome: n }}
+            className="scd-focus mt-2 inline-flex min-h-10 items-center gap-1.5 rounded-[9px] border border-[var(--in-line)] bg-[#f7fbff] px-2.5 text-[13.5px] font-semibold text-[var(--in-info)]"
+            aria-label={`Scrivi allo sponsor ${n}`}
+            data-testid="crm-write-sponsor"
+          >
+            <Mail className="size-4" aria-hidden="true" /> Scrivi allo sponsor
+          </Link>
         </li>
       ))}
     </ul>
@@ -99,6 +108,20 @@ function CrmPage({ preview }: { preview: boolean }) {
 
           <div role="tabpanel" id={`crm-panel-${tab}`} aria-labelledby={`crm-tab-${tab}`} className="mt-4">
             {tab === "sponsor" ? (
+              <>
+              <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-2">
+                <Link
+                  to="/gestionale/posta"
+                  search={{ scrivi: "sponsor" }}
+                  className="scd-focus inline-flex min-h-11 items-center justify-center gap-2 rounded-[10px] bg-[var(--in-action)] px-4 text-[15px] font-semibold text-[var(--in-ink)]"
+                  data-testid="crm-write-all"
+                >
+                  <MailPlus className="size-4" aria-hidden="true" /> Scrivi a tutti i partner
+                </Link>
+                <span className="text-[13.5px] leading-snug text-[var(--in-sub)]">
+                  Parte da sportclubcolico@gmail.com con il tuo nome; una mail separata per ogni partner, le risposte tornano nella Posta del club.
+                </span>
+              </div>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 2xl:grid-cols-4" data-testid="crm-pipeline">
                 <Column title="Da contattare" count={P.prospects}>
                   <EmptyState title="Elenco da importare">I target arriveranno dal Master Sponsor e dal MASTER CONTATTI, senza contarli a mano.</EmptyState>
@@ -113,6 +136,7 @@ function CrmPage({ preview }: { preview: boolean }) {
                   <NameList names={P.expiredToRenew} tone="warn" />
                 </Column>
               </div>
+              </>
             ) : (
               <Card>
                 <div className="p-4 sm:p-[18px]">

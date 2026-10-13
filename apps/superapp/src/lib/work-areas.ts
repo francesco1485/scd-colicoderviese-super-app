@@ -239,7 +239,7 @@ export const WORK_AREAS: Readonly<Record<WorkAreaId, WorkAreaConfig>> = {
   },
   "posta-collega": {
     id: "posta-collega", label: "Collega la casella della società", path: pathOf("posta-collega"), railId: "direzione",
-    description: "Collegamento di sportclubcolico@gmail.com alla Posta del club con Google OAuth e interruttore dell'invio. Solo Direzione.",
+    description: "Collegamento di sportclubcolico@gmail.com alla Posta del club con una password per le app di Google (o OAuth per i tecnici) e interruttore dell'invio. Solo Direzione.",
     sources: ["posta", "supabase", "inserimenti"],
     insertRoles: ["Direzione"],
   },

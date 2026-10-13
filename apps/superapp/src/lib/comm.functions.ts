@@ -1,8 +1,9 @@
 /**
  * Posta del club on the server (r95, UD-101). Every read and write goes through the SECURITY DEFINER functions of
  * migration r95 with the caller's own session (offices only; RISERVATO only for Direzione + the owning office).
- * The Gmail sync runs with the service key and only from runCommSyncNow (Direzione, checked on the server) or the
- * cron endpoint; no credential ever reaches the browser.
+ * The mailbox sync runs with the service key and only from the Direzione's verification (never sends), the staff's
+ * stale-refresh of the inbox (refreshCommMailbox) or the cron endpoint; no credential ever reaches the browser.
+ * Transport: OAuth Gmail REST or Google app password (SMTP + IMAP), chosen by the server environment (transport.ts).
  */
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
@@ -20,7 +21,9 @@ import {
   type ResolvePreview,
   type ThreadDetail,
 } from "./comm/rules";
+import { sponsorComposerSeed, type SponsorSeed } from "./comm/sponsor";
 import { runCommSyncForOrg, serviceSupabase } from "./comm/sync.server";
+import { TRANSPORT_MESSAGE, appPasswordEnv, selectTransportMode, type TransportCode, type TransportMode } from "./comm/transport";
 import { serverSupabase } from "./supabase.server";
 
 async function context() {
@@ -36,11 +39,12 @@ export interface CommOutcome {
   threadId?: string;
   messageId?: string;
   recipients?: number;
+  contactId?: string;
 }
 
 function outcome(data: unknown, error: unknown, okMessage: string): CommOutcome {
   if (error) return { ok: false, message: commError(null) };
-  const r = (data ?? {}) as { ok?: boolean; code?: string; threadId?: string; messageId?: string; recipients?: number };
+  const r = (data ?? {}) as { ok?: boolean; code?: string; threadId?: string; messageId?: string; recipients?: number; contactId?: string };
   if (!r.ok) return { ok: false, message: commError(r.code), ...(r.code ? { code: r.code } : {}) };
   return {
     ok: true,
@@ -48,6 +52,7 @@ function outcome(data: unknown, error: unknown, okMessage: string): CommOutcome 
     ...(r.threadId ? { threadId: r.threadId } : {}),
     ...(r.messageId ? { messageId: r.messageId } : {}),
     ...(typeof r.recipients === "number" ? { recipients: r.recipients } : {}),
+    ...(r.contactId ? { contactId: r.contactId } : {}),
   };
 }
 
@@ -267,30 +272,140 @@ export const setCommSending = createServerFn({ method: "POST" })
   });
 
 export const SYNC_CODE: Readonly<Record<string, string>> = {
-  NOT_CONFIGURED: "Mancano le variabili Gmail sul server: segui i cinque passi.",
-  TOKEN_REFUSED: "Google ha rifiutato le credenziali: rigenera il token di aggiornamento (passo 4).",
-  WRONG_ACCOUNT: "Le credenziali sono di un'altra casella: rifai il passo 4 entrando con sportclubcolico@gmail.com.",
-  NETWORK: "Google non risponde in questo momento. Riprova tra poco.",
-  RATE_LIMITED: "Gmail ha chiesto di rallentare: il resto parte con il prossimo giro.",
-  HISTORY_RESET: "Collegata. Il punto di lettura della posta è stato riallineato.",
+  ...TRANSPORT_MESSAGE,
+  NOT_CONFIGURED: "Mancano le credenziali della casella sul server: segui i cinque passi (password per le app su Render).",
+  HISTORY_RESET: "Collegata. Il punto di lettura della posta è stato riallineato: da ora arrivano le mail nuove.",
+  NO_SERVICE_KEY: "Manca la chiave di servizio SCD_SUPABASE_SECRET_KEY sul server.",
 };
 
+function syncSummary(r: { received: number; sent: number; failed: number; stillQueued: number; capReached: boolean; code: string | null }): string[] {
+  const parts = [`Nuove mail ricevute: ${r.received}.`];
+  if (r.sent || r.failed) parts.push(`Inviate: ${r.sent}${r.failed ? `, non inviate: ${r.failed}` : ""}.`);
+  if (r.stillQueued) parts.push(`In coda: ${r.stillQueued}${r.capReached ? " (limite giornaliero raggiunto: ripartono domani)" : ""}.`);
+  return parts;
+}
+
+/** Kept for the cron-like manual run (sends queued mail when sending is on). The setup page uses verifyCommConnection. */
 export const runCommSyncNow = createServerFn({ method: "POST" }).handler(async (): Promise<CommOutcome> => {
   const { org, sb } = await context();
   if (!sb || !org) return NOT_SIGNED;
   const dir = await sb.rpc("scd_comm_is_direction", { p_organization_id: org.organizationId });
   if (dir.data !== true) return { ok: false, message: "Solo la Direzione può verificare il collegamento." };
   const service = serviceSupabase();
-  if (!service) return { ok: false, message: "Manca la chiave di servizio SCD_SUPABASE_SECRET_KEY sul server (passo 5).", code: "NO_SERVICE_KEY" };
+  if (!service) return { ok: false, message: SYNC_CODE["NO_SERVICE_KEY"] ?? "", code: "NO_SERVICE_KEY" };
   try {
     const r = await runCommSyncForOrg(service, org.organizationId);
-    if (!r.connected) return { ok: false, message: SYNC_CODE[r.code ?? ""] ?? "Collegamento non riuscito.", ...(r.code ? { code: r.code } : {}) };
-    const parts = [`Casella collegata.`, `Nuove mail ricevute: ${r.received}.`];
-    if (r.sent || r.failed) parts.push(`Inviate: ${r.sent}${r.failed ? `, non inviate: ${r.failed}` : ""}.`);
-    if (r.stillQueued) parts.push(`In coda: ${r.stillQueued}${r.capReached ? " (limite giornaliero raggiunto: ripartono domani)" : ""}.`);
+    if (!r.receiving) return { ok: false, message: SYNC_CODE[r.code ?? ""] ?? "Collegamento non riuscito.", ...(r.code ? { code: r.code } : {}) };
+    const parts = [r.connected ? "Casella collegata." : "Ricezione collegata, invio non disponibile.", ...syncSummary(r)];
     if (r.code && SYNC_CODE[r.code]) parts.push(SYNC_CODE[r.code] ?? "");
-    return { ok: true, message: parts.join(" ") };
+    return { ok: r.connected, message: parts.join(" ") };
   } catch {
     return { ok: false, message: "Verifica non riuscita. Riprova tra poco." };
   }
 });
+
+export interface VerifyCheck {
+  id: "smtp" | "imap" | "account";
+  label: string;
+  ok: boolean;
+  message: string;
+}
+
+export interface VerifyOutcome extends CommOutcome {
+  mode: TransportMode;
+  checks: VerifyCheck[];
+}
+
+/**
+ * "Verifica collegamento" (Direzione only). App password: SMTP login + IMAP login, nothing sent; then, when both
+ * work, one receive-only sync records the connection and the read point so the Direzione can switch sending on.
+ * OAuth: the same receive-only sync. Never sends an e-mail, whatever the state of the switch.
+ */
+export const verifyCommConnection = createServerFn({ method: "POST" }).handler(async (): Promise<VerifyOutcome> => {
+  const mode = selectTransportMode();
+  const fail = (message: string, checks: VerifyCheck[] = [], code?: string): VerifyOutcome => ({ ok: false, message, mode, checks, ...(code ? { code } : {}) });
+  const { org, sb } = await context();
+  if (!sb || !org) return fail(NOT_SIGNED.message);
+  const dir = await sb.rpc("scd_comm_is_direction", { p_organization_id: org.organizationId });
+  if (dir.data !== true) return fail("Solo la Direzione può verificare il collegamento.");
+  if (mode === "DISABLED") return fail(SYNC_CODE["NOT_CONFIGURED"] ?? "", [], "NOT_CONFIGURED");
+  const service = serviceSupabase();
+  if (!service) return fail(SYNC_CODE["NO_SERVICE_KEY"] ?? "", [], "NO_SERVICE_KEY");
+  try {
+    const checks: VerifyCheck[] = [];
+    if (mode === "APP_PASSWORD") {
+      const creds = appPasswordEnv();
+      const st = await service.rpc("scd_comm_sync_state", { p_organization_id: org.organizationId });
+      const mailbox = String((st.data as { mailbox?: unknown } | null)?.mailbox ?? "sportclubcolico@gmail.com");
+      if (!creds) return fail(SYNC_CODE["NOT_CONFIGURED"] ?? "", [], "NOT_CONFIGURED");
+      const { verifyAppPassword } = await import("./comm/apppassword.server");
+      const v = await verifyAppPassword(creds, mailbox);
+      const msg = (c: { ok: boolean; code: TransportCode | null }, okText: string) => (c.ok ? okText : TRANSPORT_MESSAGE[c.code ?? "NETWORK"]);
+      checks.push({ id: "smtp", label: "Invio (smtp.gmail.com, porta 465)", ok: v.smtp.ok, message: msg(v.smtp, "Accesso riuscito. Nessuna mail inviata.") });
+      checks.push({ id: "imap", label: "Ricezione (imap.gmail.com, porta 993)", ok: v.imap.ok, message: msg(v.imap, "Accesso riuscito. La casella non viene modificata.") });
+      if (!v.imap.ok) return fail(checks.find((c) => !c.ok)?.message ?? "Collegamento non riuscito.", checks, v.imap.code ?? undefined);
+    }
+    const r = await runCommSyncForOrg(service, org.organizationId, { skipOutbound: true });
+    if (!r.receiving) return fail(SYNC_CODE[r.code ?? ""] ?? "Collegamento non riuscito.", checks, r.code ?? undefined);
+    if (mode === "OAUTH") checks.push({ id: "account", label: "Gmail API (OAuth)", ok: r.connected, message: r.connected ? "Accesso riuscito. Nessuna mail inviata." : SYNC_CODE[r.code ?? ""] ?? "" });
+    const head = r.connected ? "Casella collegata: ora la Direzione può attivare l'invio." : "Ricezione collegata, ma l'invio non è disponibile:";
+    const parts = [head];
+    if (!r.connected && r.code && SYNC_CODE[r.code]) parts.push(SYNC_CODE[r.code] ?? "");
+    parts.push(`Nuove mail ricevute: ${r.received}.`);
+    if (r.connected && r.code === "HISTORY_RESET") parts.push("Da ora arrivano qui le mail nuove.");
+    return { ok: r.connected, message: parts.join(" "), mode, checks, ...(r.code ? { code: r.code } : {}) };
+  } catch {
+    return fail("Verifica non riuscita. Riprova tra poco.");
+  }
+});
+
+/** Minimum gap between two refreshes triggered by people opening the Posta del club (the cron does the rest). */
+export const REFRESH_MIN_GAP_MS = 120_000;
+
+export interface RefreshOutcome {
+  ran: boolean;
+  received: number;
+  sent: number;
+}
+
+/**
+ * Staff opening the Posta del club (or queueing a message) bring the mailbox up to date when the last run is older
+ * than two minutes: replies arrive and queued mail leaves even before the Render cron exists. Same job, same daily
+ * cap, same switch: nothing leaves while "Invio attivo" is off. Any office member may trigger it; nothing is returned
+ * but counts.
+ */
+export const refreshCommMailbox = createServerFn({ method: "POST" }).handler(async (): Promise<RefreshOutcome> => {
+  const none: RefreshOutcome = { ran: false, received: 0, sent: 0 };
+  if (selectTransportMode() === "DISABLED") return none;
+  const { org, sb } = await context();
+  if (!sb || !org) return none;
+  const offices = await sb.rpc("scd_comm_offices", { p_organization_id: org.organizationId });
+  if (offices.error || !Array.isArray(offices.data) || offices.data.length === 0) return none;
+  const service = serviceSupabase();
+  if (!service) return none;
+  const st = await service.from("scd_comm_settings").select("last_sync_at").eq("organization_id", org.organizationId).maybeSingle();
+  const last = Date.parse(String((st.data as { last_sync_at?: unknown } | null)?.last_sync_at ?? ""));
+  if (Number.isFinite(last) && Date.now() - last < REFRESH_MIN_GAP_MS) return none;
+  try {
+    const r = await runCommSyncForOrg(service, org.organizationId, { batchMax: 25 });
+    return { ran: true, received: r.received, sent: r.sent };
+  } catch {
+    return none;
+  }
+});
+
+/** Prefill of the composer for "Scrivi allo sponsor" / "Scrivi a tutti i partner" (addresses stay on the server side lists). */
+export const getSponsorComposeSeed = createServerFn({ method: "GET" })
+  .inputValidator((d: { name?: string | null }) => z.object({ name: z.string().trim().max(120).nullish() }).parse(d))
+  .handler(async ({ data }): Promise<SponsorSeed | null> => {
+    const { org, sb } = await context();
+    if (!sb || !org) return null;
+    const [offices, dir] = await Promise.all([
+      sb.rpc("scd_comm_offices", { p_organization_id: org.organizationId }),
+      sb.rpc("scd_comm_directory", { p_organization_id: org.organizationId, p_q: data.name ?? "" }),
+    ]);
+    const list = Array.isArray(offices.data) ? (offices.data as unknown[]).filter((o): o is "DIREZIONE" | "SEGRETERIA" | "TESORERIA" => o === "DIREZIONE" || o === "SEGRETERIA" || o === "TESORERIA") : [];
+    if (list.length === 0) return null;
+    const d = parseDirectory(dir.data);
+    return sponsorComposerSeed({ name: data.name ?? null, contacts: d?.contacts ?? [], offices: list, sponsorsLinked: d ? d.counts.sponsors : null });
+  });
