@@ -90,7 +90,7 @@ export function WorkAreaShell({
         {preview && <StagingBanner />}
         <MemberServicesBar area={id} />
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="m-0 flex min-w-0 flex-1 flex-wrap items-center gap-2 text-[14px] leading-snug text-[var(--in-sub)]">
+          <p className="m-0 flex min-w-0 flex-1 basis-full flex-wrap items-center gap-2 sm:basis-[320px] text-[14px] leading-snug text-[var(--in-sub)]">
             {editable ? <Chip tone="ok">Modifiche salvate nel database del club</Chip> : <Chip tone="info">Sola lettura</Chip>}
             {note && <span className="min-w-0">{note}</span>}
           </p>
