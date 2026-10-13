@@ -7,11 +7,14 @@ import { BUILD_STAMP } from "@/lib/build-stamp";
 import { openAccessMenu } from "@/components/scd/AccessMenu";
 import { Affiliations, SkyCameo } from "@/components/universe/Community";
 import {
-  LarioHeader,
+  BoardHero,
   MondoColico,
+  NextMatchCard,
+  QuickTiles,
+  RoleDoors,
   SideTiles,
   SponsorCards,
-  Wordmark,
+  UpcomingGames,
 } from "@/components/universe/BoardHome";
 import {
   CardActions,
@@ -19,7 +22,6 @@ import {
   EmptyFeed,
   EventPost,
   FeedCard,
-  FeedHeaderActions,
   FeedTabs,
   FollowButton,
   MatchBlock,
@@ -28,10 +30,8 @@ import {
   SponsorPost,
   WeekPost,
 } from "@/components/universe/Feed";
-import { StoriesRow } from "@/components/universe/Stories";
 import type { ReportReason } from "@/lib/moderation";
 import { TeamPicker } from "@/components/universe/TeamBar";
-import { ClubCrestOfficial } from "@/components/SiteChrome";
 import { addDays } from "@/lib/board-data";
 import { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 import { getPublicFeed, getPublicSchedule } from "@/lib/club.functions";
@@ -63,7 +63,7 @@ import {
   toggleForza,
 } from "@/lib/social.functions";
 import { SPONSORS } from "@/lib/sponsors";
-import { buildStories, sponsorOfTheDay } from "@/lib/stories";
+import { sponsorOfTheDay } from "@/lib/stories";
 import { itemState, orderTeams, type Team } from "@/lib/universe";
 
 /**
@@ -157,11 +157,13 @@ function Home() {
   const doForza = useServerFn(toggleForza);
   const doReport = useServerFn(reportPost);
   const [reporting, setReporting] = useState<Post | null>(null);
+  const [going, setGoing] = useState<string[]>([]);
 
   useEffect(() => {
     setNowMs(Date.now());
     const t = setInterval(() => setNowMs(Date.now()), 30_000);
     setLocalFollow(readList("scd-follow"));
+    setGoing(readList("scd-going"));
     try {
       const m = localStorage.getItem("scd-feed-mode");
       if (m === "perte" || m === "tutti" || m === "dirette") setMode(m);
@@ -237,20 +239,6 @@ function Home() {
     [channels],
   );
 
-  const minute = Math.floor(nowMs / 60_000);
-  const stories = useMemo(
-    () =>
-      buildStories({
-        items: merged,
-        teams,
-        today,
-        nowMs: minute * 60_000,
-        sponsors: SPONSORS,
-        events: CLUB_EVENTS,
-      }),
-    [merged, teams, today, minute],
-  );
-
   const lastDay = addDays(today, 6);
   const weekGames = useMemo(
     () =>
@@ -289,6 +277,39 @@ function Home() {
     return list;
   }, [weekGames, teamById, followedTeams]);
 
+  // "Prossima gara" della tavola: la prima gara non finita (prima quelle delle squadre seguite), poi le altre.
+  const nextMatch = useMemo(() => {
+    const upcoming = merged
+      .filter(
+        (i) =>
+          i.kind === "Gara" &&
+          i.date >= today &&
+          itemState(i, nowMs) !== "done",
+      )
+      .sort((a, b) =>
+        (a.date + (a.time || "99:99")).localeCompare(
+          b.date + (b.time || "99:99"),
+        ),
+      );
+    const mine = upcoming.find((i) => followedTeams.includes(i.group));
+    return mine ?? upcoming[0] ?? null;
+  }, [merged, today, nowMs, followedTeams]);
+  const sameDay = useMemo(
+    () =>
+      nextMatch
+        ? weekGames.filter(
+            (g) => g.date === nextMatch.date && g.id !== nextMatch.id,
+          )
+        : [],
+    [weekGames, nextMatch],
+  );
+  const toggleGoing = (id: string) => {
+    const list = going.includes(id)
+      ? going.filter((x) => x !== id)
+      : [...going, id];
+    setGoing(list);
+    writeValue("scd-going", list);
+  };
   const sponsor = useMemo(() => sponsorOfTheDay(SPONSORS, today), [today]);
   const dailySponsors = useMemo(() => {
     const list = SPONSORS.filter((x) => x.nameVerified && x.name);
@@ -305,7 +326,10 @@ function Home() {
     [posts, mode, effectiveFollows],
   );
   const nodes = useMemo(
-    () => composeFeed(ordered, teamMatches, !!sponsor, nextEvent, mode),
+    () =>
+      composeFeed(ordered, teamMatches, !!sponsor, nextEvent, mode).filter(
+        (n) => n.k !== "week" && n.k !== "match" && n.k !== "top11",
+      ),
     [ordered, teamMatches, sponsor, nextEvent, mode],
   );
 
@@ -443,212 +467,201 @@ function Home() {
 
   return (
     <main data-screen="home" className="min-h-dvh bg-[#eef3f9] pb-10">
-      <LarioHeader onEnter={openAccessMenu}>
-        <div className="mx-auto hidden max-w-[1200px] items-center gap-4 px-6 pt-4 lg:flex">
-          <Link
-            to="/"
-            className="scd-focus flex items-center gap-3 rounded-md"
-            aria-label="S.C.D. ColicoDerviese, Home"
-          >
-            <ClubCrestOfficial size={62} />
-            <Wordmark size="lg" />
-          </Link>
-          <FeedHeaderActions
-            onEnter={openAccessMenu}
-            unread={social.signedIn}
-          />
-          {social.canPost && (
-            <Link
-              to="/crea"
-              className="scd-focus flex h-11 items-center rounded-[14px] bg-[var(--uv-gold)] px-4 font-bold text-[#0b1e3a]"
-            >
-              Crea post
-            </Link>
-          )}
-        </div>
-        <StoriesRow stories={stories} nowMs={nowMs} />
-        <div className="mx-auto max-w-[1200px] lg:px-6">
-          <FeedTabs mode={mode} onChange={changeMode} />
-        </div>
-      </LarioHeader>
+      <BoardHero
+        games={weekGames.length}
+        home={homeGames}
+        onEnter={openAccessMenu}
+        signedIn={social.signedIn}
+      />
 
       <div className="mx-auto grid max-w-[1200px] grid-cols-[minmax(0,1fr)] gap-4 px-3 pt-3.5 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start lg:gap-6 lg:px-6 lg:pt-6">
-        <div
-          className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-3.5"
-          data-testid="feed"
-        >
-          {nodes.map((n, idx) => {
-            switch (n.k) {
-              case "week":
-                return (
-                  <WeekPost
-                    key="week"
-                    channel={clubChannel}
-                    games={weekGames}
-                    home={homeGames}
-                    firstDay={today}
-                    lastDay={lastDay}
-                    teamOf={teamOf}
-                    onShare={() =>
-                      share(
-                        `Questa settimana ${weekGames.length} gare SCD, ${homeGames} a Colico.`,
-                      )
+        <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-3.5">
+          <div className="lg:hidden">
+            <QuickTiles
+              games={weekGames.length}
+              events={CLUB_EVENTS.filter((e) => e.date >= today).length}
+            />
+          </div>
+          <NextMatchCard
+            item={nextMatch}
+            team={nextMatch ? teamOf(nextMatch) : undefined}
+            nowMs={nowMs}
+            going={nextMatch ? going.includes(nextMatch.id) : false}
+            onGoing={() => nextMatch && toggleGoing(nextMatch.id)}
+            onShare={() =>
+              nextMatch &&
+              share(
+                `${nextMatch.title}, ${nextMatch.date.split("-").reverse().join("/")} ${nextMatch.time}. Forza ColicoDerviese!`,
+                "/calendario",
+              )
+            }
+            others={sameDay}
+          />
+          <div className="lg:hidden">
+            <SideTiles
+              event={
+                nextEvent
+                  ? {
+                      title: nextEvent.title,
+                      when: nextEvent.when,
+                      href: nextEvent.href,
                     }
-                  />
-                );
-              case "post": {
-                const ch = channel(n.post.channel);
-                return (
-                  <PostCard
-                    key={n.post.id}
-                    post={n.post}
-                    channel={ch}
-                    nowMs={nowMs}
-                    onForza={() => forza(n.post)}
-                    onReport={
-                      social.signedIn ? () => setReporting(n.post) : undefined
-                    }
-                    onShare={() =>
-                      share(
-                        `${ch.label}: ${n.post.title ?? n.post.body.slice(0, 80)}`,
-                        ch.href,
-                      )
-                    }
-                  />
-                );
+                  : null
               }
-              case "match": {
-                const { item, team } = n.match;
-                const ch = channel(teamChannel(team.id));
-                const casa = item.homeAway === "CASA";
-                return (
-                  <FeedCard key={`m-${item.id}`} testid="feed-match">
-                    <CardHead
+            />
+          </div>
+          <div className="lg:hidden">
+            <RoleDoors />
+          </div>
+          <UpcomingGames
+            items={weekGames.filter((g) => g.id !== nextMatch?.id).slice(0, 5)}
+            teamOf={teamOf}
+          />
+          <div className="lg:hidden">
+            <SponsorCards sponsors={dailySponsors} />
+          </div>
+          <div className="lg:hidden">
+            <MondoColico />
+          </div>
+
+          <section aria-labelledby="dal-club" className="grid gap-3">
+            <div className="flex items-end justify-between gap-2 px-1 pt-2">
+              <h2
+                id="dal-club"
+                className="m-0 font-uv text-[28px] uppercase leading-none text-[#0b2a5b]"
+              >
+                Dal club
+              </h2>
+              {social.canPost && (
+                <Link
+                  to="/crea"
+                  className="scd-focus inline-flex h-10 items-center rounded-[12px] bg-[var(--uv-gold)] px-4 text-[14px] font-bold text-[#0b1e3a]"
+                >
+                  Crea post
+                </Link>
+              )}
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <Link
+                to="/fantacalcio"
+                className="scd-focus flex min-h-[86px] flex-col justify-center rounded-[18px] bg-[linear-gradient(135deg,#2f8f4e,#1f6e3a)] px-3.5 py-3 text-white shadow-[0_6px_20px_-10px_rgb(6_42_99/0.35)]"
+              >
+                <b className="font-uv text-[22px] uppercase leading-none">
+                  Fantacalcio SCD
+                </b>
+                <span className="mt-1 text-[12.5px] font-semibold text-white/90">
+                  Scegli i tuoi 11, gratis
+                </span>
+              </Link>
+              <Link
+                to="/top11"
+                className="scd-focus flex min-h-[86px] flex-col justify-center rounded-[18px] bg-[#0b2a5b] px-3.5 py-3 text-white shadow-[0_6px_20px_-10px_rgb(6_42_99/0.35)]"
+              >
+                <b className="font-uv text-[22px] uppercase leading-none">
+                  Top <span className="text-[var(--uv-gold)]">11</span>
+                </b>
+                <span className="mt-1 text-[12.5px] font-semibold text-white/90">
+                  Vota i migliori della settimana
+                </span>
+              </Link>
+            </div>
+            <div className="overflow-hidden rounded-[16px] bg-[#0b2a5b]">
+              <FeedTabs mode={mode} onChange={changeMode} />
+            </div>
+          </section>
+          <div
+            className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-3.5"
+            data-testid="feed"
+          >
+            {nodes.map((n, idx) => {
+              switch (n.k) {
+                case "post": {
+                  const ch = channel(n.post.channel);
+                  return (
+                    <PostCard
+                      key={n.post.id}
+                      post={n.post}
                       channel={ch}
-                      meta={`${casa ? "Gara in casa" : "Trasferta"} · ${new Intl.DateTimeFormat("it-IT", { timeZone: "UTC", weekday: "long" }).format(new Date(`${item.date}T12:00:00Z`))}`}
-                      right={
+                      nowMs={nowMs}
+                      onForza={() => forza(n.post)}
+                      onReport={
+                        social.signedIn ? () => setReporting(n.post) : undefined
+                      }
+                      onShare={() =>
+                        share(
+                          `${ch.label}: ${n.post.title ?? n.post.body.slice(0, 80)}`,
+                          ch.href,
+                        )
+                      }
+                    />
+                  );
+                }
+                case "sponsor":
+                  return sponsor ? (
+                    <SponsorPost key="sponsor" sponsor={sponsor} />
+                  ) : null;
+                case "event": {
+                  const ch = channel(eventChannel(n.event.id));
+                  return (
+                    <EventPost
+                      key={`e-${n.event.id}`}
+                      channel={ch}
+                      when={n.event.when}
+                      image={n.event.image}
+                      text={n.event.text}
+                      follow={
                         <FollowButton
                           on={isFollowed(ch.key)}
                           onToggle={() => toggleFollow(ch.key)}
                         />
                       }
                     />
-                    <MatchBlock item={item} />
-                    <div className="flex gap-2 px-3.5 pb-3.5">
-                      <Link
-                        to="/calendario"
-                        search={{ annata: team.id } as never}
-                        className="scd-focus flex h-11 flex-1 items-center justify-center rounded-[12px] bg-[#e3eefb] text-[14px] font-bold text-[#0b2a5b]"
-                      >
-                        Calendario {team.short}
-                      </Link>
-                      <Link
-                        to="/impianti"
-                        className="scd-focus flex h-11 flex-1 items-center justify-center rounded-[12px] bg-[#e3eefb] text-[14px] font-bold text-[#0b2a5b]"
-                      >
-                        Come arrivare
-                      </Link>
-                    </div>
-                    <CardActions
-                      forza={0}
-                      mine={false}
-                      onForza={() =>
-                        setSky({
-                          title: "Forza SCD!",
-                          text: "Il tifo si fa sui post: arrivano dopo la gara.",
-                        })
-                      }
-                      onShare={() =>
-                        share(
-                          `${team.short}: ${item.title}, ${item.date.split("-").reverse().join("/")} ${item.time}. Forza ColicoDerviese!`,
-                          `/squadre/${team.id}`,
-                        )
-                      }
+                  );
+                }
+                case "press":
+                  return (
+                    <Link
+                      key="press"
+                      to="/rassegna"
+                      className="scd-focus flex items-center gap-3 rounded-[20px] bg-white p-4 shadow-[0_2px_10px_rgb(11_42_91/0.08)]"
+                    >
+                      <span className="grid size-12 shrink-0 place-items-center rounded-[14px] bg-[#e3eefb] text-[#0b2a5b]">
+                        <Newspaper className="size-6" aria-hidden="true" />
+                      </span>
+                      <span className="grid gap-0.5">
+                        <b className="font-uv text-[22px] leading-none text-[#0b1e3a]">
+                          DICONO DI NOI
+                        </b>
+                        <span className="text-[13px] text-[#5a6b85]">
+                          I titoli delle testate su società, Colico e Dervio.
+                        </span>
+                      </span>
+                    </Link>
+                  );
+                case "empty":
+                  return (
+                    <EmptyFeed
+                      key={`empty-${idx}`}
+                      mode={mode}
+                      signedIn={social.signedIn}
                     />
-                  </FeedCard>
-                );
+                  );
+                default:
+                  return null;
               }
-              case "sponsor":
-                return sponsor ? (
-                  <SponsorPost key="sponsor" sponsor={sponsor} />
-                ) : null;
-              case "event": {
-                const ch = channel(eventChannel(n.event.id));
-                return (
-                  <EventPost
-                    key={`e-${n.event.id}`}
-                    channel={ch}
-                    when={n.event.when}
-                    image={n.event.image}
-                    text={n.event.text}
-                    follow={
-                      <FollowButton
-                        on={isFollowed(ch.key)}
-                        onToggle={() => toggleFollow(ch.key)}
-                      />
-                    }
-                  />
-                );
-              }
-              case "top11":
-                return (
-                  <Link
-                    key="top11"
-                    to="/top11"
-                    className="scd-focus flex items-center gap-3 rounded-[20px] bg-[#0b2a5b] p-4 text-white shadow-[0_2px_10px_rgb(11_42_91/0.08)]"
-                  >
-                    <span className="grid size-12 shrink-0 place-items-center rounded-[14px] bg-[var(--uv-gold)] text-[#0b1e3a]">
-                      <Trophy className="size-6" aria-hidden="true" />
-                    </span>
-                    <span className="grid gap-0.5">
-                      <b className="font-uv text-[22px] leading-none">
-                        TOP 11 DELLA SETTIMANA
-                      </b>
-                      <span className="text-[13px] text-[#c8d8ee]">
-                        Vota i giocatori di tutte le squadre: 3 voti a testa,
-                        esce il lunedì.
-                      </span>
-                    </span>
-                  </Link>
-                );
-              case "press":
-                return (
-                  <Link
-                    key="press"
-                    to="/rassegna"
-                    className="scd-focus flex items-center gap-3 rounded-[20px] bg-white p-4 shadow-[0_2px_10px_rgb(11_42_91/0.08)]"
-                  >
-                    <span className="grid size-12 shrink-0 place-items-center rounded-[14px] bg-[#e3eefb] text-[#0b2a5b]">
-                      <Newspaper className="size-6" aria-hidden="true" />
-                    </span>
-                    <span className="grid gap-0.5">
-                      <b className="font-uv text-[22px] leading-none text-[#0b1e3a]">
-                        DICONO DI NOI
-                      </b>
-                      <span className="text-[13px] text-[#5a6b85]">
-                        I titoli delle testate su società, Colico e Dervio.
-                      </span>
-                    </span>
-                  </Link>
-                );
-              case "empty":
-                return (
-                  <EmptyFeed
-                    key={`empty-${idx}`}
-                    mode={mode}
-                    signedIn={social.signedIn}
-                  />
-                );
-              default:
-                return null;
-            }
-          })}
-          <p className="m-0 px-1 text-[12.5px] text-[#5a6b85]">
-            {sourceNote}. Orari e campi segnati "da confermare" non sono ancora
-            confermati dal club.
-          </p>
+            })}
+            <p className="m-0 px-1 text-[12.5px] text-[#5a6b85]">
+              {sourceNote}. Orari e campi segnati "da confermare" non sono
+              ancora confermati dal club.
+            </p>
+          </div>
         </div>
         <div className="hidden min-w-0 grid-cols-[minmax(0,1fr)] gap-4 lg:grid">
+          <QuickTiles
+            games={weekGames.length}
+            events={CLUB_EVENTS.filter((e) => e.date >= today).length}
+          />
+          <RoleDoors />
           <FeedCard>
             <div className="px-4 pb-3 pt-3.5">
               <h2 className="m-0 text-[13px] font-bold tracking-[0.04em] text-[#1e7fd8]">

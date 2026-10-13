@@ -107,6 +107,204 @@ export function LarioHeader({
   );
 }
 
+/**
+ * Testata della tavola madre (VR-009, UD-088): stemma grande, S.C.D. COLICODERVIESE con la riga tricolore, il Lario
+ * dietro, Sky con la divisa ufficiale, "Sport · Persone · Territorio" e, in una frase, a cosa serve l'app.
+ * I numeri della settimana sono quelli del calendario ufficiale.
+ */
+export function BoardHero({
+  games,
+  home,
+  onEnter,
+  signedIn,
+}: {
+  games: number;
+  home: number;
+  onEnter: () => void;
+  signedIn: boolean;
+}) {
+  return (
+    <header
+      className="relative isolate overflow-hidden bg-[#062a66] text-white"
+      data-testid="board-hero"
+    >
+      <img
+        src={CENTRO}
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 -z-20 size-full object-cover object-[center_42%]"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgb(4_26_70/0.82)_0%,rgb(5_38_96/0.62)_45%,rgb(6_42_102/0.92)_88%,#062a66_100%)] lg:bg-[linear-gradient(90deg,rgb(4_26_70/0.95)_0%,rgb(5_38_96/0.78)_48%,rgb(6_42_102/0.25)_100%)]"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute -left-10 -top-6 -z-10 h-40 w-40 rotate-[-35deg] bg-[repeating-linear-gradient(90deg,var(--uv-gold)_0_10px,transparent_10px_22px)] opacity-80 lg:h-64 lg:w-64"
+      />
+      <div className="relative mx-auto max-w-[1200px] px-4 pb-4 pt-3 lg:px-6 lg:pb-10 lg:pt-8">
+        <div className="flex items-start justify-between gap-3 lg:hidden">
+          <span className="text-[12px] font-bold uppercase tracking-[0.14em] text-white/80">
+            L'app ufficiale del club
+          </span>
+          <button
+            type="button"
+            onClick={onEnter}
+            className="scd-focus relative grid size-11 shrink-0 place-items-center rounded-full bg-white/15"
+            aria-label={signedIn ? "Avvisi e aree" : "Entra o registrati"}
+            data-testid="home-enter"
+          >
+            <Bell className="size-6" aria-hidden="true" />
+            <span
+              aria-hidden="true"
+              className="absolute right-2 top-2 size-2.5 rounded-full border-2 border-[#062a66] bg-[var(--uv-gold)]"
+            />
+          </button>
+        </div>
+
+        <div className="mt-1 flex items-center gap-3 lg:mt-0 lg:gap-6">
+          <span className="shrink-0 drop-shadow-[0_6px_14px_rgb(0_0_0/0.35)]">
+            <span className="lg:hidden">
+              <ClubCrestOfficial size={80} />
+            </span>
+            <span className="hidden lg:inline">
+              <ClubCrestOfficial size={150} />
+            </span>
+          </span>
+          <div className="min-w-0">
+            <p className="m-0 font-uv text-[18px] tracking-[0.18em] text-white/90 lg:text-[28px]">
+              S.C.D.
+            </p>
+            <h1 className="m-0 whitespace-nowrap font-uv text-[clamp(38px,11vw,96px)] uppercase leading-[0.92] [text-shadow:0_3px_0_rgb(0_0_0/0.3)]">
+              Colico<span className="text-[var(--uv-gold)]">derviese</span>
+            </h1>
+            <span
+              aria-hidden="true"
+              className="mt-2 block h-[5px] w-full max-w-[420px] rounded-full bg-[linear-gradient(90deg,#1f9d55_0_33%,#f4f6fa_33%_66%,#d62b33_66%)]"
+            />
+          </div>
+        </div>
+
+        <div className="relative mt-3 grid gap-2.5 pr-[104px] lg:mt-6 lg:gap-3 lg:max-w-[640px] lg:pr-0">
+          <p className="m-0 mb-1 -rotate-[4deg] font-uv text-[21px] italic leading-tight text-[var(--uv-gold)] lg:mb-3 lg:text-[34px]">
+            Sport · Persone · Territorio
+            <span className="block text-white">Sempre insieme!</span>
+          </p>
+          <p className="m-0 max-w-[46ch] text-[14.5px] font-medium leading-snug text-white/95 lg:text-[19px]">
+            Partite, allenamenti, convocazioni e vita del club per famiglie,
+            atleti e tifosi di Colico e Dervio. Tutto in un'app.
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            {games > 0 ? (
+              <>
+                <span className="whitespace-nowrap rounded-full bg-[var(--uv-gold)] px-3 py-1 text-[13.5px] font-extrabold text-[#0b2a5b] lg:text-[14px]">
+                  {games} {games === 1 ? "gara" : "gare"} questa settimana
+                </span>
+                <span className="rounded-full bg-white/15 px-3 py-1 text-[14px] font-bold">
+                  {home} in casa
+                </span>
+              </>
+            ) : (
+              <span className="rounded-full bg-white/15 px-3 py-1 text-[14px] font-bold">
+                Settimana di allenamenti
+              </span>
+            )}
+          </div>
+          <div className="mt-1 flex gap-2">
+            <button
+              type="button"
+              onClick={onEnter}
+              className="scd-focus inline-flex h-11 items-center whitespace-nowrap rounded-[14px] bg-[var(--uv-gold)] px-4 text-[15px] font-extrabold text-[#0b2a5b] shadow-[0_3px_0_#b89a00] lg:h-12 lg:px-5 lg:text-[16px]"
+            >
+              {signedIn ? "La mia area" : "Entra o registrati"}
+            </button>
+            <a
+              href="/calendario"
+              className="scd-focus inline-flex h-11 items-center whitespace-nowrap rounded-[14px] border-2 border-white/70 px-4 text-[15px] font-bold text-white lg:h-12 lg:px-5 lg:text-[16px]"
+            >
+              Calendario
+            </a>
+          </div>
+        </div>
+      </div>
+      <img
+        src="/media/brand/sky-atv-cut.webp"
+        alt="Sky, la mascotte della ColicoDerviese"
+        className="pointer-events-none absolute bottom-[-64px] right-[-14px] h-[230px] w-auto object-contain object-top drop-shadow-[0_10px_20px_rgb(0_0_0/0.35)] lg:bottom-[-150px] lg:right-[6%] lg:h-[520px]"
+      />
+    </header>
+  );
+}
+
+/** "Entra nella tua area": le quattro porte della tavola (atleta, famiglia, staff) più i tifosi. */
+export function RoleDoors() {
+  const doors: Array<{
+    to: string;
+    label: string;
+    sub: string;
+    bg: string;
+    fg: string;
+  }> = [
+    {
+      to: "/famiglia",
+      label: "Famiglia",
+      sub: "Figli, impegni, richieste",
+      bg: "#ffd600",
+      fg: "#0b2a5b",
+    },
+    {
+      to: "/la-mia-scd",
+      label: "Atleta",
+      sub: "Convocazioni e giochi",
+      bg: "#1556c4",
+      fg: "#ffffff",
+    },
+    {
+      to: "/aree",
+      label: "Staff",
+      sub: "Gestionale del club",
+      bg: "#0b2a5b",
+      fg: "#ffffff",
+    },
+    {
+      to: "/squadre",
+      label: "Tifoso",
+      sub: "Segui le squadre",
+      bg: "#0f9d58",
+      fg: "#ffffff",
+    },
+  ];
+  return (
+    <Card
+      className="p-3"
+      data-testid="role-doors"
+      aria-label="Entra nella tua area"
+    >
+      <h2 className="m-0 px-1 pb-2 text-[17px] font-extrabold text-[#0b2a5b]">
+        Entra nella tua area
+      </h2>
+      <ul className="m-0 grid list-none grid-cols-2 gap-2 p-0">
+        {doors.map((d) => (
+          <li key={d.label}>
+            <a
+              href={d.to}
+              className="scd-focus flex min-h-[74px] flex-col justify-center rounded-[14px] px-3 py-2"
+              style={{ background: d.bg, color: d.fg }}
+            >
+              <b className="font-uv text-[22px] uppercase leading-none">
+                {d.label}
+              </b>
+              <span className="mt-1 text-[12.5px] font-semibold opacity-90">
+                {d.sub}
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </Card>
+  );
+}
+
 function Card({
   children,
   className = "",
