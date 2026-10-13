@@ -341,6 +341,7 @@ function MisterPage({ data }: { data: Loaded }) {
                       key={next.id}
                       eventId={next.id}
                       refreshKey={sheetKey}
+                      home={next.homeAway === "CASA"}
                       heading={`${team.tag} – ${titleCase(next.opponent || "avversario da definire")} · ${longDate(next.date)}${next.time ? `, ${next.time}` : ""}`}
                     />
                   </div>
