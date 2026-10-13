@@ -39,6 +39,7 @@ function Societa() {
   return (
     <main data-screen="societa" className="scd-pub min-h-screen bg-[var(--out-night)] pb-24 font-text text-white lg:pb-12">
       <HallHero
+        motif="forte"
         kicker="Chi siamo"
         title={
           <>

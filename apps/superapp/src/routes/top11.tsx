@@ -4,6 +4,7 @@ import { Check, ShieldCheck, Trophy } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { SkyCameo } from "@/components/universe/Community";
+import { KitTexture } from "@/components/scd/kit-texture";
 import {
   castWeekVote,
   getWeekVote,
@@ -104,19 +105,10 @@ function Top11Page() {
       data-screen="top11"
       className="min-h-dvh bg-[#f2f6fb] pb-28 text-[#0b1e3a]"
     >
-      <div className="relative overflow-hidden bg-[#06306f] text-white">
-        <img
-          src="/media/scd/lario-header.webp"
-          alt=""
-          aria-hidden="true"
-          className="absolute inset-0 size-full object-cover object-[center_55%] opacity-60"
-        />
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 bg-[linear-gradient(180deg,rgb(7_29_66/0.55),#0b2a5b_90%)]"
-        />
-        <div className="relative mx-auto max-w-[720px] px-4 pb-6 pt-4">
-          <h1 className="m-0 font-uv text-[40px] leading-none">
+      <div className="relative isolate overflow-hidden bg-[#06306f] text-white" data-hero="top11">
+        <KitTexture motif="mountains-lake" />
+        <div className="relative mx-auto max-w-[720px] px-4 pb-5 pt-3 sm:pb-6 sm:pt-4">
+          <h1 className="m-0 font-uv text-[32px] leading-none sm:text-[40px]">
             TOP 11{" "}
             <span className="text-[var(--uv-gold)]">DELLA SETTIMANA</span>
           </h1>

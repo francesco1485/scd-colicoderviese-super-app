@@ -30,16 +30,16 @@ function ImpiantiPage() {
     <main className="scd-interior min-h-screen bg-[var(--in-ground)] pb-24 lg:pb-12">
       <section className="relative isolate overflow-hidden bg-[var(--scd-navy)] text-white">
         <div aria-hidden="true" data-motif="forte" className="scd-kit-stripes absolute inset-0 -z-10" />
-        <div className="mx-auto max-w-[1280px] px-4 pb-10 pt-6 sm:px-6 lg:pb-12 lg:pt-10">
-          <p className="m-0 text-[15px] font-semibold text-[var(--out-text-soft)]">Come arrivare e dove andare</p>
-          <h1 className="m-0 mt-1 font-title text-[44px] font-black leading-[0.95] sm:text-[56px]">
+        <div className="mx-auto max-w-[1280px] px-4 pb-7 pt-3 sm:px-6 sm:pt-5 lg:pb-12 lg:pt-10">
+          <p className="m-0 text-[14px] font-semibold text-[var(--out-text-soft)] lg:text-[15px]">Come arrivare e dove andare</p>
+          <h1 className="m-0 mt-0.5 font-title text-[clamp(34px,9.4vw,42px)] font-black leading-[0.95] sm:text-[46px] lg:mt-1 lg:text-[56px]">
             I nostri <span className="scd-brush">campi</span>
           </h1>
-          <p className="m-0 mt-3 max-w-[60ch] text-[16px] leading-snug text-[#e6f3fc]">
+          <p className="m-0 mt-2 line-clamp-2 max-w-[60ch] text-[15px] leading-snug text-[#e6f3fc] lg:mt-3 lg:line-clamp-none lg:text-[16px]">
             {colico.name}, {colico.address}, {colico.municipality}, e l'impianto comunale di Dervio. Tocca uno spazio per vedere se è aperto, da dove si entra e chi
             può entrare.
           </p>
-          <div className="mt-5 flex flex-wrap gap-3">
+          <div className="mt-3 flex flex-wrap gap-2 lg:mt-5 lg:gap-3 max-lg:[&>*]:h-11 max-lg:[&>*]:min-h-11">
             <Link to="/calendario" className="scd-action inline-flex h-12 items-center gap-2 rounded-[12px] px-5 text-[16px] font-bold">
               <CalendarDays className="size-5" strokeWidth={2} aria-hidden="true" />
               Gare in casa

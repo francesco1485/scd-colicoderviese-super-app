@@ -6,10 +6,11 @@
  */
 import { Link, type LinkProps } from "@tanstack/react-router";
 import { Bell, Check, ChevronRight, Lock, MapPin, Settings } from "lucide-react";
-import type { ComponentType, ReactNode } from "react";
+import type { ComponentType, CSSProperties, ReactNode } from "react";
 
 import crest from "@/assets/brand/logo-scd.png.asset.json";
 import { cn } from "@/lib/utils";
+import { KitTexture, type KitMotif } from "@/components/scd/kit-texture";
 import skyAsset from "@/assets/brand/sky-scd.png.asset.json";
 import lario from "@/assets/scd/lario-header.webp.asset.json";
 
@@ -79,33 +80,55 @@ const SKY_POS = {
 } as const;
 
 /**
- * Testata "hero" (Home, Area Staff, Comunicazioni): banda blu con lago e montagne (o blu pieno),
- * stemma, wordmark, azione a destra, titolo bianco con sottotitolo e, dove la tavola la mostra, Sky.
+ * Testata "hero" (Home, Area Staff, Comunicazioni): banda blu con lago e montagne (o blu pieno con la trama
+ * delle divise 2026/27), stemma, wordmark, azione a destra, titolo bianco con sottotitolo e, dove la tavola la
+ * mostra, Sky. Senza Sky la testata è compatta su telefono e tablet (Direzione 13/10/2026 14:55): stemma 56 px, wordmark
+ * ridotto, spazi verticali ridotti; da 1024 px in su resta quella della tavola.
  */
 export function HeroHeader({
-  title, subtitle, action, sky, plain = false, children, className = "", testId, titleGap = 34, bottomGap = 30,
+  title, subtitle, action, sky, plain = false, children, className = "", testId, titleGap = 34, bottomGap = 30, motif = "monogram",
 }: {
-  title: string; subtitle: ReactNode; action?: ReactNode; sky?: keyof typeof SKY_POS; plain?: boolean; children?: ReactNode; className?: string; testId?: string; titleGap?: number; bottomGap?: number;
+  title: string; subtitle: ReactNode; action?: ReactNode; sky?: keyof typeof SKY_POS; plain?: boolean; children?: ReactNode; className?: string; testId?: string; titleGap?: number; bottomGap?: number; motif?: KitMotif;
 }) {
+  const compact = !sky;
+  const gaps = compact
+    ? ({ "--hh-tg": `${titleGap}px`, "--hh-bg": `${bottomGap}px`, "--hh-tg-sm": `${Math.round(titleGap * 0.4)}px`, "--hh-bg-sm": `${Math.round(bottomGap * 0.6)}px` } as CSSProperties)
+    : { paddingTop: titleGap, paddingBottom: bottomGap };
   return (
-    <header className={cx("relative isolate overflow-hidden text-white", plain ? "scd-hero-plain" : "bg-[var(--scd-navy)]", className)} data-testid={testId}>
-      {!plain && (
+    <header className={cx("relative isolate overflow-hidden text-white", plain ? "scd-hero-plain" : "bg-[var(--scd-navy)]", className)} data-testid={testId} data-hero="header">
+      {plain ? (
+        <KitTexture motif={motif} />
+      ) : (
         <>
           <img src={lario.url} alt="" aria-hidden="true" className="absolute inset-0 -z-20 h-full w-full object-cover object-[50%_42%] [filter:saturate(1.4)_contrast(1.1)_brightness(1.1)]" />
           <div className="scd-hero-shade absolute inset-0 -z-10" aria-hidden="true" />
         </>
       )}
-      <div className="mx-auto max-w-6xl px-4 pt-[10px] sm:px-6">
-        <div className="flex items-start gap-[14px]">
+      <div className={cx("mx-auto max-w-6xl px-4 sm:px-6", compact ? "pt-[6px] lg:pt-[10px]" : "pt-[10px]")}>
+        <div className={cx("flex items-start", compact ? "gap-[10px] lg:gap-[14px]" : "gap-[14px]")}>
           <Link to="/" aria-label={`${CLUB_NAME}, vai alla Home`} className="shrink-0">
-            <Crest height={80} />
+            {compact ? (
+              <>
+                <Crest height={56} className="lg:hidden" />
+                <Crest height={80} className="hidden lg:block" />
+              </>
+            ) : (
+              <Crest height={80} />
+            )}
           </Link>
-          <Wordmark className="mt-[10px]" />
-          <div className="ml-auto -mr-2 mt-[8px]">{action}</div>
+          {compact ? (
+            <>
+              <Wordmark scale={0.78} className="mt-[6px] lg:hidden" />
+              <Wordmark className="mt-[10px] hidden lg:inline-flex" />
+            </>
+          ) : (
+            <Wordmark className="mt-[10px]" />
+          )}
+          <div className={cx("ml-auto -mr-2", compact ? "mt-[2px] lg:mt-[8px]" : "mt-[8px]")}>{action}</div>
         </div>
-        <div className="relative z-10" style={{ paddingTop: titleGap, paddingBottom: bottomGap }}>
-          <h1 className="text-[31px] font-bold leading-[1.05] tracking-[-0.01em] [text-shadow:0_2px_10px_rgb(0_0_0/0.45)] sm:text-[40px]">{title}</h1>
-          <p className="mt-[5px] max-w-[36ch] text-[18px] font-semibold leading-[1.2] text-white [text-shadow:0_1px_8px_rgb(0_0_0/0.55)] sm:max-w-[40ch]">{subtitle}</p>
+        <div className={cx("relative z-10", compact && "pb-[var(--hh-bg-sm)] pt-[var(--hh-tg-sm)] lg:pb-[var(--hh-bg)] lg:pt-[var(--hh-tg)]")} style={gaps}>
+          <h1 className={cx("font-bold tracking-[-0.01em] [text-shadow:0_2px_10px_rgb(0_0_0/0.45)]", compact ? "text-[26px] sm:text-[32px] lg:text-[40px]" : "text-[31px] sm:text-[40px]", "leading-[1.05]")}>{title}</h1>
+          <p className={cx("mt-[5px] max-w-[36ch] font-semibold text-white [text-shadow:0_1px_8px_rgb(0_0_0/0.55)] sm:max-w-[40ch]", compact ? "line-clamp-2 text-[15px] sm:text-[16px] lg:line-clamp-none lg:text-[18px]" : "text-[18px]", "leading-[1.2]")}>{subtitle}</p>
         </div>
         {children}
       </div>
@@ -124,10 +147,15 @@ export function HeroHeader({
   );
 }
 
-/** Testata corta (Calendario, Area Atleta, Area Riservata): stemma che sborda, titolo e azione. */
-export function PageHeader({ title, action, testId }: { title: string; action?: ReactNode; testId?: string }) {
+/**
+ * Testata corta (Calendario, Area Atleta, Area Riservata): stemma che sborda, titolo e azione, sulla trama delle
+ * divise 2026/27. Lo strato texture resta nel contesto della testata (z-0, niente `isolate`) perché lo stemma
+ * deve continuare a sbordare sopra il foglio chiaro che segue.
+ */
+export function PageHeader({ title, action, testId, motif = "monogram" }: { title: string; action?: ReactNode; testId?: string; motif?: KitMotif }) {
   return (
-    <header className="scd-hero-plain relative text-white" data-testid={testId}>
+    <header className="scd-hero-plain relative text-white" data-testid={testId} data-hero="page-header">
+      <KitTexture motif={motif} inline />
       <div className="relative mx-auto flex h-[90px] max-w-6xl items-start px-4 pb-[14px] sm:px-6">
         <Link to="/" aria-label={`${CLUB_NAME}, vai alla Home`} className="absolute left-4 top-[8px] z-20 sm:left-6">
           <Crest height={80} />

@@ -293,6 +293,13 @@
   aspect-ratio: 937 / 646;
   background-image: url("/media/brand/tex/forte-colico.png");
 }
+/* Solo monogramma (default delle testate condivise): nessun disegno al tratto. */
+.scd-kit-stripes[data-motif="monogram"]::after { content: none; }
+/* Sopra una foto (locandine evento): solo monogramma e tratto, niente colore pieno né bordino. */
+.scd-kit-stripes.scd-kit-stripes--overlay {
+  background: none;
+  box-shadow: none;
+}
 /* Pennellata gialla delle tavole SCD (card, locandine): sotto la parola chiave di un titolo. */
 .scd-brush {
   position: relative;
@@ -433,7 +440,8 @@ html.uv-big .sa-shell { zoom: 1.12; }
   --font-title: "Big Shoulders Display", "Barlow Condensed", "Barlow", sans-serif;
   --font-text: "Barlow", system-ui, sans-serif;
   --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
-  --pub-header-h: 64px;
+  /* Telefono e tablet: barra più bassa (Direzione 13/10/2026 14:55, "barra grande in alto"). */
+  --pub-header-h: 56px;
 }
 @media (min-width: 1024px) {
   :root { --pub-header-h: 72px; }

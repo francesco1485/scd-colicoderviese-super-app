@@ -12,6 +12,7 @@ import {
 import { useMemo, useState } from "react";
 
 import { SkyCameo } from "@/components/universe/Community";
+import { KitTexture } from "@/components/scd/kit-texture";
 import {
   FANTA_TEAMS,
   PER_TEAM_MAX,
@@ -113,19 +114,10 @@ function Hero({ data }: { data: FantaPage }) {
       }).format(lock)
     : "";
   return (
-    <div className="relative overflow-hidden bg-[#06306f] text-white">
-      <img
-        src="/media/scd/lario-header.webp"
-        alt=""
-        aria-hidden="true"
-        className="absolute inset-0 size-full object-cover object-[center_55%] opacity-50"
-      />
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 bg-[linear-gradient(180deg,rgb(7_29_66/0.5),#0b2a5b_88%)]"
-      />
-      <div className="relative mx-auto max-w-[960px] px-4 pb-5 pt-4">
-        <h1 className="m-0 font-uv text-[42px] leading-none">
+    <div className="relative isolate overflow-hidden bg-[#06306f] text-white" data-hero="fanta">
+      <KitTexture motif="mountains-lake" />
+      <div className="relative mx-auto max-w-[960px] px-4 pb-5 pt-3 sm:pt-4">
+        <h1 className="m-0 font-uv text-[34px] leading-none sm:text-[42px]">
           FANTACALCIO <span className="text-[var(--uv-gold)]">SCD</span>
         </h1>
         <p className="mb-0 mt-2 max-w-[560px] text-[15px] text-[#dce8f7]">

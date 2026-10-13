@@ -50,7 +50,7 @@ function Entra() {
 
   return (
     <main>
-      <PageHero eyebrow="Tesseramento · Entra nella SCD" title={<>Vuoi giocare <span className="text-accent">con noi?</span></>}>
+      <PageHero clamp={false} eyebrow="Tesseramento · Entra nella SCD" title={<>Vuoi giocare <span className="text-accent">con noi?</span></>}>
         Dalla scuola calcio alla Prima Squadra. Compila la pre-iscrizione: nessun tesseramento automatico, la segreteria ti ricontatta.
       </PageHero>
 

@@ -192,7 +192,7 @@ export function SiteHeader() {
           className="scd-focus flex min-w-0 items-center gap-2.5 rounded-md lg:gap-3"
           aria-label={`${CLUB_NAME}, vai alla Home`}
         >
-          <ClubCrestOfficial size={46} className="lg:hidden" />
+          <ClubCrestOfficial size={40} className="lg:hidden" />
           <ClubCrestOfficial size={54} className="hidden lg:block" />
           {/* 18px below 380px so crest + wordmark + access + menu fit a 360px phone without overlapping. */}
           <span className="whitespace-nowrap font-title text-[18px] font-black leading-none min-[380px]:text-[20px] lg:text-[24px]" data-testid="header-wordmark">

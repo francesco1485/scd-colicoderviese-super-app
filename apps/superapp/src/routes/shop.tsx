@@ -14,7 +14,7 @@ export const Route = createFileRoute("/shop")({
   }),
   component: () => (
     <main>
-      <PageHero eyebrow="Club store · in arrivo" title={<>Shop, membership <span className="text-accent">e convenzioni</span></>}>
+      <PageHero clamp={false} eyebrow="Club store · in arrivo" title={<>Shop, membership <span className="text-accent">e convenzioni</span></>}>
         Stiamo preparando shop ufficiale, tessera sostenitore e convenzioni con i partner locali. Nessun acquisto o pagamento è attivo oggi.
       </PageHero>
       <section className={`${heroOverlapCls} mx-auto grid max-w-6xl gap-3 px-4 md:grid-cols-4`}>

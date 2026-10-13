@@ -191,6 +191,7 @@ function Calendario() {
     <main data-screen="calendario">
       <PageHeader
         title="Calendario"
+        motif="mountains-lake"
         testId="calendar-header"
         action={
           <button type="button" onClick={() => setFiltersOpen((o) => !o)} aria-expanded={filtersOpen || (tab !== "Squadra" && filtersActive)} aria-controls="cal-filtri" aria-label="Cerca squadra e filtri" className="flex size-11 items-center justify-center text-white">

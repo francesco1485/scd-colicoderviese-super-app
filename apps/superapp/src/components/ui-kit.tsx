@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { RefreshCw, ShieldAlert } from "lucide-react";
 import type { ReactNode } from "react";
 
+import { KitTexture, type KitMotif } from "@/components/scd/kit-texture";
 import type { Club, Match, SubmitOutcome } from "@/lib/club.types";
 
 export const inputCls =
@@ -24,14 +25,24 @@ export function Field({ label, children, hint }: { label: string; children: Reac
  */
 export const heroOverlapCls = "relative z-10 -mt-8";
 
-export function PageHero({ eyebrow, title, children }: { eyebrow: string; title: ReactNode; children?: ReactNode }) {
+/**
+ * Public page hero: kit 2026/27 texture band (KitTexture, motif per page) instead of the plain template band.
+ * Compact on phone and tablet (Direzione 13/10/2026 14:55): smaller title, tighter paddings, subtitle at most
+ * two lines on phone. The bottom padding stays larger than the -mt-8 of `heroOverlapCls`, so overlapping cards
+ * never cover the text.
+ */
+export function PageHero({ eyebrow, title, children, motif = "monogram", clamp = true }: {
+  eyebrow: string; title: ReactNode; children?: ReactNode; motif?: KitMotif;
+  /** false when the subtitle carries a notice that must stay fully visible on phone too (e.g. "no payment is active"). */
+  clamp?: boolean;
+}) {
   return (
-    <section className="surface-deep relative overflow-hidden px-4 pb-14 pt-12">
-      <div className="pointer-events-none absolute -right-20 -top-20 size-72 rounded-full bg-accent/20 blur-3xl" />
+    <section className="surface-deep relative isolate overflow-hidden px-4 pb-11 pt-5 sm:pb-12 sm:pt-7 lg:pb-14 lg:pt-12" data-hero="page">
+      <KitTexture motif={motif} />
       <div className="relative mx-auto max-w-6xl">
         <p className="eyebrow">{eyebrow}</p>
-        <h1 className="mt-3 max-w-3xl text-4xl font-bold leading-[1.02] md:text-6xl">{title}</h1>
-        {children && <div className="mt-4 max-w-2xl text-sm opacity-85 md:text-base">{children}</div>}
+        <h1 className="mt-2 max-w-3xl text-[clamp(26px,7.6vw,34px)] font-bold leading-[1.06] [text-shadow:0_1px_8px_rgb(0_0_0/0.3)] sm:text-[40px] lg:mt-3 lg:text-6xl lg:leading-[1.02]">{title}</h1>
+        {children && <div className={`mt-2 max-w-2xl text-[14px] leading-snug text-white/90 sm:mt-3 md:text-base lg:mt-4 ${clamp ? "line-clamp-2 sm:line-clamp-none" : ""}`}>{children}</div>}
       </div>
     </section>
   );

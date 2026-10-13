@@ -29,7 +29,7 @@ function Eventi() {
   const eventi = feed.items.filter((i) => i.kind === "event");
   return (
     <main>
-      <PageHero eyebrow="Vivere il club" title="Eventi">
+      <PageHero motif="mountains-lake" eyebrow="Vivere il club" title="Eventi">
         Iscrizioni gratuite oggi; eventuali quote future saranno indicate su
         ogni evento.
       </PageHero>

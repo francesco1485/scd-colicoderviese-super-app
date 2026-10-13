@@ -7,15 +7,23 @@ import { Link } from "@tanstack/react-router";
 import { CalendarDays, CalendarCheck, Handshake, Info, Mail, MapPin, type LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
-export function HallHero({ kicker, title, children, actions }: { kicker: string; title: ReactNode; children?: ReactNode; actions?: ReactNode }) {
+import { KitTexture, type KitMotif } from "./kit-texture";
+
+/**
+ * Hall hero (Chi siamo, Squadre): kit 2026/27 texture band (KitTexture) in place of the plain gradient with the
+ * template ring. Compact on phone and tablet (Direzione 13/10/2026 14:55): smaller title, paragraph at most two
+ * lines below 1024 px, 44 px actions; the bottom padding stays larger than the -mt-6 of the card that follows.
+ */
+export function HallHero({ kicker, title, children, actions, motif = "monogram" }: { kicker: string; title: ReactNode; children?: ReactNode; actions?: ReactNode; motif?: KitMotif }) {
   return (
-    <section className="scd-pub relative overflow-hidden bg-[linear-gradient(160deg,#062a52_0%,#0860a8_70%,#1898d8_130%)] text-white">
-      <span aria-hidden="true" className="pointer-events-none absolute -right-24 -top-24 size-[320px] rounded-full border-[28px] border-white/[0.06]" />
-      <div className="relative mx-auto max-w-[1200px] px-4 pb-12 pt-7 sm:px-6 lg:pb-14 lg:pt-12">
-        <p className="m-0 text-[15px] font-semibold text-[var(--out-text-soft)]">{kicker}</p>
-        <h1 className="m-0 mt-1 font-title text-[46px] font-black uppercase leading-[0.92] sm:text-[64px]">{title}</h1>
-        {children && <div className="m-0 mt-3 max-w-[62ch] text-[16px] leading-snug text-[#e6f3fc]">{children}</div>}
-        {actions && <div className="mt-5 flex flex-wrap gap-3">{actions}</div>}
+    <section className="scd-pub relative isolate overflow-hidden bg-[linear-gradient(160deg,#062a52_0%,#0860a8_70%,#1898d8_130%)] text-white" data-hero="hall">
+      {/* Overlay: the hall keeps its own darker night-to-sky gradient, so the light-blue title words stay above 3:1. */}
+      <KitTexture motif={motif} overlay />
+      <div className="relative mx-auto max-w-[1200px] px-4 pb-8 pt-4 sm:px-6 sm:pt-5 lg:pb-14 lg:pt-12">
+        <p className="m-0 text-[14px] font-semibold text-[var(--out-text-soft)] sm:text-[15px]">{kicker}</p>
+        <h1 className="m-0 mt-0.5 font-title text-[clamp(32px,9vw,40px)] font-black uppercase leading-[0.92] sm:mt-1 sm:text-[42px] lg:text-[64px]">{title}</h1>
+        {children && <div className="m-0 mt-2 line-clamp-2 max-w-[62ch] text-[15px] leading-snug text-[#e6f3fc] lg:mt-3 lg:line-clamp-none lg:text-[16px]">{children}</div>}
+        {actions && <div className="mt-3 flex flex-wrap gap-2 lg:mt-5 lg:gap-3 max-lg:[&>a]:h-11 max-lg:[&>a]:px-4 max-lg:[&>a]:text-[15px]">{actions}</div>}
       </div>
     </section>
   );

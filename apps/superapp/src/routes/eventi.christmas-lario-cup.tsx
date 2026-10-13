@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Calendar, MapPin, Share2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { KitTexture } from "@/components/scd/kit-texture";
 
 import {
   CHRISTMAS_LARIO_CUP as E,
@@ -153,7 +154,8 @@ function ChristmasLarioCup() {
     >
       <section
         aria-labelledby="clc-t"
-        className="relative isolate flex min-h-[calc(100svh-var(--pub-header-h))] items-end overflow-hidden px-4 pb-9 pt-10 lg:px-6 lg:pb-16"
+        className="relative isolate flex items-end overflow-hidden px-4 pb-7 pt-5 sm:pb-8 sm:pt-7 lg:min-h-[calc(100svh-var(--pub-header-h))] lg:px-6 lg:pb-16 lg:pt-10"
+        data-hero="event"
       >
         <div
           aria-hidden="true"
@@ -164,14 +166,15 @@ function ChristmasLarioCup() {
           aria-hidden="true"
           className="absolute inset-0 -z-30 bg-[radial-gradient(70%_45%_at_50%_18%,rgb(255_207_74/0.28),transparent_70%),radial-gradient(60%_50%_at_15%_70%,rgb(216_32_42/0.25),transparent_70%),linear-gradient(180deg,rgb(2_13_43/0.3)_0%,rgb(2_13_43/0.55)_55%,#020d2b_100%)]"
         />
+        <KitTexture motif="mountains-lake" overlay />
         <Snow />
-        <div className="mx-auto grid w-full max-w-[1200px] gap-[22px] xl:grid-cols-[1.25fr_0.75fr] xl:items-end xl:gap-x-10">
-          <div className="grid gap-4">
+        <div className="mx-auto grid w-full max-w-[1200px] gap-[16px] sm:gap-[22px] xl:grid-cols-[1.25fr_0.75fr] xl:items-end xl:gap-x-10">
+          <div className="grid gap-3 sm:gap-4">
             <div className="flex items-center gap-[10px]">
               <img
                 src="/media/brand/logo-scd.webp"
                 alt="S.C.D. ColicoDerviese"
-                className="h-[60px] w-auto"
+                className="h-[46px] w-auto sm:h-[60px]"
               />
               <span className="text-[13px] font-bold leading-tight text-[#bfe4ff]">
                 S.C.D. ColicoDerviese
@@ -184,7 +187,7 @@ function ChristmasLarioCup() {
             </span>
             <h1
               id="clc-t"
-              className="font-uv text-[clamp(62px,17vw,180px)] uppercase leading-[0.8]"
+              className="font-uv text-[clamp(50px,14vw,180px)] uppercase leading-[0.8]"
             >
               <span className="uv-slam block bg-gradient-to-b from-white via-[#fff6d8] to-[#ffcf4a] bg-clip-text text-transparent [filter:drop-shadow(0_4px_0_#d8202a)_drop-shadow(0_8px_0_#a5121b)_drop-shadow(0_18px_24px_rgb(0_0_0/0.5))]">
                 Christmas
@@ -196,7 +199,7 @@ function ChristmasLarioCup() {
                 Lario Cup
               </span>
             </h1>
-            <p className="font-uv-script -rotate-3 text-[clamp(22px,5.5vw,34px)] leading-[1.1] text-[#ffcf4a] [text-shadow:0_3px_0_rgb(0_0_0/0.4)]">
+            <p className="font-uv-script -rotate-3 text-[clamp(20px,5vw,34px)] leading-[1.1] text-[#ffcf4a] [text-shadow:0_3px_0_rgb(0_0_0/0.4)]">
               {E.tagline}
             </p>
             <div className="flex flex-wrap gap-[10px]">

@@ -40,6 +40,7 @@ import {
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { ClubCrestOfficial } from "@/components/SiteChrome";
+import { KitTexture } from "@/components/scd/kit-texture";
 import { openCookiePrefs } from "@/components/CookieConsent";
 import { SPONSOR_PACKAGES } from "@/lib/catalog";
 import { CLUB_EVENTS } from "@/lib/club-events";
@@ -129,7 +130,7 @@ function QuickStrip() {
       data-testid="quick-strip"
     >
       <ul
-        className={`${WRAP} m-0 flex list-none gap-1 overflow-x-auto py-2 [mask-image:linear-gradient(90deg,#000_82%,transparent)] [scrollbar-width:none] lg:justify-between lg:[mask-image:none] lg:gap-0 lg:overflow-visible [&::-webkit-scrollbar]:hidden`}
+        className={`${WRAP} m-0 flex list-none gap-1 overflow-x-auto py-1 lg:py-2 [mask-image:linear-gradient(90deg,#000_82%,transparent)] [scrollbar-width:none] lg:justify-between lg:[mask-image:none] lg:gap-0 lg:overflow-visible [&::-webkit-scrollbar]:hidden`}
       >
         {QUICK_LINKS.map((q) => {
           const Icon = ICONS[q.icon];
@@ -137,7 +138,7 @@ function QuickStrip() {
             <li key={q.label} className="shrink-0 lg:flex-1">
               <To
                 link={q}
-                className="scd-focus group relative flex h-[62px] min-w-[84px] flex-col items-center justify-center gap-1 rounded-[12px] px-2 text-center text-[#0b2a5b] transition-colors duration-150 hover:bg-[#eef3f9]"
+                className="scd-focus group relative flex h-[54px] min-w-[84px] lg:h-[62px] flex-col items-center justify-center gap-1 rounded-[12px] px-2 text-center text-[#0b2a5b] transition-colors duration-150 hover:bg-[#eef3f9]"
               >
                 <Icon
                   className="size-[22px] text-[#1556c4]"
@@ -881,6 +882,7 @@ function Matchday({
       data-testid="matchday"
       data-state={state}
     >
+      <KitTexture motif="mountains-lake" overlay />
       <svg
         aria-hidden="true"
         viewBox="0 0 400 200"
