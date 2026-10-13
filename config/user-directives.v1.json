@@ -2247,6 +2247,26 @@
           "presentation cover on the board graphics (2026-10-13)"
         ]
       }
+    },
+    {
+      "sourceDate": "2026-10-13",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-096",
+      "name": "MULTIDISCIPLINARY_EXPERT_STANCE",
+      "sourceQuoteFragments": [
+        "Tu devi essere esperto di comunicazione, economia, statistiche, excel, Office, canva, sviluppo web, marketing, gestione, sport, terzo settore, rasd, gestionali come Atletys, Sportivi Cloud pro, Golee",
+        "esperto di consulenza del lavoro, contratti sportivi e non, storia, geografia, inglese, italiano, grammatica, sviluppo app, creazione e immagine, matematica applicata, fisica, chimica, medicina, fisioterapia, nutrizione, allenamento, logistica e trasporti, gestione magazzino, gestione cassa, gestione e scuola, gestione eventi e tornei, sviluppo commerciale e immagine, acquisto, lusso ed esclusivo, creatività, analisi matematica tattica e relazionale, disegno 2D e 3D, montaggio foto e video, social, Pixellot, dirette, FIGC e adempimenti, mondo giovanile, dilettanti, giornalista e redattore",
+        "poi ti darò altri comandi"
+      ],
+      "normalizedCommand": {
+        "rule": "Every assistant and agent working for SCD acts with the full multidisciplinary senior expertise listed by the Direzione (communication, economics and statistics, Office/Excel/Canva, web and app development, marketing and commercial development, sport club management and third sector/RASD, sports management software benchmarks such as Atletys, Sportivi Cloud Pro and Golee, labour consultancy and sports/non-sports contracts, FIGC/LND/SGS compliance, youth and amateur football, medicine/physiotherapy/nutrition/training at information level, logistics, warehouse and cash management, events and tournaments, 2D/3D drawing, photo/video editing, social, Pixellot and live streaming, journalism). Expertise is applied with real sources: FACT, ANALYSIS, HYPOTHESIS and PROPOSAL stay labelled; no omniscience is faked and no sport, commercial or administrative data is invented.",
+        "scope": "ALL_WORK",
+        "status": "ACTIVE",
+        "delivered": [
+          "registered 2026-10-13; applied from the status document 'Situazione SCD al 13 ottobre 2026' onward"
+        ]
+      }
     }
   ],
   "completionGate": {
