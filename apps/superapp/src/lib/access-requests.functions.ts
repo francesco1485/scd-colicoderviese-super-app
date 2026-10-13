@@ -5,26 +5,14 @@
  *     optional child family), reject. Every call uses the caller's own session; the database checks the role.
  */
 import { createServerFn } from "@tanstack/react-start";
-import { getRequestHeader, getRequestIP } from "@tanstack/react-start/server";
 import { z } from "zod";
 
 import { asOutcome, cleanPhone, createRateLimiter, validateAccessRequest, type RequestOutcome } from "./access-requests";
 import { sessionView } from "./auth.functions";
+import { clientIp } from "./request-ip.server";
 import { serverSupabase } from "./supabase.server";
 
 const allow = createRateLimiter(5, 10 * 60 * 1000);
-
-/**
- * Client address for the limiter (audit 2026-10-12): headers set by the hosting edge first; otherwise the right-most
- * X-Forwarded-For entry (appended by our proxy, not typed by the client). Never the left-most, client-supplied value.
- */
-function clientIp(): string {
-  const edge = getRequestHeader("cf-connecting-ip") ?? getRequestHeader("true-client-ip");
-  if (edge && edge.length <= 64) return edge.trim();
-  const xff = getRequestHeader("x-forwarded-for");
-  const last = xff?.split(",").map((x) => x.trim()).filter(Boolean).at(-1);
-  return last ?? getRequestIP() ?? "unknown";
-}
 
 function todayRome(): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Rome", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());

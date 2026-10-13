@@ -30,6 +30,14 @@ describe("http policy (launch audit 2026-10-12)", () => {
     expect(list).toEqual([...PUBLIC_PREFIXES]);
   });
 
+  it("keeps the account deletion page public, offline-ready and in the sitemap (Play / App Store 5.1.1(v))", () => {
+    expect(PUBLIC_PREFIXES).toContain("/elimina-account");
+    expect(isPublicPath("/elimina-account")).toBe(true);
+    expect(cacheControlFor("/elimina-account")).toBe("public, max-age=0, must-revalidate");
+    expect(sitemapXml("https://app.example.it")).toContain("<loc>https://app.example.it/elimina-account</loc>");
+    expect(robotsTxt(true, "https://app.example.it")).toContain("Allow: /elimina-account");
+  });
+
   it("sends the security headers", () => {
     expect(SECURITY_HEADERS["x-frame-options"]).toBe("DENY");
     expect(SECURITY_HEADERS["content-security-policy"]).toContain("frame-ancestors 'none'");

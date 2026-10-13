@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
+import { DeleteAccountCard } from "@/components/scd/DeleteAccountCard";
 import { FollowButton } from "@/components/universe/Feed";
 import { ClubCrestOfficial } from "@/components/SiteChrome";
 import { getSession, type SessionView } from "@/lib/auth.functions";
@@ -433,6 +434,7 @@ function Inside({
             </span>
           </span>
         </Link>
+        <DeleteAccountCard email={session.user?.email ?? ""} />
       </div>
     </main>
   );

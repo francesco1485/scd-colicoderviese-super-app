@@ -83,7 +83,8 @@ function Privacy() {
 
       <H2>I tuoi diritti</H2>
       <p>
-        Puoi chiedere di vedere, correggere o cancellare i tuoi dati, limitarne l'uso, opporti o riceverne una copia (art. 15-22 GDPR), scrivendo a {c.email}. Puoi anche presentare reclamo al Garante per la protezione dei dati personali (garanteprivacy.it).
+        Puoi chiedere di vedere, correggere o cancellare i tuoi dati, limitarne l'uso, opporti o riceverne una copia (art. 15-22 GDPR), scrivendo a {c.email}. Per eliminare l'account dell'app usa il pulsante <b>Elimina account</b> in La mia SCD oppure la pagina{" "}
+        <a href="/elimina-account" className="font-semibold text-primary underline" data-testid="privacy-delete-link">elimina account</a>, che spiega anche quali dati la società deve conservare per legge. Puoi anche presentare reclamo al Garante per la protezione dei dati personali (garanteprivacy.it).
       </p>
 
       <H2>Cookie</H2>

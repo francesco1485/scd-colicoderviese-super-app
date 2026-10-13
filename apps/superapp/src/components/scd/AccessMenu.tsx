@@ -283,7 +283,10 @@ export function AccessMenu() {
       <button
         ref={buttonRef}
         type="button"
-        className="scd-action"
+        // Below 460px the header has no room for the label next to the wordmark: icon-only square. The label stays as
+        // screen-reader text and the bottom bar keeps the big "Entra" tab; "!" beats the unlayered .scd-action padding.
+        // Verified at 360x780 and 390x844.
+        className="scd-action max-[459px]:w-11 max-[459px]:px-0!"
         aria-expanded={open}
         aria-controls={panelId}
         aria-haspopup="true"
@@ -294,20 +297,20 @@ export function AccessMenu() {
         data-testid="access-button"
       >
         {signedIn ? (
-          <Lock className="size-[18px]" strokeWidth={1.8} aria-hidden="true" />
+          <Lock className="size-[18px] shrink-0" strokeWidth={1.8} aria-hidden="true" />
         ) : (
-          <LogIn className="size-[18px]" strokeWidth={1.8} aria-hidden="true" />
+          <LogIn className="size-[18px] shrink-0" strokeWidth={1.8} aria-hidden="true" />
         )}
         {signedIn ? (
           <>
-            <span className="sm:hidden">Aree</span>
+            <span className="max-[459px]:sr-only sm:hidden">Aree</span>
             <span className="hidden sm:inline">Le tue aree</span>
           </>
         ) : (
-          <span>Entra</span>
+          <span className="max-[459px]:sr-only">Entra</span>
         )}
         <ChevronDown
-          className={`size-[18px] transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+          className={`size-[18px] transition-transform duration-200 max-[459px]:hidden ${open ? "rotate-180" : ""}`}
           strokeWidth={1.8}
           aria-hidden="true"
         />

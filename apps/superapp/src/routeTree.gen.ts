@@ -19,6 +19,7 @@ import { Route as CreaRouteImport } from './routes/crea'
 import { Route as CrmRouteImport } from './routes/crm'
 import { Route as DirezioneRouteImport } from './routes/direzione'
 import { Route as DocumentiRouteImport } from './routes/documenti'
+import { Route as EliminaAccountRouteImport } from './routes/elimina-account'
 import { Route as EntraRouteImport } from './routes/entra'
 import { Route as FamigliaRouteImport } from './routes/famiglia'
 import { Route as FantacalcioRouteImport } from './routes/fantacalcio'
@@ -138,6 +139,11 @@ const DirezioneRoute = DirezioneRouteImport.update({
 const DocumentiRoute = DocumentiRouteImport.update({
   id: '/documenti',
   path: '/documenti',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EliminaAccountRoute = EliminaAccountRouteImport.update({
+  id: '/elimina-account',
+  path: '/elimina-account',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EntraRoute = EntraRouteImport.update({
@@ -509,6 +515,7 @@ export interface FileRoutesByFullPath {
   '/crm': typeof CrmRoute
   '/direzione': typeof DirezioneRoute
   '/documenti': typeof DocumentiRoute
+  '/elimina-account': typeof EliminaAccountRoute
   '/entra': typeof EntraRoute
   '/famiglia': typeof FamigliaRoute
   '/fantacalcio': typeof FantacalcioRoute
@@ -591,6 +598,7 @@ export interface FileRoutesByTo {
   '/crm': typeof CrmRoute
   '/direzione': typeof DirezioneRoute
   '/documenti': typeof DocumentiRoute
+  '/elimina-account': typeof EliminaAccountRoute
   '/entra': typeof EntraRoute
   '/famiglia': typeof FamigliaRoute
   '/fantacalcio': typeof FantacalcioRoute
@@ -673,6 +681,7 @@ export interface FileRoutesById {
   '/crm': typeof CrmRoute
   '/direzione': typeof DirezioneRoute
   '/documenti': typeof DocumentiRoute
+  '/elimina-account': typeof EliminaAccountRoute
   '/entra': typeof EntraRoute
   '/famiglia': typeof FamigliaRoute
   '/fantacalcio': typeof FantacalcioRoute
@@ -757,6 +766,7 @@ export interface FileRouteTypes {
     | '/crm'
     | '/direzione'
     | '/documenti'
+    | '/elimina-account'
     | '/entra'
     | '/famiglia'
     | '/fantacalcio'
@@ -839,6 +849,7 @@ export interface FileRouteTypes {
     | '/crm'
     | '/direzione'
     | '/documenti'
+    | '/elimina-account'
     | '/entra'
     | '/famiglia'
     | '/fantacalcio'
@@ -920,6 +931,7 @@ export interface FileRouteTypes {
     | '/crm'
     | '/direzione'
     | '/documenti'
+    | '/elimina-account'
     | '/entra'
     | '/famiglia'
     | '/fantacalcio'
@@ -1003,6 +1015,7 @@ export interface RootRouteChildren {
   CrmRoute: typeof CrmRoute
   DirezioneRoute: typeof DirezioneRoute
   DocumentiRoute: typeof DocumentiRoute
+  EliminaAccountRoute: typeof EliminaAccountRoute
   EntraRoute: typeof EntraRoute
   FamigliaRoute: typeof FamigliaRoute
   FantacalcioRoute: typeof FantacalcioRoute
@@ -1139,6 +1152,13 @@ declare module '@tanstack/react-router' {
       path: '/documenti'
       fullPath: '/documenti'
       preLoaderRoute: typeof DocumentiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/elimina-account': {
+      id: '/elimina-account'
+      path: '/elimina-account'
+      fullPath: '/elimina-account'
+      preLoaderRoute: typeof EliminaAccountRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/entra': {
@@ -1666,6 +1686,7 @@ const rootRouteChildren: RootRouteChildren = {
   CrmRoute: CrmRoute,
   DirezioneRoute: DirezioneRoute,
   DocumentiRoute: DocumentiRoute,
+  EliminaAccountRoute: EliminaAccountRoute,
   EntraRoute: EntraRoute,
   FamigliaRoute: FamigliaRoute,
   FantacalcioRoute: FantacalcioRoute,
