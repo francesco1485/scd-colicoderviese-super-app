@@ -21,6 +21,10 @@ const APP = resolve(__dirname, "../..");
 const PUBLIC_FILES = [
   "src/routes/index.tsx",
   "src/components/home/HomeSections.tsx",
+  "src/components/home/PublicHome.tsx",
+  "src/components/home/MemberHome.tsx",
+  "src/components/scd/MembersOnly.tsx",
+  "src/components/SiteChrome.tsx",
   "src/routes/calendario.tsx",
   "src/routes/squadre.tsx",
   "src/routes/squadre_.$team.tsx",
