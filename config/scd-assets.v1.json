@@ -381,7 +381,8 @@
       "VENUE_PHOTO": "PHOTO",
       "FACILITY_PLAN": "PHOTO",
       "OFFICIAL_CLUB_DOCUMENT": "DOCUMENT",
-      "APP_ICON": "APP_ICON"
+      "APP_ICON": "APP_ICON",
+      "OPPONENT_CREST": "VECTOR_MARK"
     },
     "runtime_roots": [
       "apps/superapp/public/media/",
@@ -724,6 +725,546 @@
       "class": "APP_ICON",
       "status": "VERIFIED",
       "source": "PWA icon built from the official crest"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/alta-brianza-tavernerio.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Alta Brianza Tavernerio: SCD Drive: ufficio stampa/LOGHI SQUADRE CAMPIONATI/ALTA BRIANZA TAVERNERIO.jpg (1Jl2F6-OXCr8pTqQVj9h9Mh4eKRQTq0jJ)",
+      "git_blob_sha": "aea94adaa144b10985e935e157d894b8c6023391",
+      "derived_from": "SCD Drive: ufficio stampa/LOGHI SQUADRE CAMPIONATI/ALTA BRIANZA TAVERNERIO.jpg (1Jl2F6-OXCr8pTqQVj9h9Mh4eKRQTq0jJ) (original sha256 052897b0f4ae5781)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/alto-lario.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Alto Lario Calcio: https://www.facebook.com/altolariocalcio",
+      "git_blob_sha": "57daf67e5f1efd13505b0588182a40c09f1dfbfb",
+      "derived_from": "https://www.facebook.com/altolariocalcio (original sha256 1afa49804f39834f)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/arcellasco-citta-di-erba.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Arcellasco Città di Erba: https://www.facebook.com/gsdarcellasco",
+      "git_blob_sha": "41fd047667e3ebbb509956b563c37e5606cbea8d",
+      "derived_from": "https://www.facebook.com/gsdarcellasco (original sha256 7d54aea24eecd927)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/ardita-cittadella.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Ardita Cittadella 1934: https://www.facebook.com/ArditaCittadella1934",
+      "git_blob_sha": "f963e4ba47e4e627f45946f50c64843afcf37661",
+      "derived_from": "https://www.facebook.com/ArditaCittadella1934 (original sha256 62c10ed123e6c70d)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/ardor-lazzate.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Ardor Lazzate: https://www.facebook.com/675633845892280",
+      "git_blob_sha": "45407141e2dc1c1327b1b8f8e00284a3afa7f299",
+      "derived_from": "https://www.facebook.com/675633845892280 (original sha256 13142cb7c645716e)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/ars-rovagnate.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "ARS Rovagnate: https://www.facebook.com/446874388705656",
+      "git_blob_sha": "530d4fcabc4ee2071caa5942ecebaa19edcaa585",
+      "derived_from": "https://www.facebook.com/446874388705656 (original sha256 03c61ed7881f9193)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/aurora-pro-patria.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Aurora Pro Patria 1919: https://www.facebook.com/aurorapropatria1919official",
+      "git_blob_sha": "0a2a2bd83ce4dc76275b6bc2734bd5d8235a48b7",
+      "derived_from": "https://www.facebook.com/aurorapropatria1919official (original sha256 3e8a989e1d49d366)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/aurora-san-francesco.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Aurora San Francesco: https://www.facebook.com/p/GS-AURORA-SAN-FRANCESCO-100063801980191/",
+      "git_blob_sha": "f70ba0fdd5357d68a8afd92152798a69dfabd085",
+      "derived_from": "https://www.facebook.com/p/GS-AURORA-SAN-FRANCESCO-100063801980191/ (original sha256 6df150ed1fa5ed8a)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/biassono.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Biassono: https://www.facebook.com/acbiassono",
+      "git_blob_sha": "1630be31cb41d8fbec7d4afb91713010f1ff54dc",
+      "derived_from": "https://www.facebook.com/acbiassono (original sha256 d27a051ff92abd21)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/bulgaro.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Bulgaro: https://www.facebook.com/fcdbulgaroacademy",
+      "git_blob_sha": "a0ddaaa89301be167ac5ccb79f452af441bd22ed",
+      "derived_from": "https://www.facebook.com/fcdbulgaroacademy (original sha256 26d0348860591a87)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/calcio-canegrate.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Calcio Canegrate: https://www.facebook.com/calciocanegrateacademymilan",
+      "git_blob_sha": "702a92f674c356d1d30138bbb7028ca630be81c3",
+      "derived_from": "https://www.facebook.com/calciocanegrateacademymilan (original sha256 a632b785b042acfb)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/calcio-lecco.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Calcio Lecco 1912: https://www.facebook.com/CalcioLecco1912",
+      "git_blob_sha": "ba1134f16eb8240b703e0317d2f26bd78d4a16c0",
+      "derived_from": "https://www.facebook.com/CalcioLecco1912 (original sha256 4ee90f10f926d0c8)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/cantu-san-paolo.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Cantù San Paolo: https://www.facebook.com/cantusanpaolo",
+      "git_blob_sha": "a2a9b2eb51b8cdbac08e4f31ddc5b3c76239d4f3",
+      "derived_from": "https://www.facebook.com/cantusanpaolo (original sha256 b9731a18fac99bc3)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/casatese-merate.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Casatese Merate: https://www.facebook.com/CasateseMerate",
+      "git_blob_sha": "18cbf73eb1ff633a95d430b746c02f21154b3074",
+      "derived_from": "https://www.facebook.com/CasateseMerate (original sha256 77e9cec0d1a8cbb1)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/casati-arcore.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Casati Arcore: https://www.facebook.com/casaticalcioarcore",
+      "git_blob_sha": "3ed2a6f4689dc29c490dca9f7c2c6dc85c1d9668",
+      "derived_from": "https://www.facebook.com/casaticalcioarcore (original sha256 8cb1ec4d05a9d2e7)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/cassina-rizzardi.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Cassina Rizzardi: https://www.facebook.com/cassinarizzardi1977",
+      "git_blob_sha": "d48125c64fcd3ed14a783303b4c3ea0ff2f3571c",
+      "derived_from": "https://www.facebook.com/cassinarizzardi1977 (original sha256 e03e39916f978a6f)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/castellanzese.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Castellanzese 1921: https://www.facebook.com/castellanzesecalcio1921",
+      "git_blob_sha": "6b077d9edf0db1420f0413da801f266706a7a798",
+      "derived_from": "https://www.facebook.com/castellanzesecalcio1921 (original sha256 536d27b1e170df40)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/chiavennese.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Chiavennese: https://www.facebook.com/unionesportiva.chiavennese",
+      "git_blob_sha": "f6325a17be1d23993e1b9417fd8e245d49290a67",
+      "derived_from": "https://www.facebook.com/unionesportiva.chiavennese (original sha256 b821bda2569a15d1)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/cisanese.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Cisanese: https://www.facebook.com/Cisanese",
+      "git_blob_sha": "9576def55558e263718764c4d0e5124a180af5b7",
+      "derived_from": "https://www.facebook.com/Cisanese (original sha256 c94a25aeea497928)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/cob-91.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "COB 91: https://www.facebook.com/ASCob91",
+      "git_blob_sha": "e07d129708b683859b4ec0834dbdeb5f36c3346e",
+      "derived_from": "https://www.facebook.com/ASCob91 (original sha256 0ff1dbf607ed914f)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/cortenova.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Cortenova: https://www.facebook.com/csccortenova",
+      "git_blob_sha": "c98e49e39325a249de6e9f8567681dce8a97f9ee",
+      "derived_from": "https://www.facebook.com/csccortenova (original sha256 8a7c54e0296e7b6e)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/cosio-valtellino.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Cosio Valtellino: https://www.facebook.com/uscosiovaltellino",
+      "git_blob_sha": "41f6c9944acb68c5c8eb8e057f3cad4b8bff0144",
+      "derived_from": "https://www.facebook.com/uscosiovaltellino (original sha256 0a73989868d767fd)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/costamasnaga.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Costamasnaga: https://www.facebook.com/uccostamasnaga",
+      "git_blob_sha": "1bdb316d65d37e0f3ee0c711aaff6fc9c7d0370e",
+      "derived_from": "https://www.facebook.com/uccostamasnaga (original sha256 0597b83721664800)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/delebio.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Delebio: https://www.facebook.com/usdelebio",
+      "git_blob_sha": "913ea3361455cddf9528688f17143ca33bf1fc90",
+      "derived_from": "https://www.facebook.com/usdelebio (original sha256 cecde672335a479f)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/di-po.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Di.Po: https://www.facebook.com/dipovimercatesecalcio",
+      "git_blob_sha": "6dbc4dce56218ca2ee1ddb2953c65baf7563c992",
+      "derived_from": "https://www.facebook.com/dipovimercatesecalcio (original sha256 47cafedbc8519ddd)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/dubino.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Dubino: https://www.facebook.com/usdubino",
+      "git_blob_sha": "959d7570c249116279bae77b3dfacf538fe4704c",
+      "derived_from": "https://www.facebook.com/usdubino (original sha256 5497baeecc57ac74)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/grentarcadia.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Grentarcadia: https://www.facebook.com/asdgrentarcadia",
+      "git_blob_sha": "e6cdab471bf87b38ef673c6dfefb626cbf9296b4",
+      "derived_from": "https://www.facebook.com/asdgrentarcadia (original sha256 dee5c8e2eaa0d813)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/gso-ballabio.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "GSO Ballabio: https://www.facebook.com/578164399347521",
+      "git_blob_sha": "ab21dc550670180b097bce7ecc45f2d3ef3b7609",
+      "derived_from": "https://www.facebook.com/578164399347521 (original sha256 30724e6299484d78)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/lentatese.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Lentatese: https://www.facebook.com/AcdLentatese",
+      "git_blob_sha": "ac09df643ff931876e3fa88f4d8913cfecc4d72c",
+      "derived_from": "https://www.facebook.com/AcdLentatese (original sha256 8b5a101137d15769)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/leon.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Leon: https://www.facebook.com/acleonmonzabrianza",
+      "git_blob_sha": "73e803b04cd49febac5e1679a1da0b0450c38ae8",
+      "derived_from": "https://www.facebook.com/acleonmonzabrianza (original sha256 7824f0f59571c961)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/lesmo.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Lesmo: https://www.facebook.com/p/FC-Lesmo-Monza-e-Brianza-100082565132404/",
+      "git_blob_sha": "34bccdc3112e93987ac77afcf4343d9797230859",
+      "derived_from": "https://www.facebook.com/p/FC-Lesmo-Monza-e-Brianza-100082565132404/ (original sha256 fff49485a8438502)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/luciano-manara.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Luciano Manara: https://www.facebook.com/lucianomanara1909",
+      "git_blob_sha": "2464bed0511304a9b38091c314315525caba8ae9",
+      "derived_from": "https://www.facebook.com/lucianomanara1909 (original sha256 2b8b0daa285672cd)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/mariano-calcio.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Mariano Calcio: https://www.facebook.com/marianocalcio",
+      "git_blob_sha": "4ebcf28b54da0f5843097fc9f3ad010cf5b00aec",
+      "derived_from": "https://www.facebook.com/marianocalcio (original sha256 6ff90db614c35dc9)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/meda-1913.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Meda 1913: https://www.facebook.com/calciomeda",
+      "git_blob_sha": "6771cadaea5fb08116ddf057089b063c153eb3d2",
+      "derived_from": "https://www.facebook.com/calciomeda (original sha256 e9be09ab006f94be)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/mese.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Mese: https://www.facebook.com/p/AC-MESE-100057555043867/",
+      "git_blob_sha": "93b2089f9f9697f09526e8b826c7de7c130dd51e",
+      "derived_from": "https://www.facebook.com/p/AC-MESE-100057555043867/ (original sha256 fabb62ec6cb1d57a)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/nuova-sondrio.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Nuova Sondrio Calcio: https://www.facebook.com/nuovasondriocalcio",
+      "git_blob_sha": "ed791774f0ad4c85174cb5c2a655d3f8724ecffe",
+      "derived_from": "https://www.facebook.com/nuovasondriocalcio (original sha256 4f4f33eb3b76cd3d)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/olginatese.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Olginatese: https://www.facebook.com/olginatese",
+      "git_blob_sha": "a0b1c4559a2dd882f3ef3f25e08f884537fe79b0",
+      "derived_from": "https://www.facebook.com/olginatese (original sha256 d102d161a78fe68d)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/olympic-morbegno.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Olympic Morbegno: https://www.facebook.com/olympicmorbegno",
+      "git_blob_sha": "45a434f633366cd6a50de72cf89be355c4fbd53d",
+      "derived_from": "https://www.facebook.com/olympicmorbegno (original sha256 d59b22cd1c4df7ac)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/osgb-merate.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "OSGB Merate: https://www.facebook.com/OsgbCalcio",
+      "git_blob_sha": "4dc9bdb055fa9541a0ddf394946a8399a3497f2d",
+      "derived_from": "https://www.facebook.com/OsgbCalcio (original sha256 d0f801eacb315434)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/penta-piateda.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Penta Piateda: SCD Drive: ufficio stampa/LOGHI SQUADRE CAMPIONATI/A.S.D. Penta Piateda.jpg (1Vp27_eBQdRZ_59nrQzBwFvhSlTSNhq6j)",
+      "git_blob_sha": "1cd1bbcc995cb0092f7f391d6417cc7205691b6e",
+      "derived_from": "SCD Drive: ufficio stampa/LOGHI SQUADRE CAMPIONATI/A.S.D. Penta Piateda.jpg (1Vp27_eBQdRZ_59nrQzBwFvhSlTSNhq6j) (original sha256 00f685556d1fb679)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/piantedo.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Piantedo: https://www.facebook.com/asdpiantedocalcio",
+      "git_blob_sha": "36f89e67f9466aaf354201890979b8f85a8cd5fb",
+      "derived_from": "https://www.facebook.com/asdpiantedocalcio (original sha256 49298530e6ece9f9)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/pol-mandello.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Pol. Mandello del Lario: https://www.facebook.com/polisportivamandello2",
+      "git_blob_sha": "e25b6b21e80d947af59ea3ca3c6665b99126dbae",
+      "derived_from": "https://www.facebook.com/polisportivamandello2 (original sha256 2e19198f72323c6d)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/pontelambrese.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Pontelambrese: https://www.facebook.com/p/ASD-Pontelambrese-100046242326365/",
+      "git_blob_sha": "aeaf66d5f36b04a321649279b5e876a5130d96f2",
+      "derived_from": "https://www.facebook.com/p/ASD-Pontelambrese-100046242326365/ (original sha256 30e2f416702a683e)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/real-milano.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Real Milano: https://www.facebook.com/RealMilano",
+      "git_blob_sha": "6716feb084add470f225af3a6bb9526e950a1f1e",
+      "derived_from": "https://www.facebook.com/RealMilano (original sha256 4c11d6e9f875f67f)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/rovinata.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Rovinata: https://www.facebook.com/p/ASD-POL-ROVINATA-100070857826861/",
+      "git_blob_sha": "a3d287eeb3defbe1ded250fb51fd7ffcd6638d02",
+      "derived_from": "https://www.facebook.com/p/ASD-POL-ROVINATA-100070857826861/ (original sha256 cdd4d7bda430fd87)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/sala-galbiate.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Sala Galbiate 1974: https://www.facebook.com/salagalbiate1974",
+      "git_blob_sha": "fb13375312f640006478c08af339d35ade0b05e0",
+      "derived_from": "https://www.facebook.com/salagalbiate1974 (original sha256 3fc01f3ce5de90d3)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/sirtorese.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Sirtorese: https://www.facebook.com/sirtorese",
+      "git_blob_sha": "62faab0f7ff839965f6cf7ede4eda2ac73c7083a",
+      "derived_from": "https://www.facebook.com/sirtorese (original sha256 308473a900f9642d)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/valmadrera.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Valmadrera: https://www.facebook.com/1676879909208866",
+      "git_blob_sha": "d4b0cdefef0d70a6857c30b4ed10cde828931ff3",
+      "derived_from": "https://www.facebook.com/1676879909208866 (original sha256 85871e6bb4833fa6)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/valmadrera-cg.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Valmadrera C.G.: https://www.facebook.com/1676879909208866",
+      "git_blob_sha": "d4b0cdefef0d70a6857c30b4ed10cde828931ff3",
+      "derived_from": "https://www.facebook.com/1676879909208866 (original sha256 85871e6bb4833fa6)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/varese.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Varese Football Club: https://www.facebook.com/varesefootballclub",
+      "git_blob_sha": "c034bd8b2f5144be95a39e94452b05b4647c07b1",
+      "derived_from": "https://www.facebook.com/varesefootballclub (original sha256 30d673fa2e05f304)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/varesina.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Varesina: https://www.facebook.com/VaresinaCalcio",
+      "git_blob_sha": "92758275ef88fe911c40b80a84e666a9500e9db0",
+      "derived_from": "https://www.facebook.com/VaresinaCalcio (original sha256 672fbdd5c01755e6)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/vibe-ronchese.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Vibe Ronchese: https://www.facebook.com/viberonchese",
+      "git_blob_sha": "b65f3572e42fef64f3cf792dbe63620278aca5bb",
+      "derived_from": "https://www.facebook.com/viberonchese (original sha256 7362969f50b5f9df)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/vigor-milano.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Vigor Milano: https://www.facebook.com/asdvigormilano",
+      "git_blob_sha": "85d2162eec638e560ca3facf4af1ae8cb771d7d2",
+      "derived_from": "https://www.facebook.com/asdvigormilano (original sha256 2c1a40707c4862ca)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/vis-nova-giussano.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Vis Nova Giussano: https://www.facebook.com/ASVISNOVA",
+      "git_blob_sha": "b41b080f9e983bf3bf305108ddebb858725c86fc",
+      "derived_from": "https://www.facebook.com/ASVISNOVA (original sha256 d63c852a8aee1845)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
     }
   ],
   "vector_research": [
@@ -780,6 +1321,19 @@
         "SCD Drive brand folder"
       ],
       "note": "official status PENDING_VERIFICATION"
+    },
+    {
+      "subject": "Opponent club crests (third-party marks, nominative use in fixture lists)",
+      "raster_paths": [
+        "apps/superapp/public/media/crests/"
+      ],
+      "decision": "RESEARCH_REAL_ASSET",
+      "where_to_look": [
+        "SCD Drive ufficio stampa/LOGHI SQUADRE CAMPIONATI",
+        "opponent club official site or page",
+        "tuttocampo team page (manual download by the Direzione)"
+      ],
+      "note": "never redraw or trace; registry config/scd-opponent-crests.v1.json"
     }
   ]
 }

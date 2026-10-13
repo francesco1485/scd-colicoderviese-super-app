@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "generatedAt": "2026-10-13",
   "policy": {
     "rule": "REAL_VERIFIED_ONLY",
@@ -8,27 +8,10 @@
   },
   "statuses": [
     "VERIFIED_FILE",
-    "SOURCE_FOUND_DOWNLOAD_BLOCKED",
-    "NOT_FOUND"
+    "MISSING"
   ],
   "fileRoot": "/media/crests/",
   "entries": [
-    {
-      "slug": "casati-arcore",
-      "displayName": "Casati Arcore",
-      "aliases": [
-        "A. CASATI CALCIO ARCORE"
-      ],
-      "status": "VERIFIED_FILE",
-      "sourceUrl": "https://www.facebook.com/casaticalcioarcore",
-      "verifiedAt": "2026-10-13",
-      "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/casati-arcore.webp",
-      "note": "Page 'USA Casati Calcio Arcore 1946'; current page picture is the 80th-anniversary badge (1946-2026).",
-      "width": 201,
-      "height": 256,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
-    },
     {
       "slug": "academy-casatese-merate",
       "displayName": "Academy Casatese Merate",
@@ -36,12 +19,23 @@
         "ACADEMY CASATESE MERATE",
         "ACADEMY CASATESE MERASQ.B"
       ],
-      "status": "NOT_FOUND",
+      "status": "MISSING",
+      "file": null,
+      "source": null,
       "sourceUrl": null,
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/AllieviRegionaliU17/GironeC/Squadra/AcademyCasateseMerate/1137724/Scheda",
+      "scdDriveFile": "SCD Drive: ufficio stampa/LOGHI SQUADRE CAMPIONATI/ACADEMY CASATESE MERATE U.S.D..png (1NtZ5AvlR1Lm1XnTqm3k7Khj7EhEIceoh)",
       "verifiedAt": null,
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": null,
-      "note": "Separate FIGC club from Casatese Merate; no own official page found, crest not borrowed."
+      "note": "Crest present in SCD Drive but not imported here (file too large for this environment's transfer); export it at 256 px and add it.",
+      "fixtures": [
+        "EVT-U15-2A-ACADEMYCASATESEMER-CASA",
+        "EVT-U16E-4A-ACADEMYCASATESEMER-CASA",
+        "EVT-ES11-3A-ACADEMYCASATESEMER-FUORI",
+        "EVT-ES12-5A-ACADEMYCASATESEMER-FUORI",
+        "EVT-U16E-20270131-ACADEMYCASATESEMER-FUORI",
+        "EVT-U15-2R-ACADEMYCASATESEMER-FUORI"
+      ]
     },
     {
       "slug": "accademia-varesina",
@@ -49,12 +43,18 @@
       "aliases": [
         "ACCADEMIA VARESINA"
       ],
-      "status": "NOT_FOUND",
+      "status": "MISSING",
+      "file": null,
+      "source": null,
       "sourceUrl": null,
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/Pulcini7c7/Girone33Primavera1AnnoVarese/Squadra/AccademiaVaresina/1026850/Scheda",
       "verifiedAt": null,
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": null,
-      "note": "Only Varesina (senior club) pages found; distinct club, not borrowed."
+      "note": "Only Varesina (senior club) pages found; distinct club, not borrowed.",
+      "fixtures": [
+        "EVT-U16E-20261115-ACCADEMIAVARESINA-FUORI",
+        "EVT-U16E-10R-ACCADEMIAVARESINA-CASA"
+      ]
     },
     {
       "slug": "alta-brianza-tavernerio",
@@ -62,12 +62,23 @@
       "aliases": [
         "ALTA BRIANZA TAVERNERIO"
       ],
-      "status": "NOT_FOUND",
-      "sourceUrl": null,
-      "verifiedAt": null,
+      "status": "VERIFIED_FILE",
+      "file": "/media/crests/alta-brianza-tavernerio.webp",
+      "source": "SCD Drive: ufficio stampa/LOGHI SQUADRE CAMPIONATI/ALTA BRIANZA TAVERNERIO.jpg (1Jl2F6-OXCr8pTqQVj9h9Mh4eKRQTq0jJ)",
+      "sourceUrl": "https://drive.google.com/file/d/1Jl2F6-OXCr8pTqQVj9h9Mh4eKRQTq0jJ/view",
+      "sourceKind": "SCD_DRIVE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/Eccellenza/GironeA/Squadra/AltabrianzaTavernerio/675772/Scheda",
+      "scdDriveFile": "SCD Drive: ufficio stampa/LOGHI SQUADRE CAMPIONATI/ALTA BRIANZA TAVERNERIO.png (169FIwa0CDtt-NfC8p17Uxqkm2IseTIjt)",
+      "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": null,
-      "note": "No official page found (only ASO Alta Brianza, a different club)."
+      "width": 250,
+      "height": 200,
+      "originalSha256": "052897b0f4ae5781c77a9ed38e4d1c16222788dfaa40309abb3fcb2b453833b5",
+      "note": "Logo collected by the SCD press office (a larger PNG is also in the same folder).",
+      "fixtures": [
+        "EVT-PRIMA-5A-ALTABRIANZATAVERNE-CASA",
+        "EVT-PRIMA-5R-ALTABRIANZATAVERNE-FUORI"
+      ]
     },
     {
       "slug": "alto-lario",
@@ -76,13 +87,21 @@
         "ALTO LARIO CALCIO"
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/alto-lario.webp",
+      "source": "https://www.facebook.com/altolariocalcio",
       "sourceUrl": "https://www.facebook.com/altolariocalcio",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/PrimaCategoria/GironeF/Squadra/AltoLarioCalcio/935536/Scheda",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/alto-lario.webp",
       "width": 256,
       "height": 256,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "1afa49804f39834ff6646bf1c09f79000408220363fb90a06adaa63134f82f5e",
+      "fixtures": [
+        "EVT-ES-20260919-ALTOLARIOCALCIO-CASA",
+        "EVT-U15-12A-ALTOLARIOCALCIO-FUORI",
+        "EVT-U15-12R-ALTOLARIOCALCIO-CASA"
+      ]
     },
     {
       "slug": "arcellasco-citta-di-erba",
@@ -90,11 +109,23 @@
       "aliases": [
         "ARCELLASCO CITTA DI ERBA"
       ],
-      "status": "NOT_FOUND",
-      "sourceUrl": null,
-      "verifiedAt": null,
+      "status": "VERIFIED_FILE",
+      "file": "/media/crests/arcellasco-citta-di-erba.webp",
+      "source": "https://www.facebook.com/gsdarcellasco",
+      "sourceUrl": "https://www.facebook.com/gsdarcellasco",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/Esordienti9c9/GironeAUnder12PrimaverileComo/Squadra/ArcellascoCittaDiErba/1181616/Scheda",
+      "scdDriveFile": "SCD Drive: ufficio stampa/LOGHI SQUADRE CAMPIONATI/G.S.D. Arcellasco Città di Erba.png (1pyKAqgcrGpAgX_dkuqWRqU0ZX5fC2hzk)",
+      "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": null
+      "width": 256,
+      "height": 256,
+      "originalSha256": "7d54aea24eecd9270cc5ad3de744b2bf292be3985a2a1277eb59e62186af9a6a",
+      "note": "Page 'Gsd Arcellasco - Città di Erba' (1978); same crest also in SCD Drive.",
+      "fixtures": [
+        "EVT-U19E-10A-ARCELLASCOCITTADIE-FUORI",
+        "EVT-U19E-10R-ARCELLASCOCITTADIE-CASA"
+      ]
     },
     {
       "slug": "ardita-cittadella",
@@ -103,13 +134,20 @@
         "ARDITA CITTADELLA 1934"
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/ardita-cittadella.webp",
+      "source": "https://www.facebook.com/ArditaCittadella1934",
       "sourceUrl": "https://www.facebook.com/ArditaCittadella1934",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/PrimaCategoria/GironeA/Squadra/ArditaCittadella1934/81718/Scheda",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/ardita-cittadella.webp",
       "width": 256,
       "height": 256,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "62c10ed123e6c70da09f5a5b7da66cf10010d41f7b927a3ea8b09291c6741f1d",
+      "fixtures": [
+        "EVT-PRIMA-13A-ARDITACITTADELLA19-FUORI",
+        "EVT-PRIMA-13R-ARDITACITTADELLA19-CASA"
+      ]
     },
     {
       "slug": "ardor-lazzate",
@@ -118,14 +156,23 @@
         "ARDOR LAZZATE"
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/ardor-lazzate.webp",
+      "source": "https://www.facebook.com/675633845892280",
       "sourceUrl": "https://www.facebook.com/675633845892280",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/JunioresEliteU19/GironeB/Squadra/ArdorLazzate/1000914/Scheda",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/ardor-lazzate.webp",
-      "note": "Page 'Ardor Lazzate 1973'.",
       "width": 256,
       "height": 256,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "13142cb7c645716e8cfba58a19aab24f9a79d1f3cbaad1fc4610aee6255a81e4",
+      "note": "Page 'Ardor Lazzate 1973'.",
+      "fixtures": [
+        "EVT-U19E-6A-ARDORLAZZATE-CASA",
+        "EVT-U16E-20261025-ARDORLAZZATE-FUORI",
+        "EVT-U19E-6R-ARDORLAZZATE-FUORI",
+        "EVT-U16E-7R-ARDORLAZZATE-CASA"
+      ]
     },
     {
       "slug": "ars-rovagnate",
@@ -134,13 +181,25 @@
         "ARS ROVAGNATE"
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/ars-rovagnate.webp",
+      "source": "https://www.facebook.com/446874388705656",
       "sourceUrl": "https://www.facebook.com/446874388705656",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/Allievi/GironeAProvincialiFasePrimaverileLecco/Squadra/ArsRovagnate/1050660/Scheda",
+      "scdDriveFile": "SCD Drive: ufficio stampa/LOGHI SQUADRE CAMPIONATI/ARS ROVAGNATE.png (1DW61S-ZsfUufVIZQecbNFNaoR7LVzigE)",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/ars-rovagnate.webp",
       "width": 256,
       "height": 238,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "03c61ed7881f9193c38cd95bd62c3cd2b21b276f887165f09b225ae5c324372c",
+      "fixtures": [
+        "EVT-PRIMA-6A-ARSROVAGNATE-FUORI",
+        "EVT-PULMIX-4A-ARSROVAGNATE-CASA",
+        "EVT-U19E-9A-ARSROVAGNATE-CASA",
+        "EVT-ES12-8A-ARSROVAGNATE-FUORI",
+        "EVT-PRIMA-6R-ARSROVAGNATE-CASA",
+        "EVT-U19E-9R-ARSROVAGNATE-FUORI"
+      ]
     },
     {
       "slug": "aurora-pro-patria",
@@ -149,14 +208,21 @@
         "AURORA PRO PATRIA 1919"
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/aurora-pro-patria.webp",
+      "source": "https://www.facebook.com/aurorapropatria1919official",
       "sourceUrl": "https://www.facebook.com/aurorapropatria1919official",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/Pulcini7c7/Girone281Anno/Squadra/AuroraProPatria1919/1145889/Scheda",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/aurora-pro-patria.webp",
-      "note": "Youth-sector official page.",
       "width": 256,
       "height": 256,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "3e8a989e1d49d3664a9356bbb612f8d7a59b8bf6739068fc91d10157366dee74",
+      "note": "Youth-sector official page.",
+      "fixtures": [
+        "EVT-U16E-15A-AURORAPROPATRIA191-CASA",
+        "EVT-U16E-20270425-AURORAPROPATRIA191-FUORI"
+      ]
     },
     {
       "slug": "aurora-san-francesco",
@@ -165,14 +231,20 @@
         "AURORA SAN FRANCESCO G.S."
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/aurora-san-francesco.webp",
+      "source": "https://www.facebook.com/p/GS-AURORA-SAN-FRANCESCO-100063801980191/",
       "sourceUrl": "https://www.facebook.com/p/GS-AURORA-SAN-FRANCESCO-100063801980191/",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/SecondaCategoria/GironeLLegnano/Squadra/AuroraSanFrancesco/74448/Scheda",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/aurora-san-francesco.webp",
-      "note": "Profile picture only available at 240px.",
       "width": 227,
       "height": 226,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "6df150ed1fa5ed8a2582b244c2a189f9eded9be0c269f327994cb27f44638085",
+      "note": "Profile picture only available at 240px.",
+      "fixtures": [
+        "EVT-PC78-5A-AURORASANFRANCESCO-FUORI"
+      ]
     },
     {
       "slug": "bellagina",
@@ -181,13 +253,20 @@
         "BELLAGINA",
         "BELLAGINA A.D."
       ],
-      "status": "SOURCE_FOUND_DOWNLOAD_BLOCKED",
-      "sourceUrl": "https://www.facebook.com/p/US-Bellagina-100077607124428/",
-      "verifiedAt": "2026-10-13",
-      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "status": "MISSING",
       "file": null,
-      "note": "Official page found, picture not retrievable without login.",
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE"
+      "source": null,
+      "sourceUrl": "https://www.facebook.com/p/US-Bellagina-100077607124428/",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/PrimaCategoria/GironeC/Squadra/Bellagina/6000/Scheda",
+      "verifiedAt": null,
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "note": "Official page 'U.S. Bellagina' (page id 260878517323776) has no picture; SCD Drive has an unlabelled 'BELLAGIO.jpg' to be confirmed by the Direzione.",
+      "fixtures": [
+        "EVT-PC78-7A-BELLAGINAAD-FUORI",
+        "EVT-U15-13A-BELLAGINA-CASA",
+        "EVT-U15-13R-BELLAGINA-FUORI"
+      ]
     },
     {
       "slug": "biassono",
@@ -195,12 +274,22 @@
       "aliases": [
         "BIASSONO"
       ],
-      "status": "NOT_FOUND",
-      "sourceUrl": null,
-      "verifiedAt": null,
+      "status": "VERIFIED_FILE",
+      "file": "/media/crests/biassono.webp",
+      "source": "https://www.facebook.com/acbiassono",
+      "sourceUrl": "https://www.facebook.com/acbiassono",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/Promozione/GironeD/Squadra/Biassono/3850/Scheda",
+      "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": null,
-      "note": "ACD Biassono has Instagram only."
+      "width": 256,
+      "height": 256,
+      "originalSha256": "d27a051ff92abd2110c2595c11852bc5a32985868b5b8aec69271206edcb5d4c",
+      "note": "Page 'ACD Biassono' (A.C.D. Biassono 1950).",
+      "fixtures": [
+        "EVT-PRIMA-12A-BIASSONO-CASA",
+        "EVT-PRIMA-12R-BIASSONO-FUORI"
+      ]
     },
     {
       "slug": "bulgaro",
@@ -209,30 +298,21 @@
         "BULGARO"
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/bulgaro.webp",
+      "source": "https://www.facebook.com/fcdbulgaroacademy",
       "sourceUrl": "https://www.facebook.com/fcdbulgaroacademy",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/PrimaCategoria/GironeB/Squadra/Bulgaro/675327/Scheda",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/bulgaro.webp",
-      "note": "Page 'Fcd Bulgaro Academy - Scuola Calcio Elite FIGC'.",
       "width": 256,
       "height": 251,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
-    },
-    {
-      "slug": "cob-91",
-      "displayName": "COB 91",
-      "aliases": [
-        "C.O.B. 91"
-      ],
-      "status": "VERIFIED_FILE",
-      "sourceUrl": "https://www.facebook.com/ASCob91",
-      "verifiedAt": "2026-10-13",
-      "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/cob-91.webp",
-      "note": "Source image is 110px.",
-      "width": 110,
-      "height": 110,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "26d0348860591a87ed8c8150c8189fe04b4166e770d2cd907b1d6c882e3c19cf",
+      "note": "Page 'Fcd Bulgaro Academy - Scuola Calcio Elite FIGC'.",
+      "fixtures": [
+        "EVT-U16E-20260926-BULGARO-FUORI",
+        "EVT-U16E-3R-BULGARO-CASA"
+      ]
     },
     {
       "slug": "calcio-canegrate",
@@ -241,13 +321,20 @@
         "CALCIO CANEGRATE"
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/calcio-canegrate.webp",
+      "source": "https://www.facebook.com/calciocanegrateacademymilan",
       "sourceUrl": "https://www.facebook.com/calciocanegrateacademymilan",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/Promozione/GironeC/Squadra/CalcioCanegrate/917291/Scheda",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/calcio-canegrate.webp",
       "width": 256,
       "height": 252,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "a632b785b042acfb43b528afb8a98c4eb5b7c3ec15e466bb7edbf62df462b56e",
+      "fixtures": [
+        "EVT-U16E-8A-CALCIOCANEGRATE-CASA",
+        "EVT-U16E-20270228-CALCIOCANEGRATE-FUORI"
+      ]
     },
     {
       "slug": "calcio-lecco",
@@ -256,13 +343,19 @@
         "CALCIO LECCO 1912 S.R.L."
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/calcio-lecco.webp",
+      "source": "https://www.facebook.com/CalcioLecco1912",
       "sourceUrl": "https://www.facebook.com/CalcioLecco1912",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Italia/Juniores/GironeBNazionali/Squadra/CalcioLecco1912/1001127/Scheda",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/calcio-lecco.webp",
       "width": 256,
       "height": 256,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "4ee90f10f926d0c84699641879f2e29edc2fef64d2e65aeaa156e2f7f99cb5f5",
+      "fixtures": [
+        "EVT-ES11-6A-CALCIOLECCO1912SRL-CASA"
+      ]
     },
     {
       "slug": "cantu-san-paolo",
@@ -271,13 +364,20 @@
         "CANTU SAN PAOLO A.S.D."
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/cantu-san-paolo.webp",
+      "source": "https://www.facebook.com/cantusanpaolo",
       "sourceUrl": "https://www.facebook.com/cantusanpaolo",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/Promozione/GironeB/Squadra/CantuSanPaolo/1136055/Scheda",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/cantu-san-paolo.webp",
       "width": 256,
       "height": 256,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "b9731a18fac99bc38882fe05a9469649d860312017fce65233e90b58500ce535",
+      "fixtures": [
+        "EVT-PRIMA-14A-CANTUSANPAOLOASD-CASA",
+        "EVT-PRIMA-14R-CANTUSANPAOLOASD-FUORI"
+      ]
     },
     {
       "slug": "casatese-merate",
@@ -287,13 +387,46 @@
         "CASATESE MERATE A.S.DSQ.B"
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/casatese-merate.webp",
+      "source": "https://www.facebook.com/CasateseMerate",
       "sourceUrl": "https://www.facebook.com/CasateseMerate",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Italia/SerieD/GironeB/Squadra/CasateseMerate/71198/Stadio",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/casatese-merate.webp",
       "width": 197,
       "height": 256,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "77e9cec0d1a8cbb15e69ac5cb298dee66c51de40f6d4c4d270e4e51d68af4286",
+      "fixtures": [
+        "EVT-ES11-5A-CASATESEMERATEASDS-FUORI",
+        "EVT-U16E-20261129-CASATESEMERATEASD-FUORI",
+        "EVT-ES12-9A-CASATESEMERATEASD-CASA",
+        "EVT-U16E-12R-CASATESEMERATEASD-CASA"
+      ]
+    },
+    {
+      "slug": "casati-arcore",
+      "displayName": "Casati Arcore",
+      "aliases": [
+        "A. CASATI CALCIO ARCORE"
+      ],
+      "status": "VERIFIED_FILE",
+      "file": "/media/crests/casati-arcore.webp",
+      "source": "https://www.facebook.com/casaticalcioarcore",
+      "sourceUrl": "https://www.facebook.com/casaticalcioarcore",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Squadra/CasatiArcore/675757/Scheda",
+      "scdDriveFile": "SCD Drive: ufficio stampa/LOGHI SQUADRE CAMPIONATI/A.CASATI CALCIO ARCORE U.S..png (1ysmPo2pfVKQVVXxz6BrecoM6_sJcfQoB)",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "width": 201,
+      "height": 256,
+      "originalSha256": "8cb1ec4d05a9d2e716159bc7eb21d3c3ef4f6ed6f1e230c75ebb5148d2f5ae0e",
+      "note": "Page 'USA Casati Calcio Arcore 1946'; current page picture is the 80th-anniversary badge (1946-2026).",
+      "fixtures": [
+        "EVT-PRIMA-1A-ACASATICALCIOARCOR-CASA",
+        "EVT-PRIMA-1R-ACASATICALCIOARCOR-FUORI"
+      ]
     },
     {
       "slug": "cassina-rizzardi",
@@ -302,13 +435,20 @@
         "CASSINA RIZZARDI"
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/cassina-rizzardi.webp",
+      "source": "https://www.facebook.com/cassinarizzardi1977",
       "sourceUrl": "https://www.facebook.com/cassinarizzardi1977",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/PrimaCategoria/GironeA/Squadra/CassinaRizzardi/1000652/Scheda",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/cassina-rizzardi.webp",
       "width": 209,
       "height": 256,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "e03e39916f978a6fdbbe58c9e987498935e168bfa7865d601eb8164bab8867f6",
+      "fixtures": [
+        "EVT-U19E-12A-CASSINARIZZARDI-FUORI",
+        "EVT-U19E-12R-CASSINARIZZARDI-CASA"
+      ]
     },
     {
       "slug": "castellanzese",
@@ -317,13 +457,20 @@
         "CASTELLANZESE 1921"
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/castellanzese.webp",
+      "source": "https://www.facebook.com/castellanzesecalcio1921",
       "sourceUrl": "https://www.facebook.com/castellanzesecalcio1921",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Italia/SerieD/GironeD/Squadra/Castellanzese1921/930022/Scheda",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/castellanzese.webp",
       "width": 256,
       "height": 256,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "536d27b1e170df40581abc5267ee3269f7ebf115b215d800db11cacb1398b0c6",
+      "fixtures": [
+        "EVT-U16E-20261011-CASTELLANZESE1921-FUORI",
+        "EVT-U16E-5R-CASTELLANZESE1921-CASA"
+      ]
     },
     {
       "slug": "castello-citta-di-cantu",
@@ -331,12 +478,19 @@
       "aliases": [
         "CASTELLO CITTA DI CANTU"
       ],
-      "status": "NOT_FOUND",
+      "status": "MISSING",
+      "file": null,
+      "source": null,
       "sourceUrl": null,
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/Esordienti9c9/GironeAComo/Squadra/CastelloCittaDiCantu/1098438/Scheda",
+      "scdDriveFile": "SCD Drive: ufficio stampa/LOGHI SQUADRE CAMPIONATI/CASTELLO CITTA DI CANTU ASDGSO.png (10PJ9ewD0a5p0Vigbxn-3pEEs2d6H7Q-z)",
       "verifiedAt": null,
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": null,
-      "note": "Only 'Junior Castello Scuola Calcio' page found; identity not confirmed."
+      "note": "Crest present in SCD Drive but not imported here (file too large for this environment's transfer); official site castellocittadicantu.it only shows it inside a banner.",
+      "fixtures": [
+        "EVT-U19E-11A-CASTELLOCITTADICAN-CASA",
+        "EVT-U19E-11R-CASTELLOCITTADICAN-FUORI"
+      ]
     },
     {
       "slug": "chiavennese",
@@ -345,13 +499,20 @@
         "CHIAVENNESE"
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/chiavennese.webp",
+      "source": "https://www.facebook.com/unionesportiva.chiavennese",
       "sourceUrl": "https://www.facebook.com/unionesportiva.chiavennese",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/PrimaCategoria/GironeF/Squadra/Chiavennese/12680/Scheda",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/chiavennese.webp",
       "width": 226,
       "height": 235,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "b821bda2569a15d1a182bba8e1a5610f0bf2db652fab3ad8aa3defdce3fd1b25",
+      "fixtures": [
+        "EVT-U15-6A-CHIAVENNESE-FUORI",
+        "EVT-U15-6R-CHIAVENNESE-CASA"
+      ]
     },
     {
       "slug": "cinisello",
@@ -359,12 +520,18 @@
       "aliases": [
         "CINISELLO"
       ],
-      "status": "NOT_FOUND",
+      "status": "MISSING",
+      "file": null,
+      "source": null,
       "sourceUrl": null,
+      "tuttocampoUrl": "https://www.tuttocampo.it/Squadra/Cinisello/80965/Scheda",
       "verifiedAt": null,
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": null,
-      "note": "Several Cinisello clubs; identity ambiguous."
+      "note": "Several Cinisello clubs; identity ambiguous.",
+      "fixtures": [
+        "EVT-U19E-8A-CINISELLO-CASA",
+        "EVT-U19E-8R-CINISELLO-FUORI"
+      ]
     },
     {
       "slug": "cisanese",
@@ -373,13 +540,43 @@
         "CISANESE A.S.D."
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/cisanese.webp",
+      "source": "https://www.facebook.com/Cisanese",
       "sourceUrl": "https://www.facebook.com/Cisanese",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/Eccellenza/GironeB/Squadra/Cisanese/13060/Scheda",
+      "scdDriveFile": "SCD Drive: ufficio stampa/LOGHI SQUADRE CAMPIONATI/CISANESE A.S.D..jpg (19-_3dl56O8lE7J1ex-D06vR5AqLA1Jcg)",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/cisanese.webp",
       "width": 256,
       "height": 256,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "c94a25aeea497928a21f37714f9cf7179af9afbd4a93fde7679cc68ec4e7fd4b",
+      "fixtures": [
+        "EVT-U19E-2A-CISANESEASD-CASA"
+      ]
+    },
+    {
+      "slug": "cob-91",
+      "displayName": "COB 91",
+      "aliases": [
+        "C.O.B. 91"
+      ],
+      "status": "VERIFIED_FILE",
+      "file": "/media/crests/cob-91.webp",
+      "source": "https://www.facebook.com/ASCob91",
+      "sourceUrl": "https://www.facebook.com/ASCob91",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/PrimaCategoria/GironeM/Squadra/Cob91/79921/Scheda",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "width": 110,
+      "height": 110,
+      "originalSha256": "0ff1dbf607ed914f89f8545f1e7444f83cc01a41086a08b053e4309c85ee2d32",
+      "note": "Source image is 110px.",
+      "fixtures": [
+        "EVT-PRIMA-10A-COB91-CASA",
+        "EVT-PRIMA-10R-COB91-FUORI"
+      ]
     },
     {
       "slug": "cortenova",
@@ -388,14 +585,21 @@
         "CORTENOVA A.S.D."
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/cortenova.webp",
+      "source": "https://www.facebook.com/csccortenova",
       "sourceUrl": "https://www.facebook.com/csccortenova",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/SecondaCategoria/GironeUSondrio/Squadra/Cortenova/81790/Scheda",
+      "scdDriveFile": "SCD Drive: ufficio stampa/LOGHI SQUADRE CAMPIONATI/Cortenova A.S.D..png (1QOIOumo7wMq5LOySeBZOixmzc5RFTVHa)",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/cortenova.webp",
-      "note": "Page 'Centro Sportivo Culturale Cortenova'.",
       "width": 230,
       "height": 256,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "8a7c54e0296e7b6e19d2c29d8fb65938cf73bd002b90bff8fa647552a2c8831c",
+      "note": "Page 'Centro Sportivo Culturale Cortenova'.",
+      "fixtures": [
+        "EVT-PC78-8A-CORTENOVAASD-CASA"
+      ]
     },
     {
       "slug": "cosio-valtellino",
@@ -404,13 +608,20 @@
         "COSIO VALTELLINO"
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/cosio-valtellino.webp",
+      "source": "https://www.facebook.com/uscosiovaltellino",
       "sourceUrl": "https://www.facebook.com/uscosiovaltellino",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/SecondaCategoria/GironeVSondrio/Squadra/CosioValtellino/64565/Scheda",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/cosio-valtellino.webp",
       "width": 200,
       "height": 256,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "0a73989868d767fdc60b399d82b02c946bce17b22fd0598635e83451a56df574",
+      "fixtures": [
+        "EVT-U15-1A-COSIOVALTELLINO-FUORI",
+        "EVT-U15-1R-COSIOVALTELLINO-CASA"
+      ]
     },
     {
       "slug": "costamasnaga",
@@ -420,14 +631,26 @@
         "COSTAMASNAGA SQ.B"
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/costamasnaga.webp",
+      "source": "https://www.facebook.com/uccostamasnaga",
       "sourceUrl": "https://www.facebook.com/uccostamasnaga",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/PrimaCategoria/GironeD/Squadra/Costamasnaga/1000639/Scheda",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/costamasnaga.webp",
-      "note": "U.C. Costamasnaga.",
       "width": 256,
       "height": 256,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "0597b837216648001674504b41ddc3069a912cca81c1c1133d744098685d7469",
+      "note": "U.C. Costamasnaga.",
+      "fixtures": [
+        "EVT-PRIMA-20261007-COSTAMASNAGA-CASA",
+        "EVT-ES12-1A-COSTAMASNAGA-FUORI",
+        "EVT-PC78-3A-COSTAMASNAGASQB-CASA",
+        "EVT-PRIMA-7A-COSTAMASNAGA-FUORI",
+        "EVT-PULMIX-6A-COSTAMASNAGA-CASA",
+        "EVT-ES11-7A-COSTAMASNAGA-FUORI",
+        "EVT-PRIMA-7R-COSTAMASNAGA-CASA"
+      ]
     },
     {
       "slug": "delebio",
@@ -436,13 +659,20 @@
         "DELEBIO"
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/delebio.webp",
+      "source": "https://www.facebook.com/usdelebio",
       "sourceUrl": "https://www.facebook.com/usdelebio",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Squadra/Delebio/15280/Scheda",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/delebio.webp",
       "width": 256,
       "height": 256,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "cecde672335a479ff3c3ec3e7f6d3a1026293deaeed516ad287102031faf160b",
+      "fixtures": [
+        "EVT-U15-7A-DELEBIO-CASA",
+        "EVT-U15-7R-DELEBIO-FUORI"
+      ]
     },
     {
       "slug": "di-po",
@@ -450,12 +680,22 @@
       "aliases": [
         "DI.PO A.S.D."
       ],
-      "status": "NOT_FOUND",
-      "sourceUrl": null,
-      "verifiedAt": null,
+      "status": "VERIFIED_FILE",
+      "file": "/media/crests/di-po.webp",
+      "source": "https://www.facebook.com/dipovimercatesecalcio",
+      "sourceUrl": "https://www.facebook.com/dipovimercatesecalcio",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/PrimaCategoria/GironeC/Squadra/DiPoVimercatese/73305/Scheda",
+      "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": null,
-      "note": "Only CSI/polisportiva pages found."
+      "width": 256,
+      "height": 256,
+      "originalSha256": "47cafedbc8519ddd7d75b3354ed8298cb5df502c3e54802f7fe3b825ab5cbfc9",
+      "note": "Page 'DI.PO. Calcio' (Dipo Vimercatese 1945).",
+      "fixtures": [
+        "EVT-PRIMA-8A-DIPOASD-CASA",
+        "EVT-PRIMA-8R-DIPOASD-FUORI"
+      ]
     },
     {
       "slug": "dubino",
@@ -463,11 +703,22 @@
       "aliases": [
         "DUBINO ASD"
       ],
-      "status": "NOT_FOUND",
-      "sourceUrl": null,
-      "verifiedAt": null,
+      "status": "VERIFIED_FILE",
+      "file": "/media/crests/dubino.webp",
+      "source": "https://www.facebook.com/usdubino",
+      "sourceUrl": "https://www.facebook.com/usdubino",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/SecondaCategoria/GironeXSondrio/Squadra/Dubino/76265/Scheda",
+      "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": null
+      "width": 207,
+      "height": 256,
+      "originalSha256": "5497baeecc57ac74ded5c3afecbf05301f4ebcac1d593864e9df406a8933a681",
+      "note": "Page 'US Dubino' (1975).",
+      "fixtures": [
+        "EVT-U15-3A-DUBINOASD-FUORI",
+        "EVT-U15-3R-DUBINOASD-CASA"
+      ]
     },
     {
       "slug": "fucina-di-muggio",
@@ -475,12 +726,18 @@
       "aliases": [
         "FUCINA DI MUGGIO ASD"
       ],
-      "status": "NOT_FOUND",
+      "status": "MISSING",
+      "file": null,
+      "source": null,
       "sourceUrl": null,
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/Promozione/GironeB/Squadra/Muggio/1000435/Scheda",
       "verifiedAt": null,
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": null,
-      "note": "FCDFucina page not reachable."
+      "note": "FCDFucina page not reachable.",
+      "fixtures": [
+        "EVT-U19E-7A-FUCINADIMUGGIOASD-FUORI",
+        "EVT-U19E-7R-FUCINADIMUGGIOASD-CASA"
+      ]
     },
     {
       "slug": "futura-zanetti",
@@ -488,23 +745,17 @@
       "aliases": [
         "FUTURA ZANETTI A.S.D."
       ],
-      "status": "NOT_FOUND",
+      "status": "MISSING",
+      "file": null,
+      "source": null,
       "sourceUrl": null,
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/TerzaCategoria/GironeALecco/Squadra/OZanetti/675349/Scheda",
       "verifiedAt": null,
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": null
-    },
-    {
-      "slug": "gso-missaglia",
-      "displayName": "GSO Missaglia",
-      "aliases": [
-        "G.S.O. MISSAGLIA A.S.D."
-      ],
-      "status": "NOT_FOUND",
-      "sourceUrl": null,
-      "verifiedAt": null,
-      "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": null
+      "note": "Only 'A.S.D. Zanetti' (ZANETTI 1948) page found, name differs and picture is cropped: not used.",
+      "fixtures": [
+        "EVT-PC78-9A-FUTURAZANETTIASD-FUORI"
+      ]
     },
     {
       "slug": "grentarcadia",
@@ -513,13 +764,20 @@
         "GRENTARCADIA"
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/grentarcadia.webp",
+      "source": "https://www.facebook.com/asdgrentarcadia",
       "sourceUrl": "https://www.facebook.com/asdgrentarcadia",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/Promozione/GironeB/Squadra/Grentarcadia/1163797/Scheda",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/grentarcadia.webp",
       "width": 256,
       "height": 241,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "dee5c8e2eaa0d8130b17fb33c4407984362eec760458bc69ef6429dfe8d06dba",
+      "fixtures": [
+        "EVT-U15-4A-GRENTARCADIA-FUORI",
+        "EVT-U15-4R-GRENTARCADIA-CASA"
+      ]
     },
     {
       "slug": "gso-ballabio",
@@ -529,13 +787,38 @@
         "GSO BALLABIO - ASD"
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/gso-ballabio.webp",
+      "source": "https://www.facebook.com/578164399347521",
       "sourceUrl": "https://www.facebook.com/578164399347521",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/GiovanissimiProvincialiU15/GironeALecco/Squadra/GsoBallabio/1165206/Scheda",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/gso-ballabio.webp",
       "width": 256,
       "height": 256,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "30724e6299484d78ff04fc8123f8f83dffaab271abde4f0eba4aabc7e418de39",
+      "fixtures": [
+        "EVT-PC78-6A-GSOBALLABIOASD-CASA",
+        "EVT-U15-11A-GSOBALLABIO-CASA",
+        "EVT-U15-11R-GSOBALLABIO-FUORI"
+      ]
+    },
+    {
+      "slug": "gso-missaglia",
+      "displayName": "GSO Missaglia",
+      "aliases": [
+        "G.S.O. MISSAGLIA A.S.D."
+      ],
+      "status": "MISSING",
+      "file": null,
+      "source": null,
+      "sourceUrl": null,
+      "tuttocampoUrl": null,
+      "verifiedAt": null,
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "fixtures": [
+        "EVT-PULMIX-1A-GSOMISSAGLIAASD-CASA"
+      ]
     },
     {
       "slug": "la-dominante",
@@ -543,12 +826,18 @@
       "aliases": [
         "LA DOMINANTE"
       ],
-      "status": "NOT_FOUND",
+      "status": "MISSING",
+      "file": null,
+      "source": null,
       "sourceUrl": null,
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/GiovanissimiRegionaliU15/GironeB/Squadra/LaDominante/1051076/Scheda",
       "verifiedAt": null,
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": null,
-      "note": "Instagram only."
+      "note": "Instagram only.",
+      "fixtures": [
+        "EVT-U16E-2A-LADOMINANTE-CASA",
+        "EVT-U16E-20270117-LADOMINANTE-FUORI"
+      ]
     },
     {
       "slug": "lentatese",
@@ -557,13 +846,20 @@
         "LENTATESE"
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/lentatese.webp",
+      "source": "https://www.facebook.com/AcdLentatese",
       "sourceUrl": "https://www.facebook.com/AcdLentatese",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/Eccellenza/GironeA/Squadra/Lentatese/26060/Scheda",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/lentatese.webp",
       "width": 212,
       "height": 256,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "8b5a101137d15769e12208fcf66090079c6c4b7276b4fb9ea8c936a820d60729",
+      "fixtures": [
+        "EVT-U19E-4A-LENTATESE-CASA",
+        "EVT-U19E-4R-LENTATESE-FUORI"
+      ]
     },
     {
       "slug": "leon",
@@ -572,14 +868,21 @@
         "LEON"
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/leon.webp",
+      "source": "https://www.facebook.com/acleonmonzabrianza",
       "sourceUrl": "https://www.facebook.com/acleonmonzabrianza",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Italia/SerieD/GironeB/Squadra/Leon/68303/Scheda",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/leon.webp",
-      "note": "AC Leon Monza e Brianza.",
       "width": 256,
       "height": 256,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "7824f0f59571c9617a7e90cd1e39e28d1b15da1e71fb828cb34a2d821ae2c6b4",
+      "note": "AC Leon Monza e Brianza.",
+      "fixtures": [
+        "EVT-U16E-13A-LEON-CASA",
+        "EVT-U16E-20270411-LEON-FUORI"
+      ]
     },
     {
       "slug": "lesmo",
@@ -587,13 +890,24 @@
       "aliases": [
         "LESMO SSD ARL"
       ],
-      "status": "SOURCE_FOUND_DOWNLOAD_BLOCKED",
+      "status": "VERIFIED_FILE",
+      "file": "/media/crests/lesmo.webp",
+      "source": "https://www.facebook.com/p/FC-Lesmo-Monza-e-Brianza-100082565132404/",
       "sourceUrl": "https://www.facebook.com/p/FC-Lesmo-Monza-e-Brianza-100082565132404/",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/Promozione/GironeB/Squadra/Lesmo/1057148/Scheda",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": null,
-      "note": "Official page found, picture not retrievable without login.",
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE"
+      "width": 256,
+      "height": 256,
+      "originalSha256": "fff49485a843850214fd024ee3db7b825860e2e82ff66a47fed66a9c948e5a76",
+      "note": "Page 'FC Lesmo Monza e Brianza', page id 103121329109348.",
+      "fixtures": [
+        "EVT-U19E-1A-LESMOSSDARL-FUORI",
+        "EVT-PRIMA-2A-LESMOSSDARL-FUORI",
+        "EVT-U19E-1R-LESMOSSDARL-CASA",
+        "EVT-PRIMA-2R-LESMOSSDARL-CASA"
+      ]
     },
     {
       "slug": "lissone-calcio",
@@ -601,12 +915,18 @@
       "aliases": [
         "LISSONE CALCIO SSDARL"
       ],
-      "status": "NOT_FOUND",
+      "status": "MISSING",
+      "file": null,
+      "source": null,
       "sourceUrl": null,
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/Promozione/GironeD/Squadra/Lissone/62922/Scheda",
       "verifiedAt": null,
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": null,
-      "note": "Identity ambiguous (Pro Lissone / AC Lissone)."
+      "note": "Identity ambiguous (Pro Lissone / AC Lissone).",
+      "fixtures": [
+        "EVT-PRIMA-4A-LISSONECALCIOSSDAR-FUORI",
+        "EVT-PRIMA-4R-LISSONECALCIOSSDAR-CASA"
+      ]
     },
     {
       "slug": "luciano-manara",
@@ -616,13 +936,23 @@
         "LUCIANO MANARA SQ.B"
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/luciano-manara.webp",
+      "source": "https://www.facebook.com/lucianomanara1909",
       "sourceUrl": "https://www.facebook.com/lucianomanara1909",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/Eccellenza/GironeB/Squadra/LucianoManara/28710/Scheda",
+      "scdDriveFile": "SCD Drive: ufficio stampa/LOGHI SQUADRE CAMPIONATI/LUCIANO MANARA.png (1bM_bvfqEMhV1akemJq3BMYMydx00kshF)",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/luciano-manara.webp",
       "width": 148,
       "height": 256,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "2b8b0daa285672cd0dbd289f326188380218418f85c8e5b3f48828f556f7f3d1",
+      "fixtures": [
+        "EVT-ES12-4A-LUCIANOMANARA-CASA",
+        "EVT-U19E-13A-LUCIANOMANARA-CASA",
+        "EVT-ES11-9A-LUCIANOMANARASQB-FUORI",
+        "EVT-U19E-13R-LUCIANOMANARA-FUORI"
+      ]
     },
     {
       "slug": "mariano-calcio",
@@ -631,13 +961,20 @@
         "MARIANO CALCIO"
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/mariano-calcio.webp",
+      "source": "https://www.facebook.com/marianocalcio",
       "sourceUrl": "https://www.facebook.com/marianocalcio",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/Promozione/GironeD/Squadra/MarianoCalcio/64834/Scheda",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/mariano-calcio.webp",
       "width": 232,
       "height": 256,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "6ff90db614c35dc9e66c7ae77aeeb126af5dddd19e98402a371936971e325df4",
+      "fixtures": [
+        "EVT-PRIMA-15A-MARIANOCALCIO-FUORI",
+        "EVT-PRIMA-15R-MARIANOCALCIO-CASA"
+      ]
     },
     {
       "slug": "meda-1913",
@@ -646,13 +983,21 @@
         "MEDA 1913"
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/meda-1913.webp",
+      "source": "https://www.facebook.com/calciomeda",
       "sourceUrl": "https://www.facebook.com/calciomeda",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/Promozione/GironeB/Squadra/Meda1913/932494/Scheda",
+      "scdDriveFile": "SCD Drive: ufficio stampa/LOGHI SQUADRE CAMPIONATI/A.C. Meda 1913 A.S.D..png (1W96ws2crfCAkh9g2N9irU7CaJ0REJc5p)",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/meda-1913.webp",
       "width": 256,
       "height": 256,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "e9be09ab006f94bec1fae134d49dc136015b4f5a9acce67f1d90f460703681b7",
+      "fixtures": [
+        "EVT-U19E-5A-MEDA1913-FUORI",
+        "EVT-U19E-5R-MEDA1913-CASA"
+      ]
     },
     {
       "slug": "mese",
@@ -661,14 +1006,21 @@
         "MESE"
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/mese.webp",
+      "source": "https://www.facebook.com/p/AC-MESE-100057555043867/",
       "sourceUrl": "https://www.facebook.com/p/AC-MESE-100057555043867/",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/GiovanissimiProvincialiU15/GironeUnicoSondrio/Squadra/Mese/1008090/Scheda",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/mese.webp",
-      "note": "A.C. Mese 1990.",
       "width": 256,
       "height": 256,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "fabb62ec6cb1d57ac7359dc9a3b46c64b5a4b43c30be3bd675667f3cf061c58f",
+      "note": "A.C. Mese 1990.",
+      "fixtures": [
+        "EVT-U15-8A-MESE-FUORI",
+        "EVT-U15-8R-MESE-CASA"
+      ]
     },
     {
       "slug": "nuova-sondrio",
@@ -677,28 +1029,24 @@
         "NUOVA SONDRIO CALCIO"
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/nuova-sondrio.webp",
+      "source": "https://www.facebook.com/nuovasondriocalcio",
       "sourceUrl": "https://www.facebook.com/nuovasondriocalcio",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/GiovanissimiRegionaliU15/GironeC/Squadra/NuovaSondrioCalcio/1137682/Scheda",
+      "scdDriveFile": "SCD Drive: ufficio stampa/LOGHI SQUADRE CAMPIONATI/Nuova Sondrio Calcio.png (1D3tFpwanXj8O9nS6-fXWyc9e0cJmgNzI)",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/nuova-sondrio.webp",
       "width": 256,
       "height": 255,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
-    },
-    {
-      "slug": "osgb-merate",
-      "displayName": "OSGB Merate",
-      "aliases": [
-        "O.S.G.B. MERATE"
-      ],
-      "status": "VERIFIED_FILE",
-      "sourceUrl": "https://www.facebook.com/OsgbCalcio",
-      "verifiedAt": "2026-10-13",
-      "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/osgb-merate.webp",
-      "width": 244,
-      "height": 256,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "4f4f33eb3b76cd3d1d694098aa5e443df3d09bf481fe0d2a509f4b3eb4bc2bdc",
+      "fixtures": [
+        "EVT-U19E-1A-NUOVASONDRIOCALCIO-FUORI",
+        "EVT-U15-20260906-NUOVASONDRIOCALCIO-FUORI",
+        "EVT-U19E-2A-NUOVASONDRIOCALCIO-CASA",
+        "EVT-U15-20261008-NUOVASONDRIOCALCIO-CASA",
+        "EVT-U19E-2R-NUOVASONDRIOCALCIO-FUORI"
+      ]
     },
     {
       "slug": "olginatese",
@@ -708,13 +1056,23 @@
         "OLGINATESE SQ.B"
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/olginatese.webp",
+      "source": "https://www.facebook.com/olginatese",
       "sourceUrl": "https://www.facebook.com/olginatese",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/Eccellenza/GironeB/Squadra/Olginatese/60228/Scheda",
+      "scdDriveFile": "SCD Drive: ufficio stampa/LOGHI SQUADRE CAMPIONATI/olginatese.jpg (1MNzBak0mrJ5yHtu67cGdRmjSCED4JVdi)",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/olginatese.webp",
       "width": 187,
       "height": 256,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "d102d161a78fe68df50d8473aadc6caa4d0b4e829f399ff54dcc12ed0ba5827d",
+      "fixtures": [
+        "EVT-ES12-3A-OLGINATESESQB-FUORI",
+        "EVT-PC78-4A-OLGINATESE-CASA",
+        "EVT-U16E-9A-OLGINATESE-CASA",
+        "EVT-U16E-20270306-OLGINATESE-FUORI"
+      ]
     },
     {
       "slug": "olympic-morbegno",
@@ -723,13 +1081,43 @@
         "OLYMPIC MORBEGNO"
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/olympic-morbegno.webp",
+      "source": "https://www.facebook.com/olympicmorbegno",
       "sourceUrl": "https://www.facebook.com/olympicmorbegno",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/PrimaCategoria/GironeC/Squadra/OlympicMorbegno/1034432/Scheda",
+      "scdDriveFile": "SCD Drive: ufficio stampa/LOGHI SQUADRE CAMPIONATI/ASR    OLYMPIC MORBEGNO.png (1P7y_xJH750fl7CKuzn-mytaf61lsaADQ, folder Loghi Promozione Coppa Lombarda)",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/olympic-morbegno.webp",
       "width": 218,
       "height": 256,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "d59b22cd1c4df7ac47f4e598a0519b1dd2044b2207a5988d0ec18b7ad84c78b3",
+      "fixtures": [
+        "EVT-PRIMA-20260923-OLYMPICMORBEGNO-FUORI",
+        "EVT-PRIMA-3A-OLYMPICMORBEGNO-CASA",
+        "EVT-PRIMA-3R-OLYMPICMORBEGNO-FUORI"
+      ]
+    },
+    {
+      "slug": "osgb-merate",
+      "displayName": "OSGB Merate",
+      "aliases": [
+        "O.S.G.B. MERATE"
+      ],
+      "status": "VERIFIED_FILE",
+      "file": "/media/crests/osgb-merate.webp",
+      "source": "https://www.facebook.com/OsgbCalcio",
+      "sourceUrl": "https://www.facebook.com/OsgbCalcio",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/GiovanissimiProvincialiU15/GironeCLecco/Squadra/OSGBMerate/1124800/Scheda",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "width": 244,
+      "height": 256,
+      "originalSha256": "d0f801eacb315434e2f3c8b56d776f61738f780b48e4925db00f662e88fee16c",
+      "fixtures": [
+        "EVT-PULMIX-7A-OSGBMERATE-FUORI"
+      ]
     },
     {
       "slug": "penta-piateda",
@@ -737,11 +1125,22 @@
       "aliases": [
         "PENTA PIATEDA"
       ],
-      "status": "NOT_FOUND",
-      "sourceUrl": null,
-      "verifiedAt": null,
+      "status": "VERIFIED_FILE",
+      "file": "/media/crests/penta-piateda.webp",
+      "source": "SCD Drive: ufficio stampa/LOGHI SQUADRE CAMPIONATI/A.S.D. Penta Piateda.jpg (1Vp27_eBQdRZ_59nrQzBwFvhSlTSNhq6j)",
+      "sourceUrl": "https://drive.google.com/file/d/1Vp27_eBQdRZ_59nrQzBwFvhSlTSNhq6j/view",
+      "sourceKind": "SCD_DRIVE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/SecondaCategoria/GironeUSondrio/Squadra/PentaPiateda/1022954/Scheda",
+      "scdDriveFile": "SCD Drive: ufficio stampa/LOGHI SQUADRE CAMPIONATI/A.S.D. Penta Piateda.jpg (1Vp27_eBQdRZ_59nrQzBwFvhSlTSNhq6j)",
+      "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": null
+      "width": 256,
+      "height": 256,
+      "originalSha256": "00f685556d1fb67982811f4e1c5b01aa497af2e8d3c1e605da9671f2cb748d28",
+      "note": "Logo collected by the SCD press office.",
+      "fixtures": [
+        "EVT-ES-20261011-PENTAPIATEDA-CASA"
+      ]
     },
     {
       "slug": "piantedo",
@@ -750,13 +1149,20 @@
         "PIANTEDO"
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/piantedo.webp",
+      "source": "https://www.facebook.com/asdpiantedocalcio",
       "sourceUrl": "https://www.facebook.com/asdpiantedocalcio",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/SecondaCategoria/GironeVSondrio/Squadra/Piantedo/930010/Scheda",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/piantedo.webp",
       "width": 256,
       "height": 256,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "49298530e6ece9f991f4cc585dcba2f1daf416663ca1f30bb351c636232e5c9b",
+      "fixtures": [
+        "EVT-U15-5A-PIANTEDO-CASA",
+        "EVT-U15-5R-PIANTEDO-FUORI"
+      ]
     },
     {
       "slug": "pol-mandello",
@@ -765,13 +1171,19 @@
         "POL. MANDELLO DEL LARIO"
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/pol-mandello.webp",
+      "source": "https://www.facebook.com/polisportivamandello2",
       "sourceUrl": "https://www.facebook.com/polisportivamandello2",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/SecondaCategoria/GironeLLegnano/Squadra/Mandello/64292/Scheda",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/pol-mandello.webp",
       "width": 256,
       "height": 256,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "2e19198f72323c6ddacba0045a1dbd6c7bf7e16a05a8f1428e75367e40a46689",
+      "fixtures": [
+        "EVT-PC78-1A-POLMANDELLODELLARI-CASA"
+      ]
     },
     {
       "slug": "pontelambrese",
@@ -779,13 +1191,23 @@
       "aliases": [
         "PONTELAMBRESE A.S.D."
       ],
-      "status": "SOURCE_FOUND_DOWNLOAD_BLOCKED",
+      "status": "VERIFIED_FILE",
+      "file": "/media/crests/pontelambrese.webp",
+      "source": "https://www.facebook.com/p/ASD-Pontelambrese-100046242326365/",
       "sourceUrl": "https://www.facebook.com/p/ASD-Pontelambrese-100046242326365/",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/Promozione/GironeB/Squadra/Pontelambrese/675011/Scheda",
+      "scdDriveFile": "SCD Drive: ufficio stampa/LOGHI SQUADRE CAMPIONATI/pontambrese.png (1Ui4j9JdREZ6WnrGsjCECtKbk0SV_Gy_a)",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": null,
-      "note": "Official page found, picture not retrievable without login.",
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE"
+      "width": 194,
+      "height": 256,
+      "originalSha256": "30e2f416702a683ece6118a2746e3f2636e5d40df438a4535440f9c84b961515",
+      "note": "Page 'ASD Pontelambrese' (1974), page id 1422382228024547; same crest also in SCD Drive (pontambrese.png).",
+      "fixtures": [
+        "EVT-PRIMA-9A-PONTELAMBRESEASD-FUORI",
+        "EVT-PRIMA-9R-PONTELAMBRESEASD-CASA"
+      ]
     },
     {
       "slug": "real-milano",
@@ -794,13 +1216,20 @@
         "REAL MILANO SSD A RL"
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/real-milano.webp",
+      "source": "https://www.facebook.com/RealMilano",
       "sourceUrl": "https://www.facebook.com/RealMilano",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/PrimaCategoria/GironeL/Squadra/RealMilano/917106/Stadio",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/real-milano.webp",
       "width": 178,
       "height": 256,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "4c11d6e9f875f67f7a41627e89806b37ef95b83f5cefc95a295fdc37d9345149",
+      "fixtures": [
+        "EVT-U19E-15A-REALMILANOSSDARL-CASA",
+        "EVT-U19E-15R-REALMILANOSSDARL-FUORI"
+      ]
     },
     {
       "slug": "rogeno",
@@ -808,11 +1237,16 @@
       "aliases": [
         "ROGENO A.S.D."
       ],
-      "status": "NOT_FOUND",
+      "status": "MISSING",
+      "file": null,
+      "source": null,
       "sourceUrl": null,
+      "tuttocampoUrl": null,
       "verifiedAt": null,
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": null
+      "fixtures": [
+        "EVT-PULMIX-2A-ROGENOASD-FUORI"
+      ]
     },
     {
       "slug": "rovinata",
@@ -820,12 +1254,21 @@
       "aliases": [
         "ROVINATA"
       ],
-      "status": "NOT_FOUND",
-      "sourceUrl": null,
-      "verifiedAt": null,
+      "status": "VERIFIED_FILE",
+      "file": "/media/crests/rovinata.webp",
+      "source": "https://www.facebook.com/p/ASD-POL-ROVINATA-100070857826861/",
+      "sourceUrl": "https://www.facebook.com/p/ASD-POL-ROVINATA-100070857826861/",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/SecondaCategoria/GironeJLecco/Squadra/Rovinata/675271/Scheda",
+      "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": null,
-      "note": "Instagram only."
+      "width": 194,
+      "height": 239,
+      "originalSha256": "cdd4d7bda430fd87933ecaa4ff8ac8e3116974eb19f4f68dc63e6c5926a7f7bd",
+      "note": "Page 'A.S.D. POL ROVINATA' (Oratorio di Germanedo), page id 190186824359036.",
+      "fixtures": [
+        "EVT-ES12-2A-ROVINATA-CASA"
+      ]
     },
     {
       "slug": "sala-galbiate",
@@ -834,13 +1277,20 @@
         "SALA GALBIATE 1974 ASD"
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/sala-galbiate.webp",
+      "source": "https://www.facebook.com/salagalbiate1974",
       "sourceUrl": "https://www.facebook.com/salagalbiate1974",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/AllieviRegionaliU17/GironeCoppaLombardiaAllievi/Squadra/SalaGalbiate1974/1100304/Scheda",
+      "scdDriveFile": "SCD Drive: ufficio stampa/LOGHI SQUADRE CAMPIONATI/A.S.D. Sala Galbiate 1974.jpg (1lNZK8h52L66TTx8Fv2pXxD7bfGrydewX)",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/sala-galbiate.webp",
       "width": 256,
       "height": 207,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "3fc01f3ce5de90d394a379255039bd732105ece8505112dfd0cbc3aff8667f86",
+      "fixtures": [
+        "EVT-ES11-2A-SALAGALBIATE1974AS-FUORI"
+      ]
     },
     {
       "slug": "san-giorgio",
@@ -849,12 +1299,19 @@
         "SAN GIORGIO",
         "SAN GIORGIO SQ.B"
       ],
-      "status": "NOT_FOUND",
+      "status": "MISSING",
+      "file": null,
+      "source": null,
       "sourceUrl": null,
+      "tuttocampoUrl": null,
       "verifiedAt": null,
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": null,
-      "note": "Several 'San Giorgio' clubs; identity ambiguous."
+      "note": "Several 'San Giorgio' clubs; identity ambiguous.",
+      "fixtures": [
+        "EVT-PULMIX-3A-SANGIORGIO-CASA",
+        "EVT-ES11-4A-SANGIORGIOSQB-CASA",
+        "EVT-ES12-6A-SANGIORGIOSQB-CASA"
+      ]
     },
     {
       "slug": "sirtorese",
@@ -863,13 +1320,19 @@
         "SIRTORESE"
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/sirtorese.webp",
+      "source": "https://www.facebook.com/sirtorese",
       "sourceUrl": "https://www.facebook.com/sirtorese",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/SecondaCategoria/GironeLLecco/Squadra/Sirtorese/73987/Scheda",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/sirtorese.webp",
       "width": 203,
       "height": 209,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "308473a900f9642db9bb7c61cc82619d93c4c28f5172984e800c03d66afaa697",
+      "fixtures": [
+        "EVT-PULMIX-5A-SIRTORESE-FUORI"
+      ]
     },
     {
       "slug": "valmadrera",
@@ -877,12 +1340,22 @@
       "aliases": [
         "VALMADRERA"
       ],
-      "status": "NOT_FOUND",
-      "sourceUrl": null,
-      "verifiedAt": null,
+      "status": "VERIFIED_FILE",
+      "file": "/media/crests/valmadrera.webp",
+      "source": "https://www.facebook.com/1676879909208866",
+      "sourceUrl": "https://www.facebook.com/1676879909208866",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Squadra/ValmadreraCG/67527/Scheda",
+      "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": null,
-      "note": "Instagram only."
+      "width": 256,
+      "height": 256,
+      "originalSha256": "85871e6bb4833fa681f92f633e78b9a15ca477f79fa9c55c6b6f3e126754ec8f",
+      "note": "INFERRED same club as 'VALMADRERA C.G. POL.' (the only FIGC club of Valmadrera, tuttocampo ValmadreraCG 67527).",
+      "fixtures": [
+        "EVT-U15-9A-VALMADRERA-CASA",
+        "EVT-U15-9R-VALMADRERA-FUORI"
+      ]
     },
     {
       "slug": "valmadrera-cg",
@@ -890,12 +1363,21 @@
       "aliases": [
         "VALMADRERA C.G. POL."
       ],
-      "status": "NOT_FOUND",
-      "sourceUrl": null,
-      "verifiedAt": null,
+      "status": "VERIFIED_FILE",
+      "file": "/media/crests/valmadrera-cg.webp",
+      "source": "https://www.facebook.com/1676879909208866",
+      "sourceUrl": "https://www.facebook.com/1676879909208866",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Squadra/ValmadreraCG/67527/Scheda",
+      "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": null,
-      "note": "Instagram only."
+      "width": 256,
+      "height": 256,
+      "originalSha256": "85871e6bb4833fa681f92f633e78b9a15ca477f79fa9c55c6b6f3e126754ec8f",
+      "note": "Page 'Polisportiva Valmadrera 1974' = Polisportiva Centro Giovanile Valmadrera; picture is the badge on its own background, used as published.",
+      "fixtures": [
+        "EVT-ES11-8A-VALMADRERACGPOL-CASA"
+      ]
     },
     {
       "slug": "varese",
@@ -904,13 +1386,20 @@
         "VARESE FOOTBALL CLUB"
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/varese.webp",
+      "source": "https://www.facebook.com/varesefootballclub",
       "sourceUrl": "https://www.facebook.com/varesefootballclub",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Italia/SerieD/GironeA/Squadra/VareseFC/1097763/Scheda",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/varese.webp",
       "width": 204,
       "height": 256,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "30d673fa2e05f304f948c69f7d3d656393207a129c5fec24305ee28ae962d95e",
+      "fixtures": [
+        "EVT-U16E-20260913-VARESEFOOTBALLCLUB-FUORI",
+        "EVT-U16E-1R-VARESEFOOTBALLCLUB-CASA"
+      ]
     },
     {
       "slug": "varesina",
@@ -919,13 +1408,20 @@
         "VARESINA SPORT"
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/varesina.webp",
+      "source": "https://www.facebook.com/VaresinaCalcio",
       "sourceUrl": "https://www.facebook.com/VaresinaCalcio",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Italia/SerieD/GironeD/Squadra/Varesina/932361/Scheda",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/varesina.webp",
       "width": 256,
       "height": 256,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "672fbdd5c01755e623103d051b1bd6e8a442b27c29c618ad8d0574b2324899f1",
+      "fixtures": [
+        "EVT-U16E-11A-VARESINASPORT-CASA",
+        "EVT-U16E-20270321-VARESINASPORT-FUORI"
+      ]
     },
     {
       "slug": "vercurago",
@@ -933,11 +1429,16 @@
       "aliases": [
         "VERCURAGO SQ.B"
       ],
-      "status": "NOT_FOUND",
+      "status": "MISSING",
+      "file": null,
+      "source": null,
       "sourceUrl": null,
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/TerzaCategoria/GironeALecco/Squadra/Vercurago/206432/Scheda",
       "verifiedAt": null,
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": null
+      "fixtures": [
+        "EVT-PC78-2A-VERCURAGOSQB-FUORI"
+      ]
     },
     {
       "slug": "vibe-ronchese",
@@ -946,13 +1447,23 @@
         "VIBE RONCHESE"
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/vibe-ronchese.webp",
+      "source": "https://www.facebook.com/viberonchese",
       "sourceUrl": "https://www.facebook.com/viberonchese",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/Promozione/GironeC/Squadra/VibeRonchese/1000423/Scheda",
+      "scdDriveFile": "SCD Drive: ufficio stampa/LOGHI SQUADRE CAMPIONATI/VIBE RONCHESE A.S.D..png (10z5XAkFDPbUXHu38HrxtFRIRarvwAuy5)",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/vibe-ronchese.webp",
       "width": 256,
       "height": 256,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "7362969f50b5f9dffec5cc7a122e04a926e93e1f27268740a2cf8d7679f3f402",
+      "fixtures": [
+        "EVT-PRIMA-11A-VIBERONCHESE-FUORI",
+        "EVT-U19E-14A-VIBERONCHESE-FUORI",
+        "EVT-PRIMA-11R-VIBERONCHESE-CASA",
+        "EVT-U19E-14R-VIBERONCHESE-CASA"
+      ]
     },
     {
       "slug": "vigor-milano",
@@ -961,13 +1472,20 @@
         "VIGOR MILANO"
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/vigor-milano.webp",
+      "source": "https://www.facebook.com/asdvigormilano",
       "sourceUrl": "https://www.facebook.com/asdvigormilano",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/AllieviRegionaliU17/GironeB/Squadra/VigorMilano/1138665/Scheda",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/vigor-milano.webp",
       "width": 256,
       "height": 256,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "2c1a40707c4862cade80a0ceb286e27fe93b302a794f4892307a197b132f59eb",
+      "fixtures": [
+        "EVT-U16E-20261213-VIGORMILANO-FUORI",
+        "EVT-U16E-14R-VIGORMILANO-CASA"
+      ]
     },
     {
       "slug": "vis-nova-giussano",
@@ -976,13 +1494,24 @@
         "VIS NOVA GIUSSANO"
       ],
       "status": "VERIFIED_FILE",
+      "file": "/media/crests/vis-nova-giussano.webp",
+      "source": "https://www.facebook.com/ASVISNOVA",
       "sourceUrl": "https://www.facebook.com/ASVISNOVA",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/Eccellenza/GironeA/Squadra/VisNovaGiussano/675786/Scheda",
       "verifiedAt": "2026-10-13",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "file": "/media/crests/vis-nova-giussano.webp",
       "width": 256,
       "height": 256,
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+      "originalSha256": "d63c852a8aee184584b5bad3b3960b92ef87cc5361adb49df62c93f2fe7faaa2",
+      "fixtures": [
+        "EVT-U19E-3A-VISNOVAGIUSSANO-FUORI",
+        "EVT-U16E-6A-VISNOVAGIUSSANO-CASA",
+        "EVT-U19E-3R-VISNOVAGIUSSANO-CASA",
+        "EVT-U16E-20270214-VISNOVAGIUSSANO-FUORI"
+      ]
     }
-  ]
+  ],
+  "calendarSource": "apps/superapp/src/data/calendario-snapshot-20261010.json",
+  "generator": "tools/crests/catalog.py"
 }
