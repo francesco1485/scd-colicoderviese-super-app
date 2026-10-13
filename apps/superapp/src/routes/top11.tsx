@@ -4,7 +4,6 @@ import { Check, ShieldCheck, Trophy } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { SkyCameo } from "@/components/universe/Community";
-import { ClubCrestOfficial } from "@/components/SiteChrome";
 import {
   castWeekVote,
   getWeekVote,
@@ -117,13 +116,7 @@ function Top11Page() {
           className="absolute inset-0 bg-[linear-gradient(180deg,rgb(7_29_66/0.55),#0b2a5b_90%)]"
         />
         <div className="relative mx-auto max-w-[720px] px-4 pb-6 pt-4">
-          <div className="flex items-center gap-2.5">
-            <ClubCrestOfficial size={40} />
-            <span className="whitespace-nowrap font-uv text-[22px] leading-none">
-              COLICO<span className="text-[var(--uv-gold)]">DERVIESE</span>
-            </span>
-          </div>
-          <h1 className="mb-0 mt-4 font-uv text-[40px] leading-none">
+          <h1 className="m-0 font-uv text-[40px] leading-none">
             TOP 11{" "}
             <span className="text-[var(--uv-gold)]">DELLA SETTIMANA</span>
           </h1>
