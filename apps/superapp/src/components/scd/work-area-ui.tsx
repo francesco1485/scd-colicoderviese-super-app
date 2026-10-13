@@ -141,8 +141,8 @@ export function SourcesBox({ id, className = "" }: { id: WorkAreaId; className?:
 /** Honest empty state of the boards: dashed box, what is missing and where it will come from. */
 export function EmptyState({ title, children, action }: { title: string; children?: ReactNode; action?: ReactNode }) {
   return (
-    <div className="rounded-xl border border-dashed border-[#b9d5ef] bg-[#f7fbff] px-4 py-4 sm:px-[18px]">
-      <b className="block text-[16px] font-bold leading-snug">{title}</b>
+    <div className="in-empty rounded-xl border border-dashed border-[#b9d5ef] bg-[#f7fbff] px-4 py-4 sm:px-[18px]">
+      <b className="block text-[16px] font-semibold leading-snug">{title}</b>
       {children && <p className="mt-1 text-[14.5px] leading-snug text-[var(--in-sub)]">{children}</p>}
       {action && <div className="mt-3">{action}</div>}
     </div>
@@ -168,8 +168,8 @@ export function PendingButton({ children, reason }: { children: ReactNode; reaso
 export function StatTile({ value, of, label }: { value: number | null; of?: number | null; label: string }) {
   const known = value !== null && Number.isFinite(value);
   return (
-    <div className="min-w-0 rounded-xl bg-[var(--in-info-bg)] px-3 py-2.5">
-      <span className="font-title text-[32px] font-black leading-none">
+    <div className="in-stat min-w-0 rounded-xl bg-[var(--in-info-bg)] px-3 py-2.5">
+      <span className="ex-num font-title text-[32px] font-extrabold leading-none">
         {known ? value : "—"}
         {known && of != null && <span className="text-[20px] text-[var(--in-sub)]">/{of}</span>}
         {!known && <span className="sr-only"> (dato non disponibile)</span>}
@@ -277,7 +277,7 @@ export function InsertAction({ id }: { id: WorkAreaId }) {
             role="dialog"
             aria-modal="true"
             aria-labelledby={titleId}
-            className="scd-interior scd-access-panel relative max-h-[92dvh] w-full overflow-y-auto rounded-t-2xl bg-white p-5 shadow-[0_24px_60px_-20px_rgb(2_20_51/0.6)] sm:max-w-[560px] sm:rounded-2xl sm:p-6"
+            className="scd-interior scd-excelsior scd-access-panel relative max-h-[92dvh] w-full overflow-y-auto rounded-t-2xl bg-[var(--in-surface)] p-5 shadow-[0_24px_60px_-20px_rgb(2_20_51/0.6)] sm:max-w-[560px] sm:rounded-2xl sm:p-6"
           >
             <button type="button" onClick={() => setOpen(false)} aria-label="Chiudi" className="scd-focus absolute right-2 top-2 flex size-11 items-center justify-center rounded-lg text-[var(--in-sub)]">
               <X className="size-5" aria-hidden="true" />

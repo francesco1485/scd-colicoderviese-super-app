@@ -29,7 +29,7 @@ export function Card({
   return (
     <Tag
       aria-labelledby={id && title ? `${id}-title` : undefined}
-      className={`relative min-w-0 overflow-hidden rounded-2xl border border-[var(--in-line)] bg-white shadow-[var(--in-card-shadow)] ${className}`}
+      className={`in-card relative min-w-0 overflow-hidden rounded-[var(--in-radius,16px)] border border-[var(--in-line)] bg-[var(--in-surface,#fff)] shadow-[var(--in-card-shadow)] ${className}`}
     >
       {(title || aside) && (
         <header className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2 px-4 pb-2.5 pt-4 sm:px-[18px]">
@@ -37,7 +37,7 @@ export function Card({
             {title && (
               <h2
                 id={id ? `${id}-title` : undefined}
-                className="m-0 text-[19px] font-bold leading-tight"
+                className="in-card-title m-0 text-[19px] font-bold leading-tight"
               >
                 {title}
               </h2>
