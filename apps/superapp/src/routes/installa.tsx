@@ -3,7 +3,7 @@ import { Check, Copy, Download, Share2, Smartphone } from "lucide-react";
 import QRCode from "qrcode";
 import { useEffect, useState } from "react";
 
-import { PLANNED_ADDRESS, displayAddress, installUrl } from "@/lib/install-link";
+import { OFFICIAL_ADDRESS, displayAddress, installUrl } from "@/lib/install-link";
 
 /**
  * "Installa l'app": the one page to share everywhere (posters, WhatsApp groups, e-mails) until the
@@ -20,20 +20,17 @@ export const Route = createFileRoute("/installa")({
 });
 
 function Installa() {
-  const [origin, setOrigin] = useState<string | null>(null);
   const [qrSvg, setQrSvg] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    const current = window.location.origin;
-    setOrigin(current);
-    QRCode.toString(installUrl(null, current), { type: "svg", margin: 1, errorCorrectionLevel: "M", color: { dark: "#062a52", light: "#ffffff" } })
+    QRCode.toString(installUrl(), { type: "svg", margin: 1, errorCorrectionLevel: "M", color: { dark: "#062a52", light: "#ffffff" } })
       .then(setQrSvg)
       .catch(() => setQrSvg(null));
   }, []);
 
-  const address = displayAddress(null, origin);
-  const link = installUrl(null, origin);
+  const address = displayAddress();
+  const link = installUrl();
 
   async function copy() {
     try {
@@ -110,7 +107,7 @@ function Installa() {
       </section>
 
       <p className="m-0 text-[14.5px] text-muted-foreground">
-        Presto anche su Play Store e App Store, allo stesso indirizzo di sempre ({PLANNED_ADDRESS}). Cosa fare dopo: <Link to="/guida" className="underline">come funziona l'app</Link>.
+        Presto anche su Play Store e App Store, allo stesso indirizzo di sempre ({OFFICIAL_ADDRESS}). Cosa fare dopo: <Link to="/guida" className="underline">come funziona l'app</Link>.
       </p>
     </main>
   );

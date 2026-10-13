@@ -8,17 +8,12 @@ import QRCode from "qrcode";
 import { useEffect, useState } from "react";
 
 import { Card } from "@/components/scd/interior-ui";
-import { INTERIM_ADDRESS } from "@/lib/install-link";
+import { OFFICIAL_ORIGIN } from "@/lib/install-link";
 import { CLUB_CARDS, clubCardUrl, codeRangeText, itDate, licenseView, validateClubCards, type ClubCardId } from "@/lib/club-cards";
 
-const FALLBACK_ORIGIN = `https://${INTERIM_ADDRESS}`;
-
+/** Card links and printed QR codes always carry the official address, whatever host the desk is opened from. */
 function useOrigin(): string {
-  const [origin, setOrigin] = useState(FALLBACK_ORIGIN);
-  useEffect(() => {
-    if (typeof window !== "undefined") setOrigin(window.location.origin);
-  }, []);
-  return origin;
+  return OFFICIAL_ORIGIN;
 }
 
 function useQrSvg(text: string): string | null {

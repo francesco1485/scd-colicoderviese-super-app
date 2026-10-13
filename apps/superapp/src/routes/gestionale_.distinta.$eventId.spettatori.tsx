@@ -5,7 +5,7 @@ import { useEffect, useId, useMemo, useState } from "react";
 
 import { WorkAreaGateView, workAreaHead } from "@/components/scd/work-area-ui";
 import { crestFor, OpponentCrest } from "@/lib/crests";
-import { installUrl, PLANNED_ADDRESS } from "@/lib/install-link";
+import { displayAddress, installUrl } from "@/lib/install-link";
 import {
   BASE_ACTIVITY_NOTE,
   parseOpponentList,
@@ -72,9 +72,7 @@ function longDate(iso: string): string {
 
 function SpectatorPage({ sheet }: { sheet: SpectatorSheet }) {
   const [opponentText, setOpponentText] = useState("");
-  const [origin, setOrigin] = useState<string | null>(null);
   const fieldId = useId();
-  useEffect(() => setOrigin(window.location.origin), []);
 
   const opponentLines = useMemo(
     () => parseOpponentList(opponentText, sheet.teamCode, sheet.blankLines),
@@ -113,14 +111,8 @@ function SpectatorPage({ sheet }: { sheet: SpectatorSheet }) {
   // 20 players plus a full bench do not fit at the normal row height: tighten rows instead of spilling onto page 2.
   const dense =
     (sheet.players.length || sheet.blankLines) + sheet.staff.length > 22;
-  const link = installUrl(null, origin);
-  const address = (() => {
-    try {
-      return new URL(link).host;
-    } catch {
-      return PLANNED_ADDRESS;
-    }
-  })();
+  const link = installUrl();
+  const address = displayAddress();
 
   return (
     <div className="ds-root">

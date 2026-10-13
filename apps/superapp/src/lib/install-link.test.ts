@@ -1,17 +1,26 @@
 import { describe, expect, it } from "vitest";
 
-import { PLANNED_ADDRESS, displayAddress, installUrl } from "./install-link";
+import { OFFICIAL_ADDRESS, OFFICIAL_ORIGIN, PLANNED_ADDRESS, displayAddress, installUrl, officialOrigin } from "./install-link";
 
-describe("install link (UD-071)", () => {
-  it("prefers the configured site over the current origin", () => {
-    expect(displayAddress("https://app.colicoderviese.it", "https://x.onrender.com")).toBe("app.colicoderviese.it");
-    expect(installUrl("https://app.colicoderviese.it", "https://x.onrender.com")).toBe("https://app.colicoderviese.it/installa");
+describe("install link (UD-071, official address app.colicoderviese.it)", () => {
+  it("uses the official domain by default, whatever host the page is opened from", () => {
+    expect(OFFICIAL_ADDRESS).toBe("app.colicoderviese.it");
+    expect(OFFICIAL_ORIGIN).toBe("https://app.colicoderviese.it");
+    expect(PLANNED_ADDRESS).toBe(OFFICIAL_ADDRESS);
+    expect(displayAddress()).toBe("app.colicoderviese.it");
+    expect(installUrl()).toBe("https://app.colicoderviese.it/installa");
+    expect(officialOrigin(null)).toBe(OFFICIAL_ORIGIN);
   });
-  it("falls back to the current origin, then to the planned address", () => {
-    expect(displayAddress(null, "https://scd-superapp-staging.onrender.com")).toBe("scd-superapp-staging.onrender.com");
-    expect(installUrl(null, "https://scd-superapp-staging.onrender.com/")).toBe("https://scd-superapp-staging.onrender.com/installa");
-    expect(displayAddress(null, null)).toBe(PLANNED_ADDRESS);
-    expect(displayAddress("not a url", null)).toBe(PLANNED_ADDRESS);
-    expect(installUrl(null, null)).toBe(`https://${PLANNED_ADDRESS}/installa`);
+
+  it("honours an explicit, valid site URL and ignores invalid ones", () => {
+    expect(officialOrigin("https://app.colicoderviese.it/")).toBe("https://app.colicoderviese.it");
+    expect(installUrl("https://app.colicoderviese.it/some/path")).toBe("https://app.colicoderviese.it/installa");
+    expect(displayAddress("not a url")).toBe(OFFICIAL_ADDRESS);
+    expect(installUrl("javascript:alert(1)")).toBe(`${OFFICIAL_ORIGIN}/installa`);
+  });
+
+  it("never prints the temporary Render host", () => {
+    expect(installUrl()).not.toContain("onrender.com");
+    expect(displayAddress()).not.toContain("onrender.com");
   });
 });
