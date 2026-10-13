@@ -28,6 +28,10 @@ import { TransportRequestsOffice } from "@/components/scd/TransportRequestsOffic
 import { getTransportRequests } from "@/lib/transport-requests.functions";
 import type { OfficeRequest } from "@/lib/transport-requests";
 import { draftFromEvent, runsForEvent, type RunDraft, type TransportBoard, type TransportRun } from "@/lib/transport";
+import { getPulminiVans } from "@/lib/pulmini-vans.functions";
+import type { VanId, VanPlan } from "@/lib/pulmini-vans";
+import { SlotVans, VanDetailPanel, VanLines } from "@/components/scd/PulminiVans";
+import { Dialog } from "@/components/scd/Dialog";
 
 /** Pulmini (board Pulmini.dc.html): away trips of the coming weekend and the Master Flotta facts. */
 export const Route = createFileRoute("/pulmini")({
@@ -37,8 +41,8 @@ export const Route = createFileRoute("/pulmini")({
     const cal = loadCalendar();
     const runs = await getPulminiRuns();
     const { quadro } = await getTrainingQuadro();
-    const [roster, emails, transport, requests] = await Promise.all([getStaffRoster(), getStaffEmails(), getTransportBoard(), getTransportRequests()]);
-    return { gate, interior: true as const, transport, groups: cal.groups, events: cal.events, sourceModifiedAt: cal.sourceModifiedAt, runs: runs.runs, runsAsOf: runs.asOf, quadroDays: quadro.days, quadroSlots: quadro.slots, people: roster.people, emails, requests };
+    const [roster, emails, transport, requests, vans] = await Promise.all([getStaffRoster(), getStaffEmails(), getTransportBoard(), getTransportRequests(), getPulminiVans()]);
+    return { gate, interior: true as const, transport, vans, groups: cal.groups, events: cal.events, sourceModifiedAt: cal.sourceModifiedAt, runs: runs.runs, runsAsOf: runs.asOf, quadroDays: quadro.days, quadroSlots: quadro.slots, people: roster.people, emails, requests };
   },
   head: ({ loaderData }) => workAreaHead("pulmini", loaderData?.gate),
   component: PulminiRoute,
@@ -48,15 +52,19 @@ function PulminiRoute() {
   const data = Route.useLoaderData();
   return (
     <WorkAreaGateView id="pulmini" gate={data.gate}>
-      {data.interior && <PulminiPage groups={data.groups} events={data.events} sourceModifiedAt={data.sourceModifiedAt} preview={data.gate.preview} runs={data.runs} runsAsOf={data.runsAsOf} quadroDays={data.quadroDays} quadroSlots={data.quadroSlots} people={data.people} emails={data.emails} transport={data.transport} requests={data.requests} />}
+      {data.interior && <PulminiPage groups={data.groups} events={data.events} sourceModifiedAt={data.sourceModifiedAt} preview={data.gate.preview} runs={data.runs} runsAsOf={data.runsAsOf} quadroDays={data.quadroDays} quadroSlots={data.quadroSlots} people={data.people} emails={data.emails} transport={data.transport} requests={data.requests} vans={data.vans} />}
     </WorkAreaGateView>
   );
 }
 
 const F = PULMINI_FLEET;
 
-function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf, quadroDays, quadroSlots, people, emails, transport, requests }: { groups: PublicGroup[]; events: PublicEvent[]; sourceModifiedAt: string; preview: boolean; runs: PulminoRun[]; runsAsOf: string | null; quadroDays: string[]; quadroSlots: TrainingSlot[]; people: StaffPerson[]; emails: Record<string, string>; transport: TransportData; requests: OfficeRequest[] | null }) {
+function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf, quadroDays, quadroSlots, people, emails, transport, requests, vans: vanPlan }: { groups: PublicGroup[]; events: PublicEvent[]; sourceModifiedAt: string; preview: boolean; runs: PulminoRun[]; runsAsOf: string | null; quadroDays: string[]; quadroSlots: TrainingSlot[]; people: StaffPerson[]; emails: Record<string, string>; transport: TransportData; requests: OfficeRequest[] | null; vans: VanPlan | null }) {
   const board: TransportBoard | null = transport.board;
+  const [openVan, setOpenVan] = useState<VanId | null>(null);
+  const openDetail = vanPlan && openVan ? vanPlan.vans.find((v) => v.id === openVan) ?? null : null;
+  const planSlot = (day: string, start: number) => vanPlan?.slots.find((p) => p.day === day && p.start === start) ?? null;
+  const vanMoves = vanPlan ? vanPlan.slots.reduce((n, p) => n + p.vans.length, 0) : 0;
   const [draft, setDraft] = useState<RunDraft | null>(null);
   const router = useRouter();
   const transportManagers = peopleForArea(people, "pulmini");
@@ -96,8 +104,8 @@ function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf
         <Card
           id="pul-settimana"
           title="In settimana: i pulmini degli allenamenti"
-          sub="Per ogni fascia del quadro, quanti pulmini si muovono e chi c'è a bordo. Le corse arrivano dal Master Pulmini."
-          aside={<Chip tone="info">{weekdayRuns} {weekdayRuns === 1 ? "corsa" : "corse"}</Chip>}
+          sub="Sotto ogni allenamento i pulmini che lo servono, andata e ritorno, con i nomi dei ragazzi. Premi un pulmino per vedere chi c'è sempre, dove va e che percorso fa."
+          aside={vanPlan?.mode === "locked" && weekdayRuns === 0 ? <Chip tone="mute">nomi riservati</Chip> : <Chip tone="info">{weekdayRuns + vanMoves} {weekdayRuns + vanMoves === 1 ? "pulmino in fascia" : "pulmini in fascia"}</Chip>}
           className="lg:self-start"
         >
           <div className="flex flex-wrap gap-1.5 px-4 pb-3 sm:px-[18px]" role="group" aria-label="Giorno">
@@ -120,7 +128,9 @@ function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf
             <ol className="m-0 list-none p-0">
               {trainSlots.map((slot) => {
                 const vans = trainingRuns.get(trainingKey(slot.day, slot.start)) ?? [];
-                const kids = vans.reduce((a, r) => a + ridersTotal(r), 0);
+                const ps = planSlot(slot.day, slot.start);
+                const planVans = ps?.vans.length ?? 0;
+                const kids = vans.reduce((a, r) => a + ridersTotal(r), 0) + (ps ? new Set(ps.vans.flatMap((v) => [...v.out, ...v.back].map((r) => r.key))).size : 0);
                 const who = [slot.fields.C1, slot.fields.C2].filter((t) => t && t.trim() && t.trim() !== "—").join(" · ");
                 const served = trainingServiceFor(who);
                 return (
@@ -130,13 +140,18 @@ function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf
                       <span className="text-[14px] text-[var(--in-sub)]">{slot.timeLabel}</span>
                       <span className="min-w-0 flex-1 truncate text-[14px] font-semibold" title={who}>{who || "Campi liberi"}</span>
                       {served === "no" ? (
-                        <Chip tone="info">servizio non previsto per questa fascia</Chip>
-                      ) : vans.length === 0 ? (
-                        <Chip tone="warn">nessun pulmino registrato</Chip>
+                        <Chip tone="info">servizio non previsto per questa fascia{ps && ps.notServed > 0 ? ` · ${ps.notServed} richieste nel Master` : ""}</Chip>
+                      ) : vans.length + planVans === 0 ? (
+                        vanPlan?.mode === "locked" ? null : ps && ps.unplaced.length > 0 ? (
+                          <Chip tone="warn">ragazzi da collocare</Chip>
+                        ) : (
+                          <Chip tone="warn">nessun pulmino registrato</Chip>
+                        )
                       ) : (
-                        <Chip tone="ok">{vans.length} {vans.length === 1 ? "pulmino" : "pulmini"} · {kids} ragazzi</Chip>
+                        <Chip tone="ok">{vans.length + planVans} {vans.length + planVans === 1 ? "pulmino" : "pulmini"} · {kids} ragazzi</Chip>
                       )}
                     </div>
+                    {ps && vanPlan && served !== "no" && <SlotVans slot={ps} plan={vanPlan} onOpen={setOpenVan} />}
                     {vans.length > 0 && (
                       <div className="grid gap-4 rounded-2xl bg-[#f5f9ff] p-3 md:grid-cols-2">
                         {vans.map((run, i) => (
@@ -149,8 +164,15 @@ function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf
               })}
             </ol>
           )}
-          <SourceLine>Fasce dal quadro settimanale; corse dal Master Pulmini{runsAsOf ? ` (dato al ${runsAsOf.split("-").reverse().join("/")})` : ""}. Aggiungere autisti, corse e variazioni d'orario dall'app arriverà con l'accesso del responsabile trasporti.</SourceLine>
+          <SourceLine>
+            Fasce dal quadro settimanale; ragazzi, linee e giorni dal Master Pulmini{vanPlan?.asOf ? ` (copia del ${vanPlan.asOf.split("-").reverse().join("/")})` : runsAsOf ? ` (dato al ${runsAsOf.split("-").reverse().join("/")})` : ""}. Un ragazzo va sul pulmino scritto nel Master, altrimenti su quello della sua linea; la linea LAGO/LECCO resta da dividere tra Pulmino 1 e 2.{vanPlan && vanPlan.mode !== "locked" ? ` Collocati ${vanPlan.counts.placed} su ${vanPlan.counts.active} iscritti attivi.` : ""}
+          </SourceLine>
         </Card>
+        {openDetail && vanPlan && (
+          <Dialog title={`${openDetail.label} · ${openDetail.line}`} onClose={() => setOpenVan(null)} testId="van-dialog">
+            <VanDetailPanel van={openDetail} plan={vanPlan} />
+          </Dialog>
+        )}
 
         {requests && <TransportRequestsOffice initial={requests} />}
 
@@ -183,6 +205,27 @@ function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf
         </div>
         <div className="flex min-w-0 flex-col gap-[18px]">
           {board && <TransportQueueCard board={board} now={new Date(`${now.date}T12:00:00Z`)} />}
+          {vanPlan && (
+            <Card id="pul-mezzi" title="I quattro pulmini" sub="Ogni linea resta un pulmino a sé. Premi per chi c'è sempre, dove va e il percorso.">
+              <div className="px-4 pb-3 sm:px-[18px]">
+                <VanLines plan={vanPlan} onOpen={setOpenVan} />
+              </div>
+              {vanPlan.mode !== "locked" && vanPlan.unplaced.length > 0 && (
+                <div className="border-t border-[var(--in-line)] px-4 py-3 sm:px-[18px]" data-testid="unplaced-summary">
+                  <p className="m-0 mb-1.5 text-[12.5px] font-extrabold uppercase tracking-[0.05em] text-[var(--in-sub)]">Da collocare · {vanPlan.counts.unplaced}</p>
+                  <ul className="m-0 grid list-none gap-1 p-0 text-[14px] leading-snug">
+                    {vanPlan.unplaced.map((u) => (
+                      <li key={u.reason} className="flex items-start justify-between gap-3">
+                        <span className="text-[var(--in-sub)]">{u.reason}</span>
+                        <Chip tone="warn">{u.riders.length}</Chip>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              <SourceLine>{vanPlan.mode === "names" ? "Nomi dal Master Pulmini, mostrati come nome e iniziale del cognome." : vanPlan.namesNote}</SourceLine>
+            </Card>
+          )}
           <Card id="pul-domanda" title="Chi ha chiesto il servizio" sub={`Dal Master Pulmini, solo conteggi, dato al ${itDate(PULMINI_DEMAND.asOf)}.`}>
             <div className="grid grid-cols-3 gap-2 px-4 pb-3 sm:px-[18px]" data-testid="pulmini-demand">
               <StatTile value={PULMINI_DEMAND.byStatus["ATTIVO"] ?? 0} of={PULMINI_DEMAND.users} label="iscritti attivi" />
@@ -263,7 +306,7 @@ function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf
 
           <p className="m-0 flex gap-2.5 rounded-2xl border border-[var(--in-line)] bg-white px-4 py-3.5 text-[14.5px] leading-snug text-[var(--in-sub)] shadow-[var(--in-card-shadow)]">
             <ShieldCheck className="mt-[1px] size-5 flex-none text-[var(--in-info)]" strokeWidth={1.8} aria-hidden="true" />
-            I ragazzi compaiono solo come figure senza nome e senza foto, con il colore della squadra. L'elenco nominativo lo vedranno solo l'autista assegnato e il responsabile trasporti, dopo la verifica dei permessi privacy.
+            Sotto gli allenamenti i ragazzi compaiono con nome e iniziale del cognome solo per Direzione, Segreteria, responsabile trasporti e autisti, verificati dal server. Mai telefoni, genitori o indirizzi; nelle trasferte restano figure senza nome.
           </p>
 
           <SourcesBox id="pulmini" />
