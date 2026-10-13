@@ -1,13 +1,15 @@
 import { useMemo, useState, type FormEvent } from 'react';
 import { Users, Phone, Mail, Lock } from 'lucide-react';
-import { coreSteps, rubricaGroups, quadro, annateFrom, requestSources, proposedFields, validateDraft, type VariationDraft } from './snapshot';
+import { coreSteps, rubricaGroups, annateFrom, requestSources, proposedFields, validateDraft, type VariationDraft } from './snapshot';
+import { useQuadro } from './quadro-context';
 import { SourceLink } from './SourceLink';
 
 const empty: VariationDraft = { fonte: '', data: '', ora: '', annata: '', campo: '', motivo: '' };
 type Saved = VariationDraft & { id: number; step: number; urgent: boolean };
 
 export function RotazioneAnnuale() {
-  const annate = useMemo(() => annateFrom(quadro), []);
+  const quadro = useQuadro();
+  const annate = useMemo(() => annateFrom(quadro), [quadro]);
   const [draft, setDraft] = useState<VariationDraft>(empty);
   const [missing, setMissing] = useState<string[]>([]);
   const [tried, setTried] = useState(false);

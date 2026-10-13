@@ -1,6 +1,20 @@
 import { describe, expect, it } from "vitest";
 
-import { areaLabel, dueIn, dueText, dueTone, parseKb, safeLink, seasonsUntil } from "./knowledge";
+import {
+  areaLabel,
+  dueIn,
+  dueText,
+  dueTone,
+  foldText,
+  hasSearchText,
+  highlightParts,
+  kbSearchTerms,
+  parseKb,
+  safeLink,
+  seasonsUntil,
+  splitByMatch,
+  topAreas,
+} from "./knowledge";
 
 describe("parseKb", () => {
   it("returns null without an office level and keeps only valid items", () => {
@@ -43,5 +57,89 @@ describe("helpers", () => {
     expect(dueText(0)).toBe("scade oggi");
     expect(dueText(-5)).toBe("scaduto da 5 giorni");
     expect(dueText(17)).toBe("tra 17 giorni");
+  });
+});
+
+describe("r98 match field", () => {
+  const base = { id: "a", kind: "DOCUMENTO", area: "PULMINI_TRASPORTI", titolo: "Revisione pulmino" };
+  it("keeps parseKb backwards compatible: match is optional and only fts/fuzzy are accepted", () => {
+    const r = parseKb({
+      level: "RISERVATO",
+      items: [
+        base,
+        { ...base, id: "b", match: "fts" },
+        { ...base, id: "c", match: "fuzzy" },
+        { ...base, id: "d", match: "boh" },
+        { ...base, id: "e", match: null },
+      ],
+    })!;
+    expect(r.items.map((i) => i.match)).toEqual([undefined, "fts", "fuzzy", undefined, undefined]);
+    expect("match" in r.items[0]!).toBe(false);
+    expect(r.counts).toEqual({});
+  });
+  it("splits exact and similar results keeping the server order", () => {
+    const r = parseKb({
+      level: "INTERNO",
+      items: [
+        { ...base, id: "1", match: "fts" },
+        { ...base, id: "2", match: "fuzzy" },
+        { ...base, id: "3" },
+        { ...base, id: "4", match: "fuzzy" },
+      ],
+    })!;
+    const { exact, similar } = splitByMatch(r.items);
+    expect(exact.map((i) => i.id)).toEqual(["1", "3"]);
+    expect(similar.map((i) => i.id)).toEqual(["2", "4"]);
+  });
+});
+
+describe("kbSearchTerms (mirror of scd_kb_query_terms)", () => {
+  it("folds accents and case, keeps only [a-z0-9] tokens, drops single letters but not single digits", () => {
+    expect(kbSearchTerms('  Società, "Pulmini"!! a 3 livello SGS società  ')).toEqual(["societa", "pulmini", "3", "livello", "sgs"]);
+    expect(kbSearchTerms("x' or 1=1; drop table")).toEqual(["or", "1", "drop", "table"]);
+    expect(kbSearchTerms("Perché è già così")).toEqual(["perche", "gia", "cosi"]);
+    expect(kbSearchTerms("CAFÉ naïve Ærø")).toEqual(["cafe", "naive", "aero"]);
+  });
+  it("handles empty input, caps terms at 8 and length at 40", () => {
+    expect(kbSearchTerms(null)).toEqual([]);
+    expect(kbSearchTerms(" -- ")).toEqual([]);
+    expect(kbSearchTerms("a b c")).toEqual([]);
+    expect(kbSearchTerms("uno due tre quattro cinque sei sette otto nove dieci")).toHaveLength(8);
+    expect(kbSearchTerms("x".repeat(60))[0]).toHaveLength(40);
+    expect(hasSearchText("  ")).toBe(false);
+    expect(hasSearchText("a")).toBe(false);
+    expect(hasSearchText("pulm")).toBe(true);
+  });
+  it("folds text the same way for highlighting", () => {
+    expect(foldText("Società Olginatese È")).toBe("societa olginatese e");
+  });
+});
+
+describe("highlightParts", () => {
+  const join = (parts: { text: string; hit: boolean }[]) => parts.map((p) => (p.hit ? `[${p.text}]` : p.text)).join("");
+  it("marks word prefixes ignoring case and accents and keeps the original text", () => {
+    expect(join(highlightParts("Manutenzione Pulmini 9 posti", ["pulm"]))).toBe("Manutenzione [Pulm]ini 9 posti");
+    expect(join(highlightParts("Società ospite, SOCIETÀ", ["societa"]))).toBe("[Società] ospite, [SOCIETÀ]");
+    expect(join(highlightParts("Comune di Colico", ["comune", "colico"]))).toBe("[Comune] di [Colico]");
+  });
+  it("does not mark inside words and merges overlapping terms", () => {
+    expect(join(highlightParts("Sportclub rapporto", ["port"]))).toBe("Sportclub rapporto");
+    expect(join(highlightParts("Lario Cup", ["lar", "lario"]))).toBe("[Lario] Cup");
+    expect(join(highlightParts("3° livello SGS", ["3", "sgs"]))).toBe("[3]° livello [SGS]");
+  });
+  it("returns plain text without terms and nothing for empty text; markup in data stays text", () => {
+    expect(highlightParts("<b>x</b>", [])).toEqual([{ text: "<b>x</b>", hit: false }]);
+    expect(highlightParts("", ["x"])).toEqual([]);
+    expect(join(highlightParts("<img onerror=alert(1)> pulmino", ["pulmino"]))).toBe("<img onerror=alert(1)> [pulmino]");
+  });
+});
+
+describe("topAreas", () => {
+  it("orders known areas by count, ties alphabetical, ignores unknown or empty areas", () => {
+    expect(topAreas({ PULMINI_TRASPORTI: 41, FEDERAZIONE: 120, BOH: 999, ALTRO: 0, TORNEI_EVENTI: 41 }, 3)).toEqual([
+      "FEDERAZIONE",
+      "PULMINI_TRASPORTI",
+      "TORNEI_EVENTI",
+    ]);
   });
 });

@@ -4,6 +4,7 @@ import { CalendarDays, Check, MapPin, Shirt } from "lucide-react";
 import { useId, useState } from "react";
 
 import { AccessScreenPage, accessHead } from "@/components/scd/AccessScreen";
+import { GennyCard } from "@/components/scd/GennyCard";
 import { Card, Chip, type ChipTone } from "@/components/scd/interior-ui";
 import { InteriorShell } from "@/components/scd/InteriorShell";
 import { PushCard } from "@/components/scd/PushCard";
@@ -113,6 +114,7 @@ function FamilyHome({ roles, badge, members, callups, fees, failed, transport, a
         {members.length > 0 && <TransportRequestCard members={members} matches={awayMatches} requests={transport.requests} stops={transport.stops} />}
 
         {fees.length > 0 && <FeesCard fees={fees} today={today} />}
+        <GennyCard />
         <Card id="fam-documenti" title="Documenti del club" sub="Regolamenti, codice di condotta, privacy e trasferte: quelli che riguardano la tua famiglia.">
           <div className="px-4 pb-4 sm:px-[18px]">
             <Link to="/documenti" className="scd-focus inline-flex h-11 items-center rounded-[10px] border border-[var(--in-line)] bg-white px-4 text-[15px] font-semibold" data-testid="fam-documenti-link">Apri i documenti</Link>

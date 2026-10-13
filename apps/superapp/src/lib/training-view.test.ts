@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { loadQuadro } from "./public-snapshots";
+import { loadQuadro } from "./quadro-data.server";
 import { defaultDay, isFree, minutesOf, pitchZones, slotEnd, slotStates, weekdayKey } from "./training-view";
 
 const q = loadQuadro();

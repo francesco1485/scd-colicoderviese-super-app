@@ -146,6 +146,8 @@ function RootComponent() {
     return (
       <QueryClientProvider client={queryClient}>
         <Outlet />
+        {/* r99: the same chat, opened only from in-page entry points ("Chiedi a Era"), no floating launcher. */}
+        <SkyChat interior />
         <CookieConsent />
         <PwaManager />
       </QueryClientProvider>

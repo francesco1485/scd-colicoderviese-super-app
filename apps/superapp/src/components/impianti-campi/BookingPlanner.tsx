@@ -9,7 +9,6 @@
 import { Check, ClipboardCopy, ExternalLink, Send, Trash2 } from "lucide-react";
 import { useEffect, useId, useMemo, useState, type FormEvent } from "react";
 
-import quadro from "@/data/quadro-snapshot-20261009.json";
 import {
   REGISTRY_URL,
   bookingToRegistryRow,
@@ -41,12 +40,12 @@ import {
   type RoomId,
   type RotationMatch,
 } from "@/lib/rotation";
+import { useImpianti } from "./context";
 import { teamColor, type ImpiantiModel } from "./model";
 import { Chip, btnPrimary, btnSecondary, inputCls, labelCls } from "./ui";
 
 export type BookingDraft = Omit<Booking, "id">;
 
-const QUADRO_ROOMS = quadro.rooms as QuadroRoom[];
 
 const emptyDraft = (date: string): BookingDraft => ({
   kind: "allenamento",
@@ -396,11 +395,12 @@ function SendPanel({
   requestedBy: string;
   onClose: () => void;
 }) {
+  const quadroRooms = useImpianti().quadro.rooms as QuadroRoom[];
   const row = bookingToRegistryRow(booking, requestedBy);
   const brief = directionBrief(booking, {
     items: model.items,
     others: model.bookings,
-    quadroRooms: QUADRO_ROOMS,
+    quadroRooms,
     buffer: model.options.buffer,
     today: model.today,
     requestedBy,
@@ -482,6 +482,7 @@ export function BookingPlanner({
       ? { ...emptyDraft(model.today), ...draftIn }
       : emptyDraft(model.today),
   );
+  const quadroRooms = useImpianti().quadro.rooms as QuadroRoom[];
   const [errors, setErrors] = useState<string[]>([]);
   const [done, setDone] = useState<string | null>(null);
   const [sending, setSending] = useState<Booking | null>(null);
@@ -504,8 +505,8 @@ export function BookingPlanner({
     [model.items, model.options.buffer, d],
   );
   const clashes = useMemo(
-    () => roomClashes(d, model.bookings, QUADRO_ROOMS, model.options.buffer),
-    [d, model.bookings, model.options.buffer],
+    () => roomClashes(d, model.bookings, quadroRooms, model.options.buffer),
+    [d, model.bookings, quadroRooms, model.options.buffer],
   );
   const guidance = roomGuidance(d.kind);
   const colico = d.pitch !== "DV";

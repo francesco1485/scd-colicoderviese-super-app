@@ -20,6 +20,7 @@ import {
 import {
   BellAction,
   HeroHeader,
+  type SegItem,
   Segmented,
   SectionHead,
   Sheet,
@@ -35,13 +36,17 @@ import {
   upcomingMatches,
 } from "@/lib/board-data";
 import { romeParts } from "@/lib/home-week";
-import { freshnessLabel, loadQuadro } from "@/lib/public-snapshots";
+import { freshnessLabel } from "@/lib/public-snapshots";
+import { getTrainingQuadro } from "@/lib/quadro.functions";
 
-/* Public page: annata crests stay internal (Direzione, 13/10/2026); team rows use the master's team colour. */
+/*
+ * Public page: annata crests stay internal (Direzione, 13/10/2026); team rows use the master's team colour.
+ * Teams are inside (UD-100): the "Squadre" tab and the training board row exist only for signed-in members (the
+ * server marks the calendar audience); anonymous visitors see club news, the games calendar and the social hub.
+ */
 
 const TABS = ["club", "squadre", "social"] as const;
 type Tab = (typeof TABS)[number];
-const QUADRO = loadQuadro();
 
 export const Route = createFileRoute("/comunicazioni")({
   validateSearch: (s: Record<string, unknown>): { tab?: Tab | undefined } =>
@@ -54,9 +59,14 @@ export const Route = createFileRoute("/comunicazioni")({
       getPublicCalendarSnapshot(),
     ]);
     const now = romeParts(new Date().toISOString());
+    const member = calendar.audience === "member";
+    // Training quadro only for members, from the server (UD-100).
+    const quadroSlots = member ? (await getTrainingQuadro()).quadro.slots.length : 0;
     return {
       feed,
       calendar,
+      member,
+      quadroSlots,
       fresh: recentlyUpdated(calendar.sourceModifiedAt, new Date()),
       today: now?.date ?? new Date().toISOString().slice(0, 10),
       clock: now?.time ?? "00:00",
@@ -68,7 +78,7 @@ export const Route = createFileRoute("/comunicazioni")({
       {
         name: "description",
         content:
-          "Notizie, avvisi e aggiornamenti della S.C.D. ColicoDerviese: calendario, allenamenti, squadre e social del club.",
+          "Notizie, avvisi e aggiornamenti della S.C.D. ColicoDerviese: calendario gare, eventi e social del club.",
       },
       {
         property: "og:title",
@@ -94,8 +104,10 @@ type Row = {
 };
 
 function Comunicazioni() {
-  const { feed, calendar, fresh, today, clock } = Route.useLoaderData();
-  const { tab = "club" } = Route.useSearch();
+  const { feed, calendar, member, quadroSlots, fresh, today, clock } = Route.useLoaderData();
+  const { tab: asked = "club" } = Route.useSearch();
+  // Anonymous visitors asking ?tab=squadre land on the club tab: teams are inside (UD-100).
+  const tab: Tab = asked === "squadre" && !member ? "club" : asked;
   const alerts = feed.items.filter((i) => i.kind === "alert");
   const alert = alerts[0];
   const news = feed.items.filter(
@@ -123,13 +135,17 @@ function Comunicazioni() {
         sub: `Aggiornato il ${freshnessLabel(calendar.sourceModifiedAt)} · ${calendar.events.length} gare`,
         to: "/calendario",
       },
-      {
-        id: "quadro",
-        icon: ClipboardList,
-        title: "Quadro allenamenti lun–ven",
-        sub: `Fotografia del 09/10/2026 · ${QUADRO.slots.length} fasce orarie`,
-        to: "/allenamenti",
-      },
+      ...(member
+        ? [
+            {
+              id: "quadro",
+              icon: ClipboardList,
+              title: "Quadro allenamenti lun–ven",
+              sub: `Fotografia del 09/10/2026 · ${quadroSlots} fasce orarie`,
+              to: "/allenamenti",
+            } satisfies Row,
+          ]
+        : []),
       {
         id: "pulmini",
         icon: Bus,
@@ -148,7 +164,7 @@ function Comunicazioni() {
     ] satisfies Row[] as Row[]
   ).slice(0, 4);
   const upcoming = upcomingMatches(calendar.events, today, clock);
-  const teams = calendar.groups
+  const teams = !member ? [] : calendar.groups
     .filter((g) => g.count > 0 && g.id !== "other")
     .map((g) => ({ g, next: upcoming.find((e) => e.group === g.id) }));
 
@@ -179,12 +195,16 @@ function Comunicazioni() {
               active: tab === "club",
               target: { to: "/comunicazioni", search: {} },
             },
-            {
-              label: "Squadre",
-              icon: UsersRound,
-              active: tab === "squadre",
-              target: { to: "/comunicazioni", search: { tab: "squadre" } },
-            },
+            ...(member
+              ? [
+                  {
+                    label: "Squadre",
+                    icon: UsersRound,
+                    active: tab === "squadre",
+                    target: { to: "/comunicazioni", search: { tab: "squadre" } },
+                  } satisfies SegItem,
+                ]
+              : []),
             {
               label: "Social",
               icon: Share2,
@@ -248,7 +268,7 @@ function Comunicazioni() {
                 </div>
               </>
             )}
-            {tab === "squadre" && (
+            {tab === "squadre" && member && (
               <div className="scd-card px-[10px]" data-testid="comms-teams">
                 {teams.map(({ g, next }) => {
                   const d = next ? dateParts(next.date) : null;

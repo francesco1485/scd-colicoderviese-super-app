@@ -507,11 +507,11 @@ export function Affiliations({
 export function SkyCameo({
   message,
   onClose,
-  persona = "club",
+  persona = "crovi",
 }: {
   message: { title: string; text: string } | null;
   onClose: () => void;
-  /** Sky only on under-14 pages (Direzione 13/10/2026); elsewhere the club crest. */
+  /** Sky only on under-14 pages (Direzione 13/10/2026); Crovi outside, Era inside. */
   persona?: Persona;
 }) {
   useEffect(() => {

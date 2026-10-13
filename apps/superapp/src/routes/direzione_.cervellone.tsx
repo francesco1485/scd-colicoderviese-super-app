@@ -1,11 +1,27 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { CalendarClock, ExternalLink, Search } from "lucide-react";
-import { useMemo, useState } from "react";
+import { CalendarClock, ExternalLink, MessageCircle, Search } from "lucide-react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 
 import { Card, Chip } from "@/components/scd/interior-ui";
 import { EmptyState, SourcesBox, WorkAreaGateView, WorkAreaShell, workAreaHead } from "@/components/scd/work-area-ui";
-import { KB_AREAS, KB_KINDS, KIND_LABEL, areaLabel, dueIn, dueText, dueTone, seasonsUntil, type KbItem, type KbKind } from "@/lib/knowledge";
+import {
+  KB_AREAS,
+  KB_KINDS,
+  KIND_LABEL,
+  areaLabel,
+  dueIn,
+  dueText,
+  dueTone,
+  hasSearchText,
+  highlightParts,
+  kbSearchTerms,
+  seasonsUntil,
+  splitByMatch,
+  topAreas,
+  type KbItem,
+  type KbKind,
+} from "@/lib/knowledge";
 import { searchKnowledge, type KbData, type KbQuery } from "@/lib/knowledge.functions";
 import { getWorkAreaGate } from "@/lib/work-areas.functions";
 
@@ -34,6 +50,9 @@ function CervelloneRoute() {
   );
 }
 
+/** Search as you type: wait this long after the last keystroke or filter change (r98). */
+const SEARCH_DEBOUNCE_MS = 250;
+
 const inputCls = "h-11 rounded-[10px] border border-[var(--in-line)] bg-white px-3 text-[15px] text-[var(--in-ink)] outline-none focus:border-[var(--in-info)]";
 
 function CervellonePage({ due, today, preview }: { due: KbData; today: string; preview: boolean }) {
@@ -42,28 +61,63 @@ function CervellonePage({ due, today, preview }: { due: KbData; today: string; p
   const [area, setArea] = useState("");
   const [season, setSeason] = useState("");
   const [kind, setKind] = useState("");
-  const [data, setData] = useState<KbData | null>(null);
+  const [shown, setShown] = useState<{ data: KbData; terms: string[] } | null>(null);
   const [busy, setBusy] = useState(false);
+  const seq = useRef(0);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const seasons = useMemo(() => seasonsUntil(today), [today]);
-  const counts = due.result?.counts ?? {};
+  const counts = useMemo(() => due.result?.counts ?? {}, [due.result]);
   const total = Object.values(counts).reduce((a, b) => a + b, 0);
+  const suggestions = useMemo(() => topAreas(counts), [counts]);
+  const data = shown?.data ?? null;
 
-  async function run(e?: React.FormEvent) {
-    e?.preventDefault();
-    if (busy) return;
+  async function run(query: { q: string; area: string; season: string; kind: string }) {
+    const id = ++seq.current;
+    const req: KbQuery = { limit: 60 };
+    const text = query.q.trim();
+    if (text) req.q = text;
+    if (query.area) req.area = query.area as (typeof KB_AREAS)[number];
+    if (query.season) req.season = query.season;
+    if (query.kind) req.kind = query.kind as KbKind;
     setBusy(true);
+    let out: KbData;
     try {
-      const query: KbQuery = { limit: 60 };
-      if (q.trim()) query.q = q.trim();
-      if (area) query.area = area as (typeof KB_AREAS)[number];
-      if (season) query.season = season;
-      if (kind) query.kind = kind as KbKind;
-      setData(await search({ data: query }));
+      out = await search({ data: req });
     } catch {
-      setData({ connected: true, result: null, error: "Ricerca non riuscita. Riprova tra poco." });
-    } finally {
-      setBusy(false);
+      out = { connected: true, result: null, error: "Ricerca non riuscita. Riprova tra poco." };
     }
+    // Only the latest request may update the page: slower, older answers are dropped.
+    if (id !== seq.current) return;
+    setShown({ data: out, terms: kbSearchTerms(text) });
+    setBusy(false);
+  }
+
+  // Debounced search as you type or change a filter; nothing to search for clears the results.
+  useEffect(() => {
+    if (timer.current) clearTimeout(timer.current);
+    if (!hasSearchText(q) && !area && !season && !kind) {
+      seq.current++;
+      setBusy(false);
+      setShown(null);
+      return;
+    }
+    timer.current = setTimeout(() => void run({ q, area, season, kind }), SEARCH_DEBOUNCE_MS);
+    return () => {
+      if (timer.current) clearTimeout(timer.current);
+    };
+    // run is recreated every render; the four inputs are what decide a new search
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [q, area, season, kind]);
+
+  function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (timer.current) clearTimeout(timer.current);
+    void run({ q, area, season, kind });
+  }
+
+  function browseArea(a: string) {
+    setQ("");
+    setArea(a);
   }
 
   return (
@@ -82,7 +136,7 @@ function CervellonePage({ due, today, preview }: { due: KbData; today: string; p
       <div className="grid grid-cols-1 gap-[18px] lg:grid-cols-[minmax(0,1fr)_400px]">
         <div className="flex min-w-0 flex-col gap-[18px]">
           <Card id="kb-cerca" title="Cerca" sub="Parole libere: un ente, un fornitore, un torneo, un documento, una stagione.">
-            <form onSubmit={run} className="flex flex-col gap-2 px-4 pb-4 sm:px-[18px]" role="search">
+            <form onSubmit={submit} className="flex flex-col gap-2 px-4 pb-4 sm:px-[18px]" role="search">
               <label className="flex items-center gap-2 rounded-[10px] border border-[var(--in-line)] bg-white px-3">
                 <Search className="size-4 text-[var(--in-sub)]" aria-hidden="true" />
                 <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="es. omologazione Dervio, Memorial Nasazzi, Panizza, torri faro" className="h-11 w-full bg-transparent text-[15px] outline-none" aria-label="Cerca nel Cervellone" />
@@ -101,25 +155,47 @@ function CervellonePage({ due, today, preview }: { due: KbData; today: string; p
                   {KB_KINDS.map((k) => <option key={k} value={k}>{KIND_LABEL[k]}</option>)}
                 </select>
               </div>
+              <p className="sr-only" aria-live="polite">
+                {busy ? "Ricerca in corso" : data?.result ? `${data.result.items.length} voci trovate` : ""}
+              </p>
               <button type="submit" disabled={busy} className="scd-focus inline-flex h-11 items-center justify-center gap-2 rounded-[10px] bg-[var(--in-info)] px-4 text-[15px] font-bold text-white disabled:opacity-50">
                 <Search className="size-4" aria-hidden="true" /> {busy ? "Cerco…" : "Cerca"}
+              </button>
+              {/* r99 (UD-104): same chat component, opened in place; Era reads the Cervellone with this session's permissions. */}
+              <button
+                type="button"
+                onClick={() => window.dispatchEvent(new Event("era:open"))}
+                className="scd-focus inline-flex h-11 items-center justify-center gap-2 rounded-[10px] border border-[var(--in-line)] bg-white px-4 text-[15px] font-bold text-[var(--in-ink)]"
+              >
+                <MessageCircle className="size-4" aria-hidden="true" /> Chiedi a Era
               </button>
             </form>
           </Card>
 
           {data && (
-            <Card id="kb-risultati" title="Risultati" sub={data.result ? `${data.result.items.length} voci` : undefined}>
+            <Card id="kb-risultati" title="Risultati" sub={data.result ? resultsSub(data.result.items) : undefined}>
               <div className="px-4 pb-4 sm:px-[18px]">
                 {!data.connected ? (
                   <EmptyState title="Entra con il tuo account">Il Cervellone è riservato a Direzione, Segreteria e Tesoreria.</EmptyState>
                 ) : !data.result ? (
                   <EmptyState title={data.error ? "Ricerca non riuscita" : "Area riservata"}>{data.error ?? "Il tuo account non ha un ruolo d'ufficio."}</EmptyState>
                 ) : data.result.items.length === 0 ? (
-                  <EmptyState title="Nessuna voce trovata">Prova con meno parole o togli un filtro.</EmptyState>
+                  <EmptyState
+                    title="Nessuna voce trovata"
+                    action={suggestions.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5" data-testid="kb-suggestions">
+                        {suggestions.map((a) => (
+                          <button key={a} type="button" onClick={() => browseArea(a)} className="scd-focus inline-flex min-h-[32px] items-center rounded-full border border-[var(--in-line)] bg-white px-3 text-[13px] font-semibold text-[var(--in-ink)] hover:border-[var(--in-info)]">
+                            {areaLabel(a)}{counts[a] ? ` (${counts[a]})` : ""}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  >
+                    Prova con meno parole, controlla l'ortografia o togli un filtro.{suggestions.length > 0 && " Oppure sfoglia un'area:"}
+                  </EmptyState>
                 ) : (
-                  <ul className="m-0 list-none divide-y divide-[var(--in-line)] p-0" data-testid="kb-results">
-                    {data.result.items.map((it) => <KbRow key={it.id} item={it} today={today} />)}
-                  </ul>
+                  <KbResults items={data.result.items} terms={shown?.terms ?? []} today={today} areaCounts={shown && shown.terms.length > 0 && !area ? data.result.counts : {}} onArea={setArea} />
                 )}
               </div>
             </Card>
@@ -159,7 +235,74 @@ function CervellonePage({ due, today, preview }: { due: KbData; today: string; p
   );
 }
 
-function KbRow({ item: it, today }: { item: KbItem; today: string }) {
+function resultsSub(items: readonly KbItem[]): string {
+  const { exact, similar } = splitByMatch(items);
+  return similar.length ? `${exact.length} voci · ${similar.length} simili` : `${exact.length} voci`;
+}
+
+/** Text with the searched words marked; parts are rendered as text nodes (no HTML from the data). */
+function Hl({ text, terms }: { text: string; terms: readonly string[] }) {
+  return (
+    <>
+      {highlightParts(text, terms).map((p, i) =>
+        p.hit ? (
+          <mark key={i} className="rounded-[3px] bg-[#fff1a8] px-0.5 text-inherit">{p.text}</mark>
+        ) : (
+          <Fragment key={i}>{p.text}</Fragment>
+        ),
+      )}
+    </>
+  );
+}
+
+function KbResults({
+  items,
+  terms,
+  today,
+  areaCounts,
+  onArea,
+}: {
+  items: readonly KbItem[];
+  terms: readonly string[];
+  today: string;
+  areaCounts: Readonly<Record<string, number>>;
+  onArea: (area: string) => void;
+}) {
+  const { exact, similar } = splitByMatch(items);
+  const areas = Object.entries(areaCounts).filter(([, n]) => n > 0).sort((a, b) => b[1] - a[1]);
+  return (
+    <>
+      {areas.length > 1 && (
+        <div className="mb-1 flex flex-wrap items-center gap-1.5" data-testid="kb-area-facets">
+          <span className="text-[12.5px] text-[var(--in-sub)]">Per area:</span>
+          {areas.map(([a, n]) => (
+            <button key={a} type="button" onClick={() => onArea(a)} className="scd-focus inline-flex min-h-[28px] items-center rounded-full border border-[var(--in-line)] bg-white px-2.5 text-[12.5px] font-semibold text-[var(--in-ink)] hover:border-[var(--in-info)]">
+              {areaLabel(a)} ({n})
+            </button>
+          ))}
+        </div>
+      )}
+      {exact.length > 0 && (
+        <ul className="m-0 list-none divide-y divide-[var(--in-line)] p-0" data-testid="kb-results">
+          {exact.map((it) => <KbRow key={it.id} item={it} today={today} terms={terms} />)}
+        </ul>
+      )}
+      {similar.length > 0 && (
+        <section aria-labelledby="kb-simili" className={exact.length ? "mt-3 border-t border-[var(--in-line)] pt-3" : ""}>
+          <h3 id="kb-simili" className="m-0 text-[14px] font-bold">Risultati simili</h3>
+          <p className="m-0 mt-0.5 text-[12.5px] text-[var(--in-sub)]">
+            {exact.length ? "Altre voci con titolo, ente o tag simili a quanto scritto." : "Nessuna voce con tutte le parole: queste hanno titolo, ente o tag simili (forse un errore di battitura)."}
+          </p>
+          <ul className="m-0 list-none divide-y divide-[var(--in-line)] p-0" data-testid="kb-results-similar">
+            {similar.map((it) => <KbRow key={it.id} item={it} today={today} terms={terms} />)}
+          </ul>
+        </section>
+      )}
+    </>
+  );
+}
+
+function KbRow({ item: it, today, terms }: { item: KbItem; today: string; terms: readonly string[] }) {
   const days = it.due ? dueIn(today, it.due) : null;
   return (
     <li className="py-3">
@@ -172,11 +315,11 @@ function KbRow({ item: it, today }: { item: KbItem; today: string }) {
       <p className="m-0 mt-1.5 text-[15.5px] font-bold leading-snug">
         {it.link ? (
           <a href={it.link} target="_blank" rel="noopener noreferrer" className="scd-focus inline-flex items-start gap-1.5 rounded-sm underline-offset-4 hover:underline">
-            {it.title} <ExternalLink className="mt-1 size-3.5 flex-none" aria-hidden="true" />
+            <span><Hl text={it.title} terms={terms} /></span> <ExternalLink className="mt-1 size-3.5 flex-none" aria-hidden="true" />
           </a>
-        ) : it.title}
+        ) : <Hl text={it.title} terms={terms} />}
       </p>
-      {it.summary && <p className="m-0 mt-1 line-clamp-3 text-[14px] leading-snug text-[var(--in-sub)]">{it.summary}</p>}
+      {it.summary && <p className="m-0 mt-1 line-clamp-3 text-[14px] leading-snug text-[var(--in-sub)]"><Hl text={it.summary} terms={terms} /></p>}
       <p className="m-0 mt-1 text-[12.5px] text-[var(--in-sub)]">
         {[it.entity, it.date, it.status, it.amount !== null ? new Intl.NumberFormat("it-IT", { style: "currency", currency: "EUR" }).format(it.amount) : null].filter(Boolean).join(" · ")}
       </p>

@@ -8,6 +8,8 @@ import { CalendarioAnnuale } from './CalendarioAnnuale';
 import { LaMiaSquadra, IlMioSettore, DervioPulmini } from './TeamSectorViews';
 import { RotazioneAnnuale, Responsabili } from './RotazioneResponsabili';
 import { SECTION_IDS, type SectionId } from './section-ids';
+import { QuadroProvider } from './quadro-context';
+import type { QuadroSnapshot } from './snapshot';
 import './impianti.css';
 
 /** Ordine action-first: allenamenti e calendario prima di impianti e organigramma. */
@@ -24,9 +26,9 @@ const sections = [
 export { SECTION_IDS, type SectionId };
 export const IMPIANTI_SECTIONS = sections;
 
-export function ImpiantiCalendari({ initialSection = 'quadro' }: { initialSection?: SectionId }) {
+export function ImpiantiCalendari({ initialSection = 'quadro', quadro = null }: { initialSection?: SectionId; quadro?: QuadroSnapshot | null }) {
   const [section, setSection] = useState<SectionId>(initialSection);
-  return <div className="imp">
+  return <QuadroProvider value={quadro}><div className="imp">
     <div className="imp-banner" role="note">DEMO · ANTEPRIMA · CONSULTAZIONE FONTI · NESSUN DATO LIVE · NESSUNA SCRITTURA</div>
     <header className="imp-head">
       <Link to="/core" className="imp-back" aria-label="Torna all'Area club"><ArrowLeft size={18} /></Link>
@@ -49,5 +51,5 @@ export function ImpiantiCalendari({ initialSection = 'quadro' }: { initialSectio
       </main>
     </div>
     <footer className="imp-foot">Nessun dato personale · U18 ritirata, esclusa dalle categorie attive · Le fonti restano su Google Drive · Vista di prova separata da SCD ONE</footer>
-  </div>;
+  </div></QuadroProvider>;
 }

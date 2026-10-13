@@ -9,6 +9,7 @@
     "build:node": "NITRO_PRESET=node-server vite build",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
+    "test:bundle": "vitest run src/lib/client-bundle.test.ts",
     "start": "node .output/server/index.mjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",

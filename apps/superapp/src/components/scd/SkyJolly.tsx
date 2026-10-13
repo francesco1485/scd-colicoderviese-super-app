@@ -1,33 +1,39 @@
 /**
- * The floating helper of the Super App and its faces (Direzione decisions 12/10 and 13/10/2026):
- * - public pages: the chat helper is CROVI ("Chiedi a Crovi"), the realistic secretariat legend;
- * - Sky, the club's lucky charm, stays away from the general app: it appears only in the
- *   under-14 world (team pages of Esordienti, Pulcini, Primi Calci, Piccoli Amici, annate
- *   2014/2015), always as the official cut-out PNG/WebP;
- * - other reserved areas: the club assistant with the official crest, standing in for "Era"
- *   (15+, not built yet). Crovi never appears inside.
- * The chat logic lives in SkyChat.tsx and the answer engine (askSky) is unchanged.
+ * The floating helper of the Super App and its two faces (Direzione decisions 12/10/2026):
+ * - public pages: the chat helper and the launcher face are CROVI ("Chiedi a Crovi");
+ * - Sky stays away from the general app (Direzione 13/10/2026): never on public pages; inside only
+ *   for young members (lib/assistant.ts rule) and on the under-14 team pages (KIDS_TEAM_IDS);
+ * - reserved areas: the helper goes by the signed-in viewer (r99, UD-104, Direzione "Vai A B C" 13/10/2026):
+ *   Era for staff and adult members (15+), Sky for younger members and when nothing tells us the viewer is 15+.
+ *   The rule lives in one place, lib/assistant.ts eraEligible / insidePersonaFor, shared by the chat persona,
+ *   the launcher face and the server voice. Crovi never appears inside, Era never on public pages.
+ * The chat logic lives in SkyChat.tsx; answers come from the AI assistants (lib/assistant.functions.ts) with the
+ * askSky rules engine as fallback.
  *
  * Official assets only (config/scd-assets.v1.json): Sky head /media/brand/sky-atv-head.webp,
- * Sky head + ball /media/brand/sky-scd.png, CROVI avatar /media/crovi/v3 (original fictional figure).
+ * Sky head + ball /media/brand/sky-scd.png, CROVI avatar /media/crovi/v3 (original fictional figure),
+ * Era avatar /media/cast/era (original fictional figure, GENERATE_ORIGINAL).
  */
-import crest from "@/assets/brand/logo-scd.png.asset.json";
 import croviAvatar from "@/assets/crovi/crovi-avatar-256.webp.asset.json";
+import { insidePersonaFor, type HelperViewer } from "@/lib/assistant";
+import { CAST, castAvatarSrc, castReady } from "@/lib/assistant-cast";
 import { isPublicPath } from "@/lib/http-policy";
 
-export type Persona = "sky" | "crovi" | "club";
+export type Persona = "sky" | "crovi" | "era";
+
+export type { HelperViewer } from "@/lib/assistant";
+export { eraEligible } from "@/lib/assistant";
 
 /** Public media paths of the official Sky files (never generated, never altered). */
 export const SKY_HEAD_SRC = "/media/brand/sky-atv-head.webp";
 export const SKY_BALL_SRC = "/media/brand/sky-scd.png";
 export const CROVI_AVATAR_SRC = croviAvatar.url;
-export const CLUB_CREST_SRC = crest.url;
 
 /** Access flows: no floating helper at all (the visitor is filling a form). */
 const HIDDEN_PREFIXES = ["/accedi", "/entra", "/registrati"] as const;
 
 /**
- * Under-14 teams (club-profile ORDER ids): the only place where Sky appears (Direzione 13/10/2026).
+ * Under-14 teams (club-profile ORDER ids): the only pages where Sky always appears (Direzione 13/10/2026).
  * U15 is left out on purpose: it already includes 14-year-olds.
  */
 export const KIDS_TEAM_IDS = ["2014", "2015", "esordienti", "pulcini", "primicalci", "piccoli"] as const;
@@ -59,15 +65,17 @@ export function isHelperHiddenPath(pathname: string): boolean {
   return startsWithPrefix(pathname, HIDDEN_PREFIXES);
 }
 
-/** Who answers in the chat: Sky only for the under-14 pages, Crovi outside, the club assistant inside. */
-export function personaFor(pathname: string): Persona {
-  if (isKidsPath(pathname)) return "sky";
-  return isReservedPath(pathname) ? "club" : "crovi";
+/** Who answers in the chat: Crovi on public pages; inside Era (staff, adults 15+) or Sky (lib/assistant.ts). */
+export function personaFor(pathname: string, viewer?: HelperViewer | null): Persona {
+  return isReservedPath(pathname) ? insidePersonaFor(viewer?.roles, viewer?.age15plus ?? null) : "crovi";
 }
 
-/** Face shown on the floating launcher: always the same figure that answers. */
-export function launcherFaceFor(pathname: string): Persona {
-  return personaFor(pathname);
+/**
+ * Face shown on the floating launcher: always the figure that answers. Sky no longer fronts the
+ * public pages (home, games): outside it is Crovi (Direzione 13/10/2026).
+ */
+export function launcherFaceFor(pathname: string, viewer?: HelperViewer | null): Persona {
+  return personaFor(pathname, viewer);
 }
 
 /** Greeting of the chat; when Sky's face opened it on a public page, Crovi says Sky called him. */
@@ -96,7 +104,7 @@ export const PERSONA_COPY: Record<
     title: "Sky, la mascotte del club",
     subtitle: "ti porto dove ti serve, in un tocco",
     greeting:
-      "Ciao, sono Sky, la mascotte portafortuna della ColicoDerviese! Chiedimi la prossima partita, gli allenamenti o come arrivare al campo: ti accompagno io.",
+      "Ciao, sono Sky, la mascotte portafortuna della ColicoDerviese. Dimmi cosa cerchi: prossima partita, calendario, come arrivare al campo, iscrizioni, contatti o come funziona l'app.",
     placeholder: "Scrivi a Sky…",
     thinking: "Sky sta cercando…",
     quick: [
@@ -108,20 +116,19 @@ export const PERSONA_COPY: Record<
       "Come funziona l'app",
     ],
   },
-  club: {
-    name: "Assistente SCD",
-    title: "Assistente del club",
-    subtitle: "ti porto dove ti serve, in un tocco",
+  era: {
+    name: "Era",
+    title: "Chiedi a Era",
+    subtitle: "l'assistente interna: cerco nel Cervellone",
     greeting:
-      "Ciao, sono l'assistente della ColicoDerviese. Dimmi cosa cerchi: prossima partita, calendario, come arrivare al campo, iscrizioni, contatti o come funziona l'app.",
-    placeholder: "Scrivi all'assistente…",
-    thinking: "Sto cercando…",
+      "Ciao, sono Era, l'assistente interna della società. Cerco per te nel Cervellone documenti, scadenze, fornitori, tornei e regole, mostrandoti solo ciò che il tuo ruolo può vedere. Se qualcosa manca o non funziona, scrivimelo in due parole: lo giro a chi se ne occupa.",
+    placeholder: "Scrivi a Era…",
+    thinking: "Era sta cercando…",
     quick: [
-      "Prossima partita",
-      "Calendario",
-      "Come arrivare",
-      "Iscriviti",
-      "Contatti",
+      "Scadenze in vista",
+      "Documenti della federazione",
+      "Omologazione campi",
+      "Tornei e eventi",
       "Come funziona l'app",
     ],
   },
@@ -146,7 +153,7 @@ export const PERSONA_COPY: Record<
 
 /**
  * Round avatar of the active persona. Sky's head is cropped in a light circle with a navy ring,
- * CROVI keeps his approved 256px avatar.
+ * CROVI keeps his approved 256px avatar, Era uses hers once it is in (neutral 'E' until then).
  */
 export function PersonaAvatar({
   persona = "sky",
@@ -157,14 +164,29 @@ export function PersonaAvatar({
   size?: number;
   className?: string;
 }) {
-  if (persona === "club") {
+  if (persona === "era") {
+    if (castReady("era")) {
+      return (
+        <img
+          src={castAvatarSrc("era")}
+          alt=""
+          width={size}
+          height={size}
+          className={`rounded-full object-cover ring-2 ring-[#0b2a5b] ${className}`}
+          style={{ width: size, height: size }}
+          data-cast={CAST.era.id}
+        />
+      );
+    }
+    // Neutral initial only while the approved Era image is not in the app (assistant-cast readiness):
+    // no invented portrait (SCD:ASSET GENERATE_ORIGINAL, non-substitutive).
     return (
       <span
         aria-hidden="true"
-        className={`inline-flex shrink-0 items-center justify-center rounded-full bg-white ring-2 ring-[#0b2a5b] ${className}`}
-        style={{ width: size, height: size }}
+        className={`inline-flex shrink-0 items-center justify-center rounded-full bg-[#0b2a5b] font-bold text-[#ffd600] ring-2 ring-[#ffd600] ${className}`}
+        style={{ width: size, height: size, fontSize: Math.round(size * 0.46) }}
       >
-        <img src={CLUB_CREST_SRC} alt="" width={size} height={size} className="h-[78%] w-[78%] object-contain" />
+        E
       </span>
     );
   }

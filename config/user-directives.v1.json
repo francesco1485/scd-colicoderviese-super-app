@@ -2375,7 +2375,9 @@
         "rule": "The public (signed-out) experience is creative, communicative and commercial (club identity, news, video, events, partners and offers, joining) — not team lists or fixtures; teams, rosters and team calendars live inside after sign-in, because teams change. Do not use the aerial photo of the Colico sports centre as a hero. The personal avatar is realistic from the start (photorealistic/3D, original, never a drawing and never built from a minor's photo). UI reference for the public layout: the Eurobet website (desktop/web), not the Eurobet app.",
         "scope": "PUBLIC_UI_AVATAR",
         "status": "ACTIVE",
-        "delivered": []
+        "delivered": [
+          "public places closed (agent/inside, 2026-10-13): /societa without team section (members link only), /allenamenti members-only and out of robots/sitemap, Comunicazioni teams tab members-only, anonymous calendar = fixtures only (no trainings, notes, people, annata crests), getPublicRoster and getStaffRoster require a signed-in member; guarded by public-access.test.ts"
+        ]
       }
     },
     {
@@ -2424,6 +2426,70 @@
           "supabase/migrations/20261013_r97_member_avatar.sql written, NOT applied (scd_member_avatars owner-only, scd_avatar_generation_log, scd_my_age_band, scd_my_member_profile, scd_set_my_avatar, generation reserve/close); until applied the page runs in preview mode and says saving is not active",
           "pending: Direzione approval of r97 and of the base images (D8, D9), credit values (D3), DPIA + consent type AVATAR_FOTO_APP for path C, QR card codes, storage of AI-generated images"
         ]
+      }
+    },
+    {
+      "sourceDate": "2026-10-13",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-103",
+      "name": "CERVELLONE_FULL_AND_FAST",
+      "sourceQuoteFragments": [
+        "rendere il cervellone pieno e performante"
+      ],
+      "normalizedCommand": {
+        "rule": "The Cervellone (UD-077) must be complete and fast: search finds items with partial words, without accents and with typos, ranks open items and near deadlines higher, and stays fast as the catalogue grows to ~10k items. No new registry: same scd_kb_items, same access rules.",
+        "scope": "KNOWLEDGE_BASE",
+        "constraints": [
+          "same scd_kb_search signature, return shape and permission/sensitivity logic (additive field match only)",
+          "migration written and tested, applied only after Direzione approval",
+          "no personal data of families or minors in the catalogue (UD-077 unchanged)"
+        ],
+        "status": "IN_PROGRESS",
+        "delivered": [
+          "supabase/migrations/20261013_r98_kb_search_performance.sql written, NOT applied: unaccent + pg_trgm (schema extensions), scd_italian_unaccent text search configuration, prefix terms, trigram fallback flagged match=fuzzy, ranking boosts, counts without a second pass for text queries",
+          "apps/superapp/src/routes/direzione_.cervellone.tsx: search as you type (250 ms), 'Risultati simili' section, highlighted terms as text nodes, area facets and empty-state area suggestions",
+          "apps/superapp/src/lib/knowledge.ts: kbSearchTerms (mirror of scd_kb_query_terms), highlightParts, splitByMatch, topAreas; parseKb accepts optional match"
+        ],
+        "pending": [
+          "Direzione approval and application of r98 on SCD PULSE; the Fill-the-catalogue part ('pieno') continues through the UD-077 ingestion"
+        ]
+      }
+    },
+    {
+      "sourceDate": "2026-10-13",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-104",
+      "name": "REAL_AI_ASSISTANTS_CROVI_ERA",
+      "sourceQuoteFragments": [
+        "Vai A B C"
+      ],
+      "normalizedCommand": {
+        "rule": "Approved 2026-10-13 12:03. A: Crovi becomes a real AI assistant on public pages, answering naturally using ONLY public data (games calendar, events, registrations info, facilities/directions, contacts, sponsors/partner offer, app guide); never internal/reserved data, never minors' names, never invented facts. B: internal assistant for staff (Era for 15+ users; Sky stays for younger members until their own avatar) answering from the Cervellone knowledge base with the caller's permission level: office staff INTERNO, only Direzione RISERVATO, enforced by scd_kb_search with the caller's session, never a service key. C: activation, costs and privacy documented; the Direzione switches it on.",
+        "scope": "ASSISTANTS_AND_CHARACTERS",
+        "torreFloor": "0_HALL (Crovi) + internal floors (Era / Sky)",
+        "constraints": [
+          "grounding by retrieval from real server data, no invented facts: 'non lo so / chiedi in segreteria' otherwise",
+          "never minors' names, health data, IBAN, fiscal codes or passwords, even if present in the source",
+          "safeguarding never through the assistant (reserved channel), requests through the requests engine (UD-045)",
+          "feature flag SCD_ASSISTANT_AI default off; rules engine fallback on missing key, error, quota or 8 s timeout",
+          "per-IP and per-user rate limits; no prompt or answer logging",
+          "no publication or env change without Direzione approval"
+        ],
+        "status": "IMPLEMENTED_STAGED_FLAG_OFF",
+        "delivered": [
+          "apps/superapp/src/lib/assistant.ts (personas, context builders with caps, prompts, output guard, rate limiter)",
+          "apps/superapp/src/lib/assistant.server.ts + assistant.functions.ts (askAssistant public, askStaffAssistant signed-in)",
+          "apps/superapp/src/lib/anthropic.server.ts (shared Claude call, also used by moderation.server.ts)",
+          "SkyChat: AI notice, typing indicator, https links; Era persona inside; 'Chiedi a Era' on /direzione/cervellone",
+          "SCD_SYSTEM_MANIFEST.json 3.33.0: source ANTHROPIC_API, sky_and_avatar.ai_assistants; docs/AI_ASSISTANT.md"
+        ],
+        "pending": [
+          "Direzione: create the API key and set SCD_ANTHROPIC_API_KEY + SCD_ASSISTANT_AI=on on Render (see docs/AI_ASSISTANT.md)",
+          "approved Era image (UD-091 Canva MAHX1G12gBc) into config/scd-assets.v1.json to replace the neutral initial"
+        ],
+        "duplicate_work": "DENY"
       }
     }
   ],

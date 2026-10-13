@@ -5,6 +5,7 @@
  * Access: verified session with an allowed club position, or the staging
  * preview with a visible banner; otherwise the area access screen.
  */
+import { EMPTY_QUADRO_SNAPSHOT, type QuadroSnapshot } from "@/features/impianti/snapshot";
 import { Link, Outlet, useNavigate } from "@tanstack/react-router";
 import { Lock, MessageCircle } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
@@ -64,7 +65,7 @@ export function AccessScreen({
     "Chi usa quale parte del campo, giorno per giorno",
     "Conflitti sul campo 1 e avvisi al Comune di Dervio",
     "Simulazioni e nuove prenotazioni con anteprima 2D",
-    "Chiedi all'assistente: risposte dal calendario reale",
+    "Chiedi a Era: risposte dal calendario reale",
   ];
   return (
     <div className="mx-auto grid max-w-[720px] gap-5">
@@ -137,10 +138,12 @@ export function AccessScreen({
 
 function Tool({
   access,
+  quadro,
   preview,
   position,
 }: {
   access: ImpiantiAccessState;
+  quadro: QuadroSnapshot;
   preview: boolean;
   position: string | null;
 }) {
@@ -194,6 +197,7 @@ function Tool({
   const ctx = useMemo<ImpiantiContextValue>(
     () => ({
       model,
+      quadro,
       preview,
       position,
       requestedBy,
@@ -201,7 +205,7 @@ function Tool({
       draft,
       setDraft,
     }),
-    [model, preview, position, requestedBy, canApprove, draft],
+    [model, quadro, preview, position, requestedBy, canApprove, draft],
   );
 
   return (
@@ -257,8 +261,8 @@ function Tool({
               aria-expanded={sky}
               className="scd-focus inline-flex min-h-11 items-center gap-2 rounded-full border border-[var(--in-line)] bg-white py-1 pl-1 pr-4 text-[15px] font-semibold text-[var(--in-info)] shadow-[var(--in-card-shadow)] hover:bg-[var(--in-info-bg)]"
             >
-              <SkyMascot size={34} persona="club" />
-              Chiedi all'assistente
+              <SkyMascot size={34} persona="era" />
+              Chiedi a Era
               <MessageCircle className="size-4" aria-hidden="true" />
             </button>
           </div>
@@ -277,7 +281,7 @@ function Tool({
   );
 }
 
-export function ImpiantiLayout({ access }: { access: ImpiantiAccessState }) {
+export function ImpiantiLayout({ access, quadro }: { access: ImpiantiAccessState; quadro: QuadroSnapshot | null }) {
   const decision = impiantiAccess(access.session, access.stagingPreview);
   if (decision.mode === "access") {
     return (
@@ -295,6 +299,7 @@ export function ImpiantiLayout({ access }: { access: ImpiantiAccessState }) {
   return (
     <Tool
       access={access}
+      quadro={quadro ?? EMPTY_QUADRO_SNAPSHOT}
       preview={decision.mode === "preview"}
       position={decision.mode === "tool" ? decision.position : null}
     />
