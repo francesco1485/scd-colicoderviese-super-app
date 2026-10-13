@@ -18,6 +18,7 @@ import type { ReactNode } from "react";
 
 import { ClubCrestOfficial } from "@/components/SiteChrome";
 import { venueCase } from "@/lib/board-data";
+import { OpponentCrest, opponentFromTitle } from "@/lib/crests";
 import type { WeekItem } from "@/lib/home-week";
 import {
   REPORT_LABEL,
@@ -289,6 +290,8 @@ export function MatchBlock({
   compact?: boolean;
 }) {
   const casa = item.homeAway === "CASA";
+  // Opponent crest only when the registry holds a verified file; otherwise a neutral shield.
+  const opponent = opponentFromTitle(item.title);
   return (
     <div
       className={`flex overflow-hidden rounded-[16px] border border-[#dce5f0] ${compact ? "" : "mx-3.5 mb-3"}`}
@@ -307,8 +310,28 @@ export function MatchBlock({
           {casa ? "IN CASA" : "TRASFERTA"} ·{" "}
           {item.time ? `ORE ${item.time}` : "ORARIO DA CONFERMARE"}
         </span>
-        <span className="font-uv text-[24px] leading-[1.05] text-[#0b1e3a]">
-          {item.title.toUpperCase()}
+        <span className="flex items-center gap-2">
+          {item.kind === "Gara" && opponent && (
+            <span
+              className="flex shrink-0 items-center gap-1"
+              aria-hidden="true"
+            >
+              {casa ? (
+                <ClubCrestOfficial size={30} />
+              ) : (
+                <OpponentCrest name={opponent} size={30} />
+              )}
+              <span className="text-[11px] font-bold text-[#5a6b85]">vs</span>
+              {casa ? (
+                <OpponentCrest name={opponent} size={30} />
+              ) : (
+                <ClubCrestOfficial size={30} />
+              )}
+            </span>
+          )}
+          <span className="min-w-0 font-uv text-[24px] leading-[1.05] text-[#0b1e3a]">
+            {item.title.toUpperCase()}
+          </span>
         </span>
         <span className="flex items-center gap-1 text-[14px] text-[#3e5272]">
           <MapPin className="size-4 shrink-0" aria-hidden="true" />

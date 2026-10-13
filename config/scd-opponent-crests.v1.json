@@ -1,0 +1,988 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2026-10-13",
+  "policy": {
+    "rule": "REAL_VERIFIED_ONLY",
+    "fallback": "NEUTRAL_SHIELD_WITH_INITIALS",
+    "generation": "FORBIDDEN"
+  },
+  "statuses": [
+    "VERIFIED_FILE",
+    "SOURCE_FOUND_DOWNLOAD_BLOCKED",
+    "NOT_FOUND"
+  ],
+  "fileRoot": "/media/crests/",
+  "entries": [
+    {
+      "slug": "casati-arcore",
+      "displayName": "Casati Arcore",
+      "aliases": [
+        "A. CASATI CALCIO ARCORE"
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/casaticalcioarcore",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/casati-arcore.webp",
+      "note": "Page 'USA Casati Calcio Arcore 1946'; current page picture is the 80th-anniversary badge (1946-2026).",
+      "width": 201,
+      "height": 256,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "academy-casatese-merate",
+      "displayName": "Academy Casatese Merate",
+      "aliases": [
+        "ACADEMY CASATESE MERATE",
+        "ACADEMY CASATESE MERASQ.B"
+      ],
+      "status": "NOT_FOUND",
+      "sourceUrl": null,
+      "verifiedAt": null,
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": null,
+      "note": "Separate FIGC club from Casatese Merate; no own official page found, crest not borrowed."
+    },
+    {
+      "slug": "accademia-varesina",
+      "displayName": "Accademia Varesina",
+      "aliases": [
+        "ACCADEMIA VARESINA"
+      ],
+      "status": "NOT_FOUND",
+      "sourceUrl": null,
+      "verifiedAt": null,
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": null,
+      "note": "Only Varesina (senior club) pages found; distinct club, not borrowed."
+    },
+    {
+      "slug": "alta-brianza-tavernerio",
+      "displayName": "Alta Brianza Tavernerio",
+      "aliases": [
+        "ALTA BRIANZA TAVERNERIO"
+      ],
+      "status": "NOT_FOUND",
+      "sourceUrl": null,
+      "verifiedAt": null,
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": null,
+      "note": "No official page found (only ASO Alta Brianza, a different club)."
+    },
+    {
+      "slug": "alto-lario",
+      "displayName": "Alto Lario Calcio",
+      "aliases": [
+        "ALTO LARIO CALCIO"
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/altolariocalcio",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/alto-lario.webp",
+      "width": 256,
+      "height": 256,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "arcellasco-citta-di-erba",
+      "displayName": "Arcellasco Città di Erba",
+      "aliases": [
+        "ARCELLASCO CITTA DI ERBA"
+      ],
+      "status": "NOT_FOUND",
+      "sourceUrl": null,
+      "verifiedAt": null,
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": null
+    },
+    {
+      "slug": "ardita-cittadella",
+      "displayName": "Ardita Cittadella 1934",
+      "aliases": [
+        "ARDITA CITTADELLA 1934"
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/ArditaCittadella1934",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/ardita-cittadella.webp",
+      "width": 256,
+      "height": 256,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "ardor-lazzate",
+      "displayName": "Ardor Lazzate",
+      "aliases": [
+        "ARDOR LAZZATE"
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/675633845892280",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/ardor-lazzate.webp",
+      "note": "Page 'Ardor Lazzate 1973'.",
+      "width": 256,
+      "height": 256,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "ars-rovagnate",
+      "displayName": "ARS Rovagnate",
+      "aliases": [
+        "ARS ROVAGNATE"
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/446874388705656",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/ars-rovagnate.webp",
+      "width": 256,
+      "height": 238,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "aurora-pro-patria",
+      "displayName": "Aurora Pro Patria 1919",
+      "aliases": [
+        "AURORA PRO PATRIA 1919"
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/aurorapropatria1919official",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/aurora-pro-patria.webp",
+      "note": "Youth-sector official page.",
+      "width": 256,
+      "height": 256,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "aurora-san-francesco",
+      "displayName": "Aurora San Francesco",
+      "aliases": [
+        "AURORA SAN FRANCESCO G.S."
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/p/GS-AURORA-SAN-FRANCESCO-100063801980191/",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/aurora-san-francesco.webp",
+      "note": "Profile picture only available at 240px.",
+      "width": 227,
+      "height": 226,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "bellagina",
+      "displayName": "Bellagina",
+      "aliases": [
+        "BELLAGINA",
+        "BELLAGINA A.D."
+      ],
+      "status": "SOURCE_FOUND_DOWNLOAD_BLOCKED",
+      "sourceUrl": "https://www.facebook.com/p/US-Bellagina-100077607124428/",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": null,
+      "note": "Official page found, picture not retrievable without login.",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE"
+    },
+    {
+      "slug": "biassono",
+      "displayName": "Biassono",
+      "aliases": [
+        "BIASSONO"
+      ],
+      "status": "NOT_FOUND",
+      "sourceUrl": null,
+      "verifiedAt": null,
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": null,
+      "note": "ACD Biassono has Instagram only."
+    },
+    {
+      "slug": "bulgaro",
+      "displayName": "Bulgaro",
+      "aliases": [
+        "BULGARO"
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/fcdbulgaroacademy",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/bulgaro.webp",
+      "note": "Page 'Fcd Bulgaro Academy - Scuola Calcio Elite FIGC'.",
+      "width": 256,
+      "height": 251,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "cob-91",
+      "displayName": "COB 91",
+      "aliases": [
+        "C.O.B. 91"
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/ASCob91",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/cob-91.webp",
+      "note": "Source image is 110px.",
+      "width": 110,
+      "height": 110,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "calcio-canegrate",
+      "displayName": "Calcio Canegrate",
+      "aliases": [
+        "CALCIO CANEGRATE"
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/calciocanegrateacademymilan",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/calcio-canegrate.webp",
+      "width": 256,
+      "height": 252,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "calcio-lecco",
+      "displayName": "Calcio Lecco 1912",
+      "aliases": [
+        "CALCIO LECCO 1912 S.R.L."
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/CalcioLecco1912",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/calcio-lecco.webp",
+      "width": 256,
+      "height": 256,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "cantu-san-paolo",
+      "displayName": "Cantù San Paolo",
+      "aliases": [
+        "CANTU SAN PAOLO A.S.D."
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/cantusanpaolo",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/cantu-san-paolo.webp",
+      "width": 256,
+      "height": 256,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "casatese-merate",
+      "displayName": "Casatese Merate",
+      "aliases": [
+        "CASATESE MERATE A.S.D.",
+        "CASATESE MERATE A.S.DSQ.B"
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/CasateseMerate",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/casatese-merate.webp",
+      "width": 197,
+      "height": 256,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "cassina-rizzardi",
+      "displayName": "Cassina Rizzardi",
+      "aliases": [
+        "CASSINA RIZZARDI"
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/cassinarizzardi1977",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/cassina-rizzardi.webp",
+      "width": 209,
+      "height": 256,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "castellanzese",
+      "displayName": "Castellanzese 1921",
+      "aliases": [
+        "CASTELLANZESE 1921"
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/castellanzesecalcio1921",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/castellanzese.webp",
+      "width": 256,
+      "height": 256,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "castello-citta-di-cantu",
+      "displayName": "Castello Città di Cantù",
+      "aliases": [
+        "CASTELLO CITTA DI CANTU"
+      ],
+      "status": "NOT_FOUND",
+      "sourceUrl": null,
+      "verifiedAt": null,
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": null,
+      "note": "Only 'Junior Castello Scuola Calcio' page found; identity not confirmed."
+    },
+    {
+      "slug": "chiavennese",
+      "displayName": "Chiavennese",
+      "aliases": [
+        "CHIAVENNESE"
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/unionesportiva.chiavennese",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/chiavennese.webp",
+      "width": 226,
+      "height": 235,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "cinisello",
+      "displayName": "Cinisello",
+      "aliases": [
+        "CINISELLO"
+      ],
+      "status": "NOT_FOUND",
+      "sourceUrl": null,
+      "verifiedAt": null,
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": null,
+      "note": "Several Cinisello clubs; identity ambiguous."
+    },
+    {
+      "slug": "cisanese",
+      "displayName": "Cisanese",
+      "aliases": [
+        "CISANESE A.S.D."
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/Cisanese",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/cisanese.webp",
+      "width": 256,
+      "height": 256,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "cortenova",
+      "displayName": "Cortenova",
+      "aliases": [
+        "CORTENOVA A.S.D."
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/csccortenova",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/cortenova.webp",
+      "note": "Page 'Centro Sportivo Culturale Cortenova'.",
+      "width": 230,
+      "height": 256,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "cosio-valtellino",
+      "displayName": "Cosio Valtellino",
+      "aliases": [
+        "COSIO VALTELLINO"
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/uscosiovaltellino",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/cosio-valtellino.webp",
+      "width": 200,
+      "height": 256,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "costamasnaga",
+      "displayName": "Costamasnaga",
+      "aliases": [
+        "COSTAMASNAGA",
+        "COSTAMASNAGA SQ.B"
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/uccostamasnaga",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/costamasnaga.webp",
+      "note": "U.C. Costamasnaga.",
+      "width": 256,
+      "height": 256,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "delebio",
+      "displayName": "Delebio",
+      "aliases": [
+        "DELEBIO"
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/usdelebio",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/delebio.webp",
+      "width": 256,
+      "height": 256,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "di-po",
+      "displayName": "Di.Po",
+      "aliases": [
+        "DI.PO A.S.D."
+      ],
+      "status": "NOT_FOUND",
+      "sourceUrl": null,
+      "verifiedAt": null,
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": null,
+      "note": "Only CSI/polisportiva pages found."
+    },
+    {
+      "slug": "dubino",
+      "displayName": "Dubino",
+      "aliases": [
+        "DUBINO ASD"
+      ],
+      "status": "NOT_FOUND",
+      "sourceUrl": null,
+      "verifiedAt": null,
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": null
+    },
+    {
+      "slug": "fucina-di-muggio",
+      "displayName": "Fucina di Muggiò",
+      "aliases": [
+        "FUCINA DI MUGGIO ASD"
+      ],
+      "status": "NOT_FOUND",
+      "sourceUrl": null,
+      "verifiedAt": null,
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": null,
+      "note": "FCDFucina page not reachable."
+    },
+    {
+      "slug": "futura-zanetti",
+      "displayName": "Futura Zanetti",
+      "aliases": [
+        "FUTURA ZANETTI A.S.D."
+      ],
+      "status": "NOT_FOUND",
+      "sourceUrl": null,
+      "verifiedAt": null,
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": null
+    },
+    {
+      "slug": "gso-missaglia",
+      "displayName": "GSO Missaglia",
+      "aliases": [
+        "G.S.O. MISSAGLIA A.S.D."
+      ],
+      "status": "NOT_FOUND",
+      "sourceUrl": null,
+      "verifiedAt": null,
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": null
+    },
+    {
+      "slug": "grentarcadia",
+      "displayName": "Grentarcadia",
+      "aliases": [
+        "GRENTARCADIA"
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/asdgrentarcadia",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/grentarcadia.webp",
+      "width": 256,
+      "height": 241,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "gso-ballabio",
+      "displayName": "GSO Ballabio",
+      "aliases": [
+        "GSO BALLABIO",
+        "GSO BALLABIO - ASD"
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/578164399347521",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/gso-ballabio.webp",
+      "width": 256,
+      "height": 256,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "la-dominante",
+      "displayName": "La Dominante",
+      "aliases": [
+        "LA DOMINANTE"
+      ],
+      "status": "NOT_FOUND",
+      "sourceUrl": null,
+      "verifiedAt": null,
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": null,
+      "note": "Instagram only."
+    },
+    {
+      "slug": "lentatese",
+      "displayName": "Lentatese",
+      "aliases": [
+        "LENTATESE"
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/AcdLentatese",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/lentatese.webp",
+      "width": 212,
+      "height": 256,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "leon",
+      "displayName": "Leon",
+      "aliases": [
+        "LEON"
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/acleonmonzabrianza",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/leon.webp",
+      "note": "AC Leon Monza e Brianza.",
+      "width": 256,
+      "height": 256,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "lesmo",
+      "displayName": "Lesmo",
+      "aliases": [
+        "LESMO SSD ARL"
+      ],
+      "status": "SOURCE_FOUND_DOWNLOAD_BLOCKED",
+      "sourceUrl": "https://www.facebook.com/p/FC-Lesmo-Monza-e-Brianza-100082565132404/",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": null,
+      "note": "Official page found, picture not retrievable without login.",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE"
+    },
+    {
+      "slug": "lissone-calcio",
+      "displayName": "Lissone Calcio",
+      "aliases": [
+        "LISSONE CALCIO SSDARL"
+      ],
+      "status": "NOT_FOUND",
+      "sourceUrl": null,
+      "verifiedAt": null,
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": null,
+      "note": "Identity ambiguous (Pro Lissone / AC Lissone)."
+    },
+    {
+      "slug": "luciano-manara",
+      "displayName": "Luciano Manara",
+      "aliases": [
+        "LUCIANO MANARA",
+        "LUCIANO MANARA SQ.B"
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/lucianomanara1909",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/luciano-manara.webp",
+      "width": 148,
+      "height": 256,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "mariano-calcio",
+      "displayName": "Mariano Calcio",
+      "aliases": [
+        "MARIANO CALCIO"
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/marianocalcio",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/mariano-calcio.webp",
+      "width": 232,
+      "height": 256,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "meda-1913",
+      "displayName": "Meda 1913",
+      "aliases": [
+        "MEDA 1913"
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/calciomeda",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/meda-1913.webp",
+      "width": 256,
+      "height": 256,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "mese",
+      "displayName": "Mese",
+      "aliases": [
+        "MESE"
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/p/AC-MESE-100057555043867/",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/mese.webp",
+      "note": "A.C. Mese 1990.",
+      "width": 256,
+      "height": 256,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "nuova-sondrio",
+      "displayName": "Nuova Sondrio Calcio",
+      "aliases": [
+        "NUOVA SONDRIO CALCIO"
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/nuovasondriocalcio",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/nuova-sondrio.webp",
+      "width": 256,
+      "height": 255,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "osgb-merate",
+      "displayName": "OSGB Merate",
+      "aliases": [
+        "O.S.G.B. MERATE"
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/OsgbCalcio",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/osgb-merate.webp",
+      "width": 244,
+      "height": 256,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "olginatese",
+      "displayName": "Olginatese",
+      "aliases": [
+        "OLGINATESE",
+        "OLGINATESE SQ.B"
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/olginatese",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/olginatese.webp",
+      "width": 187,
+      "height": 256,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "olympic-morbegno",
+      "displayName": "Olympic Morbegno",
+      "aliases": [
+        "OLYMPIC MORBEGNO"
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/olympicmorbegno",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/olympic-morbegno.webp",
+      "width": 218,
+      "height": 256,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "penta-piateda",
+      "displayName": "Penta Piateda",
+      "aliases": [
+        "PENTA PIATEDA"
+      ],
+      "status": "NOT_FOUND",
+      "sourceUrl": null,
+      "verifiedAt": null,
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": null
+    },
+    {
+      "slug": "piantedo",
+      "displayName": "Piantedo",
+      "aliases": [
+        "PIANTEDO"
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/asdpiantedocalcio",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/piantedo.webp",
+      "width": 256,
+      "height": 256,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "pol-mandello",
+      "displayName": "Pol. Mandello del Lario",
+      "aliases": [
+        "POL. MANDELLO DEL LARIO"
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/polisportivamandello2",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/pol-mandello.webp",
+      "width": 256,
+      "height": 256,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "pontelambrese",
+      "displayName": "Pontelambrese",
+      "aliases": [
+        "PONTELAMBRESE A.S.D."
+      ],
+      "status": "SOURCE_FOUND_DOWNLOAD_BLOCKED",
+      "sourceUrl": "https://www.facebook.com/p/ASD-Pontelambrese-100046242326365/",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": null,
+      "note": "Official page found, picture not retrievable without login.",
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE"
+    },
+    {
+      "slug": "real-milano",
+      "displayName": "Real Milano",
+      "aliases": [
+        "REAL MILANO SSD A RL"
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/RealMilano",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/real-milano.webp",
+      "width": 178,
+      "height": 256,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "rogeno",
+      "displayName": "Rogeno",
+      "aliases": [
+        "ROGENO A.S.D."
+      ],
+      "status": "NOT_FOUND",
+      "sourceUrl": null,
+      "verifiedAt": null,
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": null
+    },
+    {
+      "slug": "rovinata",
+      "displayName": "Rovinata",
+      "aliases": [
+        "ROVINATA"
+      ],
+      "status": "NOT_FOUND",
+      "sourceUrl": null,
+      "verifiedAt": null,
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": null,
+      "note": "Instagram only."
+    },
+    {
+      "slug": "sala-galbiate",
+      "displayName": "Sala Galbiate 1974",
+      "aliases": [
+        "SALA GALBIATE 1974 ASD"
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/salagalbiate1974",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/sala-galbiate.webp",
+      "width": 256,
+      "height": 207,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "san-giorgio",
+      "displayName": "San Giorgio",
+      "aliases": [
+        "SAN GIORGIO",
+        "SAN GIORGIO SQ.B"
+      ],
+      "status": "NOT_FOUND",
+      "sourceUrl": null,
+      "verifiedAt": null,
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": null,
+      "note": "Several 'San Giorgio' clubs; identity ambiguous."
+    },
+    {
+      "slug": "sirtorese",
+      "displayName": "Sirtorese",
+      "aliases": [
+        "SIRTORESE"
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/sirtorese",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/sirtorese.webp",
+      "width": 203,
+      "height": 209,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "valmadrera",
+      "displayName": "Valmadrera",
+      "aliases": [
+        "VALMADRERA"
+      ],
+      "status": "NOT_FOUND",
+      "sourceUrl": null,
+      "verifiedAt": null,
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": null,
+      "note": "Instagram only."
+    },
+    {
+      "slug": "valmadrera-cg",
+      "displayName": "Valmadrera C.G.",
+      "aliases": [
+        "VALMADRERA C.G. POL."
+      ],
+      "status": "NOT_FOUND",
+      "sourceUrl": null,
+      "verifiedAt": null,
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": null,
+      "note": "Instagram only."
+    },
+    {
+      "slug": "varese",
+      "displayName": "Varese Football Club",
+      "aliases": [
+        "VARESE FOOTBALL CLUB"
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/varesefootballclub",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/varese.webp",
+      "width": 204,
+      "height": 256,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "varesina",
+      "displayName": "Varesina",
+      "aliases": [
+        "VARESINA SPORT"
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/VaresinaCalcio",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/varesina.webp",
+      "width": 256,
+      "height": 256,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "vercurago",
+      "displayName": "Vercurago",
+      "aliases": [
+        "VERCURAGO SQ.B"
+      ],
+      "status": "NOT_FOUND",
+      "sourceUrl": null,
+      "verifiedAt": null,
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": null
+    },
+    {
+      "slug": "vibe-ronchese",
+      "displayName": "Vibe Ronchese",
+      "aliases": [
+        "VIBE RONCHESE"
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/viberonchese",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/vibe-ronchese.webp",
+      "width": 256,
+      "height": 256,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "vigor-milano",
+      "displayName": "Vigor Milano",
+      "aliases": [
+        "VIGOR MILANO"
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/asdvigormilano",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/vigor-milano.webp",
+      "width": 256,
+      "height": 256,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    },
+    {
+      "slug": "vis-nova-giussano",
+      "displayName": "Vis Nova Giussano",
+      "aliases": [
+        "VIS NOVA GIUSSANO"
+      ],
+      "status": "VERIFIED_FILE",
+      "sourceUrl": "https://www.facebook.com/ASVISNOVA",
+      "verifiedAt": "2026-10-13",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "file": "/media/crests/vis-nova-giussano.webp",
+      "width": 256,
+      "height": 256,
+      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE"
+    }
+  ]
+}

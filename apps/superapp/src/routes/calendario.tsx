@@ -5,9 +5,10 @@ import { ArrowRight, CalendarDays, ChevronLeft, ChevronRight, Clock3, Link2, Map
 import { getSession } from "@/lib/auth.functions";
 import { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 import { Crest, DateBlock, PageHeader, PrimaryButton, SectionHead, Segmented, Sheet } from "@/components/scd/board";
-import { BallIcon, ConeIcon } from "@/components/scd/icons";
+import { ConeIcon } from "@/components/scd/icons";
+import { OpponentCrest, opponentLabel } from "@/lib/crests";
 import { GroupResultsLink, OfficialResults } from "@/components/scd/OfficialResults";
-import { dateParts, groupShort, matchTitle, monthRange, titleCase, trainingRowsFor, upcomingMatches, venueCase, weekRange } from "@/lib/board-data";
+import { dateParts, groupShort, matchTitle, monthRange, trainingRowsFor, upcomingMatches, venueCase, weekRange } from "@/lib/board-data";
 import { romeParts } from "@/lib/home-week";
 import { EMPTY_MESSAGE, WINDOWS, freshnessLabel, resolveAnnata, windowEnd, loadQuadro, trainingKeyFor, type WindowDays, type PublicEvent, type PublicGroup } from "@/lib/public-snapshots";
 import juniores from "@/assets/scd/SCD_JUNIORES_2008_2009.png.asset.json";
@@ -387,9 +388,9 @@ function EventRow({ e, g, open, toggle }: { e: PublicEvent; g: PublicGroup | und
       <button type="button" onClick={toggle} aria-expanded={open} className="flex w-full items-center gap-[12px] py-[13px] text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--scd-blue)]">
         <span className="w-[4px] shrink-0 self-stretch rounded-full" style={{ background: g?.color ?? "#668196" }} aria-hidden="true" />
         <Lead date={e.date} time={e.time} />
-        <span className="flex w-[44px] shrink-0 justify-center"><BallIcon size={40} className="text-[#0d1630]" title="Partita" /></span>
+        <span className="flex w-[44px] shrink-0 justify-center"><OpponentCrest name={e.opponent} size={40} /></span>
         <span className="min-w-0 flex-1">
-          <span className="block break-words text-[16.5px] font-bold leading-[1.2] tracking-[-0.01em] text-[var(--scd-ink)]">{kind !== "Campionato" ? `${kind} · ` : ""}{matchTitle(e, team)}</span>
+          <span className="block break-words text-[16.5px] font-bold leading-[1.2] tracking-[-0.01em] text-[var(--scd-ink)]">{kind !== "Campionato" ? `${kind} · ` : ""}{matchTitle({ homeAway: e.homeAway, opponent: opponentLabel(e.opponent) }, team)}</span>
           <span className="mt-[3px] flex items-start gap-[3px] text-[14px] font-medium leading-[1.25] text-[var(--scd-sub)]">
             <MapPin className="mt-[2px] size-[14px] shrink-0" strokeWidth={2.4} aria-hidden="true" />
             <span className="min-w-0 break-words">{home ? "" : "Trasferta · "}{venueCase(e.venue) || "Sede da definire"}
@@ -434,14 +435,18 @@ function TrainingRowItem({ r }: { r: Extract<Row, { kind: "allenamento" }> }) {
 function NextMatchRow({ e, g }: { e: PublicEvent; g: PublicGroup | undefined }) {
   const d = dateParts(e.date);
   const team = groupShort(g, e.category);
-  const opp = titleCase(e.opponent || "Avversario da definire");
+  const opp = opponentLabel(e.opponent);
   const home = e.homeAway === "CASA";
   return (
     <li>
       <Link to="/calendario" search={{ annata: g ? (g.years[0] ?? g.id) : undefined, vista: "prossime" }} className="flex items-center gap-[12px] py-[12px]">
         <span className="w-[4px] shrink-0 self-stretch rounded-full" style={{ background: g?.color ?? "#668196" }} aria-hidden="true" />
         <span className="w-[54px] shrink-0"><DateBlock weekday={d.weekday} day={d.day} month={d.month} /></span>
-        <Crest height={56} className="drop-shadow-none" />
+        <span className="flex shrink-0 items-center gap-[4px]">
+          {home ? <Crest height={44} className="drop-shadow-none" /> : <OpponentCrest name={e.opponent} size={40} />}
+          <span className="text-[11px] font-bold text-[var(--scd-sub)]" aria-hidden="true">vs</span>
+          {home ? <OpponentCrest name={e.opponent} size={40} /> : <Crest height={44} className="drop-shadow-none" />}
+        </span>
         <span className="min-w-0 flex-1">
           <span className="block text-[15.5px] font-bold leading-[1.25] text-[var(--scd-ink)]">{home ? <>ColicoDerviese {team}<br />vs {opp}</> : <>{opp}<br />vs ColicoDerviese {team}</>}</span>
           <span className="mt-[4px] block text-[13px] text-[var(--scd-sub)]">{e.time ? `${e.time} · ` : ""}{venueCase(e.venue) || "Sede da definire"}</span>
