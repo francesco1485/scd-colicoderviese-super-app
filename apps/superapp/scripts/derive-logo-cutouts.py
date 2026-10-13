@@ -35,10 +35,11 @@ REGISTRY = REPO / "config/scd-assets.v1.json"
 
 # Official affiliation marks: the transparent cut-outs already approved in assets/ (LOCKED,
 # SCD_INTERNAL_APPROVED). Monza: ONLY the registered "Insieme al Monza" affiliation badge.
+# Order by importance (Direzione 13/10/2026 15:55): SGS 3° livello, LND/FIGC, AC Monza.
 AFFILIATIONS = [
-    ("figc-sgs-3-livello", "assets/logo-sgs.png", "FIGC Settore Giovanile e Scolastico, Club 3° livello"),
-    ("lnd", "assets/logo-lnd.png", "FIGC Lega Nazionale Dilettanti"),
-    ("insieme-al-monza", "assets/logo-monza.png", "Insieme al Monza, progetto Academy AC Monza"),
+    ("figc-sgs-3-livello", "assets/logo-sgs.png", "FIGC Settore Giovanile e Scolastico, Club Giovanile di 3° livello"),
+    ("lnd", "assets/logo-lnd.png", "FIGC Lega Nazionale Dilettanti, Comitato Regionale Lombardia"),
+    ("insieme-al-monza", "assets/logo-monza.png", "Insieme al Monza, programma di affiliazione AC Monza"),
 ]
 
 WHITE_MIN = 226  # a pixel is "background white" when all channels are >= this and it touches the border region

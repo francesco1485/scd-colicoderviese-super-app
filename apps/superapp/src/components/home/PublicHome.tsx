@@ -41,11 +41,7 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { ClubCrestOfficial } from "@/components/SiteChrome";
 import { KitTexture } from "@/components/scd/kit-texture";
-import {
-  AffiliationMarks,
-  LogoTile,
-  SponsorLogo,
-} from "@/components/scd/Logos";
+import { ClubCredentials, LogoTile, SponsorLogo } from "@/components/scd/Logos";
 import { openCookiePrefs } from "@/components/CookieConsent";
 import { SPONSOR_PACKAGES } from "@/lib/catalog";
 import { CLUB_EVENTS } from "@/lib/club-events";
@@ -169,27 +165,22 @@ function QuickStrip() {
   );
 }
 
-/* ------------------------------------------------- affiliation strip */
+/* ------------------------------------------------- credential bar */
 
 /**
- * Official affiliations high on the home (Direzione 13/10/2026 15:31: "sono di importanza"): FIGC SGS Club 3°
- * livello, LND, Insieme al Monza. Registered official files only, cut out; slim white strip under the quick strip.
+ * The club's credentials high on the home (Direzione 13/10/2026 15:31 and 15:55): three distinct labelled items in
+ * order of importance (Club Giovanile di 3° livello FIGC SGS, iscritta FIGC con LND Lombardia, affiliata AC
+ * Monza), official marks only, slim white bar with hairline dividers under the quick strip.
  */
-function AffiliationStrip() {
+function CredentialBar() {
   return (
     <section
-      aria-label="Affiliazioni ufficiali"
+      aria-label="Riconoscimenti e affiliazioni del club"
       className="border-b border-[#dbe5f1] bg-white"
       data-testid="affiliation-strip"
     >
-      <div
-        className={`${WRAP} flex items-center justify-center gap-3 py-1.5 [--logo-k:1] sm:gap-5 lg:py-2.5 lg:[--logo-k:1.3]`}
-      >
-        <span className="text-[10.5px] font-bold uppercase leading-[1.15] tracking-[0.1em] text-[#5a6b85] max-[369px]:hidden lg:text-[12px]">
-          Società
-          <br className="lg:hidden" /> affiliata
-        </span>
-        <AffiliationMarks box={{ w: 104, h: 34 }} gapClass="gap-3 sm:gap-5" />
+      <div className={`${WRAP} py-2 [--logo-k:1] lg:py-2.5 lg:[--logo-k:1.2]`}>
+        <ClubCredentials variant="bar" className="mx-auto max-w-[1040px]" />
       </div>
     </section>
   );
@@ -1147,7 +1138,7 @@ export function PublicHome({
         S.C.D. ColicoDerviese, il club di calcio di Colico e Dervio
       </h1>
       <QuickStrip />
-      <AffiliationStrip />
+      <CredentialBar />
       <PublicWeek calendar={calendar} nowMs={nowMs} today={today} />
       <Featured />
       <PartnerTicker />
