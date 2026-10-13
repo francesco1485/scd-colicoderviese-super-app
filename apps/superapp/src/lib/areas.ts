@@ -286,7 +286,7 @@ export const ACCESS_MENU: readonly MenuGroup[] = [
     entries: [
       { id: "calendario", label: "Calendario annuale", blurb: "Partite di tutte le annate", icon: "calendar", reserved: false },
       { id: "tornei", label: "Tornei ed eventi", blurb: "Christmas Lario Cup e la stagione", icon: "trophy", reserved: false },
-      { id: "infermeria", label: "Infermeria", blurb: "Servizi; prenoti con l'account", icon: "plus", reserved: true },
+      { id: "infermeria", label: "Infermeria", blurb: "Emergenza, staff e certificato medico", icon: "plus", reserved: true },
       { id: "famiglia", label: "Area famiglia", blurb: "Annata, avvisi, quote dei figli", icon: "home", reserved: true },
     ],
   },

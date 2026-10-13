@@ -6,7 +6,7 @@
 import calendarRaw from "@/data/calendario-snapshot-20261010.json";
 import quadroRaw from "@/data/quadro-snapshot-20261009.json";
 
-export const SNAPSHOT_BANNER = "ANTEPRIMA DATI 09/10/2026 • NON LIVE • DA VERIFICARE";
+export const SNAPSHOT_BANNER = "Quadro del 09/10/2026 · per i cambi vale l'avviso del mister";
 export const EMPTY_MESSAGE = "Dati non disponibili in questa anteprima";
 
 export type PublicGroup = { id: string; label: string; color: string; logo: string | null; years: string[]; count: number };
