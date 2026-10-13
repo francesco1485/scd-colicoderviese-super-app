@@ -21,7 +21,7 @@ describe('Snapshot Quadro', () => {
   });
   test('nessun pulmino confermato', () => expect(trasporti.services.length).toBe(0));
   test('logo annata solo se riconosciuto', () => {
-    expect(logoFor('U15 2012/13')).toBe('/media/scd/SCD_U15_2012_2013.png');
+    expect(logoFor('U15 2012/13')).toBe('/media/scd/annate/SCD_U15_2012_2013-96.webp');
     expect(logoFor('Testo libero')).toBeNull();
   });
 });

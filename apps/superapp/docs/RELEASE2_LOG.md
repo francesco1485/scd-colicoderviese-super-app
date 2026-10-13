@@ -372,3 +372,14 @@ prossimi impegni e "ci sarò" in primo piano). Desktop invariato.
   ricerca delle aree interne, "Copia link", fonti, distinta (Titolare/Riserva/C/VC, casella, maglia), filtri certificati.
 - Test: `touch-targets.test.ts` (8). Suite 521.
 - Aperto: estendere lo script a home, calendario, squadre, impianti.
+
+## L3 — Regola sui formati degli asset · 2026-10-13
+- Stato: DONE su staging/superapp (SHA nel commit che aggiunge questa voce). Dettaglio in `docs/LAUNCH_QUALITY.md` (sezione L3).
+- `config/scd-assets.v1.json` 1.1.0: `format_policy` (marchi SVG se esiste il vettoriale ufficiale, altrimenti raster con
+  RESEARCH_REAL_ASSET; scontornati con alpha; foto WebP/JPG; PDF; icone PNG; originali mai serviti), `runtime_assets` (tutti i
+  file serviti da public/ registrati), `vector_research` (stemma, LND/SGS/Monza, sponsor, badge annate), `known_format_debt`
+  (5 copie legacy con perdita in `assets/`).
+- Nuovo `src/lib/asset-format.ts` + `asset-format.test.ts` (16 test). Suite 611.
+- Badge annate: resa 96 px WebP senza perdita servita al posto dei PNG 512 px (asset.json con `derived_from`), ~2,9 MB → ~163 KB;
+  originali invariati. Schermate 390×844 e 1440×900 di /allenamenti e /core/impianti-calendari: badge nitidi, nessuno scorrimento orizzontale.
+- Aperto (Direzione): stato ufficiale dei badge annate (PENDING_VERIFICATION); file vettoriali ufficiali di stemma e sponsor da recuperare.

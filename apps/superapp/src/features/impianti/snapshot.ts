@@ -44,21 +44,24 @@ export const roomsFor = (q: QuadroSnapshot, day: Day, week: Week, start: number)
   q.rooms.filter(r => r.day === day && r.week === week && r.start === start);
 
 const LOGOS: [RegExp, string][] = [
-  [/prima/i, 'SCD_PRIMA_SQUADRA.png'],
-  [/U19|juniores|2008|2009/i, 'SCD_JUNIORES_2008_2009.png'],
-  [/U16|2011/i, 'SCD_U16_2011.png'],
-  [/U15|2012|2013|giovanissimi/i, 'SCD_U15_2012_2013.png'],
-  [/U13|2014/i, 'SCD_U13_2014.png'],
-  [/U12|2015/i, 'SCD_U12_2015.png'],
-  [/U11|pulcini|2016|2017/i, 'SCD_PULCINI_2016_2017.png'],
-  [/primi\s*calci|2018|2019/i, 'SCD_PRIMI_2018_2019.png'],
-  [/piccoli|2020|2021/i, 'SCD_PICCOLI_2020_2021.png'],
+  [/prima/i, 'SCD_PRIMA_SQUADRA'],
+  [/U19|juniores|2008|2009/i, 'SCD_JUNIORES_2008_2009'],
+  [/U16|2011/i, 'SCD_U16_2011'],
+  [/U15|2012|2013|giovanissimi/i, 'SCD_U15_2012_2013'],
+  [/U13|2014/i, 'SCD_U13_2014'],
+  [/U12|2015/i, 'SCD_U12_2015'],
+  [/U11|pulcini|2016|2017/i, 'SCD_PULCINI_2016_2017'],
+  [/primi\s*calci|2018|2019/i, 'SCD_PRIMI_2018_2019'],
+  [/piccoli|2020|2021/i, 'SCD_PICCOLI_2020_2021'],
 ];
-/** Logo annata dal pacchetto di prova; null se non riconoscibile (nessuna attribuzione inventata). */
+/**
+ * Logo annata dal pacchetto di prova; null se non riconoscibile (nessuna attribuzione inventata).
+ * Serve la resa 96 px (WebP senza perdita) registrata in config/scd-assets.v1.json; il PNG 512 px resta come originale.
+ */
 export function logoFor(label: string | undefined): string | null {
   if (!label) return null;
   const hit = LOGOS.find(([re]) => re.test(label));
-  return hit ? `/media/scd/${hit[1]}` : null;
+  return hit ? `/media/scd/annate/${hit[1]}-96.webp` : null;
 }
 
 export const fmtMinutes = (m: number) => `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;

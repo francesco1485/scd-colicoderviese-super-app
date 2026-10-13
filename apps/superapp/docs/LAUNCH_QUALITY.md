@@ -129,3 +129,36 @@ accessibili o ordine dei titoli.
 `cd apps/superapp && npm run build && PORT=4173 node .output/server/index.mjs &` poi
 `A11Y_BASE_URL=http://localhost:4173 A11Y_OUT=/tmp/a11y node scripts/a11y-audit.mjs` (`A11Y_SHOTS=1` salva le schermate,
 `A11Y_ONLY=famiglia,mister` limita le pagine). Esce con errore se trova violazioni.
+
+## L3 · Regola sui formati degli asset · 2026-10-13
+
+Regola scritta in `config/scd-assets.v1.json` → `format_policy` (registro 1.1.0), dal comando utente CMD-20260930-0832
+("SVG nativo", "raster solo come placeholder") e dal punto L3 del piano di lancio.
+
+| Tipo | Formati | Condizione |
+|---|---|---|
+| Marchi (stemma, LND/FIGC-SGS/Monza, sponsor, badge annate) | SVG preferito; PNG/WebP | raster ammesso solo con `RESEARCH_REAL_ASSET` (vettoriale ufficiale da cercare); PNG solo con trasparenza; nuove derivate WebP **senza perdita** |
+| Scontornati (Sky, Crovi) | PNG o WebP | canale alpha obbligatorio |
+| Foto, locandine, tavole kit, planimetrie | WebP o JPG | niente PNG |
+| Documenti ufficiali | PDF | — |
+| Icone app | PNG | richiesto da manifest e iOS |
+| Originali conservati | come arrivati | mai serviti dal codice; serve la resa registrata |
+
+Vietato: rigenerare o ridisegnare un asset ufficiale, vettorializzare/ricalcare un raster spacciandolo per SVG ufficiale,
+ricomprimere con perdita un marchio bloccato.
+
+Registro: ogni file servito da `apps/superapp/public` (immagini e PDF, 95 file) è ora registrato (`locked_assets` o il nuovo
+`runtime_assets`, per file o per cartella). Nessun SVG ufficiale nel repository: stemma, marchi federali/Monza, sponsor e
+badge annate sono in `vector_research` come `RESEARCH_REAL_ASSET` (fonti: cartella brand del Drive, kit federali,
+file forniti dagli sponsor).
+
+Test `src/lib/asset-format.test.ts` (16): lettore di intestazioni PNG/WebP/JPEG/PDF/SVG (alpha, lossless) senza decodifica;
+ogni file servito registrato e conforme; asset bloccati conformi salvo il debito elencato; hash git dei file registrati
+invariati; ogni `/media/...` citato dal codice esiste ed è registrato; gli originali non sono serviti.
+
+Correzione trovata dal test: i 9 badge annata (PNG 512 px opachi, ~330 KB l'uno) erano serviti a 20–34 px su
+/calendario, /allenamenti, /comunicazioni e /core/impianti-calendari. Ora si serve una resa 96 px WebP senza perdita
+(17–19 KB l'una): **~2,9 MB → ~163 KB** per pagina con tutte le annate. Gli originali PNG restano invariati (hash registrato).
+
+Debito noto (`known_format_debt`, verificato dal test): `assets/logo-{scd,lnd,sgs,monza}.webp` e `assets/sky.webp` sono copie
+RGB con perdita dell'app legacy alla radice; la Super App non le usa. Da ritirare con l'app legacy, mai ricomprimere.

@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "effective_at": "2026-10-01",
   "canonical_root": "assets/",
   "statuses": [
@@ -287,5 +287,498 @@
     ],
     "opponent_logo": "VERIFIED_ONLY",
     "kit": "APPROVED_REAL_REFERENCE_ONLY"
-  }
+  },
+  "format_policy": {
+    "version": "1.0.0",
+    "effective_at": "2026-10-13",
+    "origin": [
+      "USER_COMMAND CMD-20260930-0832 ('SVG nativo', 'raster asset solo come placeholder')",
+      "LAUNCH_BACKLOG L3 (2026-10-12): crest and sponsor logos SVG when an official vector exists, cut-outs PNG with alpha, photos WebP/JPG"
+    ],
+    "never": [
+      "regenerate, redraw or alter an official asset to satisfy this policy",
+      "trace or auto-vectorize a raster and present it as an official SVG",
+      "lossy re-encode of a LOCKED mark; new derivatives of marks are lossless WebP or the official file itself"
+    ],
+    "rules": {
+      "VECTOR_MARK": {
+        "description": "Crests, federation/affiliation marks, sponsor and partner logos, category badges.",
+        "formats": [
+          "svg",
+          "png",
+          "webp"
+        ],
+        "preferred": "svg",
+        "raster_requires_vector_status": [
+          "RESEARCH_REAL_ASSET",
+          "NO_OFFICIAL_VECTOR_KNOWN"
+        ],
+        "png_requires_alpha": true,
+        "new_webp_derivative_encoding": "lossless"
+      },
+      "CUTOUT": {
+        "description": "Mascots and characters cut out from their background.",
+        "formats": [
+          "png",
+          "webp"
+        ],
+        "alpha_required": true
+      },
+      "PHOTO": {
+        "description": "Photos, posters, kit boards, illustrations and plans with an opaque background.",
+        "formats": [
+          "webp",
+          "jpg",
+          "jpeg"
+        ]
+      },
+      "DOCUMENT": {
+        "description": "Official club documents.",
+        "formats": [
+          "pdf"
+        ]
+      },
+      "APP_ICON": {
+        "description": "PWA/OS icons; the web app manifest and iOS require PNG.",
+        "formats": [
+          "png"
+        ]
+      },
+      "SOURCE_ORIGINAL": {
+        "description": "Original file kept unchanged next to its runtime rendition; never referenced by runtime code.",
+        "formats": [
+          "png",
+          "webp",
+          "jpg",
+          "jpeg",
+          "svg"
+        ],
+        "must_not_be_referenced_by_runtime_code": true,
+        "requires_rendition": true
+      }
+    },
+    "class_rules": {
+      "OFFICIAL_CLUB_LOGO": "VECTOR_MARK",
+      "OFFICIAL_CLUB_LOGO_OPTIMIZED": "VECTOR_MARK",
+      "FEDERATION_LOGO": "VECTOR_MARK",
+      "FEDERATION_LOGO_OPTIMIZED": "VECTOR_MARK",
+      "AFFILIATION_PARTNER_LOGO": "VECTOR_MARK",
+      "AFFILIATION_PARTNER_LOGO_OPTIMIZED": "VECTOR_MARK",
+      "OFFICIAL_AFFILIATION_LOGO": "VECTOR_MARK",
+      "SPONSOR_LOGO": "VECTOR_MARK",
+      "SPONSOR_LOGO_BOARD_CROP": "VECTOR_MARK",
+      "CATEGORY_BADGE_RENDITION": "VECTOR_MARK",
+      "CATEGORY_BADGE_SOURCE": "SOURCE_ORIGINAL",
+      "OFFICIAL_CLUB_MASCOT": "CUTOUT",
+      "OFFICIAL_CLUB_MASCOT_OPTIMIZED": "CUTOUT",
+      "MASCOT_CUTOUT": "CUTOUT",
+      "CHARACTER_CUTOUT": "CUTOUT",
+      "MASCOT_ILLUSTRATION": "PHOTO",
+      "CHARACTER_AVATAR_TILE": "PHOTO",
+      "SUPPLIER_KIT_BOARD": "PHOTO",
+      "EVENT_POSTER": "PHOTO",
+      "VENUE_PHOTO": "PHOTO",
+      "FACILITY_PLAN": "PHOTO",
+      "OFFICIAL_CLUB_DOCUMENT": "DOCUMENT",
+      "APP_ICON": "APP_ICON"
+    },
+    "runtime_roots": [
+      "apps/superapp/public/media/",
+      "apps/superapp/public/"
+    ],
+    "runtime_root_file_extensions": [
+      "png",
+      "webp",
+      "jpg",
+      "jpeg",
+      "svg",
+      "pdf"
+    ],
+    "known_format_debt": [
+      {
+        "path": "assets/logo-scd.webp",
+        "issue": "lossy RGB copy of an alpha mark",
+        "reason": "legacy root app asset, LOCKED; superapp serves the lossless apps/superapp/public/media/brand/logo-scd.webp",
+        "action": "retire when the legacy root app is archived; never re-encode"
+      },
+      {
+        "path": "assets/logo-lnd.webp",
+        "issue": "lossy RGB copy of an alpha mark",
+        "reason": "legacy root app asset, LOCKED; superapp serves media/affiliazioni/lnd.webp",
+        "action": "retire with the legacy root app"
+      },
+      {
+        "path": "assets/logo-sgs.webp",
+        "issue": "lossy RGB copy of an alpha mark",
+        "reason": "legacy root app asset, LOCKED",
+        "action": "retire with the legacy root app"
+      },
+      {
+        "path": "assets/logo-monza.webp",
+        "issue": "lossy RGB copy of an alpha mark",
+        "reason": "legacy root app asset, LOCKED",
+        "action": "retire with the legacy root app"
+      },
+      {
+        "path": "assets/sky.webp",
+        "issue": "lossy RGB copy of a cut-out (alpha lost)",
+        "reason": "legacy root app asset, LOCKED; superapp uses media/brand/sky-*.png/webp with alpha",
+        "action": "retire with the legacy root app"
+      }
+    ]
+  },
+  "runtime_assets": [
+    {
+      "path": "apps/superapp/public/media/brand/logo-scd.png",
+      "class": "OFFICIAL_CLUB_LOGO",
+      "status": "LOCKED",
+      "source": "copy of assets/logo-scd.png",
+      "git_blob_sha": "fb15174aa297a5b2fcd487d7ba3053dc082d2a2c",
+      "copy_of": "assets/logo-scd.png",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/brand/sky-scd.png",
+      "class": "MASCOT_CUTOUT",
+      "status": "LOCKED",
+      "source": "Sky, official club mascot (confirmed by the owner 2026-10-10); KEEP_ENHANCE alpha only",
+      "git_blob_sha": "8e3d7dbce350767e4afe45a555bfc62dfbe1faae"
+    },
+    {
+      "path": "apps/superapp/public/media/brand/sky-atv-cut.webp",
+      "class": "MASCOT_CUTOUT",
+      "status": "LOCKED",
+      "source": "Sky, official club mascot (confirmed by the owner 2026-10-10); KEEP_ENHANCE alpha only",
+      "git_blob_sha": "d6b599feaf8677886abecf0b3dbd5a66a91ee468"
+    },
+    {
+      "path": "apps/superapp/public/media/brand/sky-atv-head.webp",
+      "class": "MASCOT_CUTOUT",
+      "status": "LOCKED",
+      "source": "Sky, official club mascot (confirmed by the owner 2026-10-10); KEEP_ENHANCE alpha only",
+      "git_blob_sha": "ea488bcee34f29bc995251e4161627c57ca2d4f2"
+    },
+    {
+      "path": "apps/superapp/public/media/brand/sky-divisa-gara.webp",
+      "class": "MASCOT_ILLUSTRATION",
+      "status": "LOCKED",
+      "source": "Sky in match kit, official mascot artwork",
+      "git_blob_sha": "84c9e35e04720fcac0d10c1bdfd5ea18df65a50d"
+    },
+    {
+      "path": "apps/superapp/public/media/crovi/v3/",
+      "class": "CHARACTER_CUTOUT",
+      "status": "VERIFIED",
+      "source": "Crovi v3, original character (UD-026), GENERATE_ORIGINAL, not an official asset"
+    },
+    {
+      "path": "apps/superapp/public/media/crovi/v3/crovi-avatar-256.webp",
+      "class": "CHARACTER_AVATAR_TILE",
+      "status": "VERIFIED",
+      "source": "Crovi v3 avatar tile with background (UD-026)"
+    },
+    {
+      "path": "apps/superapp/public/media/eventi/",
+      "class": "EVENT_POSTER",
+      "status": "VERIFIED",
+      "source": "Christmas Lario Cup 2026 posters from the club"
+    },
+    {
+      "path": "apps/superapp/public/media/scd/hero-colico.webp",
+      "class": "VENUE_PHOTO",
+      "status": "VERIFIED",
+      "source": "Colico sports centre photo (copy of assets/hero-colico.webp)"
+    },
+    {
+      "path": "apps/superapp/public/media/scd/lario-header.webp",
+      "class": "VENUE_PHOTO",
+      "status": "VERIFIED",
+      "source": "Lake Como header photo"
+    },
+    {
+      "path": "apps/superapp/public/media/scd/planimetria_colico.webp",
+      "class": "FACILITY_PLAN",
+      "status": "VERIFIED",
+      "source": "Colico sports centre plan (config/scd-facilities.v1.json)"
+    },
+    {
+      "path": "apps/superapp/public/media/scd/SCD_JUNIORES_2008_2009.png",
+      "class": "CATEGORY_BADGE_SOURCE",
+      "status": "PENDING_VERIFICATION",
+      "source": "category badge uploaded to the Lovable project SCD ONE (06cb3ee4, 2026-10-09; src/assets/scd/*.asset.json); official status to be confirmed by Direzione",
+      "git_blob_sha": "c09ff275d833ebd1a5c6f1a227a9d1edd1a26951",
+      "rendition": "apps/superapp/public/media/scd/annate/SCD_JUNIORES_2008_2009-96.webp"
+    },
+    {
+      "path": "apps/superapp/public/media/scd/annate/SCD_JUNIORES_2008_2009-96.webp",
+      "class": "CATEGORY_BADGE_RENDITION",
+      "status": "PENDING_VERIFICATION",
+      "source": "display rendition of the category badge",
+      "git_blob_sha": "7bb1b787910ca7371b0aef753006ed1e4cdbe1ca",
+      "derived_from": "apps/superapp/public/media/scd/SCD_JUNIORES_2008_2009.png",
+      "transform": "downscale 512->96 px (3x of the 32 px display), lossless WebP; no redraw, no colour change (launch L3, 2026-10-13)",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/scd/SCD_PICCOLI_2020_2021.png",
+      "class": "CATEGORY_BADGE_SOURCE",
+      "status": "PENDING_VERIFICATION",
+      "source": "category badge uploaded to the Lovable project SCD ONE (06cb3ee4, 2026-10-09; src/assets/scd/*.asset.json); official status to be confirmed by Direzione",
+      "git_blob_sha": "147d030dc49ad8f476f19a785644e53e38180627",
+      "rendition": "apps/superapp/public/media/scd/annate/SCD_PICCOLI_2020_2021-96.webp"
+    },
+    {
+      "path": "apps/superapp/public/media/scd/annate/SCD_PICCOLI_2020_2021-96.webp",
+      "class": "CATEGORY_BADGE_RENDITION",
+      "status": "PENDING_VERIFICATION",
+      "source": "display rendition of the category badge",
+      "git_blob_sha": "44a867a7a9fe25c29fed0f99d7c0d44acbcc5062",
+      "derived_from": "apps/superapp/public/media/scd/SCD_PICCOLI_2020_2021.png",
+      "transform": "downscale 512->96 px (3x of the 32 px display), lossless WebP; no redraw, no colour change (launch L3, 2026-10-13)",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/scd/SCD_PRIMA_SQUADRA.png",
+      "class": "CATEGORY_BADGE_SOURCE",
+      "status": "PENDING_VERIFICATION",
+      "source": "category badge uploaded to the Lovable project SCD ONE (06cb3ee4, 2026-10-09; src/assets/scd/*.asset.json); official status to be confirmed by Direzione",
+      "git_blob_sha": "d91909d51e957b109e406b96adfabc168c1f6de9",
+      "rendition": "apps/superapp/public/media/scd/annate/SCD_PRIMA_SQUADRA-96.webp"
+    },
+    {
+      "path": "apps/superapp/public/media/scd/annate/SCD_PRIMA_SQUADRA-96.webp",
+      "class": "CATEGORY_BADGE_RENDITION",
+      "status": "PENDING_VERIFICATION",
+      "source": "display rendition of the category badge",
+      "git_blob_sha": "1c94907064e1b1bdcf35485d03055977dd5669a8",
+      "derived_from": "apps/superapp/public/media/scd/SCD_PRIMA_SQUADRA.png",
+      "transform": "downscale 512->96 px (3x of the 32 px display), lossless WebP; no redraw, no colour change (launch L3, 2026-10-13)",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/scd/SCD_PRIMI_2018_2019.png",
+      "class": "CATEGORY_BADGE_SOURCE",
+      "status": "PENDING_VERIFICATION",
+      "source": "category badge uploaded to the Lovable project SCD ONE (06cb3ee4, 2026-10-09; src/assets/scd/*.asset.json); official status to be confirmed by Direzione",
+      "git_blob_sha": "1e433d82489c919cb4ddfb2b87396e71bcca4a82",
+      "rendition": "apps/superapp/public/media/scd/annate/SCD_PRIMI_2018_2019-96.webp"
+    },
+    {
+      "path": "apps/superapp/public/media/scd/annate/SCD_PRIMI_2018_2019-96.webp",
+      "class": "CATEGORY_BADGE_RENDITION",
+      "status": "PENDING_VERIFICATION",
+      "source": "display rendition of the category badge",
+      "git_blob_sha": "f38e1e39d8c5d8421f8a63d5092d544af3f2f0d1",
+      "derived_from": "apps/superapp/public/media/scd/SCD_PRIMI_2018_2019.png",
+      "transform": "downscale 512->96 px (3x of the 32 px display), lossless WebP; no redraw, no colour change (launch L3, 2026-10-13)",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/scd/SCD_PULCINI_2016_2017.png",
+      "class": "CATEGORY_BADGE_SOURCE",
+      "status": "PENDING_VERIFICATION",
+      "source": "category badge uploaded to the Lovable project SCD ONE (06cb3ee4, 2026-10-09; src/assets/scd/*.asset.json); official status to be confirmed by Direzione",
+      "git_blob_sha": "3d99004040b665d22e3dd521b39ba54aa0da5722",
+      "rendition": "apps/superapp/public/media/scd/annate/SCD_PULCINI_2016_2017-96.webp"
+    },
+    {
+      "path": "apps/superapp/public/media/scd/annate/SCD_PULCINI_2016_2017-96.webp",
+      "class": "CATEGORY_BADGE_RENDITION",
+      "status": "PENDING_VERIFICATION",
+      "source": "display rendition of the category badge",
+      "git_blob_sha": "06c126c0c593b0c55761d7f15866df72ea88b43b",
+      "derived_from": "apps/superapp/public/media/scd/SCD_PULCINI_2016_2017.png",
+      "transform": "downscale 512->96 px (3x of the 32 px display), lossless WebP; no redraw, no colour change (launch L3, 2026-10-13)",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/scd/SCD_U12_2015.png",
+      "class": "CATEGORY_BADGE_SOURCE",
+      "status": "PENDING_VERIFICATION",
+      "source": "category badge uploaded to the Lovable project SCD ONE (06cb3ee4, 2026-10-09; src/assets/scd/*.asset.json); official status to be confirmed by Direzione",
+      "git_blob_sha": "f929655a8fb1c3778408509b574dd529f46362ac",
+      "rendition": "apps/superapp/public/media/scd/annate/SCD_U12_2015-96.webp"
+    },
+    {
+      "path": "apps/superapp/public/media/scd/annate/SCD_U12_2015-96.webp",
+      "class": "CATEGORY_BADGE_RENDITION",
+      "status": "PENDING_VERIFICATION",
+      "source": "display rendition of the category badge",
+      "git_blob_sha": "cb071ca9a9083508819125b613a5636461fc18bd",
+      "derived_from": "apps/superapp/public/media/scd/SCD_U12_2015.png",
+      "transform": "downscale 512->96 px (3x of the 32 px display), lossless WebP; no redraw, no colour change (launch L3, 2026-10-13)",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/scd/SCD_U13_2014.png",
+      "class": "CATEGORY_BADGE_SOURCE",
+      "status": "PENDING_VERIFICATION",
+      "source": "category badge uploaded to the Lovable project SCD ONE (06cb3ee4, 2026-10-09; src/assets/scd/*.asset.json); official status to be confirmed by Direzione",
+      "git_blob_sha": "aa3b3473de5b7fca203af79f106c567da1269af4",
+      "rendition": "apps/superapp/public/media/scd/annate/SCD_U13_2014-96.webp"
+    },
+    {
+      "path": "apps/superapp/public/media/scd/annate/SCD_U13_2014-96.webp",
+      "class": "CATEGORY_BADGE_RENDITION",
+      "status": "PENDING_VERIFICATION",
+      "source": "display rendition of the category badge",
+      "git_blob_sha": "7ff79670424b415e69a86977825336816bf84aa0",
+      "derived_from": "apps/superapp/public/media/scd/SCD_U13_2014.png",
+      "transform": "downscale 512->96 px (3x of the 32 px display), lossless WebP; no redraw, no colour change (launch L3, 2026-10-13)",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/scd/SCD_U15_2012_2013.png",
+      "class": "CATEGORY_BADGE_SOURCE",
+      "status": "PENDING_VERIFICATION",
+      "source": "category badge uploaded to the Lovable project SCD ONE (06cb3ee4, 2026-10-09; src/assets/scd/*.asset.json); official status to be confirmed by Direzione",
+      "git_blob_sha": "9f61b56e9b89fcf31c9d17c90a6b84837371fc21",
+      "rendition": "apps/superapp/public/media/scd/annate/SCD_U15_2012_2013-96.webp"
+    },
+    {
+      "path": "apps/superapp/public/media/scd/annate/SCD_U15_2012_2013-96.webp",
+      "class": "CATEGORY_BADGE_RENDITION",
+      "status": "PENDING_VERIFICATION",
+      "source": "display rendition of the category badge",
+      "git_blob_sha": "80e1e21f4f6fd56ae66372f486bca7ac9166a0ec",
+      "derived_from": "apps/superapp/public/media/scd/SCD_U15_2012_2013.png",
+      "transform": "downscale 512->96 px (3x of the 32 px display), lossless WebP; no redraw, no colour change (launch L3, 2026-10-13)",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/scd/SCD_U16_2011.png",
+      "class": "CATEGORY_BADGE_SOURCE",
+      "status": "PENDING_VERIFICATION",
+      "source": "category badge uploaded to the Lovable project SCD ONE (06cb3ee4, 2026-10-09; src/assets/scd/*.asset.json); official status to be confirmed by Direzione",
+      "git_blob_sha": "0744f3646b76cbaf86730b41a227541f0ce87870",
+      "rendition": "apps/superapp/public/media/scd/annate/SCD_U16_2011-96.webp"
+    },
+    {
+      "path": "apps/superapp/public/media/scd/annate/SCD_U16_2011-96.webp",
+      "class": "CATEGORY_BADGE_RENDITION",
+      "status": "PENDING_VERIFICATION",
+      "source": "display rendition of the category badge",
+      "git_blob_sha": "85579be6e6b950796889d32de521a2bef2dd5480",
+      "derived_from": "apps/superapp/public/media/scd/SCD_U16_2011.png",
+      "transform": "downscale 512->96 px (3x of the 32 px display), lossless WebP; no redraw, no colour change (launch L3, 2026-10-13)",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/hdi-maglia-assicurazioni.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "sponsor logo file already uploaded by the club (src/lib/sponsors.ts)",
+      "git_blob_sha": "a4b894705c217ff39d4b31c05c4e1213bed64d9f",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/saglio-sport.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "sponsor logo file already uploaded by the club (src/lib/sponsors.ts)",
+      "git_blob_sha": "d2f0b07f1a03f4b3efbc1959306d915c786f7c46",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/legea.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "sponsor logo file already uploaded by the club (src/lib/sponsors.ts)",
+      "git_blob_sha": "220ce24c46db4dd126f7a7d71a9a2fddab76483e",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/2026-27/",
+      "class": "SPONSOR_LOGO_BOARD_CROP",
+      "status": "VERIFIED",
+      "source": "crops of the official board 'Lo sport unisce la nostra comunita' given by Direzione 2026-10-12 (src/lib/sponsors.ts); KEEP_ENHANCE, no redraw",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/favicon.png",
+      "class": "APP_ICON",
+      "status": "VERIFIED",
+      "source": "PWA icon built from the official crest"
+    },
+    {
+      "path": "apps/superapp/public/apple-touch-icon.png",
+      "class": "APP_ICON",
+      "status": "VERIFIED",
+      "source": "PWA icon built from the official crest"
+    },
+    {
+      "path": "apps/superapp/public/icon-192.png",
+      "class": "APP_ICON",
+      "status": "VERIFIED",
+      "source": "PWA icon built from the official crest"
+    },
+    {
+      "path": "apps/superapp/public/icon-512.png",
+      "class": "APP_ICON",
+      "status": "VERIFIED",
+      "source": "PWA icon built from the official crest"
+    },
+    {
+      "path": "apps/superapp/public/icon-maskable-512.png",
+      "class": "APP_ICON",
+      "status": "VERIFIED",
+      "source": "PWA icon built from the official crest"
+    }
+  ],
+  "vector_research": [
+    {
+      "subject": "Stemma S.C.D. ColicoDerviese",
+      "raster_paths": [
+        "assets/logo-scd.png",
+        "assets/logo-scd.webp",
+        "apps/superapp/public/media/brand/logo-scd.png",
+        "apps/superapp/public/media/brand/logo-scd.webp"
+      ],
+      "decision": "RESEARCH_REAL_ASSET",
+      "where_to_look": [
+        "SCD Drive brand folder",
+        "original designer/printer files (kit supplier, signage)"
+      ],
+      "note": "no official SVG in the repo; never trace the PNG"
+    },
+    {
+      "subject": "LND / FIGC-SGS / Insieme al Monza",
+      "raster_paths": [
+        "assets/logo-lnd.png",
+        "assets/logo-sgs.png",
+        "assets/logo-monza.png",
+        "apps/superapp/public/media/affiliazioni/"
+      ],
+      "decision": "RESEARCH_REAL_ASSET",
+      "where_to_look": [
+        "FEDERATION_OR_LEAGUE brand kit",
+        "AC Monza affiliation kit"
+      ],
+      "note": "use only the files the federation/partner distribute"
+    },
+    {
+      "subject": "Sponsor 2026/27",
+      "raster_paths": [
+        "apps/superapp/public/media/sponsor/",
+        "apps/superapp/public/media/sponsor/2026-27/"
+      ],
+      "decision": "RESEARCH_REAL_ASSET",
+      "where_to_look": [
+        "PARTNER_SUPPLIED_OFFICIAL_ASSET (Drive sponsor folders)",
+        "OFFICIAL_BRAND_SITE"
+      ],
+      "note": "board crops stay until the sponsor sends its vector file"
+    },
+    {
+      "subject": "Badge annate",
+      "raster_paths": [
+        "apps/superapp/public/media/scd/"
+      ],
+      "decision": "RESEARCH_REAL_ASSET",
+      "where_to_look": [
+        "SCD Drive brand folder"
+      ],
+      "note": "official status PENDING_VERIFICATION"
+    }
+  ]
 }
