@@ -7,6 +7,7 @@ import {
   CROVI_AVATAR_SRC,
   PERSONA_COPY,
   SKY_HANDOFF,
+  eraEligible,
   greetingFor,
   isHelperHiddenPath,
   isReservedPath,
@@ -61,7 +62,7 @@ describe("helper persona (Direzione 12/10/2026: Crovi outside, Sky inside)", () 
   });
 
   it("keeps the copy free of invented facts and real-person likeness claims", () => {
-    for (const persona of ["sky", "crovi"] as const) {
+    for (const persona of ["sky", "crovi", "era"] as const) {
       const c = PERSONA_COPY[persona];
       const all = [c.title, c.subtitle, c.greeting, ...c.quick].join(" ");
       expect(all).not.toMatch(/\d{1,2}[:.]\d{2}|\d+\s*-\s*\d+/);
@@ -83,5 +84,55 @@ describe("helper persona (Direzione 12/10/2026: Crovi outside, Sky inside)", () 
     expect(cameoLine("/elimina-account")).toBeNull();
     expect(cameoLine("/safeguarding")).toBeNull();
     expect(cameoLine("/gestionale")).toBeNull();
+  });
+});
+
+describe("Era in the reserved areas (Direzione 'Vai A B C' 13/10/2026)", () => {
+  const staff = { roles: ["mister"], age15plus: null };
+  const member15 = { roles: ["atleta"], age15plus: true };
+  const minor = { roles: ["atleta"], age15plus: false };
+  const unknownAge = { roles: ["famiglia"], age15plus: null };
+  const ready = { eraReady: true };
+  const inside = ["/famiglia", "/la-mia-scd", "/direzione", "/segreteria/persone", "/infermeria", "/gestionale/organigramma"];
+
+  it("gives Era to staff and to members known to be 15+, only inside", () => {
+    for (const p of inside) {
+      expect(personaFor(p, staff, ready)).toBe("era");
+      expect(personaFor(p, member15, ready)).toBe("era");
+      expect(launcherFaceFor(p, staff, ready)).toBe("era");
+    }
+  });
+
+  it("never shows Era on public pages: Crovi stays the public helper", () => {
+    for (const p of ["/", ...PUBLIC_PREFIXES]) {
+      expect(personaFor(p, staff, ready)).toBe("crovi");
+      expect(launcherFaceFor(p, staff, ready)).not.toBe("era");
+    }
+  });
+
+  it("keeps Sky for minors, unknown age, anonymous viewers", () => {
+    for (const p of inside) {
+      expect(personaFor(p, minor, ready)).toBe("sky");
+      expect(personaFor(p, unknownAge, ready)).toBe("sky");
+      expect(personaFor(p, null, ready)).toBe("sky");
+      expect(personaFor(p, undefined, ready)).toBe("sky");
+    }
+  });
+
+  it("a viewer known to be under 15 never gets Era, even with a staff position", () => {
+    expect(eraEligible({ roles: ["mister"], age15plus: false })).toBe(false);
+    expect(personaFor("/famiglia", { roles: ["mister"], age15plus: false }, ready)).toBe("sky");
+  });
+
+  it("waits for Era's approved picture: without it Sky stands in", () => {
+    expect(personaFor("/famiglia", staff, { eraReady: false })).toBe("sky");
+    expect(launcherFaceFor("/famiglia", staff, { eraReady: false })).toBe("sky");
+  });
+
+  it("gives Era her own Italian copy", () => {
+    expect(PERSONA_COPY.era.name).toBe("Era");
+    expect(PERSONA_COPY.era.placeholder).toMatch(/Era/);
+    expect(PERSONA_COPY.era.greeting).toMatch(/aree riservate/);
+    expect(greetingFor("era")).toBe(PERSONA_COPY.era.greeting);
   });
 });

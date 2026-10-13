@@ -24,11 +24,12 @@ import {
   type CameoLine,
 } from "@/lib/crovi-cameo";
 import { askSky, type SkyReply } from "@/lib/sky.functions";
+import { useSession } from "@/lib/use-session";
 
 type Mood = SkyReply["mood"];
 type Msg = { role: "sky" | "user"; text: string; links?: SkyReply["links"] };
 
-/** Round avatar of a persona: Sky (official head asset) or CROVI (approved v3 avatar). */
+/** Round avatar of a persona: Sky (official head asset), CROVI (approved v3 avatar) or Era. */
 export function SkyMascot({
   size = 52,
   persona = "sky",
@@ -66,8 +67,12 @@ const GAP = 12;
 
 export function SkyChat() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const persona = personaFor(pathname);
-  const face = launcherFaceFor(pathname);
+  // Era needs a verified session (staff, or 15+ once the server exposes an age band); until the
+  // session answers, the reserved helper is Sky, so nobody sees Era before the server confirms.
+  const { session } = useSession();
+  const viewer = session?.user ? { roles: session.roles, age15plus: null } : null;
+  const persona = personaFor(pathname, viewer);
+  const face = launcherFaceFor(pathname, viewer);
   const copy = PERSONA_COPY[persona];
   const hidden = isHelperHiddenPath(pathname);
   const onCalendario = pathname === "/calendario";
@@ -232,7 +237,7 @@ export function SkyChat() {
                 className="h-[38px] w-[40px] shrink-0 object-contain"
               />
             ) : (
-              <PersonaAvatar persona="crovi" size={32} />
+              <PersonaAvatar persona={persona} size={32} />
             )}
             <div className="min-w-0 flex-1">
               <p className="m-0 text-[15px] font-bold leading-tight">

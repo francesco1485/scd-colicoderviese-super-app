@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { CalendarClock, ShieldCheck, TriangleAlert } from "lucide-react";
 
 import crest from "@/assets/brand/logo-scd.png.asset.json";
+import { AcanforaCard } from "@/components/scd/AcanforaCard";
 import { Card } from "@/components/scd/interior-ui";
 import {
   EmptyState,
@@ -15,7 +16,7 @@ import { getWorkAreaGate } from "@/lib/work-areas.functions";
 
 /**
  * Infermeria (board Infermeria.dc.html), audience families: emergency number, how to reach the staff, medical
- * certificate. It never stores symptoms or diagnoses. Booking returns when the staff publishes real hours.
+ * certificate, and Dottor Acanfora's general first-aid corner (AcanforaCard). It never stores symptoms or diagnoses. Booking returns when the staff publishes real hours.
  * Keeps the public chrome (family-facing page), so the loader does not mark it interior.
  */
 export const Route = createFileRoute("/infermeria")({
@@ -82,6 +83,7 @@ function InfermeriaPage({ preview }: { preview: boolean }) {
 
         <div className="grid grid-cols-1 gap-[18px] lg:grid-cols-[minmax(0,1fr)_440px] lg:items-start">
           <div className="flex min-w-0 flex-col gap-[18px]">
+            <AcanforaCard />
             <section aria-labelledby="inf-servizi">
               <div className="flex flex-wrap items-end justify-between gap-3">
                 <div>
