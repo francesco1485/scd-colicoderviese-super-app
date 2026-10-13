@@ -1,10 +1,14 @@
 /**
- * Gmail transport of the Posta del club (r95), server only. Plain HTTPS calls to the Gmail REST API with an OAuth
+ * Gmail OAuth transport of the Posta del club (r95), server only. The simpler app-password transport (SMTP + IMAP)
+ * lives in apppassword.server.ts; transport.ts selects between them and defines the shared MailTransport interface. Plain HTTPS calls to the Gmail REST API with an OAuth
  * access token obtained from the refresh token of the club mailbox. Credentials come from the environment
  * (SCD_GMAIL_CLIENT_ID, SCD_GMAIL_CLIENT_SECRET, SCD_GMAIL_REFRESH_TOKEN), set by the Direzione in Render: they are
  * never logged, never stored in the database and never returned to the browser. Inactive until they exist.
  * Scopes needed: gmail.send (outgoing) and gmail.readonly (incoming).
  */
+
+import { isImportable, parseGmailMessage, toBase64Url, type GmailMessageJson } from "./rfc2822";
+import { TransportError, isHistoryId, looksLikeAppPassword, selectTransportMode, type MailTransport } from "./transport";
 
 export interface GmailEnv {
   clientId: string;
@@ -28,10 +32,14 @@ const TOKEN_URL = "https://oauth2.googleapis.com/token";
 const API = "https://gmail.googleapis.com/gmail/v1/users/me";
 const TIMEOUT_MS = 20_000;
 
-/** Which variables are present (booleans only: values are never exposed). */
+/** Which variables are present and which transport they select (booleans and the mode only: values never leave). */
 export function gmailEnvPresence(env: Readonly<Record<string, string | undefined>> = process.env) {
   const has = (k: string) => typeof env[k] === "string" && (env[k] ?? "").trim().length > 0;
   return {
+    mode: selectTransportMode(env),
+    appPassword: has("SCD_GMAIL_APP_PASSWORD"),
+    appPasswordShape: has("SCD_GMAIL_APP_PASSWORD") ? looksLikeAppPassword(env["SCD_GMAIL_APP_PASSWORD"]) : false,
+    gmailUser: has("SCD_GMAIL_USER"),
     clientId: has("SCD_GMAIL_CLIENT_ID"),
     clientSecret: has("SCD_GMAIL_CLIENT_SECRET"),
     refreshToken: has("SCD_GMAIL_REFRESH_TOKEN"),
@@ -134,4 +142,61 @@ export async function listNewInboxMessages(
 export async function getMessage(token: string, id: string, fetchImpl: FetchLike = fetch): Promise<unknown> {
   if (!/^[A-Za-z0-9_-]{6,64}$/.test(id)) throw new GmailError("HTTP_ERROR", null);
   return api<unknown>(fetchImpl, token, `/messages/${id}?format=full`);
+}
+
+/** The r95 Gmail REST path behind the shared MailTransport interface (cursor = Gmail history id). */
+export function createOAuthTransport(env: GmailEnv, fetchImpl: FetchLike = fetch): MailTransport {
+  let token: string | null = null;
+  let profileHistoryId = "";
+  const wrap = async <T>(fn: () => Promise<T>): Promise<T> => {
+    try {
+      return await fn();
+    } catch (e) {
+      if (e instanceof GmailError) throw new TransportError(e.code === "NOT_CONFIGURED" ? "NOT_CONFIGURED" : e.code, e.status);
+      throw new TransportError("NETWORK");
+    }
+  };
+  const need = () => {
+    if (!token) throw new TransportError("NOT_CONFIGURED");
+    return token;
+  };
+  return {
+    mode: "OAUTH",
+    async open() {
+      return wrap(async () => {
+        token = await getAccessToken(env, fetchImpl);
+        const p = await getProfile(token, fetchImpl);
+        profileHistoryId = p.historyId;
+        return { account: p.emailAddress, canSend: true, sendCode: null };
+      });
+    },
+    async fetchInbound(cursor, max) {
+      const t = need();
+      if (!cursor || !isHistoryId(cursor)) return { cursor: profileHistoryId, messages: [], skipped: 0, reset: !!cursor };
+      return wrap(async () => {
+        const h = await listNewInboxMessages(t, cursor, fetchImpl);
+        const messages = [];
+        let skipped = 0;
+        for (const id of h.messageIds.slice(0, max)) {
+          const msg = parseGmailMessage((await getMessage(t, id, fetchImpl)) as GmailMessageJson);
+          if (!msg || !isImportable(msg.labels)) skipped++;
+          else messages.push(msg);
+        }
+        return { cursor: h.historyId, messages, skipped, reset: false };
+      }).catch((e: unknown) => {
+        if (e instanceof TransportError && e.code === "HISTORY_EXPIRED") return { cursor: profileHistoryId, messages: [], skipped: 0, reset: true };
+        throw e;
+      });
+    },
+    async send(envelope) {
+      const t = need();
+      return wrap(async () => {
+        const r = await sendRaw(t, toBase64Url(envelope.raw), envelope.gmailThreadId, fetchImpl);
+        return { gmailMessageId: r.id, gmailThreadId: r.threadId || null };
+      });
+    },
+    async close() {
+      token = null;
+    },
+  };
 }

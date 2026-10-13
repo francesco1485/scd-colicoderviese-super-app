@@ -975,13 +975,29 @@
           "directive": "UD-101",
           "migration": "supabase/migrations/20261013_r95_comm_hub.sql",
           "use": "Posta del club: outbound e-mail from the club mailbox on behalf of Direzione/Segreteria/Tesoreria (one e-mail per recipient, Reply-To the club mailbox, sender recorded) and inbound replies/new mails imported into threads.",
-          "transport": "Gmail REST API (users.messages.send, users.history.list, users.messages.get) with OAuth refresh token",
+          "transport": "Two interchangeable transports behind one MailTransport interface (apps/superapp/src/lib/comm/transport.ts), selected by the server env: OAUTH = Gmail REST API (users.messages.send, users.history.list, users.messages.get) with OAuth refresh token, used when its three variables exist; else APP_PASSWORD = Google app password with SMTP smtp.gmail.com:465 TLS (send) and IMAP imap.gmail.com:993 (receive, INBOX read-only, BODY.PEEK, cursor imap:<uidvalidity>:<uid> in scd_comm_settings.history_id); else DISABLED",
+          "transports": {
+            "OAUTH": {
+              "module": "apps/superapp/src/lib/comm/gmail.server.ts",
+              "credentials": "SCD_GMAIL_CLIENT_ID, SCD_GMAIL_CLIENT_SECRET, SCD_GMAIL_REFRESH_TOKEN"
+            },
+            "APP_PASSWORD": {
+              "module": "apps/superapp/src/lib/comm/apppassword.server.ts",
+              "credentials": "SCD_GMAIL_APP_PASSWORD (+ optional SCD_GMAIL_USER, default sportclubcolico@gmail.com)",
+              "libraries": ["nodemailer@10.0.11", "imapflow@2.1.2", "mailparser@3.9.31"],
+              "hosting_constraint": "Render free instances may block outbound SMTP ports: sending needs a paid instance (Starter); receiving works on free",
+              "activation_doc": "docs/POSTA_CLUB_ATTIVAZIONE.md"
+            }
+          },
+          "reply_matching": ["GMAIL_THREAD_ID", "IN_REPLY_TO_OUR_MESSAGE_ID", "REFERENCES_OUR_MESSAGE_ID", "SUBJECT_TAG_SCD_THREAD"],
           "scopes": [
             "https://www.googleapis.com/auth/gmail.send",
             "https://www.googleapis.com/auth/gmail.readonly"
           ],
-          "credentials": "Render env only: SCD_GMAIL_CLIENT_ID, SCD_GMAIL_CLIENT_SECRET, SCD_GMAIL_REFRESH_TOKEN; job auth SCD_SUPABASE_SECRET_KEY + SCD_COMM_SYNC_SECRET; never in repo, chat, database or browser",
-          "activation": "INACTIVE_UNTIL_DIRECTION_CONNECTS_OAUTH_AND_ENABLES_SENDING",
+          "credentials": "Render env only: SCD_GMAIL_APP_PASSWORD (app-password path) or SCD_GMAIL_CLIENT_ID, SCD_GMAIL_CLIENT_SECRET, SCD_GMAIL_REFRESH_TOKEN (OAuth path); job auth SCD_SUPABASE_SECRET_KEY, optional cron SCD_COMM_SYNC_SECRET; never in repo, chat, database, logs or browser",
+          "activation": "INACTIVE_UNTIL_DIRECTION_CONNECTS_MAILBOX_AND_ENABLES_SENDING",
+          "sync_triggers": ["RENDER_CRON_POST_INTERNAL_COMM_SYNC_OPTIONAL", "STAFF_OPENS_POSTA_MAX_EVERY_2_MIN", "MESSAGE_QUEUED", "DIRECTION_VERIFY_RECEIVE_ONLY"],
+          "entry_points": ["/gestionale/posta", "/direzione/posta/collega", "/crm (Scrivi allo sponsor, Scrivi a tutti i partner -> same composer, threads tagged SPONSOR)"],
           "daily_cap_default": 400,
           "rules": [
             "MINORS_RULE_IN_DATABASE",
@@ -991,7 +1007,11 @@
             "RISERVATO_DIRECTION_PLUS_OWNING_OFFICE",
             "SAFEGUARDING_EXCLUDED",
             "AUDIT_EVERY_WRITE_NO_BODIES",
-            "UNKNOWN_SENDER_PROPOSED_HUMAN_DECIDES"
+            "UNKNOWN_SENDER_PROPOSED_HUMAN_DECIDES",
+            "ONE_INDIVIDUAL_EMAIL_PER_RECIPIENT_BCC_ONLY_IN_ENVELOPE",
+            "MAILBOX_STATE_UNTOUCHED_ON_RECEIVE",
+            "VERIFY_NEVER_SENDS",
+            "NO_BODIES_OR_ADDRESSES_IN_LOGS"
           ]
         }
       },
