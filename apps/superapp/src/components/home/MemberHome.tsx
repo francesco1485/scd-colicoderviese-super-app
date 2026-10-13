@@ -36,7 +36,7 @@ import { TeamPicker } from "@/components/universe/TeamBar";
 import { addDays } from "@/lib/board-data";
 import type { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 import type { getPublicFeed, getPublicSchedule } from "@/lib/club.functions";
-import { CLUB_EVENTS } from "@/lib/club-events";
+import { CLUB_EVENTS, clubEventsOn } from "@/lib/club-events";
 import { CLUB_PROFILE, hallTeams } from "@/lib/club-profile";
 import {
   calendarToWeekItems,
@@ -248,7 +248,7 @@ export function MemberHome({
       (_, k) => list[(at + k) % list.length]!,
     );
   }, [sponsor, verifiedSponsors]);
-  const nextEvent = CLUB_EVENTS.find((e) => e.date >= today) ?? null;
+  const nextEvent = clubEventsOn(today).find((e) => e.date >= today) ?? null;
 
   const ordered = useMemo(
     () => orderFeed(posts, mode, effectiveFollows),

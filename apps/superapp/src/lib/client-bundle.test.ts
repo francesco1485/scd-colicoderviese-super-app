@@ -61,3 +61,22 @@ describe.skipIf(!built)("client bundle keeps the training quadro out (UD-100)", 
     expect(hits).toEqual([]);
   });
 });
+
+describe.skipIf(!built)("client bundle keeps time-limited initiatives out (Direzione 13/10/2026)", () => {
+  // Distinctive ASCII strings of initiatives.server.ts: served only by the server functions, inside their window.
+  const list = ["+393485200579", "Info e iscrizioni: mister Perico"];
+
+  it("finds the probes in the server build (control)", () => {
+    const server = files(SERVER_DIR).map((f) => readFileSync(f, "utf8")).join("\n");
+    expect(list.every((p) => server.includes(p))).toBe(true);
+  });
+
+  it("finds no initiative string in .output/public", () => {
+    const hits: string[] = [];
+    for (const f of files(PUBLIC_DIR)) {
+      const src = readFileSync(f, "utf8");
+      for (const p of list) if (src.includes(p)) hits.push(`${f.slice(PUBLIC_DIR.length)}: ${p}`);
+    }
+    expect(hits).toEqual([]);
+  });
+});

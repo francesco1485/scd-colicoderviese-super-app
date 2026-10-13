@@ -558,6 +558,13 @@
       "source": "Christmas Lario Cup 2026 posters from the club"
     },
     {
+      "path": "apps/superapp/public/media/iniziative/lezioni-tecnico-coordinative-perico.webp",
+      "class": "EVENT_POSTER",
+      "status": "VERIFIED",
+      "source": "third-party/club promotional flyer by mister Alessandro Perico (in collaborazione con ColicoDerviese), received from the Direzione 13/10/2026 15:57; WebP q80 rendition of the original JPEG, content unchanged (original typo 'informzioni' left in the image, the page carries the clean text)",
+      "note": "foto stock, non atleti SCD; time-limited initiative, shown only inside its window (src/lib/initiatives.server.ts)"
+    },
+    {
       "path": "apps/superapp/public/media/scd/hero-colico.webp",
       "class": "VENUE_PHOTO",
       "status": "VERIFIED",
