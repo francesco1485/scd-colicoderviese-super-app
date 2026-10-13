@@ -1,6 +1,5 @@
 /**
- * Public home (UD-095, Direzione 13/10/2026): a reasoned first page that answers, in order, why come, why enter,
- * why sign up. One card system (white, radius 18, soft shadow), Big Shoulders only for section titles, Fira Sans
+ * Sections of the signed-in member home (UD-095, UD-100, Direzione 13/10/2026): why come, why enter, why sign up. One card system (white, radius 18, soft shadow), Big Shoulders only for section titles, Fira Sans
  * body, navy/blue/white with yellow only on the primary button and one highlight. Real data only: calendar
  * snapshot, sponsor list 2026/27, club profile. No crest, number or name is invented.
  */
@@ -8,7 +7,6 @@ import { Link } from "@tanstack/react-router";
 import { ChevronRight } from "lucide-react";
 import type { ReactNode } from "react";
 
-import { ClubCrestOfficial } from "@/components/SiteChrome";
 import { venueCase } from "@/lib/board-data";
 import type { HallTeam } from "@/lib/club-profile";
 import type { WeekItem } from "@/lib/home-week";
@@ -88,9 +86,8 @@ export function HomeHero({
     <header className="bg-[#0b2a5b] text-white" data-testid="home-hero">
       <div className="mx-auto grid max-w-[1200px] items-center gap-4 px-4 pb-0 pt-4 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-10 lg:px-6 lg:py-8">
         <div className="grid gap-3.5 lg:gap-5">
+          {/* The site header above already shows the official crest: no second copy here. */}
           <h1 className="m-0 flex items-center gap-3">
-            <ClubCrestOfficial size={46} className="lg:hidden" />
-            <ClubCrestOfficial size={64} className="hidden lg:block" />
             <span className="whitespace-nowrap font-uv text-[clamp(26px,7.4vw,30px)] leading-none lg:text-[40px]">
               S.C.D. ColicoDerviese
             </span>

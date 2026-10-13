@@ -6,7 +6,11 @@
  * Pure functions so they can be tested.
  */
 
-/** Pages anyone may see without signing in (and that may be cached by the offline worker). */
+/**
+ * Pages anyone may see without signing in (and that may be cached by the offline worker).
+ * /squadre is not here: teams are inside after sign-in (UD-100, Direzione 13/10/2026), so team pages are
+ * private, no-store and out of the sitemap.
+ */
 export const PUBLIC_PREFIXES: readonly string[] = [
   "/allenamenti",
   "/calendario",
@@ -25,7 +29,6 @@ export const PUBLIC_PREFIXES: readonly string[] = [
   "/safeguarding",
   "/societa",
   "/sponsor",
-  "/squadre",
   "/top11",
 ];
 

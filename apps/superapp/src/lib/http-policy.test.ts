@@ -13,8 +13,13 @@ describe("http policy (launch audit 2026-10-12)", () => {
     expect(cacheControlFor("/")).toBe("public, max-age=0, must-revalidate");
     expect(cacheControlFor("/calendario")).toContain("public");
     expect(cacheControlFor("/assets/index-abc.js")).toBeNull();
-    expect(isPublicPath("/squadre/u15")).toBe(true);
-    expect(isPublicPath("/squadreX")).toBe(false);
+    expect(isPublicPath("/sponsor")).toBe(true);
+    expect(isPublicPath("/sponsorX")).toBe(false);
+    // Teams are inside (UD-100): team pages are private and never stored.
+    expect(isPublicPath("/squadre")).toBe(false);
+    expect(isPublicPath("/squadre/u15")).toBe(false);
+    expect(cacheControlFor("/squadre")).toContain("no-store");
+    expect(cacheControlFor("/squadre/prima")).toContain("no-store");
   });
 
   it("keeps the offline worker list equal to the public list", () => {
@@ -40,7 +45,9 @@ describe("http policy (launch audit 2026-10-12)", () => {
     expect(prod).toContain("Allow: /calendario");
     expect(prod).toContain("Disallow: /");
     expect(prod).toContain("Sitemap: https://app.example.it/sitemap.xml");
-    expect(sitemapXml("https://app.example.it/")).toContain("<loc>https://app.example.it/squadre</loc>");
+    expect(sitemapXml("https://app.example.it/")).toContain("<loc>https://app.example.it/sponsor</loc>");
+    expect(sitemapXml("https://app.example.it/")).not.toContain("/squadre");
+    expect(prod).not.toContain("Allow: /squadre");
   });
 
   it("validates the configured site URL and hides demo screens only in production", () => {

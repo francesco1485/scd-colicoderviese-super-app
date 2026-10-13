@@ -17,6 +17,11 @@ import {
   PostCard,
 } from "@/components/universe/Feed";
 import { SkyCameo } from "@/components/universe/Community";
+import {
+  MembersOnlyScreen,
+  membersOnlyHead,
+} from "@/components/scd/MembersOnly";
+import { getSession } from "@/lib/auth.functions";
 import { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 import { CLUB_EVENTS } from "@/lib/club-events";
 import { calendarToWeekItems, romeParts } from "@/lib/home-week";
@@ -51,45 +56,55 @@ import { itemState, orderTeams } from "@/lib/universe";
  * di base), i post approvati della squadra. Stessa grafica per la Prima Squadra e per i più piccoli. Niente foto
  * dei ragazzi: avatar con le iniziali nel colore della squadra.
  */
+async function loadTeam(team: string) {
+  const id = team.toLowerCase();
+  if (!/^[a-z0-9_-]{1,40}$/.test(id)) throw notFound();
+  // Teams are inside (UD-100): no team data for anonymous visitors, only the members-only screen.
+  const session = await getSession();
+  if (!session.user) return { signedIn: false as const, id };
+  const [calendar, social, posts, roster] = await Promise.all([
+    getPublicCalendarSnapshot(),
+    getPublicSocial(),
+    getChannelFeed({ data: { channel: teamChannel(id) } }),
+    getPublicRoster({ data: { team: id } }),
+  ]);
+  const group = calendar.groups.find((g) => g.id === id);
+  if (!group) throw notFound();
+  const serverNow = Date.now();
+  const today =
+    romeParts(new Date(serverNow).toISOString())?.date ??
+    new Date(serverNow).toISOString().slice(0, 10);
+  return {
+    signedIn: true as const,
+    id,
+    group,
+    groups: calendar.groups,
+    events: calendar.events.filter((e) => e.group === id),
+    social,
+    posts,
+    roster,
+    serverNow,
+    today,
+  };
+}
+
 export const Route = createFileRoute("/squadre_/$team")({
-  loader: async ({ params }) => {
-    const id = params.team.toLowerCase();
-    if (!/^[a-z0-9_-]{1,40}$/.test(id)) throw notFound();
-    const [calendar, social, posts, roster] = await Promise.all([
-      getPublicCalendarSnapshot(),
-      getPublicSocial(),
-      getChannelFeed({ data: { channel: teamChannel(id) } }),
-      getPublicRoster({ data: { team: id } }),
-    ]);
-    const group = calendar.groups.find((g) => g.id === id);
-    if (!group) throw notFound();
-    const serverNow = Date.now();
-    const today =
-      romeParts(new Date(serverNow).toISOString())?.date ??
-      new Date(serverNow).toISOString().slice(0, 10);
-    return {
-      id,
-      group,
-      groups: calendar.groups,
-      events: calendar.events.filter((e) => e.group === id),
-      social,
-      posts,
-      roster,
-      serverNow,
-      today,
-    };
-  },
-  head: ({ loaderData }) => ({
-    meta: [
-      {
-        title: `${loaderData?.group.label ?? "Squadra"} — S.C.D. ColicoDerviese`,
-      },
-      {
-        name: "description",
-        content: `Gare, notizie e dirette della squadra ${loaderData?.group.label ?? ""} della S.C.D. ColicoDerviese. Segui la squadra nell'app.`,
-      },
-    ],
-  }),
+  loader: ({ params }) => loadTeam(params.team),
+  head: ({ loaderData }) =>
+    loaderData?.signedIn
+      ? {
+          meta: [
+            {
+              title: `${loaderData.group.label} — S.C.D. ColicoDerviese`,
+            },
+            {
+              name: "description",
+              content: `Gare, notizie e dirette della squadra ${loaderData.group.label} della S.C.D. ColicoDerviese. Segui la squadra nell'app.`,
+            },
+            { name: "robots", content: "noindex" },
+          ],
+        }
+      : membersOnlyHead("Squadra"),
   notFoundComponent: () => (
     <main className="min-h-dvh bg-[#f2f6fb] px-4 pt-8 text-center text-[#0b1e3a]">
       <h1 className="font-uv text-[28px]">SQUADRA NON TROVATA</h1>
@@ -101,10 +116,21 @@ export const Route = createFileRoute("/squadre_/$team")({
       </Link>
     </main>
   ),
-  component: TeamPage,
+  component: TeamRoute,
 });
 
-function TeamPage() {
+function TeamRoute() {
+  const data = Route.useLoaderData();
+  if (!data.signedIn) return <MembersOnlyScreen next={`/squadre/${data.id}`} />;
+  return <TeamPage data={data} />;
+}
+
+type TeamData = Extract<
+  Awaited<ReturnType<typeof loadTeam>>,
+  { signedIn: true }
+>;
+
+function TeamPage({ data }: { data: TeamData }) {
   const {
     id,
     group,
@@ -115,7 +141,7 @@ function TeamPage() {
     roster,
     serverNow,
     today,
-  } = Route.useLoaderData();
+  } = data;
   const [nowMs, setNowMs] = useState(serverNow);
   const [follows, setFollows] = useState(social.follows);
   const [posts, setPosts] = useState<Post[]>(initialPosts);

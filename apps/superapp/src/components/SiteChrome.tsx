@@ -4,7 +4,10 @@ import {
   CalendarDays,
   Circle,
   Ellipsis,
+  Facebook,
+  Handshake,
   House,
+  Instagram,
   Lock,
   LogIn,
   Menu,
@@ -23,6 +26,8 @@ import crest from "@/assets/brand/logo-scd.png.asset.json";
 import { centerTabFor, type CenterTab } from "@/lib/access-nav";
 import { ACCESS_SCREEN_IDS, WORK_AREA_IDS, findArea } from "@/lib/areas";
 import { CLUB_PROFILE } from "@/lib/club-profile";
+import { SOCIAL_LINKS } from "@/lib/public-home";
+import { SPONSORS, sponsorLabel } from "@/lib/sponsors";
 import { useSession } from "@/lib/use-session";
 import { openCookiePrefs } from "./CookieConsent";
 import { AccessMenu, loginSearch, openAccessMenu } from "./scd/AccessMenu";
@@ -32,19 +37,32 @@ export const CLUB_NAME = "S.C.D. ColicoDerviese";
 
 type NavItem = { to: string; label: string };
 
-/** Navigazione desktop della barra pubblica (tavola Accesso-aree, VR-022). Le altre pagine restano nel menu completo. */
-const desktopNav: readonly NavItem[] = [
+/**
+ * Navigazione desktop della barra pubblica (tavola Accesso-aree, VR-022). Le altre pagine restano nel menu completo.
+ * UD-100 (Direzione 13/10/2026): le squadre sono dentro. Chi non ha fatto l'accesso vede notizie e partner al posto
+ * di "Squadre"; dopo l'accesso torna la voce Squadre.
+ */
+const desktopNavPublic: readonly NavItem[] = [
+  { to: "/comunicazioni", label: "Notizie" },
+  { to: "/eventi", label: "Eventi" },
+  { to: "/calendario", label: "Calendario" },
+  { to: "/sponsor", label: "Partner" },
+  { to: "/contatti", label: "Contatti" },
+];
+const desktopNavMember: readonly NavItem[] = [
   { to: "/squadre", label: "Squadre" },
   { to: "/calendario", label: "Calendario" },
   { to: "/eventi", label: "Eventi" },
   { to: "/sponsor", label: "Sponsor" },
   { to: "/contatti", label: "Contatti" },
 ];
+export const desktopNavFor = (signedIn: boolean): readonly NavItem[] =>
+  signedIn ? desktopNavMember : desktopNavPublic;
 
 /** Link a piè di pagina: tutte le pagine pubbliche principali. */
 const footerNav: readonly NavItem[] = [
   { to: "/societa", label: "Chi siamo" },
-  { to: "/squadre", label: "Squadre" },
+  { to: "/comunicazioni", label: "Notizie" },
   { to: "/calendario", label: "Calendario" },
   { to: "/impianti", label: "Mappa campi" },
   { to: "/allenamenti", label: "Allenamenti" },
@@ -67,7 +85,6 @@ const menuGroups: readonly {
     items: [
       { to: "/", label: "Home" },
       { to: "/societa", label: "Chi siamo" },
-      { to: "/squadre", label: "Squadre" },
       { to: "/calendario", label: "Calendario gare" },
       { to: "/impianti", label: "Mappa campi" },
       { to: "/allenamenti", label: "Allenamenti" },
@@ -84,6 +101,7 @@ const menuGroups: readonly {
     app: "CORE",
     items: [
       { to: "/la-mia-scd", label: "La mia SCD" },
+      { to: "/squadre", label: "Le squadre" },
       { to: "/fantacalcio", label: "Fantacalcio SCD" },
       { to: "/top11", label: "Top 11 della settimana" },
       { to: "/rassegna", label: "Dicono di noi" },
@@ -115,8 +133,8 @@ const footerLinks: readonly NavItem[] = [
 const ACCESS_SCREEN_PATHS = [...ACCESS_SCREEN_IDS, ...WORK_AREA_IDS]
   .map((id) => findArea(id)?.path)
   .filter((p): p is string => !!p);
+// The home is not a board route any more (UD-100): it sits under the compact site header on every width.
 const BOARD_ROUTES = [
-  "/",
   "/calendario",
   "/allenamenti",
   "/comunicazioni",
@@ -162,6 +180,7 @@ export function ClubCrestOfficial({
 
 export function SiteHeader() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { session } = useSession();
   const board = isBoardRoute(pathname);
   return (
     <header
@@ -184,7 +203,7 @@ export function SiteHeader() {
           className="ml-4 hidden items-center gap-[22px] lg:flex"
           aria-label="Principale"
         >
-          {desktopNav.map((n) => (
+          {desktopNavFor(!!session?.user).map((n) => (
             <Link
               key={n.to}
               to={n.to}
@@ -359,6 +378,13 @@ const TEAMS_TAB: TabDef = {
   to: "/squadre",
   match: (p) => p.startsWith("/squadre") || p.startsWith("/allenamenti"),
 };
+/** Anonymous visitors: teams are inside (UD-100), the public tab is the partner offer. */
+const PARTNER_TAB: TabDef = {
+  label: "Partner",
+  icon: Handshake,
+  to: "/sponsor",
+  match: (p) => p.startsWith("/sponsor") || p.startsWith("/fornitori"),
+};
 const AREAS_TAB: TabDef = {
   label: "Aree",
   icon: Lock,
@@ -396,9 +422,9 @@ const CENTER_TABS: Readonly<Record<CenterTab, TabDef>> = {
 };
 
 /**
- * Public bar, five tabs. Anonymous: Home · Calendario · [Entra] · Squadre · Aree. Signed in
- * without author role: Home · Calendario · [La mia] · Squadre · Aree. Author: Home · Calendario ·
- * [Crea] · Squadre · La mia.
+ * Public bar, five tabs. Anonymous: Home · Calendario · [Entra] · Partner · Aree (teams are inside,
+ * UD-100). Signed in without author role: Home · Calendario · [La mia] · Squadre · Aree. Author:
+ * Home · Calendario · [Crea] · Squadre · La mia.
  */
 export function publicTabsFor(center: CenterTab): TabDef[] {
   const last: TabDef =
@@ -410,7 +436,13 @@ export function publicTabsFor(center: CenterTab): TabDef[] {
           match: (p) => MINE_MATCH(p) || p.startsWith("/aree"),
         }
       : AREAS_TAB;
-  return [HOME_TAB, CALENDAR_TAB, CENTER_TABS[center], TEAMS_TAB, last];
+  return [
+    HOME_TAB,
+    CALENDAR_TAB,
+    CENTER_TABS[center],
+    center === "entra" ? PARTNER_TAB : TEAMS_TAB,
+    last,
+  ];
 }
 const STAFF_TABS: TabDef[] = [
   {
@@ -469,7 +501,10 @@ export function tabsFor(
   pathname: string,
   center: CenterTab = "entra",
 ): TabDef[] {
-  if (pathname.startsWith("/comunicazioni")) return COMMS_TABS;
+  if (pathname.startsWith("/comunicazioni"))
+    return center === "entra"
+      ? COMMS_TABS.map((t) => (t.to === "/squadre" ? PARTNER_TAB : t))
+      : COMMS_TABS;
   if (
     pathname === "/core" ||
     pathname === "/core/" ||
@@ -566,59 +601,180 @@ export function BottomNav() {
   );
 }
 
-export function SiteFooter() {
+/** Partner logos row of the footer (home only: elsewhere the fixed SponsorBand already shows them). */
+function FooterSponsors() {
   return (
-    <footer className="surface-deep mt-10 px-4 py-10">
-      <div className="mx-auto flex max-w-6xl flex-col gap-4 text-sm">
-        <div className="flex items-center gap-3">
-          <ClubCrestOfficial size={44} />
-          <p className="font-brand text-xl leading-none">
-            <span className="text-[#ffd600]">COLICO</span>DERVIESE
+    <section
+      aria-labelledby="footer-sponsor-t"
+      className="border-t border-[#dbe5f1] bg-white"
+      data-testid="footer-sponsors"
+    >
+      <div className="mx-auto flex max-w-[1280px] flex-col gap-3 px-4 py-5 lg:flex-row lg:items-center lg:gap-6 lg:px-8">
+        <h2
+          id="footer-sponsor-t"
+          className="m-0 shrink-0 text-[12px] font-bold uppercase tracking-[0.12em] text-[#5a6b85]"
+        >
+          Partner 2026/27
+        </h2>
+        <ul className="m-0 flex list-none flex-wrap items-center gap-x-6 gap-y-3 p-0">
+          {SPONSORS.map((sp) => (
+            <li key={sp.slug} className="flex h-7 items-center">
+              <img
+                src={sp.src}
+                alt={sponsorLabel(sp)}
+                loading="lazy"
+                decoding="async"
+                className="h-[24px] w-auto max-w-[96px] object-contain"
+              />
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
+const SOCIAL_ICON = { instagram: Instagram, facebook: Facebook } as const;
+
+export function SiteFooter() {
+  const home = useRouterState({ select: (st) => st.location.pathname === "/" });
+  return (
+    <footer className="mt-10" data-testid="site-footer">
+      {home && <FooterSponsors />}
+      <div className="bg-[#0b2a5b] px-4 py-10 text-white lg:px-8">
+        <div className="mx-auto grid max-w-[1280px] gap-8">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <Link
+              to="/"
+              className="scd-focus flex items-center gap-3 rounded-md"
+              aria-label={`${CLUB_NAME}, vai alla Home`}
+            >
+              <ClubCrestOfficial size={48} />
+              <span className="whitespace-nowrap font-title text-[24px] font-black leading-none">
+                COLICO<span className="text-[#ffd600]">DERVIESE</span>
+              </span>
+            </Link>
+            <ul className="m-0 flex list-none gap-2 p-0" aria-label="Profili social ufficiali">
+              {SOCIAL_LINKS.map((so) => {
+                const Icon = SOCIAL_ICON[so.id];
+                return (
+                  <li key={so.id}>
+                    <a
+                      href={so.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`${so.label} ${so.handle} (apre una nuova scheda)`}
+                      className="scd-focus grid size-11 place-items-center rounded-full border border-white/25 text-white transition-colors duration-150 hover:bg-white/10"
+                    >
+                      <Icon className="size-5" strokeWidth={1.8} aria-hidden="true" />
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+
+          <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)_minmax(0,1fr)]">
+            <div className="grid content-start gap-1.5 text-[14px] leading-snug text-white/85">
+              <h2 className="m-0 pb-1 text-[12px] font-bold uppercase tracking-[0.12em] text-[#ffd600]">
+                La società
+              </h2>
+              <p className="m-0 font-semibold text-white">{CLUB_NAME}</p>
+              <p className="m-0">Matricola FIGC {CLUB_PROFILE.figcMatricola}</p>
+              <p className="m-0">{CLUB_PROFILE.contacts.address}</p>
+              <p className="m-0">
+                <a
+                  href={`mailto:${CLUB_PROFILE.contacts.email}`}
+                  className="scd-focus select-text underline decoration-white/30 underline-offset-4 hover:decoration-white"
+                >
+                  {CLUB_PROFILE.contacts.email}
+                </a>
+              </p>
+              <p className="m-0">
+                PEC <span className="select-text">{CLUB_PROFILE.contacts.pec}</span>
+              </p>
+            </div>
+
+            <nav aria-label="Link a piè di pagina" className="grid content-start gap-1">
+              <h2 className="m-0 pb-1 text-[12px] font-bold uppercase tracking-[0.12em] text-[#ffd600]">
+                Pagine
+              </h2>
+              <ul className="m-0 grid list-none grid-cols-2 gap-x-4 p-0">
+                {[...footerNav, ...footerLinks].map((n) => (
+                  <li key={n.to + n.label}>
+                    <Link
+                      to={n.to}
+                      className="scd-focus inline-flex min-h-11 items-center text-[14px] text-white/85 hover:text-white"
+                    >
+                      {n.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+
+            <div className="grid content-start gap-2.5 md:col-span-2 lg:col-span-1">
+              <h2 className="m-0 text-[12px] font-bold uppercase tracking-[0.12em] text-[#ffd600]">
+                Affiliazioni
+              </h2>
+              <div className="flex items-center justify-around gap-3 rounded-[14px] bg-white px-3 py-3">
+                <img
+                  src="/media/affiliazioni/figc-sgs-3-livello.webp"
+                  alt="FIGC Settore Giovanile e Scolastico, Club 3° livello"
+                  className="h-[46px] w-auto max-w-[32%] object-contain"
+                  loading="lazy"
+                />
+                <img
+                  src="/media/affiliazioni/lnd.webp"
+                  alt="FIGC Lega Nazionale Dilettanti"
+                  className="h-[46px] w-auto max-w-[32%] object-contain"
+                  loading="lazy"
+                />
+                <img
+                  src="/media/affiliazioni/insieme-al-monza.webp"
+                  alt="Insieme al Monza, progetto Academy AC Monza"
+                  className="h-[46px] w-auto max-w-[32%] object-contain"
+                  loading="lazy"
+                />
+              </div>
+              <p className="m-0 text-[13px] leading-snug text-white/75">
+                Club FIGC SGS di 3° livello, iscritto LND, affiliato AC Monza.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2 border-t border-white/15 pt-5 text-[12.5px] text-white/70 lg:flex-row lg:items-center lg:justify-between">
+            <span className="flex flex-wrap gap-x-5">
+              <a
+                href="/privacy"
+                className="scd-focus inline-flex min-h-11 items-center underline decoration-white/30 underline-offset-4 hover:text-white"
+              >
+                Privacy
+              </a>
+              <button
+                type="button"
+                onClick={openCookiePrefs}
+                className="scd-focus inline-flex min-h-11 items-center underline decoration-white/30 underline-offset-4 hover:text-white"
+              >
+                Preferenze cookie
+              </button>
+              <Link
+                to="/safeguarding"
+                className="scd-focus inline-flex min-h-11 items-center underline decoration-white/30 underline-offset-4 hover:text-white"
+              >
+                Segnalazioni riservate
+              </Link>
+            </span>
+            <span>
+              Super App ufficiale della {CLUB_NAME} · versione del {BUILD_STAMP}
+            </span>
+          </div>
+          <p className="m-0 -mt-4 text-[12px] leading-snug text-white/60">
+            © {new Date().getFullYear()} Francesco Coppola · ideato e creato da
+            Francesco Coppola, concesso in uso gratuito alla {CLUB_NAME}.
+            Stemma, loghi e marchi appartengono ai rispettivi titolari.
           </p>
         </div>
-        <p className="opacity-90">
-          {CLUB_NAME} · {CLUB_PROFILE.contacts.address} · Alto Lago di Como
-          <br />
-          <span className="select-text">{CLUB_PROFILE.contacts.email}</span> ·
-          PEC <span className="select-text">{CLUB_PROFILE.contacts.pec}</span>
-        </p>
-        <nav
-          className="flex flex-wrap gap-x-5"
-          aria-label="Link a piè di pagina"
-        >
-          {[...footerNav, ...footerLinks].map((n) => (
-            <Link
-              key={n.to + n.label}
-              to={n.to}
-              className="scd-focus inline-flex min-h-11 min-w-11 items-center justify-center opacity-90 hover:opacity-100"
-            >
-              {n.label}
-            </Link>
-          ))}
-        </nav>
-        <span className="flex flex-wrap gap-x-5">
-          <a
-            href="/privacy"
-            className="scd-focus inline-flex min-h-11 items-center text-sm underline opacity-90 hover:opacity-100"
-          >
-            Privacy
-          </a>
-          <button
-            type="button"
-            onClick={openCookiePrefs}
-            className="scd-focus inline-flex min-h-11 items-center text-sm underline opacity-90 hover:opacity-100"
-          >
-            Preferenze cookie
-          </button>
-        </span>
-        <p className="text-xs opacity-90">
-          Super App ufficiale della {CLUB_NAME} · versione del {BUILD_STAMP}.
-        </p>
-        <p className="text-xs opacity-90">
-          © {new Date().getFullYear()} Francesco Coppola · ideato e creato da
-          Francesco Coppola, concesso in uso gratuito alla {CLUB_NAME}. Stemma,
-          loghi e marchi appartengono ai rispettivi titolari.
-        </p>
       </div>
     </footer>
   );

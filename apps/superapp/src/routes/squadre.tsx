@@ -1,44 +1,50 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { HallDoors, HallHero } from "@/components/scd/hall";
+import {
+  MembersOnlyScreen,
+  membersOnlyHead,
+} from "@/components/scd/MembersOnly";
 import { OfficialResults } from "@/components/scd/OfficialResults";
 import { dateParts, venueCase } from "@/lib/board-data";
+import { getSession } from "@/lib/auth.functions";
 import { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 import { CLUB_PROFILE, hallTeams, type HallTeam } from "@/lib/club-profile";
 import { romeParts } from "@/lib/home-week";
-import type { PublicEvent } from "@/lib/public-snapshots";
+import type { PublicEvent, PublicGroup } from "@/lib/public-snapshots";
 import { BASE_ACTIVITY_TEAMS } from "@/lib/social";
 import { publicTeamCrest } from "@/lib/team-crest";
 
+/**
+ * Teams are inside (UD-100, Direzione 13/10/2026): the loader asks the server for the session first and loads no
+ * team data for anonymous visitors, who get the members-only screen.
+ */
 export const Route = createFileRoute("/squadre")({
   loader: async () => {
+    const session = await getSession();
+    if (!session.user) return { signedIn: false as const };
     const calendar = await getPublicCalendarSnapshot();
     const now = new Date().toISOString();
     // "Today" in Europe/Rome, fixed by the server so SSR and hydration agree on the next match.
     const today = romeParts(now)?.date ?? now.slice(0, 10);
-    return { groups: calendar.groups, events: calendar.events, today };
+    return {
+      signedIn: true as const,
+      groups: calendar.groups,
+      events: calendar.events,
+      today,
+    };
   },
-  head: () => ({
-    meta: [
-      { title: "Le squadre 2026/27 — S.C.D. ColicoDerviese" },
-      {
-        name: "description",
-        content:
-          "Tutte le squadre della S.C.D. ColicoDerviese nella stagione 2026/27: Prima Squadra in Promozione girone D, Juniores Regionale U19 Élite e settore giovanile, con rosa, calendario e risultati ufficiali.",
-      },
-      {
-        property: "og:title",
-        content: "Le squadre 2026/27 — S.C.D. ColicoDerviese",
-      },
-      {
-        property: "og:description",
-        content:
-          "Dalla Prima Squadra ai Piccoli Amici: rosa, calendario e risultati di ogni squadra.",
-      },
-    ],
-  }),
-  component: SquadrePage,
+  head: () => membersOnlyHead("Le squadre 2026/27"),
+  component: SquadreRoute,
 });
+
+function SquadreRoute() {
+  const data = Route.useLoaderData();
+  if (!data.signedIn) return <MembersOnlyScreen next="/squadre" />;
+  return (
+    <SquadrePage groups={data.groups} events={data.events} today={data.today} />
+  );
+}
 
 /** First match of the team from today on (calendar snapshot, already sorted by date and time). */
 function nextMatchOf(
@@ -53,8 +59,15 @@ function nextMatchOf(
  * Public teams page. Direzione rule (13/10/2026): annata crests stay internal, so the official club crest appears
  * once in the header and every team is a clean text tile (category, birth years, next match).
  */
-function SquadrePage() {
-  const { groups, events, today } = Route.useLoaderData();
+function SquadrePage({
+  groups,
+  events,
+  today,
+}: {
+  groups: readonly PublicGroup[];
+  events: readonly PublicEvent[];
+  today: string;
+}) {
   const teams = hallTeams(groups);
   return (
     <main
