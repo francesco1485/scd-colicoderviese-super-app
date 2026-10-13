@@ -1,6 +1,8 @@
 import { describe, expect, test } from 'vitest';
 import { calendario } from './snapshot';
-import { romeToday, nextForGroup, trainingsForGroup, sectorEvents, activeGroups, PERIODS, addDays, possibleOverlaps, familyLink } from './teamSector';
+import { romeToday, nextForGroup, trainingsFor, sectorEvents, activeGroups, PERIODS, addDays, possibleOverlaps, familyLink } from './teamSector';
+import { QUADRO_SNAPSHOT } from '@/lib/quadro-data.server';
+const trainingsForGroup = (g: string) => trainingsFor(QUADRO_SNAPSHOT, g);
 
 const TODAY = romeToday(new Date('2026-10-09T16:00:00Z'));
 

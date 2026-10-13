@@ -36,7 +36,8 @@ import {
   upcomingMatches,
 } from "@/lib/board-data";
 import { romeParts } from "@/lib/home-week";
-import { freshnessLabel, loadQuadro } from "@/lib/public-snapshots";
+import { freshnessLabel } from "@/lib/public-snapshots";
+import { getTrainingQuadro } from "@/lib/quadro.functions";
 
 /*
  * Public page: annata crests stay internal (Direzione, 13/10/2026); team rows use the master's team colour.
@@ -46,7 +47,6 @@ import { freshnessLabel, loadQuadro } from "@/lib/public-snapshots";
 
 const TABS = ["club", "squadre", "social"] as const;
 type Tab = (typeof TABS)[number];
-const QUADRO = loadQuadro();
 
 export const Route = createFileRoute("/comunicazioni")({
   validateSearch: (s: Record<string, unknown>): { tab?: Tab | undefined } =>
@@ -59,10 +59,14 @@ export const Route = createFileRoute("/comunicazioni")({
       getPublicCalendarSnapshot(),
     ]);
     const now = romeParts(new Date().toISOString());
+    const member = calendar.audience === "member";
+    // Training quadro only for members, from the server (UD-100).
+    const quadroSlots = member ? (await getTrainingQuadro()).quadro.slots.length : 0;
     return {
       feed,
       calendar,
-      member: calendar.audience === "member",
+      member,
+      quadroSlots,
       fresh: recentlyUpdated(calendar.sourceModifiedAt, new Date()),
       today: now?.date ?? new Date().toISOString().slice(0, 10),
       clock: now?.time ?? "00:00",
@@ -100,7 +104,7 @@ type Row = {
 };
 
 function Comunicazioni() {
-  const { feed, calendar, member, fresh, today, clock } = Route.useLoaderData();
+  const { feed, calendar, member, quadroSlots, fresh, today, clock } = Route.useLoaderData();
   const { tab: asked = "club" } = Route.useSearch();
   // Anonymous visitors asking ?tab=squadre land on the club tab: teams are inside (UD-100).
   const tab: Tab = asked === "squadre" && !member ? "club" : asked;
@@ -137,7 +141,7 @@ function Comunicazioni() {
               id: "quadro",
               icon: ClipboardList,
               title: "Quadro allenamenti lun–ven",
-              sub: `Fotografia del 09/10/2026 · ${QUADRO.slots.length} fasce orarie`,
+              sub: `Fotografia del 09/10/2026 · ${quadroSlots} fasce orarie`,
               to: "/allenamenti",
             } satisfies Row,
           ]

@@ -18,6 +18,7 @@ import {
   type CalendarPayload,
 } from "./public-access";
 import type { PublicEvent, PublicGroup } from "./public-snapshots";
+import { quadroAllowed } from "./quadro.functions";
 import { staffRosterFor } from "./staff-roster.functions";
 
 const ANON = { user: null, memberships: [] };
@@ -73,6 +74,44 @@ describe("members guard", () => {
     const member = staffRosterFor(env, MEMBER);
     expect(member.authorized).toBe(true);
     expect(JSON.stringify(anon)).not.toContain("Mario");
+  });
+});
+
+describe("training quadro stays inside (UD-100)", () => {
+  it("is served to members and to the password-protected staging preview only", () => {
+    expect(quadroAllowed(ANON, false)).toBe(false);
+    expect(quadroAllowed(SUSPENDED, false)).toBe(false);
+    expect(quadroAllowed(MEMBER, false)).toBe(true);
+    expect(quadroAllowed(ANON, true)).toBe(true);
+  });
+
+  it("gives staff names on the pulmini page to signed-in staff, never to anonymous visitors", () => {
+    const env = {
+      SCD_STAFF_ROSTER_JSON: JSON.stringify({ asOf: "2026-10-09", people: [{ id: "a1", name: "Luca Bianchi", role: "Autista pulmino" }] }),
+    };
+    const staff = { user: { email: "autista@example.it" }, memberships: [{ organization: "scd-colicoderviese", role: "autista" }] };
+    const named = staffRosterFor(env, staff);
+    expect(named.authorized).toBe(true);
+    expect(named.people.map((p) => p.name)).toEqual(["Luca Bianchi"]);
+    expect(staffRosterFor(env, ANON).people).toEqual([]);
+  });
+
+  it("no browser code imports the quadro data: only *.server.ts modules and tests do", () => {
+    const offenders: string[] = [];
+    const walk = (dir: string) => {
+      for (const name of readdirSync(dir, { withFileTypes: true })) {
+        const p = resolve(dir, name.name);
+        if (name.isDirectory()) walk(p);
+        else if (/\.(ts|tsx)$/.test(name.name) && !/\.test\.tsx?$/.test(name.name) && !/\.server\.ts$/.test(name.name)) {
+          const src = readFileSync(p, "utf8");
+          if (/quadro-snapshot-20261009|quadro_pubblico\.json/.test(src)) offenders.push(`${p}: quadro JSON`);
+          // Static imports only: the server function reads quadro-data.server with a dynamic import in its handler.
+          if (/^\s*import\s[^;]*from\s+["'][^"']*quadro-data\.server["']/m.test(src)) offenders.push(`${p}: static import of quadro-data.server`);
+        }
+      }
+    };
+    walk(SRC);
+    expect(offenders).toEqual([]);
   });
 });
 
@@ -198,7 +237,7 @@ describe("public routes keep teams inside (UD-100)", () => {
     expect(comms).toMatch(/\.\.\.\(member\s*\?\s*\[\s*\{\s*label: "Squadre"/);
     const cal = readFileSync(resolve(ROUTES, "calendario.tsx"), "utf8");
     expect(cal).toMatch(/Entra per allenamenti e dettagli/);
-    expect(cal).toMatch(/cal\.audience === "member" \? loadQuadro\(\)\.slots : \[\]/);
+    expect(cal).toMatch(/cal\.audience === "member" \? \(await getTrainingQuadro\(\)\)\.quadro\.slots : \[\]/);
     expect(cal).not.toMatch(/const QUADRO_SLOTS/);
   });
 });

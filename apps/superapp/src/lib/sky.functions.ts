@@ -11,12 +11,14 @@ export type SkyReply = {
   text: string;
   mood: "info" | "success" | "alert";
   links?: { label: string; to: string }[];
+  /** r99: true when the text was written by the AI assistant (the chat shows the AI notice). */
+  ai?: boolean;
 };
 
 /** Plain-words needs and problems (UD-045): routed by the requests engine before the public intents. */
-const REQUEST_RE = /\b(manca|mancano|finit[oaie]|servono|serve (un|una|altro|altra|il|la|più)|rott[oaie]|guast[oaie]|non funziona|senza (acqua|luce|corrente|riscaldamento)|disservizi|segnal[oa]|propong[oa]|proporre|richiesta|richiedo|vorrei (chiedere|proporre|segnalare)|aggiung(ere|ete)|spost(are|iamo)|cambi(are|amo)|sporc[oaie])\b/i;
+export const REQUEST_RE = /\b(manca|mancano|finit[oaie]|servono|serve (un|una|altro|altra|il|la|più)|rott[oaie]|guast[oaie]|non funziona|senza (acqua|luce|corrente|riscaldamento)|disservizi|segnal[oa]|propong[oa]|proporre|richiesta|richiedo|vorrei (chiedere|proporre|segnalare)|aggiung(ere|ete)|spost(are|iamo)|cambi(are|amo)|sporc[oaie])\b/i;
 
-const INTENTS: { id: string; re: RegExp }[] = [
+export const INTENTS: { id: string; re: RegExp }[] = [
   { id: "safeguarding", re: /safeguard|abus|molest|violen|bullism|riservat/i },
   { id: "allenamenti", re: /allenament|allena|quadro|seduta/i },
   { id: "prossima", re: /prossim|quando (si )?gioca|partita|gara/i },
@@ -31,10 +33,17 @@ const INTENTS: { id: string; re: RegExp }[] = [
   { id: "contatti", re: /contatt|email|telefon|segreteri|parla/i },
 ];
 
-export const askSky = createServerFn({ method: "POST" })
-  .inputValidator((d: { message: string }) => z.object({ message: z.string().trim().min(1).max(400) }).parse(d))
-  .handler(async ({ data }): Promise<SkyReply> => {
-    const intent = INTENTS.find((i) => i.re.test(data.message))?.id;
+/** Intent id of a message for the rules engine (undefined = no intent). */
+export function skyIntent(message: string): string | undefined {
+  return INTENTS.find((i) => i.re.test(message))?.id;
+}
+
+/**
+ * The keyword rules engine (no AI). Used by askSky and as the fallback / pre-router of the AI assistants
+ * (assistant.server.ts): safeguarding and requests are always answered here, never by the model.
+ */
+export async function skyRulesAnswer(data: { message: string }): Promise<SkyReply> {
+    const intent = skyIntent(data.message);
     if (intent !== "safeguarding" && REQUEST_RE.test(data.message)) {
       const r = classifyRequest(data.message);
       if (r.unclear) return { text: "Dimmi in due parole cosa serve e dove (per esempio: \"manca il sapone in lavanderia\" oppure \"spogliatoio 2 senza acqua calda\").", mood: "info" };
@@ -50,7 +59,8 @@ export const askSky = createServerFn({ method: "POST" })
 
     if (intent === "allenamenti") {
       // Solo indirizzamento al quadro allenamenti, che è nell'area soci (UD-100): nessun orario affermato in chat.
-      const { loadQuadro, findSessions, normalizeGroupText } = await import("./public-snapshots");
+      const { findSessions, normalizeGroupText } = await import("./public-snapshots");
+      const { loadQuadro } = await import("./quadro-data.server");
       const { slots } = loadQuadro();
       const year = data.message.match(/(?<!\d)20[0-2]\d(?!\d)/)?.[0];
       const cat = normalizeGroupText(data.message).match(/\bu\d{2}\b|prima squadra|juniores/)?.[0];
@@ -104,4 +114,8 @@ export const askSky = createServerFn({ method: "POST" })
           mood: "info",
         };
     }
-  });
+}
+
+export const askSky = createServerFn({ method: "POST" })
+  .inputValidator((d: { message: string }) => z.object({ message: z.string().trim().min(1).max(400) }).parse(d))
+  .handler(async ({ data }): Promise<SkyReply> => skyRulesAnswer(data));

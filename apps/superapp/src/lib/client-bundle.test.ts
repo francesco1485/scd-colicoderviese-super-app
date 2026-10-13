@@ -1,0 +1,63 @@
+/**
+ * UD-100 (Direzione 13/10/2026): training schedules are inside. The quadro data must never ship in the browser
+ * bundle, where anyone could read it in the JS files: it lives in quadro-data.server.ts and reaches members through
+ * getTrainingQuadro. This test greps the built client assets (.output/public) for distinctive quadro strings and, as
+ * a control that the probe works, finds them in the server build. Run after `npm run build` (npm run test:bundle);
+ * skipped when no build is present.
+ */
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+import { join, resolve } from "node:path";
+
+import { describe, expect, it } from "vitest";
+
+import raw from "@/data/quadro-snapshot-20261009.json";
+
+const APP = resolve(__dirname, "../..");
+const PUBLIC_DIR = join(APP, ".output/public");
+const SERVER_DIR = join(APP, ".output/server");
+const built = existsSync(PUBLIC_DIR) && existsSync(SERVER_DIR);
+
+function files(dir: string): string[] {
+  const out: string[] = [];
+  for (const name of readdirSync(dir)) {
+    const p = join(dir, name);
+    if (statSync(p).isDirectory()) out.push(...files(p));
+    else if (/\.(m?js|json|html|txt|map)$/.test(name)) out.push(p);
+  }
+  return out;
+}
+
+/**
+ * ASCII strings that only the quadro carries: its source hash, schema id, the long slot texts and its note.
+ * esbuild escapes non-ASCII characters, so only ASCII runs are probed (fragments of longer texts included).
+ */
+function probes(): string[] {
+  const q = raw as { schema: string; note: string; source: { sha256: string }; slots: { fields: { C1: string; C2: string } }[] };
+  const texts = [...q.slots.flatMap((s) => [s.fields.C1, s.fields.C2]), ...q.note.split(/[.\n]/)]
+    .flatMap((t) => t.split(/[^\x20-\x7e]+/))
+    .map((t) => t.trim())
+    .filter((t) => t.length >= 22);
+  return [...new Set([q.source.sha256, q.schema, ...texts])];
+}
+
+describe.skipIf(!built)("client bundle keeps the training quadro out (UD-100)", () => {
+  const list = probes();
+
+  it("has distinctive probes", () => {
+    expect(list.length).toBeGreaterThanOrEqual(4);
+  });
+
+  it("finds the probes in the server build (control)", () => {
+    const server = files(SERVER_DIR).map((f) => readFileSync(f, "utf8")).join("\n");
+    expect(list.some((p) => server.includes(p))).toBe(true);
+  });
+
+  it("finds no quadro string in .output/public", () => {
+    const hits: string[] = [];
+    for (const f of files(PUBLIC_DIR)) {
+      const src = readFileSync(f, "utf8");
+      for (const p of list) if (src.includes(p)) hits.push(`${f.slice(PUBLIC_DIR.length)}: ${p.slice(0, 48)}`);
+    }
+    expect(hits).toEqual([]);
+  });
+});

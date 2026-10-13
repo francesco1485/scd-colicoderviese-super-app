@@ -5,7 +5,6 @@
  */
 import { useEffect, useMemo, useState } from "react";
 
-import quadro from "@/data/quadro-snapshot-20261009.json";
 import {
   pitchUnits,
   unitsToVerify,
@@ -19,6 +18,7 @@ import {
   type PitchFormat,
   type RotationMatch,
 } from "@/lib/rotation";
+import { useImpianti } from "./context";
 import { presetLabel, teamColor, type ImpiantiModel } from "./model";
 import {
   Card,
@@ -89,8 +89,6 @@ interface Rotation {
   timeLabel: string;
   zones: Record<string, string>;
 }
-const ROTATIONS = (quadro.rotations as Rotation[]).filter((r) => r.zones);
-const WEEKDAYS = quadro.days as string[];
 const weekdayLabel = (d: string) => d.charAt(0) + d.slice(1).toLowerCase();
 
 function zoneBlocks(
@@ -482,6 +480,9 @@ export function ColicoTab({
   onSimulate: (date: string) => void;
   focusDate: string | null;
 }) {
+  const { quadro } = useImpianti();
+  const ROTATIONS = useMemo(() => (quadro.rotations as unknown as Rotation[]).filter((r) => r.zones), [quadro]);
+  const WEEKDAYS = quadro.days as string[];
   const [mode, setMode] = useState<"gare" | "allenamenti">("gare");
   const byDay = useMemo(
     () => groupByDay(model.items.filter((m) => m.pitch !== "DV")),

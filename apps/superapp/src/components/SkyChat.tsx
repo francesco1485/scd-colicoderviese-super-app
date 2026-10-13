@@ -23,11 +23,13 @@ import {
   forceCameo,
   type CameoLine,
 } from "@/lib/crovi-cameo";
-import { askSky, type SkyReply } from "@/lib/sky.functions";
+import { AI_NOTICE } from "@/lib/assistant";
+import { askAssistant, askStaffAssistant } from "@/lib/assistant.functions";
+import { type SkyReply } from "@/lib/sky.functions";
 import { useSession } from "@/lib/use-session";
 
 type Mood = SkyReply["mood"];
-type Msg = { role: "sky" | "user"; text: string; links?: SkyReply["links"] };
+type Msg = { role: "sky" | "user"; text: string; links?: SkyReply["links"]; ai?: boolean };
 
 /** Round avatar of a persona: Sky (official head asset), CROVI (approved v3 avatar) or Era. */
 export function SkyMascot({
@@ -65,12 +67,40 @@ const NAV_H = 62;
 const STRIP_H = 34;
 const GAP = 12;
 
-export function SkyChat() {
+/** A reply link: app paths through the router, https sources (Drive, federation) in a new tab. */
+function ReplyLink({ link, onNavigate }: { link: { label: string; to: string }; onNavigate: () => void }) {
+  const cls = "rounded-md bg-[#ffd600] px-2 py-1 text-[12px] font-semibold text-[#0b1e3a]";
+  if (/^https:\/\//.test(link.to)) {
+    return (
+      <a href={link.to} target="_blank" rel="noopener noreferrer" className={cls}>
+        {link.label} ↗<span className="sr-only"> (si apre in una nuova scheda)</span>
+      </a>
+    );
+  }
+  if (!link.to.startsWith("/")) return null;
+  return (
+    <Link
+      to={link.to.split("?")[0] ?? link.to}
+      search={Object.fromEntries(new URLSearchParams(link.to.split("?")[1] ?? "")) as never}
+      onClick={onNavigate}
+      className={cls}
+    >
+      {link.label} →
+    </Link>
+  );
+}
+
+/**
+ * interior: work-area shells (no public chrome, no bottom bar). There is no floating launcher: the chat opens only
+ * from an in-page entry point ("Chiedi a Era", window event "era:open" / "sky:open") and sits 16px from the corner.
+ */
+export function SkyChat({ interior = false }: { interior?: boolean } = {}) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  // Era needs a verified session (staff, or 15+ once the server exposes an age band); until the
-  // session answers, the reserved helper is Sky, so nobody sees Era before the server confirms.
+  // Era needs a verified session; until the session answers, the reserved helper is Sky, so nobody sees Era
+  // before the server confirms. One rule for persona and face: lib/assistant.ts eraEligible (r99, UD-104).
   const { session } = useSession();
-  const viewer = session?.user ? { roles: session.roles, age15plus: null } : null;
+  const signedIn = !!session?.user;
+  const viewer = signedIn ? { roles: session?.roles ?? [], age15plus: null } : null;
   const persona = personaFor(pathname, viewer);
   const face = launcherFaceFor(pathname, viewer);
   const copy = PERSONA_COPY[persona];
@@ -86,7 +116,8 @@ export function SkyChat() {
   const [mood, setMood] = useState<Mood>("info");
   const [notify, setNotify] = useState(false);
   const [msgs, setMsgs] = useState<Msg[]>(() => greeting(persona, face));
-  const ask = useServerFn(askSky);
+  const askPublic = useServerFn(askAssistant);
+  const askInside = useServerFn(askStaffAssistant);
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
@@ -112,9 +143,11 @@ export function SkyChat() {
     };
     window.addEventListener("crovi:open", onOpen);
     window.addEventListener("sky:open", onOpen);
+    window.addEventListener("era:open", onOpen);
     return () => {
       window.removeEventListener("crovi:open", onOpen);
       window.removeEventListener("sky:open", onOpen);
+      window.removeEventListener("era:open", onOpen);
     };
   }, []);
   useEffect(() => {
@@ -190,9 +223,14 @@ export function SkyChat() {
     }
     setBusy(true);
     try {
-      const r = await ask({ data: { message } });
+      // Inside with a verified session: the staff assistant (Cervellone with the caller's own permissions).
+      // Everywhere else: the public assistant (public data only); both fall back to the rules engine.
+      const r =
+        persona !== "crovi" && signedIn
+          ? await askInside({ data: { message } })
+          : await askPublic({ data: { message, persona: persona === "crovi" ? "crovi" : "sky" } });
       setMood(r.mood);
-      setMsgs((m) => [...m, { role: "sky", text: r.text, links: r.links }]);
+      setMsgs((m) => [...m, { role: "sky", text: r.text, links: r.links, ai: r.ai === true }]);
     } catch {
       setMood("alert");
       setMsgs((m) => [
@@ -207,9 +245,11 @@ export function SkyChat() {
     }
   }
 
-  if (hidden) return null;
+  if (hidden || (interior && !open)) return null;
 
-  const phoneBottom = `calc(${NAV_H + (sponsorStrip ? STRIP_H : 0) + GAP}px + env(safe-area-inset-bottom))`;
+  const phoneBottom = interior
+    ? "calc(16px + env(safe-area-inset-bottom))"
+    : `calc(${NAV_H + (sponsorStrip ? STRIP_H : 0) + GAP}px + env(safe-area-inset-bottom))`;
   const isSky = persona === "sky";
 
   // Super App: su smartphone il widget resta sopra la barra di navigazione inferiore e la striscia sponsor.
@@ -219,7 +259,7 @@ export function SkyChat() {
       data-persona={persona}
       data-face={face}
       style={{ "--sky-bottom": phoneBottom } as CSSProperties}
-      className={`fixed bottom-[var(--sky-bottom)] right-4 z-50 flex max-w-[calc(100vw-2rem)] flex-col items-end gap-3 ${sponsorStrip ? "lg:bottom-[62px]" : "lg:bottom-4"} ${onCalendario && !open ? "max-[640px]:hidden" : ""}`}
+      className={`fixed bottom-[var(--sky-bottom)] right-4 z-50 flex max-w-[calc(100vw-2rem)] flex-col items-end gap-3 ${interior ? "lg:bottom-4" : sponsorStrip ? "lg:bottom-[62px]" : "lg:bottom-4"} ${onCalendario && !open ? "max-[640px]:hidden" : ""}`}
     >
       {open && (
         <div
@@ -269,29 +309,27 @@ export function SkyChat() {
                 }
               >
                 {m.text}
-                {m.links && (
+                {m.links && m.links.length > 0 && (
                   <div className="mt-2 flex flex-wrap gap-1">
                     {m.links.map((l) => (
-                      <Link
-                        key={l.to}
-                        to={l.to.split("?")[0] ?? l.to}
-                        search={
-                          Object.fromEntries(
-                            new URLSearchParams(l.to.split("?")[1] ?? ""),
-                          ) as never
-                        }
-                        onClick={() => setOpen(false)}
-                        className="rounded-md bg-[#ffd600] px-2 py-1 text-[12px] font-semibold text-[#0b1e3a]"
-                      >
-                        {l.label} →
-                      </Link>
+                      <ReplyLink key={l.to} link={l} onNavigate={() => setOpen(false)} />
                     ))}
                   </div>
+                )}
+                {m.ai && (
+                  <p className="m-0 mt-1.5 text-[11px] leading-tight text-[#5a6b85]">{AI_NOTICE}</p>
                 )}
               </div>
             ))}
             {busy && (
-              <p className="m-0 text-[12px] text-[#5a6b85]">{copy.thinking}</p>
+              <div role="status" aria-live="polite" className="flex w-fit items-center gap-2 rounded-xl bg-white px-3 py-2 text-[12px] text-[#5a6b85] shadow-[0_1px_2px_rgb(11_42_91/0.08)]">
+                <span aria-hidden="true" className="flex gap-1">
+                  <span className="sky-typing-dot size-1.5 rounded-full bg-[#1556c4]" />
+                  <span className="sky-typing-dot size-1.5 rounded-full bg-[#1556c4] [animation-delay:150ms]" />
+                  <span className="sky-typing-dot size-1.5 rounded-full bg-[#1556c4] [animation-delay:300ms]" />
+                </span>
+                {copy.thinking}
+              </div>
             )}
             {msgs.length === 1 && (
               <div className="flex flex-wrap gap-1.5 pt-1">
@@ -366,29 +404,31 @@ export function SkyChat() {
           />
         </div>
       )}
-      <button
-        ref={toggleRef}
-        aria-expanded={open}
-        onClick={() => {
-          setOpen((o) => !o);
-          setNotify(false);
-        }}
-        aria-label={
-          open ? `Chiudi ${copy.name}` : `Apri ${copy.title}, aiuto rapido`
-        }
-        className={`relative flex size-14 items-center justify-center rounded-full bg-white shadow-[0_8px_22px_-6px_rgb(11_42_91/0.45)] ${notify && !open ? "sky-bounce" : "sky-idle"}`}
-      >
-        <SkyMascot mood={mood} size={52} persona={face} />
-        <span
-          aria-hidden="true"
-          className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 rounded-full bg-[#0b2a5b] px-2 py-px text-[10px] font-bold leading-[14px] tracking-wide text-white"
+      {!interior && (
+        <button
+          ref={toggleRef}
+          aria-expanded={open}
+          onClick={() => {
+            setOpen((o) => !o);
+            setNotify(false);
+          }}
+          aria-label={
+            open ? `Chiudi ${copy.name}` : `Apri ${copy.title}, aiuto rapido`
+          }
+          className={`relative flex size-14 items-center justify-center rounded-full bg-white shadow-[0_8px_22px_-6px_rgb(11_42_91/0.45)] ${notify && !open ? "sky-bounce" : "sky-idle"}`}
         >
-          {PERSONA_COPY[face].name}
-        </span>
-        {notify && !open && (
-          <span className="absolute -right-0.5 -top-0.5 size-3 rounded-full border-2 border-white bg-[#ffd600]" />
-        )}
-      </button>
+          <SkyMascot mood={mood} size={52} persona={face} />
+          <span
+            aria-hidden="true"
+            className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 rounded-full bg-[#0b2a5b] px-2 py-px text-[10px] font-bold leading-[14px] tracking-wide text-white"
+          >
+            {PERSONA_COPY[face].name}
+          </span>
+          {notify && !open && (
+            <span className="absolute -right-0.5 -top-0.5 size-3 rounded-full border-2 border-white bg-[#ffd600]" />
+          )}
+        </button>
+      )}
     </div>
   );
 }

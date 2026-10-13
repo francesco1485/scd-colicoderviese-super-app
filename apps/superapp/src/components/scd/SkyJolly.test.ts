@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { cameoLine } from "@/lib/crovi-cameo";
+import { insidePersonaFor } from "@/lib/assistant";
 import { PUBLIC_PREFIXES } from "@/lib/http-policy";
 
 import {
@@ -23,7 +24,7 @@ describe("helper persona (Direzione 12/10/2026: Crovi outside, Sky inside)", () 
     expect(personaFor("/calendario/rotazione-campi")).toBe("crovi");
   });
 
-  it("puts Sky in the reserved areas (until Era exists) and never Crovi", () => {
+  it("puts Sky in the reserved areas by page (SkyChat upgrades to Era by session) and never Crovi", () => {
     for (const p of ["/famiglia", "/la-mia-scd", "/direzione", "/segreteria/persone", "/tesoreria", "/gestionale/organigramma", "/squadre", "/squadre/u16", "/aree", "/core", "/quadro", "/crm"]) {
       expect(isReservedPath(p)).toBe(true);
       expect(personaFor(p)).toBe("sky");
@@ -70,6 +71,12 @@ describe("helper persona (Direzione 12/10/2026: Crovi outside, Sky inside)", () 
     }
   });
 
+  it("titles the internal chat 'Chiedi a Era' (UD-091, UD-104)", () => {
+    expect(PERSONA_COPY.era.title).toBe("Chiedi a Era");
+    expect(PERSONA_COPY.era.placeholder).toMatch(/Era/);
+    expect(PERSONA_COPY.era.greeting).toMatch(/Cervellone/);
+  });
+
   it("lets Crovi say Sky called him when Sky's face opened the chat", () => {
     expect(greetingFor("crovi", "sky").startsWith(SKY_HANDOFF)).toBe(true);
     expect(greetingFor("crovi", "crovi")).toBe(PERSONA_COPY.crovi.greeting);
@@ -91,48 +98,53 @@ describe("Era in the reserved areas (Direzione 'Vai A B C' 13/10/2026)", () => {
   const staff = { roles: ["mister"], age15plus: null };
   const member15 = { roles: ["atleta"], age15plus: true };
   const minor = { roles: ["atleta"], age15plus: false };
-  const unknownAge = { roles: ["famiglia"], age15plus: null };
-  const ready = { eraReady: true };
+  const unknownAge = { roles: ["atleta"], age15plus: null };
+  const family = { roles: ["famiglia"], age15plus: null };
   const inside = ["/famiglia", "/la-mia-scd", "/direzione", "/segreteria/persone", "/infermeria", "/gestionale/organigramma"];
 
   it("gives Era to staff and to members known to be 15+, only inside", () => {
     for (const p of inside) {
-      expect(personaFor(p, staff, ready)).toBe("era");
-      expect(personaFor(p, member15, ready)).toBe("era");
-      expect(launcherFaceFor(p, staff, ready)).toBe("era");
+      expect(personaFor(p, staff)).toBe("era");
+      expect(personaFor(p, member15)).toBe("era");
+      expect(personaFor(p, family)).toBe("era");
+      expect(launcherFaceFor(p, staff)).toBe("era");
     }
   });
 
   it("never shows Era on public pages: Crovi stays the public helper", () => {
     for (const p of ["/", ...PUBLIC_PREFIXES]) {
-      expect(personaFor(p, staff, ready)).toBe("crovi");
-      expect(launcherFaceFor(p, staff, ready)).not.toBe("era");
+      expect(personaFor(p, staff)).toBe("crovi");
+      expect(launcherFaceFor(p, staff)).not.toBe("era");
     }
   });
 
   it("keeps Sky for minors, unknown age, anonymous viewers", () => {
     for (const p of inside) {
-      expect(personaFor(p, minor, ready)).toBe("sky");
-      expect(personaFor(p, unknownAge, ready)).toBe("sky");
-      expect(personaFor(p, null, ready)).toBe("sky");
-      expect(personaFor(p, undefined, ready)).toBe("sky");
+      expect(personaFor(p, minor)).toBe("sky");
+      expect(personaFor(p, unknownAge)).toBe("sky");
+      expect(personaFor(p, null)).toBe("sky");
+      expect(personaFor(p, undefined)).toBe("sky");
     }
   });
 
   it("a viewer known to be under 15 never gets Era, even with a staff position", () => {
     expect(eraEligible({ roles: ["mister"], age15plus: false })).toBe(false);
-    expect(personaFor("/famiglia", { roles: ["mister"], age15plus: false }, ready)).toBe("sky");
+    expect(personaFor("/famiglia", { roles: ["mister"], age15plus: false })).toBe("sky");
   });
 
-  it("waits for Era's approved picture: without it Sky stands in", () => {
-    expect(personaFor("/famiglia", staff, { eraReady: false })).toBe("sky");
-    expect(launcherFaceFor("/famiglia", staff, { eraReady: false })).toBe("sky");
+  it("uses the one rule of lib/assistant.ts for chat persona, face and server voice", () => {
+    const viewers = [staff, member15, minor, unknownAge, family, { roles: [], age15plus: null }];
+    for (const v of viewers) {
+      const expected = insidePersonaFor(v.roles, v.age15plus);
+      expect(personaFor("/famiglia", v)).toBe(expected);
+      expect(launcherFaceFor("/famiglia", v)).toBe(expected);
+      expect(eraEligible(v)).toBe(expected === "era");
+    }
   });
 
   it("gives Era her own Italian copy", () => {
     expect(PERSONA_COPY.era.name).toBe("Era");
     expect(PERSONA_COPY.era.placeholder).toMatch(/Era/);
-    expect(PERSONA_COPY.era.greeting).toMatch(/aree riservate/);
     expect(greetingFor("era")).toBe(PERSONA_COPY.era.greeting);
   });
 });

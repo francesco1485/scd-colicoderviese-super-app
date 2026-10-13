@@ -23,7 +23,7 @@ import {
   whoMayEnter,
   type FacilitiesContract,
 } from "./facilities";
-import { loadQuadro } from "./public-snapshots";
+import { loadQuadro } from "./quadro-data.server";
 
 const repo = (p: string) => fileURLToPath(new URL(`../../../../${p}`, import.meta.url));
 const clone = (): FacilitiesContract => JSON.parse(JSON.stringify(FACILITIES));

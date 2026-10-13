@@ -1,6 +1,7 @@
+import { loadQuadro } from "./quadro-data.server";
 import { describe, expect, test } from "vitest";
 
-import { loadCalendar, loadQuadro, type PublicEvent } from "./public-snapshots";
+import { loadCalendar, type PublicEvent } from "./public-snapshots";
 import {
   contrastOnWhite,
   findOverlaps,

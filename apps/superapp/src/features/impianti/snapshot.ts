@@ -2,7 +2,6 @@
  * Contratti e logica pura per gli snapshot pubblici di prova (pacchetti Drive RC8 Quadro / RC1 Calendario).
  * DATI DI PROVA · FOTOGRAFIA 09.10.2026 · NON LIVE · NON PUBBLICARE.
  */
-import quadroJson from './data/quadro_pubblico.json';
 import trasportiJson from './data/trasporti_pubblico.json';
 import calendarioJson from './data/calendario_pubblico.json';
 
@@ -24,7 +23,11 @@ export interface CalGroup { label: string; color: string; logo: string | null }
 export interface CalEvent { id: string; date: string; time: string; end: string; category: string; group: string; type: string; home_away: 'CASA' | 'FUORI'; venue: string; opponent: string; round: string; source: string; notice: string[]; match_status: string; is_variation: boolean; verification?: { time_confirmed: boolean; venue_confirmed: boolean; facility_review_required: boolean } }
 export interface CalendarioSnapshot { schema: string; season: string; snapshot_status: string; source_modified_at: string; source_sha256?: string; projection_revision?: string; groups: Record<string, CalGroup>; events: CalEvent[]; transport: { confirmed_trips: number; status: string; caption: string }; facilities: { reference: string; locker_room_slots?: string[]; allocations: string; note?: string } }
 
-export const quadro = quadroJson as QuadroSnapshot;
+/**
+ * The training quadro is members-only (UD-100) and never ships in the browser bundle: pages receive it from
+ * getTrainingQuadro (src/lib/quadro.functions.ts) and hand it down through QuadroProvider (quadro-context.tsx).
+ */
+export const EMPTY_QUADRO_SNAPSHOT: QuadroSnapshot = { schema: '', audience: '', generatedUTC: '', days: [], slots: [], rotations: [], rooms: [], note: '' };
 export const trasporti = trasportiJson as TrasportiSnapshot;
 export const calendario = calendarioJson as CalendarioSnapshot;
 

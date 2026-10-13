@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { CalendarClock, ExternalLink, Search } from "lucide-react";
+import { CalendarClock, ExternalLink, MessageCircle, Search } from "lucide-react";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 
 import { Card, Chip } from "@/components/scd/interior-ui";
@@ -160,6 +160,14 @@ function CervellonePage({ due, today, preview }: { due: KbData; today: string; p
               </p>
               <button type="submit" disabled={busy} className="scd-focus inline-flex h-11 items-center justify-center gap-2 rounded-[10px] bg-[var(--in-info)] px-4 text-[15px] font-bold text-white disabled:opacity-50">
                 <Search className="size-4" aria-hidden="true" /> {busy ? "Cerco…" : "Cerca"}
+              </button>
+              {/* r99 (UD-104): same chat component, opened in place; Era reads the Cervellone with this session's permissions. */}
+              <button
+                type="button"
+                onClick={() => window.dispatchEvent(new Event("era:open"))}
+                className="scd-focus inline-flex h-11 items-center justify-center gap-2 rounded-[10px] border border-[var(--in-line)] bg-white px-4 text-[15px] font-bold text-[var(--in-ink)]"
+              >
+                <MessageCircle className="size-4" aria-hidden="true" /> Chiedi a Era
               </button>
             </form>
           </Card>
