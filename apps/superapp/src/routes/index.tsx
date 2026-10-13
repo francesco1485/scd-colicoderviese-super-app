@@ -1,34 +1,29 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Newspaper, Trophy } from "lucide-react";
+import { ChevronRight, Newspaper } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { BUILD_STAMP } from "@/lib/build-stamp";
 import { openAccessMenu } from "@/components/scd/AccessMenu";
 import { Affiliations, SkyCameo } from "@/components/universe/Community";
 import {
-  BoardHero,
-  MondoColico,
-  NextMatchCard,
-  QuickTiles,
-  RoleDoors,
-  SideTiles,
-  SponsorCards,
-  UpcomingGames,
-} from "@/components/universe/BoardHome";
+  ClubFacts,
+  ClubGames,
+  HomeHero,
+  SectionTitle,
+  SponsorRow,
+  TeamsGrid,
+  WeekGames,
+  WhyJoin,
+} from "@/components/home/HomeSections";
 import {
-  CardActions,
-  CardHead,
   EmptyFeed,
   EventPost,
-  FeedCard,
   FeedTabs,
   FollowButton,
-  MatchBlock,
   PostCard,
   ReportSheet,
   SponsorPost,
-  WeekPost,
 } from "@/components/universe/Feed";
 import type { ReportReason } from "@/lib/moderation";
 import { TeamPicker } from "@/components/universe/TeamBar";
@@ -36,6 +31,7 @@ import { addDays } from "@/lib/board-data";
 import { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 import { getPublicFeed, getPublicSchedule } from "@/lib/club.functions";
 import { CLUB_EVENTS } from "@/lib/club-events";
+import { CLUB_PROFILE, hallTeams } from "@/lib/club-profile";
 import {
   calendarToWeekItems,
   mergeWeekItems,
@@ -67,9 +63,11 @@ import { sponsorOfTheDay } from "@/lib/stories";
 import { itemState, orderTeams, type Team } from "@/lib/universe";
 
 /**
- * Home = feed (UD-089): le notizie di tutti come su Instagram, "Per te" mette prima chi segui, "Tutti" mostra tutto,
- * "Dirette" solo le dirette ufficiali. Grafica della tavola madre (UD-088): testata Lario, storie, schede bianche.
- * Solo dati reali: post approvati, calendario ufficiale, sponsor 2026/27, eventi già pubblicati.
+ * Home = prima pagina ragionata (UD-095, Direzione 13/10/2026): perché venire (le gare della settimana di tutte le
+ * squadre), perché entrare (cosa fa l'app per famiglia, atleta, tifoso, sponsor), perché iscriversi (la società in
+ * numeri, le squadre, i giochi, gli sponsor) e in fondo il feed "Dal club" (UD-089: "Per te" mette prima chi segui,
+ * "Tutti" mostra tutto, "Dirette" solo le dirette ufficiali).
+ * Solo dati reali: calendario ufficiale, profilo del club, sponsor 2026/27, post approvati, eventi già pubblicati.
  */
 export const Route = createFileRoute("/")({
   loader: async () => {
@@ -157,13 +155,11 @@ function Home() {
   const doForza = useServerFn(toggleForza);
   const doReport = useServerFn(reportPost);
   const [reporting, setReporting] = useState<Post | null>(null);
-  const [going, setGoing] = useState<string[]>([]);
 
   useEffect(() => {
     setNowMs(Date.now());
     const t = setInterval(() => setNowMs(Date.now()), 30_000);
     setLocalFollow(readList("scd-follow"));
-    setGoing(readList("scd-going"));
     try {
       const m = localStorage.getItem("scd-feed-mode");
       if (m === "perte" || m === "tutti" || m === "dirette") setMode(m);
@@ -257,80 +253,48 @@ function Home() {
         ),
     [merged, today, lastDay, nowMs],
   );
-  const homeGames = weekGames.filter((g) => g.homeAway === "CASA").length;
-  // One card per team playing this week (followed teams first), at most 3.
-  const teamMatches = useMemo(() => {
-    const seen = new Set<string>();
-    const list: { item: WeekItem; team: Team }[] = [];
-    const ordered = [...weekGames].sort(
-      (a, b) =>
-        Number(followedTeams.includes(b.group)) -
-        Number(followedTeams.includes(a.group)),
-    );
-    for (const g of ordered) {
-      const t = teamById.get(g.group);
-      if (!t || seen.has(t.id)) continue;
-      seen.add(t.id);
-      list.push({ item: g, team: t });
-      if (list.length === 3) break;
-    }
-    return list;
-  }, [weekGames, teamById, followedTeams]);
-
-  // "Prossima gara" della tavola: la prima gara non finita (prima quelle delle squadre seguite), poi le altre.
+  // The one highlighted row of the week: the game in play, else the first to start (followed teams first).
   const nextMatch = useMemo(() => {
-    const upcoming = merged
-      .filter(
-        (i) =>
-          i.kind === "Gara" &&
-          i.date >= today &&
-          itemState(i, nowMs) !== "done",
-      )
-      .sort((a, b) =>
-        (a.date + (a.time || "99:99")).localeCompare(
-          b.date + (b.time || "99:99"),
-        ),
-      );
-    const mine = upcoming.find((i) => followedTeams.includes(i.group));
-    return mine ?? upcoming[0] ?? null;
-  }, [merged, today, nowMs, followedTeams]);
-  const sameDay = useMemo(
-    () =>
-      nextMatch
-        ? weekGames.filter(
-            (g) => g.date === nextMatch.date && g.id !== nextMatch.id,
-          )
-        : [],
-    [weekGames, nextMatch],
+    const live = weekGames.find((g) => itemState(g, nowMs) === "live");
+    if (live) return live;
+    return (
+      weekGames.find((g) => followedTeams.includes(g.group)) ??
+      weekGames[0] ??
+      null
+    );
+  }, [weekGames, nowMs, followedTeams]);
+  const groupById = useCallback(
+    (id: string) => calendar.groups.find((g) => g.id === id),
+    [calendar.groups],
   );
-  const toggleGoing = (id: string) => {
-    const list = going.includes(id)
-      ? going.filter((x) => x !== id)
-      : [...going, id];
-    setGoing(list);
-    writeValue("scd-going", list);
-  };
+  const hall = useMemo(() => hallTeams(calendar.groups), [calendar.groups]);
+  const seasonGames = calendar.events.length;
+  const verifiedSponsors = useMemo(
+    () => SPONSORS.filter((x) => x.nameVerified && x.name),
+    [],
+  );
   const sponsor = useMemo(() => sponsorOfTheDay(SPONSORS, today), [today]);
   const dailySponsors = useMemo(() => {
-    const list = SPONSORS.filter((x) => x.nameVerified && x.name);
-    const at = sponsor ? list.indexOf(sponsor) : 0;
+    const list = verifiedSponsors;
+    const at = sponsor ? Math.max(0, list.indexOf(sponsor)) : 0;
     return Array.from(
       { length: Math.min(6, list.length) },
       (_, k) => list[(at + k) % list.length]!,
     );
-  }, [sponsor]);
+  }, [sponsor, verifiedSponsors]);
   const nextEvent = CLUB_EVENTS.find((e) => e.date >= today) ?? null;
 
   const ordered = useMemo(
     () => orderFeed(posts, mode, effectiveFollows),
     [posts, mode, effectiveFollows],
   );
+  // Week, matches and Top 11 have their own sections above the feed: only posts, sponsor, event and press stay.
   const nodes = useMemo(
     () =>
-      composeFeed(ordered, teamMatches, !!sponsor, nextEvent, mode).filter(
+      composeFeed(ordered, [], !!sponsor, nextEvent, mode).filter(
         (n) => n.k !== "week" && n.k !== "match" && n.k !== "top11",
       ),
-    [ordered, teamMatches, sponsor, nextEvent, mode],
+    [ordered, sponsor, nextEvent, mode],
   );
 
   const changeMode = (m: FeedMode) => {
@@ -467,106 +431,52 @@ function Home() {
 
   return (
     <main data-screen="home" className="min-h-dvh bg-[#eef3f9] pb-10">
-      <BoardHero
-        games={weekGames.length}
-        home={homeGames}
-        onEnter={openAccessMenu}
-        signedIn={social.signedIn}
-      />
+      <HomeHero signedIn={social.signedIn} onArea={openAccessMenu} />
 
-      <div className="mx-auto grid max-w-[1200px] grid-cols-[minmax(0,1fr)] gap-4 px-3 pt-3.5 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start lg:gap-6 lg:px-6 lg:pt-6">
-        <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-3.5">
-          <div className="lg:hidden">
-            <QuickTiles
-              games={weekGames.length}
-              events={CLUB_EVENTS.filter((e) => e.date >= today).length}
-            />
-          </div>
-          <NextMatchCard
-            item={nextMatch}
-            team={nextMatch ? teamOf(nextMatch) : undefined}
-            nowMs={nowMs}
-            going={nextMatch ? going.includes(nextMatch.id) : false}
-            onGoing={() => nextMatch && toggleGoing(nextMatch.id)}
-            onShare={() =>
-              nextMatch &&
-              share(
-                `${nextMatch.title}, ${nextMatch.date.split("-").reverse().join("/")} ${nextMatch.time}. Forza ColicoDerviese!`,
-                "/calendario",
-              )
-            }
-            others={sameDay}
-          />
-          <div className="lg:hidden">
-            <SideTiles
-              event={
-                nextEvent
-                  ? {
-                      title: nextEvent.title,
-                      when: nextEvent.when,
-                      href: nextEvent.href,
-                    }
-                  : null
-              }
-            />
-          </div>
-          <div className="lg:hidden">
-            <RoleDoors />
-          </div>
-          <UpcomingGames
-            items={weekGames.filter((g) => g.id !== nextMatch?.id).slice(0, 5)}
+      <div className="mx-auto grid max-w-[1200px] grid-cols-[minmax(0,1fr)] gap-6 px-4 pt-5 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start lg:gap-x-8 lg:px-6 lg:pt-8">
+        <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-6">
+          <WeekGames
+            items={weekGames}
             teamOf={teamOf}
+            teamById={groupById}
+            highlightId={nextMatch?.id ?? null}
+            nowMs={nowMs}
           />
           <div className="lg:hidden">
-            <SponsorCards sponsors={dailySponsors} />
+            <WhyJoin />
           </div>
           <div className="lg:hidden">
-            <MondoColico />
+            <ClubFacts
+              teams={hall.length}
+              towns={CLUB_PROFILE.towns}
+              games={seasonGames}
+              sponsors={verifiedSponsors.length}
+              season={calendar.season}
+              matricola={CLUB_PROFILE.figcMatricola}
+              affiliation={CLUB_PROFILE.monza.label}
+            />
+          </div>
+          <TeamsGrid teams={hall} />
+          <ClubGames />
+          <div className="lg:hidden">
+            <SponsorRow
+              sponsors={dailySponsors}
+              total={verifiedSponsors.length}
+            />
           </div>
 
           <section aria-labelledby="dal-club" className="grid gap-3">
-            <div className="flex items-end justify-between gap-2 px-1 pt-2">
-              <h2
-                id="dal-club"
-                className="m-0 font-uv text-[28px] uppercase leading-none text-[#0b2a5b]"
-              >
-                Dal club
-              </h2>
+            <SectionTitle id="dal-club">Dal club</SectionTitle>
+            <div className="flex items-center justify-between gap-3 px-1">
+              <FeedTabs mode={mode} onChange={changeMode} tone="light" />
               {social.canPost && (
                 <Link
                   to="/crea"
-                  className="scd-focus inline-flex h-10 items-center rounded-[12px] bg-[var(--uv-gold)] px-4 text-[14px] font-bold text-[#0b1e3a]"
+                  className="scd-focus inline-flex h-10 shrink-0 items-center rounded-[12px] bg-[#0b2a5b] px-4 text-[14px] font-bold text-white"
                 >
                   Crea post
                 </Link>
               )}
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <Link
-                to="/fantacalcio"
-                className="scd-focus flex min-h-[86px] flex-col justify-center rounded-[18px] bg-[linear-gradient(135deg,#2f8f4e,#1f6e3a)] px-3.5 py-3 text-white shadow-[0_6px_20px_-10px_rgb(6_42_99/0.35)]"
-              >
-                <b className="font-uv text-[22px] uppercase leading-none">
-                  Fantacalcio SCD
-                </b>
-                <span className="mt-1 text-[12.5px] font-semibold text-white/90">
-                  Scegli i tuoi 11, gratis
-                </span>
-              </Link>
-              <Link
-                to="/top11"
-                className="scd-focus flex min-h-[86px] flex-col justify-center rounded-[18px] bg-[#0b2a5b] px-3.5 py-3 text-white shadow-[0_6px_20px_-10px_rgb(6_42_99/0.35)]"
-              >
-                <b className="font-uv text-[22px] uppercase leading-none">
-                  Top <span className="text-[var(--uv-gold)]">11</span>
-                </b>
-                <span className="mt-1 text-[12.5px] font-semibold text-white/90">
-                  Vota i migliori della settimana
-                </span>
-              </Link>
-            </div>
-            <div className="overflow-hidden rounded-[16px] bg-[#0b2a5b]">
-              <FeedTabs mode={mode} onChange={changeMode} />
             </div>
           </section>
           <div
@@ -623,19 +533,23 @@ function Home() {
                     <Link
                       key="press"
                       to="/rassegna"
-                      className="scd-focus flex items-center gap-3 rounded-[20px] bg-white p-4 shadow-[0_2px_10px_rgb(11_42_91/0.08)]"
+                      className="scd-focus flex items-center gap-3 rounded-[18px] bg-white p-4 shadow-[0_2px_12px_rgb(11_42_91/0.08)] hover:bg-[#f4f7fb]"
                     >
-                      <span className="grid size-12 shrink-0 place-items-center rounded-[14px] bg-[#e3eefb] text-[#0b2a5b]">
-                        <Newspaper className="size-6" aria-hidden="true" />
+                      <span className="grid size-11 shrink-0 place-items-center rounded-[12px] bg-[#e3eefb] text-[#0b2a5b]">
+                        <Newspaper className="size-5" aria-hidden="true" />
                       </span>
-                      <span className="grid gap-0.5">
-                        <b className="font-uv text-[22px] leading-none text-[#0b1e3a]">
-                          DICONO DI NOI
+                      <span className="grid min-w-0 gap-0.5">
+                        <b className="text-[16px] leading-tight text-[#0b1e3a]">
+                          Dicono di noi
                         </b>
-                        <span className="text-[13px] text-[#5a6b85]">
+                        <span className="text-[13.5px] text-[#5a6b85]">
                           I titoli delle testate su società, Colico e Dervio.
                         </span>
                       </span>
+                      <ChevronRight
+                        className="ml-auto size-5 shrink-0 text-[#9fb0c8]"
+                        aria-hidden="true"
+                      />
                     </Link>
                   );
                 case "empty":
@@ -656,63 +570,21 @@ function Home() {
             </p>
           </div>
         </div>
-        <div className="hidden min-w-0 grid-cols-[minmax(0,1fr)] gap-4 lg:grid">
-          <QuickTiles
-            games={weekGames.length}
-            events={CLUB_EVENTS.filter((e) => e.date >= today).length}
+        <div className="hidden min-w-0 grid-cols-[minmax(0,1fr)] gap-6 lg:grid">
+          <WhyJoin />
+          <ClubFacts
+            teams={hall.length}
+            towns={CLUB_PROFILE.towns}
+            games={seasonGames}
+            sponsors={verifiedSponsors.length}
+            season={calendar.season}
+            matricola={CLUB_PROFILE.figcMatricola}
+            affiliation={CLUB_PROFILE.monza.label}
           />
-          <RoleDoors />
-          <FeedCard>
-            <div className="px-4 pb-3 pt-3.5">
-              <h2 className="m-0 text-[13px] font-bold tracking-[0.04em] text-[#1e7fd8]">
-                SEGUI ANCHE
-              </h2>
-              <ul className="m-0 mt-2.5 grid list-none gap-2.5 p-0">
-                {channels
-                  .filter((c) => c.kind !== "club" && !isFollowed(c.key))
-                  .slice(0, 5)
-                  .map((c) => (
-                    <li key={c.key} className="flex items-center gap-2.5">
-                      <Link
-                        to={c.href}
-                        className="scd-focus flex min-w-0 flex-1 items-center gap-2.5 rounded-md"
-                      >
-                        <span
-                          aria-hidden="true"
-                          className="grid size-[34px] shrink-0 place-items-center rounded-full font-uv text-[13px]"
-                          style={{
-                            background: c.color,
-                            color: c.kind === "event" ? "#0b1e3a" : "#fff",
-                          }}
-                        >
-                          {c.code}
-                        </span>
-                        <span className="truncate text-[15px] font-semibold text-[#0b1e3a]">
-                          {c.label}
-                        </span>
-                      </Link>
-                      <FollowButton
-                        on={false}
-                        onToggle={() => toggleFollow(c.key)}
-                      />
-                    </li>
-                  ))}
-              </ul>
-            </div>
-          </FeedCard>
-          <SideTiles
-            event={
-              nextEvent
-                ? {
-                    title: nextEvent.title,
-                    when: nextEvent.when,
-                    href: nextEvent.href,
-                  }
-                : null
-            }
+          <SponsorRow
+            sponsors={dailySponsors}
+            total={verifiedSponsors.length}
           />
-          <SponsorCards sponsors={dailySponsors} />
-          <MondoColico />
           <Affiliations tone="light" />
         </div>
       </div>
