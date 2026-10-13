@@ -1,4 +1,5 @@
 /** Club events already published in the app (real pages only): channels to follow and cards of the feed. */
+import { visibleOn } from "./public-window";
 import type { ClubEvent } from "./stories";
 
 export const CLUB_EVENTS: readonly ClubEvent[] = [
@@ -12,3 +13,8 @@ export const CLUB_EVENTS: readonly ClubEvent[] = [
     image: "/media/eventi/christmas-lario-cup-2026-maschile.webp",
   },
 ];
+
+/** Club events public on a Rome day (honours showFrom/showUntil; events without a window are always listed). */
+export function clubEventsOn(day: string): ClubEvent[] {
+  return visibleOn(CLUB_EVENTS, day);
+}

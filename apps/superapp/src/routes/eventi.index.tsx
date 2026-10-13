@@ -1,10 +1,20 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowRight } from "lucide-react";
 
 import { PageHero, heroOverlapCls } from "@/components/ui-kit";
 import { getPublicFeed } from "@/lib/club.functions";
+import { dayMonth, type Initiative } from "@/lib/initiatives";
+import { getActiveInitiatives } from "@/lib/initiatives.functions";
 
 export const Route = createFileRoute("/eventi/")({
-  loader: () => getPublicFeed(),
+  loader: async () => {
+    const [feed, initiatives] = await Promise.all([
+      getPublicFeed(),
+      // Server-side window (Rome day): an initiative is listed only from showFrom to showUntil.
+      getActiveInitiatives().catch(() => ({ today: "", items: [] as Initiative[] })),
+    ]);
+    return { feed, initiatives: initiatives.items };
+  },
   head: () => ({
     meta: [
       { title: "Eventi — S.C.D. ColicoDerviese" },
@@ -25,7 +35,7 @@ export const Route = createFileRoute("/eventi/")({
 });
 
 function Eventi() {
-  const feed = Route.useLoaderData();
+  const { feed, initiatives } = Route.useLoaderData();
   const eventi = feed.items.filter((i) => i.kind === "event");
   return (
     <main>
@@ -62,6 +72,16 @@ function Eventi() {
           </span>
         </Link>
       </section>
+      {initiatives.length > 0 && (
+        <section
+          aria-label="Iniziative"
+          className="mx-auto grid max-w-6xl gap-4 px-4 pb-5 md:grid-cols-2"
+        >
+          {initiatives.map((i) => (
+            <InitiativeCard key={i.id} item={i} />
+          ))}
+        </section>
+      )}
       <section className="mx-auto grid max-w-6xl gap-5 px-4 md:grid-cols-3">
         {eventi.length === 0 ? (
           <div className="card-premium p-5 md:col-span-3">
@@ -126,5 +146,44 @@ function Eventi() {
         )}
       </section>
     </main>
+  );
+}
+
+function InitiativeCard({ item }: { item: Initiative }) {
+  return (
+    <Link
+      to={item.href as never}
+      className="group grid grid-cols-[104px_minmax(0,1fr)] overflow-hidden rounded-[20px] bg-white shadow-premium sm:grid-cols-[150px_minmax(0,1fr)]"
+      data-testid={`eventi-initiative-${item.id}`}
+    >
+      <img
+        src={item.flyer.src}
+        alt=""
+        loading="lazy"
+        decoding="async"
+        className="h-full min-h-[150px] w-full object-cover object-top"
+      />
+      <span className="grid content-start gap-1.5 p-4">
+        <span className="flex flex-wrap items-center gap-2">
+          <span className="rounded-full bg-[#ffd21f] px-2 py-[3px] text-[11px] font-extrabold uppercase leading-none tracking-[0.06em] text-[#0b1e3a]">
+            Iniziativa
+          </span>
+          <span className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#5a6b85]">
+            Fino al {dayMonth(item.showUntil)}
+          </span>
+        </span>
+        <b className="text-[19px] leading-tight text-[#0b1e3a]">{item.title}</b>
+        <span className="text-[14px] leading-snug text-[#4a5d7a]">
+          {item.subtitle}
+        </span>
+        <span className="mt-1 inline-flex items-center gap-1 text-[14px] font-semibold text-[#1556c4]">
+          Dettagli e contatti
+          <ArrowRight
+            className="size-4 transition-transform duration-200 group-hover:translate-x-0.5"
+            aria-hidden="true"
+          />
+        </span>
+      </span>
+    </Link>
   );
 }

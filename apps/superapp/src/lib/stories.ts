@@ -5,6 +5,7 @@
  */
 import { addDays } from "./board-data";
 import type { WeekItem } from "./home-week";
+import type { PublicWindow } from "./public-window";
 import type { Sponsor } from "./sponsors";
 import { itemState, type Team } from "./universe";
 
@@ -43,7 +44,8 @@ export interface Story {
   signature: string;
 }
 
-export interface ClubEvent {
+/** A published club event; optional showFrom/showUntil (Rome days) limit when it is public (public-window.ts). */
+export interface ClubEvent extends PublicWindow {
   id: string;
   title: string;
   when: string;

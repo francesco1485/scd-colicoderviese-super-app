@@ -9,12 +9,14 @@ import { MAX_INPUT_CHARS, type AssistantReply, type PublicContextInput } from ".
 import { answerPublic, answerStaff, romeToday } from "./assistant.server";
 import { sessionView } from "./auth.functions";
 import { AFFILIAZIONI, CLUB_CONTACTS, INTERESSI_ATLETA, SPONSOR_PACKAGES } from "./catalog";
-import { CLUB_EVENTS } from "./club-events";
+import { clubEventsOn } from "./club-events";
 import { CLUB_PROFILE } from "./club-profile";
 import { FACILITIES } from "./facilities";
+import { dayMonth, initiativesOn } from "./initiatives";
 import { parseKb } from "./knowledge";
 import { TICKETING } from "./match-extras";
 import { OFFICIAL_RESULT_LINKS } from "./official-links";
+import { serverRomeDay } from "./public-window";
 import { skyRulesAnswer } from "./sky.functions";
 import { SPONSORS } from "./sponsors";
 import { serverSupabase } from "./supabase.server";
@@ -30,10 +32,21 @@ async function loadPublicContext(): Promise<PublicContextInput> {
   } catch {
     calendar = null;
   }
+  // Events and time-limited initiatives: only those public today (server Rome day), never before showFrom.
+  const day = serverRomeDay(process.env, Date.now());
+  const { INITIATIVES } = await import("./initiatives.server");
   return {
     today: romeToday(),
     calendar,
-    clubEvents: CLUB_EVENTS.map((e) => ({ title: e.title, when: e.when, text: e.text, href: e.href })),
+    clubEvents: [
+      ...clubEventsOn(day).map((e) => ({ title: e.title, when: e.when, text: e.text, href: e.href })),
+      ...initiativesOn(INITIATIVES, day).map((i) => ({
+        title: `${i.title} ${i.subtitle}`,
+        when: `iniziativa fino al ${dayMonth(i.showUntil)}`,
+        text: `${i.text} ${i.contact.label}: ${i.contact.display}.`,
+        href: i.href,
+      })),
+    ],
     contacts: { email: CLUB_PROFILE.contacts.email, pec: CLUB_PROFILE.contacts.pec, site: CLUB_PROFILE.contacts.site, address: CLUB_PROFILE.contacts.address },
     sites: FACILITIES.sites.map((s) => ({ name: s.name, address: s.address, municipality: s.municipality, status: s.status })),
     ticketing: TICKETING,

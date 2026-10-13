@@ -42,7 +42,8 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { ClubCrestOfficial } from "@/components/SiteChrome";
 import { openCookiePrefs } from "@/components/CookieConsent";
 import { SPONSOR_PACKAGES } from "@/lib/catalog";
-import { CLUB_EVENTS } from "@/lib/club-events";
+import { clubEventsOn } from "@/lib/club-events";
+import { dayMonth, type Initiative } from "@/lib/initiatives";
 import type { PressItem } from "@/lib/press";
 import {
   FEATURES,
@@ -257,7 +258,30 @@ function FeatureCardView({ card }: { card: FeatureCard }) {
 const CARD_BASIS =
   "basis-[80%] sm:basis-[calc((100%-16px)/2)] md:basis-[calc((100%-32px)/3)] lg:basis-[calc((100%-48px)/4)]";
 
-function Featured() {
+/** A time-limited initiative as an editorial card (only inside its window: the server sends active ones only). */
+export function initiativeCard(i: Initiative): FeatureCard {
+  return {
+    id: `initiative-${i.id}`,
+    kicker: `Fino al ${dayMonth(i.showUntil)}`,
+    title: i.title,
+    text: i.subtitle,
+    badge: "Iniziativa",
+    to: i.href,
+    visual: {
+      kind: "image",
+      src: i.flyer.src,
+      alt: i.flyer.alt,
+      position: "center 6%",
+    },
+  };
+}
+
+function Featured({ initiatives }: { initiatives: readonly Initiative[] }) {
+  // Active initiatives go right after the first card (the headline event keeps the first slot).
+  const cards = useMemo(() => {
+    const extra = initiatives.map(initiativeCard);
+    return [...FEATURES.slice(0, 1), ...extra, ...FEATURES.slice(1)];
+  }, [initiatives]);
   return (
     <div className={`${WRAP} pt-6 lg:pt-8`} data-testid="featured">
       <Carousel
@@ -266,7 +290,7 @@ function Featured() {
         label="Contenuti in primo piano"
         itemClass={CARD_BASIS}
       >
-        {FEATURES.map((c) => (
+        {cards.map((c) => (
           <FeatureCardView key={c.id} card={c} />
         ))}
       </Carousel>
@@ -416,7 +440,7 @@ function WeekNews({
   nowMs: number;
   today: string;
 }) {
-  const event = CLUB_EVENTS.find((e) => e.date >= today) ?? null;
+  const event = clubEventsOn(today).find((e) => e.date >= today) ?? null;
   const items = press.slice(0, 4);
   return (
     <section
@@ -1104,11 +1128,13 @@ function PublicWeek({
 export function PublicHome({
   press,
   calendar,
+  initiatives = [],
   nowMs,
   today,
 }: {
   press: readonly PressItem[];
   calendar: PublicCalendar;
+  initiatives?: readonly Initiative[];
   nowMs: number;
   today: string;
 }) {
@@ -1123,7 +1149,7 @@ export function PublicHome({
       </h1>
       <QuickStrip />
       <PublicWeek calendar={calendar} nowMs={nowMs} today={today} />
-      <Featured />
+      <Featured initiatives={initiatives} />
       <PartnerTicker />
       <JoinBanner />
       <Trust />

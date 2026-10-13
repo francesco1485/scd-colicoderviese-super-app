@@ -63,6 +63,7 @@ import { Route as DirezioneCervelloneRouteImport } from './routes/direzione_.cer
 import { Route as DirezioneContenutiRouteImport } from './routes/direzione_.contenuti'
 import { Route as EventiIndexRouteImport } from './routes/eventi.index'
 import { Route as EventiChristmasLarioCupRouteImport } from './routes/eventi.christmas-lario-cup'
+import { Route as EventiLezioniTecnicoCoordinativeRouteImport } from './routes/eventi.lezioni-tecnico-coordinative'
 import { Route as GestionaleIndexRouteImport } from './routes/gestionale.index'
 import { Route as GestionaleCodaRouteImport } from './routes/gestionale.coda'
 import { Route as GestionaleMappaRouteImport } from './routes/gestionale.mappa'
@@ -366,6 +367,12 @@ const EventiChristmasLarioCupRoute = EventiChristmasLarioCupRouteImport.update({
   path: '/eventi/christmas-lario-cup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EventiLezioniTecnicoCoordinativeRoute =
+  EventiLezioniTecnicoCoordinativeRouteImport.update({
+    id: '/eventi/lezioni-tecnico-coordinative',
+    path: '/eventi/lezioni-tecnico-coordinative',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const GestionaleIndexRoute = GestionaleIndexRouteImport.update({
   id: '/gestionale/',
   path: '/gestionale/',
@@ -578,6 +585,7 @@ export interface FileRoutesByFullPath {
   '/direzione/cervellone': typeof DirezioneCervelloneRoute
   '/direzione/contenuti': typeof DirezioneContenutiRoute
   '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
+  '/eventi/lezioni-tecnico-coordinative': typeof EventiLezioniTecnicoCoordinativeRoute
   '/gestionale/coda': typeof GestionaleCodaRoute
   '/gestionale/mappa': typeof GestionaleMappaRoute
   '/gestionale/mister': typeof GestionaleMisterRoute
@@ -665,6 +673,7 @@ export interface FileRoutesByTo {
   '/direzione/cervellone': typeof DirezioneCervelloneRoute
   '/direzione/contenuti': typeof DirezioneContenutiRoute
   '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
+  '/eventi/lezioni-tecnico-coordinative': typeof EventiLezioniTecnicoCoordinativeRoute
   '/gestionale/coda': typeof GestionaleCodaRoute
   '/gestionale/mappa': typeof GestionaleMappaRoute
   '/gestionale/mister': typeof GestionaleMisterRoute
@@ -752,6 +761,7 @@ export interface FileRoutesById {
   '/direzione_/cervellone': typeof DirezioneCervelloneRoute
   '/direzione_/contenuti': typeof DirezioneContenutiRoute
   '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
+  '/eventi/lezioni-tecnico-coordinative': typeof EventiLezioniTecnicoCoordinativeRoute
   '/gestionale/coda': typeof GestionaleCodaRoute
   '/gestionale/mappa': typeof GestionaleMappaRoute
   '/gestionale/mister': typeof GestionaleMisterRoute
@@ -841,6 +851,7 @@ export interface FileRouteTypes {
     | '/direzione/cervellone'
     | '/direzione/contenuti'
     | '/eventi/christmas-lario-cup'
+    | '/eventi/lezioni-tecnico-coordinative'
     | '/gestionale/coda'
     | '/gestionale/mappa'
     | '/gestionale/mister'
@@ -928,6 +939,7 @@ export interface FileRouteTypes {
     | '/direzione/cervellone'
     | '/direzione/contenuti'
     | '/eventi/christmas-lario-cup'
+    | '/eventi/lezioni-tecnico-coordinative'
     | '/gestionale/coda'
     | '/gestionale/mappa'
     | '/gestionale/mister'
@@ -1014,6 +1026,7 @@ export interface FileRouteTypes {
     | '/direzione_/cervellone'
     | '/direzione_/contenuti'
     | '/eventi/christmas-lario-cup'
+    | '/eventi/lezioni-tecnico-coordinative'
     | '/gestionale/coda'
     | '/gestionale/mappa'
     | '/gestionale/mister'
@@ -1102,6 +1115,7 @@ export interface RootRouteChildren {
   DirezioneCervelloneRoute: typeof DirezioneCervelloneRoute
   DirezioneContenutiRoute: typeof DirezioneContenutiRoute
   EventiChristmasLarioCupRoute: typeof EventiChristmasLarioCupRoute
+  EventiLezioniTecnicoCoordinativeRoute: typeof EventiLezioniTecnicoCoordinativeRoute
   GestionaleCodaRoute: typeof GestionaleCodaRoute
   GestionaleMappaRoute: typeof GestionaleMappaRoute
   GestionaleMisterRoute: typeof GestionaleMisterRoute
@@ -1514,6 +1528,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventiChristmasLarioCupRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/eventi/lezioni-tecnico-coordinative': {
+      id: '/eventi/lezioni-tecnico-coordinative'
+      path: '/eventi/lezioni-tecnico-coordinative'
+      fullPath: '/eventi/lezioni-tecnico-coordinative'
+      preLoaderRoute: typeof EventiLezioniTecnicoCoordinativeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/gestionale/': {
       id: '/gestionale/'
       path: '/gestionale'
@@ -1805,6 +1826,7 @@ const rootRouteChildren: RootRouteChildren = {
   DirezioneCervelloneRoute: DirezioneCervelloneRoute,
   DirezioneContenutiRoute: DirezioneContenutiRoute,
   EventiChristmasLarioCupRoute: EventiChristmasLarioCupRoute,
+  EventiLezioniTecnicoCoordinativeRoute: EventiLezioniTecnicoCoordinativeRoute,
   GestionaleCodaRoute: GestionaleCodaRoute,
   GestionaleMappaRoute: GestionaleMappaRoute,
   GestionaleMisterRoute: GestionaleMisterRoute,

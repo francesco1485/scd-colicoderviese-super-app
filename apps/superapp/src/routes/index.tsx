@@ -4,6 +4,7 @@ import { MemberHome } from "@/components/home/MemberHome";
 import { PublicHome } from "@/components/home/PublicHome";
 import { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 import { getPublicFeed, getPublicSchedule } from "@/lib/club.functions";
+import { getActiveInitiatives } from "@/lib/initiatives.functions";
 import { romeParts } from "@/lib/home-week";
 import { getPressReview, type PressReview } from "@/lib/press.functions";
 import { getPublicSocial } from "@/lib/social.functions";
@@ -41,16 +42,19 @@ export const Route = createFileRoute("/")({
     const today =
       romeParts(new Date(serverNow).toISOString())?.date ??
       new Date(serverNow).toISOString().slice(0, 10);
-    const [social, press, calendar] = await Promise.all([
+    const [social, press, calendar, initiatives] = await Promise.all([
       getPublicSocial(),
       withBudget(getPressReview(), PRESS_BUDGET_MS, NO_PRESS),
       getPublicCalendarSnapshot(),
+      // Time-limited initiatives: filtered on the server's Rome day (never the visitor's clock).
+      getActiveInitiatives().catch(() => ({ today, items: [] })),
     ]);
     if (!social.signedIn) {
       return {
         kind: "public" as const,
         press: press.items,
         calendar,
+        initiatives: initiatives.items,
         serverNow,
         today,
       };
@@ -100,6 +104,7 @@ function Home() {
     <PublicHome
       press={data.press}
       calendar={data.calendar}
+      initiatives={data.initiatives}
       nowMs={data.serverNow}
       today={data.today}
     />
