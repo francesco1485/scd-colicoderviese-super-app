@@ -3,9 +3,10 @@
  * - public pages: the chat helper is CROVI ("Chiedi a Crovi"), the realistic secretariat legend;
  *   Sky, the club's lucky charm, stays in rotation as the launcher face on the home and on the
  *   kids/games pages, so the two figures alternate by context;
- * - reserved areas: the helper is Sky (up to 14, or the user's own avatar; 15+ will get "Era",
- *   not built yet, so Sky stands in for now). Crovi never appears inside.
- * The chat logic lives in SkyChat.tsx and the answer engine (askSky) is unchanged.
+ * - reserved areas: the helper goes by the signed-in roles (r99, UD-104): Era for staff and adult members (15+),
+ *   Sky for younger members until their own avatar (lib/assistant.ts insidePersonaFor). Crovi never appears inside.
+ * The chat logic lives in SkyChat.tsx; answers come from the AI assistants (lib/assistant.functions.ts) with the
+ * askSky rules engine as fallback.
  *
  * Official assets only (config/scd-assets.v1.json): Sky head /media/brand/sky-atv-head.webp,
  * Sky head + ball /media/brand/sky-scd.png, CROVI avatar /media/crovi/v3 (original fictional figure).
@@ -13,7 +14,7 @@
 import croviAvatar from "@/assets/crovi/crovi-avatar-256.webp.asset.json";
 import { isPublicPath } from "@/lib/http-policy";
 
-export type Persona = "sky" | "crovi";
+export type Persona = "sky" | "crovi" | "era";
 
 /** Public media paths of the official Sky files (never generated, never altered). */
 export const SKY_HEAD_SRC = "/media/brand/sky-atv-head.webp";
@@ -47,7 +48,7 @@ export function isHelperHiddenPath(pathname: string): boolean {
   return startsWithPrefix(pathname, HIDDEN_PREFIXES);
 }
 
-/** Who answers in the chat: Crovi on public pages, Sky inside (until Era exists). */
+/** Who answers in the chat by page: Crovi on public pages, Sky inside (SkyChat upgrades to Era by session roles). */
 export function personaFor(pathname: string): Persona {
   return isReservedPath(pathname) ? "sky" : "crovi";
 }
@@ -100,6 +101,22 @@ export const PERSONA_COPY: Record<
       "Come funziona l'app",
     ],
   },
+  era: {
+    name: "Era",
+    title: "Chiedi a Era",
+    subtitle: "l'assistente interna: cerco nel Cervellone",
+    greeting:
+      "Ciao, sono Era, l'assistente interna della società. Cerco per te nel Cervellone documenti, scadenze, fornitori, tornei e regole, mostrandoti solo ciò che il tuo ruolo può vedere. Se qualcosa manca o non funziona, scrivimelo in due parole: lo giro a chi se ne occupa.",
+    placeholder: "Scrivi a Era…",
+    thinking: "Era sta cercando…",
+    quick: [
+      "Scadenze in vista",
+      "Documenti della federazione",
+      "Omologazione campi",
+      "Tornei e eventi",
+      "Come funziona l'app",
+    ],
+  },
   crovi: {
     name: "Crovi",
     title: "Chiedi a Crovi",
@@ -132,6 +149,19 @@ export function PersonaAvatar({
   size?: number;
   className?: string;
 }) {
+  if (persona === "era") {
+    // Neutral initial until the approved Era image (UD-091, Canva MAHX1G12gBc) is registered in
+    // config/scd-assets.v1.json: no invented portrait (SCD:ASSET GENERATE_ORIGINAL, non-substitutive).
+    return (
+      <span
+        aria-hidden="true"
+        className={`inline-flex shrink-0 items-center justify-center rounded-full bg-[#0b2a5b] font-bold text-[#ffd600] ring-2 ring-[#ffd600] ${className}`}
+        style={{ width: size, height: size, fontSize: Math.round(size * 0.46) }}
+      >
+        E
+      </span>
+    );
+  }
   if (persona === "crovi") {
     return (
       <img

@@ -1756,6 +1756,55 @@
           "neutral_initials_shield_when_no_verified_file",
           "never_draw_or_generate_a_crest"
         ]
+      },
+      {
+        "id": "ANTHROPIC_API",
+        "kind": "EXTERNAL_AI_PROCESSOR",
+        "trust": "NOT_A_FACT_SOURCE",
+        "status": "STAGED_FLAG_OFF",
+        "title": "Anthropic Messages API (Claude Haiku 5.5) — data processor of the Super App assistants and of the automatic moderator",
+        "endpoint": "https://api.anthropic.com/v1/messages",
+        "model": "claude-haiku-5-5",
+        "env": [
+          "SCD_ANTHROPIC_API_KEY",
+          "SCD_ASSISTANT_AI"
+        ],
+        "authority_domains": [],
+        "consumers": [
+          "apps/superapp/src/lib/anthropic.server.ts",
+          "apps/superapp/src/lib/assistant.server.ts",
+          "apps/superapp/src/lib/assistant.functions.ts",
+          "apps/superapp/src/lib/moderation.server.ts"
+        ],
+        "data_classes_sent": {
+          "public_assistant_crovi": "PUBLIC_ONLY: next 7 days of official fixtures (date, time, home/away, team label, opponent, venue, competition), club events, ticket office rules, facility addresses, official contacts, registration paths, sponsor packages and Direzione-confirmed sponsor names, official result links, app guide",
+          "staff_assistant_era": "INTERNO or RISERVATO as returned by scd_kb_search for the caller's own session (title, summary, status, due date, season, link); amounts, sources, entities and tags excluded",
+          "moderator": "post text already filtered by database rules (no minors' names)",
+          "never": [
+            "minors_personal_data",
+            "health_data",
+            "iban",
+            "fiscal_codes",
+            "passwords_or_credentials",
+            "safeguarding_reports",
+            "rosters_or_people_lists"
+          ]
+        },
+        "rules": [
+          "PROCESSOR_NOT_SOURCE_answers_only_from_retrieved_context",
+          "FEATURE_FLAG_DEFAULT_OFF_SCD_ASSISTANT_AI",
+          "RULES_ENGINE_FALLBACK_ON_MISSING_KEY_ERROR_QUOTA_TIMEOUT_8S",
+          "CALLER_SESSION_ONLY_NEVER_SERVICE_KEY_FOR_KB",
+          "SAFEGUARDING_AND_REQUESTS_NEVER_SENT_TO_MODEL",
+          "OUTPUT_GUARD_REMOVES_NON_CLUB_EMAILS_PHONES_IBAN_FISCAL_CODES_AND_NON_ALLOWLISTED_URLS",
+          "CONTEXT_REDACTION_IBAN_FISCAL_CODES_CREDENTIALS",
+          "RATE_LIMIT_PUBLIC_20_PER_10MIN_IP_STAFF_60_PER_HOUR_USER",
+          "NO_PROMPT_OR_ANSWER_LOGGING_OUTCOME_AND_TOKEN_COUNTS_ONLY",
+          "SINGLE_TURN_NO_CONVERSATION_RETENTION",
+          "AI_NOTICE_SHOWN_ON_EVERY_AI_ANSWER"
+        ],
+        "approval": "Direzione 2026-10-13 12:03 'Vai A B C' (UD-104); activation = Direzione sets the key and the flag on Render",
+        "imported_at": "2026-10-13"
       }
     ],
     "conflict_resolution": [
@@ -2171,7 +2220,7 @@
         "AUTHORIZED_DOCUMENT_STATUS"
       ],
       "must_not_bypass_permissions": true,
-      "runtime_status": "STAGED_PUBLIC_RULES_ONLY_NOT_LLM_CONNECTED",
+      "runtime_status": "AI_ASSISTANTS_STAGED_FLAG_OFF_RULES_ENGINE_FALLBACK",
       "verified_source_policy": "R20_PUBLIC_CALENDAR_AND_CANONICAL_PUBLIC_CONTACTS_ONLY"
     },
     "personal_avatar": {
@@ -2258,6 +2307,52 @@
       "separate_from_twin": true,
       "voice_layer": "CLIENT_SIDE_NATIVE_TTS_OPTIONAL",
       "voice_rule": "USER_INITIATED_ONLY_PRIVATE_CONTENT"
+    },
+    "ai_assistants": {
+      "release": "r99_2026-10-13",
+      "directive": "UD-104",
+      "state": "IMPLEMENTED_STAGED_FLAG_OFF",
+      "provider_source_id": "ANTHROPIC_API",
+      "grounding": "RETRIEVAL_FROM_SERVER_DATA_NOT_TRAINING",
+      "personas": {
+        "crovi": {
+          "surface": "PUBLIC_PAGES",
+          "endpoint": "askAssistant",
+          "data": "PUBLIC_PROJECTION_ONLY",
+          "context_cap_tokens": 3000
+        },
+        "era": {
+          "surface": "RESERVED_AREAS_STAFF_AND_ADULT_MEMBERS",
+          "endpoint": "askStaffAssistant",
+          "data": "CERVELLONE_VIA_SCD_KB_SEARCH_CALLER_SESSION",
+          "context_cap_tokens": 4000,
+          "entry_points": [
+            "/direzione/cervellone 'Chiedi a Era'"
+          ]
+        },
+        "sky": {
+          "surface": "RESERVED_AREAS_YOUNGER_MEMBERS_UNTIL_OWN_AVATAR",
+          "endpoint": "askStaffAssistant",
+          "data": "PUBLIC_PROJECTION_ONLY",
+          "context_cap_tokens": 3000
+        }
+      },
+      "persona_rule": "Public pages Crovi; inside: staff positions and families -> Era, athlete-only or unknown age -> Sky (age not in session)",
+      "pre_router": [
+        "SAFEGUARDING_TO_RESERVED_CHANNEL_RULES",
+        "REQUESTS_TO_REQUESTS_ENGINE_UD045"
+      ],
+      "fallback": "askSky keyword rules engine",
+      "output_shape": "SkyReply {text, mood, links, ai}",
+      "max_answer_words": 120,
+      "input_max_chars": 400,
+      "ui": [
+        "AI notice line on AI answers",
+        "typing indicator",
+        "links as buttons (https in new tab)",
+        "interior shells: same SkyChat without floating launcher"
+      ],
+      "docs": "docs/AI_ASSISTANT.md"
     }
   },
   "geo_spatial": {
