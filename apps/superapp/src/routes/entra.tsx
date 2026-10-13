@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 
-import { Field, OutcomeBox, PageHero, inputCls } from "@/components/ui-kit";
+import { Field, OutcomeBox, PageHero, heroOverlapCls, inputCls } from "@/components/ui-kit";
 import { INTERESSI_ATLETA, REQUEST_STATUS_LABEL } from "@/lib/catalog";
 import { submitRegistration } from "@/lib/club.functions";
 import type { SubmitOutcome } from "@/lib/club.types";
@@ -54,7 +54,7 @@ function Entra() {
         Dalla scuola calcio alla Prima Squadra. Compila la pre-iscrizione: nessun tesseramento automatico, la segreteria ti ricontatta.
       </PageHero>
 
-      <section className="mx-auto -mt-8 grid max-w-6xl gap-6 px-4 md:grid-cols-[1fr_20rem]">
+      <section className={`${heroOverlapCls} mx-auto grid max-w-6xl gap-6 px-4 md:grid-cols-[1fr_20rem]`}>
         {PUBLIC_FORMS_LIVE ? (
           <form onSubmit={submit} className="grid gap-4 p-6 card-premium sm:grid-cols-2">
           <Field label="Interesse / categoria">

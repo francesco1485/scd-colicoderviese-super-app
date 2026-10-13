@@ -165,7 +165,7 @@ function ChristmasLarioCup() {
           className="absolute inset-0 -z-30 bg-[radial-gradient(70%_45%_at_50%_18%,rgb(255_207_74/0.28),transparent_70%),radial-gradient(60%_50%_at_15%_70%,rgb(216_32_42/0.25),transparent_70%),linear-gradient(180deg,rgb(2_13_43/0.3)_0%,rgb(2_13_43/0.55)_55%,#020d2b_100%)]"
         />
         <Snow />
-        <div className="mx-auto grid w-full max-w-[1200px] gap-[22px] lg:grid-cols-[1.25fr_0.75fr] lg:items-end lg:gap-x-10">
+        <div className="mx-auto grid w-full max-w-[1200px] gap-[22px] xl:grid-cols-[1.25fr_0.75fr] xl:items-end xl:gap-x-10">
           <div className="grid gap-4">
             <div className="flex items-center gap-[10px]">
               <img

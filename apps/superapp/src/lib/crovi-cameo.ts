@@ -16,6 +16,8 @@ const LINES: ReadonlyArray<{ prefix: string; line: CameoLine }> = [
   { prefix: "/impianti", line: { text: "Cerchi lo spogliatoio o l'ingresso giusto? Tocca la mappa: ti accompagno io, senza fretta.", ask: "Dove siete?" } },
   { prefix: "/eventi", line: { text: "Tornei, feste e serate: se c'è da organizzare qualcosa, io la checklist ce l'ho già in tasca.", ask: "Eventi" } },
   { prefix: "/sponsor", line: { text: "Vuoi vedere il tuo marchio a bordo campo? Scrivimi, ti spiego come funziona.", ask: "Diventare sponsor" } },
+  { prefix: "/partner", line: { text: "Vuoi vedere il tuo marchio a bordo campo? Scrivimi, ti spiego come funziona.", ask: "Diventare sponsor" } },
+  { prefix: "/societa", line: { text: "La storia del club la so a memoria: chiedimi pure, poi ti porto dalla persona giusta.", ask: "Contatti" } },
   { prefix: "/contatti", line: { text: "Segreteria, mail, PEC: dimmi cosa ti serve e ti dico a chi scrivere.", ask: "Contatti" } },
 ];
 
@@ -24,9 +26,13 @@ const DEFAULT_LINE: CameoLine = {
   ask: "Prossima partita",
 };
 
-/** Line for the current page; reserved areas (interior pages) get no cameo. */
+/** Public pages where a joke would be out of place: Crovi stays in the chat but does not pop in. */
+const QUIET = ["/privacy", "/elimina-account"];
+
+/** Line for the current page; reserved areas (interior pages) and quiet pages get no cameo. */
 export function cameoLine(pathname: string): CameoLine | null {
   if (isInterior(pathname)) return null;
+  if (QUIET.some((p) => pathname === p || pathname.startsWith(`${p}/`))) return null;
   const hit = LINES.find((l) => pathname === l.prefix || pathname.startsWith(`${l.prefix}/`));
   return hit ? hit.line : DEFAULT_LINE;
 }

@@ -17,6 +17,13 @@ export function Field({ label, children, hint }: { label: string; children: Reac
   );
 }
 
+/**
+ * Class for the first block after a PageHero that slides up over the hero's bottom edge.
+ * The hero is positioned (relative), so a following block must be positioned too and stacked above it,
+ * otherwise the hero paints over the block's top (cards losing icons and edges, Direzione 13/10/2026).
+ */
+export const heroOverlapCls = "relative z-10 -mt-8";
+
 export function PageHero({ eyebrow, title, children }: { eyebrow: string; title: ReactNode; children?: ReactNode }) {
   return (
     <section className="surface-deep relative overflow-hidden px-4 pb-14 pt-12">

@@ -280,7 +280,7 @@ export function FacilityMap({ mode, slots = [], now, initialSiteId = "SED-COL", 
         )}
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(320px,380px)]">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_290px] xl:grid-cols-[minmax(0,1fr)_minmax(320px,380px)]">
         <section
           id={`${tabsId}-plan`}
           aria-label={`Mappa di ${site.short}`}

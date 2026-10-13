@@ -1,13 +1,17 @@
 /**
- * Sky, the club mascot, is the "jolly" of the Super App: the one floating helper on public pages.
- * Inside reserved areas the same floating helper wears CROVI, the secretary of Biglietteria and
- * Segreteria. This module holds the persona switch and the two avatars; the chat logic lives in
- * SkyChat.tsx and the answer engine (askSky) is unchanged.
+ * The floating helper of the Super App and its two faces (Direzione decisions 12/10/2026):
+ * - public pages: the chat helper is CROVI ("Chiedi a Crovi"), the realistic secretariat legend;
+ *   Sky, the club's lucky charm, stays in rotation as the launcher face on the home and on the
+ *   kids/games pages, so the two figures alternate by context;
+ * - reserved areas: the helper is Sky (up to 14, or the user's own avatar; 15+ will get "Era",
+ *   not built yet, so Sky stands in for now). Crovi never appears inside.
+ * The chat logic lives in SkyChat.tsx and the answer engine (askSky) is unchanged.
  *
  * Official assets only (config/scd-assets.v1.json): Sky head /media/brand/sky-atv-head.webp,
- * Sky head + ball /media/brand/sky-scd.png, CROVI avatar from src/assets/crovi.
+ * Sky head + ball /media/brand/sky-scd.png, CROVI avatar /media/crovi/v3 (original fictional figure).
  */
 import croviAvatar from "@/assets/crovi/crovi-avatar-256.webp.asset.json";
+import { isPublicPath } from "@/lib/http-policy";
 
 export type Persona = "sky" | "crovi";
 
@@ -16,37 +20,56 @@ export const SKY_HEAD_SRC = "/media/brand/sky-atv-head.webp";
 export const SKY_BALL_SRC = "/media/brand/sky-scd.png";
 export const CROVI_AVATAR_SRC = croviAvatar.url;
 
-/** Reserved areas where the floating helper is CROVI (the secretary) instead of Sky. */
-const RESERVED_PREFIXES = [
-  "/direzione",
-  "/segreteria",
-  "/tesoreria",
-  "/gestionale",
-  "/famiglia",
-  "/la-mia-scd",
-] as const;
-
 /** Access flows: no floating helper at all (the visitor is filling a form). */
 const HIDDEN_PREFIXES = ["/accedi", "/entra", "/registrati"] as const;
+
+/** Public pages where Sky, the lucky charm, is the launcher face (home, games, kids). */
+const SKY_FACE_PUBLIC = ["/", "/fantacalcio", "/top11"] as const;
 
 function startsWithPrefix(
   pathname: string,
   prefixes: ReadonlyArray<string>,
 ): boolean {
-  return prefixes.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+  return prefixes.some((p) =>
+    p === "/" ? pathname === "/" || pathname === "" : pathname === p || pathname.startsWith(`${p}/`),
+  );
 }
 
+/**
+ * Reserved = everything that is not a public page (src/lib/http-policy.ts PUBLIC_PREFIXES is the
+ * single list of what anyone may see without signing in).
+ */
 export function isReservedPath(pathname: string): boolean {
-  return startsWithPrefix(pathname, RESERVED_PREFIXES);
+  return !isPublicPath(pathname);
 }
 
 export function isHelperHiddenPath(pathname: string): boolean {
   return startsWithPrefix(pathname, HIDDEN_PREFIXES);
 }
 
+/** Who answers in the chat: Crovi on public pages, Sky inside (until Era exists). */
 export function personaFor(pathname: string): Persona {
-  return isReservedPath(pathname) ? "crovi" : "sky";
+  return isReservedPath(pathname) ? "sky" : "crovi";
 }
+
+/**
+ * Face shown on the floating launcher. Inside it is always the helper (Sky); on public pages Sky
+ * and Crovi alternate by context: Sky on the home and the games/kids pages, Crovi everywhere else
+ * (calendar, tickets, contacts, partner, registrations, club, events, news, default).
+ */
+export function launcherFaceFor(pathname: string): Persona {
+  if (isReservedPath(pathname)) return "sky";
+  return startsWithPrefix(pathname, SKY_FACE_PUBLIC) ? "sky" : "crovi";
+}
+
+/** Greeting of the chat; when Sky's face opened it on a public page, Crovi says Sky called him. */
+export function greetingFor(persona: Persona, face: Persona = persona): string {
+  const base = PERSONA_COPY[persona].greeting;
+  if (persona === "crovi" && face === "sky") return `${SKY_HANDOFF} ${base}`;
+  return base;
+}
+
+export const SKY_HANDOFF = "Sky, il nostro portafortuna, mi ha passato la palla.";
 
 export const PERSONA_COPY: Record<
   Persona,
@@ -65,7 +88,7 @@ export const PERSONA_COPY: Record<
     title: "Sky, la mascotte del club",
     subtitle: "ti porto dove ti serve, in un tocco",
     greeting:
-      "Ciao, sono Sky, la mascotte della ColicoDerviese. Dimmi cosa cerchi: prossima partita, calendario, come arrivare al campo, iscrizioni, contatti o come funziona l'app.",
+      "Ciao, sono Sky, la mascotte portafortuna della ColicoDerviese. Dimmi cosa cerchi: prossima partita, calendario, come arrivare al campo, iscrizioni, contatti o come funziona l'app.",
     placeholder: "Scrivi a Sky…",
     thinking: "Sky sta cercando…",
     quick: [
@@ -78,16 +101,17 @@ export const PERSONA_COPY: Record<
     ],
   },
   crovi: {
-    name: "CROVI",
-    title: "CROVI, la segreteria del club",
-    subtitle: "biglietteria e segreteria",
+    name: "Crovi",
+    title: "Chiedi a Crovi",
+    subtitle: "il tuttologo del calcio dilettanti",
     greeting:
-      "Ciao, sono Crovi, quello della biglietteria e della segreteria. Ti indirizzo su calendario, iscrizioni, documenti, sponsor o contatti. Se qualcosa manca o non funziona, scrivimelo in due parole: lo giro a chi se ne occupa.",
-    placeholder: "Scrivi a CROVI…",
-    thinking: "CROVI sta cercando…",
+      "Ciao, sono Crovi, la leggenda della segreteria e della biglietteria. Di calcio dilettanti so quasi tutto e quello che non so lo trovo: prossima partita, calendario, come arrivare al campo, iscrizioni, sponsor o contatti. Se qualcosa manca o non funziona, scrivimelo in due parole: lo giro a chi se ne occupa.",
+    placeholder: "Scrivi a Crovi…",
+    thinking: "Crovi sta cercando…",
     quick: [
       "Prossima partita",
       "Calendario",
+      "Come arrivare",
       "Iscrizioni",
       "Contatti",
       "Diventare sponsor",

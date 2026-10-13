@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
-import { PageHero } from "@/components/ui-kit";
+import { PageHero, heroOverlapCls } from "@/components/ui-kit";
 import { getPublicFeed } from "@/lib/club.functions";
 
 export const Route = createFileRoute("/eventi/")({
@@ -33,7 +33,7 @@ function Eventi() {
         Iscrizioni gratuite oggi; eventuali quote future saranno indicate su
         ogni evento.
       </PageHero>
-      <section className="mx-auto -mt-8 max-w-6xl px-4 pb-5">
+      <section className={`${heroOverlapCls} mx-auto max-w-6xl px-4 pb-5`}>
         <Link
           to="/eventi/christmas-lario-cup"
           className="relative flex min-h-[220px] items-end overflow-hidden rounded-[20px] bg-[#021f4f] text-white shadow-premium"

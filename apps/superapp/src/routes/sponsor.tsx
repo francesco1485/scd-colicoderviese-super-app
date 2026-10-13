@@ -3,7 +3,7 @@ import { BarChart3, Check, MonitorSmartphone, Trees } from "lucide-react";
 import { useState } from "react";
 
 import { PartnerForm } from "@/components/PartnerForm";
-import { PageHero } from "@/components/ui-kit";
+import { PageHero, heroOverlapCls } from "@/components/ui-kit";
 import { SPONSOR_ASSETS, SPONSOR_PACKAGES } from "@/lib/catalog";
 
 export const Route = createFileRoute("/sponsor")({
@@ -26,7 +26,7 @@ function Sponsor() {
         Un media sportivo locale: prima squadra, settore giovanile, famiglie e tifosi dell'Alto Lario. Visibilità fisica e digitale, misurabile.
       </PageHero>
 
-      <section className="mx-auto -mt-8 grid max-w-6xl grid-cols-3 gap-3 px-4">
+      <section className={`${heroOverlapCls} mx-auto grid max-w-6xl grid-cols-3 gap-3 px-4`}>
         {[
           { icon: MonitorSmartphone, t: "App & digitale", d: "Banner, card, ticker, notifiche" },
           { icon: Trees, t: "Campo & territorio", d: "Led, tornei, club house" },

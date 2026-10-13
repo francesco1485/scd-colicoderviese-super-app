@@ -669,7 +669,11 @@
           "consent of the real person before using his likeness",
           "Fiorentina cap per previous instruction is a third-party brand: use a generic cap unless approved"
         ],
-        "duplicate_work": "DENY"
+        "duplicate_work": "DENY",
+        "decisions": [
+          "DECIDED 2026-10-12 (Direzione, recorded in project memory): Crovi appears only in the external/public part, inside the chatbot; 'Chiedi a Crovi' alongside Sky, two figures in rotation by context. Inside (reserved areas) the helper goes by age: up to 14 Sky or the user's own avatar, 15+ own avatar or Era (Era not built yet: Sky stands in).",
+          "IMPLEMENTED 2026-10-13 (agent/fixui, Direzione report 10:03 'è scomparso il Crovi e c'è solo Sky'): public pages -> chat helper Crovi ('Chiedi a Crovi', v3 avatar, cameo once per visit, none on privacy, account deletion and safeguarding); launcher face Sky on /, /fantacalcio, /top11 and Crovi on the other public pages; reserved paths (not in http-policy PUBLIC_PREFIXES) -> Sky. Corrects the earlier inverted mapping (Crovi only in reserved areas). The rule above ('present at the ticket office and in the chat') stays valid: public chat and public ticket office are the external part."
+        ]
       }
     },
     {

@@ -8,7 +8,9 @@ import {
   PERSONA_COPY,
   PersonaAvatar,
   SKY_BALL_SRC,
+  greetingFor,
   isHelperHiddenPath,
+  launcherFaceFor,
   personaFor,
   type Persona,
 } from "@/components/scd/SkyJolly";
@@ -26,7 +28,7 @@ import { askSky, type SkyReply } from "@/lib/sky.functions";
 type Mood = SkyReply["mood"];
 type Msg = { role: "sky" | "user"; text: string; links?: SkyReply["links"] };
 
-/** Round mascot avatar: Sky by default (official head asset), CROVI inside reserved areas. */
+/** Round avatar of a persona: Sky (official head asset) or CROVI (approved v3 avatar). */
 export function SkyMascot({
   size = 52,
   persona = "sky",
@@ -53,8 +55,8 @@ function localReply(message: string): SkyReply | null {
   return null;
 }
 
-function greeting(persona: Persona): Msg[] {
-  return [{ role: "sky", text: PERSONA_COPY[persona].greeting }];
+function greeting(persona: Persona, face: Persona): Msg[] {
+  return [{ role: "sky", text: greetingFor(persona, face) }];
 }
 
 /* Bottom chrome on phones (SiteChrome.BottomNav 62px, SponsorBand 34px except on the home) */
@@ -65,6 +67,7 @@ const GAP = 12;
 export function SkyChat() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const persona = personaFor(pathname);
+  const face = launcherFaceFor(pathname);
   const copy = PERSONA_COPY[persona];
   const hidden = isHelperHiddenPath(pathname);
   const onCalendario = pathname === "/calendario";
@@ -77,20 +80,24 @@ export function SkyChat() {
   const [busy, setBusy] = useState(false);
   const [mood, setMood] = useState<Mood>("info");
   const [notify, setNotify] = useState(false);
-  const [msgs, setMsgs] = useState<Msg[]>(() => greeting(persona));
+  const [msgs, setMsgs] = useState<Msg[]>(() => greeting(persona, face));
   const ask = useServerFn(askSky);
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
 
-  // A new persona (public <-> reserved) starts a fresh conversation with its own greeting.
+  // A new persona (public <-> reserved) starts a fresh conversation with its own greeting;
+  // a new launcher face only refreshes the greeting while nothing has been asked yet.
   const personaRef = useRef(persona);
   useEffect(() => {
-    if (personaRef.current === persona) return;
-    personaRef.current = persona;
-    setMsgs(greeting(persona));
-    setMood("info");
-  }, [persona]);
+    if (personaRef.current !== persona) {
+      personaRef.current = persona;
+      setMsgs(greeting(persona, face));
+      setMood("info");
+      return;
+    }
+    setMsgs((m) => (m.length === 1 && m[0]?.role === "sky" ? greeting(persona, face) : m));
+  }, [persona, face]);
 
   // Apertura dal bottone in pagina (es. "Chiedi a CROVI" su /calendario da smartphone).
   useEffect(() => {
@@ -123,7 +130,7 @@ export function SkyChat() {
     return () => clearTimeout(t);
   }, []);
 
-  // Crovi cameo (UD-026): only where CROVI is the helper (reserved areas), once per visit.
+  // Crovi cameo (UD-026): only where CROVI is the helper (public pages), once per visit.
   useEffect(() => {
     if (persona !== "crovi") return;
     const forced = forceCameo(window.location.search);
@@ -205,8 +212,9 @@ export function SkyChat() {
     <div
       data-sky-widget
       data-persona={persona}
+      data-face={face}
       style={{ "--sky-bottom": phoneBottom } as CSSProperties}
-      className={`fixed bottom-[var(--sky-bottom)] right-4 z-50 flex max-w-[calc(100vw-2rem)] flex-col items-end gap-3 lg:bottom-[62px] ${onCalendario && !open ? "max-[640px]:hidden" : ""}`}
+      className={`fixed bottom-[var(--sky-bottom)] right-4 z-50 flex max-w-[calc(100vw-2rem)] flex-col items-end gap-3 ${sponsorStrip ? "lg:bottom-[62px]" : "lg:bottom-4"} ${onCalendario && !open ? "max-[640px]:hidden" : ""}`}
     >
       {open && (
         <div
@@ -361,16 +369,16 @@ export function SkyChat() {
           setNotify(false);
         }}
         aria-label={
-          open ? `Chiudi ${copy.name}` : `Apri ${copy.name}, aiuto rapido`
+          open ? `Chiudi ${copy.name}` : `Apri ${copy.title}, aiuto rapido`
         }
         className={`relative flex size-14 items-center justify-center rounded-full bg-white shadow-[0_8px_22px_-6px_rgb(11_42_91/0.45)] ${notify && !open ? "sky-bounce" : "sky-idle"}`}
       >
-        <SkyMascot mood={mood} size={52} persona={persona} />
+        <SkyMascot mood={mood} size={52} persona={face} />
         <span
           aria-hidden="true"
           className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 rounded-full bg-[#0b2a5b] px-2 py-px text-[10px] font-bold leading-[14px] tracking-wide text-white"
         >
-          {copy.name}
+          {PERSONA_COPY[face].name}
         </span>
         {notify && !open && (
           <span className="absolute -right-0.5 -top-0.5 size-3 rounded-full border-2 border-white bg-[#ffd600]" />

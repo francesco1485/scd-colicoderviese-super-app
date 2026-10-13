@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { PartnerForm } from "@/components/PartnerForm";
-import { PageHero } from "@/components/ui-kit";
+import { PageHero, heroOverlapCls } from "@/components/ui-kit";
 
 export const Route = createFileRoute("/fornitori")({
   head: () => ({
@@ -17,7 +17,7 @@ export const Route = createFileRoute("/fornitori")({
       <PageHero eyebrow="Fornitori & partner" title={<>Proponi il tuo <span className="text-accent">prodotto o servizio</span></>}>
         Materiale tecnico, servizi, convenzioni per tesserati e famiglie: la proposta arriva direttamente alla Direzione.
       </PageHero>
-      <section className="mx-auto -mt-8 max-w-4xl px-4">
+      <section className={`${heroOverlapCls} mx-auto max-w-4xl px-4`}>
         <PartnerForm tipo="fornitore" />
       </section>
     </main>
