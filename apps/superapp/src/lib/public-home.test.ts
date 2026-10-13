@@ -11,6 +11,8 @@ import * as http from "./http-policy";
 import {
   FEATURES,
   LINK_GROUPS,
+  kickoffClock,
+  matchdayLabel,
   QUICK_LINKS,
   SOCIAL_LINKS,
   partnerOfTheMonth,
@@ -73,9 +75,7 @@ describe("public home v4", () => {
     for (const f of PUBLIC_HOME_FILES) {
       const src = read(f);
       expect(src, f).not.toMatch(/\/squadre/);
-      expect(src, f).not.toMatch(
-        /getPublicRoster|TeamsGrid|hallTeams/,
-      );
+      expect(src, f).not.toMatch(/getPublicRoster|TeamsGrid|hallTeams/);
     }
     // Direzione 13/10 09:03: "calendario settimana deve essere sempre".
     expect(read("src/components/home/PublicHome.tsx")).toMatch(/<PublicWeek/);
@@ -121,5 +121,34 @@ describe("public home v4", () => {
       "/eventi/christmas-lario-cup",
     );
     expect(QUICK_LINKS.find((q) => q.badge === "top")?.to).toBe("/sponsor");
+  });
+
+  it("counts down to the real kickoff and stops once the game has started", () => {
+    const k = Date.parse("2026-10-17T08:30:00Z");
+    expect(
+      kickoffClock(k, k - (2 * 86_400 + 3 * 3_600 + 4 * 60 + 5) * 1000),
+    ).toEqual({ d: 2, h: 3, m: 4, s: 5 });
+    expect(kickoffClock(k, k - 999)).toBeNull();
+    expect(kickoffClock(k, k)).toBeNull();
+    expect(kickoffClock(k, k + 60_000)).toBeNull();
+    // UNKNOWN is not zero: no kickoff time, no countdown.
+    expect(kickoffClock(null, k)).toBeNull();
+  });
+
+  it("names the matchday as a family reads it", () => {
+    expect(matchdayLabel("2026-10-13", "2026-10-13")).toBe("Oggi");
+    expect(matchdayLabel("2026-10-14", "2026-10-13")).toBe("Domani");
+    expect(matchdayLabel("2026-11-01", "2026-10-31")).toBe("Domani");
+    expect(matchdayLabel("2026-10-17", "2026-10-13")).toBe("Sabato 17 ottobre");
+  });
+
+  it("keeps the sponsor ticker pausable and the motion opt-out in CSS", () => {
+    const home = code("src/components/home/PublicHome.tsx");
+    expect(home).toMatch(/<PartnerTicker/);
+    expect(home).toMatch(/aria-pressed=\{paused\}/);
+    const css = read("src/styles.css");
+    expect(css).toMatch(
+      /prefers-reduced-motion: reduce\)[^}]*\{[^]*\.scd-marquee-track/,
+    );
   });
 });

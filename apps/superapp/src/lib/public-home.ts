@@ -327,6 +327,46 @@ export const SOCIAL_LINKS = [
   },
 ] as const;
 
+/** Countdown segments to a kickoff, for the matchday card. Null once the game has started (or with no kickoff). */
+export interface KickoffClock {
+  d: number;
+  h: number;
+  m: number;
+  s: number;
+}
+
+export function kickoffClock(
+  kickoffMs: number | null,
+  nowMs: number,
+): KickoffClock | null {
+  if (kickoffMs === null || !Number.isFinite(kickoffMs)) return null;
+  const dt = Math.floor((kickoffMs - nowMs) / 1000);
+  if (dt <= 0) return null;
+  return {
+    d: Math.floor(dt / 86_400),
+    h: Math.floor((dt % 86_400) / 3_600),
+    m: Math.floor((dt % 3_600) / 60),
+    s: dt % 60,
+  };
+}
+
+/** Day of a game as a family reads it: "Oggi", "Domani" or "Sabato 17 ottobre" (dates are Europe/Rome days). */
+export function matchdayLabel(date: string, today: string): string {
+  if (date === today) return "Oggi";
+  const t = Date.parse(`${today}T12:00:00Z`);
+  if (Number.isFinite(t)) {
+    const tomorrow = new Date(t + 86_400_000).toISOString().slice(0, 10);
+    if (date === tomorrow) return "Domani";
+  }
+  const s = new Intl.DateTimeFormat("it-IT", {
+    timeZone: "UTC",
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  }).format(new Date(`${date}T12:00:00Z`));
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
 /** Every internal route the public home links to (for the route-existence test). */
 export function publicHomeRoutes(): string[] {
   const all: PublicLink[] = [
