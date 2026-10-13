@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { BarChart3, Check, MonitorSmartphone, Trees } from "lucide-react";
 import { useState } from "react";
 
+import { LedwallFacsimile } from "@/components/LedwallFacsimile";
 import { PartnerForm } from "@/components/PartnerForm";
 import { PageHero, heroOverlapCls } from "@/components/ui-kit";
 import { SPONSOR_ASSETS, SPONSOR_PACKAGES } from "@/lib/catalog";
@@ -39,6 +40,8 @@ function Sponsor() {
           </div>
         ))}
       </section>
+
+      <LedwallFacsimile onRequest={() => setPick("led")} />
 
       <section className="mx-auto mt-14 max-w-6xl px-4">
         <p className="eyebrow">Pacchetti</p>

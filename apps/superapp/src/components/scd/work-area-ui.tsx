@@ -8,6 +8,7 @@ import { Check, ClipboardCopy, ExternalLink, FileSpreadsheet, Info, Plus, X } fr
 import { useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from "react";
 
 import { ALL_AREAS_ROLES, type StripItem } from "@/lib/areas";
+import { areaBadgeFor } from "@/lib/internal-badges";
 import { INSERIMENTI_COLUMNS, INSERIMENTO_TYPES, DESCRIPTION_MAX, buildInserimento } from "@/lib/inserimenti";
 import type { WorkAreaGate } from "@/lib/access";
 import { DRIVE_MASTERS, WORK_AREAS, areaSources, driveUrl, type WorkAreaId } from "@/lib/work-areas";
@@ -82,6 +83,7 @@ export function WorkAreaShell({
       activeAreaId={a.railId}
       roles={PREVIEW_RAIL_ROLES}
       roleLabel={preview ? "Anteprima staging" : "Area di lavoro"}
+      badge={areaBadgeFor(id)}
       {...(highlights ? { highlights } : {})}
     >
       <div className="flex flex-col gap-3 lg:gap-[18px]" data-work-area={id}>

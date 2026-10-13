@@ -1,5 +1,5 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { CircleCheck, MapPin, ShieldCheck, TriangleAlert } from "lucide-react";
+import { Bus, CircleCheck, MapPin, ShieldCheck, TriangleAlert } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { Card, Chip, SourceLine, TeamTag, useRomeNow } from "@/components/scd/interior-ui";
@@ -15,6 +15,8 @@ import { getTrainingQuadro } from "@/lib/quadro.functions";
 import { defaultDay, weekdayKey } from "@/lib/training-view";
 import { VanSeatMap, type TeamColor } from "@/components/scd/VanSeatMap";
 import { PeoplePins } from "@/components/scd/PeoplePins";
+import { InternalBadgeImage } from "@/components/scd/InternalBadge";
+import { lineBadgeFor } from "@/lib/internal-badges";
 import { PULMINI_SERVICE, trainingServiceFor } from "@/lib/member-services";
 import { PULMINI_DEMAND, itDate, sortedCounts } from "@/lib/roster-aggregates";
 import { peopleForArea, type StaffPerson } from "@/lib/staff-roster";
@@ -195,10 +197,8 @@ function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf
                   return <Chip key={g} tone={off ? "warn" : "info"}>{g.replace(/ \d{4}(-\d{4})?$/, "")} · {n}{off ? " · allenamenti non previsti" : ""}</Chip>;
                 })}
               </div>
-              <p className="m-0 mb-1.5 mt-3 text-[12.5px] font-extrabold uppercase tracking-[0.05em] text-[var(--in-sub)]">Per linea</p>
-              <div className="flex flex-wrap gap-1.5">
-                {sortedCounts(PULMINI_DEMAND.byLine).map(([l, n]) => <Chip key={l} tone={l === "DA VERIFICARE" ? "warn" : "info"}>{l} · {n}</Chip>)}
-              </div>
+              <p className="m-0 mb-1.5 mt-3 text-[12.5px] font-extrabold uppercase tracking-[0.05em] text-[var(--in-sub)]" id="pul-linee">Per linea</p>
+              <LineList counts={sortedCounts(PULMINI_DEMAND.byLine)} />
             </div>
             <SourceLine>{PULMINI_DEMAND.weekdayConfirmation.note} {PULMINI_DEMAND.stopsRegistered} fermate registrate su {PULMINI_DEMAND.lines.length} linee.</SourceLine>
           </Card>
@@ -347,5 +347,33 @@ function TripRow({ e, group, vans, teams, board, onOrganize }: { e: PublicEvent;
         ))}
       </div>
     </li>
+  );
+}
+
+/**
+ * "Per linea": each line of the Master Pulmini with its count and, when the line name matches exactly,
+ * the club-made minibus badge (src/lib/internal-badges.ts). Lines without a badge keep a neutral bus mark.
+ */
+function LineList({ counts }: { counts: Array<[string, number]> }) {
+  return (
+    <ul className="m-0 grid list-none gap-1.5 p-0 sm:grid-cols-2 lg:grid-cols-1" aria-labelledby="pul-linee" data-testid="pulmini-lines">
+      {counts.map(([line, n]) => {
+        const badge = lineBadgeFor(line);
+        const toCheck = line === "DA VERIFICARE";
+        return (
+          <li key={line} className="flex min-h-[52px] items-center gap-3 rounded-xl border border-[var(--in-line)] bg-white px-2.5 py-1.5" data-line={line}>
+            {badge ? (
+              <InternalBadgeImage badge={badge} size={44} />
+            ) : (
+              <span aria-hidden="true" className={`flex size-11 flex-none items-center justify-center rounded-full ${toCheck ? "bg-[var(--in-warn-bg)] text-[var(--in-warn)]" : "bg-[var(--in-info-bg)] text-[var(--in-info)]"}`}>
+                <Bus className="size-5" strokeWidth={1.8} />
+              </span>
+            )}
+            <span className="min-w-0 flex-1 text-[14.5px] font-semibold leading-tight">{line}</span>
+            <Chip tone={toCheck ? "warn" : "info"}>{n} {n === 1 ? "utente" : "utenti"}</Chip>
+          </li>
+        );
+      })}
+    </ul>
   );
 }

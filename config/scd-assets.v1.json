@@ -366,6 +366,12 @@
           "svg"
         ],
         "png_requires_alpha": true
+      },
+      "VIDEO": {
+        "description": "Short silent demo/promo videos (H.264 MP4, +faststart, no audio track) with a WebP poster; never a mark, never autoplay with sound.",
+        "formats": [
+          "mp4"
+        ]
       }
     },
     "class_rules": {
@@ -394,7 +400,10 @@
       "APP_ICON": "APP_ICON",
       "OPPONENT_CREST": "VECTOR_MARK",
       "GENERATE_ORIGINAL": "PHOTO",
-      "KIT_TEXTURE": "TEXTURE"
+      "KIT_TEXTURE": "TEXTURE",
+      "INTERNAL_BADGE": "CUTOUT",
+      "LED_DEMO_VIDEO": "VIDEO",
+      "VIDEO_POSTER": "PHOTO"
     },
     "runtime_roots": [
       "apps/superapp/public/media/",
@@ -406,7 +415,8 @@
       "jpg",
       "jpeg",
       "svg",
-      "pdf"
+      "pdf",
+      "mp4"
     ],
     "known_format_debt": [
       {
@@ -1828,6 +1838,234 @@
       "derived_from": "assets/logo-monza.png",
       "transform": "trim to the alpha bounding box (source already transparent); 765x342 px, lossless WebP; no redraw, no recolour, no upscale",
       "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/interno/area-lavoro-192.webp",
+      "class": "INTERNAL_BADGE",
+      "status": "VERIFIED",
+      "asset_decision": "KEEP_ENHANCE",
+      "source": "club-made internal badge 'Lavoro', given by the Direzione on 2026-10-13 ('immagini fatte come interne, da usare nella super app'); transparent cut-out ~1230 px PNG kept with the Direzione upload",
+      "git_blob_sha": "a892f9c0719fa65e227dc7fe1f1b757fe2ffe7a4",
+      "transform": "trim to the alpha bounding box, centred on a square transparent canvas, Lanczos resize to 192x192, WebP q88 with lossless alpha; no redraw, no recolour",
+      "use": "reserved areas only (src/lib/internal-badges.ts); never on public pages",
+      "note": "contains a rendering of the club crest: never a replacement for the official crest (media/brand/logo-scd.*)",
+      "verified_at": "2026-10-13"
+    },
+    {
+      "path": "apps/superapp/public/media/interno/area-lavoro-384.webp",
+      "class": "INTERNAL_BADGE",
+      "status": "VERIFIED",
+      "asset_decision": "KEEP_ENHANCE",
+      "source": "club-made internal badge 'Lavoro', given by the Direzione on 2026-10-13 ('immagini fatte come interne, da usare nella super app'); transparent cut-out ~1230 px PNG kept with the Direzione upload",
+      "git_blob_sha": "ab0b97a7e9cf9bd997f93bbf2fd63605ed16d9d6",
+      "transform": "trim to the alpha bounding box, centred on a square transparent canvas, Lanczos resize to 384x384, WebP q88 with lossless alpha; no redraw, no recolour",
+      "use": "reserved areas only (src/lib/internal-badges.ts); never on public pages",
+      "note": "contains a rendering of the club crest: never a replacement for the official crest (media/brand/logo-scd.*)",
+      "verified_at": "2026-10-13"
+    },
+    {
+      "path": "apps/superapp/public/media/interno/area-staff-dirigenti-192.webp",
+      "class": "INTERNAL_BADGE",
+      "status": "VERIFIED",
+      "asset_decision": "KEEP_ENHANCE",
+      "source": "club-made internal badge 'Staff & Dirigenti', given by the Direzione on 2026-10-13 ('immagini fatte come interne, da usare nella super app'); transparent cut-out ~1230 px PNG kept with the Direzione upload",
+      "git_blob_sha": "ac491c52199361f4cf371836bb030b8537e9d512",
+      "transform": "trim to the alpha bounding box, centred on a square transparent canvas, Lanczos resize to 192x192, WebP q88 with lossless alpha; no redraw, no recolour",
+      "use": "reserved areas only (src/lib/internal-badges.ts); never on public pages",
+      "note": "contains a rendering of the club crest: never a replacement for the official crest (media/brand/logo-scd.*)",
+      "verified_at": "2026-10-13"
+    },
+    {
+      "path": "apps/superapp/public/media/interno/area-staff-dirigenti-384.webp",
+      "class": "INTERNAL_BADGE",
+      "status": "VERIFIED",
+      "asset_decision": "KEEP_ENHANCE",
+      "source": "club-made internal badge 'Staff & Dirigenti', given by the Direzione on 2026-10-13 ('immagini fatte come interne, da usare nella super app'); transparent cut-out ~1230 px PNG kept with the Direzione upload",
+      "git_blob_sha": "fe73286ed40aac13c56acf93b5abfa21b8813604",
+      "transform": "trim to the alpha bounding box, centred on a square transparent canvas, Lanczos resize to 384x384, WebP q88 with lossless alpha; no redraw, no recolour",
+      "use": "reserved areas only (src/lib/internal-badges.ts); never on public pages",
+      "note": "contains a rendering of the club crest: never a replacement for the official crest (media/brand/logo-scd.*)",
+      "verified_at": "2026-10-13"
+    },
+    {
+      "path": "apps/superapp/public/media/interno/area-segreteria-192.webp",
+      "class": "INTERNAL_BADGE",
+      "status": "VERIFIED",
+      "asset_decision": "KEEP_ENHANCE",
+      "source": "club-made internal badge 'Segreteria', given by the Direzione on 2026-10-13 ('immagini fatte come interne, da usare nella super app'); transparent cut-out ~1230 px PNG kept with the Direzione upload",
+      "git_blob_sha": "302e766d59dc2184342e2a996fd039a037f0ca39",
+      "transform": "trim to the alpha bounding box, centred on a square transparent canvas, Lanczos resize to 192x192, WebP q88 with lossless alpha; no redraw, no recolour",
+      "use": "reserved areas only (src/lib/internal-badges.ts); never on public pages",
+      "note": "contains a rendering of the club crest: never a replacement for the official crest (media/brand/logo-scd.*)",
+      "verified_at": "2026-10-13"
+    },
+    {
+      "path": "apps/superapp/public/media/interno/area-segreteria-384.webp",
+      "class": "INTERNAL_BADGE",
+      "status": "VERIFIED",
+      "asset_decision": "KEEP_ENHANCE",
+      "source": "club-made internal badge 'Segreteria', given by the Direzione on 2026-10-13 ('immagini fatte come interne, da usare nella super app'); transparent cut-out ~1230 px PNG kept with the Direzione upload",
+      "git_blob_sha": "a88b42b68f438df05d243a917111e280550bbeeb",
+      "transform": "trim to the alpha bounding box, centred on a square transparent canvas, Lanczos resize to 384x384, WebP q88 with lossless alpha; no redraw, no recolour",
+      "use": "reserved areas only (src/lib/internal-badges.ts); never on public pages",
+      "note": "contains a rendering of the club crest: never a replacement for the official crest (media/brand/logo-scd.*)",
+      "verified_at": "2026-10-13"
+    },
+    {
+      "path": "apps/superapp/public/media/interno/area-responsabili-attivita-192.webp",
+      "class": "INTERNAL_BADGE",
+      "status": "VERIFIED",
+      "asset_decision": "KEEP_ENHANCE",
+      "source": "club-made internal badge 'Responsabili attività · DS · Coordinatori', given by the Direzione on 2026-10-13 ('immagini fatte come interne, da usare nella super app'); transparent cut-out ~1230 px PNG kept with the Direzione upload",
+      "git_blob_sha": "d495b07f46de3118fac1edeb75f0eefba2079d2b",
+      "transform": "trim to the alpha bounding box, centred on a square transparent canvas, Lanczos resize to 192x192, WebP q88 with lossless alpha; no redraw, no recolour",
+      "use": "reserved areas only (src/lib/internal-badges.ts); never on public pages",
+      "note": "contains a rendering of the club crest: never a replacement for the official crest (media/brand/logo-scd.*)",
+      "verified_at": "2026-10-13"
+    },
+    {
+      "path": "apps/superapp/public/media/interno/area-responsabili-attivita-384.webp",
+      "class": "INTERNAL_BADGE",
+      "status": "VERIFIED",
+      "asset_decision": "KEEP_ENHANCE",
+      "source": "club-made internal badge 'Responsabili attività · DS · Coordinatori', given by the Direzione on 2026-10-13 ('immagini fatte come interne, da usare nella super app'); transparent cut-out ~1230 px PNG kept with the Direzione upload",
+      "git_blob_sha": "746d4f538da0344b9801abc9adb1912ddac29ca6",
+      "transform": "trim to the alpha bounding box, centred on a square transparent canvas, Lanczos resize to 384x384, WebP q88 with lossless alpha; no redraw, no recolour",
+      "use": "reserved areas only (src/lib/internal-badges.ts); never on public pages",
+      "note": "contains a rendering of the club crest: never a replacement for the official crest (media/brand/logo-scd.*)",
+      "verified_at": "2026-10-13"
+    },
+    {
+      "path": "apps/superapp/public/media/interno/pulmino-1-lago-192.webp",
+      "class": "INTERNAL_BADGE",
+      "status": "VERIFIED",
+      "asset_decision": "KEEP_ENHANCE",
+      "source": "club-made internal badge 'Pulmino 1 Lago', given by the Direzione on 2026-10-13 ('immagini fatte come interne, da usare nella super app'); transparent cut-out ~1230 px PNG kept with the Direzione upload",
+      "git_blob_sha": "d76052b9f3bcdffa3916de7ec2b18eab45cc83be",
+      "transform": "trim to the alpha bounding box, centred on a square transparent canvas, Lanczos resize to 192x192, WebP q88 with lossless alpha; no redraw, no recolour",
+      "use": "reserved areas only (src/lib/internal-badges.ts); never on public pages",
+      "note": "contains a rendering of the club crest: never a replacement for the official crest (media/brand/logo-scd.*)",
+      "verified_at": "2026-10-13"
+    },
+    {
+      "path": "apps/superapp/public/media/interno/pulmino-1-lago-384.webp",
+      "class": "INTERNAL_BADGE",
+      "status": "VERIFIED",
+      "asset_decision": "KEEP_ENHANCE",
+      "source": "club-made internal badge 'Pulmino 1 Lago', given by the Direzione on 2026-10-13 ('immagini fatte come interne, da usare nella super app'); transparent cut-out ~1230 px PNG kept with the Direzione upload",
+      "git_blob_sha": "236ea97d57ba7e0f0888eb6a18a335fcfc4a00ff",
+      "transform": "trim to the alpha bounding box, centred on a square transparent canvas, Lanczos resize to 384x384, WebP q88 with lossless alpha; no redraw, no recolour",
+      "use": "reserved areas only (src/lib/internal-badges.ts); never on public pages",
+      "note": "contains a rendering of the club crest: never a replacement for the official crest (media/brand/logo-scd.*)",
+      "verified_at": "2026-10-13"
+    },
+    {
+      "path": "apps/superapp/public/media/interno/pulmino-2-lecco-192.webp",
+      "class": "INTERNAL_BADGE",
+      "status": "VERIFIED",
+      "asset_decision": "KEEP_ENHANCE",
+      "source": "club-made internal badge 'Pulmino 2 Lecco', given by the Direzione on 2026-10-13 ('immagini fatte come interne, da usare nella super app'); transparent cut-out ~1230 px PNG kept with the Direzione upload",
+      "git_blob_sha": "5dc762d7e6b967d3cd2f5dec80dadeb44e38347c",
+      "transform": "trim to the alpha bounding box, centred on a square transparent canvas, Lanczos resize to 192x192, WebP q88 with lossless alpha; no redraw, no recolour",
+      "use": "reserved areas only (src/lib/internal-badges.ts); never on public pages",
+      "note": "contains a rendering of the club crest: never a replacement for the official crest (media/brand/logo-scd.*)",
+      "verified_at": "2026-10-13"
+    },
+    {
+      "path": "apps/superapp/public/media/interno/pulmino-2-lecco-384.webp",
+      "class": "INTERNAL_BADGE",
+      "status": "VERIFIED",
+      "asset_decision": "KEEP_ENHANCE",
+      "source": "club-made internal badge 'Pulmino 2 Lecco', given by the Direzione on 2026-10-13 ('immagini fatte come interne, da usare nella super app'); transparent cut-out ~1230 px PNG kept with the Direzione upload",
+      "git_blob_sha": "e8600a062bf52be006862d5c09d42443a391296d",
+      "transform": "trim to the alpha bounding box, centred on a square transparent canvas, Lanczos resize to 384x384, WebP q88 with lossless alpha; no redraw, no recolour",
+      "use": "reserved areas only (src/lib/internal-badges.ts); never on public pages",
+      "note": "contains a rendering of the club crest: never a replacement for the official crest (media/brand/logo-scd.*)",
+      "verified_at": "2026-10-13"
+    },
+    {
+      "path": "apps/superapp/public/media/interno/pulmino-3-valtellina-192.webp",
+      "class": "INTERNAL_BADGE",
+      "status": "VERIFIED",
+      "asset_decision": "KEEP_ENHANCE",
+      "source": "club-made internal badge 'Pulmino 3 Valtellina', given by the Direzione on 2026-10-13 ('immagini fatte come interne, da usare nella super app'); transparent cut-out ~1230 px PNG kept with the Direzione upload",
+      "git_blob_sha": "893f6b4fd982b1d85f072b6a5899ae26c51a2cf7",
+      "transform": "trim to the alpha bounding box, centred on a square transparent canvas, Lanczos resize to 192x192, WebP q88 with lossless alpha; no redraw, no recolour",
+      "use": "reserved areas only (src/lib/internal-badges.ts); never on public pages",
+      "note": "contains a rendering of the club crest: never a replacement for the official crest (media/brand/logo-scd.*)",
+      "verified_at": "2026-10-13"
+    },
+    {
+      "path": "apps/superapp/public/media/interno/pulmino-3-valtellina-384.webp",
+      "class": "INTERNAL_BADGE",
+      "status": "VERIFIED",
+      "asset_decision": "KEEP_ENHANCE",
+      "source": "club-made internal badge 'Pulmino 3 Valtellina', given by the Direzione on 2026-10-13 ('immagini fatte come interne, da usare nella super app'); transparent cut-out ~1230 px PNG kept with the Direzione upload",
+      "git_blob_sha": "a22bb61c7877a65ada64d706fb2470fd833745fc",
+      "transform": "trim to the alpha bounding box, centred on a square transparent canvas, Lanczos resize to 384x384, WebP q88 with lossless alpha; no redraw, no recolour",
+      "use": "reserved areas only (src/lib/internal-badges.ts); never on public pages",
+      "note": "contains a rendering of the club crest: never a replacement for the official crest (media/brand/logo-scd.*)",
+      "verified_at": "2026-10-13"
+    },
+    {
+      "path": "apps/superapp/public/media/interno/pulmino-4-chiavenna-192.webp",
+      "class": "INTERNAL_BADGE",
+      "status": "VERIFIED",
+      "asset_decision": "KEEP_ENHANCE",
+      "source": "club-made internal badge 'Pulmino 4 Chiavenna', given by the Direzione on 2026-10-13 ('immagini fatte come interne, da usare nella super app'); transparent cut-out ~1230 px PNG kept with the Direzione upload",
+      "git_blob_sha": "ee23fac8d291f42a6f52fd679416c762ba68db28",
+      "transform": "trim to the alpha bounding box, centred on a square transparent canvas, Lanczos resize to 192x192, WebP q88 with lossless alpha; no redraw, no recolour",
+      "use": "reserved areas only (src/lib/internal-badges.ts); never on public pages",
+      "note": "contains a rendering of the club crest: never a replacement for the official crest (media/brand/logo-scd.*)",
+      "verified_at": "2026-10-13"
+    },
+    {
+      "path": "apps/superapp/public/media/interno/pulmino-4-chiavenna-384.webp",
+      "class": "INTERNAL_BADGE",
+      "status": "VERIFIED",
+      "asset_decision": "KEEP_ENHANCE",
+      "source": "club-made internal badge 'Pulmino 4 Chiavenna', given by the Direzione on 2026-10-13 ('immagini fatte come interne, da usare nella super app'); transparent cut-out ~1230 px PNG kept with the Direzione upload",
+      "git_blob_sha": "5abdda7f88408bec4978b29ad55535d36ed108af",
+      "transform": "trim to the alpha bounding box, centred on a square transparent canvas, Lanczos resize to 384x384, WebP q88 with lossless alpha; no redraw, no recolour",
+      "use": "reserved areas only (src/lib/internal-badges.ts); never on public pages",
+      "note": "contains a rendering of the club crest: never a replacement for the official crest (media/brand/logo-scd.*)",
+      "verified_at": "2026-10-13"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/ledwall-facsimile-720.mp4",
+      "class": "LED_DEMO_VIDEO",
+      "status": "VERIFIED",
+      "asset_decision": "KEEP_ENHANCE",
+      "source": "Direzione upload 2026-10-13 'SFONDO_UFFICIALE_CAMPO_PREVIEW.mp4' (1920x1080, 25 fps, 40 s, 10.9 MB): 'fac simile per avviare il lavoro da mettere nella web link sponsor e iniziare a pubblicizzare'",
+      "git_blob_sha": "b9d9d911d3c5006d08bffed946c9874319903a28",
+      "transform": "ffmpeg libx264 profile high (level 3.1), preset slow, CRF 26, 1280x720 Lanczos, yuv420p, audio removed, +faststart",
+      "use": "/sponsor section 'Il tuo marchio sul ledwall del campo' (src/components/LedwallFacsimile.tsx)",
+      "note": "demo, not a contract claim: the example sponsor shown on the LED board is HDI Maglia Assicurazioni; the page labels it 'Fac-simile · esempio di rotazione' and never states it is a club sponsor",
+      "verified_at": "2026-10-13"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/ledwall-facsimile-1080.mp4",
+      "class": "LED_DEMO_VIDEO",
+      "status": "VERIFIED",
+      "asset_decision": "KEEP_ENHANCE",
+      "source": "Direzione upload 2026-10-13 'SFONDO_UFFICIALE_CAMPO_PREVIEW.mp4' (1920x1080, 25 fps, 40 s, 10.9 MB): 'fac simile per avviare il lavoro da mettere nella web link sponsor e iniziare a pubblicizzare'",
+      "git_blob_sha": "7f50a61855cc3d9d740e9b32fbedb067929b716a",
+      "transform": "ffmpeg libx264 profile high level 4.0, preset slow, CRF 26, 1920x1080, yuv420p, audio removed, +faststart; served only with media (min-width: 1200px)",
+      "use": "/sponsor section 'Il tuo marchio sul ledwall del campo' (src/components/LedwallFacsimile.tsx)",
+      "note": "demo, not a contract claim: the example sponsor shown on the LED board is HDI Maglia Assicurazioni; the page labels it 'Fac-simile · esempio di rotazione' and never states it is a club sponsor",
+      "verified_at": "2026-10-13"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/ledwall-facsimile-poster.webp",
+      "class": "VIDEO_POSTER",
+      "status": "VERIFIED",
+      "asset_decision": "KEEP_ENHANCE",
+      "source": "Direzione upload 2026-10-13 'SFONDO_UFFICIALE_CAMPO_PREVIEW.mp4' (1920x1080, 25 fps, 40 s, 10.9 MB): 'fac simile per avviare il lavoro da mettere nella web link sponsor e iniziare a pubblicizzare'",
+      "git_blob_sha": "6862f129e656033cae5a2c9bace442628852f8df",
+      "transform": "frame at 6.6 s (full message on the board), 1280x720 Lanczos, WebP q80",
+      "use": "/sponsor section 'Il tuo marchio sul ledwall del campo' (src/components/LedwallFacsimile.tsx)",
+      "note": "demo, not a contract claim: the example sponsor shown on the LED board is HDI Maglia Assicurazioni; the page labels it 'Fac-simile · esempio di rotazione' and never states it is a club sponsor",
+      "verified_at": "2026-10-13"
     }
   ],
   "vector_research": [

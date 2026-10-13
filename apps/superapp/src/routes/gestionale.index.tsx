@@ -11,6 +11,7 @@ import {
 import { useMemo, useState } from "react";
 
 import { InteriorShell } from "@/components/scd/InteriorShell";
+import { areaBadgeFor } from "@/lib/internal-badges";
 import {
   Card,
   Chip,
@@ -147,6 +148,7 @@ function GestionalePage() {
       title="Gestionale sportivo"
       path="/gestionale"
       activeAreaId="gestionale"
+      badge={areaBadgeFor("gestionale")}
       roles={PREVIEW_ROLES}
       roleLabel="Anteprima staff"
       highlights={[

@@ -11,6 +11,7 @@ import { Lock, MessageCircle } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 
 import { InteriorShell } from "@/components/scd/InteriorShell";
+import { areaBadgeFor } from "@/lib/internal-badges";
 import { SkyMascot } from "@/components/SkyChat";
 import type { AssistantAction } from "@/lib/facility-assistant";
 import {
@@ -221,6 +222,7 @@ function Tool({
             : "Anteprima staging"
         }
         highlights={highlights}
+        badge={areaBadgeFor("impianti-campi")}
       >
         <div className={`grid grid-cols-[minmax(0,1fr)] gap-[18px] ${sky ? "lg:pr-[416px]" : ""}`}>
           {preview && (

@@ -2525,6 +2525,35 @@
           "apps/superapp/src/routes/direzione.tsx"
         ]
       }
+    },
+    {
+      "sourceDate": "2026-10-13",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-106",
+      "name": "INTERNAL_BADGES_AND_LEDWALL_FACSIMILE",
+      "sourceQuoteFragments": [
+        "immagini fatte come interne, da usare nella super app",
+        "fac simile per avviare il lavoro da mettere nella web link sponsor e iniziare a pubblicizzare"
+      ],
+      "normalizedCommand": {
+        "rule": "Club-made area badges (Lavoro, Staff & Dirigenti, Segreteria, Responsabili attività) and minibus line badges (Pulmino 1 Lago, 2 Lecco, 3 Valtellina, 4 Chiavenna) are used only in the reserved areas, next to the matching area title or line; never on public pages, never in place of the official crest. The LED board video is a fac-simile on the sponsor web link /sponsor, labelled as an example of rotation, with no claim that the example brand is a club sponsor.",
+        "scope": "INTERNAL_AREAS_AND_SPONSOR_LINK",
+        "constraints": [
+          "exact-name mapping only: the combined master line LAGO/LECCO gets no badge until the master splits it",
+          "Direzione, Tesoreria and other areas without their own badge stay without one",
+          "video muted, no autoplay with prefers-reduced-motion, CTA reuses the existing proposal form (no mail sent)"
+        ],
+        "status": "IMPLEMENTED_BRANCH_AGENT_BADGES",
+        "delivered": [
+          "apps/superapp/src/lib/internal-badges.ts (+ tests)",
+          "apps/superapp/src/components/scd/InternalBadge.tsx, InteriorShell.tsx, work-area-ui.tsx",
+          "apps/superapp/src/routes/pulmini.tsx (Per linea)",
+          "apps/superapp/src/components/LedwallFacsimile.tsx, routes/sponsor.tsx",
+          "apps/superapp/public/media/interno/, public/media/sponsor/ledwall-facsimile-*",
+          "config/scd-assets.v1.json (INTERNAL_BADGE, LED_DEMO_VIDEO, VIDEO_POSTER, rule VIDEO)"
+        ]
+      }
     }
   ],
   "completionGate": {

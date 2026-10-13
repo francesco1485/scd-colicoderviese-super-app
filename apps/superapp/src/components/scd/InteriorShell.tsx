@@ -4,7 +4,9 @@ import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from "rea
 
 import crest from "@/assets/brand/logo-scd.png.asset.json";
 import { areaLink, formatClubDay, railFor, searchAreas, stripValue, type RailGroup, type StripItem } from "@/lib/areas";
+import type { InternalBadge } from "@/lib/internal-badges";
 import { AREA_ICON } from "./area-icons";
+import { InternalBadgeImage } from "./InternalBadge";
 
 export interface InteriorShellProps {
   /** Page title (board: Big Shoulders 800). */
@@ -21,6 +23,8 @@ export interface InteriorShellProps {
   highlights?: readonly StripItem[];
   /** Injected for tests and screenshots; defaults to now. */
   today?: Date;
+  /** Club-made area badge next to the title (src/lib/internal-badges.ts). Reserved pages only: never on access screens. */
+  badge?: InternalBadge | undefined;
   children: ReactNode;
 }
 
@@ -201,7 +205,7 @@ export function HighlightStrip({ items }: { items: readonly StripItem[] }) {
  * date and search, optional dark "in evidenza" strip, ground #F2F7FC body.
  * Phone: the rail becomes a drawer behind a compact blue bar; same product, same data.
  */
-export function InteriorShell({ title, path, activeAreaId, roles, roleLabel, highlights, today, children }: InteriorShellProps) {
+export function InteriorShell({ title, path, activeAreaId, roles, roleLabel, highlights, today, badge, children }: InteriorShellProps) {
   const groups = useMemo(() => railFor(roles), [roles]);
   const [drawer, setDrawer] = useState(false);
   const [day, setDay] = useState(() => formatClubDay(today ?? new Date()));
@@ -244,7 +248,14 @@ export function InteriorShell({ title, path, activeAreaId, roles, roleLabel, hig
 
         {/* Phones: title only (UD-057); path chip, date and search are desktop furniture. */}
         <header className="ex-header flex flex-wrap items-center gap-x-4 gap-y-3 px-4 py-3 sm:px-8 lg:min-h-[72px] lg:flex-nowrap lg:py-0">
-          <h1 className="ex-title ex-header-title m-0 text-[22px] lg:text-[30px]">{title}</h1>
+          {badge ? (
+            <span className="flex min-w-0 items-center gap-2.5 lg:gap-3.5" data-testid="area-badge">
+              <InternalBadgeImage badge={badge} size={52} className="size-10 lg:size-[52px]" />
+              <h1 className="ex-title ex-header-title m-0 min-w-0 text-[22px] lg:text-[30px]">{title}</h1>
+            </span>
+          ) : (
+            <h1 className="ex-title ex-header-title m-0 text-[22px] lg:text-[30px]">{title}</h1>
+          )}
           <span className="hidden lg:contents">
             <PathChip path={path} />
             <span className="whitespace-nowrap text-[14px] text-[var(--in-sub)] lg:ml-auto" suppressHydrationWarning>{day}</span>

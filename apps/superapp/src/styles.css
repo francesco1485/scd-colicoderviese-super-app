@@ -691,6 +691,11 @@ html.uv-big .sa-shell { zoom: 1.12; }
 }
 .ex-rail-link[aria-current="page"] svg { color: var(--ex-gold); }
 
+/* Club-made internal badges (src/lib/internal-badges.ts): a coin set into the page, never a crest substitute. */
+.scd-excelsior .scd-internal-badge {
+  filter: drop-shadow(0 1px 1px rgb(11 27 51 / 0.18)) drop-shadow(0 6px 10px rgb(11 27 51 / 0.16));
+}
+
 /* Header: warm white, hairline, a short gold rule under the title like a collar piping. */
 .ex-header { background: var(--ex-cream); box-shadow: inset 0 -1px 0 var(--ex-hair); }
 .ex-header-title { position: relative; padding-bottom: 6px; }
