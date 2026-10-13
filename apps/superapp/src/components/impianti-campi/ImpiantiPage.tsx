@@ -5,6 +5,7 @@
  * Access: verified session with an allowed club position, or the staging
  * preview with a visible banner; otherwise the area access screen.
  */
+import { EMPTY_QUADRO_SNAPSHOT, type QuadroSnapshot } from "@/features/impianti/snapshot";
 import { Link, Outlet, useNavigate } from "@tanstack/react-router";
 import { Lock, MessageCircle } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
@@ -137,10 +138,12 @@ export function AccessScreen({
 
 function Tool({
   access,
+  quadro,
   preview,
   position,
 }: {
   access: ImpiantiAccessState;
+  quadro: QuadroSnapshot;
   preview: boolean;
   position: string | null;
 }) {
@@ -194,6 +197,7 @@ function Tool({
   const ctx = useMemo<ImpiantiContextValue>(
     () => ({
       model,
+      quadro,
       preview,
       position,
       requestedBy,
@@ -201,7 +205,7 @@ function Tool({
       draft,
       setDraft,
     }),
-    [model, preview, position, requestedBy, canApprove, draft],
+    [model, quadro, preview, position, requestedBy, canApprove, draft],
   );
 
   return (
@@ -277,7 +281,7 @@ function Tool({
   );
 }
 
-export function ImpiantiLayout({ access }: { access: ImpiantiAccessState }) {
+export function ImpiantiLayout({ access, quadro }: { access: ImpiantiAccessState; quadro: QuadroSnapshot | null }) {
   const decision = impiantiAccess(access.session, access.stagingPreview);
   if (decision.mode === "access") {
     return (
@@ -295,6 +299,7 @@ export function ImpiantiLayout({ access }: { access: ImpiantiAccessState }) {
   return (
     <Tool
       access={access}
+      quadro={quadro ?? EMPTY_QUADRO_SNAPSHOT}
       preview={decision.mode === "preview"}
       position={decision.mode === "tool" ? decision.position : null}
     />

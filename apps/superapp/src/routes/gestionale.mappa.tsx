@@ -5,15 +5,16 @@ import { FacilityCorrection, FacilityMap } from "@/components/scd/FacilityMap";
 import { InteriorShell } from "@/components/scd/InteriorShell";
 import { Card, SnapshotNotice, SourceLine } from "@/components/scd/interior-ui";
 import { FACILITIES } from "@/lib/facilities";
-import { freshnessLabel, loadQuadro } from "@/lib/public-snapshots";
+import { freshnessLabel } from "@/lib/public-snapshots";
+import { getTrainingQuadro } from "@/lib/quadro.functions";
 
 /** Role set of this preview: no login yet, so only areas open to every staff role appear in the rail. */
 const PREVIEW_ROLES: ReadonlySet<string> = new Set();
 
 export const Route = createFileRoute("/gestionale/mappa")({
   staticData: { interior: true },
-  loader: () => {
-    const q = loadQuadro();
+  loader: async () => {
+    const { quadro: q } = await getTrainingQuadro();
     return { slots: q.slots, quadroUTC: q.generatedUTC };
   },
   head: () => ({

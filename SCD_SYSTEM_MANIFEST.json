@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.33.0",
+    "version": "3.33.1",
     "effective_at": "2026-10-13",
     "status": "BINDING",
     "language": "it-IT",
@@ -4486,7 +4486,8 @@
       "deep_link_calendar": true,
       "audience": "SIGNED_IN_MEMBERS_ONLY",
       "public_exposure": "NONE_TEAMS_INSIDE_UD100_PUBLIC_GETS_FIXTURES_ONLY",
-      "training_schedule": "SIGNED_IN_MEMBERS_ONLY"
+      "training_schedule": "SIGNED_IN_MEMBERS_ONLY",
+      "training_quadro_delivery": "SERVER_FUNCTION_MEMBERS_OR_STAGING_PREVIEW_NEVER_IN_CLIENT_BUNDLE"
     },
     "solidarity_fund": {
       "state": "PUBLIC_DONATION_REPORTING_UI_READY_SOURCE_ADAPTER_BLOCKED",

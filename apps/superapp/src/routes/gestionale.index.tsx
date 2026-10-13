@@ -1,3 +1,4 @@
+import { getTrainingQuadro } from "@/lib/quadro.functions";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   AlertTriangle,
@@ -33,7 +34,6 @@ import {
 import {
   freshnessLabel,
   loadCalendar,
-  loadQuadro,
   type PublicEvent,
 } from "@/lib/public-snapshots";
 import {
@@ -57,9 +57,9 @@ const R20_PENDING = "dato da collegare a R20";
 
 export const Route = createFileRoute("/gestionale/")({
   staticData: { interior: true },
-  loader: () => {
+  loader: async () => {
     const cal = loadCalendar();
-    const q = loadQuadro();
+    const { quadro: q } = await getTrainingQuadro();
     return {
       groups: cal.groups,
       events: cal.events,

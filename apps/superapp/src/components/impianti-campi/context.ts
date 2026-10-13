@@ -2,10 +2,14 @@
 import { createContext, useContext } from "react";
 
 import type { BookingDraft } from "./BookingPlanner";
+import type { QuadroSnapshot } from "@/features/impianti/snapshot";
+
 import type { ImpiantiModel } from "./model";
 
 export interface ImpiantiContextValue {
   model: ImpiantiModel;
+  /** Training quadro from getTrainingQuadro (members or staging preview only, never bundled: UD-100). */
+  quadro: QuadroSnapshot;
   /** Staging preview (no verified session). */
   preview: boolean;
   /** Verified club position, or null in preview. */

@@ -50,7 +50,8 @@ export const askSky = createServerFn({ method: "POST" })
 
     if (intent === "allenamenti") {
       // Solo indirizzamento al quadro allenamenti, che è nell'area soci (UD-100): nessun orario affermato in chat.
-      const { loadQuadro, findSessions, normalizeGroupText } = await import("./public-snapshots");
+      const { findSessions, normalizeGroupText } = await import("./public-snapshots");
+      const { loadQuadro } = await import("./quadro-data.server");
       const { slots } = loadQuadro();
       const year = data.message.match(/(?<!\d)20[0-2]\d(?!\d)/)?.[0];
       const cat = normalizeGroupText(data.message).match(/\bu\d{2}\b|prima squadra|juniores/)?.[0];

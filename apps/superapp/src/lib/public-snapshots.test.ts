@@ -1,5 +1,6 @@
+import { loadQuadro } from "./quadro-data.server";
 import { describe, expect, test } from "vitest";
-import { loadCalendar, loadQuadro } from "./public-snapshots";
+import { loadCalendar } from "./public-snapshots";
 
 const PII_RE = /@|\+39|\b3\d{9}\b|targa|autista|telefono/i;
 

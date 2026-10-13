@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
 import { AlertTriangle, Bus, Home, Plane } from 'lucide-react';
 import { calendario, verificationLabels, SNAPSHOT_WATERMARK, type CalEvent } from './snapshot';
-import { activeGroups, nextForGroup, trainingsForGroup, fieldOf, yearOf, romeToday, sectorEvents, byDate, possibleOverlaps, familyLink, PERIODS, type Period, type SectorFilter } from './teamSector';
+import { activeGroups, nextForGroup, trainingsFor, fieldOf, yearOf, romeToday, sectorEvents, byDate, possibleOverlaps, familyLink, PERIODS, type Period, type SectorFilter } from './teamSector';
+import { useQuadro } from './quadro-context';
 import { DERVIO_ZONES, DERVIO_STATUS, DERVIO_CAPTION, type DervioZoneId } from './dervio';
 import dervioSvg from './assets/dervio-plan.svg?raw';
 import { SourceLink, Watermark } from './SourceLink';
@@ -20,11 +21,12 @@ function EventRow({ e }: { e: CalEvent }) {
 }
 
 export function LaMiaSquadra() {
+  const quadro = useQuadro();
   const groups = useMemo(() => activeGroups(calendario.events), []);
   const [g, setG] = useState(groups.includes('2015') ? '2015' : groups[0] ?? '');
   const today = romeToday();
   const next = nextForGroup(calendario.events, g, today);
-  const tr = trainingsForGroup(g);
+  const tr = trainingsFor(quadro, g);
   const year = yearOf(groupLabel(g));
   return <section aria-labelledby="h-team">
     <h2 id="h-team">La mia squadra</h2>

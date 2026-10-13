@@ -30,12 +30,12 @@ import {
   findSessions,
   freshnessLabel,
   loadCalendar,
-  loadQuadro,
   type PublicEvent,
   type PublicGroup,
   type TrainingSlot,
 } from "@/lib/public-snapshots";
 import { dayLabel, teamSummaries, type TeamSummary } from "@/lib/quadro";
+import { getTrainingQuadro } from "@/lib/quadro.functions";
 import { getWorkAreaGate } from "@/lib/work-areas.functions";
 import { certificateState, type CertState } from "@/lib/people";
 import {
@@ -67,7 +67,7 @@ export const Route = createFileRoute("/gestionale/mister")({
     const gate = await getWorkAreaGate({ data: { area: "mister" } });
     if (gate.view !== "page") return { gate, interior: false as const };
     const cal = loadCalendar();
-    const q = loadQuadro();
+    const { quadro: q } = await getTrainingQuadro();
     const roster = await getMyRoster();
     return {
       gate,

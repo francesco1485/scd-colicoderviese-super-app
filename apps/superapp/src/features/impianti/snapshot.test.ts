@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest';
-import { quadro, calendario, trasporti, filterEvents, slotsForDay, rotationFor, roomsFor, logoFor, rangeOf, shiftAnchor, mondayOf, activeEvents, coreSteps, rubricaGroups, ROOMS } from './snapshot';
+import { QUADRO_SNAPSHOT as quadro } from '@/lib/quadro-data.server';
+import { calendario, trasporti, filterEvents, slotsForDay, rotationFor, roomsFor, logoFor, rangeOf, shiftAnchor, mondayOf, activeEvents, coreSteps, rubricaGroups, ROOMS } from './snapshot';
 import { sources } from './sources';
 
 describe('Snapshot Quadro', () => {

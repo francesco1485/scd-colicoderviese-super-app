@@ -4,7 +4,8 @@ import { Search, X } from "lucide-react";
 
 import { useRomeNow } from "@/components/scd/interior-ui";
 import { SNAPSHOT_BANNER } from "@/lib/public-snapshots";
-import { EMPTY_MESSAGE, fieldMatches, findSessions, loadQuadro, type TrainingSlot } from "@/lib/public-snapshots";
+import { EMPTY_MESSAGE, fieldMatches, findSessions, type TrainingSlot } from "@/lib/public-snapshots";
+import { getTrainingQuadro } from "@/lib/quadro.functions";
 import { defaultDay, isFree, minutesOf, pitchZones, slotStates, weekdayKey, type PitchZone, type SlotState } from "@/lib/training-view";
 import { peopleOnPitch, type StaffPerson } from "@/lib/staff-roster";
 import { getStaffEmails, getStaffRoster } from "@/lib/staff-roster.functions";
@@ -27,8 +28,8 @@ export const Route = createFileRoute("/allenamenti")({
   loader: async ({ location }) => {
     const session = await getSession();
     if (!session.user) throw redirect({ to: "/accedi", search: { next: location.href } });
-    const [roster, emails] = await Promise.all([getStaffRoster(), getStaffEmails()]);
-    return { ...loadQuadro(), people: roster.people, emails };
+    const [roster, emails, training] = await Promise.all([getStaffRoster(), getStaffEmails(), getTrainingQuadro()]);
+    return { ...training.quadro, people: roster.people, emails };
   },
   head: () => ({
     meta: [
