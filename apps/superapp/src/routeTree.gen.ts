@@ -71,11 +71,14 @@ import { Route as SegreteriaCertificatiRouteImport } from './routes/segreteria_.
 import { Route as SegreteriaPersoneRouteImport } from './routes/segreteria_.persone'
 import { Route as SquadreTeamRouteImport } from './routes/squadre_.$team'
 import { Route as TesoreriaBiglietteriaRouteImport } from './routes/tesoreria_.biglietteria'
+import { Route as TesoreriaCalendarioIncassiRouteImport } from './routes/tesoreria_.calendario-incassi'
+import { Route as TesoreriaChiusuraRouteImport } from './routes/tesoreria_.chiusura'
 import { Route as TesoreriaClubHouseRouteImport } from './routes/tesoreria_.club-house'
 import { Route as TesoreriaCompensiRouteImport } from './routes/tesoreria_.compensi'
 import { Route as TesoreriaFornitoriRouteImport } from './routes/tesoreria_.fornitori'
 import { Route as TesoreriaMagazzinoRouteImport } from './routes/tesoreria_.magazzino'
 import { Route as TesoreriaMovimentiRouteImport } from './routes/tesoreria_.movimenti'
+import { Route as TesoreriaPrimaNotaRouteImport } from './routes/tesoreria_.prima-nota'
 import { Route as TesoreriaQuoteRouteImport } from './routes/tesoreria_.quote'
 import { Route as GestionaleImpiantiIndexRouteImport } from './routes/gestionale_.impianti.index'
 import { Route as GestionaleImpiantiApprovazioniRouteImport } from './routes/gestionale_.impianti.approvazioni'
@@ -395,6 +398,17 @@ const TesoreriaBiglietteriaRoute = TesoreriaBiglietteriaRouteImport.update({
   path: '/tesoreria/biglietteria',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TesoreriaCalendarioIncassiRoute =
+  TesoreriaCalendarioIncassiRouteImport.update({
+    id: '/tesoreria_/calendario-incassi',
+    path: '/tesoreria/calendario-incassi',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const TesoreriaChiusuraRoute = TesoreriaChiusuraRouteImport.update({
+  id: '/tesoreria_/chiusura',
+  path: '/tesoreria/chiusura',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TesoreriaClubHouseRoute = TesoreriaClubHouseRouteImport.update({
   id: '/tesoreria_/club-house',
   path: '/tesoreria/club-house',
@@ -418,6 +432,11 @@ const TesoreriaMagazzinoRoute = TesoreriaMagazzinoRouteImport.update({
 const TesoreriaMovimentiRoute = TesoreriaMovimentiRouteImport.update({
   id: '/tesoreria_/movimenti',
   path: '/tesoreria/movimenti',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TesoreriaPrimaNotaRoute = TesoreriaPrimaNotaRouteImport.update({
+  id: '/tesoreria_/prima-nota',
+  path: '/tesoreria/prima-nota',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TesoreriaQuoteRoute = TesoreriaQuoteRouteImport.update({
@@ -517,11 +536,14 @@ export interface FileRoutesByFullPath {
   '/segreteria/persone': typeof SegreteriaPersoneRoute
   '/squadre/$team': typeof SquadreTeamRoute
   '/tesoreria/biglietteria': typeof TesoreriaBiglietteriaRoute
+  '/tesoreria/calendario-incassi': typeof TesoreriaCalendarioIncassiRoute
+  '/tesoreria/chiusura': typeof TesoreriaChiusuraRoute
   '/tesoreria/club-house': typeof TesoreriaClubHouseRoute
   '/tesoreria/compensi': typeof TesoreriaCompensiRoute
   '/tesoreria/fornitori': typeof TesoreriaFornitoriRoute
   '/tesoreria/magazzino': typeof TesoreriaMagazzinoRoute
   '/tesoreria/movimenti': typeof TesoreriaMovimentiRoute
+  '/tesoreria/prima-nota': typeof TesoreriaPrimaNotaRoute
   '/tesoreria/quote': typeof TesoreriaQuoteRoute
   '/accedi/': typeof AccediIndexRoute
   '/aree/': typeof AreeIndexRoute
@@ -592,11 +614,14 @@ export interface FileRoutesByTo {
   '/segreteria/persone': typeof SegreteriaPersoneRoute
   '/squadre/$team': typeof SquadreTeamRoute
   '/tesoreria/biglietteria': typeof TesoreriaBiglietteriaRoute
+  '/tesoreria/calendario-incassi': typeof TesoreriaCalendarioIncassiRoute
+  '/tesoreria/chiusura': typeof TesoreriaChiusuraRoute
   '/tesoreria/club-house': typeof TesoreriaClubHouseRoute
   '/tesoreria/compensi': typeof TesoreriaCompensiRoute
   '/tesoreria/fornitori': typeof TesoreriaFornitoriRoute
   '/tesoreria/magazzino': typeof TesoreriaMagazzinoRoute
   '/tesoreria/movimenti': typeof TesoreriaMovimentiRoute
+  '/tesoreria/prima-nota': typeof TesoreriaPrimaNotaRoute
   '/tesoreria/quote': typeof TesoreriaQuoteRoute
   '/accedi': typeof AccediIndexRoute
   '/aree': typeof AreeIndexRoute
@@ -669,11 +694,14 @@ export interface FileRoutesById {
   '/segreteria_/persone': typeof SegreteriaPersoneRoute
   '/squadre_/$team': typeof SquadreTeamRoute
   '/tesoreria_/biglietteria': typeof TesoreriaBiglietteriaRoute
+  '/tesoreria_/calendario-incassi': typeof TesoreriaCalendarioIncassiRoute
+  '/tesoreria_/chiusura': typeof TesoreriaChiusuraRoute
   '/tesoreria_/club-house': typeof TesoreriaClubHouseRoute
   '/tesoreria_/compensi': typeof TesoreriaCompensiRoute
   '/tesoreria_/fornitori': typeof TesoreriaFornitoriRoute
   '/tesoreria_/magazzino': typeof TesoreriaMagazzinoRoute
   '/tesoreria_/movimenti': typeof TesoreriaMovimentiRoute
+  '/tesoreria_/prima-nota': typeof TesoreriaPrimaNotaRoute
   '/tesoreria_/quote': typeof TesoreriaQuoteRoute
   '/accedi/': typeof AccediIndexRoute
   '/aree/': typeof AreeIndexRoute
@@ -747,11 +775,14 @@ export interface FileRouteTypes {
     | '/segreteria/persone'
     | '/squadre/$team'
     | '/tesoreria/biglietteria'
+    | '/tesoreria/calendario-incassi'
+    | '/tesoreria/chiusura'
     | '/tesoreria/club-house'
     | '/tesoreria/compensi'
     | '/tesoreria/fornitori'
     | '/tesoreria/magazzino'
     | '/tesoreria/movimenti'
+    | '/tesoreria/prima-nota'
     | '/tesoreria/quote'
     | '/accedi/'
     | '/aree/'
@@ -822,11 +853,14 @@ export interface FileRouteTypes {
     | '/segreteria/persone'
     | '/squadre/$team'
     | '/tesoreria/biglietteria'
+    | '/tesoreria/calendario-incassi'
+    | '/tesoreria/chiusura'
     | '/tesoreria/club-house'
     | '/tesoreria/compensi'
     | '/tesoreria/fornitori'
     | '/tesoreria/magazzino'
     | '/tesoreria/movimenti'
+    | '/tesoreria/prima-nota'
     | '/tesoreria/quote'
     | '/accedi'
     | '/aree'
@@ -898,11 +932,14 @@ export interface FileRouteTypes {
     | '/segreteria_/persone'
     | '/squadre_/$team'
     | '/tesoreria_/biglietteria'
+    | '/tesoreria_/calendario-incassi'
+    | '/tesoreria_/chiusura'
     | '/tesoreria_/club-house'
     | '/tesoreria_/compensi'
     | '/tesoreria_/fornitori'
     | '/tesoreria_/magazzino'
     | '/tesoreria_/movimenti'
+    | '/tesoreria_/prima-nota'
     | '/tesoreria_/quote'
     | '/accedi/'
     | '/aree/'
@@ -975,11 +1012,14 @@ export interface RootRouteChildren {
   SegreteriaPersoneRoute: typeof SegreteriaPersoneRoute
   SquadreTeamRoute: typeof SquadreTeamRoute
   TesoreriaBiglietteriaRoute: typeof TesoreriaBiglietteriaRoute
+  TesoreriaCalendarioIncassiRoute: typeof TesoreriaCalendarioIncassiRoute
+  TesoreriaChiusuraRoute: typeof TesoreriaChiusuraRoute
   TesoreriaClubHouseRoute: typeof TesoreriaClubHouseRoute
   TesoreriaCompensiRoute: typeof TesoreriaCompensiRoute
   TesoreriaFornitoriRoute: typeof TesoreriaFornitoriRoute
   TesoreriaMagazzinoRoute: typeof TesoreriaMagazzinoRoute
   TesoreriaMovimentiRoute: typeof TesoreriaMovimentiRoute
+  TesoreriaPrimaNotaRoute: typeof TesoreriaPrimaNotaRoute
   TesoreriaQuoteRoute: typeof TesoreriaQuoteRoute
   AccediIndexRoute: typeof AccediIndexRoute
   AreeIndexRoute: typeof AreeIndexRoute
@@ -1425,6 +1465,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TesoreriaBiglietteriaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tesoreria_/calendario-incassi': {
+      id: '/tesoreria_/calendario-incassi'
+      path: '/tesoreria/calendario-incassi'
+      fullPath: '/tesoreria/calendario-incassi'
+      preLoaderRoute: typeof TesoreriaCalendarioIncassiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tesoreria_/chiusura': {
+      id: '/tesoreria_/chiusura'
+      path: '/tesoreria/chiusura'
+      fullPath: '/tesoreria/chiusura'
+      preLoaderRoute: typeof TesoreriaChiusuraRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tesoreria_/club-house': {
       id: '/tesoreria_/club-house'
       path: '/tesoreria/club-house'
@@ -1458,6 +1512,13 @@ declare module '@tanstack/react-router' {
       path: '/tesoreria/movimenti'
       fullPath: '/tesoreria/movimenti'
       preLoaderRoute: typeof TesoreriaMovimentiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tesoreria_/prima-nota': {
+      id: '/tesoreria_/prima-nota'
+      path: '/tesoreria/prima-nota'
+      fullPath: '/tesoreria/prima-nota'
+      preLoaderRoute: typeof TesoreriaPrimaNotaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tesoreria_/quote': {
@@ -1590,11 +1651,14 @@ const rootRouteChildren: RootRouteChildren = {
   SegreteriaPersoneRoute: SegreteriaPersoneRoute,
   SquadreTeamRoute: SquadreTeamRoute,
   TesoreriaBiglietteriaRoute: TesoreriaBiglietteriaRoute,
+  TesoreriaCalendarioIncassiRoute: TesoreriaCalendarioIncassiRoute,
+  TesoreriaChiusuraRoute: TesoreriaChiusuraRoute,
   TesoreriaClubHouseRoute: TesoreriaClubHouseRoute,
   TesoreriaCompensiRoute: TesoreriaCompensiRoute,
   TesoreriaFornitoriRoute: TesoreriaFornitoriRoute,
   TesoreriaMagazzinoRoute: TesoreriaMagazzinoRoute,
   TesoreriaMovimentiRoute: TesoreriaMovimentiRoute,
+  TesoreriaPrimaNotaRoute: TesoreriaPrimaNotaRoute,
   TesoreriaQuoteRoute: TesoreriaQuoteRoute,
   AccediIndexRoute: AccediIndexRoute,
   AreeIndexRoute: AreeIndexRoute,
