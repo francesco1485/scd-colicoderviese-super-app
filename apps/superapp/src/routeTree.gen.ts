@@ -29,12 +29,14 @@ import { Route as GuidaRouteImport } from './routes/guida'
 import { Route as ImpiantiRouteImport } from './routes/impianti'
 import { Route as InfermeriaRouteImport } from './routes/infermeria'
 import { Route as InstallaRouteImport } from './routes/installa'
+import { Route as KitRouteImport } from './routes/kit'
 import { Route as LaMiaScdRouteImport } from './routes/la-mia-scd'
 import { Route as MagazzinoRouteImport } from './routes/magazzino'
 import { Route as PartnerRouteImport } from './routes/partner'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PulminiRouteImport } from './routes/pulmini'
 import { Route as RassegnaRouteImport } from './routes/rassegna'
+import { Route as RassegnaStampaRouteImport } from './routes/rassegna-stampa'
 import { Route as RegistratiRouteImport } from './routes/registrati'
 import { Route as SafeguardingRouteImport } from './routes/safeguarding'
 import { Route as SegreteriaRouteImport } from './routes/segreteria'
@@ -44,6 +46,7 @@ import { Route as SponsorRouteImport } from './routes/sponsor'
 import { Route as SquadreRouteImport } from './routes/squadre'
 import { Route as TesoreriaRouteImport } from './routes/tesoreria'
 import { Route as Top11RouteImport } from './routes/top11'
+import { Route as TorneiRouteImport } from './routes/tornei'
 import { Route as AccediIndexRouteImport } from './routes/accedi.index'
 import { Route as AccediConfermaRouteImport } from './routes/accedi.conferma'
 import { Route as AccediPasswordRouteImport } from './routes/accedi.password'
@@ -198,6 +201,11 @@ const InstallaRoute = InstallaRouteImport.update({
   path: '/installa',
   getParentRoute: () => rootRouteImport,
 } as any)
+const KitRoute = KitRouteImport.update({
+  id: '/kit',
+  path: '/kit',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LaMiaScdRoute = LaMiaScdRouteImport.update({
   id: '/la-mia-scd',
   path: '/la-mia-scd',
@@ -226,6 +234,11 @@ const PulminiRoute = PulminiRouteImport.update({
 const RassegnaRoute = RassegnaRouteImport.update({
   id: '/rassegna',
   path: '/rassegna',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RassegnaStampaRoute = RassegnaStampaRouteImport.update({
+  id: '/rassegna-stampa',
+  path: '/rassegna-stampa',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RegistratiRoute = RegistratiRouteImport.update({
@@ -271,6 +284,11 @@ const TesoreriaRoute = TesoreriaRouteImport.update({
 const Top11Route = Top11RouteImport.update({
   id: '/top11',
   path: '/top11',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TorneiRoute = TorneiRouteImport.update({
+  id: '/tornei',
+  path: '/tornei',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AccediIndexRoute = AccediIndexRouteImport.update({
@@ -568,12 +586,14 @@ export interface FileRoutesByFullPath {
   '/impianti': typeof ImpiantiRoute
   '/infermeria': typeof InfermeriaRoute
   '/installa': typeof InstallaRoute
+  '/kit': typeof KitRoute
   '/la-mia-scd': typeof LaMiaScdRoute
   '/magazzino': typeof MagazzinoRoute
   '/partner': typeof PartnerRoute
   '/privacy': typeof PrivacyRoute
   '/pulmini': typeof PulminiRoute
   '/rassegna': typeof RassegnaRoute
+  '/rassegna-stampa': typeof RassegnaStampaRoute
   '/registrati': typeof RegistratiRoute
   '/safeguarding': typeof SafeguardingRoute
   '/segreteria': typeof SegreteriaRoute
@@ -583,6 +603,7 @@ export interface FileRoutesByFullPath {
   '/squadre': typeof SquadreRoute
   '/tesoreria': typeof TesoreriaRoute
   '/top11': typeof Top11Route
+  '/tornei': typeof TorneiRoute
   '/accedi/conferma': typeof AccediConfermaRoute
   '/accedi/password': typeof AccediPasswordRoute
   '/aree/$area': typeof AreeAreaRoute
@@ -658,12 +679,14 @@ export interface FileRoutesByTo {
   '/impianti': typeof ImpiantiRoute
   '/infermeria': typeof InfermeriaRoute
   '/installa': typeof InstallaRoute
+  '/kit': typeof KitRoute
   '/la-mia-scd': typeof LaMiaScdRoute
   '/magazzino': typeof MagazzinoRoute
   '/partner': typeof PartnerRoute
   '/privacy': typeof PrivacyRoute
   '/pulmini': typeof PulminiRoute
   '/rassegna': typeof RassegnaRoute
+  '/rassegna-stampa': typeof RassegnaStampaRoute
   '/registrati': typeof RegistratiRoute
   '/safeguarding': typeof SafeguardingRoute
   '/segreteria': typeof SegreteriaRoute
@@ -673,6 +696,7 @@ export interface FileRoutesByTo {
   '/squadre': typeof SquadreRoute
   '/tesoreria': typeof TesoreriaRoute
   '/top11': typeof Top11Route
+  '/tornei': typeof TorneiRoute
   '/accedi/conferma': typeof AccediConfermaRoute
   '/accedi/password': typeof AccediPasswordRoute
   '/aree/$area': typeof AreeAreaRoute
@@ -748,12 +772,14 @@ export interface FileRoutesById {
   '/impianti': typeof ImpiantiRoute
   '/infermeria': typeof InfermeriaRoute
   '/installa': typeof InstallaRoute
+  '/kit': typeof KitRoute
   '/la-mia-scd': typeof LaMiaScdRoute
   '/magazzino': typeof MagazzinoRoute
   '/partner': typeof PartnerRoute
   '/privacy': typeof PrivacyRoute
   '/pulmini': typeof PulminiRoute
   '/rassegna': typeof RassegnaRoute
+  '/rassegna-stampa': typeof RassegnaStampaRoute
   '/registrati': typeof RegistratiRoute
   '/safeguarding': typeof SafeguardingRoute
   '/segreteria': typeof SegreteriaRoute
@@ -763,6 +789,7 @@ export interface FileRoutesById {
   '/squadre': typeof SquadreRoute
   '/tesoreria': typeof TesoreriaRoute
   '/top11': typeof Top11Route
+  '/tornei': typeof TorneiRoute
   '/accedi/conferma': typeof AccediConfermaRoute
   '/accedi/password': typeof AccediPasswordRoute
   '/aree/$area': typeof AreeAreaRoute
@@ -840,12 +867,14 @@ export interface FileRouteTypes {
     | '/impianti'
     | '/infermeria'
     | '/installa'
+    | '/kit'
     | '/la-mia-scd'
     | '/magazzino'
     | '/partner'
     | '/privacy'
     | '/pulmini'
     | '/rassegna'
+    | '/rassegna-stampa'
     | '/registrati'
     | '/safeguarding'
     | '/segreteria'
@@ -855,6 +884,7 @@ export interface FileRouteTypes {
     | '/squadre'
     | '/tesoreria'
     | '/top11'
+    | '/tornei'
     | '/accedi/conferma'
     | '/accedi/password'
     | '/aree/$area'
@@ -930,12 +960,14 @@ export interface FileRouteTypes {
     | '/impianti'
     | '/infermeria'
     | '/installa'
+    | '/kit'
     | '/la-mia-scd'
     | '/magazzino'
     | '/partner'
     | '/privacy'
     | '/pulmini'
     | '/rassegna'
+    | '/rassegna-stampa'
     | '/registrati'
     | '/safeguarding'
     | '/segreteria'
@@ -945,6 +977,7 @@ export interface FileRouteTypes {
     | '/squadre'
     | '/tesoreria'
     | '/top11'
+    | '/tornei'
     | '/accedi/conferma'
     | '/accedi/password'
     | '/aree/$area'
@@ -1019,12 +1052,14 @@ export interface FileRouteTypes {
     | '/impianti'
     | '/infermeria'
     | '/installa'
+    | '/kit'
     | '/la-mia-scd'
     | '/magazzino'
     | '/partner'
     | '/privacy'
     | '/pulmini'
     | '/rassegna'
+    | '/rassegna-stampa'
     | '/registrati'
     | '/safeguarding'
     | '/segreteria'
@@ -1034,6 +1069,7 @@ export interface FileRouteTypes {
     | '/squadre'
     | '/tesoreria'
     | '/top11'
+    | '/tornei'
     | '/accedi/conferma'
     | '/accedi/password'
     | '/aree/$area'
@@ -1110,12 +1146,14 @@ export interface RootRouteChildren {
   ImpiantiRoute: typeof ImpiantiRoute
   InfermeriaRoute: typeof InfermeriaRoute
   InstallaRoute: typeof InstallaRoute
+  KitRoute: typeof KitRoute
   LaMiaScdRoute: typeof LaMiaScdRoute
   MagazzinoRoute: typeof MagazzinoRoute
   PartnerRoute: typeof PartnerRoute
   PrivacyRoute: typeof PrivacyRoute
   PulminiRoute: typeof PulminiRoute
   RassegnaRoute: typeof RassegnaRoute
+  RassegnaStampaRoute: typeof RassegnaStampaRoute
   RegistratiRoute: typeof RegistratiRoute
   SafeguardingRoute: typeof SafeguardingRoute
   SegreteriaRoute: typeof SegreteriaRoute
@@ -1125,6 +1163,7 @@ export interface RootRouteChildren {
   SquadreRoute: typeof SquadreRoute
   TesoreriaRoute: typeof TesoreriaRoute
   Top11Route: typeof Top11Route
+  TorneiRoute: typeof TorneiRoute
   AccediConfermaRoute: typeof AccediConfermaRoute
   AccediPasswordRoute: typeof AccediPasswordRoute
   AreeAreaRoute: typeof AreeAreaRoute
@@ -1316,6 +1355,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InstallaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/kit': {
+      id: '/kit'
+      path: '/kit'
+      fullPath: '/kit'
+      preLoaderRoute: typeof KitRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/la-mia-scd': {
       id: '/la-mia-scd'
       path: '/la-mia-scd'
@@ -1356,6 +1402,13 @@ declare module '@tanstack/react-router' {
       path: '/rassegna'
       fullPath: '/rassegna'
       preLoaderRoute: typeof RassegnaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rassegna-stampa': {
+      id: '/rassegna-stampa'
+      path: '/rassegna-stampa'
+      fullPath: '/rassegna-stampa'
+      preLoaderRoute: typeof RassegnaStampaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/registrati': {
@@ -1419,6 +1472,13 @@ declare module '@tanstack/react-router' {
       path: '/top11'
       fullPath: '/top11'
       preLoaderRoute: typeof Top11RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tornei': {
+      id: '/tornei'
+      path: '/tornei'
+      fullPath: '/tornei'
+      preLoaderRoute: typeof TorneiRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/accedi/': {
@@ -1837,12 +1897,14 @@ const rootRouteChildren: RootRouteChildren = {
   ImpiantiRoute: ImpiantiRoute,
   InfermeriaRoute: InfermeriaRoute,
   InstallaRoute: InstallaRoute,
+  KitRoute: KitRoute,
   LaMiaScdRoute: LaMiaScdRoute,
   MagazzinoRoute: MagazzinoRoute,
   PartnerRoute: PartnerRoute,
   PrivacyRoute: PrivacyRoute,
   PulminiRoute: PulminiRoute,
   RassegnaRoute: RassegnaRoute,
+  RassegnaStampaRoute: RassegnaStampaRoute,
   RegistratiRoute: RegistratiRoute,
   SafeguardingRoute: SafeguardingRoute,
   SegreteriaRoute: SegreteriaRoute,
@@ -1852,6 +1914,7 @@ const rootRouteChildren: RootRouteChildren = {
   SquadreRoute: SquadreRoute,
   TesoreriaRoute: TesoreriaRoute,
   Top11Route: Top11Route,
+  TorneiRoute: TorneiRoute,
   AccediConfermaRoute: AccediConfermaRoute,
   AccediPasswordRoute: AccediPasswordRoute,
   AreeAreaRoute: AreeAreaRoute,

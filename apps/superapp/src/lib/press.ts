@@ -39,8 +39,15 @@ function tag(block: string, name: string): string | null {
   );
 }
 
-/** Parses an RSS 2.0 feed (Google News shape) into items; anything odd is skipped, never thrown. */
-export function parseRss(xml: string, limit = 20): PressItem[] {
+/**
+ * Parses an RSS 2.0 feed into items; anything odd is skipped, never thrown. `googleNews` (default) cuts the
+ * " - Testata" suffix Google News appends to titles; pass false for ordinary feeds (e.g. the club's WordPress site).
+ */
+export function parseRss(
+  xml: string,
+  limit = 20,
+  googleNews = true,
+): PressItem[] {
   const out: PressItem[] = [];
   const items = xml.match(/<item\b[\s\S]*?<\/item>/gi) ?? [];
   for (const block of items) {
@@ -48,7 +55,7 @@ export function parseRss(xml: string, limit = 20): PressItem[] {
     const url = tag(block, "link");
     if (!rawTitle || !url || !/^https?:\/\//.test(url)) continue;
     // Google News titles end with " - Testata".
-    const dash = rawTitle.lastIndexOf(" - ");
+    const dash = googleNews ? rawTitle.lastIndexOf(" - ") : -1;
     const suffix = dash > 0 ? rawTitle.slice(dash + 3).trim() : "";
     const source = tag(block, "source") ?? suffix;
     // Cut the " - Testata" suffix when it is the source (Google News always appends it).
@@ -90,6 +97,9 @@ export const PRESS_QUERIES: readonly string[] = [
   '"Colico Derviese" calcio',
   "Colico calcio Promozione",
   "Dervio calcio giovanile",
+  // UD-110 (19:03): news of every age group, not only the first team.
+  '"ColicoDerviese" Juniores OR Allievi OR Giovanissimi OR Esordienti',
+  "Colico calcio giovanile Under",
 ];
 
 export function googleNewsRssUrl(query: string): string {

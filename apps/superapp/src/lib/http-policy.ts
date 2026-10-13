@@ -24,13 +24,15 @@ export const PUBLIC_PREFIXES: readonly string[] = [
   "/guida",
   "/impianti",
   "/installa",
+  "/kit",
   "/partner",
   "/privacy",
-  "/rassegna",
+  "/rassegna-stampa",
   "/safeguarding",
   "/societa",
   "/sponsor",
   "/top11",
+  "/tornei",
 ];
 
 /**

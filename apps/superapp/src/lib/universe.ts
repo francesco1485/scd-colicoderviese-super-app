@@ -181,6 +181,28 @@ export function countdown(targetMs: number, nowMs: number): string | null {
 
 export type Consent = { v: 1; stats: boolean; mkt: boolean; ts: string };
 export const CONSENT_KEY = "scd-consent";
+/** Technical cookie mirroring the consent choice (fallback when localStorage is unavailable): 180 days. */
+export const CONSENT_COOKIE_MAX_AGE_S = 180 * 86_400;
+
+/** Raw consent JSON from a document.cookie string (null when absent or unreadable). */
+export function consentFromCookie(cookieHeader: string): string | null {
+  for (const part of cookieHeader.split(";")) {
+    const i = part.indexOf("=");
+    if (i < 0) continue;
+    if (part.slice(0, i).trim() !== CONSENT_KEY) continue;
+    try {
+      return decodeURIComponent(part.slice(i + 1).trim());
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
+/** document.cookie assignment for the consent choice: first-party, Lax, path /, Secure on https. */
+export function consentCookie(rawJson: string, secure: boolean): string {
+  return `${CONSENT_KEY}=${encodeURIComponent(rawJson)}; Max-Age=${CONSENT_COOKIE_MAX_AGE_S}; Path=/; SameSite=Lax${secure ? "; Secure" : ""}`;
+}
 
 export function parseConsent(raw: string | null): Consent | null {
   if (!raw) return null;

@@ -355,7 +355,7 @@ function Comunicazioni() {
                 Crea post
               </Link>
               <Link
-                to="/rassegna"
+                to="/rassegna-stampa"
                 className="flex h-[54px] items-center justify-center gap-[10px] rounded-[10px] bg-[#dde0e6] text-[17px] font-bold text-[var(--scd-ink)] shadow-[var(--scd-card-shadow)]"
               >
                 <List

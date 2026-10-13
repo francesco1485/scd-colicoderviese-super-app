@@ -12,7 +12,7 @@ function Plates({ hidden = false }: { hidden?: boolean }) {
     <>
       {SPONSORS.map((s) => (
         <span key={s.slug + String(hidden)} className="flex h-[28px] w-[88px] shrink-0 items-center justify-center lg:h-[38px] lg:w-[116px]" aria-hidden={hidden || undefined}>
-          <SponsorLogo sponsor={s} box={{ w: 104, h: 32 }} decorative={hidden} mono={false} />
+          <SponsorLogo sponsor={s} box={{ w: 104, h: 32 }} decorative={hidden} />
         </span>
       ))}
     </>

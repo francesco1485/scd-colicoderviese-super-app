@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 
 import {
   CONSENT_KEY,
+  consentCookie,
+  consentFromCookie,
   marketingAllowed,
   parseConsent,
   type Consent,
@@ -20,19 +22,38 @@ export const OPTIONAL_TOOLS_ACTIVE = false;
 export const openCookiePrefs = () =>
   window.dispatchEvent(new CustomEvent("scd:cookie-prefs"));
 
+/**
+ * The choice is kept in localStorage AND in a first-party technical cookie (UD-110 bug fix: "il banner ricompare a
+ * ogni apertura della home"). Root cause: when localStorage is unavailable or wiped — in-app browsers (WhatsApp,
+ * Instagram, Facebook), private windows, storage blocked by the browser — the write failed silently and the banner
+ * came back on every load. The cookie is the fallback read when localStorage has nothing valid.
+ */
 function readConsent(): Consent | null {
+  let fromStorage: Consent | null = null;
   try {
-    return parseConsent(localStorage.getItem(CONSENT_KEY));
+    fromStorage = parseConsent(localStorage.getItem(CONSENT_KEY));
+  } catch {
+    fromStorage = null;
+  }
+  if (fromStorage) return fromStorage;
+  try {
+    return parseConsent(consentFromCookie(document.cookie));
   } catch {
     return null;
   }
 }
 
 function writeConsent(c: Consent) {
+  const raw = JSON.stringify(c);
   try {
-    localStorage.setItem(CONSENT_KEY, JSON.stringify(c));
+    localStorage.setItem(CONSENT_KEY, raw);
   } catch {
-    /* storage bloccato: la scelta vale per questa visita */
+    /* storage bloccato: resta il cookie tecnico */
+  }
+  try {
+    document.cookie = consentCookie(raw, window.location.protocol === "https:");
+  } catch {
+    /* cookie bloccati: la scelta vale per questa visita */
   }
   window.dispatchEvent(new CustomEvent("scd:consent", { detail: c }));
 }

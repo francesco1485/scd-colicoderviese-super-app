@@ -1215,7 +1215,18 @@
           "OFFICIAL_PUBLIC_CONTENT",
           "NAVIGATION_REFERENCE"
         ],
-        "news_policy": "DISABLED_FOR_NEWS_UNTIL_FRESHNESS_VERIFIED"
+        "news_policy": "DISABLED_FOR_NEWS_UNTIL_FRESHNESS_VERIFIED",
+        "article_links_policy": {
+          "directive": "UD-110",
+          "rule": "The site is not the app's news authority. The public home news block and /rassegna-stampa only LINK to its recent articles read from the WordPress RSS feed: title, date and link, opened on the site; freshness verified per item (published within 45 days for the home highlight), negative headlines kept out of the home highlight, nothing copied.",
+          "feed": "https://www.colicoderviese.it/feed/",
+          "consumers": [
+            "apps/superapp/src/lib/news.functions.ts",
+            "apps/superapp/src/lib/news-mix.ts"
+          ],
+          "verified_at": "2026-10-13",
+          "latest_item_at_verification": "2026-09-17"
+        }
       },
       {
         "id": "SCD_FACEBOOK",
@@ -1760,6 +1771,28 @@
           "READERS_WAREHOUSE_SECRETARIAT_TREASURY_DIRECTION"
         ],
         "imported_at": "2026-10-12"
+      },
+      {
+        "id": "GOOGLE_NEWS_PRESS_RSS",
+        "kind": "EXTERNAL_PUBLIC_AGGREGATOR",
+        "trust": "EXTERNAL_ATTRIBUTED",
+        "status": "ACTIVE",
+        "title": "Google News RSS searches on the club and the two towns (press review, UD-094; youth queries UD-110)",
+        "endpoint": "https://news.google.com/rss/search",
+        "authority_domains": [],
+        "consumers": [
+          "apps/superapp/src/lib/press.ts",
+          "apps/superapp/src/lib/press.functions.ts",
+          "apps/superapp/src/lib/news.functions.ts"
+        ],
+        "rules": [
+          "TITLE_SOURCE_LINK_ONLY_NEVER_ARTICLE_TEXT_OR_SCANS",
+          "ATTRIBUTED_TO_THE_ORIGINAL_NEWSPAPER_OPENS_ORIGINAL",
+          "CRIME_AND_WEATHER_FILTERED",
+          "NEGATIVE_HEADLINES_NEVER_HOME_HIGHLIGHT_ONLY_RASSEGNA_STAMPA",
+          "CACHE_30_MIN_FAIL_SOFT_EMPTY"
+        ],
+        "imported_at": "2026-10-13"
       },
       {
         "id": "OPPONENT_CLUB_OFFICIAL_PAGES",
@@ -4675,6 +4708,85 @@
         ],
         "privacy_rule": "NO_PERSONAL_DONOR_DATA"
       }
+    },
+    "public_vetrina": {
+      "directive": "UD-110",
+      "app": "SCD_ONE",
+      "surface": "HOME_PUBLIC (+ MEMBER_HOME world soci)",
+      "home_order": [
+        "QUICK_STRIP",
+        "CREDENTIAL_STRIP_ONCE",
+        "GAMES_OF_THE_WEEK",
+        "VETRINA",
+        "NEWS_MIXED",
+        "JOIN_BANNER",
+        "SPONSOR_ZONE_ONE",
+        "FOOTER_WITH_LINK_GROUPS"
+      ],
+      "removed_from_home": [
+        "TRUST_CAROUSEL_PERCHE_LA_COLICODERVIESE",
+        "PRESS_LIST (moved to /rassegna-stampa; /rassegna redirects)",
+        "SCROLLING_LOGO_BAND",
+        "PARTNER_GRID_18",
+        "FOOTER_PARTNER_GRID_37",
+        "TUTTO_SUL_CLUB_ACCORDIONS (moved to the footer)"
+      ],
+      "engine": "apps/superapp/src/lib/vetrina.ts (pure, tested); catalogue apps/superapp/src/lib/vetrina-slots.server.ts (server only); getVetrina in vetrina.functions.ts on the server Rome day",
+      "slot": "{id, kind, theme, title, text, href (registered route), hash?, search?, visual, audience public|members, audiences[], weight, pinned?, commercial?, kidFriendly?, evergreen?, weekdays? (0=Sunday), monthFrom/monthTo?, peakFrom/peakUntil?, peakMonthFrom/peakMonthTo?, showFrom/showUntil?, requires?}",
+      "worlds": {
+        "public_choice": [
+          "tutti",
+          "bambini",
+          "ragazzi",
+          "famiglie",
+          "tifosi"
+        ],
+        "session_derived": "soci",
+        "storage": "localStorage scd-vetrina-world on the device only; no age, no birthdate, no profiling",
+        "kids_world_rules": [
+          "NEVER_COMMERCIAL_SLOTS",
+          "ALWAYS_ONE_KID_FRIENDLY_SLOT",
+          "SKY_ONLY_IN_KIDS_WORLD_SMALL_NEVER_HERO"
+        ]
+      },
+      "palinsesto": {
+        "constant": "VETRINA_RHYTHM in apps/superapp/src/lib/vetrina.ts",
+        "mon": "partner, convenzioni, card (tifosi, famiglie)",
+        "tue": "formazione e tecnica (ragazzi, bambini)",
+        "wed": "servizi: infermeria, segreteria, nutrizione (famiglie)",
+        "thu": "squadre e annate (tutti)",
+        "fri": "si gioca nel weekend, biglietteria (tifosi)",
+        "sat": "dirette e partite (tutti)",
+        "sun": "racconti: rassegna, comunicazioni (tutti)",
+        "season_arc": "iscrizioni peak Sep-Oct; Christmas Lario Cup M/F peak 1 Nov - 8 Dec (from lib/events.ts); Memorial Nasazzi peak 7 weeks before its recorded date (lib/tournaments.ts)"
+      },
+      "rotation": "pinned/peak first, then weighted draw seeded by Rome day + world; focus worlds of the day weigh x2; 3..6 slots, evergreen fill",
+      "new_public_routes": [
+        "/tornei",
+        "/rassegna-stampa",
+        "/kit"
+      ],
+      "sponsor_zone": "LedwallRotator every day (LEDWALL_HOME_DAYS all weekdays) + partner of the month + partner news (lib/partner-news.ts, empty until real items) + Diventa partner + link to all partners; logos always in colour",
+      "reserved_kinds_no_items": [
+        "convenzione",
+        "partner-initiative"
+      ],
+      "rules": [
+        "EVERY_HREF_IS_A_REGISTERED_ROUTE_TESTED",
+        "NO_INVENTED_DATA_UNKNOWN_IS_NOT_ZERO",
+        "NO_MINORS_NAMES_OR_FACES_PUBLIC",
+        "TEAMS_INSIDE_PUBLIC_SHOWS_THE_CLUB",
+        "OFFICIAL_ASSETS_ONLY",
+        "SAME_GRAPHIC_SYSTEM_EVERYWHERE"
+      ],
+      "phase_2_not_built": [
+        "POLLS_VOTE_YOUR_TEAM (needs storage + anti-abuse)",
+        "STANDINGS_ROTATION (needs official structured standings source)",
+        "FOOTBALL_WORLD_NEWS (needs licensed source/RSS)",
+        "PODCAST_PARLIAMO_DI_NOI (needs episodes)",
+        "SOCIAL_POSTS_IN_NEWS (needs authorised freshness adapter)",
+        "FONDO_SOLIDALE_SLOT (no public page in the super app yet)"
+      ]
     },
     "partner_kit": {
       "directive": "UD-109",

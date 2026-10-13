@@ -184,8 +184,9 @@ export function mayAnimate(win: Pick<Window, "matchMedia"> | undefined): boolean
  * - homeMatchDays: also on any day with a home game in the official public calendar.
  * The sponsor showcase page (/sponsor) always shows it.
  */
+// UD-110 (Direzione 13/10/2026): the LED wall is part of the single sponsor zone of the home, every day.
 export const LEDWALL_HOME_DAYS = {
-  weekdays: [1, 4] as readonly number[],
+  weekdays: [1, 2, 3, 4, 5, 6, 7] as readonly number[],
   homeMatchDays: true,
 } as const;
 

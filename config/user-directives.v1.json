@@ -2658,6 +2658,49 @@
         ],
         "duplicate_work": "DENY"
       }
+    },
+    {
+      "sourceDate": "2026-10-13",
+      "sourceTime": "18:42-19:06",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-110",
+      "name": "PUBLIC_HOME_VETRINA_PALINSESTO",
+      "sourceQuoteFragments": [
+        "ci sono cose nella pagina iniziale ripetute più volte come sponsor e loghi in fondo, poi secondo me questo non interessa a nessuno e sponsor devono essere a colori, si può studiare qualcosa come news per sponsor, e poi altro per articoli di giornale, banner collegati o anche dona",
+        "devi decidere tu e essere sempre pronto anche a cambiare e far girare la vetrina, importante avere le giuste idee e avere tutto sotto controllo; di eventi c'è anche il Nasazzi e la Christmas Cup è sia maschile che femminile, anche il link tornei importante da sviluppare; poi anche far comparire infermeria, segreteria e nutrizionista ogni tanto a rotazione; le nostre attività con Sky; le nostre promozioni per tesserati; compra la tua maglia; si deve creare interazione tra interno e esterno; anche la possibile formazione, classifiche delle squadre a rotazione, sondaggi, vota chi ti piace di più tra le squadre, info e chicche dal mondo del calcio, rubrica parliamo di noi, podcast Colico e tanto altro: questa deve essere la vetrina",
+        "nelle news anche altre notizie di altre annate, con spinta ad altri giornali, poi eventualmente qualche articolo da social e articoli dal sito recenti. Manca il discorso fondo solidale, iscrizioni, avatar e altro ancora di cose che possono ruotare e accendere ogni giorno la voglia di andare su app. Poi troveremo accordi e daremo spazio anche alle nostre convenzioni e altre iniziative.",
+        "devi pensare a un mondo, un flusso programmato di dare info nel tempo così da rendere la cosa interessante in base alle età"
+      ],
+      "context": "Direzione, 13/10/2026 18:42-18:47 (home review on staging), 19:03 and 19:06 additions.",
+      "normalizedCommand": {
+        "rule": "The public home is the club 'vetrina': nothing repeated (one credential strip, one sponsor zone, no logo grids, no trust carousel, no accordions in the body), partner logos always in colour, a rotating showcase near the top driven by a typed palinsesto (weekly rhythm, season arc, audience worlds chosen by the visitor: Tutti, Bambini, Ragazzi, Famiglie, Tifosi & territorio; Soci e staff from the session), a mixed news block (newspapers on every age group, recent club-site articles, club news; each opening the original; negative headlines only on /rassegna-stampa), a tornei hub (/tornei: Christmas Lario Cup maschile and Female Edition, Memorial Nasazzi, Memorial Guattini), a public kit page (/kit) and one sponsor zone (LED wall every day, partner of the month, partner news, Diventa partner, all partners link).",
+        "scope": "SCD_ONE_PUBLIC_HOME",
+        "decisions": [
+          "removed: 'Perché la ColicoDerviese', the scrolling logo band, the 18-logo grid, the 37-logo footer grid, the home press list and the 'Tutto sul club' accordions (moved into the footer)",
+          "/rassegna -> /rassegna-stampa (301)",
+          "LEDWALL_HOME_DAYS = every day",
+          "weekly rhythm (VETRINA_RHYTHM): Mon partner/convenzioni/card, Tue formazione, Wed servizi, Thu squadre e annate, Fri weekend/biglietteria, Sat dirette, Sun racconti/rassegna",
+          "convenzioni and partner initiatives reserved as slot kinds with no items until agreements exist"
+        ],
+        "constraints": [
+          "every vetrina href is a registered route (tested); nothing invented (UNKNOWN != ZERO)",
+          "Sky only in the kids' world, small, never a hero; kids' world never receives commercial slots",
+          "teams inside; no minors' names or faces in public; official assets only",
+          "world choice stored only in localStorage on the device: no age, no birthdate, no tracking",
+          "phase 2 (not built, no fake versions): polls/vote your team, standings rotation, football-world news, podcast 'Parliamo di noi', social posts in news, fondo solidale slot (no public page yet)"
+        ],
+        "status": "IMPLEMENTED_BRANCH_AGENT_VETRINA",
+        "delivered": [
+          "apps/superapp/src/lib/vetrina.ts, vetrina-slots.server.ts, vetrina.functions.ts (+ vetrina.test.ts)",
+          "apps/superapp/src/lib/news-mix.ts, news.functions.ts, press.ts (youth queries, plain RSS titles), partner-news.ts, tournaments.ts (+ news-mix.test.ts)",
+          "apps/superapp/src/components/home/PublicHome.tsx (Vetrina, HomeNewsBlock, SponsorZone), MemberHome.tsx (world soci), PublicPageHeader.tsx",
+          "apps/superapp/src/routes/tornei.tsx, kit.tsx, rassegna-stampa.tsx, rassegna.tsx (redirect), index.tsx",
+          "apps/superapp/src/components/SiteChrome.tsx (footer link groups, no logo grid), scd/Logos.tsx + styles.css (no greyscale), CookieConsent.tsx + lib/universe.ts (cookie fallback)",
+          "SCD_SYSTEM_MANIFEST.json product_direction.public_vetrina, source_registry GOOGLE_NEWS_PRESS_RSS, SCD_OFFICIAL_SITE.article_links_policy"
+        ],
+        "duplicate_work": "DENY"
+      }
     }
   ],
   "completionGate": {

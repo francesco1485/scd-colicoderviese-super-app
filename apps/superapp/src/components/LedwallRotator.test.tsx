@@ -82,7 +82,8 @@ describe("LedwallRotator (SSR)", () => {
   it("appears on the public home only (never in internal pages)", () => {
     const home = src("./home/PublicHome.tsx");
     expect(home).toContain("showLedwallOnHome(");
-    expect(home).toMatch(/\{ledOnHome && <HomeLedwall/);
+    expect(home).toMatch(/\{ledOnHome && \(/);
+    expect(home).toMatch(/<LedwallRotator day=\{day\}/);
     expect(home).toContain('to="/sponsor"');
     for (const f of ["./scd/InteriorShell.tsx", "./home/MemberHome.tsx"]) expect(src(f)).not.toContain("LedwallRotator");
   });

@@ -2,7 +2,8 @@
  * Logo presentation shared by the LED ticker, the partner grid, the sponsor band, the footer and the affiliation
  * marks (Direzione 13/10/2026 15:31). Official files only, trimmed cut-outs (scripts/derive-logo-cutouts.py):
  * same tile for every logo, size normalised by visual area (lib/logo-fit), never upscaled. The cut-outs are made
- * for light surfaces, so tiles are always white. On desktop with a pointer, logos are greyscale until hover/focus.
+ * for light surfaces, so tiles are always white. Partner logos are ALWAYS in full colour (UD-110, Direzione 13/10/2026:
+ * "sponsor devono essere a colori"): the former greyscale-until-hover treatment is removed everywhere.
  */
 import type { ReactNode } from "react";
 
@@ -14,15 +15,12 @@ export function SponsorLogo({
   sponsor,
   box,
   decorative = false,
-  mono = true,
   className = "",
 }: {
   sponsor: Sponsor;
   /** Inner box in CSS px: the same for every logo of a row. */
   box: Box;
   decorative?: boolean;
-  /** Greyscale until hover (desktop, pointer devices only). */
-  mono?: boolean;
   className?: string;
 }) {
   const art = sponsorArt(sponsor);
@@ -40,7 +38,7 @@ export function SponsorLogo({
       decoding="async"
       draggable={false}
       data-low-res={fit.capped || undefined}
-      className={`block max-w-full object-contain ${mono ? "scd-logo-mono" : ""} ${className}`}
+      className={`block max-w-full object-contain ${className}`}
       // --logo-k lets a container shrink every logo of a row by the same factor (e.g. the phone sponsor band).
       style={{
         width: `calc(${fit.width}px * var(--logo-k, 1))`,

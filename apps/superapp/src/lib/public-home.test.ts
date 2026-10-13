@@ -9,7 +9,6 @@ import { describe, expect, it } from "vitest";
 
 import * as http from "./http-policy";
 import {
-  FEATURES,
   LINK_GROUPS,
   kickoffClock,
   matchdayLabel,
@@ -17,7 +16,6 @@ import {
   SOCIAL_LINKS,
   partnerOfTheMonth,
   publicHomeRoutes,
-  trustFacts,
   verifiedSponsors,
 } from "./public-home";
 import { SPONSORS } from "./sponsors";
@@ -93,27 +91,19 @@ describe("public home v4", () => {
     }
   });
 
-  it("shows real assets only", () => {
-    for (const c of FEATURES) {
-      const v = c.visual;
-      if (v.kind !== "image") continue;
-      expect(v.src, c.id).toMatch(/^\/media\//);
-      expect(() =>
-        readFileSync(resolve(APP, "public", v.src.slice(1))),
-      ).not.toThrow();
-    }
+  it("shows real social profiles only", () => {
     for (const s of SOCIAL_LINKS)
       expect(s.href).toMatch(/^https:\/\/www\.(instagram|facebook)\.com\//);
   });
 
-  it("states the real number of partners and rotates the showcase by month", () => {
-    expect(trustFacts().at(-1)!.text).toContain(String(SPONSORS.length));
+  it("rotates the partner of the month over verified partners", () => {
     const oct = partnerOfTheMonth("2026-10-13");
     expect(oct).not.toBeNull();
     expect(partnerOfTheMonth("2026-10-31")).toBe(oct);
     expect(verifiedSponsors()).toContain(oct);
     expect(partnerOfTheMonth("2026-11-01")).not.toBe(oct);
     expect(partnerOfTheMonth("2026-10-13", [])).toBeNull();
+    expect(SPONSORS.length).toBeGreaterThan(0);
   });
 
   it("gives the quick strip the brief's badges", () => {
@@ -142,13 +132,49 @@ describe("public home v4", () => {
     expect(matchdayLabel("2026-10-17", "2026-10-13")).toBe("Sabato 17 ottobre");
   });
 
-  it("keeps the sponsor ticker pausable and the motion opt-out in CSS", () => {
+  it("UD-110: nothing repeated — one credential strip, one sponsor zone, no trust carousel, no logo grids, no accordions in the body", () => {
     const home = code("src/components/home/PublicHome.tsx");
-    expect(home).toMatch(/<PartnerTicker/);
-    expect(home).toMatch(/aria-pressed=\{paused\}/);
-    const css = read("src/styles.css");
-    expect(css).toMatch(
-      /prefers-reduced-motion: reduce\)[^}]*\{[^]*\.scd-marquee-track/,
+    expect(home.match(/<CredentialBar \/>/g)).toHaveLength(1);
+    expect(home.match(/<SponsorZone /g)).toHaveLength(1);
+    for (const gone of [
+      /<Trust\b/,
+      /<PartnerTicker\b/,
+      /<Partners\b/,
+      /<LinkGroups\b/,
+      /<WeekNews\b/,
+      /<Featured\b/,
+      /Perché la ColicoDerviese/,
+      /Tutto sul club/,
+    ])
+      expect(home).not.toMatch(gone);
+    // The footer keeps the link groups; it no longer repeats the 37 partner logos on the home.
+    const chrome = code("src/components/SiteChrome.tsx");
+    expect(chrome).toMatch(/LINK_GROUPS\.map/);
+    expect(chrome).not.toMatch(/FooterSponsors|SPONSORS\.map/);
+    // Partners link once to the full list.
+    expect(home).toMatch(/Tutti i \{SPONSORS\.length\} partner/);
+  });
+
+  it("UD-110: partner logos are always in colour (no greyscale anywhere on public logos)", () => {
+    for (const f of [
+      "src/components/scd/Logos.tsx",
+      "src/components/home/PublicHome.tsx",
+      "src/components/SponsorBand.tsx",
+      "src/components/SiteChrome.tsx",
+      "src/routes/sponsor.tsx",
+    ]) {
+      const src = code(f);
+      expect(src, f).not.toMatch(/scd-logo-mono|grayscale|mono=/);
+    }
+    expect(read("src/styles.css")).not.toMatch(
+      /\.scd-logo-mono|grayscale\(1\)/,
     );
+  });
+
+  it("UD-110: the press list is off the home (only the vetrina slot and the filtered news block link to /rassegna-stampa)", () => {
+    const home = code("src/components/home/PublicHome.tsx");
+    expect(home).not.toMatch(/PressItem|press\.slice/);
+    expect(home).toMatch(/to="\/rassegna-stampa"/);
+    expect(publicHomeRoutes()).not.toContain("/rassegna");
   });
 });

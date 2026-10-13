@@ -13,7 +13,7 @@ const PAGES = [
   ["2-calendario", "/calendario"],
   ["3-fantacalcio", "/fantacalcio"],
   ["4-top11", "/top11"],
-  ["5-rassegna", "/rassegna"],
+  ["5-rassegna", "/rassegna-stampa"],
   ["6-guida", "/guida"],
 ];
 const UA = {

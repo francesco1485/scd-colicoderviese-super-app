@@ -89,7 +89,7 @@ function Privacy() {
 
       <H2>Cookie</H2>
       <p>
-        L'app usa solo strumenti tecnici: un cookie di sessione per tenerti dentro dopo l'accesso, la memoria del browser per ricordare le tue scelte e una copia offline delle sole pagine pubbliche. Non usiamo statistiche né cookie di marketing. Le aree riservate non vengono mai salvate offline e, quando esci, la copia sul telefono viene cancellata.
+        L'app usa solo strumenti tecnici: un cookie di sessione per tenerti dentro dopo l'accesso, la memoria del browser per ricordare le tue scelte (anche il «mondo» scelto in vetrina, solo sul tuo dispositivo), un cookie tecnico che ricorda la scelta sui cookie per 180 giorni e una copia offline delle sole pagine pubbliche. Non usiamo statistiche né cookie di marketing. Le aree riservate non vengono mai salvate offline e, quando esci, la copia sul telefono viene cancellata.
       </p>
       <H2>Crediti e proprietà intellettuale</H2>
       <p>

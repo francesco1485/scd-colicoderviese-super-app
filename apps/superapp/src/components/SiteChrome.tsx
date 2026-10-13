@@ -26,13 +26,12 @@ import crest from "@/assets/brand/logo-scd.png.asset.json";
 import { centerTabFor, type CenterTab } from "@/lib/access-nav";
 import { ACCESS_SCREEN_IDS, WORK_AREA_IDS, findArea } from "@/lib/areas";
 import { CLUB_PROFILE } from "@/lib/club-profile";
-import { SOCIAL_LINKS } from "@/lib/public-home";
-import { SPONSORS } from "@/lib/sponsors";
+import { LINK_GROUPS, SOCIAL_LINKS } from "@/lib/public-home";
 import { useSession } from "@/lib/use-session";
 import { openCookiePrefs } from "./CookieConsent";
 import { AccessMenu, loginSearch, openAccessMenu } from "./scd/AccessMenu";
 import { CREDENTIALS_SENTENCE } from "@/lib/club-credentials";
-import { ClubCredentials, LogoTile, SponsorLogo } from "./scd/Logos";
+import { ClubCredentials } from "./scd/Logos";
 
 /** Nome ufficiale della società (sigla S.C.D., non invertire le lettere). */
 export const CLUB_NAME = "S.C.D. ColicoDerviese";
@@ -61,19 +60,6 @@ const desktopNavMember: readonly NavItem[] = [
 export const desktopNavFor = (signedIn: boolean): readonly NavItem[] =>
   signedIn ? desktopNavMember : desktopNavPublic;
 
-/** Link a piè di pagina: tutte le pagine pubbliche principali (squadre e allenamenti sono dentro, UD-100). */
-const footerNav: readonly NavItem[] = [
-  { to: "/societa", label: "Chi siamo" },
-  { to: "/comunicazioni", label: "Notizie" },
-  { to: "/calendario", label: "Calendario" },
-  { to: "/impianti", label: "Mappa campi" },
-  { to: "/comunicazioni", label: "Comunicazioni" },
-  { to: "/eventi", label: "Eventi" },
-  { to: "/aree", label: "Area club" },
-  { to: "/sponsor", label: "Sponsor" },
-  { to: "/contatti", label: "Contatti" },
-];
-
 /** Menu completo (drawer mobile e voce "Altro"), raggruppato per app. */
 const menuGroups: readonly {
   title: string;
@@ -90,6 +76,7 @@ const menuGroups: readonly {
       { to: "/impianti", label: "Mappa campi" },
       { to: "/comunicazioni", label: "Comunicazioni" },
       { to: "/eventi", label: "Eventi" },
+      { to: "/tornei", label: "Tornei" },
       { to: "/eventi/christmas-lario-cup", label: "Christmas Lario Cup" },
       { to: "/community", label: "Tifosi" },
       { to: "/entra", label: "Gioca con noi" },
@@ -105,7 +92,7 @@ const menuGroups: readonly {
       { to: "/allenamenti", label: "Allenamenti" },
       { to: "/fantacalcio", label: "Fantacalcio SCD" },
       { to: "/top11", label: "Top 11 della settimana" },
-      { to: "/rassegna", label: "Dicono di noi" },
+      { to: "/rassegna-stampa", label: "Dicono di noi" },
       { to: "/aree", label: "Il tuo ingresso (tutte le aree)" },
     ],
   },
@@ -117,13 +104,6 @@ const menuGroups: readonly {
       { to: "/fornitori", label: "Fornitori" },
     ],
   },
-];
-
-const footerLinks: readonly NavItem[] = [
-  { to: "/installa", label: "Installa l'app" },
-  { to: "/guida", label: "Come funziona l'app" },
-  { to: "/fornitori", label: "Fornitori" },
-  { to: "/safeguarding", label: "Safeguarding" },
 ];
 
 /**
@@ -610,42 +590,11 @@ export function BottomNav() {
   );
 }
 
-/** Partner logos row of the footer (home only: elsewhere the fixed SponsorBand already shows them). */
-function FooterSponsors() {
-  return (
-    <section
-      aria-labelledby="footer-sponsor-t"
-      className="border-t border-[#dbe5f1] bg-white"
-      data-testid="footer-sponsors"
-    >
-      <div className="mx-auto flex max-w-[1280px] flex-col gap-3 px-4 py-5 lg:flex-row lg:items-center lg:gap-6 lg:px-8">
-        <h2
-          id="footer-sponsor-t"
-          className="m-0 shrink-0 text-[12px] font-bold uppercase tracking-[0.12em] text-[#5a6b85]"
-        >
-          Partner 2026/27
-        </h2>
-        <ul className="m-0 grid list-none grid-cols-[repeat(auto-fill,minmax(96px,1fr))] gap-2 p-0 lg:flex-1">
-          {SPONSORS.map((sp) => (
-            <li key={sp.slug}>
-              <LogoTile className="h-[52px]">
-                <SponsorLogo sponsor={sp} box={{ w: 84, h: 32 }} />
-              </LogoTile>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </section>
-  );
-}
-
 const SOCIAL_ICON = { instagram: Instagram, facebook: Facebook } as const;
 
 export function SiteFooter() {
-  const home = useRouterState({ select: (st) => st.location.pathname === "/" });
   return (
     <footer className="mt-10" data-testid="site-footer">
-      {home && <FooterSponsors />}
       <div className="bg-[#0b2a5b] px-4 pb-20 pt-10 text-white lg:px-8">
         <div className="mx-auto grid max-w-[1280px] gap-8">
           <div className="flex flex-wrap items-center justify-between gap-4">
@@ -679,7 +628,7 @@ export function SiteFooter() {
             </ul>
           </div>
 
-          <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)_minmax(0,1fr)]">
+          <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)] lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.8fr)_minmax(0,1fr)]">
             <div className="grid content-start gap-1.5 text-[14px] leading-snug text-white/85">
               <h2 className="m-0 pb-1 text-[12px] font-bold uppercase tracking-[0.12em] text-[#ffd600]">
                 La società
@@ -700,22 +649,33 @@ export function SiteFooter() {
               </p>
             </div>
 
-            <nav aria-label="Link a piè di pagina" className="grid content-start gap-1">
+            <nav aria-label="Link a piè di pagina" className="grid content-start gap-1" data-testid="footer-links">
               <h2 className="m-0 pb-1 text-[12px] font-bold uppercase tracking-[0.12em] text-[#ffd600]">
-                Pagine
+                Tutto sul club
               </h2>
-              <ul className="m-0 grid list-none grid-cols-2 gap-x-4 p-0">
-                {[...footerNav, ...footerLinks].map((n) => (
-                  <li key={n.to + n.label}>
-                    <Link
-                      to={n.to}
-                      className="scd-focus inline-flex min-h-11 min-w-11 items-center text-[14px] text-white/85 hover:text-white"
-                    >
-                      {n.label}
-                    </Link>
-                  </li>
+              {/* UD-110: the former home accordions "Tutto sul club" live here, on every page. */}
+              <div className="grid gap-x-6 gap-y-4 sm:grid-cols-2 xl:grid-cols-3">
+                {LINK_GROUPS.map((g) => (
+                  <div key={g.id} className="grid content-start gap-0">
+                    <h3 className="m-0 text-[13px] font-bold text-white">{g.title}</h3>
+                    <ul className="m-0 grid list-none p-0">
+                      {g.items.map((n) => (
+                        <li key={n.label}>
+                          <Link
+                            to={n.to as never}
+                            search={n.search as never}
+                            {...(n.hash ? { hash: n.hash } : {})}
+                            className="scd-focus inline-flex min-h-11 min-w-11 items-center text-[14px] gap-1.5 text-white/85 hover:text-white"
+                          >
+                            {n.label}
+                            {n.reserved && <Lock className="size-3.5 text-white/60" aria-label="area riservata" />}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </nav>
 
             <div className="grid content-start gap-2.5 md:col-span-2 lg:col-span-1">

@@ -1,9 +1,13 @@
 /**
- * Signed-out public home v4 (UD-100, brief "Public home v4", Direzione 13/10/2026).
+ * Signed-out public home v4 (UD-100, brief "Public home v4"), cleaned up as the club "vetrina" (UD-110, Direzione
+ * 13/10/2026 18:42–18:47: nothing repeated, sponsors in colour, content that rotates and stays under control).
  *
  * Creative, communicative, commercial: club identity, events, news, games, partners and joining. Structure taken
- * from the Eurobet web homepage as a LAYOUT reference only (strip → editorial carousel → CTA banner → trust
- * carousel → content of the week → partners → link accordions → footer); no betting content of any kind.
+ * from the Eurobet web homepage as a LAYOUT reference only (strip → credential strip → games of the week → vetrina →
+ * CTA banner → one sponsor zone → footer with the link groups); no betting content of any kind.
+ * Removed by UD-110: "Perché la ColicoDerviese" (duplicate of the credential strip and footer), the press list
+ * (now /rassegna-stampa, only a "Dicono di noi" vetrina slot here), the scrolling logo band, the 18-logo grid, the
+ * footer 37-logo grid and the "Tutto sul club" accordions (now in the footer).
  * Teams, rosters, fixtures and team calendars are not here: they live inside after sign-in.
  * Palette: navy #0b2a5b, blue #1556c4, light #eef3f9, white; yellow #ffd600 only for accents and the main CTA.
  * Real assets only (public/media); our age-group crests never appear; no minor is named.
@@ -15,8 +19,6 @@ import {
   BadgeCheck,
   Building2,
   CalendarDays,
-  Check,
-  ChevronDown,
   ChevronRight,
   ClipboardList,
   Gamepad2,
@@ -25,10 +27,9 @@ import {
   HeartHandshake,
   Lock,
   MapPin,
+  Megaphone,
   Newspaper,
-  Pause,
   Phone,
-  Play,
   Shield,
   Smartphone,
   Star,
@@ -43,28 +44,29 @@ import { LedwallRotator } from "@/components/LedwallRotator";
 import { ClubCrestOfficial } from "@/components/SiteChrome";
 import { KitTexture } from "@/components/scd/kit-texture";
 import { ClubCredentials, LogoTile, SponsorLogo } from "@/components/scd/Logos";
-import { openCookiePrefs } from "@/components/CookieConsent";
-import { SPONSOR_PACKAGES } from "@/lib/catalog";
-import { clubEventsOn } from "@/lib/club-events";
-import { dayMonth, type Initiative } from "@/lib/initiatives";
-import type { PressItem } from "@/lib/press";
+import { NEWS_SOURCE_LABEL, type NewsItem } from "@/lib/news-mix";
+import { partnerNewsOn } from "@/lib/partner-news";
+import { timeAgo } from "@/lib/social";
 import {
-  FEATURES,
-  LINK_GROUPS,
   QUICK_LINKS,
   kickoffClock,
   matchdayLabel,
   partnerOfTheMonth,
-  trustFacts,
-  verifiedSponsors,
-  type FeatureCard,
   type PublicIcon,
   type PublicLink,
 } from "@/lib/public-home";
-import { timeAgo } from "@/lib/social";
 import { SPONSORS, sponsorLabel } from "@/lib/sponsors";
+import {
+  EMPTY_WORLDS,
+  PUBLIC_WORLDS,
+  WORLD_HINT,
+  WORLD_LABEL,
+  WORLD_STORAGE_KEY,
+  isVetrinaWorld,
+  type VetrinaSlot,
+  type VetrinaWorld,
+} from "@/lib/vetrina";
 
-import { Carousel } from "./Carousel";
 import { sides } from "./match-sides";
 import { WeekGames, venueShort } from "@/components/home/HomeSections";
 import { venueCase } from "@/lib/board-data";
@@ -189,139 +191,6 @@ function CredentialBar() {
   );
 }
 
-/* ---------------------------------------------------- editorial cards */
-
-function SponsorMosaic() {
-  const logos = verifiedSponsors().slice(0, 6);
-  return (
-    <div className="grid size-full grid-cols-3 grid-rows-2 gap-1.5 bg-[#eef3f9] p-2.5">
-      {logos.map((s) => (
-        <span
-          key={s.slug}
-          className="grid place-items-center rounded-[8px] bg-white p-1.5"
-        >
-          <SponsorLogo
-            sponsor={s}
-            box={{ w: 76, h: 30 }}
-            decorative
-            mono={false}
-          />
-        </span>
-      ))}
-    </div>
-  );
-}
-
-function FeatureVisualView({ card }: { card: FeatureCard }) {
-  const v = card.visual;
-  if (v.kind === "sponsors") return <SponsorMosaic />;
-  if (v.kind === "type")
-    return (
-      <div className="relative size-full overflow-hidden bg-[radial-gradient(120%_120%_at_90%_10%,#1556c4_0%,#0b2a5b_58%)]">
-        <span
-          aria-hidden="true"
-          className={`absolute -bottom-6 right-3 font-uv leading-none text-[#ffd600] ${v.big.length > 3 ? "text-[110px]" : "text-[150px]"}`}
-        >
-          {v.big}
-        </span>
-        <span className="absolute left-4 top-4 max-w-[60%] font-uv text-[22px] uppercase leading-[0.95] text-white">
-          {v.small}
-        </span>
-      </div>
-    );
-  return (
-    <img
-      src={v.src}
-      alt={v.alt}
-      loading="lazy"
-      decoding="async"
-      style={{ objectPosition: v.position }}
-      className={`size-full ${v.fit === "contain" ? "bg-white object-contain p-6" : "object-cover"}`}
-    />
-  );
-}
-
-function FeatureCardView({ card }: { card: FeatureCard }) {
-  return (
-    <To
-      link={card}
-      className="scd-focus scd-lift group flex w-full flex-col overflow-hidden rounded-[16px] bg-white shadow-[0_1px_2px_rgb(11_42_91/0.06),0_8px_24px_-12px_rgb(11_42_91/0.25)] hover:shadow-[0_1px_2px_rgb(11_42_91/0.08),0_14px_30px_-12px_rgb(11_42_91/0.35)]"
-    >
-      <span className="relative block aspect-[274/170] w-full overflow-hidden border-b border-[#e6edf6]">
-        <span className="scd-zoom block size-full">
-          <FeatureVisualView card={card} />
-        </span>
-        {card.badge && (
-          <span className="absolute left-3 top-3 rounded-full bg-[#ffd600] px-2.5 py-1 text-[11px] font-extrabold uppercase leading-none tracking-[0.06em] text-[#0b1e3a]">
-            {card.badge}
-          </span>
-        )}
-      </span>
-      <span className="flex flex-1 flex-col gap-1 px-4 pb-4 pt-3">
-        <span className="text-[11.5px] font-bold uppercase tracking-[0.08em] text-[#1556c4]">
-          {card.kicker}
-        </span>
-        <span className="text-[18px] font-bold leading-tight text-[#0b1e3a]">
-          {card.title}
-        </span>
-        <span className="text-[14px] leading-snug text-[#4a5d7a]">
-          {card.text}
-        </span>
-        <span className="mt-auto inline-flex items-center gap-1 pt-2 text-[14px] font-semibold text-[#1556c4]">
-          Scopri
-          <ArrowRight
-            className="size-4 transition-transform duration-200 group-hover:translate-x-0.5"
-            aria-hidden="true"
-          />
-        </span>
-      </span>
-    </To>
-  );
-}
-
-const CARD_BASIS =
-  "basis-[80%] sm:basis-[calc((100%-16px)/2)] md:basis-[calc((100%-32px)/3)] lg:basis-[calc((100%-48px)/4)]";
-
-/** A time-limited initiative as an editorial card (only inside its window: the server sends active ones only). */
-export function initiativeCard(i: Initiative): FeatureCard {
-  return {
-    id: `initiative-${i.id}`,
-    kicker: `Fino al ${dayMonth(i.showUntil)}`,
-    title: i.title,
-    text: i.subtitle,
-    badge: "Iniziativa",
-    to: i.href,
-    visual: {
-      kind: "image",
-      src: i.flyer.src,
-      alt: i.flyer.alt,
-      position: "center 6%",
-    },
-  };
-}
-
-function Featured({ initiatives }: { initiatives: readonly Initiative[] }) {
-  // Active initiatives go right after the first card (the headline event keeps the first slot).
-  const cards = useMemo(() => {
-    const extra = initiatives.map(initiativeCard);
-    return [...FEATURES.slice(0, 1), ...extra, ...FEATURES.slice(1)];
-  }, [initiatives]);
-  return (
-    <div className={`${WRAP} pt-6 lg:pt-8`} data-testid="featured">
-      <Carousel
-        title="In primo piano"
-        titleId="primo-piano-t"
-        label="Contenuti in primo piano"
-        itemClass={CARD_BASIS}
-      >
-        {cards.map((c) => (
-          <FeatureCardView key={c.id} card={c} />
-        ))}
-      </Carousel>
-    </div>
-  );
-}
-
 /* ------------------------------------------------------------ CTA banner */
 
 function JoinBanner() {
@@ -389,239 +258,331 @@ function JoinBanner() {
   );
 }
 
-/* --------------------------------------------------------- trust cards */
+/* ------------------------------------------------------------- vetrina */
 
-function Trust() {
-  const facts = trustFacts(SPONSORS.length);
-  return (
-    <div className="mt-8 border-y border-[#dbe5f1] bg-white py-8 lg:mt-12 lg:py-10">
-      <div className={WRAP} data-testid="trust">
-        <Carousel
-          title="Perché la ColicoDerviese"
-          titleId="perche-t"
-          label="Perché scegliere la ColicoDerviese"
-          itemClass={CARD_BASIS}
+/** Visual of a vetrina slot: real poster/flyer/board, a small cast portrait, or an original typographic panel. */
+function SlotVisual({ slot }: { slot: VetrinaSlot }) {
+  const v = slot.visual;
+  if (v.kind === "portrait")
+    return (
+      <span className="relative flex size-full items-center justify-center overflow-hidden bg-[radial-gradient(120%_120%_at_85%_15%,#1556c4_0%,#0b2a5b_62%)]">
+        <KitTexture motif="mountains-lake" overlay />
+        <img
+          src={v.src}
+          alt={v.alt}
+          width={112}
+          height={112}
+          loading="lazy"
+          decoding="async"
+          className="relative size-[96px] rounded-full bg-white object-cover shadow-[0_8px_22px_-8px_rgb(0_0_0/0.55)] ring-4 ring-white/90 lg:size-[112px]"
+        />
+      </span>
+    );
+  if (v.kind === "type")
+    return (
+      <span className="relative block size-full overflow-hidden bg-[radial-gradient(120%_120%_at_90%_10%,#1556c4_0%,#0b2a5b_58%)]">
+        <span
+          aria-hidden="true"
+          className={`absolute -bottom-5 right-3 font-uv leading-none text-[#ffd600] ${v.big.length > 3 ? "text-[96px]" : "text-[130px]"}`}
         >
-          {facts.map((f) => {
-            const Icon = ICONS[f.icon];
-            return (
-              <To
-                key={f.title}
-                link={f}
-                className="scd-focus scd-lift group flex w-full flex-col gap-3 rounded-[16px] border border-[#dfe8f3] bg-[#f7f9fc] p-5 hover:border-[#b9cde6] hover:bg-white"
-              >
-                <span className="grid size-11 place-items-center rounded-full bg-[#0b2a5b] text-[#ffd600]">
-                  <Icon
-                    className="size-[22px]"
-                    strokeWidth={1.8}
-                    aria-hidden="true"
-                  />
-                </span>
-                <span className="text-[15px] font-extrabold uppercase leading-tight tracking-[0.04em] text-[#0b2a5b]">
-                  {f.title}
-                </span>
-                <span className="text-[14px] leading-snug text-[#4a5d7a]">
-                  {f.text}
-                </span>
-              </To>
-            );
-          })}
-        </Carousel>
+          {v.big}
+        </span>
+        <span className="absolute left-4 top-4 max-w-[62%] font-uv text-[21px] uppercase leading-[0.95] text-white">
+          {v.small}
+        </span>
+      </span>
+    );
+  return (
+    <img
+      src={v.src}
+      alt={v.alt}
+      loading="lazy"
+      decoding="async"
+      style={{ objectPosition: v.position }}
+      className={`size-full ${v.fit === "contain" ? "bg-white object-contain p-2" : "object-cover"}`}
+    />
+  );
+}
+
+function SlotCard({ slot }: { slot: VetrinaSlot }) {
+  const members = slot.audience === "members";
+  return (
+    <Link
+      to={slot.href as never}
+      {...(slot.hash ? { hash: slot.hash } : {})}
+      {...(slot.search ? { search: slot.search as never } : {})}
+      className="scd-focus scd-lift group flex h-full w-full flex-col overflow-hidden rounded-[16px] bg-white shadow-[0_1px_2px_rgb(11_42_91/0.06),0_8px_24px_-12px_rgb(11_42_91/0.25)] hover:shadow-[0_1px_2px_rgb(11_42_91/0.08),0_14px_30px_-12px_rgb(11_42_91/0.35)]"
+      data-slot={slot.id}
+      data-kind={slot.kind}
+      data-audience={slot.audience}
+    >
+      <span className="relative block aspect-[274/160] w-full overflow-hidden border-b border-[#e6edf6]">
+        <span className="scd-zoom block size-full">
+          <SlotVisual slot={slot} />
+        </span>
+        {slot.badge && (
+          <span className="absolute left-3 top-3 rounded-full bg-[#ffd600] px-2.5 py-1 text-[11px] font-extrabold uppercase leading-none tracking-[0.06em] text-[#0b1e3a]">
+            {slot.badge}
+          </span>
+        )}
+        {members && (
+          <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-extrabold uppercase leading-none tracking-[0.06em] text-[#0b2a5b] shadow-sm">
+            <Lock className="size-3" aria-hidden="true" />
+            Per i tesserati
+          </span>
+        )}
+      </span>
+      <span className="flex flex-1 flex-col gap-1 px-4 pb-4 pt-3">
+        <span className="text-[11.5px] font-bold uppercase tracking-[0.08em] text-[#1556c4]">{slot.kicker}</span>
+        <span className="text-[18px] font-bold leading-tight text-[#0b1e3a]">{slot.title}</span>
+        <span className="text-[14px] leading-snug text-[#4a5d7a]">{slot.text}</span>
+        <span className="mt-auto inline-flex items-center gap-1 pt-2 text-[14px] font-semibold text-[#1556c4]">
+          {slot.cta}
+          <ArrowRight
+            className="size-4 transition-transform duration-200 group-hover:translate-x-0.5"
+            aria-hidden="true"
+          />
+        </span>
+      </span>
+    </Link>
+  );
+}
+
+function readWorld(): VetrinaWorld {
+  try {
+    const v = window.localStorage.getItem(WORLD_STORAGE_KEY);
+    return isVetrinaWorld(v) && v !== "soci" ? v : "tutti";
+  } catch {
+    return "tutti";
+  }
+}
+
+function saveWorld(w: VetrinaWorld) {
+  try {
+    window.localStorage.setItem(WORLD_STORAGE_KEY, w);
+  } catch {
+    /* storage blocked: the choice lasts for this visit */
+  }
+}
+
+/** "Il tuo mondo": the visitor picks a world (no age, no profile, no tracking; stored on this device only). */
+function WorldChips({ value, onChange }: { value: VetrinaWorld; onChange: (w: VetrinaWorld) => void }) {
+  return (
+    <div className="flex flex-col gap-1.5 pb-3 sm:flex-row sm:items-center sm:gap-3">
+      <span id="mondo-l" className="text-[12px] font-bold uppercase tracking-[0.1em] text-[#5a6b85]">
+        Il tuo mondo
+      </span>
+      <div
+        role="radiogroup"
+        aria-labelledby="mondo-l"
+        className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden"
+        data-testid="world-chips"
+      >
+        {PUBLIC_WORLDS.map((w) => {
+          const on = w === value;
+          return (
+            <button
+              key={w}
+              type="button"
+              role="radio"
+              aria-checked={on}
+              title={WORLD_HINT[w]}
+              onClick={() => onChange(w)}
+              data-world={w}
+              className={`scd-focus inline-flex min-h-11 shrink-0 items-center rounded-full border px-4 text-[14px] font-semibold transition-colors duration-150 ${on ? "border-[#0b2a5b] bg-[#0b2a5b] text-white" : "border-[#c9d7ea] bg-white text-[#0b2a5b] hover:border-[#1556c4]"}`}
+            >
+              {WORLD_LABEL[w]}
+            </button>
+          );
+        })}
       </div>
     </div>
   );
 }
 
-/* ---------------------------------------------------- this week's news */
-
-const WEEK_FALLBACK = [
-  {
-    to: "/comunicazioni",
-    icon: Newspaper,
-    title: "Comunicazioni del club",
-    text: "Avvisi e novità della società, aggiornati dalla segreteria.",
-  },
-  {
-    to: "/top11",
-    icon: Star,
-    title: "Top 11 della settimana",
-    text: "Vota i migliori in campo: si premia ogni mese in club house.",
-  },
-  {
-    to: "/fantacalcio",
-    icon: Gamepad2,
-    title: "Fantacalcio SCD",
-    text: "Scegli i tuoi 11 tra i giocatori del club, gratis.",
-  },
-] as const;
-
-function WeekNews({
-  press,
-  nowMs,
-  today,
+/**
+ * La vetrina (UD-110) with its palinsesto: one rotating showcase right after the games of the week. The picks of the
+ * day for every world come from the server (getVetrina, Rome day); the visitor's world is chosen with the chips
+ * (public home) or fixed (member home: "soci"). Phones swipe a single row, desktop sees every slot in a grid.
+ */
+export function Vetrina({
+  worlds,
+  fixedWorld,
+  embedded = false,
 }: {
-  press: readonly PressItem[];
-  nowMs: number;
-  today: string;
+  worlds: Readonly<Record<VetrinaWorld, readonly VetrinaSlot[]>>;
+  /** Member home: the world comes from the session, no chips. */
+  fixedWorld?: VetrinaWorld;
+  /** Inside another layout column (member home): no page gutter. */
+  embedded?: boolean;
 }) {
-  const event = clubEventsOn(today).find((e) => e.date >= today) ?? null;
-  const items = press.slice(0, 4);
+  const [world, setWorld] = useState<VetrinaWorld>(fixedWorld ?? "tutti");
+  useEffect(() => {
+    if (!fixedWorld) setWorld(readWorld());
+  }, [fixedWorld]);
+  const choose = (w: VetrinaWorld) => {
+    setWorld(w);
+    saveWorld(w);
+  };
+  const slots = worlds[world] ?? [];
+  const any = Object.values(worlds).some((l) => l.length > 0);
+  if (!any) return null;
   return (
     <section
-      aria-labelledby="club-settimana-t"
-      className={`${WRAP} pt-8 lg:pt-12`}
-      data-testid="week-news"
+      aria-labelledby="vetrina-t"
+      className={embedded ? "min-w-0" : `${WRAP} pt-6 lg:pt-10`}
+      data-testid="vetrina"
+      data-world={world}
     >
       <div className="flex items-end justify-between gap-3 pb-3">
+        <div className="grid gap-1">
+          <span className="text-[11.5px] font-extrabold uppercase tracking-[0.12em] text-[#1556c4]">
+            Oggi nel club · cambia ogni giorno
+          </span>
+          <h2
+            id="vetrina-t"
+            className="scd-reveal m-0 font-uv text-[24px] uppercase leading-none text-[#0b2a5b] sm:text-[26px] lg:text-[30px]"
+          >
+            In vetrina
+          </h2>
+        </div>
+        <Link
+          to="/eventi"
+          className="scd-focus inline-flex min-h-11 shrink-0 items-center gap-0.5 rounded-md text-[14px] font-semibold text-[#1556c4]"
+        >
+          Tutti gli eventi
+          <ChevronRight className="size-4" aria-hidden="true" />
+        </Link>
+      </div>
+      {!fixedWorld && <WorldChips value={world} onChange={choose} />}
+      <ul
+        className={`-mx-4 m-0 flex list-none snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] lg:mx-0 lg:grid lg:snap-none lg:gap-4 lg:overflow-visible lg:px-0 [&::-webkit-scrollbar]:hidden ${embedded ? "lg:grid-cols-2" : "lg:grid-cols-3"}`}
+        aria-label={`Contenuti in vetrina oggi: ${WORLD_LABEL[world]}`}
+        aria-live="polite"
+      >
+        {slots.map((s) => (
+          <li key={s.id} className="flex shrink-0 basis-[80%] snap-start sm:basis-[calc((100%-12px)/2)] lg:basis-auto">
+            <SlotCard slot={s} />
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+/* ---------------------------------------------------------------- news */
+
+/**
+ * Le notizie (UD-110, 19:03): a short mixed feed — newspapers on every age group, recent articles of the club website
+ * and club news — each item opening the original. Negative headlines are filtered on the server (they stay on
+ * /rassegna-stampa); with nothing recent the block says so and links to the press review.
+ */
+function HomeNewsBlock({ items, nowMs }: { items: readonly NewsItem[]; nowMs: number }) {
+  return (
+    <section aria-labelledby="notizie-t" className={`${WRAP} pt-8 lg:pt-12`} data-testid="home-news">
+      <div className="flex items-end justify-between gap-3 pb-3">
         <h2
-          id="club-settimana-t"
+          id="notizie-t"
           className="scd-reveal m-0 font-uv text-[24px] uppercase leading-none text-[#0b2a5b] sm:text-[26px] lg:text-[30px]"
         >
-          Questa settimana nel club
+          Le notizie
         </h2>
         <Link
-          to="/rassegna"
+          to="/rassegna-stampa"
           className="scd-focus inline-flex min-h-11 shrink-0 items-center gap-0.5 rounded-md text-[14px] font-semibold text-[#1556c4]"
         >
           Tutte<span className="max-sm:hidden">&nbsp;le notizie</span>
           <ChevronRight className="size-4" aria-hidden="true" />
         </Link>
       </div>
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
-        {event && (
-          <Link
-            to={event.href as never}
-            className="scd-focus scd-lift group grid grid-cols-[112px_minmax(0,1fr)] overflow-hidden rounded-[16px] bg-[#0b2a5b] text-white shadow-[0_8px_24px_-12px_rgb(11_42_91/0.45)] sm:grid-cols-[160px_minmax(0,1fr)] lg:grid-cols-[200px_minmax(0,1fr)]"
-          >
-            <img
-              src={event.image}
-              alt={`Locandina ${event.title}`}
-              loading="lazy"
-              decoding="async"
-              className="h-full min-h-[150px] w-full object-cover object-top"
-            />
-            <span className="flex flex-col gap-1.5 p-4 lg:p-5">
-              <span className="w-fit rounded-full bg-[#ffd600] px-2 py-[3px] text-[10.5px] font-extrabold uppercase leading-none tracking-[0.06em] text-[#0b1e3a]">
-                Evento · {event.when}
-              </span>
-              <span className="font-uv text-[26px] uppercase leading-[0.95] lg:text-[32px]">
-                {event.title}
-              </span>
-              <span className="text-[14px] leading-snug text-white/85">
-                {event.text}
-              </span>
-              <span className="mt-auto inline-flex items-center gap-1 pt-1 text-[14px] font-semibold text-[#ffd600]">
-                Programma e iscrizioni
-                <ArrowRight
-                  className="size-4 transition-transform duration-200 group-hover:translate-x-0.5"
-                  aria-hidden="true"
-                />
-              </span>
-            </span>
-          </Link>
+      <div className="overflow-hidden rounded-[16px] bg-white shadow-[0_1px_2px_rgb(11_42_91/0.06),0_8px_24px_-12px_rgb(11_42_91/0.25)]">
+        {items.length > 0 ? (
+          <ul className="m-0 grid list-none divide-y divide-[#e6edf6] p-0 lg:grid-cols-2 lg:divide-y-0 lg:[&>li]:border-b lg:[&>li]:border-[#e6edf6]">
+            {items.map((n) => {
+              const inner = (
+                <>
+                  <span className="grid size-9 shrink-0 place-items-center rounded-[10px] bg-[#e6eefa] text-[#1556c4]">
+                    <Newspaper className="size-[18px]" aria-hidden="true" />
+                  </span>
+                  <span className="grid min-w-0 flex-1 gap-0.5">
+                    <span className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[12px] font-semibold uppercase tracking-[0.05em] text-[#5a6b85]">
+                      <span>{NEWS_SOURCE_LABEL[n.sourceKind]}</span>
+                      <span aria-hidden="true">·</span>
+                      <span className="normal-case tracking-normal">{n.source}</span>
+                      {n.publishedAt && <span className="normal-case tracking-normal">· {timeAgo(n.publishedAt, nowMs)}</span>}
+                      {n.tag && (
+                        <span className="rounded-full bg-[#ffd600] px-1.5 py-[2px] text-[10px] font-extrabold leading-none text-[#0b1e3a]">
+                          {n.tag}
+                        </span>
+                      )}
+                    </span>
+                    <span className="line-clamp-2 text-[15px] font-semibold leading-snug text-[#0b1e3a] group-hover:underline">
+                      {n.title}
+                    </span>
+                  </span>
+                  <ArrowUpRight className="mt-1 size-4 shrink-0 text-[#9fb0c8]" aria-hidden="true" />
+                </>
+              );
+              return (
+                <li key={n.id}>
+                  {n.external ? (
+                    <a
+                      href={n.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="scd-focus group flex items-start gap-3 px-4 py-3.5 hover:bg-[#f4f7fb]"
+                    >
+                      {inner}
+                      <span className="sr-only">(apre il sito di {n.source})</span>
+                    </a>
+                  ) : (
+                    <Link to={n.url as never} className="scd-focus group flex items-start gap-3 px-4 py-3.5 hover:bg-[#f4f7fb]">
+                      {inner}
+                    </Link>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        ) : (
+          <p className="m-0 flex items-center gap-3 px-4 py-4 text-[14.5px] text-[#4a5d7a]" data-testid="home-news-empty">
+            <Newspaper className="size-5 shrink-0 text-[#1556c4]" aria-hidden="true" />
+            Nessuna notizia recente in questo momento: la rassegna si aggiorna da sola.
+          </p>
         )}
-        <div className="overflow-hidden rounded-[16px] bg-white shadow-[0_1px_2px_rgb(11_42_91/0.06),0_8px_24px_-12px_rgb(11_42_91/0.25)]">
-          {items.length > 0 ? (
-            <ul className="m-0 list-none divide-y divide-[#e6edf6] p-0">
-              {items.map((p) => (
-                <li key={p.url}>
-                  <a
-                    href={p.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="scd-focus group flex items-start gap-3 px-4 py-3.5 hover:bg-[#f4f7fb]"
-                  >
-                    <span className="grid size-9 shrink-0 place-items-center rounded-[10px] bg-[#e6eefa] text-[#1556c4]">
-                      <Newspaper className="size-[18px]" aria-hidden="true" />
-                    </span>
-                    <span className="grid min-w-0 flex-1 gap-0.5">
-                      <span className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#5a6b85]">
-                        {p.source}
-                        {p.publishedAt
-                          ? ` · ${timeAgo(p.publishedAt, nowMs)}`
-                          : ""}
-                      </span>
-                      <span className="line-clamp-2 text-[15px] font-semibold leading-snug text-[#0b1e3a] group-hover:underline">
-                        {p.title}
-                      </span>
-                    </span>
-                    <ArrowUpRight
-                      className="mt-1 size-4 shrink-0 text-[#9fb0c8]"
-                      aria-hidden="true"
-                    />
-                    <span className="sr-only">
-                      (apre il sito della testata)
-                    </span>
-                  </a>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <ul className="m-0 list-none divide-y divide-[#e6edf6] p-0">
-              {WEEK_FALLBACK.map((w) => (
-                <li key={w.to}>
-                  <Link
-                    to={w.to}
-                    className="scd-focus flex items-center gap-3 px-4 py-4 hover:bg-[#f4f7fb]"
-                  >
-                    <span className="grid size-10 shrink-0 place-items-center rounded-[10px] bg-[#e6eefa] text-[#1556c4]">
-                      <w.icon className="size-5" aria-hidden="true" />
-                    </span>
-                    <span className="grid min-w-0 flex-1 gap-0.5">
-                      <b className="text-[15.5px] leading-tight text-[#0b1e3a]">
-                        {w.title}
-                      </b>
-                      <span className="text-[13.5px] leading-snug text-[#4a5d7a]">
-                        {w.text}
-                      </span>
-                    </span>
-                    <ChevronRight
-                      className="size-5 shrink-0 text-[#9fb0c8]"
-                      aria-hidden="true"
-                    />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
       </div>
     </section>
   );
 }
 
-/* ------------------------------------------------------------- partners */
+/* --------------------------------------------------------- sponsor zone */
 
 const monthName = (day: string) =>
   new Intl.DateTimeFormat("it-IT", { timeZone: "UTC", month: "long" }).format(
     new Date(`${day.slice(0, 7)}-15T12:00:00Z`),
   );
 
-const PACKAGE_IDS = ["main", "naming", "team", "digital"];
-
-function Partners({ today }: { today: string }) {
-  const verified = verifiedSponsors();
-  const logos = verified.slice(0, 18);
-  const showcase = partnerOfTheMonth(today);
-  const shownPackages = PACKAGE_IDS.map((id) =>
-    SPONSOR_PACKAGES.find((p) => p.id === id),
-  ).filter((p): p is (typeof SPONSOR_PACKAGES)[number] => !!p);
+/**
+ * The ONE sponsor zone of the home (UD-110: "sponsor e loghi in fondo ripetuti più volte … sponsor devono essere a
+ * colori"): LED wall with every partner in rotation (UD-107, every day now), the partner of the month, partner news
+ * (lib/partner-news.ts, never invented: empty state invites partners) and "Diventa partner". Logos always in colour.
+ */
+function SponsorZone({ day, nowMs, ledOnHome }: { day: string; nowMs: number; ledOnHome: boolean }) {
+  const showcase = partnerOfTheMonth(day);
+  const news = partnerNewsOn(day);
   return (
-    <section
-      aria-labelledby="partner-t"
-      className={`${WRAP} pt-8 lg:pt-12`}
-      data-testid="partners"
-    >
+    <section aria-labelledby="partner-t" className={`${WRAP} pt-8 lg:pt-12`} data-testid="sponsor-zone">
       <div className="flex items-end justify-between gap-3 pb-3">
         <h2
           id="partner-t"
           className="scd-reveal m-0 font-uv text-[24px] uppercase leading-none text-[#0b2a5b] sm:text-[26px] lg:text-[30px]"
         >
-          Partner e sponsor
+          I nostri partner
         </h2>
         <Link
           to="/sponsor"
           className="scd-focus inline-flex min-h-11 shrink-0 items-center gap-0.5 rounded-md text-[14px] font-semibold text-[#1556c4]"
+          data-testid="all-partners"
         >
           Tutti i {SPONSORS.length} partner
           <ChevronRight className="size-4" aria-hidden="true" />
@@ -629,212 +590,125 @@ function Partners({ today }: { today: string }) {
       </div>
       <div className="grid gap-4 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
         <div className="flex flex-col gap-4 rounded-[16px] bg-white p-4 shadow-[0_1px_2px_rgb(11_42_91/0.06),0_8px_24px_-12px_rgb(11_42_91/0.25)] lg:p-5">
-          <p className="m-0 text-[14px] leading-snug text-[#4a5d7a]">
-            Le aziende che sostengono la stagione 2026/27 della ColicoDerviese.
-          </p>
-          <ul className="m-0 grid list-none grid-cols-3 gap-2 p-0 sm:grid-cols-4 lg:grid-cols-6">
-            {logos.map((s, i) => (
-              <li
-                key={s.slug}
-                className={i >= 12 ? "max-lg:hidden" : undefined}
-              >
-                <LogoTile className="h-[68px] px-2">
-                  <SponsorLogo sponsor={s} box={{ w: 92, h: 38 }} />
-                </LogoTile>
-              </li>
-            ))}
-          </ul>
+          {ledOnHome && (
+            <div data-testid="home-ledwall">
+              <LedwallRotator day={day} nowMs={nowMs} variant="compact" />
+            </div>
+          )}
           {showcase && (
-            <div className="mt-auto flex items-center gap-3.5 rounded-[12px] bg-[#eef3f9] p-3">
-              <LogoTile className="h-[56px] w-[88px] shrink-0">
-                <SponsorLogo
-                  sponsor={showcase}
-                  box={{ w: 72, h: 40 }}
-                  decorative
-                  mono={false}
-                />
+            <div
+              className="mt-auto flex items-center gap-3.5 rounded-[12px] bg-[#eef3f9] p-3"
+              data-testid="partner-of-month"
+            >
+              <LogoTile className="h-[60px] w-[96px] shrink-0">
+                <SponsorLogo sponsor={showcase} box={{ w: 80, h: 44 }} decorative />
               </LogoTile>
-              <span className="grid min-w-0 gap-0.5">
+              <span className="grid min-w-0 flex-1 gap-0.5">
                 <span className="text-[11.5px] font-bold uppercase tracking-[0.08em] text-[#1556c4]">
-                  In vetrina a {monthName(today)}
+                  Partner del mese · {monthName(day)}
                 </span>
-                <b className="text-[16px] leading-tight text-[#0b1e3a]">
-                  {sponsorLabel(showcase)}
-                </b>
+                <b className="text-[16px] leading-tight text-[#0b1e3a]">{sponsorLabel(showcase)}</b>
               </span>
             </div>
           )}
         </div>
-        <div
-          className="relative isolate flex flex-col gap-4 overflow-hidden rounded-[16px] bg-[#0b2a5b] p-5 text-white lg:p-6"
-          data-testid="become-partner"
-        >
-          <span
-            aria-hidden="true"
-            className="absolute -right-16 -top-16 -z-10 size-56 rounded-full bg-[#1556c4]/45 blur-2xl"
-          />
-          <div className="grid gap-1.5">
+        <div className="grid content-start gap-4">
+          <div
+            className="rounded-[16px] bg-white p-4 shadow-[0_1px_2px_rgb(11_42_91/0.06),0_8px_24px_-12px_rgb(11_42_91/0.25)] lg:p-5"
+            data-testid="partner-news"
+          >
+            <h3 className="m-0 text-[12px] font-bold uppercase tracking-[0.1em] text-[#1556c4]">
+              Notizie dai partner
+            </h3>
+            {news.length > 0 ? (
+              <ul className="m-0 mt-2 grid list-none gap-0 divide-y divide-[#e6edf6] p-0">
+                {news.map((n) => {
+                  const body = (
+                    <>
+                      <LogoTile className="h-[44px] w-[64px] shrink-0">
+                        <SponsorLogo sponsor={n.sponsor} box={{ w: 54, h: 30 }} decorative />
+                      </LogoTile>
+                      <span className="grid min-w-0 gap-0.5">
+                        <span className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#5a6b85]">
+                          {n.label}
+                        </span>
+                        <b className="text-[15px] leading-snug text-[#0b1e3a]">{n.title}</b>
+                        <span className="text-[13.5px] leading-snug text-[#4a5d7a]">{n.text}</span>
+                      </span>
+                    </>
+                  );
+                  return (
+                    <li key={n.id}>
+                      {n.url ? (
+                        <a
+                          href={n.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="scd-focus flex items-start gap-3 py-3 hover:bg-[#f4f7fb]"
+                        >
+                          {body}
+                          <span className="sr-only">(apre il sito del partner)</span>
+                        </a>
+                      ) : (
+                        <div className="flex items-start gap-3 py-3">{body}</div>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <div className="mt-2 flex items-start gap-3" data-testid="partner-news-empty">
+                <span className="grid size-10 shrink-0 place-items-center rounded-[10px] bg-[#e6eefa] text-[#1556c4]">
+                  <Megaphone className="size-5" aria-hidden="true" />
+                </span>
+                <span className="grid min-w-0 gap-1">
+                  <b className="text-[15.5px] leading-tight text-[#0b1e3a]">Raccontaci la tua novità</b>
+                  <span className="text-[14px] leading-snug text-[#4a5d7a]">
+                    Sei un nostro partner? Un nuovo prodotto, un'apertura, un'offerta per le famiglie: la pubblichiamo
+                    qui.
+                  </span>
+                  <Link
+                    to="/contatti"
+                    className="scd-focus inline-flex min-h-11 w-fit items-center gap-1 rounded-md text-[14.5px] font-bold text-[#1556c4]"
+                  >
+                    Invia la notizia
+                    <ArrowRight className="size-4" aria-hidden="true" />
+                  </Link>
+                </span>
+              </div>
+            )}
+          </div>
+          <div
+            className="relative isolate flex flex-col gap-3 overflow-hidden rounded-[16px] bg-[#0b2a5b] p-5 text-white lg:p-6"
+            data-testid="become-partner"
+          >
+            <span
+              aria-hidden="true"
+              className="absolute -right-16 -top-16 -z-10 size-56 rounded-full bg-[#1556c4]/45 blur-2xl"
+            />
             <span className="w-fit rounded-full bg-[#ffd600] px-2.5 py-1 text-[11px] font-extrabold uppercase leading-none tracking-[0.06em] text-[#0b1e3a]">
               Diventa partner
             </span>
-            <h3 className="m-0 font-uv text-[30px] uppercase leading-[0.95] lg:text-[36px]">
+            <h3 className="m-0 font-uv text-[28px] uppercase leading-[0.95] lg:text-[32px]">
               Il tuo marchio sul campo
             </h3>
             <p className="m-0 text-[14.5px] leading-snug text-white/85">
-              LED a bordo campo, divise, eventi e app: famiglie e tifosi di
-              Colico e Dervio, ogni settimana.
+              LED a bordo campo, divise, tornei e app: famiglie e tifosi di Colico e Dervio, ogni settimana.
             </p>
+            <div className="flex flex-wrap items-center gap-2.5 pt-1">
+              <Link
+                to="/sponsor"
+                hash="proposta"
+                className="scd-focus inline-flex h-12 items-center gap-2 rounded-[12px] bg-[#ffd600] px-5 text-[15.5px] font-bold text-[#0b1e3a] transition-[filter] duration-150 hover:brightness-95"
+                data-testid="home-ledwall-cta"
+              >
+                Richiedi una proposta
+                <ArrowRight className="size-[18px]" aria-hidden="true" />
+              </Link>
+            </div>
+            <p className="m-0 text-[12.5px] text-white/65">Proposte su misura, nessun pagamento online.</p>
           </div>
-          <ul className="m-0 grid list-none gap-2.5 p-0">
-            {shownPackages.map((p) => (
-              <li key={p.id} className="flex gap-2.5">
-                <Check
-                  className="mt-[3px] size-[18px] shrink-0 text-[#ffd600]"
-                  strokeWidth={2.4}
-                  aria-hidden="true"
-                />
-                <span className="text-[14.5px] leading-snug">
-                  <b className="font-semibold">{p.nome}</b>
-                  <span className="text-white/80"> · {p.pitch}</span>
-                </span>
-              </li>
-            ))}
-          </ul>
-          <div className="mt-auto flex flex-wrap items-center gap-2.5 pt-1">
-            <Link
-              to="/sponsor"
-              hash="proposta"
-              className="scd-focus inline-flex h-12 items-center gap-2 rounded-[12px] bg-[#ffd600] px-5 text-[15.5px] font-bold text-[#0b1e3a] transition-[filter] duration-150 hover:brightness-95"
-            >
-              Richiedi una proposta
-              <ArrowRight className="size-[18px]" aria-hidden="true" />
-            </Link>
-            <Link
-              to="/contatti"
-              className="scd-focus inline-flex h-12 items-center rounded-[12px] px-3 text-[15px] font-semibold text-white underline decoration-white/40 underline-offset-4 hover:decoration-white"
-            >
-              Parla con noi
-            </Link>
-          </div>
-          <p className="m-0 text-[12.5px] text-white/65">
-            Proposte su misura, nessun pagamento online.
-          </p>
         </div>
-      </div>
-    </section>
-  );
-}
-
-/* ------------------------------------------------------ LED wall (UD-107) */
-
-/**
- * Compact LED wall on the home, only on the LED wall days (LEDWALL_HOME_DAYS: Monday, Thursday and home-game days).
- * Placed with the partners, far below the first screen; the sponsor page shows it every day.
- */
-function HomeLedwall({ day, nowMs }: { day: string; nowMs: number }) {
-  return (
-    <section
-      aria-labelledby="ledwall-home-t"
-      className={`${WRAP} pt-8 lg:pt-12`}
-      data-testid="home-ledwall"
-    >
-      <div className="grid items-center gap-4 rounded-[16px] bg-white p-4 shadow-[0_1px_2px_rgb(11_42_91/0.06),0_8px_24px_-12px_rgb(11_42_91/0.25)] lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-6 lg:p-5">
-        <LedwallRotator day={day} nowMs={nowMs} variant="compact" />
-        <div className="grid gap-2 lg:pr-2">
-          <span className="w-fit rounded-full bg-[#0b2a5b] px-2.5 py-1 text-[11px] font-extrabold uppercase leading-none tracking-[0.06em] text-[#ffd600]">
-            Oggi sul ledwall
-          </span>
-          <h2
-            id="ledwall-home-t"
-            className="m-0 font-uv text-[24px] uppercase leading-[0.95] text-[#0b2a5b] sm:text-[26px] lg:text-[30px]"
-          >
-            I nostri partner in campo
-          </h2>
-          <p className="m-0 text-[14.5px] leading-snug text-[#4a5d7a]">
-            Tutti i partner della stagione 2026/27 a rotazione sul ledwall a bordo campo.
-          </p>
-          <Link
-            to="/sponsor"
-            className="scd-focus mt-1 inline-flex min-h-11 w-fit items-center gap-1 rounded-md text-[15px] font-bold text-[#1556c4]"
-            data-testid="home-ledwall-cta"
-          >
-            Diventa partner
-            <ArrowRight className="size-4" aria-hidden="true" />
-          </Link>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ------------------------------------------------------- link accordions */
-
-function LinkGroups() {
-  return (
-    <section
-      aria-labelledby="tutto-t"
-      className={`${WRAP} pb-4 pt-8 lg:pt-12`}
-      data-testid="link-groups"
-    >
-      <h2
-        id="tutto-t"
-        className="scd-reveal m-0 pb-3 font-uv text-[24px] uppercase leading-none text-[#0b2a5b] sm:text-[26px] lg:text-[30px]"
-      >
-        Tutto sul club
-      </h2>
-      <div className="grid gap-2.5 md:grid-cols-2 lg:grid-cols-3 lg:items-start">
-        {LINK_GROUPS.map((g) => (
-          <details
-            key={g.id}
-            className="group rounded-[14px] border border-[#dbe5f1] bg-white open:shadow-[0_8px_24px_-14px_rgb(11_42_91/0.3)]"
-          >
-            <summary className="scd-focus flex min-h-[52px] cursor-pointer list-none items-center justify-between gap-3 rounded-[14px] px-4 text-[15.5px] font-bold text-[#0b2a5b] [&::-webkit-details-marker]:hidden">
-              {g.title}
-              <ChevronDown
-                className="size-5 shrink-0 text-[#1556c4] transition-transform duration-200 group-open:rotate-180 motion-reduce:transition-none"
-                aria-hidden="true"
-              />
-            </summary>
-            <ul className="m-0 grid list-none gap-0.5 px-2 pb-3 pt-0">
-              {g.items.map((it) => (
-                <li key={it.label}>
-                  <To
-                    link={it}
-                    className="scd-focus flex min-h-11 items-center justify-between gap-2 rounded-[10px] px-2 text-[15px] text-[#24385a] hover:bg-[#eef3f9]"
-                  >
-                    <span>{it.label}</span>
-                    {it.reserved ? (
-                      <span className="inline-flex items-center gap-1 text-[12px] font-semibold text-[#5a6b85]">
-                        <Lock className="size-3.5" aria-hidden="true" />
-                        riservata
-                      </span>
-                    ) : (
-                      <ChevronRight
-                        className="size-4 text-[#9fb0c8]"
-                        aria-hidden="true"
-                      />
-                    )}
-                  </To>
-                </li>
-              ))}
-              {g.id === "app" && (
-                <li>
-                  <button
-                    type="button"
-                    onClick={openCookiePrefs}
-                    className="scd-focus flex min-h-11 w-full items-center justify-between gap-2 rounded-[10px] px-2 text-left text-[15px] text-[#24385a] hover:bg-[#eef3f9]"
-                  >
-                    Preferenze cookie
-                    <ChevronRight
-                      className="size-4 text-[#9fb0c8]"
-                      aria-hidden="true"
-                    />
-                  </button>
-                </li>
-              )}
-            </ul>
-          </details>
-        ))}
       </div>
     </section>
   );
@@ -1054,78 +928,6 @@ function Matchday({
   );
 }
 
-/* ------------------------------------------------------ partner ticker */
-
-/** Pitch-side LED board: verified partners scroll by; pausable (WCAG 2.2.2), static with reduced motion. */
-function PartnerTicker() {
-  const logos = verifiedSponsors();
-  const [paused, setPaused] = useState(false);
-  if (logos.length < 4) return null;
-  const row = (copy: boolean) => (
-    <ul
-      aria-hidden={copy || undefined}
-      className={`m-0 flex list-none gap-3 p-0 pr-3 ${copy ? "scd-marquee-copy" : ""}`}
-    >
-      {logos.map((s) => (
-        <li key={s.slug} className="shrink-0">
-          <LogoTile className="h-[52px] w-[120px] border-white/0 shadow-[inset_0_-2px_0_rgb(11_42_91/0.08),0_1px_0_rgb(255_255_255/0.35)] lg:h-[58px] lg:w-[132px]">
-            <SponsorLogo
-              sponsor={s}
-              box={{ w: 104, h: 36 }}
-              decorative={copy}
-              mono={false}
-            />
-          </LogoTile>
-        </li>
-      ))}
-    </ul>
-  );
-  return (
-    <section
-      aria-label="Partner della stagione 2026/27"
-      className="scd-ledband mt-8 border-y-2 border-[#ffd600] py-3 lg:mt-12"
-      data-testid="partner-ticker"
-    >
-      <div className={`${WRAP} flex items-center gap-3 lg:gap-5`}>
-        <Link
-          to="/sponsor"
-          className="scd-focus shrink-0 rounded-md font-uv text-[17px] uppercase leading-[0.95] text-white max-sm:hidden lg:text-[20px]"
-        >
-          Partner
-          <br />
-          <span className="text-[#ffd600]">2026/27</span>
-        </Link>
-        <div
-          className="scd-marquee relative min-w-0 flex-1 overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_5%,#000_95%,transparent)]"
-          data-paused={paused ? "true" : "false"}
-        >
-          <div className="scd-marquee-track">
-            {row(false)}
-            {row(true)}
-          </div>
-        </div>
-        <button
-          type="button"
-          onClick={() => setPaused((p) => !p)}
-          aria-pressed={paused}
-          aria-label={
-            paused
-              ? "Riprendi lo scorrimento dei partner"
-              : "Metti in pausa lo scorrimento dei partner"
-          }
-          className="scd-focus scd-marquee-btn grid size-11 shrink-0 place-items-center rounded-full border border-white/35 text-white transition-colors duration-150 hover:bg-white/10"
-        >
-          {paused ? (
-            <Play className="size-4" aria-hidden="true" />
-          ) : (
-            <Pause className="size-4" aria-hidden="true" />
-          )}
-        </button>
-      </div>
-    </section>
-  );
-}
-
 /* ---------------------------------------------------------------- page */
 
 /** Games of the next 7 days of every team (official calendar snapshot): always on the public home. */
@@ -1186,17 +988,19 @@ function PublicWeek({
 }
 
 export function PublicHome({
-  press,
   calendar,
-  initiatives = [],
+  news = [],
+  vetrina = EMPTY_WORLDS,
   ledwallDay,
   nowMs,
   today,
 }: {
-  press: readonly PressItem[];
   calendar: PublicCalendar;
-  initiatives?: readonly Initiative[];
-  /** Server Rome day for the LED wall days (defaults to today). */
+  /** Mixed news highlight of the day (getHomeNews). */
+  news?: readonly NewsItem[];
+  /** Vetrina picks of the day for every world, from the server (getVetrina). */
+  vetrina?: Readonly<Record<VetrinaWorld, readonly VetrinaSlot[]>>;
+  /** Server Rome day for the LED wall and the sponsor zone (defaults to today). */
   ledwallDay?: string;
   nowMs: number;
   today: string;
@@ -1212,6 +1016,7 @@ export function PublicHome({
       }),
     [calendar, ledDay],
   );
+  // UD-110 order: strip → credentials (once) → games of the week → vetrina → news → join → ONE sponsor zone → footer.
   return (
     <main
       data-screen="home"
@@ -1224,14 +1029,10 @@ export function PublicHome({
       <QuickStrip />
       <CredentialBar />
       <PublicWeek calendar={calendar} nowMs={nowMs} today={today} />
-      <Featured initiatives={initiatives} />
-      <PartnerTicker />
+      <Vetrina worlds={vetrina} />
+      <HomeNewsBlock items={news} nowMs={nowMs} />
       <JoinBanner />
-      <Trust />
-      <WeekNews press={press} nowMs={nowMs} today={today} />
-      {ledOnHome && <HomeLedwall day={ledDay} nowMs={nowMs} />}
-      <Partners today={today} />
-      <LinkGroups />
+      <SponsorZone day={ledDay} nowMs={nowMs} ledOnHome={ledOnHome} />
     </main>
   );
 }

@@ -40,7 +40,7 @@ describe("helper persona (Direzione 12/10/2026: Crovi outside, Sky inside)", () 
   });
 
   it("never fronts the public pages with Sky (Direzione 13/10/2026): Crovi everywhere outside", () => {
-    for (const p of ["/", "/fantacalcio", "/top11", "/top11/settimana", "/calendario", "/contatti", "/partner", "/sponsor", "/societa", "/eventi", "/comunicazioni", "/rassegna", "/impianti", "/privacy"]) {
+    for (const p of ["/", "/fantacalcio", "/top11", "/top11/settimana", "/calendario", "/contatti", "/partner", "/sponsor", "/societa", "/eventi", "/comunicazioni", "/rassegna-stampa", "/tornei", "/kit", "/impianti", "/privacy"]) {
       expect(launcherFaceFor(p)).toBe("crovi");
       expect(personaFor(p)).toBe("crovi");
     }

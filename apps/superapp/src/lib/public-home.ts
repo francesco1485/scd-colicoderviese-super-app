@@ -1,9 +1,10 @@
 /**
- * Content model of the signed-out public home (UD-100, brief "Public home v4", Direzione 13/10/2026).
+ * Content model of the signed-out public home (UD-100, brief "Public home v4"; vetrina clean-up UD-110, Direzione
+ * 13/10/2026).
  *
- * Layout reference: the Eurobet web homepage structure only (quick-link strip, editorial carousel, wide CTA banner,
- * trust carousel, content of the week, partners, SEO accordions, rich footer). Never betting, odds, bonus or casino
- * content. Every entry below is real club content and every internal link is an existing public route
+ * Layout reference: the Eurobet web homepage structure only (quick-link strip, credential strip, games of the week,
+ * rotating vetrina, wide CTA banner, ONE sponsor zone, rich footer with the link groups). Never betting, odds, bonus or
+ * casino content. The vetrina slots live in vetrina-slots.server.ts (picked per day on the server). Every entry below is real club content and every internal link is an existing public route
  * (checked by public-home.test.ts against src/routeTree.gen.ts). Teams, rosters, fixtures and team calendars are
  * not part of the public home: they live inside after sign-in.
  */
@@ -50,6 +51,7 @@ export const QUICK_LINKS: readonly QuickLink[] = [
     icon: "trophy",
     badge: "nuovo",
   },
+  { label: "Tornei", to: "/tornei", icon: "trophy" },
   { label: "Diventa partner", to: "/sponsor", icon: "handshake", badge: "top" },
   { label: "Iscrizioni 2026/27", to: "/entra", icon: "clipboard" },
   { label: "Notizie", to: "/comunicazioni", icon: "newspaper" },
@@ -66,156 +68,10 @@ export const QUICK_LINKS: readonly QuickLink[] = [
   { label: "Contatti", to: "/contatti", icon: "phone" },
 ];
 
-/** Visual of an editorial card: a real image, or an original typographic/logo panel (no invented asset). */
-export type FeatureVisual =
-  | {
-      kind: "image";
-      src: string;
-      alt: string;
-      position?: string;
-      fit?: "cover" | "contain";
-    }
-  | { kind: "sponsors" }
-  | { kind: "type"; big: string; small: string };
-
-export interface FeatureCard extends PublicLink {
-  id: string;
-  title: string;
-  text: string;
-  kicker: string;
-  badge?: string;
-  visual: FeatureVisual;
-}
-
-/** "In primo piano": editorial carousel of real club content. No aerial photo of the sports centre (UD-100). */
-export const FEATURES: readonly FeatureCard[] = [
-  {
-    id: "lario-cup",
-    kicker: "Torneo · 8 dicembre 2026",
-    title: "Christmas Lario Cup",
-    text: "1ª edizione a Colico: annate 2015 e 2016, iscrizioni aperte.",
-    badge: "Nuovo",
-    to: "/eventi/christmas-lario-cup",
-    visual: {
-      kind: "image",
-      src: "/media/eventi/christmas-lario-cup-2026-maschile.webp",
-      alt: "Locandina ufficiale della Christmas Lario Cup 2026",
-      position: "center 18%",
-    },
-  },
-  {
-    id: "partner",
-    kicker: "Partner 2026/27",
-    title: "Il tuo marchio sul campo",
-    text: "LED, divise, eventi e app: una proposta su misura per la tua azienda.",
-    to: "/sponsor",
-    visual: { kind: "sponsors" },
-  },
-  {
-    id: "iscrizioni",
-    kicker: "Stagione 2026/27",
-    title: "Iscrizioni e Scuola Calcio",
-    text: "Dai Piccoli Amici alla Prima Squadra: chiedi una prova.",
-    to: "/entra",
-    // Typographic panel: the kit boards carry shop prices, which do not belong on an editorial card.
-    visual: { kind: "type", big: "26/27", small: "Iscrizioni aperte" },
-  },
-  {
-    id: "rassegna",
-    kicker: "Rassegna stampa",
-    title: "Dicono di noi",
-    text: "I titoli delle testate su società, Colico e Dervio.",
-    to: "/rassegna",
-    visual: {
-      kind: "image",
-      src: "/media/scd/lario-header.webp",
-      alt: "L'Alto Lago di Como visto da Colico",
-      position: "30% center",
-    },
-  },
-  {
-    id: "fantacalcio",
-    kicker: "Giochi del club",
-    title: "Fantacalcio SCD",
-    text: "Scegli i tuoi 11 tra i giocatori del club e sfida gli altri tifosi.",
-    to: "/fantacalcio",
-    visual: { kind: "type", big: "11", small: "Fantacalcio SCD" },
-  },
-  {
-    id: "monza",
-    kicker: "Affiliazione",
-    title: "Insieme al Monza",
-    text: "Società affiliata al progetto Academy dell'AC Monza.",
-    to: "/societa",
-    visual: {
-      kind: "image",
-      src: "/media/affiliazioni/insieme-al-monza.webp",
-      alt: "Marchio Insieme al Monza, progetto Academy AC Monza",
-      fit: "contain",
-    },
-  },
-];
-
-export interface TrustFact extends PublicLink {
-  icon: PublicIcon;
-  title: string;
-  text: string;
-}
-
 /** Partners named with certainty in the 2026/27 list (src/lib/sponsors.ts). */
 export const verifiedSponsors = (
   list: readonly Sponsor[] = SPONSORS,
 ): Sponsor[] => list.filter((s) => s.nameVerified && !!s.name);
-
-/** "Perché la ColicoDerviese": real facts only (club profile, affiliations, documents, sponsor list). */
-export function trustFacts(
-  sponsorCount: number = SPONSORS.length,
-): TrustFact[] {
-  return [
-    {
-      icon: "badge",
-      title: "Club FIGC SGS 3° livello",
-      text: "Riconoscimento del Settore Giovanile e Scolastico FIGC. Matricola 26020.",
-      to: "/societa",
-    },
-    {
-      icon: "shield",
-      title: "Progetto Academy AC Monza",
-      text: "Società affiliata all'AC Monza: un percorso di crescita condiviso.",
-      to: "/societa",
-    },
-    {
-      icon: "map",
-      title: "Colico e Dervio, Alto Lago",
-      text: "Due paesi, una società: campi a Colico e a Dervio sul Lago di Como.",
-      to: "/impianti",
-    },
-    {
-      icon: "heart",
-      title: "Tutela dei minori",
-      text: "Modello safeguarding, regole su trasferte e immagini, segnalazioni riservate.",
-      to: "/safeguarding",
-    },
-    {
-      icon: "whistle",
-      title: "Tecnici per ogni gruppo",
-      text: "Uno staff dedicato a ogni annata, dalla Scuola Calcio alla Prima Squadra.",
-      to: "/societa",
-    },
-    {
-      icon: "smartphone",
-      title: "Un'app per tutto il club",
-      text: "Famiglie, atleti e tifosi: avvisi, calendario, giochi e aree riservate.",
-      to: "/guida",
-    },
-    {
-      icon: "building",
-      title: "Partner del territorio",
-      text: `${sponsorCount} aziende sostengono la stagione 2026/27.`,
-      to: "/sponsor",
-    },
-  ];
-}
 
 /** Partner shown "in vetrina" this month: rotates over the verified list by calendar month (Europe/Rome date). */
 export function partnerOfTheMonth(
@@ -242,7 +98,10 @@ export interface LinkGroup {
   items: readonly LinkItem[];
 }
 
-/** Accordion link groups (Eurobet SEO accordions). Real public routes only; reserved areas are marked. */
+/**
+ * Link groups of the site footer (UD-110: moved off the home body, the former "Tutto sul club" accordions). Real
+ * public routes only; reserved areas are marked.
+ */
 export const LINK_GROUPS: readonly LinkGroup[] = [
   {
     id: "club",
@@ -259,10 +118,13 @@ export const LINK_GROUPS: readonly LinkGroup[] = [
     title: "Per le famiglie",
     items: [
       { label: "Iscrizioni e prova", to: "/entra" },
+      { label: "Kit ufficiale 2026/27", to: "/kit" },
+      { label: "Le card 2026/27", to: "/card" },
       { label: "Registrati nell'app", to: "/registrati" },
       { label: "Calendario gare", to: "/calendario" },
       { label: "Guida all'app", to: "/guida" },
       { label: "Area famiglia", to: "/famiglia", reserved: true },
+      { label: "Area club", to: "/aree", reserved: true },
     ],
   },
   {
@@ -270,6 +132,7 @@ export const LINK_GROUPS: readonly LinkGroup[] = [
     title: "Eventi e tornei",
     items: [
       { label: "Tutti gli eventi", to: "/eventi" },
+      { label: "Tornei del club", to: "/tornei" },
       { label: "Christmas Lario Cup", to: "/eventi/christmas-lario-cup" },
       { label: "Fantacalcio SCD", to: "/fantacalcio" },
       { label: "Top 11 della settimana", to: "/top11" },
@@ -290,7 +153,7 @@ export const LINK_GROUPS: readonly LinkGroup[] = [
     title: "Comunicazione",
     items: [
       { label: "Comunicazioni del club", to: "/comunicazioni" },
-      { label: "Dicono di noi", to: "/rassegna" },
+      { label: "Dicono di noi", to: "/rassegna-stampa" },
       {
         label: "Social e video",
         to: "/comunicazioni",
@@ -371,14 +234,11 @@ export function matchdayLabel(date: string, today: string): string {
 export function publicHomeRoutes(): string[] {
   const all: PublicLink[] = [
     ...QUICK_LINKS,
-    ...FEATURES,
-    ...trustFacts(),
     ...LINK_GROUPS.flatMap((g) => g.items),
     { to: "/accedi" },
     { to: "/registrati" },
     { to: "/sponsor" },
-    { to: "/rassegna" },
-    { to: "/eventi" },
+    { to: "/contatti" },
   ];
   return [...new Set(all.map((l) => l.to))];
 }

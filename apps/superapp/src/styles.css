@@ -300,14 +300,7 @@
   background: none;
   box-shadow: none;
 }
-/* Loghi sponsor (Direzione 13/10/2026 15:31): su desktop con mouse in scala di grigi, a colori al passaggio o al focus. */
-@media (hover: hover) and (min-width: 1024px) {
-  .scd-logo-mono { filter: grayscale(1); opacity: 0.85; transition: filter 180ms var(--ease-out-strong), opacity 180ms var(--ease-out-strong); }
-  .scd-logo-tile:hover .scd-logo-mono,
-  a:focus-visible .scd-logo-mono,
-  .scd-logo-tile:focus-within .scd-logo-mono { filter: none; opacity: 1; }
-}
-@media (prefers-reduced-motion: reduce) { .scd-logo-mono { transition: none; } }
+/* Loghi sponsor: sempre a colori (UD-110, Direzione 13/10/2026 18:42). Nessun filtro grigio. */
 /* Pennellata gialla delle tavole SCD (card, locandine): sotto la parola chiave di un titolo. */
 .scd-brush {
   position: relative;

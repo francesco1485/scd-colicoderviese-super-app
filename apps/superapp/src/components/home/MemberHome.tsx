@@ -5,6 +5,8 @@
  * official live posts). Signed-out visitors get PublicHome instead. Real data only.
  */
 import { Link } from "@tanstack/react-router";
+import { Vetrina } from "@/components/home/PublicHome";
+import type { VetrinaSlot, VetrinaWorld } from "@/lib/vetrina";
 import { useServerFn } from "@tanstack/react-start";
 import { ChevronRight, Newspaper } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -75,6 +77,8 @@ export interface MemberHomeData {
   social: Awaited<ReturnType<typeof getPublicSocial>>;
   serverNow: number;
   today: string;
+  /** Vetrina of the day for the "soci" world (UD-110 palinsesto), from getVetrina({ members: true }). */
+  vetrina?: Readonly<Record<VetrinaWorld, readonly VetrinaSlot[]>>;
 }
 
 const MAIN_TEAMS = [
@@ -112,6 +116,7 @@ export function MemberHome({
   social,
   serverNow,
   today,
+  vetrina,
 }: MemberHomeData) {
   const [nowMs, setNowMs] = useState(serverNow);
   const [mode, setMode] = useState<FeedMode>("perte");
@@ -407,6 +412,7 @@ export function MemberHome({
             highlightId={nextMatch?.id ?? null}
             nowMs={nowMs}
           />
+          {vetrina && <Vetrina worlds={vetrina} fixedWorld="soci" embedded />}
           <div className="lg:hidden">
             <WhyJoin />
           </div>
@@ -497,7 +503,7 @@ export function MemberHome({
                   return (
                     <Link
                       key="press"
-                      to="/rassegna"
+                      to="/rassegna-stampa"
                       className="scd-focus flex items-center gap-3 rounded-[18px] bg-white p-4 shadow-[0_2px_12px_rgb(11_42_91/0.08)] hover:bg-[#f4f7fb]"
                     >
                       <span className="grid size-11 shrink-0 place-items-center rounded-[12px] bg-[#e3eefb] text-[#0b2a5b]">

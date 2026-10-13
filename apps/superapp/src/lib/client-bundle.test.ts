@@ -101,3 +101,22 @@ describe.skipIf(!built)("client bundle keeps the riders' roster on the server (U
     expect(hits).toEqual([]);
   });
 });
+
+describe.skipIf(!built)("client bundle keeps the vetrina catalogue on the server (UD-110)", () => {
+  // Distinctive strings of vetrina-slots.server.ts: the browser only receives the slots picked for the day.
+  const list = ["Prova la Scuola Calcio", "Entra tra i tifosi"];
+
+  it("finds the probes in the server build (control)", () => {
+    const server = files(SERVER_DIR).map((f) => readFileSync(f, "utf8")).join("\n");
+    expect(list.every((p) => server.includes(p))).toBe(true);
+  });
+
+  it("finds no catalogue string in .output/public", () => {
+    const hits: string[] = [];
+    for (const f of files(PUBLIC_DIR)) {
+      const src = readFileSync(f, "utf8");
+      for (const p of list) if (src.includes(p)) hits.push(`${f.slice(PUBLIC_DIR.length)}: ${p}`);
+    }
+    expect(hits).toEqual([]);
+  });
+});

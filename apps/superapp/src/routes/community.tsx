@@ -75,7 +75,7 @@ const DOORS: readonly Door[] = [
     fg: "#ffffff",
   },
   {
-    to: "/rassegna",
+    to: "/rassegna-stampa",
     title: "Dicono di noi",
     text: "I titoli delle testate che parlano della società, di Colico e di Dervio.",
     icon: <Newspaper className="size-7" aria-hidden="true" />,

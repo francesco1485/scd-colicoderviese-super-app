@@ -170,15 +170,17 @@ describe("LED wall · slots", () => {
 });
 
 describe("LED wall · days on the home (single config constant)", () => {
-  it("is on Monday and Thursday by default", () => {
-    expect(LEDWALL_HOME_DAYS.weekdays).toEqual([1, 4]);
+  it("is on every day by default (UD-110: part of the single sponsor zone)", () => {
+    expect(LEDWALL_HOME_DAYS.weekdays).toEqual([1, 2, 3, 4, 5, 6, 7]);
     expect(isoWeekday("2026-10-12")).toBe(1);
     expect(isoWeekday("2026-10-13")).toBe(2);
     expect(isoWeekday("2026-10-15")).toBe(4);
     expect(isoWeekday("2026-10-18")).toBe(7);
     expect(showLedwallOnHome("2026-10-12")).toBe(true);
     expect(showLedwallOnHome("2026-10-15")).toBe(true);
-    for (const d of ["2026-10-13", "2026-10-14", "2026-10-16", "2026-10-17", "2026-10-18"]) expect(showLedwallOnHome(d), d).toBe(false);
+    for (const d of ["2026-10-13", "2026-10-14", "2026-10-16", "2026-10-17", "2026-10-18"]) expect(showLedwallOnHome(d), d).toBe(true);
+    // The constant still switches days off when the Direzione wants (e.g. only Monday and Thursday).
+    expect(showLedwallOnHome("2026-10-13", {}, { weekdays: [1, 4], homeMatchDays: false })).toBe(false);
   });
 
   it("also on a day with a home game, and fails closed on an invalid day", () => {

@@ -4,14 +4,15 @@ import { MemberHome } from "@/components/home/MemberHome";
 import { PublicHome } from "@/components/home/PublicHome";
 import { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 import { getPublicFeed, getPublicSchedule } from "@/lib/club.functions";
-import { getActiveInitiatives } from "@/lib/initiatives.functions";
 import { romeParts } from "@/lib/home-week";
-import { getPressReview, type PressReview } from "@/lib/press.functions";
+import { getHomeNews, type HomeNews } from "@/lib/news.functions";
 import { getPublicSocial } from "@/lib/social.functions";
+import { EMPTY_WORLDS } from "@/lib/vetrina";
+import { getVetrina, type VetrinaDay } from "@/lib/vetrina.functions";
 
-/** Longest wait for the press review on a cold cache: the home never hangs on Google News. */
-const PRESS_BUDGET_MS = 1_200;
-const NO_PRESS: PressReview = { items: [], fetchedAt: null };
+/** Longest wait for the news sources on a cold cache: the home never hangs on Google News or the club site. */
+const NEWS_BUDGET_MS = 1_500;
+const NO_NEWS: HomeNews = { items: [], pressCount: 0 };
 
 function withBudget<T>(p: Promise<T>, ms: number, fallback: T): Promise<T> {
   return new Promise((resolve) => {
@@ -31,7 +32,8 @@ function withBudget<T>(p: Promise<T>, ms: number, fallback: T): Promise<T> {
 
 /**
  * Home (UD-100, Direzione 13/10/2026). Two audiences, one address:
- * - signed out: the public home v4 — creative, communicative, commercial (events, news, games, partners, joining).
+ * - signed out: the public home v4 / vetrina (UD-110) — creative, communicative, commercial (rotating vetrina,
+ *   games of the week, joining, one sponsor zone).
  *   No team list or roster (teams are inside); the games of the week of all teams are always shown (Direzione 09:03).
  * - signed in: the member home with the games of the week, the teams and the "Dal club" feed.
  * The loader only reads team calendars when the server has confirmed a session.
@@ -42,28 +44,40 @@ export const Route = createFileRoute("/")({
     const today =
       romeParts(new Date(serverNow).toISOString())?.date ??
       new Date(serverNow).toISOString().slice(0, 10);
-    const [social, press, calendar, initiatives] = await Promise.all([
+    // Started in parallel with the session and calendar reads (as before): it never delays the home beyond the budget.
+    const newsP = withBudget(getHomeNews(), NEWS_BUDGET_MS, NO_NEWS);
+    const [social, calendar] = await Promise.all([
       getPublicSocial(),
-      withBudget(getPressReview(), PRESS_BUDGET_MS, NO_PRESS),
       getPublicCalendarSnapshot(),
-      // Time-limited initiatives: filtered on the server's Rome day (never the visitor's clock).
-      getActiveInitiatives().catch(() => ({ today, items: [] })),
     ]);
     if (!social.signedIn) {
+      // Mixed news highlight (press of every age group, club site, club feed; negative headlines filtered, UD-110).
+      // The full press list lives on /rassegna-stampa; the home never waits more than NEWS_BUDGET_MS for it.
+      const news = await newsP;
+      // Vetrina of the day, picked on the server's Rome day (never the visitor's clock); time-limited slots
+      // (initiatives) never reach the browser before their window.
+      const vetrina: VetrinaDay = await getVetrina({
+        data: { pressRecent: news.pressCount > 0 },
+      }).catch((): VetrinaDay => ({ today, worlds: EMPTY_WORLDS }));
       return {
         kind: "public" as const,
-        press: press.items,
         calendar,
-        initiatives: initiatives.items,
-        // Server Rome day (QA day honoured only outside production): decides the LED wall days on the home.
-        ledwallDay: initiatives.today,
+        news: news.items,
+        vetrina: vetrina.worlds,
+        // Server Rome day (QA day honoured only outside production): seeds the LED wall and the partner of the month.
+        ledwallDay: vetrina.today,
         serverNow,
         today,
       };
     }
-    const [feed, schedule] = await Promise.all([
+    const [feed, schedule, vetrina] = await Promise.all([
       getPublicFeed(),
       getPublicSchedule(),
+      // "Soci e staff" world of the palinsesto: derived from the confirmed session, no new data.
+      getVetrina({ data: { members: true } }).catch((): VetrinaDay => ({
+        today,
+        worlds: EMPTY_WORLDS,
+      })),
     ]);
     return {
       kind: "member" as const,
@@ -71,6 +85,7 @@ export const Route = createFileRoute("/")({
       schedule,
       calendar,
       social,
+      vetrina: vetrina.worlds,
       serverNow,
       today,
     };
@@ -104,9 +119,9 @@ function Home() {
   if (data.kind === "member") return <MemberHome {...data} />;
   return (
     <PublicHome
-      press={data.press}
       calendar={data.calendar}
-      initiatives={data.initiatives}
+      news={data.news}
+      vetrina={data.vetrina}
       ledwallDay={data.ledwallDay}
       nowMs={data.serverNow}
       today={data.today}
