@@ -66,7 +66,7 @@ describe("public home v4", () => {
     }
   });
 
-  it("keeps teams inside: no team list, roster, fixtures or team calendar on the public home", () => {
+  it("keeps teams inside: no team list or roster on the public home; the games of the week of all teams are always shown", () => {
     expect(publicHomeRoutes().some((r) => r.startsWith("/squadre"))).toBe(
       false,
     );
@@ -74,9 +74,11 @@ describe("public home v4", () => {
       const src = read(f);
       expect(src, f).not.toMatch(/\/squadre/);
       expect(src, f).not.toMatch(
-        /getPublicRoster|TeamsGrid|WeekGames|hallTeams/,
+        /getPublicRoster|TeamsGrid|hallTeams/,
       );
     }
+    // Direzione 13/10 09:03: "calendario settimana deve essere sempre".
+    expect(read("src/components/home/PublicHome.tsx")).toMatch(/<PublicWeek/);
     // The single calendar link of the brief lives in the quick strip.
     expect(QUICK_LINKS.filter((q) => q.to === "/calendario")).toHaveLength(1);
   });

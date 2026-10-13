@@ -31,7 +31,7 @@ function withBudget<T>(p: Promise<T>, ms: number, fallback: T): Promise<T> {
 /**
  * Home (UD-100, Direzione 13/10/2026). Two audiences, one address:
  * - signed out: the public home v4 — creative, communicative, commercial (events, news, games, partners, joining).
- *   No team list, roster, fixture list or team calendar: teams are inside.
+ *   No team list or roster (teams are inside); the games of the week of all teams are always shown (Direzione 09:03).
  * - signed in: the member home with the games of the week, the teams and the "Dal club" feed.
  * The loader only reads team calendars when the server has confirmed a session.
  */
@@ -41,22 +41,23 @@ export const Route = createFileRoute("/")({
     const today =
       romeParts(new Date(serverNow).toISOString())?.date ??
       new Date(serverNow).toISOString().slice(0, 10);
-    const [social, press] = await Promise.all([
+    const [social, press, calendar] = await Promise.all([
       getPublicSocial(),
       withBudget(getPressReview(), PRESS_BUDGET_MS, NO_PRESS),
+      getPublicCalendarSnapshot(),
     ]);
     if (!social.signedIn) {
       return {
         kind: "public" as const,
         press: press.items,
+        calendar,
         serverNow,
         today,
       };
     }
-    const [feed, schedule, calendar] = await Promise.all([
+    const [feed, schedule] = await Promise.all([
       getPublicFeed(),
       getPublicSchedule(),
-      getPublicCalendarSnapshot(),
     ]);
     return {
       kind: "member" as const,
@@ -96,6 +97,11 @@ function Home() {
   const data = Route.useLoaderData();
   if (data.kind === "member") return <MemberHome {...data} />;
   return (
-    <PublicHome press={data.press} nowMs={data.serverNow} today={data.today} />
+    <PublicHome
+      press={data.press}
+      calendar={data.calendar}
+      nowMs={data.serverNow}
+      today={data.today}
+    />
   );
 }

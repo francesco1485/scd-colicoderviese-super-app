@@ -57,6 +57,14 @@ import { timeAgo } from "@/lib/social";
 import { SPONSORS, sponsorLabel } from "@/lib/sponsors";
 
 import { Carousel } from "./Carousel";
+import { useMemo } from "react";
+import { WeekGames } from "@/components/home/HomeSections";
+import { addDays } from "@/lib/board-data";
+import type { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
+import { calendarToWeekItems, type WeekItem } from "@/lib/home-week";
+import { itemState, orderTeams } from "@/lib/universe";
+
+type PublicCalendar = Awaited<ReturnType<typeof getPublicCalendarSnapshot>>;
 
 const ICONS: Readonly<Record<PublicIcon, LucideIcon>> = {
   trophy: Trophy,
@@ -741,12 +749,61 @@ function LinkGroups() {
 
 /* ---------------------------------------------------------------- page */
 
+/** Games of the next 7 days of every team (official calendar snapshot): always on the public home. */
+function PublicWeek({
+  calendar,
+  nowMs,
+  today,
+}: {
+  calendar: PublicCalendar;
+  nowMs: number;
+  today: string;
+}) {
+  const teams = useMemo(
+    () => new Map(orderTeams(calendar.groups).map((t) => [t.id, t])),
+    [calendar.groups],
+  );
+  const lastDay = addDays(today, 6);
+  const items = useMemo(
+    () =>
+      calendarToWeekItems(calendar.events, calendar.groups)
+        .filter(
+          (i) =>
+            i.kind === "Gara" &&
+            i.date >= today &&
+            i.date <= lastDay &&
+            itemState(i, nowMs) !== "done",
+        )
+        .sort((a, b) =>
+          (a.date + (a.time || "99:99")).localeCompare(
+            b.date + (b.time || "99:99"),
+          ),
+        ),
+    [calendar, today, lastDay, nowMs],
+  );
+  const highlight =
+    items.find((g) => itemState(g, nowMs) === "live") ?? items[0] ?? null;
+  if (items.length === 0) return null;
+  return (
+    <div className="mx-auto max-w-[1280px] px-4 pt-5 sm:px-6 lg:px-8">
+      <WeekGames
+        items={items}
+        teamOf={(i: WeekItem) => teams.get(i.group)}
+        highlightId={highlight?.id ?? null}
+        nowMs={nowMs}
+      />
+    </div>
+  );
+}
+
 export function PublicHome({
   press,
+  calendar,
   nowMs,
   today,
 }: {
   press: readonly PressItem[];
+  calendar: PublicCalendar;
   nowMs: number;
   today: string;
 }) {
@@ -760,6 +817,7 @@ export function PublicHome({
         S.C.D. ColicoDerviese, il club di calcio di Colico e Dervio
       </h1>
       <QuickStrip />
+      <PublicWeek calendar={calendar} nowMs={nowMs} today={today} />
       <Featured />
       <JoinBanner />
       <Trust />
