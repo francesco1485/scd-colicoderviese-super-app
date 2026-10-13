@@ -46,6 +46,7 @@ import { Route as TesoreriaRouteImport } from './routes/tesoreria'
 import { Route as Top11RouteImport } from './routes/top11'
 import { Route as AccediIndexRouteImport } from './routes/accedi.index'
 import { Route as AccediConfermaRouteImport } from './routes/accedi.conferma'
+import { Route as AccediPasswordRouteImport } from './routes/accedi.password'
 import { Route as AreeIndexRouteImport } from './routes/aree.index'
 import { Route as AreeAreaRouteImport } from './routes/aree.$area'
 import { Route as CalendarioRotazioneCampiRouteImport } from './routes/calendario_.rotazione-campi'
@@ -275,6 +276,11 @@ const AccediIndexRoute = AccediIndexRouteImport.update({
 const AccediConfermaRoute = AccediConfermaRouteImport.update({
   id: '/accedi/conferma',
   path: '/accedi/conferma',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccediPasswordRoute = AccediPasswordRouteImport.update({
+  id: '/accedi/password',
+  path: '/accedi/password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AreeIndexRoute = AreeIndexRouteImport.update({
@@ -547,6 +553,7 @@ export interface FileRoutesByFullPath {
   '/tesoreria': typeof TesoreriaRoute
   '/top11': typeof Top11Route
   '/accedi/conferma': typeof AccediConfermaRoute
+  '/accedi/password': typeof AccediPasswordRoute
   '/aree/$area': typeof AreeAreaRoute
   '/calendario/rotazione-campi': typeof CalendarioRotazioneCampiRoute
   '/core/atleta': typeof CoreAtletaRoute
@@ -631,6 +638,7 @@ export interface FileRoutesByTo {
   '/tesoreria': typeof TesoreriaRoute
   '/top11': typeof Top11Route
   '/accedi/conferma': typeof AccediConfermaRoute
+  '/accedi/password': typeof AccediPasswordRoute
   '/aree/$area': typeof AreeAreaRoute
   '/calendario/rotazione-campi': typeof CalendarioRotazioneCampiRoute
   '/core/atleta': typeof CoreAtletaRoute
@@ -715,6 +723,7 @@ export interface FileRoutesById {
   '/tesoreria': typeof TesoreriaRoute
   '/top11': typeof Top11Route
   '/accedi/conferma': typeof AccediConfermaRoute
+  '/accedi/password': typeof AccediPasswordRoute
   '/aree/$area': typeof AreeAreaRoute
   '/calendario_/rotazione-campi': typeof CalendarioRotazioneCampiRoute
   '/core/atleta': typeof CoreAtletaRoute
@@ -801,6 +810,7 @@ export interface FileRouteTypes {
     | '/tesoreria'
     | '/top11'
     | '/accedi/conferma'
+    | '/accedi/password'
     | '/aree/$area'
     | '/calendario/rotazione-campi'
     | '/core/atleta'
@@ -885,6 +895,7 @@ export interface FileRouteTypes {
     | '/tesoreria'
     | '/top11'
     | '/accedi/conferma'
+    | '/accedi/password'
     | '/aree/$area'
     | '/calendario/rotazione-campi'
     | '/core/atleta'
@@ -968,6 +979,7 @@ export interface FileRouteTypes {
     | '/tesoreria'
     | '/top11'
     | '/accedi/conferma'
+    | '/accedi/password'
     | '/aree/$area'
     | '/calendario_/rotazione-campi'
     | '/core/atleta'
@@ -1053,6 +1065,7 @@ export interface RootRouteChildren {
   TesoreriaRoute: typeof TesoreriaRoute
   Top11Route: typeof Top11Route
   AccediConfermaRoute: typeof AccediConfermaRoute
+  AccediPasswordRoute: typeof AccediPasswordRoute
   AreeAreaRoute: typeof AreeAreaRoute
   CalendarioRotazioneCampiRoute: typeof CalendarioRotazioneCampiRoute
   CoreAtletaRoute: typeof CoreAtletaRoute
@@ -1354,6 +1367,13 @@ declare module '@tanstack/react-router' {
       path: '/accedi/conferma'
       fullPath: '/accedi/conferma'
       preLoaderRoute: typeof AccediConfermaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/accedi/password': {
+      id: '/accedi/password'
+      path: '/accedi/password'
+      fullPath: '/accedi/password'
+      preLoaderRoute: typeof AccediPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/aree/': {
@@ -1732,6 +1752,7 @@ const rootRouteChildren: RootRouteChildren = {
   TesoreriaRoute: TesoreriaRoute,
   Top11Route: Top11Route,
   AccediConfermaRoute: AccediConfermaRoute,
+  AccediPasswordRoute: AccediPasswordRoute,
   AreeAreaRoute: AreeAreaRoute,
   CalendarioRotazioneCampiRoute: CalendarioRotazioneCampiRoute,
   CoreAtletaRoute: CoreAtletaRoute,

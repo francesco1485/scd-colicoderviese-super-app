@@ -9,6 +9,7 @@ export const Route = createFileRoute("/accedi/conferma")({
   validateSearch: (s: Record<string, unknown>) => ({
     code: typeof s["code"] === "string" ? s["code"] : undefined,
     next: typeof s["next"] === "string" ? safeNext(s["next"]) : undefined,
+    r: s["r"] === "0" || s["r"] === 0 ? ("0" as const) : undefined,
     error_description: typeof s["error_description"] === "string" ? s["error_description"] : undefined,
   }),
   head: () => ({ meta: [{ title: "Conferma accesso — S.C.D. ColicoDerviese" }, { name: "robots", content: "noindex" }] }),
@@ -17,7 +18,7 @@ export const Route = createFileRoute("/accedi/conferma")({
 
 /** The magic link lands here with `?code=`: the server exchanges it for the session cookies, then we move on. */
 function Conferma() {
-  const { code, next, error_description } = Route.useSearch();
+  const { code, next, r, error_description } = Route.useSearch();
   const navigate = useNavigate();
   const confirm = useServerFn(confirmMagicLink);
   const [state, setState] = useState<{ phase: "working" | "ok" | "error"; message: string }>({ phase: "working", message: "Sto confermando il tuo accesso…" });
@@ -32,7 +33,7 @@ function Conferma() {
       setState({ phase: "error", message: "Questo link non contiene un codice di accesso." });
       return;
     }
-    confirm({ data: { code, next } })
+    confirm({ data: { code, next, remember: r !== "0" } })
       .then((r) => {
         if (!alive) return;
         if (r.ok) {
@@ -45,7 +46,7 @@ function Conferma() {
       alive = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [code, next, error_description]);
+  }, [code, next, r, error_description]);
 
   return (
     <main className="bg-[var(--scd-page)] px-4 py-14 sm:px-6">

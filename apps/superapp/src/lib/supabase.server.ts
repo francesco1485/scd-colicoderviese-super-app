@@ -7,6 +7,8 @@
 import { createServerClient } from "@supabase/ssr";
 import { getCookies, setCookie } from "@tanstack/react-start/server";
 
+import { REMEMBER_COOKIE, REMEMBER_PREF_MAX_AGE, rememberFrom, sessionCookieOptions, type CookieOptionsLike } from "./auth-remember";
+
 export interface SupabaseEnv {
   url: string;
   publishableKey: string;
@@ -20,15 +22,35 @@ export function supabaseEnv(env: Readonly<Record<string, string | undefined>> = 
   return { url, publishableKey };
 }
 
-export function serverSupabase() {
+/**
+ * `remember` overrides the device preference for the request that signs in (the preference
+ * cookie set in that same request is not readable yet); later requests read it from the cookie.
+ */
+export function serverSupabase(opts: { remember?: boolean } = {}) {
   const env = supabaseEnv();
   if (!env) return null;
   return createServerClient(env.url, env.publishableKey, {
     cookies: {
       getAll: () => Object.entries(getCookies()).map(([name, value]) => ({ name, value })),
       setAll: (list) => {
-        for (const c of list) setCookie(c.name, c.value, { path: "/", sameSite: "lax", httpOnly: true, secure: true, ...c.options });
+        const remember = opts.remember ?? rememberFrom(getCookies());
+        for (const c of list) {
+          const options = sessionCookieOptions(c.options as CookieOptionsLike | undefined, remember);
+          const clean = Object.fromEntries(Object.entries(options).filter(([, v]) => v !== undefined));
+          setCookie(c.name, c.value, { path: "/", sameSite: "lax", httpOnly: true, secure: true, ...clean });
+        }
       },
     },
+  });
+}
+
+/** Stores the "Ricordami" choice of this device (no personal data). */
+export function setRememberPreference(remember: boolean) {
+  setCookie(REMEMBER_COOKIE, remember ? "1" : "0", {
+    path: "/",
+    sameSite: "lax",
+    httpOnly: true,
+    secure: true,
+    ...(remember ? { maxAge: REMEMBER_PREF_MAX_AGE } : {}),
   });
 }
