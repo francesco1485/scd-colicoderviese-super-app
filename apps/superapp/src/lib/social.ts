@@ -38,6 +38,22 @@ export const AUTHOR_LABEL: Readonly<Record<AuthorKind, string>> = {
 };
 
 export const POST_KINDS: readonly PostKind[] = ["NEWS", "MATCH", "LIVE"];
+
+/** Membership roles (scd_role) of the content office: publish directly, approve the queue. */
+export const OFFICE_ROLES: ReadonlySet<string> = new Set([
+  "DIRECTION",
+  "SECRETARIAT",
+]);
+/** Membership roles that may write a post (any staff membership); families and athletes only read. */
+export const AUTHOR_ROLES: ReadonlySet<string> = new Set([
+  "DIRECTION",
+  "SECRETARIAT",
+  "REGISTRATION",
+  "MANAGER",
+  "MISTER",
+  "STAFF",
+  "TOURNAMENTS",
+]);
 export const POST_STATUSES: readonly PostStatus[] = [
   "PENDING",
   "APPROVED",

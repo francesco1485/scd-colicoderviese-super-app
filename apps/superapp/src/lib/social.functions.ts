@@ -8,7 +8,9 @@ import { z } from "zod";
 
 import { sessionView } from "./auth.functions";
 import {
+  AUTHOR_ROLES,
   CHANNEL_RE,
+  OFFICE_ROLES,
   parseCounts,
   parseFollows,
   parsePosts,
@@ -58,17 +60,6 @@ const EMPTY: PublicSocial = {
   canPost: false,
   office: false,
 };
-
-const OFFICE_ROLES = new Set(["DIRECTION", "SECRETARIAT"]);
-const AUTHOR_ROLES = new Set([
-  "DIRECTION",
-  "SECRETARIAT",
-  "REGISTRATION",
-  "MANAGER",
-  "MISTER",
-  "STAFF",
-  "TOURNAMENTS",
-]);
 
 /** Feed, follower counts and the caller's own follows. Works signed out (public part only). */
 export const getPublicSocial = createServerFn({ method: "GET" }).handler(

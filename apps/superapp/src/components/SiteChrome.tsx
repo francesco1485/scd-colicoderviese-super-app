@@ -6,6 +6,7 @@ import {
   Ellipsis,
   House,
   Lock,
+  LogIn,
   Menu,
   Newspaper,
   Plus,
@@ -19,10 +20,12 @@ import {
 import { useEffect, useState } from "react";
 
 import crest from "@/assets/brand/logo-scd.png.asset.json";
+import { centerTabFor, type CenterTab } from "@/lib/access-nav";
 import { ACCESS_SCREEN_IDS, WORK_AREA_IDS, findArea } from "@/lib/areas";
 import { CLUB_PROFILE } from "@/lib/club-profile";
+import { useSession } from "@/lib/use-session";
 import { openCookiePrefs } from "./CookieConsent";
-import { AccessMenu, openAccessMenu } from "./scd/AccessMenu";
+import { AccessMenu, loginSearch, openAccessMenu } from "./scd/AccessMenu";
 
 /** Nome ufficiale della società (sigla S.C.D., non invertire le lettere). */
 export const CLUB_NAME = "S.C.D. ColicoDerviese";
@@ -211,6 +214,8 @@ export function SiteHeader() {
 export function MenuDrawer() {
   const [open, setOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { session } = useSession();
+  const signedIn = !!session?.user;
   useEffect(() => setOpen(false), [pathname]);
   useEffect(() => {
     const onOpen = () => setOpen((o) => !o);
@@ -260,14 +265,24 @@ export function MenuDrawer() {
           className="scd-action mb-1 w-full justify-between"
         >
           <span className="inline-flex items-center gap-2">
-            <Lock
-              className="size-[18px]"
-              strokeWidth={1.8}
-              aria-hidden="true"
-            />
-            Accesso aree
+            {signedIn ? (
+              <Lock
+                className="size-[18px]"
+                strokeWidth={1.8}
+                aria-hidden="true"
+              />
+            ) : (
+              <LogIn
+                className="size-[18px]"
+                strokeWidth={1.8}
+                aria-hidden="true"
+              />
+            )}
+            {signedIn ? "Le tue aree" : "Entra o registrati"}
           </span>
-          <span className="text-[13px] font-medium">un link per area</span>
+          <span className="text-[13px] font-medium">
+            {signedIn ? "un link per area" : "le aree riservate dopo l'accesso"}
+          </span>
         </button>
         {menuGroups.map((g) => (
           <div
@@ -311,45 +326,92 @@ type TabDef = {
   label: string;
   icon: LucideIcon;
   to?: string;
-  search?: Record<string, string>;
-  menu?: true;
+  search?: Record<string, string | undefined>;
+  /** Opens the full menu ("Altro") or the access menu ("Aree") instead of navigating. */
+  menu?: "full" | "access";
   match: (p: string) => boolean;
+  /** Raised yellow circle in the centre of the bar. */
   tone?: "yellow";
+  ariaLabel?: string;
 };
 
-const PUBLIC_TABS: TabDef[] = [
-  { label: "Home", icon: House, to: "/", match: (p) => p === "/" },
-  {
-    label: "Calendario",
-    icon: CalendarDays,
-    to: "/calendario",
-    match: (p) => p.startsWith("/calendario"),
+const MINE_MATCH = (p: string) =>
+  p.startsWith("/la-mia-scd") ||
+  p.startsWith("/famiglia") ||
+  p.startsWith("/core/atleta") ||
+  p.startsWith("/core/famiglia");
+
+const HOME_TAB: TabDef = {
+  label: "Home",
+  icon: House,
+  to: "/",
+  match: (p) => p === "/",
+};
+const CALENDAR_TAB: TabDef = {
+  label: "Calendario",
+  icon: CalendarDays,
+  to: "/calendario",
+  match: (p) => p.startsWith("/calendario"),
+};
+const TEAMS_TAB: TabDef = {
+  label: "Squadre",
+  icon: UsersRound,
+  to: "/squadre",
+  match: (p) => p.startsWith("/squadre") || p.startsWith("/allenamenti"),
+};
+const AREAS_TAB: TabDef = {
+  label: "Aree",
+  icon: Lock,
+  menu: "access",
+  match: (p) => p.startsWith("/aree"),
+  ariaLabel: "Aree: entra o apri le tue aree",
+};
+
+/** Raised centre tab of the public bar: who you are decides what it offers (src/lib/access-nav.ts). */
+const CENTER_TABS: Readonly<Record<CenterTab, TabDef>> = {
+  entra: {
+    label: "Entra",
+    icon: LogIn,
+    to: "/accedi",
+    match: (p) => p.startsWith("/accedi") || p.startsWith("/registrati"),
+    tone: "yellow",
+    ariaLabel: "Entra: accedi o registrati",
   },
-  {
+  mine: {
+    label: "La mia",
+    icon: UserRound,
+    to: "/la-mia-scd",
+    match: MINE_MATCH,
+    tone: "yellow",
+    ariaLabel: "La mia SCD: la tua area",
+  },
+  crea: {
     label: "Crea",
     icon: Plus,
     to: "/crea",
     match: (p) => p.startsWith("/crea"),
     tone: "yellow",
+    ariaLabel: "Crea: nuovo post",
   },
-  {
-    label: "Squadre",
-    icon: UsersRound,
-    to: "/squadre",
-    match: (p) => p.startsWith("/squadre") || p.startsWith("/allenamenti"),
-  },
-  {
-    label: "La mia",
-    icon: UserRound,
-    to: "/la-mia-scd",
-    match: (p) =>
-      p.startsWith("/la-mia-scd") ||
-      p.startsWith("/famiglia") ||
-      p.startsWith("/core/atleta") ||
-      p.startsWith("/core/famiglia") ||
-      p.startsWith("/aree"),
-  },
-];
+};
+
+/**
+ * Public bar, five tabs. Anonymous: Home · Calendario · [Entra] · Squadre · Aree. Signed in
+ * without author role: Home · Calendario · [La mia] · Squadre · Aree. Author: Home · Calendario ·
+ * [Crea] · Squadre · La mia.
+ */
+export function publicTabsFor(center: CenterTab): TabDef[] {
+  const last: TabDef =
+    center === "crea"
+      ? {
+          label: "La mia",
+          icon: UserRound,
+          to: "/la-mia-scd",
+          match: (p) => MINE_MATCH(p) || p.startsWith("/aree"),
+        }
+      : AREAS_TAB;
+  return [HOME_TAB, CALENDAR_TAB, CENTER_TABS[center], TEAMS_TAB, last];
+}
 const STAFF_TABS: TabDef[] = [
   {
     label: "Dashboard",
@@ -377,7 +439,7 @@ const STAFF_TABS: TabDef[] = [
     to: "/comunicazioni",
     match: (p) => p.startsWith("/comunicazioni"),
   },
-  { label: "Altro", icon: Ellipsis, menu: true, match: () => false },
+  { label: "Altro", icon: Ellipsis, menu: "full", match: () => false },
 ];
 const COMMS_TABS: TabDef[] = [
   { label: "Home", icon: House, to: "/", match: (p) => p === "/" },
@@ -400,10 +462,13 @@ const COMMS_TABS: TabDef[] = [
     to: "/squadre",
     match: (p) => p.startsWith("/squadre") || p.startsWith("/allenamenti"),
   },
-  { label: "Altro", icon: Ellipsis, menu: true, match: () => false },
+  { label: "Altro", icon: Ellipsis, menu: "full", match: () => false },
 ];
 
-export function tabsFor(pathname: string): TabDef[] {
+export function tabsFor(
+  pathname: string,
+  center: CenterTab = "entra",
+): TabDef[] {
   if (pathname.startsWith("/comunicazioni")) return COMMS_TABS;
   if (
     pathname === "/core" ||
@@ -412,13 +477,14 @@ export function tabsFor(pathname: string): TabDef[] {
     pathname.startsWith("/core/impianti-calendari")
   )
     return STAFF_TABS;
-  return PUBLIC_TABS;
+  return publicTabsFor(center);
 }
 
 /** Barra inferiore (smartphone/tablet): blu notte della tavola, voce attiva gialla. */
 export function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const tabs = tabsFor(pathname);
+  const { session } = useSession();
+  const tabs = tabsFor(pathname, centerTabFor(session));
   return (
     <nav
       aria-label="Navigazione Super App"
@@ -443,15 +509,21 @@ export function BottomNav() {
               </span>
             </>
           );
-          if (t.tone === "yellow" && t.to && t.icon === Plus) {
-            // "Crea" della tavola: cerchio giallo rialzato al centro della barra.
+          if (t.tone === "yellow" && t.to) {
+            // Tab centrale della tavola: cerchio giallo rialzato (Entra / La mia / Crea).
             return (
               <Link
                 key={t.label}
                 to={t.to}
-                aria-label={`${t.label}: nuovo post`}
+                search={
+                  (t.to === "/accedi"
+                    ? loginSearch(pathname)
+                    : t.search) as never
+                }
+                aria-label={t.ariaLabel ?? t.label}
                 aria-current={active ? "page" : undefined}
                 className="scd-focus flex flex-col items-center justify-start"
+                data-testid="tab-center"
               >
                 <span className="-mt-5 grid size-[56px] place-items-center rounded-full border-4 border-[var(--uv-night)] bg-[var(--uv-gold)] text-[#0b1e3a] shadow-[0_6px_16px_rgb(11_42_91/0.35)]">
                   <t.icon
@@ -471,9 +543,9 @@ export function BottomNav() {
             <button
               key={t.label}
               type="button"
-              onClick={openMenu}
+              onClick={t.menu === "access" ? openAccessMenu : openMenu}
               className={cls}
-              aria-label="Altro: menu completo"
+              aria-label={t.ariaLabel ?? "Altro: menu completo"}
             >
               {inner}
             </button>

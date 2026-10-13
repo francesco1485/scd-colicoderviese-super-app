@@ -13,6 +13,7 @@
 import registryJson from "../../../../config/superapp-areas.v1.json";
 
 import { SATELLITES } from "./satellites";
+import { isStaffSession } from "./session";
 
 export type AreaStatus = "design" | "planned" | "live";
 
@@ -42,7 +43,20 @@ export interface AreaNode {
 }
 
 /** Coarse roles of SCD_SYSTEM_MANIFEST.json (checked against the manifest in areas.test.ts). */
-export const MANIFEST_ROLES: readonly string[] = ["USER_BASE", "FAMILY", "ATHLETE", "MISTER", "STAFF", "MANAGER", "SECRETARIAT", "REGISTRATION", "TOURNAMENTS", "DIRECTION", "ADMIN", "SYSTEM"];
+export const MANIFEST_ROLES: readonly string[] = [
+  "USER_BASE",
+  "FAMILY",
+  "ATHLETE",
+  "MISTER",
+  "STAFF",
+  "MANAGER",
+  "SECRETARIAT",
+  "REGISTRATION",
+  "TOURNAMENTS",
+  "DIRECTION",
+  "ADMIN",
+  "SYSTEM",
+];
 
 export interface AreaRegistry {
   schema: string;
@@ -61,11 +75,16 @@ export interface FlatArea extends Omit<AreaNode, "children"> {
 export const AREA_REGISTRY = registryJson as unknown as AreaRegistry;
 
 /** Every area and sub-area, parents before children. */
-export function flattenAreas(nodes: readonly AreaNode[] = AREA_REGISTRY.areas, parentId: string | null = null, depth = 0): FlatArea[] {
+export function flattenAreas(
+  nodes: readonly AreaNode[] = AREA_REGISTRY.areas,
+  parentId: string | null = null,
+  depth = 0,
+): FlatArea[] {
   const out: FlatArea[] = [];
   for (const { children, ...node } of nodes) {
     out.push({ ...node, parentId, depth });
-    if (children?.length) out.push(...flattenAreas(children, node.id, depth + 1));
+    if (children?.length)
+      out.push(...flattenAreas(children, node.id, depth + 1));
   }
   return out;
 }
@@ -82,13 +101,19 @@ export function findAreaByPath(path: string): FlatArea | undefined {
 }
 
 /** Boards that the Visual Master keeps in the private canvas (open security items). */
-export const PRIVATE_BOARDS: readonly string[] = ["Plancia-direzione.dc.html", "Tesoreria.dc.html"];
+export const PRIVATE_BOARDS: readonly string[] = [
+  "Plancia-direzione.dc.html",
+  "Tesoreria.dc.html",
+];
 
 /**
  * Structural checks on the registry. Returns human-readable problems, empty when valid.
  * `boards`, when given, is the list of board files available in docs/design/visual-master.
  */
-export function validateAreas(nodes: readonly AreaNode[] = AREA_REGISTRY.areas, boards?: readonly string[]): string[] {
+export function validateAreas(
+  nodes: readonly AreaNode[] = AREA_REGISTRY.areas,
+  boards?: readonly string[],
+): string[] {
   const flat = flattenAreas(nodes);
   const problems: string[] = [];
   const ids = new Map<string, number>();
@@ -96,24 +121,56 @@ export function validateAreas(nodes: readonly AreaNode[] = AREA_REGISTRY.areas, 
   for (const a of flat) {
     ids.set(a.id, (ids.get(a.id) ?? 0) + 1);
     paths.set(a.path, (paths.get(a.path) ?? 0) + 1);
-    if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(a.id)) problems.push(`id "${a.id}" is not kebab-case`);
-    if (!/^\/[a-z0-9:/-]*$/.test(a.path) || (a.path.length > 1 && a.path.endsWith("/"))) problems.push(`path "${a.path}" of "${a.id}" is not a clean absolute path`);
-    if (!["design", "planned", "live"].includes(a.status)) problems.push(`status "${a.status}" of "${a.id}" is unknown`);
-    if (a.parentId !== null && !flat.some((p) => p.id === a.parentId)) problems.push(`"${a.id}" has a missing parent "${a.parentId}"`);
-    if (a.alias_of && !flat.some((p) => p.id === a.alias_of && !p.alias_of)) problems.push(`"${a.id}" is an alias of a missing area "${a.alias_of}"`);
-    if (a.flows_to && !flat.some((p) => p.id === a.flows_to)) problems.push(`"${a.id}" flows to a missing area "${a.flows_to}"`);
-    if (a.used_by) for (const u of a.used_by) if (!flat.some((p) => p.id === u)) problems.push(`"${a.id}" is used by a missing area "${u}"`);
+    if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(a.id))
+      problems.push(`id "${a.id}" is not kebab-case`);
+    if (
+      !/^\/[a-z0-9:/-]*$/.test(a.path) ||
+      (a.path.length > 1 && a.path.endsWith("/"))
+    )
+      problems.push(
+        `path "${a.path}" of "${a.id}" is not a clean absolute path`,
+      );
+    if (!["design", "planned", "live"].includes(a.status))
+      problems.push(`status "${a.status}" of "${a.id}" is unknown`);
+    if (a.parentId !== null && !flat.some((p) => p.id === a.parentId))
+      problems.push(`"${a.id}" has a missing parent "${a.parentId}"`);
+    if (a.alias_of && !flat.some((p) => p.id === a.alias_of && !p.alias_of))
+      problems.push(`"${a.id}" is an alias of a missing area "${a.alias_of}"`);
+    if (a.flows_to && !flat.some((p) => p.id === a.flows_to))
+      problems.push(`"${a.id}" flows to a missing area "${a.flows_to}"`);
+    if (a.used_by)
+      for (const u of a.used_by)
+        if (!flat.some((p) => p.id === u))
+          problems.push(`"${a.id}" is used by a missing area "${u}"`);
     if (a.role_map) {
       for (const [pos, role] of Object.entries(a.role_map)) {
-        if (!a.roles?.includes(pos)) problems.push(`"${a.id}" maps position "${pos}" that is not in its roles`);
-        if (!MANIFEST_ROLES.includes(role)) problems.push(`"${a.id}" maps "${pos}" to "${role}", not a manifest role`);
+        if (!a.roles?.includes(pos))
+          problems.push(
+            `"${a.id}" maps position "${pos}" that is not in its roles`,
+          );
+        if (!MANIFEST_ROLES.includes(role))
+          problems.push(
+            `"${a.id}" maps "${pos}" to "${role}", not a manifest role`,
+          );
       }
-      for (const r of a.roles ?? []) if (!(r in a.role_map)) problems.push(`"${a.id}" has role "${r}" without a manifest mapping`);
+      for (const r of a.roles ?? [])
+        if (!(r in a.role_map))
+          problems.push(`"${a.id}" has role "${r}" without a manifest mapping`);
     }
-    if (boards && a.board && !boards.includes(a.board) && !PRIVATE_BOARDS.includes(a.board)) problems.push(`board "${a.board}" of "${a.id}" is not in the Visual Master`);
+    if (
+      boards &&
+      a.board &&
+      !boards.includes(a.board) &&
+      !PRIVATE_BOARDS.includes(a.board)
+    )
+      problems.push(
+        `board "${a.board}" of "${a.id}" is not in the Visual Master`,
+      );
   }
-  for (const [id, n] of ids) if (n > 1) problems.push(`id "${id}" is used ${n} times`);
-  for (const [path, n] of paths) if (n > 1) problems.push(`path "${path}" is used ${n} times`);
+  for (const [id, n] of ids)
+    if (n > 1) problems.push(`id "${id}" is used ${n} times`);
+  for (const [path, n] of paths)
+    if (n > 1) problems.push(`path "${path}" is used ${n} times`);
   return problems;
 }
 
@@ -258,12 +315,32 @@ export function areaLink(id: string): AreaLink {
   if (!area) throw new Error(`Unknown area "${id}"`);
   const href = CURRENT_HREF[id] ?? null;
   const direct = href === area.path;
-  return { id, path: area.path, href, direct, access: direct && hasAccessScreen(id), page: direct && isWorkArea(id) };
+  return {
+    id,
+    path: area.path,
+    href,
+    direct,
+    access: direct && hasAccessScreen(id),
+    page: direct && isWorkArea(id),
+  };
 }
 
 export type AreaIcon =
-  | "calendar" | "trophy" | "plus" | "home" | "grid" | "table" | "bus" | "box"
-  | "file" | "coin" | "users" | "gauge" | "star" | "handshake" | "map";
+  | "calendar"
+  | "trophy"
+  | "plus"
+  | "home"
+  | "grid"
+  | "table"
+  | "bus"
+  | "box"
+  | "file"
+  | "coin"
+  | "users"
+  | "gauge"
+  | "star"
+  | "handshake"
+  | "map";
 
 export interface MenuEntry {
   id: string;
@@ -284,35 +361,119 @@ export const ACCESS_MENU: readonly MenuGroup[] = [
   {
     title: "Per famiglie e tifosi",
     entries: [
-      { id: "calendario", label: "Calendario annuale", blurb: "Partite di tutte le annate", icon: "calendar", reserved: false },
-      { id: "tornei", label: "Tornei ed eventi", blurb: "Christmas Lario Cup e la stagione", icon: "trophy", reserved: false },
-      { id: "infermeria", label: "Infermeria", blurb: "Emergenza, staff e certificato medico", icon: "plus", reserved: true },
-      { id: "famiglia", label: "Area famiglia", blurb: "Annata, avvisi, quote dei figli", icon: "home", reserved: true },
+      {
+        id: "calendario",
+        label: "Calendario annuale",
+        blurb: "Partite di tutte le annate",
+        icon: "calendar",
+        reserved: false,
+      },
+      {
+        id: "tornei",
+        label: "Tornei ed eventi",
+        blurb: "Christmas Lario Cup e la stagione",
+        icon: "trophy",
+        reserved: false,
+      },
+      {
+        id: "infermeria",
+        label: "Infermeria",
+        blurb: "Emergenza, staff e certificato medico",
+        icon: "plus",
+        reserved: true,
+      },
+      {
+        id: "famiglia",
+        label: "Area famiglia",
+        blurb: "Annata, avvisi, quote dei figli",
+        icon: "home",
+        reserved: true,
+      },
     ],
   },
   {
     title: "Per lo staff tecnico",
     entries: [
-      { id: "gestionale", label: "Gestionale sportivo", blurb: "Squadre, partite, attività", icon: "grid", reserved: true },
-      { id: "quadro", label: "Quadro settimanale", blurb: "Campi e spogliatoi", icon: "table", reserved: true },
-      { id: "pulmini", label: "Pulmini", blurb: "Mezzi, autisti, corse", icon: "bus", reserved: true },
-      { id: "magazzino", label: "Magazzino", blurb: "Kit, taglie, consegne", icon: "box", reserved: true },
+      {
+        id: "gestionale",
+        label: "Gestionale sportivo",
+        blurb: "Squadre, partite, attività",
+        icon: "grid",
+        reserved: true,
+      },
+      {
+        id: "quadro",
+        label: "Quadro settimanale",
+        blurb: "Campi e spogliatoi",
+        icon: "table",
+        reserved: true,
+      },
+      {
+        id: "pulmini",
+        label: "Pulmini",
+        blurb: "Mezzi, autisti, corse",
+        icon: "bus",
+        reserved: true,
+      },
+      {
+        id: "magazzino",
+        label: "Magazzino",
+        blurb: "Kit, taglie, consegne",
+        icon: "box",
+        reserved: true,
+      },
     ],
   },
   {
     title: "Per l'ufficio",
     entries: [
-      { id: "segreteria", label: "Segreteria", blurb: "Tesseramenti, distinte, scadenze", icon: "file", reserved: true },
-      { id: "tesoreria", label: "Tesoreria", blurb: "Quote, fondo, cassa", icon: "coin", reserved: true },
-      { id: "crm", label: "CRM contatti", blurb: "Sponsor, tornei, segreteria", icon: "users", reserved: true },
-      { id: "direzione", label: "Direzione", blurb: "La società in un colpo d'occhio", icon: "gauge", reserved: true },
+      {
+        id: "segreteria",
+        label: "Segreteria",
+        blurb: "Tesseramenti, distinte, scadenze",
+        icon: "file",
+        reserved: true,
+      },
+      {
+        id: "tesoreria",
+        label: "Tesoreria",
+        blurb: "Quote, fondo, cassa",
+        icon: "coin",
+        reserved: true,
+      },
+      {
+        id: "crm",
+        label: "CRM contatti",
+        blurb: "Sponsor, tornei, segreteria",
+        icon: "users",
+        reserved: true,
+      },
+      {
+        id: "direzione",
+        label: "Direzione",
+        blurb: "La società in un colpo d'occhio",
+        icon: "gauge",
+        reserved: true,
+      },
     ],
   },
   {
     title: "Per le aziende",
     entries: [
-      { id: "sponsor", label: "Sponsor", blurb: "Diventa partner della SCD", icon: "star", reserved: false },
-      { id: "partner", label: "Area partner", blurb: "La tua scheda e i materiali", icon: "handshake", reserved: true },
+      {
+        id: "sponsor",
+        label: "Sponsor",
+        blurb: "Diventa partner della SCD",
+        icon: "star",
+        reserved: false,
+      },
+      {
+        id: "partner",
+        label: "Area partner",
+        blurb: "La tua scheda e i materiali",
+        icon: "handshake",
+        reserved: true,
+      },
     ],
   },
 ];
@@ -364,27 +525,78 @@ export const INTERIOR_RAIL: readonly RailGroup[] = [
  * areas with one are shown only to those roles (plus Direzione).
  * This filters navigation only: access control stays with R20 on the server.
  */
-export function canSeeArea(area: Pick<AreaNode, "roles">, roles: ReadonlySet<string>): boolean {
+export function canSeeArea(
+  area: Pick<AreaNode, "roles">,
+  roles: ReadonlySet<string>,
+): boolean {
   if (ALL_AREAS_ROLES.some((r) => roles.has(r))) return true;
   if (!area.roles || area.roles.length === 0) return true;
   return area.roles.some((r) => roles.has(r));
 }
 
-export function railFor(roles: ReadonlySet<string>, rail: readonly RailGroup[] = INTERIOR_RAIL): RailGroup[] {
+export function railFor(
+  roles: ReadonlySet<string>,
+  rail: readonly RailGroup[] = INTERIOR_RAIL,
+): RailGroup[] {
   return rail
-    .map((g) => ({ ...g, items: g.items.filter((it) => { const a = findArea(it.id); return a ? canSeeArea(a, roles) : false; }) }))
+    .map((g) => ({
+      ...g,
+      items: g.items.filter((it) => {
+        const a = findArea(it.id);
+        return a ? canSeeArea(a, roles) : false;
+      }),
+    }))
     .filter((g) => g.items.length > 0);
+}
+
+/**
+ * Whether one "Accesso aree" entry is shown to a visitor. `roles` is null for an anonymous
+ * visitor, otherwise the positions of the verified session (src/lib/session.ts).
+ * - open entries (`reserved: false`) are shown to everybody;
+ * - reserved entries never appear without a session;
+ * - with a session the registry decides: an explicit `roles` list behaves like the work-area
+ *   gate (canSeeArea, Direzione sees all); an area without a list opens to staff positions when
+ *   its audience is staff, and to any signed-in person when its audience includes families.
+ * Navigation only: the server gate of each page stays the authority.
+ */
+export function canSeeMenuEntry(
+  entry: Pick<MenuEntry, "id" | "reserved">,
+  roles: ReadonlySet<string> | null,
+): boolean {
+  if (!entry.reserved) return true;
+  if (roles === null) return false;
+  const area = findArea(entry.id);
+  if (!area) return false;
+  if (area.roles && area.roles.length > 0) return canSeeArea(area, roles);
+  const audience = area.audience ?? "staff";
+  if (audience === "staff") return isStaffSession(roles);
+  return true;
+}
+
+/** The "Accesso aree" menu a visitor may see: filtered entries, empty groups dropped. */
+export function menuFor(
+  roles: ReadonlySet<string> | null,
+  menu: readonly MenuGroup[] = ACCESS_MENU,
+): MenuGroup[] {
+  return menu
+    .map((g) => ({
+      ...g,
+      entries: g.entries.filter((e) => canSeeMenuEntry(e, roles)),
+    }))
+    .filter((g) => g.entries.length > 0);
 }
 
 /** Labels for every area id that appears in a menu or rail (used by search). */
 export function labelIndex(): Map<string, string> {
   const m = new Map<string, string>();
   for (const g of ACCESS_MENU) for (const e of g.entries) m.set(e.id, e.label);
-  for (const g of INTERIOR_RAIL) for (const it of g.items) if (!m.has(it.id)) m.set(it.id, it.label);
+  for (const g of INTERIOR_RAIL)
+    for (const it of g.items) if (!m.has(it.id)) m.set(it.id, it.label);
   return m;
 }
 
-const normalize = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
+const normalize = (s: string) =>
+  s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
 
 export interface SearchHit extends AreaLink {
   label: string;
@@ -400,10 +612,21 @@ export function searchAreas(query: string, limit = 6): SearchHit[] {
     if (!area) continue;
     const name = normalize(label);
     const path = normalize(area.path).replace(/^\//, "");
-    const score = name.startsWith(q) || path.startsWith(q) ? 0 : name.includes(q) || path.includes(q) || id.includes(q) ? 1 : -1;
+    const score =
+      name.startsWith(q) || path.startsWith(q)
+        ? 0
+        : name.includes(q) || path.includes(q) || id.includes(q)
+          ? 1
+          : -1;
     if (score >= 0) hits.push({ hit: { ...areaLink(id), label }, score });
   }
-  return hits.sort((a, b) => a.score - b.score || a.hit.label.localeCompare(b.hit.label, "it")).slice(0, limit).map((h) => h.hit);
+  return hits
+    .sort(
+      (a, b) =>
+        a.score - b.score || a.hit.label.localeCompare(b.hit.label, "it"),
+    )
+    .slice(0, limit)
+    .map((h) => h.hit);
 }
 
 export interface StripItem {
@@ -416,13 +639,27 @@ export interface StripItem {
  * "In evidenza" strip value: unknown is never shown as zero (renders "—"),
  * and both zero and unknown are muted so only real numbers draw the eye.
  */
-export function stripValue(value: number | null | undefined): { text: string; muted: boolean; known: boolean } {
-  if (value === null || value === undefined || !Number.isFinite(value)) return { text: "—", muted: true, known: false };
-  return { text: new Intl.NumberFormat("it-IT").format(value), muted: value === 0, known: true };
+export function stripValue(value: number | null | undefined): {
+  text: string;
+  muted: boolean;
+  known: boolean;
+} {
+  if (value === null || value === undefined || !Number.isFinite(value))
+    return { text: "—", muted: true, known: false };
+  return {
+    text: new Intl.NumberFormat("it-IT").format(value),
+    muted: value === 0,
+    known: true,
+  };
 }
 
 /** "Sabato 10 ottobre" in the club's time zone. */
 export function formatClubDay(date: Date): string {
-  const s = new Intl.DateTimeFormat("it-IT", { weekday: "long", day: "numeric", month: "long", timeZone: "Europe/Rome" }).format(date);
+  const s = new Intl.DateTimeFormat("it-IT", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    timeZone: "Europe/Rome",
+  }).format(date);
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
