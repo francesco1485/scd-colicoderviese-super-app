@@ -86,7 +86,8 @@ function InsideCard({ s }: { s: AccessScreen }) {
       )}
       <p className="mt-4 flex gap-2 border-t border-[var(--in-line)] pt-3 text-[13.5px] leading-snug text-[var(--in-sub)]">
         <Database className="mt-[1px] size-4 flex-none" strokeWidth={1.8} aria-hidden="true" />
-        <span>{s.sources.length ? <>I dati arrivano da: {s.sources.join(", ")}. Nessun registro parallelo.</> : "I dati arrivano dagli archivi della società."}</span>
+        {/* Public-facing: no internal sheet names here (the sources stay listed in the work area's "Fonti" card). */}
+        <span>I dati arrivano dagli archivi ufficiali della società e li vede solo chi ne ha diritto.</span>
       </p>
       {s.blocker && (
         <p className="mt-3 flex gap-2 rounded-xl bg-[var(--in-warn-bg)] px-3 py-2.5 text-[14px] leading-snug text-[var(--in-warn)]">

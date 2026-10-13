@@ -126,11 +126,11 @@ function Societa() {
           <ul className="m-0 mt-4 grid list-none gap-2 p-0 sm:grid-cols-2 lg:grid-cols-3">
             {CLUB_DOCUMENTS.map((d) => (
               <li key={d.id}>
-                <a href={d.file} target="_blank" rel="noopener noreferrer" className="flex min-h-[72px] items-start gap-3 rounded-[14px] border border-[var(--out-line,#d3e0ee)] bg-white px-3 py-2.5 text-[var(--scd-ink,#062a52)]">
+                <a href={d.file} target="_blank" rel="noopener noreferrer" className="flex min-h-[72px] items-start gap-3 rounded-[14px] border border-[var(--in-line)] bg-white px-3 py-2.5 text-[var(--in-ink)]">
                   <FileText className="mt-0.5 size-5 shrink-0 text-[var(--scd-blue,#0457af)]" strokeWidth={1.8} aria-hidden="true" />
                   <span className="min-w-0">
                     <b className="block text-[14.5px] leading-tight">{d.title}</b>
-                    <span className="block text-[12.5px] text-[var(--out-text-soft,#46617f)]">{d.audience} · PDF, {d.pages} pagine</span>
+                    <span className="mt-0.5 block text-[13px] leading-snug text-[var(--in-sub)]">{d.audience} · PDF, {d.pages} pagine</span>
                   </span>
                 </a>
               </li>
@@ -144,7 +144,7 @@ function Societa() {
           <h2 id="avversarie-t" className="m-0 font-title text-[26px] font-black uppercase leading-none">
             Le società che incontriamo
           </h2>
-          <p className="m-0 mt-1 text-[14px] text-[var(--out-text-soft)]">Dal DB CLUBS del gestionale. Gli stemmi non verificati sono segnalati: non generiamo loghi inventati.</p>
+          <p className="m-0 mt-1 text-[14px] text-[var(--out-text-soft)]">Le squadre avversarie della stagione. Mostriamo solo stemmi ufficiali verificati: dove manca, resta il nome.</p>
           <div className="mt-3 grid gap-3 text-[var(--scd-ink)] md:grid-cols-3">
             {clubs.length === 0 ? (
               <>

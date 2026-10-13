@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { ExternalLink, FileText, Search, Users } from "lucide-react";
 import { useMemo, useState } from "react";
 
+import { PUBLIC_WRAP, PublicPageHeader } from "@/components/home/PublicPageHeader";
 import { Dialog } from "@/components/scd/Dialog";
 import { Card, Chip } from "@/components/scd/interior-ui";
 import { InteriorShell } from "@/components/scd/InteriorShell";
@@ -55,28 +56,43 @@ function DocumentsRoute() {
 }
 
 function PublicDocuments() {
+  // Signed-out view. /documenti is a board route (no site header on phones), so the page brings its own public band
+  // and uses the light "inside" tokens for text on the light ground (the "out" tokens are for dark backgrounds).
   return (
-    <main className="mx-auto max-w-4xl px-4 py-10 text-[var(--scd-ink,#062a52)]">
-      <h1 className="m-0 font-title text-[34px] font-black uppercase leading-none">Documenti del club</h1>
-      <p className="m-0 mt-2 max-w-[60ch] text-[15px] text-[var(--out-text-soft,#46617f)]">
-        I regolamenti pubblici della stagione 2026/27. Famiglie, atleti e staff trovano gli altri documenti che li riguardano dopo l'accesso.
-      </p>
-      <ul className="m-0 mt-6 grid list-none gap-2 p-0 sm:grid-cols-2" data-testid="documenti-pubblici">
-        {CLUB_DOCUMENTS.map((doc) => (
-          <li key={doc.id}>
-            <a href={doc.file} target="_blank" rel="noopener noreferrer" className="flex min-h-[72px] items-start gap-3 rounded-[14px] border border-[var(--out-line,#d3e0ee)] bg-white px-3 py-2.5">
-              <FileText className="mt-0.5 size-5 shrink-0 text-[var(--scd-blue,#0457af)]" strokeWidth={1.8} aria-hidden="true" />
-              <span className="min-w-0">
-                <b className="block text-[14.5px] leading-tight">{doc.title}</b>
-                <span className="block text-[12.5px] text-[var(--out-text-soft,#46617f)]">{doc.audience} · PDF, {doc.pages} pagine</span>
-              </span>
-            </a>
-          </li>
-        ))}
-      </ul>
-      <Link to="/accedi" search={{ next: "/documenti" }} className="scd-focus mt-6 inline-flex h-11 items-center rounded-[10px] bg-[#F8D000] px-5 text-[15px] font-bold text-[#062a52]">
-        Entra per i tuoi documenti
-      </Link>
+    <main data-screen="documenti-pubblici" className="min-h-dvh bg-[#eef3f9] pb-10 text-[var(--in-ink)]">
+      <PublicPageHeader eyebrow="Stagione 2026/27" title="Documenti" accent="del club">
+        I regolamenti pubblici della stagione. Famiglie, atleti e staff trovano gli altri documenti che li riguardano dopo l'accesso.
+      </PublicPageHeader>
+      <div className={`${PUBLIC_WRAP} pt-5 lg:pt-8`}>
+        <ul className="m-0 grid list-none gap-2 p-0 sm:grid-cols-2 xl:grid-cols-3" data-testid="documenti-pubblici">
+          {CLUB_DOCUMENTS.map((doc) => (
+            <li key={doc.id}>
+              <a
+                href={doc.file}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="scd-focus flex h-full min-h-[72px] items-start gap-3 rounded-[14px] border border-[var(--in-line)] bg-white px-3 py-2.5 hover:border-[#9fbbe0]"
+              >
+                <FileText className="mt-0.5 size-5 shrink-0 text-[var(--out-blue)]" strokeWidth={1.8} aria-hidden="true" />
+                <span className="min-w-0">
+                  <b className="block text-[15px] leading-tight">{doc.title}</b>
+                  <span className="mt-0.5 block text-[13px] leading-snug text-[var(--in-sub)]">
+                    {doc.audience} · PDF, {doc.pages} pagine
+                  </span>
+                </span>
+                <ExternalLink className="ml-auto mt-0.5 size-4 shrink-0 text-[var(--in-sub)]" aria-label="apre il PDF in una nuova scheda" />
+              </a>
+            </li>
+          ))}
+        </ul>
+        <Link
+          to="/accedi"
+          search={{ next: "/documenti" }}
+          className="scd-focus mt-6 inline-flex h-11 items-center rounded-[10px] bg-[var(--out-yellow)] px-5 text-[15px] font-bold text-[var(--out-night)] hover:bg-[var(--out-yellow-hover)]"
+        >
+          Entra per i tuoi documenti
+        </Link>
+      </div>
     </main>
   );
 }
