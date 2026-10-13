@@ -185,8 +185,13 @@ Sito: https://appcolicoderviese.vercel.app
   cancellazione dell'account e dei dati e (b) una **pagina web** raggiungibile senza reinstallare l'app, con il nome
   dell'app come in scheda, da indicare nel modulo Data Safety
   ([Google Play Console Help — account deletion requirements](https://support.google.com/googleplay/android-developer/answer/13327111?hl=en-GB)).
-  Oggi la pagina `/privacy` cita solo il diritto di cancellazione via e-mail: manca il pulsante nell'area personale e
-  la pagina dedicata (proposta: `/elimina-account`). È un lavoro di codice separato (vedi "Prossimi passi").
+  **Stato 13/10/2026 (branch `agent/delete`):** pagina pubblica `/elimina-account` (senza accesso, nel footer e in
+  `/privacy`) e pulsante **Elimina account** con conferma in *La mia SCD*. Le richieste entrano nella coda della
+  segreteria (`/gestionale/coda`, voce "Eliminazione account"); l'app non cancella nulla da sola, la segreteria esegue.
+  Da fare prima dell'invio: applicare la migrazione `supabase/migrations/20261013_r96_account_deletion_request.sql`
+  (finché non è applicata il modulo risponde "invio non riuscito" e propone l'e-mail già pronta a
+  sportclubcolico@gmail.com). URL da indicare nel modulo Data Safety:
+  `https://scd-superapp-staging.onrender.com/elimina-account`.
 
 ## 8. Materiale grafico
 - Icona 512×512: `apps/superapp/public/icon-512.png` (stemma ufficiale, KEEP_LOCKED)

@@ -195,7 +195,8 @@ export function SiteHeader() {
         >
           <ClubCrestOfficial size={46} className="lg:hidden" />
           <ClubCrestOfficial size={54} className="hidden lg:block" />
-          <span className="whitespace-nowrap font-title text-[20px] font-black leading-none lg:text-[24px]">
+          {/* 18px below 380px so crest + wordmark + access + menu fit a 360px phone without overlapping. */}
+          <span className="whitespace-nowrap font-title text-[18px] font-black leading-none min-[380px]:text-[20px] lg:text-[24px]" data-testid="header-wordmark">
             COLICO<span className="text-[#ffd600]">DERVIESE</span>
           </span>
         </Link>
@@ -214,7 +215,7 @@ export function SiteHeader() {
             </Link>
           ))}
         </nav>
-        <div className="ml-auto flex items-center gap-2 lg:gap-3">
+        <div className="ml-auto flex shrink-0 items-center gap-2 lg:gap-3">
           <AccessMenu />
           <button
             className="scd-focus flex size-11 shrink-0 items-center justify-center rounded-[10px] border border-white/25 text-white transition-colors duration-150 hover:bg-white/10"
@@ -764,6 +765,12 @@ export function SiteFooter() {
               >
                 Segnalazioni riservate
               </Link>
+              <a
+                href="/elimina-account"
+                className="scd-focus inline-flex min-h-11 items-center underline decoration-white/30 underline-offset-4 hover:text-white"
+              >
+                Elimina account
+              </a>
             </span>
             <span>
               Super App ufficiale della {CLUB_NAME} · versione del {BUILD_STAMP}

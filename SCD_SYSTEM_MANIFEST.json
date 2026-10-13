@@ -848,7 +848,8 @@
         "audiences": "UD-078 (2026-10-12): config/superapp-audiences.v1.json defines four doors (tifosi, associati, lavoro, partner) over existing pages and satellites; drives /aree and /guida; validated by apps/superapp/src/lib/audiences.test.ts (every satellite in one door, every task on an existing route); no new auth or core experience",
         "domain_masters": "UD-082 (2026-10-12): one master sheet per domain, the app reads an automatic copy: people and FIGC registrations = 04_TESSERATI; fees and kit = SCD_MASTER_GESTIONALE_2026-27; solidarity fund = FONDO_SOLIDALE registro riservato; events = Master Calendario; pitch rotation = ROTAZIONE_CAMPI; training = Quadro settimanale; minibuses = 05_PULMINI; accounting and compensation plan = Master economico-finanziario; supplier instalments = TESORERIA FORNITORI; sponsors = Master Sponsor Intelligence; tournaments = Master Tornei; ticketing rules = Master canonico biglietteria. 00 - SCD OPERATIVO PILOTA becomes archive/kernel: its duplicate tabs are SUPERSEDED, nothing is moved or deleted.",
         "knowledge_base": "r77 (2026-10-12, UD-077): scd_kb_items (Cervellone) with Italian full-text search; scd_kb_search for office staff (INTERNO) and Direzione (RISERVATO), scd_kb_upsert Direzione only, audited; loaded from the Cervellone Drive catalogue (archived documents, Drive file index, mail index per season/area/organization, economy of organizations 2026/27, history, facilities); no personal data of families or minors; page /direzione/cervellone",
-        "distribution": "UD-071 (2026-10-12): one permanent address app.colicoderviese.it (club domain); public /installa page with QR; icons from the official crest for stores; /.well-known/assetlinks.json served only with SCD_ANDROID_PACKAGE + SCD_ANDROID_SHA256; Play Store (TWA) then App Store wrapper after internal operational work — apps/superapp/docs/DOMINIO_E_STORE.md"
+        "distribution": "UD-071 (2026-10-12) superseded for the store launch by the Direzione decision of 2026-10-13: public short URL https://appcolicoderviese.vercel.app (Vercel proxy forwarding to Render; store listing and marketing texts only, never the app origin); app origin for both stores https://scd-superapp-staging.onrender.com (serves /manifest.webmanifest and /.well-known/assetlinks.json only with SCD_ANDROID_PACKAGE + SCD_ANDROID_SHA256); Android = Trusted Web Activity built with Bubblewrap >= 1.25.0 (target API 36), package it.colicoderviese.app, Play App Signing (docs/play-store/twa-manifest.json, PLAY_STORE_SUBMISSION.md); iOS = Capacitor shell over the same origin, bundle it.colicoderviese.app (APP_STORE_SUBMISSION.md); public /installa page with QR; icons from the official crest (KEEP_LOCKED). The club domain app.colicoderviese.it stays the future target: switching needs a new store build with the new host and assetlinks kept on Render during the transition.",
+        "account_deletion": "r96 (2026-10-13, Google Play account-deletion policy + Apple 5.1.1(v)): public page /elimina-account (no login, in PUBLIC_PREFIXES, offline list and sitemap; linked from footer and /privacy) explains what is deleted (account, follows, posts, game data, avatar) and what the club keeps by law (FIGC registration records, accounting documents, consent history); in-app 'Elimina account' with confirmation in /la-mia-scd. Both file a request in the existing Secretariat queue scd_proposals (machine M2, area segreteria, kind RICHIESTA, source MANUAL) through scd_account_deletion_request (anon + authenticated, no new table, global hourly limit, per-e-mail/per-user de-duplication); the client never deletes data, the Secretariat executes the deletion — supabase/migrations/20261013_r96_account_deletion_request.sql, apps/superapp/src/lib/account-deletion.ts"
       }
     },
     "intake_hub": {
@@ -2560,7 +2561,11 @@
       "r20_apps_script": "https://script.google.com/macros/s/AKfycbwYQ_3yLYsp-6jX3FIgufBjpmaZb9uO1AklF9hdG-CuLII9J4ITUX1EA-EKuWXBMEc/exec",
       "r22_command_platform": "https://scd-colicoderviese-command-r22.onrender.com",
       "android_package": "it.colicoderviese.app",
-      "ios_bundle_planned": "it.colicoderviese.app"
+      "ios_bundle_planned": "it.colicoderviese.app",
+      "store_app_origin": "https://scd-superapp-staging.onrender.com",
+      "public_short_url": "https://appcolicoderviese.vercel.app",
+      "android_wrapper": "TWA_BUBBLEWRAP",
+      "ios_wrapper": "CAPACITOR"
     },
     "flow": [
       "CLIENT",

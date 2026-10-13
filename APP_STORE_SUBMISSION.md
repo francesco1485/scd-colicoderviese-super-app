@@ -172,7 +172,7 @@ and QR at the stadium entrance, offline screen when the network is unavailable.
 Sign-in: e-mail one-time code (no passwords, no third-party login).
 Demo account: <REVIEW_EMAIL — to be entered only in App Store Connect>
 Code: <REVIEW_CODE_OR_INSTRUCTIONS — to be entered only in App Store Connect>
-The demo account contains no data of minors. Account deletion: Profile → Elimina account.
+The demo account contains no data of minors. Account deletion: La mia SCD (bottom tab "La mia") → "Elimina account" → confirm; public page: https://scd-superapp-staging.onrender.com/elimina-account. Requests reach the club secretariat queue, which completes the deletion within 30 days.
 Contact: sportclubcolico@gmail.com
 ```
 
