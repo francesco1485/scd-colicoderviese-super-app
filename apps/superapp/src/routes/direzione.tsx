@@ -33,7 +33,7 @@ const LINKS = [
   { to: "/direzione/cervellone", icon: Brain, title: "Cervellone", sub: "Cerca in documenti, file, posta, economia, storia e impianti. Scadenze in vista." },
   { to: "/direzione/accessi", icon: KeyRound, title: "Accessi e permessi", sub: "Chi entra, con quale ruolo e quali aree in più. Sospendi, riattiva, storico." },
   { to: "/segreteria/persone", icon: UserCheck, title: "Persone e richieste di accesso", sub: "Anagrafica del club e registrazioni da verificare." },
-  { to: "/gestionale/mister", icon: Shirt, title: "Rose e convocazioni", sub: "Rosa di ogni squadra, convocazioni con \"Ci sarò\"." },
+  { to: "/gestionale/mister", icon: Shirt, title: "Rose e convocazioni", sub: "Rosa di ogni squadra, convocazioni con presa visione e impedimenti segnalati." },
   { to: "/segreteria", icon: ClipboardList, title: "Segreteria", sub: "Scadenze, tesseramenti, distinte." },
   { to: "/calendario", icon: CalendarDays, title: "Calendario", sub: "Gare ufficiali della stagione." },
   { to: "/gestionale/organigramma", icon: Users, title: "Organigramma", sub: "Dirigenza, responsabili e staff." },

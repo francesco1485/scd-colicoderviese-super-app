@@ -3,16 +3,17 @@ import { Check, ChevronDown, CircleAlert, Send } from "lucide-react";
 import { useEffect, useId, useMemo, useState } from "react";
 
 import { Chip, type ChipTone } from "@/components/scd/interior-ui";
-import { OUTCOME_LABEL, RESPONSE_LABEL, callupsToWithdraw, outcomeCounts, responseCounts, romeTime, sendButtonLabel, validateCallupInput, type CallupResponse, type SendOutcome } from "@/lib/callups";
+import { MISTER_CALLUP_COPY, OUTCOME_LABEL, RESPONSE_LABEL, callupsToWithdraw, outcomeCounts, responseCounts, responseSummary, romeTime, sendButtonLabel, validateCallupInput, type CallupResponse, type SendOutcome } from "@/lib/callups";
 import { getEventCallups, sendCallups, withdrawCallups, type TeamCallup } from "@/lib/callups.functions";
 import { certificateState } from "@/lib/people";
 import type { RosterRow } from "@/lib/roster";
 
-const RESPONSE_TONE: Readonly<Record<CallupResponse, ChipTone>> = { CONFIRMED: "ok", DECLINED: "crit", PENDING: "mute" };
+const RESPONSE_TONE: Readonly<Record<CallupResponse, ChipTone>> = { CONFIRMED: "ok", DECLINED: "warn", PENDING: "mute" };
 
 /**
  * Call-up for one calendar match (UD-062). The mister ticks the squad, sets meeting time and place,
- * sends; families answer "Ci sarò" from their page and the answers appear here.
+ * sends. A call-up is mandatory (UD-099): families only take notice ("presa visione") or report an
+ * impediment from their page; the mister sees who has seen it and decides on impediments.
  * Eligibility (certificate valid on match day, FIGC registration) is enforced by the database:
  * the hints below only warn before sending.
  */
@@ -70,6 +71,7 @@ export function CallupPanel({
 
   const byAthlete = useMemo(() => new Map((callups ?? []).map((c) => [c.athleteId, c])), [callups]);
   const counts = responseCounts((callups ?? []).map((c) => ({ response: c.response })));
+  const summary = responseSummary(counts);
   const toWithdraw = useMemo(() => callupsToWithdraw(callups ?? [], picked), [callups, picked]);
   const errors = picked.size > 0 ? validateCallupInput({ date: eventDate, meetingTime, meetingPlace, kitNote, athleteIds: [...picked] }) : [];
 
@@ -154,11 +156,11 @@ export function CallupPanel({
   return (
     <div className="flex flex-col gap-3">
       {callups && callups.length > 0 && (
-        <p className="m-0 flex flex-wrap gap-2 text-[14px]" aria-label="Risposte alla convocazione">
+        <p className="m-0 flex flex-wrap gap-2 text-[14px]" aria-label="Stato della convocazione">
           <Chip tone="info">{counts.total} convocati</Chip>
-          <Chip tone="ok">{counts.confirmed} ci saranno</Chip>
-          {counts.declined > 0 && <Chip tone="crit">{counts.declined} non ci saranno</Chip>}
-          {counts.pending > 0 && <Chip tone="mute">{counts.pending} in attesa</Chip>}
+          <Chip tone="ok">{summary.seen}</Chip>
+          <Chip tone="mute">{summary.toSee}</Chip>
+          <Chip tone={counts.declined > 0 ? "warn" : "mute"}>{summary.impediments}</Chip>
         </p>
       )}
 
@@ -211,7 +213,7 @@ export function CallupPanel({
             <Send className="size-[18px]" strokeWidth={2} aria-hidden="true" />
             {busy ? "Invio…" : sendButtonLabel(picked.size, toWithdraw.length)}
           </button>
-          <span className="text-[13.5px] text-[var(--in-sub)]">{toWithdraw.length > 0 ? "Chi hai tolto sparisce dalla pagina della famiglia; resta nello storico." : "Le famiglie rispondono \"Ci sarò\" dalla loro pagina."}</span>
+          <span className="text-[13.5px] text-[var(--in-sub)]">{toWithdraw.length > 0 ? "Chi hai tolto sparisce dalla pagina della famiglia; resta nello storico." : MISTER_CALLUP_COPY.familiesHint}</span>
         </div>
       </form>
 

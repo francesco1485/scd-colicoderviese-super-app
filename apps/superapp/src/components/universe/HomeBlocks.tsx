@@ -354,7 +354,7 @@ export function NextTicket({
           aria-pressed={going}
           className={`min-h-[50px] rounded-[14px] font-uv text-[20px] uppercase tracking-[0.06em] transition-transform active:translate-y-[3px] ${going ? "bg-[#0b8a43] text-white shadow-[0_4px_0_#05532a]" : "bg-[var(--uv-night)] text-[var(--uv-gold)] shadow-[0_4px_0_#000c2a]"}`}
         >
-          {going ? "Ci sarò ✓" : "Ci sarò"}
+          {going ? "Vengo a vedere ✓" : "Vengo a vedere"}
         </button>
         <button
           type="button"
@@ -370,7 +370,7 @@ export function NextTicket({
           aria-hidden="true"
           className="uv-thump pointer-events-none absolute bottom-[62px] right-4 rounded-[6px] border-[3px] border-[#0b8a43] bg-white px-[9px] py-[6px] font-uv text-[17px] uppercase tracking-[0.1em] text-[#0b8a43]"
         >
-          Ci sono!
+          Ci vediamo!
         </span>
       )}
       <Link

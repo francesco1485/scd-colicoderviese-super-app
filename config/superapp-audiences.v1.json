@@ -36,7 +36,7 @@
       "login": "account",
       "satellites": ["atleta", "famiglia"],
       "tasks": [
-        { "label": "Convocazioni e \"Ci sarò\"", "to": "/famiglia", "hint": "Rispondi in un tocco.", "login": true },
+        { "label": "Convocazioni e presa visione", "to": "/famiglia", "hint": "Leggi la convocazione e prendine visione in un tocco.", "login": true },
         { "label": "Allenamenti della settimana", "to": "/allenamenti", "hint": "Orari e campi della tua squadra." },
         { "label": "Iscriviti alla SCD", "to": "/entra", "hint": "Modulo di iscrizione e documenti." },
         { "label": "Comunicazioni del club", "to": "/comunicazioni", "hint": "Avvisi e novità." },

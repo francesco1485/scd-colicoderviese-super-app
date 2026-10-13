@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { asOutcome, asResponse, callupsToWithdraw, matchTitle, meetingAtLiteral, outcomeCounts, responseCounts, romeDay, romeTime, sendButtonLabel, validateCallupInput } from "./callups";
+import { CALLUP_PUSH_TEXT, FAMILY_CALLUP_COPY, MISTER_CALLUP_COPY, MY_RESPONSE_LABEL, RESPONSE_LABEL, asOutcome, asResponse, callupsToWithdraw, matchTitle, meetingAtLiteral, outcomeCounts, respondedMessage, responseCounts, responseSummary, romeDay, romeTime, sendButtonLabel, validateCallupInput } from "./callups";
 
 describe("callups", () => {
   it("builds the title from SCD's side", () => {
@@ -60,5 +60,46 @@ describe("withdrawing call-ups (r68)", () => {
     const sql = readFileSync(fileURLToPath(new URL("../../../../supabase/migrations/20261011_r68_callup_withdraw.sql", import.meta.url)), "utf8");
     expect(sql).not.toMatch(/\bdelete\s+from\b/i);
     expect(sql).toContain("withdrawn_at = now()");
+  });
+});
+
+describe("a call-up is mandatory, not an RSVP (UD-099)", () => {
+  const allCopy = [
+    ...Object.values(RESPONSE_LABEL),
+    ...Object.values(MY_RESPONSE_LABEL),
+    ...Object.values(FAMILY_CALLUP_COPY),
+    ...Object.values(MISTER_CALLUP_COPY),
+    CALLUP_PUSH_TEXT,
+    respondedMessage("CONFIRMED"),
+    respondedMessage("DECLINED"),
+  ];
+
+  it("labels the family card as acknowledgement and impediment", () => {
+    expect(MY_RESPONSE_LABEL).toEqual({ PENDING: "Convocato · da prendere visione", CONFIRMED: "Presa visione", DECLINED: "Impedimento segnalato" });
+    expect(FAMILY_CALLUP_COPY.acknowledge).toBe("Presa visione");
+    expect(FAMILY_CALLUP_COPY.report).toBe("Segnala un impedimento");
+    expect(FAMILY_CALLUP_COPY.reportConfirm).toBe("Conferma segnalazione");
+    expect(FAMILY_CALLUP_COPY.reportNote).toBe(
+      "La convocazione resta valida: il mister riceve la segnalazione e decide. Per motivi di salute non scrivere dettagli: parlane con il mister o con la segreteria.",
+    );
+  });
+
+  it("labels the mister panel as seen / not seen / impediments", () => {
+    expect(RESPONSE_LABEL).toEqual({ PENDING: "Non ancora vista", CONFIRMED: "Vista", DECLINED: "Impedimento segnalato" });
+    const c = responseCounts([{ response: "CONFIRMED" }, { response: "CONFIRMED" }, { response: "PENDING" }, { response: "DECLINED" }]);
+    expect(responseSummary(c)).toEqual({ seen: "Viste 2", toSee: "Da vedere 1", impediments: "Impedimenti 1" });
+    expect(MISTER_CALLUP_COPY.familiesHint).toBe("Le famiglie prendono visione dalla loro pagina.");
+  });
+
+  it("asks to open the app to take notice in the push text", () => {
+    expect(CALLUP_PUSH_TEXT).toBe("Nuova convocazione: apri l'app per prenderne visione");
+  });
+
+  it("never offers a choice to attend", () => {
+    for (const text of allCopy) expect(text).not.toMatch(/ci sar[òoà]|non ci sar|parteciper/i);
+  });
+
+  it("keeps the convocation valid when an impediment is reported", () => {
+    expect(respondedMessage("DECLINED")).toContain("la convocazione resta valida");
   });
 });

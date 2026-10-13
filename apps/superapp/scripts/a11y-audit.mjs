@@ -92,7 +92,7 @@ const PAGES = [
   { slug: "accedi", path: "/accedi" },
   { slug: "registrati", path: "/registrati" },
   { slug: "privacy", path: "/privacy" },
-  { slug: "famiglia", path: "/famiglia", fixtures: "famiglia", ready: "text=Ci sarò" },
+  { slug: "famiglia", path: "/famiglia", fixtures: "famiglia", ready: "text=Presa visione" },
   { slug: "mister", path: "/gestionale/mister?squadra=u19", fixtures: "mister", ready: "text=Marco Valsecchi" },
   { slug: "certificati", path: "/segreteria/certificati", fixtures: "certificati", ready: "text=Da fare" },
 ].filter((p) => !ONLY || ONLY.has(p.slug));
