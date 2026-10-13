@@ -7,7 +7,8 @@
     "VERIFIED",
     "PENDING_VERIFICATION",
     "RETIRED",
-    "REFERENCE_PROTOTYPE"
+    "REFERENCE_PROTOTYPE",
+    "APPROVED"
   ],
   "folders": {
     "canonical_existing": "assets/",
@@ -480,6 +481,66 @@
       "class": "CHARACTER_AVATAR_TILE",
       "status": "VERIFIED",
       "source": "Crovi v3 avatar tile with background (UD-026)"
+    },
+    {
+      "path": "apps/superapp/public/media/cast/era/",
+      "class": "CHARACTER_CUTOUT",
+      "asset_class": "GENERATE_ORIGINAL",
+      "status": "APPROVED",
+      "approval_evidence": "Direzione 'Ci siamo' round 4 + 'Vai A B C' 13/10/2026",
+      "canva_media_id": "MAHX1G12gBc",
+      "canva_export_design_id": "DAHX4vg-ENE",
+      "source": "Era, original realistic character (assistant cast), GENERATE_ORIGINAL, not an official asset and no real-person likeness; cut-outs era-440/era-900 from Canva media MAHX1G12gBc exported via design DAHX4vg-ENE"
+    },
+    {
+      "path": "apps/superapp/public/media/cast/era/era-avatar-256.webp",
+      "class": "CHARACTER_AVATAR_TILE",
+      "asset_class": "GENERATE_ORIGINAL",
+      "status": "APPROVED",
+      "approval_evidence": "Direzione 'Ci siamo' round 4 + 'Vai A B C' 13/10/2026",
+      "canva_media_id": "MAHX1G12gBc",
+      "canva_export_design_id": "DAHX4vg-ENE",
+      "source": "Era avatar tile with background, square crop of Canva media MAHX1G12gBc (export design DAHX4vg-ENE)"
+    },
+    {
+      "path": "apps/superapp/public/media/cast/genny/",
+      "class": "CHARACTER_CUTOUT",
+      "asset_class": "GENERATE_ORIGINAL",
+      "status": "APPROVED",
+      "approval_evidence": "Direzione 'Ci siamo' round 4 + 'Vai A B C' 13/10/2026",
+      "canva_media_id": "MAHX1KTH6yk",
+      "canva_export_design_id": "DAHX4uTHmCs",
+      "source": "Genny, original realistic character (assistant cast), GENERATE_ORIGINAL, not an official asset and no real-person likeness; cut-outs genny-440/genny-900 from Canva media MAHX1KTH6yk exported via design DAHX4uTHmCs"
+    },
+    {
+      "path": "apps/superapp/public/media/cast/genny/genny-avatar-256.webp",
+      "class": "CHARACTER_AVATAR_TILE",
+      "asset_class": "GENERATE_ORIGINAL",
+      "status": "APPROVED",
+      "approval_evidence": "Direzione 'Ci siamo' round 4 + 'Vai A B C' 13/10/2026",
+      "canva_media_id": "MAHX1KTH6yk",
+      "canva_export_design_id": "DAHX4uTHmCs",
+      "source": "Genny avatar tile with background, square crop of Canva media MAHX1KTH6yk (export design DAHX4uTHmCs)"
+    },
+    {
+      "path": "apps/superapp/public/media/cast/acanfora/",
+      "class": "CHARACTER_CUTOUT",
+      "asset_class": "GENERATE_ORIGINAL",
+      "status": "APPROVED",
+      "approval_evidence": "Direzione 'Ci siamo' round 4 + 'Vai A B C' 13/10/2026",
+      "canva_media_id": "MAHX1M4GK7g",
+      "canva_export_design_id": "DAHX4j7HujU",
+      "source": "Dottor Acanfora, original realistic character (assistant cast), GENERATE_ORIGINAL, not an official asset and no real-person likeness; cut-outs acanfora-440/acanfora-900 from Canva media MAHX1M4GK7g exported via design DAHX4j7HujU"
+    },
+    {
+      "path": "apps/superapp/public/media/cast/acanfora/acanfora-avatar-256.webp",
+      "class": "CHARACTER_AVATAR_TILE",
+      "asset_class": "GENERATE_ORIGINAL",
+      "status": "APPROVED",
+      "approval_evidence": "Direzione 'Ci siamo' round 4 + 'Vai A B C' 13/10/2026",
+      "canva_media_id": "MAHX1M4GK7g",
+      "canva_export_design_id": "DAHX4j7HujU",
+      "source": "Dottor Acanfora avatar tile with background, square crop of Canva media MAHX1M4GK7g (export design DAHX4j7HujU)"
     },
     {
       "path": "apps/superapp/public/media/eventi/",

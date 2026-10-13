@@ -1,7 +1,7 @@
 import { CAST, castPortraitSrc, castReady, type CastId } from "@/lib/assistant-cast";
 
 /**
- * Portrait of a cast character (Era, Genny, Dottor Acanfora) with the same subtle life as Crovi:
+ * Cut-out portrait of a cast character (Era, Genny, Dottor Acanfora) with the same subtle life as Crovi:
  * the figure breathes from the feet (styles.css .crovi-actor), and stands still with "reduce
  * motion". Renders nothing until the approved picture is in the app: no drawing ever replaces it.
  * Sized by the caller with a height class; the width follows the portrait frame (1136 x 1408).
@@ -26,18 +26,23 @@ export function CastPortrait({
   return (
     <div
       className={`crovi-actor relative flex-none select-none ${className}`}
-      style={{ aspectRatio: `${CAST_FRAME_RATIO}` }}
+      // the photos end at the waist: a soft fade hides the hard crop line
+      style={{
+        aspectRatio: `${CAST_FRAME_RATIO}`,
+        maskImage: "linear-gradient(to bottom, #000 82%, transparent 100%)",
+        WebkitMaskImage: "linear-gradient(to bottom, #000 82%, transparent 100%)",
+      }}
       data-cast={id}
     >
       <img
         src={castPortraitSrc(id, size)}
-        srcSet={`${castPortraitSrc(id, 440)} 440w, ${castPortraitSrc(id, 900)} 900w`}
-        sizes="(min-width: 1024px) 220px, 150px"
+        srcSet={`${castPortraitSrc(id, 440)} 355w, ${castPortraitSrc(id, 900)} 726w`}
+        sizes="(min-width: 1024px) 178px, 122px"
         alt={member.alt}
         draggable={false}
         decoding="async"
         loading="lazy"
-        className="absolute inset-0 size-full rounded-[18px] object-cover object-top"
+        className="absolute inset-0 size-full object-contain object-bottom"
       />
     </div>
   );

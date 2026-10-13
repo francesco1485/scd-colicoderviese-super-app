@@ -41,6 +41,20 @@ describe("assistant cast registry (Direzione 'Ci siamo' round 4, 'Vai A B C' 13/
     }
   });
 
+  it("registers each character as an approved original with its Canva provenance", () => {
+    for (const id of CAST_IDS) {
+      const folder = registry.runtime_assets.find((a) => a.path === `apps/superapp/public/media/cast/${id}/`) as Record<string, unknown> | undefined;
+      expect(folder, id).toBeDefined();
+      expect(folder?.["class"]).toBe("CHARACTER_CUTOUT");
+      expect(folder?.["asset_class"]).toBe("GENERATE_ORIGINAL");
+      expect(folder?.["status"]).toBe("APPROVED");
+      expect(String(folder?.["approval_evidence"])).toMatch(/Ci siamo.*Vai A B C.*13\/10\/2026/);
+      expect(folder?.["canva_media_id"]).toBe(CAST[id].canvaAssetId);
+      expect(folder?.["canva_export_design_id"]).toBe(CAST[id].canvaExportDesignId);
+      expect(castReady(id)).toBe(true);
+    }
+  });
+
   it("keeps the alt texts free of real-person likeness claims", () => {
     for (const id of CAST_IDS) expect(CAST[id].alt).not.toMatch(/sosia|somiglia|attore|attrice|Venere|Elena/i);
   });

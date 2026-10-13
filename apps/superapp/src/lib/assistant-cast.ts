@@ -10,8 +10,11 @@
  * Image readiness is a feature check, not a placeholder: a character's picture appears only when
  * its optimized files exist in public/media/cast/<id>/ AND are registered in
  * config/scd-assets.v1.json (asset test enforces both). Until then the text features work and no
- * drawing stands in for the approved face. 13/10/2026: the round-4 items are Canva media assets
- * (MA…), not designs, so they could not be exported at full size by the agent; see CAST_ASSET_BLOCKER.
+ * drawing stands in for the approved face.
+ *
+ * 13/10/2026: the round-4 media were placed full size (1136 x 1408) in one Canva design each
+ * ("SCD cast export · <name> · 2026-10-13"), exported as PNG, cut out (rembg isnet-general-use;
+ * faces untouched) and encoded as WebP: <id>-440/-900 cut-outs and <id>-avatar-256 tile.
  */
 
 export type CastId = "era" | "genny" | "acanfora";
@@ -27,6 +30,8 @@ export interface CastMember {
   alt: string;
   /** Canva media id of the approved round-4 image (provenance). */
   canvaAssetId: string;
+  /** Canva design used to export the image at full size (provenance). */
+  canvaExportDesignId: string;
   /** Public folder of the optimized variants. */
   mediaDir: `/media/cast/${CastId}/`;
   /** True only once the optimized variants are committed and registered. */
@@ -40,8 +45,9 @@ export const CAST: Readonly<Record<CastId, CastMember>> = {
     role: "Assistente delle aree riservate per staff e tesserati dai 15 anni",
     alt: "Era, l'assistente del club, in tuta blu della società",
     canvaAssetId: "MAHX1G12gBc",
+    canvaExportDesignId: "DAHX4vg-ENE",
     mediaDir: "/media/cast/era/",
-    ready: false,
+    ready: true,
   },
   genny: {
     id: "genny",
@@ -49,8 +55,9 @@ export const CAST: Readonly<Record<CastId, CastMember>> = {
     role: "Consigli generali di sana alimentazione per i giovani atleti",
     alt: "Genny, la ragazza dei consigli, con un frutto in mano al campo",
     canvaAssetId: "MAHX1KTH6yk",
+    canvaExportDesignId: "DAHX4uTHmCs",
     mediaDir: "/media/cast/genny/",
-    ready: false,
+    ready: true,
   },
   acanfora: {
     id: "acanfora",
@@ -58,14 +65,11 @@ export const CAST: Readonly<Record<CastId, CastMember>> = {
     role: "L'angolo infermeria: informazioni generali di primo soccorso",
     alt: "Il Dottor Acanfora con camice e borsa del club",
     canvaAssetId: "MAHX1M4GK7g",
+    canvaExportDesignId: "DAHX4j7HujU",
     mediaDir: "/media/cast/acanfora/",
-    ready: false,
+    ready: true,
   },
 };
-
-/** Why the pictures are not in yet (shown nowhere in the UI; used by docs/tests and the handoff). */
-export const CAST_ASSET_BLOCKER =
-  "Round-4 images are Canva media assets (MAHX1G12gBc, MAHX1KTH6yk, MAHX1M4GK7g): export-design accepts only design ids, full-size files to be exported from Canva and added to public/media/cast/.";
 
 export type CastPortraitSize = 440 | 900;
 
