@@ -9,9 +9,15 @@ import type { ReactNode } from "react";
 
 import { venueCase } from "@/lib/board-data";
 import type { HallTeam } from "@/lib/club-profile";
-import type { WeekItem } from "@/lib/home-week";
+import { romeParts, type WeekItem } from "@/lib/home-week";
 import { sponsorLabel, type Sponsor } from "@/lib/sponsors";
 import { itemState, type Team } from "@/lib/universe";
+import {
+  competitionBadge,
+  dayChip,
+  dayCount,
+  sideTone,
+} from "@/lib/week-style";
 
 import { sides } from "./match-sides";
 import { OpponentCrest } from "@/lib/crests";
@@ -189,22 +195,46 @@ export function WeekGames({
   lead?: ReactNode;
 }) {
   const days = [...new Set(items.map((i) => i.date))];
+  const today =
+    romeParts(new Date(nowMs).toISOString())?.date ??
+    new Date(nowMs).toISOString().slice(0, 10);
   const list = (
-    <Card className={lead ? "min-w-0" : ""}>
+    <Card className={`overflow-hidden ${lead ? "min-w-0" : ""}`}>
       {items.length === 0 ? (
         <p className="m-0 px-4 py-5 text-[15px] text-[#3e5272]">
           Nessuna gara nei prossimi sette giorni: è settimana di allenamenti.
         </p>
       ) : (
-        days.map((d) => (
-          <div key={d} className="border-b border-[#e6edf6] last:border-b-0">
-            <h3 className="m-0 px-4 pb-1 pt-3 text-[13px] font-bold uppercase tracking-[0.06em] text-[#5a6b85]">
-              {cap(dayLong(d))}
-            </h3>
-            <ul className="m-0 list-none p-0 pb-1.5">
-              {items
-                .filter((i) => i.date === d)
-                .map((i) => (
+        days.map((d) => {
+          const rows = items.filter((i) => i.date === d);
+          const chip = dayChip(d, today);
+          return (
+            <div
+              key={d}
+              className="border-b border-[#e6edf6] last:border-b-0"
+              data-day-tone={chip.tone}
+            >
+              <h3 className="m-0 flex items-center gap-2.5 bg-[linear-gradient(90deg,#f1f5fb,#fff)] px-4 py-2">
+                <span
+                  className={`inline-flex h-[26px] items-center rounded-[7px] px-2.5 font-title text-[16px] font-extrabold uppercase leading-none tracking-[0.04em] ${
+                    chip.tone === "today"
+                      ? "bg-[#ffd600] text-[#0b1e3a] shadow-[0_2px_0_#c9a800]"
+                      : chip.tone === "tomorrow"
+                        ? "bg-[#1556c4] text-white"
+                        : "bg-[#0b2a5b] text-white"
+                  }`}
+                >
+                  {chip.label}
+                </span>
+                <span className="min-w-0 flex-1 truncate text-[13.5px] font-bold uppercase tracking-[0.05em] text-[#0b2a5b]">
+                  {chip.date}
+                </span>
+                <span className="shrink-0 text-[12.5px] font-semibold text-[#5a6b85]">
+                  {dayCount(rows)}
+                </span>
+              </h3>
+              <ul className="m-0 list-none p-0">
+                {rows.map((i) => (
                   <GameRow
                     key={i.id}
                     item={i}
@@ -213,9 +243,10 @@ export function WeekGames({
                     live={itemState(i, nowMs) === "live"}
                   />
                 ))}
-            </ul>
-          </div>
-        ))
+              </ul>
+            </div>
+          );
+        })
       )}
     </Card>
   );
@@ -238,7 +269,7 @@ export function WeekGames({
   );
 }
 
-/** One game of the week. Our side: official club crest + "ColicoDerviese · <team>" (annata crests stay internal). */
+/** One game of the week. Our side: official club crest + "ColicoDerviese" and the team chip (annata crests stay internal). */
 function GameRow({
   item,
   team,
@@ -255,89 +286,113 @@ function GameRow({
     ? venueCase(rawOpponent)
     : "Avversario da definire";
   const us = team?.short ?? item.groupLabel.split("·")[0]!.trim();
-  const label = `ColicoDerviese · ${us}`;
-  const home = item.homeAway === "CASA";
-  const meta: ReactNode[] = [];
-  if (live)
-    meta.push(
-      <b key="live" className="text-[#c8102e]">
-        In campo ora
-      </b>,
-    );
-  else if (highlight)
-    meta.push(
-      <b key="next" className="text-[#0b2a5b]">
-        Prossima
-      </b>,
-    );
-  if (item.homeAway)
-    meta.push(
-      <span key="ha" className={home ? "font-semibold text-[#0b2a5b]" : ""}>
-        {home ? "Casa" : "Fuori"}
-      </span>,
-    );
-  if (item.venue) meta.push(<span key="venue">{venueShort(item.venue)}</span>);
-  if (!item.certain)
-    meta.push(
-      <span key="tbc" className="text-[#8a6a00]">
-        da confermare
-      </span>,
-    );
+  const tone = sideTone(item.homeAway);
+  const comp = competitionBadge(item.competition);
+  const bar = live
+    ? "bg-[#e5243b]"
+    : highlight
+      ? "bg-[#ffd600]"
+      : tone === "home"
+        ? "bg-[#1556c4]"
+        : tone === "away"
+          ? "bg-[#9cc3ea]"
+          : "bg-[#dbe5f1]";
+  const ours = (
+    <span className="inline-flex min-w-0 items-center gap-1.5">
+      <span className="font-title text-[18px] font-extrabold uppercase leading-none text-[#0b2a5b]">
+        ColicoDerviese
+      </span>
+      <span className="inline-flex h-[20px] shrink-0 items-center rounded-full bg-[#e7effa] px-2 text-[11.5px] font-bold leading-none text-[#1556c4]">
+        {us}
+      </span>
+    </span>
+  );
+  const theirs = (
+    <span className="font-title text-[18px] font-bold uppercase leading-none text-[#0b1e3a]">
+      {opponent}
+    </span>
+  );
   return (
-    <li>
+    <li className="border-t border-[#eef2f8] first:border-t-0">
       <Link
         to="/calendario"
         search={{ annata: item.group }}
-        className={`scd-focus relative flex items-center gap-3 px-4 py-2.5 hover:bg-[#f4f7fb] ${highlight ? "bg-[#f7f9fc]" : ""}`}
+        className={`scd-focus group relative flex items-center gap-3 py-2.5 pl-[18px] pr-3 transition-colors duration-150 hover:bg-[#f4f7fb] lg:pr-4 ${highlight || live ? "bg-[#fffbe6]" : ""}`}
         aria-current={highlight ? "true" : undefined}
+        data-side={tone}
       >
-        {highlight && (
-          <span
-            aria-hidden="true"
-            className="absolute inset-y-2 left-0 w-[3px] rounded-r-full bg-[#ffd600]"
-          />
-        )}
-        <span className="w-[42px] shrink-0 text-[15px] font-bold tabular-nums leading-none text-[#0b1e3a]">
-          {item.time || "—"}
+        <span
+          aria-hidden="true"
+          className={`absolute inset-y-1.5 left-1.5 w-[4px] rounded-full ${bar}`}
+        />
+        <span className="flex w-[50px] shrink-0 flex-col items-start gap-1">
+          <span className="font-title text-[24px] font-black tabular-nums leading-none text-[#0b2a5b]">
+            {item.time || "—"}
+          </span>
+          {tone !== "none" && (
+            <span
+              className={`inline-flex h-[17px] items-center rounded-[5px] px-1.5 text-[10px] font-extrabold uppercase leading-none tracking-[0.08em] ${
+                tone === "home"
+                  ? "bg-[#1556c4] text-white"
+                  : "border border-[#9cc3ea] bg-white text-[#1556c4]"
+              }`}
+            >
+              {tone === "home" ? "Casa" : "Fuori"}
+            </span>
+          )}
         </span>
-        <span className="flex shrink-0 items-center gap-1">
-          <span className="grid size-[30px] place-items-center">
+        <span className="flex shrink-0 items-center -space-x-1">
+          <span className="relative z-[1] grid size-[32px] place-items-center rounded-full bg-white shadow-[0_1px_4px_rgb(11_42_91/0.18)]">
             <img
               src={publicTeamCrest()}
               alt=""
-              width={23}
-              height={30}
+              width={20}
+              height={26}
               loading="lazy"
-              className="h-[30px] w-auto object-contain"
+              className="h-[24px] w-auto object-contain"
             />
           </span>
-          <OpponentCrest name={rawOpponent} size={30} />
+          <OpponentCrest name={rawOpponent} size={32} />
         </span>
         <span className="min-w-0 flex-1">
-          <span className="line-clamp-2 text-[15px] font-semibold leading-tight text-[#0b1e3a]">
-            {weHome ? (
-              <>
-                {label} <span className="font-normal text-[#5a6b85]">vs</span>{" "}
-                {opponent}
-              </>
-            ) : (
-              <>
-                {opponent}{" "}
-                <span className="font-normal text-[#5a6b85]">vs</span> {label}
-              </>
-            )}
+          <span className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1">
+            {weHome ? ours : theirs}
+            <span className="text-[12px] font-semibold uppercase text-[#8a9ab3]">
+              vs
+            </span>
+            {weHome ? theirs : ours}
           </span>
-          <span className="mt-0.5 block truncate text-[13px] text-[#5a6b85]">
-            {meta.map((m, i) => (
-              <span key={i}>
-                {i > 0 && <span aria-hidden="true"> · </span>}
-                {m}
+          <span className="mt-1 flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-[12.5px] leading-none text-[#5a6b85]">
+            {live ? (
+              <span className="inline-flex h-[18px] items-center gap-1.5 rounded-full bg-[#e5243b] px-2 text-[10.5px] font-extrabold uppercase tracking-[0.08em] text-white">
+                <span
+                  aria-hidden="true"
+                  className="scd-live-dot size-1.5 rounded-full bg-white"
+                />
+                Live
               </span>
-            ))}
+            ) : highlight ? (
+              <span className="inline-flex h-[18px] items-center rounded-full bg-[#0b2a5b] px-2 text-[10.5px] font-extrabold uppercase tracking-[0.08em] text-[#ffd600]">
+                Prossima
+              </span>
+            ) : null}
+            {comp && (
+              <span className="inline-flex h-[18px] items-center rounded-full border border-[#c9d6e8] px-2 text-[10.5px] font-bold uppercase tracking-[0.06em] text-[#0b2a5b]">
+                {comp}
+              </span>
+            )}
+            {item.venue && (
+              <span className="truncate">{venueShort(item.venue)}</span>
+            )}
+            {!item.certain && (
+              <span className="inline-flex h-[18px] items-center rounded-full bg-[#fff4c2] px-2 text-[10.5px] font-bold uppercase tracking-[0.04em] text-[#7a5c00]">
+                da confermare
+              </span>
+            )}
           </span>
         </span>
         <ChevronRight
-          className="hidden size-5 shrink-0 text-[#c3cfe0] lg:block"
+          className="hidden size-5 shrink-0 text-[#c3cfe0] transition-transform duration-150 group-hover:translate-x-0.5 lg:block"
           aria-hidden="true"
         />
       </Link>

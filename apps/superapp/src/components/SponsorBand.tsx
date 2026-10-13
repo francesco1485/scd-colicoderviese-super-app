@@ -1,6 +1,7 @@
 import { useRouterState } from "@tanstack/react-router";
 
-import { SPONSORS, sponsorLabel } from "@/lib/sponsors";
+import { SponsorLogo } from "@/components/scd/Logos";
+import { SPONSORS } from "@/lib/sponsors";
 
 /**
  * Fascia sponsor sempre visibile sopra la barra di navigazione (su desktop in fondo alla pagina).
@@ -10,8 +11,8 @@ function Plates({ hidden = false }: { hidden?: boolean }) {
   return (
     <>
       {SPONSORS.map((s) => (
-        <span key={s.slug + String(hidden)} className="flex h-7 shrink-0 items-center lg:h-8" aria-hidden={hidden || undefined}>
-          <img src={s.src} alt={hidden ? "" : sponsorLabel(s)} className="h-[22px] w-auto lg:h-[30px]" loading="lazy" decoding="async" />
+        <span key={s.slug + String(hidden)} className="flex h-[28px] w-[88px] shrink-0 items-center justify-center lg:h-[38px] lg:w-[116px]" aria-hidden={hidden || undefined}>
+          <SponsorLogo sponsor={s} box={{ w: 104, h: 32 }} decorative={hidden} mono={false} />
         </span>
       ))}
     </>
@@ -30,7 +31,7 @@ export function SponsorBand() {
       <span className="uv-notch relative z-[1] flex h-full shrink-0 items-center bg-[var(--uv-night)] pl-[12px] pr-[20px] font-uv text-[12px] lg:pl-[14px] lg:pr-[24px] lg:text-[14px] uppercase tracking-[0.12em] text-[var(--uv-gold)]">
         Sponsor
       </span>
-      <div className="uv-marquee flex w-max items-center gap-9 pl-6" style={{ animationDuration: "140s" }}>
+      <div className="uv-marquee flex w-max items-center gap-3 pl-4 [--logo-k:0.78] lg:gap-5 lg:pl-6 lg:[--logo-k:1]" style={{ animationDuration: "140s" }}>
         <Plates />
         <Plates hidden />
       </div>

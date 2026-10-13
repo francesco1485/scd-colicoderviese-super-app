@@ -27,10 +27,11 @@ import { centerTabFor, type CenterTab } from "@/lib/access-nav";
 import { ACCESS_SCREEN_IDS, WORK_AREA_IDS, findArea } from "@/lib/areas";
 import { CLUB_PROFILE } from "@/lib/club-profile";
 import { SOCIAL_LINKS } from "@/lib/public-home";
-import { SPONSORS, sponsorLabel } from "@/lib/sponsors";
+import { SPONSORS } from "@/lib/sponsors";
 import { useSession } from "@/lib/use-session";
 import { openCookiePrefs } from "./CookieConsent";
 import { AccessMenu, loginSearch, openAccessMenu } from "./scd/AccessMenu";
+import { AffiliationMarks, LogoTile, SponsorLogo } from "./scd/Logos";
 
 /** Nome ufficiale della società (sigla S.C.D., non invertire le lettere). */
 export const CLUB_NAME = "S.C.D. ColicoDerviese";
@@ -214,7 +215,14 @@ export function SiteHeader() {
             </Link>
           ))}
         </nav>
-        <div className="ml-auto flex shrink-0 items-center gap-2 lg:gap-3">
+        {/* Affiliazioni ufficiali in testata da 1280 px in su (Direzione 13/10/2026 15:31): piccola placca bianca.
+            Non sulla home, che le mostra già più grandi nella fascia sotto la striscia rapida. */}
+        {pathname !== "/" && (
+          <div className="ml-auto hidden h-[46px] shrink-0 items-center rounded-[10px] bg-white px-3 xl:flex" aria-label="Affiliazioni ufficiali" role="group">
+            <AffiliationMarks box={{ w: 62, h: 30 }} gapClass="gap-2.5" />
+          </div>
+        )}
+        <div className={`ml-auto flex shrink-0 items-center gap-2 lg:gap-3 ${pathname !== "/" ? "xl:ml-0" : ""}`}>
           <AccessMenu />
           <button
             className="scd-focus flex size-11 shrink-0 items-center justify-center rounded-[10px] border border-white/25 text-white transition-colors duration-150 hover:bg-white/10"
@@ -616,16 +624,12 @@ function FooterSponsors() {
         >
           Partner 2026/27
         </h2>
-        <ul className="m-0 flex list-none flex-wrap items-center gap-x-6 gap-y-3 p-0">
+        <ul className="m-0 grid list-none grid-cols-[repeat(auto-fill,minmax(96px,1fr))] gap-2 p-0 lg:flex-1">
           {SPONSORS.map((sp) => (
-            <li key={sp.slug} className="flex h-7 items-center">
-              <img
-                src={sp.src}
-                alt={sponsorLabel(sp)}
-                loading="lazy"
-                decoding="async"
-                className="h-[24px] w-auto max-w-[96px] object-contain"
-              />
+            <li key={sp.slug}>
+              <LogoTile className="h-[52px]">
+                <SponsorLogo sponsor={sp} box={{ w: 84, h: 32 }} />
+              </LogoTile>
             </li>
           ))}
         </ul>
@@ -717,25 +721,8 @@ export function SiteFooter() {
               <h2 className="m-0 text-[12px] font-bold uppercase tracking-[0.12em] text-[#ffd600]">
                 Affiliazioni
               </h2>
-              <div className="flex items-center justify-around gap-3 rounded-[14px] bg-white px-3 py-3">
-                <img
-                  src="/media/affiliazioni/figc-sgs-3-livello.webp"
-                  alt="FIGC Settore Giovanile e Scolastico, Club 3° livello"
-                  className="h-[46px] w-auto max-w-[32%] object-contain"
-                  loading="lazy"
-                />
-                <img
-                  src="/media/affiliazioni/lnd.webp"
-                  alt="FIGC Lega Nazionale Dilettanti"
-                  className="h-[46px] w-auto max-w-[32%] object-contain"
-                  loading="lazy"
-                />
-                <img
-                  src="/media/affiliazioni/insieme-al-monza.webp"
-                  alt="Insieme al Monza, progetto Academy AC Monza"
-                  className="h-[46px] w-auto max-w-[32%] object-contain"
-                  loading="lazy"
-                />
+              <div className="rounded-[14px] bg-white px-3 py-3">
+                <AffiliationMarks box={{ w: 96, h: 46 }} gapClass="gap-3" className="justify-around" />
               </div>
               <p className="m-0 text-[13px] leading-snug text-white/75">
                 Club FIGC SGS di 3° livello, iscritto LND, affiliato AC Monza.

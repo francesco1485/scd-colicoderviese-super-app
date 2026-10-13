@@ -1421,6 +1421,406 @@
       "status": "VERIFIED",
       "source": "Yellow brush stroke from the club's 2026/27 card and poster boards (Direzione upload 2026-10-13), redrawn as a plain decorative SVG shape: not a mark",
       "git_blob_sha": "0d92692fbf58fc184843e8d30e249a513c6f0582"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/cut/hdi-maglia.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "40df8b22bd67b57b49fa9dad0282a53c48958465",
+      "derived_from": "apps/superapp/public/media/sponsor/hdi-maglia-assicurazioni.webp",
+      "transform": "trim to the alpha bounding box (source already transparent); 504x96 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/cut/dell-oca.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "52a738b8cd13b73a08700cee601b4b02b8de62f8",
+      "derived_from": "apps/superapp/public/media/sponsor/2026-27/dell-oca.webp",
+      "transform": "flat white background connected to the border made transparent, then trimmed; 76x32 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/cut/atl-iveco.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "a5d75889abe32af9f54e6f06430f081e757d69fe",
+      "derived_from": "apps/superapp/public/media/sponsor/2026-27/atl-iveco.webp",
+      "transform": "flat white background connected to the border made transparent, then trimmed; 74x32 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/cut/atv.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "d052e66465302fa75397bc3042601e314d1cd7a6",
+      "derived_from": "apps/superapp/public/media/sponsor/2026-27/atv.webp",
+      "transform": "flat white background connected to the border made transparent, then trimmed; 67x32 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/cut/carcano.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "bae37f222a7e7674b96781ac533a06e28de9738d",
+      "derived_from": "apps/superapp/public/media/sponsor/2026-27/carcano.webp",
+      "transform": "flat white background connected to the border made transparent, then trimmed; 80x22 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/cut/mds-impianti.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "c1952a9f7667a83b29cc692057e198bf93f1b77c",
+      "derived_from": "apps/superapp/public/media/sponsor/2026-27/mds-impianti.webp",
+      "transform": "flat white background connected to the border made transparent, then trimmed; 43x32 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/cut/bigamonti.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "624b8e98ac1d9e5feff6883e6094a52515786a75",
+      "derived_from": "apps/superapp/public/media/sponsor/2026-27/bigamonti.webp",
+      "transform": "flat white background connected to the border made transparent, then trimmed; 80x22 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/cut/nbc.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "a941a2b4b50d6566138a78564f3ba4510e9b4ea5",
+      "derived_from": "apps/superapp/public/media/sponsor/2026-27/nbc.webp",
+      "transform": "flat white background connected to the border made transparent, then trimmed; 78x22 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/cut/sponsor-sole.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "6de7018e7f0c0fc43dac2febfd3fbea0dc9a75f0",
+      "derived_from": "apps/superapp/public/media/sponsor/2026-27/sponsor-sole.webp",
+      "transform": "flat white background connected to the border made transparent, then trimmed; 57x34 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/cut/turbojet-spurghi.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "2fdc68c38ee8d2017a10f6b41bac42b2fc097676",
+      "derived_from": "apps/superapp/public/media/sponsor/2026-27/turbojet-spurghi.webp",
+      "transform": "flat white background connected to the border made transparent, then trimmed; 36x34 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/cut/gimoka.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "22c1b2b2e1cc32cb2da6ca72426a271c22db8aeb",
+      "derived_from": "apps/superapp/public/media/sponsor/2026-27/gimoka.webp",
+      "transform": "flat white background connected to the border made transparent, then trimmed; 77x21 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/cut/attivita-di-recupero.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "444731e15a63062e9362d9792ac845735f46f6a4",
+      "derived_from": "apps/superapp/public/media/sponsor/2026-27/attivita-di-recupero.webp",
+      "transform": "flat white background connected to the border made transparent, then trimmed; 75x34 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/cut/farmacia-santa-rita.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "b8670508898e952af7cbf76c5e79442f05b6e056",
+      "derived_from": "apps/superapp/public/media/sponsor/2026-27/farmacia-santa-rita.webp",
+      "transform": "flat white background connected to the border made transparent, then trimmed; 79x12 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/cut/saglio-sport.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "6dcb56d31c9a176d40a0d48c350f3e137e445889",
+      "derived_from": "apps/superapp/public/media/sponsor/saglio-sport.webp",
+      "transform": "trim to the alpha bounding box (source already transparent); 499x110 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/cut/consilia-studio.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "34d6195013c5404b13934c92045083e26e84c7ae",
+      "derived_from": "apps/superapp/public/media/sponsor/2026-27/consilia-studio.webp",
+      "transform": "flat white background connected to the border made transparent, then trimmed; 78x19 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/cut/domino-services.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "3b9b8c0e94186db379429d413503f3bbc0fb8254",
+      "derived_from": "apps/superapp/public/media/sponsor/2026-27/domino-services.webp",
+      "transform": "flat white background connected to the border made transparent, then trimmed; 76x17 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/cut/molteni.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "e771fe6ef5b0f226eabaac2c237aa8eed662aaf8",
+      "derived_from": "apps/superapp/public/media/sponsor/2026-27/molteni.webp",
+      "transform": "flat white background connected to the border made transparent, then trimmed; 76x20 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/cut/rusconi-guerino.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "1bb8de15c3b622cf49c84792e3d5a50237c84bf4",
+      "derived_from": "apps/superapp/public/media/sponsor/2026-27/rusconi-guerino.webp",
+      "transform": "flat white background connected to the border made transparent, then trimmed; 28x34 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/cut/ottica-visus.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "d2a2eb4c97a9eaffcb56f945c56a69ed4a649536",
+      "derived_from": "apps/superapp/public/media/sponsor/2026-27/ottica-visus.webp",
+      "transform": "flat white background connected to the border made transparent, then trimmed; 20x34 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/cut/mps-infissi.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "7d7713e76ef0b865411569f9d7c8dd979b5738bd",
+      "derived_from": "apps/superapp/public/media/sponsor/2026-27/mps-infissi.webp",
+      "transform": "flat white background connected to the border made transparent, then trimmed; 36x34 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/cut/lumax.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "88b55b7133b9bb52337513754ff4949fa6b009e5",
+      "derived_from": "apps/superapp/public/media/sponsor/2026-27/lumax.webp",
+      "transform": "flat white background connected to the border made transparent, then trimmed; 80x18 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/cut/bcc-valsassina.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "5fc1bb9ec0e21229bb85cb9aeadf6ac78f627ca7",
+      "derived_from": "apps/superapp/public/media/sponsor/2026-27/bcc-valsassina.webp",
+      "transform": "flat white background connected to the border made transparent, then trimmed; 75x17 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/cut/trafilerie-alexia.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "5d04bbb996a843003e2016cf518b93fcd263baf5",
+      "derived_from": "apps/superapp/public/media/sponsor/2026-27/trafilerie-alexia.webp",
+      "transform": "flat white background connected to the border made transparent, then trimmed; 79x22 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/cut/quaini-impianti.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "6b697ea8c5af17a2ca0d73ce320f067c63409ccf",
+      "derived_from": "apps/superapp/public/media/sponsor/2026-27/quaini-impianti.webp",
+      "transform": "flat white background connected to the border made transparent, then trimmed; 76x33 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/cut/spazio-domus.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "fe2aec1a6a16b838ccc77d160badc18f67f24dd5",
+      "derived_from": "apps/superapp/public/media/sponsor/2026-27/spazio-domus.webp",
+      "transform": "flat white background connected to the border made transparent, then trimmed; 77x24 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/cut/lo-squalo.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "3c8aa754a208b15089b4d4034119d245feb9ed18",
+      "derived_from": "apps/superapp/public/media/sponsor/2026-27/lo-squalo.webp",
+      "transform": "flat white background connected to the border made transparent, then trimmed; 35x33 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/cut/sponsor-bar.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "d76711e0c400d8c86635dd0e0b2e35286de648da",
+      "derived_from": "apps/superapp/public/media/sponsor/2026-27/sponsor-bar.webp",
+      "transform": "flat white background connected to the border made transparent, then trimmed; 36x33 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/cut/cleaning.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "ab805215523ea82660484f154c64c573f3dd2bda",
+      "derived_from": "apps/superapp/public/media/sponsor/2026-27/cleaning.webp",
+      "transform": "flat white background connected to the border made transparent, then trimmed; 50x33 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/cut/nagi-car.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "4727b82b261fd72a00aa4de51ff42d9c519d3b10",
+      "derived_from": "apps/superapp/public/media/sponsor/2026-27/nagi-car.webp",
+      "transform": "flat white background connected to the border made transparent, then trimmed; 39x33 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/cut/prisma.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "f2e5856f66cb657ad20e066da30480a686c09e5a",
+      "derived_from": "apps/superapp/public/media/sponsor/2026-27/prisma.webp",
+      "transform": "flat white background connected to the border made transparent, then trimmed; 77x32 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/cut/varenna-holidays.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "5bbad01d4a075d29d21750c3419bb44ab5b359a1",
+      "derived_from": "apps/superapp/public/media/sponsor/2026-27/varenna-holidays.webp",
+      "transform": "flat white background connected to the border made transparent, then trimmed; 76x31 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/cut/zurich.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "9b9376641a1ea8027b9d597f8127c24028cbbf0a",
+      "derived_from": "apps/superapp/public/media/sponsor/2026-27/zurich.webp",
+      "transform": "flat white background connected to the border made transparent, then trimmed; 78x21 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/cut/stilmoto.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "06407dad9c1a534f4abb10216fefde193ece4d7d",
+      "derived_from": "apps/superapp/public/media/sponsor/2026-27/stilmoto.webp",
+      "transform": "flat white background connected to the border made transparent, then trimmed; 78x23 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/cut/sponsor-bb.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "e8223b6e901ccec40233d777430eebeb743ae6e0",
+      "derived_from": "apps/superapp/public/media/sponsor/2026-27/sponsor-bb.webp",
+      "transform": "flat white background connected to the border made transparent, then trimmed; 35x34 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/cut/sponsor-arancio.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "d6925ef00f269889ee791eec334af042e3f13b28",
+      "derived_from": "apps/superapp/public/media/sponsor/2026-27/sponsor-arancio.webp",
+      "transform": "flat white background connected to the border made transparent, then trimmed; 38x34 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/cut/dego-arredamenti.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "31fab80c7f77c29346ba5215d80d2a3c13372ac8",
+      "derived_from": "apps/superapp/public/media/sponsor/2026-27/dego-arredamenti.webp",
+      "transform": "flat white background connected to the border made transparent, then trimmed; 79x23 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/cut/essegi-legno.webp",
+      "class": "SPONSOR_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "f9e8ad0a5d02194b2cffe5efaafd9fc7f62f6fa5",
+      "derived_from": "apps/superapp/public/media/sponsor/2026-27/essegi-legno.webp",
+      "transform": "flat white background connected to the border made transparent, then trimmed; 48x34 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/affiliazioni/cut/figc-sgs-3-livello.webp",
+      "class": "OFFICIAL_AFFILIATION_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "4bd87cc2a5fc13f81721549e77ad9ee03a2ba604",
+      "derived_from": "assets/logo-sgs.png",
+      "transform": "trim to the alpha bounding box (source already transparent); 764x306 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/affiliazioni/cut/lnd.webp",
+      "class": "OFFICIAL_AFFILIATION_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "dd59db092ea54414fafd0c931c11dff0d0869698",
+      "derived_from": "assets/logo-lnd.png",
+      "transform": "trim to the alpha bounding box (source already transparent); 196x220 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/affiliazioni/cut/insieme-al-monza.webp",
+      "class": "OFFICIAL_AFFILIATION_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
+      "git_blob_sha": "6a8756ec8d8a34b25dbbf0d470c9822defd683cd",
+      "derived_from": "assets/logo-monza.png",
+      "transform": "trim to the alpha bounding box (source already transparent); 765x342 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
     }
   ],
   "vector_research": [

@@ -41,6 +41,11 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { ClubCrestOfficial } from "@/components/SiteChrome";
 import { KitTexture } from "@/components/scd/kit-texture";
+import {
+  AffiliationMarks,
+  LogoTile,
+  SponsorLogo,
+} from "@/components/scd/Logos";
 import { openCookiePrefs } from "@/components/CookieConsent";
 import { SPONSOR_PACKAGES } from "@/lib/catalog";
 import { CLUB_EVENTS } from "@/lib/club-events";
@@ -164,6 +169,32 @@ function QuickStrip() {
   );
 }
 
+/* ------------------------------------------------- affiliation strip */
+
+/**
+ * Official affiliations high on the home (Direzione 13/10/2026 15:31: "sono di importanza"): FIGC SGS Club 3°
+ * livello, LND, Insieme al Monza. Registered official files only, cut out; slim white strip under the quick strip.
+ */
+function AffiliationStrip() {
+  return (
+    <section
+      aria-label="Affiliazioni ufficiali"
+      className="border-b border-[#dbe5f1] bg-white"
+      data-testid="affiliation-strip"
+    >
+      <div
+        className={`${WRAP} flex items-center justify-center gap-3 py-1.5 [--logo-k:1] sm:gap-5 lg:py-2.5 lg:[--logo-k:1.3]`}
+      >
+        <span className="text-[10.5px] font-bold uppercase leading-[1.15] tracking-[0.1em] text-[#5a6b85] max-[369px]:hidden lg:text-[12px]">
+          Società
+          <br className="lg:hidden" /> affiliata
+        </span>
+        <AffiliationMarks box={{ w: 104, h: 34 }} gapClass="gap-3 sm:gap-5" />
+      </div>
+    </section>
+  );
+}
+
 /* ---------------------------------------------------- editorial cards */
 
 function SponsorMosaic() {
@@ -175,12 +206,11 @@ function SponsorMosaic() {
           key={s.slug}
           className="grid place-items-center rounded-[8px] bg-white p-1.5"
         >
-          <img
-            src={s.src}
-            alt=""
-            loading="lazy"
-            decoding="async"
-            className="max-h-[34px] max-w-full object-contain"
+          <SponsorLogo
+            sponsor={s}
+            box={{ w: 76, h: 30 }}
+            decorative
+            mono={false}
           />
         </span>
       ))}
@@ -591,28 +621,22 @@ function Partners({ today }: { today: string }) {
                 key={s.slug}
                 className={i >= 12 ? "max-lg:hidden" : undefined}
               >
-                <span className="grid h-[60px] place-items-center rounded-[10px] border border-[#e6edf6] bg-white p-2">
-                  <img
-                    src={s.src}
-                    alt={sponsorLabel(s)}
-                    loading="lazy"
-                    decoding="async"
-                    className="max-h-full max-w-full object-contain"
-                  />
-                </span>
+                <LogoTile className="h-[68px] px-2">
+                  <SponsorLogo sponsor={s} box={{ w: 92, h: 38 }} />
+                </LogoTile>
               </li>
             ))}
           </ul>
           {showcase && (
             <div className="mt-auto flex items-center gap-3.5 rounded-[12px] bg-[#eef3f9] p-3">
-              <span className="grid h-[56px] w-[88px] shrink-0 place-items-center rounded-[10px] bg-white p-2">
-                <img
-                  src={showcase.src}
-                  alt=""
-                  loading="lazy"
-                  className="max-h-full max-w-full object-contain"
+              <LogoTile className="h-[56px] w-[88px] shrink-0">
+                <SponsorLogo
+                  sponsor={showcase}
+                  box={{ w: 72, h: 40 }}
+                  decorative
+                  mono={false}
                 />
-              </span>
+              </LogoTile>
               <span className="grid min-w-0 gap-0.5">
                 <span className="text-[11.5px] font-bold uppercase tracking-[0.08em] text-[#1556c4]">
                   In vetrina a {monthName(today)}
@@ -878,7 +902,7 @@ function Matchday({
   return (
     <aside
       aria-label={`${eyebrow}: ${weHome ? `ColicoDerviese ${us} contro ${opponent}` : `${opponent} contro ColicoDerviese ${us}`}`}
-      className="scd-matchday rounded-[18px] p-4 text-white shadow-[0_18px_40px_-20px_rgb(11_42_91/0.7)] lg:p-6"
+      className="scd-matchday rounded-[18px] p-4 text-white lg:p-6"
       data-testid="matchday"
       data-state={state}
     >
@@ -985,15 +1009,14 @@ function PartnerTicker() {
     >
       {logos.map((s) => (
         <li key={s.slug} className="shrink-0">
-          <span className="grid h-[48px] w-[112px] place-items-center rounded-[10px] bg-white px-3 py-2 lg:h-[54px] lg:w-[128px]">
-            <img
-              src={s.src}
-              alt={copy ? "" : sponsorLabel(s)}
-              loading="lazy"
-              decoding="async"
-              className="max-h-full max-w-full object-contain"
+          <LogoTile className="h-[52px] w-[120px] border-white/0 shadow-[inset_0_-2px_0_rgb(11_42_91/0.08),0_1px_0_rgb(255_255_255/0.35)] lg:h-[58px] lg:w-[132px]">
+            <SponsorLogo
+              sponsor={s}
+              box={{ w: 104, h: 36 }}
+              decorative={copy}
+              mono={false}
             />
-          </span>
+          </LogoTile>
         </li>
       ))}
     </ul>
@@ -1124,6 +1147,7 @@ export function PublicHome({
         S.C.D. ColicoDerviese, il club di calcio di Colico e Dervio
       </h1>
       <QuickStrip />
+      <AffiliationStrip />
       <PublicWeek calendar={calendar} nowMs={nowMs} today={today} />
       <Featured />
       <PartnerTicker />
