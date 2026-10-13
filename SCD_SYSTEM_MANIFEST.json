@@ -1709,6 +1709,22 @@
           "READERS_WAREHOUSE_SECRETARIAT_TREASURY_DIRECTION"
         ],
         "imported_at": "2026-10-12"
+      },
+      {
+        "id": "OPPONENT_CLUB_OFFICIAL_PAGES",
+        "kind": "EXTERNAL_PUBLIC",
+        "trust": "EXTERNAL_VERIFIED",
+        "authority_domains": [
+          "OPPONENT_CRESTS"
+        ],
+        "registry": "config/scd-opponent-crests.v1.json",
+        "rules": [
+          "real_file_only_from_official_club_page_or_site",
+          "record_source_url_and_verification_date",
+          "nominative_use_in_fixture_lists_only",
+          "neutral_initials_shield_when_no_verified_file",
+          "never_draw_or_generate_a_crest"
+        ]
       }
     ],
     "conflict_resolution": [

@@ -16,7 +16,7 @@ import { sponsorLabel, type Sponsor } from "@/lib/sponsors";
 import { itemState, type Team } from "@/lib/universe";
 
 import { sides } from "./match-sides";
-import { OpponentShield } from "./OpponentShield";
+import { OpponentCrest } from "@/lib/crests";
 import { teamCrestSrc } from "./team-crest";
 
 const LARIO = "/media/scd/lario-header.webp";
@@ -307,7 +307,7 @@ function GameRow({
           ) : (
             <span className="inline-block size-[30px] rounded-full bg-[#e6edf6]" />
           )}
-          <OpponentShield name={rawOpponent} size={30} />
+          <OpponentCrest name={rawOpponent} size={30} />
         </span>
         <span className="min-w-0 flex-1">
           <span className="line-clamp-2 text-[15px] font-semibold leading-tight text-[#0b1e3a]">

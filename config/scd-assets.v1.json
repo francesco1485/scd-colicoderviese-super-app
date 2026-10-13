@@ -13,7 +13,8 @@
     "kits": "assets/kits/",
     "opponents": "assets/opponents/",
     "sponsors": "assets/sponsors/",
-    "partners": "assets/partners/"
+    "partners": "assets/partners/",
+    "opponent_crests": "apps/superapp/public/media/crests/ (registry: config/scd-opponent-crests.v1.json)"
   },
   "rules": {
     "official_asset_generation": "FORBIDDEN",
