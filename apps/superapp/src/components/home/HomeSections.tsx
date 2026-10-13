@@ -161,7 +161,7 @@ const dayLong = (d: string) =>
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 /** Short venue: "Colico · Campo 1" or the town of an away ground. */
-function venueShort(v: string): string {
+export function venueShort(v: string): string {
   const t = venueCase(v.trim());
   const m = t.match(/^([^-–,]+?)\s*[-–]\s*(.+)$/);
   if (!m) return t;
@@ -179,46 +179,61 @@ export function WeekGames({
   teamOf,
   highlightId,
   nowMs,
+  lead,
 }: {
   items: readonly WeekItem[];
   teamOf: (i: WeekItem) => Team | undefined;
   highlightId: string | null;
   nowMs: number;
+  /** Optional lead panel (public home matchday card): above the list on phones, a sticky column beside it on desktop. */
+  lead?: ReactNode;
 }) {
   const days = [...new Set(items.map((i) => i.date))];
+  const list = (
+    <Card className={lead ? "min-w-0" : ""}>
+      {items.length === 0 ? (
+        <p className="m-0 px-4 py-5 text-[15px] text-[#3e5272]">
+          Nessuna gara nei prossimi sette giorni: è settimana di allenamenti.
+        </p>
+      ) : (
+        days.map((d) => (
+          <div key={d} className="border-b border-[#e6edf6] last:border-b-0">
+            <h3 className="m-0 px-4 pb-1 pt-3 text-[13px] font-bold uppercase tracking-[0.06em] text-[#5a6b85]">
+              {cap(dayLong(d))}
+            </h3>
+            <ul className="m-0 list-none p-0 pb-1.5">
+              {items
+                .filter((i) => i.date === d)
+                .map((i) => (
+                  <GameRow
+                    key={i.id}
+                    item={i}
+                    team={teamOf(i)}
+                    highlight={i.id === highlightId}
+                    live={itemState(i, nowMs) === "live"}
+                  />
+                ))}
+            </ul>
+          </div>
+        ))
+      )}
+    </Card>
+  );
   return (
     <section aria-labelledby="settimana-t" data-testid="week-games">
       <SectionTitle id="settimana-t" more="/calendario" moreLabel="Tutte">
         Si gioca questa settimana
       </SectionTitle>
-      <Card>
-        {items.length === 0 ? (
-          <p className="m-0 px-4 py-5 text-[15px] text-[#3e5272]">
-            Nessuna gara nei prossimi sette giorni: è settimana di allenamenti.
-          </p>
-        ) : (
-          days.map((d) => (
-            <div key={d} className="border-b border-[#e6edf6] last:border-b-0">
-              <h3 className="m-0 px-4 pb-1 pt-3 text-[13px] font-bold uppercase tracking-[0.06em] text-[#5a6b85]">
-                {cap(dayLong(d))}
-              </h3>
-              <ul className="m-0 list-none p-0 pb-1.5">
-                {items
-                  .filter((i) => i.date === d)
-                  .map((i) => (
-                    <GameRow
-                      key={i.id}
-                      item={i}
-                      team={teamOf(i)}
-                      highlight={i.id === highlightId}
-                      live={itemState(i, nowMs) === "live"}
-                    />
-                  ))}
-              </ul>
-            </div>
-          ))
-        )}
-      </Card>
+      {lead ? (
+        <div className="grid gap-3 lg:grid-cols-[minmax(0,400px)_minmax(0,1fr)] lg:items-start lg:gap-5">
+          <div className="lg:sticky lg:top-[calc(var(--pub-header-h,64px)+16px)]">
+            {lead}
+          </div>
+          {list}
+        </div>
+      ) : (
+        list
+      )}
     </section>
   );
 }

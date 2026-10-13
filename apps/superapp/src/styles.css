@@ -416,3 +416,73 @@ html.uv-big .sa-shell { zoom: 1.12; }
 }
 
 @keyframes scd-story-in { from { opacity: 0; transform: translateY(14px) scale(0.98); } to { opacity: 1; transform: none; } }
+
+/* ---------------------------------------------------------------------------------------------------------------
+ * Public home polish (Direzione 13/10/2026 09:14). CSS only, no photos, no libraries.
+ * - .scd-matchday: next-kickoff card, stadium floodlights (radial light) + fine film grain over the club navy.
+ * - .scd-tick / .scd-live-dot: kinetic countdown digits and the "in campo ora" pulse.
+ * - .scd-ledband / .scd-marquee: partner ticker styled as a pitch-side LED board; pausable, static with reduced motion.
+ * - .scd-lift / .scd-zoom: hover lift and press feedback on cards (transform only, pointer devices for hover).
+ * - .scd-reveal: scroll-driven reveal of section titles where animation-timeline is supported.
+ * ------------------------------------------------------------------------------------------------------------- */
+.scd-matchday {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background-color: #0b2a5b;
+  background-image:
+    radial-gradient(52% 62% at 8% -14%, rgb(255 255 255 / 0.22), transparent 72%),
+    radial-gradient(52% 62% at 92% -14%, rgb(255 255 255 / 0.16), transparent 72%),
+    radial-gradient(110% 80% at 50% 125%, rgb(21 86 196 / 0.75), transparent 68%);
+}
+.scd-matchday::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.18;
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+}
+@keyframes scd-tick { from { opacity: 0; transform: translateY(-38%); } to { opacity: 1; transform: none; } }
+.scd-tick { display: inline-block; animation: scd-tick 240ms var(--ease-out-strong) both; }
+@keyframes scd-live-pulse { 0% { box-shadow: 0 0 0 0 rgb(255 92 92 / 0.65); } 70%, 100% { box-shadow: 0 0 0 9px rgb(255 92 92 / 0); } }
+.scd-live-dot { animation: scd-live-pulse 1.6s ease-out infinite; }
+
+.scd-ledband {
+  background-color: #0b2a5b;
+  background-image: radial-gradient(rgb(255 255 255 / 0.07) 1px, transparent 1.4px);
+  background-size: 5px 5px;
+}
+@keyframes scd-marquee { to { transform: translateX(-50%); } }
+.scd-marquee-track { display: flex; width: max-content; animation: scd-marquee 48s linear infinite; }
+.scd-marquee:hover .scd-marquee-track,
+.scd-marquee:focus-within .scd-marquee-track,
+.scd-marquee[data-paused="true"] .scd-marquee-track { animation-play-state: paused; }
+
+.scd-lift { transition: transform 220ms var(--ease-out-strong), box-shadow 220ms ease-out, border-color 150ms ease-out, background-color 150ms ease-out; }
+.scd-lift:active { transform: scale(0.985); transition-duration: 120ms; }
+.scd-zoom { transition: transform 500ms var(--ease-out-strong); }
+@media (hover: hover) and (pointer: fine) {
+  .scd-lift:hover { transform: translateY(-3px); }
+  .scd-lift:hover .scd-zoom { transform: scale(1.04); }
+  .scd-lift:active { transform: translateY(-1px) scale(0.985); }
+}
+
+@keyframes scd-reveal { from { opacity: 0.25; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .scd-reveal { animation: scd-reveal linear both; animation-timeline: view(); animation-range: entry 0% entry 80%; }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scd-tick, .scd-live-dot { animation: none !important; }
+  .scd-marquee { overflow-x: auto !important; scrollbar-width: none; }
+  .scd-marquee-track { animation: none !important; }
+  .scd-marquee-copy, .scd-marquee-btn { display: none !important; }
+  .scd-lift, .scd-zoom { transition: none !important; }
+  .scd-lift:hover, .scd-lift:active, .scd-lift:hover .scd-zoom { transform: none !important; }
+}

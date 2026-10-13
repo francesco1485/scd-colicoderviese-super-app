@@ -26,7 +26,9 @@ import {
   Lock,
   MapPin,
   Newspaper,
+  Pause,
   Phone,
+  Play,
   Shield,
   Smartphone,
   Star,
@@ -35,7 +37,7 @@ import {
   Video,
   type LucideIcon,
 } from "lucide-react";
-import type { ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { ClubCrestOfficial } from "@/components/SiteChrome";
 import { openCookiePrefs } from "@/components/CookieConsent";
@@ -46,6 +48,8 @@ import {
   FEATURES,
   LINK_GROUPS,
   QUICK_LINKS,
+  kickoffClock,
+  matchdayLabel,
   partnerOfTheMonth,
   trustFacts,
   verifiedSponsors,
@@ -57,12 +61,15 @@ import { timeAgo } from "@/lib/social";
 import { SPONSORS, sponsorLabel } from "@/lib/sponsors";
 
 import { Carousel } from "./Carousel";
-import { useMemo } from "react";
-import { WeekGames } from "@/components/home/HomeSections";
+import { sides } from "./match-sides";
+import { WeekGames, venueShort } from "@/components/home/HomeSections";
+import { venueCase } from "@/lib/board-data";
+import { OpponentCrest } from "@/lib/crests";
+import { publicTeamCrest } from "@/lib/team-crest";
 import { addDays } from "@/lib/board-data";
 import type { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 import { calendarToWeekItems, type WeekItem } from "@/lib/home-week";
-import { itemState, orderTeams } from "@/lib/universe";
+import { itemState, orderTeams, startMs, type Team } from "@/lib/universe";
 
 type PublicCalendar = Awaited<ReturnType<typeof getPublicCalendarSnapshot>>;
 
@@ -213,10 +220,12 @@ function FeatureCardView({ card }: { card: FeatureCard }) {
   return (
     <To
       link={card}
-      className="scd-focus group flex w-full flex-col overflow-hidden rounded-[16px] bg-white shadow-[0_1px_2px_rgb(11_42_91/0.06),0_8px_24px_-12px_rgb(11_42_91/0.25)] transition-shadow duration-200 hover:shadow-[0_1px_2px_rgb(11_42_91/0.08),0_14px_30px_-12px_rgb(11_42_91/0.35)]"
+      className="scd-focus scd-lift group flex w-full flex-col overflow-hidden rounded-[16px] bg-white shadow-[0_1px_2px_rgb(11_42_91/0.06),0_8px_24px_-12px_rgb(11_42_91/0.25)] hover:shadow-[0_1px_2px_rgb(11_42_91/0.08),0_14px_30px_-12px_rgb(11_42_91/0.35)]"
     >
       <span className="relative block aspect-[274/170] w-full overflow-hidden border-b border-[#e6edf6]">
-        <FeatureVisualView card={card} />
+        <span className="scd-zoom block size-full">
+          <FeatureVisualView card={card} />
+        </span>
         {card.badge && (
           <span className="absolute left-3 top-3 rounded-full bg-[#ffd600] px-2.5 py-1 text-[11px] font-extrabold uppercase leading-none tracking-[0.06em] text-[#0b1e3a]">
             {card.badge}
@@ -351,7 +360,7 @@ function Trust() {
               <To
                 key={f.title}
                 link={f}
-                className="scd-focus group flex w-full flex-col gap-3 rounded-[16px] border border-[#dfe8f3] bg-[#f7f9fc] p-5 transition-colors duration-150 hover:border-[#b9cde6] hover:bg-white"
+                className="scd-focus scd-lift group flex w-full flex-col gap-3 rounded-[16px] border border-[#dfe8f3] bg-[#f7f9fc] p-5 hover:border-[#b9cde6] hover:bg-white"
               >
                 <span className="grid size-11 place-items-center rounded-full bg-[#0b2a5b] text-[#ffd600]">
                   <Icon
@@ -411,14 +420,14 @@ function WeekNews({
   const items = press.slice(0, 4);
   return (
     <section
-      aria-labelledby="settimana-t"
+      aria-labelledby="club-settimana-t"
       className={`${WRAP} pt-8 lg:pt-12`}
       data-testid="week-news"
     >
       <div className="flex items-end justify-between gap-3 pb-3">
         <h2
-          id="settimana-t"
-          className="m-0 font-uv text-[24px] uppercase leading-none text-[#0b2a5b] sm:text-[26px] lg:text-[30px]"
+          id="club-settimana-t"
+          className="scd-reveal m-0 font-uv text-[24px] uppercase leading-none text-[#0b2a5b] sm:text-[26px] lg:text-[30px]"
         >
           Questa settimana nel club
         </h2>
@@ -434,7 +443,7 @@ function WeekNews({
         {event && (
           <Link
             to={event.href as never}
-            className="scd-focus group grid grid-cols-[112px_minmax(0,1fr)] overflow-hidden rounded-[16px] bg-[#0b2a5b] text-white shadow-[0_8px_24px_-12px_rgb(11_42_91/0.45)] sm:grid-cols-[160px_minmax(0,1fr)] lg:grid-cols-[200px_minmax(0,1fr)]"
+            className="scd-focus scd-lift group grid grid-cols-[112px_minmax(0,1fr)] overflow-hidden rounded-[16px] bg-[#0b2a5b] text-white shadow-[0_8px_24px_-12px_rgb(11_42_91/0.45)] sm:grid-cols-[160px_minmax(0,1fr)] lg:grid-cols-[200px_minmax(0,1fr)]"
           >
             <img
               src={event.image}
@@ -558,7 +567,7 @@ function Partners({ today }: { today: string }) {
       <div className="flex items-end justify-between gap-3 pb-3">
         <h2
           id="partner-t"
-          className="m-0 font-uv text-[24px] uppercase leading-none text-[#0b2a5b] sm:text-[26px] lg:text-[30px]"
+          className="scd-reveal m-0 font-uv text-[24px] uppercase leading-none text-[#0b2a5b] sm:text-[26px] lg:text-[30px]"
         >
           Partner e sponsor
         </h2>
@@ -685,7 +694,7 @@ function LinkGroups() {
     >
       <h2
         id="tutto-t"
-        className="m-0 pb-3 font-uv text-[24px] uppercase leading-none text-[#0b2a5b] sm:text-[26px] lg:text-[30px]"
+        className="scd-reveal m-0 pb-3 font-uv text-[24px] uppercase leading-none text-[#0b2a5b] sm:text-[26px] lg:text-[30px]"
       >
         Tutto sul club
       </h2>
@@ -747,6 +756,292 @@ function LinkGroups() {
   );
 }
 
+/* ------------------------------------------------------------ matchday */
+
+const pad = (n: number) => String(n).padStart(2, "0");
+
+/** Seconds tick while the card is on screen; the first render uses the server clock (no hydration mismatch). */
+function useTick(serverNow: number): number {
+  const [now, setNow] = useState(serverNow);
+  useEffect(() => {
+    setNow(Date.now());
+    const id = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(id);
+  }, []);
+  return now;
+}
+
+function Side({
+  crest,
+  name,
+  sub,
+}: {
+  crest: ReactNode;
+  name: string;
+  sub?: string;
+}) {
+  return (
+    <span className="flex min-w-0 flex-1 flex-col items-center gap-1.5 text-center">
+      <span className="grid size-[46px] place-items-center rounded-full bg-white shadow-[0_6px_18px_-6px_rgb(0_0_0/0.45)] lg:size-[64px]">
+        {crest}
+      </span>
+      <span className="line-clamp-2 text-[14px] font-semibold leading-tight text-white lg:text-[15px]">
+        {name}
+      </span>
+      {sub && (
+        <span className="-mt-1 text-[12.5px] font-medium leading-tight text-[#ffd600]">
+          {sub}
+        </span>
+      )}
+    </span>
+  );
+}
+
+function Segment({ value, unit }: { value: number; unit: string }) {
+  const v = pad(value);
+  return (
+    <span className="flex flex-col items-center gap-1">
+      <span className="grid h-[40px] w-full place-items-center overflow-hidden rounded-[10px] bg-white/[0.08] ring-1 ring-inset ring-white/15 lg:h-[56px]">
+        <span
+          key={v}
+          className="scd-tick font-uv text-[26px] leading-none tabular-nums text-white lg:text-[38px]"
+        >
+          {v}
+        </span>
+      </span>
+      <span className="text-[10.5px] font-bold uppercase tracking-[0.12em] text-white/70">
+        {unit}
+      </span>
+    </span>
+  );
+}
+
+/**
+ * Matchday card: the next kickoff of the week (or the game in play) from the official calendar, with a live
+ * countdown. Our side is the official club crest + "ColicoDerviese" and the team label (annata crests stay inside);
+ * no score is shown because the calendar carries none (nothing is invented).
+ */
+function Matchday({
+  item,
+  team,
+  serverNow,
+  today,
+}: {
+  item: WeekItem;
+  team: Team | undefined;
+  serverNow: number;
+  today: string;
+}) {
+  const now = useTick(serverNow);
+  const kickoff = startMs(item);
+  const state = itemState(item, now);
+  const clock = kickoffClock(kickoff, now);
+  const { opponent: raw, weHome } = sides(item);
+  const opponent = raw ? venueCase(raw) : "Avversario da definire";
+  const us = team?.short ?? item.groupLabel.split("·")[0]!.trim();
+  const ours = (
+    <Side
+      crest={
+        <img
+          src={publicTeamCrest()}
+          alt=""
+          width={34}
+          height={44}
+          className="h-[34px] w-auto object-contain lg:h-[46px]"
+        />
+      }
+      name="ColicoDerviese"
+      sub={us}
+    />
+  );
+  const theirs = (
+    <Side crest={<OpponentCrest name={raw} size={36} />} name={opponent} />
+  );
+  const day = matchdayLabel(item.date, today);
+  const live = state === "live";
+  const eyebrow = live
+    ? "In campo ora"
+    : state === "done"
+      ? "Gara terminata"
+      : day === "Oggi"
+        ? "Oggi si gioca"
+        : "Prossimo calcio d'inizio";
+  const meta = [
+    item.homeAway === "CASA"
+      ? "Casa"
+      : item.homeAway === "FUORI"
+        ? "Fuori"
+        : "",
+    item.venue ? venueShort(item.venue) : "",
+  ].filter(Boolean);
+  return (
+    <aside
+      aria-label={`${eyebrow}: ${weHome ? `ColicoDerviese ${us} contro ${opponent}` : `${opponent} contro ColicoDerviese ${us}`}`}
+      className="scd-matchday rounded-[18px] p-4 text-white shadow-[0_18px_40px_-20px_rgb(11_42_91/0.7)] lg:p-6"
+      data-testid="matchday"
+      data-state={state}
+    >
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 400 200"
+        preserveAspectRatio="xMidYMax slice"
+        className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-[70%] w-full text-white/[0.07]"
+      >
+        <g fill="none" stroke="currentColor" strokeWidth="1.5">
+          <line x1="200" y1="0" x2="200" y2="200" />
+          <circle cx="200" cy="200" r="70" />
+          <circle cx="200" cy="200" r="3" fill="currentColor" />
+        </g>
+      </svg>
+      <div className="flex items-center justify-between gap-3">
+        <span
+          className={`inline-flex items-center gap-2 text-[11.5px] font-extrabold uppercase tracking-[0.14em] ${live ? "text-white" : "text-[#ffd600]"}`}
+        >
+          {live && (
+            <span
+              aria-hidden="true"
+              className="scd-live-dot size-2 rounded-full bg-[#ff5c5c]"
+            />
+          )}
+          {eyebrow}
+        </span>
+        {!item.certain && (
+          <span className="rounded-full bg-white/12 px-2 py-[3px] text-[11px] font-semibold text-white/85 ring-1 ring-inset ring-white/20">
+            da confermare
+          </span>
+        )}
+      </div>
+
+      <div className="mt-2 flex items-start gap-2 lg:mt-5">
+        {weHome ? ours : theirs}
+        <span
+          aria-hidden="true"
+          className="mt-[12px] shrink-0 font-uv text-[22px] leading-none text-white/55 lg:mt-[20px] lg:text-[26px]"
+        >
+          VS
+        </span>
+        {weHome ? theirs : ours}
+      </div>
+
+      <p className="m-0 mt-2 text-center text-[13.5px] leading-snug text-white/80 lg:mt-4 lg:text-[14.5px]">
+        <b className="font-semibold text-white">
+          {day}
+          {item.time ? ` · ${item.time}` : ""}
+        </b>
+        {meta.length > 0 && ` · ${meta.join(" · ")}`}
+      </p>
+
+      <div className="mt-3 lg:mt-5">
+        {clock ? (
+          <>
+            <div aria-hidden="true" className="grid grid-cols-4 gap-2">
+              <Segment value={clock.d} unit="giorni" />
+              <Segment value={clock.h} unit="ore" />
+              <Segment value={clock.m} unit="min" />
+              <Segment value={clock.s} unit="sec" />
+            </div>
+            <span className="sr-only">
+              {`Mancano ${clock.d} giorni, ${clock.h} ore e ${clock.m} minuti al calcio d'inizio.`}
+            </span>
+          </>
+        ) : (
+          <div className="grid h-[60px] place-items-center rounded-[12px] bg-white/[0.08] ring-1 ring-inset ring-white/15 lg:h-[82px]">
+            <span className="font-uv text-[30px] uppercase leading-none text-[#ffd600] lg:text-[38px]">
+              {live
+                ? "In corso"
+                : state === "done"
+                  ? "Fischio finale"
+                  : "Orario da definire"}
+            </span>
+          </div>
+        )}
+      </div>
+
+      <Link
+        to="/calendario"
+        search={{ annata: item.group } as never}
+        className="scd-focus mt-5 hidden min-h-11 w-full items-center justify-center gap-1.5 rounded-[12px] bg-[#ffd600] text-[15px] font-bold text-[#0b1e3a] transition-[filter,transform] duration-150 hover:brightness-95 active:scale-[0.98] lg:inline-flex"
+      >
+        Dettagli gara
+        <ArrowRight className="size-[18px]" aria-hidden="true" />
+      </Link>
+    </aside>
+  );
+}
+
+/* ------------------------------------------------------ partner ticker */
+
+/** Pitch-side LED board: verified partners scroll by; pausable (WCAG 2.2.2), static with reduced motion. */
+function PartnerTicker() {
+  const logos = verifiedSponsors();
+  const [paused, setPaused] = useState(false);
+  if (logos.length < 4) return null;
+  const row = (copy: boolean) => (
+    <ul
+      aria-hidden={copy || undefined}
+      className={`m-0 flex list-none gap-3 p-0 pr-3 ${copy ? "scd-marquee-copy" : ""}`}
+    >
+      {logos.map((s) => (
+        <li key={s.slug} className="shrink-0">
+          <span className="grid h-[48px] w-[112px] place-items-center rounded-[10px] bg-white px-3 py-2 lg:h-[54px] lg:w-[128px]">
+            <img
+              src={s.src}
+              alt={copy ? "" : sponsorLabel(s)}
+              loading="lazy"
+              decoding="async"
+              className="max-h-full max-w-full object-contain"
+            />
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+  return (
+    <section
+      aria-label="Partner della stagione 2026/27"
+      className="scd-ledband mt-8 border-y-2 border-[#ffd600] py-3 lg:mt-12"
+      data-testid="partner-ticker"
+    >
+      <div className={`${WRAP} flex items-center gap-3 lg:gap-5`}>
+        <Link
+          to="/sponsor"
+          className="scd-focus shrink-0 rounded-md font-uv text-[17px] uppercase leading-[0.95] text-white max-sm:hidden lg:text-[20px]"
+        >
+          Partner
+          <br />
+          <span className="text-[#ffd600]">2026/27</span>
+        </Link>
+        <div
+          className="scd-marquee relative min-w-0 flex-1 overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_5%,#000_95%,transparent)]"
+          data-paused={paused ? "true" : "false"}
+        >
+          <div className="scd-marquee-track">
+            {row(false)}
+            {row(true)}
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={() => setPaused((p) => !p)}
+          aria-pressed={paused}
+          aria-label={
+            paused
+              ? "Riprendi lo scorrimento dei partner"
+              : "Metti in pausa lo scorrimento dei partner"
+          }
+          className="scd-focus scd-marquee-btn grid size-11 shrink-0 place-items-center rounded-full border border-white/35 text-white transition-colors duration-150 hover:bg-white/10"
+        >
+          {paused ? (
+            <Play className="size-4" aria-hidden="true" />
+          ) : (
+            <Pause className="size-4" aria-hidden="true" />
+          )}
+        </button>
+      </div>
+    </section>
+  );
+}
+
 /* ---------------------------------------------------------------- page */
 
 /** Games of the next 7 days of every team (official calendar snapshot): always on the public home. */
@@ -791,6 +1086,16 @@ function PublicWeek({
         teamOf={(i: WeekItem) => teams.get(i.group)}
         highlightId={highlight?.id ?? null}
         nowMs={nowMs}
+        lead={
+          highlight ? (
+            <Matchday
+              item={highlight}
+              team={teams.get(highlight.group)}
+              serverNow={nowMs}
+              today={today}
+            />
+          ) : undefined
+        }
       />
     </div>
   );
@@ -819,6 +1124,7 @@ export function PublicHome({
       <QuickStrip />
       <PublicWeek calendar={calendar} nowMs={nowMs} today={today} />
       <Featured />
+      <PartnerTicker />
       <JoinBanner />
       <Trust />
       <WeekNews press={press} nowMs={nowMs} today={today} />
