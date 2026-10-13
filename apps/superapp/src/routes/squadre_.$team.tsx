@@ -17,7 +17,6 @@ import {
   PostCard,
 } from "@/components/universe/Feed";
 import { SkyCameo } from "@/components/universe/Community";
-import { ClubCrestOfficial } from "@/components/SiteChrome";
 import { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 import { CLUB_EVENTS } from "@/lib/club-events";
 import { calendarToWeekItems, romeParts } from "@/lib/home-week";
@@ -30,7 +29,7 @@ import {
   type RosterPlayer,
 } from "@/lib/public-roster";
 import { getPublicRoster } from "@/lib/public-roster.functions";
-import { teamCrest } from "@/lib/team-crest";
+import { publicTeamCrest } from "@/lib/team-crest";
 import { resultLinkFor, VERIFIED_CHAMPIONSHIPS } from "@/lib/official-links";
 import {
   channelsFrom,
@@ -160,7 +159,6 @@ function TeamPage() {
   const c = VERIFIED_CHAMPIONSHIPS[id];
   const champ = c ? `${c.name} ${c.group}`.trim() : null;
   const results = resultLinkFor(id);
-  const crest = teamCrest(group);
 
   const toggle = async () => {
     if (!social.signedIn) {
@@ -242,26 +240,21 @@ function TeamPage() {
       </div>
       <div className="border-b border-[#dce5f0] bg-white px-4 pb-4">
         <div className="relative -mt-11 flex items-end gap-3.5">
-          {crest ? (
+          {/* Public page: official club crest only; annata crests stay internal (Direzione, 13/10/2026). */}
+          <span className="grid size-[88px] place-items-center rounded-[24px] border-4 border-white bg-white shadow-[0_6px_16px_rgb(11_42_91/0.2)]">
             <img
-              src={crest}
-              alt=""
-              width={88}
-              height={88}
-              className="size-[88px] rounded-full border-4 border-white bg-white object-contain shadow-[0_6px_16px_rgb(11_42_91/0.2)]"
+              src={publicTeamCrest()}
+              alt="Stemma ufficiale S.C.D. ColicoDerviese"
+              width={55}
+              height={72}
+              className="h-[70px] w-auto object-contain"
             />
-          ) : (
-            <span
-              aria-hidden="true"
-              className="grid size-[88px] place-items-center rounded-[24px] border-4 border-white font-uv text-[34px] text-white shadow-[0_6px_16px_rgb(11_42_91/0.2)]"
-              style={{ background: team.color }}
-            >
-              {team.code}
-            </span>
-          )}
-          <ClubCrestOfficial size={44} className="mb-1.5" />
+          </span>
         </div>
-        <h1 className="mb-0 mt-3 font-uv text-[32px] leading-none">
+        <p className="mb-0 mt-3 text-[13px] font-bold uppercase tracking-[0.08em] text-[#3e5272]">
+          ColicoDerviese
+        </p>
+        <h1 className="mb-0 mt-1 font-uv text-[32px] leading-none">
           {group.label.toUpperCase()}
         </h1>
         <p className="mb-0 mt-1.5 text-[15px] text-[#3e5272]">

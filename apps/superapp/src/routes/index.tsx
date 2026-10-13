@@ -263,10 +263,6 @@ function Home() {
       null
     );
   }, [weekGames, nowMs, followedTeams]);
-  const groupById = useCallback(
-    (id: string) => calendar.groups.find((g) => g.id === id),
-    [calendar.groups],
-  );
   const hall = useMemo(() => hallTeams(calendar.groups), [calendar.groups]);
   const seasonGames = calendar.events.length;
   const verifiedSponsors = useMemo(
@@ -438,7 +434,6 @@ function Home() {
           <WeekGames
             items={weekGames}
             teamOf={teamOf}
-            teamById={groupById}
             highlightId={nextMatch?.id ?? null}
             nowMs={nowMs}
           />

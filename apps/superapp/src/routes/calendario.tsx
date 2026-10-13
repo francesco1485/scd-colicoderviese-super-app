@@ -11,23 +11,12 @@ import { GroupResultsLink, OfficialResults } from "@/components/scd/OfficialResu
 import { dateParts, groupShort, matchTitle, monthRange, trainingRowsFor, upcomingMatches, venueCase, weekRange } from "@/lib/board-data";
 import { romeParts } from "@/lib/home-week";
 import { EMPTY_MESSAGE, WINDOWS, freshnessLabel, resolveAnnata, windowEnd, loadQuadro, trainingKeyFor, type WindowDays, type PublicEvent, type PublicGroup } from "@/lib/public-snapshots";
-import juniores from "@/assets/scd/SCD_JUNIORES_2008_2009.png.asset.json";
-import piccoli from "@/assets/scd/SCD_PICCOLI_2020_2021.png.asset.json";
-import prima from "@/assets/scd/SCD_PRIMA_SQUADRA.png.asset.json";
-import primi from "@/assets/scd/SCD_PRIMI_2018_2019.png.asset.json";
-import pulcini from "@/assets/scd/SCD_PULCINI_2016_2017.png.asset.json";
-import u12 from "@/assets/scd/SCD_U12_2015.png.asset.json";
-import u13 from "@/assets/scd/SCD_U13_2014.png.asset.json";
-import u15 from "@/assets/scd/SCD_U15_2012_2013.png.asset.json";
-import u16 from "@/assets/scd/SCD_U16_2011.png.asset.json";
 import crovi from "@/assets/crovi/crovi-avatar-256.webp.asset.json";
 
-/** Solo loghi ufficiali esistenti, indicati dal master per il gruppo. */
-const LOGO_FILES: Record<string, string> = {
-  "SCD_JUNIORES_2008_2009.png": juniores.url, "SCD_PICCOLI_2020_2021.png": piccoli.url, "SCD_PRIMA_SQUADRA.png": prima.url,
-  "SCD_PRIMI_2018_2019.png": primi.url, "SCD_PULCINI_2016_2017.png": pulcini.url, "SCD_U12_2015.png": u12.url,
-  "SCD_U13_2014.png": u13.url, "SCD_U15_2012_2013.png": u15.url, "SCD_U16_2011.png": u16.url,
-};
+/*
+ * Public page: our side is the official club crest + "ColicoDerviese <team>"; annata crests stay internal
+ * (Direzione, 13/10/2026). The team chips use the master's team colour, not a crest.
+ */
 
 const QUADRO_SLOTS = loadQuadro().slots;
 const VIEWS = ["prossime", "settimana", "mese", "stagione"] as const;
@@ -239,7 +228,7 @@ function Calendario() {
                   return (
                     <button key={g.id} type="button" aria-pressed={on} onClick={() => pickTeam(on ? undefined : g)}
                       className={`flex h-[46px] shrink-0 items-center gap-[7px] rounded-[10px] pl-[6px] pr-[12px] text-[14px] font-bold ${on ? "bg-[var(--scd-blue)] text-white" : "bg-[#eef0f3] text-[var(--scd-ink)]"}`}>
-                      {g.logo && LOGO_FILES[g.logo] ? <img src={LOGO_FILES[g.logo]} alt="" className="size-[34px] shrink-0 rounded-full bg-white object-contain" /> : <span className="size-[12px] shrink-0 rounded-full" style={{ background: g.color }} aria-hidden="true" />}
+                      <span className="size-[12px] shrink-0 rounded-full ring-2 ring-white" style={{ background: g.color }} aria-hidden="true" />
                       <span className="whitespace-nowrap">{shortLabel(g)}</span>
                     </button>
                   );
@@ -390,7 +379,7 @@ function EventRow({ e, g, open, toggle }: { e: PublicEvent; g: PublicGroup | und
         <Lead date={e.date} time={e.time} />
         <span className="flex w-[44px] shrink-0 justify-center"><OpponentCrest name={e.opponent} size={40} /></span>
         <span className="min-w-0 flex-1">
-          <span className="block break-words text-[16.5px] font-bold leading-[1.2] tracking-[-0.01em] text-[var(--scd-ink)]">{kind !== "Campionato" ? `${kind} · ` : ""}{matchTitle({ homeAway: e.homeAway, opponent: opponentLabel(e.opponent) }, team)}</span>
+          <span className="block break-words text-[16.5px] font-bold leading-[1.2] tracking-[-0.01em] text-[var(--scd-ink)]">{kind !== "Campionato" ? `${kind} · ` : ""}{matchTitle({ homeAway: e.homeAway, opponent: opponentLabel(e.opponent) }, `ColicoDerviese ${team}`)}</span>
           <span className="mt-[3px] flex items-start gap-[3px] text-[14px] font-medium leading-[1.25] text-[var(--scd-sub)]">
             <MapPin className="mt-[2px] size-[14px] shrink-0" strokeWidth={2.4} aria-hidden="true" />
             <span className="min-w-0 break-words">{home ? "" : "Trasferta · "}{venueCase(e.venue) || "Sede da definire"}
