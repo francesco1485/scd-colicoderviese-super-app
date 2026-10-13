@@ -2373,6 +2373,25 @@
         "status": "ACTIVE",
         "delivered": []
       }
+    },
+    {
+      "sourceDate": "2026-10-13",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-102",
+      "name": "AVATAR_FROM_PHOTO_OR_TEXT_AND_MEMBER_CARDS_WITH_CREDITS",
+      "sourceQuoteFragments": [
+        "Deve poter fare foto volto e sviluppare anche il suo",
+        "se non vuole può creare con indicazioni scritte a mano o scelta base di avatar già pronti",
+        "Card tifoso e card tesserato e card famiglia come detto con sconti e agevolazioni",
+        "si sbloccano delle cose così da realizzare o aver il suo avatar o altro dove poter utilizzare i crediti virtuali"
+      ],
+      "normalizedCommand": {
+        "rule": "Avatar creation has three paths: (1) from a face photo (consent-based; adults directly, minors only through the family account with guardian consent; photo used to generate and then deleted, no biometric template kept), (2) from a written description, (3) from ready-made realistic bases. Digital membership cards — Card Tifoso, Card Tesserato, Card Famiglia — carry discounts and benefits (partners, ticketing, club house) and earn/spend virtual credits that unlock avatar items and other rewards. Credits are never money and never convertible.",
+        "scope": "AVATAR_CARDS_CREDITS",
+        "status": "PROPOSED",
+        "delivered": []
+      }
     }
   ],
   "completionGate": {
