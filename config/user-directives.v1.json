@@ -2496,6 +2496,35 @@
         ],
         "duplicate_work": "DENY"
       }
+    },
+    {
+      "sourceDate": "2026-10-13",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-105",
+      "name": "EXCELSIOR_INTERIORS_CONTROL_ROOM",
+      "sourceQuoteFragments": [
+        "si deve continuare sulla strada del bello, del lusso e dell'excelsior, soprattutto in gestione, lavoro interno e sviluppo",
+        "vorrei vedere come continuano i lavori internamente"
+      ],
+      "normalizedCommand": {
+        "rule": "Internal areas (gestione, lavoro interno, sviluppo) follow the 'Excelsior' language: premium, precise, calm, dense-but-clear operations UI (recorded preference: Rolls-Royce interiors, Boeing engine, Starlink control unit, photo-studio colours, rigorous organisation, condensed 'Wanted'-style caps for headings, strength). Mineral navy and warm white surfaces with the kit monogram at a whisper, 1px hairlines, 8-pt spacing, tabular numbers, gold from the kit piping only for focus and active place, club yellow only for actions, Big Shoulders Display wide caps for section titles, Fira Sans text. The Direzione desktop is a 'Control Room' (reference board CONTROL ROOM OPERATIVA, REFERENCE_BOARD: structure only) filled only from real sources; a tile without a real source is hidden; no invented percentages.",
+        "scope": "INTERNAL_SHELL_AND_DIREZIONE",
+        "constraints": [
+          "public pages unchanged (scope class .scd-excelsior set by InteriorShell only)",
+          "no sample data from boards; club name S.C.D. ColicoDerviese",
+          "'Sistema operativo attivo' only when every source answers and is fresh",
+          "phone: same content as a prioritised stack (Oggi, Alert, Task first)"
+        ],
+        "status": "IMPLEMENTED_BRANCH_AGENT_LUX",
+        "delivered": [
+          "apps/superapp/src/styles.css (.scd-excelsior tokens)",
+          "apps/superapp/src/components/scd/InteriorShell.tsx, interior-ui.tsx, work-area-ui.tsx",
+          "apps/superapp/src/lib/control-room.ts (+ tests)",
+          "apps/superapp/src/components/scd/ControlRoom.tsx",
+          "apps/superapp/src/routes/direzione.tsx"
+        ]
+      }
     }
   ],
   "completionGate": {

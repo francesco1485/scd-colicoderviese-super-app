@@ -1,15 +1,31 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Brain, CalendarDays, ChevronRight, ClipboardList, KeyRound, Mail, Shirt, UserCheck, Users, Wallet } from "lucide-react";
+import { useMemo } from "react";
 
 import { AccessScreenPage, accessHead } from "@/components/scd/AccessScreen";
-import { Card, Chip } from "@/components/scd/interior-ui";
+import { ControlRoom } from "@/components/scd/ControlRoom";
+import { Chip, useRomeNow } from "@/components/scd/interior-ui";
 import { InteriorShell } from "@/components/scd/InteriorShell";
+import { ShareLink } from "@/components/scd/ShareLink";
 import { getAccessRequests } from "@/lib/access-requests.functions";
 import { getSession } from "@/lib/auth.functions";
-import { ClubDeadlinesCard } from "@/components/scd/ClubDeadlines";
-import { ShareLink } from "@/components/scd/ShareLink";
-import { useRomeNow } from "@/components/scd/interior-ui";
+import { getCommInbox } from "@/lib/comm.functions";
+import type { ControlRoomSources } from "@/lib/control-room";
+import { getFeeBoard } from "@/lib/fees.functions";
 import { searchKnowledge } from "@/lib/knowledge.functions";
+import { getProposalQueue } from "@/lib/proposals.functions";
+import { loadCalendar } from "@/lib/public-snapshots";
+import { getTrainingQuadro } from "@/lib/quadro.functions";
+import { getTransportBoard } from "@/lib/transport.functions";
+
+/** A source that fails to load is shown as "not connected", never as an empty truth. */
+async function soft<T>(p: Promise<T>): Promise<T | null> {
+  try {
+    return await p;
+  } catch {
+    return null;
+  }
+}
 
 /**
  * Direzione landing. Signed in with an office position: shortcuts to the working pages and the pending access
@@ -19,10 +35,34 @@ export const Route = createFileRoute("/direzione")({
   loader: async () => {
     const session = await getSession();
     const office = session.roles.includes("direzione") || session.roles.includes("dirigenza");
-    const [requests, due] = office
-      ? await Promise.all([getAccessRequests(), searchKnowledge({ data: { onlyDue: true, limit: 8 } })])
-      : [[], null];
-    return { due, office, roles: session.roles, badge: session.badge, email: session.user?.email ?? null, pending: requests.filter((r) => r.status === "PENDING").length };
+    // interior: the Control Room brings its own shell (no public chrome around it); the access screen keeps it.
+    const base = { office, interior: office, roles: session.roles, badge: session.badge, email: session.user?.email ?? null };
+    if (!office) return { ...base, pending: 0, cr: null };
+    const cal = loadCalendar();
+    const [requests, due, queue, inbox, fees, transport, quadro] = await Promise.all([
+      soft(getAccessRequests()),
+      soft(searchKnowledge({ data: { onlyDue: true, limit: 40 } })),
+      soft(getProposalQueue()),
+      soft(getCommInbox()),
+      soft(getFeeBoard({ data: {} })),
+      soft(getTransportBoard()),
+      soft(getTrainingQuadro()),
+    ]);
+    const pending = requests ? requests.filter((r) => r.status === "PENDING").length : 0;
+    return {
+      ...base,
+      pending,
+      cr: {
+        calendar: { events: cal.events, groups: cal.groups, sourceModifiedAt: cal.sourceModifiedAt, season: cal.season },
+        quadro: quadro?.authorized ? { slots: quadro.quadro.slots, days: quadro.quadro.days, generatedUTC: quadro.quadro.generatedUTC } : null,
+        queue,
+        inbox,
+        fees,
+        transport,
+        due,
+        pendingAccess: requests ? pending : null,
+      },
+    };
   },
   head: () => accessHead("direzione"),
   component: DirezioneRoute,
@@ -43,36 +83,44 @@ const LINKS = [
 function DirezioneRoute() {
   const d = Route.useLoaderData();
   const now = useRomeNow();
-  if (!d.office) return <AccessScreenPage id="direzione" />;
+  const sources = useMemo<ControlRoomSources | null>(
+    () => (d.cr ? { ...d.cr, today: now.date, nowHHMM: now.time, nowIso: new Date().toISOString() } : null),
+    [d.cr, now.date, now.time],
+  );
+  if (!d.office || !sources) return <AccessScreenPage id="direzione" />;
   return (
-    <InteriorShell
-      title="Direzione"
-      path="/direzione"
-      activeAreaId="direzione"
-      roles={new Set(d.roles)}
-      roleLabel={d.badge ?? "Direzione"}
-      highlights={[{ value: d.pending, label: "richieste di accesso da verificare" }]}
-    >
-      <div className="grid grid-cols-1 gap-[18px] xl:grid-cols-[minmax(0,1fr)_400px]">
-      <Card id="dir-scorciatoie" title="Da qui governi l'app" sub={d.email ? `Sei entrato come ${d.email}.` : undefined} aside={<ShareLink path="/direzione" />} className="xl:self-start">
-        <ul className="m-0 list-none p-0">
-          {LINKS.map((l) => (
-            <li key={l.to}>
-              <Link to={l.to} className="scd-focus flex min-h-16 items-center gap-3 border-t border-[var(--in-line)] px-4 py-3 hover:bg-[#f7fbff] sm:px-[18px]">
-                <l.icon className="size-6 flex-none text-[var(--in-info)]" strokeWidth={1.8} aria-hidden="true" />
-                <span className="min-w-0 flex-1">
-                  <b className="block text-[16px] leading-tight">{l.title}</b>
-                  <span className="block text-[13.5px] leading-snug text-[var(--in-sub)]">{l.sub}</span>
-                </span>
-                {l.to === "/segreteria/persone" && d.pending > 0 && <Chip tone="warn">{d.pending} da verificare</Chip>}
-                <ChevronRight className="size-5 flex-none text-[var(--in-sub)]" aria-hidden="true" />
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </Card>
-      {d.due && <ClubDeadlinesCard id="dir-scadenze" due={d.due} today={now.date} className="xl:self-start" />}
-      </div>
+    <InteriorShell title="Direzione" path="/direzione" activeAreaId="direzione" roles={new Set(d.roles)} roleLabel={d.badge ?? "Direzione"}>
+      <ControlRoom sources={sources} path="/direzione" tools={<DirectionTools email={d.email} pending={d.pending} />} />
     </InteriorShell>
+  );
+}
+
+/** The governance shortcuts of the Direzione, kept under the Control Room (same links as before). */
+function DirectionTools({ email, pending }: { email: string | null; pending: number }) {
+  return (
+    <section aria-labelledby="dir-strumenti-t" className="ex-panel overflow-hidden" id="dir-scorciatoie">
+      <header className="flex flex-wrap items-center justify-between gap-3 px-4 pb-3 pt-4 sm:px-5">
+        <div className="min-w-0">
+          <h2 id="dir-strumenti-t" className="ex-title m-0 text-[17px]">Strumenti di direzione</h2>
+          {email && <p className="mt-1 text-[13px] text-[var(--ex-sub)]">Sei entrato come {email}.</p>}
+        </div>
+        <ShareLink path="/direzione" />
+      </header>
+      <ul className="m-0 grid list-none grid-cols-1 border-t border-[var(--ex-hair)] p-0 md:grid-cols-2 xl:grid-cols-3">
+        {LINKS.map((l) => (
+          <li key={l.to} className="border-b border-[var(--ex-hair)] md:border-r md:[&:nth-child(2n)]:border-r-0 xl:[&:nth-child(2n)]:border-r xl:[&:nth-child(3n)]:border-r-0">
+            <Link to={l.to} className="scd-focus flex min-h-16 items-center gap-3 px-4 py-3 hover:bg-[rgb(11_27_51/0.025)] sm:px-5">
+              <l.icon className="size-5 flex-none text-[var(--ex-ink)]" strokeWidth={1.75} aria-hidden="true" />
+              <span className="min-w-0 flex-1">
+                <b className="block text-[14.5px] font-semibold leading-tight">{l.title}</b>
+                <span className="block text-[12.5px] leading-snug text-[var(--ex-sub)]">{l.sub}</span>
+              </span>
+              {l.to === "/segreteria/persone" && pending > 0 && <Chip tone="warn">{pending} da verificare</Chip>}
+              <ChevronRight className="size-4 flex-none text-[var(--ex-sub)]" aria-hidden="true" />
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }

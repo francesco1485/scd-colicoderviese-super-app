@@ -34,19 +34,19 @@ function Rail({ groups, activeAreaId, roleLabel, onNavigate }: { groups: RailGro
       <div className="flex items-center gap-2.5 px-2 pb-[18px] pt-0.5">
         <Crest size={44} />
         <div className="leading-none">
-          <b className="block font-title text-[22px] font-extrabold tracking-[0.01em]">SCD Dentro</b>
-          <small className="mt-1 block text-[13px] text-[#d6ebfb]">Un account, tutte le aree</small>
+          <b className="ex-title block text-[20px] text-[var(--ex-on-navy)]">SCD Dentro</b>
+          <small className="mt-1.5 block text-[12.5px] text-[var(--ex-on-navy-soft)]">Un account, tutte le aree</small>
         </div>
       </div>
       <nav aria-label="Aree di lavoro" className="min-h-0 flex-1 overflow-y-auto">
         {groups.map((g) => (
           <div key={g.title}>
-            <p className="mx-2.5 mb-1.5 mt-3.5 text-[13px] font-semibold text-[var(--in-rail-soft)]">{g.title}</p>
+            <p className="ex-eyebrow mx-2.5 mb-1.5 mt-4 !text-[var(--ex-on-navy-soft)]">{g.title}</p>
             {g.items.map((it) => {
               const link = areaLink(it.id);
               const Icon = AREA_ICON[it.icon];
               const active = it.id === activeAreaId;
-              const cls = "flex h-11 items-center gap-2.5 rounded-[10px] px-2.5 text-[15px] font-semibold";
+              const cls = "flex h-11 items-center gap-2.5 rounded-[8px] px-3 text-[14.5px] font-medium";
               if (!link.href) {
                 return (
                   <div key={it.id} className={`${cls} text-white/65`} aria-disabled="true">
@@ -62,7 +62,7 @@ function Rail({ groups, activeAreaId, roleLabel, onNavigate }: { groups: RailGro
                   to={link.href as never}
                   onClick={onNavigate}
                   aria-current={active ? "page" : undefined}
-                  className={`${cls} scd-focus transition-colors duration-150 ${active ? "bg-[var(--in-action)] text-[var(--in-ink)]" : "text-white hover:bg-white/12"}`}
+                  className={`${cls} ex-rail-link scd-focus transition-colors duration-150 ${active ? "" : "text-[var(--ex-on-navy)]/90 hover:bg-white/[0.06] hover:text-white"}`}
                 >
                   <Icon className="size-[19px] flex-none" strokeWidth={1.8} aria-hidden="true" />
                   <span className="min-w-0 truncate">{it.label}</span>
@@ -72,8 +72,8 @@ function Rail({ groups, activeAreaId, roleLabel, onNavigate }: { groups: RailGro
           </div>
         ))}
       </nav>
-      <div className="mt-auto border-t border-white/22 px-2.5 pt-3 text-[14px] text-[#e6f3fc]">
-        <b className="block text-[15px] text-white">{roleLabel}</b>
+      <div className="mt-auto border-t border-[rgb(201_162_39/0.3)] px-2.5 pt-3 text-[13px] text-[var(--ex-on-navy-soft)]">
+        <b className="block text-[14.5px] font-semibold text-[var(--ex-on-navy)]">{roleLabel}</b>
         Vedi le aree del tuo ruolo
       </div>
     </>
@@ -103,7 +103,7 @@ function PathChip({ path }: { path: string }) {
         type="button"
         onClick={copy}
         aria-label={`Copia il link diretto ${path}`}
-        className="scd-focus inline-flex h-11 flex-none items-center gap-2 rounded-full bg-[var(--in-info-bg)] px-3 text-[14px] font-semibold text-[var(--in-info)] transition-transform duration-150 active:scale-[0.97]"
+        className="scd-focus inline-flex h-11 flex-none items-center gap-2 rounded-full border border-[var(--ex-hair)] bg-white/70 px-3 text-[13px] font-medium text-[var(--in-sub)] transition-[transform,color] duration-150 hover:text-[var(--in-ink)] active:scale-[0.97]"
       >
         {state === "copied" ? <Check className="size-4" strokeWidth={2} aria-hidden="true" /> : <Link2 className="size-4" strokeWidth={1.8} aria-hidden="true" />}
         {path}
@@ -133,7 +133,7 @@ function AreaSearch() {
         if (firstLive?.href) void navigate({ to: firstLive.href as never });
       }}
     >
-      <label className="flex h-11 items-center gap-2 rounded-[10px] border border-[var(--in-line)] bg-white px-3 text-[var(--in-sub)] focus-within:border-[var(--in-focus)] focus-within:ring-2 focus-within:ring-[var(--in-focus)]/30">
+      <label className="flex h-11 items-center gap-2 rounded-[8px] border border-[var(--ex-hair-strong)] bg-white px-3 text-[var(--in-sub)] focus-within:border-[var(--ex-ink)] focus-within:shadow-[0_0_0_4px_rgb(201_162_39/0.35)]">
         <Search className="size-[18px] flex-none" strokeWidth={1.8} aria-hidden="true" />
         <span className="sr-only">Cerca in tutta la SCD</span>
         <input
@@ -151,7 +151,7 @@ function AreaSearch() {
         />
       </label>
       {open && (
-        <ul id={listId} role="listbox" aria-label="Aree trovate" className="absolute inset-x-0 top-[calc(100%+6px)] z-30 overflow-hidden rounded-xl border border-[var(--in-line)] bg-white py-1 shadow-[var(--in-card-shadow)]">
+        <ul id={listId} role="listbox" aria-label="Aree trovate" className="absolute inset-x-0 top-[calc(100%+6px)] z-30 overflow-hidden rounded-[10px] border border-[var(--ex-hair)] bg-[var(--ex-cream)] py-1 shadow-[var(--ex-shadow-2)]">
           {hits.length === 0 && <li className="px-3 py-2.5 text-[14px] text-[var(--in-sub)]">Nessuna area con questo nome.</li>}
           {hits.map((h) => (
             <li key={h.id} role="option" aria-selected={h === firstLive}>
@@ -177,17 +177,17 @@ export function HighlightStrip({ items }: { items: readonly StripItem[] }) {
   return (
     <section
       aria-label="In evidenza"
-      className="scd-led-strip grid flex-none grid-cols-2 text-white sm:grid-cols-[repeat(auto-fit,minmax(150px,1fr))] lg:flex lg:min-h-[66px] lg:items-stretch"
+      className="scd-led-strip ex-dark grid flex-none shadow-[inset_0_-1px_0_rgb(201_162_39/0.45)] grid-cols-2 text-white sm:grid-cols-[repeat(auto-fit,minmax(150px,1fr))] lg:flex lg:min-h-[66px] lg:items-stretch"
     >
       {items.map((it) => {
         const v = stripValue(it.value);
         return (
-          <div key={it.label} className="flex items-center gap-2 border-b border-r border-white/14 px-3 py-2 lg:gap-3 lg:border-b-0 lg:px-6 lg:py-2.5 lg:first:pl-7">
-            <span className={`font-title text-[22px] font-black leading-none lg:text-[36px] ${v.muted ? "text-[var(--in-strip-muted)]" : "text-[var(--in-action)]"}`}>
+          <div key={it.label} className="flex items-center gap-2 border-b border-r border-white/10 px-3 py-2 lg:gap-3 lg:border-b-0 lg:px-6 lg:py-2.5 lg:first:pl-8">
+            <span className={`ex-num font-title text-[22px] font-extrabold leading-none lg:text-[32px] ${v.muted ? "text-[var(--in-strip-muted)]" : "text-[var(--in-action)]"}`}>
               {v.text}
               {!v.known && <span className="sr-only"> (dato non disponibile)</span>}
             </span>
-            <span className="max-w-[22ch] text-[12.5px] leading-tight text-[#eaf4fd] lg:text-[14px]">{it.label}</span>
+            <span className="max-w-[22ch] text-[12.5px] leading-tight text-[var(--ex-on-navy-soft)] lg:text-[13.5px]">{it.label}</span>
           </div>
         );
       })}
@@ -216,15 +216,15 @@ export function InteriorShell({ title, path, activeAreaId, roles, roleLabel, hig
   }, [drawer]);
 
   return (
-    <div className="scd-interior flex min-h-dvh bg-[var(--in-ground)]" data-shell="interior">
-      <aside className="sticky top-0 hidden h-dvh w-[236px] flex-none flex-col bg-[var(--in-rail)] px-3.5 py-[18px] text-white lg:flex" aria-label="Menu delle aree">
+    <div className="scd-interior scd-excelsior flex min-h-dvh bg-[var(--in-ground)]" data-shell="interior">
+      <aside className="ex-rail ex-dark sticky top-0 hidden h-dvh w-[240px] flex-none flex-col px-3 py-4 text-white lg:flex" aria-label="Menu delle aree">
         <Rail groups={groups} activeAreaId={activeAreaId} roleLabel={roleLabel} />
       </aside>
 
       {drawer && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <button type="button" aria-label="Chiudi menu aree" className="absolute inset-0 bg-[#021433]/55" onClick={() => setDrawer(false)} />
-          <div ref={drawerRef} className="scd-access-panel absolute inset-y-0 left-0 flex w-[min(300px,86vw)] flex-col bg-[var(--in-rail)] px-3.5 py-[18px] text-white shadow-[16px_0_40px_rgb(2_20_51/0.35)]">
+          <div ref={drawerRef} className="ex-rail ex-dark scd-access-panel absolute inset-y-0 left-0 flex w-[min(300px,86vw)] flex-col px-3 py-4 text-white shadow-[16px_0_40px_rgb(2_20_51/0.35)]">
             <button type="button" onClick={() => setDrawer(false)} aria-label="Chiudi menu aree" className="scd-focus absolute right-2 top-2 flex size-11 items-center justify-center rounded-lg">
               <X className="size-5" aria-hidden="true" />
             </button>
@@ -234,27 +234,27 @@ export function InteriorShell({ title, path, activeAreaId, roles, roleLabel, hig
       )}
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <div className="flex h-14 items-center gap-3 bg-[var(--in-rail)] px-3 text-white lg:hidden">
+        <div className="ex-rail ex-dark flex h-14 items-center gap-3 px-3 text-white lg:hidden">
           <button type="button" onClick={() => setDrawer(true)} aria-label="Apri menu aree" aria-expanded={drawer} className="scd-focus flex size-11 items-center justify-center rounded-lg">
             <Menu className="size-5" aria-hidden="true" />
           </button>
           <Crest size={34} />
-          <b className="font-title text-[20px] font-extrabold">SCD Dentro</b>
+          <b className="ex-title text-[18px] text-[var(--ex-on-navy)]">SCD Dentro</b>
         </div>
 
         {/* Phones: title only (UD-057); path chip, date and search are desktop furniture. */}
-        <header className="flex flex-wrap items-center gap-x-4 gap-y-3 border-b border-[var(--in-line)] bg-white px-4 py-2.5 sm:px-7 lg:min-h-[72px] lg:flex-nowrap lg:py-0">
-          <h1 className="m-0 font-title text-[24px] font-extrabold leading-none lg:text-[34px]">{title}</h1>
+        <header className="ex-header flex flex-wrap items-center gap-x-4 gap-y-3 px-4 py-3 sm:px-8 lg:min-h-[72px] lg:flex-nowrap lg:py-0">
+          <h1 className="ex-title ex-header-title m-0 text-[22px] lg:text-[30px]">{title}</h1>
           <span className="hidden lg:contents">
             <PathChip path={path} />
-            <span className="whitespace-nowrap text-[15px] text-[var(--in-sub)] lg:ml-auto" suppressHydrationWarning>{day}</span>
+            <span className="whitespace-nowrap text-[14px] text-[var(--in-sub)] lg:ml-auto" suppressHydrationWarning>{day}</span>
             <AreaSearch />
           </span>
         </header>
 
         {highlights && highlights.length > 0 && <HighlightStrip items={highlights} />}
 
-        <main className="flex-1 px-4 py-4 sm:px-7 lg:py-[22px]">{children}</main>
+        <main className="flex-1 px-4 py-4 sm:px-8 lg:py-6">{children}</main>
       </div>
     </div>
   );
