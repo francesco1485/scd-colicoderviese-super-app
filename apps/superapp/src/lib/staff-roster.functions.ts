@@ -1,11 +1,14 @@
 /**
- * Staff roster on the server. Names and roles are public (the club's organigramma);
- * e-mail only when the caller is inside an open work area (verified session or staging preview). Phones are never returned by these functions.
+ * Staff roster on the server. People are inside (UD-100, Direzione 13/10/2026): names and roles only for a
+ * signed-in member (verified session), never for anonymous callers, who get an empty roster plus an explicit
+ * not-authorized flag. E-mail only when the caller is inside an open work area (verified session or staging
+ * preview). Phones are never returned by these functions.
  */
 import { createServerFn } from "@tanstack/react-start";
 
 import { workAreaView } from "./access";
-import { sessionRoles } from "./auth.functions";
+import { sessionRoles, sessionView } from "./auth.functions";
+import { isSignedInMember, NOT_AUTHORIZED, type NotAuthorized, type SessionLike } from "./public-access";
 import { stagingPreviewEnabled } from "./impianti-access";
 import { parseRoster, type StaffRoster } from "./staff-roster";
 
@@ -22,6 +25,14 @@ export function staffEmails(env: Readonly<Record<string, string | undefined>>, i
   return out;
 }
 
-export const getStaffRoster = createServerFn({ method: "GET" }).handler(async (): Promise<StaffRoster> => staffRosterPublic(process.env));
+export type StaffRosterResult = (StaffRoster & { authorized: true }) | (StaffRoster & NotAuthorized);
+
+/** Pure guard: the roster for a signed-in member, an empty roster with the explicit refusal for anyone else. */
+export function staffRosterFor(env: Readonly<Record<string, string | undefined>>, session: SessionLike | null): StaffRosterResult {
+  if (!isSignedInMember(session)) return { ...parseRoster(undefined).roster, ...NOT_AUTHORIZED };
+  return { ...staffRosterPublic(env), authorized: true };
+}
+
+export const getStaffRoster = createServerFn({ method: "GET" }).handler(async (): Promise<StaffRosterResult> => staffRosterFor(process.env, await sessionView()));
 
 export const getStaffEmails = createServerFn({ method: "GET" }).handler(async (): Promise<Record<string, string>> => staffEmails(process.env, import.meta.env.PROD, await sessionRoles()));

@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Search, X } from "lucide-react";
 
@@ -8,28 +8,33 @@ import { EMPTY_MESSAGE, fieldMatches, findSessions, loadQuadro, type TrainingSlo
 import { defaultDay, isFree, minutesOf, pitchZones, slotStates, weekdayKey, type PitchZone, type SlotState } from "@/lib/training-view";
 import { peopleOnPitch, type StaffPerson } from "@/lib/staff-roster";
 import { getStaffEmails, getStaffRoster } from "@/lib/staff-roster.functions";
+import { getSession } from "@/lib/auth.functions";
 import { PeoplePins } from "@/components/scd/PeoplePins";
 import planimetria from "@/assets/scd/planimetria_colico.webp.asset.json";
 
-/* Public page: annata crests stay internal (Direzione, 13/10/2026); the group name is written as text. */
+/*
+ * Training board, members only (UD-100, Direzione 13/10/2026: "Le squadre sono dentro non fuori"). The loader asks
+ * the server for the session first: anonymous visitors are sent to sign in and come back here (same annata).
+ * The page is private and no-store (src/lib/http-policy.ts MEMBERS_ONLY_PREFIXES) and out of robots/sitemap.
+ * Annata crests stay internal anyway; the group name is written as text.
+ */
 
 export const Route = createFileRoute("/allenamenti")({
   validateSearch: (s: Record<string, unknown>): { annata?: string | undefined } => {
     const v = s["annata"];
     return typeof v === "string" || typeof v === "number" ? { annata: String(v).slice(0, 40) } : {};
   },
-  loader: async () => {
+  loader: async ({ location }) => {
+    const session = await getSession();
+    if (!session.user) throw redirect({ to: "/accedi", search: { next: location.href } });
     const [roster, emails] = await Promise.all([getStaffRoster(), getStaffEmails()]);
     return { ...loadQuadro(), people: roster.people, emails };
   },
   head: () => ({
     meta: [
       { title: "Allenamenti lun-ven — S.C.D. ColicoDerviese" },
-      { name: "description", content: "Allenamenti SCD dal lunedì al venerdì al centro sportivo di Colico: orari, campi, zone e spogliatoi per annata." },
-      { property: "og:title", content: "Allenamenti — S.C.D. ColicoDerviese" },
-      { property: "og:description", content: "Orari, campi e spogliatoi per annata, dal lunedì al venerdì." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { name: "description", content: "Area soci: allenamenti SCD dal lunedì al venerdì al centro sportivo di Colico." },
+      { name: "robots", content: "noindex, nofollow" },
     ],
   }),
   component: Allenamenti,

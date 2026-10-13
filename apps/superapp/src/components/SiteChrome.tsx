@@ -59,13 +59,12 @@ const desktopNavMember: readonly NavItem[] = [
 export const desktopNavFor = (signedIn: boolean): readonly NavItem[] =>
   signedIn ? desktopNavMember : desktopNavPublic;
 
-/** Link a piè di pagina: tutte le pagine pubbliche principali. */
+/** Link a piè di pagina: tutte le pagine pubbliche principali (squadre e allenamenti sono dentro, UD-100). */
 const footerNav: readonly NavItem[] = [
   { to: "/societa", label: "Chi siamo" },
   { to: "/comunicazioni", label: "Notizie" },
   { to: "/calendario", label: "Calendario" },
   { to: "/impianti", label: "Mappa campi" },
-  { to: "/allenamenti", label: "Allenamenti" },
   { to: "/comunicazioni", label: "Comunicazioni" },
   { to: "/eventi", label: "Eventi" },
   { to: "/aree", label: "Area club" },
@@ -87,7 +86,6 @@ const menuGroups: readonly {
       { to: "/societa", label: "Chi siamo" },
       { to: "/calendario", label: "Calendario gare" },
       { to: "/impianti", label: "Mappa campi" },
-      { to: "/allenamenti", label: "Allenamenti" },
       { to: "/comunicazioni", label: "Comunicazioni" },
       { to: "/eventi", label: "Eventi" },
       { to: "/eventi/christmas-lario-cup", label: "Christmas Lario Cup" },
@@ -102,6 +100,7 @@ const menuGroups: readonly {
     items: [
       { to: "/la-mia-scd", label: "La mia SCD" },
       { to: "/squadre", label: "Le squadre" },
+      { to: "/allenamenti", label: "Allenamenti" },
       { to: "/fantacalcio", label: "Fantacalcio SCD" },
       { to: "/top11", label: "Top 11 della settimana" },
       { to: "/rassegna", label: "Dicono di noi" },

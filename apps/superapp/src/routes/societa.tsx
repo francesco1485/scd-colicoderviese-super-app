@@ -1,25 +1,29 @@
 import { CLUB_DOCUMENTS } from "@/lib/club-documents";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, ExternalLink, FileText, MapPin } from "lucide-react";
+import { ArrowRight, ExternalLink, FileText, Lock, MapPin } from "lucide-react";
 
 import { ClubCrestOfficial } from "@/components/SiteChrome";
 import { HallDoors, HallHero } from "@/components/scd/hall";
 import { ClubCrest, SyncPlaceholder } from "@/components/ui-kit";
-import { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 import { getClubDirectory } from "@/lib/club.functions";
-import { CLUB_PROFILE, hallTeams, pitchFacts } from "@/lib/club-profile";
+import { CLUB_PROFILE, pitchFacts } from "@/lib/club-profile";
 
+/**
+ * Chi siamo, public (UD-100, Direzione 13/10/2026: "Le squadre sono dentro non fuori. Fuori che aspetto creativo
+ * comunicativo e commerciale"): club identity, facilities, affiliation, documents and the clubs we meet. No team
+ * grid, roster or team crest here: one small link sends members to the teams inside. The loader reads no team data.
+ */
 export const Route = createFileRoute("/societa")({
   loader: async () => {
-    const [directory, calendar] = await Promise.all([getClubDirectory(), getPublicCalendarSnapshot()]);
-    return { clubs: directory.clubs, groups: calendar.groups };
+    const directory = await getClubDirectory();
+    return { clubs: directory.clubs };
   },
   head: () => ({
     meta: [
       { title: "Chi siamo — S.C.D. ColicoDerviese" },
       {
         name: "description",
-        content: "La S.C.D. ColicoDerviese: il club di calcio di Colico e Dervio sull'Alto Lago di Como, matricola FIGC 26020, società affiliata AC Monza. Squadre, campi e contatti della stagione 2026/27.",
+        content: "La S.C.D. ColicoDerviese: il club di calcio di Colico e Dervio sull'Alto Lago di Como, matricola FIGC 26020, società affiliata AC Monza. Identità, campi, documenti e contatti della stagione 2026/27.",
       },
       { property: "og:title", content: "Chi siamo — S.C.D. ColicoDerviese" },
       { property: "og:description", content: "Due paesi, un club: Colico e Dervio, stagione 2026/27." },
@@ -29,8 +33,7 @@ export const Route = createFileRoute("/societa")({
 });
 
 function Societa() {
-  const { clubs, groups } = Route.useLoaderData();
-  const teams = hallTeams(groups);
+  const { clubs } = Route.useLoaderData();
   const pitches = pitchFacts();
   const c = CLUB_PROFILE;
   return (
@@ -46,18 +49,18 @@ function Societa() {
         }
         actions={
           <>
-            <Link to="/squadre" className="scd-action inline-flex h-12 items-center gap-2 rounded-[12px] px-5 text-[16px] font-bold">
-              Le squadre <ArrowRight className="size-5" aria-hidden="true" />
+            <Link to="/eventi" className="scd-action inline-flex h-12 items-center gap-2 rounded-[12px] px-5 text-[16px] font-bold">
+              Eventi e tornei <ArrowRight className="size-5" aria-hidden="true" />
             </Link>
-            <Link to="/calendario" className="scd-focus inline-flex h-12 items-center rounded-[12px] border border-white/40 px-5 text-[16px] font-semibold text-white hover:bg-white/10">
-              Calendario
+            <Link to="/sponsor" className="scd-focus inline-flex h-12 items-center rounded-[12px] border border-white/40 px-5 text-[16px] font-semibold text-white hover:bg-white/10">
+              Diventa partner
             </Link>
           </>
         }
       >
         <p className="m-0">
-          La {c.name} è la società di calcio di {c.towns.join(" e ")}, sull'{c.area}. Nella stagione {c.season} porta in campo {teams.length} squadre, dalla Prima
-          Squadra ai bambini dei Piccoli Amici.
+          La {c.name} è la società di calcio di {c.towns.join(" e ")}, sull'{c.area}. Nella stagione {c.season} porta in campo ragazzi e
+          ragazze di tutte le età, dalla Prima Squadra ai bambini dei Piccoli Amici.
         </p>
       </HallHero>
 
@@ -106,31 +109,13 @@ function Societa() {
           </div>
         </section>
 
-        <section aria-labelledby="squadre-t" className="mt-10">
-          <div className="mb-3 flex items-end justify-between gap-3">
-            <h2 id="squadre-t" className="m-0 font-title text-[30px] font-black uppercase leading-none">
-              Le squadre {c.season}
-            </h2>
-            <Link to="/squadre" className="py-2 text-[15px] font-bold text-[var(--out-yellow)]">
-              Tutte le squadre
-            </Link>
-          </div>
-          <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
-            {teams.map((t) => (
-              <li key={t.id}>
-                <Link
-                  to="/squadre"
-                  hash={`squadra-${t.id}`}
-                  className="scd-focus inline-flex min-h-11 items-center gap-2 rounded-full border border-white/20 bg-white/[0.07] px-4 text-[15px] font-semibold hover:border-[var(--out-yellow)]"
-                >
-                  <span aria-hidden="true" className="size-2.5 rounded-full" style={{ background: t.color }} />
-                  {t.label.replace(/\s·\s/g, " ")}
-                  {t.championship && <span className="text-[13px] font-medium text-[var(--out-text-soft)]">· {t.championship.name.replace(" Lombardia", "")}</span>}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
+        <p className="mt-8 flex flex-wrap items-center gap-x-3 gap-y-1 text-[15px] text-[var(--out-text-soft)]" data-testid="societa-teams-inside">
+          <Lock className="size-4 shrink-0" aria-hidden="true" />
+          <span>Le squadre sono nell'area soci</span>
+          <Link to="/accedi" search={{ next: "/squadre" }} className="scd-focus inline-flex min-h-11 items-center gap-1 rounded-sm font-bold text-[var(--out-yellow)] underline-offset-4 hover:underline">
+            Entra <ArrowRight className="size-4" aria-hidden="true" />
+          </Link>
+        </p>
 
         <section aria-labelledby="documenti-t" className="mt-12" data-testid="club-documents">
           <h2 id="documenti-t" className="m-0 font-title text-[26px] font-black uppercase leading-none">
