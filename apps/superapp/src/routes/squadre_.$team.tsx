@@ -6,6 +6,7 @@ import {
   ExternalLink,
   Share2,
   ShieldCheck,
+  Users,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
@@ -20,6 +21,16 @@ import { ClubCrestOfficial } from "@/components/SiteChrome";
 import { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 import { CLUB_EVENTS } from "@/lib/club-events";
 import { calendarToWeekItems, romeParts } from "@/lib/home-week";
+import { InitialsAvatar } from "@/components/scd/Avatar";
+import {
+  ROSTER_PUBLIC_TEAMS,
+  roleLabel,
+  rosterCountLabel,
+  rosterSections,
+  type RosterPlayer,
+} from "@/lib/public-roster";
+import { getPublicRoster } from "@/lib/public-roster.functions";
+import { teamCrest } from "@/lib/team-crest";
 import { resultLinkFor, VERIFIED_CHAMPIONSHIPS } from "@/lib/official-links";
 import {
   channelsFrom,
@@ -37,17 +48,19 @@ import { itemState, orderTeams } from "@/lib/universe";
 
 /**
  * Pagina squadra (UD-089, foglio 3): testata con il colore ufficiale dell'annata, "Segui", prossima gara, le gare
- * che vengono, i post approvati della squadra. Stessa grafica per la Prima Squadra e per i più piccoli. Rosa e foto
- * dei ragazzi non sono qui: restano nell'area riservata a staff e famiglie.
+ * che vengono, la rosa (r94: nomi per le squadre agonistiche con la regola dell'età, solo il numero per l'attività
+ * di base), i post approvati della squadra. Stessa grafica per la Prima Squadra e per i più piccoli. Niente foto
+ * dei ragazzi: avatar con le iniziali nel colore della squadra.
  */
 export const Route = createFileRoute("/squadre_/$team")({
   loader: async ({ params }) => {
     const id = params.team.toLowerCase();
     if (!/^[a-z0-9_-]{1,40}$/.test(id)) throw notFound();
-    const [calendar, social, posts] = await Promise.all([
+    const [calendar, social, posts, roster] = await Promise.all([
       getPublicCalendarSnapshot(),
       getPublicSocial(),
       getChannelFeed({ data: { channel: teamChannel(id) } }),
+      getPublicRoster({ data: { team: id } }),
     ]);
     const group = calendar.groups.find((g) => g.id === id);
     if (!group) throw notFound();
@@ -62,6 +75,7 @@ export const Route = createFileRoute("/squadre_/$team")({
       events: calendar.events.filter((e) => e.group === id),
       social,
       posts,
+      roster,
       serverNow,
       today,
     };
@@ -99,6 +113,7 @@ function TeamPage() {
     events,
     social,
     posts: initialPosts,
+    roster,
     serverNow,
     today,
   } = Route.useLoaderData();
@@ -145,6 +160,7 @@ function TeamPage() {
   const c = VERIFIED_CHAMPIONSHIPS[id];
   const champ = c ? `${c.name} ${c.group}`.trim() : null;
   const results = resultLinkFor(id);
+  const crest = teamCrest(group);
 
   const toggle = async () => {
     if (!social.signedIn) {
@@ -218,24 +234,31 @@ function TeamPage() {
         >
           <ChevronLeft className="size-6" aria-hidden="true" />
         </Link>
-        <div
+        <span
           aria-hidden="true"
-          className="absolute inset-x-0 bottom-0 flex h-2"
-        >
-          <span className="flex-1" style={{ background: team.color }} />
-          <span className="flex-1 bg-[var(--uv-gold)]" />
-          <span className="flex-1 bg-[#1e90e0]" />
-        </div>
+          className="absolute inset-x-0 bottom-0 h-1.5"
+          style={{ background: team.color }}
+        />
       </div>
       <div className="border-b border-[#dce5f0] bg-white px-4 pb-4">
         <div className="relative -mt-11 flex items-end gap-3.5">
-          <span
-            aria-hidden="true"
-            className="grid size-[88px] place-items-center rounded-[24px] border-4 border-white font-uv text-[34px] text-white shadow-[0_6px_16px_rgb(11_42_91/0.2)]"
-            style={{ background: team.color }}
-          >
-            {team.code}
-          </span>
+          {crest ? (
+            <img
+              src={crest}
+              alt=""
+              width={88}
+              height={88}
+              className="size-[88px] rounded-full border-4 border-white bg-white object-contain shadow-[0_6px_16px_rgb(11_42_91/0.2)]"
+            />
+          ) : (
+            <span
+              aria-hidden="true"
+              className="grid size-[88px] place-items-center rounded-[24px] border-4 border-white font-uv text-[34px] text-white shadow-[0_6px_16px_rgb(11_42_91/0.2)]"
+              style={{ background: team.color }}
+            >
+              {team.code}
+            </span>
+          )}
           <ClubCrestOfficial size={44} className="mb-1.5" />
         </div>
         <h1 className="mb-0 mt-3 font-uv text-[32px] leading-none">
@@ -272,7 +295,15 @@ function TeamPage() {
         </div>
       </div>
 
-      <div className="mx-auto grid max-w-[720px] gap-3.5 px-3 pt-3.5">
+      <div className="mx-auto grid max-w-[720px] grid-cols-1 gap-3.5 px-3 pt-3.5">
+        <RosterSection
+          teamId={id}
+          color={team.color}
+          base={base}
+          count={roster.count}
+          players={roster.players}
+          signedIn={social.signedIn}
+        />
         <section className="rounded-[20px] bg-white p-3.5 shadow-[0_2px_10px_rgb(11_42_91/0.08)]">
           <h2 className="mb-2.5 mt-0 text-[13px] font-bold tracking-[0.04em] text-[#1e7fd8]">
             PROSSIMA GARA
@@ -365,12 +396,97 @@ function TeamPage() {
             className="size-[18px] shrink-0 text-[#1e7fd8]"
             aria-hidden="true"
           />
-          Rosa e foto dei ragazzi sono visibili solo a staff e famiglie della
-          squadra, nell'area riservata.
+          {base
+            ? "Attività di base: i nomi e le foto dei bambini restano nell'area riservata a staff e famiglie."
+            : "Rosa dalle liste ufficiali della stagione. Dei minorenni compare solo il nome con l'iniziale del cognome; niente foto dei ragazzi."}
         </p>
       </div>
       <SkyCameo message={sky} onClose={() => setSky(null)} />
     </main>
+  );
+}
+
+function RosterSection({
+  teamId,
+  color,
+  base,
+  count,
+  players,
+  signedIn,
+}: {
+  teamId: string;
+  color: string;
+  base: boolean;
+  count: number;
+  players: readonly RosterPlayer[];
+  signedIn: boolean;
+}) {
+  const named = ROSTER_PUBLIC_TEAMS.has(teamId) && !base;
+  const sections = named ? rosterSections(players) : [];
+  const minors = players.some((p) => !p.adult);
+  return (
+    <section
+      className="rounded-[20px] bg-white p-3.5 shadow-[0_2px_10px_rgb(11_42_91/0.08)]"
+      aria-labelledby="rosa-title"
+      data-testid="team-roster"
+    >
+      <div className="mb-2.5 flex items-center justify-between gap-2">
+        <h2
+          id="rosa-title"
+          className="m-0 text-[13px] font-bold tracking-[0.04em] text-[#1e7fd8]"
+        >
+          ROSA
+        </h2>
+        <span className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#3e5272]">
+          <Users className="size-4" aria-hidden="true" />
+          {rosterCountLabel(count, base)}
+        </span>
+      </div>
+      {named && sections.length > 0 ? (
+        <div className="grid gap-3">
+          {sections.map((s) => (
+            <div key={s.role ?? "none"}>
+              {s.label && (
+                <h3 className="mb-1.5 mt-0 text-[12px] font-bold uppercase tracking-[0.06em] text-[#5a6b85]">
+                  {s.label}
+                </h3>
+              )}
+              <ul className="m-0 grid list-none grid-cols-2 gap-x-3 gap-y-2 p-0 sm:grid-cols-3">
+                {s.players.map((p) => (
+                  <li key={p.id} className="flex min-w-0 items-center gap-2.5">
+                    <InitialsAvatar name={p.name} color={color} size={36} />
+                    <span className="min-w-0">
+                      <span className="block truncate text-[15px] font-semibold leading-tight">
+                        {p.name}
+                      </span>
+                      {p.role && !s.label && (
+                        <span className="block text-[12px] text-[#5a6b85]">
+                          {roleLabel(p.role)}
+                        </span>
+                      )}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+          {minors && !signedIn && (
+            <p className="m-0 text-[13px] leading-[1.4] text-[#5a6b85]">
+              Dei minorenni compare l'iniziale del cognome. I tesserati SCD
+              vedono i nomi completi dopo l'accesso.
+            </p>
+          )}
+        </div>
+      ) : (
+        <p className="m-0 text-[15px] leading-[1.45] text-[#3e5272]">
+          {base
+            ? count > 0
+              ? "Nell'attività di base i bambini giocano per imparare: niente nomi in pubblico."
+              : "Gli iscritti arrivano dal gestionale della stagione."
+            : "La rosa arriva dalle liste ufficiali della stagione, appena disponibile."}
+        </p>
+      )}
+    </section>
   );
 }
 
