@@ -44,7 +44,7 @@ export const SPONSOR_ART: Readonly<Record<string, LogoArt>> = {
 
 /** Official affiliation marks (FIGC SGS 3° livello, LND, Insieme al Monza), trimmed cut-outs. */
 export const AFFILIATION_ART: ReadonlyArray<LogoArt & { id: string; label: string }> = [
-  { id: "figc-sgs-3-livello", label: "FIGC Settore Giovanile e Scolastico, Club 3° livello", src: "/media/affiliazioni/cut/figc-sgs-3-livello.webp", w: 764, h: 306 },
-  { id: "lnd", label: "FIGC Lega Nazionale Dilettanti", src: "/media/affiliazioni/cut/lnd.webp", w: 196, h: 220 },
-  { id: "insieme-al-monza", label: "Insieme al Monza, progetto Academy AC Monza", src: "/media/affiliazioni/cut/insieme-al-monza.webp", w: 765, h: 342 },
+  { id: "figc-sgs-3-livello", label: "FIGC Settore Giovanile e Scolastico, Club Giovanile di 3° livello", src: "/media/affiliazioni/cut/figc-sgs-3-livello.webp", w: 764, h: 306 },
+  { id: "lnd", label: "FIGC Lega Nazionale Dilettanti, Comitato Regionale Lombardia", src: "/media/affiliazioni/cut/lnd.webp", w: 196, h: 220 },
+  { id: "insieme-al-monza", label: "Insieme al Monza, programma di affiliazione AC Monza", src: "/media/affiliazioni/cut/insieme-al-monza.webp", w: 765, h: 342 },
 ];

@@ -31,7 +31,8 @@ import { SPONSORS } from "@/lib/sponsors";
 import { useSession } from "@/lib/use-session";
 import { openCookiePrefs } from "./CookieConsent";
 import { AccessMenu, loginSearch, openAccessMenu } from "./scd/AccessMenu";
-import { AffiliationMarks, LogoTile, SponsorLogo } from "./scd/Logos";
+import { CREDENTIALS_SENTENCE } from "@/lib/club-credentials";
+import { ClubCredentials, LogoTile, SponsorLogo } from "./scd/Logos";
 
 /** Nome ufficiale della società (sigla S.C.D., non invertire le lettere). */
 export const CLUB_NAME = "S.C.D. ColicoDerviese";
@@ -215,14 +216,14 @@ export function SiteHeader() {
             </Link>
           ))}
         </nav>
-        {/* Affiliazioni ufficiali in testata da 1280 px in su (Direzione 13/10/2026 15:31): piccola placca bianca.
+        {/* Riconoscimenti e affiliazioni in testata da 1400 px in su (Direzione 13/10/2026 15:31): piccola placca bianca.
             Non sulla home, che le mostra già più grandi nella fascia sotto la striscia rapida. */}
         {pathname !== "/" && (
-          <div className="ml-auto hidden h-[46px] shrink-0 items-center rounded-[10px] bg-white px-3 xl:flex" aria-label="Affiliazioni ufficiali" role="group">
-            <AffiliationMarks box={{ w: 62, h: 30 }} gapClass="gap-2.5" />
+          <div className="ml-auto hidden h-[48px] shrink-0 items-center rounded-[10px] bg-white px-1 shadow-[inset_0_-2px_0_#d4ab55] min-[1400px]:flex" aria-label="Riconoscimenti e affiliazioni del club" role="group">
+            <ClubCredentials variant="plaque" />
           </div>
         )}
-        <div className={`ml-auto flex shrink-0 items-center gap-2 lg:gap-3 ${pathname !== "/" ? "xl:ml-0" : ""}`}>
+        <div className={`ml-auto flex shrink-0 items-center gap-2 lg:gap-3 ${pathname !== "/" ? "min-[1400px]:ml-0" : ""}`}>
           <AccessMenu />
           <button
             className="scd-focus flex size-11 shrink-0 items-center justify-center rounded-[10px] border border-white/25 text-white transition-colors duration-150 hover:bg-white/10"
@@ -719,13 +720,13 @@ export function SiteFooter() {
 
             <div className="grid content-start gap-2.5 md:col-span-2 lg:col-span-1">
               <h2 className="m-0 text-[12px] font-bold uppercase tracking-[0.12em] text-[#ffd600]">
-                Affiliazioni
+                Riconoscimenti e affiliazioni
               </h2>
-              <div className="rounded-[14px] bg-white px-3 py-3">
-                <AffiliationMarks box={{ w: 96, h: 46 }} gapClass="gap-3" className="justify-around" />
+              <div className="rounded-[14px] bg-white px-3.5 py-3">
+                <ClubCredentials variant="list" />
               </div>
               <p className="m-0 text-[13px] leading-snug text-white/75">
-                Club FIGC SGS di 3° livello, iscritto LND, affiliato AC Monza.
+                {CREDENTIALS_SENTENCE}
               </p>
             </div>
           </div>

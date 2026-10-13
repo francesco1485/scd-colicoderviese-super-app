@@ -1,4 +1,5 @@
 import { PersonaAvatar, type Persona } from "@/components/scd/SkyJolly";
+import { ClubCredentials } from "@/components/scd/Logos";
 import { Link } from "@tanstack/react-router";
 import { useEffect, useId, useState } from "react";
 
@@ -469,34 +470,12 @@ export function Affiliations({
 }: { tone?: "dark" | "light" } = {}) {
   return (
     <section
-      aria-label="Affiliazioni"
+      aria-label="Riconoscimenti e affiliazioni del club"
       className={tone === "light" ? "" : "mt-6"}
     >
-      <div className="flex items-center justify-around gap-3 rounded-[18px] bg-white p-[14px] shadow-[0_6px_20px_-10px_rgb(6_42_99/0.35)]">
-        <img
-          src="/media/affiliazioni/figc-sgs-3-livello.webp"
-          alt="FIGC Settore Giovanile e Scolastico, Club 3° livello"
-          className="h-[54px] w-auto max-w-[31%] object-contain"
-          loading="lazy"
-        />
-        <img
-          src="/media/affiliazioni/insieme-al-monza.webp"
-          alt="Insieme al Monza, AC Monza"
-          className="h-[54px] w-auto max-w-[31%] object-contain"
-          loading="lazy"
-        />
-        <img
-          src="/media/affiliazioni/lnd.webp"
-          alt="FIGC Lega Nazionale Dilettanti"
-          className="h-[54px] w-auto max-w-[31%] object-contain"
-          loading="lazy"
-        />
+      <div className="rounded-[18px] bg-white px-1 py-3 shadow-[0_6px_20px_-10px_rgb(6_42_99/0.35)]">
+        <ClubCredentials variant="bar" />
       </div>
-      <span
-        className={`mt-2 block text-center text-[13px] font-bold ${tone === "light" ? "text-[#3a4d6b]" : "text-[#cfe0ff]"}`}
-      >
-        Club FIGC SGS di 3° livello, affiliato AC Monza, iscritto LND
-      </span>
     </section>
   );
 }

@@ -504,8 +504,8 @@ export function ClubFacts({
           ))}
         </dl>
         <p className="m-0 mt-3.5 border-t border-[#e6edf6] pt-3 text-[13px] leading-snug text-[#5a6b85]">
-          Matricola FIGC {matricola} · {affiliation} · Club FIGC SGS di 3°
-          livello, iscritto LND
+          Matricola FIGC {matricola} · Club Giovanile di 3° livello FIGC SGS ·
+          iscritta FIGC con LND Lombardia · {affiliation}
         </p>
       </Card>
     </section>
