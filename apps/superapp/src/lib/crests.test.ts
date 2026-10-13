@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import {
   CREST_REGISTRY,
   crestEntryFor,
+  crestEntryForFixture,
   crestFor,
   normalizeOpponentName,
   opponentFromTitle,
@@ -96,6 +97,36 @@ describe("crestFor", () => {
   it("resolves every alias of the registry", () => {
     for (const e of CREST_REGISTRY)
       for (const a of e.aliases) expect(crestEntryFor(a)?.slug, a).toBe(e.slug);
+  });
+});
+
+describe("second catalogue batch (2026-10-13)", () => {
+  it("resolves new aliases to their real crest files", () => {
+    expect(crestFor("PONTELAMBRESE A.S.D.").src).toBe("/media/crests/pontelambrese.webp");
+    expect(crestFor("DI.PO A.S.D.").src).toBe("/media/crests/di-po.webp");
+    expect(crestFor("VALMADRERA C.G. POL.").src).toBe("/media/crests/valmadrera-cg.webp");
+    expect(crestFor("LESMO SSD ARL").src).toBe("/media/crests/lesmo.webp");
+    expect(crestFor("PENTA PIATEDA").src).toBe("/media/crests/penta-piateda.webp");
+  });
+  it("keeps MISSING clubs on the neutral shield", () => {
+    const v = crestEntryFor("VERCURAGO SQ.B");
+    expect(v?.status).toBe("MISSING");
+    expect(crestFor("VERCURAGO SQ.B").src).toBeNull();
+  });
+  it("ties every crest to the official fixtures it appears in", () => {
+    const raw = JSON.parse(
+      readFileSync(resolve(ROOT, "src/data/calendario-snapshot-20261010.json"), "utf8"),
+    ) as { events: { id: string; opponent?: string }[] };
+    const clubFixtures = raw.events.filter((e) => e.opponent && !/MEMORIAL/i.test(e.opponent));
+    for (const ev of clubFixtures) {
+      expect(crestEntryForFixture(ev.id)?.slug, ev.id).toBe(crestEntryFor(ev.opponent!)?.slug);
+    }
+    expect(crestEntryForFixture("EVT-PRIMA-12A-BIASSONO-CASA")?.file).toBe("/media/crests/biassono.webp");
+  });
+  it("records tuttocampo references only on tuttocampo.it", () => {
+    for (const e of CREST_REGISTRY)
+      if (e.tuttocampoUrl) expect(e.tuttocampoUrl, e.slug).toMatch(/^https:\/\/(www\.)?tuttocampo\.it\//);
+    expect(CREST_REGISTRY.filter((e) => e.tuttocampoUrl).length).toBeGreaterThan(50);
   });
 });
 

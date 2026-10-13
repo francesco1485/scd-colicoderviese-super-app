@@ -10,8 +10,12 @@ import registryRaw from "../../../../config/scd-opponent-crests.v1.json";
 // here so consumers import everything from one path. crests.tsx only uses crestFor at render time.
 export { OpponentCrest } from "./crests.tsx";
 
+/** MISSING = no real file yet (neutral shield). The two legacy values are still accepted when reading. */
 export type CrestStatus =
-  "VERIFIED_FILE" | "SOURCE_FOUND_DOWNLOAD_BLOCKED" | "NOT_FOUND";
+  | "VERIFIED_FILE"
+  | "MISSING"
+  | "SOURCE_FOUND_DOWNLOAD_BLOCKED"
+  | "NOT_FOUND";
 
 export type CrestEntry = {
   slug: string;
@@ -19,9 +23,15 @@ export type CrestEntry = {
   aliases: string[];
   status: CrestStatus;
   sourceUrl: string | null;
+  /** Provenance: "SCD Drive: <path> (fileId)" or the official page URL. */
+  source: string | null;
+  /** Reference team page on tuttocampo.it (the Direzione's catalogue), when found. */
+  tuttocampoUrl: string | null;
   verifiedAt: string | null;
   licenceNote: string;
   file: string | null;
+  /** Official calendar fixture ids where this opponent appears. */
+  fixtures: string[];
 };
 
 export type CrestInfo = {
@@ -36,6 +46,7 @@ export type CrestInfo = {
 const str = (v: unknown) => (typeof v === "string" ? v : "");
 const STATUSES = new Set<CrestStatus>([
   "VERIFIED_FILE",
+  "MISSING",
   "SOURCE_FOUND_DOWNLOAD_BLOCKED",
   "NOT_FOUND",
 ]);
@@ -58,6 +69,10 @@ export const CREST_REGISTRY: readonly CrestEntry[] = (
         : [],
       status,
       sourceUrl: str(r["sourceUrl"]) || null,
+      source: str(r["source"]) || null,
+      tuttocampoUrl: /^https:\/\/(www\.)?tuttocampo\.it\//.test(str(r["tuttocampoUrl"]))
+        ? str(r["tuttocampoUrl"])
+        : null,
       verifiedAt: str(r["verifiedAt"]) || null,
       licenceNote: str(r["licenceNote"]),
       file:
@@ -65,6 +80,9 @@ export const CREST_REGISTRY: readonly CrestEntry[] = (
         /^\/media\/crests\/[a-z0-9-]+\.webp$/.test(file)
           ? file
           : null,
+      fixtures: Array.isArray(r["fixtures"])
+        ? r["fixtures"].filter((f): f is string => typeof f === "string")
+        : [],
     };
   })
   .filter((e): e is CrestEntry => e !== null);
@@ -102,6 +120,14 @@ const BY_SLUG = new Map<string, CrestEntry>();
 for (const e of CREST_REGISTRY) {
   BY_SLUG.set(e.slug, e);
   for (const a of e.aliases) BY_ALIAS.set(normalizeOpponentName(a), e);
+}
+
+const BY_FIXTURE = new Map<string, CrestEntry>();
+for (const e of CREST_REGISTRY) for (const f of e.fixtures) BY_FIXTURE.set(f, e);
+
+/** Registry entry tied to an official calendar fixture id (permanent link crest ↔ fixture). */
+export function crestEntryForFixture(fixtureId: string): CrestEntry | null {
+  return BY_FIXTURE.get(fixtureId) ?? null;
 }
 
 /** Registry entry for a calendar opponent string, by alias first, then by slug. */
