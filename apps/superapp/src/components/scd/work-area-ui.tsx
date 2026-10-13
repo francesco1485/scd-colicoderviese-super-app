@@ -59,10 +59,13 @@ export function WorkAreaShell({
   highlights,
   note,
   editable = false,
+  path,
   children,
 }: {
   id: WorkAreaId;
   title?: string;
+  /** Direct path of a page that shares the area's access but lives at its own URL (e.g. /tesoreria/prima-nota). */
+  path?: string;
   preview: boolean;
   highlights?: readonly StripItem[];
   /** True when the page writes to the club database itself: no "Sola lettura" chip, no Inserisci-to-sheet action. */
@@ -75,7 +78,7 @@ export function WorkAreaShell({
   return (
     <InteriorShell
       title={title ?? a.label}
-      path={a.path}
+      path={path ?? a.path}
       activeAreaId={a.railId}
       roles={PREVIEW_RAIL_ROLES}
       roleLabel={preview ? "Anteprima staging" : "Area di lavoro"}
@@ -90,7 +93,7 @@ export function WorkAreaShell({
             {note && <span className="min-w-0">{note}</span>}
           </p>
           <span className="flex flex-wrap items-center gap-2">
-            <ShareLink path={a.path} />
+            <ShareLink path={path ?? a.path} />
             {!editable && <InsertAction id={id} />}
           </span>
         </div>

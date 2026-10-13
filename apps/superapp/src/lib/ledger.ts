@@ -50,6 +50,10 @@ export interface LedgerEntry {
   linkLabel: string | null;
   verifiedAt: string | null;
   note: string | null;
+  /** scd_ledger_entries.account, when the board sends it (prima nota: SumUp, bank, cash). */
+  account?: string | null;
+  /** Link to the supporting document (receipt, invoice), when the board sends it. */
+  documentUrl?: string | null;
 }
 
 export interface LedgerSummary {
@@ -113,6 +117,8 @@ export function parseEntry(v: unknown): LedgerEntry | null {
     linkLabel: str(r["linkLabel"]),
     verifiedAt: str(r["verifiedAt"]),
     note: str(r["note"]),
+    account: str(r["account"]),
+    documentUrl: str(r["documentUrl"]),
   };
 }
 
