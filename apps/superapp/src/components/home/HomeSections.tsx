@@ -17,7 +17,7 @@ import { itemState, type Team } from "@/lib/universe";
 
 import { sides } from "./match-sides";
 import { OpponentCrest } from "@/lib/crests";
-import { teamCrestSrc } from "./team-crest";
+import { publicTeamCrest } from "@/lib/team-crest";
 
 const LARIO = "/media/scd/lario-header.webp";
 
@@ -180,15 +180,11 @@ function venueShort(v: string): string {
 export function WeekGames({
   items,
   teamOf,
-  teamById,
   highlightId,
   nowMs,
 }: {
   items: readonly WeekItem[];
   teamOf: (i: WeekItem) => Team | undefined;
-  teamById: (
-    id: string,
-  ) => { id: string; label: string; logo: string | null } | undefined;
   highlightId: string | null;
   nowMs: number;
 }) {
@@ -217,7 +213,6 @@ export function WeekGames({
                       key={i.id}
                       item={i}
                       team={teamOf(i)}
-                      crest={teamCrestSrc(teamById(i.group))}
                       highlight={i.id === highlightId}
                       live={itemState(i, nowMs) === "live"}
                     />
@@ -231,16 +226,15 @@ export function WeekGames({
   );
 }
 
+/** One game of the week. Our side: official club crest + "ColicoDerviese · <team>" (annata crests stay internal). */
 function GameRow({
   item,
   team,
-  crest,
   highlight,
   live,
 }: {
   item: WeekItem;
   team: Team | undefined;
-  crest: string | null;
   highlight: boolean;
   live: boolean;
 }) {
@@ -249,7 +243,7 @@ function GameRow({
     ? venueCase(rawOpponent)
     : "Avversario da definire";
   const us = team?.short ?? item.groupLabel.split("·")[0]!.trim();
-  const label = `SCD ${us}`;
+  const label = `ColicoDerviese · ${us}`;
   const home = item.homeAway === "CASA";
   const meta: ReactNode[] = [];
   if (live)
@@ -295,18 +289,16 @@ function GameRow({
           {item.time || "—"}
         </span>
         <span className="flex shrink-0 items-center gap-1">
-          {crest ? (
+          <span className="grid size-[30px] place-items-center">
             <img
-              src={crest}
+              src={publicTeamCrest()}
               alt=""
-              width={30}
+              width={23}
               height={30}
               loading="lazy"
-              className="size-[30px] object-contain"
+              className="h-[30px] w-auto object-contain"
             />
-          ) : (
-            <span className="inline-block size-[30px] rounded-full bg-[#e6edf6]" />
-          )}
+          </span>
           <OpponentCrest name={rawOpponent} size={30} />
         </span>
         <span className="min-w-0 flex-1">
@@ -455,6 +447,10 @@ export function ClubFacts({
 
 /* ---------------------------------------------------------------- teams */
 
+/**
+ * Our teams as clean text tiles. The club crest appears once in the card header: annata crests are internal only
+ * (Direzione, 13/10/2026) and nine copies of the same club crest would only repeat themselves.
+ */
 export function TeamsGrid({ teams }: { teams: readonly HallTeam[] }) {
   return (
     <section aria-labelledby="squadre-t" data-testid="teams-grid">
@@ -462,9 +458,24 @@ export function TeamsGrid({ teams }: { teams: readonly HallTeam[] }) {
         Le nostre squadre
       </SectionTitle>
       <Card className="p-2">
-        <ul className="m-0 grid list-none grid-cols-3 gap-1 p-0 sm:grid-cols-5">
+        <p className="m-0 flex items-center gap-2.5 px-2 pb-2.5 pt-1.5">
+          <img
+            src={publicTeamCrest()}
+            alt="Stemma ufficiale S.C.D. ColicoDerviese"
+            width={26}
+            height={34}
+            loading="lazy"
+            className="h-[34px] w-auto object-contain"
+          />
+          <span className="grid leading-tight">
+            <b className="text-[15px] text-[#0b1e3a]">ColicoDerviese</b>
+            <span className="text-[12.5px] text-[#5a6b85]">
+              {teams.length} squadre tra Colico e Dervio
+            </span>
+          </span>
+        </p>
+        <ul className="m-0 grid list-none grid-cols-2 gap-1.5 p-0 sm:grid-cols-3 lg:grid-cols-5">
           {teams.map((t) => {
-            const crest = teamCrestSrc(t);
             const title = t.label.split("·")[0]!.trim();
             const sub = t.label.includes("·")
               ? t.label.split("·").slice(1).join("·").trim()
@@ -474,27 +485,16 @@ export function TeamsGrid({ teams }: { teams: readonly HallTeam[] }) {
                 <Link
                   to="/squadre/$team"
                   params={{ team: t.id }}
-                  className="scd-focus flex min-h-[112px] flex-col items-center justify-start gap-1.5 rounded-[12px] px-1 pb-2 pt-2.5 text-center hover:bg-[#f4f7fb]"
+                  aria-label={`ColicoDerviese · ${t.label.replace(/\s·\s/g, " ")}`}
+                  className="scd-focus flex h-full min-h-[64px] items-stretch gap-2.5 rounded-[12px] bg-[#f4f7fb] px-2.5 py-2 hover:bg-[#e9f0f8]"
                 >
-                  {crest ? (
-                    <img
-                      src={crest}
-                      alt=""
-                      width={56}
-                      height={56}
-                      loading="lazy"
-                      className="size-14 object-contain"
-                    />
-                  ) : (
-                    <span
-                      aria-hidden="true"
-                      className="grid size-14 place-items-center rounded-full bg-[#e6edf6] text-[14px] font-bold text-[#3e5272]"
-                    >
-                      {title.slice(0, 2).toUpperCase()}
-                    </span>
-                  )}
-                  <span className="grid gap-0.5">
-                    <b className="text-[13.5px] leading-tight text-[#0b1e3a]">
+                  <span
+                    aria-hidden="true"
+                    className="w-[4px] shrink-0 rounded-full"
+                    style={{ background: t.color }}
+                  />
+                  <span className="grid min-w-0 content-center gap-0.5">
+                    <b className="text-[14px] leading-tight text-[#0b1e3a]">
                       {title}
                     </b>
                     {sub && (

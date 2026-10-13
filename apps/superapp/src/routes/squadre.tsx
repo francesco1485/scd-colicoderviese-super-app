@@ -1,16 +1,23 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ExternalLink } from "lucide-react";
 
-import { ClubCrestOfficial } from "@/components/SiteChrome";
 import { HallDoors, HallHero } from "@/components/scd/hall";
 import { OfficialResults } from "@/components/scd/OfficialResults";
+import { dateParts, venueCase } from "@/lib/board-data";
 import { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 import { CLUB_PROFILE, hallTeams, type HallTeam } from "@/lib/club-profile";
+import { romeParts } from "@/lib/home-week";
+import type { PublicEvent } from "@/lib/public-snapshots";
 import { BASE_ACTIVITY_TEAMS } from "@/lib/social";
-import { teamCrest } from "@/lib/team-crest";
+import { publicTeamCrest } from "@/lib/team-crest";
 
 export const Route = createFileRoute("/squadre")({
-  loader: () => getPublicCalendarSnapshot(),
+  loader: async () => {
+    const calendar = await getPublicCalendarSnapshot();
+    const now = new Date().toISOString();
+    // "Today" in Europe/Rome, fixed by the server so SSR and hydration agree on the next match.
+    const today = romeParts(now)?.date ?? now.slice(0, 10);
+    return { groups: calendar.groups, events: calendar.events, today };
+  },
   head: () => ({
     meta: [
       { title: "Le squadre 2026/27 — S.C.D. ColicoDerviese" },
@@ -33,8 +40,21 @@ export const Route = createFileRoute("/squadre")({
   component: SquadrePage,
 });
 
+/** First match of the team from today on (calendar snapshot, already sorted by date and time). */
+function nextMatchOf(
+  events: readonly PublicEvent[],
+  team: string,
+  today: string,
+): PublicEvent | null {
+  return events.find((e) => e.group === team && e.date >= today) ?? null;
+}
+
+/**
+ * Public teams page. Direzione rule (13/10/2026): annata crests stay internal, so the official club crest appears
+ * once in the header and every team is a clean text tile (category, birth years, next match).
+ */
 function SquadrePage() {
-  const { groups } = Route.useLoaderData();
+  const { groups, events, today } = Route.useLoaderData();
   const teams = hallTeams(groups);
   return (
     <main
@@ -42,8 +62,19 @@ function SquadrePage() {
       className="scd-pub min-h-screen bg-[#eef3f9] pb-24 font-text text-[#0b1e3a] lg:pb-12"
     >
       <HallHero
-        kicker={`Stagione ${CLUB_PROFILE.season}`}
-        title="Le nostre squadre"
+        kicker={`ColicoDerviese · Stagione ${CLUB_PROFILE.season}`}
+        title={
+          <span className="flex items-center gap-3 sm:gap-4">
+            <img
+              src={publicTeamCrest()}
+              alt="Stemma ufficiale S.C.D. ColicoDerviese"
+              width={55}
+              height={72}
+              className="h-[60px] w-auto shrink-0 object-contain drop-shadow-[0_2px_6px_rgb(0_0_0/0.35)] sm:h-[78px]"
+            />
+            <span>Le nostre squadre</span>
+          </span>
+        }
       >
         {teams.length} squadre tra Colico e Dervio, dalla Prima Squadra ai più
         piccoli. Tocca una squadra per rosa, gare e notizie.
@@ -54,7 +85,11 @@ function SquadrePage() {
           data-testid="team-list"
         >
           {teams.map((t) => (
-            <TeamTile key={t.id} t={t} />
+            <TeamTile
+              key={t.id}
+              t={t}
+              next={nextMatchOf(events, t.id, today)}
+            />
           ))}
         </ul>
         <p className="m-0 mt-3 text-[13px] leading-snug text-[#5a6b85]">
@@ -73,55 +108,82 @@ function SquadrePage() {
   );
 }
 
-function TeamTile({ t }: { t: HallTeam }) {
-  const crest = teamCrest(t);
+function TeamTile({ t, next }: { t: HallTeam; next: PublicEvent | null }) {
   const base = BASE_ACTIVITY_TEAMS.has(t.id);
+  const name = t.label.replace(/\s·\s/g, " ");
   const line = t.championship
     ? `${t.championship.name} · ${t.championship.group}`
     : base
       ? "Attività di base"
       : "Settore giovanile";
-  const games =
-    t.matches > 0
-      ? `${t.matches} ${t.matches === 1 ? "gara" : "gare"}`
-      : "Calendario in arrivo";
+  const years = t.years.length
+    ? `${t.years.length === 1 ? "Annata" : "Annate"} ${t.years.join("–")}`
+    : null;
+  const d = next ? dateParts(next.date) : null;
+  const when =
+    next && d
+      ? `${d.weekday} ${d.day} ${d.month}${next.time ? ` · ${next.time}` : ""}`
+      : null;
+  const where =
+    next?.homeAway === "CASA"
+      ? "Casa"
+      : next?.homeAway === "FUORI"
+        ? "Fuori"
+        : null;
+  const opponent = next
+    ? venueCase(next.opponent || "Avversario da definire")
+    : null;
+  const summary = next
+    ? `prossima gara ${when}${opponent ? ` contro ${opponent}` : ""}`
+    : t.matches > 0
+      ? "nessuna altra gara in calendario"
+      : "calendario in arrivo";
   return (
     <li id={`squadra-${t.id}`} className="scroll-mt-24" data-team={t.id}>
       <Link
         to="/squadre/$team"
         params={{ team: t.id }}
-        className="scd-focus flex h-full flex-col gap-2.5 rounded-[18px] bg-white p-3.5 text-[#0b1e3a] shadow-[0_2px_10px_rgb(11_42_91/0.08)] transition-shadow hover:shadow-[0_8px_22px_rgb(11_42_91/0.16)]"
-        aria-label={`${t.label.replace(/\s·\s/g, " ")}: ${line}, ${games}`}
+        className="scd-focus relative flex h-full flex-col overflow-hidden rounded-[18px] bg-white p-3.5 pl-4 text-[#0b1e3a] shadow-[0_2px_10px_rgb(11_42_91/0.08)] transition-shadow hover:shadow-[0_8px_22px_rgb(11_42_91/0.16)]"
+        aria-label={`ColicoDerviese · ${name}: ${line}${years ? `, ${years}` : ""}, ${summary}`}
       >
-        <span className="flex items-center justify-between gap-2">
-          {crest ? (
-            <img
-              src={crest}
-              alt=""
-              width={56}
-              height={56}
-              loading="lazy"
-              className="size-14 rounded-full bg-white object-contain"
-            />
-          ) : (
-            <ClubCrestOfficial size={56} />
-          )}
-          <span
-            aria-hidden="true"
-            className="size-3 rounded-full"
-            style={{ background: t.color }}
-          />
+        <span
+          aria-hidden="true"
+          className="absolute inset-y-0 left-0 w-[5px]"
+          style={{ background: t.color }}
+        />
+        <span className="block font-title text-[20px] font-black uppercase leading-[1] sm:text-[22px]">
+          {name}
         </span>
-        <span className="min-w-0">
-          <span className="block font-title text-[20px] font-black uppercase leading-[1] sm:text-[22px]">
-            {t.label.replace(/\s·\s/g, " ")}
-          </span>
-          <span className="mt-1.5 block text-[13px] font-semibold leading-snug text-[#3e5272]">
-            {line}
-          </span>
+        <span className="mt-1.5 block text-[13px] font-semibold leading-snug text-[#3e5272]">
+          {line}
+        </span>
+        {years && (
           <span className="mt-0.5 block text-[13px] text-[#5a6b85]">
-            {games}
+            {years}
           </span>
+        )}
+        <span aria-hidden="true" className="block min-h-2.5 flex-1" />
+        <span className="block border-t border-[#e6edf6] pt-2.5 text-[12.5px] leading-snug text-[#3e5272]">
+          {next ? (
+            <>
+              <span className="block text-[11px] font-bold uppercase tracking-[0.06em] text-[#5a6b85]">
+                Prossima gara
+              </span>
+              <span className="block font-semibold capitalize text-[#0b1e3a]">
+                {when}
+              </span>
+              <span className="line-clamp-2 block">
+                vs {opponent}
+                {where ? ` · ${where}` : ""}
+              </span>
+            </>
+          ) : (
+            <span className="block text-[#5a6b85]">
+              {t.matches > 0
+                ? "Nessuna altra gara in calendario"
+                : "Calendario in arrivo"}
+            </span>
+          )}
         </span>
       </Link>
     </li>

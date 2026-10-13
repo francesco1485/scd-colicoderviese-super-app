@@ -1,7 +1,13 @@
 /**
- * Official team crests of the RC1 package (public/media/scd). The master's logo file wins; otherwise the RC1
- * rule on the label (public-snapshots.logoKeysFor). No other crest is ever drawn: null means "use the club crest".
+ * SCD crests.
+ *
+ * Direzione rule (13/10/2026): the per-age-group crests ("annate": Prima Squadra, Juniores, U16, U15, U13/2014,
+ * U12/2015, Pulcini, Primi, Piccoli) are INTERNAL ONLY: they help staff recognise our age groups inside the
+ * reserved work areas (gestionale, mister, segreteria, direzione, famiglia, la-mia-scd, tesoreria, core). On every
+ * public page our side is shown with the official club crest and the name "ColicoDerviese" plus the team label as
+ * text. Guarded by src/lib/public-crest-policy.test.ts.
  */
+import clubCrest from "@/assets/brand/logo-scd.png.asset.json";
 import juniores from "@/assets/scd/SCD_JUNIORES_2008_2009.png.asset.json";
 import piccoli from "@/assets/scd/SCD_PICCOLI_2020_2021.png.asset.json";
 import prima from "@/assets/scd/SCD_PRIMA_SQUADRA.png.asset.json";
@@ -26,6 +32,19 @@ export const TEAM_LOGOS: Readonly<Record<string, string>> = {
   U16: u16.url,
 };
 
+/**
+ * Crest for one of our teams on a PUBLIC page: always the official club crest, whatever the team.
+ * Annata crests never leave the reserved areas (Direzione, 13/10/2026).
+ */
+export function publicTeamCrest(): string {
+  return clubCrest.url;
+}
+
+/**
+ * INTERNAL ONLY: annata crest of one of our teams, for the reserved work areas. Never call it from a public route
+ * (use publicTeamCrest()). The master's logo file wins; otherwise the RC1 rule on the label
+ * (public-snapshots.logoKeysFor). Null means "no annata crest: use the club crest".
+ */
 export function teamCrest(t: {
   logo: string | null;
   label: string;

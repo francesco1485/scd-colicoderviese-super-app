@@ -36,27 +36,8 @@ import {
 } from "@/lib/board-data";
 import { romeParts } from "@/lib/home-week";
 import { freshnessLabel, loadQuadro } from "@/lib/public-snapshots";
-import juniores from "@/assets/scd/SCD_JUNIORES_2008_2009.png.asset.json";
-import piccoli from "@/assets/scd/SCD_PICCOLI_2020_2021.png.asset.json";
-import prima from "@/assets/scd/SCD_PRIMA_SQUADRA.png.asset.json";
-import primi from "@/assets/scd/SCD_PRIMI_2018_2019.png.asset.json";
-import pulcini from "@/assets/scd/SCD_PULCINI_2016_2017.png.asset.json";
-import u12 from "@/assets/scd/SCD_U12_2015.png.asset.json";
-import u13 from "@/assets/scd/SCD_U13_2014.png.asset.json";
-import u15 from "@/assets/scd/SCD_U15_2012_2013.png.asset.json";
-import u16 from "@/assets/scd/SCD_U16_2011.png.asset.json";
 
-const LOGO_FILES: Record<string, string> = {
-  "SCD_JUNIORES_2008_2009.png": juniores.url,
-  "SCD_PICCOLI_2020_2021.png": piccoli.url,
-  "SCD_PRIMA_SQUADRA.png": prima.url,
-  "SCD_PRIMI_2018_2019.png": primi.url,
-  "SCD_PULCINI_2016_2017.png": pulcini.url,
-  "SCD_U12_2015.png": u12.url,
-  "SCD_U13_2014.png": u13.url,
-  "SCD_U15_2012_2013.png": u15.url,
-  "SCD_U16_2011.png": u16.url,
-};
+/* Public page: annata crests stay internal (Direzione, 13/10/2026); team rows use the master's team colour. */
 
 const TABS = ["club", "squadre", "social"] as const;
 type Tab = (typeof TABS)[number];
@@ -278,26 +259,18 @@ function Comunicazioni() {
                       search={{ annata: g.years[0] ?? g.id, vista: "prossime" }}
                       className="flex items-center gap-[12px] border-b border-[var(--scd-line)] py-[12px] last:border-0"
                     >
-                      {g.logo && LOGO_FILES[g.logo] ? (
-                        <img
-                          src={LOGO_FILES[g.logo]}
-                          alt=""
-                          className="size-[38px] shrink-0 rounded-full object-contain"
-                        />
-                      ) : (
-                        <span
-                          className="size-[38px] shrink-0 rounded-full"
-                          style={{ background: g.color }}
-                          aria-hidden="true"
-                        />
-                      )}
+                      <span
+                        className="w-[5px] shrink-0 self-stretch rounded-full"
+                        style={{ background: g.color }}
+                        aria-hidden="true"
+                      />
                       <span className="min-w-0 flex-1">
                         <span className="block text-[16px] font-bold leading-tight text-[var(--scd-ink)]">
                           {g.label}
                         </span>
                         <span className="mt-[2px] block text-[13.5px] text-[var(--scd-sub)]">
                           {next && d
-                            ? `Prossima: ${matchTitle(next, groupShort(g))} · ${d.weekday} ${d.day} ${d.month}${next.time ? ` ${next.time}` : ""}`
+                            ? `Prossima: ${matchTitle(next, `ColicoDerviese ${groupShort(g)}`)} · ${d.weekday} ${d.day} ${d.month}${next.time ? ` ${next.time}` : ""}`
                             : "Nessuna gara in programma"}
                         </span>
                       </span>

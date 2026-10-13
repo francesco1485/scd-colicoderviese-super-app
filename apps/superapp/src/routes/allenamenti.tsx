@@ -4,35 +4,14 @@ import { Search, X } from "lucide-react";
 
 import { useRomeNow } from "@/components/scd/interior-ui";
 import { SNAPSHOT_BANNER } from "@/lib/public-snapshots";
-import { EMPTY_MESSAGE, fieldMatches, findSessions, loadQuadro, logoKeysFor, type TrainingSlot } from "@/lib/public-snapshots";
+import { EMPTY_MESSAGE, fieldMatches, findSessions, loadQuadro, type TrainingSlot } from "@/lib/public-snapshots";
 import { defaultDay, isFree, minutesOf, pitchZones, slotStates, weekdayKey, type PitchZone, type SlotState } from "@/lib/training-view";
 import { peopleOnPitch, type StaffPerson } from "@/lib/staff-roster";
 import { getStaffEmails, getStaffRoster } from "@/lib/staff-roster.functions";
 import { PeoplePins } from "@/components/scd/PeoplePins";
-import juniores from "@/assets/scd/SCD_JUNIORES_2008_2009.png.asset.json";
-import piccoli from "@/assets/scd/SCD_PICCOLI_2020_2021.png.asset.json";
-import prima from "@/assets/scd/SCD_PRIMA_SQUADRA.png.asset.json";
-import primi from "@/assets/scd/SCD_PRIMI_2018_2019.png.asset.json";
-import pulcini from "@/assets/scd/SCD_PULCINI_2016_2017.png.asset.json";
-import u12 from "@/assets/scd/SCD_U12_2015.png.asset.json";
-import u13 from "@/assets/scd/SCD_U13_2014.png.asset.json";
-import u15 from "@/assets/scd/SCD_U15_2012_2013.png.asset.json";
-import u16 from "@/assets/scd/SCD_U16_2011.png.asset.json";
 import planimetria from "@/assets/scd/planimetria_colico.webp.asset.json";
 
-const LOGOS: Record<string, string> = { JUNIORES: juniores.url, PICCOLI: piccoli.url, PRIMA: prima.url, PRIMI: primi.url, PULCINI: pulcini.url, U12: u12.url, U13: u13.url, U15: u15.url, U16: u16.url };
-
-function Logos({ text, size = 24 }: { text: string; size?: number }) {
-  const keys = logoKeysFor(text);
-  if (!keys.length) return null;
-  return (
-    <span className="inline-flex shrink-0 -space-x-1.5">
-      {keys.map((k) => (
-        <img key={k} src={LOGOS[k]} alt="" width={size} height={size} loading="lazy" className="rounded-full bg-white object-contain ring-2 ring-white" style={{ width: size, height: size }} />
-      ))}
-    </span>
-  );
-}
+/* Public page: annata crests stay internal (Direzione, 13/10/2026); the group name is written as text. */
 
 export const Route = createFileRoute("/allenamenti")({
   validateSearch: (s: Record<string, unknown>): { annata?: string | undefined } => {
@@ -162,7 +141,6 @@ function Allenamenti() {
                   ) : (
                     list.map((x) => (
                       <div key={x.timeLabel + x.field} className="mt-1.5 flex items-center gap-2">
-                        <Logos text={x.text} size={20} />
                         <span className="text-[14px]">
                           <b>{x.timeLabel}</b> · Campo {x.field.slice(1)}
                         </span>
@@ -279,7 +257,6 @@ function SlotCard({ slot, state, zones1, zones2, people, emails }: { slot: Train
           return (
             <div key={r} className={`flex min-w-0 flex-col items-center gap-1 rounded-[10px] px-1 py-1.5 text-center ${free ? "border border-dashed border-[#b9cfe6]" : "bg-white shadow-[0_2px_6px_rgb(0_20_60/0.08)]"}`}>
               <span className="text-[11px] font-extrabold text-[var(--scd-sub)]">{r}</span>
-              {!free && <Logos text={who} size={20} />}
               <span className="w-full break-words text-[11.5px] font-semibold leading-tight">{free ? "libero" : who}</span>
             </div>
           );
@@ -311,7 +288,6 @@ function Pitch({ name, text, zones, small = false }: { name: string; text: strin
                 <span className="rounded-full bg-white/85 px-1.5 text-[10.5px] font-extrabold text-[#14532d]">{z.key}</span>
                 {z.label ? (
                   <>
-                    <Logos text={z.label} size={26} />
                     <span className="w-full break-words rounded-[6px] bg-white/90 px-1 py-0.5 text-[11.5px] font-bold leading-tight">{z.label}</span>
                   </>
                 ) : (
@@ -326,7 +302,6 @@ function Pitch({ name, text, zones, small = false }: { name: string; text: strin
               <span className="text-[14px] font-bold text-[#3f5d4a]">Nessun allenamento</span>
             ) : (
               <>
-                <Logos text={text} size={30} />
                 <span className="max-w-full whitespace-pre-line break-words rounded-[8px] bg-white/90 px-2 py-1 text-[13.5px] font-bold leading-tight">{text}</span>
               </>
             )}
