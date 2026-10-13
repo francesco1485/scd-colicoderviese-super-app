@@ -232,7 +232,7 @@ export function SkyChat() {
                 className="h-[38px] w-[40px] shrink-0 object-contain"
               />
             ) : (
-              <PersonaAvatar persona="crovi" size={32} />
+              <PersonaAvatar persona={persona} size={32} />
             )}
             <div className="min-w-0 flex-1">
               <p className="m-0 text-[15px] font-bold leading-tight">

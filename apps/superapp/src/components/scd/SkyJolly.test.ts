@@ -7,8 +7,10 @@ import {
   CROVI_AVATAR_SRC,
   PERSONA_COPY,
   SKY_HANDOFF,
+  KIDS_TEAM_IDS,
   greetingFor,
   isHelperHiddenPath,
+  isKidsPath,
   isReservedPath,
   launcherFaceFor,
   personaFor,
@@ -22,26 +24,35 @@ describe("helper persona (Direzione 12/10/2026: Crovi outside, Sky inside)", () 
     expect(personaFor("/calendario/rotazione-campi")).toBe("crovi");
   });
 
-  it("puts Sky in the reserved areas (until Era exists) and never Crovi", () => {
-    for (const p of ["/famiglia", "/la-mia-scd", "/direzione", "/segreteria/persone", "/tesoreria", "/gestionale/organigramma", "/squadre", "/squadre/u16", "/aree", "/core", "/quadro", "/crm"]) {
+  it("puts the club assistant in the reserved areas (until Era exists), never Crovi or Sky", () => {
+    for (const p of ["/famiglia", "/la-mia-scd", "/direzione", "/segreteria/persone", "/tesoreria", "/gestionale/organigramma", "/squadre", "/squadre/u16", "/squadre/u15", "/aree", "/core", "/quadro", "/crm"]) {
       expect(isReservedPath(p)).toBe(true);
-      expect(personaFor(p)).toBe("sky");
-      expect(launcherFaceFor(p)).toBe("sky");
+      expect(personaFor(p)).toBe("club");
+      expect(launcherFaceFor(p)).toBe("club");
+    }
+  });
+
+  it("keeps Sky only for the under-14 team pages (Direzione 13/10/2026)", () => {
+    for (const id of KIDS_TEAM_IDS) {
+      expect(isKidsPath(`/squadre/${id}`)).toBe(true);
+      expect(personaFor(`/squadre/${id}`)).toBe("sky");
+      expect(launcherFaceFor(`/squadre/${id}/`)).toBe("sky");
+    }
+    for (const p of ["/", "/fantacalcio", "/top11", "/squadre", "/squadre/prima", "/squadre/u19", "/squadre/u15", "/squadre/pulcini/extra", "/la-mia-scd"]) {
+      expect(isKidsPath(p)).toBe(false);
+      expect(personaFor(p)).not.toBe("sky");
     }
   });
 
   it("does not mistake look-alike paths for public ones", () => {
-    expect(personaFor("/calendariox")).toBe("sky");
-    expect(personaFor("/partners")).toBe("sky");
+    expect(personaFor("/calendariox")).toBe("club");
+    expect(personaFor("/partners")).toBe("club");
   });
 
-  it("alternates the launcher face by context on public pages", () => {
-    for (const p of ["/", "/fantacalcio", "/top11", "/top11/settimana"]) expect(launcherFaceFor(p)).toBe("sky");
-    for (const p of ["/calendario", "/contatti", "/partner", "/sponsor", "/societa", "/eventi", "/comunicazioni", "/rassegna", "/impianti", "/privacy"]) {
+  it("shows on the launcher the same figure that answers", () => {
+    for (const p of ["/", "/fantacalcio", "/top11", "/top11/settimana", "/calendario", "/contatti", "/partner", "/sponsor", "/societa", "/eventi", "/comunicazioni", "/rassegna", "/impianti", "/privacy"]) {
       expect(launcherFaceFor(p)).toBe("crovi");
     }
-    // the chat helper stays Crovi even where Sky's face opens it
-    expect(personaFor("/fantacalcio")).toBe("crovi");
   });
 
   it("hides the helper in the access flows", () => {
@@ -61,7 +72,7 @@ describe("helper persona (Direzione 12/10/2026: Crovi outside, Sky inside)", () 
   });
 
   it("keeps the copy free of invented facts and real-person likeness claims", () => {
-    for (const persona of ["sky", "crovi"] as const) {
+    for (const persona of ["sky", "crovi", "club"] as const) {
       const c = PERSONA_COPY[persona];
       const all = [c.title, c.subtitle, c.greeting, ...c.quick].join(" ");
       expect(all).not.toMatch(/\d{1,2}[:.]\d{2}|\d+\s*-\s*\d+/);

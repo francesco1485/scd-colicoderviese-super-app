@@ -1,30 +1,42 @@
 /**
- * The floating helper of the Super App and its two faces (Direzione decisions 12/10/2026):
+ * The floating helper of the Super App and its faces (Direzione decisions 12/10 and 13/10/2026):
  * - public pages: the chat helper is CROVI ("Chiedi a Crovi"), the realistic secretariat legend;
- *   Sky, the club's lucky charm, stays in rotation as the launcher face on the home and on the
- *   kids/games pages, so the two figures alternate by context;
- * - reserved areas: the helper is Sky (up to 14, or the user's own avatar; 15+ will get "Era",
- *   not built yet, so Sky stands in for now). Crovi never appears inside.
+ * - Sky, the club's lucky charm, stays away from the general app: it appears only in the
+ *   under-14 world (team pages of Esordienti, Pulcini, Primi Calci, Piccoli Amici, annate
+ *   2014/2015), always as the official cut-out PNG/WebP;
+ * - other reserved areas: the club assistant with the official crest, standing in for "Era"
+ *   (15+, not built yet). Crovi never appears inside.
  * The chat logic lives in SkyChat.tsx and the answer engine (askSky) is unchanged.
  *
  * Official assets only (config/scd-assets.v1.json): Sky head /media/brand/sky-atv-head.webp,
  * Sky head + ball /media/brand/sky-scd.png, CROVI avatar /media/crovi/v3 (original fictional figure).
  */
+import crest from "@/assets/brand/logo-scd.png.asset.json";
 import croviAvatar from "@/assets/crovi/crovi-avatar-256.webp.asset.json";
 import { isPublicPath } from "@/lib/http-policy";
 
-export type Persona = "sky" | "crovi";
+export type Persona = "sky" | "crovi" | "club";
 
 /** Public media paths of the official Sky files (never generated, never altered). */
 export const SKY_HEAD_SRC = "/media/brand/sky-atv-head.webp";
 export const SKY_BALL_SRC = "/media/brand/sky-scd.png";
 export const CROVI_AVATAR_SRC = croviAvatar.url;
+export const CLUB_CREST_SRC = crest.url;
 
 /** Access flows: no floating helper at all (the visitor is filling a form). */
 const HIDDEN_PREFIXES = ["/accedi", "/entra", "/registrati"] as const;
 
-/** Public pages where Sky, the lucky charm, is the launcher face (home, games, kids). */
-const SKY_FACE_PUBLIC = ["/", "/fantacalcio", "/top11"] as const;
+/**
+ * Under-14 teams (club-profile ORDER ids): the only place where Sky appears (Direzione 13/10/2026).
+ * U15 is left out on purpose: it already includes 14-year-olds.
+ */
+export const KIDS_TEAM_IDS = ["2014", "2015", "esordienti", "pulcini", "primicalci", "piccoli"] as const;
+
+/** True for a team page of an under-14 group, e.g. /squadre/pulcini. */
+export function isKidsPath(pathname: string): boolean {
+  const m = /^\/squadre\/([^/]+)\/?$/.exec(pathname);
+  return !!m && (KIDS_TEAM_IDS as ReadonlyArray<string>).includes(decodeURIComponent(m[1] ?? "").toLowerCase());
+}
 
 function startsWithPrefix(
   pathname: string,
@@ -47,19 +59,15 @@ export function isHelperHiddenPath(pathname: string): boolean {
   return startsWithPrefix(pathname, HIDDEN_PREFIXES);
 }
 
-/** Who answers in the chat: Crovi on public pages, Sky inside (until Era exists). */
+/** Who answers in the chat: Sky only for the under-14 pages, Crovi outside, the club assistant inside. */
 export function personaFor(pathname: string): Persona {
-  return isReservedPath(pathname) ? "sky" : "crovi";
+  if (isKidsPath(pathname)) return "sky";
+  return isReservedPath(pathname) ? "club" : "crovi";
 }
 
-/**
- * Face shown on the floating launcher. Inside it is always the helper (Sky); on public pages Sky
- * and Crovi alternate by context: Sky on the home and the games/kids pages, Crovi everywhere else
- * (calendar, tickets, contacts, partner, registrations, club, events, news, default).
- */
+/** Face shown on the floating launcher: always the same figure that answers. */
 export function launcherFaceFor(pathname: string): Persona {
-  if (isReservedPath(pathname)) return "sky";
-  return startsWithPrefix(pathname, SKY_FACE_PUBLIC) ? "sky" : "crovi";
+  return personaFor(pathname);
 }
 
 /** Greeting of the chat; when Sky's face opened it on a public page, Crovi says Sky called him. */
@@ -88,9 +96,26 @@ export const PERSONA_COPY: Record<
     title: "Sky, la mascotte del club",
     subtitle: "ti porto dove ti serve, in un tocco",
     greeting:
-      "Ciao, sono Sky, la mascotte portafortuna della ColicoDerviese. Dimmi cosa cerchi: prossima partita, calendario, come arrivare al campo, iscrizioni, contatti o come funziona l'app.",
+      "Ciao, sono Sky, la mascotte portafortuna della ColicoDerviese! Chiedimi la prossima partita, gli allenamenti o come arrivare al campo: ti accompagno io.",
     placeholder: "Scrivi a Sky…",
     thinking: "Sky sta cercando…",
+    quick: [
+      "Prossima partita",
+      "Calendario",
+      "Come arrivare",
+      "Iscriviti",
+      "Contatti",
+      "Come funziona l'app",
+    ],
+  },
+  club: {
+    name: "Assistente SCD",
+    title: "Assistente del club",
+    subtitle: "ti porto dove ti serve, in un tocco",
+    greeting:
+      "Ciao, sono l'assistente della ColicoDerviese. Dimmi cosa cerchi: prossima partita, calendario, come arrivare al campo, iscrizioni, contatti o come funziona l'app.",
+    placeholder: "Scrivi all'assistente…",
+    thinking: "Sto cercando…",
     quick: [
       "Prossima partita",
       "Calendario",
@@ -132,6 +157,17 @@ export function PersonaAvatar({
   size?: number;
   className?: string;
 }) {
+  if (persona === "club") {
+    return (
+      <span
+        aria-hidden="true"
+        className={`inline-flex shrink-0 items-center justify-center rounded-full bg-white ring-2 ring-[#0b2a5b] ${className}`}
+        style={{ width: size, height: size }}
+      >
+        <img src={CLUB_CREST_SRC} alt="" width={size} height={size} className="h-[78%] w-[78%] object-contain" />
+      </span>
+    );
+  }
   if (persona === "crovi") {
     return (
       <img

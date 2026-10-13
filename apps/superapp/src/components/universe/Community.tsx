@@ -1,3 +1,4 @@
+import { PersonaAvatar, type Persona } from "@/components/scd/SkyJolly";
 import { Link } from "@tanstack/react-router";
 import { useEffect, useId, useState } from "react";
 
@@ -413,15 +414,9 @@ export function ShareCard() {
       aria-labelledby="share-t"
       data-testid="share-card"
     >
-      <img
-        src="/media/brand/sky-atv-cut.webp"
-        alt=""
-        className="sky-float pointer-events-none absolute -right-[6px] top-[4px] w-[clamp(58px,16vw,74px)] drop-shadow-[0_8px_12px_rgb(0_0_0/0.25)]"
-        loading="lazy"
-      />
       <h3
         id="share-t"
-        className="pr-[clamp(56px,17vw,76px)] font-uv text-[clamp(26px,7.4vw,30px)] uppercase leading-[0.92]"
+        className="font-uv text-[clamp(26px,7.4vw,30px)] uppercase leading-[0.92]"
       >
         Fai girare la <span className="text-[var(--uv-royal)]">SCD</span>
       </h3>
@@ -512,9 +507,12 @@ export function Affiliations({
 export function SkyCameo({
   message,
   onClose,
+  persona = "club",
 }: {
   message: { title: string; text: string } | null;
   onClose: () => void;
+  /** Sky only on under-14 pages (Direzione 13/10/2026); elsewhere the club crest. */
+  persona?: Persona;
 }) {
   useEffect(() => {
     if (!message) return;
@@ -534,19 +532,8 @@ export function SkyCameo({
           aria-label={`${message.title}. ${message.text}. Chiudi`}
           className="pointer-events-auto flex min-w-0 max-w-[min(300px,calc(100vw-2rem))] items-start gap-3 rounded-[18px] border border-[#dbe3ee] bg-white px-3 py-3 text-left shadow-[0_18px_40px_-12px_rgb(11_42_91/0.35)]"
         >
-          <span
-            key={`${message.title}|${message.text}`}
-            aria-hidden="true"
-            className="sky-hop-in inline-block size-11 shrink-0 overflow-hidden rounded-full bg-[#eef3f9] ring-2 ring-[#0b2a5b]"
-          >
-            <img
-              src="/media/brand/sky-atv-head.webp"
-              alt=""
-              width={44}
-              height={44}
-              className="size-full object-cover object-top"
-              style={{ transform: "scale(1.12)", transformOrigin: "50% 20%" }}
-            />
+          <span key={`${message.title}|${message.text}`} aria-hidden="true" className="sky-hop-in inline-block shrink-0">
+            <PersonaAvatar persona={persona} size={44} />
           </span>
           <span className="min-w-0">
             <b className="block border-l-[3px] border-[#ffd600] pl-2 text-[14px] font-bold leading-tight text-[#0b2a5b]">

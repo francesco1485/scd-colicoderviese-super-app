@@ -357,6 +357,14 @@
         ],
         "must_not_be_referenced_by_runtime_code": true,
         "requires_rendition": true
+      },
+      "TEXTURE": {
+        "description": "Background textures from the official 2026/27 kit artwork (line art, monogram pattern): decorative only, never a mark.",
+        "formats": [
+          "png",
+          "svg"
+        ],
+        "png_requires_alpha": true
       }
     },
     "class_rules": {
@@ -384,7 +392,8 @@
       "OFFICIAL_CLUB_DOCUMENT": "DOCUMENT",
       "APP_ICON": "APP_ICON",
       "OPPONENT_CREST": "VECTOR_MARK",
-      "GENERATE_ORIGINAL": "PHOTO"
+      "GENERATE_ORIGINAL": "PHOTO",
+      "KIT_TEXTURE": "TEXTURE"
     },
     "runtime_roots": [
       "apps/superapp/public/media/",
@@ -1309,6 +1318,34 @@
       "status": "REFERENCE_PROTOTYPE",
       "source": "Crea il tuo campione, base avatar realistica 'tifosa' (prototype sheet avatar-06-adulta-tifosa.png, 13/10/2026), 640 px WebP q80, metadata stripped",
       "note": "AI-generated original, not a photo, pending Direzione approval (plan D9). Fictitious person, no crest, no sponsor, no real kit. Members area only (UD-102)."
+    },
+    {
+      "path": "apps/superapp/public/media/brand/tex/mountains-lake.png",
+      "class": "KIT_TEXTURE",
+      "status": "VERIFIED",
+      "source": "Direzione upload 2026-10-13 (kit 2026/27 artwork); white lines extracted on transparent background (PNG RGBA), used at low opacity as hero texture: lago e monti",
+      "git_blob_sha": "40b345b1c5b44dbdcfb13a17fa334dc75a638483"
+    },
+    {
+      "path": "apps/superapp/public/media/brand/tex/forte-colico.png",
+      "class": "KIT_TEXTURE",
+      "status": "VERIFIED",
+      "source": "Direzione upload 2026-10-13 (kit 2026/27 artwork); white lines extracted on transparent background (PNG RGBA), used at low opacity as hero texture: forte di Colico",
+      "git_blob_sha": "e979c31794f8b807b7dabc106a2a0097bf729ebd"
+    },
+    {
+      "path": "apps/superapp/public/media/brand/tex/monogram-white.svg",
+      "class": "KIT_TEXTURE",
+      "status": "VERIFIED",
+      "source": "Repeat tile of the 'C' monogram pattern seen on the 2026/27 kits (Direzione upload 2026-10-13), redrawn as a plain stroke pattern: decorative texture, not the official crest or a mark",
+      "git_blob_sha": "783c647eb2540049dbcccb8a31277fa7dd4e8ce1"
+    },
+    {
+      "path": "apps/superapp/public/media/brand/tex/monogram-navy.svg",
+      "class": "KIT_TEXTURE",
+      "status": "VERIFIED",
+      "source": "Same 'C' monogram tile in navy at 4% stroke opacity for light pages",
+      "git_blob_sha": "fadc003e11735867ca0ac407fe7beb23a2c6dd91"
     }
   ],
   "vector_research": [

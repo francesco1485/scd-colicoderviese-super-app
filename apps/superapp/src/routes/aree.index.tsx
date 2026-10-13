@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ChevronRight, Info } from "lucide-react";
 
-import skyKit from "@/assets/brand/sky-divisa-gara.webp.asset.json";
 import { SATELLITE_TONE } from "@/components/scd/satellite-tone";
 import { DOORS, LOGIN_LABEL } from "@/lib/audiences";
 import { R20_LOGIN_LIVE, SATELLITES, STATUS_LABEL } from "@/lib/satellites";
@@ -28,19 +27,14 @@ function Gateway() {
   return (
     <main data-screen="gateway" className="bg-[var(--scd-page)] pb-12">
       <header className="relative isolate overflow-hidden bg-[var(--scd-navy)] text-white" data-testid="gateway-hero">
-        <div aria-hidden="true" className="scd-kit-stripes absolute inset-0 -z-10" />
-        <div className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-end gap-4 px-4 pt-4 sm:px-6 lg:pt-6">
+        <div aria-hidden="true" data-motif="forte" className="scd-kit-stripes absolute inset-0 -z-10" />
+        <div className="mx-auto grid max-w-6xl items-end gap-4 px-4 pt-4 sm:px-6 lg:pt-6">
           <div className="pb-6 lg:pb-8">
             <h1 className="font-brand mt-3 text-[36px] uppercase leading-[0.92] sm:text-[44px] lg:text-[52px]">Il tuo ingresso</h1>
             <p className="mt-2 max-w-[48ch] text-[16px] leading-snug text-white/90 sm:text-[17px]">
               Un solo accesso alla Super App: ognuno entra nella sua area e vede solo quello che gli serve.
             </p>
           </div>
-          <figure className="relative -mb-px hidden w-[96px] self-end sm:block lg:w-[120px]" aria-hidden="true">
-            <div className="rounded-t-[18px] bg-white px-1.5 pt-2 shadow-[0_-10px_30px_-12px_rgb(0_0_0/0.5)]">
-              <img src={skyKit.url} width={skyKit.width} height={skyKit.height} alt="" className="mx-auto h-auto w-full" loading="eager" decoding="async" />
-            </div>
-          </figure>
         </div>
       </header>
 

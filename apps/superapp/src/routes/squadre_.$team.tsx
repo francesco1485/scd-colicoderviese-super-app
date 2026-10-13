@@ -17,6 +17,7 @@ import {
   PostCard,
 } from "@/components/universe/Feed";
 import { SkyCameo } from "@/components/universe/Community";
+import { isKidsPath } from "@/components/scd/SkyJolly";
 import {
   MembersOnlyScreen,
   membersOnlyHead,
@@ -420,7 +421,7 @@ function TeamPage({ data }: { data: TeamData }) {
             : "Rosa dalle liste ufficiali della stagione. Dei minorenni compare solo il nome con l'iniziale del cognome; niente foto dei ragazzi."}
         </p>
       </div>
-      <SkyCameo message={sky} onClose={() => setSky(null)} />
+      <SkyCameo message={sky} onClose={() => setSky(null)} persona={isKidsPath(`/squadre/${id}`) ? "sky" : "club"} />
     </main>
   );
 }
