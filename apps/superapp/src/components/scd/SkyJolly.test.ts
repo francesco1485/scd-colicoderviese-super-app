@@ -22,7 +22,7 @@ describe("helper persona (Direzione 12/10/2026: Crovi outside, Sky inside)", () 
     expect(personaFor("/calendario/rotazione-campi")).toBe("crovi");
   });
 
-  it("puts Sky in the reserved areas (until Era exists) and never Crovi", () => {
+  it("puts Sky in the reserved areas by page (SkyChat upgrades to Era by session) and never Crovi", () => {
     for (const p of ["/famiglia", "/la-mia-scd", "/direzione", "/segreteria/persone", "/tesoreria", "/gestionale/organigramma", "/squadre", "/squadre/u16", "/aree", "/core", "/quadro", "/crm"]) {
       expect(isReservedPath(p)).toBe(true);
       expect(personaFor(p)).toBe("sky");
@@ -61,12 +61,18 @@ describe("helper persona (Direzione 12/10/2026: Crovi outside, Sky inside)", () 
   });
 
   it("keeps the copy free of invented facts and real-person likeness claims", () => {
-    for (const persona of ["sky", "crovi"] as const) {
+    for (const persona of ["sky", "crovi", "era"] as const) {
       const c = PERSONA_COPY[persona];
       const all = [c.title, c.subtitle, c.greeting, ...c.quick].join(" ");
       expect(all).not.toMatch(/\d{1,2}[:.]\d{2}|\d+\s*-\s*\d+/);
       expect(all).not.toMatch(/Banfi|Trinità|sosia|somiglia/i);
     }
+  });
+
+  it("titles the internal chat 'Chiedi a Era' (UD-091, UD-104)", () => {
+    expect(PERSONA_COPY.era.title).toBe("Chiedi a Era");
+    expect(PERSONA_COPY.era.placeholder).toMatch(/Era/);
+    expect(PERSONA_COPY.era.greeting).toMatch(/Cervellone/);
   });
 
   it("lets Crovi say Sky called him when Sky's face opened the chat", () => {

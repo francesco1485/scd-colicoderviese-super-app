@@ -2453,6 +2453,42 @@
           "Direzione approval and application of r98 on SCD PULSE; the Fill-the-catalogue part ('pieno') continues through the UD-077 ingestion"
         ]
       }
+    },
+    {
+      "sourceDate": "2026-10-13",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-104",
+      "name": "REAL_AI_ASSISTANTS_CROVI_ERA",
+      "sourceQuoteFragments": [
+        "Vai A B C"
+      ],
+      "normalizedCommand": {
+        "rule": "Approved 2026-10-13 12:03. A: Crovi becomes a real AI assistant on public pages, answering naturally using ONLY public data (games calendar, events, registrations info, facilities/directions, contacts, sponsors/partner offer, app guide); never internal/reserved data, never minors' names, never invented facts. B: internal assistant for staff (Era for 15+ users; Sky stays for younger members until their own avatar) answering from the Cervellone knowledge base with the caller's permission level: office staff INTERNO, only Direzione RISERVATO, enforced by scd_kb_search with the caller's session, never a service key. C: activation, costs and privacy documented; the Direzione switches it on.",
+        "scope": "ASSISTANTS_AND_CHARACTERS",
+        "torreFloor": "0_HALL (Crovi) + internal floors (Era / Sky)",
+        "constraints": [
+          "grounding by retrieval from real server data, no invented facts: 'non lo so / chiedi in segreteria' otherwise",
+          "never minors' names, health data, IBAN, fiscal codes or passwords, even if present in the source",
+          "safeguarding never through the assistant (reserved channel), requests through the requests engine (UD-045)",
+          "feature flag SCD_ASSISTANT_AI default off; rules engine fallback on missing key, error, quota or 8 s timeout",
+          "per-IP and per-user rate limits; no prompt or answer logging",
+          "no publication or env change without Direzione approval"
+        ],
+        "status": "IMPLEMENTED_STAGED_FLAG_OFF",
+        "delivered": [
+          "apps/superapp/src/lib/assistant.ts (personas, context builders with caps, prompts, output guard, rate limiter)",
+          "apps/superapp/src/lib/assistant.server.ts + assistant.functions.ts (askAssistant public, askStaffAssistant signed-in)",
+          "apps/superapp/src/lib/anthropic.server.ts (shared Claude call, also used by moderation.server.ts)",
+          "SkyChat: AI notice, typing indicator, https links; Era persona inside; 'Chiedi a Era' on /direzione/cervellone",
+          "SCD_SYSTEM_MANIFEST.json 3.33.0: source ANTHROPIC_API, sky_and_avatar.ai_assistants; docs/AI_ASSISTANT.md"
+        ],
+        "pending": [
+          "Direzione: create the API key and set SCD_ANTHROPIC_API_KEY + SCD_ASSISTANT_AI=on on Render (see docs/AI_ASSISTANT.md)",
+          "approved Era image (UD-091 Canva MAHX1G12gBc) into config/scd-assets.v1.json to replace the neutral initial"
+        ],
+        "duplicate_work": "DENY"
+      }
     }
   ],
   "completionGate": {

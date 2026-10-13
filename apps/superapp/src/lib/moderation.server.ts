@@ -12,16 +12,15 @@ import {
   type ModerationResult,
 } from "./moderation";
 
-const MODEL = "claude-haiku-5-5";
+import { anthropicApiKey, callClaude } from "./anthropic.server";
 
 export function moderationEnv(
   env: Readonly<Record<string, string | undefined>> = process.env,
 ): { token: string | null; apiKey: string | null } {
   const token = env["SCD_MODERATION_TOKEN"] ?? null;
-  const apiKey = env["SCD_ANTHROPIC_API_KEY"] ?? null;
   return {
     token: token && token.length >= 20 ? token : null,
-    apiKey: apiKey && apiKey.startsWith("sk-ant-") ? apiKey : null,
+    apiKey: anthropicApiKey(env),
   };
 }
 
@@ -36,47 +35,27 @@ export async function moderate(input: {
 }): Promise<ModerationResult> {
   const { apiKey } = moderationEnv();
   if (!apiKey) return trustVerdict(input.trusted);
-  try {
-    const ctrl = new AbortController();
-    const t = setTimeout(() => ctrl.abort(), 12_000);
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        max_tokens: 300,
-        temperature: 0,
-        system: MODERATION_RULES,
-        messages: [{ role: "user", content: moderationUserMessage(input) }],
-      }),
-      signal: ctrl.signal,
-    });
-    clearTimeout(t);
-    if (!res.ok)
-      return {
-        verdict: "REVIEW",
-        reason: `Moderatore non disponibile (${res.status}): lo vede una persona.`,
-        engine: "ai",
-        categories: [],
-      };
-    const data = (await res.json()) as {
-      content?: Array<{ type: string; text?: string }>;
-    };
-    const text = (data.content ?? [])
-      .filter((c) => c.type === "text")
-      .map((c) => c.text ?? "")
-      .join("\n");
-    return parseModerationAnswer(text);
-  } catch {
+  const out = await callClaude({
+    apiKey,
+    system: MODERATION_RULES,
+    user: moderationUserMessage(input),
+    maxTokens: 300,
+    temperature: 0,
+    timeoutMs: 12_000,
+  });
+  if (out.ok) return parseModerationAnswer(out.text);
+  if (out.reason === "http")
     return {
       verdict: "REVIEW",
-      reason: "Moderatore non raggiungibile: lo vede una persona.",
+      reason: `Moderatore non disponibile (${out.status}): lo vede una persona.`,
       engine: "ai",
       categories: [],
     };
-  }
+  if (out.reason === "empty") return parseModerationAnswer("");
+  return {
+    verdict: "REVIEW",
+    reason: "Moderatore non raggiungibile: lo vede una persona.",
+    engine: "ai",
+    categories: [],
+  };
 }
