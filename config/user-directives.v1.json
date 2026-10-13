@@ -2275,6 +2275,61 @@
           "registered 2026-10-13; applied from the status document 'Situazione SCD al 13 ottobre 2026' onward"
         ]
       }
+    },
+    {
+      "sourceDate": "2026-10-13",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-097",
+      "name": "ROLE_AGENTS_AND_SKILLS_INSTALL",
+      "sourceQuoteFragments": [
+        "Istalla tutto quello che può servire e migliorare te e i miei progetti. Skill e plug in e agenti",
+        "agente gratuito che ti fa elaborare graficamente",
+        "agente gratuito che cerca in rete loghi e idee per società sportive",
+        "Agente che cerca bandi nel mondo",
+        "Agente che risponde alle mail",
+        "Agente che risponde ai messaggi",
+        "Agente che gestisce social",
+        "Agente che lavora tesoreria",
+        "Agente che fa segreteria",
+        "Agente che gestisce area sponsor",
+        "Agente che gestisce tesserati",
+        "Agente che gestisce atleti",
+        "Agente gestisce intere azioni e dinamiche",
+        "Agente che pensa a cosa fare e come"
+      ],
+      "normalizedCommand": {
+        "rule": "Provide free role agents for every club function (graphics, logos and ideas, grants, mail, messages, social, treasury, secretariat, sponsor, members, athletes, operations orchestrator, strategist) plus useful plugins/connectors. Agents prepare drafts and proposals only; they never send, publish, pay or change roles, registrations, attendance, sensitive documents or safeguarding.",
+        "scope": "ALL_WORK",
+        "status": "DELIVERED",
+        "delivered": [
+          "13 role agents under .claude/agents (9526fba, 2026-10-13)",
+          "plugins Social Media Skills and Email Triage, connectors Google Sheets, Google Docs, Granted enabled by the Direzione (2026-10-13)"
+        ]
+      }
+    },
+    {
+      "sourceDate": "2026-10-13",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-098",
+      "name": "PUBLIC_IDENTITY_CLUB_CREST_REAL_OPPONENTS_ALWAYS_ONLINE",
+      "sourceQuoteFragments": [
+        "No loghi squadra nostri dati da me restano interni per riconoscere nostre annate",
+        "All'esterno resta Colicoderviese",
+        "I loro devono essere reali",
+        "Li trovi tutto su sito tutto campo .It se li cerchi e te lo cataloghi e li tieni per sempre su quelle partite da calendario ufficiale",
+        "Hai tutto collegato già Figc e aia e altri per verificare giornaliera e info reale di tutto",
+        "Importante essere sempre in rete per recepire info e programmi e tutto per la nostra app e non"
+      ],
+      "normalizedCommand": {
+        "rule": "Age-group crests are internal only (reserved areas); every public surface shows the ColicoDerviese club crest and the team name as text. Opponent crests must be real files, catalogued permanently and linked to the official-calendar fixtures (sources: club Drive logo folder, official club sites/socials, tuttocampo.it team pages as reference). Official sources (FIGC, LND/CR Lombardia, AIA, mail) are checked every day by scheduled tasks.",
+        "scope": "PUBLIC_UI_AND_DATA_SOURCES",
+        "status": "IN_PROGRESS",
+        "delivered": [
+          "public pages use club crest only, guarded by public-crest-policy test (b5e6418, 2026-10-13)"
+        ]
+      }
     }
   ],
   "completionGate": {
