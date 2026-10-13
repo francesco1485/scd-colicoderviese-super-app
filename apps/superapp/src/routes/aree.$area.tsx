@@ -47,7 +47,7 @@ function AreaPage() {
             <span aria-hidden="true" className="h-[10px] w-[28px] rounded-full ring-2 ring-white/80" style={{ background: tone.bar }} />
             {s.who}
           </p>
-          <h1 className="font-brand mt-2 text-[44px] uppercase leading-[0.95] sm:text-[60px]">Area {s.name}</h1>
+          <h1 className="font-brand mt-2 text-[44px] uppercase leading-[0.95] sm:text-[60px]">Area <span className="scd-brush">{s.name}</span></h1>
           <p className="mt-2 max-w-[40ch] text-[18px] leading-snug text-white/90">{s.promise}</p>
         </div>
       </header>

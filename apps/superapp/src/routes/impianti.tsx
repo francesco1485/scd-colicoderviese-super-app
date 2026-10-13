@@ -2,7 +2,11 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { CalendarDays, Ticket } from "lucide-react";
 
 import { FacilityMap } from "@/components/scd/FacilityMap";
+import { TicketRules } from "@/components/scd/TicketRules";
 import { FACILITIES, siteById, spaceById } from "@/lib/facilities";
+
+/** Schematic plan of Colico sent by the Direzione on 13/10/2026 (FACILITY_PLAN in config/scd-assets.v1.json). */
+const PIANTA_COLICO = "/media/scd/pianta-colico-2026.webp";
 
 export const Route = createFileRoute("/impianti")({
   head: () => ({
@@ -24,10 +28,13 @@ function ImpiantiPage() {
   const ticket = spaceById("SPA-COL-BIG")!;
   return (
     <main className="scd-interior min-h-screen bg-[var(--in-ground)] pb-24 lg:pb-12">
-      <section className="bg-[linear-gradient(180deg,#062a52_0%,#0860a8_100%)] text-white">
+      <section className="relative isolate overflow-hidden bg-[var(--scd-navy)] text-white">
+        <div aria-hidden="true" data-motif="forte" className="scd-kit-stripes absolute inset-0 -z-10" />
         <div className="mx-auto max-w-[1280px] px-4 pb-10 pt-6 sm:px-6 lg:pb-12 lg:pt-10">
           <p className="m-0 text-[15px] font-semibold text-[var(--out-text-soft)]">Come arrivare e dove andare</p>
-          <h1 className="m-0 mt-1 font-title text-[44px] font-black leading-[0.95] sm:text-[56px]">I nostri campi</h1>
+          <h1 className="m-0 mt-1 font-title text-[44px] font-black leading-[0.95] sm:text-[56px]">
+            I nostri <span className="scd-brush">campi</span>
+          </h1>
           <p className="m-0 mt-3 max-w-[60ch] text-[16px] leading-snug text-[#e6f3fc]">
             {colico.name}, {colico.address}, {colico.municipality}, e l'impianto comunale di Dervio. Tocca uno spazio per vedere se è aperto, da dove si entra e chi
             può entrare.
@@ -46,6 +53,18 @@ function ImpiantiPage() {
       </section>
       <div className="mx-auto -mt-5 max-w-[1280px] px-4 sm:px-6">
         <FacilityMap mode="public" />
+        <figure className="scd-card m-0 mt-5 overflow-hidden p-0" data-testid="pianta-colico">
+          <figcaption className="flex flex-wrap items-baseline justify-between gap-2 px-4 pt-4 sm:px-5">
+            <span className="font-uv text-[24px] uppercase leading-none text-[#0b2a5b]">Pianta del Centro Sportivo Colico</span>
+            <span className="text-[13px] text-[var(--in-sub)]">Ingressi: pubblico, atleti, visitatori · schema non in scala</span>
+          </figcaption>
+          <a href={PIANTA_COLICO} target="_blank" rel="noreferrer" className="scd-focus mt-3 block bg-[#f4f1e6]" aria-label="Apri la pianta di Colico a schermo intero">
+            <img src={PIANTA_COLICO} width={1122} height={1402} alt="Pianta del Centro Sportivo Colico: Campo 1 e Campo 2, spogliatoi 1-4 e arbitri, segreteria, magazzino attrezzi e lavanderia con infermeria, club house, biglietteria, tribuna, palestrina e servizi; ingressi pubblico, atleti e visitatori su via Lido." loading="lazy" decoding="async" className="mx-auto h-auto w-full max-w-[640px]" />
+          </a>
+        </figure>
+        <div className="mt-5">
+          <TicketRules />
+        </div>
         <p className="m-0 mt-4 text-[13px] leading-snug text-[var(--in-sub)]">
           Fonte: master impianti della società ({FACILITIES.sources.master.label}). Posizioni schematiche, non in scala. Quello che non è ancora confermato è scritto
           "da inserire" o "da verificare".

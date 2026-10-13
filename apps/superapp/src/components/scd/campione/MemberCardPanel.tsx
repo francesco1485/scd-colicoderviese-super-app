@@ -3,7 +3,7 @@
  * credits balance is read-only from the club ledger (0 with an explanation when not connected). The earning list is
  * the Direzione's list, labelled "Valori in definizione". No QR yet, no prices, no gambling: credits are never money.
  */
-import { Check, Coins, Info, Lock, QrCode } from "lucide-react";
+import { CalendarDays, Check, Coins, Info, Lock, QrCode } from "lucide-react";
 import { useId, useState } from "react";
 
 import { ClubCrestOfficial } from "@/components/SiteChrome";
@@ -18,6 +18,8 @@ import {
 } from "@/lib/avatar-studio";
 
 const KINDS: CardKind[] = ["TIFOSO", "TESSERATO", "FAMIGLIA"];
+/** Lake Como panorama already in the app (VENUE_PHOTO), as on the club's card boards. */
+const CARD_PHOTO = "/media/scd/lario-header.webp";
 const SHORT: Record<CardKind, string> = { TIFOSO: "Tifoso", TESSERATO: "Tesserato", FAMIGLIA: "Famiglia" };
 
 export function MemberCardPanel({
@@ -76,51 +78,88 @@ export function MemberCardPanel({
       </div>
 
       <div role="tabpanel" id={`${id}-panel`} aria-labelledby={`${id}-tab-${kind}`} className="grid gap-4">
+        {/* Card face in the style of the club's 2026/27 card boards: lake, yellow brush, crest (Direzione 13/10/2026). */}
         <div
-          className={`relative overflow-hidden rounded-[22px] p-5 text-white shadow-[0_18px_40px_-20px_rgb(11_42_91/0.6)] ${
-            held ? "bg-[linear-gradient(140deg,#1556c4,#0b2a5b_78%)]" : "bg-[linear-gradient(140deg,#5b6f8f,#33445f)]"
-          }`}
+          className={`relative isolate overflow-hidden rounded-[22px] text-white shadow-[0_18px_40px_-20px_rgb(11_42_91/0.6)] ${held ? "bg-[#022456]" : "bg-[#2b3445]"}`}
+          data-testid="member-card-face"
+          data-held={held ? "1" : "0"}
         >
-          <div className="flex items-start justify-between gap-3">
-            <span className="flex items-center gap-2.5">
-              <ClubCrestOfficial size={46} />
-              <span className="grid gap-0.5">
-                <span className="font-uv text-[20px] leading-none">
-                  COLICO<span className="text-[#ffd600]">DERVIESE</span>
+          <div
+            aria-hidden="true"
+            className={`absolute inset-x-0 top-0 -z-20 h-[66%] bg-cover bg-[center_45%] ${held ? "saturate-[1.25]" : "grayscale"}`}
+            style={{
+              backgroundImage: `url(${CARD_PHOTO})`,
+              maskImage: "linear-gradient(180deg, #000 55%, transparent 100%)",
+              WebkitMaskImage: "linear-gradient(180deg, #000 55%, transparent 100%)",
+            }}
+          />
+          <div
+            aria-hidden="true"
+            className={`absolute inset-0 -z-10 ${held ? "bg-[linear-gradient(180deg,rgb(4_44_104/0.4)_0%,rgb(4_44_104/0.08)_34%,rgb(2_36_86/0.6)_60%,transparent_100%)]" : "bg-[rgb(30_38_52/0.45)]"}`}
+          />
+          <div className="grid gap-3 p-4 sm:p-5">
+            <div className="flex items-start justify-between gap-3">
+              <span className="flex min-w-0 items-center gap-2.5">
+                <ClubCrestOfficial size={48} />
+                <span className="grid min-w-0 gap-0.5">
+                  <span className="font-uv text-[21px] leading-none drop-shadow-[0_1px_2px_rgb(0_0_0/0.35)]">
+                    COLICO<span className="text-[#ffd600]">DERVIESE</span>
+                  </span>
+                  <span className="text-[11.5px] font-semibold tracking-[0.12em] text-white/90">CARD DIGITALE · 2026/27</span>
                 </span>
-                <span className="text-[12px] font-semibold tracking-[0.08em] text-[#dbe6f5]">CARD DIGITALE · 2026/27</span>
               </span>
-            </span>
-            <span className="text-right">
-              <span className="block text-[12px] font-bold tracking-[0.1em] text-[#dbe6f5]">CARD</span>
-              <span className="block font-uv text-[30px] uppercase leading-none">{SHORT[kind]}</span>
-            </span>
-          </div>
-          <div className="mt-5 grid grid-cols-[1fr_auto] items-end gap-3">
-            <span className="grid gap-1">
-              <span className="text-[12px] font-bold tracking-[0.08em] text-[#dbe6f5]">NICKNAME</span>
-              <span className="truncate font-uv text-[34px] uppercase leading-none">{nickname || "—"}</span>
-            </span>
-            <span className="grid justify-items-end gap-1">
-              <span className="text-[12px] font-bold tracking-[0.08em] text-[#dbe6f5]">CREDITI</span>
-              <span className="inline-flex items-center gap-1.5 font-uv text-[32px] leading-none" data-testid="credits-balance">
-                <Coins className="size-6 text-[#ffd600]" aria-hidden="true" />
-                {held ? credits.balance : "—"}
+              <span className="scd-motto shrink-0 pt-1 text-right text-[17px] text-[#ffe25a] drop-shadow-[0_1px_2px_rgb(0_0_0/0.45)]">
+                Insieme
+                <br />
+                più lontano
               </span>
-            </span>
-          </div>
-          <div className="mt-4 flex items-center gap-2 rounded-[14px] bg-white/12 px-3 py-2.5 text-[13.5px] leading-snug">
-            {held ? (
-              <>
-                <QrCode className="size-5 shrink-0 text-[#ffd600]" aria-hidden="true" />
-                Card attiva. Il codice QR per presenze e sconti arriva in una fase successiva.
-              </>
-            ) : (
-              <>
-                <Lock className="size-5 shrink-0 text-[#ffd600]" aria-hidden="true" />
-                Non attiva: {info.howToGet}
-              </>
-            )}
+            </div>
+
+            <p className="m-0 mt-3">
+              <span className="scd-brush scd-brush--full font-uv text-[34px] uppercase leading-none text-[#0b2a5b] sm:text-[40px]">
+                Card {SHORT[kind]}
+              </span>
+            </p>
+
+            <div className="mt-1 grid grid-cols-[1fr_auto] gap-2 rounded-[14px] bg-white/95 p-3 text-[#0b2a5b]">
+              <span className="grid min-w-0 gap-0.5">
+                <span className="text-[11.5px] font-bold tracking-[0.08em] text-[#4a5d7a]">NICKNAME</span>
+                <span className="truncate font-uv text-[26px] uppercase leading-none">{nickname || "—"}</span>
+              </span>
+              <span className="grid justify-items-end gap-0.5 border-l border-[#dbe3ee] pl-3">
+                <span className="text-[11.5px] font-bold tracking-[0.08em] text-[#4a5d7a]">CREDITI</span>
+                <span className="inline-flex items-center gap-1.5 font-uv text-[26px] leading-none" data-testid="credits-balance">
+                  <Coins className="size-5 text-[#d9a600]" aria-hidden="true" />
+                  {held ? credits.balance : "—"}
+                </span>
+              </span>
+            </div>
+
+            <p className="m-0 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12.5px] font-semibold text-white/90">
+              <span className="inline-flex items-center gap-1.5">
+                <CalendarDays className="size-4 text-[#ffd600]" aria-hidden="true" />
+                Valida fino al 30.06.2027
+              </span>
+              <span aria-hidden="true" className="hidden h-3.5 w-px bg-white/40 min-[400px]:inline-block" />
+              <span className="inline-flex items-center gap-1.5">
+                <Lock className="size-4 text-[#ffd600]" aria-hidden="true" />
+                Personale e non cedibile
+              </span>
+            </p>
+
+            <div className="flex items-center gap-2 rounded-[12px] bg-white/12 px-3 py-2.5 text-[13.5px] leading-snug backdrop-blur-[2px]">
+              {held ? (
+                <>
+                  <QrCode className="size-5 shrink-0 text-[#ffd600]" aria-hidden="true" />
+                  Card attiva. Il codice QR per presenze e sconti arriva in una fase successiva.
+                </>
+              ) : (
+                <>
+                  <Lock className="size-5 shrink-0 text-[#ffd600]" aria-hidden="true" />
+                  Non attiva: {info.howToGet}
+                </>
+              )}
+            </div>
           </div>
         </div>
 

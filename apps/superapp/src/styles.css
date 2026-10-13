@@ -293,6 +293,38 @@
   aspect-ratio: 937 / 646;
   background-image: url("/media/brand/tex/forte-colico.png");
 }
+/* Pennellata gialla delle tavole SCD (card, locandine): sotto la parola chiave di un titolo. */
+.scd-brush {
+  position: relative;
+  isolation: isolate;
+  white-space: nowrap;
+}
+.scd-brush::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: -0.1em;
+  right: -0.14em;
+  bottom: -0.1em;
+  height: 0.26em;
+  background: url("/media/brand/tex/brush-yellow.svg") center / 100% 100% no-repeat;
+  opacity: 0.95;
+}
+.scd-brush--full::before {
+  left: -0.25em;
+  right: -0.3em;
+  bottom: -0.12em;
+  height: 1.2em;
+  opacity: 1;
+}
+/* Motto in corsivo delle tavole ("Insieme più lontano"). */
+.scd-motto {
+  font-family: var(--font-uv-script);
+  font-weight: 400;
+  line-height: 1;
+  transform: rotate(-6deg);
+  display: inline-block;
+}
 /* Pagine chiare: monogramma "C" appena accennato, come la trama della divisa bianca. */
 main.bg-\[var\(--scd-page\)\] {
   background-image: url("/media/brand/tex/monogram-navy.svg");

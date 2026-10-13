@@ -132,7 +132,7 @@ function Accedi() {
             <ClubCrestOfficial size={56} />
           </span>
           <div className="min-w-0 pr-16 sm:pr-0">
-            <h1 className="font-brand text-[32px] uppercase leading-none sm:text-[48px]">Accedi</h1>
+            <h1 className="font-brand text-[32px] uppercase leading-none sm:text-[48px]"><span className="scd-brush">Accedi</span></h1>
             <p className="mt-1 text-[14.5px] leading-snug text-white/90 sm:text-[17px]">Un solo accesso per tutte le aree del club.</p>
           </div>
         </div>

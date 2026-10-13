@@ -1407,6 +1407,20 @@
       "status": "VERIFIED",
       "source": "Same 'C' monogram tile in navy at 4% stroke opacity for light pages",
       "git_blob_sha": "fadc003e11735867ca0ac407fe7beb23a2c6dd91"
+    },
+    {
+      "path": "apps/superapp/public/media/scd/pianta-colico-2026.webp",
+      "class": "FACILITY_PLAN",
+      "status": "VERIFIED",
+      "source": "Pianta schematica del Centro Sportivo Colico (campi 1-2, spogliatoi 1-4, arbitri, segreteria, magazzino e lavanderia, infermeria, club house, biglietteria, tribuna, ingressi pubblico/atleti/visitatori), tavola inviata dalla Direzione il 2026-10-13; schema non in scala",
+      "git_blob_sha": "9d09fdccf3028e2248c25dfe1d07d7d4397d554f"
+    },
+    {
+      "path": "apps/superapp/public/media/brand/tex/brush-yellow.svg",
+      "class": "KIT_TEXTURE",
+      "status": "VERIFIED",
+      "source": "Yellow brush stroke from the club's 2026/27 card and poster boards (Direzione upload 2026-10-13), redrawn as a plain decorative SVG shape: not a mark",
+      "git_blob_sha": "0d92692fbf58fc184843e8d30e249a513c6f0582"
     }
   ],
   "vector_research": [

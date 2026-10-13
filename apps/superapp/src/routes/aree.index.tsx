@@ -30,7 +30,7 @@ function Gateway() {
         <div aria-hidden="true" data-motif="forte" className="scd-kit-stripes absolute inset-0 -z-10" />
         <div className="mx-auto grid max-w-6xl items-end gap-4 px-4 pt-4 sm:px-6 lg:pt-6">
           <div className="pb-6 lg:pb-8">
-            <h1 className="font-brand mt-3 text-[36px] uppercase leading-[0.92] sm:text-[44px] lg:text-[52px]">Il tuo ingresso</h1>
+            <h1 className="font-brand mt-3 text-[36px] uppercase leading-[0.92] sm:text-[44px] lg:text-[52px]">Il tuo <span className="scd-brush">ingresso</span></h1>
             <p className="mt-2 max-w-[48ch] text-[16px] leading-snug text-white/90 sm:text-[17px]">
               Un solo accesso alla Super App: ognuno entra nella sua area e vede solo quello che gli serve.
             </p>

@@ -65,7 +65,7 @@ function Registrati() {
         <div className="mx-auto flex max-w-6xl items-end gap-4 px-4 pb-8 pt-8 sm:px-6 lg:pb-12 lg:pt-12">
           <ClubCrestOfficial size={64} />
           <div>
-            <h1 className="font-brand text-[42px] uppercase leading-[0.92] sm:text-[60px]">Registrati</h1>
+            <h1 className="font-brand text-[42px] uppercase leading-[0.92] sm:text-[60px]"><span className="scd-brush">Registrati</span></h1>
             <p className="mt-2 max-w-[38ch] text-[16px] leading-snug text-white/90 sm:text-[18px]">Un solo link per tutti: cinque dati e sei dentro. Poi la Direzione ti abilita quello che ti serve.</p>
           </div>
         </div>
