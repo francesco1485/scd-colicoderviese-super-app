@@ -69,11 +69,16 @@ export interface KbItem {
   source: string;
   link: string | null;
   tags: string[];
+  /** r98: 'fts' = full-text match, 'fuzzy' = similar title/ente/tags (typo tolerance). Absent before r98 or without a text query. */
+  match?: KbMatch;
 }
+
+export type KbMatch = "fts" | "fuzzy";
 
 export interface KbResult {
   level: "INTERNO" | "RISERVATO";
   items: KbItem[];
+  /** Without a text query: visible catalogue per area. With a text query (r98): matches per area. */
   counts: Record<string, number>;
 }
 
@@ -116,6 +121,7 @@ export function parseKb(raw: unknown): KbResult | null {
       source: str(o["fonte"]) ?? "",
       link: safeLink(o["link"]),
       tags: Array.isArray(o["tags"]) ? o["tags"].filter((t): t is string => typeof t === "string") : [],
+      ...(o["match"] === "fts" || o["match"] === "fuzzy" ? { match: o["match"] } : {}),
     }];
   });
   const counts: Record<string, number> = {};
@@ -159,4 +165,102 @@ export function seasonsUntil(todayIso: string): string[] {
   const out: string[] = [];
   for (let s = last; s >= 2011; s--) out.push(`${s}/${String(s + 1).slice(2)}`);
   return out;
+}
+
+/** Lower case without accents ("Società" → "societa"), one output char group per input char. */
+const FOLD_EXTRA: Readonly<Record<string, string>> = { æ: "ae", œ: "oe", ø: "o", ß: "ss", đ: "d", ł: "l", ð: "d", þ: "th" };
+
+function foldChar(c: string): string {
+  const base = c.normalize("NFD").replace(/\p{M}+/gu, "").toLowerCase();
+  return FOLD_EXTRA[base] ?? base;
+}
+
+export function foldText(s: string): string {
+  return Array.from(s, foldChar).join("");
+}
+
+/**
+ * Search terms exactly as scd_kb_search builds them (r98, scd_kb_query_terms): no accents, lower case,
+ * only [a-z0-9] tokens, single letters dropped (single digits kept: "3 livello"), no duplicates,
+ * first 8 terms, each at most 40 characters.
+ */
+export function kbSearchTerms(query: string | null | undefined): string[] {
+  const out: string[] = [];
+  for (const raw of foldText(query ?? "").split(/[^a-z0-9]+/)) {
+    const t = raw.slice(0, 40);
+    if (!t || (t.length < 2 && !/^[0-9]$/.test(t)) || out.includes(t)) continue;
+    out.push(t);
+    if (out.length === 8) break;
+  }
+  return out;
+}
+
+/** True when the query has something to search for (the server would run a text search). */
+export function hasSearchText(query: string | null | undefined): boolean {
+  return kbSearchTerms(query).length > 0;
+}
+
+export interface HighlightPart {
+  text: string;
+  hit: boolean;
+}
+
+const WORD = /[\p{L}\p{N}]/u;
+
+/**
+ * Splits `text` into plain and highlighted parts: a term is highlighted where a word starts with it
+ * (prefix search), ignoring case and accents. Pure data: the UI renders parts as text nodes, never HTML.
+ */
+export function highlightParts(text: string, terms: readonly string[]): HighlightPart[] {
+  if (!text) return [];
+  const usable = terms.filter((t) => t.length > 0);
+  if (usable.length === 0) return [{ text, hit: false }];
+  const chars = Array.from(text);
+  // folded string plus, for every folded code unit, the index of the original char it came from
+  let folded = "";
+  const origin: number[] = [];
+  chars.forEach((c, i) => {
+    const f = foldChar(c);
+    folded += f;
+    for (let k = 0; k < f.length; k++) origin.push(i);
+  });
+  const hit = new Array<boolean>(chars.length).fill(false);
+  for (const term of usable) {
+    let from = 0;
+    for (;;) {
+      const at = folded.indexOf(term, from);
+      if (at < 0) break;
+      const startChar = origin[at]!;
+      const prev = startChar > 0 ? chars[startChar - 1]! : "";
+      if (!prev || !WORD.test(prev)) {
+        const endChar = origin[at + term.length - 1]!;
+        for (let i = startChar; i <= endChar; i++) hit[i] = true;
+      }
+      from = at + 1;
+    }
+  }
+  const parts: HighlightPart[] = [];
+  chars.forEach((c, i) => {
+    const last = parts[parts.length - 1];
+    if (last && last.hit === hit[i]) last.text += c;
+    else parts.push({ text: c, hit: hit[i]! });
+  });
+  return parts;
+}
+
+/** Splits results into full-text matches and similar ones (typo tolerance), keeping server order. */
+export function splitByMatch(items: readonly KbItem[]): { exact: KbItem[]; similar: KbItem[] } {
+  const exact: KbItem[] = [];
+  const similar: KbItem[] = [];
+  for (const it of items) (it.match === "fuzzy" ? similar : exact).push(it);
+  return { exact, similar };
+}
+
+/** Areas with the most items first (ties alphabetical), for the empty-state suggestions. */
+export function topAreas(counts: Readonly<Record<string, number>>, n = 6): string[] {
+  return Object.entries(counts)
+    .filter(([a, c]) => c > 0 && (KB_AREAS as readonly string[]).includes(a))
+    .sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0]))
+    .slice(0, n)
+    .map(([a]) => a);
 }

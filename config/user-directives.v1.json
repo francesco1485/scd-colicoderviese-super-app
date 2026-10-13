@@ -2425,6 +2425,34 @@
           "pending: Direzione approval of r97 and of the base images (D8, D9), credit values (D3), DPIA + consent type AVATAR_FOTO_APP for path C, QR card codes, storage of AI-generated images"
         ]
       }
+    },
+    {
+      "sourceDate": "2026-10-13",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-103",
+      "name": "CERVELLONE_FULL_AND_FAST",
+      "sourceQuoteFragments": [
+        "rendere il cervellone pieno e performante"
+      ],
+      "normalizedCommand": {
+        "rule": "The Cervellone (UD-077) must be complete and fast: search finds items with partial words, without accents and with typos, ranks open items and near deadlines higher, and stays fast as the catalogue grows to ~10k items. No new registry: same scd_kb_items, same access rules.",
+        "scope": "KNOWLEDGE_BASE",
+        "constraints": [
+          "same scd_kb_search signature, return shape and permission/sensitivity logic (additive field match only)",
+          "migration written and tested, applied only after Direzione approval",
+          "no personal data of families or minors in the catalogue (UD-077 unchanged)"
+        ],
+        "status": "IN_PROGRESS",
+        "delivered": [
+          "supabase/migrations/20261013_r98_kb_search_performance.sql written, NOT applied: unaccent + pg_trgm (schema extensions), scd_italian_unaccent text search configuration, prefix terms, trigram fallback flagged match=fuzzy, ranking boosts, counts without a second pass for text queries",
+          "apps/superapp/src/routes/direzione_.cervellone.tsx: search as you type (250 ms), 'Risultati simili' section, highlighted terms as text nodes, area facets and empty-state area suggestions",
+          "apps/superapp/src/lib/knowledge.ts: kbSearchTerms (mirror of scd_kb_query_terms), highlightParts, splitByMatch, topAreas; parseKb accepts optional match"
+        ],
+        "pending": [
+          "Direzione approval and application of r98 on SCD PULSE; the Fill-the-catalogue part ('pieno') continues through the UD-077 ingestion"
+        ]
+      }
     }
   ],
   "completionGate": {
