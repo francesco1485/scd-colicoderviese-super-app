@@ -2,6 +2,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { BUILD_STAMP } from "@/lib/build-stamp";
 import {
   CalendarDays,
+  ChevronDown,
   Circle,
   Ellipsis,
   Facebook,
@@ -593,6 +594,14 @@ export function BottomNav() {
 const SOCIAL_ICON = { instagram: Instagram, facebook: Facebook } as const;
 
 export function SiteFooter() {
+  const [openGroups, setOpenGroups] = useState<ReadonlySet<string>>(() => new Set());
+  const toggleGroup = (id: string) =>
+    setOpenGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
   return (
     <footer className="mt-10" data-testid="site-footer">
       <div className="bg-[#0b2a5b] px-4 pb-20 pt-10 text-white lg:px-8">
@@ -654,11 +663,30 @@ export function SiteFooter() {
                 Tutto sul club
               </h2>
               {/* UD-110: the former home accordions "Tutto sul club" live here, on every page. */}
-              <div className="grid gap-x-6 gap-y-4 sm:grid-cols-2 xl:grid-cols-3">
+              {/* Phones: each group is a collapsible row so the footer stays short. From sm up every group is open. */}
+              <div className="grid gap-x-6 sm:grid-cols-2 sm:gap-y-4 xl:grid-cols-3">
                 {LINK_GROUPS.map((g) => (
-                  <div key={g.id} className="grid content-start gap-0">
-                    <h3 className="m-0 text-[13px] font-bold text-white">{g.title}</h3>
-                    <ul className="m-0 grid list-none p-0">
+                  <div key={g.id} className="grid content-start gap-0 border-b border-white/15 sm:border-b-0" data-testid={`footer-group-${g.id}`}>
+                    <h3 className="m-0 text-[13px] font-bold text-white">
+                      <button
+                        type="button"
+                        onClick={() => toggleGroup(g.id)}
+                        aria-expanded={openGroups.has(g.id)}
+                        aria-controls={`footer-group-list-${g.id}`}
+                        className="scd-focus flex min-h-12 w-full items-center justify-between gap-2 text-left text-[14px] sm:hidden"
+                      >
+                        {g.title}
+                        <ChevronDown
+                          className={`size-4 shrink-0 text-white/70 transition-transform duration-150 motion-reduce:transition-none ${openGroups.has(g.id) ? "rotate-180" : ""}`}
+                          aria-hidden="true"
+                        />
+                      </button>
+                      <span className="hidden sm:inline">{g.title}</span>
+                    </h3>
+                    <ul
+                      id={`footer-group-list-${g.id}`}
+                      className={`m-0 list-none p-0 pb-2 sm:grid sm:pb-0 ${openGroups.has(g.id) ? "grid" : "hidden"}`}
+                    >
                       {g.items.map((n) => (
                         <li key={n.label}>
                           <Link
