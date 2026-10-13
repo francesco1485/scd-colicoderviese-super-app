@@ -127,7 +127,7 @@ export function HeroHeader({
 /** Testata corta (Calendario, Area Atleta, Area Riservata): stemma che sborda, titolo e azione. */
 export function PageHeader({ title, action, testId }: { title: string; action?: ReactNode; testId?: string }) {
   return (
-    <header className="scd-hero-plain relative z-10 text-white" data-testid={testId}>
+    <header className="scd-hero-plain relative text-white" data-testid={testId}>
       <div className="relative mx-auto flex h-[90px] max-w-6xl items-start px-4 pb-[14px] sm:px-6">
         <Link to="/" aria-label={`${CLUB_NAME}, vai alla Home`} className="absolute left-4 top-[8px] z-20 sm:left-6">
           <Crest height={80} />

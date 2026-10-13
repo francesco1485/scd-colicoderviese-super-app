@@ -642,7 +642,7 @@ export function SiteFooter() {
   return (
     <footer className="mt-10" data-testid="site-footer">
       {home && <FooterSponsors />}
-      <div className="bg-[#0b2a5b] px-4 py-10 text-white lg:px-8">
+      <div className="bg-[#0b2a5b] px-4 pb-20 pt-10 text-white lg:px-8">
         <div className="mx-auto grid max-w-[1280px] gap-8">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <Link

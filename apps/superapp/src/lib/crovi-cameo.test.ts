@@ -72,7 +72,7 @@ describe("Crovi cameo", () => {
   });
 
   it("never states scores, times or names", () => {
-    for (const p of ["/", "/calendario", "/squadre", "/impianti", "/eventi", "/sponsor", "/contatti"]) {
+    for (const p of ["/", "/calendario", "/squadre", "/impianti", "/eventi", "/sponsor", "/partner", "/societa", "/contatti"]) {
       expect(cameoLine(p)!.text).not.toMatch(/\d{1,2}[:.]\d{2}|\d+\s*-\s*\d+/);
     }
   });
