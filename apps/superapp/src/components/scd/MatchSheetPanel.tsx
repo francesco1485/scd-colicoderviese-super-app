@@ -1,5 +1,6 @@
 import { useServerFn } from "@tanstack/react-start";
-import { Check, ClipboardCopy, ClipboardList, Plus, Printer, RefreshCw, X } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { Check, ClipboardCopy, ClipboardList, Plus, Printer, RefreshCw, UsersRound, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Chip } from "@/components/scd/interior-ui";
@@ -24,7 +25,7 @@ const escapeHtml = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", 
  * numbers, starters, captain, vice and the adults on the bench. The club officer copies it into the LND portal
  * (mandatory "lista di presentazione" for youth championships) or prints it where paper is allowed.
  */
-export function MatchSheetPanel({ eventId, heading, refreshKey }: { eventId: string; heading: string; refreshKey: number }) {
+export function MatchSheetPanel({ eventId, heading, refreshKey, home = false }: { eventId: string; heading: string; refreshKey: number; home?: boolean }) {
   const load = useServerFn(getMatchSheet);
   const save = useServerFn(saveMatchSheet);
   const [data, setData] = useState<MatchSheetData | null>(null);
@@ -270,7 +271,25 @@ export function MatchSheetPanel({ eventId, heading, refreshKey }: { eventId: str
                 <Printer className="size-4" aria-hidden="true" />
                 Stampa
               </button>
+              {home && (
+                <Link
+                  to="/gestionale/distinta/$eventId/spettatori"
+                  params={{ eventId }}
+                  target="_blank"
+                  className="scd-focus inline-flex h-11 items-center gap-2 rounded-[10px] border border-[var(--scd-blue)] bg-white px-3 text-[14px] font-semibold text-[var(--scd-blue)]"
+                  data-testid="sheet-spectators"
+                >
+                  <UsersRound className="size-4" aria-hidden="true" />
+                  Stampa distinta spettatori
+                </Link>
+              )}
             </div>
+            {home && (
+              <p className="m-0 text-[13px] text-[var(--in-sub)]">
+                La distinta spettatori usa la versione salvata: minorenni con
+                nome e iniziale del cognome, nessun nome per l'attività di base.
+              </p>
+            )}
             <p className="m-0 text-[13px] text-[var(--in-sub)]">Per Allievi e Giovanissimi la lista ufficiale si fa sul portale LND (lista di presentazione). Tessere e documenti si verificano lì: l'app non li conserva.</p>
           </div>
         </details>

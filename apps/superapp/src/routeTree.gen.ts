@@ -83,6 +83,7 @@ import { Route as GestionaleImpiantiColicoRouteImport } from './routes/gestional
 import { Route as GestionaleImpiantiDervioRouteImport } from './routes/gestionale_.impianti.dervio'
 import { Route as GestionaleImpiantiNuovaRouteImport } from './routes/gestionale_.impianti.nuova'
 import { Route as GestionaleImpiantiSimulazioneRouteImport } from './routes/gestionale_.impianti.simulazione'
+import { Route as GestionaleDistintaEventIdSpettatoriRouteImport } from './routes/gestionale_.distinta.$eventId.spettatori'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -459,6 +460,12 @@ const GestionaleImpiantiSimulazioneRoute =
     path: '/simulazione',
     getParentRoute: () => GestionaleImpiantiRoute,
   } as any)
+const GestionaleDistintaEventIdSpettatoriRoute =
+  GestionaleDistintaEventIdSpettatoriRouteImport.update({
+    id: '/gestionale_/distinta/$eventId/spettatori',
+    path: '/gestionale/distinta/$eventId/spettatori',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -535,6 +542,7 @@ export interface FileRoutesByFullPath {
   '/gestionale/impianti/nuova': typeof GestionaleImpiantiNuovaRoute
   '/gestionale/impianti/simulazione': typeof GestionaleImpiantiSimulazioneRoute
   '/gestionale/impianti/': typeof GestionaleImpiantiIndexRoute
+  '/gestionale/distinta/$eventId/spettatori': typeof GestionaleDistintaEventIdSpettatoriRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -610,6 +618,7 @@ export interface FileRoutesByTo {
   '/gestionale/impianti/nuova': typeof GestionaleImpiantiNuovaRoute
   '/gestionale/impianti/simulazione': typeof GestionaleImpiantiSimulazioneRoute
   '/gestionale/impianti': typeof GestionaleImpiantiIndexRoute
+  '/gestionale/distinta/$eventId/spettatori': typeof GestionaleDistintaEventIdSpettatoriRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -687,6 +696,7 @@ export interface FileRoutesById {
   '/gestionale_/impianti/nuova': typeof GestionaleImpiantiNuovaRoute
   '/gestionale_/impianti/simulazione': typeof GestionaleImpiantiSimulazioneRoute
   '/gestionale_/impianti/': typeof GestionaleImpiantiIndexRoute
+  '/gestionale_/distinta/$eventId/spettatori': typeof GestionaleDistintaEventIdSpettatoriRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -765,6 +775,7 @@ export interface FileRouteTypes {
     | '/gestionale/impianti/nuova'
     | '/gestionale/impianti/simulazione'
     | '/gestionale/impianti/'
+    | '/gestionale/distinta/$eventId/spettatori'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -840,6 +851,7 @@ export interface FileRouteTypes {
     | '/gestionale/impianti/nuova'
     | '/gestionale/impianti/simulazione'
     | '/gestionale/impianti'
+    | '/gestionale/distinta/$eventId/spettatori'
   id:
     | '__root__'
     | '/'
@@ -916,6 +928,7 @@ export interface FileRouteTypes {
     | '/gestionale_/impianti/nuova'
     | '/gestionale_/impianti/simulazione'
     | '/gestionale_/impianti/'
+    | '/gestionale_/distinta/$eventId/spettatori'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -987,6 +1000,7 @@ export interface RootRouteChildren {
   EventiIndexRoute: typeof EventiIndexRoute
   GestionaleIndexRoute: typeof GestionaleIndexRoute
   QuadroIndexRoute: typeof QuadroIndexRoute
+  GestionaleDistintaEventIdSpettatoriRoute: typeof GestionaleDistintaEventIdSpettatoriRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1509,6 +1523,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GestionaleImpiantiSimulazioneRouteImport
       parentRoute: typeof GestionaleImpiantiRoute
     }
+    '/gestionale_/distinta/$eventId/spettatori': {
+      id: '/gestionale_/distinta/$eventId/spettatori'
+      path: '/gestionale/distinta/$eventId/spettatori'
+      fullPath: '/gestionale/distinta/$eventId/spettatori'
+      preLoaderRoute: typeof GestionaleDistintaEventIdSpettatoriRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -1602,6 +1623,8 @@ const rootRouteChildren: RootRouteChildren = {
   EventiIndexRoute: EventiIndexRoute,
   GestionaleIndexRoute: GestionaleIndexRoute,
   QuadroIndexRoute: QuadroIndexRoute,
+  GestionaleDistintaEventIdSpettatoriRoute:
+    GestionaleDistintaEventIdSpettatoriRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
