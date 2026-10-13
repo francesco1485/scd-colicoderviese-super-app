@@ -1,11 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Mail, MailPlus, UsersRound } from "lucide-react";
+import { ImagePlus, Mail, MailPlus, Shirt, UsersRound } from "lucide-react";
 import { useState, type ReactNode } from "react";
 
 import { Card, SourceLine } from "@/components/scd/interior-ui";
 import { EmptyState, SourcesBox, WorkAreaGateView, WorkAreaShell, workAreaHead } from "@/components/scd/work-area-ui";
+import { crmKitId, kitSubjectLabel, sponsorLogo, subjectFromSponsor } from "@/lib/partner-kit";
+import { SPONSORS, SPONSORS_AS_OF } from "@/lib/sponsors";
 import { getWorkAreaGate } from "@/lib/work-areas.functions";
-import { CRM_PIPELINE, factStamp } from "@/lib/work-areas";
+import { CRM_PIPELINE, factStamp, italianDate } from "@/lib/work-areas";
 
 /** CRM contatti (board CRM.dc.html): one register, pipeline with documented counts only. */
 export const Route = createFileRoute("/crm")({
@@ -68,6 +70,15 @@ function NameList({ names, tone }: { names: readonly string[]; tone: "ok" | "war
           >
             <Mail className="size-4" aria-hidden="true" /> Scrivi allo sponsor
           </Link>
+          <Link
+            to="/crm/partner/$partnerId"
+            params={{ partnerId: crmKitId(n) }}
+            className="scd-focus ml-1.5 mt-2 inline-flex min-h-10 items-center gap-1.5 rounded-[9px] border border-[var(--in-line)] bg-[#f7fbff] px-2.5 text-[13.5px] font-semibold text-[var(--in-info)]"
+            aria-label={`Kit partner di ${n}`}
+            data-testid="crm-partner-kit"
+          >
+            <Shirt className="size-4" aria-hidden="true" /> Kit partner
+          </Link>
         </li>
       ))}
     </ul>
@@ -118,6 +129,13 @@ function CrmPage({ preview }: { preview: boolean }) {
                 >
                   <MailPlus className="size-4" aria-hidden="true" /> Scrivi a tutti i partner
                 </Link>
+                <Link
+                  to="/crm/partner/nuovo"
+                  className="scd-focus inline-flex min-h-11 items-center justify-center gap-2 rounded-[10px] border border-[var(--in-line)] bg-white px-4 text-[15px] font-semibold text-[var(--in-ink)]"
+                  data-testid="crm-new-partner-kit"
+                >
+                  <ImagePlus className="size-4" aria-hidden="true" /> Kit nuovo partner
+                </Link>
                 <span className="text-[13.5px] leading-snug text-[var(--in-sub)]">
                   Parte da sportclubcolico@gmail.com con il tuo nome; una mail separata per ogni partner, le risposte tornano nella Posta del club.
                 </span>
@@ -136,6 +154,7 @@ function CrmPage({ preview }: { preview: boolean }) {
                   <NameList names={P.expiredToRenew} tone="warn" />
                 </Column>
               </div>
+              <PartnerKitGrid />
               </>
             ) : (
               <Card>
@@ -167,5 +186,40 @@ function CrmPage({ preview }: { preview: boolean }) {
         </div>
       </div>
     </WorkAreaShell>
+  );
+}
+
+/** Kit partner of every season sponsor (UD-109): official logo tiles, each opening /crm/partner/<slug>. */
+function PartnerKitGrid() {
+  return (
+    <section aria-labelledby="crm-kit-title" className="mt-4 rounded-2xl border border-[var(--in-line)] bg-white p-3 sm:p-4" data-testid="crm-kit-grid">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 px-1 pb-3">
+        <h3 id="crm-kit-title" className="m-0 text-[16px] font-bold">
+          Kit partner · sponsor 2026/27
+        </h3>
+        <span className="text-[13px] text-[var(--in-sub)]">
+          {SPONSORS.length} partner, elenco della Direzione al {italianDate(SPONSORS_AS_OF)}
+        </span>
+      </div>
+      <ul className="m-0 grid list-none grid-cols-2 gap-2 p-0 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6">
+        {SPONSORS.map((s) => {
+          const subject = subjectFromSponsor(s);
+          const label = kitSubjectLabel(subject);
+          return (
+            <li key={s.slug} className="min-w-0">
+              <Link
+                to="/crm/partner/$partnerId"
+                params={{ partnerId: s.slug }}
+                className="scd-focus group flex h-full min-h-[92px] flex-col items-center justify-center gap-1.5 rounded-xl border border-[var(--in-line)] bg-[#fbfdff] px-2 py-2.5 text-center transition-colors duration-150 hover:border-[#b9d5ef] hover:bg-white"
+                aria-label={`Kit partner di ${label}`}
+              >
+                <img src={sponsorLogo(s).src} alt="" aria-hidden="true" loading="lazy" decoding="async" className="h-9 w-auto max-w-[80%] object-contain" />
+                <span className="line-clamp-2 text-[12.5px] font-semibold leading-tight text-[var(--in-ink)]">{label}</span>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
   );
 }

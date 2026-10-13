@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, 
 
 import {
   LEDWALL_BOARD,
+  LEDWALL_CLUB_EVERY,
   LEDWALL_CLUB_TEXT,
   LEDWALL_CREST,
   LEDWALL_SLOT_MS,
@@ -38,14 +39,27 @@ export interface LedwallRotatorProps {
   /** full: the sponsor page visual; compact: a close-up band for the home. */
   variant?: "full" | "compact";
   list?: readonly Sponsor[];
+  /** Club slot after every N partners (default LEDWALL_CLUB_EVERY); 1 alternates partner and club (dedicated board). */
+  clubEvery?: number;
+  /** Visible label over the still (default: the rotation label). */
+  label?: string;
   className?: string;
 }
 
 const LABEL = "Anteprima ledwall · i partner a rotazione";
 
-export function LedwallRotator({ day, nowMs, variant = "full", list = SPONSORS, className = "" }: LedwallRotatorProps) {
-  const slots = useMemo(() => ledwallSequence(list, day), [list, day]);
+export function LedwallRotator({
+  day,
+  nowMs,
+  variant = "full",
+  list = SPONSORS,
+  clubEvery = LEDWALL_CLUB_EVERY,
+  label = LABEL,
+  className = "",
+}: LedwallRotatorProps) {
+  const slots = useMemo(() => ledwallSequence(list, day, clubEvery), [list, day, clubEvery]);
   const partners = list.length;
+  const single = partners === 1;
   const [idx, setIdx] = useState(() => slotIndexAt(slots.length, msIntoRomeDay(nowMs)));
   const [auto, setAuto] = useState(false);
   const [userPaused, setUserPaused] = useState(false);
@@ -108,7 +122,9 @@ export function LedwallRotator({ day, nowMs, variant = "full", list = SPONSORS, 
       setIdx(n);
       setAnnounce(
         s?.kind === "partner"
-          ? `${s.label}, partner ${s.ordinal} di ${partners}`
+          ? single
+            ? s.label
+            : `${s.label}, partner ${s.ordinal} di ${partners}`
           : `${LEDWALL_CLUB_TEXT.kicker}, ${LEDWALL_CLUB_TEXT.title}`,
       );
     },
@@ -135,7 +151,7 @@ export function LedwallRotator({ day, nowMs, variant = "full", list = SPONSORS, 
       ref={rootRef}
       role="region"
       aria-roledescription="carosello"
-      aria-label="Anteprima del ledwall del campo: i partner della stagione 2026/27 a rotazione"
+      aria-label={single ? "Anteprima del ledwall del campo dedicato al partner, alternato allo spazio del club" : "Anteprima del ledwall del campo: i partner della stagione 2026/27 a rotazione"}
       className={`scd-ledrot ${className}`}
       data-variant={variant}
       data-running={running ? "true" : "false"}
@@ -194,14 +210,14 @@ export function LedwallRotator({ day, nowMs, variant = "full", list = SPONSORS, 
           className="pointer-events-none absolute left-2.5 top-2.5 rounded-full bg-[#0b2a5b]/85 px-2.5 py-1 text-[11.5px] font-bold uppercase leading-none tracking-[0.06em] text-white ring-1 ring-white/25 backdrop-blur-sm sm:left-3 sm:top-3 sm:text-[12.5px]"
           data-testid="ledwall-rotator-label"
         >
-          {LABEL}
+          {label}
         </span>
       </div>
       <div className={`flex items-center gap-2 ${compact ? "pt-2.5" : "pt-3"}`}>
         <p className="m-0 min-w-0 flex-1 truncate text-[13px] font-semibold tabular-nums text-[#4a5d7a]" data-testid="ledwall-counter">
-          {slot.kind === "partner" ? `Partner ${slot.ordinal} di ${partners}` : "Spazio del club"}
+          {slot.kind === "partner" ? (single ? "Partner dedicato" : `Partner ${slot.ordinal} di ${partners}`) : "Spazio del club"}
         </p>
-        <button type="button" className={btn} onClick={() => go(-1)} aria-label="Partner precedente sul ledwall">
+        <button type="button" className={btn} onClick={() => go(-1)} aria-label={single ? "Passaggio precedente sul ledwall" : "Partner precedente sul ledwall"}>
           <ChevronLeft className="size-5" aria-hidden="true" />
         </button>
         {auto && (
@@ -216,7 +232,7 @@ export function LedwallRotator({ day, nowMs, variant = "full", list = SPONSORS, 
             {userPaused ? <Play className="size-4" aria-hidden="true" /> : <Pause className="size-4" aria-hidden="true" />}
           </button>
         )}
-        <button type="button" className={btn} onClick={() => go(1)} aria-label="Partner successivo sul ledwall">
+        <button type="button" className={btn} onClick={() => go(1)} aria-label={single ? "Passaggio successivo sul ledwall" : "Partner successivo sul ledwall"}>
           <ChevronRight className="size-5" aria-hidden="true" />
         </button>
       </div>

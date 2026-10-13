@@ -2618,6 +2618,46 @@
           "apps/superapp/src/lib/client-bundle.test.ts (roster RPC and fixtures out of the public bundle)"
         ]
       }
+    },
+    {
+      "sourceDate": "2026-10-13",
+      "sourceTime": "17:45",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-109",
+      "name": "PARTNER_KIT_IN_SPONSOR_GESTIONALE",
+      "sourceQuoteFragments": [
+        "avere dentro al gestionale sponsor già pronto il ledwall studiato ad hoc per ogni partner, anche la divisa della mascotte, le divise con stemma in primo piano, immagine di calendari e dirette con sponsor che è in barra sotto, e poi man mano penseremo ad altro",
+        "questo ci permette di far capire allo sponsor subito di cosa stiamo parlando e quando mandiamo offerta è completa in base alla sua richiesta o alla nostra offerta di rinnovo, poi per i nuovi sponsor una volta anagrafati nel CRM andremo a fare lo stesso così da avere già idea dell'offerta"
+      ],
+      "normalizedCommand": {
+        "rule": "Inside the sponsor management area (/crm, same gate) every partner has a ready 'Kit partner' page (/crm/partner/<id>): (1) dedicated LED wall (LedwallRotator with only that partner alternating with the club slot) plus the downloadable 12 s 9:16 spot; (2) Sky in white match kit with the partner logo on the chest instead of ATV, only as an internal proposal labelled 'Proposta · non pubblicare senza approvazione'; (3) the four kits of the club identity board (Home, Away, Orange, Goalkeeper) with the partner logo in the sponsor zone and the official crest in front (x1.3); (4) the week's calendar card (1080x1350 and 1080x1920) from the official fixtures with the bar 'Calendario offerto da <logo>'; (5) the live-stream frame 1920x1080 with the partner bar at the bottom and the score bug area free; (6) 'Prepara offerta': every image exported as PNG in the browser (one button each and 'Scarica tutto') plus a printable summary of what the partner receives. New prospects: 'Kit nuovo partner' (/crm/partner/nuovo) with a logo picked on the device; CRM records work through the same PartnerKitSubject {id, name, nameVerified, logoSrc, source sponsors|crm|local}.",
+        "scope": "SPONSOR_AREA_INTERNAL",
+        "torreFloor": "3_PARTNER + -1_REGIA (/crm)",
+        "decisions": [
+          "Sky may carry the partner logo instead of ATV ONLY as an internal proposal (label 'Proposta')",
+          "kits come from the club identity board (Home/Away/Orange/Goalkeeper); crest is the official media/brand/logo-scd.png, never redrawn",
+          "same visual system everywhere ('stesse impostazioni grafiche da per tutto'); name always 'S.C.D. ColicoDerviese'"
+        ],
+        "constraints": [
+          "internal only: work area 'crm' gate (R20 roles or staging preview with banner), noindex, never linked from public pages",
+          "unverified names show 'Partner', never an invented name",
+          "local logos stay on the device (object URL): never uploaded, stored or mailed; no mail is sent from the page",
+          "calendar card: only public fixture facts (date, time, team label, opponent, home/away, venue); no player names, no faces of minors",
+          "no amounts in the offer summary (values only on the Direzione's personalised proposal)",
+          "CRM contract names map to a sponsor kit only through the explicit alias table CRM_SPONSOR_ALIASES (INFERRED, to confirm)"
+        ],
+        "status": "IMPLEMENTED_BRANCH_AGENT_PARTNERKIT",
+        "delivered": [
+          "apps/superapp/src/lib/partner-kit.ts (+ tests), partner-kit-render.ts, partner-kit.functions.ts",
+          "apps/superapp/src/components/partner-kit/PartnerKitPage.tsx (+ tests)",
+          "apps/superapp/src/routes/crm_.partner.$partnerId.tsx, crm_.partner.nuovo.tsx, crm.tsx (Kit partner links, Kit nuovo partner, sponsor kit grid)",
+          "apps/superapp/src/components/LedwallRotator.tsx (clubEvery, label props)",
+          "apps/superapp/public/media/sponsor/kit/, public/media/sponsor/spot/ (37 spots + posters)",
+          "config/scd-assets.v1.json (PARTNER_KIT_MOCKUP_BASE, spots, posters)"
+        ],
+        "duplicate_work": "DENY"
+      }
     }
   ],
   "completionGate": {

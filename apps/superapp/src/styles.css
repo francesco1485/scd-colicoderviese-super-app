@@ -898,3 +898,11 @@ html.uv-big .sa-shell { zoom: 1.12; }
   .scd-ledrot-slot { animation: none !important; }
   .scd-ledrot-board { transition: none !important; }
 }
+
+/* Kit partner (UD-109): "Stampa il riepilogo" prints only the offer summary of the page. */
+@media print {
+  body.pk-printing * { visibility: hidden !important; }
+  body.pk-printing .pk-print,
+  body.pk-printing .pk-print * { visibility: visible !important; }
+  body.pk-printing .pk-print { position: absolute; left: 0; top: 0; width: 100%; border: 0; box-shadow: none; }
+}
