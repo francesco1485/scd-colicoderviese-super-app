@@ -4676,6 +4676,38 @@
         "privacy_rule": "NO_PERSONAL_DONOR_DATA"
       }
     },
+    "partner_kit": {
+      "directive": "UD-109",
+      "app": "SCD_GROW_IN_CORE_SPONSOR_AREA",
+      "routes": [
+        "/crm/partner/$partnerId",
+        "/crm/partner/nuovo"
+      ],
+      "access": "SAME_GATE_AS_CRM_WORK_AREA_NOINDEX_NEVER_PUBLIC",
+      "subject": "PartnerKitSubject {id, name|null, nameVerified, logoSrc, source: sponsors|crm|local}",
+      "blocks": [
+        "LEDWALL_DEDICATED",
+        "SKY_PROPOSAL",
+        "KITS_CREST_IN_FRONT",
+        "WEEK_CALENDAR_CARD",
+        "LIVE_PARTNER_BAR",
+        "OFFER_EXPORT_AND_PRINT"
+      ],
+      "rules": [
+        "NO_INVENTED_NAMES_NEUTRAL_PARTNER_LABEL",
+        "OFFICIAL_CREST_NEVER_REDRAWN",
+        "SKY_LOGO_SWAP_PROPOSAL_ONLY",
+        "LOCAL_LOGO_NEVER_UPLOADED",
+        "NO_MAIL_SENT",
+        "PUBLIC_FIXTURE_FACTS_ONLY_NO_MINORS",
+        "NO_AMOUNTS"
+      ],
+      "sources": [
+        "apps/superapp/src/lib/sponsors.ts SPONSORS",
+        "apps/superapp/src/lib/work-areas.ts CRM_PIPELINE",
+        "official calendar snapshot via calendar-bridge.server.ts"
+      ]
+    },
     "sponsor_center_development": {
       "state": "LIVE_MASTER_WITH_VERIFIED_SNAPSHOT_FALLBACK",
       "private_surface": "PARTNER_OS_EXISTING_INITIATIVES_VIEW",

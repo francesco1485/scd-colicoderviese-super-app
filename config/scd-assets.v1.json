@@ -404,7 +404,8 @@
       "INTERNAL_BADGE": "CUTOUT",
       "LED_DEMO_VIDEO": "VIDEO",
       "VIDEO_POSTER": "PHOTO",
-      "LED_BOARD_STILL": "PHOTO"
+      "LED_BOARD_STILL": "PHOTO",
+      "PARTNER_KIT_MOCKUP_BASE": "PHOTO"
     },
     "runtime_roots": [
       "apps/superapp/public/media/",
@@ -2091,6 +2092,82 @@
       "use": "LED wall preview (src/components/LedwallRotator.tsx): /sponsor every day, compact on the public home on LEDWALL_HOME_DAYS; board rectangle x 246-1718, y 422-540 of the 1920x1080 frame (LEDWALL_BOARD_PX)",
       "note": "composite preview, not footage: the partner logos are overlaid in the app on the empty board and the page labels it 'Anteprima ledwall · i partner a rotazione'; no claim about the real board schedule",
       "verified_at": "2026-10-13"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/kit/kit-home.webp",
+      "class": "PARTNER_KIT_MOCKUP_BASE",
+      "status": "REFERENCE_PROTOTYPE",
+      "asset_decision": "KEEP_ENHANCE",
+      "source": "Direzione upload 2026-10-13 (club identity board 05448a4a, kits Home/Away/Orange/Goalkeeper): 'avere dentro al gestionale sponsor ... le divise con stemma in primo piano'",
+      "git_blob_sha": "8771611d35393462188df7656073da055c92c297",
+      "transform": "rectangular crop of the Home kit panel of the board (coloured panel and kit label included), WebP lossy; no crest or sponsor in the panel",
+      "use": "internal partner kit /crm/partner/<id> (src/lib/partner-kit.ts KIT_BASES): partner logo in the measured sponsor zone, official crest media/brand/logo-scd.png composited at the chest anchor x1.3",
+      "note": "REFERENCE_BOARD-derived mockup, internal only (UD-109): labelled 'Proposta', never on public pages, not an approved kit"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/kit/kit-away.webp",
+      "class": "PARTNER_KIT_MOCKUP_BASE",
+      "status": "REFERENCE_PROTOTYPE",
+      "asset_decision": "KEEP_ENHANCE",
+      "source": "Direzione upload 2026-10-13 (club identity board 05448a4a, kits Home/Away/Orange/Goalkeeper): 'avere dentro al gestionale sponsor ... le divise con stemma in primo piano'",
+      "git_blob_sha": "e322c13cf6c8fad87006eb3ed3df95a462ec1e74",
+      "transform": "rectangular crop of the Away kit panel of the board (coloured panel and kit label included), WebP lossy; no crest or sponsor in the panel",
+      "use": "internal partner kit /crm/partner/<id> (src/lib/partner-kit.ts KIT_BASES): partner logo in the measured sponsor zone, official crest media/brand/logo-scd.png composited at the chest anchor x1.3",
+      "note": "REFERENCE_BOARD-derived mockup, internal only (UD-109): labelled 'Proposta', never on public pages, not an approved kit"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/kit/kit-orange.webp",
+      "class": "PARTNER_KIT_MOCKUP_BASE",
+      "status": "REFERENCE_PROTOTYPE",
+      "asset_decision": "KEEP_ENHANCE",
+      "source": "Direzione upload 2026-10-13 (club identity board 05448a4a, kits Home/Away/Orange/Goalkeeper): 'avere dentro al gestionale sponsor ... le divise con stemma in primo piano'",
+      "git_blob_sha": "f330862a039f649a5284404c7e9f188aca79f808",
+      "transform": "rectangular crop of the Orange kit panel of the board (coloured panel and kit label included), WebP lossy; no crest or sponsor in the panel",
+      "use": "internal partner kit /crm/partner/<id> (src/lib/partner-kit.ts KIT_BASES): partner logo in the measured sponsor zone, official crest media/brand/logo-scd.png composited at the chest anchor x1.3",
+      "note": "REFERENCE_BOARD-derived mockup, internal only (UD-109): labelled 'Proposta', never on public pages, not an approved kit"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/kit/kit-goalkeeper.webp",
+      "class": "PARTNER_KIT_MOCKUP_BASE",
+      "status": "REFERENCE_PROTOTYPE",
+      "asset_decision": "KEEP_ENHANCE",
+      "source": "Direzione upload 2026-10-13 (club identity board 05448a4a, kits Home/Away/Orange/Goalkeeper): 'avere dentro al gestionale sponsor ... le divise con stemma in primo piano'",
+      "git_blob_sha": "fd778e94a677ba15464c17d33a7a3bd8abe30bb9",
+      "transform": "rectangular crop of the Goalkeeper kit panel of the board (coloured panel and kit label included), WebP lossy; no crest or sponsor in the panel",
+      "use": "internal partner kit /crm/partner/<id> (src/lib/partner-kit.ts KIT_BASES): partner logo in the measured sponsor zone, official crest media/brand/logo-scd.png composited at the chest anchor x1.3",
+      "note": "REFERENCE_BOARD-derived mockup, internal only (UD-109): labelled 'Proposta', never on public pages, not an approved kit"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/kit/sky-partner-base.webp",
+      "class": "PARTNER_KIT_MOCKUP_BASE",
+      "status": "REFERENCE_PROTOTYPE",
+      "asset_decision": "KEEP_ENHANCE",
+      "source": "derived from the official Sky artwork apps/superapp/public/media/brand/sky-divisa-gara.webp (Sky in white match kit)",
+      "derived_from": "apps/superapp/public/media/brand/sky-divisa-gara.webp",
+      "git_blob_sha": "b507b53893c1182fc350e828f4b78fbfd1b53c6d",
+      "transform": "ATV chest logo inpainted away (plain shirt texture), a small residual red blur at x 183-224, y 319-341 cleaned with local inpainting; crest, other marks and the mascot untouched (pixel-identical outside the cleaned areas); WebP lossless 447x900",
+      "use": "internal partner kit, block 'Sky con il logo del partner' (SKY_BASE): partner logo composited in the chest zone",
+      "note": "internal proposal only (Direzione 13/10/2026): Sky may carry the partner logo instead of ATV only as a 'Proposta · non pubblicare senza approvazione'; the official Sky stays sky-divisa-gara.webp"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/spot/",
+      "class": "LED_DEMO_VIDEO",
+      "status": "REFERENCE_PROTOTYPE",
+      "asset_decision": "GENERATE_ORIGINAL",
+      "source": "12 s 9:16 LED spot per season sponsor (src/lib/sponsors.ts, 37 partners) rendered in session 2026-10-13 from the official crest, the sponsor cut-outs and the LED board still; unverified names are not written (logo only)",
+      "transform": "ffmpeg libx264 profile high, preset slow, CRF 28, 720x1280 Lanczos from the 1080x1920 render, yuv420p, no audio, +faststart (~370 KB each)",
+      "use": "internal partner kit, block 'Ledwall dedicato' (spotFor): loaded only on click, downloadable; HD masters on the Drive Ledwall sponsor folder",
+      "note": "demo for the partner offer, internal until the partner approves (UD-019); no claim about the real board schedule"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/spot/poster/",
+      "class": "VIDEO_POSTER",
+      "status": "REFERENCE_PROTOTYPE",
+      "asset_decision": "GENERATE_ORIGINAL",
+      "source": "frame at 6 s of each spot in media/sponsor/spot/",
+      "transform": "270x480 Lanczos, WebP lossy q62",
+      "use": "poster of the spot in the partner kit page",
+      "note": "internal, same rules as the spots"
     }
   ],
   "vector_research": [
