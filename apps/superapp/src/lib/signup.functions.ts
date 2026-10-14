@@ -56,6 +56,7 @@ const DeclarationInput = z.object({
     )
     .max(8),
   note: z.string().max(400),
+  tesserato: z.enum(["SI", "NO", "NON_SO"]).optional(),
 });
 
 function asDeclaration(d: z.infer<typeof DeclarationInput>): Declaration {
@@ -63,6 +64,7 @@ function asDeclaration(d: z.infer<typeof DeclarationInput>): Declaration {
     kinds: d.kinds as Declaration["kinds"],
     children: d.children,
     note: d.note,
+    tesserato: d.tesserato ?? "NON_SO",
   });
 }
 
@@ -136,7 +138,7 @@ export const signUpWithPassword = createServerFn({ method: "POST" })
     const sb = serverSupabase();
     if (!sb) return { outcome: "ERROR" };
     const email = data.email.trim().toLowerCase();
-    const { error } = await sb.auth.signUp({
+    const { data: created, error } = await sb.auth.signUp({
       email,
       password: data.password,
       options: {
@@ -144,6 +146,12 @@ export const signUpWithPassword = createServerFn({ method: "POST" })
         data: signupMetadata(input, declaration),
       },
     });
+    // An account with this e-mail already exists (e.g. the families loaded by the office, who never chose a
+    // password): Supabase answers with an empty identity list and sends nothing. Send the "scegli la password" e-mail
+    // instead, so everybody can register "from scratch" the same way (Direzione 14/10/2026). Same answer either way.
+    if (!error && created.user && (created.user.identities?.length ?? 0) === 0) {
+      await sb.auth.resetPasswordForEmail(email, { redirectTo: `${siteOrigin()}/accedi/conferma` });
+    }
     if (error) {
       const m = `${error.code ?? ""} ${error.message}`;
       if (/weak_password|pwned|leaked|weak/i.test(m))

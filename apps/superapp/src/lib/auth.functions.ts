@@ -13,6 +13,9 @@ import { mapAuthError, tokenHashInputSchema, verifyOtpInputSchema, type AuthErro
 import { landingFor, safeNext, sessionBadge, sessionRolesFrom, type Membership } from "./session";
 import { PROFILE_PAGE, isSocialUser, profileComplete } from "./signup";
 import { configuredSiteUrl } from "./http-policy";
+import { createRateLimiter } from "./access-requests";
+import { parseLoginIdentifier } from "./login-identifier";
+import { clientIp } from "./request-ip.server";
 import { serverSupabase, setRememberPreference } from "./supabase.server";
 
 export interface SessionView {
@@ -196,6 +199,11 @@ export const confirmTokenHash = createServerFn({ method: "POST" })
       const mapped = error ? mapAuthError(error, "send") : mapAuthError({}, "send");
       return { ok: false, next, message: mapped.kind === "rate_limit" ? mapped.message : "Link scaduto o già usato: chiedi un nuovo codice.", kind: mapped.kind === "rate_limit" ? "rate_limit" : "otp_invalid", retryAfter: mapped.retryAfter };
     }
+    // "Scegli la password" e-mail (registration of an account that already existed, or forgotten password).
+    if (data.type === "recovery") {
+      const landing = data.next ? next : (await sessionView()).landing;
+      return { ok: true, next: `${PASSWORD_PAGE}?benvenuto=1&next=${encodeURIComponent(landing)}`, message: "Sei dentro: scegli la password." };
+    }
     return landAfterEmailSignIn(verified.user, data.next, next);
   });
 
@@ -209,11 +217,13 @@ export interface PasswordOutcome {
   kind?: AuthErrorKind | undefined;
 }
 
+const allowPasswordAttempt = createRateLimiter(10, 10 * 60 * 1000);
+
 export const signInWithPassword = createServerFn({ method: "POST" })
-  .inputValidator((d: { email: string; password: string; remember: boolean; next?: string | undefined }) =>
+  .inputValidator((d: { identifier: string; password: string; remember: boolean; next?: string | undefined }) =>
     z
       .object({
-        email: z.string().trim().toLowerCase().email().max(120),
+        identifier: z.string().trim().max(120),
         password: z.string().min(1).max(PASSWORD_MAX),
         remember: z.boolean(),
         next: z.string().max(200).optional(),
@@ -224,8 +234,20 @@ export const signInWithPassword = createServerFn({ method: "POST" })
     const sb = serverSupabase({ remember: data.remember });
     const next = safeNext(data.next);
     if (!sb) return { ok: false, next, message: "L'accesso non è ancora configurato su questo server." };
+    const wrong = "E-mail (o telefono) o password non corretti. Riprova o usa \"Password dimenticata\".";
+    if (!allowPasswordAttempt(clientIp())) return { ok: false, next, message: "Troppi tentativi: riprova tra dieci minuti.", kind: "rate_limit" };
+    const id = parseLoginIdentifier(data.identifier);
+    if (id.kind === "invalid") return { ok: false, next, message: "Scrivi l'e-mail o il numero di telefono usati nella registrazione." };
+    let email = id.kind === "email" ? id.email : null;
+    if (id.kind === "phone") {
+      // r105: the database returns the e-mail only when this phone AND this password belong to one single account.
+      const { data: found, error: lookupError } = await sb.rpc("scd_login_email", { p_phone: id.phone, p_password: data.password });
+      if (lookupError || typeof found !== "string" || !found) return { ok: false, next, message: wrong, kind: "invalid_credentials" };
+      email = found;
+    }
+    if (!email) return { ok: false, next, message: wrong, kind: "invalid_credentials" };
     setRememberPreference(data.remember);
-    const { error } = await sb.auth.signInWithPassword({ email: data.email, password: data.password });
+    const { error } = await sb.auth.signInWithPassword({ email, password: data.password });
     if (error) {
       // Same answer for unknown e-mail and wrong password (no account enumeration).
       const mapped = mapAuthError(error, "password");

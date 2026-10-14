@@ -11,7 +11,7 @@ export const Route = createFileRoute("/accedi/conferma")({
   validateSearch: (s: Record<string, unknown>) => ({
     code: typeof s["code"] === "string" ? s["code"] : undefined,
     token_hash: typeof s["token_hash"] === "string" ? s["token_hash"] : undefined,
-    type: s["type"] === "magiclink" ? ("magiclink" as const) : s["type"] === "email" ? ("email" as const) : undefined,
+    type: (["magiclink", "email", "signup", "recovery"] as const).find((t) => t === s["type"]),
     next: typeof s["next"] === "string" ? safeNext(s["next"]) : undefined,
     r: s["r"] === "0" || s["r"] === 0 ? ("0" as const) : undefined,
     error_description: typeof s["error_description"] === "string" ? s["error_description"] : undefined,
@@ -76,7 +76,9 @@ function Conferma() {
         <h1 className="mt-3 text-[24px] font-bold text-[var(--scd-ink)]">{title}</h1>
         {state.phase === "ready" && (
           <>
-            <p className="mt-2 text-[15.5px] leading-snug text-[var(--scd-sub)]">Tocca il pulsante per entrare nella Super App del club con questo dispositivo.</p>
+            <p className="mt-2 text-[15.5px] leading-snug text-[var(--scd-sub)]">
+              {type === "recovery" ? "Tocca il pulsante: poi scegli la tua password e da lì in avanti entri sempre con e-mail (o telefono) e password." : "Tocca il pulsante per confermare: da qui in avanti entri sempre con e-mail (o telefono) e password."}
+            </p>
             <button type="button" onClick={() => void enter()} className="scd-action mt-5 h-[52px] w-full text-[17px] font-bold" data-testid="confirm-enter">
               Entra
               <ArrowRight className="size-5" aria-hidden="true" />

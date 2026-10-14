@@ -24,7 +24,7 @@ export const Route = createFileRoute("/accedi/")({
   head: () => ({
     meta: [
       { title: "Accedi — S.C.D. ColicoDerviese" },
-      { name: "description", content: "Entra nella Super App con e-mail e password, oppure con Google. Password dimenticata? Ti mandiamo un codice." },
+      { name: "description", content: "Entra nella Super App con e-mail o telefono e password. Password dimenticata? Ti mandiamo un codice." },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -162,7 +162,7 @@ function Accedi() {
     setBusy(true);
     setNotice(null);
     try {
-      const r = await login({ data: { email, password, remember, next } });
+      const r = await login({ data: { identifier: email, password, remember, next } });
       if (r.ok) {
         setPassword("");
         void navigate({ to: r.next as never, replace: true });
@@ -170,7 +170,7 @@ function Accedi() {
       }
       setNotice({ ok: false, message: r.kind === "not_confirmed" ? "Devi ancora confermare l'indirizzo: apri il link della e-mail di registrazione (una volta sola)." : r.message, kind: r.kind });
     } catch {
-      setNotice({ ok: false, message: "Controlla e-mail e password e riprova." });
+      setNotice({ ok: false, message: "Controlla e-mail (o telefono) e password e riprova." });
     } finally {
       setBusy(false);
     }
@@ -281,16 +281,16 @@ function Accedi() {
 
   const emailField = (
     <>
-      <label htmlFor={`${id}-e`} className="text-[14px] font-bold text-[var(--scd-sub)]">E-mail</label>
+      <label htmlFor={`${id}-e`} className="text-[14px] font-bold text-[var(--scd-sub)]">{forgot ? "E-mail" : "E-mail o telefono"}</label>
       <div className={field}>
         <Mail className="size-5 shrink-0 text-[var(--scd-sub)]" aria-hidden="true" />
         <input
           id={`${id}-e`}
           name="email"
-          type="email"
+          type={forgot ? "email" : "text"}
           required
           autoComplete={forgot ? "email" : "username"}
-          inputMode="email"
+          inputMode={forgot ? "email" : "text"}
           autoCapitalize="none"
           spellCheck={false}
           value={email}
@@ -299,7 +299,7 @@ function Accedi() {
             if (codeStep) setCodeStep(false);
           }}
           className={input}
-          placeholder="nome@esempio.it"
+          placeholder={forgot ? "nome@esempio.it" : "e-mail oppure 333 1234567"}
           data-testid="login-email"
         />
       </div>
@@ -546,7 +546,7 @@ function Accedi() {
             <ol className="mt-1 list-decimal space-y-1 pl-5">
               <li>Ti registri una volta con e-mail, telefono e password.</li>
               <li>Apri il link della e-mail di conferma, solo la prima volta.</li>
-              <li>Poi entri sempre con e-mail e password. Con "Ricordami" resti dentro su quel dispositivo.</li>
+              <li>Poi entri sempre con e-mail o telefono e password. Con "Ricordami" resti dentro su quel dispositivo.</li>
             </ol>
           </div>
           <p className="rounded-[14px] bg-white p-4 shadow-[0_6px_18px_-12px_rgb(2_20_51/0.4)]">

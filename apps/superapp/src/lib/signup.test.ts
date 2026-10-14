@@ -110,7 +110,7 @@ describe("normalizeDeclaration", () => {
       children: [{ firstName: "A", lastName: "B", birthYear: "" }],
       note: "  Under   15 ",
     });
-    expect(n).toEqual({ kinds: ["DIRIGENTE"], children: [], note: "Under 15" });
+    expect(n).toEqual({ kinds: ["DIRIGENTE"], children: [], note: "Under 15", tesserato: "NON_SO" });
   });
   it("keeps catalogue order and trims children, max five", () => {
     const kids = Array.from({ length: 7 }, (_, i) => ({
@@ -201,5 +201,14 @@ describe("signupMetadata and support", () => {
       true,
     );
     expect(decodeURIComponent(u)).toContain("Dove: Pagina Accedi");
+  });
+});
+
+describe("tesserato answer (Direzione 14/10/2026)", () => {
+  it("keeps SI / NO and turns anything else into NON_SO", () => {
+    const base = { kinds: [], children: [], note: "" };
+    expect(normalizeDeclaration({ ...base, tesserato: "SI" }).tesserato).toBe("SI");
+    expect(normalizeDeclaration({ ...base, tesserato: "NO" }).tesserato).toBe("NO");
+    expect(normalizeDeclaration(base).tesserato).toBe("NON_SO");
   });
 });

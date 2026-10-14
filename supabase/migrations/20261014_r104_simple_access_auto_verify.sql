@@ -66,7 +66,8 @@ as $$
   select jsonb_build_object(
     'kinds', case when jsonb_array_length(k.kinds) = 0 then '["TIFOSO"]'::jsonb else k.kinds end,
     'children', case when k.kinds ? 'GENITORE' then c.children else '[]'::jsonb end,
-    'note', left(btrim(coalesce(p ->> 'note', '')), 200))
+    'note', left(btrim(coalesce(p ->> 'note', '')), 200),
+    'tesserato', case when p ->> 'tesserato' in ('SI','NO') then p ->> 'tesserato' else 'NON_SO' end)
   from k, c;
 $$;
 

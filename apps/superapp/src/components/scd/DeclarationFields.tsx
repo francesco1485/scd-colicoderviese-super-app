@@ -4,6 +4,7 @@ import {
   ACCESS_PATH_TEXT,
   DECLARATION_KINDS,
   MAX_CHILDREN,
+  TESSERATO_OPTIONS,
   accessPaths,
   type Declaration,
   type DeclarationKind,
@@ -68,6 +69,29 @@ export function DeclarationFields({
       <legend className="px-1 text-[17px] font-bold text-[var(--scd-ink)]">
         Chi sei nel club?
       </legend>
+      <div role="radiogroup" aria-labelledby={`${idPrefix}-tess`} className="grid gap-2" data-testid="declare-tesserato">
+        <p id={`${idPrefix}-tess`} className="text-[15px] font-bold text-[var(--scd-ink)]">
+          Sei già tesserato con la S.C.D. ColicoDerviese?
+        </p>
+        <div className="grid gap-2 sm:grid-cols-3">
+          {TESSERATO_OPTIONS.map((o) => (
+            <label
+              key={o.id}
+              className={`flex min-h-12 cursor-pointer items-center gap-3 rounded-[12px] border-2 bg-white px-3 py-2 text-[15px] ${value.tesserato === o.id ? "border-[var(--scd-blue)]" : "border-[var(--scd-line)]"}`}
+              data-testid={`tesserato-${o.id}`}
+            >
+              <input
+                type="radio"
+                name={`${idPrefix}-tesserato`}
+                checked={value.tesserato === o.id}
+                onChange={() => onChange({ ...value, tesserato: o.id })}
+                className="size-5 shrink-0 accent-[var(--scd-blue)]"
+              />
+              <span className="text-[var(--scd-ink)]">{o.label}</span>
+            </label>
+          ))}
+        </div>
+      </div>
       <p className="-mt-1 text-[14px] leading-snug text-[var(--scd-sub)]">
         Puoi scegliere più voci. Se non scegli nulla entri come tifoso.
       </p>

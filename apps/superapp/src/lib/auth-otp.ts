@@ -17,7 +17,7 @@ export const SEND_COOLDOWN_SECONDS = 60;
 export const OTP_INVALID_MESSAGE = "Codice non valido o scaduto: chiedine uno nuovo";
 export const LINK_USED_MESSAGE = "Questo link è già stato usato o è scaduto. Succede anche quando il programma di posta lo apre da solo per controllarlo: nessun problema, chiedi un nuovo codice.";
 export const MAIL_DOWN_MESSAGE = "Il servizio di invio mail non risponde: avvisa la segreteria";
-export const INVALID_CREDENTIALS_MESSAGE = "E-mail o password non corretti. Se non hai mai impostato una password, usa il link o il codice via email.";
+export const INVALID_CREDENTIALS_MESSAGE = "E-mail (o telefono) o password non corretti. Se non hai ancora scelto una password, tocca \"Registrati\" oppure \"Password dimenticata\".";
 
 /** The subset of a Supabase AuthError this module reads (AuthApiError carries `status` and `code`). */
 export interface ProviderError {
@@ -108,7 +108,7 @@ export type VerifyOtpInput = z.input<typeof verifyOtpInputSchema>;
 /** Input of the confirm-by-click path for a scanner-safe template link (`?token_hash=…&type=email`). */
 export const tokenHashInputSchema = z.object({
   tokenHash: z.string().regex(/^[A-Za-z0-9_-]{16,200}$/),
-  type: z.enum(["email", "magiclink"]).default("email"),
+  type: z.enum(["email", "magiclink", "signup", "recovery"]).default("email"),
   next: z.string().max(200).optional(),
   remember: z.boolean().optional(),
 });

@@ -103,7 +103,7 @@ function Registrati() {
           <ClubCrestOfficial size={64} />
           <div>
             <h1 className="font-brand text-[42px] uppercase leading-[0.92] sm:text-[60px]"><span className="scd-brush">Registrati</span></h1>
-            <p className="mt-2 max-w-[40ch] text-[16px] leading-snug text-white/90 sm:text-[18px]">Una volta sola. Poi entri sempre con e-mail e password.</p>
+            <p className="mt-2 max-w-[40ch] text-[16px] leading-snug text-white/90 sm:text-[18px]">Una volta sola. Poi entri sempre con e-mail o telefono e password.</p>
           </div>
         </div>
       </section>
@@ -154,10 +154,10 @@ function Registrati() {
               <Field id={`${id}-birthDate`} label="Data di nascita" error={err("birthDate")}>
                 <input id={`${id}-birthDate`} type="date" autoComplete="bday" max={todayRome()} value={form.birthDate} onChange={(e) => set("birthDate", e.target.value)} {...aria("birthDate")} className={field} />
               </Field>
-              <Field id={`${id}-email`} label="E-mail (la userai per entrare)" error={err("email")}>
+              <Field id={`${id}-email`} label="E-mail (per entrare e per la conferma)" error={err("email")}>
                 <input id={`${id}-email`} type="email" inputMode="email" autoComplete="email" autoCapitalize="none" spellCheck={false} value={form.email} onChange={(e) => set("email", e.target.value)} {...aria("email")} className={field} placeholder="nome@esempio.it" />
               </Field>
-              <Field id={`${id}-phone`} label="Telefono cellulare" error={err("phone")}>
+              <Field id={`${id}-phone`} label="Telefono cellulare (puoi usarlo anche per entrare)" error={err("phone")}>
                 <input id={`${id}-phone`} type="tel" inputMode="tel" autoComplete="tel" value={form.phone} onChange={(e) => set("phone", e.target.value)} {...aria("phone")} className={field} placeholder="333 1234567" />
               </Field>
               <Field id={`${id}-password`} label={`Password (almeno ${PASSWORD_MIN} caratteri, una lettera e un numero)`} error={err("password")}>

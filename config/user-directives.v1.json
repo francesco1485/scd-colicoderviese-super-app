@@ -2835,6 +2835,24 @@
           "migration": "supabase/migrations/20261014_r104_simple_access_auto_verify.sql (STAGED, NOT APPLIED)"
         }
       }
+    },
+    {
+      "sourceDate": "2026-10-14",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-118",
+      "name": "CLASSIC_REGISTRATION_EMAIL_OR_PHONE_PASSWORD",
+      "sourceQuoteFragments": [
+        "voglio entrare con registrazione classica e poi una volta scelto stop nessun sistema strano",
+        "entra con numero tel o mail e pass e basta",
+        "tutti si registrano da capo e poi si anagrafano",
+        "nella registrazione devono indicare se gia tesserati ruolo se non tesserati se familiari"
+      ],
+      "context": "Direzione message of 14/10/2026 18:22 after finding that nobody could enter (English magic-link mail without code, link to the old onrender address).",
+      "normalizedCommand": {
+        "rule": "Classic registration for everybody, including people already loaded by the office: e-mail, phone, password, 'Sei già tesserato con la S.C.D. ColicoDerviese?' (SI/NO/NON_SO) and 'Chi sei nel club?'. One e-mail only at registration (confirm address; for an address already in the system it is the 'scegli la password' e-mail). Afterwards sign-in is always e-mail OR phone + password with Ricordami; no link or code to enter. Phone sign-in resolves the account in the database only together with the right password (r105). Forgotten password stays available.",
+        "supersedes": "UD-117 sign-in via e-mail link/code as a normal way in"
+      }
     }
   ],
   "completionGate": {

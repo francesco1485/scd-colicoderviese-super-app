@@ -81,17 +81,29 @@ export interface DeclaredChild {
   birthYear: string;
 }
 
+/** "Sei già tesserato con la S.C.D. ColicoDerviese?" asked at registration (Direzione 14/10/2026). */
+export type TesseratoAnswer = "SI" | "NO" | "NON_SO";
+
+export const TESSERATO_OPTIONS: ReadonlyArray<{ id: TesseratoAnswer; label: string }> = [
+  { id: "SI", label: "Sì, sono già tesserato (o lo è mio figlio)" },
+  { id: "NO", label: "No, non ancora" },
+  { id: "NON_SO", label: "Non lo so" },
+];
+
 export interface Declaration {
   kinds: DeclarationKind[];
   children: DeclaredChild[];
   /** Free text: team, role, company… at most 200 characters. */
   note: string;
+  /** Already registered with the club (FIGC card)? Checked by the office against the federation portal. */
+  tesserato?: TesseratoAnswer | undefined;
 }
 
 export const EMPTY_DECLARATION: Declaration = {
   kinds: [],
   children: [],
   note: "",
+  tesserato: "NON_SO",
 };
 
 export interface SignupInput {
@@ -195,6 +207,7 @@ export function normalizeDeclaration(d: Declaration): Declaration {
     kinds: kinds.length ? kinds : ["TIFOSO"],
     children,
     note: squash(d.note, 200),
+    tesserato: d.tesserato === "SI" || d.tesserato === "NO" ? d.tesserato : "NON_SO",
   };
 }
 
@@ -233,7 +246,7 @@ export type SignupOutcome =
 
 export const SIGNUP_MESSAGE: Readonly<Record<SignupOutcome, string>> = {
   CHECK_EMAIL:
-    'Ti abbiamo mandato una e-mail: apri il link UNA volta sola per confermare l\'indirizzo. Da quel momento entri sempre con e-mail e password. Se avevi già un accesso, usa "Password dimenticata" in Accedi. Se non arriva entro qualche minuto controlla lo spam.',
+    "Fatto! Ti abbiamo mandato UNA e-mail: tocca il pulsante una volta sola (serve a confermare che l'indirizzo è tuo; se eri già nel sistema del club ti chiede di scegliere la password). Da quel momento entri sempre con e-mail o telefono e password. Se non arriva entro qualche minuto controlla lo spam.",
   INVALID: "Controlla i dati inseriti e riprova.",
   WEAK_PASSWORD:
     "Password troppo facile da indovinare: scegline una più lunga o meno comune.",
