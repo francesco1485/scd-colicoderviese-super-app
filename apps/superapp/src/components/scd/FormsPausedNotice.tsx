@@ -3,8 +3,22 @@ import { Mail, ShieldAlert } from "lucide-react";
 import { OFFICIAL_CHANNELS, PAUSED_COPY, mailtoFor, type FormKind } from "@/lib/public-forms";
 
 /** Shown instead of a public form while its channel is not live: official e-mail and PEC, nothing is sent. */
-export function FormsPausedNotice({ kind, topic, body }: { kind: FormKind; topic?: string | undefined; body?: string | undefined }) {
-  const c = PAUSED_COPY[kind];
+export function FormsPausedNotice({
+  kind,
+  topic,
+  body,
+  note,
+  copy,
+}: {
+  kind: FormKind;
+  topic?: string | undefined;
+  body?: string | undefined;
+  /** Extra line under the e-mail (e.g. what happens after the answer to a LED spot); ignored for safeguarding. */
+  note?: string | undefined;
+  /** Title and text for this use (the subject stays the official one); ignored for safeguarding. */
+  copy?: { title: string; text: string } | undefined;
+}) {
+  const c = kind !== "safeguarding" && copy ? { ...PAUSED_COPY[kind], ...copy } : PAUSED_COPY[kind];
   const withTopic = kind !== "safeguarding" && topic;
   return (
     <section className="grid gap-3 rounded-2xl border border-border bg-card p-6" aria-labelledby={`paused-${kind}`} data-testid="forms-paused">
@@ -32,6 +46,9 @@ export function FormsPausedNotice({ kind, topic, body }: { kind: FormKind; topic
           </span>
         )}
       </div>
+      {kind !== "safeguarding" && note && (
+        <p className="m-0 text-[15px] text-muted-foreground" data-testid="forms-paused-note">{note}</p>
+      )}
       {kind === "safeguarding" && (
         <p className="m-0 flex items-start gap-2 rounded-xl bg-[#fff4f2] px-3 py-2 text-[14.5px] leading-snug text-[#7a1d10]">
           <ShieldAlert className="mt-0.5 size-5 flex-none" aria-hidden="true" />

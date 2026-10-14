@@ -89,6 +89,7 @@ import { Route as SostieniIndexRouteImport } from './routes/sostieni.index'
 import { Route as SostieniDonaMaterialeRouteImport } from './routes/sostieni.dona-materiale'
 import { Route as SostieniFondoSolidaleRouteImport } from './routes/sostieni.fondo-solidale'
 import { Route as SostieniProponiRouteImport } from './routes/sostieni.proponi'
+import { Route as SpotSlugRouteImport } from './routes/spot.$slug'
 import { Route as SquadreTeamRouteImport } from './routes/squadre_.$team'
 import { Route as TesoreriaBiglietteriaRouteImport } from './routes/tesoreria_.biglietteria'
 import { Route as TesoreriaCalendarioIncassiRouteImport } from './routes/tesoreria_.calendario-incassi'
@@ -517,6 +518,11 @@ const SostieniProponiRoute = SostieniProponiRouteImport.update({
   path: '/sostieni/proponi',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SpotSlugRoute = SpotSlugRouteImport.update({
+  id: '/spot/$slug',
+  path: '/spot/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SquadreTeamRoute = SquadreTeamRouteImport.update({
   id: '/squadre_/$team',
   path: '/squadre/$team',
@@ -718,6 +724,7 @@ export interface FileRoutesByFullPath {
   '/sostieni/dona-materiale': typeof SostieniDonaMaterialeRoute
   '/sostieni/fondo-solidale': typeof SostieniFondoSolidaleRoute
   '/sostieni/proponi': typeof SostieniProponiRoute
+  '/spot/$slug': typeof SpotSlugRoute
   '/squadre/$team': typeof SquadreTeamRoute
   '/tesoreria/biglietteria': typeof TesoreriaBiglietteriaRoute
   '/tesoreria/calendario-incassi': typeof TesoreriaCalendarioIncassiRoute
@@ -823,6 +830,7 @@ export interface FileRoutesByTo {
   '/sostieni/dona-materiale': typeof SostieniDonaMaterialeRoute
   '/sostieni/fondo-solidale': typeof SostieniFondoSolidaleRoute
   '/sostieni/proponi': typeof SostieniProponiRoute
+  '/spot/$slug': typeof SpotSlugRoute
   '/squadre/$team': typeof SquadreTeamRoute
   '/tesoreria/biglietteria': typeof TesoreriaBiglietteriaRoute
   '/tesoreria/calendario-incassi': typeof TesoreriaCalendarioIncassiRoute
@@ -930,6 +938,7 @@ export interface FileRoutesById {
   '/sostieni/dona-materiale': typeof SostieniDonaMaterialeRoute
   '/sostieni/fondo-solidale': typeof SostieniFondoSolidaleRoute
   '/sostieni/proponi': typeof SostieniProponiRoute
+  '/spot/$slug': typeof SpotSlugRoute
   '/squadre_/$team': typeof SquadreTeamRoute
   '/tesoreria_/biglietteria': typeof TesoreriaBiglietteriaRoute
   '/tesoreria_/calendario-incassi': typeof TesoreriaCalendarioIncassiRoute
@@ -1038,6 +1047,7 @@ export interface FileRouteTypes {
     | '/sostieni/dona-materiale'
     | '/sostieni/fondo-solidale'
     | '/sostieni/proponi'
+    | '/spot/$slug'
     | '/squadre/$team'
     | '/tesoreria/biglietteria'
     | '/tesoreria/calendario-incassi'
@@ -1143,6 +1153,7 @@ export interface FileRouteTypes {
     | '/sostieni/dona-materiale'
     | '/sostieni/fondo-solidale'
     | '/sostieni/proponi'
+    | '/spot/$slug'
     | '/squadre/$team'
     | '/tesoreria/biglietteria'
     | '/tesoreria/calendario-incassi'
@@ -1249,6 +1260,7 @@ export interface FileRouteTypes {
     | '/sostieni/dona-materiale'
     | '/sostieni/fondo-solidale'
     | '/sostieni/proponi'
+    | '/spot/$slug'
     | '/squadre_/$team'
     | '/tesoreria_/biglietteria'
     | '/tesoreria_/calendario-incassi'
@@ -1356,6 +1368,7 @@ export interface RootRouteChildren {
   SostieniDonaMaterialeRoute: typeof SostieniDonaMaterialeRoute
   SostieniFondoSolidaleRoute: typeof SostieniFondoSolidaleRoute
   SostieniProponiRoute: typeof SostieniProponiRoute
+  SpotSlugRoute: typeof SpotSlugRoute
   SquadreTeamRoute: typeof SquadreTeamRoute
   TesoreriaBiglietteriaRoute: typeof TesoreriaBiglietteriaRoute
   TesoreriaCalendarioIncassiRoute: typeof TesoreriaCalendarioIncassiRoute
@@ -1946,6 +1959,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SostieniProponiRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/spot/$slug': {
+      id: '/spot/$slug'
+      path: '/spot/$slug'
+      fullPath: '/spot/$slug'
+      preLoaderRoute: typeof SpotSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/squadre_/$team': {
       id: '/squadre_/$team'
       path: '/squadre/$team'
@@ -2211,6 +2231,7 @@ const rootRouteChildren: RootRouteChildren = {
   SostieniDonaMaterialeRoute: SostieniDonaMaterialeRoute,
   SostieniFondoSolidaleRoute: SostieniFondoSolidaleRoute,
   SostieniProponiRoute: SostieniProponiRoute,
+  SpotSlugRoute: SpotSlugRoute,
   SquadreTeamRoute: SquadreTeamRoute,
   TesoreriaBiglietteriaRoute: TesoreriaBiglietteriaRoute,
   TesoreriaCalendarioIncassiRoute: TesoreriaCalendarioIncassiRoute,

@@ -9,13 +9,35 @@ import type { SubmitOutcome } from "@/lib/club.types";
 import { FormsPausedNotice } from "@/components/scd/FormsPausedNotice";
 import { PUBLIC_FORMS_LIVE } from "@/lib/public-forms";
 
-export function PartnerForm({ tipo, preselect }: { tipo: "sponsor" | "fornitore"; preselect?: string | undefined }) {
+/**
+ * Prefill of the sponsor proposal form by another page (B1, /spot/$slug: the company answers on a LED spot).
+ * Same form, same server function (submitPartnerLead), same storage: only the starting values change.
+ */
+export interface PartnerFormPreset {
+  /** Short subject, e.g. "Spot carcano: approvato"; also the e-mail subject while public forms are paused. */
+  topic: string;
+  /** Starting message (editable). */
+  message: string;
+  /** Starting company name (editable). */
+  azienda?: string;
+  /** Starting interests (package or asset ids). */
+  interessi?: readonly string[];
+  /** Line shown once the request has been delivered by the online form. */
+  receivedNote?: string;
+  /** Line shown next to the official e-mail while public forms are paused (nothing has been sent yet). */
+  pausedNote?: string;
+  /** Title and text of the official e-mail box shown while public forms are paused. */
+  pausedCopy?: { title: string; text: string };
+}
+
+export function PartnerForm({ tipo, preselect, preset }: { tipo: "sponsor" | "fornitore"; preselect?: string | undefined; preset?: PartnerFormPreset | undefined }) {
   const send = useServerFn(submitPartnerLead);
   const empty = { azienda: "", referente: "", email: "", telefono: "", settore: SETTORI[0] as string, budget: BUDGET[0] as string, messaggio: "" };
   // A package chosen on /sponsor ("Chiedi questo pacchetto") travels in interessi and is named in the message.
-  const chosen = tipo === "sponsor" ? packageById(preselect) : undefined;
-  const [f, setF] = useState(chosen ? { ...empty, messaggio: packageRequestNote(chosen.id) } : empty);
-  const [interessi, setInteressi] = useState<string[]>(preselect ? [preselect] : []);
+  const chosen = tipo === "sponsor" && !preset ? packageById(preselect) : undefined;
+  const start = preset ? { ...empty, azienda: preset.azienda ?? "", messaggio: preset.message } : chosen ? { ...empty, messaggio: packageRequestNote(chosen.id) } : empty;
+  const [f, setF] = useState(start);
+  const [interessi, setInteressi] = useState<string[]>(preset?.interessi ? [...preset.interessi] : preselect ? [preselect] : []);
   const [privacy, setPrivacy] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -44,6 +66,11 @@ export function PartnerForm({ tipo, preselect }: { tipo: "sponsor" | "fornitore"
   return (
     <>{PUBLIC_FORMS_LIVE ? (
       <form onSubmit={submit} className="grid gap-4 p-6 card-premium sm:grid-cols-2" data-testid="partner-form" data-package={chosen?.id}>
+      {preset && (
+        <p className="rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-sm sm:col-span-2" data-testid="partner-form-preset" role="status">
+          Risposta: <strong>{preset.topic}</strong>. Completa i tuoi recapiti e invia.
+        </p>
+      )}
       {chosen && (
         <p className="rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-sm sm:col-span-2" data-testid="partner-form-package" role="status">
           Pacchetto scelto: <strong>{chosen.title}</strong>. Puoi aggiungere altri interessi qui sotto.
@@ -82,13 +109,20 @@ export function PartnerForm({ tipo, preselect }: { tipo: "sponsor" | "fornitore"
         <input type="checkbox" className="mt-1" checked={privacy} onChange={(e) => setPrivacy(e.target.checked)} /> Acconsento a essere ricontattato dalla società (obbligatorio).
       </label>
       <button disabled={busy} className="surface-sun min-h-11 rounded-xl px-5 py-3 text-sm font-bold uppercase disabled:opacity-60 sm:col-span-2">
-        {busy ? "Invio…" : tipo === "sponsor" ? "Richiedi proposta" : "Invia proposta"}
+        {busy ? "Invio…" : preset ? "Invia la risposta" : tipo === "sponsor" ? "Richiedi proposta" : "Invia proposta"}
       </button>
       {err && <p className="text-sm text-destructive sm:col-span-2">{err}</p>}
       <div className="sm:col-span-2"><OutcomeBox outcome={outcome} /></div>
+      {preset?.receivedNote && outcome?.delivered && (
+        <p className="m-0 text-sm font-semibold sm:col-span-2" data-testid="partner-form-received">{preset.receivedNote}</p>
+      )}
     </form>
     ) : (
-      <FormsPausedNotice kind="partner" topic={chosen ? `Pacchetto ${chosen.title}` : undefined} body={chosen ? packageRequestNote(chosen.id) : undefined} />
+      preset ? (
+        <FormsPausedNotice kind="partner" topic={preset.topic} body={preset.message} note={preset.pausedNote} copy={preset.pausedCopy} />
+      ) : (
+        <FormsPausedNotice kind="partner" topic={chosen ? `Pacchetto ${chosen.title}` : undefined} body={chosen ? packageRequestNote(chosen.id) : undefined} />
+      )
     )}</>
   );
 }

@@ -1,8 +1,9 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, ArrowUpRight, Check, ChevronLeft, ChevronRight, Copy, MonitorPlay, Pause, Play } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Check, ChevronLeft, ChevronRight, Copy, FileCheck2, Link2, MessageCircle, MonitorPlay, Pause, Play } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { mayAnimate, stepIndex } from "@/lib/ledwall-rotation";
+import { spotReviewPath, spotReviewShareText, spotReviewUrl, spotReviewWhatsapp } from "@/lib/spot-review";
 import {
   LED_MASTER,
   SPONSOR_SPOTS,
@@ -54,7 +55,7 @@ function useOnScreen<T extends Element>(threshold = 0.25) {
 }
 
 /** The visual of one spot: field preview 16:9, or the LED master strip on a dark panel when there is no preview. */
-function SpotStage({
+export function SpotStage({
   spot,
   play,
   mountVideo,
@@ -322,6 +323,73 @@ function CopyCaption({ text, sponsor }: { text: string; sponsor: string }) {
   );
 }
 
+/**
+ * B1: the review page for the company (/spot/$slug). The commerciale opens it, copies the link or prepares a WhatsApp
+ * message and sends it himself: the app never sends anything. If the clipboard is blocked, the address appears
+ * selected in a field to copy by hand.
+ */
+function SpotReviewLinks({ spot }: { spot: SponsorSpot }) {
+  const [state, setState] = useState<"idle" | "done" | "manual">("idle");
+  const field = useRef<HTMLInputElement>(null);
+  const timer = useRef<number | undefined>(undefined);
+  const url = spotReviewUrl(spot.slug);
+
+  useEffect(() => () => window.clearTimeout(timer.current), []);
+  useEffect(() => {
+    if (state === "manual") field.current?.select();
+  }, [state]);
+
+  async function copy() {
+    window.clearTimeout(timer.current);
+    try {
+      if (!navigator.clipboard?.writeText) throw new Error("clipboard unavailable");
+      await navigator.clipboard.writeText(url);
+      setState("done");
+      timer.current = window.setTimeout(() => setState("idle"), 2500);
+    } catch {
+      setState("manual");
+    }
+  }
+
+  const btn =
+    "scd-focus inline-flex min-h-10 items-center gap-1.5 rounded-[9px] border border-[var(--in-line)] bg-[#f7fbff] px-2.5 text-[13.5px] font-semibold text-[var(--in-info)]";
+  return (
+    <div className="grid gap-1.5 rounded-lg border border-dashed border-[var(--in-line)] p-2.5" data-testid="crm-spot-review">
+      <span className="text-[12.5px] font-bold uppercase tracking-[0.06em] text-[var(--in-sub)]">Per l'azienda</span>
+      <div className="flex flex-wrap gap-1.5">
+        <a href={spotReviewPath(spot.slug)} target="_blank" rel="noopener" className={btn} data-testid="crm-spot-review-link">
+          <FileCheck2 className="size-4" aria-hidden="true" /> Pagina per l'azienda
+          <span className="sr-only">di {spot.sponsorName} (si apre in una nuova scheda)</span>
+        </a>
+        <button type="button" onClick={() => void copy()} className={btn} aria-label={`Copia il link della pagina per ${spot.sponsorName}`} data-testid="crm-spot-review-copy">
+          {state === "done" ? <Check className="size-4" aria-hidden="true" /> : <Link2 className="size-4" aria-hidden="true" />}
+          {state === "done" ? "Link copiato" : "Copia link"}
+        </button>
+        <a
+          href={spotReviewWhatsapp(spot)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={btn}
+          aria-label={`Prepara un messaggio WhatsApp per ${spot.sponsorName}: scegli tu la chat e invii tu`}
+          data-testid="crm-spot-review-wa"
+          title={spotReviewShareText(spot)}
+        >
+          <MessageCircle className="size-4" aria-hidden="true" /> WhatsApp
+        </a>
+      </div>
+      {state === "manual" && (
+        <label className="grid gap-1 text-[12.5px] text-[var(--in-sub)]">
+          Copia il link a mano:
+          <input ref={field} readOnly value={url} className="min-h-10 w-full rounded-md border border-[var(--in-line)] bg-white px-2 text-[13px] text-[#0b1e3a]" onFocus={(e) => e.currentTarget.select()} />
+        </label>
+      )}
+      <span className="sr-only" aria-live="polite">
+        {state === "done" ? "Link copiato" : ""}
+      </span>
+    </div>
+  );
+}
+
 function VetrinaCard({ spot }: { spot: SponsorSpot }) {
   const [open, setOpen] = useState(false);
   return (
@@ -359,6 +427,7 @@ function VetrinaCard({ spot }: { spot: SponsorSpot }) {
           <MonitorPlay className="size-4" aria-hidden="true" /> Master LED
         </a>
       </div>
+      <SpotReviewLinks spot={spot} />
     </li>
   );
 }
@@ -383,6 +452,7 @@ export function SpotLedVetrina({ spots = SPONSOR_SPOTS }: { spots?: readonly Spo
       </div>
       <p className="m-0 px-1 text-[14px] leading-snug text-[var(--in-sub)]">
         Gli spot girano già sulla pagina iniziale dell'app e sul LED wall. Niente invio per mail: lo spot si mostra allo sponsor dall'app.
+        Ogni spot ha una pagina per l'azienda: copi il link e lo mandi tu, l'azienda approva o chiede modifiche da lì.
       </p>
       <ol className="m-0 mt-3 grid list-none gap-2 p-0 sm:grid-cols-3" aria-label="Come si approva uno spot" data-testid="crm-spot-flow">
         {SPOT_FLOW.map((step, i) => (
