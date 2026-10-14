@@ -4,10 +4,12 @@ import { useState } from "react";
 
 import { CampaignCard, ItemCard, NotActiveNote, PledgeDialog, btnLine, btnSun } from "@/components/giving/public";
 import { ShareButton } from "@/components/scd/ShareButton";
+import { TribuneSeatsSection } from "@/components/giving/TribuneSeats";
 import { PageHero, heroOverlapCls } from "@/components/ui-kit";
 import { CATEGORY_LABEL, ITEM_CATEGORIES, ITEM_STATUS_LABEL, PROPOSAL_AREA_LABEL, PROPOSAL_STATUS_LABEL, type PublicItem } from "@/lib/giving";
 import { getGivingPublic } from "@/lib/giving.functions";
 import { SHARE_PAGES, pageMeta } from "@/lib/share";
+import { findTribuneItem, tribuneDraftItem } from "@/lib/tribune-seats";
 
 /**
  * Sostieni il club (UD-113, SCD ONE): Fondo Solidale, "Adotta un oggetto", campaigns palestra / infermeria (goods),
@@ -29,8 +31,11 @@ const HOW = [
 function SostieniPage() {
   const { engine, data } = Route.useLoaderData();
   const active = engine === "applied" && data !== null;
-  const [pledge, setPledge] = useState<PublicItem | null>(null);
-  const items = data?.items ?? [];
+  const [pledge, setPledge] = useState<{ item: PublicItem; unit: number | null } | null>(null);
+  const allItems = data?.items ?? [];
+  // C2 "Adotta un seggiolino": the tribune is an item of the same catalogue, shown in its own section with the seat map.
+  const tribune = findTribuneItem(allItems);
+  const items = allItems.filter((i) => i !== tribune);
   return (
     <main>
       <PageHero eyebrow="Sostieni il club" title={<>Aiutaci a <span className="text-accent">crescere</span>, come puoi.</>} clamp={false} action={<ShareButton page={SHARE_PAGES.sostieni} />}>
@@ -53,6 +58,16 @@ function SostieniPage() {
         </div>
       )}
 
+      <TribuneSeatsSection
+        item={tribune}
+        active={active}
+        onAdopt={(unit) => {
+          // Not active: the draft item opens the same dialog, which answers "Da attivare" and sends nothing.
+          const item = tribune ?? (active ? null : tribuneDraftItem());
+          if (item) setPledge({ item, unit });
+        }}
+      />
+
       <section className="mx-auto mt-14 max-w-6xl px-4" aria-labelledby="adotta-title">
         <p className="eyebrow">Adotta un oggetto</p>
         <h2 id="adotta-title" className="mt-1 text-3xl font-bold">Cose di cui il club ha bisogno</h2>
@@ -61,11 +76,11 @@ function SostieniPage() {
         </p>
         {items.length > 0 ? (
           <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {items.map((i) => <ItemCard key={i.id} item={i} onAdopt={setPledge} />)}
+            {items.map((i) => <ItemCard key={i.id} item={i} onAdopt={(it) => setPledge({ item: it, unit: null })} />)}
           </div>
         ) : (
           <div className="mt-6 rounded-2xl border border-dashed border-border bg-card p-5" data-testid="adopt-empty">
-            <p className="m-0 font-semibold">{active ? "Il catalogo è in preparazione." : "Catalogo da attivare."}</p>
+            <p className="m-0 font-semibold">{active ? (tribune ? "Altri oggetti in arrivo." : "Il catalogo è in preparazione.") : "Catalogo da attivare."}</p>
             <p className="m-0 mt-1 text-sm text-muted-foreground">Le categorie: {ITEM_CATEGORIES.map((c) => CATEGORY_LABEL[c]).join(" · ")}.</p>
           </div>
         )}
@@ -122,7 +137,7 @@ function SostieniPage() {
         </p>
       </section>
 
-      {pledge && <PledgeDialog item={pledge} onClose={() => setPledge(null)} active={active} />}
+      {pledge && <PledgeDialog item={pledge.item} initialUnit={pledge.unit} onClose={() => setPledge(null)} active={active} />}
     </main>
   );
 }

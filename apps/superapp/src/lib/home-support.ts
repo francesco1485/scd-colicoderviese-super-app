@@ -34,7 +34,7 @@ export const SUPPORT_ACTIONS: readonly SupportAction[] = [
     label: "Adotta un seggiolino",
     hint: "Un posto della nuova tribuna con il tuo nome o quello della tua famiglia.",
     to: "/sostieni",
-    hash: "adotta-title",
+    hash: "seggiolino-title",
     engine: "DONAZIONE",
   },
   {
