@@ -2394,6 +2394,45 @@
       "use": "poster of the master spot where the field preview is not in the repo (preview on Drive 'SAGLIO_SPORT_02_PREVIEW_CAMPO_GIORNO_V4_EVOLUTO.mp4', 11.2 MB, above the 10 MB connector download limit)",
       "note": "spot ufficiale sponsor confermato; approvazione testi da registrare",
       "verified_at": "2026-10-14"
+    },
+    {
+      "path": "apps/superapp/public/media/ledwall/2026-27/dego-arredamenti-master.mp4",
+      "class": "LED_DEMO_VIDEO",
+      "status": "VERIFIED",
+      "asset_decision": "KEEP_LOCKED",
+      "source": "Drive 02_V4_SPONSOR_VALIDATI/DEGO_ARREDAMENTI 'DEGO_01_MASTER_LED_V4_EVOLUTO_20SEC.mp4' (file id 1npv1Q1cMONlBNuO9ywEjkoE__6y6ZxQw)",
+      "source_drive_file_id": "1npv1Q1cMONlBNuO9ywEjkoE__6y6ZxQw",
+      "sponsor_state": "CONFIRMED",
+      "transform": "ffmpeg transcode only (content unaltered): libx264 high, preset slow, CRF 28, 1920x164 kept, 25 fps, yuv420p, audio removed, +faststart",
+      "use": "LED wall player /ledwall/player (src/routes/ledwall.player.tsx) via src/lib/sponsor-spots.ts",
+      "note": "spot ufficiale sponsor confermato; approvazione testi da registrare",
+      "verified_at": "2026-10-14"
+    },
+    {
+      "path": "apps/superapp/public/media/ledwall/2026-27/dego-arredamenti-preview-720.mp4",
+      "class": "LED_DEMO_VIDEO",
+      "status": "VERIFIED",
+      "asset_decision": "KEEP_LOCKED",
+      "source": "Drive 02_V4_SPONSOR_VALIDATI/DEGO_ARREDAMENTI 'DEGO_02_PREVIEW_CAMPO_GIORNO_V4_EVOLUTO.mp4' (file id 1vyKsw2KedMx83EdZjsEyQBXCyi7bD5ei)",
+      "source_drive_file_id": "1vyKsw2KedMx83EdZjsEyQBXCyi7bD5ei",
+      "sponsor_state": "CONFIRMED",
+      "transform": "ffmpeg transcode only (content unaltered): libx264 high, preset slow, CRF 30, 1920x1080 -> 1280x720 Lanczos, 25 fps, yuv420p, audio removed, +faststart",
+      "use": "public home 'Sul LED wall' and /crm 'Spot LED' (src/components/SponsorSpots.tsx) via src/lib/sponsor-spots.ts",
+      "note": "spot ufficiale sponsor confermato; approvazione testi da registrare",
+      "verified_at": "2026-10-14"
+    },
+    {
+      "path": "apps/superapp/public/media/ledwall/2026-27/dego-arredamenti-preview-poster.webp",
+      "class": "VIDEO_POSTER",
+      "status": "VERIFIED",
+      "asset_decision": "KEEP_LOCKED",
+      "source": "Drive 02_V4_SPONSOR_VALIDATI/DEGO_ARREDAMENTI 'DEGO_02_PREVIEW_CAMPO_GIORNO_V4_EVOLUTO.mp4' (file id 1vyKsw2KedMx83EdZjsEyQBXCyi7bD5ei), frame at 3 s",
+      "source_drive_file_id": "1vyKsw2KedMx83EdZjsEyQBXCyi7bD5ei",
+      "sponsor_state": "CONFIRMED",
+      "transform": "single frame at 3 s, 1280x720 Lanczos, WebP lossy q72",
+      "use": "poster of the preview video (home 'Sul LED wall', /crm 'Spot LED')",
+      "note": "spot ufficiale sponsor confermato; approvazione testi da registrare",
+      "verified_at": "2026-10-14"
     }
   ],
   "vector_research": [

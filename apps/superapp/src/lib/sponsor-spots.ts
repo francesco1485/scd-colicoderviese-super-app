@@ -78,7 +78,8 @@ interface SpotSeed {
 /**
  * The spots ready on Drive for sponsors of the list (14/10/2026). Order = order of sponsors.ts.
  * Websites: HDI Maglia, Dell'Oca and Carcano from the "CONTATTI_VERIFICATI"/"ANAGRAFICA" files in their Drive
- * folders; Saglio Sport from config/reference-sources.v1.json (SRC-0032). ATV and nbc: none documented.
+ * folders; Saglio Sport from config/reference-sources.v1.json (SRC-0032); Dego Arredamenti from the Drive dossier
+ * "05_SCHEDA_CONTATTI_FONTI - DEGO_ARREDAMENTI" (sito ufficiale VERIFICATO, 14/10/2026). ATV and nbc: none documented.
  */
 const SEEDS: readonly SpotSeed[] = [
   { slug: "hdi-maglia", driveFolderId: "154U0A3wua7vyWW0ZhLILiBaV3z6OqI0f", hasPreview: true, status: "DA_APPROVARE", website: "https://www.assicurazionimaglia.it/", socialHandle: null },
@@ -88,6 +89,7 @@ const SEEDS: readonly SpotSeed[] = [
   { slug: "nbc", driveFolderId: "12wztzSMaWwwhwoZTBDA56J9uNVoNd6mr", hasPreview: true, status: "DA_APPROVARE", socialHandle: null },
   // Field preview on Drive (11.2 MB) not in the repo yet: the master is shown instead.
   { slug: "saglio-sport", driveFolderId: "1c9I7KJT6F0qSEFqyU_bfAxfKJ0SjvA_K", hasPreview: false, status: "DA_APPROVARE", website: "https://www.sagliosport.it/", socialHandle: null },
+  { slug: "dego-arredamenti", driveFolderId: "1pZRvWzu0AgDFaW64vuw93wQruFCZ1ZMK", hasPreview: true, status: "DA_APPROVARE", website: "https://www.degoarredamenti.it/", socialHandle: null },
 ];
 
 function sponsorOf(slug: string, list: readonly Sponsor[]): Sponsor | undefined {
