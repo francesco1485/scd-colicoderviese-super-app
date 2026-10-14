@@ -11,6 +11,8 @@ import {
   PUBLIC_WRAP,
   PublicPageHeader,
 } from "@/components/home/PublicPageHeader";
+import { CastPresence } from "@/components/scd/CastPresence";
+import { tournamentText } from "@/lib/cast-live";
 import { getActiveInitiatives } from "@/lib/initiatives.functions";
 import { romeDay } from "@/lib/public-window";
 import {
@@ -182,6 +184,21 @@ function TorneiPage() {
           {list.map((t) => (
             <TournamentCard key={t.id} t={t} />
           ))}
+        </div>
+      </section>
+      <section
+        id="personaggi-tornei"
+        aria-label="I personaggi dei tornei"
+        className={`${PUBLIC_WRAP} scroll-mt-24 pt-6 lg:pt-10`}
+        data-testid="tornei-personaggi"
+      >
+        <div className="grid gap-4 md:grid-cols-2">
+          <CastPresence
+            id="mentore-tornei"
+            day={today}
+            live={list[0] ? { label: "Il prossimo", text: tournamentText(list[0]) } : null}
+          />
+          <CastPresence id="volto-sponsor" day={today} />
         </div>
       </section>
       <section

@@ -29,6 +29,7 @@ import { deskHeadline, deskLines, type DeskTone } from "@/lib/secretariat-desk";
 import { getWorkAreaGate } from "@/lib/work-areas.functions";
 import { weekendMatches } from "@/lib/work-areas";
 import { StatTile } from "@/components/scd/work-area-ui";
+import { CastPresence } from "@/components/scd/CastPresence";
 import { TESSERATI, itDate, sortedCounts } from "@/lib/roster-aggregates";
 import { ClubDeadlinesCard } from "@/components/scd/ClubDeadlines";
 import { searchKnowledge, type KbData } from "@/lib/knowledge.functions";
@@ -270,6 +271,7 @@ function SegreteriaPage({
         </Card>
 
         <div className="flex min-w-0 flex-col gap-[18px] lg:col-span-2 xl:col-span-1">
+          <CastPresence id="genny" />
           <Card
             id="seg-tesseramenti"
             title="Tesseramenti"

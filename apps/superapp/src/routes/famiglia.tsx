@@ -4,12 +4,15 @@ import { CalendarDays, Check, MapPin, Shirt } from "lucide-react";
 import { useId, useState } from "react";
 
 import { AccessScreenPage, accessHead } from "@/components/scd/AccessScreen";
+import { CastHelpersCard } from "@/components/scd/CastPresence";
+import { ClubHouseOrderCard } from "@/components/scd/ClubHouseOrderCard";
 import { EraNutritionCard } from "@/components/scd/EraNutritionCard";
 import { Card, Chip, type ChipTone } from "@/components/scd/interior-ui";
 import { InteriorShell } from "@/components/scd/InteriorShell";
 import { PushCard } from "@/components/scd/PushCard";
 import { TransportRequestCard } from "@/components/scd/TransportRequestCard";
 import { EmptyState } from "@/components/scd/work-area-ui";
+import { getClubHouseDesk, type ClubHouseDesk } from "@/lib/area-requests.functions";
 import { getSession } from "@/lib/auth.functions";
 import { FAMILY_CALLUP_COPY, MY_RESPONSE_LABEL, romeDay, romeTime, type CallupResponse } from "@/lib/callups";
 import { getMyCallups, respondCallup, type MyCallup } from "@/lib/callups.functions";
@@ -30,11 +33,18 @@ import { getFamilyTransport, type FamilyTransport } from "@/lib/transport-reques
  */
 export const Route = createFileRoute("/famiglia")({
   loader: async () => {
-    const [session, family, callups, fees, transport] = await Promise.all([getSession(), getMyFamily(), getMyCallups(), getMyFees(), getFamilyTransport()]);
+    const [session, family, callups, fees, transport, clubHouse] = await Promise.all([
+      getSession(),
+      getMyFamily(),
+      getMyCallups(),
+      getMyFees(),
+      getFamilyTransport(),
+      getClubHouseDesk().catch((): ClubHouseDesk => ({ state: "off" })),
+    ]);
     // Away matches of the family's teams from the official calendar copy (only what the family can ask a seat for).
     const teamCodes = family.state === "ok" ? [...new Set(family.members.flatMap((m) => m.teamCodes))] : [];
     const awayMatches: AwayMatch[] = teamCodes.length ? awayMatchesFor(loadCalendar().events, teamCodes, todayRome()) : [];
-    return { roles: session.roles, badge: session.badge, family, callups, fees: fees.state === "ok" ? fees.fees : [], transport, awayMatches };
+    return { roles: session.roles, badge: session.badge, family, callups, fees: fees.state === "ok" ? fees.fees : [], transport, awayMatches, clubHouse };
   },
   head: () => accessHead("famiglia"),
   component: FamigliaRoute,
@@ -43,7 +53,7 @@ export const Route = createFileRoute("/famiglia")({
 function FamigliaRoute() {
   const data = Route.useLoaderData();
   if (data.family.state !== "ok" && data.family.state !== "error") return <AccessScreenPage id="famiglia" />;
-  return <FamilyHome roles={data.roles} badge={data.badge} members={data.family.members} callups={data.callups} fees={data.fees} failed={data.family.state === "error"} transport={data.transport} awayMatches={data.awayMatches} />;
+  return <FamilyHome roles={data.roles} badge={data.badge} members={data.family.members} callups={data.callups} fees={data.fees} failed={data.family.state === "error"} transport={data.transport} awayMatches={data.awayMatches} clubHouse={data.clubHouse} />;
 }
 
 const TONE: Readonly<Record<CallupResponse, ChipTone>> = { CONFIRMED: "ok", DECLINED: "warn", PENDING: "info" };
@@ -52,7 +62,7 @@ function todayRome(): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Rome", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
 }
 
-function FamilyHome({ roles, badge, members, callups, fees, failed, transport, awayMatches }: { roles: string[]; badge: string | null; members: FamilyMember[]; callups: MyCallup[]; fees: MyFee[]; failed: boolean; transport: FamilyTransport; awayMatches: AwayMatch[] }) {
+function FamilyHome({ roles, badge, members, callups, fees, failed, transport, awayMatches, clubHouse }: { roles: string[]; badge: string | null; members: FamilyMember[]; callups: MyCallup[]; fees: MyFee[]; failed: boolean; transport: FamilyTransport; awayMatches: AwayMatch[]; clubHouse: ClubHouseDesk }) {
   const [items, setItems] = useState(callups);
   const pending = items.filter((c) => c.response === "PENDING").length;
   const kids = members.filter((m) => m.relationship !== "SELF");
@@ -115,6 +125,14 @@ function FamilyHome({ roles, badge, members, callups, fees, failed, transport, a
 
         {fees.length > 0 && <FeesCard fees={fees} today={today} />}
         <EraNutritionCard />
+        <CastHelpersCard
+          id="cast-helpers"
+          ids={["preparatore-atletico", "mental-coach", "musica-relax"]}
+          title="Chi ti aiuta nel club"
+          sub="Consigli generali per tutti, uguali ogni giorno per tutta la squadra: mai schede o percorsi personali."
+          day={today}
+        />
+        {(clubHouse.state === "ok" || clubHouse.state === "off") && <ClubHouseOrderCard desk={clubHouse} today={today} />}
         <Card id="fam-documenti" title="Documenti del club" sub="Regolamenti, codice di condotta, privacy e trasferte: quelli che riguardano la tua famiglia.">
           <div className="px-4 pb-4 sm:px-[18px]">
             <Link to="/documenti" className="scd-focus inline-flex h-11 items-center rounded-[10px] border border-[var(--in-line)] bg-white px-4 text-[15px] font-semibold" data-testid="fam-documenti-link">Apri i documenti</Link>

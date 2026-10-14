@@ -155,7 +155,10 @@ describe("Genny in the reserved areas (Direzione 'Vai A B C' 13/10/2026, roles c
     expect(greetingFor("genny")).toBe(PERSONA_COPY.genny.greeting);
   });
 
-  it("no longer has an Era chat persona: Era is the nutritionist, a content character (Direzione 14/10/2026)", () => {
-    expect(Object.keys(PERSONA_COPY).sort()).toEqual(["crovi", "genny", "sky"]);
+  it("keeps Era out of the helper rule: she answers only when her area opens her chat (Direzione 14/10/2026, UD-114)", () => {
+    expect(personaFor("/famiglia", { roles: ["famiglia"] })).toBe("genny");
+    expect(personaFor("/famiglia", { roles: ["famiglia"] }, "era")).toBe("era");
+    expect(PERSONA_COPY.era.title).toBe("Chiedi a Era");
+    expect(PERSONA_COPY.era.greeting).toMatch(/nutrizionista/);
   });
 });

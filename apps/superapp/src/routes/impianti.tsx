@@ -1,14 +1,23 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CalendarDays, CreditCard, Ticket } from "lucide-react";
 
+import { CastPresence } from "@/components/scd/CastPresence";
 import { FacilityMap } from "@/components/scd/FacilityMap";
 import { TicketRules } from "@/components/scd/TicketRules";
 import { FACILITIES, siteById, spaceById } from "@/lib/facilities";
+import { romeDay } from "@/lib/public-window";
 
 /** Schematic plan of Colico sent by the Direzione on 13/10/2026 (FACILITY_PLAN in config/scd-assets.v1.json). */
 const PIANTA_COLICO = "/media/scd/pianta-colico-2026.webp";
 
 export const Route = createFileRoute("/impianti")({
+  // Live line of "La biglietteria" (UD-114): next ticketed home match from the official calendar copy, nothing invented.
+  loader: async () => {
+    const today = romeDay(Date.now());
+    const [{ loadCalendar }, { nextHomeMatchText }] = await Promise.all([import("@/lib/public-snapshots"), import("@/lib/cast-live")]);
+    const cal = loadCalendar();
+    return { today, nextHome: nextHomeMatchText(cal.groups, cal.events, today) };
+  },
   head: () => ({
     meta: [
       { title: "I nostri campi — Impianti S.C.D. ColicoDerviese" },
@@ -24,6 +33,7 @@ export const Route = createFileRoute("/impianti")({
 });
 
 function ImpiantiPage() {
+  const { today, nextHome } = Route.useLoaderData();
   const colico = siteById("SED-COL")!;
   const ticket = spaceById("SPA-COL-BIG")!;
   return (
@@ -66,8 +76,13 @@ function ImpiantiPage() {
             <img src={PIANTA_COLICO} width={1122} height={1402} alt="Pianta del Centro Sportivo Colico: Campo 1 e Campo 2, spogliatoi 1-4 e arbitri, segreteria, magazzino attrezzi e lavanderia con infermeria, club house, biglietteria, tribuna, palestrina e servizi; ingressi pubblico, atleti e visitatori su via Lido." loading="lazy" decoding="async" className="mx-auto h-auto w-full max-w-[640px]" />
           </a>
         </figure>
-        <div className="mt-5">
+        <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-start">
           <TicketRules />
+          <CastPresence
+            id="biglietteria"
+            day={today}
+            live={nextHome ? { label: "Prossima in casa con biglietteria", text: nextHome, link: { label: "Calendario", to: "/calendario" } } : null}
+          />
         </div>
         <p className="m-0 mt-4 text-[13px] leading-snug text-[var(--in-sub)]">
           Fonte: master impianti della società ({FACILITIES.sources.master.label}). Posizioni schematiche, non in scala. Quello che non è ancora confermato è scritto

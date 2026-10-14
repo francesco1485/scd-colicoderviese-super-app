@@ -1,12 +1,16 @@
 /**
  * Server functions of the AI assistants (r99, UD-104): askAssistant (public pages, Crovi) and askStaffAssistant
- * (signed-in, Genny / Sky). Real data loaders are wired here; the logic and its tests live in assistant.server.ts.
+ * (signed-in, Genny / Sky). Since UD-114 both accept the area persona a page opened with "Chiedi a …"; the server
+ * re-checks it (assistant.ts chatPersonaFor) and the rules engine keeps the persona's voice (cast-rules.ts).
+ * Real data loaders are wired here; the logic and its tests live in assistant.server.ts and cast-rules.ts.
  */
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-import { MAX_INPUT_CHARS, type AssistantReply, type PublicContextInput } from "./assistant";
+import { MAX_INPUT_CHARS, chatPersonaFor, type AssistantPersona, type AssistantReply, type PublicContextInput } from "./assistant";
 import { answerPublic, answerStaff, romeToday } from "./assistant.server";
+import { CAST_PERSONA_IDS, type CastFacts } from "./cast-personas";
+import { castRulesAnswer } from "./cast-rules";
 import { sessionView } from "./auth.functions";
 import { AFFILIAZIONI, CLUB_CONTACTS, INTERESSI_ATLETA, SPONSOR_PACKAGES } from "./catalog";
 import { clubEventsOn } from "./club-events";
@@ -22,6 +26,21 @@ import { SPONSORS } from "./sponsors";
 import { serverSupabase } from "./supabase.server";
 
 const message = z.string().trim().min(1).max(MAX_INPUT_CHARS);
+const castPersona = z.enum(CAST_PERSONA_IDS as unknown as [string, ...string[]]);
+
+/** Real facts the area personas may quote: ticket office rules, next ticketed home match, upcoming tournaments. */
+async function loadCastFacts(): Promise<CastFacts> {
+  const today = romeToday();
+  const [{ loadCalendar }, { nextHomeMatchText, upcomingTournamentTexts }] = await Promise.all([import("./public-snapshots"), import("./cast-live")]);
+  const cal = loadCalendar();
+  return { ticketing: TICKETING, nextHomeMatch: nextHomeMatchText(cal.groups, cal.events, today), tournaments: upcomingTournamentTexts(today) };
+}
+
+/** Rules engine with the persona's voice (cast-rules.ts) on top of the general one (skyRulesAnswer). */
+async function rulesFor(data: { message: string; persona?: AssistantPersona }) {
+  const facts = await loadCastFacts().catch(() => undefined);
+  return castRulesAnswer(data, { general: skyRulesAnswer, day: romeToday(), ...(facts ? { facts } : {}) });
+}
 
 async function loadPublicContext(): Promise<PublicContextInput> {
   const { getCalendar } = await import("./calendar-bridge.server");
@@ -60,25 +79,28 @@ async function loadPublicContext(): Promise<PublicContextInput> {
 }
 
 export const askAssistant = createServerFn({ method: "POST" })
-  .inputValidator((d: { message: string; persona?: "crovi" | "sky" | undefined }) =>
-    z.object({ message, persona: z.enum(["crovi", "sky"]).optional() }).parse(d),
+  .inputValidator((d: { message: string; persona?: string | undefined }) =>
+    z.object({ message, persona: z.union([z.enum(["crovi", "sky"]), castPersona]).optional() }).parse(d),
   )
   .handler(async ({ data }): Promise<AssistantReply> => {
     const { clientIp } = await import("./request-ip.server");
+    // Sky stays as asked (reserved page before the session answers); any other request goes through the one rule.
+    const persona: AssistantPersona = data.persona === "sky" ? "sky" : chatPersonaFor("public", null, data.persona);
     return answerPublic(
-      { message: data.message, persona: data.persona ?? "crovi", ip: clientIp() },
-      { rules: skyRulesAnswer, loadContext: loadPublicContext },
+      { message: data.message, persona, ip: clientIp() },
+      { rules: rulesFor, loadContext: loadPublicContext, castFacts: loadCastFacts },
     );
   });
 
 export const askStaffAssistant = createServerFn({ method: "POST" })
-  .inputValidator((d: { message: string }) => z.object({ message }).parse(d))
+  .inputValidator((d: { message: string; persona?: string | undefined }) => z.object({ message, persona: castPersona.optional() }).parse(d))
   .handler(async ({ data }): Promise<AssistantReply> => {
     // One verified session for the whole answer: roles for the persona, organization for the Cervellone.
     const view = await sessionView();
     const org = view.memberships[0] ?? null;
     return answerStaff(data.message, {
-      rules: skyRulesAnswer,
+      rules: rulesFor,
+      castFacts: loadCastFacts,
       loadPublicContext,
       session: async () => ({ user: view.user, roles: view.roles }),
       kbSearch: async ({ query, onlyDue, limit }) => {
@@ -97,5 +119,5 @@ export const askStaffAssistant = createServerFn({ method: "POST" })
         });
         return error ? null : parseKb(out);
       },
-    });
+    }, data.persona ?? null);
   });

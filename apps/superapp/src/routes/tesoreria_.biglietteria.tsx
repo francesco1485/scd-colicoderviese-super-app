@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo } from "react";
 
+import { CastPresence } from "@/components/scd/CastPresence";
 import { SubAreaList, TariffWarning } from "@/components/scd/tesoreria";
 import { EmptyState, SourcesBox, WorkAreaGateView, WorkAreaShell, workAreaHead } from "@/components/scd/work-area-ui";
 import { Card, Chip, SourceLine, useRomeNow } from "@/components/scd/interior-ui";
@@ -122,6 +123,7 @@ function BiglietteriaPage({ preview, groups, events }: { preview: boolean; group
               </ol>
             )}
           </Card>
+          <CastPresence id="biglietteria" />
           <SubAreaList current="biglietteria" />
           <SourcesBox id="biglietteria" />
         </div>
