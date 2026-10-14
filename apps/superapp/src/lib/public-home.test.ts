@@ -1,6 +1,6 @@
 /**
- * Public home v4 (UD-100, Direzione 13/10/2026): only real routes, no team content outside, no betting content,
- * no banned hero photo.
+ * Public home v5 (UD-100, UD-110, UD-116 — Direzione 14/10/2026): only real routes, no team content outside, no betting
+ * content, no banned hero photo, practical blocks first, the link index in the menu (not in the footer).
  */
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -12,12 +12,15 @@ import {
   LINK_GROUPS,
   kickoffClock,
   matchdayLabel,
-  QUICK_LINKS,
   SOCIAL_LINKS,
   partnerOfTheMonth,
   publicHomeRoutes,
+  trimVetrina,
   verifiedSponsors,
+  vetrinaRepeats,
 } from "./public-home";
+import { quickActions } from "./home-actions";
+import { MENU_GROUPS, menuSections, searchMenu } from "./site-menu";
 import { SPONSORS } from "./sponsors";
 
 const APP = resolve(__dirname, "../..");
@@ -41,10 +44,11 @@ const PUBLIC_HOME_FILES = [
   "src/routes/index.tsx",
   "src/components/home/PublicHome.tsx",
   "src/components/home/Carousel.tsx",
+  "src/components/home/HomePractical.tsx",
   "src/lib/public-home.ts",
 ] as const;
 
-describe("public home v4", () => {
+describe("public home v5", () => {
   it("links only to routes that exist", () => {
     const routes = routePaths();
     for (const to of publicHomeRoutes()) {
@@ -66,19 +70,75 @@ describe("public home v4", () => {
     }
   });
 
-  it("keeps teams inside: no team list or roster on the public home; the games of the week of all teams are always shown", () => {
-    expect(publicHomeRoutes().some((r) => r.startsWith("/squadre"))).toBe(
-      false,
-    );
+  it("keeps teams inside: no team list, roster or training on the public home; today's games and the next home game of each team are shown", () => {
+    expect(
+      publicHomeRoutes().some(
+        (r) => r.startsWith("/squadre") || r.startsWith("/allenamenti"),
+      ),
+    ).toBe(false);
     for (const f of PUBLIC_HOME_FILES) {
       const src = read(f);
       expect(src, f).not.toMatch(/\/squadre/);
-      expect(src, f).not.toMatch(/getPublicRoster|TeamsGrid|hallTeams/);
+      expect(src, f).not.toMatch(
+        /getPublicRoster|TeamsGrid|hallTeams|getTrainingQuadro|quadro-data/,
+      );
     }
-    // Direzione 13/10 09:03: "calendario settimana deve essere sempre".
-    expect(read("src/components/home/PublicHome.tsx")).toMatch(/<PublicWeek/);
-    // The single calendar link of the brief lives in the quick strip.
-    expect(QUICK_LINKS.filter((q) => q.to === "/calendario")).toHaveLength(1);
+    const home = code("src/components/home/PublicHome.tsx");
+    // Direzione 13/10 09:03 "calendario settimana deve essere sempre" + UD-116 "Oggi e questa settimana" on top.
+    expect(home).toMatch(/<PublicWeek/);
+    expect(home).toMatch(/nextHomeMatchPerTeam\(/);
+    expect(home).toMatch(
+      /weekMatches\(calendar\.events, calendar\.groups, today, null, 1\)/,
+    );
+  });
+
+  it("UD-116: practical blocks come first, in the decided order, then the vetrina, news and ONE partner band", () => {
+    const home = code("src/components/home/PublicHome.tsx");
+    const body = home.slice(home.indexOf("export function PublicHome"));
+    const order = [
+      "<UrgentNotices",
+      "<ClubNoticeCard",
+      "<PublicWeek",
+      "<QuickActions",
+      "<WeekendResults",
+      "<DailyTipCard",
+      "<CredentialBar",
+      "<Vetrina worlds",
+      "<HomeNewsBlock",
+      "<JoinBanner",
+      "<PartnerBand",
+    ];
+    const at = order.map((t) => body.indexOf(t));
+    for (const [i, p] of at.entries()) expect(p, order[i]).toBeGreaterThan(-1);
+    expect([...at].sort((x, y) => x - y)).toEqual(at);
+    // The old 11-link quick strip and the big sponsor zone are gone.
+    expect(home).not.toMatch(
+      /QuickStrip|QUICK_LINKS|SponsorZone|partner-news-empty/,
+    );
+  });
+
+  it("UD-116: the vetrina leaves out slots that only repeat a page the home already opens", () => {
+    const repeats = vetrinaRepeats(quickActions("visitatore"));
+    expect(repeats).toEqual(
+      expect.arrayContaining([
+        "/entra",
+        "/card",
+        "/installa",
+        "/rassegna-stampa",
+        "/sponsor",
+      ]),
+    );
+    const s = (id: string, href: string) => ({ id, href });
+    const out = trimVetrina(
+      {
+        tutti: [s("a", "/entra"), s("b", "/tornei")],
+        bambini: [s("c", "/card")],
+      },
+      repeats,
+    );
+    expect(out.tutti.map((x) => x.id)).toEqual(["b"]);
+    // A world is never emptied by the trim.
+    expect(out.bambini.map((x) => x.id)).toEqual(["c"]);
   });
 
   it("never uses the aerial photo of the sports centre nor any betting wording", () => {
@@ -106,13 +166,6 @@ describe("public home v4", () => {
     expect(SPONSORS.length).toBeGreaterThan(0);
   });
 
-  it("gives the quick strip the brief's badges", () => {
-    expect(QUICK_LINKS.find((q) => q.badge === "nuovo")?.to).toBe(
-      "/eventi/christmas-lario-cup",
-    );
-    expect(QUICK_LINKS.find((q) => q.badge === "top")?.to).toBe("/sponsor");
-  });
-
   it("counts down to the real kickoff and stops once the game has started", () => {
     const k = Date.parse("2026-10-17T08:30:00Z");
     expect(
@@ -132,10 +185,11 @@ describe("public home v4", () => {
     expect(matchdayLabel("2026-10-17", "2026-10-13")).toBe("Sabato 17 ottobre");
   });
 
-  it("UD-110: nothing repeated — one credential strip, one sponsor zone, no trust carousel, no logo grids, no accordions in the body", () => {
+  it("UD-110/UD-116: nothing repeated — one credential strip, one partner band, no trust carousel, no logo grids, no accordions in the body", () => {
     const home = code("src/components/home/PublicHome.tsx");
     expect(home.match(/<CredentialBar \/>/g)).toHaveLength(1);
-    expect(home.match(/<SponsorZone /g)).toHaveLength(1);
+    expect(home.match(/<PartnerBand /g)).toHaveLength(1);
+    expect(home.match(/<LedwallRotator /g)).toHaveLength(1);
     for (const gone of [
       /<Trust\b/,
       /<PartnerTicker\b/,
@@ -147,18 +201,72 @@ describe("public home v4", () => {
       /Tutto sul club/,
     ])
       expect(home).not.toMatch(gone);
-    // The footer keeps the link groups; it no longer repeats the 37 partner logos on the home.
-    const chrome = code("src/components/SiteChrome.tsx");
-    expect(chrome).toMatch(/LINK_GROUPS\.map/);
-    expect(chrome).not.toMatch(/FooterSponsors|SPONSORS\.map/);
     // Partners link once to the full list.
     expect(home).toMatch(/Tutti i \{SPONSORS\.length\} partner/);
+  });
+
+  it("UD-116: the footer is reduced (logo, contacts, social, install, legal links, federal credits) and has no link index", () => {
+    const chrome = code("src/components/SiteChrome.tsx");
+    const footer = chrome.slice(chrome.indexOf("export function SiteFooter"));
+    expect(footer).not.toMatch(/LINK_GROUPS|Tutto sul club|footer-group-/);
+    expect(chrome).not.toMatch(/FooterSponsors|SPONSORS\.map/);
+    for (const must of [
+      /<ClubCrestOfficial/,
+      /CLUB_PROFILE\.contacts\.email/,
+      /CLUB_PROFILE\.contacts\.pec/,
+      /CLUB_PROFILE\.contacts\.address/,
+      /SOCIAL_LINKS\.map/,
+      /to="\/installa"/,
+      /href="\/privacy"/,
+      /openCookiePrefs/,
+      /to="\/safeguarding"/,
+      /href="\/elimina-account"/,
+      /<ClubCredentials variant="list"/,
+    ])
+      expect(footer).toMatch(must);
+  });
+
+  it("UD-116: the menu reaches every page of the former footer index, and its search finds them", () => {
+    const sections = menuSections();
+    const inMenu = new Set(
+      sections
+        .flatMap((g) => g.items)
+        .map(
+          (i) =>
+            `${i.to}#${i.hash ?? ""}?${new URLSearchParams(i.search ?? {}).toString()}`,
+        ),
+    );
+    for (const item of LINK_GROUPS.flatMap((g) => g.items))
+      expect(
+        inMenu.has(
+          `${item.to}#${item.hash ?? ""}?${new URLSearchParams(item.search ?? {}).toString()}`,
+        ),
+        item.label,
+      ).toBe(true);
+    const routes = routePaths();
+    for (const i of sections.flatMap((g) => g.items))
+      expect(routes.has(i.to.replace(/\/$/, "") || "/"), i.to).toBe(true);
+    expect(sections.slice(0, MENU_GROUPS.length).map((g) => g.id)).toEqual(
+      MENU_GROUPS.map((g) => g.id),
+    );
+    expect(searchMenu("kit").map((i) => i.to)).toContain("/kit");
+    expect(searchMenu("iscrizioni").map((i) => i.to)).toContain("/entra");
+    expect(searchMenu("CHRISTMAS lario").map((i) => i.to)).toContain(
+      "/eventi/christmas-lario-cup",
+    );
+    expect(searchMenu("   ")).toEqual([]);
+    expect(searchMenu("zzzz")).toEqual([]);
+    // The drawer renders the sections and the search.
+    const chrome = code("src/components/SiteChrome.tsx");
+    expect(chrome).toMatch(/menuSections\(\)/);
+    expect(chrome).toMatch(/searchMenu\(query, sections\)/);
   });
 
   it("UD-110: partner logos are always in colour (no greyscale anywhere on public logos)", () => {
     for (const f of [
       "src/components/scd/Logos.tsx",
       "src/components/home/PublicHome.tsx",
+      "src/components/home/HomePractical.tsx",
       "src/components/SponsorBand.tsx",
       "src/components/SiteChrome.tsx",
       "src/routes/sponsor.tsx",

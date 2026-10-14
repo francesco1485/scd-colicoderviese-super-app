@@ -2795,6 +2795,42 @@
         "implementationStatus": "IMPLEMENTED_STAGING_MIGRATION_NOT_APPLIED",
         "duplicate_work": "DENY"
       }
+    },
+    {
+      "sourceDate": "2026-10-14",
+      "sourceTime": "10:59",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-116",
+      "name": "HOME_WHAT_REALLY_MATTERS_AND_REDUCED_FOOTER",
+      "sourceQuoteFragments": [
+        "the big footer with \"Tutto sul club\" links is useless to people; the home pages must show what really matters (Direzione decision 14/10/2026 10:59, relayed by the orchestrating session as verbatim intent; original Italian wording not in this repository)",
+        "the Direttore says he cannot tell whether the home page is improving and that much is still missing"
+      ],
+      "context": "Direzione, 14/10/2026 10:59, relayed to the build session with the list of blocks to build.",
+      "normalizedCommand": {
+        "rule": "Both homes open with what matters: (1) 'Oggi e questa settimana' — trainings and matches with time, field and changes highlighted, urgent notices when the data has them; signed in only the person's teams and children, signed out the next home game of each team; real data only, empty states otherwise; (2) at most six big quick actions per person type (visitatore, famiglia, staff) linking only to existing routes; (3) weekend results and standings only with a real source, hidden otherwise; (4) ONE club communication chosen by the Direzione with an expiry date; (5) tip of the day in rotation Era / Dottor Acanfora / Genny; (6) ONE sober partner band (LED wall rotation once); (7) the UD-110 vetrina kept below the practical blocks, trimmed so nothing repeats; (8) footer reduced to logo, contacts (mail, PEC, address), social, Installa l'app, privacy / cookie / segnalazioni riservate / elimina account and federal credits; the link index moves to the menu and its search.",
+        "scope": "SCD_ONE_PUBLIC_HOME + MEMBER_HOME + SITE_CHROME",
+        "supersedesInPart": [
+          "UD-110 home order (quick strip, games of the week list, footer with link groups)"
+        ],
+        "constraints": [
+          "no invented data (UNKNOWN != ZERO); changes only from master flags or R20 alerts",
+          "minors: no names or faces in public; signed-in families see their children's first names only",
+          "teams, rosters and trainings stay inside (UD-100)",
+          "attività di base: no results, no standings (SGS)",
+          "every quick-action and menu route is a registered route (tested); closest existing page used and marked when the wished page does not exist",
+          "club communication list empty by default, showUntil mandatory, server Rome day",
+          "no assistant persona files edited; Era and Genny without portrait (UD-111 hold)"
+        ],
+        "status": "IMPLEMENTED_BRANCH_AGENT_HOME2",
+        "delivered": [
+          "apps/superapp/src/lib/home-today.ts, home-actions.ts, home-results.ts, home-tips.ts, club-notice.ts (+ .server, .functions), home-scope.functions.ts, site-menu.ts",
+          "apps/superapp/src/components/home/HomePractical.tsx; PublicHome.tsx and MemberHome.tsx recomposed; SiteChrome.tsx reduced footer and menu with search",
+          "tests: home-actions, home-today, club-notice, home-tips, home-results, public-home (new contract)"
+        ],
+        "duplicate_work": "DENY"
+      }
     }
   ],
   "completionGate": {

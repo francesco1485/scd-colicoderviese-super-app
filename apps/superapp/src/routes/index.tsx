@@ -4,6 +4,13 @@ import { MemberHome } from "@/components/home/MemberHome";
 import { PublicHome } from "@/components/home/PublicHome";
 import { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 import { getPublicFeed, getPublicSchedule } from "@/lib/club.functions";
+import type { PublicFeed } from "@/lib/club.types";
+import { getClubNotice } from "@/lib/club-notice.functions";
+import {
+  getMyHomeScope,
+  type HomePreview,
+  type HomeScope,
+} from "@/lib/home-scope.functions";
 import { romeParts } from "@/lib/home-week";
 import { getHomeNews, type HomeNews } from "@/lib/news.functions";
 import { getPublicSocial } from "@/lib/social.functions";
@@ -13,6 +20,8 @@ import { getVetrina, type VetrinaDay } from "@/lib/vetrina.functions";
 /** Longest wait for the news sources on a cold cache: the home never hangs on Google News or the club site. */
 const NEWS_BUDGET_MS = 1_500;
 const NO_NEWS: HomeNews = { items: [], pressCount: 0 };
+/** Longest wait for the R20 feed (alerts and weekend results) on the public home. */
+const FEED_BUDGET_MS = 1_500;
 
 function withBudget<T>(p: Promise<T>, ms: number, fallback: T): Promise<T> {
   return new Promise((resolve) => {
@@ -30,8 +39,11 @@ function withBudget<T>(p: Promise<T>, ms: number, fallback: T): Promise<T> {
   });
 }
 
+/** Staging preview of the signed-in compositions (`/?anteprima=famiglia|staff`); ignored outside staging. */
+type HomeSearch = { anteprima?: HomePreview | undefined };
+
 /**
- * Home (UD-100, Direzione 13/10/2026). Two audiences, one address:
+ * Home (UD-100, Direzione 13/10/2026; UD-116, 14/10/2026: what really matters at the top). Two audiences, one address:
  * - signed out: the public home v4 / vetrina (UD-110) — creative, communicative, commercial (rotating vetrina,
  *   games of the week, joining, one sponsor zone).
  *   No team list or roster (teams are inside); the games of the week of all teams are always shown (Direzione 09:03).
@@ -39,7 +51,12 @@ function withBudget<T>(p: Promise<T>, ms: number, fallback: T): Promise<T> {
  * The loader only reads team calendars when the server has confirmed a session.
  */
 export const Route = createFileRoute("/")({
-  loader: async () => {
+  validateSearch: (s: Record<string, unknown>): HomeSearch =>
+    s["anteprima"] === "famiglia" || s["anteprima"] === "staff"
+      ? { anteprima: s["anteprima"] }
+      : {},
+  loaderDeps: ({ search }) => ({ anteprima: search.anteprima }),
+  loader: async ({ deps }) => {
     const serverNow = Date.now();
     const today =
       romeParts(new Date(serverNow).toISOString())?.date ??
@@ -50,9 +67,24 @@ export const Route = createFileRoute("/")({
       getPublicSocial(),
       getPublicCalendarSnapshot(),
     ]);
-    if (!social.signedIn) {
+    // Staging only: the server decides whether the preview is allowed (stagingPreviewEnabled); otherwise "none".
+    const previewScope: HomeScope | null =
+      !social.signedIn && deps.anteprima
+        ? await getMyHomeScope({ data: { preview: deps.anteprima } })
+            .then((x) => (x.preview ? x : null))
+            .catch(() => null)
+        : null;
+    if (!social.signedIn && !previewScope) {
       // Mixed news highlight (press of every age group, club site, club feed; negative headlines filtered, UD-110).
       // The full press list lives on /rassegna-stampa; the home never waits more than NEWS_BUDGET_MS for it.
+      const feedP = withBudget<PublicFeed | null>(
+        getPublicFeed(),
+        FEED_BUDGET_MS,
+        null,
+      );
+      const noticeP = getClubNotice({ data: { signedIn: false } }).catch(
+        () => null,
+      );
       const news = await newsP;
       // Vetrina of the day, picked on the server's Rome day (never the visitor's clock); time-limited slots
       // (initiatives) never reach the browser before their window.
@@ -64,13 +96,15 @@ export const Route = createFileRoute("/")({
         calendar,
         news: news.items,
         vetrina: vetrina.worlds,
+        feed: await feedP,
+        notice: await noticeP,
         // Server Rome day (QA day honoured only outside production): seeds the LED wall and the partner of the month.
         ledwallDay: vetrina.today,
         serverNow,
         today,
       };
     }
-    const [feed, schedule, vetrina] = await Promise.all([
+    const [feed, schedule, vetrina, scope, notice] = await Promise.all([
       getPublicFeed(),
       getPublicSchedule(),
       // "Soci e staff" world of the palinsesto: derived from the confirmed session, no new data.
@@ -78,6 +112,18 @@ export const Route = createFileRoute("/")({
         today,
         worlds: EMPTY_WORLDS,
       })),
+      previewScope
+        ? Promise.resolve(previewScope)
+        : getMyHomeScope({ data: {} }).catch((): HomeScope => ({
+            audience: "visitatore",
+            preview: null,
+            state: "error",
+            groups: [],
+            children: [],
+            trainings: [],
+            today,
+          })),
+      getClubNotice({ data: { signedIn: social.signedIn } }).catch(() => null),
     ]);
     return {
       kind: "member" as const,
@@ -86,6 +132,8 @@ export const Route = createFileRoute("/")({
       calendar,
       social,
       vetrina: vetrina.worlds,
+      scope,
+      notice,
       serverNow,
       today,
     };
@@ -123,6 +171,8 @@ function Home() {
       news={data.news}
       vetrina={data.vetrina}
       ledwallDay={data.ledwallDay}
+      feed={data.feed}
+      notice={data.notice}
       nowMs={data.serverNow}
       today={data.today}
     />
