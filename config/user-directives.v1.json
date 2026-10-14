@@ -2795,6 +2795,34 @@
         "implementationStatus": "IMPLEMENTED_STAGING_MIGRATION_NOT_APPLIED",
         "duplicate_work": "DENY"
       }
+    },
+    {
+      "sourceDate": "2026-10-14",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-113",
+      "name": "ADOPT_AN_ITEM_CATALOGUE",
+      "sourceQuoteFragments": [
+        "spinta forte su sponsor",
+        "gestionale adotta un oggetto"
+      ],
+      "context": "Direzione message of 14/10/2026 11:09, detailed in project doc SCD_RICHIESTE_DIREZIONE_2026-10-14 §10: catalogue of things the club needs (goals, balls, technical gear, benches, defibrillator, a team kit, a van, a piece of the Club House), each with price, picture and state; open to families, fans and companies; recognition (plate, social thanks with consent, certificate); money to the treasury with a receipt; companies into the sponsor CRM.",
+      "normalizedCommand": {
+        "rule": "Public page /adotta with the catalogue, states DA_ADOTTARE/IN_ADOZIONE/ADOTTATO/CONSEGNATO, adoption by prefilled e-mail to the club mailbox (no online payment, public forms stay paused); live states and adoptions from scd_adopt_items/scd_adoptions once r101 is applied.",
+        "scope": "GROW_AND_TREASURY",
+        "constraints": [
+          "prices never guessed: null until the Direzione sets them",
+          "adopter named publicly only with written consent; minors never adopt or appear",
+          "receipt reference required before an adoption counts as cashed",
+          "companies recorded in GROW, no parallel registry",
+          "migration r101 applied only with explicit Direzione approval"
+        ],
+        "implementation": {
+          "pure_logic": "apps/superapp/src/lib/adopt-items.ts",
+          "route": "/adotta (public, linked from /sponsor and the Sponsor & Partner menu)",
+          "migration": "supabase/migrations/20261014_r101_adopt_items.sql (STAGED, NOT APPLIED)"
+        }
+      }
     }
   ],
   "completionGate": {

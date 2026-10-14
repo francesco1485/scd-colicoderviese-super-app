@@ -83,6 +83,17 @@ function Sponsor() {
         <p className="mt-3 text-xs text-muted-foreground">Disponibilità di slot e periodi gestita dalla Direzione. Nessun pagamento online attivo: ogni accordo passa da una proposta.</p>
       </section>
 
+      <section className="mx-auto mt-14 max-w-6xl px-4" aria-labelledby="sponsor-adotta">
+        <div className="card-premium flex flex-col gap-3 p-6 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="eyebrow">Adotta un oggetto</p>
+            <h2 id="sponsor-adotta" className="mt-1 text-2xl font-bold">Porte, palloni, un pulmino, il defibrillatore</h2>
+            <p className="mt-1 text-sm text-muted-foreground">Un contributo mirato con targhetta, attestato e ricevuta: aperto ad aziende, famiglie e tifosi.</p>
+          </div>
+          <Link to="/adotta" className="surface-sun inline-flex min-h-11 shrink-0 items-center justify-center rounded-lg px-4 text-sm font-bold uppercase">Vedi il catalogo</Link>
+        </div>
+      </section>
+
       <section id="proposta" className="mx-auto mt-14 max-w-4xl scroll-mt-20 px-4">
         <p className="eyebrow">Richiedi proposta</p>
         <h2 className="mt-1 mb-5 text-3xl font-bold">Parliamo del tuo progetto</h2>

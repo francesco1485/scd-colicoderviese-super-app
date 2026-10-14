@@ -102,6 +102,7 @@ const menuGroups: readonly {
     app: "GROW",
     items: [
       { to: "/sponsor", label: "Sponsor & Partner" },
+      { to: "/adotta", label: "Adotta un oggetto" },
       { to: "/fornitori", label: "Fornitori" },
     ],
   },

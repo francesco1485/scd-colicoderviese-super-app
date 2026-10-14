@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdottaRouteImport } from './routes/adotta'
 import { Route as AllenamentiRouteImport } from './routes/allenamenti'
 import { Route as CalendarioRouteImport } from './routes/calendario'
 import { Route as CommunityRouteImport } from './routes/community'
@@ -105,6 +106,11 @@ import { Route as GestionaleDistintaEventIdSpettatoriRouteImport } from './route
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdottaRoute = AdottaRouteImport.update({
+  id: '/adotta',
+  path: '/adotta',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AllenamentiRoute = AllenamentiRouteImport.update({
@@ -574,6 +580,7 @@ const GestionaleDistintaEventIdSpettatoriRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/adotta': typeof AdottaRoute
   '/allenamenti': typeof AllenamentiRoute
   '/calendario': typeof CalendarioRoute
   '/community': typeof CommunityRoute
@@ -668,6 +675,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/adotta': typeof AdottaRoute
   '/allenamenti': typeof AllenamentiRoute
   '/calendario': typeof CalendarioRoute
   '/community': typeof CommunityRoute
@@ -762,6 +770,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/adotta': typeof AdottaRoute
   '/allenamenti': typeof AllenamentiRoute
   '/calendario': typeof CalendarioRoute
   '/community': typeof CommunityRoute
@@ -858,6 +867,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/adotta'
     | '/allenamenti'
     | '/calendario'
     | '/community'
@@ -952,6 +962,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/adotta'
     | '/allenamenti'
     | '/calendario'
     | '/community'
@@ -1045,6 +1056,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/adotta'
     | '/allenamenti'
     | '/calendario'
     | '/community'
@@ -1140,6 +1152,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdottaRoute: typeof AdottaRoute
   AllenamentiRoute: typeof AllenamentiRoute
   CalendarioRoute: typeof CalendarioRoute
   CommunityRoute: typeof CommunityRoute
@@ -1234,6 +1247,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/adotta': {
+      id: '/adotta'
+      path: '/adotta'
+      fullPath: '/adotta'
+      preLoaderRoute: typeof AdottaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/allenamenti': {
@@ -1899,6 +1919,7 @@ const GestionaleImpiantiRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdottaRoute: AdottaRoute,
   AllenamentiRoute: AllenamentiRoute,
   CalendarioRoute: CalendarioRoute,
   CommunityRoute: CommunityRoute,

@@ -144,6 +144,7 @@ export const LINK_GROUPS: readonly LinkGroup[] = [
     items: [
       { label: "Diventa partner", to: "/sponsor" },
       { label: "Richiedi una proposta", to: "/sponsor", hash: "proposta" },
+      { label: "Adotta un oggetto", to: "/adotta" },
       { label: "Fornitori", to: "/fornitori" },
       { label: "Area partner", to: "/partner", reserved: true },
     ],
