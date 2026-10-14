@@ -50,12 +50,13 @@ describe("spot review page /spot/$slug (B1)", () => {
     expect(form).toContain("preset?.receivedNote && outcome?.delivered");
   });
 
-  it("CRM vetrina: page link, copy link with fallback and a WhatsApp draft per spot; nothing is sent", () => {
+  it("CRM vetrina: page link, copy link with fallback, no WhatsApp or other message (Francesco 14/10: nessun messaggio)", () => {
     expect(ui).toContain("<SpotReviewLinks spot={spot} />");
     expect(ui).toContain("Pagina per l'azienda");
     expect(ui).toContain("navigator.clipboard?.writeText");
     expect(ui).toContain('setState("manual")');
-    expect(ui).toContain("spotReviewWhatsapp(spot)");
+    expect(ui).not.toContain("spotReviewWhatsapp");
+    expect(ui).not.toContain("wa.me");
     expect(ui).not.toMatch(/mailto:|sendMessage|\/gestionale\/posta/);
   });
 

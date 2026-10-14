@@ -1,17 +1,18 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, ArrowUpRight, Check, ChevronLeft, ChevronRight, Copy, FileCheck2, Link2, MessageCircle, MonitorPlay, Pause, Play } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Check, ChevronLeft, ChevronRight, Copy, FileCheck2, Link2, MonitorPlay, Pause, Play, Radio } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { mayAnimate, stepIndex } from "@/lib/ledwall-rotation";
-import { spotReviewPath, spotReviewShareText, spotReviewUrl, spotReviewWhatsapp } from "@/lib/spot-review";
+import { spotReviewPath, spotReviewUrl } from "@/lib/spot-review";
+import { ledOnAir, loopSeconds, passesPerHour, romeClock, spotVideoFile, upcomingSlots } from "@/lib/spot-schedule";
+import { useNow, useVideoFormat } from "@/lib/use-spot-clock";
 import {
   LED_MASTER,
   SPONSOR_SPOTS,
   SPOT_FLOW,
   SPOT_STATUS_LABEL,
   partnerHref,
-  spotsForHome,
-  spotsInDayOrder,
+  spotsForLedwall,
   type SponsorSpot,
   type SpotStatus,
 } from "@/lib/sponsor-spots";
@@ -62,6 +63,8 @@ export function SpotStage({
   controls,
   onEnded,
   priority,
+  startAtMs,
+  masterOnly,
 }: {
   spot: SponsorSpot;
   play: boolean;
@@ -69,10 +72,28 @@ export function SpotStage({
   controls?: boolean;
   onEnded?: () => void;
   priority?: boolean;
+  /** Start the video at this point of the slot (clock-synced rotation); read once when the spot mounts. */
+  startAtMs?: number | undefined;
+  /** Show the LED master strip even when a field preview exists (regia of the gestionale). */
+  masterOnly?: boolean;
 }) {
   const ref = useRef<HTMLVideoElement>(null);
-  const src = spot.preview ?? spot.master;
-  const strip = spot.preview === null;
+  const format = useVideoFormat();
+  const strip = masterOnly || spot.preview === null;
+  const src = spotVideoFile(strip ? spot.master : (spot.preview ?? spot.master), format);
+  const startAt = useRef(startAtMs);
+  startAt.current = startAtMs;
+  const onMeta = () => {
+    const v = ref.current;
+    const ms = startAt.current;
+    if (v && ms && ms > 500 && ms < LED_MASTER.seconds * 1000 - 500) {
+      try {
+        v.currentTime = ms / 1000;
+      } catch {
+        /* not seekable yet */
+      }
+    }
+  };
 
   useEffect(() => {
     const v = ref.current;
@@ -80,14 +101,15 @@ export function SpotStage({
     v.muted = true;
     if (play) v.play().catch(() => undefined);
     else v.pause();
-  }, [play, mountVideo, spot.slug]);
+  }, [play, mountVideo, spot.slug, src]);
 
   const media = mountVideo ? (
     <video
-      key={spot.slug}
+      key={`${spot.slug}-${format}-${strip ? "m" : "p"}`}
       ref={ref}
       src={src}
-      poster={spot.poster}
+      onLoadedMetadata={onMeta}
+      poster={strip && spot.preview !== null ? undefined : spot.poster}
       muted
       playsInline
       autoPlay={play}
@@ -139,10 +161,15 @@ const ctrl =
  * Reduced motion: posters with previous/next, a video plays only when the visitor starts it.
  */
 export function SponsorSpotsHome({ day, className = "" }: { day: string; className?: string }) {
-  const spots = useMemo(() => spotsInDayOrder(spotsForHome(), day), [day]);
+  // Clock-synced with the LED wall player and the gestionale regia (lib/spot-schedule.ts). Before mount the order of
+  // the server day is used, so server and first client render match.
+  const now = useNow(1000);
+  const air = useMemo(() => ledOnAir(now || Date.parse(`${day}T12:00:00Z`)), [now, day]);
+  const spots = air.order;
   const n = spots.length;
   const { ref, visible, seen } = useOnScreen<HTMLElement>();
-  const [idx, setIdx] = useState(0);
+  /** null = follow the LED wall clock; a number = the visitor moved by hand. */
+  const [manualIdx, setManualIdx] = useState<number | null>(null);
   const [auto, setAuto] = useState(false);
   const [userPaused, setUserPaused] = useState(false);
   const [manualPlay, setManualPlay] = useState(false);
@@ -158,15 +185,18 @@ export function SponsorSpotsHome({ day, className = "" }: { day: string; classNa
     return () => mq.removeEventListener?.("change", onChange);
   }, []);
 
+  const following = auto && !userPaused && manualIdx === null;
+  const idx = manualIdx ?? Math.max(0, air.index);
+
   const go = useCallback(
     (delta: number) => {
       const next = stepIndex(idx, delta, n);
-      setIdx(next);
-      setManualPlay(false);
+      setManualIdx(next);
+      setManualPlay(!auto);
       const s = spots[next];
       if (s) setAnnounce(`${s.sponsorName}, spot ${next + 1} di ${n}`);
     },
-    [idx, n, spots],
+    [idx, n, spots, auto],
   );
 
   if (n === 0) return null;
@@ -175,8 +205,10 @@ export function SponsorSpotsHome({ day, className = "" }: { day: string; classNa
   const mountVideo = seen && (auto || manualPlay);
   const link = partnerHref(spot);
 
+  // By hand: at the end of a spot go on to the next one; following the clock, the clock moves on by itself.
   const onEnded = () => {
-    if (auto && !userPaused) setIdx((i) => stepIndex(i, 1, n));
+    if (following) return;
+    if (auto && !userPaused) setManualIdx(stepIndex(idx, 1, n));
     else setManualPlay(false);
   };
 
@@ -185,9 +217,9 @@ export function SponsorSpotsHome({ day, className = "" }: { day: string; classNa
       <div className="grid gap-4 rounded-[22px] bg-white p-4 shadow-[0_1px_2px_rgb(11_42_91/0.06),0_8px_24px_-12px_rgb(11_42_91/0.25)] lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-center lg:gap-6 lg:p-6">
         <div className="min-w-0">
           <div className="relative">
-            <SpotStage spot={spot} play={play} mountVideo={mountVideo} onEnded={onEnded} controls={!auto && manualPlay} priority={false} />
+            <SpotStage spot={spot} play={play} mountVideo={mountVideo} onEnded={onEnded} controls={!auto && manualPlay} priority={false} startAtMs={following ? air.elapsedMs : undefined} />
             <span className="pointer-events-none absolute left-2.5 top-2.5 rounded-full bg-[#0b2a5b]/85 px-2.5 py-1 text-[11.5px] font-bold uppercase leading-none tracking-[0.06em] text-white ring-1 ring-white/25 backdrop-blur-sm">
-              Anteprima dello spot
+              {following ? "In onda ora sul LED wall" : "Anteprima dello spot"}
             </span>
             {!auto && !manualPlay && (
               <button
@@ -241,6 +273,11 @@ export function SponsorSpotsHome({ day, className = "" }: { day: string; classNa
           <div className="flex items-center gap-2">
             <p className="m-0 min-w-0 flex-1 text-[13px] font-semibold tabular-nums text-[#4a5d7a]" data-testid="spot-counter">
               Spot {idx + 1} di {n}
+              {manualIdx !== null && auto && (
+                <button type="button" onClick={() => setManualIdx(null)} className="scd-focus ml-2 rounded text-[13px] font-semibold text-[#1556c4] underline-offset-2 hover:underline" data-testid="spot-live">
+                  Torna alla diretta
+                </button>
+              )}
             </p>
             <button type="button" className={ctrl} onClick={() => go(-1)} aria-label="Spot precedente">
               <ChevronLeft className="size-5" aria-hidden="true" />
@@ -324,8 +361,8 @@ function CopyCaption({ text, sponsor }: { text: string; sponsor: string }) {
 }
 
 /**
- * B1: the review page for the company (/spot/$slug). The commerciale opens it, copies the link or prepares a WhatsApp
- * message and sends it himself: the app never sends anything. If the clipboard is blocked, the address appears
+ * B1: the review page for the company (/spot/$slug), opened from the gestionale or shown on screen during a meeting.
+ * The app never sends messages (Francesco 14/10: "nessun messaggio"). If the clipboard is blocked, the address appears
  * selected in a field to copy by hand.
  */
 function SpotReviewLinks({ spot }: { spot: SponsorSpot }) {
@@ -365,17 +402,6 @@ function SpotReviewLinks({ spot }: { spot: SponsorSpot }) {
           {state === "done" ? <Check className="size-4" aria-hidden="true" /> : <Link2 className="size-4" aria-hidden="true" />}
           {state === "done" ? "Link copiato" : "Copia link"}
         </button>
-        <a
-          href={spotReviewWhatsapp(spot)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={btn}
-          aria-label={`Prepara un messaggio WhatsApp per ${spot.sponsorName}: scegli tu la chat e invii tu`}
-          data-testid="crm-spot-review-wa"
-          title={spotReviewShareText(spot)}
-        >
-          <MessageCircle className="size-4" aria-hidden="true" /> WhatsApp
-        </a>
       </div>
       {state === "manual" && (
         <label className="grid gap-1 text-[12.5px] text-[var(--in-sub)]">
@@ -432,6 +458,141 @@ function VetrinaCard({ spot }: { spot: SponsorSpot }) {
   );
 }
 
+/* ------------------------------------------------------------ regia (gestionale) */
+
+function mmss(totalSeconds: number): string {
+  const m = Math.floor(totalSeconds / 60);
+  const sec = totalSeconds % 60;
+  return `${m}:${String(sec).padStart(2, "0")}`;
+}
+
+/**
+ * Regia of the LED wall inside the sponsor gestionale: what is on air now (same clock as the player and the home),
+ * what comes next, the palinsesto of the loop and the calculated passes. Read-only: the rotation runs by itself.
+ */
+export function SpotRegia({ spots = SPONSOR_SPOTS }: { spots?: readonly SponsorSpot[] }) {
+  const now = useNow(1000);
+  const format = useVideoFormat();
+  const showable = useMemo(() => spotsForLedwall(spots), [spots]);
+  const air = useMemo(() => (now ? ledOnAir(now, showable) : null), [now, showable]);
+  const excluded = spots.length - showable.length;
+  const n = showable.length;
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const startAt = useRef(0);
+  startAt.current = air?.elapsedMs ?? 0;
+  const upcoming = air && now ? upcomingSlots(air, now, n) : [];
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = true;
+    v.play().catch(() => undefined);
+  }, [air?.current?.slug, format]);
+
+  const onMeta = () => {
+    const v = videoRef.current;
+    const ms = startAt.current;
+    if (v && ms > 500) {
+      try {
+        v.currentTime = ms / 1000;
+      } catch {
+        /* not seekable yet */
+      }
+    }
+  };
+
+  return (
+    <section aria-labelledby="crm-regia-title" className="mt-3 min-w-0 overflow-hidden rounded-xl bg-[#06142b] p-3 text-white sm:p-4" data-testid="crm-spot-regia">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h4 id="crm-regia-title" className="m-0 inline-flex items-center gap-2 text-[15px] font-bold">
+          <span className="relative inline-flex size-2.5">
+            <span className="absolute inset-0 animate-ping rounded-full bg-[#ff4d4d] opacity-60 motion-reduce:animate-none" />
+            <span className="relative inline-flex size-2.5 rounded-full bg-[#ff4d4d]" />
+          </span>
+          Regia LED wall · in diretta
+        </h4>
+        <a
+          href="/ledwall/player"
+          target="_blank"
+          rel="noopener"
+          className="scd-focus inline-flex min-h-10 items-center gap-1.5 rounded-[9px] bg-[#ffd600] px-3 text-[13.5px] font-bold text-[#0b1e3a]"
+          data-testid="crm-regia-player"
+        >
+          <MonitorPlay className="size-4" aria-hidden="true" /> Apri il player sul PC del LED wall
+        </a>
+      </div>
+      <div className="mt-3 overflow-hidden rounded-[6px] bg-black ring-1 ring-white/15" style={{ aspectRatio: `${LED_MASTER.width} / ${LED_MASTER.height}` }}>
+        {air?.current ? (
+          <video
+            key={`${air.current.slug}-${format}`}
+            ref={videoRef}
+            src={spotVideoFile(air.current.master, format)}
+            onLoadedMetadata={onMeta}
+            muted
+            playsInline
+            autoPlay
+            preload="auto"
+            width={LED_MASTER.width}
+            height={LED_MASTER.height}
+            className="block size-full object-fill"
+            aria-label={`In onda sul LED wall: ${air.current.sponsorName}`}
+            data-testid="crm-regia-video"
+          />
+        ) : null}
+      </div>
+      <div className="mt-3 grid gap-2 sm:grid-cols-2">
+        <div className="rounded-lg bg-white/[0.07] p-2.5" aria-live="polite" aria-atomic="true">
+          <span className="block text-[12px] font-bold uppercase tracking-[0.08em] text-white/60">In onda ora</span>
+          <b className="block text-[16px] leading-tight" data-testid="crm-regia-current">
+            {air?.current?.sponsorName ?? (n === 0 ? "Nessuno spot in rotazione" : "…")}
+          </b>
+        </div>
+        <div className="rounded-lg bg-white/[0.07] p-2.5">
+          <span className="block text-[12px] font-bold uppercase tracking-[0.08em] text-white/60">
+            Poi{air ? ` · tra ${Math.ceil(air.remainingMs / 1000)} s` : ""}
+          </span>
+          <b className="block text-[16px] leading-tight tabular-nums" data-testid="crm-regia-next">
+            {air?.next?.sponsorName ?? "…"}
+          </b>
+        </div>
+      </div>
+      <dl className="m-0 mt-2 grid grid-cols-3 gap-2 text-center" data-testid="crm-regia-stats">
+        <div className="rounded-lg bg-white/[0.07] p-2">
+          <dt className="text-[11.5px] text-white/60">Spot in rotazione</dt>
+          <dd className="m-0 text-[18px] font-bold tabular-nums">{n}</dd>
+        </div>
+        <div className="rounded-lg bg-white/[0.07] p-2">
+          <dt className="text-[11.5px] text-white/60">Giro completo</dt>
+          <dd className="m-0 text-[18px] font-bold tabular-nums">{mmss(loopSeconds(n))}</dd>
+        </div>
+        <div className="rounded-lg bg-white/[0.07] p-2">
+          <dt className="text-[11.5px] text-white/60">Passaggi per partner ogni ora</dt>
+          <dd className="m-0 text-[18px] font-bold tabular-nums">{passesPerHour(n)}</dd>
+        </div>
+      </dl>
+      <p className="m-0 mt-1.5 text-[12px] leading-snug text-white/60">
+        Calcolato: {LED_MASTER.seconds} secondi a spot, {n} spot in giro, per ogni ora di LED wall acceso. Il pubblico non è stimato.
+        {excluded > 0 ? ` ${excluded} spot fuori rotazione per modifiche richieste.` : ""}
+      </p>
+      {upcoming.length > 0 && (
+        <ol className="m-0 mt-3 grid list-none gap-1 p-0" aria-label="Palinsesto del giro" data-testid="crm-regia-palinsesto">
+          {upcoming.map(({ at, spot }, k) => (
+            <li
+              key={spot.slug}
+              className={`flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13.5px] ${k === 0 ? "bg-[#ffd600] font-bold text-[#0b1e3a]" : "bg-white/[0.05]"}`}
+              aria-current={k === 0 ? "true" : undefined}
+            >
+              <span className="w-[4.5rem] flex-none tabular-nums">{romeClock(at)}</span>
+              <span className="min-w-0 flex-1 truncate">{spot.sponsorName}</span>
+              {k === 0 ? <Radio className="size-4 flex-none" aria-label="in onda" /> : <span className="hidden flex-none sm:inline-flex"><SpotStatusBadge status={spot.status} /></span>}
+            </li>
+          ))}
+        </ol>
+      )}
+    </section>
+  );
+}
+
 /** "Spot LED" section of the sponsor gestionale (/crm): every spot, its status and the approval flow. */
 export function SpotLedVetrina({ spots = SPONSOR_SPOTS }: { spots?: readonly SponsorSpot[] }) {
   return (
@@ -451,9 +612,10 @@ export function SpotLedVetrina({ spots = SPONSOR_SPOTS }: { spots?: readonly Spo
         </a>
       </div>
       <p className="m-0 px-1 text-[14px] leading-snug text-[var(--in-sub)]">
-        Gli spot girano già sulla pagina iniziale dell'app e sul LED wall. Niente invio per mail: lo spot si mostra allo sponsor dall'app.
-        Ogni spot ha una pagina per l'azienda: copi il link e lo mandi tu, l'azienda approva o chiede modifiche da lì.
+        Gli spot girano da soli, tutti con lo stesso orologio: sul LED wall del campo, nella pagina iniziale dell'app e qui in regia.
+        Nessun messaggio parte dall'app. Ogni spot ha anche una pagina per l'azienda, da aprire quando serve.
       </p>
+      <SpotRegia spots={spots} />
       <ol className="m-0 mt-3 grid list-none gap-2 p-0 sm:grid-cols-3" aria-label="Come si approva uno spot" data-testid="crm-spot-flow">
         {SPOT_FLOW.map((step, i) => (
           <li key={step.key} className="flex gap-2.5 rounded-xl bg-[#e9f2fb] p-3">

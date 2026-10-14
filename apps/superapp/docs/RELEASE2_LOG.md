@@ -495,3 +495,14 @@ Richiesta della Direzione (14/10/2026 11:00), registrata come **UD-130**: sotto 
 - Nessuna tabella, migrazione, scrittura Supabase, ruolo o permesso nuovo.
 - QA: tsc, build, vitest 1553, test:manifest, test:claude-hooks; Playwright 390×844 e 1440×900 su build locale in anteprima (piano bloccato) e su dati di prova con nomi inventati; nessun errore, nessuno scroll orizzontale. Screenshot in `/tmp/claude-0/qa/pulmini2d/`.
 - Da completare nel Master Pulmini/Flotta: pulmino (MEZZO) per ognuno dei 61 ragazzi, posto fisso se deciso, posti/targa/scadenze dei mezzi, orari delle fermate, divisione della linea LAGO/LECCO tra Pulmino 1 e 2, autisti per corsa. Per mostrare fermate e posto accanto ai nomi serve un aggiornamento (da approvare) di `scd_transport_rider_roster` che restituisca anche fermata andata/ritorno e posto.
+
+## UD-131 — Gestionale sponsor a regime: gli spot girano da soli · 2026-10-14
+
+Francesco 14/10 20:56: «No nessun messaggio … devi lavorare nel gestionale sponsor per metterlo a regime, quei video e spot devono girare».
+
+- `src/lib/spot-schedule.ts` (+ test): un solo orologio (Roma, slot di 20 s = durata del master, ordine del giorno) per player LED, home e regia; `passesPerHour` calcolato (mai pubblico stimato); `chooseVideoFormat`/`spotVideoFile`: MP4 H.264 dove si riproduce, altrimenti il gemello WebM VP9.
+- 13 file `.webm` (VP9) accanto agli MP4 in `public/media/ledwall/2026-27/` (master e anteprime).
+- `/ledwall/player`: rotazione guidata dall'orologio (non più dall'evento «ended»): un video che non si carica non blocca il giro; ricaricando la pagina riparte al secondo giusto; stesso spot della home e della regia.
+- Home «Sul LED wall»: segue la diretta («In onda ora sul LED wall»), le frecce passano al manuale con «Torna alla diretta».
+- `/crm` → Spot LED: nuova **Regia LED wall · in diretta** (tabellone che gira, in onda ora, poi tra N s, spot in rotazione, giro completo, passaggi per partner ogni ora calcolati, palinsesto con orari); tolto il pulsante WhatsApp (nessun messaggio dall'app).
+- QA locale (Playwright, Chromium senza H.264 → WebM): player cambia spot allo scadere dei 20 s; home e regia riproducono; 390/1440 senza scroll orizzontale né errori.

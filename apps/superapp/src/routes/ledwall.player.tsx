@@ -1,16 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
-import { stepIndex } from "@/lib/ledwall-rotation";
 import { romeDay } from "@/lib/public-window";
-import { LED_MASTER, spotsForLedwall, spotsInDayOrder } from "@/lib/sponsor-spots";
+import { LED_MASTER } from "@/lib/sponsor-spots";
+import { ledOnAir, spotVideoFile } from "@/lib/spot-schedule";
+import { useVideoFormat } from "@/lib/use-spot-clock";
 
 /**
  * LED wall player (UD-119: "tutto è gestito dal vivo attraverso l'app, che alimenta anche il LED wall").
  * Opened full screen on the PC connected to the LED controller: a black page with the 1920x164 board canvas scaled
  * to the window width, the master spots one after another in the order of the Rome day, in loop. No header, footer,
  * chat or banner (staticData.bare), noindex. Never shows a spot with MODIFICHE_RICHIESTE (spotsForLedwall).
- * Two video elements alternate so the next spot is already loaded when the current one ends.
+ * The spot on air comes from the Rome clock (lib/spot-schedule.ts): the same spot as the home and the gestionale
+ * regia at the same moment; a reload restarts at the right second; a video that fails to load never stops the loop
+ * (the clock moves on after 20 s). Two video elements alternate so the next spot is already loaded.
+ * MP4 (H.264) or its WebM (VP9) twin, whichever the PC's browser plays.
  * Screen kept awake with the Wake Lock API when the browser allows it (silently ignored otherwise).
  * Double click or the F key toggles full screen.
  */
@@ -66,28 +70,22 @@ function toggleFullscreen() {
 
 function LedwallPlayer() {
   const { day: serverDay } = Route.useLoaderData();
-  const [day, setDay] = useState(serverDay);
-  const order = useMemo(() => spotsInDayOrder(spotsForLedwall(), day), [day]);
-  const n = order.length;
-  const [cur, setCur] = useState(0);
-  const [active, setActive] = useState<0 | 1>(0);
+  const format = useVideoFormat();
+  const [now, setNow] = useState(0);
   const a = useRef<HTMLVideoElement>(null);
   const b = useRef<HTMLVideoElement>(null);
-  const refs = [a, b] as const;
+  const refs = useMemo(() => [a, b] as const, []);
+  const [active, setActive] = useState<0 | 1>(0);
+  const lastIndex = useRef<string>("");
 
   useWakeLock();
 
-  // A new Rome day reorders the rotation (checked every minute).
+  // The clock drives the rotation (4 ticks a second: the swap lands within 250 ms of the slot change).
   useEffect(() => {
-    const t = window.setInterval(() => {
-      const d = romeDay(Date.now());
-      setDay((old) => (old === d ? old : d));
-    }, 60_000);
+    setNow(Date.now());
+    const t = window.setInterval(() => setNow(Date.now()), 250);
     return () => window.clearInterval(t);
   }, []);
-  useEffect(() => {
-    setCur(0);
-  }, [day]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -97,41 +95,43 @@ function LedwallPlayer() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  // The active element plays the current spot; the other one holds the next spot, loaded and paused at the start.
-  const src = (slot: 0 | 1) => {
-    if (n === 0) return undefined;
-    const i = slot === active ? cur : stepIndex(cur, 1, n);
-    return order[Math.min(i, n - 1)]?.master;
-  };
+  const air = useMemo(() => ledOnAir(now || Date.parse(`${serverDay}T12:00:00Z`)), [now, serverDay]);
+  const n = air.order.length;
+  const slotKey = `${air.day}#${air.index}`;
+  const sources: [string | undefined, string | undefined] = [undefined, undefined];
+  if (air.current) {
+    sources[active] = spotVideoFile(air.current.master, format);
+    sources[active === 0 ? 1 : 0] = air.next ? spotVideoFile(air.next.master, format) : undefined;
+  }
 
+  // Slot change: the preloaded element becomes the active one.
   useEffect(() => {
+    if (!now) return;
+    if (lastIndex.current && lastIndex.current !== slotKey) setActive((x) => (x === 0 ? 1 : 0));
+    lastIndex.current = slotKey;
+  }, [slotKey, now]);
+
+  // Keep the active element playing at the clock position (re-seek only when it drifts more than a second).
+  useEffect(() => {
+    if (!now || !air.current) return;
     const v = refs[active].current;
     if (!v) return;
     v.muted = true;
-    v.play().catch(() => undefined);
+    const target = air.elapsedMs / 1000;
+    if (v.readyState >= 1 && Math.abs(v.currentTime - target) > 1) {
+      try {
+        v.currentTime = target;
+      } catch {
+        /* not seekable yet */
+      }
+    }
+    if (v.paused) v.play().catch(() => undefined);
     const other = refs[active === 0 ? 1 : 0].current;
-    if (other) {
+    if (other && !other.paused) {
       other.pause();
       other.currentTime = 0;
     }
-  }, [active, cur, n]);
-
-  const onEnded = useCallback(
-    (slot: 0 | 1) => {
-      if (slot !== active) return;
-      if (n <= 1) {
-        const v = refs[slot].current;
-        if (v) {
-          v.currentTime = 0;
-          v.play().catch(() => undefined);
-        }
-        return;
-      }
-      setActive(slot === 0 ? 1 : 0);
-      setCur((c) => stepIndex(c, 1, n));
-    },
-    [active, n],
-  );
+  }, [now, active, air.current, air.elapsedMs, refs]);
 
   return (
     <main
@@ -145,21 +145,22 @@ function LedwallPlayer() {
         className="relative w-full overflow-hidden bg-black"
         style={{ aspectRatio: `${LED_MASTER.width} / ${LED_MASTER.height}` }}
         data-testid="ledwall-canvas"
-        data-spot={n > 0 ? order[Math.min(cur, n - 1)]?.slug : ""}
+        data-spot={air.current?.slug ?? ""}
+        data-spots={n}
       >
         {n > 0 &&
           ([0, 1] as const).map((slot) => (
             <video
               key={slot}
               ref={refs[slot]}
-              src={src(slot)}
+              src={sources[slot]}
               muted
               playsInline
               autoPlay={slot === active}
+              loop={n === 1}
               preload="auto"
               width={LED_MASTER.width}
               height={LED_MASTER.height}
-              onEnded={() => onEnded(slot)}
               className="absolute inset-0 block size-full object-fill"
               style={{ opacity: slot === active ? 1 : 0 }}
               aria-hidden={slot !== active}

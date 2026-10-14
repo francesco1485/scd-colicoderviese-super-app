@@ -3162,6 +3162,27 @@
           "apps/superapp/src/routes/pulmini.tsx, routes/allenamenti.tsx"
         ]
       }
+    },
+    {
+      "sourceDate": "2026-10-14",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-131",
+      "name": "SPONSOR_GESTIONALE_SPOTS_RUN_LIVE_NO_MESSAGES",
+      "sourceQuoteFragments": [
+        "No nessun messaggio devi andare avanti",
+        "devi lavorare nel gestionale sponsor per metterlo a regime",
+        "quei video e spot devono girare"
+      ],
+      "context": "Francesco 14/10/2026 20:56, after a Drive doc with ready-to-send WhatsApp messages to the 7 sponsors was proposed. Decision: no messages to companies; the sponsor gestionale must run the spots by itself.",
+      "normalizedCommand": {
+        "rule": "The LED spots run on their own on every screen from one clock (lib/spot-schedule.ts: Rome clock, 20 s slots, order of the day): LED wall player, home block 'Sul LED wall' (\"In onda ora sul LED wall\") and a live 'Regia LED wall' in the /crm Spot LED section (on air now, next, palinsesto, calculated passes per hour). A video that fails to load never stops the rotation. Every spot ships as MP4 (H.264) plus a WebM (VP9) twin chosen by the browser. The app sends no messages to sponsors: no WhatsApp drafts in the gestionale.",
+        "scope": "PUBLIC_HOME + LEDWALL_PLAYER + CRM_SPOT_LED",
+        "forbidden": [
+          "sending or drafting messages to sponsors from the app",
+          "invented audience numbers (only calculated passes)"
+        ]
+      }
     }
   ],
   "completionGate": {

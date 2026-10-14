@@ -32,7 +32,8 @@ describe("sponsor LED spots in the UI (UD-119)", () => {
     expect(ui).toContain('data-testid="spot-poster"');
     expect(ui).toContain("aspect-video");
     expect(ui).toContain('aria-label={userPaused ? "Riprendi gli spot" : "Metti in pausa gli spot"}');
-    expect(ui).toContain("spotsForHome()");
+    expect(ui).toContain("ledOnAir(");
+    expect(ui).toContain("Torna alla diretta");
   });
 
   it("gestionale vetrina: inside the existing /crm sponsor tab (no parallel CRM), status badge, flow, note on the register", () => {
@@ -42,7 +43,9 @@ describe("sponsor LED spots in the UI (UD-119)", () => {
     expect(ui).toContain("SPOT_FLOW.map");
     expect(ui).toContain("<SpotStatusBadge status={spot.status} />");
     expect(ui).toContain("lo stato si aggiorna dal gestionale quando sarà attivo il registro spot (migrazione da approvare)".replace(/^l/, "L"));
-    expect(ui).toContain("Niente invio per mail");
+    expect(ui).toContain("Nessun messaggio parte dall'app");
+    expect(ui).toContain("Regia LED wall");
+    expect(ui).toContain("Il pubblico non è stimato");
     expect(ui).not.toMatch(/mailto:|\/gestionale\/posta/);
   });
 
@@ -51,7 +54,8 @@ describe("sponsor LED spots in the UI (UD-119)", () => {
     expect(player).toContain('createFileRoute("/ledwall/player")');
     expect(player).toContain("staticData: { bare: true }");
     expect(player).toContain('"noindex, nofollow"');
-    expect(player).toContain("spotsForLedwall()");
+    expect(player).toContain("ledOnAir(");
+    expect(player).toContain("useVideoFormat");
     expect(player).toContain(".master");
     expect(player).not.toContain(".preview");
     expect(player).toContain('wl.request("screen")');

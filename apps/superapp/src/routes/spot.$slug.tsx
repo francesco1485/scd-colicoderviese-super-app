@@ -5,6 +5,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { PartnerForm, type PartnerFormPreset } from "@/components/PartnerForm";
 import { SpotStage, SpotStatusBadge } from "@/components/SponsorSpots";
 import { LED_MASTER, type SponsorSpot } from "@/lib/sponsor-spots";
+import { spotVideoFile } from "@/lib/spot-schedule";
+import { useVideoFormat } from "@/lib/use-spot-clock";
 import {
   MODIFICHE_MAX,
   SPOT_ANSWER_AFTER_MAIL,
@@ -120,6 +122,7 @@ function SpotMedia({ spot }: { spot: SponsorSpot }) {
 /** The 1920x164 master as it runs on the board. Muted, plays only when the visitor starts it. */
 function LedStrip({ spot }: { spot: SponsorSpot }) {
   const ref = useRef<HTMLVideoElement>(null);
+  const format = useVideoFormat();
   const [playing, setPlaying] = useState(false);
   useEffect(() => {
     const v = ref.current;
@@ -149,7 +152,8 @@ function LedStrip({ spot }: { spot: SponsorSpot }) {
       <div className="w-full overflow-hidden rounded-[4px] ring-1 ring-white/15" style={{ aspectRatio: `${LED_MASTER.width} / ${LED_MASTER.height}` }}>
         <video
           ref={ref}
-          src={`${spot.master}#t=0.1`}
+          key={format}
+          src={`${spotVideoFile(spot.master, format)}#t=0.1`}
           muted
           playsInline
           loop
