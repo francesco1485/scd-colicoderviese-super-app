@@ -509,7 +509,7 @@
       "class": "CHARACTER_CUTOUT",
       "asset_class": "GENERATE_ORIGINAL",
       "status": "ON_HOLD",
-      "hold_reason": "Direzione 14/10/2026 (UD-111): ruoli di Era e della segretaria (allora Genny, oggi Vera, UD-118) invertiti; immagine round 4 fatta per il ruolo precedente (Era in tuta blu). File conservati, non mostrati finché la Direzione non approva una nuova immagine ufficiale.",
+      "hold_reason": "Direzione 14/10/2026 (UD-111): ruoli di Era e della segretaria (allora Genny, oggi Vera, UD-121) invertiti; immagine round 4 fatta per il ruolo precedente (Era in tuta blu). File conservati, non mostrati finché la Direzione non approva una nuova immagine ufficiale.",
       "approval_evidence": "Direzione 'Ci siamo' round 4 + 'Vai A B C' 13/10/2026",
       "canva_media_id": "MAHX1G12gBc",
       "canva_export_design_id": "DAHX4vg-ENE",
@@ -520,7 +520,7 @@
       "class": "CHARACTER_AVATAR_TILE",
       "asset_class": "GENERATE_ORIGINAL",
       "status": "ON_HOLD",
-      "hold_reason": "Direzione 14/10/2026 (UD-111): ruoli di Era e della segretaria (allora Genny, oggi Vera, UD-118) invertiti; immagine round 4 fatta per il ruolo precedente (Era in tuta blu). File conservati, non mostrati finché la Direzione non approva una nuova immagine ufficiale.",
+      "hold_reason": "Direzione 14/10/2026 (UD-111): ruoli di Era e della segretaria (allora Genny, oggi Vera, UD-121) invertiti; immagine round 4 fatta per il ruolo precedente (Era in tuta blu). File conservati, non mostrati finché la Direzione non approva una nuova immagine ufficiale.",
       "approval_evidence": "Direzione 'Ci siamo' round 4 + 'Vai A B C' 13/10/2026",
       "canva_media_id": "MAHX1G12gBc",
       "canva_export_design_id": "DAHX4vg-ENE",
@@ -533,11 +533,11 @@
       "status": "ON_HOLD",
       "character": "vera",
       "legacy_character": "genny",
-      "hold_reason": "Direzione 14/10/2026 (UD-118): la chat si chiama Vera, la reception del club, al posto di Genny (UD-111); immagine round 4 fatta per un altro ruolo (con un frutto, senza occhiali). Cartella e file con il vecchio nome conservati, non mostrati finché la Direzione non approva una nuova immagine ufficiale di Vera.",
+      "hold_reason": "Direzione 14/10/2026 (UD-121): la chat si chiama Vera, la reception del club, al posto di Genny (UD-111); immagine round 4 fatta per un altro ruolo (con un frutto, senza occhiali). Cartella e file con il vecchio nome conservati, non mostrati finché la Direzione non approva una nuova immagine ufficiale di Vera.",
       "approval_evidence": "Direzione 'Ci siamo' round 4 + 'Vai A B C' 13/10/2026",
       "canva_media_id": "MAHX1KTH6yk",
       "canva_export_design_id": "DAHX4uTHmCs",
-      "source": "Vera (formerly Genny, renamed by UD-118), original realistic character (assistant cast), GENERATE_ORIGINAL, not an official asset and no real-person likeness; legacy cut-outs genny-440/genny-900 from Canva media MAHX1KTH6yk exported via design DAHX4uTHmCs"
+      "source": "Vera (formerly Genny, renamed by UD-121), original realistic character (assistant cast), GENERATE_ORIGINAL, not an official asset and no real-person likeness; legacy cut-outs genny-440/genny-900 from Canva media MAHX1KTH6yk exported via design DAHX4uTHmCs"
     },
     {
       "path": "apps/superapp/public/media/cast/genny/genny-avatar-256.webp",
@@ -546,11 +546,11 @@
       "status": "ON_HOLD",
       "character": "vera",
       "legacy_character": "genny",
-      "hold_reason": "Direzione 14/10/2026 (UD-118): la chat si chiama Vera, la reception del club, al posto di Genny (UD-111); immagine round 4 fatta per un altro ruolo (con un frutto, senza occhiali). Cartella e file con il vecchio nome conservati, non mostrati finché la Direzione non approva una nuova immagine ufficiale di Vera.",
+      "hold_reason": "Direzione 14/10/2026 (UD-121): la chat si chiama Vera, la reception del club, al posto di Genny (UD-111); immagine round 4 fatta per un altro ruolo (con un frutto, senza occhiali). Cartella e file con il vecchio nome conservati, non mostrati finché la Direzione non approva una nuova immagine ufficiale di Vera.",
       "approval_evidence": "Direzione 'Ci siamo' round 4 + 'Vai A B C' 13/10/2026",
       "canva_media_id": "MAHX1KTH6yk",
       "canva_export_design_id": "DAHX4uTHmCs",
-      "source": "Vera (formerly Genny, UD-118) avatar tile with background, square crop of Canva media MAHX1KTH6yk (export design DAHX4uTHmCs)"
+      "source": "Vera (formerly Genny, UD-121) avatar tile with background, square crop of Canva media MAHX1KTH6yk (export design DAHX4uTHmCs)"
     },
     {
       "path": "apps/superapp/public/media/cast/acanfora/",

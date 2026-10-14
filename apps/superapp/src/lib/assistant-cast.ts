@@ -2,7 +2,7 @@
  * Assistant cast of the Super App: realistic ORIGINAL characters inspired by a role, never cartoon, never the name,
  * face or voice of a real person. Sky stays the official lucky mascot (only in the under-14 world).
  *
- * Simplified by the Direzione on 14/10/2026 (UD-118, Francesco ~18:05: "una sola assistente chat in tutta l'app, di
+ * Simplified by the Direzione on 14/10/2026 (UD-121, Francesco ~18:05: "una sola assistente chat in tutta l'app, di
  * nome VERA (sostituisce il nome Genny, che non piace)"):
  * - Vera = the club reception and the ONLY chat of the app (lib/assistant.ts persona "vera"): she answers with the
  *   club's real data quoting the source, hands over to the faces of the areas and opens a request to the secretariat
@@ -49,7 +49,7 @@ const ROLE_SWAP_HOLD =
   "Direzione 14/10/2026: ruoli di Era e Genny invertiti; l'immagine del round 4 era stata fatta per il ruolo precedente. Nessun ritratto finché la Direzione non approva una nuova immagine ufficiale.";
 
 const VERA_HOLD =
-  "Direzione 14/10/2026 (UD-118): la chat si chiama Vera, la reception del club (al posto di Genny); l'immagine del round 4 era stata fatta per un altro ruolo. Nessun ritratto finché la Direzione non approva una nuova immagine ufficiale.";
+  "Direzione 14/10/2026 (UD-121): la chat si chiama Vera, la reception del club (al posto di Genny); l'immagine del round 4 era stata fatta per un altro ruolo. Nessun ritratto finché la Direzione non approva una nuova immagine ufficiale.";
 
 export const CAST: Readonly<Record<CastId, CastMember>> = {
   era: {
@@ -157,7 +157,7 @@ export interface CastRosterEntry {
   /** Voice: audio only after a Direzione-approved synthetic voice not tied to a real person (UD-092). */
   voice: { ready: false; rule: string };
   /**
-   * UD-118: CHAT_PERSONA = Vera, the one chat of the app (lib/assistant.ts); FACE = area card with concrete actions
+   * UD-121: CHAT_PERSONA = Vera, the one chat of the app (lib/assistant.ts); FACE = area card with concrete actions
    * and "Chiedi a Vera" (lib/cast-personas.ts CAST_FACES); TIP_ONLY = "consiglio del giorno" only, no chat;
    * ABSORBED = answered by Vera (ticket office).
    */
@@ -179,7 +179,7 @@ export const CAST_SHARED_RULES: readonly string[] = [
 const VOICE_RULE =
   "Audio solo dopo che la Direzione approva una voce sintetica originale, non legata a una persona reale; mai sotto i 14 anni senza account del genitore.";
 
-const NEW_ROLE = "Direzione 14/10/2026 (UD-111): nuovo ruolo, nome da decidere; UD-118 decide se è volto o consiglio del giorno";
+const NEW_ROLE = "Direzione 14/10/2026 (UD-111): nuovo ruolo, nome da decidere; UD-121 decide se è volto o consiglio del giorno";
 
 export const CAST_ROSTER: readonly CastRosterEntry[] = [
   {
@@ -237,7 +237,7 @@ export const CAST_ROSTER: readonly CastRosterEntry[] = [
     },
     voice: { ready: false, rule: VOICE_RULE },
     presence: "CHAT_PERSONA",
-    decidedBy: "Direzione 14/10/2026 (UD-118): una sola chat, Vera, al posto di Genny",
+    decidedBy: "Direzione 14/10/2026 (UD-121): una sola chat, Vera, al posto di Genny",
   },
   {
     id: "acanfora",

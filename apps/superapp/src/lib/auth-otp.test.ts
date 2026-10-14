@@ -80,7 +80,7 @@ describe("mapAuthError — codes and passwords", () => {
     const m = mapAuthError({ status: 400, code: "invalid_credentials", message: "Invalid login credentials" }, "password");
     expect(m.kind).toBe("invalid_credentials");
     expect(m.message).toBe(INVALID_CREDENTIALS_MESSAGE);
-    expect(m.message).toContain("Se non hai mai impostato una password, usa il link o il codice via email");
+    expect(m.message).toContain("Se non hai ancora scelto una password");
     expect(mapAuthError({ message: "Invalid login credentials" }, "password").kind).toBe("invalid_credentials");
   });
 

@@ -3,7 +3,7 @@
 Release r99, direttiva **UD-104**, approvata dalla Direzione il 13/10/2026 alle 12:03 ("Vai A B C").
 Contratto: `SCD_SYSTEM_MANIFEST.json`, fonte `ANTHROPIC_API` e sezioni `sky_and_avatar.ai_assistants` e `sky_and_avatar.assistant_cast`.
 
-Aggiornamento 14/10/2026 ore 18:05 (**UD-118**, decisione di Francesco): **una sola chat in tutta l'app, Vera**, la reception del club, al posto di Genny. Vera risponde con i dati veri del club citando la fonte, porta dal volto giusto (Chef della Club House, Volto sponsor, Mentore dei tornei; Sky solo nel mondo dei bambini under 14) e apre una richiesta alla segreteria quando serve una persona. Risponde anche su biglietti e card (la biglietteria è assorbita) e sostituisce Crovi nella chat pubblica (Crovi non è un asset APPROVED nel registro). Era, Dottor Acanfora, preparatore atletico, mental coach e musica e relax sono solo "consiglio del giorno". Il vecchio id `genny` (e `crovi`) è accettato come alias di `vera`.
+Aggiornamento 14/10/2026 ore 18:05 (**UD-121**, decisione di Francesco): **una sola chat in tutta l'app, Vera**, la reception del club, al posto di Genny. Vera risponde con i dati veri del club citando la fonte, porta dal volto giusto (Chef della Club House, Volto sponsor, Mentore dei tornei; Sky solo nel mondo dei bambini under 14) e apre una richiesta alla segreteria quando serve una persona. Risponde anche su biglietti e card (la biglietteria è assorbita) e sostituisce Crovi nella chat pubblica (Crovi non è un asset APPROVED nel registro). Era, Dottor Acanfora, preparatore atletico, mental coach e musica e relax sono solo "consiglio del giorno". Il vecchio id `genny` (e `crovi`) è accettato come alias di `vera`.
 
 Storico 14/10/2026 (**UD-111**, decisione della Direzione): i ruoli di Era e Genny erano invertiti. L'assistente interna della chat è **Genny, la segretaria**; **Era è la nutrizionista** (solo contenuti, "I consigli di Era" nell'area famiglie) e il **Dottor Acanfora è il medico** (infermeria, mai diagnosi). Era e Genny non hanno ritratto finché la Direzione non approva immagini nuove adatte ai ruoli.
 
@@ -69,7 +69,7 @@ Volume previsto: 3.000 domande al mese al pubblico + 1.500 dallo staff ≈ **2�
 - `apps/superapp/src/components/SkyChat.tsx`: la chat unica (Vera, oppure Sky per i soci più giovani).
 - Test: `assistant.test.ts`, `assistant.server.test.ts` (non chiamano mai l'API vera).
 
-## Il cast dei personaggi (UD-111, semplificato da UD-118)
+## Il cast dei personaggi (UD-111, semplificato da UD-121)
 
 Elenco completo in `apps/superapp/src/lib/assistant-cast.ts` (`CAST_ROSTER`): ruolo, area, cosa fa, regole e persone reali a cui rimanda. Tutti sono personaggi **originali ispirati al ruolo**, mai nome, volto o voce di una persona reale o famosa; la tutela dei minori è sempre attiva.
 

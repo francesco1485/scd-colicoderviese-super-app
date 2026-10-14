@@ -1,5 +1,5 @@
 /**
- * Opens the app chat (SkyChat) from a page button. Since UD-118 there is one chat, Vera: a face card ("Chiedi a Vera"
+ * Opens the app chat (SkyChat) from a page button. Since UD-121 there is one chat, Vera: a face card ("Chiedi a Vera"
  * on the Club House, sponsor or tournaments card) opens it with its area as context. SkyChat and the server both
  * re-check the area with assistant.ts resolveChat, so a younger member gets Sky and a page where the area is not
  * allowed gets Vera's general chat.

@@ -59,7 +59,7 @@ describe("feature flag and key", () => {
   });
 });
 
-describe("public assistant (Vera, UD-118)", () => {
+describe("public assistant (Vera, UD-121)", () => {
   it("answers with the rules engine when the flag is off: no call to the API", async () => {
     const f = vi.fn();
     const t = pub({ SCD_ANTHROPIC_API_KEY: KEY }, f);
@@ -262,7 +262,7 @@ describe("inside assistant (Vera / Sky)", () => {
   });
 });
 
-describe("Vera's chat opened with an area (UD-118: one chat, faces hand over)", () => {
+describe("Vera's chat opened with an area (UD-121: one chat, faces hand over)", () => {
   let seq = 0;
   function inside(roles: string[], fetchImpl: ReturnType<typeof vi.fn>, env: Record<string, string> = ON) {
     const email = `cast${++seq}@example.org`;

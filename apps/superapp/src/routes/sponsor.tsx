@@ -67,7 +67,7 @@ function Sponsor() {
 
       <PartnerPackages onChoose={choose} />
 
-      {/* UD-118: the Volto sponsor face lives here (listino, "chiedi un pacchetto", "Chiedi a Vera"). */}
+      {/* UD-121: the Volto sponsor face lives here (listino, "chiedi un pacchetto", "Chiedi a Vera"). */}
       <section id="volto-sponsor" aria-label="Il Volto sponsor" className="mx-auto mt-10 max-w-3xl scroll-mt-20 px-4" data-testid="sponsor-volto">
         <CastPresence id="volto-sponsor" day={day} />
       </section>

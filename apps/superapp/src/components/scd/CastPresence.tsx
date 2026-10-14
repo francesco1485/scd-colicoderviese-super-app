@@ -11,7 +11,7 @@ import { romeDay } from "@/lib/era-nutrition-tips";
 import { useSession } from "@/lib/use-session";
 
 /**
- * Presence of the cast on a page (UD-118, Direzione 14/10/2026: "Personaggi semplificati"):
+ * Presence of the cast on a page (UD-121, Direzione 14/10/2026: "Personaggi semplificati"):
  * - Vera ("vera"): the club reception and the one chat of the app, with her tip and "Chiedi a Vera";
  * - a FACE (Chef della Club House, Volto sponsor, Mentore dei tornei): area card with 2-3 real actions and "Chiedi a
  *   Vera", which opens Vera's chat with the area as context;
@@ -34,7 +34,7 @@ interface PresenceView {
   ask: ChatAreaId | null | undefined;
 }
 
-/** What a presence shows; `ask` is undefined for the tip-only characters (no chat entry, UD-118). */
+/** What a presence shows; `ask` is undefined for the tip-only characters (no chat entry, UD-121). */
 export function presenceView(id: PresenceId): PresenceView {
   if (id === "vera") {
     return { label: VERA_PRESENCE.label, role: VERA_PRESENCE.role, badge: "vera", disclaimer: VERA_PRESENCE.disclaimer, quick: VERA_PRESENCE.quick, nameTbd: false, ask: null };

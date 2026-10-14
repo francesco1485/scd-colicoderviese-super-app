@@ -48,6 +48,7 @@ import { Route as TesoreriaRouteImport } from './routes/tesoreria'
 import { Route as Top11RouteImport } from './routes/top11'
 import { Route as TorneiRouteImport } from './routes/tornei'
 import { Route as AccediIndexRouteImport } from './routes/accedi.index'
+import { Route as AccediCompletaRouteImport } from './routes/accedi.completa'
 import { Route as AccediConfermaRouteImport } from './routes/accedi.conferma'
 import { Route as AccediPasswordRouteImport } from './routes/accedi.password'
 import { Route as AreeIndexRouteImport } from './routes/aree.index'
@@ -306,6 +307,11 @@ const TorneiRoute = TorneiRouteImport.update({
 const AccediIndexRoute = AccediIndexRouteImport.update({
   id: '/accedi/',
   path: '/accedi/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccediCompletaRoute = AccediCompletaRouteImport.update({
+  id: '/accedi/completa',
+  path: '/accedi/completa',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AccediConfermaRoute = AccediConfermaRouteImport.update({
@@ -678,6 +684,7 @@ export interface FileRoutesByFullPath {
   '/tesoreria': typeof TesoreriaRoute
   '/top11': typeof Top11Route
   '/tornei': typeof TorneiRoute
+  '/accedi/completa': typeof AccediCompletaRoute
   '/accedi/conferma': typeof AccediConfermaRoute
   '/accedi/password': typeof AccediPasswordRoute
   '/aree/$area': typeof AreeAreaRoute
@@ -783,6 +790,7 @@ export interface FileRoutesByTo {
   '/tesoreria': typeof TesoreriaRoute
   '/top11': typeof Top11Route
   '/tornei': typeof TorneiRoute
+  '/accedi/completa': typeof AccediCompletaRoute
   '/accedi/conferma': typeof AccediConfermaRoute
   '/accedi/password': typeof AccediPasswordRoute
   '/aree/$area': typeof AreeAreaRoute
@@ -888,6 +896,7 @@ export interface FileRoutesById {
   '/tesoreria': typeof TesoreriaRoute
   '/top11': typeof Top11Route
   '/tornei': typeof TorneiRoute
+  '/accedi/completa': typeof AccediCompletaRoute
   '/accedi/conferma': typeof AccediConfermaRoute
   '/accedi/password': typeof AccediPasswordRoute
   '/aree/$area': typeof AreeAreaRoute
@@ -995,6 +1004,7 @@ export interface FileRouteTypes {
     | '/tesoreria'
     | '/top11'
     | '/tornei'
+    | '/accedi/completa'
     | '/accedi/conferma'
     | '/accedi/password'
     | '/aree/$area'
@@ -1100,6 +1110,7 @@ export interface FileRouteTypes {
     | '/tesoreria'
     | '/top11'
     | '/tornei'
+    | '/accedi/completa'
     | '/accedi/conferma'
     | '/accedi/password'
     | '/aree/$area'
@@ -1204,6 +1215,7 @@ export interface FileRouteTypes {
     | '/tesoreria'
     | '/top11'
     | '/tornei'
+    | '/accedi/completa'
     | '/accedi/conferma'
     | '/accedi/password'
     | '/aree/$area'
@@ -1310,6 +1322,7 @@ export interface RootRouteChildren {
   TesoreriaRoute: typeof TesoreriaRoute
   Top11Route: typeof Top11Route
   TorneiRoute: typeof TorneiRoute
+  AccediCompletaRoute: typeof AccediCompletaRoute
   AccediConfermaRoute: typeof AccediConfermaRoute
   AccediPasswordRoute: typeof AccediPasswordRoute
   AreeAreaRoute: typeof AreeAreaRoute
@@ -1644,6 +1657,13 @@ declare module '@tanstack/react-router' {
       path: '/accedi'
       fullPath: '/accedi/'
       preLoaderRoute: typeof AccediIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/accedi/completa': {
+      id: '/accedi/completa'
+      path: '/accedi/completa'
+      fullPath: '/accedi/completa'
+      preLoaderRoute: typeof AccediCompletaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/accedi/conferma': {
@@ -2157,6 +2177,7 @@ const rootRouteChildren: RootRouteChildren = {
   TesoreriaRoute: TesoreriaRoute,
   Top11Route: Top11Route,
   TorneiRoute: TorneiRoute,
+  AccediCompletaRoute: AccediCompletaRoute,
   AccediConfermaRoute: AccediConfermaRoute,
   AccediPasswordRoute: AccediPasswordRoute,
   AreeAreaRoute: AreeAreaRoute,

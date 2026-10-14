@@ -1,6 +1,6 @@
 /**
  * "Il consiglio del giorno" on the home (UD-116, Direzione 14/10/2026), in rotation between the characters that since
- * UD-118 (Direzione 14/10/2026 ~18:05, "Personaggi semplificati") are ONLY a short tip — Era (nutrizionista), Dottor
+ * UD-121 (Direzione 14/10/2026 ~18:05, "Personaggi semplificati") are ONLY a short tip — Era (nutrizionista), Dottor
  * Acanfora (medico, prevention), the Preparatore atletico, the Mental coach, Musica e relax — and Vera, the club
  * reception, with practical secretariat reminders.
  *

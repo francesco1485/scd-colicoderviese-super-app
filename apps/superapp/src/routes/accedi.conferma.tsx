@@ -11,7 +11,7 @@ export const Route = createFileRoute("/accedi/conferma")({
   validateSearch: (s: Record<string, unknown>) => ({
     code: typeof s["code"] === "string" ? s["code"] : undefined,
     token_hash: typeof s["token_hash"] === "string" ? s["token_hash"] : undefined,
-    type: s["type"] === "magiclink" ? ("magiclink" as const) : s["type"] === "email" ? ("email" as const) : undefined,
+    type: (["magiclink", "email", "signup", "recovery"] as const).find((t) => t === s["type"]),
     next: typeof s["next"] === "string" ? safeNext(s["next"]) : undefined,
     r: s["r"] === "0" || s["r"] === 0 ? ("0" as const) : undefined,
     error_description: typeof s["error_description"] === "string" ? s["error_description"] : undefined,
@@ -42,7 +42,7 @@ function Conferma() {
     if (error_description || error_code || hash.get("error_code") || hash.get("error")) {
       setState({ phase: "error", message: LINK_USED_MESSAGE });
     } else if (!code && !token_hash) {
-      setState({ phase: "error", message: "Questo link non contiene un codice di accesso valido. Chiedi un nuovo codice: arriva in un minuto." });
+      setState({ phase: "error", message: "Questo link non è valido. Torna su Accedi: entra con e-mail o telefono e password, oppure usa \"Password dimenticata\"." });
     }
   }, [code, token_hash, error_description, error_code]);
 
@@ -76,7 +76,9 @@ function Conferma() {
         <h1 className="mt-3 text-[24px] font-bold text-[var(--scd-ink)]">{title}</h1>
         {state.phase === "ready" && (
           <>
-            <p className="mt-2 text-[15.5px] leading-snug text-[var(--scd-sub)]">Tocca il pulsante per entrare nella Super App del club con questo dispositivo.</p>
+            <p className="mt-2 text-[15.5px] leading-snug text-[var(--scd-sub)]">
+              {type === "recovery" ? "Tocca il pulsante: poi scegli la tua password e da lì in avanti entri sempre con e-mail (o telefono) e password." : "Tocca il pulsante per confermare: da qui in avanti entri sempre con e-mail (o telefono) e password."}
+            </p>
             <button type="button" onClick={() => void enter()} className="scd-action mt-5 h-[52px] w-full text-[17px] font-bold" data-testid="confirm-enter">
               Entra
               <ArrowRight className="size-5" aria-hidden="true" />
@@ -86,11 +88,15 @@ function Conferma() {
         {state.phase !== "ready" && <p className="mt-2 text-[15.5px] leading-snug text-[var(--scd-sub)]">{state.message}</p>}
         {state.phase === "error" && (
           <div className="mt-5 grid gap-2">
-            <Link to="/accedi" search={{ next, modo: "link" }} className="scd-action h-[52px] w-full text-[17px] font-bold" data-testid="confirm-new-code">
+            <Link to="/accedi" search={{ next }} className="scd-action h-[52px] w-full text-[17px] font-bold" data-testid="confirm-new-code">
               <Hash className="size-5" aria-hidden="true" />
-              Chiedi un nuovo codice
+              Vai ad Accedi
             </Link>
-            <p className="text-[13.5px] leading-snug text-[var(--scd-sub)]">Nel nuovo messaggio trovi un codice di 6 cifre: puoi scriverlo nella pagina Accedi anche da un altro dispositivo.</p>
+            <p className="text-[13.5px] leading-snug text-[var(--scd-sub)]">Se ti eri già registrato, entra con e-mail o telefono e password. Se non ricordi la password usa "Password dimenticata": ti arriva una nuova e-mail.</p>
+            {/* Registration link opened on another device: the address is usually already confirmed (UD-117). */}
+            <Link to="/accedi" search={{ next }} className="scd-focus mt-1 inline-flex min-h-11 items-center justify-center rounded-[10px] border border-[#b9d5ef] bg-white text-[15px] font-semibold text-[var(--scd-blue)]" data-testid="confirm-password">
+              Ti sei appena registrato? Entra con e-mail e password
+            </Link>
           </div>
         )}
       </section>

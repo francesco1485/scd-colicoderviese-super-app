@@ -1,5 +1,5 @@
 /**
- * Server functions of the AI assistants (r99, UD-104; one chat since UD-118): askAssistant (public pages, Vera) and
+ * Server functions of the AI assistants (r99, UD-104; one chat since UD-121): askAssistant (public pages, Vera) and
  * askStaffAssistant (signed-in, Vera / Sky). Both accept the area a page opened Vera's chat with ("Chiedi a Vera" on a
  * face card); the server re-checks it (assistant.ts resolveChat) and the rules engine keeps the area (cast-rules.ts).
  * Older clients may still send `persona` ("genny", "crovi" or an area id): it is read as an alias, never trusted.

@@ -64,7 +64,7 @@ describe("assistant cast registry (round 4 images, roles corrected by the Direzi
     }
   });
 
-  it("states the roles: Era nutritionist, Vera reception and the one chat (UD-118), Acanfora doctor", () => {
+  it("states the roles: Era nutritionist, Vera reception and the one chat (UD-121), Acanfora doctor", () => {
     expect(CAST.era.role).toMatch(/nutrizionista/i);
     expect(CAST.vera.name).toBe("Vera");
     expect(CAST.vera.role).toMatch(/reception/i);
@@ -81,9 +81,9 @@ describe("assistant cast registry (round 4 images, roles corrected by the Direzi
       expect(folder?.["status"], id).toBe("ON_HOLD");
       expect(String(folder?.["hold_reason"]), id).toMatch(/14\/10\/2026/);
     }
-    expect(CAST.vera.portraitHold).toMatch(/UD-118/);
+    expect(CAST.vera.portraitHold).toMatch(/UD-121/);
     expect(castFolder("genny")?.["character"]).toBe("vera");
-    expect(String(castFolder("genny")?.["hold_reason"])).toMatch(/UD-118/);
+    expect(String(castFolder("genny")?.["hold_reason"])).toMatch(/UD-121/);
     expect(registry.statuses).toContain("ON_HOLD");
   });
 
@@ -187,7 +187,7 @@ describe("cast roster (Direzione 14/10/2026, UD-111)", () => {
     expect(CAST_SHARED_RULES.join(" ")).toMatch(/S\.C\.D\. ColicoDerviese/);
   });
 
-  it("has Vera as the only chat persona, three faces, five tip-only characters and the absorbed ticket office (UD-118)", () => {
+  it("has Vera as the only chat persona, three faces, five tip-only characters and the absorbed ticket office (UD-121)", () => {
     const by = (p: string) => CAST_ROSTER.filter((r) => r.presence === p).map((r) => r.id);
     expect(by("CHAT_PERSONA")).toEqual(["vera"]);
     expect(by("FACE")).toEqual(["accoglienza-chef", "mentore-tornei", "volto-sponsor"]);
@@ -197,7 +197,7 @@ describe("cast roster (Direzione 14/10/2026, UD-111)", () => {
       expect(rosterEntry(id).portrait.ready, id).toBe(castReady(id));
     expect(rosterEntry("era").role).toBe("Nutrizionista");
     expect(rosterEntry("vera").role).toBe("Reception");
-    expect(rosterEntry("vera").decidedBy).toMatch(/UD-118/);
+    expect(rosterEntry("vera").decidedBy).toMatch(/UD-121/);
     expect(rosterEntry("acanfora").role).toBe("Medico");
   });
 

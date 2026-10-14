@@ -12,14 +12,14 @@ function deps() {
   return { general, day: "2026-10-14" };
 }
 
-/** Every chat the rules engine can serve since UD-118: Vera alone, Vera with an area, Sky. */
+/** Every chat the rules engine can serve since UD-121: Vera alone, Vera with an area, Sky. */
 const CHATS = [
   { persona: "vera" as const, area: null },
   ...CHAT_AREA_IDS.map((area) => ({ persona: "vera" as const, area })),
   { persona: "sky" as const, area: null },
 ];
 
-describe("rules engine of Vera's chat (UD-118)", () => {
+describe("rules engine of Vera's chat (UD-121)", () => {
   it("applies the distress referral to every chat and area before anything else, without calling the general engine", async () => {
     for (const chat of CHATS) {
       for (const message of ["mi sento giù e non ce la faccio più", "prima della partita ho l'ansia", "voglio ordinare una torta ma mi sento triste"]) {

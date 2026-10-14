@@ -19,7 +19,7 @@ import {
   veraEligible,
 } from "./SkyJolly";
 
-describe("helper persona (UD-118: one chat, Vera; Sky only for the younger members)", () => {
+describe("helper persona (UD-121: one chat, Vera; Sky only for the younger members)", () => {
   it("puts Vera in the chat on every public page", () => {
     expect(personaFor("/")).toBe("vera");
     for (const p of PUBLIC_PREFIXES) expect(personaFor(p)).toBe("vera");
@@ -81,7 +81,7 @@ describe("helper persona (UD-118: one chat, Vera; Sky only for the younger membe
   });
 });
 
-describe("Vera opened from a face card (UD-118)", () => {
+describe("Vera opened from a face card (UD-121)", () => {
   const staff = { roles: ["mister"], age15plus: null };
 
   it("hands over to the face of the area and shows its action buttons", () => {
@@ -120,7 +120,7 @@ describe("Vera opened from a face card (UD-118)", () => {
   });
 });
 
-describe("Vera in the reserved areas (Direzione 'Vai A B C' 13/10/2026, UD-118)", () => {
+describe("Vera in the reserved areas (Direzione 'Vai A B C' 13/10/2026, UD-121)", () => {
   const staff = { roles: ["mister"], age15plus: null };
   const member15 = { roles: ["atleta"], age15plus: true };
   const minor = { roles: ["atleta"], age15plus: false };

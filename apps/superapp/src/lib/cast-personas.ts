@@ -1,5 +1,5 @@
 /**
- * Areas of the assistant cast, simplified by the Direzione on 14/10/2026 (UD-118, Francesco ~18:05: "Personaggi
+ * Areas of the assistant cast, simplified by the Direzione on 14/10/2026 (UD-121, Francesco ~18:05: "Personaggi
  * semplificati: una sola assistente chat in tutta l'app, di nome VERA"). Pure data and helpers, no I/O, safe for the
  * browser.
  *
@@ -58,7 +58,7 @@ export function isCastPersona(p: unknown): p is CastPersonaId {
   return typeof p === "string" && (CAST_PERSONA_IDS as readonly string[]).includes(p);
 }
 
-/** How a character lives in the app since UD-118. */
+/** How a character lives in the app since UD-121. */
 export type CastKind = "FACE" | "TIP_ONLY" | "ABSORBED";
 
 /** Faces of the cast with an area card and concrete actions (Sky is the fourth face, see {@link CAST_FACES}). */
@@ -69,7 +69,7 @@ export type ChatAreaId = FaceAreaId | "biglietteria";
 
 export const CHAT_AREA_IDS: readonly ChatAreaId[] = ["accoglienza-chef", "volto-sponsor", "mentore-tornei", "biglietteria"];
 
-/** Characters that are only a "consiglio del giorno": no chat entry anywhere (UD-118). */
+/** Characters that are only a "consiglio del giorno": no chat entry anywhere (UD-121). */
 export type TipOnlyId = "era" | "acanfora" | "preparatore-atletico" | "mental-coach" | "musica-relax";
 
 export const TIP_ONLY_IDS: readonly TipOnlyId[] = ["era", "acanfora", "preparatore-atletico", "mental-coach", "musica-relax"];
@@ -723,7 +723,7 @@ export const CAST_PERSONAS: Readonly<Record<CastPersonaId, CastPersonaDef>> = {
 /* ─────────────────────────────── Vera (the one chat) ─────────────────────────────── */
 
 /**
- * Vera, the club reception (UD-118: "una sola assistente chat in tutta l'app, di nome VERA", replacing the name
+ * Vera, the club reception (UD-121: "una sola assistente chat in tutta l'app, di nome VERA", replacing the name
  * Genny). Her chat persona is assistant.ts "vera"; this is her presence (secretariat page, directory, ticket office):
  * a practical tip of the day and links to real pages. No portrait until the Direzione approves an image.
  */
@@ -776,7 +776,7 @@ export const VERA_PRESENCE = {
 /** A presence on a page: an area of the cast, or Vera herself. */
 export type PresenceId = CastPersonaId | "vera";
 
-/* ─────────────────────────────── faces (UD-118) ─────────────────────────────── */
+/* ─────────────────────────────── faces (UD-121) ─────────────────────────────── */
 
 export type FaceId = FaceAreaId | "sky";
 
@@ -794,7 +794,7 @@ export interface CastFace {
 }
 
 /**
- * The four faces with concrete actions (UD-118): the Chef della Club House, the Volto sponsor, the Mentore dei tornei
+ * The four faces with concrete actions (UD-121): the Chef della Club House, the Volto sponsor, the Mentore dei tornei
  * and Sky, the official mascot, only in the world of the under-14s (never a hero, never commercial).
  */
 export const CAST_FACES: Readonly<Record<FaceId, CastFace>> = {
@@ -1111,7 +1111,7 @@ export function veraAreaReply(area: ChatAreaId, day: string): SkyReply {
   return reply(`${def.handoff ?? ""} Usa i pulsanti qui sotto oppure scrivimi cosa ti serve. Il consiglio di oggi: ${tip.title}. ${tip.text}`.trim(), def.quick);
 }
 
-/** Ticket words: Vera answers on the ticket office she absorbed (UD-118) only when the message is about it. */
+/** Ticket words: Vera answers on the ticket office she absorbed (UD-121) only when the message is about it. */
 const TICKET_TOPIC_RE = /bigliett|ingress|gratis|gratuit|\bcard\b|abbonament|tessera|ridott|tariff|prevendit/i;
 
 /** Safety topics of the tip-only characters that Vera answers with their fixed copy (never with the model). */

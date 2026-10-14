@@ -6,7 +6,7 @@ import { CastBadge, PersonaAvatar } from "@/components/scd/SkyJolly";
 import { PUBLIC_CHAT_AREAS } from "@/lib/assistant";
 import { CAST_FACES, CAST_PERSONAS, FACE_IDS, PRESENCE_HOMES, TIP_ONLY_IDS, VERA_PRESENCE, type CastLink, type FaceId, type TipOnlyId } from "@/lib/cast-personas";
 
-/** Order of the directory (UD-118): Vera first, then the four faces, then the "consigli del giorno" group. */
+/** Order of the directory (UD-121): Vera first, then the four faces, then the "consigli del giorno" group. */
 export const CAST_DIRECTORY_ORDER = {
   chat: "vera",
   faces: FACE_IDS,
@@ -49,7 +49,7 @@ function FaceRow({ id }: { id: FaceId }) {
 }
 
 /**
- * "I nostri personaggi" (UD-118, Direzione 14/10/2026: "Personaggi semplificati"), on a public page:
+ * "I nostri personaggi" (UD-121, Direzione 14/10/2026: "Personaggi semplificati"), on a public page:
  * 1. Vera, the club reception and the one chat of the app;
  * 2. the four faces with concrete actions (Chef della Club House, Volto sponsor, Mentore dei tornei, Sky only in the
  *    under-14 world), each with one line on what it does for you and where it lives;

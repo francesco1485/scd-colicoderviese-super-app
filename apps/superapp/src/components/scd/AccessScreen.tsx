@@ -107,7 +107,7 @@ function InsideCard({ s }: { s: AccessScreen }) {
         Torna alle aree
       </button>
       <p className="mt-3 text-[14px] leading-snug text-[var(--in-sub)]">
-        Ricevi un codice di 6 cifre via e-mail, senza password. Lo stesso account apre tutte le aree del ruolo che la società ti ha assegnato.
+        Entri con e-mail o telefono e la tua password. Lo stesso account apre tutte le aree del ruolo che la società ti ha assegnato.
       </p>
     </section>
   );

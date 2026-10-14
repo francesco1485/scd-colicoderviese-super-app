@@ -1,6 +1,6 @@
 /**
  * Rules engine of Vera's chat (no AI): used when SCD_ASSISTANT_AI is off or the key is missing, and as the fallback /
- * pre-router of the AI (assistant.server.ts). Order of every answer (UD-118: one chat, Vera, with an optional area):
+ * pre-router of the AI (assistant.server.ts). Order of every answer (UD-121: one chat, Vera, with an optional area):
  * 1. signs of distress → fixed referral to real people (cast-safety.ts, UD-111), for every persona and area;
  * 2. safeguarding → the general rules engine (skyRulesAnswer: reserved channel only);
  * 3. operational requests of the area (orders, team registrations, sponsor contracts) or a ticket purchase → fixed

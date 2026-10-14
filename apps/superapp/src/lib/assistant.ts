@@ -1,6 +1,6 @@
 /**
  * AI assistants of the Super App (r99, Direzione 13/10/2026 12:03 "Vai A B C", UD-104). Pure helpers, no I/O:
- * - personas (UD-118, Direzione 14/10/2026: "una sola assistente chat in tutta l'app, di nome VERA"): Vera, the club
+ * - personas (UD-121, Direzione 14/10/2026: "una sola assistente chat in tutta l'app, di nome VERA"): Vera, the club
  *   reception, everywhere — public pages and inside for staff and members 15+; Sky only for the younger members and
  *   the under-14 world (UD-026, UD-091). An area of the cast (cast-personas.ts) is only a CONTEXT of Vera's chat,
  *   never a separate persona. Legacy ids ("genny", "crovi") are aliases of "vera" ({@link normalizePersona});
@@ -23,7 +23,7 @@ import type { KbItem } from "./knowledge";
 import type { PublicEvent, PublicGroup } from "./public-snapshots";
 import type { SkyReply } from "./sky.functions";
 
-/** Who answers: Vera, the one chat of the app, or Sky for the younger members (UD-118). */
+/** Who answers: Vera, the one chat of the app, or Sky for the younger members (UD-121). */
 export type AssistantPersona = "vera" | "sky";
 export type { ChatAreaId } from "./cast-personas";
 export { isChatArea } from "./cast-personas";
@@ -31,7 +31,7 @@ export type AssistantLevel = "PUBLIC" | "INTERNO" | "RISERVATO";
 
 /**
  * Persona ids that may still arrive from older clients, events, links or logs, mapped to today's persona: "genny" (the
- * name before UD-118) and "crovi" (the public helper, not an APPROVED asset, absorbed by Vera).
+ * name before UD-121) and "crovi" (the public helper, not an APPROVED asset, absorbed by Vera).
  */
 export const LEGACY_PERSONA_ALIASES: Readonly<Record<string, AssistantPersona>> = { genny: "vera", crovi: "vera" };
 
@@ -44,7 +44,7 @@ export function normalizePersona(id: unknown): AssistantPersona | null {
 
 /**
  * Area of Vera's chat asked by a page or an older client. Only the chat areas (faces and the ticket office) are kept:
- * a persona id ("vera", "genny"…), a tip-only character (no chat since UD-118) or anything unknown gives null.
+ * a persona id ("vera", "genny"…), a tip-only character (no chat since UD-121) or anything unknown gives null.
  */
 export function normalizeChatArea(id: unknown): ChatAreaId | null {
   return isChatArea(id) ? id : null;
@@ -87,7 +87,7 @@ export interface HelperViewer {
 }
 
 /**
- * Single rule for the internal helper (Direzione "Vai A B C" 13/10/2026, UD-104; since UD-118 the helper is Vera),
+ * Single rule for the internal helper (Direzione "Vai A B C" 13/10/2026, UD-104; since UD-121 the helper is Vera),
  * used by the chat persona, the launcher face and the server voice: a viewer known to be under 15 never gets Vera
  * inside; known 15+ gets her; with unknown age, staff positions and families (guardians, adults) get Vera,
  * athlete-only or no position stays with Sky (safe choice).
@@ -116,7 +116,7 @@ export interface ResolvedChat {
 }
 
 /**
- * One rule for the browser (SkyChat) and the server (assistant.functions.ts), UD-118:
+ * One rule for the browser (SkyChat) and the server (assistant.functions.ts), UD-121:
  * - public pages: always Vera; an area only when it has public data (ticket office, tournaments, sponsor);
  * - inside: Vera for staff and adult members ({@link veraEligible}), with the area when the area is allowed inside;
  *   a younger member or an unknown age keeps Sky, the only helper of the under-14s, and never an area.
@@ -145,7 +145,7 @@ const HELPER_VOICE: Readonly<Record<AssistantPersona, string>> = {
     "Sei Sky, la mascotte portafortuna della S.C.D. ColicoDerviese, e parli con soci giovani. Tono allegro, semplice e gentile, frasi corte, nessun linguaggio da adulti.",
 };
 
-/** Vera's hard rules on top of the shared ones (UD-118). */
+/** Vera's hard rules on top of the shared ones (UD-121). */
 export const VERA_RULES: readonly string[] = [
   "Cita sempre la fonte del dato: la pagina dell'app o il documento del CONTESTO da cui viene (per esempio \"fonte: Calendario gare\").",
   "Richieste operative (ordini, prenotazioni, iscrizioni, biglietti, pagamenti): non confermarle mai e non chiedere pagamenti; spiega che diventano una richiesta per una persona del club e indica la pagina giusta del CONTESTO.",
@@ -283,13 +283,13 @@ function mapsUrl(address: string, municipality: string): string {
  * Public CONTEXT for Vera on public pages (≈3k tokens): next 7 days of games (fixtures only: date, time, home/away, team label,
  * opponent, venue, competition), club events, ticket office, facilities and directions, contacts, registrations,
  * sponsor offer, official result links and the app guide. Never people: no rosters, staff, notes or minors' names.
- * With `area` (a chat area of Vera, UD-118) the area's notes and curated copy come first.
+ * With `area` (a chat area of Vera, UD-121) the area's notes and curated copy come first.
  */
 export function buildPublicContext(input: PublicContextInput, maxTokens = PUBLIC_CONTEXT_TOKENS, area?: CastAreaContext | null): BuiltContext {
   const b = new ContextBuilder(Math.floor(maxTokens * CHARS_PER_TOKEN));
   b.line(`Oggi è ${italianDate(input.today)} ${input.today.slice(0, 4)} (fuso Europe/Rome). Stagione 2026/27.`);
 
-  // Area of Vera's chat first (UD-118): its notes and curated copy are never cut by the cap.
+  // Area of Vera's chat first (UD-121): its notes and curated copy are never cut by the cap.
   if (area) {
     b.section(area.title);
     for (const l of area.lines) b.line(l.text, l.to);
@@ -542,7 +542,7 @@ export function parseAssistantAnswer(raw: string, ctx: BuiltContext, persona?: A
   }
   if (text === null && !m && raw.trim() && !raw.includes("{")) text = raw;
   if (!text || !text.trim()) return null;
-  // Vera's guard (UD-118): an answer that breaks her hard rules is dropped and the rules engine answers.
+  // Vera's guard (UD-121): an answer that breaks her hard rules is dropped and the rules engine answers.
   if (persona === "vera" && veraAnswerProblems(text, strict).length) return null;
   const guarded = clipWords(guardAnswerText(text.trim(), ctx));
   return links.length ? { text: guarded, mood, links } : { text: guarded, mood };

@@ -32,6 +32,7 @@ vi.mock("@tanstack/react-start", () => ({
 vi.mock("@tanstack/react-start/server", () => ({ getRequestUrl: () => new URL("https://app.example.test/accedi") }));
 vi.mock("./supabase.server", () => ({ serverSupabase: () => sb, setRememberPreference: (r: boolean) => setRemember(r) }));
 vi.mock("./http-policy", () => ({ configuredSiteUrl: () => "https://app.example.test" }));
+vi.mock("./request-ip.server", () => ({ clientIp: () => "127.0.0.1" }));
 
 const { verifyEmailCode, requestMagicLink, signInWithPassword, confirmTokenHash } = await import("./auth.functions");
 
@@ -96,10 +97,27 @@ describe("requestMagicLink", () => {
 describe("signInWithPassword", () => {
   it("invalid credentials point to the e-mail link or code", async () => {
     auth.signInWithPassword.mockResolvedValueOnce({ error: { status: 400, code: "invalid_credentials", message: "Invalid login credentials" } });
-    const out = await password({ data: { email: "a@b.it", password: "sbagliata1", remember: true } });
+    const out = await password({ data: { identifier: "a@b.it", password: "sbagliata1", remember: true } });
     expect(out.ok).toBe(false);
     expect(out.kind).toBe("invalid_credentials");
-    expect(out.message).toContain("Se non hai mai impostato una password, usa il link o il codice via email");
+    expect(out.message).toContain("Se non hai ancora scelto una password");
+  });
+
+  it("a phone is resolved by the database only together with the password (r105)", async () => {
+    sb.rpc.mockResolvedValueOnce({ data: "mario@example.it" } as never);
+    auth.signInWithPassword.mockResolvedValueOnce({ error: null });
+    const out = await password({ data: { identifier: "+39 333 123 4567", password: "Giusta123", remember: true, next: "/aree" } });
+    expect(sb.rpc).toHaveBeenCalledWith("scd_login_email", { p_phone: "3331234567", p_password: "Giusta123" });
+    expect(auth.signInWithPassword).toHaveBeenLastCalledWith({ email: "mario@example.it", password: "Giusta123" });
+    expect(out.ok).toBe(true);
+  });
+
+  it("an unknown phone or a wrong password gives the same neutral answer", async () => {
+    sb.rpc.mockResolvedValueOnce({ data: null } as never);
+    const calls = auth.signInWithPassword.mock.calls.length;
+    const out = await password({ data: { identifier: "333 0000000", password: "Qualsiasi1", remember: true } });
+    expect(out).toMatchObject({ ok: false, kind: "invalid_credentials" });
+    expect(auth.signInWithPassword.mock.calls.length).toBe(calls);
   });
 });
 

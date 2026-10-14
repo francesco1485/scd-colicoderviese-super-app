@@ -38,7 +38,7 @@ function routePaths(): Set<string> {
 const PRESENCES: readonly PresenceId[] = [...CAST_PERSONA_IDS, "vera"];
 const tipsOf = (id: PresenceId) => (id === "vera" ? VERA_PRESENCE.tips : CAST_PERSONAS[id].tips);
 
-describe("simplified cast (UD-118): Vera + four faces + tips of the day", () => {
+describe("simplified cast (UD-121): Vera + four faces + tips of the day", () => {
   it("covers every roster area once, with the kind decided by the Direzione", () => {
     expect(new Set(CAST_PERSONA_IDS).size).toBe(CAST_PERSONA_IDS.length);
     expect([...CAST_PERSONA_IDS].sort()).toEqual(CAST_ROSTER.filter((r) => r.presence !== "CHAT_PERSONA").map((r) => r.id).sort());

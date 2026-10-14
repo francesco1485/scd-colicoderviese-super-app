@@ -4,7 +4,7 @@
  *
  * Order: urgent notices (R20 alerts, only when there are) → the one club communication chosen by the Direzione (with
  * expiry) → "Oggi e questa settimana" (matchday card, today's games, next home game of each team) → six quick
- * actions for visitors → weekend results (only with a real source) → tip of the day (tip-only characters and Vera, UD-118)
+ * actions for visitors → weekend results (only with a real source) → tip of the day (tip-only characters and Vera, UD-121)
  * → credentials once → vetrina (trimmed so nothing repeats) → news → join → ONE partner band → reduced footer.
  * Teams, rosters and trainings are not here: they live inside after sign-in (UD-100).
  * Palette: navy #0b2a5b, blue #1556c4, light #eef3f9, white; yellow #ffd600 for changes and the main CTA.

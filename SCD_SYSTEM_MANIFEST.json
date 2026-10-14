@@ -1865,7 +1865,7 @@
           "apps/superapp/src/lib/moderation.server.ts"
         ],
         "data_classes_sent": {
-          "public_assistant_vera": "PUBLIC_ONLY (UD-118, formerly public_assistant_crovi): next 7 days of official fixtures (date, time, home/away, team label, opponent, venue, competition), club events, ticket office rules, facility addresses, official contacts, registration paths, sponsor packages and Direzione-confirmed sponsor names, official result links, app guide",
+          "public_assistant_vera": "PUBLIC_ONLY (UD-121, formerly public_assistant_crovi): next 7 days of official fixtures (date, time, home/away, team label, opponent, venue, competition), club events, ticket office rules, facility addresses, official contacts, registration paths, sponsor packages and Direzione-confirmed sponsor names, official result links, app guide",
           "staff_assistant_era": "INTERNO or RISERVATO as returned by scd_kb_search for the caller's own session (title, summary, status, due date, season, link); amounts, sources, entities and tags excluded",
           "moderator": "post text already filtered by database rules (no minors' names)",
           "never": [
@@ -2403,7 +2403,7 @@
       "provider_source_id": "ANTHROPIC_API",
       "grounding": "RETRIEVAL_FROM_SERVER_DATA_NOT_TRAINING",
       "personas": {
-        "directive": "UD-118",
+        "directive": "UD-121",
         "rule": "ONE_CHAT_PERSONA_VERA_EVERYWHERE; SKY_ONLY_FOR_YOUNGER_MEMBERS_AND_UNDER_14_WORLD",
         "legacy_aliases": {"genny": "vera", "crovi": "vera"},
         "vera": {
@@ -2421,7 +2421,7 @@
           "context_cap_tokens": 3000
         },
         "chat_areas": {
-          "directive": "UD-118 (supersedes the UD-114 separate area personas)",
+          "directive": "UD-121 (supersedes the UD-114 separate area personas)",
           "ids": ["accoglienza-chef", "volto-sponsor", "mentore-tornei", "biglietteria"],
           "registry": "apps/superapp/src/lib/cast-personas.ts CHAT_AREA_IDS",
           "opened_by": "'Chiedi a Vera' on a face card (window event assistant:open {area}, lib/assistant-open.ts); legacy {persona} accepted",
@@ -2432,7 +2432,7 @@
         },
         "tip_only_no_chat": ["era", "acanfora", "preparatore-atletico", "mental-coach", "musica-relax"]
       },
-      "persona_rule": "UD-118: public pages Vera; inside: staff positions and families -> Vera, athlete-only or unknown age -> Sky (age not in session); a chat area answers only inside Vera's chat when a face card asks for it and assistant.ts resolveChat allows it",
+      "persona_rule": "UD-121: public pages Vera; inside: staff positions and families -> Vera, athlete-only or unknown age -> Sky (age not in session); a chat area answers only inside Vera's chat when a face card asks for it and assistant.ts resolveChat allows it",
       "pre_router": [
         "DISTRESS_TO_FIXED_REFERRAL_UD111",
         "SAFEGUARDING_TO_RESERVED_CHANNEL_RULES",
@@ -2458,7 +2458,7 @@
       "origin_rule": "ORIGINAL_CHARACTERS_INSPIRED_BY_ROLE_NEVER_REAL_PERSON_NAME_FACE_OR_VOICE",
       "minors_protection": "ALWAYS_ON",
       "simplified": {
-        "directive": "UD-118",
+        "directive": "UD-121",
         "decided_at": "2026-10-14T18:05",
         "chat_persona": "vera",
         "faces": ["accoglienza-chef", "volto-sponsor", "mentore-tornei", "sky"],
@@ -2488,7 +2488,7 @@
         "directive": "UD-114",
         "presence_component": "apps/superapp/src/components/scd/CastPresence.tsx (CastPresence, CastHelpersCard, CastAskButton = 'Chiedi a Vera' with an optional area)",
         "daily_tip": "deterministic by Europe/Rome day (dailyPick); curated in-repo copy guarded by castCopyProblems (no digits except 112, no diet/drug/therapy/plan wording)",
-        "placements": "UD-118: /impianti and /tesoreria/biglietteria Vera with the ticket actions (live next ticketed home match); /tornei Mentore dei tornei face (live next tournament); /sponsor Volto sponsor face; /famiglia Era tips (no chat), CastHelpersCard tips (preparatore-atletico, mental-coach, musica-relax, no chat), Club House order request + dish poll; /infermeria Acanfora tips (no chat); /segreteria Vera; /tesoreria/club-house Chef face + office board; /guida#personaggi directory (Vera, four faces, Consigli del giorno). Home layout unchanged.",
+        "placements": "UD-121: /impianti and /tesoreria/biglietteria Vera with the ticket actions (live next ticketed home match); /tornei Mentore dei tornei face (live next tournament); /sponsor Volto sponsor face; /famiglia Era tips (no chat), CastHelpersCard tips (preparatore-atletico, mental-coach, musica-relax, no chat), Club House order request + dish poll; /infermeria Acanfora tips (no chat); /segreteria Vera; /tesoreria/club-house Chef face + office board; /guida#personaggi directory (Vera, four faces, Consigli del giorno). Home layout unchanged.",
         "area_requests_migration": "supabase/migrations/20261014_r103_area_requests.sql (STAGED, NOT APPLIED)",
         "area_requests_flow": "request in app -> a person of the Club House confirms -> payment at the club till (SQUBY/SumUp); never payments or confirmations in app; no health data in the form",
         "dish_polls": "scd_area_polls / scd_area_poll_votes in r103 (scd_week_votes is athlete-only, not reusable)"
@@ -4871,7 +4871,7 @@
         "quick_actions": "apps/superapp/src/lib/home-actions.ts (visitatore / famiglia / staff, max 6, registered routes only, closest-page entries marked)",
         "club_notice": "apps/superapp/src/lib/club-notice.ts + club-notice.server.ts (empty by default; showFrom/showUntil mandatory; Direzione only) via getClubNotice on the server Rome day",
         "results": "apps/superapp/src/lib/home-results.ts: R20 results with both scores in the last three days, attività di base excluded; block hidden otherwise; standings = official gare.lnd.it links",
-        "daily_tip": "apps/superapp/src/lib/home-tips.ts (UD-118): Era (era-nutrition-tips.ts), Dottor Acanfora (first-aid-info.ts), Preparatore atletico, Mental coach, Musica e relax (cast-personas.ts curated copy) and Vera (VERA_TIPS) day by day, no portraits, no chat",
+        "daily_tip": "apps/superapp/src/lib/home-tips.ts (UD-121): Era (era-nutrition-tips.ts), Dottor Acanfora (first-aid-info.ts), Preparatore atletico, Mental coach, Musica e relax (cast-personas.ts curated copy) and Vera (VERA_TIPS) day by day, no portraits, no chat",
         "footer": "logo, contacts (mail, PEC, address), social, Installa l'app, privacy / cookie / segnalazioni riservate / elimina account, federal credentials; the link index moved to the menu with search (apps/superapp/src/lib/site-menu.ts)",
         "staging_preview": "/?anteprima=famiglia|staff only when stagingPreviewEnabled: no personal data, staff = every team, famiglia = empty states"
       },

@@ -1,5 +1,5 @@
 /**
- * The floating helper of the Super App (one chat since UD-118, Direzione 14/10/2026: "una sola assistente chat in
+ * The floating helper of the Super App (one chat since UD-121, Direzione 14/10/2026: "una sola assistente chat in
  * tutta l'app, di nome VERA"):
  * - public pages: the chat and the launcher face are Vera, the club reception ("Chiedi a Vera");
  * - Sky stays away from the general app (Direzione 13/10/2026): never on public pages; inside only for young members
@@ -66,7 +66,7 @@ export function isHelperHiddenPath(pathname: string): boolean {
   return startsWithPrefix(pathname, HIDDEN_PREFIXES);
 }
 
-/** Who answers in the chat: Vera everywhere, Sky inside for younger members (lib/assistant.ts resolveChat, UD-118). */
+/** Who answers in the chat: Vera everywhere, Sky inside for younger members (lib/assistant.ts resolveChat, UD-121). */
 export function personaFor(pathname: string, viewer?: HelperViewer | null, requested?: string | null): Persona {
   return resolveChat(isReservedPath(pathname) ? "inside" : "public", viewer, requested).persona;
 }
@@ -76,7 +76,7 @@ export function chatAreaFor(pathname: string, viewer?: HelperViewer | null, requ
   return resolveChat(isReservedPath(pathname) ? "inside" : "public", viewer, requested).area;
 }
 
-/** Face shown on the floating launcher: always the figure that answers (Vera outside, Direzione 13/10 + UD-118). */
+/** Face shown on the floating launcher: always the figure that answers (Vera outside, Direzione 13/10 + UD-121). */
 export function launcherFaceFor(pathname: string, viewer?: HelperViewer | null): Persona {
   return personaFor(pathname, viewer);
 }

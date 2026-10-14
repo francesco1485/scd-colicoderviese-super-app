@@ -1,5 +1,5 @@
 /**
- * AI assistants on the server (r99, UD-104; one chat since UD-118). Vera answers on public pages from the public
+ * AI assistants on the server (r99, UD-104; one chat since UD-121). Vera answers on public pages from the public
  * projection only; inside, Vera (or Sky for younger members) answers from the Cervellone, read through scd_kb_search
  * with the CALLER'S session (publishable key + request cookies): the database decides INTERNO vs RISERVATO, nothing
  * here elevates access.
@@ -193,7 +193,7 @@ export interface StaffDeps extends AnswerDeps {
 }
 
 /**
- * Inside answer. `requested` is the area a page opened Vera's chat with ("Chiedi a Vera" on a face card, UD-118) or a
+ * Inside answer. `requested` is the area a page opened Vera's chat with ("Chiedi a Vera" on a face card, UD-121) or a
  * legacy value: the server re-checks it with resolveChat, so a younger member or an unknown age always gets Sky (and
  * no area) whatever the browser sent.
  */

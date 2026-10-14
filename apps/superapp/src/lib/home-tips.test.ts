@@ -1,4 +1,4 @@
-/** UD-116 tip of the day, since UD-118 the only place of the tip-only characters (plus Vera's reminders). */
+/** UD-116 tip of the day, since UD-121 the only place of the tip-only characters (plus Vera's reminders). */
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
@@ -22,7 +22,7 @@ const routes = new Set(
 const day = (n: number) =>
   new Date(Date.UTC(2026, 9, 14 + n)).toISOString().slice(0, 10);
 
-describe("tip of the day (UD-116, UD-118)", () => {
+describe("tip of the day (UD-116, UD-121)", () => {
   it("rotates the five tip-only characters and Vera day by day, the same for everybody on a Rome day", () => {
     expect([...TIP_ORDER].sort()).toEqual([...TIP_ONLY_IDS, "vera"].sort());
     const n = TIP_ORDER.length;

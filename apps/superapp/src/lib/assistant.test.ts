@@ -257,7 +257,7 @@ describe("rate limiter", () => {
   });
 });
 
-describe("persona routing (UD-118: one chat, Vera)", () => {
+describe("persona routing (UD-121: one chat, Vera)", () => {
   it("gives Vera to staff and adult families inside, Sky to athletes and unknown ages", () => {
     expect(insidePersonaFor(["segreteria"])).toBe("vera");
     expect(insidePersonaFor(["direzione", "dirigenza"])).toBe("vera");

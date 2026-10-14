@@ -99,7 +99,7 @@ function ReplyLink({ link, onNavigate }: { link: { label: string; to: string }; 
 }
 
 /**
- * The one chat of the app (UD-118): Vera, or Sky for younger members inside.
+ * The one chat of the app (UD-121): Vera, or Sky for younger members inside.
  * interior: work-area shells (no public chrome, no bottom bar). There is no floating launcher: the chat opens only
  * from an in-page entry point ("Chiedi a Vera", window event "vera:open" — legacy "genny:open" / "crovi:open" — or
  * "sky:open") and sits 16px from the corner. "Chiedi a Vera" on a face card sends "assistant:open" with its area: Vera
@@ -108,7 +108,7 @@ function ReplyLink({ link, onNavigate }: { link: { label: string; to: string }; 
 export function SkyChat({ interior = false }: { interior?: boolean } = {}) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   // Inside, Vera needs a verified session; until the session answers, the reserved helper is Sky, so nobody sees Vera
-  // inside before the server confirms. One rule for persona, area and face: lib/assistant.ts resolveChat (UD-118).
+  // inside before the server confirms. One rule for persona, area and face: lib/assistant.ts resolveChat (UD-121).
   const { session } = useSession();
   const signedIn = !!session?.user;
   const viewer = signedIn ? { roles: session?.roles ?? [], age15plus: null } : null;
