@@ -186,7 +186,7 @@ export function CastHelpersCard({ ids, title, sub, day, id = "cast-helpers", chi
         </h2>
         {sub && <p className="m-0 mt-1 text-[14px] leading-snug text-[var(--in-sub,#4a5d7a)]">{sub}</p>}
       </header>
-      <div role="tablist" aria-label={title} className="flex gap-2 overflow-x-auto px-4 pb-1 pt-1 sm:px-[18px]">
+      <div role="tablist" aria-label={title} className="flex flex-wrap gap-2 px-4 pb-1 pt-1 sm:px-[18px]">
         {ids.map((pid, i) => {
           const selected = i === active;
           return (

@@ -42,7 +42,7 @@ export function ClubHouseOrderCard({ desk, today }: { desk: Extract<ClubHouseDes
   const submit = useServerFn(submitClubHouseOrder);
   const ids = useId().replace(/:/g, "");
   const live = desk.state === "ok";
-  const [form, setForm] = useState({ what: "", when: "", time: "", people: "", contact: "app" as string, occasion: "Festa di squadra" as string });
+  const [form, setForm] = useState({ what: "", when: "", time: "", people: "", contact: (live ? "app" : "email") as string, occasion: "Festa di squadra" as string });
   const [errors, setErrors] = useState<Partial<Record<OrderField, string>>>({});
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<string | null>(null);
@@ -169,7 +169,7 @@ export function ClubHouseOrderCard({ desk, today }: { desk: Extract<ClubHouseDes
         <fieldset className="m-0 border-0 p-0 sm:col-span-2" {...(errors.contact ? { "aria-describedby": `${ids}-contact-err` } : {})}>
           <legend className={LABEL}>Come preferisci essere ricontattato</legend>
           <div className="mt-1 flex flex-wrap gap-2">
-            {CONTACT_PREFS.map((c) => (
+            {CONTACT_PREFS.filter((c) => live || c !== "app").map((c) => (
               <label key={c} className={`inline-flex focus-within:ring-2 focus-within:ring-[#1556c4] min-h-11 cursor-pointer items-center gap-2 rounded-[10px] border px-3 text-[14.5px] ${form.contact === c ? "border-[#0b2a5b] bg-[#eef5fc] font-semibold" : "border-[var(--in-line,#dbe3ee)] bg-white"}`}>
                 <input type="radio" name={`${ids}-contact`} value={c} checked={form.contact === c} onChange={set("contact")} className="size-4 accent-[#0b2a5b]" />
                 {CONTACT_PREF_LABEL[c]}
