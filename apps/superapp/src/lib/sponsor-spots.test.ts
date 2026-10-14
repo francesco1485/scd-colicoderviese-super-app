@@ -28,8 +28,8 @@ const addDay = (day: string, n: number) => new Date(Date.parse(`${day}T12:00:00Z
 const files = (s: SponsorSpot) => [s.master, s.poster, ...(s.preview ? [s.preview] : [])];
 
 describe("sponsor LED spots (UD-119)", () => {
-  it("has the six ready spots of confirmed sponsors, in the order of sponsors.ts", () => {
-    expect(SPONSOR_SPOTS.map((s) => s.slug)).toEqual(["hdi-maglia", "dell-oca", "atv", "carcano", "nbc", "saglio-sport"]);
+  it("has the seven ready spots of confirmed sponsors, in the order of sponsors.ts", () => {
+    expect(SPONSOR_SPOTS.map((s) => s.slug)).toEqual(["hdi-maglia", "dell-oca", "atv", "carcano", "nbc", "saglio-sport", "dego-arredamenti"]);
     const order = SPONSORS.map((s) => s.slug);
     const idx = SPONSOR_SPOTS.map((s) => order.indexOf(s.slug));
     expect([...idx].sort((a, b) => a - b)).toEqual(idx);
@@ -106,7 +106,7 @@ describe("sponsor LED spots (UD-119)", () => {
     expect(partnerHref({ website: "https://carcano.com/" })).toEqual({ href: "https://carcano.com/", external: true });
     expect(partnerHref({})).toEqual({ href: "/sponsor", external: false });
     const withSite = SPONSOR_SPOTS.filter((s) => s.website).map((s) => s.slug);
-    expect(withSite).toEqual(["hdi-maglia", "dell-oca", "carcano", "saglio-sport"]);
+    expect(withSite).toEqual(["hdi-maglia", "dell-oca", "carcano", "saglio-sport", "dego-arredamenti"]);
     for (const s of SPONSOR_SPOTS) if (s.website) expect(s.website).toMatch(/^https:\/\//);
   });
 
