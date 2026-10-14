@@ -67,7 +67,7 @@ export default defineConfig({
               urlPattern: ({ request, url }) =>
                 request.mode === "navigate" &&
                 (url.pathname === "/" ||
-                  ["/calendario", "/card", "/community", "/comunicazioni", "/contatti", "/elimina-account", "/entra", "/eventi", "/fantacalcio", "/fornitori", "/guida", "/impianti", "/installa", "/kit", "/partner", "/privacy", "/rassegna-stampa", "/safeguarding", "/societa", "/sostieni", "/sponsor", "/top11", "/tornei"].some(
+                  ["/calendario", "/card", "/community", "/comunicazioni", "/contatti", "/elimina-account", "/entra", "/eventi", "/fantacalcio", "/fornitori", "/guida", "/impianti", "/installa", "/kit", "/partner", "/privacy", "/rassegna-stampa", "/safeguarding", "/societa", "/sponsor", "/top11", "/tornei"].some(
                     (p) => url.pathname === p || url.pathname.startsWith(p + "/"),
                   )),
               handler: "NetworkFirst",

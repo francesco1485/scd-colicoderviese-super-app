@@ -18,7 +18,22 @@ import { SHARE_PAGES, pageMeta } from "@/lib/share";
  */
 export const Route = createFileRoute("/sostieni/fondo-solidale")({
   loader: async () => {
-    const [pub, family] = await Promise.all([getGivingPublic(), getMyFamily()]);
+    const [pub, raw] = await Promise.all([getGivingPublic(), getMyFamily()]);
+    // Only what the application form needs travels to the page (security review 14/10/2026): no birth year, teams,
+    // registration status or medical certificate date in the HTML or the loader data.
+    const family = {
+      state: raw.state,
+      members: raw.members.map((m) => ({
+        personId: m.personId,
+        displayName: m.displayName,
+        relationship: m.relationship,
+        minor: m.minor,
+        birthYear: null,
+        teamCodes: [],
+        registrationStatus: null,
+        certificateExpiresAt: null,
+      })),
+    };
     return { pub, family };
   },
   head: () => ({ meta: pageMeta(SHARE_PAGES.fondoSolidale) }),

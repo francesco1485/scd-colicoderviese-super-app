@@ -3859,7 +3859,7 @@
       "severity": "MEDIUM",
       "statement": "UD-113 (Direzione 14/10/2026): Fondo Solidale back office, Adotta un oggetto, donations (money recorded by the treasury, goods for the palestra/infermeria campaigns) and improvement proposals are implemented in the app and in migration r101, but r101 is not applied, the public Fondo texts have not arrived from the Direzione, nobody holds the four new section grants and the consent/receipt wording is not yet confirmed by the Direzione and the commercialista.",
       "required_fix": "Direzione approves texts, queue owners and consent/receipt wording (commercialista); applies r101; grants fondo-solidale / adotta / donazioni / proposte person by person; fills FONDO_PUBLIC_TEXT; adds the first catalogue items from real offers; optionally puts SOSTIENI_VETRINA_SLOT on air.",
-      "safe_runtime_behavior": "Until r101 is applied every Sostieni page and back-office page says 'Da attivare: serve l'OK della Direzione per applicare r101'; no form sends anything, no data is read or invented; the rest of the app is unchanged."
+      "safe_runtime_behavior": "Until r101 is applied every public Sostieni page says 'Non ancora aperto online' (visitors are sent to the segreteria) and every back-office page says 'Non ancora aperto: serve l'apertura da parte della Direzione (migrazione r101)'; no form sends anything, no data is read or invented; the rest of the app is unchanged."
     }
   ],
   "development_contract": {

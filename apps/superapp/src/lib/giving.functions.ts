@@ -286,7 +286,7 @@ function refOf(data: unknown): { ref: string | null; todo: string | null } {
 /** One write: only when the section is open for the caller; the database checks the level again. */
 async function act(section: GivingSection, fn: string, args: (orgId: string) => Record<string, unknown>, done: string): Promise<ActionResult> {
   const { gate, org, sb } = await backoffice(section);
-  if (gate.state === "not-active") return { ok: false, message: "Non ancora aperto online: per ora rivolgiti alla segreteria. Qui non viene registrato nulla." };
+  if (gate.state === "not-active") return { ok: false, message: "Non ancora aperto: serve l'apertura da parte della Direzione (migrazione r101). Qui non viene registrato nulla." };
   if (gate.state !== "open" || !sb || !org) return { ok: false, message: "Non sei abilitato a questa sezione: chiedi alla Direzione." };
   const { data, error } = await sb.rpc(fn as never, args(org.organizationId) as never);
   if (error) return { ok: false, message: givingErrorText(error) };

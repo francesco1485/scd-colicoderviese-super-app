@@ -114,5 +114,10 @@ describe("store readiness (UD-071)", () => {
     }
     expect(manifest.theme_color).toBe("#062a52");
   });
-});
 
+  it("keeps the Fondo Solidale page private: it renders the signed-in parent's children", () => {
+    expect(isPublicPath("/sostieni/fondo-solidale")).toBe(false);
+    expect(cacheControlFor("/sostieni/fondo-solidale")).toBe("private, no-store, max-age=0");
+    expect(isPublicPath("/entra")).toBe(true);
+  });
+});

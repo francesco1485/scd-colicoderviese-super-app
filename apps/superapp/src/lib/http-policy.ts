@@ -31,7 +31,6 @@ export const PUBLIC_PREFIXES: readonly string[] = [
   "/rassegna-stampa",
   "/safeguarding",
   "/societa",
-  "/sostieni",
   "/sponsor",
   "/top11",
   "/tornei",

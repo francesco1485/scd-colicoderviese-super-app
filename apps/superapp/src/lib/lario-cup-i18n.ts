@@ -145,7 +145,7 @@ const IT: LarioText = {
   orgInfo: "Informazioni e adesioni:",
   privacy:
     "Foto e video solo con il consenso delle famiglie, area media dedicata. Nessun nome o statistica individuale di atleti minorenni viene pubblicato.",
-  sourceLabel: "Dati dalle locandine ufficiali del torneo.",
+  sourceLabel: "Dati dalle locandine ufficiali del torneo maschile e della Female Edition.",
   langLabel: "Lingua",
 };
 
@@ -202,7 +202,7 @@ const DE: LarioText = {
   villageKicker: "Nicht nur Spiele",
   villageTitle: "Das Weihnachtsdorf",
   village: [
-    { title: "Top-Mannschaften", text: "Profi-Nachwuchs und Vereine aus der Region" },
+    { title: "Renommierte Mannschaften", text: "Profi-Nachwuchs und Vereine aus der Region" },
     { title: "Verpflegung", text: "Den ganzen Tag" },
     { title: "Verkostungshütten", text: "Aromen vom See und von Weihnachten" },
     { title: "Weihnachtsdorf", text: "Für Familien und Kinder" },
@@ -288,7 +288,7 @@ const EN: LarioText = {
   villageKicker: "More than matches",
   villageTitle: "The Christmas village",
   village: [
-    { title: "Top teams", text: "Professional academies and local clubs" },
+    { title: "Leading teams", text: "Professional academies and local clubs" },
     { title: "Food area", text: "Open all day" },
     { title: "Tasting huts", text: "Flavours of the lake and of Christmas" },
     { title: "Christmas village", text: "For families and children" },

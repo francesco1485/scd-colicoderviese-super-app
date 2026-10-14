@@ -506,3 +506,14 @@ Francesco 14/10 20:56: «No nessun messaggio … devi lavorare nel gestionale sp
 - Home «Sul LED wall»: segue la diretta («In onda ora sul LED wall»), le frecce passano al manuale con «Torna alla diretta».
 - `/crm` → Spot LED: nuova **Regia LED wall · in diretta** (tabellone che gira, in onda ora, poi tra N s, spot in rotazione, giro completo, passaggi per partner ogni ora calcolati, palinsesto con orari); tolto il pulsante WhatsApp (nessun messaggio dall'app).
 - QA locale (Playwright, Chromium senza H.264 → WebM): player cambia spot allo scadere dei 20 s; home e regia riproducono; 390/1440 senza scroll orizzontale né errori.
+
+## Strategia 14/10 — prime mosse pubbliche · 2026-10-14
+
+Francesco 14/10 22:42: «procedi a fare quello che secondo te fa il meglio e la renda sempre migliore oggi e domani». Fonte: documento «SCD Super App — Analisi e strategia» e giro sull'app pubblicata (7 percorsi, 50 pagine).
+
+- **Christmas Lario Cup in italiano, tedesco e inglese** (`?lang=de|en`, selettore lingua, hreflang): i fatti restano in `events.ts`, si traducono solo le parole; tutela dei minori in tutte le lingue.
+- **«Quando va in onda»** su `/spot/<slug>`: prossimi passaggi dello spot oggi dallo stesso orologio del LED (`nextAirings`/`ledAirings`, mai oltre la mezzanotte di Roma), passaggi e secondi per ora di LED acceso; calcolati, pubblico mai stimato.
+- **/impianti «Come arrivare»**: link Maps per Colico e Dervio dagli indirizzi del master impianti.
+- **Parole semplici**: nelle pagine pubbliche di Sostieni e in /entra niente più «r101» o «lead»; il back-office dice «serve l'apertura da parte della Direzione (migrazione r101)». Manifest `safe_runtime_behavior` aggiornato.
+- **/entra pubblica** (sitemap e robots in produzione, offline worker): nessun dato di sessione. **/sostieni resta privata**: la revisione di sicurezza ha trovato che `/sostieni/fondo-solidale` incorpora i figli del genitore collegato; in più il loader ora passa solo id, nome, relazione e minore (niente anno, squadre, tesseramento, scadenza certificato). Test che la pagina resti `private, no-store`.
+- Revisione: primo giro BLOCK (scd-sicurezza CRITICA su /sostieni; scd-revisore stessa causa + manifest, messaggio staff, fonte e traduzioni) → corretti.
