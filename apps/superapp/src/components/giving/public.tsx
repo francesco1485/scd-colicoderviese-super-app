@@ -48,9 +48,11 @@ import {
   type Visibility,
 } from "@/lib/giving";
 import { submitOffer, submitPledge, submitProposal } from "@/lib/giving.functions";
+import { ANONYMOUS_PLATE } from "@/lib/tribune-seats";
 
-export const btnSun = "surface-sun scd-focus inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 py-2 text-center text-sm font-bold uppercase disabled:opacity-60";
-export const btnLine = "scd-focus inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-semibold";
+import { btnLine, btnSun } from "./buttons";
+
+export { btnLine, btnSun };
 
 function romeToday(): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Rome", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
@@ -214,6 +216,7 @@ export function UnitsGrid({ item, picked, onPick }: { item: PublicItem; picked: 
               type="button"
               disabled={u.adopted}
               aria-pressed={picked === u.n}
+              aria-label={`${item.unitLabel === "posto" || !item.unitLabel ? "Posto" : item.unitLabel} ${u.n}, ${u.adopted ? `adottato${u.plate ? `: ${u.plate}` : ""}` : "libero"}`}
               title={u.adopted ? (u.plate ? `Adottato: ${u.plate}` : "Adottato") : `Libero: ${item.unitLabel ?? "posto"} ${u.n}`}
               onClick={() => onPick(u.n)}
               className={`scd-focus h-11 w-full rounded-md text-sm font-bold ${u.adopted ? "cursor-not-allowed bg-muted text-muted-foreground line-through" : picked === u.n ? "bg-primary text-primary-foreground" : "border border-border bg-card"}`}
@@ -229,10 +232,17 @@ export function UnitsGrid({ item, picked, onPick }: { item: PublicItem; picked: 
 
 /* ------------------------------------------------------------------ pledge */
 
-export function PledgeDialog({ item, onClose, active }: { item: PublicItem; onClose: () => void; active: boolean }) {
+export function PledgeDialog({ item, onClose, active, initialUnit = null }: {
+  item: PublicItem;
+  onClose: () => void;
+  active: boolean;
+  /** Seat already chosen on the tribune map (C2 "Adotta un seggiolino"). */
+  initialUnit?: number | null;
+}) {
   const send = useServerFn(submitPledge);
   const [company, setCompany] = useState(false);
-  const [unit, setUnit] = useState<number | null>(null);
+  const [unit, setUnit] = useState<number | null>(initialUnit);
+  const [plateConsent, setPlateConsent] = useState(false);
   const [vis, setVis] = useState<Visibility>(DEFAULT_VISIBILITY);
   const [f, setF] = useState({ name: "", contact: "", publicName: "", plateText: "", amount: "" });
   const [showAmount, setShowAmount] = useState(false);
@@ -244,6 +254,8 @@ export function PledgeDialog({ item, onClose, active }: { item: PublicItem; onCl
   const errs = donorErrors({ visibility: vis, name: f.name, contact: f.contact, publicName: f.publicName, plateText: f.plateText, showAmount, unit: unit !== null });
   const needsUnit = item.unitsTotal !== null && unit === null;
   const needsPrivacy = vis !== "COMPLETAMENTE_ANONIMO" && !privacy;
+  // The plate text is printed only with explicit consent (C2): without it the plate says "Un amico della ColicoDerviese".
+  const needsPlateConsent = vis === "NOME_PUBBLICO" && f.plateText.trim() !== "" && !plateConsent;
   const amount = f.amount.trim() ? Number(f.amount.replace(",", ".")) : null;
   const amountBad = amount !== null && !(Number.isFinite(amount) && amount > 0 && amount <= 100000);
 
@@ -251,10 +263,11 @@ export function PledgeDialog({ item, onClose, active }: { item: PublicItem; onCl
     e.preventDefault();
     setTried(true);
     if (!active) return setOutcome({ ok: false, code: "NOT_ACTIVE" });
-    if (Object.keys(errs).length || needsUnit || needsPrivacy || amountBad) return;
+    if (Object.keys(errs).length || needsUnit || needsPrivacy || needsPlateConsent || amountBad) return;
     setBusy(true);
     try {
-      setOutcome(await send({ data: { itemId: item.id, unitNumber: unit, visibility: vis, donorName: f.name, donorContact: f.contact, publicName: f.publicName, plateText: f.plateText, showAmount, pledgedAmount: amount, privacy, website } }));
+      const plateText = vis === "NOME_PUBBLICO" && plateConsent ? f.plateText : "";
+      setOutcome(await send({ data: { itemId: item.id, unitNumber: unit, visibility: vis, donorName: f.name, donorContact: f.contact, publicName: f.publicName, plateText, showAmount, pledgedAmount: amount, privacy, website } }));
     } catch {
       setOutcome({ ok: false, code: "ERROR" });
     } finally {
@@ -265,7 +278,11 @@ export function PledgeDialog({ item, onClose, active }: { item: PublicItem; onCl
   return (
     <Dialog title={`Adotta: ${item.title}`} onClose={onClose} testId="pledge-dialog">
       <div className="mt-3 max-h-[70vh] overflow-y-auto pr-1">
-        <p className="m-0 text-sm text-muted-foreground">L'app non incassa nulla: registri la tua adozione e la Tesoreria ti spiega come versare dai canali ufficiali del club. Il versamento vale solo quando la Tesoreria lo conferma.</p>
+        {!active && <NotActiveNote />}
+        <p className={`m-0 text-sm text-muted-foreground ${!active ? "mt-3" : ""}`}>L'app non incassa nulla: registri la tua adozione e la Tesoreria ti spiega come versare dai canali ufficiali del club. Il versamento vale solo quando la Tesoreria lo conferma.</p>
+        {item.unitsTotal !== null && (
+          <p className="m-0 mt-2 text-sm text-muted-foreground">Per privati e famiglie è una donazione (erogazione liberale): la Tesoreria rilascia la ricevuta. Un'azienda che vuole visibilità con fattura fa una sponsorizzazione.</p>
+        )}
         <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="Chi adotta">
           <button type="button" aria-pressed={!company} onClick={() => setCompany(false)} className={`${btnLine} ${!company ? "border-primary bg-primary/5" : ""}`}>Privato o famiglia</button>
           <button type="button" aria-pressed={company} onClick={() => setCompany(true)} className={`${btnLine} ${company ? "border-primary bg-primary/5" : ""}`}><Building2 className="size-4" aria-hidden="true" />Azienda</button>
@@ -299,13 +316,19 @@ export function PledgeDialog({ item, onClose, active }: { item: PublicItem; onCl
               <div className="grid gap-3 sm:grid-cols-2">
                 <Field label="Nome da mostrare" hint="Es. «Famiglia Rossi», «Bar Sport». Niente recapiti."><input className={inputCls} value={f.publicName} onChange={(e) => setF({ ...f, publicName: e.target.value })} aria-invalid={tried && !!errs.publicName} /></Field>
                 {item.unitsTotal !== null && (
-                  <Field label="Testo della targhetta (facoltativo)" hint="Compare sulla targhetta numerata del posto."><input className={inputCls} value={f.plateText} maxLength={60} onChange={(e) => setF({ ...f, plateText: e.target.value })} /></Field>
+                  <Field label="Testo della targhetta (facoltativo)" hint="Compare sulla targhetta numerata del posto. Niente nomi di ragazzi minorenni, niente recapiti."><input className={inputCls} value={f.plateText} maxLength={60} onChange={(e) => setF({ ...f, plateText: e.target.value })} /></Field>
+                )}
+                {item.unitsTotal !== null && f.plateText.trim() !== "" && (
+                  <label className="flex items-start gap-2 text-sm sm:col-span-2">
+                    <input type="checkbox" className="mt-1 size-4" checked={plateConsent} onChange={(e) => setPlateConsent(e.target.checked)} aria-invalid={tried && needsPlateConsent} />
+                    <span>Autorizzo il club a scrivere questo testo sulla targhetta del posto. Senza il mio consenso la targhetta dice «{ANONYMOUS_PLATE}».</span>
+                  </label>
                 )}
                 <label className="flex items-start gap-2 text-sm sm:col-span-2">
                   <input type="checkbox" className="mt-1 size-4" checked={showAmount} onChange={(e) => setShowAmount(e.target.checked)} />
                   <span>Mostra anche l'importo accanto al mio nome (di solito resta riservato).</span>
                 </label>
-                {tried && <ErrorText id="pl-pub" text={errs.publicName ?? errs.plateText} />}
+                {tried && <ErrorText id="pl-pub" text={errs.publicName ?? errs.plateText ?? (needsPlateConsent ? "Per la targhetta serve il tuo consenso (oppure lascia vuoto il testo)." : undefined)} />}
               </div>
             )}
             <Field label="Quanto pensi di dare (facoltativo, riservato)" hint="Serve solo alla Tesoreria per prepararsi: non è un pagamento.">

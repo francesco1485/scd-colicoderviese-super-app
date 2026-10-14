@@ -673,6 +673,34 @@ export interface PublicUnit {
   n: number;
   adopted: boolean;
   plate: string | null;
+  /**
+   * Open pledges (PROMESSA) on this unit. The staged r101 public read does not emit it yet, so it is 0 until the read
+   * path carries it: never guessed (tribune-seats.ts shows "promesso" only from this real count).
+   */
+  pledges: number;
+  /** Received adopters of this unit (co-adoption, max 3). Without the field: 1 when adopted, else 0. */
+  adopters: number;
+  /** Public plate texts of this unit (only donors who chose a public name and consented). Without the field: [plate]. */
+  plates: string[];
+}
+
+/** One numbered unit of the public/back-office reads; optional fields fall back to what r101 emits today. */
+function parseUnit(u: unknown): PublicUnit[] {
+  const o = obj(u);
+  const n = o ? num(o["n"]) : null;
+  if (!o || n === null) return [];
+  const adopted = o["status"] === "ADOTTATO";
+  const plate = str(o["plate"]);
+  const plates = Array.isArray(o["plates"]) ? arr(o["plates"]).flatMap((x) => (str(x) ? [str(x) as string] : [])) : plate ? [plate] : [];
+  const adopters = num(o["adopters"]);
+  return [{
+    n,
+    adopted,
+    plate,
+    pledges: Math.max(0, Math.floor(num(o["pledges"]) ?? 0)),
+    adopters: adopters !== null ? Math.max(0, Math.floor(adopters)) : adopted ? 1 : 0,
+    plates,
+  }];
 }
 export interface PublicItem {
   id: string;
@@ -715,11 +743,7 @@ export function parsePublic(v: unknown): PublicData {
       const i = obj(x);
       const id = i ? str(i["id"]) : null;
       if (!i || !id) return [];
-      const units = arr(i["units"]).flatMap((u) => {
-        const o = obj(u);
-        const n = o ? num(o["n"]) : null;
-        return o && n !== null ? [{ n, adopted: o["status"] === "ADOTTATO", plate: str(o["plate"]) }] : [];
-      });
+      const units = arr(i["units"]).flatMap(parseUnit);
       return [{
         id,
         code: str(i["code"]) ?? "",
@@ -1102,11 +1126,7 @@ export function parseAdoptBoard(v: unknown): AdoptBoard | null {
         contributions: num(i["contributions"]) ?? 0,
         pledges: num(i["pledges"]) ?? 0,
         unitsAdopted: num(i["unitsAdopted"]) ?? 0,
-        units: arr(i["units"]).flatMap((u) => {
-          const o = obj(u);
-          const n = o ? num(o["n"]) : null;
-          return o && n !== null ? [{ n, adopted: o["status"] === "ADOTTATO", plate: str(o["plate"]) }] : [];
-        }),
+        units: arr(i["units"]).flatMap(parseUnit),
       }];
     }),
   };
