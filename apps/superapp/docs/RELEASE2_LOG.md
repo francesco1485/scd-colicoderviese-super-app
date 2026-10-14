@@ -410,3 +410,9 @@ prossimi impegni e "ci sarò" in primo piano). Desktop invariato.
 - Note: `vite dev` locale si ferma su un errore preesistente di import-protection (`/fantacalcio` → `supabase.server.ts`), non toccato; la build di produzione è sana.
 - Da decidere (Francesco): confermare il formato «Storico:» nella colonna Note del registro (in alternativa una colonna «Storico» da aggiungere al master e al manifest); confermare la regola luci dalle 17:00.
 
+
+## C4 — Home: «Sostieni il club» dopo la settimana · 2026-10-14
+- Stato: DONE su integ/r2-hall → wip/superapp-20261013-otp (non pubblicato).
+- `src/lib/home-support.ts` (+4 test): tre azioni fisse che portano soldi al club — Diventa partner (/sponsor, unico evidenziato in giallo), Adotta un seggiolino (/sostieni#adotta-title), Dona materiale (/sostieni#campagne-title). La lotteria entra solo quando la Direzione la pubblica (`supportActions({ lotteryPublic })`, oggi false: la pagina resta non collegata come da UD-115). Nessun prezzo, numero o parola gonfiata (test).
+- `SupportStrip` in `HomePractical.tsx`: fascia blu notte, un blocco unico; home pubblica subito dopo «Oggi e questa settimana», home soci dopo «Vai subito a». `/sostieni` aggiunto a `vetrinaRepeats` (niente si ripete).
+- QA: tsc, vitest 1406, build; Playwright 390×844 e 1440×900 (anteprima staging locale): nessun errore in console, nessuno scorrimento orizzontale, i link aprono le sezioni giuste.

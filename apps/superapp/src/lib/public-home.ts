@@ -190,6 +190,7 @@ export function vetrinaRepeats(actions: readonly PublicLink[]): string[] {
       ...actions.map((a) => a.to),
       "/rassegna-stampa",
       "/sponsor",
+      "/sostieni",
       "/registrati",
     ]),
   ];

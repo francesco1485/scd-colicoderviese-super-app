@@ -26,10 +26,12 @@ import {
   DailyTipCard,
   MyWeek,
   QuickActions,
+  SupportStrip,
   UrgentNotices,
   WeekendResults,
   WRAP,
 } from "@/components/home/HomePractical";
+import { supportActions } from "@/lib/home-support";
 import {
   EmptyFeed,
   EventPost,
@@ -472,6 +474,7 @@ export function MemberHome({
         }
       />
       <QuickActions audience={scope.audience} actions={actions} />
+      <SupportStrip actions={supportActions({ lotteryPublic: false })} />
       <WeekendResults rows={results} />
       <DailyTipCard
         tip={tip}

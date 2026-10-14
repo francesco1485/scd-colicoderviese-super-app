@@ -28,6 +28,9 @@ import {
   UsersRound,
   Goal,
   LandPlot,
+  Handshake,
+  Armchair,
+  PackageOpen,
   type LucideIcon,
 } from "lucide-react";
 import type { ReactNode } from "react";
@@ -42,6 +45,7 @@ import {
   type QuickAction,
 } from "@/lib/home-actions";
 import type { ResultRow } from "@/lib/home-results";
+import type { SupportAction } from "@/lib/home-support";
 import {
   splitWeek,
   type TodayEntry,
@@ -600,6 +604,96 @@ export function QuickActions({
           );
         })}
       </ul>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------- support */
+
+const SUPPORT_ICON: Record<string, LucideIcon> = {
+  partner: Handshake,
+  seggiolino: Armchair,
+  materiale: PackageOpen,
+  lotteria: Ticket,
+};
+
+/**
+ * "Sostieni il club" (C4): the actions that bring money to the club, right after the week. Navy band so it reads as
+ * one block; the partner action carries the only yellow highlight. No prices or counts here: each page says them.
+ */
+export function SupportStrip({ actions }: { actions: readonly SupportAction[] }) {
+  if (actions.length === 0) return null;
+  return (
+    <section
+      aria-labelledby="sostieni-t"
+      className={`${WRAP} pt-6 lg:pt-10`}
+      data-testid="support-strip"
+    >
+      <div className="relative isolate overflow-hidden rounded-[22px] bg-[#0b2a5b] p-4 text-white sm:p-5 lg:p-7">
+        <div
+          aria-hidden="true"
+          className="absolute -right-16 -top-20 -z-10 size-64 rounded-full bg-[#1556c4] opacity-40 blur-2xl"
+        />
+        <div className="flex flex-wrap items-end justify-between gap-2 pb-4">
+          <div className="grid gap-1">
+            <span className="text-[11.5px] font-extrabold uppercase tracking-[0.12em] text-[#ffd600]">
+              Colico e Dervio crescono con voi
+            </span>
+            <h2
+              id="sostieni-t"
+              className="m-0 font-uv text-[24px] uppercase leading-none sm:text-[26px] lg:text-[30px]"
+            >
+              Sostieni il club
+            </h2>
+          </div>
+          <p className="m-0 max-w-[46ch] text-[14px] leading-snug text-white/80">
+            Aziende, famiglie e tifosi: ogni aiuto va a campi, attrezzature e ragazzi.
+          </p>
+        </div>
+        <ul
+          className={`m-0 grid list-none gap-3 p-0 ${actions.length > 3 ? "sm:grid-cols-2 lg:grid-cols-4" : "sm:grid-cols-3"}`}
+        >
+          {actions.map((a) => {
+            const Icon = SUPPORT_ICON[a.id] ?? Handshake;
+            return (
+              <li key={a.id} className="flex">
+                <Link
+                  to={a.to as never}
+                  {...(a.hash ? { hash: a.hash } : {})}
+                  data-support={a.id}
+                  className={`scd-focus group flex min-h-[76px] w-full items-center gap-3 rounded-[16px] p-3.5 transition-colors duration-150 sm:min-h-[132px] sm:flex-col sm:items-start sm:justify-between lg:p-4 ${
+                    a.primary
+                      ? "bg-[#ffd600] text-[#0b1e3a] hover:brightness-95"
+                      : "bg-white/[0.08] text-white ring-1 ring-white/15 hover:bg-white/[0.14]"
+                  }`}
+                >
+                  <span
+                    className={`grid size-11 shrink-0 place-items-center rounded-[12px] ${
+                      a.primary ? "bg-[#0b2a5b] text-[#ffd600]" : "bg-white/10 text-[#ffd600]"
+                    }`}
+                  >
+                    <Icon className="size-[22px]" strokeWidth={1.9} aria-hidden="true" />
+                  </span>
+                  <span className="grid min-w-0 flex-1 gap-0.5">
+                    <b className="flex items-center gap-1 text-[16px] leading-tight lg:text-[17px]">
+                      {a.label}
+                      <ArrowRight
+                        className="size-4 transition-transform duration-150 group-hover:translate-x-0.5"
+                        aria-hidden="true"
+                      />
+                    </b>
+                    <span
+                      className={`text-[13px] leading-snug ${a.primary ? "text-[#24385a]" : "text-white/80"}`}
+                    >
+                      {a.hint}
+                    </span>
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
     </section>
   );
 }

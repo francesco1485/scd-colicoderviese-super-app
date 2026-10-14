@@ -41,7 +41,8 @@ import {
 } from "@/lib/vetrina";
 
 import { sides } from "./match-sides";
-import { ClubNoticeCard, DailyTipCard, PublicToday, QuickActions, UrgentNotices, WeekendResults } from "@/components/home/HomePractical";
+import { ClubNoticeCard, DailyTipCard, PublicToday, QuickActions, SupportStrip, UrgentNotices, WeekendResults } from "@/components/home/HomePractical";
+import { supportActions } from "@/lib/home-support";
 import { venueShort } from "@/components/home/HomeSections";
 import { venueCase } from "@/lib/board-data";
 import { OpponentCrest } from "@/lib/crests";
@@ -820,7 +821,7 @@ export function PublicHome({
   // Nothing repeats (UD-110, UD-116): vetrina slots that only open a page already in the quick actions, the news
   // block or the partner band are left out of the vetrina.
   const worlds = useMemo(() => trimVetrina(vetrina, vetrinaRepeats(actions)), [vetrina, actions]);
-  // UD-116 order: urgent → communication → oggi e settimana → quick actions → results → tip → credentials (once) →
+  // UD-116 order (+ C4 support strip after the week): urgent → communication → oggi e settimana → sostieni il club → quick actions → results → tip → credentials (once) →
   // vetrina → news → join → ONE partner band → reduced footer.
   return (
     <main data-screen="home" data-variant="public" className="min-h-dvh bg-[#eef3f9] pb-6 font-sans text-[#0b1e3a]">
@@ -828,6 +829,7 @@ export function PublicHome({
       <UrgentNotices items={alerts} />
       <ClubNoticeCard notice={notice} />
       <PublicWeek calendar={calendar} nowMs={nowMs} today={today} />
+      <SupportStrip actions={supportActions({ lotteryPublic: false })} />
       <QuickActions audience="visitatore" actions={actions} />
       <WeekendResults rows={results} />
       <DailyTipCard tip={tip} signedIn={false} />
