@@ -1,18 +1,19 @@
 /**
- * Signed-out public home v5 (UD-116, Direzione 14/10/2026 10:59: "il footer grande con Tutto sul club non serve
- * alle persone; le home devono mostrare ciò che conta davvero"), built on the vetrina clean-up of UD-110.
+ * Signed-out public home v6 "Matchday" (UD-132, Francesco 14/10/2026 23:22: a short home that pushes ragazzi and
+ * families to live the app; before: 6086 px at 390 px, about seven phone screens), built on UD-116 and UD-110.
  *
  * Order: urgent notices (R20 alerts, only when there are) → the one club communication chosen by the Direzione (with
- * expiry) → "Oggi e questa settimana" (matchday card, today's games, next home game of each team) → six quick
- * actions for visitors → weekend results (only with a real source) → tip of the day (tip-only characters and Vera, UD-121)
- * → credentials once → vetrina (trimmed so nothing repeats) → news → join → ONE partner band → reduced footer.
+ * expiry) → "Questa settimana" (games of the next 7 days with filters, HomeMatchday.tsx) with the compact LED wall
+ * strip beside it on desktop → weekend results (only with a real source) → join → credentials once → ONE partner
+ * band → reduced footer. Support strip, quick actions (the bottom nav covers them), tip of the day, vetrina and news
+ * are not rendered here any more; Vetrina and HomeNewsBlock stay exported for other pages.
  * Teams, rosters and trainings are not here: they live inside after sign-in (UD-100).
  * Palette: navy #0b2a5b, blue #1556c4, light #eef3f9, white; yellow #ffd600 for changes and the main CTA.
  * Real assets only (public/media); our age-group crests never appear; no minor is named.
  */
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, ArrowUpRight, ChevronRight, Lock, Newspaper } from "lucide-react";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { LedwallRotator } from "@/components/LedwallRotator";
 import { SponsorSpotsHome } from "@/components/SponsorSpots";
@@ -21,17 +22,14 @@ import { KitTexture } from "@/components/scd/kit-texture";
 import { ClubCredentials, LogoTile, SponsorLogo } from "@/components/scd/Logos";
 import type { ClubNotice } from "@/lib/club-notice";
 import type { PublicFeed } from "@/lib/club.types";
-import { quickActions } from "@/lib/home-actions";
 import { weekendResults } from "@/lib/home-results";
-import { nextHomeMatchPerTeam, urgentNotices, weekMatches } from "@/lib/home-today";
-import { dailyTip } from "@/lib/home-tips";
+import { urgentNotices } from "@/lib/home-today";
 import { NEWS_SOURCE_LABEL, type NewsItem } from "@/lib/news-mix";
 import { partnerNewsOn } from "@/lib/partner-news";
 import { timeAgo } from "@/lib/social";
-import { kickoffClock, matchdayLabel, partnerOfTheMonth, trimVetrina, vetrinaRepeats } from "@/lib/public-home";
+import { partnerOfTheMonth } from "@/lib/public-home";
 import { SPONSORS, sponsorLabel } from "@/lib/sponsors";
 import {
-  EMPTY_WORLDS,
   PUBLIC_WORLDS,
   WORLD_HINT,
   WORLD_LABEL,
@@ -41,18 +39,11 @@ import {
   type VetrinaWorld,
 } from "@/lib/vetrina";
 
-import { sides } from "./match-sides";
-import { ClubNoticeCard, DailyTipCard, PublicToday, QuickActions, SupportStrip, UrgentNotices, WeekendResults } from "@/components/home/HomePractical";
-import { supportActions } from "@/lib/home-support";
-import { venueShort } from "@/components/home/HomeSections";
-import { venueCase } from "@/lib/board-data";
-import { OpponentCrest } from "@/lib/crests";
-import { publicTeamCrest } from "@/lib/team-crest";
-import { addDays } from "@/lib/board-data";
+import { HomeMatchday } from "@/components/home/HomeMatchday";
+import { ClubNoticeCard, UrgentNotices, WeekendResults } from "@/components/home/HomePractical";
 import type { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
-import { calendarToWeekItems, romeParts, type WeekItem } from "@/lib/home-week";
+import { calendarToWeekItems } from "@/lib/home-week";
 import { hasHomeMatch, showLedwallOnHome } from "@/lib/ledwall-rotation";
-import { itemState, orderTeams, startMs, type Team } from "@/lib/universe";
 
 type PublicCalendar = Awaited<ReturnType<typeof getPublicCalendarSnapshot>>;
 
@@ -112,14 +103,14 @@ function JoinBanner() {
           <div className="grid gap-2">
             <h2
               id="entra-t"
-              className="m-0 font-uv text-[34px] uppercase leading-[0.95] lg:text-[44px]"
+              className="m-0 max-w-[18ch] font-uv text-[30px] uppercase leading-[0.95] lg:text-[40px]"
             >
-              Entra nel club<span className="text-[#ffd600]">.</span>
+              La tua squadra, i tuoi orari, il tuo pulmino<span className="text-[#ffd600]">.</span>
             </h2>
             <p className="m-0 max-w-[46ch] text-[15.5px] leading-snug text-white/90 lg:text-[17px]">
-              Segui la società, gioca al Fantacalcio e ricevi avvisi e
-              convocazioni nell'app. Un solo account per famiglia, atleti e
-              tifosi.
+              Entra nell'app del club: le gare della tua squadra, le
+              convocazioni da vedere e la richiesta del posto in pulmino per
+              le trasferte. Un solo account per la famiglia.
             </p>
           </div>
           <div className="flex flex-wrap gap-2.5">
@@ -365,7 +356,7 @@ export function Vetrina({
  * and club news — each item opening the original. Negative headlines are filtered on the server (they stay on
  * /rassegna-stampa); with nothing recent the block says so and links to the press review.
  */
-function HomeNewsBlock({ items, nowMs }: { items: readonly NewsItem[]; nowMs: number }) {
+export function HomeNewsBlock({ items, nowMs }: { items: readonly NewsItem[]; nowMs: number }) {
   return (
     <section aria-labelledby="notizie-t" className={`${WRAP} pt-8 lg:pt-12`} data-testid="home-news">
       <div className="flex items-end justify-between gap-3 pb-3">
@@ -531,262 +522,10 @@ function PartnerBand({ day, nowMs, ledOnHome }: { day: string; nowMs: number; le
   );
 }
 
-/* ------------------------------------------------------------ matchday */
-
-const pad = (n: number) => String(n).padStart(2, "0");
-
-/** Seconds tick while the card is on screen; the first render uses the server clock (no hydration mismatch). */
-function useTick(serverNow: number): number {
-  const [now, setNow] = useState(serverNow);
-  useEffect(() => {
-    setNow(Date.now());
-    const id = window.setInterval(() => setNow(Date.now()), 1000);
-    return () => window.clearInterval(id);
-  }, []);
-  return now;
-}
-
-function Side({
-  crest,
-  name,
-  sub,
-}: {
-  crest: ReactNode;
-  name: string;
-  sub?: string;
-}) {
-  return (
-    <span className="flex min-w-0 flex-1 flex-col items-center gap-1.5 text-center">
-      <span className="grid size-[46px] place-items-center rounded-full bg-white shadow-[0_6px_18px_-6px_rgb(0_0_0/0.45)] lg:size-[64px]">
-        {crest}
-      </span>
-      <span className="line-clamp-2 text-[14px] font-semibold leading-tight text-white lg:text-[15px]">
-        {name}
-      </span>
-      {sub && (
-        <span className="-mt-1 text-[12.5px] font-medium leading-tight text-[#ffd600]">
-          {sub}
-        </span>
-      )}
-    </span>
-  );
-}
-
-function Segment({ value, unit }: { value: number; unit: string }) {
-  const v = pad(value);
-  return (
-    <span className="flex flex-col items-center gap-1">
-      <span className="grid h-[40px] w-full place-items-center overflow-hidden rounded-[10px] bg-white/[0.08] ring-1 ring-inset ring-white/15 lg:h-[56px]">
-        <span
-          key={v}
-          className="scd-tick font-uv text-[26px] leading-none tabular-nums text-white lg:text-[38px]"
-        >
-          {v}
-        </span>
-      </span>
-      <span className="text-[10.5px] font-bold uppercase tracking-[0.12em] text-white/70">
-        {unit}
-      </span>
-    </span>
-  );
-}
-
-/**
- * Matchday card: the next kickoff of the week (or the game in play) from the official calendar, with a live
- * countdown. Our side is the official club crest + "ColicoDerviese" and the team label (annata crests stay inside);
- * no score is shown because the calendar carries none (nothing is invented).
- */
-function Matchday({
-  item,
-  team,
-  serverNow,
-  today,
-}: {
-  item: WeekItem;
-  team: Team | undefined;
-  serverNow: number;
-  today: string;
-}) {
-  const now = useTick(serverNow);
-  const kickoff = startMs(item);
-  const state = itemState(item, now);
-  const clock = kickoffClock(kickoff, now);
-  const { opponent: raw, weHome } = sides(item);
-  const opponent = raw ? venueCase(raw) : "Avversario da definire";
-  const us = team?.short ?? item.groupLabel.split("·")[0]!.trim();
-  const ours = (
-    <Side
-      crest={
-        <img
-          src={publicTeamCrest()}
-          alt=""
-          width={34}
-          height={44}
-          className="h-[34px] w-auto object-contain lg:h-[46px]"
-        />
-      }
-      name="ColicoDerviese"
-      sub={us}
-    />
-  );
-  const theirs = (
-    <Side crest={<OpponentCrest name={raw} size={36} />} name={opponent} />
-  );
-  const day = matchdayLabel(item.date, today);
-  const live = state === "live";
-  const eyebrow = live
-    ? "In campo ora"
-    : state === "done"
-      ? "Gara terminata"
-      : day === "Oggi"
-        ? "Oggi si gioca"
-        : "Prossimo calcio d'inizio";
-  const meta = [
-    item.homeAway === "CASA"
-      ? "Casa"
-      : item.homeAway === "FUORI"
-        ? "Fuori"
-        : "",
-    item.venue ? venueShort(item.venue) : "",
-  ].filter(Boolean);
-  return (
-    <aside
-      aria-label={`${eyebrow}: ${weHome ? `ColicoDerviese ${us} contro ${opponent}` : `${opponent} contro ColicoDerviese ${us}`}`}
-      className="scd-matchday rounded-[18px] p-4 text-white lg:p-6"
-      data-testid="matchday"
-      data-state={state}
-    >
-      <KitTexture motif="mountains-lake" overlay />
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 400 200"
-        preserveAspectRatio="xMidYMax slice"
-        className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-[70%] w-full text-white/[0.07]"
-      >
-        <g fill="none" stroke="currentColor" strokeWidth="1.5">
-          <line x1="200" y1="0" x2="200" y2="200" />
-          <circle cx="200" cy="200" r="70" />
-          <circle cx="200" cy="200" r="3" fill="currentColor" />
-        </g>
-      </svg>
-      <div className="flex items-center justify-between gap-3">
-        <span
-          className={`inline-flex items-center gap-2 text-[11.5px] font-extrabold uppercase tracking-[0.14em] ${live ? "text-white" : "text-[#ffd600]"}`}
-        >
-          {live && (
-            <span
-              aria-hidden="true"
-              className="scd-live-dot size-2 rounded-full bg-[#ff5c5c]"
-            />
-          )}
-          {eyebrow}
-        </span>
-        {!item.certain && (
-          <span className="rounded-full bg-white/12 px-2 py-[3px] text-[11px] font-semibold text-white/85 ring-1 ring-inset ring-white/20">
-            da confermare
-          </span>
-        )}
-      </div>
-
-      <div className="mt-2 flex items-start gap-2 lg:mt-5">
-        {weHome ? ours : theirs}
-        <span
-          aria-hidden="true"
-          className="mt-[12px] shrink-0 font-uv text-[22px] leading-none text-white/55 lg:mt-[20px] lg:text-[26px]"
-        >
-          VS
-        </span>
-        {weHome ? theirs : ours}
-      </div>
-
-      <p className="m-0 mt-2 text-center text-[13.5px] leading-snug text-white/80 lg:mt-4 lg:text-[14.5px]">
-        <b className="font-semibold text-white">
-          {day}
-          {item.time ? ` · ${item.time}` : ""}
-        </b>
-        {meta.length > 0 && ` · ${meta.join(" · ")}`}
-      </p>
-
-      <div className="mt-3 lg:mt-5">
-        {clock ? (
-          <>
-            <div aria-hidden="true" className="grid grid-cols-4 gap-2">
-              <Segment value={clock.d} unit="giorni" />
-              <Segment value={clock.h} unit="ore" />
-              <Segment value={clock.m} unit="min" />
-              <Segment value={clock.s} unit="sec" />
-            </div>
-            <span className="sr-only">
-              {`Mancano ${clock.d} giorni, ${clock.h} ore e ${clock.m} minuti al calcio d'inizio.`}
-            </span>
-          </>
-        ) : (
-          <div className="grid h-[60px] place-items-center rounded-[12px] bg-white/[0.08] ring-1 ring-inset ring-white/15 lg:h-[82px]">
-            <span className="font-uv text-[30px] uppercase leading-none text-[#ffd600] lg:text-[38px]">
-              {live
-                ? "In corso"
-                : state === "done"
-                  ? "Fischio finale"
-                  : "Orario da definire"}
-            </span>
-          </div>
-        )}
-      </div>
-
-      <Link
-        to="/calendario"
-        search={{ annata: item.group } as never}
-        className="scd-focus mt-5 hidden min-h-11 w-full items-center justify-center gap-1.5 rounded-[12px] bg-[#ffd600] text-[15px] font-bold text-[#0b1e3a] transition-[filter,transform] duration-150 hover:brightness-95 active:scale-[0.98] lg:inline-flex"
-      >
-        Dettagli gara
-        <ArrowRight className="size-[18px]" aria-hidden="true" />
-      </Link>
-    </aside>
-  );
-}
-
 /* ---------------------------------------------------------------- page */
-
-/** Rome "HH:MM" of an instant. */
-const romeClock = (ms: number) => romeParts(new Date(ms).toISOString())?.time ?? "00:00";
-
-/**
- * "Oggi e questa settimana" for anonymous visitors: the matchday card of the next game (or the one in play),
- * today's games of every team and the next home game of each team. Fixtures only (teams are inside, UD-100).
- */
-function PublicWeek({ calendar, nowMs, today }: { calendar: PublicCalendar; nowMs: number; today: string }) {
-  const teams = useMemo(() => new Map(orderTeams(calendar.groups).map((t) => [t.id, t])), [calendar.groups]);
-  const nowHHMM = romeClock(nowMs);
-  const todayGames = useMemo(() => weekMatches(calendar.events, calendar.groups, today, null, 1), [calendar, today]);
-  const nextHome = useMemo(
-    () => nextHomeMatchPerTeam(calendar.events, calendar.groups, today, nowHHMM),
-    [calendar, today, nowHHMM],
-  );
-  const lastDay = addDays(today, 6);
-  const highlight = useMemo(() => {
-    const games = calendarToWeekItems(calendar.events, calendar.groups)
-      .filter((i) => i.date >= today && i.date <= lastDay && itemState(i, nowMs) !== "done")
-      .sort((a, b) => (a.date + (a.time || "99:99")).localeCompare(b.date + (b.time || "99:99")));
-    return games.find((g) => itemState(g, nowMs) === "live") ?? games[0] ?? null;
-  }, [calendar, today, lastDay, nowMs]);
-  return (
-    <PublicToday
-      todayGames={todayGames}
-      nextHome={nextHome}
-      today={today}
-      lead={
-        highlight ? (
-          <Matchday item={highlight} team={teams.get(highlight.group)} serverNow={nowMs} today={today} />
-        ) : undefined
-      }
-    />
-  );
-}
 
 export function PublicHome({
   calendar,
-  news = [],
-  vetrina = EMPTY_WORLDS,
   ledwallDay,
   feed = null,
   notice = null,
@@ -794,9 +533,9 @@ export function PublicHome({
   today,
 }: {
   calendar: PublicCalendar;
-  /** Mixed news highlight of the day (getHomeNews). */
+  /** Mixed news highlight of the day (getHomeNews); accepted for the route contract, not rendered since UD-132. */
   news?: readonly NewsItem[];
-  /** Vetrina picks of the day for every world, from the server (getVetrina). */
+  /** Vetrina picks of the day (getVetrina); accepted for the route contract, not rendered since UD-132. */
   vetrina?: Readonly<Record<VetrinaWorld, readonly VetrinaSlot[]>>;
   /** Server Rome day for the LED wall and the partner band (defaults to today). */
   ledwallDay?: string;
@@ -815,30 +554,29 @@ export function PublicHome({
       }),
     [calendar, ledDay],
   );
-  const actions = useMemo(() => quickActions("visitatore"), []);
   const alerts = useMemo(() => urgentNotices(feed?.items ?? [], nowMs, false), [feed, nowMs]);
   const results = useMemo(() => weekendResults(feed, today), [feed, today]);
-  const tip = useMemo(() => dailyTip(ledDay), [ledDay]);
-  // Nothing repeats (UD-110, UD-116): vetrina slots that only open a page already in the quick actions, the news
-  // block or the partner band are left out of the vetrina.
-  const worlds = useMemo(() => trimVetrina(vetrina, vetrinaRepeats(actions)), [vetrina, actions]);
-  // UD-116 order (+ C4 support strip after the week, + C6/UD-119 sponsor LED spots right after it): urgent → communication → oggi e settimana → sostieni il club → quick actions → results → tip → credentials (once) →
-  // vetrina → news → join → ONE partner band → reduced footer.
+  // UD-132 Matchday order (Francesco 14/10/2026: a short home that pushes ragazzi and families to live the app):
+  // urgent → communication → "Questa settimana" (+ the LED wall strip beside it on desktop) → results (only with a
+  // source) → join → credentials (once) → ONE partner band → reduced footer. Support strip, quick actions (the bottom
+  // nav covers them), tip of the day, vetrina and news are no longer on the public home: the components stay exported.
   return (
     <main data-screen="home" data-variant="public" className="min-h-dvh bg-[#eef3f9] pb-6 font-sans text-[#0b1e3a]">
       <h1 className="sr-only">S.C.D. ColicoDerviese, il club di calcio di Colico e Dervio</h1>
       <UrgentNotices items={alerts} />
       <ClubNoticeCard notice={notice} />
-      <PublicWeek calendar={calendar} nowMs={nowMs} today={today} />
-      <SupportStrip actions={supportActions({ lotteryPublic: false })} />
-      <SponsorSpotsHome day={ledDay} />
-      <QuickActions audience="visitatore" actions={actions} />
+      <div
+        className={`${WRAP} grid gap-5 pt-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,400px)] lg:items-start lg:gap-8 lg:pt-8`}
+        data-testid="home-matchday-layout"
+      >
+        <HomeMatchday calendar={calendar} nowMs={nowMs} today={today} />
+        <aside aria-label="LED wall del campo" className="min-w-0 lg:sticky lg:top-[calc(var(--pub-header-h,64px)+16px)] lg:pt-[52px]">
+          <SponsorSpotsHome day={ledDay} compact />
+        </aside>
+      </div>
       <WeekendResults rows={results} />
-      <DailyTipCard tip={tip} signedIn={false} />
-      <CredentialBar />
-      <Vetrina worlds={worlds} />
-      <HomeNewsBlock items={news} nowMs={nowMs} />
       <JoinBanner />
+      <CredentialBar />
       <PartnerBand day={ledDay} nowMs={nowMs} ledOnHome={ledOnHome} />
     </main>
   );

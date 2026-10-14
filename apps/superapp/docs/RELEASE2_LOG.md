@@ -528,3 +528,13 @@ Francesco 14/10 23:20: «Adotta un seggiolino e lotteria al momento teniamoli in
 - /sostieni: nascosta la mappa dei posti della tribuna.
 - /eventi/lotteria-dello-sport: sempre «Iniziativa in preparazione» e noindex, niente anteprima di struttura; /eventi non la elenca.
 - Pagine Direzione e Tesoreria invariate.
+
+## Home pubblica Matchday · 2026-10-15
+
+UD-132 (Francesco 14/10 23:20: spingere ragazzi e famiglie a vivere l'app; «la home non è per nulla un'idea bella»). Solo home pubblica; home iscritti, accesso e funzioni server invariati.
+- Nuovo ordine: avvisi urgenti (se ci sono) → comunicazione del club (se c'è) → **«Questa settimana»** (`components/home/HomeMatchday.tsx`: gare dei prossimi 7 giorni dal Calendario SCD, raggruppate per giorno, filtri Tutte / In casa / Agonistica / Attività di base con `aria-pressed`, riga «N gare · M in casa a Colico/Dervio», stemma avversario solo se verificato nel registro, «In corso» per la gara in campo, «da confermare» in tono leggero, link «Tutto il calendario») → striscia LED compatta (`SponsorSpotsHome compact`, stesso orologio del LED wall, pausa e reduced-motion; a destra su desktop) → risultati (solo con fonte) → «La tua squadra, i tuoi orari, il tuo pulmino» → riconoscimenti → fascia partner.
+- Tolti dalla home pubblica (componenti ancora esportati): Sostieni il club, azioni rapide (le copre la barra in basso), consiglio del giorno, vetrina, notizie; anche la card con il conto alla rovescia.
+- Logica pura in `lib/home-matchday.ts` (classificazione con la regola di `lib/universe.ts`, conteggi, raggruppamento, riepilogo, etichette dei giorni) con 7 test vitest; test dell'ordine della home aggiornati.
+- Altezza della home con i dati reali (Playwright, build locale): **390×844 da 6086 px a 3150 px**; **1440×900 da 4657 px a 2194 px**. Nessuno scroll orizzontale, nessun errore in console.
+- Controlli: tsc, build, vitest (149 file, 1614 test), `test:manifest`, `test:claude-hooks` verdi.
+- Aperto: nei giorni con gara in casa la fascia partner mostra ancora anche il LedwallRotator, quindi due blocchi LED nella stessa pagina; da decidere se tenerne uno solo.

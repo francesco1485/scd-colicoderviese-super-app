@@ -45,6 +45,7 @@ const PUBLIC_HOME_FILES = [
   "src/components/home/PublicHome.tsx",
   "src/components/home/Carousel.tsx",
   "src/components/home/HomePractical.tsx",
+  "src/components/home/HomeMatchday.tsx",
   "src/lib/public-home.ts",
 ] as const;
 
@@ -84,33 +85,50 @@ describe("public home v5", () => {
       );
     }
     const home = code("src/components/home/PublicHome.tsx");
-    // Direzione 13/10 09:03 "calendario settimana deve essere sempre" + UD-116 "Oggi e questa settimana" on top.
-    expect(home).toMatch(/<PublicWeek/);
-    expect(home).toMatch(/nextHomeMatchPerTeam\(/);
-    expect(home).toMatch(
-      /weekMatches\(calendar\.events, calendar\.groups, today, null, 1\)/,
+    // Direzione 13/10 09:03 "calendario settimana deve essere sempre" + UD-132 Matchday: the games of the next 7 days.
+    expect(home).toMatch(/<HomeMatchday calendar=\{calendar\}/);
+    const week = code("src/components/home/HomeMatchday.tsx");
+    expect(week).toMatch(
+      /weekMatches\(calendar\.events, calendar\.groups, today, null\)/,
     );
+    expect(week).toContain('data-testid="home-matchday"');
+    expect(week).toContain("Nessuna gara nei prossimi 7 giorni.");
+    // Opponent crest only from the verified registry: no neutral shield, no invented crest.
+    expect(week).toMatch(/const \{ src, label \} = crestFor\(name\);\s*if \(!src\) return null;/);
+    expect(week).not.toMatch(/OpponentCrest|publicTeamCrest|team-crest/);
+    // Filters are real buttons with aria-pressed.
+    expect(week).toMatch(/<button[\s\S]{0,80}type="button"[\s\S]{0,40}aria-pressed=\{on\}/);
   });
 
-  it("UD-116: practical blocks come first, in the decided order, then the vetrina, news and ONE partner band", () => {
+  it("UD-132: the short Matchday order — week, LED strip, results, join, credentials, ONE partner band", () => {
     const home = code("src/components/home/PublicHome.tsx");
     const body = home.slice(home.indexOf("export function PublicHome"));
     const order = [
       "<UrgentNotices",
       "<ClubNoticeCard",
-      "<PublicWeek",
-      "<QuickActions",
+      "<HomeMatchday",
+      "<SponsorSpotsHome",
       "<WeekendResults",
-      "<DailyTipCard",
-      "<CredentialBar",
-      "<Vetrina worlds",
-      "<HomeNewsBlock",
       "<JoinBanner",
+      "<CredentialBar",
       "<PartnerBand",
     ];
     const at = order.map((t) => body.indexOf(t));
     for (const [i, p] of at.entries()) expect(p, order[i]).toBeGreaterThan(-1);
     expect([...at].sort((x, y) => x - y)).toEqual(at);
+    // Off the public home since UD-132 (components kept for other pages).
+    for (const gone of [
+      "<PublicWeek",
+      "<PublicToday",
+      "<SupportStrip",
+      "<QuickActions",
+      "<DailyTipCard",
+      "<Vetrina ",
+      "<HomeNewsBlock",
+    ])
+      expect(body, gone).not.toContain(gone);
+    expect(home).toMatch(/export function Vetrina\(/);
+    expect(home).toMatch(/export function HomeNewsBlock\(/);
     // The old 11-link quick strip and the big sponsor zone are gone.
     expect(home).not.toMatch(
       /QuickStrip|QUICK_LINKS|SponsorZone|partner-news-empty/,
