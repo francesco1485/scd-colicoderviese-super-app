@@ -2754,6 +2754,47 @@
         ],
         "duplicate_work": "DENY"
       }
+    },
+    {
+      "sourceDate": "2026-10-14",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-112",
+      "name": "PER_PERSON_SECTION_GRANTS_ROLE_IS_DESCRIPTION",
+      "sourceQuoteFragments": [
+        "un ruolo (es. \"Dirigente annata 2015\") è solo una descrizione: non apre nulla in automatico",
+        "ogni nuovo account riceve solo la base: pagine pubbliche, proprio profilo, propria tessera; tutto il resto lo abilita la Direzione",
+        "la Direzione abilita ogni sezione singolarmente per ogni persona, scegliendo livello (Vede / Modifica / Approva) e perimetro (Tutto / sue annate / sua sede / suoi figli / solo sé)",
+        "aiuti facoltativi che non decidono mai da soli: copia abilitazioni da…; proponi in base al ruolo, con spunte suggerite da confermare una per una",
+        "restano sempre i blocchi: dati di salute dei minori, Safeguarding, nessuno modifica il proprio accesso, account del club protetto",
+        "finché non esiste, le richieste di accesso in attesa restano in attesa: non attivare nessuno"
+      ],
+      "context": "Direzione decision of 14/10/2026 relayed to the build session as a verbatim summary; it supersedes any access derived from roles.",
+      "normalizedCommand": {
+        "rule": "Access is a per-person, per-section grant set by the Direzione (level READ/WRITE/APPROVE, perimeter ALL/OWN_TEAMS/OWN_SITE/OWN_CHILDREN/SELF). Roles and positions are descriptions only. Base for every account: public pages, own profile, own card. Helpers (copy from a person, suggestions from the role) only propose; the Direzione confirms.",
+        "scope": "IDENTITY_AND_ACCESS",
+        "constraints": [
+          "minors' health data and Safeguarding are never granted from this system",
+          "nobody edits their own grants; the club account is protected",
+          "a minor receives only the SELF perimeter; sensitive sections need a written reason",
+          "every change audited in scd_access_audit",
+          "pending access requests stay pending until the system is active; nobody is activated",
+          "migration r100 applied only with explicit Direzione approval; no behaviour change before"
+        ],
+        "supersedesInPart": [
+          "UD-064 role-derived extra areas",
+          "UD-087 enabling by role"
+        ],
+        "implementation": {
+          "catalogue": "config/scd-sections.v1.json",
+          "migration": "supabase/migrations/20261014_r100_person_grants.sql (STAGED, NOT APPLIED)",
+          "admin_route": "/direzione/accessi/$personId",
+          "pure_logic": "apps/superapp/src/lib/person-grants.ts",
+          "manifest": "identity_and_access.person_grants, GAP-ACCESS-R100"
+        },
+        "implementationStatus": "IMPLEMENTED_STAGING_MIGRATION_NOT_APPLIED",
+        "duplicate_work": "DENY"
+      }
     }
   ],
   "completionGate": {

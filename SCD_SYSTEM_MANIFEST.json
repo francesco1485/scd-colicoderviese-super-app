@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.34.0",
+    "version": "3.35.0",
     "effective_at": "2026-10-14",
     "status": "BINDING",
     "language": "it-IT",
@@ -668,6 +668,33 @@
     }
   },
   "identity_and_access": {
+    "person_grants": {
+      "directive": "UD-112",
+      "decided_at": "2026-10-14",
+      "authority": "DIREZIONE_SCD",
+      "state": "STAGED_R100_NOT_APPLIED",
+      "supersedes": "Any access derived from roles or positions. A role (e.g. 'Dirigente annata 2015') is only a description and opens nothing automatically.",
+      "base_sections": ["pubblico", "profilo", "tessera"],
+      "rule": "Every account gets only the base sections (public pages, own profile, own card). The Direzione enables each section individually for each person with a level (READ/WRITE/APPROVE = Vede/Modifica/Approva) and a perimeter (ALL/OWN_TEAMS/OWN_SITE/OWN_CHILDREN/SELF = Tutto/sue annate/sua sede/suoi figli/solo sé).",
+      "helpers": {
+        "copy_from_person": "EXPLICIT_DIREZIONE_ACTION_AUDITED",
+        "suggest_from_role": "PROPOSAL_ONLY_CONFIRM_ONE_BY_ONE"
+      },
+      "hard_blocks": ["MINORS_HEALTH_DATA", "SAFEGUARDING", "NO_SELF_EDIT", "CLUB_ACCOUNT_PROTECTED", "MINOR_SELF_PERIMETER_ONLY", "SENSITIVE_NEEDS_REASON"],
+      "catalogue": "config/scd-sections.v1.json",
+      "migration": "supabase/migrations/20261014_r100_person_grants.sql",
+      "table": "scd_person_grants",
+      "check_function": "scd_can",
+      "suggest_function": "scd_suggest_grants",
+      "copy_function": "scd_copy_person_grants",
+      "write_function": "scd_set_person_grants",
+      "audit": "scd_access_audit (GRANT_SECTION, CHANGE_SECTION, REVOKE_SECTION, COPY_GRANTS)",
+      "admin_route": "/direzione/accessi/$personId",
+      "grantee_key": "scd_people.id via scd_identity_links (a login without a linked person keeps the base only)",
+      "direzione_rule": "An active DIRECTION membership opens every section that is not hard-blocked (pending Direzione confirmation).",
+      "activation": "Apply r100 only after explicit Direzione approval. Until then the app keeps today's role-derived guards unchanged; no guard reads scd_can. Switching each existing guard to scd_can is a separate, explicit step.",
+      "pending_requests_policy": "Pending access requests stay pending until this system is active: nobody is activated."
+    },
     "single_account": true,
     "registration_fields": [
       "first_name",
@@ -3769,6 +3796,13 @@
       "statement": "Signed Intake Link Factory is implemented, but final document upload/routing to Google Drive is not yet connected server-side.",
       "required_fix": "Implement authenticated server-side Drive adapter with MIME/size validation, routing, audit persistence and rate limiting; then enable upload flag.",
       "safe_runtime_behavior": "Signed links can be issued and verified; file controls and submission remain disabled."
+    },
+    {
+      "id": "GAP-ACCESS-R100",
+      "severity": "HIGH",
+      "statement": "UD-112 (Direzione 14/10/2026): access must be granted per person and per section, never derived from roles. The catalogue, migration r100 and the admin page /direzione/accessi/$personId exist, but r100 is not applied and the existing work-area guards still open areas from role positions (session.ts ROLE_POSITIONS, areas.ts canSeeArea).",
+      "required_fix": "Direzione approves and applies r100; Direzione grants sections person by person; then each existing guard is switched to scd_can (person-grants.server.ts sectionCheck) with tests, removing role-derived opening.",
+      "safe_runtime_behavior": "Until r100 is applied the page is a simulation (no save, no copy) and nobody's access changes; pending access requests stay pending."
     }
   ],
   "development_contract": {
