@@ -1,7 +1,7 @@
 /**
- * Server side of the simple access (UD-114): registration with password, social sign-in, profile completion for
+ * Server side of the simple access (UD-117): registration with password, social sign-in, profile completion for
  * social accounts, confirmation e-mail resend, enabled providers. Every call uses the caller's own cookies; the
- * database decides what opens (r85 base access; staged r102 automatic checks and office notifications).
+ * database decides what opens (r85 base access; staged r104 automatic checks and office notifications).
  */
 import { createServerFn } from "@tanstack/react-start";
 import { getRequestUrl } from "@tanstack/react-start/server";
@@ -69,8 +69,8 @@ function asDeclaration(d: z.infer<typeof DeclarationInput>): Declaration {
 type Sb = NonNullable<ReturnType<typeof serverSupabase>>;
 
 /**
- * Records the registration in the office queue. Uses `scd_request_access_v2` (staged r102: stores the declaration
- * and runs the automatic checks) and falls back to the live r85 function while r102 is not applied.
+ * Records the registration in the office queue. Uses `scd_request_access_v2` (staged r104: stores the declaration
+ * and runs the automatic checks) and falls back to the live r85 function while r104 is not applied.
  */
 async function recordRequest(
   sb: Sb,
@@ -97,7 +97,7 @@ async function recordRequest(
     p_declared: p.declaration,
   });
   if (!v2.error) return typeof v2.data === "string" ? v2.data : "RECEIVED";
-  // PGRST202 = function not in the schema cache (r102 not applied yet).
+  // PGRST202 = function not in the schema cache (r104 not applied yet).
   if (
     v2.error.code !== "PGRST202" &&
     !/could not find the function/i.test(v2.error.message)

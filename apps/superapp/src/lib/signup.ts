@@ -1,5 +1,5 @@
 /**
- * Simple access (UD-114, Direzione 14/10/2026 16:40): one way in, like the big apps.
+ * Simple access (UD-117, Direzione 14/10/2026 16:40): one way in, like the big apps.
  *
  *   1. Register once: name, surname, birth date, e-mail, phone (mandatory), password, consent; optional "Chi sei nel
  *      club?" (fan, member, parent of…, athlete, coach, club official, staff, volunteer, sponsor).
@@ -66,7 +66,7 @@ export const ROLE_REVIEW_KINDS: readonly DeclarationKind[] = [
   "STAFF",
 ];
 
-/** Declarations the database may verify on its own against the registry (staged migration r102). */
+/** Declarations the database may verify on its own against the registry (staged migration r104). */
 export const AUTO_CHECK_KINDS: readonly DeclarationKind[] = [
   "GENITORE",
   "ATLETA",
@@ -244,7 +244,7 @@ export const SIGNUP_MESSAGE: Readonly<Record<SignupOutcome, string>> = {
     "Registrazione non riuscita, riprova tra poco. Se continua scrivi all'assistenza.",
 };
 
-/** Help desk: one place for every access problem (UD-114). */
+/** Help desk: one place for every access problem (UD-117). */
 export const SUPPORT = {
   email: "sportclubcolico@gmail.com",
   subject: "Assistenza app S.C.D. ColicoDerviese",

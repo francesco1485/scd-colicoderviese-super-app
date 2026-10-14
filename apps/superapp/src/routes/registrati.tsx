@@ -10,7 +10,7 @@ import { EMPTY_DECLARATION, SIGNUP_MESSAGE, SOCIAL_PROVIDERS, supportMailto, val
 import { getAuthProviders, signUpWithPassword, startSocialSignIn } from "@/lib/signup.functions";
 
 /**
- * Registration (UD-114): once, with password and phone. One confirmation e-mail, then always e-mail + password.
+ * Registration (UD-117): once, with password and phone. One confirmation e-mail, then always e-mail + password.
  * Everyone enters the open area at once; "Chi sei nel club?" decides what the club checks next (lib/signup.ts).
  */
 export const Route = createFileRoute("/registrati")({

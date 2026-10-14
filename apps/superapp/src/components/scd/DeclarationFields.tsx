@@ -10,7 +10,7 @@ import {
 } from "@/lib/signup";
 
 /**
- * "Chi sei nel club?" (UD-114): several choices at once (a parent can also be a club official and a member).
+ * "Chi sei nel club?" (UD-117): several choices at once (a parent can also be a club official and a member).
  * Nothing here opens an area by itself: the summary below says what happens next, in plain words.
  */
 export function DeclarationFields({

@@ -12,7 +12,7 @@ import { SOCIAL_PROVIDERS, supportMailto, type SocialProvider } from "@/lib/sign
 import { getAuthProviders, resendSignupEmail, startSocialSignIn } from "@/lib/signup.functions";
 
 /**
- * Sign-in (UD-114, Direzione 14/10/2026): one way in, like the big apps. E-mail + password with "Ricordami", or
+ * Sign-in (UD-117, Direzione 14/10/2026): one way in, like the big apps. E-mail + password with "Ricordami", or
  * Google / Apple / Facebook when the club switches them on. The e-mail code is ONLY for a forgotten password
  * (or an old account that never chose one): it leads straight to "choose a new password".
  */

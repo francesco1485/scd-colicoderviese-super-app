@@ -128,7 +128,7 @@ async function landAfterEmailSignIn(
   next: string,
 ): Promise<ConfirmOutcome> {
   const landing = asked ? next : (await sessionView()).landing;
-  // Google / Apple / Facebook accounts have no password: ask once for phone, birth date and consent (UD-114).
+  // Google / Apple / Facebook accounts have no password: ask once for phone, birth date and consent (UD-117).
   if (isSocialUser(user?.app_metadata)) {
     if (!profileComplete(user?.user_metadata)) {
       return { ok: true, next: `${PROFILE_PAGE}?next=${encodeURIComponent(landing)}`, message: "Sei dentro." };

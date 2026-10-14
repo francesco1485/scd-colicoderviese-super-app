@@ -1,4 +1,4 @@
--- r102: simple access with automatic checks (Direzione 2026-10-14 16:40, UD-114). STAGED: written, NOT applied.
+-- r104: simple access with automatic checks (Direzione 2026-10-14 16:40, UD-117). STAGED: written, NOT applied.
 -- Apply only after the Direzione's explicit OK. Additive only; the live r85 function keeps working untouched.
 --
 -- Decision recorded:

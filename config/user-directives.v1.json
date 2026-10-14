@@ -2800,7 +2800,7 @@
       "sourceDate": "2026-10-14",
       "sourceStatus": "EXPLICIT_USER_COMMAND",
       "authority": "DIREZIONE_SCD",
-      "id": "UD-114",
+      "id": "UD-117",
       "name": "SIMPLE_ACCESS_ONE_WAY_IN_AUTO_VERIFY",
       "sourceQuoteFragments": [
         "Deve esserci un solo modo di ingresso o un modo simile a quello social altrimenti si diventa pazzi",
@@ -2832,7 +2832,7 @@
           "pure_logic": "apps/superapp/src/lib/signup.ts",
           "server": "apps/superapp/src/lib/signup.functions.ts",
           "routes": "/accedi (password-first), /registrati, /accedi/completa",
-          "migration": "supabase/migrations/20261014_r102_simple_access_auto_verify.sql (STAGED, NOT APPLIED)"
+          "migration": "supabase/migrations/20261014_r104_simple_access_auto_verify.sql (STAGED, NOT APPLIED)"
         }
       }
     }

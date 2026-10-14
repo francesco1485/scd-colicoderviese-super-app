@@ -13,7 +13,7 @@ import {
 } from "@/lib/signup.functions";
 
 /**
- * One-time completion for Google / Apple / Facebook accounts (UD-114): phone (mandatory), birth date, consent and
+ * One-time completion for Google / Apple / Facebook accounts (UD-117): phone (mandatory), birth date, consent and
  * "Chi sei nel club?". Same rules as the registration; then the person continues where they were going.
  */
 export const Route = createFileRoute("/accedi/completa")({
