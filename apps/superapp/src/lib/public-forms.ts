@@ -24,9 +24,17 @@ export const PAUSED_COPY: Readonly<Record<FormKind, { title: string; text: strin
   safeguarding: { title: "Segnalazioni safeguarding", text: "Il modulo riservato dell'app non è ancora attivo. Per una segnalazione scrivi alla PEC della società con l'oggetto indicato qui sotto: la legge solo il referente safeguarding.", subject: CLUB_CONTACTS.safeguardingSubject },
 };
 
-export function mailtoFor(kind: FormKind): string {
+/**
+ * mailto link of the official channel. `topic` (e.g. the listino package chosen on /sponsor) is appended to the subject
+ * and `body` prefills the message; both are ignored for safeguarding, whose subject must stay exactly as published.
+ */
+export function mailtoFor(kind: FormKind, extra: { topic?: string | undefined; body?: string | undefined } = {}): string {
   const to = kind === "safeguarding" ? OFFICIAL_CHANNELS.pec : OFFICIAL_CHANNELS.email;
-  return `mailto:${to}?subject=${encodeURIComponent(PAUSED_COPY[kind].subject)}`;
+  const base = PAUSED_COPY[kind].subject;
+  if (kind === "safeguarding") return `mailto:${to}?subject=${encodeURIComponent(base)}`;
+  const subject = extra.topic ? `${base} · ${extra.topic}` : base;
+  const body = extra.body ? `&body=${encodeURIComponent(extra.body)}` : "";
+  return `mailto:${to}?subject=${encodeURIComponent(subject)}${body}`;
 }
 
 export const PAUSED_OUTCOME = {

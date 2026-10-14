@@ -1,14 +1,21 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { BarChart3, Check, HeartHandshake, MonitorSmartphone, Trees } from "lucide-react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { BarChart3, HeartHandshake, MonitorSmartphone, Trees } from "lucide-react";
 import { useState } from "react";
 
 import { LedwallFacsimile } from "@/components/LedwallFacsimile";
 import { PartnerForm } from "@/components/PartnerForm";
+import { PartnerPackages } from "@/components/PartnerPackages";
 import { PageHero, heroOverlapCls } from "@/components/ui-kit";
-import { SPONSOR_ASSETS, SPONSOR_PACKAGES } from "@/lib/catalog";
+import { SPONSOR_ASSETS } from "@/lib/catalog";
 import { romeDay } from "@/lib/public-window";
+import { parsePackageParam } from "@/lib/sponsor-packages";
 
 export const Route = createFileRoute("/sponsor")({
+  // ?pacchetto=<id>: a listino package preselected in the proposal form (only known ids, see sponsor-packages.ts).
+  validateSearch: (s: Record<string, unknown>): { pacchetto?: string | undefined } => {
+    const pacchetto = parsePackageParam(s["pacchetto"]);
+    return pacchetto ? { pacchetto } : {};
+  },
   // Server time and Rome day for the LED wall preview: rendered on the server, reused on hydration (same first slot).
   loader: () => {
     const nowMs = Date.now();
@@ -17,9 +24,9 @@ export const Route = createFileRoute("/sponsor")({
   head: () => ({
     meta: [
       { title: "Diventa Sponsor — Commercial Hub | SCD ColicoDerviese" },
-      { name: "description", content: "Pacchetti Naming Event, Main Partner, Team, Digital, Local e Sponsor Tecnico: porta il tuo brand in campo con la S.C.D. ColicoDerviese." },
+      { name: "description", content: "Listino partner della S.C.D. ColicoDerviese: LED wall a bordo campo, maglia e kit, tornei, digitale e settore giovanile. Prezzi su richiesta." },
       { property: "og:title", content: "Diventa Sponsor della SCD ColicoDerviese" },
-      { property: "og:description", content: "Commercial Hub: pacchetti, asset digitali e fisici, richiesta proposta." },
+      { property: "og:description", content: "Listino partner: cosa comprende ogni pacchetto, chi lo vede, richiesta proposta." },
     ],
   }),
   component: Sponsor,
@@ -27,7 +34,19 @@ export const Route = createFileRoute("/sponsor")({
 
 function Sponsor() {
   const { nowMs, day } = Route.useLoaderData();
-  const [pick, setPick] = useState<string | undefined>();
+  const { pacchetto } = Route.useSearch();
+  const navigate = useNavigate({ from: "/sponsor" });
+  const [pick, setPick] = useState<string | undefined>(pacchetto);
+  /** "Chiedi questo pacchetto": preselect in the form, keep it in the URL (shareable), scroll to the form. */
+  const choose = (id: string) => {
+    setPick(id);
+    void navigate({ search: { pacchetto: id }, replace: true, resetScroll: false });
+    const target = document.getElementById("proposta");
+    if (!target) return;
+    const reduce = typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    target.focus({ preventScroll: true });
+  };
   return (
     <main>
       <PageHero eyebrow="Commercial Hub · Sponsor & Partner" title={<>Il tuo brand, <span className="text-accent">in campo</span> ogni settimana.</>}>
@@ -48,26 +67,9 @@ function Sponsor() {
         ))}
       </section>
 
-      <LedwallFacsimile onRequest={() => setPick("led")} day={day} nowMs={nowMs} />
+      <LedwallFacsimile onRequest={() => setPick("ledwall")} day={day} nowMs={nowMs} />
 
-      <section className="mx-auto mt-14 max-w-6xl px-4">
-        <p className="eyebrow">Pacchetti</p>
-        <h2 className="mt-1 text-3xl font-bold">Scegli il livello di partnership</h2>
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
-          {SPONSOR_PACKAGES.map((p) => (
-            <article key={p.id} className={`flex flex-col rounded-2xl p-5 ${p.tier === "Top" ? "surface-deep shadow-premium" : "card-premium"}`}>
-              <p className="eyebrow">{p.tier}</p>
-              <h3 className="mt-1 text-2xl font-bold">{p.nome}</h3>
-              <p className="mt-2 text-sm opacity-80">{p.pitch}</p>
-              <ul className="mt-4 flex-1 space-y-1.5 text-sm">
-                {p.include.map((i) => <li key={i} className="flex gap-2"><Check className="size-4 text-accent" />{i}</li>)}
-              </ul>
-              <p className="mt-4 text-xs opacity-70">Valore su proposta personalizzata</p>
-              <a href="#proposta" onClick={() => setPick(p.id)} className="surface-sun mt-3 rounded-lg px-4 py-2 text-center text-sm font-bold uppercase">Richiedi proposta</a>
-            </article>
-          ))}
-        </div>
-      </section>
+      <PartnerPackages onChoose={choose} />
 
       <section className="mx-auto mt-14 max-w-6xl px-4">
         <p className="eyebrow">Asset disponibili</p>
@@ -95,12 +97,12 @@ function Sponsor() {
         </div>
       </section>
 
-      <section id="proposta" className="mx-auto mt-14 max-w-4xl scroll-mt-20 px-4">
+      <section id="proposta" tabIndex={-1} aria-labelledby="proposta-title" className="mx-auto mt-14 max-w-4xl scroll-mt-20 px-4 focus:outline-none">
         <p className="eyebrow">Richiedi proposta</p>
-        <h2 className="mt-1 mb-5 text-3xl font-bold">Parliamo del tuo progetto</h2>
+        <h2 id="proposta-title" className="mt-1 mb-5 text-3xl font-bold">Parliamo del tuo progetto</h2>
         <PartnerForm key={pick} tipo="sponsor" preselect={pick} />
         <p className="mt-4 text-sm text-muted-foreground">
-          Sei un fornitore? <Link to="/fornitori" className="font-semibold text-primary underline">Proponi prodotti o servizi alla SCD</Link>
+          Sei un fornitore? <Link to="/fornitori" className="scd-focus inline-flex min-h-11 items-center font-semibold text-primary underline">Proponi prodotti o servizi alla SCD</Link>
         </p>
       </section>
     </main>
