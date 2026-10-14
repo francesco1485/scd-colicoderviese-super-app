@@ -121,7 +121,7 @@ export function CookieConsent() {
           role="dialog"
           aria-labelledby="ck-t"
           aria-describedby="ck-d"
-          data-testid="cookie-banner"
+          data-testid="cookie-banner-consent"
           className="fixed inset-x-3 bottom-[calc(118px+env(safe-area-inset-bottom))] z-[70] mx-auto max-w-[560px] rounded-[18px] border-2 border-[var(--uv-gold)] bg-white p-4 text-[var(--scd-ink)] shadow-[0_18px_50px_rgb(0_0_0/0.5)] lg:bottom-[62px]"
         >
           <div className="flex items-center justify-between gap-2">
@@ -141,18 +141,9 @@ export function CookieConsent() {
             id="ck-d"
             className="mb-3 mt-[6px] text-[14px] leading-[1.4] text-[var(--scd-sub)]"
           >
-            {OPTIONAL_TOOLS_ACTIVE ? (
-              <>Usiamo cookie tecnici per far funzionare l'app. Con il tuo consenso usiamo anche statistiche e strumenti di misura delle campagne. Nelle aree riservate e nei profili dei minori non usiamo mai cookie di marketing.</>
-            ) : (
-              <>Usiamo solo cookie tecnici, necessari per l'accesso e per ricordare le tue scelte. Nessuna statistica, nessuna pubblicità. </>
-            )}
+            Usiamo cookie tecnici per far funzionare l'app. Con il tuo consenso usiamo anche statistiche e strumenti di misura delle campagne. Nelle aree riservate e nei profili dei minori non usiamo mai cookie di marketing.{" "}
             <a href="/privacy" className="font-semibold text-[var(--scd-blue)] underline">Informativa privacy</a>
           </p>
-          {!OPTIONAL_TOOLS_ACTIVE ? (
-            <button type="button" onClick={() => save(false, false)} className="min-h-12 w-full rounded-[12px] bg-[var(--uv-night)] text-[15px] font-extrabold text-white" data-testid="cookie-ok">
-              Ho capito
-            </button>
-          ) : (
           <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
@@ -180,7 +171,6 @@ export function CookieConsent() {
               Personalizza
             </button>
           </div>
-          )}
         </div>
       )}
       {prefs && (
