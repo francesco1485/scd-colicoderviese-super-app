@@ -3131,6 +3131,37 @@
       "normalizedCommand": {
         "rule": "The Club House chef face is named Garrison; the tournaments mentor face is named Enea. Crovi stays the app mascot: image only (greets once per visit on public pages and points to Vera's chat), never a separate chat. The sponsor face name is still to be decided."
       }
+    },
+    {
+      "sourceDate": "2026-10-14",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-123",
+      "name": "PULMINI_2D_SEAT_PLAN_AND_GIRO_UNDER_TRAININGS",
+      "sourceQuoteFragments": [
+        "sotto gli allenamenti una pianta 2D di ogni pulmino come i campi e gli spogliatoi, con chi c'è dentro",
+        "3-4 pulmini; per ognuno chi sale e chi scende e dove",
+        "genitori, dirigenti e mister dell'annata interessata (riservato)"
+      ],
+      "context": "Richiesta della Direzione, 14/10/2026 11:00. Verified on Drive 14/10: 3 Fiat Ducato M1, 9 posti = 1 autista + 8; layout 'davanti 1 autista + 2 | centro 3 | dietro 3' (indicazione del club 10/10/2026). Master Flotta: plates/seats/expiries DA CONFERMARE; database: 4 vehicles BUS-01..04 without seats, 61 riders with stops and line, 17 stops, 6 drivers, no rider assigned to a vehicle, no runs.",
+      "normalizedCommand": {
+        "rule": "Under the trainings (/allenamenti for the Pulmini work-area audience, and /pulmini under the weekly trainings) each van has a 2D top view in the pitch/changing-room style: driver seat + numbered passenger seats; tapping a seat shows first name + surname initial, age group, where the rider gets on (andata) and off (ritorno) with the planned time when present. A 'Giro' tab per line lists the ordered stops with who gets on and off. Contacts of parents/guardians, mister, dirigente and transport manager stay a locked placeholder until a permission-checked server function exists.",
+        "scope": "INTERNAL_AREA_PULMINI",
+        "constraints": [
+          "seats only from the Master: van written for the rider AND a fixed seat; a van without seat is 'posto non fissato'; no van is 'da collocare'; never inferred from the line",
+          "seat map from the Master seats; the verified Ducato 9-seat layout only as labelled 'disposizione indicativa' while seats are DA CONFERMARE",
+          "amends UD-108 'no stops of a single child': a rider's stop is shown ONLY as one of the registered stops of the line (11 TRATTE FERMATE), never the free text of the Master (it may be a home address); same reserved audience",
+          "times only from the Master; alerts (over capacity, no stop, no vehicle, licence and vehicle expiries) only from data that exists",
+          "minors: first name + surname initial, never phones; no new tables, roles, migrations or Supabase writes"
+        ],
+        "status": "IMPLEMENTED_BRANCH_AGENT_PULMINI2D",
+        "delivered": [
+          "apps/superapp/src/lib/van-plan.ts (+ van-plan.test.tsx)",
+          "apps/superapp/src/components/scd/VanPlan2D.tsx",
+          "apps/superapp/src/lib/pulmini-vans.ts, pulmini-vans.functions.ts (assigned van, fixed seat, registered stops)",
+          "apps/superapp/src/routes/pulmini.tsx, routes/allenamenti.tsx"
+        ]
+      }
     }
   ],
   "completionGate": {
