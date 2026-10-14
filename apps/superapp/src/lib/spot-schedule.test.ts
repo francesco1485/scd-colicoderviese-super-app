@@ -4,7 +4,9 @@ import { SPONSOR_SPOTS, spotsForLedwall, type SponsorSpot } from "./sponsor-spot
 import {
   SPOT_SLOT_MS,
   chooseVideoFormat,
+  ledAirings,
   ledOnAir,
+  nextAirings,
   loopSeconds,
   onAirAt,
   passesPerHour,
@@ -98,5 +100,26 @@ describe("spot schedule (one clock for player, home and regia)", () => {
     expect(b.slot).toBe(a.slot + 1);
     expect(b.slot % 2).not.toBe(a.slot % 2);
     expect(onAirAt([], T0).slot).toBe(a.slot);
+  });
+
+  it("lists when one spot goes on air next, every full loop, within the same day", () => {
+    // 10:00:25 → slot of "b" (started 10:00:20); "a" comes back at 10:01:00, then every 60 s.
+    const now = T0 + 25_000;
+    expect(nextAirings(list, "a", now, 3).map(romeClock)).toEqual(["10:01:00", "10:02:00", "10:03:00"]);
+    expect(nextAirings(list, "b", now, 2).map(romeClock)).toEqual(["10:00:20", "10:01:20"]);
+    expect(nextAirings(list, "zzz", now, 3)).toEqual([]);
+    expect(nextAirings([], "a", now, 3)).toEqual([]);
+  });
+
+  it("never lists airings after Rome midnight (the next day has another order)", () => {
+    const lateNight = Date.parse("2026-10-14T21:59:30Z"); // 23:59:30 in Rome
+    const at = nextAirings(list, "a", lateNight, 10);
+    expect(at.length).toBeLessThanOrEqual(1);
+    for (const ms of at) expect(romeClock(ms) < "24").toBe(true);
+  });
+
+  it("puts every showable LED spot on air at least once per loop", () => {
+    const shown = spotsForLedwall();
+    for (const s of shown) expect(ledAirings(s.slug, T0, 1)).toHaveLength(1);
   });
 });

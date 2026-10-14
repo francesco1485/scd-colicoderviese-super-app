@@ -85,6 +85,38 @@ export function upcomingSlots<T extends { slug: string }>(air: OnAir<T>, nowMs: 
   return out;
 }
 
+/**
+ * Next start instants of one spot (for the sponsor's own review page): the slots of the same Rome day in which `slug`
+ * is on air, from the current slot on. Empty when the spot is not in rotation. Never crosses midnight, because the
+ * order of the next day is different (the loop restarts at Rome midnight).
+ */
+export function nextAirings<T extends { slug: string }>(
+  list: readonly T[],
+  slug: string,
+  nowMs: number,
+  count: number,
+  order?: (l: readonly T[], day: string) => T[],
+): number[] {
+  const air = onAirAt(list, nowMs, order);
+  const n = air.order.length;
+  const idx = air.order.findIndex((s) => s.slug === slug);
+  if (n === 0 || idx < 0 || air.index < 0 || count <= 0) return [];
+  const start = nowMs - air.elapsedMs;
+  const first = (idx - air.index + n) % n;
+  const out: number[] = [];
+  for (let j = 0; j < count; j++) {
+    const at = start + (first + j * n) * SPOT_SLOT_MS;
+    if (romeDay(at) !== air.day) break;
+    out.push(at);
+  }
+  return out;
+}
+
+/** LED wall airings of one spot (showable spots, order of the Rome day). */
+export function ledAirings(slug: string, nowMs: number, count: number, spots: readonly SponsorSpot[] = spotsForLedwall()): number[] {
+  return nextAirings(spots, slug, nowMs, count, spotsInDayOrder);
+}
+
 /** Rome clock time of an instant, HH:MM:SS. */
 export function romeClock(ms: number): string {
   return new Intl.DateTimeFormat("it-IT", { timeZone: "Europe/Rome", hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23" }).format(new Date(ms));

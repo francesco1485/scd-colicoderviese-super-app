@@ -4,9 +4,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { PartnerForm, type PartnerFormPreset } from "@/components/PartnerForm";
 import { SpotStage, SpotStatusBadge } from "@/components/SponsorSpots";
-import { LED_MASTER, type SponsorSpot } from "@/lib/sponsor-spots";
-import { spotVideoFile } from "@/lib/spot-schedule";
-import { useVideoFormat } from "@/lib/use-spot-clock";
+import { LED_MASTER, isShowable, spotsForLedwall, type SponsorSpot } from "@/lib/sponsor-spots";
+import { SPOT_SLOT_MS, ledAirings, ledOnAir, passesPerHour, romeClock, spotVideoFile } from "@/lib/spot-schedule";
+import { useNow, useVideoFormat } from "@/lib/use-spot-clock";
 import {
   MODIFICHE_MAX,
   SPOT_ANSWER_AFTER_MAIL,
@@ -183,6 +183,7 @@ function SpotFacts({ spot }: { spot: SponsorSpot }) {
           {spotAirNote(spot)}
         </p>
       </section>
+      {isShowable(spot) && <SpotOnAir spot={spot} />}
       <section aria-labelledby="spot-where-t" className="scd-card grid gap-2.5 p-4">
         <h2 id="spot-where-t" className="m-0 text-[17px] font-bold">
           Dove si vede
@@ -339,6 +340,50 @@ function SpotAnswer({ spot }: { spot: SponsorSpot }) {
           </div>
         )}
       </div>
+    </section>
+  );
+}
+
+/**
+ * When this spot is on the LED wall today, from the same clock as the player (lib/spot-schedule.ts). Calculated from
+ * the palinsesto only: passes per hour of LED switched on and seconds of visibility. The audience is never estimated.
+ */
+function SpotOnAir({ spot }: { spot: SponsorSpot }) {
+  const now = useNow(1000);
+  if (now === 0) return null;
+  const spots = spotsForLedwall();
+  const air = ledOnAir(now, spots);
+  const onAirNow = air.current?.slug === spot.slug;
+  const upcoming = ledAirings(spot.slug, now, 4).filter((at) => at > now);
+  const later = onAirNow ? upcoming.slice(0, 3) : upcoming.slice(1, 3);
+  const perHour = passesPerHour(spots.length);
+  const seconds = (perHour * SPOT_SLOT_MS) / 1000;
+  return (
+    <section aria-labelledby="spot-onair-t" className="scd-card grid gap-2.5 p-4" data-testid="spot-review-onair">
+      <h2 id="spot-onair-t" className="m-0 text-[17px] font-bold">
+        Quando va in onda
+      </h2>
+      <p className="m-0 text-[14.5px] font-semibold leading-snug" role="status" aria-live="polite">
+        {onAirNow ? "In onda adesso sul LED wall." : upcoming.length > 0 ? `Prossimo passaggio alle ${romeClock(upcoming[0]!)}.` : "Oggi il giro è finito: riparte a mezzanotte."}
+      </p>
+      {later.length > 0 && (
+        <p className="m-0 text-[13.5px] text-[#4a5d7a]">
+          {onAirNow ? "Prossimi passaggi" : "Poi"} alle {later.map((at) => romeClock(at)).join(", ")}.
+        </p>
+      )}
+      <dl className="m-0 grid grid-cols-2 gap-2">
+        <div className="rounded-xl bg-[#e9f2fb] p-3">
+          <dt className="text-[12.5px] font-semibold text-[#4a5d7a]">Passaggi per ogni ora di LED acceso</dt>
+          <dd className="m-0 text-[22px] font-bold tabular-nums">{perHour}</dd>
+        </div>
+        <div className="rounded-xl bg-[#e9f2fb] p-3">
+          <dt className="text-[12.5px] font-semibold text-[#4a5d7a]">Secondi in onda per ogni ora</dt>
+          <dd className="m-0 text-[22px] font-bold tabular-nums">{seconds}</dd>
+        </div>
+      </dl>
+      <p className="m-0 text-[12.5px] leading-snug text-[#4a5d7a]">
+        Calcolati dal palinsesto: {spots.length} spot da {SPOT_SLOT_MS / 1000} secondi a rotazione. Il pubblico non è stimato.
+      </p>
     </section>
   );
 }
