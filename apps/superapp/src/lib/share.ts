@@ -103,9 +103,10 @@ export const SHARE_PAGES = {
   },
   lotteria: {
     path: "/eventi/lotteria-dello-sport",
-    title: "Lotteria dello sport — S.C.D. ColicoDerviese",
-    description: "Lotteria dello sport della S.C.D. ColicoDerviese: iniziativa benefica, tutti i dettagli in questa pagina.",
-    shareText: "Lotteria dello sport della ColicoDerviese, iniziativa benefica: qui tutti i dettagli.",
+    // UD-132: kept internal — neutral wording until Francesco decides to publish it.
+    title: "Iniziativa in preparazione — S.C.D. ColicoDerviese",
+    description: "La S.C.D. ColicoDerviese pubblicherà qui i dettagli quando saranno pronti.",
+    shareText: "Un'iniziativa della ColicoDerviese in preparazione.",
     image: CREST_SHARE_IMAGE,
   },
   tornei: {

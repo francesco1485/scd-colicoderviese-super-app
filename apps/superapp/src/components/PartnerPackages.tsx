@@ -12,8 +12,8 @@ import {
 
 /**
  * Listino partner on /sponsor (item C1). Hierarchy, not a wall of equal cards:
- * the LED wall is the main package (wide, deep surface), three packages follow in a row, the tribune seat is a slim line
- * that links to /sostieni. Every price is "in approvazione" until the Direzione approves it (sponsor-packages.ts).
+ * the LED wall is the main package (wide, deep surface), three packages follow in a row; packages with a link (none while
+ * the tribune seat is internal, UD-132) render as slim lines. Every price is "in approvazione" until the Direzione approves it (sponsor-packages.ts).
  * "Chiedi questo pacchetto" calls `onChoose(id)`: the page preselects it in the #proposta form and scrolls there.
  */
 

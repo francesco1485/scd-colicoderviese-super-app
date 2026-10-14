@@ -1,5 +1,6 @@
 /**
- * "Adotta un seggiolino" on /sostieni (C2, UD-113): the story, the seat map of the new tribune and the CTA that opens the
+ * "Adotta un seggiolino" (C2, UD-113) — kept INTERNAL by UD-132: /sostieni renders it only when
+ * INTERNAL_ONLY.seatAdoption is false. The story, the seat map of the new tribune and the CTA that opens the
  * existing pledge dialog. Seat states come only from the catalogue item's units (real pledge data via getGivingPublic);
  * with no data every seat is free and the count says "0 di 60". No amount while TRIBUNE_SEAT_AMOUNT is null.
  */

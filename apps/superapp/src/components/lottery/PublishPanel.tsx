@@ -1,5 +1,6 @@
 import { Eye, EyeOff, Globe } from "lucide-react";
 
+import { INTERNAL_ONLY } from "@/lib/internal-initiatives";
 import { Card, Chip } from "@/components/scd/interior-ui";
 import {
   publicWindow,
@@ -40,7 +41,11 @@ export function PublishPanel({
       <Card
         id="lot-publish"
         title="8 · Pagina pubblica"
-        sub={`Pronta ma non collegata dalla home: compare su ${PUBLIC_PATH} e in Eventi solo dopo che la Direzione la pubblica. Nessuna vendita online, nessun pagamento in app.`}
+        sub={
+          INTERNAL_ONLY.lottery
+            ? `Per ora resta interna (UD-132): ${PUBLIC_PATH} risponde "in preparazione" anche se la pubblichi qui, e non compare in Eventi né in home. Nessuna vendita online, nessun pagamento in app.`
+            : `Pronta ma non collegata dalla home: compare su ${PUBLIC_PATH} e in Eventi solo dopo che la Direzione la pubblica. Nessuna vendita online, nessun pagamento in app.`
+        }
         aside={
           published ? (
             <Chip tone="ok">Pubblica dal {shortDay(state.publishedOn)}</Chip>
