@@ -6,13 +6,14 @@ import { chooseVideoFormat, type VideoFormat } from "./spot-schedule";
  * Current time, refreshed every `tickMs` on the client. Starts from `initialMs` (server time from the loader, or 0)
  * so the first client render matches the server render; the clock takes over right after mount.
  */
-export function useNow(tickMs = 1000, initialMs = 0): number {
+export function useNow(tickMs = 1000, initialMs = 0, enabled = true): number {
   const [now, setNow] = useState(initialMs);
   useEffect(() => {
     setNow(Date.now());
+    if (!enabled) return;
     const t = window.setInterval(() => setNow(Date.now()), tickMs);
     return () => window.clearInterval(t);
-  }, [tickMs]);
+  }, [tickMs, enabled]);
   return now;
 }
 

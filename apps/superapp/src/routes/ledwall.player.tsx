@@ -75,8 +75,6 @@ function LedwallPlayer() {
   const a = useRef<HTMLVideoElement>(null);
   const b = useRef<HTMLVideoElement>(null);
   const refs = useMemo(() => [a, b] as const, []);
-  const [active, setActive] = useState<0 | 1>(0);
-  const lastIndex = useRef<string>("");
 
   useWakeLock();
 
@@ -97,19 +95,14 @@ function LedwallPlayer() {
 
   const air = useMemo(() => ledOnAir(now || Date.parse(`${serverDay}T12:00:00Z`)), [now, serverDay]);
   const n = air.order.length;
-  const slotKey = `${air.day}#${air.index}`;
+  // The element of the current slot is picked by the parity of the absolute slot number, in the same render as the
+  // slot change: the element that preloaded the next spot becomes the active one without reloading.
+  const active = (air.slot % 2) as 0 | 1;
   const sources: [string | undefined, string | undefined] = [undefined, undefined];
   if (air.current) {
     sources[active] = spotVideoFile(air.current.master, format);
     sources[active === 0 ? 1 : 0] = air.next ? spotVideoFile(air.next.master, format) : undefined;
   }
-
-  // Slot change: the preloaded element becomes the active one.
-  useEffect(() => {
-    if (!now) return;
-    if (lastIndex.current && lastIndex.current !== slotKey) setActive((x) => (x === 0 ? 1 : 0));
-    lastIndex.current = slotKey;
-  }, [slotKey, now]);
 
   // Keep the active element playing at the clock position (re-seek only when it drifts more than a second).
   useEffect(() => {

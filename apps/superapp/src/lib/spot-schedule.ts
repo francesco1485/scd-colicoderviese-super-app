@@ -8,6 +8,8 @@
  *   - slot length: the master length (LED_MASTER.seconds, 20 s);
  *   - slot at an instant: floor(ms since Rome midnight / slot) mod number of spots.
  * Passes per hour are CALCULATED from the slot length and the number of spots (never measured audiences).
+ * The loop restarts at Rome midnight (a day has 4320 slots, not a multiple of every spot count) and jumps with the
+ * daylight-saving change: both are expected and identical on every screen.
  */
 import { msIntoRomeDay, slotIndexAt } from "./ledwall-rotation";
 import { romeDay } from "./public-window";
@@ -28,6 +30,8 @@ export interface OnAir<T> {
   elapsedMs: number;
   /** Milliseconds to the next spot. */
   remainingMs: number;
+  /** Absolute slot number of the day (never wraps inside the day): its parity picks the player's video element. */
+  slot: number;
 }
 
 /** Spot on air at an instant, for a given list (already filtered by the caller). */
@@ -35,8 +39,9 @@ export function onAirAt<T extends { slug: string }>(list: readonly T[], nowMs: n
   const day = romeDay(nowMs);
   const sorted = order ? order(list, day) : [...list];
   const n = sorted.length;
-  if (n === 0) return { day, order: sorted, index: -1, current: null, next: null, elapsedMs: 0, remainingMs: SPOT_SLOT_MS };
   const into = msIntoRomeDay(nowMs);
+  const slot = Math.floor(Math.max(0, into) / SPOT_SLOT_MS);
+  if (n === 0) return { day, order: sorted, index: -1, current: null, next: null, elapsedMs: 0, remainingMs: SPOT_SLOT_MS, slot };
   const index = slotIndexAt(n, into, SPOT_SLOT_MS);
   const elapsedMs = ((into % SPOT_SLOT_MS) + SPOT_SLOT_MS) % SPOT_SLOT_MS;
   return {
@@ -47,6 +52,7 @@ export function onAirAt<T extends { slug: string }>(list: readonly T[], nowMs: n
     next: sorted[(index + 1) % n] ?? null,
     elapsedMs,
     remainingMs: SPOT_SLOT_MS - elapsedMs,
+    slot,
   };
 }
 

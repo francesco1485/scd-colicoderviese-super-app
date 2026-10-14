@@ -32,7 +32,7 @@ Copia estesa: documento di progetto claude.ai `claude/SCD_DIVISIONE_COMPITI.md`.
 
 Regole:
 1. **Numerazione riservata** — chat CLOUD: direttive `UD-130…UD-149`, migrazioni `r110…r129`; chat PC: `UD-150…UD-169`, `r130…r149`. Già usati: PC UD-117, UD-120, r104, r105; CLOUD UD-119, UD-121, UD-122, r101, r102, r103, r106. UD-118 non va riusato.
-2. **Pubblicazione** — solo con il "pubblica" di Francesco. Prima: `git fetch`, unire `origin/staging/superapp` nel proprio ramo, controlli verdi (tsc, build, vitest, `test:manifest`, `test:claude-hooks`), push solo in avanti su `staging/superapp`, deploy Render. File condivisi (`config/user-directives.v1.json`, manifest, `apps/superapp/docs/RELEASE2_LOG.md`, `routeTree.gen.ts`) si uniscono, mai si sovrascrivono.
+2. **Pubblicazione** — Francesco 14/10/2026 19:53: "Pubblica sempre" = approvazione permanente per il lavoro che passa tutti i controlli (esclusi: migrazioni da applicare, ruoli/permessi/accessi, pagamenti, tesseramenti, presenze, documenti sensibili, safeguarding). Prima: `git fetch`, unire `origin/staging/superapp` nel proprio ramo, controlli verdi (tsc, build, vitest, `test:manifest`, `test:claude-hooks`), **revisione indipendente: agenti `scd-revisore` e `scd-sicurezza` sul diff `origin/staging/superapp..HEAD`, entrambi `ESITO: PASS`** (un BLOCK ferma la pubblicazione), push solo in avanti su `staging/superapp`, deploy Render, controllo del sito live (pagine cambiate a 390 e 1440 px, nessun errore). File condivisi (`config/user-directives.v1.json`, manifest, `apps/superapp/docs/RELEASE2_LOG.md`, `routeTree.gen.ts`) si uniscono, mai si sovrascrivono.
 3. **Posta senza doppioni** — Make (chat PC) legge e registra; l'agente Claude "Presidio posta" (chat CLOUD) fa solo etichette Gmail e proposte nella coda dell'app. Nessuno dei due invia mail.
 4. **Richieste all'altra chat** — si scrivono nella sezione 5 di `claude/SCD_DIVISIONE_COMPITI.md`; l'area la modifica solo la chat proprietaria.
 
@@ -212,3 +212,17 @@ Comandi interni: `/credits`, `/freefirst`, `/nonprofit`, `/trialgate`, `/toolsco
 - `PreToolUse Bash` → blocca force push, push su main/production, merge di PR, `reset --hard`, `clean -f`, `commit --no-verify`; prima di ogni commit esegue `test:manifest` e cerca IBAN, codici fiscali, chiavi e token nelle modifiche in stage.
 - `PreToolUse Write/Edit` → blocca file `.env`, export di fogli di calcolo fuori da `apps/*/src/data` e `tests/fixtures`, file di credenziali e contenuti con dati sensibili.
 Gli hook non sostituiscono i gate: li rendono obbligatori.
+
+## SCD:TEAM — AGENTI DI SVILUPPO (ECC + SCD)
+
+Installati il 14/10/2026 su richiesta di Francesco ("Istalla e fai tutto … anche a tutte le chat presenti e future"). Valgono per ogni sessione Claude Code su questo repository (chat cloud, chat PC, attività programmate).
+
+Sequenza per ogni lavoro non banale:
+1. **Pianifica** — `ecc-planner` (passi, rischi, file) dopo SCD:STATE/EXPERT.
+2. **Architettura** — `ecc-architect` / `ecc-code-explorer` per capire l'esistente prima di sostituirlo.
+3. **Costruisci** — chat o agente di lavoro in worktree; `ecc-build-error-resolver` / `ecc-react-build-resolver` se la build si rompe; `ecc-tdd-guide` per la logica nuova.
+4. **Metti in sicurezza** — `scd-sicurezza` (obbligatorio) + `ecc-security-reviewer` per codice server/Supabase.
+5. **Testa e rivedi** — `scd-revisore` (obbligatorio) + `ecc-typescript-reviewer` / `ecc-react-reviewer` / `ecc-a11y-architect` / `ecc-performance-optimizer` quando servono; `ecc-e2e-runner` per i percorsi critici.
+6. **Pubblica** — solo con entrambi i PASS (sezione SCD:SESSIONI punto 2).
+
+Skill ECC disponibili con prefisso `ecc-` (elenco in `.claude/skills/THIRD_PARTY.md`). Non installati di proposito: hook, script, installer e configurazioni MCP di ECC (eseguirebbero codice di terzi a ogni chiamata e si scontrerebbero con `.claude/settings.json`). In caso di conflitto valgono sempre le regole SCD di questo file.

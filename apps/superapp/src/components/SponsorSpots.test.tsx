@@ -34,6 +34,8 @@ describe("sponsor LED spots in the UI (UD-119)", () => {
     expect(ui).toContain('aria-label={userPaused ? "Riprendi gli spot" : "Metti in pausa gli spot"}');
     expect(ui).toContain("ledOnAir(");
     expect(ui).toContain("Torna alla diretta");
+    expect(ui).toContain("useNow(1000, 0, visible && following)");
+    expect(ui).toContain("freeze()");
   });
 
   it("gestionale vetrina: inside the existing /crm sponsor tab (no parallel CRM), status badge, flow, note on the register", () => {
@@ -56,6 +58,8 @@ describe("sponsor LED spots in the UI (UD-119)", () => {
     expect(player).toContain('"noindex, nofollow"');
     expect(player).toContain("ledOnAir(");
     expect(player).toContain("useVideoFormat");
+    expect(player).toContain("air.slot % 2");
+    expect(player).not.toContain("setActive");
     expect(player).toContain(".master");
     expect(player).not.toContain(".preview");
     expect(player).toContain('wl.request("screen")');

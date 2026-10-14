@@ -163,15 +163,17 @@ const ctrl =
 export function SponsorSpotsHome({ day, className = "" }: { day: string; className?: string }) {
   // Clock-synced with the LED wall player and the gestionale regia (lib/spot-schedule.ts). Before mount the order of
   // the server day is used, so server and first client render match.
-  const now = useNow(1000);
-  const air = useMemo(() => ledOnAir(now || Date.parse(`${day}T12:00:00Z`)), [now, day]);
-  const spots = air.order;
-  const n = spots.length;
   const { ref, visible, seen } = useOnScreen<HTMLElement>();
-  /** null = follow the LED wall clock; a number = the visitor moved by hand. */
+  /** null = follow the LED wall clock; a number = the visitor moved by hand (or paused, or started a spot). */
   const [manualIdx, setManualIdx] = useState<number | null>(null);
   const [auto, setAuto] = useState(false);
   const [userPaused, setUserPaused] = useState(false);
+  const following = auto && !userPaused && manualIdx === null;
+  // The clock ticks only while the block is on screen and following the live board (no re-render otherwise).
+  const now = useNow(1000, 0, visible && following);
+  const air = useMemo(() => ledOnAir(now || Date.parse(`${day}T12:00:00Z`)), [now, day]);
+  const spots = air.order;
+  const n = spots.length;
   const [manualPlay, setManualPlay] = useState(false);
   const [announce, setAnnounce] = useState("");
 
@@ -185,8 +187,9 @@ export function SponsorSpotsHome({ day, className = "" }: { day: string; classNa
     return () => mq.removeEventListener?.("change", onChange);
   }, []);
 
-  const following = auto && !userPaused && manualIdx === null;
+  // Not following (reduced motion, paused, by hand): the spot stays where it is, never changes by itself.
   const idx = manualIdx ?? Math.max(0, air.index);
+  const freeze = () => setManualIdx((m) => m ?? idx);
 
   const go = useCallback(
     (delta: number) => {
@@ -224,7 +227,10 @@ export function SponsorSpotsHome({ day, className = "" }: { day: string; classNa
             {!auto && !manualPlay && (
               <button
                 type="button"
-                onClick={() => setManualPlay(true)}
+                onClick={() => {
+                  freeze();
+                  setManualPlay(true);
+                }}
                 className="scd-focus absolute bottom-3 left-3 inline-flex min-h-11 items-center gap-2 rounded-full bg-[#ffd600] py-2 pl-3 pr-4 text-[14px] font-bold text-[#0b1e3a] shadow-[0_10px_30px_-8px_rgb(2_20_51/0.6)]"
                 data-testid="spot-play"
               >
@@ -286,7 +292,10 @@ export function SponsorSpotsHome({ day, className = "" }: { day: string; classNa
               <button
                 type="button"
                 className={ctrl}
-                onClick={() => setUserPaused((p) => !p)}
+                onClick={() => {
+                  if (!userPaused) freeze();
+                  setUserPaused((p) => !p);
+                }}
                 aria-pressed={userPaused}
                 aria-label={userPaused ? "Riprendi gli spot" : "Metti in pausa gli spot"}
                 data-testid="spot-pause"
@@ -394,7 +403,7 @@ function SpotReviewLinks({ spot }: { spot: SponsorSpot }) {
     <div className="grid gap-1.5 rounded-lg border border-dashed border-[var(--in-line)] p-2.5" data-testid="crm-spot-review">
       <span className="text-[12.5px] font-bold uppercase tracking-[0.06em] text-[var(--in-sub)]">Per l'azienda</span>
       <div className="flex flex-wrap gap-1.5">
-        <a href={spotReviewPath(spot.slug)} target="_blank" rel="noopener" className={btn} data-testid="crm-spot-review-link">
+        <a href={spotReviewPath(spot.slug)} target="_blank" rel="noopener noreferrer" className={btn} data-testid="crm-spot-review-link">
           <FileCheck2 className="size-4" aria-hidden="true" /> Pagina per l'azienda
           <span className="sr-only">di {spot.sponsorName} (si apre in una nuova scheda)</span>
         </a>
@@ -473,6 +482,10 @@ function mmss(totalSeconds: number): string {
 export function SpotRegia({ spots = SPONSOR_SPOTS }: { spots?: readonly SponsorSpot[] }) {
   const now = useNow(1000);
   const format = useVideoFormat();
+  const [motionOk, setMotionOk] = useState(false);
+  useEffect(() => {
+    if (typeof window !== "undefined") setMotionOk(mayAnimate(window));
+  }, []);
   const showable = useMemo(() => spotsForLedwall(spots), [spots]);
   const air = useMemo(() => (now ? ledOnAir(now, showable) : null), [now, showable]);
   const excluded = spots.length - showable.length;
@@ -486,8 +499,8 @@ export function SpotRegia({ spots = SPONSOR_SPOTS }: { spots?: readonly SponsorS
     const v = videoRef.current;
     if (!v) return;
     v.muted = true;
-    v.play().catch(() => undefined);
-  }, [air?.current?.slug, format]);
+    if (motionOk) v.play().catch(() => undefined);
+  }, [air?.current?.slug, format, motionOk]);
 
   const onMeta = () => {
     const v = videoRef.current;
@@ -514,7 +527,7 @@ export function SpotRegia({ spots = SPONSOR_SPOTS }: { spots?: readonly SponsorS
         <a
           href="/ledwall/player"
           target="_blank"
-          rel="noopener"
+          rel="noopener noreferrer"
           className="scd-focus inline-flex min-h-10 items-center gap-1.5 rounded-[9px] bg-[#ffd600] px-3 text-[13.5px] font-bold text-[#0b1e3a]"
           data-testid="crm-regia-player"
         >
@@ -530,7 +543,8 @@ export function SpotRegia({ spots = SPONSOR_SPOTS }: { spots?: readonly SponsorS
             onLoadedMetadata={onMeta}
             muted
             playsInline
-            autoPlay
+            autoPlay={motionOk}
+            controls={!motionOk}
             preload="auto"
             width={LED_MASTER.width}
             height={LED_MASTER.height}
@@ -604,7 +618,7 @@ export function SpotLedVetrina({ spots = SPONSOR_SPOTS }: { spots?: readonly Spo
         <a
           href="/ledwall/player"
           target="_blank"
-          rel="noopener"
+          rel="noopener noreferrer"
           className="scd-focus inline-flex min-h-10 items-center gap-1.5 rounded-md text-[14px] font-semibold text-[var(--in-info)]"
           data-testid="crm-spot-player"
         >

@@ -1,6 +1,6 @@
 # Agenti SCD
 
-Tredici agenti di ruolo per la S.C.D. ColicoDerviese. Si chiamano in chat: "usa l'agente scd-tesoreria per la chiusura di settembre", "chiedi a scd-bandi i bandi in scadenza".
+Diciotto agenti di ruolo SCD più la squadra di sviluppo ECC per la S.C.D. ColicoDerviese. Si chiamano in chat: "usa l'agente scd-tesoreria per la chiusura di settembre", "chiedi a scd-bandi i bandi in scadenza".
 
 | Agente | Cosa fa |
 | --- | --- |
@@ -17,5 +17,14 @@ Tredici agenti di ruolo per la S.C.D. ColicoDerviese. Si chiamano in chat: "usa 
 | scd-atleti | Rose, convocabilità, certificati, presa visione delle convocazioni |
 | scd-azioni | Coordina gli altri agenti su un obiettivo e riporta lo stato |
 | scd-stratega | Priorità della settimana, rischi, decisioni da prendere |
+| scd-avatar | Crea e ambienta avatar e personaggi 2D e 3D (sintetici, mai volti reali senza consenso) |
+| scd-regista | Il regista del gestionale: cosa fare oggi, in che ordine, chi lo fa, cosa prepara subito Claude |
+| scd-maestro | Maestro e ricercatore in tutte le materie, dalla scuola all'università alla filosofia, con fonti |
+| scd-revisore | Rilegge ogni modifica prima che vada online (PASS o BLOCK) |
+| scd-sicurezza | Controlla segreti, dati personali, minori e sicurezza prima di pubblicare (PASS o BLOCK) |
+
+## Squadra di sviluppo ECC (cartella `ecc/`)
+
+Agenti della raccolta open source Everything Claude Code (MIT), con prefisso `ecc-`: pianificatore, architetto, revisori (codice, TypeScript, React, database, sicurezza), tester end-to-end, chi ripara la build, ottimizzatore delle prestazioni, accessibilità, cacciatore di errori silenziosi, semplificatore, documentazione, SEO e marketing. Ordine di lavoro in AGENTS.md, sezione SCD:TEAM.
 
 Regole: nessun agente invia, pubblica, paga o cambia ruoli, permessi, tesseramenti, presenze, documenti sensibili o tutela dei minori; preparano bozze e proposte, decide la Direzione. Lavorano dentro una sessione o in un'attività programmata: nessuno gira da solo 24 ore su 24.

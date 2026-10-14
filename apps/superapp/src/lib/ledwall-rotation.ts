@@ -146,15 +146,17 @@ export function ledwallSequence(
 }
 
 /** Milliseconds elapsed since 00:00 of the Rome day of an instant (summer/winter time handled by Intl). */
+let romeClockFormat: Intl.DateTimeFormat | null = null;
 export function msIntoRomeDay(nowMs: number): number {
   if (!Number.isFinite(nowMs)) return 0;
-  const parts = new Intl.DateTimeFormat("en-GB", {
+  romeClockFormat ??= new Intl.DateTimeFormat("en-GB", {
     timeZone: "Europe/Rome",
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
     hourCycle: "h23",
-  }).formatToParts(new Date(nowMs));
+  });
+  const parts = romeClockFormat.formatToParts(new Date(nowMs));
   const get = (t: string) => Number(parts.find((p) => p.type === t)?.value ?? 0);
   const ms = ((nowMs % 1000) + 1000) % 1000;
   return ((get("hour") * 60 + get("minute")) * 60 + get("second")) * 1000 + ms;

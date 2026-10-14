@@ -91,4 +91,12 @@ describe("spot schedule (one clock for player, home and regia)", () => {
     expect(chooseVideoFormat({ canPlayType: (t) => (t.includes("webm") ? "probably" : "") })).toBe("webm");
     expect(chooseVideoFormat(null)).toBe("mp4");
   });
+
+  it("gives an absolute slot number whose parity alternates at every change (player double buffer)", () => {
+    const a = onAirAt(list, T0 + 19_000);
+    const b = onAirAt(list, T0 + 20_000);
+    expect(b.slot).toBe(a.slot + 1);
+    expect(b.slot % 2).not.toBe(a.slot % 2);
+    expect(onAirAt([], T0).slot).toBe(a.slot);
+  });
 });
