@@ -32,6 +32,8 @@ import { getPulminiVans } from "@/lib/pulmini-vans.functions";
 import type { VanId, VanPlan } from "@/lib/pulmini-vans";
 import { SlotVans, VanDetailPanel, VanLines } from "@/components/scd/PulminiVans";
 import { Dialog } from "@/components/scd/Dialog";
+import { VanPlan2D } from "@/components/scd/VanPlan2D";
+import { fleetFromBoard } from "@/lib/van-plan";
 
 /** Pulmini (board Pulmini.dc.html): away trips of the coming weekend and the Master Flotta facts. */
 export const Route = createFileRoute("/pulmini")({
@@ -85,6 +87,7 @@ function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf
   const [trainDay, setTrainDay] = useState(() => defaultDay(quadroDays, now.date));
   const trainSlots = useMemo(() => quadroSlots.filter((s) => s.day === trainDay).sort((a, b) => a.start - b.start), [quadroSlots, trainDay]);
   const todayKey = weekdayKey(now.date);
+  const fleet = useMemo(() => fleetFromBoard(board), [board]);
   const weekendLabel = `sabato ${Number(sat.slice(8))} e domenica ${Number(sun.slice(8))}`;
 
   return (
@@ -163,6 +166,13 @@ function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf
                 );
               })}
             </ol>
+          )}
+          {vanPlan && (
+            <section className="border-t border-[var(--in-line)] px-4 py-4 sm:px-[18px]" aria-labelledby="pul-2d" id="pul-pianta">
+              <h3 id="pul-2d" className="m-0 text-[17px] font-bold">I pulmini visti dall'alto · {trainDay.charAt(0) + trainDay.slice(1).toLowerCase()}</h3>
+              <p className="m-0 mb-3 mt-0.5 text-[14px] leading-snug text-[var(--in-sub)]">Come i campi e gli spogliatoi: chi siede dove, e nel giro chi sale e chi scende a ogni fermata.</p>
+              <VanPlan2D plan={vanPlan} fleet={fleet} day={trainDay} today={now.date} />
+            </section>
           )}
           <SourceLine>
             Fasce dal quadro settimanale; ragazzi, linee e giorni dal Master Pulmini{vanPlan?.asOf ? ` (copia del ${vanPlan.asOf.split("-").reverse().join("/")})` : runsAsOf ? ` (dato al ${runsAsOf.split("-").reverse().join("/")})` : ""}. Un ragazzo va sul pulmino scritto nel Master, altrimenti su quello della sua linea; la linea LAGO/LECCO resta da dividere tra Pulmino 1 e 2.{vanPlan && vanPlan.mode !== "locked" ? ` Collocati ${vanPlan.counts.placed} su ${vanPlan.counts.active} iscritti attivi.` : ""}

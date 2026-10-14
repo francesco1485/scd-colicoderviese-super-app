@@ -483,3 +483,15 @@ prossimi impegni e "ci sarò" in primo piano). Desktop invariato.
 - QA: tsc, build, vitest 1505, test:manifest, test:claude-hooks; Playwright 390×844 della home con `?crovi`: saluto visibile, nessun errore.
 
 - Nota 14/10 sera: rinumerazioni per collisione con l'altra sessione (accesso classico pubblicato): registro spot r105 → **r106**; direttiva nomi/mascotte UD-120 → **UD-122**; personaggi semplificati UD-118 → **UD-121**. UD-120 = accesso classico (altra sessione).
+
+## C7 — Pulmini in 2D sotto gli allenamenti · 2026-10-14
+
+Richiesta della Direzione (14/10/2026 11:00), registrata come **UD-130**: sotto gli allenamenti una pianta 2D di ogni pulmino come campi e spogliatoi, con chi c'è dentro, chi sale e chi scende e dove; contatti di genitori, dirigenti e mister riservati.
+
+- `src/lib/van-plan.ts` (+ `van-plan.test.tsx`, 23 test): pianta Fiat Ducato 9 posti (D autista, 1-2 davanti, 3-5 centro, 6-8 dietro); `seatsFor` usa i posti del Master Flotta, altrimenti la disposizione verificata del club **solo come "disposizione indicativa"**; posti assegnati **solo** con pulmino scritto nel Master + posto fisso (pulmino senza posto = "posto non fissato", senza pulmino = "da collocare"); giro per linea con fermate in ordine, ▲ chi sale (andata) e ▼ chi scende (ritorno), orari solo se nel Master; avvisi: oltre i posti, ragazzi senza fermata, senza pulmino, scadenze mezzi e patenti solo da date esistenti.
+- `pulmini-vans.ts` / `.functions.ts`: ogni ragazzo porta pulmino assegnato (solo da MEZZO del Master), posto fisso e fermate **solo come fermate registrate della linea**: il testo libero del Master (può essere un indirizzo) non esce mai dal server.
+- `components/scd/VanPlan2D.tsx`: vista dall'alto (contorno blu notte, sfondo chiaro, giallo per l'evidenza), tocca un posto → nome e iniziale, annata, sale a / scende a con orario; scheda "Giro di …"; stato vuoto con i numeri reali ("Assegna i ragazzi ai pulmini nel Master Flotta: oggi 0 su 61 assegnati"); contatti: segnaposto bloccato "Contatti riservati… (sezione pulmini-contatti)", nessun dato richiesto (non esiste una funzione server con permessi per i contatti dei genitori).
+- Posizionato in /pulmini sotto gli allenamenti della settimana e in /allenamenti solo per chi apre l'area Pulmini (stessa funzione server `getPulminiVans`).
+- Nessuna tabella, migrazione, scrittura Supabase, ruolo o permesso nuovo.
+- QA: tsc, build, vitest 1553, test:manifest, test:claude-hooks; Playwright 390×844 e 1440×900 su build locale in anteprima (piano bloccato) e su dati di prova con nomi inventati; nessun errore, nessuno scroll orizzontale. Screenshot in `/tmp/claude-0/qa/pulmini2d/`.
+- Da completare nel Master Pulmini/Flotta: pulmino (MEZZO) per ognuno dei 61 ragazzi, posto fisso se deciso, posti/targa/scadenze dei mezzi, orari delle fermate, divisione della linea LAGO/LECCO tra Pulmino 1 e 2, autisti per corsa. Per mostrare fermate e posto accanto ai nomi serve un aggiornamento (da approvare) di `scd_transport_rider_roster` che restituisca anche fermata andata/ritorno e posto.

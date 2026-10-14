@@ -121,6 +121,8 @@ describe("internal badges · never on public pages", () => {
       "components/scd/InteriorShell.tsx",
       "components/scd/InternalBadge.tsx",
       "components/scd/PulminiVans.tsx",
+      // VanPlan2D renders only for the Pulmini work-area audience (getPulminiVans), on /pulmini and /allenamenti (members only).
+      "components/scd/VanPlan2D.tsx",
       "components/scd/work-area-ui.tsx",
       "lib/internal-badges.ts",
       "lib/pulmini-vans.ts",

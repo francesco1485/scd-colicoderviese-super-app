@@ -8,7 +8,8 @@
  *   3. names come only from scd_transport_rider_roster (migration r99), which repeats the same check.
  * Any missing link gives the plan without names (counts by team) or the locked plan (preview / not allowed).
  * Names are formatted here (RIDER_NAME_FORMAT) and nothing else of the child leaves the server: no Master code,
- * no phone, no parent, no stop, no note. Nothing is logged.
+ * no phone, no parent, no note. Stop texts are read only to match one of the line's REGISTERED stops (UD-130,
+ * Direzione 14/10/2026 "chi sale e scende e dove"): the free text never leaves. Nothing is logged.
  */
 import { createServerFn } from "@tanstack/react-start";
 
@@ -63,10 +64,10 @@ export function vansFromSources({ gate, board, roster, slots }: VansSources): Va
   const r = obj(roster);
   // Allowlist: only these keys of a rider are read; anything else the database might send is dropped here.
   const rosterRiders: RawRider[] = r && r["canSeeNames"] === true
-    ? records(r["riders"]).map((x) => ({ teamGroup: x["teamGroup"], serviceStatus: x["serviceStatus"], line: x["line"], vehicle: x["vehicle"], days: x["days"], firstName: x["firstName"], lastName: x["lastName"] }))
+    ? records(r["riders"]).map((x) => ({ teamGroup: x["teamGroup"], serviceStatus: x["serviceStatus"], line: x["line"], vehicle: x["vehicle"], days: x["days"], firstName: x["firstName"], lastName: x["lastName"], stopOut: x["stopOut"], stopBack: x["stopBack"], seat: x["seat"] }))
     : [];
   const named = rosterRiders.some((x) => typeof x.firstName === "string" && x.firstName.trim() !== "");
-  const riders: RawRider[] = named ? rosterRiders : records(b["riders"]).map((x) => ({ teamGroup: x["teamGroup"], serviceStatus: x["serviceStatus"], line: x["line"], days: x["days"] }));
+  const riders: RawRider[] = named ? rosterRiders : records(b["riders"]).map((x) => ({ teamGroup: x["teamGroup"], serviceStatus: x["serviceStatus"], line: x["line"], days: x["days"], stopOut: x["stopOut"], stopBack: x["stopBack"] }));
   return buildVanPlan({ riders, withNames: named, stops, slots, asOf, lineCounts: PULMINI_DEMAND.byLine, namesNote: named ? null : NAMES_NOT_COPIED_NOTE });
 }
 

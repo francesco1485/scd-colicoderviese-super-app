@@ -12,6 +12,10 @@ import { getStaffEmails, getStaffRoster } from "@/lib/staff-roster.functions";
 import { getSession } from "@/lib/auth.functions";
 import { PeoplePins } from "@/components/scd/PeoplePins";
 import planimetria from "@/assets/scd/planimetria_colico.webp.asset.json";
+import { VanPlan2D } from "@/components/scd/VanPlan2D";
+import { getPulminiVans } from "@/lib/pulmini-vans.functions";
+import { getTransportBoard } from "@/lib/transport.functions";
+import { fleetFromBoard } from "@/lib/van-plan";
 
 /*
  * Training board, members only (UD-100, Direzione 13/10/2026: "Le squadre sono dentro non fuori"). The loader asks
@@ -28,8 +32,10 @@ export const Route = createFileRoute("/allenamenti")({
   loader: async ({ location }) => {
     const session = await getSession();
     if (!session.user) throw redirect({ to: "/accedi", search: { next: location.href } });
-    const [roster, emails, training] = await Promise.all([getStaffRoster(), getStaffEmails(), getTrainingQuadro()]);
-    return { ...training.quadro, people: roster.people, emails };
+    // Vans in 2D: getPulminiVans answers only to the Pulmini work area (staff); everyone else gets null and nothing.
+    const [roster, emails, training, vans] = await Promise.all([getStaffRoster(), getStaffEmails(), getTrainingQuadro(), getPulminiVans()]);
+    const transport = vans ? await getTransportBoard() : null;
+    return { ...training.quadro, people: roster.people, emails, vans, board: transport?.board ?? null };
   },
   head: () => ({
     meta: [
@@ -46,7 +52,8 @@ const SHORT: Record<string, string> = { "LUNEDÌ": "Lun", "MARTEDÌ": "Mar", "ME
 const nice = (d: string) => d.charAt(0) + d.slice(1).toLowerCase();
 
 function Allenamenti() {
-  const { days, slots, rotations, note, people, emails } = Route.useLoaderData();
+  const { days, slots, rotations, note, people, emails, vans, board } = Route.useLoaderData();
+  const fleet = useMemo(() => fleetFromBoard(board), [board]);
   const now = useRomeNow();
   const [day, setDay] = useState(days[0] ?? "");
   const chosen = useRef(false);
@@ -188,6 +195,17 @@ function Allenamenti() {
                 <SlotCard key={s.timeLabel + s.start} slot={s} state={states[i] ?? "later"} zones1={pitchZones(rotations, day, week, s.start, "C1")} zones2={pitchZones(rotations, day, week, s.start, "C2")} people={peopleOnPitch(people, [s.fields.C1, s.fields.C2])} emails={emails} />
               ))}
             </ol>
+          )}
+
+          {vans && (
+            <section className="mt-6 overflow-hidden rounded-[18px] bg-white p-4 text-[var(--scd-ink)] shadow-[0_14px_28px_rgb(0_10_40/0.28)]" aria-labelledby="all-pulmini" data-testid="allenamenti-pulmini">
+              <h2 id="all-pulmini" className="font-uv text-[26px] uppercase leading-none text-[var(--in-ink)]">Pulmini di {nice(day)}</h2>
+              <p className="mb-3 mt-1 text-[14px] leading-snug text-[var(--in-sub)]">Riservato al personale dei trasporti. Chi siede dove e, nel giro, chi sale e chi scende a ogni fermata.</p>
+              <VanPlan2D plan={vans} fleet={fleet} day={day} today={now.date} />
+              <Link to="/pulmini" hash="pul-pianta" className="mt-3 inline-flex min-h-[44px] items-center text-[14.5px] font-bold text-[var(--in-info)] underline">
+                Apri l'area Pulmini
+              </Link>
+            </section>
           )}
         </div>
 

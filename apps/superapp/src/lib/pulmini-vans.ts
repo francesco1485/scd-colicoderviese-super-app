@@ -185,7 +185,18 @@ export interface PlanRider {
   /** Provisional / to formalise riders are flagged; inactive riders never reach the plan. */
   provisional: boolean;
   days: Record<WeekdayCode, { out: RideFlag; back: RideFlag }>;
+  /** Van written in the Master for this rider (MEZZO / PULMINO column) — never inferred from the line. */
+  assigned: VanId | null;
+  /** Fixed seat written in the Master ("1".."8"), when present. */
+  seat: string | null;
+  /** Where the rider gets on (andata) / off (ritorno): ONLY a registered stop of the van's route, never free text. */
+  up: RouteStop | null;
+  down: RouteStop | null;
+  /** ok = stop found on the route; missing = no stop in the Master; unmatched = text not among the route's stops. */
+  stopIssue: { out: StopIssue; back: StopIssue };
 }
+
+export type StopIssue = "ok" | "missing" | "unmatched";
 
 /** Shape read from the database (scd_transport_board riders or scd_transport_rider_roster). Extra keys are ignored. */
 export interface RawRider {
@@ -196,6 +207,11 @@ export interface RawRider {
   days?: unknown;
   firstName?: unknown;
   lastName?: unknown;
+  /** Stop text of the Master: read only to match a registered stop; the text itself never leaves. */
+  stopOut?: unknown;
+  stopBack?: unknown;
+  /** Fixed seat of the Master, when the copy carries it. */
+  seat?: unknown;
 }
 
 function str(v: unknown, max = 80): string | null {
@@ -337,6 +353,40 @@ export function vanRoute(unit: VanUnit, stops: readonly RawStop[] | null): VanRo
   return { stops: [], source: "none", note: "Percorso non ancora nel Master né nella tavola linee." };
 }
 
+function stopKey(v: string): string {
+  return v
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toUpperCase()
+    .replace(/[^A-Z0-9]+/g, " ")
+    .trim();
+}
+
+const hasWord = (hay: string, needle: string) => needle !== "" && ` ${hay} `.includes(` ${needle} `);
+
+/**
+ * Matches the stop text of a rider to ONE registered stop of the route. Exact "town place" or place first,
+ * then the town alone when only one stop of the route is in that town. Anything else is "unmatched":
+ * the raw text (it may be a home address) is never returned.
+ */
+export function matchStop(text: unknown, stops: readonly RouteStop[]): { stop: RouteStop | null; issue: StopIssue } {
+  const t = typeof text === "string" ? stopKey(text) : "";
+  if (!t || t === "DA DEFINIRE" || t === "DA CONFERMARE" || t === "NO") return { stop: null, issue: "missing" };
+  const keyed = stops.map((s) => ({ s, town: stopKey(s.town), place: s.place ? stopKey(s.place) : "" }));
+  const exact = keyed.filter((k) => t === `${k.town} ${k.place}`.trim() || (k.place !== "" && t === k.place));
+  if (exact.length === 1) return { stop: exact[0]!.s, issue: "ok" };
+  const both = keyed.filter((k) => hasWord(t, k.town) && k.place !== "" && hasWord(t, k.place));
+  if (both.length === 1) return { stop: both[0]!.s, issue: "ok" };
+  const town = keyed.filter((k) => hasWord(t, k.town));
+  if (town.length === 1) return { stop: town[0]!.s, issue: "ok" };
+  return { stop: null, issue: "unmatched" };
+}
+
+function seatOf(v: unknown): string | null {
+  const t = typeof v === "number" && Number.isInteger(v) ? String(v) : typeof v === "string" ? v.trim() : "";
+  return /^[1-9]\d?$/.test(t) ? t : null;
+}
+
 export interface BuildInput {
   /** Riders as read from the database; null when this session may not read them. */
   riders: readonly RawRider[] | null;
@@ -379,6 +429,7 @@ export function buildVanPlan(input: BuildInput): VanPlan {
   const mode: PlanMode = input.riders === null ? "locked" : input.withNames ? "names" : "no-names";
   type Placed = { rider: PlanRider; teamKeys: string[]; placement: Placement };
   const placed: Placed[] = [];
+  const routes = new Map<VanId, VanRoute>(VAN_UNITS.map((u) => [u.id, vanRoute(u, input.stops)]));
   let i = 0;
   for (const r of input.riders ?? []) {
     if (isInactive(r.serviceStatus)) continue;
@@ -387,6 +438,10 @@ export function buildVanPlan(input: BuildInput): VanPlan {
     const days = Object.fromEntries(WEEKDAY_CODES.map((d) => [d, { out: rideFlag(daysRaw[`${d}_A`]), back: rideFlag(daysRaw[`${d}_R`]) }])) as PlanRider["days"];
     const status = (str(r.serviceStatus) ?? "").toUpperCase();
     i += 1;
+    const placement = placeRider(str(r.vehicle, 20), str(r.line));
+    const routeStops = placement.van ? routes.get(placement.van)!.stops : [];
+    const up = matchStop(r.stopOut, routeStops);
+    const down = matchStop(r.stopBack, routeStops);
     placed.push({
       rider: {
         key: `r${i}`,
@@ -394,9 +449,14 @@ export function buildVanPlan(input: BuildInput): VanPlan {
         team,
         provisional: status !== "" && status !== "ATTIVO",
         days,
+        assigned: placement.van !== null && placement.by === "vehicle" ? placement.van : null,
+        seat: placement.van !== null && placement.by === "vehicle" ? seatOf(r.seat) : null,
+        up: up.stop,
+        down: down.stop,
+        stopIssue: { out: up.issue, back: down.issue },
       },
       teamKeys: teamKeys(team),
-      placement: placeRider(str(r.vehicle, 20), str(r.line)),
+      placement,
     });
   }
 
@@ -428,7 +488,7 @@ export function buildVanPlan(input: BuildInput): VanPlan {
     badge: unit.badge,
     destination: DESTINATION_COLICO,
     seats: VAN_PASSENGER_SEATS,
-    route: vanRoute(unit, input.stops),
+    route: routes.get(unit.id)!,
     regulars: placed
       .filter((p) => p.placement.van === unit.id && WEEKDAY_CODES.some((d) => p.rider.days[d].out !== "no" || p.rider.days[d].back !== "no"))
       .map((p) => p.rider)
