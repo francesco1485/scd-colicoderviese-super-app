@@ -3,14 +3,20 @@ import { Mail, ShieldAlert } from "lucide-react";
 import { OFFICIAL_CHANNELS, PAUSED_COPY, mailtoFor, type FormKind } from "@/lib/public-forms";
 
 /** Shown instead of a public form while its channel is not live: official e-mail and PEC, nothing is sent. */
-export function FormsPausedNotice({ kind }: { kind: FormKind }) {
+export function FormsPausedNotice({ kind, topic, body }: { kind: FormKind; topic?: string | undefined; body?: string | undefined }) {
   const c = PAUSED_COPY[kind];
+  const withTopic = kind !== "safeguarding" && topic;
   return (
     <section className="grid gap-3 rounded-2xl border border-border bg-card p-6" aria-labelledby={`paused-${kind}`} data-testid="forms-paused">
       <h2 id={`paused-${kind}`} className="m-0 text-[20px] font-bold">{c.title}</h2>
       <p className="m-0 text-[15.5px] leading-relaxed">{c.text}</p>
+      {withTopic && (
+        <p className="m-0 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-[15px]" role="status" data-testid="forms-paused-topic">
+          Hai scelto: <b>{topic}</b>. L'e-mail parte già con questo oggetto.
+        </p>
+      )}
       <div className="flex flex-wrap items-center gap-3">
-        <a href={mailtoFor(kind)} className="inline-flex h-12 items-center gap-2 rounded-[10px] bg-[var(--scd-blue)] px-4 text-[16px] font-semibold text-white">
+        <a href={mailtoFor(kind, withTopic ? { topic, body } : {})} className="inline-flex h-12 items-center gap-2 rounded-[10px] bg-[var(--scd-blue)] px-4 text-[16px] font-semibold text-white">
           <Mail className="size-5" aria-hidden="true" />
           {kind === "safeguarding" ? "Scrivi alla PEC riservata" : "Scrivi alla società"}
         </a>
