@@ -115,21 +115,27 @@ export const getMyFamilyForFund = createServerFn({ method: "GET" }).handler(asyn
 });
 
 /**
- * Training-board shortcuts (Direzione 14/10): only the first name and birth year of the caller's minor children leave
- * the server — no surname, team code, registration status or certificate date.
+ * Training-board shortcuts (Direzione 14/10): only the first name of the caller's minor children and the board word
+ * that really has sessions (year or category) leave the server — no surname, team code, registration status or
+ * certificate date.
  */
 export const getMyTrainingKids = createServerFn({ method: "GET" }).handler(async (): Promise<{ state: ScopedState; kids: TrainingKid[] }> => {
   const c = await scope();
   if (c.state !== "ok") return { state: c.state, kids: [] };
   const { data, error } = await c.sb.rpc("scd_my_family", { p_organization_id: c.org.organizationId });
   if (error) return { state: "error", kids: [] };
+  const { loadQuadro } = await import("./quadro-data.server");
   return {
     state: "ok",
-    kids: trainingKids(((data ?? []) as FamilyDbRow[]).map((m) => ({
-      displayName: m.display_name,
-      birthYear: m.birth_year,
-      minor: m.is_minor,
-      relationship: m.relationship,
-    }))),
+    kids: trainingKids(
+      ((data ?? []) as FamilyDbRow[]).map((m) => ({
+        displayName: m.display_name,
+        birthYear: m.birth_year,
+        minor: m.is_minor,
+        relationship: m.relationship,
+        teamCodes: m.team_codes ?? [],
+      })),
+      loadQuadro().slots,
+    ),
   };
 });

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { loadQuadro } from "./quadro-data.server";
+import { findSessions } from "./public-snapshots";
 import { defaultDay, isFree, minutesOf, pitchZones, slotEnd, slotStates, trainingKids, weekdayKey } from "./training-view";
 
 const q = loadQuadro();
@@ -53,28 +54,33 @@ describe("training view", () => {
 });
 
 describe("trainingKids", () => {
-  const m = (displayName: string, birthYear: number | null, minor: boolean | null, relationship = "FIGLIO") => ({ displayName, birthYear, minor, relationship });
+  const m = (displayName: string, birthYear: number | null, minor: boolean | null, relationship = "FIGLIO", teamCodes: string[] = []) => ({ displayName, birthYear, minor, relationship, teamCodes });
 
-  it("keeps minor children with a birth year, first name only, youngest last", () => {
-    expect(trainingKids([m("Luca Rossi", 2014, true), m("Anna Rossi", 2011, true)])).toEqual([
-      { firstName: "Anna", birthYear: 2011 },
-      { firstName: "Luca", birthYear: 2014 },
-    ]);
+  it("uses the birth year when the board names it", () => {
+    expect(trainingKids([m("Anna Rossi", 2015, true)], q.slots)).toEqual([{ firstName: "Anna", key: "2015" }]);
   });
 
-  it("drops parents, adults, unknown years and duplicates", () => {
-    expect(trainingKids([
+  it("falls back to the team category, never guessing U13=2014 or similar", () => {
+    const out = trainingKids([m("Marco Rossi", 2011, true, "FIGLIO", ["u16"])], q.slots);
+    expect(out).toEqual([{ firstName: "Marco", key: "U16" }]);
+    expect(findSessions(q.slots, "U16").length).toBeGreaterThan(0);
+  });
+
+  it("a child whose year and team are not on the board gets no key (no empty week)", () => {
+    const out = trainingKids([m("Luca Rossi", 2014, true, "FIGLIO", ["2014"])], q.slots);
+    expect(out).toHaveLength(1);
+    if (out[0]!.key !== null) expect(findSessions(q.slots, out[0]!.key).length).toBeGreaterThan(0);
+  });
+
+  it("drops parents, adults and duplicates and never exposes surname or team code", () => {
+    const out = trainingKids([
       m("Maria Rossi", 1980, false, "MADRE"),
       m("Paolo Rossi", 1978, true, "PADRE"),
       m("Gianni Rossi", 2005, false),
-      m("Sara Rossi", null, true),
-      m("Luca Rossi", 2014, true),
-      m("Luca  Rossi", 2014, true),
-    ])).toEqual([{ firstName: "Luca", birthYear: 2014 }]);
-  });
-
-  it("never exposes the surname", () => {
-    const out = trainingKids([m("Luca Rossi Bianchi", 2014, true)]);
-    expect(JSON.stringify(out)).not.toMatch(/Rossi|Bianchi/);
+      m("Anna Rossi Bianchi", 2015, true, "FIGLIO", ["u16"]),
+      m("Anna  Rossi", 2015, true),
+    ], q.slots);
+    expect(out).toEqual([{ firstName: "Anna", key: "2015" }]);
+    expect(JSON.stringify(out)).not.toMatch(/Rossi|Bianchi|u16/);
   });
 });

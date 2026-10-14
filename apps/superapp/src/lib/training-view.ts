@@ -2,7 +2,7 @@
  * View helpers for the public training board (/allenamenti).
  * Pure functions over the quadro snapshot: no data is invented, unknown stays empty.
  */
-import { appliesToWeek, type TrainingRotation, type TrainingSlot } from "./public-snapshots";
+import { appliesToWeek, findSessions, type TrainingRotation, type TrainingSlot } from "./public-snapshots";
 
 const WEEKDAYS = ["DOMENICA", "LUNEDÌ", "MARTEDÌ", "MERCOLEDÌ", "GIOVEDÌ", "VENERDÌ", "SABATO"] as const;
 
@@ -92,29 +92,50 @@ export function isFree(text: string | undefined): boolean {
   return t === "" || t === "—";
 }
 
-/** A child of the signed-in family, reduced to what the training board needs: first name and birth year. */
+/** A child of the signed-in family on the training board: first name and the verified board key (null = not on it). */
 export interface TrainingKid {
   firstName: string;
-  birthYear: number;
+  key: string | null;
 }
+
+/** Board words for a team code; the key is accepted only if it really appears in Campo 1/Campo 2 (no U13=2014 guess). */
+const TEAM_CODE_KEYS: Readonly<Record<string, readonly string[]>> = {
+  prima: ["Prima Squadra"],
+  u19: ["Juniores", "U19"],
+  u18: ["U18"],
+  u16: ["U16"],
+  u15: ["U15"],
+  pulcini: ["Pulcini"],
+  primicalci: ["Primi Calci"],
+  piccoliamici: ["Piccoli Amici"],
+};
+
+type KidSource = { displayName: string; birthYear: number | null; minor: boolean | null; relationship: string; teamCodes: readonly string[] };
 
 /**
  * Children of the caller's family for the "I tuoi ragazzi" shortcuts on /allenamenti (Direzione 14/10: the parent must
- * reach "the training of this week" in one tap). Only minors with a known birth year; the first name only, never the
- * surname; one chip per child, sorted youngest last, at most 6.
+ * reach "the training of this week" in one tap). Minor children only (FIGLIO/FIGLIA or an unlabelled family member
+ * flagged minor), first name only. The key is the birth year or the team category, whichever really has sessions on
+ * the board; otherwise null, and the page says the annata is not written on the board instead of showing an empty week.
+ * Team codes never leave the server: only the matched board word does.
  */
-export function trainingKids(members: ReadonlyArray<{ displayName: string; birthYear: number | null; minor: boolean | null; relationship: string }>): TrainingKid[] {
+export function trainingKids(members: ReadonlyArray<KidSource>, slots: TrainingSlot[]): TrainingKid[] {
   const seen = new Set<string>();
-  const out: TrainingKid[] = [];
+  const out: Array<TrainingKid & { order: number }> = [];
   for (const m of members) {
-    if (m.minor !== true || m.birthYear === null || !Number.isInteger(m.birthYear)) continue;
-    if (!/^(figlio|figlia|minore)$/i.test(m.relationship.trim())) continue;
+    if (m.minor !== true) continue;
+    if (!/^(figlio|figlia|minore|family)$/i.test(m.relationship.trim())) continue;
     const firstName = m.displayName.trim().split(/\s+/)[0] ?? "";
     if (!firstName || firstName === "Nome") continue;
-    const key = `${firstName.toLowerCase()}|${m.birthYear}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    out.push({ firstName, birthYear: m.birthYear });
+    const candidates = [
+      ...(m.birthYear !== null && Number.isInteger(m.birthYear) ? [String(m.birthYear)] : []),
+      ...m.teamCodes.flatMap((c) => (/^\d{4}$/.test(c) ? [c] : TEAM_CODE_KEYS[c.toLowerCase()] ?? [])),
+    ];
+    const key = candidates.find((k) => findSessions(slots, k).length > 0) ?? null;
+    const id = `${firstName.toLowerCase()}|${m.birthYear ?? ""}`;
+    if (seen.has(id)) continue;
+    seen.add(id);
+    out.push({ firstName, key, order: m.birthYear ?? 9999 });
   }
-  return out.sort((a, b) => a.birthYear - b.birthYear).slice(0, 6);
+  return out.sort((a, b) => a.order - b.order).slice(0, 6).map(({ firstName, key }) => ({ firstName, key }));
 }

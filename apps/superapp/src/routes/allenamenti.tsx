@@ -70,9 +70,10 @@ function Allenamenti() {
   // One child in the family and no search yet: open straight on that child's week (one tap less for parents).
   const autoKid = useRef(false);
   useEffect(() => {
-    if (autoKid.current || search.annata !== undefined || kids.length !== 1) return;
+    const only = kids.length === 1 ? kids[0]!.key : null;
+    if (autoKid.current || search.annata !== undefined || !only) return;
     autoKid.current = true;
-    navigate({ search: { annata: String(kids[0]!.birthYear) }, replace: true, resetScroll: false });
+    navigate({ search: { annata: only }, replace: true, resetScroll: false });
   }, [kids, search.annata, navigate]);
 
   // Open on today's training day (Rome time) unless the visitor already picked one.
@@ -151,20 +152,23 @@ function Allenamenti() {
       {kids.length > 0 && (
         <nav aria-label="I tuoi ragazzi" className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-2 px-4 pt-4 lg:px-6" data-testid="allenamenti-kids">
           <span className="text-[13px] font-bold uppercase tracking-[0.06em] text-[var(--uv-gold)]">I tuoi ragazzi</span>
-          {kids.map((k) => {
-            const on = query === String(k.birthYear);
-            return (
+          {kids.map((k) =>
+            k.key ? (
               <button
-                key={`${k.firstName}-${k.birthYear}`}
+                key={`${k.firstName}-${k.key}`}
                 type="button"
-                onClick={() => setQ(on ? "" : String(k.birthYear))}
-                aria-pressed={on}
-                className={`h-[40px] rounded-full px-4 text-[14.5px] font-bold ${on ? "bg-[var(--uv-gold)] text-[var(--uv-night)]" : "bg-white/10 text-white"}`}
+                onClick={() => setQ(query === k.key ? "" : (k.key ?? ""))}
+                aria-pressed={query === k.key}
+                className={`h-[40px] rounded-full px-4 text-[14.5px] font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--uv-gold)] ${query === k.key ? "bg-[var(--uv-gold)] text-[var(--uv-night)]" : "bg-white/10 text-white"}`}
               >
-                {k.firstName} · {k.birthYear}
+                {k.firstName} · {k.key}
               </button>
-            );
-          })}
+            ) : (
+              <span key={`${k.firstName}-none`} className="rounded-full border border-white/20 px-4 py-2 text-[14px] text-[#cfe0ff]">
+                {k.firstName}: la sua annata non è scritta nel quadro, chiedi al mister
+              </span>
+            ),
+          )}
         </nav>
       )}
 
