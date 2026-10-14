@@ -538,3 +538,10 @@ UD-132 (Francesco 14/10 23:20: spingere ragazzi e famiglie a vivere l'app; «la 
 - Altezza della home con i dati reali (Playwright, build locale): **390×844 da 6086 px a 3150 px**; **1440×900 da 4657 px a 2194 px**. Nessuno scroll orizzontale, nessun errore in console.
 - Controlli: tsc, build, vitest (149 file, 1614 test), `test:manifest`, `test:claude-hooks` verdi.
 - Aperto: nei giorni con gara in casa la fascia partner mostra ancora anche il LedwallRotator, quindi due blocchi LED nella stessa pagina; da decidere se tenerne uno solo.
+
+## 15/10/2026 — chat PC: allenamenti per i genitori, testo di /entra, agenti per gestionale
+
+- `/allenamenti`: riga "I tuoi ragazzi" per il genitore collegato. Il server (`getMyTrainingKids`) manda solo il nome di battesimo dei figli minori e la parola del quadro che ha davvero allenamenti (anno o categoria, `trainingKids` in `lib/training-view.ts`); nessun cognome né codice squadra. Con un solo figlio la pagina apre subito la sua settimana; se l'annata non è scritta nel quadro compare "chiedi al mister" invece di una settimana vuota.
+- `/entra`, Sky e assistente: niente più "Compila la pre-iscrizione" finché il modulo pubblico è spento (`JOIN_INVITE` segue `PUBLIC_FORMS_LIVE`).
+- Agenti: 40 agenti SCD (uno per gestionale + legale, CFO, commerciale, negoziazione); chi legge il database lo dichiara "solo SELECT".
+- Controlli: tsc, build, vitest, `test:manifest`, `test:claude-hooks` verdi; scd-revisore BLOCK → corretto → PASS; scd-sicurezza PASS × 2.

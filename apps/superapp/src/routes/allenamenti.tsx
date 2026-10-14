@@ -34,7 +34,7 @@ export const Route = createFileRoute("/allenamenti")({
     const session = await getSession();
     if (!session.user) throw redirect({ to: "/accedi", search: { next: location.href } });
     // Vans in 2D: getPulminiVans answers only to the Pulmini work area (staff); everyone else gets null and nothing.
-    const [roster, emails, training, vans, family] = await Promise.all([getStaffRoster(), getStaffEmails(), getTrainingQuadro(), getPulminiVans(), getMyTrainingKids()]);
+    const [roster, emails, training, vans, family] = await Promise.all([getStaffRoster(), getStaffEmails(), getTrainingQuadro(), getPulminiVans(), getMyTrainingKids().catch(() => ({ state: "error" as const, kids: [] }))]);
     const transport = vans ? await getTransportBoard() : null;
     return { ...training.quadro, people: roster.people, emails, vans, board: transport?.board ?? null, kids: family.kids };
   },
@@ -152,10 +152,10 @@ function Allenamenti() {
       {kids.length > 0 && (
         <nav aria-label="I tuoi ragazzi" className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-2 px-4 pt-4 lg:px-6" data-testid="allenamenti-kids">
           <span className="text-[13px] font-bold uppercase tracking-[0.06em] text-[var(--uv-gold)]">I tuoi ragazzi</span>
-          {kids.map((k) =>
+          {kids.map((k, i) =>
             k.key ? (
               <button
-                key={`${k.firstName}-${k.key}`}
+                key={`${i}-${k.firstName}-${k.key}`}
                 type="button"
                 onClick={() => setQ(query === k.key ? "" : (k.key ?? ""))}
                 aria-pressed={query === k.key}
@@ -164,7 +164,7 @@ function Allenamenti() {
                 {k.firstName} · {k.key}
               </button>
             ) : (
-              <span key={`${k.firstName}-none`} className="rounded-full border border-white/20 px-4 py-2 text-[14px] text-[#cfe0ff]">
+              <span key={`${i}-${k.firstName}-none`} className="rounded-full border border-white/20 px-4 py-2 text-[14px] text-[#cfe0ff]">
                 {k.firstName}: la sua annata non è scritta nel quadro, chiedi al mister
               </span>
             ),

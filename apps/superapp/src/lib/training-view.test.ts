@@ -67,9 +67,8 @@ describe("trainingKids", () => {
   });
 
   it("a child whose year and team are not on the board gets no key (no empty week)", () => {
-    const out = trainingKids([m("Luca Rossi", 2014, true, "FIGLIO", ["2014"])], q.slots);
-    expect(out).toHaveLength(1);
-    if (out[0]!.key !== null) expect(findSessions(q.slots, out[0]!.key).length).toBeGreaterThan(0);
+    const slots = q.slots.filter((s) => !/2014|u13|under 13/i.test(`${s.fields.C1} ${s.fields.C2}`));
+    expect(trainingKids([m("Luca Rossi", 2014, true, "FIGLIO", ["2014"])], slots)).toEqual([{ firstName: "Luca", key: null }]);
   });
 
   it("drops parents, adults and duplicates and never exposes surname or team code", () => {
