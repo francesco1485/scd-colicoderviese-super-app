@@ -15,7 +15,7 @@ One backlog item per night, finished to a verifiable boundary. Status: `done`, `
 | 7 | Gioca "in arrivo" teaser | todo | | |
 | 2b | Facility map `/impianti` + `/gestionale/mappa` | done | 06da5f2 | 2026-10-11 |
 | 5a | Public hall (chi siamo, squadre, official results links, contatti) | done | 8ffd491 | 2026-10-11 |
-| 8 | Impianti follow-ups from benchmark: one request for pitch+rooms+lights, state history (who/when), day view prenotato/disponibile/rilasciato, quadro trainings in pitch capacity check | todo | | |
+| 8 | Impianti follow-ups from benchmark: one request for pitch+rooms+lights, state history (who/when), day view prenotato/disponibile/rilasciato, quadro trainings in pitch capacity check | done | see item 8 entry | 2026-10-14 |
 | L1 | Launch performance: Lighthouse mobile/desktop on /, /guida, /accedi, /calendario, /squadre; fixes; `docs/LAUNCH_QUALITY.md` | done | see L1 entry | 2026-10-12 |
 | L4 | Presentation screenshots 390×844 / 1440×900 of the main flows, fixture data only, `docs/presentation/` | done | see L4 entry | 2026-10-13 |
 
@@ -398,3 +398,15 @@ prossimi impegni e "ci sarò" in primo piano). Desktop invariato.
   39 px, "Privacy" 40 px) → `SiteChrome.tsx` min-h-11/min-w-11, guardia in `touch-targets.test.ts` (9 test). Audit di
   nuovo a 0 violazioni axe e 0 bersagli piccoli. Suite 977.
 - Aperto: `installa-*` va ricatturata sul dominio definitivo; `persone-*` restano del 12/10 (nessun dato di prova nello script).
+
+## Item 8 — Impianti e campi: richiesta unica, storico, giornata per campo, Quadro nel controllo · 2026-10-14
+- Stato: DONE su staging/superapp (SHA nel commit che aggiunge questa voce).
+- Motore puro `src/lib/impianti-planning.ts` (+23 test vitest in `impianti-planning.test.ts`), riusa `rotation.ts`, `bookings-register.ts`, `facilities.ts`:
+  - (a) una richiesta = zona di campo + spogliatoi + luci: `Booking.lights`, `lightsAdvice` (luci dalle 17:00, regola proposta già usata per Dervio; omologazione luci registrata solo per Colico campo 1), `requestResources`, `checkRequest` (tutto o niente: campo nelle due settimane, spogliatoi liberi; luci mancanti = avviso). In /gestionale/impianti/nuova: casella «Chiedi anche le luci» e riquadro «Una sola richiesta» con stato di ogni risorsa.
+  - (b) storico dello stato chi/quando: nessuna colonna nuova nel master «17 - PRENOTAZIONI IMPIANTI» (colonne nel manifest); lo storico vive nella colonna Note come `Storico: gg/mm/aaaa hh:mm STATO (ruolo); …`, insieme a `Luci: …` e `Respinta: motivo`. La riga copiata per il registro porta la prima voce PROPOSTA; in /approvazioni ogni proposta mostra lo storico e la decisione prepara la Note completa da copiare. Righe senza storico: voci «dedotte» dalla riga, senza data (mai inventata). Ruoli, mai nomi.
+  - (c) giornata per campo `pitchDayView` + componente `PitchDayView` (Colico 1, Colico 2, Dervio; 08–23): prenotato (gare, righe CONFERMATA, Quadro della settimana scelta, con quota di campo libera), rilasciato (righe ANNULLATA), disponibile; richieste in attesa e ipotesi elencate ma non bloccano. In /nuova per il giorno della bozza (registro non letto lì, detto in pagina) e in /approvazioni con scelta del giorno e registro quando configurato.
+  - (d) allenamenti del Quadro nel controllo capienza: `quadroTrainings` (campo 1 in terzi, campo 2 in metà, unione per zona: nessun doppio conteggio), `checkSlotWithQuadro` controlla settimana A e settimana B (non determinabile) e chiede che stiano in entrambe; etichetta «Allenamento dal Quadro settimanale (settimana …)». Usato in anteprima 2D, scheda per la Direzione e /approvazioni. Quadro assente = «non disponibile», mai «nessun allenamento».
+- QA: build, tsc, vitest (tutti verdi), test:manifest, test:claude-hooks; Playwright 390×844 e 1440×900 di /gestionale/impianti/nuova e /approvazioni (build di produzione locale in anteprima staging, dati di prova inventati): nessuno scorrimento orizzontale, nessun errore in console; impeccable detect senza segnalazioni sui file cambiati.
+- Note: `vite dev` locale si ferma su un errore preesistente di import-protection (`/fantacalcio` → `supabase.server.ts`), non toccato; la build di produzione è sana.
+- Da decidere (Francesco): confermare il formato «Storico:» nella colonna Note del registro (in alternativa una colonna «Storico» da aggiungere al master e al manifest); confermare la regola luci dalle 17:00.
+

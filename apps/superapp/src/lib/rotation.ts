@@ -663,6 +663,10 @@ export interface Booking {
   entrance?: string;
   /** Rental amount in euro as typed (only for "affitto"), e.g. "150" or "150,00". */
   amount?: string;
+  /** Pitch lights requested together with the pitch and the rooms (one request). */
+  lights?: boolean;
+  /** When the ipotesi was created in this browser (ISO date-time), for the state history. */
+  createdAt?: string;
 }
 
 /** Colico changing rooms: SPA-COL-SP1..SP4 and the dedicated referees' room SPA-COL-ARB. */
@@ -756,6 +760,13 @@ export function validateBooking(b: Omit<Booking, "id">): string[] {
     out.push(
       "Niente email o numeri di telefono: solo il nome della squadra, dell'evento o dell'ente.",
     );
+  if (b.lights !== undefined && typeof b.lights !== "boolean")
+    out.push("Luci: valore non valido.");
+  if (
+    b.createdAt !== undefined &&
+    (typeof b.createdAt !== "string" || Number.isNaN(Date.parse(b.createdAt)))
+  )
+    out.push("Data di creazione non valida.");
   if (b.kind === "affitto" && !title)
     out.push(
       "Per un affitto scrivi il nome dell'ente o della società che chiede il campo.",
@@ -921,7 +932,8 @@ export interface QuadroRoom {
   group: string;
 }
 
-const QUADRO_DAY = [
+/** Weekday names of the training board, indexed like `Date.getUTCDay()`. */
+export const QUADRO_DAY: readonly string[] = [
   "DOMENICA",
   "LUNEDÌ",
   "MARTEDÌ",

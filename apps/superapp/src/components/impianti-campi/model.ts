@@ -104,7 +104,7 @@ export function useImpiantiModel(): ImpiantiModel {
 
   const addBooking = useCallback((b: Omit<Booking, "id">): Booking => {
     const id = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
-    const created = { ...b, id };
+    const created = { ...b, id, createdAt: new Date().toISOString() };
     setBookings((list) => [...list, created]);
     return created;
   }, []);

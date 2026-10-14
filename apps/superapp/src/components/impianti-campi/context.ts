@@ -43,3 +43,13 @@ export function validateDaySearch(s: Record<string, unknown>): {
     ? { giorno: g }
     : {};
 }
+
+/**
+ * Rotations of the training board for the capacity checks, or null when the
+ * quadro did not reach this page (unknown, never treated as "no trainings").
+ */
+export function quadroRotationsOf(
+  q: Pick<QuadroSnapshot, "schema" | "rotations"> | null | undefined,
+): QuadroSnapshot["rotations"] | null {
+  return q && q.schema && q.rotations.length ? q.rotations : null;
+}
