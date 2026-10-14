@@ -284,9 +284,9 @@ describe("Vera's chat opened with an area (UD-118: one chat, faces hand over)", 
     expect(t.kbSearch).not.toHaveBeenCalled();
     const sys = systemOf(f);
     expect(sys).toContain("Sei Vera, la reception");
-    expect(sys).toContain("Per la Club House ti aiuta lo Chef");
+    expect(sys).toContain("Per la Club House ti aiuta Garrison, lo Chef");
     expect(sys).toContain("SQUBY/SumUp");
-    expect(sys).toContain("Area: Lo Chef");
+    expect(sys).toContain("Area: Garrison");
     expect(sys).toMatch(/Cita sempre la fonte/);
     expect(r).toMatchObject({ ai: true, persona: "vera", area: "accoglienza-chef", links: [{ label: "Richiesta", to: "/famiglia" }] });
   });

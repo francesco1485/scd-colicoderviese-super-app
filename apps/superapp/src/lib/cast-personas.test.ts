@@ -71,7 +71,7 @@ describe("simplified cast (UD-118): Vera + four faces + tips of the day", () => 
       expect(d.handoff, id).toBeTruthy();
       expect(d.chatQuick.length, id).toBeGreaterThanOrEqual(2);
     }
-    expect(CAST_PERSONAS["accoglienza-chef"].handoff).toMatch(/^Per la Club House ti aiuta lo Chef/);
+    expect(CAST_PERSONAS["accoglienza-chef"].handoff).toMatch(/^Per la Club House ti aiuta Garrison, lo Chef/);
   });
 
   it("gives each of the four faces 2-3 actions on pages that exist, and a home page that exists", () => {
@@ -104,7 +104,8 @@ describe("simplified cast (UD-118): Vera + four faces + tips of the day", () => 
       if (d.nameTbd) expect(d.label, id).toMatch(/^(Lo|La|Il|L'|Musica)/);
       else expect(d.label, id).toBe(r.label);
     }
-    expect(CAST_PERSONAS["accoglienza-chef"].label).toBe("Lo Chef");
+    expect(CAST_PERSONAS["accoglienza-chef"].label).toBe("Garrison");
+    expect(CAST_PERSONAS["mentore-tornei"].label).toBe("Enea");
     expect(VERA_PRESENCE.label).toBe("Vera");
   });
 

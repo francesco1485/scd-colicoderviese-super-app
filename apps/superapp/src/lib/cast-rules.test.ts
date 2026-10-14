@@ -92,7 +92,7 @@ describe("rules engine of Vera's chat (UD-118)", () => {
       expect(r.links?.length, area).toBeGreaterThanOrEqual(2);
     }
     const chef = await castRulesAnswer({ message: "ciao", persona: "vera", area: "accoglienza-chef" }, deps());
-    expect(chef.text).toMatch(/Per la Club House ti aiuta lo Chef/);
+    expect(chef.text).toMatch(/Per la Club House ti aiuta Garrison, lo Chef/);
   });
 
   it("leaves Vera without an area, Sky and legacy tip-only areas on the general engine", async () => {

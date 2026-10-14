@@ -3058,6 +3058,21 @@
         ],
         "duplicate_work": "DENY"
       }
+    },
+    {
+      "sourceDate": "2026-10-14",
+      "sourceTime": "18:46",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-120",
+      "name": "CAST_NAMES_GARRISON_ENEA_CROVI_MASCOT",
+      "sourceQuoteFragments": [
+        "Crovi resta la mascotte dell'app - lo chef si chiama Garrison - il mentore Enea - 4 pubblica"
+      ],
+      "context": "Francesco, 14/10/2026 18:46, answering the open points of the simplified cast (UD-118).",
+      "normalizedCommand": {
+        "rule": "The Club House chef face is named Garrison; the tournaments mentor face is named Enea. Crovi stays the app mascot: image only (greets once per visit on public pages and points to Vera's chat), never a separate chat. The sponsor face name is still to be decided."
+      }
     }
   ],
   "completionGate": {

@@ -153,15 +153,20 @@ describe("cast roster (Direzione 14/10/2026, UD-111)", () => {
   });
 
   it("gives the new roles neutral role labels with the name still to be decided, no picture and no voice", () => {
+    // Named by the Direzione on 14/10/2026 18:46 (UD-120): Garrison (Chef) and Enea (Mentore dei tornei).
+    const NAMED: Record<string, string> = { "accoglienza-chef": "Garrison", "mentore-tornei": "Enea" };
     for (const id of NEW_ROLES) {
       const r = rosterEntry(id);
-      expect(r.nameTbd, id).toBe(true);
+      if (NAMED[id]) {
+        expect(r.nameTbd, id).toBe(false);
+        expect(r.label, id).toBe(NAMED[id]);
+      } else expect(r.nameTbd, id).toBe(true);
       expect(r.portrait.ready, id).toBe(false);
       expect(r.voice.ready, id).toBe(false);
       expect(["FACE", "TIP_ONLY", "ABSORBED"], id).toContain(r.presence);
-      expect(r.decidedBy, id).toMatch(/14\/10\/2026.*nome da decidere/);
+      expect(r.decidedBy, id).toMatch(NAMED[id] ? /14\/10\/2026.*nome (Garrison|Enea)/ : /14\/10\/2026.*nome da decidere/);
     }
-    expect(rosterEntry("accoglienza-chef").label).toBe("Chef della Club House");
+    expect(rosterEntry("accoglienza-chef").label).toBe("Garrison");
     expect(rosterEntry("mentore-tornei").role).toMatch(/direttore artistico/i);
   });
 

@@ -267,8 +267,8 @@ export const CAST_ROSTER: readonly CastRosterEntry[] = [
   },
   {
     id: "accoglienza-chef",
-    label: "Chef della Club House",
-    nameTbd: true,
+    label: "Garrison",
+    nameTbd: false,
     role: "Accoglienza e cucina",
     area: "Area ristoro e Club House",
     does: [
@@ -290,7 +290,7 @@ export const CAST_ROSTER: readonly CastRosterEntry[] = [
     },
     voice: { ready: false, rule: VOICE_RULE },
     presence: "FACE",
-    decidedBy: NEW_ROLE,
+    decidedBy: "Direzione 14/10/2026 ore 18:46: nome Garrison (UD-120)",
   },
   {
     id: "biglietteria",
@@ -322,8 +322,8 @@ export const CAST_ROSTER: readonly CastRosterEntry[] = [
   },
   {
     id: "mentore-tornei",
-    label: "Mentore dei tornei",
-    nameTbd: true,
+    label: "Enea",
+    nameTbd: false,
     role: "Direttore artistico di tornei ed eventi",
     area: "Tornei ed eventi",
     does: [
@@ -345,7 +345,7 @@ export const CAST_ROSTER: readonly CastRosterEntry[] = [
     },
     voice: { ready: false, rule: VOICE_RULE },
     presence: "FACE",
-    decidedBy: NEW_ROLE,
+    decidedBy: "Direzione 14/10/2026 ore 18:46: nome Enea (UD-120)",
   },
   {
     id: "mental-coach",

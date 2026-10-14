@@ -6,27 +6,27 @@
 
 export interface CameoLine {
   text: string;
-  /** Suggested question to send when the visitor taps "Chiedi a Crovi". */
+  /** Suggested question to send when the visitor taps "Chiedi a Vera". */
   ask: string;
 }
 
 const LINES: ReadonlyArray<{ prefix: string; line: CameoLine }> = [
-  { prefix: "/calendario", line: { text: "Gli orari cambiano più spesso del meteo sul lago: prima di partire ricontrolla qui, che io lo aggiorno dalle fonti ufficiali.", ask: "Prossima partita" } },
-  { prefix: "/squadre", line: { text: "Dalla Prima ai Piccoli Amici: dimmi l'annata e ti porto dritto al suo calendario.", ask: "Calendario" } },
-  { prefix: "/impianti", line: { text: "Cerchi lo spogliatoio o l'ingresso giusto? Tocca la mappa: ti accompagno io, senza fretta.", ask: "Dove siete?" } },
-  { prefix: "/eventi", line: { text: "Tornei, feste e serate: se c'è da organizzare qualcosa, io la checklist ce l'ho già in tasca.", ask: "Eventi" } },
-  { prefix: "/sponsor", line: { text: "Vuoi vedere il tuo marchio a bordo campo? Scrivimi, ti spiego come funziona.", ask: "Diventare sponsor" } },
-  { prefix: "/partner", line: { text: "Vuoi vedere il tuo marchio a bordo campo? Scrivimi, ti spiego come funziona.", ask: "Diventare sponsor" } },
-  { prefix: "/societa", line: { text: "La storia del club la so a memoria: chiedimi pure, poi ti porto dalla persona giusta.", ask: "Contatti" } },
-  { prefix: "/contatti", line: { text: "Segreteria, mail, PEC: dimmi cosa ti serve e ti dico a chi scrivere.", ask: "Contatti" } },
+  { prefix: "/calendario", line: { text: "Gli orari cambiano più spesso del meteo sul lago: prima di partire ricontrolla qui. Per ogni dubbio chiedi a Vera.", ask: "Prossima partita" } },
+  { prefix: "/squadre", line: { text: "Dalla Prima ai Piccoli Amici: Vera ti porta dritto al calendario della tua annata.", ask: "Calendario" } },
+  { prefix: "/impianti", line: { text: "Cerchi lo spogliatoio o l'ingresso giusto? Tocca la mappa, oppure chiedi a Vera.", ask: "Dove siete?" } },
+  { prefix: "/eventi", line: { text: "Tornei, feste e serate: se c'è da organizzare qualcosa, Vera sa a chi chiedere.", ask: "Eventi" } },
+  { prefix: "/sponsor", line: { text: "Vuoi vedere il tuo marchio a bordo campo? Chiedi a Vera come funziona.", ask: "Diventare sponsor" } },
+  { prefix: "/partner", line: { text: "Vuoi vedere il tuo marchio a bordo campo? Chiedi a Vera come funziona.", ask: "Diventare sponsor" } },
+  { prefix: "/societa", line: { text: "Vuoi sapere qualcosa del club? Vera ti porta dalla persona giusta.", ask: "Contatti" } },
+  { prefix: "/contatti", line: { text: "Segreteria, mail, PEC: chiedi a Vera a chi scrivere.", ask: "Contatti" } },
 ];
 
 const DEFAULT_LINE: CameoLine = {
-  text: "Ciao, sono Crovi, quello della biglietteria. Di calcio dilettanti so quasi tutto: chiedimi pure!",
+  text: "Ciao, sono Crovi, la mascotte della ColicoDerviese! Per ogni domanda c'è Vera: prova a chiederle qualcosa.",
   ask: "Prossima partita",
 };
 
-/** Public pages where a joke would be out of place: Crovi stays in the chat but does not pop in. */
+/** Public pages where a joke would be out of place: the mascot does not pop in. */
 const QUIET = ["/privacy", "/elimina-account"];
 
 /** Line for the current page; reserved areas (interior pages) and quiet pages get no cameo. */

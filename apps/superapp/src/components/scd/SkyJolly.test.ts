@@ -87,7 +87,7 @@ describe("Vera opened from a face card (UD-118)", () => {
   it("hands over to the face of the area and shows its action buttons", () => {
     const g = greetingFor("vera", "accoglienza-chef");
     expect(g.text).toMatch(/^Ciao, sono Vera/);
-    expect(g.text).toContain("Per la Club House ti aiuta lo Chef");
+    expect(g.text).toContain("Per la Club House ti aiuta Garrison, lo Chef");
     expect(g.links?.map((l) => l.to)).toEqual(["/famiglia#richiesta-ordine", "/famiglia#sondaggi-piatti", "/eventi"]);
     expect(greetingFor("vera").text).toBe(PERSONA_COPY.vera.greeting);
     expect(greetingFor("sky", "accoglienza-chef").text).toBe(PERSONA_COPY.sky.greeting);

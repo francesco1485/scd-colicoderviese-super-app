@@ -495,8 +495,8 @@
     {
       "path": "apps/superapp/public/media/crovi/v3/",
       "class": "CHARACTER_CUTOUT",
-      "status": "VERIFIED",
-      "source": "Crovi v3, original character (UD-026), GENERATE_ORIGINAL, not an official asset"
+      "status": "APPROVED",
+      "source": "Crovi v3, original character (UD-026), GENERATE_ORIGINAL; approved as the app mascot by the Direzione 14/10/2026 18:46 (UD-120): image only, no chat"
     },
     {
       "path": "apps/superapp/public/media/crovi/v3/crovi-avatar-256.webp",

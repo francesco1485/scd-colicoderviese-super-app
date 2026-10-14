@@ -131,9 +131,9 @@ export const PERSONA_COPY: Readonly<Record<Persona, PersonaCopy>> = {
 
 /** Header line of Vera's chat opened with an area. */
 const AREA_SUBTITLE: Readonly<Record<ChatAreaId, string>> = {
-  "accoglienza-chef": "la reception · area Club House con lo Chef",
+  "accoglienza-chef": "la reception · area Club House con Garrison",
   "volto-sponsor": "la reception · area sponsor con il Volto sponsor",
-  "mentore-tornei": "la reception · area tornei con il Mentore",
+  "mentore-tornei": "la reception · area tornei con Enea",
   biglietteria: "la reception · biglietti, gratuità e card",
 };
 
