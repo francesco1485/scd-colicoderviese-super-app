@@ -13,6 +13,29 @@ Prima di qualunque lavoro sostanziale leggere anche:
 
 I comandi espliciti dell'utente sono requisiti di origine. Non possono essere sostituiti, abbreviati fino a perderne il significato o ignorati in favore di un riassunto dell'assistente. Se un comando nuovo modifica un contratto o l'architettura, il contratto/manifest va aggiornato nel normale change process invece di scartare il comando.
 
+## SCD:SESSIONI — DIVISIONE DEI COMPITI TRA LE CHAT (OBBLIGATORIA)
+Decisione di Francesco (14/10/2026 ore 19:30): "Dividi i compiti: tu lavori dove lui non lavora, e così anche gli agenti."
+Due chat lavorano sullo stesso repository e sullo stesso sito. Ogni chat e ogni suo agente resta nella propria area.
+Copia estesa: documento di progetto claude.ai `claude/SCD_DIVISIONE_COMPITI.md`.
+
+| Area | Chat PC (app desktop) | Chat CLOUD (web, ramo `wip/superapp-20261013-otp`) |
+|---|---|---|
+| Accesso, registrazione, password, login con telefono, conferme e modelli e-mail Supabase (`accedi*`, `registrati*`, `auth*`, `login*`, conferma) | **SÌ** | no |
+| Posta del club con Make (lettura, smistamento, SCD_INTAKE_LOG, riepilogo serale), Tally e scenari iscrizioni | **SÌ** | no |
+| Centralino, WhatsApp Business, telefono segreteria | **SÌ** | no |
+| Portali FIGC/LND (riconciliazione tesserati), mappe reali Google di Colico/Dervio, Play Store | **SÌ** | no |
+| Commerciale (sponsor, listino, CRM/GROW, spot LED, `/ledwall/player`, campagne social sponsor) | no | **SÌ** |
+| Sostieni (Fondo, Adotta, donazioni, proposte, lotteria) | no | **SÌ** |
+| Personaggi (Vera, Garrison, Enea, Volto sponsor, Sky, Crovi mascotte, avatar) | no | **SÌ** |
+| Home e pagine pubbliche, pulmini e impianti nell'app | no | **SÌ** |
+| Agenti programmati Claude e inserimenti nella coda `/gestionale/coda` | no | **SÌ** |
+
+Regole:
+1. **Numerazione riservata** — chat CLOUD: direttive `UD-130…UD-149`, migrazioni `r110…r129`; chat PC: `UD-150…UD-169`, `r130…r149`. Già usati: PC UD-117, UD-120, r104, r105; CLOUD UD-119, UD-121, UD-122, r101, r102, r103, r106. UD-118 non va riusato.
+2. **Pubblicazione** — solo con il "pubblica" di Francesco. Prima: `git fetch`, unire `origin/staging/superapp` nel proprio ramo, controlli verdi (tsc, build, vitest, `test:manifest`, `test:claude-hooks`), push solo in avanti su `staging/superapp`, deploy Render. File condivisi (`config/user-directives.v1.json`, manifest, `apps/superapp/docs/RELEASE2_LOG.md`, `routeTree.gen.ts`) si uniscono, mai si sovrascrivono.
+3. **Posta senza doppioni** — Make (chat PC) legge e registra; l'agente Claude "Presidio posta" (chat CLOUD) fa solo etichette Gmail e proposte nella coda dell'app. Nessuno dei due invia mail.
+4. **Richieste all'altra chat** — si scrivono nella sezione 5 di `claude/SCD_DIVISIONE_COMPITI.md`; l'area la modifica solo la chat proprietaria.
+
 ## SCD:STATE — HARD GATE
 Prima di qualsiasi operazione di scrittura sul progetto deve essere completata una fotografia verificata dello stato reale.
 
