@@ -3,11 +3,13 @@ import { FileText, HandCoins, Mail, Scale, Users } from "lucide-react";
 
 import { FundApplicationForm } from "@/components/giving/fund-apply";
 import { NotActiveNote, btnSun } from "@/components/giving/public";
+import { ShareButton } from "@/components/scd/ShareButton";
 import { PageHero, heroOverlapCls, inputCls } from "@/components/ui-kit";
 import { CLUB_PROFILE } from "@/lib/club-profile";
 import { FONDO_PUBLIC_TEXT, TEXT_PENDING, euro, itDay } from "@/lib/giving";
 import { getGivingPublic } from "@/lib/giving.functions";
 import { getMyFamily } from "@/lib/roster.functions";
+import { SHARE_PAGES, pageMeta } from "@/lib/share";
 
 /**
  * Fondo Solidale, public page (UD-113). The texts are the Direzione's (FONDO_PUBLIC_TEXT): until they arrive every block
@@ -19,12 +21,7 @@ export const Route = createFileRoute("/sostieni/fondo-solidale")({
     const [pub, family] = await Promise.all([getGivingPublic(), getMyFamily()]);
     return { pub, family };
   },
-  head: () => ({
-    meta: [
-      { title: "Fondo Solidale — S.C.D. ColicoDerviese" },
-      { name: "description", content: "Il Fondo Solidale della S.C.D. ColicoDerviese aiuta le famiglie in difficoltà con la quota. Come sostenerlo e come fare domanda, in modo riservato." },
-    ],
-  }),
+  head: () => ({ meta: pageMeta(SHARE_PAGES.fondoSolidale) }),
   component: FondoPage,
 });
 
@@ -41,7 +38,7 @@ function FondoPage() {
   const signedIn = family.state === "ok";
   return (
     <main>
-      <PageHero eyebrow="Fondo Solidale" title={<>Nessun ragazzo resta fuori <span className="text-accent">per la quota</span></>} clamp={false}>
+      <PageHero eyebrow="Fondo Solidale" title={<>Nessun ragazzo resta fuori <span className="text-accent">per la quota</span></>} clamp={false} action={<ShareButton page={SHARE_PAGES.fondoSolidale} />}>
         Il Fondo Solidale della S.C.D. ColicoDerviese. Domande, ISEE e nomi restano riservati alla Direzione.
       </PageHero>
       <section className={`${heroOverlapCls} mx-auto grid max-w-6xl gap-4 px-4 md:grid-cols-2`}>

@@ -12,6 +12,7 @@ export function PublicPageHeader({
   title,
   accent,
   children,
+  action,
 }: {
   eyebrow: string;
   /** First part of the title (white). */
@@ -19,6 +20,8 @@ export function PublicPageHeader({
   /** Keyword of the title (yellow). */
   accent?: string;
   children?: ReactNode;
+  /** Optional row under the subtitle (e.g. the ShareButton of a public page). */
+  action?: ReactNode;
 }) {
   return (
     <header
@@ -49,6 +52,7 @@ export function PublicPageHeader({
             {children}
           </div>
         )}
+        {action && <div className="mt-4 lg:mt-5">{action}</div>}
       </div>
     </header>
   );

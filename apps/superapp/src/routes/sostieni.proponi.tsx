@@ -1,19 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { NotActiveNote, ProposalForm } from "@/components/giving/public";
+import { ShareButton } from "@/components/scd/ShareButton";
 import { PageHero, heroOverlapCls } from "@/components/ui-kit";
 import { getGivingPublic } from "@/lib/giving.functions";
+import { SHARE_PAGES, pageMeta } from "@/lib/share";
 import { useSession } from "@/lib/use-session";
 
 /** Proponi un miglioramento (UD-113): anyone, signed in or not, optionally anonymous. Never public until staff publish. */
 export const Route = createFileRoute("/sostieni/proponi")({
   loader: () => getGivingPublic(),
-  head: () => ({
-    meta: [
-      { title: "Proponi un miglioramento — S.C.D. ColicoDerviese" },
-      { name: "description", content: "Segnala alla S.C.D. ColicoDerviese un miglioramento o un bisogno per campi, palestra, infermeria, club house o sicurezza, anche in forma anonima." },
-    ],
-  }),
+  head: () => ({ meta: pageMeta(SHARE_PAGES.proponi) }),
   component: ProponiPage,
 });
 
@@ -23,7 +20,7 @@ function ProponiPage() {
   const active = engine === "applied";
   return (
     <main>
-      <PageHero eyebrow="Sostieni il club" title={<>Proponi un <span className="text-accent">miglioramento</span></>} clamp={false}>
+      <PageHero eyebrow="Sostieni il club" title={<>Proponi un <span className="text-accent">miglioramento</span></>} clamp={false} action={<ShareButton page={SHARE_PAGES.proponi} />}>
         Campi, palestra, infermeria, club house, sicurezza: dicci cosa servirebbe. Puoi restare anonimo e dire se puoi dare una mano.
       </PageHero>
       <section className={`${heroOverlapCls} mx-auto mb-16 max-w-3xl px-4`}>

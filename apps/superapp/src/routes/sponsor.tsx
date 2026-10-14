@@ -4,9 +4,11 @@ import { useState } from "react";
 
 import { LedwallFacsimile } from "@/components/LedwallFacsimile";
 import { PartnerForm } from "@/components/PartnerForm";
+import { ShareButton } from "@/components/scd/ShareButton";
 import { PageHero, heroOverlapCls } from "@/components/ui-kit";
 import { SPONSOR_ASSETS, SPONSOR_PACKAGES } from "@/lib/catalog";
 import { romeDay } from "@/lib/public-window";
+import { SHARE_PAGES, pageMeta } from "@/lib/share";
 
 export const Route = createFileRoute("/sponsor")({
   // Server time and Rome day for the LED wall preview: rendered on the server, reused on hydration (same first slot).
@@ -14,14 +16,7 @@ export const Route = createFileRoute("/sponsor")({
     const nowMs = Date.now();
     return { nowMs, day: romeDay(nowMs) };
   },
-  head: () => ({
-    meta: [
-      { title: "Diventa Sponsor — Commercial Hub | SCD ColicoDerviese" },
-      { name: "description", content: "Pacchetti Naming Event, Main Partner, Team, Digital, Local e Sponsor Tecnico: porta il tuo brand in campo con la S.C.D. ColicoDerviese." },
-      { property: "og:title", content: "Diventa Sponsor della SCD ColicoDerviese" },
-      { property: "og:description", content: "Commercial Hub: pacchetti, asset digitali e fisici, richiesta proposta." },
-    ],
-  }),
+  head: () => ({ meta: pageMeta(SHARE_PAGES.sponsor) }),
   component: Sponsor,
 });
 
@@ -30,7 +25,7 @@ function Sponsor() {
   const [pick, setPick] = useState<string | undefined>();
   return (
     <main>
-      <PageHero eyebrow="Commercial Hub · Sponsor & Partner" title={<>Il tuo brand, <span className="text-accent">in campo</span> ogni settimana.</>}>
+      <PageHero eyebrow="Commercial Hub · Sponsor & Partner" title={<>Il tuo brand, <span className="text-accent">in campo</span> ogni settimana.</>} action={<ShareButton page={SHARE_PAGES.sponsor} />}>
         Un media sportivo locale: prima squadra, settore giovanile, famiglie e tifosi dell'Alto Lario. Visibilità fisica e digitale, misurabile.
       </PageHero>
 
