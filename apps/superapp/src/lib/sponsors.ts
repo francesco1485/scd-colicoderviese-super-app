@@ -22,7 +22,8 @@ export const SPONSORS: readonly Sponsor[] = [
   { slug: "carcano", name: "Carcano", nameVerified: true, src: "/media/sponsor/2026-27/carcano.webp" },
   { slug: "mds-impianti", name: "MDS Impianti", nameVerified: true, src: "/media/sponsor/2026-27/mds-impianti.webp" },
   { slug: "bigamonti", name: "Bigamonti", nameVerified: false, src: "/media/sponsor/2026-27/bigamonti.webp" },
-  { slug: "nbc", name: "nbc", nameVerified: false, src: "/media/sponsor/2026-27/nbc.webp" },
+  // Name verified 14/10/2026: official site nbcweighing.com, Drive folder NBC_ELETTRONICA, official LED spot "NBC ELETTRONICA GROUP".
+  { slug: "nbc", name: "NBC Elettronica Group", nameVerified: true, src: "/media/sponsor/2026-27/nbc.webp" },
   { slug: "sponsor-sole", name: null, nameVerified: false, src: "/media/sponsor/2026-27/sponsor-sole.webp" },
   { slug: "turbojet-spurghi", name: "Turbojet Spurghi", nameVerified: true, src: "/media/sponsor/2026-27/turbojet-spurghi.webp" },
   { slug: "gimoka", name: "Gimoka", nameVerified: true, src: "/media/sponsor/2026-27/gimoka.webp" },
