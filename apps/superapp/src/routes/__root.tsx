@@ -142,6 +142,16 @@ function RootComponent() {
     select: (ms) => ms.some((m) => m.staticData?.interior === true || (m.loaderData as { interior?: unknown } | undefined)?.interior === true),
   });
 
+  // Bare pages (staticData.bare, e.g. the LED wall player): only the page itself, nothing drawn over it.
+  const bare = useMatches({ select: (ms) => ms.some((m) => m.staticData?.bare === true) });
+  if (bare) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <Outlet />
+      </QueryClientProvider>
+    );
+  }
+
   if (interior) {
     return (
       <QueryClientProvider client={queryClient}>

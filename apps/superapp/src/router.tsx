@@ -21,5 +21,10 @@ declare module "@tanstack/react-router" {
      * (top bar, footer, sponsor band, bottom nav, Sky chat) is not shown.
      */
     interior?: boolean;
+    /**
+     * Full-bleed page with no chrome at all (no header, footer, chat, cookie banner, PWA prompts): used by the
+     * LED wall player (/ledwall/player), opened full screen on the PC connected to the LED controller.
+     */
+    bare?: boolean;
   }
 }

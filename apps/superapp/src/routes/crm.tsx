@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ImagePlus, Mail, MailPlus, Shirt, UsersRound } from "lucide-react";
 import { useState, type ReactNode } from "react";
 
+import { SpotLedVetrina } from "@/components/SponsorSpots";
 import { Card, SourceLine } from "@/components/scd/interior-ui";
 import { EmptyState, SourcesBox, WorkAreaGateView, WorkAreaShell, workAreaHead } from "@/components/scd/work-area-ui";
 import { crmKitId, kitSubjectLabel, sponsorLogo, subjectFromSponsor } from "@/lib/partner-kit";
@@ -155,6 +156,7 @@ function CrmPage({ preview }: { preview: boolean }) {
                 </Column>
               </div>
               <PartnerKitGrid />
+              <SpotLedVetrina />
               </>
             ) : (
               <Card>

@@ -79,6 +79,7 @@ import { Route as GestionaleOrganigrammaRouteImport } from './routes/gestionale.
 import { Route as GestionalePostaRouteImport } from './routes/gestionale.posta'
 import { Route as GestionaleImpiantiRouteImport } from './routes/gestionale_.impianti'
 import { Route as LaMiaScdCampioneRouteImport } from './routes/la-mia-scd_.campione'
+import { Route as LedwallPlayerRouteImport } from './routes/ledwall.player'
 import { Route as QuadroIndexRouteImport } from './routes/quadro.index'
 import { Route as QuadroRotazioneCampiRouteImport } from './routes/quadro.rotazione-campi'
 import { Route as SegreteriaCertificatiRouteImport } from './routes/segreteria_.certificati'
@@ -465,6 +466,11 @@ const LaMiaScdCampioneRoute = LaMiaScdCampioneRouteImport.update({
   path: '/la-mia-scd/campione',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LedwallPlayerRoute = LedwallPlayerRouteImport.update({
+  id: '/ledwall/player',
+  path: '/ledwall/player',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const QuadroIndexRoute = QuadroIndexRouteImport.update({
   id: '/quadro/',
   path: '/quadro/',
@@ -698,6 +704,7 @@ export interface FileRoutesByFullPath {
   '/gestionale/posta': typeof GestionalePostaRoute
   '/gestionale/impianti': typeof GestionaleImpiantiRouteWithChildren
   '/la-mia-scd/campione': typeof LaMiaScdCampioneRoute
+  '/ledwall/player': typeof LedwallPlayerRoute
   '/quadro/rotazione-campi': typeof QuadroRotazioneCampiRoute
   '/segreteria/certificati': typeof SegreteriaCertificatiRoute
   '/segreteria/persone': typeof SegreteriaPersoneRoute
@@ -801,6 +808,7 @@ export interface FileRoutesByTo {
   '/gestionale/organigramma': typeof GestionaleOrganigrammaRoute
   '/gestionale/posta': typeof GestionalePostaRoute
   '/la-mia-scd/campione': typeof LaMiaScdCampioneRoute
+  '/ledwall/player': typeof LedwallPlayerRoute
   '/quadro/rotazione-campi': typeof QuadroRotazioneCampiRoute
   '/segreteria/certificati': typeof SegreteriaCertificatiRoute
   '/segreteria/persone': typeof SegreteriaPersoneRoute
@@ -906,6 +914,7 @@ export interface FileRoutesById {
   '/gestionale/posta': typeof GestionalePostaRoute
   '/gestionale_/impianti': typeof GestionaleImpiantiRouteWithChildren
   '/la-mia-scd_/campione': typeof LaMiaScdCampioneRoute
+  '/ledwall/player': typeof LedwallPlayerRoute
   '/quadro/rotazione-campi': typeof QuadroRotazioneCampiRoute
   '/segreteria_/certificati': typeof SegreteriaCertificatiRoute
   '/segreteria_/persone': typeof SegreteriaPersoneRoute
@@ -1012,6 +1021,7 @@ export interface FileRouteTypes {
     | '/gestionale/posta'
     | '/gestionale/impianti'
     | '/la-mia-scd/campione'
+    | '/ledwall/player'
     | '/quadro/rotazione-campi'
     | '/segreteria/certificati'
     | '/segreteria/persone'
@@ -1115,6 +1125,7 @@ export interface FileRouteTypes {
     | '/gestionale/organigramma'
     | '/gestionale/posta'
     | '/la-mia-scd/campione'
+    | '/ledwall/player'
     | '/quadro/rotazione-campi'
     | '/segreteria/certificati'
     | '/segreteria/persone'
@@ -1219,6 +1230,7 @@ export interface FileRouteTypes {
     | '/gestionale/posta'
     | '/gestionale_/impianti'
     | '/la-mia-scd_/campione'
+    | '/ledwall/player'
     | '/quadro/rotazione-campi'
     | '/segreteria_/certificati'
     | '/segreteria_/persone'
@@ -1324,6 +1336,7 @@ export interface RootRouteChildren {
   GestionalePostaRoute: typeof GestionalePostaRoute
   GestionaleImpiantiRoute: typeof GestionaleImpiantiRouteWithChildren
   LaMiaScdCampioneRoute: typeof LaMiaScdCampioneRoute
+  LedwallPlayerRoute: typeof LedwallPlayerRoute
   QuadroRotazioneCampiRoute: typeof QuadroRotazioneCampiRoute
   SegreteriaCertificatiRoute: typeof SegreteriaCertificatiRoute
   SegreteriaPersoneRoute: typeof SegreteriaPersoneRoute
@@ -1850,6 +1863,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LaMiaScdCampioneRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ledwall/player': {
+      id: '/ledwall/player'
+      path: '/ledwall/player'
+      fullPath: '/ledwall/player'
+      preLoaderRoute: typeof LedwallPlayerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/quadro/': {
       id: '/quadro/'
       path: '/quadro'
@@ -2163,6 +2183,7 @@ const rootRouteChildren: RootRouteChildren = {
   GestionalePostaRoute: GestionalePostaRoute,
   GestionaleImpiantiRoute: GestionaleImpiantiRouteWithChildren,
   LaMiaScdCampioneRoute: LaMiaScdCampioneRoute,
+  LedwallPlayerRoute: LedwallPlayerRoute,
   QuadroRotazioneCampiRoute: QuadroRotazioneCampiRoute,
   SegreteriaCertificatiRoute: SegreteriaCertificatiRoute,
   SegreteriaPersoneRoute: SegreteriaPersoneRoute,

@@ -15,6 +15,7 @@ import { ArrowRight, ArrowUpRight, ChevronRight, Lock, Newspaper } from "lucide-
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { LedwallRotator } from "@/components/LedwallRotator";
+import { SponsorSpotsHome } from "@/components/SponsorSpots";
 import { ClubCrestOfficial } from "@/components/SiteChrome";
 import { KitTexture } from "@/components/scd/kit-texture";
 import { ClubCredentials, LogoTile, SponsorLogo } from "@/components/scd/Logos";
@@ -821,7 +822,7 @@ export function PublicHome({
   // Nothing repeats (UD-110, UD-116): vetrina slots that only open a page already in the quick actions, the news
   // block or the partner band are left out of the vetrina.
   const worlds = useMemo(() => trimVetrina(vetrina, vetrinaRepeats(actions)), [vetrina, actions]);
-  // UD-116 order (+ C4 support strip after the week): urgent → communication → oggi e settimana → sostieni il club → quick actions → results → tip → credentials (once) →
+  // UD-116 order (+ C4 support strip after the week, + C6/UD-119 sponsor LED spots right after it): urgent → communication → oggi e settimana → sostieni il club → quick actions → results → tip → credentials (once) →
   // vetrina → news → join → ONE partner band → reduced footer.
   return (
     <main data-screen="home" data-variant="public" className="min-h-dvh bg-[#eef3f9] pb-6 font-sans text-[#0b1e3a]">
@@ -830,6 +831,7 @@ export function PublicHome({
       <ClubNoticeCard notice={notice} />
       <PublicWeek calendar={calendar} nowMs={nowMs} today={today} />
       <SupportStrip actions={supportActions({ lotteryPublic: false })} />
+      <SponsorSpotsHome day={ledDay} />
       <QuickActions audience="visitatore" actions={actions} />
       <WeekendResults rows={results} />
       <DailyTipCard tip={tip} signedIn={false} />

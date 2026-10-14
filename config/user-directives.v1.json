@@ -2972,6 +2972,35 @@
         ],
         "duplicate_work": "DENY"
       }
+    },
+    {
+      "sourceDate": "2026-10-14",
+      "sourceTime": "18:14",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-119",
+      "name": "SPONSOR_LED_SPOTS_LIVE_IN_APP_NOT_BY_MAIL",
+      "sourceQuoteFragments": [
+        "Gli spot LED degli sponsor girano a rotazione sulla pagina iniziale dell'app e nella vetrina del gestionale sponsor: niente invio per mail. Servono a rendere virale l'azienda (tag sui social, annuncio 'innovazione in arrivo a Colico nelle prossime settimane'). Poi Presidente o commerciale propone lo spot allo sponsor, che accetta o chiede modifiche; tutto è gestito dal vivo attraverso l'app, che alimenta anche il LED wall. Gli sponsor dell'elenco sul sito (sponsors.ts) sono confermati; gli altri si aggiungono man mano."
+      ],
+      "context": "Francesco, 14/10/2026 18:14, decision relayed verbatim to the build session (C6). Same day he confirmed that every sponsor in apps/superapp/src/lib/sponsors.ts is a CONFIRMED sponsor.",
+      "normalizedCommand": {
+        "rule": "The ready LED spots of confirmed sponsors (Drive 02_V4_SPONSOR_VALIDATI) rotate on the public home ('Sul LED wall') and in the sponsor gestionale vetrina (/crm, 'Spot LED'); they are never sent by e-mail. The flow is live in the app: Presidente or commerciale proposes the spot, the sponsor approves or asks for changes, then it goes on air; the same app feeds the LED wall (/ledwall/player, master 1920x164 in day order). Spots rotate now while approval follows (status DA_APPROVARE shown), a spot with MODIFICHE_RICHIESTE is never shown on the home or the LED wall. Social: caption template 'In arrivo a Colico' with the sponsor tag left as '[@handle da verificare]' until the official handle is verified.",
+        "scope": "SCD_ONE_PUBLIC_HOME + SCD_GROW_CRM_VETRINA + LEDWALL_PLAYER",
+        "constraints": [
+          "only sponsors listed in src/lib/sponsors.ts (confirmed); sponsors outside the list (e.g. Iperal, Legea) are added only after confirmation",
+          "official spots only: transcoded, never redrawn or altered",
+          "no social handles, contacts or numbers invented; nothing published to social channels by the app",
+          "spot status register in the database only after the staged migration r105 is approved and applied"
+        ],
+        "status": "IMPLEMENTED_BRANCH_AGENT_SPOT",
+        "delivered": [
+          "apps/superapp/public/media/ledwall/2026-27/ (master + preview + poster per spot)",
+          "apps/superapp/src/lib/sponsor-spots.ts (+ test), components/SponsorSpots.tsx, routes/ledwall.player.tsx, /crm 'Spot LED' section",
+          "supabase/migrations/20261014_r105_sponsor_spots.sql (STAGED, not applied)"
+        ],
+        "duplicate_work": "DENY"
+      }
     }
   ],
   "completionGate": {
