@@ -87,3 +87,28 @@ export const getMyFamily = createServerFn({ method: "GET" }).handler(async (): P
     })),
   };
 });
+
+/**
+ * Fondo Solidale application form (security review 14/10/2026): only what the form needs leaves the server — id, name,
+ * relationship and minor flag. No birth year, teams, registration status or medical certificate date, on the first
+ * render or on in-app navigation.
+ */
+export const getMyFamilyForFund = createServerFn({ method: "GET" }).handler(async (): Promise<MyFamily> => {
+  const c = await scope();
+  if (c.state !== "ok") return { state: c.state, members: [] };
+  const { data, error } = await c.sb.rpc("scd_my_family", { p_organization_id: c.org.organizationId });
+  if (error) return { state: "error", members: [] };
+  return {
+    state: "ok",
+    members: ((data ?? []) as FamilyDbRow[]).map((m) => ({
+      personId: m.person_id,
+      displayName: m.display_name.trim() || "Nome non indicato",
+      relationship: m.relationship,
+      birthYear: null,
+      minor: m.is_minor,
+      teamCodes: [],
+      registrationStatus: null,
+      certificateExpiresAt: null,
+    })),
+  };
+});

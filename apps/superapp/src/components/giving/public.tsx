@@ -58,7 +58,7 @@ function romeToday(): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Rome", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
 }
 
-/** "Da attivare" note shown on public pages until r101 is applied. */
+/** "Non ancora aperto online" note shown on public pages until r101 is applied. */
 export function NotActiveNote({ children }: { children?: ReactNode }) {
   return (
     <div role="note" data-testid="giving-not-active" className="flex items-start gap-3 rounded-xl border border-accent bg-accent/15 px-4 py-3 text-sm">
