@@ -31,7 +31,7 @@ import { useSession } from "@/lib/use-session";
 type Mood = SkyReply["mood"];
 type Msg = { role: "sky" | "user"; text: string; links?: SkyReply["links"]; ai?: boolean };
 
-/** Round avatar of a persona: Sky (official head asset), CROVI (approved v3 avatar) or Era. */
+/** Round avatar of a persona: Sky (official head asset), CROVI (approved v3 avatar) or Genny. */
 export function SkyMascot({
   size = 52,
   persona = "sky",
@@ -92,12 +92,12 @@ function ReplyLink({ link, onNavigate }: { link: { label: string; to: string }; 
 
 /**
  * interior: work-area shells (no public chrome, no bottom bar). There is no floating launcher: the chat opens only
- * from an in-page entry point ("Chiedi a Era", window event "era:open" / "sky:open") and sits 16px from the corner.
+ * from an in-page entry point ("Chiedi a Genny", window event "genny:open" / "sky:open") and sits 16px from the corner.
  */
 export function SkyChat({ interior = false }: { interior?: boolean } = {}) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  // Era needs a verified session; until the session answers, the reserved helper is Sky, so nobody sees Era
-  // before the server confirms. One rule for persona and face: lib/assistant.ts eraEligible (r99, UD-104).
+  // Genny needs a verified session; until the session answers, the reserved helper is Sky, so nobody sees Genny
+  // before the server confirms. One rule for persona and face: lib/assistant.ts gennyEligible (r99, UD-104, UD-111).
   const { session } = useSession();
   const signedIn = !!session?.user;
   const viewer = signedIn ? { roles: session?.roles ?? [], age15plus: null } : null;
@@ -143,11 +143,11 @@ export function SkyChat({ interior = false }: { interior?: boolean } = {}) {
     };
     window.addEventListener("crovi:open", onOpen);
     window.addEventListener("sky:open", onOpen);
-    window.addEventListener("era:open", onOpen);
+    window.addEventListener("genny:open", onOpen);
     return () => {
       window.removeEventListener("crovi:open", onOpen);
       window.removeEventListener("sky:open", onOpen);
-      window.removeEventListener("era:open", onOpen);
+      window.removeEventListener("genny:open", onOpen);
     };
   }, []);
   useEffect(() => {

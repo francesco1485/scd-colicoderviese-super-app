@@ -1,6 +1,6 @@
 /**
  * Server functions of the AI assistants (r99, UD-104): askAssistant (public pages, Crovi) and askStaffAssistant
- * (signed-in, Era / Sky). Real data loaders are wired here; the logic and its tests live in assistant.server.ts.
+ * (signed-in, Genny / Sky). Real data loaders are wired here; the logic and its tests live in assistant.server.ts.
  */
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";

@@ -1,8 +1,9 @@
 /**
  * AI assistants of the Super App (r99, Direzione 13/10/2026 12:03 "Vai A B C", UD-104). Pure helpers, no I/O:
- * - personas: Crovi on public pages, Era inside for 15+ and staff, Sky inside for younger members (UD-026, UD-091);
+ * - personas: Crovi on public pages, Genny (the club secretary, Direzione 14/10/2026) inside for 15+ and staff, Sky
+ *   inside for younger members (UD-026, UD-091, UD-111);
  * - grounding by retrieval: compact CONTEXT blocks built from real server data (public projection for Crovi,
- *   Cervellone results filtered by the database for Era) with a size cap;
+ *   Cervellone results filtered by the database for Genny) with a size cap;
  * - system prompts in Italian with the hard rules (CONTEXT only, no minors' names, no health data, no IBAN / fiscal
  *   codes / passwords, safeguarding and requests never answered by the model);
  * - answer parsing with a link allowlist and an output guard that removes contacts and identifiers not in the CONTEXT;
@@ -12,7 +13,7 @@ import type { KbItem } from "./knowledge";
 import type { PublicEvent, PublicGroup } from "./public-snapshots";
 import type { SkyReply } from "./sky.functions";
 
-export type AssistantPersona = "crovi" | "era" | "sky";
+export type AssistantPersona = "crovi" | "genny" | "sky";
 export type AssistantLevel = "PUBLIC" | "INTERNO" | "RISERVATO";
 
 export interface AssistantReply extends SkyReply {
@@ -50,20 +51,21 @@ export interface HelperViewer {
 }
 
 /**
- * Single rule for Era (Direzione "Vai A B C" 13/10/2026, UD-104), used by the chat persona, the launcher face and
- * the server voice: a viewer known to be under 15 never gets Era; known 15+ gets her; with unknown age, staff
- * positions and families (guardians, adults) get Era, athlete-only or no position stays with Sky (safe choice).
+ * Single rule for the internal helper (Direzione "Vai A B C" 13/10/2026, UD-104; since 14/10/2026 the internal helper
+ * is Genny, the club secretary, UD-111), used by the chat persona, the launcher face and the server voice: a viewer
+ * known to be under 15 never gets Genny; known 15+ gets her; with unknown age, staff positions and families
+ * (guardians, adults) get Genny, athlete-only or no position stays with Sky (safe choice).
  */
-export function eraEligible(viewer: HelperViewer | null | undefined): boolean {
+export function gennyEligible(viewer: HelperViewer | null | undefined): boolean {
   if (!viewer) return false;
   if (viewer.age15plus === false) return false;
   if (viewer.age15plus === true) return true;
   return viewer.roles.some((p) => !NON_STAFF_POSITIONS.has(p)) || viewer.roles.includes("famiglia");
 }
 
-/** Helper inside the app: Era when {@link eraEligible}, otherwise Sky. */
+/** Helper inside the app: Genny when {@link gennyEligible}, otherwise Sky. */
 export function insidePersonaFor(roles: readonly string[] | null | undefined, age15plus: boolean | null = null): AssistantPersona {
-  return eraEligible(roles ? { roles, age15plus } : null) ? "era" : "sky";
+  return gennyEligible(roles ? { roles, age15plus } : null) ? "genny" : "sky";
 }
 
 /** True when the caller holds at least one staff position (the Cervellone is offered only to them). */
@@ -74,8 +76,8 @@ export function isStaff(roles: readonly string[] | null | undefined): boolean {
 const PERSONA_VOICE: Readonly<Record<AssistantPersona, string>> = {
   crovi:
     "Sei Crovi, la leggenda della segreteria e della biglietteria della S.C.D. ColicoDerviese: un signore simpatico di circa 70 anni, tuttologo del calcio dilettanti. Tono caldo, familiare e cordiale, con una battuta leggera quando ci sta. Risposte brevi.",
-  era:
-    "Sei Era, l'assistente interna della S.C.D. ColicoDerviese per lo staff e i soci adulti. Tono professionale, preciso e organizzato: vai al punto, metti in ordine scadenze e passi da fare. Mai ammiccante.",
+  genny:
+    "Sei Genny, la segretaria della S.C.D. ColicoDerviese, e parli con lo staff e i soci adulti. Sei vivace, sveglia e con un pizzico di simpatica sfacciataggine, ma sempre gentile e rispettosa, e hai tutto sotto controllo. Spieghi come funziona la segreteria, prepari guide di lavoro chiare passo per passo e comunichi le informazioni con messaggi brevi: vai al punto, metti in ordine scadenze e passi da fare. Mai ammiccante.",
   sky:
     "Sei Sky, la mascotte portafortuna della S.C.D. ColicoDerviese, e parli con soci giovani. Tono allegro, semplice e gentile, frasi corte, nessun linguaggio da adulti.",
 };
@@ -288,7 +290,7 @@ function kbLine(it: KbItem, today: string): string {
 }
 
 /**
- * Staff CONTEXT for Era (≈4k tokens): the items scd_kb_search returned for the caller's own session (the database
+ * Staff CONTEXT for Genny (≈4k tokens): the items scd_kb_search returned for the caller's own session (the database
  * already filtered INTERNO / RISERVATO) plus upcoming deadlines. Only title, summary, status, due date, season and
  * link; amounts, sources, entities and tags stay out. Sensitive identifiers are redacted line by line.
  */

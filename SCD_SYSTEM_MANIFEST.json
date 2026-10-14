@@ -3,8 +3,8 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.33.1",
-    "effective_at": "2026-10-13",
+    "version": "3.34.0",
+    "effective_at": "2026-10-14",
     "status": "BINDING",
     "language": "it-IT",
     "timezone": "Europe/Rome",
@@ -2374,13 +2374,15 @@
           "data": "PUBLIC_PROJECTION_ONLY",
           "context_cap_tokens": 3000
         },
-        "era": {
+        "genny": {
           "surface": "RESERVED_AREAS_STAFF_AND_ADULT_MEMBERS",
           "endpoint": "askStaffAssistant",
           "data": "CERVELLONE_VIA_SCD_KB_SEARCH_CALLER_SESSION",
           "context_cap_tokens": 4000,
+          "role": "SEGRETARIA (UD-111, Direzione 14/10/2026: replaces the former internal persona 'era')",
           "entry_points": [
-            "/direzione/cervellone 'Chiedi a Era'"
+            "/direzione/cervellone 'Chiedi a Genny'",
+            "/impianti 'Chiedi a Genny' (deterministic rotation panel)"
           ]
         },
         "sky": {
@@ -2390,8 +2392,9 @@
           "context_cap_tokens": 3000
         }
       },
-      "persona_rule": "Public pages Crovi; inside: staff positions and families -> Era, athlete-only or unknown age -> Sky (age not in session)",
+      "persona_rule": "Public pages Crovi; inside: staff positions and families -> Genny, athlete-only or unknown age -> Sky (age not in session)",
       "pre_router": [
+        "DISTRESS_TO_FIXED_REFERRAL_UD111",
         "SAFEGUARDING_TO_RESERVED_CHANNEL_RULES",
         "REQUESTS_TO_REQUESTS_ENGINE_UD045"
       ],
@@ -2406,6 +2409,31 @@
         "interior shells: same SkyChat without floating launcher"
       ],
       "docs": "docs/AI_ASSISTANT.md"
+    },
+    "assistant_cast": {
+      "directive": "UD-111",
+      "decided_at": "2026-10-14",
+      "registry": "apps/superapp/src/lib/assistant-cast.ts CAST_ROSTER",
+      "origin_rule": "ORIGINAL_CHARACTERS_INSPIRED_BY_ROLE_NEVER_REAL_PERSON_NAME_FACE_OR_VOICE",
+      "minors_protection": "ALWAYS_ON",
+      "named": {
+        "era": "NUTRIZIONISTA_CONTENT_ONLY",
+        "genny": "SEGRETARIA_CHAT_PERSONA",
+        "acanfora": "MEDICO_CONTENT_ONLY"
+      },
+      "new_roles_name_tbd": [
+        "accoglienza-chef",
+        "biglietteria",
+        "mentore-tornei",
+        "mental-coach",
+        "preparatore-atletico",
+        "musica-relax",
+        "volto-sponsor"
+      ],
+      "new_roles_presence": "CONTENT_ENTRIES_ONLY_NO_CHAT_PERSONA_NO_PORTRAIT_NO_VOICE",
+      "portraits": "SHOWN_ONLY_WHEN_READY_AND_REGISTERED_APPROVED; era and genny ON_HOLD until new Direzione-approved images",
+      "voices": "NONE_UNTIL_DIREZIONE_APPROVES_ORIGINAL_SYNTHETIC_VOICE_NOT_TIED_TO_A_REAL_PERSON",
+      "safety_rule": "DISTRESS_FIXED_REFERRAL_NO_THERAPY (cast-safety.ts; rules engine and AI pre-router)"
     }
   },
   "geo_spatial": {

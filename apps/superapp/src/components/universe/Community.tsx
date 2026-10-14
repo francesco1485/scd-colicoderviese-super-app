@@ -490,7 +490,7 @@ export function SkyCameo({
 }: {
   message: { title: string; text: string } | null;
   onClose: () => void;
-  /** Sky only on under-14 pages (Direzione 13/10/2026); Crovi outside, Era inside. */
+  /** Sky only on under-14 pages (Direzione 13/10/2026); Crovi outside, Genny inside. */
   persona?: Persona;
 }) {
   useEffect(() => {

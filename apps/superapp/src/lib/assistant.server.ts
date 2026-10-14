@@ -1,10 +1,11 @@
 /**
- * AI assistants on the server (r99, UD-104). Crovi answers on public pages from the public projection only; Era (or
+ * AI assistants on the server (r99, UD-104). Crovi answers on public pages from the public projection only; Genny (or
  * Sky for younger members) answers inside from the Cervellone, read through scd_kb_search with the CALLER'S session
  * (publishable key + request cookies): the database decides INTERNO vs RISERVATO, nothing here elevates access.
  *
  * Order of every answer:
- * 1. safeguarding and plain-words requests (UD-045) → rules engine (askSky), never the model;
+ * 1. signs of distress (fixed referral, cast-safety.ts), safeguarding and plain-words requests (UD-045) → rules engine
+ *    (askSky), never the model;
  * 2. feature off (SCD_ASSISTANT_AI != "on") or no SCD_ANTHROPIC_API_KEY → rules engine (behaviour of today);
  * 3. rate limit (public 20 / 10 min per IP, staff 60 / hour per user);
  * 4. CONTEXT from real data → Claude (8 s timeout) → JSON parse + output guard;
@@ -33,6 +34,7 @@ import {
   type BuiltContext,
   type PublicContextInput,
 } from "./assistant";
+import { detectDistress } from "./cast-safety";
 import type { KbResult } from "./knowledge";
 import { REQUEST_RE, skyIntent, type SkyReply } from "./sky.functions";
 
@@ -50,8 +52,12 @@ export function assistantConfig(env: Env = process.env): AssistantConfig {
   return { enabled: flag && apiKey !== null, apiKey: flag ? apiKey : null };
 }
 
-/** Messages the model must never handle: safeguarding and requests/problems go to the rules engine. */
-export function bypassesModel(message: string): "safeguarding" | "request" | null {
+/**
+ * Messages the model must never handle: distress (fixed referral to people, never therapy), safeguarding and
+ * requests/problems go to the rules engine.
+ */
+export function bypassesModel(message: string): "distress" | "safeguarding" | "request" | null {
+  if (detectDistress(message)) return "distress";
   if (skyIntent(message) === "safeguarding") return "safeguarding";
   if (REQUEST_RE.test(message)) return "request";
   return null;
@@ -145,7 +151,7 @@ export async function answerPublic(input: PublicAnswerInput, deps: PublicDeps): 
   return (await modelAnswer(input.message, input.persona, "PUBLIC", ctx, cfg, deps)) ?? asReply(await deps.rules({ message: input.message }), input.persona);
 }
 
-/* ─────────────────────────────── staff (Era / Sky) ─────────────────────────────── */
+/* ─────────────────────────────── staff (Genny / Sky) ─────────────────────────────── */
 
 export interface StaffSession {
   user: { email: string } | null;

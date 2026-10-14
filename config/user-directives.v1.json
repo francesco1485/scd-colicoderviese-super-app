@@ -2150,6 +2150,9 @@
           "Acanfora: first aid and 'who to call' only, no diagnosis; emergencies always 112; health data never in ordinary flows",
           "no likeness of real people without written consent",
           "no sexualized curves or poses; attention comes from charisma, expression and light"
+        ],
+        "decisions": [
+          "UPDATED 2026-10-14 by UD-111 (Direzione): roles corrected, Era = Nutrizionista, Genny = Segretaria (internal chat persona), Dottor Acanfora = Medico; round-4 images of Era and Genny ON_HOLD (they fit the old roles)"
         ]
       }
     },
@@ -2494,7 +2497,10 @@
           "Direzione: create the API key and set SCD_ANTHROPIC_API_KEY + SCD_ASSISTANT_AI=on on Render (see docs/AI_ASSISTANT.md)",
           "approved Era image (UD-091 Canva MAHX1G12gBc) into config/scd-assets.v1.json to replace the neutral initial"
         ],
-        "duplicate_work": "DENY"
+        "duplicate_work": "DENY",
+        "decisions": [
+          "UPDATED 2026-10-14 by UD-111: the internal persona is Genny (segretaria), not Era; same rules, endpoint and data"
+        ]
       }
     },
     {
@@ -2698,6 +2704,53 @@
           "apps/superapp/src/routes/tornei.tsx, kit.tsx, rassegna-stampa.tsx, rassegna.tsx (redirect), index.tsx",
           "apps/superapp/src/components/SiteChrome.tsx (footer link groups, no logo grid), scd/Logos.tsx + styles.css (no greyscale), CookieConsent.tsx + lib/universe.ts (cookie fallback)",
           "SCD_SYSTEM_MANIFEST.json product_direction.public_vetrina, source_registry GOOGLE_NEWS_PRESS_RSS, SCD_OFFICIAL_SITE.article_links_policy"
+        ],
+        "duplicate_work": "DENY"
+      }
+    },
+    {
+      "sourceDate": "2026-10-14",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-111",
+      "name": "ASSISTANT_CAST_ROLES_CORRECTED_AND_NEW_ROLES",
+      "sourceQuoteFragments": [
+        "Era and Genny roles are inverted (Direzione decision 14/10/2026, relayed by the orchestrating session; original Italian wording not in this repository)",
+        "Era = Nutrizionista: daily healthy-eating tip, personal initiatives, videos on how to eat by age; never personal plans, numbers or weight for minors",
+        "Genny = Segretaria: lively, glasses, cheeky, always on top of things, beautiful voice; explains secretariat functions, creates work guides for staff, communicates information by messages (audio later)",
+        "Dottor Acanfora = Medico: daily tips, first-aid and prevention initiatives and videos; never diagnoses",
+        "new characters: Accoglienza + Chef, Biglietteria, Mentore dei tornei (direttore artistico), Mental coach, Preparatore atletico, Musica e relax, Volto sponsor; names to be decided by the Direzione"
+      ],
+      "normalizedCommand": {
+        "rule": "Correct the assistant cast roles: Era is the club nutritionist (content: tip of the day and general habits on /famiglia, vetrina 'I consigli di Era'), Genny is the club secretary and becomes the internal chat persona that was 'era' (staff and adult members 15+, 'Chiedi a Genny' on /direzione/cervellone and /impianti), Dottor Acanfora is the club doctor (prevention tip of the day, first aid, 112, never a diagnosis). Seven new original roles enter the roster (assistant-cast.ts CAST_ROSTER) with role, area, what they do, rules and real people to refer to, nameTbd true, no portrait, no voice, content entries only.",
+        "scope": "ASSISTANTS_AND_CHARACTERS",
+        "torreFloor": "0_HALL (Crovi) + internal floors (Genny / Sky)",
+        "constraints": [
+          "original characters inspired by the role, never the name, face or voice of a real or famous person",
+          "neutral role labels until the Direzione decides the names: never an invented personal name",
+          "round-4 images of Era and Genny fit the old roles: files kept, registry status ON_HOLD, no portrait shown until new official images are approved; no image generation",
+          "audio only after a Direzione-approved original synthetic voice not tied to a real person (UD-092)",
+          "Era: never personal plans, numbers, quantities or weight for minors; Acanfora: never a diagnosis or a medicine",
+          "Musica e relax is not psychotherapy: distress gets a fixed referral to family, mister, doctor, professionals and the club's Tutela minori referent, 112 for danger; enforced for every persona in the rules engine and the AI pre-router",
+          "Accoglienza e Chef: request -> human confirmation -> payment at the SQUBY/SumUp till, never payments in chat",
+          "new roles are not wired as chat personas"
+        ],
+        "status": "IMPLEMENTED_BRANCH_AGENT_CAST",
+        "delivered": [
+          "apps/superapp/src/lib/assistant-cast.ts: corrected roles, Era and Genny ready:false with portraitHold, CAST_ROSTER with ten entries and CAST_SHARED_RULES",
+          "apps/superapp/src/lib/era-nutrition-tips.ts (was genny-tips.ts) with daily pick; components/scd/EraNutritionCard.tsx (was GennyCard.tsx) on /famiglia",
+          "apps/superapp/src/lib/first-aid-info.ts ACANFORA_DAILY_TIPS and AcanforaCard prevention tip of the day",
+          "apps/superapp/src/lib/assistant.ts persona 'genny' (gennyEligible, secretary voice); SkyJolly 'Chiedi a Genny' with neutral 'G' avatar",
+          "apps/superapp/src/lib/cast-safety.ts distress referral, wired in sky.functions.ts skyRulesAnswer and assistant.server.ts bypassesModel",
+          "apps/superapp/src/lib/vetrina-slots.server.ts cast slots follow portrait readiness",
+          "config/scd-assets.v1.json status ON_HOLD for the Era and Genny round-4 files",
+          "SCD_SYSTEM_MANIFEST.json 3.34.0 sky_and_avatar.ai_assistants (genny) and sky_and_avatar.assistant_cast; docs/AI_ASSISTANT.md"
+        ],
+        "pending": [
+          "Direzione: personal names of the seven new roles",
+          "Direzione: new official images for Era (nutritionist) and Genny (secretary with glasses), or an explicit decision to reuse the round-4 files",
+          "Direzione: original synthetic voices (Genny first) before any audio",
+          "Direzione: role boundary between Crovi (public, 'leggenda della segreteria e della biglietteria'), Genny (secretary, inside) and the new Biglietteria character"
         ],
         "duplicate_work": "DENY"
       }

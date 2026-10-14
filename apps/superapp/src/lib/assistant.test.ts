@@ -135,7 +135,7 @@ describe("public context (Crovi)", () => {
   });
 });
 
-describe("staff context (Era)", () => {
+describe("staff context (Genny)", () => {
   it("sends only title, summary, status, due date, season and link (no amounts, sources, entities, tags)", () => {
     const c = buildStaffContext({
       today: "2026-10-13",
@@ -253,11 +253,11 @@ describe("rate limiter", () => {
 });
 
 describe("persona routing", () => {
-  it("gives Era to staff and adult families, Sky to athletes and unknown ages", () => {
-    expect(insidePersonaFor(["segreteria"])).toBe("era");
-    expect(insidePersonaFor(["direzione", "dirigenza"])).toBe("era");
-    expect(insidePersonaFor(["mister", "atleta"])).toBe("era");
-    expect(insidePersonaFor(["famiglia"])).toBe("era");
+  it("gives Genny, the club secretary, to staff and adult families, Sky to athletes and unknown ages", () => {
+    expect(insidePersonaFor(["segreteria"])).toBe("genny");
+    expect(insidePersonaFor(["direzione", "dirigenza"])).toBe("genny");
+    expect(insidePersonaFor(["mister", "atleta"])).toBe("genny");
+    expect(insidePersonaFor(["famiglia"])).toBe("genny");
     expect(insidePersonaFor(["atleta"])).toBe("sky");
     expect(insidePersonaFor([])).toBe("sky");
     expect(insidePersonaFor(null)).toBe("sky");
@@ -276,7 +276,11 @@ describe("persona routing", () => {
     expect(p).toMatch(/IBAN/);
     expect(p).toMatch(/Safeguarding/);
     expect(p).toContain(ctx.text);
-    expect(systemPrompt("era", "RISERVATO", ctx)).toMatch(/Era.*professionale/s);
+    const genny = systemPrompt("genny", "RISERVATO", ctx);
+    expect(genny).toMatch(/Sei Genny, la segretaria della S\.C\.D\. ColicoDerviese/);
+    expect(genny).toMatch(/guide di lavoro/);
+    expect(genny).toMatch(/Mai nomi di minori/);
+    expect(genny).not.toMatch(/Sei Era/);
   });
 
   it("keeps the context as fenced data after the rules and checks", () => {

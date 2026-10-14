@@ -2,6 +2,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
+import { detectDistress, distressReferral } from "./cast-safety";
 import { CLUB_CONTACTS } from "./catalog";
 import { KIND_LABEL, areaPath, classifyRequest, requestMessage } from "./requests";
 
@@ -40,9 +41,12 @@ export function skyIntent(message: string): string | undefined {
 
 /**
  * The keyword rules engine (no AI). Used by askSky and as the fallback / pre-router of the AI assistants
- * (assistant.server.ts): safeguarding and requests are always answered here, never by the model.
+ * (assistant.server.ts): distress, safeguarding and requests are always answered here, never by the model.
  */
 export async function skyRulesAnswer(data: { message: string }): Promise<SkyReply> {
+    // Distress first (UD-111, cast-safety.ts): a fixed referral to real people, never therapy, never a request.
+    const distress = detectDistress(data.message);
+    if (distress) return distressReferral(distress);
     const intent = skyIntent(data.message);
     if (intent !== "safeguarding" && REQUEST_RE.test(data.message)) {
       const r = classifyRequest(data.message);

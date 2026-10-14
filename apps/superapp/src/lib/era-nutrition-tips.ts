@@ -1,19 +1,20 @@
 /**
- * "I consigli di Genny": general, evidence-based healthy habits for young athletes (hydration,
- * what kind of snack before and after training, breakfast, variety, sleep). Fixed copy reviewed
- * against the content rules of the cast (Direzione 13/10/2026):
+ * "I consigli di Era", la nutrizionista del club (Direzione 14/10/2026: Era = Nutrizionista, ruoli di Era e Genny
+ * invertiti). General, evidence-based healthy habits for young athletes (hydration, what kind of snack before and
+ * after training, breakfast, variety, sleep) and one "consiglio del giorno" chosen by the Rome date.
+ * Fixed copy reviewed against the content rules of the cast:
  * - no numbers, quantities or targets (minors), no personal plans, no body-weight topics;
  * - no medical advice: for specific needs the family talks to the paediatrician or the doctor.
  * `tipProblems` is the guard the tests run on every tip; new copy must pass it.
  */
 
-export interface GennyTip {
+export interface NutritionTip {
   id: string;
   title: string;
   text: string;
 }
 
-export const GENNY_TIPS: readonly GennyTip[] = [
+export const ERA_TIPS: readonly NutritionTip[] = [
   {
     id: "acqua",
     title: "Bevi spesso, non solo quando hai sete",
@@ -46,11 +47,12 @@ export const GENNY_TIPS: readonly GennyTip[] = [
   },
 ];
 
-export const GENNY_DISCLAIMER =
-  "Consigli generali, per esigenze specifiche rivolgiti al pediatra o al medico.";
+export const ERA_DISCLAIMER =
+  "Consigli generali della nutrizionista del club, mai piani personali: per esigenze specifiche rivolgiti al pediatra o al medico.";
 
-/** Words that never appear in Genny's tips (no plans, no body-weight talk, no supplements). */
-const FORBIDDEN = /\b(dieta|diete|peso|pesi|pesarsi|calorie|caloria|calorico|dimagr\w*|grammi|chili|kg|integrator\w*|digiun\w*)\b/i;
+/** Words that never appear in Era's tips (no plans, no body-weight talk, no supplements). */
+const FORBIDDEN =
+  /\b(dieta|diete|peso|pesi|pesarsi|calorie|caloria|calorico|dimagr\w*|grammi|chili|kg|integrator\w*|digiun\w*|piano alimentare|bmi)\b/i;
 
 /** Problems of one tip text; empty when it respects the rules. */
 export function tipProblems(text: string): string[] {
@@ -59,4 +61,25 @@ export function tipProblems(text: string): string[] {
   const hit = FORBIDDEN.exec(text);
   if (hit) out.push(`forbidden word: ${hit[0]}`);
   return out;
+}
+
+/** Calendar day in Europe/Rome (YYYY-MM-DD): server and browser pick the same daily tip. */
+export function romeDay(at: Date = new Date()): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Rome",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(at);
+}
+
+/**
+ * One item per day, the same for everybody on that day, every item once per cycle (days since the epoch modulo the
+ * list length). Shared by Era's and Dottor Acanfora's "consiglio del giorno".
+ */
+export function dailyPick<T>(items: readonly T[], day: string): T {
+  if (items.length === 0) throw new Error("dailyPick: empty list");
+  const days = Math.floor(Date.parse(`${day}T12:00:00Z`) / 86_400_000);
+  const i = ((days % items.length) + items.length) % items.length;
+  return items[i] as T;
 }

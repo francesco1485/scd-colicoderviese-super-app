@@ -13,6 +13,7 @@
  * affiliations (credential strip and footer), team lists (teams are inside, UD-100). Not available yet (no real page
  * or data, reported): fondo solidale, end-of-season events, standings, polls, podcast "Parliamo di noi".
  */
+import { CAST, castAvatarSrc, castReady } from "./assistant-cast";
 import { CHRISTMAS_LARIO_CUP as CLC } from "./events";
 import { INITIATIVES } from "./initiatives.server";
 import { dayMonth, type Initiative } from "./initiatives";
@@ -56,6 +57,15 @@ export function initiativeSlot(i: Initiative): VetrinaSlot {
  * world), audiences e.g. ["tifosi", "famiglie", "soci"], href to an existing page (e.g. /card or /sponsor).
  */
 export const CONVENZIONI: readonly VetrinaSlot[] = [];
+
+/**
+ * Visual of a cast slot: the character's round portrait only when its approved picture fits the current role
+ * (assistant-cast readiness), otherwise an original typographic panel. Era and Genny have no portrait until the
+ * Direzione approves new images (roles inverted 14/10/2026, UD-111).
+ */
+export function castSlotVisual(id: "era" | "acanfora", alt: string, fallback: { big: string; small: string }): VetrinaSlot["visual"] {
+  return castReady(id) ? { kind: "portrait", src: castAvatarSrc(id), alt } : { kind: "type", ...fallback };
+}
 
 const CLC_DAY = CLC.start.slice(0, 10);
 /** Season arc from the event date: the Christmas Lario Cup is on air every day from 1 November to the event day. */
@@ -223,20 +233,16 @@ export const VETRINA_SLOTS: readonly VetrinaSlot[] = [
     evergreen: true,
   },
   {
-    // config/scd-member-services.v1.json: massaggi-tecar (ACTIVE, infermeria). Cast: Dottor Acanfora (UD-091).
+    // config/scd-member-services.v1.json: massaggi-tecar (ACTIVE, infermeria). Cast: Dottor Acanfora, medico (UD-091, UD-111).
     id: "servizio-infermeria",
     kind: "service",
     theme: "servizi",
     kicker: "Servizi ai tesserati",
     title: "Infermeria del club",
-    text: "Massaggi e tecar riservati ai tesserati, e l'angolo primo soccorso del Dottor Acanfora.",
+    text: "Massaggi e tecar riservati ai tesserati, e i consigli di prevenzione e primo soccorso del Dottor Acanfora, il medico del club.",
     href: "/infermeria",
     cta: "Vai all'infermeria",
-    visual: {
-      kind: "portrait",
-      src: "/media/cast/acanfora/acanfora-avatar-256.webp",
-      alt: "Dottor Acanfora, assistente dell'infermeria",
-    },
+    visual: castSlotVisual("acanfora", `${CAST.acanfora.name}, il medico del club`, { big: "112", small: "Infermeria" }),
     audience: "members",
     audiences: ["famiglie", "ragazzi", "soci"],
     weight: 3,
@@ -258,20 +264,16 @@ export const VETRINA_SLOTS: readonly VetrinaSlot[] = [
     evergreen: true,
   },
   {
-    // lib/genny-tips.ts (GennyCard on /famiglia). Cast: Dottoressa Genny (UD-091): general habits only.
+    // lib/era-nutrition-tips.ts (EraNutritionCard on /famiglia). Cast: Era, nutrizionista (UD-111): general habits only.
     id: "servizio-nutrizione",
     kind: "service",
     theme: "servizi",
     kicker: "Alimentazione e sport",
-    title: "I consigli di Genny",
-    text: "Acqua, merenda prima e dopo l'allenamento, colazione e sonno: buone abitudini per chi fa sport.",
+    title: "I consigli di Era",
+    text: "La nutrizionista del club: il consiglio del giorno, acqua, merenda prima e dopo l'allenamento, colazione e sonno.",
     href: "/famiglia",
     cta: "Leggi i consigli",
-    visual: {
-      kind: "portrait",
-      src: "/media/cast/genny/genny-avatar-256.webp",
-      alt: "Dottoressa Genny, assistente per l'alimentazione",
-    },
+    visual: castSlotVisual("era", `${CAST.era.name}, la nutrizionista del club`, { big: "ERA", small: "Nutrizione" }),
     audience: "members",
     audiences: ["famiglie", "ragazzi", "soci"],
     weight: 3,

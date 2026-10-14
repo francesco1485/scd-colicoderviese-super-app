@@ -1,9 +1,11 @@
 import { Link } from "@tanstack/react-router";
-import { MapPin, Phone, TriangleAlert } from "lucide-react";
+import { MapPin, Phone, ShieldPlus, TriangleAlert } from "lucide-react";
 
 import { CastPortrait } from "@/components/scd/CastPortrait";
 import { Card } from "@/components/scd/interior-ui";
+import { dailyPick, romeDay } from "@/lib/era-nutrition-tips";
 import {
+  ACANFORA_DAILY_TIPS,
   ACANFORA_DISCLAIMER,
   CALL_112_WHEN,
   HEAD_KNOCK_RULE,
@@ -12,17 +14,19 @@ import {
 } from "@/lib/first-aid-info";
 
 /**
- * Dottor Acanfora's corner of the Infermeria: what to do for common sports knocks (RICE in plain
- * words), when to call 112, and where the infermeria room is when the facility data records it.
- * General information only, never a diagnosis. His picture shows once it is in the app.
+ * Dottor Acanfora's corner of the Infermeria (the club doctor character, Direzione 14/10/2026): the prevention tip of
+ * the day, what to do for common sports knocks (RICE in plain words), when to call 112, and where the infermeria room
+ * is when the facility data records it. General information only, never a diagnosis. His picture shows once it is in
+ * the app.
  */
-export function AcanforaCard({ portraitReady }: { portraitReady?: boolean }) {
+export function AcanforaCard({ portraitReady, day }: { portraitReady?: boolean; day?: string }) {
   const rooms = firstAidRooms();
+  const tip = dailyPick(ACANFORA_DAILY_TIPS, day ?? romeDay());
   return (
     <Card
       id="inf-acanfora"
       title="L'angolo del Dottor Acanfora"
-      sub="Botte, distorsioni e colpi in campo: cosa fare subito, in parole semplici."
+      sub="Il medico del club: prevenzione e primo soccorso in parole semplici."
     >
       <div className="flex flex-col gap-4 px-4 pb-5 sm:px-[18px] lg:flex-row lg:items-start">
         <CastPortrait
@@ -31,6 +35,23 @@ export function AcanforaCard({ portraitReady }: { portraitReady?: boolean }) {
           className="h-[150px] self-center lg:h-[220px] lg:self-start"
         />
         <div className="flex min-w-0 flex-1 flex-col gap-4">
+          <section
+            aria-labelledby="inf-oggi"
+            className="flex gap-3 rounded-xl border-2 border-[#ffd600] bg-white px-3.5 py-3"
+            data-testid="acanfora-tip-today"
+          >
+            <span className="mt-[2px] flex size-9 flex-none items-center justify-center rounded-full bg-[#0b2a5b] text-[#ffd600]">
+              <ShieldPlus className="size-[18px]" strokeWidth={2} aria-hidden="true" />
+            </span>
+            <span className="min-w-0">
+              <span id="inf-oggi" className="block text-[13px] font-bold uppercase tracking-wide text-[#0860A8]">
+                Prevenzione · il consiglio di oggi
+              </span>
+              <b className="block text-[15.5px] font-bold leading-snug text-[#0b2a5b]">{tip.title}</b>
+              <span className="mt-0.5 block text-[14.5px] leading-snug">{tip.text}</span>
+            </span>
+          </section>
+
           <section aria-labelledby="inf-botte">
             <h3 id="inf-botte" className="m-0 text-[17px] font-bold">
               Botta o distorsione

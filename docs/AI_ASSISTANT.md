@@ -1,20 +1,23 @@
-# Assistenti IA della Super App: Crovi ed Era
+# Assistenti IA della Super App: Crovi e Genny
 
 Release r99, direttiva **UD-104**, approvata dalla Direzione il 13/10/2026 alle 12:03 ("Vai A B C").
-Contratto: `SCD_SYSTEM_MANIFEST.json`, fonte `ANTHROPIC_API` e sezione `sky_and_avatar.ai_assistants`.
+Contratto: `SCD_SYSTEM_MANIFEST.json`, fonte `ANTHROPIC_API` e sezioni `sky_and_avatar.ai_assistants` e `sky_and_avatar.assistant_cast`.
+
+Aggiornamento 14/10/2026 (**UD-111**, decisione della Direzione): i ruoli di Era e Genny erano invertiti. L'assistente interna della chat è **Genny, la segretaria**; **Era è la nutrizionista** (solo contenuti, "I consigli di Era" nell'area famiglie) e il **Dottor Acanfora è il medico** (infermeria, mai diagnosi). Era e Genny non hanno ritratto finché la Direzione non approva immagini nuove adatte ai ruoli.
 
 ## Cosa fanno
 
 | Assistente | Dove | Su quali dati risponde |
 |---|---|---|
 | **Crovi** | pagine pubbliche ("Chiedi a Crovi") | solo dati pubblici: gare dei prossimi 7 giorni (solo partite ufficiali), eventi, biglietteria, impianti e indirizzi, contatti ufficiali, iscrizioni, offerta sponsor e sponsor confermati, link ufficiali ai risultati, guida all'app |
-| **Era** | aree riservate, staff e soci adulti; pulsante "Chiedi a Era" nel Cervellone | Cervellone letto con `scd_kb_search` **con la sessione di chi chiede**: l'ufficio vede INTERNO, solo la Direzione vede RISERVATO. Il database decide, l'app non aggira mai il controllo (niente service key) |
+| **Genny** (segretaria) | aree riservate, staff e soci adulti; pulsante "Chiedi a Genny" nel Cervellone e negli impianti | Cervellone letto con `scd_kb_search` **con la sessione di chi chiede**: l'ufficio vede INTERNO, solo la Direzione vede RISERVATO. Il database decide, l'app non aggira mai il controllo (niente service key) |
 | **Sky** | aree riservate, soci più giovani (finché non c'è il loro avatar) | solo dati pubblici, con un tono semplice |
 
 Regole sempre attive:
 - risponde **solo** con quello che trova nel contesto; altrimenti dice "non lo so" e manda alla segreteria;
 - mai nomi di minori, dati sanitari, IBAN, codici fiscali o password (vengono anche tolti dal contesto e dalla risposta da un filtro automatico);
 - **safeguarding**: la domanda non arriva mai all'IA, risponde il canale riservato di sempre;
+- **disagio** (ansia, tristezza, pensieri di farsi del male): la domanda non arriva mai all'IA; risponde un testo fisso che rimanda a famiglia, mister, medico, professionisti e al referente Tutela minori, e al 112 se c'è pericolo. Nessun personaggio fa terapia (`apps/superapp/src/lib/cast-safety.ts`);
 - **richieste e problemi** ("manca il sapone", "faro rotto"): li gestisce il motore delle richieste (UD-045), non l'IA;
 - risposte di massimo ~120 parole con collegamenti cliccabili; sotto ogni risposta IA compare "Risposta generata con IA · verifica le informazioni importanti";
 - una domanda alla volta: la conversazione non viene conservata.
@@ -44,7 +47,7 @@ Modello: **Claude Haiku 5.5** (`claude-haiku-5-5`). Prezzo indicato da fonti ter
 | Voce | Token per domanda | Costo per domanda |
 |---|---|---|
 | Crovi (contesto pubblico ≤ 3.000 + regole) | ~3.600 in + ~200 out | ~0,0005 $ |
-| Era (Cervellone ≤ 4.000 + regole) | ~4.600 in + ~200 out | ~0,0006 $ |
+| Genny (Cervellone ≤ 4.000 + regole) | ~4.600 in + ~200 out | ~0,0006 $ |
 
 Volume previsto: 3.000 domande al mese al pubblico + 1.500 dallo staff ≈ **2–3 $ al mese**. Anche con 10 volte il traffico si resta sotto i 30 $. Protezioni contro l'abuso: 20 domande ogni 10 minuti per indirizzo IP sulle pagine pubbliche, 60 all'ora per persona all'interno, domande lunghe al massimo 400 caratteri.
 
@@ -61,5 +64,18 @@ Volume previsto: 3.000 domande al mese al pubblico + 1.500 dallo staff ≈ **2�
 - `apps/superapp/src/lib/assistant.server.ts`: ordine delle risposte (safeguarding/richieste → regole; IA spenta → regole; limiti; IA; errore → regole).
 - `apps/superapp/src/lib/assistant.functions.ts`: `askAssistant` (pubblico) e `askStaffAssistant` (con accesso), collegati ai dati veri.
 - `apps/superapp/src/lib/anthropic.server.ts`: chiamata unica a Claude, usata anche dal moderatore automatico.
-- `apps/superapp/src/components/SkyChat.tsx`: la chat (stessa per Crovi, Era e Sky).
+- `apps/superapp/src/components/SkyChat.tsx`: la chat (stessa per Crovi, Genny e Sky).
 - Test: `assistant.test.ts`, `assistant.server.test.ts` (non chiamano mai l'API vera).
+
+## Il cast dei personaggi (UD-111)
+
+Elenco completo in `apps/superapp/src/lib/assistant-cast.ts` (`CAST_ROSTER`): ruolo, area, cosa fa, regole e persone reali a cui rimanda. Tutti sono personaggi **originali ispirati al ruolo**, mai nome, volto o voce di una persona reale o famosa; la tutela dei minori è sempre attiva.
+
+| Personaggio | Ruolo | Nella chat? | Ritratto | Voce |
+|---|---|---|---|---|
+| Era | Nutrizionista | no, contenuti | in attesa di nuova immagine | no |
+| Genny | Segretaria | sì, aree riservate | in attesa di nuova immagine (iniziale "G") | no |
+| Dottor Acanfora | Medico | no, contenuti | sì (round 4) | no |
+| Accoglienza e Chef · Biglietteria · Mentore dei tornei · Mental coach · Preparatore atletico · Musica e relax · Volto sponsor | nuovi ruoli, **nome da decidere** | no, solo contenuti | no | no |
+
+La voce arriverà solo dopo che la Direzione approva una voce sintetica originale, non legata a una persona reale.

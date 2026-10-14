@@ -4,25 +4,27 @@
  * - Sky stays away from the general app (Direzione 13/10/2026): never on public pages; inside only
  *   for young members (lib/assistant.ts rule) and on the under-14 team pages (KIDS_TEAM_IDS);
  * - reserved areas: the helper goes by the signed-in viewer (r99, UD-104, Direzione "Vai A B C" 13/10/2026):
- *   Era for staff and adult members (15+), Sky for younger members and when nothing tells us the viewer is 15+.
- *   The rule lives in one place, lib/assistant.ts eraEligible / insidePersonaFor, shared by the chat persona,
- *   the launcher face and the server voice. Crovi never appears inside, Era never on public pages.
+ *   Genny, the club secretary (Direzione 14/10/2026, UD-111), for staff and adult members (15+), Sky for younger
+ *   members and when nothing tells us the viewer is 15+. The rule lives in one place, lib/assistant.ts
+ *   gennyEligible / insidePersonaFor, shared by the chat persona, the launcher face and the server voice. Crovi never
+ *   appears inside, Genny never on public pages.
  * The chat logic lives in SkyChat.tsx; answers come from the AI assistants (lib/assistant.functions.ts) with the
  * askSky rules engine as fallback.
  *
  * Official assets only (config/scd-assets.v1.json): Sky head /media/brand/sky-atv-head.webp,
  * Sky head + ball /media/brand/sky-scd.png, CROVI avatar /media/crovi/v3 (original fictional figure),
- * Era avatar /media/cast/era (original fictional figure, GENERATE_ORIGINAL).
+ * Genny avatar /media/cast/genny only once the Direzione approves an image that fits the secretary role (neutral 'G'
+ * until then: the held round-4 image does not match the new role).
  */
 import croviAvatar from "@/assets/crovi/crovi-avatar-256.webp.asset.json";
 import { insidePersonaFor, type HelperViewer } from "@/lib/assistant";
 import { CAST, castAvatarSrc, castReady } from "@/lib/assistant-cast";
 import { isPublicPath } from "@/lib/http-policy";
 
-export type Persona = "sky" | "crovi" | "era";
+export type Persona = "sky" | "crovi" | "genny";
 
 export type { HelperViewer } from "@/lib/assistant";
-export { eraEligible } from "@/lib/assistant";
+export { gennyEligible } from "@/lib/assistant";
 
 /** Public media paths of the official Sky files (never generated, never altered). */
 export const SKY_HEAD_SRC = "/media/brand/sky-atv-head.webp";
@@ -65,7 +67,7 @@ export function isHelperHiddenPath(pathname: string): boolean {
   return startsWithPrefix(pathname, HIDDEN_PREFIXES);
 }
 
-/** Who answers in the chat: Crovi on public pages; inside Era (staff, adults 15+) or Sky (lib/assistant.ts). */
+/** Who answers in the chat: Crovi on public pages; inside Genny (staff, adults 15+) or Sky (lib/assistant.ts). */
 export function personaFor(pathname: string, viewer?: HelperViewer | null): Persona {
   return isReservedPath(pathname) ? insidePersonaFor(viewer?.roles, viewer?.age15plus ?? null) : "crovi";
 }
@@ -116,14 +118,14 @@ export const PERSONA_COPY: Record<
       "Come funziona l'app",
     ],
   },
-  era: {
-    name: "Era",
-    title: "Chiedi a Era",
-    subtitle: "l'assistente interna: cerco nel Cervellone",
+  genny: {
+    name: "Genny",
+    title: "Chiedi a Genny",
+    subtitle: "la segretaria del club: ho tutto sotto controllo",
     greeting:
-      "Ciao, sono Era, l'assistente interna della società. Cerco per te nel Cervellone documenti, scadenze, fornitori, tornei e regole, mostrandoti solo ciò che il tuo ruolo può vedere. Se qualcosa manca o non funziona, scrivimelo in due parole: lo giro a chi se ne occupa.",
-    placeholder: "Scrivi a Era…",
-    thinking: "Era sta cercando…",
+      "Ciao, sono Genny, la segretaria della società. Ti spiego come funziona la segreteria, ti preparo una guida passo per passo e cerco nel Cervellone documenti, scadenze, fornitori, tornei e regole, mostrandoti solo ciò che il tuo ruolo può vedere. Se qualcosa manca o non funziona, scrivimelo in due parole: lo giro a chi se ne occupa.",
+    placeholder: "Scrivi a Genny…",
+    thinking: "Genny sta cercando…",
     quick: [
       "Scadenze in vista",
       "Documenti della federazione",
@@ -153,7 +155,8 @@ export const PERSONA_COPY: Record<
 
 /**
  * Round avatar of the active persona. Sky's head is cropped in a light circle with a navy ring,
- * CROVI keeps his approved 256px avatar, Era uses hers once it is in (neutral 'E' until then).
+ * CROVI keeps his approved 256px avatar, Genny uses hers once an image fitting the role is approved (neutral 'G'
+ * until then).
  */
 export function PersonaAvatar({
   persona = "sky",
@@ -164,21 +167,21 @@ export function PersonaAvatar({
   size?: number;
   className?: string;
 }) {
-  if (persona === "era") {
-    if (castReady("era")) {
+  if (persona === "genny") {
+    if (castReady("genny")) {
       return (
         <img
-          src={castAvatarSrc("era")}
+          src={castAvatarSrc("genny")}
           alt=""
           width={size}
           height={size}
           className={`rounded-full object-cover ring-2 ring-[#0b2a5b] ${className}`}
           style={{ width: size, height: size }}
-          data-cast={CAST.era.id}
+          data-cast={CAST.genny.id}
         />
       );
     }
-    // Neutral initial only while the approved Era image is not in the app (assistant-cast readiness):
+    // Neutral initial only while no approved Genny image fits the role (assistant-cast readiness):
     // no invented portrait (SCD:ASSET GENERATE_ORIGINAL, non-substitutive).
     return (
       <span
@@ -186,7 +189,7 @@ export function PersonaAvatar({
         className={`inline-flex shrink-0 items-center justify-center rounded-full bg-[#0b2a5b] font-bold text-[#ffd600] ring-2 ring-[#ffd600] ${className}`}
         style={{ width: size, height: size, fontSize: Math.round(size * 0.46) }}
       >
-        E
+        G
       </span>
     );
   }

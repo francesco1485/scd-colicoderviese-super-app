@@ -421,7 +421,7 @@ function TeamPage({ data }: { data: TeamData }) {
             : "Rosa dalle liste ufficiali della stagione. Dei minorenni compare solo il nome con l'iniziale del cognome; niente foto dei ragazzi."}
         </p>
       </div>
-      <SkyCameo message={sky} onClose={() => setSky(null)} persona={isKidsPath(`/squadre/${id}`) ? "sky" : "era"} />
+      <SkyCameo message={sky} onClose={() => setSky(null)} persona={isKidsPath(`/squadre/${id}`) ? "sky" : "genny"} />
     </main>
   );
 }

@@ -580,7 +580,7 @@ export function MemberHome({
       {reporting && (
         <ReportSheet onPick={report} onClose={() => setReporting(null)} />
       )}
-      <SkyCameo message={sky} onClose={closeSky} persona="era" />
+      <SkyCameo message={sky} onClose={closeSky} persona="genny" />
     </main>
   );
 }

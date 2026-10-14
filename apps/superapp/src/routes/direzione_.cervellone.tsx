@@ -161,13 +161,13 @@ function CervellonePage({ due, today, preview }: { due: KbData; today: string; p
               <button type="submit" disabled={busy} className="scd-focus inline-flex h-11 items-center justify-center gap-2 rounded-[10px] bg-[var(--in-info)] px-4 text-[15px] font-bold text-white disabled:opacity-50">
                 <Search className="size-4" aria-hidden="true" /> {busy ? "Cerco…" : "Cerca"}
               </button>
-              {/* r99 (UD-104): same chat component, opened in place; Era reads the Cervellone with this session's permissions. */}
+              {/* r99 (UD-104): same chat component, opened in place; Genny reads the Cervellone with this session's permissions. */}
               <button
                 type="button"
-                onClick={() => window.dispatchEvent(new Event("era:open"))}
+                onClick={() => window.dispatchEvent(new Event("genny:open"))}
                 className="scd-focus inline-flex h-11 items-center justify-center gap-2 rounded-[10px] border border-[var(--in-line)] bg-white px-4 text-[15px] font-bold text-[var(--in-ink)]"
               >
-                <MessageCircle className="size-4" aria-hidden="true" /> Chiedi a Era
+                <MessageCircle className="size-4" aria-hidden="true" /> Chiedi a Genny
               </button>
             </form>
           </Card>

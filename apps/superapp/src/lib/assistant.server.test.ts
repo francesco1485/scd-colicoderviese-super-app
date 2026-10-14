@@ -133,6 +133,15 @@ describe("public assistant (Crovi)", () => {
     expect(r.ai).toBe(false);
   });
 
+  it("never sends distress to the model: the rules engine answers with the fixed referral (UD-111)", async () => {
+    const f = vi.fn();
+    const t = pub(ON, f, "mi sento giù e non ce la faccio più");
+    const r = await t.run();
+    expect(f).not.toHaveBeenCalled();
+    expect(t.rules).toHaveBeenCalledWith({ message: "mi sento giù e non ce la faccio più" });
+    expect(r.ai).toBe(false);
+  });
+
   it("routes requests and problems to the requests engine, not the model (UD-045)", async () => {
     const f = vi.fn();
     const t = pub(ON, f, "manca il sapone in lavanderia");
@@ -141,6 +150,8 @@ describe("public assistant (Crovi)", () => {
     expect(t.rules).toHaveBeenCalled();
     expect(bypassesModel("spogliatoio 2 senza acqua calda")).toBe("request");
     expect(bypassesModel("abuso in spogliatoio")).toBe("safeguarding");
+    expect(bypassesModel("prima della partita ho l'ansia")).toBe("distress");
+    expect(bypassesModel("voglio farla finita")).toBe("distress");
     expect(bypassesModel("quando gioca la juniores?")).toBeNull();
   });
 
@@ -167,7 +178,7 @@ describe("public assistant (Crovi)", () => {
   });
 });
 
-describe("staff assistant (Era / Sky)", () => {
+describe("staff assistant (Genny / Sky)", () => {
   const kbResult: KbResult = {
     level: "INTERNO",
     counts: {},
@@ -184,7 +195,7 @@ describe("staff assistant (Era / Sky)", () => {
     return { deps, kbSearch, rules, loadPublicContext };
   }
 
-  it("asks the Cervellone with the caller's session and answers as Era with the database level", async () => {
+  it("asks the Cervellone with the caller's session and answers as Genny with the database level", async () => {
     const f = vi.fn(async () => claudeResponse('{"text":"Omologazione Dervio aperta, scade il 01/12.","links":[{"label":"Documento","to":"https://drive.google.com/file/d/x"}]}'));
     const t = staff(["segreteria"], f);
     const r = await answerStaff("omologazione dervio", t.deps);
@@ -194,7 +205,7 @@ describe("staff assistant (Era / Sky)", () => {
     expect(body.system).toContain("livello INTERNO");
     expect(body.system).toContain("Omologazione Dervio");
     expect(body.system).not.toContain("500");
-    expect(r).toMatchObject({ ai: true, persona: "era", links: [{ label: "Documento", to: "https://drive.google.com/file/d/x" }] });
+    expect(r).toMatchObject({ ai: true, persona: "genny", links: [{ label: "Documento", to: "https://drive.google.com/file/d/x" }] });
   });
 
   it("never queries the Cervellone for non-staff members: Sky with public data for athletes", async () => {
@@ -221,7 +232,7 @@ describe("staff assistant (Era / Sky)", () => {
     const r = await answerStaff("scadenze", t.deps);
     expect(f).not.toHaveBeenCalled();
     expect(t.kbSearch).not.toHaveBeenCalled();
-    expect(r).toMatchObject({ text: RULES.text, ai: false, persona: "era" });
+    expect(r).toMatchObject({ text: RULES.text, ai: false, persona: "genny" });
   });
 
   it("routes safeguarding and requests to the rules engine before anything else", async () => {

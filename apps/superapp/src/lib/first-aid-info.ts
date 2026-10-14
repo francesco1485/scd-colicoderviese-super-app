@@ -1,6 +1,7 @@
 /**
- * Dottor Acanfora's corner in the Infermeria: general first-aid information for common sports
- * knocks, in plain words, plus when to call 112. Fixed copy, never a diagnosis, never a medicine.
+ * Dottor Acanfora's corner in the Infermeria. He is the club doctor character (Direzione 14/10/2026: Medico, daily
+ * tips, first-aid and prevention initiatives): general first-aid information for common sports knocks, in plain
+ * words, when to call 112 and a prevention "consiglio del giorno". Fixed copy, never a diagnosis, never a medicine.
  * The only number in this copy is the single European emergency number 112.
  * Where the infermeria room is comes from config/scd-facilities.v1.json (spaces of type
  * "first_aid"); first-aid kit and defibrillator locations are not in the facility data yet, so
@@ -50,8 +51,42 @@ export const CALL_112_WHEN: readonly string[] = [
 export const HEAD_KNOCK_RULE =
   "Colpo alla testa: nel dubbio fuori. Chi ha preso un colpo alla testa non rientra in campo quel giorno e lo valuta un medico.";
 
+/** Prevention tips, one shown per day (era-nutrition-tips.ts dailyPick). General, for everybody, no numbers. */
+export const ACANFORA_DAILY_TIPS: readonly FirstAidStep[] = [
+  {
+    key: "riscaldamento",
+    title: "Scaldati sempre prima di correre forte",
+    text: "Corsa leggera e movimenti di gambe e braccia preparano muscoli e articolazioni: si parte piano e si aumenta.",
+  },
+  {
+    key: "parastinchi",
+    title: "Parastinchi sempre, anche in allenamento",
+    text: "Proteggono da colpi e tacchetti: vanno messi in partita e in allenamento, sotto i calzettoni.",
+  },
+  {
+    key: "scarpe",
+    title: "Scarpe giuste per il campo",
+    text: "Tacchetti adatti al terreno, erba o sintetico, e scarpe della misura giusta aiutano a evitare distorsioni e vesciche.",
+  },
+  {
+    key: "dolore",
+    title: "Il dolore è un segnale, non una sfida",
+    text: "Se senti dolore che non passa fermati e avvisa il mister: giocare con il dolore peggiora le cose.",
+  },
+  {
+    key: "certificato",
+    title: "Certificato medico sportivo in regola",
+    text: "Per allenarsi e giocare serve il certificato valido: controlla la scadenza con la segreteria prima che scada.",
+  },
+  {
+    key: "meteo",
+    title: "Caldo e freddo si preparano",
+    text: "Con il caldo cappellino, crema solare e pause all'ombra; con il freddo strati di vestiti e una maglia asciutta per dopo.",
+  },
+];
+
 export const ACANFORA_DISCLAIMER =
-  "Il Dottor Acanfora dà informazioni generali di primo soccorso e non fa diagnosi: per ogni dubbio rivolgiti al medico o chiama il 112.";
+  "Il Dottor Acanfora, il medico del club, dà consigli generali di prevenzione e primo soccorso e non fa diagnosi: per ogni dubbio rivolgiti al medico o chiama il 112.";
 
 export interface FirstAidRoom {
   site: string;
