@@ -153,7 +153,7 @@ describe("cast roster (Direzione 14/10/2026, UD-111)", () => {
   });
 
   it("gives the new roles neutral role labels with the name still to be decided, no picture and no voice", () => {
-    // Named by the Direzione on 14/10/2026 18:46 (UD-120): Garrison (Chef) and Enea (Mentore dei tornei).
+    // Named by the Direzione on 14/10/2026 18:46 (UD-122): Garrison (Chef) and Enea (Mentore dei tornei).
     const NAMED: Record<string, string> = { "accoglienza-chef": "Garrison", "mentore-tornei": "Enea" };
     for (const id of NEW_ROLES) {
       const r = rosterEntry(id);

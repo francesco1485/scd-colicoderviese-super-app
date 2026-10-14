@@ -290,7 +290,7 @@ export const CAST_ROSTER: readonly CastRosterEntry[] = [
     },
     voice: { ready: false, rule: VOICE_RULE },
     presence: "FACE",
-    decidedBy: "Direzione 14/10/2026 ore 18:46: nome Garrison (UD-120)",
+    decidedBy: "Direzione 14/10/2026 ore 18:46: nome Garrison (UD-122)",
   },
   {
     id: "biglietteria",
@@ -345,7 +345,7 @@ export const CAST_ROSTER: readonly CastRosterEntry[] = [
     },
     voice: { ready: false, rule: VOICE_RULE },
     presence: "FACE",
-    decidedBy: "Direzione 14/10/2026 ore 18:46: nome Enea (UD-120)",
+    decidedBy: "Direzione 14/10/2026 ore 18:46: nome Enea (UD-122)",
   },
   {
     id: "mental-coach",

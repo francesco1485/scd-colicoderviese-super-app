@@ -10,7 +10,7 @@
  *
  * Status: today it comes from this file. All spots start as DA_APPROVARE and are already shown (Francesco: they
  * rotate now, approval follows). A spot with MODIFICHE_RICHIESTE never reaches the home or the LED wall. When the
- * staged spot register (supabase/migrations/20261014_r105_sponsor_spots.sql) is approved and applied, the status will
+ * staged spot register (supabase/migrations/20261014_r106_sponsor_spots.sql) is approved and applied, the status will
  * be read from there instead.
  *
  * Pure data and functions, SSR safe, tested in sponsor-spots.test.ts.

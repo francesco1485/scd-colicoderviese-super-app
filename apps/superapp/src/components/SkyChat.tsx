@@ -132,7 +132,7 @@ export function SkyChat({ interior = false }: { interior?: boolean } = {}) {
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
-  // Crovi is the app mascot (Direzione 14/10/2026, UD-120): on public pages he greets once per visit and points to
+  // Crovi is the app mascot (Direzione 14/10/2026, UD-122): on public pages he greets once per visit and points to
   // Vera's chat. Image only: he never answers, the chat is always Vera.
   const [cameo, setCameo] = useState<CameoLine | null>(null);
   const mascotPage = persona === "vera" && !interior && !isReservedPath(pathname);

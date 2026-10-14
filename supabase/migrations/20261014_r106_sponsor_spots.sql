@@ -1,4 +1,4 @@
--- r105 (STAGED, DO NOT APPLY without explicit Direzione approval): spot register of the sponsor LED spots
+-- r106 (STAGED, DO NOT APPLY without explicit Direzione approval): spot register of the sponsor LED spots
 -- (UD-119, Francesco 14/10/2026 18:14: "Poi Presidente o commerciale propone lo spot allo sponsor, che accetta o chiede
 -- modifiche; tutto è gestito dal vivo attraverso l'app, che alimenta anche il LED wall").
 --   * one row per spot of a confirmed sponsor (slug of apps/superapp/src/lib/sponsors.ts) with its status:

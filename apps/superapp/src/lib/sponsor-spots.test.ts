@@ -131,8 +131,8 @@ describe("sponsor LED spots (UD-119)", () => {
     expect(Object.keys(SPOT_STATUS_LABEL).sort()).toEqual(["APPROVATO", "DA_APPROVARE", "IN_ONDA", "MODIFICHE_RICHIESTE"]);
   });
 
-  it("the staged migration r105 keeps RLS on, writes only through checked security definer functions, no destructive words", () => {
-    const sql = readFileSync(resolve(REPO, "supabase/migrations/20261014_r105_sponsor_spots.sql"), "utf8");
+  it("the staged migration r106 keeps RLS on, writes only through checked security definer functions, no destructive words", () => {
+    const sql = readFileSync(resolve(REPO, "supabase/migrations/20261014_r106_sponsor_spots.sql"), "utf8");
     expect(sql).toMatch(/STAGED, DO NOT APPLY/);
     expect(sql).not.toMatch(/\b(delete|drop|truncate)\b/i);
     const tables = [...sql.matchAll(/create table if not exists (public\.\w+)/g)].map((m) => m[1]);
