@@ -112,6 +112,29 @@ export const requestMagicLink = createServerFn({ method: "POST" })
     return { sent: true, message: neutral, retryAfter: null, rateLimited: false };
   });
 
+
+/**
+ * "Password dimenticata" (UD-118, Direzione 14/10/2026: no codes): one e-mail with the "Scegli la password" button
+ * (Supabase recovery, template with token_hash -> /accedi/conferma -> password page). Same answer for every address.
+ */
+const allowReset = createRateLimiter(5, 10 * 60 * 1000);
+
+export const requestPasswordReset = createServerFn({ method: "POST" })
+  .inputValidator((d: { email: string }) => z.object({ email: z.string().trim().toLowerCase().email().max(120) }).parse(d))
+  .handler(async ({ data }): Promise<MagicLinkOutcome> => {
+    const neutral =
+      'Se questa e-mail è registrata, entro un minuto ti arriva un messaggio con il pulsante "Scegli la password". Toccalo una volta, scegli la password e poi entri sempre con e-mail o telefono e password. Se non arriva, controlla lo spam.';
+    if (!allowReset(clientIp())) return { sent: false, message: "Hai già chiesto diverse e-mail: riprova tra dieci minuti.", retryAfter: 600, rateLimited: true };
+    const sb = serverSupabase();
+    if (!sb) return { sent: false, message: "L'accesso non è ancora configurato su questo server.", retryAfter: null, rateLimited: false };
+    const origin = configuredSiteUrl(process.env) ?? getRequestUrl().origin;
+    const { error } = await sb.auth.resetPasswordForEmail(data.email, { redirectTo: `${origin}/accedi/conferma` });
+    if (error && (error.status === 429 || /rate limit|too many/i.test(error.message))) {
+      return { sent: false, message: "Troppe richieste: riprova tra qualche minuto.", retryAfter: 60, rateLimited: true };
+    }
+    return { sent: true, message: neutral, retryAfter: 60, rateLimited: false };
+  });
+
 export interface ConfirmOutcome {
   ok: boolean;
   next: string;

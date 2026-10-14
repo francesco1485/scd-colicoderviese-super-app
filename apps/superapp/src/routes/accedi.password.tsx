@@ -121,8 +121,8 @@ function PasswordPage() {
               Prima entra
             </h1>
             <p className="mt-2 text-[15px] leading-snug text-[var(--scd-sub)]">
-              Per creare o cambiare la password devi essere dentro: entra con il
-              codice che ricevi via e-mail e torni qui.
+              Per cambiare la password devi essere dentro. Se non la ricordi,
+              in Accedi tocca "Password dimenticata": ti arriva una e-mail per sceglierla.
             </p>
             <Link
               to="/accedi"

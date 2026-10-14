@@ -6,7 +6,7 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { ClubCrestOfficial } from "@/components/SiteChrome";
 import { PASSWORD_MAX, PASSWORD_PAGE } from "@/lib/auth-remember";
 import { OTP_LENGTH, cooldownUntil, normalizeOtpInput, secondsLeft, sendButtonLabel, type AuthErrorKind } from "@/lib/auth-otp";
-import { getSession, requestMagicLink, signInWithPassword, signOut, verifyEmailCode, type MagicLinkOutcome, type SessionView } from "@/lib/auth.functions";
+import { getSession, requestPasswordReset, signInWithPassword, signOut, verifyEmailCode, type MagicLinkOutcome, type SessionView } from "@/lib/auth.functions";
 import { safeNext } from "@/lib/session";
 import { SOCIAL_PROVIDERS, supportMailto, type SocialProvider } from "@/lib/signup";
 import { getAuthProviders, resendSignupEmail, startSocialSignIn } from "@/lib/signup.functions";
@@ -24,7 +24,7 @@ export const Route = createFileRoute("/accedi/")({
   head: () => ({
     meta: [
       { title: "Accedi — S.C.D. ColicoDerviese" },
-      { name: "description", content: "Entra nella Super App con e-mail o telefono e password. Password dimenticata? Ti mandiamo un codice." },
+      { name: "description", content: "Entra nella Super App con e-mail o telefono e password. Password dimenticata? Ti mandiamo una e-mail per sceglierne una nuova." },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -80,7 +80,7 @@ function ProviderMark({ id }: { id: SocialProvider }) {
 function Accedi() {
   const { next, modo } = Route.useSearch();
   const navigate = useNavigate();
-  const sendCode = useServerFn(requestMagicLink);
+  const sendReset = useServerFn(requestPasswordReset);
   const verifyCode = useServerFn(verifyEmailCode);
   const login = useServerFn(signInWithPassword);
   const logout = useServerFn(signOut);
@@ -213,15 +213,10 @@ function Accedi() {
     setBusy(true);
     setNotice(null);
     try {
-      const r: MagicLinkOutcome = await sendCode({ data: { email, next: PASSWORD_PAGE, remember } });
+      const r: MagicLinkOutcome = await sendReset({ data: { email } });
       setNotice({ ok: r.sent, message: r.message, kind: r.rateLimited ? "rate_limit" : undefined });
       startCooldown(r.retryAfter);
-      if (r.sent) {
-        setCode("");
-        setCodeNotice(null);
-        lastTried.current = "";
-        setCodeStep(true);
-      }
+
     } catch {
       setNotice({ ok: false, message: "Controlla l'indirizzo e riprova." });
     } finally {
@@ -468,7 +463,7 @@ function Accedi() {
               </button>
               <h2 id={`${id}-h`} className="text-[20px] font-bold leading-tight text-[var(--scd-ink)]">Scegli una nuova password</h2>
               <p className="-mt-1 text-[14.5px] leading-snug text-[var(--scd-sub)]">
-                Scrivi la tua e-mail: ti mandiamo un codice di 6 cifre. Lo scrivi qui e scegli la nuova password. Vale anche se non avevi mai creato una password.
+                Scrivi la tua e-mail: ti mandiamo un messaggio con il pulsante "Scegli la password". Lo tocchi una volta, scegli la password e poi entri sempre con e-mail o telefono e password.
               </p>
               <form onSubmit={submitForgot} className="grid gap-3" data-testid="login-link-form">
                 {emailField}
@@ -478,11 +473,11 @@ function Accedi() {
                   className={`h-[52px] w-full text-[17px] font-bold disabled:opacity-60 ${codeStep ? "scd-focus inline-flex items-center justify-center gap-2 rounded-[12px] border-2 border-[#b9d5ef] bg-white text-[var(--scd-blue)]" : "scd-action"}`}
                   data-testid="login-send"
                 >
-                  {busy && !codeStep ? "Invio…" : sendButtonLabel(left, false, codeStep ? "Mandami un nuovo codice" : "Mandami il codice")}
+                  {busy && !codeStep ? "Invio…" : sendButtonLabel(left, false, notice?.ok ? "Mandamela di nuovo" : "Mandami la e-mail")}
                 </button>
                 {left > 0 && (
                   <p className="-mt-1 text-center text-[13.5px] text-[var(--scd-sub)]" data-testid="login-cooldown">
-                    Puoi chiedere un altro codice tra <b className="tabular-nums">{left}</b> secondi.
+                    Puoi chiedere un'altra e-mail tra <b className="tabular-nums">{left}</b> secondi.
                   </p>
                 )}
               </form>
