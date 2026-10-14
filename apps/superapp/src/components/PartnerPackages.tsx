@@ -157,7 +157,7 @@ export function PartnerPackages({ onChoose }: { onChoose: (id: string) => void }
   const regular = PARTNER_PACKAGES.filter((p) => !p.featured && !p.link);
   const linked = PARTNER_PACKAGES.filter((p) => !p.featured && p.link);
   return (
-    <section aria-labelledby="listino-title" className="mx-auto mt-14 max-w-6xl px-4" data-testid="partner-packages">
+    <section id="listino" aria-labelledby="listino-title" className="mx-auto mt-14 max-w-6xl scroll-mt-20 px-4" data-testid="partner-packages">
       <p className="eyebrow">Listino partner · stagione 2026/27</p>
       <h2 id="listino-title" className="mt-1 text-3xl font-bold">Cosa puoi avere come partner</h2>
       <p className="mt-2 max-w-3xl text-sm text-muted-foreground">

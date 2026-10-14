@@ -1,26 +1,31 @@
 /**
- * Rules engine of the assistant personas (no AI): used when SCD_ASSISTANT_AI is off or the key is missing, and as the
- * fallback / pre-router of the AI (assistant.server.ts). Order of every answer, the same for all personas:
- * 1. signs of distress → fixed referral to real people (cast-safety.ts, UD-111), for every persona;
+ * Rules engine of Vera's chat (no AI): used when SCD_ASSISTANT_AI is off or the key is missing, and as the fallback /
+ * pre-router of the AI (assistant.server.ts). Order of every answer (UD-118: one chat, Vera, with an optional area):
+ * 1. signs of distress → fixed referral to real people (cast-safety.ts, UD-111), for every persona and area;
  * 2. safeguarding → the general rules engine (skyRulesAnswer: reserved channel only);
- * 3. operational requests of an area persona (orders, team registrations, tickets) → fixed reply that collects the
- *    request for a person, never a confirmation or a payment; other plain-words requests or problems (UD-045) → the
- *    general requests engine;
- * 4. keyword intents of the persona → persona-flavoured answers from curated copy and real facts;
+ * 3. operational requests of the area (orders, team registrations, sponsor contracts) or a ticket purchase → fixed
+ *    reply that collects the request for a person, never a confirmation or a payment; other plain-words requests or
+ *    problems (UD-045) → the general requests engine (it opens a request for the secretariat);
+ * 4. keyword intents of the area → answers from curated copy and real facts;
  * 5. general intents (calendar, contacts, …) → the general rules engine;
- * 6. nothing matched → the persona's own default (who they are, today's tip, quick links).
+ * 6. Vera's own topics (ticket office she absorbed, fixed refusals of the tip-only topics: diets, medicines, plans);
+ * 7. nothing matched → with an area, Vera's hand-over to the face of the area (today's tip, action buttons);
+ *    without an area, the general rules engine.
  * Pure apart from the injected general engine, so it is tested without R20 or the network.
  */
 import type { AssistantPersona } from "./assistant";
 import { detectDistress, distressReferral } from "./cast-safety";
 import {
   EMPTY_CAST_FACTS,
-  castDefaultReply,
   castIntentReply,
   castOperationalReply,
-  isCastPersona,
+  isChatArea,
   isOperationalFor,
+  isTicketRequest,
+  veraAreaReply,
+  veraTopicReply,
   type CastFacts,
+  type ChatAreaId,
 } from "./cast-personas";
 import { REQUEST_RE, skyIntent, type SkyReply } from "./sky.functions";
 
@@ -29,6 +34,8 @@ export type GeneralRules = (data: { message: string }) => Promise<SkyReply>;
 export interface CastRulesInput {
   message: string;
   persona?: AssistantPersona | undefined;
+  /** Area of Vera's chat (already resolved with assistant.ts resolveChat); ignored for Sky. */
+  area?: ChatAreaId | null | undefined;
 }
 
 export interface CastRulesDeps {
@@ -39,27 +46,39 @@ export interface CastRulesDeps {
 }
 
 /** Why the rules engine answered as it did (tests and logs; never the message). */
-export type CastRulesRoute = "distress" | "general-safety" | "operational" | "persona" | "general" | "default";
+export type CastRulesRoute = "distress" | "general-safety" | "operational" | "area" | "vera" | "general";
 
-export function castRulesRoute(message: string, persona?: AssistantPersona): CastRulesRoute {
+function veraArea(persona: AssistantPersona | undefined, area: ChatAreaId | null | undefined): ChatAreaId | null {
+  return persona !== "sky" && isChatArea(area) ? area : null;
+}
+
+export function castRulesRoute(message: string, persona?: AssistantPersona, area?: ChatAreaId | null): CastRulesRoute {
   if (detectDistress(message)) return "distress";
   if (skyIntent(message) === "safeguarding") return "general-safety";
-  const cast = persona && isCastPersona(persona) ? persona : null;
-  // An order or a registration for an area persona is collected for a person before the generic requests engine.
-  if (cast && isOperationalFor(cast, message)) return "operational";
+  if (persona === "sky") return "general";
+  const a = veraArea(persona, area);
+  // An order or a registration for an area is collected for a person before the generic requests engine.
+  if (a && isOperationalFor(a, message)) return "operational";
+  if (isTicketRequest(message)) return "operational";
   if (REQUEST_RE.test(message)) return "general-safety";
-  return cast ? "persona" : "general";
+  return a ? "area" : "vera";
 }
 
 export async function castRulesAnswer(input: CastRulesInput, deps: CastRulesDeps): Promise<SkyReply> {
   const { message, persona } = input;
   const distress = detectDistress(message);
   if (distress) return distressReferral(distress);
-  const route = castRulesRoute(message, persona);
-  if (route === "general-safety" || route === "general" || !persona || !isCastPersona(persona)) return deps.general({ message });
-  if (route === "operational") return castOperationalReply(persona);
-  const own = castIntentReply(persona, message, deps.facts ?? EMPTY_CAST_FACTS);
-  if (own) return own;
+  const route = castRulesRoute(message, persona, input.area);
+  if (route === "general-safety" || route === "general") return deps.general({ message });
+  const area = veraArea(persona, input.area);
+  const facts = deps.facts ?? EMPTY_CAST_FACTS;
+  if (route === "operational") return castOperationalReply(area && isOperationalFor(area, message) ? area : "biglietteria");
+  if (area) {
+    const own = castIntentReply(area, message, facts);
+    if (own) return own;
+  }
   if (skyIntent(message)) return deps.general({ message });
-  return castDefaultReply(persona, deps.day);
+  const topic = veraTopicReply(message, facts);
+  if (topic) return topic;
+  return area ? veraAreaReply(area, deps.day) : deps.general({ message });
 }

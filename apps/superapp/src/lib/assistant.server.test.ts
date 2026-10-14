@@ -39,7 +39,7 @@ function pub(env: Record<string, string>, fetchImpl: ReturnType<typeof vi.fn>, m
   return {
     rules,
     loadContext,
-    run: () => answerPublic({ message, persona: "crovi", ip: nextIp() }, { env, fetchImpl: fetchImpl as never, rules, loadContext }),
+    run: () => answerPublic({ message, persona: "vera", ip: nextIp() }, { env, fetchImpl: fetchImpl as never, rules, loadContext }),
   };
 }
 
@@ -59,13 +59,13 @@ describe("feature flag and key", () => {
   });
 });
 
-describe("public assistant (Crovi)", () => {
+describe("public assistant (Vera, UD-118)", () => {
   it("answers with the rules engine when the flag is off: no call to the API", async () => {
     const f = vi.fn();
     const t = pub({ SCD_ANTHROPIC_API_KEY: KEY }, f);
     const r = await t.run();
     expect(f).not.toHaveBeenCalled();
-    expect(r).toMatchObject({ text: RULES.text, ai: false, persona: "crovi" });
+    expect(r).toMatchObject({ text: RULES.text, ai: false, persona: "vera" });
   });
 
   it("answers with the rules engine when the key is missing", async () => {
@@ -89,7 +89,7 @@ describe("public assistant (Crovi)", () => {
     expect(body.model).toBe("claude-haiku-5-5");
     expect(body.system).toContain("CONTESTO:");
     expect(body.messages[0]!.content).toContain("Quando gioca la prima squadra?");
-    expect(r).toEqual({ text: "Scrivi a sportclubcolico@gmail.com o a [contatto rimosso]", mood: "success", links: [{ label: "Contatti", to: "/contatti" }], ai: true, persona: "crovi" });
+    expect(r).toEqual({ text: "Scrivi a sportclubcolico@gmail.com o a [contatto rimosso]", mood: "success", links: [{ label: "Contatti", to: "/contatti" }], ai: true, persona: "vera", area: null });
     expect(t.rules).not.toHaveBeenCalled();
   });
 
@@ -129,7 +129,7 @@ describe("public assistant (Crovi)", () => {
     const t = pub(ON, f, "devo segnalare un caso di bullismo");
     const r = await t.run();
     expect(f).not.toHaveBeenCalled();
-    expect(t.rules).toHaveBeenCalledWith({ message: "devo segnalare un caso di bullismo", persona: "crovi" });
+    expect(t.rules).toHaveBeenCalledWith({ message: "devo segnalare un caso di bullismo", persona: "vera", area: null });
     expect(r.ai).toBe(false);
   });
 
@@ -138,7 +138,7 @@ describe("public assistant (Crovi)", () => {
     const t = pub(ON, f, "mi sento giù e non ce la faccio più");
     const r = await t.run();
     expect(f).not.toHaveBeenCalled();
-    expect(t.rules).toHaveBeenCalledWith({ message: "mi sento giù e non ce la faccio più", persona: "crovi" });
+    expect(t.rules).toHaveBeenCalledWith({ message: "mi sento giù e non ce la faccio più", persona: "vera", area: null });
     expect(r.ai).toBe(false);
   });
 
@@ -161,8 +161,8 @@ describe("public assistant (Crovi)", () => {
     const loadContext = vi.fn(async () => ctxInput());
     const ip = "192.168.50.50";
     const now = () => 1_000_000;
-    for (let i = 0; i < 20; i++) expect((await answerPublic({ message: "ciao", persona: "crovi", ip }, { env: ON, fetchImpl: f as never, rules, loadContext, now })).ai).toBe(true);
-    const r = await answerPublic({ message: "ciao", persona: "crovi", ip }, { env: ON, fetchImpl: f as never, rules, loadContext, now });
+    for (let i = 0; i < 20; i++) expect((await answerPublic({ message: "ciao", persona: "vera", ip }, { env: ON, fetchImpl: f as never, rules, loadContext, now })).ai).toBe(true);
+    const r = await answerPublic({ message: "ciao", persona: "vera", ip }, { env: ON, fetchImpl: f as never, rules, loadContext, now });
     expect(r.ai).toBe(false);
     expect(r.mood).toBe("alert");
     expect(r.text).toMatch(/riprova tra 10 minuti/);
@@ -172,13 +172,13 @@ describe("public assistant (Crovi)", () => {
   it("falls back when the context cannot be loaded", async () => {
     const f = vi.fn();
     const rules = vi.fn(async () => RULES);
-    const r = await answerPublic({ message: "ciao", persona: "crovi", ip: nextIp() }, { env: ON, fetchImpl: f as never, rules, loadContext: async () => { throw new Error("drive down"); } });
+    const r = await answerPublic({ message: "ciao", persona: "vera", ip: nextIp() }, { env: ON, fetchImpl: f as never, rules, loadContext: async () => { throw new Error("drive down"); } });
     expect(f).not.toHaveBeenCalled();
     expect(r.ai).toBe(false);
   });
 });
 
-describe("staff assistant (Genny / Sky)", () => {
+describe("inside assistant (Vera / Sky)", () => {
   const kbResult: KbResult = {
     level: "INTERNO",
     counts: {},
@@ -195,7 +195,7 @@ describe("staff assistant (Genny / Sky)", () => {
     return { deps, kbSearch, rules, loadPublicContext };
   }
 
-  it("asks the Cervellone with the caller's session and answers as Genny with the database level", async () => {
+  it("asks the Cervellone with the caller's session and answers as Vera with the database level", async () => {
     const f = vi.fn(async () => claudeResponse('{"text":"Omologazione Dervio aperta, scade il 01/12.","links":[{"label":"Documento","to":"https://drive.google.com/file/d/x"}]}'));
     const t = staff(["segreteria"], f);
     const r = await answerStaff("omologazione dervio", t.deps);
@@ -205,7 +205,7 @@ describe("staff assistant (Genny / Sky)", () => {
     expect(body.system).toContain("livello INTERNO");
     expect(body.system).toContain("Omologazione Dervio");
     expect(body.system).not.toContain("500");
-    expect(r).toMatchObject({ ai: true, persona: "genny", links: [{ label: "Documento", to: "https://drive.google.com/file/d/x" }] });
+    expect(r).toMatchObject({ ai: true, persona: "vera", links: [{ label: "Documento", to: "https://drive.google.com/file/d/x" }] });
   });
 
   it("never queries the Cervellone for non-staff members: Sky with public data for athletes", async () => {
@@ -232,7 +232,7 @@ describe("staff assistant (Genny / Sky)", () => {
     const r = await answerStaff("scadenze", t.deps);
     expect(f).not.toHaveBeenCalled();
     expect(t.kbSearch).not.toHaveBeenCalled();
-    expect(r).toMatchObject({ text: RULES.text, ai: false, persona: "genny" });
+    expect(r).toMatchObject({ text: RULES.text, ai: false, persona: "vera" });
   });
 
   it("routes safeguarding and requests to the rules engine before anything else", async () => {
@@ -262,7 +262,7 @@ describe("staff assistant (Genny / Sky)", () => {
   });
 });
 
-describe("area personas of the cast (UD-114)", () => {
+describe("Vera's chat opened with an area (UD-118: one chat, faces hand over)", () => {
   let seq = 0;
   function inside(roles: string[], fetchImpl: ReturnType<typeof vi.fn>, env: Record<string, string> = ON) {
     const email = `cast${++seq}@example.org`;
@@ -277,80 +277,87 @@ describe("area personas of the cast (UD-114)", () => {
     return (JSON.parse(String((f.mock.calls[0] as unknown as [string, RequestInit])[1].body)) as { system: string }).system;
   }
 
-  it("answers as the chef with its voice, rules and area, never reading the Cervellone", async () => {
-    const f = vi.fn(async () => claudeResponse('{"text":"Il listino non è ancora pubblicato: per la festa compila la richiesta nell\'area famiglia.","links":[{"label":"Richiesta","to":"/famiglia"}]}'));
+  it("answers as Vera with the Club House area: the chef's rules and notes, never the Cervellone", async () => {
+    const f = vi.fn(async () => claudeResponse('{"text":"Il listino non è ancora pubblicato: per la festa compila la richiesta nell\'area famiglia (fonte: Club House).","links":[{"label":"Richiesta","to":"/famiglia"}]}'));
     const t = inside(["segreteria"], f);
     const r = await answerStaff("cosa c'è in menu?", t.deps, "accoglienza-chef");
     expect(t.kbSearch).not.toHaveBeenCalled();
     const sys = systemOf(f);
-    expect(sys).toContain("chef e l'accoglienza della Club House");
+    expect(sys).toContain("Sei Vera, la reception");
+    expect(sys).toContain("Per la Club House ti aiuta lo Chef");
     expect(sys).toContain("SQUBY/SumUp");
-    expect(sys).toContain("Area di Lo chef");
-    expect(r).toMatchObject({ ai: true, persona: "accoglienza-chef", links: [{ label: "Richiesta", to: "/famiglia" }] });
+    expect(sys).toContain("Area: Lo Chef");
+    expect(sys).toMatch(/Cita sempre la fonte/);
+    expect(r).toMatchObject({ ai: true, persona: "vera", area: "accoglienza-chef", links: [{ label: "Richiesta", to: "/famiglia" }] });
   });
 
-  it("re-checks the persona on the server: an athlete asking for the mental coach gets Sky", async () => {
+  it("re-checks on the server: an athlete asking for an area gets Sky, without the area", async () => {
     const f = vi.fn(async () => claudeResponse('{"text":"Ciao!"}'));
     const t = inside(["atleta"], f);
-    const r = await answerStaff("come mi concentro?", t.deps, "mental-coach");
-    expect(r.persona).toBe("sky");
+    const r = await answerStaff("cosa c'è in menu?", t.deps, "accoglienza-chef");
+    expect(r).toMatchObject({ persona: "sky", area: null });
     expect(systemOf(f)).toContain("Sei Sky");
   });
 
-  it("ignores an unknown persona and keeps Genny for staff", async () => {
-    const f = vi.fn(async () => claudeResponse('{"text":"ok"}'));
-    const t = inside(["segreteria"], f);
-    const r = await answerStaff("ciao", t.deps, "admin");
-    expect(r.persona).toBe("genny");
+  it("maps legacy and tip-only requests to Vera's general chat (no chat for Era, Acanfora, coach, preparatore, relax)", async () => {
+    for (const legacy of ["admin", "genny", "crovi", "era", "acanfora", "mental-coach", "preparatore-atletico", "musica-relax"]) {
+      const f = vi.fn(async () => claudeResponse('{"text":"ok"}'));
+      const t = inside(["segreteria"], f);
+      const r = await answerStaff("ciao", t.deps, legacy);
+      expect(r, legacy).toMatchObject({ persona: "vera", area: null });
+    }
   });
 
-  it("never sends an order to the model: the rules engine collects it with the chef's voice", async () => {
+  it("never sends an order to the model: the rules engine collects it in the Club House area", async () => {
     const f = vi.fn();
     const t = inside(["famiglia"], f);
     const r = await answerStaff("vorrei ordinare una torta per il compleanno", t.deps, "accoglienza-chef");
     expect(f).not.toHaveBeenCalled();
-    expect(t.rules).toHaveBeenCalledWith({ message: "vorrei ordinare una torta per il compleanno", persona: "accoglienza-chef" });
-    expect(r.persona).toBe("accoglienza-chef");
+    expect(t.rules).toHaveBeenCalledWith({ message: "vorrei ordinare una torta per il compleanno", persona: "vera", area: "accoglienza-chef" });
+    expect(r).toMatchObject({ persona: "vera", area: "accoglienza-chef" });
     expect(bypassesModel("posso comprare il biglietto qui?", "biglietteria")).toBe("operational");
-    expect(bypassesModel("posso comprare il biglietto qui?", "crovi")).toBeNull();
+    expect(bypassesModel("posso comprare il biglietto qui?")).toBe("operational");
+    expect(bypassesModel("vorrei ordinare una torta", null)).toBeNull();
   });
 
-  it("never sends distress to the model, whatever the persona", async () => {
-    for (const persona of ["musica-relax", "mental-coach", "accoglienza-chef", "biglietteria"]) {
+  it("never sends distress to the model, whatever the area", async () => {
+    for (const area of ["volto-sponsor", "mentore-tornei", "accoglienza-chef", "biglietteria", null]) {
       const f = vi.fn();
       const t = inside(["famiglia"], f);
-      await answerStaff("prima della partita ho l'ansia", t.deps, persona);
-      expect(f, persona).not.toHaveBeenCalled();
-      expect(bypassesModel("mi sento giù", persona as never)).toBe("distress");
+      await answerStaff("prima della partita ho l'ansia", t.deps, area);
+      expect(f, String(area)).not.toHaveBeenCalled();
+      expect(bypassesModel("mi sento giù", area as never)).toBe("distress");
     }
   });
 
-  it("falls back to the rules engine when the model breaks the persona's rules", async () => {
-    const f = vi.fn(async () => claudeResponse('{"text":"Facciamo una terapia di respirazione."}'));
-    const t = inside(["famiglia"], f);
-    const r = await answerStaff("come mi rilasso?", t.deps, "musica-relax");
-    expect(f).toHaveBeenCalled();
-    expect(r).toMatchObject({ ai: false, persona: "musica-relax", text: RULES.text });
+  it("falls back to the rules engine when the model breaks Vera's rules (therapy, diets, drugs, confirmations)", async () => {
+    for (const bad of ["Facciamo una terapia di respirazione.", "Segui questa dieta.", "Prendi un antidolorifico.", "Perfetto, ho confermato il tuo ordine!"]) {
+      const f = vi.fn(async () => claudeResponse(JSON.stringify({ text: bad })));
+      const t = inside(["famiglia"], f);
+      const r = await answerStaff("una domanda", t.deps, "accoglienza-chef");
+      expect(f).toHaveBeenCalled();
+      expect(r, bad).toMatchObject({ ai: false, persona: "vera", text: RULES.text });
+    }
   });
 
-  it("opens the public-data personas on public pages with their area and real facts", async () => {
-    const f = vi.fn(async () => claudeResponse('{"text":"Christmas Lario Cup in programma."}'));
+  it("opens Vera with a public area on public pages with its notes and real facts", async () => {
+    const f = vi.fn(async () => claudeResponse('{"text":"Christmas Lario Cup in programma (fonte: Tornei)."}'));
     const rules = vi.fn(async () => RULES);
     const r = await answerPublic(
-      { message: "che tornei ci sono?", persona: "mentore-tornei", ip: nextIp() },
+      { message: "che tornei ci sono?", persona: "vera", area: "mentore-tornei", ip: nextIp() },
       { env: ON, fetchImpl: f as never, rules, loadContext: async () => ctxInput(), castFacts: async () => ({ ticketing: null, nextHomeMatch: null, tournaments: ["Christmas Lario Cup, 8 dicembre 2026, Colico (in programma)"] }) },
     );
     expect(systemOf(f)).toContain("Torneo: Christmas Lario Cup");
-    expect(systemOf(f)).toContain("mentore dei tornei");
-    expect(r).toMatchObject({ ai: true, persona: "mentore-tornei" });
+    expect(systemOf(f)).toContain("Mentore dei tornei");
+    expect(r).toMatchObject({ ai: true, persona: "vera", area: "mentore-tornei" });
   });
 
-  it("keeps the persona on the rules engine when the AI is off", async () => {
+  it("keeps the area on the rules engine when the AI is off", async () => {
     const f = vi.fn();
     const t = inside(["famiglia"], f, {});
-    const r = await answerStaff("ciao", t.deps, "preparatore-atletico");
+    const r = await answerStaff("ciao", t.deps, "volto-sponsor");
     expect(f).not.toHaveBeenCalled();
-    expect(t.rules).toHaveBeenCalledWith({ message: "ciao", persona: "preparatore-atletico" });
-    expect(r.persona).toBe("preparatore-atletico");
+    expect(t.rules).toHaveBeenCalledWith({ message: "ciao", persona: "vera", area: "volto-sponsor" });
+    expect(r).toMatchObject({ persona: "vera", area: "volto-sponsor" });
   });
 });

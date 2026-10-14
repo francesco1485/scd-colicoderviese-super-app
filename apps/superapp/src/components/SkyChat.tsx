@@ -3,11 +3,12 @@ import { useServerFn } from "@tanstack/react-start";
 import { Send, X } from "lucide-react";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 
-import { CroviActor } from "@/components/CroviActor";
 import {
   PERSONA_COPY,
   PersonaAvatar,
   SKY_BALL_SRC,
+  chatAreaFor,
+  chatCopyFor,
   greetingFor,
   isHelperHiddenPath,
   isReservedPath,
@@ -15,25 +16,16 @@ import {
   personaFor,
   type Persona,
 } from "@/components/scd/SkyJolly";
-import {
-  CAMEO_SEEN_KEY,
-  CAMEO_VISIBLE_MS,
-  FORCED_CAMEO_DELAY_MS,
-  cameoDelayMs,
-  cameoLine,
-  forceCameo,
-  type CameoLine,
-} from "@/lib/crovi-cameo";
-import { AI_NOTICE, isCastPersona } from "@/lib/assistant";
+import { AI_NOTICE, type ChatAreaId } from "@/lib/assistant";
 import { askAssistant, askStaffAssistant } from "@/lib/assistant.functions";
-import { ASSISTANT_OPEN_EVENT, openedPersona } from "@/lib/assistant-open";
+import { ASSISTANT_OPEN_EVENT, VERA_OPEN_EVENTS, openedArea } from "@/lib/assistant-open";
 import { type SkyReply } from "@/lib/sky.functions";
 import { useSession } from "@/lib/use-session";
 
 type Mood = SkyReply["mood"];
 type Msg = { role: "sky" | "user"; text: string; links?: SkyReply["links"]; ai?: boolean };
 
-/** Round avatar of a persona: Sky (official head asset), CROVI (approved v3 avatar), Genny or a cast badge. */
+/** Round avatar of a persona: Sky (official head asset) or Vera (neutral badge until an image is approved). */
 export function SkyMascot({
   size = 52,
   persona = "sky",
@@ -60,8 +52,9 @@ function localReply(message: string): SkyReply | null {
   return null;
 }
 
-function greeting(persona: Persona, face: Persona): Msg[] {
-  return [{ role: "sky", text: greetingFor(persona, face) }];
+function greeting(persona: Persona, area: ChatAreaId | null): Msg[] {
+  const g = greetingFor(persona, area);
+  return [{ role: "sky", text: g.text, ...(g.links ? { links: g.links } : {}) }];
 }
 
 /* Bottom chrome on phones (SiteChrome.BottomNav 62px, SponsorBand 34px except on the home) */
@@ -69,7 +62,7 @@ const NAV_H = 62;
 const STRIP_H = 34;
 const GAP = 12;
 
-/** A reply link: app paths through the router, https sources (Drive, federation) in a new tab. */
+/** A reply link: app paths through the router (with "?query" and "#anchor"), https sources in a new tab. */
 function ReplyLink({ link, onNavigate }: { link: { label: string; to: string }; onNavigate: () => void }) {
   const cls = "rounded-md bg-[#ffd600] px-2 py-1 text-[12px] font-semibold text-[#0b1e3a]";
   if (/^https:\/\//.test(link.to)) {
@@ -80,10 +73,13 @@ function ReplyLink({ link, onNavigate }: { link: { label: string; to: string }; 
     );
   }
   if (!link.to.startsWith("/")) return null;
+  const [beforeHash = link.to, hash] = link.to.split("#");
+  const [path = beforeHash, query = ""] = beforeHash.split("?");
   return (
     <Link
-      to={link.to.split("?")[0] ?? link.to}
-      search={Object.fromEntries(new URLSearchParams(link.to.split("?")[1] ?? "")) as never}
+      to={path as never}
+      search={Object.fromEntries(new URLSearchParams(query)) as never}
+      {...(hash ? { hash } : {})}
       onClick={onNavigate}
       className={cls}
     >
@@ -93,55 +89,52 @@ function ReplyLink({ link, onNavigate }: { link: { label: string; to: string }; 
 }
 
 /**
+ * The one chat of the app (UD-118): Vera, or Sky for younger members inside.
  * interior: work-area shells (no public chrome, no bottom bar). There is no floating launcher: the chat opens only
- * from an in-page entry point ("Chiedi a Genny", window event "genny:open" / "sky:open") and sits 16px from the corner.
- * "Chiedi a …" of an area character (UD-114) sends "assistant:open" with its persona: the chat answers as that
- * persona while it stays open on the page (the one rule assistant.ts chatPersonaFor decides, the server re-checks).
+ * from an in-page entry point ("Chiedi a Vera", window event "vera:open" — legacy "genny:open" / "crovi:open" — or
+ * "sky:open") and sits 16px from the corner. "Chiedi a Vera" on a face card sends "assistant:open" with its area: Vera
+ * keeps that area while the chat stays open on the page (assistant.ts resolveChat decides, the server re-checks).
  */
 export function SkyChat({ interior = false }: { interior?: boolean } = {}) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  // Genny needs a verified session; until the session answers, the reserved helper is Sky, so nobody sees Genny
-  // before the server confirms. One rule for persona and face: lib/assistant.ts gennyEligible (r99, UD-104, UD-111).
+  // Inside, Vera needs a verified session; until the session answers, the reserved helper is Sky, so nobody sees Vera
+  // inside before the server confirms. One rule for persona, area and face: lib/assistant.ts resolveChat (UD-118).
   const { session } = useSession();
   const signedIn = !!session?.user;
   const viewer = signedIn ? { roles: session?.roles ?? [], age15plus: null } : null;
-  // Area persona asked by a page button; forgotten when the chat closes or the page changes.
-  const [requested, setRequested] = useState<string | null>(null);
+  // Area asked by a face card ("Chiedi a Vera"); forgotten when the chat closes or the page changes.
+  const [requested, setRequested] = useState<ChatAreaId | null>(null);
   const persona = personaFor(pathname, viewer, requested);
+  const area = chatAreaFor(pathname, viewer, requested);
   const face = launcherFaceFor(pathname, viewer);
-  const copy = PERSONA_COPY[persona];
+  const copy = chatCopyFor(persona, area);
   const hidden = isHelperHiddenPath(pathname);
   const onCalendario = pathname === "/calendario";
   const sponsorStrip = pathname !== "/";
-  const [cameo, setCameo] = useState<CameoLine | null>(null);
-  const pathRef = useRef(pathname);
-  pathRef.current = pathname;
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [mood, setMood] = useState<Mood>("info");
   const [notify, setNotify] = useState(false);
-  const [msgs, setMsgs] = useState<Msg[]>(() => greeting(persona, face));
+  const [msgs, setMsgs] = useState<Msg[]>(() => greeting(persona, area));
   const askPublic = useServerFn(askAssistant);
   const askInside = useServerFn(askStaffAssistant);
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
 
-  // A new persona (public <-> reserved) starts a fresh conversation with its own greeting;
-  // a new launcher face only refreshes the greeting while nothing has been asked yet.
-  const personaRef = useRef(persona);
+  // A new persona (public <-> reserved) or a new area starts a fresh conversation with its own greeting.
+  const chatKey = `${persona}|${area ?? ""}`;
+  const chatKeyRef = useRef(chatKey);
   useEffect(() => {
-    if (personaRef.current !== persona) {
-      personaRef.current = persona;
-      setMsgs(greeting(persona, face));
+    if (chatKeyRef.current !== chatKey) {
+      chatKeyRef.current = chatKey;
+      setMsgs(greeting(persona, area));
       setMood("info");
-      return;
     }
-    setMsgs((m) => (m.length === 1 && m[0]?.role === "sky" ? greeting(persona, face) : m));
-  }, [persona, face]);
+  }, [chatKey, persona, area]);
 
-  // Apertura dal bottone in pagina (es. "Chiedi a CROVI" su /calendario da smartphone).
+  // Opening from an in-page button ("Chiedi a Vera", legacy "Chiedi a Genny / Crovi", Sky on kids' pages).
   useEffect(() => {
     const onOpen = () => {
       setRequested(null);
@@ -149,19 +142,15 @@ export function SkyChat({ interior = false }: { interior?: boolean } = {}) {
       setNotify(false);
     };
     const onAssistant = (e: Event) => {
-      const p = openedPersona(e);
-      setRequested(isCastPersona(p) ? p : null);
+      setRequested(openedArea(e));
       setOpen(true);
       setNotify(false);
     };
-    window.addEventListener("crovi:open", onOpen);
-    window.addEventListener("sky:open", onOpen);
-    window.addEventListener("genny:open", onOpen);
+    const names = [...VERA_OPEN_EVENTS, "sky:open"];
+    for (const n of names) window.addEventListener(n, onOpen);
     window.addEventListener(ASSISTANT_OPEN_EVENT, onAssistant);
     return () => {
-      window.removeEventListener("crovi:open", onOpen);
-      window.removeEventListener("sky:open", onOpen);
-      window.removeEventListener("genny:open", onOpen);
+      for (const n of names) window.removeEventListener(n, onOpen);
       window.removeEventListener(ASSISTANT_OPEN_EVENT, onAssistant);
     };
   }, []);
@@ -189,40 +178,6 @@ export function SkyChat({ interior = false }: { interior?: boolean } = {}) {
     return () => clearTimeout(t);
   }, []);
 
-  // Crovi cameo (UD-026): only where CROVI is the helper (public pages), once per visit.
-  useEffect(() => {
-    if (persona !== "crovi") return;
-    const forced = forceCameo(window.location.search);
-    let seen = false;
-    try {
-      seen = sessionStorage.getItem(CAMEO_SEEN_KEY) === "1";
-    } catch {
-      /* storage off: show once per page load */
-    }
-    if (seen && !forced) return;
-    const t = setTimeout(
-      () => {
-        const line = cameoLine(pathRef.current);
-        if (!line) return;
-        setCameo(line);
-        try {
-          sessionStorage.setItem(CAMEO_SEEN_KEY, "1");
-        } catch {
-          /* ignore */
-        }
-      },
-      forced ? FORCED_CAMEO_DELAY_MS : cameoDelayMs(Math.random()),
-    );
-    return () => clearTimeout(t);
-  }, [persona]);
-  useEffect(() => {
-    if (!cameo) return;
-    const t = setTimeout(() => setCameo(null), CAMEO_VISIBLE_MS);
-    return () => clearTimeout(t);
-  }, [cameo]);
-  useEffect(() => {
-    if (open || persona !== "crovi") setCameo(null);
-  }, [open, persona]);
   useEffect(
     () => endRef.current?.scrollIntoView({ block: "end" }),
     [msgs, open],
@@ -244,14 +199,13 @@ export function SkyChat({ interior = false }: { interior?: boolean } = {}) {
     }
     setBusy(true);
     try {
-      // Inside with a verified session: the staff assistant (Cervellone with the caller's own permissions, or the
-      // area persona the page asked for). Everywhere else: the public assistant (public data only, Crovi or a public
-      // area persona); both fall back to the rules engine and the server re-checks the persona.
+      // Inside with a verified session: Vera reads the Cervellone with the caller's own permissions, or the area the
+      // face card asked for. Everywhere else: Vera with public data only (or Sky on a reserved page before the
+      // session); both fall back to the rules engine and the server re-checks persona and area.
       const inside = isReservedPath(pathname) && signedIn;
-      const cast = isCastPersona(persona) ? persona : undefined;
       const r = inside
-        ? await askInside({ data: cast ? { message, persona: cast } : { message } })
-        : await askPublic({ data: { message, persona: cast ?? (persona === "crovi" ? "crovi" : "sky") } });
+        ? await askInside({ data: area ? { message, area } : { message } })
+        : await askPublic({ data: { message, persona, ...(area ? { area } : {}) } });
       setMood(r.mood);
       setMsgs((m) => [...m, { role: "sky", text: r.text, links: r.links, ai: r.ai === true }]);
     } catch {
@@ -288,6 +242,7 @@ export function SkyChat({ interior = false }: { interior?: boolean } = {}) {
         <div
           role="dialog"
           aria-label={`Chat con ${copy.name}`}
+          data-chat-area={area ?? ""}
           className="sky-panel flex max-h-[calc(100dvh-11rem)] w-[min(21rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-[20px] border border-[#dbe3ee] bg-white shadow-[0_18px_40px_-12px_rgb(11_42_91/0.35)] lg:max-h-[calc(100dvh-6rem)]"
         >
           <div className="flex items-center gap-3 bg-[#0b2a5b] px-4 py-3 text-white" data-chat-persona={persona}>
@@ -388,43 +343,6 @@ export function SkyChat({ interior = false }: { interior?: boolean } = {}) {
               <Send className="size-4" />
             </button>
           </div>
-        </div>
-      )}
-      {cameo && !open && persona === "crovi" && (
-        <div
-          role="status"
-          aria-live="polite"
-          className="crovi-cameo flex items-end gap-1"
-          data-testid="crovi-cameo"
-        >
-          <div className="mb-12 min-w-0 max-w-[min(13.5rem,calc(100vw-12.5rem))] rounded-2xl rounded-br-sm border border-[#dbe3ee] bg-white px-3 py-2.5 text-[0.8rem] leading-snug text-[#0b1e3a] shadow-[0_18px_40px_-12px_rgb(11_42_91/0.35)]">
-            <p className="m-0">{cameo.text}</p>
-            <div className="mt-2 flex items-center gap-2">
-              <button
-                onClick={() => {
-                  const q = cameo.ask;
-                  setCameo(null);
-                  setOpen(true);
-                  setNotify(false);
-                  void send(q);
-                }}
-                className="rounded-full bg-[#ffd600] px-3 py-1 text-[0.75rem] font-semibold text-[#0b1e3a]"
-              >
-                Chiedi a Crovi
-              </button>
-              <button
-                onClick={() => setCameo(null)}
-                aria-label="Chiudi il messaggio di Crovi"
-                className="flex size-8 items-center justify-center rounded-full text-[#5a6b85]"
-              >
-                <X className="size-3.5" />
-              </button>
-            </div>
-          </div>
-          <CroviActor
-            className="h-[clamp(150px,24svh,190px)] shrink-0 drop-shadow-[0_10px_14px_rgb(0_10_40/0.35)] lg:h-[210px]"
-            label="Crovi saluta e indica la chat"
-          />
         </div>
       )}
       {!interior && (

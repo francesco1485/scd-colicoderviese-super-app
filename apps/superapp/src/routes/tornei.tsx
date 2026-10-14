@@ -185,13 +185,12 @@ function TorneiPage() {
         className={`${PUBLIC_WRAP} scroll-mt-24 pt-6 lg:pt-10`}
         data-testid="tornei-personaggi"
       >
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="max-w-3xl">
           <CastPresence
             id="mentore-tornei"
             day={today}
             live={list[0] ? { label: "Il prossimo", text: tournamentText(list[0]) } : null}
           />
-          <CastPresence id="volto-sponsor" day={today} />
         </div>
       </section>
       <section

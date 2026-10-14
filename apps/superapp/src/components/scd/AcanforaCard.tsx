@@ -1,7 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { MapPin, Phone, ShieldPlus, TriangleAlert } from "lucide-react";
 
-import { CastAskButton } from "@/components/scd/CastPresence";
 import { CastPortrait } from "@/components/scd/CastPortrait";
 import { Card } from "@/components/scd/interior-ui";
 import { dailyPick, romeDay } from "@/lib/era-nutrition-tips";
@@ -120,9 +119,6 @@ export function AcanforaCard({ portraitReady, day }: { portraitReady?: boolean; 
           <p role="note" className="m-0 rounded-xl bg-[var(--in-info-bg)] px-3.5 py-3 text-[14px] leading-snug text-[var(--in-info)]">
             {ACANFORA_DISCLAIMER}
           </p>
-          <div>
-            <CastAskButton id="acanfora" />
-          </div>
         </div>
       </div>
     </Card>

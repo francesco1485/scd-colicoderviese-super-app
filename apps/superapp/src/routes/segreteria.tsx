@@ -271,7 +271,7 @@ function SegreteriaPage({
         </Card>
 
         <div className="flex min-w-0 flex-col gap-[18px] lg:col-span-2 xl:col-span-1">
-          <CastPresence id="genny" />
+          <CastPresence id="vera" />
           <Card
             id="seg-tesseramenti"
             title="Tesseramenti"

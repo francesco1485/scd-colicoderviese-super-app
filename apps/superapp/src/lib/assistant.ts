@@ -1,38 +1,60 @@
 /**
  * AI assistants of the Super App (r99, Direzione 13/10/2026 12:03 "Vai A B C", UD-104). Pure helpers, no I/O:
- * - personas: Crovi on public pages, Genny (the club secretary, Direzione 14/10/2026) inside for 15+ and staff, Sky
- *   inside for younger members (UD-026, UD-091, UD-111);
- * - grounding by retrieval: compact CONTEXT blocks built from real server data (public projection for Crovi,
- *   Cervellone results filtered by the database for Genny) with a size cap;
- * - system prompts in Italian with the hard rules (CONTEXT only, no minors' names, no health data, no IBAN / fiscal
- *   codes / passwords, safeguarding and requests never answered by the model);
+ * - personas (UD-118, Direzione 14/10/2026: "una sola assistente chat in tutta l'app, di nome VERA"): Vera, the club
+ *   reception, everywhere — public pages and inside for staff and members 15+; Sky only for the younger members and
+ *   the under-14 world (UD-026, UD-091). An area of the cast (cast-personas.ts) is only a CONTEXT of Vera's chat,
+ *   never a separate persona. Legacy ids ("genny", "crovi") are aliases of "vera" ({@link normalizePersona});
+ * - grounding by retrieval: compact CONTEXT blocks built from real server data (public projection, Cervellone results
+ *   filtered by the database for staff) with a size cap;
+ * - system prompts in Italian with the hard rules (CONTEXT only, quote the source, no minors' names, no health data,
+ *   no IBAN / fiscal codes / passwords, safeguarding and requests never answered by the model);
  * - answer parsing with a link allowlist and an output guard that removes contacts and identifiers not in the CONTEXT;
  * - in-memory sliding-window rate limiter (single instance).
  */
 import {
   CAST_PERSONAS,
-  CAST_PERSONA_SHARED_RULES,
-  castAnswerProblems,
-  isCastPersona,
+  CHAT_AREA_IDS,
+  isChatArea,
+  veraAnswerProblems,
   type CastAreaContext,
-  type CastPersonaId,
+  type ChatAreaId,
 } from "./cast-personas";
 import type { KbItem } from "./knowledge";
 import type { PublicEvent, PublicGroup } from "./public-snapshots";
 import type { SkyReply } from "./sky.functions";
 
-/**
- * Who answers: the three helpers (Crovi public, Genny inside for staff and adults, Sky inside for younger members)
- * and the area personas of the cast (UD-114, cast-personas.ts), opened by "Chiedi a …" in their area.
- */
-export type AssistantPersona = "crovi" | "genny" | "sky" | CastPersonaId;
-export type { CastPersonaId } from "./cast-personas";
-export { isCastPersona } from "./cast-personas";
+/** Who answers: Vera, the one chat of the app, or Sky for the younger members (UD-118). */
+export type AssistantPersona = "vera" | "sky";
+export type { ChatAreaId } from "./cast-personas";
+export { isChatArea } from "./cast-personas";
 export type AssistantLevel = "PUBLIC" | "INTERNO" | "RISERVATO";
+
+/**
+ * Persona ids that may still arrive from older clients, events, links or logs, mapped to today's persona: "genny" (the
+ * name before UD-118) and "crovi" (the public helper, not an APPROVED asset, absorbed by Vera).
+ */
+export const LEGACY_PERSONA_ALIASES: Readonly<Record<string, AssistantPersona>> = { genny: "vera", crovi: "vera" };
+
+/** Today's persona for an id (current or legacy alias); null when unknown. */
+export function normalizePersona(id: unknown): AssistantPersona | null {
+  if (id === "vera" || id === "sky") return id;
+  if (typeof id !== "string") return null;
+  return Object.prototype.hasOwnProperty.call(LEGACY_PERSONA_ALIASES, id) ? LEGACY_PERSONA_ALIASES[id]! : null;
+}
+
+/**
+ * Area of Vera's chat asked by a page or an older client. Only the chat areas (faces and the ticket office) are kept:
+ * a persona id ("vera", "genny"…), a tip-only character (no chat since UD-118) or anything unknown gives null.
+ */
+export function normalizeChatArea(id: unknown): ChatAreaId | null {
+  return isChatArea(id) ? id : null;
+}
 
 export interface AssistantReply extends SkyReply {
   ai: boolean;
   persona: AssistantPersona;
+  /** Area of Vera's chat the answer was given in (null or absent: her general chat). */
+  area?: ChatAreaId | null;
 }
 
 export const MAX_INPUT_CHARS = 400;
@@ -65,21 +87,21 @@ export interface HelperViewer {
 }
 
 /**
- * Single rule for the internal helper (Direzione "Vai A B C" 13/10/2026, UD-104; since 14/10/2026 the internal helper
- * is Genny, the club secretary, UD-111), used by the chat persona, the launcher face and the server voice: a viewer
- * known to be under 15 never gets Genny; known 15+ gets her; with unknown age, staff positions and families
- * (guardians, adults) get Genny, athlete-only or no position stays with Sky (safe choice).
+ * Single rule for the internal helper (Direzione "Vai A B C" 13/10/2026, UD-104; since UD-118 the helper is Vera),
+ * used by the chat persona, the launcher face and the server voice: a viewer known to be under 15 never gets Vera
+ * inside; known 15+ gets her; with unknown age, staff positions and families (guardians, adults) get Vera,
+ * athlete-only or no position stays with Sky (safe choice).
  */
-export function gennyEligible(viewer: HelperViewer | null | undefined): boolean {
+export function veraEligible(viewer: HelperViewer | null | undefined): boolean {
   if (!viewer) return false;
   if (viewer.age15plus === false) return false;
   if (viewer.age15plus === true) return true;
   return viewer.roles.some((p) => !NON_STAFF_POSITIONS.has(p)) || viewer.roles.includes("famiglia");
 }
 
-/** Helper inside the app: Genny when {@link gennyEligible}, otherwise Sky. */
+/** Helper inside the app: Vera when {@link veraEligible}, otherwise Sky. */
 export function insidePersonaFor(roles: readonly string[] | null | undefined, age15plus: boolean | null = null): AssistantPersona {
-  return gennyEligible(roles ? { roles, age15plus } : null) ? "genny" : "sky";
+  return veraEligible(roles ? { roles, age15plus } : null) ? "vera" : "sky";
 }
 
 /** True when the caller holds at least one staff position (the Cervellone is offered only to them). */
@@ -87,48 +109,60 @@ export function isStaff(roles: readonly string[] | null | undefined): boolean {
   return (roles ?? []).some((p) => !NON_STAFF_POSITIONS.has(p));
 }
 
-/**
- * Persona of the chat for a surface, a viewer and the persona a page asked for with "Chiedi a …" (UD-114), one rule
- * for the browser (SkyChat) and the server (assistant.functions.ts):
- * - no request, or not a cast persona: Crovi on public pages, Genny or Sky inside ({@link insidePersonaFor});
- * - public pages: only the personas with public data (biglietteria, mentore dei tornei, volto sponsor);
- * - inside: area personas only for staff and adult members ({@link gennyEligible}); a younger member or an unknown
- *   age keeps Sky, the only helper for the under-14s (Direzione 13/10/2026).
- */
-export function chatPersonaFor(
-  surface: "public" | "inside",
-  viewer: HelperViewer | null | undefined,
-  requested?: string | null,
-): AssistantPersona {
-  const base: AssistantPersona = surface === "public" ? "crovi" : insidePersonaFor(viewer?.roles, viewer?.age15plus ?? null);
-  if (!isCastPersona(requested)) return base;
-  const def = CAST_PERSONAS[requested];
-  if (surface === "public") return def.surfaces.public ? requested : base;
-  return base === "genny" && def.surfaces.inside ? requested : base;
+export interface ResolvedChat {
+  persona: AssistantPersona;
+  /** Area context of Vera's chat (a face or the ticket office), null for her general chat and for Sky. */
+  area: ChatAreaId | null;
 }
 
-/** Area personas a public page may open (public data only). */
-export const PUBLIC_CAST_PERSONAS: readonly CastPersonaId[] = (Object.keys(CAST_PERSONAS) as CastPersonaId[]).filter(
-  (id) => CAST_PERSONAS[id].surfaces.public,
-);
+/**
+ * One rule for the browser (SkyChat) and the server (assistant.functions.ts), UD-118:
+ * - public pages: always Vera; an area only when it has public data (ticket office, tournaments, sponsor);
+ * - inside: Vera for staff and adult members ({@link veraEligible}), with the area when the area is allowed inside;
+ *   a younger member or an unknown age keeps Sky, the only helper of the under-14s, and never an area.
+ * `requested` may be an area id or a legacy value (tip-only character, persona id): see {@link normalizeChatArea}.
+ */
+export function resolveChat(surface: "public" | "inside", viewer: HelperViewer | null | undefined, requested?: string | null): ResolvedChat {
+  const persona: AssistantPersona = surface === "public" ? "vera" : insidePersonaFor(viewer?.roles, viewer?.age15plus ?? null);
+  const area = normalizeChatArea(requested);
+  if (persona !== "vera" || !area) return { persona, area: null };
+  const allowed = surface === "public" ? CAST_PERSONAS[area].surfaces.public : CAST_PERSONAS[area].surfaces.inside;
+  return { persona, area: allowed ? area : null };
+}
 
-const HELPER_VOICE: Readonly<Record<"crovi" | "genny" | "sky", string>> = {
-  crovi:
-    "Sei Crovi, la leggenda della segreteria e della biglietteria della S.C.D. ColicoDerviese: un signore simpatico di circa 70 anni, tuttologo del calcio dilettanti. Tono caldo, familiare e cordiale, con una battuta leggera quando ci sta. Risposte brevi.",
-  genny:
-    "Sei Genny, la segretaria della S.C.D. ColicoDerviese, e parli con lo staff e i soci adulti. Sei vivace, sveglia e con un pizzico di simpatica sfacciataggine, ma sempre gentile e rispettosa, e hai tutto sotto controllo. Spieghi come funziona la segreteria, prepari guide di lavoro chiare passo per passo e comunichi le informazioni con messaggi brevi: vai al punto, metti in ordine scadenze e passi da fare. Mai ammiccante.",
+/** Persona of the chat for a surface and a viewer ({@link resolveChat}). */
+export function chatPersonaFor(surface: "public" | "inside", viewer: HelperViewer | null | undefined, requested?: string | null): AssistantPersona {
+  return resolveChat(surface, viewer, requested).persona;
+}
+
+/** Areas a public page may open Vera's chat with (public data only). */
+export const PUBLIC_CHAT_AREAS: readonly ChatAreaId[] = CHAT_AREA_IDS.filter((id) => CAST_PERSONAS[id].surfaces.public);
+
+const HELPER_VOICE: Readonly<Record<AssistantPersona, string>> = {
+  vera:
+    "Sei Vera, la reception della S.C.D. ColicoDerviese e l'unica assistente della chat dell'app: un personaggio originale dell'app, non una persona reale. Accogliente, sveglia e precisa, hai tutto sotto controllo: rispondi con i dati veri del club e dici sempre da dove vengono, indirizzi la persona al volto giusto dell'area (lo Chef della Club House, il Volto sponsor, il Mentore dei tornei) e, quando serve una persona, invita ad aprire una richiesta alla segreteria. Rispondi anche su biglietti, gratuità e card. Tono cordiale e diretto, mai ammiccante.",
   sky:
     "Sei Sky, la mascotte portafortuna della S.C.D. ColicoDerviese, e parli con soci giovani. Tono allegro, semplice e gentile, frasi corte, nessun linguaggio da adulti.",
 };
 
-/** Voice (<role>) of a persona: the three helpers, or the area voice of a cast persona. */
+/** Vera's hard rules on top of the shared ones (UD-118). */
+export const VERA_RULES: readonly string[] = [
+  "Cita sempre la fonte del dato: la pagina dell'app o il documento del CONTESTO da cui viene (per esempio \"fonte: Calendario gare\").",
+  "Richieste operative (ordini, prenotazioni, iscrizioni, biglietti, pagamenti): non confermarle mai e non chiedere pagamenti; spiega che diventano una richiesta per una persona del club e indica la pagina giusta del CONTESTO.",
+  "Alimentazione, salute, allenamento e stato d'animo: solo consigli generali, mai piani personali, numeri, pesi, diagnosi, farmaci o terapia; per i dubbi famiglia, pediatra o medico.",
+  "Se compaiono tristezza, ansia, paura o disagio non approfondire e non fare terapia: invita a parlarne con famiglia, mister, medico o il referente Tutela minori; pericolo immediato 112.",
+  "Sei un personaggio originale dell'app: non imitare persone reali e non dare nomi propri ai volti delle aree il cui nome è ancora da decidere.",
+];
+
+/** Voice (<role>) of a persona. */
 export function personaVoice(persona: AssistantPersona): string {
-  return isCastPersona(persona) ? CAST_PERSONAS[persona].voice : HELPER_VOICE[persona];
+  return HELPER_VOICE[persona];
 }
 
-/** Extra hard rules of a persona on top of the shared ones (empty for the three helpers). */
-export function personaRules(persona: AssistantPersona): readonly string[] {
-  return isCastPersona(persona) ? [...CAST_PERSONA_SHARED_RULES, ...CAST_PERSONAS[persona].rules] : [];
+/** Extra hard rules of a persona on top of the shared ones: Vera's rules, plus the area's rules when she has one. */
+export function personaRules(persona: AssistantPersona, area: ChatAreaId | null = null): readonly string[] {
+  if (persona !== "vera") return [];
+  return area ? [...VERA_RULES, ...CAST_PERSONAS[area].rules] : VERA_RULES;
 }
 
 /* ─────────────────────────────── context ─────────────────────────────── */
@@ -246,16 +280,16 @@ function mapsUrl(address: string, municipality: string): string {
 }
 
 /**
- * Public CONTEXT for Crovi (≈3k tokens): next 7 days of games (fixtures only: date, time, home/away, team label,
+ * Public CONTEXT for Vera on public pages (≈3k tokens): next 7 days of games (fixtures only: date, time, home/away, team label,
  * opponent, venue, competition), club events, ticket office, facilities and directions, contacts, registrations,
  * sponsor offer, official result links and the app guide. Never people: no rosters, staff, notes or minors' names.
- * With `area` (a cast persona, UD-114) the persona's area notes and curated copy come first.
+ * With `area` (a chat area of Vera, UD-118) the area's notes and curated copy come first.
  */
 export function buildPublicContext(input: PublicContextInput, maxTokens = PUBLIC_CONTEXT_TOKENS, area?: CastAreaContext | null): BuiltContext {
   const b = new ContextBuilder(Math.floor(maxTokens * CHARS_PER_TOKEN));
   b.line(`Oggi è ${italianDate(input.today)} ${input.today.slice(0, 4)} (fuso Europe/Rome). Stagione 2026/27.`);
 
-  // Area of a cast persona first (UD-114): its notes and curated copy are never cut by the cap.
+  // Area of Vera's chat first (UD-118): its notes and curated copy are never cut by the cap.
   if (area) {
     b.section(area.title);
     for (const l of area.lines) b.line(l.text, l.to);
@@ -346,7 +380,7 @@ function kbLine(it: KbItem, today: string): string {
 }
 
 /**
- * Staff CONTEXT for Genny (≈4k tokens): the items scd_kb_search returned for the caller's own session (the database
+ * Staff CONTEXT for Vera inside (≈4k tokens): the items scd_kb_search returned for the caller's own session (the database
  * already filtered INTERNO / RISERVATO) plus upcoming deadlines. Only title, summary, status, due date, season and
  * link; amounts, sources, entities and tags stay out. Sensitive identifiers are redacted line by line.
  */
@@ -379,8 +413,8 @@ function fenceData(text: string): string {
  * Structured system prompt (role, objective, rules, output format, final checks, then the data in its own block).
  * The CONTEXT is data, never instructions: it sits last, fenced in <context>.
  */
-export function systemPrompt(persona: AssistantPersona, level: AssistantLevel, context: BuiltContext): string {
-  const extra = personaRules(persona);
+export function systemPrompt(persona: AssistantPersona, level: AssistantLevel, context: BuiltContext, area: ChatAreaId | null = null): string {
+  const extra = personaRules(persona, area);
   const audience =
     level === "PUBLIC"
       ? "Rispondi a visitatori, famiglie e tifosi usando SOLO i dati pubblici del CONTESTO."
@@ -388,6 +422,7 @@ export function systemPrompt(persona: AssistantPersona, level: AssistantLevel, c
   return [
     "<role>",
     personaVoice(persona),
+    ...(area && CAST_PERSONAS[area].handoff ? [`Ora la persona è nell'area "${CAST_PERSONAS[area].label}" (${CAST_PERSONAS[area].role}): ${CAST_PERSONAS[area].handoff}`] : []),
     "Parli per conto della S.C.D. ColicoDerviese (Colico e Dervio): scrivi sempre il nome così, mai \"S.D.C.\".",
     "</role>",
     "",
@@ -416,7 +451,7 @@ export function systemPrompt(persona: AssistantPersona, level: AssistantLevel, c
     "",
     "<final_checks>",
     "Prima di rispondere verifica: ogni dato viene dal CONTESTO; nessun nome di minore, dato sanitario o credenziale; nessuna informazione riservata a chi non ne ha diritto; JSON valido su una riga.",
-    ...(extra.length ? ["Verifica anche di aver rispettato le regole del tuo personaggio: nessun ordine, biglietto o iscrizione confermati, nessun pagamento in chat, nessuna terapia."] : []),
+    ...(extra.length ? ["Verifica anche di aver rispettato le regole del tuo personaggio: fonte citata, nessun ordine, biglietto o iscrizione confermati, nessun pagamento in chat, nessuna terapia."] : []),
     "</final_checks>",
     "",
     "CONTESTO:",
@@ -477,10 +512,11 @@ const MOODS = new Set(["info", "success", "alert"]);
 
 /**
  * Reads the model's JSON answer. Links survive only when their target is in the CONTEXT allowlist (max 3).
- * Returns null when the answer is unreadable or breaks a cast persona's rules (the caller falls back to the rules
- * engine).
+ * Returns null when the answer is unreadable or breaks Vera's rules (the caller falls back to the rules engine).
+ * `strict` (default true) also applies the limits of the tip-only topics (cast-personas.ts veraAnswerProblems); the
+ * server turns it off only for staff reading the Cervellone without an area.
  */
-export function parseAssistantAnswer(raw: string, ctx: BuiltContext, persona?: AssistantPersona): Pick<SkyReply, "text" | "mood" | "links"> | null {
+export function parseAssistantAnswer(raw: string, ctx: BuiltContext, persona?: AssistantPersona, strict = true): Pick<SkyReply, "text" | "mood" | "links"> | null {
   const m = raw.match(/\{[\s\S]*\}/);
   let text: string | null = null;
   let mood: SkyReply["mood"] = "info";
@@ -506,8 +542,8 @@ export function parseAssistantAnswer(raw: string, ctx: BuiltContext, persona?: A
   }
   if (text === null && !m && raw.trim() && !raw.includes("{")) text = raw;
   if (!text || !text.trim()) return null;
-  // Persona guard (UD-114): an answer that breaks the character's hard rules is dropped and the rules engine answers.
-  if (persona && isCastPersona(persona) && castAnswerProblems(persona, text).length) return null;
+  // Vera's guard (UD-118): an answer that breaks her hard rules is dropped and the rules engine answers.
+  if (persona === "vera" && veraAnswerProblems(text, strict).length) return null;
   const guarded = clipWords(guardAnswerText(text.trim(), ctx));
   return links.length ? { text: guarded, mood, links } : { text: guarded, mood };
 }

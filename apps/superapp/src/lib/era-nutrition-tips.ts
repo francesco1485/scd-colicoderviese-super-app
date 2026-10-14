@@ -1,6 +1,6 @@
 /**
- * "I consigli di Era", la nutrizionista del club (Direzione 14/10/2026: Era = Nutrizionista, ruoli di Era e Genny
- * invertiti). General, evidence-based healthy habits for young athletes (hydration, what kind of snack before and
+ * "I consigli di Era", la nutrizionista del club (Direzione 14/10/2026: Era = Nutrizionista, UD-111; since UD-118 a
+ * "consiglio del giorno" only, no chat). General, evidence-based healthy habits for young athletes (hydration, what kind of snack before and
  * after training, breakfast, variety, sleep) and one "consiglio del giorno" chosen by the Rome date.
  * Fixed copy reviewed against the content rules of the cast:
  * - no numbers, quantities or targets (minors), no personal plans, no body-weight topics;

@@ -128,8 +128,8 @@ function FamilyHome({ roles, badge, members, callups, fees, failed, transport, a
         <CastHelpersCard
           id="cast-helpers"
           ids={["preparatore-atletico", "mental-coach", "musica-relax"]}
-          title="Chi ti aiuta nel club"
-          sub="Consigli generali per tutti, uguali ogni giorno per tutta la squadra: mai schede o percorsi personali."
+          title="Consigli del giorno"
+          sub="Testi brevi e generali, uguali ogni giorno per tutta la squadra: mai schede, consigli medici o percorsi personali. Per una domanda c'è Vera."
           day={today}
         />
         {(clubHouse.state === "ok" || clubHouse.state === "off") && <ClubHouseOrderCard desk={clubHouse} today={today} />}

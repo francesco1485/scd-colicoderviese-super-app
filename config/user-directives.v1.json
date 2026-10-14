@@ -2972,6 +2972,63 @@
         ],
         "duplicate_work": "DENY"
       }
+    },
+    {
+      "sourceDate": "2026-10-14",
+      "sourceTime": "18:05",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-118",
+      "name": "CAST_SIMPLIFIED_ONE_CHAT_VERA_FOUR_FACES",
+      "sourceQuoteFragments": [
+        "Personaggi semplificati: una sola assistente chat in tutta l'app, di nome VERA (sostituisce il nome Genny, che non piace).",
+        "Vera è la reception del club: risponde con i dati veri del club citando la fonte, smista ai volti delle aree, apre una richiesta alla segreteria quando serve una persona.",
+        "I volti con azioni concrete sono quattro: Chef della Club House (ordini per feste, sondaggio piatti), Volto sponsor (/sponsor: chiedi pacchetto), Mentore dei tornei (/tornei: iscrivi la squadra, ospitalità), Sky solo nel mondo bambini under 14.",
+        "Era (alimentazione), Dottor Acanfora (prevenzione), preparatore atletico, mental coach, musica e relax diventano solo 'consiglio del giorno' (testo breve a rotazione), non chat.",
+        "Biglietteria e Crovi: assorbiti da Vera (Vera risponde su biglietti e card; Crovi resta solo se è un asset/mascotte già approvato in config/scd-assets.v1.json, altrimenti la sua chat passa a Vera)."
+      ],
+      "context": "Decision of Francesco (Direzione), 14/10/2026 ~18:05, relayed verbatim to the build session (branch agent/vera from integ/r2-hall).",
+      "normalizedCommand": {
+        "rule": "One chat persona in the whole app: Vera ('vera'), the club reception, replacing the name Genny. She answers from real club data quoting the source, hands over to the faces of the areas and opens a request to the secretariat (requests engine, UD-045) when a person is needed; she also answers on tickets, free entries and cards. Four faces keep an area card with 2-3 real actions and a 'Chiedi a Vera' button that opens Vera's chat with the area as context: Chef della Club House (order request for parties, dish poll), Volto sponsor (/sponsor: listino, chiedi un pacchetto), Mentore dei tornei (/tornei and the tournament page: iscrivi la squadra, ospitalità), Sky only in the under-14 world. Era, Dottor Acanfora, the Preparatore atletico, the Mental coach and Musica e relax are only the rotating 'consiglio del giorno' (home-tips.ts), never a chat. The ticket office and Crovi are absorbed by Vera.",
+        "scope": "ASSISTANTS_AND_CHARACTERS",
+        "decisions": [
+          "persona ids: 'vera' and 'sky' only; legacy ids 'genny' and 'crovi' are aliases of 'vera' (assistant.ts LEGACY_PERSONA_ALIASES, normalizePersona); old 'assistant:open' events with {persona} and the window events 'genny:open' / 'crovi:open' still open Vera",
+          "chat areas (context of Vera's chat, never a persona): accoglienza-chef, volto-sponsor, mentore-tornei, biglietteria (assistant.ts resolveChat; public pages only the public-data areas)",
+          "Crovi: config/scd-assets.v1.json registers the v3 files as VERIFIED with 'not an official asset', never APPROVED, so his chat and cameo pass to Vera; the files stay in the repository untouched until the Direzione decides",
+          "Vera's round-4 image is the held 'genny' set: folder and file names unchanged, registry ON_HOLD with character 'vera', no portrait until the Direzione approves an image (ready=false)",
+          "the Volto sponsor face moves from /tornei to /sponsor (UD-114 pending item)"
+        ],
+        "constraints": [
+          "distress -> fixed referral (cast-safety.ts) before anything else, never the model, for every chat and area",
+          "no real-person imitation, no invented personal names for the faces whose names are still to be decided",
+          "Sky only for younger members inside and in the under-14 world; a younger member or an unknown age never gets Vera inside and never an area",
+          "tip-only characters: short general copy guarded by castCopyProblems (no digits but 112, no diet, drug, therapy or personal-plan wording); no medical or psychological advice to minors",
+          "Vera's strict output guard (public pages and area chats): no confirmed orders/tickets/registrations/payments, no diet, drug, therapy or personal-plan wording; staff reading the Cervellone keep the confirmation guard",
+          "no images generated, no voices, no migrations, no Supabase writes, no deploys"
+        ],
+        "supersedesInPart": [
+          "UD-111 Genny = Segretaria chat persona (renamed Vera, now the reception and the only chat)",
+          "UD-114 'Chiedi a …' opening a separate chat persona per area character",
+          "UD-116 tip of the day rotation Era / Dottor Acanfora / Genny"
+        ],
+        "implementation": {
+          "registry": "apps/superapp/src/lib/cast-personas.ts (CastKind, CHAT_AREA_IDS, TIP_ONLY_IDS, CAST_FACES, VERA_PRESENCE, veraAreaReply, veraTopicReply, veraAnswerProblems)",
+          "routing": "apps/superapp/src/lib/assistant.ts (AssistantPersona 'vera' | 'sky', resolveChat, normalizePersona, normalizeChatArea, VERA_RULES); assistant.server.ts; assistant.functions.ts; assistant-open.ts",
+          "rules_engine": "apps/superapp/src/lib/cast-rules.ts",
+          "ui": "apps/superapp/src/components/SkyChat.tsx, components/scd/SkyJolly.tsx, CastPresence.tsx, CastDirectory.tsx; /sponsor Volto sponsor card; /tornei Mentore card; /tesoreria/club-house and /famiglia Chef",
+          "tips": "apps/superapp/src/lib/home-tips.ts (Era, Acanfora, Preparatore, Mental coach, Musica e relax, Vera)",
+          "assets": "config/scd-assets.v1.json cast/genny entries: character 'vera', ON_HOLD",
+          "manifest": "sky_and_avatar.ai_assistants.personas, sky_and_avatar.assistant_cast"
+        },
+        "pending": [
+          "Direzione: approve an official image for Vera (and new images for Era) before any portrait is shown",
+          "Direzione: approve an original synthetic voice for Vera (UD-092) before any audio",
+          "Direzione: decide whether Crovi becomes an APPROVED mascot (visual only, no chat) or is retired",
+          "Direzione: personal names of the faces (Chef, Volto sponsor, Mentore dei tornei)"
+        ],
+        "implementationStatus": "IMPLEMENTED_BRANCH_AGENT_VERA",
+        "duplicate_work": "DENY"
+      }
     }
   ],
   "completionGate": {

@@ -4,20 +4,25 @@ import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
 import { CAST_ROSTER, rosterEntry } from "./assistant-cast";
-import { PUBLIC_CAST_PERSONAS, buildPublicContext, chatPersonaFor, parseAssistantAnswer, personaRules, personaVoice, systemPrompt, type BuiltContext, type PublicContextInput } from "./assistant";
+import { PUBLIC_CHAT_AREAS, buildPublicContext, parseAssistantAnswer, personaRules, resolveChat, systemPrompt, type BuiltContext, type PublicContextInput } from "./assistant";
 import {
+  CAST_FACES,
   CAST_PERSONAS,
   CAST_PERSONA_IDS,
-  GENNY_PRESENCE,
+  CHAT_AREA_IDS,
+  FACE_IDS,
   PRESENCE_HOMES,
-  castAnswerProblems,
+  TIP_ONLY_IDS,
+  VERA_PRESENCE,
   castAreaContext,
   castCopyProblems,
-  castDefaultReply,
   castIntentReply,
   castOperationalReply,
   dailyCastTip,
+  isChatArea,
   isOperationalFor,
+  veraAnswerProblems,
+  veraAreaReply,
   type CastFacts,
   type PresenceId,
 } from "./cast-personas";
@@ -30,13 +35,65 @@ function routePaths(): Set<string> {
   return new Set([...block.matchAll(/'([^']+)': typeof/g)].map((m) => m[1]!.replace(/\/$/, "") || "/"));
 }
 
-const PRESENCES: readonly PresenceId[] = [...CAST_PERSONA_IDS, "genny"];
+const PRESENCES: readonly PresenceId[] = [...CAST_PERSONA_IDS, "vera"];
+const tipsOf = (id: PresenceId) => (id === "vera" ? VERA_PRESENCE.tips : CAST_PERSONAS[id].tips);
 
-describe("area personas registry (UD-114)", () => {
-  it("covers every roster character except Genny's helper role, once", () => {
+describe("simplified cast (UD-118): Vera + four faces + tips of the day", () => {
+  it("covers every roster area once, with the kind decided by the Direzione", () => {
     expect(new Set(CAST_PERSONA_IDS).size).toBe(CAST_PERSONA_IDS.length);
-    expect([...CAST_PERSONA_IDS].sort()).toEqual(CAST_ROSTER.filter((r) => r.presence === "AREA_PERSONA").map((r) => r.id).sort());
-    for (const id of CAST_PERSONA_IDS) expect(CAST_PERSONAS[id].id).toBe(id);
+    expect([...CAST_PERSONA_IDS].sort()).toEqual(CAST_ROSTER.filter((r) => r.presence !== "CHAT_PERSONA").map((r) => r.id).sort());
+    for (const id of CAST_PERSONA_IDS) {
+      expect(CAST_PERSONAS[id].id).toBe(id);
+      expect(CAST_PERSONAS[id].kind, id).toBe(rosterEntry(id).presence);
+    }
+    expect(CAST_PERSONA_IDS.filter((id) => CAST_PERSONAS[id].kind === "FACE").sort()).toEqual(["accoglienza-chef", "mentore-tornei", "volto-sponsor"]);
+    expect([...TIP_ONLY_IDS].sort()).toEqual(["acanfora", "era", "mental-coach", "musica-relax", "preparatore-atletico"]);
+    expect(CAST_PERSONAS.biglietteria.kind).toBe("ABSORBED");
+  });
+
+  it("has no chat entry for the tip-only characters: no chat area, no surface, no hand-over, no chat questions", () => {
+    for (const id of TIP_ONLY_IDS) {
+      const d = CAST_PERSONAS[id];
+      expect(isChatArea(id), id).toBe(false);
+      expect(CHAT_AREA_IDS as readonly string[]).not.toContain(id);
+      expect(d.surfaces, id).toEqual({ public: false, inside: false });
+      expect(d.handoff, id).toBeNull();
+      expect(d.chatQuick, id).toEqual([]);
+      expect(d.operational, id).toBeNull();
+      for (const surface of ["public", "inside"] as const) expect(resolveChat(surface, { roles: ["segreteria"], age15plus: null }, id).area, `${surface}/${id}`).toBeNull();
+    }
+  });
+
+  it("opens Vera's chat with the faces and the ticket office only, each with a hand-over and chat questions", () => {
+    expect([...CHAT_AREA_IDS].sort()).toEqual(["accoglienza-chef", "biglietteria", "mentore-tornei", "volto-sponsor"]);
+    for (const id of CHAT_AREA_IDS) {
+      const d = CAST_PERSONAS[id];
+      expect(d.handoff, id).toBeTruthy();
+      expect(d.chatQuick.length, id).toBeGreaterThanOrEqual(2);
+    }
+    expect(CAST_PERSONAS["accoglienza-chef"].handoff).toMatch(/^Per la Club House ti aiuta lo Chef/);
+  });
+
+  it("gives each of the four faces 2-3 actions on pages that exist, and a home page that exists", () => {
+    const paths = routePaths();
+    expect(FACE_IDS).toEqual(["accoglienza-chef", "volto-sponsor", "mentore-tornei", "sky"]);
+    for (const id of FACE_IDS) {
+      const f = CAST_FACES[id];
+      expect(f.actions.length, id).toBeGreaterThanOrEqual(2);
+      expect(f.actions.length, id).toBeLessThanOrEqual(3);
+      for (const l of f.actions) expect(paths.has(l.to), `${id} -> ${l.to}`).toBe(true);
+      expect(paths.has(f.home.to), `${id} home -> ${f.home.to}`).toBe(true);
+      expect(f.does.length, id).toBeGreaterThan(20);
+    }
+    expect(CAST_FACES["volto-sponsor"].actions.some((a) => a.to === "/sponsor")).toBe(true);
+    expect(CAST_FACES["mentore-tornei"].actions.some((a) => a.hash === "iscrizioni")).toBe(true);
+    expect(CAST_FACES["accoglienza-chef"].actions.map((a) => a.hash)).toEqual(expect.arrayContaining(["richiesta-ordine", "sondaggi-piatti"]));
+    expect(CAST_FACES.sky.area).toBeNull();
+  });
+
+  it("keeps Sky's face in the kids' world: no commercial action, no chat area", () => {
+    for (const a of CAST_FACES.sky.actions) expect(a.to, a.label).not.toMatch(/sponsor|partner|shop|kit|card|tesoreria|crm/);
+    expect(CAST_FACES.sky.does).toMatch(/under 14/);
   });
 
   it("keeps neutral role labels while the names are to be decided, never an invented personal name", () => {
@@ -44,25 +101,25 @@ describe("area personas registry (UD-114)", () => {
       const d = CAST_PERSONAS[id];
       const r = rosterEntry(d.rosterId);
       expect(d.nameTbd, id).toBe(r.nameTbd);
-      if (d.nameTbd) {
-        expect(d.label, id).toMatch(/^(Lo|La|Il|L'|Musica)/);
-        expect(d.voice, id).toMatch(/nome ancora da decidere/);
-      } else expect(d.label, id).toBe(r.label);
+      if (d.nameTbd) expect(d.label, id).toMatch(/^(Lo|La|Il|L'|Musica)/);
+      else expect(d.label, id).toBe(r.label);
     }
-    expect(CAST_PERSONAS["accoglienza-chef"].label).toBe("Lo chef");
-    expect(CAST_PERSONAS.biglietteria.label).toBe("La biglietteria");
+    expect(CAST_PERSONAS["accoglienza-chef"].label).toBe("Lo Chef");
+    expect(VERA_PRESENCE.label).toBe("Vera");
   });
 
   it("writes every piece of curated copy within the rules: no digits but 112, no diet, drug, therapy or plan wording", () => {
     for (const id of PRESENCES) {
-      const tips = id === "genny" ? GENNY_PRESENCE.tips : CAST_PERSONAS[id].tips;
+      const tips = tipsOf(id);
       expect(tips.length, id).toBeGreaterThanOrEqual(6);
       for (const t of tips) expect(castCopyProblems(id, `${t.title} ${t.text}`), `${id}/${t.key}`).toEqual([]);
-      const disclaimer = id === "genny" ? GENNY_PRESENCE.disclaimer : CAST_PERSONAS[id].disclaimer;
+      const disclaimer = id === "vera" ? VERA_PRESENCE.disclaimer : CAST_PERSONAS[id].disclaimer;
       expect(castCopyProblems(id, disclaimer), id).toEqual([]);
-      if (id !== "genny") {
-        expect(castCopyProblems(id, CAST_PERSONAS[id].chat.greeting), id).toEqual([]);
-        for (const n of CAST_PERSONAS[id].notes) expect(castCopyProblems(id, n.text), id).toEqual([]);
+      if (id !== "vera") {
+        const d = CAST_PERSONAS[id];
+        expect(castCopyProblems(id, d.does), id).toEqual([]);
+        if (d.handoff) expect(castCopyProblems(id, d.handoff), id).toEqual([]);
+        for (const n of d.notes) expect(castCopyProblems(id, n.text), id).toEqual([]);
       }
     }
   });
@@ -79,28 +136,25 @@ describe("area personas registry (UD-114)", () => {
   });
 
   it("never lets a distress pattern sit in curated copy (it would trigger the referral on itself)", () => {
-    for (const id of PRESENCES) {
-      const tips = id === "genny" ? GENNY_PRESENCE.tips : CAST_PERSONAS[id].tips;
-      for (const t of tips) expect(detectDistress(`${t.title} ${t.text}`), `${id}/${t.key}`).toBeNull();
-    }
+    for (const id of PRESENCES) for (const t of tipsOf(id)) expect(detectDistress(`${t.title} ${t.text}`), `${id}/${t.key}`).toBeNull();
   });
 
-  it("gives every persona 2-4 quick actions to pages that exist, and a home page that exists", () => {
+  it("links every presence to pages that exist, with a home page that exists", () => {
     const paths = routePaths();
-    expect(paths.has("/famiglia")).toBe(true);
     for (const id of PRESENCES) {
-      const quick = id === "genny" ? GENNY_PRESENCE.quick : CAST_PERSONAS[id].quick;
+      const quick = id === "vera" ? VERA_PRESENCE.quick : CAST_PERSONAS[id].quick;
       expect(quick.length, id).toBeGreaterThanOrEqual(2);
-      expect(quick.length, id).toBeLessThanOrEqual(4);
+      expect(quick.length, id).toBeLessThanOrEqual(3);
       for (const l of quick) expect(paths.has(l.to), `${id} -> ${l.to}`).toBe(true);
       expect(paths.has(PRESENCE_HOMES[id].to), `${id} home -> ${PRESENCE_HOMES[id].to}`).toBe(true);
     }
     for (const id of CAST_PERSONA_IDS) for (const n of CAST_PERSONAS[id].notes) if (n.to) expect(paths.has(n.to), `${id} note -> ${n.to}`).toBe(true);
   });
 
-  it("points public personas only to public pages", async () => {
+  it("points public areas only to public pages", async () => {
     const { isPublicPath } = await import("./http-policy");
-    for (const id of PUBLIC_CAST_PERSONAS) for (const l of CAST_PERSONAS[id].quick) expect(isPublicPath(l.to), `${id} -> ${l.to}`).toBe(true);
+    expect([...PUBLIC_CHAT_AREAS].sort()).toEqual(["biglietteria", "mentore-tornei", "volto-sponsor"]);
+    for (const id of PUBLIC_CHAT_AREAS) for (const l of CAST_PERSONAS[id].quick) expect(isPublicPath(l.to), `${id} -> ${l.to}`).toBe(true);
   });
 });
 
@@ -108,7 +162,7 @@ describe("daily tip", () => {
   it("is deterministic by Rome day, the same for everybody, and cycles through every tip", () => {
     for (const id of PRESENCES) {
       expect(dailyCastTip(id, "2026-10-14")).toEqual(dailyCastTip(id, "2026-10-14"));
-      const tips = id === "genny" ? GENNY_PRESENCE.tips : CAST_PERSONAS[id].tips;
+      const tips = tipsOf(id);
       const seen = new Set<string>();
       for (let d = 1; d <= tips.length; d++) seen.add(dailyCastTip(id, `2026-11-${String(d).padStart(2, "0")}`).key);
       expect(seen.size, id).toBe(tips.length);
@@ -116,57 +170,56 @@ describe("daily tip", () => {
   });
 
   it("changes from one day to the next", () => {
-    expect(dailyCastTip("biglietteria", "2026-10-14").key).not.toBe(dailyCastTip("biglietteria", "2026-10-15").key);
+    expect(dailyCastTip("vera", "2026-10-14").key).not.toBe(dailyCastTip("vera", "2026-10-15").key);
   });
 });
 
-describe("persona routing (one rule for chat, button and server)", () => {
+describe("area routing (one rule for chat, button and server)", () => {
   const family = { roles: ["famiglia"], age15plus: null };
   const athlete = { roles: ["atleta"], age15plus: null };
   const staff = { roles: ["segreteria"], age15plus: null };
 
-  it("keeps the base helper when nothing or something unknown is asked", () => {
-    expect(chatPersonaFor("public", null)).toBe("crovi");
-    expect(chatPersonaFor("public", null, "hacker")).toBe("crovi");
-    expect(chatPersonaFor("inside", staff, "genny")).toBe("genny");
-    expect(chatPersonaFor("inside", athlete, null)).toBe("sky");
+  it("keeps Vera's general chat when nothing or something unknown is asked", () => {
+    expect(resolveChat("public", null)).toEqual({ persona: "vera", area: null });
+    expect(resolveChat("public", null, "hacker")).toEqual({ persona: "vera", area: null });
+    expect(resolveChat("inside", staff, "vera")).toEqual({ persona: "vera", area: null });
+    expect(resolveChat("inside", athlete, null)).toEqual({ persona: "sky", area: null });
   });
 
-  it("opens only the public-data personas on public pages", () => {
-    expect([...PUBLIC_CAST_PERSONAS].sort()).toEqual(["biglietteria", "mentore-tornei", "volto-sponsor"]);
-    expect(chatPersonaFor("public", null, "biglietteria")).toBe("biglietteria");
-    expect(chatPersonaFor("public", null, "mentore-tornei")).toBe("mentore-tornei");
-    for (const inside of ["accoglienza-chef", "era", "acanfora", "mental-coach", "musica-relax", "preparatore-atletico"]) expect(chatPersonaFor("public", family, inside)).toBe("crovi");
+  it("opens only the public-data areas on public pages", () => {
+    expect(resolveChat("public", null, "biglietteria")).toEqual({ persona: "vera", area: "biglietteria" });
+    expect(resolveChat("public", null, "mentore-tornei")).toEqual({ persona: "vera", area: "mentore-tornei" });
+    expect(resolveChat("public", null, "volto-sponsor")).toEqual({ persona: "vera", area: "volto-sponsor" });
+    expect(resolveChat("public", family, "accoglienza-chef")).toEqual({ persona: "vera", area: null });
   });
 
-  it("opens area personas inside only for staff and adult members; younger members and unknown ages keep Sky", () => {
-    for (const id of CAST_PERSONA_IDS) {
-      expect(chatPersonaFor("inside", family, id)).toBe(id);
-      expect(chatPersonaFor("inside", staff, id)).toBe(id);
-      expect(chatPersonaFor("inside", athlete, id)).toBe("sky");
-      expect(chatPersonaFor("inside", null, id)).toBe("sky");
-      expect(chatPersonaFor("inside", { roles: ["segreteria"], age15plus: false }, id)).toBe("sky");
+  it("opens areas inside only for staff and adult members; younger members and unknown ages keep Sky, without area", () => {
+    for (const id of CHAT_AREA_IDS) {
+      expect(resolveChat("inside", family, id)).toEqual({ persona: "vera", area: id });
+      expect(resolveChat("inside", staff, id)).toEqual({ persona: "vera", area: id });
+      expect(resolveChat("inside", athlete, id)).toEqual({ persona: "sky", area: null });
+      expect(resolveChat("inside", null, id)).toEqual({ persona: "sky", area: null });
+      expect(resolveChat("inside", { roles: ["segreteria"], age15plus: false }, id)).toEqual({ persona: "sky", area: null });
     }
   });
 });
 
-describe("system prompt of an area persona", () => {
+describe("system prompt of Vera with an area", () => {
   const ctx: BuiltContext = { text: "## Dati\nNiente", links: new Set(["/famiglia"]), emails: new Set(), phones: new Set(), truncated: false };
 
-  it("carries the persona voice, the shared persona rules and its own hard rules, with the same JSON output", () => {
-    for (const id of CAST_PERSONA_IDS) {
-      const p = systemPrompt(id, "PUBLIC", ctx);
-      expect(p).toContain(personaVoice(id));
-      for (const r of personaRules(id)) expect(p).toContain(r);
+  it("carries Vera's voice and rules, the area's hand-over and hard rules, with the same JSON output", () => {
+    for (const area of CHAT_AREA_IDS) {
+      const p = systemPrompt("vera", "PUBLIC", ctx, area);
+      expect(p).toMatch(/Sei Vera, la reception/);
+      for (const r of personaRules("vera", area)) expect(p).toContain(r);
+      expect(p).toContain(CAST_PERSONAS[area].handoff!);
       expect(p).toMatch(/non confermarle mai e non chiedere pagamenti/);
       expect(p).toMatch(/non fare terapia/);
       expect(p).toContain('{"text":"risposta","mood":"info|success|alert"');
       expect(p.indexOf("</final_checks>")).toBeLessThan(p.indexOf("<context>"));
     }
-    expect(systemPrompt("musica-relax", "PUBLIC", ctx)).toMatch(/Non sei uno psicologo/);
-    expect(systemPrompt("mental-coach", "PUBLIC", ctx)).toMatch(/minori senza i genitori/);
-    expect(systemPrompt("accoglienza-chef", "PUBLIC", ctx)).toMatch(/SQUBY\/SumUp/);
-    expect(systemPrompt("crovi", "PUBLIC", ctx)).not.toMatch(/personaggio originale dell'app/);
+    expect(systemPrompt("vera", "PUBLIC", ctx, "accoglienza-chef")).toMatch(/SQUBY\/SumUp/);
+    expect(systemPrompt("sky", "PUBLIC", ctx, "accoglienza-chef")).not.toMatch(/SQUBY/);
   });
 
   it("puts the area first in the context so the cap never cuts it", () => {
@@ -198,30 +251,32 @@ describe("system prompt of an area persona", () => {
   });
 });
 
-describe("output guard of an area persona", () => {
+describe("output guard of Vera", () => {
   const ctx: BuiltContext = { text: "", links: new Set(["/famiglia"]), emails: new Set(), phones: new Set(), truncated: false };
 
   it("drops answers that confirm an order, a ticket or a payment (the rules engine answers instead)", () => {
-    expect(parseAssistantAnswer('{"text":"Perfetto, ho confermato il tuo ordine per sabato!"}', ctx, "accoglienza-chef")).toBeNull();
-    expect(parseAssistantAnswer('{"text":"Il biglietto è confermato, pagamento ricevuto."}', ctx, "biglietteria")).toBeNull();
-    expect(castAnswerProblems("mentore-tornei", "La tua iscrizione è confermata")).not.toEqual([]);
+    expect(parseAssistantAnswer('{"text":"Perfetto, ho confermato il tuo ordine per sabato!"}', ctx, "vera")).toBeNull();
+    expect(parseAssistantAnswer('{"text":"Il biglietto è confermato, pagamento ricevuto."}', ctx, "vera", false)).toBeNull();
+    expect(veraAnswerProblems("La tua iscrizione è confermata")).not.toEqual([]);
   });
 
-  it("drops therapy wording for Musica e relax and the Mental coach, numbers and plans for Era and the Preparatore", () => {
-    expect(parseAssistantAnswer('{"text":"Facciamo una piccola terapia insieme."}', ctx, "musica-relax")).toBeNull();
-    expect(parseAssistantAnswer('{"text":"La diagnosi è stress da gara."}', ctx, "mental-coach")).toBeNull();
-    expect(parseAssistantAnswer('{"text":"Mangia 80 grammi di pasta."}', ctx, "era")).toBeNull();
-    expect(parseAssistantAnswer('{"text":"Fai 3 serie da 10 ripetizioni."}', ctx, "preparatore-atletico")).toBeNull();
-    expect(parseAssistantAnswer('{"text":"Prendi un antidolorifico."}', ctx, "acanfora")).toBeNull();
+  it("keeps the limits of the tip-only topics in Vera's mouth: no therapy, diet, drugs or personal plans", () => {
+    expect(parseAssistantAnswer('{"text":"Facciamo una piccola terapia insieme."}', ctx, "vera")).toBeNull();
+    expect(parseAssistantAnswer('{"text":"La diagnosi è stress da gara."}', ctx, "vera")).toBeNull();
+    expect(parseAssistantAnswer('{"text":"Segui una dieta leggera e controlla il peso."}', ctx, "vera")).toBeNull();
+    expect(parseAssistantAnswer('{"text":"Fai tre serie da dieci ripetizioni."}', ctx, "vera")).toBeNull();
+    expect(parseAssistantAnswer('{"text":"Prendi un antidolorifico."}', ctx, "vera")).toBeNull();
+    // Staff reading the Cervellone (non-strict): only the confirmation guard.
+    expect(parseAssistantAnswer('{"text":"Il fornitore dei farmaci dell\'infermeria è nel Cervellone."}', ctx, "vera", false)).not.toBeNull();
   });
 
   it("keeps good answers and the link allowlist", () => {
-    const r = parseAssistantAnswer('{"text":"Compila la richiesta nell\'area famiglia: conferma una persona e si paga alla cassa.","links":[{"label":"Richiesta","to":"/famiglia"},{"label":"Fuori","to":"/admin"}]}', ctx, "accoglienza-chef");
+    const r = parseAssistantAnswer('{"text":"Compila la richiesta nell\'area famiglia (fonte: Club House): conferma una persona e si paga alla cassa.","links":[{"label":"Richiesta","to":"/famiglia"},{"label":"Fuori","to":"/admin"}]}', ctx, "vera");
     expect(r?.links).toEqual([{ label: "Richiesta", to: "/famiglia" }]);
   });
 });
 
-describe("rules-engine answers of the personas (AI off)", () => {
+describe("rules-engine answers of the areas (AI off)", () => {
   const facts: CastFacts = {
     ticketing: {
       status: "CONFIRMED",
@@ -247,7 +302,7 @@ describe("rules-engine answers of the personas (AI off)", () => {
     expect(castIntentReply("mentore-tornei", "qual è il prossimo torneo?", facts)?.text).toMatch(/Christmas Lario Cup/);
   });
 
-  it("refuses plans, numbers and medicines in the persona's voice", () => {
+  it("refuses plans, numbers and medicines with fixed copy", () => {
     expect(castIntentReply("era", "mi fai una dieta per mio figlio?")?.text).toMatch(/Non do piani/);
     expect(castIntentReply("preparatore-atletico", "mi fai una scheda personale?")?.text).toMatch(/non li do/);
     expect(castIntentReply("acanfora", "che farmaco gli do?")?.text).toMatch(/Non indico farmaci/);
@@ -259,20 +314,23 @@ describe("rules-engine answers of the personas (AI off)", () => {
     expect(isOperationalFor("biglietteria", "posso comprare il biglietto qui?")).toBe(true);
     expect(isOperationalFor("mentore-tornei", "vorremmo iscrivere la nostra squadra")).toBe(true);
     expect(isOperationalFor("musica-relax", "vorrei ordinare")).toBe(false);
-    for (const id of ["accoglienza-chef", "biglietteria", "mentore-tornei", "mental-coach", "volto-sponsor"] as const) {
+    expect(isOperationalFor("mental-coach", "vorrei un appuntamento")).toBe(false);
+    for (const id of CHAT_AREA_IDS) {
       const r = castOperationalReply(id);
-      expect(castAnswerProblems(id, r.text), id).toEqual([]);
+      expect(veraAnswerProblems(r.text), id).toEqual([]);
       expect(r.text, id).not.toMatch(/confermat[oa] (il|la|tuo|tua)/);
       expect(r.links?.length, id).toBeGreaterThan(0);
     }
     expect(castOperationalReply("accoglienza-chef").text).toMatch(/si paga alla cassa del club, mai in chat/);
   });
 
-  it("answers with the persona's own default when nothing matches: who, today's tip, quick links", () => {
-    for (const id of CAST_PERSONA_IDS) {
-      const r = castDefaultReply(id, "2026-10-14");
+  it("hands over to the face of the area with today's tip and its actions when nothing matches", () => {
+    for (const id of CHAT_AREA_IDS) {
+      const r = veraAreaReply(id, "2026-10-14");
+      expect(r.text, id).toContain(CAST_PERSONAS[id].handoff!);
       expect(r.text, id).toContain(dailyCastTip(id, "2026-10-14").text);
       expect(r.links?.length, id).toBeGreaterThanOrEqual(2);
     }
+    expect(veraAreaReply("accoglienza-chef", "2026-10-14").links?.[0]?.to).toBe("/famiglia#richiesta-ordine");
   });
 });

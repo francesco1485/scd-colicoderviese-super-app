@@ -7,12 +7,12 @@ import { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 import { getTrainingQuadro } from "@/lib/quadro.functions";
 import { Crest, DateBlock, PageHeader, PrimaryButton, SectionHead, Segmented, Sheet } from "@/components/scd/board";
 import { ConeIcon } from "@/components/scd/icons";
+import { PersonaAvatar } from "@/components/scd/SkyJolly";
 import { OpponentCrest, opponentLabel } from "@/lib/crests";
 import { GroupResultsLink, OfficialResults } from "@/components/scd/OfficialResults";
 import { dateParts, groupShort, matchTitle, monthRange, trainingRowsFor, upcomingMatches, venueCase, weekRange } from "@/lib/board-data";
 import { romeParts } from "@/lib/home-week";
 import { EMPTY_MESSAGE, WINDOWS, freshnessLabel, resolveAnnata, windowEnd, trainingKeyFor, type WindowDays, type PublicEvent, type PublicGroup } from "@/lib/public-snapshots";
-import crovi from "@/assets/crovi/crovi-avatar-256.webp.asset.json";
 
 /*
  * Public page: our side is the official club crest + "ColicoDerviese <team>"; annata crests stay internal
@@ -333,8 +333,8 @@ function Calendario() {
               </button>
               <button type="button" onClick={copyLink} className="inline-flex h-[38px] items-center gap-1.5 rounded-[8px] bg-[var(--scd-yellow)] px-[10px] text-[13px] font-bold"><Link2 className="size-4" /> Copia link {selected ? "annata" : "calendario"}</button>
               {canShare && <button type="button" onClick={shareLink} className="inline-flex h-[38px] items-center gap-1.5 rounded-[8px] bg-white px-[10px] text-[13px] font-bold shadow-[var(--scd-card-shadow)]"><Share2 className="size-4" /> Condividi</button>}
-              <button type="button" onClick={() => window.dispatchEvent(new CustomEvent("crovi:open"))} aria-label="Chiedi a Crovi, assistente del club" className="inline-flex h-[38px] items-center gap-1.5 rounded-[8px] bg-white px-[8px] text-[13px] font-bold shadow-[var(--scd-card-shadow)] min-[641px]:hidden">
-                <img src={crovi.url} alt="" width={24} height={24} className="size-6 rounded-full" /> Chiedi a Crovi
+              <button type="button" onClick={() => window.dispatchEvent(new CustomEvent("vera:open"))} aria-label="Chiedi a Vera, la reception del club" className="inline-flex h-[38px] items-center gap-1.5 rounded-[8px] bg-white px-[8px] text-[13px] font-bold shadow-[var(--scd-card-shadow)] min-[641px]:hidden">
+                <PersonaAvatar persona="vera" size={24} /> Chiedi a Vera
               </button>
             </div>
             <p role="status" aria-live="polite" className="mt-[4px] min-h-0 text-[13px] font-semibold text-[var(--scd-blue)]">{refreshMsg ?? copied}</p>

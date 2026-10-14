@@ -66,7 +66,7 @@ export function AccessScreen({
     "Chi usa quale parte del campo, giorno per giorno",
     "Conflitti sul campo 1 e avvisi al Comune di Dervio",
     "Simulazioni e nuove prenotazioni con anteprima 2D",
-    "Chiedi a Genny: risposte dal calendario reale",
+    "Chiedi a Vera: risposte dal calendario reale",
   ];
   return (
     <div className="mx-auto grid max-w-[720px] gap-5">
@@ -263,8 +263,8 @@ function Tool({
               aria-expanded={sky}
               className="scd-focus inline-flex min-h-11 items-center gap-2 rounded-full border border-[var(--in-line)] bg-white py-1 pl-1 pr-4 text-[15px] font-semibold text-[var(--in-info)] shadow-[var(--in-card-shadow)] hover:bg-[var(--in-info-bg)]"
             >
-              <SkyMascot size={34} persona="genny" />
-              Chiedi a Genny
+              <SkyMascot size={34} persona="vera" />
+              Chiedi a Vera
               <MessageCircle className="size-4" aria-hidden="true" />
             </button>
           </div>

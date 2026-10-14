@@ -9,7 +9,7 @@ type Act = {
   icon: string;
   text: string;
   to?: string;
-  action?: "crovi" | "bigtext";
+  action?: "vera" | "bigtext";
 };
 const AGES: { key: string; label: string; see: Act[]; doo: Act[] }[] = [
   {
@@ -29,7 +29,7 @@ const AGES: { key: string; label: string; see: Act[]; doo: Act[] }[] = [
     ],
     doo: [
       { icon: "🎉", text: "Eventi e feste del club", to: "/eventi" },
-      { icon: "💬", text: "Fai una domanda a Crovi", action: "crovi" },
+      { icon: "💬", text: "Fai una domanda a Vera", action: "vera" },
     ],
   },
   {
@@ -89,7 +89,7 @@ const AGES: { key: string; label: string; see: Act[]; doo: Act[] }[] = [
     ],
     doo: [
       { icon: "🔠", text: "Attiva il testo grande", action: "bigtext" },
-      { icon: "💬", text: "Chiedi a Crovi", action: "crovi" },
+      { icon: "💬", text: "Chiedi a Vera", action: "vera" },
     ],
   },
 ];
@@ -147,8 +147,8 @@ export function AgeGuide() {
           type="button"
           className={cls}
           onClick={() =>
-            x.action === "crovi"
-              ? window.dispatchEvent(new CustomEvent("crovi:open"))
+            x.action === "vera"
+              ? window.dispatchEvent(new CustomEvent("vera:open"))
               : toggleBig()
           }
         >
@@ -486,11 +486,11 @@ export function Affiliations({
 export function SkyCameo({
   message,
   onClose,
-  persona = "crovi",
+  persona = "vera",
 }: {
   message: { title: string; text: string } | null;
   onClose: () => void;
-  /** Sky only on under-14 pages (Direzione 13/10/2026); Crovi outside, Genny inside. */
+  /** Sky only on under-14 pages (Direzione 13/10/2026); Vera everywhere else (UD-118). */
   persona?: Persona;
 }) {
   useEffect(() => {

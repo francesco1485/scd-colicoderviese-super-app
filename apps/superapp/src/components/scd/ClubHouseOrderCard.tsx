@@ -185,7 +185,7 @@ export function ClubHouseOrderCard({ desk, today }: { desk: Extract<ClubHouseDes
           <button type="submit" disabled={busy} className="scd-focus inline-flex h-12 items-center justify-center rounded-[10px] bg-[#0b2a5b] px-5 text-[16px] font-semibold text-white disabled:opacity-60" data-testid="clubhouse-submit">
             {live ? "Invia la richiesta" : "Prepara il messaggio"}
           </button>
-          <CastAskButton id="accoglienza-chef" tone="quiet" />
+          <CastAskButton area="accoglienza-chef" tone="quiet" />
         </div>
         <p role="status" aria-live="polite" className="m-0 min-h-[1.2em] text-[14px] text-[var(--in-sub,#4a5d7a)] sm:col-span-2">
           {note}
@@ -253,7 +253,7 @@ function DishPolls({ polls }: { polls: AreaPoll[] | null }) {
     }
   }
   return (
-    <div className="border-t border-[var(--in-line,#dbe3ee)] px-4 py-3 sm:px-[18px]" data-testid="clubhouse-polls">
+    <div id="sondaggi-piatti" className="scroll-mt-24 border-t border-[var(--in-line,#dbe3ee)] px-4 py-3 sm:px-[18px]" data-testid="clubhouse-polls">
       <h3 className="m-0 flex items-center gap-2 text-[16px] font-bold">
         <Vote className="size-[18px] text-[#0860A8]" strokeWidth={2} aria-hidden="true" />
         Sondaggi sui piatti

@@ -8,7 +8,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-import { gennyEligible } from "./assistant";
+import { veraEligible } from "./assistant";
 import {
   CONTACT_PREFS,
   OCCASIONS,
@@ -43,7 +43,7 @@ export type ClubHouseDesk =
 export const getClubHouseDesk = createServerFn({ method: "GET" }).handler(async (): Promise<ClubHouseDesk> => {
   const { s, org, sb } = await context();
   if (!s.user) return { state: "signed-out" };
-  if (!gennyEligible({ roles: s.roles, age15plus: null })) return { state: "not-allowed" };
+  if (!veraEligible({ roles: s.roles, age15plus: null })) return { state: "not-allowed" };
   if (!sb || !org) return { state: "off" };
   const [mine, polls] = await Promise.all([
     sb.rpc("scd_my_area_requests", { p_organization_id: org.organizationId, p_area: "club-house" }),
@@ -78,7 +78,7 @@ export const submitClubHouseOrder = createServerFn({ method: "POST" })
     if (!v.ok) return { ok: false, message: "Controlla i campi evidenziati.", errors: v.errors };
     const { s, org, sb } = await context();
     if (!s.user) return { ok: false, message: "Entra con il tuo account per mandare la richiesta." };
-    if (!gennyEligible({ roles: s.roles, age15plus: null })) return { ok: false, message: areaRequestError("forbidden") };
+    if (!veraEligible({ roles: s.roles, age15plus: null })) return { ok: false, message: areaRequestError("forbidden") };
     const copyText = orderRequestMessage(v.value);
     if (!sb || !org) return { ok: false, off: true, copyText, message: "Le richieste in app non sono ancora attive: copia il messaggio e mandalo alla segreteria." };
     const { data: out, error } = await sb.rpc("scd_area_request_create", {

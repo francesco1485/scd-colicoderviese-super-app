@@ -1,7 +1,7 @@
 import { CAST, castPortraitSrc, castReady, type CastId } from "@/lib/assistant-cast";
 
 /**
- * Cut-out portrait of a cast character (Era, Genny, Dottor Acanfora) with the same subtle life as Crovi:
+ * Cut-out portrait of a cast character (Era, Vera, Dottor Acanfora) with the same subtle life as the Crovi actor:
  * the figure breathes from the feet (styles.css .crovi-actor), and stands still with "reduce
  * motion". Renders nothing until the approved picture is in the app: no drawing ever replaces it.
  * Sized by the caller with a height class; the width follows the portrait frame (1136 x 1408).

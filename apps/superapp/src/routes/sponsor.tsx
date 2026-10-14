@@ -3,6 +3,7 @@ import { BarChart3, HeartHandshake, MonitorSmartphone, Trees } from "lucide-reac
 import { useState } from "react";
 
 import { LedwallFacsimile } from "@/components/LedwallFacsimile";
+import { CastPresence } from "@/components/scd/CastPresence";
 import { PartnerForm } from "@/components/PartnerForm";
 import { ShareButton } from "@/components/scd/ShareButton";
 import { PartnerPackages } from "@/components/PartnerPackages";
@@ -65,6 +66,11 @@ function Sponsor() {
       <LedwallFacsimile onRequest={() => setPick("ledwall")} day={day} nowMs={nowMs} />
 
       <PartnerPackages onChoose={choose} />
+
+      {/* UD-118: the Volto sponsor face lives here (listino, "chiedi un pacchetto", "Chiedi a Vera"). */}
+      <section id="volto-sponsor" aria-label="Il Volto sponsor" className="mx-auto mt-10 max-w-3xl scroll-mt-20 px-4" data-testid="sponsor-volto">
+        <CastPresence id="volto-sponsor" day={day} />
+      </section>
 
       <section className="mx-auto mt-14 max-w-6xl px-4">
         <p className="eyebrow">Asset disponibili</p>

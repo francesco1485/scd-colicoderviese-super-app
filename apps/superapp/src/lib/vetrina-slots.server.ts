@@ -60,7 +60,7 @@ export const CONVENZIONI: readonly VetrinaSlot[] = [];
 
 /**
  * Visual of a cast slot: the character's round portrait only when its approved picture fits the current role
- * (assistant-cast readiness), otherwise an original typographic panel. Era and Genny have no portrait until the
+ * (assistant-cast readiness), otherwise an original typographic panel. Era and Vera have no portrait until the
  * Direzione approves new images (roles inverted 14/10/2026, UD-111).
  */
 export function castSlotVisual(id: "era" | "acanfora", alt: string, fallback: { big: string; small: string }): VetrinaSlot["visual"] {
