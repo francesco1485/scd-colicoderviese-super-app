@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { loadQuadro } from "./quadro-data.server";
-import { defaultDay, isFree, minutesOf, pitchZones, slotEnd, slotStates, weekdayKey } from "./training-view";
+import { defaultDay, isFree, minutesOf, pitchZones, slotEnd, slotStates, trainingKids, weekdayKey } from "./training-view";
 
 const q = loadQuadro();
 
@@ -49,5 +49,32 @@ describe("training view", () => {
     expect(isFree("")).toBe(true);
     expect(isFree(" — ")).toBe(true);
     expect(isFree("U16")).toBe(false);
+  });
+});
+
+describe("trainingKids", () => {
+  const m = (displayName: string, birthYear: number | null, minor: boolean | null, relationship = "FIGLIO") => ({ displayName, birthYear, minor, relationship });
+
+  it("keeps minor children with a birth year, first name only, youngest last", () => {
+    expect(trainingKids([m("Luca Rossi", 2014, true), m("Anna Rossi", 2011, true)])).toEqual([
+      { firstName: "Anna", birthYear: 2011 },
+      { firstName: "Luca", birthYear: 2014 },
+    ]);
+  });
+
+  it("drops parents, adults, unknown years and duplicates", () => {
+    expect(trainingKids([
+      m("Maria Rossi", 1980, false, "MADRE"),
+      m("Paolo Rossi", 1978, true, "PADRE"),
+      m("Gianni Rossi", 2005, false),
+      m("Sara Rossi", null, true),
+      m("Luca Rossi", 2014, true),
+      m("Luca  Rossi", 2014, true),
+    ])).toEqual([{ firstName: "Luca", birthYear: 2014 }]);
+  });
+
+  it("never exposes the surname", () => {
+    const out = trainingKids([m("Luca Rossi Bianchi", 2014, true)]);
+    expect(JSON.stringify(out)).not.toMatch(/Rossi|Bianchi/);
   });
 });

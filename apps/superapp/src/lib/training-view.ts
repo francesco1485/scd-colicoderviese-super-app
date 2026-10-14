@@ -91,3 +91,30 @@ export function isFree(text: string | undefined): boolean {
   const t = (text ?? "").trim();
   return t === "" || t === "—";
 }
+
+/** A child of the signed-in family, reduced to what the training board needs: first name and birth year. */
+export interface TrainingKid {
+  firstName: string;
+  birthYear: number;
+}
+
+/**
+ * Children of the caller's family for the "I tuoi ragazzi" shortcuts on /allenamenti (Direzione 14/10: the parent must
+ * reach "the training of this week" in one tap). Only minors with a known birth year; the first name only, never the
+ * surname; one chip per child, sorted youngest last, at most 6.
+ */
+export function trainingKids(members: ReadonlyArray<{ displayName: string; birthYear: number | null; minor: boolean | null; relationship: string }>): TrainingKid[] {
+  const seen = new Set<string>();
+  const out: TrainingKid[] = [];
+  for (const m of members) {
+    if (m.minor !== true || m.birthYear === null || !Number.isInteger(m.birthYear)) continue;
+    if (/^(genitore|madre|padre|tutore|referente)$/i.test(m.relationship.trim())) continue;
+    const firstName = m.displayName.trim().split(/\s+/)[0] ?? "";
+    if (!firstName || firstName === "Nome") continue;
+    const key = `${firstName.toLowerCase()}|${m.birthYear}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({ firstName, birthYear: m.birthYear });
+  }
+  return out.sort((a, b) => a.birthYear - b.birthYear).slice(0, 6);
+}

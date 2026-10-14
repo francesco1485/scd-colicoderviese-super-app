@@ -10,6 +10,7 @@ import { defaultDay, isFree, minutesOf, pitchZones, slotStates, weekdayKey, type
 import { peopleOnPitch, type StaffPerson } from "@/lib/staff-roster";
 import { getStaffEmails, getStaffRoster } from "@/lib/staff-roster.functions";
 import { getSession } from "@/lib/auth.functions";
+import { getMyTrainingKids } from "@/lib/roster.functions";
 import { PeoplePins } from "@/components/scd/PeoplePins";
 import planimetria from "@/assets/scd/planimetria_colico.webp.asset.json";
 import { VanPlan2D } from "@/components/scd/VanPlan2D";
@@ -33,9 +34,9 @@ export const Route = createFileRoute("/allenamenti")({
     const session = await getSession();
     if (!session.user) throw redirect({ to: "/accedi", search: { next: location.href } });
     // Vans in 2D: getPulminiVans answers only to the Pulmini work area (staff); everyone else gets null and nothing.
-    const [roster, emails, training, vans] = await Promise.all([getStaffRoster(), getStaffEmails(), getTrainingQuadro(), getPulminiVans()]);
+    const [roster, emails, training, vans, family] = await Promise.all([getStaffRoster(), getStaffEmails(), getTrainingQuadro(), getPulminiVans(), getMyTrainingKids()]);
     const transport = vans ? await getTransportBoard() : null;
-    return { ...training.quadro, people: roster.people, emails, vans, board: transport?.board ?? null };
+    return { ...training.quadro, people: roster.people, emails, vans, board: transport?.board ?? null, kids: family.kids };
   },
   head: () => ({
     meta: [
@@ -52,7 +53,7 @@ const SHORT: Record<string, string> = { "LUNEDÌ": "Lun", "MARTEDÌ": "Mar", "ME
 const nice = (d: string) => d.charAt(0) + d.slice(1).toLowerCase();
 
 function Allenamenti() {
-  const { days, slots, rotations, note, people, emails, vans, board } = Route.useLoaderData();
+  const { days, slots, rotations, note, people, emails, vans, board, kids } = Route.useLoaderData();
   const fleet = useMemo(() => fleetFromBoard(board), [board]);
   const now = useRomeNow();
   const [day, setDay] = useState(days[0] ?? "");
@@ -66,6 +67,13 @@ function Allenamenti() {
   const q = search.annata ?? "";
   const setQ = (v: string) => navigate({ search: v.trim() ? { annata: v } : {}, replace: true, resetScroll: false });
   const query = q.trim();
+  // One child in the family and no search yet: open straight on that child's week (one tap less for parents).
+  const autoKid = useRef(false);
+  useEffect(() => {
+    if (autoKid.current || search.annata !== undefined || kids.length !== 1) return;
+    autoKid.current = true;
+    navigate({ search: { annata: String(kids[0]!.birthYear) }, replace: true, resetScroll: false });
+  }, [kids, search.annata, navigate]);
 
   // Open on today's training day (Rome time) unless the visitor already picked one.
   useEffect(() => {
@@ -139,6 +147,26 @@ function Allenamenti() {
           </label>
         </div>
       </div>
+
+      {kids.length > 0 && (
+        <nav aria-label="I tuoi ragazzi" className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-2 px-4 pt-4 lg:px-6" data-testid="allenamenti-kids">
+          <span className="text-[13px] font-bold uppercase tracking-[0.06em] text-[var(--uv-gold)]">I tuoi ragazzi</span>
+          {kids.map((k) => {
+            const on = query === String(k.birthYear);
+            return (
+              <button
+                key={`${k.firstName}-${k.birthYear}`}
+                type="button"
+                onClick={() => setQ(on ? "" : String(k.birthYear))}
+                aria-pressed={on}
+                className={`h-[40px] rounded-full px-4 text-[14.5px] font-bold ${on ? "bg-[var(--uv-gold)] text-[var(--uv-night)]" : "bg-white/10 text-white"}`}
+              >
+                {k.firstName} · {k.birthYear}
+              </button>
+            );
+          })}
+        </nav>
+      )}
 
       {query && (
         <section aria-label="Settimana dell'annata" className="mx-auto max-w-[1200px] px-4 pt-5 lg:px-6">
