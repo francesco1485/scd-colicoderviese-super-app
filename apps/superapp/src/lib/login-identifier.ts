@@ -1,5 +1,5 @@
 /**
- * Sign-in identifier (Direzione 14/10/2026, UD-118): the person types the e-mail OR the phone used at registration,
+ * Sign-in identifier (Direzione 14/10/2026, UD-120): the person types the e-mail OR the phone used at registration,
  * then the password. The phone is resolved to the account only by the database, and only together with the right
  * password (r105 `scd_login_email`), so nobody can discover an e-mail from a phone number.
  */

@@ -114,7 +114,7 @@ export const requestMagicLink = createServerFn({ method: "POST" })
 
 
 /**
- * "Password dimenticata" (UD-118, Direzione 14/10/2026: no codes): one e-mail with the "Scegli la password" button
+ * "Password dimenticata" (UD-120, Direzione 14/10/2026: no codes): one e-mail with the "Scegli la password" button
  * (Supabase recovery, template with token_hash -> /accedi/conferma -> password page). Same answer for every address.
  */
 const allowReset = createRateLimiter(5, 10 * 60 * 1000);
