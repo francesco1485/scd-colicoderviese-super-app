@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.35.0",
+    "version": "3.36.0",
     "effective_at": "2026-10-14",
     "status": "BINDING",
     "language": "it-IT",
@@ -672,7 +672,15 @@
       "directive": "UD-112",
       "decided_at": "2026-10-14",
       "authority": "DIREZIONE_SCD",
-      "state": "STAGED_R100_NOT_APPLIED",
+      "state": "R100_APPLIED_VERIFIED_2026_10_14_GUARDS_NOT_SWITCHED",
+      "state_evidence": "Read-only check on SCD PULSE (ndevtxxijbcnskgysdit) 2026-10-14: scd_person_grants, scd_can and scd_section_catalog (35 rows) present. Existing work-area guards still role-derived (see GAP-ACCESS-R100).",
+      "extended_by": {
+        "directive": "UD-113",
+        "migration": "supabase/migrations/20261014_r101_fondo_adotta.sql",
+        "state": "STAGED_R101_NOT_APPLIED",
+        "sections": ["fondo-solidale", "adotta", "donazioni", "proposte"],
+        "rule": "r101 recreates scd_section_catalog() keeping every r100 entry identical and appending the four sections; the new back-office pages are the first ones gated ONLY by scd_can (person-grants.server.ts sectionCheck)."
+      },
       "supersedes": "Any access derived from roles or positions. A role (e.g. 'Dirigente annata 2015') is only a description and opens nothing automatically.",
       "base_sections": ["pubblico", "profilo", "tessera"],
       "rule": "Every account gets only the base sections (public pages, own profile, own card). The Direzione enables each section individually for each person with a level (READ/WRITE/APPROVE = Vede/Modifica/Approva) and a perimeter (ALL/OWN_TEAMS/OWN_SITE/OWN_CHILDREN/SELF = Tutto/sue annate/sua sede/suoi figli/solo sé).",
@@ -3621,8 +3629,12 @@
       "required": true,
       "state": "PARTIAL",
       "sources": [
-        "R20"
+        "R20",
+        "SCD_SUPABASE"
       ],
+      "directives": ["UD-113"],
+      "screens": ["/sostieni", "/sostieni/fondo-solidale", "/sostieni/dona-materiale", "/sostieni/proponi", "/tesoreria/fondo-solidale", "/tesoreria/donazioni", "/direzione/adotta", "/direzione/proposte"],
+      "gap": "GAP-GIVING-R101",
       "contract": "PUBLIC_VOLUNTARY_DONATION_AREA_CONFIG_GATED_OFFICIAL_CHANNELS_NO_CARD_STORAGE_NO_PUBLIC_DONOR_WALL_NO_AUTO_TAX_CLAIMS_NO_ROLE_OR_MEMBERSHIP_SIDE_EFFECTS"
     },
     {
@@ -3803,6 +3815,13 @@
       "statement": "UD-112 (Direzione 14/10/2026): access must be granted per person and per section, never derived from roles. The catalogue, migration r100 and the admin page /direzione/accessi/$personId exist, but r100 is not applied and the existing work-area guards still open areas from role positions (session.ts ROLE_POSITIONS, areas.ts canSeeArea).",
       "required_fix": "Direzione approves and applies r100; Direzione grants sections person by person; then each existing guard is switched to scd_can (person-grants.server.ts sectionCheck) with tests, removing role-derived opening.",
       "safe_runtime_behavior": "Until r100 is applied the page is a simulation (no save, no copy) and nobody's access changes; pending access requests stay pending."
+    },
+    {
+      "id": "GAP-GIVING-R101",
+      "severity": "MEDIUM",
+      "statement": "UD-113 (Direzione 14/10/2026): Fondo Solidale back office, Adotta un oggetto, donations (money recorded by the treasury, goods for the palestra/infermeria campaigns) and improvement proposals are implemented in the app and in migration r101, but r101 is not applied, the public Fondo texts have not arrived from the Direzione, nobody holds the four new section grants and the consent/receipt wording is not yet confirmed by the Direzione and the commercialista.",
+      "required_fix": "Direzione approves texts, queue owners and consent/receipt wording (commercialista); applies r101; grants fondo-solidale / adotta / donazioni / proposte person by person; fills FONDO_PUBLIC_TEXT; adds the first catalogue items from real offers; optionally puts SOSTIENI_VETRINA_SLOT on air.",
+      "safe_runtime_behavior": "Until r101 is applied every Sostieni page and back-office page says 'Da attivare: serve l'OK della Direzione per applicare r101'; no form sends anything, no data is read or invented; the rest of the app is unchanged."
     }
   ],
   "development_contract": {
@@ -4700,6 +4719,22 @@
       "training_quadro_delivery": "SERVER_FUNCTION_MEMBERS_OR_STAGING_PREVIEW_NEVER_IN_CLIENT_BUNDLE"
     },
     "solidarity_fund": {
+      "ud113": {
+        "directive": "UD-113",
+        "state": "IMPLEMENTED_STAGING_R101_NOT_APPLIED",
+        "apps": {"SCD_ONE": "/sostieni pages (public)", "SCD_CORE": "Tesoreria/Direzione back office", "SCD_GROW": "companies handed to /sponsor#proposta (existing CRM flow)"},
+        "migration": "supabase/migrations/20261014_r101_fondo_adotta.sql",
+        "access": "per-person section grants fondo-solidale (sensitive), adotta, donazioni (sensitive), proposte via scd_can; tables RLS on with no policy, only SECURITY DEFINER functions",
+        "payments": "NONE_IN_APP: public adoptions are pledges; the treasury records money from the official channel and issues receipts",
+        "donor_visibility": ["NOME_PUBBLICO", "ANONIMO_PUBBLICO", "COMPLETAMENTE_ANONIMO"],
+        "donor_visibility_default": "ANONIMO_PUBBLICO",
+        "public_recognition": "Consented public names appear only on the adopted item and its numbered plate (no global donor wall); amounts per person only with consent; aggregates only with >= 3 contributions or everybody's consent. Refines privacy.public_donor_wall=false, which stays false.",
+        "fund_rules": ["ISEE_NAMES_CONTACTS_ONLY_WITH_FONDO_SOLIDALE_GRANT", "NO_DOUBLE_DISCOUNT_FONDO_SIBLINGS_DB_AND_LOGIC", "FEE_STAYS_IN_GESTIONALE_UD082", "PUBLIC_TEXT_ONLY_FROM_DIREZIONE", "PUBLIC_TOTALS_ONLY_WITH_DIREZIONE_SWITCH"],
+        "inkind_rules": ["MEDICINES_SEALED_AND_NOT_EXPIRED_ONLY", "MEDICAL_ITEMS_NEW_SEALED_OR_PROFESSIONALLY_VERIFIABLE", "MEDICAL_ACCEPTANCE_NEEDS_INFERMERIA_GRANT", "CONDITION_CHECK_BEFORE_RECEIVED", "INVENTORY_REFERENCE_FOR_MAGAZZINO"],
+        "proposal_rules": ["ANONYMOUS_ALLOWED_NO_CONTACT", "NEVER_PUBLIC_UNTIL_STAFF_PUBLISH_STAFF_TEXT", "NO_CONTACTS_IN_PUBLISHED_TEXT", "HONEYPOT_PER_IP_AND_GLOBAL_HOURLY_LIMIT"],
+        "catalogue_rules": ["CLUB_PHOTOS_ONLY_NEVER_SUPPLIER_CATALOGUE_IMAGES", "EXPIRED_QUOTE_SHOWN_AS_DA_PREVENTIVO_AGGIORNATO", "NO_SEEDED_ITEMS"],
+        "gap": "GAP-GIVING-R101"
+      },
       "state": "PUBLIC_DONATION_REPORTING_UI_READY_SOURCE_ADAPTER_BLOCKED",
       "id": "SCD_SOLIDARITY_FUND",
       "purpose": "Sostegno alla partecipazione sportiva di ragazzi e famiglie in difficolta secondo criteri e approvazioni societarie.",

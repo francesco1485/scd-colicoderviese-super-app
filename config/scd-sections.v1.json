@@ -1,10 +1,11 @@
 {
   "schema": "scd.sections.v1",
   "id": "SCD_SECTIONS_V1",
-  "status": "STAGED_R100_NOT_APPLIED",
+  "status": "R100_APPLIED_R101_STAGED",
   "updated": "2026-10-14",
   "authority": "DIREZIONE_SCD",
   "directive": "UD-112",
+  "extendedBy": [{ "directive": "UD-113", "migration": "supabase/migrations/20261014_r101_fondo_adotta.sql", "sections": ["fondo-solidale", "adotta", "donazioni", "proposte"], "state": "STAGED_NOT_APPLIED" }],
   "purpose": "Canonical list of the Super App sections that the Direzione enables person by person (r100 scd_person_grants). A role is only a description: it opens nothing. Every account starts with the base sections; everything else is a per-person grant with a level and a perimeter.",
   "rules": [
     "A role (e.g. 'Dirigente annata 2015') is only a description: it opens nothing automatically.",
@@ -16,7 +17,7 @@
     "Sections with directionOnly=true are never granted here: only an active Direzione membership opens them.",
     "Sensitive sections require a written reason for every grant.",
     "A minor can only receive the SELF perimeter.",
-    "Kept in sync with supabase/migrations/20261014_r100_person_grants.sql (scd_section_catalog) by apps/superapp/src/lib/person-grants.test.ts."
+    "Kept in sync with the latest migration that defines scd_section_catalog (r100, then r101 which appends the UD-113 sections and keeps every r100 entry identical) by apps/superapp/src/lib/person-grants.test.ts."
   ],
   "levels": [
     { "code": "READ", "label": "Vede", "hint": "Apre la sezione e legge." },
@@ -85,7 +86,12 @@
     { "code": "cervellone", "area": "cervellone", "label": "Cervellone: catalogo e memoria", "group": "societa", "path": "/direzione/cervellone", "levels": ["READ", "WRITE"], "perimeters": ["ALL"], "sensitive": true, "sees": "il catalogo dei documenti" },
     { "code": "accessi", "area": "accessi", "label": "Accessi (consultazione)", "group": "societa", "path": "/direzione/accessi", "levels": ["READ"], "perimeters": ["ALL"], "sensitive": true, "sees": "l'elenco degli accessi (le abilitazioni le cambia solo la Direzione)" },
     { "code": "posta-collega", "area": "posta-collega", "label": "Collega la casella del club", "group": "societa", "path": "/direzione/posta/collega", "levels": [], "perimeters": [], "directionOnly": true, "sensitive": true, "blockReason": "Solo la Direzione." },
-    { "code": "partner", "area": "partner", "label": "Area partner", "group": "societa", "path": "/partner", "levels": ["READ", "WRITE"], "perimeters": ["SELF"], "sees": "la propria scheda partner" }
+    { "code": "partner", "area": "partner", "label": "Area partner", "group": "societa", "path": "/partner", "levels": ["READ", "WRITE"], "perimeters": ["SELF"], "sees": "la propria scheda partner" },
+
+    { "code": "fondo-solidale", "label": "Fondo Solidale: domande, decisioni, entrate e uscite", "group": "soldi", "path": "/tesoreria/fondo-solidale", "levels": ["READ", "WRITE", "APPROVE"], "perimeters": ["ALL"], "sensitive": true, "sees": "le domande al Fondo Solidale con nomi e ISEE, le decisioni, le entrate e le uscite del Fondo" },
+    { "code": "adotta", "label": "Adotta un oggetto: catalogo e adozioni", "group": "societa", "path": "/direzione/adotta", "levels": ["READ", "WRITE", "APPROVE"], "perimeters": ["ALL"], "sees": "il catalogo delle cose da adottare e l'avanzamento delle adozioni (mai i dati dei donatori)" },
+    { "code": "donazioni", "label": "Donazioni: denaro registrato, ricevute, materiale offerto", "group": "soldi", "path": "/tesoreria/donazioni", "levels": ["READ", "WRITE", "APPROVE"], "perimeters": ["ALL"], "sensitive": true, "sees": "le donazioni con i dati dei donatori non anonimi, le ricevute e le offerte di materiale" },
+    { "code": "proposte", "label": "Proposte di miglioramento: valutazione", "group": "societa", "path": "/direzione/proposte", "levels": ["READ", "WRITE", "APPROVE"], "perimeters": ["ALL"], "sees": "le proposte di miglioramento arrivate e la loro valutazione" }
   ],
   "roleSuggestions": {
     "note": "Used only by 'Proponi in base al ruolo': suggestions are shown to the Direzione and confirmed one by one, never saved automatically. Keys are club positions (apps/superapp/src/lib/session.ts KNOWN_POSITIONS). OWN_TEAMS suggestions take the teams of the person's structure roles; OWN_SITE suggestions carry the site.",

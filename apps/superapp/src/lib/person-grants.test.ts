@@ -37,10 +37,12 @@ import { KNOWN_POSITIONS, ROLE_POSITIONS } from "./session";
 
 const repo = (p: string) => fileURLToPath(new URL(`../../../../${p}`, import.meta.url));
 const SQL = readFileSync(repo("supabase/migrations/20261014_r100_person_grants.sql"), "utf8");
+/** r101 (UD-113) recreates scd_section_catalog() with the r100 entries unchanged plus the new sections. */
+const SQL101 = readFileSync(repo("supabase/migrations/20261014_r101_fondo_adotta.sql"), "utf8");
 const routeTree = readFileSync(fileURLToPath(new URL("../routeTree.gen.ts", import.meta.url)), "utf8");
 
-function literal(tag: string): unknown {
-  const m = SQL.match(new RegExp(`\\$${tag}\\$([\\s\\S]*?)\\$${tag}\\$`));
+function literal(tag: string, sql: string = SQL): unknown {
+  const m = sql.match(new RegExp(`\\$${tag}\\$([\\s\\S]*?)\\$${tag}\\$`));
   if (!m) throw new Error(`literal $${tag}$ not found`);
   return JSON.parse(m[1]!);
 }
@@ -110,10 +112,19 @@ describe("sections catalogue (config/scd-sections.v1.json)", () => {
 });
 
 describe("migration r100 stays in sync with the catalogue", () => {
-  it("embeds the same section catalogue", () => {
-    expect(literal("cat")).toEqual(
-      SECTIONS.map((s) => ({ code: s.code, levels: s.levels, perimeters: s.perimeters, base: !!s.base, hard_blocked: !!s.hardBlocked, direction_only: !!s.directionOnly, sensitive: !!s.sensitive })),
-    );
+  const asSql = (s: (typeof SECTIONS)[number]) => ({ code: s.code, levels: s.levels, perimeters: s.perimeters, base: !!s.base, hard_blocked: !!s.hardBlocked, direction_only: !!s.directionOnly, sensitive: !!s.sensitive });
+  const R101_SECTIONS = ["fondo-solidale", "adotta", "donazioni", "proposte"];
+
+  it("the latest catalogue (r101) is the whole config file", () => {
+    expect(literal("cat", SQL101)).toEqual(SECTIONS.map(asSql));
+  });
+
+  it("r101 keeps every r100 entry identical and only appends the UD-113 sections", () => {
+    const r100 = literal("cat") as unknown[];
+    const r101 = literal("cat", SQL101) as Array<{ code: string }>;
+    expect(r101.slice(0, r100.length)).toEqual(r100);
+    expect(r101.slice(r100.length).map((x) => x.code)).toEqual(R101_SECTIONS);
+    expect(SECTIONS.filter((s) => !R101_SECTIONS.includes(s.code)).map(asSql)).toEqual(r100);
   });
 
   it("embeds the same role suggestions, role baselines and role kinds", () => {
