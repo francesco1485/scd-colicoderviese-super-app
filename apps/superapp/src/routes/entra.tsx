@@ -108,7 +108,7 @@ function Entra() {
               ))}
             </ol>
           </div>
-          <p className="text-xs text-muted-foreground">La richiesta genera una lead per segreteria e DG. Ruoli e tesseramenti vengono assegnati solo dalla società.</p>
+          <p className="text-xs text-muted-foreground">La richiesta arriva alla segreteria, che ti ricontatta. Ruoli e tesseramenti li assegna solo la società.</p>
         </aside>
       </section>
     </main>

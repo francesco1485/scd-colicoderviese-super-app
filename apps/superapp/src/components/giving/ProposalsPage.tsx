@@ -64,7 +64,7 @@ export function ProposalsPage({ initial }: { initial: { gate: GivingGate; board:
         sub={`Prima le nuove. ${board?.spam ? `${board.spam} segnate come spam (nascoste).` : ""}`}
         aside={<button type="button" className={inGhost} onClick={() => refresh()} disabled={!open} aria-label="Aggiorna"><RefreshCw className="size-4" aria-hidden="true" /></button>}
       >
-        {list.length === 0 ? <EmptyRow>{open ? "Nessuna proposta." : "Le proposte compariranno qui quando r101 sarà attivo."}</EmptyRow> : (
+        {list.length === 0 ? <EmptyRow>{open ? "Nessuna proposta." : "Le proposte compariranno qui quando la raccolta sarà aperta online."}</EmptyRow> : (
           <ul className="m-0 list-none p-0" data-testid="proposals">
             {list.map((p) => (
               <li key={p.id} className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-t border-[var(--in-line)] px-4 py-3 sm:px-[18px]">

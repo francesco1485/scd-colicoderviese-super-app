@@ -59,7 +59,7 @@ export function FundApplicationForm({
     e.preventDefault();
     setTried(true);
     if (problem) return;
-    if (!active) return setResult({ ok: false, message: "Da attivare: serve l'OK della Direzione per applicare r101." });
+    if (!active) return setResult({ ok: false, message: "Le domande online non sono ancora aperte: per ora chiedi in segreteria. Qui non viene registrato nulla." });
     setBusy(true);
     try {
       const kid = kids.find((k) => k.personId === f.child);

@@ -286,7 +286,7 @@ function refOf(data: unknown): { ref: string | null; todo: string | null } {
 /** One write: only when the section is open for the caller; the database checks the level again. */
 async function act(section: GivingSection, fn: string, args: (orgId: string) => Record<string, unknown>, done: string): Promise<ActionResult> {
   const { gate, org, sb } = await backoffice(section);
-  if (gate.state === "not-active") return { ok: false, message: "Da attivare: serve l'OK della Direzione per applicare r101." };
+  if (gate.state === "not-active") return { ok: false, message: "Non ancora aperto online: per ora rivolgiti alla segreteria. Qui non viene registrato nulla." };
   if (gate.state !== "open" || !sb || !org) return { ok: false, message: "Non sei abilitato a questa sezione: chiedi alla Direzione." };
   const { data, error } = await sb.rpc(fn as never, args(org.organizationId) as never);
   if (error) return { ok: false, message: givingErrorText(error) };
@@ -319,7 +319,7 @@ export const fundSubmitApplication = createServerFn({ method: "POST" })
     const sb = org ? serverSupabase() : null;
     if (!sb || !org) return { ok: false, message: "Accedi per fare domanda al Fondo Solidale." };
     const engine = await givingEngineState(sb as unknown as GrantsClient);
-    if (engine !== "applied") return { ok: false, message: "Da attivare: serve l'OK della Direzione per applicare r101." };
+    if (engine !== "applied") return { ok: false, message: "Non ancora aperto online: per ora rivolgiti alla segreteria. Qui non viene registrato nulla." };
     const { data: code, error } = await sb.rpc("scd_fund_submit_application" as never, {
       p_organization_id: org.organizationId,
       p_season: data.season,

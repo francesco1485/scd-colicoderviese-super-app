@@ -374,7 +374,7 @@ describe("fail-closed gate (no behaviour change before r101)", () => {
     expect(givingErrorText({ code: "22023", message: "double discount: Fondo and sibling discount are not cumulative" })).toMatch(/non sono cumulabili/);
     expect(givingErrorText({ code: "42501", message: "medical items: the infermeria responsible approves" })).toMatch(/infermeria/);
     expect(givingErrorText({ code: "42501", message: "not enabled: donazioni WRITE" })).toMatch(/Direzione/);
-    expect(givingErrorText({ code: "PGRST202", message: "Could not find the function" })).toMatch(/r101/);
+    expect(givingErrorText({ code: "PGRST202", message: "Could not find the function" })).toMatch(/Non ancora aperto online/);
   });
 });
 

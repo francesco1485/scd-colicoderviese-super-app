@@ -33,7 +33,7 @@ export const TEXT_PENDING = "Testo in arrivo dalla Direzione";
 
 /** Shown wherever r101 is not applied yet. */
 export const NOT_ACTIVE_TITLE = "Da attivare";
-export const NOT_ACTIVE_TEXT = "Serve l'OK della Direzione per applicare r101: fino ad allora qui non si registra nulla.";
+export const NOT_ACTIVE_TEXT = "Non ancora aperto online: fino all'apertura qui non viene registrato nulla. Per adottare o donare adesso, rivolgiti alla segreteria.";
 
 /* ------------------------------------------------------------------ catalogues */
 

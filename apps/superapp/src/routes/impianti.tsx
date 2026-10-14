@@ -1,10 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CalendarDays, CreditCard, Ticket } from "lucide-react";
+import { CalendarDays, CreditCard, MapPin, Navigation, Ticket } from "lucide-react";
 
 import { CastPresence } from "@/components/scd/CastPresence";
 import { FacilityMap } from "@/components/scd/FacilityMap";
 import { TicketRules } from "@/components/scd/TicketRules";
 import { FACILITIES, siteById, spaceById } from "@/lib/facilities";
+import { mapsUrl } from "@/lib/match-extras";
 import { romeDay } from "@/lib/public-window";
 
 /** Schematic plan of Colico sent by the Direzione on 13/10/2026 (FACILITY_PLAN in config/scd-assets.v1.json). */
@@ -66,7 +67,10 @@ function ImpiantiPage() {
         </div>
       </section>
       <div className="mx-auto -mt-5 max-w-[1280px] px-4 sm:px-6">
-        <FacilityMap mode="public" />
+        <Directions />
+        <div className="mt-5">
+          <FacilityMap mode="public" />
+        </div>
         <figure className="scd-card m-0 mt-5 overflow-hidden p-0" data-testid="pianta-colico">
           <figcaption className="flex flex-wrap items-baseline justify-between gap-2 px-4 pt-4 sm:px-5">
             <span className="font-uv text-[24px] uppercase leading-none text-[#0b2a5b]">Pianta del Centro Sportivo Colico</span>
@@ -90,5 +94,48 @@ function ImpiantiPage() {
         </p>
       </div>
     </main>
+  );
+}
+
+/**
+ * "Come arrivare" (live audit 14/10/2026: a grandparent found the address but no way to navigate). Addresses from the
+ * facilities master (config/scd-facilities.v1.json); a site without a confirmed address shows no link.
+ */
+function Directions() {
+  const sites = [siteById("SED-COL"), siteById("SED-DER")].filter((s): s is NonNullable<typeof s> => Boolean(s));
+  return (
+    <section aria-labelledby="arrivare-t" className="scd-card grid gap-3 p-4 sm:p-5" data-testid="impianti-arrivare">
+      <h2 id="arrivare-t" className="m-0 flex items-center gap-2 text-[19px] font-bold text-[#0b2a5b]">
+        <Navigation className="size-5 text-[#1556c4]" aria-hidden="true" />
+        Come arrivare
+      </h2>
+      <ul className="m-0 grid list-none gap-3 p-0 sm:grid-cols-2">
+        {sites.map((s) => {
+          const url = s.address ? mapsUrl(`${s.name}, ${s.address}, ${s.municipality}`) : null;
+          return (
+            <li key={s.id} className="grid gap-2 rounded-xl bg-[#e9f2fb] p-3.5">
+              <span className="flex items-start gap-2">
+                <MapPin className="mt-0.5 size-5 flex-none text-[#1556c4]" aria-hidden="true" />
+                <span className="grid gap-0.5">
+                  <b className="text-[16px] leading-tight text-[#0b1e3a]">{s.name}</b>
+                  <span className="text-[15px] text-[#4a5d7a]">{s.address ? `${s.address}, ${s.municipality}` : `${s.municipality} · indirizzo da verificare`}</span>
+                </span>
+              </span>
+              {url && (
+                <a
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="scd-focus inline-flex min-h-12 items-center justify-center gap-2 rounded-[12px] bg-[#ffd600] px-4 text-[16px] font-bold text-[#0b1e3a]"
+                >
+                  <Navigation className="size-5" aria-hidden="true" />
+                  Portami qui con Maps
+                </a>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </section>
   );
 }

@@ -116,7 +116,7 @@ export function FundPage({ initial }: { initial: { gate: GivingGate; board: Fund
               ))}
             </div>
             {shown.length === 0 ? (
-              <EmptyRow>{open ? "Nessuna domanda in questo elenco." : "Le domande compariranno qui quando r101 sarà attivo."}</EmptyRow>
+              <EmptyRow>{open ? "Nessuna domanda in questo elenco." : "Le domande compariranno qui quando il Fondo sarà aperto online."}</EmptyRow>
             ) : (
               <ul className="m-0 list-none p-0" data-testid="fund-apps">
                 {shown.map((a) => (

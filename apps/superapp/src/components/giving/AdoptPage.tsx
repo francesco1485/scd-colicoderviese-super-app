@@ -96,7 +96,7 @@ export function AdoptPage({ initial }: { initial: { gate: GivingGate; board: Ado
           </>
         }
       >
-        {items.length === 0 ? <EmptyRow>{open ? "Catalogo vuoto: aggiungi il primo oggetto." : "Gli oggetti compariranno qui quando r101 sarà attivo. Nessun oggetto viene inserito in automatico."}</EmptyRow> : (
+        {items.length === 0 ? <EmptyRow>{open ? "Catalogo vuoto: aggiungi il primo oggetto." : "Gli oggetti compariranno qui quando le adozioni saranno aperte online. Nessun oggetto viene inserito in automatico."}</EmptyRow> : (
           <ul className="m-0 list-none p-0" data-testid="adopt-items">
             {items.map((i) => {
               const target = i.effectivePriceMode === "PREZZO" ? i.priceTotal : null;

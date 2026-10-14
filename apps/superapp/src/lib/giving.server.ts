@@ -82,6 +82,6 @@ export function givingErrorText(error: { code?: string; message: string } | null
   if (/transition|not allowed/.test(m)) return "Passaggio di stato non previsto.";
   if (/reason needed|question needed/.test(m)) return "Scrivi il motivo.";
   if (/not found/.test(m) || error.code === "P0002") return "Elemento non trovato: ricarica la pagina.";
-  if (isMissingObjectError(error)) return "Da attivare: serve l'OK della Direzione per applicare r101.";
+  if (isMissingObjectError(error)) return "Non ancora aperto online: per ora rivolgiti alla segreteria. Qui non viene registrato nulla.";
   return "Dati non validi: controlla i campi e riprova.";
 }

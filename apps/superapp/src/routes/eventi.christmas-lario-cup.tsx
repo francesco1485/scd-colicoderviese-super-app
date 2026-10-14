@@ -536,7 +536,7 @@ function ChristmasLarioCup() {
               .
             </p>
             <p className="mt-3 text-[13.5px] text-[#b9c9e8]">
-              {T.privacy} {T.sourceLabel} {E.source}.
+              {T.privacy} {T.sourceLabel}
             </p>
           </div>
         </Sec>

@@ -145,7 +145,7 @@ const IT: LarioText = {
   orgInfo: "Informazioni e adesioni:",
   privacy:
     "Foto e video solo con il consenso delle famiglie, area media dedicata. Nessun nome o statistica individuale di atleti minorenni viene pubblicato.",
-  sourceLabel: "Dati da:",
+  sourceLabel: "Dati dalle locandine ufficiali del torneo.",
   langLabel: "Lingua",
 };
 
@@ -233,7 +233,7 @@ const DE: LarioText = {
   orgInfo: "Informationen und Anmeldung:",
   privacy:
     "Fotos und Videos nur mit Zustimmung der Familien, eigener Medienbereich. Es werden keine Namen oder Einzelstatistiken minderjähriger Spielerinnen und Spieler veröffentlicht.",
-  sourceLabel: "Quelle:",
+  sourceLabel: "Angaben laut den offiziellen Turnierplakaten.",
   langLabel: "Sprache",
 };
 
@@ -319,7 +319,7 @@ const EN: LarioText = {
   orgInfo: "Information and registration:",
   privacy:
     "Photos and videos only with families' consent, in a dedicated media area. No names or individual statistics of underage players are published.",
-  sourceLabel: "Source:",
+  sourceLabel: "Details from the official tournament posters.",
   langLabel: "Language",
 };
 

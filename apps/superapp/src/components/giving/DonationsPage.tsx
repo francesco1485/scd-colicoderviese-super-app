@@ -99,7 +99,7 @@ export function DonationsPage({ initial }: { initial: { gate: GivingGate; board:
             </>
           }
         >
-          {donations.length === 0 ? <EmptyRow>{open ? "Nessuna donazione registrata." : "Le donazioni compariranno qui quando r101 sarà attivo."}</EmptyRow> : (
+          {donations.length === 0 ? <EmptyRow>{open ? "Nessuna donazione registrata." : "Le donazioni compariranno qui quando la raccolta sarà aperta online."}</EmptyRow> : (
             <ul className="m-0 list-none p-0" data-testid="donations">
               {donations.map((d) => (
                 <li key={d.id} className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-t border-[var(--in-line)] px-4 py-3 sm:px-[18px]">
