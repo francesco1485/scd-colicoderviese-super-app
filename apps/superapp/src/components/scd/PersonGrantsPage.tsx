@@ -129,6 +129,7 @@ export function PersonGrantsPage({ initial, personId }: { initial: PersonGrantsD
       path={`/direzione/accessi/${personId}`}
       preview={data.gate.preview}
       editable
+      status={applied ? undefined : <Chip tone="warn">Simulazione: non si salva nulla</Chip>}
       highlights={[
         { value: data.connected && applied ? next.length : null, label: "sezioni abilitate" },
         { value: data.connected ? pending.length : null, label: "proposte da confermare" },
@@ -422,7 +423,7 @@ function SectionRow({
                 className={`${inputCls} h-11 font-normal`}
               >
                 {s.perimeters.map((p) => (
-                  <option key={p} value={p} disabled={minor === true && p !== "SELF"}>{PERIMETER_LABEL[p]} — {PERIMETER_HINT[p]}</option>
+                  <option key={p} value={p} disabled={minor === true && p !== "SELF"}>{PERIMETER_LABEL[p]} — {lowerFirst(PERIMETER_HINT[p].replace(/\.$/, ""))}</option>
                 ))}
               </select>
             </label>
@@ -659,4 +660,8 @@ function GrantAuditCard({ data }: { data: PersonGrantsData }) {
       )}
     </Card>
   );
+}
+
+function lowerFirst(s: string): string {
+  return s.charAt(0).toLowerCase() + s.slice(1);
 }

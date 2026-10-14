@@ -61,9 +61,12 @@ export function WorkAreaShell({
   note,
   editable = false,
   path,
+  status,
   children,
 }: {
   id: WorkAreaId;
+  /** Replaces the default "Sola lettura" / "Modifiche salvate" chip (e.g. a page whose writes are not active yet). */
+  status?: ReactNode;
   title?: string;
   /** Direct path of a page that shares the area's access but lives at its own URL (e.g. /tesoreria/prima-nota). */
   path?: string;
@@ -91,7 +94,7 @@ export function WorkAreaShell({
         <MemberServicesBar area={id} />
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="m-0 flex min-w-0 flex-1 basis-full flex-wrap items-center gap-2 sm:basis-[320px] text-[14px] leading-snug text-[var(--in-sub)]">
-            {editable ? <Chip tone="ok">Modifiche salvate nel database del club</Chip> : <Chip tone="info">Sola lettura</Chip>}
+            {status ?? (editable ? <Chip tone="ok">Modifiche salvate nel database del club</Chip> : <Chip tone="info">Sola lettura</Chip>)}
             {note && <span className="min-w-0">{note}</span>}
           </p>
           <span className="flex flex-wrap items-center gap-2">
