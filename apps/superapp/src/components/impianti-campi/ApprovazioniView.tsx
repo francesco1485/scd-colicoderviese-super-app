@@ -6,7 +6,7 @@
  * sheet. Nothing is written by the app.
  */
 import { ExternalLink } from "lucide-react";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 
 import {
   OPEN_STATUSES,
@@ -17,10 +17,26 @@ import {
   type Proposal,
 } from "@/lib/bookings-register";
 import { APPROVER_POSITIONS } from "@/lib/impianti-access";
+import {
+  decisionWithHistory,
+  noteFreeText,
+  noteLights,
+  proposalHistory,
+  trainingLines,
+  type HistoryEntry,
+  type QuadroRotationLike,
+} from "@/lib/impianti-planning";
 import type { ProposalsFeed } from "@/lib/impianti.functions";
 import { PITCHES, hhmm, longDay, type PitchFormat } from "@/lib/rotation";
-import { PitchPreview, copyText, type Preview } from "./BookingPlanner";
-import { useImpianti } from "./context";
+import {
+  CopyBlock,
+  PitchPreview,
+  copyText,
+  trainingItems,
+  type Preview,
+} from "./BookingPlanner";
+import { quadroRotationsOf, useImpianti } from "./context";
+import { PitchDayView } from "./PitchDayView";
 import { AccessScreen } from "./ImpiantiPage";
 import { BASE_MATCHES } from "./model";
 import {
@@ -42,11 +58,61 @@ const STATUS_TONE: Record<string, Tone> = {
 const fmtText = (f: PitchFormat | null) =>
   f === null ? "—" : f === "full" ? "campo intero" : `${f} contro ${f}`;
 
-function ProposalCard({ p, buffer }: { p: Proposal; buffer: number }) {
-  const check = checkProposal(p, BASE_MATCHES, buffer);
+const whenText = (e: HistoryEntry) =>
+  e.when
+    ? `${e.when.slice(8, 10)}/${e.when.slice(5, 7)}/${e.when.slice(0, 4)} ${e.when.slice(11, 16)}`
+    : "data non registrata";
+
+function HistoryList({ entries }: { entries: HistoryEntry[] }) {
+  return (
+    <div className="grid gap-1">
+      <b className="text-[13px] text-[var(--in-sub)]">Storico dello stato</b>
+      <ol className="m-0 grid list-none gap-1 border-l-2 border-[var(--in-rail-soft)] p-0 pl-3 text-[14px]">
+        {entries.map((e, i) => (
+          <li key={`${e.status}-${i}`} className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+            <Chip tone={STATUS_TONE[e.status] ?? "mute"}>{e.status}</Chip>
+            <span>{e.who}</span>
+            <span
+              className={`tabular-nums ${e.when ? "text-[var(--in-sub)]" : "text-[var(--in-warn)]"}`}
+            >
+              · {whenText(e)}
+            </span>
+            {e.basis === "dedotto" && (
+              <span className="text-[12px] text-[var(--in-sub)]">
+                (dalla riga, non dallo storico)
+              </span>
+            )}
+            {e.reason && (
+              <span className="basis-full text-[13px] text-[var(--in-sub)]">
+                Motivo: {e.reason}
+              </span>
+            )}
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
+function ProposalCard({
+  p,
+  buffer,
+  rotations,
+  who,
+}: {
+  p: Proposal;
+  buffer: number;
+  rotations: readonly QuadroRotationLike[] | null;
+  who: string;
+}) {
+  const check = checkProposal(p, BASE_MATCHES, buffer, rotations);
+  const history = useMemo(() => proposalHistory(p), [p]);
+  const lights = noteLights(p.note);
+  const free = noteFreeText(p.note);
   const [reason, setReason] = useState("");
   const [rejecting, setRejecting] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
+  const [newNote, setNewNote] = useState<string | null>(null);
   const rid = useId();
   useEffect(() => {
     if (!msg) return;
@@ -56,12 +122,19 @@ function ProposalCard({ p, buffer }: { p: Proposal; buffer: number }) {
 
   const decide = async (d: "CONFERMATA" | "RESPINTA" | "IN VALUTAZIONE") => {
     const cells = decisionCells(d, reason);
+    const withHistory = decisionWithHistory(d, {
+      note: p.note,
+      who,
+      at: new Date(),
+      reason,
+    });
+    setNewNote(withHistory.note);
     const ok = await copyText(cells.stato);
     window.open(REGISTRY_URL, "_blank", "noopener,noreferrer");
     setMsg(
       ok
-        ? `Copiato «${cells.stato}»: incollalo nella colonna Stato della riga ${p.id}${d === "RESPINTA" ? " e copia il motivo nella colonna Note" : ""}; scrivi il tuo ruolo in «Approvato da».`
-        : `Copia non riuscita: scrivi «${cells.stato}» nella colonna Stato della riga ${p.id}.`,
+        ? `Copiato «${cells.stato}»: incollalo nella colonna Stato della riga ${p.id}; poi copia qui sotto la nota con lo storico per la colonna Note; scrivi il tuo ruolo in «Approvato da».`
+        : `Copia non riuscita: scrivi «${cells.stato}» nella colonna Stato della riga ${p.id} e copia qui sotto la nota con lo storico.`,
     );
   };
 
@@ -74,7 +147,11 @@ function ProposalCard({ p, buffer }: { p: Proposal; buffer: number }) {
     p.end !== null
       ? {
           fits: !!check.fits,
-          others: check.sharing,
+          others: [
+            ...check.sharing,
+            ...(check.quadro ? trainingItems(check.quadro, p.date) : []),
+          ],
+          ...(check.quadro ? { check: check.quadro } : {}),
           probe: {
             id: "__proposal__",
             date: p.date,
@@ -130,6 +207,8 @@ function ProposalCard({ p, buffer }: { p: Proposal; buffer: number }) {
           </dd>
           <dt className="text-[var(--in-sub)]">Spogliatoi</dt>
           <dd className="m-0">{p.rooms || "—"}</dd>
+          <dt className="text-[var(--in-sub)]">Luci</dt>
+          <dd className="m-0">{lights || "—"}</dd>
           <dt className="text-[var(--in-sub)]">Ingresso</dt>
           <dd className="m-0">{p.entrance || "—"}</dd>
           <dt className="text-[var(--in-sub)]">Richiesto da</dt>
@@ -142,7 +221,14 @@ function ProposalCard({ p, buffer }: { p: Proposal; buffer: number }) {
           )}
           <dt className="text-[var(--in-sub)]">Avviso Comune</dt>
           <dd className="m-0">{p.notice || "—"}</dd>
+          {free && (
+            <>
+              <dt className="text-[var(--in-sub)]">Note</dt>
+              <dd className="m-0">{free}</dd>
+            </>
+          )}
         </dl>
+        <HistoryList entries={history} />
         <p className="m-0 text-[14px]">
           {!check.checkable ? (
             <span className="text-[var(--in-sub)]">
@@ -151,18 +237,42 @@ function ProposalCard({ p, buffer }: { p: Proposal; buffer: number }) {
             </span>
           ) : check.fits ? (
             <span className="font-semibold text-[var(--in-ok)]">
-              Nessun conflitto con il calendario gare.
+              Nessun conflitto con il calendario gare
+              {check.quadro?.quadroKnown
+                ? " e con il Quadro settimanale (settimane A e B)"
+                : ""}
+              .
             </span>
           ) : (
             <span className="font-semibold text-[var(--in-crit)]">
-              Conflitto con il calendario:{" "}
-              {check.sharing
-                .map((m) => `${m.label} ${hhmm(m.start)}`)
-                .join(", ") || "formato da verificare sulle misure"}
+              Conflitto:{" "}
+              {[
+                ...check.sharing.map((m) => `${m.label} ${hhmm(m.start)}`),
+                ...(check.quadro &&
+                !check.quadro.measuresToVerify &&
+                (!check.quadro.byWeek.A.fits || !check.quadro.byWeek.B.fits)
+                  ? [
+                      `allenamenti del Quadro (settimana ${
+                        !check.quadro.byWeek.A.fits && !check.quadro.byWeek.B.fits
+                          ? "A e B"
+                          : !check.quadro.byWeek.A.fits
+                            ? "A"
+                            : "B"
+                      })`,
+                    ]
+                  : []),
+              ].join(", ") || "formato da verificare sulle misure"}
               .
             </span>
           )}
         </p>
+        {check.quadro && (
+          <ul className="m-0 grid gap-0.5 pl-5 text-[13.5px] text-[var(--in-sub)]">
+            {trainingLines(check.quadro).map((t) => (
+              <li key={t}>{t}</li>
+            ))}
+          </ul>
+        )}
         {open && (
           <div className="grid gap-2">
             <div className="flex flex-wrap gap-2">
@@ -239,6 +349,13 @@ function ProposalCard({ p, buffer }: { p: Proposal; buffer: number }) {
         >
           {msg ?? ""}
         </p>
+        {newNote !== null && (
+          <CopyBlock
+            label={`Nota con lo storico per la colonna Note (riga ${p.id})`}
+            text={newNote}
+            rows={3}
+          />
+        )}
       </div>
       <div>
         {preview && p.pitch && p.format ? (
@@ -259,7 +376,8 @@ function ProposalCard({ p, buffer }: { p: Proposal; buffer: number }) {
 }
 
 export function ApprovazioniView({ feed }: { feed: ProposalsFeed }) {
-  const { model, canApprove, requestedBy } = useImpianti();
+  const { model, canApprove, requestedBy, quadro } = useImpianti();
+  const rotations = useMemo(() => quadroRotationsOf(quadro), [quadro]);
   if (!canApprove)
     return (
       <AccessScreen
@@ -281,6 +399,9 @@ export function ApprovazioniView({ feed }: { feed: ProposalsFeed }) {
       (a.date ?? "").localeCompare(b.date ?? ""),
   );
   const local = model.bookings.map((b) => bookingToProposal(b, requestedBy));
+  const dayViewDate =
+    openFirst.find((p) => p.date && p.status && OPEN_STATUSES.includes(p.status))
+      ?.date ?? model.today;
   return (
     <div className="grid gap-[18px]">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -348,6 +469,8 @@ export function ApprovazioniView({ feed }: { feed: ProposalsFeed }) {
                 key={`r-${p.id}`}
                 p={p}
                 buffer={model.options.buffer}
+                rotations={rotations}
+                who={requestedBy}
               />
             ))}
             {!registry.length && (
@@ -369,6 +492,8 @@ export function ApprovazioniView({ feed }: { feed: ProposalsFeed }) {
               key={`l-${p.id}`}
               p={p}
               buffer={model.options.buffer}
+              rotations={rotations}
+              who={requestedBy}
             />
           ))
         ) : (
@@ -378,10 +503,19 @@ export function ApprovazioniView({ feed }: { feed: ProposalsFeed }) {
           </p>
         )}
       </section>
+      <PitchDayView
+        date={dayViewDate}
+        editableDate
+        items={model.items}
+        proposals={feed.status === "ok" ? registry : null}
+        rotations={rotations}
+      />
+
       <SimulationNote>
-        I conflitti sono ricalcolati sul calendario gare dello snapshot;
-        allenamenti del Quadro e altre prenotazioni del registro non sono
-        inclusi.
+        I conflitti sono ricalcolati sul calendario gare dello snapshot e, quando
+        disponibile, sul Quadro settimanale (settimana A e B controllate
+        entrambe); le altre prenotazioni del registro non entrano nel controllo
+        della singola proposta, ma si vedono nella giornata dei campi.
       </SimulationNote>
     </div>
   );

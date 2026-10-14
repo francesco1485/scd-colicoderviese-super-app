@@ -28,6 +28,14 @@ import {
   type QuadroRoom,
   type RotationMatch,
 } from "./rotation";
+import {
+  checkSlotWithQuadro,
+  lightsAdvice,
+  requestNote,
+  trainingLines,
+  type CapacityCheck,
+  type QuadroRotationLike,
+} from "./impianti-planning";
 
 /** Column order of the master. */
 export const REGISTRY_COLUMNS = [
@@ -105,9 +113,15 @@ const fmtLabel = (f: PitchFormat) =>
 /**
  * One TSV row for the master, in REGISTRY_COLUMNS order. Status is always
  * PROPOSTA: the Direzione decides in the sheet. `requestedBy` is the
- * position of the person sending it (empty when not verified).
+ * position of the person sending it (empty when not verified). The Note
+ * carries the lights of the same request and, with `at`, the first entry of
+ * the state history ("Storico: dd/mm/yyyy hh:mm PROPOSTA (ruolo)").
  */
-export function bookingToRegistryRow(b: Booking, requestedBy = ""): string {
+export function bookingToRegistryRow(
+  b: Booking,
+  requestedBy = "",
+  at: Date | null = null,
+): string {
   const start = toMinutes(b.start) ?? 0;
   const p = PITCHES[b.pitch];
   const roomIds = (b.rooms ?? []).map(
@@ -135,7 +149,7 @@ export function bookingToRegistryRow(b: Booking, requestedBy = ""): string {
       b.pitch === "DV"
         ? `Entro il ${itDate(minusDays(b.date, NOTICE_DAYS))}`
         : "Non serve",
-    Note: "",
+    Note: requestNote(b, requestedBy, at),
     Origine: "Super App /gestionale/impianti",
   };
   return REGISTRY_COLUMNS.map((c) => cell(values[c])).join("\t");
@@ -151,6 +165,8 @@ export interface BriefContext {
   buffer: number;
   today: string;
   requestedBy: string;
+  /** Training board rotations; when given, trainings enter the pitch check (week A and B). */
+  rotations?: readonly QuadroRotationLike[] | null;
 }
 
 /** Pre-filled "scheda per la Direzione": plain text, ready to copy. */
@@ -159,14 +175,23 @@ export function directionBrief(b: Booking, ctx: BriefContext): string {
   const p = PITCHES[b.pitch];
   const day = groupByDay(ctx.items).get(b.date) ?? [];
   const sameDay = day.filter((m) => m.id !== `ipotesi-${b.id}`);
-  const check = checkSlot(
-    sameDay,
-    b.pitch,
-    start,
-    b.duration,
-    b.format,
-    ctx.buffer,
-  );
+  const quadro: CapacityCheck | null =
+    ctx.rotations !== undefined
+      ? checkSlotWithQuadro(
+          sameDay,
+          ctx.rotations,
+          b.date,
+          b.pitch,
+          start,
+          b.duration,
+          b.format,
+          ctx.buffer,
+        )
+      : null;
+  const check =
+    quadro ??
+    checkSlot(sameDay, b.pitch, start, b.duration, b.format, ctx.buffer);
+  const lights = lightsAdvice(b);
   const rooms = roomClashes(
     b,
     ctx.others.filter((o) => o.id !== b.id),
@@ -180,10 +205,22 @@ export function directionBrief(b: Booking, ctx: BriefContext): string {
     `Quando: ${longDay(b.date)} ${b.date.slice(0, 4)}, ${hhmm(start)}–${hhmm(start + b.duration)} (+${ctx.buffer} min cambio campo)`,
     check.fits
       ? `Conflitti sul campo: nessuno${check.sharing.length ? `; condivide il campo con ${check.sharing.map((m) => `${m.label} ${hhmm(m.start)}`).join(", ")}` : ""}`
-      : `Conflitti sul campo: SÌ, il campo non basta con ${check.sharing.map((m) => `${m.label} ${hhmm(m.start)}`).join(", ") || "il formato scelto (misure da verificare)"}`,
+      : `Conflitti sul campo: SÌ, il campo non basta con ${
+          [
+            ...check.sharing.map((m) => `${m.label} ${hhmm(m.start)}`),
+            ...(quadro &&
+            !quadro.measuresToVerify &&
+            (quadro.byWeek.A.trainings.length ||
+              quadro.byWeek.B.trainings.length)
+              ? ["gli allenamenti del Quadro settimanale"]
+              : []),
+          ].join(", ") || "il formato scelto (misure da verificare)"
+        }`,
     `Spogliatoi: ${(b.rooms ?? []).length ? (b.rooms ?? []).map((r) => (r === "ARB" ? "arbitri" : r)).join(", ") : "—"}${rooms.length ? ` · ATTENZIONE già assegnati: ${rooms.map((r) => `${r.room} a ${r.by} ${hhmm(r.start)}`).join("; ")}` : ""}`,
+    `Luci: ${lights.window ? `sì, ${hhmm(lights.window[0])}–${hhmm(lights.window[1])}` : lights.recommended ? "non richieste (finisce dopo le 17:00: da valutare)" : "no"}`,
     `Ingresso: ${(b.entrance ?? "").trim() || "—"}`,
   ];
+  if (quadro) lines.splice(5, 0, ...trainingLines(quadro));
   if (b.kind === "affitto")
     lines.push(
       `Affitto: importo ${(b.amount ?? "").trim() ? `${(b.amount ?? "").trim()} €` : "—"}; servono accordo scritto e verifica dell'assicurazione dell'ente`,
@@ -347,6 +384,7 @@ export function csvToProposals(text: string): Proposal[] {
 
 /** A local ipotesi as a proposal card (status PROPOSTA, not yet in the master). */
 export function bookingToProposal(b: Booking, requestedBy = ""): Proposal {
+  const created = b.createdAt ? new Date(b.createdAt) : null;
   const start = toMinutes(b.start);
   return {
     id: `IPO-${b.id}`,
@@ -368,7 +406,11 @@ export function bookingToProposal(b: Booking, requestedBy = ""): Proposal {
       b.pitch === "DV"
         ? `Entro il ${itDate(minusDays(b.date, NOTICE_DAYS))}`
         : "Non serve",
-    note: "",
+    note: requestNote(
+      b,
+      requestedBy,
+      created && !Number.isNaN(created.getTime()) ? created : null,
+    ),
     source: "ipotesi",
   };
 }
@@ -378,17 +420,36 @@ export interface ProposalCheck {
   checkable: boolean;
   fits: boolean | null;
   sharing: RotationMatch[];
+  /** Present when the training board was part of the check (week A and B). */
+  quadro?: CapacityCheck;
 }
 
-/** Conflicts of a proposal recomputed against the calendar snapshot (and nothing else). */
+/**
+ * Conflicts of a proposal recomputed against the calendar snapshot and, when
+ * `rotations` is given, the trainings of the Quadro settimanale.
+ */
 export function checkProposal(
   p: Proposal,
   matches: readonly RotationMatch[],
   buffer: number,
+  rotations?: readonly QuadroRotationLike[] | null,
 ): ProposalCheck {
   if (!p.date || p.start === null || p.end === null || !p.pitch || !p.format)
     return { checkable: false, fits: null, sharing: [] };
   const day = groupByDay(matches).get(p.date) ?? [];
+  if (rotations !== undefined) {
+    const q = checkSlotWithQuadro(
+      day,
+      rotations,
+      p.date,
+      p.pitch,
+      p.start,
+      p.end - p.start,
+      p.format,
+      buffer,
+    );
+    return { checkable: true, fits: q.fits, sharing: q.sharing, quadro: q };
+  }
   const r = checkSlot(day, p.pitch, p.start, p.end - p.start, p.format, buffer);
   return { checkable: true, fits: r.fits, sharing: r.sharing };
 }

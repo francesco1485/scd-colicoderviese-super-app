@@ -6,7 +6,14 @@
  * server writes. The pitch SVG is self-contained here so it can later merge
  * into the shared facility map component.
  */
-import { Check, ClipboardCopy, ExternalLink, Send, Trash2 } from "lucide-react";
+import {
+  Check,
+  ClipboardCopy,
+  ExternalLink,
+  Lightbulb,
+  Send,
+  Trash2,
+} from "lucide-react";
 import { useEffect, useId, useMemo, useState, type FormEvent } from "react";
 
 import {
@@ -15,13 +22,20 @@ import {
   directionBrief,
 } from "@/lib/bookings-register";
 import {
+  checkRequest,
+  checkSlotWithQuadro,
+  trainingLines,
+  type CapacityCheck,
+  type QuadroRotationLike,
+  type RequestCheck,
+} from "@/lib/impianti-planning";
+import {
   BOOKING_DEFAULTS,
   BOOKING_KIND_LABEL,
   BOOKING_TITLE_MAX,
   PITCHES,
   ROOMS,
   bookingToItem,
-  checkSlot,
   ddmm,
   groupByDay,
   hhmm,
@@ -40,8 +54,9 @@ import {
   type RoomId,
   type RotationMatch,
 } from "@/lib/rotation";
-import { useImpianti } from "./context";
+import { quadroRotationsOf, useImpianti } from "./context";
 import { teamColor, type ImpiantiModel } from "./model";
+import { PitchDayView } from "./PitchDayView";
 import { Chip, btnPrimary, btnSecondary, inputCls, labelCls } from "./ui";
 
 export type BookingDraft = Omit<Booking, "id">;
@@ -58,6 +73,7 @@ const emptyDraft = (date: string): BookingDraft => ({
   rooms: [],
   entrance: "",
   amount: "",
+  lights: false,
 });
 
 const fmtText = (f: PitchFormat) =>
@@ -77,14 +93,48 @@ export interface Preview {
   fits: boolean;
   others: RotationMatch[];
   probe: RotationMatch | null;
+  /** Capacity check with the Quadro trainings (week A and B), when computed. */
+  check?: CapacityCheck;
 }
 
-/** Preview of a use of `pitch` against the items of that day (pure). */
+/**
+ * Quadro trainings of the worse week as drawable items: one item per zone
+ * (campo 1 in thirds = 5 contro 5 share, campo 2 in halves = 7 contro 7 share).
+ */
+export function trainingItems(check: CapacityCheck, date: string): RotationMatch[] {
+  const week =
+    check.byWeek.B.peak > check.byWeek.A.peak ? check.byWeek.B : check.byWeek.A;
+  // One drawn item per zone: the first training holding it in the slot.
+  const seen = new Set<string>();
+  return week.trainings.flatMap((u) =>
+    u.zones.filter((z) => !seen.has(z) && seen.add(z)).map(
+      (z): RotationMatch => ({
+        id: `quadro-${week.week}-${u.start}-${z}`,
+        date,
+        start: u.start,
+        end: u.end,
+        endKnown: true,
+        group: "quadro",
+        label: `Quadro sett. ${week.week} · ${u.groups.join(", ")}`,
+        short: "Quadro",
+        format: u.pitch === "C1" ? 5 : 7,
+        opponent: "",
+        kind: "allenamento",
+        homePitch: u.pitch,
+        pitch: u.pitch,
+        moved: false,
+      }),
+    ),
+  );
+}
+
+/** Preview of a use of `pitch` against the items of that day and the Quadro trainings (pure). */
 export function previewFor(
   items: readonly RotationMatch[],
   buffer: number,
   d: BookingDraft,
   excludeId?: string,
+  rotations: readonly QuadroRotationLike[] | null = null,
 ): Preview {
   const start = toMinutes(d.start);
   if (start === null || !Number.isFinite(d.duration) || d.duration < 15)
@@ -92,8 +142,10 @@ export function previewFor(
   const dayItems = (groupByDay(items).get(d.date) ?? []).filter(
     (m) => m.id !== excludeId,
   );
-  const check = checkSlot(
+  const check = checkSlotWithQuadro(
     dayItems,
+    rotations,
+    d.date,
     d.pitch,
     start,
     d.duration,
@@ -105,8 +157,16 @@ export function previewFor(
     id: "__draft__",
     title: d.title || "Nuova ipotesi",
   });
-  return { fits: check.fits, others: check.sharing, probe };
+  return {
+    fits: check.fits,
+    others: [...check.sharing, ...trainingItems(check, d.date)],
+    probe,
+    check,
+  };
 }
+
+const itemTag = (m: RotationMatch) =>
+  m.kind === "match" ? m.short : m.group === "quadro" ? "Quadro" : "Ipotesi";
 
 export function PitchPreview({
   pitch,
@@ -139,7 +199,7 @@ export function PitchPreview({
         ? `ci sta e occupa ${shareText(share)}`
         : "non ci sta"
       : "orario non valido"
-  }${preview.others.length ? `; già in campo: ${preview.others.map((m) => m.label).join(", ")}` : "; nessun altro uso nell'orario"}`;
+  }${preview.others.length ? `; già in campo: ${[...new Set(preview.others.map((m) => m.label))].join(", ")}` : "; nessun altro uso nell'orario"}`;
   const px = (s: { x: number; overflow: boolean }) =>
     pad + (s.overflow ? 0 : s.x) * iw + 3;
   return (
@@ -192,8 +252,7 @@ export function PitchPreview({
                 fontSize="20"
                 fill="#062a52"
               >
-                {s.match.kind === "match" ? s.match.short : "Ipotesi"}{" "}
-                {hhmm(s.match.start)}
+                {itemTag(s.match)} {hhmm(s.match.start)}
               </text>
             </g>
           ))}
@@ -220,8 +279,7 @@ export function PitchPreview({
                 fontSize="16"
                 fill="#a3241b"
               >
-                {s.match.kind === "match" ? s.match.short : "Ipotesi"}{" "}
-                {hhmm(s.match.start)}: già oltre
+                {itemTag(s.match)} {hhmm(s.match.start)}: già oltre
               </text>
             </g>
           ))}
@@ -295,8 +353,10 @@ export function PitchPreview({
         {p.site} {p.name.toLowerCase()} · {p.surface} · {p.size ?? "—"}. Schema
         non in scala. Il campo intero blocca metà, terzi e quarti, e una parte
         occupata blocca il campo intero: il controllo avviene prima dell'invio,
-        cambio campo compreso. Allenamenti del Quadro non inclusi nel controllo
-        del campo.
+        cambio campo compreso.{" "}
+        {preview.check && !preview.check.quadroKnown
+          ? "Quadro settimanale non disponibile qui: allenamenti non controllati."
+          : "Allenamenti del Quadro settimanale inclusi: settimana A e settimana B controllate entrambe (in figura la più carica)."}
       </figcaption>
     </figure>
   );
@@ -326,7 +386,7 @@ export async function copyText(text: string): Promise<boolean> {
   }
 }
 
-function CopyBlock({
+export function CopyBlock({
   label,
   text,
   rows,
@@ -395,9 +455,16 @@ function SendPanel({
   requestedBy: string;
   onClose: () => void;
 }) {
-  const quadroRooms = useImpianti().quadro.rooms as QuadroRoom[];
-  const row = bookingToRegistryRow(booking, requestedBy);
+  const { quadro } = useImpianti();
+  const quadroRooms = quadro.rooms as QuadroRoom[];
+  const created = booking.createdAt ? new Date(booking.createdAt) : null;
+  const row = bookingToRegistryRow(
+    booking,
+    requestedBy,
+    created && !Number.isNaN(created.getTime()) ? created : new Date(),
+  );
   const brief = directionBrief(booking, {
+    rotations: quadroRotationsOf(quadro),
     items: model.items,
     others: model.bookings,
     quadroRooms,
@@ -449,7 +516,7 @@ function SendPanel({
         text={row}
         rows={2}
       />
-      <CopyBlock label="Scheda per la Direzione" text={brief} rows={10} />
+      <CopyBlock label="Scheda per la Direzione" text={brief} rows={12} />
       <div>
         <a
           href={REGISTRY_URL}
@@ -463,6 +530,68 @@ function SendPanel({
         </a>
       </div>
     </section>
+  );
+}
+
+/* ---------------- One request: pitch + rooms + lights ---------------- */
+
+const RESOURCE_LABEL = { campo: "Campo", spogliatoio: "Spogliatoio", luci: "Luci" };
+
+function RequestSummary({ request }: { request: RequestCheck }) {
+  if (!request.resources.length) return null;
+  const roomBusy = new Set(request.rooms.map((r) => r.room));
+  return (
+    <div className="grid gap-2 rounded-xl border border-[var(--in-line)] p-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <b className="text-[15px]">Una sola richiesta</b>
+        <Chip tone={request.ok ? "ok" : "crit"}>
+          {request.ok ? "Tutto libero insieme" : "Da sistemare"}
+        </Chip>
+      </div>
+      <ul className="m-0 grid list-none gap-1 p-0 text-[14px]">
+        {request.resources.map((r) => {
+          const bad =
+            r.kind === "campo"
+              ? !(request.pitch?.fits ?? false)
+              : r.kind === "spogliatoio"
+                ? [...roomBusy].some((x) => r.spaceId.endsWith(`-${x}`))
+                : false;
+          return (
+            <li
+              key={`${r.kind}-${r.spaceId}`}
+              className="flex flex-wrap items-center gap-x-2 gap-y-0.5"
+            >
+              <span className="w-[92px] text-[13px] font-semibold text-[var(--in-sub)]">
+                {RESOURCE_LABEL[r.kind]}
+              </span>
+              <span>
+                {r.label} · {hhmm(r.from)}–{hhmm(r.to)}
+              </span>
+              <Chip tone={bad ? "crit" : "ok"}>{bad ? "occupato" : "libero"}</Chip>
+            </li>
+          );
+        })}
+      </ul>
+      {(request.problems.length > 0 || request.warnings.length > 0) && (
+        <ul className="m-0 grid gap-1 pl-5 text-[13.5px]">
+          {request.problems.map((t) => (
+            <li key={t} className="text-[var(--in-crit)]">
+              {t}
+            </li>
+          ))}
+          {request.warnings.map((t) => (
+            <li key={t} className="text-[var(--in-warn)]">
+              {t}
+            </li>
+          ))}
+        </ul>
+      )}
+      <p className="m-0 text-[12.5px] text-[var(--in-sub)]">
+        Campo, spogliatoi e luci vanno insieme nella stessa riga del registro
+        (luci nella colonna Note): la Direzione li conferma o li respinge
+        insieme.
+      </p>
+    </div>
   );
 }
 
@@ -482,7 +611,9 @@ export function BookingPlanner({
       ? { ...emptyDraft(model.today), ...draftIn }
       : emptyDraft(model.today),
   );
-  const quadroRooms = useImpianti().quadro.rooms as QuadroRoom[];
+  const { quadro } = useImpianti();
+  const quadroRooms = quadro.rooms as QuadroRoom[];
+  const rotations = useMemo(() => quadroRotationsOf(quadro), [quadro]);
   const [errors, setErrors] = useState<string[]>([]);
   const [done, setDone] = useState<string | null>(null);
   const [sending, setSending] = useState<Booking | null>(null);
@@ -501,12 +632,23 @@ export function BookingPlanner({
   const set = <K extends keyof BookingDraft>(k: K, v: BookingDraft[K]) =>
     setD((x) => ({ ...x, [k]: v }));
   const preview = useMemo(
-    () => previewFor(model.items, model.options.buffer, d),
-    [model.items, model.options.buffer, d],
+    () => previewFor(model.items, model.options.buffer, d, undefined, rotations),
+    [model.items, model.options.buffer, d, rotations],
   );
   const clashes = useMemo(
     () => roomClashes(d, model.bookings, quadroRooms, model.options.buffer),
     [d, model.bookings, quadroRooms, model.options.buffer],
+  );
+  const request = useMemo(
+    () =>
+      checkRequest(d, {
+        dayItems: groupByDay(model.items).get(d.date) ?? [],
+        others: model.bookings,
+        quadroRooms,
+        rotations,
+        buffer: model.options.buffer,
+      }),
+    [d, model.items, model.bookings, quadroRooms, rotations, model.options.buffer],
   );
   const guidance = roomGuidance(d.kind);
   const colico = d.pitch !== "DV";
@@ -525,6 +667,7 @@ export function BookingPlanner({
       rooms: colico ? (d.rooms ?? []) : [],
       entrance: (d.entrance ?? "").trim(),
       amount: d.kind === "affitto" ? (d.amount ?? "").trim() : "",
+      lights: d.lights === true,
     };
     const errs = validateBooking(clean);
     setErrors(errs);
@@ -790,6 +933,35 @@ export function BookingPlanner({
             </div>
           </fieldset>
 
+          <fieldset className="m-0 grid gap-2 rounded-xl border border-[var(--in-line)] p-3">
+            <legend className="px-1 text-[13px] font-semibold text-[var(--in-sub)]">
+              Luci
+            </legend>
+            <label
+              className={`flex min-h-11 cursor-pointer items-center gap-2 rounded-lg border px-3 text-[15px] font-semibold ${d.lights ? "border-[var(--in-info)] bg-[var(--in-info-bg)]" : "border-[var(--in-line)] bg-white"}`}
+            >
+              <input
+                type="checkbox"
+                className="scd-focus size-5"
+                checked={d.lights === true}
+                onChange={(e) => set("lights", e.target.checked)}
+              />
+              <Lightbulb className="size-4" aria-hidden="true" />
+              Chiedi anche le luci del campo
+            </label>
+            <p className="m-0 text-[13.5px] text-[var(--in-sub)]">
+              {request.lights.window
+                ? `Luci accese ${hhmm(request.lights.window[0])}–${hhmm(request.lights.window[1])}. `
+                : request.lights.recommended
+                  ? "Finisce dopo le 17:00: di solito servono le luci. "
+                  : ""}
+              {request.lights.note}{" "}
+              <span className="text-[12px] font-semibold text-[var(--in-warn)]">
+                (regola proposta: luci dalle 17:00)
+              </span>
+            </p>
+          </fieldset>
+
           <p
             id={`${fid}-note`}
             className="m-0 text-[13px] text-[var(--in-sub)]"
@@ -838,6 +1010,7 @@ export function BookingPlanner({
             )}
           </div>
           <PitchPreview pitch={d.pitch} format={d.format} preview={preview} />
+          <RequestSummary request={request} />
           <ul className="m-0 grid gap-1 pl-5 text-[13.5px] text-[var(--in-sub)]">
             {preview.probe && (
               <li>
@@ -847,19 +1020,29 @@ export function BookingPlanner({
                 cambio campo.
               </li>
             )}
-            {preview.others.map((m) => (
+            {preview.check?.sharing.map((m) => (
               <li key={m.id}>
                 Già in campo: {m.label}
                 {m.kind === "match" ? "" : " (ipotesi)"} {hhmm(m.start)}–
                 {hhmm(m.end)} · {fmtText(m.format)}
               </li>
             ))}
+            {preview.check &&
+              trainingLines(preview.check).map((t) => <li key={t}>{t}</li>)}
             {preview.probe && !preview.others.length && (
               <li>Nessun altro uso del campo in quell'orario.</li>
             )}
           </ul>
         </div>
       </div>
+
+      <PitchDayView
+        date={d.date}
+        items={model.items}
+        proposals={null}
+        rotations={rotations}
+        title={`Giornata dei campi · ${/^\d{4}-\d{2}-\d{2}$/.test(d.date) ? ddmm(d.date) : "—"}`}
+      />
 
       {sending && (
         <SendPanel
@@ -903,6 +1086,7 @@ export function BookingPlanner({
                   {(b.rooms ?? []).length
                     ? ` · spogliatoi ${(b.rooms ?? []).join(", ")}`
                     : ""}
+                  {b.lights ? " · luci" : ""}
                 </span>
                 <Chip tone={bad ? "crit" : "ok"}>
                   {bad ? "non ci sta" : "ci sta"}
