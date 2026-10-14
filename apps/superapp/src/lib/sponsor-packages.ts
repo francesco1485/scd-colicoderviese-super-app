@@ -97,7 +97,10 @@ export const PARTNER_PACKAGES: readonly PartnerPackage[] = [
     price: { kind: "da_approvare" },
     icon: "digitale",
   },
-  {
+];
+
+/** "Seggiolino in tribuna": kept internal while INTERNAL_ONLY.seatAdoption (UD-132); not offered on /sponsor. */
+export const SEAT_PACKAGE_INTERNAL: PartnerPackage = {
     id: "seggiolino",
     title: "Seggiolino in tribuna",
     summary: "Un posto della tribuna con la targhetta della tua azienda.",
@@ -111,8 +114,7 @@ export const PARTNER_PACKAGES: readonly PartnerPackage[] = [
     price: { kind: "da_approvare" },
     icon: "seggiolino",
     link: { to: "/sostieni", label: "Vedi la tribuna in Sostieni" },
-  },
-];
+  };
 
 export const AUDIENCE_TO_MEASURE = "da misurare";
 

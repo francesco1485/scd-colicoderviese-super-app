@@ -3183,6 +3183,26 @@
           "invented audience numbers (only calculated passes)"
         ]
       }
+    },
+    {
+      "sourceDate": "2026-10-14",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-132",
+      "name": "SEAT_ADOPTION_AND_LOTTERY_INTERNAL_FOCUS_KIDS_FAMILIES",
+      "sourceQuoteFragments": [
+        "Adotta un seggiolino e lotteria al momento teniamoli interni senza pubblicazione",
+        "Mettiamo concentrati su quello che è spingere i ragazzi e le famiglie a starci sopra e viverla",
+        "Scegli tu la cosa migliore"
+      ],
+      "context": "Francesco 14/10/2026 23:20-23:22, after the three new-home proposals (A tavola madre, B il tuo prossimo momento, C matchday).",
+      "normalizedCommand": {
+        "rule": "'Adotta un seggiolino' and the 'Lotteria dello sport' stay internal: no public link, home strip entry, sponsor package or public page content (lib/internal-initiatives.ts INTERNAL_ONLY). Direzione and Tesoreria pages keep working. Product priority: daily reasons for ragazzi and families to use and live the app.",
+        "scope": "PUBLIC_HOME + SOSTIENI + SPONSOR + EVENTI",
+        "forbidden": [
+          "publishing seat adoption or the lottery before a new explicit decision"
+        ]
+      }
     }
   ],
   "completionGate": {

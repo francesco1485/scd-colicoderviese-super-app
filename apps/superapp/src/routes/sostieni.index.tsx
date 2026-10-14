@@ -9,6 +9,7 @@ import { PageHero, heroOverlapCls } from "@/components/ui-kit";
 import { CATEGORY_LABEL, ITEM_CATEGORIES, ITEM_STATUS_LABEL, PROPOSAL_AREA_LABEL, PROPOSAL_STATUS_LABEL, type PublicItem } from "@/lib/giving";
 import { getGivingPublic } from "@/lib/giving.functions";
 import { SHARE_PAGES, pageMeta } from "@/lib/share";
+import { INTERNAL_ONLY } from "@/lib/internal-initiatives";
 import { findTribuneItem, tribuneDraftItem } from "@/lib/tribune-seats";
 
 /**
@@ -58,7 +59,7 @@ function SostieniPage() {
         </div>
       )}
 
-      <TribuneSeatsSection
+      {!INTERNAL_ONLY.seatAdoption && <TribuneSeatsSection
         item={tribune}
         active={active}
         onAdopt={(unit) => {
@@ -66,13 +67,13 @@ function SostieniPage() {
           const item = tribune ?? (active ? null : tribuneDraftItem());
           if (item) setPledge({ item, unit });
         }}
-      />
+      />}
 
       <section className="mx-auto mt-14 max-w-6xl px-4" aria-labelledby="adotta-title">
         <p className="eyebrow">Adotta un oggetto</p>
         <h2 id="adotta-title" className="mt-1 text-3xl font-bold">Cose di cui il club ha bisogno</h2>
         <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
-          Ogni oggetto ha prezzo o «da preventivo», fornitore e stato: {(["DA_ADOTTARE", "IN_RACCOLTA", "ADOTTATO", "CONSEGNATO"] as const).map((s) => ITEM_STATUS_LABEL[s].toLowerCase()).join(", ")}. Più persone possono adottare lo stesso oggetto; alcuni sono divisi in unità (per esempio i posti numerati di una tribuna, con la targhetta).
+          Ogni oggetto ha prezzo o «da preventivo», fornitore e stato: {(["DA_ADOTTARE", "IN_RACCOLTA", "ADOTTATO", "CONSEGNATO"] as const).map((s) => ITEM_STATUS_LABEL[s].toLowerCase()).join(", ")}. Più persone possono adottare lo stesso oggetto; alcuni sono divisi in unità.
         </p>
         {items.length > 0 ? (
           <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">

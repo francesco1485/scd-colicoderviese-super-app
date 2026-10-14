@@ -517,3 +517,14 @@ Francesco 14/10 22:42: «procedi a fare quello che secondo te fa il meglio e la 
 - **Parole semplici**: nelle pagine pubbliche di Sostieni e in /entra niente più «r101» o «lead»; il back-office dice «serve l'apertura da parte della Direzione (migrazione r101)». Manifest `safe_runtime_behavior` aggiornato.
 - **/entra pubblica** (sitemap e robots in produzione, offline worker): nessun dato di sessione. **/sostieni resta privata**: la revisione di sicurezza ha trovato che `/sostieni/fondo-solidale` incorpora i figli del genitore collegato; in più la pagina usa `getMyFamilyForFund`, che dal server restituisce solo id, nome, relazione e minore (niente anno, squadre, tesseramento, scadenza certificato), sia al primo caricamento sia navigando nell'app. Test che la pagina resti `private, no-store`.
 - Revisione: primo giro BLOCK (scd-sicurezza CRITICA su /sostieni; scd-revisore stessa causa + manifest, messaggio staff, fonte e traduzioni) → corretti.
+
+## UD-132 — Seggiolino e lotteria interni · 2026-10-14
+
+Francesco 14/10 23:20: «Adotta un seggiolino e lotteria al momento teniamoli interni senza pubblicazione. Mettiamo concentrati su quello che è spingere i ragazzi e le famiglie a starci sopra e viverla».
+
+- `src/lib/internal-initiatives.ts`: `INTERNAL_ONLY = { seatAdoption: true, lottery: true }`.
+- Home (pubblica e iscritti): la striscia «Sostieni il club» mostra solo «Diventa partner» e «Dona materiale»; seggiolino e lotteria mai, anche se la lotteria venisse pubblicata dal pannello.
+- /sponsor: tolto il pacchetto «Seggiolino in tribuna» (resta come `SEAT_PACKAGE_INTERNAL`).
+- /sostieni: nascosta la mappa dei posti della tribuna.
+- /eventi/lotteria-dello-sport: sempre «Iniziativa in preparazione» e noindex, niente anteprima di struttura; /eventi non la elenca.
+- Pagine Direzione e Tesoreria invariate.
