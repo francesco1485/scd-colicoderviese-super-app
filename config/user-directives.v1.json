@@ -2800,6 +2800,66 @@
       "sourceDate": "2026-10-14",
       "sourceStatus": "EXPLICIT_USER_COMMAND",
       "authority": "DIREZIONE_SCD",
+      "id": "UD-113",
+      "name": "FONDO_SOLIDALE_ADOTTA_DONATIONS_PROPOSALS",
+      "sourceQuoteFragments": [
+        "Gestionale Fondo Solidale: domande e valutazione riservata, decisione e quota ridotta, scadenze, entrate del Fondo (donazioni, eventi, sponsor dedicati), uscite (quote coperte), rendiconto",
+        "ISEE e nomi mai visibili fuori dalla Direzione o da chi è abilitato esplicitamente alla sezione; nessun doppio sconto (Fondo + fratelli) imposto in logica e nel database",
+        "pagina pubblica solo con testo reale, altrimenti struttura con \"Testo in arrivo dalla Direzione\"; nessun IBAN, nessun importo inventato",
+        "\"Adotta un oggetto\": catalogo delle cose che servono al club, con titolo, categoria, descrizione, fornitore, codice prodotto, link, foto facoltativa solo del club (mai copiare le immagini dei cataloghi), prezzo totale oppure \"da preventivo\", stato (da adottare / in raccolta / adottato / consegnato)",
+        "adozione parziale: più adottanti contribuiscono allo stesso oggetto con barra di avanzamento; oggetti divisibili in unità (es. posti di una tribuna, ognuno adottabile con riconoscimento sulla targhetta numerata)",
+        "campagne \"Adotta la nuova palestra SCD\" e \"Adotta la nuova infermeria\": donazioni in natura con offerta, revisione dello staff (accetta / rifiuta con motivo / servono informazioni), controllo dello stato, ricevuto/inventariato, collegate alla campagna e al magazzino",
+        "materiale sanitario: solo nuovo/sigillato o verificabile da un professionista; farmaci scaduti o aperti MAI accettati; approva il responsabile dell'infermeria",
+        "visibilità del donatore su ogni donazione/adozione: nome pubblico / anonimo in pubblico (nome solo per la ricevuta della tesoreria) / completamente anonimo (nessun dato personale; spiegare che allora non si può rilasciare ricevuta); mai importi per persona in pubblico senza consenso",
+        "\"Proponi un miglioramento\": chiunque, anche anonimo, con \"posso contribuire\" (tempo, beni, denaro); coda di valutazione dello staff (nuova / in valutazione / accettata → diventa oggetto adottabile / non fattibile con motivo); limiti anti-spam; mai pubbliche finché lo staff non le pubblica",
+        "nessun pagamento nell'app: le donazioni in denaro le registra la tesoreria con ricevuta; le aziende passano dal CRM sponsor esistente"
+      ],
+      "context": "Direzione requirements of 14/10/2026 relayed to the build session as a structured brief (A Fondo Solidale, B Adotta un oggetto, C campaigns palestra/infermeria, D anonymous donations and improvement proposals). Real examples (KOMPAN StreetBLOCK FSP10300, KOMPAN Torre Doppia con Scivoli PCW200121, Doppia Torre con 2 Scivoli PCW200321, SACO Multiservizi tribune offer 14/05/2026: 60 numbered seats, 54.500 € + IVA 22% = 66.490 €, offer expired) are test fixtures and documentation only, never seeded.",
+      "normalizedCommand": {
+        "rule": "One staged migration (r101) adds the Fondo Solidale back office, the adoptable-items catalogue with partial and unit adoption, money donations recorded by the treasury, goods offers for the palestra/infermeria campaigns and improvement proposals, all behind per-person section grants (fondo-solidale, adotta, donazioni, proposte) checked with scd_can. Public pages show only real data or honest placeholders; the app never processes payments.",
+        "scope": "SCD_ONE_PUBLIC_SOSTIENI + SCD_CORE_TESORERIA_DIREZIONE + SCD_GROW_SPONSOR_HANDOFF",
+        "constraints": [
+          "ISEE, names and contacts of Fund applications readable only through functions that check scd_can('fondo-solidale')",
+          "Fondo and sibling discount never cumulative: table constraint + check against the Gestionale copy (scd_fee_positions.family_rule)",
+          "completely anonymous donations carry no personal data and get no receipt; public names only with NOME_PUBBLICO; amounts only with consent; aggregates only with >= 3 contributions or everybody's consent",
+          "medicines only sealed and not expired; other medical items new and sealed or professionally verifiable; medical acceptance needs the infermeria grant",
+          "proposals never public until staff publish a staff-written text without contacts",
+          "no seeded items, no invented prices, IBAN or Fund texts; expired quotes shown as 'da preventivo aggiornato'",
+          "no payment processing; companies go to /sponsor#proposta (existing CRM flow)",
+          "migration r101 applied only with explicit Direzione approval; pages say 'Da attivare' until then; no production writes"
+        ],
+        "implementation": {
+          "migration": "supabase/migrations/20261014_r101_fondo_adotta.sql (STAGED, NOT APPLIED)",
+          "sections": "config/scd-sections.v1.json: fondo-solidale, adotta, donazioni, proposte",
+          "pure_logic": "apps/superapp/src/lib/giving.ts (+ giving.server.ts, giving.functions.ts)",
+          "public_routes": [
+            "/sostieni",
+            "/sostieni/fondo-solidale",
+            "/sostieni/dona-materiale",
+            "/sostieni/proponi"
+          ],
+          "backoffice_routes": [
+            "/tesoreria/fondo-solidale",
+            "/tesoreria/donazioni",
+            "/direzione/adotta",
+            "/direzione/proposte"
+          ],
+          "entry_points": [
+            "/sponsor (Sostieni il club)",
+            "/tesoreria card",
+            "/direzione tools",
+            "SOSTIENI_VETRINA_SLOT ready, not on air"
+          ],
+          "manifest": "product_direction.solidarity_fund.ud113, CAP-SOLIDARITY-FUND, GAP-GIVING-R101"
+        },
+        "implementationStatus": "IMPLEMENTED_STAGING_MIGRATION_NOT_APPLIED",
+        "duplicate_work": "DENY"
+      }
+    },
+    {
+      "sourceDate": "2026-10-14",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
       "id": "UD-114",
       "name": "CAST_AVATARS_LIVE_AREA_GUIDES_INTERACTIVE",
       "sourceQuoteFragments": [

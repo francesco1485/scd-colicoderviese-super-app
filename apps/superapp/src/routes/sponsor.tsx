@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { BarChart3, Check, MonitorSmartphone, Trees } from "lucide-react";
+import { BarChart3, Check, HeartHandshake, MonitorSmartphone, Trees } from "lucide-react";
 import { useState } from "react";
 
 import { LedwallFacsimile } from "@/components/LedwallFacsimile";
@@ -81,6 +81,18 @@ function Sponsor() {
           ))}
         </div>
         <p className="mt-3 text-xs text-muted-foreground">Disponibilità di slot e periodi gestita dalla Direzione. Nessun pagamento online attivo: ogni accordo passa da una proposta.</p>
+      </section>
+
+      <section className="mx-auto mt-14 max-w-6xl px-4" aria-labelledby="sostieni-title" data-testid="sponsor-sostieni">
+        <div className="card-premium flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
+          <HeartHandshake className="size-8 flex-none text-primary" aria-hidden="true" />
+          <div className="min-w-0 flex-1">
+            <p className="eyebrow">Sostieni il club</p>
+            <h2 id="sostieni-title" className="mt-1 text-2xl font-bold">Adotta un oggetto o sostieni il Fondo Solidale</h2>
+            <p className="m-0 mt-1 text-sm text-muted-foreground">Attrezzature, area giochi, tribuna, palestra e infermeria: la tua azienda può adottare qualcosa di cui il club ha bisogno, o dedicare una sponsorizzazione al Fondo Solidale.</p>
+          </div>
+          <Link to="/sostieni" className="surface-sun scd-focus inline-flex min-h-11 items-center justify-center rounded-lg px-4 py-2 text-sm font-bold uppercase">Vedi cosa serve</Link>
+        </div>
       </section>
 
       <section id="proposta" className="mx-auto mt-14 max-w-4xl scroll-mt-20 px-4">

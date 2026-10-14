@@ -62,9 +62,11 @@ import { Route as CoreImpiantiCalendariRouteImport } from './routes/core.impiant
 import { Route as CoreStaffRouteImport } from './routes/core.staff'
 import { Route as DirezioneAccessiRouteImport } from './routes/direzione_.accessi'
 import { Route as DirezioneAcquistiRouteImport } from './routes/direzione_.acquisti'
+import { Route as DirezioneAdottaRouteImport } from './routes/direzione_.adotta'
 import { Route as DirezioneCervelloneRouteImport } from './routes/direzione_.cervellone'
 import { Route as DirezioneContenutiRouteImport } from './routes/direzione_.contenuti'
 import { Route as DirezioneLotteriaRouteImport } from './routes/direzione_.lotteria'
+import { Route as DirezioneProposteRouteImport } from './routes/direzione_.proposte'
 import { Route as EventiIndexRouteImport } from './routes/eventi.index'
 import { Route as EventiChristmasLarioCupRouteImport } from './routes/eventi.christmas-lario-cup'
 import { Route as EventiLezioniTecnicoCoordinativeRouteImport } from './routes/eventi.lezioni-tecnico-coordinative'
@@ -81,12 +83,18 @@ import { Route as QuadroIndexRouteImport } from './routes/quadro.index'
 import { Route as QuadroRotazioneCampiRouteImport } from './routes/quadro.rotazione-campi'
 import { Route as SegreteriaCertificatiRouteImport } from './routes/segreteria_.certificati'
 import { Route as SegreteriaPersoneRouteImport } from './routes/segreteria_.persone'
+import { Route as SostieniIndexRouteImport } from './routes/sostieni.index'
+import { Route as SostieniDonaMaterialeRouteImport } from './routes/sostieni.dona-materiale'
+import { Route as SostieniFondoSolidaleRouteImport } from './routes/sostieni.fondo-solidale'
+import { Route as SostieniProponiRouteImport } from './routes/sostieni.proponi'
 import { Route as SquadreTeamRouteImport } from './routes/squadre_.$team'
 import { Route as TesoreriaBiglietteriaRouteImport } from './routes/tesoreria_.biglietteria'
 import { Route as TesoreriaCalendarioIncassiRouteImport } from './routes/tesoreria_.calendario-incassi'
 import { Route as TesoreriaChiusuraRouteImport } from './routes/tesoreria_.chiusura'
 import { Route as TesoreriaClubHouseRouteImport } from './routes/tesoreria_.club-house'
 import { Route as TesoreriaCompensiRouteImport } from './routes/tesoreria_.compensi'
+import { Route as TesoreriaDonazioniRouteImport } from './routes/tesoreria_.donazioni'
+import { Route as TesoreriaFondoSolidaleRouteImport } from './routes/tesoreria_.fondo-solidale'
 import { Route as TesoreriaFornitoriRouteImport } from './routes/tesoreria_.fornitori'
 import { Route as TesoreriaMagazzinoRouteImport } from './routes/tesoreria_.magazzino'
 import { Route as TesoreriaMovimentiRouteImport } from './routes/tesoreria_.movimenti'
@@ -370,6 +378,11 @@ const DirezioneAcquistiRoute = DirezioneAcquistiRouteImport.update({
   path: '/direzione/acquisti',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DirezioneAdottaRoute = DirezioneAdottaRouteImport.update({
+  id: '/direzione_/adotta',
+  path: '/direzione/adotta',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DirezioneCervelloneRoute = DirezioneCervelloneRouteImport.update({
   id: '/direzione_/cervellone',
   path: '/direzione/cervellone',
@@ -383,6 +396,11 @@ const DirezioneContenutiRoute = DirezioneContenutiRouteImport.update({
 const DirezioneLotteriaRoute = DirezioneLotteriaRouteImport.update({
   id: '/direzione_/lotteria',
   path: '/direzione/lotteria',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DirezioneProposteRoute = DirezioneProposteRouteImport.update({
+  id: '/direzione_/proposte',
+  path: '/direzione/proposte',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EventiIndexRoute = EventiIndexRouteImport.update({
@@ -467,6 +485,26 @@ const SegreteriaPersoneRoute = SegreteriaPersoneRouteImport.update({
   path: '/segreteria/persone',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SostieniIndexRoute = SostieniIndexRouteImport.update({
+  id: '/sostieni/',
+  path: '/sostieni/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SostieniDonaMaterialeRoute = SostieniDonaMaterialeRouteImport.update({
+  id: '/sostieni/dona-materiale',
+  path: '/sostieni/dona-materiale',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SostieniFondoSolidaleRoute = SostieniFondoSolidaleRouteImport.update({
+  id: '/sostieni/fondo-solidale',
+  path: '/sostieni/fondo-solidale',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SostieniProponiRoute = SostieniProponiRouteImport.update({
+  id: '/sostieni/proponi',
+  path: '/sostieni/proponi',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SquadreTeamRoute = SquadreTeamRouteImport.update({
   id: '/squadre_/$team',
   path: '/squadre/$team',
@@ -496,6 +534,16 @@ const TesoreriaClubHouseRoute = TesoreriaClubHouseRouteImport.update({
 const TesoreriaCompensiRoute = TesoreriaCompensiRouteImport.update({
   id: '/tesoreria_/compensi',
   path: '/tesoreria/compensi',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TesoreriaDonazioniRoute = TesoreriaDonazioniRouteImport.update({
+  id: '/tesoreria_/donazioni',
+  path: '/tesoreria/donazioni',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TesoreriaFondoSolidaleRoute = TesoreriaFondoSolidaleRouteImport.update({
+  id: '/tesoreria_/fondo-solidale',
+  path: '/tesoreria/fondo-solidale',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TesoreriaFornitoriRoute = TesoreriaFornitoriRouteImport.update({
@@ -635,9 +683,11 @@ export interface FileRoutesByFullPath {
   '/core/staff': typeof CoreStaffRoute
   '/direzione/accessi': typeof DirezioneAccessiRoute
   '/direzione/acquisti': typeof DirezioneAcquistiRoute
+  '/direzione/adotta': typeof DirezioneAdottaRoute
   '/direzione/cervellone': typeof DirezioneCervelloneRoute
   '/direzione/contenuti': typeof DirezioneContenutiRoute
   '/direzione/lotteria': typeof DirezioneLotteriaRoute
+  '/direzione/proposte': typeof DirezioneProposteRoute
   '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
   '/eventi/lezioni-tecnico-coordinative': typeof EventiLezioniTecnicoCoordinativeRoute
   '/eventi/lotteria-dello-sport': typeof EventiLotteriaDelloSportRoute
@@ -651,12 +701,17 @@ export interface FileRoutesByFullPath {
   '/quadro/rotazione-campi': typeof QuadroRotazioneCampiRoute
   '/segreteria/certificati': typeof SegreteriaCertificatiRoute
   '/segreteria/persone': typeof SegreteriaPersoneRoute
+  '/sostieni/dona-materiale': typeof SostieniDonaMaterialeRoute
+  '/sostieni/fondo-solidale': typeof SostieniFondoSolidaleRoute
+  '/sostieni/proponi': typeof SostieniProponiRoute
   '/squadre/$team': typeof SquadreTeamRoute
   '/tesoreria/biglietteria': typeof TesoreriaBiglietteriaRoute
   '/tesoreria/calendario-incassi': typeof TesoreriaCalendarioIncassiRoute
   '/tesoreria/chiusura': typeof TesoreriaChiusuraRoute
   '/tesoreria/club-house': typeof TesoreriaClubHouseRoute
   '/tesoreria/compensi': typeof TesoreriaCompensiRoute
+  '/tesoreria/donazioni': typeof TesoreriaDonazioniRoute
+  '/tesoreria/fondo-solidale': typeof TesoreriaFondoSolidaleRoute
   '/tesoreria/fornitori': typeof TesoreriaFornitoriRoute
   '/tesoreria/magazzino': typeof TesoreriaMagazzinoRoute
   '/tesoreria/movimenti': typeof TesoreriaMovimentiRoute
@@ -669,6 +724,7 @@ export interface FileRoutesByFullPath {
   '/eventi/': typeof EventiIndexRoute
   '/gestionale/': typeof GestionaleIndexRoute
   '/quadro/': typeof QuadroIndexRoute
+  '/sostieni/': typeof SostieniIndexRoute
   '/crm/partner/$partnerId': typeof CrmPartnerPartnerIdRoute
   '/crm/partner/nuovo': typeof CrmPartnerNuovoRoute
   '/direzione/accessi/$personId': typeof DirezioneAccessiPersonIdRoute
@@ -731,9 +787,11 @@ export interface FileRoutesByTo {
   '/core/staff': typeof CoreStaffRoute
   '/direzione/accessi': typeof DirezioneAccessiRoute
   '/direzione/acquisti': typeof DirezioneAcquistiRoute
+  '/direzione/adotta': typeof DirezioneAdottaRoute
   '/direzione/cervellone': typeof DirezioneCervelloneRoute
   '/direzione/contenuti': typeof DirezioneContenutiRoute
   '/direzione/lotteria': typeof DirezioneLotteriaRoute
+  '/direzione/proposte': typeof DirezioneProposteRoute
   '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
   '/eventi/lezioni-tecnico-coordinative': typeof EventiLezioniTecnicoCoordinativeRoute
   '/eventi/lotteria-dello-sport': typeof EventiLotteriaDelloSportRoute
@@ -746,12 +804,17 @@ export interface FileRoutesByTo {
   '/quadro/rotazione-campi': typeof QuadroRotazioneCampiRoute
   '/segreteria/certificati': typeof SegreteriaCertificatiRoute
   '/segreteria/persone': typeof SegreteriaPersoneRoute
+  '/sostieni/dona-materiale': typeof SostieniDonaMaterialeRoute
+  '/sostieni/fondo-solidale': typeof SostieniFondoSolidaleRoute
+  '/sostieni/proponi': typeof SostieniProponiRoute
   '/squadre/$team': typeof SquadreTeamRoute
   '/tesoreria/biglietteria': typeof TesoreriaBiglietteriaRoute
   '/tesoreria/calendario-incassi': typeof TesoreriaCalendarioIncassiRoute
   '/tesoreria/chiusura': typeof TesoreriaChiusuraRoute
   '/tesoreria/club-house': typeof TesoreriaClubHouseRoute
   '/tesoreria/compensi': typeof TesoreriaCompensiRoute
+  '/tesoreria/donazioni': typeof TesoreriaDonazioniRoute
+  '/tesoreria/fondo-solidale': typeof TesoreriaFondoSolidaleRoute
   '/tesoreria/fornitori': typeof TesoreriaFornitoriRoute
   '/tesoreria/magazzino': typeof TesoreriaMagazzinoRoute
   '/tesoreria/movimenti': typeof TesoreriaMovimentiRoute
@@ -764,6 +827,7 @@ export interface FileRoutesByTo {
   '/eventi': typeof EventiIndexRoute
   '/gestionale': typeof GestionaleIndexRoute
   '/quadro': typeof QuadroIndexRoute
+  '/sostieni': typeof SostieniIndexRoute
   '/crm/partner/$partnerId': typeof CrmPartnerPartnerIdRoute
   '/crm/partner/nuovo': typeof CrmPartnerNuovoRoute
   '/direzione/accessi/$personId': typeof DirezioneAccessiPersonIdRoute
@@ -827,9 +891,11 @@ export interface FileRoutesById {
   '/core/staff': typeof CoreStaffRoute
   '/direzione_/accessi': typeof DirezioneAccessiRoute
   '/direzione_/acquisti': typeof DirezioneAcquistiRoute
+  '/direzione_/adotta': typeof DirezioneAdottaRoute
   '/direzione_/cervellone': typeof DirezioneCervelloneRoute
   '/direzione_/contenuti': typeof DirezioneContenutiRoute
   '/direzione_/lotteria': typeof DirezioneLotteriaRoute
+  '/direzione_/proposte': typeof DirezioneProposteRoute
   '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
   '/eventi/lezioni-tecnico-coordinative': typeof EventiLezioniTecnicoCoordinativeRoute
   '/eventi/lotteria-dello-sport': typeof EventiLotteriaDelloSportRoute
@@ -843,12 +909,17 @@ export interface FileRoutesById {
   '/quadro/rotazione-campi': typeof QuadroRotazioneCampiRoute
   '/segreteria_/certificati': typeof SegreteriaCertificatiRoute
   '/segreteria_/persone': typeof SegreteriaPersoneRoute
+  '/sostieni/dona-materiale': typeof SostieniDonaMaterialeRoute
+  '/sostieni/fondo-solidale': typeof SostieniFondoSolidaleRoute
+  '/sostieni/proponi': typeof SostieniProponiRoute
   '/squadre_/$team': typeof SquadreTeamRoute
   '/tesoreria_/biglietteria': typeof TesoreriaBiglietteriaRoute
   '/tesoreria_/calendario-incassi': typeof TesoreriaCalendarioIncassiRoute
   '/tesoreria_/chiusura': typeof TesoreriaChiusuraRoute
   '/tesoreria_/club-house': typeof TesoreriaClubHouseRoute
   '/tesoreria_/compensi': typeof TesoreriaCompensiRoute
+  '/tesoreria_/donazioni': typeof TesoreriaDonazioniRoute
+  '/tesoreria_/fondo-solidale': typeof TesoreriaFondoSolidaleRoute
   '/tesoreria_/fornitori': typeof TesoreriaFornitoriRoute
   '/tesoreria_/magazzino': typeof TesoreriaMagazzinoRoute
   '/tesoreria_/movimenti': typeof TesoreriaMovimentiRoute
@@ -861,6 +932,7 @@ export interface FileRoutesById {
   '/eventi/': typeof EventiIndexRoute
   '/gestionale/': typeof GestionaleIndexRoute
   '/quadro/': typeof QuadroIndexRoute
+  '/sostieni/': typeof SostieniIndexRoute
   '/crm_/partner/$partnerId': typeof CrmPartnerPartnerIdRoute
   '/crm_/partner/nuovo': typeof CrmPartnerNuovoRoute
   '/direzione_/accessi_/$personId': typeof DirezioneAccessiPersonIdRoute
@@ -925,9 +997,11 @@ export interface FileRouteTypes {
     | '/core/staff'
     | '/direzione/accessi'
     | '/direzione/acquisti'
+    | '/direzione/adotta'
     | '/direzione/cervellone'
     | '/direzione/contenuti'
     | '/direzione/lotteria'
+    | '/direzione/proposte'
     | '/eventi/christmas-lario-cup'
     | '/eventi/lezioni-tecnico-coordinative'
     | '/eventi/lotteria-dello-sport'
@@ -941,12 +1015,17 @@ export interface FileRouteTypes {
     | '/quadro/rotazione-campi'
     | '/segreteria/certificati'
     | '/segreteria/persone'
+    | '/sostieni/dona-materiale'
+    | '/sostieni/fondo-solidale'
+    | '/sostieni/proponi'
     | '/squadre/$team'
     | '/tesoreria/biglietteria'
     | '/tesoreria/calendario-incassi'
     | '/tesoreria/chiusura'
     | '/tesoreria/club-house'
     | '/tesoreria/compensi'
+    | '/tesoreria/donazioni'
+    | '/tesoreria/fondo-solidale'
     | '/tesoreria/fornitori'
     | '/tesoreria/magazzino'
     | '/tesoreria/movimenti'
@@ -959,6 +1038,7 @@ export interface FileRouteTypes {
     | '/eventi/'
     | '/gestionale/'
     | '/quadro/'
+    | '/sostieni/'
     | '/crm/partner/$partnerId'
     | '/crm/partner/nuovo'
     | '/direzione/accessi/$personId'
@@ -1021,9 +1101,11 @@ export interface FileRouteTypes {
     | '/core/staff'
     | '/direzione/accessi'
     | '/direzione/acquisti'
+    | '/direzione/adotta'
     | '/direzione/cervellone'
     | '/direzione/contenuti'
     | '/direzione/lotteria'
+    | '/direzione/proposte'
     | '/eventi/christmas-lario-cup'
     | '/eventi/lezioni-tecnico-coordinative'
     | '/eventi/lotteria-dello-sport'
@@ -1036,12 +1118,17 @@ export interface FileRouteTypes {
     | '/quadro/rotazione-campi'
     | '/segreteria/certificati'
     | '/segreteria/persone'
+    | '/sostieni/dona-materiale'
+    | '/sostieni/fondo-solidale'
+    | '/sostieni/proponi'
     | '/squadre/$team'
     | '/tesoreria/biglietteria'
     | '/tesoreria/calendario-incassi'
     | '/tesoreria/chiusura'
     | '/tesoreria/club-house'
     | '/tesoreria/compensi'
+    | '/tesoreria/donazioni'
+    | '/tesoreria/fondo-solidale'
     | '/tesoreria/fornitori'
     | '/tesoreria/magazzino'
     | '/tesoreria/movimenti'
@@ -1054,6 +1141,7 @@ export interface FileRouteTypes {
     | '/eventi'
     | '/gestionale'
     | '/quadro'
+    | '/sostieni'
     | '/crm/partner/$partnerId'
     | '/crm/partner/nuovo'
     | '/direzione/accessi/$personId'
@@ -1116,9 +1204,11 @@ export interface FileRouteTypes {
     | '/core/staff'
     | '/direzione_/accessi'
     | '/direzione_/acquisti'
+    | '/direzione_/adotta'
     | '/direzione_/cervellone'
     | '/direzione_/contenuti'
     | '/direzione_/lotteria'
+    | '/direzione_/proposte'
     | '/eventi/christmas-lario-cup'
     | '/eventi/lezioni-tecnico-coordinative'
     | '/eventi/lotteria-dello-sport'
@@ -1132,12 +1222,17 @@ export interface FileRouteTypes {
     | '/quadro/rotazione-campi'
     | '/segreteria_/certificati'
     | '/segreteria_/persone'
+    | '/sostieni/dona-materiale'
+    | '/sostieni/fondo-solidale'
+    | '/sostieni/proponi'
     | '/squadre_/$team'
     | '/tesoreria_/biglietteria'
     | '/tesoreria_/calendario-incassi'
     | '/tesoreria_/chiusura'
     | '/tesoreria_/club-house'
     | '/tesoreria_/compensi'
+    | '/tesoreria_/donazioni'
+    | '/tesoreria_/fondo-solidale'
     | '/tesoreria_/fornitori'
     | '/tesoreria_/magazzino'
     | '/tesoreria_/movimenti'
@@ -1150,6 +1245,7 @@ export interface FileRouteTypes {
     | '/eventi/'
     | '/gestionale/'
     | '/quadro/'
+    | '/sostieni/'
     | '/crm_/partner/$partnerId'
     | '/crm_/partner/nuovo'
     | '/direzione_/accessi_/$personId'
@@ -1213,9 +1309,11 @@ export interface RootRouteChildren {
   CoreStaffRoute: typeof CoreStaffRoute
   DirezioneAccessiRoute: typeof DirezioneAccessiRoute
   DirezioneAcquistiRoute: typeof DirezioneAcquistiRoute
+  DirezioneAdottaRoute: typeof DirezioneAdottaRoute
   DirezioneCervelloneRoute: typeof DirezioneCervelloneRoute
   DirezioneContenutiRoute: typeof DirezioneContenutiRoute
   DirezioneLotteriaRoute: typeof DirezioneLotteriaRoute
+  DirezioneProposteRoute: typeof DirezioneProposteRoute
   EventiChristmasLarioCupRoute: typeof EventiChristmasLarioCupRoute
   EventiLezioniTecnicoCoordinativeRoute: typeof EventiLezioniTecnicoCoordinativeRoute
   EventiLotteriaDelloSportRoute: typeof EventiLotteriaDelloSportRoute
@@ -1229,12 +1327,17 @@ export interface RootRouteChildren {
   QuadroRotazioneCampiRoute: typeof QuadroRotazioneCampiRoute
   SegreteriaCertificatiRoute: typeof SegreteriaCertificatiRoute
   SegreteriaPersoneRoute: typeof SegreteriaPersoneRoute
+  SostieniDonaMaterialeRoute: typeof SostieniDonaMaterialeRoute
+  SostieniFondoSolidaleRoute: typeof SostieniFondoSolidaleRoute
+  SostieniProponiRoute: typeof SostieniProponiRoute
   SquadreTeamRoute: typeof SquadreTeamRoute
   TesoreriaBiglietteriaRoute: typeof TesoreriaBiglietteriaRoute
   TesoreriaCalendarioIncassiRoute: typeof TesoreriaCalendarioIncassiRoute
   TesoreriaChiusuraRoute: typeof TesoreriaChiusuraRoute
   TesoreriaClubHouseRoute: typeof TesoreriaClubHouseRoute
   TesoreriaCompensiRoute: typeof TesoreriaCompensiRoute
+  TesoreriaDonazioniRoute: typeof TesoreriaDonazioniRoute
+  TesoreriaFondoSolidaleRoute: typeof TesoreriaFondoSolidaleRoute
   TesoreriaFornitoriRoute: typeof TesoreriaFornitoriRoute
   TesoreriaMagazzinoRoute: typeof TesoreriaMagazzinoRoute
   TesoreriaMovimentiRoute: typeof TesoreriaMovimentiRoute
@@ -1247,6 +1350,7 @@ export interface RootRouteChildren {
   EventiIndexRoute: typeof EventiIndexRoute
   GestionaleIndexRoute: typeof GestionaleIndexRoute
   QuadroIndexRoute: typeof QuadroIndexRoute
+  SostieniIndexRoute: typeof SostieniIndexRoute
   CrmPartnerPartnerIdRoute: typeof CrmPartnerPartnerIdRoute
   CrmPartnerNuovoRoute: typeof CrmPartnerNuovoRoute
   DirezioneAccessiPersonIdRoute: typeof DirezioneAccessiPersonIdRoute
@@ -1627,6 +1731,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DirezioneAcquistiRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/direzione_/adotta': {
+      id: '/direzione_/adotta'
+      path: '/direzione/adotta'
+      fullPath: '/direzione/adotta'
+      preLoaderRoute: typeof DirezioneAdottaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/direzione_/cervellone': {
       id: '/direzione_/cervellone'
       path: '/direzione/cervellone'
@@ -1646,6 +1757,13 @@ declare module '@tanstack/react-router' {
       path: '/direzione/lotteria'
       fullPath: '/direzione/lotteria'
       preLoaderRoute: typeof DirezioneLotteriaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/direzione_/proposte': {
+      id: '/direzione_/proposte'
+      path: '/direzione/proposte'
+      fullPath: '/direzione/proposte'
+      preLoaderRoute: typeof DirezioneProposteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/eventi/': {
@@ -1760,6 +1878,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SegreteriaPersoneRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sostieni/': {
+      id: '/sostieni/'
+      path: '/sostieni'
+      fullPath: '/sostieni/'
+      preLoaderRoute: typeof SostieniIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sostieni/dona-materiale': {
+      id: '/sostieni/dona-materiale'
+      path: '/sostieni/dona-materiale'
+      fullPath: '/sostieni/dona-materiale'
+      preLoaderRoute: typeof SostieniDonaMaterialeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sostieni/fondo-solidale': {
+      id: '/sostieni/fondo-solidale'
+      path: '/sostieni/fondo-solidale'
+      fullPath: '/sostieni/fondo-solidale'
+      preLoaderRoute: typeof SostieniFondoSolidaleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sostieni/proponi': {
+      id: '/sostieni/proponi'
+      path: '/sostieni/proponi'
+      fullPath: '/sostieni/proponi'
+      preLoaderRoute: typeof SostieniProponiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/squadre_/$team': {
       id: '/squadre_/$team'
       path: '/squadre/$team'
@@ -1800,6 +1946,20 @@ declare module '@tanstack/react-router' {
       path: '/tesoreria/compensi'
       fullPath: '/tesoreria/compensi'
       preLoaderRoute: typeof TesoreriaCompensiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tesoreria_/donazioni': {
+      id: '/tesoreria_/donazioni'
+      path: '/tesoreria/donazioni'
+      fullPath: '/tesoreria/donazioni'
+      preLoaderRoute: typeof TesoreriaDonazioniRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tesoreria_/fondo-solidale': {
+      id: '/tesoreria_/fondo-solidale'
+      path: '/tesoreria/fondo-solidale'
+      fullPath: '/tesoreria/fondo-solidale'
+      preLoaderRoute: typeof TesoreriaFondoSolidaleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tesoreria_/fornitori': {
@@ -1988,9 +2148,11 @@ const rootRouteChildren: RootRouteChildren = {
   CoreStaffRoute: CoreStaffRoute,
   DirezioneAccessiRoute: DirezioneAccessiRoute,
   DirezioneAcquistiRoute: DirezioneAcquistiRoute,
+  DirezioneAdottaRoute: DirezioneAdottaRoute,
   DirezioneCervelloneRoute: DirezioneCervelloneRoute,
   DirezioneContenutiRoute: DirezioneContenutiRoute,
   DirezioneLotteriaRoute: DirezioneLotteriaRoute,
+  DirezioneProposteRoute: DirezioneProposteRoute,
   EventiChristmasLarioCupRoute: EventiChristmasLarioCupRoute,
   EventiLezioniTecnicoCoordinativeRoute: EventiLezioniTecnicoCoordinativeRoute,
   EventiLotteriaDelloSportRoute: EventiLotteriaDelloSportRoute,
@@ -2004,12 +2166,17 @@ const rootRouteChildren: RootRouteChildren = {
   QuadroRotazioneCampiRoute: QuadroRotazioneCampiRoute,
   SegreteriaCertificatiRoute: SegreteriaCertificatiRoute,
   SegreteriaPersoneRoute: SegreteriaPersoneRoute,
+  SostieniDonaMaterialeRoute: SostieniDonaMaterialeRoute,
+  SostieniFondoSolidaleRoute: SostieniFondoSolidaleRoute,
+  SostieniProponiRoute: SostieniProponiRoute,
   SquadreTeamRoute: SquadreTeamRoute,
   TesoreriaBiglietteriaRoute: TesoreriaBiglietteriaRoute,
   TesoreriaCalendarioIncassiRoute: TesoreriaCalendarioIncassiRoute,
   TesoreriaChiusuraRoute: TesoreriaChiusuraRoute,
   TesoreriaClubHouseRoute: TesoreriaClubHouseRoute,
   TesoreriaCompensiRoute: TesoreriaCompensiRoute,
+  TesoreriaDonazioniRoute: TesoreriaDonazioniRoute,
+  TesoreriaFondoSolidaleRoute: TesoreriaFondoSolidaleRoute,
   TesoreriaFornitoriRoute: TesoreriaFornitoriRoute,
   TesoreriaMagazzinoRoute: TesoreriaMagazzinoRoute,
   TesoreriaMovimentiRoute: TesoreriaMovimentiRoute,
@@ -2022,6 +2189,7 @@ const rootRouteChildren: RootRouteChildren = {
   EventiIndexRoute: EventiIndexRoute,
   GestionaleIndexRoute: GestionaleIndexRoute,
   QuadroIndexRoute: QuadroIndexRoute,
+  SostieniIndexRoute: SostieniIndexRoute,
   CrmPartnerPartnerIdRoute: CrmPartnerPartnerIdRoute,
   CrmPartnerNuovoRoute: CrmPartnerNuovoRoute,
   DirezioneAccessiPersonIdRoute: DirezioneAccessiPersonIdRoute,

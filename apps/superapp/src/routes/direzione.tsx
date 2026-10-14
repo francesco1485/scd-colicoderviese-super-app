@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Brain, CalendarDays, ChevronRight, ClipboardList, KeyRound, Mail, Shirt, UserCheck, Users, Wallet } from "lucide-react";
+import { Brain, CalendarDays, ChevronRight, ClipboardList, HandCoins, HeartHandshake, KeyRound, Lightbulb, Mail, Package, Shirt, UserCheck, Users, Wallet } from "lucide-react";
 import { useMemo } from "react";
 
 import { AccessScreenPage, accessHead } from "@/components/scd/AccessScreen";
@@ -78,6 +78,10 @@ const LINKS = [
   { to: "/segreteria", icon: ClipboardList, title: "Segreteria", sub: "Scadenze, tesseramenti, distinte." },
   { to: "/calendario", icon: CalendarDays, title: "Calendario", sub: "Gare ufficiali della stagione." },
   { to: "/gestionale/organigramma", icon: Users, title: "Organigramma", sub: "Dirigenza, responsabili e staff." },
+  { to: "/tesoreria/fondo-solidale", icon: HandCoins, title: "Fondo Solidale", sub: "Domande riservate, decisioni, entrate e uscite del Fondo. Da attivare (r101)." },
+  { to: "/tesoreria/donazioni", icon: Package, title: "Donazioni e materiale", sub: "Donazioni registrate con ricevuta, offerte per palestra e infermeria." },
+  { to: "/direzione/adotta", icon: HeartHandshake, title: "Adotta un oggetto", sub: "Catalogo delle cose di cui il club ha bisogno, adozioni e posti numerati." },
+  { to: "/direzione/proposte", icon: Lightbulb, title: "Proposte di miglioramento", sub: "Idee e bisogni segnalati da chiunque, anche anonimi: valutazione e pubblicazione." },
 ] as const;
 
 function DirezioneRoute() {
