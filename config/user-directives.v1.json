@@ -2795,6 +2795,46 @@
         "implementationStatus": "IMPLEMENTED_STAGING_MIGRATION_NOT_APPLIED",
         "duplicate_work": "DENY"
       }
+    },
+    {
+      "sourceDate": "2026-10-14",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-114",
+      "name": "SIMPLE_ACCESS_ONE_WAY_IN_AUTO_VERIFY",
+      "sourceQuoteFragments": [
+        "Deve esserci un solo modo di ingresso o un modo simile a quello social altrimenti si diventa pazzi",
+        "quando deve rientrare da browser o app deve entrare sempre con user e pass, non link che arriva e rientra",
+        "dev'esserci il tasto ricordami",
+        "la devono utilizzare tutti dalla persona anziana a quella di 100 anni",
+        "deve essere presente un servizio di assistenza con mail dedicata",
+        "se non indica cosa è all'interno della società va in un'area franca",
+        "se non è riscontro con anagrafica presente lo fa accedere ma non gli dà area dedicata",
+        "chi scrive che ricopre ruoli dirigenziali deve arrivare comunicazione al direttore sportivo",
+        "deve arrivare una mail a sportclubcolico@gmail.com di riepilogo",
+        "le autorizzazioni o altre cose importanti le deve autorizzare il presidente"
+      ],
+      "context": "Direzione message of 14/10/2026 16:40 about test users unable to get in.",
+      "normalizedCommand": {
+        "rule": "Register once (name, surname, birth date, e-mail, mandatory phone, password, consent, optional 'Chi sei nel club?'); one confirmation e-mail; then always e-mail + password with Ricordami, or Google/Apple/Facebook when enabled; forgotten password via e-mail code; help desk link on every access page. Everyone enters the open area at once; parents and adult athletes verified automatically against the registry open their area immediately; officials/coaches/staff notify the Direttore Sportivo and the Presidente authorizes; daily summary to sportclubcolico@gmail.com.",
+        "scope": "IDENTITY_AND_ACCESS",
+        "supersedesInPart": [
+          "UD-112 'pending requests stay pending, nobody activated' for FAMILY/ATHLETE verified automatically by confirmed e-mail; section grants for officials stay manual"
+        ],
+        "constraints": [
+          "automatic FAMILY only when the confirmed e-mail is a registered guardian's e-mail AND the declared child is a FIGLIO of that family; name-only matches never open anything",
+          "automatic ATHLETE only for adults with same e-mail and birth date; 14-17 wait for family consent",
+          "officials never automatic",
+          "outbox only queues; no e-mail is sent until the Direzione switches sending on",
+          "migration r102 applied only with explicit Direzione approval"
+        ],
+        "implementation": {
+          "pure_logic": "apps/superapp/src/lib/signup.ts",
+          "server": "apps/superapp/src/lib/signup.functions.ts",
+          "routes": "/accedi (password-first), /registrati, /accedi/completa",
+          "migration": "supabase/migrations/20261014_r102_simple_access_auto_verify.sql (STAGED, NOT APPLIED)"
+        }
+      }
     }
   ],
   "completionGate": {

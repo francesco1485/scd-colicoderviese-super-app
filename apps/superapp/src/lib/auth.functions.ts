@@ -11,6 +11,7 @@ import { z } from "zod";
 import { PASSWORD_MAX, PASSWORD_PAGE, hasAppPassword, passwordProblem } from "./auth-remember";
 import { mapAuthError, tokenHashInputSchema, verifyOtpInputSchema, type AuthErrorKind, type TokenHashInput, type VerifyOtpInput } from "./auth-otp";
 import { landingFor, safeNext, sessionBadge, sessionRolesFrom, type Membership } from "./session";
+import { PROFILE_PAGE, isSocialUser, profileComplete } from "./signup";
 import { configuredSiteUrl } from "./http-policy";
 import { serverSupabase, setRememberPreference } from "./supabase.server";
 
@@ -121,8 +122,19 @@ export interface ConfirmOutcome {
  * Common tail of every e-mail sign-in (link, code, token hash): the session cookies are already set by the client;
  * pick the landing and, on a first access without password, invite the person to choose one.
  */
-async function landAfterEmailSignIn(user: { user_metadata?: unknown } | null | undefined, asked: string | undefined, next: string): Promise<ConfirmOutcome> {
+async function landAfterEmailSignIn(
+  user: { user_metadata?: unknown; app_metadata?: unknown } | null | undefined,
+  asked: string | undefined,
+  next: string,
+): Promise<ConfirmOutcome> {
   const landing = asked ? next : (await sessionView()).landing;
+  // Google / Apple / Facebook accounts have no password: ask once for phone, birth date and consent (UD-114).
+  if (isSocialUser(user?.app_metadata)) {
+    if (!profileComplete(user?.user_metadata)) {
+      return { ok: true, next: `${PROFILE_PAGE}?next=${encodeURIComponent(landing)}`, message: "Sei dentro." };
+    }
+    return { ok: true, next: landing, message: "Sei dentro." };
+  }
   if (!hasAppPassword(user?.user_metadata)) {
     return { ok: true, next: `${PASSWORD_PAGE}?benvenuto=1&next=${encodeURIComponent(landing)}`, message: "Sei dentro." };
   }

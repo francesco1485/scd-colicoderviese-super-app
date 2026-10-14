@@ -91,6 +91,10 @@ function Conferma() {
               Chiedi un nuovo codice
             </Link>
             <p className="text-[13.5px] leading-snug text-[var(--scd-sub)]">Nel nuovo messaggio trovi un codice di 6 cifre: puoi scriverlo nella pagina Accedi anche da un altro dispositivo.</p>
+            {/* Registration link opened on another device: the address is usually already confirmed (UD-114). */}
+            <Link to="/accedi" search={{ next }} className="scd-focus mt-1 inline-flex min-h-11 items-center justify-center rounded-[10px] border border-[#b9d5ef] bg-white text-[15px] font-semibold text-[var(--scd-blue)]" data-testid="confirm-password">
+              Ti sei appena registrato? Entra con e-mail e password
+            </Link>
           </div>
         )}
       </section>
