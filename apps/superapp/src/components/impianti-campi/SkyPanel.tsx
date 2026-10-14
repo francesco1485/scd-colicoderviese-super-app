@@ -1,5 +1,5 @@
 /**
- * "Chiedi a Genny" side panel: deterministic answers from the rotation engine
+ * "Chiedi a Vera" side panel: deterministic answers from the rotation engine
  * (src/lib/facility-assistant.ts). No LLM, no network: questions never leave
  * the browser. Sky's face is the existing official avatar (SkyMascot).
  */
@@ -44,7 +44,7 @@ export function SkyPanel({
     {
       id: 0,
       role: "sky",
-      text: "Ciao, sono Genny, la segretaria. Ti dico se un campo è libero, dove mettere un torneo e quando avvisare il Comune, usando il calendario reale e le tue ipotesi. Sono simulazioni: non prenoto e non sposto niente.",
+      text: "Ciao, sono Vera, la reception del club. Ti dico se un campo è libero, dove mettere un torneo e quando avvisare il Comune, usando il calendario reale e le tue ipotesi. Sono simulazioni: non prenoto e non sposto niente.",
     },
   ]);
   const [q, setQ] = useState("");
@@ -90,13 +90,13 @@ export function SkyPanel({
   if (!open) return null;
   return (
     <aside
-      aria-label="Chiedi a Genny"
+      aria-label="Chiedi a Vera"
       className="fixed inset-x-0 bottom-0 z-40 flex max-h-[85dvh] flex-col rounded-t-2xl border border-[var(--in-line)] bg-white shadow-[0_-16px_40px_rgb(6_42_82/0.25)] lg:inset-x-auto lg:bottom-4 lg:right-4 lg:top-[88px] lg:max-h-none lg:w-[400px] lg:rounded-2xl"
     >
       <header className="flex items-center gap-3 border-b border-[var(--in-line)] px-4 py-3">
-        <SkyMascot size={44} persona="genny" />
+        <SkyMascot size={44} persona="vera" />
         <div className="min-w-0 flex-1">
-          <h2 className="m-0 text-[18px] font-bold">Chiedi a Genny</h2>
+          <h2 className="m-0 text-[18px] font-bold">Chiedi a Vera</h2>
           <p className="m-0 text-[13px] text-[var(--in-sub)]">
             Risposte dal calendario e dalle tue ipotesi, senza intelligenza
             artificiale.
@@ -105,7 +105,7 @@ export function SkyPanel({
         <button
           type="button"
           onClick={onClose}
-          aria-label="Chiudi Chiedi a Genny"
+          aria-label="Chiudi Chiedi a Vera"
           className="scd-focus flex size-11 flex-none items-center justify-center rounded-lg hover:bg-[var(--in-info-bg)]"
         >
           <X className="size-5" aria-hidden="true" />
@@ -116,7 +116,7 @@ export function SkyPanel({
         className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-3"
         role="log"
         aria-live="polite"
-        aria-label="Conversazione con Genny"
+        aria-label="Conversazione con Vera"
       >
         {msgs.map((m) =>
           m.role === "user" ? (
@@ -194,7 +194,7 @@ export function SkyPanel({
         className="flex items-center gap-2 border-t border-[var(--in-line)] px-3 py-3"
       >
         <label className="sr-only" htmlFor="sky-q">
-          Fai una domanda a Genny
+          Fai una domanda a Vera
         </label>
         <input
           id="sky-q"

@@ -11,7 +11,7 @@ import {
 import type { ReactNode } from "react";
 
 import { titleCase, venueCase } from "@/lib/board-data";
-import { CROVI_AVATAR } from "@/lib/crovi-cameo";
+import { PersonaAvatar } from "@/components/scd/SkyJolly";
 import type { WeekItem } from "@/lib/home-week";
 import {
   countdown,
@@ -634,17 +634,13 @@ export function Shortcuts() {
       </Link>
       <button
         type="button"
-        onClick={() => window.dispatchEvent(new CustomEvent("crovi:open"))}
+        onClick={() => window.dispatchEvent(new CustomEvent("vera:open"))}
         className={item}
       >
         <span className={ring}>
-          <img
-            src={CROVI_AVATAR}
-            alt=""
-            className="size-full object-cover object-[50%_20%]"
-          />
+          <PersonaAvatar persona="vera" size={44} />
         </span>
-        Chiedi a Crovi
+        Chiedi a Vera
       </button>
       <Link to="/aree" className={item}>
         <span className={ring}>

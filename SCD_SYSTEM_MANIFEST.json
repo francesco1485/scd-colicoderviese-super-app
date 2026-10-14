@@ -1865,7 +1865,7 @@
           "apps/superapp/src/lib/moderation.server.ts"
         ],
         "data_classes_sent": {
-          "public_assistant_crovi": "PUBLIC_ONLY: next 7 days of official fixtures (date, time, home/away, team label, opponent, venue, competition), club events, ticket office rules, facility addresses, official contacts, registration paths, sponsor packages and Direzione-confirmed sponsor names, official result links, app guide",
+          "public_assistant_vera": "PUBLIC_ONLY (UD-118, formerly public_assistant_crovi): next 7 days of official fixtures (date, time, home/away, team label, opponent, venue, competition), club events, ticket office rules, facility addresses, official contacts, registration paths, sponsor packages and Direzione-confirmed sponsor names, official result links, app guide",
           "staff_assistant_era": "INTERNO or RISERVATO as returned by scd_kb_search for the caller's own session (title, summary, status, due date, season, link); amounts, sources, entities and tags excluded",
           "moderator": "post text already filtered by database rules (no minors' names)",
           "never": [
@@ -2403,22 +2403,16 @@
       "provider_source_id": "ANTHROPIC_API",
       "grounding": "RETRIEVAL_FROM_SERVER_DATA_NOT_TRAINING",
       "personas": {
-        "crovi": {
-          "surface": "PUBLIC_PAGES",
-          "endpoint": "askAssistant",
-          "data": "PUBLIC_PROJECTION_ONLY",
-          "context_cap_tokens": 3000
-        },
-        "genny": {
-          "surface": "RESERVED_AREAS_STAFF_AND_ADULT_MEMBERS",
-          "endpoint": "askStaffAssistant",
-          "data": "CERVELLONE_VIA_SCD_KB_SEARCH_CALLER_SESSION",
-          "context_cap_tokens": 4000,
-          "role": "SEGRETARIA (UD-111, Direzione 14/10/2026: replaces the former internal persona 'era')",
-          "entry_points": [
-            "/direzione/cervellone 'Chiedi a Genny'",
-            "/impianti 'Chiedi a Genny' (deterministic rotation panel)"
-          ]
+        "directive": "UD-118",
+        "rule": "ONE_CHAT_PERSONA_VERA_EVERYWHERE; SKY_ONLY_FOR_YOUNGER_MEMBERS_AND_UNDER_14_WORLD",
+        "legacy_aliases": {"genny": "vera", "crovi": "vera"},
+        "vera": {
+          "role": "RECEPTION_OF_THE_CLUB (replaces the name Genny; absorbs the public helper Crovi and the ticket office)",
+          "surface_public": "askAssistant, PUBLIC_PROJECTION_ONLY, context_cap_tokens 3000",
+          "surface_inside": "askStaffAssistant, staff and adult members (veraEligible): CERVELLONE_VIA_SCD_KB_SEARCH_CALLER_SESSION, context_cap_tokens 4000",
+          "duties": ["answers from real club data quoting the source", "hands over to the faces of the areas", "opens a request to the secretariat via the requests engine (UD-045)", "tickets, free entries and cards"],
+          "entry_points": ["floating launcher on public pages", "'Chiedi a Vera' on /direzione/cervellone, /impianti panel, /segreteria, /guida#personaggi", "face cards ('Chiedi a Vera' with the area)"],
+          "output_guard": "veraAnswerProblems: confirmations always; strict (public and area chats) also diet, drug/diagnosis, therapy and personal-plan wording -> rules engine"
         },
         "sky": {
           "surface": "RESERVED_AREAS_YOUNGER_MEMBERS_UNTIL_OWN_AVATAR",
@@ -2426,24 +2420,23 @@
           "data": "PUBLIC_PROJECTION_ONLY",
           "context_cap_tokens": 3000
         },
-        "cast_area_personas": {
-          "directive": "UD-114",
-          "ids": ["era", "acanfora", "accoglienza-chef", "biglietteria", "mentore-tornei", "mental-coach", "preparatore-atletico", "musica-relax", "volto-sponsor"],
-          "registry": "apps/superapp/src/lib/cast-personas.ts CAST_PERSONAS",
-          "opened_by": "'Chiedi a …' in the character's own area only (window event assistant:open, lib/assistant-open.ts)",
-          "surface_public": "biglietteria, mentore-tornei, volto-sponsor (askAssistant, public projection only)",
-          "surface_inside": "every area persona, only for staff and adult members (gennyEligible); younger members and unknown age keep Sky",
+        "chat_areas": {
+          "directive": "UD-118 (supersedes the UD-114 separate area personas)",
+          "ids": ["accoglienza-chef", "volto-sponsor", "mentore-tornei", "biglietteria"],
+          "registry": "apps/superapp/src/lib/cast-personas.ts CHAT_AREA_IDS",
+          "opened_by": "'Chiedi a Vera' on a face card (window event assistant:open {area}, lib/assistant-open.ts); legacy {persona} accepted",
+          "surface_public": "biglietteria, mentore-tornei, volto-sponsor",
+          "surface_inside": "every chat area, only for staff and adult members (veraEligible); younger members and unknown age keep Sky without area",
           "data": "PUBLIC_PROJECTION_PLUS_AREA_NOTES_NEVER_CERVELLONE",
-          "context_cap_tokens": 3000,
-          "output_guard": "castAnswerProblems: confirmations of orders/tickets/registrations/payments, therapy wording (musica-relax, mental-coach), numbers or plans (era, preparatore-atletico), drugs (acanfora) -> rules engine",
-          "fallback": "cast-rules.ts castRulesAnswer: distress -> safeguarding -> operational -> requests engine -> persona intents (real facts only) -> general intents -> persona default (today's tip, quick links)"
-        }
+          "fallback": "cast-rules.ts castRulesAnswer: distress -> safeguarding -> area operational / ticket purchase -> requests engine -> area intents (real facts only) -> general intents -> Vera topics -> hand-over to the face (today's tip, action buttons)"
+        },
+        "tip_only_no_chat": ["era", "acanfora", "preparatore-atletico", "mental-coach", "musica-relax"]
       },
-      "persona_rule": "Public pages Crovi; inside: staff positions and families -> Genny, athlete-only or unknown age -> Sky (age not in session); an area persona (UD-114) answers only when its area asks for it and assistant.ts chatPersonaFor allows it",
+      "persona_rule": "UD-118: public pages Vera; inside: staff positions and families -> Vera, athlete-only or unknown age -> Sky (age not in session); a chat area answers only inside Vera's chat when a face card asks for it and assistant.ts resolveChat allows it",
       "pre_router": [
         "DISTRESS_TO_FIXED_REFERRAL_UD111",
         "SAFEGUARDING_TO_RESERVED_CHANNEL_RULES",
-        "OPERATIONAL_REQUESTS_OF_AREA_PERSONAS_TO_FIXED_REPLY_UD114",
+        "OPERATIONAL_REQUESTS_OF_CHAT_AREAS_AND_TICKET_PURCHASES_TO_FIXED_REPLY_UD114_UD118",
         "REQUESTS_TO_REQUESTS_ENGINE_UD045"
       ],
       "fallback": "askSky keyword rules engine",
@@ -2464,10 +2457,19 @@
       "registry": "apps/superapp/src/lib/assistant-cast.ts CAST_ROSTER",
       "origin_rule": "ORIGINAL_CHARACTERS_INSPIRED_BY_ROLE_NEVER_REAL_PERSON_NAME_FACE_OR_VOICE",
       "minors_protection": "ALWAYS_ON",
+      "simplified": {
+        "directive": "UD-118",
+        "decided_at": "2026-10-14T18:05",
+        "chat_persona": "vera",
+        "faces": ["accoglienza-chef", "volto-sponsor", "mentore-tornei", "sky"],
+        "faces_registry": "apps/superapp/src/lib/cast-personas.ts CAST_FACES (2-3 actions on registered routes, 'Chiedi a Vera')",
+        "tip_only": ["era", "acanfora", "preparatore-atletico", "mental-coach", "musica-relax"],
+        "absorbed_by_vera": ["biglietteria", "crovi (v3 files VERIFIED, never APPROVED: chat and cameo removed, files kept)"]
+      },
       "named": {
-        "era": "NUTRIZIONISTA_CONTENT_ONLY",
-        "genny": "SEGRETARIA_CHAT_PERSONA",
-        "acanfora": "MEDICO_CONTENT_ONLY"
+        "era": "NUTRIZIONISTA_TIP_OF_THE_DAY_ONLY",
+        "vera": "RECEPTION_THE_ONE_CHAT_PERSONA (legacy id genny)",
+        "acanfora": "MEDICO_TIP_OF_THE_DAY_ONLY"
       },
       "new_roles_name_tbd": [
         "accoglienza-chef",
@@ -2478,15 +2480,15 @@
         "musica-relax",
         "volto-sponsor"
       ],
-      "new_roles_presence": "AREA_PERSONA_UD114_LIVE_GUIDE_NO_PORTRAIT_NO_VOICE_NAMES_TBD_AS_ROLE_LABELS",
-      "portraits": "SHOWN_ONLY_WHEN_READY_AND_REGISTERED_APPROVED; era and genny ON_HOLD until new Direzione-approved images",
+      "new_roles_presence": "UD118_FACE_OR_TIP_ONLY_OR_ABSORBED_NO_PORTRAIT_NO_VOICE_NAMES_TBD_AS_ROLE_LABELS",
+      "portraits": "SHOWN_ONLY_WHEN_READY_AND_REGISTERED_APPROVED; era and vera (legacy folder cast/genny) ON_HOLD until new Direzione-approved images",
       "voices": "NONE_UNTIL_DIREZIONE_APPROVES_ORIGINAL_SYNTHETIC_VOICE_NOT_TIED_TO_A_REAL_PERSON",
       "safety_rule": "DISTRESS_FIXED_REFERRAL_NO_THERAPY (cast-safety.ts; rules engine and AI pre-router)",
       "area_personas": {
         "directive": "UD-114",
-        "presence_component": "apps/superapp/src/components/scd/CastPresence.tsx (CastPresence, CastHelpersCard, CastAskButton)",
+        "presence_component": "apps/superapp/src/components/scd/CastPresence.tsx (CastPresence, CastHelpersCard, CastAskButton = 'Chiedi a Vera' with an optional area)",
         "daily_tip": "deterministic by Europe/Rome day (dailyPick); curated in-repo copy guarded by castCopyProblems (no digits except 112, no diet/drug/therapy/plan wording)",
-        "placements": "/impianti biglietteria (live next ticketed home match); /tornei mentore-tornei (live next tournament) + volto-sponsor; /famiglia Era ask, CastHelpersCard (preparatore-atletico, mental-coach, musica-relax), Club House order request; /infermeria Acanfora ask; /segreteria Genny; /tesoreria/biglietteria; /tesoreria/club-house chef + office board; /guida#personaggi directory. Home layout unchanged.",
+        "placements": "UD-118: /impianti and /tesoreria/biglietteria Vera with the ticket actions (live next ticketed home match); /tornei Mentore dei tornei face (live next tournament); /sponsor Volto sponsor face; /famiglia Era tips (no chat), CastHelpersCard tips (preparatore-atletico, mental-coach, musica-relax, no chat), Club House order request + dish poll; /infermeria Acanfora tips (no chat); /segreteria Vera; /tesoreria/club-house Chef face + office board; /guida#personaggi directory (Vera, four faces, Consigli del giorno). Home layout unchanged.",
         "area_requests_migration": "supabase/migrations/20261014_r103_area_requests.sql (STAGED, NOT APPLIED)",
         "area_requests_flow": "request in app -> a person of the Club House confirms -> payment at the club till (SQUBY/SumUp); never payments or confirmations in app; no health data in the form",
         "dish_polls": "scd_area_polls / scd_area_poll_votes in r103 (scd_week_votes is athlete-only, not reusable)"
@@ -4852,7 +4854,7 @@
         "OGGI_E_QUESTA_SETTIMANA",
         "QUICK_ACTIONS_MAX_6_BY_AUDIENCE",
         "WEEKEND_RESULTS_ONLY_WITH_REAL_SOURCE",
-        "DAILY_TIP_ERA_ACANFORA_GENNY",
+        "DAILY_TIP_TIP_ONLY_CAST_AND_VERA_UD118",
         "CREDENTIAL_STRIP_ONCE",
         "VETRINA_TRIMMED_NO_REPEATS",
         "NEWS_MIXED",
@@ -4869,7 +4871,7 @@
         "quick_actions": "apps/superapp/src/lib/home-actions.ts (visitatore / famiglia / staff, max 6, registered routes only, closest-page entries marked)",
         "club_notice": "apps/superapp/src/lib/club-notice.ts + club-notice.server.ts (empty by default; showFrom/showUntil mandatory; Direzione only) via getClubNotice on the server Rome day",
         "results": "apps/superapp/src/lib/home-results.ts: R20 results with both scores in the last three days, attività di base excluded; block hidden otherwise; standings = official gare.lnd.it links",
-        "daily_tip": "apps/superapp/src/lib/home-tips.ts: Era (era-nutrition-tips.ts), Dottor Acanfora (first-aid-info.ts), Genny (GENNY_TIPS) day by day, no portraits",
+        "daily_tip": "apps/superapp/src/lib/home-tips.ts (UD-118): Era (era-nutrition-tips.ts), Dottor Acanfora (first-aid-info.ts), Preparatore atletico, Mental coach, Musica e relax (cast-personas.ts curated copy) and Vera (VERA_TIPS) day by day, no portraits, no chat",
         "footer": "logo, contacts (mail, PEC, address), social, Installa l'app, privacy / cookie / segnalazioni riservate / elimina account, federal credentials; the link index moved to the menu with search (apps/superapp/src/lib/site-menu.ts)",
         "staging_preview": "/?anteprima=famiglia|staff only when stagingPreviewEnabled: no personal data, staff = every team, famiglia = empty states"
       },

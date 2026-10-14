@@ -1,15 +1,16 @@
 /**
- * Server functions of the AI assistants (r99, UD-104): askAssistant (public pages, Crovi) and askStaffAssistant
- * (signed-in, Genny / Sky). Since UD-114 both accept the area persona a page opened with "Chiedi a …"; the server
- * re-checks it (assistant.ts chatPersonaFor) and the rules engine keeps the persona's voice (cast-rules.ts).
+ * Server functions of the AI assistants (r99, UD-104; one chat since UD-118): askAssistant (public pages, Vera) and
+ * askStaffAssistant (signed-in, Vera / Sky). Both accept the area a page opened Vera's chat with ("Chiedi a Vera" on a
+ * face card); the server re-checks it (assistant.ts resolveChat) and the rules engine keeps the area (cast-rules.ts).
+ * Older clients may still send `persona` ("genny", "crovi" or an area id): it is read as an alias, never trusted.
  * Real data loaders are wired here; the logic and its tests live in assistant.server.ts and cast-rules.ts.
  */
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-import { MAX_INPUT_CHARS, chatPersonaFor, type AssistantPersona, type AssistantReply, type PublicContextInput } from "./assistant";
+import { MAX_INPUT_CHARS, normalizePersona, resolveChat, type AssistantPersona, type AssistantReply, type ChatAreaId, type PublicContextInput } from "./assistant";
 import { answerPublic, answerStaff, romeToday } from "./assistant.server";
-import { CAST_PERSONA_IDS, type CastFacts } from "./cast-personas";
+import type { CastFacts } from "./cast-personas";
 import { castRulesAnswer } from "./cast-rules";
 import { sessionView } from "./auth.functions";
 import { AFFILIAZIONI, CLUB_CONTACTS, INTERESSI_ATLETA, SPONSOR_PACKAGES } from "./catalog";
@@ -26,9 +27,10 @@ import { SPONSORS } from "./sponsors";
 import { serverSupabase } from "./supabase.server";
 
 const message = z.string().trim().min(1).max(MAX_INPUT_CHARS);
-const castPersona = z.enum(CAST_PERSONA_IDS as unknown as [string, ...string[]]);
+/** Persona or area ids (current or legacy): short tokens only, resolved by assistant.ts, never trusted as sent. */
+const token = z.string().trim().max(40).regex(/^[a-z-]*$/);
 
-/** Real facts the area personas may quote: ticket office rules, next ticketed home match, upcoming tournaments. */
+/** Real facts Vera may quote in an area: ticket office rules, next ticketed home match, upcoming tournaments. */
 async function loadCastFacts(): Promise<CastFacts> {
   const today = romeToday();
   const [{ loadCalendar }, { nextHomeMatchText, upcomingTournamentTexts }] = await Promise.all([import("./public-snapshots"), import("./cast-live")]);
@@ -36,8 +38,8 @@ async function loadCastFacts(): Promise<CastFacts> {
   return { ticketing: TICKETING, nextHomeMatch: nextHomeMatchText(cal.groups, cal.events, today), tournaments: upcomingTournamentTexts(today) };
 }
 
-/** Rules engine with the persona's voice (cast-rules.ts) on top of the general one (skyRulesAnswer). */
-async function rulesFor(data: { message: string; persona?: AssistantPersona }) {
+/** Rules engine with Vera's areas (cast-rules.ts) on top of the general one (skyRulesAnswer). */
+async function rulesFor(data: { message: string; persona?: AssistantPersona; area?: ChatAreaId | null }) {
   const facts = await loadCastFacts().catch(() => undefined);
   return castRulesAnswer(data, { general: skyRulesAnswer, day: romeToday(), ...(facts ? { facts } : {}) });
 }
@@ -79,21 +81,27 @@ async function loadPublicContext(): Promise<PublicContextInput> {
 }
 
 export const askAssistant = createServerFn({ method: "POST" })
-  .inputValidator((d: { message: string; persona?: string | undefined }) =>
-    z.object({ message, persona: z.union([z.enum(["crovi", "sky"]), castPersona]).optional() }).parse(d),
+  .inputValidator((d: { message: string; persona?: string | undefined; area?: string | undefined }) =>
+    z.object({ message, persona: token.optional(), area: token.optional() }).parse(d),
   )
   .handler(async ({ data }): Promise<AssistantReply> => {
     const { clientIp } = await import("./request-ip.server");
-    // Sky stays as asked (reserved page before the session answers); any other request goes through the one rule.
-    const persona: AssistantPersona = data.persona === "sky" ? "sky" : chatPersonaFor("public", null, data.persona);
+    // Sky stays as asked (reserved page before the session answers); everything else is Vera, with the area only when
+    // it is a public area. A legacy client may send the area in `persona` (UD-114 "assistant:open").
+    if (normalizePersona(data.persona) === "sky") {
+      return answerPublic({ message: data.message, persona: "sky", area: null, ip: clientIp() }, { rules: rulesFor, loadContext: loadPublicContext, castFacts: loadCastFacts });
+    }
+    const { persona, area } = resolveChat("public", null, data.area ?? data.persona ?? null);
     return answerPublic(
-      { message: data.message, persona, ip: clientIp() },
+      { message: data.message, persona, area, ip: clientIp() },
       { rules: rulesFor, loadContext: loadPublicContext, castFacts: loadCastFacts },
     );
   });
 
 export const askStaffAssistant = createServerFn({ method: "POST" })
-  .inputValidator((d: { message: string; persona?: string | undefined }) => z.object({ message, persona: castPersona.optional() }).parse(d))
+  .inputValidator((d: { message: string; area?: string | undefined; persona?: string | undefined }) =>
+    z.object({ message, area: token.optional(), persona: token.optional() }).parse(d),
+  )
   .handler(async ({ data }): Promise<AssistantReply> => {
     // One verified session for the whole answer: roles for the persona, organization for the Cervellone.
     const view = await sessionView();
@@ -119,5 +127,5 @@ export const askStaffAssistant = createServerFn({ method: "POST" })
         });
         return error ? null : parseKb(out);
       },
-    }, data.persona ?? null);
+    }, data.area ?? data.persona ?? null);
   });

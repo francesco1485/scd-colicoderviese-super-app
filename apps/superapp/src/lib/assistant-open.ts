@@ -1,24 +1,35 @@
 /**
- * Opens the app chat (SkyChat) from a page button. With a persona ("Chiedi allo chef", UD-114) the chat asks for that
- * area persona; SkyChat and the server both re-check it with assistant.ts chatPersonaFor, so a younger member or a
- * page where the persona is not allowed simply gets the usual helper (Crovi, Genny or Sky).
+ * Opens the app chat (SkyChat) from a page button. Since UD-118 there is one chat, Vera: a face card ("Chiedi a Vera"
+ * on the Club House, sponsor or tournaments card) opens it with its area as context. SkyChat and the server both
+ * re-check the area with assistant.ts resolveChat, so a younger member gets Sky and a page where the area is not
+ * allowed gets Vera's general chat.
+ *
+ * Backward compatibility: older pages and links sent `{ persona: "<area or genny>" }` and the window events
+ * "genny:open" / "crovi:open"; they are still understood (openedArea, SkyChat listeners) and map to Vera.
  */
-import type { PresenceId } from "./cast-personas";
+import { normalizeChatArea, type ChatAreaId } from "./assistant";
 
 export const ASSISTANT_OPEN_EVENT = "assistant:open";
 
+/** Window events that open Vera's general chat: "vera:open" plus the legacy names of the same chat. */
+export const VERA_OPEN_EVENTS = ["vera:open", "genny:open", "crovi:open"] as const;
+
 export interface AssistantOpenDetail {
-  /** Area persona asked by the page; "genny" (and no value) opens the usual helper. */
-  persona: PresenceId | null;
+  /** Area of Vera's chat asked by the page; null opens her general chat. */
+  area: ChatAreaId | null;
 }
 
-export function openAssistant(persona: PresenceId | null = null): void {
+export function openAssistant(area: ChatAreaId | null = null): void {
   if (typeof window === "undefined") return;
-  window.dispatchEvent(new CustomEvent<AssistantOpenDetail>(ASSISTANT_OPEN_EVENT, { detail: { persona } }));
+  window.dispatchEvent(new CustomEvent<AssistantOpenDetail>(ASSISTANT_OPEN_EVENT, { detail: { area } }));
 }
 
-/** Persona carried by an open event (null when absent or malformed). */
-export function openedPersona(e: Event): string | null {
-  const d = (e as CustomEvent<Partial<AssistantOpenDetail> | null>).detail;
-  return d && typeof d.persona === "string" ? d.persona : null;
+/**
+ * Area carried by an open event: `detail.area`, or the legacy `detail.persona` of UD-114 ("genny", a tip-only
+ * character or an area id). Null when absent, malformed, or not a chat area.
+ */
+export function openedArea(e: Event): ChatAreaId | null {
+  const d = (e as CustomEvent<{ area?: unknown; persona?: unknown } | null>).detail;
+  if (!d || typeof d !== "object") return null;
+  return normalizeChatArea(d.area ?? d.persona);
 }

@@ -1,38 +1,34 @@
 /**
- * The floating helper of the Super App and its two faces (Direzione decisions 12/10/2026):
- * - public pages: the chat helper and the launcher face are CROVI ("Chiedi a Crovi");
- * - Sky stays away from the general app (Direzione 13/10/2026): never on public pages; inside only
- *   for young members (lib/assistant.ts rule) and on the under-14 team pages (KIDS_TEAM_IDS);
- * - reserved areas: the helper goes by the signed-in viewer (r99, UD-104, Direzione "Vai A B C" 13/10/2026):
- *   Genny, the club secretary (Direzione 14/10/2026, UD-111), for staff and adult members (15+), Sky for younger
- *   members and when nothing tells us the viewer is 15+. The rule lives in one place, lib/assistant.ts
- *   gennyEligible / insidePersonaFor, shared by the chat persona, the launcher face and the server voice. Crovi never
- *   appears inside, Genny never on public pages.
+ * The floating helper of the Super App (one chat since UD-118, Direzione 14/10/2026: "una sola assistente chat in
+ * tutta l'app, di nome VERA"):
+ * - public pages: the chat and the launcher face are Vera, the club reception ("Chiedi a Vera");
+ * - Sky stays away from the general app (Direzione 13/10/2026): never on public pages; inside only for young members
+ *   (lib/assistant.ts rule) and on the under-14 team pages (KIDS_TEAM_IDS);
+ * - reserved areas: the helper goes by the signed-in viewer (r99, UD-104): Vera for staff and adult members (15+),
+ *   Sky for younger members and when nothing tells us the viewer is 15+. The rule lives in one place, lib/assistant.ts
+ *   veraEligible / resolveChat, shared by the chat persona, the launcher face and the server voice.
+ * A face card of the cast (lib/cast-personas.ts CAST_FACES) opens Vera's chat with its area ("Chiedi a Vera", window
+ * event "assistant:open", lib/assistant-open.ts): Vera hands over to the face and shows its action buttons.
  * The chat logic lives in SkyChat.tsx; answers come from the AI assistants (lib/assistant.functions.ts) with the
- * askSky rules engine as fallback.
+ * rules engine as fallback.
  *
- * Official assets only (config/scd-assets.v1.json): Sky head /media/brand/sky-atv-head.webp,
- * Sky head + ball /media/brand/sky-scd.png, CROVI avatar /media/crovi/v3 (original fictional figure),
- * Genny avatar /media/cast/genny only once the Direzione approves an image that fits the secretary role (neutral 'G'
- * until then: the held round-4 image does not match the new role).
- * Area personas of the cast (UD-114, lib/cast-personas.ts) answer when a page opens the chat with "Chiedi a …"
- * (window event "assistant:open", lib/assistant-open.ts): portrait only when approved, otherwise their initial.
+ * Official assets only (config/scd-assets.v1.json): Sky head /media/brand/sky-atv-head.webp, Sky head + ball
+ * /media/brand/sky-scd.png. Vera has no approved image yet: neutral 'V' initial until the Direzione approves one.
  */
-import croviAvatar from "@/assets/crovi/crovi-avatar-256.webp.asset.json";
-import { chatPersonaFor, isCastPersona, type AssistantPersona, type HelperViewer } from "@/lib/assistant";
-import { CAST, CAST_IDS, castAvatarSrc, castReady, type CastId } from "@/lib/assistant-cast";
-import { CAST_PERSONAS, CAST_PERSONA_IDS, type CastPersonaId } from "@/lib/cast-personas";
+import { resolveChat, type AssistantPersona, type ChatAreaId, type HelperViewer } from "@/lib/assistant";
+import { CAST_IDS, castAvatarSrc, castReady, type CastId } from "@/lib/assistant-cast";
+import { CAST_PERSONAS, VERA_PRESENCE, castLinkTo, type CastPersonaId } from "@/lib/cast-personas";
 import { isPublicPath } from "@/lib/http-policy";
+import type { SkyReply } from "@/lib/sky.functions";
 
 export type Persona = AssistantPersona;
 
 export type { HelperViewer } from "@/lib/assistant";
-export { gennyEligible } from "@/lib/assistant";
+export { veraEligible } from "@/lib/assistant";
 
 /** Public media paths of the official Sky files (never generated, never altered). */
 export const SKY_HEAD_SRC = "/media/brand/sky-atv-head.webp";
 export const SKY_BALL_SRC = "/media/brand/sky-scd.png";
-export const CROVI_AVATAR_SRC = croviAvatar.url;
 
 /** Access flows: no floating helper at all (the visitor is filling a form). */
 const HIDDEN_PREFIXES = ["/accedi", "/entra", "/registrati"] as const;
@@ -70,30 +66,20 @@ export function isHelperHiddenPath(pathname: string): boolean {
   return startsWithPrefix(pathname, HIDDEN_PREFIXES);
 }
 
-/**
- * Who answers in the chat: Crovi on public pages; inside Genny (staff, adults 15+) or Sky (lib/assistant.ts); an area
- * persona when a page asked for it and the one rule allows it (assistant.ts chatPersonaFor, UD-114).
- */
+/** Who answers in the chat: Vera everywhere, Sky inside for younger members (lib/assistant.ts resolveChat, UD-118). */
 export function personaFor(pathname: string, viewer?: HelperViewer | null, requested?: string | null): Persona {
-  return chatPersonaFor(isReservedPath(pathname) ? "inside" : "public", viewer, requested);
+  return resolveChat(isReservedPath(pathname) ? "inside" : "public", viewer, requested).persona;
 }
 
-/**
- * Face shown on the floating launcher: always the figure that answers. Sky no longer fronts the
- * public pages (home, games): outside it is Crovi (Direzione 13/10/2026).
- */
+/** Area of Vera's chat on this page for this viewer (null: her general chat, or Sky). */
+export function chatAreaFor(pathname: string, viewer?: HelperViewer | null, requested?: string | null): ChatAreaId | null {
+  return resolveChat(isReservedPath(pathname) ? "inside" : "public", viewer, requested).area;
+}
+
+/** Face shown on the floating launcher: always the figure that answers (Vera outside, Direzione 13/10 + UD-118). */
 export function launcherFaceFor(pathname: string, viewer?: HelperViewer | null): Persona {
   return personaFor(pathname, viewer);
 }
-
-/** Greeting of the chat; when Sky's face opened it on a public page, Crovi says Sky called him. */
-export function greetingFor(persona: Persona, face: Persona = persona): string {
-  const base = PERSONA_COPY[persona].greeting;
-  if (persona === "crovi" && face === "sky") return `${SKY_HANDOFF} ${base}`;
-  return base;
-}
-
-export const SKY_HANDOFF = "Sky, il nostro portafortuna, mi ha passato la palla.";
 
 export interface PersonaCopy {
   name: string;
@@ -105,7 +91,8 @@ export interface PersonaCopy {
   quick: ReadonlyArray<string>;
 }
 
-const HELPER_COPY: Record<"sky" | "genny" | "crovi", PersonaCopy> = {
+/** Chat copy of the two personas (Vera, Sky). */
+export const PERSONA_COPY: Readonly<Record<Persona, PersonaCopy>> = {
   sky: {
     name: "Sky",
     title: "Sky, la mascotte del club",
@@ -123,51 +110,56 @@ const HELPER_COPY: Record<"sky" | "genny" | "crovi", PersonaCopy> = {
       "Come funziona l'app",
     ],
   },
-  genny: {
-    name: "Genny",
-    title: "Chiedi a Genny",
-    subtitle: "la segretaria del club: ho tutto sotto controllo",
+  vera: {
+    name: "Vera",
+    title: "Chiedi a Vera",
+    subtitle: "la reception del club: dati veri, con la fonte",
     greeting:
-      "Ciao, sono Genny, la segretaria della società. Ti spiego come funziona la segreteria, ti preparo una guida passo per passo e cerco nel Cervellone documenti, scadenze, fornitori, tornei e regole, mostrandoti solo ciò che il tuo ruolo può vedere. Se qualcosa manca o non funziona, scrivimelo in due parole: lo giro a chi se ne occupa.",
-    placeholder: "Scrivi a Genny…",
-    thinking: "Genny sta cercando…",
-    quick: [
-      "Scadenze in vista",
-      "Documenti della federazione",
-      "Omologazione campi",
-      "Tornei e eventi",
-      "Come funziona l'app",
-    ],
-  },
-  crovi: {
-    name: "Crovi",
-    title: "Chiedi a Crovi",
-    subtitle: "il tuttologo del calcio dilettanti",
-    greeting:
-      "Ciao, sono Crovi, la leggenda della segreteria e della biglietteria. Di calcio dilettanti so quasi tutto e quello che non so lo trovo: prossima partita, calendario, come arrivare al campo, iscrizioni, sponsor o contatti. Se qualcosa manca o non funziona, scrivimelo in due parole: lo giro a chi se ne occupa.",
-    placeholder: "Scrivi a Crovi…",
-    thinking: "Crovi sta cercando…",
+      "Ciao, sono Vera, la reception della ColicoDerviese. Ti rispondo con i dati veri del club e ti dico da dove vengono: partite, campi, iscrizioni, biglietti, card, sponsor e tornei. Se serve una persona, apro una richiesta alla segreteria: scrivimi in due parole cosa ti serve.",
+    placeholder: "Scrivi a Vera…",
+    thinking: "Vera sta cercando…",
     quick: [
       "Prossima partita",
-      "Calendario",
+      "Biglietti e card",
       "Come arrivare",
       "Iscrizioni",
-      "Contatti",
       "Diventare sponsor",
+      "Contatti",
     ],
   },
 };
 
-/** Chat copy of every persona: the three helpers and the area personas (cast-personas.ts). */
-export const PERSONA_COPY: Readonly<Record<Persona, PersonaCopy>> = {
-  ...HELPER_COPY,
-  ...(Object.fromEntries(CAST_PERSONA_IDS.map((id) => [id, { name: CAST_PERSONAS[id].label, ...CAST_PERSONAS[id].chat }])) as Record<CastPersonaId, PersonaCopy>),
+/** Header line of Vera's chat opened with an area. */
+const AREA_SUBTITLE: Readonly<Record<ChatAreaId, string>> = {
+  "accoglienza-chef": "la reception · area Club House con lo Chef",
+  "volto-sponsor": "la reception · area sponsor con il Volto sponsor",
+  "mentore-tornei": "la reception · area tornei con il Mentore",
+  biglietteria: "la reception · biglietti, gratuità e card",
 };
 
+/** Chat copy for a persona and an area: Vera opened from a face card keeps her name and takes the area's questions. */
+export function chatCopyFor(persona: Persona, area: ChatAreaId | null = null): PersonaCopy {
+  const base = PERSONA_COPY[persona];
+  if (persona !== "vera" || !area) return base;
+  return { ...base, subtitle: AREA_SUBTITLE[area], quick: CAST_PERSONAS[area].chatQuick };
+}
+
 /**
- * Round avatar of the active persona. Sky's head is cropped in a light circle with a navy ring,
- * CROVI keeps his approved 256px avatar, Genny uses hers once an image fitting the role is approved (neutral 'G'
- * until then).
+ * First message of the chat. With an area Vera hands over to its face ("Per la Club House ti aiuta lo Chef: …") and
+ * shows the area's action buttons as links.
+ */
+export function greetingFor(persona: Persona, area: ChatAreaId | null = null): { text: string; links?: SkyReply["links"] } {
+  if (persona !== "vera" || !area) return { text: PERSONA_COPY[persona].greeting };
+  const def = CAST_PERSONAS[area];
+  return {
+    text: `Ciao, sono Vera, la reception del club. ${def.handoff ?? ""} Scegli qui sotto o scrivimi.`.replace(/\s+/g, " ").trim(),
+    links: def.quick.map((l) => ({ label: l.label, to: castLinkTo(l) })),
+  };
+}
+
+/**
+ * Round avatar of the active persona. Sky's head is cropped in a light circle with a navy ring; Vera uses her picture
+ * once an image is approved (neutral 'V' until then).
  */
 export function PersonaAvatar({
   persona = "sky",
@@ -178,45 +170,7 @@ export function PersonaAvatar({
   size?: number;
   className?: string;
 }) {
-  if (isCastPersona(persona)) return <CastBadge id={persona} size={size} className={className} />;
-  if (persona === "genny") {
-    if (castReady("genny")) {
-      return (
-        <img
-          src={castAvatarSrc("genny")}
-          alt=""
-          width={size}
-          height={size}
-          className={`rounded-full object-cover ring-2 ring-[#0b2a5b] ${className}`}
-          style={{ width: size, height: size }}
-          data-cast={CAST.genny.id}
-        />
-      );
-    }
-    // Neutral initial only while no approved Genny image fits the role (assistant-cast readiness):
-    // no invented portrait (SCD:ASSET GENERATE_ORIGINAL, non-substitutive).
-    return (
-      <span
-        aria-hidden="true"
-        className={`inline-flex shrink-0 items-center justify-center rounded-full bg-[#0b2a5b] font-bold text-[#ffd600] ring-2 ring-[#ffd600] ${className}`}
-        style={{ width: size, height: size, fontSize: Math.round(size * 0.46) }}
-      >
-        G
-      </span>
-    );
-  }
-  if (persona === "crovi") {
-    return (
-      <img
-        src={CROVI_AVATAR_SRC}
-        alt=""
-        width={size}
-        height={size}
-        className={`rounded-full object-cover ${className}`}
-        style={{ width: size, height: size }}
-      />
-    );
-  }
+  if (persona === "vera") return <CastBadge id="vera" size={size} className={className} />;
   return (
     <span
       aria-hidden="true"
@@ -236,9 +190,9 @@ export function PersonaAvatar({
 }
 
 /**
- * Round badge of a cast character (UD-114): the approved 256px avatar when the character's portrait is ready
- * (assistant-cast.ts readiness), otherwise its initial in the club colours, like Genny's "G". Never a drawing that
- * stands in for a face the Direzione has not approved.
+ * Round badge of a cast character: the approved 256px avatar when the character's portrait is ready (assistant-cast.ts
+ * readiness), otherwise its initial in the club colours (Vera "V"). Never a drawing that stands in for a face the
+ * Direzione has not approved.
  */
 export function CastBadge({
   id,
@@ -246,10 +200,10 @@ export function CastBadge({
   className = "",
   initial,
 }: {
-  id: CastPersonaId | "genny";
+  id: CastPersonaId | "vera";
   size?: number;
   className?: string;
-  /** Letter for characters outside cast-personas (Genny). */
+  /** Letter override (defaults to the character's own initial). */
   initial?: string;
 }) {
   const castId = (CAST_IDS as readonly string[]).includes(id) ? (id as CastId) : null;
@@ -266,7 +220,7 @@ export function CastBadge({
       />
     );
   }
-  const letter = initial ?? (id === "genny" ? "G" : CAST_PERSONAS[id].initial);
+  const letter = initial ?? (id === "vera" ? VERA_PRESENCE.initial : CAST_PERSONAS[id].initial);
   return (
     <span
       aria-hidden="true"

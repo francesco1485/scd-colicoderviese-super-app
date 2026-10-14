@@ -759,7 +759,7 @@ export function WeekendResults({ rows }: { rows: readonly ResultRow[] }) {
 
 /* ------------------------------------------------------------- the tip */
 
-/** Tip of the day, in rotation between Era, Dottor Acanfora and Genny. */
+/** Tip of the day, in rotation between the tip-only characters and Vera (UD-118). */
 export function DailyTipCard({
   tip,
   signedIn,

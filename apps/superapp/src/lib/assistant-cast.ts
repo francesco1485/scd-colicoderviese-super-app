@@ -1,28 +1,28 @@
 /**
  * Assistant cast of the Super App: realistic ORIGINAL characters inspired by a role, never cartoon, never the name,
- * face or voice of a real person. Sky stays the official lucky mascot and Crovi (public/media/crovi/v3) is unchanged.
+ * face or voice of a real person. Sky stays the official lucky mascot (only in the under-14 world).
  *
- * Roles (Direzione 14/10/2026, UD-111: Era and Genny roles were inverted, now corrected):
- * - Era = Nutrizionista: healthy-eating tip of the day, initiatives, videos on how to eat by age; never personal
- *   plans, numbers or weight for minors (era-nutrition-tips.ts guard);
- * - Genny = Segretaria: lively, glasses, cheeky, always on top of things; explains the secretariat, writes work guides
- *   for the staff, sends information by messages; she is the internal helper of the chat (lib/assistant.ts);
- * - Dottor Acanfora = Medico: daily tips, first-aid and prevention; never a diagnosis (first-aid-info.ts guard).
- * Plus seven new roles defined by the Direzione on 14/10/2026 ({@link CAST_ROSTER}): their names are still to be
- * decided (`nameTbd`), they have no picture and no voice. Since UD-114 (Direzione 14/10/2026: "gli avatar devono
- * rendere tutto interattivo e dinamico") every character except Genny's internal helper role is also an AREA_PERSONA:
- * a live guide of its area (lib/cast-personas.ts) whose chat opens only from "Chiedi a …" in that area.
+ * Simplified by the Direzione on 14/10/2026 (UD-118, Francesco ~18:05: "una sola assistente chat in tutta l'app, di
+ * nome VERA (sostituisce il nome Genny, che non piace)"):
+ * - Vera = the club reception and the ONLY chat of the app (lib/assistant.ts persona "vera"): she answers with the
+ *   club's real data quoting the source, hands over to the faces of the areas and opens a request to the secretariat
+ *   when a person is needed. She absorbs the ticket office and the public helper (Crovi is not an APPROVED asset in
+ *   config/scd-assets.v1.json). The old id "genny" is accepted as an alias of "vera" (assistant.ts).
+ * - Faces with concrete actions: the Chef della Club House, the Volto sponsor, the Mentore dei tornei and Sky (only in
+ *   the under-14 world): lib/cast-personas.ts CAST_FACES.
+ * - Tip-only: Era (nutrizionista), Dottor Acanfora (medico), the Preparatore atletico, the Mental coach and Musica e
+ *   relax are only the "consiglio del giorno" (home-tips.ts), never a chat.
  *
  * Image readiness is a feature check, not a placeholder: a character's picture appears only when its optimized files
- * exist in public/media/cast/<id>/, are registered in config/scd-assets.v1.json as APPROVED and `ready` is true.
- * Era and Genny keep their round-4 files in the app, registered ON_HOLD: the pictures were made for the old roles
- * (Genny holds a fruit and wears no glasses, Era wears the blue tracksuit), so no portrait shows for them until the
- * Direzione approves new official images. No drawing ever stands in for an approved face.
+ * exist in public/media/cast/<folder>/, are registered in config/scd-assets.v1.json as APPROVED and `ready` is true.
+ * Era and Vera keep the round-4 files in the app (Vera's are in the legacy folder "genny"), registered ON_HOLD: the
+ * pictures were made for other roles, so no portrait shows for them until the Direzione approves new official images.
+ * No drawing ever stands in for an approved face.
  */
 
-export type CastId = "era" | "genny" | "acanfora";
+export type CastId = "era" | "vera" | "acanfora";
 
-export const CAST_IDS: readonly CastId[] = ["era", "genny", "acanfora"];
+export const CAST_IDS: readonly CastId[] = ["era", "vera", "acanfora"];
 
 export interface CastMember {
   id: CastId;
@@ -31,12 +31,14 @@ export interface CastMember {
   role: string;
   /** Accessible description of the portrait (no likeness claims). */
   alt: string;
-  /** Canva media id of the round-4 image (provenance; ON_HOLD for Era and Genny). */
+  /** Canva media id of the round-4 image (provenance; ON_HOLD for Era and Vera). */
   canvaAssetId: string;
   /** Canva design used to export the image at full size (provenance). */
   canvaExportDesignId: string;
-  /** Public folder of the optimized variants. */
-  mediaDir: `/media/cast/${CastId}/`;
+  /** Public folder of the optimized variants (Vera keeps the legacy folder of the held round-4 image). */
+  mediaDir: `/media/cast/${string}/`;
+  /** File name stem of the variants in mediaDir (`<stem>-avatar-256.webp`, `<stem>-440.webp`, `<stem>-900.webp`). */
+  fileStem: string;
   /** True only when the files are committed, registered APPROVED and match the character's current role. */
   ready: boolean;
   /** Why an existing picture is not shown (files kept, registry status ON_HOLD). */
@@ -45,6 +47,9 @@ export interface CastMember {
 
 const ROLE_SWAP_HOLD =
   "Direzione 14/10/2026: ruoli di Era e Genny invertiti; l'immagine del round 4 era stata fatta per il ruolo precedente. Nessun ritratto finché la Direzione non approva una nuova immagine ufficiale.";
+
+const VERA_HOLD =
+  "Direzione 14/10/2026 (UD-118): la chat si chiama Vera, la reception del club (al posto di Genny); l'immagine del round 4 era stata fatta per un altro ruolo. Nessun ritratto finché la Direzione non approva una nuova immagine ufficiale.";
 
 export const CAST: Readonly<Record<CastId, CastMember>> = {
   era: {
@@ -55,19 +60,22 @@ export const CAST: Readonly<Record<CastId, CastMember>> = {
     canvaAssetId: "MAHX1G12gBc",
     canvaExportDesignId: "DAHX4vg-ENE",
     mediaDir: "/media/cast/era/",
+    fileStem: "era",
     ready: false,
     portraitHold: ROLE_SWAP_HOLD,
   },
-  genny: {
-    id: "genny",
-    name: "Genny",
-    role: "La segretaria del club: spiega la segreteria, prepara guide di lavoro per lo staff e comunica con messaggi",
-    alt: "Genny, la segretaria del club",
+  vera: {
+    id: "vera",
+    name: "Vera",
+    role: "La reception del club e l'unica chat dell'app: risponde con i dati veri citando la fonte, ti porta dal volto giusto e apre una richiesta alla segreteria",
+    alt: "Vera, la reception del club",
     canvaAssetId: "MAHX1KTH6yk",
     canvaExportDesignId: "DAHX4uTHmCs",
+    // Legacy folder and file names of the held round-4 image (made for "Genny"): not renamed, not shown.
     mediaDir: "/media/cast/genny/",
+    fileStem: "genny",
     ready: false,
-    portraitHold: ROLE_SWAP_HOLD,
+    portraitHold: VERA_HOLD,
   },
   acanfora: {
     id: "acanfora",
@@ -77,6 +85,7 @@ export const CAST: Readonly<Record<CastId, CastMember>> = {
     canvaAssetId: "MAHX1M4GK7g",
     canvaExportDesignId: "DAHX4j7HujU",
     mediaDir: "/media/cast/acanfora/",
+    fileStem: "acanfora",
     ready: true,
   },
 };
@@ -92,12 +101,12 @@ export function castReady(
 
 /** Round avatar file (256px, like Crovi v3). */
 export function castAvatarSrc(id: CastId): string {
-  return `${CAST[id].mediaDir}${id}-avatar-256.webp`;
+  return `${CAST[id].mediaDir}${CAST[id].fileStem}-avatar-256.webp`;
 }
 
 /** Portrait file in one of the two widths (like Crovi v3). */
 export function castPortraitSrc(id: CastId, size: CastPortraitSize): string {
-  return `${CAST[id].mediaDir}${id}-${size}.webp`;
+  return `${CAST[id].mediaDir}${CAST[id].fileStem}-${size}.webp`;
 }
 
 /** Every file a ready character must ship (the asset test checks existence and registration). */
@@ -148,10 +157,11 @@ export interface CastRosterEntry {
   /** Voice: audio only after a Direzione-approved synthetic voice not tied to a real person (UD-092). */
   voice: { ready: false; rule: string };
   /**
-   * CHAT_PERSONA = the internal helper of SkyChat (lib/assistant.ts insidePersonaFor); AREA_PERSONA = live guide of
-   * its area with its own chat opened by "Chiedi a …" (lib/cast-personas.ts, UD-114); CONTENT = cards and copy only.
+   * UD-118: CHAT_PERSONA = Vera, the one chat of the app (lib/assistant.ts); FACE = area card with concrete actions
+   * and "Chiedi a Vera" (lib/cast-personas.ts CAST_FACES); TIP_ONLY = "consiglio del giorno" only, no chat;
+   * ABSORBED = answered by Vera (ticket office).
    */
-  presence: "CHAT_PERSONA" | "AREA_PERSONA" | "CONTENT";
+  presence: "CHAT_PERSONA" | "FACE" | "TIP_ONLY" | "ABSORBED";
   /** Decision behind the entry. */
   decidedBy: string;
 }
@@ -169,7 +179,7 @@ export const CAST_SHARED_RULES: readonly string[] = [
 const VOICE_RULE =
   "Audio solo dopo che la Direzione approva una voce sintetica originale, non legata a una persona reale; mai sotto i 14 anni senza account del genitore.";
 
-const NEW_ROLE = "Direzione 14/10/2026 (UD-111): nuovo ruolo, nome da decidere";
+const NEW_ROLE = "Direzione 14/10/2026 (UD-111): nuovo ruolo, nome da decidere; UD-118 decide se è volto o consiglio del giorno";
 
 export const CAST_ROSTER: readonly CastRosterEntry[] = [
   {
@@ -197,36 +207,37 @@ export const CAST_ROSTER: readonly CastRosterEntry[] = [
         "Nutrizionista solare e professionale, in contesto sportivo; nuova immagine da approvare",
     },
     voice: { ready: false, rule: VOICE_RULE },
-    presence: "AREA_PERSONA",
+    presence: "TIP_ONLY",
     decidedBy: "Direzione 14/10/2026 (UD-111): Era = Nutrizionista",
   },
   {
-    id: "genny",
-    label: "Genny",
+    id: "vera",
+    label: "Vera",
     nameTbd: false,
-    role: "Segretaria",
-    area: 'Aree riservate: chat "Chiedi a Genny" (staff e soci adulti), Cervellone, impianti',
+    role: "Reception",
+    area: "Tutta l'app: è l'unica chat (pagine pubbliche, aree riservate, Cervellone, impianti)",
     does: [
-      "Spiega come funziona la segreteria",
-      "Prepara guide di lavoro passo per passo per lo staff",
-      "Comunica le informazioni con messaggi; audio più avanti, solo con voce approvata",
+      "Risponde con i dati veri del club e cita la fonte (pagina o documento)",
+      "Ti porta dal volto giusto: Chef della Club House, Volto sponsor, Mentore dei tornei",
+      "Apre una richiesta alla segreteria quando serve una persona",
+      "Risponde su biglietti, gratuità e card",
     ],
     rules: [
       "Mostra solo ciò che il ruolo di chi chiede può vedere",
       "Richieste e problemi vanno al motore richieste, senza promettere soluzioni",
-      "Mai con chi ha meno di quindici anni: per loro c'è Sky",
+      "Mai con chi ha meno di quindici anni nelle aree riservate: per loro c'è Sky",
     ],
     refersTo: ["Segreteria del club", "Responsabili d'area"],
     minorsProtection: true,
     origin: "ORIGINAL_INSPIRED_BY_ROLE",
     portrait: {
-      ready: CAST.genny.ready,
+      ready: CAST.vera.ready,
       brief:
-        "Segretaria vivace con gli occhiali, sguardo sveglio e un po' sfacciato, sempre sul pezzo; nuova immagine da approvare",
+        "Receptionist del club accogliente e sveglia, con gli occhiali, sempre sul pezzo; immagine da approvare",
     },
     voice: { ready: false, rule: VOICE_RULE },
     presence: "CHAT_PERSONA",
-    decidedBy: "Direzione 14/10/2026 (UD-111): Genny = Segretaria",
+    decidedBy: "Direzione 14/10/2026 (UD-118): una sola chat, Vera, al posto di Genny",
   },
   {
     id: "acanfora",
@@ -251,12 +262,12 @@ export const CAST_ROSTER: readonly CastRosterEntry[] = [
       brief: "Immagine round 4 approvata (Canva MAHX1M4GK7g)",
     },
     voice: { ready: false, rule: VOICE_RULE },
-    presence: "AREA_PERSONA",
+    presence: "TIP_ONLY",
     decidedBy: "Direzione 14/10/2026 (UD-111): Dottor Acanfora = Medico",
   },
   {
     id: "accoglienza-chef",
-    label: "Accoglienza e Chef",
+    label: "Chef della Club House",
     nameTbd: true,
     role: "Accoglienza e cucina",
     area: "Area ristoro e Club House",
@@ -278,7 +289,7 @@ export const CAST_ROSTER: readonly CastRosterEntry[] = [
       brief: "Figura accogliente in divisa da cucina con i colori del club",
     },
     voice: { ready: false, rule: VOICE_RULE },
-    presence: "AREA_PERSONA",
+    presence: "FACE",
     decidedBy: NEW_ROLE,
   },
   {
@@ -292,6 +303,7 @@ export const CAST_ROSTER: readonly CastRosterEntry[] = [
       "Le card del club",
       "Le prossime partite in casa",
       "La prevendita, solo quando è attiva",
+      "Ora risponde Vera, la reception del club: niente chat a parte",
     ],
     rules: [
       "Solo prezzi e regole pubblicati dalla società, mai inventati",
@@ -305,7 +317,7 @@ export const CAST_ROSTER: readonly CastRosterEntry[] = [
       brief: "Addetto o addetta alla biglietteria, cordiale, con pass del club",
     },
     voice: { ready: false, rule: VOICE_RULE },
-    presence: "AREA_PERSONA",
+    presence: "ABSORBED",
     decidedBy: NEW_ROLE,
   },
   {
@@ -332,7 +344,7 @@ export const CAST_ROSTER: readonly CastRosterEntry[] = [
         "Regista di eventi carismatico con cartellina e accredito del torneo",
     },
     voice: { ready: false, rule: VOICE_RULE },
-    presence: "AREA_PERSONA",
+    presence: "FACE",
     decidedBy: NEW_ROLE,
   },
   {
@@ -357,7 +369,7 @@ export const CAST_ROSTER: readonly CastRosterEntry[] = [
       brief: "Coach positivo e calmo, in tuta del club, a bordo campo",
     },
     voice: { ready: false, rule: VOICE_RULE },
-    presence: "AREA_PERSONA",
+    presence: "TIP_ONLY",
     decidedBy: NEW_ROLE,
   },
   {
@@ -382,7 +394,7 @@ export const CAST_ROSTER: readonly CastRosterEntry[] = [
       brief: "Preparatore atletico energico con cronometro e coni",
     },
     voice: { ready: false, rule: VOICE_RULE },
-    presence: "AREA_PERSONA",
+    presence: "TIP_ONLY",
     decidedBy: NEW_ROLE,
   },
   {
@@ -411,7 +423,7 @@ export const CAST_ROSTER: readonly CastRosterEntry[] = [
       brief: "Figura serena con cuffie, atmosfera calma, colori del club",
     },
     voice: { ready: false, rule: VOICE_RULE },
-    presence: "AREA_PERSONA",
+    presence: "TIP_ONLY",
     decidedBy: NEW_ROLE,
   },
   {
@@ -438,7 +450,7 @@ export const CAST_ROSTER: readonly CastRosterEntry[] = [
       brief: "Ambasciatore elegante del club, stile business sportivo",
     },
     voice: { ready: false, rule: VOICE_RULE },
-    presence: "AREA_PERSONA",
+    presence: "FACE",
     decidedBy: NEW_ROLE,
   },
 ];

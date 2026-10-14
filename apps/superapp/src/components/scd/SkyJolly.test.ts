@@ -1,32 +1,33 @@
 import { describe, expect, it } from "vitest";
 
-import { cameoLine } from "@/lib/crovi-cameo";
 import { insidePersonaFor } from "@/lib/assistant";
+import { ASSISTANT_OPEN_EVENT, VERA_OPEN_EVENTS, openedArea } from "@/lib/assistant-open";
+import { CAST_PERSONAS } from "@/lib/cast-personas";
 import { PUBLIC_PREFIXES } from "@/lib/http-policy";
 
 import {
-  CROVI_AVATAR_SRC,
   PERSONA_COPY,
-  SKY_HANDOFF,
-  gennyEligible,
   KIDS_TEAM_IDS,
+  chatAreaFor,
+  chatCopyFor,
   greetingFor,
   isHelperHiddenPath,
   isKidsPath,
   isReservedPath,
   launcherFaceFor,
   personaFor,
+  veraEligible,
 } from "./SkyJolly";
 
-describe("helper persona (Direzione 12/10/2026: Crovi outside, Sky inside)", () => {
-  it("puts Crovi in the chat on every public page", () => {
-    expect(personaFor("/")).toBe("crovi");
-    for (const p of PUBLIC_PREFIXES) expect(personaFor(p)).toBe("crovi");
-    expect(personaFor("/eventi/christmas-lario-cup")).toBe("crovi");
-    expect(personaFor("/calendario/rotazione-campi")).toBe("crovi");
+describe("helper persona (UD-118: one chat, Vera; Sky only for the younger members)", () => {
+  it("puts Vera in the chat on every public page", () => {
+    expect(personaFor("/")).toBe("vera");
+    for (const p of PUBLIC_PREFIXES) expect(personaFor(p)).toBe("vera");
+    expect(personaFor("/eventi/christmas-lario-cup")).toBe("vera");
+    expect(personaFor("/calendario/rotazione-campi")).toBe("vera");
   });
 
-  it("puts Sky in the reserved areas by page (SkyChat upgrades to Genny by session) and never Crovi", () => {
+  it("puts Sky in the reserved areas by page until the session says otherwise (SkyChat upgrades to Vera)", () => {
     for (const p of ["/famiglia", "/la-mia-scd", "/direzione", "/segreteria/persone", "/tesoreria", "/gestionale/organigramma", "/squadre", "/squadre/u16", "/aree", "/core", "/quadro", "/crm"]) {
       expect(isReservedPath(p)).toBe(true);
       expect(personaFor(p)).toBe("sky");
@@ -39,10 +40,10 @@ describe("helper persona (Direzione 12/10/2026: Crovi outside, Sky inside)", () 
     expect(personaFor("/partners")).toBe("sky");
   });
 
-  it("never fronts the public pages with Sky (Direzione 13/10/2026): Crovi everywhere outside", () => {
+  it("never fronts the public pages with Sky (Direzione 13/10/2026): Vera everywhere outside", () => {
     for (const p of ["/", "/fantacalcio", "/top11", "/top11/settimana", "/calendario", "/contatti", "/partner", "/sponsor", "/societa", "/eventi", "/comunicazioni", "/rassegna-stampa", "/tornei", "/kit", "/impianti", "/privacy"]) {
-      expect(launcherFaceFor(p)).toBe("crovi");
-      expect(personaFor(p)).toBe("crovi");
+      expect(launcherFaceFor(p)).toBe("vera");
+      expect(personaFor(p)).toBe("vera");
     }
   });
 
@@ -60,48 +61,66 @@ describe("helper persona (Direzione 12/10/2026: Crovi outside, Sky inside)", () 
     expect(isHelperHiddenPath("/entrata")).toBe(false);
   });
 
-  it("titles the public chat 'Chiedi a Crovi' with the realistic v3 avatar", () => {
-    expect(PERSONA_COPY.crovi.title).toBe("Chiedi a Crovi");
-    expect(PERSONA_COPY.crovi.name).toBe("Crovi");
-    expect(PERSONA_COPY.crovi.placeholder).toMatch(/Crovi/);
-    expect(CROVI_AVATAR_SRC).toMatch(/^\/media\/crovi\/v3\//);
+  it("titles the chat 'Chiedi a Vera', the club reception, and has only two personas", () => {
+    expect(Object.keys(PERSONA_COPY).sort()).toEqual(["sky", "vera"]);
+    expect(PERSONA_COPY.vera.title).toBe("Chiedi a Vera");
+    expect(PERSONA_COPY.vera.name).toBe("Vera");
+    expect(PERSONA_COPY.vera.placeholder).toMatch(/Vera/);
+    expect(PERSONA_COPY.vera.greeting).toMatch(/reception/);
+    expect(PERSONA_COPY.vera.greeting).toMatch(/dati veri/);
+    expect(PERSONA_COPY.vera.greeting).toMatch(/richiesta alla segreteria/);
   });
 
-  it("keeps the copy free of invented facts and real-person likeness claims", () => {
-    for (const persona of ["sky", "crovi", "genny"] as const) {
+  it("keeps the copy free of invented facts, real-person likeness claims and the old names", () => {
+    for (const persona of ["sky", "vera"] as const) {
       const c = PERSONA_COPY[persona];
       const all = [c.title, c.subtitle, c.greeting, ...c.quick].join(" ");
       expect(all).not.toMatch(/\d{1,2}[:.]\d{2}|\d+\s*-\s*\d+/);
-      expect(all).not.toMatch(/Banfi|Trinità|sosia|somiglia/i);
+      expect(all).not.toMatch(/Banfi|Trinità|sosia|somiglia|Genny|Crovi/i);
     }
-  });
-
-  it("titles the internal chat 'Chiedi a Genny', the club secretary (UD-104, UD-111)", () => {
-    expect(PERSONA_COPY.genny.title).toBe("Chiedi a Genny");
-    expect(PERSONA_COPY.genny.placeholder).toMatch(/Genny/);
-    expect(PERSONA_COPY.genny.greeting).toMatch(/Cervellone/);
-    expect(PERSONA_COPY.genny.greeting).toMatch(/segretaria/);
-    expect(PERSONA_COPY.genny.greeting).toMatch(/guida passo per passo/);
-  });
-
-  it("lets Crovi say Sky called him when Sky's face opened the chat", () => {
-    expect(greetingFor("crovi", "sky").startsWith(SKY_HANDOFF)).toBe(true);
-    expect(greetingFor("crovi", "crovi")).toBe(PERSONA_COPY.crovi.greeting);
-    expect(greetingFor("sky")).toBe(PERSONA_COPY.sky.greeting);
-  });
-
-  it("lets the Crovi cameo play on public pages but never inside or on quiet pages", () => {
-    expect(cameoLine("/partner")?.ask).toBe("Diventare sponsor");
-    expect(cameoLine("/societa")).not.toBeNull();
-    expect(cameoLine("/fantacalcio")).not.toBeNull();
-    expect(cameoLine("/privacy")).toBeNull();
-    expect(cameoLine("/elimina-account")).toBeNull();
-    expect(cameoLine("/safeguarding")).toBeNull();
-    expect(cameoLine("/gestionale")).toBeNull();
   });
 });
 
-describe("Genny in the reserved areas (Direzione 'Vai A B C' 13/10/2026, roles corrected 14/10/2026)", () => {
+describe("Vera opened from a face card (UD-118)", () => {
+  const staff = { roles: ["mister"], age15plus: null };
+
+  it("hands over to the face of the area and shows its action buttons", () => {
+    const g = greetingFor("vera", "accoglienza-chef");
+    expect(g.text).toMatch(/^Ciao, sono Vera/);
+    expect(g.text).toContain("Per la Club House ti aiuta lo Chef");
+    expect(g.links?.map((l) => l.to)).toEqual(["/famiglia#richiesta-ordine", "/famiglia#sondaggi-piatti", "/eventi"]);
+    expect(greetingFor("vera").text).toBe(PERSONA_COPY.vera.greeting);
+    expect(greetingFor("sky", "accoglienza-chef").text).toBe(PERSONA_COPY.sky.greeting);
+  });
+
+  it("keeps Vera's name and takes the area's questions", () => {
+    const c = chatCopyFor("vera", "volto-sponsor");
+    expect(c.title).toBe("Chiedi a Vera");
+    expect(c.quick).toEqual(CAST_PERSONAS["volto-sponsor"].chatQuick);
+    expect(chatCopyFor("vera", null)).toBe(PERSONA_COPY.vera);
+  });
+
+  it("resolves the area per page and viewer: public areas outside, the Club House only inside for adults", () => {
+    expect(chatAreaFor("/sponsor", null, "volto-sponsor")).toBe("volto-sponsor");
+    expect(chatAreaFor("/tornei", null, "accoglienza-chef")).toBeNull();
+    expect(chatAreaFor("/tesoreria/club-house", staff, "accoglienza-chef")).toBe("accoglienza-chef");
+    expect(chatAreaFor("/tesoreria/club-house", null, "accoglienza-chef")).toBeNull();
+    expect(personaFor("/tesoreria/club-house", staff, "accoglienza-chef")).toBe("vera");
+  });
+
+  it("reads the open event, including the legacy persona ids (alias genny -> Vera's general chat)", () => {
+    const ev = (detail: unknown) => new CustomEvent(ASSISTANT_OPEN_EVENT, { detail });
+    expect(openedArea(ev({ area: "accoglienza-chef" }))).toBe("accoglienza-chef");
+    expect(openedArea(ev({ persona: "mentore-tornei" }))).toBe("mentore-tornei");
+    expect(openedArea(ev({ persona: "genny" }))).toBeNull();
+    expect(openedArea(ev({ persona: "era" }))).toBeNull();
+    expect(openedArea(ev({ area: "admin" }))).toBeNull();
+    expect(openedArea(ev(null))).toBeNull();
+    expect(VERA_OPEN_EVENTS).toEqual(["vera:open", "genny:open", "crovi:open"]);
+  });
+});
+
+describe("Vera in the reserved areas (Direzione 'Vai A B C' 13/10/2026, UD-118)", () => {
   const staff = { roles: ["mister"], age15plus: null };
   const member15 = { roles: ["atleta"], age15plus: true };
   const minor = { roles: ["atleta"], age15plus: false };
@@ -109,19 +128,12 @@ describe("Genny in the reserved areas (Direzione 'Vai A B C' 13/10/2026, roles c
   const family = { roles: ["famiglia"], age15plus: null };
   const inside = ["/famiglia", "/la-mia-scd", "/direzione", "/segreteria/persone", "/infermeria", "/gestionale/organigramma"];
 
-  it("gives Genny to staff and to members known to be 15+, only inside", () => {
+  it("gives Vera to staff and to members known to be 15+ inside", () => {
     for (const p of inside) {
-      expect(personaFor(p, staff)).toBe("genny");
-      expect(personaFor(p, member15)).toBe("genny");
-      expect(personaFor(p, family)).toBe("genny");
-      expect(launcherFaceFor(p, staff)).toBe("genny");
-    }
-  });
-
-  it("never shows Genny on public pages: Crovi stays the public helper", () => {
-    for (const p of ["/", ...PUBLIC_PREFIXES]) {
-      expect(personaFor(p, staff)).toBe("crovi");
-      expect(launcherFaceFor(p, staff)).not.toBe("genny");
+      expect(personaFor(p, staff)).toBe("vera");
+      expect(personaFor(p, member15)).toBe("vera");
+      expect(personaFor(p, family)).toBe("vera");
+      expect(launcherFaceFor(p, staff)).toBe("vera");
     }
   });
 
@@ -134,8 +146,8 @@ describe("Genny in the reserved areas (Direzione 'Vai A B C' 13/10/2026, roles c
     }
   });
 
-  it("a viewer known to be under 15 never gets Genny, even with a staff position", () => {
-    expect(gennyEligible({ roles: ["mister"], age15plus: false })).toBe(false);
+  it("a viewer known to be under 15 never gets Vera inside, even with a staff position", () => {
+    expect(veraEligible({ roles: ["mister"], age15plus: false })).toBe(false);
     expect(personaFor("/famiglia", { roles: ["mister"], age15plus: false })).toBe("sky");
   });
 
@@ -145,20 +157,12 @@ describe("Genny in the reserved areas (Direzione 'Vai A B C' 13/10/2026, roles c
       const expected = insidePersonaFor(v.roles, v.age15plus);
       expect(personaFor("/famiglia", v)).toBe(expected);
       expect(launcherFaceFor("/famiglia", v)).toBe(expected);
-      expect(gennyEligible(v)).toBe(expected === "genny");
+      expect(veraEligible(v)).toBe(expected === "vera");
     }
   });
 
-  it("gives Genny her own Italian copy", () => {
-    expect(PERSONA_COPY.genny.name).toBe("Genny");
-    expect(PERSONA_COPY.genny.placeholder).toMatch(/Genny/);
-    expect(greetingFor("genny")).toBe(PERSONA_COPY.genny.greeting);
-  });
-
-  it("keeps Era out of the helper rule: she answers only when her area opens her chat (Direzione 14/10/2026, UD-114)", () => {
-    expect(personaFor("/famiglia", { roles: ["famiglia"] })).toBe("genny");
-    expect(personaFor("/famiglia", { roles: ["famiglia"] }, "era")).toBe("era");
-    expect(PERSONA_COPY.era.title).toBe("Chiedi a Era");
-    expect(PERSONA_COPY.era.greeting).toMatch(/nutrizionista/);
+  it("never opens a tip-only character's chat: asking for Era gives Vera's general chat", () => {
+    expect(personaFor("/famiglia", { roles: ["famiglia"] }, "era")).toBe("vera");
+    expect(chatAreaFor("/famiglia", { roles: ["famiglia"] }, "era")).toBeNull();
   });
 });

@@ -50,10 +50,12 @@ const castFolder = (id: string) =>
 describe("assistant cast registry (round 4 images, roles corrected by the Direzione 14/10/2026)", () => {
   it("keeps the Canva provenance of each character", () => {
     expect(CAST.era.canvaAssetId).toBe("MAHX1G12gBc");
-    expect(CAST.genny.canvaAssetId).toBe("MAHX1KTH6yk");
+    expect(CAST.vera.canvaAssetId).toBe("MAHX1KTH6yk");
     expect(CAST.acanfora.canvaAssetId).toBe("MAHX1M4GK7g");
     for (const id of CAST_IDS)
-      expect(CAST[id].mediaDir).toBe(`/media/cast/${id}/`);
+      expect(CAST[id].mediaDir).toBe(`/media/cast/${CAST[id].fileStem}/`);
+    // Vera keeps the legacy folder of the held round-4 image: no file is renamed, none is invented.
+    expect(CAST.vera.mediaDir).toBe("/media/cast/genny/");
   });
 
   it("never replaces Crovi v3 or Sky", () => {
@@ -62,22 +64,26 @@ describe("assistant cast registry (round 4 images, roles corrected by the Direzi
     }
   });
 
-  it("states the corrected roles: Era nutritionist, Genny secretary, Acanfora doctor", () => {
+  it("states the roles: Era nutritionist, Vera reception and the one chat (UD-118), Acanfora doctor", () => {
     expect(CAST.era.role).toMatch(/nutrizionista/i);
-    expect(CAST.genny.role).toMatch(/segretaria/i);
+    expect(CAST.vera.name).toBe("Vera");
+    expect(CAST.vera.role).toMatch(/reception/i);
+    expect(CAST.vera.role).toMatch(/unica chat/i);
     expect(CAST.acanfora.role).toMatch(/medico/i);
     expect(CAST.acanfora.role).toMatch(/mai diagnosi/i);
   });
 
-  it("shows no portrait for Era and Genny until new images are approved (the round-4 ones fit the old roles)", () => {
-    for (const id of ["era", "genny"] as const) {
+  it("shows no portrait for Era and Vera until new images are approved (the round-4 ones fit other roles)", () => {
+    for (const id of ["era", "vera"] as const) {
+      const folder = castFolder(CAST[id].fileStem);
       expect(castReady(id), id).toBe(false);
       expect(CAST[id].portraitHold, id).toMatch(/14\/10\/2026/);
-      expect(castFolder(id)?.["status"], id).toBe("ON_HOLD");
-      expect(String(castFolder(id)?.["hold_reason"]), id).toMatch(
-        /14\/10\/2026/,
-      );
+      expect(folder?.["status"], id).toBe("ON_HOLD");
+      expect(String(folder?.["hold_reason"]), id).toMatch(/14\/10\/2026/);
     }
+    expect(CAST.vera.portraitHold).toMatch(/UD-118/);
+    expect(castFolder("genny")?.["character"]).toBe("vera");
+    expect(String(castFolder("genny")?.["hold_reason"])).toMatch(/UD-118/);
     expect(registry.statuses).toContain("ON_HOLD");
   });
 
@@ -142,7 +148,8 @@ describe("cast roster (Direzione 14/10/2026, UD-111)", () => {
   it("lists the three named characters and the seven new roles, each once", () => {
     const ids = CAST_ROSTER.map((r) => r.id);
     expect(new Set(ids).size).toBe(ids.length);
-    expect(ids).toEqual(["era", "genny", "acanfora", ...NEW_ROLES]);
+    expect(ids).toEqual(["era", "vera", "acanfora", ...NEW_ROLES]);
+    expect(ids).not.toContain("genny");
   });
 
   it("gives the new roles neutral role labels with the name still to be decided, no picture and no voice", () => {
@@ -151,10 +158,10 @@ describe("cast roster (Direzione 14/10/2026, UD-111)", () => {
       expect(r.nameTbd, id).toBe(true);
       expect(r.portrait.ready, id).toBe(false);
       expect(r.voice.ready, id).toBe(false);
-      expect(r.presence, id).toBe("AREA_PERSONA");
+      expect(["FACE", "TIP_ONLY", "ABSORBED"], id).toContain(r.presence);
       expect(r.decidedBy, id).toMatch(/14\/10\/2026.*nome da decidere/);
     }
-    expect(rosterEntry("accoglienza-chef").label).toBe("Accoglienza e Chef");
+    expect(rosterEntry("accoglienza-chef").label).toBe("Chef della Club House");
     expect(rosterEntry("mentore-tornei").role).toMatch(/direttore artistico/i);
   });
 
@@ -175,17 +182,17 @@ describe("cast roster (Direzione 14/10/2026, UD-111)", () => {
     expect(CAST_SHARED_RULES.join(" ")).toMatch(/S\.C\.D\. ColicoDerviese/);
   });
 
-  it("has Genny as the only helper persona, the others as area personas (UD-114), and keeps the named roles in sync with CAST", () => {
-    expect(
-      CAST_ROSTER.filter((r) => r.presence === "CHAT_PERSONA").map((r) => r.id),
-    ).toEqual(["genny"]);
-    expect(
-      CAST_ROSTER.filter((r) => r.presence === "AREA_PERSONA").map((r) => r.id),
-    ).toEqual(["era", "acanfora", ...NEW_ROLES]);
+  it("has Vera as the only chat persona, three faces, five tip-only characters and the absorbed ticket office (UD-118)", () => {
+    const by = (p: string) => CAST_ROSTER.filter((r) => r.presence === p).map((r) => r.id);
+    expect(by("CHAT_PERSONA")).toEqual(["vera"]);
+    expect(by("FACE")).toEqual(["accoglienza-chef", "mentore-tornei", "volto-sponsor"]);
+    expect(by("TIP_ONLY")).toEqual(["era", "acanfora", "mental-coach", "preparatore-atletico", "musica-relax"]);
+    expect(by("ABSORBED")).toEqual(["biglietteria"]);
     for (const id of CAST_IDS)
       expect(rosterEntry(id).portrait.ready, id).toBe(castReady(id));
     expect(rosterEntry("era").role).toBe("Nutrizionista");
-    expect(rosterEntry("genny").role).toBe("Segretaria");
+    expect(rosterEntry("vera").role).toBe("Reception");
+    expect(rosterEntry("vera").decidedBy).toMatch(/UD-118/);
     expect(rosterEntry("acanfora").role).toBe("Medico");
   });
 

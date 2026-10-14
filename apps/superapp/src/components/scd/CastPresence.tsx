@@ -2,52 +2,61 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { MessageCircle, Sparkles } from "lucide-react";
 import { useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 
-import { CastBadge, PERSONA_COPY, isReservedPath, personaFor } from "@/components/scd/SkyJolly";
+import { CastBadge, PERSONA_COPY, personaFor } from "@/components/scd/SkyJolly";
 import { CastPortrait } from "@/components/scd/CastPortrait";
 import { openAssistant } from "@/lib/assistant-open";
 import { castReady } from "@/lib/assistant-cast";
-import { CAST_PERSONAS, GENNY_PRESENCE, dailyCastTip, type CastLink, type CastPersonaId, type PresenceId } from "@/lib/cast-personas";
+import { CAST_PERSONAS, VERA_PRESENCE, dailyCastTip, isChatArea, type CastLink, type CastPersonaId, type ChatAreaId, type PresenceId } from "@/lib/cast-personas";
 import { romeDay } from "@/lib/era-nutrition-tips";
 import { useSession } from "@/lib/use-session";
 
 /**
- * Live guide of an area (UD-114): the character of the cast who helps on this page. Portrait only when approved
- * (assistant-cast readiness), otherwise the initial badge; today's tip (same for everybody on a Rome day); an
- * optional live line from real data given by the page; 2-4 quick actions to real pages; "Chiedi a …" opening the
- * app chat with that persona. Names still to be decided show the neutral role label.
+ * Presence of the cast on a page (UD-118, Direzione 14/10/2026: "Personaggi semplificati"):
+ * - Vera ("vera"): the club reception and the one chat of the app, with her tip and "Chiedi a Vera";
+ * - a FACE (Chef della Club House, Volto sponsor, Mentore dei tornei): area card with 2-3 real actions and "Chiedi a
+ *   Vera", which opens Vera's chat with the area as context;
+ * - the ticket office ("biglietteria"): absorbed by Vera, shown as Vera with the ticket actions;
+ * - a TIP_ONLY character (Era, Dottor Acanfora, Preparatore, Mental coach, Musica e relax): only the "consiglio di
+ *   oggi" and useful links, never a chat button.
+ * Portrait only when approved (assistant-cast readiness), otherwise the initial badge; names still to be decided show
+ * the neutral role label.
  */
 
 interface PresenceView {
   label: string;
   role: string;
-  askLabel: string;
-  tips: boolean;
+  /** Badge of the presence (the ticket office shows Vera's). */
+  badge: CastPersonaId | "vera";
   disclaimer: string;
   quick: readonly CastLink[];
   nameTbd: boolean;
+  /** Area Vera's chat opens with from this card; undefined = no chat button (tip-only characters). */
+  ask: ChatAreaId | null | undefined;
 }
 
-function view(id: PresenceId): PresenceView {
-  if (id === "genny") {
-    return { label: GENNY_PRESENCE.label, role: GENNY_PRESENCE.role, askLabel: GENNY_PRESENCE.askLabel, tips: true, disclaimer: GENNY_PRESENCE.disclaimer, quick: GENNY_PRESENCE.quick, nameTbd: false };
+/** What a presence shows; `ask` is undefined for the tip-only characters (no chat entry, UD-118). */
+export function presenceView(id: PresenceId): PresenceView {
+  if (id === "vera") {
+    return { label: VERA_PRESENCE.label, role: VERA_PRESENCE.role, badge: "vera", disclaimer: VERA_PRESENCE.disclaimer, quick: VERA_PRESENCE.quick, nameTbd: false, ask: null };
   }
   const d = CAST_PERSONAS[id];
-  return { label: d.label, role: d.role, askLabel: d.askLabel, tips: true, disclaimer: d.disclaimer, quick: d.quick, nameTbd: d.nameTbd };
+  if (d.kind === "ABSORBED") {
+    return { label: VERA_PRESENCE.label, role: d.does, badge: "vera", disclaimer: d.disclaimer, quick: d.quick, nameTbd: false, ask: isChatArea(id) ? id : null };
+  }
+  return { label: d.label, role: d.role, badge: id, disclaimer: d.disclaimer, quick: d.quick, nameTbd: d.nameTbd, ask: d.kind === "FACE" && isChatArea(id) ? id : undefined };
 }
 
 /**
- * "Chiedi a …" button. The label follows the one persona rule (assistant.ts chatPersonaFor): when the persona is not
- * available to this viewer (a younger member, a public page for an inside persona) it names the helper who will
- * answer instead. While the session is loading it keeps the asked label; the server re-checks anyway.
+ * "Chiedi a Vera" button: opens the one chat, with an area when given. The label follows the one rule
+ * (assistant.ts resolveChat): when Vera is not available to this viewer (a younger member inside) it names Sky, who
+ * will answer instead. While the session is loading it keeps Vera's label; the server re-checks anyway.
  */
-export function CastAskButton({ id, className = "", tone = "primary" }: { id: PresenceId; className?: string; tone?: "primary" | "quiet" }) {
+export function CastAskButton({ area = null, className = "", tone = "primary" }: { area?: ChatAreaId | null; className?: string; tone?: "primary" | "quiet" }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { session, loading } = useSession();
   const viewer = session?.user ? { roles: session.roles ?? [], age15plus: null } : null;
-  const asked = id === "genny" ? null : id;
-  const resolved = personaFor(pathname, viewer, asked);
-  const own = id === "genny" ? resolved === "genny" : resolved === id;
-  const label = loading || own ? view(id).askLabel : `Chiedi a ${PERSONA_COPY[resolved].name}`;
+  const resolved = personaFor(pathname, viewer, area);
+  const label = loading || resolved === "vera" ? VERA_PRESENCE.askLabel : `Chiedi a ${PERSONA_COPY[resolved].name}`;
   const cls =
     tone === "primary"
       ? "bg-[#ffd600] text-[#0b1e3a] hover:brightness-95"
@@ -55,10 +64,11 @@ export function CastAskButton({ id, className = "", tone = "primary" }: { id: Pr
   return (
     <button
       type="button"
-      onClick={() => (id === "genny" && isReservedPath(pathname) ? window.dispatchEvent(new Event("genny:open")) : openAssistant(asked))}
+      onClick={() => openAssistant(area)}
       className={`scd-focus inline-flex min-h-11 items-center gap-2 rounded-[12px] px-4 text-[15px] font-bold ${cls} ${className}`}
-      data-testid={`ask-${id}`}
+      data-testid={`ask-vera${area ? `-${area}` : ""}`}
       data-ask-persona={resolved}
+      data-ask-area={area ?? ""}
     >
       <MessageCircle className="size-[18px]" strokeWidth={2.2} aria-hidden="true" />
       {label}
@@ -87,20 +97,20 @@ export interface PresenceLive {
 
 /** Body of a presence (no outer card): used alone in a card or inside {@link CastHelpersCard} tabs. */
 export function CastPresenceBody({ id, day, live, headingLevel = 2, headingId }: { id: PresenceId; day?: string | undefined; live?: PresenceLive | null | undefined; headingLevel?: 2 | 3; headingId: string }) {
-  const v = view(id);
+  const v = presenceView(id);
   const tip = dailyCastTip(id, day ?? romeDay());
   const H = headingLevel === 2 ? "h2" : "h3";
   const portrait = id === "acanfora" && castReady("acanfora");
   return (
-    <div className="flex flex-col gap-3.5" data-presence={id} data-name-tbd={v.nameTbd ? "true" : "false"}>
+    <div className="flex flex-col gap-3.5" data-presence={id} data-name-tbd={v.nameTbd ? "true" : "false"} data-can-ask={v.ask === undefined ? "false" : "true"}>
       <div className="flex items-center gap-3">
         {portrait ? (
           <CastPortrait id="acanfora" className="h-[86px] flex-none lg:h-[104px]" />
         ) : (
-          <CastBadge id={id} size={52} />
+          <CastBadge id={v.badge} size={52} />
         )}
         <div className="min-w-0">
-          <p className="m-0 text-[12.5px] font-bold uppercase tracking-wide text-[#0860A8]">Ti aiuta qui</p>
+          <p className="m-0 text-[12.5px] font-bold uppercase tracking-wide text-[#0860A8]">{v.ask === undefined ? "Il consiglio del giorno" : "Ti aiuta qui"}</p>
           <H id={headingId} className="m-0 text-[20px] font-extrabold leading-tight text-[#0b2a5b]">
             {v.label}
           </H>
@@ -132,8 +142,8 @@ export function CastPresenceBody({ id, day, live, headingLevel = 2, headingId }:
         </p>
       )}
       <div className="flex flex-wrap items-center gap-2">
-        <CastAskButton id={id} />
-        {v.quick.slice(0, 4).map((l) => (
+        {v.ask !== undefined && <CastAskButton area={v.ask} />}
+        {v.quick.slice(0, 3).map((l) => (
           <QuickLink key={`${l.to}#${l.hash ?? ""}`} link={l} />
         ))}
       </div>

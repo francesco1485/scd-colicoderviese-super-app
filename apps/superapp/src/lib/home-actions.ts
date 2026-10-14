@@ -106,7 +106,7 @@ const VISITOR: readonly QuickAction[] = [
   {
     id: "segreteria",
     label: "Scrivi alla segreteria",
-    hint: "Genny e la segreteria ti rispondono",
+    hint: "Vera e la segreteria ti rispondono",
     to: "/contatti",
     icon: "mail",
   },
@@ -154,7 +154,7 @@ const FAMILY: readonly QuickAction[] = [
   {
     id: "segreteria",
     label: "Scrivi alla segreteria",
-    hint: "Genny e la segreteria ti rispondono",
+    hint: "Vera e la segreteria ti rispondono",
     to: "/contatti",
     icon: "mail",
   },

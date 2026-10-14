@@ -1,20 +1,22 @@
 /**
- * Live guides of the assistant cast (Direzione 14/10/2026, UD-114: "Importante sono i gestionali e gli avatar che
- * devono creare e rendere tutto interattivo e dinamico"). Pure data and helpers, no I/O, safe for the browser.
+ * Areas of the assistant cast, simplified by the Direzione on 14/10/2026 (UD-118, Francesco ~18:05: "Personaggi
+ * semplificati: una sola assistente chat in tutta l'app, di nome VERA"). Pure data and helpers, no I/O, safe for the
+ * browser.
  *
- * Each character of the roster (assistant-cast.ts CAST_ROSTER) becomes a guide of its area:
- * - a presence in the page (portrait only when approved, otherwise a styled initial like Genny's "G");
- * - a "consiglio di oggi" chosen by the Rome date from curated copy written here (general, safe, no digits, no
- *   invented club facts, no plans for minors);
- * - quick actions to real pages of the app;
- * - "Chiedi a …": the existing chat (SkyChat) with that persona, with its own voice and extra hard rules
- *   (assistant.ts systemPrompt), the same JSON output, link allowlist and output guards, and a rules-engine fallback
- *   (cast-rules.ts) when the AI is off.
+ * - Vera (assistant.ts persona "vera") is the ONLY chat of the app: the club reception. She answers from real club
+ *   data quoting the source, hands over to the face of an area and opens a request to the secretariat when a person
+ *   is needed. She also absorbs the ticket office and the public helper (Crovi is not an APPROVED asset).
+ * - FACE: the faces with concrete actions — the Chef della Club House, the Volto sponsor and the Mentore dei tornei
+ *   (plus Sky, the mascot, only in the under-14 world: {@link CAST_FACES}). A face has an area card with 2-3 real
+ *   actions and a "Chiedi a Vera" button: Vera's chat opens with that area as context ({@link ChatAreaId}).
+ * - TIP_ONLY: Era, Dottor Acanfora, the Preparatore atletico, the Mental coach and Musica e relax are only "consiglio
+ *   del giorno" (short rotating copy, home-tips.ts): no chat, no "Chiedi a …".
+ * - ABSORBED: the ticket office ("biglietteria") is answered by Vera herself (prices, free entries, cards).
  *
- * Names still to be decided (`nameTbd` in the roster) use neutral role labels ("Lo chef", "La biglietteria"):
+ * Names still to be decided (`nameTbd` in the roster) use neutral role labels ("Lo Chef", "Il Mentore dei tornei"):
  * never an invented personal name. Operational requests (orders, team registrations, tickets) are collected as
  * requests for a person and never confirmed or paid in the app. The distress referral (cast-safety.ts) applies to
- * every persona before anything else.
+ * every chat before anything else.
  */
 import type { RosterId } from "./assistant-cast";
 import { relaxCopyProblems } from "./cast-safety";
@@ -28,6 +30,7 @@ import {
 } from "./first-aid-info";
 import type { SkyReply } from "./sky.functions";
 
+/** Every area of the cast (faces, tip-only characters and the absorbed ticket office). */
 export type CastPersonaId =
   | "era"
   | "acanfora"
@@ -55,6 +58,30 @@ export function isCastPersona(p: unknown): p is CastPersonaId {
   return typeof p === "string" && (CAST_PERSONA_IDS as readonly string[]).includes(p);
 }
 
+/** How a character lives in the app since UD-118. */
+export type CastKind = "FACE" | "TIP_ONLY" | "ABSORBED";
+
+/** Faces of the cast with an area card and concrete actions (Sky is the fourth face, see {@link CAST_FACES}). */
+export type FaceAreaId = "accoglienza-chef" | "volto-sponsor" | "mentore-tornei";
+
+/** Areas Vera's chat can be opened with ("Chiedi a Vera" on a face card, or the ticket office she absorbed). */
+export type ChatAreaId = FaceAreaId | "biglietteria";
+
+export const CHAT_AREA_IDS: readonly ChatAreaId[] = ["accoglienza-chef", "volto-sponsor", "mentore-tornei", "biglietteria"];
+
+/** Characters that are only a "consiglio del giorno": no chat entry anywhere (UD-118). */
+export type TipOnlyId = "era" | "acanfora" | "preparatore-atletico" | "mental-coach" | "musica-relax";
+
+export const TIP_ONLY_IDS: readonly TipOnlyId[] = ["era", "acanfora", "preparatore-atletico", "mental-coach", "musica-relax"];
+
+export function isChatArea(p: unknown): p is ChatAreaId {
+  return typeof p === "string" && (CHAT_AREA_IDS as readonly string[]).includes(p);
+}
+
+export function isTipOnly(p: unknown): p is TipOnlyId {
+  return typeof p === "string" && (TIP_ONLY_IDS as readonly string[]).includes(p);
+}
+
 export interface CastLink {
   label: string;
   /** App path that exists in the route tree (tested). */
@@ -69,16 +96,7 @@ export interface CastTip {
   text: string;
 }
 
-export interface CastChatCopy {
-  title: string;
-  subtitle: string;
-  greeting: string;
-  placeholder: string;
-  thinking: string;
-  quick: readonly string[];
-}
-
-/** Keyword intent of a persona for the rules engine (AI off or fallback). */
+/** Keyword intent of an area for the rules engine (AI off or fallback). */
 export interface CastIntent {
   id: string;
   re: RegExp;
@@ -87,31 +105,38 @@ export interface CastIntent {
 export interface CastPersonaDef {
   id: CastPersonaId;
   rosterId: RosterId;
+  kind: CastKind;
   /** Display label: the personal name when decided, otherwise a neutral role label. */
   label: string;
   nameTbd: boolean;
   /** Role in a few plain words. */
   role: string;
-  /** "Chiedi a …" button text. */
-  askLabel: string;
-  /** Letter of the badge shown while no approved portrait exists (Genny's "G" style). */
+  /** One plain line: what the character does for you (directory, cards). */
+  does: string;
+  /** Letter of the badge shown while no approved portrait exists. */
   initial: string;
   /**
-   * Where the chat persona may answer: public pages (anyone, public data only) and/or inside (staff and adult
-   * members only: younger members and unknown ages keep Sky, assistant.ts chatPersonaFor).
+   * Where Vera's chat may be opened with this area: public pages (anyone, public data only) and/or inside (staff and
+   * adult members only: younger members and unknown ages keep Sky, assistant.ts resolveChat). Both false for the
+   * TIP_ONLY characters: they have no chat.
    */
   surfaces: { public: boolean; inside: boolean };
-  /** First lines of the system prompt (<role>). */
-  voice: string;
-  /** Extra hard rules appended to the shared rules of the system prompt. */
+  /**
+   * What Vera says when her chat opens with this area ("Per la Club House ti aiuta lo Chef: …"); null for the
+   * tip-only characters.
+   */
+  handoff: string | null;
+  /** Quick questions shown in Vera's chat opened with this area (empty for tip-only characters). */
+  chatQuick: readonly string[];
+  /** Extra hard rules appended to Vera's rules when her chat is opened with this area. */
   rules: readonly string[];
   /** Fixed notes of the area given to the model as data (the CONTEXT), with app links. */
   notes: readonly { text: string; to?: string }[];
   tips: readonly CastTip[];
   /** Note shown under the tip (what the character never does). */
   disclaimer: string;
+  /** Actions (faces) or useful links (tip cards) to real pages. */
   quick: readonly CastLink[];
-  chat: CastChatCopy;
   /** Operational requests (orders, registrations, tickets): answered by a fixed reply, never by the model. */
   operational: RegExp | null;
   intents: readonly CastIntent[];
@@ -371,15 +396,16 @@ export const CAST_PERSONA_SHARED_RULES: readonly string[] = [
 export const CAST_PERSONAS: Readonly<Record<CastPersonaId, CastPersonaDef>> = {
   era: {
     id: "era",
+    kind: "TIP_ONLY",
     rosterId: "era",
     label: "Era",
     nameTbd: false,
     role: "La nutrizionista del club",
-    askLabel: "Chiedi a Era",
+    does: "Un consiglio al giorno per mangiare e bere bene quando si fa sport.",
     initial: "E",
-    surfaces: { public: false, inside: true },
-    voice:
-      "Sei Era, la nutrizionista della S.C.D. ColicoDerviese, e parli con famiglie e soci adulti di buone abitudini alimentari per chi fa sport. Tono solare, concreto e rassicurante.",
+    surfaces: { public: false, inside: false },
+    handoff: null,
+    chatQuick: [],
     rules: [
       "Mai piani alimentari personali, numeri, quantità, calorie o peso, soprattutto per i minori.",
       "Nessun cibo magico o proibito, nessun integratore.",
@@ -396,15 +422,6 @@ export const CAST_PERSONAS: Readonly<Record<CastPersonaId, CastPersonaDef>> = {
       { label: "Infermeria", to: "/infermeria" },
       { label: "Documenti del club", to: "/documenti" },
     ],
-    chat: {
-      title: "Chiedi a Era",
-      subtitle: "la nutrizionista del club: buone abitudini per chi fa sport",
-      greeting:
-        "Ciao, sono Era, la nutrizionista del club. Ti do consigli generali su cosa mangiare e bere prima e dopo lo sport, per tutta la famiglia. Niente piani personali né numeri: per esigenze specifiche c'è il pediatra o il medico.",
-      placeholder: "Scrivi a Era…",
-      thinking: "Era sta pensando…",
-      quick: ["Cosa mangiare prima dell'allenamento", "Merenda dopo la partita", "Quanto bere"],
-    },
     operational: null,
     intents: [
       { id: "limiti", re: /dieta|diete|peso|dimagr|calori|integrator|grammi|chili|piano alimentare/i },
@@ -417,15 +434,16 @@ export const CAST_PERSONAS: Readonly<Record<CastPersonaId, CastPersonaDef>> = {
   },
   acanfora: {
     id: "acanfora",
+    kind: "TIP_ONLY",
     rosterId: "acanfora",
     label: "Dottor Acanfora",
     nameTbd: false,
     role: "Il medico del club",
-    askLabel: "Chiedi al Dottor Acanfora",
+    does: "Un consiglio al giorno di prevenzione e primo soccorso, mai diagnosi.",
     initial: "A",
-    surfaces: { public: false, inside: true },
-    voice:
-      "Sei il Dottor Acanfora, il medico della S.C.D. ColicoDerviese: calmo, chiaro e rassicurante. Dai consigli generali di prevenzione e primo soccorso in parole semplici.",
+    surfaces: { public: false, inside: false },
+    handoff: null,
+    chatQuick: [],
     rules: [
       "Mai diagnosi, mai farmaci o dosi: per ogni dubbio il medico; emergenza 112.",
       "Colpo alla testa: nel dubbio fuori dal campo e valutazione di un medico.",
@@ -444,15 +462,6 @@ export const CAST_PERSONAS: Readonly<Record<CastPersonaId, CastPersonaDef>> = {
       { label: "Certificato e documenti", to: "/documenti" },
       { label: "Contatti", to: "/contatti" },
     ],
-    chat: {
-      title: "Chiedi al Dottor Acanfora",
-      subtitle: "il medico del club: prevenzione e primo soccorso, mai diagnosi",
-      greeting:
-        "Buongiorno, sono il Dottor Acanfora, il medico del club. Ti spiego in parole semplici prevenzione e primo soccorso per lo sport. Non faccio diagnosi e per le medicine decide sempre il medico: in emergenza chiama subito il 112.",
-      placeholder: "Scrivi al Dottor Acanfora…",
-      thinking: "Il Dottor Acanfora sta pensando…",
-      quick: ["Botta alla caviglia", "Colpo alla testa", "Certificato medico"],
-    },
     operational: null,
     intents: [
       { id: "farmaci", re: /farmac|medicin|antidolorific|pastigli|pomata|ibuprofen|paracetamol/i },
@@ -463,15 +472,16 @@ export const CAST_PERSONAS: Readonly<Record<CastPersonaId, CastPersonaDef>> = {
   },
   "accoglienza-chef": {
     id: "accoglienza-chef",
+    kind: "FACE",
     rosterId: "accoglienza-chef",
-    label: "Lo chef",
+    label: "Lo Chef",
     nameTbd: true,
-    role: "Accoglienza e cucina della Club House",
-    askLabel: "Chiedi allo chef",
+    role: "Lo Chef della Club House",
+    does: "Raccoglie gli ordini per feste e iniziative e apre il sondaggio sui piatti della Club House.",
     initial: "C",
     surfaces: { public: false, inside: true },
-    voice:
-      "Sei lo chef e l'accoglienza della Club House della S.C.D. ColicoDerviese, un personaggio dell'app con il nome ancora da decidere: tono caloroso e ospitale, da padrone di casa.",
+    handoff: "Per la Club House ti aiuta lo Chef: ordini per feste e iniziative e sondaggio sui piatti. Una persona conferma e si paga alla cassa, mai in chat.",
+    chatQuick: ["Il menu", "Allergie e intolleranze", "Torta per un compleanno"],
     rules: [
       "Menu, piatti e prezzi solo se sono nel CONTESTO: se il listino non è pubblicato dillo e non indicarli.",
       "Ordini per feste e iniziative: si raccoglie solo una richiesta con il modulo dell'area famiglia; una persona della Club House la conferma e si paga alla cassa del club (SQUBY/SumUp), mai in chat.",
@@ -490,19 +500,10 @@ export const CAST_PERSONAS: Readonly<Record<CastPersonaId, CastPersonaDef>> = {
     tips: CHEF_TIPS,
     disclaimer: "L'app raccoglie richieste, non ordini: conferma una persona della Club House e si paga alla cassa, mai in chat.",
     quick: [
-      { label: "Richiesta d'ordine", to: "/famiglia", hash: "richiesta-ordine" },
+      { label: "Ordine per una festa", to: "/famiglia", hash: "richiesta-ordine" },
+      { label: "Sondaggio sui piatti", to: "/famiglia", hash: "sondaggi-piatti" },
       { label: "Eventi del club", to: "/eventi" },
-      { label: "Contatti", to: "/contatti" },
     ],
-    chat: {
-      title: "Chiedi allo chef",
-      subtitle: "accoglienza e cucina della Club House",
-      greeting:
-        "Benvenuto in Club House! Sono lo chef: ti racconto le novità, raccolgo le richieste d'ordine per feste e iniziative e ti dico come funzionano i sondaggi sui piatti. Le richieste le conferma una persona e si paga alla cassa, mai in chat.",
-      placeholder: "Scrivi allo chef…",
-      thinking: "Lo chef sta controllando…",
-      quick: ["Ordine per una festa", "Il menu", "Sondaggio sui piatti"],
-    },
     operational: /\b(ordin\w*|prenot\w*|torta|torte|buffet|rinfresc\w*|catering|compleann\w*|aperitiv\w*|festa|feste)\b/i,
     intents: [
       { id: "allergie", re: /allerg|intolleran|celiac/i },
@@ -512,15 +513,16 @@ export const CAST_PERSONAS: Readonly<Record<CastPersonaId, CastPersonaDef>> = {
   },
   biglietteria: {
     id: "biglietteria",
+    kind: "ABSORBED",
     rosterId: "biglietteria",
     label: "La biglietteria",
     nameTbd: true,
     role: "Prezzi, gratuità, card e partite in casa",
-    askLabel: "Chiedi alla biglietteria",
+    does: "Prezzi, ingressi gratuiti, card e partite in casa: ti risponde Vera.",
     initial: "B",
     surfaces: { public: true, inside: true },
-    voice:
-      "Sei la biglietteria della S.C.D. ColicoDerviese, un personaggio dell'app con il nome ancora da decidere: cordiale, precisa e veloce, sai tutto su prezzi, gratuità, card e partite in casa.",
+    handoff: "Per biglietti, gratuità e card ti rispondo io. I biglietti non si vendono in chat: si pagano all'ingresso dell'impianto.",
+    chatQuick: ["Quanto costa il biglietto", "Chi entra gratis", "Prossima partita in casa"],
     rules: [
       "Prezzi, gratuità e card solo come scritti nel CONTESTO: se i prezzi non sono confermati non indicarli.",
       "Nessuna vendita, prenotazione o pagamento in chat: i biglietti si pagano alla biglietteria dell'impianto come indicato nel CONTESTO.",
@@ -538,15 +540,6 @@ export const CAST_PERSONAS: Readonly<Record<CastPersonaId, CastPersonaDef>> = {
       { label: "Le card", to: "/card" },
       { label: "Partite in casa", to: "/calendario" },
     ],
-    chat: {
-      title: "Chiedi alla biglietteria",
-      subtitle: "prezzi, gratuità, card e partite in casa",
-      greeting:
-        "Ciao, qui biglietteria! Ti dico prezzi e ingressi gratuiti, a cosa servono le card del club e quando si gioca in casa. I biglietti non si vendono in chat: si pagano all'ingresso dell'impianto.",
-      placeholder: "Scrivi alla biglietteria…",
-      thinking: "La biglietteria sta controllando…",
-      quick: ["Quanto costa il biglietto", "Chi entra gratis", "Prossima partita in casa"],
-    },
     operational: /\b(compr\w*|acquist\w*|prenot\w*|pagar\w*|prevendit\w*|riserv\w* (un |il )?posto)\b/i,
     intents: [
       { id: "gratis", re: /gratis|gratuit|bambin|tesserat|famil|omagg/i },
@@ -557,15 +550,16 @@ export const CAST_PERSONAS: Readonly<Record<CastPersonaId, CastPersonaDef>> = {
   },
   "mentore-tornei": {
     id: "mentore-tornei",
+    kind: "FACE",
     rosterId: "mentore-tornei",
-    label: "Il mentore dei tornei",
+    label: "Il Mentore dei tornei",
     nameTbd: true,
     role: "Direttore artistico di tornei ed eventi",
-    askLabel: "Chiedi al mentore dei tornei",
+    does: "Ti fa iscrivere la squadra ai tornei del club e ti indica l'ospitalità per chi viene da fuori.",
     initial: "T",
     surfaces: { public: true, inside: true },
-    voice:
-      "Sei il mentore dei tornei della S.C.D. ColicoDerviese, il direttore artistico di tornei ed eventi, un personaggio dell'app con il nome ancora da decidere: carismatico, organizzato e accogliente con le società ospiti.",
+    handoff: "Per i tornei ti aiuta il Mentore dei tornei: iscrizione della squadra e ospitalità. L'iscrizione la conferma sempre l'organizzazione.",
+    chatQuick: ["Prossimo torneo", "Programma del torneo", "Vogliamo partecipare"],
     rules: [
       "Tornei, date, luoghi e programmi solo dal CONTESTO: se il programma non è pubblicato dillo.",
       "L'interesse di una squadra non è un'iscrizione: raccoglilo e rimanda alla società, che risponde con programma e condizioni.",
@@ -579,33 +573,25 @@ export const CAST_PERSONAS: Readonly<Record<CastPersonaId, CastPersonaDef>> = {
     tips: TOURNAMENT_TIPS,
     disclaimer: "L'interesse a partecipare non è un'iscrizione: conferma sempre l'organizzazione del torneo.",
     quick: [
-      { label: "I tornei", to: "/tornei" },
-      { label: "Eventi", to: "/eventi" },
-      { label: "Scrivi alla società", to: "/contatti" },
+      { label: "Iscrivi la squadra", to: "/eventi/christmas-lario-cup", hash: "iscrizioni" },
+      { label: "Ospitalità e come arrivare", to: "/eventi/christmas-lario-cup", hash: "arrivare" },
+      { label: "Tutti i tornei", to: "/tornei" },
     ],
-    chat: {
-      title: "Chiedi al mentore dei tornei",
-      subtitle: "il direttore artistico di tornei ed eventi",
-      greeting:
-        "Benvenuti! Sono il mentore dei tornei della ColicoDerviese: vi presento i tornei del club, vi dico cosa è già in programma e come far sapere che la vostra squadra vuole partecipare. L'iscrizione la conferma sempre l'organizzazione.",
-      placeholder: "Scrivi al mentore dei tornei…",
-      thinking: "Il mentore sta guardando il programma…",
-      quick: ["Prossimo torneo", "Come partecipare", "Ospitalità per le squadre"],
-    },
     operational: /\b(iscriv\w*|iscrizion\w*|partecip\w*|ospitalit\w*|alloggi\w*|pernott\w*|albergh\w*|hotel)\b/i,
     intents: [{ id: "prossimo", re: /prossim|quando|date|data|programma|torne/i }],
   },
   "mental-coach": {
     id: "mental-coach",
+    kind: "TIP_ONLY",
     rosterId: "mental-coach",
-    label: "Il mental coach",
+    label: "Il Mental coach",
     nameTbd: true,
     role: "Motivazione per lo sport e la squadra",
-    askLabel: "Chiedi al mental coach",
+    does: "Un consiglio al giorno per affrontare partite e allenamenti con la testa giusta.",
     initial: "M",
-    surfaces: { public: false, inside: true },
-    voice:
-      "Sei il mental coach della S.C.D. ColicoDerviese, un personaggio dell'app con il nome ancora da decidere: positivo, calmo e incoraggiante. Dai solo spunti generali di motivazione per lo sport e per la squadra.",
+    surfaces: { public: false, inside: false },
+    handoff: null,
+    chatQuick: [],
     rules: [
       "Non fai terapia, non fai diagnosi e non proponi percorsi personali: sei un personaggio dell'app.",
       "Mai percorsi personali con minori senza i genitori: per un aiuto personale invita a parlarne in famiglia e con il club, che indica il mental coach reale del club se presente.",
@@ -621,16 +607,7 @@ export const CAST_PERSONAS: Readonly<Record<CastPersonaId, CastPersonaDef>> = {
       { label: "Parla con il club", to: "/contatti" },
       { label: "Tutela minori", to: "/safeguarding" },
     ],
-    chat: {
-      title: "Chiedi al mental coach",
-      subtitle: "motivazione per lo sport e la squadra",
-      greeting:
-        "Ciao! Sono il mental coach dell'app: ti do qualche spunto per affrontare partite e allenamenti con la testa giusta e fare squadra. Non sono un percorso personale: per quello parlane in famiglia e con il club.",
-      placeholder: "Scrivi al mental coach…",
-      thinking: "Il mental coach sta pensando…",
-      quick: ["Prima della partita", "Dopo un errore", "Fare squadra"],
-    },
-    operational: /\b(percors\w* personal\w*|sedut\w*|appuntament\w*|parlare con (il|un) (mental coach|psicolog\w*))\b/i,
+    operational: null,
     intents: [
       { id: "prima", re: /prima (della |di )?(partita|gara)|tension|agitat|emozion/i },
       { id: "errore", re: /error|sbagli|perso|sconfitt/i },
@@ -639,15 +616,16 @@ export const CAST_PERSONAS: Readonly<Record<CastPersonaId, CastPersonaDef>> = {
   },
   "preparatore-atletico": {
     id: "preparatore-atletico",
+    kind: "TIP_ONLY",
     rosterId: "preparatore-atletico",
-    label: "Il preparatore atletico",
+    label: "Il Preparatore atletico",
     nameTbd: true,
     role: "Riscaldamento e prevenzione per età",
-    askLabel: "Chiedi al preparatore",
+    does: "Un consiglio al giorno su riscaldamento e prevenzione, mai schede personali.",
     initial: "P",
-    surfaces: { public: false, inside: true },
-    voice:
-      "Sei il preparatore atletico della S.C.D. ColicoDerviese, un personaggio dell'app con il nome ancora da decidere: energico, chiaro e attento alla sicurezza. Spieghi esercizi generali di riscaldamento e prevenzione adatti all'età.",
+    surfaces: { public: false, inside: false },
+    handoff: null,
+    chatQuick: [],
     rules: [
       "Mai piani, schede, carichi, numeri di ripetizioni o tempi personali, e mai per i minori.",
       "Solo indicazioni generali: gli esercizi li guidano mister e preparatori del club.",
@@ -663,15 +641,6 @@ export const CAST_PERSONAS: Readonly<Record<CastPersonaId, CastPersonaDef>> = {
       { label: "Allenamenti", to: "/allenamenti" },
       { label: "Infermeria", to: "/infermeria" },
     ],
-    chat: {
-      title: "Chiedi al preparatore",
-      subtitle: "riscaldamento e prevenzione per età",
-      greeting:
-        "Ciao, sono il preparatore atletico dell'app! Ti spiego come scaldarsi bene e prevenire gli infortuni, con indicazioni generali per età. Niente schede personali: gli allenamenti li guidano mister e preparatori del club.",
-      placeholder: "Scrivi al preparatore…",
-      thinking: "Il preparatore sta pensando…",
-      quick: ["Riscaldamento prima della partita", "Scuola calcio", "Ho male al ginocchio"],
-    },
     operational: null,
     intents: [
       { id: "limiti", re: /scheda|piano (personal|di allenamento)|quante (ripetizion|serie)|programma personal|dimagr|peso|pesi/i },
@@ -682,15 +651,16 @@ export const CAST_PERSONAS: Readonly<Record<CastPersonaId, CastPersonaDef>> = {
   },
   "musica-relax": {
     id: "musica-relax",
+    kind: "TIP_ONLY",
     rosterId: "musica-relax",
     label: "Musica e relax",
     nameTbd: true,
     role: "Musica e respiro per ritrovare la calma",
-    askLabel: "Chiedi a Musica e relax",
+    does: "Un consiglio al giorno di calma e respiro, prima e dopo la partita.",
     initial: "R",
-    surfaces: { public: false, inside: true },
-    voice:
-      "Sei Musica e relax, un personaggio dell'app della S.C.D. ColicoDerviese con il nome ancora da decidere: voce calma e gentile. Proponi semplici momenti di calma con musica tranquilla e respirazione prima e dopo la partita.",
+    surfaces: { public: false, inside: false },
+    handoff: null,
+    chatQuick: [],
     rules: [
       "Non sei uno psicologo: non fai terapia e non fai diagnosi, proponi solo semplici esercizi di calma per tutti.",
       "Se qualcuno parla di tristezza, ansia, paura o disagio non approfondire: rimanda a famiglia, mister, medico, professionisti e referente Tutela minori; pericolo 112.",
@@ -706,15 +676,6 @@ export const CAST_PERSONAS: Readonly<Record<CastPersonaId, CastPersonaDef>> = {
       { label: "Tutela minori", to: "/safeguarding" },
       { label: "Infermeria", to: "/infermeria" },
     ],
-    chat: {
-      title: "Chiedi a Musica e relax",
-      subtitle: "musica e respiro per ritrovare la calma",
-      greeting:
-        "Ciao. Qui Musica e relax: ti propongo un respiro lento o un momento di musica tranquilla prima e dopo la partita. Non sono uno psicologo: se qualcosa ti pesa davvero, parlane con la tua famiglia o con un adulto di fiducia del club.",
-      placeholder: "Scrivi a Musica e relax…",
-      thinking: "Musica e relax sta preparando…",
-      quick: ["Un respiro per calmarmi", "Prima della partita", "Dopo la partita"],
-    },
     operational: null,
     intents: [
       { id: "respiro", re: /respir|calm|rilass/i },
@@ -724,15 +685,16 @@ export const CAST_PERSONAS: Readonly<Record<CastPersonaId, CastPersonaDef>> = {
   },
   "volto-sponsor": {
     id: "volto-sponsor",
+    kind: "FACE",
     rosterId: "volto-sponsor",
-    label: "Il volto sponsor",
+    label: "Il Volto sponsor",
     nameTbd: true,
-    role: "Storie dei partner e pacchetti",
-    askLabel: "Chiedi al volto sponsor",
-    initial: "V",
+    role: "Partner e pacchetti",
+    does: "Ti mostra il listino partner e ti fa chiedere il pacchetto che ti interessa.",
+    initial: "S",
     surfaces: { public: true, inside: true },
-    voice:
-      "Sei il volto sponsor della S.C.D. ColicoDerviese, l'ambasciatore dei partner, un personaggio dell'app con il nome ancora da decidere: elegante, concreto e orgoglioso del territorio.",
+    handoff: "Per diventare partner ti aiuta il Volto sponsor: guarda il listino e chiedi il pacchetto che ti interessa. Ogni proposta passa dall'ufficio commerciale.",
+    chatQuick: ["Quanto costa un pacchetto", "Chi sono i partner", "Vorrei un preventivo"],
     rules: [
       "Solo partner reali e pacchetti presenti nel CONTESTO: i prezzi dei pacchetti non sono pubblicati.",
       "Le proposte passano sempre dall'ufficio commerciale del club: invita a richiedere una proposta.",
@@ -745,19 +707,10 @@ export const CAST_PERSONAS: Readonly<Record<CastPersonaId, CastPersonaDef>> = {
     tips: SPONSOR_TIPS,
     disclaimer: "Solo partner reali e pacchetti pubblicati: ogni proposta passa dall'ufficio commerciale del club.",
     quick: [
-      { label: "Diventa partner", to: "/sponsor", hash: "proposta" },
+      { label: "Chiedi un pacchetto", to: "/sponsor", hash: "proposta" },
+      { label: "Il listino partner", to: "/sponsor", hash: "listino" },
       { label: "I partner", to: "/partner" },
-      { label: "I tornei", to: "/tornei" },
     ],
-    chat: {
-      title: "Chiedi al volto sponsor",
-      subtitle: "storie dei partner e pacchetti",
-      greeting:
-        "Benvenuto! Sono il volto sponsor della ColicoDerviese: ti racconto chi sostiene il club, quali spazi può avere un partner e come chiedere una proposta su misura all'ufficio commerciale.",
-      placeholder: "Scrivi al volto sponsor…",
-      thinking: "Il volto sponsor sta preparando…",
-      quick: ["Diventare partner", "Pacchetti", "Chi sono i partner"],
-    },
     operational: /\b(contratt\w*|firm\w*|preventiv\w*)\b/i,
     intents: [
       { id: "pacchetti", re: /pacchett|prezz|cost|quanto|spazi|visibilit/i },
@@ -767,17 +720,19 @@ export const CAST_PERSONAS: Readonly<Record<CastPersonaId, CastPersonaDef>> = {
   },
 };
 
-/* ─────────────────────────────── Genny (presence only) ─────────────────────────────── */
+/* ─────────────────────────────── Vera (the one chat) ─────────────────────────────── */
 
 /**
- * Genny's presence on the secretariat page. Her chat persona already exists (assistant.ts "genny", staff and adult
- * members): the presence only adds her daily secretariat tip and quick links to real pages.
+ * Vera, the club reception (UD-118: "una sola assistente chat in tutta l'app, di nome VERA", replacing the name
+ * Genny). Her chat persona is assistant.ts "vera"; this is her presence (secretariat page, directory, ticket office):
+ * a practical tip of the day and links to real pages. No portrait until the Direzione approves an image.
  */
-export const GENNY_PRESENCE = {
-  label: "Genny",
-  role: "La segretaria del club",
-  askLabel: "Chiedi a Genny",
-  initial: "G",
+export const VERA_PRESENCE = {
+  label: "Vera",
+  role: "La reception del club",
+  does: "Risponde con i dati veri del club e ti dice da dove vengono, ti porta dal volto giusto e, se serve una persona, apre una richiesta alla segreteria. Anche biglietti e card.",
+  askLabel: "Chiedi a Vera",
+  initial: "V",
   tips: [
     {
       key: "un-messaggio",
@@ -810,7 +765,7 @@ export const GENNY_PRESENCE = {
       text: "Nomi, contatti e documenti dei minori si condividono solo con chi ne ha bisogno per il proprio ruolo, mai nei gruppi.",
     },
   ] as readonly CastTip[],
-  disclaimer: "Genny ti mostra solo ciò che il tuo ruolo può vedere; richieste e problemi vanno alla persona che se ne occupa.",
+  disclaimer: "Vera ti mostra solo ciò che il tuo ruolo può vedere; richieste e problemi vanno alla persona che se ne occupa.",
   quick: [
     { label: "Certificati medici", to: "/segreteria/certificati" },
     { label: "Documenti", to: "/documenti" },
@@ -818,13 +773,76 @@ export const GENNY_PRESENCE = {
   ] as readonly CastLink[],
 } as const;
 
-export type PresenceId = CastPersonaId | "genny";
+/** A presence on a page: an area of the cast, or Vera herself. */
+export type PresenceId = CastPersonaId | "vera";
+
+/* ─────────────────────────────── faces (UD-118) ─────────────────────────────── */
+
+export type FaceId = FaceAreaId | "sky";
+
+export interface CastFace {
+  id: FaceId;
+  label: string;
+  /** One plain line: what the face does for you. */
+  does: string;
+  /** 2-3 concrete actions on real pages (tested against the route tree). */
+  actions: readonly CastLink[];
+  /** Where the face lives. */
+  home: CastLink & { reserved: boolean };
+  /** Area Vera's chat opens with from this face ("Chiedi a Vera"); null for Sky, who is the kids' own helper. */
+  area: FaceAreaId | null;
+}
+
+/**
+ * The four faces with concrete actions (UD-118): the Chef della Club House, the Volto sponsor, the Mentore dei tornei
+ * and Sky, the official mascot, only in the world of the under-14s (never a hero, never commercial).
+ */
+export const CAST_FACES: Readonly<Record<FaceId, CastFace>> = {
+  "accoglienza-chef": {
+    id: "accoglienza-chef",
+    label: CAST_PERSONAS["accoglienza-chef"].label,
+    does: CAST_PERSONAS["accoglienza-chef"].does,
+    actions: CAST_PERSONAS["accoglienza-chef"].quick,
+    home: { label: "Area famiglia · Club House", to: "/famiglia", hash: "richiesta-ordine", reserved: true },
+    area: "accoglienza-chef",
+  },
+  "volto-sponsor": {
+    id: "volto-sponsor",
+    label: CAST_PERSONAS["volto-sponsor"].label,
+    does: CAST_PERSONAS["volto-sponsor"].does,
+    actions: CAST_PERSONAS["volto-sponsor"].quick,
+    home: { label: "Sponsor e partner", to: "/sponsor", reserved: false },
+    area: "volto-sponsor",
+  },
+  "mentore-tornei": {
+    id: "mentore-tornei",
+    label: CAST_PERSONAS["mentore-tornei"].label,
+    does: CAST_PERSONAS["mentore-tornei"].does,
+    actions: CAST_PERSONAS["mentore-tornei"].quick,
+    home: { label: "Tornei", to: "/tornei", hash: "personaggi-tornei", reserved: false },
+    area: "mentore-tornei",
+  },
+  sky: {
+    id: "sky",
+    label: "Sky",
+    does: "La mascotte portafortuna, solo nel mondo dei bambini under 14: scuola calcio, giochi e squadre dei più piccoli.",
+    actions: [
+      { label: "Prova la scuola calcio", to: "/entra" },
+      { label: "Le squadre dei piccoli", to: "/squadre" },
+      { label: "Fantacalcio", to: "/fantacalcio" },
+    ],
+    home: { label: "Squadre dei più piccoli", to: "/squadre", reserved: false },
+    area: null,
+  },
+};
+
+export const FACE_IDS: readonly FaceId[] = ["accoglienza-chef", "volto-sponsor", "mentore-tornei", "sky"];
 
 /* ─────────────────────────────── daily tip ─────────────────────────────── */
 
-/** Tip of the day of a persona: the same for everybody on a Rome day (era-nutrition-tips.ts dailyPick). */
+/** Tip of the day of a presence: the same for everybody on a Rome day (era-nutrition-tips.ts dailyPick). */
 export function dailyCastTip(id: PresenceId, day: string): CastTip {
-  return dailyPick(id === "genny" ? GENNY_PRESENCE.tips : CAST_PERSONAS[id].tips, day);
+  return dailyPick(id === "vera" ? VERA_PRESENCE.tips : CAST_PERSONAS[id].tips, day);
 }
 
 /* ─────────────────────────────── guards ─────────────────────────────── */
@@ -837,8 +855,8 @@ function hasDigits(text: string): boolean {
 const PERSONAL_PLAN_RE = /\b(scheda personal\w*|piano personal\w*|serie da|ripetizion\w*|carich\w*)\b/i;
 
 /**
- * Problems of one piece of curated copy of a persona (tips, greeting, disclaimer); empty when it respects the rules.
- * Every persona: no digits except 112. Era: no diet/weight words. Dottor Acanfora: no drugs or diagnosis wording.
+ * Problems of one piece of curated copy of a presence (tips, handoff, disclaimer); empty when it respects the rules.
+ * Every presence: no digits except 112. Era: no diet/weight words. Dottor Acanfora: no drugs or diagnosis wording.
  * Mental coach and Musica e relax: never therapy wording. Preparatore: never personal plans.
  */
 export function castCopyProblems(id: PresenceId, text: string): string[] {
@@ -856,22 +874,23 @@ const CONFIRMATION_RE =
   /\b(ho (confermato|prenotato|registrato|iscritto|ordinato)|(ordine|prenotazione|biglietto|iscrizione) (è |e' )?(confermat[oa]|registrat[oa]|accettat[oa])|pagamento (ricevuto|effettuato|confermato)|paga (qui|ora) in chat)\b/i;
 
 /**
- * Output guard of an AI answer for an area persona: problems make the server fall back to the rules engine
- * (assistant.ts parseAssistantAnswer). Prices and dates may appear when they come from the CONTEXT, so digits are
- * refused only for Era and the Preparatore (plans and numbers for minors).
+ * Output guard of an AI answer of Vera: problems make the server fall back to the rules engine (assistant.ts
+ * parseAssistantAnswer). Always: no confirmed orders, tickets, registrations or payments. With `strict` (public pages,
+ * area chats, anyone who is not reading the Cervellone as staff) the topics of the tip-only characters keep their
+ * limits in Vera's mouth too: no diet or weight wording, no drugs or diagnosis, no therapy, no personal training plans.
+ * Prices and dates may appear when they come from the CONTEXT, so digits are not refused here.
  */
-export function castAnswerProblems(id: CastPersonaId, text: string): string[] {
+export function veraAnswerProblems(text: string, strict = true): string[] {
   const out: string[] = [];
   if (CONFIRMATION_RE.test(text)) out.push("confirms an operational request");
-  if (id === "era") out.push(...tipProblems(text));
-  if (id === "preparatore-atletico") {
-    if (hasDigits(text)) out.push("contains digits other than 112");
-    if (PERSONAL_PLAN_RE.test(text)) out.push("personal plan wording");
-  }
-  if (id === "acanfora") out.push(...firstAidProblems(text).filter((p) => !p.startsWith("contains digits")));
-  if (id === "mental-coach" || id === "musica-relax") out.push(...relaxCopyProblems(text));
+  if (!strict) return out;
+  out.push(...tipProblems(text).filter((p) => p !== "contains digits"));
+  out.push(...firstAidProblems(text).filter((p) => !p.startsWith("contains digits")));
+  out.push(...relaxCopyProblems(text));
+  if (PERSONAL_PLAN_RE.test(text)) out.push("personal plan wording");
   return out;
 }
+
 
 /* ─────────────────────────────── rules engine (no AI) ─────────────────────────────── */
 
@@ -901,12 +920,17 @@ function euroText(n: number): string {
   return `${n.toFixed(2).replace(".", ",").replace(",00", "")} €`;
 }
 
-function reply(text: string, links: readonly CastLink[], mood: SkyReply["mood"] = "info"): SkyReply {
-  return { text, mood, links: links.map((l) => ({ label: l.label, to: l.to })) };
+/** App link of a cast link for a chat reply: the anchor travels as "#hash" (SkyChat ReplyLink splits it). */
+export function castLinkTo(l: CastLink): string {
+  return l.hash ? `${l.to}#${l.hash}` : l.to;
 }
 
-/** Fixed answer to an operational request of a persona (orders, registrations, tickets): never confirmed. */
-export function castOperationalReply(id: CastPersonaId): SkyReply {
+function reply(text: string, links: readonly CastLink[], mood: SkyReply["mood"] = "info"): SkyReply {
+  return { text, mood, links: links.map((l) => ({ label: l.label, to: castLinkTo(l) })) };
+}
+
+/** Fixed answer of Vera to an operational request of an area (orders, registrations, tickets): never confirmed. */
+export function castOperationalReply(id: ChatAreaId): SkyReply {
   switch (id) {
     case "accoglienza-chef":
       return reply(
@@ -922,24 +946,15 @@ export function castOperationalReply(id: CastPersonaId): SkyReply {
     case "mentore-tornei":
       return reply(
         "Bello che vogliate esserci! Scrivete alla società dalla pagina Contatti con il nome della società, la categoria e il torneo: l'organizzazione risponde con programma, ospitalità e condizioni. L'interesse non è ancora un'iscrizione.",
-        [{ label: "Scrivi alla società", to: "/contatti" }, { label: "I tornei", to: "/tornei" }],
+        [{ label: "Scrivi alla società", to: "/contatti" }, { label: "Iscrivi la squadra", to: "/eventi/christmas-lario-cup", hash: "iscrizioni" }],
         "success",
-      );
-    case "mental-coach":
-      return reply(
-        "Per un percorso personale parlane in famiglia e scrivi al club: ti indicherà il mental coach reale della società, se presente. Con i ragazzi minorenni sempre insieme ai genitori.",
-        [{ label: "Scrivi al club", to: "/contatti" }],
       );
     case "volto-sponsor":
       return reply(
         "Contratti e preventivi li prepara l'ufficio commerciale del club: parti dalla richiesta di proposta nella pagina Sponsor e ti ricontattano.",
-        [{ label: "Richiedi una proposta", to: "/sponsor" }],
+        [{ label: "Richiedi una proposta", to: "/sponsor", hash: "proposta" }],
         "success",
       );
-    default: {
-      const def = CAST_PERSONAS[id];
-      return reply(`${def.label} raccoglie solo richieste per una persona del club: scrivila alla segreteria.`, [{ label: "Contatti", to: "/contatti" }]);
-    }
   }
 }
 
@@ -1086,15 +1101,40 @@ export function castIntentReply(id: CastPersonaId, message: string, facts: CastF
   }
 }
 
-/** Default answer of a persona when nothing matched: who they are, today's tip and the quick links. */
-export function castDefaultReply(id: CastPersonaId, day: string): SkyReply {
-  const def = CAST_PERSONAS[id];
-  const tip = dailyCastTip(id, day);
-  const hello = /^.*?[.!?](?=\s|$)/.exec(def.chat.greeting)?.[0] ?? def.chat.title;
-  return reply(
-    `${hello} Posso aiutarti con: ${def.chat.quick.map((q) => q.toLowerCase()).join(", ")}. Il consiglio di oggi: ${tip.title}. ${tip.text}`,
-    def.quick,
-  );
+/**
+ * Vera's answer with an area when nothing more specific matched: the hand-over to the face of the area ("Per la Club
+ * House ti aiuta lo Chef: …"), today's tip of the area and its action buttons.
+ */
+export function veraAreaReply(area: ChatAreaId, day: string): SkyReply {
+  const def = CAST_PERSONAS[area];
+  const tip = dailyCastTip(area, day);
+  return reply(`${def.handoff ?? ""} Usa i pulsanti qui sotto oppure scrivimi cosa ti serve. Il consiglio di oggi: ${tip.title}. ${tip.text}`.trim(), def.quick);
+}
+
+/** Ticket words: Vera answers on the ticket office she absorbed (UD-118) only when the message is about it. */
+const TICKET_TOPIC_RE = /bigliett|ingress|gratis|gratuit|\bcard\b|abbonament|tessera|ridott|tariff|prevendit/i;
+
+/** Safety topics of the tip-only characters that Vera answers with their fixed copy (never with the model). */
+const VERA_SAFETY_TOPICS: ReadonlyArray<readonly [CastPersonaId, string]> = [
+  ["era", "limiti"],
+  ["acanfora", "farmaci"],
+  ["preparatore-atletico", "limiti"],
+];
+
+/**
+ * Vera's own topics without an area: the ticket office she absorbed (prices, free entries, cards, only with ticket
+ * words) and the fixed refusals of the tip-only characters (diets, medicines, personal training plans). Null when the
+ * message is about something else.
+ */
+export function veraTopicReply(message: string, facts: CastFacts = EMPTY_CAST_FACTS): SkyReply | null {
+  for (const [id, intent] of VERA_SAFETY_TOPICS) if (castIntent(id, message) === intent) return castIntentReply(id, message, facts);
+  if (TICKET_TOPIC_RE.test(message)) return castIntentReply("biglietteria", message, facts);
+  return null;
+}
+
+/** True when Vera should collect a ticket request (buy, book, pay a ticket) without an area. */
+export function isTicketRequest(message: string): boolean {
+  return /bigliett|prevendit/i.test(message) && isOperationalFor("biglietteria", message);
 }
 
 /* ─────────────────────────────── AI context ─────────────────────────────── */
@@ -1105,7 +1145,7 @@ export interface CastAreaContext {
 }
 
 /** Area notes and curated copy given to the model as data, placed first in the CONTEXT so it is never truncated. */
-export function castAreaContext(id: CastPersonaId, day: string, facts: CastFacts = EMPTY_CAST_FACTS): CastAreaContext {
+export function castAreaContext(id: ChatAreaId, day: string, facts: CastFacts = EMPTY_CAST_FACTS): CastAreaContext {
   const def = CAST_PERSONAS[id];
   const tip = dailyCastTip(id, day);
   const lines: { text: string; to?: string }[] = [...def.notes];
@@ -1117,25 +1157,25 @@ export function castAreaContext(id: CastPersonaId, day: string, facts: CastFacts
   lines.push({ text: `Consiglio di oggi di ${def.label}: ${tip.title}. ${tip.text}` });
   for (const t of def.tips) if (t.key !== tip.key) lines.push({ text: `- ${t.title}: ${t.text}` });
   lines.push({ text: def.disclaimer });
-  return { title: `Area di ${def.label} (${def.role})`, lines };
+  if (def.handoff) lines.push({ text: `Vera apre questa area così: ${def.handoff}` });
+  return { title: `Area: ${def.label} (${def.role})`, lines };
 }
 
 /* ─────────────────────────────── where they live ─────────────────────────────── */
 
 /**
- * Page where each character's presence lives ("I nostri personaggi", /guida#personaggi). Reserved pages ask to sign
- * in first; the route tree test checks every path.
+ * Page where each presence lives ("I nostri personaggi", /guida#personaggi). Reserved pages ask to sign in first; the
+ * route tree test checks every path.
  */
 export const PRESENCE_HOMES: Readonly<Record<PresenceId, CastLink & { reserved: boolean }>> = {
+  vera: { label: "In ogni pagina", to: "/guida", hash: "personaggi", reserved: false },
   era: { label: "Area famiglia", to: "/famiglia", hash: "fam-era", reserved: true },
   acanfora: { label: "Infermeria", to: "/infermeria", reserved: true },
-  "accoglienza-chef": { label: "Area famiglia · Club House", to: "/famiglia", hash: "richiesta-ordine", reserved: true },
+  "accoglienza-chef": CAST_FACES["accoglienza-chef"].home,
   biglietteria: { label: "Impianti e biglietteria", to: "/impianti", reserved: false },
-  "mentore-tornei": { label: "Tornei", to: "/tornei", hash: "personaggi-tornei", reserved: false },
+  "mentore-tornei": CAST_FACES["mentore-tornei"].home,
   "mental-coach": { label: "Area famiglia", to: "/famiglia", hash: "cast-helpers", reserved: true },
   "preparatore-atletico": { label: "Area famiglia", to: "/famiglia", hash: "cast-helpers", reserved: true },
   "musica-relax": { label: "Area famiglia", to: "/famiglia", hash: "cast-helpers", reserved: true },
-  // /sponsor is being reworked on another branch (agent/fondo2): the presence lives on /tornei for now.
-  "volto-sponsor": { label: "Tornei", to: "/tornei", hash: "personaggi-tornei", reserved: false },
-  genny: { label: "Segreteria", to: "/segreteria", reserved: true },
+  "volto-sponsor": CAST_FACES["volto-sponsor"].home,
 };
