@@ -88,14 +88,25 @@ function MatchRow({
       <span>{opponent}</span>
     </span>
   );
-  const label = `${cat}, ${weFirst ? `ColicoDerviese contro ${opponent}` : `${opponent} contro ColicoDerviese`}, ${e.time ? `ore ${e.time}` : "orario da definire"}, ${venue}`;
+  const label = [
+    cat,
+    weFirst ? `ColicoDerviese contro ${opponent}` : `${opponent} contro ColicoDerviese`,
+    e.homeAway === "CASA" ? "in casa" : e.homeAway === "FUORI" ? "in trasferta" : "",
+    e.time ? `ore ${e.time}` : "orario da definire",
+    venue,
+    live ? "in corso" : done ? "conclusa" : "",
+    ...e.changes,
+    ...e.pending,
+  ]
+    .filter(Boolean)
+    .join(", ");
   return (
     <li data-state={state} data-changed={changed ? "true" : undefined}>
       <Link
         to="/calendario"
         search={{ annata: e.group } as never}
         aria-label={label}
-        className={`scd-focus group relative flex min-h-[60px] items-center gap-3 py-2 pl-4 pr-3 transition-colors duration-150 hover:bg-[#f4f7fb] ${changed ? "bg-[#fffbe6]" : ""} ${done ? "opacity-60" : ""}`}
+        className={`scd-focus group relative flex min-h-[60px] items-center gap-3 py-2 pl-4 pr-3 transition-colors duration-150 hover:bg-[#f4f7fb] ${changed ? "bg-[#fffbe6]" : done ? "bg-[#f7f9fc]" : ""}`}
       >
         <span
           aria-hidden="true"
@@ -239,6 +250,9 @@ export function HomeMatchday({
           className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-3 [scrollbar-width:none] lg:mx-0 lg:px-0 [&::-webkit-scrollbar]:hidden"
           data-testid="home-matchday-filters"
         >
+          <span className="sr-only" role="status" aria-live="polite">
+            {`${counts[filter]} gare`}
+          </span>
           {MATCHDAY_FILTERS.map((f) => {
             const on = f === filter;
             return (
@@ -264,7 +278,6 @@ export function HomeMatchday({
 
       <div
         className="overflow-hidden rounded-[18px] bg-white shadow-[0_1px_2px_rgb(11_42_91/0.06),0_8px_24px_-12px_rgb(11_42_91/0.25)]"
-        aria-live="polite"
       >
         {days.length === 0 ? (
           <p

@@ -105,7 +105,7 @@ function JoinBanner() {
               id="entra-t"
               className="m-0 max-w-[18ch] font-uv text-[30px] uppercase leading-[0.95] lg:text-[40px]"
             >
-              La tua squadra, i tuoi orari, il tuo pulmino<span className="text-[#ffd600]">.</span>
+              La tua squadra, i tuoi orari, le trasferte<span className="text-[#ffd600]">.</span>
             </h2>
             <p className="m-0 max-w-[46ch] text-[15.5px] leading-snug text-white/90 lg:text-[17px]">
               Entra nell'app del club: le gare della tua squadra, le
