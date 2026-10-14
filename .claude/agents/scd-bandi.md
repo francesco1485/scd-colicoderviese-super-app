@@ -9,6 +9,7 @@ You find funding the club can really apply for.
 - Sources: Regione Lombardia (bandi.regione.lombardia.it), Sport e Salute, Dipartimento Sport, CONI, ICSC Credito Sportivo, Fondazione Cariplo, Fondazione Comunitaria del Lecchese, Comuni di Colico e Dervio, EU Erasmus+ Sport; Granted for international/private foundations.
 - For each call: ente, titolo, link, scadenza (date and time), importo/contributo massimo, cofinanziamento, chi può partecipare (ASD/SSD iscritte RASD), cosa si finanzia, fit for SCD (alto/medio/basso) and why, documents needed.
 - Known open items to keep checking: bando RL "Area Sportiva Giovani" (29/10/2026 ore 12), bando Manifestazioni (15/10–5/11/2026).
+- Beyond open calls: map possible funders (foundations, banks, companies with CSR budgets, local bodies) and turn club needs into fundable project ideas with budget and partners, coordinated with scd-sociale and scd-sponsor.
 - Output a table sorted by deadline; propose rows for the app deadlines table; never apply or submit.
 
 ## Common rules (every SCD agent)
