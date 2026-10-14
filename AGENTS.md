@@ -1,5 +1,22 @@
 # AGENTS.md — SCD ColicoDerviese
 
+## SCD:PRINCIPI — PRIMA LA LOGICA, POI LE REGOLE (leggere per primo)
+
+Francesco 14/10/2026: "meno regole, la logica". Le sezioni sotto restano valide come dettaglio, ma si capiscono da questi principi. Quando un caso non è previsto, decidi con lo scopo e il motivo, non cercando una regola che lo copra.
+
+**Lo scopo.** La S.C.D. ColicoDerviese è un club di calcio di paese (Colico e Dervio) fatto da volontari, famiglie e ragazzi. La Super App esiste per tre motori: SOLDI (sponsor, Adotta, lotteria, Club House), PERSONE (famiglie e tifosi che entrano, tornano, condividono), TEMPO (ore restituite a segreteria, tesoreria, mister, direzione). Un lavoro che non muove nessuno dei tre aspetta.
+
+**I principi e il loro perché.**
+1. **Proteggiamo i ragazzi.** Molti utenti sono minori: chi guarda l'app o un post non deve poter riconoscere un bambino. Quindi nome e iniziale, niente volti, niente dati di minori fuori dalle aree riservate, nessun contatto adulto-minore 1:1, safeguarding mai nei flussi ordinari.
+2. **Diciamo solo il vero.** Un club vive di fiducia: un risultato, un prezzo, uno sponsor o un numero inventato la rompe. Quindi dati da fonti verificate, "non noto" invece di zero, numeri calcolati dichiarati come calcolati.
+3. **Le persone decidono, le macchine preparano.** Soldi, ruoli, tesseramenti, presenze, documenti sensibili e messaggi a terzi hanno conseguenze reali e spesso irreversibili. Quindi gli agenti preparano bozze e proposte; inviare, pagare, cambiare permessi o applicare migrazioni lo autorizza una persona.
+4. **Un solo sistema.** Ogni registro doppio diventa presto sbagliato. Quindi si migliora l'esistente (Super App, R20, fogli master, Drive): mai un secondo gestionale, database o login.
+5. **Identità ufficiale intatta.** Stemma, maglie e loghi sponsor sono di altri o del club e valgono legalmente. Quindi solo file originali, mai ridisegnati.
+6. **Niente va online senza un secondo sguardo.** Chi scrive non vede i propri errori. Quindi controlli automatici verdi, revisione di `scd-revisore` e `scd-sicurezza` con PASS, poi pubblicazione ("Pubblica sempre") e controllo del sito vero.
+7. **Prima capire lo stato reale.** Lavorare su una fotografia vecchia rompe il lavoro degli altri (l'altra chat, gli agenti notturni). Quindi prima si verifica lo stato (SCD:STATE), poi si scrive.
+
+**I pochi divieti assoluti** (nessuna logica li supera): dati personali o di minori in pubblico; segreti (password, chiavi, IBAN, codici fiscali) in chat, codice o log; pagamenti, ruoli/permessi, tesseramenti, presenze, safeguarding modificati in produzione da un agente; messaggi inviati a terzi senza persona; migrazioni applicate senza "applica"; il progetto Supabase dfnwzwutvnwiitiffwvr.
+
 ## Regola 0
 Prima di modificare codice, dati, UI, workflow, API, ruoli, fonti o infrastruttura leggere:
 
