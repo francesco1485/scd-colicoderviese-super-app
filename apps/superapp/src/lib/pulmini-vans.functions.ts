@@ -8,7 +8,7 @@
  *   3. names come only from scd_transport_rider_roster (migration r99), which repeats the same check.
  * Any missing link gives the plan without names (counts by team) or the locked plan (preview / not allowed).
  * Names are formatted here (RIDER_NAME_FORMAT) and nothing else of the child leaves the server: no Master code,
- * no phone, no parent, no note. Stop texts are read only to match one of the line's REGISTERED stops (UD-123,
+ * no phone, no parent, no note. Stop texts are read only to match one of the line's REGISTERED stops (UD-130,
  * Direzione 14/10/2026 "chi sale e scende e dove"): the free text never leaves. Nothing is logged.
  */
 import { createServerFn } from "@tanstack/react-start";

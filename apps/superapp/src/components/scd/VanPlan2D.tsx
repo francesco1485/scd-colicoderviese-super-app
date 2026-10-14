@@ -1,5 +1,5 @@
 /**
- * Minibuses in 2D under the trainings (UD-123, Direzione 14/10/2026 11:00). Same visual language as the
+ * Minibuses in 2D under the trainings (UD-130, Direzione 14/10/2026 11:00). Same visual language as the
  * pitches and changing rooms of /impianti (navy outline, light fill, yellow only to highlight):
  * a top view of each van with the driver seat and numbered passenger seats, and a "Giro" tab with the
  * ordered stops of the line and who gets on (andata) and off (ritorno) at each one.

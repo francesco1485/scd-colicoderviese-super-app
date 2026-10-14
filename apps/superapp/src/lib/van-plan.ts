@@ -1,5 +1,5 @@
 /**
- * Minibuses in 2D under the trainings (Direzione 14/10/2026 11:00, UD-123):
+ * Minibuses in 2D under the trainings (Direzione 14/10/2026 11:00, UD-130):
  * "sotto gli allenamenti una pianta 2D di ogni pulmino come i campi e gli spogliatoi, con chi c'è dentro;
  * 3-4 pulmini; per ognuno chi sale e chi scende e dove".
  *

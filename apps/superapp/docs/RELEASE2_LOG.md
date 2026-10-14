@@ -486,7 +486,7 @@ prossimi impegni e "ci sarò" in primo piano). Desktop invariato.
 
 ## C7 — Pulmini in 2D sotto gli allenamenti · 2026-10-14
 
-Richiesta della Direzione (14/10/2026 11:00), registrata come **UD-123**: sotto gli allenamenti una pianta 2D di ogni pulmino come campi e spogliatoi, con chi c'è dentro, chi sale e chi scende e dove; contatti di genitori, dirigenti e mister riservati.
+Richiesta della Direzione (14/10/2026 11:00), registrata come **UD-130**: sotto gli allenamenti una pianta 2D di ogni pulmino come campi e spogliatoi, con chi c'è dentro, chi sale e chi scende e dove; contatti di genitori, dirigenti e mister riservati.
 
 - `src/lib/van-plan.ts` (+ `van-plan.test.tsx`, 23 test): pianta Fiat Ducato 9 posti (D autista, 1-2 davanti, 3-5 centro, 6-8 dietro); `seatsFor` usa i posti del Master Flotta, altrimenti la disposizione verificata del club **solo come "disposizione indicativa"**; posti assegnati **solo** con pulmino scritto nel Master + posto fisso (pulmino senza posto = "posto non fissato", senza pulmino = "da collocare"); giro per linea con fermate in ordine, ▲ chi sale (andata) e ▼ chi scende (ritorno), orari solo se nel Master; avvisi: oltre i posti, ragazzi senza fermata, senza pulmino, scadenze mezzi e patenti solo da date esistenti.
 - `pulmini-vans.ts` / `.functions.ts`: ogni ragazzo porta pulmino assegnato (solo da MEZZO del Master), posto fisso e fermate **solo come fermate registrate della linea**: il testo libero del Master (può essere un indirizzo) non esce mai dal server.
