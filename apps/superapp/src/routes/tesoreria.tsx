@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CalendarClock, Mail, Receipt, Wallet } from "lucide-react";
+import { CalendarClock, HandCoins, Mail, Package, Receipt, Wallet } from "lucide-react";
 
 import { CONTABILITA_PAGES } from "@/components/scd/contabilita";
 
@@ -47,6 +47,16 @@ function TesoreriaRoute() {
               <div className="px-4 pb-4 sm:px-[18px]">
                 <Link to="/tesoreria/quote" className="scd-focus inline-flex h-11 items-center gap-2 rounded-[10px] bg-[var(--in-info)] px-4 text-[15px] font-bold text-white" data-testid="tes-quote-link">
                   <Receipt className="size-4" aria-hidden="true" /> Apri quote della stagione
+                </Link>
+              </div>
+            </Card>
+            <Card id="tes-fondo" title="Fondo Solidale e donazioni" sub="Abilitazione per persona: domande riservate al Fondo, donazioni registrate con ricevuta, materiale offerto. Da attivare con r101.">
+              <div className="flex flex-wrap gap-2 px-4 pb-4 sm:px-[18px]">
+                <Link to="/tesoreria/fondo-solidale" className="scd-focus inline-flex h-11 items-center gap-2 rounded-[10px] bg-[var(--in-info)] px-4 text-[15px] font-bold text-white" data-testid="tes-fondo-link">
+                  <HandCoins className="size-4" aria-hidden="true" /> Apri Fondo Solidale
+                </Link>
+                <Link to="/tesoreria/donazioni" className="scd-focus inline-flex h-11 items-center gap-2 rounded-[10px] border border-[var(--in-line)] bg-white px-4 text-[15px] font-semibold" data-testid="tes-donazioni-link">
+                  <Package className="size-4" aria-hidden="true" /> Apri donazioni
                 </Link>
               </div>
             </Card>
