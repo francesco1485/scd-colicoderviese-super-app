@@ -100,7 +100,23 @@ export function CookieConsent() {
 
   return (
     <>
-      {banner && !prefs && (
+      {banner && !prefs && !OPTIONAL_TOOLS_ACTIVE && (
+        <div
+          role="region"
+          aria-label="Cookie e privacy"
+          data-testid="cookie-banner"
+          className="fixed inset-x-3 bottom-[calc(118px+env(safe-area-inset-bottom))] z-[70] mx-auto flex max-w-[560px] items-center gap-3 rounded-[14px] border border-[var(--uv-gold)] bg-white px-3 py-2 text-[var(--scd-ink)] shadow-[0_10px_30px_rgb(0_0_0/0.35)] lg:bottom-[62px]"
+        >
+          <p className="m-0 flex-1 text-[13.5px] leading-[1.35] text-[var(--scd-sub)]">
+            Solo cookie tecnici: nessuna statistica, nessuna pubblicità.{" "}
+            <a href="/privacy" className="font-semibold text-[var(--scd-blue)] underline">Privacy</a>
+          </p>
+          <button type="button" onClick={() => save(false, false)} className="min-h-11 shrink-0 rounded-[10px] bg-[var(--uv-night)] px-4 text-[14.5px] font-extrabold text-white" data-testid="cookie-ok">
+            Ho capito
+          </button>
+        </div>
+      )}
+      {banner && !prefs && OPTIONAL_TOOLS_ACTIVE && (
         <div
           role="dialog"
           aria-labelledby="ck-t"
