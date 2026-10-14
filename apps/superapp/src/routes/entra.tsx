@@ -7,15 +7,15 @@ import { INTERESSI_ATLETA, REQUEST_STATUS_LABEL } from "@/lib/catalog";
 import { submitRegistration } from "@/lib/club.functions";
 import type { SubmitOutcome } from "@/lib/club.types";
 import { FormsPausedNotice } from "@/components/scd/FormsPausedNotice";
-import { PUBLIC_FORMS_LIVE } from "@/lib/public-forms";
+import { JOIN_INVITE, PUBLIC_FORMS_LIVE } from "@/lib/public-forms";
 
 export const Route = createFileRoute("/entra")({
   head: () => ({
     meta: [
-      { title: "Entra nella SCD — Pre-iscrizione e prova | ColicoDerviese" },
-      { name: "description", content: "Vuoi giocare con la S.C.D. ColicoDerviese? Scegli categoria e annata, richiedi una prova o l'open day: la segreteria ti ricontatta." },
+      { title: "Entra nella SCD — Prova e iscrizione | ColicoDerviese" },
+      { name: "description", content: "Vuoi giocare con la S.C.D. ColicoDerviese? Richiedi una prova o l'open day: la segreteria ti ricontatta." },
       { property: "og:title", content: "Entra nella SCD — Vuoi giocare con noi?" },
-      { property: "og:description", content: "Pre-iscrizione atleti e famiglie della S.C.D. ColicoDerviese." },
+      { property: "og:description", content: "Prova e iscrizione per atleti e famiglie della S.C.D. ColicoDerviese." },
     ],
   }),
   component: Entra,
@@ -51,7 +51,7 @@ function Entra() {
   return (
     <main>
       <PageHero clamp={false} eyebrow="Tesseramento · Entra nella SCD" title={<>Vuoi giocare <span className="text-accent">con noi?</span></>}>
-        Dalla scuola calcio alla Prima Squadra. Compila la pre-iscrizione: nessun tesseramento automatico, la segreteria ti ricontatta.
+        Dalla scuola calcio alla Prima Squadra. {JOIN_INVITE}
       </PageHero>
 
       <section className={`${heroOverlapCls} mx-auto grid max-w-6xl gap-6 px-4 md:grid-cols-[1fr_20rem]`}>

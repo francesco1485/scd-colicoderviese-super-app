@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import { detectDistress, distressReferral } from "./cast-safety";
 import { CLUB_CONTACTS } from "./catalog";
+import { JOIN_INVITE } from "./public-forms";
 import { KIND_LABEL, areaPath, classifyRequest, requestMessage } from "./requests";
 
 type M = { casa?: string; ospite?: string; golCasa?: number; golOspite?: number; dataLabel?: string; data?: string };
@@ -99,7 +100,7 @@ export async function skyRulesAnswer(data: { message: string }): Promise<SkyRepl
           links: [{ label: "Canale Safeguarding", to: "/safeguarding" }],
         };
       case "iscrizione":
-        return { text: "Vuoi giocare con noi? Compila la pre-iscrizione: la segreteria ti ricontatta per prova o open day.", mood: "success", links: [{ label: "Entra nella SCD", to: "/entra" }] };
+        return { text: `Vuoi giocare con noi? ${JOIN_INVITE}`, mood: "success", links: [{ label: "Entra nella SCD", to: "/entra" }] };
       case "sponsor":
         return { text: "Pacchetti, asset e richiesta proposta sono nel Commercial Hub.", mood: "success", links: [{ label: "Diventa sponsor", to: "/sponsor" }] };
       case "eventi":
@@ -109,7 +110,7 @@ export async function skyRulesAnswer(data: { message: string }): Promise<SkyRepl
       case "dove":
         return { text: `Siamo a ${CLUB_CONTACTS.sede}.`, mood: "info", links: [{ label: "Parla con noi", to: "/contatti" }] };
       case "squadre":
-        return { text: "Dalla scuola calcio alla Prima Squadra: scegli categoria e annata nella pre-iscrizione.", mood: "info", links: [{ label: "Categorie", to: "/entra" }] };
+        return { text: "Dalla scuola calcio alla Prima Squadra: categorie e annate sono nella pagina Entra nella SCD.", mood: "info", links: [{ label: "Categorie", to: "/entra" }] };
       case "contatti":
         return { text: "Scegli la categoria giusta e apri un ticket: arriva alla persona corretta.", mood: "info", links: [{ label: "Centro contatti", to: "/contatti" }] };
       default:

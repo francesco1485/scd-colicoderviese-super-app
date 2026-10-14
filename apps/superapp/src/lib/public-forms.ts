@@ -37,6 +37,14 @@ export function mailtoFor(kind: FormKind, extra: { topic?: string | undefined; b
   return `mailto:${to}?subject=${encodeURIComponent(subject)}${body}`;
 }
 
+/**
+ * How a prospective athlete joins, in one sentence, consistent with whether the online pre-registration is live
+ * (Direzione 14/10: /entra must not promise a form that is switched off).
+ */
+export const JOIN_INVITE = PUBLIC_FORMS_LIVE
+  ? "Compila la pre-iscrizione: nessun tesseramento automatico, la segreteria ti ricontatta per una prova o l'open day."
+  : `Scrivi alla segreteria (${CLUB_PROFILE.contacts.email}) con nome, anno di nascita e un recapito: ti ricontattiamo per una prova o l'open day.`;
+
 export const PAUSED_OUTCOME = {
   ok: false as const,
   delivered: false as const,

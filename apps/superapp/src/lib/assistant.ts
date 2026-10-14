@@ -20,6 +20,7 @@ import {
   type ChatAreaId,
 } from "./cast-personas";
 import type { KbItem } from "./knowledge";
+import { JOIN_INVITE } from "./public-forms";
 import type { PublicEvent, PublicGroup } from "./public-snapshots";
 import type { SkyReply } from "./sky.functions";
 
@@ -341,7 +342,7 @@ export function buildPublicContext(input: PublicContextInput, maxTokens = PUBLIC
   b.line("Tutti gli eventi: [link: /eventi]", "/eventi");
 
   b.section("Iscrizioni");
-  b.line("Per giocare con noi: pre-iscrizione online, la segreteria ricontatta per prova o open day [link: /entra]. Nessun costo o data di iscrizione è pubblicato in chat.", "/entra");
+  b.line(`Per giocare con noi: ${JOIN_INVITE} [link: /entra]. Nessun costo o data di iscrizione è pubblicato in chat.`, "/entra");
   b.line(`Percorsi: ${input.registration.interests.join("; ")}.`);
   b.line(`Affiliazioni: ${input.registration.affiliations.map((a) => `${a.nome} (${a.descrizione})`).join(", ")}.`);
 
