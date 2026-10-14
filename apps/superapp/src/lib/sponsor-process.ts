@@ -25,7 +25,7 @@ export interface SponsorFaq {
 }
 
 /** Spot standard as written on the page: "20 secondi, 1920x164". */
-export const SPOT_STANDARD_TEXT = `${LED_MASTER.seconds} secondi, ${LED_MASTER.width}x${LED_MASTER.height}`;
+export const SPOT_STANDARD_TEXT = `${LED_MASTER.seconds}\u00a0secondi, ${LED_MASTER.width}x${LED_MASTER.height}`;
 
 export const SPONSOR_PROCESS_STEPS: readonly ProcessStep[] = [
   {

@@ -25,8 +25,8 @@ describe("sponsor process steps", () => {
   });
 
   it("states the LED standard from sponsor-spots (20 secondi, 1920x164) only in the spot step", () => {
-    expect(SPOT_STANDARD_TEXT).toBe(`${LED_MASTER.seconds} secondi, ${LED_MASTER.width}x${LED_MASTER.height}`);
-    expect(SPOT_STANDARD_TEXT).toBe("20 secondi, 1920x164");
+    expect(SPOT_STANDARD_TEXT).toBe(`${LED_MASTER.seconds}\u00a0secondi, ${LED_MASTER.width}x${LED_MASTER.height}`);
+    expect(SPOT_STANDARD_TEXT).toBe("20\u00a0secondi, 1920x164");
     const spot = SPONSOR_PROCESS_STEPS.find((s) => s.id === "spot");
     expect(spot?.text).toContain(SPOT_STANDARD_TEXT);
     for (const s of SPONSOR_PROCESS_STEPS) {
