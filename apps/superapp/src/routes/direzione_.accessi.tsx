@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { KeyRound, Search, ShieldCheck, UserPlus, X } from "lucide-react";
+import { KeyRound, ListChecks, Search, ShieldCheck, UserPlus, X } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { Card, Chip, type ChipTone } from "@/components/scd/interior-ui";
@@ -166,6 +166,15 @@ function AccessiPage({ initial, people, preview }: { initial: AccessAdminData; p
               <li className="flex gap-2 py-1"><ShieldCheck className="mt-0.5 size-4 flex-none text-[var(--in-info)]" aria-hidden="true" />Nessuno modifica il proprio accesso; resta sempre almeno una Direzione.</li>
               <li className="flex gap-2 py-1"><ShieldCheck className="mt-0.5 size-4 flex-none text-[var(--in-info)]" aria-hidden="true" />Mister e dirigenti vedono le squadre del loro ruolo nell'organigramma; i genitori solo i propri figli.</li>
             </ul>
+          </Card>
+          <Card id="accessi-abilitazioni" title="Abilitazioni per persona" sub="Decisione della Direzione del 14/10/2026.">
+            <div className="px-4 pb-4 text-[14.5px] leading-snug sm:px-[18px]">
+              <p className="m-0">Il ruolo diventa solo una descrizione: ogni sezione si abilita persona per persona, scegliendo <b>Vede</b>, <b>Modifica</b> o <b>Approva</b> e su cosa (tutto, sue annate, sua sede, suoi figli, solo sé).</p>
+              <p className="m-0 mt-2 flex items-start gap-2"><ListChecks className="mt-0.5 size-4 flex-none text-[var(--in-info)]" aria-hidden="true" />Apri un accesso e premi <b>Abilitazioni</b> accanto alla persona collegata.</p>
+              {data.grantsEngine !== "applied" && (
+                <p className="m-0 mt-2 rounded-xl bg-[var(--in-warn-bg)] px-3 py-2 text-[var(--in-warn)]">Da attivare: serve l'OK della Direzione per applicare r100. Fino ad allora gli accessi restano esattamente come oggi.</p>
+              )}
+            </div>
           </Card>
           <AuditCard audit={data.audit} />
           <SourcesBox id="accessi" />
@@ -344,7 +353,12 @@ function AccountDialog({ account, teams, actorRole, isSelf, onClose, onDone }: {
             {account.persons.map((p) => (
               <li key={p.id} className="flex min-h-11 items-center justify-between gap-2 border-t border-[var(--in-line)] px-3 py-1.5 text-[14.5px] first:border-t-0">
                 <span className="min-w-0 truncate"><b>{p.name}</b> <span className="text-[13px] text-[var(--in-sub)]">· {p.kind}</span></span>
-                {editable && <button type="button" disabled={busy} onClick={() => void unlink(p.id)} className="scd-focus h-9 flex-none rounded-lg px-2 text-[13.5px] font-semibold text-[#9a1d14]">Revoca</button>}
+                <span className="flex flex-none items-center gap-1">
+                  <Link to="/direzione/accessi/$personId" params={{ personId: p.id }} className="scd-focus inline-flex h-9 items-center gap-1 rounded-lg px-2 text-[13.5px] font-semibold text-[var(--in-info)]">
+                    <ListChecks className="size-4" aria-hidden="true" />Abilitazioni
+                  </Link>
+                  {editable && <button type="button" disabled={busy} onClick={() => void unlink(p.id)} className="scd-focus h-9 rounded-lg px-2 text-[13.5px] font-semibold text-[#9a1d14]">Revoca</button>}
+                </span>
               </li>
             ))}
           </ul>

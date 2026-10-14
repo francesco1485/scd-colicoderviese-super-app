@@ -92,6 +92,7 @@ import { Route as TesoreriaPrimaNotaRouteImport } from './routes/tesoreria_.prim
 import { Route as TesoreriaQuoteRouteImport } from './routes/tesoreria_.quote'
 import { Route as CrmPartnerPartnerIdRouteImport } from './routes/crm_.partner.$partnerId'
 import { Route as CrmPartnerNuovoRouteImport } from './routes/crm_.partner.nuovo'
+import { Route as DirezioneAccessiPersonIdRouteImport } from './routes/direzione_.accessi_.$personId'
 import { Route as DirezionePostaCollegaRouteImport } from './routes/direzione_.posta.collega'
 import { Route as GestionaleImpiantiIndexRouteImport } from './routes/gestionale_.impianti.index'
 import { Route as GestionaleImpiantiApprovazioniRouteImport } from './routes/gestionale_.impianti.approvazioni'
@@ -519,6 +520,12 @@ const CrmPartnerNuovoRoute = CrmPartnerNuovoRouteImport.update({
   path: '/crm/partner/nuovo',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DirezioneAccessiPersonIdRoute =
+  DirezioneAccessiPersonIdRouteImport.update({
+    id: '/direzione_/accessi_/$personId',
+    path: '/direzione/accessi/$personId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const DirezionePostaCollegaRoute = DirezionePostaCollegaRouteImport.update({
   id: '/direzione_/posta/collega',
   path: '/direzione/posta/collega',
@@ -649,6 +656,7 @@ export interface FileRoutesByFullPath {
   '/quadro/': typeof QuadroIndexRoute
   '/crm/partner/$partnerId': typeof CrmPartnerPartnerIdRoute
   '/crm/partner/nuovo': typeof CrmPartnerNuovoRoute
+  '/direzione/accessi/$personId': typeof DirezioneAccessiPersonIdRoute
   '/direzione/posta/collega': typeof DirezionePostaCollegaRoute
   '/gestionale/impianti/approvazioni': typeof GestionaleImpiantiApprovazioniRoute
   '/gestionale/impianti/colico': typeof GestionaleImpiantiColicoRoute
@@ -741,6 +749,7 @@ export interface FileRoutesByTo {
   '/quadro': typeof QuadroIndexRoute
   '/crm/partner/$partnerId': typeof CrmPartnerPartnerIdRoute
   '/crm/partner/nuovo': typeof CrmPartnerNuovoRoute
+  '/direzione/accessi/$personId': typeof DirezioneAccessiPersonIdRoute
   '/direzione/posta/collega': typeof DirezionePostaCollegaRoute
   '/gestionale/impianti/approvazioni': typeof GestionaleImpiantiApprovazioniRoute
   '/gestionale/impianti/colico': typeof GestionaleImpiantiColicoRoute
@@ -835,6 +844,7 @@ export interface FileRoutesById {
   '/quadro/': typeof QuadroIndexRoute
   '/crm_/partner/$partnerId': typeof CrmPartnerPartnerIdRoute
   '/crm_/partner/nuovo': typeof CrmPartnerNuovoRoute
+  '/direzione_/accessi_/$personId': typeof DirezioneAccessiPersonIdRoute
   '/direzione_/posta/collega': typeof DirezionePostaCollegaRoute
   '/gestionale_/impianti/approvazioni': typeof GestionaleImpiantiApprovazioniRoute
   '/gestionale_/impianti/colico': typeof GestionaleImpiantiColicoRoute
@@ -930,6 +940,7 @@ export interface FileRouteTypes {
     | '/quadro/'
     | '/crm/partner/$partnerId'
     | '/crm/partner/nuovo'
+    | '/direzione/accessi/$personId'
     | '/direzione/posta/collega'
     | '/gestionale/impianti/approvazioni'
     | '/gestionale/impianti/colico'
@@ -1022,6 +1033,7 @@ export interface FileRouteTypes {
     | '/quadro'
     | '/crm/partner/$partnerId'
     | '/crm/partner/nuovo'
+    | '/direzione/accessi/$personId'
     | '/direzione/posta/collega'
     | '/gestionale/impianti/approvazioni'
     | '/gestionale/impianti/colico'
@@ -1115,6 +1127,7 @@ export interface FileRouteTypes {
     | '/quadro/'
     | '/crm_/partner/$partnerId'
     | '/crm_/partner/nuovo'
+    | '/direzione_/accessi_/$personId'
     | '/direzione_/posta/collega'
     | '/gestionale_/impianti/approvazioni'
     | '/gestionale_/impianti/colico'
@@ -1209,6 +1222,7 @@ export interface RootRouteChildren {
   QuadroIndexRoute: typeof QuadroIndexRoute
   CrmPartnerPartnerIdRoute: typeof CrmPartnerPartnerIdRoute
   CrmPartnerNuovoRoute: typeof CrmPartnerNuovoRoute
+  DirezioneAccessiPersonIdRoute: typeof DirezioneAccessiPersonIdRoute
   DirezionePostaCollegaRoute: typeof DirezionePostaCollegaRoute
   GestionaleDistintaEventIdSpettatoriRoute: typeof GestionaleDistintaEventIdSpettatoriRoute
 }
@@ -1796,6 +1810,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CrmPartnerNuovoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/direzione_/accessi_/$personId': {
+      id: '/direzione_/accessi_/$personId'
+      path: '/direzione/accessi/$personId'
+      fullPath: '/direzione/accessi/$personId'
+      preLoaderRoute: typeof DirezioneAccessiPersonIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/direzione_/posta/collega': {
       id: '/direzione_/posta/collega'
       path: '/direzione/posta/collega'
@@ -1960,6 +1981,7 @@ const rootRouteChildren: RootRouteChildren = {
   QuadroIndexRoute: QuadroIndexRoute,
   CrmPartnerPartnerIdRoute: CrmPartnerPartnerIdRoute,
   CrmPartnerNuovoRoute: CrmPartnerNuovoRoute,
+  DirezioneAccessiPersonIdRoute: DirezioneAccessiPersonIdRoute,
   DirezionePostaCollegaRoute: DirezionePostaCollegaRoute,
   GestionaleDistintaEventIdSpettatoriRoute:
     GestionaleDistintaEventIdSpettatoriRoute,

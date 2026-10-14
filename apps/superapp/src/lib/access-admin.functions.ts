@@ -9,6 +9,7 @@ import { workAreaView, type WorkAreaGate } from "./access";
 import { auditSummary, isDbRoleValue, type Account } from "./access-admin";
 import { sessionView } from "./auth.functions";
 import { stagingPreviewEnabled } from "./impianti-access";
+import { grantsEngineState, type GrantsClient, type GrantsEngine } from "./person-grants.server";
 import { DB_ROLES, type DbRole } from "./session";
 import { serverSupabase } from "./supabase.server";
 
@@ -32,6 +33,8 @@ export interface AccessAdminData {
   accounts: Account[];
   audit: AuditEntry[];
   teams: Array<{ code: string; name: string; status: string }>;
+  /** Per-person section grants (r100): "applied" only once the Direzione has had the migration applied. */
+  grantsEngine: GrantsEngine;
 }
 
 async function context() {
@@ -49,19 +52,21 @@ type AuditRow = { id: number; created_at: string; action: string; actor_email: s
 
 export const getAccessAdmin = createServerFn({ method: "GET" }).handler(async (): Promise<AccessAdminData> => {
   const { gate, org, actorRole, actorEmail, sb } = await context();
-  const base: AccessAdminData = { gate, connected: false, actorRole, actorEmail, accounts: [], audit: [], teams: [] };
+  const base: AccessAdminData = { gate, connected: false, actorRole, actorEmail, accounts: [], audit: [], teams: [], grantsEngine: "unknown" };
   if (gate.view !== "page" || !sb || !org) return base;
-  const [acc, aud, accTeams, teams] = await Promise.all([
+  const [acc, aud, accTeams, teams, grantsEngine] = await Promise.all([
     sb.rpc("scd_admin_accounts", { p_organization_id: org.organizationId }),
     sb.rpc("scd_admin_audit", { p_organization_id: org.organizationId, p_limit: 60 }),
     sb.rpc("scd_admin_account_teams", { p_organization_id: org.organizationId }),
     sb.from("scd_teams").select("code,name,status").eq("organization_id", org.organizationId).order("code"),
+    grantsEngineState(sb as unknown as GrantsClient),
   ]);
-  if (acc.error) return base;
+  if (acc.error) return { ...base, grantsEngine };
   const teamsOf = new Map(((accTeams.data ?? []) as Array<{ user_id: string; teams: string[] | null }>).map((r) => [r.user_id, r.teams ?? []]));
   return {
     ...base,
     connected: true,
+    grantsEngine,
     accounts: ((acc.data ?? []) as AccountRow[]).map((r) => ({
       userId: r.user_id,
       email: r.email,

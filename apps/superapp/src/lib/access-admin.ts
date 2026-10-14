@@ -2,6 +2,7 @@
  * Personalised access (r65). Pure rules and labels for /direzione/accessi. The database enforces the same
  * rules (scd_access_admin_guard); here they only shape the screen (what is offered, what is greyed out).
  */
+import { GRANT_AUDIT_LABEL, grantAuditSummary } from "./person-grants";
 import { DB_ROLES, KNOWN_POSITIONS, type DbRole } from "./session";
 
 export const OFFICE_ROLES: readonly DbRole[] = [
@@ -284,6 +285,7 @@ export const AUDIT_LABEL: Readonly<Record<string, string>> = {
   REVOKE_LINK: "Collegamento revocato",
   APPROVE_REQUEST: "Richiesta autorizzata",
   REJECT_REQUEST: "Richiesta rifiutata",
+  ...GRANT_AUDIT_LABEL,
 };
 
 /** One-line Italian summary of an audit entry's detail. */
@@ -299,6 +301,7 @@ export function auditSummary(
           .map(positionLabel)
           .join(", ")
       : "";
+  if (action in GRANT_AUDIT_LABEL) return grantAuditSummary(action, detail);
   if (action === "SET_ACCESS") {
     const b = (detail["before"] ?? {}) as Record<string, unknown>;
     const a = (detail["after"] ?? {}) as Record<string, unknown>;
