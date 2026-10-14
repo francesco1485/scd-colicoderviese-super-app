@@ -3,9 +3,11 @@ import { Building2, HeartHandshake, Lightbulb, Package, ShieldCheck } from "luci
 import { useState } from "react";
 
 import { CampaignCard, ItemCard, NotActiveNote, PledgeDialog, btnLine, btnSun } from "@/components/giving/public";
+import { ShareButton } from "@/components/scd/ShareButton";
 import { PageHero, heroOverlapCls } from "@/components/ui-kit";
 import { CATEGORY_LABEL, ITEM_CATEGORIES, ITEM_STATUS_LABEL, PROPOSAL_AREA_LABEL, PROPOSAL_STATUS_LABEL, type PublicItem } from "@/lib/giving";
 import { getGivingPublic } from "@/lib/giving.functions";
+import { SHARE_PAGES, pageMeta } from "@/lib/share";
 
 /**
  * Sostieni il club (UD-113, SCD ONE): Fondo Solidale, "Adotta un oggetto", campaigns palestra / infermeria (goods),
@@ -14,14 +16,7 @@ import { getGivingPublic } from "@/lib/giving.functions";
  */
 export const Route = createFileRoute("/sostieni/")({
   loader: () => getGivingPublic(),
-  head: () => ({
-    meta: [
-      { title: "Sostieni il club — S.C.D. ColicoDerviese" },
-      { name: "description", content: "Adotta un oggetto di cui il club ha bisogno, dona materiale per la nuova palestra e la nuova infermeria, sostieni il Fondo Solidale o proponi un miglioramento." },
-      { property: "og:title", content: "Sostieni la S.C.D. ColicoDerviese" },
-      { property: "og:description", content: "Adotta un oggetto, dona materiale, sostieni il Fondo Solidale, proponi un miglioramento." },
-    ],
-  }),
+  head: () => ({ meta: pageMeta(SHARE_PAGES.sostieni) }),
   component: SostieniPage,
 });
 
@@ -38,7 +33,7 @@ function SostieniPage() {
   const items = data?.items ?? [];
   return (
     <main>
-      <PageHero eyebrow="Sostieni il club" title={<>Aiutaci a <span className="text-accent">crescere</span>, come puoi.</>} clamp={false}>
+      <PageHero eyebrow="Sostieni il club" title={<>Aiutaci a <span className="text-accent">crescere</span>, come puoi.</>} clamp={false} action={<ShareButton page={SHARE_PAGES.sostieni} />}>
         Cose di cui la S.C.D. ColicoDerviese ha bisogno, materiale da donare, il Fondo Solidale e le tue proposte. L'app non incassa nulla: i versamenti passano dalla Tesoreria.
       </PageHero>
 

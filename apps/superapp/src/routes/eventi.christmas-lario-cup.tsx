@@ -1,7 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Calendar, MapPin, Share2 } from "lucide-react";
+import { Calendar, MapPin } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { KitTexture } from "@/components/scd/kit-texture";
+import { ShareButton } from "@/components/scd/ShareButton";
+import { SHARE_PAGES, pageMeta } from "@/lib/share";
 
 import {
   CHRISTMAS_LARIO_CUP as E,
@@ -13,30 +15,7 @@ import {
 
 export const Route = createFileRoute("/eventi/christmas-lario-cup")({
   loader: () => ({ serverNow: Date.now() }),
-  head: () => ({
-    meta: [
-      { title: "Christmas Lario Cup 2026 — 8 dicembre, Colico e Dervio" },
-      {
-        name: "description",
-        content:
-          "1ª edizione della Christmas Lario Cup: torneo giovanile maschile (annate 2015 e 2016) a Colico e Female Edition (Esordienti 9v9) a Dervio, martedì 8 dicembre 2026. Iscrizioni aperte.",
-      },
-      {
-        property: "og:title",
-        content: "Christmas Lario Cup 2026 — Colico e Dervio",
-      },
-      {
-        property: "og:description",
-        content:
-          "Il calcio che unisce, anche a Natale. 8 dicembre 2026 sul Lago di Como.",
-      },
-      { property: "og:type", content: "website" },
-      {
-        property: "og:image",
-        content: "/media/eventi/christmas-lario-cup-2026-maschile.webp",
-      },
-    ],
-  }),
+  head: () => ({ meta: pageMeta(SHARE_PAGES.christmasLarioCup) }),
   component: ChristmasLarioCup,
 });
 
@@ -132,19 +111,6 @@ function ChristmasLarioCup() {
   const red = `${cta} bg-gradient-to-b from-[#ff3b44] to-[#d8202a] text-white shadow-[0_4px_0_#a5121b,0_10px_30px_rgb(216_32_42/0.45)]`;
   const gold = `${cta} bg-gradient-to-b from-[#ffe066] to-[var(--uv-gold)] text-[var(--uv-night)] shadow-[0_4px_0_#b38f00]`;
   const ghost = `${cta} bg-white/10 text-white shadow-[inset_0_0_0_2px_rgb(255_255_255/0.4)]`;
-  const share = async () => {
-    const d = {
-      title: "Christmas Lario Cup 2026",
-      text: "8 dicembre 2026, Colico e Dervio: torneo giovanile di Natale sul Lago di Como.",
-      url: location.href,
-    };
-    try {
-      if (navigator.share) await navigator.share(d);
-      else await navigator.clipboard.writeText(`${d.text} ${d.url}`);
-    } catch {
-      /* annullato */
-    }
-  };
 
   return (
     <main
@@ -264,10 +230,7 @@ function ChristmasLarioCup() {
               <a href="#iscrizioni" className={red}>
                 Iscrivi la tua squadra
               </a>
-              <button type="button" onClick={share} className={ghost}>
-                <Share2 className="size-5" aria-hidden="true" />
-                Condividi
-              </button>
+              <ShareButton page={SHARE_PAGES.christmasLarioCup} />
             </div>
           </div>
         </div>

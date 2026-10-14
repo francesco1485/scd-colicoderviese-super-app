@@ -31,10 +31,12 @@ export const heroOverlapCls = "relative z-10 -mt-8";
  * two lines on phone. The bottom padding stays larger than the -mt-8 of `heroOverlapCls`, so overlapping cards
  * never cover the text.
  */
-export function PageHero({ eyebrow, title, children, motif = "monogram", clamp = true }: {
+export function PageHero({ eyebrow, title, children, motif = "monogram", clamp = true, action }: {
   eyebrow: string; title: ReactNode; children?: ReactNode; motif?: KitMotif;
   /** false when the subtitle carries a notice that must stay fully visible on phone too (e.g. "no payment is active"). */
   clamp?: boolean;
+  /** Optional row under the subtitle (e.g. the ShareButton of a public page). */
+  action?: ReactNode;
 }) {
   return (
     <section className="surface-deep relative isolate overflow-hidden px-4 pb-11 pt-5 sm:pb-12 sm:pt-7 lg:pb-14 lg:pt-12" data-hero="page">
@@ -43,6 +45,7 @@ export function PageHero({ eyebrow, title, children, motif = "monogram", clamp =
         <p className="eyebrow">{eyebrow}</p>
         <h1 className="mt-2 max-w-3xl text-[clamp(26px,7.6vw,34px)] font-bold leading-[1.06] [text-shadow:0_1px_8px_rgb(0_0_0/0.3)] sm:text-[40px] lg:mt-3 lg:text-6xl lg:leading-[1.02]">{title}</h1>
         {children && <div className={`mt-2 max-w-2xl text-[14px] leading-snug text-white/90 sm:mt-3 md:text-base lg:mt-4 ${clamp ? "line-clamp-2 sm:line-clamp-none" : ""}`}>{children}</div>}
+        {action && <div className="mt-4 lg:mt-5">{action}</div>}
       </div>
     </section>
   );

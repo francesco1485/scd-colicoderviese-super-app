@@ -12,9 +12,11 @@ import {
   PublicPageHeader,
 } from "@/components/home/PublicPageHeader";
 import { CastPresence } from "@/components/scd/CastPresence";
+import { ShareButton } from "@/components/scd/ShareButton";
 import { tournamentText } from "@/lib/cast-live";
 import { getActiveInitiatives } from "@/lib/initiatives.functions";
 import { romeDay } from "@/lib/public-window";
+import { SHARE_PAGES, pageMeta } from "@/lib/share";
 import {
   TOURNAMENT_STATUS_LABEL,
   upcomingTournaments,
@@ -34,17 +36,7 @@ export const Route = createFileRoute("/tornei")({
     }));
     return { today };
   },
-  head: () => ({
-    meta: [
-      { title: "Tornei — S.C.D. ColicoDerviese" },
-      {
-        name: "description",
-        content:
-          "I tornei della S.C.D. ColicoDerviese: Christmas Lario Cup maschile e Female Edition (8 dicembre 2026), Memorial José Nasazzi 2027, Memorial Sandro Guattini.",
-      },
-      { property: "og:title", content: "Tornei — S.C.D. ColicoDerviese" },
-    ],
-  }),
+  head: () => ({ meta: pageMeta(SHARE_PAGES.tornei) }),
   component: TorneiPage,
 });
 
@@ -166,6 +158,7 @@ function TorneiPage() {
         eyebrow="Eventi e tornei"
         title="I nostri"
         accent="tornei"
+        action={<ShareButton page={SHARE_PAGES.tornei} />}
       >
         Tornei giovanili maschili e femminili organizzati dalla ColicoDerviese a
         Colico e Dervio, con vivai professionistici e club del territorio.

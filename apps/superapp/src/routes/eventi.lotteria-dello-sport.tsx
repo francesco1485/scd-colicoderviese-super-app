@@ -8,6 +8,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 
 import { PublicLotteryView } from "@/components/lottery/PublicLotteryView";
+import { ShareButton } from "@/components/scd/ShareButton";
 import { PageHero, heroOverlapCls } from "@/components/ui-kit";
 import {
   BENEFICIARY_DEFAULT_PURPOSE,
@@ -16,6 +17,7 @@ import {
   type PublicLottery,
 } from "@/lib/lottery";
 import { getPublicLottery } from "@/lib/lottery.functions";
+import { SHARE_PAGES, pageMeta } from "@/lib/share";
 
 /** Staging-only structure preview: every value empty ("da definire"). */
 const STRUCTURE_PREVIEW: PublicLottery = {
@@ -47,20 +49,17 @@ export const Route = createFileRoute("/eventi/lotteria-dello-sport")({
     const title = l
       ? `${l.title || `${KIND_LABEL[l.kind]} dello sport`} — S.C.D. ColicoDerviese`
       : "Lotteria dello sport — S.C.D. ColicoDerviese";
+    // Open Graph is always present (a forwarded link shows the club crest); before publication the page stays noindex.
+    const page = l
+      ? {
+          ...SHARE_PAGES.lotteria,
+          title,
+          ogTitle: title,
+          description: `${l.beneficiary} Giornata dello sport: ${l.sportDay ? longDay(l.sportDay) : "data da definire"}.`,
+        }
+      : SHARE_PAGES.lotteria;
     return {
-      meta: [
-        { title },
-        ...(l
-          ? [
-              {
-                name: "description",
-                content: `${l.beneficiary} Giornata dello sport: ${l.sportDay ? longDay(l.sportDay) : "data da definire"}.`,
-              },
-              { property: "og:title", content: title },
-              { property: "og:type", content: "website" },
-            ]
-          : [{ name: "robots", content: "noindex" }]),
-      ],
+      meta: [...pageMeta(page), ...(l ? [] : [{ name: "robots", content: "noindex" }])],
     };
   },
   component: LotteriaPublic,
@@ -95,6 +94,7 @@ function LotteriaPublic() {
         eyebrow={`Iniziativa benefica · ${KIND_LABEL[data.kind]}`}
         title={data.title || `${KIND_LABEL[data.kind]} dello sport`}
         clamp={false}
+        action={<ShareButton page={SHARE_PAGES.lotteria} />}
       >
         {data.beneficiary}
       </PageHero>
