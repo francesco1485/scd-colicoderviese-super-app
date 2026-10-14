@@ -186,6 +186,8 @@ const EXPLICIT_HREF: Readonly<Record<string, string>> = {
   calendario: "/calendario",
   tornei: "/eventi",
   "christmas-lario-cup": "/eventi/christmas-lario-cup",
+  // UD-115: ready but not linked from the home; the page shows the initiative only once the Direzione publishes it.
+  "lotteria-dello-sport": "/eventi/lotteria-dello-sport",
   sponsor: "/sponsor",
   gestionale: "/gestionale",
   quadro: "/quadro",
@@ -245,6 +247,7 @@ export const WORK_AREA_IDS: readonly string[] = [
   "certificati",
   "posta",
   "posta-collega",
+  "lotteria",
 ];
 
 /**

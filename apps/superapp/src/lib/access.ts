@@ -26,6 +26,7 @@ const SUB_AREA_COPY: Readonly<Record<string, { label: string; icon: AreaIcon }>>
   cervellone: { label: "Cervellone", icon: "file" },
   posta: { label: "Posta del club", icon: "file" },
   "posta-collega": { label: "Collega la casella", icon: "file" },
+  lotteria: { label: "Lotteria dello sport", icon: "coin" },
 };
 
 /** Plain Italian for the role ids used in the registry. */

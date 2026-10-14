@@ -3803,6 +3803,13 @@
       "statement": "UD-112 (Direzione 14/10/2026): access must be granted per person and per section, never derived from roles. The catalogue, migration r100 and the admin page /direzione/accessi/$personId exist, but r100 is not applied and the existing work-area guards still open areas from role positions (session.ts ROLE_POSITIONS, areas.ts canSeeArea).",
       "required_fix": "Direzione approves and applies r100; Direzione grants sections person by person; then each existing guard is switched to scd_can (person-grants.server.ts sectionCheck) with tests, removing role-derived opening.",
       "safe_runtime_behavior": "Until r100 is applied the page is a simulation (no save, no copy) and nobody's access changes; pending access requests stay pending."
+    },
+    {
+      "id": "GAP-LOTTERIA-R102",
+      "severity": "MEDIUM",
+      "statement": "UD-115 (Direzione 14/10/2026): the Lotteria dello sport back office and public page exist, but migration r102 (and its prerequisite r100) are not applied: nothing can be saved or published yet.",
+      "required_fix": "Direzione approves and applies r100 then r102; Direzione decides name, dates, prices, prizes and partners; the legal checklist is verified with SUAP, Prefettura di Lecco and the commercialista before any communication.",
+      "safe_runtime_behavior": "Simulation only (local, not saved); public page 'in preparazione' and not listed; no sale or payment in app."
     }
   ],
   "development_contract": {
@@ -5333,6 +5340,22 @@
         "SAFEGUARDING_SEPARATE_HUMAN_CHANNEL"
       ],
       "rollback": "REVERT_ISOLATED_BRANCH_AND_DISABLE_PUBLIC_SKY_ENDPOINT"
+    },
+    "charity_lottery": {
+      "directive": "UD-115",
+      "decided_at": "2026-10-14",
+      "authority": "DIREZIONE_SCD",
+      "state": "STAGED_R102_NOT_APPLIED_SIMULATION_ONLY",
+      "purpose": "Short 'lotteria dello sport' (or tombola / pesca di beneficenza) ending with a day dedicated to all sports; ALL proceeds donated for works on the calcetto pitch of the parish church.",
+      "values_policy": "Name, dates, prices, prizes and partners come later from the Direzione: nothing is pre-filled or invented.",
+      "legal_frame": "D.P.R. 430/2001, checked 2026-10-14 on secondary sources; shown as a checklist to verify with SUAP / Prefettura di Lecco / commercialista, never as legal certainty. Enforced: tickets total <= 51645.69 EUR (lotteria/pesca), tombola prizes <= 12911.42 EUR, prizes goods/services only, unreturned registers void, communications >= 30 days before the draw, 10% withholding (to verify).",
+      "back_office_route": "/direzione/lotteria",
+      "public_route": "/eventi/lotteria-dello-sport",
+      "public_rule": "Ready but not linked from the home; shown (and listed in /eventi) only after the Direzione publishes it, inside its window. No online sale, payment or gambling mechanic in app; no minors' names or faces; partner logos only from the asset registry.",
+      "access": "Work area 'lotteria' (direzione, presidente, direttore-generale, tesoreria). With r100+r102: read/write = scd_can('direzione'|'tesoreria','READ'); publish and confirm winners = Direzione membership only.",
+      "migration": "supabase/migrations/20261014_r102_lotteria.sql (STAGED, NOT APPLIED; requires r100)",
+      "pure_logic": "apps/superapp/src/lib/lottery.ts",
+      "fail_closed": "Until r102 is applied the back office is a local simulation (nothing saved) and the public page answers 'in preparazione'."
     }
   },
   "research_intelligence": {

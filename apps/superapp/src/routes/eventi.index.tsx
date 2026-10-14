@@ -5,15 +5,21 @@ import { PageHero, heroOverlapCls } from "@/components/ui-kit";
 import { getPublicFeed } from "@/lib/club.functions";
 import { dayMonth, type Initiative } from "@/lib/initiatives";
 import { getActiveInitiatives } from "@/lib/initiatives.functions";
+import { KIND_LABEL, longDay, type PublicLottery } from "@/lib/lottery";
+import { getPublicLottery } from "@/lib/lottery.functions";
 
 export const Route = createFileRoute("/eventi/")({
   loader: async () => {
-    const [feed, initiatives] = await Promise.all([
+    const [feed, initiatives, lottery] = await Promise.all([
       getPublicFeed(),
       // Server-side window (Rome day): an initiative is listed only from showFrom to showUntil.
       getActiveInitiatives().catch(() => ({ today: "", items: [] as Initiative[] })),
+      // Lotteria dello sport (UD-115): listed only once the Direzione publishes it, inside its window.
+      getPublicLottery()
+        .then((r) => r.lottery)
+        .catch(() => null as PublicLottery | null),
     ]);
-    return { feed, initiatives: initiatives.items };
+    return { feed, initiatives: initiatives.items, lottery };
   },
   head: () => ({
     meta: [
@@ -35,7 +41,7 @@ export const Route = createFileRoute("/eventi/")({
 });
 
 function Eventi() {
-  const { feed, initiatives } = Route.useLoaderData();
+  const { feed, initiatives, lottery } = Route.useLoaderData();
   const eventi = feed.items.filter((i) => i.kind === "event");
   return (
     <main>
@@ -72,6 +78,7 @@ function Eventi() {
           </span>
         </Link>
       </section>
+      {lottery && <LotteryCard lottery={lottery} />}
       {initiatives.length > 0 && (
         <section
           aria-label="Iniziative"
@@ -185,5 +192,34 @@ function InitiativeCard({ item }: { item: Initiative }) {
         </span>
       </span>
     </Link>
+  );
+}
+
+function LotteryCard({ lottery }: { lottery: PublicLottery }) {
+  return (
+    <section aria-label="Iniziativa benefica" className="mx-auto max-w-6xl px-4 pb-5">
+      <Link
+        to="/eventi/lotteria-dello-sport"
+        className="group grid gap-1.5 rounded-[20px] bg-white p-5 shadow-premium"
+        data-testid="eventi-lotteria"
+      >
+        <span className="flex flex-wrap items-center gap-2">
+          <span className="rounded-full bg-[#ffd21f] px-2 py-[3px] text-[11px] font-extrabold uppercase leading-none tracking-[0.06em] text-[#0b1e3a]">
+            Iniziativa benefica
+          </span>
+          {lottery.sportDay && (
+            <span className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#5a6b85]">
+              Giornata dello sport · {longDay(lottery.sportDay)}
+            </span>
+          )}
+        </span>
+        <b className="text-[19px] leading-tight text-[#0b1e3a]">{lottery.title || `${KIND_LABEL[lottery.kind]} dello sport`}</b>
+        <span className="text-[14px] leading-snug text-[#4a5d7a]">{lottery.beneficiary}</span>
+        <span className="mt-1 inline-flex items-center gap-1 text-[14px] font-semibold text-[#1556c4]">
+          Premi, biglietti e regole
+          <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" aria-hidden="true" />
+        </span>
+      </Link>
+    </section>
   );
 }

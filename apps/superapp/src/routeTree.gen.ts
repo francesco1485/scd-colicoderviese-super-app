@@ -64,9 +64,11 @@ import { Route as DirezioneAccessiRouteImport } from './routes/direzione_.access
 import { Route as DirezioneAcquistiRouteImport } from './routes/direzione_.acquisti'
 import { Route as DirezioneCervelloneRouteImport } from './routes/direzione_.cervellone'
 import { Route as DirezioneContenutiRouteImport } from './routes/direzione_.contenuti'
+import { Route as DirezioneLotteriaRouteImport } from './routes/direzione_.lotteria'
 import { Route as EventiIndexRouteImport } from './routes/eventi.index'
 import { Route as EventiChristmasLarioCupRouteImport } from './routes/eventi.christmas-lario-cup'
 import { Route as EventiLezioniTecnicoCoordinativeRouteImport } from './routes/eventi.lezioni-tecnico-coordinative'
+import { Route as EventiLotteriaDelloSportRouteImport } from './routes/eventi.lotteria-dello-sport'
 import { Route as GestionaleIndexRouteImport } from './routes/gestionale.index'
 import { Route as GestionaleCodaRouteImport } from './routes/gestionale.coda'
 import { Route as GestionaleMappaRouteImport } from './routes/gestionale.mappa'
@@ -378,6 +380,11 @@ const DirezioneContenutiRoute = DirezioneContenutiRouteImport.update({
   path: '/direzione/contenuti',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DirezioneLotteriaRoute = DirezioneLotteriaRouteImport.update({
+  id: '/direzione_/lotteria',
+  path: '/direzione/lotteria',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EventiIndexRoute = EventiIndexRouteImport.update({
   id: '/eventi/',
   path: '/eventi/',
@@ -392,6 +399,12 @@ const EventiLezioniTecnicoCoordinativeRoute =
   EventiLezioniTecnicoCoordinativeRouteImport.update({
     id: '/eventi/lezioni-tecnico-coordinative',
     path: '/eventi/lezioni-tecnico-coordinative',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const EventiLotteriaDelloSportRoute =
+  EventiLotteriaDelloSportRouteImport.update({
+    id: '/eventi/lotteria-dello-sport',
+    path: '/eventi/lotteria-dello-sport',
     getParentRoute: () => rootRouteImport,
   } as any)
 const GestionaleIndexRoute = GestionaleIndexRouteImport.update({
@@ -624,8 +637,10 @@ export interface FileRoutesByFullPath {
   '/direzione/acquisti': typeof DirezioneAcquistiRoute
   '/direzione/cervellone': typeof DirezioneCervelloneRoute
   '/direzione/contenuti': typeof DirezioneContenutiRoute
+  '/direzione/lotteria': typeof DirezioneLotteriaRoute
   '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
   '/eventi/lezioni-tecnico-coordinative': typeof EventiLezioniTecnicoCoordinativeRoute
+  '/eventi/lotteria-dello-sport': typeof EventiLotteriaDelloSportRoute
   '/gestionale/coda': typeof GestionaleCodaRoute
   '/gestionale/mappa': typeof GestionaleMappaRoute
   '/gestionale/mister': typeof GestionaleMisterRoute
@@ -718,8 +733,10 @@ export interface FileRoutesByTo {
   '/direzione/acquisti': typeof DirezioneAcquistiRoute
   '/direzione/cervellone': typeof DirezioneCervelloneRoute
   '/direzione/contenuti': typeof DirezioneContenutiRoute
+  '/direzione/lotteria': typeof DirezioneLotteriaRoute
   '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
   '/eventi/lezioni-tecnico-coordinative': typeof EventiLezioniTecnicoCoordinativeRoute
+  '/eventi/lotteria-dello-sport': typeof EventiLotteriaDelloSportRoute
   '/gestionale/coda': typeof GestionaleCodaRoute
   '/gestionale/mappa': typeof GestionaleMappaRoute
   '/gestionale/mister': typeof GestionaleMisterRoute
@@ -812,8 +829,10 @@ export interface FileRoutesById {
   '/direzione_/acquisti': typeof DirezioneAcquistiRoute
   '/direzione_/cervellone': typeof DirezioneCervelloneRoute
   '/direzione_/contenuti': typeof DirezioneContenutiRoute
+  '/direzione_/lotteria': typeof DirezioneLotteriaRoute
   '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
   '/eventi/lezioni-tecnico-coordinative': typeof EventiLezioniTecnicoCoordinativeRoute
+  '/eventi/lotteria-dello-sport': typeof EventiLotteriaDelloSportRoute
   '/gestionale/coda': typeof GestionaleCodaRoute
   '/gestionale/mappa': typeof GestionaleMappaRoute
   '/gestionale/mister': typeof GestionaleMisterRoute
@@ -908,8 +927,10 @@ export interface FileRouteTypes {
     | '/direzione/acquisti'
     | '/direzione/cervellone'
     | '/direzione/contenuti'
+    | '/direzione/lotteria'
     | '/eventi/christmas-lario-cup'
     | '/eventi/lezioni-tecnico-coordinative'
+    | '/eventi/lotteria-dello-sport'
     | '/gestionale/coda'
     | '/gestionale/mappa'
     | '/gestionale/mister'
@@ -1002,8 +1023,10 @@ export interface FileRouteTypes {
     | '/direzione/acquisti'
     | '/direzione/cervellone'
     | '/direzione/contenuti'
+    | '/direzione/lotteria'
     | '/eventi/christmas-lario-cup'
     | '/eventi/lezioni-tecnico-coordinative'
+    | '/eventi/lotteria-dello-sport'
     | '/gestionale/coda'
     | '/gestionale/mappa'
     | '/gestionale/mister'
@@ -1095,8 +1118,10 @@ export interface FileRouteTypes {
     | '/direzione_/acquisti'
     | '/direzione_/cervellone'
     | '/direzione_/contenuti'
+    | '/direzione_/lotteria'
     | '/eventi/christmas-lario-cup'
     | '/eventi/lezioni-tecnico-coordinative'
+    | '/eventi/lotteria-dello-sport'
     | '/gestionale/coda'
     | '/gestionale/mappa'
     | '/gestionale/mister'
@@ -1190,8 +1215,10 @@ export interface RootRouteChildren {
   DirezioneAcquistiRoute: typeof DirezioneAcquistiRoute
   DirezioneCervelloneRoute: typeof DirezioneCervelloneRoute
   DirezioneContenutiRoute: typeof DirezioneContenutiRoute
+  DirezioneLotteriaRoute: typeof DirezioneLotteriaRoute
   EventiChristmasLarioCupRoute: typeof EventiChristmasLarioCupRoute
   EventiLezioniTecnicoCoordinativeRoute: typeof EventiLezioniTecnicoCoordinativeRoute
+  EventiLotteriaDelloSportRoute: typeof EventiLotteriaDelloSportRoute
   GestionaleCodaRoute: typeof GestionaleCodaRoute
   GestionaleMappaRoute: typeof GestionaleMappaRoute
   GestionaleMisterRoute: typeof GestionaleMisterRoute
@@ -1614,6 +1641,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DirezioneContenutiRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/direzione_/lotteria': {
+      id: '/direzione_/lotteria'
+      path: '/direzione/lotteria'
+      fullPath: '/direzione/lotteria'
+      preLoaderRoute: typeof DirezioneLotteriaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/eventi/': {
       id: '/eventi/'
       path: '/eventi'
@@ -1633,6 +1667,13 @@ declare module '@tanstack/react-router' {
       path: '/eventi/lezioni-tecnico-coordinative'
       fullPath: '/eventi/lezioni-tecnico-coordinative'
       preLoaderRoute: typeof EventiLezioniTecnicoCoordinativeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/eventi/lotteria-dello-sport': {
+      id: '/eventi/lotteria-dello-sport'
+      path: '/eventi/lotteria-dello-sport'
+      fullPath: '/eventi/lotteria-dello-sport'
+      preLoaderRoute: typeof EventiLotteriaDelloSportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/gestionale/': {
@@ -1949,8 +1990,10 @@ const rootRouteChildren: RootRouteChildren = {
   DirezioneAcquistiRoute: DirezioneAcquistiRoute,
   DirezioneCervelloneRoute: DirezioneCervelloneRoute,
   DirezioneContenutiRoute: DirezioneContenutiRoute,
+  DirezioneLotteriaRoute: DirezioneLotteriaRoute,
   EventiChristmasLarioCupRoute: EventiChristmasLarioCupRoute,
   EventiLezioniTecnicoCoordinativeRoute: EventiLezioniTecnicoCoordinativeRoute,
+  EventiLotteriaDelloSportRoute: EventiLotteriaDelloSportRoute,
   GestionaleCodaRoute: GestionaleCodaRoute,
   GestionaleMappaRoute: GestionaleMappaRoute,
   GestionaleMisterRoute: GestionaleMisterRoute,

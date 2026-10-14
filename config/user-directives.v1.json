@@ -2795,6 +2795,40 @@
         "implementationStatus": "IMPLEMENTED_STAGING_MIGRATION_NOT_APPLIED",
         "duplicate_work": "DENY"
       }
+    },
+    {
+      "sourceDate": "2026-10-14",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-115",
+      "name": "CHARITY_LOTTERY_FOR_PARISH_CALCETTO_PITCH",
+      "sourceQuoteFragments": [
+        "prossima iniziativa: una breve \"lotteria dello sport\" (o simile) che si conclude con una giornata dedicata a tutti gli sport",
+        "tutto il ricavato devoluto per i lavori sul campo di calcetto alla chiesa patronale",
+        "dettagli (nome, date, prezzi, premi, partner) arriveranno dopo: costruire ora lo strumento, senza valori inventati"
+      ],
+      "context": "Direzione decision of 14/10/2026 relayed to the build session; legal frame (D.P.R. 430/2001) verified the same day on secondary sources and shown as a checklist to verify.",
+      "normalizedCommand": {
+        "rule": "Build a back office (setup with legal cap, compliance checklist with computed deadlines, regolamento draft, prizes with forbidden-category validation and 10% withholding, ticket register and reconciliation, draw and verbale draft, manual treasury entries) and a public page for the initiative, with no invented values.",
+        "scope": "EVENTS_AND_FUNDRAISING",
+        "constraints": [
+          "no online sale, no payment, no gambling mechanics in the app",
+          "legal frame shown as checklist 'da verificare con SUAP/Prefettura/commercialista', never as legal certainty",
+          "public page not linked from home until the Direzione publishes it; winning numbers public only after Direzione confirmation",
+          "minors: no names or faces; sellers are adult staff only",
+          "partner logos only if already in the asset registry",
+          "one staged migration r102, not applied without explicit Direzione approval; simulation until then"
+        ],
+        "implementation": {
+          "migration": "supabase/migrations/20261014_r102_lotteria.sql (STAGED, NOT APPLIED)",
+          "admin_route": "/direzione/lotteria",
+          "public_route": "/eventi/lotteria-dello-sport",
+          "pure_logic": "apps/superapp/src/lib/lottery.ts",
+          "manifest": "product_direction.charity_lottery, GAP-LOTTERIA-R102"
+        },
+        "implementationStatus": "IMPLEMENTED_STAGING_MIGRATION_NOT_APPLIED",
+        "duplicate_work": "DENY"
+      }
     }
   ],
   "completionGate": {

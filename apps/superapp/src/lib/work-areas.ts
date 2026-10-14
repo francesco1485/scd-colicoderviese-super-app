@@ -34,7 +34,8 @@ export type WorkAreaId =
   | "cervellone"
   | "certificati"
   | "posta"
-  | "posta-collega";
+  | "posta-collega"
+  | "lotteria";
 
 export interface DriveMaster {
   key: string;
@@ -128,6 +129,12 @@ export const WORK_AREAS: Readonly<Record<WorkAreaId, WorkAreaConfig>> = {
     description: "Scadenze dei certificati medici di ogni atleta, squadra per squadra: chi manca, chi è scaduto, chi è da controllare. Direzione e Segreteria.",
     sources: ["supabase", "iscrizioni", "inserimenti"],
     insertRoles: ["Direzione", "Segreteria"],
+  },
+  lotteria: {
+    id: "lotteria", label: "Lotteria dello sport", path: pathOf("lotteria"), railId: "direzione",
+    description: "Iniziativa benefica per il campo di calcetto della chiesa patronale: impostazione, adempimenti, regolamento, premi, biglietti, estrazione e raccolta. Direzione e Tesoreria.",
+    sources: ["supabase", "inserimenti"],
+    insertRoles: ["Direzione", "Tesoreria"],
   },
   cervellone: {
     id: "cervellone", label: "Cervellone · catalogo e memoria", path: pathOf("cervellone"), railId: "direzione",

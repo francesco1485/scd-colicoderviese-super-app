@@ -120,3 +120,22 @@ describe.skipIf(!built)("client bundle keeps the vetrina catalogue on the server
     expect(hits).toEqual([]);
   });
 });
+
+describe.skipIf(!built)("client bundle keeps the lotteria RPCs on the server (UD-115, r102)", () => {
+  // Write RPC names live only inside server-function handlers (lottery.functions.ts).
+  const list = ["scd_lottery_save_setup", "scd_lottery_record_draw", "scd_lottery_confirm_winners", "scd_lottery_public"];
+
+  it("finds the RPC names in the server build (control)", () => {
+    const server = files(SERVER_DIR).map((f) => readFileSync(f, "utf8")).join("\n");
+    expect(list.every((p) => server.includes(p))).toBe(true);
+  });
+
+  it("finds no lotteria RPC name in .output/public", () => {
+    const hits: string[] = [];
+    for (const f of files(PUBLIC_DIR)) {
+      const src = readFileSync(f, "utf8");
+      for (const p of list) if (src.includes(p)) hits.push(`${f.slice(PUBLIC_DIR.length)}: ${p}`);
+    }
+    expect(hits).toEqual([]);
+  });
+});
