@@ -7,15 +7,25 @@ const src = (rel: string) => readFileSync(fileURLToPath(new URL(rel, import.meta
 describe("sponsor LED spots in the UI (UD-119)", () => {
   const ui = src("./SponsorSpots.tsx");
 
-  it("home block: right after the support strip, once, with the partner line, the partner link and the LED wall CTA", () => {
+  it("home block (UD-132): once, compact, beside the Matchday week and before the results; the partner line, the partner link and the LED wall CTA", () => {
     const home = src("./home/PublicHome.tsx");
     const body = home.slice(home.indexOf("export function PublicHome"));
     expect(body.match(/<SponsorSpotsHome /g)).toHaveLength(1);
-    const strip = body.indexOf("<SupportStrip");
+    expect(body).toMatch(/<SponsorSpotsHome day=\{ledDay\} compact \/>/);
+    const week = body.indexOf("<HomeMatchday");
     const spots = body.indexOf("<SponsorSpotsHome");
-    expect(strip).toBeGreaterThan(-1);
-    expect(spots).toBeGreaterThan(strip);
-    expect(body.indexOf("<QuickActions")).toBeGreaterThan(spots);
+    expect(week).toBeGreaterThan(-1);
+    expect(spots).toBeGreaterThan(week);
+    expect(body.indexOf("<WeekendResults")).toBeGreaterThan(spots);
+    expect(body).not.toMatch(/<SupportStrip|<QuickActions/);
+    // Compact variant: same clock, the on-air label, the partner name and "Diventa partner".
+    const compact = ui.slice(ui.indexOf("if (compact)"), ui.indexOf("if (compact)") + 4000);
+    expect(compact).toContain("{onAirLabel}");
+    expect(ui).toContain('following ? "In onda ora sul LED wall" : "Anteprima dello spot"');
+    expect(compact).toContain('data-testid="spot-sponsor"');
+    expect(compact).toContain("Diventa partner");
+    expect(compact).toMatch(/search=\{\{ pacchetto: "ledwall" \}\}/);
+    expect(compact).toContain("<SpotStage spot={spot} play={play}");
     expect(ui).toContain("Sul LED wall");
     expect(ui).toContain("Partner della S.C.D. ColicoDerviese");
     expect(ui).toContain("Scopri il partner");

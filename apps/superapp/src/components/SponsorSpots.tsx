@@ -160,7 +160,19 @@ const ctrl =
  * muted, one after another. Only the current video loads, and only once the block is on screen; posters first.
  * Reduced motion: posters with previous/next, a video plays only when the visitor starts it.
  */
-export function SponsorSpotsHome({ day, className = "" }: { day: string; className?: string }) {
+export function SponsorSpotsHome({
+  day,
+  className = "",
+  compact = false,
+}: {
+  day: string;
+  className?: string;
+  /**
+   * Public home Matchday layout (UD-132): one 16:9 strip with "In onda ora sul LED wall", the partner name and
+   * "Diventa partner", no page gutter (the caller places it). Same clock, reduced-motion and pause rules.
+   */
+  compact?: boolean;
+}) {
   // Clock-synced with the LED wall player and the gestionale regia (lib/spot-schedule.ts). Before mount the order of
   // the server day is used, so server and first client render match.
   const { ref, visible, seen } = useOnScreen<HTMLElement>();
@@ -215,6 +227,91 @@ export function SponsorSpotsHome({ day, className = "" }: { day: string; classNa
     else setManualPlay(false);
   };
 
+  const onAirLabel = following ? "In onda ora sul LED wall" : "Anteprima dello spot";
+  const playButton = !auto && !manualPlay && (
+    <button
+      type="button"
+      onClick={() => {
+        freeze();
+        setManualPlay(true);
+      }}
+      className="scd-focus absolute bottom-3 left-3 inline-flex min-h-11 items-center gap-2 rounded-full bg-[#ffd600] py-2 pl-3 pr-4 text-[14px] font-bold text-[#0b1e3a] shadow-[0_10px_30px_-8px_rgb(2_20_51/0.6)]"
+      data-testid="spot-play"
+    >
+      <Play className="size-4" fill="currentColor" aria-hidden="true" />
+      Guarda lo spot
+    </button>
+  );
+
+  if (compact)
+    return (
+      <section ref={ref} aria-labelledby="ledspot-t" className={`min-w-0 ${className}`} data-testid="home-led-spots" data-variant="compact">
+        <div className="rounded-[18px] bg-white p-2.5 shadow-[0_1px_2px_rgb(11_42_91/0.06),0_8px_24px_-12px_rgb(11_42_91/0.25)]">
+          <div className="relative">
+            <SpotStage spot={spot} play={play} mountVideo={mountVideo} onEnded={onEnded} controls={!auto && manualPlay} priority={false} startAtMs={following ? air.elapsedMs : undefined} />
+            <span className="pointer-events-none absolute left-2.5 top-2.5 inline-flex items-center gap-1.5 rounded-full bg-[#0b2a5b]/85 px-2.5 py-1 text-[11.5px] font-bold uppercase leading-none tracking-[0.06em] text-white ring-1 ring-white/25 backdrop-blur-sm">
+              {following && <span aria-hidden="true" className="scd-live-dot size-1.5 rounded-full bg-[#ff5c5c]" />}
+              {onAirLabel}
+            </span>
+            {playButton}
+          </div>
+          <div className="flex items-center gap-2 px-1 pt-2.5">
+            <div className="grid min-w-0 flex-1 leading-tight" aria-live="off">
+              <h2 id="ledspot-t" className="m-0 text-[11.5px] font-extrabold uppercase tracking-[0.1em] text-[#1556c4]">
+                Sul LED wall · {idx + 1} di {n}
+              </h2>
+              {link.external ? (
+                <a
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="scd-focus truncate rounded text-[16px] font-bold text-[#0b1e3a] hover:underline"
+                  data-testid="spot-sponsor"
+                >
+                  {spot.sponsorName}
+                  <span className="sr-only"> (apre il sito del partner)</span>
+                </a>
+              ) : (
+                <b className="truncate text-[16px] text-[#0b1e3a]" data-testid="spot-sponsor">
+                  {spot.sponsorName}
+                </b>
+              )}
+            </div>
+            {auto ? (
+              <button
+                type="button"
+                className={ctrl}
+                onClick={() => {
+                  if (!userPaused) freeze();
+                  setUserPaused((p) => !p);
+                }}
+                aria-pressed={userPaused}
+                aria-label={userPaused ? "Riprendi gli spot" : "Metti in pausa gli spot"}
+                data-testid="spot-pause"
+              >
+                {userPaused ? <Play className="size-4" aria-hidden="true" /> : <Pause className="size-4" aria-hidden="true" />}
+              </button>
+            ) : (
+              <button type="button" className={ctrl} onClick={() => go(1)} aria-label="Spot successivo">
+                <ChevronRight className="size-5" aria-hidden="true" />
+              </button>
+            )}
+            <Link
+              to="/sponsor"
+              search={{ pacchetto: "ledwall" }}
+              className="scd-focus inline-flex min-h-11 shrink-0 items-center gap-1 rounded-[12px] bg-[#0b2a5b] px-3.5 text-[14px] font-bold text-white transition-[filter] duration-150 hover:brightness-110"
+              data-testid="spot-cta"
+            >
+              Diventa partner
+            </Link>
+          </div>
+        </div>
+        <p className="sr-only" aria-live="polite" aria-atomic="true">
+          {announce}
+        </p>
+      </section>
+    );
+
   return (
     <section ref={ref} aria-labelledby="ledspot-t" className={`mx-auto w-full max-w-[1280px] px-4 pt-6 lg:px-8 lg:pt-10 ${className}`} data-testid="home-led-spots">
       <div className="grid gap-4 rounded-[22px] bg-white p-4 shadow-[0_1px_2px_rgb(11_42_91/0.06),0_8px_24px_-12px_rgb(11_42_91/0.25)] lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-center lg:gap-6 lg:p-6">
@@ -222,22 +319,9 @@ export function SponsorSpotsHome({ day, className = "" }: { day: string; classNa
           <div className="relative">
             <SpotStage spot={spot} play={play} mountVideo={mountVideo} onEnded={onEnded} controls={!auto && manualPlay} priority={false} startAtMs={following ? air.elapsedMs : undefined} />
             <span className="pointer-events-none absolute left-2.5 top-2.5 rounded-full bg-[#0b2a5b]/85 px-2.5 py-1 text-[11.5px] font-bold uppercase leading-none tracking-[0.06em] text-white ring-1 ring-white/25 backdrop-blur-sm">
-              {following ? "In onda ora sul LED wall" : "Anteprima dello spot"}
+              {onAirLabel}
             </span>
-            {!auto && !manualPlay && (
-              <button
-                type="button"
-                onClick={() => {
-                  freeze();
-                  setManualPlay(true);
-                }}
-                className="scd-focus absolute bottom-3 left-3 inline-flex min-h-11 items-center gap-2 rounded-full bg-[#ffd600] py-2 pl-3 pr-4 text-[14px] font-bold text-[#0b1e3a] shadow-[0_10px_30px_-8px_rgb(2_20_51/0.6)]"
-                data-testid="spot-play"
-              >
-                <Play className="size-4" fill="currentColor" aria-hidden="true" />
-                Guarda lo spot
-              </button>
-            )}
+            {playButton}
           </div>
         </div>
         <div className="grid min-w-0 content-start gap-3">

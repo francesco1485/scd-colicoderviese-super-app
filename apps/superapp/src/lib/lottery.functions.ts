@@ -7,6 +7,7 @@
  * While r102 is missing every write answers "Da attivare" and nothing is written: the page works in simulation.
  * No sale, payment or gambling mechanic: proceeds are entered by hand.
  */
+import { INTERNAL_ONLY } from "./internal-initiatives";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
@@ -634,6 +635,8 @@ export interface PublicLotteryData {
 export const getPublicLottery = createServerFn({ method: "GET" }).handler(
   async (): Promise<PublicLotteryData> => {
     const today = serverRomeDay(process.env, Date.now());
+    // UD-132: the lottery stays internal; no public content, not even the staging structure preview.
+    if (INTERNAL_ONLY.lottery) return { today, lottery: null, preview: false };
     const preview = stagingPreviewEnabled(process.env, import.meta.env.PROD);
     const sb = serverSupabase();
     if (!sb) return { today, lottery: null, preview };

@@ -4759,6 +4759,7 @@
     "solidarity_fund": {
       "ud113": {
         "directive": "UD-113",
+        "internal_only": "UD-132 (14/10/2026 23:20): 'Adotta un seggiolino' is internal — no tribune seat map on /sostieni, no 'Seggiolino in tribuna' package on /sponsor, no home strip entry; lib/internal-initiatives.ts INTERNAL_ONLY.seatAdoption.",
         "state": "IMPLEMENTED_STAGING_R101_NOT_APPLIED",
         "apps": {"SCD_ONE": "/sostieni pages (public)", "SCD_CORE": "Tesoreria/Direzione back office", "SCD_GROW": "companies handed to /sponsor#proposta (existing CRM flow)"},
         "migration": "supabase/migrations/20261014_r101_fondo_adotta.sql",
@@ -5428,6 +5429,7 @@
     },
     "charity_lottery": {
       "directive": "UD-115",
+      "internal_only": "UD-132 (14/10/2026 23:20): kept internal — the public page always answers 'in preparazione' (noindex, neutral title), /eventi never lists it and the home strip never shows it, even if the Direzione publishes it from the panel; lib/internal-initiatives.ts INTERNAL_ONLY.lottery.",
       "decided_at": "2026-10-14",
       "authority": "DIREZIONE_SCD",
       "state": "STAGED_R102_NOT_APPLIED_SIMULATION_ONLY",

@@ -85,17 +85,17 @@ export const Route = createFileRoute("/")({
       const noticeP = getClubNotice({ data: { signedIn: false } }).catch(
         () => null,
       );
-      const news = await newsP;
-      // Vetrina of the day, picked on the server's Rome day (never the visitor's clock); time-limited slots
-      // (initiatives) never reach the browser before their window.
+      // The short Matchday home (UD-132) shows neither news nor vetrina: no waiting for them. getVetrina is kept only
+      // for the server Rome day (QA day honoured outside production) that seeds the LED wall; its worlds are not sent.
+      void newsP.catch(() => NO_NEWS);
       const vetrina: VetrinaDay = await getVetrina({
-        data: { pressRecent: news.pressCount > 0 },
+        data: { pressRecent: false },
       }).catch((): VetrinaDay => ({ today, worlds: EMPTY_WORLDS }));
       return {
         kind: "public" as const,
         calendar,
-        news: news.items,
-        vetrina: vetrina.worlds,
+        news: [],
+        vetrina: EMPTY_WORLDS,
         feed: await feedP,
         notice: await noticeP,
         // Server Rome day (QA day honoured only outside production): seeds the LED wall and the partner of the month.

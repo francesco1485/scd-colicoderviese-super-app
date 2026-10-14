@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { SPONSORS } from "./sponsors";
 import {
+  SEAT_PACKAGE_INTERNAL,
   FORBIDDEN_HYPE_STEMS,
   PACKAGE_STEPS,
   PARTNER_PACKAGES,
@@ -76,9 +77,9 @@ describe("PARTNER_PACKAGES", () => {
     }
   });
 
-  it("the seat package links to /sostieni and is not requestable through the form", () => {
-    const seat = packageById("seggiolino");
-    expect(seat?.link?.to).toBe("/sostieni");
+  it("the seat package is internal (UD-132): not offered on /sponsor, not requestable", () => {
+    expect(packageById("seggiolino")).toBeUndefined();
+    expect(SEAT_PACKAGE_INTERNAL.link?.to).toBe("/sostieni");
     expect(requestablePackages().map((p) => p.id)).not.toContain("seggiolino");
     expect(requestablePackages().map((p) => p.id)).toEqual(["ledwall", "maglia-kit", "tornei", "digitale-giovanili"]);
   });
