@@ -4783,22 +4783,41 @@
       "app": "SCD_ONE",
       "surface": "HOME_PUBLIC (+ MEMBER_HOME world soci)",
       "home_order": [
-        "QUICK_STRIP",
+        "URGENT_NOTICES_R20_ALERTS_IF_ANY",
+        "CLUB_NOTICE_ONE_WITH_EXPIRY_IF_ANY",
+        "OGGI_E_QUESTA_SETTIMANA",
+        "QUICK_ACTIONS_MAX_6_BY_AUDIENCE",
+        "WEEKEND_RESULTS_ONLY_WITH_REAL_SOURCE",
+        "DAILY_TIP_ERA_ACANFORA_GENNY",
         "CREDENTIAL_STRIP_ONCE",
-        "GAMES_OF_THE_WEEK",
-        "VETRINA",
+        "VETRINA_TRIMMED_NO_REPEATS",
         "NEWS_MIXED",
         "JOIN_BANNER",
-        "SPONSOR_ZONE_ONE",
-        "FOOTER_WITH_LINK_GROUPS"
+        "PARTNER_BAND_ONE",
+        "FOOTER_REDUCED"
       ],
+      "home_order_directive": "UD-116 (supersedes the UD-110 order: QUICK_STRIP, GAMES_OF_THE_WEEK and FOOTER_WITH_LINK_GROUPS are replaced)",
+      "home_practical": {
+        "directive": "UD-116",
+        "today_and_week": "signed out: matchday card + today's games of every team + next home game of each team (fixtures only); signed in: games and trainings of the person's teams (staff, scd_my_team_roster) and children's teams (families, scd_my_family; first names only), changes from master flags (is_variation, notices) highlighted, unconfirmed time/venue shown as pending; trainings from the weekly quadro (members only, server side) with the coach's notice prevailing",
+        "sources": ["calendar mirror/validated copy (getPublicCalendarSnapshot)", "Quadro allenamenti (getTrainingQuadro)", "R20 public.feed alerts and results (getPublicFeed)", "getMyFamily / getMyRoster (scoped RPC)"],
+        "scope_function": "apps/superapp/src/lib/home-scope.functions.ts getMyHomeScope (returns group ids, children first names, training entries only)",
+        "quick_actions": "apps/superapp/src/lib/home-actions.ts (visitatore / famiglia / staff, max 6, registered routes only, closest-page entries marked)",
+        "club_notice": "apps/superapp/src/lib/club-notice.ts + club-notice.server.ts (empty by default; showFrom/showUntil mandatory; Direzione only) via getClubNotice on the server Rome day",
+        "results": "apps/superapp/src/lib/home-results.ts: R20 results with both scores in the last three days, attività di base excluded; block hidden otherwise; standings = official gare.lnd.it links",
+        "daily_tip": "apps/superapp/src/lib/home-tips.ts: Era (era-nutrition-tips.ts), Dottor Acanfora (first-aid-info.ts), Genny (GENNY_TIPS) day by day, no portraits",
+        "footer": "logo, contacts (mail, PEC, address), social, Installa l'app, privacy / cookie / segnalazioni riservate / elimina account, federal credentials; the link index moved to the menu with search (apps/superapp/src/lib/site-menu.ts)",
+        "staging_preview": "/?anteprima=famiglia|staff only when stagingPreviewEnabled: no personal data, staff = every team, famiglia = empty states"
+      },
       "removed_from_home": [
         "TRUST_CAROUSEL_PERCHE_LA_COLICODERVIESE",
         "PRESS_LIST (moved to /rassegna-stampa; /rassegna redirects)",
         "SCROLLING_LOGO_BAND",
         "PARTNER_GRID_18",
         "FOOTER_PARTNER_GRID_37",
-        "TUTTO_SUL_CLUB_ACCORDIONS (moved to the footer)"
+        "TUTTO_SUL_CLUB_ACCORDIONS (moved to the footer, then to the menu by UD-116)",
+        "QUICK_STRIP_11_LINKS (UD-116: replaced by six quick actions per audience)",
+        "SPONSOR_ZONE_PARTNER_NEWS_EMPTY_STATE (UD-116: one sober partner band)"
       ],
       "engine": "apps/superapp/src/lib/vetrina.ts (pure, tested); catalogue apps/superapp/src/lib/vetrina-slots.server.ts (server only); getVetrina in vetrina.functions.ts on the server Rome day",
       "slot": "{id, kind, theme, title, text, href (registered route), hash?, search?, visual, audience public|members, audiences[], weight, pinned?, commercial?, kidFriendly?, evergreen?, weekdays? (0=Sunday), monthFrom/monthTo?, peakFrom/peakUntil?, peakMonthFrom/peakMonthTo?, showFrom/showUntil?, requires?}",

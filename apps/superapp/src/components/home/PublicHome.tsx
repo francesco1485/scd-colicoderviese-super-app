@@ -1,60 +1,33 @@
 /**
- * Signed-out public home v4 (UD-100, brief "Public home v4"), cleaned up as the club "vetrina" (UD-110, Direzione
- * 13/10/2026 18:42–18:47: nothing repeated, sponsors in colour, content that rotates and stays under control).
+ * Signed-out public home v5 (UD-116, Direzione 14/10/2026 10:59: "il footer grande con Tutto sul club non serve
+ * alle persone; le home devono mostrare ciò che conta davvero"), built on the vetrina clean-up of UD-110.
  *
- * Creative, communicative, commercial: club identity, events, news, games, partners and joining. Structure taken
- * from the Eurobet web homepage as a LAYOUT reference only (strip → credential strip → games of the week → vetrina →
- * CTA banner → one sponsor zone → footer with the link groups); no betting content of any kind.
- * Removed by UD-110: "Perché la ColicoDerviese" (duplicate of the credential strip and footer), the press list
- * (now /rassegna-stampa, only a "Dicono di noi" vetrina slot here), the scrolling logo band, the 18-logo grid, the
- * footer 37-logo grid and the "Tutto sul club" accordions (now in the footer).
- * Teams, rosters, fixtures and team calendars are not here: they live inside after sign-in.
- * Palette: navy #0b2a5b, blue #1556c4, light #eef3f9, white; yellow #ffd600 only for accents and the main CTA.
+ * Order: urgent notices (R20 alerts, only when there are) → the one club communication chosen by the Direzione (with
+ * expiry) → "Oggi e questa settimana" (matchday card, today's games, next home game of each team) → six quick
+ * actions for visitors → weekend results (only with a real source) → tip of the day (Era / Dottor Acanfora / Genny)
+ * → credentials once → vetrina (trimmed so nothing repeats) → news → join → ONE partner band → reduced footer.
+ * Teams, rosters and trainings are not here: they live inside after sign-in (UD-100).
+ * Palette: navy #0b2a5b, blue #1556c4, light #eef3f9, white; yellow #ffd600 for changes and the main CTA.
  * Real assets only (public/media); our age-group crests never appear; no minor is named.
  */
 import { Link } from "@tanstack/react-router";
-import {
-  ArrowRight,
-  ArrowUpRight,
-  BadgeCheck,
-  Building2,
-  CalendarDays,
-  ChevronRight,
-  ClipboardList,
-  Gamepad2,
-  GraduationCap,
-  Handshake,
-  HeartHandshake,
-  Lock,
-  MapPin,
-  Megaphone,
-  Newspaper,
-  Phone,
-  Shield,
-  Smartphone,
-  Star,
-  Ticket,
-  Trophy,
-  Video,
-  type LucideIcon,
-} from "lucide-react";
+import { ArrowRight, ArrowUpRight, ChevronRight, Lock, Newspaper } from "lucide-react";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { LedwallRotator } from "@/components/LedwallRotator";
 import { ClubCrestOfficial } from "@/components/SiteChrome";
 import { KitTexture } from "@/components/scd/kit-texture";
 import { ClubCredentials, LogoTile, SponsorLogo } from "@/components/scd/Logos";
+import type { ClubNotice } from "@/lib/club-notice";
+import type { PublicFeed } from "@/lib/club.types";
+import { quickActions } from "@/lib/home-actions";
+import { weekendResults } from "@/lib/home-results";
+import { nextHomeMatchPerTeam, urgentNotices, weekMatches } from "@/lib/home-today";
+import { dailyTip } from "@/lib/home-tips";
 import { NEWS_SOURCE_LABEL, type NewsItem } from "@/lib/news-mix";
 import { partnerNewsOn } from "@/lib/partner-news";
 import { timeAgo } from "@/lib/social";
-import {
-  QUICK_LINKS,
-  kickoffClock,
-  matchdayLabel,
-  partnerOfTheMonth,
-  type PublicIcon,
-  type PublicLink,
-} from "@/lib/public-home";
+import { kickoffClock, matchdayLabel, partnerOfTheMonth, trimVetrina, vetrinaRepeats } from "@/lib/public-home";
 import { SPONSORS, sponsorLabel } from "@/lib/sponsors";
 import {
   EMPTY_WORLDS,
@@ -68,123 +41,36 @@ import {
 } from "@/lib/vetrina";
 
 import { sides } from "./match-sides";
-import { WeekGames, venueShort } from "@/components/home/HomeSections";
+import { ClubNoticeCard, DailyTipCard, PublicToday, QuickActions, UrgentNotices, WeekendResults } from "@/components/home/HomePractical";
+import { venueShort } from "@/components/home/HomeSections";
 import { venueCase } from "@/lib/board-data";
 import { OpponentCrest } from "@/lib/crests";
 import { publicTeamCrest } from "@/lib/team-crest";
 import { addDays } from "@/lib/board-data";
 import type { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
-import { calendarToWeekItems, type WeekItem } from "@/lib/home-week";
+import { calendarToWeekItems, romeParts, type WeekItem } from "@/lib/home-week";
 import { hasHomeMatch, showLedwallOnHome } from "@/lib/ledwall-rotation";
 import { itemState, orderTeams, startMs, type Team } from "@/lib/universe";
 
 type PublicCalendar = Awaited<ReturnType<typeof getPublicCalendarSnapshot>>;
 
-const ICONS: Readonly<Record<PublicIcon, LucideIcon>> = {
-  trophy: Trophy,
-  handshake: Handshake,
-  clipboard: ClipboardList,
-  newspaper: Newspaper,
-  video: Video,
-  gamepad: Gamepad2,
-  star: Star,
-  ticket: Ticket,
-  calendar: CalendarDays,
-  phone: Phone,
-  shield: Shield,
-  badge: BadgeCheck,
-  map: MapPin,
-  heart: HeartHandshake,
-  whistle: GraduationCap,
-  smartphone: Smartphone,
-  building: Building2,
-};
-
 const WRAP = "mx-auto w-full max-w-[1280px] px-4 lg:px-8";
-
-/** Internal link from the content model (route + optional search/hash). */
-function To({
-  link,
-  className,
-  children,
-  ...rest
-}: {
-  link: PublicLink;
-  className?: string;
-  children: ReactNode;
-} & Record<string, unknown>) {
-  return (
-    <Link
-      to={link.to as never}
-      search={link.search as never}
-      {...(link.hash ? { hash: link.hash } : {})}
-      className={className}
-      {...rest}
-    >
-      {children}
-    </Link>
-  );
-}
-
-/* --------------------------------------------------------- quick strip */
-
-function QuickStrip() {
-  return (
-    <nav
-      aria-label="In evidenza"
-      className="border-b border-[#dbe5f1] bg-white"
-      data-testid="quick-strip"
-    >
-      <ul
-        className={`${WRAP} m-0 flex list-none gap-1 overflow-x-auto py-1 lg:py-2 [mask-image:linear-gradient(90deg,#000_82%,transparent)] [scrollbar-width:none] lg:justify-between lg:[mask-image:none] lg:gap-0 lg:overflow-visible [&::-webkit-scrollbar]:hidden`}
-      >
-        {QUICK_LINKS.map((q) => {
-          const Icon = ICONS[q.icon];
-          return (
-            <li key={q.label} className="shrink-0 lg:flex-1">
-              <To
-                link={q}
-                className="scd-focus group relative flex h-[54px] min-w-[84px] lg:h-[62px] flex-col items-center justify-center gap-1 rounded-[12px] px-2 text-center text-[#0b2a5b] transition-colors duration-150 hover:bg-[#eef3f9]"
-              >
-                <Icon
-                  className="size-[22px] text-[#1556c4]"
-                  strokeWidth={1.8}
-                  aria-hidden="true"
-                />
-                <span className="whitespace-nowrap text-[12.5px] font-semibold leading-none">
-                  {q.label}
-                </span>
-                {q.badge && (
-                  <span
-                    className={`absolute right-1.5 top-1 rounded-full px-1.5 py-[2px] text-[9.5px] font-extrabold uppercase leading-none tracking-[0.06em] ${q.badge === "nuovo" ? "bg-[#ffd600] text-[#0b1e3a]" : "bg-[#1556c4] text-white"}`}
-                  >
-                    {q.badge === "nuovo" ? "Nuovo" : "Top"}
-                  </span>
-                )}
-              </To>
-            </li>
-          );
-        })}
-      </ul>
-    </nav>
-  );
-}
 
 /* ------------------------------------------------- credential bar */
 
 /**
  * The club's credentials high on the home (Direzione 13/10/2026 15:31 and 15:55): three distinct labelled items in
  * order of importance (Club Giovanile di 3° livello FIGC SGS, iscritta FIGC con LND Lombardia, affiliata AC
- * Monza), official marks only, slim white bar with hairline dividers under the quick strip.
+ * Monza), official marks only, slim white card below the practical blocks (UD-116).
  */
 function CredentialBar() {
   return (
     <section
       aria-label="Riconoscimenti e affiliazioni del club"
-      className="border-b border-[#dbe5f1] bg-white"
+      className={`${WRAP} pt-6 lg:pt-10`}
       data-testid="affiliation-strip"
     >
-      <div className={`${WRAP} py-2 [--logo-k:1] lg:py-2.5 lg:[--logo-k:1.2]`}>
+      <div className="rounded-[16px] bg-white px-3 py-2 [--logo-k:1] lg:py-2.5 lg:[--logo-k:1.2]">
         <ClubCredentials variant="bar" className="mx-auto max-w-[1040px]" />
       </div>
     </section>
@@ -555,7 +441,7 @@ function HomeNewsBlock({ items, nowMs }: { items: readonly NewsItem[]; nowMs: nu
   );
 }
 
-/* --------------------------------------------------------- sponsor zone */
+/* --------------------------------------------------------- partner band */
 
 const monthName = (day: string) =>
   new Intl.DateTimeFormat("it-IT", { timeZone: "UTC", month: "long" }).format(
@@ -563,15 +449,15 @@ const monthName = (day: string) =>
   );
 
 /**
- * The ONE sponsor zone of the home (UD-110: "sponsor e loghi in fondo ripetuti più volte … sponsor devono essere a
- * colori"): LED wall with every partner in rotation (UD-107, every day now), the partner of the month, partner news
- * (lib/partner-news.ts, never invented: empty state invites partners) and "Diventa partner". Logos always in colour.
+ * The ONE partner band of the home (UD-116 "una sola fascia sobria", after UD-110): the LED wall with every partner
+ * in rotation (UD-107), the partner of the month, partner news only when a partner has sent one, and the two links
+ * (all partners, become a partner). Logos always in colour.
  */
-function SponsorZone({ day, nowMs, ledOnHome }: { day: string; nowMs: number; ledOnHome: boolean }) {
+function PartnerBand({ day, nowMs, ledOnHome }: { day: string; nowMs: number; ledOnHome: boolean }) {
   const showcase = partnerOfTheMonth(day);
   const news = partnerNewsOn(day);
   return (
-    <section aria-labelledby="partner-t" className={`${WRAP} pt-8 lg:pt-12`} data-testid="sponsor-zone">
+    <section aria-labelledby="partner-t" className={`${WRAP} pt-8 lg:pt-12`} data-testid="partner-band">
       <div className="flex items-end justify-between gap-3 pb-3">
         <h2
           id="partner-t"
@@ -588,18 +474,15 @@ function SponsorZone({ day, nowMs, ledOnHome }: { day: string; nowMs: number; le
           <ChevronRight className="size-4" aria-hidden="true" />
         </Link>
       </div>
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
-        <div className="flex flex-col gap-4 rounded-[16px] bg-white p-4 shadow-[0_1px_2px_rgb(11_42_91/0.06),0_8px_24px_-12px_rgb(11_42_91/0.25)] lg:p-5">
-          {ledOnHome && (
-            <div data-testid="home-ledwall">
-              <LedwallRotator day={day} nowMs={nowMs} variant="compact" />
-            </div>
-          )}
+      <div className="grid gap-4 rounded-[16px] bg-white p-4 shadow-[0_1px_2px_rgb(11_42_91/0.06),0_8px_24px_-12px_rgb(11_42_91/0.25)] lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-center lg:p-5">
+        {ledOnHome && (
+          <div data-testid="home-ledwall" className="min-w-0">
+            <LedwallRotator day={day} nowMs={nowMs} variant="compact" />
+          </div>
+        )}
+        <div className="grid content-start gap-3">
           {showcase && (
-            <div
-              className="mt-auto flex items-center gap-3.5 rounded-[12px] bg-[#eef3f9] p-3"
-              data-testid="partner-of-month"
-            >
+            <div className="flex items-center gap-3.5 rounded-[12px] bg-[#eef3f9] p-3" data-testid="partner-of-month">
               <LogoTile className="h-[60px] w-[96px] shrink-0">
                 <SponsorLogo sponsor={showcase} box={{ w: 80, h: 44 }} decorative />
               </LogoTile>
@@ -611,103 +494,35 @@ function SponsorZone({ day, nowMs, ledOnHome }: { day: string; nowMs: number; le
               </span>
             </div>
           )}
-        </div>
-        <div className="grid content-start gap-4">
-          <div
-            className="rounded-[16px] bg-white p-4 shadow-[0_1px_2px_rgb(11_42_91/0.06),0_8px_24px_-12px_rgb(11_42_91/0.25)] lg:p-5"
-            data-testid="partner-news"
+          {news.length > 0 && (
+            <ul className="m-0 grid list-none gap-0 divide-y divide-[#e6edf6] p-0" data-testid="partner-news">
+              {news.slice(0, 2).map((n) => (
+                <li key={n.id} className="py-2">
+                  {n.url ? (
+                    <a href={n.url} target="_blank" rel="noopener noreferrer" className="scd-focus grid gap-0.5 hover:underline">
+                      <span className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#5a6b85]">{n.label}</span>
+                      <b className="text-[15px] leading-snug text-[#0b1e3a]">{n.title}</b>
+                      <span className="sr-only">(apre il sito del partner)</span>
+                    </a>
+                  ) : (
+                    <span className="grid gap-0.5">
+                      <span className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#5a6b85]">{n.label}</span>
+                      <b className="text-[15px] leading-snug text-[#0b1e3a]">{n.title}</b>
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+          <Link
+            to="/sponsor"
+            hash="proposta"
+            className="scd-focus inline-flex h-12 w-fit items-center gap-2 rounded-[12px] bg-[#0b2a5b] px-5 text-[15px] font-bold text-white transition-[filter] duration-150 hover:brightness-110"
+            data-testid="home-ledwall-cta"
           >
-            <h3 className="m-0 text-[12px] font-bold uppercase tracking-[0.1em] text-[#1556c4]">
-              Notizie dai partner
-            </h3>
-            {news.length > 0 ? (
-              <ul className="m-0 mt-2 grid list-none gap-0 divide-y divide-[#e6edf6] p-0">
-                {news.map((n) => {
-                  const body = (
-                    <>
-                      <LogoTile className="h-[44px] w-[64px] shrink-0">
-                        <SponsorLogo sponsor={n.sponsor} box={{ w: 54, h: 30 }} decorative />
-                      </LogoTile>
-                      <span className="grid min-w-0 gap-0.5">
-                        <span className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#5a6b85]">
-                          {n.label}
-                        </span>
-                        <b className="text-[15px] leading-snug text-[#0b1e3a]">{n.title}</b>
-                        <span className="text-[13.5px] leading-snug text-[#4a5d7a]">{n.text}</span>
-                      </span>
-                    </>
-                  );
-                  return (
-                    <li key={n.id}>
-                      {n.url ? (
-                        <a
-                          href={n.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="scd-focus flex items-start gap-3 py-3 hover:bg-[#f4f7fb]"
-                        >
-                          {body}
-                          <span className="sr-only">(apre il sito del partner)</span>
-                        </a>
-                      ) : (
-                        <div className="flex items-start gap-3 py-3">{body}</div>
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
-            ) : (
-              <div className="mt-2 flex items-start gap-3" data-testid="partner-news-empty">
-                <span className="grid size-10 shrink-0 place-items-center rounded-[10px] bg-[#e6eefa] text-[#1556c4]">
-                  <Megaphone className="size-5" aria-hidden="true" />
-                </span>
-                <span className="grid min-w-0 gap-1">
-                  <b className="text-[15.5px] leading-tight text-[#0b1e3a]">Raccontaci la tua novità</b>
-                  <span className="text-[14px] leading-snug text-[#4a5d7a]">
-                    Sei un nostro partner? Un nuovo prodotto, un'apertura, un'offerta per le famiglie: la pubblichiamo
-                    qui.
-                  </span>
-                  <Link
-                    to="/contatti"
-                    className="scd-focus inline-flex min-h-11 w-fit items-center gap-1 rounded-md text-[14.5px] font-bold text-[#1556c4]"
-                  >
-                    Invia la notizia
-                    <ArrowRight className="size-4" aria-hidden="true" />
-                  </Link>
-                </span>
-              </div>
-            )}
-          </div>
-          <div
-            className="relative isolate flex flex-col gap-3 overflow-hidden rounded-[16px] bg-[#0b2a5b] p-5 text-white lg:p-6"
-            data-testid="become-partner"
-          >
-            <span
-              aria-hidden="true"
-              className="absolute -right-16 -top-16 -z-10 size-56 rounded-full bg-[#1556c4]/45 blur-2xl"
-            />
-            <span className="w-fit rounded-full bg-[#ffd600] px-2.5 py-1 text-[11px] font-extrabold uppercase leading-none tracking-[0.06em] text-[#0b1e3a]">
-              Diventa partner
-            </span>
-            <h3 className="m-0 font-uv text-[28px] uppercase leading-[0.95] lg:text-[32px]">
-              Il tuo marchio sul campo
-            </h3>
-            <p className="m-0 text-[14.5px] leading-snug text-white/85">
-              LED a bordo campo, divise, tornei e app: famiglie e tifosi di Colico e Dervio, ogni settimana.
-            </p>
-            <div className="flex flex-wrap items-center gap-2.5 pt-1">
-              <Link
-                to="/sponsor"
-                hash="proposta"
-                className="scd-focus inline-flex h-12 items-center gap-2 rounded-[12px] bg-[#ffd600] px-5 text-[15.5px] font-bold text-[#0b1e3a] transition-[filter] duration-150 hover:brightness-95"
-                data-testid="home-ledwall-cta"
-              >
-                Richiedi una proposta
-                <ArrowRight className="size-[18px]" aria-hidden="true" />
-              </Link>
-            </div>
-            <p className="m-0 text-[12.5px] text-white/65">Proposte su misura, nessun pagamento online.</p>
-          </div>
+            Diventa partner
+            <ArrowRight className="size-[18px]" aria-hidden="true" />
+          </Link>
         </div>
       </div>
     </section>
@@ -930,60 +745,39 @@ function Matchday({
 
 /* ---------------------------------------------------------------- page */
 
-/** Games of the next 7 days of every team (official calendar snapshot): always on the public home. */
-function PublicWeek({
-  calendar,
-  nowMs,
-  today,
-}: {
-  calendar: PublicCalendar;
-  nowMs: number;
-  today: string;
-}) {
-  const teams = useMemo(
-    () => new Map(orderTeams(calendar.groups).map((t) => [t.id, t])),
-    [calendar.groups],
+/** Rome "HH:MM" of an instant. */
+const romeClock = (ms: number) => romeParts(new Date(ms).toISOString())?.time ?? "00:00";
+
+/**
+ * "Oggi e questa settimana" for anonymous visitors: the matchday card of the next game (or the one in play),
+ * today's games of every team and the next home game of each team. Fixtures only (teams are inside, UD-100).
+ */
+function PublicWeek({ calendar, nowMs, today }: { calendar: PublicCalendar; nowMs: number; today: string }) {
+  const teams = useMemo(() => new Map(orderTeams(calendar.groups).map((t) => [t.id, t])), [calendar.groups]);
+  const nowHHMM = romeClock(nowMs);
+  const todayGames = useMemo(() => weekMatches(calendar.events, calendar.groups, today, null, 1), [calendar, today]);
+  const nextHome = useMemo(
+    () => nextHomeMatchPerTeam(calendar.events, calendar.groups, today, nowHHMM),
+    [calendar, today, nowHHMM],
   );
   const lastDay = addDays(today, 6);
-  const items = useMemo(
-    () =>
-      calendarToWeekItems(calendar.events, calendar.groups)
-        .filter(
-          (i) =>
-            i.kind === "Gara" &&
-            i.date >= today &&
-            i.date <= lastDay &&
-            itemState(i, nowMs) !== "done",
-        )
-        .sort((a, b) =>
-          (a.date + (a.time || "99:99")).localeCompare(
-            b.date + (b.time || "99:99"),
-          ),
-        ),
-    [calendar, today, lastDay, nowMs],
-  );
-  const highlight =
-    items.find((g) => itemState(g, nowMs) === "live") ?? items[0] ?? null;
-  if (items.length === 0) return null;
+  const highlight = useMemo(() => {
+    const games = calendarToWeekItems(calendar.events, calendar.groups)
+      .filter((i) => i.date >= today && i.date <= lastDay && itemState(i, nowMs) !== "done")
+      .sort((a, b) => (a.date + (a.time || "99:99")).localeCompare(b.date + (b.time || "99:99")));
+    return games.find((g) => itemState(g, nowMs) === "live") ?? games[0] ?? null;
+  }, [calendar, today, lastDay, nowMs]);
   return (
-    <div className="mx-auto max-w-[1280px] px-4 pt-5 sm:px-6 lg:px-8">
-      <WeekGames
-        items={items}
-        teamOf={(i: WeekItem) => teams.get(i.group)}
-        highlightId={highlight?.id ?? null}
-        nowMs={nowMs}
-        lead={
-          highlight ? (
-            <Matchday
-              item={highlight}
-              team={teams.get(highlight.group)}
-              serverNow={nowMs}
-              today={today}
-            />
-          ) : undefined
-        }
-      />
-    </div>
+    <PublicToday
+      todayGames={todayGames}
+      nextHome={nextHome}
+      today={today}
+      lead={
+        highlight ? (
+          <Matchday item={highlight} team={teams.get(highlight.group)} serverNow={nowMs} today={today} />
+        ) : undefined
+      }
+    />
   );
 }
 
@@ -992,6 +786,8 @@ export function PublicHome({
   news = [],
   vetrina = EMPTY_WORLDS,
   ledwallDay,
+  feed = null,
+  notice = null,
   nowMs,
   today,
 }: {
@@ -1000,8 +796,12 @@ export function PublicHome({
   news?: readonly NewsItem[];
   /** Vetrina picks of the day for every world, from the server (getVetrina). */
   vetrina?: Readonly<Record<VetrinaWorld, readonly VetrinaSlot[]>>;
-  /** Server Rome day for the LED wall and the sponsor zone (defaults to today). */
+  /** Server Rome day for the LED wall and the partner band (defaults to today). */
   ledwallDay?: string;
+  /** R20 public feed (alerts and weekend results); null when R20 did not answer in time. */
+  feed?: PublicFeed | null;
+  /** The one club communication of the day (getClubNotice), or null. */
+  notice?: ClubNotice | null;
   nowMs: number;
   today: string;
 }) {
@@ -1009,30 +809,33 @@ export function PublicHome({
   const ledOnHome = useMemo(
     () =>
       showLedwallOnHome(ledDay, {
-        homeMatch: hasHomeMatch(
-          calendarToWeekItems(calendar.events, calendar.groups),
-          ledDay,
-        ),
+        homeMatch: hasHomeMatch(calendarToWeekItems(calendar.events, calendar.groups), ledDay),
       }),
     [calendar, ledDay],
   );
-  // UD-110 order: strip → credentials (once) → games of the week → vetrina → news → join → ONE sponsor zone → footer.
+  const actions = useMemo(() => quickActions("visitatore"), []);
+  const alerts = useMemo(() => urgentNotices(feed?.items ?? [], nowMs, false), [feed, nowMs]);
+  const results = useMemo(() => weekendResults(feed, today), [feed, today]);
+  const tip = useMemo(() => dailyTip(ledDay), [ledDay]);
+  // Nothing repeats (UD-110, UD-116): vetrina slots that only open a page already in the quick actions, the news
+  // block or the partner band are left out of the vetrina.
+  const worlds = useMemo(() => trimVetrina(vetrina, vetrinaRepeats(actions)), [vetrina, actions]);
+  // UD-116 order: urgent → communication → oggi e settimana → quick actions → results → tip → credentials (once) →
+  // vetrina → news → join → ONE partner band → reduced footer.
   return (
-    <main
-      data-screen="home"
-      data-variant="public"
-      className="min-h-dvh bg-[#eef3f9] pb-6 font-sans text-[#0b1e3a]"
-    >
-      <h1 className="sr-only">
-        S.C.D. ColicoDerviese, il club di calcio di Colico e Dervio
-      </h1>
-      <QuickStrip />
-      <CredentialBar />
+    <main data-screen="home" data-variant="public" className="min-h-dvh bg-[#eef3f9] pb-6 font-sans text-[#0b1e3a]">
+      <h1 className="sr-only">S.C.D. ColicoDerviese, il club di calcio di Colico e Dervio</h1>
+      <UrgentNotices items={alerts} />
+      <ClubNoticeCard notice={notice} />
       <PublicWeek calendar={calendar} nowMs={nowMs} today={today} />
-      <Vetrina worlds={vetrina} />
+      <QuickActions audience="visitatore" actions={actions} />
+      <WeekendResults rows={results} />
+      <DailyTipCard tip={tip} signedIn={false} />
+      <CredentialBar />
+      <Vetrina worlds={worlds} />
       <HomeNewsBlock items={news} nowMs={nowMs} />
       <JoinBanner />
-      <SponsorZone day={ledDay} nowMs={nowMs} ledOnHome={ledOnHome} />
+      <PartnerBand day={ledDay} nowMs={nowMs} ledOnHome={ledOnHome} />
     </main>
   );
 }

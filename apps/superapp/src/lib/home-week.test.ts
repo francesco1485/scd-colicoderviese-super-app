@@ -1,12 +1,30 @@
 import { describe, expect, test } from "vitest";
 
 import type { Match } from "./club.types";
-import { calendarToWeekItems, countdownLabel, itemsOn, mergeWeekItems, nextMatchItem, r20MatchToWeekItem, romeToIso, todayAtCentre, weekItemToMatch } from "./home-week";
+import {
+  calendarToWeekItems,
+  countdownLabel,
+  itemsOn,
+  mergeWeekItems,
+  nextMatchItem,
+  r20MatchToWeekItem,
+  romeToIso,
+  todayAtCentre,
+  weekItemToMatch,
+} from "./home-week";
 import { loadCalendar } from "./public-snapshots";
 
 const { events, groups } = loadCalendar();
 const items = calendarToWeekItems(events, groups);
-const week = ["2026-10-05", "2026-10-06", "2026-10-07", "2026-10-08", "2026-10-09", "2026-10-10", "2026-10-11"];
+const week = [
+  "2026-10-05",
+  "2026-10-06",
+  "2026-10-07",
+  "2026-10-08",
+  "2026-10-09",
+  "2026-10-10",
+  "2026-10-11",
+];
 
 describe("Home: settimana dal calendario validato", () => {
   test("settimana 5–11 ottobre 2026: 10 gare", () => {
@@ -22,15 +40,27 @@ describe("Home: settimana dal calendario validato", () => {
   });
   test("stato di verifica onesto: Missaglia e Mandello con orario/sede da confermare", () => {
     const today = itemsOn(items, "2026-10-10");
-    expect(today.filter((i) => !i.certain).map((i) => i.time)).toEqual(["15:00", "16:00"]);
+    expect(today.filter((i) => !i.certain).map((i) => i.time)).toEqual([
+      "15:00",
+      "16:00",
+    ]);
   });
   test("oggi al centro sportivo: solo gare in casa a Colico/Dervio", () => {
-    expect(todayAtCentre(items, "2026-10-10").map((i) => i.time)).toEqual(["15:00", "16:00"]);
+    expect(todayAtCentre(items, "2026-10-10").map((i) => i.time)).toEqual([
+      "15:00",
+      "16:00",
+    ]);
   });
   test("prossima partita in base all'ora (Europe/Rome)", () => {
-    expect(nextMatchItem(items, "2026-10-10", "13:00")?.title).toBe("MEDA 1913 – SCD");
-    expect(nextMatchItem(items, "2026-10-10", "15:30")?.title).toBe("SCD – POL. MANDELLO DEL LARIO");
-    expect(nextMatchItem(items, "2026-10-10", "18:00")?.date).toBe("2026-10-11");
+    expect(nextMatchItem(items, "2026-10-10", "13:00")?.title).toBe(
+      "MEDA 1913 – SCD",
+    );
+    expect(nextMatchItem(items, "2026-10-10", "15:30")?.title).toBe(
+      "SCD – POL. MANDELLO DEL LARIO",
+    );
+    expect(nextMatchItem(items, "2026-10-10", "18:00")?.date).toBe(
+      "2026-10-11",
+    );
   });
   test("countdown per giorni di calendario, non per 24 ore", () => {
     expect(countdownLabel("2026-10-10", "2026-10-10")).toBe("Oggi");
@@ -41,8 +71,28 @@ describe("Home: settimana dal calendario validato", () => {
 });
 
 describe("Home: unione con R20 senza doppioni", () => {
-  const r20Meda: Match = { id: "x1", competizione: "", squadra: "Juniores", casa: "Meda 1913", ospite: "S.C.D. ColicoDerviese", startAt: "2026-10-10T12:30:00.000Z", dataLabel: "", golCasa: null, golOspite: null };
-  const r20Other: Match = { id: "x2", competizione: "", squadra: "Prima Squadra", casa: "ColicoDerviese", ospite: "Squadra Nuova", startAt: "2026-10-09T18:00:00.000Z", dataLabel: "", golCasa: null, golOspite: null };
+  const r20Meda: Match = {
+    id: "x1",
+    competizione: "",
+    squadra: "Juniores",
+    casa: "Meda 1913",
+    ospite: "S.C.D. ColicoDerviese",
+    startAt: "2026-10-10T12:30:00.000Z",
+    dataLabel: "",
+    golCasa: null,
+    golOspite: null,
+  };
+  const r20Other: Match = {
+    id: "x2",
+    competizione: "",
+    squadra: "Prima Squadra",
+    casa: "ColicoDerviese",
+    ospite: "Squadra Nuova",
+    startAt: "2026-10-09T18:00:00.000Z",
+    dataLabel: "",
+    golCasa: null,
+    golOspite: null,
+  };
   test("stessa data e avversario: resta la voce del calendario", () => {
     const merged = mergeWeekItems(items, [r20MatchToWeekItem(r20Meda)!]);
     expect(merged.length).toBe(items.length);

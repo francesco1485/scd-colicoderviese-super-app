@@ -1,8 +1,9 @@
 /**
- * Home of a signed-in member (UD-095 + UD-100, Direzione 13/10/2026). Teams are inside: once signed in, the home
- * keeps the club board — the games of the week of every team, why join, the club in numbers, the teams, the games
- * and the "Dal club" feed (UD-089: "Per te" puts followed channels first, "Tutti" shows everything, "Dirette" only
- * official live posts). Signed-out visitors get PublicHome instead. Real data only.
+ * Home of a signed-in member (UD-116, Direzione 14/10/2026 10:59, after UD-095/UD-100): what matters first.
+ * Urgent notices → the one club communication → "Oggi e questa settimana" limited to the person's teams (staff) and
+ * children's teams (families), with trainings from the weekly quadro and changes highlighted → six quick actions for
+ * this kind of person → weekend results (real source only) → tip of the day → the "soci" vetrina, teams, club games
+ * and the "Dal club" feed (UD-089) → partners once. Signed-out visitors get PublicHome instead. Real data only.
  */
 import { Link } from "@tanstack/react-router";
 import { Vetrina } from "@/components/home/PublicHome";
@@ -13,17 +14,22 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { BUILD_STAMP } from "@/lib/build-stamp";
 import { openAccessMenu } from "@/components/scd/AccessMenu";
-import { Affiliations, SkyCameo } from "@/components/universe/Community";
+import { SkyCameo } from "@/components/universe/Community";
 import {
-  ClubFacts,
   ClubGames,
-  HomeHero,
   SectionTitle,
   SponsorRow,
   TeamsGrid,
-  WeekGames,
-  WhyJoin,
 } from "@/components/home/HomeSections";
+import {
+  ClubNoticeCard,
+  DailyTipCard,
+  MyWeek,
+  QuickActions,
+  UrgentNotices,
+  WeekendResults,
+  WRAP,
+} from "@/components/home/HomePractical";
 import {
   EmptyFeed,
   EventPost,
@@ -35,20 +41,25 @@ import {
 } from "@/components/universe/Feed";
 import type { ReportReason } from "@/lib/moderation";
 import { TeamPicker } from "@/components/universe/TeamBar";
-import { addDays } from "@/lib/board-data";
 import type { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 import type { getPublicFeed, getPublicSchedule } from "@/lib/club.functions";
 import { CLUB_EVENTS, clubEventsOn } from "@/lib/club-events";
-import { CLUB_PROFILE, hallTeams } from "@/lib/club-profile";
+import { hallTeams } from "@/lib/club-profile";
+import type { ClubNotice } from "@/lib/club-notice";
+import { quickActions } from "@/lib/home-actions";
+import { weekendResults } from "@/lib/home-results";
+import type { HomeScope } from "@/lib/home-scope.functions";
+import { tagChildren, urgentNotices, weekMatches } from "@/lib/home-today";
+import { dailyTip } from "@/lib/home-tips";
 import {
   calendarToWeekItems,
   mergeWeekItems,
   r20ItemToWeekItem,
   r20MatchToWeekItem,
-  romeParts,
   type WeekItem,
 } from "@/lib/home-week";
-import { freshnessLabel } from "@/lib/public-snapshots";
+import { trimVetrina, vetrinaRepeats } from "@/lib/public-home";
+import { freshnessLabel, SNAPSHOT_BANNER } from "@/lib/public-snapshots";
 import {
   channelOf,
   channelsFrom,
@@ -79,6 +90,10 @@ export interface MemberHomeData {
   today: string;
   /** Vetrina of the day for the "soci" world (UD-110 palinsesto), from getVetrina({ members: true }). */
   vetrina?: Readonly<Record<VetrinaWorld, readonly VetrinaSlot[]>>;
+  /** Personal scope of "Oggi e questa settimana" (getMyHomeScope). */
+  scope: HomeScope;
+  /** The one club communication of the day (getClubNotice), or null. */
+  notice: ClubNotice | null;
 }
 
 const MAIN_TEAMS = [
@@ -117,6 +132,8 @@ export function MemberHome({
   serverNow,
   today,
   vetrina,
+  scope,
+  notice,
 }: MemberHomeData) {
   const [nowMs, setNowMs] = useState(serverNow);
   const [mode, setMode] = useState<FeedMode>("perte");
@@ -210,36 +227,32 @@ export function MemberHome({
     [channels],
   );
 
-  const lastDay = addDays(today, 6);
-  const weekGames = useMemo(
-    () =>
-      merged
-        .filter(
-          (i) =>
-            i.kind === "Gara" &&
-            i.date >= today &&
-            i.date <= lastDay &&
-            itemState(i, nowMs) !== "done",
-        )
-        .sort((a, b) =>
-          (a.date + (a.time || "99:99")).localeCompare(
-            b.date + (b.time || "99:99"),
-          ),
-        ),
-    [merged, today, lastDay, nowMs],
-  );
-  // The one highlighted row of the week: the game in play, else the first to start (followed teams first).
-  const nextMatch = useMemo(() => {
-    const live = weekGames.find((g) => itemState(g, nowMs) === "live");
-    if (live) return live;
-    return (
-      weekGames.find((g) => followedTeams.includes(g.group)) ??
-      weekGames[0] ??
-      null
-    );
-  }, [weekGames, nowMs, followedTeams]);
   const hall = useMemo(() => hallTeams(calendar.groups), [calendar.groups]);
-  const seasonGames = calendar.events.length;
+  // "Oggi e questa settimana": games of the person's groups (live calendar) + trainings of those groups (quadro).
+  const myWeek = useMemo(() => {
+    const only = new Set(scope.groups);
+    const games = scope.groups.length
+      ? weekMatches(calendar.events, calendar.groups, scope.today, only)
+      : [];
+    return tagChildren([...games, ...scope.trainings], scope.children);
+  }, [calendar, scope]);
+  const alerts = useMemo(
+    () => urgentNotices(feed.items, nowMs, true),
+    [feed.items, nowMs],
+  );
+  const results = useMemo(() => weekendResults(feed, today), [feed, today]);
+  const tip = useMemo(() => dailyTip(today), [today]);
+  const actions = useMemo(
+    () =>
+      quickActions(scope.audience, {
+        childGroups: scope.children.flatMap((c) => c.groups),
+      }),
+    [scope],
+  );
+  const worlds = useMemo(
+    () => (vetrina ? trimVetrina(vetrina, vetrinaRepeats(actions)) : null),
+    [vetrina, actions],
+  );
   const verifiedSponsors = useMemo(
     () => SPONSORS.filter((x) => x.nameVerified && x.name),
     [],
@@ -401,41 +414,75 @@ export function MemberHome({
   const clubChannel = channel("club");
 
   return (
-    <main data-screen="home" className="min-h-dvh bg-[#eef3f9] pb-10">
-      <HomeHero signedIn={social.signedIn} onArea={openAccessMenu} />
+    <main
+      data-screen="home"
+      data-variant="member"
+      className="min-h-dvh bg-[#eef3f9] pb-10"
+    >
+      <header className="bg-[#0b2a5b] text-white" data-testid="home-hero">
+        <div
+          className={`${WRAP} flex items-center justify-between gap-3 py-3 lg:py-4`}
+        >
+          <div className="grid min-w-0 gap-0.5">
+            <span className="text-[11.5px] font-extrabold uppercase tracking-[0.12em] text-[#ffd600]">
+              {scope.preview
+                ? `Anteprima staging · vista ${scope.preview}`
+                : social.signedIn
+                  ? "La tua home"
+                  : "Home"}
+            </span>
+            <h1 className="m-0 truncate font-uv text-[24px] leading-none lg:text-[30px]">
+              S.C.D. ColicoDerviese
+            </h1>
+          </div>
+          {social.signedIn && (
+            <button
+              type="button"
+              onClick={openAccessMenu}
+              className="scd-focus inline-flex h-11 shrink-0 items-center rounded-[12px] bg-[#ffd600] px-4 text-[15px] font-bold text-[#0b1e3a] lg:h-12 lg:px-6"
+              data-testid="home-area"
+            >
+              Le mie aree
+            </button>
+          )}
+        </div>
+      </header>
+      {scope.preview && (
+        <p
+          className={`${WRAP} m-0 pt-3 text-[13px] text-[#5a6b85]`}
+          data-testid="home-preview-note"
+        >
+          Anteprima senza accesso: nessun dato personale.{" "}
+          {scope.preview === "staff"
+            ? "Mostra tutte le squadre come un ruolo d'ufficio."
+            : "Nessun ragazzo collegato: si vedono gli stati vuoti."}
+        </p>
+      )}
+      <UrgentNotices items={alerts} />
+      <ClubNoticeCard notice={notice} />
+      <MyWeek
+        entries={myWeek}
+        today={scope.today}
+        hasScope={scope.groups.length > 0}
+        failed={scope.state === "error"}
+        note={
+          <>
+            {sourceNote}. Allenamenti: {SNAPSHOT_BANNER}.
+          </>
+        }
+      />
+      <QuickActions audience={scope.audience} actions={actions} />
+      <WeekendResults rows={results} />
+      <DailyTipCard
+        tip={tip}
+        signedIn={social.signedIn || scope.preview !== null}
+      />
 
-      <div className="mx-auto grid max-w-[1200px] grid-cols-[minmax(0,1fr)] gap-6 px-4 pt-5 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start lg:gap-x-8 lg:px-6 lg:pt-8">
+      <div
+        className={`${WRAP} grid grid-cols-[minmax(0,1fr)] gap-6 pt-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start lg:gap-x-8 lg:pt-12`}
+      >
         <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-6">
-          <WeekGames
-            items={weekGames}
-            teamOf={teamOf}
-            highlightId={nextMatch?.id ?? null}
-            nowMs={nowMs}
-          />
-          {vetrina && <Vetrina worlds={vetrina} fixedWorld="soci" embedded />}
-          <div className="lg:hidden">
-            <WhyJoin />
-          </div>
-          <div className="lg:hidden">
-            <ClubFacts
-              teams={hall.length}
-              towns={CLUB_PROFILE.towns}
-              games={seasonGames}
-              sponsors={verifiedSponsors.length}
-              season={calendar.season}
-              matricola={CLUB_PROFILE.figcMatricola}
-              affiliation={CLUB_PROFILE.monza.label}
-            />
-          </div>
-          <TeamsGrid teams={hall} />
-          <ClubGames />
-          <div className="lg:hidden">
-            <SponsorRow
-              sponsors={dailySponsors}
-              total={verifiedSponsors.length}
-            />
-          </div>
-
+          {worlds && <Vetrina worlds={worlds} fixedWorld="soci" embedded />}
           <section aria-labelledby="dal-club" className="grid gap-3">
             <SectionTitle id="dal-club">Dal club</SectionTitle>
             <div className="flex items-center justify-between gap-3 px-1">
@@ -443,7 +490,7 @@ export function MemberHome({
               {social.canPost && (
                 <Link
                   to="/crea"
-                  className="scd-focus inline-flex h-10 shrink-0 items-center rounded-[12px] bg-[#0b2a5b] px-4 text-[14px] font-bold text-white"
+                  className="scd-focus inline-flex h-11 shrink-0 items-center rounded-[12px] bg-[#0b2a5b] px-4 text-[14px] font-bold text-white"
                 >
                   Crea post
                 </Link>
@@ -535,28 +582,15 @@ export function MemberHome({
                   return null;
               }
             })}
-            <p className="m-0 px-1 text-[12.5px] text-[#5a6b85]">
-              {sourceNote}. Orari e campi segnati "da confermare" non sono
-              ancora confermati dal club.
-            </p>
           </div>
         </div>
-        <div className="hidden min-w-0 grid-cols-[minmax(0,1fr)] gap-6 lg:grid">
-          <WhyJoin />
-          <ClubFacts
-            teams={hall.length}
-            towns={CLUB_PROFILE.towns}
-            games={seasonGames}
-            sponsors={verifiedSponsors.length}
-            season={calendar.season}
-            matricola={CLUB_PROFILE.figcMatricola}
-            affiliation={CLUB_PROFILE.monza.label}
-          />
+        <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-6">
+          <TeamsGrid teams={hall} />
+          <ClubGames />
           <SponsorRow
             sponsors={dailySponsors}
             total={verifiedSponsors.length}
           />
-          <Affiliations tone="light" />
         </div>
       </div>
       <p className="mt-6 text-center text-[11.5px] text-[#7a8aa3]">

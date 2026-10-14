@@ -2,7 +2,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { BUILD_STAMP } from "@/lib/build-stamp";
 import {
   CalendarDays,
-  ChevronDown,
+  Download,
   Circle,
   Ellipsis,
   Facebook,
@@ -14,6 +14,7 @@ import {
   Menu,
   Newspaper,
   Plus,
+  Search,
   Shirt,
   ShieldCheck,
   UserRound,
@@ -21,13 +22,14 @@ import {
   X,
   type LucideIcon,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import crest from "@/assets/brand/logo-scd.png.asset.json";
 import { centerTabFor, type CenterTab } from "@/lib/access-nav";
 import { ACCESS_SCREEN_IDS, WORK_AREA_IDS, findArea } from "@/lib/areas";
 import { CLUB_PROFILE } from "@/lib/club-profile";
-import { LINK_GROUPS, SOCIAL_LINKS } from "@/lib/public-home";
+import { SOCIAL_LINKS } from "@/lib/public-home";
+import { menuSections, searchMenu, type MenuItem } from "@/lib/site-menu";
 import { useSession } from "@/lib/use-session";
 import { openCookiePrefs } from "./CookieConsent";
 import { AccessMenu, loginSearch, openAccessMenu } from "./scd/AccessMenu";
@@ -60,52 +62,6 @@ const desktopNavMember: readonly NavItem[] = [
 ];
 export const desktopNavFor = (signedIn: boolean): readonly NavItem[] =>
   signedIn ? desktopNavMember : desktopNavPublic;
-
-/** Menu completo (drawer mobile e voce "Altro"), raggruppato per app. */
-const menuGroups: readonly {
-  title: string;
-  app: string;
-  items: readonly NavItem[];
-}[] = [
-  {
-    title: "Il Club",
-    app: "ONE",
-    items: [
-      { to: "/", label: "Home" },
-      { to: "/societa", label: "Chi siamo" },
-      { to: "/calendario", label: "Calendario gare" },
-      { to: "/impianti", label: "Mappa campi" },
-      { to: "/comunicazioni", label: "Comunicazioni" },
-      { to: "/eventi", label: "Eventi" },
-      { to: "/tornei", label: "Tornei" },
-      { to: "/eventi/christmas-lario-cup", label: "Christmas Lario Cup" },
-      { to: "/community", label: "Tifosi" },
-      { to: "/entra", label: "Gioca con noi" },
-      { to: "/contatti", label: "Contatti" },
-    ],
-  },
-  {
-    title: "Area club",
-    app: "CORE",
-    items: [
-      { to: "/la-mia-scd", label: "La mia SCD" },
-      { to: "/squadre", label: "Le squadre" },
-      { to: "/allenamenti", label: "Allenamenti" },
-      { to: "/fantacalcio", label: "Fantacalcio SCD" },
-      { to: "/top11", label: "Top 11 della settimana" },
-      { to: "/rassegna-stampa", label: "Dicono di noi" },
-      { to: "/aree", label: "Il tuo ingresso (tutte le aree)" },
-    ],
-  },
-  {
-    title: "Sponsor & Partner",
-    app: "GROW",
-    items: [
-      { to: "/sponsor", label: "Sponsor & Partner" },
-      { to: "/fornitori", label: "Fornitori" },
-    ],
-  },
-];
 
 /**
  * Schermate costruite sulle tavole: hanno la propria testata (stemma + wordmark/titolo), quindi su
@@ -219,13 +175,38 @@ export function SiteHeader() {
   );
 }
 
-/** Menu completo, aperto dall'evento "scd:menu". */
+/** One page of the menu: reserved areas carry a lock (their page shows the access screen to visitors). */
+function MenuLink({ item, active, onPick }: { item: MenuItem; active: boolean; onPick: () => void }) {
+  return (
+    <Link
+      to={item.to as never}
+      search={item.search as never}
+      {...(item.hash ? { hash: item.hash } : {})}
+      onClick={onPick}
+      className={`flex min-h-11 items-center gap-1.5 rounded-lg px-2 py-2 text-[15px] font-medium ${active ? "font-bold text-[var(--scd-blue)]" : ""}`}
+    >
+      {item.label}
+      {item.reserved && <Lock className="size-3.5 shrink-0 text-[#6a7a92]" aria-label="area riservata" />}
+    </Link>
+  );
+}
+
+/**
+ * Menu completo, aperto dall'evento "scd:menu" (UD-116): le app, poi "Tutto sul club" con ogni pagina dell'indice del
+ * sito (non più nel piè di pagina) e una ricerca per nome.
+ */
 export function MenuDrawer() {
   const [open, setOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { session } = useSession();
   const signedIn = !!session?.user;
+  const [query, setQuery] = useState("");
+  const sections = useMemo(() => menuSections(), []);
+  const results = useMemo(() => searchMenu(query, sections), [query, sections]);
   useEffect(() => setOpen(false), [pathname]);
+  useEffect(() => {
+    if (!open) setQuery("");
+  }, [open]);
   useEffect(() => {
     const onOpen = () => setOpen((o) => !o);
     window.addEventListener("scd:menu", onOpen);
@@ -293,31 +274,56 @@ export function MenuDrawer() {
             {signedIn ? "un link per area" : "le aree riservate dopo l'accesso"}
           </span>
         </button>
-        {menuGroups.map((g) => (
-          <div
-            key={g.app}
-            className="border-b border-[var(--scd-line)] py-2 last:border-0"
-          >
-            <p className="flex items-center gap-2 px-2 py-1 text-[0.7rem] font-bold uppercase tracking-[0.16em] text-[var(--scd-blue)]">
-              {g.title}{" "}
-              <span className="rounded bg-[var(--scd-yellow)] px-1.5 py-0.5 text-[0.6rem] tracking-wider text-[var(--scd-ink)]">
-                {g.app}
-              </span>
-            </p>
-            <div className="grid grid-cols-2 gap-x-2">
-              {g.items.map((n) => (
-                <Link
-                  key={n.to}
-                  to={n.to}
-                  onClick={() => setOpen(false)}
-                  className={`flex min-h-11 items-center rounded-lg px-2 py-2 text-[15px] font-medium ${isActive(pathname, n.to) ? "font-bold text-[var(--scd-blue)]" : ""}`}
-                >
-                  {n.label}
-                </Link>
-              ))}
-            </div>
+        <div className="pb-1 pt-2">
+          <label htmlFor="sa-menu-search" className="sr-only">
+            Cerca una pagina
+          </label>
+          <span className="relative flex items-center">
+            <Search className="pointer-events-none absolute left-3 size-[18px] text-[var(--scd-blue)]" aria-hidden="true" />
+            <input
+              id="sa-menu-search"
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Cerca una pagina (es. iscrizioni, kit, tornei)"
+              autoComplete="off"
+              enterKeyHint="search"
+              className="scd-focus min-h-12 w-full rounded-[12px] border border-[var(--scd-line)] bg-[#f4f7fb] pl-10 pr-3 text-[15px] text-[var(--scd-ink)] placeholder:text-[#6a7a92]"
+              data-testid="menu-search"
+            />
+          </span>
+        </div>
+        {query.trim() ? (
+          <div className="py-2" data-testid="menu-results" aria-live="polite">
+            {results.length ? (
+              <div className="grid grid-cols-2 gap-x-2">
+                {results.map((n) => (
+                  <MenuLink key={`${n.to}#${n.hash ?? ""}${n.label}`} item={n} active={isActive(pathname, n.to)} onPick={() => setOpen(false)} />
+                ))}
+              </div>
+            ) : (
+              <p className="m-0 px-2 py-3 text-[14.5px] text-[#4a5d7a]">Nessuna pagina trovata. Prova con un'altra parola.</p>
+            )}
           </div>
-        ))}
+        ) : (
+          sections.map((g) => (
+            <div key={g.id} className="border-b border-[var(--scd-line)] py-2 last:border-0" data-testid={`menu-group-${g.id}`}>
+              <p className="flex items-center gap-2 px-2 py-1 text-[0.7rem] font-bold uppercase tracking-[0.16em] text-[var(--scd-blue)]">
+                {g.title}{" "}
+                {g.app !== "INFO" && (
+                  <span className="rounded bg-[var(--scd-yellow)] px-1.5 py-0.5 text-[0.6rem] tracking-wider text-[var(--scd-ink)]">
+                    {g.app}
+                  </span>
+                )}
+              </p>
+              <div className="grid grid-cols-2 gap-x-2">
+                {g.items.map((n) => (
+                  <MenuLink key={`${n.to}#${n.hash ?? ""}${n.label}`} item={n} active={isActive(pathname, n.to)} onPick={() => setOpen(false)} />
+                ))}
+              </div>
+            </div>
+          ))
+        )}
         <Link
           to="/safeguarding"
           onClick={() => setOpen(false)}
@@ -593,57 +599,61 @@ export function BottomNav() {
 
 const SOCIAL_ICON = { instagram: Instagram, facebook: Facebook } as const;
 
+/**
+ * Piè di pagina ridotto (UD-116, Direzione 14/10/2026: il footer grande con "Tutto sul club" non serve alle persone):
+ * logo, contatti (mail, PEC, sede), social, Installa l'app, privacy / cookie / segnalazioni riservate / elimina
+ * account e i riconoscimenti federali. L'indice delle pagine è nel menu, con la ricerca.
+ */
 export function SiteFooter() {
-  const [openGroups, setOpenGroups] = useState<ReadonlySet<string>>(() => new Set());
-  const toggleGroup = (id: string) =>
-    setOpenGroups((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
   return (
     <footer className="mt-10" data-testid="site-footer">
-      <div className="bg-[#0b2a5b] px-4 pb-20 pt-10 text-white lg:px-8">
-        <div className="mx-auto grid max-w-[1280px] gap-8">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <Link
-              to="/"
-              className="scd-focus flex items-center gap-3 rounded-md"
-              aria-label={`${CLUB_NAME}, vai alla Home`}
-            >
-              <ClubCrestOfficial size={48} />
-              <span className="whitespace-nowrap font-title text-[24px] font-black leading-none">
-                COLICO<span className="text-[#ffd600]">DERVIESE</span>
-              </span>
-            </Link>
-            <ul className="m-0 flex list-none gap-2 p-0" aria-label="Profili social ufficiali">
-              {SOCIAL_LINKS.map((so) => {
-                const Icon = SOCIAL_ICON[so.id];
-                return (
-                  <li key={so.id}>
-                    <a
-                      href={so.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={`${so.label} ${so.handle} (apre una nuova scheda)`}
-                      className="scd-focus grid size-11 place-items-center rounded-full border border-white/25 text-white transition-colors duration-150 hover:bg-white/10"
-                    >
-                      <Icon className="size-5" strokeWidth={1.8} aria-hidden="true" />
-                    </a>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
+      <div className="bg-[#0b2a5b] px-4 pb-20 pt-8 text-white lg:px-8 lg:pb-8">
+        <div className="mx-auto grid max-w-[1280px] gap-6">
+          <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)_minmax(0,1.2fr)] lg:items-start">
+            <div className="grid content-start gap-3">
+              <Link
+                to="/"
+                className="scd-focus flex w-fit items-center gap-3 rounded-md"
+                aria-label={`${CLUB_NAME}, vai alla Home`}
+              >
+                <ClubCrestOfficial size={48} />
+                <span className="whitespace-nowrap font-title text-[24px] font-black leading-none">
+                  COLICO<span className="text-[#ffd600]">DERVIESE</span>
+                </span>
+              </Link>
+              <div className="flex flex-wrap items-center gap-2">
+                <ul className="m-0 flex list-none gap-2 p-0" aria-label="Profili social ufficiali">
+                  {SOCIAL_LINKS.map((so) => {
+                    const Icon = SOCIAL_ICON[so.id];
+                    return (
+                      <li key={so.id}>
+                        <a
+                          href={so.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`${so.label} ${so.handle} (apre una nuova scheda)`}
+                          className="scd-focus grid size-11 place-items-center rounded-full border border-white/25 text-white transition-colors duration-150 hover:bg-white/10"
+                        >
+                          <Icon className="size-5" strokeWidth={1.8} aria-hidden="true" />
+                        </a>
+                      </li>
+                    );
+                  })}
+                </ul>
+                <Link
+                  to="/installa"
+                  className="scd-focus inline-flex min-h-11 min-w-11 items-center text-[14px] gap-1.5 rounded-full bg-[#ffd600] px-4 font-bold text-[#0b1e3a] transition-[filter] duration-150 hover:brightness-95"
+                  data-testid="footer-install"
+                >
+                  <Download className="size-4" aria-hidden="true" />
+                  Installa l'app
+                </Link>
+              </div>
+            </div>
 
-          <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)] lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.8fr)_minmax(0,1fr)]">
-            <div className="grid content-start gap-1.5 text-[14px] leading-snug text-white/85">
-              <h2 className="m-0 pb-1 text-[12px] font-bold uppercase tracking-[0.12em] text-[#ffd600]">
-                La società
-              </h2>
+            <address className="grid content-start gap-0.5 text-[14px] not-italic leading-snug text-white/85" data-testid="footer-contacts">
+              <h2 className="m-0 pb-1 text-[12px] font-bold uppercase tracking-[0.12em] text-[#ffd600]">Contatti</h2>
               <p className="m-0 font-semibold text-white">{CLUB_NAME}</p>
-              <p className="m-0">Matricola FIGC {CLUB_PROFILE.figcMatricola}</p>
               <p className="m-0">{CLUB_PROFILE.contacts.address}</p>
               <p className="m-0">
                 <a
@@ -656,70 +666,21 @@ export function SiteFooter() {
               <p className="m-0">
                 PEC <span className="select-text">{CLUB_PROFILE.contacts.pec}</span>
               </p>
-            </div>
+              <p className="m-0 text-white/70">Matricola FIGC {CLUB_PROFILE.figcMatricola}</p>
+            </address>
 
-            <nav aria-label="Link a piè di pagina" className="grid content-start gap-1" data-testid="footer-links">
-              <h2 className="m-0 pb-1 text-[12px] font-bold uppercase tracking-[0.12em] text-[#ffd600]">
-                Tutto sul club
-              </h2>
-              {/* UD-110: the former home accordions "Tutto sul club" live here, on every page. */}
-              {/* Phones: each group is a collapsible row so the footer stays short. From sm up every group is open. */}
-              <div className="grid gap-x-6 sm:grid-cols-2 sm:gap-y-4 xl:grid-cols-3">
-                {LINK_GROUPS.map((g) => (
-                  <div key={g.id} className="grid content-start gap-0 border-b border-white/15 sm:border-b-0" data-testid={`footer-group-${g.id}`}>
-                    <h3 className="m-0 text-[13px] font-bold text-white">
-                      <button
-                        type="button"
-                        onClick={() => toggleGroup(g.id)}
-                        aria-expanded={openGroups.has(g.id)}
-                        aria-controls={`footer-group-list-${g.id}`}
-                        className="scd-focus flex min-h-12 w-full items-center justify-between gap-2 text-left text-[14px] sm:hidden"
-                      >
-                        {g.title}
-                        <ChevronDown
-                          className={`size-4 shrink-0 text-white/70 transition-transform duration-150 motion-reduce:transition-none ${openGroups.has(g.id) ? "rotate-180" : ""}`}
-                          aria-hidden="true"
-                        />
-                      </button>
-                      <span className="hidden sm:inline">{g.title}</span>
-                    </h3>
-                    <ul
-                      id={`footer-group-list-${g.id}`}
-                      className={`m-0 list-none p-0 pb-2 sm:grid sm:pb-0 ${openGroups.has(g.id) ? "grid" : "hidden"}`}
-                    >
-                      {g.items.map((n) => (
-                        <li key={n.label}>
-                          <Link
-                            to={n.to as never}
-                            search={n.search as never}
-                            {...(n.hash ? { hash: n.hash } : {})}
-                            className="scd-focus inline-flex min-h-11 min-w-11 items-center text-[14px] gap-1.5 text-white/85 hover:text-white"
-                          >
-                            {n.label}
-                            {n.reserved && <Lock className="size-3.5 text-white/60" aria-label="area riservata" />}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-            </nav>
-
-            <div className="grid content-start gap-2.5 md:col-span-2 lg:col-span-1">
+            <div className="grid content-start gap-2 md:col-span-2 lg:col-span-1" data-testid="footer-credits">
               <h2 className="m-0 text-[12px] font-bold uppercase tracking-[0.12em] text-[#ffd600]">
                 Riconoscimenti e affiliazioni
               </h2>
               <div className="rounded-[14px] bg-white px-3.5 py-3">
                 <ClubCredentials variant="list" />
               </div>
-              <p className="m-0 text-[13px] leading-snug text-white/75">
-                {CREDENTIALS_SENTENCE}
-              </p>
+              <p className="m-0 text-[12.5px] leading-snug text-white/70">{CREDENTIALS_SENTENCE}</p>
             </div>
           </div>
 
-          <div className="flex flex-col gap-2 border-t border-white/15 pt-5 text-[12.5px] text-white/70 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex flex-col gap-2 border-t border-white/15 pt-4 text-[12.5px] text-white/70 lg:flex-row lg:items-center lg:justify-between">
             <span className="flex flex-wrap gap-x-5">
               <a
                 href="/privacy"
@@ -746,15 +707,20 @@ export function SiteFooter() {
               >
                 Elimina account
               </a>
+              <button
+                type="button"
+                onClick={openMenu}
+                className="scd-focus inline-flex min-h-11 items-center gap-1 underline decoration-white/30 underline-offset-4 hover:text-white"
+              >
+                <Search className="size-3.5" aria-hidden="true" />
+                Tutte le pagine
+              </button>
             </span>
-            <span>
-              Super App ufficiale della {CLUB_NAME} · versione del {BUILD_STAMP}
-            </span>
+            <span>Super App ufficiale della {CLUB_NAME} · versione del {BUILD_STAMP}</span>
           </div>
-          <p className="m-0 -mt-4 text-[12px] leading-snug text-white/60">
-            © {new Date().getFullYear()} Francesco Coppola · ideato e creato da
-            Francesco Coppola, concesso in uso gratuito alla {CLUB_NAME}.
-            Stemma, loghi e marchi appartengono ai rispettivi titolari.
+          <p className="m-0 -mt-3 text-[12px] leading-snug text-white/60">
+            © {new Date().getFullYear()} Francesco Coppola · ideato e creato da Francesco Coppola, concesso in uso gratuito
+            alla {CLUB_NAME}. Stemma, loghi e marchi appartengono ai rispettivi titolari.
           </p>
         </div>
       </div>

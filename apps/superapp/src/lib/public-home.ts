@@ -1,72 +1,19 @@
 /**
- * Content model of the signed-out public home (UD-100, brief "Public home v4"; vetrina clean-up UD-110, Direzione
- * 13/10/2026).
+ * Content model of the public home and of the site index (UD-100, UD-110, UD-116 — Direzione 14/10/2026: the big
+ * "Tutto sul club" footer is useless to people; the link index lives in the menu and its search).
  *
- * Layout reference: the Eurobet web homepage structure only (quick-link strip, credential strip, games of the week,
- * rotating vetrina, wide CTA banner, ONE sponsor zone, rich footer with the link groups). Never betting, odds, bonus or
- * casino content. The vetrina slots live in vetrina-slots.server.ts (picked per day on the server). Every entry below is real club content and every internal link is an existing public route
- * (checked by public-home.test.ts against src/routeTree.gen.ts). Teams, rosters, fixtures and team calendars are
- * not part of the public home: they live inside after sign-in.
+ * Every internal link is an existing route (checked by public-home.test.ts against src/routeTree.gen.ts). Teams,
+ * rosters and trainings are not part of the public home: they live inside after sign-in.
  */
+import { quickActions } from "./home-actions";
 import { SPONSORS, type Sponsor } from "./sponsors";
 
-/** Icon keys resolved to lucide glyphs by the view (keeps this module free of React). */
-export type PublicIcon =
-  | "trophy"
-  | "handshake"
-  | "clipboard"
-  | "newspaper"
-  | "video"
-  | "gamepad"
-  | "star"
-  | "ticket"
-  | "calendar"
-  | "phone"
-  | "shield"
-  | "badge"
-  | "map"
-  | "heart"
-  | "whistle"
-  | "smartphone"
-  | "building";
-
-/** An internal route (optionally with search/hash) or an external https link. */
+/** An internal route (optionally with search/hash). */
 export interface PublicLink {
   to: string;
   search?: Record<string, string>;
   hash?: string;
 }
-
-export interface QuickLink extends PublicLink {
-  label: string;
-  icon: PublicIcon;
-  badge?: "nuovo" | "top";
-}
-
-/** Quick-link strip under the top bar (Eurobet strip with "new"/"hot" badges). One row on desktop. */
-export const QUICK_LINKS: readonly QuickLink[] = [
-  {
-    label: "Christmas Lario Cup",
-    to: "/eventi/christmas-lario-cup",
-    icon: "trophy",
-    badge: "nuovo",
-  },
-  { label: "Tornei", to: "/tornei", icon: "trophy" },
-  { label: "Diventa partner", to: "/sponsor", icon: "handshake", badge: "top" },
-  { label: "Iscrizioni 2026/27", to: "/entra", icon: "clipboard" },
-  { label: "Notizie", to: "/comunicazioni", icon: "newspaper" },
-  {
-    label: "Video",
-    to: "/comunicazioni",
-    search: { tab: "social" },
-    icon: "video",
-  },
-  { label: "Fantacalcio", to: "/fantacalcio", icon: "gamepad" },
-  { label: "Top 11", to: "/top11", icon: "star" },
-  { label: "Biglietti", to: "/impianti", icon: "ticket" },
-  { label: "Calendario gare", to: "/calendario", icon: "calendar" },
-  { label: "Contatti", to: "/contatti", icon: "phone" },
-];
 
 /** Partners named with certainty in the 2026/27 list (src/lib/sponsors.ts). */
 export const verifiedSponsors = (
@@ -99,8 +46,8 @@ export interface LinkGroup {
 }
 
 /**
- * Link groups of the site footer (UD-110: moved off the home body, the former "Tutto sul club" accordions). Real
- * public routes only; reserved areas are marked.
+ * The site index (former footer "Tutto sul club" groups, UD-110 → UD-116: now reachable from the menu and its search,
+ * never as a footer wall). Real routes only; reserved areas are marked.
  */
 export const LINK_GROUPS: readonly LinkGroup[] = [
   {
@@ -230,15 +177,56 @@ export function matchdayLabel(date: string, today: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-/** Every internal route the public home links to (for the route-existence test). */
+/* ---------------------------------------------------------- no repeats */
+
+interface HrefSlot {
+  href: string;
+}
+
+/** Pages the home already opens from its own blocks (quick actions, news, partner band, join banner). */
+export function vetrinaRepeats(actions: readonly PublicLink[]): string[] {
+  return [
+    ...new Set([
+      ...actions.map((a) => a.to),
+      "/rassegna-stampa",
+      "/sponsor",
+      "/registrati",
+    ]),
+  ];
+}
+
+/**
+ * Vetrina without the slots that only repeat a page the home already opens elsewhere (UD-116 "niente si ripete").
+ * A world that would be left empty keeps its original picks: the vetrina never disappears because of the trim.
+ */
+export function trimVetrina<W extends string, S extends HrefSlot>(
+  worlds: Readonly<Record<W, readonly S[]>>,
+  repeats: readonly string[],
+): Record<W, S[]> {
+  const out = {} as Record<W, S[]>;
+  for (const w of Object.keys(worlds) as W[]) {
+    const list = worlds[w] ?? [];
+    const kept = list.filter((s) => !repeats.includes(s.href));
+    out[w] = kept.length > 0 ? kept : [...list];
+  }
+  return out;
+}
+
+/** Every internal route the signed-out home and its footer link to (for the route-existence test). */
 export function publicHomeRoutes(): string[] {
   const all: PublicLink[] = [
-    ...QUICK_LINKS,
-    ...LINK_GROUPS.flatMap((g) => g.items),
+    ...quickActions("visitatore"),
+    { to: "/calendario" },
+    { to: "/rassegna-stampa" },
+    { to: "/eventi" },
     { to: "/accedi" },
     { to: "/registrati" },
     { to: "/sponsor" },
     { to: "/contatti" },
+    { to: "/installa" },
+    { to: "/privacy" },
+    { to: "/safeguarding" },
+    { to: "/elimina-account" },
   ];
   return [...new Set(all.map((l) => l.to))];
 }
