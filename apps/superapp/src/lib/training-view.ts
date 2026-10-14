@@ -108,7 +108,7 @@ export function trainingKids(members: ReadonlyArray<{ displayName: string; birth
   const out: TrainingKid[] = [];
   for (const m of members) {
     if (m.minor !== true || m.birthYear === null || !Number.isInteger(m.birthYear)) continue;
-    if (/^(genitore|madre|padre|tutore|referente)$/i.test(m.relationship.trim())) continue;
+    if (!/^(figlio|figlia|minore)$/i.test(m.relationship.trim())) continue;
     const firstName = m.displayName.trim().split(/\s+/)[0] ?? "";
     if (!firstName || firstName === "Nome") continue;
     const key = `${firstName.toLowerCase()}|${m.birthYear}`;
