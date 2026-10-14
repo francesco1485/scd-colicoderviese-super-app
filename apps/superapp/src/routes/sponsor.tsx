@@ -7,6 +7,7 @@ import { CastPresence } from "@/components/scd/CastPresence";
 import { PartnerForm } from "@/components/PartnerForm";
 import { ShareButton } from "@/components/scd/ShareButton";
 import { PartnerPackages } from "@/components/PartnerPackages";
+import { SponsorProcess } from "@/components/SponsorProcess";
 import { PageHero, heroOverlapCls } from "@/components/ui-kit";
 import { SPONSOR_ASSETS } from "@/lib/catalog";
 import { romeDay } from "@/lib/public-window";
@@ -97,6 +98,9 @@ function Sponsor() {
           <Link to="/sostieni" className="surface-sun scd-focus inline-flex min-h-11 items-center justify-center rounded-lg px-4 py-2 text-sm font-bold uppercase">Vedi cosa serve</Link>
         </div>
       </section>
+
+      {/* B2: partnership process and FAQ, right before the proposal form. */}
+      <SponsorProcess />
 
       <section id="proposta" tabIndex={-1} aria-labelledby="proposta-title" className="mx-auto mt-14 max-w-4xl scroll-mt-20 px-4 focus:outline-none">
         <p className="eyebrow">Richiedi proposta</p>
