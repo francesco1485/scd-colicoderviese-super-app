@@ -9,7 +9,9 @@
  *   for the staff, sends information by messages; she is the internal helper of the chat (lib/assistant.ts);
  * - Dottor Acanfora = Medico: daily tips, first-aid and prevention; never a diagnosis (first-aid-info.ts guard).
  * Plus seven new roles defined by the Direzione on 14/10/2026 ({@link CAST_ROSTER}): their names are still to be
- * decided (`nameTbd`), they have no picture and no voice, and they are content entries only (no chat persona).
+ * decided (`nameTbd`), they have no picture and no voice. Since UD-114 (Direzione 14/10/2026: "gli avatar devono
+ * rendere tutto interattivo e dinamico") every character except Genny's internal helper role is also an AREA_PERSONA:
+ * a live guide of its area (lib/cast-personas.ts) whose chat opens only from "Chiedi a …" in that area.
  *
  * Image readiness is a feature check, not a placeholder: a character's picture appears only when its optimized files
  * exist in public/media/cast/<id>/, are registered in config/scd-assets.v1.json as APPROVED and `ready` is true.
@@ -145,8 +147,11 @@ export interface CastRosterEntry {
   portrait: { ready: boolean; brief: string };
   /** Voice: audio only after a Direzione-approved synthetic voice not tied to a real person (UD-092). */
   voice: { ready: false; rule: string };
-  /** CHAT_PERSONA = answers in SkyChat (lib/assistant.ts); CONTENT = cards and copy only. */
-  presence: "CHAT_PERSONA" | "CONTENT";
+  /**
+   * CHAT_PERSONA = the internal helper of SkyChat (lib/assistant.ts insidePersonaFor); AREA_PERSONA = live guide of
+   * its area with its own chat opened by "Chiedi a …" (lib/cast-personas.ts, UD-114); CONTENT = cards and copy only.
+   */
+  presence: "CHAT_PERSONA" | "AREA_PERSONA" | "CONTENT";
   /** Decision behind the entry. */
   decidedBy: string;
 }
@@ -192,7 +197,7 @@ export const CAST_ROSTER: readonly CastRosterEntry[] = [
         "Nutrizionista solare e professionale, in contesto sportivo; nuova immagine da approvare",
     },
     voice: { ready: false, rule: VOICE_RULE },
-    presence: "CONTENT",
+    presence: "AREA_PERSONA",
     decidedBy: "Direzione 14/10/2026 (UD-111): Era = Nutrizionista",
   },
   {
@@ -246,7 +251,7 @@ export const CAST_ROSTER: readonly CastRosterEntry[] = [
       brief: "Immagine round 4 approvata (Canva MAHX1M4GK7g)",
     },
     voice: { ready: false, rule: VOICE_RULE },
-    presence: "CONTENT",
+    presence: "AREA_PERSONA",
     decidedBy: "Direzione 14/10/2026 (UD-111): Dottor Acanfora = Medico",
   },
   {
@@ -273,7 +278,7 @@ export const CAST_ROSTER: readonly CastRosterEntry[] = [
       brief: "Figura accogliente in divisa da cucina con i colori del club",
     },
     voice: { ready: false, rule: VOICE_RULE },
-    presence: "CONTENT",
+    presence: "AREA_PERSONA",
     decidedBy: NEW_ROLE,
   },
   {
@@ -300,7 +305,7 @@ export const CAST_ROSTER: readonly CastRosterEntry[] = [
       brief: "Addetto o addetta alla biglietteria, cordiale, con pass del club",
     },
     voice: { ready: false, rule: VOICE_RULE },
-    presence: "CONTENT",
+    presence: "AREA_PERSONA",
     decidedBy: NEW_ROLE,
   },
   {
@@ -327,7 +332,7 @@ export const CAST_ROSTER: readonly CastRosterEntry[] = [
         "Regista di eventi carismatico con cartellina e accredito del torneo",
     },
     voice: { ready: false, rule: VOICE_RULE },
-    presence: "CONTENT",
+    presence: "AREA_PERSONA",
     decidedBy: NEW_ROLE,
   },
   {
@@ -352,7 +357,7 @@ export const CAST_ROSTER: readonly CastRosterEntry[] = [
       brief: "Coach positivo e calmo, in tuta del club, a bordo campo",
     },
     voice: { ready: false, rule: VOICE_RULE },
-    presence: "CONTENT",
+    presence: "AREA_PERSONA",
     decidedBy: NEW_ROLE,
   },
   {
@@ -377,7 +382,7 @@ export const CAST_ROSTER: readonly CastRosterEntry[] = [
       brief: "Preparatore atletico energico con cronometro e coni",
     },
     voice: { ready: false, rule: VOICE_RULE },
-    presence: "CONTENT",
+    presence: "AREA_PERSONA",
     decidedBy: NEW_ROLE,
   },
   {
@@ -406,7 +411,7 @@ export const CAST_ROSTER: readonly CastRosterEntry[] = [
       brief: "Figura serena con cuffie, atmosfera calma, colori del club",
     },
     voice: { ready: false, rule: VOICE_RULE },
-    presence: "CONTENT",
+    presence: "AREA_PERSONA",
     decidedBy: NEW_ROLE,
   },
   {
@@ -433,7 +438,7 @@ export const CAST_ROSTER: readonly CastRosterEntry[] = [
       brief: "Ambasciatore elegante del club, stile business sportivo",
     },
     voice: { ready: false, rule: VOICE_RULE },
-    presence: "CONTENT",
+    presence: "AREA_PERSONA",
     decidedBy: NEW_ROLE,
   },
 ];

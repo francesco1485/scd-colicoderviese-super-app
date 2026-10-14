@@ -2795,6 +2795,53 @@
         "implementationStatus": "IMPLEMENTED_STAGING_MIGRATION_NOT_APPLIED",
         "duplicate_work": "DENY"
       }
+    },
+    {
+      "sourceDate": "2026-10-14",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-114",
+      "name": "CAST_AVATARS_LIVE_AREA_GUIDES_INTERACTIVE",
+      "sourceQuoteFragments": [
+        "Importante sono i gestionali e gli avatar che devono creare e rendere tutto interattivo e dinamico",
+        "Accoglienza + Chef: area ristoro/Club House, menu, ordini per feste e iniziative -> conferma umana -> pagamento alla cassa SQUBY/SumUp, novità, sondaggi sui piatti (characters requested earlier, relayed by the orchestrating session)",
+        "Biglietteria: prezzi, gratuità, card, prossime partite in casa; Mentore dei tornei (direttore artistico): tornei, interesse iscrizione squadre, programma, ospitalità",
+        "Mental coach: motivazione, invito a contattare il mental coach reale del club, mai percorsi personali con minori senza genitori; Preparatore atletico: riscaldamento e prevenzione per età, mai piani personali per minori",
+        "Musica e relax: calma e respiro, NON terapia, disagio -> professionisti e referente Tutela minori; Volto sponsor: storie dei partner, pacchetti, diventa partner"
+      ],
+      "context": "Direzione intent of 14/10/2026 relayed to the build session (verbatim first fragment; the per-character list repeats the requests already recorded in UD-111).",
+      "normalizedCommand": {
+        "rule": "Every character of the cast becomes a live, interactive guide of its area: a presence on the area page (portrait only when approved, otherwise an initial badge; role labels while names are TBD), a deterministic tip of the day from curated safe copy, 2-4 quick actions to real pages and 'Chiedi a …' opening the existing chat with that persona. Personas extend the existing assistant system (same JSON output, link allowlist, output guards, distress pre-router for every persona) and answer only from CONTEXT; operational requests (orders, team registrations, tickets) are collected for a person, never confirmed or paid in the app. With the AI off the rules engine answers in the persona's voice with links.",
+        "scope": "ASSISTANTS_AND_CHARACTERS",
+        "constraints": [
+          "area personas inside only for staff and adult members; younger members and unknown ages keep Sky (Sky only for the under-14 contexts)",
+          "public pages open only the public-data personas (biglietteria, mentore dei tornei, volto sponsor)",
+          "Musica e relax and Mental coach never act as therapy; distress gets the fixed referral of cast-safety.ts for every persona",
+          "Era and the Preparatore never give numbers, quantities, weight or personal plans; Dottor Acanfora never a diagnosis or a medicine",
+          "Club House: request -> human confirmation -> payment at the SQUBY/SumUp till; no allergies or other health data in the form; orders only from adults or family accounts",
+          "no images generated, no voices; portraits stay hidden until approved; home layout unchanged; no invented club facts",
+          "migration r103 staged only, applied with explicit Direzione approval; the UI fails closed until then"
+        ],
+        "supersedesInPart": [
+          "UD-111 constraint 'new roles are not wired as chat personas'"
+        ],
+        "implementation": {
+          "registry": "apps/superapp/src/lib/cast-personas.ts",
+          "routing": "apps/superapp/src/lib/assistant.ts chatPersonaFor, personaVoice, personaRules; assistant.server.ts; assistant.functions.ts",
+          "rules_engine": "apps/superapp/src/lib/cast-rules.ts",
+          "ui": "apps/superapp/src/components/scd/CastPresence.tsx, ClubHouseOrderCard.tsx, ClubHouseBoardCard.tsx, CastDirectory.tsx; SkyChat assistant:open",
+          "requests": "apps/superapp/src/lib/area-requests.ts, area-requests.functions.ts; supabase/migrations/20261014_r103_area_requests.sql (STAGED, NOT APPLIED)",
+          "manifest": "sky_and_avatar.ai_assistants.personas.cast_area_personas, sky_and_avatar.assistant_cast.area_personas, GAP-CAST-AREA-REQUESTS-R103"
+        },
+        "pending": [
+          "Direzione: personal names of the seven new roles",
+          "Direzione: approve and apply r103 (Club House requests and dish polls)",
+          "Direzione: role boundary between Crovi ('leggenda della segreteria e della biglietteria') and the Biglietteria character on public pages",
+          "Move the Volto sponsor presence to /sponsor once the sponsor/partner rework of agent/fondo2 is merged"
+        ],
+        "implementationStatus": "IMPLEMENTED_BRANCH_AGENT_AVATARS_MIGRATION_STAGED",
+        "duplicate_work": "DENY"
+      }
     }
   ],
   "completionGate": {

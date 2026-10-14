@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.35.0",
+    "version": "3.36.0",
     "effective_at": "2026-10-14",
     "status": "BINDING",
     "language": "it-IT",
@@ -2417,12 +2417,25 @@
           "endpoint": "askStaffAssistant",
           "data": "PUBLIC_PROJECTION_ONLY",
           "context_cap_tokens": 3000
+        },
+        "cast_area_personas": {
+          "directive": "UD-114",
+          "ids": ["era", "acanfora", "accoglienza-chef", "biglietteria", "mentore-tornei", "mental-coach", "preparatore-atletico", "musica-relax", "volto-sponsor"],
+          "registry": "apps/superapp/src/lib/cast-personas.ts CAST_PERSONAS",
+          "opened_by": "'Chiedi a …' in the character's own area only (window event assistant:open, lib/assistant-open.ts)",
+          "surface_public": "biglietteria, mentore-tornei, volto-sponsor (askAssistant, public projection only)",
+          "surface_inside": "every area persona, only for staff and adult members (gennyEligible); younger members and unknown age keep Sky",
+          "data": "PUBLIC_PROJECTION_PLUS_AREA_NOTES_NEVER_CERVELLONE",
+          "context_cap_tokens": 3000,
+          "output_guard": "castAnswerProblems: confirmations of orders/tickets/registrations/payments, therapy wording (musica-relax, mental-coach), numbers or plans (era, preparatore-atletico), drugs (acanfora) -> rules engine",
+          "fallback": "cast-rules.ts castRulesAnswer: distress -> safeguarding -> operational -> requests engine -> persona intents (real facts only) -> general intents -> persona default (today's tip, quick links)"
         }
       },
-      "persona_rule": "Public pages Crovi; inside: staff positions and families -> Genny, athlete-only or unknown age -> Sky (age not in session)",
+      "persona_rule": "Public pages Crovi; inside: staff positions and families -> Genny, athlete-only or unknown age -> Sky (age not in session); an area persona (UD-114) answers only when its area asks for it and assistant.ts chatPersonaFor allows it",
       "pre_router": [
         "DISTRESS_TO_FIXED_REFERRAL_UD111",
         "SAFEGUARDING_TO_RESERVED_CHANNEL_RULES",
+        "OPERATIONAL_REQUESTS_OF_AREA_PERSONAS_TO_FIXED_REPLY_UD114",
         "REQUESTS_TO_REQUESTS_ENGINE_UD045"
       ],
       "fallback": "askSky keyword rules engine",
@@ -2457,10 +2470,19 @@
         "musica-relax",
         "volto-sponsor"
       ],
-      "new_roles_presence": "CONTENT_ENTRIES_ONLY_NO_CHAT_PERSONA_NO_PORTRAIT_NO_VOICE",
+      "new_roles_presence": "AREA_PERSONA_UD114_LIVE_GUIDE_NO_PORTRAIT_NO_VOICE_NAMES_TBD_AS_ROLE_LABELS",
       "portraits": "SHOWN_ONLY_WHEN_READY_AND_REGISTERED_APPROVED; era and genny ON_HOLD until new Direzione-approved images",
       "voices": "NONE_UNTIL_DIREZIONE_APPROVES_ORIGINAL_SYNTHETIC_VOICE_NOT_TIED_TO_A_REAL_PERSON",
-      "safety_rule": "DISTRESS_FIXED_REFERRAL_NO_THERAPY (cast-safety.ts; rules engine and AI pre-router)"
+      "safety_rule": "DISTRESS_FIXED_REFERRAL_NO_THERAPY (cast-safety.ts; rules engine and AI pre-router)",
+      "area_personas": {
+        "directive": "UD-114",
+        "presence_component": "apps/superapp/src/components/scd/CastPresence.tsx (CastPresence, CastHelpersCard, CastAskButton)",
+        "daily_tip": "deterministic by Europe/Rome day (dailyPick); curated in-repo copy guarded by castCopyProblems (no digits except 112, no diet/drug/therapy/plan wording)",
+        "placements": "/impianti biglietteria (live next ticketed home match); /tornei mentore-tornei (live next tournament) + volto-sponsor; /famiglia Era ask, CastHelpersCard (preparatore-atletico, mental-coach, musica-relax), Club House order request; /infermeria Acanfora ask; /segreteria Genny; /tesoreria/biglietteria; /tesoreria/club-house chef + office board; /guida#personaggi directory. Home layout unchanged.",
+        "area_requests_migration": "supabase/migrations/20261014_r103_area_requests.sql (STAGED, NOT APPLIED)",
+        "area_requests_flow": "request in app -> a person of the Club House confirms -> payment at the club till (SQUBY/SumUp); never payments or confirmations in app; no health data in the form",
+        "dish_polls": "scd_area_polls / scd_area_poll_votes in r103 (scd_week_votes is athlete-only, not reusable)"
+      }
     }
   },
   "geo_spatial": {
@@ -3803,6 +3825,13 @@
       "statement": "UD-112 (Direzione 14/10/2026): access must be granted per person and per section, never derived from roles. The catalogue, migration r100 and the admin page /direzione/accessi/$personId exist, but r100 is not applied and the existing work-area guards still open areas from role positions (session.ts ROLE_POSITIONS, areas.ts canSeeArea).",
       "required_fix": "Direzione approves and applies r100; Direzione grants sections person by person; then each existing guard is switched to scd_can (person-grants.server.ts sectionCheck) with tests, removing role-derived opening.",
       "safe_runtime_behavior": "Until r100 is applied the page is a simulation (no save, no copy) and nobody's access changes; pending access requests stay pending."
+    },
+    {
+      "id": "GAP-CAST-AREA-REQUESTS-R103",
+      "severity": "MEDIUM",
+      "statement": "UD-114 (Direzione 14/10/2026): the Club House order requests and dish polls of 'Lo chef' exist in the app and in the staged migration r103, which is not applied: today the family form only prepares a message for the secretariat.",
+      "required_fix": "Direzione approves and applies r103; the Club House office tests a request end to end (request, confirmation, payment at the till) and opens the first dish poll.",
+      "safe_runtime_behavior": "Fail closed: no request is shown as sent, no poll is shown, no payment ever in the app."
     }
   ],
   "development_contract": {

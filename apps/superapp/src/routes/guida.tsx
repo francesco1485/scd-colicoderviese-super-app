@@ -2,6 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { BellRing, Brain, CalendarDays, ClipboardCheck, ClipboardList, FileText, HeartPulse, KeyRound, Megaphone, PartyPopper, ShieldCheck, Smartphone, Ticket, UserPlus, Users, Wallet } from "lucide-react";
 import type { ReactNode } from "react";
 
+import { CastDirectory } from "@/components/scd/CastDirectory";
+
 /**
  * "Come funziona": quick guide for the launch, public so families can read it before signing in.
  * Plain steps per role, matching what the app does today (UD-062…UD-069) and the four doors of
@@ -57,6 +59,7 @@ function Guida() {
           {ROLES.map((r) => (
             <a key={r.id} href={`#${r.id}`} className="inline-flex h-11 items-center rounded-full border border-border bg-white px-4 text-[15px] font-semibold">{r.label}</a>
           ))}
+          <a href="#personaggi" className="inline-flex h-11 items-center rounded-full border border-border bg-white px-4 text-[15px] font-semibold">I nostri personaggi</a>
         </nav>
       </header>
 
@@ -143,6 +146,14 @@ function Guida() {
           Direzione → Cervellone: cerca in documenti, posta catalogata, economia e storia del club, con le scadenze in vista. Ognuno vede solo il livello del proprio ruolo.
         </Step>
       </Section>
+
+      <section id="personaggi" aria-labelledby="personaggi-t" className="scroll-mt-24 rounded-2xl border border-border bg-card p-5 sm:p-6">
+        <h2 id="personaggi-t" className="m-0 text-[24px] font-bold leading-tight">I nostri personaggi</h2>
+        <p className="mt-1 text-[15px] text-muted-foreground">Chi ti aiuta e dove lo trovi: ogni personaggio ha il suo angolo, il consiglio del giorno e risponde alle domande della sua area.</p>
+        <div className="mt-4">
+          <CastDirectory />
+        </div>
+      </section>
 
       <p className="m-0 text-[14.5px] text-muted-foreground">
         Dubbi? Scrivi alla segreteria: <b className="select-all">sportclubcolico@gmail.com</b>. Come trattiamo i dati: <Link to="/privacy" className="underline">informativa privacy</Link>.

@@ -151,7 +151,7 @@ describe("cast roster (Direzione 14/10/2026, UD-111)", () => {
       expect(r.nameTbd, id).toBe(true);
       expect(r.portrait.ready, id).toBe(false);
       expect(r.voice.ready, id).toBe(false);
-      expect(r.presence, id).toBe("CONTENT");
+      expect(r.presence, id).toBe("AREA_PERSONA");
       expect(r.decidedBy, id).toMatch(/14\/10\/2026.*nome da decidere/);
     }
     expect(rosterEntry("accoglienza-chef").label).toBe("Accoglienza e Chef");
@@ -175,10 +175,13 @@ describe("cast roster (Direzione 14/10/2026, UD-111)", () => {
     expect(CAST_SHARED_RULES.join(" ")).toMatch(/S\.C\.D\. ColicoDerviese/);
   });
 
-  it("has Genny as the only chat persona of the cast and keeps the named roles in sync with CAST", () => {
+  it("has Genny as the only helper persona, the others as area personas (UD-114), and keeps the named roles in sync with CAST", () => {
     expect(
       CAST_ROSTER.filter((r) => r.presence === "CHAT_PERSONA").map((r) => r.id),
     ).toEqual(["genny"]);
+    expect(
+      CAST_ROSTER.filter((r) => r.presence === "AREA_PERSONA").map((r) => r.id),
+    ).toEqual(["era", "acanfora", ...NEW_ROLES]);
     for (const id of CAST_IDS)
       expect(rosterEntry(id).portrait.ready, id).toBe(castReady(id));
     expect(rosterEntry("era").role).toBe("Nutrizionista");

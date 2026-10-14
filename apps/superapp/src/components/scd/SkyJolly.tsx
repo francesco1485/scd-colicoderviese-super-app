@@ -15,13 +15,16 @@
  * Sky head + ball /media/brand/sky-scd.png, CROVI avatar /media/crovi/v3 (original fictional figure),
  * Genny avatar /media/cast/genny only once the Direzione approves an image that fits the secretary role (neutral 'G'
  * until then: the held round-4 image does not match the new role).
+ * Area personas of the cast (UD-114, lib/cast-personas.ts) answer when a page opens the chat with "Chiedi a …"
+ * (window event "assistant:open", lib/assistant-open.ts): portrait only when approved, otherwise their initial.
  */
 import croviAvatar from "@/assets/crovi/crovi-avatar-256.webp.asset.json";
-import { insidePersonaFor, type HelperViewer } from "@/lib/assistant";
-import { CAST, castAvatarSrc, castReady } from "@/lib/assistant-cast";
+import { chatPersonaFor, isCastPersona, type AssistantPersona, type HelperViewer } from "@/lib/assistant";
+import { CAST, CAST_IDS, castAvatarSrc, castReady, type CastId } from "@/lib/assistant-cast";
+import { CAST_PERSONAS, CAST_PERSONA_IDS, type CastPersonaId } from "@/lib/cast-personas";
 import { isPublicPath } from "@/lib/http-policy";
 
-export type Persona = "sky" | "crovi" | "genny";
+export type Persona = AssistantPersona;
 
 export type { HelperViewer } from "@/lib/assistant";
 export { gennyEligible } from "@/lib/assistant";
@@ -67,9 +70,12 @@ export function isHelperHiddenPath(pathname: string): boolean {
   return startsWithPrefix(pathname, HIDDEN_PREFIXES);
 }
 
-/** Who answers in the chat: Crovi on public pages; inside Genny (staff, adults 15+) or Sky (lib/assistant.ts). */
-export function personaFor(pathname: string, viewer?: HelperViewer | null): Persona {
-  return isReservedPath(pathname) ? insidePersonaFor(viewer?.roles, viewer?.age15plus ?? null) : "crovi";
+/**
+ * Who answers in the chat: Crovi on public pages; inside Genny (staff, adults 15+) or Sky (lib/assistant.ts); an area
+ * persona when a page asked for it and the one rule allows it (assistant.ts chatPersonaFor, UD-114).
+ */
+export function personaFor(pathname: string, viewer?: HelperViewer | null, requested?: string | null): Persona {
+  return chatPersonaFor(isReservedPath(pathname) ? "inside" : "public", viewer, requested);
 }
 
 /**
@@ -89,18 +95,17 @@ export function greetingFor(persona: Persona, face: Persona = persona): string {
 
 export const SKY_HANDOFF = "Sky, il nostro portafortuna, mi ha passato la palla.";
 
-export const PERSONA_COPY: Record<
-  Persona,
-  {
-    name: string;
-    title: string;
-    subtitle: string;
-    greeting: string;
-    placeholder: string;
-    thinking: string;
-    quick: ReadonlyArray<string>;
-  }
-> = {
+export interface PersonaCopy {
+  name: string;
+  title: string;
+  subtitle: string;
+  greeting: string;
+  placeholder: string;
+  thinking: string;
+  quick: ReadonlyArray<string>;
+}
+
+const HELPER_COPY: Record<"sky" | "genny" | "crovi", PersonaCopy> = {
   sky: {
     name: "Sky",
     title: "Sky, la mascotte del club",
@@ -153,6 +158,12 @@ export const PERSONA_COPY: Record<
   },
 };
 
+/** Chat copy of every persona: the three helpers and the area personas (cast-personas.ts). */
+export const PERSONA_COPY: Readonly<Record<Persona, PersonaCopy>> = {
+  ...HELPER_COPY,
+  ...(Object.fromEntries(CAST_PERSONA_IDS.map((id) => [id, { name: CAST_PERSONAS[id].label, ...CAST_PERSONAS[id].chat }])) as Record<CastPersonaId, PersonaCopy>),
+};
+
 /**
  * Round avatar of the active persona. Sky's head is cropped in a light circle with a navy ring,
  * CROVI keeps his approved 256px avatar, Genny uses hers once an image fitting the role is approved (neutral 'G'
@@ -167,6 +178,7 @@ export function PersonaAvatar({
   size?: number;
   className?: string;
 }) {
+  if (isCastPersona(persona)) return <CastBadge id={persona} size={size} className={className} />;
   if (persona === "genny") {
     if (castReady("genny")) {
       return (
@@ -219,6 +231,50 @@ export function PersonaAvatar({
         className="size-full object-cover object-top"
         style={{ transform: "scale(1.12)", transformOrigin: "50% 20%" }}
       />
+    </span>
+  );
+}
+
+/**
+ * Round badge of a cast character (UD-114): the approved 256px avatar when the character's portrait is ready
+ * (assistant-cast.ts readiness), otherwise its initial in the club colours, like Genny's "G". Never a drawing that
+ * stands in for a face the Direzione has not approved.
+ */
+export function CastBadge({
+  id,
+  size = 44,
+  className = "",
+  initial,
+}: {
+  id: CastPersonaId | "genny";
+  size?: number;
+  className?: string;
+  /** Letter for characters outside cast-personas (Genny). */
+  initial?: string;
+}) {
+  const castId = (CAST_IDS as readonly string[]).includes(id) ? (id as CastId) : null;
+  if (castId && castReady(castId)) {
+    return (
+      <img
+        src={castAvatarSrc(castId)}
+        alt=""
+        width={size}
+        height={size}
+        className={`shrink-0 rounded-full object-cover ring-2 ring-[#0b2a5b] ${className}`}
+        style={{ width: size, height: size }}
+        data-cast={castId}
+      />
+    );
+  }
+  const letter = initial ?? (id === "genny" ? "G" : CAST_PERSONAS[id].initial);
+  return (
+    <span
+      aria-hidden="true"
+      data-cast-initial={id}
+      className={`inline-flex shrink-0 items-center justify-center rounded-full bg-[#0b2a5b] font-bold text-[#ffd600] ring-2 ring-[#ffd600] ${className}`}
+      style={{ width: size, height: size, fontSize: Math.round(size * 0.46) }}
+    >
+      {letter}
     </span>
   );
 }

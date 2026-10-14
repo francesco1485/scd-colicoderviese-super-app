@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import type { ComponentType, SVGProps } from "react";
 
+import { CastAskButton } from "@/components/scd/CastPresence";
 import { CastPortrait } from "@/components/scd/CastPortrait";
 import { Card } from "@/components/scd/interior-ui";
 import {
@@ -126,6 +127,9 @@ export function EraNutritionCard({
           >
             {ERA_DISCLAIMER}
           </p>
+          <div className="mt-3">
+            <CastAskButton id="era" />
+          </div>
         </div>
       </div>
     </Card>

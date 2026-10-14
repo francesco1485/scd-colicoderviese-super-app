@@ -129,7 +129,7 @@ describe("public assistant (Crovi)", () => {
     const t = pub(ON, f, "devo segnalare un caso di bullismo");
     const r = await t.run();
     expect(f).not.toHaveBeenCalled();
-    expect(t.rules).toHaveBeenCalledWith({ message: "devo segnalare un caso di bullismo" });
+    expect(t.rules).toHaveBeenCalledWith({ message: "devo segnalare un caso di bullismo", persona: "crovi" });
     expect(r.ai).toBe(false);
   });
 
@@ -138,7 +138,7 @@ describe("public assistant (Crovi)", () => {
     const t = pub(ON, f, "mi sento giù e non ce la faccio più");
     const r = await t.run();
     expect(f).not.toHaveBeenCalled();
-    expect(t.rules).toHaveBeenCalledWith({ message: "mi sento giù e non ce la faccio più" });
+    expect(t.rules).toHaveBeenCalledWith({ message: "mi sento giù e non ce la faccio più", persona: "crovi" });
     expect(r.ai).toBe(false);
   });
 
@@ -259,5 +259,98 @@ describe("staff assistant (Genny / Sky)", () => {
     for (let i = 0; i < 60; i++) expect((await answerStaff("ciao", deps)).ai).toBe(true);
     const r = await answerStaff("ciao", deps);
     expect(r).toMatchObject({ ai: false, mood: "alert" });
+  });
+});
+
+describe("area personas of the cast (UD-114)", () => {
+  let seq = 0;
+  function inside(roles: string[], fetchImpl: ReturnType<typeof vi.fn>, env: Record<string, string> = ON) {
+    const email = `cast${++seq}@example.org`;
+    const kbSearch = vi.fn(async () => null);
+    const rules = vi.fn(async () => RULES);
+    const loadPublicContext = vi.fn(async () => ctxInput());
+    const deps: StaffDeps = { env, fetchImpl: fetchImpl as never, rules, kbSearch, loadPublicContext, session: async () => ({ user: { email }, roles }) };
+    return { deps, kbSearch, rules, loadPublicContext };
+  }
+
+  function systemOf(f: ReturnType<typeof vi.fn>): string {
+    return (JSON.parse(String((f.mock.calls[0] as unknown as [string, RequestInit])[1].body)) as { system: string }).system;
+  }
+
+  it("answers as the chef with its voice, rules and area, never reading the Cervellone", async () => {
+    const f = vi.fn(async () => claudeResponse('{"text":"Il listino non è ancora pubblicato: per la festa compila la richiesta nell\'area famiglia.","links":[{"label":"Richiesta","to":"/famiglia"}]}'));
+    const t = inside(["segreteria"], f);
+    const r = await answerStaff("cosa c'è in menu?", t.deps, "accoglienza-chef");
+    expect(t.kbSearch).not.toHaveBeenCalled();
+    const sys = systemOf(f);
+    expect(sys).toContain("chef e l'accoglienza della Club House");
+    expect(sys).toContain("SQUBY/SumUp");
+    expect(sys).toContain("Area di Lo chef");
+    expect(r).toMatchObject({ ai: true, persona: "accoglienza-chef", links: [{ label: "Richiesta", to: "/famiglia" }] });
+  });
+
+  it("re-checks the persona on the server: an athlete asking for the mental coach gets Sky", async () => {
+    const f = vi.fn(async () => claudeResponse('{"text":"Ciao!"}'));
+    const t = inside(["atleta"], f);
+    const r = await answerStaff("come mi concentro?", t.deps, "mental-coach");
+    expect(r.persona).toBe("sky");
+    expect(systemOf(f)).toContain("Sei Sky");
+  });
+
+  it("ignores an unknown persona and keeps Genny for staff", async () => {
+    const f = vi.fn(async () => claudeResponse('{"text":"ok"}'));
+    const t = inside(["segreteria"], f);
+    const r = await answerStaff("ciao", t.deps, "admin");
+    expect(r.persona).toBe("genny");
+  });
+
+  it("never sends an order to the model: the rules engine collects it with the chef's voice", async () => {
+    const f = vi.fn();
+    const t = inside(["famiglia"], f);
+    const r = await answerStaff("vorrei ordinare una torta per il compleanno", t.deps, "accoglienza-chef");
+    expect(f).not.toHaveBeenCalled();
+    expect(t.rules).toHaveBeenCalledWith({ message: "vorrei ordinare una torta per il compleanno", persona: "accoglienza-chef" });
+    expect(r.persona).toBe("accoglienza-chef");
+    expect(bypassesModel("posso comprare il biglietto qui?", "biglietteria")).toBe("operational");
+    expect(bypassesModel("posso comprare il biglietto qui?", "crovi")).toBeNull();
+  });
+
+  it("never sends distress to the model, whatever the persona", async () => {
+    for (const persona of ["musica-relax", "mental-coach", "accoglienza-chef", "biglietteria"]) {
+      const f = vi.fn();
+      const t = inside(["famiglia"], f);
+      await answerStaff("prima della partita ho l'ansia", t.deps, persona);
+      expect(f, persona).not.toHaveBeenCalled();
+      expect(bypassesModel("mi sento giù", persona as never)).toBe("distress");
+    }
+  });
+
+  it("falls back to the rules engine when the model breaks the persona's rules", async () => {
+    const f = vi.fn(async () => claudeResponse('{"text":"Facciamo una terapia di respirazione."}'));
+    const t = inside(["famiglia"], f);
+    const r = await answerStaff("come mi rilasso?", t.deps, "musica-relax");
+    expect(f).toHaveBeenCalled();
+    expect(r).toMatchObject({ ai: false, persona: "musica-relax", text: RULES.text });
+  });
+
+  it("opens the public-data personas on public pages with their area and real facts", async () => {
+    const f = vi.fn(async () => claudeResponse('{"text":"Christmas Lario Cup in programma."}'));
+    const rules = vi.fn(async () => RULES);
+    const r = await answerPublic(
+      { message: "che tornei ci sono?", persona: "mentore-tornei", ip: nextIp() },
+      { env: ON, fetchImpl: f as never, rules, loadContext: async () => ctxInput(), castFacts: async () => ({ ticketing: null, nextHomeMatch: null, tournaments: ["Christmas Lario Cup, 8 dicembre 2026, Colico (in programma)"] }) },
+    );
+    expect(systemOf(f)).toContain("Torneo: Christmas Lario Cup");
+    expect(systemOf(f)).toContain("mentore dei tornei");
+    expect(r).toMatchObject({ ai: true, persona: "mentore-tornei" });
+  });
+
+  it("keeps the persona on the rules engine when the AI is off", async () => {
+    const f = vi.fn();
+    const t = inside(["famiglia"], f, {});
+    const r = await answerStaff("ciao", t.deps, "preparatore-atletico");
+    expect(f).not.toHaveBeenCalled();
+    expect(t.rules).toHaveBeenCalledWith({ message: "ciao", persona: "preparatore-atletico" });
+    expect(r.persona).toBe("preparatore-atletico");
   });
 });
