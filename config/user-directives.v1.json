@@ -3418,7 +3418,7 @@
     },
     {
       "sourceDate": "2026-10-15",
-      "sourceTime": "17:16-17:30",
+      "sourceTime": "17:16-18:52",
       "sourceStatus": "EXPLICIT_USER_COMMAND",
       "authority": "FRANCESCO_SCD",
       "id": "UD-155",
@@ -3429,7 +3429,11 @@
         "risposte: Tutto in automatico; costo AI: Budget piccolo ok; contatti: Rubrica da verificare",
         "creare un agente ad oc per la segreteria super evoluto ed esperto in tutto quelo che è un segretario sportivo, di calcio, di sport, di associaizoni, di adempimenti, di programmazione",
         "i contatti devono essere messi dal drive e dalla mail di sportlub nei contatti di google e anagrafati e poi posrati nel telefono caricando account sportclueb sul telefono",
-        "anche immagine e risposta del numero deve essere fatta da avatar deella segreteria"
+        "anche immagine e risposta del numero deve essere fatta da avatar deella segreteria",
+        "vorrei mettere u nome di una divinità greca (17:33) -> scelta: Iride; avatar: 'si questa' (17:37)",
+        "vera non ce piu ce iride - crovi per i piu giovani (18:40, chat cloud)",
+        "ok salva cognome e ruolo (18:26)",
+        "va bene procedi (18:52, pagina /installa con Iride, foto e contatto)"
       ],
       "context": "Francesco 15/10/2026 (chat PC). Extends UD-154 from friendlies to every request on every channel. Choices given through the question card at 17:18: automatic replies, small AI budget (about 20-30 EUR/month, today covered by the Make plan credits), contacts saved only after the Segreteria checks them. At 17:21 asked for a dedicated expert secretary agent; at 17:28 'via'; at 17:30 contacts to Google Contacts of sportclubcolico and the WhatsApp profile as the Segreteria avatar.",
       "normalizedCommand": {
@@ -3445,13 +3449,15 @@
           "with a minor: general club information only, a parent is invited to write",
           "only replies to people who wrote first (WhatsApp 24-hour window); messages the club starts towards many contacts stay a Direzione decision",
           "contacts from the sportclubcolico mailbox and Drive go to a 'rubrica da verificare' and reach Google Contacts of sportclubcolico only after the Segreteria checks them; never in the repo",
-          "WhatsApp profile picture and name use the Segreteria avatar only after the Direzione approves the image (character images are frozen, UD-111/UD-121)"
+          "Iride is the AI Segreteria persona everywhere (WhatsApp now; the app chat replaces Vera through the cloud chat, Francesco 18:40); avatar approved 17:37 (Canva MAHYF_fzGq0) for WhatsApp and the app",
+          "the contacts book stores name, surname and declared role only of adults who introduce themselves (children: team only), says so in the reply and deletes on CANCELLA; the declared role never unlocks reserved information"
         ],
         "implementation": {
           "make_scenario": "7979437 'SCD · Segreteria AI · WhatsApp' (Make AI Tools on Make's AI Provider, plan credits)",
           "prompt_source": "automations/make/segreteria-ai/system-prompt.it.md",
           "agent": ".claude/agents/scd-segreteria.md",
-          "register": "SCD_INTAKE_LOG"
+          "register": "SCD_INTAKE_LOG",
+          "install_page": "/installa (Francesco 18:52): one-tap install, Iride card with avatar, vCard /iride.vcf, wa.me"
         }
       }
     }

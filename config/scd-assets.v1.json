@@ -2643,6 +2643,15 @@
       "derived_from": "Supplied by the SCD Direzione on 2026-10-15 16:33 (fornito dalla Direzione SCD 15/10/2026): castello-cantu.png (original sha256 b883426d57b6cd21)",
       "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
       "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/cast/iride/iride-avatar-256.webp",
+      "class": "CHARACTER_AVATAR_TILE",
+      "asset_class": "GENERATE_ORIGINAL",
+      "status": "VERIFIED",
+      "approval_evidence": "Francesco 15/10/2026 17:37 'si questa' (avatar of Iride, AI Segreteria, UD-155); 18:40 'vera non ce piu ce iride'; 18:52 'va bene procedi' on the /installa page with this avatar",
+      "canva_media_id": "MAHYF_fzGq0",
+      "source": "Iride avatar tile with background, original character (career woman inspired by the Greek messenger goddess Iris), square resize of Canva media MAHYF_fzGq0"
     }
   ],
   "vector_research": [
