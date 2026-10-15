@@ -5,7 +5,12 @@
  * No minor, no invented content. Pure functions, tested in home-stories.test.ts.
  */
 import { clubEventsOn } from "./club-events";
-import { spotsForHome, spotsInDayOrder, type SponsorSpot } from "./sponsor-spots";
+import {
+  spotsForHome,
+  spotsInDayOrder,
+  type SponsorSpot,
+} from "./sponsor-spots";
+import { SPONSORS } from "./sponsors";
 import type { ClubEvent } from "./stories";
 
 export type HomeStory = {
@@ -13,9 +18,12 @@ export type HomeStory = {
   /** Ring label (short). */
   label: string;
   /** Small round image of the ring. */
+  thumbFit?: "cover" | "contain";
   thumb: string;
   /** Full-screen media. */
-  media: { kind: "image"; src: string } | { kind: "video"; src: string; poster: string };
+  media:
+    | { kind: "image"; src: string }
+    | { kind: "video"; src: string; poster: string };
   /** Caption over the media. */
   title: string;
   text: string;
@@ -55,7 +63,10 @@ const LAKE: HomeStory = {
 export function eventStory(e: ClubEvent): HomeStory {
   return {
     id: `evento-${e.id}`,
-    label: e.title.length > 14 ? `${e.title.split(" ").slice(-2).join(" ")}` : e.title,
+    label:
+      e.title.length > 14
+        ? `${e.title.split(" ").slice(-2).join(" ")}`
+        : e.title,
     thumb: e.image,
     media: { kind: "image", src: e.image },
     title: e.title,
@@ -68,9 +79,16 @@ export function eventStory(e: ClubEvent): HomeStory {
 export function spotStory(s: SponsorSpot): HomeStory {
   return {
     id: `spot-${s.slug}`,
-    label: s.sponsorName.length > 12 ? `${s.sponsorName.slice(0, 11)}…` : s.sponsorName,
-    thumb: s.poster,
-    media: s.preview ? { kind: "video", src: s.preview, poster: s.poster } : { kind: "image", src: s.poster },
+    thumbFit: "contain",
+    label:
+      s.sponsorName.length > 12
+        ? `${s.sponsorName.slice(0, 11)}…`
+        : s.sponsorName,
+    // The ring shows the partner's logo (recognisable at a glance), the story plays the spot.
+    thumb: SPONSORS.find((x) => x.slug === s.slug)?.src ?? s.poster,
+    media: s.preview
+      ? { kind: "video", src: s.preview, poster: s.poster }
+      : { kind: "image", src: s.poster },
     title: `In onda sul LED: ${s.sponsorName}`,
     text: "Lo spot del partner che passa sul LED wall del campo di Colico.",
     href: `/spot/${s.slug}`,
@@ -84,7 +102,11 @@ export function homeStories(
   events: readonly ClubEvent[] = clubEventsOn(day),
   spots: readonly SponsorSpot[] = spotsForHome(),
 ): HomeStory[] {
-  const upcoming = events.filter((e) => !e.date || e.date >= day).map(eventStory);
-  const partners = spotsInDayOrder(spots, day).slice(0, STORY_SPOTS).map(spotStory);
+  const upcoming = events
+    .filter((e) => !e.date || e.date >= day)
+    .map(eventStory);
+  const partners = spotsInDayOrder(spots, day)
+    .slice(0, STORY_SPOTS)
+    .map(spotStory);
   return [...upcoming, ...partners, CENTRE, LAKE];
 }

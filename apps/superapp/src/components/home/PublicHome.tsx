@@ -12,10 +12,15 @@
  * Real assets only (public/media); our age-group crests never appear; no minor is named.
  */
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, ArrowUpRight, ChevronRight, Lock, Newspaper } from "lucide-react";
+import {
+  ArrowRight,
+  ArrowUpRight,
+  ChevronRight,
+  Lock,
+  Newspaper,
+} from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
-import { LedwallRotator } from "@/components/LedwallRotator";
 import { SponsorSpotsHome } from "@/components/SponsorSpots";
 import { ClubCrestOfficial } from "@/components/SiteChrome";
 import { KitTexture } from "@/components/scd/kit-texture";
@@ -42,102 +47,16 @@ import {
 import { HomeBoard } from "@/components/home/HomeBoard";
 import { HomeStories } from "@/components/home/HomeStories";
 import { HomeMatchday } from "@/components/home/HomeMatchday";
-import { ClubNoticeCard, UrgentNotices, WeekendResults } from "@/components/home/HomePractical";
+import {
+  ClubNoticeCard,
+  UrgentNotices,
+  WeekendResults,
+} from "@/components/home/HomePractical";
 import type { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
-import { calendarToWeekItems } from "@/lib/home-week";
-import { hasHomeMatch, showLedwallOnHome } from "@/lib/ledwall-rotation";
 
 type PublicCalendar = Awaited<ReturnType<typeof getPublicCalendarSnapshot>>;
 
 const WRAP = "mx-auto w-full max-w-[1280px] px-4 lg:px-8";
-
-/* ------------------------------------------------- credential bar */
-
-/**
- * The club's credentials high on the home (Direzione 13/10/2026 15:31 and 15:55): three distinct labelled items in
- * order of importance (Club Giovanile di 3° livello FIGC SGS, iscritta FIGC con LND Lombardia, affiliata AC
- * Monza), official marks only, slim white card below the practical blocks (UD-116).
- */
-function CredentialBar() {
-  return (
-    <section
-      aria-label="Riconoscimenti e affiliazioni del club"
-      className={`${WRAP} pt-6 lg:pt-10`}
-      data-testid="affiliation-strip"
-    >
-      <div className="rounded-[16px] bg-white px-3 py-2 [--logo-k:1] lg:py-2.5 lg:[--logo-k:1.2]">
-        <ClubCredentials variant="bar" className="mx-auto max-w-[1040px]" />
-      </div>
-    </section>
-  );
-}
-
-/* ------------------------------------------------------------ CTA banner */
-
-function JoinBanner() {
-  return (
-    <div className={`${WRAP} pt-6 lg:pt-10`}>
-      <section
-        aria-labelledby="entra-t"
-        className="relative isolate overflow-hidden rounded-[20px] bg-[#0b2a5b] text-white"
-        data-testid="join-banner"
-      >
-        <picture>
-          <source
-            media="(min-width: 1024px)"
-            srcSet="/media/scd/lario-header.webp"
-          />
-          <img
-            src="/media/scd/lario-header.webp"
-            alt=""
-            aria-hidden="true"
-            loading="lazy"
-            decoding="async"
-            className="absolute inset-0 -z-10 size-full object-cover object-[78%_center] lg:object-[center_40%]"
-          />
-        </picture>
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgb(11_42_91/0.55)_0%,rgb(11_42_91/0.92)_62%)] lg:bg-[linear-gradient(90deg,rgb(11_42_91/0.96)_0%,rgb(11_42_91/0.86)_45%,rgb(11_42_91/0.2)_100%)]"
-        />
-        <div className="grid gap-4 px-5 pb-6 pt-16 sm:px-8 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:items-center lg:gap-8 lg:px-10 lg:py-9">
-          <ClubCrestOfficial size={72} className="hidden lg:block" />
-          <div className="grid gap-2">
-            <h2
-              id="entra-t"
-              className="m-0 max-w-[18ch] font-uv text-[30px] uppercase leading-[0.95] lg:text-[40px]"
-            >
-              La tua squadra, i tuoi orari, le trasferte<span className="text-[#ffd600]">.</span>
-            </h2>
-            <p className="m-0 max-w-[46ch] text-[15.5px] leading-snug text-white/90 lg:text-[17px]">
-              Entra nell'app del club: le gare della tua squadra, le
-              convocazioni da vedere e la richiesta del posto in pulmino per
-              le trasferte. Un solo account per la famiglia.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2.5">
-            <Link
-              to="/registrati"
-              className="scd-focus inline-flex h-12 items-center gap-2 rounded-[12px] bg-[#ffd600] px-6 text-[16px] font-bold text-[#0b1e3a] transition-[filter] duration-150 hover:brightness-95"
-              data-testid="home-signup"
-            >
-              Registrati
-              <ArrowRight className="size-[18px]" aria-hidden="true" />
-            </Link>
-            <Link
-              to="/accedi"
-              search={{ next: undefined }}
-              className="scd-focus inline-flex h-12 items-center rounded-[12px] border border-white/70 px-6 text-[16px] font-semibold text-white transition-colors duration-150 hover:bg-white/10"
-              data-testid="home-enter"
-            >
-              Entra
-            </Link>
-          </div>
-        </div>
-      </section>
-    </div>
-  );
-}
 
 /* ------------------------------------------------------------- vetrina */
 
@@ -214,9 +133,15 @@ function SlotCard({ slot }: { slot: VetrinaSlot }) {
         )}
       </span>
       <span className="flex flex-1 flex-col gap-1 px-4 pb-4 pt-3">
-        <span className="text-[11.5px] font-bold uppercase tracking-[0.08em] text-[#1556c4]">{slot.kicker}</span>
-        <span className="text-[18px] font-bold leading-tight text-[#0b1e3a]">{slot.title}</span>
-        <span className="text-[14px] leading-snug text-[#4a5d7a]">{slot.text}</span>
+        <span className="text-[11.5px] font-bold uppercase tracking-[0.08em] text-[#1556c4]">
+          {slot.kicker}
+        </span>
+        <span className="text-[18px] font-bold leading-tight text-[#0b1e3a]">
+          {slot.title}
+        </span>
+        <span className="text-[14px] leading-snug text-[#4a5d7a]">
+          {slot.text}
+        </span>
         <span className="mt-auto inline-flex items-center gap-1 pt-2 text-[14px] font-semibold text-[#1556c4]">
           {slot.cta}
           <ArrowRight
@@ -247,10 +172,19 @@ function saveWorld(w: VetrinaWorld) {
 }
 
 /** "Il tuo mondo": the visitor picks a world (no age, no profile, no tracking; stored on this device only). */
-function WorldChips({ value, onChange }: { value: VetrinaWorld; onChange: (w: VetrinaWorld) => void }) {
+function WorldChips({
+  value,
+  onChange,
+}: {
+  value: VetrinaWorld;
+  onChange: (w: VetrinaWorld) => void;
+}) {
   return (
     <div className="flex flex-col gap-1.5 pb-3 sm:flex-row sm:items-center sm:gap-3">
-      <span id="mondo-l" className="text-[12px] font-bold uppercase tracking-[0.1em] text-[#5a6b85]">
+      <span
+        id="mondo-l"
+        className="text-[12px] font-bold uppercase tracking-[0.1em] text-[#5a6b85]"
+      >
         Il tuo mondo
       </span>
       <div
@@ -342,7 +276,10 @@ export function Vetrina({
         aria-live="polite"
       >
         {slots.map((s) => (
-          <li key={s.id} className="flex shrink-0 basis-[80%] snap-start sm:basis-[calc((100%-12px)/2)] lg:basis-auto">
+          <li
+            key={s.id}
+            className="flex shrink-0 basis-[80%] snap-start sm:basis-[calc((100%-12px)/2)] lg:basis-auto"
+          >
             <SlotCard slot={s} />
           </li>
         ))}
@@ -358,9 +295,19 @@ export function Vetrina({
  * and club news — each item opening the original. Negative headlines are filtered on the server (they stay on
  * /rassegna-stampa); with nothing recent the block says so and links to the press review.
  */
-export function HomeNewsBlock({ items, nowMs }: { items: readonly NewsItem[]; nowMs: number }) {
+export function HomeNewsBlock({
+  items,
+  nowMs,
+}: {
+  items: readonly NewsItem[];
+  nowMs: number;
+}) {
   return (
-    <section aria-labelledby="notizie-t" className={`${WRAP} pt-8 lg:pt-12`} data-testid="home-news">
+    <section
+      aria-labelledby="notizie-t"
+      className={`${WRAP} pt-8 lg:pt-12`}
+      data-testid="home-news"
+    >
       <div className="flex items-end justify-between gap-3 pb-3">
         <h2
           id="notizie-t"
@@ -389,8 +336,14 @@ export function HomeNewsBlock({ items, nowMs }: { items: readonly NewsItem[]; no
                     <span className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[12px] font-semibold uppercase tracking-[0.05em] text-[#5a6b85]">
                       <span>{NEWS_SOURCE_LABEL[n.sourceKind]}</span>
                       <span aria-hidden="true">·</span>
-                      <span className="normal-case tracking-normal">{n.source}</span>
-                      {n.publishedAt && <span className="normal-case tracking-normal">· {timeAgo(n.publishedAt, nowMs)}</span>}
+                      <span className="normal-case tracking-normal">
+                        {n.source}
+                      </span>
+                      {n.publishedAt && (
+                        <span className="normal-case tracking-normal">
+                          · {timeAgo(n.publishedAt, nowMs)}
+                        </span>
+                      )}
                       {n.tag && (
                         <span className="rounded-full bg-[#ffd600] px-1.5 py-[2px] text-[10px] font-extrabold leading-none text-[#0b1e3a]">
                           {n.tag}
@@ -401,7 +354,10 @@ export function HomeNewsBlock({ items, nowMs }: { items: readonly NewsItem[]; no
                       {n.title}
                     </span>
                   </span>
-                  <ArrowUpRight className="mt-1 size-4 shrink-0 text-[#9fb0c8]" aria-hidden="true" />
+                  <ArrowUpRight
+                    className="mt-1 size-4 shrink-0 text-[#9fb0c8]"
+                    aria-hidden="true"
+                  />
                 </>
               );
               return (
@@ -414,10 +370,15 @@ export function HomeNewsBlock({ items, nowMs }: { items: readonly NewsItem[]; no
                       className="scd-focus group flex items-start gap-3 px-4 py-3.5 hover:bg-[#f4f7fb]"
                     >
                       {inner}
-                      <span className="sr-only">(apre il sito di {n.source})</span>
+                      <span className="sr-only">
+                        (apre il sito di {n.source})
+                      </span>
                     </a>
                   ) : (
-                    <Link to={n.url as never} className="scd-focus group flex items-start gap-3 px-4 py-3.5 hover:bg-[#f4f7fb]">
+                    <Link
+                      to={n.url as never}
+                      className="scd-focus group flex items-start gap-3 px-4 py-3.5 hover:bg-[#f4f7fb]"
+                    >
                       {inner}
                     </Link>
                   )}
@@ -426,9 +387,16 @@ export function HomeNewsBlock({ items, nowMs }: { items: readonly NewsItem[]; no
             })}
           </ul>
         ) : (
-          <p className="m-0 flex items-center gap-3 px-4 py-4 text-[14.5px] text-[#4a5d7a]" data-testid="home-news-empty">
-            <Newspaper className="size-5 shrink-0 text-[#1556c4]" aria-hidden="true" />
-            Nessuna notizia recente in questo momento: la rassegna si aggiorna da sola.
+          <p
+            className="m-0 flex items-center gap-3 px-4 py-4 text-[14.5px] text-[#4a5d7a]"
+            data-testid="home-news-empty"
+          >
+            <Newspaper
+              className="size-5 shrink-0 text-[#1556c4]"
+              aria-hidden="true"
+            />
+            Nessuna notizia recente in questo momento: la rassegna si aggiorna
+            da sola.
           </p>
         )}
       </div>
@@ -448,11 +416,15 @@ const monthName = (day: string) =>
  * in rotation (UD-107), the partner of the month, partner news only when a partner has sent one, and the two links
  * (all partners, become a partner). Logos always in colour.
  */
-function PartnerBand({ day, nowMs, ledOnHome }: { day: string; nowMs: number; ledOnHome: boolean }) {
+function PartnerBand({ day }: { day: string }) {
   const showcase = partnerOfTheMonth(day);
   const news = partnerNewsOn(day);
   return (
-    <section aria-labelledby="partner-t" className={`${WRAP} pt-8 lg:pt-12`} data-testid="partner-band">
+    <section
+      aria-labelledby="partner-t"
+      className={`${WRAP} pt-8 lg:pt-12`}
+      data-testid="partner-band"
+    >
       <div className="flex items-end justify-between gap-3 pb-3">
         <h2
           id="partner-t"
@@ -470,39 +442,64 @@ function PartnerBand({ day, nowMs, ledOnHome }: { day: string; nowMs: number; le
         </Link>
       </div>
       <div className="grid gap-4 rounded-[16px] bg-white p-4 shadow-[0_1px_2px_rgb(11_42_91/0.06),0_8px_24px_-12px_rgb(11_42_91/0.25)] lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-center lg:p-5">
-        {ledOnHome && (
-          <div data-testid="home-ledwall" className="min-w-0">
-            <LedwallRotator day={day} nowMs={nowMs} variant="compact" />
-          </div>
-        )}
+        <div data-testid="home-ledwall" className="min-w-0">
+          <SponsorSpotsHome day={day} compact />
+        </div>
         <div className="grid content-start gap-3">
           {showcase && (
-            <div className="flex items-center gap-3.5 rounded-[12px] bg-[#eef3f9] p-3" data-testid="partner-of-month">
+            <div
+              className="flex items-center gap-3.5 rounded-[12px] bg-[#eef3f9] p-3"
+              data-testid="partner-of-month"
+            >
               <LogoTile className="h-[60px] w-[96px] shrink-0">
-                <SponsorLogo sponsor={showcase} box={{ w: 80, h: 44 }} decorative />
+                <SponsorLogo
+                  sponsor={showcase}
+                  box={{ w: 80, h: 44 }}
+                  decorative
+                />
               </LogoTile>
               <span className="grid min-w-0 flex-1 gap-0.5">
                 <span className="text-[11.5px] font-bold uppercase tracking-[0.08em] text-[#1556c4]">
                   Partner del mese · {monthName(day)}
                 </span>
-                <b className="text-[16px] leading-tight text-[#0b1e3a]">{sponsorLabel(showcase)}</b>
+                <b className="text-[16px] leading-tight text-[#0b1e3a]">
+                  {sponsorLabel(showcase)}
+                </b>
               </span>
             </div>
           )}
           {news.length > 0 && (
-            <ul className="m-0 grid list-none gap-0 divide-y divide-[#e6edf6] p-0" data-testid="partner-news">
+            <ul
+              className="m-0 grid list-none gap-0 divide-y divide-[#e6edf6] p-0"
+              data-testid="partner-news"
+            >
               {news.slice(0, 2).map((n) => (
                 <li key={n.id} className="py-2">
                   {n.url ? (
-                    <a href={n.url} target="_blank" rel="noopener noreferrer" className="scd-focus grid gap-0.5 hover:underline">
-                      <span className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#5a6b85]">{n.label}</span>
-                      <b className="text-[15px] leading-snug text-[#0b1e3a]">{n.title}</b>
-                      <span className="sr-only">(apre il sito del partner)</span>
+                    <a
+                      href={n.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="scd-focus grid gap-0.5 hover:underline"
+                    >
+                      <span className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#5a6b85]">
+                        {n.label}
+                      </span>
+                      <b className="text-[15px] leading-snug text-[#0b1e3a]">
+                        {n.title}
+                      </b>
+                      <span className="sr-only">
+                        (apre il sito del partner)
+                      </span>
                     </a>
                   ) : (
                     <span className="grid gap-0.5">
-                      <span className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#5a6b85]">{n.label}</span>
-                      <b className="text-[15px] leading-snug text-[#0b1e3a]">{n.title}</b>
+                      <span className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#5a6b85]">
+                        {n.label}
+                      </span>
+                      <b className="text-[15px] leading-snug text-[#0b1e3a]">
+                        {n.title}
+                      </b>
                     </span>
                   )}
                 </li>
@@ -550,40 +547,38 @@ export function PublicHome({
   today: string;
 }) {
   const ledDay = ledwallDay ?? today;
-  const ledOnHome = useMemo(
-    () =>
-      showLedwallOnHome(ledDay, {
-        homeMatch: hasHomeMatch(calendarToWeekItems(calendar.events, calendar.groups), ledDay),
-      }),
-    [calendar, ledDay],
+  const alerts = useMemo(
+    () => urgentNotices(feed?.items ?? [], nowMs, false),
+    [feed, nowMs],
   );
-  const alerts = useMemo(() => urgentNotices(feed?.items ?? [], nowMs, false), [feed, nowMs]);
   const results = useMemo(() => weekendResults(feed, today), [feed, today]);
-  // Board order (VR-009 screen 1, Francesco 15/10/2026 06:30): urgent → communication → "Questa settimana" hero with
-  // Sky, four tiles, Prossima gara, Allenamenti + next event → I nostri sponsor (ONE partner band, LED wall) → "Mondo
-  // Colico" (the rotating vetrina, asked again 13/10) → the full week of games (the calendar is only one block) with
-  // the LED strip → results (only with a source) → join → credentials (once) → reduced footer.
+  // Board order (VR-009 screen 1) made logical (Francesco 15/10/2026 07:04 "fuori ogni logica"): every block once.
+  // urgent → communication → hero, tiles, the club's most important next game with its countdown, trainings + event
+  // → stories → partners (the ONE live LED spot, partner of the month, become a partner) → "Mondo Colico" vetrina →
+  // all the games of the week → results (only with a source) → footer (credentials, contacts). The join banner and
+  // the second credential strip are gone: "Entra" is in the header and in the bottom bar, the credentials in the footer.
   return (
-    <main data-screen="home" data-variant="public" className="min-h-dvh bg-[#eef3f9] pb-6 font-sans text-[#0b1e3a]">
-      <h1 className="sr-only">S.C.D. ColicoDerviese, il club di calcio di Colico e Dervio</h1>
+    <main
+      data-screen="home"
+      data-variant="public"
+      className="min-h-dvh bg-[#eef3f9] pb-6 font-sans text-[#0b1e3a]"
+    >
+      <h1 className="sr-only">
+        S.C.D. ColicoDerviese, il club di calcio di Colico e Dervio
+      </h1>
       <UrgentNotices items={alerts} />
       <ClubNoticeCard notice={notice} />
       <HomeBoard calendar={calendar} nowMs={nowMs} today={today} />
       <HomeStories day={ledDay} />
-      <PartnerBand day={ledDay} nowMs={nowMs} ledOnHome={ledOnHome} />
+      <PartnerBand day={ledDay} />
       {vetrina && <Vetrina worlds={vetrina} />}
       <div
-        className={`${WRAP} grid gap-5 pt-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,400px)] lg:items-start lg:gap-8 lg:pt-8`}
+        className={`${WRAP} pt-5 lg:pt-8`}
         data-testid="home-matchday-layout"
       >
         <HomeMatchday calendar={calendar} nowMs={nowMs} today={today} />
-        <aside aria-label="LED wall del campo" className="min-w-0 lg:sticky lg:top-[calc(var(--pub-header-h,64px)+16px)] lg:pt-[52px]">
-          <SponsorSpotsHome day={ledDay} compact />
-        </aside>
       </div>
       <WeekendResults rows={results} />
-      <JoinBanner />
-      <CredentialBar />
     </main>
   );
 }

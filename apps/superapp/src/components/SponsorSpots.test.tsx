@@ -7,17 +7,13 @@ const src = (rel: string) => readFileSync(fileURLToPath(new URL(rel, import.meta
 describe("sponsor LED spots in the UI (UD-119)", () => {
   const ui = src("./SponsorSpots.tsx");
 
-  it("home block (UD-132): once, compact, beside the Matchday week and before the results; the partner line, the partner link and the LED wall CTA", () => {
+  it("home block (15/10 07:04): once, compact, inside the ONE partner band (no second LED on the home)", () => {
     const home = src("./home/PublicHome.tsx");
-    const body = home.slice(home.indexOf("export function PublicHome"));
-    expect(body.match(/<SponsorSpotsHome /g)).toHaveLength(1);
-    expect(body).toMatch(/<SponsorSpotsHome day=\{ledDay\} compact \/>/);
-    const week = body.indexOf("<HomeMatchday");
-    const spots = body.indexOf("<SponsorSpotsHome");
-    expect(week).toBeGreaterThan(-1);
-    expect(spots).toBeGreaterThan(week);
-    expect(body.indexOf("<WeekendResults")).toBeGreaterThan(spots);
-    expect(body).not.toMatch(/<SupportStrip|<QuickActions/);
+    expect(home.match(/<SponsorSpotsHome /g)).toHaveLength(1);
+    expect(home).toMatch(/<SponsorSpotsHome day=\{day\} compact \/>/);
+    const band = home.slice(home.indexOf("function PartnerBand"));
+    expect(band.indexOf("<SponsorSpotsHome")).toBeGreaterThan(-1);
+    expect(home).not.toMatch(/<SupportStrip|<QuickActions|<LedwallRotator /);
     // Compact variant: same clock, the on-air label, the partner name and "Diventa partner".
     const compact = ui.slice(ui.indexOf("if (compact)"), ui.indexOf("if (compact)") + 4000);
     expect(compact).toContain("{onAirLabel}");

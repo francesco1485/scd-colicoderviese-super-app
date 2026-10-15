@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { boardDate, countdownParts, gamesLeft, kickoffMs, nextBoardMatch, nextHomeKickoff } from "./home-board";
+import { boardDate, boardRank, countdownParts, gamesLeft, kickoffMs, nextBoardMatch, nextHomeKickoff } from "./home-board";
 import type { TodayEntry } from "./home-today";
 
 const entry = (over: Partial<TodayEntry>): TodayEntry => ({
@@ -70,5 +70,18 @@ describe("countdown to the next home game", () => {
   it("formats days and hh:mm:ss", () => {
     expect(countdownParts(((26 * 60 + 3) * 60 + 9) * 1000)).toEqual({ days: 1, hh: "02", mm: "03", ss: "09" });
     expect(countdownParts(-5)).toEqual({ days: 0, hh: "00", mm: "00", ss: "00" });
+  });
+});
+
+describe("boardRank: the club's most important next game", () => {
+  const ago = (g: string) => ["prima", "u16", "u19"].includes(g);
+  const rank = (e: TodayEntry) => boardRank(e, ago);
+  it("prefers Prima Squadra, then agonistica, then base; confirmed before pending", () => {
+    const base = entry({ id: "base", date: "2026-10-17", time: "10:30", group: "primi", pending: ["Orario da confermare"] });
+    const u16 = entry({ id: "u16", date: "2026-10-17", time: "18:00", group: "u16" });
+    const prima = entry({ id: "prima" });
+    expect(nextBoardMatch([base, u16, prima], SAT_16 - 6 * 3600_000, rank)?.id).toBe("prima");
+    expect(nextBoardMatch([base, u16], SAT_16 - 6 * 3600_000, rank)?.id).toBe("u16");
+    expect(nextBoardMatch([base], SAT_16 - 6 * 3600_000, rank)?.id).toBe("base");
   });
 });

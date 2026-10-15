@@ -83,11 +83,9 @@ describe("LedwallRotator (SSR)", () => {
     expect(src("../styles.css")).toMatch(/prefers-reduced-motion: reduce\)\s*\{\s*\.scd-ledrot-slot \{ animation: none/);
   });
 
-  it("appears on the public home only (never in internal pages)", () => {
+  it("never in internal pages; the public home shows the live LED spot instead (15/10 07:04, one LED only)", () => {
     const home = src("./home/PublicHome.tsx");
-    expect(home).toContain("showLedwallOnHome(");
-    expect(home).toMatch(/\{ledOnHome && \(/);
-    expect(home).toMatch(/<LedwallRotator day=\{day\}/);
+    expect(home).not.toMatch(/<LedwallRotator /);
     expect(home).toContain('to="/sponsor"');
     for (const f of ["./scd/InteriorShell.tsx", "./home/MemberHome.tsx"]) expect(src(f)).not.toContain("LedwallRotator");
   });

@@ -104,20 +104,18 @@ describe("public home v5", () => {
     expect(week).toMatch(/<button[\s\S]{0,80}type="button"[\s\S]{0,40}aria-pressed=\{on\}/);
   });
 
-  it("VR-009 board order (15/10): board top, ONE partner band, Mondo Colico vetrina, week + LED strip, results, join, credentials", () => {
+  it("VR-009 board order made logical (15/10 07:04): board top, stories, ONE partner band with the live LED spot, Mondo Colico, week, results", () => {
     const home = code("src/components/home/PublicHome.tsx");
     const body = home.slice(home.indexOf("export function PublicHome"));
     const order = [
       "<UrgentNotices",
       "<ClubNoticeCard",
       "<HomeBoard",
+      "<HomeStories",
       "<PartnerBand",
       "<Vetrina ",
       "<HomeMatchday",
-      "<SponsorSpotsHome",
       "<WeekendResults",
-      "<JoinBanner",
-      "<CredentialBar",
     ];
     const at = order.map((t) => body.indexOf(t));
     for (const [i, p] of at.entries()) expect(p, order[i]).toBeGreaterThan(-1);
@@ -130,6 +128,8 @@ describe("public home v5", () => {
       "<QuickActions",
       "<DailyTipCard",
       "<HomeNewsBlock",
+      "<JoinBanner",
+      "<CredentialBar",
     ])
       expect(body, gone).not.toContain(gone);
     expect(home).toMatch(/export function Vetrina\(/);
@@ -210,9 +210,11 @@ describe("public home v5", () => {
 
   it("UD-110/UD-116: nothing repeated — one credential strip, one partner band, no trust carousel, no logo grids, no accordions in the body", () => {
     const home = code("src/components/home/PublicHome.tsx");
-    expect(home.match(/<CredentialBar \/>/g)).toHaveLength(1);
+    // 07:04 "fuori ogni logica": every block once — credentials only in the footer, ONE LED (the live spot in the
+    // partner band), no join banner (Entra is in the header and in the bottom bar).
+    expect(home).not.toMatch(/<CredentialBar|<JoinBanner|<LedwallRotator /);
     expect(home.match(/<PartnerBand /g)).toHaveLength(1);
-    expect(home.match(/<LedwallRotator /g)).toHaveLength(1);
+    expect(home.match(/<SponsorSpotsHome /g)).toHaveLength(1);
     for (const gone of [
       /<Trust\b/,
       /<PartnerTicker\b/,
