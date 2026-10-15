@@ -17,7 +17,7 @@ import {
   Trophy,
   UserPlus,
 } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 
 import { ClubCrestOfficial } from "@/components/SiteChrome";
 import {
@@ -41,20 +41,23 @@ function reducedMotion(): boolean {
 
 /** A shaded football drawn here (no stock image): the "object of our world" of the reference scene. */
 function HeroBall({ className }: { className?: string }) {
+  const uid = useId();
+  const sh = `hb-sh-${uid}`;
+  const gl = `hb-gl-${uid}`;
   return (
     <svg viewBox="0 0 200 200" className={className} aria-hidden="true">
       <defs>
-        <radialGradient id="hb-sh" cx="38%" cy="32%" r="68%">
+        <radialGradient id={sh} cx="38%" cy="32%" r="68%">
           <stop offset="0" stopColor="#ffffff" />
           <stop offset="0.55" stopColor="#e9eef6" />
           <stop offset="1" stopColor="#8a97ad" />
         </radialGradient>
-        <radialGradient id="hb-gl" cx="50%" cy="50%" r="50%">
+        <radialGradient id={gl} cx="50%" cy="50%" r="50%">
           <stop offset="0.8" stopColor="rgb(0 10 40 / 0)" />
           <stop offset="1" stopColor="rgb(0 10 40 / 0.35)" />
         </radialGradient>
       </defs>
-      <circle cx="100" cy="100" r="96" fill="url(#hb-sh)" />
+      <circle cx="100" cy="100" r="96" fill={`url(#${sh})`} />
       <g fill="#0b1e3a">
         <path d="m100 58 30 22-11 36H81L70 80z" />
         <path d="M100 58V22l-26 12z" opacity=".85" />
@@ -63,7 +66,7 @@ function HeroBall({ className }: { className?: string }) {
         <path d="m81 116-22 10 6 34 28-10z" opacity=".85" />
         <path d="m70 80-34-12-8 30 24 10z" opacity=".85" />
       </g>
-      <circle cx="100" cy="100" r="96" fill="url(#hb-gl)" />
+      <circle cx="100" cy="100" r="96" fill={`url(#${gl})`} />
     </svg>
   );
 }
@@ -96,7 +99,7 @@ function SlideArt({ art, first }: { art: PromoSlide["art"]; first: boolean }) {
               <span className="scd-brush scd-brush--full font-uv text-[44px] uppercase leading-[0.9] text-[#0b1e3a] lg:text-[118px]">
                 {art.big}
               </span>
-              <span className="scd-motto mt-2 pr-1 text-[15px] text-[#ffe25a] drop-shadow-[0_2px_4px_rgb(0_0_0/0.6)] lg:mt-4 lg:text-[34px]">
+              <span className="scd-motto mt-2 pr-1 text-[17px] text-[#ffe25a] drop-shadow-[0_2px_4px_rgb(0_0_0/0.6)] lg:mt-4 lg:text-[34px]">
                 {art.small}
               </span>
             </span>

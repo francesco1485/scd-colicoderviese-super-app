@@ -70,9 +70,8 @@ export function CookieConsent({ interior = false }: { interior?: boolean } = {})
   useEffect(() => {
     const c = readConsent();
     setConsent(c);
-    if (c) return undefined;
-    const t = setTimeout(() => setBanner(true), 900);
-    return () => clearTimeout(t);
+    // In the page flow (UD-135): shown at hydration, no delay, so the layout settles once instead of jumping later.
+    if (!c) setBanner(true);
   }, []);
   useEffect(() => {
     const open = () => {

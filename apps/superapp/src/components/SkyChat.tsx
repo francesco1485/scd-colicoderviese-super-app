@@ -60,7 +60,7 @@ function greeting(persona: Persona, area: ChatAreaId | null): Msg[] {
 /* Bottom chrome on phones (SiteChrome.BottomNav 62px, SponsorBand 34px on every public page, UD-134) */
 const NAV_H = 62;
 const STRIP_H = 34;
-/** Launcher (56px) centred on the sponsor strip on phones: it covers the strip's reserved right cap, never page content. */
+/** Launcher (40px on phones, UD-135) centred on the sponsor strip: it sits on the strip's white right cap, never on page content. */
 const LAUNCHER = 40;
 
 /** A reply link: app paths through the router (with "?query" and "#anchor"), https sources in a new tab. */

@@ -318,6 +318,7 @@
   opacity: 0.95;
 }
 .scd-brush--full::before {
+  background-color: #ffd600;
   left: -0.25em;
   right: -0.3em;
   bottom: -0.12em;
