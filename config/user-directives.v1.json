@@ -3415,6 +3415,45 @@
           "manifest_source": "SCD_RICHIESTE"
         }
       }
+    },
+    {
+      "sourceDate": "2026-10-15",
+      "sourceTime": "17:16-17:30",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-155",
+      "name": "AI_SEGRETERIA_AUTONOMOUS_REPLIES_AND_SECRETARY_AGENT",
+      "sourceQuoteFragments": [
+        "deve essere una segreteria chatboat a tutti gli effetti, deve leggere e scrivere e rispondere e fare tutto quelo che fa una segretaria di ultima generazione Ai e che coordina la struttura tra mail e telefno per migliorare servizzi e coordinare i lavori e preparai nella piattaforma, se ancora meglio aperta h24 senza mai fermarsi e anche se resce a leggere il passato delle chat per capire meglio ancora",
+        "anche a recuperare e sistemare il telefono o accaount anagrfando e scrivedo e salvando tutti i contatti presenti cosi da sapere chi contattare",
+        "risposte: Tutto in automatico; costo AI: Budget piccolo ok; contatti: Rubrica da verificare",
+        "creare un agente ad oc per la segreteria super evoluto ed esperto in tutto quelo che è un segretario sportivo, di calcio, di sport, di associaizoni, di adempimenti, di programmazione",
+        "i contatti devono essere messi dal drive e dalla mail di sportlub nei contatti di google e anagrafati e poi posrati nel telefono caricando account sportclueb sul telefono",
+        "anche immagine e risposta del numero deve essere fatta da avatar deella segreteria"
+      ],
+      "context": "Francesco 15/10/2026 (chat PC). Extends UD-154 from friendlies to every request on every channel. Choices given through the question card at 17:18: automatic replies, small AI budget (about 20-30 EUR/month, today covered by the Make plan credits), contacts saved only after the Segreteria checks them. At 17:21 asked for a dedicated expert secretary agent; at 17:28 'via'; at 17:30 contacts to Google Contacts of sportclubcolico and the WhatsApp profile as the Segreteria avatar.",
+      "normalizedCommand": {
+        "rule": "The AI Segreteria (persona Vera, UD-121) reads every inbound message of the official channels (WhatsApp Business via Make first, then club mail, then a phone voice assistant), answers ALONE 24/7 from the club knowledge (Google Doc 'SCD · Segreteria AI · Conoscenza') and the public calendar, writes the request and the answer in SCD_INTAKE_LOG with office, type, urgency and 'serve persona', and marks what a person must handle. This is the only exception to the AGENTS.md rule 'messaggi inviati a terzi senza persona': replies to whoever wrote first, within the fixed limits below. The secretary-general agent scd-segreteria is the expert mind and owns the prompt and the knowledge.",
+        "scope": "SECRETARIAT_ALL_CHANNELS",
+        "engines": "TEMPO (answers at night and on weekends without volunteers, schede already classified), PERSONE (families get an answer in seconds), SOLDI (no lost registration or sponsor request)",
+        "status": "WHATSAPP_ACTIVE_MAIL_PHONE_CONTACTS_PENDING",
+        "constraints": [
+          "always declares it is an AI assistant (EU AI Act transparency) and signs as Vera, assistente AI della S.C.D. ColicoDerviese",
+          "emergencies, injuries, health, a minor in difficulty, abuse and safeguarding: no answer on the merits, 112 when there is danger, urgency ALTA and a person takes over",
+          "never confirms or decides payments, registrations, tesseramenti, roles, permissions, presenze, sanctions or prices not in the knowledge",
+          "never gives personal data of other people and never asks for IBAN, codice fiscale, passwords or health data",
+          "with a minor: general club information only, a parent is invited to write",
+          "only replies to people who wrote first (WhatsApp 24-hour window); messages the club starts towards many contacts stay a Direzione decision",
+          "contacts from the sportclubcolico mailbox and Drive go to a 'rubrica da verificare' and reach Google Contacts of sportclubcolico only after the Segreteria checks them; never in the repo",
+          "WhatsApp profile picture and name use the Segreteria avatar only after the Direzione approves the image (character images are frozen, UD-111/UD-121)"
+        ],
+        "implementation": {
+          "make_scenario": "7979437 'SCD · Segreteria AI · WhatsApp' (Make AI Tools on Make's AI Provider, plan credits)",
+          "prompt_source": "automations/make/segreteria-ai/system-prompt.it.md",
+          "agent": ".claude/agents/scd-segreteria.md",
+          "register": "SCD_INTAKE_LOG"
+        }
+      }
     }
   ],
   "completionGate": {
