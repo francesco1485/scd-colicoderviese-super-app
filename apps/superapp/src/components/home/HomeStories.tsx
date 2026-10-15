@@ -27,19 +27,15 @@ function StoryViewer({ stories, start, onClose }: { stories: readonly HomeStory[
   const [paused, setPaused] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
   const reduced = useMemo(prefersReducedMotion, []);
   const story = stories[i];
 
   const next = useCallback(() => {
     setProgress(0);
-    setI((n) => {
-      if (n + 1 >= stories.length) {
-        onClose();
-        return n;
-      }
-      return n + 1;
-    });
-  }, [stories.length, onClose]);
+    if (i + 1 >= stories.length) onClose();
+    else setI(i + 1);
+  }, [i, stories.length, onClose]);
   const prev = useCallback(() => {
     setProgress(0);
     setI((n) => Math.max(0, n - 1));
@@ -52,7 +48,24 @@ function StoryViewer({ stories, start, onClose }: { stories: readonly HomeStory[
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Tab") {
+        const root = dialogRef.current;
+        const items = root ? Array.from(root.querySelectorAll<HTMLElement>("button, a[href]")) : [];
+        const first = items[0];
+        const last = items[items.length - 1];
+        if (first && last) {
+          if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          } else if (!root?.contains(document.activeElement)) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      } else if (e.key === "Escape") onClose();
       else if (e.key === "ArrowRight") next();
       else if (e.key === "ArrowLeft") prev();
     };
@@ -69,29 +82,28 @@ function StoryViewer({ stories, start, onClose }: { stories: readonly HomeStory[
     if (!story || story.media.kind !== "image" || reduced || paused) return;
     const step = 100;
     const id = window.setInterval(() => {
-      setProgress((p) => {
-        const np = p + step / (STORY_IMAGE_SECONDS * 1000);
-        if (np >= 1) {
-          window.setTimeout(next, 0);
-          return 1;
-        }
-        return np;
-      });
+      setProgress((p) => Math.min(1, p + step / (STORY_IMAGE_SECONDS * 1000)));
     }, step);
     return () => window.clearInterval(id);
-  }, [story, reduced, paused, next]);
+  }, [story, reduced, paused]);
+
+  // Advance from an effect when an image story is complete (no side effects inside state updaters).
+  useEffect(() => {
+    if (story?.media.kind === "image" && progress >= 1) next();
+  }, [progress, story, next]);
 
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
     v.muted = true;
-    if (paused) v.pause();
+    if (paused || reduced) v.pause();
     else v.play().catch(() => undefined);
-  }, [i, paused]);
+  }, [i, paused, reduced]);
 
   if (!story) return null;
   return (
     <div
+      ref={dialogRef}
       role="dialog"
       aria-modal="true"
       aria-label={`Storia ${i + 1} di ${stories.length}: ${story.title}`}

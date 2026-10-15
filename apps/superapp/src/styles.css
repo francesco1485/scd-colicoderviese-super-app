@@ -908,14 +908,11 @@ html.uv-big .sa-shell { zoom: 1.12; }
   body.pk-printing .pk-print { position: absolute; left: 0; top: 0; width: 100%; border: 0; box-shadow: none; }
 }
 
-/* Board home hero (15/10): slow zoom and crossfade of the two real photos, crest pop. Off with reduced motion. */
+/* Board home hero (15/10): slow zoom of the real lake photo, crest pop. Off with reduced motion. */
 @keyframes board-kb { from { transform: scale(1) } to { transform: scale(1.12) } }
-@keyframes board-fade { 0%, 42% { opacity: 0 } 50%, 92% { opacity: 1 } 100% { opacity: 0 } }
 @keyframes board-pop { 0% { opacity: 0; transform: translateY(10px) scale(.92) } 100% { opacity: 1; transform: none } }
 .scd-board-kb { animation: board-kb 18s ease-in-out infinite alternate; will-change: transform }
-.scd-board-fade { opacity: 0; animation: board-kb 18s ease-in-out infinite alternate, board-fade 16s ease-in-out infinite }
 .scd-board-pop { animation: board-pop .7s cubic-bezier(.2,.8,.2,1) both }
 @media (prefers-reduced-motion: reduce) {
   .scd-board-kb, .scd-board-pop { animation: none }
-  .scd-board-fade { animation: none; opacity: 0 }
 }
