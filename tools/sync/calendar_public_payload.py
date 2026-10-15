@@ -285,6 +285,7 @@ def self_test() -> None:
     assert c["notice"] == ["Utilizzo struttura da verificare"] and c["verification"]["facility_review_required"] is True
     assert event_of({**base, "CATEGORY": "Esordienti 12 anni (2014)"})["group"] == "2014"
     assert event_of({**base, "CATEGORY": "Pulcini misti 7v7"})["group"] == "pulcini"
+    assert event_of({**base, "VENUE": "COLICO -\u00a0CAMPO 1"})["venue"] == "COLICO - CAMPO 1"
     o = event_of({**base, "EVENT_ID": "EVT-U19E-5A-MEDA1913-FUORI", "CATEGORY": "Juniores U19 Élite", "TIME": dt.time(17, 0)})
     assert o["time"] == "14:30" and o["end"] == "" and o["notice"][0].startswith("Orario ufficiale FIGC/LND")
     n = event_of({**base, "EVENT_ID": "EVT-U19E-5A-MEDA1913-FUORI", "CATEGORY": "Juniores U19 Élite", "TIME": dt.time(16, 0)}, quiet=True)
