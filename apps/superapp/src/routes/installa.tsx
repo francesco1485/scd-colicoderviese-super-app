@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Check, Copy, Download, Share2, Smartphone } from "lucide-react";
+import { Check, Copy, Download, MessageCircle, Share2, Smartphone, UserPlus } from "lucide-react";
 import QRCode from "qrcode";
 import { useEffect, useState } from "react";
 
+import { InstallButton } from "@/components/scd/InstallButton";
 import { OFFICIAL_ADDRESS, displayAddress, installUrl } from "@/lib/install-link";
 
 /**
@@ -61,7 +62,28 @@ function Installa() {
         <p className="mt-2 text-[16px] leading-relaxed">
           Un minuto e l'app della società è sul tuo telefono, con lo stemma, senza passare dagli store.
         </p>
+        <div className="mt-4">
+          <InstallButton />
+        </div>
       </header>
+
+      <section aria-labelledby="iride-t" className="grid gap-4 rounded-2xl border border-border bg-card p-5 sm:grid-cols-[96px_minmax(0,1fr)] sm:items-center sm:p-6" data-testid="install-iride">
+        <img src="/media/cast/iride/iride-avatar-256.webp" alt="Iride, l'assistente AI della segreteria" width={96} height={96} className="size-24 rounded-full object-cover" loading="lazy" />
+        <div className="min-w-0">
+          <h2 id="iride-t" className="m-0 text-[22px] font-bold">Salva Iride, la segreteria 24/7</h2>
+          <p className="mt-1 text-[15px] leading-relaxed text-muted-foreground">
+            Iride è l'assistente AI della segreteria: su WhatsApp risponde a ogni ora su gare, iscrizioni e richieste. Numero <b className="select-all text-foreground">+39 334 196 1321</b>.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <a href="/iride.vcf" download="Iride-Segreteria-ColicoDerviese.vcf" className="inline-flex h-11 items-center gap-2 rounded-[10px] bg-[var(--scd-blue)] px-4 text-[15px] font-semibold text-white" data-testid="iride-vcard">
+              <UserPlus className="size-4" aria-hidden="true" /> Salva il contatto
+            </a>
+            <a href="https://wa.me/393341961321?text=Ciao%20Iride!" target="_blank" rel="noopener noreferrer" className="inline-flex h-11 items-center gap-2 rounded-[10px] border border-border bg-white px-4 text-[15px] font-semibold" data-testid="iride-whatsapp">
+              <MessageCircle className="size-4" aria-hidden="true" /> Scrivi su WhatsApp
+            </a>
+          </div>
+        </div>
+      </section>
 
       <section aria-labelledby="link-t" className="grid gap-5 rounded-2xl border border-border bg-card p-5 sm:grid-cols-[minmax(0,1fr)_200px] sm:items-center sm:p-6">
         <div className="min-w-0">
