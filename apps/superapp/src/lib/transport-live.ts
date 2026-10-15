@@ -51,7 +51,7 @@ export function arrivalPoint(key: string | null | undefined): ArrivalPoint | nul
 
 /** Copy of the acknowledgement the volunteer confirms on the phone before the first shared run. */
 export const DRIVER_ACK_TEXT: readonly string[] = [
-  "Guidi come volontario: la posizione del tuo telefono serve solo a dire alle famiglie dei ragazzi confermati su questa corsa dov'è il pulmino.",
+  "Guidi come volontario: la posizione del tuo telefono serve solo a dire alle famiglie dei ragazzi confermati su questa trasferta dov'è il pulmino.",
   "La posizione parte quando premi “Inizia corsa” e si ferma con “Termina corsa” o da sola 60 minuti dopo l'arrivo previsto.",
   "Le famiglie vedono solo stato, ultimo aggiornamento, distanza e arrivo stimato: nessuna mappa. I punti si cancellano entro 24 ore, il registro della corsa dopo 90 giorni.",
 ];

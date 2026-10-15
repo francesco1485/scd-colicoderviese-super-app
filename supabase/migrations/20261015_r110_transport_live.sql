@@ -397,7 +397,7 @@ begin
         from public.scd_transport_runs t
         left join lateral (
           select * from public.scd_transport_live_sessions s1
-          where s1.run_id = t.id and s1.started_at::date >= v_today - 1
+          where s1.run_id = t.id and (s1.started_at at time zone 'Europe/Rome')::date >= v_today - 1
           order by (s1.status = 'ATTIVA') desc, s1.started_at desc limit 1) s on true
         left join lateral (
           select * from public.scd_transport_live_points p1

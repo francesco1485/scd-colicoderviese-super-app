@@ -132,7 +132,7 @@ export const startLiveRun = createServerFn({ method: "POST" })
       p_target_lng: target?.lng ?? null,
     }));
     if (!res.ok || !res.raw?.id) return { ok: false, message: res.message || liveErrorText(null), ...(res.code ? { code: res.code } : {}) };
-    return { ok: true, message: "Posizione condivisa con le famiglie dei ragazzi confermati su questa corsa.", sessionId: res.raw.id, ...(res.raw.expiresAt ? { expiresAt: res.raw.expiresAt } : {}) };
+    return { ok: true, message: "Posizione condivisa con le famiglie dei ragazzi confermati su questa trasferta.", sessionId: res.raw.id, ...(res.raw.expiresAt ? { expiresAt: res.raw.expiresAt } : {}) };
   });
 
 const allowPing = createPingLimiter();
