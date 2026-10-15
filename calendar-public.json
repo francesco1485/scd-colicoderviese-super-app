@@ -108,6 +108,56 @@
    }
   },
   {
+   "id": "EVT-U15-20260909-ALTOLARIO-CASA",
+   "date": "2026-09-09",
+   "time": "18:00",
+   "end": "",
+   "category": "Giovanissimi U15",
+   "group": "u15",
+   "type": "AMICHEVOLE",
+   "home_away": "CASA",
+   "venue": "COLICO - CAMPO 2",
+   "opponent": "ALTO LARIO",
+   "round": "",
+   "source": "SCD",
+   "notice": [
+    "Orario o sede da verificare",
+    "Attesa verifica"
+   ],
+   "match_status": "CLUB_EVENT",
+   "is_variation": false,
+   "verification": {
+    "time_confirmed": false,
+    "venue_confirmed": false,
+    "facility_review_required": false
+   }
+  },
+  {
+   "id": "EVT-U16E-20260909-JUNIORESALTOLARIO-CASA",
+   "date": "2026-09-09",
+   "time": "20:30",
+   "end": "",
+   "category": "U16 Elite",
+   "group": "u16",
+   "type": "AMICHEVOLE",
+   "home_away": "CASA",
+   "venue": "COLICO - CAMPO 1",
+   "opponent": "JUNIORES ALTO LARIO",
+   "round": "",
+   "source": "SCD",
+   "notice": [
+    "Orario o sede da verificare",
+    "Attesa verifica"
+   ],
+   "match_status": "CLUB_EVENT",
+   "is_variation": false,
+   "verification": {
+    "time_confirmed": false,
+    "venue_confirmed": false,
+    "facility_review_required": false
+   }
+  },
+  {
    "id": "EVT-U19E-1A-LESMOSSDARL-FUORI",
    "date": "2026-09-12",
    "time": "18:15",
@@ -372,6 +422,81 @@
    }
   },
   {
+   "id": "EVT-ES-20260926-DUBINO-CASA",
+   "date": "2026-09-26",
+   "time": "14:30",
+   "end": "",
+   "category": "Esordienti 11 anni (2015)",
+   "group": "2015",
+   "type": "AMICHEVOLE",
+   "home_away": "CASA",
+   "venue": "COLICO - CAMPO 1",
+   "opponent": "DUBINO",
+   "round": "",
+   "source": "SCD",
+   "notice": [
+    "Orario o sede da verificare",
+    "Attesa verifica"
+   ],
+   "match_status": "CLUB_EVENT",
+   "is_variation": false,
+   "verification": {
+    "time_confirmed": false,
+    "venue_confirmed": false,
+    "facility_review_required": false
+   }
+  },
+  {
+   "id": "EVT-ES-20260926-CALCIOLECCO-CASA",
+   "date": "2026-09-26",
+   "time": "15:00",
+   "end": "",
+   "category": "Esordienti 12 anni (2014)",
+   "group": "2014",
+   "type": "AMICHEVOLE",
+   "home_away": "CASA",
+   "venue": "COLICO - CAMPO 1",
+   "opponent": "CALCIO LECCO",
+   "round": "",
+   "source": "SCD",
+   "notice": [
+    "Orario o sede da verificare",
+    "Attesa verifica"
+   ],
+   "match_status": "CLUB_EVENT",
+   "is_variation": false,
+   "verification": {
+    "time_confirmed": false,
+    "venue_confirmed": false,
+    "facility_review_required": false
+   }
+  },
+  {
+   "id": "EVT-PUL-20260926-VALCHIAVENNA-CASA",
+   "date": "2026-09-26",
+   "time": "17:00",
+   "end": "",
+   "category": "Pulcini misti 7v7",
+   "group": "pulcini",
+   "type": "AMICHEVOLE",
+   "home_away": "CASA",
+   "venue": "COLICO - CAMPO 2",
+   "opponent": "VALCHIAVENNA",
+   "round": "",
+   "source": "SCD",
+   "notice": [
+    "Orario o sede da verificare",
+    "Attesa verifica"
+   ],
+   "match_status": "CLUB_EVENT",
+   "is_variation": false,
+   "verification": {
+    "time_confirmed": false,
+    "venue_confirmed": false,
+    "facility_review_required": false
+   }
+  },
+  {
    "id": "EVT-U19E-3A-VISNOVAGIUSSANO-FUORI",
    "date": "2026-09-26",
    "time": "17:30",
@@ -460,6 +585,31 @@
    }
   },
   {
+   "id": "EVT-PUL-20261003-TALAMONESE-CASA",
+   "date": "2026-10-03",
+   "time": "14:30",
+   "end": "",
+   "category": "Pulcini misti 7v7",
+   "group": "pulcini",
+   "type": "AMICHEVOLE",
+   "home_away": "CASA",
+   "venue": "COLICO - CAMPO 2",
+   "opponent": "TALAMONESE",
+   "round": "",
+   "source": "SCD",
+   "notice": [
+    "Orario o sede da verificare",
+    "Attesa verifica"
+   ],
+   "match_status": "CLUB_EVENT",
+   "is_variation": false,
+   "verification": {
+    "time_confirmed": false,
+    "venue_confirmed": false,
+    "facility_review_required": false
+   }
+  },
+  {
    "id": "EVT-U19E-4A-LENTATESE-CASA",
    "date": "2026-10-03",
    "time": "15:00",
@@ -478,6 +628,31 @@
    "verification": {
     "time_confirmed": true,
     "venue_confirmed": true,
+    "facility_review_required": false
+   }
+  },
+  {
+   "id": "EVT-ES-20261003-CORTENOVA-CASA",
+   "date": "2026-10-03",
+   "time": "17:00",
+   "end": "",
+   "category": "Esordienti 12 anni (2014)",
+   "group": "2014",
+   "type": "AMICHEVOLE",
+   "home_away": "CASA",
+   "venue": "COLICO - CAMPO 2",
+   "opponent": "CORTENOVA",
+   "round": "",
+   "source": "SCD",
+   "notice": [
+    "Orario o sede da verificare",
+    "Attesa verifica"
+   ],
+   "match_status": "CLUB_EVENT",
+   "is_variation": false,
+   "verification": {
+    "time_confirmed": false,
+    "venue_confirmed": false,
     "facility_review_required": false
    }
   },
@@ -544,6 +719,31 @@
    "verification": {
     "time_confirmed": true,
     "venue_confirmed": true,
+    "facility_review_required": false
+   }
+  },
+  {
+   "id": "EVT-ES-20261005-DELEBIO-CASA",
+   "date": "2026-10-05",
+   "time": "17:30",
+   "end": "",
+   "category": "Esordienti 11 anni (2015)",
+   "group": "2015",
+   "type": "AMICHEVOLE",
+   "home_away": "CASA",
+   "venue": "COLICO - CAMPO 1",
+   "opponent": "DELEBIO",
+   "round": "",
+   "source": "SCD",
+   "notice": [
+    "Orario o sede da verificare",
+    "Attesa verifica"
+   ],
+   "match_status": "CLUB_EVENT",
+   "is_variation": false,
+   "verification": {
+    "time_confirmed": false,
+    "venue_confirmed": false,
     "facility_review_required": false
    }
   },
@@ -741,8 +941,8 @@
   {
    "id": "EVT-ES-20261011-PENTAPIATEDA-CASA",
    "date": "2026-10-11",
-   "time": "14:30",
-   "end": "17:15",
+   "time": "15:00",
+   "end": "",
    "category": "Esordienti 11 anni (2015)",
    "group": "2015",
    "type": "AMICHEVOLE",
@@ -751,7 +951,9 @@
    "opponent": "PENTA PIATEDA",
    "round": "",
    "source": "SCD",
-   "notice": [],
+   "notice": [
+    "Orario approvato SCD: 15:00, ultimo Master Calendario Gare societario aggiornato il 09/10/2026. Amichevole organizzata dalla società, non comunicato FIGC."
+   ],
    "match_status": "CLUB_EVENT",
    "is_variation": true,
    "verification": {
@@ -948,6 +1150,31 @@
    }
   },
   {
+   "id": "EVT-MAN-20261018-001",
+   "date": "2026-10-18",
+   "time": "15:00",
+   "end": "16:30",
+   "category": "Pulcini Misti 7v7",
+   "group": "pulcini",
+   "type": "AMICHEVOLE",
+   "home_away": "CASA",
+   "venue": "COLICO - CAMPO 1",
+   "opponent": "PENTA PIATEDA",
+   "round": "",
+   "source": "SCD",
+   "notice": [
+    "Orario o sede da verificare",
+    "Attesa verifica"
+   ],
+   "match_status": "CLUB_EVENT",
+   "is_variation": false,
+   "verification": {
+    "time_confirmed": false,
+    "venue_confirmed": false,
+    "facility_review_required": false
+   }
+  },
+  {
    "id": "EVT-PRIMA-6A-ARSROVAGNATE-FUORI",
    "date": "2026-10-18",
    "time": "15:30",
@@ -966,6 +1193,31 @@
    "verification": {
     "time_confirmed": true,
     "venue_confirmed": true,
+    "facility_review_required": false
+   }
+  },
+  {
+   "id": "EVT-PUL-20261024-OLYMPICMORBEGNO-CASA",
+   "date": "2026-10-24",
+   "time": "10:00",
+   "end": "11:30",
+   "category": "Pulcini misti 7v7",
+   "group": "pulcini",
+   "type": "AMICHEVOLE",
+   "home_away": "CASA",
+   "venue": "COLICO - CAMPO 1",
+   "opponent": "OLYMPIC MORBEGNO",
+   "round": "",
+   "source": "SCD",
+   "notice": [
+    "Orario o sede da verificare",
+    "Attesa verifica"
+   ],
+   "match_status": "CLUB_EVENT",
+   "is_variation": false,
+   "verification": {
+    "time_confirmed": false,
+    "venue_confirmed": false,
     "facility_review_required": false
    }
   },
@@ -1492,6 +1744,31 @@
    }
   },
   {
+   "id": "EVT-PA-20261108-NA-CASA",
+   "date": "2026-11-08",
+   "time": "10:00",
+   "end": "11:00",
+   "category": "Piccoli Amici",
+   "group": "piccoli",
+   "type": "TORNEO",
+   "home_away": "CASA",
+   "venue": "COLICO - CAMPO 1",
+   "opponent": "",
+   "round": "",
+   "source": "SCD",
+   "notice": [
+    "Orario o sede da verificare",
+    "Attesa verifica"
+   ],
+   "match_status": "CLUB_EVENT",
+   "is_variation": false,
+   "verification": {
+    "time_confirmed": false,
+    "venue_confirmed": false,
+    "facility_review_required": false
+   }
+  },
+  {
    "id": "EVT-U15-8A-MESE-FUORI",
    "date": "2026-11-08",
    "time": "10:30",
@@ -1792,6 +2069,31 @@
    "verification": {
     "time_confirmed": true,
     "venue_confirmed": true,
+    "facility_review_required": false
+   }
+  },
+  {
+   "id": "EVT-ES-20261121-NUOVASONDRIOCALCIO-CASA",
+   "date": "2026-11-21",
+   "time": "18:00",
+   "end": "19:15",
+   "category": "Esordienti 12 anni (2014)",
+   "group": "2014",
+   "type": "AMICHEVOLE",
+   "home_away": "CASA",
+   "venue": "COLICO - CAMPO 2",
+   "opponent": "NUOVA SONDRIO CALCIO",
+   "round": "",
+   "source": "SCD",
+   "notice": [
+    "Orario o sede da verificare",
+    "Attesa verifica"
+   ],
+   "match_status": "CLUB_EVENT",
+   "is_variation": false,
+   "verification": {
+    "time_confirmed": false,
+    "venue_confirmed": false,
     "facility_review_required": false
    }
   },
@@ -2171,6 +2473,31 @@
    }
   },
   {
+   "id": "EVT-ES-20261212-NUOVASONDRIOCALCIO-CASA",
+   "date": "2026-12-12",
+   "time": "15:30",
+   "end": "16:45",
+   "category": "Esordienti 11 anni (2015)",
+   "group": "2015",
+   "type": "AMICHEVOLE",
+   "home_away": "CASA",
+   "venue": "COLICO - CAMPO 1",
+   "opponent": "NUOVA SONDRIO CALCIO",
+   "round": "",
+   "source": "SCD",
+   "notice": [
+    "Orario o sede da verificare",
+    "Attesa verifica"
+   ],
+   "match_status": "CLUB_EVENT",
+   "is_variation": false,
+   "verification": {
+    "time_confirmed": false,
+    "venue_confirmed": false,
+    "facility_review_required": false
+   }
+  },
+  {
    "id": "EVT-U19E-14A-VIBERONCHESE-FUORI",
    "date": "2026-12-12",
    "time": "17:30",
@@ -2255,6 +2582,56 @@
    "verification": {
     "time_confirmed": true,
     "venue_confirmed": true,
+    "facility_review_required": false
+   }
+  },
+  {
+   "id": "EVT-ES-20261219-ALTOLARIOCALCIO-CASA",
+   "date": "2026-12-19",
+   "time": "14:30",
+   "end": "15:45",
+   "category": "Esordienti 11 anni (2015)",
+   "group": "2015",
+   "type": "AMICHEVOLE",
+   "home_away": "CASA",
+   "venue": "COLICO - CAMPO 2",
+   "opponent": "ALTO LARIO CALCIO",
+   "round": "",
+   "source": "SCD",
+   "notice": [
+    "Orario o sede da verificare",
+    "Attesa verifica"
+   ],
+   "match_status": "CLUB_EVENT",
+   "is_variation": false,
+   "verification": {
+    "time_confirmed": false,
+    "venue_confirmed": false,
+    "facility_review_required": false
+   }
+  },
+  {
+   "id": "EVT-MAN-20261219-002",
+   "date": "2026-12-19",
+   "time": "15:00",
+   "end": "",
+   "category": "Pulcini Misti 7v7",
+   "group": "pulcini",
+   "type": "AMICHEVOLE",
+   "home_away": "FUORI",
+   "venue": "SONDRIO",
+   "opponent": "NUOVA SONDRIO CALCIO",
+   "round": "",
+   "source": "SCD",
+   "notice": [
+    "Orario o sede da verificare",
+    "Attesa verifica"
+   ],
+   "match_status": "CLUB_EVENT",
+   "is_variation": false,
+   "verification": {
+    "time_confirmed": false,
+    "venue_confirmed": false,
     "facility_review_required": false
    }
   },
