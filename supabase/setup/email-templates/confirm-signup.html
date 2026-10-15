@@ -1,0 +1,42 @@
+<!-- Supabase → Authentication → Emails → Templates → "Confirm signup".
+     Oggetto: Conferma la tua e-mail per la app S.C.D. ColicoDerviese
+     Link "a prova di antivirus": porta a /accedi/conferma con token_hash e type=signup. -->
+<!doctype html>
+<html lang="it">
+  <body style="margin:0;padding:0;background:#eef3f9;font-family:Arial,Helvetica,sans-serif;color:#0d1b3e;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#eef3f9;padding:24px 12px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#ffffff;border-radius:16px;overflow:hidden;">
+            <tr>
+              <td style="background:#0d2f6e;padding:20px 24px;border-bottom:4px solid #f5c400;">
+                <div style="font-size:20px;font-weight:bold;color:#ffffff;letter-spacing:0.5px;">S.C.D. <span style="color:#f5c400;">COLICO</span>DERVIESE</div>
+                <div style="font-size:13px;color:#cfe0f7;margin-top:2px;">App ufficiale della società</div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:24px;">
+                <p style="margin:0 0 12px;font-size:17px;font-weight:bold;">Conferma la tua e-mail</p>
+                <p style="margin:0 0 20px;font-size:15px;line-height:1.5;">Hai scelto la password nella app della società: tocca il pulsante per confermare che questa e-mail è tua. Dopo entri sempre con la tua e-mail (o il telefono) e la password.</p>
+                <table role="presentation" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td style="background:#1557c0;border-radius:10px;">
+                      <a href="{{ .SiteURL }}/accedi/conferma?token_hash={{ .TokenHash }}&amp;type=signup" style="display:inline-block;padding:14px 22px;font-size:16px;font-weight:bold;color:#ffffff;text-decoration:none;">Conferma ed entra</a>
+                    </td>
+                  </tr>
+                </table>
+                <p style="margin:20px 0 0;font-size:13px;line-height:1.5;color:#4a5b78;">Se non ti sei registrato tu, ignora questa e-mail: senza la conferma l'accesso non si attiva.</p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:16px 24px;background:#f6f9fd;font-size:12px;line-height:1.5;color:#4a5b78;">
+                S.C.D. ColicoDerviese · Colico e Dervio (LC)<br />
+                Problemi con l'accesso? Scrivi a sportclubcolico@gmail.com
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

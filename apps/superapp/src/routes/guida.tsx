@@ -54,7 +54,7 @@ function Guida() {
     <main className="mx-auto flex max-w-3xl flex-col gap-6 px-4 py-10" data-testid="guida">
       <header>
         <h1 className="m-0 text-[34px] font-bold leading-tight">Come funziona l'app</h1>
-        <p className="mt-2 text-[16px] leading-relaxed">Tre minuti per capire cosa fai tu e cosa fa l'app. Per seguire la squadra non serve nessun account; chi ha un ruolo nel club entra con e-mail o telefono e password. Password dimenticata? Ti arriva un codice via e-mail per sceglierne una nuova.</p>
+        <p className="mt-2 text-[16px] leading-relaxed">Tre minuti per capire cosa fai tu e cosa fa l'app. Per seguire la squadra non serve nessun account; chi ha un ruolo nel club entra con e-mail o telefono e password. Password dimenticata? Ti arriva una e-mail con il pulsante per sceglierne una nuova.</p>
         <nav aria-label="Scegli il tuo ruolo" className="mt-4 flex flex-wrap gap-2">
           {ROLES.map((r) => (
             <a key={r.id} href={`#${r.id}`} className="inline-flex h-11 items-center rounded-full border border-border bg-white px-4 text-[15px] font-semibold">{r.label}</a>
