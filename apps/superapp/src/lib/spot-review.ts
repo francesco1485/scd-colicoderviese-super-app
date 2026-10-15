@@ -49,10 +49,9 @@ export function sponsorLogoSrc(slug: string, list: readonly Sponsor[] = SPONSORS
   return s && s.src.startsWith("/media/sponsor/") ? s.src : null;
 }
 
-/** Where the spot runs: only what the code already states (home "Sul LED wall", LED wall player, FAQ "spot-dove"). */
+/** Where the spot runs: only what is true (LED wall player, FAQ "spot-dove"). No in-app showcase (Francesco 15/10/2026: no vetrine). */
 export const SPOT_WHERE: readonly { id: string; title: string; text: string }[] = [
   { id: "ledwall", title: "LED wall del campo", text: "Sul LED wall a bordo campo a Colico, in rotazione con gli altri partner." },
-  { id: "home", title: "App del club", text: "Nella vetrina «Sul LED wall» della pagina iniziale dell'app, uno spot dopo l'altro." },
 ];
 
 /** One line on whether the spot is in rotation now, from the same rule as the home and the LED wall (isShowable). */

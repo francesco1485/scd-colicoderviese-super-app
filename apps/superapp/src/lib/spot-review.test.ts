@@ -66,10 +66,10 @@ describe("spot review page logic (B1, UD-119)", () => {
   it("says where the spot runs only as the FAQ already states it", () => {
     const faq = SPONSOR_FAQ.find((f) => f.id === "spot-dove")!.a;
     expect(faq).toContain("LED wall a bordo campo a Colico");
-    expect(faq).toContain("«Sul LED wall»");
-    expect(SPOT_WHERE.map((w) => w.id)).toEqual(["ledwall", "home"]);
+    expect(faq).not.toMatch(/vetrina/i);
+    expect(SPOT_WHERE.map((w) => w.id)).toEqual(["ledwall"]);
     expect(SPOT_WHERE[0]!.text).toContain("LED wall a bordo campo a Colico");
-    expect(SPOT_WHERE[1]!.text).toContain("«Sul LED wall»");
+    expect(SPOT_WHERE.some((w) => /vetrina|pagina iniziale/i.test(w.text))).toBe(false);
   });
 
   it("air note follows the home / LED wall rule (never 'in rotation' with changes requested)", () => {

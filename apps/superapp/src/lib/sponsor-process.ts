@@ -74,7 +74,7 @@ export const SPONSOR_FAQ: readonly SponsorFaq[] = [
   {
     id: "spot-dove",
     q: "Dove si vede lo spot?",
-    a: "Sul LED wall a bordo campo a Colico e nella vetrina «Sul LED wall» della pagina iniziale dell'app, in rotazione con gli altri partner.",
+    a: "Sul LED wall a bordo campo a Colico, in rotazione con gli altri partner.",
   },
   {
     id: "social",
