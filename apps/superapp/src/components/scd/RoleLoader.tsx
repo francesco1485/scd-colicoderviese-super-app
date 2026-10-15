@@ -44,7 +44,8 @@ export function RoleLoader({
       const res = await load();
       setEngine(res.engine);
       setTemplates(res.templates);
-      if (res.engine !== "applied") setMessage("I ruoli si caricano dopo «applica r111».");
+      if (res.readError) setMessage("Lettura dei ruoli non riuscita, riprova.");
+      else if (res.engine !== "applied") setMessage("I ruoli si caricano dopo «applica r111».");
       else if (!res.templates.length) setMessage("Nessun ruolo attivo: li crea il Presidente o il Direttore Generale in Direzione → Ruoli.");
     } catch {
       setMessage("Lettura dei ruoli non riuscita, riprova.");
@@ -84,6 +85,7 @@ export function RoleLoader({
             {picked && needsTeams(picked) && (
               <fieldset className="m-0 flex flex-col gap-1 border-0 p-0">
                 <legend className="mb-1 text-[15px] font-semibold">Squadre di questa persona</legend>
+                {teams.length === 0 && <p className="m-0 text-[14px] text-[var(--in-warn)]">Nessuna squadra attiva: senza squadre questo ruolo non si può caricare.</p>}
                 <div className="flex flex-wrap gap-2">
                   {teams.map((t) => {
                     const on = teamIds.includes(t.id);

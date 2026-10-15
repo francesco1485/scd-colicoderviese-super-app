@@ -709,10 +709,11 @@
         "behaviour_test": "supabase/tests/r111_role_templates.pglite.mjs",
         "platforms": ["ONE", "CORE", "GROW"],
         "tables": ["scd_role_templates", "scd_role_template_grants"],
-        "creator_rule": "scd_is_role_creator: active DIRECTION account linked to the person holding the active structure role Presidente or Direttore Generale.",
+        "creator_rule": "scd_is_role_creator: active DIRECTION account with a verified link to the person holding the active structure role Presidente or Direttore Generale.",
         "empty_role": "Every platform always offers 'Crea ruolo vuoto' (every section 'Nessuno').",
         "apply_rule": "A role opens nothing: loaded on a person as unconfirmed proposals with that person's teams or site, saved through scd_set_person_grants.",
-        "base_access_rule": "Trigger scd_person_grants_base_access: a new grant needs an active account of the club; revocations are never blocked.",
+        "base_access_rule": "Trigger scd_person_grants_base_access: a new or wider grant needs an active account of the club with a verified link; revoking or narrowing is never blocked.",
+        "creator_protection": "Triggers scd_structure_roles_creator_guard and scd_identity_links_creator_guard: only an existing creator (or a migration / service role) adds, changes or links the structure roles Presidente / Direttore Generale.",
         "admin_route": "/direzione/ruoli",
         "audit": "scd_access_audit (CREATE_ROLE, CHANGE_ROLE, ROLE_STATUS)"
       }

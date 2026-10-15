@@ -70,7 +70,7 @@ export const ROLE_RULES_IT: readonly string[] = [
   "Solo il Presidente e il Direttore Generale creano, modificano o disattivano i ruoli.",
   "Un ruolo non apre nulla da solo: la Direzione lo carica sulla persona, sceglie le sue squadre o la sede e conferma.",
   "Un incarico di squadra vede solo la sua squadra. Un responsabile vede più squadre, aree o piattaforme solo se la Direzione gliele dà, una per una.",
-  "Prima serve l'accesso base: senza un accesso attivo al club non si abilita nulla.",
+  "Prima serve l'accesso base: senza un accesso attivo al club non si abilita nulla. Togliere o ridurre si può sempre.",
 ];
 
 export const ROLE_PRESETS: Readonly<Record<Platform, readonly RolePreset[]>> = FILE.roleTemplates.presets;
@@ -214,6 +214,7 @@ export function explainRoleError(error: { code?: string; message: string }, notA
   const m = error.message;
   if (/does not exist|could not find the (table|function)/i.test(m) || ["42P01", "42883", "PGRST202", "PGRST205"].includes(error.code ?? "")) return notApplied;
   if (m.includes("Presidente or Direttore Generale only")) return "Solo il Presidente e il Direttore Generale creano e modificano i ruoli.";
+  if (m.includes("change these roles") || m.includes("link accounts to these people")) return "Solo il Presidente e il Direttore Generale cambiano questi incarichi.";
   if (m.includes("role label already used")) return "Esiste già un ruolo attivo con questo nome in questa piattaforma.";
   if (m.includes("section of another platform")) return "Una sezione appartiene a un'altra piattaforma.";
   if (m.includes("section not grantable")) return "Una sezione non si mette in un ruolo (parte protetta o non prevista).";

@@ -96,7 +96,7 @@
     { "code": "fondo-solidale", "platform": "CORE", "label": "Fondo Solidale: domande, decisioni, entrate e uscite", "group": "soldi", "path": "/tesoreria/fondo-solidale", "levels": ["READ", "WRITE", "APPROVE"], "perimeters": ["ALL"], "sensitive": true, "sees": "le domande al Fondo Solidale con nomi e ISEE, le decisioni, le entrate e le uscite del Fondo" },
     { "code": "adotta", "platform": "GROW", "label": "Adotta un oggetto: catalogo e adozioni", "group": "societa", "path": "/direzione/adotta", "levels": ["READ", "WRITE", "APPROVE"], "perimeters": ["ALL"], "sees": "il catalogo delle cose da adottare e l'avanzamento delle adozioni (mai i dati dei donatori)" },
     { "code": "donazioni", "platform": "CORE", "label": "Donazioni: denaro registrato, ricevute, materiale offerto", "group": "soldi", "path": "/tesoreria/donazioni", "levels": ["READ", "WRITE", "APPROVE"], "perimeters": ["ALL"], "sensitive": true, "sees": "le donazioni con i dati dei donatori non anonimi, le ricevute e le offerte di materiale" },
-    { "code": "proposte", "platform": "GROW", "label": "Proposte di miglioramento: valutazione", "group": "societa", "path": "/direzione/proposte", "levels": ["READ", "WRITE", "APPROVE"], "perimeters": ["ALL"], "sees": "le proposte di miglioramento arrivate e la loro valutazione" }
+    { "code": "proposte", "platform": "CORE", "label": "Proposte di miglioramento: valutazione", "group": "societa", "path": "/direzione/proposte", "levels": ["READ", "WRITE", "APPROVE"], "perimeters": ["ALL"], "sees": "le proposte di miglioramento arrivate e la loro valutazione" }
   ],
   "roleTemplates": {
     "decidedBy": "Francesco (DG) 15/10/2026, claude.ai project doc claude/SCD_DELEGHE_DECISIONI_2026-10-15.md; migration supabase/migrations/20261015_r111_role_templates.sql",
@@ -105,7 +105,7 @@
       "Only the Presidente and the Direttore Generale create, edit or deactivate roles (r111 scd_is_role_creator).",
       "A role opens nothing by itself: the Direzione loads it into a person's checklist, chooses that person's teams or site and saves it as person grants (r100).",
       "A team role sees only the teams chosen for that person; a responsabile sees more teams, areas or platforms only as granted one by one by the Direzione.",
-      "Grants need the base access first: an active account of the club (r111 trigger)."
+      "Grants need the base access first: an active account of the club with a verified link (r111 trigger); revoking or narrowing is never blocked."
     ],
     "presets": {
       "ONE": [

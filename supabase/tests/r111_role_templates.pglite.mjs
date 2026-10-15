@@ -36,7 +36,7 @@ create type public.scd_role as enum ('USER_BASE','FAMILY','ATHLETE','MISTER','MA
 create table public.scd_organizations (id uuid primary key);
 create table public.scd_people (id uuid primary key, organization_id uuid not null, first_name text default 'X', last_name text default 'Y', display_name text, birth_date date, status text default 'ACTIVE');
 create table public.scd_memberships (user_id uuid, organization_id uuid, role public.scd_role, active boolean, scope jsonb default '{}', created_at timestamptz default now());
-create table public.scd_identity_links (id uuid primary key default gen_random_uuid(), organization_id uuid, user_id uuid, person_id uuid, link_state text default 'VERIFIED');
+create table public.scd_identity_links (id uuid primary key default gen_random_uuid(), organization_id uuid, user_id uuid, person_id uuid, link_state text default 'AUTO_VERIFIED' check (link_state in ('AUTO_VERIFIED','VERIFIED_BY_STAFF','PENDING_REVIEW','REJECTED','REVOKED')));
 create table public.scd_structure_roles (id uuid primary key default gen_random_uuid(), organization_id uuid, person_id uuid, role_label text, role_kind text, team_id uuid, active boolean default true, valid_to date);
 create table public.scd_teams (id uuid primary key, organization_id uuid, code text, name text, status text);
 create table public.scd_athletes (id uuid primary key default gen_random_uuid(), person_id uuid);
@@ -78,6 +78,7 @@ async function fails(sql, params, needle) {
   });
 }
 const CREATE = `select public.scd_create_role_template($1, $2, $3, $4)`;
+const CREATE_WITH = `select public.scd_create_role_template($1, $2, $3, $4, $5::jsonb)`;
 const SET = `select public.scd_set_role_template($1, $2, $3, $4, $5::jsonb, $6)`;
 const ACTIVE = `select public.scd_set_role_template_active($1, $2, $3, $4)`;
 const GRANTS = `select public.scd_set_person_grants($1, $2, $3::jsonb, $4)`;
@@ -110,10 +111,33 @@ await fails(SET, [ORG, core, "Mister annata", "", '[{"section":"mister","level":
 await fails(SET, [ORG, core, "Mister annata", "", '[{"section":"mister","level":"READ","perimeter":"ALL"},{"section":"mister","level":"WRITE","perimeter":"ALL"}]', ""], "duplicate or missing section");
 const tpl = '[{"section":"mister","level":"WRITE","perimeter":"OWN_TEAMS"},{"section":"quadro","level":"READ","perimeter":"OWN_TEAMS"}]';
 assert.equal(await one(SET, [ORG, core, "Mister annata", "Squadra", tpl, "prima versione"]), 2);
-await fails(CREATE, [ORG, "CORE", "  mister ANNATA ", ""], "role label already used");
+await fails(CREATE, [ORG, "CORE", "  mister   ANNATA ", ""], "role label already used");
+// A model is saved in the same call (atomic); a bad model leaves nothing behind.
+const fromModel = await one(CREATE_WITH, [ORG, "GROW", "Commerciale", "", '[{"section":"crm","level":"WRITE","perimeter":"ALL"}]']);
+assert.equal(Number(await one(`select count(*) from public.scd_role_template_grants where template_id = $1`, [fromModel])), 1);
+await fails(CREATE_WITH, [ORG, "GROW", "Sbagliato", "", '[{"section":"mister","level":"READ","perimeter":"ALL"}]'], "section of another platform");
+assert.equal(Number(await one(`select count(*) from public.scd_role_templates where label = 'Sbagliato'`)), 0);
+await fails(CREATE, [ORG, null, "Senza piattaforma", ""], "unknown platform");
 assert.ok(await one(CREATE, [ORG, "ONE", "Mister annata", ""]), "same label on another platform");
 assert.equal(await one(SET, [ORG, core, "Mister annata", "Squadra", "[]", "torna vuoto"]), 0);
 assert.equal(await one(SET, [ORG, core, "Mister annata", "Squadra", tpl, "di nuovo"]), 2);
+
+// 2b. Nobody can make himself Presidente or DG to become a creator (r59 lets Direzione/Segreteria write the organigramma).
+await as(3);
+await fails(`insert into public.scd_structure_roles (organization_id, person_id, role_label, role_kind) values ($1, $2, 'Presidente', 'ORGANO_SOCIETARIO')`, [ORG, P(3)], "only Presidente or Direttore Generale change these roles");
+await fails(`update public.scd_structure_roles set role_label = 'Direttore Generale' where person_id = $1`, [P(3)], "only Presidente or Direttore Generale change these roles");
+await fails(`update public.scd_structure_roles set active = false where person_id = $1`, [P(1)], "only Presidente or Direttore Generale change these roles");
+await db.query(`update public.scd_structure_roles set role_label = 'Direttore Sportivo agonistica' where person_id = $1`, [P(3)]); // other labels stay free
+// ...nor link a second login of his own to the Presidente's person (r65 path).
+await db.query(`insert into auth.users values ('10000000-0000-0000-0000-000000000009', 'nuovo@example.test')`);
+await fails(`insert into public.scd_identity_links (organization_id, user_id, person_id, link_state) values ($1, '10000000-0000-0000-0000-000000000009', $2, 'VERIFIED_BY_STAFF')`, [ORG, P(1)], "only Presidente or Direttore Generale link accounts");
+// An unverified link does not make a creator.
+await db.query(`insert into public.scd_identity_links (organization_id, user_id, person_id, link_state) values ($1, '10000000-0000-0000-0000-000000000009', $2, 'PENDING_REVIEW')`, [ORG, P(1)]);
+await db.query(`insert into public.scd_memberships (user_id, organization_id, role, active) values ('10000000-0000-0000-0000-000000000009', $1, 'DIRECTION', true)`, [ORG]);
+await db.query(`select set_config('request.jwt.claim.sub', '10000000-0000-0000-0000-000000000009', false)`);
+assert.equal(await one(`select public.scd_is_role_creator($1)`, [ORG]), false);
+await as(2);
+await db.query(`update public.scd_structure_roles set valid_to = null where person_id = $1`, [P(2)]); // a creator may edit them
 
 // 3. The Direzione applies it to one person through r100, with that person's team: a team role sees its team only.
 await as(3);
@@ -131,11 +155,24 @@ await as(5);
 assert.equal(await one(CAN, ["mister", "WRITE", ORG, T2]), true);
 assert.equal(await one(CAN, ["quadro", "READ", ORG, T1]), false, "sections left out of the new set are revoked");
 
-// 5. Base access first; revoking always works, even after the account is closed.
+// 5. Base access first; revoking and narrowing always work, even after the account is closed.
 await as(3);
 await fails(GRANTS, [ORG, P(6), '[{"section":"magazzino","level":"READ","perimeter":"ALL"}]', ""], "base access missing");
+await db.query(GRANTS, [ORG, P(5), JSON.stringify([
+  { section: "mister", level: "WRITE", perimeter: "OWN_TEAMS", team_ids: [T1, T2] },
+  { section: "magazzino", level: "WRITE", perimeter: "ALL" }]), "prima della chiusura"]);
 await db.query(`update public.scd_memberships set active = false where user_id = $1`, [U(5)]);
-assert.equal(await one(GRANTS, [ORG, P(5), "[]", "account chiuso"]), 1);
+await fails(GRANTS, [ORG, P(5), JSON.stringify([
+  { section: "mister", level: "WRITE", perimeter: "OWN_TEAMS", team_ids: [T1, T2] },
+  { section: "magazzino", level: "WRITE", perimeter: "ALL" },
+  { section: "quadro", level: "READ", perimeter: "ALL" }]), "nuova sezione"], "base access missing");
+await fails(GRANTS, [ORG, P(5), JSON.stringify([
+  { section: "mister", level: "APPROVE", perimeter: "OWN_TEAMS", team_ids: [T1, T2] },
+  { section: "magazzino", level: "WRITE", perimeter: "ALL" }]), "allarga"], "base access missing");
+assert.equal(await one(GRANTS, [ORG, P(5), JSON.stringify([
+  { section: "mister", level: "READ", perimeter: "OWN_TEAMS", team_ids: [T1] },
+  { section: "magazzino", level: "READ", perimeter: "OWN_SITE", site: "COLICO" }]), "riduzione"]), 2);
+assert.equal(await one(GRANTS, [ORG, P(5), "[]", "account chiuso"]), 2);
 
 // 6. Deactivate / reactivate: creators only, labels stay unique, inactive templates are frozen.
 await as(2);
@@ -147,6 +184,7 @@ await fails(SET, [ORG, core, "Altro nome", "", "[]", ""], "role is not active");
 
 // 7. Audit trail and table shape.
 const actions = (await db.query(`select action from public.scd_access_audit order by id`)).rows.map((r) => r.action);
+assert.equal(await one(`select public.scd_section_platform('proposte')`), "CORE");
 for (const a of ["CREATE_ROLE", "CHANGE_ROLE", "ROLE_STATUS", "GRANT_SECTION", "REVOKE_SECTION"]) assert.ok(actions.includes(a), a);
 assert.equal(Number(await one(`select count(*) from pg_policies where tablename in ('scd_role_templates','scd_role_template_grants') and cmd <> 'SELECT'`)), 0);
 assert.equal(await one(`select public.scd_section_platform('crm')`), "GROW");

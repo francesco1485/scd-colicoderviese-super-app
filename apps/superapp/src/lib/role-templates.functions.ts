@@ -19,7 +19,6 @@ import {
   explainRoleError,
   isPlatform,
   isRoleCreatorByRoles,
-  presetGrants,
   sortGrants,
   templateProblem,
   type RoleTemplate,
@@ -37,6 +36,8 @@ export interface RoleTemplatesData {
   engine: GrantsEngine;
   actor: { isDirection: boolean; isCreator: boolean; email: string | null };
   templates: RoleTemplate[];
+  /** True when r111 is applied but the roles could not be read (never shown as "no roles"). */
+  readError: boolean;
 }
 
 type Sb = NonNullable<ReturnType<typeof serverSupabase>>;
@@ -109,39 +110,42 @@ async function creatorOf(sb: Sb, organizationId: string, engine: GrantsEngine): 
   return isRoleCreatorByRoles(labels);
 }
 
-export async function readTemplates(sb: Sb, organizationId: string): Promise<RoleTemplate[]> {
+export async function readTemplates(sb: Sb, organizationId: string): Promise<RoleTemplate[] | null> {
   const { data, error } = await sb
     .from("scd_role_templates")
     .select("id,platform,label,description,active,updated_at,scd_role_template_grants(section_code,level,perimeter)")
     .eq("organization_id", organizationId)
     .order("platform")
     .order("label");
-  if (error) return [];
+  if (error) return null;
   return ((data ?? []) as TemplateDb[]).map(toTemplate).filter((t): t is RoleTemplate => t !== null);
 }
 
 export const getRoleTemplates = createServerFn({ method: "GET" }).handler(async (): Promise<RoleTemplatesData> => {
   const { gate, org, isDirection, actorEmail, sb } = await context();
-  const base: RoleTemplatesData = { gate, connected: false, engine: "unknown", actor: { isDirection, isCreator: false, email: actorEmail }, templates: [] };
+  const base: RoleTemplatesData = { gate, connected: false, engine: "unknown", actor: { isDirection, isCreator: false, email: actorEmail }, templates: [], readError: false };
   if (gate.view !== "page" || !sb || !org) return base;
   const engine = await roleTemplatesEngine(sb);
   const isCreator = isDirection && (await creatorOf(sb, org.organizationId, engine));
+  const templates = engine === "applied" && isDirection ? await readTemplates(sb, org.organizationId) : [];
   return {
     ...base,
     connected: true,
     engine,
     actor: { isDirection, isCreator, email: actorEmail },
-    templates: engine === "applied" && isDirection ? await readTemplates(sb, org.organizationId) : [],
+    templates: templates ?? [],
+    readError: templates === null,
   };
 });
 
 /** Active roles for the person checklist ("Carica un ruolo"); empty while r111 is not applied or for non-Direzione. */
-export const getActiveRoleTemplates = createServerFn({ method: "GET" }).handler(async (): Promise<{ engine: GrantsEngine; templates: RoleTemplate[] }> => {
+export const getActiveRoleTemplates = createServerFn({ method: "GET" }).handler(async (): Promise<{ engine: GrantsEngine; templates: RoleTemplate[]; readError: boolean }> => {
   const { gate, org, isDirection, sb } = await context();
-  if (gate.view !== "page" || !sb || !org || !isDirection) return { engine: "unknown", templates: [] };
+  if (gate.view !== "page" || !sb || !org || !isDirection) return { engine: "unknown", templates: [], readError: false };
   const engine = await roleTemplatesEngine(sb);
-  if (engine !== "applied") return { engine, templates: [] };
-  return { engine, templates: (await readTemplates(sb, org.organizationId)).filter((t) => t.active) };
+  if (engine !== "applied") return { engine, templates: [], readError: false };
+  const templates = await readTemplates(sb, org.organizationId);
+  return { engine, templates: (templates ?? []).filter((t) => t.active), readError: templates === null };
 });
 
 const GrantInput = z.object({
@@ -159,38 +163,30 @@ async function writeContext(): Promise<{ ok: false; message: string } | { ok: tr
   if (gate.view !== "page" || !sb || !org) return { ok: false, message: "Accesso non valido." };
   if (!isDirection) return { ok: false, message: "Solo il Presidente e il Direttore Generale creano e modificano i ruoli." };
   if ((await roleTemplatesEngine(sb)) !== "applied") return { ok: false, message: ROLES_NOT_APPLIED };
+  // Defence in depth: the database checks it again inside every write function.
+  if (!(await creatorOf(sb, org.organizationId, "applied"))) return { ok: false, message: "Solo il Presidente e il Direttore Generale creano e modificano i ruoli." };
   return { ok: true, sb, organizationId: org.organizationId };
 }
 
-/** Creates a role on a platform: always empty first; with a model, the model's sections are saved right after. */
+/** Creates a role on a platform in one call: empty (no sections) or with the sections chosen on screen. */
 export const createRoleTemplate = createServerFn({ method: "POST" })
-  .inputValidator((d: { platform: string; label: string; description: string; preset: string | null }) =>
-    z.object({ platform: z.enum(PLATFORMS), label: Label, description: Note, preset: z.string().regex(/^[a-z0-9-]{2,40}$/).nullable() }).parse(d))
+  .inputValidator((d: { platform: string; label: string; description: string; grants: Array<z.infer<typeof GrantInput>> }) =>
+    z.object({ platform: z.enum(PLATFORMS), label: Label, description: Note, grants: z.array(GrantInput).max(60) }).parse(d))
   .handler(async ({ data }): Promise<Result> => {
     const w = await writeContext();
     if (!w.ok) return w;
-    const grants = presetGrants(data.platform, data.preset);
-    const problem = templateProblem(data.platform, grants);
+    const problem = templateProblem(data.platform, data.grants);
     if (problem) return { ok: false, message: problem };
     const { data: id, error } = await w.sb.rpc("scd_create_role_template", {
       p_organization_id: w.organizationId,
       p_platform: data.platform,
       p_label: data.label,
       p_description: data.description,
+      p_grants: data.grants.map((g) => ({ section: g.sectionCode, level: g.level, perimeter: g.perimeter })),
     });
     if (error || typeof id !== "string") return { ok: false, message: error ? explainRoleError(error, ROLES_NOT_APPLIED) : "Creazione non riuscita, riprova." };
-    if (grants.length) {
-      const { error: e2 } = await w.sb.rpc("scd_set_role_template", {
-        p_organization_id: w.organizationId,
-        p_template_id: id,
-        p_label: data.label,
-        p_description: data.description,
-        p_grants: grants.map((g) => ({ section: g.sectionCode, level: g.level, perimeter: g.perimeter })),
-        p_note: `modello ${data.preset}`,
-      });
-      if (e2) return { ok: false, id, message: `Ruolo creato vuoto; il modello non è stato copiato: ${explainRoleError(e2, ROLES_NOT_APPLIED)}` };
-    }
-    return { ok: true, id, message: grants.length ? "Ruolo creato dal modello: controlla le sezioni e salva se cambi qualcosa." : "Ruolo vuoto creato: tutte le sezioni sono su “Nessuno”." };
+    const n = data.grants.length;
+    return { ok: true, id, message: n ? `Ruolo creato: ${n} ${n === 1 ? "sezione" : "sezioni"}.` : "Ruolo vuoto creato: tutte le sezioni sono su “Nessuno”." };
   });
 
 export const saveRoleTemplate = createServerFn({ method: "POST" })

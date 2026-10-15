@@ -129,6 +129,17 @@ describe("role content", () => {
     expect(narrowestPerimeter({ perimeters: ["ALL"] })).toBe("ALL");
   });
 
+  it("names are compared like the database does (trim, inner spaces, case)", () => {
+    expect(SQL111).toContain("lower(regexp_replace(btrim(coalesce(p_label, '')), '\\s+', ' ', 'g'))");
+    expect(SQL111).toContain("public.scd_role_label_key(label)) where active");
+  });
+
+  it("nobody can make himself Presidente or DG: triggers guard the organigramma and the account links", () => {
+    expect(SQL111).toMatch(/create trigger scd_structure_roles_creator_guard\s+before insert or update or delete on public\.scd_structure_roles/);
+    expect(SQL111).toMatch(/create trigger scd_identity_links_creator_guard\s+before insert or update on public\.scd_identity_links/);
+    expect(SQL111).toMatch(/link_state in \('AUTO_VERIFIED', 'VERIFIED_BY_STAFF'\)/);
+  });
+
   it("groups by platform, active first", () => {
     const g = byPlatform([tpl({ id: "z", label: "Zeta", active: false }), tpl({ id: "a", label: "Alfa" }), tpl({ id: "o", platform: "ONE", label: "Genitore" })]);
     expect(g.CORE.map((t) => t.id)).toEqual(["a", "z"]);
@@ -175,8 +186,9 @@ describe("loading a role on a person (Francesco 15/10: team role = own team, res
 });
 
 describe("base access first and wiring", () => {
-  it("a new grant needs an active account; revoking is never blocked (insert-only trigger)", () => {
+  it("a new or wider grant needs an active account; revoking and narrowing are never blocked", () => {
     expect(SQL111).toMatch(/before insert on public\.scd_person_grants/);
+    expect(SQL111).toMatch(/o\.revoked_at = now\(\)/);
     expect(SQL111).not.toMatch(/before (update|delete)[^;]*scd_person_grants/);
   });
 

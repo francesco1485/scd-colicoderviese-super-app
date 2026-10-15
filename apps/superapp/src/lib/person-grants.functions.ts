@@ -246,6 +246,7 @@ export const NOT_APPLIED_MESSAGE = "Da attivare: serve l'OK della Direzione per 
 export function explainGrantError(error: { code?: string; message: string }): string {
   const m = error.message;
   if (isMissingObjectError(error)) return NOT_APPLIED_MESSAGE;
+  if (m.includes("base access missing")) return "Questa persona non ha un accesso attivo al club: prima riattiva l'accesso base. Togliere o ridurre le abilitazioni si può sempre.";
   if (m.includes("cannot edit own access")) return "Sono le tue abilitazioni: le può cambiare solo un'altra persona della Direzione.";
   if (m.includes("club account is protected")) return "Account del club: è protetto e non si modifica da qui.";
   if (m.includes("Direzione only")) return "Solo la Direzione abilita le sezioni.";

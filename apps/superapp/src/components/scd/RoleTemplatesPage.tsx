@@ -8,7 +8,7 @@
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowLeft, Eye, Layers, Lock, Pencil, Plus, Power, Save, ShieldAlert, X } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type KeyboardEvent } from "react";
 
 import { Card, Chip } from "@/components/scd/interior-ui";
 import { EmptyState, WorkAreaShell } from "@/components/scd/work-area-ui";
@@ -79,8 +79,18 @@ export function RoleTemplatesPage({ initial }: { initial: RoleTemplatesData }) {
     try {
       setData(await reload());
     } catch {
-      /* keep the current screen */
+      setMessage("Non riesco a ricaricare i ruoli: aggiorna la pagina.");
     }
+  }
+
+  function onTabKey(e: KeyboardEvent<HTMLButtonElement>) {
+    const i = PLATFORMS.indexOf(tab);
+    const next = e.key === "ArrowRight" ? PLATFORMS[(i + 1) % PLATFORMS.length] : e.key === "ArrowLeft" ? PLATFORMS[(i + PLATFORMS.length - 1) % PLATFORMS.length] : e.key === "Home" ? PLATFORMS[0] : e.key === "End" ? PLATFORMS[PLATFORMS.length - 1] : null;
+    if (!next) return;
+    e.preventDefault();
+    setTab(next);
+    setEditing((x) => (x && x.platform !== next ? null : x));
+    document.getElementById(`roles-tab-${next}`)?.focus();
   }
 
   function startEmpty(platform: Platform) {
@@ -103,22 +113,8 @@ export function RoleTemplatesPage({ initial }: { initial: RoleTemplatesData }) {
     setBusy(true);
     setMessage(null);
     try {
-      let id = e.id;
-      if (!id) {
-        const res = await create({ data: { platform: e.platform, label: cleanLabel(e.label), description: e.description, preset: null } });
-        if (!res.ok || !res.id) {
-          setMessage(res.message);
-          return;
-        }
-        id = res.id;
-        if (e.grants.length === 0) {
-          setMessage(res.message);
-          setEditing(null);
-          await refresh();
-          return;
-        }
-      }
-      const res = await save({ data: { id, platform: e.platform, label: cleanLabel(e.label), description: e.description, grants: sortGrants(e.grants), note } });
+      const payload = { platform: e.platform, label: cleanLabel(e.label), description: e.description, grants: sortGrants(e.grants) };
+      const res = e.id ? await save({ data: { id: e.id, ...payload, note } }) : await create({ data: payload });
       setMessage(res.message);
       if (res.ok) {
         setEditing(null);
@@ -192,6 +188,8 @@ export function RoleTemplatesPage({ initial }: { initial: RoleTemplatesData }) {
             id={`roles-tab-${p}`}
             aria-selected={tab === p}
             aria-controls={`roles-panel-${p}`}
+            tabIndex={tab === p ? 0 : -1}
+            onKeyDown={onTabKey}
             onClick={() => { setTab(p); setEditing((e) => (e && e.platform !== p ? null : e)); }}
             className={`scd-focus inline-flex min-h-11 items-center gap-2 rounded-full border px-4 text-[15px] font-semibold ${tab === p ? "border-[var(--scd-blue)] bg-[var(--scd-blue)] text-white" : "border-[var(--in-line)] bg-white text-[var(--in-ink)]"}`}
           >
@@ -238,7 +236,9 @@ export function RoleTemplatesPage({ initial }: { initial: RoleTemplatesData }) {
 
           <Card id="roles-list" title={`Ruoli di ${PLATFORM_LABEL[tab]}`} sub="Si caricano sulle persone da Accessi → scheda della persona → “Carica un ruolo”.">
             <div className="px-4 pb-4 sm:px-[18px]">
-              {grouped[tab].length === 0 ? (
+              {data.readError ? (
+                <p role="alert" className="m-0 rounded-xl bg-[var(--in-crit-bg)] px-3 py-2 text-[14.5px] text-[var(--in-crit)]">Lettura dei ruoli non riuscita: aggiorna la pagina tra poco.</p>
+              ) : grouped[tab].length === 0 ? (
                 <EmptyState title="Nessun ruolo ancora">{applied ? "Crea il primo con “Crea ruolo vuoto”." : data.connected ? "I ruoli salvati compariranno qui dopo «applica r111»." : "Anteprima senza database: i ruoli arrivano con l'accesso Direzione."}</EmptyState>
               ) : (
                 <ul className="m-0 list-none divide-y divide-[var(--in-line)] p-0" data-testid="roles-items">
@@ -308,11 +308,13 @@ function RoleEditor({
   onSubmit: (note: string) => void;
 }) {
   const [note, setNote] = useState("");
+  const [touched, setTouched] = useState(Boolean(editing.label));
   const sections = platformSections(editing.platform);
   const byCode = new Map(editing.grants.map((g) => [g.sectionCode, g]));
   const nameProblem = labelProblem(editing.label, editing.platform, others, editing.id ?? undefined);
   const contentProblem = templateProblem(editing.platform, editing.grants);
   const problem = nameProblem ?? contentProblem;
+  const shownProblem = touched ? problem : contentProblem;
 
   function setGrant(s: SectionDef, level: Level | "NONE", perimeter?: Perimeter) {
     const rest = editing.grants.filter((g) => g.sectionCode !== s.code);
@@ -328,7 +330,7 @@ function RoleEditor({
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <label className="flex flex-col gap-1 text-[15px] font-semibold">
             Nome del ruolo
-            <input value={editing.label} maxLength={80} onChange={(e) => onChange({ ...editing, label: e.target.value })} placeholder="Es. Dirigente accompagnatore" className={`${inputCls} font-normal`} />
+            <input value={editing.label} maxLength={80} onChange={(e) => { setTouched(true); onChange({ ...editing, label: e.target.value }); }} onBlur={() => setTouched(true)} placeholder="Es. Dirigente accompagnatore" className={`${inputCls} font-normal`} />
           </label>
           <label className="flex flex-col gap-1 text-[15px] font-semibold">
             Descrizione (facoltativa)
@@ -349,7 +351,7 @@ function RoleEditor({
                   return (
                     <li key={s.code} className="grid grid-cols-2 gap-2 px-3 py-2.5 sm:grid-cols-[minmax(0,1fr)_170px_170px] sm:items-center">
                       <span className="col-span-2 min-w-0 text-[14.5px] leading-snug sm:col-span-1">
-                        <b className="block">{s.label}{s.sensitive ? <Lock className="ml-1 inline size-3.5 text-[var(--in-warn)]" aria-label="dati riservati" /> : null}</b>
+                        <b className="block">{s.label}{s.sensitive ? <Lock role="img" className="ml-1 inline size-3.5 text-[var(--in-warn)]" aria-label="dati riservati" /> : null}</b>
                         {s.sees && <span className="text-[13px] text-[var(--in-sub)]">{s.sees}</span>}
                       </span>
                       <label className="sr-only" htmlFor={`${id}-level`}>{s.label}: livello</label>
@@ -384,7 +386,7 @@ function RoleEditor({
           Motivo (facoltativo)
           <input value={note} maxLength={300} onChange={(e) => setNote(e.target.value)} placeholder="Es. nuovo incarico deciso in consiglio" className={`${inputCls} font-normal`} />
         </label>
-        {problem && <p role="alert" className="m-0 rounded-xl bg-[var(--in-crit-bg)] px-3 py-2 text-[14px] text-[var(--in-crit)]">{problem}</p>}
+        {shownProblem && <p role="alert" className="m-0 rounded-xl bg-[var(--in-crit-bg)] px-3 py-2 text-[14px] text-[var(--in-crit)]">{shownProblem}</p>}
         <div className="flex flex-wrap gap-2">
           <button type="button" data-testid="roles-save" disabled={!canSave || busy || problem !== null} onClick={() => onSubmit(note)} className="scd-focus inline-flex h-12 items-center gap-2 rounded-[10px] bg-[var(--scd-blue)] px-4 text-[16px] font-semibold text-white disabled:opacity-50">
             <Save className="size-[18px]" aria-hidden="true" />{busy ? "Salvo…" : editing.id ? "Salva il ruolo" : "Crea il ruolo"}
