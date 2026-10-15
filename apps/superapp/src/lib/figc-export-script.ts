@@ -73,14 +73,20 @@ export const FIGC_EXPORT_SOURCE = String.raw`(async function () {
   function readTabulato(season, fallbackSector) {
     var out = [];
     var rows = document.querySelectorAll("table tbody tr");
+    // Birth column by header ("nasc"): the first dd/mm/yyyy cell is only a fallback when the header is unreadable.
+    var heads = Array.prototype.map.call(document.querySelectorAll("table thead th"), function (h) { return txt(h).toLowerCase(); });
+    var birthCol = -1;
+    for (var h = 0; h < heads.length; h++) { if (/nasc/.test(heads[h])) { birthCol = h; break; } }
     for (var i = 0; i < rows.length; i++) {
       var cells = Array.prototype.map.call(rows[i].querySelectorAll("td"), txt);
       var mat = null, name = null, birth = null, sector = null;
+      if (birthCol >= 0 && cells[birthCol] && DMY_RE.test(cells[birthCol])) birth = cells[birthCol];
       for (var j = 0; j < cells.length; j++) {
         var c = cells[j];
         if (!c || CF_RE.test(c)) continue;
+        if (birthCol >= 0 && j === birthCol) continue;
         if (!mat && MAT_RE.test(c)) { mat = c; continue; }
-        if (!birth && DMY_RE.test(c)) { birth = c; continue; }
+        if (!birth && birthCol < 0 && DMY_RE.test(c)) { birth = c; continue; }
         if (!sector && (c === "D" || c === "S")) { sector = c; continue; }
         if (!name && /^[A-ZÀ-ÖØ-Ý' .-]{3,}$/.test(c) && c.indexOf(" ") > 0) { name = c; continue; }
       }

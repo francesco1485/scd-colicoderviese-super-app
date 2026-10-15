@@ -222,7 +222,9 @@ begin
     select distinct on (ro.id) ro.id, te.person_id
     from public.scd_figc_roster ro
     join public.scd_tesseramenti te
-      on te.organization_id = ro.organization_id and te.source_record_id = ro.matricola
+      on te.organization_id = ro.organization_id
+     and te.source_id like 'FIGC%'
+     and te.source_record_id in (ro.matricola, 'FIGC:' || ro.matricola)
     where ro.organization_id = p_organization_id and ro.person_id is null
     order by ro.id, te.updated_at desc
   ), u as (
