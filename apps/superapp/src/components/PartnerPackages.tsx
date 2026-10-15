@@ -11,9 +11,9 @@ import {
 } from "@/lib/sponsor-packages";
 
 /**
- * Listino partner on /sponsor (item C1). Hierarchy, not a wall of equal cards:
- * the LED wall is the main package (wide, deep surface), three packages follow in a row; packages with a link (none while
- * the tribune seat is internal, UD-132) render as slim lines. Every price is "in approvazione" until the Direzione approves it (sponsor-packages.ts).
+ * Listino partner on /sponsor (item C1). Every package is the same plain card, in listino order (no "pacchetto
+ * principale" promo card: no vetrine, Francesco 15/10/2026); packages with a link (none while the tribune seat is
+ * internal, UD-132) render as slim lines. Every price is "in approvazione" until the Direzione approves it (sponsor-packages.ts).
  * "Chiedi questo pacchetto" calls `onChoose(id)`: the page preselects it in the #proposta form and scrolls there.
  */
 
@@ -45,12 +45,12 @@ function ChooseButton({ p, onChoose }: { p: PartnerPackage; onChoose: (id: strin
   );
 }
 
-function Benefits({ items, tone }: { items: readonly string[]; tone: "deep" | "card" }) {
+function Benefits({ items }: { items: readonly string[] }) {
   return (
     <ul className="m-0 list-none space-y-2 p-0 text-sm">
       {items.map((b) => (
         <li key={b} className="flex gap-2">
-          <Check className={`mt-0.5 size-4 flex-none ${tone === "deep" ? "text-[#ffd600]" : "text-primary"}`} aria-hidden="true" />
+          <Check className="mt-0.5 size-4 flex-none text-primary" aria-hidden="true" />
           <span>{b}</span>
         </li>
       ))}
@@ -58,51 +58,20 @@ function Benefits({ items, tone }: { items: readonly string[]; tone: "deep" | "c
   );
 }
 
-function Meta({ p, tone }: { p: PartnerPackage; tone: "deep" | "card" }) {
-  const muted = tone === "deep" ? "text-white/80" : "text-muted-foreground";
+function Meta({ p }: { p: PartnerPackage }) {
   return (
     <dl className="m-0 grid gap-2 text-sm">
       <div>
-        <dt className={`text-xs font-semibold uppercase tracking-wider ${muted}`}>Chi lo vede</dt>
+        <dt className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Chi lo vede</dt>
         <dd className="m-0">
-          {p.audience} <span className={muted}>{formatAudienceNumbers(p)}.</span>
+          {p.audience} <span className="text-muted-foreground">{formatAudienceNumbers(p)}.</span>
         </dd>
       </div>
       <div>
-        <dt className={`text-xs font-semibold uppercase tracking-wider ${muted}`}>Prezzo</dt>
+        <dt className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Prezzo</dt>
         <dd className="m-0 font-semibold" data-testid={`package-price-${p.id}`}>{formatPackagePrice(p.price)}</dd>
       </div>
     </dl>
-  );
-}
-
-function FeaturedCard({ p, onChoose }: { p: PartnerPackage; onChoose: (id: string) => void }) {
-  const Icon = ICONS[p.icon];
-  return (
-    <article
-      aria-labelledby={`pkg-${p.id}`}
-      className="surface-deep grid gap-6 rounded-2xl p-5 shadow-premium sm:p-7 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-x-10"
-      data-testid={`package-${p.id}`}
-    >
-      <div className="min-w-0">
-        <p className="m-0 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-[#ffd600]">
-          <Icon className="size-4" aria-hidden="true" /> Pacchetto principale
-        </p>
-        <h3 id={`pkg-${p.id}`} className="mt-2 text-3xl font-bold sm:text-4xl">{p.title}</h3>
-        <p className="mt-2 max-w-prose text-base text-white/90">{p.summary}</p>
-        <div className="mt-5">
-          <Meta p={p} tone="deep" />
-        </div>
-      </div>
-      {/* Phone: benefits before the button. Desktop: benefits in the right column, button under the left text. */}
-      <div className="min-w-0 self-start rounded-xl bg-white/[0.07] p-4 ring-1 ring-white/15 sm:p-5 lg:col-start-2 lg:row-span-2 lg:row-start-1">
-        <p className="m-0 mb-3 text-xs font-semibold uppercase tracking-wider text-white/80">Cosa comprende</p>
-        <Benefits items={p.benefits} tone="deep" />
-      </div>
-      <div className="lg:col-start-1 lg:row-start-2">
-        <ChooseButton p={p} onChoose={onChoose} />
-      </div>
-    </article>
   );
 }
 
@@ -116,10 +85,10 @@ function PackageCard({ p, onChoose }: { p: PartnerPackage; onChoose: (id: string
       <h3 id={`pkg-${p.id}`} className="mt-3 text-xl font-bold">{p.title}</h3>
       <p className="mt-1 text-sm text-muted-foreground">{p.summary}</p>
       <div className="mt-4 flex-1">
-        <Benefits items={p.benefits} tone="card" />
+        <Benefits items={p.benefits} />
       </div>
       <div className="mt-5 border-t border-border pt-4">
-        <Meta p={p} tone="card" />
+        <Meta p={p} />
       </div>
       <div className="mt-4">
         <ChooseButton p={p} onChoose={onChoose} />
@@ -153,9 +122,8 @@ function LinkRow({ p }: { p: PartnerPackage }) {
 }
 
 export function PartnerPackages({ onChoose }: { onChoose: (id: string) => void }) {
-  const featured = PARTNER_PACKAGES.filter((p) => p.featured);
-  const regular = PARTNER_PACKAGES.filter((p) => !p.featured && !p.link);
-  const linked = PARTNER_PACKAGES.filter((p) => !p.featured && p.link);
+  const cards = PARTNER_PACKAGES.filter((p) => !p.link);
+  const linked = PARTNER_PACKAGES.filter((p) => p.link);
   return (
     <section id="listino" aria-labelledby="listino-title" className="mx-auto mt-14 max-w-6xl scroll-mt-20 px-4" data-testid="partner-packages">
       <p className="eyebrow">Listino partner · stagione 2026/27</p>
@@ -165,9 +133,8 @@ export function PartnerPackages({ onChoose }: { onChoose: (id: string) => void }
       </p>
 
       <div className="mt-6 grid gap-4">
-        {featured.map((p) => <FeaturedCard key={p.id} p={p} onChoose={onChoose} />)}
-        <div className="grid gap-4 md:grid-cols-3">
-          {regular.map((p) => <PackageCard key={p.id} p={p} onChoose={onChoose} />)}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {cards.map((p) => <PackageCard key={p.id} p={p} onChoose={onChoose} />)}
         </div>
         {linked.map((p) => <LinkRow key={p.id} p={p} />)}
       </div>

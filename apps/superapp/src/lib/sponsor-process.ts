@@ -51,7 +51,7 @@ export const SPONSOR_PROCESS_STEPS: readonly ProcessStep[] = [
   {
     id: "in-onda",
     title: "In onda",
-    text: "Lo spot entra in rotazione sul LED wall e nella vetrina dell'app, con il tag social della tua azienda.",
+    text: "Lo spot entra in rotazione sul LED wall del campo, con il tag social della tua azienda.",
   },
 ];
 
@@ -74,7 +74,7 @@ export const SPONSOR_FAQ: readonly SponsorFaq[] = [
   {
     id: "spot-dove",
     q: "Dove si vede lo spot?",
-    a: "Sul LED wall a bordo campo a Colico e nella vetrina «Sul LED wall» della pagina iniziale dell'app, in rotazione con gli altri partner.",
+    a: "Sul LED wall a bordo campo a Colico, in rotazione con gli altri partner.",
   },
   {
     id: "social",

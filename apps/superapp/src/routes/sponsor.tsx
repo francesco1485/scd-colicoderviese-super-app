@@ -2,12 +2,10 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { BarChart3, HeartHandshake, MonitorSmartphone, Trees } from "lucide-react";
 import { useState } from "react";
 
-import { LedwallFacsimile } from "@/components/LedwallFacsimile";
 import { CastPresence } from "@/components/scd/CastPresence";
 import { PartnerForm } from "@/components/PartnerForm";
 import { ShareButton } from "@/components/scd/ShareButton";
 import { PartnerPackages } from "@/components/PartnerPackages";
-import { PartnerBand } from "@/components/sponsor/PartnerBand";
 import { SponsorProcess } from "@/components/SponsorProcess";
 import { PageHero, heroOverlapCls } from "@/components/ui-kit";
 import { SPONSOR_ASSETS } from "@/lib/catalog";
@@ -21,17 +19,14 @@ export const Route = createFileRoute("/sponsor")({
     const pacchetto = parsePackageParam(s["pacchetto"]);
     return pacchetto ? { pacchetto } : {};
   },
-  // Server time and Rome day for the LED wall preview: rendered on the server, reused on hydration (same first slot).
-  loader: () => {
-    const nowMs = Date.now();
-    return { nowMs, day: romeDay(nowMs) };
-  },
+  // Rome day of the server for the Volto sponsor presence: rendered on the server, reused on hydration.
+  loader: () => ({ day: romeDay(Date.now()) }),
   head: () => ({ meta: pageMeta(SHARE_PAGES.sponsor) }),
   component: Sponsor,
 });
 
 function Sponsor() {
-  const { nowMs, day } = Route.useLoaderData();
+  const { day } = Route.useLoaderData();
   const { pacchetto } = Route.useSearch();
   const navigate = useNavigate({ from: "/sponsor" });
   const [pick, setPick] = useState<string | undefined>(pacchetto);
@@ -65,8 +60,6 @@ function Sponsor() {
         ))}
       </section>
 
-      <LedwallFacsimile onRequest={() => setPick("ledwall")} day={day} nowMs={nowMs} />
-
       <PartnerPackages onChoose={choose} />
 
       {/* UD-121: the Volto sponsor face lives here (listino, "chiedi un pacchetto", "Chiedi a Vera"). */}
@@ -74,8 +67,8 @@ function Sponsor() {
         <CastPresence id="volto-sponsor" day={day} />
       </section>
 
-      {/* UD-134: partner news and the live LED spot, moved here from the public home. */}
-      <PartnerBand day={day} />
+      {/* No vetrine (Francesco 15/10/2026): no rotating LED preview, no "in onda ora", no partner of the month here.
+          The partners scroll only in the fixed SponsorBand at the bottom of every page. */}
 
       <section className="mx-auto mt-14 max-w-6xl px-4">
         <p className="eyebrow">Asset disponibili</p>

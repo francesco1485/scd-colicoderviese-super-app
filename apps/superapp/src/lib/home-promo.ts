@@ -104,6 +104,14 @@ export function promoSlides(
   return [welcomeSlide(creditsLive), ...upcoming, iscrizioniSlide(formsLive)];
 }
 
+/**
+ * Whether the home carousel may move by itself (B4, WCAG 2.2.2 / 2.3.3): never with reduced motion, never while
+ * the visitor paused it or is hovering, touching or focusing it, never with fewer than two slides.
+ */
+export function autoAdvance(s: { reduced: boolean; paused: boolean; hold: boolean; length: number }): boolean {
+  return !s.reduced && !s.paused && !s.hold && s.length >= 2;
+}
+
 /** Next index of the carousel, wrapping around; 0 for an empty list. */
 export function nextIndex(i: number, length: number, step = 1): number {
   if (length <= 0) return 0;

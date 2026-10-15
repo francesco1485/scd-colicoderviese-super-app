@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { ArrowLeft, Download, FileImage, ImagePlus, Loader2, Play, Printer, Trash2, TriangleAlert } from "lucide-react";
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type ChangeEvent, type ReactNode } from "react";
 
-import { LedwallRotator } from "@/components/LedwallRotator";
+import { LedwallPreview } from "@/components/LedwallPreview";
 import { Card, Chip, SourceLine } from "@/components/scd/interior-ui";
 import { EmptyState, WorkAreaShell } from "@/components/scd/work-area-ui";
 import type { PartnerKitData } from "@/lib/partner-kit.functions";
@@ -224,7 +224,7 @@ function KitBody({
           </a>
         ))}
       </nav>
-      <LedwallBlock subject={subject} hasLogo={hasLogo} spot={spot} label={label} data={data} />
+      <LedwallBlock subject={subject} hasLogo={hasLogo} spot={spot} label={label} />
       <SkyBlock subject={subject} aspect={aspect} hasLogo={hasLogo} label={label} />
       <KitsBlock subject={subject} aspect={aspect} hasLogo={hasLogo} label={label} />
       <CalendarBlock subject={subject} hasLogo={hasLogo} label={label} data={data} />
@@ -376,22 +376,24 @@ function LedwallBlock({
   hasLogo,
   spot,
   label,
-  data,
 }: {
   subject: PartnerKitSubject;
   hasLogo: boolean;
   spot: { src: string; poster: string } | null;
   label: string;
-  data: PartnerKitData;
 }) {
-  const list = useMemo(() => [asSponsor(subject)], [subject]);
+  const sponsor = useMemo(() => asSponsor(subject), [subject]);
   const [play, setPlay] = useState(false);
-  const reduce = typeof window !== "undefined" && typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const videoRef = useRef<HTMLVideoElement>(null);
+  // The video exists only after the user pressed play: start it once, never by itself.
+  useEffect(() => {
+    if (play) videoRef.current?.play().catch(() => undefined);
+  }, [play]);
   return (
-    <Block id="pk-ledwall" title="Ledwall dedicato" sub="Il partner sul ledwall a bordo campo, alternato allo spazio del club, come lo vedrà il pubblico.">
+    <Block id="pk-ledwall" title="Ledwall dedicato" sub="Il partner sul ledwall a bordo campo, come lo vedrà il pubblico. Lo spot parte solo se premi play.">
       <div className={`grid gap-4 ${spot ? "lg:grid-cols-[minmax(0,1fr)_260px]" : ""}`}>
         {hasLogo ? (
-          <LedwallRotator day={data.today} nowMs={data.nowMs} list={list} clubEvery={1} label="Anteprima ledwall · partner dedicato" />
+          <LedwallPreview sponsor={sponsor} label="Anteprima ledwall · partner dedicato" />
         ) : (
           <NoLogo />
         )}
@@ -399,7 +401,7 @@ function LedwallBlock({
           <div className="flex flex-col gap-2" data-testid="pk-spot">
             <div className="relative mx-auto aspect-[9/16] w-full max-w-[220px] overflow-hidden rounded-xl bg-[#0b2a5b] lg:max-w-none">
               {play ? (
-                <video src={spot.src} poster={spot.poster} controls muted playsInline autoPlay={!reduce} preload="metadata" className="absolute inset-0 size-full object-cover">
+                <video ref={videoRef} src={spot.src} poster={spot.poster} controls muted playsInline preload="metadata" className="absolute inset-0 size-full object-cover">
                   <track kind="captions" />
                 </video>
               ) : (

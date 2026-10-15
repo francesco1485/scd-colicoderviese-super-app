@@ -643,7 +643,7 @@ export interface StripItem {
 }
 
 /**
- * "In evidenza" strip value: unknown is never shown as zero (renders "—"),
+ * "Oggi" strip value (InteriorShell HighlightStrip): unknown is never shown as zero (renders "—"),
  * and both zero and unknown are muted so only real numbers draw the eye.
  */
 export function stripValue(value: number | null | undefined): {

@@ -664,6 +664,20 @@ Da decidere (Direzione): applicazione di r110 dopo DPIA e testo di presa visione
 - **Codice morto (punto 8)**: rimossi `Carousel.tsx`, `PublicToday`, `HomeNewsBlock`, `nextHomeKickoff`; la home non scarica più `getHomeNews()` per poi scartarlo (né per i visitatori né per i soci). Nessun cambiamento visibile oltre al punto 5.
 - **Processo (punto 9)**: lavoro su ramo `feat/cloud-audit-cleanup`, `test:bundle` (privacy dei ragazzi nel codice del telefono) eseguito dopo la build: 11/11.
 - Revisioni (scd-revisore e scd-sicurezza: PASS con note, note applicate): il server dà il mondo "soci" della vetrina solo a una sessione che conferma lui (non al solo parametro del chiamante); `getHomeNews` e i suoi aiuti rimossi; messaggio del voto "Entra con il tuo account per votare"; /community "Votano i tesserati". Da decidere a Francesco: oggi il database lascia votare la Top 11 a qualunque account registrato (membership USER_BASE), non solo ai tesserati.
+- **Niente vetrine fuori dalla home (Francesco 15/10/2026 13:54, ramo `feat/pc-niente-vetrine`, motore SOLDI/PERSONE, misura: 0 elementi a rotazione o in autoplay su /sponsor, /crm e kit partner, verificato a 390 e 1440 px)**: /sponsor senza ledwall a rotazione e senza fascia "In onda ora / Partner del mese"; listino con quattro schede uguali (niente "Pacchetto principale"); /crm "Spot LED" diventa un elenco, il video parte solo premendo play e la regia è solo testo; kit partner con anteprima ledwall ferma (`LedwallPreview`) e spot solo su richiesta; striscia contatori delle aree di lavoro rinominata "Oggi". Eliminati `LedwallRotator`, `LedwallFacsimile`, `PartnerBand`, `SponsorSpotsHome`, `universe/Stories`, `universe/HomeBlocks`, `AgeGuide` ("Chi sei"). Resta la barra sponsor fissa in basso e la rotazione del player fisico `/ledwall/player`.
+
+
+## B4 — Accessibilità delle pagine pubbliche (home, /sponsor, /sostieni, /tornei, /pulmini, player LED) · 2026-10-15
+
+Backlog cloud B4. Motori: PERSONE (famiglie e tifosi leggono e toccano tutto anche da telefono) e SOLDI (/sponsor leggibile per i partner). Dettagli e numeri in `docs/LAUNCH_QUALITY.md` → B4.
+- Audit axe (WCAG A/AA) + bersagli 44 px esteso alle sei pagine; prima 39 problemi, dopo 0 (restano 3 bersagli piccoli nella schermata d'accesso di /pulmini, area chat PC).
+- Occhielli gialli su fondo chiaro → blu del club (il giallo resta sulle superfici blu); etichette squadra delle gare scurite quanto basta per 4,5:1; crediti del piè di pagina e date dei tornei più leggibili.
+- 44 px: puntini e pausa del banner (la riga va a capo se le slide sono tante), logo della testata, "Vedi tutte", striscia "Prossima gara" (il nome del partner nello spot è uscito con la rimozione delle vetrine su /sponsor, chat PC 15/10 13:54).
+- Barra sponsor: si ferma sotto il puntatore o il dito; con "riduci movimento" è ferma. Test `home-motion.test.tsx`: la home non si muove mai da sola con "riduci movimento".
+- Da decidere: pulsante di pausa da tastiera per la barra sponsor (linguetta "Sponsor").
+- Revisione: scd-revisore PASS (note applicate: `flex-wrap` sui puntini), scd-sicurezza PASS.
+
+
 
 ## 15/10/2026 14:40 · Chat cloud: calendario dell'app di nuovo allineato al master (piano di partenza, punto 1)
 

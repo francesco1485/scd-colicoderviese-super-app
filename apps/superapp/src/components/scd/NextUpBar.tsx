@@ -27,7 +27,7 @@ export function NextUpBar() {
   // While the answer is on its way the room is reserved, so the strip never pushes the content down later;
   // with no game in the week (or no answer) nothing is drawn.
   if (pending || now === null)
-    return <div aria-hidden="true" className="h-10" data-testid="next-up-bar-slot" />;
+    return <div aria-hidden="true" className="h-11" data-testid="next-up-bar-slot" />;
   if (!pulse || (pulse.live === 0 && !pulse.next)) return null;
   const live = pulse.live > 0;
   const n = pulse.next;
@@ -45,7 +45,7 @@ export function NextUpBar() {
       {...(n && !live ? { search: { annata: n.group } as never } : {})}
       data-testid="next-up-bar"
       data-live={live || undefined}
-      className={`scd-focus flex min-h-10 items-center justify-center gap-2 px-4 text-[13.5px] font-semibold ${live ? "bg-[#e11d2e] text-white" : "bg-[#0b2a5b] text-white"}`}
+      className={`scd-focus flex min-h-11 items-center justify-center gap-2 px-4 text-[13.5px] font-semibold ${live ? "bg-[#e11d2e] text-white" : "bg-[#0b2a5b] text-white"}`}
     >
       {live ? (
         <>

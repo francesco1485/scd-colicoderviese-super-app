@@ -3,8 +3,7 @@ import { resolve } from "node:path";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
-import { LedwallRotator } from "@/components/LedwallRotator";
-import { ledwallSequence } from "@/lib/ledwall-rotation";
+import { LedwallPreview } from "@/components/LedwallPreview";
 import { KIT_BASES, SKY_BASE, crestPx, logoPlacement, toPercent, zonePx } from "@/lib/partner-kit";
 import { publicHomeRoutes } from "@/lib/public-home";
 import { SPONSORS } from "@/lib/sponsors";
@@ -48,13 +47,15 @@ describe("kit partner · SSR", () => {
     expect(html).toContain("Proposta");
   });
 
-  it("dedicated LED wall: one partner alternating with the club slot, own label", () => {
-    const one = [SPONSORS.find((s) => s.slug === "hdi-maglia")!];
-    expect(ledwallSequence(one, "2026-10-13", 1).map((s) => s.kind)).toEqual(["partner", "club"]);
-    const html = renderToStaticMarkup(<LedwallRotator day="2026-10-13" nowMs={Date.parse("2026-10-13T08:00:00Z")} list={one} clubEvery={1} label="Anteprima ledwall · partner dedicato" />);
+  it("dedicated LED wall: one static partner board, own label, no rotation controls (no vetrine, 15/10/2026)", () => {
+    const one = SPONSORS.find((s) => s.slug === "hdi-maglia")!;
+    const html = renderToStaticMarkup(<LedwallPreview sponsor={one} label="Anteprima ledwall · partner dedicato" />);
     expect(html).toContain("Anteprima ledwall · partner dedicato");
-    expect(html).toContain("Passaggio successivo sul ledwall");
-    expect(html).not.toContain("Partner 1 di 1");
+    expect(html).toContain('data-kind="partner"');
+    expect(html).not.toMatch(/carosello|Passaggio successivo|Metti in pausa/);
+    const page = read(resolve(APP, "src/components/partner-kit/PartnerKitPage.tsx"));
+    expect(page).not.toMatch(/autoPlay|LedwallRotator/);
+    expect(page).toContain("<LedwallPreview sponsor={sponsor}");
   });
 });
 

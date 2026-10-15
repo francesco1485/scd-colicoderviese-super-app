@@ -136,6 +136,41 @@ scelta (non toccato qui: area consenso, da decidere).
 Come L1; per lo spostamento dei caratteri: `python3 scripts/derive-font-fallbacks.py > src/font-fallbacks.css`
 dopo ogni cambio di famiglie o pesi in `src/styles.css` (il test `font-fallbacks.test.ts` fallisce se manca una faccia).
 
+## B4 · Accessibilità delle pagine pubbliche commerciali e famiglie · 2026-10-15
+
+Strumento: `scripts/a11y-audit.mjs` (axe-core WCAG 2.0/2.1/2.2 A e AA + bersagli da 44 px), ora anche su `/`, `/sponsor`,
+`/sostieni`, `/tornei`, `/pulmini`, `/ledwall/player` (il player è un ledwall a schermo intero: esente dalla regola dei
+bersagli, le regole axe valgono). Build locale, Chromium preinstallato, 390×844 e 1440×900, "riduci movimento" attivo
+(i titoli con la comparsa legata allo scorrimento restano a opacità 0,25 finché non entrano nello schermo e axe li
+leggerebbe come contrasto basso: con "riduci movimento" sono nello stato finale).
+
+| Pagina | Prima (axe · bersagli piccoli) | Dopo |
+|---|---|---|
+| `/` | contrasto 5 · 5–6 | 0 · 0 |
+| `/sponsor` | contrasto 9 · 2 | 0 · 0 |
+| `/sostieni` | contrasto 6 · 1–2 | 0 · 0 |
+| `/tornei` | contrasto 5 · 1–2 | 0 · 0 |
+| `/pulmini` | contrasto 1 · 4 | 0 · 3 (schermata d'accesso, area chat PC) |
+| `/ledwall/player` | 0 | 0 |
+
+Correzioni:
+- **Occhiello giallo su fondo chiaro** (1,3:1): `eyebrow` usa il blu del club (`--primary`, 6,5:1 su #f4f5f7) sulle
+  superfici chiare; il giallo resta sulle superfici blu (`surface-deep` imposta `--eyebrow-fg`, `card-premium` lo azzera).
+- **Etichetta squadra nelle gare della settimana**: colori del calendario Primi Calci e 2015 con testo bianco a 4,05:1;
+  il fondo passa da `readableOnWhite` (scurito quanto basta per 4,5:1). Il colore della striscia laterale resta quello del
+  calendario.
+- **Crediti nel piè di pagina** da bianco 45 % a 60 % (4,0 → oltre 4,5:1); date dei tornei #7a8aa3 → #5b6b85.
+- **Bersagli da 44 px**: puntini e pausa del banner in home, logo della testata, "Vedi tutte", striscia "Prossima gara"
+  (spazio riservato da 40 a 44 px, nessun salto). Il nome del partner nello spot di /sponsor (20 px) è uscito con la
+  rimozione delle vetrine su /sponsor (chat PC, 15/10 13:54).
+- **Barra sponsor fissa** (WCAG 2.2.2): si ferma sotto il puntatore o il dito; con "riduci movimento" è ferma.
+- Test `components/home/home-motion.test.tsx`: il banner della home non avanza mai da solo con "riduci movimento"
+  (`autoAdvance`), primo disegno statico, un solo timer; la barra sponsor non ha timer e la regola CSS la ferma.
+
+Aperto: `/pulmini` per i visitatori mostra la schermata d'accesso (`AccessScreen`, area della chat PC) con "Tutte le aree"
+e "Copia il link" alti 34 px e il link "Scrivi alla segreteria" 17 px. La barra sponsor non ha un pulsante di pausa da
+tastiera (i loghi non sono attivabili): da decidere se aggiungerlo nella linguetta "Sponsor".
+
 ## L2 · Accessibilità (axe-core + bersagli da 44 px) · 2026-10-12
 
 ### Come è stato misurato (`VERIFIED`)

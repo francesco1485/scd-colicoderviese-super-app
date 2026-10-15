@@ -118,7 +118,7 @@ function NextMatch({
           )}
           <Link
             to="/calendario"
-            className="scd-focus inline-flex h-10 items-center gap-0.5 text-[13.5px] font-bold text-[#1556c4] hover:underline"
+            className="scd-focus inline-flex h-11 items-center gap-0.5 text-[13.5px] font-bold text-[#1556c4] hover:underline"
           >
             Vedi tutte
             <ChevronRight className="size-4" aria-hidden="true" />
