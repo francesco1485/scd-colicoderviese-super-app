@@ -248,6 +248,10 @@ export const WORK_AREA_IDS: readonly string[] = [
   "posta",
   "posta-collega",
   "lotteria",
+  // Direzione 15/10/2026 ("Ok" to closing the internal pages): the staff preview of /gestionale, /gestionale/mappa
+  // and /quadro was open without access; now they answer with the access screen like the other work areas.
+  "gestionale",
+  "quadro",
 ];
 
 /**
@@ -256,8 +260,6 @@ export const WORK_AREA_IDS: readonly string[] = [
  * covers the sub-paths too, so children added by the owning branch stay owned.
  */
 export const DEFERRED_PATHS: Readonly<Record<string, string>> = {
-  "/quadro": "item 4 · quadro settimanale",
-  "/gestionale": "item 4 · gestionale",
   "/oggi": "item 5 · public today",
   "/partite": "item 5 · match live page",
   "/sky-club": "item 5 · Sky Club",

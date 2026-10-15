@@ -1,3 +1,6 @@
+import { StagingBanner, WorkAreaGateView } from "@/components/scd/work-area-ui";
+import { getWorkAreaGate } from "@/lib/work-areas.functions";
+import { EMPTY_QUADRO } from "@/lib/public-snapshots";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 
@@ -8,14 +11,14 @@ import { FACILITIES } from "@/lib/facilities";
 import { freshnessLabel } from "@/lib/public-snapshots";
 import { getTrainingQuadro } from "@/lib/quadro.functions";
 
-/** Role set of this preview: no login yet, so only areas open to every staff role appear in the rail. */
+/** Rail role set: only areas open to every staff role appear (the page itself is behind the work-area gate). */
 const PREVIEW_ROLES: ReadonlySet<string> = new Set();
 
 export const Route = createFileRoute("/gestionale/mappa")({
-  staticData: { interior: true },
   loader: async () => {
-    const { quadro: q } = await getTrainingQuadro();
-    return { slots: q.slots, quadroUTC: q.generatedUTC };
+    const gate = await getWorkAreaGate({ data: { area: "gestionale" } });
+    const { quadro: q } = gate.view === "page" ? await getTrainingQuadro() : { quadro: EMPTY_QUADRO };
+    return { gate, interior: gate.view === "page", slots: q.slots, quadroUTC: q.generatedUTC };
   },
   head: () => ({
     meta: [
@@ -28,7 +31,7 @@ export const Route = createFileRoute("/gestionale/mappa")({
       { name: "robots", content: "noindex" },
     ],
   }),
-  component: MappaPage,
+  component: MappaPageGate,
 });
 
 function MappaPage() {
@@ -82,5 +85,16 @@ function MappaPage() {
         </div>
       </div>
     </InteriorShell>
+  );
+}
+
+/** Staff only (Direzione 15/10/2026): without an allowed session the area's access screen, never the preview. */
+function MappaPageGate() {
+  const { gate } = Route.useLoaderData();
+  return (
+    <WorkAreaGateView id="gestionale" gate={gate}>
+      {gate.preview && <StagingBanner />}
+      <MappaPage />
+    </WorkAreaGateView>
   );
 }

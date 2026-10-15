@@ -35,7 +35,9 @@ export type WorkAreaId =
   | "certificati"
   | "posta"
   | "posta-collega"
-  | "lotteria";
+  | "lotteria"
+  | "gestionale"
+  | "quadro";
 
 export interface DriveMaster {
   key: string;
@@ -249,6 +251,18 @@ export const WORK_AREAS: Readonly<Record<WorkAreaId, WorkAreaConfig>> = {
     description: "Collegamento di sportclubcolico@gmail.com alla Posta del club con una password per le app di Google (o OAuth per i tecnici) e interruttore dell'invio. Solo Direzione.",
     sources: ["posta", "supabase", "inserimenti"],
     insertRoles: ["Direzione"],
+  },
+  gestionale: {
+    id: "gestionale", label: "Gestionale sportivo", path: pathOf("gestionale"), railId: "gestionale",
+    description: "Squadre, partite e attività della settimana dal calendario ufficiale e dal quadro allenamenti. Solo per lo staff con accesso.",
+    sources: ["calendario", "quadro", "impianti", "inserimenti"],
+    insertRoles: uniq([...registryRoles("gestionale"), "Direzione"]),
+  },
+  quadro: {
+    id: "quadro", label: "Quadro settimanale", path: pathOf("quadro"), railId: "quadro",
+    description: "Campi e spogliatoi della settimana dal quadro allenamenti. Solo per lo staff con accesso; le famiglie vedono i propri orari in Allenamenti.",
+    sources: ["quadro", "impianti", "inserimenti"],
+    insertRoles: uniq([...registryRoles("quadro"), "Direzione"]),
   },
 };
 

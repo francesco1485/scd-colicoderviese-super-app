@@ -568,3 +568,10 @@ Backlog cloud B3 (prestazioni e prima schermata). Motore: PERSONE (la home si ap
 - 06:46 Francesco: no allo scoiattolo Sky in testata, "poco wow, poco vivo". Tolto Sky; hero con il lago in lento movimento, stemma ufficiale e conto alla rovescia live (secondi) alla prossima gara in casa; nuove storie "Guarda cosa succede a Colico" (Lario Cup, spot LED dei partner del giorno, il centro, il club) con visore a schermo intero come i social. Niente foto aerea del centro (UD-100).
 - 06:51 Francesco: crediti dell'autore "non visibili così ma molto riservati": nel footer resta "© anno · Tutti i diritti riservati · Crediti", il testo completo si apre solo toccando "Crediti".
 - 07:04 Francesco "fuori ogni logica": la home ora segue una logica sola. "Prossima gara" = la gara più importante (Prima Squadra, poi agonistica, poi base; confermata prima di "da confermare", `boardRank`) con il suo conto alla rovescia dentro la card (non più due gare diverse tra hero e card). Ogni blocco una volta: un solo LED (lo spot in onda, dentro "I nostri partner"), tolti il banner "Registrati/Entra" (c'è già Entra in alto e in basso) e la seconda fascia riconoscimenti (resta nel footer). Storie dei partner con il logo invece del campo uguale per tutti. Pagina a 390 px: da 4264 a 3843 px.
+
+
+## 15/10/2026 — chat PC: pagine interne dietro l'accesso
+
+- Direzione 15/10 ("Ok"): `/gestionale`, `/gestionale/mappa` e `/quadro` non mostrano più l'anteprima a chi non ha accesso. Come le altre aree di lavoro (`WORK_AREA_IDS` + `WORK_AREAS`), senza sessione con ruolo ammesso rispondono con la schermata d'accesso dell'area; il personale con accesso vede la pagina come prima. Tolti da `DEFERRED_PATHS`.
+- Nessun pixel di marketing su `/quadro`, `/allenamenti`, `/la-mia-scd`, `/squadre` (`NO_MARKETING` in `lib/universe.ts`).
+- Prima: `/direzione`, `/tesoreria`, `/segreteria` e le altre aree mostravano già solo la schermata d'accesso; restavano aperte in anteprima solo queste tre pagine.
