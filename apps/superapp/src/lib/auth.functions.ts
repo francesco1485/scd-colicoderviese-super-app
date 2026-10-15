@@ -180,7 +180,7 @@ export const confirmMagicLink = createServerFn({ method: "POST" })
     const { data: exchanged, error } = await sb.auth.exchangeCodeForSession(data.code);
     if (error) {
       const mapped = mapAuthError(error, "send");
-      return { ok: false, next, message: mapped.kind === "rate_limit" ? mapped.message : "Link scaduto o già usato: chiedi un nuovo codice.", kind: mapped.kind === "rate_limit" ? "rate_limit" : "otp_invalid", retryAfter: mapped.retryAfter };
+      return { ok: false, next, message: mapped.kind === "rate_limit" ? mapped.message : "Link scaduto o già usato: chiedi di nuovo la e-mail «Scegli la password» da Entra.", kind: mapped.kind === "rate_limit" ? "rate_limit" : "otp_invalid", retryAfter: mapped.retryAfter };
     }
     return landAfterEmailSignIn(exchanged.user, data.next, next);
   });
@@ -220,7 +220,7 @@ export const confirmTokenHash = createServerFn({ method: "POST" })
     const { data: verified, error } = await sb.auth.verifyOtp({ token_hash: data.tokenHash, type: data.type });
     if (error || !verified.session) {
       const mapped = error ? mapAuthError(error, "send") : mapAuthError({}, "send");
-      return { ok: false, next, message: mapped.kind === "rate_limit" ? mapped.message : "Link scaduto o già usato: chiedi un nuovo codice.", kind: mapped.kind === "rate_limit" ? "rate_limit" : "otp_invalid", retryAfter: mapped.retryAfter };
+      return { ok: false, next, message: mapped.kind === "rate_limit" ? mapped.message : "Link scaduto o già usato: chiedi di nuovo la e-mail «Scegli la password» da Entra.", kind: mapped.kind === "rate_limit" ? "rate_limit" : "otp_invalid", retryAfter: mapped.retryAfter };
     }
     // "Scegli la password" e-mail (registration of an account that already existed, or forgotten password).
     if (data.type === "recovery") {

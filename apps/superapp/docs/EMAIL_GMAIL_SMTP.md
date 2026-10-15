@@ -21,8 +21,10 @@ Nessuna password va incollata in chat: tutti i passi li fa la Direzione nei pann
    gli inviti a tutte le famiglie si mandano in più giorni, a gruppi.
 
 ## 3. Indirizzo dell'app e testi in italiano
-1. **Authentication → URL Configuration**: *Site URL* = l'indirizzo pubblico dell'app (oggi `https://scd-superapp-staging.onrender.com`,
-   domani il dominio definitivo). In *Redirect URLs* aggiungi `<indirizzo>/accedi/conferma`. Tutti i pulsanti delle e-mail usano il Site URL.
+1. **Authentication → URL Configuration**: *Site URL* = **`https://app.colicoderviese.it`** (indirizzo pubblico dell'app, attivo).
+   In *Redirect URLs* aggiungi `https://app.colicoderviese.it/accedi/conferma` e, solo per le prove, `https://scd-superapp-staging.onrender.com/accedi/conferma`.
+   Tutti i pulsanti delle e-mail usano il Site URL: se resta l'indirizzo di prova, le famiglie finiscono lì.
+   Nella stessa sezione Authentication → Emails, la **scadenza del codice e-mail (Email OTP Expiration)** deve restare **3600 secondi**: il testo dell'e-mail promette "scade dopo un'ora".
 2. **Authentication → Emails → Templates** (oggetto + corpo = contenuto del file, da `<!doctype html>` in giù):
 
 | Modello Supabase | Quando parte | Oggetto | File |
