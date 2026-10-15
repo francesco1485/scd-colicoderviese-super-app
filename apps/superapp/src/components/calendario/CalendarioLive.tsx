@@ -28,6 +28,8 @@ import {
 import { matchdayClass } from "@/lib/home-matchday";
 import { crestFor, opponentLabel } from "@/lib/crests";
 import { countdownParts } from "@/lib/home-board";
+import { matchShare } from "@/lib/share-match";
+import { ShareWhatsApp } from "@/components/scd/ShareWhatsApp";
 import type { PublicEvent, PublicGroup } from "@/lib/public-snapshots";
 
 export const CARD =
@@ -366,6 +368,23 @@ export function GameRow({
               </button>
             )}
             <GroupResultsLink group={e.group} />
+            {!done && (
+              <ShareWhatsApp
+                data={matchShare(
+                  {
+                    date: e.date,
+                    time: e.time,
+                    group: e.group,
+                    opponent: opponentLabel(e.opponent),
+                    homeAway: e.homeAway === "FUORI" ? "FUORI" : e.homeAway === "CASA" ? "CASA" : "",
+                    place: e.venue ? venueShort(e.venue) : "",
+                    pending: certain ? [] : ["Orario o campo da confermare"],
+                  },
+                  team,
+                )}
+                className="bg-white shadow-[0_1px_3px_rgb(11_42_91/0.15)]"
+              />
+            )}
           </div>
         </div>
       )}

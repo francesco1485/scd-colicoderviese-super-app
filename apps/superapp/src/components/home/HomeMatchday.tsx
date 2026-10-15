@@ -15,6 +15,8 @@ import { useEffect, useMemo, useState } from "react";
 import { venueShort } from "@/components/home/HomeSections";
 import type { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 import { crestFor } from "@/lib/crests";
+import { matchShare } from "@/lib/share-match";
+import { ShareWhatsApp } from "@/components/scd/ShareWhatsApp";
 import {
   MATCHDAY_FILTERS,
   MATCHDAY_FILTER_LABEL,
@@ -101,12 +103,16 @@ function MatchRow({
     .filter(Boolean)
     .join(", ");
   return (
-    <li data-state={state} data-changed={changed ? "true" : undefined}>
+    <li
+      data-state={state}
+      data-changed={changed ? "true" : undefined}
+      className={`flex items-stretch ${changed ? "bg-[#fffbe6]" : done ? "bg-[#f7f9fc]" : ""}`}
+    >
       <Link
         to="/calendario"
         search={{ annata: e.group } as never}
         aria-label={label}
-        className={`scd-focus group relative flex min-h-[60px] items-center gap-3 py-2 pl-4 pr-3 transition-colors duration-150 hover:bg-[#f4f7fb] ${changed ? "bg-[#fffbe6]" : done ? "bg-[#f7f9fc]" : ""}`}
+        className="scd-focus group relative flex min-h-[60px] min-w-0 flex-1 items-center gap-3 py-2 pl-4 pr-2 transition-colors duration-150 hover:bg-[#f4f7fb]"
       >
         <span
           aria-hidden="true"
@@ -180,6 +186,14 @@ function MatchRow({
               : "Gara"}
         </span>
       </Link>
+      {!done && (
+        <span className="flex shrink-0 items-center pr-2">
+          <ShareWhatsApp
+            data={matchShare({ ...e, opponent: e.opponent ? opponent : "", place: e.place ? venue : "" }, cat)}
+            compact
+          />
+        </span>
+      )}
     </li>
   );
 }

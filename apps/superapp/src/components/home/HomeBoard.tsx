@@ -30,6 +30,8 @@ import { clubEventsOn } from "@/lib/club-events";
 import { weekMatches } from "@/lib/home-today";
 import { promoSlides, quickChips } from "@/lib/home-promo";
 import { itemState } from "@/lib/universe";
+import { matchShare } from "@/lib/share-match";
+import { ShareWhatsApp } from "@/components/scd/ShareWhatsApp";
 import { PromoCarousel, QuickChips } from "@/components/home/HomePromo";
 
 type PublicCalendar = Awaited<ReturnType<typeof getPublicCalendarSnapshot>>;
@@ -109,13 +111,20 @@ function NextMatch({
           <Trophy className="size-4" aria-hidden="true" />
           Prossima gara
         </h2>
-        <Link
-          to="/calendario"
-          className="scd-focus inline-flex items-center gap-0.5 pb-1.5 text-[13.5px] font-bold text-[#1556c4] hover:underline"
-        >
-          Vedi tutte
-          <ChevronRight className="size-4" aria-hidden="true" />
-        </Link>
+        <span className="flex items-center gap-1 pb-1">
+          {m && (
+            <ShareWhatsApp
+              data={matchShare({ ...m, opponent: opp?.label ?? m.opponent, place: m.place ? venueShort(m.place) : "" }, cat)}
+            />
+          )}
+          <Link
+            to="/calendario"
+            className="scd-focus inline-flex h-10 items-center gap-0.5 text-[13.5px] font-bold text-[#1556c4] hover:underline"
+          >
+            Vedi tutte
+            <ChevronRight className="size-4" aria-hidden="true" />
+          </Link>
+        </span>
       </div>
       {m && date ? (
         <Link
