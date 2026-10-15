@@ -1,8 +1,7 @@
 /**
  * Top of the public home drawn from the six-screen board VR-009, screen 1 "Home pubblica" (Francesco 15/10/2026
  * 06:30: "tutto deve partire dallo studio di questa immagine… solo migliorare"). Board order, improved:
- *   1. "Questa settimana" hero: the real lake photo with a slow zoom, the official crest, a live countdown to the
- *      (Sky removed: Francesco 15/10 06:46);
+ *   1. "Questa settimana" hero: the real lake photo with a slow zoom, the official crest, no mascot (Sky removed: Francesco 15/10 06:46);
  *   2. four white tiles over the hero edge: Gare (games left this week), Allenamenti, Eventi, Iniziative;
  *   3. "Prossima gara": the club's most important next game (Prima Squadra > agonistica > base, boardRank) with its
  *      live countdown, folder tab, big date block, our crest VS the verified opponent crest;
@@ -235,6 +234,9 @@ function NextMatch({
                 ? "in trasferta"
                 : "",
             m.place ? venueShort(m.place) : "",
+            start !== null && start > nowMs
+              ? `inizia tra ${countdownParts(start - nowMs).days} giorni e ${Number(countdownParts(start - nowMs).hh)} ore`
+              : "",
           ]
             .filter(Boolean)
             .join(", ")}
@@ -354,7 +356,7 @@ export function HomeBoard({
   return (
     <div data-testid="home-board">
       {/* 1. Hero "Questa settimana": the real lake photo with a slow zoom, the official crest,
-          and a live countdown to the next home game. */}
+          (the countdown lives in the Prossima gara card). */}
       <section
         aria-labelledby="board-week-t"
         className="relative isolate overflow-hidden bg-[#0b3a8a] text-white"

@@ -18,8 +18,9 @@ export type HomeStory = {
   /** Ring label (short). */
   label: string;
   /** Small round image of the ring. */
-  thumbFit?: "cover" | "contain";
   thumb: string;
+  /** "contain" for logos on white, "cover" for photos and posters. */
+  thumbFit?: "cover" | "contain";
   /** Full-screen media. */
   media:
     | { kind: "image"; src: string }

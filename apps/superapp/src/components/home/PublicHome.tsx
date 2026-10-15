@@ -22,9 +22,8 @@ import {
 import { useEffect, useMemo, useState } from "react";
 
 import { SponsorSpotsHome } from "@/components/SponsorSpots";
-import { ClubCrestOfficial } from "@/components/SiteChrome";
 import { KitTexture } from "@/components/scd/kit-texture";
-import { ClubCredentials, LogoTile, SponsorLogo } from "@/components/scd/Logos";
+import { LogoTile, SponsorLogo } from "@/components/scd/Logos";
 import type { ClubNotice } from "@/lib/club-notice";
 import type { PublicFeed } from "@/lib/club.types";
 import { weekendResults } from "@/lib/home-results";
