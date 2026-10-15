@@ -779,14 +779,14 @@ const masterToken = (s: string, max: number) =>
     .slice(0, max);
 
 /**
- * Stable EVENT_ID in Master style ("EVT-ES-20260919-ALTOLARIOCALCIO-CASA"): EVT-AMI-<team>-<yyyymmdd>-<OPPONENT>-<CASA|FUORI>.
+ * Stable EVENT_ID in Master style ("EVT-ES-20260919-ALTOLARIOCALCIO-CASA"): EVT-AMI-<team>-<yyyymmddHHMM>-<OPPONENT>-<CASA|FUORI> (time included so two friendlies on the same day never collide).
  * Empty when a piece is unknown (the row is then not ready to paste).
  */
 export function masterEventId(r: RequestRow): string {
   const p = r.startsAt ? romeParts(r.startsAt) : null;
   const opp = masterToken(r.club?.name ?? r.opponentText ?? "", 30);
   if (!r.teamKey || NEEDS_BIRTH_YEAR.includes(r.teamKey) || !p || !opp || !r.homeAway) return "";
-  return `EVT-AMI-${masterToken(r.teamKey, 12)}-${p.date.replace(/-/g, "")}-${opp}-${r.homeAway}`;
+  return `EVT-AMI-${masterToken(r.teamKey, 12)}-${p.date.replace(/-/g, "")}${p.time.replace(":", "")}-${opp}-${r.homeAway}`;
 }
 
 /**

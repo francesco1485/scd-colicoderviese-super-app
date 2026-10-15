@@ -70,7 +70,7 @@ describe("Master Calendario row ↔ calendar_public_payload.event_of", () => {
       expect(r.ok, `${row.teamKey} ${row.homeAway}: ${r.ok ? "" : r.stop}`).toBe(true);
       if (!r.ok || !r.event) throw new Error(`not published: ${row.teamKey}`);
       expect(r.event).toMatchObject({
-        id: `EVT-AMI-${row.teamKey!.toUpperCase()}-20261024-ASDOLGINATESE-${row.homeAway}`,
+        id: `EVT-AMI-${row.teamKey!.toUpperCase()}-202610241500-ASDOLGINATESE-${row.homeAway}`,
         date: "2026-10-24",
         time: "15:00",
         group: row.teamKey,

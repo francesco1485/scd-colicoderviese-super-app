@@ -267,7 +267,7 @@ describe("privacy of free text and public location (scd-sicurezza notes)", () =>
       HOME_AWAY: "CASA",
       VENUE: "COLICO - CAMPO 2",
       OPPONENT_EVENT: "OLGINATESE",
-      EVENT_ID: "EVT-AMI-U15-20261024-OLGINATESE-CASA",
+      EVENT_ID: "EVT-AMI-U15-202610241500-OLGINATESE-CASA",
       SOURCE_TYPE: "SCD_INTERNAL",
       MATCH_STATUS: "CLUB_EVENT",
       TIME_STATUS: "CONFIRMED",
@@ -275,7 +275,7 @@ describe("privacy of free text and public location (scd-sicurezza notes)", () =>
     });
     const away = Object.fromEntries(masterCalendarRow(row({ homeAway: "FUORI", venue: null })).map((c) => [c.column, c.value]));
     expect(away["VENUE"]).toBe("OLGINATE");
-    expect(away["EVENT_ID"]).toBe("EVT-AMI-U15-20261024-OLGINATESE-FUORI");
+    expect(away["EVENT_ID"]).toBe("EVT-AMI-U15-202610241500-OLGINATESE-FUORI");
     const unknownPitch = Object.fromEntries(masterCalendarRow(row({ venue: null })).map((c) => [c.column, c.value]));
     expect(unknownPitch["VENUE_STATUS"]).toBe("TO_VERIFY");
     expect(masterCalendarTsv(row({ venue: "Colico" })).split("\t")).toHaveLength(12);

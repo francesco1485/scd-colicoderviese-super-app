@@ -415,7 +415,7 @@ function MasterRow({ r, busy, onDone }: { r: RequestRow; busy: boolean; onDone: 
         </button>
       </div>
       {missing.length > 0 && (
-        <p className="mt-1.5 text-[13.5px] font-semibold text-[var(--in-crit)]" role="alert">
+        <p className="mt-1.5 text-[13.5px] font-semibold text-[var(--in-crit)]" role="status">
           Riga incompleta ({missing.join(", ")}): correggi la richiesta prima di copiarla.
         </p>
       )}
