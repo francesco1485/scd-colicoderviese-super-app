@@ -239,7 +239,7 @@ describe("federal form and e-mail draft", () => {
 
 describe("privacy of free text and public location (scd-sicurezza notes)", () => {
   it("redacts phone numbers and e-mails, keeps dates, times and birth years", () => {
-    expect(redactContacts("chiama Marco 333 123 4567 o +39 0341-940123, scrivi a mister.rossi@example.it")).toBe(
+    expect(redactContacts("chiama Marco 333 123 4567 o +39 0000-000000, scrivi a mister.rossi@example.it")).toBe(
       "chiama Marco [telefono] o [telefono], scrivi a [email]",
     );
     expect(redactContacts("amichevole 2014 2015 il 24/10/2026 ore 15:30 tel 3331234567")).toBe("amichevole 2014 2015 il 24/10/2026 ore 15:30 tel [telefono]");
