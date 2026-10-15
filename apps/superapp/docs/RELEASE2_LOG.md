@@ -554,5 +554,6 @@ Backlog cloud B3 (prestazioni e prima schermata). Motore: PERSONE (la home si ap
 - **Fermo immagine del ledwall** in 640/960 px per i telefoni a bassa densità; su /sponsor caricato subito con priorità alta: LCP ~9,8 s → ~6,0 s.
 - Peso prima visita: home 1789 → 1483 KiB, /sponsor 1486 → 1175 KiB. Asset ufficiali invariati (hash), locandine degli spot non toccate.
 - Aperto: alla prima visita l'LCP della home è ora l'avviso cookie, che compare dopo l'idratazione (~10 s nella simulazione lenta); si sposterebbe disegnandolo dal server con il cookie tecnico della scelta (area consenso: da decidere). Stemmi avversari ancora 50–73 KB per uno stemma da 20 px (prossimo passo, stesso metodo).
+- Stato: DONE, commit `6e9f848` + `5412b38`, **pubblicato** 15/10 01:38 (Render `dep-db82sion74is73ditb00`, live); controllo sul sito reale 390/1440 su /, /sponsor, /calendario: HTTP 200, nessun errore in console, nessuno scroll orizzontale, CLS home 0.0005.
 - Revisione: scd-revisore PASS (corretti: regola `.uppercase` limitata a `--font-uv`, testi più precisi su densità schermo e Roboto), scd-sicurezza PASS.
 - Test: `font-fallbacks.test.ts` (5), resa 96 px in `club-credentials.test.tsx`, srcset e priorità in `LedwallRotator.test.tsx`.
