@@ -2,7 +2,7 @@
  * Validazione stretta della copia pubblica (mirror Drive, sola lettura) del calendario.
  * Pura e senza rete: usata dal ponte server e dai test. Rifiuta tutto ciò che non è nell'allowlist.
  */
-import bundled from "@/data/calendario-snapshot-20261010.json";
+import bundled from "@/data/calendario-snapshot.json";
 
 export const MIRROR_SCHEMA = "scd-calendar-public-v3";
 export const MIRROR_AUDIENCE = "PUBLIC_READ_ONLY_SNAPSHOT";

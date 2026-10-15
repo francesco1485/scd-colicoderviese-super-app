@@ -3,7 +3,7 @@
  * di Calendario eventi e Quadro allenamenti. Non sono master: i master restano su Drive.
  * Espone solo campi in allowlist, così nessun dato personale può passare.
  */
-import calendarRaw from "@/data/calendario-snapshot-20261010.json";
+import calendarRaw from "@/data/calendario-snapshot.json";
 
 export const SNAPSHOT_BANNER = "Quadro del 09/10/2026 · per i cambi vale l'avviso del mister";
 export const EMPTY_MESSAGE = "Dati non disponibili in questa anteprima";
