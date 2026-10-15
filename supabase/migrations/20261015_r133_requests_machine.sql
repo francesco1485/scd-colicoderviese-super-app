@@ -395,7 +395,10 @@ begin
   select * into r from public.scd_requests where id = p_request_id and organization_id = p_organization_id for update;
   if r.id is null then return jsonb_build_object('ok', false, 'code', 'not_found'); end if;
   if r.status <> 'BOZZA' then return jsonb_build_object('ok', false, 'code', 'state'); end if;
-  if r.team_key is null or r.proposed_starts_at is null or (r.opponent_club_id is null and r.opponent_text is null) then
+  -- "esordienti" alone maps to no team of the Master Calendario: the birth year (2014 or 2015) is required
+  if r.team_key = 'esordienti' then return jsonb_build_object('ok', false, 'code', 'team_year'); end if;
+  if r.team_key is null or r.proposed_starts_at is null or r.payload->>'homeAway' is null
+     or (r.opponent_club_id is null and r.opponent_text is null) then
     return jsonb_build_object('ok', false, 'code', 'incomplete');
   end if;
   if r.proposed_starts_at <= now() then return jsonb_build_object('ok', false, 'code', 'date'); end if;
@@ -453,6 +456,7 @@ begin
   if r.id is null then return jsonb_build_object('ok', false, 'code', 'not_found'); end if;
   if not public.scd_request_can_confirm(p_organization_id, r.team_key) then return jsonb_build_object('ok', false, 'code', 'forbidden'); end if;
   if r.status <> 'DA_CONFERMARE' then return jsonb_build_object('ok', false, 'code', 'state'); end if;
+  if r.team_key = 'esordienti' then return jsonb_build_object('ok', false, 'code', 'team_year'); end if;
   if r.expires_at <= now() then
     update public.scd_requests set status = 'SCADUTA', updated_at = now() where id = r.id;
     insert into public.scd_request_events (organization_id, request_id, action, actor, note)
@@ -472,6 +476,7 @@ begin
     where id = coalesce(p_opponent_club_id, r.opponent_club_id) and organization_id = p_organization_id;
   if v_club.id is null then return jsonb_build_object('ok', false, 'code', 'club'); end if;
   if r.proposed_starts_at is null or r.proposed_starts_at <= now() then return jsonb_build_object('ok', false, 'code', 'date'); end if;
+  if r.payload->>'homeAway' is null then return jsonb_build_object('ok', false, 'code', 'incomplete'); end if;
 
   -- Location: the known facility, or "Trasferta" with the opponent's city. Mirror of lib/request-machine.ts eventLocation.
   v_loc := case when r.payload->>'homeAway' = 'FUORI' then 'Trasferta' || coalesce(' · ' || v_club.city, '') else r.venue_text end;

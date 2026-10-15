@@ -380,6 +380,8 @@ function RequestItem({ r, canWrite, nowMs, onEdit, onChanged }: ListProps & { r:
 function MasterRow({ r, busy, onDone }: { r: RequestRow; busy: boolean; onDone: () => void }) {
   const [copied, setCopied] = useState<string | null>(null);
   const cells = masterCalendarRow(r);
+  // Columns event_of() of tools/sync/calendar_public_payload.py needs to publish the row.
+  const missing = cells.filter((c) => ["EVENT_ID", "DATE", "CATEGORY", "HOME_AWAY", "OPPONENT_EVENT"].includes(c.column) && !c.value).map((c) => c.column);
   async function copy() {
     try {
       await navigator.clipboard.writeText(masterCalendarTsv(r));
@@ -404,7 +406,7 @@ function MasterRow({ r, busy, onDone }: { r: RequestRow; busy: boolean; onDone: 
         ))}
       </dl>
       <div className="mt-2 flex flex-wrap gap-2">
-        <button type="button" onClick={() => void copy()} className={btnGhost}>
+        <button type="button" disabled={missing.length > 0} onClick={() => void copy()} className={`${btnGhost} disabled:opacity-50`}>
           <ClipboardCopy className="size-4" aria-hidden="true" />
           Copia la riga
         </button>
@@ -412,6 +414,11 @@ function MasterRow({ r, busy, onDone }: { r: RequestRow; busy: boolean; onDone: 
           Fatto, è nel Master
         </button>
       </div>
+      {missing.length > 0 && (
+        <p className="mt-1.5 text-[13.5px] font-semibold text-[var(--in-crit)]" role="alert">
+          Riga incompleta ({missing.join(", ")}): correggi la richiesta prima di copiarla.
+        </p>
+      )}
       {copied && (
         <p className="mt-1.5 text-[13.5px]" role="status">
           {copied}

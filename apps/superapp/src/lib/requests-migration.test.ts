@@ -118,6 +118,14 @@ describe("r133 request machine (staged, not applied)", () => {
     expect(cancel).toContain("update public.scd_events set status = 'CANCELLED'");
   });
 
+  it("requires the birth year for Esordienti and home/away before sending and confirming", () => {
+    const send = body.match(/function public\.scd_request_send[\s\S]*?\$\$;/)?.[0] ?? "";
+    const decide = body.match(/function public\.scd_request_decide[\s\S]*?\$\$;/)?.[0] ?? "";
+    for (const f of [send, decide]) expect(f).toContain("if r.team_key = 'esordienti' then return jsonb_build_object('ok', false, 'code', 'team_year')");
+    expect(send).toContain("r.payload->>'homeAway' is null");
+    expect(decide).toContain("if r.payload->>'homeAway' is null then return jsonb_build_object('ok', false, 'code', 'incomplete')");
+  });
+
   it("keeps the log append-only", () => {
     expect(body).toMatch(/before update or delete on public\.scd_request_events/);
     expect(body).toMatch(/'scd_request_events is append-only'/);

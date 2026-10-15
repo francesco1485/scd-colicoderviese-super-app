@@ -160,8 +160,10 @@ describe("drafts", () => {
   });
 
   it("lists what is missing before sending", () => {
-    expect(missingToSend({ teamKey: null, startsAt: null, opponentText: null, club: null })).toEqual(["squadra", "data e ora", "avversaria"]);
+    expect(missingToSend({ teamKey: null, startsAt: null, opponentText: null, club: null, homeAway: null })).toEqual(["squadra", "data e ora", "casa o fuori", "avversaria"]);
     expect(missingToSend(row())).toEqual([]);
+    // generic Esordienti maps to no team of the Master Calendario: the birth year is required
+    expect(missingToSend(row({ teamKey: "esordienti" }))).toEqual(["annata Esordienti (2014 o 2015)"]);
   });
 
   it("drops malformed rows instead of guessing", () => {
@@ -265,13 +267,18 @@ describe("privacy of free text and public location (scd-sicurezza notes)", () =>
       HOME_AWAY: "CASA",
       VENUE: "COLICO - CAMPO 2",
       OPPONENT_EVENT: "OLGINATESE",
+      EVENT_ID: "EVT-AMI-U15-20261024-OLGINATESE-CASA",
+      SOURCE_TYPE: "SCD_INTERNAL",
       MATCH_STATUS: "CLUB_EVENT",
       TIME_STATUS: "CONFIRMED",
       VENUE_STATUS: "CONFIRMED",
     });
     const away = Object.fromEntries(masterCalendarRow(row({ homeAway: "FUORI", venue: null })).map((c) => [c.column, c.value]));
     expect(away["VENUE"]).toBe("OLGINATE");
-    expect(masterCalendarTsv(row({ venue: "Colico" })).split("\t")).toHaveLength(11);
+    expect(away["EVENT_ID"]).toBe("EVT-AMI-U15-20261024-OLGINATESE-FUORI");
+    const unknownPitch = Object.fromEntries(masterCalendarRow(row({ venue: null })).map((c) => [c.column, c.value]));
+    expect(unknownPitch["VENUE_STATUS"]).toBe("TO_VERIFY");
+    expect(masterCalendarTsv(row({ venue: "Colico" })).split("\t")).toHaveLength(12);
     expect(masterCalendarTsv(row({ opponentText: "A\tB", club: null }))).not.toMatch(/A\tB/);
   });
 });

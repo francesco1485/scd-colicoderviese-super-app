@@ -334,10 +334,19 @@ export function validateDraft(d: DraftInput, nowMs: number): { ok: true; value: 
 }
 
 /** What a draft still misses before it can be sent to the person who confirms. */
-export function missingToSend(r: Pick<RequestRow, "teamKey" | "startsAt" | "opponentText" | "club">): string[] {
+/**
+ * Groups that cannot be sent nor confirmed without the birth year: "esordienti" alone maps to no team of the Master
+ * Calendario (tools/sync/calendar_public_payload.py CATEGORY_RULES needs 2014 or 2015). Mirror of r133.
+ */
+export const NEEDS_BIRTH_YEAR: readonly string[] = ["esordienti"];
+
+/** What a draft still misses before it can be sent to the person who confirms (mirror of scd_request_send). */
+export function missingToSend(r: Pick<RequestRow, "teamKey" | "startsAt" | "opponentText" | "club" | "homeAway">): string[] {
   const out: string[] = [];
   if (!r.teamKey) out.push("squadra");
+  else if (NEEDS_BIRTH_YEAR.includes(r.teamKey)) out.push("annata Esordienti (2014 o 2015)");
   if (!r.startsAt) out.push("data e ora");
+  if (!r.homeAway) out.push("casa o fuori");
   if (!r.opponentText && !r.club) out.push("avversaria");
   return out;
 }
@@ -503,6 +512,8 @@ export function requestError(code: string | null | undefined): string {
       return "La richiesta è già stata gestita: aggiorna la pagina.";
     case "scope":
       return "Piccoli Amici: amichevoli nazionali e internazionali non ammesse.";
+    case "team_year":
+      return "Esordienti: indica l'annata (2014 o 2015) prima di mandare o confermare.";
     case "venue":
       return "Scegli un campo del club (Colico Campo 1 o 2, Colico, Dervio) oppure Fuori casa.";
     default:
@@ -759,27 +770,48 @@ export interface MasterCell {
   value: string;
 }
 
+const masterToken = (s: string, max: number) =>
+  s
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toUpperCase()
+    .replace(/[^A-Z0-9]+/g, "")
+    .slice(0, max);
+
+/**
+ * Stable EVENT_ID in Master style ("EVT-ES-20260919-ALTOLARIOCALCIO-CASA"): EVT-AMI-<team>-<yyyymmdd>-<OPPONENT>-<CASA|FUORI>.
+ * Empty when a piece is unknown (the row is then not ready to paste).
+ */
+export function masterEventId(r: RequestRow): string {
+  const p = r.startsAt ? romeParts(r.startsAt) : null;
+  const opp = masterToken(r.club?.name ?? r.opponentText ?? "", 30);
+  if (!r.teamKey || NEEDS_BIRTH_YEAR.includes(r.teamKey) || !p || !opp || !r.homeAway) return "";
+  return `EVT-AMI-${masterToken(r.teamKey, 12)}-${p.date.replace(/-/g, "")}-${opp}-${r.homeAway}`;
+}
+
 /**
  * The exact row the Segreteria pastes into the Master Calendario (the only public calendar source). Column names are
- * those read by tools/sync/calendar_public_payload.py; the column ORDER of the sheet and the CATEGORY wording must be
- * checked against the sheet (INFERRED): the page shows them as labelled cells. Empty when the data is not known.
+ * those read by tools/sync/calendar_public_payload.py (event_of), and a test feeds this row to event_of itself; the
+ * column ORDER of the sheet must be checked against the sheet (INFERRED): the page shows them as labelled cells.
+ * Empty when the data is not known.
  */
 export function masterCalendarRow(r: RequestRow): MasterCell[] {
   const p = r.startsAt ? romeParts(r.startsAt) : null;
   const away = r.homeAway === "FUORI";
   const venue = away ? (r.club?.city ? r.club.city.toUpperCase() : "") : isVenue(r.venue) ? MASTER_VENUE[r.venue] : "";
   return [
+    { column: "EVENT_ID", value: masterEventId(r) },
     { column: "DATE", value: p ? itDay(p.date) : "" },
     { column: "TIME", value: p?.time ?? "" },
-    { column: "CATEGORY", value: r.teamKey ? teamLabel(r.teamKey) : "" },
+    { column: "CATEGORY", value: r.teamKey && !NEEDS_BIRTH_YEAR.includes(r.teamKey) ? teamLabel(r.teamKey) : "" },
     { column: "TYPE", value: "AMICHEVOLE" },
     { column: "HOME_AWAY", value: r.homeAway ?? "" },
     { column: "VENUE", value: venue },
     { column: "OPPONENT_EVENT", value: (r.club?.name ?? r.opponentText ?? "").toUpperCase() },
-    { column: "SOURCE_TYPE", value: "SCD" },
+    { column: "SOURCE_TYPE", value: "SCD_INTERNAL" },
     { column: "MATCH_STATUS", value: "CLUB_EVENT" },
     { column: "TIME_STATUS", value: "CONFIRMED" },
-    { column: "VENUE_STATUS", value: venue ? "CONFIRMED" : "" },
+    { column: "VENUE_STATUS", value: venue ? "CONFIRMED" : "TO_VERIFY" },
   ];
 }
 
