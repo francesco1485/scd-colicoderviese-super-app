@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 
 import { describe, expect, it } from "vitest";
 
-import { MEMBERS_ONLY_PREFIXES, PUBLIC_PREFIXES, SECURITY_HEADERS, assetLinksJson, cacheControlFor, configuredSiteUrl, demoRedirect, isProductionEnv, isPublicPath, robotsTxt, sitemapXml } from "./http-policy";
+import { GEOLOCATION_PREFIXES, MEMBERS_ONLY_PREFIXES, PUBLIC_PREFIXES, SECURITY_HEADERS, assetLinksJson, permissionsPolicyFor, cacheControlFor, configuredSiteUrl, demoRedirect, isProductionEnv, isPublicPath, robotsTxt, sitemapXml } from "./http-policy";
 
 describe("http policy (launch audit 2026-10-12)", () => {
   it("never lets browsers keep private pages or server functions", () => {
@@ -54,6 +54,20 @@ describe("http policy (launch audit 2026-10-12)", () => {
     expect(cacheControlFor("/elimina-account")).toBe("public, max-age=0, must-revalidate");
     expect(sitemapXml("https://app.example.it")).toContain("<loc>https://app.example.it/elimina-account</loc>");
     expect(robotsTxt(true, "https://app.example.it")).toContain("Allow: /elimina-account");
+  });
+
+  it("allows geolocation only on the Pulmino in diretta driver page (r110)", () => {
+    expect(SECURITY_HEADERS["permissions-policy"]).toContain("geolocation=()");
+    expect(GEOLOCATION_PREFIXES).toEqual(["/pulmini"]);
+    expect(permissionsPolicyFor("/pulmini")).toContain("geolocation=(self)");
+    expect(permissionsPolicyFor("/pulmini")).toContain("camera=()");
+    expect(permissionsPolicyFor("/pulmini")).toContain("microphone=()");
+    for (const p of ["/", "/famiglia", "/pulminixyz", "/calendario", "/_serverFn/abc", "/gestionale"]) {
+      expect(permissionsPolicyFor(p)).toContain("geolocation=()");
+      expect(permissionsPolicyFor(p)).not.toContain("geolocation=(self)");
+    }
+    expect(isPublicPath("/pulmini")).toBe(false);
+    expect(cacheControlFor("/pulmini")).toBe("private, no-store, max-age=0");
   });
 
   it("sends the security headers", () => {

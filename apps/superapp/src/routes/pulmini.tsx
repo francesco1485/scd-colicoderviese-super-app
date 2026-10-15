@@ -32,6 +32,8 @@ import { getPulminiVans } from "@/lib/pulmini-vans.functions";
 import type { VanId, VanPlan } from "@/lib/pulmini-vans";
 import { SlotVans, VanDetailPanel, VanLines } from "@/components/scd/PulminiVans";
 import { Dialog } from "@/components/scd/Dialog";
+import { TransportLiveDriverPanel } from "@/components/scd/TransportLiveDriverPanel";
+import { getLiveDriverPanel, type DriverPanel } from "@/lib/transport-live.functions";
 import { VanPlan2D } from "@/components/scd/VanPlan2D";
 import { fleetFromBoard } from "@/lib/van-plan";
 
@@ -43,8 +45,8 @@ export const Route = createFileRoute("/pulmini")({
     const cal = loadCalendar();
     const runs = await getPulminiRuns();
     const { quadro } = await getTrainingQuadro();
-    const [roster, emails, transport, requests, vans] = await Promise.all([getStaffRoster(), getStaffEmails(), getTransportBoard(), getTransportRequests(), getPulminiVans()]);
-    return { gate, interior: true as const, transport, vans, groups: cal.groups, events: cal.events, sourceModifiedAt: cal.sourceModifiedAt, runs: runs.runs, runsAsOf: runs.asOf, quadroDays: quadro.days, quadroSlots: quadro.slots, people: roster.people, emails, requests };
+    const [roster, emails, transport, requests, vans, live] = await Promise.all([getStaffRoster(), getStaffEmails(), getTransportBoard(), getTransportRequests(), getPulminiVans(), getLiveDriverPanel().catch((): DriverPanel => ({ state: "unavailable", preview: false, acknowledged: false, runs: [], arrivals: [] }))]);
+    return { gate, interior: true as const, transport, vans, groups: cal.groups, events: cal.events, sourceModifiedAt: cal.sourceModifiedAt, runs: runs.runs, runsAsOf: runs.asOf, quadroDays: quadro.days, quadroSlots: quadro.slots, people: roster.people, emails, requests, live };
   },
   head: ({ loaderData }) => workAreaHead("pulmini", loaderData?.gate),
   component: PulminiRoute,
@@ -54,14 +56,14 @@ function PulminiRoute() {
   const data = Route.useLoaderData();
   return (
     <WorkAreaGateView id="pulmini" gate={data.gate}>
-      {data.interior && <PulminiPage groups={data.groups} events={data.events} sourceModifiedAt={data.sourceModifiedAt} preview={data.gate.preview} runs={data.runs} runsAsOf={data.runsAsOf} quadroDays={data.quadroDays} quadroSlots={data.quadroSlots} people={data.people} emails={data.emails} transport={data.transport} requests={data.requests} vans={data.vans} />}
+      {data.interior && <PulminiPage groups={data.groups} events={data.events} sourceModifiedAt={data.sourceModifiedAt} preview={data.gate.preview} runs={data.runs} runsAsOf={data.runsAsOf} quadroDays={data.quadroDays} quadroSlots={data.quadroSlots} people={data.people} emails={data.emails} transport={data.transport} requests={data.requests} vans={data.vans} live={data.live} />}
     </WorkAreaGateView>
   );
 }
 
 const F = PULMINI_FLEET;
 
-function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf, quadroDays, quadroSlots, people, emails, transport, requests, vans: vanPlan }: { groups: PublicGroup[]; events: PublicEvent[]; sourceModifiedAt: string; preview: boolean; runs: PulminoRun[]; runsAsOf: string | null; quadroDays: string[]; quadroSlots: TrainingSlot[]; people: StaffPerson[]; emails: Record<string, string>; transport: TransportData; requests: OfficeRequest[] | null; vans: VanPlan | null }) {
+function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf, quadroDays, quadroSlots, people, emails, transport, requests, vans: vanPlan, live }: { live: DriverPanel; groups: PublicGroup[]; events: PublicEvent[]; sourceModifiedAt: string; preview: boolean; runs: PulminoRun[]; runsAsOf: string | null; quadroDays: string[]; quadroSlots: TrainingSlot[]; people: StaffPerson[]; emails: Record<string, string>; transport: TransportData; requests: OfficeRequest[] | null; vans: VanPlan | null }) {
   const board: TransportBoard | null = transport.board;
   const [openVan, setOpenVan] = useState<VanId | null>(null);
   const openDetail = vanPlan && openVan ? vanPlan.vans.find((v) => v.id === openVan) ?? null : null;
@@ -102,6 +104,7 @@ function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf
       ]}
       note={<>Calendario ufficiale: copia del {freshnessLabel(sourceModifiedAt)} · Flotta: {factStamp(F)}.</>}
     >
+      <TransportLiveDriverPanel panel={live} />
       <div className="grid grid-cols-1 gap-[18px] lg:grid-cols-[minmax(0,1fr)_360px]">
         <div className="flex min-w-0 flex-col gap-[18px]">
         <Card

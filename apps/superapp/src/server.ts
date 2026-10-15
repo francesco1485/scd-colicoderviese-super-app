@@ -2,7 +2,7 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
-import { SECURITY_HEADERS, assetLinksJson, cacheControlFor, configuredSiteUrl, demoRedirect, isProductionEnv, robotsTxt, sitemapXml } from "./lib/http-policy";
+import { SECURITY_HEADERS, assetLinksJson, cacheControlFor, configuredSiteUrl, demoRedirect, isProductionEnv, permissionsPolicyFor, robotsTxt, sitemapXml } from "./lib/http-policy";
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -49,6 +49,8 @@ function isH3SwallowedErrorBody(body: string): boolean {
 function withPolicy(response: Response, pathname: string): Response {
   const headers = new Headers(response.headers);
   for (const [k, v] of Object.entries(SECURITY_HEADERS)) if (!headers.has(k)) headers.set(k, v);
+  // Geolocation only for the driver page of Pulmino in diretta (r110); geolocation=() everywhere else.
+  headers.set("permissions-policy", permissionsPolicyFor(pathname));
   const cc = cacheControlFor(pathname);
   if (cc) headers.set("cache-control", cc);
   return new Response(response.body, { status: response.status, statusText: response.statusText, headers });

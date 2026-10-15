@@ -76,6 +76,19 @@ export const SECURITY_HEADERS: Readonly<Record<string, string>> = {
   "cross-origin-opener-policy": "same-origin",
 };
 
+/**
+ * Pages whose document may ask the browser for the position (Pulmino in diretta, r110): only the driver panel on
+ * /pulmini. Every other page keeps geolocation=() so no other screen can ever read the position.
+ */
+export const GEOLOCATION_PREFIXES: readonly string[] = ["/pulmini"];
+
+/** Permissions-Policy for one response: geolocation=(self) only on GEOLOCATION_PREFIXES, () everywhere else. */
+export function permissionsPolicyFor(pathname: string): string {
+  const base = SECURITY_HEADERS["permissions-policy"]!;
+  const geo = GEOLOCATION_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+  return geo ? base.replace("geolocation=()", "geolocation=(self)") : base;
+}
+
 export function isProductionEnv(env: Readonly<Record<string, string | undefined>>): boolean {
   return (env["SCD_ENV"] ?? "").toLowerCase() === "production" && env["SCD_STAGING_GATEWAY"] !== "1";
 }

@@ -10,6 +10,7 @@ import { EraNutritionCard } from "@/components/scd/EraNutritionCard";
 import { Card, Chip, type ChipTone } from "@/components/scd/interior-ui";
 import { InteriorShell } from "@/components/scd/InteriorShell";
 import { PushCard } from "@/components/scd/PushCard";
+import { TransportLiveFamilyCard } from "@/components/scd/TransportLiveFamilyCard";
 import { TransportRequestCard } from "@/components/scd/TransportRequestCard";
 import { EmptyState } from "@/components/scd/work-area-ui";
 import { getClubHouseDesk, type ClubHouseDesk } from "@/lib/area-requests.functions";
@@ -24,6 +25,7 @@ import { getMyFees } from "@/lib/fees.functions";
 import { loadCalendar } from "@/lib/public-snapshots";
 import { awayMatchesFor, type AwayMatch } from "@/lib/transport-requests";
 import { getFamilyTransport, type FamilyTransport } from "@/lib/transport-requests.functions";
+import { getFamilyLive, type FamilyLive } from "@/lib/transport-live.functions";
 
 /**
  * Family area (UD-061, UD-062). Signed out: the access screen of the registry. Signed in: the caller's
@@ -33,18 +35,19 @@ import { getFamilyTransport, type FamilyTransport } from "@/lib/transport-reques
  */
 export const Route = createFileRoute("/famiglia")({
   loader: async () => {
-    const [session, family, callups, fees, transport, clubHouse] = await Promise.all([
+    const [session, family, callups, fees, transport, clubHouse, live] = await Promise.all([
       getSession(),
       getMyFamily(),
       getMyCallups(),
       getMyFees(),
       getFamilyTransport(),
       getClubHouseDesk().catch((): ClubHouseDesk => ({ state: "off" })),
+      getFamilyLive().catch((): FamilyLive => ({ state: "unavailable", items: [], checkedAt: new Date().toISOString() })),
     ]);
     // Away matches of the family's teams from the official calendar copy (only what the family can ask a seat for).
     const teamCodes = family.state === "ok" ? [...new Set(family.members.flatMap((m) => m.teamCodes))] : [];
     const awayMatches: AwayMatch[] = teamCodes.length ? awayMatchesFor(loadCalendar().events, teamCodes, todayRome()) : [];
-    return { roles: session.roles, badge: session.badge, family, callups, fees: fees.state === "ok" ? fees.fees : [], transport, awayMatches, clubHouse };
+    return { roles: session.roles, badge: session.badge, family, callups, fees: fees.state === "ok" ? fees.fees : [], transport, awayMatches, clubHouse, live };
   },
   head: () => accessHead("famiglia"),
   component: FamigliaRoute,
@@ -53,7 +56,7 @@ export const Route = createFileRoute("/famiglia")({
 function FamigliaRoute() {
   const data = Route.useLoaderData();
   if (data.family.state !== "ok" && data.family.state !== "error") return <AccessScreenPage id="famiglia" />;
-  return <FamilyHome roles={data.roles} badge={data.badge} members={data.family.members} callups={data.callups} fees={data.fees} failed={data.family.state === "error"} transport={data.transport} awayMatches={data.awayMatches} clubHouse={data.clubHouse} />;
+  return <FamilyHome roles={data.roles} badge={data.badge} members={data.family.members} callups={data.callups} fees={data.fees} failed={data.family.state === "error"} transport={data.transport} awayMatches={data.awayMatches} clubHouse={data.clubHouse} live={data.live} />;
 }
 
 const TONE: Readonly<Record<CallupResponse, ChipTone>> = { CONFIRMED: "ok", DECLINED: "warn", PENDING: "info" };
@@ -62,7 +65,7 @@ function todayRome(): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Rome", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
 }
 
-function FamilyHome({ roles, badge, members, callups, fees, failed, transport, awayMatches, clubHouse }: { roles: string[]; badge: string | null; members: FamilyMember[]; callups: MyCallup[]; fees: MyFee[]; failed: boolean; transport: FamilyTransport; awayMatches: AwayMatch[]; clubHouse: ClubHouseDesk }) {
+function FamilyHome({ roles, badge, members, callups, fees, failed, transport, awayMatches, clubHouse, live }: { roles: string[]; badge: string | null; members: FamilyMember[]; callups: MyCallup[]; fees: MyFee[]; failed: boolean; transport: FamilyTransport; awayMatches: AwayMatch[]; clubHouse: ClubHouseDesk; live: FamilyLive }) {
   const [items, setItems] = useState(callups);
   const pending = items.filter((c) => c.response === "PENDING").length;
   const kids = members.filter((m) => m.relationship !== "SELF");
@@ -82,6 +85,7 @@ function FamilyHome({ roles, badge, members, callups, fees, failed, transport, a
     >
       <div className="flex flex-col gap-[18px]">
         <PushCard />
+        <TransportLiveFamilyCard initial={live} />
         <Card id="fam-convocazioni" title="Convocazioni" sub={FAMILY_CALLUP_COPY.cardSub}>
           <div className="flex flex-col gap-3 px-4 pb-4 sm:px-[18px]">
             {failed ? (
