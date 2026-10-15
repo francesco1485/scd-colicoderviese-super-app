@@ -20,7 +20,10 @@
 --     (verified link + active membership). Revoking or narrowing a grant is never blocked.
 --   * Creator identity cannot be self-assigned: triggers on scd_structure_roles and scd_identity_links refuse, from
 --     anyone who is not already a creator, any row that adds, changes or links the structure roles "Presidente" /
---     "Direttore Generale" (migrations and the service role, with no user, are not affected).
+--     "Direttore Generale" (migrations and the service role, with no user, are not affected). This also covers
+--     closing them or marking the person as left (r59): only a creator or the service role does it.
+--     Bootstrap VERIFIED 15/10/2026 on SCD PULSE: Presidente and Direttore Generale already have an AUTO_VERIFIED
+--     link and an active DIRECTION membership, so they are creators as soon as r111 is applied.
 --   * Audit actions CREATE_ROLE / CHANGE_ROLE / ROLE_STATUS in scd_access_audit.
 --
 -- Rollback (only on Francesco's explicit order; templates are lost, person grants are untouched):
@@ -415,6 +418,10 @@ declare
   v_org uuid := coalesce(new.organization_id, old.organization_id);
 begin
   if (select auth.uid()) is null then return coalesce(new, old); end if;
+  if tg_op = 'UPDATE' and new.organization_id is distinct from old.organization_id
+     and (public.scd_is_creator_label(old.role_label) or public.scd_is_creator_label(new.role_label)) then
+    raise exception 'only Presidente or Direttore Generale change these roles' using errcode = '42501';
+  end if;
   if (tg_op <> 'INSERT' and public.scd_is_creator_label(old.role_label))
      or (tg_op <> 'DELETE' and public.scd_is_creator_label(new.role_label)) then
     if not public.scd_is_role_creator(v_org) then

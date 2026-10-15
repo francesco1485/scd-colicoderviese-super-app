@@ -221,7 +221,15 @@ export const insertPerson = createServerFn({ method: "POST" })
     const id = (person as { id: string }).id;
     await sb.from("scd_person_events").insert({ organization_id: org.organizationId, person_id: id, event_type: "ENTRATA", reason: data.kind === "staff" ? "Nuovo incarico" : "Nuovo tesserato", note: data.note ?? null });
     if (data.kind === "staff") {
-      await sb.from("scd_structure_roles").insert({ organization_id: org.organizationId, person_id: id, role_label: data.roleLabel, role_kind: data.roleKind, contact_email: data.email ?? null, contact_phone: data.phone ?? null, source_id: "SUPERAPP_DIREZIONE" });
+      const { error: roleError } = await sb.from("scd_structure_roles").insert({ organization_id: org.organizationId, person_id: id, role_label: data.roleLabel, role_kind: data.roleKind, contact_email: data.email ?? null, contact_phone: data.phone ?? null, source_id: "SUPERAPP_DIREZIONE" });
+      if (roleError)
+        return {
+          ok: false,
+          id,
+          message: /change these roles/.test(roleError.message)
+            ? "Persona inserita senza incarico: Presidente e Direttore Generale li assegnano solo il Presidente o il Direttore Generale."
+            : "Persona inserita, ma l'incarico non è stato salvato: riprova dalla sua scheda.",
+        };
     } else {
       await sb.from("scd_athletes").insert({ organization_id: org.organizationId, person_id: id, registration_status: "UNVERIFIED" });
     }
