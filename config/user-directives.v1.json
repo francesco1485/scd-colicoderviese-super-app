@@ -3265,6 +3265,24 @@
           "apps/superapp/src/lib/squadra-carte.ts"
         ]
       }
+    },
+    {
+      "sourceDate": "2026-10-15",
+      "sourceTime": "10:04-10:09",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-135",
+      "name": "PUBLIC_HOME_REFERENCE_TEMPLATE_NO_OVERLAPS",
+      "sourceQuoteFragments": [
+        "non ce una idea e un template corretto soprattutto le sovrapposizzioni e la creazione non va bene guardatelo e vedi anche tu",
+        "da qui potresti partire per migliorare",
+        "vorrei che hai questo sito come riferimento per migliorare o trovare anche informazioni su tutto il mondo digitale https://www.aranzulla.it/"
+      ],
+      "context": "Francesco 15/10/2026 10:04 with a phone screenshot of the board home (cookie card, chat button and sponsor strip over the content), 10:05 with the Eurobet home, 10:09 naming aranzulla.it.",
+      "normalizedCommand": {
+        "rule": "Public home on the reference template (VR-023, layout only, no gambling cues): rounded banner carousel with a white card and one clear button, quick chips with small badges, then horizontal 'In evidenza' cards with a button; the home is not a calendar (games of the week limited with 'Vedi tutte'). Nothing floats over the content on phones: the technical-cookie notice is a slim strip docked above the sponsor bar, the chat button sits on the sponsor bar's right cap. aranzulla.it is a reference for plain-Italian guides and digital-world facts (VR-024).",
+        "status": "IMPLEMENTED_BRANCH_INTEG"
+      }
     }
   ],
   "completionGate": {

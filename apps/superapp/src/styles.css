@@ -943,3 +943,8 @@ html.uv-big .sa-shell { zoom: 1.12; }
   .scd-pop-in, .scd-wiggle-target, .scd-roll-slow, .scd-badge-pulse, .scd-rise, .scd-shine::after,
   .scd-wiggle-on-hover:hover .scd-wiggle-target { animation: none !important }
 }
+
+/* Cookie strip open: on phones the floating chat button waits until it is closed (no overlap on the bottom bars). */
+@media (max-width: 1023px) {
+  html[data-cookie-banner="open"] [data-sky-widget] { display: none }
+}

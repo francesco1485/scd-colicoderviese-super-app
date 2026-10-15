@@ -52,7 +52,7 @@ const WRAP = "mx-auto w-full max-w-[1280px] px-4 lg:px-8";
 /* ------------------------------------------------------------- vetrina */
 
 /** Visual of a vetrina slot: real poster/flyer/board, a small cast portrait, or an original typographic panel. */
-function SlotVisual({ slot }: { slot: VetrinaSlot }) {
+function SlotVisual({ slot, compact = false }: { slot: VetrinaSlot; compact?: boolean }) {
   const v = slot.visual;
   if (v.kind === "portrait")
     return (
@@ -65,7 +65,7 @@ function SlotVisual({ slot }: { slot: VetrinaSlot }) {
           height={112}
           loading="lazy"
           decoding="async"
-          className="relative size-[96px] rounded-full bg-white object-cover shadow-[0_8px_22px_-8px_rgb(0_0_0/0.55)] ring-4 ring-white/90 lg:size-[112px]"
+          className={`relative rounded-full bg-white object-cover shadow-[0_8px_22px_-8px_rgb(0_0_0/0.55)] ring-4 ring-white/90 ${compact ? "size-[72px]" : "size-[96px] lg:size-[112px]"}`}
         />
       </span>
     );
@@ -74,11 +74,11 @@ function SlotVisual({ slot }: { slot: VetrinaSlot }) {
       <span className="relative block size-full overflow-hidden bg-[radial-gradient(120%_120%_at_90%_10%,#1556c4_0%,#0b2a5b_58%)]">
         <span
           aria-hidden="true"
-          className={`absolute -bottom-5 right-3 font-uv leading-none text-[#ffd600] ${v.big.length > 3 ? "text-[96px]" : "text-[130px]"}`}
+          className={`absolute font-uv leading-none text-[#ffd600] ${compact ? `-bottom-2 right-2 ${v.big.length > 3 ? "text-[44px]" : "text-[60px]"}` : `-bottom-5 right-3 ${v.big.length > 3 ? "text-[96px]" : "text-[130px]"}`}`}
         >
           {v.big}
         </span>
-        <span className="absolute left-4 top-4 max-w-[62%] font-uv text-[21px] uppercase leading-[0.95] text-white">
+        <span className={`absolute font-uv uppercase leading-[0.95] text-white ${compact ? "left-2.5 top-2.5 max-w-[85%] text-[15px]" : "left-4 top-4 max-w-[62%] text-[21px]"}`}>
           {v.small}
         </span>
       </span>
@@ -139,6 +139,51 @@ function SlotCard({ slot }: { slot: VetrinaSlot }) {
             className="size-4 transition-transform duration-200 group-hover:translate-x-0.5"
             aria-hidden="true"
           />
+        </span>
+      </span>
+    </Link>
+  );
+}
+
+/**
+ * "In evidenza" row card of the public home (reference template, Francesco 15/10/2026 10:05): picture on the left,
+ * title, one line and a real button on the right, all cards the same height.
+ */
+function SlotRow({ slot }: { slot: VetrinaSlot }) {
+  const members = slot.audience === "members";
+  return (
+    <Link
+      to={slot.href as never}
+      {...(slot.hash ? { hash: slot.hash } : {})}
+      {...(slot.search ? { search: slot.search as never } : {})}
+      className="scd-focus group grid h-full w-full grid-cols-[minmax(0,40%)_minmax(0,1fr)] overflow-hidden rounded-[14px] border border-[#dbe4f0] bg-white shadow-[0_1px_2px_rgb(11_42_91/0.06)] transition-shadow duration-150 hover:shadow-[0_10px_24px_-12px_rgb(11_42_91/0.35)]"
+      data-slot={slot.id}
+      data-kind={slot.kind}
+      data-audience={slot.audience}
+    >
+      <span className="relative block min-h-[150px] overflow-hidden">
+        <SlotVisual slot={slot} compact />
+        {slot.badge && (
+          <span className="absolute left-2 top-2 rounded-[5px] bg-[#ffd600] px-1.5 py-[3px] text-[10px] font-extrabold uppercase leading-none tracking-[0.05em] text-[#0b1e3a]">
+            {slot.badge}
+          </span>
+        )}
+      </span>
+      <span className="flex min-w-0 flex-col gap-1 p-3.5">
+        <span className="text-[16.5px] font-bold leading-tight text-[#0b1e3a]">
+          {slot.title}
+        </span>
+        <span className="line-clamp-2 text-[13px] leading-snug text-[#4a5d7a]">
+          {members ? (
+            <span className="inline-flex items-center gap-1 font-semibold text-[#0b2a5b]">
+              <Lock className="size-3" aria-hidden="true" />
+              Per i tesserati ·{" "}
+            </span>
+          ) : null}
+          {slot.text}
+        </span>
+        <span className="mt-auto inline-flex h-10 w-fit items-center rounded-[9px] bg-[#1556c4] px-4 text-[14px] font-bold text-white transition-[filter] duration-150 group-hover:brightness-110">
+          {slot.cta}
         </span>
       </span>
     </Link>
@@ -215,12 +260,15 @@ export function Vetrina({
   worlds,
   fixedWorld,
   embedded = false,
+  rows = false,
 }: {
   worlds: Readonly<Record<VetrinaWorld, readonly VetrinaSlot[]>>;
   /** Member home: the world comes from the session, no chips. */
   fixedWorld?: VetrinaWorld;
   /** Inside another layout column (member home): no page gutter. */
   embedded?: boolean;
+  /** Public home: "In evidenza", horizontal row cards, no world chips (reference template, 15/10/2026 10:05). */
+  rows?: boolean;
 }) {
   const [world, setWorld] = useState<VetrinaWorld>(fixedWorld ?? "tutti");
   useEffect(() => {
@@ -242,14 +290,16 @@ export function Vetrina({
     >
       <div className="flex items-end justify-between gap-3 pb-3">
         <div className="grid gap-1">
-          <span className="text-[11.5px] font-extrabold uppercase tracking-[0.12em] text-[#1556c4]">
-            Oggi nel club · cambia ogni giorno
-          </span>
+          {!rows && (
+            <span className="text-[11.5px] font-extrabold uppercase tracking-[0.12em] text-[#1556c4]">
+              Oggi nel club · cambia ogni giorno
+            </span>
+          )}
           <h2
             id="vetrina-t"
             className="scd-reveal m-0 font-uv text-[24px] uppercase leading-none text-[#0b2a5b] sm:text-[26px] lg:text-[30px]"
           >
-            {fixedWorld ? "In vetrina" : "Mondo Colico"}
+            {fixedWorld ? "In vetrina" : rows ? "In evidenza" : "Mondo Colico"}
           </h2>
         </div>
         <Link
@@ -260,18 +310,19 @@ export function Vetrina({
           <ChevronRight className="size-4" aria-hidden="true" />
         </Link>
       </div>
-      {!fixedWorld && <WorldChips value={world} onChange={choose} />}
+      {!fixedWorld && !rows && <WorldChips value={world} onChange={choose} />}
       <ul
         className={`-mx-4 m-0 flex list-none snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] lg:mx-0 lg:grid lg:snap-none lg:gap-4 lg:overflow-visible lg:px-0 [&::-webkit-scrollbar]:hidden ${embedded ? "lg:grid-cols-2" : "lg:grid-cols-3"}`}
+        data-variant={rows ? "rows" : "cards"}
         aria-label={`Contenuti in vetrina oggi: ${WORLD_LABEL[world]}`}
         aria-live="polite"
       >
         {slots.map((s) => (
           <li
             key={s.id}
-            className="flex shrink-0 basis-[80%] snap-start sm:basis-[calc((100%-12px)/2)] lg:basis-auto"
+            className={`flex shrink-0 snap-start lg:basis-auto ${rows ? "basis-[88%] sm:basis-[calc((100%-12px)/2)]" : "basis-[80%] sm:basis-[calc((100%-12px)/2)]"}`}
           >
-            <SlotCard slot={s} />
+            {rows ? <SlotRow slot={s} /> : <SlotCard slot={s} />}
           </li>
         ))}
       </ul>
@@ -440,12 +491,12 @@ export function PublicHome({
       <UrgentNotices items={alerts} />
       <ClubNoticeCard notice={notice} />
       <HomeBoard calendar={calendar} nowMs={nowMs} today={today} />
-      {vetrina && <Vetrina worlds={vetrina} />}
+      {vetrina && <Vetrina worlds={vetrina} rows />}
       <div
         className={`${WRAP} pt-5 lg:pt-8`}
         data-testid="home-matchday-layout"
       >
-        <HomeMatchday calendar={calendar} nowMs={nowMs} today={today} />
+        <HomeMatchday calendar={calendar} nowMs={nowMs} today={today} limit={4} />
       </div>
       <WeekendResults rows={results} />
     </main>

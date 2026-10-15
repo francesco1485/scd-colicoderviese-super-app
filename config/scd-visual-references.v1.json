@@ -358,6 +358,49 @@
         "FANTASCD_TEAM_LEVEL"
       ],
       "usage": "Source of truth for layout, palette and component language of the Super App. Data shown on boards is real snapshot data or explicit placeholders; never copy placeholders into runtime as values."
+    },
+    {
+      "id": "VR-023",
+      "product": "SCD_ONE",
+      "name": "Eurobet home (www.eurobet.it) — layout reference only",
+      "url": "https://www.eurobet.it/it/",
+      "type": "USER_SUPPLIED_SCREEN_REFERENCE",
+      "relevance": "HIGH",
+      "sourceKind": "USER_CONVERSATION_UPLOAD_2026_10_15",
+      "sourceStatus": "EXTERNAL_TEMPLATE_REFERENCE_NOT_RUNTIME_ASSET",
+      "observedConcepts": [
+        "ROUNDED_BANNER_CAROUSEL_WITH_WHITE_OFFER_CARD",
+        "ONE_PRIMARY_CTA_PER_SLIDE",
+        "QUICK_CHIPS_WITH_HOT_NEW_BADGES",
+        "HORIZONTAL_CARDS_IMAGE_LEFT_CTA_RIGHT"
+      ],
+      "usage": "Template of the public home (Francesco 15/10/2026 10:05 'da qui potresti partire per migliorare'). Copy the layout only: never betting, odds, bonus money or gambling cues (club rule).",
+      "approval": {
+        "by": "Francesco",
+        "date": "2026-10-15",
+        "evidence": "Explicit user message 10:05 with two screenshots of the Eurobet home"
+      }
+    },
+    {
+      "id": "VR-024",
+      "product": "SCD_SHARED",
+      "name": "Aranzulla.it — digital-world knowledge and editorial reference",
+      "url": "https://www.aranzulla.it/",
+      "type": "USER_NAMED_EXTERNAL_REFERENCE",
+      "relevance": "MEDIUM",
+      "sourceKind": "USER_CONVERSATION_MESSAGE_2026_10_15",
+      "sourceStatus": "EXTERNAL_REFERENCE_NOT_RUNTIME_ASSET",
+      "observedConcepts": [
+        "PLAIN_ITALIAN_HOW_TO_GUIDES",
+        "STEP_BY_STEP_EXPLANATIONS",
+        "DIGITAL_TOOLS_KNOWLEDGE"
+      ],
+      "usage": "Francesco 15/10/2026 10:09: 'vorrei che hai questo sito come riferimento per migliorare o trovare anche informazioni su tutto il mondo digitale'. Use for plain-Italian how-to style (guide, help pages, app explanations) and as a source to check digital-tool facts; cite it, never copy its texts.",
+      "approval": {
+        "by": "Francesco",
+        "date": "2026-10-15",
+        "evidence": "Explicit user message 10:09"
+      }
     }
   ],
   "nextRecoveryTargets": [

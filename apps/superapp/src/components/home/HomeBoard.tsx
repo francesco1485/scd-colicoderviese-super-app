@@ -1,16 +1,16 @@
 /**
- * Top of the public home drawn from the six-screen board VR-009, screen 1 "Home pubblica" (Francesco 15/10/2026
- * 06:30: "tutto deve partire dallo studio di questa immagine… solo migliorare"). Board order, improved:
- *   1. "Questa settimana" hero: the real lake photo with a slow zoom, the official crest, no mascot (Sky removed: Francesco 15/10 06:46);
- *   2. four white tiles over the hero edge: Gare (games left this week), Allenamenti, Eventi, Iniziative;
+ * Top of the public home. Template from the reference Francesco pointed to on 15/10/2026 10:05 (Eurobet home, only the
+ * layout: no betting, no money), content from board VR-009:
+ *   1. banner carousel with a white card and one clear button (HomePromo: welcome/sign-up, published events, season
+ *      sign-up, the new squad cards);
+ *   2. quick chips with small badges (games left this week or LIVE, NUOVO);
  *   3. "Prossima gara": the club's most important next game (Prima Squadra > agonistica > base, boardRank) with its
- *      live countdown, folder tab, big date block, our crest VS the verified opponent crest;
- *   4. two small cards: Allenamenti della settimana (green) and the next club event (yellow, from clubEventsOn).
- * The partner box and "Mondo Colico" (vetrina) follow in PublicHome. Data: the public calendar only (weekMatches,
- * same source as /calendario); no score, no invented crest, no minor named. Assets: official crest and Sky.
+ *      live countdown, our crest VS the verified opponent crest;
+ *   4. two small cards: Allenamenti della settimana and the pitches (how to get there).
+ * Data: the public calendar only (weekMatches, same source as /calendario); no score, no invented crest, no minor named.
  */
 import { Link } from "@tanstack/react-router";
-import { CalendarDays, ChevronRight, MapPin, Trophy } from "lucide-react";
+import { ChevronRight, MapPin, Trophy } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { ClubCrestOfficial } from "@/components/SiteChrome";
@@ -28,6 +28,9 @@ import {
 import { categoryShort, matchdayClass } from "@/lib/home-matchday";
 import { clubEventsOn } from "@/lib/club-events";
 import { weekMatches } from "@/lib/home-today";
+import { promoSlides, quickChips } from "@/lib/home-promo";
+import { itemState } from "@/lib/universe";
+import { PromoCarousel, QuickChips } from "@/components/home/HomePromo";
 
 type PublicCalendar = Awaited<ReturnType<typeof getPublicCalendarSnapshot>>;
 
@@ -44,111 +47,6 @@ function useMinuteClock(serverNow: number): number {
     return () => window.clearInterval(id);
   }, []);
   return now;
-}
-
-/* Tile icons in the board style: filled, two colours, no stock line icons. */
-function BallIcon() {
-  return (
-    <svg viewBox="0 0 32 32" className="scd-roll-slow size-8" aria-hidden="true">
-      <circle
-        cx="16"
-        cy="16"
-        r="13"
-        fill="#fff"
-        stroke="#0b1e3a"
-        strokeWidth="2"
-      />
-      <path d="m16 9.5 5.5 4-2 6.5h-7l-2-6.5z" fill="#0b1e3a" />
-      <path
-        d="M16 9.5V3.5M21.5 13.5l5.5-2M19.5 20l3.5 5M12.5 20 9 25M10.5 13.5l-5.5-2"
-        stroke="#0b1e3a"
-        strokeWidth="1.6"
-      />
-    </svg>
-  );
-}
-function ConeIcon() {
-  return (
-    <svg viewBox="0 0 32 32" className="size-8" aria-hidden="true">
-      <path d="M13 4h6l6 20H7z" fill="#ff6a1a" />
-      <path d="M11.2 12h9.6M9.6 18h12.8" stroke="#fff" strokeWidth="2.4" />
-      <rect x="4" y="24" width="24" height="4" rx="1.5" fill="#ff6a1a" />
-    </svg>
-  );
-}
-function CalendarIcon() {
-  return (
-    <svg viewBox="0 0 32 32" className="size-8" fill="none" aria-hidden="true">
-      <rect
-        x="4.5"
-        y="6.5"
-        width="23"
-        height="21"
-        rx="3.5"
-        stroke="#0b2a5b"
-        strokeWidth="2.4"
-      />
-      <path
-        d="M4.5 13h23M11 4v5M21 4v5"
-        stroke="#0b2a5b"
-        strokeWidth="2.4"
-        strokeLinecap="round"
-      />
-      <path
-        d="M10 18h3M15 18h3M20 18h3M10 22.5h3M15 22.5h3"
-        stroke="#1556c4"
-        strokeWidth="2.2"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-function PeopleIcon() {
-  return (
-    <svg viewBox="0 0 34 32" className="size-8" aria-hidden="true">
-      <circle cx="17" cy="9" r="4.6" fill="#1f9d55" />
-      <circle cx="7" cy="11.5" r="3.6" fill="#1f9d55" />
-      <circle cx="27" cy="11.5" r="3.6" fill="#1f9d55" />
-      <path
-        d="M8.5 28c0-5.4 3.8-9.4 8.5-9.4s8.5 4 8.5 9.4zM1 26.5c0-4 2.6-6.9 6.4-6.9 1.3 0 2.4.3 3.3.8-1.6 1.8-2.5 4-2.6 6.1zM33 26.5c0-4-2.6-6.9-6.4-6.9-1.3 0-2.4.3-3.3.8 1.6 1.8 2.5 4 2.6 6.1z"
-        fill="#1f9d55"
-      />
-    </svg>
-  );
-}
-
-function Tile({
-  to,
-  label,
-  icon,
-  count,
-  testId,
-  i = 0,
-}: {
-  to: "/calendario" | "/allenamenti" | "/eventi" | "/tornei";
-  label: string;
-  icon: React.ReactNode;
-  count?: number;
-  testId: string;
-  i?: number;
-}) {
-  return (
-    <Link
-      to={to}
-      data-testid={testId}
-      style={{ "--i": i } as React.CSSProperties}
-      aria-label={count ? `${label}, ${count} questa settimana` : label}
-      className={`${CARD} scd-focus scd-pop-in scd-wiggle-on-hover relative flex h-[92px] flex-col items-center justify-center gap-1.5 text-[13px] font-bold text-[#0b1e3a] transition-transform duration-150 hover:-translate-y-0.5 lg:h-[112px] lg:text-[15px]`}
-    >
-      <span className="scd-wiggle-target inline-flex">{icon}</span>
-      {label}
-      {count ? (
-        <span className="scd-badge-pulse absolute right-2 top-2 grid h-[22px] min-w-[22px] place-items-center rounded-full bg-[#ffd600] px-1.5 text-[12px] font-extrabold leading-none text-[#0b1e3a] tabular-nums">
-          {count}
-        </span>
-      ) : null}
-    </Link>
-  );
 }
 
 function NextMatch({
@@ -348,123 +246,25 @@ export function HomeBoard({
   today: string;
 }) {
   const nowMs = useMinuteClock(serverNow);
-  // Next club event from the published list (honours its window): the board's yellow card, never hardcoded.
-  const event =
-    clubEventsOn(today).find((e) => !e.date || e.date >= today) ?? null;
-  const left = useMemo(
-    () =>
-      gamesLeft(
-        weekMatches(calendar.events, calendar.groups, today, null),
-        nowMs,
-      ),
-    [calendar, today, nowMs],
+  const week = useMemo(
+    () => weekMatches(calendar.events, calendar.groups, today, null),
+    [calendar, today],
   );
+  const left = gamesLeft(week, nowMs);
+  const live = week.some((e) => e.kind === "gara" && itemState(e, nowMs) === "live");
+  const chips = quickChips(left, live);
+  const slides = useMemo(() => promoSlides(today, clubEventsOn(today)), [today]);
   return (
     <div data-testid="home-board">
-      {/* 1. Hero "Questa settimana": the real lake photo with a slow zoom, the official crest,
-          (the countdown lives in the Prossima gara card). */}
-      <section
-        aria-labelledby="board-week-t"
-        className="relative isolate overflow-hidden bg-[#0b3a8a] text-white"
-        data-testid="board-hero"
-      >
-        <img
-          src="/media/scd/lario-header.webp"
-          alt=""
-          aria-hidden="true"
-          fetchPriority="high"
-          decoding="async"
-          className="scd-board-kb absolute inset-0 -z-20 size-full object-cover object-[center_62%]"
-        />
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgb(11_42_120/0.9)_0%,rgb(11_42_120/0.45)_30%,rgb(8_30_90/0.72)_50%,rgb(6_26_80/0.92)_100%)] lg:bg-[linear-gradient(90deg,rgb(6_26_80/0.94)_0%,rgb(8_30_90/0.78)_45%,rgb(11_42_120/0.2)_100%)]"
-        />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
-        >
-          <span className="scd-beam left-[4%]" />
-          <span
-            className="scd-beam right-[6%]"
-            style={{ animationDelay: "-4.5s" }}
-          />
-          {[8, 22, 37, 55, 68, 81, 93].map((x, k) => (
-            <span
-              key={x}
-              className="scd-float-dot"
-              style={{
-                left: `${x}%`,
-                animationDelay: `${k * 0.85}s`,
-                animationDuration: `${5 + (k % 3)}s`,
-              }}
-            />
-          ))}
-        </div>
-        <div
-          className={`${WRAP} relative flex min-h-[260px] items-end gap-4 pb-14 pt-6 lg:min-h-[340px] lg:pb-20`}
-        >
-          <div className="grid gap-2 lg:max-w-[620px]">
-            <ClubCrestOfficial
-              size={64}
-              className="scd-board-pop drop-shadow-[0_6px_12px_rgb(0_0_0/0.45)] lg:hidden"
-            />
-            <h2
-              id="board-week-t"
-              className="m-0 text-[30px] font-extrabold leading-tight lg:text-[48px]"
-            >
-              Questa settimana
-            </h2>
-            <p className="m-0 text-[15px] font-semibold leading-snug lg:text-[19px]">
-              Sport, crescita e comunità nel cuore dell'Alto Lario.
-            </p>
-          </div>
-          <ClubCrestOfficial
-            size={150}
-            className="scd-board-pop ml-auto hidden drop-shadow-[0_10px_20px_rgb(0_0_0/0.5)] lg:block"
-          />
-        </div>
-      </section>
+      {/* 1. Banner carousel and 2. quick chips (reference template, Francesco 15/10 10:05). */}
+      <PromoCarousel slides={slides} />
+      <QuickChips chips={chips} />
 
-      {/* 2. Tiles over the hero edge, then 3. and 4. on the light panel */}
-      <div className={`${WRAP} relative -mt-9 grid gap-4 lg:-mt-12 lg:gap-6`}>
-        <nav
-          aria-label="Esplora il club"
-          className="grid grid-cols-4 gap-2 lg:gap-4"
-        >
-          <Tile
-            to="/calendario"
-            i={0}
-            label="Gare"
-            icon={<BallIcon />}
-            count={left}
-            testId="board-tile-gare"
-          />
-          <Tile
-            to="/allenamenti"
-            i={1}
-            label="Allenamenti"
-            icon={<ConeIcon />}
-            testId="board-tile-allenamenti"
-          />
-          <Tile
-            to="/eventi"
-            i={2}
-            label="Eventi"
-            icon={<CalendarIcon />}
-            testId="board-tile-eventi"
-          />
-          <Tile
-            to="/tornei"
-            i={3}
-            label="Iniziative"
-            icon={<PeopleIcon />}
-            testId="board-tile-iniziative"
-          />
-        </nav>
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:items-end lg:gap-6">
+      {/* 3. The club's most important next game and 4. the two small cards. */}
+      <div className={`${WRAP} relative grid gap-4 pt-5 lg:gap-6 lg:pt-8`}>
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:items-stretch lg:gap-6">
           <NextMatch calendar={calendar} nowMs={nowMs} today={today} />
-          <div className="grid grid-cols-2 gap-2 lg:gap-4">
+          <div className="grid grid-cols-2 gap-2 lg:grid-cols-1 lg:gap-4 lg:pt-[30px]">
             <Link
               to="/allenamenti"
               data-testid="board-trainings"
@@ -493,49 +293,26 @@ export function HomeBoard({
                 </span>
               </span>
             </Link>
-            {event ? (
-              <Link
-                to={event.href as never}
-                data-testid="board-event"
-                className={`${CARD} scd-focus grid grid-cols-[48px_minmax(0,1fr)] items-center gap-2 p-2.5 hover:bg-[#fbfcfe]`}
+            <Link
+              to="/impianti"
+              data-testid="board-impianti"
+              className={`${CARD} scd-focus grid grid-cols-[48px_minmax(0,1fr)] items-center gap-2 p-2.5 hover:bg-[#fbfcfe]`}
+            >
+              <span
+                aria-hidden="true"
+                className="grid size-12 place-items-center rounded-[12px] bg-[#ffd600] text-[#0b2a5b]"
               >
-                <span
-                  aria-hidden="true"
-                  className="grid size-12 place-items-center rounded-[12px] bg-[#ffd600] text-[#0b2a5b]"
-                >
-                  <CalendarDays className="size-7" />
+                <MapPin className="size-7" />
+              </span>
+              <span className="min-w-0">
+                <span className="block text-[13.5px] font-extrabold leading-tight">
+                  Campi e come arrivare
                 </span>
-                <span className="min-w-0">
-                  <span className="block text-[13.5px] font-extrabold leading-tight">
-                    {event.title}
-                  </span>
-                  <span className="block text-[11.5px] leading-snug text-[#4a5d7a]">
-                    {event.when}
-                  </span>
+                <span className="block text-[11.5px] leading-snug text-[#4a5d7a]">
+                  Colico e Dervio
                 </span>
-              </Link>
-            ) : (
-              <Link
-                to="/eventi"
-                data-testid="board-event"
-                className={`${CARD} scd-focus grid grid-cols-[48px_minmax(0,1fr)] items-center gap-2 p-2.5 hover:bg-[#fbfcfe]`}
-              >
-                <span
-                  aria-hidden="true"
-                  className="grid size-12 place-items-center rounded-[12px] bg-[#ffd600] text-[#0b2a5b]"
-                >
-                  <CalendarDays className="size-7" />
-                </span>
-                <span className="min-w-0">
-                  <span className="block text-[13.5px] font-extrabold leading-tight">
-                    Eventi
-                  </span>
-                  <span className="block text-[11.5px] leading-snug text-[#4a5d7a]">
-                    Tornei e iniziative del club
-                  </span>
-                </span>
-              </Link>
-            )}
+              </span>
+            </Link>
           </div>
         </div>
       </div>

@@ -33,6 +33,8 @@ export function SponsorBand() {
         <Plates />
         <Plates hidden />
       </div>
+      {/* Phones: a white cap at the right end where the chat button sits, so no logo hides behind it. */}
+      <span aria-hidden="true" className="absolute inset-y-0 right-0 z-[1] w-[76px] bg-white lg:hidden" />
     </aside>
   );
 }

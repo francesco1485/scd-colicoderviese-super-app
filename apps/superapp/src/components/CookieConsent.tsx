@@ -90,6 +90,12 @@ export function CookieConsent() {
     );
   }, [consent, pathname]);
 
+  // While the slim technical-cookie strip is open, the floating chat button steps aside on phones (no overlap).
+  useEffect(() => {
+    const open = banner && !prefs;
+    document.documentElement.dataset["cookieBanner"] = open ? "open" : "closed";
+  }, [banner, prefs]);
+
   const save = (s: boolean, m: boolean) => {
     const c: Consent = { v: 1, stats: s, mkt: m, ts: new Date().toISOString() };
     writeConsent(c);
@@ -105,13 +111,13 @@ export function CookieConsent() {
           role="region"
           aria-label="Cookie e privacy"
           data-testid="cookie-banner"
-          className="fixed inset-x-3 bottom-[calc(118px+env(safe-area-inset-bottom))] z-[70] mx-auto flex max-w-[560px] items-center gap-3 rounded-[14px] border border-[var(--uv-gold)] bg-white px-3 py-2 text-[var(--scd-ink)] shadow-[0_10px_30px_rgb(0_0_0/0.35)] lg:bottom-[62px]"
+          className="fixed inset-x-0 bottom-[calc(96px+env(safe-area-inset-bottom))] z-[45] flex items-center gap-3 border-t border-[#d5dfec] bg-white px-4 py-0.5 text-[var(--scd-ink)] shadow-[0_-6px_16px_-10px_rgb(11_42_91/0.35)] lg:bottom-[46px] lg:justify-center"
         >
-          <p className="m-0 flex-1 text-[13.5px] leading-[1.35] text-[var(--scd-sub)]">
+          <p className="m-0 min-w-0 flex-1 text-[12.5px] leading-[1.3] text-[var(--scd-sub)] lg:flex-none">
             Solo cookie tecnici: nessuna statistica, nessuna pubblicità.{" "}
             <a href="/privacy" className="font-semibold text-[var(--scd-blue)] underline">Privacy</a>
           </p>
-          <button type="button" onClick={() => save(false, false)} className="min-h-11 shrink-0 rounded-[10px] bg-[var(--uv-night)] px-4 text-[14.5px] font-extrabold text-white" data-testid="cookie-ok">
+          <button type="button" onClick={() => save(false, false)} className="min-h-11 shrink-0 rounded-[10px] px-3 text-[14px] font-extrabold text-[var(--scd-blue)]" data-testid="cookie-ok">
             Ho capito
           </button>
         </div>

@@ -60,7 +60,8 @@ function greeting(persona: Persona, area: ChatAreaId | null): Msg[] {
 /* Bottom chrome on phones (SiteChrome.BottomNav 62px, SponsorBand 34px on every public page, UD-134) */
 const NAV_H = 62;
 const STRIP_H = 34;
-const GAP = 12;
+/** Launcher (56px) centred on the sponsor strip on phones: it covers the strip's reserved right cap, never page content. */
+const LAUNCHER = 56;
 
 /** A reply link: app paths through the router (with "?query" and "#anchor"), https sources in a new tab. */
 function ReplyLink({ link, onNavigate }: { link: { label: string; to: string }; onNavigate: () => void }) {
@@ -227,7 +228,7 @@ export function SkyChat({ interior = false }: { interior?: boolean } = {}) {
 
   const phoneBottom = interior
     ? "calc(16px + env(safe-area-inset-bottom))"
-    : `calc(${NAV_H + STRIP_H + GAP}px + env(safe-area-inset-bottom))`;
+    : `calc(${NAV_H + STRIP_H / 2 - LAUNCHER / 2}px + env(safe-area-inset-bottom))`;
   const isSky = persona === "sky";
 
   // Super App: su smartphone il widget resta sopra la barra di navigazione inferiore e la striscia sponsor.

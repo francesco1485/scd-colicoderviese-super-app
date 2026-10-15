@@ -188,12 +188,16 @@ export function HomeMatchday({
   calendar,
   nowMs,
   today,
+  limit,
 }: {
   calendar: PublicCalendar;
   nowMs: number;
   today: string;
+  /** Rows shown before "Vedi tutte" (the home is not a calendar: Francesco 15/10/2026). Unset: all. */
+  limit?: number;
 }) {
   const [filter, setFilter] = useState<MatchdayFilter>("tutte");
+  const [expanded, setExpanded] = useState(false);
   const now = useMinuteClock(nowMs);
   const week = useMemo(
     () => weekMatches(calendar.events, calendar.groups, today, null),
@@ -204,9 +208,11 @@ export function HomeMatchday({
     () => matchdaySummaryLine(matchdaySummary(week)),
     [week],
   );
+  const filtered = useMemo(() => filterMatchday(week, filter), [week, filter]);
+  const cut = limit !== undefined && !expanded && filtered.length > limit;
   const days = useMemo(
-    () => groupByDay(filterMatchday(week, filter)),
-    [week, filter],
+    () => groupByDay(cut ? filtered.slice(0, limit) : filtered),
+    [filtered, cut, limit],
   );
 
   return (
@@ -222,7 +228,7 @@ export function HomeMatchday({
             id="matchday-t"
             className="m-0 font-uv text-[30px] uppercase leading-none text-[#0b2a5b] lg:text-[36px]"
           >
-            Tutte le gare della settimana
+            {limit !== undefined ? "Le gare della settimana" : "Tutte le gare della settimana"}
           </h2>
           {summary && (
             <p
@@ -309,6 +315,17 @@ export function HomeMatchday({
               </ul>
             </div>
           ))
+        )}
+        {cut && (
+          <button
+            type="button"
+            onClick={() => setExpanded(true)}
+            className="scd-focus flex h-12 w-full items-center justify-center gap-1 border-t border-[#e6edf6] text-[14.5px] font-bold text-[#1556c4] hover:bg-[#f4f7fb]"
+            data-testid="home-matchday-more"
+          >
+            Vedi tutte le {filtered.length} gare
+            <ChevronRight className="size-4 rotate-90" aria-hidden="true" />
+          </button>
         )}
       </div>
       <p className="m-0 px-1 pt-2 text-[12.5px] leading-snug text-[#5a6b85]">
