@@ -11,7 +11,8 @@ apps/superapp/src/lib/calendar-bridge.server.ts and checked by calendar-mirror.t
 the master and never stores games in the database (NO_PARALLEL_CALENDAR_EDITING_IN_DB).
 
 The rules are the ones of the hand-made copy of 09-10/10/2026 (projection SCD_RC6_GERARCHIA_FONTI_20261010), re-derived
-on 15/10/2026 by comparing all 156 published games with the master row by row:
+on 15/10/2026 by comparing all 156 published games with the master row by row, then aligned the same day with the
+approved 171-game copy (provisional club friendlies included):
 - out: the withdrawn U18 team, rows WITHDRAWN / REST / REJECTED and type RIPOSO. Club events (CLUB_EVENT) are published
   also while provisional, flagged "Orario o sede da verificare" + "Attesa verifica" (aligned on 15/10/2026 with the copy
   the PC chat regenerated and Francesco approved: 171 games, Pulcini friendlies of 18 and 24/10 included);

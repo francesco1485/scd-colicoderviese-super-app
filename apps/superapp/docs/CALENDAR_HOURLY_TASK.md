@@ -51,7 +51,9 @@ PROCEDURE
    new copy must not have fewer games than the current file (a converter regression, not a calendar change). The app applies the same rules (validateMirror) and
    would refuse a copy that fails them.
 7. Copy calendar-public.json over data/calendar-public.json. If `git -C data status --porcelain` prints nothing, the
-   copy is already identical: report "Calendario invariato (master <modifiedTime>)" and stop. Otherwise it must print
+   copy is already identical: if the converter commit differs from the one of step 2, record it with
+   `git -C data commit --allow-empty` (same author, message "data(calendar): converter <sha>, copy unchanged" + blank
+   line + "converter: <sha>") and push; then report "Calendario invariato (master <modifiedTime>)" and stop. Otherwise it must print
    exactly " M calendar-public.json" and nothing else (otherwise BLOCKER). Commit with author
    "SCD Calendario <noreply@anthropic.com>" and message
    "data(calendar): public calendar from the master of <modifiedTime>" followed by a blank line and
