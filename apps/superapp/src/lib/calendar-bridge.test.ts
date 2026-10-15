@@ -2,6 +2,7 @@ import { createServer } from "node:http";
 import type { AddressInfo } from "node:net";
 import { describe, expect, test } from "vitest";
 import bundled from "@/data/calendario-snapshot.json";
+import fixture20261010 from "@/data/calendario-snapshot-20261010.json";
 import { validateMirror } from "./calendar-mirror";
 import { createCachedSource, fetchMirror } from "./calendar-bridge.server";
 
@@ -33,6 +34,8 @@ describe("validazione copia pubblica", () => {
     const b = clone(); b.events[0].opponent = "chiama 333 1234567"; expect(validateMirror(b).ok).toBe(false);
   });
   test("rifiuta ID duplicato", () => { const a = clone(); a.events.push(a.events[0]); expect(validateMirror(a).ok).toBe(false); });
+  test("la vecchia copia del 09/10 ancora su Drive è rifiutata: più vecchia di quella inclusa", () =>
+    expect(validateMirror(fixture20261010)).toEqual({ ok: false, reason: "più vecchio della copia di sicurezza" }));
   test("rifiuta dati più vecchi della copia di sicurezza", () => { const a = clone(); a.source_modified_at = "2026-10-01T00:00:00Z"; expect(validateMirror(a).ok).toBe(false); });
   test("rifiuta campi sconosciuti, HTML e verification mancante", () => {
     const a = clone(); a.events[0].telefono_genitore = "x"; expect(validateMirror(a).ok).toBe(false);
@@ -61,7 +64,7 @@ describe("ponte con cache 5 minuti", () => {
     expect(fresh.sourceModifiedAt).toBe("2026-10-16T08:00:00.000Z");
     f.stop();
   });
-  test("rete giù: copia di sicurezza RC3 visibile", async () => {
+  test("rete giù: copia di sicurezza inclusa visibile", async () => {
     const f = await fixture(); f.down();
     const r = await fetchMirror([f.url]);
     expect(r.origin).toBe("fallback");

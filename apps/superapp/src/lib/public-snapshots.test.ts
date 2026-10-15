@@ -81,7 +81,7 @@ describe("calendario RC3 mobile", () => {
   const c = loadCalendar();
   test("copia inclusa (generata dal master con tools/sync/calendar_public_payload.py): hash file e fonte master tracciati", () => {
     const buf = readFileSync(new URL("../data/calendario-snapshot.json", import.meta.url));
-    expect(createHash("sha256").update(buf).digest("hex")).toBe("94e793397ff433a2c909a83a6b93507327f9f55e0dac39cc65dd81806ee49bae");
+    expect(createHash("sha256").update(buf).digest("hex")).toBe("6b586721aa4459eaad855f9f923ce651d11ef3279298c74a93ccd619d7504c39");
     expect(c.sourceModifiedAt).toBe("2026-10-15T09:47:09.544Z");
   });
   test("freschezza in ora italiana: 15/10/2026 ore 11:47", () => {

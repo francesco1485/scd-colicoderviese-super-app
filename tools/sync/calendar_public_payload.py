@@ -16,9 +16,13 @@ on 15/10/2026 by comparing all 156 published games with the master row by row:
   or venue is not CONFIRMED (a provisional friendly is not published until the club confirms it in the master);
 - fields: only the allowlisted keys of calendar-mirror.ts; verification flags from TIME_STATUS / VENUE_STATUS /
   CONFLICT_STATUS; notices from the same statuses; source FIGC/LND or SCD;
-- two hand corrections of 09-10/10 (official FIGC time over the master on 10/10, club-approved time on 11/10) are kept
-  in OVERRIDES with their reason, so a regeneration does not undo them.
-A row whose category maps to no known team stops the run (exit 2): a new team is added here, never guessed.
+- one hand correction of 09-10/10 (official FIGC time over the master on 10/10, rule FIGC_LND_OFFICIAL_FIXTURES_WIN) is
+  kept in OVERRIDES with its reason and the master value it corrects: it applies only while the master still carries
+  that value (a newer master value wins and the correction is reported on stderr as stale);
+- events are sorted by date, effective time and id.
+A row whose category maps to no known team, an unreadable date or time, an over-long text or PII-like text stops the
+run (exit 2): nothing is written. The checks mirror calendar-mirror.ts validateMirror, so the app never refuses a copy
+this script produced.
 No personal data: the master sheet has teams, venues and statuses only; the text checks below refuse e-mails, phones
 and fiscal codes anyway (same patterns as the app validator).
 """
@@ -66,27 +70,26 @@ CATEGORY_RULES: list[tuple[re.Pattern, str | None]] = [
 ]
 
 EXCLUDED_STATUS = {"WITHDRAWN", "REST", "REJECTED"}
+WITHDRAWN_RX = re.compile(r"RITIRAT|ANNULLAT|CANCEL|WITHDRAWN", re.I)  # same words the app validator refuses
 
-# Hand corrections of the 09-10/10 copy (source hierarchy): kept until the master carries the same value.
+# Hand corrections of the 09-10/10 copy (source hierarchy). "master" = the master value the correction overrides: the
+# correction applies only while the master still says exactly that.
 OVERRIDES: dict[str, dict] = {
     "EVT-U19E-5A-MEDA1913-FUORI": {
-        "time": "14:30",
-        "end": "",
-        "notice": [
-            "Orario ufficiale FIGC/LND: 14:30, C.U. CRL n.28 del 24/09/2026, confermato nel programma gare CRL 09-12/10 pubblicato il 09/10/2026."
-        ],
-    },
-    "EVT-ES-20261011-PENTAPIATEDA-CASA": {
-        "time": "15:00",
-        "end": "",
-        "notice": [
-            "Orario approvato SCD: 15:00, ultimo Master Calendario Gare societario aggiornato il 09/10/2026. Amichevole organizzata dalla società, non comunicato FIGC."
-        ],
+        "master": {"time": "17:00"},
+        "set": {
+            "time": "14:30",
+            "end": "",
+            "notice": [
+                "Orario ufficiale FIGC/LND: 14:30, C.U. CRL n.28 del 24/09/2026, confermato nel programma gare CRL 09-12/10 pubblicato il 09/10/2026."
+            ],
+        },
     },
 }
 
 BAD_TEXT = [
     re.compile(r"</?[a-z!]", re.I),
+    re.compile("[\u0000-\u0008\u000b-\u001f\u007f-\u009f\u200b-\u200f\u202a-\u202e\u2066-\u2069]"),
     re.compile(r"[^\s@]+@[^\s@]+\.[a-z]{2,}", re.I),
     re.compile(r"(\+39|0039)\s?\d"),
     re.compile(r"(?<!\d)3\d{2}[\s.-]?\d{6,7}(?!\d)"),
@@ -103,7 +106,9 @@ class Stop(Exception):
 def text(v, limit: int = 500) -> str:
     if v is None:
         return ""
-    s = re.sub(r"\s+", " ", str(v)).strip()[:limit]
+    s = re.sub(r"[ \t\r\n]+", " ", str(v)).strip()
+    if len(s) > limit:
+        raise Stop(f"testo troppo lungo ({len(s)} > {limit}): {s[:40]}…")
     for r in BAD_TEXT:
         if r.search(s):
             raise Stop(f"testo non ammesso nel master: {s[:40]}…")
@@ -120,7 +125,10 @@ def iso_date(v) -> str:
     if m:
         return dt.date(int(m[3]), int(m[2]), int(m[1])).isoformat()
     if re.match(r"^\d{4}-\d{2}-\d{2}", s):
-        return s[:10]
+        try:
+            return dt.date.fromisoformat(s[:10]).isoformat()
+        except ValueError:
+            pass
     raise Stop(f"data non leggibile: {s!r}")
 
 
@@ -130,9 +138,9 @@ def hhmm(v) -> str:
     if isinstance(v, (dt.time, dt.datetime)):
         return v.strftime("%H:%M")
     s = text(v, 10)
-    m = re.match(r"^(\d{1,2})[:.](\d{2})", s)
+    m = re.match(r"^(\d{1,2})[:.](\d{2})(:\d{2})?$", s)
     if not m or int(m[1]) > 23 or int(m[2]) > 59:
-        return ""
+        raise Stop(f"ora non leggibile: {s!r}")
     return f"{int(m[1]):02d}:{m[2]}"
 
 
@@ -144,7 +152,8 @@ def group_of(category: str) -> str | None:
 
 
 def published(row: dict) -> bool:
-    if (row.get("MATCH_STATUS") or "") in EXCLUDED_STATUS:
+    status = row.get("MATCH_STATUS") or ""
+    if status in EXCLUDED_STATUS or WITHDRAWN_RX.search(str(status)):
         return False
     if (row.get("TYPE") or "").upper() == "RIPOSO":
         return False
@@ -197,8 +206,12 @@ def event_of(row: dict) -> dict | None:
             "facility_review_required": (row.get("CONFLICT_STATUS") or "NONE") != "NONE",
         },
     }
-    if eid in OVERRIDES:
-        e.update(OVERRIDES[eid])
+    fix = OVERRIDES.get(eid)
+    if fix:
+        if all(e.get(k) == v for k, v in fix["master"].items()):
+            e.update(fix["set"])
+        else:
+            print(f"AVVISO: correzione manuale di {eid} non applicata, il master è cambiato: vale il master", file=sys.stderr)
     return e
 
 
@@ -274,7 +287,19 @@ def self_test() -> None:
     assert event_of({**base, "CATEGORY": "Pulcini misti 7v7"})["group"] == "pulcini"
     o = event_of({**base, "EVENT_ID": "EVT-U19E-5A-MEDA1913-FUORI", "CATEGORY": "Juniores U19 Élite", "TIME": dt.time(17, 0)})
     assert o["time"] == "14:30" and o["end"] == "" and o["notice"][0].startswith("Orario ufficiale FIGC/LND")
-    for bad in ({**base, "CATEGORY": "Calcio a 5"}, {**base, "VENUE": "chiamare 333 1234567"}, {**base, "HOME_AWAY": "?"}):
+    n = event_of({**base, "EVENT_ID": "EVT-U19E-5A-MEDA1913-FUORI", "CATEGORY": "Juniores U19 Élite", "TIME": dt.time(16, 0)})
+    assert n["time"] == "16:00" and n["notice"] == []  # newer master value wins over a stale correction
+    for st in ("ANNULLATA", "CANCELLED", "RITIRATA"):
+        assert event_of({**base, "MATCH_STATUS": st}) is None
+    for bad in (
+        {**base, "CATEGORY": "Calcio a 5"},
+        {**base, "VENUE": "chiamare 333 1234567"},
+        {**base, "HOME_AWAY": "?"},
+        {**base, "TIME": "15,30"},
+        {**base, "DATE": "2026-13-45"},
+        {**base, "VENUE": "x" * 501},
+        {**base, "OPPONENT_EVENT": "Squadra\u200b"},
+    ):
         try:
             event_of(bad)
             raise AssertionError("doveva fermarsi")

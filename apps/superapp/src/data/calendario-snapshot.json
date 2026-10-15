@@ -741,8 +741,8 @@
   {
    "id": "EVT-ES-20261011-PENTAPIATEDA-CASA",
    "date": "2026-10-11",
-   "time": "15:00",
-   "end": "",
+   "time": "14:30",
+   "end": "17:15",
    "category": "Esordienti 11 anni (2015)",
    "group": "2015",
    "type": "AMICHEVOLE",
@@ -751,9 +751,7 @@
    "opponent": "PENTA PIATEDA",
    "round": "",
    "source": "SCD",
-   "notice": [
-    "Orario approvato SCD: 15:00, ultimo Master Calendario Gare societario aggiornato il 09/10/2026. Amichevole organizzata dalla società, non comunicato FIGC."
-   ],
+   "notice": [],
    "match_status": "CLUB_EVENT",
    "is_variation": true,
    "verification": {
