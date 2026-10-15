@@ -645,3 +645,7 @@ Da decidere (Direzione): applicazione di r110 dopo DPIA e testo di presa visione
 - Guida "Come funziona l'app" (`/guida`): già con indice per ruolo e passi numerati (stile Aranzulla) → KEEP; da aggiornare il testo sull'accesso quando la chat PC chiude il login con password.
 - **Azione A1/C11 — Prossimo appuntamento e LIVE**: striscia sottile sotto la testata delle pagine pubbliche (non su home e calendario, che lo mostrano già) con "tra 3g 3h · Avversario – ColicoDerviese Prima" oppure "In campo ora" in rosso durante una gara; badge LIVE sul tab Calendario della barra del telefono. Dati dal calendario pubblico già in cache (`lib/club-pulse.ts` + test, `club-pulse.functions.ts`, una sola query condivisa aggiornata ogni 2 minuti).
 - Revisione striscia (PASS con note): spazio riservato mentre arriva la risposta (niente salto), orologio del telefono corretto con quello del server, "Prossima gara:" per chi usa lo screen reader, badge LIVE a 10 px.
+
+## 15/10/2026 · Storia calciatori FIGC (chat PC, ramo feat/pc-figc-storia)
+
+- **Storia calciatori FIGC**: pagina `/segreteria/storia` riservata a Direzione/Segreteria (chi resta, chi torna, chi arriva, chi non è tornato, stagione per stagione); importazione dal file esportato dal portale FIGC/LND con il segnalibro della Segreteria (solo anno di nascita, mai codice fiscale; file con data di nascita completa rifiutato); migrazione r131 in attesa di "applica r131". Motori: PERSONE (quota rientri, lista recupero per anno) e TEMPO (minuti di segreteria per aggiornamento). Direttiva UD-150.

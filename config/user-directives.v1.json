@@ -3307,6 +3307,37 @@
           "apps/superapp/src/components/scd/NextUpBar.tsx"
         ]
       }
+    },
+    {
+      "sourceDate": "2026-10-15",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-150",
+      "name": "FIGC_PLAYER_HISTORY_ALWAYS_AVAILABLE_IN_SUPER_APP",
+      "sourceQuoteFragments": [
+        "voglio anche capire se possibile per creare la storia dei calciatori della societa e avere una situazione di come è andata ae come va chi vieni , chi torna capire se nel portale si possono recuperare info ultimi 3 anni di storia scd colicoderviese e anche nel rusd di contratti e altro",
+        "contina e rendilo disponibile sempre in super app"
+      ],
+      "context": "Francesco 15/10/2026 (chat PC) after the FIGC/LND portal reconciliation: who stays, who comes back, who arrives and who did not come back, season by season, from the portal tabulati and 'Storico calciatore'; then asked to continue and keep it always available in the Super App.",
+      "normalizedCommand": {
+        "rule": "The player history of the club (last seasons from the FIGC/LND portal: confirmed, returned, new from other clubs, first registrations, departures with release code) is a permanent page of the Super App, /segreteria/storia, reserved to Direzione and Segreteria (work area persone). Data enter only through the file exported by the Segreteria from its own portal session (same-origin bookmarklet, no credentials in the app, no fiscal code, birth year only, names shown as 'Nome C.'), validated client and server side and written by the audited r131 function. RASD contract data: not yet covered, to be studied separately. Unknown stays null, never 0.",
+        "scope": "SECRETARIAT_PERSONE",
+        "engines": "PERSONE (share of previous-season players back, recovery list by birth year), TEMPO (minutes of Segreteria per update instead of manual portal reconciliation)",
+        "status": "IMPLEMENTED_ON_BRANCH_MIGRATION_PENDING",
+        "constraints": [
+          "migration r131 is staged on the branch and applied only after an explicit 'applica r131' from the Direzione",
+          "export file version 2 carries birth_year only; files with birth_date are refused by the parser and by the database function",
+          "when the bookmarklet cannot read the season from the portal page it asks the person to confirm the fallback season and stops on Annulla"
+        ],
+        "implementation": {
+          "pure_logic": "apps/superapp/src/lib/figc-history.ts",
+          "export_script": "apps/superapp/src/lib/figc-export-script.ts",
+          "server": "apps/superapp/src/lib/figc-history.functions.ts",
+          "routes": "/segreteria/storia (link 'Storia' in the Segreteria Tesseramenti card)",
+          "migration": "supabase/migrations/20261015_r131_figc_player_history.sql (STAGED, NOT APPLIED)",
+          "manifest_source": "FIGC_STORICO_CALCIATORI"
+        }
+      }
     }
   ],
   "completionGate": {

@@ -7,8 +7,11 @@
  * What it does, step by step:
  *  1. refuses to run outside iscrizioni.lnd.it;
  *  2. reads the "Tabulato" rows of the page the person is on (FIGC number, "COGNOME NOME",
- *     birth date, sector D/S), clicking the portal's own "#next-page" button to read every page;
- *     the fiscal-code cell is never read (the script picks only the cells it needs);
+ *     birth YEAR taken from the date cell, sector D/S), clicking the portal's own "#next-page"
+ *     button to read every page; the fiscal-code cell is never read and the full birth date is
+ *     never written (the script picks only the cells it needs and keeps only the year);
+ *     the season is read from the page; when it cannot be read, the person is asked to confirm
+ *     the current season (Annulla stops the script);
  *  3. for every FIGC number asks the portal's own page
  *     /InterrogazioneCalciatori/VisualizzaStorico?matricola=N (same origin, one request every
  *     250 ms) and keeps season, movement, club, status, date and the release note;
@@ -27,7 +30,8 @@
 export const FIGC_EXPORT_SOURCE = String.raw`(async function () {
   var HOST = "iscrizioni.lnd.it";
   var CLUB_CODE = "26020";
-  var KEY = "scd-figc-export-v1";
+  var KEY = "scd-figc-export-v2";
+  var VERSION = 2;
   var STORICO = "/InterrogazioneCalciatori/VisualizzaStorico?matricola=";
   if (location.hostname !== HOST) {
     alert("Apri prima il portale " + HOST + " con l'utente della società, poi clicca di nuovo.");
@@ -49,18 +53,22 @@ export const FIGC_EXPORT_SOURCE = String.raw`(async function () {
       var s = txt(opts[o]).match(/(?:^|\D)(20\d{2})\s*\/\s*(20\d{2})(?!\d)/);
       if (s && Number(s[2]) === Number(s[1]) + 1) return s[1] + "/" + s[2];
     }
-    var m =(document.body.innerText || document.body.textContent || "").match(/(?:^|\D)(20\d{2})\s*\/\s*(20\d{2})(?!\d)/);
+    var m = (document.body.innerText || document.body.textContent || "").match(/(?:^|\D)(20\d{2})\s*\/\s*(20\d{2})(?!\d)/);
     if (m && Number(m[2]) === Number(m[1]) + 1) return m[1] + "/" + m[2];
-    return seasonNow();
+    return null;
   }
+  function birthYear(dmy) {
+    var y = Number(dmy.slice(6, 10));
+    return y >= 1900 && y <= 2100 ? y : null;
+  }
+  var state = { kind: "scd-figc-export", version: VERSION, club_code: CLUB_CODE, season: seasonNow(), read_at: "", roster: [], career: [], done: [] };
+  try { var saved = JSON.parse(sessionStorage.getItem(KEY) || "null"); if (saved && saved.kind === "scd-figc-export" && saved.version === VERSION) state = saved; } catch (e) {}
   function pageSector() {
     var t = ((document.title || "") + " " + location.pathname + " " + txt(document.querySelector("h1, h2, h3, .page-title"))).toLowerCase();
     if (/sgs|giovanil/.test(t)) return "S";
     if (/dilettant/.test(t)) return "D";
     return null;
   }
-  var state = { kind: "scd-figc-export", version: 1, club_code: CLUB_CODE, season: seasonNow(), read_at: "", roster: [], career: [], done: [] };
-  try { var saved = JSON.parse(sessionStorage.getItem(KEY) || "null"); if (saved && saved.kind === "scd-figc-export") state = saved; } catch (e) {}
 
   function readTabulato(season, fallbackSector) {
     var out = [];
@@ -76,7 +84,7 @@ export const FIGC_EXPORT_SOURCE = String.raw`(async function () {
         if (!sector && (c === "D" || c === "S")) { sector = c; continue; }
         if (!name && /^[A-ZÀ-ÖØ-Ý' .-]{3,}$/.test(c) && c.indexOf(" ") > 0) { name = c; continue; }
       }
-      if (mat && name) out.push({ matricola: mat, name: name, birth_date: birth || "", sector: sector || fallbackSector, season: season });
+      if (mat && name) out.push({ matricola: mat, name: name, birth_year: birth ? birthYear(birth) : null, sector: sector || fallbackSector, season: season });
     }
     return out;
   }
@@ -115,7 +123,7 @@ export const FIGC_EXPORT_SOURCE = String.raw`(async function () {
     return out;
   }
   function download() {
-    var data = { kind: state.kind, version: 1, club_code: CLUB_CODE, season: state.season, read_at: new Date().toISOString(), roster: state.roster, career: state.career };
+    var data = { kind: state.kind, version: VERSION, club_code: CLUB_CODE, season: state.season, read_at: new Date().toISOString(), roster: state.roster, career: state.career };
     var blob = new Blob([JSON.stringify(data, null, 1)], { type: "application/json" });
     var a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
@@ -125,6 +133,11 @@ export const FIGC_EXPORT_SOURCE = String.raw`(async function () {
   }
 
   var season = pageSeason();
+  if (!season) {
+    var fallback = seasonNow();
+    if (!confirm("Non riesco a leggere la stagione da questa pagina.\nUso la stagione " + fallback + "?\n\nOK = sì, continua con " + fallback + ".\nAnnulla = fermati (apri il tabulato con la stagione visibile e riprova).")) return;
+    season = fallback;
+  }
   var sector = pageSector();
   var page = readTabulato(season, sector || "D");
   if (page.length === 0) {

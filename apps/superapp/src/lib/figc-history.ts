@@ -10,9 +10,10 @@
  * `scd_figc_roster` / `scd_figc_career`; `computeHistory` builds every view of /segreteria/storia
  * from the rows read back from the database.
  *
- * Minimisation: only the birth YEAR leaves this module (the birth date of the file is dropped),
- * fiscal codes are rejected at the schema, and every name shown is "Nome C." (first name + surname
- * initial). Unknown stays null ("—"), never 0.
+ * Minimisation: the export file itself carries only the birth YEAR (the script keeps the year of
+ * the portal's date cell and drops day and month before writing the file); a file with
+ * `birth_date` or a fiscal code is refused at the schema, and every name shown is "Nome C."
+ * (first name + surname initial). Unknown stays null ("—"), never 0.
  *
  * Name split: the portal writes "COGNOME NOME" without a separator, so a compound surname or a
  * double first name cannot be told apart. Rule: last_name = every token but the last, first_name =
@@ -78,12 +79,17 @@ const DMY_RE = /^(\d{2})\/(\d{2})\/(\d{4})$/;
 const seasonSchema = z.string().refine(isSeason, "stagione non valida (es. 2025/2026)");
 const matricolaSchema = z.string().regex(/^\d{5,8}$/, "matricola FIGC non valida");
 const dmyOrEmpty = z.union([z.string().regex(DMY_RE), z.literal(""), z.null()]);
+/** Birth year only (integer 1900–2100) or null when the portal cell could not be read. */
+const birthYearSchema = z.union([z.number().int().min(1900).max(2100), z.null()]);
+
+/** Version of the export file written by figc-export-script.ts and accepted by `parseExportFile`. */
+export const EXPORT_FILE_VERSION = 2;
 
 export const exportRosterSchema = z
   .object({
     matricola: matricolaSchema,
     name: z.string().trim().min(2).max(120),
-    birth_date: dmyOrEmpty,
+    birth_year: birthYearSchema,
     sector: z.enum(["D", "S"]),
     season: seasonSchema,
   })
@@ -101,11 +107,14 @@ export const exportCareerSchema = z
   })
   .strict();
 
-/** The JSON file produced by the portal export script (version 1). Unknown keys are refused (no fiscal code can slip in). */
+/**
+ * The JSON file produced by the portal export script (version 2: birth year only). Unknown keys
+ * are refused, so neither a fiscal code nor a `birth_date` (version 1 files) can slip in.
+ */
 export const exportFileSchema = z
   .object({
     kind: z.literal("scd-figc-export"),
-    version: z.literal(1),
+    version: z.literal(EXPORT_FILE_VERSION),
     club_code: z.string().regex(/^\d{1,10}$/),
     season: seasonSchema,
     read_at: z.string().datetime({ offset: true }),
@@ -232,6 +241,13 @@ export function movementLabel(code: string, portalLabel: string): string {
   return MOVEMENT_LABEL[code] ?? code;
 }
 
+/** True when the raw file carries a full birth date anywhere in its roster (old version 1 files). */
+export function carriesBirthDate(raw: unknown): boolean {
+  if (!raw || typeof raw !== "object") return false;
+  const roster = (raw as { roster?: unknown }).roster;
+  return Array.isArray(roster) && roster.some((r) => Boolean(r) && typeof r === "object" && "birth_date" in (r as object));
+}
+
 const careerKey = (c: Pick<CareerRow, "matricola" | "season" | "club_code" | "movement_code" | "event_date">) =>
   `${c.matricola}|${c.season}|${c.club_code}|${c.movement_code}|${c.event_date ?? ""}`;
 
@@ -247,6 +263,9 @@ export function parseExportFile(text: string, ownClubCode: string = OWN_CLUB_COD
     raw = JSON.parse(text);
   } catch {
     return { ok: false, error: "Il file non è un JSON valido." };
+  }
+  if (carriesBirthDate(raw)) {
+    return { ok: false, error: "Il file contiene la data di nascita completa: rifai l'esportazione con il segnalibro aggiornato, che salva solo l'anno di nascita." };
   }
   const parsed = exportFileSchema.safeParse(raw);
   if (!parsed.success) {
@@ -271,7 +290,7 @@ export function parseExportFile(text: string, ownClubCode: string = OWN_CLUB_COD
       sector: r.sector,
       last_name: lastName.slice(0, 80),
       first_name: firstName.slice(0, 80),
-      birth_year: birthYearOf(r.birth_date),
+      birth_year: r.birth_year,
     });
   }
 

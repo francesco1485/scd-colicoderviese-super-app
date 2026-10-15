@@ -4,8 +4,10 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  EXPORT_FILE_VERSION,
   OWN_CLUB_CODE,
   birthYearOf,
+  carriesBirthDate,
   computeHistory,
   dmyToIso,
   filterDepartures,
@@ -33,13 +35,13 @@ const OWN = `${OWN_CLUB_CODE} S.D.C. CLUB DI PROVA`;
 function file(over: Record<string, unknown> = {}) {
   return {
     kind: "scd-figc-export",
-    version: 1,
+    version: EXPORT_FILE_VERSION,
     club_code: OWN_CLUB_CODE,
     season: "2026/2027",
     read_at: "2026-10-15T09:30:00.000Z",
     roster: [
-      { matricola: "1000001", name: "ATLETA UNO", birth_date: "05/03/2012", sector: "S", season: "2026/2027" },
-      { matricola: "1000002", name: "ATLETA DOPPIO DUE", birth_date: "", sector: "D", season: "2026/2027" },
+      { matricola: "1000001", name: "ATLETA UNO", birth_year: 2012, sector: "S", season: "2026/2027" },
+      { matricola: "1000002", name: "ATLETA DOPPIO DUE", birth_year: null, sector: "D", season: "2026/2027" },
     ],
     career: [
       { matricola: "1000001", season: "2025/2026", movement: "AG AGGIORNAMENTO DI POSIZIONE", club: OWN, status: "3 DILETTANTE", date: "01/09/2025", note: "Svincolo : *X TERMINE AUTOMATICO tess. giov. del: 01/07/2026" },
@@ -127,22 +129,44 @@ describe("parseExportFile", () => {
     });
     expect(r.data.career[1]).toMatchObject({ is_own_club: false, event_date: null, status_code: null });
     expect(r.data.players).toBe(2);
-    // Minimisation: no birth date, no day/month, anywhere in the rows.
+    // Minimisation: no birth date anywhere in the rows, only the year.
     const out = JSON.stringify(r.data);
-    expect(out).not.toContain("05/03/2012");
-    expect(out).not.toContain("2012-03-05");
     expect(out).not.toMatch(/birth_date/);
+    expect(out).toContain('"birth_year":2012');
   });
 
   it("refuses invalid files", () => {
     expect(parseExportFile("not json")).toEqual({ ok: false, error: "Il file non è un JSON valido." });
     expect(parseExportFile(JSON.stringify(file({ kind: "other" }))).ok).toBe(false);
-    expect(parseExportFile(JSON.stringify(file({ version: 2 }))).ok).toBe(false);
+    expect(EXPORT_FILE_VERSION).toBe(2);
+    expect(parseExportFile(JSON.stringify(file({ version: 1 }))).ok).toBe(false);
+    expect(parseExportFile(JSON.stringify(file({ version: 3 }))).ok).toBe(false);
+    const badYear = file();
+    (badYear.roster as Array<Record<string, unknown>>)[0]!["birth_year"] = "2012";
+    expect(parseExportFile(JSON.stringify(badYear)).ok).toBe(false);
+    (badYear.roster as Array<Record<string, unknown>>)[0]!["birth_year"] = 2012.5;
+    expect(parseExportFile(JSON.stringify(badYear)).ok).toBe(false);
+    (badYear.roster as Array<Record<string, unknown>>)[0]!["birth_year"] = 1850;
+    expect(parseExportFile(JSON.stringify(badYear)).ok).toBe(false);
     expect(parseExportFile(JSON.stringify(file({ season: "2026/2028" }))).ok).toBe(false);
     expect(parseExportFile(JSON.stringify(file({ read_at: "ieri" }))).ok).toBe(false);
     const badMat = file();
     (badMat.roster as Array<Record<string, unknown>>)[0]!["matricola"] = "12";
     expect(parseExportFile(JSON.stringify(badMat)).ok).toBe(false);
+  });
+
+  it("refuses a file carrying a full birth date (version 1 files), with a plain message", () => {
+    const withDate = file();
+    (withDate.roster as Array<Record<string, unknown>>)[0]!["birth_date"] = "05/03/2012";
+    expect(carriesBirthDate(withDate)).toBe(true);
+    expect(carriesBirthDate(file())).toBe(false);
+    const r = parseExportFile(JSON.stringify(withDate));
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(r.error).toMatch(/data di nascita completa/);
+    // Even with birth_year present, an extra birth_date is refused.
+    const both = file();
+    (both.roster as Array<Record<string, unknown>>)[1]!["birth_date"] = "";
+    expect(parseExportFile(JSON.stringify(both)).ok).toBe(false);
   });
 
   it("refuses a file carrying a fiscal code or any unknown field", () => {

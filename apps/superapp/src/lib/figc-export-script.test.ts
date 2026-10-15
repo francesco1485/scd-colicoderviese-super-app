@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { FIGC_EXPORT_BOOKMARKLET, FIGC_EXPORT_SOURCE, FIGC_PORTAL_HOST, FIGC_STORICO_ENDPOINT } from "./figc-export-script";
-import { OWN_CLUB_CODE, exportCareerSchema, exportFileSchema, exportRosterSchema } from "./figc-history";
+import { EXPORT_FILE_VERSION, OWN_CLUB_CODE, exportCareerSchema, exportFileSchema, exportRosterSchema } from "./figc-history";
 
 describe("FIGC portal export script", () => {
   it("is valid JavaScript (compiles without running)", () => {
@@ -37,6 +37,17 @@ describe("FIGC portal export script", () => {
     expect(FIGC_EXPORT_SOURCE).not.toMatch(/fiscal|codice_fiscale|codiceFiscale|\bcf\s*:/i);
   });
 
+  it("writes the birth year only, never the full birth date", () => {
+    expect(FIGC_EXPORT_SOURCE).not.toMatch(/birth_date/);
+    expect(FIGC_EXPORT_SOURCE).toContain("birth_year: birth ? birthYear(birth) : null");
+    expect(FIGC_EXPORT_SOURCE).toContain("var y = Number(dmy.slice(6, 10));");
+  });
+
+  it("asks before using the fallback season and stops on Annulla", () => {
+    expect(FIGC_EXPORT_SOURCE).toContain("return null;\n  }\n  function birthYear");
+    expect(FIGC_EXPORT_SOURCE).toMatch(/if \(!season\) \{\s*var fallback = seasonNow\(\);\s*if \(!confirm\("Non riesco a leggere la stagione[^\n]*\)\) return;\s*season = fallback;/);
+  });
+
   it("writes exactly the fields of the export schema", () => {
     const keysOf = (re: RegExp) => {
       const m = re.exec(FIGC_EXPORT_SOURCE);
@@ -46,7 +57,9 @@ describe("FIGC portal export script", () => {
     expect(keysOf(/out\.push\(\{ (matricola: mat, name[^}]*)\}/)).toEqual(Object.keys(exportRosterSchema.shape).sort());
     expect(keysOf(/out\.push\(\{ (matricola: mat, season[^}]*)\}/)).toEqual(Object.keys(exportCareerSchema.shape).sort());
     expect(keysOf(/var data = \{ ([^}]*)\}/)).toEqual(Object.keys(exportFileSchema.shape).sort());
-    expect(FIGC_EXPORT_SOURCE).toContain('kind: "scd-figc-export", version: 1');
+    expect(FIGC_EXPORT_SOURCE).toContain(`var VERSION = ${EXPORT_FILE_VERSION};`);
+    expect(FIGC_EXPORT_SOURCE).toContain('kind: "scd-figc-export", version: VERSION');
+    expect(FIGC_EXPORT_SOURCE).toContain("version: VERSION, club_code: CLUB_CODE");
     expect(FIGC_EXPORT_SOURCE).toContain('"scd-figc-storico-" + new Date().toISOString().slice(0, 10) + ".json"');
   });
 });

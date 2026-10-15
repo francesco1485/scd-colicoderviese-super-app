@@ -7,7 +7,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Check, ChevronDown, ClipboardCopy, Search, Upload } from "lucide-react";
-import { useId, useMemo, useState, type ChangeEvent } from "react";
+import { useEffect, useId, useMemo, useRef, useState, type ChangeEvent } from "react";
 
 import { Card, Chip, type ChipTone } from "@/components/scd/interior-ui";
 import { EmptyState, SourcesBox, WorkAreaGateView, WorkAreaShell, workAreaHead } from "@/components/scd/work-area-ui";
@@ -74,6 +74,7 @@ const inputCls = "h-11 w-full bg-transparent text-[15px] outline-none";
 
 function StoriaPage({ initial, preview }: { initial: FigcHistoryData; preview: boolean }) {
   const [data, setData] = useState(initial);
+  const [refreshError, setRefreshError] = useState<string | null>(null);
   const reload = useServerFn(getFigcHistory);
   const v = data.view;
   const cur = v?.current ? v.table.find((t) => t.season === v.current) ?? null : null;
@@ -82,8 +83,10 @@ function StoriaPage({ initial, preview }: { initial: FigcHistoryData; preview: b
   async function refresh() {
     try {
       setData(await reload());
+      setRefreshError(null);
     } catch {
-      /* keep the current view */
+      // Keep the current view and say it plainly.
+      setRefreshError("Non sono riuscito ad aggiornare la pagina, riprova.");
     }
   }
 
@@ -111,6 +114,11 @@ function StoriaPage({ initial, preview }: { initial: FigcHistoryData; preview: b
     >
       <div className="grid grid-cols-1 gap-[18px] lg:grid-cols-[minmax(0,1fr)_360px]" data-testid="storia-page">
         <div className="flex min-w-0 flex-col gap-[18px]">
+          {refreshError && (
+            <p className="m-0 text-[14px] font-semibold text-[var(--in-crit)]" role="alert">
+              {refreshError}
+            </p>
+          )}
           {!data.connected ? (
             <Card title="Storia dei calciatori">
               <div className={pad}>
@@ -519,11 +527,19 @@ function ImportPanel({ ready, onDone }: { ready: boolean; onDone: () => Promise<
 function HowTo() {
   const [copied, setCopied] = useState(false);
   const areaId = useId();
+  const copiedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(
+    () => () => {
+      if (copiedTimer.current) clearTimeout(copiedTimer.current);
+    },
+    [],
+  );
   async function copy() {
     try {
       await navigator.clipboard.writeText(FIGC_EXPORT_BOOKMARKLET);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2500);
+      if (copiedTimer.current) clearTimeout(copiedTimer.current);
+      copiedTimer.current = setTimeout(() => setCopied(false), 2500);
     } catch {
       setCopied(false);
     }
