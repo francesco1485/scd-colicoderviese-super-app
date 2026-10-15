@@ -549,9 +549,10 @@ UD-132 (Francesco 14/10 23:20: spingere ragazzi e famiglie a vivere l'app; «la 
 ## B3 — Prima schermata più stabile e più leggera (home, /sponsor) · 2026-10-15
 
 Backlog cloud B3 (prestazioni e prima schermata). Motore: PERSONE (la home si apre senza salti e con meno dati sul telefono) e SOLDI (/sponsor mostra prima il ledwall ai partner). Numeri prima/dopo in `docs/LAUNCH_QUALITY.md` → B3.
-- **Niente più salti mentre arrivano i caratteri**: `src/font-fallbacks.css` (generato da `scripts/derive-font-fallbacks.py` dai file ufficiali) dà a ogni famiglia e peso un carattere di riserva locale con le stesse misure; i titoli in maiuscolo usano facce misurate sulle maiuscole. CLS home mobile **0.120 → 0.000**; risolto anche l'aperto di L1 su /calendario (0.092 → 0.000) e /squadre (0.062 → 0.002).
+- **Niente più salti mentre arrivano i caratteri**: `src/font-fallbacks.css` (generato da `scripts/derive-font-fallbacks.py` dai file ufficiali) dà a ogni famiglia e peso un carattere di riserva locale con le stesse misure; i titoli `font-uv` in maiuscolo usano facce misurate sulle maiuscole. CLS home mobile **0.120 → 0.000**; risolto anche l'aperto di L1 su /calendario (0.092 → 0.000) e /squadre (0.062 → 0.002).
 - **Marchi FIGC SGS, LND, Insieme al Monza** serviti in resa 96 px senza perdita (`cut/<id>-h96.webp`, registrati): ~240 KB → ~60 KB su ogni pagina (testata).
-- **Fermo immagine del ledwall** in 640/960 px per i telefoni; su /sponsor caricato subito con priorità alta: LCP ~9,8 s → ~6,0 s.
+- **Fermo immagine del ledwall** in 640/960 px per i telefoni a bassa densità; su /sponsor caricato subito con priorità alta: LCP ~9,8 s → ~6,0 s.
 - Peso prima visita: home 1789 → 1483 KiB, /sponsor 1486 → 1175 KiB. Asset ufficiali invariati (hash), locandine degli spot non toccate.
 - Aperto: alla prima visita l'LCP della home è ora l'avviso cookie, che compare dopo l'idratazione (~10 s nella simulazione lenta); si sposterebbe disegnandolo dal server con il cookie tecnico della scelta (area consenso: da decidere). Stemmi avversari ancora 50–73 KB per uno stemma da 20 px (prossimo passo, stesso metodo).
+- Revisione: scd-revisore PASS (corretti: regola `.uppercase` limitata a `--font-uv`, testi più precisi su densità schermo e Roboto), scd-sicurezza PASS.
 - Test: `font-fallbacks.test.ts` (5), resa 96 px in `club-credentials.test.tsx`, srcset e priorità in `LedwallRotator.test.tsx`.

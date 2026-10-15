@@ -364,12 +364,10 @@ main.bg-\[var\(--scd-page\)\] {
   --font-uv-script: "Kaushan Script", cursive;
 }
 @utility font-uv { font-family: var(--font-uv); font-weight: 900; letter-spacing: 0; }
-/* B3 (2026-10-15): uppercase display titles fall back on faces measured on capitals, so a title that fits one line
+/* B3 (2026-10-15): uppercase `font-uv` titles (font-uv + uppercase classes) fall back on faces measured on capitals, so a title that fits one line
  * in the official font also fits while the font downloads (no re-wrap jump). See scripts/derive-font-fallbacks.py. */
 .uppercase {
   --font-uv: "Big Shoulders Display", "Big Shoulders Display Caps Fallback", "Anton", Impact, sans-serif;
-  --font-brand: "Anton", "Anton Caps Fallback", "Fira Sans Condensed", Impact, sans-serif;
-  --font-title: "Big Shoulders Display", "Big Shoulders Display Caps Fallback", "Barlow Condensed", "Barlow", sans-serif;
 }
 @utility font-uv-script { font-family: var(--font-uv-script); font-weight: 400; }
 .uv-page {

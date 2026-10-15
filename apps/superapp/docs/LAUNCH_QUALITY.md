@@ -110,15 +110,20 @@ scelta (non toccato qui: area consenso, da decidere).
 1. **Caratteri di riserva con le stesse misure** (`src/font-fallbacks.css`, generato da
    `scripts/derive-font-fallbacks.py`): per ogni famiglia e peso ufficiale (Fira Sans, Fira Sans Condensed, Anton,
    Big Shoulders Display, Barlow) una faccia «<Famiglia> Fallback» su Arial/Liberation Sans/Helvetica/Roboto locali con
-   `size-adjust` e `ascent/descent/line-gap-override` calcolati dai file ufficiali. Per i titoli in maiuscolo
-   (`.uppercase`) Anton e Big Shoulders usano una faccia misurata sulle sole maiuscole. Mentre il carattere ufficiale
+   `size-adjust` e `ascent/descent/line-gap-override` calcolati dai file ufficiali. Per i titoli `font-uv` in
+   maiuscolo (classe `uppercase`, es. «Questa settimana») Big Shoulders usa una faccia misurata sulle sole maiuscole
+   (le facce «Caps» di Anton sono pronte ma non ancora collegate: `--font-brand`/`--font-title` sono incorporate da
+   Tailwind). Mentre il carattere ufficiale
    arriva le righe non cambiano più: CLS home 0.120 → 0.000, risolto anche l'aperto di L1 su `/calendario` e `/squadre`.
-   I file ufficiali sono solo letti; nessun carattere scaricato in più.
+   I file ufficiali sono solo letti; nessun carattere scaricato in più. Il CLS 0 è misurato in laboratorio con Liberation
+   Sans (stesse misure di Arial/Helvetica); su Android il ripiego è Roboto, un po' diverso: stabilità buona, non per
+   forza zero.
 2. **Marchi FIGC SGS, LND e Insieme al Monza in resa 96 px** (`/media/affiliazioni/cut/<id>-h96.webp`, WebP senza
    perdita con alfa, registrati con `derived_from`): si vedono al massimo a 34 px (testata di ogni pagina, fascia della
    home, piè di pagina). 183 + 40 + 20 KB → 33 + 18 + 9 KB **su ogni pagina**.
 3. **Fermo immagine del ledwall in 640 e 960 px** (`ledwall-board-empty-640/960.webp`, foto senza marchi, registrate):
-   un telefono scarica 37–85 KB invece di 216 KB. Su `/sponsor` è l'elemento più grande della prima schermata: ora si
+   un telefono a densità fino a ~1,8 (profilo Lighthouse) scarica 37–85 KB invece di 216 KB; a densità 2 resta il
+   1280w, a densità 3 il 1920w come prima (`sizes` 130vw da ripensare). Su `/sponsor` è l'elemento più grande della prima schermata: ora si
    carica subito e con priorità alta (`LedwallRotator priority`), LCP ~9,8 s → ~5,9 s.
 
 ### Non toccato (motivo)

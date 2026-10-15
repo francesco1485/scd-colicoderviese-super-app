@@ -60,12 +60,13 @@ describe("font fallbacks (B3 layout stability)", () => {
     }
   });
 
-  it("uppercase titles use the caps-measured faces of the display families", () => {
+  it("uppercase font-uv titles use the caps-measured faces", () => {
     const rule = /\.uppercase \{([^}]*)\}/.exec(styles)?.[1] ?? "";
     expect(rule).toContain(
       '"Big Shoulders Display", "Big Shoulders Display Caps Fallback"',
     );
-    expect(rule).toContain('"Anton", "Anton Caps Fallback"');
+    // --font-title/--font-brand are inlined by Tailwind @theme inline, so only --font-uv can be swapped here.
+    expect(rule).not.toMatch(/--font-(title|brand)/);
     for (const w of [700, 800, 900]) {
       const caps = faces.find(
         (f) =>
