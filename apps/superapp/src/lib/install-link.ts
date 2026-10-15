@@ -33,3 +33,13 @@ export function displayAddress(siteUrl?: string | null): string {
 export function installUrl(siteUrl?: string | null): string {
   return `${officialOrigin(siteUrl)}/installa`;
 }
+
+/**
+ * The secretariat's public WhatsApp (club public phone, already published as PUBLIC_CONTACTS.phone), answered 24/7 by
+ * the AI assistant of the Segreteria (UD-155). One place for the number: the vCard /iride.vcf and its test check it.
+ */
+export const SEGRETERIA_WHATSAPP = {
+  display: "+39 334 196 1321",
+  e164: "393341961321",
+  chatUrl: "https://wa.me/393341961321",
+} as const;

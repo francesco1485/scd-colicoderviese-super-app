@@ -4,7 +4,7 @@ import QRCode from "qrcode";
 import { useEffect, useState } from "react";
 
 import { InstallButton } from "@/components/scd/InstallButton";
-import { OFFICIAL_ADDRESS, displayAddress, installUrl } from "@/lib/install-link";
+import { OFFICIAL_ADDRESS, SEGRETERIA_WHATSAPP, displayAddress, installUrl } from "@/lib/install-link";
 
 /**
  * "Installa l'app": the one page to share everywhere (posters, WhatsApp groups, e-mails) until the
@@ -67,21 +67,21 @@ function Installa() {
         </div>
       </header>
 
-      <section aria-labelledby="iride-t" className="grid gap-4 rounded-2xl border border-border bg-card p-5 sm:grid-cols-[96px_minmax(0,1fr)] sm:items-center sm:p-6" data-testid="install-iride">
-        <img src="/media/cast/iride/iride-avatar-256.webp" alt="Iride, l'assistente AI della segreteria" width={96} height={96} className="size-24 rounded-full object-cover" loading="lazy" />
-        <div className="min-w-0">
-          <h2 id="iride-t" className="m-0 text-[22px] font-bold">Salva Iride, la segreteria 24/7</h2>
-          <p className="mt-1 text-[15px] leading-relaxed text-muted-foreground">
-            Iride è l'assistente AI della segreteria: su WhatsApp risponde a ogni ora su gare, iscrizioni e richieste. Numero <b className="select-all text-foreground">+39 334 196 1321</b>.
-          </p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <a href="/iride.vcf" download="Iride-Segreteria-ColicoDerviese.vcf" className="inline-flex h-11 items-center gap-2 rounded-[10px] bg-[var(--scd-blue)] px-4 text-[15px] font-semibold text-white" data-testid="iride-vcard">
-              <UserPlus className="size-4" aria-hidden="true" /> Salva il contatto
-            </a>
-            <a href="https://wa.me/393341961321?text=Ciao%20Iride!" target="_blank" rel="noopener noreferrer" className="inline-flex h-11 items-center gap-2 rounded-[10px] border border-border bg-white px-4 text-[15px] font-semibold" data-testid="iride-whatsapp">
-              <MessageCircle className="size-4" aria-hidden="true" /> Scrivi su WhatsApp
-            </a>
-          </div>
+      <section aria-labelledby="wa-t" className="rounded-2xl border border-border bg-card p-5 sm:p-6" data-testid="install-segreteria-wa">
+        <h2 id="wa-t" className="m-0 flex items-center gap-2 text-[22px] font-bold">
+          <MessageCircle className="size-5" aria-hidden="true" /> Salva il WhatsApp della segreteria
+        </h2>
+        <p className="mt-1 text-[15px] leading-relaxed text-muted-foreground">
+          Su WhatsApp risponde a ogni ora l'assistente AI della segreteria: gare, iscrizioni e richieste. Numero{" "}
+          <b className="select-all text-foreground">{SEGRETERIA_WHATSAPP.display}</b>.
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <a href="/iride.vcf" download="Segreteria-ColicoDerviese.vcf" className="inline-flex h-11 items-center gap-2 rounded-[10px] bg-[var(--scd-blue)] px-4 text-[15px] font-semibold text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" data-testid="segreteria-vcard">
+            <UserPlus className="size-4" aria-hidden="true" /> Salva il contatto
+          </a>
+          <a href={SEGRETERIA_WHATSAPP.chatUrl} target="_blank" rel="noopener noreferrer" className="inline-flex h-11 items-center gap-2 rounded-[10px] border border-border bg-white px-4 text-[15px] font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" data-testid="segreteria-whatsapp">
+            <MessageCircle className="size-4" aria-hidden="true" /> Scrivi su WhatsApp
+          </a>
         </div>
       </section>
 

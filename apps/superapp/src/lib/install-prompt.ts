@@ -31,6 +31,8 @@ export interface InstallEnv {
   userAgent: string;
   standalone: boolean;
   hasPrompt: boolean;
+  /** navigator.maxTouchPoints: tells iPadOS desktop-mode Safari from a Mac. */
+  maxTouchPoints?: number;
 }
 
 /** In-app browsers and non-Safari iOS browsers cannot add a web app to the Home Screen reliably. */
@@ -44,6 +46,9 @@ export function isIosSafari(ua: string): boolean {
 export function installMode(env: InstallEnv): InstallMode {
   if (env.standalone) return "installed";
   if (env.hasPrompt) return "one-tap";
+  // iPadOS Safari in desktop mode reports "Macintosh" without "Mobile/": a touch screen tells it apart from a Mac.
+  const ipadDesktop = /Macintosh/.test(env.userAgent) && (env.maxTouchPoints ?? 0) > 1;
+  if (ipadDesktop) return isIosSafari(env.userAgent.replace("Macintosh", "iPad")) ? "ios-steps" : "ios-open-safari";
   if (isIos(env.userAgent)) return isIosSafari(env.userAgent) ? "ios-steps" : "ios-open-safari";
   return "menu-steps";
 }
@@ -99,16 +104,17 @@ export function isStandalone(): boolean {
 export async function promptInstall(): Promise<"accepted" | "dismissed" | "unavailable"> {
   const ev = deferred;
   if (!ev) return "unavailable";
-  // The event can be used only once.
-  deferred = null;
-  emit();
   try {
     await ev.prompt();
     const choice = await ev.userChoice;
     if (choice.outcome === "accepted") installedNow = true;
-    emit();
     return choice.outcome;
-  } catch {
+  } catch (err) {
+    console.warn("[install] browser install dialog failed", err);
     return "unavailable";
+  } finally {
+    // The event can be used only once: drop it after the dialog closed, then refresh the buttons.
+    deferred = null;
+    emit();
   }
 }
