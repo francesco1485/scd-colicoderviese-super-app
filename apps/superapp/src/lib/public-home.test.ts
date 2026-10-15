@@ -20,7 +20,7 @@ import {
   vetrinaRepeats,
 } from "./public-home";
 import { quickActions } from "./home-actions";
-import { MENU_GROUPS, menuSections, searchMenu } from "./site-menu";
+import { MENU_GROUPS, isHiddenFromMenu, menuSections, searchMenu } from "./site-menu";
 import { SPONSORS } from "./sponsors";
 
 const APP = resolve(__dirname, "../..");
@@ -273,7 +273,7 @@ describe("public home v5", () => {
           `${item.to}#${item.hash ?? ""}?${new URLSearchParams(item.search ?? {}).toString()}`,
         ),
         item.label,
-      ).toBe(true);
+      ).toBe(item.publicMenu !== false);
     const routes = routePaths();
     for (const i of sections.flatMap((g) => g.items))
       expect(routes.has(i.to.replace(/\/$/, "") || "/"), i.to).toBe(true);
@@ -291,6 +291,57 @@ describe("public home v5", () => {
     const chrome = code("src/components/SiteChrome.tsx");
     expect(chrome).toMatch(/menuSections\(\)/);
     expect(chrome).toMatch(/searchMenu\(query, sections\)/);
+  });
+
+  it("cleanup 15/10/2026: no ONE/CORE/GROW badge, no build stamp in the footer copy; publicMenu: false keeps a page out of the menu (no page uses it today)", () => {
+    const sections = menuSections();
+    const labels = sections.flatMap((g) => g.items).map((i) => i.label);
+    // Every public page of the index is in the menu: the six "placeholder" candidates are real public pages.
+    for (const shown of [
+      "Fantacalcio SCD",
+      "Top 11 della settimana",
+      "Dicono di noi",
+      "Le card 2026/27",
+      "Kit ufficiale 2026/27",
+      "Richiedi una proposta",
+    ])
+      expect(labels, shown).toContain(shown);
+    expect(isHiddenFromMenu({ to: "/x", publicMenu: false })).toBe(true);
+    expect(isHiddenFromMenu({ to: "/x" })).toBe(false);
+    for (const kept of [
+      "Home",
+      "Chi siamo",
+      "Calendario gare",
+      "Mappa campi",
+      "Comunicazioni",
+      "Eventi",
+      "Tornei",
+      "Christmas Lario Cup",
+      "Tifosi",
+      "Gioca con noi",
+      "Contatti",
+      "La mia SCD",
+      "Le squadre",
+      "Allenamenti",
+      "Sponsor & Partner",
+      "Fornitori",
+      "Documenti della società",
+      "Tutela dei minori",
+      "Registrati nell'app",
+      "Guida all'app",
+      "Area famiglia",
+      "Area partner",
+      "Social e video",
+      "Installa l'app",
+      "Privacy",
+    ])
+      expect(labels, kept).toContain(kept);
+    const chrome = code("src/components/SiteChrome.tsx");
+    const drawer = chrome.slice(chrome.indexOf("export function MenuDrawer"), chrome.indexOf("type TabDef"));
+    expect(drawer).not.toMatch(/\{g\.app\}/);
+    const footer = chrome.slice(chrome.indexOf("export function SiteFooter"));
+    expect(footer).not.toMatch(/versione del/);
+    expect(footer).toMatch(/data-build=\{BUILD_STAMP\}/);
   });
 
   it("UD-110: partner logos are always in colour (no greyscale anywhere on public logos)", () => {

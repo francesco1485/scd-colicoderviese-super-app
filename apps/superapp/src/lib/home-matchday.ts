@@ -11,10 +11,11 @@ import type { TodayEntry } from "./home-today";
 import type { PublicGroup } from "./public-snapshots";
 import { teamFromGroup } from "./universe";
 
-export type MatchdayFilter = "tutte" | "casa" | "agonistica" | "base";
+export type MatchdayFilter = "tutte" | "seguite" | "casa" | "agonistica" | "base";
 
 export const MATCHDAY_FILTERS: readonly MatchdayFilter[] = [
   "tutte",
+  "seguite",
   "casa",
   "agonistica",
   "base",
@@ -22,6 +23,7 @@ export const MATCHDAY_FILTERS: readonly MatchdayFilter[] = [
 
 export const MATCHDAY_FILTER_LABEL: Readonly<Record<MatchdayFilter, string>> = {
   tutte: "Tutte",
+  seguite: "Le mie squadre",
   casa: "In casa",
   agonistica: "Agonistica",
   base: "Attività di base",
@@ -41,27 +43,30 @@ export function matchdayClass(groupId: string): MatchdayClass {
 export function matchesFilter(
   e: Pick<TodayEntry, "group" | "homeAway">,
   f: MatchdayFilter,
+  followed: readonly string[] = [],
 ): boolean {
   if (f === "tutte") return true;
+  if (f === "seguite") return followed.includes(e.group);
   if (f === "casa") return e.homeAway === "CASA";
   return matchdayClass(e.group) === f;
 }
 
 export function filterMatchday<
   T extends Pick<TodayEntry, "group" | "homeAway">,
->(entries: readonly T[], f: MatchdayFilter): T[] {
-  return entries.filter((e) => matchesFilter(e, f));
+>(entries: readonly T[], f: MatchdayFilter, followed: readonly string[] = []): T[] {
+  return entries.filter((e) => matchesFilter(e, f, followed));
 }
 
 /** How many games each chip would show (a chip with 0 stays visible and says so). */
 export function filterCounts(
   entries: readonly Pick<TodayEntry, "group" | "homeAway">[],
+  followed: readonly string[] = [],
 ): Record<MatchdayFilter, number> {
-  const out = { tutte: 0, casa: 0, agonistica: 0, base: 0 } as Record<
+  const out = { tutte: 0, seguite: 0, casa: 0, agonistica: 0, base: 0 } as Record<
     MatchdayFilter,
     number
   >;
-  for (const f of MATCHDAY_FILTERS) out[f] = filterMatchday(entries, f).length;
+  for (const f of MATCHDAY_FILTERS) out[f] = filterMatchday(entries, f, followed).length;
   return out;
 }
 

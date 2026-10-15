@@ -25,6 +25,13 @@ describe("helper persona (UD-121: one chat, Vera; Sky only for the younger membe
     for (const p of PUBLIC_PREFIXES) expect(personaFor(p)).toBe("vera");
     expect(personaFor("/eventi/christmas-lario-cup")).toBe("vera");
     expect(personaFor("/calendario/rotazione-campi")).toBe("vera");
+    // /sostieni is open to everyone (out of PUBLIC_PREFIXES only for caching): Vera, never Sky (cleanup 15/10/2026).
+    for (const p of ["/sostieni", "/sostieni/dona-materiale", "/sostieni/proponi", "/sostieni/fondo-solidale"]) {
+      expect(isReservedPath(p)).toBe(false);
+      expect(personaFor(p)).toBe("vera");
+      expect(launcherFaceFor(p)).toBe("vera");
+    }
+    expect(personaFor("/sostienix")).toBe("sky");
   });
 
   it("puts Sky in the reserved areas by page until the session says otherwise (SkyChat upgrades to Vera)", () => {

@@ -13,6 +13,8 @@ export interface PublicLink {
   to: string;
   search?: Record<string, string>;
   hash?: string;
+  /** false: the page stays out of the public menu (route alive, reachable by URL and search engines). */
+  publicMenu?: boolean;
 }
 
 /** Partners named with certainty in the 2026/27 list (src/lib/sponsors.ts). */

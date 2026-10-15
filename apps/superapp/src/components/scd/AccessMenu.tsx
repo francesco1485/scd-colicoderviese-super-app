@@ -151,7 +151,7 @@ function EnterBlock({
       </h2>
       <p className="mt-1 text-[13.5px] leading-snug text-[var(--in-sub)]">
         {configured
-          ? "Un codice via e-mail, nessuna password."
+          ? "Entri con e-mail o telefono e password. Password dimenticata? Ti arriva un codice via e-mail per sceglierne una nuova."
           : "Accesso in attivazione su questo server."}
       </p>
       <div className="mt-3 grid grid-cols-2 gap-2">

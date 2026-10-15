@@ -271,7 +271,7 @@ export const APP_GUIDE: ReadonlyArray<{ text: string; to: string }> = [
   { text: "Chi siamo: la società", to: "/societa" },
   { text: "Guida all'app passo per passo (tifosi, soci, famiglie, mister, segreteria)", to: "/guida" },
   { text: "Installare l'app sul telefono", to: "/installa" },
-  { text: "Accesso all'area soci con la propria e-mail (link magico, niente password)", to: "/accedi" },
+  { text: "Accesso all'area soci con e-mail o telefono e password; password dimenticata = codice via e-mail per sceglierne una nuova", to: "/accedi" },
   { text: "Tutela dei minori: canale riservato Safeguarding", to: "/safeguarding" },
   { text: "Orari degli allenamenti: solo nella pagina Allenamenti, mai comunicati in chat", to: "/allenamenti" },
 ];

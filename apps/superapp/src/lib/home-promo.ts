@@ -119,19 +119,20 @@ export interface QuickChip {
   id: string;
   label: string;
   to: string;
-  /** "count" shows a number, the others a short label like the reference badges. */
-  badge?: { kind: "count"; value: number } | { kind: "new" } | { kind: "live" };
+  /** Only a live game earns a badge: counts and "Nuovo" were noise for the public (cleanup 15/10/2026). */
+  badge?: { kind: "live" };
 }
 
-/** Quick chips under the banner: the most used pages first. Games left this week and a live game decide the badges. */
-export function quickChips(gamesLeftThisWeek: number, live: boolean): QuickChip[] {
+/**
+ * Quick chips under the banner: the most used pages first, a LIVE badge on the games while a club game is played.
+ * The public home is shown to visitors only (routes/index.tsx renders MemberHome for a session), so members-only pages
+ * (Allenamenti, Carte della rosa: they show the access screen to visitors) are not offered here (cleanup 15/10/2026).
+ */
+export function quickChips(live: boolean): QuickChip[] {
   const gare: QuickChip = { id: "gare", label: "Gare", to: "/calendario" };
   if (live) gare.badge = { kind: "live" };
-  else if (gamesLeftThisWeek > 0) gare.badge = { kind: "count", value: gamesLeftThisWeek };
   return [
     gare,
-    { id: "allenamenti", label: "Allenamenti", to: "/allenamenti" },
-    { id: "carte", label: "Carte della rosa", to: "/squadre/carte", badge: { kind: "new" } },
     { id: "eventi", label: "Eventi", to: "/eventi" },
     { id: "tornei", label: "Tornei", to: "/tornei" },
     { id: "iscrizioni", label: "Iscrizioni", to: PUBLIC_FORMS_LIVE ? "/entra" : "/contatti" },

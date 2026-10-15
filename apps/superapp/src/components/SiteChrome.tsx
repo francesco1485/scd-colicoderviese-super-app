@@ -309,13 +309,9 @@ export function MenuDrawer() {
         ) : (
           sections.map((g) => (
             <div key={g.id} className="border-b border-[var(--scd-line)] py-2 last:border-0" data-testid={`menu-group-${g.id}`}>
-              <p className="flex items-center gap-2 px-2 py-1 text-[0.7rem] font-bold uppercase tracking-[0.16em] text-[var(--scd-blue)]">
-                {g.title}{" "}
-                {g.app !== "INFO" && (
-                  <span className="rounded bg-[var(--scd-yellow)] px-1.5 py-0.5 text-[0.6rem] tracking-wider text-[var(--scd-ink)]">
-                    {g.app}
-                  </span>
-                )}
+              {/* Group title only: the ONE / CORE / GROW ids are internal, never shown to the public (cleanup 15/10/2026). */}
+              <p className="px-2 py-1 text-[0.7rem] font-bold uppercase tracking-[0.16em] text-[var(--scd-blue)]">
+                {g.title}
               </p>
               <div className="grid grid-cols-2 gap-x-2">
                 {g.items.map((n) => (
@@ -731,7 +727,8 @@ export function SiteFooter() {
                 Tutte le pagine
               </button>
             </span>
-            <span>Super App ufficiale della {CLUB_NAME} · versione del {BUILD_STAMP}</span>
+            {/* Build date and git hash are for the team: hidden data attribute, not public copy (cleanup 15/10/2026). */}
+            <span data-build={BUILD_STAMP}>Super App ufficiale della {CLUB_NAME}</span>
           </div>
           {/* Authorship kept but discreet (Francesco 15/10/2026 06:51: "non visibile così ma molto riservato"). */}
           <details className="-mt-3 text-[11px] leading-snug text-white/45">

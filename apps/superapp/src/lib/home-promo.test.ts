@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
 import { eventSlide, iscrizioniSlide, nextIndex, promoSlides, quickChips, welcomeSlide } from "./home-promo";
+import { MEMBERS_ONLY_PREFIXES } from "./http-policy";
 import type { ClubEvent } from "./stories";
 
 const ev = (over: Partial<ClubEvent> = {}): ClubEvent => ({
@@ -54,15 +55,30 @@ describe("promo carousel", () => {
 });
 
 describe("quick chips", () => {
-  it("games badge: live beats the count, zero hides it", () => {
-    expect(quickChips(4, true)[0]?.badge).toEqual({ kind: "live" });
-    expect(quickChips(4, false)[0]?.badge).toEqual({ kind: "count", value: 4 });
-    expect(quickChips(0, false)[0]?.badge).toBeUndefined();
+  it("games badge: LIVE while a club game is played, nothing otherwise (no counts, no NUOVO: cleanup 15/10/2026)", () => {
+    expect(quickChips(true)[0]?.badge).toEqual({ kind: "live" });
+    expect(quickChips(false)[0]?.badge).toBeUndefined();
+    for (const c of quickChips(true)) if (c.badge) expect(c.badge.kind).toBe("live");
   });
-  it("all chips lead to app pages, the cards are marked new", () => {
-    const chips = quickChips(1, false);
-    expect(chips.every((c) => c.to.startsWith("/"))).toBe(true);
-    expect(chips.find((c) => c.id === "carte")?.badge).toEqual({ kind: "new" });
+  it("all chips lead to app pages", () => {
+    expect(quickChips(false).every((c) => c.to.startsWith("/"))).toBe(true);
+  });
+});
+
+/**
+ * The public home is rendered for visitors only (routes/index.tsx): none of its chips or board tiles may open a page
+ * that answers a visitor with the access screen or a redirect to /accedi (members-only prefixes of http-policy.ts).
+ */
+describe("guest home never links to members-only pages", () => {
+  const membersOnly = (to: string) => MEMBERS_ONLY_PREFIXES.some((p) => to === p || to.startsWith(`${p}/`));
+  it("chips", () => {
+    for (const c of quickChips(true)) expect(membersOnly(c.to), c.to).toBe(false);
+  });
+  it("board tiles", () => {
+    const board = readFileSync(resolve(__dirname, "../components/home/HomeBoard.tsx"), "utf8")
+      .replace(/\/\*[\s\S]*?\*\//g, "")
+      .replace(/^\s*\/\/.*$/gm, "");
+    for (const m of board.matchAll(/to="([^"]+)"/g)) expect(membersOnly(m[1] ?? ""), m[1]).toBe(false);
   });
 });
 
@@ -72,7 +88,7 @@ describe("every promo and chip link is a real route", () => {
   it("slides and chips", () => {
     const links = [
       ...promoSlides("2026-10-15", [ev()]).flatMap((s) => [s.cta.to, ...(s.secondary ? [s.secondary.to] : [])]),
-      ...quickChips(1, false).map((c) => c.to),
+      ...quickChips(false).map((c) => c.to),
     ];
     for (const to of links) expect(routes.has(to), to).toBe(true);
   });

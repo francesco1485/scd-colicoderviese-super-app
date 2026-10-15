@@ -16,7 +16,7 @@ export interface MenuItem extends PublicLink {
 export interface MenuGroup {
   id: string;
   title: string;
-  /** App of the ecosystem the group belongs to (badge in the drawer). */
+  /** App of the ecosystem the group belongs to (internal id, never shown to the public: cleanup 15/10/2026). */
   app: "ONE" | "CORE" | "GROW" | "INFO";
   items: readonly MenuItem[];
 }
@@ -69,20 +69,25 @@ export const MENU_GROUPS: readonly MenuGroup[] = [
 const linkKey = (l: PublicLink) =>
   `${l.to}#${l.hash ?? ""}?${new URLSearchParams(l.search ?? {}).toString()}`;
 
+/** Pages marked publicMenu: false (here or in LINK_GROUPS) stay out of the public menu; their routes stay alive. */
+export const isHiddenFromMenu = (l: PublicLink): boolean => l.publicMenu === false;
+
 /**
  * The menu sections: the app groups, then "Tutto sul club" with every page of the site index (LINK_GROUPS) that the
- * app groups do not already list. Every LINK_GROUPS page is therefore reachable from the menu (tested).
+ * app groups do not already list. Every LINK_GROUPS page is therefore reachable from the menu (tested), unless it is
+ * marked publicMenu: false.
  */
 export function menuSections(): MenuGroup[] {
   const groups = MENU_GROUPS.map((g) => ({
     ...g,
-    items: g.items.map((i) => ({ ...i })),
+    items: g.items.filter((i) => !isHiddenFromMenu(i)).map((i) => ({ ...i })),
   }));
   const byKey = new Map<string, MenuItem>(
     groups.flatMap((g) => g.items.map((i) => [linkKey(i), i] as const)),
   );
   const extra: MenuItem[] = [];
   for (const item of LINK_GROUPS.flatMap((g) => g.items)) {
+    if (isHiddenFromMenu(item)) continue;
     const k = linkKey(item);
     const hit = byKey.get(k);
     if (hit) {

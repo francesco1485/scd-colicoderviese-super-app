@@ -84,16 +84,26 @@ describe("home matchday (UD-132)", () => {
     expect(filterMatchday(ROWS, "base").map((x) => x.id)).toEqual(["a", "b"]);
     expect(filterCounts(ROWS)).toEqual({
       tutte: 6,
+      seguite: 0,
       casa: 3,
       agonistica: 3,
       base: 2,
     });
     expect(filterCounts([])).toEqual({
       tutte: 0,
+      seguite: 0,
       casa: 0,
       agonistica: 0,
       base: 0,
     });
+  });
+
+  it("'Le mie squadre' keeps only the followed groups (star on the row), counts follow", () => {
+    expect(filterMatchday(ROWS, "seguite", ["u15", "2014"]).map((x) => x.id)).toEqual(["b", "d"]);
+    expect(filterMatchday(ROWS, "seguite", [])).toEqual([]);
+    expect(filterMatchday(ROWS, "seguite")).toEqual([]);
+    expect(filterCounts(ROWS, ["prima"]).seguite).toBe(1);
+    expect(filterCounts(ROWS, ["prima"]).tutte).toBe(6);
   });
 
   it("groups by day in calendar order, keeping the order of the games", () => {

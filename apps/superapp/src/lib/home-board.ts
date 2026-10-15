@@ -70,7 +70,7 @@ export function boardRank(
   return level * 2 + (e.pending.length > 0 ? 1 : 0);
 }
 
-/** Games of the week still to play (the counter on the "Gare" tile); 0 hides the counter. */
+/** Games of the week still to play. Utility kept for other screens: the public home no longer shows a counter (cleanup 15/10/2026). */
 export function gamesLeft(
   entries: readonly TodayEntry[],
   nowMs: number,

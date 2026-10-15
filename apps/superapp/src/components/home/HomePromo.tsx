@@ -9,9 +9,7 @@ import { Link } from "@tanstack/react-router";
 import {
   Building2,
   CalendarDays,
-  Dumbbell,
   Handshake,
-  Layers,
   Pause,
   Play,
   Trophy,
@@ -331,8 +329,6 @@ const FootballIcon: ChipIcon = ({ className, style }) => (
 
 const CHIP_ICON: Readonly<Record<string, { icon: ChipIcon; tint: string }>> = {
   gare: { icon: FootballIcon, tint: "#0b2a5b" },
-  allenamenti: { icon: Dumbbell, tint: "#1f9d55" },
-  carte: { icon: Layers, tint: "#0b2a5b" },
   eventi: { icon: CalendarDays, tint: "#c98a00" },
   tornei: { icon: Trophy, tint: "#c98a00" },
   iscrizioni: { icon: UserPlus, tint: "#1556c4" },
@@ -343,15 +339,7 @@ const CHIP_ICON: Readonly<Record<string, { icon: ChipIcon; tint: string }>> = {
 function ChipBadge({ badge }: { badge: NonNullable<QuickChip["badge"]> }) {
   const base =
     "absolute -right-1 -top-2 rounded-[5px] px-1.5 py-[3px] text-[10px] font-extrabold uppercase leading-none tracking-[0.04em]";
-  if (badge.kind === "live")
-    return <span className={`${base} bg-[#e11d2e] text-white`}>Live</span>;
-  if (badge.kind === "new")
-    return <span className={`${base} bg-[#157a3f] text-white`}>Nuovo</span>;
-  return (
-    <span className={`${base} bg-[#ffd600] tabular-nums text-[#0b1e3a]`}>
-      {badge.value}
-    </span>
-  );
+  return <span className={`${base} bg-[#e11d2e] text-white`}>Live</span>;
 }
 
 export function QuickChips({ chips }: { chips: readonly QuickChip[] }) {
@@ -361,14 +349,7 @@ export function QuickChips({ chips }: { chips: readonly QuickChip[] }) {
         {chips.map((c) => {
           const meta = CHIP_ICON[c.id] ?? { icon: FootballIcon, tint: "#0b2a5b" };
           const Icon = meta.icon;
-          const extra =
-            c.badge?.kind === "count"
-              ? `, ${c.badge.value} questa settimana`
-              : c.badge?.kind === "live"
-                ? ", gara in corso"
-                : c.badge?.kind === "new"
-                  ? ", novità"
-                  : "";
+          const extra = c.badge?.kind === "live" ? ", gara in corso" : "";
           return (
             <li key={c.id} className="shrink-0">
               <Link

@@ -60,8 +60,11 @@ function greeting(persona: Persona, area: ChatAreaId | null): Msg[] {
 /* Bottom chrome on phones (SiteChrome.BottomNav 62px, SponsorBand 34px on every public page, UD-134) */
 const NAV_H = 62;
 const STRIP_H = 34;
-/** Launcher (40px on phones, UD-135) centred on the sponsor strip: it sits on the strip's white right cap, never on page content. */
-const LAUNCHER = 40;
+/**
+ * Launcher centred on the sponsor strip (UD-135): it sits on the strip's white right cap, never on page content.
+ * 44px on phones, the minimum touch target (WCAG 2.5.8 / platform guidelines; cleanup 15/10/2026).
+ */
+const LAUNCHER = 44;
 
 /** A reply link: app paths through the router (with "?query" and "#anchor"), https sources in a new tab. */
 function ReplyLink({ link, onNavigate }: { link: { label: string; to: string }; onNavigate: () => void }) {
@@ -110,6 +113,9 @@ export function SkyChat({ interior = false }: { interior?: boolean } = {}) {
   const face = launcherFaceFor(pathname, viewer);
   const copy = chatCopyFor(persona, area);
   const hidden = isHelperHiddenPath(pathname);
+  // /calendario on phones (≤640px) has its own in-page "Chiedi a Vera" button in the toolbar (routes/calendario.tsx),
+  // which opens this chat through "vera:open": the floating launcher is hidden there so the page shows one entry point
+  // and the launcher never covers the calendar rows. Kept on purpose (verified 15/10/2026).
   const onCalendario = pathname === "/calendario";
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
@@ -359,9 +365,9 @@ export function SkyChat({ interior = false }: { interior?: boolean } = {}) {
           aria-label={
             open ? `Chiudi ${copy.name}` : `Apri ${copy.title}, aiuto rapido`
           }
-          className={`relative flex size-10 items-center justify-center rounded-full lg:size-14 bg-white shadow-[0_8px_22px_-6px_rgb(11_42_91/0.45)] ${notify && !open ? "sky-bounce" : "sky-idle"}`}
+          className={`relative flex size-11 items-center justify-center rounded-full lg:size-14 bg-white shadow-[0_8px_22px_-6px_rgb(11_42_91/0.45)] ${notify && !open ? "sky-bounce" : "sky-idle"}`}
         >
-          <span className="flex origin-center scale-[0.72] lg:scale-100">
+          <span className="flex origin-center scale-[0.8] lg:scale-100">
             <SkyMascot mood={mood} size={52} persona={face} />
           </span>
           <span
