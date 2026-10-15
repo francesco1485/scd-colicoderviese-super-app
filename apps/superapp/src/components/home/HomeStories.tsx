@@ -254,7 +254,7 @@ export function HomeStories({ day }: { day: string }) {
               className="scd-focus group grid w-[84px] justify-items-center gap-1.5 rounded-[12px] text-center lg:w-[104px]"
               aria-label={`Apri la storia: ${s.title}`}
             >
-              <span className="block size-[76px] rounded-full bg-[conic-gradient(#ffd600,#29b6ff,#1556c4,#ffd600)] p-[3px] transition-transform duration-200 group-hover:scale-105 lg:size-[92px]">
+              <span className="scd-ring block size-[76px] rounded-full p-[3px] transition-transform duration-200 group-hover:scale-110 lg:size-[92px]">
                 <img
                   src={s.thumb}
                   alt=""

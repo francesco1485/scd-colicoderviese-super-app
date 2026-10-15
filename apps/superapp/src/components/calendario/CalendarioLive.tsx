@@ -385,7 +385,7 @@ export type TrainingItem = {
 export function TrainingRow({ r }: { r: TrainingItem }) {
   const d = dateParts(r.date);
   return (
-    <li className={`${CARD} relative overflow-hidden`}>
+    <li className={`${CARD} scd-rise relative overflow-hidden`}>
       <span
         className="absolute inset-y-0 left-0 w-[5px] bg-[#1f9d55]"
         aria-hidden="true"
@@ -453,7 +453,10 @@ export function NextMatchRow({
   const clock = matchClock(e, nowMs);
   const home = e.homeAway === "CASA";
   return (
-    <li className={`${CARD} relative overflow-hidden`} data-testid={testId}>
+    <li
+      className={`${CARD} scd-rise relative overflow-hidden`}
+      data-testid={testId}
+    >
       <span
         className="absolute inset-y-0 left-0 w-[5px]"
         style={{
@@ -590,7 +593,10 @@ export function LiveBanner({
         aria-hidden="true"
       >
         {left.days > 0 ? `${left.days}g ` : ""}
-        {left.hh}:{left.mm}:{left.ss}
+        {left.hh}:{left.mm}:
+        <span key={left.ss} className="scd-tick">
+          {left.ss}
+        </span>
       </span>
       <span className="sr-only">
         tra {left.days} giorni e {Number(left.hh)} ore

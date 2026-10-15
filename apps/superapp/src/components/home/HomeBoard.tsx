@@ -123,24 +123,27 @@ function Tile({
   icon,
   count,
   testId,
+  i = 0,
 }: {
   to: "/calendario" | "/allenamenti" | "/eventi" | "/tornei";
   label: string;
   icon: React.ReactNode;
   count?: number;
   testId: string;
+  i?: number;
 }) {
   return (
     <Link
       to={to}
       data-testid={testId}
+      style={{ "--i": i } as React.CSSProperties}
       aria-label={count ? `${label}, ${count} questa settimana` : label}
-      className={`${CARD} scd-focus relative flex h-[92px] flex-col items-center justify-center gap-1.5 text-[13px] font-bold text-[#0b1e3a] transition-transform duration-150 hover:-translate-y-0.5 lg:h-[112px] lg:text-[15px]`}
+      className={`${CARD} scd-focus scd-pop-in scd-wiggle-on-hover relative flex h-[92px] flex-col items-center justify-center gap-1.5 text-[13px] font-bold text-[#0b1e3a] transition-transform duration-150 hover:-translate-y-0.5 lg:h-[112px] lg:text-[15px]`}
     >
-      {icon}
+      <span className="scd-wiggle-target inline-flex">{icon}</span>
       {label}
       {count ? (
-        <span className="absolute right-2 top-2 grid h-[22px] min-w-[22px] place-items-center rounded-full bg-[#ffd600] px-1.5 text-[12px] font-extrabold leading-none text-[#0b1e3a] tabular-nums">
+        <span className="scd-badge-pulse absolute right-2 top-2 grid h-[22px] min-w-[22px] place-items-center rounded-full bg-[#ffd600] px-1.5 text-[12px] font-extrabold leading-none text-[#0b1e3a] tabular-nums">
           {count}
         </span>
       ) : null}
@@ -220,7 +223,7 @@ function NextMatch({
         <Link
           to="/calendario"
           search={{ annata: m.group }}
-          className={`${CARD} scd-focus grid grid-cols-[78px_minmax(0,1fr)] rounded-tl-none border-l-4 border-[#1556c4] py-3 pl-2 pr-3 hover:bg-[#fbfcfe]`}
+          className={`${CARD} scd-focus scd-shine grid grid-cols-[78px_minmax(0,1fr)] rounded-tl-none border-l-4 border-[#1556c4] py-3 pl-2 pr-3 hover:bg-[#fbfcfe]`}
           aria-label={[
             cat,
             weFirst
@@ -323,7 +326,10 @@ function Countdown({ startMs, nowMs }: { startMs: number; nowMs: number }) {
         aria-hidden="true"
       >
         {left.days > 0 ? `${left.days}g ` : ""}
-        {left.hh}:{left.mm}:{left.ss}
+        {left.hh}:{left.mm}:
+        <span key={left.ss} className="scd-tick">
+          {left.ss}
+        </span>
       </span>
       <span className="sr-only">
         {left.days} giorni e {Number(left.hh)} ore
@@ -375,6 +381,27 @@ export function HomeBoard({
           className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgb(11_42_120/0.9)_0%,rgb(11_42_120/0.45)_30%,rgb(8_30_90/0.72)_50%,rgb(6_26_80/0.92)_100%)] lg:bg-[linear-gradient(90deg,rgb(6_26_80/0.94)_0%,rgb(8_30_90/0.78)_45%,rgb(11_42_120/0.2)_100%)]"
         />
         <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
+        >
+          <span className="scd-beam left-[4%]" />
+          <span
+            className="scd-beam right-[6%]"
+            style={{ animationDelay: "-4.5s" }}
+          />
+          {[8, 22, 37, 55, 68, 81, 93].map((x, k) => (
+            <span
+              key={x}
+              className="scd-float-dot"
+              style={{
+                left: `${x}%`,
+                animationDelay: `${k * 0.85}s`,
+                animationDuration: `${5 + (k % 3)}s`,
+              }}
+            />
+          ))}
+        </div>
+        <div
           className={`${WRAP} relative flex min-h-[260px] items-end gap-4 pb-14 pt-6 lg:min-h-[340px] lg:pb-20`}
         >
           <div className="grid gap-2 lg:max-w-[620px]">
@@ -407,6 +434,7 @@ export function HomeBoard({
         >
           <Tile
             to="/calendario"
+            i={0}
             label="Gare"
             icon={<BallIcon />}
             count={left}
@@ -414,18 +442,21 @@ export function HomeBoard({
           />
           <Tile
             to="/allenamenti"
+            i={1}
             label="Allenamenti"
             icon={<ConeIcon />}
             testId="board-tile-allenamenti"
           />
           <Tile
             to="/eventi"
+            i={2}
             label="Eventi"
             icon={<CalendarIcon />}
             testId="board-tile-eventi"
           />
           <Tile
             to="/tornei"
+            i={3}
             label="Iniziative"
             icon={<PeopleIcon />}
             testId="board-tile-iniziative"
