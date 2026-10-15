@@ -265,7 +265,7 @@ export function SponsorSpotsHome({
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="scd-focus -mb-3 block truncate rounded pb-3 pt-1 text-[16px] font-bold text-[#0b1e3a] hover:underline"
+                  className="scd-focus -my-3 block truncate rounded py-3 text-[16px] font-bold text-[#0b1e3a] hover:underline"
                   data-testid="spot-sponsor"
                 >
                   {spot.sponsorName}

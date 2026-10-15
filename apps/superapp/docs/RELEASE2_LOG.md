@@ -673,5 +673,5 @@ Backlog cloud B4. Motori: PERSONE (famiglie e tifosi leggono e toccano tutto anc
 - 44 px: puntini e pausa del banner (la riga va a capo se le slide sono tante), logo della testata, "Vedi tutte", striscia "Prossima gara", nome del partner nello spot.
 - Barra sponsor: si ferma sotto il puntatore o il dito; con "riduci movimento" è ferma. Test `home-motion.test.tsx`: la home non si muove mai da sola con "riduci movimento".
 - Da decidere: pulsante di pausa da tastiera per la barra sponsor (linguetta "Sponsor").
-- Revisione: scd-revisore PASS (note applicate: `flex-wrap` sui puntini, area di tocco del partner solo verso il basso), scd-sicurezza PASS.
+- Revisione: scd-revisore PASS (note applicate: `flex-wrap` sui puntini; l'area di tocco del nome del partner resta 44 px e copre anche il titolo "Sul LED wall" sopra, scelta accettata), scd-sicurezza PASS.
 
