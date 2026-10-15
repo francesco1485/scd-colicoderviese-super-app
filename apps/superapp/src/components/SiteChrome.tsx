@@ -31,6 +31,7 @@ import { CLUB_PROFILE } from "@/lib/club-profile";
 import { SOCIAL_LINKS } from "@/lib/public-home";
 import { menuSections, searchMenu, type MenuItem } from "@/lib/site-menu";
 import { useSession } from "@/lib/use-session";
+import { useClubPulse } from "@/lib/use-club-pulse";
 import { openCookiePrefs } from "./CookieConsent";
 import { AccessMenu, loginSearch, openAccessMenu } from "./scd/AccessMenu";
 import { CREDENTIALS_SENTENCE } from "@/lib/club-credentials";
@@ -516,6 +517,9 @@ export function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { session } = useSession();
   const tabs = tabsFor(pathname, centerTabFor(session));
+  // LIVE on the Calendario tab while a club game is being played (study 15/10, block A/C).
+  const pulse = useClubPulse();
+  const liveNow = (pulse?.live ?? 0) > 0;
   return (
     <nav
       aria-label="Navigazione Super App"
@@ -525,14 +529,25 @@ export function BottomNav() {
         {tabs.map((t) => {
           const active = t.match(pathname);
           const color = active ? "text-[var(--uv-gold)]" : "text-[#b9cdf0]";
+          const liveTab = liveNow && t.to === "/calendario";
           const inner = (
             <>
-              <t.icon
-                className="size-[25px]"
-                strokeWidth={active ? 2.4 : 1.8}
-                fill={active && t.icon === House ? "currentColor" : "none"}
-                aria-hidden="true"
-              />
+              <span className="relative inline-flex">
+                <t.icon
+                  className="size-[25px]"
+                  strokeWidth={active ? 2.4 : 1.8}
+                  fill={active && t.icon === House ? "currentColor" : "none"}
+                  aria-hidden="true"
+                />
+                {liveTab && (
+                  <span
+                    className="absolute -right-3 -top-1.5 rounded-[4px] bg-[#e11d2e] px-1 py-[2px] text-[9px] font-extrabold uppercase leading-none tracking-[0.04em] text-white"
+                    data-testid="tab-live"
+                  >
+                    Live<span className="sr-only">: gara in corso</span>
+                  </span>
+                )}
+              </span>
               <span
                 className={`text-[11.5px] leading-none ${active ? "font-bold" : "font-medium"}`}
               >

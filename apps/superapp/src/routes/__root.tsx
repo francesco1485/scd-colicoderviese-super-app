@@ -17,6 +17,7 @@ import { SkyChat } from "../components/SkyChat";
 import { PwaManager } from "../components/PwaManager";
 import { SponsorBand } from "../components/SponsorBand";
 import { CookieConsent } from "../components/CookieConsent";
+import { NextUpBar } from "../components/scd/NextUpBar";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
@@ -168,6 +169,8 @@ function RootComponent() {
         <SiteHeader />
         {/* Technical-cookie notice in the page flow, under the header: nothing floats over the content (UD-135). */}
         <CookieConsent />
+        {/* "Prossimo appuntamento" strip (not on the home or the calendar, which show it themselves). */}
+        <NextUpBar />
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
         <SiteFooter />
