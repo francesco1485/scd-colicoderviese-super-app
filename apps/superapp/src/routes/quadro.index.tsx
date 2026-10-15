@@ -1,6 +1,7 @@
 import { getTrainingQuadro } from "@/lib/quadro.functions";
-import { WorkAreaGateView } from "@/components/scd/work-area-ui";
+import { StagingBanner, WorkAreaGateView } from "@/components/scd/work-area-ui";
 import { getWorkAreaGate } from "@/lib/work-areas.functions";
+import { EMPTY_QUADRO } from "@/lib/public-snapshots";
 import { createFileRoute } from "@tanstack/react-router";
 import { AlertTriangle, Clock3, Info } from "lucide-react";
 import { useMemo } from "react";
@@ -43,7 +44,7 @@ import {
 
 type Search = { settimana?: Week | undefined };
 
-/** Role set of this preview: no login yet, so only areas open to every staff role appear in the rail. */
+/** Rail role set: only areas open to every staff role appear (the page itself is behind the work-area gate). */
 const PREVIEW_ROLES: ReadonlySet<string> = new Set();
 
 export const Route = createFileRoute("/quadro/")({
@@ -53,11 +54,11 @@ export const Route = createFileRoute("/quadro/")({
       : {},
   loader: async () => {
     const gate = await getWorkAreaGate({ data: { area: "quadro" } });
+    // Closed gate: nothing of the quadro is read or serialised, only the access screen renders.
+    if (gate.view !== "page") return { gate, interior: false, ...EMPTY_QUADRO, groups: [] };
     const { quadro: q } = await getTrainingQuadro();
     const cal = loadCalendar();
-    return {
-      gate,
-      interior: gate.view === "page", ...q, groups: cal.groups };
+    return { gate, interior: gate.view === "page", ...q, groups: cal.groups };
   },
   head: () => ({
     meta: [
@@ -594,6 +595,7 @@ function QuadroPageGate() {
   const { gate } = Route.useLoaderData();
   return (
     <WorkAreaGateView id="quadro" gate={gate}>
+      {gate.preview && <StagingBanner />}
       <QuadroPage />
     </WorkAreaGateView>
   );
