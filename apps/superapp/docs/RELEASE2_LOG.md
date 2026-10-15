@@ -557,3 +557,9 @@ Backlog cloud B3 (prestazioni e prima schermata). Motore: PERSONE (la home si ap
 - Stato: DONE, commit `6e9f848` + `5412b38`, **pubblicato** 15/10 01:38 (Render `dep-db82sion74is73ditb00`, live); controllo sul sito reale 390/1440 su /, /sponsor, /calendario: HTTP 200, nessun errore in console, nessuno scroll orizzontale, CLS home 0.0005.
 - Revisione: scd-revisore PASS (corretti: regola `.uppercase` limitata a `--font-uv`, testi più precisi su densità schermo e Roboto), scd-sicurezza PASS.
 - Test: `font-fallbacks.test.ts` (5), resa 96 px in `club-credentials.test.tsx`, srcset e priorità in `LedwallRotator.test.tsx`.
+
+## Home pubblica dalla tavola VR-009 · 2026-10-15
+- Francesco 15/10 06:30: "tutto deve partire dallo studio di questa immagine… solo migliorare". La home pubblica riparte dalla schermata 1 della tavola a sei schermate.
+- Nuovo `HomeBoard.tsx`: hero "Questa settimana" con lago e Sky (asset ufficiale), 4 riquadri (Gare con contatore delle gare rimaste, Allenamenti, Eventi, Iniziative), "Prossima gara" con linguetta, data grande e stemmi (solo registro verificato), Allenamenti + Lario Cup.
+- Poi la fascia partner unica, "Mondo Colico" (vetrina del giorno, di nuovo caricata dal server), la settimana completa con il LED, risultati, iscrizione, riconoscimenti.
+- Logica pura in `lib/home-board.ts` con test. Allenamenti resta dietro l'accesso: la pagina contiene staff, pulmini e figli; una vista pubblica solo squadre/orari è il prossimo blocco.

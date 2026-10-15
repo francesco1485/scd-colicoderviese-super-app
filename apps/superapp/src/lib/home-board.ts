@@ -1,0 +1,33 @@
+/**
+ * Pure helpers of the board-faithful public home (VR-009 "Home pubblica", Francesco 15/10/2026 06:30: "tutto deve
+ * partire dallo studio di questa immagine"). No network, no invented data: everything comes from the same calendar
+ * entries as /calendario. Tested in home-board.test.ts.
+ */
+import type { TodayEntry } from "./home-today";
+import { itemState } from "./universe";
+
+const WD = ["DOM", "LUN", "MAR", "MER", "GIO", "VEN", "SAB"] as const;
+const MO = ["GEN", "FEB", "MAR", "APR", "MAG", "GIU", "LUG", "AGO", "SET", "OTT", "NOV", "DIC"] as const;
+
+/** "2026-10-18" → { wd: "DOM", day: "18", month: "OTT" }; invalid → null. */
+export function boardDate(iso: string): { wd: string; day: string; month: string } | null {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+  if (!m) return null;
+  const t = Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3]), 12);
+  const d = new Date(t);
+  if (Number.isNaN(t) || d.getUTCDate() !== Number(m[3])) return null;
+  return { wd: WD[d.getUTCDay()] ?? "", day: String(d.getUTCDate()), month: MO[d.getUTCMonth()] ?? "" };
+}
+
+/**
+ * The "Prossima gara" of the board: the first game of the week that is not over yet (live counts as next).
+ * Entries are already in date/time order (weekMatches). Null when the week has no game left.
+ */
+export function nextBoardMatch(entries: readonly TodayEntry[], nowMs: number): TodayEntry | null {
+  return entries.find((e) => e.kind === "gara" && itemState(e, nowMs) !== "done") ?? null;
+}
+
+/** Games of the week still to play (the counter on the "Gare" tile); 0 hides the counter. */
+export function gamesLeft(entries: readonly TodayEntry[], nowMs: number): number {
+  return entries.filter((e) => e.kind === "gara" && itemState(e, nowMs) !== "done").length;
+}

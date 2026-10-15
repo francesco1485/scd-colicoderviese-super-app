@@ -46,6 +46,8 @@ const PUBLIC_HOME_FILES = [
   "src/components/home/Carousel.tsx",
   "src/components/home/HomePractical.tsx",
   "src/components/home/HomeMatchday.tsx",
+  "src/components/home/HomeBoard.tsx",
+  "src/lib/home-board.ts",
   "src/lib/public-home.ts",
 ] as const;
 
@@ -100,18 +102,20 @@ describe("public home v5", () => {
     expect(week).toMatch(/<button[\s\S]{0,80}type="button"[\s\S]{0,40}aria-pressed=\{on\}/);
   });
 
-  it("UD-132: the short Matchday order — week, LED strip, results, join, credentials, ONE partner band", () => {
+  it("VR-009 board order (15/10): board top, ONE partner band, Mondo Colico vetrina, week + LED strip, results, join, credentials", () => {
     const home = code("src/components/home/PublicHome.tsx");
     const body = home.slice(home.indexOf("export function PublicHome"));
     const order = [
       "<UrgentNotices",
       "<ClubNoticeCard",
+      "<HomeBoard",
+      "<PartnerBand",
+      "<Vetrina ",
       "<HomeMatchday",
       "<SponsorSpotsHome",
       "<WeekendResults",
       "<JoinBanner",
       "<CredentialBar",
-      "<PartnerBand",
     ];
     const at = order.map((t) => body.indexOf(t));
     for (const [i, p] of at.entries()) expect(p, order[i]).toBeGreaterThan(-1);
@@ -123,7 +127,6 @@ describe("public home v5", () => {
       "<SupportStrip",
       "<QuickActions",
       "<DailyTipCard",
-      "<Vetrina ",
       "<HomeNewsBlock",
     ])
       expect(body, gone).not.toContain(gone);

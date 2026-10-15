@@ -85,8 +85,8 @@ export const Route = createFileRoute("/")({
       const noticeP = getClubNotice({ data: { signedIn: false } }).catch(
         () => null,
       );
-      // The short Matchday home (UD-132) shows neither news nor vetrina: no waiting for them. getVetrina is kept only
-      // for the server Rome day (QA day honoured outside production) that seeds the LED wall; its worlds are not sent.
+      // Board home (VR-009, 15/10): "Mondo Colico" is the vetrina of the day; news are not shown (no waiting for them).
+      // getVetrina also gives the server Rome day (QA day honoured outside production) that seeds the LED wall.
       void newsP.catch(() => NO_NEWS);
       const vetrina: VetrinaDay = await getVetrina({
         data: { pressRecent: false },
@@ -95,7 +95,7 @@ export const Route = createFileRoute("/")({
         kind: "public" as const,
         calendar,
         news: [],
-        vetrina: EMPTY_WORLDS,
+        vetrina: vetrina.worlds,
         feed: await feedP,
         notice: await noticeP,
         // Server Rome day (QA day honoured only outside production): seeds the LED wall and the partner of the month.

@@ -39,6 +39,7 @@ import {
   type VetrinaWorld,
 } from "@/lib/vetrina";
 
+import { HomeBoard } from "@/components/home/HomeBoard";
 import { HomeMatchday } from "@/components/home/HomeMatchday";
 import { ClubNoticeCard, UrgentNotices, WeekendResults } from "@/components/home/HomePractical";
 import type { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
@@ -529,13 +530,14 @@ export function PublicHome({
   ledwallDay,
   feed = null,
   notice = null,
+  vetrina,
   nowMs,
   today,
 }: {
   calendar: PublicCalendar;
   /** Mixed news highlight of the day (getHomeNews); accepted for the route contract, not rendered since UD-132. */
   news?: readonly NewsItem[];
-  /** Vetrina picks of the day (getVetrina); accepted for the route contract, not rendered since UD-132. */
+  /** Vetrina picks of the day (getVetrina): "Mondo Colico" of the board (VR-009), back on the home since 15/10. */
   vetrina?: Readonly<Record<VetrinaWorld, readonly VetrinaSlot[]>>;
   /** Server Rome day for the LED wall and the partner band (defaults to today). */
   ledwallDay?: string;
@@ -556,15 +558,18 @@ export function PublicHome({
   );
   const alerts = useMemo(() => urgentNotices(feed?.items ?? [], nowMs, false), [feed, nowMs]);
   const results = useMemo(() => weekendResults(feed, today), [feed, today]);
-  // UD-132 Matchday order (Francesco 14/10/2026: a short home that pushes ragazzi and families to live the app):
-  // urgent → communication → "Questa settimana" (+ the LED wall strip beside it on desktop) → results (only with a
-  // source) → join → credentials (once) → ONE partner band → reduced footer. Support strip, quick actions (the bottom
-  // nav covers them), tip of the day, vetrina and news are no longer on the public home: the components stay exported.
+  // Board order (VR-009 screen 1, Francesco 15/10/2026 06:30): urgent → communication → "Questa settimana" hero with
+  // Sky, four tiles, Prossima gara, Allenamenti + next event → I nostri sponsor (ONE partner band, LED wall) → "Mondo
+  // Colico" (the rotating vetrina, asked again 13/10) → the full week of games (the calendar is only one block) with
+  // the LED strip → results (only with a source) → join → credentials (once) → reduced footer.
   return (
     <main data-screen="home" data-variant="public" className="min-h-dvh bg-[#eef3f9] pb-6 font-sans text-[#0b1e3a]">
       <h1 className="sr-only">S.C.D. ColicoDerviese, il club di calcio di Colico e Dervio</h1>
       <UrgentNotices items={alerts} />
       <ClubNoticeCard notice={notice} />
+      <HomeBoard calendar={calendar} nowMs={nowMs} today={today} />
+      <PartnerBand day={ledDay} nowMs={nowMs} ledOnHome={ledOnHome} />
+      {vetrina && <Vetrina worlds={vetrina} />}
       <div
         className={`${WRAP} grid gap-5 pt-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,400px)] lg:items-start lg:gap-8 lg:pt-8`}
         data-testid="home-matchday-layout"
@@ -577,7 +582,6 @@ export function PublicHome({
       <WeekendResults rows={results} />
       <JoinBanner />
       <CredentialBar />
-      <PartnerBand day={ledDay} nowMs={nowMs} ledOnHome={ledOnHome} />
     </main>
   );
 }
