@@ -3283,6 +3283,30 @@
         "rule": "Public home on the reference template (VR-023, layout only, no gambling cues): rounded banner carousel with a white card and one clear button, quick chips with small badges, then horizontal 'In evidenza' cards with a button; the home is not a calendar (games of the week limited with 'Vedi tutte'). Nothing floats over the content on phones: the technical-cookie notice is a slim strip docked above the sponsor bar, the chat button sits on the sponsor bar's right cap. aranzulla.it is a reference for plain-Italian guides and digital-world facts (VR-024).",
         "status": "IMPLEMENTED_BRANCH_INTEG"
       }
+    },
+    {
+      "sourceDate": "2026-10-15",
+      "sourceTime": "11:07-11:20",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-136",
+      "name": "REFERENCE_LINKS_ARE_RESEARCH_AND_DEVELOPMENT_SOURCES",
+      "sourceQuoteFragments": [
+        "questi link sono e devono restare nella memoria per migliorare e analizzare al meglio per migliorare tutto il disegno e il progetto per creare la migliore piattaforma web",
+        "devono essere di sviluppo e ricerca, analisi concreta di ogni singolo punto di tutto in tutto da inizio e fine e studiare e ricopiare le cose migliori e come sviluppare e migliorare tutto",
+        "i link da aprire sono aperti per continuare a lavorare"
+      ],
+      "context": "Francesco 15/10/2026 10:38-11:20 sent ~79 reference links (home template, digital-world guides, graphics/social, app builders, AI agents, learning, football apps, scouting, club management software, CRM, store/warehouse, jobs, sponsorship).",
+      "normalizedCommand": {
+        "rule": "The reference links are a standing research-and-development set: every one is analysed concretely from start to finish (what it is, how it is built, the best things to copy, how to build them in the Super App, what not to copy, priority, effort) and the results drive the development plan. Catalogue: claude/SCD_RIFERIMENTI_WEB_2026-10-15.md; study and 20-action plan: claude/SCD_STUDIO_RIFERIMENTI_2026-10-15.md. Copy layout and mechanics, never content; no betting; no parallel gestionale/CRM/DB/auth; official assets; minors never public.",
+        "status": "STUDY_DONE_ACTIONS_IN_PROGRESS",
+        "delivered": [
+          "apps/superapp/src/lib/share-match.ts",
+          "apps/superapp/src/components/scd/ShareWhatsApp.tsx",
+          "apps/superapp/src/lib/club-pulse.ts",
+          "apps/superapp/src/components/scd/NextUpBar.tsx"
+        ]
+      }
     }
   ],
   "completionGate": {
