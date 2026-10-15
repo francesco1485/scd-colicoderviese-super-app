@@ -1,4 +1,6 @@
 import { getTrainingQuadro } from "@/lib/quadro.functions";
+import { WorkAreaGateView } from "@/components/scd/work-area-ui";
+import { getWorkAreaGate } from "@/lib/work-areas.functions";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   AlertTriangle,
@@ -57,11 +59,13 @@ const PREVIEW_ROLES: ReadonlySet<string> = new Set();
 const R20_PENDING = "dato da collegare a R20";
 
 export const Route = createFileRoute("/gestionale/")({
-  staticData: { interior: true },
   loader: async () => {
+    const gate = await getWorkAreaGate({ data: { area: "gestionale" } });
     const cal = loadCalendar();
     const { quadro: q } = await getTrainingQuadro();
     return {
+      gate,
+      interior: gate.view === "page",
       groups: cal.groups,
       events: cal.events,
       sourceModifiedAt: cal.sourceModifiedAt,
@@ -83,7 +87,7 @@ export const Route = createFileRoute("/gestionale/")({
       { name: "robots", content: "noindex" },
     ],
   }),
-  component: GestionalePage,
+  component: GestionalePageGate,
 });
 
 const shortDate = (iso: string) => {
@@ -598,5 +602,15 @@ function Pending({ label }: { label: string }) {
         </span>
       </dd>
     </div>
+  );
+}
+
+/** Staff only (Direzione 15/10/2026): without an allowed session the area's access screen, never the preview. */
+function GestionalePageGate() {
+  const { gate } = Route.useLoaderData();
+  return (
+    <WorkAreaGateView id="gestionale" gate={gate}>
+      <GestionalePage />
+    </WorkAreaGateView>
   );
 }

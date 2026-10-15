@@ -1,4 +1,6 @@
 import { getTrainingQuadro } from "@/lib/quadro.functions";
+import { WorkAreaGateView } from "@/components/scd/work-area-ui";
+import { getWorkAreaGate } from "@/lib/work-areas.functions";
 import { createFileRoute } from "@tanstack/react-router";
 import { AlertTriangle, Clock3, Info } from "lucide-react";
 import { useMemo } from "react";
@@ -45,15 +47,17 @@ type Search = { settimana?: Week | undefined };
 const PREVIEW_ROLES: ReadonlySet<string> = new Set();
 
 export const Route = createFileRoute("/quadro/")({
-  staticData: { interior: true },
   validateSearch: (s: Record<string, unknown>): Search =>
     s["settimana"] === "A" || s["settimana"] === "B"
       ? { settimana: s["settimana"] }
       : {},
   loader: async () => {
+    const gate = await getWorkAreaGate({ data: { area: "quadro" } });
     const { quadro: q } = await getTrainingQuadro();
     const cal = loadCalendar();
-    return { ...q, groups: cal.groups };
+    return {
+      gate,
+      interior: gate.view === "page", ...q, groups: cal.groups };
   },
   head: () => ({
     meta: [
@@ -66,7 +70,7 @@ export const Route = createFileRoute("/quadro/")({
       { name: "robots", content: "noindex" },
     ],
   }),
-  component: QuadroPage,
+  component: QuadroPageGate,
 });
 
 const ZONE_LABEL: Record<(typeof ZONE_IDS)[number], string> = {
@@ -582,5 +586,15 @@ function WeekSwitch({
         );
       })}
     </div>
+  );
+}
+
+/** Staff only (Direzione 15/10/2026): without an allowed session the area's access screen, never the preview. */
+function QuadroPageGate() {
+  const { gate } = Route.useLoaderData();
+  return (
+    <WorkAreaGateView id="quadro" gate={gate}>
+      <QuadroPage />
+    </WorkAreaGateView>
   );
 }

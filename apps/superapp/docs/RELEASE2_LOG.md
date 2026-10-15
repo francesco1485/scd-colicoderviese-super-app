@@ -565,3 +565,9 @@ Backlog cloud B3 (prestazioni e prima schermata). Motore: PERSONE (la home si ap
 - Logica pura in `lib/home-board.ts` con test. Allenamenti resta dietro l'accesso: la pagina contiene staff, pulmini e figli; una vista pubblica solo squadre/orari è il prossimo blocco.
 - Revisione: sicurezza PASS (la vetrina pubblica contiene solo i cinque mondi pubblici, nessun dato di soci o minori, nessuna iniziativa interna). Codice: BLOCK sul contrasto del testo bianco sulla foto, corretto (scrim più scuro; contrasto misurato ≥ 7,9:1 a 390 e 1440 px); card evento letta da `clubEventsOn` (sparisce dopo l'evento); titoli distinti ("Tutte le gare della settimana"); vetrina pubblica intitolata "Mondo Colico" come nella tavola.
 - Sky grande nell'hero: la tavola VR-009 del DG mette la mascotte nella testata, quindi supera la vecchia regola UD-110 "Sky solo nel mondo bambini".
+
+## 15/10/2026 — chat PC: pagine interne dietro l'accesso
+
+- Direzione 15/10 ("Ok"): `/gestionale`, `/gestionale/mappa` e `/quadro` non mostrano più l'anteprima a chi non ha accesso. Come le altre aree di lavoro (`WORK_AREA_IDS` + `WORK_AREAS`), senza sessione con ruolo ammesso rispondono con la schermata d'accesso dell'area; il personale con accesso vede la pagina come prima. Tolti da `DEFERRED_PATHS`.
+- Nessun pixel di marketing su `/quadro`, `/allenamenti`, `/la-mia-scd`, `/squadre` (`NO_MARKETING` in `lib/universe.ts`).
+- Prima: `/direzione`, `/tesoreria`, `/segreteria` e le altre aree mostravano già solo la schermata d'accesso; restavano aperte in anteprima solo queste tre pagine.

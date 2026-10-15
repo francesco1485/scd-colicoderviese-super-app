@@ -1,3 +1,5 @@
+import { WorkAreaGateView } from "@/components/scd/work-area-ui";
+import { getWorkAreaGate } from "@/lib/work-areas.functions";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 
@@ -12,10 +14,12 @@ import { getTrainingQuadro } from "@/lib/quadro.functions";
 const PREVIEW_ROLES: ReadonlySet<string> = new Set();
 
 export const Route = createFileRoute("/gestionale/mappa")({
-  staticData: { interior: true },
   loader: async () => {
+    const gate = await getWorkAreaGate({ data: { area: "gestionale" } });
     const { quadro: q } = await getTrainingQuadro();
-    return { slots: q.slots, quadroUTC: q.generatedUTC };
+    return {
+      gate,
+      interior: gate.view === "page", slots: q.slots, quadroUTC: q.generatedUTC };
   },
   head: () => ({
     meta: [
@@ -28,7 +32,7 @@ export const Route = createFileRoute("/gestionale/mappa")({
       { name: "robots", content: "noindex" },
     ],
   }),
-  component: MappaPage,
+  component: MappaPageGate,
 });
 
 function MappaPage() {
@@ -82,5 +86,15 @@ function MappaPage() {
         </div>
       </div>
     </InteriorShell>
+  );
+}
+
+/** Staff only (Direzione 15/10/2026): without an allowed session the area's access screen, never the preview. */
+function MappaPageGate() {
+  const { gate } = Route.useLoaderData();
+  return (
+    <WorkAreaGateView id="gestionale" gate={gate}>
+      <MappaPage />
+    </WorkAreaGateView>
   );
 }

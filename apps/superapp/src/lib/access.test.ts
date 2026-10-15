@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
@@ -115,7 +115,7 @@ describe("access screen content from the registry", () => {
   });
 
   it("refuses areas without an access screen", () => {
-    expect(() => accessScreen("quadro")).toThrow();
+    expect(() => accessScreen("calendario")).toThrow();
     expect(() => accessScreen("nope")).toThrow();
   });
 
@@ -127,8 +127,12 @@ describe("access screen content from the registry", () => {
 });
 
 describe("work areas: real read-only pages behind the same access gate", () => {
-  const routeFile = (path: string) =>
-    fileURLToPath(new URL(`../routes/${path.slice(1).replace(/^(tesoreria|segreteria|direzione)\//, "$1_.").replace(/\//g, ".")}.tsx`, import.meta.url));
+  const routeFile = (path: string) => {
+    const base = path.slice(1).replace(/^(tesoreria|segreteria|direzione)\//, "$1_.").replace(/\//g, ".");
+    const own = fileURLToPath(new URL(`../routes/${base}.tsx`, import.meta.url));
+    // /gestionale and /quadro are index routes (gestionale.index.tsx, quadro.index.tsx).
+    return existsSync(own) ? own : fileURLToPath(new URL(`../routes/${base}.index.tsx`, import.meta.url));
+  };
 
   it("are registry areas, distinct from the access-only list", () => {
     expect(new Set(WORK_AREA_IDS).size).toBe(WORK_AREA_IDS.length);
@@ -136,7 +140,7 @@ describe("work areas: real read-only pages behind the same access gate", () => {
       expect(findArea(id), id).toBeDefined();
       expect(ACCESS_SCREEN_IDS, id).not.toContain(id);
     }
-    expect([...WORK_AREA_IDS].sort()).toEqual(["accessi", "biglietteria", "certificati", "cervellone", "club-house", "coda", "compensi", "crm", "infermeria", "lotteria", "magazzino", "magazzino-cassa", "mister", "movimenti", "organigramma", "persone", "posta", "posta-collega", "pulmini", "quote", "scadenzario", "segreteria", "tesoreria"]);
+    expect([...WORK_AREA_IDS].sort()).toEqual(["accessi", "biglietteria", "certificati", "cervellone", "club-house", "coda", "compensi", "crm", "gestionale", "infermeria", "lotteria", "magazzino", "magazzino-cassa", "mister", "movimenti", "organigramma", "persone", "posta", "posta-collega", "pulmini", "quadro", "quote", "scadenzario", "segreteria", "tesoreria"]);
   });
 
   it("each has a real route at its canonical path and is marked 'page', not 'access screen'", () => {
