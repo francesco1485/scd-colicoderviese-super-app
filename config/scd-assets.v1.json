@@ -573,6 +573,24 @@
       "source": "Dottor Acanfora avatar tile with background, square crop of Canva media MAHX1M4GK7g (export design DAHX4j7HujU)"
     },
     {
+      "path": "apps/superapp/public/media/cast/iride/",
+      "class": "CHARACTER_CUTOUT",
+      "asset_class": "GENERATE_ORIGINAL",
+      "status": "APPROVED",
+      "approval_evidence": "Francesco 15/10/2026 (memoria progetto Segreteria AI): approvata la versione tailleur blu + foulard arcobaleno; foto profilo WhatsApp della segreteria (chat PC, Canva MAHYF_fzGq0); 18:40 \"vera non ce piu ce iride\"",
+      "canva_media_id": "MAHYF_fzGq0",
+      "source": "Iride, AI secretary of the club (original character inspired by the Greek messenger goddess), GENERATE_ORIGINAL, not an official asset and no real-person likeness; iride-440/iride-900 resized from the approved 800x800 WhatsApp profile image"
+    },
+    {
+      "path": "apps/superapp/public/media/cast/iride/iride-avatar-256.webp",
+      "class": "CHARACTER_AVATAR_TILE",
+      "asset_class": "GENERATE_ORIGINAL",
+      "status": "APPROVED",
+      "approval_evidence": "Francesco 15/10/2026 (memoria progetto Segreteria AI): approvata la versione tailleur blu + foulard arcobaleno; foto profilo WhatsApp della segreteria (chat PC, Canva MAHYF_fzGq0); 18:40 \"vera non ce piu ce iride\"",
+      "canva_media_id": "MAHYF_fzGq0",
+      "source": "Iride avatar tile, head-and-shoulders crop of the approved 800x800 WhatsApp profile image"
+    },
+    {
       "path": "apps/superapp/public/media/eventi/",
       "class": "EVENT_POSTER",
       "status": "VERIFIED",

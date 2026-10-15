@@ -116,7 +116,7 @@ export function CastDirectory() {
       </div>
 
       <p className="m-0 text-[13.5px] leading-snug text-muted-foreground">
-        Sono personaggi originali dell'app, non persone reali: alcuni nomi sono ancora da decidere. Vera risponde solo con le informazioni della società, non conferma ordini né
+        Sono personaggi originali dell'app, non persone reali: alcuni nomi sono ancora da decidere. Iride risponde solo con le informazioni della società, non conferma ordini né
         incassa, e per chi è in difficoltà indica sempre una persona vera e il referente Tutela minori. I consigli del giorno sono testi brevi e generali, mai consigli medici o
         psicologici personali.
       </p>

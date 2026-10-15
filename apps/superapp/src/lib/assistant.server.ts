@@ -200,7 +200,7 @@ export interface StaffDeps extends AnswerDeps {
 export async function answerStaff(message: string, deps: StaffDeps, requested?: string | null): Promise<AssistantReply> {
   const s = await deps.session();
   if (!s.user) {
-    return { text: "Per parlare con Vera nelle aree riservate devi prima entrare con la tua e-mail.", mood: "info", links: [{ label: "Entra", to: "/accedi" }], ai: false, persona: "sky", area: null };
+    return { text: "Per parlare con Iride nelle aree riservate devi prima entrare con la tua e-mail.", mood: "info", links: [{ label: "Entra", to: "/accedi" }], ai: false, persona: "sky", area: null };
   }
   const { persona, area } = resolveChat("inside", { roles: s.roles, age15plus: null }, requested);
   const cfg = assistantConfig(deps.env);

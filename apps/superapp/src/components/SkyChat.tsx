@@ -6,7 +6,6 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 import {
   PERSONA_COPY,
   PersonaAvatar,
-  SKY_BALL_SRC,
   chatAreaFor,
   chatCopyFor,
   greetingFor,
@@ -251,7 +250,6 @@ export function SkyChat({ interior = false }: { interior?: boolean } = {}) {
   const phoneBottom = interior
     ? "calc(16px + env(safe-area-inset-bottom))"
     : `calc(${NAV_H + LAUNCHER_GAP}px + env(safe-area-inset-bottom))`;
-  const isSky = persona === "sky";
 
   // Super App: su smartphone il widget resta sopra la barra di navigazione inferiore e la striscia sponsor.
   return (
@@ -271,17 +269,7 @@ export function SkyChat({ interior = false }: { interior?: boolean } = {}) {
           className="sky-panel flex max-h-[calc(100dvh-11rem)] w-[min(21rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-[20px] border border-[#dbe3ee] bg-white shadow-[0_18px_40px_-12px_rgb(11_42_91/0.35)] lg:max-h-[calc(100dvh-6rem)]"
         >
           <div className="flex items-center gap-3 bg-[#0b2a5b] px-4 py-3 text-white" data-chat-persona={persona}>
-            {isSky ? (
-              <img
-                src={SKY_BALL_SRC}
-                alt=""
-                width={40}
-                height={38}
-                className="h-[38px] w-[40px] shrink-0 object-contain"
-              />
-            ) : (
-              <PersonaAvatar persona={persona} size={32} />
-            )}
+            <PersonaAvatar persona={persona} size={32} />
             <div className="min-w-0 flex-1">
               <p className="m-0 text-[15px] font-bold leading-tight">
                 {copy.title}

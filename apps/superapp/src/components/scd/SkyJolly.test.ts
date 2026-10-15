@@ -19,8 +19,8 @@ import {
   veraEligible,
 } from "./SkyJolly";
 
-describe("helper persona (UD-121: one chat, Vera; Sky only for the younger members)", () => {
-  it("puts Vera in the chat on every public page", () => {
+describe("helper persona (UD-121: one chat, Iride; Sky only for the younger members)", () => {
+  it("puts Iride in the chat on every public page", () => {
     expect(personaFor("/")).toBe("vera");
     for (const p of PUBLIC_PREFIXES) expect(personaFor(p)).toBe("vera");
     expect(personaFor("/eventi/christmas-lario-cup")).toBe("vera");
@@ -34,7 +34,7 @@ describe("helper persona (UD-121: one chat, Vera; Sky only for the younger membe
     expect(personaFor("/sostienix")).toBe("sky");
   });
 
-  it("puts Sky in the reserved areas by page until the session says otherwise (SkyChat upgrades to Vera)", () => {
+  it("puts Sky in the reserved areas by page until the session says otherwise (SkyChat upgrades to Iride)", () => {
     for (const p of ["/famiglia", "/la-mia-scd", "/direzione", "/segreteria/persone", "/tesoreria", "/gestionale/organigramma", "/squadre", "/squadre/u16", "/aree", "/core", "/quadro", "/crm"]) {
       expect(isReservedPath(p)).toBe(true);
       expect(personaFor(p)).toBe("sky");
@@ -47,7 +47,7 @@ describe("helper persona (UD-121: one chat, Vera; Sky only for the younger membe
     expect(personaFor("/partners")).toBe("sky");
   });
 
-  it("never fronts the public pages with Sky (Direzione 13/10/2026): Vera everywhere outside", () => {
+  it("never fronts the public pages with Sky (Direzione 13/10/2026): Iride everywhere outside", () => {
     for (const p of ["/", "/fantacalcio", "/top11", "/top11/settimana", "/calendario", "/contatti", "/partner", "/sponsor", "/societa", "/eventi", "/comunicazioni", "/rassegna-stampa", "/tornei", "/kit", "/impianti", "/privacy"]) {
       expect(launcherFaceFor(p)).toBe("vera");
       expect(personaFor(p)).toBe("vera");
@@ -68,12 +68,12 @@ describe("helper persona (UD-121: one chat, Vera; Sky only for the younger membe
     expect(isHelperHiddenPath("/entrata")).toBe(false);
   });
 
-  it("titles the chat 'Chiedi a Vera', the club reception, and has only two personas", () => {
+  it("titles the chat 'Chiedi a Iride', the club reception, and has only two personas", () => {
     expect(Object.keys(PERSONA_COPY).sort()).toEqual(["sky", "vera"]);
-    expect(PERSONA_COPY.vera.title).toBe("Chiedi a Vera");
-    expect(PERSONA_COPY.vera.name).toBe("Vera");
-    expect(PERSONA_COPY.vera.placeholder).toMatch(/Vera/);
-    expect(PERSONA_COPY.vera.greeting).toMatch(/reception/);
+    expect(PERSONA_COPY.vera.title).toBe("Chiedi a Iride");
+    expect(PERSONA_COPY.vera.name).toBe("Iride");
+    expect(PERSONA_COPY.vera.placeholder).toMatch(/Iride/);
+    expect(PERSONA_COPY.vera.greeting).toMatch(/assistente AI della segreteria/);
     expect(PERSONA_COPY.vera.greeting).toMatch(/dati veri/);
     expect(PERSONA_COPY.vera.greeting).toMatch(/richiesta alla segreteria/);
   });
@@ -83,26 +83,26 @@ describe("helper persona (UD-121: one chat, Vera; Sky only for the younger membe
       const c = PERSONA_COPY[persona];
       const all = [c.title, c.subtitle, c.greeting, ...c.quick].join(" ");
       expect(all).not.toMatch(/\d{1,2}[:.]\d{2}|\d+\s*-\s*\d+/);
-      expect(all).not.toMatch(/Banfi|Trinità|sosia|somiglia|Genny|Crovi/i);
+      expect(all).not.toMatch(/Banfi|Trinità|sosia|somiglia|Genny|Vera|\bSky\b/i);
     }
   });
 });
 
-describe("Vera opened from a face card (UD-121)", () => {
+describe("Iride opened from a face card (UD-121)", () => {
   const staff = { roles: ["mister"], age15plus: null };
 
   it("hands over to the face of the area and shows its action buttons", () => {
     const g = greetingFor("vera", "accoglienza-chef");
-    expect(g.text).toMatch(/^Ciao, sono Vera/);
+    expect(g.text).toMatch(/^Ciao, sono Iride/);
     expect(g.text).toContain("Per la Club House ti aiuta Garrison, lo Chef");
     expect(g.links?.map((l) => l.to)).toEqual(["/famiglia#richiesta-ordine", "/famiglia#sondaggi-piatti", "/eventi"]);
     expect(greetingFor("vera").text).toBe(PERSONA_COPY.vera.greeting);
     expect(greetingFor("sky", "accoglienza-chef").text).toBe(PERSONA_COPY.sky.greeting);
   });
 
-  it("keeps Vera's name and takes the area's questions", () => {
+  it("keeps Iride's name and takes the area's questions", () => {
     const c = chatCopyFor("vera", "volto-sponsor");
-    expect(c.title).toBe("Chiedi a Vera");
+    expect(c.title).toBe("Chiedi a Iride");
     expect(c.quick).toEqual(CAST_PERSONAS["volto-sponsor"].chatQuick);
     expect(chatCopyFor("vera", null)).toBe(PERSONA_COPY.vera);
   });
@@ -127,7 +127,7 @@ describe("Vera opened from a face card (UD-121)", () => {
   });
 });
 
-describe("Vera in the reserved areas (Direzione 'Vai A B C' 13/10/2026, UD-121)", () => {
+describe("Iride in the reserved areas (Direzione 'Vai A B C' 13/10/2026, UD-121)", () => {
   const staff = { roles: ["mister"], age15plus: null };
   const member15 = { roles: ["atleta"], age15plus: true };
   const minor = { roles: ["atleta"], age15plus: false };
@@ -135,7 +135,7 @@ describe("Vera in the reserved areas (Direzione 'Vai A B C' 13/10/2026, UD-121)"
   const family = { roles: ["famiglia"], age15plus: null };
   const inside = ["/famiglia", "/la-mia-scd", "/direzione", "/segreteria/persone", "/infermeria", "/gestionale/organigramma"];
 
-  it("gives Vera to staff and to members known to be 15+ inside", () => {
+  it("gives Iride to staff and to members known to be 15+ inside", () => {
     for (const p of inside) {
       expect(personaFor(p, staff)).toBe("vera");
       expect(personaFor(p, member15)).toBe("vera");
@@ -153,7 +153,7 @@ describe("Vera in the reserved areas (Direzione 'Vai A B C' 13/10/2026, UD-121)"
     }
   });
 
-  it("a viewer known to be under 15 never gets Vera inside, even with a staff position", () => {
+  it("a viewer known to be under 15 never gets Iride inside, even with a staff position", () => {
     expect(veraEligible({ roles: ["mister"], age15plus: false })).toBe(false);
     expect(personaFor("/famiglia", { roles: ["mister"], age15plus: false })).toBe("sky");
   });
@@ -168,7 +168,7 @@ describe("Vera in the reserved areas (Direzione 'Vai A B C' 13/10/2026, UD-121)"
     }
   });
 
-  it("never opens a tip-only character's chat: asking for Era gives Vera's general chat", () => {
+  it("never opens a tip-only character's chat: asking for Era gives Iride's general chat", () => {
     expect(personaFor("/famiglia", { roles: ["famiglia"] }, "era")).toBe("vera");
     expect(chatAreaFor("/famiglia", { roles: ["famiglia"] }, "era")).toBeNull();
   });

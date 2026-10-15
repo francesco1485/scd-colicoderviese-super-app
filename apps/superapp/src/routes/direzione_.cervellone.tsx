@@ -167,7 +167,7 @@ function CervellonePage({ due, today, preview }: { due: KbData; today: string; p
                 onClick={() => window.dispatchEvent(new Event("vera:open"))}
                 className="scd-focus inline-flex h-11 items-center justify-center gap-2 rounded-[10px] border border-[var(--in-line)] bg-white px-4 text-[15px] font-bold text-[var(--in-ink)]"
               >
-                <MessageCircle className="size-4" aria-hidden="true" /> Chiedi a Vera
+                <MessageCircle className="size-4" aria-hidden="true" /> Chiedi a Iride
               </button>
             </form>
           </Card>

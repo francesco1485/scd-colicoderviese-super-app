@@ -441,8 +441,8 @@ function Calendario() {
               </button>
               <button type="button" onClick={copyLink} className="scd-focus inline-flex h-[40px] items-center gap-1.5 rounded-[10px] bg-[#ffd600] px-[12px] text-[13px] font-bold text-[#0b2a5b]"><Link2 className="size-4" aria-hidden="true" /> Copia link {selected ? "annata" : "calendario"}</button>
               {canShare && <button type="button" onClick={shareLink} className="scd-focus inline-flex h-[40px] items-center gap-1.5 rounded-[10px] bg-[#eef3f9] px-[12px] text-[13px] font-bold"><Share2 className="size-4" aria-hidden="true" /> Condividi</button>}
-              <button type="button" onClick={() => window.dispatchEvent(new CustomEvent("vera:open"))} aria-label="Chiedi a Vera, la reception del club" className="scd-focus inline-flex h-[40px] items-center gap-1.5 rounded-[10px] bg-[#eef3f9] px-[8px] text-[13px] font-bold min-[641px]:hidden">
-                <PersonaAvatar persona="vera" size={24} /> Chiedi a Vera
+              <button type="button" onClick={() => window.dispatchEvent(new CustomEvent("vera:open"))} aria-label="Chiedi a Iride, l'assistente AI della segreteria" className="scd-focus inline-flex h-[40px] items-center gap-1.5 rounded-[10px] bg-[#eef3f9] px-[8px] text-[13px] font-bold min-[641px]:hidden">
+                <PersonaAvatar persona="vera" size={24} /> Chiedi a Iride
               </button>
             </div>
             <p role="status" aria-live="polite" className="m-0 mt-[4px] min-h-0 text-[13px] font-semibold text-[#1556c4]">{refreshMsg ?? copied}</p>
