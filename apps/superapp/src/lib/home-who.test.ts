@@ -4,16 +4,29 @@ import { WHO_ROWS } from "./home-who";
 import { PUBLIC_FORMS_LIVE } from "./public-forms";
 
 const GUIDE_SECTIONS = new Set(["tifosi", "soci", "famiglie", "mister", "segreteria"]);
-const APP_PAGES = new Set(["/calendario", "/accedi", "/contatti", "/registrati", "/sponsor"]);
+/** Pages open to a signed-out visitor (members-only pages such as /squadre would bounce to the login). */
+const PUBLIC_PAGES = new Set([
+  "/calendario",
+  "/accedi",
+  "/contatti",
+  "/registrati",
+  "/sponsor",
+  "/allenamenti",
+  "/guida",
+]);
 
 describe("home 'Chi sei → cosa trovi' (study 15/10 action 3)", () => {
-  it("has the five profiles, each with three things to find and a real destination", () => {
+  it("has the five profiles, each with three things to find and public destinations", () => {
     expect(WHO_ROWS.map((r) => r.id)).toEqual(["tifoso", "famiglia", "atleta", "staff", "sponsor"]);
     for (const r of WHO_ROWS) {
       expect(r.finds).toHaveLength(3);
-      expect(APP_PAGES.has(r.href), r.href).toBe(true);
+      expect(PUBLIC_PAGES.has(r.href), r.href).toBe(true);
       expect(r.cta.length).toBeGreaterThan(3);
-      if (r.guide) expect(GUIDE_SECTIONS.has(r.guide), r.guide).toBe(true);
+      if (r.more) {
+        expect(PUBLIC_PAGES.has(r.more.to), r.more.to).toBe(true);
+        if (r.more.to === "/guida") expect(GUIDE_SECTIONS.has(r.more.hash ?? ""), r.id).toBe(true);
+        else expect(r.more.hash).toBeUndefined();
+      }
     }
   });
 
@@ -23,7 +36,9 @@ describe("home 'Chi sei → cosa trovi' (study 15/10 action 3)", () => {
     else {
       expect(join.href).toBe("/contatti");
       expect(join.cta).not.toMatch(/registrati/i);
+      for (const f of join.finds) expect(f).not.toMatch(/modulo|richiam|in un minuto/i);
     }
+    expect(join.more?.to).toBe("/allenamenti");
   });
 
   it("names no person: profiles only", () => {

@@ -6,6 +6,7 @@
 import { Link } from "@tanstack/react-router";
 import {
   BookOpen,
+  CalendarDays,
   Check,
   ClipboardList,
   Flag,
@@ -59,10 +60,10 @@ export function HomeWho() {
                   <Icon className="size-5" aria-hidden="true" />
                 </span>
                 <span className="grid min-w-0">
-                  <span className="text-[17px] font-bold leading-tight text-[#0b1e3a]">
+                  <h3 className="m-0 text-[17px] font-bold leading-tight text-[#0b1e3a]">
                     {r.who}
-                  </span>
-                  <span className="text-[12.5px] leading-tight text-[#4a5d7a]">
+                  </h3>
+                  <span className="text-[13px] leading-tight text-[#4a5d7a]">
                     {r.claim}
                   </span>
                 </span>
@@ -82,19 +83,24 @@ export function HomeWho() {
                   of the five cards sit on one line whatever each card holds. */}
               <div className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 pt-1 lg:flex-col lg:items-start">
                 <Link
-                  to={r.href as never}
+                  to={r.href}
                   className="scd-focus inline-flex h-11 items-center rounded-[10px] bg-[#1556c4] px-4 text-[14px] font-bold text-white transition-[filter] duration-150 hover:brightness-110"
                 >
                   {r.cta}
                 </Link>
-                {r.guide && (
+                {r.more && (
                   <Link
-                    to="/guida"
-                    hash={r.guide}
+                    to={r.more.to}
+                    {...(r.more.hash ? { hash: r.more.hash } : {})}
+                    aria-label={`${r.more.label}: ${r.who}`}
                     className="scd-focus inline-flex min-h-11 items-center gap-1 rounded-md text-[13.5px] font-semibold text-[#1556c4] lg:order-first"
                   >
-                    <BookOpen className="size-4" aria-hidden="true" />
-                    Come si fa
+                    {r.more.to === "/guida" ? (
+                      <BookOpen className="size-4" aria-hidden="true" />
+                    ) : (
+                      <CalendarDays className="size-4" aria-hidden="true" />
+                    )}
+                    {r.more.label}
                   </Link>
                 )}
               </div>
