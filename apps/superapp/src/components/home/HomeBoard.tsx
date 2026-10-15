@@ -49,7 +49,7 @@ function useMinuteClock(serverNow: number): number {
 /* Tile icons in the board style: filled, two colours, no stock line icons. */
 function BallIcon() {
   return (
-    <svg viewBox="0 0 32 32" className="size-8" aria-hidden="true">
+    <svg viewBox="0 0 32 32" className="scd-roll-slow size-8" aria-hidden="true">
       <circle
         cx="16"
         cy="16"
