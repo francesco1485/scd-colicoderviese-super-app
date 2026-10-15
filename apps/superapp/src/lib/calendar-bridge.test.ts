@@ -4,7 +4,7 @@ import { describe, expect, test } from "vitest";
 import bundled from "@/data/calendario-snapshot.json";
 import fixture20261010 from "@/data/calendario-snapshot-20261010.json";
 import { validateMirror } from "./calendar-mirror";
-import { createCachedSource, fetchMirror } from "./calendar-bridge.server";
+import { MIRROR_URLS, REPO_MIRROR_URL, createCachedSource, fetchMirror } from "./calendar-bridge.server";
 
 const clone = () => JSON.parse(JSON.stringify(bundled));
 const FUTURE = {
@@ -26,6 +26,22 @@ async function fixture() {
   const { port } = server.address() as AddressInfo;
   return { url: `http://127.0.0.1:${port}/mirror.json`, set: (o: unknown) => { body = JSON.stringify(o); }, down: () => { up = false; }, stop: () => { server.close(); } };
 }
+
+describe("canali della copia pubblica", () => {
+  test("prima la copia oraria nel ramo dati del repository, poi Drive; solo https, mai il master", () => {
+    expect(MIRROR_URLS[0]).toBe(REPO_MIRROR_URL);
+    expect(REPO_MIRROR_URL).toBe("https://raw.githubusercontent.com/francesco1485/scd-colicoderviese-super-app/data/calendar-public/calendar-public.json");
+    for (const u of MIRROR_URLS) {
+      expect(u.startsWith("https://")).toBe(true);
+      expect(u).not.toMatch(/1eXS-kY5PCHFg4CXiAErNAKtIVEMIKgWs|docs\.google\.com\/spreadsheets/);
+    }
+  });
+  test("una copia servita come text/plain (raw di GitHub) è accettata; una pagina HTML no", async () => {
+    const mk = (ct: string) => async () => new Response(JSON.stringify(bundled), { status: 200, headers: { "content-type": ct } });
+    expect((await fetchMirror(["https://x/plain"], mk("text/plain; charset=utf-8"))).origin).toBe("mirror");
+    expect((await fetchMirror(["https://x/html"], mk("text/html"))).origin).toBe("fallback");
+  });
+});
 
 describe("validazione copia pubblica", () => {
   test("la copia inclusa (generata dal master il 15/10) è accettata", () => expect(validateMirror(bundled)).toEqual({ ok: true }));

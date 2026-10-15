@@ -5,7 +5,16 @@ import { MAX_BYTES, validateMirror } from "./calendar-mirror";
 /** Interruttore: false = solo copia di sicurezza inclusa nell'app. */
 export const MIRROR_ENABLED = true;
 export const MIRROR_FILE_ID = "1xSQ2MClw7LlIeWhJCSXllmCMQMrXYPn5";
+/**
+ * Hourly public copy (Francesco 15/10/2026: "copia nel repository"): the scheduled task "SCD Calendario · copia pubblica
+ * oraria" regenerates it from the master with tools/sync/calendar_public_payload.py and commits it to the data branch
+ * data/calendar-public only when the master changed. Read first; the Drive copy stays as a second channel. Every
+ * channel passes validateMirror and the freshness rule, so a wrong or older file never replaces the bundled copy.
+ */
+export const REPO_MIRROR_URL =
+  "https://raw.githubusercontent.com/francesco1485/scd-colicoderviese-super-app/data/calendar-public/calendar-public.json";
 export const MIRROR_URLS = [
+  REPO_MIRROR_URL,
   `https://drive.usercontent.google.com/download?id=${MIRROR_FILE_ID}&export=download&confirm=t`,
   `https://drive.google.com/uc?export=download&id=${MIRROR_FILE_ID}`,
 ];
