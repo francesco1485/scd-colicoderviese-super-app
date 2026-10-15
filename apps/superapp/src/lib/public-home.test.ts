@@ -46,6 +46,7 @@ const PUBLIC_HOME_FILES = [
   "src/components/home/HomePractical.tsx",
   "src/components/home/HomeMatchday.tsx",
   "src/components/home/HomeBoard.tsx",
+  "src/components/home/HomePromo.tsx",
   "src/lib/home-board.ts",
   "src/components/home/WinConfetti.tsx",
   "src/lib/public-home.ts",
@@ -116,7 +117,7 @@ describe("public home v5", () => {
     const at = order.map((t) => body.indexOf(t));
     for (const [i, p] of at.entries()) expect(p, order[i]).toBeGreaterThan(-1);
     expect([...at].sort((x, y) => x - y)).toEqual(at);
-    // Off the public home since UD-132 (components kept for other pages).
+    // Off the public home since UD-132; PublicToday and HomeNewsBlock deleted (PC audit 15/10, item 8).
     for (const gone of [
       "<PublicWeek",
       "<PublicToday",

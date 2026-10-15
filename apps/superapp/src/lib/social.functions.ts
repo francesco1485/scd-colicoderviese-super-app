@@ -608,7 +608,7 @@ export const castWeekVote = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<SocialOutcome> => {
     const { org, sb } = await context();
     if (!sb || !org)
-      return { ok: false, message: "Iscriviti o entra per votare." };
+      return { ok: false, message: "Entra con il tuo account per votare." };
     const { data: out, error } = await sb.rpc("scd_cast_week_vote", {
       p_organization_id: org.organizationId,
       p_athlete_id: data.athleteId,

@@ -119,6 +119,12 @@ describe("vetrina catalogue", () => {
     expect(worldAccepts(top11!, "soci")).toBe(true);
   });
 
+  it("the server gives the members' world only to a session it confirms, not to a caller's flag (security review 15/10)", () => {
+    const fn = read("src/lib/vetrina.functions.ts");
+    expect(fn).toMatch(/data\.members === true &&[\s\S]{0,160}\(await sessionView\(\)\)\.user/);
+    expect(fn).not.toMatch(/data\.members\s*\?\s*\["soci"\]/);
+  });
+
   it("anchors exist on the destination pages", () => {
     const pages: Record<string, string> = {
       "/eventi/christmas-lario-cup": read(

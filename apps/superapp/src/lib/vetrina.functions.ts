@@ -6,6 +6,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
+import { sessionView } from "./auth.functions";
+import { stagingPreviewEnabled } from "./impianti-access";
 import { PARTNER_NEWS, partnerNewsOn } from "./partner-news";
 import { serverRomeDay } from "./public-window";
 import {
@@ -39,10 +41,13 @@ export const getVetrina = createServerFn({ method: "GET" })
       pressRecent: data.pressRecent === true,
       partnerNews: partnerNewsOn(today, PARTNER_NEWS).length > 0,
     };
-    // The "soci" world is computed only when the caller is the member home (it holds no secret, just less noise).
-    const worlds: readonly VetrinaWorld[] = data.members
-      ? ["soci"]
-      : PUBLIC_WORLDS;
+    // The "soci" world only for a session the server confirms (or the staging preview of the member home): the caller's
+    // `members` flag alone is not trusted (security review 15/10/2026). Anyone else gets the public worlds.
+    const members =
+      data.members === true &&
+      (stagingPreviewEnabled(process.env, import.meta.env.PROD) ||
+        !!(await sessionView()).user);
+    const worlds: readonly VetrinaWorld[] = members ? ["soci"] : PUBLIC_WORLDS;
     return {
       today,
       worlds: pickAllWorlds(vetrinaCatalogue(), today, facts, worlds),
