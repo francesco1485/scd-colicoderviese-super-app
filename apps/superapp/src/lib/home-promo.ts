@@ -6,6 +6,7 @@
  * and uses real club material (lake photo, official crest, published event posters). Pure functions, tested in
  * home-promo.test.ts.
  */
+import { PUBLIC_FORMS_LIVE } from "./public-forms";
 import type { ClubEvent } from "./stories";
 
 export interface PromoSlide {
@@ -30,20 +31,32 @@ const WELCOME: PromoSlide = {
   id: "benvenuto",
   tag: "Nuovi iscritti",
   title: "Entra nel mondo ColicoDerviese",
-  text: "Iscriviti in un minuto: rose, allenamenti, carte della squadra e tutta la vita del club, sempre in tasca.",
+  text: "Crea il tuo account: rose, allenamenti, carte della squadra e tutta la vita del club, sempre in tasca.",
   cta: { label: "Registrati", to: "/registrati" },
-  secondary: { label: "Accedi", to: "/entra" },
+  secondary: { label: "Accedi", to: "/accedi" },
   art: { kind: "lake" },
 };
 
-const ISCRIZIONI: PromoSlide = {
-  id: "iscrizioni",
-  tag: "Stagione 2026/27",
-  title: "Vuoi giocare con noi?",
-  text: "Scegli categoria e annata e chiedi una prova: la segreteria ti ricontatta.",
-  cta: { label: "Chiedi una prova", to: "/entra" },
-  art: { kind: "stripes", big: "26/27", small: "Iscrizioni aperte" },
-};
+/** Sign-up slide: the in-app request only while the public forms are live, otherwise the official contacts. */
+export function iscrizioniSlide(formsLive: boolean = PUBLIC_FORMS_LIVE): PromoSlide {
+  return formsLive
+    ? {
+        id: "iscrizioni",
+        tag: "Stagione 2026/27",
+        title: "Vuoi giocare con noi?",
+        text: "Scegli categoria e annata e chiedi una prova: la segreteria ti ricontatta.",
+        cta: { label: "Chiedi una prova", to: "/entra" },
+        art: { kind: "stripes", big: "26/27", small: "Iscrizioni aperte" },
+      }
+    : {
+        id: "iscrizioni",
+        tag: "Stagione 2026/27",
+        title: "Vuoi giocare con noi?",
+        text: "Scrivi alla segreteria per categoria, annata e una prova in campo.",
+        cta: { label: "Contatta la segreteria", to: "/contatti" },
+        art: { kind: "stripes", big: "26/27", small: "Iscrizioni aperte" },
+      };
+}
 
 const CARTE: PromoSlide = {
   id: "carte",
@@ -66,9 +79,13 @@ export function eventSlide(e: ClubEvent): PromoSlide {
 }
 
 /** Slides of a Rome day: welcome first, then the upcoming published events, the season sign-up, the new cards. */
-export function promoSlides(day: string, events: readonly ClubEvent[]): PromoSlide[] {
+export function promoSlides(
+  day: string,
+  events: readonly ClubEvent[],
+  formsLive: boolean = PUBLIC_FORMS_LIVE,
+): PromoSlide[] {
   const upcoming = events.filter((e) => !e.date || e.date >= day).map(eventSlide);
-  return [WELCOME, ...upcoming, ISCRIZIONI, CARTE];
+  return [WELCOME, ...upcoming, iscrizioniSlide(formsLive), CARTE];
 }
 
 /** Next index of the carousel, wrapping around; 0 for an empty list. */
@@ -96,7 +113,7 @@ export function quickChips(gamesLeftThisWeek: number, live: boolean): QuickChip[
     { id: "carte", label: "Carte della rosa", to: "/squadre/carte", badge: { kind: "new" } },
     { id: "eventi", label: "Eventi", to: "/eventi" },
     { id: "tornei", label: "Tornei", to: "/tornei" },
-    { id: "iscrizioni", label: "Iscrizioni", to: "/entra" },
+    { id: "iscrizioni", label: "Iscrizioni", to: PUBLIC_FORMS_LIVE ? "/entra" : "/contatti" },
     { id: "impianti", label: "Impianti", to: "/impianti" },
     { id: "sponsor", label: "Partner", to: "/sponsor" },
   ];

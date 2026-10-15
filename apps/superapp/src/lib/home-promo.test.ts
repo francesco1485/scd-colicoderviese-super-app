@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
-import { eventSlide, nextIndex, promoSlides, quickChips } from "./home-promo";
+import { eventSlide, iscrizioniSlide, nextIndex, promoSlides, quickChips } from "./home-promo";
 import type { ClubEvent } from "./stories";
 
 const ev = (over: Partial<ClubEvent> = {}): ClubEvent => ({
@@ -32,6 +32,14 @@ describe("promo carousel", () => {
     const s = eventSlide(ev());
     expect(s.art).toEqual({ kind: "poster", src: ev().image, alt: "Locandina Christmas Lario Cup" });
     expect(s.cta.to).toBe("/eventi/christmas-lario-cup");
+  });
+  it("sign-up slide never promises a callback while the public forms are paused", () => {
+    expect(iscrizioniSlide(false).cta.to).toBe("/contatti");
+    expect(iscrizioniSlide(false).text).not.toMatch(/ricontatta/);
+    expect(iscrizioniSlide(true).cta.to).toBe("/entra");
+  });
+  it("Accedi goes to the sign-in page", () => {
+    expect(promoSlides("2026-10-15", [])[0]?.secondary?.to).toBe("/accedi");
   });
   it("nextIndex wraps both ways", () => {
     expect(nextIndex(3, 4)).toBe(0);

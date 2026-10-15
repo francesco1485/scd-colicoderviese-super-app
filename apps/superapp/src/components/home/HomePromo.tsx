@@ -316,7 +316,7 @@ function ChipBadge({ badge }: { badge: NonNullable<QuickChip["badge"]> }) {
   if (badge.kind === "live")
     return <span className={`${base} bg-[#e11d2e] text-white`}>Live</span>;
   if (badge.kind === "new")
-    return <span className={`${base} bg-[#1f9d55] text-white`}>Nuovo</span>;
+    return <span className={`${base} bg-[#157a3f] text-white`}>Nuovo</span>;
   return (
     <span className={`${base} bg-[#ffd600] tabular-nums text-[#0b1e3a]`}>
       {badge.value}

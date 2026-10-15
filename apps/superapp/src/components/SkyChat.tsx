@@ -61,7 +61,7 @@ function greeting(persona: Persona, area: ChatAreaId | null): Msg[] {
 const NAV_H = 62;
 const STRIP_H = 34;
 /** Launcher (56px) centred on the sponsor strip on phones: it covers the strip's reserved right cap, never page content. */
-const LAUNCHER = 56;
+const LAUNCHER = 44;
 
 /** A reply link: app paths through the router (with "?query" and "#anchor"), https sources in a new tab. */
 function ReplyLink({ link, onNavigate }: { link: { label: string; to: string }; onNavigate: () => void }) {
@@ -235,6 +235,8 @@ export function SkyChat({ interior = false }: { interior?: boolean } = {}) {
   return (
     <div
       data-sky-widget
+      data-interior={interior || undefined}
+      data-open={open || undefined}
       data-persona={persona}
       data-face={face}
       style={{ "--sky-bottom": phoneBottom } as CSSProperties}
@@ -358,9 +360,11 @@ export function SkyChat({ interior = false }: { interior?: boolean } = {}) {
           aria-label={
             open ? `Chiudi ${copy.name}` : `Apri ${copy.title}, aiuto rapido`
           }
-          className={`relative flex size-14 items-center justify-center rounded-full bg-white shadow-[0_8px_22px_-6px_rgb(11_42_91/0.45)] ${notify && !open ? "sky-bounce" : "sky-idle"}`}
+          className={`relative flex size-11 items-center justify-center rounded-full lg:size-14 bg-white shadow-[0_8px_22px_-6px_rgb(11_42_91/0.45)] ${notify && !open ? "sky-bounce" : "sky-idle"}`}
         >
-          <SkyMascot mood={mood} size={52} persona={face} />
+          <span className="flex origin-center scale-[0.8] lg:scale-100">
+            <SkyMascot mood={mood} size={52} persona={face} />
+          </span>
           <span
             aria-hidden="true"
             className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 rounded-full bg-[#0b2a5b] px-2 py-px text-[10px] font-bold leading-[14px] tracking-wide text-white"

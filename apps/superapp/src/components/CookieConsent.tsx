@@ -58,7 +58,8 @@ function writeConsent(c: Consent) {
   window.dispatchEvent(new CustomEvent("scd:consent", { detail: c }));
 }
 
-export function CookieConsent() {
+/** interior: work-area shells have no bottom bar and no sponsor strip, so the strip sits at the very bottom. */
+export function CookieConsent({ interior = false }: { interior?: boolean } = {}) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [consent, setConsent] = useState<Consent | null>(null);
   const [banner, setBanner] = useState(false);
@@ -94,6 +95,9 @@ export function CookieConsent() {
   useEffect(() => {
     const open = banner && !prefs;
     document.documentElement.dataset["cookieBanner"] = open ? "open" : "closed";
+    return () => {
+      delete document.documentElement.dataset["cookieBanner"];
+    };
   }, [banner, prefs]);
 
   const save = (s: boolean, m: boolean) => {
@@ -111,7 +115,7 @@ export function CookieConsent() {
           role="region"
           aria-label="Cookie e privacy"
           data-testid="cookie-banner"
-          className="fixed inset-x-0 bottom-[calc(96px+env(safe-area-inset-bottom))] z-[45] flex items-center gap-3 border-t border-[#d5dfec] bg-white px-4 py-0.5 text-[var(--scd-ink)] shadow-[0_-6px_16px_-10px_rgb(11_42_91/0.35)] lg:bottom-[46px] lg:justify-center"
+          className={`fixed inset-x-0 z-[45] flex ${interior ? "bottom-0 pb-[env(safe-area-inset-bottom)]" : "bottom-[calc(96px+env(safe-area-inset-bottom))] lg:bottom-[46px]"} items-center gap-3 border-t border-[#d5dfec] bg-white px-4 py-0.5 text-[var(--scd-ink)] shadow-[0_-6px_16px_-10px_rgb(11_42_91/0.35)] lg:justify-center`}
         >
           <p className="m-0 min-w-0 flex-1 text-[12.5px] leading-[1.3] text-[var(--scd-sub)] lg:flex-none">
             Solo cookie tecnici: nessuna statistica, nessuna pubblicità.{" "}

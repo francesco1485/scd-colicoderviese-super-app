@@ -155,7 +155,7 @@ function RootComponent() {
         <Outlet />
         {/* r99: the same chat, opened only from in-page entry points ("Chiedi a Vera"), no floating launcher. */}
         <SkyChat interior />
-        <CookieConsent />
+        <CookieConsent interior />
         <PwaManager />
       </QueryClientProvider>
     );

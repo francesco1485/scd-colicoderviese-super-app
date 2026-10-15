@@ -13,6 +13,7 @@
  * affiliations (credential strip and footer), team lists (teams are inside, UD-100). Not available yet (no real page
  * or data, reported): fondo solidale, end-of-season events, standings, polls, podcast "Parliamo di noi".
  */
+import { PUBLIC_FORMS_LIVE } from "./public-forms";
 import { CAST, castAvatarSrc, castReady } from "./assistant-cast";
 import { CHRISTMAS_LARIO_CUP as CLC } from "./events";
 import { INITIATIVES } from "./initiatives.server";
@@ -182,9 +183,12 @@ export const VETRINA_SLOTS: readonly VetrinaSlot[] = [
     theme: "iscrizioni",
     kicker: "Stagione 2026/27",
     title: "Iscrizioni e prova",
-    text: "Vuoi giocare con noi? Scegli categoria e annata: la segreteria ti ricontatta.",
-    href: "/entra",
-    cta: "Chiedi una prova",
+    // Callback promise only while the public forms are live (public-forms.ts); otherwise the official contacts.
+    text: PUBLIC_FORMS_LIVE
+      ? "Vuoi giocare con noi? Scegli categoria e annata: la segreteria ti ricontatta."
+      : "Vuoi giocare con noi? Scrivi alla segreteria per categoria, annata e una prova in campo.",
+    href: PUBLIC_FORMS_LIVE ? "/entra" : "/contatti",
+    cta: PUBLIC_FORMS_LIVE ? "Chiedi una prova" : "Contatta la segreteria",
     visual: { kind: "type", big: "26/27", small: "Iscrizioni aperte" },
     audience: "public",
     audiences: ["bambini", "ragazzi", "famiglie"],
