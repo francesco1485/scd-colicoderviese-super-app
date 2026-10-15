@@ -61,6 +61,7 @@ export async function fetchMirror(urls: string[], fetchImpl: FetchLike = fetch):
   for (const url of urls) {
     try {
       // The repository copy is served directly: no redirect is followed there. Drive needs its own redirects.
+      // "error" needs the Node runtime (Nitro node-server preset); on another runtime use "manual" and drop 3xx.
       const redirect: RequestRedirect = url === REPO_MIRROR_URL ? "error" : "follow";
       const res = await fetchImpl(url, { redirect, signal: AbortSignal.timeout(6000), headers: { accept: "application/json" } });
       if (!res.ok) { reason = `HTTP ${res.status}`; continue; }
