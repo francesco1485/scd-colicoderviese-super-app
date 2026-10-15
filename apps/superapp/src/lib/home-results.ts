@@ -72,3 +72,33 @@ export function weekendResults(
   }
   return out.sort((a, b) => b.date.localeCompare(a.date)).slice(0, 6);
 }
+
+/** Our side in a result: the S.C.D. ColicoDerviese name (any spelling of Colico / Derviese) on exactly one side. */
+const OURS = /colico|derviese/i;
+
+/**
+ * True when the row is a ColicoDerviese win (UD-134, Francesco 15/10/2026 09:18: "coriandoli se si vince"). A draw,
+ * a defeat, or a row where our name is on both sides or on neither (not ours, or a derby between our own teams) is
+ * never a win.
+ */
+export function isClubWin(
+  r: Pick<ResultRow, "home" | "away" | "homeGoals" | "awayGoals">,
+): boolean {
+  const atHome = OURS.test(r.home);
+  const away = OURS.test(r.away);
+  if (atHome === away) return false;
+  return atHome ? r.homeGoals > r.awayGoals : r.awayGoals > r.homeGoals;
+}
+
+/** Confetti pieces of a celebration: deterministic (no random at render), spread across the width. */
+export function confettiPieces(
+  count: number,
+): { x: number; delay: number; spin: number; drift: number; color: number }[] {
+  return Array.from({ length: Math.max(0, Math.floor(count)) }, (_, i) => ({
+    x: Math.round(((i * 37) % 100) * 10) / 10,
+    delay: (i % 7) * 70,
+    spin: ((i * 53) % 2 === 0 ? 1 : -1) * (360 + ((i * 97) % 360)),
+    drift: ((i * 29) % 41) - 20,
+    color: i % 4,
+  }));
+}

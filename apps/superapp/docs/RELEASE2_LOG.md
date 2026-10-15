@@ -598,3 +598,12 @@ QA: `tsc` ok, vitest completo verde, `npm run build` ok, `test:manifest` e `test
 
 Da decidere (Direzione): applicazione di r110 dopo DPIA e testo di presa visione; collegamento account-autista; job orario per `scd_transport_live_purge`; coordinate verificate dei punti d'arrivo.
 - 08:51 Francesco: "sì" al Calendario live, "voglio animazione e tanta dinamicità". Strato di movimento (tutto spento con "riduci movimento"): fasci di luce da stadio e luci gialle che salgono nella testata, riquadri che entrano rimbalzando con icona che si muove (pallone che rotola), numero gare che pulsa, riflesso che passa sulla card Prossima gara, secondi del conto alla rovescia che scattano, anelli delle storie che girano, righe del calendario che salgono mentre scorri.
+
+## 15/10/2026 09:18 · UD-134: coriandoli solo se vinciamo, via le storie, torna la barra sponsor, un solo assistente
+
+- **Coriandoli solo sulle vittorie**: nei "Risultati del weekend" una riga ColicoDerviese vinta ha il badge giallo "Vittoria" e, quando il blocco entra nello schermo, parte una pioggia di coriandoli nei colori del club (una volta per sessione per le stesse vittorie). Pareggi, sconfitte, derby tra nostre squadre e gare non nostre: niente. Con "riduci movimento": niente coriandoli. Logica pura `isClubWin` + `confettiPieces` in `lib/home-results.ts` (test), componente `home/WinConfetti.tsx`.
+- **Via le storie** dalla home ("mi sembra una cavolata"): rimossi `HomeStories.tsx`, `lib/home-stories.ts` e il test; tolta la classe `scd-ring`.
+- **Torna la barra sponsor scorrevole** anche sulla home (`SponsorBand` senza eccezione per "/", spazio riservato nella shell, chat Vera posizionata sopra la barra).
+- **Notizie partner e LED wall fuori dalla home**: il blocco (spot in onda, partner del mese, notizie dei partner) è ora `components/sponsor/PartnerBand.tsx` sulla pagina `/sponsor`, dopo il listino; un solo "Diventa partner" (quello dello spot).
+- **Un solo assistente**: tolto il fumetto di Crovi che compariva accanto a Vera (supera la parte "saluta una volta per visita" di UD-122). Vera resta l'unica chat.
+- Registrato il comando in `config/user-directives.v1.json` come UD-134 (carte giocatori/staff in lavorazione; ticker non deciso, non costruito).

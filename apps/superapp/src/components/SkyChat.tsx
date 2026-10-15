@@ -16,16 +16,6 @@ import {
   personaFor,
   type Persona,
 } from "@/components/scd/SkyJolly";
-import { CroviActor } from "@/components/CroviActor";
-import {
-  CAMEO_SEEN_KEY,
-  CAMEO_VISIBLE_MS,
-  FORCED_CAMEO_DELAY_MS,
-  cameoDelayMs,
-  cameoLine,
-  forceCameo,
-  type CameoLine,
-} from "@/lib/crovi-cameo";
 import { AI_NOTICE, type ChatAreaId } from "@/lib/assistant";
 import { askAssistant, askStaffAssistant } from "@/lib/assistant.functions";
 import { ASSISTANT_OPEN_EVENT, VERA_OPEN_EVENTS, openedArea } from "@/lib/assistant-open";
@@ -67,7 +57,7 @@ function greeting(persona: Persona, area: ChatAreaId | null): Msg[] {
   return [{ role: "sky", text: g.text, ...(g.links ? { links: g.links } : {}) }];
 }
 
-/* Bottom chrome on phones (SiteChrome.BottomNav 62px, SponsorBand 34px except on the home) */
+/* Bottom chrome on phones (SiteChrome.BottomNav 62px, SponsorBand 34px on every public page, UD-134) */
 const NAV_H = 62;
 const STRIP_H = 34;
 const GAP = 12;
@@ -120,7 +110,6 @@ export function SkyChat({ interior = false }: { interior?: boolean } = {}) {
   const copy = chatCopyFor(persona, area);
   const hidden = isHelperHiddenPath(pathname);
   const onCalendario = pathname === "/calendario";
-  const sponsorStrip = pathname !== "/";
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
@@ -132,43 +121,8 @@ export function SkyChat({ interior = false }: { interior?: boolean } = {}) {
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
-  // Crovi is the app mascot (Direzione 14/10/2026, UD-122): on public pages he greets once per visit and points to
-  // Vera's chat. Image only: he never answers, the chat is always Vera.
-  const [cameo, setCameo] = useState<CameoLine | null>(null);
-  const mascotPage = persona === "vera" && !interior && !isReservedPath(pathname);
-  useEffect(() => {
-    if (!mascotPage) return;
-    const forced = forceCameo(window.location.search);
-    let seen = false;
-    try {
-      seen = sessionStorage.getItem(CAMEO_SEEN_KEY) === "1";
-    } catch {
-      /* storage off: show once per page load */
-    }
-    if (seen && !forced) return;
-    const t = setTimeout(
-      () => {
-        const line = cameoLine(pathname);
-        if (!line) return;
-        setCameo(line);
-        try {
-          sessionStorage.setItem(CAMEO_SEEN_KEY, "1");
-        } catch {
-          /* ignore */
-        }
-      },
-      forced ? FORCED_CAMEO_DELAY_MS : cameoDelayMs(Math.random()),
-    );
-    return () => clearTimeout(t);
-  }, [mascotPage, pathname]);
-  useEffect(() => {
-    if (!cameo) return;
-    const t = setTimeout(() => setCameo(null), CAMEO_VISIBLE_MS);
-    return () => clearTimeout(t);
-  }, [cameo]);
-  useEffect(() => {
-    if (open || !mascotPage) setCameo(null);
-  }, [open, mascotPage]);
+  // One assistant only (UD-134, Francesco 15/10/2026 09:18: "ci sono due chatbot e non si capisce nulla"): the Crovi
+  // greeting bubble is gone; Vera is the only chat on public pages.
 
   // A new persona (public <-> reserved) or a new area starts a fresh conversation with its own greeting.
   const chatKey = `${persona}|${area ?? ""}`;
@@ -273,7 +227,7 @@ export function SkyChat({ interior = false }: { interior?: boolean } = {}) {
 
   const phoneBottom = interior
     ? "calc(16px + env(safe-area-inset-bottom))"
-    : `calc(${NAV_H + (sponsorStrip ? STRIP_H : 0) + GAP}px + env(safe-area-inset-bottom))`;
+    : `calc(${NAV_H + STRIP_H + GAP}px + env(safe-area-inset-bottom))`;
   const isSky = persona === "sky";
 
   // Super App: su smartphone il widget resta sopra la barra di navigazione inferiore e la striscia sponsor.
@@ -283,7 +237,7 @@ export function SkyChat({ interior = false }: { interior?: boolean } = {}) {
       data-persona={persona}
       data-face={face}
       style={{ "--sky-bottom": phoneBottom } as CSSProperties}
-      className={`fixed bottom-[var(--sky-bottom)] right-4 z-50 flex max-w-[calc(100vw-2rem)] flex-col items-end gap-3 ${interior ? "lg:bottom-4" : sponsorStrip ? "lg:bottom-[62px]" : "lg:bottom-4"} ${onCalendario && !open ? "max-[640px]:hidden" : ""}`}
+      className={`fixed bottom-[var(--sky-bottom)] right-4 z-50 flex max-w-[calc(100vw-2rem)] flex-col items-end gap-3 ${interior ? "lg:bottom-4" : "lg:bottom-[62px]"} ${onCalendario && !open ? "max-[640px]:hidden" : ""}`}
     >
       {open && (
         <div
@@ -390,43 +344,6 @@ export function SkyChat({ interior = false }: { interior?: boolean } = {}) {
               <Send className="size-4" />
             </button>
           </div>
-        </div>
-      )}
-      {cameo && !open && mascotPage && (
-        <div
-          role="status"
-          aria-live="polite"
-          className="crovi-cameo flex items-end gap-1"
-          data-testid="crovi-cameo"
-        >
-          <div className="mb-12 min-w-0 max-w-[min(13.5rem,calc(100vw-12.5rem))] rounded-2xl rounded-br-sm border border-[#dbe3ee] bg-white px-3 py-2.5 text-[0.8rem] leading-snug text-[#0b1e3a] shadow-[0_18px_40px_-12px_rgb(11_42_91/0.35)]">
-            <p className="m-0">{cameo.text}</p>
-            <div className="mt-2 flex items-center gap-2">
-              <button
-                onClick={() => {
-                  const q = cameo.ask;
-                  setCameo(null);
-                  setOpen(true);
-                  setNotify(false);
-                  void send(q);
-                }}
-                className="min-h-8 rounded-full bg-[#ffd600] px-3 py-1 text-[0.75rem] font-semibold text-[#0b1e3a]"
-              >
-                Chiedi a Vera
-              </button>
-              <button
-                onClick={() => setCameo(null)}
-                aria-label="Chiudi il saluto di Crovi"
-                className="flex size-8 items-center justify-center rounded-full text-[#5a6b85]"
-              >
-                <X className="size-3.5" />
-              </button>
-            </div>
-          </div>
-          <CroviActor
-            className="h-[clamp(150px,24svh,190px)] shrink-0 drop-shadow-[0_10px_14px_rgb(0_10_40/0.35)] lg:h-[210px]"
-            label="Crovi, la mascotte del club, saluta e indica la chat di Vera"
-          />
         </div>
       )}
       {!interior && (

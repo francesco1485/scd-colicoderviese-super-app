@@ -211,10 +211,8 @@
 .sky-typing-dot { animation: sky-typing 1s ease-in-out infinite; }
 .sky-panel { animation: sky-pop .22s ease-out; transform-origin: bottom right; }
 /* Crovi cameo: entra saltellando dal bordo, respira, e a ogni cambio di posa fa un piccolo saltello */
-@keyframes crovi-in { 0% { opacity: 0; transform: translateX(70px) } 45% { opacity: 1; transform: translateX(-8px) translateY(-10px) } 70% { transform: translateX(2px) translateY(0) } 85% { transform: translateY(-4px) } 100% { opacity: 1; transform: none } }
 @keyframes crovi-breathe { 0%,100% { transform: scale(1,1) rotate(0) } 50% { transform: scale(1.012,1.022) rotate(-.8deg) } }
 @keyframes crovi-hop { 0% { transform: scale(1.03,.95) } 35% { transform: translateY(-7px) scale(.98,1.03) } 70% { transform: translateY(0) scale(1.02,.98) } 100% { transform: none } }
-.crovi-cameo { animation: crovi-in .75s cubic-bezier(.2,.8,.2,1) both; }
 .crovi-actor { transform-origin: 50% 100%; animation: crovi-breathe 2.6s ease-in-out .8s infinite; }
 .crovi-beat { transform-origin: 50% 100%; animation: crovi-hop .32s ease-out; }
 /* Sky: entra con un salto, poi ondeggia e annuisce mentre parla */
@@ -224,7 +222,7 @@
 .sky-hop-in { transform-origin: 50% 100%; animation: sky-hop-in .7s cubic-bezier(.2,.8,.2,1) both, sky-talk 2.2s ease-in-out .7s infinite; }
 .sky-float { transform-origin: 50% 100%; animation: sky-float 3.6s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) {
-  .sky-idle, .sky-bounce, .sky-typing-dot, .sky-panel, .crovi-cameo, .crovi-actor, .crovi-beat, .sky-hop-in, .sky-float { animation: none; }
+  .sky-idle, .sky-bounce, .sky-typing-dot, .sky-panel, .crovi-actor, .crovi-beat, .sky-hop-in, .sky-float { animation: none; }
 }
 
 /* ---------- Super App: integrazione moduli CORE/GROW nella shell unica ---------- */
@@ -925,7 +923,6 @@ html.uv-big .sa-shell { zoom: 1.12; }
 @keyframes scd-roll { to { transform: rotate(360deg) } }
 @keyframes scd-wiggle-hover { 0%, 100% { transform: rotate(0) } 25% { transform: rotate(-12deg) scale(1.12) } 60% { transform: rotate(9deg) scale(1.08) } }
 @keyframes scd-badge { 0%, 100% { transform: scale(1) } 50% { transform: scale(1.15) } }
-@keyframes scd-ring-spin { to { transform: rotate(360deg) } }
 @keyframes scd-rise { from { opacity: 0; transform: translateY(26px) scale(.98) } to { opacity: 1; transform: none } }
 @keyframes scd-shine { from { transform: translateX(-120%) skewX(-18deg) } to { transform: translateX(260%) skewX(-18deg) } }
 .scd-beam { position: absolute; top: -30%; width: 34%; height: 170%; background: linear-gradient(rgb(200 228 255 / .38), rgb(200 228 255 / 0) 70%); filter: blur(10px); transform-origin: top center; animation: scd-beam 9s ease-in-out infinite; pointer-events: none }
@@ -935,15 +932,16 @@ html.uv-big .sa-shell { zoom: 1.12; }
 .scd-wiggle-target { animation: scd-wiggle .9s ease-in-out both; animation-delay: calc(var(--i, 0) * 90ms + 800ms) }
 .scd-roll-slow { animation: scd-roll 14s linear infinite }
 .scd-badge-pulse { animation: scd-badge 2s ease-in-out infinite }
-.scd-ring { position: relative; isolation: isolate; overflow: hidden }
-.scd-ring::before { content: ""; position: absolute; inset: -40%; z-index: -1; background: conic-gradient(#ffd600, #29b6ff, #1556c4, #ffd600); animation: scd-ring-spin 4s linear infinite }
 .scd-shine { position: relative; overflow: hidden }
 .scd-shine::after { content: ""; position: absolute; inset: 0 auto 0 0; width: 40%; background: linear-gradient(90deg, transparent, rgb(255 255 255 / .55), transparent); animation: scd-shine 3.6s ease-in-out infinite; animation-delay: 1.2s; pointer-events: none }
+/* UD-134: confetti over the weekend results, only on a ColicoDerviese win (WinConfetti.tsx). */
+@keyframes scd-confetti { 0% { opacity: 0; transform: translate3d(0, -20px, 0) rotate(0) } 10% { opacity: 1 } 100% { opacity: 0; transform: translate3d(var(--drift, 0), 420px, 0) rotate(var(--spin, 540deg)) } }
+.scd-confetti { opacity: 0; animation: scd-confetti 1.9s cubic-bezier(.25,.6,.45,1) both }
 @supports (animation-timeline: view()) {
   .scd-rise { animation: scd-rise linear both; animation-timeline: view(); animation-range: entry 0% entry 60% }
 }
 @media (prefers-reduced-motion: reduce) {
-  .scd-beam, .scd-float-dot, .scd-shine::after { display: none }
-  .scd-pop-in, .scd-wiggle-target, .scd-roll-slow, .scd-badge-pulse, .scd-rise, .scd-ring::before, .scd-shine::after,
+  .scd-beam, .scd-float-dot, .scd-shine::after, .scd-confetti { display: none }
+  .scd-pop-in, .scd-wiggle-target, .scd-roll-slow, .scd-badge-pulse, .scd-rise, .scd-shine::after,
   .scd-wiggle-on-hover:hover .scd-wiggle-target { animation: none !important }
 }

@@ -133,9 +133,6 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  // The fixed SponsorBand is hidden on the home (partners are a section there), so the shell only
-  // reserves room for the bottom tab bar on phones and nothing on desktop.
-  const home = useRouterState({ select: (s) => s.location.pathname === "/" });
   // Work areas (staticData.interior, or a gated work area whose loader opened the page) bring
   // their own shell: no public chrome around them. A gated area showing its access screen keeps it.
   const interior = useMatches({
@@ -166,7 +163,8 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className={`sa-shell min-h-dvh overflow-x-clip ${home ? "pb-[calc(4rem+env(safe-area-inset-bottom))] lg:pb-0" : "pb-[calc(4rem+46px+env(safe-area-inset-bottom))] lg:pb-[46px]"}`}>
+      {/* Room for the bottom tab bar and the fixed sponsor bar, on every public page (UD-134). */}
+      <div className="sa-shell min-h-dvh overflow-x-clip pb-[calc(4rem+46px+env(safe-area-inset-bottom))] lg:pb-[46px]">
         <SiteHeader />
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />

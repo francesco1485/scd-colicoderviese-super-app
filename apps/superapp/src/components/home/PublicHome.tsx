@@ -1,15 +1,13 @@
 /**
- * Signed-out public home v6 "Matchday" (UD-132, Francesco 14/10/2026 23:22: a short home that pushes ragazzi and
- * families to live the app; before: 6086 px at 390 px, about seven phone screens), built on UD-116 and UD-110.
+ * Signed-out public home on board VR-009 (UD-133, then UD-134 Francesco 15/10/2026 09:18).
  *
- * Order: urgent notices (R20 alerts, only when there are) → the one club communication chosen by the Direzione (with
- * expiry) → "Questa settimana" (games of the next 7 days with filters, HomeMatchday.tsx) with the compact LED wall
- * strip beside it on desktop → weekend results (only with a real source) → join → credentials once → ONE partner
- * band → reduced footer. Support strip, quick actions (the bottom nav covers them), tip of the day, vetrina and news
- * are not rendered here any more; Vetrina and HomeNewsBlock stay exported for other pages.
- * Teams, rosters and trainings are not here: they live inside after sign-in (UD-100).
+ * Order: urgent notices (R20 alerts, only when there are) → the one club communication chosen by the Direzione →
+ * HomeBoard (lake hero, tiles, the club's most important next game with its countdown, trainings and the event of the
+ * day) → "Mondo Colico" vetrina → all the games of the week (HomeMatchday) → weekend results (only with a real source;
+ * "Vittoria" and confetti only on a ColicoDerviese win) → footer. Partners scroll in the fixed SponsorBand on every
+ * page; the LED spot, the partner of the month and partner news live on /sponsor (PartnerBand). No stories.
  * Palette: navy #0b2a5b, blue #1556c4, light #eef3f9, white; yellow #ffd600 for changes and the main CTA.
- * Real assets only (public/media); our age-group crests never appear; no minor is named.
+ * Real assets only (public/media); no minor is named.
  */
 import { Link } from "@tanstack/react-router";
 import {
@@ -21,18 +19,13 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
-import { SponsorSpotsHome } from "@/components/SponsorSpots";
 import { KitTexture } from "@/components/scd/kit-texture";
-import { LogoTile, SponsorLogo } from "@/components/scd/Logos";
 import type { ClubNotice } from "@/lib/club-notice";
 import type { PublicFeed } from "@/lib/club.types";
 import { weekendResults } from "@/lib/home-results";
 import { urgentNotices } from "@/lib/home-today";
 import { NEWS_SOURCE_LABEL, type NewsItem } from "@/lib/news-mix";
-import { partnerNewsOn } from "@/lib/partner-news";
 import { timeAgo } from "@/lib/social";
-import { partnerOfTheMonth } from "@/lib/public-home";
-import { SPONSORS, sponsorLabel } from "@/lib/sponsors";
 import {
   PUBLIC_WORLDS,
   WORLD_HINT,
@@ -44,7 +37,6 @@ import {
 } from "@/lib/vetrina";
 
 import { HomeBoard } from "@/components/home/HomeBoard";
-import { HomeStories } from "@/components/home/HomeStories";
 import { HomeMatchday } from "@/components/home/HomeMatchday";
 import {
   ClubNoticeCard,
@@ -403,128 +395,10 @@ export function HomeNewsBlock({
   );
 }
 
-/* --------------------------------------------------------- partner band */
-
-const monthName = (day: string) =>
-  new Intl.DateTimeFormat("it-IT", { timeZone: "UTC", month: "long" }).format(
-    new Date(`${day.slice(0, 7)}-15T12:00:00Z`),
-  );
-
-/**
- * The ONE partner band of the home (UD-116 "una sola fascia sobria", after UD-110): the LED wall with every partner
- * in rotation (UD-107), the partner of the month, partner news only when a partner has sent one, and the two links
- * (all partners, become a partner). Logos always in colour.
- */
-function PartnerBand({ day }: { day: string }) {
-  const showcase = partnerOfTheMonth(day);
-  const news = partnerNewsOn(day);
-  return (
-    <section
-      aria-labelledby="partner-t"
-      className={`${WRAP} pt-8 lg:pt-12`}
-      data-testid="partner-band"
-    >
-      <div className="flex items-end justify-between gap-3 pb-3">
-        <h2
-          id="partner-t"
-          className="scd-reveal m-0 font-uv text-[24px] uppercase leading-none text-[#0b2a5b] sm:text-[26px] lg:text-[30px]"
-        >
-          I nostri partner
-        </h2>
-        <Link
-          to="/sponsor"
-          className="scd-focus inline-flex min-h-11 shrink-0 items-center gap-0.5 rounded-md text-[14px] font-semibold text-[#1556c4]"
-          data-testid="all-partners"
-        >
-          Tutti i {SPONSORS.length} partner
-          <ChevronRight className="size-4" aria-hidden="true" />
-        </Link>
-      </div>
-      <div className="grid gap-4 rounded-[16px] bg-white p-4 shadow-[0_1px_2px_rgb(11_42_91/0.06),0_8px_24px_-12px_rgb(11_42_91/0.25)] lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-center lg:p-5">
-        <div data-testid="home-ledwall" className="min-w-0">
-          <SponsorSpotsHome day={day} compact />
-        </div>
-        <div className="grid content-start gap-3">
-          {showcase && (
-            <div
-              className="flex items-center gap-3.5 rounded-[12px] bg-[#eef3f9] p-3"
-              data-testid="partner-of-month"
-            >
-              <LogoTile className="h-[60px] w-[96px] shrink-0">
-                <SponsorLogo
-                  sponsor={showcase}
-                  box={{ w: 80, h: 44 }}
-                  decorative
-                />
-              </LogoTile>
-              <span className="grid min-w-0 flex-1 gap-0.5">
-                <span className="text-[11.5px] font-bold uppercase tracking-[0.08em] text-[#1556c4]">
-                  Partner del mese · {monthName(day)}
-                </span>
-                <b className="text-[16px] leading-tight text-[#0b1e3a]">
-                  {sponsorLabel(showcase)}
-                </b>
-              </span>
-            </div>
-          )}
-          {news.length > 0 && (
-            <ul
-              className="m-0 grid list-none gap-0 divide-y divide-[#e6edf6] p-0"
-              data-testid="partner-news"
-            >
-              {news.slice(0, 2).map((n) => (
-                <li key={n.id} className="py-2">
-                  {n.url ? (
-                    <a
-                      href={n.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="scd-focus grid gap-0.5 hover:underline"
-                    >
-                      <span className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#5a6b85]">
-                        {n.label}
-                      </span>
-                      <b className="text-[15px] leading-snug text-[#0b1e3a]">
-                        {n.title}
-                      </b>
-                      <span className="sr-only">
-                        (apre il sito del partner)
-                      </span>
-                    </a>
-                  ) : (
-                    <span className="grid gap-0.5">
-                      <span className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#5a6b85]">
-                        {n.label}
-                      </span>
-                      <b className="text-[15px] leading-snug text-[#0b1e3a]">
-                        {n.title}
-                      </b>
-                    </span>
-                  )}
-                </li>
-              ))}
-            </ul>
-          )}
-          <Link
-            to="/sponsor"
-            hash="proposta"
-            className="scd-focus inline-flex h-12 w-fit items-center gap-2 rounded-[12px] bg-[#0b2a5b] px-5 text-[15px] font-bold text-white transition-[filter] duration-150 hover:brightness-110"
-            data-testid="home-ledwall-cta"
-          >
-            Diventa partner
-            <ArrowRight className="size-[18px]" aria-hidden="true" />
-          </Link>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 /* ---------------------------------------------------------------- page */
 
 export function PublicHome({
   calendar,
-  ledwallDay,
   feed = null,
   notice = null,
   vetrina,
@@ -536,7 +410,7 @@ export function PublicHome({
   news?: readonly NewsItem[];
   /** Vetrina picks of the day (getVetrina): "Mondo Colico" of the board (VR-009), back on the home since 15/10. */
   vetrina?: Readonly<Record<VetrinaWorld, readonly VetrinaSlot[]>>;
-  /** Server Rome day for the LED wall and the partner band (defaults to today). */
+  /** Server Rome day of the LED wall; accepted for the route contract, the partner band moved to /sponsor (UD-134). */
   ledwallDay?: string;
   /** R20 public feed (alerts and weekend results); null when R20 did not answer in time. */
   feed?: PublicFeed | null;
@@ -545,7 +419,6 @@ export function PublicHome({
   nowMs: number;
   today: string;
 }) {
-  const ledDay = ledwallDay ?? today;
   const alerts = useMemo(
     () => urgentNotices(feed?.items ?? [], nowMs, false),
     [feed, nowMs],
@@ -553,8 +426,9 @@ export function PublicHome({
   const results = useMemo(() => weekendResults(feed, today), [feed, today]);
   // Board order (VR-009 screen 1) made logical (Francesco 15/10/2026 07:04 "fuori ogni logica"): every block once.
   // urgent → communication → hero, tiles, the club's most important next game with its countdown, trainings + event
-  // → stories → partners (the ONE live LED spot, partner of the month, become a partner) → "Mondo Colico" vetrina →
-  // all the games of the week → results (only with a source) → footer (credentials, contacts). The join banner and
+  // → "Mondo Colico" vetrina → all the games of the week → results (only with a source, confetti only on a win) →
+  // footer. No stories and no partner band since UD-134 (15/10 09:18): partners scroll in the fixed sponsor bar, the
+  // LED spot and partner news live on /sponsor. The join banner and
   // the second credential strip are gone: "Entra" is in the header and in the bottom bar, the credentials in the footer.
   return (
     <main
@@ -568,8 +442,6 @@ export function PublicHome({
       <UrgentNotices items={alerts} />
       <ClubNoticeCard notice={notice} />
       <HomeBoard calendar={calendar} nowMs={nowMs} today={today} />
-      <HomeStories day={ledDay} />
-      <PartnerBand day={ledDay} />
       {vetrina && <Vetrina worlds={vetrina} />}
       <div
         className={`${WRAP} pt-5 lg:pt-8`}

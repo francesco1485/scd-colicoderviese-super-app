@@ -48,8 +48,7 @@ const PUBLIC_HOME_FILES = [
   "src/components/home/HomeMatchday.tsx",
   "src/components/home/HomeBoard.tsx",
   "src/lib/home-board.ts",
-  "src/components/home/HomeStories.tsx",
-  "src/lib/home-stories.ts",
+  "src/components/home/WinConfetti.tsx",
   "src/lib/public-home.ts",
 ] as const;
 
@@ -104,15 +103,13 @@ describe("public home v5", () => {
     expect(week).toMatch(/<button[\s\S]{0,80}type="button"[\s\S]{0,40}aria-pressed=\{on\}/);
   });
 
-  it("VR-009 board order made logical (15/10 07:04): board top, stories, ONE partner band with the live LED spot, Mondo Colico, week, results", () => {
+  it("VR-009 board order (15/10 07:04, UD-134 09:18): board top, Mondo Colico, week, results; no stories, no partner band", () => {
     const home = code("src/components/home/PublicHome.tsx");
     const body = home.slice(home.indexOf("export function PublicHome"));
     const order = [
       "<UrgentNotices",
       "<ClubNoticeCard",
       "<HomeBoard",
-      "<HomeStories",
-      "<PartnerBand",
       "<Vetrina ",
       "<HomeMatchday",
       "<WeekendResults",
@@ -130,6 +127,10 @@ describe("public home v5", () => {
       "<HomeNewsBlock",
       "<JoinBanner",
       "<CredentialBar",
+      // UD-134: stories were "una cavolata"; partner news and the LED spot moved to /sponsor.
+      "<HomeStories",
+      "<PartnerBand",
+      "<SponsorSpotsHome",
     ])
       expect(body, gone).not.toContain(gone);
     expect(home).toMatch(/export function Vetrina\(/);
@@ -213,8 +214,8 @@ describe("public home v5", () => {
     // 07:04 "fuori ogni logica": every block once — credentials only in the footer, ONE LED (the live spot in the
     // partner band), no join banner (Entra is in the header and in the bottom bar).
     expect(home).not.toMatch(/<CredentialBar|<JoinBanner|<LedwallRotator /);
-    expect(home.match(/<PartnerBand /g)).toHaveLength(1);
-    expect(home.match(/<SponsorSpotsHome /g)).toHaveLength(1);
+    // UD-134: no partner band and no LED spot on the home; partners scroll in the fixed SponsorBand.
+    expect(home).not.toMatch(/<PartnerBand |<SponsorSpotsHome /);
     for (const gone of [
       /<Trust\b/,
       /<PartnerTicker\b/,
@@ -226,8 +227,13 @@ describe("public home v5", () => {
       /Tutto sul club/,
     ])
       expect(home).not.toMatch(gone);
-    // Partners link once to the full list.
-    expect(home).toMatch(/Tutti i \{SPONSORS\.length\} partner/);
+    // UD-134: the scrolling sponsor bar is back on the home (no home exception in the band or in the shell).
+    const band = code("src/components/SponsorBand.tsx");
+    expect(band).not.toMatch(/useRouterState|\? "hidden"/);
+    expect(code("src/routes/__root.tsx")).not.toMatch(/pathname === "\/"/);
+    // UD-134: one assistant only — the Crovi greeting bubble beside Vera's launcher is gone.
+    const chat = code("src/components/SkyChat.tsx");
+    expect(chat).not.toMatch(/crovi-cameo|CroviActor|cameoLine/);
   });
 
   it("UD-116: the footer is reduced (logo, contacts, social, install, legal links, federal credits) and has no link index", () => {

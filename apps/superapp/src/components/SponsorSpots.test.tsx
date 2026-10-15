@@ -7,13 +7,14 @@ const src = (rel: string) => readFileSync(fileURLToPath(new URL(rel, import.meta
 describe("sponsor LED spots in the UI (UD-119)", () => {
   const ui = src("./SponsorSpots.tsx");
 
-  it("home block (15/10 07:04): once, compact, inside the ONE partner band (no second LED on the home)", () => {
+  it("live spot block (UD-134): once, compact, inside the partner band on /sponsor, never on the home", () => {
     const home = src("./home/PublicHome.tsx");
-    expect(home.match(/<SponsorSpotsHome /g)).toHaveLength(1);
-    expect(home).toMatch(/<SponsorSpotsHome day=\{day\} compact \/>/);
-    const band = home.slice(home.indexOf("function PartnerBand"));
-    expect(band.indexOf("<SponsorSpotsHome")).toBeGreaterThan(-1);
+    expect(home).not.toMatch(/<SponsorSpotsHome |<PartnerBand /);
     expect(home).not.toMatch(/<SupportStrip|<QuickActions|<LedwallRotator /);
+    const band = src("./sponsor/PartnerBand.tsx");
+    expect(band.match(/<SponsorSpotsHome /g)).toHaveLength(1);
+    expect(band).toMatch(/<SponsorSpotsHome day=\{day\} compact \/>/);
+    expect(src("../routes/sponsor.tsx").match(/<PartnerBand day=\{day\} \/>/g)).toHaveLength(1);
     // Compact variant: same clock, the on-air label, the partner name and "Diventa partner".
     const compact = ui.slice(ui.indexOf("if (compact)"), ui.indexOf("if (compact)") + 4000);
     expect(compact).toContain("{onAirLabel}");

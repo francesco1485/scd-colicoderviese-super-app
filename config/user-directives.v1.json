@@ -3231,6 +3231,33 @@
           "automatic grants of managerial roles without Direttore Sportivo / Presidente approval (UD-117/UD-120 rules still apply)"
         ]
       }
+    },
+    {
+      "sourceDate": "2026-10-15",
+      "sourceTime": "09:18",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-134",
+      "name": "HOME_WIN_CONFETTI_NO_STORIES_SPONSOR_MARQUEE_ONE_ASSISTANT",
+      "sourceQuoteFragments": [
+        "Coriandoli se si vince",
+        "Nastro non saprei se è corretto",
+        "Storie mi sembra una cavolata",
+        "Qualcosa che si apre come carta potrebbe essere elenco calciatori prima con staff e gli staff delle varie annate",
+        "era ottima la barra scorrevole sponsor sotto e è tolta",
+        "Le ultime notizie sui nostri sponsor e far vedere il ledwal a bordo campo non è una cosa che interessa a molti quindi va messa in una scale di priorità su una pagina",
+        "I template e impostazioni pagine iniziale e vetrine per ogni gestionale e app sono importantissime",
+        "ci sono due Chatboat e non si capisce nulla. Il crovi e il chatboat della pagina della web app",
+        "fare capire che qui si fa non si perde tempo"
+      ],
+      "context": "Francesco 15/10/2026 09:18 after the board home with stories, countdown and motion (331ba02).",
+      "normalizedCommand": {
+        "rule": "Public home: confetti burst only on a ColicoDerviese win in the weekend results (reduced motion: none); no story rings; the fixed scrolling sponsor bar is shown on the home too; the partner band (LED spot, partner of the month, partner news) leaves the home and lives on /sponsor; one assistant only: the Crovi cameo bubble is removed (supersedes the 'greets once per visit' part of UD-122; Crovi stays a mascot image where pages use it). Flip cards for Prima Squadra players + staff and the staff of each age group (minors never named in public). Ticker: undecided, not built. Templates of home and vetrina for every area/gestionale are to be studied from reference apps and sites.",
+        "supersedes": [
+          "UD-122 (cameo greeting only)"
+        ],
+        "status": "IN_PROGRESS"
+      }
     }
   ],
   "completionGate": {

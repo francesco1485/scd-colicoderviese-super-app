@@ -7,6 +7,7 @@ import { CastPresence } from "@/components/scd/CastPresence";
 import { PartnerForm } from "@/components/PartnerForm";
 import { ShareButton } from "@/components/scd/ShareButton";
 import { PartnerPackages } from "@/components/PartnerPackages";
+import { PartnerBand } from "@/components/sponsor/PartnerBand";
 import { SponsorProcess } from "@/components/SponsorProcess";
 import { PageHero, heroOverlapCls } from "@/components/ui-kit";
 import { SPONSOR_ASSETS } from "@/lib/catalog";
@@ -72,6 +73,9 @@ function Sponsor() {
       <section id="volto-sponsor" aria-label="Il Volto sponsor" className="mx-auto mt-10 max-w-3xl scroll-mt-20 px-4" data-testid="sponsor-volto">
         <CastPresence id="volto-sponsor" day={day} />
       </section>
+
+      {/* UD-134: partner news and the live LED spot, moved here from the public home. */}
+      <PartnerBand day={day} />
 
       <section className="mx-auto mt-14 max-w-6xl px-4">
         <p className="eyebrow">Asset disponibili</p>

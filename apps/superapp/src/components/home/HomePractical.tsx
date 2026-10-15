@@ -44,7 +44,8 @@ import {
   type HomeAudience,
   type QuickAction,
 } from "@/lib/home-actions";
-import type { ResultRow } from "@/lib/home-results";
+import { isClubWin, type ResultRow } from "@/lib/home-results";
+import { WinConfetti } from "@/components/home/WinConfetti";
 import type { SupportAction } from "@/lib/home-support";
 import {
   splitWeek,
@@ -700,10 +701,14 @@ export function SupportStrip({ actions }: { actions: readonly SupportAction[] })
 
 /* ------------------------------------------------------------- results */
 
-/** Weekend results, only when a real source has them; standings are the official federation pages. */
+/**
+ * Weekend results, only when a real source has them; standings are the official federation pages. A ColicoDerviese
+ * win gets the "Vittoria" badge and a confetti burst (UD-134: only when we win).
+ */
 export function WeekendResults({ rows }: { rows: readonly ResultRow[] }) {
   if (rows.length === 0) return null;
   const standings = OFFICIAL_RESULT_LINKS.filter((l) => l.group);
+  const wins = rows.filter(isClubWin).map((r) => r.id);
   return (
     <section
       aria-labelledby="risultati-t"
@@ -714,17 +719,27 @@ export function WeekendResults({ rows }: { rows: readonly ResultRow[] }) {
         Risultati
       </Title>
       <div
-        className={`${CARD} grid gap-0 overflow-hidden lg:grid-cols-[minmax(0,1fr)_minmax(0,320px)]`}
+        className={`${CARD} relative grid gap-0 overflow-hidden lg:grid-cols-[minmax(0,1fr)_minmax(0,320px)]`}
       >
+        {wins.length > 0 && <WinConfetti winIds={wins} />}
         <ul className="m-0 list-none divide-y divide-[#e6edf6] p-0">
           {rows.map((r) => (
-            <li key={r.id} className="flex items-center gap-3 px-4 py-3">
+            <li
+              key={r.id}
+              className="flex items-center gap-3 px-4 py-3"
+              data-win={wins.includes(r.id) || undefined}
+            >
               <span className="w-[86px] shrink-0 text-[12px] font-bold uppercase tracking-[0.04em] text-[#5a6b85]">
                 {r.team}
               </span>
               <span className="min-w-0 flex-1 text-[14.5px] font-semibold leading-snug text-[#0b1e3a]">
                 {venueCase(r.home)} – {venueCase(r.away)}
               </span>
+              {wins.includes(r.id) && (
+                <span className="shrink-0 rounded-full bg-[#ffd600] px-2.5 py-1 text-[11.5px] font-extrabold uppercase tracking-[0.06em] text-[#0b1e3a]">
+                  Vittoria
+                </span>
+              )}
               <b className="shrink-0 font-title text-[22px] tabular-nums text-[#0b2a5b]">
                 {r.homeGoals}–{r.awayGoals}
               </b>

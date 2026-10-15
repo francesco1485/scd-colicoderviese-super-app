@@ -2,7 +2,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { FeedItem, Match } from "./club.types";
-import { weekendResults } from "./home-results";
+import { confettiPieces, isClubWin, weekendResults } from "./home-results";
 
 const m = (o: Partial<Match>): Match => ({
   id: "m",
@@ -79,5 +79,31 @@ describe("weekend results (UD-116)", () => {
         weekendResults({ items: [], lastResult: m({ squadra }) }, "2026-10-13"),
         squadra,
       ).toEqual([]);
+  });
+});
+
+describe("isClubWin: confetti only when we win (UD-134)", () => {
+  const r = (home: string, away: string, homeGoals: number, awayGoals: number) => ({ home, away, homeGoals, awayGoals });
+  it("wins at home and away", () => {
+    expect(isClubWin(r("COLICODERVIESE", "Rivale", 2, 1))).toBe(true);
+    expect(isClubWin(r("Rivale", "S.C.D. ColicoDerviese", 0, 3))).toBe(true);
+  });
+  it("never on a draw, a defeat, a derby or a game that is not ours", () => {
+    expect(isClubWin(r("COLICODERVIESE", "Rivale", 1, 1))).toBe(false);
+    expect(isClubWin(r("COLICODERVIESE", "Rivale", 0, 2))).toBe(false);
+    expect(isClubWin(r("Rivale", "Colicoderviese", 2, 1))).toBe(false);
+    expect(isClubWin(r("ColicoDerviese A", "ColicoDerviese B", 3, 0))).toBe(false);
+    expect(isClubWin(r("Bellagina", "Rivale", 4, 0))).toBe(false);
+  });
+  it("confetti pieces are deterministic and inside the width", () => {
+    const a = confettiPieces(28);
+    expect(a).toEqual(confettiPieces(28));
+    expect(a).toHaveLength(28);
+    for (const p of a) {
+      expect(p.x).toBeGreaterThanOrEqual(0);
+      expect(p.x).toBeLessThan(100);
+      expect(p.color).toBeLessThan(4);
+    }
+    expect(confettiPieces(-1)).toEqual([]);
   });
 });
