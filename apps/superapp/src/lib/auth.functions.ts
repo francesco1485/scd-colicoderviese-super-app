@@ -288,12 +288,12 @@ export const setMyPassword = createServerFn({ method: "POST" })
     const sb = serverSupabase();
     if (!sb) return { ok: false, message: "L'accesso non è ancora configurato su questo server." };
     const { data: me, error: meError } = await sb.auth.getUser();
-    if (meError || !me.user) return { ok: false, message: "Sessione scaduta: entra di nuovo con il codice via e-mail." };
+    if (meError || !me.user) return { ok: false, message: "Sessione scaduta: chiedi di nuovo la e-mail «Scegli la password» da Entra." };
     const { error } = await sb.auth.updateUser({ password: data.password, data: { scd_password_set: true } });
     if (error) {
       if (/different from the old/i.test(error.message)) return { ok: false, message: "È uguale alla password attuale: scegline una diversa." };
       if (/weak|pwned|leaked/i.test(error.message)) return { ok: false, message: "Password troppo facile da indovinare: scegline una più lunga o meno comune." };
-      if (/reauthenticat/i.test(error.message)) return { ok: false, message: "Per sicurezza entra di nuovo con il codice via e-mail, poi cambia la password." };
+      if (/reauthenticat/i.test(error.message)) return { ok: false, message: "Per sicurezza chiedi di nuovo la e-mail «Scegli la password» da Entra e cambiala da lì." };
       return { ok: false, message: "Salvataggio non riuscito, riprova tra un minuto." };
     }
     return { ok: true, message: "Password salvata. Da ora entri con e-mail e password." };
