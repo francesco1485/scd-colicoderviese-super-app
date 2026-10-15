@@ -676,4 +676,6 @@ Backlog cloud B4. Motori: PERSONE (famiglie e tifosi leggono e toccano tutto anc
 - Barra sponsor: si ferma sotto il puntatore o il dito; con "riduci movimento" è ferma. Test `home-motion.test.tsx`: la home non si muove mai da sola con "riduci movimento".
 - Da decidere: pulsante di pausa da tastiera per la barra sponsor (linguetta "Sponsor").
 - Revisione: scd-revisore PASS (note applicate: `flex-wrap` sui puntini), scd-sicurezza PASS.
+- Stato: DONE, commit `47cadb5` + `6a07dc2` + `9792f2e` (merge `bdd8b06`), **pubblicato** 15/10 14:29 (Render `dep-db8cdhivcj2c739054f0`, live). Controllo sul sito reale 390/1440 su /, /sponsor, /sostieni, /tornei, /pulmini, /ledwall/player: HTTP 200, nessun errore in console, nessuno scroll orizzontale; axe sul sito reale: 0 violazioni e 0 bersagli piccoli su /, /sponsor, /sostieni, /tornei (sul player live l'audit non arriva a "rete ferma" entro 30 s; in locale 0).
+- Prima di questo lavoro: staging (`aa108d7`, chat cloud) era avanti rispetto al live; pubblicato con Render `dep-db8c128u01pc73f90bf0`.
 
