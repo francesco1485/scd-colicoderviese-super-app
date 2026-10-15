@@ -3435,14 +3435,14 @@
         "ok salva cognome e ruolo (18:26)",
         "va bene procedi (18:52, pagina /installa con Iride, foto e contatto)"
       ],
-      "context": "Francesco 15/10/2026 (chat PC). Extends UD-154 from friendlies to every request on every channel. Choices given through the question card at 17:18: automatic replies, small AI budget (about 20-30 EUR/month, today covered by the Make plan credits), contacts saved only after the Segreteria checks them. At 17:21 asked for a dedicated expert secretary agent; at 17:28 'via'; at 17:30 contacts to Google Contacts of sportclubcolico and the WhatsApp profile as the Segreteria avatar.",
+      "context": "Francesco 15/10/2026 (chat PC). Extends UD-154 from friendlies to every request on every channel. Choices given through the question card at 17:18: automatic replies, small AI budget (about 20-30 EUR/month, today covered by the Make plan credits), contacts saved only after the Segreteria checks them (refined at 18:26, 'ok salva cognome e ruolo': Iride stores at once only what the person declares - name, surname, declared role - and only the Segreteria writes the verified role). At 17:21 asked for a dedicated expert secretary agent; at 17:28 'via'; at 17:30 contacts to Google Contacts of sportclubcolico and the WhatsApp profile as the Segreteria avatar.",
       "normalizedCommand": {
         "rule": "The AI Segreteria (persona Iride on WhatsApp (Francesco 15/10 17:33), Vera in the app until the cloud chat aligns it (UD-121)) reads every inbound message of the official channels (WhatsApp Business via Make first, then club mail, then a phone voice assistant), answers ALONE 24/7 from the club knowledge (Google Doc 'SCD · Segreteria AI · Conoscenza') and the public calendar, writes the request and the answer in SCD_INTAKE_LOG with office, type, urgency and 'serve persona', and marks what a person must handle. This is the only exception to the AGENTS.md rule 'messaggi inviati a terzi senza persona': replies to whoever wrote first, within the fixed limits below. The secretary-general agent scd-segreteria is the expert mind and owns the prompt and the knowledge.",
         "scope": "SECRETARIAT_ALL_CHANNELS",
         "engines": "TEMPO (answers at night and on weekends without volunteers, schede already classified), PERSONE (families get an answer in seconds), SOLDI (no lost registration or sponsor request)",
         "status": "WHATSAPP_ACTIVE_MAIL_PHONE_CONTACTS_PENDING",
         "constraints": [
-          "always declares it is an AI assistant (EU AI Act transparency) and signs as Vera, assistente AI della S.C.D. ColicoDerviese",
+          "always declares it is an AI assistant (EU AI Act transparency) and signs as Iride, assistente AI della S.C.D. ColicoDerviese",
           "emergencies, injuries, health, a minor in difficulty, abuse and safeguarding: no answer on the merits, 112 when there is danger, urgency ALTA and a person takes over",
           "never confirms or decides payments, registrations, tesseramenti, roles, permissions, presenze, sanctions or prices not in the knowledge",
           "never gives personal data of other people and never asks for IBAN, codice fiscale, passwords or health data",
