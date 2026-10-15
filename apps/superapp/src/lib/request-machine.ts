@@ -5,8 +5,10 @@
  *
  * Flow of a friendly match (AMICHEVOLE, the only kind active today; TORNEO, PULMINO, CAMPO, VISITA reuse the same
  * table later):
- *   message to the Segreteria -> draft (BOZZA) -> sent to the person who confirms (DA_CONFERMARE, 15 days, never
- *   after the match) -> CONFERMATA (calendar row PLANNED + federal form DA_PREPARARE) | RIFIUTATA | SCADUTA | ANNULLATA.
+ *   message to the Segreteria (read in the browser, never stored) -> draft (BOZZA) -> sent to the person who confirms
+ *   (DA_CONFERMARE, 15 days, never after the match; any edit sends it back to BOZZA) -> CONFERMATA (internal calendar
+ *   row, Segreteria tasks: copy into the Master Calendario, the only public source, and federal form) | RIFIUTATA |
+ *   SCADUTA | ANNULLATA (also after confirmation: the internal row becomes CANCELLED).
  *
  * Engines: TEMPO (Segreteria and teams stop chasing each other by phone; the form is prefilled) and PERSONE
  * (families see the confirmed friendly in the calendar). Measure: requests per month, hours from draft to
@@ -16,7 +18,6 @@ import { z } from "zod";
 
 import { CLUB_PROFILE } from "./club-profile";
 import { romeParts, romeToIso } from "./home-week";
-import type { PublicEvent } from "./public-snapshots";
 import { KNOWN_POSITIONS } from "./session";
 
 /* ------------------------------------------------------------------ vocabulary */
@@ -65,6 +66,11 @@ export const SCOPE_LABEL: Readonly<Record<MatchScope, string>> = {
 };
 
 export const REQUEST_DAYS = 15;
+
+/** Known facilities of the club: the only venues a request can carry (mirror of the r133 check). Away = null. */
+export const VENUES = ["Colico · Campo 1", "Colico · Campo 2", "Colico", "Dervio"] as const;
+export type Venue = (typeof VENUES)[number];
+export const isVenue = (v: string | null | undefined): v is Venue => !!v && (VENUES as readonly string[]).includes(v);
 
 /** Calendar groups that can ask for a friendly, with the label of the calendar master. */
 export const REQUEST_TEAMS: ReadonlyArray<{ key: string; label: string }> = [
@@ -189,15 +195,15 @@ const TRANSITIONS: Readonly<Record<RequestAction, { from: readonly RequestStatus
   INVIA: { from: ["BOZZA"], to: "DA_CONFERMARE" },
   CONFERMA: { from: ["DA_CONFERMARE"], to: "CONFERMATA" },
   RIFIUTA: { from: ["DA_CONFERMARE"], to: "RIFIUTATA" },
-  ANNULLA: { from: ["BOZZA", "DA_CONFERMARE"], to: "ANNULLATA" },
+  ANNULLA: { from: ["BOZZA", "DA_CONFERMARE", "CONFERMATA"], to: "ANNULLATA" },
   SCADE: { from: ["DA_CONFERMARE"], to: "SCADUTA" },
 };
 
-/** Status after an action, or null when the action is not allowed from `from`. MODIFICA keeps the status. */
+/** Status after an action, or null when not allowed. MODIFICA always returns to BOZZA (a waiting request must be sent again). */
 export function nextStatus(from: RequestStatus, action: RequestAction): RequestStatus | null {
   const t = TRANSITIONS[action];
   if (!t.from.includes(from)) return null;
-  return action === "MODIFICA" ? from : t.to;
+  return t.to;
 }
 
 export function isOpen(status: RequestStatus): boolean {
@@ -245,20 +251,12 @@ export function redactContacts(text: string | null | undefined): string | null {
   return text.replace(new RegExp(EMAIL_PATTERN, "g"), "[email]").replace(new RegExp(PHONE_PATTERN, "g"), "[telefono]");
 }
 
-export const FREE_TEXT_HINT = "Non incollare nomi di ragazzi, telefoni o e-mail: telefoni ed e-mail vengono comunque tolti prima di salvare.";
+export const FREE_TEXT_HINT = "Non incollare nomi di ragazzi, telefoni o e-mail. Il messaggio non viene salvato: restano solo i dati della bozza.";
 
-/**
- * Location shown on the PUBLIC calendar row of a confirmed friendly (mirror of scd_request_decide in r133): only a
- * known facility of the club, or "Trasferta" with the opponent's city. Any other free text is never published.
- */
-export function publicLocation(venue: string | null, homeAway: "CASA" | "FUORI" | null, opponentCity: string | null): string | null {
+/** Location of the internal calendar row (mirror of scd_request_decide): the known facility, or "Trasferta" + city. */
+export function eventLocation(venue: string | null, homeAway: "CASA" | "FUORI" | null, opponentCity: string | null): string | null {
   if (homeAway === "FUORI") return opponentCity ? `Trasferta · ${opponentCity}` : "Trasferta";
-  const v = venue ?? "";
-  if (/^\s*colico\b.*\bcampo\s*1\s*$/i.test(v)) return "Colico · Campo 1";
-  if (/^\s*colico\b.*\bcampo\s*2\s*$/i.test(v)) return "Colico · Campo 2";
-  if (/^\s*colico\s*$/i.test(v)) return "Colico";
-  if (/^\s*dervio\b/i.test(v)) return "Dervio";
-  return null;
+  return isVenue(venue) ? venue : null;
 }
 
 /* ------------------------------------------------------------------ drafts (mirror of scd_request_clean) */
@@ -317,13 +315,15 @@ export function validateDraft(d: DraftInput, nowMs: number): { ok: true; value: 
   const opponentClubId = trimOrNull(d.opponentClubId, 36);
   if (opponentClubId && !UUID.test(opponentClubId)) errors["opponentClubId"] = "Società non valida.";
   if (d.homeAway && d.homeAway !== "CASA" && d.homeAway !== "FUORI") errors["homeAway"] = "Casa o fuori.";
+  const venue = trimOrNull(d.venue, 40);
+  if (venue && d.homeAway !== "FUORI" && !isVenue(venue)) errors["venue"] = "Scegli un campo del club (o Fuori casa).";
   if (Object.keys(errors).length) return { ok: false, errors };
   return {
     ok: true,
     value: {
       teamKey,
       startsAt,
-      venue: trimOrNull(d.venue, 160),
+      venue: d.homeAway === "FUORI" ? null : venue,
       homeAway: d.homeAway ?? null,
       scope,
       opponentText: trimOrNull(d.opponentText, 120),
@@ -358,7 +358,6 @@ const rowSchema = z.object({
   id: z.string(),
   kind: z.enum(REQUEST_KINDS),
   channel: z.enum(REQUEST_CHANNELS),
-  rawText: z.string().nullable().optional(),
   teamKey: z.string().nullable().optional(),
   startsAt: z.string().nullable().optional(),
   venue: z.string().nullable().optional(),
@@ -373,6 +372,7 @@ const rowSchema = z.object({
   decisionNote: z.string().nullable().optional(),
   eventId: z.string().nullable().optional(),
   formStatus: z.enum(FORM_STATUSES).nullable().optional(),
+  calendarCopiedAt: z.string().nullable().optional(),
   createdAt: z.string(),
   club: clubSchema.nullable().optional(),
   organization: z.string().nullable().optional(),
@@ -382,7 +382,6 @@ export interface RequestRow {
   id: string;
   kind: RequestKind;
   channel: RequestChannel;
-  rawText: string | null;
   teamKey: string | null;
   startsAt: string | null;
   venue: string | null;
@@ -397,6 +396,7 @@ export interface RequestRow {
   decisionNote: string | null;
   eventId: string | null;
   formStatus: FormStatus | null;
+  calendarCopiedAt: string | null;
   createdAt: string;
   club: ClubRow | null;
 }
@@ -412,7 +412,6 @@ export function toRequestRow(raw: unknown): RequestRow | null {
     id: r.id,
     kind: r.kind,
     channel: r.channel,
-    rawText: r.rawText ?? null,
     teamKey: r.teamKey ?? null,
     startsAt: r.startsAt ?? null,
     venue: r.venue ?? null,
@@ -427,6 +426,7 @@ export function toRequestRow(raw: unknown): RequestRow | null {
     decisionNote: r.decisionNote ?? null,
     eventId: r.eventId ?? null,
     formStatus: r.formStatus ?? null,
+    calendarCopiedAt: r.calendarCopiedAt ?? null,
     createdAt: r.createdAt,
     club: toClub(r.club),
   };
@@ -481,6 +481,7 @@ export const NOTICE_LABEL: Readonly<Record<string, string>> = {
   SCADUTA: "Scaduta senza conferma",
   ANNULLATA: "Annullata",
   MODULO: "Modulo federale aggiornato",
+  CALENDARIO: "Copiata nel Master Calendario",
 };
 
 /** Plain error of a database code. */
@@ -502,8 +503,8 @@ export function requestError(code: string | null | undefined): string {
       return "La richiesta è già stata gestita: aggiorna la pagina.";
     case "scope":
       return "Piccoli Amici: amichevoli nazionali e internazionali non ammesse.";
-    case "too_long":
-      return "Messaggio troppo lungo (massimo 1000 caratteri).";
+    case "venue":
+      return "Scegli un campo del club (Colico Campo 1 o 2, Colico, Dervio) oppure Fuori casa.";
     default:
       return "Operazione non riuscita, riprova.";
   }
@@ -742,28 +743,49 @@ export function friendlyEmailDraft(r: RequestRow): { to: string; subject: string
   return { to: FRIENDLY_OFFICE.email, subject, body };
 }
 
-/* ------------------------------------------------------------------ public calendar (design, not wired here) */
+/* ------------------------------------------------------------------ Segreteria task: copy into the Master Calendario */
 
-const normName = (s: string) =>
-  s
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .toLowerCase()
-    .replace(/\b(a\.?s\.?d\.?|u\.?s\.?d?\.?|s\.?s\.?d\.?|a\.?c\.?|f\.?c\.?|calcio|polisportiva|s\.?c\.?d\.?)\b/g, "")
-    .replace(/[^a-z0-9]+/g, "");
+/** Venue as the Master Calendario writes it ("COLICO - CAMPO 1"). */
+const MASTER_VENUE: Readonly<Record<Venue, string>> = {
+  "Colico · Campo 1": "COLICO - CAMPO 1",
+  "Colico · Campo 2": "COLICO - CAMPO 2",
+  Colico: "COLICO",
+  Dervio: "DERVIO",
+};
+
+export interface MasterCell {
+  /** Column name of the Master Calendario sheet (tools/sync/calendar_public_payload.py). */
+  column: string;
+  value: string;
+}
 
 /**
- * Adds confirmed friendlies (scd_events source SCD_RICHIESTE, already PUBLIC) to the public calendar events,
- * skipping any that the calendar master already lists (same day, same group, same opponent). Pure; the read path
- * of /calendario belongs to the other chat (SCD:SESSIONI) and is not changed here.
+ * The exact row the Segreteria pastes into the Master Calendario (the only public calendar source). Column names are
+ * those read by tools/sync/calendar_public_payload.py; the column ORDER of the sheet and the CATEGORY wording must be
+ * checked against the sheet (INFERRED): the page shows them as labelled cells. Empty when the data is not known.
  */
-export function mergeConfirmedFriendlies(events: readonly PublicEvent[], friendlies: readonly PublicEvent[]): PublicEvent[] {
-  const seen = new Set(events.map((e) => `${e.date}|${e.group}|${normName(e.opponent)}`));
-  const extra = friendlies.filter((f) => {
-    const k = `${f.date}|${f.group}|${normName(f.opponent)}`;
-    if (seen.has(k)) return false;
-    seen.add(k);
-    return true;
-  });
-  return [...events, ...extra].sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+export function masterCalendarRow(r: RequestRow): MasterCell[] {
+  const p = r.startsAt ? romeParts(r.startsAt) : null;
+  const away = r.homeAway === "FUORI";
+  const venue = away ? (r.club?.city ? r.club.city.toUpperCase() : "") : isVenue(r.venue) ? MASTER_VENUE[r.venue] : "";
+  return [
+    { column: "DATE", value: p ? itDay(p.date) : "" },
+    { column: "TIME", value: p?.time ?? "" },
+    { column: "CATEGORY", value: r.teamKey ? teamLabel(r.teamKey) : "" },
+    { column: "TYPE", value: "AMICHEVOLE" },
+    { column: "HOME_AWAY", value: r.homeAway ?? "" },
+    { column: "VENUE", value: venue },
+    { column: "OPPONENT_EVENT", value: (r.club?.name ?? r.opponentText ?? "").toUpperCase() },
+    { column: "SOURCE_TYPE", value: "SCD" },
+    { column: "MATCH_STATUS", value: "CLUB_EVENT" },
+    { column: "TIME_STATUS", value: "CONFIRMED" },
+    { column: "VENUE_STATUS", value: venue ? "CONFIRMED" : "" },
+  ];
+}
+
+/** Tab-separated values of the row, ready to paste into the sheet (column order as listed). */
+export function masterCalendarTsv(r: RequestRow): string {
+  return masterCalendarRow(r)
+    .map((c) => c.value.replace(/[\t\r\n]+/g, " "))
+    .join("\t");
 }

@@ -2,12 +2,12 @@
  * "Da confermare" card of La mia SCD (UD-154): requests of the groups the person confirms (Responsabile Attività di
  * Base, Direttore Sportivo Agonistica/Generale when created, Direzione on behalf), with the days left and the
  * federal deadline, Confirm / Not possible. Confirming needs the opponent club (search bar or "Nuova società") and
- * asks the Segreteria to prepare the federal form. Direttore Generale and Coordinatore see the in-app notices.
+ * asks the Segreteria to put it in the official calendar (Master Calendario) and to prepare the federal form. Direttore Generale and Coordinatore see the in-app notices.
  * Loads itself after the page: hidden for anybody with no part in the machine; "in preparazione" while r133 is off.
  */
 import { useServerFn } from "@tanstack/react-start";
 import { CalendarCheck, Check, X } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { ClubPicker, type PickedClub } from "@/components/scd/ClubPicker";
 import { romeParts } from "@/lib/home-week";
@@ -103,6 +103,10 @@ function ToConfirm({ r, nowMs, onDone }: { r: RequestRow; nowMs: number; onDone:
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => {
+    if (timer.current) clearTimeout(timer.current);
+  }, []);
   const day = r.startsAt ? romeParts(r.startsAt)?.date ?? null : null;
   const federal = noticeDeadline(r.teamKey, r.scope, day);
   const by = confirmBy(r.expiresAt, federal);
@@ -115,7 +119,7 @@ function ToConfirm({ r, nowMs, onDone }: { r: RequestRow; nowMs: number; onDone:
     try {
       const o = await decide({ data: { id: r.id, decision, ...(note.trim() ? { note: note.trim() } : {}), clubId: club?.id ?? null } });
       setMsg({ ok: o.ok, text: o.message });
-      if (o.ok) setTimeout(onDone, 1200);
+      if (o.ok) timer.current = setTimeout(onDone, 1200);
     } catch {
       setMsg({ ok: false, text: "Operazione non riuscita, riprova." });
     } finally {
@@ -162,7 +166,7 @@ function ToConfirm({ r, nowMs, onDone }: { r: RequestRow; nowMs: number; onDone:
             Nota (facoltativa)
             <input value={note} maxLength={300} onChange={(e) => setNote(e.target.value)} className="scd-focus h-11 rounded-[10px] border border-[#b9c8dc] px-3 text-[15px] text-[#0b1e3a]" />
           </label>
-          <p className="m-0 text-[14px] text-[#3e5272]">Confermando, l'amichevole compare in calendario e chiedi alla Segreteria di preparare il modulo amichevoli per la FIGC da far firmare.</p>
+          <p className="m-0 text-[14px] text-[#3e5272]">Confermando, chiedi alla Segreteria di inserirla nel calendario ufficiale e di preparare il modulo amichevoli per la FIGC da far firmare.</p>
           <div className="grid grid-cols-2 gap-2">
             <button type="button" disabled={busy || !club} onClick={() => void submit("CONFERMA")} className={`${btn} bg-[#0b2a5b] text-white disabled:opacity-50`}>
               Conferma

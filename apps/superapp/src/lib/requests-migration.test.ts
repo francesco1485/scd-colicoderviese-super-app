@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
-import { EMAIL_PATTERN, PHONE_PATTERN, REQUEST_CHANNELS, REQUEST_CONFIRMERS, REQUEST_STATUSES, FORM_STATUSES, MATCH_SCOPES, REQUEST_WATCHERS, dbConfirmerPositions } from "./request-machine";
+import { EMAIL_PATTERN, PHONE_PATTERN, VENUES, REQUEST_CHANNELS, REQUEST_CONFIRMERS, REQUEST_STATUSES, FORM_STATUSES, MATCH_SCOPES, REQUEST_WATCHERS, dbConfirmerPositions } from "./request-machine";
 
 const read = (rel: string) => readFileSync(fileURLToPath(new URL(rel, import.meta.url)), "utf8");
 const sql = read("../../../../supabase/migrations/20261015_r133_requests_machine.sql");
@@ -55,7 +55,7 @@ describe("r133 request machine (staged, not applied)", () => {
     expect(quoted(body.match(/form_status in \(([^)]*)\)/)?.[1] ?? "")).toEqual([...FORM_STATUSES]);
     expect(quoted(body.match(/v_scope not in \(([^)]*)\)/)?.[1] ?? "")).toEqual([...MATCH_SCOPES]);
     expect(body).toMatch(/kind text not null check \(kind in \('AMICHEVOLE'\)\)/);
-    expect(body).toMatch(/char_length\(raw_text\) <= 1000/);
+    expect(body).not.toMatch(/raw_text|rawText/);
     expect(body).toMatch(/expires_at timestamptz not null default \(now\(\) \+ interval '15 days'\)/);
     expect(body).toContain("least(now() + interval '15 days', r.proposed_starts_at)");
   });
@@ -78,11 +78,14 @@ describe("r133 request machine (staged, not applied)", () => {
     expect(body).not.toMatch(/scd_notification_outbox|net\.http|pg_net|http_post/i);
   });
 
-  it("writes a PLANNED public calendar row only on confirmation, with team-level data", () => {
+  it("keeps the Master Calendario the only public source: confirmation writes an internal STAFF row", () => {
     const decide = body.match(/function public\.scd_request_decide[\s\S]*?\$\$;/)?.[0] ?? "";
     expect(decide).toMatch(/insert into public\.scd_events/);
     expect(decide).toContain("'AMICHEVOLE'");
-    expect(decide).toContain("'PLANNED', 'PUBLIC'");
+    expect(decide).toContain("'PLANNED', 'STAFF'");
+    expect(body).not.toMatch(/'PUBLIC'/);
+    expect(body).toContain("calendar_copied_at timestamptz");
+    expect(body).toMatch(/function public\.scd_request_mark_copied[\s\S]*?'CALENDARIO'/);
     expect(decide).toContain("'SCD_RICHIESTE'");
     expect(decide).toContain("form_status = 'DA_PREPARARE'");
     expect(body.match(/insert into public\.scd_events/g)).toHaveLength(1);
@@ -93,11 +96,11 @@ describe("r133 request machine (staged, not applied)", () => {
     const fn = body.match(/function public\.scd_request_redact[\s\S]*?\$\$;/)?.[0] ?? "";
     expect(fn).toContain(`'${EMAIL_PATTERN}', '[email]'`);
     expect(fn).toContain(`'${PHONE_PATTERN}', '[telefono]'`);
-    expect(body).toContain("public.scd_request_redact(coalesce(p->>'rawText', ''))");
     expect(body).toContain("public.scd_request_redact(coalesce(p->>'note', ''))");
     expect(body).toContain("public.scd_request_redact(coalesce(p_note, ''))");
-    expect(body).toContain("'PLANNED', 'PUBLIC', v_loc, 'SCD_RICHIESTE'");
-    expect(body).not.toMatch(/'PUBLIC', r\.venue_text/);
+    expect(body).toContain("'PLANNED', 'STAFF', v_loc, 'SCD_RICHIESTE'");
+    const venues = [...(body.match(/venue_text in \(([^)]*)\)/)?.[1] ?? "").matchAll(/'([^']+)'/g)].map((m) => m[1]);
+    expect(venues).toEqual([...VENUES]);
   });
 
   it("closes the helpers to every client role and refuses null payloads", () => {
@@ -105,6 +108,14 @@ describe("r133 request machine (staged, not applied)", () => {
       expect(body, h).toContain(`revoke all on function public.${h} from public, anon, authenticated;`);
     expect(body).toContain("if p is null or jsonb_typeof(p) <> 'object' or octet_length(p::text) > 4000");
     expect(body).toContain("if p is null or jsonb_typeof(p) <> 'object' or char_length(v_name)");
+  });
+
+  it("sends an edited waiting request back to the draft and cancels confirmed ones with their calendar row", () => {
+    const upd = body.match(/function public\.scd_request_update[\s\S]*?\$\$;/)?.[0] ?? "";
+    expect(upd).toContain("status = 'BOZZA', sent_at = null");
+    const cancel = body.match(/function public\.scd_request_cancel[\s\S]*?\$\$;/)?.[0] ?? "";
+    expect(cancel).toContain("r.status not in ('BOZZA','DA_CONFERMARE','CONFERMATA')");
+    expect(cancel).toContain("update public.scd_events set status = 'CANCELLED'");
   });
 
   it("keeps the log append-only", () => {

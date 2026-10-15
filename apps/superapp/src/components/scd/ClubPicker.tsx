@@ -72,10 +72,15 @@ export function ClubPicker({
       return;
     }
     setBusy(true);
-    const r = await create({ data: { name: s.name, ...(s.crestKey ? { crestKey: s.crestKey } : {}) } });
-    setBusy(false);
-    if (r.ok && r.club?.id) onChange({ id: r.club.id, name: r.club.name, city: r.club.city });
-    else setMsg(r.message);
+    try {
+      const r = await create({ data: { name: s.name, ...(s.crestKey ? { crestKey: s.crestKey } : {}) } });
+      if (r.ok && r.club?.id) onChange({ id: r.club.id, name: r.club.name, city: r.club.city });
+      else setMsg(r.message);
+    } catch {
+      setMsg("Società non salvata: riprova.");
+    } finally {
+      setBusy(false);
+    }
   }
 
   async function addNew() {
@@ -85,19 +90,24 @@ export function ClubPicker({
       return;
     }
     setBusy(true);
-    const r = await create({
-      data: {
-        name: newClub.name.trim(),
-        ...(newClub.city.trim() ? { city: newClub.city.trim() } : {}),
-        ...(newClub.province.trim() ? { province: newClub.province.trim() } : {}),
-        ...(newClub.figcMatricola.trim() ? { figcMatricola: newClub.figcMatricola.trim() } : {}),
-      },
-    });
-    setBusy(false);
-    if (r.ok && r.club?.id) {
-      onChange({ id: r.club.id, name: r.club.name, city: r.club.city });
-      setAdding(false);
-    } else setMsg(r.message);
+    try {
+      const r = await create({
+        data: {
+          name: newClub.name.trim(),
+          ...(newClub.city.trim() ? { city: newClub.city.trim() } : {}),
+          ...(newClub.province.trim() ? { province: newClub.province.trim() } : {}),
+          ...(newClub.figcMatricola.trim() ? { figcMatricola: newClub.figcMatricola.trim() } : {}),
+        },
+      });
+      if (r.ok && r.club?.id) {
+        onChange({ id: r.club.id, name: r.club.name, city: r.club.city });
+        setAdding(false);
+      } else setMsg(r.message);
+    } catch {
+      setMsg("Società non salvata: riprova.");
+    } finally {
+      setBusy(false);
+    }
   }
 
   if (value) {

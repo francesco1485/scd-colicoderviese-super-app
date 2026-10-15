@@ -16,14 +16,15 @@ import {
   hasRequestRole,
   isWorkingDay,
   mayConfirm,
-  mergeConfirmedFriendlies,
+  masterCalendarRow,
+  masterCalendarTsv,
   missingConfirmerPositions,
   missingToSend,
   nextFormStatus,
   nextStatus,
   noticeDeadline,
   parseRequestRows,
-  publicLocation,
+  eventLocation,
   redactContacts,
   seesEverything,
   toRequestRow,
@@ -31,7 +32,6 @@ import {
   workingDaysBefore,
   type RequestRow,
 } from "./request-machine";
-import type { PublicEvent } from "./public-snapshots";
 
 const NOW = Date.parse("2026-10-15T13:07:00Z");
 
@@ -39,7 +39,6 @@ const row = (over: Partial<RequestRow> = {}): RequestRow => ({
   id: "11111111-1111-1111-1111-111111111111",
   kind: "AMICHEVOLE",
   channel: "WHATSAPP",
-  rawText: null,
   teamKey: "u15",
   startsAt: "2026-10-24T13:00:00.000Z",
   venue: "Colico",
@@ -54,6 +53,7 @@ const row = (over: Partial<RequestRow> = {}): RequestRow => ({
   decisionNote: null,
   eventId: null,
   formStatus: null,
+  calendarCopiedAt: null,
   createdAt: "2026-10-15T13:00:00.000Z",
   club: { id: "c", name: "Olginatese", city: "Olginate", province: "LC", figcMatricola: "123456", crestKey: null },
   ...over,
@@ -104,9 +104,12 @@ describe("status transitions and expiry", () => {
     expect(nextStatus("DA_CONFERMARE", "RIFIUTA")).toBe("RIFIUTATA");
     expect(nextStatus("DA_CONFERMARE", "SCADE")).toBe("SCADUTA");
     expect(nextStatus("BOZZA", "CONFERMA")).toBeNull();
-    expect(nextStatus("CONFERMATA", "ANNULLA")).toBeNull();
+    expect(nextStatus("CONFERMATA", "ANNULLA")).toBe("ANNULLATA");
+    expect(nextStatus("RIFIUTATA", "ANNULLA")).toBeNull();
     expect(nextStatus("SCADUTA", "CONFERMA")).toBeNull();
-    expect(nextStatus("DA_CONFERMARE", "MODIFICA")).toBe("DA_CONFERMARE");
+    // an edit sends a waiting request back to the draft: it must be sent again
+    expect(nextStatus("DA_CONFERMARE", "MODIFICA")).toBe("BOZZA");
+    expect(nextStatus("CONFERMATA", "MODIFICA")).toBeNull();
   });
 
   it("moves the federal form forward one step at a time", () => {
@@ -150,6 +153,10 @@ describe("drafts", () => {
     const piccoli = validateDraft({ teamKey: "piccoli", scope: "NAZIONALE" }, NOW);
     expect(!piccoli.ok && piccoli.errors["scope"]).toMatch(/Piccoli/);
     expect(validateDraft({}, NOW).ok).toBe(true);
+    const venue = validateDraft({ venue: "a casa di Luca B." }, NOW);
+    expect(!venue.ok && venue.errors["venue"]).toMatch(/campo del club/);
+    const away = validateDraft({ venue: "Dervio", homeAway: "FUORI" }, NOW);
+    expect(away.ok && away.value.venue).toBeNull();
   });
 
   it("lists what is missing before sending", () => {
@@ -230,21 +237,6 @@ describe("federal form and e-mail draft", () => {
   });
 });
 
-describe("mergeConfirmedFriendlies", () => {
-  const ev = (o: Partial<PublicEvent>): PublicEvent => ({
-    id: "e", date: "2026-10-24", time: "15:00", group: "u15", category: "", type: "AMICHEVOLE", homeAway: "CASA",
-    opponent: "OLGINATESE", venue: "", round: "", source: "SCD", status: "", isVariation: false, notice: [],
-    timeConfirmed: true, venueConfirmed: true, facilityReview: false, ...o,
-  });
-  it("skips friendlies already in the master and keeps the order", () => {
-    const out = mergeConfirmedFriendlies(
-      [ev({ id: "m1" }), ev({ id: "m2", date: "2026-10-30" })],
-      [ev({ id: "r1", opponent: "A.S.D. Olginatese" }), ev({ id: "r2", date: "2026-10-25", opponent: "Bellano" })],
-    );
-    expect(out.map((e) => e.id)).toEqual(["m1", "r2", "m2"]);
-  });
-});
-
 describe("privacy of free text and public location (scd-sicurezza notes)", () => {
   it("redacts phone numbers and e-mails, keeps dates, times and birth years", () => {
     expect(redactContacts("chiama Marco 333 123 4567 o +39 0341-940123, scrivi a mister.rossi@example.it")).toBe(
@@ -254,14 +246,32 @@ describe("privacy of free text and public location (scd-sicurezza notes)", () =>
     expect(redactContacts(null)).toBeNull();
   });
 
-  it("publishes only a known facility or 'Trasferta' with the city", () => {
-    expect(publicLocation("Colico · Campo 2", "CASA", null)).toBe("Colico · Campo 2");
-    expect(publicLocation("colico campo 1", null, null)).toBe("Colico · Campo 1");
-    expect(publicLocation("Colico", "CASA", null)).toBe("Colico");
-    expect(publicLocation("Dervio", "CASA", null)).toBe("Dervio");
-    expect(publicLocation("Olginate", "FUORI", "Olginate")).toBe("Trasferta · Olginate");
-    expect(publicLocation("a casa di Luca B.", "FUORI", null)).toBe("Trasferta");
-    expect(publicLocation("palestra della scuola di Marco", "CASA", null)).toBeNull();
-    expect(publicLocation(null, null, null)).toBeNull();
+  it("locates the internal calendar row only at a known facility or 'Trasferta' with the city", () => {
+    expect(eventLocation("Colico · Campo 2", "CASA", null)).toBe("Colico · Campo 2");
+    expect(eventLocation("Dervio", "CASA", null)).toBe("Dervio");
+    expect(eventLocation("Olginate", "FUORI", "Olginate")).toBe("Trasferta · Olginate");
+    expect(eventLocation("a casa di Luca B.", "FUORI", null)).toBe("Trasferta");
+    expect(eventLocation("palestra della scuola di Marco", "CASA", null)).toBeNull();
+    expect(eventLocation(null, null, null)).toBeNull();
+  });
+
+  it("prepares the exact Master Calendario row for the Segreteria (the only public source)", () => {
+    const cells = Object.fromEntries(masterCalendarRow(row({ venue: "Colico · Campo 2" })).map((c) => [c.column, c.value]));
+    expect(cells).toMatchObject({
+      DATE: "24/10/2026",
+      TIME: "15:00",
+      CATEGORY: "U15 · Giovanissimi",
+      TYPE: "AMICHEVOLE",
+      HOME_AWAY: "CASA",
+      VENUE: "COLICO - CAMPO 2",
+      OPPONENT_EVENT: "OLGINATESE",
+      MATCH_STATUS: "CLUB_EVENT",
+      TIME_STATUS: "CONFIRMED",
+      VENUE_STATUS: "CONFIRMED",
+    });
+    const away = Object.fromEntries(masterCalendarRow(row({ homeAway: "FUORI", venue: null })).map((c) => [c.column, c.value]));
+    expect(away["VENUE"]).toBe("OLGINATE");
+    expect(masterCalendarTsv(row({ venue: "Colico" })).split("\t")).toHaveLength(11);
+    expect(masterCalendarTsv(row({ opponentText: "A\tB", club: null }))).not.toMatch(/A\tB/);
   });
 });

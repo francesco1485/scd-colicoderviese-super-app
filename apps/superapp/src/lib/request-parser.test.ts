@@ -91,6 +91,7 @@ describe("parseRequestMessage", () => {
     expect(dervio.venue).toBe("Dervio");
     expect(dervio.homeAway).toBe("CASA");
     expect(dervio.opponent).toBe("Bellano");
+    expect(p("amichevole pulcini sabato a Dervio campo 1 con Bellano").venue).toBe("Dervio");
     const c2 = p("amichevole 2015 sabato a Colico campo 2 con Alto Lario Calcio");
     expect(c2.venue).toBe("Colico · Campo 2");
     expect(c2.opponent).toBe("Alto Lario Calcio");

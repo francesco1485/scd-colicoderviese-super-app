@@ -5,7 +5,7 @@
 --
 -- Why (UD-154, Francesco 15/10/2026 15:07 and 15:17): a team asks the Segreteria for a friendly match with a message;
 -- the Segreteria turns it into a draft, the person in charge of that birth-year group confirms it within 15 days in
--- the app, the match appears in the calendar only after the confirmation, and the Segreteria prints the federal form
+-- the app, only then the Segreteria puts it in the official calendar (Master Calendario) and prints the federal form
 -- for the Presidente's signature. One generic table for every kind of request (later TORNEO, PULMINO, CAMPO, VISITA):
 -- only AMICHEVOLE is accepted today.
 --
@@ -22,7 +22,11 @@
 --   * Direttore Generale and Coordinatore Attivita Sportiva see every request and get an in-app notice of every step
 --     (rows of scd_request_events with notify_positions, read by scd_request_notices). No e-mail, no external message.
 --
--- No personal data: requests are team-level (group key, date, venue, opponent club). Minors never appear.
+-- No personal data: requests are team-level (group key, date, known facility, opponent club). Minors never appear.
+-- The team's original message is read in the browser and NEVER stored: only the structured fields are saved, and
+-- free notes are stripped of phone numbers and e-mails (scd_request_redact).
+-- ONE public source: the Master Calendario on Drive stays the only public calendar. A confirmation creates an
+-- internal scd_events row (visibility STAFF) and a Segreteria task "Copia nel Master Calendario" (calendar_copied_at).
 -- RLS enabled on every new table with NO policies and no grants to anon/authenticated: access only through the
 -- SECURITY DEFINER functions below (explicit role checks, fixed search_path, validated input).
 -- Expiry: scd_requests_expire(org) marks SCADUTA the requests not confirmed in time; no cron (the app calls it when a
@@ -34,12 +38,13 @@
 --
 -- Additive only, idempotent (create if not exists / create or replace). Nothing existing is changed.
 --
--- Rollback (only while no confirmed request has produced calendar rows that must stay; those rows keep
--- source_id 'SCD_RICHIESTE' and can be found and kept or removed by hand):
+-- Rollback (internal calendar rows created by confirmations keep source_id 'SCD_RICHIESTE', visibility STAFF, and can
+-- be found and kept or removed by hand before dropping the tables):
 --   begin;
 --   drop function if exists public.scd_request_notices(uuid);
 --   drop function if exists public.scd_request_form(uuid, uuid);
 --   drop function if exists public.scd_request_set_form_status(uuid, uuid, text);
+--   drop function if exists public.scd_request_mark_copied(uuid, uuid);
 --   drop function if exists public.scd_request_json(public.scd_requests);
 --   drop function if exists public.scd_requests_to_confirm(uuid);
 --   drop function if exists public.scd_requests_board(uuid);
@@ -92,12 +97,12 @@ create table if not exists public.scd_requests (
   organization_id uuid not null references public.scd_organizations(id),
   kind text not null check (kind in ('AMICHEVOLE')),
   channel text not null check (channel in ('WHATSAPP','EMAIL','APP','SEGRETERIA')),
-  raw_text text check (raw_text is null or char_length(raw_text) <= 1000),
   payload jsonb not null default '{}'::jsonb
     check (jsonb_typeof(payload) = 'object' and octet_length(payload::text) <= 2000),
   team_key text check (team_key is null or team_key ~ '^[a-z0-9]{2,20}$'),
   proposed_starts_at timestamptz,
-  venue_text text check (venue_text is null or char_length(venue_text) <= 160),
+  -- only a known facility of the club (mirror of lib/request-machine.ts VENUES); away matches keep it null
+  venue_text text check (venue_text is null or venue_text in ('Colico · Campo 1','Colico · Campo 2','Colico','Dervio')),
   opponent_club_id uuid references public.scd_clubs(id),
   opponent_text text check (opponent_text is null or char_length(opponent_text) <= 120),
   status text not null default 'BOZZA'
@@ -109,6 +114,8 @@ create table if not exists public.scd_requests (
   decision_note text check (decision_note is null or char_length(decision_note) <= 300),
   event_id uuid references public.scd_events(id),
   form_status text check (form_status is null or form_status in ('DA_PREPARARE','PRONTO','FIRMATO','INVIATO')),
+  -- Segreteria task: the confirmed friendly has been copied into the Master Calendario (the only public source)
+  calendar_copied_at timestamptz,
   created_by uuid,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
@@ -125,7 +132,7 @@ create table if not exists public.scd_request_events (
   id bigint generated always as identity primary key,
   organization_id uuid not null,
   request_id uuid not null references public.scd_requests(id),
-  action text not null check (action in ('CREATA','MODIFICATA','INVIATA','CONFERMATA','RIFIUTATA','SCADUTA','ANNULLATA','MODULO')),
+  action text not null check (action in ('CREATA','MODIFICATA','INVIATA','CONFERMATA','RIFIUTATA','SCADUTA','ANNULLATA','MODULO','CALENDARIO')),
   actor uuid,
   note text check (note is null or char_length(note) <= 300),
   -- positions told in the app about this step (Direttore Generale and Coordinatore always)
@@ -221,14 +228,13 @@ returns jsonb language plpgsql stable set search_path to 'public' as $$
 declare
   v_team text := nullif(btrim(coalesce(p->>'teamKey', '')), '');
   v_starts timestamptz;
-  v_venue text := nullif(left(btrim(coalesce(p->>'venue', '')), 160), '');
+  v_venue text := nullif(btrim(coalesce(p->>'venue', '')), '');
   v_opp text := nullif(left(btrim(coalesce(p->>'opponentText', '')), 120), '');
   v_club uuid;
   v_home text := nullif(p->>'homeAway', '');
   -- territorial scope of the friendly (federal notice period): Lombardy opponents are REGIONALE/PROVINCIALE/LOCALE
   v_scope text := nullif(p->>'scope', '');
   v_note text := nullif(left(btrim(public.scd_request_redact(coalesce(p->>'note', ''))), 300), '');
-  v_raw text := nullif(btrim(public.scd_request_redact(coalesce(p->>'rawText', ''))), '');
   v_channel text := coalesce(nullif(p->>'channel', ''), 'SEGRETERIA');
 begin
   if p is null or jsonb_typeof(p) <> 'object' or octet_length(p::text) > 4000 then return jsonb_build_object('error', 'invalid'); end if;
@@ -240,7 +246,11 @@ begin
   -- Piccoli Amici: no national or international friendlies (CU n.5 SGS 2026/27 par. 4)
   if v_team = 'piccoli' and v_scope in ('NAZIONALE','INTERNAZIONALE','ESTERO') then return jsonb_build_object('error', 'scope'); end if;
   if v_channel not in ('WHATSAPP','EMAIL','APP','SEGRETERIA') then return jsonb_build_object('error', 'invalid'); end if;
-  if v_raw is not null and char_length(p->>'rawText') > 1000 then return jsonb_build_object('error', 'too_long'); end if;
+  -- away: the venue is the opponent's ground, never stored as free text
+  if v_home = 'FUORI' then v_venue := null; end if;
+  if v_venue is not null and v_venue not in ('Colico · Campo 1','Colico · Campo 2','Colico','Dervio') then
+    return jsonb_build_object('error', 'venue');
+  end if;
   begin
     v_starts := nullif(p->>'startsAt', '')::timestamptz;
     v_club := nullif(p->>'opponentClubId', '')::uuid;
@@ -251,7 +261,7 @@ begin
     return jsonb_build_object('error', 'date');
   end if;
   return jsonb_build_object('teamKey', v_team, 'startsAt', v_starts, 'venue', v_venue, 'opponentText', v_opp,
-    'opponentClubId', v_club, 'homeAway', v_home, 'scope', v_scope, 'note', v_note, 'rawText', v_raw, 'channel', v_channel);
+    'opponentClubId', v_club, 'homeAway', v_home, 'scope', v_scope, 'note', v_note, 'channel', v_channel);
 end;
 $$;
 revoke all on function public.scd_request_clean(jsonb) from public, anon, authenticated;
@@ -328,9 +338,9 @@ begin
        select 1 from public.scd_clubs where id = (c->>'opponentClubId')::uuid and organization_id = p_organization_id) then
     return jsonb_build_object('ok', false, 'code', 'club');
   end if;
-  insert into public.scd_requests (organization_id, kind, channel, raw_text, payload, team_key, proposed_starts_at,
+  insert into public.scd_requests (organization_id, kind, channel, payload, team_key, proposed_starts_at,
     venue_text, opponent_club_id, opponent_text, created_by)
-  values (p_organization_id, 'AMICHEVOLE', c->>'channel', c->>'rawText',
+  values (p_organization_id, 'AMICHEVOLE', c->>'channel',
     jsonb_strip_nulls(jsonb_build_object('homeAway', c->>'homeAway', 'scope', c->>'scope', 'note', c->>'note')),
     c->>'teamKey', (c->>'startsAt')::timestamptz, c->>'venue', (c->>'opponentClubId')::uuid, c->>'opponentText', auth.uid())
   returning id into v_id;
@@ -341,7 +351,8 @@ $$;
 revoke all on function public.scd_request_create(uuid, jsonb) from public, anon;
 grant execute on function public.scd_request_create(uuid, jsonb) to authenticated;
 
--- Edit a draft (BOZZA) or a request still waiting (DA_CONFERMARE). raw_text and channel never change.
+-- Edit a draft (BOZZA) or a request still waiting (DA_CONFERMARE). A waiting request goes back to BOZZA and must be
+-- sent again (the confirmer never confirms something different from what was sent). Channel never changes.
 create or replace function public.scd_request_update(p_organization_id uuid, p_request_id uuid, p jsonb)
 returns jsonb language plpgsql security definer set search_path to 'public' as $$
 declare
@@ -358,19 +369,17 @@ begin
        select 1 from public.scd_clubs where id = (c->>'opponentClubId')::uuid and organization_id = p_organization_id) then
     return jsonb_build_object('ok', false, 'code', 'club');
   end if;
-  if r.status = 'DA_CONFERMARE' and ((c->>'teamKey') is null or (c->>'startsAt') is null) then
-    return jsonb_build_object('ok', false, 'code', 'incomplete');
-  end if;
   update public.scd_requests set
     team_key = c->>'teamKey', proposed_starts_at = (c->>'startsAt')::timestamptz, venue_text = c->>'venue',
     opponent_club_id = (c->>'opponentClubId')::uuid, opponent_text = c->>'opponentText',
     payload = jsonb_strip_nulls(jsonb_build_object('homeAway', c->>'homeAway', 'scope', c->>'scope', 'note', c->>'note')),
-    expires_at = case when r.status = 'DA_CONFERMARE'
-      then least(r.expires_at, greatest((c->>'startsAt')::timestamptz, now())) else r.expires_at end,
+    status = 'BOZZA', sent_at = null,
     updated_at = now()
   where id = p_request_id;
-  insert into public.scd_request_events (organization_id, request_id, action, actor) values (p_organization_id, p_request_id, 'MODIFICATA', auth.uid());
-  return jsonb_build_object('ok', true);
+  insert into public.scd_request_events (organization_id, request_id, action, actor, note)
+  values (p_organization_id, p_request_id, 'MODIFICATA', auth.uid(),
+    case when r.status = 'DA_CONFERMARE' then 'Tornata in bozza: da rimandare a chi conferma' else null end);
+  return jsonb_build_object('ok', true, 'status', 'BOZZA');
 end;
 $$;
 revoke all on function public.scd_request_update(uuid, uuid, jsonb) from public, anon;
@@ -427,7 +436,8 @@ grant execute on function public.scd_requests_expire(uuid) to authenticated;
 
 -- ---------------------------------------------------------------- 9. decision (confirmer)
 -- CONFERMA: the opponent must be a registered club (picked in the search bar or added as "Nuova societa");
--- a PLANNED, PUBLIC calendar row is created (team-level data only) and the federal form waits for the Segreteria.
+-- an internal PLANNED calendar row (visibility STAFF, team-level data only) is created; the Segreteria copies it into
+-- the Master Calendario (the only public source) and prepares the federal form.
 create or replace function public.scd_request_decide(p_organization_id uuid, p_request_id uuid, p_decision text, p_note text, p_opponent_club_id uuid)
 returns jsonb language plpgsql security definer set search_path to 'public' as $$
 declare
@@ -463,20 +473,12 @@ begin
   if v_club.id is null then return jsonb_build_object('ok', false, 'code', 'club'); end if;
   if r.proposed_starts_at is null or r.proposed_starts_at <= now() then return jsonb_build_object('ok', false, 'code', 'date'); end if;
 
-  -- Public location: only a known facility of the club, or "Trasferta" with the opponent's city; free text never.
-  -- Mirror of lib/request-machine.ts publicLocation.
-  v_loc := case
-    when r.payload->>'homeAway' = 'FUORI' then 'Trasferta' || coalesce(' · ' || v_club.city, '')
-    when r.venue_text ~* '^\s*colico\M.*\mcampo\s*1\s*$' then 'Colico · Campo 1'
-    when r.venue_text ~* '^\s*colico\M.*\mcampo\s*2\s*$' then 'Colico · Campo 2'
-    when r.venue_text ~* '^\s*colico\s*$' then 'Colico'
-    when r.venue_text ~* '^\s*dervio\M' then 'Dervio'
-    else null
-  end;
+  -- Location: the known facility, or "Trasferta" with the opponent's city. Mirror of lib/request-machine.ts eventLocation.
+  v_loc := case when r.payload->>'homeAway' = 'FUORI' then 'Trasferta' || coalesce(' · ' || v_club.city, '') else r.venue_text end;
   insert into public.scd_events (organization_id, event_type, title, starts_at, status, visibility, location_text,
     source_id, source_record_id, source_verified_at, source_confidence, metadata)
   values (p_organization_id, 'AMICHEVOLE', left('Amichevole ' || r.team_key || ' - ' || v_club.name, 200), r.proposed_starts_at,
-    'PLANNED', 'PUBLIC', v_loc, 'SCD_RICHIESTE', r.id::text, now(), 100,
+    'PLANNED', 'STAFF', v_loc, 'SCD_RICHIESTE', r.id::text, now(), 100,
     jsonb_strip_nulls(jsonb_build_object('teamKey', r.team_key, 'opponent', v_club.name, 'opponentClubId', v_club.id,
       'crestKey', v_club.crest_asset_key, 'homeAway', r.payload->>'homeAway', 'requestId', r.id)))
   returning id into v_event;
@@ -493,28 +495,53 @@ begin
     confirmed_at = now(), decision_note = v_note, event_id = v_event, form_status = 'DA_PREPARARE', updated_at = now()
   where id = r.id;
   insert into public.scd_request_events (organization_id, request_id, action, actor, note)
-  values (p_organization_id, r.id, 'CONFERMATA', auth.uid(), coalesce(v_note, 'Modulo amichevole da preparare in Segreteria'));
+  values (p_organization_id, r.id, 'CONFERMATA', auth.uid(),
+    coalesce(v_note, 'Segreteria: copia nel Master Calendario e prepara il modulo amichevole'));
   return jsonb_build_object('ok', true, 'eventId', v_event);
 end;
 $$;
 revoke all on function public.scd_request_decide(uuid, uuid, text, text, uuid) from public, anon;
 grant execute on function public.scd_request_decide(uuid, uuid, text, text, uuid) to authenticated;
 
--- Cancel a request nobody has confirmed yet (office or Direzione).
+-- Cancel a request (Segreteria or Direzione): BOZZA, DA_CONFERMARE or CONFERMATA. A confirmed one also marks its
+-- internal calendar row CANCELLED (the Segreteria removes it from the Master Calendario if already copied).
 create or replace function public.scd_request_cancel(p_organization_id uuid, p_request_id uuid, p_note text)
 returns jsonb language plpgsql security definer set search_path to 'public' as $$
+declare
+  r public.scd_requests;
+  v_note text := nullif(left(btrim(public.scd_request_redact(coalesce(p_note, ''))), 300), '');
 begin
   if not public.scd_request_office(p_organization_id) then return jsonb_build_object('ok', false, 'code', 'forbidden'); end if;
-  update public.scd_requests set status = 'ANNULLATA', decision_note = nullif(left(btrim(coalesce(p_note, '')), 300), ''), updated_at = now()
-  where id = p_request_id and organization_id = p_organization_id and status in ('BOZZA','DA_CONFERMARE');
-  if not found then return jsonb_build_object('ok', false, 'code', 'state'); end if;
+  select * into r from public.scd_requests where id = p_request_id and organization_id = p_organization_id for update;
+  if r.id is null or r.status not in ('BOZZA','DA_CONFERMARE','CONFERMATA') then return jsonb_build_object('ok', false, 'code', 'state'); end if;
+  update public.scd_requests set status = 'ANNULLATA', decision_note = coalesce(v_note, decision_note), updated_at = now() where id = r.id;
+  if r.event_id is not null then
+    update public.scd_events set status = 'CANCELLED', updated_at = now() where id = r.event_id and organization_id = p_organization_id;
+  end if;
   insert into public.scd_request_events (organization_id, request_id, action, actor, note)
-  values (p_organization_id, p_request_id, 'ANNULLATA', auth.uid(), nullif(left(btrim(coalesce(p_note, '')), 300), ''));
-  return jsonb_build_object('ok', true);
+  values (p_organization_id, r.id, 'ANNULLATA', auth.uid(),
+    coalesce(v_note, case when r.status = 'CONFERMATA' then 'Amichevole annullata dopo la conferma' else null end));
+  return jsonb_build_object('ok', true, 'wasConfirmed', r.status = 'CONFERMATA', 'wasCopied', r.calendar_copied_at is not null);
 end;
 $$;
 revoke all on function public.scd_request_cancel(uuid, uuid, text) from public, anon;
 grant execute on function public.scd_request_cancel(uuid, uuid, text) to authenticated;
+
+-- Segreteria task: the confirmed friendly has been copied into the Master Calendario.
+create or replace function public.scd_request_mark_copied(p_organization_id uuid, p_request_id uuid)
+returns jsonb language plpgsql security definer set search_path to 'public' as $$
+begin
+  if not public.scd_request_office(p_organization_id) then return jsonb_build_object('ok', false, 'code', 'forbidden'); end if;
+  update public.scd_requests set calendar_copied_at = now(), updated_at = now()
+  where id = p_request_id and organization_id = p_organization_id and status = 'CONFERMATA' and calendar_copied_at is null;
+  if not found then return jsonb_build_object('ok', false, 'code', 'state'); end if;
+  insert into public.scd_request_events (organization_id, request_id, action, actor, note)
+  values (p_organization_id, p_request_id, 'CALENDARIO', auth.uid(), 'Copiata nel Master Calendario');
+  return jsonb_build_object('ok', true);
+end;
+$$;
+revoke all on function public.scd_request_mark_copied(uuid, uuid) from public, anon;
+grant execute on function public.scd_request_mark_copied(uuid, uuid) to authenticated;
 
 -- Federal form: forward only DA_PREPARARE -> PRONTO -> FIRMATO -> INVIATO (sending is done by a person, outside the app).
 create or replace function public.scd_request_set_form_status(p_organization_id uuid, p_request_id uuid, p_form_status text)
@@ -543,10 +570,10 @@ grant execute on function public.scd_request_set_form_status(uuid, uuid, text) t
 -- ---------------------------------------------------------------- 10. reads
 create or replace function public.scd_request_json(r public.scd_requests)
 returns jsonb language sql stable set search_path to 'public' as $$
-  select jsonb_build_object('id', r.id, 'kind', r.kind, 'channel', r.channel, 'rawText', r.raw_text, 'teamKey', r.team_key,
+  select jsonb_build_object('id', r.id, 'kind', r.kind, 'channel', r.channel, 'teamKey', r.team_key,
     'startsAt', r.proposed_starts_at, 'venue', r.venue_text, 'homeAway', r.payload->>'homeAway', 'scope', r.payload->>'scope', 'note', r.payload->>'note',
     'opponentText', r.opponent_text, 'status', r.status, 'expiresAt', r.expires_at, 'sentAt', r.sent_at,
-    'confirmedAt', r.confirmed_at, 'decisionNote', r.decision_note, 'eventId', r.event_id, 'formStatus', r.form_status,
+    'confirmedAt', r.confirmed_at, 'decisionNote', r.decision_note, 'eventId', r.event_id, 'formStatus', r.form_status, 'calendarCopiedAt', r.calendar_copied_at,
     'createdAt', r.created_at,
     'club', (select jsonb_build_object('id', c.id, 'name', c.name, 'city', c.city, 'province', c.province,
       'figcMatricola', c.figc_matricola, 'crestKey', c.crest_asset_key) from public.scd_clubs c where c.id = r.opponent_club_id));
@@ -562,7 +589,8 @@ begin
     select jsonb_agg(public.scd_request_json(r) order by r.created_at desc)
     from public.scd_requests r
     where r.organization_id = p_organization_id
-      and (r.status in ('BOZZA','DA_CONFERMARE') or (r.status = 'CONFERMATA' and r.form_status <> 'INVIATO')
+      and (r.status in ('BOZZA','DA_CONFERMARE')
+           or (r.status = 'CONFERMATA' and (r.form_status <> 'INVIATO' or r.calendar_copied_at is null))
            or r.updated_at > now() - interval '60 days')), '[]'::jsonb);
 end;
 $$;

@@ -81,6 +81,7 @@ describe("request machine server functions", () => {
     });
     const d = await desk();
     expect(d).toMatchObject({ ready: true, canEdit: false });
+    expect(typeof d.serverNow).toBe("number");
     expect(d.rows.map((r) => r.id)).toEqual(["r1"]);
   });
 
@@ -101,14 +102,24 @@ describe("request machine server functions", () => {
     await expect(create({ data: { channel: "SMS" } })).rejects.toThrow();
   });
 
-  it("removes phone numbers and e-mails from the message before storing it", async () => {
+  it("never sends the team's message to the database and strips contacts from notes", async () => {
     session = as(["segreteria"]);
     rpc.mockResolvedValue({ data: { ok: true, id: "r1" }, error: null });
-    const r = await create({ data: { channel: "WHATSAPP", rawText: "amichevole u15, chiamami 333 1234567 o a x.y@example.it", teamKey: "u15", note: "tel 0341 940123" } });
+    await expect(create({ data: { channel: "WHATSAPP", rawText: "amichevole u15 333 1234567", teamKey: "u15" } })).rejects.toThrow();
+    expect(rpc).not.toHaveBeenCalled();
+    const r = await create({ data: { channel: "WHATSAPP", teamKey: "u15", venue: "Colico · Campo 1", note: "tel 0341 940123" } });
     expect(r.ok).toBe(true);
     const p = rpc.mock.calls[0]?.[1]?.p as Record<string, unknown>;
-    expect(p["rawText"]).toBe("amichevole u15, chiamami [telefono] o a [email]");
+    expect(p).not.toHaveProperty("rawText");
     expect(p["note"]).toBe("tel [telefono]");
+    expect(p["venue"]).toBe("Colico · Campo 1");
+  });
+
+  it("says plainly that a confirmed and copied friendly must also leave the Master Calendario", async () => {
+    session = as(["segreteria"]);
+    rpc.mockResolvedValue({ data: { ok: true, wasConfirmed: true, wasCopied: true }, error: null });
+    const cancel = fns.cancelRequest as unknown as Fn<Record<string, unknown>, MachineOutcome>;
+    expect((await cancel({ data: { id: "11111111-1111-1111-1111-111111111111" } })).message).toMatch(/Master Calendario/);
   });
 
   it("relays the database refusal of a confirmation in plain words", async () => {

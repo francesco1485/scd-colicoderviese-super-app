@@ -14,7 +14,6 @@ import { romeParts } from "@/lib/home-week";
 import {
   FORM_SOURCE,
   FRIENDLY_OFFICE,
-  confirmerLine,
   formValues,
   friendlyEmailDraft,
   noticeDeadline,
@@ -165,9 +164,7 @@ function Sheet({ row }: { row: RequestRow }) {
             <div className="rf-head-text">
               <p className="rf-club">S.C.D. COLICODERVIESE</p>
               <p className="rf-title">Richiesta gara amichevole</p>
-              <p className="rf-sub">
-                {teamLabel(row.teamKey)} · {confirmerLine(row.teamKey).replace("Conferma: ", "confermata da ")}
-              </p>
+              <p className="rf-sub">{teamLabel(row.teamKey)}</p>
             </div>
           </header>
           {sections.map((s) => (

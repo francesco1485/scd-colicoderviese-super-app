@@ -62,13 +62,15 @@ export interface RequestsDesk {
   rows: RequestRow[];
   notices: RequestNotice[];
   error: string | null;
+  /** Server clock when the board was read: days left are counted from it (no client clock drift). */
+  serverNow: number;
 }
 
 export const getRequestsDesk = createServerFn({ method: "GET" }).handler(async (): Promise<RequestsDesk> => {
   const { s, roles, org, sb } = await context();
   const gate = workAreaView("richieste", { preview: stagingPreviewEnabled(process.env, import.meta.env.PROD), sessionRoles: roles });
   const canEdit = Boolean(roles && org && ["DIRECTION", "SECRETARIAT", "REGISTRATION"].includes(org.role));
-  const base: RequestsDesk = { gate, connected: false, ready: false, canEdit: false, rows: [], notices: [], error: null };
+  const base: RequestsDesk = { gate, connected: false, ready: false, canEdit: false, rows: [], notices: [], error: null, serverNow: Date.now() };
   if (gate.view !== "page" || !sb || !org || !s.user) return base;
   const orgId = org.organizationId;
   const exp = await sb.rpc("scd_requests_expire", { p_organization_id: orgId });
@@ -127,15 +129,17 @@ const draftSchema = z.object({
   note: z.string().max(400).nullable().optional(),
 });
 
-async function call(fn: string, args: Record<string, unknown>, okMessage: string): Promise<MachineOutcome> {
+type DbOut = { ok?: boolean; code?: string; id?: string; wasConfirmed?: boolean; wasCopied?: boolean };
+
+async function call(fn: string, args: Record<string, unknown>, okMessage: string | ((r: DbOut) => string)): Promise<MachineOutcome> {
   const { org, sb } = await context();
   if (!sb || !org) return { ok: false, message: "Entra con il tuo account per continuare." };
   const { data, error } = await sb.rpc(fn, { p_organization_id: org.organizationId, ...args });
   if (machineMissing(error)) return { ok: false, message: OFF_WRITE };
   if (error) return { ok: false, message: requestError(null) };
-  const r = (data ?? {}) as { ok?: boolean; code?: string; id?: string };
+  const r = (data ?? {}) as DbOut;
   if (!r.ok) return { ok: false, message: requestError(r.code) };
-  return { ok: true, message: okMessage, ...(r.id ? { id: r.id } : {}) };
+  return { ok: true, message: typeof okMessage === "function" ? okMessage(r) : okMessage, ...(r.id ? { id: r.id } : {}) };
 }
 
 const dbDraft = (v: ReturnType<typeof validateDraft> & { ok: true }) => ({
@@ -151,14 +155,14 @@ const dbDraft = (v: ReturnType<typeof validateDraft> & { ok: true }) => ({
 
 export const createRequestDraft = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) =>
-    draftSchema.extend({ channel: z.enum(REQUEST_CHANNELS), rawText: z.string().max(1000).nullable().optional() }).parse(d),
+    draftSchema.extend({ channel: z.enum(REQUEST_CHANNELS) }).strict().parse(d),
   )
   .handler(async ({ data }): Promise<MachineOutcome> => {
     const v = validateDraft(data, Date.now());
     if (!v.ok) return { ok: false, message: "Controlla i campi evidenziati.", errors: v.errors };
     return call(
       "scd_request_create",
-      { p: { kind: "AMICHEVOLE", channel: data.channel, rawText: redactContacts(data.rawText)?.trim() || null, ...dbDraft(v) } },
+      { p: { kind: "AMICHEVOLE", channel: data.channel, ...dbDraft(v) } },
       "Bozza salvata. Controlla i dati e mandala a chi conferma.",
     );
   });
@@ -168,7 +172,7 @@ export const updateRequestDraft = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<MachineOutcome> => {
     const v = validateDraft(data, Date.now());
     if (!v.ok) return { ok: false, message: "Controlla i campi evidenziati.", errors: v.errors };
-    return call("scd_request_update", { p_request_id: data.id, p: dbDraft(v) }, "Modifiche salvate.");
+    return call("scd_request_update", { p_request_id: data.id, p: dbDraft(v) }, "Modifiche salvate. La richiesta è in bozza: rimandala a chi conferma.");
   });
 
 const idSchema = z.object({ id: z.string().uuid() });
@@ -179,7 +183,19 @@ export const sendRequest = createServerFn({ method: "POST" })
 
 export const cancelRequest = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => idSchema.extend({ note: z.string().max(300).optional() }).parse(d))
-  .handler(async ({ data }) => call("scd_request_cancel", { p_request_id: data.id, p_note: data.note ?? null }, "Richiesta annullata."));
+  .handler(async ({ data }) =>
+    call("scd_request_cancel", { p_request_id: data.id, p_note: redactContacts(data.note ?? null) }, (r) =>
+      r.wasCopied
+        ? "Amichevole annullata. Toglila anche dal Master Calendario e avvisa la squadra."
+        : r.wasConfirmed
+          ? "Amichevole annullata: non era ancora nel Master Calendario."
+          : "Richiesta annullata.",
+    ),
+  );
+
+export const markCopiedToMaster = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => idSchema.parse(d))
+  .handler(async ({ data }) => call("scd_request_mark_copied", { p_request_id: data.id }, "Segnata come copiata nel Master Calendario."));
 
 export const decideRequest = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) =>
@@ -192,7 +208,7 @@ export const decideRequest = createServerFn({ method: "POST" })
       "scd_request_decide",
       { p_request_id: data.id, p_decision: data.decision, p_note: redactContacts(data.note ?? null), p_opponent_club_id: data.clubId ?? null },
       data.decision === "CONFERMA"
-        ? "Confermata: compare in calendario e la Segreteria prepara il modulo da far firmare."
+        ? "Confermata: la Segreteria la inserisce nel calendario ufficiale e prepara il modulo da far firmare."
         : "Segnata come non possibile. La Segreteria è avvisata nell'app.",
     ),
   );

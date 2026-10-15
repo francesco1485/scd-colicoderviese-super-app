@@ -218,7 +218,8 @@ export function parseRequestMessage(input: string, now: Date): ParsedRequest {
   let homeAway: HomeAway | null = null;
   const ours = /\b(?:a|al|presso(?:\s+il)?)\s+(?:campo\s+(?:di\s+)?)?(colico|dervio)\b(?:\s*[-,]?\s*campo\s*([12]))?/i.exec(text);
   if (ours) {
-    venue = OUR_VENUES[ours[1]!.toLowerCase()]! + (ours[2] ? ` · Campo ${ours[2]}` : "");
+    const town = OUR_VENUES[ours[1]!.toLowerCase()]!;
+    venue = town === "Colico" && ours[2] ? `Colico · Campo ${ours[2]}` : town;
     homeAway = "CASA";
     text = cut(text, ours);
   } else {
