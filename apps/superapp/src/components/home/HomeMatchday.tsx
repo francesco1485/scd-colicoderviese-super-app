@@ -16,6 +16,7 @@ import { venueShort } from "@/components/home/HomeSections";
 import type { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 import { crestFor } from "@/lib/crests";
 import { matchShare } from "@/lib/share-match";
+import { readableOnWhite } from "@/lib/quadro";
 import { ShareWhatsApp } from "@/components/scd/ShareWhatsApp";
 import {
   MATCHDAY_FILTERS,
@@ -160,7 +161,7 @@ function MatchRow({
           <span className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1 text-[12.5px] leading-tight text-[#4a5d7a]">
             <span
               className="inline-flex h-[20px] shrink-0 items-center rounded-full px-2 text-[11px] font-bold leading-none text-white"
-              style={{ background: color }}
+              style={{ background: readableOnWhite(color) }}
             >
               {cat}
             </span>

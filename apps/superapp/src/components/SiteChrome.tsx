@@ -129,7 +129,7 @@ export function SiteHeader() {
       <div className="mx-auto flex h-full max-w-[1440px] items-center gap-3 px-4 sm:px-6 lg:gap-7 lg:px-10">
         <Link
           to="/"
-          className="scd-focus flex min-w-0 items-center gap-2.5 rounded-md lg:gap-3"
+          className="scd-focus flex min-h-11 min-w-0 items-center gap-2.5 rounded-md lg:gap-3"
           aria-label={`${CLUB_NAME}, vai alla Home`}
         >
           <ClubCrestOfficial size={40} className="lg:hidden" />
@@ -731,7 +731,7 @@ export function SiteFooter() {
             <span data-build={BUILD_STAMP}>Super App ufficiale della {CLUB_NAME}</span>
           </div>
           {/* Authorship kept but discreet (Francesco 15/10/2026 06:51: "non visibile così ma molto riservato"). */}
-          <details className="-mt-3 text-[11px] leading-snug text-white/45">
+          <details className="-mt-3 text-[11px] leading-snug text-white/60">
             <summary className="scd-focus inline-flex min-h-11 cursor-pointer list-none items-center">
               © {new Date().getFullYear()} · Tutti i diritti riservati · Crediti
             </summary>

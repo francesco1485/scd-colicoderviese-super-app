@@ -20,6 +20,7 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { ClubCrestOfficial } from "@/components/SiteChrome";
 import {
   PROMO_SECONDS,
+  autoAdvance,
   nextIndex,
   type PromoSlide,
   type QuickChip,
@@ -245,7 +246,7 @@ export function PromoCarousel({ slides }: { slides: readonly PromoSlide[] }) {
   }, [slides.length]);
 
   useEffect(() => {
-    if (reduced || paused || hold || slides.length < 2) return;
+    if (!autoAdvance({ reduced, paused, hold, length: slides.length })) return;
     const id = window.setTimeout(
       () => go(nextIndex(index, slides.length)),
       PROMO_SECONDS * 1000,
@@ -279,7 +280,7 @@ export function PromoCarousel({ slides }: { slides: readonly PromoSlide[] }) {
         ))}
       </ul>
       {slides.length > 1 && (
-        <div className="flex items-center justify-center gap-1 pt-2">
+        <div className="flex items-center justify-center pt-1">
           {slides.map((s, n) => (
             <button
               key={s.id}
@@ -287,7 +288,7 @@ export function PromoCarousel({ slides }: { slides: readonly PromoSlide[] }) {
               onClick={() => go(n)}
               aria-label={`Vai a: ${s.title}`}
               aria-current={n === index || undefined}
-              className="scd-focus grid size-8 place-items-center rounded-full"
+              className="scd-focus grid size-11 place-items-center rounded-full"
             >
               <span
                 className={`block h-2 rounded-full transition-[width,background-color] duration-300 ${n === index ? "w-6 bg-[#1556c4]" : "w-2 bg-[#b9c7dc]"}`}
@@ -299,7 +300,7 @@ export function PromoCarousel({ slides }: { slides: readonly PromoSlide[] }) {
               type="button"
               onClick={() => setPaused((p) => !p)}
               aria-label={paused ? "Riprendi lo scorrimento" : "Ferma lo scorrimento"}
-              className="scd-focus ml-1 grid size-8 place-items-center rounded-full text-[#0b2a5b] hover:bg-white"
+              className="scd-focus grid size-11 place-items-center rounded-full text-[#0b2a5b] hover:bg-white"
             >
               {paused ? (
                 <Play className="size-4" aria-hidden="true" />

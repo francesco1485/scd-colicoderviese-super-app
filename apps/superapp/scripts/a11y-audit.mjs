@@ -28,6 +28,15 @@ const SHOTS = process.env.A11Y_SHOTS === "1";
 mkdirSync(OUT, { recursive: true });
 
 const PAGES = [
+  // B4 (15/10/2026): public pages that carry the commercial and family journeys.
+  { slug: "home", path: "/" },
+  { slug: "sponsor", path: "/sponsor" },
+  { slug: "sostieni", path: "/sostieni" },
+  { slug: "tornei", path: "/tornei" },
+  { slug: "pulmini", path: "/pulmini" },
+  // The LED player is a full-screen signage surface with no site header or navigation, so it is
+  // exempt from the touch-target rule (nobody taps a stadium wall); axe WCAG rules still apply.
+  { slug: "ledwall-player", path: "/ledwall/player", signage: true },
   { slug: "guida", path: "/guida" },
   { slug: "accedi", path: "/accedi" },
   { slug: "registrati", path: "/registrati" },
@@ -75,7 +84,9 @@ let problems = 0;
 
 for (const vp of VIEWPORTS) {
   for (const pg of PAGES) {
-    const ctx = await browser.newContext({ ...vp.opts, locale: "it-IT", timezoneId: "Europe/Rome" });
+    // Reduced motion: section titles use a scroll-driven reveal (opacity 0.25 until scrolled into view), which
+    // axe would measure as low contrast; with reduced motion they render in their final, readable state.
+    const ctx = await browser.newContext({ ...vp.opts, locale: "it-IT", timezoneId: "Europe/Rome", reducedMotion: "reduce" });
     const page = await ctx.newPage();
     let unknownFns = new Set();
     if (pg.fixtures) {
@@ -91,7 +102,7 @@ for (const vp of VIEWPORTS) {
       const slim = (v) => ({ id: v.id, impact: v.impact, help: v.help, nodes: v.nodes.slice(0, 8).map((n) => ({ target: n.target.join(" "), summary: (n.failureSummary ?? "").split("\n").slice(0, 3).join(" ") })), count: v.nodes.length });
       return { violations: r.violations.map(slim), incomplete: r.incomplete.filter((v) => v.id === "color-contrast").map(slim) };
     });
-    const small = await page.evaluate(smallTargets);
+    const small = pg.signage ? [] : await page.evaluate(smallTargets);
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     if (SHOTS) await page.screenshot({ path: join(OUT, `${pg.slug}-${vp.name}.png`), fullPage: true });
     const row = { page: pg.path, viewport: vp.name, violations: axe.violations, contrastToReview: axe.incomplete, smallTargets: small, overflow, passthroughFns: [...unknownFns] };

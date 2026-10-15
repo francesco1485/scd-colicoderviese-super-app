@@ -137,7 +137,7 @@ function TournamentCard({ t }: { t: TournamentEdition }) {
               Programma e iscrizioni appena pubblicati
             </span>
           )}
-          <span className="text-[11.5px] text-[#7a8aa3]">
+          <span className="text-[11.5px] text-[#5b6b85]">
             Fonte: {t.source}
           </span>
         </div>
