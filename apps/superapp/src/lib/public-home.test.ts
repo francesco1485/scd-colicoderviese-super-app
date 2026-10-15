@@ -45,7 +45,7 @@ const PUBLIC_HOME_FILES = [
   "src/routes/index.tsx",
   "src/components/home/PublicHome.tsx",
   "src/components/home/HomePractical.tsx",
-  "src/components/home/HomeWeek.tsx",
+  "src/components/home/HomeLobby.tsx",
   "src/components/home/HomeBoard.tsx",
   "src/lib/home-week-board.ts",
   "src/components/home/HomePromo.tsx",
@@ -90,28 +90,28 @@ describe("public home v5", () => {
       );
     }
     const home = code("src/components/home/PublicHome.tsx");
-    // Direzione 13/10 09:03 "calendario settimana deve essere sempre" + 15/10 21:35 new idea: the home IS the week of
-    // every team, drawn like the Calendario board (VR-025).
-    expect(home).toMatch(/<HomeWeek calendar=\{calendar\}/);
-    const week = code("src/components/home/HomeWeek.tsx");
-    expect(week).toMatch(/weekBoardEvents\(calendar\.events, today\)/);
-    expect(week).toContain('data-testid="home-week"');
-    expect(week).toContain("Nessuna gara nei prossimi 7 giorni.");
-    // Rows are the Calendario rows (opponent crest only from the verified registry, StackedCrests/crestFor).
-    expect(week).toMatch(/<GameRow\b/);
-    expect(week).not.toMatch(/OpponentCrest|publicTeamCrest|team-crest/);
-    // Day strip and filters are real buttons with aria-pressed; no hero art, no mascot.
-    expect(week.match(/aria-pressed=\{on\}/g)?.length).toBe(2);
-    expect(week).not.toMatch(/HeroArt|Sky|SkyJolly|PersonaAvatar/);
+    // Direzione 13/10 09:03 "calendario settimana deve essere sempre" + 15/10 22:04 Eurobet rebuild: the week of every
+    // team as event cards, right after the chips and the one static match banner.
+    expect(home).toMatch(/<HomeLobby calendar=\{calendar\}/);
+    const lobby = code("src/components/home/HomeLobby.tsx");
+    expect(lobby).toMatch(/weekBoardEvents\(calendar\.events, today\)/);
+    expect(lobby).toContain('data-testid="home-lobby"');
+    expect(lobby).toContain("Nessuna gara nei prossimi 7 giorni.");
+    // Opponent crest only from the verified registry: empty disc when unknown, never an invented crest.
+    expect(lobby).toMatch(/const \{ src, label \} = crestFor\(name\);\s*if \(!src\) return <span aria-hidden="true"/);
+    expect(lobby).not.toMatch(/publicTeamCrest|team-crest/);
+    // Filters are real buttons with aria-pressed; one static banner, no slider, no hero art, no mascot.
+    expect(lobby).toMatch(/aria-pressed=\{on\}/);
+    expect(lobby).not.toMatch(/setInterval|Carousel|slide|HeroArt|SkyJolly|PersonaAvatar/i);
   });
 
-  it("home order (15/10 07:04, UD-134 09:18, new idea 21:35): notices, communication, week board, results; no stories, no partner band", () => {
+  it("home order (15/10 07:04, UD-134 09:18, new idea 21:35): notices, communication, lobby, results; no stories, no partner band", () => {
     const home = code("src/components/home/PublicHome.tsx");
     const body = home.slice(home.indexOf("export function PublicHome"));
     const order = [
       "<UrgentNotices",
       "<ClubNoticeCard",
-      "<HomeWeek",
+      "<HomeLobby",
       "<WeekendResults",
     ];
     const at = order.map((t) => body.indexOf(t));
@@ -253,7 +253,7 @@ describe("public home v5", () => {
     expect(chat).not.toMatch(/crovi-cameo|CroviActor|cameoLine/);
   });
 
-  it("UD-116: the footer is reduced (logo, contacts, social, install, legal links, federal credits) and has no link index", () => {
+  it("UD-116 + Eurobet footer (22:04): reduced footer (credits band, logo, contacts, app + social, legal links), no link index", () => {
     const chrome = code("src/components/SiteChrome.tsx");
     const footer = chrome.slice(chrome.indexOf("export function SiteFooter"));
     expect(footer).not.toMatch(/LINK_GROUPS|Tutto sul club|footer-group-/);
@@ -269,7 +269,7 @@ describe("public home v5", () => {
       /openCookiePrefs/,
       /to="\/safeguarding"/,
       /href="\/elimina-account"/,
-      /<ClubCredentials variant="list"/,
+      /<ClubCredentials variant="bar"/,
     ])
       expect(footer).toMatch(must);
   });

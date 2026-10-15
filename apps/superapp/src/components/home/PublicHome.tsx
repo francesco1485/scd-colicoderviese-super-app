@@ -1,10 +1,10 @@
 /**
  * Signed-out public home on board VR-009 (UD-133, then UD-134 Francesco 15/10/2026 09:18).
  *
- * New idea (Francesco 15/10/2026 21:35 «avevo detto che bisogna cambiare idea di grafica», boards VR-025): urgent
- * notices (R20 alerts, only when there are) → the one club communication chosen by the Direzione → HomeWeek (thin
- * title band, week strip with the chosen day in the blue circle, pill filters, every team's games by day as board
- * rows; desktop right column with the next big game, practical cards and Iride) → weekend results (only with a real source;
+ * Rebuilt from scratch on the Eurobet structure (Francesco 15/10/2026 22:04): urgent notices (R20 alerts, only when
+ * there are) → the one club communication chosen by the Direzione → HomeLobby (team chips, one static match banner,
+ * "In programma" event cards, "Dal club", services, "Perché la ColicoDerviese"; desktop right rail "Entra nel club")
+ * → weekend results (only with a real source;
  * "Vittoria" and confetti only on a ColicoDerviese win) → footer ("Chi sei?" removed, UD-152). Partners scroll in the fixed SponsorBand on every
  * page; the LED spot, the partner of the month and partner news live on /sponsor (PartnerBand). No stories.
  * Palette: navy #0b2a5b, blue #1556c4, light #eef3f9, white; yellow #ffd600 for changes and the main CTA.
@@ -18,7 +18,7 @@ import { weekendResults } from "@/lib/home-results";
 import { urgentNotices } from "@/lib/home-today";
 import type { VetrinaSlot, VetrinaWorld } from "@/lib/vetrina";
 
-import { HomeWeek } from "@/components/home/HomeWeek";
+import { HomeLobby } from "@/components/home/HomeLobby";
 import {
   ClubNoticeCard,
   UrgentNotices,
@@ -62,14 +62,14 @@ export function PublicHome({
     <main
       data-screen="home"
       data-variant="public"
-      className="min-h-dvh bg-[#eef3f9] pb-6 font-sans text-[#0b1e3a]"
+      className="min-h-dvh bg-[#eef3f9] pb-6 font-sans text-[#0b1e3a] shadow-[0_0_0_100vmax_#eef3f9] [clip-path:inset(0_-100vmax_0_0)]"
     >
       <h1 className="sr-only">
         S.C.D. ColicoDerviese, il club di calcio di Colico e Dervio
       </h1>
       <UrgentNotices items={alerts} />
       <ClubNoticeCard notice={notice} />
-      <HomeWeek calendar={calendar} nowMs={nowMs} today={today} />
+      <HomeLobby calendar={calendar} nowMs={nowMs} today={today} />
       <WeekendResults rows={results} />
     </main>
   );

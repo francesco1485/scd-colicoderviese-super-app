@@ -775,87 +775,109 @@ export function BottomNav() {
 const SOCIAL_ICON = { instagram: Instagram, facebook: Facebook } as const;
 
 /**
- * Piè di pagina ridotto (UD-116, Direzione 14/10/2026: il footer grande con "Tutto sul club" non serve alle persone):
- * logo, contatti (mail, PEC, sede), social, Installa l'app, privacy / cookie / segnalazioni riservate / elimina
- * account e i riconoscimenti federali. L'indice delle pagine è nel menu, con la ricerca.
+ * Piè di pagina riprogettato sulla struttura Eurobet (Francesco 15/10/2026 22:04: «parte finale fa schifo, la devi
+ * riprogettare da zero completamente partendo dallo stile Eurobet»), sempre ridotto come da UD-116 (nessun indice di
+ * pagine: quello sta nel menu con la ricerca). Tre fasce, come il footer Eurobet:
+ *   1. fascia chiara dei riconoscimenti (il posto dei loghi di certificazione): marchi ufficiali FIGC SGS, LND, Monza;
+ *   2. fascia blu: stemma e nome, contatti, "Scarica l'app" + social (il posto di "Scarica le app");
+ *   3. fascia scura legale: privacy, cookie, segnalazioni riservate, elimina account, tutte le pagine, crediti.
  */
 export function SiteFooter() {
+  const legal =
+    "scd-focus inline-flex min-h-11 items-center underline decoration-white/30 underline-offset-4 hover:text-white";
   return (
     <footer className="mt-10" data-testid="site-footer">
-      <div className="bg-[#0b2a5b] px-4 pb-8 pt-8 text-white lg:px-8 lg:pb-8">
-        <div className="mx-auto grid max-w-[1280px] gap-6">
-          <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)_minmax(0,1.2fr)] lg:items-start">
-            <div className="grid content-start gap-3">
-              <Link
-                to="/"
-                className="scd-focus flex w-fit items-center gap-3 rounded-md"
-                aria-label={`${CLUB_NAME}, vai alla Home`}
-              >
-                <ClubCrestOfficial size={48} />
-                <span className="whitespace-nowrap font-title text-[24px] font-black leading-none">
-                  COLICO<span className="text-[#ffd600]">DERVIESE</span>
+      <section
+        aria-labelledby="footer-credits-t"
+        className="border-t border-[#dfe7f2] bg-white px-4 py-6 lg:px-8"
+        data-testid="footer-credits"
+      >
+        <div className="mx-auto grid max-w-[1240px] gap-3 lg:grid-cols-[220px_minmax(0,1fr)] lg:items-center lg:gap-8">
+          <h2 id="footer-credits-t" className="m-0 text-[12px] font-extrabold uppercase tracking-[0.14em] text-[#1556c4]">
+            Riconoscimenti e affiliazioni
+          </h2>
+          <div className="grid gap-2">
+            <ClubCredentials variant="bar" className="rounded-[12px] border border-[#e6edf6] py-2" />
+            <p className="m-0 text-[12.5px] leading-snug text-[#4a5d7a]">{CREDENTIALS_SENTENCE}</p>
+          </div>
+        </div>
+      </section>
+
+      <div className="bg-[#0b2a5b] px-4 py-8 text-white lg:px-8">
+        <div className="mx-auto grid max-w-[1240px] gap-7 md:grid-cols-2 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)] lg:items-start">
+          <div className="grid content-start gap-3">
+            <Link
+              to="/"
+              className="scd-focus flex w-fit items-center gap-3 rounded-md"
+              aria-label={`${CLUB_NAME}, vai alla Home`}
+            >
+              <ClubCrestOfficial size={52} />
+              <span className="grid leading-none">
+                <span className="text-[11px] font-bold tracking-[0.2em] text-white/80">S.C.D.</span>
+                <span className="whitespace-nowrap font-title text-[25px] font-black">
+                  <span className="text-[#ffd600]">COLICO</span>DERVIESE
                 </span>
-              </Link>
-              <div className="flex flex-wrap items-center gap-2">
-                <ul className="m-0 flex list-none gap-2 p-0" aria-label="Profili social ufficiali">
-                  {SOCIAL_LINKS.map((so) => {
-                    const Icon = SOCIAL_ICON[so.id];
-                    return (
-                      <li key={so.id}>
-                        <a
-                          href={so.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          aria-label={`${so.label} ${so.handle} (apre una nuova scheda)`}
-                          className="scd-focus grid size-11 place-items-center rounded-full border border-white/25 text-white transition-colors duration-150 hover:bg-white/10"
-                        >
-                          <Icon className="size-5" strokeWidth={1.8} aria-hidden="true" />
-                        </a>
-                      </li>
-                    );
-                  })}
-                </ul>
-                <Link
-                  to="/installa"
-                  className="scd-focus inline-flex min-h-11 min-w-11 items-center text-[14px] gap-1.5 rounded-full bg-[#ffd600] px-4 font-bold text-[#0b1e3a] transition-[filter] duration-150 hover:brightness-95"
-                  data-testid="footer-install"
-                >
-                  <Download className="size-4" aria-hidden="true" />
-                  Installa l'app
-                </Link>
-              </div>
-            </div>
-
-            <address className="grid content-start gap-0.5 text-[14px] not-italic leading-snug text-white/85" data-testid="footer-contacts">
-              <h2 className="m-0 pb-1 text-[12px] font-bold uppercase tracking-[0.12em] text-[#ffd600]">Contatti</h2>
-              <p className="m-0 font-semibold text-white">{CLUB_NAME}</p>
-              <p className="m-0">{CLUB_PROFILE.contacts.address}</p>
-              <p className="m-0">
-                <a
-                  href={`mailto:${CLUB_PROFILE.contacts.email}`}
-                  className="scd-focus inline-flex min-h-11 select-text items-center underline decoration-white/30 underline-offset-4 hover:decoration-white"
-                >
-                  {CLUB_PROFILE.contacts.email}
-                </a>
-              </p>
-              <p className="m-0">
-                PEC <span className="select-text">{CLUB_PROFILE.contacts.pec}</span>
-              </p>
-              <p className="m-0 text-white/70">Matricola FIGC {CLUB_PROFILE.figcMatricola}</p>
-            </address>
-
-            <div className="grid content-start gap-2 md:col-span-2 lg:col-span-1" data-testid="footer-credits">
-              <h2 className="m-0 text-[12px] font-bold uppercase tracking-[0.12em] text-[#ffd600]">
-                Riconoscimenti e affiliazioni
-              </h2>
-              <div className="rounded-[14px] bg-white px-3.5 py-3">
-                <ClubCredentials variant="list" />
-              </div>
-              <p className="m-0 text-[12.5px] leading-snug text-white/70">{CREDENTIALS_SENTENCE}</p>
-            </div>
+              </span>
+            </Link>
+            <p className="m-0 max-w-[36ch] text-[14px] leading-snug text-white/75">
+              Il club di calcio di Colico e Dervio: prima squadra, settore giovanile e scuola calcio.
+            </p>
           </div>
 
-          <div className="flex flex-col gap-2 border-t border-white/15 pt-4 text-[12.5px] text-white/70 lg:flex-row lg:items-center lg:justify-between">
+          <address className="grid content-start gap-0.5 text-[14px] not-italic leading-snug text-white/85" data-testid="footer-contacts">
+            <h2 className="m-0 pb-1 text-[12px] font-bold uppercase tracking-[0.12em] text-[#ffd600]">Contatti</h2>
+            <p className="m-0 font-semibold text-white">{CLUB_NAME}</p>
+            <p className="m-0">{CLUB_PROFILE.contacts.address}</p>
+            <p className="m-0">
+              <a
+                href={`mailto:${CLUB_PROFILE.contacts.email}`}
+                className="scd-focus inline-flex min-h-11 select-text items-center underline decoration-white/30 underline-offset-4 hover:decoration-white"
+              >
+                {CLUB_PROFILE.contacts.email}
+              </a>
+            </p>
+            <p className="m-0">
+              PEC <span className="select-text">{CLUB_PROFILE.contacts.pec}</span>
+            </p>
+            <p className="m-0 text-white/70">Matricola FIGC {CLUB_PROFILE.figcMatricola}</p>
+          </address>
+
+          <div className="grid content-start gap-3">
+            <h2 className="m-0 text-[12px] font-bold uppercase tracking-[0.12em] text-[#ffd600]">Scarica l'app</h2>
+            <p className="m-0 text-[14px] leading-snug text-white/80">Gare, comunicazioni e la tua area sempre sul telefono.</p>
+            <Link
+              to="/installa"
+              className="scd-focus inline-flex min-h-11 min-w-11 items-center text-[14px] w-fit gap-1.5 rounded-[10px] bg-[#ffd600] px-4 font-extrabold text-[#0b1e3a] transition-[filter] duration-150 hover:brightness-95"
+              data-testid="footer-install"
+            >
+              <Download className="size-4" aria-hidden="true" />
+              Installa l'app
+            </Link>
+            <ul className="m-0 flex list-none gap-2 p-0" aria-label="Profili social ufficiali">
+              {SOCIAL_LINKS.map((so) => {
+                const Icon = SOCIAL_ICON[so.id];
+                return (
+                  <li key={so.id}>
+                    <a
+                      href={so.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`${so.label} ${so.handle} (apre una nuova scheda)`}
+                      className="scd-focus grid size-11 place-items-center rounded-full border border-white/25 text-white transition-colors duration-150 hover:bg-white/10"
+                    >
+                      <Icon className="size-5" strokeWidth={1.8} aria-hidden="true" />
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-[#061a3d] px-4 pb-6 pt-3 text-[12.5px] text-white/70 lg:px-8">
+        <div className="mx-auto grid max-w-[1240px] gap-1">
+          <div className="flex flex-col gap-1 lg:flex-row lg:items-center lg:justify-between">
             <span className="flex flex-wrap gap-x-5">
               <a
                 href="/privacy"
@@ -863,30 +885,16 @@ export function SiteFooter() {
               >
                 Privacy
               </a>
-              <button
-                type="button"
-                onClick={openCookiePrefs}
-                className="scd-focus inline-flex min-h-11 items-center underline decoration-white/30 underline-offset-4 hover:text-white"
-              >
+              <button type="button" onClick={openCookiePrefs} className={legal}>
                 Preferenze cookie
               </button>
-              <Link
-                to="/safeguarding"
-                className="scd-focus inline-flex min-h-11 items-center underline decoration-white/30 underline-offset-4 hover:text-white"
-              >
+              <Link to="/safeguarding" className={legal}>
                 Segnalazioni riservate
               </Link>
-              <a
-                href="/elimina-account"
-                className="scd-focus inline-flex min-h-11 items-center underline decoration-white/30 underline-offset-4 hover:text-white"
-              >
+              <a href="/elimina-account" className={legal}>
                 Elimina account
               </a>
-              <button
-                type="button"
-                onClick={openMenu}
-                className="scd-focus inline-flex min-h-11 items-center gap-1 underline decoration-white/30 underline-offset-4 hover:text-white"
-              >
+              <button type="button" onClick={openMenu} className={`${legal} gap-1`}>
                 <Search className="size-3.5" aria-hidden="true" />
                 Tutte le pagine
               </button>
@@ -895,7 +903,7 @@ export function SiteFooter() {
             <span data-build={BUILD_STAMP}>Super App ufficiale della {CLUB_NAME}</span>
           </div>
           {/* Authorship kept but discreet (Francesco 15/10/2026 06:51: "non visibile così ma molto riservato"). */}
-          <details className="-mt-3 text-[11px] leading-snug text-white/60">
+          <details className="text-[11px] leading-snug text-white/60">
             <summary className="scd-focus inline-flex min-h-11 cursor-pointer list-none items-center">
               © {new Date().getFullYear()} · Tutti i diritti riservati · Crediti
             </summary>

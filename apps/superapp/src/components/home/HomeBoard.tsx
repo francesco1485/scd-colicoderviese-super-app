@@ -14,7 +14,7 @@ import { ChevronRight, MapPin, MessageCircle, Trophy } from "lucide-react";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { ClubCrestOfficial } from "@/components/SiteChrome";
-import { BrushStroke } from "@/components/home/HeroArt";
+import { BrushStroke } from "@/components/home/BrushStroke";
 import { venueShort } from "@/components/home/HomeSections";
 import type { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 import { crestFor } from "@/lib/crests";
