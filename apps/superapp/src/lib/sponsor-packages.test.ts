@@ -37,9 +37,8 @@ describe("PARTNER_PACKAGES", () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it("exactly one featured package, the LED wall, listed first", () => {
-    const featured = PARTNER_PACKAGES.filter((p) => p.featured);
-    expect(featured.map((p) => p.id)).toEqual(["ledwall"]);
+  it("no featured package (no showcase, Francesco 15/10/2026), the LED wall listed first", () => {
+    expect(PARTNER_PACKAGES.some((p) => "featured" in p && (p as { featured?: boolean }).featured)).toBe(false);
     expect(PARTNER_PACKAGES[0]?.id).toBe("ledwall");
   });
 

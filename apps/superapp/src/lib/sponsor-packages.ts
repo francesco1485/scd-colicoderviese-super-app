@@ -56,7 +56,6 @@ export const PARTNER_PACKAGES: readonly PartnerPackage[] = [
     audienceNumbers: null,
     price: { kind: "da_approvare" },
     icon: "ledwall",
-    featured: true,
   },
   {
     id: "maglia-kit",

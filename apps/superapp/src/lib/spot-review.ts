@@ -59,8 +59,8 @@ export function spotAirNote(spot: Pick<SponsorSpot, "slug" | "status">, list: re
   if (!isShowable(spot, list)) {
     return "Con modifiche richieste lo spot non va in onda: il club prepara la nuova versione e te la propone.";
   }
-  if (spot.status === "DA_APPROVARE") return "Intanto lo spot è già in rotazione in questi due posti, in attesa della tua risposta.";
-  return "Lo spot è in rotazione in questi due posti.";
+  if (spot.status === "DA_APPROVARE") return "Intanto lo spot è già in rotazione sul LED wall del campo, in attesa della tua risposta.";
+  return "Lo spot è in rotazione sul LED wall del campo.";
 }
 
 export type SpotAnswerKind = "approvato" | "modifiche";

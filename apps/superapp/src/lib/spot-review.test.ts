@@ -70,6 +70,9 @@ describe("spot review page logic (B1, UD-119)", () => {
     expect(SPOT_WHERE.map((w) => w.id)).toEqual(["ledwall"]);
     expect(SPOT_WHERE[0]!.text).toContain("LED wall a bordo campo a Colico");
     expect(SPOT_WHERE.some((w) => /vetrina|pagina iniziale/i.test(w.text))).toBe(false);
+    for (const status of ["DA_APPROVARE", "IN_ONDA", "APPROVATO"] as const) {
+      expect(spotAirNote({ slug: "carcano", status })).not.toMatch(/due posti/);
+    }
   });
 
   it("air note follows the home / LED wall rule (never 'in rotation' with changes requested)", () => {
