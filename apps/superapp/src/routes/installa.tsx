@@ -26,18 +26,9 @@ export const Route = createFileRoute("/installa")({
 function Installa() {
   const [qrSvg, setQrSvg] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  const [avatarOk, setAvatarOk] = useState(true);
   const copiedTimer = useRef<number | undefined>(undefined);
 
-  const avatarRef = useRef<HTMLImageElement>(null);
-
   useEffect(() => () => window.clearTimeout(copiedTimer.current), []);
-
-  // An error that happened before hydration never reaches onError: check the image once mounted.
-  useEffect(() => {
-    const img = avatarRef.current;
-    if (img && img.complete && img.naturalWidth === 0) setAvatarOk(false);
-  }, []);
 
   useEffect(() => {
     QRCode.toString(installUrl(), { type: "svg", margin: 0, errorCorrectionLevel: "M", color: { dark: "#071d44", light: "#ffffff" } })
@@ -122,16 +113,15 @@ function Installa() {
           className="grid grid-cols-[76px_minmax(0,1fr)] items-center gap-3.5 rounded-[22px] border border-white/10 bg-[linear-gradient(120deg,#0e3a7a,#0b2a5b)] p-4"
           data-testid="install-iride"
         >
-          {/* The avatar file belongs to the cloud chat (personaggi, UD-139); until it reaches staging the official crest stands in. */}
+          {/* Iride's avatar file belongs to the cloud chat (personaggi, UD-139): the official crest stands in until that file
+              is on staging, then this image switches to /media/cast/iride/ in the same change that registers it. */}
           <img
-            ref={avatarRef}
-            src={avatarOk ? "/media/cast/iride/iride-avatar-256.webp" : "/media/brand/logo-scd.webp"}
-            alt={avatarOk ? "Iride, l'assistente AI della segreteria" : "Stemma S.C.D. ColicoDerviese"}
-            width={256}
-            height={256}
+            src="/media/brand/logo-scd.webp"
+            alt="Stemma S.C.D. ColicoDerviese"
+            width={480}
+            height={628}
             loading="lazy"
-            onError={() => setAvatarOk(false)}
-            className={`size-[76px] rounded-full border-[3px] border-[var(--scd-yellow)] ${avatarOk ? "object-cover" : "bg-white object-contain p-2"}`}
+            className="size-[76px] rounded-full border-[3px] border-[var(--scd-yellow)] bg-white object-contain p-2"
           />
           <div className="min-w-0">
             <span className="font-[family-name:var(--font-display)] text-[13px] font-bold uppercase tracking-[0.08em] text-[var(--scd-yellow)]">
