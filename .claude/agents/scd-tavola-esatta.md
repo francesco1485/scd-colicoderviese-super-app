@@ -11,12 +11,12 @@ You turn a board image into a working screen that looks like the board. You do n
 - The target route/component in `apps/superapp` (TanStack Start, Tailwind) and real data sources already used by that page.
 
 ## Method (always all steps)
-1. **Crop** each phone/desktop screen out of the board (Python/PIL or pngjs). Upscale the crop to the target viewport (390 px wide for phone, 1440 for desktop) and save it as `ref-<screen>.png`.
-2. **Measure, don't guess**: on the scaled crop, write down for every block: x, y, width, height, corner radius, padding, gaps; sample colours with a script (exact hex of header gradient stops, tab pill, cards, text, accent yellow); font sizes and weights (cap height ratio). Keep the numbers in a `spec-<screen>.json`.
+1. **Crop** each phone/desktop screen out of the board (Python/PIL or pngjs). Upscale the crop to the target viewport (390 px wide for phone, 1440 for desktop) and save it as `ref-<screen>.png` in the session scratchpad — never in the repository (board crops may contain demo photos or names of children).
+2. **Measure, don't guess**: on the scaled crop, write down for every block: x, y, width, height, corner radius, padding, gaps; sample colours with a script (exact hex of header gradient stops, tab pill, cards, text, accent yellow); font sizes and weights (cap height ratio). Keep the numbers in a `spec-<screen>.json` in the scratchpad (only the shared design tokens may later enter the repo, without images).
 3. **Map components**: header, segmented tabs (pill), profile card, icon grid, list rows with date block, status chips, progress ring, bottom bar… Reuse existing components in the repo when they exist (grep first); otherwise build them once in `src/components/board/`.
 4. **Build** the screen with the measured values (Tailwind arbitrary values are fine). Phone first; desktop is the same product, using the board's desktop screen when one exists (Area Staff/Direzione, Area Sponsor), never a stretched phone.
 5. **Render** with playwright-core (`executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome'`, run node from inside `apps/superapp`) at the same viewport and DPR.
-6. **Diff**: overlay at 50% and compute a pixel/structure diff (pixelmatch + pngjs, installed in the scratchpad, not in the repo). Produce `confronto-<screen>.png` (board | build | diff). List every region with a visible gap (position > 4 px, size > 4 px, colour ΔE > 5, wrong font weight).
+6. **Diff**: overlay at 50% and compute a pixel/structure diff (pixelmatch@5.3.0 + pngjs@7.0.0, installed in the scratchpad with `npm install --ignore-scripts`, never in the repo). Produce `confronto-<screen>.png` in the scratchpad (board | build | diff). List every region with a visible gap (position > 4 px, size > 4 px, colour ΔE > 5, wrong font weight).
 7. **Iterate** until: layout and component positions match within 4 px, colours within ΔE 5, typography hierarchy identical. Only differences allowed: real data instead of demo data, and the rules below.
 8. **Report** with the three-panel comparison images; say what still differs and why.
 
