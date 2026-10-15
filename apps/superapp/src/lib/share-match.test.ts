@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { eventShare, matchShare, shortDay } from "./share-match";
+import { matchShare, shortDay } from "./share-match";
 
 describe("share a game on WhatsApp", () => {
   const base = { date: "2026-10-18", time: "15:30", group: "prima", opponent: "ARS Rovagnate", homeAway: "FUORI" as const, place: "La Valletta Brianza", pending: [] as string[] };
@@ -21,10 +21,5 @@ describe("share a game on WhatsApp", () => {
     expect(d.text).toContain("ColicoDerviese U16 – ARS Rovagnate");
     expect(d.text).toContain("orario da definire");
     expect(d.text).toContain("campo da definire (Orario da confermare)");
-  });
-  it("event share links to the event page", () => {
-    const d = eventShare({ title: "Christmas Lario Cup", when: "8 dicembre", href: "/eventi/christmas-lario-cup", text: "Torneo a Colico e Dervio." });
-    expect(d.url).toBe("https://app.colicoderviese.it/eventi/christmas-lario-cup");
-    expect(d.text).toContain("8 dicembre");
   });
 });

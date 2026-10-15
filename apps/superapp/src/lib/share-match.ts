@@ -6,7 +6,6 @@
  */
 import type { TodayEntry } from "./home-today";
 import { absoluteUrl, type ShareData } from "./share";
-import type { ClubEvent } from "./stories";
 
 const WD = ["dom", "lun", "mar", "mer", "gio", "ven", "sab"] as const;
 const MO = [
@@ -54,17 +53,5 @@ export function matchShare(
     title: `${pair} · S.C.D. ColicoDerviese`,
     text: `⚽ ${pair}\n📅 ${when}\n📍 ${where}${note}\nTutte le gare della settimana:`,
     url: absoluteUrl(`/calendario?annata=${encodeURIComponent(e.group)}`, siteUrl),
-  };
-}
-
-/** Share data of a published club event: title, when, link to its page. */
-export function eventShare(
-  ev: Pick<ClubEvent, "title" | "when" | "href" | "text">,
-  siteUrl?: string | null,
-): ShareData {
-  return {
-    title: `${ev.title} · S.C.D. ColicoDerviese`,
-    text: `🏆 ${ev.title}\n📅 ${ev.when}\n${ev.text}`.trim(),
-    url: absoluteUrl(ev.href, siteUrl),
   };
 }

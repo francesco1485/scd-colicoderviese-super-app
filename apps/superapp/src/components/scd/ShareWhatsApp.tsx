@@ -39,7 +39,7 @@ export function ShareWhatsApp({
       onClick={onClick}
       aria-label={`${label} su WhatsApp: ${data.title}`}
       data-testid="share-whatsapp"
-      className={`scd-focus inline-flex items-center justify-center gap-1.5 rounded-full text-[#1556c4] transition-colors duration-150 hover:bg-[#eef3f9] ${compact ? "size-11" : "h-10 px-3 text-[13.5px] font-bold"} ${className}`}
+      className={`scd-focus inline-flex items-center justify-center gap-1.5 rounded-full text-[#1556c4] transition-colors duration-150 hover:bg-[#eef3f9] ${compact ? "size-11" : "h-11 px-3 text-[13.5px] font-bold"} ${className}`}
     >
       <Share2 className="size-[18px]" aria-hidden="true" />
       {!compact && label}
