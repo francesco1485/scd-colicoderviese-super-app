@@ -173,13 +173,13 @@ def self_test() -> None:
             "Importo di fatturazione in entrata,Valuta della carta,Importo transazione in uscita,Importo transazione in entrata,"
             "Valuta della transazione,Tasso di cambio,Commissione,Saldo disponibile\n")
     body = (
-        '"12/10/26, 11:15",AAA1,Bonifico bancario in entrata,Mario Rossi IT60X0542811101000000123456,Servizio pulmino ottobre Luca R. 2015,Approvato,0.00,20.00,EUR,0.00,20.00,EUR,1.00,0.00,120.00\n'
-        '"24/09/26, 07:11",AAA2,Bonifico bancario in entrata,Mario Rossi IT60X0542811101000000123456,Accettazione servizio pullmino 2026 27 Luca R. 2015,Approvato,0.00,15.00,EUR,0.00,15.00,EUR,1.00,0.00,100.00\n'
-        '"14/09/26, 07:19",AAA3,Bonifico bancario in entrata,Mario Rossi IT60X0542811101000000123456,LUCA R. 2015 QUOTA RATA 1 DI 3 2026/27,Approvato,0.00,85.00,EUR,0.00,85.00,EUR,1.00,0.00,85.00\n'
+        '"12/10/26, 11:15",AAA1,Bonifico bancario in entrata,Mario Rossi IT00XEXAMPLE0000000000000,Servizio pulmino ottobre Luca R. 2015,Approvato,0.00,20.00,EUR,0.00,20.00,EUR,1.00,0.00,120.00\n'
+        '"24/09/26, 07:11",AAA2,Bonifico bancario in entrata,Mario Rossi IT00XEXAMPLE0000000000000,Accettazione servizio pullmino 2026 27 Luca R. 2015,Approvato,0.00,15.00,EUR,0.00,15.00,EUR,1.00,0.00,100.00\n'
+        '"14/09/26, 07:19",AAA3,Bonifico bancario in entrata,Mario Rossi IT00XEXAMPLE0000000000000,LUCA R. 2015 QUOTA RATA 1 DI 3 2026/27,Approvato,0.00,85.00,EUR,0.00,85.00,EUR,1.00,0.00,85.00\n'
         '"09/10/26, 09:48",AAA4,Bonifico bancario in uscita,iGrest S.r.l. LT000000000000000000,Ordine #1,Approvato,10.00,0.00,EUR,10.00,0.00,EUR,1.00,0.00,110.00\n'
         '"09/09/26, 11:54",AAA5,Prelievo allo sportello ATM,ATM BPER - DISTACCATO MODENA          IT,,Approvato,50.00,0.00,EUR,50.00,0.00,EUR,1.00,1.00,34.00\n'
         '"08/10/26, 07:00",AAA6,Pagamento da SumUp,SUMUP PID1,,Pagamento in entrata,0.00,78.00,EUR,0.00,78.00,EUR,1.00,0.00,200.00\n'
-        '"30/07/26, 11:59",AAA7,Bonifico bancario in uscita,Paolo Bianchi IT60X0542811101000000123456,acquisto biglietto aereo,Approvato,5.00,0.00,EUR,5.00,0.00,EUR,1.00,0.00,1.00\n'
+        '"30/07/26, 11:59",AAA7,Bonifico bancario in uscita,Paolo Bianchi IT00XEXAMPLE0000000000000,acquisto biglietto aereo,Approvato,5.00,0.00,EUR,5.00,0.00,EUR,1.00,0.00,1.00\n'
         '"10/10/26, 10:09",AAA8,Pagamento online,LOVABLE               DOVER           US,,Approvato,12.00,0.00,EUR,12.00,0.00,EUR,1.00,0.00,98.00\n'
     )
     fd, path = tempfile.mkstemp(suffix=".csv")
