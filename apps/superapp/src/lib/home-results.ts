@@ -73,8 +73,8 @@ export function weekendResults(
   return out.sort((a, b) => b.date.localeCompare(a.date)).slice(0, 6);
 }
 
-/** Our side in a result: the S.C.D. ColicoDerviese name (any spelling of Colico / Derviese) on exactly one side. */
-const OURS = /colico|derviese/i;
+/** Our side in a result: the S.C.D. ColicoDerviese name ("ColicoDerviese", "Colico Derviese", any case) on exactly one side. */
+const OURS = /colico\s*-?\s*derviese/i;
 
 /**
  * True when the row is a ColicoDerviese win (UD-134, Francesco 15/10/2026 09:18: "coriandoli se si vince"). A draw,

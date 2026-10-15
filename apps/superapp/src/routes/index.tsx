@@ -98,8 +98,6 @@ export const Route = createFileRoute("/")({
         vetrina: vetrina.worlds,
         feed: await feedP,
         notice: await noticeP,
-        // Server Rome day (QA day honoured only outside production): seeds the LED wall and the partner of the month.
-        ledwallDay: vetrina.today,
         serverNow,
         today,
       };
@@ -170,7 +168,6 @@ function Home() {
       calendar={data.calendar}
       news={data.news}
       vetrina={data.vetrina}
-      ledwallDay={data.ledwallDay}
       feed={data.feed}
       notice={data.notice}
       nowMs={data.serverNow}

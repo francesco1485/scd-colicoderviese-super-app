@@ -410,8 +410,6 @@ export function PublicHome({
   news?: readonly NewsItem[];
   /** Vetrina picks of the day (getVetrina): "Mondo Colico" of the board (VR-009), back on the home since 15/10. */
   vetrina?: Readonly<Record<VetrinaWorld, readonly VetrinaSlot[]>>;
-  /** Server Rome day of the LED wall; accepted for the route contract, the partner band moved to /sponsor (UD-134). */
-  ledwallDay?: string;
   /** R20 public feed (alerts and weekend results); null when R20 did not answer in time. */
   feed?: PublicFeed | null;
   /** The one club communication of the day (getClubNotice), or null. */

@@ -210,11 +210,9 @@
 @keyframes sky-typing { 0%,80%,100% { opacity: .25; transform: translateY(0) } 40% { opacity: 1; transform: translateY(-2px) } }
 .sky-typing-dot { animation: sky-typing 1s ease-in-out infinite; }
 .sky-panel { animation: sky-pop .22s ease-out; transform-origin: bottom right; }
-/* Crovi cameo: entra saltellando dal bordo, respira, e a ogni cambio di posa fa un piccolo saltello */
+/* Crovi (CastPortrait): respira lentamente */
 @keyframes crovi-breathe { 0%,100% { transform: scale(1,1) rotate(0) } 50% { transform: scale(1.012,1.022) rotate(-.8deg) } }
-@keyframes crovi-hop { 0% { transform: scale(1.03,.95) } 35% { transform: translateY(-7px) scale(.98,1.03) } 70% { transform: translateY(0) scale(1.02,.98) } 100% { transform: none } }
 .crovi-actor { transform-origin: 50% 100%; animation: crovi-breathe 2.6s ease-in-out .8s infinite; }
-.crovi-beat { transform-origin: 50% 100%; animation: crovi-hop .32s ease-out; }
 /* Sky: entra con un salto, poi ondeggia e annuisce mentre parla */
 @keyframes sky-hop-in { 0% { transform: translateY(40px) rotate(8deg); opacity: 0 } 50% { transform: translateY(-14px) rotate(-4deg); opacity: 1 } 75% { transform: translateY(3px) rotate(1deg) } 100% { transform: none } }
 @keyframes sky-talk { 0%,100% { transform: translateY(0) rotate(0) } 20% { transform: translateY(-5px) rotate(-3deg) } 40% { transform: translateY(0) rotate(2deg) } 60% { transform: translateY(-3px) rotate(-1.5deg) } 80% { transform: translateY(0) rotate(1deg) } }
@@ -222,7 +220,7 @@
 .sky-hop-in { transform-origin: 50% 100%; animation: sky-hop-in .7s cubic-bezier(.2,.8,.2,1) both, sky-talk 2.2s ease-in-out .7s infinite; }
 .sky-float { transform-origin: 50% 100%; animation: sky-float 3.6s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) {
-  .sky-idle, .sky-bounce, .sky-typing-dot, .sky-panel, .crovi-actor, .crovi-beat, .sky-hop-in, .sky-float { animation: none; }
+  .sky-idle, .sky-bounce, .sky-typing-dot, .sky-panel, .crovi-actor, .sky-hop-in, .sky-float { animation: none; }
 }
 
 /* ---------- Super App: integrazione moduli CORE/GROW nella shell unica ---------- */

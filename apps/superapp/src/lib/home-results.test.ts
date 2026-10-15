@@ -94,6 +94,9 @@ describe("isClubWin: confetti only when we win (UD-134)", () => {
     expect(isClubWin(r("Rivale", "Colicoderviese", 2, 1))).toBe(false);
     expect(isClubWin(r("ColicoDerviese A", "ColicoDerviese B", 3, 0))).toBe(false);
     expect(isClubWin(r("Bellagina", "Rivale", 4, 0))).toBe(false);
+    // An opponent with "Colico" alone in its name is not us.
+    expect(isClubWin(r("Colico Vecchie Glorie", "Rivale", 2, 0))).toBe(false);
+    expect(isClubWin(r("Colico Derviese", "Rivale", 2, 0))).toBe(true);
   });
   it("confetti pieces are deterministic and inside the width", () => {
     const a = confettiPieces(28);
