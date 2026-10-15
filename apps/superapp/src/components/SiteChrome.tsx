@@ -518,7 +518,7 @@ export function BottomNav() {
   const { session } = useSession();
   const tabs = tabsFor(pathname, centerTabFor(session));
   // LIVE on the Calendario tab while a club game is being played (study 15/10, block A/C).
-  const pulse = useClubPulse();
+  const { pulse } = useClubPulse();
   const liveNow = (pulse?.live ?? 0) > 0;
   return (
     <nav
@@ -541,7 +541,7 @@ export function BottomNav() {
                 />
                 {liveTab && (
                   <span
-                    className="absolute -right-3 -top-1.5 rounded-[4px] bg-[#e11d2e] px-1 py-[2px] text-[9px] font-extrabold uppercase leading-none tracking-[0.04em] text-white"
+                    className="absolute -right-3 -top-1.5 rounded-[4px] bg-[#e11d2e] px-1 py-[2px] text-[10px] font-extrabold uppercase leading-none tracking-[0.04em] text-white"
                     data-testid="tab-live"
                   >
                     Live<span className="sr-only">: gara in corso</span>

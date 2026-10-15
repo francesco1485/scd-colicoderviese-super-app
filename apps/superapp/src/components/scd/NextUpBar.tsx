@@ -16,18 +16,24 @@ const HIDDEN_ON = new Set(["/", "/calendario"]);
 
 export function NextUpBar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const pulse = useClubPulse();
+  const { pulse, pending } = useClubPulse();
   const [now, setNow] = useState<number | null>(null);
   useEffect(() => {
     setNow(Date.now());
     const id = window.setInterval(() => setNow(Date.now()), 60_000);
     return () => window.clearInterval(id);
   }, []);
-  if (HIDDEN_ON.has(pathname) || !pulse || now === null) return null;
+  if (HIDDEN_ON.has(pathname)) return null;
+  // While the answer is on its way the room is reserved, so the strip never pushes the content down later;
+  // with no game in the week (or no answer) nothing is drawn.
+  if (pending || now === null)
+    return <div aria-hidden="true" className="h-10" data-testid="next-up-bar-slot" />;
+  if (!pulse || (pulse.live === 0 && !pulse.next)) return null;
   const live = pulse.live > 0;
   const n = pulse.next;
-  if (!live && !n) return null;
-  const left = n ? compactLeft(n.startMs - now) : "";
+  // Device clock corrected by the server's: the strip never shows a time the server would not.
+  const skew = pulse.serverNow - (pulse.receivedAt ?? pulse.serverNow);
+  const left = n ? compactLeft(n.startMs - (now + skew)) : "";
   const pair = n
     ? n.homeAway === "FUORI"
       ? `${crestFor(n.opponent).label} – ColicoDerviese ${n.category}`
@@ -53,7 +59,10 @@ export function NextUpBar() {
           <span className="shrink-0 rounded-[4px] bg-[#ffd600] px-1.5 py-0.5 text-[11px] font-extrabold uppercase tracking-[0.06em] text-[#0b1e3a]">
             tra {left}
           </span>
-          <span className="truncate">{pair}</span>
+          <span className="truncate">
+            <span className="sr-only">Prossima gara: </span>
+            {pair}
+          </span>
         </>
       )}
       <ChevronRight className="size-4 shrink-0 opacity-80" aria-hidden="true" />

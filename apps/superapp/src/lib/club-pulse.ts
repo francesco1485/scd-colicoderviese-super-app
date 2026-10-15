@@ -24,6 +24,8 @@ export interface ClubPulse {
     startMs: number;
   } | null;
   serverNow: number;
+  /** Device time when the answer arrived (set by the client hook). */
+  receivedAt?: number;
 }
 
 export function clubPulse(
