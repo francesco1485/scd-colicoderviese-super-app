@@ -323,7 +323,7 @@ export function Vetrina({
             id="vetrina-t"
             className="scd-reveal m-0 font-uv text-[24px] uppercase leading-none text-[#0b2a5b] sm:text-[26px] lg:text-[30px]"
           >
-            In vetrina
+            {fixedWorld ? "In vetrina" : "Mondo Colico"}
           </h2>
         </div>
         <Link

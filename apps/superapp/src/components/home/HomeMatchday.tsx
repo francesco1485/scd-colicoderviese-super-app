@@ -222,7 +222,7 @@ export function HomeMatchday({
             id="matchday-t"
             className="m-0 font-uv text-[30px] uppercase leading-none text-[#0b2a5b] lg:text-[36px]"
           >
-            Questa settimana
+            Tutte le gare della settimana
           </h2>
           {summary && (
             <p

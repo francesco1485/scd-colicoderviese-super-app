@@ -4,7 +4,7 @@
  *   1. "Questa settimana" hero: lake and mountains of the Alto Lario, the official mascot Sky, the club line;
  *   2. four white tiles over the hero edge: Gare (games left this week), Allenamenti, Eventi, Iniziative;
  *   3. "Prossima gara" card with the folder tab, big date block, our crest VS the verified opponent crest;
- *   4. two small cards: Allenamenti della settimana (green) and the next club event (yellow).
+ *   4. two small cards: Allenamenti della settimana (green) and the next club event (yellow, from clubEventsOn).
  * The partner box and "Mondo Colico" (vetrina) follow in PublicHome. Data: the public calendar only (weekMatches,
  * same source as /calendario); no score, no invented crest, no minor named. Assets: official crest and Sky.
  */
@@ -18,6 +18,7 @@ import type { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 import { crestFor } from "@/lib/crests";
 import { boardDate, gamesLeft, nextBoardMatch } from "@/lib/home-board";
 import { categoryShort } from "@/lib/home-matchday";
+import { clubEventsOn } from "@/lib/club-events";
 import { weekMatches } from "@/lib/home-today";
 
 type PublicCalendar = Awaited<ReturnType<typeof getPublicCalendarSnapshot>>;
@@ -150,7 +151,7 @@ function NextMatch({ calendar, nowMs, today }: { calendar: PublicCalendar; nowMs
       {m && date ? (
         <Link
           to="/calendario"
-          search={{ annata: m.group } as never}
+          search={{ annata: m.group }}
           className={`${CARD} scd-focus grid grid-cols-[78px_minmax(0,1fr)] rounded-tl-none border-l-4 border-[#1556c4] py-3 pl-2 pr-3 hover:bg-[#fbfcfe]`}
           aria-label={[
             cat,
@@ -211,6 +212,8 @@ export function HomeBoard({
   today: string;
 }) {
   const nowMs = useMinuteClock(serverNow);
+  // Next club event from the published list (honours its window): the board's yellow card, never hardcoded.
+  const event = clubEventsOn(today).find((e) => !e.date || e.date >= today) ?? null;
   const left = useMemo(
     () => gamesLeft(weekMatches(calendar.events, calendar.groups, today, null), nowMs),
     [calendar, today, nowMs],
@@ -233,7 +236,7 @@ export function HomeBoard({
         />
         <div
           aria-hidden="true"
-          className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgb(11_42_120/0.9)_0%,rgb(11_42_120/0.35)_42%,rgb(11_42_120/0.25)_62%,rgb(8_30_90/0.88)_100%)]"
+          className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgb(11_42_120/0.9)_0%,rgb(11_42_120/0.45)_30%,rgb(8_30_90/0.72)_50%,rgb(6_26_80/0.92)_100%)] lg:bg-[linear-gradient(90deg,rgb(6_26_80/0.94)_0%,rgb(8_30_90/0.78)_45%,rgb(11_42_120/0.2)_100%)]"
         />
         <div className={`${WRAP} relative flex min-h-[236px] items-end pb-14 pt-6 lg:min-h-[320px] lg:pb-20`}>
           <div className="max-w-[230px] lg:max-w-[520px]">
@@ -281,19 +284,35 @@ export function HomeBoard({
                 <span className="block text-[11.5px] leading-snug text-[#4a5d7a]">Della settimana, tutte le categorie</span>
               </span>
             </Link>
-            <Link
-              to="/eventi/christmas-lario-cup"
-              data-testid="board-event"
-              className={`${CARD} scd-focus grid grid-cols-[48px_minmax(0,1fr)] items-center gap-2 p-2.5 hover:bg-[#fbfcfe]`}
-            >
-              <span aria-hidden="true" className="grid size-12 place-items-center rounded-[12px] bg-[#ffd600] text-[#0b2a5b]">
-                <CalendarDays className="size-7" />
-              </span>
-              <span className="min-w-0">
-                <span className="block text-[13.5px] font-extrabold leading-tight">Lario Cup</span>
-                <span className="block text-[11.5px] leading-snug text-[#4a5d7a]">8 dicembre, Colico e Dervio</span>
-              </span>
-            </Link>
+            {event ? (
+              <Link
+                to={event.href as never}
+                data-testid="board-event"
+                className={`${CARD} scd-focus grid grid-cols-[48px_minmax(0,1fr)] items-center gap-2 p-2.5 hover:bg-[#fbfcfe]`}
+              >
+                <span aria-hidden="true" className="grid size-12 place-items-center rounded-[12px] bg-[#ffd600] text-[#0b2a5b]">
+                  <CalendarDays className="size-7" />
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-[13.5px] font-extrabold leading-tight">{event.title}</span>
+                  <span className="block text-[11.5px] leading-snug text-[#4a5d7a]">{event.when}</span>
+                </span>
+              </Link>
+            ) : (
+              <Link
+                to="/eventi"
+                data-testid="board-event"
+                className={`${CARD} scd-focus grid grid-cols-[48px_minmax(0,1fr)] items-center gap-2 p-2.5 hover:bg-[#fbfcfe]`}
+              >
+                <span aria-hidden="true" className="grid size-12 place-items-center rounded-[12px] bg-[#ffd600] text-[#0b2a5b]">
+                  <CalendarDays className="size-7" />
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-[13.5px] font-extrabold leading-tight">Eventi</span>
+                  <span className="block text-[11.5px] leading-snug text-[#4a5d7a]">Tornei e iniziative del club</span>
+                </span>
+              </Link>
+            )}
           </div>
         </div>
       </div>
