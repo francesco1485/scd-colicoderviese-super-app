@@ -1105,7 +1105,8 @@
         "account": "sportclubcolico@gmail.com",
         "db_source_ids": {
           "TESSERATI_MASTER_2026_27": "people, athletes, team memberships, structure roles (sheet 01 PERSONE / STRUTTURA)",
-          "FIGC_TABULATI_2026_10_09": "scd_tesseramenti APPROVATO_FIGC from sheet FIGC_09OTT_2026_UFFICIALI (FIGC/LND tabulati, read 2026-10-09)"
+          "FIGC_TABULATI_2026_10_09": "scd_tesseramenti APPROVATO_FIGC from sheet FIGC_09OTT_2026_UFFICIALI (FIGC/LND tabulati, read 2026-10-09)",
+          "FIGC_PORTALE_2026_10_15": "FIGC/LND portal tabulati DL+SGS read live 2026-10-15 (169 athletes): approved tesseramenti, 2 missing people, registry corrections and departures. One-off private data operation r130 (kept with Segreteria records, never in the repository); FIGC number as key, no fiscal code"
         },
         "consumers": [
           "SCD_SUPABASE.scd_people",
