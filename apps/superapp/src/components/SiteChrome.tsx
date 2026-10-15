@@ -789,16 +789,16 @@ export function SiteFooter() {
     <footer className="mt-10" data-testid="site-footer">
       <section
         aria-labelledby="footer-credits-t"
-        className="border-t border-[#dfe7f2] bg-white px-4 py-6 lg:px-8"
+        className="border-t border-white/10 bg-[#082255] px-4 py-6 lg:px-8"
         data-testid="footer-credits"
       >
         <div className="mx-auto grid max-w-[1240px] gap-3 lg:grid-cols-[220px_minmax(0,1fr)] lg:items-center lg:gap-8">
-          <h2 id="footer-credits-t" className="m-0 text-[12px] font-extrabold uppercase tracking-[0.14em] text-[#1556c4]">
+          <h2 id="footer-credits-t" className="m-0 text-[12px] font-extrabold uppercase tracking-[0.14em] text-[#ffd600]">
             Riconoscimenti e affiliazioni
           </h2>
           <div className="grid gap-2">
-            <ClubCredentials variant="bar" className="rounded-[12px] border border-[#e6edf6] py-2" />
-            <p className="m-0 text-[12.5px] leading-snug text-[#4a5d7a]">{CREDENTIALS_SENTENCE}</p>
+            <ClubCredentials variant="bar" className="rounded-[12px] bg-white py-2" />
+            <p className="m-0 text-[12.5px] leading-snug text-white/70">{CREDENTIALS_SENTENCE}</p>
           </div>
         </div>
       </section>
