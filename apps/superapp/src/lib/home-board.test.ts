@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { boardDate, gamesLeft, nextBoardMatch } from "./home-board";
+import { boardDate, countdownParts, gamesLeft, kickoffMs, nextBoardMatch, nextHomeKickoff } from "./home-board";
 import type { TodayEntry } from "./home-today";
 
 const entry = (over: Partial<TodayEntry>): TodayEntry => ({
@@ -51,5 +51,24 @@ describe("nextBoardMatch and gamesLeft", () => {
   });
   it("keeps a game without time (unknown is not over)", () => {
     expect(nextBoardMatch([entry({ id: "u", date: "2026-10-17", time: "" })], SAT_16)?.id).toBe("u");
+  });
+});
+
+describe("countdown to the next home game", () => {
+  it("converts Rome time to UTC in summer and winter", () => {
+    expect(kickoffMs({ date: "2026-10-17", time: "18:00" })).toBe(Date.UTC(2026, 9, 17, 16, 0));
+    expect(kickoffMs({ date: "2026-11-08", time: "15:00" })).toBe(Date.UTC(2026, 10, 8, 14, 0));
+    expect(kickoffMs({ date: "2026-10-17", time: "" })).toBeNull();
+  });
+  it("picks the next home game with a time, skipping away and started games", () => {
+    const away = entry({ id: "a", date: "2026-10-17", time: "17:00", homeAway: "FUORI" });
+    const started = entry({ id: "s", date: "2026-10-17", time: "15:00", homeAway: "CASA" });
+    const home = entry({ id: "h", date: "2026-10-17", time: "18:00", homeAway: "CASA" });
+    expect(nextHomeKickoff([started, away, home], SAT_16)?.entry.id).toBe("h");
+    expect(nextHomeKickoff([started, away], SAT_16)).toBeNull();
+  });
+  it("formats days and hh:mm:ss", () => {
+    expect(countdownParts(((26 * 60 + 3) * 60 + 9) * 1000)).toEqual({ days: 1, hh: "02", mm: "03", ss: "09" });
+    expect(countdownParts(-5)).toEqual({ days: 0, hh: "00", mm: "00", ss: "00" });
   });
 });

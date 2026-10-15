@@ -40,6 +40,7 @@ import {
 } from "@/lib/vetrina";
 
 import { HomeBoard } from "@/components/home/HomeBoard";
+import { HomeStories } from "@/components/home/HomeStories";
 import { HomeMatchday } from "@/components/home/HomeMatchday";
 import { ClubNoticeCard, UrgentNotices, WeekendResults } from "@/components/home/HomePractical";
 import type { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
@@ -568,6 +569,7 @@ export function PublicHome({
       <UrgentNotices items={alerts} />
       <ClubNoticeCard notice={notice} />
       <HomeBoard calendar={calendar} nowMs={nowMs} today={today} />
+      <HomeStories day={ledDay} />
       <PartnerBand day={ledDay} nowMs={nowMs} ledOnHome={ledOnHome} />
       {vetrina && <Vetrina worlds={vetrina} />}
       <div

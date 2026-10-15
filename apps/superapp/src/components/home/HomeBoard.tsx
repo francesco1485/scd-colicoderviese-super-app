@@ -1,7 +1,8 @@
 /**
  * Top of the public home drawn from the six-screen board VR-009, screen 1 "Home pubblica" (Francesco 15/10/2026
  * 06:30: "tutto deve partire dallo studio di questa immagine… solo migliorare"). Board order, improved:
- *   1. "Questa settimana" hero: lake and mountains of the Alto Lario, the official mascot Sky, the club line;
+ *   1. "Questa settimana" hero: the real lake photo with a slow zoom, the official crest, a live countdown to the
+ *      next home game (Sky removed: Francesco 15/10 06:46);
  *   2. four white tiles over the hero edge: Gare (games left this week), Allenamenti, Eventi, Iniziative;
  *   3. "Prossima gara" card with the folder tab, big date block, our crest VS the verified opponent crest;
  *   4. two small cards: Allenamenti della settimana (green) and the next club event (yellow, from clubEventsOn).
@@ -16,7 +17,7 @@ import { ClubCrestOfficial } from "@/components/SiteChrome";
 import { venueShort } from "@/components/home/HomeSections";
 import type { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 import { crestFor } from "@/lib/crests";
-import { boardDate, gamesLeft, nextBoardMatch } from "@/lib/home-board";
+import { boardDate, countdownParts, gamesLeft, nextBoardMatch, nextHomeKickoff } from "@/lib/home-board";
 import { categoryShort } from "@/lib/home-matchday";
 import { clubEventsOn } from "@/lib/club-events";
 import { weekMatches } from "@/lib/home-today";
@@ -202,6 +203,34 @@ function NextMatch({ calendar, nowMs, today }: { calendar: PublicCalendar; nowMs
   );
 }
 
+/** Live countdown to the next HOME game of the week (seconds tick only on the device, after hydration). */
+function HomeCountdown({ calendar, nowMs, today }: { calendar: PublicCalendar; nowMs: number; today: string }) {
+  const [now, setNow] = useState(nowMs);
+  useEffect(() => {
+    setNow(Date.now());
+    const id = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(id);
+  }, []);
+  const week = useMemo(() => weekMatches(calendar.events, calendar.groups, today, null), [calendar, today]);
+  const next = nextHomeKickoff(week, now);
+  if (!next) return null;
+  const left = countdownParts(next.startMs - now);
+  const cat = categoryShort(next.entry.group, calendar.groups, next.entry.team);
+  return (
+    <p className="m-0 mt-1 inline-flex w-fit flex-wrap items-center gap-x-2 gap-y-1 rounded-[12px] bg-white/12 px-3 py-2 text-[13px] font-semibold backdrop-blur-sm" data-testid="board-countdown">
+      <span className="scd-live-dot size-2 rounded-full bg-[#ffd600]" aria-hidden="true" />
+      <span>Prossima in casa · {cat}</span>
+      <span className="font-uv text-[20px] leading-none tabular-nums text-[#ffd600]" aria-hidden="true">
+        {left.days > 0 ? `${left.days}g ` : ""}
+        {left.hh}:{left.mm}:{left.ss}
+      </span>
+      <span className="sr-only">
+        tra {left.days} giorni e {Number(left.hh)} ore
+      </span>
+    </p>
+  );
+}
+
 export function HomeBoard({
   calendar,
   nowMs: serverNow,
@@ -220,7 +249,8 @@ export function HomeBoard({
   );
   return (
     <div data-testid="home-board">
-      {/* 1. Hero "Questa settimana" */}
+      {/* 1. Hero "Questa settimana": the real lake photo with a slow zoom, the official crest,
+          and a live countdown to the next home game. */}
       <section
         aria-labelledby="board-week-t"
         className="relative isolate overflow-hidden bg-[#0b3a8a] text-white"
@@ -232,29 +262,24 @@ export function HomeBoard({
           aria-hidden="true"
           fetchPriority="high"
           decoding="async"
-          className="absolute inset-0 -z-20 size-full object-cover object-[center_62%]"
+          className="scd-board-kb absolute inset-0 -z-20 size-full object-cover object-[center_62%]"
         />
         <div
           aria-hidden="true"
           className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgb(11_42_120/0.9)_0%,rgb(11_42_120/0.45)_30%,rgb(8_30_90/0.72)_50%,rgb(6_26_80/0.92)_100%)] lg:bg-[linear-gradient(90deg,rgb(6_26_80/0.94)_0%,rgb(8_30_90/0.78)_45%,rgb(11_42_120/0.2)_100%)]"
         />
-        <div className={`${WRAP} relative flex min-h-[236px] items-end pb-14 pt-6 lg:min-h-[320px] lg:pb-20`}>
-          <div className="max-w-[230px] lg:max-w-[520px]">
-            <h2 id="board-week-t" className="m-0 text-[27px] font-extrabold leading-tight [text-shadow:0_2px_10px_rgb(0_0_0/0.45)] lg:text-[44px]">
+        <div className={`${WRAP} relative flex min-h-[260px] items-end gap-4 pb-14 pt-6 lg:min-h-[340px] lg:pb-20`}>
+          <div className="grid gap-2 lg:max-w-[620px]">
+            <ClubCrestOfficial size={64} className="scd-board-pop drop-shadow-[0_6px_12px_rgb(0_0_0/0.45)] lg:hidden" />
+            <h2 id="board-week-t" className="m-0 text-[30px] font-extrabold leading-tight lg:text-[48px]">
               Questa settimana
             </h2>
-            <p className="m-0 mt-1 text-[14.5px] font-semibold leading-snug [text-shadow:0_2px_8px_rgb(0_0_0/0.55)] lg:text-[19px]">
+            <p className="m-0 text-[15px] font-semibold leading-snug lg:text-[19px]">
               Sport, crescita e comunità nel cuore dell'Alto Lario.
             </p>
+            <HomeCountdown calendar={calendar} nowMs={nowMs} today={today} />
           </div>
-          <img
-            src="/media/brand/sky-atv-cut.webp"
-            alt="Sky, la mascotte della S.C.D. ColicoDerviese"
-            width={520}
-            height={1076}
-            decoding="async"
-            className="pointer-events-none absolute bottom-[-64px] right-1 h-[250px] w-auto drop-shadow-[0_10px_14px_rgb(0_0_0/0.35)] lg:bottom-[-90px] lg:right-10 lg:h-[380px]"
-          />
+          <ClubCrestOfficial size={150} className="scd-board-pop ml-auto hidden drop-shadow-[0_10px_20px_rgb(0_0_0/0.5)] lg:block" />
         </div>
       </section>
 

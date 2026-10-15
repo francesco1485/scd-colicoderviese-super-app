@@ -718,10 +718,16 @@ export function SiteFooter() {
             </span>
             <span>Super App ufficiale della {CLUB_NAME} · versione del {BUILD_STAMP}</span>
           </div>
-          <p className="m-0 -mt-3 text-[12px] leading-snug text-white/60">
-            © {new Date().getFullYear()} Francesco Coppola · ideato e creato da Francesco Coppola, concesso in uso gratuito
-            alla {CLUB_NAME}. Stemma, loghi e marchi appartengono ai rispettivi titolari.
-          </p>
+          {/* Authorship kept but discreet (Francesco 15/10/2026 06:51: "non visibile così ma molto riservato"). */}
+          <details className="-mt-3 text-[11px] leading-snug text-white/45">
+            <summary className="scd-focus inline-flex min-h-11 cursor-pointer list-none items-center">
+              © {new Date().getFullYear()} · Tutti i diritti riservati · Crediti
+            </summary>
+            <p className="m-0 pb-2">
+              Ideata e realizzata da Francesco Coppola, concessa in uso gratuito alla {CLUB_NAME}. Stemma, loghi e marchi
+              appartengono ai rispettivi titolari.
+            </p>
+          </details>
         </div>
       </div>
     </footer>
