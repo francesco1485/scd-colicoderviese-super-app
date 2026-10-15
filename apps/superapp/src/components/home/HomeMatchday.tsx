@@ -297,7 +297,7 @@ export function HomeMatchday({
         <div className="grid gap-1">
           <h2
             id="matchday-t"
-            className="m-0 font-uv text-[30px] uppercase leading-none text-[#0b2a5b] lg:text-[36px]"
+            className="m-0 text-[20px] font-extrabold leading-tight text-[#0b1e3a] lg:text-[24px]"
           >
             {limit !== undefined ? "Le gare della settimana" : "Tutte le gare della settimana"}
           </h2>

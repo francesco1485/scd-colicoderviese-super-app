@@ -1,16 +1,16 @@
 /**
  * "Il consiglio del giorno" on the home (UD-116, Direzione 14/10/2026), in rotation between the characters that since
  * UD-121 (Direzione 14/10/2026 ~18:05, "Personaggi semplificati") are ONLY a short tip — Era (nutrizionista), Dottor
- * Acanfora (medico, prevention), the Preparatore atletico, the Mental coach, Musica e relax — and Vera, the club
- * reception, with practical secretariat reminders.
+ * Acanfora (medico, prevention), the Preparatore atletico, the Mental coach, Musica e relax — and Iride, the club's
+ * AI Segreteria (UD-155; internal id "vera" kept), with practical secretariat reminders.
  *
  * Era's and Acanfora's tips are their existing content modules (era-nutrition-tips.ts, first-aid-info.ts); the
  * Preparatore, the Mental coach and Musica e relax use their curated copy in cast-personas.ts (guarded by
- * castCopyProblems: no digits, no plans, no therapy wording, never a distress pattern); Vera's are the reminders below,
+ * castCopyProblems: no digits, no plans, no therapy wording, never a distress pattern); Iride's are the reminders below,
  * each pointing to an existing page. The character changes every day (same for everybody on that Rome day). No chat
  * starts from a tip and no portrait is shown here: the card uses the neutral initial.
  */
-import { CAST_PERSONAS, VERA_PRESENCE } from "./cast-personas";
+import { CAST_PERSONAS } from "./cast-personas";
 import { ACANFORA_DAILY_TIPS, ACANFORA_DISCLAIMER } from "./first-aid-info";
 import { ERA_DISCLAIMER, ERA_TIPS, dailyPick } from "./era-nutrition-tips";
 import { isPublicPath } from "./http-policy";
@@ -28,7 +28,7 @@ export interface VeraTip {
   members?: boolean;
 }
 
-/** Vera's practical secretariat reminders (no numbers, no personal data, only features that exist). */
+/** Iride's practical secretariat reminders (no numbers, no personal data, only features that exist). */
 export const VERA_TIPS: readonly VeraTip[] = [
   {
     id: "certificato",
@@ -73,7 +73,7 @@ export const VERA_TIPS: readonly VeraTip[] = [
 ];
 
 export const VERA_DISCLAIMER =
-  "Vera è la reception del club: per pratiche, pagamenti e documenti fa sempre fede la segreteria.";
+  "Iride è la segreteria AI del club: per pratiche, pagamenti e documenti fa sempre fede la segreteria.";
 
 export const TIP_ORDER: readonly TipPersona[] = ["era", "acanfora", "preparatore-atletico", "mental-coach", "musica-relax", "vera"];
 
@@ -83,7 +83,7 @@ export const TIP_PERSONA: Readonly<Record<TipPersona, { name: string; role: stri
   "preparatore-atletico": { name: "Il Preparatore atletico", role: "riscaldamento e prevenzione", initial: CAST_PERSONAS["preparatore-atletico"].initial },
   "mental-coach": { name: "Il Mental coach", role: "la testa giusta in campo", initial: CAST_PERSONAS["mental-coach"].initial },
   "musica-relax": { name: "Musica e relax", role: "calma e respiro", initial: CAST_PERSONAS["musica-relax"].initial },
-  vera: { name: "Vera", role: "la reception del club", initial: VERA_PRESENCE.initial },
+  vera: { name: "Iride", role: "la segreteria AI del club", initial: "I" },
 };
 
 export interface DailyTip {

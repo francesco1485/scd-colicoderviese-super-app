@@ -4,7 +4,7 @@
  * Order: urgent notices (R20 alerts, only when there are) → the one club communication chosen by the Direzione →
  * HomeBoard (lake hero, tiles, the club's most important next game with its countdown, trainings and the event of the
  * day) → "Mondo Colico" vetrina → all the games of the week (HomeMatchday) → weekend results (only with a real source;
- * "Vittoria" and confetti only on a ColicoDerviese win) → "Chi sei? Ecco cosa trovi" (HomeWho) → footer. Partners scroll in the fixed SponsorBand on every
+ * "Vittoria" and confetti only on a ColicoDerviese win) → footer ("Chi sei?" removed, UD-152). Partners scroll in the fixed SponsorBand on every
  * page; the LED spot, the partner of the month and partner news live on /sponsor (PartnerBand). No stories.
  * Palette: navy #0b2a5b, blue #1556c4, light #eef3f9, white; yellow #ffd600 for changes and the main CTA.
  * Real assets only (public/media); no minor is named.
@@ -30,7 +30,6 @@ import {
 
 import { HomeBoard } from "@/components/home/HomeBoard";
 import { HomeMatchday } from "@/components/home/HomeMatchday";
-import { HomeWho } from "@/components/home/HomeWho";
 import {
   ClubNoticeCard,
   UrgentNotices,
@@ -40,7 +39,7 @@ import type { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 
 type PublicCalendar = Awaited<ReturnType<typeof getPublicCalendarSnapshot>>;
 
-const WRAP = "mx-auto w-full max-w-[1280px] px-4 lg:px-8";
+const WRAP = "mx-auto w-full max-w-[1200px] px-4 lg:px-8";
 
 /* ------------------------------------------------------------- vetrina */
 
@@ -290,7 +289,7 @@ export function Vetrina({
           )}
           <h2
             id="vetrina-t"
-            className="scd-reveal m-0 font-uv text-[24px] uppercase leading-none text-[#0b2a5b] sm:text-[26px] lg:text-[30px]"
+            className="m-0 text-[20px] font-extrabold leading-tight text-[#0b1e3a] lg:text-[24px]"
           >
             {fixedWorld ? "In vetrina" : rows ? "In evidenza" : "Mondo Colico"}
           </h2>
@@ -374,7 +373,6 @@ export function PublicHome({
         <HomeMatchday calendar={calendar} nowMs={nowMs} today={today} limit={4} />
       </div>
       <WeekendResults rows={results} />
-      <HomeWho />
     </main>
   );
 }

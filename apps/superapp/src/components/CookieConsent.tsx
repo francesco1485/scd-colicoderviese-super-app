@@ -122,7 +122,7 @@ export function CookieConsent({ interior = false }: { interior?: boolean } = {})
           aria-labelledby="ck-t"
           aria-describedby="ck-d"
           data-testid="cookie-banner-consent"
-          className="fixed inset-x-3 bottom-[calc(118px+env(safe-area-inset-bottom))] z-[70] mx-auto max-w-[560px] rounded-[18px] border-2 border-[var(--uv-gold)] bg-white p-4 text-[var(--scd-ink)] shadow-[0_18px_50px_rgb(0_0_0/0.5)] lg:bottom-[62px]"
+          className="fixed inset-x-3 bottom-[calc(110px+env(safe-area-inset-bottom))] z-[70] mx-auto max-w-[560px] rounded-[18px] border-2 border-[var(--uv-gold)] bg-white p-4 text-[var(--scd-ink)] shadow-[0_18px_50px_rgb(0_0_0/0.5)] lg:bottom-[62px]"
         >
           <div className="flex items-center justify-between gap-2">
             <b id="ck-t" className="font-uv text-[22px] uppercase leading-none">
