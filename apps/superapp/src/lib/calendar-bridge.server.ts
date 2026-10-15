@@ -10,6 +10,7 @@ export const MIRROR_FILE_ID = "1xSQ2MClw7LlIeWhJCSXllmCMQMrXYPn5";
  * oraria" regenerates it from the master with tools/sync/calendar_public_payload.py and commits it to the data branch
  * data/calendar-public only when the master changed. Read first; the Drive copy stays as a second channel. Every
  * channel passes validateMirror and the freshness rule, so a wrong or older file never replaces the bundled copy.
+ * The first valid channel wins; the Drive copy is legacy (not updated since 10/10/2026, not link-shared).
  */
 export const REPO_MIRROR_URL =
   "https://raw.githubusercontent.com/francesco1485/scd-colicoderviese-super-app/data/calendar-public/calendar-public.json";
@@ -59,7 +60,9 @@ export async function fetchMirror(urls: string[], fetchImpl: FetchLike = fetch):
   let reason = "copia pubblica non raggiungibile";
   for (const url of urls) {
     try {
-      const res = await fetchImpl(url, { redirect: "follow", signal: AbortSignal.timeout(6000), headers: { accept: "application/json" } });
+      // The repository copy is served directly: no redirect is followed there. Drive needs its own redirects.
+      const redirect: RequestRedirect = url === REPO_MIRROR_URL ? "error" : "follow";
+      const res = await fetchImpl(url, { redirect, signal: AbortSignal.timeout(6000), headers: { accept: "application/json" } });
       if (!res.ok) { reason = `HTTP ${res.status}`; continue; }
       const ct = res.headers.get("content-type") ?? "";
       if (/text\/html/i.test(ct)) { reason = "pagina HTML invece di JSON"; continue; }

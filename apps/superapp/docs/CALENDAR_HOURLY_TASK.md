@@ -26,21 +26,29 @@ PRINCIPLES
 PROCEDURE
 1. Google Drive get_file_metadata on 1eXS-kY5PCHFg4CXiAErNAKtIVEMIKgWs (excludeContentSnippets true) → modifiedTime.
 2. In a new empty directory: `git clone --depth 1 -b data/calendar-public https://github.com/francesco1485/scd-colicoderviese-super-app data`
-   and read `source_modified_at` from data/calendar-public.json. If it equals modifiedTime (same instant), report
-   "Calendario invariato (master <modifiedTime>)" and stop.
-3. In another new empty directory: `git clone --depth 1 -b staging/superapp https://github.com/francesco1485/scd-colicoderviese-super-app code`.
-   Install openpyxl with `pip install --break-system-packages openpyxl` only if missing.
+   and read `source_modified_at` from data/calendar-public.json and the converter commit written in the last commit
+   message of the data branch (line "converter: <sha>", `git -C data log -1 --format=%B`).
+3. In another new empty directory: `git clone --depth 50 -b staging/superapp https://github.com/francesco1485/scd-colicoderviese-super-app code`
+   and read the converter commit: `git -C code log -1 --format=%H -- tools/sync/calendar_public_payload.py`.
+   If source_modified_at equals modifiedTime (same instant) AND the converter commit equals the one of step 2, report
+   "Calendario invariato (master <modifiedTime>)" and stop (a changed converter regenerates even if the master did not).
+   Install openpyxl with `pip install --break-system-packages "openpyxl==3.1.5"` only if missing.
 4. Google Drive download_file_content on the master; the result is saved to a file: decode its base64 "content" with
    `python3 -I -B` into master.xlsx in its own new empty directory. Never retype base64.
 5. `python3 -I -B code/tools/sync/calendar_public_payload.py --self-test` (must print "self-test ok"), then
    `python3 -I -B code/tools/sync/calendar_public_payload.py <master.xlsx> <modifiedTime> > calendar-public.json`.
    Exit code 2 or any "BLOCKER" line → stop and report it (nothing pushed). Report any "AVVISO" line.
 6. Checks before publishing, all mandatory: valid JSON; schema "scd-calendar-public-v3"; audience
-   "PUBLIC_READ_ONLY_SNAPSHOT"; source_file_id 1eXS-kY5PCHFg4CXiAErNAKtIVEMIKgWs; source_modified_at newer than the
-   current file; events count between 1 and 1000 and not below 70% of the current file's count; size under 600 KB.
-7. Copy calendar-public.json over data/calendar-public.json; `git -C data diff --stat` must show only that file.
-   Commit with author "SCD Calendario <noreply@anthropic.com>" and message
-   "data(calendar): public calendar from the master of <modifiedTime>", then `git -C data push origin data/calendar-public`.
+   "PUBLIC_READ_ONLY_SNAPSHOT"; source_file_id 1eXS-kY5PCHFg4CXiAErNAKtIVEMIKgWs; source_modified_at not older than
+   the current file and not in the future (more than 10 minutes ahead of now); events count between 1 and 1000 and not
+   below 70% of the current file's count; size under 600 KB. The app applies the same rules (validateMirror) and
+   would refuse a copy that fails them.
+7. Copy calendar-public.json over data/calendar-public.json. If `git -C data status --porcelain` prints nothing, the
+   copy is already identical: report "Calendario invariato (master <modifiedTime>)" and stop. Otherwise it must print
+   exactly " M calendar-public.json" and nothing else (otherwise BLOCKER). Commit with author
+   "SCD Calendario <noreply@anthropic.com>" and message
+   "data(calendar): public calendar from the master of <modifiedTime>" followed by a blank line and
+   "converter: <converter commit of step 3>", then `git -C data push origin data/calendar-public` (never --force).
    If the push is refused (someone pushed meanwhile), stop and report: the next run retries.
 8. Verify: fetch https://raw.githubusercontent.com/francesco1485/scd-colicoderviese-super-app/data/calendar-public/calendar-public.json
    (cache up to 5 minutes; one retry after 5 minutes is enough) and check source_modified_at.

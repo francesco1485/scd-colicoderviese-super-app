@@ -329,6 +329,14 @@ def main(argv: list[str]) -> int:
         print("BLOCKER: source_modified_iso non valido", file=sys.stderr)
         return 1
     try:
+        stamp = dt.datetime.fromisoformat(modified.replace("Z", "+00:00"))
+    except ValueError:
+        print("BLOCKER: source_modified_iso non valido", file=sys.stderr)
+        return 1
+    if stamp.tzinfo is None or stamp > dt.datetime.now(dt.timezone.utc) + dt.timedelta(minutes=10):
+        print("BLOCKER: source_modified_iso senza fuso orario o nel futuro", file=sys.stderr)
+        return 1
+    try:
         with open(path, "rb") as f:
             sha = hashlib.sha256(f.read()).hexdigest()
         out = build(read_master(path), modified, sha)
