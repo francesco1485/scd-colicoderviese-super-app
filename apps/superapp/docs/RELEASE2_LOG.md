@@ -664,3 +664,14 @@ Da decidere (Direzione): applicazione di r110 dopo DPIA e testo di presa visione
 - **Codice morto (punto 8)**: rimossi `Carousel.tsx`, `PublicToday`, `HomeNewsBlock`, `nextHomeKickoff`; la home non scarica più `getHomeNews()` per poi scartarlo (né per i visitatori né per i soci). Nessun cambiamento visibile oltre al punto 5.
 - **Processo (punto 9)**: lavoro su ramo `feat/cloud-audit-cleanup`, `test:bundle` (privacy dei ragazzi nel codice del telefono) eseguito dopo la build: 11/11.
 - Revisioni (scd-revisore e scd-sicurezza: PASS con note, note applicate): il server dà il mondo "soci" della vetrina solo a una sessione che conferma lui (non al solo parametro del chiamante); `getHomeNews` e i suoi aiuti rimossi; messaggio del voto "Entra con il tuo account per votare"; /community "Votano i tesserati". Da decidere a Francesco: oggi il database lascia votare la Top 11 a qualunque account registrato (membership USER_BASE), non solo ai tesserati.
+
+## B4 — Accessibilità delle pagine pubbliche (home, /sponsor, /sostieni, /tornei, /pulmini, player LED) · 2026-10-15
+
+Backlog cloud B4. Motori: PERSONE (famiglie e tifosi leggono e toccano tutto anche da telefono) e SOLDI (/sponsor leggibile per i partner). Dettagli e numeri in `docs/LAUNCH_QUALITY.md` → B4.
+- Audit axe (WCAG A/AA) + bersagli 44 px esteso alle sei pagine; prima 39 problemi, dopo 0 (restano 3 bersagli piccoli nella schermata d'accesso di /pulmini, area chat PC).
+- Occhielli gialli su fondo chiaro → blu del club (il giallo resta sulle superfici blu); etichette squadra delle gare scurite quanto basta per 4,5:1; crediti del piè di pagina e date dei tornei più leggibili.
+- 44 px: puntini e pausa del banner (la riga va a capo se le slide sono tante), logo della testata, "Vedi tutte", striscia "Prossima gara", nome del partner nello spot.
+- Barra sponsor: si ferma sotto il puntatore o il dito; con "riduci movimento" è ferma. Test `home-motion.test.tsx`: la home non si muove mai da sola con "riduci movimento".
+- Da decidere: pulsante di pausa da tastiera per la barra sponsor (linguetta "Sponsor").
+- Revisione: scd-revisore PASS (note applicate: `flex-wrap` sui puntini, area di tocco del partner solo verso il basso), scd-sicurezza PASS.
+

@@ -280,7 +280,7 @@ export function PromoCarousel({ slides }: { slides: readonly PromoSlide[] }) {
         ))}
       </ul>
       {slides.length > 1 && (
-        <div className="flex items-center justify-center pt-1">
+        <div className="flex flex-wrap items-center justify-center pt-1">
           {slides.map((s, n) => (
             <button
               key={s.id}
