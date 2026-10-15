@@ -3,10 +3,10 @@
  * layout: no betting, no money), content from board VR-009:
  *   1. banner carousel with a white card and one clear button (HomePromo: welcome/sign-up, published events, season
  *      sign-up, the new squad cards);
- *   2. quick chips with small badges (games left this week or LIVE, NUOVO);
+ *   2. quick chips (LIVE badge on the games while a club game is played);
  *   3. "Prossima gara": the club's most important next game (Prima Squadra > agonistica > base, boardRank) with its
  *      live countdown, our crest VS the verified opponent crest;
- *   4. two small cards: Allenamenti della settimana and the pitches (how to get there).
+ *   4. one small card: the pitches (how to get there). Members-only pages are not offered to visitors.
  * Data: the public calendar only (weekMatches, same source as /calendario); no score, no invented crest, no minor named.
  */
 import { Link } from "@tanstack/react-router";
@@ -21,7 +21,6 @@ import {
   boardDate,
   boardRank,
   countdownParts,
-  gamesLeft,
   kickoffMs,
   nextBoardMatch,
 } from "@/lib/home-board";
@@ -259,9 +258,8 @@ export function HomeBoard({
     () => weekMatches(calendar.events, calendar.groups, today, null),
     [calendar, today],
   );
-  const left = gamesLeft(week, nowMs);
   const live = week.some((e) => e.kind === "gara" && itemState(e, nowMs) === "live");
-  const chips = quickChips(left, live);
+  const chips = quickChips(live);
   const slides = useMemo(() => promoSlides(today, clubEventsOn(today)), [today]);
   return (
     <div data-testid="home-board">
@@ -273,35 +271,8 @@ export function HomeBoard({
       <div className={`${WRAP} relative grid gap-4 pt-5 lg:gap-6 lg:pt-8`}>
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:items-stretch lg:gap-6">
           <NextMatch calendar={calendar} nowMs={nowMs} today={today} />
-          <div className="grid grid-cols-2 gap-2 lg:grid-cols-1 lg:gap-4 lg:pt-[30px]">
-            <Link
-              to="/allenamenti"
-              data-testid="board-trainings"
-              className={`${CARD} scd-focus grid grid-cols-[48px_minmax(0,1fr)] items-center gap-2 p-2.5 hover:bg-[#fbfcfe]`}
-            >
-              <span
-                aria-hidden="true"
-                className="grid size-12 place-items-center rounded-[12px] bg-[#1f9d55]"
-              >
-                <svg
-                  viewBox="0 0 32 32"
-                  className="size-7"
-                  fill="none"
-                  stroke="#fff"
-                  strokeWidth="2.4"
-                >
-                  <path d="M13 4h6l6 20H7zM11.2 12h9.6M9.6 18h12.8M4 26h24" />
-                </svg>
-              </span>
-              <span className="min-w-0">
-                <span className="block text-[13.5px] font-extrabold leading-tight">
-                  Allenamenti
-                </span>
-                <span className="block text-[11.5px] leading-snug text-[#4a5d7a]">
-                  Della settimana, tutte le categorie
-                </span>
-              </span>
-            </Link>
+          {/* Visitors' home: the Allenamenti tile (members-only page, access screen for guests) is gone (cleanup 15/10/2026). */}
+          <div className="grid gap-2 lg:gap-4 lg:pt-[30px]">
             <Link
               to="/impianti"
               data-testid="board-impianti"

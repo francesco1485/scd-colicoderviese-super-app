@@ -273,14 +273,14 @@ describe("public home v5", () => {
           `${item.to}#${item.hash ?? ""}?${new URLSearchParams(item.search ?? {}).toString()}`,
         ),
         item.label,
-      ).toBe(true);
+      ).toBe(item.publicMenu !== false);
     const routes = routePaths();
     for (const i of sections.flatMap((g) => g.items))
       expect(routes.has(i.to.replace(/\/$/, "") || "/"), i.to).toBe(true);
     expect(sections.slice(0, MENU_GROUPS.length).map((g) => g.id)).toEqual(
       MENU_GROUPS.map((g) => g.id),
     );
-    expect(searchMenu("kit").map((i) => i.to)).toContain("/kit");
+    expect(searchMenu("mappa").map((i) => i.to)).toContain("/impianti");
     expect(searchMenu("iscrizioni").map((i) => i.to)).toContain("/entra");
     expect(searchMenu("CHRISTMAS lario").map((i) => i.to)).toContain(
       "/eventi/christmas-lario-cup",
@@ -291,6 +291,57 @@ describe("public home v5", () => {
     const chrome = code("src/components/SiteChrome.tsx");
     expect(chrome).toMatch(/menuSections\(\)/);
     expect(chrome).toMatch(/searchMenu\(query, sections\)/);
+  });
+
+  it("cleanup 15/10/2026: empty placeholder pages are out of the public menu (routes alive), no ONE/CORE/GROW badge, no build stamp in the footer copy", () => {
+    const sections = menuSections();
+    const labels = sections.flatMap((g) => g.items).map((i) => i.label);
+    for (const hidden of [
+      "Fantacalcio SCD",
+      "Top 11 della settimana",
+      "Dicono di noi",
+      "Le card 2026/27",
+      "Kit ufficiale 2026/27",
+      "Richiedi una proposta",
+    ])
+      expect(labels, hidden).not.toContain(hidden);
+    const routes = routePaths();
+    for (const alive of ["/fantacalcio", "/top11", "/rassegna-stampa", "/card", "/kit"]) expect(routes.has(alive), alive).toBe(true);
+    for (const kept of [
+      "Home",
+      "Chi siamo",
+      "Calendario gare",
+      "Mappa campi",
+      "Comunicazioni",
+      "Eventi",
+      "Tornei",
+      "Christmas Lario Cup",
+      "Tifosi",
+      "Gioca con noi",
+      "Contatti",
+      "La mia SCD",
+      "Le squadre",
+      "Allenamenti",
+      "Sponsor & Partner",
+      "Fornitori",
+      "Documenti della società",
+      "Tutela dei minori",
+      "Registrati nell'app",
+      "Guida all'app",
+      "Area famiglia",
+      "Area partner",
+      "Social e video",
+      "Installa l'app",
+      "Privacy",
+    ])
+      expect(labels, kept).toContain(kept);
+    expect(searchMenu("fantacalcio")).toEqual([]);
+    const chrome = code("src/components/SiteChrome.tsx");
+    const drawer = chrome.slice(chrome.indexOf("export function MenuDrawer"), chrome.indexOf("type TabDef"));
+    expect(drawer).not.toMatch(/\{g\.app\}/);
+    const footer = chrome.slice(chrome.indexOf("export function SiteFooter"));
+    expect(footer).not.toMatch(/versione del/);
+    expect(footer).toMatch(/data-build=\{BUILD_STAMP\}/);
   });
 
   it("UD-110: partner logos are always in colour (no greyscale anywhere on public logos)", () => {

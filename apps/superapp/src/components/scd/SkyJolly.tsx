@@ -55,11 +55,18 @@ function startsWithPrefix(
 }
 
 /**
+ * Pages open to everyone that stay out of PUBLIC_PREFIXES only because one of them is never cached as public
+ * (/sostieni/fondo-solidale renders the signed-in parent's children): for the helper they are public surface, so the
+ * visitor meets Vera there as on the home (one assistant on public pages, UD-121 / UD-134; cleanup 15/10/2026).
+ */
+const PUBLIC_HELPER_PREFIXES = ["/sostieni"] as const;
+
+/**
  * Reserved = everything that is not a public page (src/lib/http-policy.ts PUBLIC_PREFIXES is the
- * single list of what anyone may see without signing in).
+ * single list of what anyone may see without signing in), except PUBLIC_HELPER_PREFIXES.
  */
 export function isReservedPath(pathname: string): boolean {
-  return !isPublicPath(pathname);
+  return !isPublicPath(pathname) && !startsWithPrefix(pathname, PUBLIC_HELPER_PREFIXES);
 }
 
 export function isHelperHiddenPath(pathname: string): boolean {
