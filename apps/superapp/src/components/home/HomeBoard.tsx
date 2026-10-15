@@ -267,12 +267,12 @@ export function HomeBoard({
       <PromoCarousel slides={slides} />
       <QuickChips chips={chips} />
 
-      {/* 3. The club's most important next game and 4. the two small cards. */}
+      {/* 3. The club's most important next game and 4. the pitches card (lg:self-start: no empty column below it). */}
       <div className={`${WRAP} relative grid gap-4 pt-5 lg:gap-6 lg:pt-8`}>
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:items-stretch lg:gap-6">
           <NextMatch calendar={calendar} nowMs={nowMs} today={today} />
           {/* Visitors' home: the Allenamenti tile (members-only page, access screen for guests) is gone (cleanup 15/10/2026). */}
-          <div className="grid gap-2 lg:gap-4 lg:pt-[30px]">
+          <div className="grid gap-2 lg:gap-4 lg:self-start lg:pt-[30px]">
             <Link
               to="/impianti"
               data-testid="board-impianti"

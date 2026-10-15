@@ -47,7 +47,7 @@ export function validateAccessRequest(i: AccessRequestInput, todayIso: string): 
 export type RequestOutcome = "RECEIVED" | "MINOR_UNDER_14" | "CONSENT" | "INVALID" | "BUSY" | "ERROR";
 
 export const OUTCOME_MESSAGE: Readonly<Record<RequestOutcome, string>> = {
-  RECEIVED: "Fatto. Entra subito da \"Accedi\" con questa e-mail, con la tua password o con un codice via e-mail. All'inizio vedi calendario e attività; il resto (la tua squadra, i tuoi figli, il tuo ruolo) lo abilita la Direzione.",
+  RECEIVED: "Fatto. Entra subito da \"Accedi\" con questa e-mail (o il telefono) e la tua password. All'inizio vedi calendario e attività; il resto (la tua squadra, i tuoi figli, il tuo ruolo) lo abilita la Direzione.",
   MINOR_UNDER_14: "Sotto i 14 anni la registrazione la fa un genitore o tutore, con i suoi dati.",
   CONSENT: "Serve il consenso al trattamento dei dati.",
   INVALID: "Controlla i dati inseriti e riprova.",

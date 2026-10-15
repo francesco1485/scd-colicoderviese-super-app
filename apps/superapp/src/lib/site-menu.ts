@@ -49,9 +49,9 @@ export const MENU_GROUPS: readonly MenuGroup[] = [
       { to: "/la-mia-scd", label: "La mia SCD", reserved: true },
       { to: "/squadre", label: "Le squadre", reserved: true },
       { to: "/allenamenti", label: "Allenamenti", reserved: true },
-      { to: "/fantacalcio", label: "Fantacalcio SCD", publicMenu: false },
-      { to: "/top11", label: "Top 11 della settimana", publicMenu: false },
-      { to: "/rassegna-stampa", label: "Dicono di noi", publicMenu: false },
+      { to: "/fantacalcio", label: "Fantacalcio SCD" },
+      { to: "/top11", label: "Top 11 della settimana" },
+      { to: "/rassegna-stampa", label: "Dicono di noi" },
       { to: "/aree", label: "Il tuo ingresso (tutte le aree)", reserved: true },
     ],
   },
@@ -69,13 +69,13 @@ export const MENU_GROUPS: readonly MenuGroup[] = [
 const linkKey = (l: PublicLink) =>
   `${l.to}#${l.hash ?? ""}?${new URLSearchParams(l.search ?? {}).toString()}`;
 
-/** Empty placeholder pages stay out of the public menu (publicMenu: false here or in LINK_GROUPS); routes alive. */
+/** Pages marked publicMenu: false (here or in LINK_GROUPS) stay out of the public menu; their routes stay alive. */
 export const isHiddenFromMenu = (l: PublicLink): boolean => l.publicMenu === false;
 
 /**
  * The menu sections: the app groups, then "Tutto sul club" with every page of the site index (LINK_GROUPS) that the
- * app groups do not already list. Every LINK_GROUPS page is therefore reachable from the menu (tested), except the
- * placeholders marked publicMenu: false.
+ * app groups do not already list. Every LINK_GROUPS page is therefore reachable from the menu (tested), unless it is
+ * marked publicMenu: false.
  */
 export function menuSections(): MenuGroup[] {
   const groups = MENU_GROUPS.map((g) => ({

@@ -339,9 +339,7 @@ const CHIP_ICON: Readonly<Record<string, { icon: ChipIcon; tint: string }>> = {
 function ChipBadge({ badge }: { badge: NonNullable<QuickChip["badge"]> }) {
   const base =
     "absolute -right-1 -top-2 rounded-[5px] px-1.5 py-[3px] text-[10px] font-extrabold uppercase leading-none tracking-[0.04em]";
-  if (badge.kind === "live")
-    return <span className={`${base} bg-[#e11d2e] text-white`}>Live</span>;
-  return null;
+  return <span className={`${base} bg-[#e11d2e] text-white`}>Live</span>;
 }
 
 export function QuickChips({ chips }: { chips: readonly QuickChip[] }) {

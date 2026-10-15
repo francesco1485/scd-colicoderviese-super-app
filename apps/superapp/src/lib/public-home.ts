@@ -13,7 +13,7 @@ export interface PublicLink {
   to: string;
   search?: Record<string, string>;
   hash?: string;
-  /** false: empty placeholder page today, kept out of the public menu (route alive). Cleanup 15/10/2026. */
+  /** false: the page stays out of the public menu (route alive, reachable by URL and search engines). */
   publicMenu?: boolean;
 }
 
@@ -67,8 +67,8 @@ export const LINK_GROUPS: readonly LinkGroup[] = [
     title: "Per le famiglie",
     items: [
       { label: "Iscrizioni e prova", to: "/entra" },
-      { label: "Kit ufficiale 2026/27", to: "/kit", publicMenu: false },
-      { label: "Le card 2026/27", to: "/card", publicMenu: false },
+      { label: "Kit ufficiale 2026/27", to: "/kit" },
+      { label: "Le card 2026/27", to: "/card" },
       { label: "Registrati nell'app", to: "/registrati" },
       { label: "Calendario gare", to: "/calendario" },
       { label: "Guida all'app", to: "/guida" },
@@ -83,8 +83,8 @@ export const LINK_GROUPS: readonly LinkGroup[] = [
       { label: "Tutti gli eventi", to: "/eventi" },
       { label: "Tornei del club", to: "/tornei" },
       { label: "Christmas Lario Cup", to: "/eventi/christmas-lario-cup" },
-      { label: "Fantacalcio SCD", to: "/fantacalcio", publicMenu: false },
-      { label: "Top 11 della settimana", to: "/top11", publicMenu: false },
+      { label: "Fantacalcio SCD", to: "/fantacalcio" },
+      { label: "Top 11 della settimana", to: "/top11" },
     ],
   },
   {
@@ -92,7 +92,7 @@ export const LINK_GROUPS: readonly LinkGroup[] = [
     title: "Partner e sponsor",
     items: [
       { label: "Diventa partner", to: "/sponsor" },
-      { label: "Richiedi una proposta", to: "/sponsor", hash: "proposta", publicMenu: false },
+      { label: "Richiedi una proposta", to: "/sponsor", hash: "proposta" },
       { label: "Fornitori", to: "/fornitori" },
       { label: "Area partner", to: "/partner", reserved: true },
     ],
@@ -102,7 +102,7 @@ export const LINK_GROUPS: readonly LinkGroup[] = [
     title: "Comunicazione",
     items: [
       { label: "Comunicazioni del club", to: "/comunicazioni" },
-      { label: "Dicono di noi", to: "/rassegna-stampa", publicMenu: false },
+      { label: "Dicono di noi", to: "/rassegna-stampa" },
       {
         label: "Social e video",
         to: "/comunicazioni",

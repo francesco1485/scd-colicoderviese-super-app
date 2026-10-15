@@ -20,7 +20,7 @@ import {
   vetrinaRepeats,
 } from "./public-home";
 import { quickActions } from "./home-actions";
-import { MENU_GROUPS, menuSections, searchMenu } from "./site-menu";
+import { MENU_GROUPS, isHiddenFromMenu, menuSections, searchMenu } from "./site-menu";
 import { SPONSORS } from "./sponsors";
 
 const APP = resolve(__dirname, "../..");
@@ -280,7 +280,7 @@ describe("public home v5", () => {
     expect(sections.slice(0, MENU_GROUPS.length).map((g) => g.id)).toEqual(
       MENU_GROUPS.map((g) => g.id),
     );
-    expect(searchMenu("mappa").map((i) => i.to)).toContain("/impianti");
+    expect(searchMenu("kit").map((i) => i.to)).toContain("/kit");
     expect(searchMenu("iscrizioni").map((i) => i.to)).toContain("/entra");
     expect(searchMenu("CHRISTMAS lario").map((i) => i.to)).toContain(
       "/eventi/christmas-lario-cup",
@@ -293,10 +293,11 @@ describe("public home v5", () => {
     expect(chrome).toMatch(/searchMenu\(query, sections\)/);
   });
 
-  it("cleanup 15/10/2026: empty placeholder pages are out of the public menu (routes alive), no ONE/CORE/GROW badge, no build stamp in the footer copy", () => {
+  it("cleanup 15/10/2026: no ONE/CORE/GROW badge, no build stamp in the footer copy; publicMenu: false keeps a page out of the menu (no page uses it today)", () => {
     const sections = menuSections();
     const labels = sections.flatMap((g) => g.items).map((i) => i.label);
-    for (const hidden of [
+    // Every public page of the index is in the menu: the six "placeholder" candidates are real public pages.
+    for (const shown of [
       "Fantacalcio SCD",
       "Top 11 della settimana",
       "Dicono di noi",
@@ -304,9 +305,9 @@ describe("public home v5", () => {
       "Kit ufficiale 2026/27",
       "Richiedi una proposta",
     ])
-      expect(labels, hidden).not.toContain(hidden);
-    const routes = routePaths();
-    for (const alive of ["/fantacalcio", "/top11", "/rassegna-stampa", "/card", "/kit"]) expect(routes.has(alive), alive).toBe(true);
+      expect(labels, shown).toContain(shown);
+    expect(isHiddenFromMenu({ to: "/x", publicMenu: false })).toBe(true);
+    expect(isHiddenFromMenu({ to: "/x" })).toBe(false);
     for (const kept of [
       "Home",
       "Chi siamo",
@@ -335,7 +336,6 @@ describe("public home v5", () => {
       "Privacy",
     ])
       expect(labels, kept).toContain(kept);
-    expect(searchMenu("fantacalcio")).toEqual([]);
     const chrome = code("src/components/SiteChrome.tsx");
     const drawer = chrome.slice(chrome.indexOf("export function MenuDrawer"), chrome.indexOf("type TabDef"));
     expect(drawer).not.toMatch(/\{g\.app\}/);
