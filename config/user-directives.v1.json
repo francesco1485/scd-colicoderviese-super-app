@@ -3203,6 +3203,34 @@
           "publishing seat adoption or the lottery before a new explicit decision"
         ]
       }
+    },
+    {
+      "sourceDate": "2026-10-15",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "DIREZIONE_SCD",
+      "id": "UD-133",
+      "name": "WOW_WORLD_HOME_TWO_TAP_ENTRY_IN_APP_ACCESS_REQUEST",
+      "sourceQuoteFragments": [
+        "Sembra in app di un calendario",
+        "il gestionale solo chi lo deve utilizzare il resto la devono vivere, divertirsi, relazionarsi e renderla virale",
+        "mancano la dinamica, il 3D il fattore wau il voler dire mi iscrivo veloce e vedo cosa hanno fatto, manca fammi vede a colico cosa fa",
+        "Deve essere qualcosa che a impatto deve poter servire a tutti da 0 a 100 anni",
+        "troppe informazioni, troppo tempo per iscriversi, manca la parte loghi Google veloce per accedere",
+        "Potevi fare iscrizione veloce, entra e poi una volta nel mondo super app, al ingresso appare ... conosci già Colicoderviese o fai parte della famiglia Colicoderviese ... premi qui e chiedi accesso dedicato",
+        "dichiaro di aver detto la verità salvi o invia e tu verifichi se corretto in automatico gli apri le porte ... seno gli dici la direzione a breve effettuerà le verifiche ... e fai arrivare una mail di richiesta",
+        "manca la pagina proprio interna del wau che bello per tutti dopo la pagina vetrina app sempre aggiornata e interattiva e dinamica",
+        "Perché non recuperare le immagini che io ti ho fornito dal quale partire e prendere spunto"
+      ],
+      "context": "Francesco 15/10/2026 05:50 after seeing the short 'Matchday' public home (f7c07d0) and the registration pages, with screenshots, the six-screen board photo and hand-drawn plans of Colico and Dervio.",
+      "normalizedCommand": {
+        "rule": "The public home is the 'world' of the club, not a calendar or a gestionale: board-faithful graphics (VR-009/VR-010: lake and mountains, crest, COLICODERVIESE wordmark, script taglines), dynamic 'see what happens in Colico' content (stories, LED spots, matches, events, explorable sports centre), the daily rotating vetrina (UD-110) back, the calendar as one block only. Entry in two taps: Google (and other common accounts) or e-mail + password, no questionnaire before entering. Inside, an 'Fai parte della famiglia ColicoDerviese? Chiedi il tuo accesso' prompt opens the dedicated-access request (questions, truth declaration, send): automatic match with the registry opens the allowed area at once, otherwise the Direzione is notified by e-mail and the person sees 'la Direzione verificherà a breve'. A post-entry 'wow' page shows every visitor why it is worth being inside. Start from the images Francesco provided (VR-009, VR-010, his hand-drawn facility plans).",
+        "scope": "PUBLIC_HOME + ONBOARDING (access flow owned by the PC chat) + FACILITY_PLANS",
+        "forbidden": [
+          "gestionale-like public home",
+          "long forms before entering",
+          "automatic grants of managerial roles without Direttore Sportivo / Presidente approval (UD-117/UD-120 rules still apply)"
+        ]
+      }
     }
   ],
   "completionGate": {
