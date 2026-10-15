@@ -79,8 +79,10 @@ describe("guest home never links to members-only pages", () => {
       for (const to of [sl.cta.to, ...(sl.secondary ? [sl.secondary.to] : [])])
         if (to !== "/accedi") expect(membersOnly(to), to).toBe(false);
   });
-  it("board tiles", () => {
-    const board = readFileSync(resolve(__dirname, "../components/home/HomeBoard.tsx"), "utf8")
+  it("board cards and week board", () => {
+    const board = ["../components/home/HomeBoard.tsx", "../components/home/HomeWeek.tsx"]
+      .map((f) => readFileSync(resolve(__dirname, f), "utf8"))
+      .join("\n")
       .replace(/\/\*[\s\S]*?\*\//g, "")
       .replace(/^\s*\/\/.*$/gm, "");
     for (const m of board.matchAll(/to="([^"]+)"/g)) expect(membersOnly(m[1] ?? ""), m[1]).toBe(false);

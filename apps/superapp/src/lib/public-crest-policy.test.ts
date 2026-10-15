@@ -23,7 +23,7 @@ const PUBLIC_FILES = [
   "src/routes/index.tsx",
   "src/components/home/HomeSections.tsx",
   "src/components/home/PublicHome.tsx",
-  "src/components/home/HomeMatchday.tsx",
+  "src/components/home/HomeWeek.tsx",
   "src/components/home/MemberHome.tsx",
   "src/components/scd/MembersOnly.tsx",
   "src/components/SiteChrome.tsx",

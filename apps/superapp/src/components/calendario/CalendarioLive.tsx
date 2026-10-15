@@ -166,12 +166,34 @@ function DateLead({
   date,
   time,
   clock,
+  timeOnly = false,
 }: {
   date: string;
   time: string;
   clock: ReturnType<typeof matchClock>;
+  /** Rows already grouped under a day heading (home week board): the time only, as on the board. */
+  timeOnly?: boolean;
 }) {
   const d = dateParts(date);
+  if (timeOnly)
+    return (
+      <span className="grid w-[46px] shrink-0 justify-items-center leading-none text-[#0b2a5b] lg:w-[54px]">
+        {clock.state === "live" ? (
+          <span
+            className="rounded-[5px] px-1 py-[3px] text-[13px] font-extrabold tabular-nums text-white"
+            style={{ background: LIVE_RED }}
+          >
+            {clock.label}
+          </span>
+        ) : (
+          <span
+            className={`text-[17px] font-extrabold tabular-nums lg:text-[18px] ${clock.state === "done" ? "text-[#4a5d7a]" : ""}`}
+          >
+            {time || "--:--"}
+          </span>
+        )}
+      </span>
+    );
   return (
     <span className="grid w-[50px] shrink-0 justify-items-center leading-none text-[#0b2a5b] lg:w-[56px]">
       <span className="text-[12px] font-extrabold uppercase">{d.weekday}</span>
@@ -205,6 +227,7 @@ export function GameRow({
   toggle,
   followed,
   onFollow,
+  timeOnly = false,
 }: {
   e: PublicEvent;
   g: PublicGroup | undefined;
@@ -213,6 +236,8 @@ export function GameRow({
   toggle: () => void;
   followed: boolean;
   onFollow: (id: string) => void;
+  /** Under a day heading: show the kick-off time only (home week board). */
+  timeOnly?: boolean;
 }) {
   const clock = matchClock(e, nowMs);
   const live = clock.state === "live";
@@ -242,7 +267,7 @@ export function GameRow({
         aria-expanded={open}
         className={`scd-focus flex w-full items-center gap-[10px] py-[12px] pl-[14px] pr-[10px] text-left lg:gap-[14px] lg:pl-[18px] lg:pr-[14px] ${done ? "opacity-75" : ""}`}
       >
-        <DateLead date={e.date} time={e.time} clock={clock} />
+        <DateLead date={e.date} time={e.time} clock={clock} timeOnly={timeOnly} />
         <TypeIcon kind={gameIcon(e.type)} live={live} />
         <span className="min-w-0 flex-1">
           {live && (

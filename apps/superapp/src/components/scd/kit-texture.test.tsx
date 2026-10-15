@@ -54,13 +54,12 @@ describe("kit 2026/27 texture on shared hero bands (Direzione 13/10/2026)", () =
     expect(componentBody(board, "PageHeader")).toMatch(/<KitTexture motif=\{motif\} inline \/>/);
   });
 
-  it("public pages pick their motif and the home hero is the drawn lake", () => {
+  it("public pages pick their motif and the home has no hero art", () => {
     // Calendario live (board VR-009 screen 2): own hero with the lake photo plus the mountains-lake line art.
     expect(src("../../routes/calendario.tsx")).toContain('<KitTexture motif="mountains-lake" overlay />');
     expect(src("../../routes/societa.tsx")).toMatch(/<HallHero\s+motif="forte"/);
     expect(src("../../routes/eventi.index.tsx")).toMatch(/<PageHero motif="mountains-lake"/);
-    // The home hero is the drawn Alto Lario (HeroArt, no photo, 15/10 19:19); the vetrina that carried the texture is
-    // gone (UD-152).
-    expect(src("../home/HomeBoard.tsx")).toContain("<HeroArt ");
+    // New idea (15/10 21:35): no hero art on the home, the week board opens it (no photo either, 19:19).
+    expect(src("../home/HomeWeek.tsx")).not.toMatch(/HeroArt|<img/);
   });
 });

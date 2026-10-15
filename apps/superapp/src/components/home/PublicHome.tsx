@@ -1,9 +1,10 @@
 /**
  * Signed-out public home on board VR-009 (UD-133, then UD-134 Francesco 15/10/2026 09:18).
  *
- * Order: urgent notices (R20 alerts, only when there are) → the one club communication chosen by the Direzione →
- * HomeBoard (lake hero, tiles, the club's most important next game with its countdown, trainings and the event of the
- * day) → all the games of the week (HomeMatchday) → weekend results (only with a real source;
+ * New idea (Francesco 15/10/2026 21:35 «avevo detto che bisogna cambiare idea di grafica», boards VR-025): urgent
+ * notices (R20 alerts, only when there are) → the one club communication chosen by the Direzione → HomeWeek (thin
+ * title band, week strip with the chosen day in the blue circle, pill filters, every team's games by day as board
+ * rows; desktop right column with the next big game, practical cards and Iride) → weekend results (only with a real source;
  * "Vittoria" and confetti only on a ColicoDerviese win) → footer ("Chi sei?" removed, UD-152). Partners scroll in the fixed SponsorBand on every
  * page; the LED spot, the partner of the month and partner news live on /sponsor (PartnerBand). No stories.
  * Palette: navy #0b2a5b, blue #1556c4, light #eef3f9, white; yellow #ffd600 for changes and the main CTA.
@@ -17,8 +18,7 @@ import { weekendResults } from "@/lib/home-results";
 import { urgentNotices } from "@/lib/home-today";
 import type { VetrinaSlot, VetrinaWorld } from "@/lib/vetrina";
 
-import { HomeBoard } from "@/components/home/HomeBoard";
-import { HomeMatchday } from "@/components/home/HomeMatchday";
+import { HomeWeek } from "@/components/home/HomeWeek";
 import {
   ClubNoticeCard,
   UrgentNotices,
@@ -27,8 +27,6 @@ import {
 import type { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 
 type PublicCalendar = Awaited<ReturnType<typeof getPublicCalendarSnapshot>>;
-
-const WRAP = "mx-auto w-full max-w-[1200px] px-4 lg:px-8";
 
 /* ---------------------------------------------------------------- page */
 
@@ -71,13 +69,7 @@ export function PublicHome({
       </h1>
       <UrgentNotices items={alerts} />
       <ClubNoticeCard notice={notice} />
-      <HomeBoard calendar={calendar} nowMs={nowMs} today={today} />
-      <div
-        className={`${WRAP} pt-5 lg:pt-8`}
-        data-testid="home-matchday-layout"
-      >
-        <HomeMatchday calendar={calendar} nowMs={nowMs} today={today} limit={4} />
-      </div>
+      <HomeWeek calendar={calendar} nowMs={nowMs} today={today} />
       <WeekendResults rows={results} />
     </main>
   );

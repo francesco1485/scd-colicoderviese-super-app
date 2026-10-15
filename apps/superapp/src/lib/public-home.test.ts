@@ -45,8 +45,9 @@ const PUBLIC_HOME_FILES = [
   "src/routes/index.tsx",
   "src/components/home/PublicHome.tsx",
   "src/components/home/HomePractical.tsx",
-  "src/components/home/HomeMatchday.tsx",
+  "src/components/home/HomeWeek.tsx",
   "src/components/home/HomeBoard.tsx",
+  "src/lib/home-week-board.ts",
   "src/components/home/HomePromo.tsx",
   "src/lib/home-board.ts",
   "src/components/home/WinConfetti.tsx",
@@ -89,29 +90,28 @@ describe("public home v5", () => {
       );
     }
     const home = code("src/components/home/PublicHome.tsx");
-    // Direzione 13/10 09:03 "calendario settimana deve essere sempre" + UD-132 Matchday: the games of the next 7 days.
-    expect(home).toMatch(/<HomeMatchday calendar=\{calendar\}/);
-    const week = code("src/components/home/HomeMatchday.tsx");
-    expect(week).toMatch(
-      /weekMatches\(calendar\.events, calendar\.groups, today, null\)/,
-    );
-    expect(week).toContain('data-testid="home-matchday"');
+    // Direzione 13/10 09:03 "calendario settimana deve essere sempre" + 15/10 21:35 new idea: the home IS the week of
+    // every team, drawn like the Calendario board (VR-025).
+    expect(home).toMatch(/<HomeWeek calendar=\{calendar\}/);
+    const week = code("src/components/home/HomeWeek.tsx");
+    expect(week).toMatch(/weekBoardEvents\(calendar\.events, today\)/);
+    expect(week).toContain('data-testid="home-week"');
     expect(week).toContain("Nessuna gara nei prossimi 7 giorni.");
-    // Opponent crest only from the verified registry: no neutral shield, no invented crest.
-    expect(week).toMatch(/const \{ src, label \} = crestFor\(name\);\s*if \(!src\) return null;/);
+    // Rows are the Calendario rows (opponent crest only from the verified registry, StackedCrests/crestFor).
+    expect(week).toMatch(/<GameRow\b/);
     expect(week).not.toMatch(/OpponentCrest|publicTeamCrest|team-crest/);
-    // Filters are real buttons with aria-pressed.
-    expect(week).toMatch(/<button[\s\S]{0,80}type="button"[\s\S]{0,40}aria-pressed=\{on\}/);
+    // Day strip and filters are real buttons with aria-pressed; no hero art, no mascot.
+    expect(week.match(/aria-pressed=\{on\}/g)?.length).toBe(2);
+    expect(week).not.toMatch(/HeroArt|Sky|SkyJolly|PersonaAvatar/);
   });
 
-  it("VR-009 board order (15/10 07:04, UD-134 09:18): board top, Mondo Colico, week, results; no stories, no partner band", () => {
+  it("home order (15/10 07:04, UD-134 09:18, new idea 21:35): notices, communication, week board, results; no stories, no partner band", () => {
     const home = code("src/components/home/PublicHome.tsx");
     const body = home.slice(home.indexOf("export function PublicHome"));
     const order = [
       "<UrgentNotices",
       "<ClubNoticeCard",
-      "<HomeBoard",
-      "<HomeMatchday",
+      "<HomeWeek",
       "<WeekendResults",
     ];
     const at = order.map((t) => body.indexOf(t));

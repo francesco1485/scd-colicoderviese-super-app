@@ -1,35 +1,28 @@
 /**
- * Top of the public home, rebuilt on Francesco's home board (home-originale.png, 15/10/2026 19:20 "voglio questo,
- * riprodurre questo e basta in tutto"; 19:19 no photo of the pitch):
- *   1. hero: original illustration of the Alto Lario at dusk (HeroArt, no photo), "Questa settimana" with the yellow
- *      brush stroke and the board subtitle (the crest and the wordmark sit in the header right above);
- *   2. four white tiles over the bottom of the hero: Gare, Allenamenti (for members: through the sign-in), Eventi,
- *      Iniziative (lib/home-tiles.ts);
- *   3. "Prossima gara": the club's most important next game of the week (boardRank) from the public calendar, date
- *      block, our official crest VS the verified opponent crest (crestFor; none → no image), place with a pin;
- *   4. two small cards (Dove ci alleniamo, Gioca con noi) and the Iride card (Segreteria AI on WhatsApp, UD-155);
- *   5. "I nostri sponsor": verified partners, a fair daily window (sponsorsOfTheDay), logos in colour on white tiles;
- *   6. "Mondo Colico": a designed card (no photo, no minor) to the club news.
- * Phones: one column. Desktop: the hero across the column, the tiles in a row, then two columns (game + cards left;
- * sponsors, Iride and Mondo Colico right). Data: public calendar only; no score, no invented crest, no minor named.
+ * Shared board cards of the public home (Francesco's boards; since 15/10/2026 21:35 the home itself is HomeWeek, the
+ * week of every team drawn like the Calendario board VR-025):
+ *   - NextMatch: "Prossima gara", the club's most important next game of the week (boardRank) from the public calendar,
+ *     date block, our official crest VS the verified opponent crest (crestFor; none → no image), place with a pin;
+ *   - SmallCard: the two practical cards (Dove ci alleniamo, Gioca con noi, lib/home-tiles.ts);
+ *   - IrideCard: Iride, the Segreteria AI on WhatsApp (UD-155).
+ * The lake hero, the four big tiles, the sponsor panel and "Mondo Colico" are gone with the old idea (no big bars,
+ * 16:09; sponsors only in the fixed strip; no promo cards, UD-152). Data: public calendar only; no invented crest, no
+ * minor named.
  */
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, ChevronRight, Lock, MapPin, MessageCircle, Trophy } from "lucide-react";
+import { ChevronRight, MapPin, MessageCircle, Trophy } from "lucide-react";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { ClubCrestOfficial } from "@/components/SiteChrome";
-import { BrushStroke, HeroArt } from "@/components/home/HeroArt";
+import { BrushStroke } from "@/components/home/HeroArt";
 import { venueShort } from "@/components/home/HomeSections";
-import { KitTexture } from "@/components/scd/kit-texture";
-import { LogoTile, SponsorLogo } from "@/components/scd/Logos";
 import type { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 import { crestFor } from "@/lib/crests";
 import { boardDate, boardRank, nextBoardMatch } from "@/lib/home-board";
 import { categoryShort, matchdayClass } from "@/lib/home-matchday";
 import { weekMatches } from "@/lib/home-today";
-import { bigTiles, smallTiles, type HomeTile, type TileIcon } from "@/lib/home-tiles";
+import { type HomeTile, type TileIcon } from "@/lib/home-tiles";
 import { SEGRETERIA_WHATSAPP } from "@/lib/install-link";
-import { sponsorsOfTheDay } from "@/lib/public-home";
 
 type PublicCalendar = Awaited<ReturnType<typeof getPublicCalendarSnapshot>>;
 
@@ -40,7 +33,7 @@ export const BOARD_CARD =
   "rounded-[18px] bg-white shadow-[0_1px_2px_rgb(11_42_91/0.06),0_10px_26px_-14px_rgb(11_42_91/0.32)]";
 
 /** Minute clock: server time on the first render (no hydration mismatch), then the device clock. */
-function useMinuteClock(serverNow: number): number {
+export function useMinuteClock(serverNow: number): number {
   const [now, setNow] = useState(serverNow);
   useEffect(() => {
     setNow(Date.now());
@@ -137,68 +130,6 @@ function TileGlyph({ icon }: { icon: TileIcon }) {
   }
 }
 
-/* ------------------------------------------------------------------- hero */
-
-function Hero() {
-  return (
-    <section
-      aria-labelledby="home-hero-t"
-      className="relative isolate overflow-hidden bg-[#0b3a8c] text-white lg:-mr-12 2xl:mr-0"
-      data-testid="home-hero"
-    >
-      <HeroArt className="absolute inset-0 -z-10 size-full" />
-      <div className={`${WRAP} pb-[60px] pt-4 sm:pt-5 lg:pb-[84px] lg:pt-8`}>
-        <h2
-          id="home-hero-t"
-          className="m-0 font-uv text-[32px] leading-[0.95] tracking-[0.005em] drop-shadow-[0_3px_14px_rgb(6_26_61/0.45)] min-[400px]:text-[34px] lg:text-[52px]"
-        >
-          Questa settimana
-        </h2>
-        <BrushStroke className="mt-1 block h-[9px] w-[140px] lg:h-[12px] lg:w-[220px]" />
-        <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1">
-          <p className="m-0 max-w-[21rem] text-[15px] font-semibold leading-[1.25] drop-shadow-[0_2px_10px_rgb(6_26_61/0.5)] lg:max-w-none lg:text-[18px]">
-            Sport, crescita e comunità nel cuore dell'Alto Lario.
-          </p>
-          {/* Visitors only (the public home): a small, clear invitation, not a banner (UD-152, handover 15/10 19:55). */}
-          <Link
-            to="/registrati"
-            className="scd-focus inline-flex min-h-11 items-center gap-1 rounded-md text-[14.5px] font-bold text-[#ffd600] underline decoration-[#ffd600]/60 underline-offset-4 hover:decoration-[#ffd600]"
-            data-testid="home-join"
-          >
-            Iscriviti al club
-            <ArrowRight className="size-4" aria-hidden="true" />
-          </Link>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function BigTile({ tile }: { tile: HomeTile }) {
-  return (
-    <li className="min-w-0">
-      <Link
-        to={tile.to as never}
-        search={tile.search as never}
-        {...(tile.hash ? { hash: tile.hash } : {})}
-        aria-label={tile.members ? `${tile.label}: per i soci, entra per vederli` : tile.label}
-        className={`${BOARD_CARD} scd-focus scd-lift relative grid h-full min-h-[92px] place-items-center content-center gap-1.5 px-1 py-3 text-center lg:min-h-[120px] lg:gap-2`}
-        data-tile={tile.id}
-      >
-        <TileGlyph icon={tile.icon} />
-        <span className="text-[13px] font-bold leading-tight text-[#0b1e3a] min-[400px]:text-[13.5px] lg:text-[16px]">
-          {tile.label}
-        </span>
-        {tile.members && (
-          <span className="absolute right-1.5 top-1.5 grid size-5 place-items-center rounded-full bg-[#eef3f9] text-[#4a5d7a]">
-            <Lock className="size-3" aria-hidden="true" />
-          </span>
-        )}
-      </Link>
-    </li>
-  );
-}
-
 /* ------------------------------------------------------------ next match */
 
 /** Section heading of the boards: blue tab label on the left, "Vedi tutti" on the right. */
@@ -223,7 +154,7 @@ function TabHeading({ id, icon, children, to, linkLabel }: { id: string; icon: R
   );
 }
 
-function NextMatch({ calendar, nowMs, today }: { calendar: PublicCalendar; nowMs: number; today: string }) {
+export function NextMatch({ calendar, nowMs, today }: { calendar: PublicCalendar; nowMs: number; today: string }) {
   const week = useMemo(() => weekMatches(calendar.events, calendar.groups, today, null), [calendar, today]);
   const m = nextBoardMatch(week, nowMs, (e) => boardRank(e, (g) => matchdayClass(g) === "agonistica"));
   const date = m ? boardDate(m.date) : null;
@@ -325,7 +256,7 @@ const SMALL_TONE: Record<string, string> = {
   gioca: "bg-[#ffd600]",
 };
 
-function SmallCard({ tile }: { tile: HomeTile }) {
+export function SmallCard({ tile }: { tile: HomeTile }) {
   return (
     <Link
       to={tile.to as never}
@@ -346,7 +277,7 @@ function SmallCard({ tile }: { tile: HomeTile }) {
 }
 
 /** Iride, the AI Segreteria on WhatsApp (UD-155): same facts as the /installa card, no avatar until the official file lands. */
-function IrideCard() {
+export function IrideCard() {
   return (
     <section
       aria-labelledby="home-iride-t"
@@ -374,112 +305,5 @@ function IrideCard() {
         Scrivi su WhatsApp
       </a>
     </section>
-  );
-}
-
-function SponsorPanel({ today }: { today: string }) {
-  const picks = useMemo(() => sponsorsOfTheDay(today, 6), [today]);
-  if (picks.length === 0) return null;
-  return (
-    <section
-      aria-labelledby="home-sponsor-t"
-      className="rounded-[18px] bg-[linear-gradient(120deg,#1d5fd0_0%,#1149a8_50%,#0b3a8c_100%)] p-3 pb-3.5 shadow-[0_12px_28px_-14px_rgb(11_42_91/0.55)] lg:p-4"
-      data-testid="home-sponsors"
-    >
-      <div className="flex items-center justify-between gap-2 px-1 pb-2">
-        <h2 id="home-sponsor-t" className="m-0 text-[18px] font-extrabold leading-none text-white lg:text-[20px]">
-          I nostri sponsor
-        </h2>
-        <Link
-          to="/sponsor"
-          className="scd-focus inline-flex min-h-11 items-center gap-0.5 rounded-md text-[14px] font-bold text-white hover:underline"
-        >
-          Vedi tutti
-          <ChevronRight className="size-4" aria-hidden="true" />
-        </Link>
-      </div>
-      <ul className="m-0 grid list-none grid-cols-3 gap-2 p-0">
-        {picks.map((s) => (
-          <li key={s.slug}>
-            <LogoTile className="h-[60px] w-full rounded-[12px] border-0 px-2 lg:h-[72px]">
-              <SponsorLogo sponsor={s} box={{ w: 92, h: 38 }} />
-            </LogoTile>
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-}
-
-/** "Mondo Colico" of the board, with a designed graphic instead of the photo of the boys (no faces, no pitch photo). */
-function MondoColico() {
-  return (
-    <section aria-labelledby="home-mondo-t" data-testid="home-mondo">
-      <h2 id="home-mondo-t" className="m-0 px-1 pb-2 text-[19px] font-extrabold leading-none text-[#0b1e3a] lg:text-[21px]">
-        Mondo Colico
-      </h2>
-      <Link
-        to="/comunicazioni"
-        className={`${BOARD_CARD} scd-focus scd-lift grid grid-cols-[minmax(0,46%)_minmax(0,1fr)] overflow-hidden`}
-        aria-label="Mondo Colico: notizie, storie, eventi e territorio. Scopri"
-      >
-        <span aria-hidden="true" className="relative grid min-h-[124px] place-items-center overflow-hidden bg-[radial-gradient(120%_120%_at_80%_10%,#1d5fd0_0%,#0b2f6b_65%)] lg:min-h-[150px]">
-          <KitTexture motif="mountains-lake" overlay />
-          <span className="relative grid justify-items-center gap-1">
-            <ClubCrestOfficial size={58} className="drop-shadow-[0_6px_14px_rgb(0_0_0/0.4)]" />
-            <span className="font-uv text-[15px] uppercase leading-none tracking-[0.06em] text-[#ffd600]">Colico · Dervio</span>
-          </span>
-        </span>
-        <span className="flex min-w-0 flex-col gap-1 p-3.5 lg:p-4">
-          <span className="text-[16px] font-extrabold leading-tight text-[#0b1e3a]">Mondo Colico</span>
-          <span className="text-[13px] leading-snug text-[#4a5d7a]">Notizie, storie, eventi e territorio, sempre con noi.</span>
-          <span className="mt-auto inline-flex min-h-10 w-fit items-center gap-1.5 rounded-[10px] bg-[#1556c4] px-4 text-[14px] font-bold text-white">
-            Scopri
-            <ArrowRight className="size-4" aria-hidden="true" />
-          </span>
-        </span>
-      </Link>
-    </section>
-  );
-}
-
-/* ------------------------------------------------------------------ board */
-
-export function HomeBoard({
-  calendar,
-  nowMs: serverNow,
-  today,
-}: {
-  calendar: PublicCalendar;
-  nowMs: number;
-  today: string;
-}) {
-  const nowMs = useMinuteClock(serverNow);
-  return (
-    <div data-testid="home-board">
-      <Hero />
-      <div className={`${WRAP} relative z-[1] -mt-[58px] lg:-mt-[80px]`}>
-        <ul className="m-0 grid list-none grid-cols-4 gap-2 p-0 lg:gap-4" aria-label="Sezioni" data-testid="home-tiles">
-          {bigTiles().map((t) => (
-            <BigTile key={t.id} tile={t} />
-          ))}
-        </ul>
-      </div>
-      <div className={`${WRAP} grid gap-4 pt-5 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start lg:gap-6 lg:pt-8`}>
-        <div className="grid min-w-0 gap-4 lg:gap-5">
-          <NextMatch calendar={calendar} nowMs={nowMs} today={today} />
-          <div className="grid grid-cols-2 gap-2.5 lg:gap-4">
-            {smallTiles().map((t) => (
-              <SmallCard key={t.id} tile={t} />
-            ))}
-          </div>
-        </div>
-        <div className="grid min-w-0 gap-4 lg:gap-5">
-          <SponsorPanel today={today} />
-          <IrideCard />
-          <MondoColico />
-        </div>
-      </div>
-    </div>
   );
 }
