@@ -203,13 +203,13 @@ function Top11Page() {
         {!data.signedIn ? (
           <section className="rounded-[20px] bg-white p-4 text-center shadow-[0_2px_10px_rgb(11_42_91/0.08)]">
             <p className="m-0 text-[15px] text-[#3e5272]">
-              Per votare serve l'account: iscriviti con un tocco.
+              Votano i tesserati del club: entra con il tuo account per dare i tuoi 3 voti.
             </p>
             <Link
-              to="/registrati"
+              to="/accedi"
               className="scd-focus mt-3 inline-flex h-11 items-center rounded-[12px] bg-[var(--uv-gold)] px-5 font-bold text-[#0b1e3a]"
             >
-              Iscriviti
+              Entra
             </Link>
           </section>
         ) : (

@@ -12,14 +12,10 @@ import {
   type HomeScope,
 } from "@/lib/home-scope.functions";
 import { romeParts } from "@/lib/home-week";
-import { getHomeNews, type HomeNews } from "@/lib/news.functions";
 import { getPublicSocial } from "@/lib/social.functions";
 import { EMPTY_WORLDS } from "@/lib/vetrina";
 import { getVetrina, type VetrinaDay } from "@/lib/vetrina.functions";
 
-/** Longest wait for the news sources on a cold cache: the home never hangs on Google News or the club site. */
-const NEWS_BUDGET_MS = 1_500;
-const NO_NEWS: HomeNews = { items: [], pressCount: 0 };
 /** Longest wait for the R20 feed (alerts and weekend results) on the public home. */
 const FEED_BUDGET_MS = 1_500;
 
@@ -61,8 +57,6 @@ export const Route = createFileRoute("/")({
     const today =
       romeParts(new Date(serverNow).toISOString())?.date ??
       new Date(serverNow).toISOString().slice(0, 10);
-    // Started in parallel with the session and calendar reads (as before): it never delays the home beyond the budget.
-    const newsP = withBudget(getHomeNews(), NEWS_BUDGET_MS, NO_NEWS);
     const [social, calendar] = await Promise.all([
       getPublicSocial(),
       getPublicCalendarSnapshot(),
@@ -75,8 +69,6 @@ export const Route = createFileRoute("/")({
             .catch(() => null)
         : null;
     if (!social.signedIn && !previewScope) {
-      // Mixed news highlight (press of every age group, club site, club feed; negative headlines filtered, UD-110).
-      // The full press list lives on /rassegna-stampa; the home never waits more than NEWS_BUDGET_MS for it.
       const feedP = withBudget<PublicFeed | null>(
         getPublicFeed(),
         FEED_BUDGET_MS,
@@ -87,14 +79,12 @@ export const Route = createFileRoute("/")({
       );
       // Board home (VR-009, 15/10): "Mondo Colico" is the vetrina of the day; news are not shown (no waiting for them).
       // getVetrina also gives the server Rome day (QA day honoured outside production) that seeds the LED wall.
-      void newsP.catch(() => NO_NEWS);
       const vetrina: VetrinaDay = await getVetrina({
         data: { pressRecent: false },
       }).catch((): VetrinaDay => ({ today, worlds: EMPTY_WORLDS }));
       return {
         kind: "public" as const,
         calendar,
-        news: [],
         vetrina: vetrina.worlds,
         feed: await feedP,
         notice: await noticeP,
@@ -166,7 +156,6 @@ function Home() {
   return (
     <PublicHome
       calendar={data.calendar}
-      news={data.news}
       vetrina={data.vetrina}
       feed={data.feed}
       notice={data.notice}

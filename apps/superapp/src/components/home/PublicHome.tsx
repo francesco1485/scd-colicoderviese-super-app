@@ -10,13 +10,7 @@
  * Real assets only (public/media); no minor is named.
  */
 import { Link } from "@tanstack/react-router";
-import {
-  ArrowRight,
-  ArrowUpRight,
-  ChevronRight,
-  Lock,
-  Newspaper,
-} from "lucide-react";
+import { ArrowRight, ChevronRight, Lock } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { KitTexture } from "@/components/scd/kit-texture";
@@ -24,8 +18,6 @@ import type { ClubNotice } from "@/lib/club-notice";
 import type { PublicFeed } from "@/lib/club.types";
 import { weekendResults } from "@/lib/home-results";
 import { urgentNotices } from "@/lib/home-today";
-import { NEWS_SOURCE_LABEL, type NewsItem } from "@/lib/news-mix";
-import { timeAgo } from "@/lib/social";
 import {
   PUBLIC_WORLDS,
   WORLD_HINT,
@@ -331,122 +323,6 @@ export function Vetrina({
   );
 }
 
-/* ---------------------------------------------------------------- news */
-
-/**
- * Le notizie (UD-110, 19:03): a short mixed feed — newspapers on every age group, recent articles of the club website
- * and club news — each item opening the original. Negative headlines are filtered on the server (they stay on
- * /rassegna-stampa); with nothing recent the block says so and links to the press review.
- */
-export function HomeNewsBlock({
-  items,
-  nowMs,
-}: {
-  items: readonly NewsItem[];
-  nowMs: number;
-}) {
-  return (
-    <section
-      aria-labelledby="notizie-t"
-      className={`${WRAP} pt-8 lg:pt-12`}
-      data-testid="home-news"
-    >
-      <div className="flex items-end justify-between gap-3 pb-3">
-        <h2
-          id="notizie-t"
-          className="scd-reveal m-0 font-uv text-[24px] uppercase leading-none text-[#0b2a5b] sm:text-[26px] lg:text-[30px]"
-        >
-          Le notizie
-        </h2>
-        <Link
-          to="/rassegna-stampa"
-          className="scd-focus inline-flex min-h-11 shrink-0 items-center gap-0.5 rounded-md text-[14px] font-semibold text-[#1556c4]"
-        >
-          Tutte<span className="max-sm:hidden">&nbsp;le notizie</span>
-          <ChevronRight className="size-4" aria-hidden="true" />
-        </Link>
-      </div>
-      <div className="overflow-hidden rounded-[16px] bg-white shadow-[0_1px_2px_rgb(11_42_91/0.06),0_8px_24px_-12px_rgb(11_42_91/0.25)]">
-        {items.length > 0 ? (
-          <ul className="m-0 grid list-none divide-y divide-[#e6edf6] p-0 lg:grid-cols-2 lg:divide-y-0 lg:[&>li]:border-b lg:[&>li]:border-[#e6edf6]">
-            {items.map((n) => {
-              const inner = (
-                <>
-                  <span className="grid size-9 shrink-0 place-items-center rounded-[10px] bg-[#e6eefa] text-[#1556c4]">
-                    <Newspaper className="size-[18px]" aria-hidden="true" />
-                  </span>
-                  <span className="grid min-w-0 flex-1 gap-0.5">
-                    <span className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[12px] font-semibold uppercase tracking-[0.05em] text-[#5a6b85]">
-                      <span>{NEWS_SOURCE_LABEL[n.sourceKind]}</span>
-                      <span aria-hidden="true">·</span>
-                      <span className="normal-case tracking-normal">
-                        {n.source}
-                      </span>
-                      {n.publishedAt && (
-                        <span className="normal-case tracking-normal">
-                          · {timeAgo(n.publishedAt, nowMs)}
-                        </span>
-                      )}
-                      {n.tag && (
-                        <span className="rounded-full bg-[#ffd600] px-1.5 py-[2px] text-[10px] font-extrabold leading-none text-[#0b1e3a]">
-                          {n.tag}
-                        </span>
-                      )}
-                    </span>
-                    <span className="line-clamp-2 text-[15px] font-semibold leading-snug text-[#0b1e3a] group-hover:underline">
-                      {n.title}
-                    </span>
-                  </span>
-                  <ArrowUpRight
-                    className="mt-1 size-4 shrink-0 text-[#9fb0c8]"
-                    aria-hidden="true"
-                  />
-                </>
-              );
-              return (
-                <li key={n.id}>
-                  {n.external ? (
-                    <a
-                      href={n.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="scd-focus group flex items-start gap-3 px-4 py-3.5 hover:bg-[#f4f7fb]"
-                    >
-                      {inner}
-                      <span className="sr-only">
-                        (apre il sito di {n.source})
-                      </span>
-                    </a>
-                  ) : (
-                    <Link
-                      to={n.url as never}
-                      className="scd-focus group flex items-start gap-3 px-4 py-3.5 hover:bg-[#f4f7fb]"
-                    >
-                      {inner}
-                    </Link>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        ) : (
-          <p
-            className="m-0 flex items-center gap-3 px-4 py-4 text-[14.5px] text-[#4a5d7a]"
-            data-testid="home-news-empty"
-          >
-            <Newspaper
-              className="size-5 shrink-0 text-[#1556c4]"
-              aria-hidden="true"
-            />
-            Nessuna notizia recente in questo momento: la rassegna si aggiorna
-            da sola.
-          </p>
-        )}
-      </div>
-    </section>
-  );
-}
-
 /* ---------------------------------------------------------------- page */
 
 export function PublicHome({
@@ -458,8 +334,6 @@ export function PublicHome({
   today,
 }: {
   calendar: PublicCalendar;
-  /** Mixed news highlight of the day (getHomeNews); accepted for the route contract, not rendered since UD-132. */
-  news?: readonly NewsItem[];
   /** Vetrina picks of the day (getVetrina): "Mondo Colico" of the board (VR-009), back on the home since 15/10. */
   vetrina?: Readonly<Record<VetrinaWorld, readonly VetrinaSlot[]>>;
   /** R20 public feed (alerts and weekend results); null when R20 did not answer in time. */

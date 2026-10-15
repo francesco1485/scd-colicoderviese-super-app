@@ -444,7 +444,8 @@ export const VETRINA_SLOTS: readonly VetrinaSlot[] = [
     cta: "Vota",
     visual: { kind: "type", big: "TOP", small: "Top 11" },
     audience: "public",
-    audiences: ["ragazzi", "famiglie", "tifosi", "soci"],
+    // Only members vote: offered in the members' vetrina, not to visitors who could not vote (audit 15/10, item 5).
+    audiences: ["soci"],
     weight: 2,
     weekdays: [0],
   },

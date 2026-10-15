@@ -112,6 +112,13 @@ describe("vetrina catalogue", () => {
     }
   });
 
+  it("an action only members can do (voting the Top 11) is offered only in the members' world (PC audit 15/10, item 5)", () => {
+    const top11 = CATALOGUE.find((s) => s.id === "top11");
+    expect(top11?.audiences).toEqual(["soci"]);
+    for (const w of PUBLIC_WORLDS) expect(worldAccepts(top11!, w), w).toBe(false);
+    expect(worldAccepts(top11!, "soci")).toBe(true);
+  });
+
   it("anchors exist on the destination pages", () => {
     const pages: Record<string, string> = {
       "/eventi/christmas-lario-cup": read(

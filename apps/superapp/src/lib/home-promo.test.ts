@@ -18,10 +18,10 @@ const ev = (over: Partial<ClubEvent> = {}): ClubEvent => ({
 });
 
 describe("promo carousel", () => {
-  it("welcome first, then upcoming events, sign-up and cards; past events are left out", () => {
+  it("welcome first, then upcoming events and the sign-up; past events are left out", () => {
     const ids = promoSlides("2026-10-15", [ev(), ev({ id: "old", date: "2026-09-01" })]).map((s) => s.id);
-    expect(ids).toEqual(["benvenuto", "evento-clc", "iscrizioni", "carte"]);
-    expect(promoSlides("2026-10-15", []).map((s) => s.id)).toEqual(["benvenuto", "iscrizioni", "carte"]);
+    expect(ids).toEqual(["benvenuto", "evento-clc", "iscrizioni"]);
+    expect(promoSlides("2026-10-15", []).map((s) => s.id)).toEqual(["benvenuto", "iscrizioni"]);
   });
   it("every slide has one main button to a real page and no money or betting words", () => {
     for (const s of promoSlides("2026-10-15", [ev()])) {
@@ -73,6 +73,11 @@ describe("guest home never links to members-only pages", () => {
   const membersOnly = (to: string) => MEMBERS_ONLY_PREFIXES.some((p) => to === p || to.startsWith(`${p}/`));
   it("chips", () => {
     for (const c of quickChips(true)) expect(membersOnly(c.to), c.to).toBe(false);
+  });
+  it("banner slides (the cards of the squad opened the access screen: PC audit 15/10, item 5)", () => {
+    for (const sl of promoSlides("2026-10-15", [ev()]))
+      for (const to of [sl.cta.to, ...(sl.secondary ? [sl.secondary.to] : [])])
+        if (to !== "/accedi") expect(membersOnly(to), to).toBe(false);
   });
   it("board tiles", () => {
     const board = readFileSync(resolve(__dirname, "../components/home/HomeBoard.tsx"), "utf8")

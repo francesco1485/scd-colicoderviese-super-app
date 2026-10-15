@@ -78,15 +78,6 @@ export function iscrizioniSlide(formsLive: boolean = PUBLIC_FORMS_LIVE): PromoSl
       };
 }
 
-const CARTE: PromoSlide = {
-  id: "carte",
-  tag: "Nuovo",
-  title: "Le carte della rosa",
-  text: "Giocatori della Prima Squadra e staff di ogni annata: tocca una carta e girala. Per i soci.",
-  cta: { label: "Apri le carte", to: "/squadre/carte" },
-  art: { kind: "stripes", big: "P D C A", small: "Carte della rosa" },
-};
-
 export function eventSlide(e: ClubEvent): PromoSlide {
   return {
     id: `evento-${e.id}`,
@@ -98,7 +89,11 @@ export function eventSlide(e: ClubEvent): PromoSlide {
   };
 }
 
-/** Slides of a Rome day: welcome first, then the upcoming published events, the season sign-up, the new cards. */
+/**
+ * Slides of a Rome day: welcome first, then the upcoming published events, then the season sign-up. The banner is on the
+ * visitors' home only, so no slide points to a members-only page (the cards of the squad went to the access screen:
+ * audit of the PC chat 15/10/2026, item 5).
+ */
 export function promoSlides(
   day: string,
   events: readonly ClubEvent[],
@@ -106,7 +101,7 @@ export function promoSlides(
   creditsLive: boolean = WELCOME_CREDITS_LIVE,
 ): PromoSlide[] {
   const upcoming = events.filter((e) => !e.date || e.date >= day).map(eventSlide);
-  return [welcomeSlide(creditsLive), ...upcoming, iscrizioniSlide(formsLive), CARTE];
+  return [welcomeSlide(creditsLive), ...upcoming, iscrizioniSlide(formsLive)];
 }
 
 /** Next index of the carousel, wrapping around; 0 for an empty list. */

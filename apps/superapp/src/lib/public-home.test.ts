@@ -43,7 +43,6 @@ function routePaths(): Set<string> {
 const PUBLIC_HOME_FILES = [
   "src/routes/index.tsx",
   "src/components/home/PublicHome.tsx",
-  "src/components/home/Carousel.tsx",
   "src/components/home/HomePractical.tsx",
   "src/components/home/HomeMatchday.tsx",
   "src/components/home/HomeBoard.tsx",
@@ -134,7 +133,9 @@ describe("public home v5", () => {
     ])
       expect(body, gone).not.toContain(gone);
     expect(home).toMatch(/export function Vetrina\(/);
-    expect(home).toMatch(/export function HomeNewsBlock\(/);
+    // Dead code removed (PC audit 15/10, item 8): no news block, no carousel, no unused news fetch on the home.
+    expect(home).not.toMatch(/HomeNewsBlock|NewsItem/);
+    expect(code("src/routes/index.tsx")).not.toMatch(/getHomeNews/);
     // The old 11-link quick strip and the big sponsor zone are gone.
     expect(home).not.toMatch(
       /QuickStrip|QUICK_LINKS|SponsorZone|partner-news-empty/,
@@ -361,10 +362,9 @@ describe("public home v5", () => {
     );
   });
 
-  it("UD-110: the press list is off the home (only the vetrina slot and the filtered news block link to /rassegna-stampa)", () => {
+  it("UD-110: the press list is off the home (reached from the menu and the vetrina slot, never listed on the home)", () => {
     const home = code("src/components/home/PublicHome.tsx");
     expect(home).not.toMatch(/PressItem|press\.slice/);
-    expect(home).toMatch(/to="\/rassegna-stampa"/);
     expect(publicHomeRoutes()).not.toContain("/rassegna");
   });
 });

@@ -198,22 +198,10 @@ export function ClubNoticeCard({ notice }: { notice: ClubNotice | null }) {
 
 /* -------------------------------------------------------- today & week */
 
-/** "Oggi", "Domani" or "sab 17 ott". */
-function shortDay(date: string, today: string): string {
-  const l = matchdayLabel(date, today);
-  if (l === "Oggi" || l === "Domani") return l;
-  return new Intl.DateTimeFormat("it-IT", {
-    timeZone: "UTC",
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-  }).format(new Date(`${date}T12:00:00Z`));
-}
-
 const timeOf = (e: TodayEntry) =>
   e.time ? (e.end ? `${e.time}–${e.end}` : e.time) : "";
 
-function EntryRow({ e, dateLabel }: { e: TodayEntry; dateLabel?: string }) {
+function EntryRow({ e }: { e: TodayEntry }) {
   const changed = e.changes.length > 0;
   const game = e.kind === "gara";
   const what = game
@@ -230,11 +218,6 @@ function EntryRow({ e, dateLabel }: { e: TodayEntry; dateLabel?: string }) {
         className={`absolute inset-y-2 left-1.5 w-[4px] rounded-full ${changed ? "bg-[#ffd600]" : game ? "bg-[#1556c4]" : "bg-[#9cc3ea]"}`}
       />
       <span className="flex w-[72px] shrink-0 flex-col gap-1">
-        {dateLabel && (
-          <span className="text-[11px] font-bold uppercase leading-tight tracking-[0.04em] text-[#5a6b85]">
-            {dateLabel}
-          </span>
-        )}
         <span className="font-title text-[22px] font-black tabular-nums leading-none text-[#0b2a5b]">
           {e.time || "—"}
         </span>
@@ -445,90 +428,6 @@ export function MyWeek({
           {note}
         </p>
       )}
-    </section>
-  );
-}
-
-/**
- * Signed out: today's games of every team, then the next home game of each team, beside the matchday card.
- * Teams and trainings stay inside (UD-100): only fixtures.
- */
-export function PublicToday({
-  todayGames,
-  nextHome,
-  today,
-  lead,
-}: {
-  todayGames: readonly TodayEntry[];
-  nextHome: readonly TodayEntry[];
-  today: string;
-  lead?: ReactNode;
-}) {
-  const list = (
-    <div className={`${CARD} min-w-0 overflow-hidden`}>
-      <div data-testid="home-today-now">
-        <h3 className="m-0 px-4 pb-1 pt-3 text-[12px] font-extrabold uppercase tracking-[0.12em] text-[#1556c4]">
-          Oggi si gioca
-        </h3>
-        {todayGames.length ? (
-          <ul className="m-0 list-none p-0">
-            {todayGames.map((e) => (
-              <EntryRow key={e.id} e={e} />
-            ))}
-          </ul>
-        ) : (
-          <Empty>Oggi nessuna gara in calendario.</Empty>
-        )}
-      </div>
-      <div className="border-t border-[#dbe5f1]" data-testid="home-next-home">
-        <h3 className="m-0 px-4 pb-1 pt-3 text-[12px] font-extrabold uppercase tracking-[0.12em] text-[#1556c4]">
-          Prossima gara in casa di ogni squadra
-        </h3>
-        {nextHome.length ? (
-          <ul className="m-0 list-none p-0">
-            {nextHome.map((e) => (
-              <EntryRow key={e.id} e={e} dateLabel={shortDay(e.date, today)} />
-            ))}
-          </ul>
-        ) : (
-          <Empty>Nessuna gara in casa in calendario per ora.</Empty>
-        )}
-      </div>
-    </div>
-  );
-  return (
-    <section
-      aria-labelledby="oggi-t"
-      className={`${WRAP} pt-5 lg:pt-8`}
-      data-testid="home-today"
-      data-scope="public"
-    >
-      <Title
-        id="oggi-t"
-        kicker="Gare di tutte le squadre"
-        more={
-          <MoreLink to="/calendario" search={{ vista: "settimana" }}>
-            Tutta la settimana
-          </MoreLink>
-        }
-      >
-        Oggi e questa settimana
-      </Title>
-      {lead ? (
-        <div className="grid gap-3 lg:grid-cols-[minmax(0,400px)_minmax(0,1fr)] lg:items-start lg:gap-5">
-          <div className="lg:sticky lg:top-[calc(var(--pub-header-h,64px)+16px)]">
-            {lead}
-          </div>
-          {list}
-        </div>
-      ) : (
-        list
-      )}
-      <p className="m-0 px-1 pt-2 text-[12.5px] leading-snug text-[#5a6b85]">
-        Dal Calendario SCD. Gli orari segnati "da confermare" non sono ancora
-        confermati dal club; allenamenti e dettagli delle squadre dopo
-        l'accesso.
-      </p>
     </section>
   );
 }

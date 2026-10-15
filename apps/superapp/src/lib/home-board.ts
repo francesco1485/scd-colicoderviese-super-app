@@ -101,19 +101,6 @@ export function kickoffMs(e: Pick<TodayEntry, "date" | "time">): number | null {
   return guess - (rome.getTime() - utc.getTime());
 }
 
-/** The next home game of the week with a known time still to start. */
-export function nextHomeKickoff(
-  entries: readonly TodayEntry[],
-  nowMs: number,
-): { entry: TodayEntry; startMs: number } | null {
-  for (const e of entries) {
-    if (e.kind !== "gara" || e.homeAway !== "CASA") continue;
-    const start = kickoffMs(e);
-    if (start !== null && start > nowMs) return { entry: e, startMs: start };
-  }
-  return null;
-}
-
 /** Remaining ms → days and zero-padded hh:mm:ss (never negative). */
 export function countdownParts(ms: number): {
   days: number;

@@ -654,3 +654,9 @@ Da decidere (Direzione): applicazione di r110 dopo DPIA e testo di presa visione
 ## 15/10/2026 · Storia calciatori FIGC (chat PC, ramo feat/pc-figc-storia)
 
 - **Storia calciatori FIGC**: pagina `/segreteria/storia` riservata a Direzione/Segreteria (chi resta, chi torna, chi arriva, chi non è tornato, stagione per stagione); importazione dal file esportato dal portale FIGC/LND con il segnalibro della Segreteria (solo anno di nascita, mai codice fiscale; file con data di nascita completa rifiutato); migrazione r131 in attesa di "applica r131". Motori: PERSONE (quota rientri, lista recupero per anno) e TEMPO (minuti di segreteria per aggiornamento). Direttiva UD-150.
+
+## 15/10/2026 13:45 · Chat cloud: punti dell'audit della chat PC (5, 8, 9)
+
+- **Porte chiuse (punto 5)**: tolta dal banner della home dei visitori la diapositiva "Le carte della rosa" (etichetta "Nuovo", portava alla schermata d'accesso); la scheda "Top 11 della settimana — Vota" esce dalla vetrina pubblica e resta in quella dei soci, che possono votare; su /top11 il visitatore legge "Votano i tesserati del club: entra con il tuo account" con pulsante "Entra" (prima "iscriviti con un tocco"). Guardie nei test: nessuna diapositiva del banner verso pagine riservate; la Top 11 solo nel mondo "soci".
+- **Codice morto (punto 8)**: rimossi `Carousel.tsx`, `PublicToday`, `HomeNewsBlock`, `nextHomeKickoff`; la home non scarica più `getHomeNews()` per poi scartarlo (né per i visitatori né per i soci). Nessun cambiamento visibile oltre al punto 5.
+- **Processo (punto 9)**: lavoro su ramo `feat/cloud-audit-cleanup`, `test:bundle` (privacy dei ragazzi nel codice del telefono) eseguito dopo la build: 11/11.
