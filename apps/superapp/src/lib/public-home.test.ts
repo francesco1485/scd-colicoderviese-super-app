@@ -48,6 +48,8 @@ const PUBLIC_HOME_FILES = [
   "src/components/home/HomeMatchday.tsx",
   "src/components/home/HomeBoard.tsx",
   "src/lib/home-board.ts",
+  "src/components/home/HomeStories.tsx",
+  "src/lib/home-stories.ts",
   "src/lib/public-home.ts",
 ] as const;
 

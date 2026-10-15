@@ -565,6 +565,9 @@ Backlog cloud B3 (prestazioni e prima schermata). Motore: PERSONE (la home si ap
 - Logica pura in `lib/home-board.ts` con test. Allenamenti resta dietro l'accesso: la pagina contiene staff, pulmini e figli; una vista pubblica solo squadre/orari è il prossimo blocco.
 - Revisione: sicurezza PASS (la vetrina pubblica contiene solo i cinque mondi pubblici, nessun dato di soci o minori, nessuna iniziativa interna). Codice: BLOCK sul contrasto del testo bianco sulla foto, corretto (scrim più scuro; contrasto misurato ≥ 7,9:1 a 390 e 1440 px); card evento letta da `clubEventsOn` (sparisce dopo l'evento); titoli distinti ("Tutte le gare della settimana"); vetrina pubblica intitolata "Mondo Colico" come nella tavola.
 - Sky grande nell'hero: la tavola VR-009 del DG mette la mascotte nella testata, quindi supera la vecchia regola UD-110 "Sky solo nel mondo bambini".
+- 06:46 Francesco: no allo scoiattolo Sky in testata, "poco wow, poco vivo". Tolto Sky; hero con il lago in lento movimento, stemma ufficiale e conto alla rovescia live (secondi) alla prossima gara in casa; nuove storie "Guarda cosa succede a Colico" (Lario Cup, spot LED dei partner del giorno, il centro, il club) con visore a schermo intero come i social. Niente foto aerea del centro (UD-100).
+- 06:51 Francesco: crediti dell'autore "non visibili così ma molto riservati": nel footer resta "© anno · Tutti i diritti riservati · Crediti", il testo completo si apre solo toccando "Crediti".
+
 
 ## 15/10/2026 — chat PC: pagine interne dietro l'accesso
 
