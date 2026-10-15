@@ -8,6 +8,11 @@ wrong it keeps the last good copy or the bundled one (`src/data/calendario-snaps
 This file is the source of truth for the task prompt below: change the prompt here, get the usual two reviews, then
 update the scheduled task with the same text.
 
+Outside the task, nobody writes `data/calendar-public` by hand without a scd-sicurezza PASS on the exact file first: it
+is the channel the live site reads first. The task is switched on only after the GitHub ruleset on main,
+staging/superapp and data/calendar-public (no deletion, no force-push) exists and after the converter on
+staging/superapp produces the approved copy.
+
 ## Prompt (as configured in the scheduled task)
 
 ```
@@ -42,7 +47,8 @@ PROCEDURE
 6. Checks before publishing, all mandatory: valid JSON; schema "scd-calendar-public-v3"; audience
    "PUBLIC_READ_ONLY_SNAPSHOT"; source_file_id 1eXS-kY5PCHFg4CXiAErNAKtIVEMIKgWs; source_modified_at not older than
    the current file and not in the future (more than 10 minutes ahead of now); events count between 1 and 1000 and not
-   below 70% of the current file's count; size under 600 KB. The app applies the same rules (validateMirror) and
+   below 70% of the current file's count; size under 600 KB; if the master did not change (same modifiedTime) the
+   new copy must not have fewer games than the current file (a converter regression, not a calendar change). The app applies the same rules (validateMirror) and
    would refuse a copy that fails them.
 7. Copy calendar-public.json over data/calendar-public.json. If `git -C data status --porcelain` prints nothing, the
    copy is already identical: report "Calendario invariato (master <modifiedTime>)" and stop. Otherwise it must print
