@@ -53,7 +53,7 @@ const DOORS: readonly Door[] = [
   {
     to: "/top11",
     title: "Top 11 della settimana",
-    text: "Votano i tesserati: tre voti a testa ai giocatori delle squadre agonistiche. Esce il lunedì.",
+    text: "Con un account del club: tre voti a testa ai giocatori delle squadre agonistiche. Esce il lunedì.",
     icon: <Trophy className="size-7" aria-hidden="true" />,
     bg: "#0b2a5b",
     fg: "#ffffff",

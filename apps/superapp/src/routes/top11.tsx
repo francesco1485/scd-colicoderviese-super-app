@@ -12,7 +12,7 @@ import {
 } from "@/lib/social.functions";
 
 /**
- * Top 11 della settimana (UD-094): ogni tesserato dà 3 voti ai giocatori delle squadre agonistiche. I conteggi della
+ * Top 11 della settimana (UD-094): ogni account del club dà 3 voti ai giocatori delle squadre agonistiche (Francesco 15/10/2026: voto aperto a ogni account registrato, non solo ai tesserati). I conteggi della
  * settimana in corso restano chiusi; la Top 11 esce il lunedì. Minorenni solo con il consenso registrato, e solo con
  * nome e iniziale; attività di base mai (niente classifiche individuali). Solo punti e onore: nessun premio in denaro.
  */
@@ -24,7 +24,7 @@ export const Route = createFileRoute("/top11")({
       {
         name: "description",
         content:
-          "La Top 11 della settimana votata dai tesserati della S.C.D. ColicoDerviese: Prima Squadra, Juniores, U16 e U15 insieme.",
+          "La Top 11 della settimana votata da chi ha un account del club S.C.D. ColicoDerviese: Prima Squadra, Juniores, U16 e U15 insieme.",
       },
     ],
   }),
@@ -113,7 +113,7 @@ function Top11Page() {
             <span className="text-[var(--uv-gold)]">DELLA SETTIMANA</span>
           </h1>
           <p className="mb-0 mt-2 text-[15px] text-[#dce8f7]">
-            Votano i tesserati: 3 voti a testa, tutte le squadre agonistiche
+            Vota chi ha un account del club: 3 voti a testa, tutte le squadre agonistiche
             insieme. La Top 11 esce il lunedì.
           </p>
         </div>
@@ -203,7 +203,7 @@ function Top11Page() {
         {!data.signedIn ? (
           <section className="rounded-[20px] bg-white p-4 text-center shadow-[0_2px_10px_rgb(11_42_91/0.08)]">
             <p className="m-0 text-[15px] text-[#3e5272]">
-              Votano i tesserati del club: entra con il tuo account per dare i tuoi 3 voti.
+              Per votare serve un account del club: entra per dare i tuoi 3 voti.
             </p>
             <Link
               to="/accedi"

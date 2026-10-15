@@ -3312,6 +3312,49 @@
       "sourceDate": "2026-10-15",
       "sourceStatus": "EXPLICIT_USER_COMMAND",
       "authority": "FRANCESCO_SCD",
+      "id": "UD-137",
+      "name": "TOP11_VOTE_OPEN_TO_ANY_CLUB_ACCOUNT",
+      "sourceQuoteFragments": [
+        "Lascia votare tutti"
+      ],
+      "context": "Francesco 15/10/2026 ~14:20 (chat cloud), answer to the question whether the Top 11 vote should be restricted to tesserati with a migration (today scd_cast_week_vote accepts any active membership, USER_BASE included). Option chosen: 'Lascia votare tutti' (only the copy changes to 'serve un account del club').",
+      "normalizedCommand": {
+        "rule": "The Top 11 vote stays open to every registered club account (any active membership); no migration. Public copy says an account of the club is needed, never 'votano i tesserati'. Amends UD-094 ('voted by members').",
+        "status": "DONE_PENDING_PUBLISH",
+        "delivered": [
+          "apps/superapp/src/routes/top11.tsx",
+          "apps/superapp/src/routes/community.tsx"
+        ]
+      }
+    },
+    {
+      "sourceDate": "2026-10-15",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-138",
+      "name": "PUBLIC_CALENDAR_HOURLY_COPY_IN_REPOSITORY",
+      "sourceQuoteFragments": [
+        "Sì, subito e ogni ora",
+        "Copia nel repository",
+        "Sì, aggiungi la regola"
+      ],
+      "context": "Francesco 15/10/2026 14:20-15:20 (chat cloud), answers to three questions: regenerate the public calendar from the Master Calendario now and every hour; channel = a copy in the repository (data branch) instead of the Drive file the connector cannot overwrite; add a GitHub rule against deleting or force-pushing main, staging/superapp and data/calendar-public before the hourly task starts (created by Francesco: the session proxy cannot write repository settings).",
+      "normalizedCommand": {
+        "rule": "The app calendar comes from the master through tools/sync/calendar_public_payload.py; the bundled copy is refreshed by reviewed releases and an hourly scheduled task writes only calendar-public.json on branch data/calendar-public, read first by calendar-bridge.server.ts and always checked by validateMirror (never older, never in the future, at least 70% of the games). The hourly task starts only after the GitHub ruleset exists.",
+        "status": "CODE_LIVE_TASK_WAITING_FOR_RULESET",
+        "delivered": [
+          "tools/sync/calendar_public_payload.py",
+          "apps/superapp/src/data/calendario-snapshot.json",
+          "apps/superapp/src/lib/calendar-bridge.server.ts",
+          "apps/superapp/src/lib/calendar-mirror.ts",
+          "apps/superapp/docs/CALENDAR_HOURLY_TASK.md"
+        ]
+      }
+    },
+    {
+      "sourceDate": "2026-10-15",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
       "id": "UD-150",
       "name": "FIGC_PLAYER_HISTORY_ALWAYS_AVAILABLE_IN_SUPER_APP",
       "sourceQuoteFragments": [
