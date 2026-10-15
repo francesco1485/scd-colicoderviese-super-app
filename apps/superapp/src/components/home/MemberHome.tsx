@@ -2,11 +2,10 @@
  * Home of a signed-in member (UD-116, Direzione 14/10/2026 10:59, after UD-095/UD-100): what matters first.
  * Urgent notices → the one club communication → "Oggi e questa settimana" limited to the person's teams (staff) and
  * children's teams (families), with trainings from the weekly quadro and changes highlighted → six quick actions for
- * this kind of person → weekend results (real source only) → tip of the day → the "soci" vetrina, teams, club games
+ * this kind of person → weekend results (real source only) → tip of the day → teams, club games (no vetrina, UD-152)
  * and the "Dal club" feed (UD-089) → partners once. Signed-out visitors get PublicHome instead. Real data only.
  */
 import { Link } from "@tanstack/react-router";
-import { Vetrina } from "@/components/home/PublicHome";
 import type { VetrinaSlot, VetrinaWorld } from "@/lib/vetrina";
 import { useServerFn } from "@tanstack/react-start";
 import { ChevronRight, Newspaper } from "lucide-react";
@@ -60,7 +59,6 @@ import {
   r20MatchToWeekItem,
   type WeekItem,
 } from "@/lib/home-week";
-import { trimVetrina, vetrinaRepeats } from "@/lib/public-home";
 import { freshnessLabel, SNAPSHOT_BANNER } from "@/lib/public-snapshots";
 import {
   channelOf,
@@ -90,7 +88,7 @@ export interface MemberHomeData {
   social: Awaited<ReturnType<typeof getPublicSocial>>;
   serverNow: number;
   today: string;
-  /** Vetrina of the day for the "soci" world (UD-110 palinsesto), from getVetrina({ members: true }). */
+  /** Vetrina of the day: loaded for the LED wall day only, never rendered here (UD-152, 15/10 13:54). */
   vetrina?: Readonly<Record<VetrinaWorld, readonly VetrinaSlot[]>>;
   /** Personal scope of "Oggi e questa settimana" (getMyHomeScope). */
   scope: HomeScope;
@@ -133,7 +131,6 @@ export function MemberHome({
   social,
   serverNow,
   today,
-  vetrina,
   scope,
   notice,
 }: MemberHomeData) {
@@ -250,10 +247,6 @@ export function MemberHome({
         childGroups: scope.children.flatMap((c) => c.groups),
       }),
     [scope],
-  );
-  const worlds = useMemo(
-    () => (vetrina ? trimVetrina(vetrina, vetrinaRepeats(actions)) : null),
-    [vetrina, actions],
   );
   const verifiedSponsors = useMemo(
     () => SPONSORS.filter((x) => x.nameVerified && x.name),
@@ -485,7 +478,6 @@ export function MemberHome({
         className={`${WRAP} grid grid-cols-[minmax(0,1fr)] gap-6 pt-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start lg:gap-x-8 lg:pt-12`}
       >
         <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-6">
-          {worlds && <Vetrina worlds={worlds} fixedWorld="soci" embedded />}
           <section aria-labelledby="dal-club" className="grid gap-3">
             <SectionTitle id="dal-club">Dal club</SectionTitle>
             <div className="flex items-center justify-between gap-3 px-1">

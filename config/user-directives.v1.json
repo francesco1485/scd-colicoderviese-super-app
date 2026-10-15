@@ -3407,6 +3407,55 @@
     },
     {
       "sourceDate": "2026-10-15",
+      "sourceTime": "13:22",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-151",
+      "name": "CHARACTER_CAST_BY_AREA_SKY_ONLY_ON_THE_PITCH",
+      "sourceQuoteFragments": [
+        "sky è la nostra mascotte sul campo ideata per lo stile americano del calcio ma non sta nell'app dove arriva il genitore si relaziona col minore dentro, al contrario per una questione di simpatia chiunque trova il crovi all'inizio",
+        "la colicoderviese ha un unico stemma come anche gli altri"
+      ],
+      "context": "Recorded by the cloud chat on 15/10/2026 20:30 from claude.ai project doc claude/SCD_PERSONAGGI_E_LOGHI_2026-10-15.md §1 and §4 (number reserved by the PC chat; the PC registration commit 1430278 is no longer on the remote). Vera in the cast table became Iride on 15/10 18:40 (UD-139).",
+      "normalizedCommand": {
+        "rule": "Sky is the pitch mascot only (field, social, LED), never inside the app; Crovi welcomes at the entrance; Iride (ex Vera, UD-139) in administration; the other characters by area as listed in the project doc. One official crest per club; year-group logos only inside app and gestionale.",
+        "status": "RECORDED"
+      }
+    },
+    {
+      "sourceDate": "2026-10-15",
+      "sourceTime": "13:54-13:55",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-152",
+      "name": "NO_SHOWCASES_ANYWHERE",
+      "sourceQuoteFragments": [
+        "io non voglio nessuna di queste idee in nessuna vetrina di nessuna app e in nessuna vetrina dei gestionali e dei supporti web link, vetrine di sponsor, tornei e eventi, comunicazione e avatar"
+      ],
+      "context": "Recorded by the cloud chat on 15/10/2026 20:30 from claude.ai project doc claude/SCD_PERSONAGGI_E_LOGHI_2026-10-15.md §0; clarification chosen by Francesco at 13:55: it refers to today's showcases.",
+      "normalizedCommand": {
+        "rule": "No carousels, rotating banners, autoplay video, 'In evidenza' bands, large promotional boxes or 'Chi sei?' tables in any app, gestionale or page. Allowed: the fixed sponsor logo strip at the bottom (once), true information in clear lists, a small still image band only where Francesco's board has one, the real LED wall player.",
+        "status": "RECORDED"
+      }
+    },
+    {
+      "sourceDate": "2026-10-15",
+      "sourceTime": "14:40",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-153",
+      "name": "APPROVED_APP_LOGIC_PHONE_BOARDS_DESKTOP_THREE_COLUMNS",
+      "sourceQuoteFragments": [
+        "la logica è questa"
+      ],
+      "context": "Recorded by the cloud chat on 15/10/2026 20:30 from claude.ai project doc claude/SCD_LOGICA_APPROVATA_2026-10-15.md (Francesco approved the single page 'La logica della Super App' with seven boards and a betting-site layout as structure only); boards registered as VR-025/VR-026 at 19:20-19:22.",
+      "normalizedCommand": {
+        "rule": "Phone = Francesco's boards (VR-025); desktop = top bar with logo and search, left menu, content in the centre, right column with upcoming activities; gestionali on VR-026. Never betting content.",
+        "status": "RECORDED"
+      }
+    },
+    {
+      "sourceDate": "2026-10-15",
       "sourceTime": "15:07-15:17",
       "sourceStatus": "EXPLICIT_USER_COMMAND",
       "authority": "FRANCESCO_SCD",

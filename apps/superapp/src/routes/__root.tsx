@@ -154,7 +154,7 @@ function RootComponent() {
     return (
       <QueryClientProvider client={queryClient}>
         <Outlet />
-        {/* r99: the same chat, opened only from in-page entry points ("Chiedi a Vera"), no floating launcher. */}
+        {/* r99: the same chat, opened only from in-page entry points ("Chiedi a Iride"), no floating launcher. */}
         <SkyChat interior />
         <CookieConsent interior />
         <PwaManager />
@@ -164,7 +164,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Room under the content so the Vera launcher never covers the last row (Francesco 15/10/2026): phones, the
+      {/* Room under the content so the Iride launcher never covers the last row (Francesco 15/10/2026): phones, the
           bottom tab bar + slim sponsor strip + launcher (PHONE_CONTENT_CLEARANCE); desktop, the sponsor strip (UD-134)
           + launcher (DESKTOP_CONTENT_CLEARANCE). Desktop: top bar, sticky left sidebar (240px) and the content column,
           max 1200px (board shell UD-153, Francesco 15/10/2026 14:40; Eurobet as structure reference only). */}
@@ -188,15 +188,16 @@ function RootComponent() {
         <div className="lg:grid lg:grid-cols-[240px_minmax(0,1fr)]" data-testid="shell-body">
           <SideNav />
           <div className="min-w-0" data-testid="shell-content">
-            {/* Desktop: the right gutter keeps the column clear of the Vera launcher (launcher footprint 80px =
+            {/* Desktop: the right gutter keeps the column clear of the Iride launcher (launcher footprint 80px =
                 48px here + the pages' own 32px); from 1536px the centred column has that margin by itself. */}
             <div id="contenuto" tabIndex={-1} className="w-full outline-none lg:mx-auto lg:max-w-[1200px] lg:pr-12 2xl:pr-0">
-              {/* Technical-cookie notice in the page flow, under the header: nothing floats over the content (UD-135). */}
-              <CookieConsent />
               {/* "Prossimo appuntamento" strip (not on the home or the calendar, which show it themselves). */}
               <NextUpBar />
               {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
               <Outlet />
+              {/* Technical-cookie notice at the end of the page flow: it never pushes the first screen down and nothing
+                  floats over the content (UD-135; handover 15/10 19:55 point 6). */}
+              <CookieConsent />
             </div>
             <SiteFooter />
           </div>

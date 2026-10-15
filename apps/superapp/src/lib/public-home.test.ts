@@ -111,7 +111,6 @@ describe("public home v5", () => {
       "<UrgentNotices",
       "<ClubNoticeCard",
       "<HomeBoard",
-      "<Vetrina ",
       "<HomeMatchday",
       "<WeekendResults",
     ];
@@ -134,7 +133,9 @@ describe("public home v5", () => {
       "<SponsorSpotsHome",
     ])
       expect(body, gone).not.toContain(gone);
-    expect(home).toMatch(/export function Vetrina\(/);
+    // UD-152 (15/10 13:54): no vetrina / "In evidenza" on any home.
+    expect(home).not.toMatch(/<Vetrina[\s/>]|In evidenza/);
+    expect(code("src/components/home/MemberHome.tsx")).not.toMatch(/<Vetrina[\s/>]|In vetrina/);
     // Dead code removed (PC audit 15/10, item 8): no news block, no carousel, no unused news fetch on the home.
     expect(home).not.toMatch(/HomeNewsBlock|NewsItem/);
     expect(code("src/routes/index.tsx")).not.toMatch(/getHomeNews/);

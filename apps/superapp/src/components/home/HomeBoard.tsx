@@ -147,26 +147,28 @@ function Hero() {
       data-testid="home-hero"
     >
       <HeroArt className="absolute inset-0 -z-10 size-full" />
-      <div className={`${WRAP} pb-[78px] pt-7 sm:pt-10 lg:pb-[112px] lg:pt-16`}>
+      <div className={`${WRAP} pb-[60px] pt-4 sm:pt-5 lg:pb-[84px] lg:pt-8`}>
         <h2
           id="home-hero-t"
-          className="m-0 font-uv text-[44px] leading-[0.95] tracking-[0.005em] drop-shadow-[0_3px_14px_rgb(6_26_61/0.45)] min-[400px]:text-[48px] lg:text-[72px]"
+          className="m-0 font-uv text-[32px] leading-[0.95] tracking-[0.005em] drop-shadow-[0_3px_14px_rgb(6_26_61/0.45)] min-[400px]:text-[34px] lg:text-[52px]"
         >
           Questa settimana
         </h2>
-        <BrushStroke className="mt-1 block h-[12px] w-[190px] lg:h-[16px] lg:w-[300px]" />
-        <p className="m-0 mt-2.5 max-w-[19rem] text-[17px] font-semibold leading-[1.25] drop-shadow-[0_2px_10px_rgb(6_26_61/0.5)] lg:max-w-[30rem] lg:text-[22px]">
-          Sport, crescita e comunità nel cuore dell'Alto Lario.
-        </p>
-        {/* Visitors only (the public home): the way in, the role the old welcome banner had. */}
-        <Link
-          to="/registrati"
-          className="scd-focus mt-4 inline-flex min-h-11 items-center gap-1.5 rounded-full bg-[#ffd600] px-5 text-[15px] font-extrabold text-[#0b1e3a] shadow-[0_8px_20px_-8px_rgb(0_0_0/0.5)] transition-[filter] duration-150 hover:brightness-95"
-          data-testid="home-join"
-        >
-          Entra nel club
-          <ArrowRight className="size-4" aria-hidden="true" />
-        </Link>
+        <BrushStroke className="mt-1 block h-[9px] w-[140px] lg:h-[12px] lg:w-[220px]" />
+        <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1">
+          <p className="m-0 max-w-[21rem] text-[15px] font-semibold leading-[1.25] drop-shadow-[0_2px_10px_rgb(6_26_61/0.5)] lg:max-w-none lg:text-[18px]">
+            Sport, crescita e comunità nel cuore dell'Alto Lario.
+          </p>
+          {/* Visitors only (the public home): a small, clear invitation, not a banner (UD-152, handover 15/10 19:55). */}
+          <Link
+            to="/registrati"
+            className="scd-focus inline-flex min-h-11 items-center gap-1 rounded-md text-[14.5px] font-bold text-[#ffd600] underline decoration-[#ffd600]/60 underline-offset-4 hover:decoration-[#ffd600]"
+            data-testid="home-join"
+          >
+            Iscriviti al club
+            <ArrowRight className="size-4" aria-hidden="true" />
+          </Link>
+        </div>
       </div>
     </section>
   );
@@ -309,7 +311,7 @@ function NextMatch({ calendar, nowMs, today }: { calendar: PublicCalendar; nowMs
         </Link>
       ) : (
         <p className={`${BOARD_CARD} m-0 rounded-tl-none px-4 py-5 text-[15px] text-[#4a5d7a]`} data-testid="board-next-empty">
-          Nessuna gara nei prossimi 7 giorni. Il calendario completo è sempre aggiornato.
+          Nessuna gara nei prossimi 7 giorni. Trovi tutte le gare nel calendario.
         </p>
       )}
     </section>
