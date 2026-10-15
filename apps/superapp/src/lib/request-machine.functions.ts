@@ -22,6 +22,7 @@ import {
   parseClubRows,
   parseNotices,
   parseRequestRows,
+  redactContacts,
   requestError,
   toRequestRow,
   validateDraft,
@@ -157,7 +158,7 @@ export const createRequestDraft = createServerFn({ method: "POST" })
     if (!v.ok) return { ok: false, message: "Controlla i campi evidenziati.", errors: v.errors };
     return call(
       "scd_request_create",
-      { p: { kind: "AMICHEVOLE", channel: data.channel, rawText: data.rawText ?? null, ...dbDraft(v) } },
+      { p: { kind: "AMICHEVOLE", channel: data.channel, rawText: redactContacts(data.rawText)?.trim() || null, ...dbDraft(v) } },
       "Bozza salvata. Controlla i dati e mandala a chi conferma.",
     );
   });
@@ -189,7 +190,7 @@ export const decideRequest = createServerFn({ method: "POST" })
   .handler(async ({ data }) =>
     call(
       "scd_request_decide",
-      { p_request_id: data.id, p_decision: data.decision, p_note: data.note ?? null, p_opponent_club_id: data.clubId ?? null },
+      { p_request_id: data.id, p_decision: data.decision, p_note: redactContacts(data.note ?? null), p_opponent_club_id: data.clubId ?? null },
       data.decision === "CONFERMA"
         ? "Confermata: compare in calendario e la Segreteria prepara il modulo da far firmare."
         : "Segnata come non possibile. La Segreteria è avvisata nell'app.",

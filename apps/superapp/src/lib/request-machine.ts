@@ -231,6 +231,36 @@ export function daysLeftLabel(days: number | null): string {
   return `${days} giorni`;
 }
 
+/* ------------------------------------------------------------------ privacy of free text (mirror of r133) */
+
+/** Same patterns as scd_request_redact in r133 (a test keeps them equal). */
+export const EMAIL_PATTERN = "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}";
+export const PHONE_PATTERN = "(\\+|00)?[0-9]([ -]?[0-9]){8,}";
+
+/** Phone numbers and e-mail addresses become [telefono] / [email] before anything is stored. */
+export function redactContacts(text: string): string;
+export function redactContacts(text: string | null | undefined): string | null;
+export function redactContacts(text: string | null | undefined): string | null {
+  if (text === null || text === undefined) return null;
+  return text.replace(new RegExp(EMAIL_PATTERN, "g"), "[email]").replace(new RegExp(PHONE_PATTERN, "g"), "[telefono]");
+}
+
+export const FREE_TEXT_HINT = "Non incollare nomi di ragazzi, telefoni o e-mail: telefoni ed e-mail vengono comunque tolti prima di salvare.";
+
+/**
+ * Location shown on the PUBLIC calendar row of a confirmed friendly (mirror of scd_request_decide in r133): only a
+ * known facility of the club, or "Trasferta" with the opponent's city. Any other free text is never published.
+ */
+export function publicLocation(venue: string | null, homeAway: "CASA" | "FUORI" | null, opponentCity: string | null): string | null {
+  if (homeAway === "FUORI") return opponentCity ? `Trasferta · ${opponentCity}` : "Trasferta";
+  const v = venue ?? "";
+  if (/^\s*colico\b.*\bcampo\s*1\s*$/i.test(v)) return "Colico · Campo 1";
+  if (/^\s*colico\b.*\bcampo\s*2\s*$/i.test(v)) return "Colico · Campo 2";
+  if (/^\s*colico\s*$/i.test(v)) return "Colico";
+  if (/^\s*dervio\b/i.test(v)) return "Dervio";
+  return null;
+}
+
 /* ------------------------------------------------------------------ drafts (mirror of scd_request_clean) */
 
 export interface DraftInput {
@@ -298,7 +328,7 @@ export function validateDraft(d: DraftInput, nowMs: number): { ok: true; value: 
       scope,
       opponentText: trimOrNull(d.opponentText, 120),
       opponentClubId,
-      note: trimOrNull(d.note, 300),
+      note: trimOrNull(redactContacts(d.note), 300),
     },
   };
 }

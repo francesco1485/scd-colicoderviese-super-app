@@ -101,6 +101,16 @@ describe("request machine server functions", () => {
     await expect(create({ data: { channel: "SMS" } })).rejects.toThrow();
   });
 
+  it("removes phone numbers and e-mails from the message before storing it", async () => {
+    session = as(["segreteria"]);
+    rpc.mockResolvedValue({ data: { ok: true, id: "r1" }, error: null });
+    const r = await create({ data: { channel: "WHATSAPP", rawText: "amichevole u15, chiamami 333 1234567 o a x.y@example.it", teamKey: "u15", note: "tel 0341 940123" } });
+    expect(r.ok).toBe(true);
+    const p = rpc.mock.calls[0]?.[1]?.p as Record<string, unknown>;
+    expect(p["rawText"]).toBe("amichevole u15, chiamami [telefono] o a [email]");
+    expect(p["note"]).toBe("tel [telefono]");
+  });
+
   it("relays the database refusal of a confirmation in plain words", async () => {
     session = as(["responsabile-attivita-base"], "STAFF");
     rpc.mockResolvedValue({ data: { ok: false, code: "forbidden" }, error: null });

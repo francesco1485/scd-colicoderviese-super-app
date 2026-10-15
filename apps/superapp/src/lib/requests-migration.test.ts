@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
-import { REQUEST_CHANNELS, REQUEST_CONFIRMERS, REQUEST_STATUSES, FORM_STATUSES, MATCH_SCOPES, REQUEST_WATCHERS, dbConfirmerPositions } from "./request-machine";
+import { EMAIL_PATTERN, PHONE_PATTERN, REQUEST_CHANNELS, REQUEST_CONFIRMERS, REQUEST_STATUSES, FORM_STATUSES, MATCH_SCOPES, REQUEST_WATCHERS, dbConfirmerPositions } from "./request-machine";
 
 const read = (rel: string) => readFileSync(fileURLToPath(new URL(rel, import.meta.url)), "utf8");
 const sql = read("../../../../supabase/migrations/20261015_r133_requests_machine.sql");
@@ -87,6 +87,24 @@ describe("r133 request machine (staged, not applied)", () => {
     expect(decide).toContain("form_status = 'DA_PREPARARE'");
     expect(body.match(/insert into public\.scd_events/g)).toHaveLength(1);
     expect(body).not.toMatch(/birth_date|first_name|last_name|phone|fiscal|codice_fiscale/i);
+  });
+
+  it("redacts contacts with the same patterns as the app and publishes only known locations", () => {
+    const fn = body.match(/function public\.scd_request_redact[\s\S]*?\$\$;/)?.[0] ?? "";
+    expect(fn).toContain(`'${EMAIL_PATTERN}', '[email]'`);
+    expect(fn).toContain(`'${PHONE_PATTERN}', '[telefono]'`);
+    expect(body).toContain("public.scd_request_redact(coalesce(p->>'rawText', ''))");
+    expect(body).toContain("public.scd_request_redact(coalesce(p->>'note', ''))");
+    expect(body).toContain("public.scd_request_redact(coalesce(p_note, ''))");
+    expect(body).toContain("'PLANNED', 'PUBLIC', v_loc, 'SCD_RICHIESTE'");
+    expect(body).not.toMatch(/'PUBLIC', r\.venue_text/);
+  });
+
+  it("closes the helpers to every client role and refuses null payloads", () => {
+    for (const h of ["scd_request_group_confirmers(text)", "scd_request_office(uuid)", "scd_request_viewer(uuid)", "scd_request_actor(uuid)", "scd_request_can_confirm(uuid, text)", "scd_request_clean(jsonb)", "scd_request_redact(text)", "scd_request_json(public.scd_requests)"])
+      expect(body, h).toContain(`revoke all on function public.${h} from public, anon, authenticated;`);
+    expect(body).toContain("if p is null or jsonb_typeof(p) <> 'object' or octet_length(p::text) > 4000");
+    expect(body).toContain("if p is null or jsonb_typeof(p) <> 'object' or char_length(v_name)");
   });
 
   it("keeps the log append-only", () => {

@@ -18,6 +18,7 @@ import { parseRequestMessage, type ParsedRequest } from "@/lib/request-parser";
 import {
   CHANNEL_LABEL,
   FORM_STATUS_LABEL,
+  FREE_TEXT_HINT,
   MATCH_SCOPES,
   NOTICE_LABEL,
   REQUEST_CONFIRMERS,
@@ -458,9 +459,15 @@ function DraftCard({ canWrite, editing, onDone, onCancelEdit }: { canWrite: bool
                   onChange={(e) => setText(e.target.value)}
                   placeholder="es. amichevole U15 sabato 24 ore 15 a Colico con Olginatese"
                   className="scd-focus w-full rounded-[10px] border border-[var(--in-line)] bg-white p-3 text-[15px] leading-snug text-[var(--in-ink)]"
+                  aria-describedby={`${id}-msg-hint`}
                   data-testid="request-message"
                 />
-                <span className="text-right text-[12.5px] font-normal">{text.length}/1000</span>
+                <span className="flex flex-wrap justify-between gap-2 text-[13px] font-normal">
+                  <span id={`${id}-msg-hint`} className="font-semibold text-[var(--in-warn)]">
+                    {FREE_TEXT_HINT}
+                  </span>
+                  <span>{text.length}/1000</span>
+                </span>
               </label>
             </div>
             <button type="button" onClick={read} disabled={text.trim().length < 3} className={`${btnPrimary} justify-self-start disabled:opacity-50`} data-testid="request-read">

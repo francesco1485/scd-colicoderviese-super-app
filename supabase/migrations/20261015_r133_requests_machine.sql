@@ -52,6 +52,7 @@
 --   drop function if exists public.scd_club_create(uuid, jsonb);
 --   drop function if exists public.scd_clubs_search(uuid, text);
 --   drop function if exists public.scd_request_clean(jsonb);
+--   drop function if exists public.scd_request_redact(text);
 --   drop function if exists public.scd_request_can_confirm(uuid, text);
 --   drop function if exists public.scd_request_actor(uuid);
 --   drop function if exists public.scd_request_viewer(uuid);
@@ -159,7 +160,7 @@ returns text[] language sql immutable set search_path to 'public' as $$
     else null
   end;
 $$;
-revoke all on function public.scd_request_group_confirmers(text) from public, anon;
+revoke all on function public.scd_request_group_confirmers(text) from public, anon, authenticated;
 
 -- Segreteria and Direzione: drafts and federal form.
 create or replace function public.scd_request_office(p_organization_id uuid)
@@ -167,7 +168,7 @@ returns boolean language sql stable security definer set search_path to 'public'
   select auth.uid() is not null
     and public.scd_has_org_role(p_organization_id, array['DIRECTION','SECRETARIAT','REGISTRATION']::public.scd_role[]);
 $$;
-revoke all on function public.scd_request_office(uuid) from public, anon;
+revoke all on function public.scd_request_office(uuid) from public, anon, authenticated;
 
 -- Everybody who sees every request: office, Presidente, Direttore Generale, Coordinatore Attivita Sportiva.
 create or replace function public.scd_request_viewer(p_organization_id uuid)
@@ -176,7 +177,7 @@ returns boolean language sql stable security definer set search_path to 'public'
     public.scd_request_office(p_organization_id)
     or public.scd_has_position(p_organization_id, array['presidente','direttore-generale','coordinatore-attivita-sportiva']));
 $$;
-revoke all on function public.scd_request_viewer(uuid) from public, anon;
+revoke all on function public.scd_request_viewer(uuid) from public, anon, authenticated;
 
 -- Anybody with a part in the machine (viewer or confirmer of at least one group): may search and add clubs.
 create or replace function public.scd_request_actor(p_organization_id uuid)
@@ -185,7 +186,7 @@ returns boolean language sql stable security definer set search_path to 'public'
     public.scd_request_viewer(p_organization_id)
     or public.scd_has_position(p_organization_id, array['responsabile-attivita-base']));
 $$;
-revoke all on function public.scd_request_actor(uuid) from public, anon;
+revoke all on function public.scd_request_actor(uuid) from public, anon, authenticated;
 
 -- May confirm a request of this group: Direzione (role or Presidente) always, otherwise the group's confirmer.
 create or replace function public.scd_request_can_confirm(p_organization_id uuid, p_team_key text)
@@ -198,7 +199,20 @@ returns boolean language sql stable security definer set search_path to 'public'
       or (cardinality(public.scd_request_group_confirmers(p_team_key)) > 0
           and public.scd_has_position(p_organization_id, public.scd_request_group_confirmers(p_team_key))));
 $$;
-revoke all on function public.scd_request_can_confirm(uuid, text) from public, anon;
+revoke all on function public.scd_request_can_confirm(uuid, text) from public, anon, authenticated;
+
+-- ---------------------------------------------------------------- 5a. redaction of contacts in free text
+-- Phone numbers (9+ digits, optional +/00 prefix, spaces or dashes) and e-mail addresses become [telefono] / [email]
+-- before anything is stored. Mirror of lib/request-machine.ts redactContacts (same patterns, tested on both sides).
+create or replace function public.scd_request_redact(p_text text)
+returns text language sql immutable set search_path to 'public' as $$
+  select case when p_text is null then null else
+    regexp_replace(
+      regexp_replace(p_text, '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}', '[email]', 'g'),
+      '(\+|00)?[0-9]([ -]?[0-9]){8,}', '[telefono]', 'g')
+  end;
+$$;
+revoke all on function public.scd_request_redact(text) from public, anon, authenticated;
 
 -- ---------------------------------------------------------------- 5. input cleaning (mirror of lib/request-machine.ts validateDraft)
 -- Returns the cleaned draft or {"error": code}. The browser is never trusted.
@@ -213,11 +227,11 @@ declare
   v_home text := nullif(p->>'homeAway', '');
   -- territorial scope of the friendly (federal notice period): Lombardy opponents are REGIONALE/PROVINCIALE/LOCALE
   v_scope text := nullif(p->>'scope', '');
-  v_note text := nullif(left(btrim(coalesce(p->>'note', '')), 300), '');
-  v_raw text := nullif(btrim(coalesce(p->>'rawText', '')), '');
+  v_note text := nullif(left(btrim(public.scd_request_redact(coalesce(p->>'note', ''))), 300), '');
+  v_raw text := nullif(btrim(public.scd_request_redact(coalesce(p->>'rawText', ''))), '');
   v_channel text := coalesce(nullif(p->>'channel', ''), 'SEGRETERIA');
 begin
-  if jsonb_typeof(p) <> 'object' or octet_length(p::text) > 4000 then return jsonb_build_object('error', 'invalid'); end if;
+  if p is null or jsonb_typeof(p) <> 'object' or octet_length(p::text) > 4000 then return jsonb_build_object('error', 'invalid'); end if;
   if v_team is not null and public.scd_request_group_confirmers(v_team) is null then return jsonb_build_object('error', 'team'); end if;
   if v_home is not null and v_home not in ('CASA','FUORI') then return jsonb_build_object('error', 'invalid'); end if;
   if v_scope is not null and v_scope not in ('LOCALE','PROVINCIALE','REGIONALE','NAZIONALE','INTERNAZIONALE','ESTERO') then
@@ -226,7 +240,7 @@ begin
   -- Piccoli Amici: no national or international friendlies (CU n.5 SGS 2026/27 par. 4)
   if v_team = 'piccoli' and v_scope in ('NAZIONALE','INTERNAZIONALE','ESTERO') then return jsonb_build_object('error', 'scope'); end if;
   if v_channel not in ('WHATSAPP','EMAIL','APP','SEGRETERIA') then return jsonb_build_object('error', 'invalid'); end if;
-  if v_raw is not null and char_length(v_raw) > 1000 then return jsonb_build_object('error', 'too_long'); end if;
+  if v_raw is not null and char_length(p->>'rawText') > 1000 then return jsonb_build_object('error', 'too_long'); end if;
   begin
     v_starts := nullif(p->>'startsAt', '')::timestamptz;
     v_club := nullif(p->>'opponentClubId', '')::uuid;
@@ -240,7 +254,7 @@ begin
     'opponentClubId', v_club, 'homeAway', v_home, 'scope', v_scope, 'note', v_note, 'rawText', v_raw, 'channel', v_channel);
 end;
 $$;
-revoke all on function public.scd_request_clean(jsonb) from public, anon;
+revoke all on function public.scd_request_clean(jsonb) from public, anon, authenticated;
 
 -- ---------------------------------------------------------------- 6. clubs
 create or replace function public.scd_clubs_search(p_organization_id uuid, p_query text)
@@ -274,7 +288,7 @@ declare
   v_id uuid;
 begin
   if not public.scd_request_actor(p_organization_id) then return jsonb_build_object('ok', false, 'code', 'forbidden'); end if;
-  if jsonb_typeof(p) <> 'object' or char_length(v_name) not between 2 and 120
+  if p is null or jsonb_typeof(p) <> 'object' or char_length(v_name) not between 2 and 120
      or (v_city is not null and char_length(v_city) not between 2 and 80)
      or (v_prov is not null and v_prov !~ '^[A-Z]{2}$')
      or (v_mat is not null and v_mat !~ '^[0-9]{3,10}$')
@@ -421,7 +435,8 @@ declare
   v_club public.scd_clubs;
   v_event uuid;
   v_team uuid;
-  v_note text := nullif(left(btrim(coalesce(p_note, '')), 300), '');
+  v_note text := nullif(left(btrim(public.scd_request_redact(coalesce(p_note, ''))), 300), '');
+  v_loc text;
 begin
   if p_decision not in ('CONFERMA','RIFIUTA') then return jsonb_build_object('ok', false, 'code', 'invalid'); end if;
   select * into r from public.scd_requests where id = p_request_id and organization_id = p_organization_id for update;
@@ -448,10 +463,20 @@ begin
   if v_club.id is null then return jsonb_build_object('ok', false, 'code', 'club'); end if;
   if r.proposed_starts_at is null or r.proposed_starts_at <= now() then return jsonb_build_object('ok', false, 'code', 'date'); end if;
 
+  -- Public location: only a known facility of the club, or "Trasferta" with the opponent's city; free text never.
+  -- Mirror of lib/request-machine.ts publicLocation.
+  v_loc := case
+    when r.payload->>'homeAway' = 'FUORI' then 'Trasferta' || coalesce(' · ' || v_club.city, '')
+    when r.venue_text ~* '^\s*colico\M.*\mcampo\s*1\s*$' then 'Colico · Campo 1'
+    when r.venue_text ~* '^\s*colico\M.*\mcampo\s*2\s*$' then 'Colico · Campo 2'
+    when r.venue_text ~* '^\s*colico\s*$' then 'Colico'
+    when r.venue_text ~* '^\s*dervio\M' then 'Dervio'
+    else null
+  end;
   insert into public.scd_events (organization_id, event_type, title, starts_at, status, visibility, location_text,
     source_id, source_record_id, source_verified_at, source_confidence, metadata)
   values (p_organization_id, 'AMICHEVOLE', left('Amichevole ' || r.team_key || ' - ' || v_club.name, 200), r.proposed_starts_at,
-    'PLANNED', 'PUBLIC', r.venue_text, 'SCD_RICHIESTE', r.id::text, now(), 100,
+    'PLANNED', 'PUBLIC', v_loc, 'SCD_RICHIESTE', r.id::text, now(), 100,
     jsonb_strip_nulls(jsonb_build_object('teamKey', r.team_key, 'opponent', v_club.name, 'opponentClubId', v_club.id,
       'crestKey', v_club.crest_asset_key, 'homeAway', r.payload->>'homeAway', 'requestId', r.id)))
   returning id into v_event;

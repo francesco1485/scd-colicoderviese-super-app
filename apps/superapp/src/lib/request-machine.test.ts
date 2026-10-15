@@ -23,6 +23,8 @@ import {
   nextStatus,
   noticeDeadline,
   parseRequestRows,
+  publicLocation,
+  redactContacts,
   seesEverything,
   toRequestRow,
   validateDraft,
@@ -240,5 +242,26 @@ describe("mergeConfirmedFriendlies", () => {
       [ev({ id: "r1", opponent: "A.S.D. Olginatese" }), ev({ id: "r2", date: "2026-10-25", opponent: "Bellano" })],
     );
     expect(out.map((e) => e.id)).toEqual(["m1", "r2", "m2"]);
+  });
+});
+
+describe("privacy of free text and public location (scd-sicurezza notes)", () => {
+  it("redacts phone numbers and e-mails, keeps dates, times and birth years", () => {
+    expect(redactContacts("chiama Marco 333 123 4567 o +39 0341-940123, scrivi a mister.rossi@example.it")).toBe(
+      "chiama Marco [telefono] o [telefono], scrivi a [email]",
+    );
+    expect(redactContacts("amichevole 2014 2015 il 24/10/2026 ore 15:30 tel 3331234567")).toBe("amichevole 2014 2015 il 24/10/2026 ore 15:30 tel [telefono]");
+    expect(redactContacts(null)).toBeNull();
+  });
+
+  it("publishes only a known facility or 'Trasferta' with the city", () => {
+    expect(publicLocation("Colico · Campo 2", "CASA", null)).toBe("Colico · Campo 2");
+    expect(publicLocation("colico campo 1", null, null)).toBe("Colico · Campo 1");
+    expect(publicLocation("Colico", "CASA", null)).toBe("Colico");
+    expect(publicLocation("Dervio", "CASA", null)).toBe("Dervio");
+    expect(publicLocation("Olginate", "FUORI", "Olginate")).toBe("Trasferta · Olginate");
+    expect(publicLocation("a casa di Luca B.", "FUORI", null)).toBe("Trasferta");
+    expect(publicLocation("palestra della scuola di Marco", "CASA", null)).toBeNull();
+    expect(publicLocation(null, null, null)).toBeNull();
   });
 });
