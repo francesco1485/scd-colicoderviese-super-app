@@ -149,3 +149,14 @@ describe("Le mie squadre (followed teams)", () => {
     expect(todayOf(Date.parse("2026-10-15T08:00:00Z"))).toBe("2026-10-15");
   });
 });
+
+describe("eventRank in the countdown", () => {
+  test("prefers Prima Squadra, then agonistica, confirmed before pending", async () => {
+    const { eventRank } = await import("./calendario-live");
+    const ago = (g: string) => g === "u16";
+    const base = { group: "primi", timeConfirmed: false, venueConfirmed: false };
+    expect(eventRank({ group: "prima", timeConfirmed: true, venueConfirmed: true }, ago)).toBe(0);
+    expect(eventRank({ group: "u16", timeConfirmed: true, venueConfirmed: true }, ago)).toBe(2);
+    expect(eventRank(base, ago)).toBe(5);
+  });
+});
