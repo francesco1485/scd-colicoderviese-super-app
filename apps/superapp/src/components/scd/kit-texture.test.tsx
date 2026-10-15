@@ -55,7 +55,8 @@ describe("kit 2026/27 texture on shared hero bands (Direzione 13/10/2026)", () =
   });
 
   it("public pages pick their motif and the home matchday card carries the texture", () => {
-    expect(src("../../routes/calendario.tsx")).toMatch(/<PageHeader[\s\S]{0,80}motif="mountains-lake"/);
+    // Calendario live (board VR-009 screen 2): own hero with the lake photo plus the mountains-lake line art.
+    expect(src("../../routes/calendario.tsx")).toContain('<KitTexture motif="mountains-lake" overlay />');
     expect(src("../../routes/societa.tsx")).toMatch(/<HallHero\s+motif="forte"/);
     expect(src("../../routes/eventi.index.tsx")).toMatch(/<PageHero motif="mountains-lake"/);
     expect(src("../home/PublicHome.tsx")).toContain('<KitTexture motif="mountains-lake" overlay />');

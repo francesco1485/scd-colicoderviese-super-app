@@ -28,6 +28,7 @@ const PUBLIC_FILES = [
   "src/components/scd/MembersOnly.tsx",
   "src/components/SiteChrome.tsx",
   "src/routes/calendario.tsx",
+  "src/components/calendario/CalendarioLive.tsx",
   "src/routes/squadre.tsx",
   "src/routes/squadre_.$team.tsx",
   "src/routes/allenamenti.tsx",

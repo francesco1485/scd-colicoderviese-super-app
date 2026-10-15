@@ -1,27 +1,37 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, CalendarDays, ChevronLeft, ChevronRight, Clock3, Link2, Lock, MapPin, RefreshCw, Search, Share2 } from "lucide-react";
+import { ArrowRight, CalendarDays, ChevronLeft, ChevronRight, Link2, Lock, RefreshCw, Search, Share2 } from "lucide-react";
 
 import { getSession } from "@/lib/auth.functions";
 import { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 import { getTrainingQuadro } from "@/lib/quadro.functions";
-import { Crest, DateBlock, PageHeader, PrimaryButton, SectionHead, Segmented, Sheet } from "@/components/scd/board";
+import { ClubCrestOfficial } from "@/components/SiteChrome";
 import { ConeIcon } from "@/components/scd/icons";
+import { KitTexture } from "@/components/scd/kit-texture";
 import { PersonaAvatar } from "@/components/scd/SkyJolly";
-import { OpponentCrest, opponentLabel } from "@/lib/crests";
-import { GroupResultsLink, OfficialResults } from "@/components/scd/OfficialResults";
-import { dateParts, groupShort, matchTitle, monthRange, trainingRowsFor, upcomingMatches, venueCase, weekRange } from "@/lib/board-data";
+import { OfficialResults } from "@/components/scd/OfficialResults";
+import { CARD, GameRow, LiveBanner, NextMatchRow, TeamChips, TrainingRow, type TrainingItem } from "@/components/calendario/CalendarioLive";
+import { addDays, groupShort, monthRange, trainingRowsFor, upcomingMatches, weekRange } from "@/lib/board-data";
+import {
+  DAY_VIEWS, dayOf, dayStrip, followedFirst, gamesOn, isDayView, nextForFollowed, nextGameDay, previousGameDay,
+  readFollowed, toggleFollowed, writeFollowed, type DayView,
+} from "@/lib/calendario-live";
 import { romeParts } from "@/lib/home-week";
 import { EMPTY_MESSAGE, WINDOWS, freshnessLabel, resolveAnnata, windowEnd, trainingKeyFor, type WindowDays, type PublicEvent, type PublicGroup } from "@/lib/public-snapshots";
 
 /*
- * Public page: our side is the official club crest + "ColicoDerviese <team>"; annata crests stay internal
- * (Direzione, 13/10/2026). The team chips use the master's team colour, not a crest.
- * UD-100 ("Le squadre sono dentro non fuori"): anonymous visitors get the games only (the server strips trainings,
- * notes and annata crest files) plus an "Entra per allenamenti e dettagli" hint; training rows, training links and
- * the teams link exist only for signed-in members (calendar audience "member").
+ * Public page "Calendario live" (board VR-009 screen 2, Francesco 15/10/2026): hero with the lake photo, the official
+ * crest and the live pulse (red minute during a game, countdown otherwise); IERI / OGGI / DOMANI / Calendario tabs;
+ * week header with arrows on the real current week; white rows with coloured bar, date block, round type icon,
+ * bold title, place; the blue full-width button; "Prossime gare". Followed teams ("Le mie squadre", star, kept on
+ * this device only) come first. Pure logic: lib/calendario-live.ts (tested).
+ *
+ * Our side is the official club crest + "ColicoDerviese <team>"; annata crests stay internal (Direzione,
+ * 13/10/2026). UD-100 ("Le squadre sono dentro non fuori"): anonymous visitors get the games only (the server strips
+ * trainings, notes and annata crest files) plus an "Entra per allenamenti e dettagli" hint; training rows, training
+ * links and the teams link exist only for signed-in members (calendar audience "member").
  */
-const VIEWS = ["prossime", "settimana", "mese", "stagione"] as const;
+const VIEWS = ["prossime", "settimana", "mese", "stagione", ...DAY_VIEWS] as const;
 const PLACES = ["tutte", "casa", "fuori"] as const;
 type View = (typeof VIEWS)[number];
 type Place = (typeof PLACES)[number];
@@ -43,14 +53,14 @@ export const Route = createFileRoute("/calendario")({
     const [cal, session] = await Promise.all([getPublicCalendarSnapshot(), getSession()]);
     // Training board only for members: anonymous visitors never receive the slots in the loader data.
     const trainingSlots = cal.audience === "member" ? (await getTrainingQuadro()).quadro.slots : [];
-    return { ...cal, trainingSlots, access: accessState(session) };
+    return { ...cal, trainingSlots, access: accessState(session), serverNow: Date.now() };
   },
   head: () => ({
     meta: [
       { title: "Calendario 2026/27 — S.C.D. ColicoDerviese" },
-      { name: "description", content: "Le gare SCD della settimana e del mese: casa e trasferta, stagione 2026/27. Dati da riconfermare in caso di variazioni." },
+      { name: "description", content: "Le gare SCD di ieri, oggi, domani e della settimana: casa e trasferta, stagione 2026/27. Dati da riconfermare in caso di variazioni." },
       { property: "og:title", content: "Calendario 2026/27 — S.C.D. ColicoDerviese" },
-      { property: "og:description", content: "Le gare SCD della stagione 2026/27 per settimana, mese e squadra." },
+      { property: "og:description", content: "Le gare SCD della stagione 2026/27 per giorno, settimana, mese e squadra." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -71,7 +81,7 @@ function accessState(s: { user: { email: string } | null; roles: string[]; membe
 
 function BaseAccessNotice({ state }: { state: Exclude<AccessState, null> }) {
   return (
-    <p role="status" className="mt-[12px] rounded-[12px] border border-[#f2d675] bg-[#fffbea] px-3 py-2.5 text-[14.5px] leading-snug text-[#5a4500]" data-testid="base-access-notice">
+    <p role="status" className="m-0 rounded-[12px] border border-[#f2d675] bg-[#fffbea] px-3 py-2.5 text-[14.5px] leading-snug text-[#5a4500]" data-testid="base-access-notice">
       {state === "base" ? (
         <>Sei dentro. Per ora vedi calendario e <Link to="/eventi" className="font-bold underline underline-offset-2">attività</Link> del club: la Direzione abilita le funzioni del tuo ruolo (la tua squadra, i tuoi figli, il tuo lavoro) dopo aver verificato i tuoi dati.</>
       ) : (
@@ -81,15 +91,27 @@ function BaseAccessNotice({ state }: { state: Exclude<AccessState, null> }) {
   );
 }
 
+const WRAP = "mx-auto w-full max-w-[1280px] px-4 lg:px-8";
 const fmt = (iso: string, o: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat("it-IT", { timeZone: "UTC", ...o }).format(new Date(`${iso}T12:00:00Z`));
-const romeNow = () => romeParts(new Date().toISOString()) ?? { date: new Date().toISOString().slice(0, 10), time: "00:00" };
+const romeAt = (ms: number) => romeParts(new Date(ms).toISOString()) ?? { date: new Date(ms).toISOString().slice(0, 10), time: "00:00" };
 
 type Row =
   | { kind: "gara"; id: string; date: string; time: string; e: PublicEvent; g: PublicGroup | undefined }
-  | { kind: "allenamento"; id: string; date: string; time: string; title: string; sub: string; teams?: string };
+  | ({ kind: "allenamento" } & TrainingItem);
+
+/** Minute clock: server time on the first render (no hydration mismatch), then the device clock. */
+function useMinuteClock(serverNow: number): number {
+  const [now, setNow] = useState(serverNow);
+  useEffect(() => {
+    setNow(Date.now());
+    const id = window.setInterval(() => setNow(Date.now()), 30_000);
+    return () => window.clearInterval(id);
+  }, []);
+  return now;
+}
 
 function Calendario() {
-  const { season, sourceModifiedAt, groups, events, origin, access, audience, trainingSlots } = Route.useLoaderData();
+  const { season, sourceModifiedAt, groups, events, origin, access, audience, trainingSlots, serverNow } = Route.useLoaderData();
   const member = audience === "member";
   const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
@@ -109,12 +131,13 @@ function Calendario() {
   const navigate = Route.useNavigate();
   // Tavola: la vista iniziale è "Settimana"; i link condivisi per annata/finestra aprono "Squadra".
   const view: View = search.vista ?? (search.annata || search.entro ? "prossime" : "settimana");
-  const tab = view === "settimana" ? "Settimana" : view === "mese" ? "Mese" : "Squadra";
+  const dayView: DayView | null = isDayView(view) ? view : null;
+  const tab = dayView ? "Giorno" : view === "settimana" ? "Settimana" : view === "mese" ? "Mese" : "Squadra";
   const place = search.luogo ?? "tutte";
   const offset = search.p ?? 0;
   const selected = search.annata ? resolveAnnata(groups, search.annata) : null;
-  const [now, setNow] = useState(romeNow);
-  useEffect(() => { const t = setInterval(() => setNow(romeNow()), 60000); return () => clearInterval(t); }, []);
+  const nowMs = useMinuteClock(serverNow);
+  const now = romeAt(nowMs);
   const today = now.date;
   const [openId, setOpenId] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
@@ -122,35 +145,51 @@ function Calendario() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   useEffect(() => setCanShare(typeof navigator !== "undefined" && typeof navigator.share === "function"), []);
 
+  // "Le mie squadre": followed teams kept on this device only (localStorage behind try/catch in the lib).
+  const [followed, setFollowed] = useState<string[]>([]);
+  useEffect(() => {
+    let store: Storage | null = null;
+    try { store = window.localStorage; } catch { store = null; }
+    setFollowed(readFollowed(store));
+  }, []);
+  function follow(id: string) {
+    setFollowed((prev) => {
+      const next = toggleFollowed(prev, id);
+      let store: Storage | null = null;
+      try { store = window.localStorage; } catch { store = null; }
+      writeFollowed(store, next);
+      return next;
+    });
+  }
+
   const set = (patch: Partial<Search>) => navigate({ search: (prev) => ({ ...prev, ...patch }), replace: true, resetScroll: false });
-  const choices = groups.filter((g) => g.count > 0);
+  const choices = useMemo(() => followedFirst(groups, followed), [groups, followed]);
   const groupOf = (id: string) => groups.find((x) => x.id === id);
 
   const [from, to, label] = useMemo((): [string, string, string] => {
+    if (dayView) { const d = dayOf(dayView, today); return [d, d, fmt(d, { weekday: "long", day: "numeric", month: "long" })]; }
     if (view === "settimana") { const w = weekRange(today, offset); return [w.from, w.to, w.label]; }
     if (view === "mese") { const m = monthRange(today, offset); return [m.from, m.to, m.label]; }
     if (view === "prossime") return search.entro
       ? [today, windowEnd(today, search.entro), search.entro === 180 ? "Prossimi 6 mesi" : `Prossimi ${search.entro} giorni`]
       : [today, "9999-12-31", "Da oggi in avanti"];
     return ["0000-01-01", "9999-12-31", `Tutta la stagione ${season}`];
-  }, [view, offset, today, season, search.entro]);
+  }, [dayView, view, offset, today, season, search.entro]);
 
   const matchesFilter = (e: PublicEvent) => (!selected || e.group === selected.id) && (place === "tutte" || (place === "casa" ? e.homeAway === "CASA" : e.homeAway === "FUORI"));
-  const visible = events.filter((e) => matchesFilter(e) && e.date >= from && e.date <= to);
+  const filtered = events.filter(matchesFilter);
+  const visible = dayView ? gamesOn(filtered, from) : filtered.filter((e) => e.date >= from && e.date <= to);
   const trainingKey = useMemo(() => (member && selected ? trainingKeyFor(selected, trainingSlots) : null), [member, selected, trainingSlots]);
 
   // Calendario = partite ed eventi; il quadro allenamenti è distinto (decisione Direzione, export 10/10).
-  // Gli allenamenti entrano qui solo per la PROPRIA annata scelta, settimana corrente, sede Colico.
+  // Gli allenamenti entrano qui solo per i soci e la PROPRIA annata scelta, settimana corrente o un giorno, sede Colico.
   const trainingRows: Row[] = useMemo(() => {
-    if (!member || view !== "settimana" || offset !== 0 || place === "fuori" || !selected || !trainingKey) return [];
-    return Array.from({ length: 7 }, (_, i) => addDaysIso(from, i)).flatMap((date): Row[] => {
-      const list = trainingRowsFor(date, trainingSlots, trainingKey ?? undefined);
-      if (!list.length) return [];
-      if (trainingKey) return list.map((t) => ({ kind: "allenamento", id: t.id, date, time: t.time, title: `Allenamento ${t.teams}`, sub: `Centro Sportivo - Colico · Campo ${t.field.slice(1)}`, teams: `${t.time}–${t.end}` }));
-      const teams = [...new Set(list.flatMap((t) => t.teams.split(" + ")))];
-      return [{ kind: "allenamento", id: `all-${date}`, date, time: list[0]!.time, title: `Allenamenti · ${teams.length} ${teams.length === 1 ? "gruppo" : "gruppi"}`, sub: "Centro Sportivo - Colico", teams: `${list[0]!.time}–${list.reduce((m, t) => (t.end > m ? t.end : m), "")} · ${teams.join(", ")}` }];
-    });
-  }, [member, view, offset, place, selected, trainingKey, from, trainingSlots]);
+    if (!member || place === "fuori" || !selected || !trainingKey) return [];
+    const days = dayView ? [from] : view === "settimana" && offset === 0 ? Array.from({ length: 7 }, (_, i) => addDays(from, i)) : [];
+    return days.flatMap((date): Row[] =>
+      trainingRowsFor(date, trainingSlots, trainingKey).map((t) => ({ kind: "allenamento", id: t.id, date, time: t.time, title: `Allenamento ${t.teams}`, sub: `Centro Sportivo - Colico · Campo ${t.field.slice(1)}`, teams: `${t.time}–${t.end}` })),
+    );
+  }, [member, dayView, view, offset, place, selected, trainingKey, from, trainingSlots]);
 
   const firstBlock = selected ? 6 : 8;
   const [extra, setExtra] = useState(0);
@@ -160,7 +199,11 @@ function Calendario() {
   const remaining = visible.length - shown.length;
   const rows: Row[] = [...shown.map((e): Row => ({ kind: "gara", id: e.id, date: e.date, time: e.time, e, g: groupOf(e.group) })), ...trainingRows]
     .sort((a, b) => (a.date + (a.time || "99:99")).localeCompare(b.date + (b.time || "99:99")));
-  const nextMatches = upcomingMatches(events, today, now.time).filter(matchesFilter).slice(0, 2);
+  const nextMatches = upcomingMatches(events, today, now.time).filter(matchesFilter).slice(0, 3);
+  const mine = useMemo(() => nextForFollowed(events, followed, nowMs), [events, followed, nowMs]);
+  const strip = dayStrip(today).map((d) => ({ ...d, count: gamesOn(filtered, d.date).length }));
+  const emptyNext = dayView ? nextGameDay(filtered, from) : null;
+  const emptyPrev = dayView === "ieri" ? previousGameDay(filtered, from) : null;
 
   function shareUrl() {
     const u = new URL("/calendario", window.location.origin);
@@ -186,141 +229,206 @@ function Calendario() {
   }
   const pickTeam = (g: PublicGroup | undefined) => { set({ annata: g ? (g.years[0] ?? g.id) : undefined, p: undefined }); setOpenId(null); };
   const filtersActive = !!selected || place !== "tutte";
+  const showFilters = filtersOpen || (tab !== "Squadra" && filtersActive);
+  const goDay = (d: DayView) => set({ vista: d, p: undefined, entro: undefined });
+  const tabBtn = (on: boolean) => `scd-focus relative flex h-[48px] min-w-0 flex-1 flex-col items-center justify-center rounded-[12px] text-[13px] font-extrabold uppercase tracking-[0.03em] transition-colors ${on ? "bg-[#0b2a5b] text-white shadow-[0_4px_12px_-4px_rgb(11_42_91/0.6)]" : "text-[#0b2a5b] hover:bg-[#eef3f9]"}`;
+
+  const nextBlock = (
+    <section aria-labelledby="cal-next-t" className="grid gap-[10px]">
+      <div className="flex items-end justify-between gap-3">
+        <h2 id="cal-next-t" className="m-0 inline-flex items-center rounded-[12px] bg-[#1556c4] py-[8px] pl-3 pr-7 font-uv text-[17px] uppercase leading-none tracking-[0.03em] text-white shadow-[0_6px_14px_-8px_rgb(11_42_91/0.7)] [clip-path:polygon(0_0,88%_0,100%_100%,0_100%)]">Prossime gare</h2>
+        <Link to="/calendario" search={{ ...(selected ? { annata: selected.years[0] ?? selected.id } : {}), vista: "prossime" }}
+          className="scd-focus inline-flex h-[36px] items-center gap-0.5 rounded-full bg-white px-3 text-[13.5px] font-bold text-[#1556c4] shadow-[0_1px_3px_rgb(11_42_91/0.14)] hover:underline">Vedi tutte<ChevronRight className="size-4" aria-hidden="true" /></Link>
+      </div>
+      <ul className="m-0 grid list-none gap-[8px] p-0" data-testid="next-matches">
+        {nextMatches.length ? nextMatches.map((e) => <NextMatchRow key={e.id} e={e} g={groupOf(e.group)} nowMs={nowMs} />)
+          : <li className={`${CARD} px-4 py-4 text-[14px] text-[#4a5d7a]`}>Nessuna gara in programma{selected ? ` per ${selected.label}` : ""}.</li>}
+      </ul>
+    </section>
+  );
 
   return (
-    <main data-screen="calendario">
-      <PageHeader
-        title="Calendario"
-        motif="mountains-lake"
-        testId="calendar-header"
-        action={
-          <button type="button" onClick={() => setFiltersOpen((o) => !o)} aria-expanded={filtersOpen || (tab !== "Squadra" && filtersActive)} aria-controls="cal-filtri" aria-label="Cerca squadra e filtri" className="flex size-11 items-center justify-center text-white">
-            <Search className="size-[28px]" strokeWidth={2.2} aria-hidden="true" />
-          </button>
-        }
-      />
-      <Sheet overlap={14} className="bg-white lg:bg-[var(--scd-page)]">
-        <div className="mx-auto max-w-3xl px-[6px] pt-[8px]">
-          <Segmented
-            label="Vista calendario"
-            items={[
-              { label: "Settimana", active: tab === "Settimana", onClick: () => set({ vista: selected || search.entro ? "settimana" : undefined, p: undefined, entro: undefined }) },
-              { label: "Mese", active: tab === "Mese", onClick: () => set({ vista: "mese", p: undefined, entro: undefined }) },
-              { label: "Squadra", active: tab === "Squadra", onClick: () => set({ vista: "prossime", p: undefined }) },
-            ]}
-          />
+    <main data-screen="calendario" className="bg-[#eef3f9] pb-10">
+      {/* Hero: lake photo with a slow zoom, official crest, title and the live pulse */}
+      <header className="relative isolate overflow-hidden bg-[#0b2a5b] text-white" data-testid="calendar-header">
+        <img src="/media/scd/lario-header.webp" alt="" aria-hidden="true" fetchPriority="high" decoding="async"
+          className="scd-board-kb absolute inset-0 -z-20 size-full object-cover object-[center_62%]" />
+        <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgb(11_42_120/0.88)_0%,rgb(11_42_120/0.35)_45%,rgb(6_26_80/0.9)_100%)] lg:bg-[linear-gradient(90deg,rgb(6_26_80/0.95)_0%,rgb(8_30_90/0.8)_50%,rgb(11_42_120/0.3)_100%)]" />
+        <KitTexture motif="mountains-lake" overlay />
+        <div className={`${WRAP} relative grid gap-3 pb-14 pt-5 lg:pb-20 lg:pt-8`}>
+          <div className="flex items-center gap-3">
+            <Link to="/" aria-label="S.C.D. ColicoDerviese, vai alla Home" className="scd-focus shrink-0 rounded-[8px]">
+              <ClubCrestOfficial size={62} className="scd-board-pop drop-shadow-[0_6px_12px_rgb(0_0_0/0.45)] lg:hidden" />
+              <ClubCrestOfficial size={96} className="scd-board-pop hidden drop-shadow-[0_8px_16px_rgb(0_0_0/0.5)] lg:block" />
+            </Link>
+            <div className="min-w-0 flex-1">
+              <p className="m-0 text-[12.5px] font-extrabold uppercase tracking-[0.12em] text-[#ffd600] lg:text-[14px]">Stagione {season}</p>
+              <h1 className="m-0 font-uv text-[38px] uppercase leading-[0.95] lg:text-[64px]">Calendario live</h1>
+              <p className="m-0 mt-1 hidden text-[17px] font-semibold text-white/90 lg:block">Le gare di tutte le squadre ColicoDerviese, in casa e in trasferta.</p>
+            </div>
+            <button type="button" onClick={() => setFiltersOpen((o) => !o)} aria-expanded={showFilters} aria-controls="cal-filtri" aria-label="Cerca squadra e filtri"
+              className="scd-focus grid size-11 shrink-0 place-items-center rounded-full bg-white/12 text-white backdrop-blur-sm hover:bg-white/20">
+              <Search className="size-[22px]" strokeWidth={2.4} aria-hidden="true" />
+            </button>
+          </div>
+          <LiveBanner events={filtered} groups={groups} nowMs={nowMs} />
+        </div>
+      </header>
+
+      <div className={`${WRAP} relative -mt-9 grid gap-5 lg:-mt-12 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] lg:items-start lg:gap-8`}>
+        <div className="grid min-w-0 gap-4">
+          {/* IERI / OGGI / DOMANI + Calendario */}
+          <nav aria-label="Giorno o calendario" className={`${CARD} grid gap-2 p-2`}>
+            <div className="flex gap-1.5" role="group" aria-label="Scegli il giorno">
+              {strip.map((d) => (
+                <button key={d.key} type="button" aria-pressed={dayView === d.key} onClick={() => goDay(d.key)} className={tabBtn(dayView === d.key)}
+                  aria-label={`${d.label}, ${fmt(d.date, { weekday: "long", day: "numeric", month: "long" })}${d.count ? `, ${d.count} ${d.count === 1 ? "gara" : "gare"}` : ""}`}>
+                  <span className="inline-flex items-center gap-1">{d.label}{d.count > 0 && <span className="grid h-[17px] min-w-[17px] place-items-center rounded-full bg-[#ffd600] px-1 text-[10.5px] font-extrabold leading-none tracking-normal text-[#0b2a5b] tabular-nums" aria-hidden="true">{d.count}</span>}</span>
+                  <span className={`text-[11px] font-bold normal-case tracking-normal ${dayView === d.key ? "text-white/80" : "text-[#4a5d7a]"}`}>{fmt(d.date, { day: "numeric", month: "short" })}</span>
+                </button>
+              ))}
+              <button type="button" aria-pressed={!dayView} onClick={() => set({ vista: selected || search.entro ? "settimana" : undefined, p: undefined, entro: undefined })} className={tabBtn(!dayView)}>
+                <CalendarDays className="size-[18px]" strokeWidth={2.4} aria-hidden="true" />
+                <span className="text-[11px]">Calendario</span>
+              </button>
+            </div>
+            {!dayView && (
+              <div className="flex gap-1.5 border-t border-[#e3eaf4] pt-2" role="group" aria-label="Vista calendario">
+                {([["Settimana", () => set({ vista: selected || search.entro ? "settimana" : undefined, p: undefined, entro: undefined })], ["Mese", () => set({ vista: "mese", p: undefined, entro: undefined })], ["Squadra", () => set({ vista: "prossime", p: undefined })]] as const).map(([l, fn]) => (
+                  <button key={l} type="button" aria-pressed={tab === l} onClick={fn}
+                    className={`scd-focus h-[44px] flex-1 rounded-full text-[13.5px] font-bold ${tab === l ? "bg-[#1556c4] text-white" : "text-[#0b2a5b] hover:bg-[#eef3f9]"}`}>{l}</button>
+                ))}
+              </div>
+            )}
+          </nav>
 
           {access && <BaseAccessNotice state={access} />}
 
-          {(filtersOpen || (tab !== "Squadra" && filtersActive)) && (
-            <div id="cal-filtri" className="mt-[12px] grid gap-[8px] rounded-[12px] bg-[var(--scd-page)] p-[10px]">
-              <label htmlFor="annata" className="text-[14px] font-bold text-[var(--scd-ink)]">Trova la tua annata</label>
+          {showFilters && (
+            <div id="cal-filtri" className={`${CARD} grid gap-[8px] p-3`}>
+              <label htmlFor="annata" className="text-[14px] font-bold text-[#0b1e3a]">Trova la tua annata</label>
               <select id="annata" value={selected?.id ?? ""} onChange={(e) => pickTeam(choices.find((x) => x.id === e.target.value))}
-                className="h-[46px] w-full rounded-[9px] border border-[#cfd5df] bg-white px-3 text-[16px] font-semibold text-[var(--scd-ink)]">
+                className="h-[46px] w-full rounded-[10px] border border-[#cfd8e6] bg-white px-3 text-[16px] font-semibold text-[#0b1e3a]">
                 <option value="">Tutte le annate e categorie</option>
                 {choices.map((g) => <option key={g.id} value={g.id}>{g.label}</option>)}
               </select>
               <PlaceSwitch place={place} onChange={(pl) => set({ luogo: pl === "tutte" ? undefined : pl })} />
             </div>
           )}
-          {search.annata && !selected && <p role="alert" className="mt-2 text-[15px] font-semibold">Annata “{search.annata}” non presente nel calendario: mostro tutte le categorie.</p>}
+          {search.annata && !selected && <p role="alert" className="m-0 text-[15px] font-semibold">Annata “{search.annata}” non presente nel calendario: mostro tutte le categorie.</p>}
+
+          {/* Squadre: star to follow, tap to filter; followed teams first */}
+          <section aria-labelledby="cal-teams-t" className="grid gap-2">
+            <h2 id="cal-teams-t" className="m-0 flex items-baseline justify-between gap-2 text-[15px] font-extrabold text-[#0b2a5b]">
+              {followed.length ? "Le mie squadre" : "Squadre"}
+              <span className="text-[12.5px] font-semibold text-[#4a5d7a]">{followed.length ? "seguite su questo dispositivo" : "tocca ☆ per seguire"}</span>
+            </h2>
+            <TeamChips groups={choices} followed={followed} selectedId={selected?.id ?? null} label={(g) => groupShort(g, g.label)} onPick={pickTeam} onFollow={follow} />
+            {mine.length > 0 && !selected && (
+              <ul className="m-0 grid list-none gap-[8px] p-0" data-testid="cal-my-teams">
+                {mine.map((e) => <NextMatchRow key={e.id} e={e} g={groupOf(e.group)} nowMs={nowMs} />)}
+              </ul>
+            )}
+          </section>
 
           {tab === "Squadra" && (
-            <div className="mt-[12px] grid gap-[10px]">
-              <div className="scd-scroll-x -mx-[18px] flex gap-[8px] overflow-x-auto px-[18px] pb-[2px]" role="group" aria-label="Squadre rapide">
-                <button type="button" aria-pressed={!selected} onClick={() => pickTeam(undefined)} className={`flex h-[46px] shrink-0 items-center rounded-[10px] px-[14px] text-[14px] font-bold ${!selected ? "bg-[var(--scd-blue)] text-white" : "bg-[#eef0f3] text-[var(--scd-ink)]"}`}>Tutte</button>
-                {choices.map((g) => {
-                  const on = selected?.id === g.id;
-                  return (
-                    <button key={g.id} type="button" aria-pressed={on} onClick={() => pickTeam(on ? undefined : g)}
-                      className={`flex h-[46px] shrink-0 items-center gap-[7px] rounded-[10px] pl-[6px] pr-[12px] text-[14px] font-bold ${on ? "bg-[var(--scd-blue)] text-white" : "bg-[#eef0f3] text-[var(--scd-ink)]"}`}>
-                      <span className="size-[12px] shrink-0 rounded-full ring-2 ring-white" style={{ background: g.color }} aria-hidden="true" />
-                      <span className="whitespace-nowrap">{shortLabel(g)}</span>
-                    </button>
-                  );
-                })}
-              </div>
+            <div className={`${CARD} grid gap-[10px] p-3`}>
               <PlaceSwitch place={place} onChange={(pl) => set({ luogo: pl === "tutte" ? undefined : pl })} />
-              <div className="grid grid-cols-6 gap-[5px]" role="group" aria-label="Intervallo da oggi">
+              <div className="grid grid-cols-3 gap-[6px] sm:grid-cols-6" role="group" aria-label="Intervallo da oggi">
                 {([undefined, ...WINDOWS] as (WindowDays | undefined)[]).map((w) => {
                   const on = view === "prossime" && search.entro === w;
                   return (
                     <button key={w ?? "all"} type="button" aria-pressed={on} onClick={() => set({ vista: "prossime", entro: w })}
-                      className={`h-[36px] rounded-[8px] text-[13px] font-bold ${on ? "bg-[var(--scd-blue)] text-white" : "bg-[#eef0f3] text-[var(--scd-ink)]"}`}>
+                      className={`scd-focus h-[40px] rounded-[10px] text-[13px] font-bold ${on ? "bg-[#1556c4] text-white" : "bg-[#eef3f9] text-[#0b2a5b]"}`}>
                       {w === undefined ? "Tutte" : w === 180 ? "6 mesi" : `${w} gg`}
                     </button>
                   );
                 })}
                 <button type="button" aria-pressed={view === "stagione"} onClick={() => set({ vista: "stagione", entro: undefined })}
-                  className={`h-[36px] rounded-[8px] text-[13px] font-bold ${view === "stagione" ? "bg-[var(--scd-blue)] text-white" : "bg-[#eef0f3] text-[var(--scd-ink)]"}`}>Stagione</button>
+                  className={`scd-focus h-[40px] rounded-[10px] text-[13px] font-bold ${view === "stagione" ? "bg-[#1556c4] text-white" : "bg-[#eef3f9] text-[#0b2a5b]"}`}>Stagione</button>
               </div>
-              <p className="text-[14px] font-semibold text-[var(--scd-ink)]">{label} · {view === "prossime" ? `${shown.length} di ${visible.length}` : visible.length} {visible.length === 1 ? "gara" : "gare"}{selected ? ` · ${selected.label}` : ""}</p>
+              <p className="m-0 text-[14px] font-semibold text-[#0b1e3a]">{label} · {view === "prossime" ? `${shown.length} di ${visible.length}` : visible.length} {visible.length === 1 ? "gara" : "gare"}{selected ? ` · ${selected.label}` : ""}</p>
               {member && selected && (trainingKey
-                ? <Link to="/allenamenti" search={{ annata: trainingKey }} className="inline-flex h-[42px] w-fit items-center gap-2 rounded-[9px] border-2 border-[var(--scd-blue)] px-[12px] text-[14px] font-bold text-[var(--scd-blue)]"><ConeIcon size={20} className="text-[var(--scd-orange)]" />Allenamenti della mia annata ({trainingKey})</Link>
-                : <p className="text-[13px] text-[var(--scd-sub)]">Allenamenti: categoria non trovata automaticamente nel <Link to="/allenamenti" className="font-bold text-[var(--scd-blue)] underline">quadro settimanale</Link>.</p>)}
+                ? <Link to="/allenamenti" search={{ annata: trainingKey }} className="inline-flex h-[44px] w-fit items-center gap-2 rounded-[10px] border-2 border-[#1556c4] px-[12px] text-[14px] font-bold text-[#1556c4]"><ConeIcon size={20} className="text-[var(--scd-orange)]" />Allenamenti della mia annata ({trainingKey})</Link>
+                : <p className="m-0 text-[13px] text-[#4a5d7a]">Allenamenti: categoria non trovata automaticamente nel <Link to="/allenamenti" className="font-bold text-[#1556c4] underline">quadro settimanale</Link>.</p>)}
             </div>
           )}
 
-          {tab !== "Squadra" && (
-            <div className="mt-[14px] flex items-center gap-1">
-              <button type="button" aria-label={tab === "Mese" ? "Mese precedente" : "Settimana precedente"} onClick={() => set({ p: offset - 1 || undefined })} className="flex size-11 items-center justify-center text-[var(--scd-ink)]"><ChevronLeft className="size-[28px]" strokeWidth={2.4} /></button>
-              <p className="flex flex-1 items-center justify-center gap-[8px] text-[19px] font-bold capitalize text-[var(--scd-ink)]" aria-live="polite">
-                <CalendarDays className="size-[22px]" strokeWidth={2.3} aria-hidden="true" />{label}
-              </p>
-              <button type="button" aria-label={tab === "Mese" ? "Mese successivo" : "Settimana successiva"} onClick={() => set({ p: offset + 1 || undefined })} className="flex size-11 items-center justify-center text-[var(--scd-ink)]"><ChevronRight className="size-[28px]" strokeWidth={2.4} /></button>
+          {/* Week / month header with arrows (real current week), or the day heading */}
+          {(tab === "Settimana" || tab === "Mese") && (
+            <div className="grid gap-1">
+              <div className={`${CARD} flex items-center gap-1 px-1 py-1`}>
+                <button type="button" aria-label={tab === "Mese" ? "Mese precedente" : "Settimana precedente"} onClick={() => set({ p: offset - 1 || undefined })} className="scd-focus grid size-11 place-items-center rounded-full text-[#0b2a5b] hover:bg-[#eef3f9]"><ChevronLeft className="size-[26px]" strokeWidth={2.6} /></button>
+                <p className="m-0 flex flex-1 items-center justify-center gap-[8px] text-center text-[17px] font-extrabold text-[#0b2a5b] lg:text-[19px]" aria-live="polite">
+                  <CalendarDays className="size-[20px] shrink-0 text-[#1556c4]" strokeWidth={2.4} aria-hidden="true" /><span className="inline-block first-letter:uppercase">{label}</span>
+                </p>
+                <button type="button" aria-label={tab === "Mese" ? "Mese successivo" : "Settimana successiva"} onClick={() => set({ p: offset + 1 || undefined })} className="scd-focus grid size-11 place-items-center rounded-full text-[#0b2a5b] hover:bg-[#eef3f9]"><ChevronRight className="size-[26px]" strokeWidth={2.6} /></button>
+              </div>
+              {offset !== 0 && <div className="flex justify-center"><button type="button" onClick={() => set({ p: undefined })} className="scd-focus h-[36px] rounded-full bg-white px-[14px] text-[13px] font-bold text-[#0b2a5b] shadow-[0_1px_3px_rgb(11_42_91/0.14)]">{tab === "Mese" ? "Torna a questo mese" : "Torna a questa settimana"}</button></div>}
             </div>
           )}
-          {tab !== "Squadra" && offset !== 0 && <div className="flex justify-center"><button type="button" onClick={() => set({ p: undefined })} className="h-[34px] rounded-full bg-[#eef0f3] px-[14px] text-[13px] font-bold text-[var(--scd-ink)]">Torna a oggi</button></div>}
+          {dayView && <h2 className="m-0 text-[19px] font-extrabold text-[#0b2a5b] first-letter:uppercase" aria-live="polite">{label}</h2>}
 
-          <section className="mt-[6px]" aria-label={label} data-testid="calendar-list" data-rows={rows.length}>
-            {events.length === 0 ? <p className="py-10 text-center text-base text-[var(--scd-sub)]">{EMPTY_MESSAGE}</p>
-              : rows.length === 0 ? <p className="py-8 text-center text-[15px] text-[var(--scd-sub)]">Nessuna gara in questo periodo{selected ? ` per ${selected.label}` : ""}.</p>
-              : <ul className="divide-y divide-[var(--scd-line)] lg:grid lg:grid-cols-2 lg:gap-x-8 lg:divide-y-0">
+          <section aria-label={label} data-testid="calendar-list" data-rows={rows.length}>
+            {events.length === 0 ? <p className={`${CARD} m-0 px-4 py-10 text-center text-base text-[#4a5d7a]`}>{EMPTY_MESSAGE}</p>
+              : rows.length === 0 ? (
+                <div className={`${CARD} grid justify-items-center gap-2 px-4 py-7 text-center`} data-testid="calendar-empty">
+                  <p className="m-0 text-[15px] font-semibold text-[#0b1e3a]">Nessuna gara {dayView ? (dayView === "oggi" ? "oggi" : dayView === "ieri" ? "ieri" : "domani") : "in questo periodo"}{selected ? ` per ${selected.label}` : ""}.</p>
+                  {(emptyNext || emptyPrev) && (
+                    <div className="flex flex-wrap justify-center gap-2">
+                      {emptyPrev && <button type="button" onClick={() => set({ vista: "settimana", p: weekShift(today, emptyPrev) || undefined })} className="scd-focus h-[44px] rounded-full bg-[#eef3f9] px-4 text-[14px] font-bold text-[#0b2a5b]">Ultima giornata: {fmt(emptyPrev, { weekday: "short", day: "numeric", month: "short" })}</button>}
+                      {emptyNext && <button type="button" onClick={() => set({ vista: "settimana", p: weekShift(today, emptyNext) || undefined })} className="scd-focus h-[44px] rounded-full bg-[#1556c4] px-4 text-[14px] font-bold text-white">Prossima giornata: {fmt(emptyNext, { weekday: "short", day: "numeric", month: "short" })}</button>}
+                    </div>
+                  )}
+                </div>
+              )
+              : <ul className="m-0 grid list-none gap-[8px] p-0 xl:grid-cols-1">
                 {rows.map((r) => r.kind === "gara"
-                  ? <EventRow key={r.id} e={r.e} g={r.g} open={openId === r.id} toggle={() => setOpenId(openId === r.id ? null : r.id)} />
-                  : <TrainingRowItem key={r.id} r={r} />)}
+                  ? <GameRow key={r.id} e={r.e} g={r.g} nowMs={nowMs} open={openId === r.id} toggle={() => setOpenId(openId === r.id ? null : r.id)} followed={!!r.g && followed.includes(r.g.id)} onFollow={follow} />
+                  : <TrainingRow key={r.id} r={r} />)}
               </ul>}
             {remaining > 0 && (
-              <button type="button" onClick={() => setExtra((x) => x + 8)} className="mt-3 h-[44px] w-full rounded-[9px] border-2 border-[var(--scd-blue)] bg-white text-[15px] font-bold text-[var(--scd-blue)]">
+              <button type="button" onClick={() => setExtra((x) => x + 8)} className="scd-focus mt-3 h-[46px] w-full rounded-[12px] border-2 border-[#1556c4] bg-white text-[15px] font-bold text-[#1556c4]">
                 Mostra altre {Math.min(8, remaining)}
               </button>
             )}
-            {trainingRows.length > 0 && <p className="pt-[4px] text-[12px] text-[var(--scd-sub)]">Allenamenti dal quadro settimanale lun–ven (fotografia 09/10/2026, non live).</p>}
-            {!member && (
-              <Link to="/accedi" search={{ next: "/calendario" }} className="mt-3 flex items-center gap-3 rounded-[12px] border border-[var(--scd-line)] bg-white px-3 py-2.5 text-[var(--scd-ink)]" data-testid="cal-members-hint">
-                <Lock className="size-5 shrink-0 text-[var(--scd-blue)]" aria-hidden="true" />
-                <span className="min-w-0 flex-1">
-                  <b className="block text-[15px] leading-tight">Entra per allenamenti e dettagli</b>
-                  <small className="block text-[13px] text-[var(--scd-sub)]">Qui vedi le gare; squadre e allenamenti sono nell'area soci</small>
-                </span>
-                <span aria-hidden="true" className="text-[18px] text-[var(--scd-blue)]">›</span>
-              </Link>
-            )}
-            {member && !selected && (
-              <Link to="/allenamenti" className="mt-3 flex items-center gap-3 rounded-[12px] border border-[var(--scd-line)] bg-white px-3 py-2.5 text-[var(--scd-ink)]" data-testid="cal-training-link">
-                <ConeIcon size={24} className="shrink-0 text-[var(--scd-orange)]" />
-                <span className="min-w-0 flex-1">
-                  <b className="block text-[15px] leading-tight">Allenamenti della settimana</b>
-                  <small className="block text-[13px] text-[var(--scd-sub)]">Campi, orari e spogliatoi di tutte le annate</small>
-                </span>
-                <span aria-hidden="true" className="text-[18px] text-[var(--scd-blue)]">›</span>
-              </Link>
-            )}
+            {trainingRows.length > 0 && <p className="m-0 pt-[6px] text-[12px] text-[#4a5d7a]">Allenamenti dal quadro settimanale lun–ven (fotografia 09/10/2026, non live).</p>}
           </section>
 
           {tab !== "Squadra" && (
-            <>
-              <PrimaryButton className="mt-[14px]" onClick={() => set({ vista: "prossime", p: undefined })}>Vedi tutti gli eventi <ArrowRight className="size-[20px]" strokeWidth={2.4} /></PrimaryButton>
-              <SectionHead title="Prossime gare" more={{ label: "Vedi tutti", target: { to: "/calendario", search: { ...(selected ? { annata: selected.years[0] ?? selected.id } : {}), vista: "prossime" } } }} />
-              <ul className="divide-y divide-[var(--scd-line)]" data-testid="next-matches">
-                {nextMatches.length ? nextMatches.map((e) => <NextMatchRow key={e.id} e={e} g={groupOf(e.group)} />)
-                  : <li className="py-4 text-[14px] text-[var(--scd-sub)]">Nessuna gara in programma{selected ? ` per ${selected.label}` : ""}.</li>}
-              </ul>
-            </>
+            <button type="button" onClick={() => set({ vista: "prossime", p: undefined })}
+              className="scd-focus flex h-[50px] w-full items-center justify-center gap-2 rounded-[12px] bg-[#1556c4] text-[16.5px] font-bold text-white shadow-[0_6px_14px_-6px_rgb(21_86_196/0.7)] hover:bg-[#124bb0]">
+              Vedi tutti gli eventi <ArrowRight className="size-[20px]" strokeWidth={2.4} aria-hidden="true" />
+            </button>
           )}
 
-          <div className="mt-[18px] rounded-[12px] bg-[var(--scd-page)] p-[12px] text-[13px] text-[var(--scd-ink)] lg:bg-white">
-            <p data-calendar-origin={origin} className="font-medium">
+          {!member && (
+            <Link to="/accedi" search={{ next: "/calendario" }} className={`${CARD} scd-focus flex items-center gap-3 px-3 py-3 text-[#0b1e3a]`} data-testid="cal-members-hint">
+              <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[#0b2a5b]"><Lock className="size-5 text-[#ffd600]" aria-hidden="true" /></span>
+              <span className="min-w-0 flex-1">
+                <b className="block text-[15px] leading-tight">Entra per allenamenti e dettagli</b>
+                <small className="block text-[13px] text-[#4a5d7a]">Qui vedi le gare; squadre e allenamenti sono nell'area soci</small>
+              </span>
+              <ChevronRight className="size-5 shrink-0 text-[#1556c4]" aria-hidden="true" />
+            </Link>
+          )}
+          {member && !selected && (
+            <Link to="/allenamenti" className={`${CARD} scd-focus flex items-center gap-3 px-3 py-3 text-[#0b1e3a]`} data-testid="cal-training-link">
+              <ConeIcon size={24} className="shrink-0 text-[var(--scd-orange)]" />
+              <span className="min-w-0 flex-1">
+                <b className="block text-[15px] leading-tight">Allenamenti della settimana</b>
+                <small className="block text-[13px] text-[#4a5d7a]">Campi, orari e spogliatoi di tutte le annate</small>
+              </span>
+              <ChevronRight className="size-5 shrink-0 text-[#1556c4]" aria-hidden="true" />
+            </Link>
+          )}
+        </div>
+
+        <aside className="grid min-w-0 gap-5 lg:sticky lg:top-4" aria-label="Prossime gare e informazioni">
+          {tab !== "Squadra" && nextBlock}
+
+          <div className={`${CARD} p-3 text-[13px] text-[#0b1e3a]`}>
+            <p data-calendar-origin={origin} className="m-0 font-medium">
               {origin === "mirror"
                 ? <>Calendario aggiornato {freshnessLabel(sourceModifiedAt)} (Italia), da riconfermare in caso di variazioni.</>
                 : origin === "stale"
@@ -328,31 +436,34 @@ function Calendario() {
                   : <>Copia di sicurezza del {freshnessLabel(sourceModifiedAt)} — aggiornamenti in verifica.</>}
             </p>
             <div className="mt-[8px] flex flex-wrap items-center gap-[8px]">
-              <button type="button" onClick={refresh} disabled={refreshing} aria-label="Verifica aggiornamenti del calendario" className="inline-flex h-[38px] items-center gap-1.5 rounded-[8px] bg-white px-[10px] text-[13px] font-bold shadow-[var(--scd-card-shadow)] disabled:opacity-60 lg:bg-[var(--scd-page)]">
-                <RefreshCw className={`size-4 ${refreshing ? "animate-spin motion-reduce:animate-none" : ""}`} /> Verifica
+              <button type="button" onClick={refresh} disabled={refreshing} aria-label="Verifica aggiornamenti del calendario" className="scd-focus inline-flex h-[40px] items-center gap-1.5 rounded-[10px] bg-[#eef3f9] px-[12px] text-[13px] font-bold disabled:opacity-60">
+                <RefreshCw className={`size-4 ${refreshing ? "animate-spin motion-reduce:animate-none" : ""}`} aria-hidden="true" /> Verifica
               </button>
-              <button type="button" onClick={copyLink} className="inline-flex h-[38px] items-center gap-1.5 rounded-[8px] bg-[var(--scd-yellow)] px-[10px] text-[13px] font-bold"><Link2 className="size-4" /> Copia link {selected ? "annata" : "calendario"}</button>
-              {canShare && <button type="button" onClick={shareLink} className="inline-flex h-[38px] items-center gap-1.5 rounded-[8px] bg-white px-[10px] text-[13px] font-bold shadow-[var(--scd-card-shadow)]"><Share2 className="size-4" /> Condividi</button>}
-              <button type="button" onClick={() => window.dispatchEvent(new CustomEvent("vera:open"))} aria-label="Chiedi a Vera, la reception del club" className="inline-flex h-[38px] items-center gap-1.5 rounded-[8px] bg-white px-[8px] text-[13px] font-bold shadow-[var(--scd-card-shadow)] min-[641px]:hidden">
+              <button type="button" onClick={copyLink} className="scd-focus inline-flex h-[40px] items-center gap-1.5 rounded-[10px] bg-[#ffd600] px-[12px] text-[13px] font-bold text-[#0b2a5b]"><Link2 className="size-4" aria-hidden="true" /> Copia link {selected ? "annata" : "calendario"}</button>
+              {canShare && <button type="button" onClick={shareLink} className="scd-focus inline-flex h-[40px] items-center gap-1.5 rounded-[10px] bg-[#eef3f9] px-[12px] text-[13px] font-bold"><Share2 className="size-4" aria-hidden="true" /> Condividi</button>}
+              <button type="button" onClick={() => window.dispatchEvent(new CustomEvent("vera:open"))} aria-label="Chiedi a Vera, la reception del club" className="scd-focus inline-flex h-[40px] items-center gap-1.5 rounded-[10px] bg-[#eef3f9] px-[8px] text-[13px] font-bold min-[641px]:hidden">
                 <PersonaAvatar persona="vera" size={24} /> Chiedi a Vera
               </button>
             </div>
-            <p role="status" aria-live="polite" className="mt-[4px] min-h-0 text-[13px] font-semibold text-[var(--scd-blue)]">{refreshMsg ?? copied}</p>
+            <p role="status" aria-live="polite" className="m-0 mt-[4px] min-h-0 text-[13px] font-semibold text-[#1556c4]">{refreshMsg ?? copied}</p>
           </div>
 
-          <OfficialResults className="mt-[18px]" />
-          <p className="mt-[12px] text-[13px] text-[var(--scd-sub)]">
-            Dove si gioca: <Link to="/impianti" className="font-bold text-[var(--scd-blue)] underline">mappa dei campi di Colico e Dervio</Link>
-            {member && <> · <Link to="/squadre" className="font-bold text-[var(--scd-blue)] underline">tutte le squadre</Link></>}
+          <OfficialResults />
+          <p className="m-0 text-[13px] text-[#4a5d7a]">
+            Dove si gioca: <Link to="/impianti" className="font-bold text-[#1556c4] underline">mappa dei campi di Colico e Dervio</Link>
+            {member && <> · <Link to="/squadre" className="font-bold text-[#1556c4] underline">tutte le squadre</Link></>}
           </p>
-        </div>
-      </Sheet>
+        </aside>
+      </div>
     </main>
   );
 }
 
-function addDaysIso(iso: string, n: number) {
-  return new Date(Date.parse(`${iso}T12:00:00Z`) + n * 86_400_000).toISOString().slice(0, 10);
+/** Week offset from the current week to the week holding `date` (to jump to the nearest game day). */
+function weekShift(today: string, date: string) {
+  const a = Date.parse(`${weekRange(today).from}T12:00:00Z`);
+  const b = Date.parse(`${weekRange(date).from}T12:00:00Z`);
+  return Math.round((b - a) / (7 * 86_400_000));
 }
 
 function PlaceSwitch({ place, onChange }: { place: Place; onChange: (p: Place) => void }) {
@@ -360,106 +471,10 @@ function PlaceSwitch({ place, onChange }: { place: Place; onChange: (p: Place) =
     <div className="grid grid-cols-3 gap-[6px]" role="group" aria-label="Casa o trasferta">
       {PLACES.map((pl) => (
         <button key={pl} type="button" aria-pressed={place === pl} onClick={() => onChange(pl)}
-          className={`h-[36px] rounded-full text-[13px] font-bold uppercase ${place === pl ? "bg-[var(--scd-blue)] text-white" : "bg-[#eef0f3] text-[var(--scd-ink)]"}`}>
+          className={`scd-focus h-[40px] rounded-full text-[13px] font-bold uppercase ${place === pl ? "bg-[#1556c4] text-white" : "bg-[#eef3f9] text-[#0b2a5b]"}`}>
           {pl === "fuori" ? "Trasferta" : pl === "casa" ? "Casa" : "Tutte"}
         </button>
       ))}
     </div>
   );
 }
-
-function shortLabel(g: PublicGroup) {
-  const m = g.label.match(/\b(U\d{2}|Under\s?\d{2}|Juniores|Allievi|Giovanissimi|Prima Squadra)\b/i);
-  if (g.years.length) return g.years.join("/");
-  return m ? m[1]!.replace(/Under\s?/i, "U") : g.label.slice(0, 14);
-}
-
-function Lead({ date, time }: { date: string; time: string }) {
-  const d = dateParts(date);
-  return (
-    <span className="block w-[78px] shrink-0 leading-none text-[var(--scd-ink)]">
-      <span className="block whitespace-nowrap text-[14px] font-bold uppercase tracking-[-0.01em]">{d.weekday} {d.day} {d.month}</span>
-      <span className="mt-[6px] block text-[19px] font-bold">{time || "--:--"}</span>
-    </span>
-  );
-}
-
-function EventRow({ e, g, open, toggle }: { e: PublicEvent; g: PublicGroup | undefined; open: boolean; toggle: () => void }) {
-  const certain = e.timeConfirmed && e.venueConfirmed;
-  const home = e.homeAway === "CASA";
-  const team = groupShort(g, e.category);
-  const kind = e.type ? e.type.charAt(0) + e.type.slice(1).toLowerCase() : "Gara";
-  return (
-    <li data-event-id={e.id}>
-      <button type="button" onClick={toggle} aria-expanded={open} className="flex w-full items-center gap-[12px] py-[13px] text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--scd-blue)]">
-        <span className="w-[4px] shrink-0 self-stretch rounded-full" style={{ background: g?.color ?? "#668196" }} aria-hidden="true" />
-        <Lead date={e.date} time={e.time} />
-        <span className="flex w-[44px] shrink-0 justify-center"><OpponentCrest name={e.opponent} size={40} /></span>
-        <span className="min-w-0 flex-1">
-          <span className="block break-words text-[16.5px] font-bold leading-[1.2] tracking-[-0.01em] text-[var(--scd-ink)]">{kind !== "Campionato" ? `${kind} · ` : ""}{matchTitle({ homeAway: e.homeAway, opponent: opponentLabel(e.opponent) }, `ColicoDerviese ${team}`)}</span>
-          <span className="mt-[3px] flex items-start gap-[3px] text-[14px] font-medium leading-[1.25] text-[var(--scd-sub)]">
-            <MapPin className="mt-[2px] size-[14px] shrink-0" strokeWidth={2.4} aria-hidden="true" />
-            <span className="min-w-0 break-words">{home ? "" : "Trasferta · "}{venueCase(e.venue) || "Sede da definire"}
-              {!certain && <span className="ml-[5px] whitespace-nowrap rounded bg-[#fff3c4] px-[5px] text-[11px] font-bold uppercase text-[#8a5a00]">da confermare</span>}
-              {e.isVariation && <span className="ml-[5px] whitespace-nowrap rounded border border-[var(--scd-blue)] px-[4px] text-[11px] font-bold uppercase text-[var(--scd-blue)]">Variazione</span>}
-            </span>
-          </span>
-        </span>
-      </button>
-      {open && (
-        <dl className="mb-[12px] ml-[16px] grid gap-1.5 rounded-[10px] bg-[var(--scd-page)] px-3 py-3 text-[14px]">
-          <div><Clock3 className="mr-1 inline size-4" />{fmt(e.date, { weekday: "long", day: "numeric", month: "long", year: "numeric" })} · {e.time ? `${e.time}${certain ? "" : " (indicativo)"}` : "orario da definire"}</div>
-          <div className="flex gap-1"><MapPin className="mt-1 size-4 shrink-0" /><span className="break-words">{e.venue || "Sede da definire"}{e.venueConfirmed ? "" : " (da confermare)"}</span></div>
-          <div><dt className="inline text-[var(--scd-sub)]">Categoria: </dt><dd className="inline">{e.category}{e.round ? ` · giornata ${e.round}` : ""}</dd></div>
-          <div><dt className="inline text-[var(--scd-sub)]">Provenienza: </dt><dd className="inline">{e.source || "Calendario SCD"} · {e.status === "OFFICIAL_CALENDAR" ? "calendario ufficiale" : e.status === "CLUB_EVENT" ? "evento organizzato dalla società (non certificato FIGC)" : e.status} · fotografia non live</dd></div>
-          {e.facilityReview && <div className="font-semibold text-[var(--scd-sub)]">Disponibilità impianto da verificare</div>}
-          {e.notice.map((n) => <div key={n} className="font-semibold">⚠ {n}</div>)}
-          <div><GroupResultsLink group={e.group} /></div>
-        </dl>
-      )}
-    </li>
-  );
-}
-
-function TrainingRowItem({ r }: { r: Extract<Row, { kind: "allenamento" }> }) {
-  return (
-    <li>
-      <Link to="/allenamenti" className="flex items-center gap-[12px] py-[13px]">
-        <span className="w-[4px] shrink-0 self-stretch rounded-full bg-[var(--scd-green)]" aria-hidden="true" />
-        <Lead date={r.date} time={r.time} />
-        <span className="flex w-[44px] shrink-0 justify-center"><ConeIcon size={40} className="text-[var(--scd-orange)]" title="Allenamento" /></span>
-        <span className="min-w-0 flex-1">
-          <span className="block break-words text-[16.5px] font-bold leading-[1.2] tracking-[-0.01em] text-[var(--scd-ink)]">{r.title}</span>
-          <span className="mt-[3px] flex items-start gap-[3px] text-[14px] font-medium leading-[1.25] text-[var(--scd-sub)]"><MapPin className="mt-[2px] size-[14px] shrink-0" strokeWidth={2.4} aria-hidden="true" /><span className="min-w-0">{r.sub}</span></span>
-          {r.teams && <span className="mt-[2px] block truncate text-[12px] font-medium text-[var(--scd-sub)]">{r.teams}</span>}
-        </span>
-      </Link>
-    </li>
-  );
-}
-
-function NextMatchRow({ e, g }: { e: PublicEvent; g: PublicGroup | undefined }) {
-  const d = dateParts(e.date);
-  const team = groupShort(g, e.category);
-  const opp = opponentLabel(e.opponent);
-  const home = e.homeAway === "CASA";
-  return (
-    <li>
-      <Link to="/calendario" search={{ annata: g ? (g.years[0] ?? g.id) : undefined, vista: "prossime" }} className="flex items-center gap-[12px] py-[12px]">
-        <span className="w-[4px] shrink-0 self-stretch rounded-full" style={{ background: g?.color ?? "#668196" }} aria-hidden="true" />
-        <span className="w-[54px] shrink-0"><DateBlock weekday={d.weekday} day={d.day} month={d.month} /></span>
-        <span className="flex shrink-0 items-center gap-[4px]">
-          {home ? <Crest height={44} className="drop-shadow-none" /> : <OpponentCrest name={e.opponent} size={40} />}
-          <span className="text-[11px] font-bold text-[var(--scd-sub)]" aria-hidden="true">vs</span>
-          {home ? <OpponentCrest name={e.opponent} size={40} /> : <Crest height={44} className="drop-shadow-none" />}
-        </span>
-        <span className="min-w-0 flex-1">
-          <span className="block text-[15.5px] font-bold leading-[1.25] text-[var(--scd-ink)]">{home ? <>ColicoDerviese {team}<br />vs {opp}</> : <>{opp}<br />vs ColicoDerviese {team}</>}</span>
-          <span className="mt-[4px] block text-[13px] text-[var(--scd-sub)]">{e.time ? `${e.time} · ` : ""}{venueCase(e.venue) || "Sede da definire"}</span>
-        </span>
-        <ChevronRight className="size-[24px] shrink-0 text-[var(--scd-ink)]" strokeWidth={2.4} aria-hidden="true" />
-      </Link>
-    </li>
-  );
-}
-
