@@ -3256,7 +3256,14 @@
         "supersedes": [
           "UD-122 (cameo greeting only)"
         ],
-        "status": "IN_PROGRESS"
+        "status": "IMPLEMENTED_LIVE_HOME_PARTS; FLIP_CARDS_MEMBERS_ONLY",
+        "delivered": [
+          "apps/superapp/src/components/home/WinConfetti.tsx",
+          "apps/superapp/src/components/sponsor/PartnerBand.tsx",
+          "apps/superapp/src/routes/squadre_.carte.tsx",
+          "apps/superapp/src/components/squadre/SquadraCarte.tsx",
+          "apps/superapp/src/lib/squadra-carte.ts"
+        ]
       }
     }
   ],

@@ -2,9 +2,11 @@ import { describe, expect, it } from "vitest";
 
 import type { RosterPlayer } from "./public-roster";
 import {
+  cardName,
   deckMode,
   deckTeams,
   flipHint,
+  minimizeDeck,
   pickTeam,
   playerCards,
   roleCounts,
@@ -140,5 +142,36 @@ describe("squadra carte · switcher", () => {
     expect(teamShortName("Esordienti · 2014")).toBe("Esordienti 2014");
     expect(flipHint(false)).toMatch(/girare/);
     expect(flipHint(true)).toMatch(/tornare/);
+  });
+});
+
+describe("squadra carte · minimisation (review 15/10)", () => {
+  it("minors always first name + initial, adults as written", () => {
+    expect(cardName({ name: "Luca Verdi", adult: false })).toBe("Luca V.");
+    expect(cardName({ name: "Luca De Santis", adult: false })).toBe("Luca S.");
+    expect(cardName({ name: "Luca V.", adult: false })).toBe("Luca V.");
+    expect(cardName({ name: "Luca", adult: false })).toBe("Luca");
+    expect(cardName({ name: "Marco Rossi", adult: true })).toBe("Marco Rossi");
+  });
+  it("no player names for base teams; only this team's staff, without avatars or drivers", () => {
+    const team = { id: "u15", label: "U15 Giovanissimi", years: ["2011"] };
+    const base = { id: "pulcini", label: "Pulcini", years: ["2016"] };
+    const roster = { team: "u15", count: 2, players: [p("a", "Luca Verdi", "D", false), p("b", "Ugo Neri", "C", true)] };
+    const staff = {
+      authorized: true,
+      asOf: null,
+      people: [
+        { ...s("1", "Mario Bianchi", "Allenatore", ["U15"]), avatar: "/x.webp", areas: ["pulmini"] },
+        s("2", "Gino Gialli", "Dirigente", ["Prima"]),
+        s("3", "Aldo Blu", "Autista", ["U15"], "autista"),
+      ],
+    };
+    const out = minimizeDeck(roster, staff, team);
+    expect(out.roster?.players.map((x) => x.name)).toEqual(["Luca V.", "Ugo Neri"]);
+    expect(out.staff.people.map((x) => x.id)).toEqual(["1"]);
+    expect(out.staff.people[0]?.avatar).toBeNull();
+    expect(out.staff.people[0]?.areas).toEqual([]);
+    expect(minimizeDeck({ ...roster, team: "pulcini" }, staff, base).roster?.players).toEqual([]);
+    expect(minimizeDeck(null, staff, null).staff.people).toEqual([]);
   });
 });

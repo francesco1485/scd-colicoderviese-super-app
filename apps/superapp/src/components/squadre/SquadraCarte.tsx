@@ -222,7 +222,7 @@ function Deck({ team, roster, staff }: { team: CarteTeam; roster: CarteProps["ro
  * One card. A real <button> (Enter and Space flip it), aria-pressed carries the state, the hidden face is
  * aria-hidden. With prefers-reduced-motion the card swaps faces at once without rotating.
  */
-export function FlipCard({ front, back }: { front: ReactNode; back: ReactNode }) {
+function FlipCard({ front, back }: { front: ReactNode; back: ReactNode }) {
   const [flipped, setFlipped] = useState(false);
   return (
     <button

@@ -6,14 +6,15 @@ import { getSession } from "@/lib/auth.functions";
 import { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 import { hallTeams } from "@/lib/club-profile";
 import { getPublicRoster } from "@/lib/public-roster.functions";
-import { deckTeams, pickTeam } from "@/lib/squadra-carte";
+import { deckTeams, minimizeDeck, pickTeam } from "@/lib/squadra-carte";
 import { getStaffRoster } from "@/lib/staff-roster.functions";
 
 /**
  * /squadre/carte — carte della rosa (DG 15/10/2026 09:18). Teams are inside (UD-100): the loader asks the server for
  * the session first and loads nothing for anonymous visitors. For signed-in callers it uses only the existing
  * functions (calendar snapshot for the teams, getPublicRoster for the selected team, getStaffRoster for the staff),
- * which keep their own members-only checks and age rule.
+ * which keep their own members-only checks; minimizeDeck then trims the payload (minors first name + initial, no
+ * names for base teams, only the selected team's staff).
  */
 interface Search {
   squadra?: string;
@@ -30,7 +31,9 @@ export const Route = createFileRoute("/squadre_/carte")({
     const teams = deckTeams(hallTeams(calendar.groups)).map((t) => ({ id: t.id, label: t.label, years: t.years, color: t.color }));
     const team = pickTeam(deps.squadra, teams.map((t) => t.id));
     const [roster, staff] = await Promise.all([team ? getPublicRoster({ data: { team } }) : Promise.resolve(null), getStaffRoster()]);
-    return { signedIn: true as const, teams, team, roster, staff };
+    // Server-side minimisation: minors as first name + initial, no names for base teams, only this team's staff.
+    const min = minimizeDeck(roster, staff, teams.find((t) => t.id === team) ?? null);
+    return { signedIn: true as const, teams, team, roster: min.roster, staff: min.staff };
   },
   head: () => membersOnlyHead("Carte della rosa"),
   component: CarteRoute,

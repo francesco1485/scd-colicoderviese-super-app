@@ -150,3 +150,41 @@ export function teamShortName(label: string): string {
 export function flipHint(flipped: boolean): string {
   return flipped ? "Retro della carta. Premi per tornare al fronte." : "Premi per girare la carta.";
 }
+
+/**
+ * Name on a card: adults as the roster writes them; minors always first name + surname initial ("Luca V."), even when
+ * the roster function returns the full name to signed-in members (r94). Applied on the server before the page data.
+ */
+export function cardName(p: Pick<RosterPlayer, "name" | "adult">): string {
+  if (p.adult) return p.name;
+  const parts = p.name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length < 2) return parts[0] ?? "";
+  const last = parts[parts.length - 1] ?? "";
+  if (/^\p{L}\.$/u.test(last)) return `${parts[0]} ${last}`;
+  return `${parts[0]} ${last.charAt(0).toUpperCase()}.`;
+}
+
+/**
+ * Data minimisation for /squadre/carte (server side): players only for teams that show player cards, minors reduced
+ * to first name + initial; staff only for the selected team, without avatars, areas or drivers.
+ */
+export function minimizeDeck<
+  R extends { team: string; count: number; players: readonly RosterPlayer[] },
+  S extends { people: readonly StaffPerson[] },
+>(roster: R | null, staff: S, team: DeckTeam | null): { roster: R | null; staff: S } {
+  const outRoster =
+    roster && team
+      ? {
+          ...roster,
+          players:
+            deckMode(team.id, true) === "players"
+              ? roster.players.map((p) => ({ ...p, name: cardName(p) }))
+              : [],
+        }
+      : roster;
+  const keep = team ? new Set(staffCards(staff.people, team).map((c) => c.id)) : new Set<string>();
+  const people = staff.people
+    .filter((p) => keep.has(p.id))
+    .map((p) => ({ ...p, areas: [], avatar: null }));
+  return { roster: outRoster, staff: { ...staff, people } };
+}
