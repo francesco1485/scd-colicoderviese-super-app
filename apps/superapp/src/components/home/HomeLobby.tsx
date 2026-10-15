@@ -36,7 +36,7 @@ type PublicCalendar = Awaited<ReturnType<typeof getPublicCalendarSnapshot>>;
 
 const WRAP = "mx-auto w-full max-w-[1240px] px-4 lg:px-8";
 /** Glass panel on the night page. */
-const GLASS = "rounded-[16px] border border-white/[0.08] bg-[linear-gradient(160deg,rgb(255_255_255/0.07),rgb(255_255_255/0.02))]";
+const GLASS = "rounded-[16px] border border-[#e3eaf4] bg-white shadow-[0_10px_26px_-18px_rgb(11_42_91/0.35)]";
 const SHOWN_CARDS = 10;
 
 const KIT_FRONT = "/media/kit/kit-2026-27-blu-fronte.webp";
@@ -55,7 +55,7 @@ const dayParts = (iso: string) => {
 function Heading({ id, children, action }: { id: string; children: ReactNode; action?: ReactNode }) {
   return (
     <div className="flex items-end justify-between gap-3 pb-3">
-      <h2 id={id} className="m-0 font-title text-[24px] font-black uppercase leading-none tracking-[0.02em] text-white lg:text-[30px]">
+      <h2 id={id} className="m-0 font-title text-[24px] font-black uppercase leading-none tracking-[0.02em] text-[#0b1e3a] lg:text-[30px]">
         {children}
       </h2>
       {action}
@@ -65,7 +65,7 @@ function Heading({ id, children, action }: { id: string; children: ReactNode; ac
 
 function More({ to, children }: { to: string; children: ReactNode }) {
   return (
-    <Link to={to as never} className="scd-focus inline-flex min-h-11 shrink-0 items-center gap-0.5 rounded-md text-[14px] font-bold text-[#ffd600] hover:underline">
+    <Link to={to as never} className="scd-focus inline-flex min-h-11 shrink-0 items-center gap-0.5 rounded-md text-[14px] font-bold text-[#1556c4] hover:underline">
       {children}
       <ChevronRight className="size-4" aria-hidden="true" />
     </Link>
@@ -74,7 +74,7 @@ function More({ to, children }: { to: string; children: ReactNode }) {
 
 function OpponentCrest({ name, size }: { name: string; size: number }) {
   const { src, label } = crestFor(name);
-  if (!src) return <span aria-hidden="true" className="block rounded-full bg-white/10 ring-1 ring-white/15" style={{ width: size, height: size }} />;
+  if (!src) return <span aria-hidden="true" className="block rounded-full bg-[#eef3f9] ring-1 ring-[#dfe7f2]" style={{ width: size, height: size }} />;
   return <img src={src} alt={`Stemma ${label}`} width={size} height={size} loading="lazy" decoding="async" className="object-contain" style={{ width: size, height: size }} />;
 }
 
@@ -103,7 +103,7 @@ function Hero({ calendar, nowMs, today }: { calendar: PublicCalendar; nowMs: num
   return (
     <section
       aria-label="Prossima gara"
-      className="relative isolate overflow-hidden rounded-[22px] border border-white/[0.08] bg-[radial-gradient(120%_90%_at_85%_20%,#1d5fd0_0%,#0d3580_38%,#061a3d_75%)]"
+      className="relative isolate overflow-hidden rounded-[22px] border-0 bg-[radial-gradient(120%_100%_at_85%_15%,#3b82f6_0%,#1d5fd0_40%,#0f45a6_80%)] shadow-[0_18px_40px_-24px_rgb(11_42_91/0.6)]"
       data-testid="home-hero"
     >
       <img src={ART_C} alt="" aria-hidden="true" className="pointer-events-none absolute -left-10 -top-10 -z-10 w-[420px] max-w-none opacity-[0.06]" />
@@ -118,7 +118,7 @@ function Hero({ calendar, nowMs, today }: { calendar: PublicCalendar; nowMs: num
       <div className="grid gap-4 p-4 pr-[34%] lg:grid-cols-[minmax(0,1fr)] lg:p-8 lg:pr-[36%]">
         <div className="flex items-center gap-2">
           <span className="rounded-[6px] bg-[#ffd600] px-2 py-[3px] text-[11.5px] font-extrabold uppercase tracking-[0.08em] text-[#061a3d]">Prossima gara</span>
-          {cat && <span className="truncate text-[12.5px] font-bold uppercase tracking-[0.08em] text-[#9fc3ff]">{cat}</span>}
+          {cat && <span className="truncate text-[12.5px] font-bold uppercase tracking-[0.08em] text-[#dbe8ff]">{cat}</span>}
         </div>
         {m && date ? (
           <>
@@ -126,7 +126,7 @@ function Hero({ calendar, nowMs, today }: { calendar: PublicCalendar; nowMs: num
               {weFirst ? us : side(<OpponentCrest name={m.opponent} size={54} />, opp)}
               <span className="grid justify-items-center leading-none">
                 <span className="font-uv text-[44px] text-white lg:text-[64px]">{date.day}</span>
-                <span className="text-[12px] font-extrabold uppercase tracking-[0.1em] text-[#9fc3ff]">
+                <span className="text-[12px] font-extrabold uppercase tracking-[0.1em] text-[#dbe8ff]">
                   {date.wd} · {date.month}
                 </span>
                 <span className="mt-1.5 rounded-[6px] bg-white/10 px-2 py-[3px] text-[14px] font-extrabold tabular-nums text-white">{m.time || "--:--"}</span>
@@ -134,7 +134,7 @@ function Hero({ calendar, nowMs, today }: { calendar: PublicCalendar; nowMs: num
               {weFirst ? side(<OpponentCrest name={m.opponent} size={54} />, opp) : us}
             </div>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-              <span className="flex min-w-0 items-center gap-1 text-[13px] text-[#c9d7ee]">
+              <span className="flex min-w-0 items-center gap-1 text-[13px] text-white/90">
                 <MapPin className="size-4 shrink-0 text-[#ffd600]" aria-hidden="true" />
                 <span className="truncate">
                   {m.homeAway === "FUORI" ? "Trasferta · " : m.homeAway === "CASA" ? "In casa · " : ""}
@@ -155,7 +155,7 @@ function Hero({ calendar, nowMs, today }: { calendar: PublicCalendar; nowMs: num
             )}
           </>
         ) : (
-          <p className="m-0 text-[15px] text-[#c9d7ee]" data-testid="home-hero-empty">
+          <p className="m-0 text-[15px] text-white/90" data-testid="home-hero-empty">
             Nessuna gara nei prossimi 7 giorni. Trovi tutte le gare nel calendario.
           </p>
         )}
@@ -181,12 +181,12 @@ function TeamChips({ events, groups }: { events: readonly PublicEvent[]; groups:
             <Link
               to="/calendario"
               search={{ annata: c.id }}
-              className="scd-focus inline-flex min-h-11 items-center gap-2 rounded-full border border-white/12 bg-white/[0.06] px-3.5 text-[14px] font-bold text-white hover:bg-white/[0.12]"
+              className="scd-focus inline-flex min-h-11 items-center gap-2 rounded-full border border-[#dfe7f2] bg-white px-3.5 text-[14px] font-bold text-[#0b2a5b] shadow-[0_2px_6px_-4px_rgb(11_42_91/0.3)] hover:border-[#1556c4]"
               aria-label={`${c.label}: ${c.n === 1 ? "1 gara" : `${c.n} gare`} questa settimana`}
             >
               <span aria-hidden="true" className="size-2.5 rounded-full" style={{ background: c.color }} />
               {c.label}
-              <span className="text-[12px] font-semibold tabular-nums text-white/60">{c.n}</span>
+              <span className="text-[12px] font-semibold tabular-nums text-[#5a6b85]">{c.n}</span>
             </Link>
           </li>
         ))}
@@ -213,31 +213,31 @@ function MatchCard({ e, g }: { e: PublicEvent; g: PublicGroup | undefined }) {
       <Link
         to="/calendario"
         search={{ annata: e.group }}
-        className={`${GLASS} scd-focus relative grid h-full grid-cols-[58px_minmax(0,1fr)] overflow-hidden transition-colors duration-150 hover:border-white/25`}
+        className={`${GLASS} scd-focus relative grid h-full grid-cols-[58px_minmax(0,1fr)] overflow-hidden transition-colors duration-150 hover:border-[#1556c4]`}
         aria-label={`${rows.map((r) => r[1]).join(" contro ")}, ${d.wd} ${d.day} ${d.month}, ${e.time ? `ore ${e.time}` : "orario da definire"}, ${home ? "in casa" : "in trasferta"}${certain ? "" : ", da confermare"}`}
       >
-        <span className="grid content-center justify-items-center gap-0.5 border-r border-white/[0.08] py-3 leading-none" style={{ boxShadow: `inset 3px 0 0 ${g?.color ?? "#668196"}` }}>
-          <span className="text-[11px] font-extrabold tracking-[0.08em] text-[#9fc3ff]">{d.wd}</span>
-          <span className="font-uv text-[28px] text-white">{d.day}</span>
-          <span className="text-[13px] font-extrabold tabular-nums text-[#ffd600]">{e.time || "--:--"}</span>
+        <span className="grid content-center justify-items-center gap-0.5 border-r border-[#eef2f8] bg-[#f6f9fd] py-3 leading-none" style={{ boxShadow: `inset 3px 0 0 ${g?.color ?? "#668196"}` }}>
+          <span className="text-[11px] font-extrabold tracking-[0.08em] text-[#1556c4]">{d.wd}</span>
+          <span className="font-uv text-[28px] text-[#0b1e3a]">{d.day}</span>
+          <span className="text-[13px] font-extrabold tabular-nums text-[#1556c4]">{e.time || "--:--"}</span>
         </span>
         <span className="grid min-w-0 gap-1.5 p-3">
           <span className="flex items-center justify-between gap-2">
-            <span className="truncate text-[11.5px] font-extrabold uppercase tracking-[0.08em] text-[#9fc3ff]">{team}</span>
-            <span className={`shrink-0 rounded-[5px] px-1.5 py-[2px] text-[10.5px] font-extrabold uppercase ${home ? "bg-[#ffd600] text-[#061a3d]" : "bg-white/10 text-white/80"}`}>
+            <span className="truncate text-[11.5px] font-extrabold uppercase tracking-[0.08em] text-[#1556c4]">{team}</span>
+            <span className={`shrink-0 rounded-[5px] px-1.5 py-[2px] text-[10.5px] font-extrabold uppercase ${home ? "bg-[#ffd600] text-[#061a3d]" : "bg-[#eef2f8] text-[#4a5d7a]"}`}>
               {home ? "Casa" : "Trasferta"}
             </span>
           </span>
           {rows.map(([crest, name, ours]) => (
             <span key={name} className="flex min-w-0 items-center gap-2">
               <span className="grid size-[30px] shrink-0 place-items-center">{crest}</span>
-              <span className={`truncate text-[14.5px] leading-tight ${ours ? "font-extrabold text-white" : "font-semibold text-[#c9d7ee]"}`}>{name}</span>
+              <span className={`truncate text-[14.5px] leading-tight ${ours ? "font-extrabold text-[#0b1e3a]" : "font-semibold text-[#23406e]"}`}>{name}</span>
             </span>
           ))}
-          <span className="flex min-w-0 items-center gap-1 text-[12.5px] text-[#8fa6c8]">
+          <span className="flex min-w-0 items-center gap-1 text-[12.5px] text-[#5a6b85]">
             <MapPin className="size-3.5 shrink-0" aria-hidden="true" />
             <span className="truncate">{e.venue ? venueShort(e.venue) : "Campo da definire"}</span>
-            {!certain && <span className="ml-auto shrink-0 text-[11px] font-bold text-[#ffe766]">da confermare</span>}
+            {!certain && <span className="ml-auto shrink-0 text-[11px] font-bold text-[#8a6d00]">da confermare</span>}
           </span>
         </span>
       </Link>
@@ -270,11 +270,11 @@ function Programme({ events, groups }: { events: readonly PublicEvent[]; groups:
                 aria-pressed={on}
                 onClick={() => setFilter(f)}
                 className={`scd-focus inline-flex min-h-11 items-center gap-1.5 rounded-full px-4 text-[14px] font-bold transition-colors ${
-                  on ? "bg-white text-[#061a3d]" : "bg-white/[0.07] text-white hover:bg-white/[0.12]"
+                  on ? "bg-[#0b2a5b] text-white" : "bg-[#e9eff7] text-[#0b2a5b] hover:bg-[#dde6f2]"
                 }`}
               >
                 {WEEK_BOARD_FILTER_LABEL[f]}
-                <span className={`text-[12px] tabular-nums ${on ? "text-[#061a3d]/60" : "text-white/55"}`}>{counts[f]}</span>
+                <span className={`text-[12px] tabular-nums ${on ? "text-white/75" : "text-[#5a6b85]"}`}>{counts[f]}</span>
               </button>
             );
           })}
@@ -292,7 +292,7 @@ function Programme({ events, groups }: { events: readonly PublicEvent[]; groups:
         </ul>
       )}
       {list.length > SHOWN_CARDS && (
-        <Link to="/calendario" className="scd-focus mt-3 flex min-h-11 items-center justify-center gap-1.5 rounded-[12px] border border-white/12 text-[14.5px] font-bold text-white hover:bg-white/[0.06]">
+        <Link to="/calendario" className="scd-focus mt-3 flex min-h-11 items-center justify-center gap-1.5 rounded-[12px] border border-[#dfe7f2] bg-white text-[14.5px] font-bold text-[#1556c4] hover:border-[#1556c4]">
           Tutte le {list.length} gare della settimana
           <ArrowRight className="size-4" aria-hidden="true" />
         </Link>
@@ -311,7 +311,7 @@ const TILES: readonly Tile[] = [
     to: "/calendario",
     title: "Calendario",
     sub: "Tutte le gare della stagione",
-    tone: "bg-[linear-gradient(150deg,#1d5fd0,#0b2f6b)]",
+    tone: "bg-[linear-gradient(150deg,#3b82f6,#1d5fd0)]",
     art: <img src={ART_LAKE} alt="" aria-hidden="true" className="absolute -bottom-2 right-[-12%] w-[90%] max-w-none opacity-45" />,
   },
   {
@@ -319,7 +319,7 @@ const TILES: readonly Tile[] = [
     to: "/kit",
     title: "Kit 2026/27",
     sub: "La maglia ufficiale",
-    tone: "bg-[linear-gradient(150deg,#123e8c,#061a3d)]",
+    tone: "bg-[linear-gradient(150deg,#2563eb,#123e8c)]",
     art: <img src={KIT_FULL} alt="" aria-hidden="true" className="absolute -bottom-[18%] right-[-20%] w-[95%] max-w-none drop-shadow-[0_14px_20px_rgb(0_0_0/0.5)]" />,
   },
   {
@@ -327,7 +327,7 @@ const TILES: readonly Tile[] = [
     to: "/societa",
     title: "Il club",
     sub: "Storia, valori, persone",
-    tone: "bg-[linear-gradient(150deg,#0f4fb8,#08245a)]",
+    tone: "bg-[linear-gradient(150deg,#1556c4,#0b3a8c)]",
     art: <img src={ART_FORTE} alt="" aria-hidden="true" className="absolute -bottom-[6%] right-[-14%] w-[92%] max-w-none opacity-45" />,
   },
   {
@@ -343,7 +343,7 @@ const TILES: readonly Tile[] = [
     to: "/impianti",
     title: "I nostri campi",
     sub: "Colico e Dervio",
-    tone: "bg-[linear-gradient(150deg,#0b3a8c,#061a3d)]",
+    tone: "bg-[linear-gradient(150deg,#1d5fd0,#0b3a8c)]",
     art: <img src={ART_LAKE} alt="" aria-hidden="true" className="absolute -bottom-3 left-[-10%] w-[95%] max-w-none opacity-30 [transform:scaleX(-1)]" />,
   },
   {
@@ -351,7 +351,7 @@ const TILES: readonly Tile[] = [
     to: "/sostieni",
     title: "Sostieni il club",
     sub: "Fondo solidale e donazioni",
-    tone: "bg-[linear-gradient(150deg,#1556c4,#0b2a5b)]",
+    tone: "bg-[linear-gradient(150deg,#3b82f6,#1556c4)]",
     art: <img src={ART_C} alt="" aria-hidden="true" className="absolute -bottom-8 -right-8 w-[75%] max-w-none opacity-15" />,
   },
 ];
@@ -367,7 +367,7 @@ function ClubTiles() {
             <li key={t.id}>
               <Link
                 to={t.to as never}
-                className={`scd-focus relative isolate flex aspect-[4/3] flex-col justify-end overflow-hidden rounded-[16px] border border-white/[0.08] p-3.5 transition-transform duration-200 hover:-translate-y-0.5 lg:aspect-[16/10] lg:p-5 ${t.tone}`}
+                className={`scd-focus relative isolate flex aspect-[4/3] flex-col justify-end overflow-hidden rounded-[16px] p-3.5 shadow-[0_10px_24px_-16px_rgb(11_42_91/0.5)] transition-transform duration-200 hover:-translate-y-0.5 lg:aspect-[16/10] lg:p-5 ${t.tone}`}
                 data-tile={t.id}
               >
                 <span className="absolute inset-0 -z-10">{t.art}</span>
@@ -394,17 +394,17 @@ const SERVICES: readonly Service[] = [
 function ServiceRow({ s }: { s: Service }) {
   const body = (
     <>
-      <span aria-hidden="true" className="grid size-11 shrink-0 place-items-center rounded-[12px] bg-white/10 text-[#ffd600]">
+      <span aria-hidden="true" className="grid size-11 shrink-0 place-items-center rounded-[12px] bg-[#e8f0fd] text-[#1556c4]">
         <s.icon className="size-[22px]" strokeWidth={2.1} />
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block text-[15px] font-extrabold leading-tight text-white">{s.title}</span>
-        <span className="mt-0.5 block text-[13px] leading-snug text-[#9fb2d0]">{s.text}</span>
+        <span className="block text-[15px] font-extrabold leading-tight text-[#0b1e3a]">{s.title}</span>
+        <span className="mt-0.5 block text-[13px] leading-snug text-[#4a5d7a]">{s.text}</span>
       </span>
-      <span className="inline-flex min-h-10 shrink-0 items-center rounded-[10px] bg-white/10 px-3.5 text-[14px] font-bold text-white">{s.cta}</span>
+      <span className="inline-flex min-h-10 shrink-0 items-center rounded-[10px] bg-[#eef3f9] px-3.5 text-[14px] font-bold text-[#1556c4]">{s.cta}</span>
     </>
   );
-  const cls = `${GLASS} scd-focus flex items-center gap-3 p-3 transition-colors duration-150 hover:border-white/25`;
+  const cls = `${GLASS} scd-focus flex items-center gap-3 p-3 transition-colors duration-150 hover:border-[#1556c4]`;
   return (
     <li>
       {s.href ? (
@@ -426,14 +426,14 @@ function JoinPanel({ className = "" }: { className?: string }) {
       <div className="flex items-center gap-3">
         <ClubCrestOfficial size={44} />
         <div className="min-w-0">
-          <h2 id="home-join-t" className="m-0 font-title text-[22px] font-black uppercase leading-none text-white">
+          <h2 id="home-join-t" className="m-0 font-title text-[22px] font-black uppercase leading-none text-[#0b1e3a]">
             Entra nel club
           </h2>
-          <p className="m-0 mt-1 text-[13px] leading-snug text-[#9fb2d0]">Allenamenti, convocazioni e la tua area con un solo account.</p>
+          <p className="m-0 mt-1 text-[13px] leading-snug text-[#4a5d7a]">Allenamenti, convocazioni e la tua area con un solo account.</p>
         </div>
       </div>
       <div className="grid grid-cols-2 gap-2">
-        <Link to="/accedi" className="scd-focus inline-flex min-h-11 items-center justify-center gap-1.5 rounded-[10px] border border-white/25 text-[14.5px] font-bold text-white hover:bg-white/[0.08]">
+        <Link to="/accedi" className="scd-focus inline-flex min-h-11 items-center justify-center gap-1.5 rounded-[10px] border-2 border-[#0b2a5b] text-[14.5px] font-bold text-[#0b2a5b] hover:bg-[#eef3f9]">
           <LogIn className="size-4" aria-hidden="true" />
           Accedi
         </Link>

@@ -62,7 +62,7 @@ export function PublicHome({
     <main
       data-screen="home"
       data-variant="public"
-      className="min-h-dvh bg-[#061a3d] pb-8 font-sans text-white shadow-[0_0_0_100vmax_#061a3d] [clip-path:inset(0_-100vmax_0_0)]"
+      className="min-h-dvh bg-[#f3f6fb] pb-8 font-sans text-[#0b1e3a] shadow-[0_0_0_100vmax_#f3f6fb] [clip-path:inset(0_-100vmax_0_0)]"
     >
       <h1 className="sr-only">
         S.C.D. ColicoDerviese, il club di calcio di Colico e Dervio
