@@ -31,6 +31,8 @@ const PUBLIC_FILES = [
   "src/components/calendario/CalendarioLive.tsx",
   "src/routes/squadre.tsx",
   "src/routes/squadre_.$team.tsx",
+  "src/routes/squadre_.carte.tsx",
+  "src/components/squadre/SquadraCarte.tsx",
   "src/routes/allenamenti.tsx",
   "src/routes/comunicazioni.tsx",
   "src/components/universe/Feed.tsx",

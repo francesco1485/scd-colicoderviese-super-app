@@ -105,6 +105,30 @@ function SquadrePage({
             />
           ))}
         </ul>
+        <Link
+          to="/squadre/carte"
+          className="scd-focus mt-4 flex items-center gap-3 rounded-[18px] bg-[#0b2a5b] p-3.5 text-white shadow-[0_2px_10px_rgb(11_42_91/0.08)] hover:bg-[#123a78]"
+          data-testid="carte-link"
+        >
+          <span
+            aria-hidden="true"
+            className="grid h-[52px] w-[38px] shrink-0 place-items-center rounded-[8px] border-2 border-white bg-[#ffd600] font-uv text-[24px] leading-none text-[#0b2a5b]"
+          >
+            P
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block font-uv text-[20px] uppercase leading-none">
+              Carte della rosa
+            </span>
+            <span className="mt-1 block text-[13px] leading-snug text-white/85">
+              Calciatori della Prima Squadra e staff di ogni annata: tocca e
+              gira le carte.
+            </span>
+          </span>
+          <span aria-hidden="true" className="text-[22px] text-[#ffd600]">
+            ›
+          </span>
+        </Link>
         <p className="m-0 mt-3 text-[13px] leading-snug text-[#5a6b85]">
           Squadre e numero di gare dal calendario SCD della stagione. Il
           campionato è indicato solo dove è verificato sul sito della LND; per

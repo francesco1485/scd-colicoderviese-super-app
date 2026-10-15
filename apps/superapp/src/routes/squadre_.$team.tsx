@@ -462,6 +462,19 @@ function RosterSection({
           {rosterCountLabel(count, base)}
         </span>
       </div>
+      <Link
+        to="/squadre/carte"
+        search={{ squadra: teamId }}
+        className="scd-focus mb-3 inline-flex h-11 items-center gap-2 rounded-[12px] bg-[#0b2a5b] px-3.5 text-[14px] font-bold text-white"
+      >
+        <span
+          aria-hidden="true"
+          className="grid h-7 w-5 place-items-center rounded-[4px] bg-[#ffd600] font-uv text-[13px] leading-none text-[#0b2a5b]"
+        >
+          {base ? "S" : "P"}
+        </span>
+        {base ? "Apri le carte dello staff" : "Apri le carte della rosa"}
+      </Link>
       {named && sections.length > 0 ? (
         <div className="grid gap-3">
           {sections.map((s) => (

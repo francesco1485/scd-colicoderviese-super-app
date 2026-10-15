@@ -91,6 +91,7 @@ import { Route as SostieniFondoSolidaleRouteImport } from './routes/sostieni.fon
 import { Route as SostieniProponiRouteImport } from './routes/sostieni.proponi'
 import { Route as SpotSlugRouteImport } from './routes/spot.$slug'
 import { Route as SquadreTeamRouteImport } from './routes/squadre_.$team'
+import { Route as SquadreCarteRouteImport } from './routes/squadre_.carte'
 import { Route as TesoreriaBiglietteriaRouteImport } from './routes/tesoreria_.biglietteria'
 import { Route as TesoreriaCalendarioIncassiRouteImport } from './routes/tesoreria_.calendario-incassi'
 import { Route as TesoreriaChiusuraRouteImport } from './routes/tesoreria_.chiusura'
@@ -528,6 +529,11 @@ const SquadreTeamRoute = SquadreTeamRouteImport.update({
   path: '/squadre/$team',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SquadreCarteRoute = SquadreCarteRouteImport.update({
+  id: '/squadre_/carte',
+  path: '/squadre/carte',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TesoreriaBiglietteriaRoute = TesoreriaBiglietteriaRouteImport.update({
   id: '/tesoreria_/biglietteria',
   path: '/tesoreria/biglietteria',
@@ -726,6 +732,7 @@ export interface FileRoutesByFullPath {
   '/sostieni/proponi': typeof SostieniProponiRoute
   '/spot/$slug': typeof SpotSlugRoute
   '/squadre/$team': typeof SquadreTeamRoute
+  '/squadre/carte': typeof SquadreCarteRoute
   '/tesoreria/biglietteria': typeof TesoreriaBiglietteriaRoute
   '/tesoreria/calendario-incassi': typeof TesoreriaCalendarioIncassiRoute
   '/tesoreria/chiusura': typeof TesoreriaChiusuraRoute
@@ -832,6 +839,7 @@ export interface FileRoutesByTo {
   '/sostieni/proponi': typeof SostieniProponiRoute
   '/spot/$slug': typeof SpotSlugRoute
   '/squadre/$team': typeof SquadreTeamRoute
+  '/squadre/carte': typeof SquadreCarteRoute
   '/tesoreria/biglietteria': typeof TesoreriaBiglietteriaRoute
   '/tesoreria/calendario-incassi': typeof TesoreriaCalendarioIncassiRoute
   '/tesoreria/chiusura': typeof TesoreriaChiusuraRoute
@@ -940,6 +948,7 @@ export interface FileRoutesById {
   '/sostieni/proponi': typeof SostieniProponiRoute
   '/spot/$slug': typeof SpotSlugRoute
   '/squadre_/$team': typeof SquadreTeamRoute
+  '/squadre_/carte': typeof SquadreCarteRoute
   '/tesoreria_/biglietteria': typeof TesoreriaBiglietteriaRoute
   '/tesoreria_/calendario-incassi': typeof TesoreriaCalendarioIncassiRoute
   '/tesoreria_/chiusura': typeof TesoreriaChiusuraRoute
@@ -1049,6 +1058,7 @@ export interface FileRouteTypes {
     | '/sostieni/proponi'
     | '/spot/$slug'
     | '/squadre/$team'
+    | '/squadre/carte'
     | '/tesoreria/biglietteria'
     | '/tesoreria/calendario-incassi'
     | '/tesoreria/chiusura'
@@ -1155,6 +1165,7 @@ export interface FileRouteTypes {
     | '/sostieni/proponi'
     | '/spot/$slug'
     | '/squadre/$team'
+    | '/squadre/carte'
     | '/tesoreria/biglietteria'
     | '/tesoreria/calendario-incassi'
     | '/tesoreria/chiusura'
@@ -1262,6 +1273,7 @@ export interface FileRouteTypes {
     | '/sostieni/proponi'
     | '/spot/$slug'
     | '/squadre_/$team'
+    | '/squadre_/carte'
     | '/tesoreria_/biglietteria'
     | '/tesoreria_/calendario-incassi'
     | '/tesoreria_/chiusura'
@@ -1370,6 +1382,7 @@ export interface RootRouteChildren {
   SostieniProponiRoute: typeof SostieniProponiRoute
   SpotSlugRoute: typeof SpotSlugRoute
   SquadreTeamRoute: typeof SquadreTeamRoute
+  SquadreCarteRoute: typeof SquadreCarteRoute
   TesoreriaBiglietteriaRoute: typeof TesoreriaBiglietteriaRoute
   TesoreriaCalendarioIncassiRoute: typeof TesoreriaCalendarioIncassiRoute
   TesoreriaChiusuraRoute: typeof TesoreriaChiusuraRoute
@@ -1973,6 +1986,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SquadreTeamRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/squadre_/carte': {
+      id: '/squadre_/carte'
+      path: '/squadre/carte'
+      fullPath: '/squadre/carte'
+      preLoaderRoute: typeof SquadreCarteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tesoreria_/biglietteria': {
       id: '/tesoreria_/biglietteria'
       path: '/tesoreria/biglietteria'
@@ -2233,6 +2253,7 @@ const rootRouteChildren: RootRouteChildren = {
   SostieniProponiRoute: SostieniProponiRoute,
   SpotSlugRoute: SpotSlugRoute,
   SquadreTeamRoute: SquadreTeamRoute,
+  SquadreCarteRoute: SquadreCarteRoute,
   TesoreriaBiglietteriaRoute: TesoreriaBiglietteriaRoute,
   TesoreriaCalendarioIncassiRoute: TesoreriaCalendarioIncassiRoute,
   TesoreriaChiusuraRoute: TesoreriaChiusuraRoute,
