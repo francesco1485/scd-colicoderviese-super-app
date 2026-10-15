@@ -51,7 +51,7 @@ export const SPONSOR_PROCESS_STEPS: readonly ProcessStep[] = [
   {
     id: "in-onda",
     title: "In onda",
-    text: "Lo spot entra in rotazione sul LED wall e nella vetrina dell'app, con il tag social della tua azienda.",
+    text: "Lo spot entra in rotazione sul LED wall del campo, con il tag social della tua azienda.",
   },
 ];
 

@@ -489,7 +489,7 @@ html.uv-big .sa-shell { zoom: 1.12; }
 .scd-access-panel { animation: scd-sheet-in 240ms var(--ease-out-strong) both; transform-origin: top right; }
 @media (min-width: 1024px) { .scd-access-panel { animation: scd-pop-in 200ms var(--ease-out-strong) both; } }
 
-/* Aree di lavoro: striscia "in evidenza" a puntini LED. */
+/* Aree di lavoro: striscia "Oggi" a puntini LED. */
 .scd-led-strip {
   background-color: var(--in-ink);
   background-image: radial-gradient(rgb(248 208 0 / 0.13) 1px, transparent 1.3px);
@@ -794,7 +794,7 @@ html.uv-big .sa-shell { zoom: 1.12; }
 .scd-excelsior .in-stat { background: #fff; border: 1px solid var(--ex-hair); }
 
 /* ---------------------------------------------------------------------------------------------------------------
- * LED wall preview (UD-107, src/components/LedwallRotator.tsx): all partners in rotation on the real pitch-side
+ * Static LED wall preview (src/components/LedwallPreview.tsx, no rotation since 15/10/2026): a partner on the real pitch-side
  * board. The frame crops the 16:9 still (--ledrot-a = frame aspect, --ledrot-z = zoom) around the board centre
  * (--ledrot-cx/--ledrot-cy, from LEDWALL_BOARD_PX); clamp() keeps the still covering the frame, so no empty edges.
  * Phones get a close-up (the board is a 12.5:1 strip: at full frame a phone would show 17 px logos).

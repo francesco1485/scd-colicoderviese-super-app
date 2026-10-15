@@ -19,7 +19,7 @@ export interface InteriorShellProps {
   roles: ReadonlySet<string>;
   /** Who is looking, in plain words (rail footer). */
   roleLabel: string;
-  /** "In evidenza" counts. Unknown values render "—" and are muted, never 0. */
+  /** "Oggi" counts. Unknown values render "—" and are muted, never 0. */
   highlights?: readonly StripItem[];
   /** Injected for tests and screenshots; defaults to now. */
   today?: Date;
@@ -176,11 +176,11 @@ function AreaSearch() {
   );
 }
 
-/** Dark "in evidenza" strip (LED dots). Zero and unknown are muted; unknown shows "—". */
+/** Dark "Oggi" strip (LED dots). Zero and unknown are muted; unknown shows "—". */
 export function HighlightStrip({ items }: { items: readonly StripItem[] }) {
   return (
     <section
-      aria-label="In evidenza"
+      aria-label="Oggi"
       className="scd-led-strip ex-dark grid flex-none shadow-[inset_0_-1px_0_rgb(201_162_39/0.45)] grid-cols-2 text-white sm:grid-cols-[repeat(auto-fit,minmax(150px,1fr))] lg:flex lg:min-h-[66px] lg:items-stretch"
     >
       {items.map((it) => {
@@ -202,7 +202,7 @@ export function HighlightStrip({ items }: { items: readonly StripItem[] }) {
 /**
  * Interior work-area shell (boards Quadro-settimanale, Gestionale, Pulmini…):
  * blue rail filtered by the role set, white header with title, copy-link path chip,
- * date and search, optional dark "in evidenza" strip, ground #F2F7FC body.
+ * date and search, optional dark "Oggi" strip, ground #F2F7FC body.
  * Phone: the rail becomes a drawer behind a compact blue bar; same product, same data.
  */
 export function InteriorShell({ title, path, activeAreaId, roles, roleLabel, highlights, today, badge, children }: InteriorShellProps) {

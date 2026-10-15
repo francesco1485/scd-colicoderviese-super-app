@@ -194,7 +194,7 @@ describe("search", () => {
   });
 });
 
-describe("in evidenza strip", () => {
+describe("Oggi strip (InteriorShell HighlightStrip)", () => {
   it("never renders unknown as zero", () => {
     expect(stripValue(null)).toEqual({ text: "—", muted: true, known: false });
     expect(stripValue(undefined)).toEqual({ text: "—", muted: true, known: false });
@@ -205,6 +205,12 @@ describe("in evidenza strip", () => {
     expect(stripValue(0)).toEqual({ text: "0", muted: true, known: true });
     expect(stripValue(18)).toEqual({ text: "18", muted: false, known: true });
     expect(stripValue(12560).text).toBe("12.560");
+  });
+
+  it('is labelled "Oggi", never "In evidenza" (no vetrine, Francesco 15/10/2026)', () => {
+    const shell = readFileSync(fileURLToPath(new URL("../components/scd/InteriorShell.tsx", import.meta.url)), "utf8");
+    expect(shell).toContain('aria-label="Oggi"');
+    expect(shell).not.toMatch(/in evidenza/i);
   });
 });
 
