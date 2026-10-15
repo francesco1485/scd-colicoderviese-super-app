@@ -1,6 +1,6 @@
 ---
 name: scd-segreteria
-description: Segretario generale of the club, expert in everything a sports and football secretariat handles (FIGC/LND/SGS, ASD/SSD law, deadlines, documents, people, planning, safeguarding, inclusion, admin, legal, health rules, equipment, institutions). Owns the AI Segreteria (WhatsApp, mail, phone) and its knowledge. Use for any secretariat question, check, plan, letter, reply or deadline.
+description: Segretario generale of the club, expert in everything a sports and football secretariat handles (FIGC/LND/SGS, ASD/SSD law, deadlines, documents, people, planning, safeguarding, inclusion, admin, legal, health rules, equipment, institutions). Expert source for the AI Segreteria Iride (rules, deadlines, federations); scd-iride owns her prompt, knowledge and channels. Use for any secretariat question, check, plan, letter, reply or deadline.
 tools: Read, Write, Edit, Glob, Grep, Bash, WebSearch, WebFetch, mcp__Supabase__execute_sql, mcp__Google_Drive__search_files, mcp__Google_Drive__read_file_content, mcp__Google_Sheets__get_values, mcp__Gmail__search_threads, mcp__Gmail__get_thread, mcp__Gmail__create_draft, mcp__Google_Calendar__list_events, mcp__Make__scenarios_list, mcp__Make__scenarios_get, mcp__Make__executions_list, mcp__Make__executions_get-detail
 model: inherit
 ---

@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.38.0",
+    "version": "3.39.0",
     "effective_at": "2026-10-15",
     "status": "BINDING",
     "language": "it-IT",
@@ -963,6 +963,60 @@
       "BENCHMARK": "N/A"
     },
     "sources": [
+      {
+        "id": "SCD_AI_SEGRETERIA_KNOWLEDGE",
+        "kind": "INTERNAL_KNOWLEDGE_DOC",
+        "trust": "KNOWLEDGE",
+        "authority_domains": [
+          "AI_SEGRETERIA_ANSWERS"
+        ],
+        "account": "sportclubcolico@gmail.com",
+        "location": "Google Doc 'SCD · Segreteria AI · Conoscenza' (Drive of sportclubcolico)",
+        "directive": "UD-155",
+        "rules": [
+          "verified_facts_only_with_source_and_date",
+          "candidates_confirmed_by_francesco_before_entry",
+          "no_personal_data",
+          "never_iban_or_codice_fiscale"
+        ]
+      },
+      {
+        "id": "SCD_IRIDE_CONTACTS_BOOK",
+        "kind": "OPERATIONAL_PERSONAL_DATA_STORE",
+        "trust": "USER_SUBMISSION",
+        "authority_domains": [
+          "DECLARED_CONTACT_IDENTITY"
+        ],
+        "location": "Make data store (team 2129271), approved by Francesco 15/10/2026 18:08 and 18:26",
+        "directive": "UD-155",
+        "rules": [
+          "declared_name_surname_role_of_adults_only",
+          "declared_role_never_unlocks_reserved_information",
+          "verified_role_written_only_by_the_segreteria",
+          "delete_on_CANCELLA",
+          "never_in_repository",
+          "to_be_listed_in_the_privacy_notice_with_retention"
+        ]
+      },
+      {
+        "id": "SCD_INTAKE_LOG",
+        "kind": "OPERATIONAL_REQUEST_REGISTER",
+        "trust": "INTERNAL_VERIFIED",
+        "authority_domains": [
+          "INCOMING_REQUESTS",
+          "AI_SEGRETERIA_LOG"
+        ],
+        "account": "sportclubcolico@gmail.com",
+        "writers": [
+          "Make mail intake (chat PC)",
+          "Make scenario 'SCD · Segreteria AI · WhatsApp' (UD-155)"
+        ],
+        "rules": [
+          "summary_only_no_health_data",
+          "no_minor_personal_data_beyond_first_name",
+          "status_DA_GESTIRE_IN_CARICO_CHIUSO"
+        ]
+      },
       {
         "id": "SCD_DRIVE",
         "kind": "INTERNAL_BACKOFFICE",
@@ -2342,7 +2396,20 @@
         "opt_in_required": true,
         "confidence_export_default": false,
         "anconfidence_export_default": false,
-        "safeguarding_export": false
+        "safeguarding_export": false,
+        "ai_segreteria": {
+          "status": "ACTIVE",
+          "directive": "UD-155",
+          "persona": "Iride",
+          "number": "+39 334 196 1321 (club secretariat, WhatsApp Business coexistence)",
+          "engine": "Make scenario 'SCD · Segreteria AI · WhatsApp' with Make AI Tools",
+          "prompt_source": "automations/make/segreteria-ai/system-prompt.it.md",
+          "owner_agent": ".claude/agents/scd-iride.md",
+          "sends": "replies only to whoever wrote first, inside the 24-hour window (AGENTS.md exception, Francesco 19:01)",
+          "staff_alerts": "PROPOSED (Francesco 19:05-19:06): utility templates to the people in the 'chi fa cosa' sheet; not active until Francesco approves",
+          "groups": "not supported on a coexistence number",
+          "live_changes_require": "Francesco's explicit OK with the diff shown first"
+        }
       }
     },
     "safeguarding": {

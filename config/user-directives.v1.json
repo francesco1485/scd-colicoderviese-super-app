@@ -3418,7 +3418,7 @@
     },
     {
       "sourceDate": "2026-10-15",
-      "sourceTime": "17:16-18:52",
+      "sourceTime": "17:16-19:06",
       "sourceStatus": "EXPLICIT_USER_COMMAND",
       "authority": "FRANCESCO_SCD",
       "id": "UD-155",
@@ -3433,16 +3433,19 @@
         "vorrei mettere u nome di una divinità greca (17:33) -> scelta: Iride; avatar: 'si questa' (17:37)",
         "vera non ce piu ce iride - crovi per i piu giovani (18:40, chat cloud)",
         "ok salva cognome e ruolo (18:26)",
-        "va bene procedi (18:52, pagina /installa con Iride, foto e contatto)"
+        "va bene procedi (18:52, pagina /installa con Iride, foto e contatto)",
+        "Confermo l'eccezione in AGENTS.md (19:01: risposte automatiche di Iride a chi ha scritto per primo)",
+        "chi l'ha contattata e cosa voleva… lei deve poter mandare whatsapp a persona che puo rispondere o puo autorizzare… calciatore chiede appuntamento con infermeria, iride manda messaggio a fisioterapista e direttore generale… verificare come si comporta il fisioterapista (19:05)",
+        "se uno contatta per una amichevole da impostare come responsabile lei deve comunicare a direttore sportivo a mister annata e a direttore generale e cosi via ragionando (19:06)"
       ],
       "context": "Francesco 15/10/2026 (chat PC). Extends UD-154 from friendlies to every request on every channel. Choices given through the question card at 17:18: automatic replies, small AI budget (about 20-30 EUR/month, today covered by the Make plan credits), contacts saved only after the Segreteria checks them (refined at 18:26, 'ok salva cognome e ruolo': Iride stores at once only what the person declares - name, surname, declared role - and only the Segreteria writes the verified role). At 17:21 asked for a dedicated expert secretary agent; at 17:28 'via'; at 17:30 contacts to Google Contacts of sportclubcolico and the WhatsApp profile as the Segreteria avatar.",
       "normalizedCommand": {
-        "rule": "The AI Segreteria (persona Iride on WhatsApp (Francesco 15/10 17:33), Vera in the app until the cloud chat aligns it (UD-121)) reads every inbound message of the official channels (WhatsApp Business via Make first, then club mail, then a phone voice assistant), answers ALONE 24/7 from the club knowledge (Google Doc 'SCD · Segreteria AI · Conoscenza') and the public calendar, writes the request and the answer in SCD_INTAKE_LOG with office, type, urgency and 'serve persona', and marks what a person must handle. This is the only exception to the AGENTS.md rule 'messaggi inviati a terzi senza persona': replies to whoever wrote first, within the fixed limits below. The secretary-general agent scd-segreteria is the expert mind and owns the prompt and the knowledge.",
+        "rule": "The AI Segreteria (persona Iride on every channel, Francesco 15/10 17:33 and 18:40; the app chat follows through the cloud chat, UD-139) reads every inbound message of the official channels (WhatsApp Business via Make first, then club mail, then a phone voice assistant), answers ALONE 24/7 from the club knowledge (Google Doc 'SCD · Segreteria AI · Conoscenza') and the public calendar, writes the request and the answer in SCD_INTAKE_LOG with office, type, urgency and 'serve persona', and marks what a person must handle. This is the only exception to the AGENTS.md rule 'messaggi inviati a terzi senza persona': replies to whoever wrote first, within the fixed limits below. The agent scd-iride owns Iride (prompt, knowledge, channels, quality); scd-segreteria is the expert source on rules and deadlines. Staff alerts (19:05-19:06): when a request needs a person, Iride must tell the people who can answer or authorise it, reasoning on the topic (infermeria -> physiotherapist + general manager; friendly to set up -> sporting director + coach of the age group + general manager), from a 'chi fa cosa' sheet confirmed by the Segreteria, track who takes it and remind after a deadline; sending to staff is a new sending channel and starts only after Francesco's OK on the design.",
         "scope": "SECRETARIAT_ALL_CHANNELS",
         "engines": "TEMPO (answers at night and on weekends without volunteers, schede already classified), PERSONE (families get an answer in seconds), SOLDI (no lost registration or sponsor request)",
         "status": "WHATSAPP_ACTIVE_MAIL_PHONE_CONTACTS_PENDING",
         "constraints": [
-          "always declares it is an AI assistant (EU AI Act transparency) and signs as Iride, assistente AI della S.C.D. ColicoDerviese",
+          "always declares it is an AI assistant (EU AI Act transparency); persona Iride, no signature at the end",
           "emergencies, injuries, health, a minor in difficulty, abuse and safeguarding: no answer on the merits, 112 when there is danger, urgency ALTA and a person takes over",
           "never confirms or decides payments, registrations, tesseramenti, roles, permissions, presenze, sanctions or prices not in the knowledge",
           "never gives personal data of other people and never asks for IBAN, codice fiscale, passwords or health data",
@@ -3455,9 +3458,10 @@
         "implementation": {
           "make_scenario": "7979437 'SCD · Segreteria AI · WhatsApp' (Make AI Tools on Make's AI Provider, plan credits)",
           "prompt_source": "automations/make/segreteria-ai/system-prompt.it.md",
-          "agent": ".claude/agents/scd-segreteria.md",
+          "agent": ".claude/agents/scd-iride.md (owner) and .claude/agents/scd-segreteria.md (expert source)",
+          "agents_md_exception": "AGENTS.md divieti assoluti: 'unica eccezione: le risposte della Segreteria AI a chi ha scritto per primo, entro i limiti di UD-155' (Francesco 19:01)",
           "register": "SCD_INTAKE_LOG",
-          "install_page": "/installa (Francesco 18:52): one-tap install, Iride card with avatar, vCard /iride.vcf, wa.me"
+          "install_page": "/installa (Francesco 18:52): one-tap install, Iride card with avatar (file owned by the cloud chat, UD-139), vCard /iride.vcf, wa.me"
         }
       }
     }
