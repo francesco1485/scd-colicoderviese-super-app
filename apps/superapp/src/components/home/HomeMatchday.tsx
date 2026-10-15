@@ -9,7 +9,7 @@
  * yellow only for changes.
  */
 import { Link } from "@tanstack/react-router";
-import { AlertTriangle, ChevronRight, MapPin } from "lucide-react";
+import { AlertTriangle, ChevronRight, MapPin, Star } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { venueShort } from "@/components/home/HomeSections";
@@ -31,6 +31,7 @@ import {
   type MatchdayFilter,
 } from "@/lib/home-matchday";
 import { weekMatches, type TodayEntry } from "@/lib/home-today";
+import { readFollowed, toggleFollowed, writeFollowed } from "@/lib/calendario-live";
 import type { PublicGroup } from "@/lib/public-snapshots";
 import { itemState } from "@/lib/universe";
 
@@ -63,14 +64,36 @@ function OpponentMark({ name }: { name: string }) {
   );
 }
 
+/** "Casa" / "Fuori" tag: on the phone it sits in the first line (next to the category) so the venue keeps its room beside
+ * the star and share buttons; from `sm` up it goes back to the right edge of the row. */
+function HomeAwayBadge({
+  homeAway,
+  className,
+}: {
+  homeAway: TodayEntry["homeAway"];
+  className: string;
+}) {
+  return (
+    <span
+      className={`h-[20px] shrink-0 items-center rounded-[6px] px-1.5 text-[10.5px] font-extrabold uppercase tracking-[0.06em] ${homeAway === "CASA" ? "bg-[#0b2a5b] text-white" : "bg-[#e7effa] text-[#1556c4]"} ${className}`}
+    >
+      {homeAway === "CASA" ? "Casa" : homeAway === "FUORI" ? "Fuori" : "Gara"}
+    </span>
+  );
+}
+
 function MatchRow({
   e,
   groups,
   nowMs,
+  followed,
+  onFollow,
 }: {
   e: TodayEntry;
   groups: readonly PublicGroup[];
   nowMs: number;
+  followed: boolean;
+  onFollow: (group: string) => void;
 }) {
   const state = itemState(e, nowMs);
   const live = state === "live";
@@ -134,18 +157,22 @@ function MatchRow({
           )}
         </span>
         <span className="grid min-w-0 flex-1 gap-1">
-          <span className="flex min-w-0 items-center gap-1.5 text-[12.5px] leading-tight text-[#4a5d7a]">
+          <span className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1 text-[12.5px] leading-tight text-[#4a5d7a]">
             <span
               className="inline-flex h-[20px] shrink-0 items-center rounded-full px-2 text-[11px] font-bold leading-none text-white"
               style={{ background: color }}
             >
               {cat}
             </span>
-            <MapPin
-              className="size-3.5 shrink-0 text-[#7a8aa3]"
-              aria-hidden="true"
-            />
-            <span className="truncate">{venue}</span>
+            <HomeAwayBadge homeAway={e.homeAway} className="inline-flex sm:hidden" />
+            {/* The venue wraps to its own line when the first one is full (phone), instead of being cut to a letter. */}
+            <span className="inline-flex min-w-0 max-w-full items-center gap-1.5">
+              <MapPin
+                className="size-3.5 shrink-0 text-[#7a8aa3]"
+                aria-hidden="true"
+              />
+              <span className="truncate">{venue}</span>
+            </span>
           </span>
           <span className="flex min-w-0 flex-wrap items-center gap-x-1 gap-y-0.5 text-[15px] leading-tight text-[#0b1e3a]">
             {weFirst ? us : them}
@@ -176,24 +203,31 @@ function MatchRow({
             </span>
           )}
         </span>
-        <span
-          className={`inline-flex h-[22px] shrink-0 items-center rounded-[6px] px-1.5 text-[10.5px] font-extrabold uppercase tracking-[0.06em] ${e.homeAway === "CASA" ? "bg-[#0b2a5b] text-white" : "bg-[#e7effa] text-[#1556c4]"}`}
-        >
-          {e.homeAway === "CASA"
-            ? "Casa"
-            : e.homeAway === "FUORI"
-              ? "Fuori"
-              : "Gara"}
-        </span>
+        <HomeAwayBadge homeAway={e.homeAway} className="hidden sm:inline-flex" />
       </Link>
-      {!done && (
-        <span className="flex shrink-0 items-center pr-2">
+      <span className="flex shrink-0 items-center pr-2">
+        <button
+          type="button"
+          onClick={() => onFollow(e.group)}
+          aria-pressed={followed}
+          aria-label={followed ? `Non seguire più ColicoDerviese ${cat}` : `Segui ColicoDerviese ${cat}`}
+          data-testid="row-follow"
+          className="scd-focus grid size-11 place-items-center rounded-full text-[#0b2a5b] transition-colors duration-150 hover:bg-[#eef3f9]"
+        >
+          <Star
+            className="size-[18px]"
+            fill={followed ? "#ffd600" : "none"}
+            stroke={followed ? "#8a6d00" : "currentColor"}
+            aria-hidden="true"
+          />
+        </button>
+        {!done && (
           <ShareWhatsApp
             data={matchShare({ ...e, opponent: e.opponent ? opponent : "", place: e.place ? venue : "" }, cat)}
             compact
           />
-        </span>
-      )}
+        )}
+      </span>
     </li>
   );
 }
@@ -212,17 +246,35 @@ export function HomeMatchday({
 }) {
   const [filter, setFilter] = useState<MatchdayFilter>("tutte");
   const [expanded, setExpanded] = useState(false);
+  // "Le mie squadre": the same teams starred on /calendario (this device only), read after mount.
+  const [followed, setFollowed] = useState<string[]>([]);
+  useEffect(() => {
+    try {
+      setFollowed(readFollowed(window.localStorage));
+    } catch {
+      /* storage off */
+    }
+  }, []);
+  const follow = (id: string) => {
+    const next = toggleFollowed(followed, id);
+    setFollowed(next);
+    try {
+      writeFollowed(window.localStorage, next);
+    } catch {
+      /* in memory only */
+    }
+  };
   const now = useMinuteClock(nowMs);
   const week = useMemo(
     () => weekMatches(calendar.events, calendar.groups, today, null),
     [calendar.events, calendar.groups, today],
   );
-  const counts = useMemo(() => filterCounts(week), [week]);
+  const counts = useMemo(() => filterCounts(week, followed), [week, followed]);
   const summary = useMemo(
     () => matchdaySummaryLine(matchdaySummary(week)),
     [week],
   );
-  const filtered = useMemo(() => filterMatchday(week, filter), [week, filter]);
+  const filtered = useMemo(() => filterMatchday(week, filter, followed), [week, filter, followed]);
   const cut = limit !== undefined && !expanded && filtered.length > limit;
   const days = useMemo(
     () => groupByDay(cut ? filtered.slice(0, limit) : filtered),
@@ -273,7 +325,7 @@ export function HomeMatchday({
           <span className="sr-only" role="status" aria-live="polite">
             {`${counts[filter]} gare`}
           </span>
-          {MATCHDAY_FILTERS.map((f) => {
+          {MATCHDAY_FILTERS.filter((f) => f !== "seguite" || followed.length > 0).map((f) => {
             const on = f === filter;
             return (
               <button
@@ -306,7 +358,9 @@ export function HomeMatchday({
           >
             {week.length === 0
               ? "Nessuna gara nei prossimi 7 giorni."
-              : `Nessuna gara "${MATCHDAY_FILTER_LABEL[filter]}" nei prossimi 7 giorni.`}
+              : filter === "seguite"
+                ? "Nessuna gara delle tue squadre nei prossimi 7 giorni. Tocca la stella su una gara per seguire una squadra."
+                : `Nessuna gara "${MATCHDAY_FILTER_LABEL[filter]}" nei prossimi 7 giorni.`}
           </p>
         ) : (
           days.map((d) => (
@@ -324,6 +378,8 @@ export function HomeMatchday({
                     e={e}
                     groups={calendar.groups}
                     nowMs={now}
+                    followed={followed.includes(e.group)}
+                    onFollow={follow}
                   />
                 ))}
               </ul>
