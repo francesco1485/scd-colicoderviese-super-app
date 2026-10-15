@@ -85,6 +85,7 @@ import { Route as QuadroIndexRouteImport } from './routes/quadro.index'
 import { Route as QuadroRotazioneCampiRouteImport } from './routes/quadro.rotazione-campi'
 import { Route as SegreteriaCertificatiRouteImport } from './routes/segreteria_.certificati'
 import { Route as SegreteriaPersoneRouteImport } from './routes/segreteria_.persone'
+import { Route as SegreteriaStoriaRouteImport } from './routes/segreteria_.storia'
 import { Route as SostieniIndexRouteImport } from './routes/sostieni.index'
 import { Route as SostieniDonaMaterialeRouteImport } from './routes/sostieni.dona-materiale'
 import { Route as SostieniFondoSolidaleRouteImport } from './routes/sostieni.fondo-solidale'
@@ -499,6 +500,11 @@ const SegreteriaPersoneRoute = SegreteriaPersoneRouteImport.update({
   path: '/segreteria/persone',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SegreteriaStoriaRoute = SegreteriaStoriaRouteImport.update({
+  id: '/segreteria_/storia',
+  path: '/segreteria/storia',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SostieniIndexRoute = SostieniIndexRouteImport.update({
   id: '/sostieni/',
   path: '/sostieni/',
@@ -727,6 +733,7 @@ export interface FileRoutesByFullPath {
   '/quadro/rotazione-campi': typeof QuadroRotazioneCampiRoute
   '/segreteria/certificati': typeof SegreteriaCertificatiRoute
   '/segreteria/persone': typeof SegreteriaPersoneRoute
+  '/segreteria/storia': typeof SegreteriaStoriaRoute
   '/sostieni/dona-materiale': typeof SostieniDonaMaterialeRoute
   '/sostieni/fondo-solidale': typeof SostieniFondoSolidaleRoute
   '/sostieni/proponi': typeof SostieniProponiRoute
@@ -834,6 +841,7 @@ export interface FileRoutesByTo {
   '/quadro/rotazione-campi': typeof QuadroRotazioneCampiRoute
   '/segreteria/certificati': typeof SegreteriaCertificatiRoute
   '/segreteria/persone': typeof SegreteriaPersoneRoute
+  '/segreteria/storia': typeof SegreteriaStoriaRoute
   '/sostieni/dona-materiale': typeof SostieniDonaMaterialeRoute
   '/sostieni/fondo-solidale': typeof SostieniFondoSolidaleRoute
   '/sostieni/proponi': typeof SostieniProponiRoute
@@ -943,6 +951,7 @@ export interface FileRoutesById {
   '/quadro/rotazione-campi': typeof QuadroRotazioneCampiRoute
   '/segreteria_/certificati': typeof SegreteriaCertificatiRoute
   '/segreteria_/persone': typeof SegreteriaPersoneRoute
+  '/segreteria_/storia': typeof SegreteriaStoriaRoute
   '/sostieni/dona-materiale': typeof SostieniDonaMaterialeRoute
   '/sostieni/fondo-solidale': typeof SostieniFondoSolidaleRoute
   '/sostieni/proponi': typeof SostieniProponiRoute
@@ -1053,6 +1062,7 @@ export interface FileRouteTypes {
     | '/quadro/rotazione-campi'
     | '/segreteria/certificati'
     | '/segreteria/persone'
+    | '/segreteria/storia'
     | '/sostieni/dona-materiale'
     | '/sostieni/fondo-solidale'
     | '/sostieni/proponi'
@@ -1160,6 +1170,7 @@ export interface FileRouteTypes {
     | '/quadro/rotazione-campi'
     | '/segreteria/certificati'
     | '/segreteria/persone'
+    | '/segreteria/storia'
     | '/sostieni/dona-materiale'
     | '/sostieni/fondo-solidale'
     | '/sostieni/proponi'
@@ -1268,6 +1279,7 @@ export interface FileRouteTypes {
     | '/quadro/rotazione-campi'
     | '/segreteria_/certificati'
     | '/segreteria_/persone'
+    | '/segreteria_/storia'
     | '/sostieni/dona-materiale'
     | '/sostieni/fondo-solidale'
     | '/sostieni/proponi'
@@ -1377,6 +1389,7 @@ export interface RootRouteChildren {
   QuadroRotazioneCampiRoute: typeof QuadroRotazioneCampiRoute
   SegreteriaCertificatiRoute: typeof SegreteriaCertificatiRoute
   SegreteriaPersoneRoute: typeof SegreteriaPersoneRoute
+  SegreteriaStoriaRoute: typeof SegreteriaStoriaRoute
   SostieniDonaMaterialeRoute: typeof SostieniDonaMaterialeRoute
   SostieniFondoSolidaleRoute: typeof SostieniFondoSolidaleRoute
   SostieniProponiRoute: typeof SostieniProponiRoute
@@ -1944,6 +1957,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SegreteriaPersoneRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/segreteria_/storia': {
+      id: '/segreteria_/storia'
+      path: '/segreteria/storia'
+      fullPath: '/segreteria/storia'
+      preLoaderRoute: typeof SegreteriaStoriaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sostieni/': {
       id: '/sostieni/'
       path: '/sostieni'
@@ -2248,6 +2268,7 @@ const rootRouteChildren: RootRouteChildren = {
   QuadroRotazioneCampiRoute: QuadroRotazioneCampiRoute,
   SegreteriaCertificatiRoute: SegreteriaCertificatiRoute,
   SegreteriaPersoneRoute: SegreteriaPersoneRoute,
+  SegreteriaStoriaRoute: SegreteriaStoriaRoute,
   SostieniDonaMaterialeRoute: SostieniDonaMaterialeRoute,
   SostieniFondoSolidaleRoute: SostieniFondoSolidaleRoute,
   SostieniProponiRoute: SostieniProponiRoute,

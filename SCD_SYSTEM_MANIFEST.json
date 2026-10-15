@@ -1935,6 +1935,42 @@
           "ARRIVAL_POINT_COORDINATES_NULL_UNTIL_VERIFIED_NO_INVENTED_DISTANCE"
         ],
         "imported_at": "2026-10-15"
+      },
+      {
+        "id": "FIGC_STORICO_CALCIATORI",
+        "kind": "FEDERATION_OFFICIAL",
+        "trust": "INTERNAL_VERIFIED",
+        "status": "STAGED_INACTIVE_UNTIL_R131_APPLIED",
+        "title": "FIGC/LND portal (iscrizioni.lnd.it): season tabulati (Dilettanti, SGS) and 'Storico calciatore' per FIGC number, exported by the Segreteria from its own logged-in browser",
+        "endpoint": "iscrizioni.lnd.it /InterrogazioneCalciatori/VisualizzaStorico?matricola= (same-origin, read by the club's own user; nothing is stored by the app outside the two tables)",
+        "authority_domains": [
+          "ATHLETES_CAREER_HISTORY",
+          "TESSERAMENTI_HISTORY",
+          "PLAYER_FLOWS_IN_OUT_RETURN"
+        ],
+        "storage": "supabase/migrations/20261015_r131_figc_player_history.sql (STAGED, NOT APPLIED): scd_figc_roster, scd_figc_career",
+        "consumers": [
+          "SCD_SUPABASE.scd_figc_roster",
+          "SCD_SUPABASE.scd_figc_career",
+          "apps/superapp/src/lib/figc-history.ts",
+          "apps/superapp/src/lib/figc-history.functions.ts",
+          "apps/superapp/src/lib/figc-export-script.ts",
+          "apps/superapp/src/routes/segreteria_.storia.tsx"
+        ],
+        "routes": [
+          "/segreteria/storia"
+        ],
+        "rules": [
+          "MINIMISATION_BIRTH_YEAR_ONLY_NO_BIRTH_DATE_STORED",
+          "NO_FISCAL_CODE_COLLECTED_OR_STORED",
+          "FIGC_NUMBER_AS_KEY_REIMPORT_IS_IDEMPOTENT",
+          "READERS_DIRECTION_AND_SECRETARIAT_ONLY_RLS",
+          "WRITES_ONLY_THROUGH_SCD_FIGC_HISTORY_IMPORT_AUDITED",
+          "UI_SHOWS_FIRST_NAME_AND_SURNAME_INITIAL_PLUS_BIRTH_YEAR",
+          "EXPORT_SCRIPT_SAME_ORIGIN_ONLY_NO_REMOTE_CODE_RUN_BY_A_PERSON",
+          "PORTAL_DATA_NEVER_OVERRIDES_TESSERAMENTI_OR_PEOPLE_ONLY_LINKS_PERSON_ID"
+        ],
+        "imported_at": "2026-10-15"
       }
     ],
     "conflict_resolution": [
