@@ -49,7 +49,6 @@ export const PARTNER_PACKAGES: readonly PartnerPackage[] = [
     benefits: [
       "Uno slot nella rotazione del ledwall a bordo campo",
       "Logo, messaggio, servizi, zona e sito nel tuo spot",
-      "Il tuo marchio entra anche nell'anteprima del ledwall in app, sulla pagina sponsor",
       "Testi e immagini concordati con la società prima della messa in onda",
     ],
     audience:
@@ -57,7 +56,6 @@ export const PARTNER_PACKAGES: readonly PartnerPackage[] = [
     audienceNumbers: null,
     price: { kind: "da_approvare" },
     icon: "ledwall",
-    featured: true,
   },
   {
     id: "maglia-kit",

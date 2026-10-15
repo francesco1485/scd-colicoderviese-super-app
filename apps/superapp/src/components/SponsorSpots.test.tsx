@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
@@ -7,48 +7,30 @@ const src = (rel: string) => readFileSync(fileURLToPath(new URL(rel, import.meta
 describe("sponsor LED spots in the UI (UD-119)", () => {
   const ui = src("./SponsorSpots.tsx");
 
-  it("live spot block (UD-134): once, compact, inside the partner band on /sponsor, never on the home", () => {
-    const home = src("./home/PublicHome.tsx");
-    expect(home).not.toMatch(/<SponsorSpotsHome |<PartnerBand /);
-    expect(home).not.toMatch(/<SupportStrip|<QuickActions|<LedwallRotator /);
-    const band = src("./sponsor/PartnerBand.tsx");
-    expect(band.match(/<SponsorSpotsHome /g)).toHaveLength(1);
-    expect(band).toMatch(/<SponsorSpotsHome day=\{day\} compact \/>/);
-    expect(src("../routes/sponsor.tsx").match(/<PartnerBand day=\{day\} \/>/g)).toHaveLength(1);
-    // Compact variant: same clock, the on-air label, the partner name and "Diventa partner".
-    const compact = ui.slice(ui.indexOf("if (compact)"), ui.indexOf("if (compact)") + 4000);
-    expect(compact).toContain("{onAirLabel}");
-    expect(ui).toContain('following ? "In onda ora sul LED wall" : "Anteprima dello spot"');
-    expect(compact).toContain('data-testid="spot-sponsor"');
-    expect(compact).toContain("Diventa partner");
-    expect(compact).toMatch(/search=\{\{ pacchetto: "ledwall" \}\}/);
-    expect(compact).toContain("<SpotStage spot={spot} play={play}");
-    expect(ui).toContain("Sul LED wall");
-    expect(ui).toContain("Partner della S.C.D. ColicoDerviese");
-    expect(ui).toContain("Scopri il partner");
-    expect(ui).toContain("Vuoi il tuo spot qui?");
-    expect(ui).toMatch(/search=\{\{ pacchetto: "ledwall" \}\}/);
+  it("no vetrine (Francesco 15/10/2026): no rotating spot block anywhere in the app, no partner band on /sponsor", () => {
+    expect(ui).not.toMatch(/export function SponsorSpotsHome|In onda ora sul LED wall|Torna alla diretta|mayAnimate/);
+    const sponsor = src("../routes/sponsor.tsx");
+    expect(sponsor).not.toMatch(/<PartnerBand|<LedwallFacsimile|<LedwallRotator|<SponsorSpotsHome/);
+    expect(existsSync(fileURLToPath(new URL("./sponsor/PartnerBand.tsx", import.meta.url)))).toBe(false);
+    expect(existsSync(fileURLToPath(new URL("./LedwallRotator.tsx", import.meta.url)))).toBe(false);
+    expect(existsSync(fileURLToPath(new URL("./LedwallFacsimile.tsx", import.meta.url)))).toBe(false);
   });
 
-  it("home videos: muted, inline, only the current one mounted, posters first, reduced motion respected, pause control", () => {
-    expect(ui).toMatch(/muted\s/);
-    expect(ui).toContain("playsInline");
-    expect(ui).toContain("mayAnimate(window)");
-    expect(ui).toContain("prefers-reduced-motion");
-    expect(ui).toContain("const mountVideo = seen && (auto || manualPlay)");
-    expect(ui).toContain('data-testid="spot-poster"');
-    expect(ui).toContain("aspect-video");
-    expect(ui).toContain('aria-label={userPaused ? "Riprendi gli spot" : "Metti in pausa gli spot"}');
-    expect(ui).toContain("ledOnAir(");
-    expect(ui).toContain("Torna alla diretta");
-    expect(ui).toContain("useNow(1000, 0, visible && following)");
-    expect(ui).toContain("freeze()");
+  it("spot videos in the app play only after a press: no autoPlay outside SpotStage, which follows the press", () => {
+    // SpotStage plays only when `play` is true; the gestionale list sets it from the user's press.
+    expect(ui).toContain("<SpotStage spot={spot} play={open} mountVideo={open} controls />");
+    expect(ui.match(/autoPlay=/g)).toHaveLength(1);
+    expect(ui).toContain("autoPlay={play}");
+    const regia = ui.slice(ui.indexOf("export function SpotRegia"), ui.indexOf("export function SpotLedList"));
+    expect(regia).not.toMatch(/<video|autoPlay|animate-ping/);
+    expect(src("../routes/spot.$slug.tsx")).toContain("<SpotStage spot={spot} play={false} mountVideo controls priority />");
   });
 
-  it("gestionale vetrina: inside the existing /crm sponsor tab (no parallel CRM), status badge, flow, note on the register", () => {
+  it("gestionale spot list: inside the existing /crm sponsor tab (no parallel CRM), status badge, flow, note on the register", () => {
     const crm = src("../routes/crm.tsx");
-    expect(crm.match(/<SpotLedVetrina /g)).toHaveLength(1);
-    expect(crm.indexOf("<SpotLedVetrina")).toBeGreaterThan(crm.indexOf("<PartnerKitGrid />"));
+    expect(crm.match(/<SpotLedList /g)).toHaveLength(1);
+    expect(crm.indexOf("<SpotLedList")).toBeGreaterThan(crm.indexOf("<PartnerKitGrid />"));
+    expect(crm).not.toMatch(/Vetrina/);
     expect(ui).toContain("SPOT_FLOW.map");
     expect(ui).toContain("<SpotStatusBadge status={spot.status} />");
     expect(ui).toContain("lo stato si aggiorna dal gestionale quando sarà attivo il registro spot (migrazione da approvare)".replace(/^l/, "L"));

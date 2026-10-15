@@ -2,7 +2,6 @@ import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
-import { LEDWALL_FACSIMILE } from "@/components/LedwallFacsimile";
 import { mayAnimate } from "./ledwall-rotation";
 import { findArea } from "./areas";
 import { readImageInfo, type AssetRegistry } from "./asset-format";
@@ -11,6 +10,12 @@ import { PULMINI_DEMAND } from "./roster-aggregates";
 
 const APP = resolve(__dirname, "../..");
 const REPO = resolve(APP, "../..");
+/** Direzione LED fac-simile files (UD-106): kept as club assets; no app page shows them since the no-vetrine rule (15/10/2026). */
+const LEDWALL_FACSIMILE = {
+  poster: "/media/sponsor/ledwall-facsimile-poster.webp",
+  hd: "/media/sponsor/ledwall-facsimile-1080.mp4",
+  sd: "/media/sponsor/ledwall-facsimile-720.mp4",
+} as const;
 const registry = JSON.parse(readFileSync(resolve(REPO, "config/scd-assets.v1.json"), "utf8")) as AssetRegistry;
 const publicFile = (url: string) => resolve(APP, "public", url.slice(1));
 const entry = (url: string) => registry.runtime_assets.find((a) => a.path === `apps/superapp/public${url}`) as
@@ -171,25 +176,15 @@ describe("ledwall fac-simile (sponsor web link)", () => {
     expect(readImageInfo(new Uint8Array(readFileSync(publicFile(LEDWALL_FACSIMILE.poster))))).toMatchObject({ format: "webp" });
   });
 
-  it("never names the example sponsor in the page copy", () => {
-    for (const f of ["components/LedwallFacsimile.tsx", "routes/sponsor.tsx"]) {
-      const text = readFileSync(resolve(APP, "src", f), "utf8");
-      expect(text, f).not.toMatch(/HDI|Maglia Assicurazioni/i);
-    }
-    const section = readFileSync(resolve(APP, "src/components/LedwallFacsimile.tsx"), "utf8");
-    expect(section).toContain("Fac-simile · esempio di rotazione");
-    expect(section).toContain('preload="metadata"');
+  it("never names the example sponsor in the sponsor page copy", () => {
+    const text = readFileSync(resolve(APP, "src/routes/sponsor.tsx"), "utf8");
+    expect(text).not.toMatch(/HDI|Maglia Assicurazioni/i);
   });
 
-  it("motion only without prefers-reduced-motion (LED wall preview; the video waits for a click)", () => {
+  it("motion only without prefers-reduced-motion (mayAnimate, lib/ledwall-rotation)", () => {
     const win = (reduce: boolean) => ({ matchMedia: (q: string) => ({ matches: reduce && q.includes("reduce") }) as MediaQueryList });
     expect(mayAnimate(win(false))).toBe(true);
     expect(mayAnimate(win(true))).toBe(false);
     expect(mayAnimate(undefined)).toBe(false);
-    const section = readFileSync(resolve(APP, "src/components/LedwallFacsimile.tsx"), "utf8");
-    expect(section).not.toMatch(/autoPlay/);
-    // The <video> (and so any download) exists only after the visitor opens it.
-    expect(section).toMatch(/open \? \(\s*<video/);
-    expect(section).toContain("Guarda il video fac-simile");
   });
 });

@@ -161,8 +161,8 @@ Correzioni:
   calendario.
 - **Crediti nel piè di pagina** da bianco 45 % a 60 % (4,0 → oltre 4,5:1); date dei tornei #7a8aa3 → #5b6b85.
 - **Bersagli da 44 px**: puntini e pausa del banner in home, logo della testata, "Vedi tutte", striscia "Prossima gara"
-  (spazio riservato da 40 a 44 px, nessun salto), nome del partner nello spot di /sponsor (area di tocco con padding e
-  margine negativo, impaginazione invariata).
+  (spazio riservato da 40 a 44 px, nessun salto). Il nome del partner nello spot di /sponsor (20 px) è uscito con la
+  rimozione delle vetrine su /sponsor (chat PC, 15/10 13:54).
 - **Barra sponsor fissa** (WCAG 2.2.2): si ferma sotto il puntatore o il dito; con "riduci movimento" è ferma.
 - Test `components/home/home-motion.test.tsx`: il banner della home non avanza mai da solo con "riduci movimento"
   (`autoAdvance`), primo disegno statico, un solo timer; la barra sponsor non ha timer e la regola CSS la ferma.
