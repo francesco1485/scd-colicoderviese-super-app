@@ -106,7 +106,7 @@ class Stop(Exception):
 def text(v, limit: int = 500) -> str:
     if v is None:
         return ""
-    s = re.sub(r"[ \t\r\n]+", " ", str(v)).strip()
+    s = re.sub(r"[ \t\r\n\u00a0]+", " ", str(v)).strip()
     if len(s) > limit:
         raise Stop(f"testo troppo lungo ({len(s)} > {limit}): {s[:40]}…")
     for r in BAD_TEXT:
@@ -175,7 +175,7 @@ def notices(row: dict) -> list[str]:
     return out
 
 
-def event_of(row: dict) -> dict | None:
+def event_of(row: dict, quiet: bool = False) -> dict | None:
     category = text(row.get("CATEGORY"), 120)
     group = group_of(category)
     if group is None or not published(row):
@@ -210,7 +210,7 @@ def event_of(row: dict) -> dict | None:
     if fix:
         if all(e.get(k) == v for k, v in fix["master"].items()):
             e.update(fix["set"])
-        else:
+        elif not quiet:
             print(f"AVVISO: correzione manuale di {eid} non applicata, il master è cambiato: vale il master", file=sys.stderr)
     return e
 
@@ -287,7 +287,7 @@ def self_test() -> None:
     assert event_of({**base, "CATEGORY": "Pulcini misti 7v7"})["group"] == "pulcini"
     o = event_of({**base, "EVENT_ID": "EVT-U19E-5A-MEDA1913-FUORI", "CATEGORY": "Juniores U19 Élite", "TIME": dt.time(17, 0)})
     assert o["time"] == "14:30" and o["end"] == "" and o["notice"][0].startswith("Orario ufficiale FIGC/LND")
-    n = event_of({**base, "EVENT_ID": "EVT-U19E-5A-MEDA1913-FUORI", "CATEGORY": "Juniores U19 Élite", "TIME": dt.time(16, 0)})
+    n = event_of({**base, "EVENT_ID": "EVT-U19E-5A-MEDA1913-FUORI", "CATEGORY": "Juniores U19 Élite", "TIME": dt.time(16, 0)}, quiet=True)
     assert n["time"] == "16:00" and n["notice"] == []  # newer master value wins over a stale correction
     for st in ("ANNULLATA", "CANCELLED", "RITIRATA"):
         assert event_of({**base, "MATCH_STATUS": st}) is None
