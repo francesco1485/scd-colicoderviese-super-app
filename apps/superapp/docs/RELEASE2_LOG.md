@@ -687,6 +687,13 @@ Backlog cloud B4. Motori: PERSONE (famiglie e tifosi leggono e toccano tutto anc
 - Manifest: consumatori di MASTER_CALENDARIO_2026_27 aggiornati.
 - Revisioni (scd-revisore e scd-sicurezza: PASS con note, note applicate): il convertitore ha gli stessi controlli del validatore dell'app (parole RITIRAT/ANNULLAT/CANCEL, caratteri invisibili, lunghezze, date e orari veri: se qualcosa non torna si ferma invece di tagliare o indovinare); la correzione manuale resta solo per la gara del 10/10 (orario ufficiale FIGC) e vale finché il master ha ancora il valore di allora; tolta quella dell'11/10 (Penta Piateda, gara già giocata): il master ha la riga confermata dalla società l'08/10 alle 14:30, la copia del 09/10 diceva 15:00; vale il master finché la Direzione non indica l'orario reale. Test nuovo: la vecchia copia del 09/10 su Drive è rifiutata. `__pycache__/` nel `.gitignore`.
 
+## 15/10/2026 15:10 · Chat cloud: calendario aggiornato ogni ora (scelta di Francesco: "copia nel repository")
+
+- L'app legge per prima la copia pubblica sul ramo dati `data/calendar-public` (`calendar-public.json`, servito da raw.githubusercontent.com), poi la copia Drive; ogni canale passa da `validateMirror` e dalla regola "mai più vecchia della copia inclusa". Nessuna condivisione Drive cambiata, nessuna ripubblicazione del sito a ogni modifica.
+- Ramo dati creato con la copia del master del 15/10 11:47. L'attività programmata "SCD Calendario · copia pubblica oraria" (testo in `docs/CALENDAR_HOURLY_TASK.md`) la rigenera ogni ora con `tools/sync/calendar_public_payload.py` solo se il master cambia, e può scrivere solo quel file su quel ramo.
+- Manifest: nuovo consumatore di MASTER_CALENDARIO_2026_27. Test: ordine dei canali, solo https e mai il master, copia `text/plain` accettata e pagina HTML rifiutata.
+- Revisioni (PASS con note, note applicate): l'app rifiuta anche una copia con data nel futuro (oltre 10 minuti: bloccherebbe ogni aggiornamento) e una copia con meno del 70% delle gare di quella inclusa; il canale del repository non segue rimandi; prima vince il primo canale valido (Drive è il vecchio canale). Attività: stessi controlli prima di pubblicare, openpyxl fissato a 3.1.5, nel commit solo il file del calendario, rigenera anche quando cambia il convertitore. Ritardo massimo tra master e app: circa 1 ora e 10 minuti.
+
 ## 15/10/2026 15:00 · Chat cloud: testi della Top 11 (decisione di Francesco)
 
 - Francesco 15/10: il voto della Top 11 resta aperto a ogni account registrato ("lascia votare tutti", UD-137; UD-138 registra le sue scelte sul calendario orario). /top11 e /community non dicono più "votano i tesserati" ma "serve un account del club". Nessun cambio al database.
