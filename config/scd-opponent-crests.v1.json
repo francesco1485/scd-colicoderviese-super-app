@@ -1,6 +1,6 @@
 {
-  "version": "1.1.0",
-  "generatedAt": "2026-10-13",
+  "version": "1.2.0",
+  "generatedAt": "2026-10-15",
   "policy": {
     "rule": "REAL_VERIFIED_ONLY",
     "fallback": "NEUTRAL_SHIELD_WITH_INITIALS",
@@ -50,7 +50,7 @@
       "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/Pulcini7c7/Girone33Primavera1AnnoVarese/Squadra/AccademiaVaresina/1026850/Scheda",
       "verifiedAt": null,
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "note": "Only Varesina (senior club) pages found; distinct club, not borrowed.",
+      "note": "A.S.D. Accademia Varesina (CONI registry 22643) is a club distinct from Varesina Sport (derby reported on varesinacalcio.it): do not reuse the Varesina crest; no official site found.",
       "fixtures": [
         "EVT-U16E-20261115-ACCADEMIAVARESINA-FUORI",
         "EVT-U16E-10R-ACCADEMIAVARESINA-CASA"
@@ -520,14 +520,18 @@
       "aliases": [
         "CINISELLO"
       ],
-      "status": "MISSING",
-      "file": null,
-      "source": null,
-      "sourceUrl": null,
+      "status": "VERIFIED_FILE",
+      "file": "/media/crests/cinisello.webp",
+      "source": "https://www.fccinisello1945.it/societa.aspx",
+      "sourceUrl": "https://www.fccinisello1945.it/App_Images/Title.png",
+      "sourceKind": "OFFICIAL_CLUB_WEBSITE",
       "tuttocampoUrl": "https://www.tuttocampo.it/Squadra/Cinisello/80965/Scheda",
-      "verifiedAt": null,
+      "verifiedAt": "2026-10-15",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "note": "Several Cinisello clubs; identity ambiguous.",
+      "width": 76,
+      "height": 88,
+      "originalSha256": "9d273748f31a62ca4751e28711c646ae9efc991498c8665010ae16e3f530449b",
+      "note": "Official site of FC Cinisello Calcio 1945 (Via Cilea 50, plays at Stadio Gaetano Scirea, the venue of the calendar fixture). The crest is the left element of the site title image (343x104 RGBA); only the crest area was cut out. The site is old (Eccellenza-era pages) and the original is small (68x80 px): the Direzione should confirm it is still the current crest.",
       "fixtures": [
         "EVT-U19E-8A-CINISELLO-CASA",
         "EVT-U19E-8R-CINISELLO-FUORI"
@@ -733,7 +737,7 @@
       "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/Promozione/GironeB/Squadra/Muggio/1000435/Scheda",
       "verifiedAt": null,
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "note": "FCDFucina page not reachable.",
+      "note": "Club renamed back to F.C.D. Muggio (bepitv.it 'La Fucina cambia volto: nasce l'F.C.D. Muggio'): crest to confirm for 2026/27; no official site found, Instagram/Facebook not readable.",
       "fixtures": [
         "EVT-U19E-7A-FUCINADIMUGGIOASD-FUORI",
         "EVT-U19E-7R-FUCINADIMUGGIOASD-CASA"
@@ -752,7 +756,7 @@
       "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/TerzaCategoria/GironeALecco/Squadra/OZanetti/675349/Scheda",
       "verifiedAt": null,
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "note": "Only 'A.S.D. Zanetti' (ZANETTI 1948) page found, name differs and picture is cropped: not used.",
+      "note": "Only 'A.S.D. Zanetti' (ZANETTI 1948) page found, name differs and picture is cropped: not used. 2026-10-15: club born in 2026 from the Pol. Futura 96 + Osvaldo Zanetti merger; no official site or crest published yet.",
       "fixtures": [
         "EVT-PC78-9A-FUTURAZANETTIASD-FUORI"
       ]
@@ -805,17 +809,22 @@
     },
     {
       "slug": "gso-missaglia",
-      "displayName": "GSO Missaglia",
+      "displayName": "G.S.O. Missaglia",
       "aliases": [
         "G.S.O. MISSAGLIA A.S.D."
       ],
-      "status": "MISSING",
-      "file": null,
-      "source": null,
-      "sourceUrl": null,
+      "status": "VERIFIED_FILE",
+      "file": "/media/crests/gso-missaglia.webp",
+      "source": "https://chiesadimissaglia.it/attivita/sport.html",
+      "sourceUrl": "https://chiesadimissaglia.it/images/2023/GSO.jpg",
+      "sourceKind": "OFFICIAL_CLUB_WEBSITE",
       "tuttocampoUrl": null,
-      "verifiedAt": null,
+      "verifiedAt": "2026-10-15",
       "licenceNote": "club trademark, used nominatively in fixture lists",
+      "width": 138,
+      "height": 130,
+      "originalSha256": "99923c47c18219badf1fbf3e24ac5d9e27144db1fcd32c00834f5bb9e8d98b4b",
+      "note": "Page 'Gruppo Sportivo Oratori Missaglia - GSOM' on the parish site that hosts the club (Via Roma 3, Missaglia). The crest is the left element of the club letterhead image GSO.jpg (680x160); only the crest area was cut out, the crest itself is untouched. Small original (about 128x120 px).",
       "fixtures": [
         "EVT-PULMIX-1A-GSOMISSAGLIAASD-CASA"
       ]
@@ -826,14 +835,18 @@
       "aliases": [
         "LA DOMINANTE"
       ],
-      "status": "MISSING",
-      "file": null,
-      "source": null,
-      "sourceUrl": null,
+      "status": "VERIFIED_FILE",
+      "file": "/media/crests/la-dominante.webp",
+      "source": "https://ladominante1929.wixsite.com/calcio",
+      "sourceUrl": "https://static.wixstatic.com/media/325af3_9eb8bc007d5d47379df3ef202188a955~mv2.jpg",
+      "sourceKind": "OFFICIAL_CLUB_WEBSITE",
       "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/GiovanissimiRegionaliU15/GironeB/Squadra/LaDominante/1051076/Scheda",
-      "verifiedAt": null,
+      "verifiedAt": "2026-10-15",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "note": "Instagram only.",
+      "width": 104,
+      "height": 134,
+      "originalSha256": "07d71db96a6f411e64f0bc232b03e3565ee7474a5d6bae8cbfe3c691ba790ce7",
+      "note": "Calcio site of ASD La Dominante Monza (linked from ladominante.it). The crest is the left element of the site header banner (1080x168 JPEG); only the crest area was cut out of the banner, the crest itself is untouched. Small original (about 94x124 px): replace with a larger official file when available.",
       "fixtures": [
         "EVT-U16E-2A-LADOMINANTE-CASA",
         "EVT-U16E-20270117-LADOMINANTE-FUORI"
@@ -915,14 +928,18 @@
       "aliases": [
         "LISSONE CALCIO SSDARL"
       ],
-      "status": "MISSING",
-      "file": null,
-      "source": null,
-      "sourceUrl": null,
+      "status": "VERIFIED_FILE",
+      "file": "/media/crests/lissone-calcio.webp",
+      "source": "https://www.aclissone.it/prima-squadra/",
+      "sourceUrl": "https://www.aclissone.it/wp-content/uploads/2024/11/AC-L_logo.png",
+      "sourceKind": "OFFICIAL_CLUB_WEBSITE",
       "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/Promozione/GironeD/Squadra/Lissone/62922/Scheda",
-      "verifiedAt": null,
+      "verifiedAt": "2026-10-15",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "note": "Identity ambiguous (Pro Lissone / AC Lissone).",
+      "width": 256,
+      "height": 256,
+      "originalSha256": "91ca393eb86f659513e292dfdacef5b2852311a16eb285ee9090f74fae550ea4",
+      "note": "Official site 'WeAreACLISSONE' (aclissone.it): header crest AC-L_logo.png 2432x2432 RGBA, used as published. Identity: its 'Partite promozione' calendar lists the ColicoDerviese fixtures; golee.it lists 'Lissone Calcio SSD A.R.L.' under the AC Lissone club page.",
       "fixtures": [
         "EVT-PRIMA-4A-LISSONECALCIOSSDAR-FUORI",
         "EVT-PRIMA-4R-LISSONECALCIOSSDAR-CASA"
@@ -1244,6 +1261,7 @@
       "tuttocampoUrl": null,
       "verifiedAt": null,
       "licenceNote": "club trademark, used nominatively in fixture lists",
+      "note": "Gruppo Sportivo Rogeno (Oratorio Pio XI): no official website found; Facebook not readable by the web tools.",
       "fixtures": [
         "EVT-PULMIX-2A-ROGENOASD-FUORI"
       ]
@@ -1306,7 +1324,7 @@
       "tuttocampoUrl": null,
       "verifiedAt": null,
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "note": "Several 'San Giorgio' clubs; identity ambiguous.",
+      "note": "FIGC Lecco lists two clubs: 'GSO SAN GIORGIO' (Casatenovo) and 'SAN GIORGIO' (San Giorgio Molteno / Pol. D. San Giorgio MoltenoBrongio). The calendar name matches the second; its only crest pages found (Facebook, accademiacalciocomo.com) are not readable by the web tools. Do NOT use the GSO San Giorgio Casatenovo crest.",
       "fixtures": [
         "EVT-PULMIX-3A-SANGIORGIO-CASA",
         "EVT-ES11-4A-SANGIORGIOSQB-CASA",
@@ -1436,6 +1454,7 @@
       "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/TerzaCategoria/GironeALecco/Squadra/Vercurago/206432/Scheda",
       "verifiedAt": null,
       "licenceNote": "club trademark, used nominatively in fixture lists",
+      "note": "Calcio Vercurago A.S.D. (CONI registry 53816): no official website found; Facebook/Instagram not readable by the web tools.",
       "fixtures": [
         "EVT-PC78-2A-VERCURAGOSQB-FUORI"
       ]

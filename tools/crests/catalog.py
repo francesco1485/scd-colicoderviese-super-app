@@ -104,6 +104,11 @@ ORIGINALS = {
     "dubino": ("crests-dl2/du1.fb.img", FB + "usdubino", "OFFICIAL_FACEBOOK_PAGE_PICTURE"),
     "valmadrera-cg": ("crests-dl2/valmadrera.fb.img", FB + "1676879909208866", "OFFICIAL_FACEBOOK_PAGE_PICTURE"),
     "valmadrera": ("crests-dl2/valmadrera.fb.img", FB + "1676879909208866", "OFFICIAL_FACEBOOK_PAGE_PICTURE"),
+    # third batch (2026-10-15): official club websites; composite images only had the crest area cut out
+    "lissone-calcio": ("crests3/lissone-logo.png", "https://www.aclissone.it/prima-squadra/", "OFFICIAL_CLUB_WEBSITE"),
+    "la-dominante": ("crests3/la-dominante.png", "https://ladominante1929.wixsite.com/calcio", "OFFICIAL_CLUB_WEBSITE"),
+    "gso-missaglia": ("crests3/gso-missaglia.png", "https://chiesadimissaglia.it/attivita/sport.html", "OFFICIAL_CLUB_WEBSITE"),
+    "cinisello": ("crests3/cinisello.png", "https://www.fccinisello1945.it/societa.aspx", "OFFICIAL_CLUB_WEBSITE"),
 }
 
 NOTES = {
@@ -121,7 +126,28 @@ NOTES = {
     "academy-casatese-merate": "Crest present in SCD Drive but not imported here (file too large for this environment's transfer); export it at 256 px and add it.",
     "castello-citta-di-cantu": "Crest present in SCD Drive but not imported here (file too large for this environment's transfer); official site castellocittadicantu.it only shows it inside a banner.",
     "bellagina": "Official page 'U.S. Bellagina' (page id 260878517323776) has no picture; SCD Drive has an unlabelled 'BELLAGIO.jpg' to be confirmed by the Direzione.",
-    "futura-zanetti": "Only 'A.S.D. Zanetti' (ZANETTI 1948) page found, name differs and picture is cropped: not used.",
+    "futura-zanetti": "Only 'A.S.D. Zanetti' (ZANETTI 1948) page found, name differs and picture is cropped: not used. "
+                      "2026-10-15: club born in 2026 from the Pol. Futura 96 + Osvaldo Zanetti merger; no official site or crest published yet.",
+    "lissone-calcio": "Official site 'WeAreACLISSONE' (aclissone.it): header crest AC-L_logo.png 2432x2432 RGBA, used as published. "
+                      "Identity: its 'Partite promozione' calendar lists the ColicoDerviese fixtures; golee.it lists 'Lissone Calcio SSD A.R.L.' under the AC Lissone club page.",
+    "la-dominante": "Calcio site of ASD La Dominante Monza (linked from ladominante.it). The crest is the left element of the site header banner "
+                    "(1080x168 JPEG); only the crest area was cut out of the banner, the crest itself is untouched. Small original (about 94x124 px): "
+                    "replace with a larger official file when available.",
+    "gso-missaglia": "Page 'Gruppo Sportivo Oratori Missaglia - GSOM' on the parish site that hosts the club (Via Roma 3, Missaglia). The crest is the left "
+                     "element of the club letterhead image GSO.jpg (680x160); only the crest area was cut out, the crest itself is untouched. "
+                     "Small original (about 128x120 px).",
+    "cinisello": "Official site of FC Cinisello Calcio 1945 (Via Cilea 50, plays at Stadio Gaetano Scirea, the venue of the calendar fixture). "
+                 "The crest is the left element of the site title image (343x104 RGBA); only the crest area was cut out. The site is old "
+                 "(Eccellenza-era pages) and the original is small (68x80 px): the Direzione should confirm it is still the current crest.",
+    "san-giorgio": "FIGC Lecco lists two clubs: 'GSO SAN GIORGIO' (Casatenovo) and 'SAN GIORGIO' (San Giorgio Molteno / Pol. D. San Giorgio MoltenoBrongio). "
+                   "The calendar name matches the second; its only crest pages found (Facebook, accademiacalciocomo.com) are not readable by the web tools. "
+                   "Do NOT use the GSO San Giorgio Casatenovo crest.",
+    "fucina-di-muggio": "Club renamed back to F.C.D. Muggio (bepitv.it 'La Fucina cambia volto: nasce l'F.C.D. Muggio'): crest to confirm for 2026/27; "
+                        "no official site found, Instagram/Facebook not readable.",
+    "vercurago": "Calcio Vercurago A.S.D. (CONI registry 53816): no official website found; Facebook/Instagram not readable by the web tools.",
+    "rogeno": "Gruppo Sportivo Rogeno (Oratorio Pio XI): no official website found; Facebook not readable by the web tools.",
+    "accademia-varesina": "A.S.D. Accademia Varesina (CONI registry 22643) is a club distinct from Varesina Sport (derby reported on varesinacalcio.it): "
+                          "do not reuse the Varesina crest; no official site found.",
 }
 
 # Crest files the club's press office already holds (for provenance / manual import).

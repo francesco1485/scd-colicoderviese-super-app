@@ -2493,6 +2493,46 @@
       "use": "poster of the preview video (home 'Sul LED wall', /crm 'Spot LED')",
       "note": "spot ufficiale sponsor confermato; approvazione testi da registrare",
       "verified_at": "2026-10-14"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/cinisello.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Cinisello: https://www.fccinisello1945.it/societa.aspx",
+      "git_blob_sha": "7a24e59bc9546dafbad71d240f1e2df281741f00",
+      "derived_from": "https://www.fccinisello1945.it/App_Images/Title.png (original sha256 9d273748f31a62ca)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change; crest area cut out of the published composite image",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/gso-missaglia.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "G.S.O. Missaglia: https://chiesadimissaglia.it/attivita/sport.html",
+      "git_blob_sha": "78f54587e0edf6514b9e25556aa6888db22ed27e",
+      "derived_from": "https://chiesadimissaglia.it/images/2023/GSO.jpg (original sha256 99923c47c18219ba)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change; crest area cut out of the published composite image",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/la-dominante.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "La Dominante: https://ladominante1929.wixsite.com/calcio",
+      "git_blob_sha": "0267bf01ce850399e623ea78ef0110b85ec8bc92",
+      "derived_from": "https://static.wixstatic.com/media/325af3_9eb8bc007d5d47379df3ef202188a955~mv2.jpg (original sha256 07d71db96a6f411e)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change; crest area cut out of the published composite image",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/crests/lissone-calcio.webp",
+      "class": "OPPONENT_CREST",
+      "status": "VERIFIED",
+      "source": "Lissone Calcio: https://www.aclissone.it/prima-squadra/",
+      "git_blob_sha": "ad4ca03839f20a8371e5363dba07e74794066178",
+      "derived_from": "https://www.aclissone.it/wp-content/uploads/2024/11/AC-L_logo.png (original sha256 91ca393eb86f6595)",
+      "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
+      "vector_status": "RESEARCH_REAL_ASSET"
     }
   ],
   "vector_research": [

@@ -130,6 +130,39 @@ describe("second catalogue batch (2026-10-13)", () => {
   });
 });
 
+describe("third catalogue batch (2026-10-15)", () => {
+  it("resolves the new official-site crests", () => {
+    expect(crestFor("LISSONE CALCIO SSDARL").src).toBe("/media/crests/lissone-calcio.webp");
+    expect(crestFor("LA DOMINANTE").src).toBe("/media/crests/la-dominante.webp");
+    expect(crestFor("G.S.O. MISSAGLIA A.S.D.").src).toBe("/media/crests/gso-missaglia.webp");
+    expect(crestFor("CINISELLO").src).toBe("/media/crests/cinisello.webp");
+  });
+  it("gives every Promozione girone D 2026/27 club a real crest", () => {
+    const gironeD = [
+      "A. CASATI CALCIO ARCORE",
+      "ALTA BRIANZA TAVERNERIO",
+      "ARDITA CITTADELLA 1934",
+      "ARS ROVAGNATE",
+      "BIASSONO",
+      "C.O.B. 91",
+      "CANTU SAN PAOLO A.S.D.",
+      "COSTAMASNAGA",
+      "DI.PO A.S.D.",
+      "LESMO SSD ARL",
+      "LISSONE CALCIO SSDARL",
+      "MARIANO CALCIO",
+      "OLYMPIC MORBEGNO",
+      "PONTELAMBRESE A.S.D.",
+      "VIBE RONCHESE",
+    ];
+    for (const club of gironeD) expect(crestFor(club).src, club).toMatch(/^\/media\/crests\/[a-z0-9-]+\.webp$/);
+  });
+  it("never maps the ambiguous 'SAN GIORGIO' (Molteno) to another club's crest", () => {
+    expect(crestEntryFor("SAN GIORGIO SQ.B")?.status).toBe("MISSING");
+    expect(crestFor("SAN GIORGIO").src).toBeNull();
+  });
+});
+
 describe("registry integrity", () => {
   it("every referenced file exists and no two entries share a slug", () => {
     const slugs = new Set<string>();
