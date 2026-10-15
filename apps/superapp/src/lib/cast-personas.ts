@@ -729,7 +729,7 @@ export const CAST_PERSONAS: Readonly<Record<CastPersonaId, CastPersonaDef>> = {
  */
 export const VERA_PRESENCE = {
   label: "Iride",
-  role: "La reception del club",
+  role: "L'assistente AI della segreteria",
   does: "Risponde con i dati veri del club e ti dice da dove vengono, ti porta dal volto giusto e, se serve una persona, apre una richiesta alla segreteria. Anche biglietti e card.",
   askLabel: "Chiedi a Iride",
   initial: "I",

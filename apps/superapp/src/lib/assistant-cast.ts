@@ -48,9 +48,6 @@ export interface CastMember {
 const ROLE_SWAP_HOLD =
   "Direzione 14/10/2026: ruoli di Era e Genny invertiti; l'immagine del round 4 era stata fatta per il ruolo precedente. Nessun ritratto finché la Direzione non approva una nuova immagine ufficiale.";
 
-const VERA_HOLD =
-  "Direzione 14/10/2026 (UD-121): la chat si chiama Vera, la reception del club (al posto di Genny); l'immagine del round 4 era stata fatta per un altro ruolo. Nessun ritratto finché la Direzione non approva una nuova immagine ufficiale.";
-
 export const CAST: Readonly<Record<CastId, CastMember>> = {
   era: {
     id: "era",
@@ -67,15 +64,16 @@ export const CAST: Readonly<Record<CastId, CastMember>> = {
   vera: {
     id: "vera",
     name: "Iride",
-    role: "La reception del club e l'unica chat dell'app: risponde con i dati veri citando la fonte, ti porta dal volto giusto e apre una richiesta alla segreteria",
-    alt: "Iride, la reception del club",
-    canvaAssetId: "MAHX1KTH6yk",
-    canvaExportDesignId: "DAHX4uTHmCs",
-    // Legacy folder and file names of the held round-4 image (made for "Genny"): not renamed, not shown.
-    mediaDir: "/media/cast/genny/",
-    fileStem: "genny",
-    ready: false,
-    portraitHold: VERA_HOLD,
+    role: "L'assistente AI della segreteria e l'unica chat dell'app: risponde con i dati veri citando la fonte, ti porta dal volto giusto e apre una richiesta alla segreteria",
+    alt: "Iride, l'assistente AI della segreteria",
+    canvaAssetId: "MAHYF_fzGq0",
+    // No Canva export design: the files come from the approved WhatsApp profile image (Drive, 800x800).
+    canvaExportDesignId: "",
+    // Iride's approved image (Francesco 15/10/2026: tailored navy suit + rainbow scarf, the WhatsApp profile of the
+    // AI secretary). The held round-4 "genny" files stay in /media/cast/genny/ and are not shown.
+    mediaDir: "/media/cast/iride/",
+    fileStem: "iride",
+    ready: true,
   },
   acanfora: {
     id: "acanfora",
@@ -214,7 +212,7 @@ export const CAST_ROSTER: readonly CastRosterEntry[] = [
     id: "vera",
     label: "Iride",
     nameTbd: false,
-    role: "Reception",
+    role: "Segreteria AI",
     area: "Tutta l'app: è l'unica chat (pagine pubbliche, aree riservate, Cervellone, impianti)",
     does: [
       "Risponde con i dati veri del club e cita la fonte (pagina o documento)",
@@ -233,7 +231,7 @@ export const CAST_ROSTER: readonly CastRosterEntry[] = [
     portrait: {
       ready: CAST.vera.ready,
       brief:
-        "Receptionist del club accogliente e sveglia, con gli occhiali, sempre sul pezzo; immagine da approvare",
+        "Donna moderna ed elegante ispirata alla messaggera degli dei (avatar approvato da Francesco il 15/10/2026, Canva MAHYF_fzGq0): file da aggiungere all'app",
     },
     voice: { ready: false, rule: VOICE_RULE },
     presence: "CHAT_PERSONA",
@@ -303,7 +301,7 @@ export const CAST_ROSTER: readonly CastRosterEntry[] = [
       "Le card del club",
       "Le prossime partite in casa",
       "La prevendita, solo quando è attiva",
-      "Ora risponde Iride, la reception del club: niente chat a parte",
+      "Ora risponde Iride, l'assistente AI della segreteria: niente chat a parte",
     ],
     rules: [
       "Solo prezzi e regole pubblicati dalla società, mai inventati",

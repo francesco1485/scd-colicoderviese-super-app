@@ -301,7 +301,7 @@ describe("persona routing (UD-121: one chat, Iride)", () => {
   it("writes the persona and the hard rules into the system prompt", () => {
     const ctx = buildPublicContext(publicInput());
     const p = systemPrompt("vera", "PUBLIC", ctx);
-    expect(p).toMatch(/Sei Iride, la reception della S\.C\.D\. ColicoDerviese/);
+    expect(p).toMatch(/Sei Iride, l'assistente AI della segreteria della S\.C\.D\. ColicoDerviese/);
     expect(p).toMatch(/Cita sempre la fonte/);
     expect(p).toMatch(/Mai nomi di minori/);
     expect(p).toMatch(/IBAN/);

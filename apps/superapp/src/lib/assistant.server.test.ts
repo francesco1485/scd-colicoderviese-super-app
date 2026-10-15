@@ -283,7 +283,7 @@ describe("Iride's chat opened with an area (UD-121: one chat, faces hand over)",
     const r = await answerStaff("cosa c'è in menu?", t.deps, "accoglienza-chef");
     expect(t.kbSearch).not.toHaveBeenCalled();
     const sys = systemOf(f);
-    expect(sys).toContain("Sei Iride, la reception");
+    expect(sys).toContain("Sei Iride, l'assistente AI della segreteria");
     expect(sys).toContain("Per la Club House ti aiuta Garrison, lo Chef");
     expect(sys).toContain("SQUBY/SumUp");
     expect(sys).toContain("Area: Garrison");

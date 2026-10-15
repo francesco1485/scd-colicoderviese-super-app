@@ -73,7 +73,7 @@ describe("helper persona (UD-121: one chat, Iride; Sky only for the younger memb
     expect(PERSONA_COPY.vera.title).toBe("Chiedi a Iride");
     expect(PERSONA_COPY.vera.name).toBe("Iride");
     expect(PERSONA_COPY.vera.placeholder).toMatch(/Iride/);
-    expect(PERSONA_COPY.vera.greeting).toMatch(/reception/);
+    expect(PERSONA_COPY.vera.greeting).toMatch(/assistente AI della segreteria/);
     expect(PERSONA_COPY.vera.greeting).toMatch(/dati veri/);
     expect(PERSONA_COPY.vera.greeting).toMatch(/richiesta alla segreteria/);
   });

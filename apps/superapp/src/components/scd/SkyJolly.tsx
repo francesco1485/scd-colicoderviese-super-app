@@ -123,9 +123,9 @@ export const PERSONA_COPY: Readonly<Record<Persona, PersonaCopy>> = {
   vera: {
     name: "Iride",
     title: "Chiedi a Iride",
-    subtitle: "la reception del club: dati veri, con la fonte",
+    subtitle: "l'assistente AI della segreteria: dati veri, con la fonte",
     greeting:
-      "Ciao, sono Iride, la reception della ColicoDerviese. Ti rispondo con i dati veri del club e ti dico da dove vengono: partite, campi, iscrizioni, biglietti, card, sponsor e tornei. Se serve una persona, apro una richiesta alla segreteria: scrivimi in due parole cosa ti serve.",
+      "Ciao, sono Iride, l'assistente AI della segreteria della ColicoDerviese. Ti rispondo con i dati veri del club e ti dico da dove vengono: partite, campi, iscrizioni, biglietti, card, sponsor e tornei. Se serve una persona, apro una richiesta alla segreteria: scrivimi in due parole cosa ti serve.",
     placeholder: "Scrivi a Iride…",
     thinking: "Iride sta cercando…",
     quick: [
@@ -141,10 +141,10 @@ export const PERSONA_COPY: Readonly<Record<Persona, PersonaCopy>> = {
 
 /** Header line of Vera's chat opened with an area. */
 const AREA_SUBTITLE: Readonly<Record<ChatAreaId, string>> = {
-  "accoglienza-chef": "la reception · area Club House con Garrison",
-  "volto-sponsor": "la reception · area sponsor con il Volto sponsor",
-  "mentore-tornei": "la reception · area tornei con Enea",
-  biglietteria: "la reception · biglietti, gratuità e card",
+  "accoglienza-chef": "la segreteria · area Club House con Garrison",
+  "volto-sponsor": "la segreteria · area sponsor con il Volto sponsor",
+  "mentore-tornei": "la segreteria · area tornei con Enea",
+  biglietteria: "la segreteria · biglietti, gratuità e card",
 };
 
 /** Chat copy for a persona and an area: Vera opened from a face card keeps her name and takes the area's questions. */
@@ -162,7 +162,7 @@ export function greetingFor(persona: Persona, area: ChatAreaId | null = null): {
   if (persona !== "vera" || !area) return { text: PERSONA_COPY[persona].greeting };
   const def = CAST_PERSONAS[area];
   return {
-    text: `Ciao, sono Iride, la reception del club. ${def.handoff ?? ""} Scegli qui sotto o scrivimi.`.replace(/\s+/g, " ").trim(),
+    text: `Ciao, sono Iride, l'assistente AI della segreteria. ${def.handoff ?? ""} Scegli qui sotto o scrivimi.`.replace(/\s+/g, " ").trim(),
     links: def.quick.map((l) => ({ label: l.label, to: castLinkTo(l) })),
   };
 }

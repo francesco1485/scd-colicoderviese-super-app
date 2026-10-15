@@ -44,7 +44,7 @@ export function SkyPanel({
     {
       id: 0,
       role: "sky",
-      text: "Ciao, sono Iride, la reception del club. Ti dico se un campo è libero, dove mettere un torneo e quando avvisare il Comune, usando il calendario reale e le tue ipotesi. Sono simulazioni: non prenoto e non sposto niente.",
+      text: "Ciao, sono Iride, l'assistente AI della segreteria. Ti dico se un campo è libero, dove mettere un torneo e quando avvisare il Comune, usando il calendario reale e le tue ipotesi. Sono simulazioni: non prenoto e non sposto niente.",
     },
   ]);
   const [q, setQ] = useState("");

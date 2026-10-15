@@ -50,12 +50,12 @@ const castFolder = (id: string) =>
 describe("assistant cast registry (round 4 images, roles corrected by the Direzione 14/10/2026)", () => {
   it("keeps the Canva provenance of each character", () => {
     expect(CAST.era.canvaAssetId).toBe("MAHX1G12gBc");
-    expect(CAST.vera.canvaAssetId).toBe("MAHX1KTH6yk");
+    expect(CAST.vera.canvaAssetId).toBe("MAHYF_fzGq0");
     expect(CAST.acanfora.canvaAssetId).toBe("MAHX1M4GK7g");
     for (const id of CAST_IDS)
       expect(CAST[id].mediaDir).toBe(`/media/cast/${CAST[id].fileStem}/`);
-    // Vera keeps the legacy folder of the held round-4 image: no file is renamed, none is invented.
-    expect(CAST.vera.mediaDir).toBe("/media/cast/genny/");
+    // Iride (persona id "vera") uses her approved image; the held round-4 "genny" folder is kept, not shown.
+    expect(CAST.vera.mediaDir).toBe("/media/cast/iride/");
   });
 
   it("never replaces Crovi v3 or Sky", () => {
@@ -67,21 +67,24 @@ describe("assistant cast registry (round 4 images, roles corrected by the Direzi
   it("states the roles: Era nutritionist, Iride reception and the one chat (UD-121), Acanfora doctor", () => {
     expect(CAST.era.role).toMatch(/nutrizionista/i);
     expect(CAST.vera.name).toBe("Iride");
-    expect(CAST.vera.role).toMatch(/reception/i);
+    expect(CAST.vera.role).toMatch(/assistente AI della segreteria/i);
     expect(CAST.vera.role).toMatch(/unica chat/i);
     expect(CAST.acanfora.role).toMatch(/medico/i);
     expect(CAST.acanfora.role).toMatch(/mai diagnosi/i);
   });
 
-  it("shows no portrait for Era and Iride until new images are approved (the round-4 ones fit other roles)", () => {
-    for (const id of ["era", "vera"] as const) {
-      const folder = castFolder(CAST[id].fileStem);
-      expect(castReady(id), id).toBe(false);
-      expect(CAST[id].portraitHold, id).toMatch(/14\/10\/2026/);
-      expect(folder?.["status"], id).toBe("ON_HOLD");
-      expect(String(folder?.["hold_reason"]), id).toMatch(/14\/10\/2026/);
-    }
-    expect(CAST.vera.portraitHold).toMatch(/UD-121/);
+  it("shows no portrait for Era until a new image is approved; Iride shows her approved image (15/10/2026)", () => {
+    const era = castFolder(CAST.era.fileStem);
+    expect(castReady("era")).toBe(false);
+    expect(CAST.era.portraitHold).toMatch(/14\/10\/2026/);
+    expect(era?.["status"]).toBe("ON_HOLD");
+    expect(String(era?.["hold_reason"])).toMatch(/14\/10\/2026/);
+    expect(castReady("vera")).toBe(true);
+    expect(CAST.vera.portraitHold).toBeUndefined();
+    expect(castFolder("iride")?.["status"]).toBe("APPROVED");
+    expect(String(castFolder("iride")?.["approval_evidence"])).toMatch(/15\/10\/2026/);
+    // The held round-4 image made for another role stays on hold and unused.
+    expect(castFolder("genny")?.["status"]).toBe("ON_HOLD");
     expect(castFolder("genny")?.["character"]).toBe("vera");
     expect(String(castFolder("genny")?.["hold_reason"])).toMatch(/UD-121/);
     expect(registry.statuses).toContain("ON_HOLD");
@@ -196,7 +199,7 @@ describe("cast roster (Direzione 14/10/2026, UD-111)", () => {
     for (const id of CAST_IDS)
       expect(rosterEntry(id).portrait.ready, id).toBe(castReady(id));
     expect(rosterEntry("era").role).toBe("Nutrizionista");
-    expect(rosterEntry("vera").role).toBe("Reception");
+    expect(rosterEntry("vera").role).toBe("Segreteria AI");
     expect(rosterEntry("vera").decidedBy).toMatch(/UD-121/);
     expect(rosterEntry("acanfora").role).toBe("Medico");
   });

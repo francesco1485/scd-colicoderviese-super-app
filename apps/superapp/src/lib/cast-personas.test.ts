@@ -211,7 +211,7 @@ describe("system prompt of Iride with an area", () => {
   it("carries Iride's voice and rules, the area's hand-over and hard rules, with the same JSON output", () => {
     for (const area of CHAT_AREA_IDS) {
       const p = systemPrompt("vera", "PUBLIC", ctx, area);
-      expect(p).toMatch(/Sei Iride, la reception/);
+      expect(p).toMatch(/Sei Iride, l'assistente AI della segreteria/);
       for (const r of personaRules("vera", area)) expect(p).toContain(r);
       expect(p).toContain(CAST_PERSONAS[area].handoff!);
       expect(p).toMatch(/non confermarle mai e non chiedere pagamenti/);
