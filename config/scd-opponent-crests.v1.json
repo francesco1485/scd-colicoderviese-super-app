@@ -1,5 +1,5 @@
 {
-  "version": "1.2.0",
+  "version": "1.3.0",
   "generatedAt": "2026-10-15",
   "policy": {
     "rule": "REAL_VERIFIED_ONLY",
@@ -64,17 +64,17 @@
       ],
       "status": "VERIFIED_FILE",
       "file": "/media/crests/alta-brianza-tavernerio.webp",
-      "source": "SCD Drive: ufficio stampa/LOGHI SQUADRE CAMPIONATI/ALTA BRIANZA TAVERNERIO.jpg (1Jl2F6-OXCr8pTqQVj9h9Mh4eKRQTq0jJ)",
-      "sourceUrl": "https://drive.google.com/file/d/1Jl2F6-OXCr8pTqQVj9h9Mh4eKRQTq0jJ/view",
-      "sourceKind": "SCD_DRIVE",
+      "source": "Supplied by the SCD Direzione on 2026-10-15 16:34 (fornito dalla Direzione SCD 15/10/2026): alta-brianza.png",
+      "sourceUrl": null,
+      "sourceKind": "SCD_DIREZIONE_SUPPLIED",
       "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/Eccellenza/GironeA/Squadra/AltabrianzaTavernerio/675772/Scheda",
       "scdDriveFile": "SCD Drive: ufficio stampa/LOGHI SQUADRE CAMPIONATI/ALTA BRIANZA TAVERNERIO.png (169FIwa0CDtt-NfC8p17Uxqkm2IseTIjt)",
-      "verifiedAt": "2026-10-13",
+      "verifiedAt": "2026-10-15",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "width": 250,
-      "height": 200,
-      "originalSha256": "052897b0f4ae5781c77a9ed38e4d1c16222788dfaa40309abb3fcb2b453833b5",
-      "note": "Logo collected by the SCD press office (a larger PNG is also in the same folder).",
+      "width": 225,
+      "height": 256,
+      "originalSha256": "c06160fa701c02931c4bf9fcf1aecd742dc1b0216f13e23a183c281d8c08652d",
+      "note": "Alta Brianza Calcio 1951 (Tavernerio); the earlier Drive JPEG had the bottom of the crest cut off. Replaced 2026-10-15 (same crest, higher-quality file); previous file came from https://drive.google.com/file/d/1Jl2F6-OXCr8pTqQVj9h9Mh4eKRQTq0jJ/view.",
       "fixtures": [
         "EVT-PRIMA-5A-ALTABRIANZATAVERNE-CASA",
         "EVT-PRIMA-5R-ALTABRIANZATAVERNE-FUORI"
@@ -111,17 +111,17 @@
       ],
       "status": "VERIFIED_FILE",
       "file": "/media/crests/arcellasco-citta-di-erba.webp",
-      "source": "https://www.facebook.com/gsdarcellasco",
-      "sourceUrl": "https://www.facebook.com/gsdarcellasco",
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "source": "Supplied by the SCD Direzione on 2026-10-15 16:34 (fornito dalla Direzione SCD 15/10/2026): arcellasco.png",
+      "sourceUrl": null,
+      "sourceKind": "SCD_DIREZIONE_SUPPLIED",
       "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/Esordienti9c9/GironeAUnder12PrimaverileComo/Squadra/ArcellascoCittaDiErba/1181616/Scheda",
       "scdDriveFile": "SCD Drive: ufficio stampa/LOGHI SQUADRE CAMPIONATI/G.S.D. Arcellasco Città di Erba.png (1pyKAqgcrGpAgX_dkuqWRqU0ZX5fC2hzk)",
-      "verifiedAt": "2026-10-13",
+      "verifiedAt": "2026-10-15",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "width": 256,
+      "width": 194,
       "height": 256,
-      "originalSha256": "7d54aea24eecd9270cc5ad3de744b2bf292be3985a2a1277eb59e62186af9a6a",
-      "note": "Page 'Gsd Arcellasco - Città di Erba' (1978); same crest also in SCD Drive.",
+      "originalSha256": "fccbf3e35af87087d99f4b7139f141b57c1a094994e4f11a58d5f67e9beb01b4",
+      "note": "G.S.D. Arcellasco Città di Erba 1978; the earlier Facebook picture showed the same crest on a red circle. White background kept as supplied. Replaced 2026-10-15 (same crest, higher-quality file); previous file came from https://www.facebook.com/gsdarcellasco.",
       "fixtures": [
         "EVT-U19E-10A-ARCELLASCOCITTADIE-FUORI",
         "EVT-U19E-10R-ARCELLASCOCITTADIE-CASA"
@@ -245,6 +245,47 @@
       "fixtures": [
         "EVT-PC78-5A-AURORASANFRANCESCO-FUORI"
       ]
+    },
+    {
+      "slug": "aurora-seriate",
+      "displayName": "Aurora Seriate",
+      "aliases": [
+        "AURORA SERIATE 1967",
+        "AURORA SERIATE"
+      ],
+      "status": "VERIFIED_FILE",
+      "file": "/media/crests/aurora-seriate.webp",
+      "source": "Supplied by the SCD Direzione on 2026-10-15 16:34 (fornito dalla Direzione SCD 15/10/2026): aurora-seriate.png",
+      "sourceUrl": null,
+      "sourceKind": "SCD_DIREZIONE_SUPPLIED",
+      "tuttocampoUrl": null,
+      "verifiedAt": "2026-10-15",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "width": 203,
+      "height": 256,
+      "originalSha256": "dec63e2ca22dbf7191c6996dc60c291cc62c69a0ee4b18b92209d2497f28d72b",
+      "note": "Aurora Seriate 1967.",
+      "fixtures": []
+    },
+    {
+      "slug": "base-96",
+      "displayName": "Base 96",
+      "aliases": [
+        "BASE 96"
+      ],
+      "status": "VERIFIED_FILE",
+      "file": "/media/crests/base-96.webp",
+      "source": "Supplied by the SCD Direzione on 2026-10-15 16:33 (fornito dalla Direzione SCD 15/10/2026): base96.png",
+      "sourceUrl": null,
+      "sourceKind": "SCD_DIREZIONE_SUPPLIED",
+      "tuttocampoUrl": null,
+      "verifiedAt": "2026-10-15",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "width": 256,
+      "height": 254,
+      "originalSha256": "8ee994447f26ae2880ddce4e8764851cdbd4041cbe47f29ad437d4a1b9e923f8",
+      "note": "Base 96.",
+      "fixtures": []
     },
     {
       "slug": "bellagina",
@@ -478,15 +519,19 @@
       "aliases": [
         "CASTELLO CITTA DI CANTU"
       ],
-      "status": "MISSING",
-      "file": null,
-      "source": null,
+      "status": "VERIFIED_FILE",
+      "file": "/media/crests/castello-citta-di-cantu.webp",
+      "source": "Supplied by the SCD Direzione on 2026-10-15 16:33 (fornito dalla Direzione SCD 15/10/2026): castello-cantu.png",
       "sourceUrl": null,
+      "sourceKind": "SCD_DIREZIONE_SUPPLIED",
       "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/Esordienti9c9/GironeAComo/Squadra/CastelloCittaDiCantu/1098438/Scheda",
       "scdDriveFile": "SCD Drive: ufficio stampa/LOGHI SQUADRE CAMPIONATI/CASTELLO CITTA DI CANTU ASDGSO.png (10PJ9ewD0a5p0Vigbxn-3pEEs2d6H7Q-z)",
-      "verifiedAt": null,
+      "verifiedAt": "2026-10-15",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "note": "Crest present in SCD Drive but not imported here (file too large for this environment's transfer); official site castellocittadicantu.it only shows it inside a banner.",
+      "width": 196,
+      "height": 256,
+      "originalSha256": "b883426d57b6cd21cba8cae253654ebe11ad155b1744d552bb9fd117ca740b00",
+      "note": "G.S.O. Castello Città di Cantù 1999; file supplied by the Direzione (was MISSING).",
       "fixtures": [
         "EVT-U19E-11A-CASTELLOCITTADICAN-CASA",
         "EVT-U19E-11R-CASTELLOCITTADICAN-FUORI"
@@ -558,6 +603,48 @@
       "fixtures": [
         "EVT-U19E-2A-CISANESEASD-CASA"
       ]
+    },
+    {
+      "slug": "citta-di-albino",
+      "displayName": "Città di Albino",
+      "aliases": [
+        "CDA CITTA DI ALBINO",
+        "CITTA DI ALBINO"
+      ],
+      "status": "VERIFIED_FILE",
+      "file": "/media/crests/citta-di-albino.webp",
+      "source": "Supplied by the SCD Direzione on 2026-10-15 16:34 (fornito dalla Direzione SCD 15/10/2026): citta-di-albino.png",
+      "sourceUrl": null,
+      "sourceKind": "SCD_DIREZIONE_SUPPLIED",
+      "tuttocampoUrl": null,
+      "verifiedAt": "2026-10-15",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "width": 160,
+      "height": 256,
+      "originalSha256": "8158d02f8dd8f81816b8ab51e9eeec0f8b23d65122b1b4530110bec9b25dc046",
+      "note": "CDA Città di Albino 2024.",
+      "fixtures": []
+    },
+    {
+      "slug": "civate",
+      "displayName": "Civate",
+      "aliases": [
+        "A.S.D. CIVATE 2014",
+        "CIVATE"
+      ],
+      "status": "VERIFIED_FILE",
+      "file": "/media/crests/civate.webp",
+      "source": "Supplied by the SCD Direzione on 2026-10-15 16:33 (fornito dalla Direzione SCD 15/10/2026): civate.png",
+      "sourceUrl": null,
+      "sourceKind": "SCD_DIREZIONE_SUPPLIED",
+      "tuttocampoUrl": null,
+      "verifiedAt": "2026-10-15",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "width": 256,
+      "height": 229,
+      "originalSha256": "46f567a7f906e704d3fa8ccd6a97985e7a2164a4213604c7246f152df73fff3e",
+      "note": "A.S.D. Civate 2014.",
+      "fixtures": []
     },
     {
       "slug": "cob-91",
@@ -725,6 +812,28 @@
       ]
     },
     {
+      "slug": "fiorente-colognola",
+      "displayName": "Fiorente Colognola",
+      "aliases": [
+        "FIORENTE 1946 COLOGNOLA",
+        "FIORENTE COLOGNOLA",
+        "FIORENTE BERGAMO"
+      ],
+      "status": "VERIFIED_FILE",
+      "file": "/media/crests/fiorente-colognola.webp",
+      "source": "Supplied by the SCD Direzione on 2026-10-15 16:34 (fornito dalla Direzione SCD 15/10/2026): fiorente-colognola.png",
+      "sourceUrl": null,
+      "sourceKind": "SCD_DIREZIONE_SUPPLIED",
+      "tuttocampoUrl": null,
+      "verifiedAt": "2026-10-15",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "width": 256,
+      "height": 256,
+      "originalSha256": "79168d3f4eb7ed688f065a81b075e90b293d04bac88f3bb7fa929a03b993b350",
+      "note": "Fiorente 1946 Colognola (Bergamo). Badge on its own light background, used as supplied.",
+      "fixtures": []
+    },
+    {
       "slug": "fucina-di-muggio",
       "displayName": "Fucina di Muggiò",
       "aliases": [
@@ -769,15 +878,16 @@
       ],
       "status": "VERIFIED_FILE",
       "file": "/media/crests/grentarcadia.webp",
-      "source": "https://www.facebook.com/asdgrentarcadia",
-      "sourceUrl": "https://www.facebook.com/asdgrentarcadia",
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "source": "Supplied by the SCD Direzione on 2026-10-15 16:33 (fornito dalla Direzione SCD 15/10/2026): grentarcadia.png",
+      "sourceUrl": null,
+      "sourceKind": "SCD_DIREZIONE_SUPPLIED",
       "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/Promozione/GironeB/Squadra/Grentarcadia/1163797/Scheda",
-      "verifiedAt": "2026-10-13",
+      "verifiedAt": "2026-10-15",
       "licenceNote": "club trademark, used nominatively in fixture lists",
-      "width": 256,
-      "height": 241,
-      "originalSha256": "dee5c8e2eaa0d8130b17fb33c4407984362eec760458bc69ef6429dfe8d06dba",
+      "width": 241,
+      "height": 256,
+      "originalSha256": "ee2c256cd3aceba2fcb4944ee8a6a98aa12952f92301c3c27d66852437bb9543",
+      "note": "Replaced 2026-10-15 (same crest, higher-quality file); previous file came from https://www.facebook.com/asdgrentarcadia.",
       "fixtures": [
         "EVT-U15-4A-GRENTARCADIA-FUORI",
         "EVT-U15-4R-GRENTARCADIA-CASA"
@@ -853,6 +963,27 @@
       ]
     },
     {
+      "slug": "lemine-almenno",
+      "displayName": "Lemine Almenno",
+      "aliases": [
+        "LEMINE ALMENNO CALCIO A.S.D.",
+        "LEMINE ALMENNO"
+      ],
+      "status": "VERIFIED_FILE",
+      "file": "/media/crests/lemine-almenno.webp",
+      "source": "Supplied by the SCD Direzione on 2026-10-15 16:34 (fornito dalla Direzione SCD 15/10/2026): lemine-almenno.png",
+      "sourceUrl": null,
+      "sourceKind": "SCD_DIREZIONE_SUPPLIED",
+      "tuttocampoUrl": null,
+      "verifiedAt": "2026-10-15",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "width": 183,
+      "height": 256,
+      "originalSha256": "0773ae7caa2ec44efd3a345a253967d45d255725f0efd66ef9301ed179520930",
+      "note": "Lemine Almenno Calcio A.S.D.",
+      "fixtures": []
+    },
+    {
       "slug": "lentatese",
       "displayName": "Lentatese",
       "aliases": [
@@ -905,16 +1036,16 @@
       ],
       "status": "VERIFIED_FILE",
       "file": "/media/crests/lesmo.webp",
-      "source": "https://www.facebook.com/p/FC-Lesmo-Monza-e-Brianza-100082565132404/",
-      "sourceUrl": "https://www.facebook.com/p/FC-Lesmo-Monza-e-Brianza-100082565132404/",
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "source": "Supplied by the SCD Direzione on 2026-10-15 16:33 (fornito dalla Direzione SCD 15/10/2026): lesmo.png",
+      "sourceUrl": null,
+      "sourceKind": "SCD_DIREZIONE_SUPPLIED",
       "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/Promozione/GironeB/Squadra/Lesmo/1057148/Scheda",
-      "verifiedAt": "2026-10-13",
+      "verifiedAt": "2026-10-15",
       "licenceNote": "club trademark, used nominatively in fixture lists",
       "width": 256,
-      "height": 256,
-      "originalSha256": "fff49485a843850214fd024ee3db7b825860e2e82ff66a47fed66a9c948e5a76",
-      "note": "Page 'FC Lesmo Monza e Brianza', page id 103121329109348.",
+      "height": 255,
+      "originalSha256": "75906faf8af42ddc4dba072097610c5ffe574d04fe5d411d449a105de55c17c0",
+      "note": "Page 'FC Lesmo Monza e Brianza', page id 103121329109348. Replaced 2026-10-15 (same crest, higher-quality file); previous file came from https://www.facebook.com/p/FC-Lesmo-Monza-e-Brianza-100082565132404/.",
       "fixtures": [
         "EVT-U19E-1A-LESMOSSDARL-FUORI",
         "EVT-PRIMA-2A-LESMOSSDARL-FUORI",
@@ -1267,6 +1398,27 @@
       ]
     },
     {
+      "slug": "rovellasca",
+      "displayName": "Rovellasca 1910",
+      "aliases": [
+        "S.C. ROVELLASCA 1910",
+        "ROVELLASCA"
+      ],
+      "status": "VERIFIED_FILE",
+      "file": "/media/crests/rovellasca.webp",
+      "source": "Supplied by the SCD Direzione on 2026-10-15 16:33 (fornito dalla Direzione SCD 15/10/2026): rovellasca.png",
+      "sourceUrl": null,
+      "sourceKind": "SCD_DIREZIONE_SUPPLIED",
+      "tuttocampoUrl": null,
+      "verifiedAt": "2026-10-15",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "width": 256,
+      "height": 252,
+      "originalSha256": "26e0e0bb26f558e2ced80bdf22e34db5a26a26b5572467128fb1cdf16dde0acd",
+      "note": "S.C. Rovellasca 1910.",
+      "fixtures": []
+    },
+    {
       "slug": "rovinata",
       "displayName": "Rovinata",
       "aliases": [
@@ -1332,6 +1484,27 @@
       ]
     },
     {
+      "slug": "san-pellegrino",
+      "displayName": "San Pellegrino",
+      "aliases": [
+        "U.S. CALCIO SAN PELLEGRINO 1922",
+        "SAN PELLEGRINO"
+      ],
+      "status": "VERIFIED_FILE",
+      "file": "/media/crests/san-pellegrino.webp",
+      "source": "Supplied by the SCD Direzione on 2026-10-15 16:34 (fornito dalla Direzione SCD 15/10/2026): san-pellegrino.png",
+      "sourceUrl": null,
+      "sourceKind": "SCD_DIREZIONE_SUPPLIED",
+      "tuttocampoUrl": null,
+      "verifiedAt": "2026-10-15",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "width": 184,
+      "height": 200,
+      "originalSha256": "e6ed4e9047ab74684044f45c75e9bf150d5c23f36f14f6337e5580a0ae6ed5b1",
+      "note": "U.S. Calcio San Pellegrino 1922. Small original (200x200 px): replace with a larger official file when available.",
+      "fixtures": []
+    },
+    {
       "slug": "sirtorese",
       "displayName": "Sirtorese",
       "aliases": [
@@ -1351,6 +1524,48 @@
       "fixtures": [
         "EVT-PULMIX-5A-SIRTORESE-FUORI"
       ]
+    },
+    {
+      "slug": "speranza-agrate",
+      "displayName": "Speranza Agrate",
+      "aliases": [
+        "SPERANZA AGRATE 1972",
+        "SPERANZA AGRATE"
+      ],
+      "status": "VERIFIED_FILE",
+      "file": "/media/crests/speranza-agrate.webp",
+      "source": "Supplied by the SCD Direzione on 2026-10-15 16:34 (fornito dalla Direzione SCD 15/10/2026): speranza-agrate.png",
+      "sourceUrl": null,
+      "sourceKind": "SCD_DIREZIONE_SUPPLIED",
+      "tuttocampoUrl": null,
+      "verifiedAt": "2026-10-15",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "width": 233,
+      "height": 256,
+      "originalSha256": "2d961738b749de7584e04045936ac92c0f27a9773f89f681f4a926c6f7cd8430",
+      "note": "Speranza Agrate 1972.",
+      "fixtures": []
+    },
+    {
+      "slug": "tritium",
+      "displayName": "Tritium",
+      "aliases": [
+        "TRITIUM 1908",
+        "TRITIUM"
+      ],
+      "status": "VERIFIED_FILE",
+      "file": "/media/crests/tritium.webp",
+      "source": "Supplied by the SCD Direzione on 2026-10-15 16:34 (fornito dalla Direzione SCD 15/10/2026): tritium.png",
+      "sourceUrl": null,
+      "sourceKind": "SCD_DIREZIONE_SUPPLIED",
+      "tuttocampoUrl": null,
+      "verifiedAt": "2026-10-15",
+      "licenceNote": "club trademark, used nominatively in fixture lists",
+      "width": 198,
+      "height": 256,
+      "originalSha256": "3aaaecd406d24937b7e87563258615018f92ee803dfdd5b49ec64438e8f38dd5",
+      "note": "Tritium 1908.",
+      "fixtures": []
     },
     {
       "slug": "valmadrera",
@@ -1467,16 +1682,17 @@
       ],
       "status": "VERIFIED_FILE",
       "file": "/media/crests/vibe-ronchese.webp",
-      "source": "https://www.facebook.com/viberonchese",
-      "sourceUrl": "https://www.facebook.com/viberonchese",
-      "sourceKind": "OFFICIAL_FACEBOOK_PAGE_PICTURE",
+      "source": "Supplied by the SCD Direzione on 2026-10-15 16:33 (fornito dalla Direzione SCD 15/10/2026): vibe-ronchese.png",
+      "sourceUrl": null,
+      "sourceKind": "SCD_DIREZIONE_SUPPLIED",
       "tuttocampoUrl": "https://www.tuttocampo.it/Lombardia/Promozione/GironeC/Squadra/VibeRonchese/1000423/Scheda",
       "scdDriveFile": "SCD Drive: ufficio stampa/LOGHI SQUADRE CAMPIONATI/VIBE RONCHESE A.S.D..png (10z5XAkFDPbUXHu38HrxtFRIRarvwAuy5)",
-      "verifiedAt": "2026-10-13",
+      "verifiedAt": "2026-10-15",
       "licenceNote": "club trademark, used nominatively in fixture lists",
       "width": 256,
       "height": 256,
-      "originalSha256": "7362969f50b5f9dffec5cc7a122e04a926e93e1f27268740a2cf8d7679f3f402",
+      "originalSha256": "47f63095e8b1b069cedce3190c54432c64c8485e064f64c44fc60abea46e6305",
+      "note": "Full crest with the 'VIBE RONCHESE' ring; the earlier Facebook picture was a crop of the same mark. Replaced 2026-10-15 (same crest, higher-quality file); previous file came from https://www.facebook.com/viberonchese.",
       "fixtures": [
         "EVT-PRIMA-11A-VIBERONCHESE-FUORI",
         "EVT-U19E-14A-VIBERONCHESE-FUORI",
