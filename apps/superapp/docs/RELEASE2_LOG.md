@@ -697,3 +697,8 @@ Backlog cloud B4. Motori: PERSONE (famiglie e tifosi leggono e toccano tutto anc
 ## 15/10/2026 15:00 · Chat cloud: testi della Top 11 (decisione di Francesco)
 
 - Francesco 15/10: il voto della Top 11 resta aperto a ogni account registrato ("lascia votare tutti", UD-137; UD-138 registra le sue scelte sul calendario orario). /top11 e /community non dicono più "votano i tesserati" ma "serve un account del club". Nessun cambio al database.
+
+## 15/10/2026 15:45 · Chat cloud: un solo generatore del calendario, allineato alla copia approvata
+
+- Alle 15:10 la chat PC e Francesco hanno rigenerato e condiviso la copia su Drive (171 gare, con le amichevoli del club da confermare). Alle 15:16 la chat cloud ha messo in linea per primo il canale del repository con la sua copia da 156 gare: le amichevoli Pulcini del 18 e 24/10 sono sparite dal sito per circa mezz'ora. Corretto alle 15:35 aggiornando il ramo dati con la copia allineata (171 gare, identica gara per gara a quella approvata).
+- Convertitore `tools/sync/calendar_public_payload.py` allineato: le amichevoli del club si pubblicano anche da confermare, con "Orario o sede da verificare" + "Attesa verifica"; la correzione di Penta Piateda (15:00) resta come nella copia approvata, finché il master ha 14:30. Copia inclusa nell'app = stessa copia da 171 gare; test aggiornati ai numeri veri (171 gare, 92 in casa, 46 da confermare).

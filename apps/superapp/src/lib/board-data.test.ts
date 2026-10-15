@@ -67,7 +67,7 @@ describe("calendario validato -> tavole", () => {
   });
   test("contatori Staff: solo numeri derivabili (squadre, gare), mai inventati", () => {
     const c = staffCounters(cal.groups, cal.events);
-    expect(c.seasonMatches).toBe(156);
+    expect(c.seasonMatches).toBe(171);
     expect(c.teams).toBe(cal.groups.filter((g) => g.count > 0 && g.id !== "other").length);
     expect(staffCounters([], [])).toEqual({ teams: null, seasonMatches: null });
   });
