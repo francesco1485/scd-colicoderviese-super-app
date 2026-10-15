@@ -3415,6 +3415,29 @@
           "manifest_source": "SCD_RICHIESTE"
         }
       }
+    },
+    {
+      "sourceDate": "2026-10-15",
+      "sourceTime": "18:40",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-139",
+      "name": "APP_CHAT_IRIDE_AND_CROVI_NO_SKY",
+      "sourceQuoteFragments": [
+        "vera non ce piu ce iride - crovi per i piu giovani",
+        "altra chat gia ha impostato tutto e sa chi è iride e la sua impostazione confrontati e poi continui"
+      ],
+      "context": "Francesco 15/10/2026 18:40 (chat cloud), answer to the question who replaces Sky in the app chat button, then the instruction to align with the PC chat's Iride (UD-155 on branch feat/pc-segreteria-ai: AI secretary, says she is an AI, short and warm). Sky leaves the app (cast decision relayed by the PC chat as UD-151, Sky only on the pitch).",
+      "normalizedCommand": {
+        "rule": "The app chat's visible persona is Iride, the club's AI secretary (persona id 'vera' unchanged), with her approved image; younger members and reserved pages before the session meet Crovi (persona id 'sky' unchanged, neutral 'C' initial until an image is approved); Sky never appears in the app chat. Access rules (resolveChat) are unchanged.",
+        "appliesTo": [
+          "apps/superapp/src/components/SkyChat.tsx",
+          "apps/superapp/src/components/scd/SkyJolly.tsx",
+          "apps/superapp/src/lib/assistant.ts",
+          "apps/superapp/src/lib/assistant-cast.ts",
+          "apps/superapp/src/lib/cast-personas.ts"
+        ]
+      }
     }
   ],
   "completionGate": {

@@ -13,7 +13,8 @@
  * rules engine as fallback.
  *
  * Official assets only (config/scd-assets.v1.json): Sky head /media/brand/sky-atv-head.webp, Sky head + ball
- * /media/brand/sky-scd.png. Vera has no approved image yet: neutral 'V' initial until the Direzione approves one.
+ * /media/brand/sky-scd.png (Sky stays out of the app since UD-151). Iride (persona id "vera") shows her approved image;
+ * Crovi (persona id "sky") a neutral 'C' initial until the Direzione approves one.
  */
 import { resolveChat, type AssistantPersona, type ChatAreaId, type HelperViewer } from "@/lib/assistant";
 import { CAST_IDS, castAvatarSrc, castReady, type CastId } from "@/lib/assistant-cast";
@@ -25,10 +26,6 @@ export type Persona = AssistantPersona;
 
 export type { HelperViewer } from "@/lib/assistant";
 export { veraEligible } from "@/lib/assistant";
-
-/** Public media paths of the official Sky files (never generated, never altered). */
-export const SKY_HEAD_SRC = "/media/brand/sky-atv-head.webp";
-export const SKY_BALL_SRC = "/media/brand/sky-scd.png";
 
 /** Access flows: no floating helper at all (the visitor is filling a form). */
 const HIDDEN_PREFIXES = ["/accedi", "/entra", "/registrati"] as const;
@@ -172,7 +169,7 @@ export const CROVI_INITIAL = "C";
 
 /**
  * Round avatar of the active persona: Vera and Crovi use their picture once an image is approved; until then a
- * neutral initial in the club colours ('V', 'C'). Sky never appears in the app (UD-151).
+ * neutral initial in the club colours (Crovi 'C'; Iride has her approved image). Sky never appears in the app (UD-151).
  */
 export function PersonaAvatar({
   persona = "sky",

@@ -231,11 +231,11 @@ export const CAST_ROSTER: readonly CastRosterEntry[] = [
     portrait: {
       ready: CAST.vera.ready,
       brief:
-        "Donna moderna ed elegante ispirata alla messaggera degli dei (avatar approvato da Francesco il 15/10/2026, Canva MAHYF_fzGq0): file da aggiungere all'app",
+        "Donna moderna ed elegante ispirata alla messaggera degli dei (avatar approvato da Francesco il 15/10/2026, Canva MAHYF_fzGq0), nell'app da /media/cast/iride/",
     },
     voice: { ready: false, rule: VOICE_RULE },
     presence: "CHAT_PERSONA",
-    decidedBy: "Direzione 14/10/2026 (UD-121): una sola chat, Vera, al posto di Genny",
+    decidedBy: "Direzione 14/10/2026 (UD-121): una sola chat, al posto di Genny; Francesco 15/10/2026 (UD-139): si chiama Iride, l'assistente AI della segreteria",
   },
   {
     id: "acanfora",
