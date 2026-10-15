@@ -68,6 +68,7 @@ import { Route as DirezioneCervelloneRouteImport } from './routes/direzione_.cer
 import { Route as DirezioneContenutiRouteImport } from './routes/direzione_.contenuti'
 import { Route as DirezioneLotteriaRouteImport } from './routes/direzione_.lotteria'
 import { Route as DirezioneProposteRouteImport } from './routes/direzione_.proposte'
+import { Route as DirezioneRuoliRouteImport } from './routes/direzione_.ruoli'
 import { Route as EventiIndexRouteImport } from './routes/eventi.index'
 import { Route as EventiChristmasLarioCupRouteImport } from './routes/eventi.christmas-lario-cup'
 import { Route as EventiLezioniTecnicoCoordinativeRouteImport } from './routes/eventi.lezioni-tecnico-coordinative'
@@ -415,6 +416,11 @@ const DirezioneProposteRoute = DirezioneProposteRouteImport.update({
   path: '/direzione/proposte',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DirezioneRuoliRoute = DirezioneRuoliRouteImport.update({
+  id: '/direzione_/ruoli',
+  path: '/direzione/ruoli',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EventiIndexRoute = EventiIndexRouteImport.update({
   id: '/eventi/',
   path: '/eventi/',
@@ -732,6 +738,7 @@ export interface FileRoutesByFullPath {
   '/direzione/contenuti': typeof DirezioneContenutiRoute
   '/direzione/lotteria': typeof DirezioneLotteriaRoute
   '/direzione/proposte': typeof DirezioneProposteRoute
+  '/direzione/ruoli': typeof DirezioneRuoliRoute
   '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
   '/eventi/lezioni-tecnico-coordinative': typeof EventiLezioniTecnicoCoordinativeRoute
   '/eventi/lotteria-dello-sport': typeof EventiLotteriaDelloSportRoute
@@ -843,6 +850,7 @@ export interface FileRoutesByTo {
   '/direzione/contenuti': typeof DirezioneContenutiRoute
   '/direzione/lotteria': typeof DirezioneLotteriaRoute
   '/direzione/proposte': typeof DirezioneProposteRoute
+  '/direzione/ruoli': typeof DirezioneRuoliRoute
   '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
   '/eventi/lezioni-tecnico-coordinative': typeof EventiLezioniTecnicoCoordinativeRoute
   '/eventi/lotteria-dello-sport': typeof EventiLotteriaDelloSportRoute
@@ -954,6 +962,7 @@ export interface FileRoutesById {
   '/direzione_/contenuti': typeof DirezioneContenutiRoute
   '/direzione_/lotteria': typeof DirezioneLotteriaRoute
   '/direzione_/proposte': typeof DirezioneProposteRoute
+  '/direzione_/ruoli': typeof DirezioneRuoliRoute
   '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
   '/eventi/lezioni-tecnico-coordinative': typeof EventiLezioniTecnicoCoordinativeRoute
   '/eventi/lotteria-dello-sport': typeof EventiLotteriaDelloSportRoute
@@ -1067,6 +1076,7 @@ export interface FileRouteTypes {
     | '/direzione/contenuti'
     | '/direzione/lotteria'
     | '/direzione/proposte'
+    | '/direzione/ruoli'
     | '/eventi/christmas-lario-cup'
     | '/eventi/lezioni-tecnico-coordinative'
     | '/eventi/lotteria-dello-sport'
@@ -1178,6 +1188,7 @@ export interface FileRouteTypes {
     | '/direzione/contenuti'
     | '/direzione/lotteria'
     | '/direzione/proposte'
+    | '/direzione/ruoli'
     | '/eventi/christmas-lario-cup'
     | '/eventi/lezioni-tecnico-coordinative'
     | '/eventi/lotteria-dello-sport'
@@ -1288,6 +1299,7 @@ export interface FileRouteTypes {
     | '/direzione_/contenuti'
     | '/direzione_/lotteria'
     | '/direzione_/proposte'
+    | '/direzione_/ruoli'
     | '/eventi/christmas-lario-cup'
     | '/eventi/lezioni-tecnico-coordinative'
     | '/eventi/lotteria-dello-sport'
@@ -1400,6 +1412,7 @@ export interface RootRouteChildren {
   DirezioneContenutiRoute: typeof DirezioneContenutiRoute
   DirezioneLotteriaRoute: typeof DirezioneLotteriaRoute
   DirezioneProposteRoute: typeof DirezioneProposteRoute
+  DirezioneRuoliRoute: typeof DirezioneRuoliRoute
   EventiChristmasLarioCupRoute: typeof EventiChristmasLarioCupRoute
   EventiLezioniTecnicoCoordinativeRoute: typeof EventiLezioniTecnicoCoordinativeRoute
   EventiLotteriaDelloSportRoute: typeof EventiLotteriaDelloSportRoute
@@ -1865,6 +1878,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DirezioneProposteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/direzione_/ruoli': {
+      id: '/direzione_/ruoli'
+      path: '/direzione/ruoli'
+      fullPath: '/direzione/ruoli'
+      preLoaderRoute: typeof DirezioneRuoliRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/eventi/': {
       id: '/eventi/'
       path: '/eventi'
@@ -2295,6 +2315,7 @@ const rootRouteChildren: RootRouteChildren = {
   DirezioneContenutiRoute: DirezioneContenutiRoute,
   DirezioneLotteriaRoute: DirezioneLotteriaRoute,
   DirezioneProposteRoute: DirezioneProposteRoute,
+  DirezioneRuoliRoute: DirezioneRuoliRoute,
   EventiChristmasLarioCupRoute: EventiChristmasLarioCupRoute,
   EventiLezioniTecnicoCoordinativeRoute: EventiLezioniTecnicoCoordinativeRoute,
   EventiLotteriaDelloSportRoute: EventiLotteriaDelloSportRoute,

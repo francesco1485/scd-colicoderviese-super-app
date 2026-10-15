@@ -3355,6 +3355,40 @@
       "sourceDate": "2026-10-15",
       "sourceStatus": "EXPLICIT_USER_COMMAND",
       "authority": "FRANCESCO_SCD",
+      "id": "UD-140",
+      "name": "DELEGATIONS_ROLE_TEMPLATES_PER_PLATFORM",
+      "sourceQuoteFragments": [
+        "iniziamo a lavorare sui gestionali e sulle dleghe",
+        "confermo ma deve esserci anche possibilita di creare uno vuoto da zero sempre in tutte le piattaforme",
+        "a creare puo essere presidente e direttore generale",
+        "inarico di squadra vede cose della squadra , il responsabile vede piu squadre e piu aree o piu piattaforme in base alle autorizzazioni che la direzione gli da dopo aver avuto accesso a quelle basi",
+        "confrontandoti senpre anche con altra chat per sapere chi e cos fare senza accavallare lacoro"
+      ],
+      "context": "Francesco 15/10/2026 19:00-19:30 (chat cloud), answers to the three open decisions of claude.ai project doc claude/SCD_RUOLI_INCARICHI_v1.md section 8; recorded in claude/SCD_DELEGHE_DECISIONI_2026-10-15.md. Builds on UD-112 (per-person grants, r100 applied 14/10).",
+      "normalizedCommand": {
+        "rule": "Roles are named sets of section grants, one platform each (SCD ONE, CORE, GROW); every platform always offers an empty role; only the Presidente and the Direttore Generale create, edit or deactivate roles; a role opens nothing by itself and is loaded on a person as proposals with that person's teams or site, saved through r100; a team role sees only its teams, a responsabile only the teams/areas/platforms the Direzione grants; a grant needs the person's base access (active account) first. Work split with the PC chat recorded in claude/SCD_DIVISIONE_COMPITI.md section 5.",
+        "status": "STAGED_R111_NOT_APPLIED",
+        "delivered": [
+          "supabase/migrations/20261015_r111_role_templates.sql",
+          "supabase/tests/r111_role_templates.pglite.mjs",
+          "config/scd-sections.v1.json (platform, platforms, roleTemplates)",
+          "apps/superapp/src/lib/role-templates.ts",
+          "apps/superapp/src/lib/role-templates.functions.ts",
+          "apps/superapp/src/components/scd/RoleTemplatesPage.tsx",
+          "apps/superapp/src/components/scd/RoleLoader.tsx",
+          "apps/superapp/src/routes/direzione_.ruoli.tsx"
+        ],
+        "pending": [
+          "Francesco's photo approval of /direzione/ruoli and of 'Carica un ruolo'",
+          "\"applica r111\"",
+          "switching existing guards to scd_can (separate step, GAP-ACCESS-R100)"
+        ]
+      }
+    },
+    {
+      "sourceDate": "2026-10-15",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
       "id": "UD-150",
       "name": "FIGC_PLAYER_HISTORY_ALWAYS_AVAILABLE_IN_SUPER_APP",
       "sourceQuoteFragments": [

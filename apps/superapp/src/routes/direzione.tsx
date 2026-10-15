@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Brain, CalendarDays, ChevronRight, ClipboardList, HandCoins, HeartHandshake, KeyRound, Lightbulb, Mail, Package, Shirt, UserCheck, Users, Wallet } from "lucide-react";
+import { Brain, CalendarDays, ChevronRight, ClipboardList, HandCoins, HeartHandshake, KeyRound, Layers, Lightbulb, Mail, Package, Shirt, UserCheck, Users, Wallet } from "lucide-react";
 import { useMemo } from "react";
 
 import { AccessScreenPage, accessHead } from "@/components/scd/AccessScreen";
@@ -73,6 +73,7 @@ const LINKS = [
   { to: "/gestionale/posta", icon: Mail, title: "Posta del club", sub: "Mail a tesserati, famiglie, sponsor e fornitori da sportclubcolico@gmail.com; risposte qui. Collega la casella." },
   { to: "/direzione/cervellone", icon: Brain, title: "Cervellone", sub: "Cerca in documenti, file, posta, economia, storia e impianti. Scadenze in vista." },
   { to: "/direzione/accessi", icon: KeyRound, title: "Accessi e permessi", sub: "Chi entra, con quale ruolo e quali aree in più. Sospendi, riattiva, storico." },
+  { to: "/direzione/ruoli", icon: Layers, title: "Ruoli", sub: "Gruppi di sezioni pronti per SCD ONE, CORE e GROW. Li creano Presidente e Direttore Generale." },
   { to: "/segreteria/persone", icon: UserCheck, title: "Persone e richieste di accesso", sub: "Anagrafica del club e registrazioni da verificare." },
   { to: "/gestionale/mister", icon: Shirt, title: "Rose e convocazioni", sub: "Rosa di ogni squadra, convocazioni con presa visione e impedimenti segnalati." },
   { to: "/segreteria", icon: ClipboardList, title: "Segreteria", sub: "Scadenze, tesseramenti, distinte." },

@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.39.0",
+    "version": "3.39.1",
     "effective_at": "2026-10-15",
     "status": "BINDING",
     "language": "it-IT",
@@ -701,7 +701,21 @@
       "grantee_key": "scd_people.id via scd_identity_links (a login without a linked person keeps the base only)",
       "direzione_rule": "An active DIRECTION membership opens every section that is not hard-blocked (pending Direzione confirmation).",
       "activation": "Apply r100 only after explicit Direzione approval. Until then the app keeps today's role-derived guards unchanged; no guard reads scd_can. Switching each existing guard to scd_can is a separate, explicit step.",
-      "pending_requests_policy": "Pending access requests stay pending until this system is active: nobody is activated."
+      "pending_requests_policy": "Pending access requests stay pending until this system is active: nobody is activated.",
+      "r100_state": "VERIFIED 15/10/2026 19:45 on SCD PULSE: r100 applied on 14/10/2026 (schema_migrations 20261014111613), 0 grants saved; no existing guard reads scd_can yet.",
+      "role_templates": {
+        "decided_by": "Francesco (DG) 15/10/2026, claude.ai project doc claude/SCD_DELEGHE_DECISIONI_2026-10-15.md",
+        "migration": "supabase/migrations/20261015_r111_role_templates.sql (STAGED, apply only on \"applica r111\")",
+        "behaviour_test": "supabase/tests/r111_role_templates.pglite.mjs",
+        "platforms": ["ONE", "CORE", "GROW"],
+        "tables": ["scd_role_templates", "scd_role_template_grants"],
+        "creator_rule": "scd_is_role_creator: active DIRECTION account linked to the person holding the active structure role Presidente or Direttore Generale.",
+        "empty_role": "Every platform always offers 'Crea ruolo vuoto' (every section 'Nessuno').",
+        "apply_rule": "A role opens nothing: loaded on a person as unconfirmed proposals with that person's teams or site, saved through scd_set_person_grants.",
+        "base_access_rule": "Trigger scd_person_grants_base_access: a new grant needs an active account of the club; revocations are never blocked.",
+        "admin_route": "/direzione/ruoli",
+        "audit": "scd_access_audit (CREATE_ROLE, CHANGE_ROLE, ROLE_STATUS)"
+      }
     },
     "single_account": true,
     "registration_fields": [
@@ -4037,9 +4051,9 @@
     {
       "id": "GAP-ACCESS-R100",
       "severity": "HIGH",
-      "statement": "UD-112 (Direzione 14/10/2026): access must be granted per person and per section, never derived from roles. The catalogue, migration r100 and the admin page /direzione/accessi/$personId exist, but r100 is not applied and the existing work-area guards still open areas from role positions (session.ts ROLE_POSITIONS, areas.ts canSeeArea).",
-      "required_fix": "Direzione approves and applies r100; Direzione grants sections person by person; then each existing guard is switched to scd_can (person-grants.server.ts sectionCheck) with tests, removing role-derived opening.",
-      "safe_runtime_behavior": "Until r100 is applied the page is a simulation (no save, no copy) and nobody's access changes; pending access requests stay pending."
+      "statement": "UD-112 (Direzione 14/10/2026): access must be granted per person and per section, never derived from roles. The catalogue, migration r100 (applied 14/10, VERIFIED 15/10: 0 grants saved) and the admin page /direzione/accessi/$personId exist; role templates (r111, /direzione/ruoli) are staged. The existing work-area guards still open areas from role positions (session.ts ROLE_POSITIONS, areas.ts canSeeArea).",
+      "required_fix": "Direzione grants sections person by person (optionally from r111 roles after \"applica r111\"); then each existing guard is switched to scd_can (person-grants.server.ts sectionCheck) with tests, removing role-derived opening.",
+      "safe_runtime_behavior": "Grants saved today change nobody's access because no guard reads scd_can yet; r111 writes stay off until applied; pending access requests stay pending."
     },
     {
       "id": "GAP-LOTTERIA-R102",

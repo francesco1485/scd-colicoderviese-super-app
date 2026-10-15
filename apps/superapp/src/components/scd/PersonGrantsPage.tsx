@@ -12,6 +12,7 @@ import { useMemo, useState } from "react";
 import { Dialog } from "@/components/scd/Dialog";
 import { Card, Chip } from "@/components/scd/interior-ui";
 import { EmptyState, WorkAreaShell } from "@/components/scd/work-area-ui";
+import { RoleLoader } from "@/components/scd/RoleLoader";
 import { roleLabelOf } from "@/lib/access-admin";
 import {
   BASE_SECTIONS,
@@ -218,6 +219,13 @@ export function PersonGrantsPage({ initial, personId }: { initial: PersonGrantsD
         </div>
 
         <div className="flex min-w-0 flex-col gap-[18px]">
+          <RoleLoader
+            connected={data.connected}
+            locked={locked}
+            minor={data.person?.minor ?? null}
+            teams={activeTeams}
+            onLoad={(rows) => setDraft((d) => applyProposals(d, rows, "role"))}
+          />
           <HelpersCard
             data={data}
             draft={draft}
@@ -391,7 +399,7 @@ function SectionRow({
       {proposal && row && (
         <div id={`${id}-why`} className="mt-2 flex flex-wrap items-center gap-2 pl-9 text-[13.5px] text-[var(--in-warn)]">
           <Sparkles className="size-4" aria-hidden="true" />
-          <span className="min-w-0 flex-1">{row.origin === "copied" ? "Da copia" : "Suggerito"}{row.reason ? `: ${row.reason}` : ""}. Non conta finché non confermi.</span>
+          <span className="min-w-0 flex-1">{row.origin === "copied" ? "Da copia" : row.origin === "role" ? "Dal ruolo" : "Suggerito"}{row.reason ? `: ${row.reason}` : ""}. Non conta finché non confermi.</span>
           <button type="button" disabled={locked} onClick={() => onChange({ ...row, confirmed: true })} className="scd-focus inline-flex min-h-10 items-center gap-1 rounded-lg bg-[var(--in-info)] px-3 font-semibold text-white disabled:opacity-50">
             <Check className="size-4" aria-hidden="true" />Conferma
           </button>

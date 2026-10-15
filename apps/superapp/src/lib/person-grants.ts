@@ -33,6 +33,8 @@ export interface SectionDef {
   code: string;
   label: string;
   group: string;
+  /** SCD ONE / CORE / GROW (r111 role templates). */
+  platform?: string;
   path?: string;
   area?: string;
   base?: boolean;
@@ -428,7 +430,7 @@ function normalizeSuggestion(s: Suggestion): Suggestion {
 
 /* ---------- draft (what the checklist holds before saving) ---------- */
 
-export type DraftOrigin = "saved" | "manual" | "suggested" | "copied";
+export type DraftOrigin = "saved" | "manual" | "suggested" | "copied" | "role";
 
 export interface DraftRow extends Grant {
   on: boolean;
@@ -475,7 +477,7 @@ export function draftFromGrants(rows: readonly GrantRow[]): Draft {
 export function applyProposals(
   draft: Draft,
   proposals: readonly (Grant & { reason?: string })[],
-  origin: "suggested" | "copied",
+  origin: "suggested" | "copied" | "role",
 ): Draft {
   const out: Record<string, DraftRow> = { ...draft };
   for (const p of proposals) {
