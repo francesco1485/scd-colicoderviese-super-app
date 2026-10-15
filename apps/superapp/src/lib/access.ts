@@ -18,6 +18,7 @@ const SUB_AREA_COPY: Readonly<Record<string, { label: string; icon: AreaIcon }>>
   acquisti: { label: "Acquisti", icon: "file" },
   persone: { label: "Persone", icon: "users" },
   certificati: { label: "Certificati medici", icon: "file" },
+  richieste: { label: "Richieste delle squadre", icon: "file" },
   compensi: { label: "Compensi e stipendi", icon: "coin" },
   quote: { label: "Quote e Fondo", icon: "coin" },
   coda: { label: "Coda di lavoro", icon: "file" },
@@ -47,6 +48,7 @@ const ROLE_LABEL: Readonly<Record<string, string>> = {
   tesoreria: "Tesoreria",
   presidente: "Presidente",
   "direttore-generale": "Direttore generale",
+  "coordinatore-attivita-sportiva": "Coordinatore attività sportiva",
 };
 
 /** Registry notes written in technical English, shown in Italian. */

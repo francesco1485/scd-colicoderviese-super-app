@@ -59,7 +59,11 @@
           "features": ["elenco persone attive con ruolo, squadra e stato documenti", "scheda con storico entrate/uscite", "Inserisci persona (Direzione, Segreteria)", "Segna uscito con motivo: resta nello storico, sparisce dalle viste"], "status": "live" },
         { "id": "certificati", "path": "/segreteria/certificati", "audience": "staff", "roles": ["direzione", "segreteria"], "role_map": { "direzione": "DIRECTION", "segreteria": "SECRETARIAT" },
           "sources": ["SUPABASE_SCD (scd_athletes.medical_certificate_* , scd_audit_events — migration r66)", "ISCRIZIONI_ATLETI_2026_27 (declared dates)"],
-          "features": ["elenco atleti per squadra con scadenza del certificato", "filtri: manca, scaduto, in scadenza, da controllare", "inserisci o correggi la data, tipo agonistico/non agonistico", "segna come controllato sul certificato cartaceo", "ogni modifica nello storico"], "status": "live" } ] },
+          "features": ["elenco atleti per squadra con scadenza del certificato", "filtri: manca, scaduto, in scadenza, da controllare", "inserisci o correggi la data, tipo agonistico/non agonistico", "segna come controllato sul certificato cartaceo", "ogni modifica nello storico"], "status": "live" },
+        { "id": "richieste", "path": "/segreteria/richieste", "audience": "staff", "roles": ["direzione", "segreteria", "presidente", "direttore-generale", "coordinatore-attivita-sportiva"], "role_map": { "direzione": "DIRECTION", "segreteria": "SECRETARIAT", "presidente": "DIRECTION", "direttore-generale": "DIRECTION", "coordinatore-attivita-sportiva": "STAFF" },
+          "sources": ["SUPABASE_SCD (scd_requests, scd_request_events, scd_clubs — migration r133, staged)", "Messaggi delle squadre alla Segreteria (WhatsApp, e-mail)"],
+          "flow": ["messaggio alla Segreteria", "bozza", "conferma entro 15 giorni (Attività di Base, DS Agonistica, DS Generale o Direzione)", "calendario", "modulo federale firmato"],
+          "features": ["Nuova da messaggio: il testo diventa una bozza da correggere", "ricerca società avversaria o Nuova società", "stato di ogni richiesta e giorni rimasti", "modulo amichevole stampabile da firmare", "Direttore Generale e Coordinatore sempre informati nell'app"], "status": "live" } ] },
     { "id": "tesoreria", "path": "/tesoreria", "audience": "staff", "board": "Tesoreria.dc.html", "status": "live",
       "children": [
         { "id": "club-house", "path": "/tesoreria/club-house", "roles": ["responsabile-club-house"], "board": "Tesoreria-sottoaree.dc.html", "status": "design" },

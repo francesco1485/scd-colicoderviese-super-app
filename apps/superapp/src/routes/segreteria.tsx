@@ -301,6 +301,13 @@ function SegreteriaPage({
                   Storia
                 </Link>
                 <Link
+                  to="/segreteria/richieste"
+                  className="scd-focus inline-flex h-10 items-center gap-2 rounded-[10px] border border-[var(--in-info)] bg-white px-3.5 text-[14.5px] font-bold text-[var(--in-info)]"
+                  data-testid="seg-richieste-link"
+                >
+                  Richieste
+                </Link>
+                <Link
                   to="/direzione/accessi"
                   className="scd-focus inline-flex h-10 items-center gap-2 rounded-[10px] border border-[var(--in-info)] bg-white px-3.5 text-[14.5px] font-bold text-[var(--in-info)]"
                   data-testid="seg-accessi-link"

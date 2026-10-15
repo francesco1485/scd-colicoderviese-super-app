@@ -1973,6 +1973,52 @@
           "PORTAL_DATA_NEVER_OVERRIDES_TESSERAMENTI_OR_PEOPLE_ONLY_LINKS_PERSON_ID"
         ],
         "imported_at": "2026-10-15"
+      },
+      {
+        "id": "SCD_RICHIESTE",
+        "kind": "INTERNAL_WORKFLOW",
+        "trust": "INTERNAL_VERIFIED",
+        "status": "STAGED_INACTIVE_UNTIL_R133_APPLIED",
+        "title": "Request machine (UD-154): team requests to the Segreteria (first kind AMICHEVOLE), confirmation by birth-year group within 15 days, calendar row and federal form",
+        "endpoint": "Supabase SCD PULSE SECURITY DEFINER functions scd_request_* / scd_requests_* / scd_club* (no direct table access)",
+        "authority_domains": [
+          "TEAM_REQUESTS",
+          "FRIENDLY_MATCH_AUTHORIZATION",
+          "OPPONENT_CLUBS_REGISTRY"
+        ],
+        "storage": "supabase/migrations/20261015_r133_requests_machine.sql (STAGED, NOT APPLIED): scd_requests, scd_request_events, scd_clubs; confirmed friendlies become scd_events rows with source_id SCD_RICHIESTE",
+        "consumers": [
+          "SCD_SUPABASE.scd_requests",
+          "SCD_SUPABASE.scd_request_events",
+          "SCD_SUPABASE.scd_clubs",
+          "SCD_SUPABASE.scd_events (source_id SCD_RICHIESTE)",
+          "apps/superapp/src/lib/request-machine.ts",
+          "apps/superapp/src/lib/request-parser.ts",
+          "apps/superapp/src/lib/request-machine.functions.ts",
+          "apps/superapp/src/routes/segreteria_.richieste.tsx",
+          "apps/superapp/src/routes/segreteria_.richieste_.$id.modulo.tsx",
+          "apps/superapp/src/components/scd/RequestsToConfirmCard.tsx",
+          "apps/superapp/src/components/scd/ClubPicker.tsx"
+        ],
+        "routes": [
+          "/segreteria/richieste",
+          "/segreteria/richieste/$id/modulo",
+          "/la-mia-scd"
+        ],
+        "rules": [
+          "ONE_GENERIC_TABLE_FOR_EVERY_REQUEST_KIND_ONLY_AMICHEVOLE_ACTIVE",
+          "TEAM_LEVEL_ONLY_NO_PERSONAL_OR_MINOR_DATA",
+          "PARSER_DETERMINISTIC_UNKNOWN_FIELDS_STAY_NULL",
+          "CONFIRMER_BY_BIRTH_YEAR_GROUP_ONE_CONFIG_REQUEST_CONFIRMERS_MIRRORED_IN_SQL",
+          "MISSING_POSITIONS_FAIL_CLOSED_DIREZIONE_CONFIRMS",
+          "DIRETTORE_GENERALE_AND_COORDINATORE_ALWAYS_NOTIFIED_IN_APP_ONLY",
+          "CONFIRM_WITHIN_15_DAYS_NEVER_AFTER_MATCH_EXPIRY_WITHOUT_CRON",
+          "CALENDAR_ROW_ONLY_AFTER_CONFIRMATION_PLANNED_PUBLIC",
+          "FEDERAL_FORM_PRINTED_AND_SIGNED_BY_A_PERSON_EMAIL_IS_A_DRAFT_NEVER_SENT",
+          "LND_FRIENDLY_RULES_UNVERIFIED_NO_INVENTED_DEADLINE",
+          "LOG_APPEND_ONLY_RLS_NO_POLICIES_ACCESS_ONLY_VIA_SECURITY_DEFINER"
+        ],
+        "imported_at": "2026-10-15"
       }
     ],
     "conflict_resolution": [

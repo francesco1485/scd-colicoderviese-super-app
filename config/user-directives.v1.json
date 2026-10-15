@@ -3338,6 +3338,40 @@
           "manifest_source": "FIGC_STORICO_CALCIATORI"
         }
       }
+    },
+    {
+      "sourceDate": "2026-10-15",
+      "sourceTime": "15:07-15:17",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-154",
+      "name": "REQUEST_MACHINE_FRIENDLY_MATCH_FIRST_CASE",
+      "sourceQuoteFragments": [
+        "se il responsabile deve inserire una amichevole o altro se manda un messaggio alla segreteria lei lo legge in automatico e lo mette in calendario, poi il responsabile lo trova nel suo portale e entro 15 gg da conferma per farlo comparire a calendario, lì poi nel dare conferma chiede alla segreteria di inviare il modulo amichevoli alla figc, compila lui i dati con il caricamento della squadra avversaria come nuova società o se già è anagrafata la prende nella barra ricerca e in automatico arriva alla segreteria il file da stampare e far firmare al presidente o responsabile",
+        "il responsabile attività di base conferma fino ad annata 2014 a 2021 - direttore sportivo generale prima squadra e juniores - direttore sportivo agonistica 2015/2013 - 2011 - chi visualizza e deve essere messo sempre a conoscenza il direttore generale e coordinatore attività sportiva"
+      ],
+      "context": "Francesco 15/10/2026 (chat PC). 15:07 the request flow; 15:13 delegated the decisions (Segreteria creates drafts and prepares the federal form, Direzione sees everything); 15:17 who confirms by birth-year group and who is always informed. Same pattern later for tornei, pulmino, campo, visite.",
+      "normalizedCommand": {
+        "rule": "One generic request machine (scd_requests, one table for every kind; only AMICHEVOLE active). A team's message to the Segreteria is read by a deterministic parser into a draft (unknown fields stay null); the Segreteria corrects it and sends it to whoever confirms that birth-year group; the confirmer finds it in La mia SCD and confirms within 15 days (never after the match) or answers 'non possibile'; on confirmation the opponent is picked from the club search bar or added as 'Nuova societa', a PLANNED public calendar row is created and the Segreteria gets the printable federal form to have signed by the Presidente. Confirmers: Responsabile Attivita di Base (2014-2021: Esordienti 2014/2015, Pulcini, Primi Calci, Piccoli Amici), Direttore Sportivo Agonistica (2011-2013: U16, U15; Francesco wrote '2015/2013 - 2011', 2015 already belongs to the Attivita di Base), Direttore Sportivo Generale (Prima Squadra, Juniores U19); the Direzione may confirm on behalf. Direttore Generale and Coordinatore Attivita Sportiva see every request and are always informed in the app (no e-mail, no external message).",
+        "scope": "SECRETARIAT_TEAMS_DIRECTION",
+        "engines": "TEMPO (hours from message to confirmed friendly, minutes of Segreteria per federal form, no phone round-trips) and PERSONE (families see confirmed friendlies in the calendar)",
+        "status": "IMPLEMENTED_ON_BRANCH_MIGRATION_PENDING",
+        "constraints": [
+          "migration r133 is staged and applied only after an explicit 'applica r133'",
+          "positions direttore-sportivo-agonistica and direttore-sportivo-generale do not exist in the registry: until Francesco creates them only the Direzione confirms U16, U15, Prima Squadra and Juniores (fail closed); mapping in ONE constant REQUEST_CONFIRMERS mirrored in SQL",
+          "federal notice: SGS regional/provincial/local 3 working days (attivita di base) or 5 (Giovanissimi/Allievi), national 5, international and abroad 20 (CU n.1/n.5 SGS 2026/27, VERIFIED 15/10); LND friendlies (Prima, Juniores) UNVERIFIED: shown as 'regole da verificare'",
+          "the e-mail to the Ufficio Tornei CR Lombardia is a DRAFT to copy; the app never sends it; the address is INFERRED from the club mailbox",
+          "Safeguarding officer and managers' names and phones are written by hand on the printed form (club setting still to create)",
+          "the public calendar merge of confirmed friendlies is designed (mergeConfirmedFriendlies) but the /calendario read path belongs to the CLOUD chat"
+        ],
+        "implementation": {
+          "pure_logic": "apps/superapp/src/lib/request-machine.ts, apps/superapp/src/lib/request-parser.ts",
+          "server": "apps/superapp/src/lib/request-machine.functions.ts",
+          "routes": "/segreteria/richieste, /segreteria/richieste/$id/modulo, card 'Richieste da confermare' in /la-mia-scd",
+          "migration": "supabase/migrations/20261015_r133_requests_machine.sql (STAGED, NOT APPLIED)",
+          "manifest_source": "SCD_RICHIESTE"
+        }
+      }
     }
   ],
   "completionGate": {
