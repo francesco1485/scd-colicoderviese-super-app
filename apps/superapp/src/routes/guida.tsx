@@ -149,7 +149,7 @@ function Guida() {
 
       <section id="personaggi" aria-labelledby="personaggi-t" className="scroll-mt-24 rounded-2xl border border-border bg-card p-5 sm:p-6">
         <h2 id="personaggi-t" className="m-0 text-[24px] font-bold leading-tight">I nostri personaggi</h2>
-        <p className="mt-1 text-[15px] text-muted-foreground">Una sola chat, Vera, che risponde a tutto e ti porta dal volto giusto; quattro volti con azioni concrete; e i consigli del giorno.</p>
+        <p className="mt-1 text-[15px] text-muted-foreground">Una sola chat, Iride, che risponde a tutto e ti porta dal volto giusto; quattro volti con azioni concrete; e i consigli del giorno.</p>
         <div className="mt-4">
           <CastDirectory />
         </div>

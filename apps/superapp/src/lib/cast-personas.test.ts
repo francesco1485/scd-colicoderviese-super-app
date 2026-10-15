@@ -38,7 +38,7 @@ function routePaths(): Set<string> {
 const PRESENCES: readonly PresenceId[] = [...CAST_PERSONA_IDS, "vera"];
 const tipsOf = (id: PresenceId) => (id === "vera" ? VERA_PRESENCE.tips : CAST_PERSONAS[id].tips);
 
-describe("simplified cast (UD-121): Vera + four faces + tips of the day", () => {
+describe("simplified cast (UD-121): Iride + four faces + tips of the day", () => {
   it("covers every roster area once, with the kind decided by the Direzione", () => {
     expect(new Set(CAST_PERSONA_IDS).size).toBe(CAST_PERSONA_IDS.length);
     expect([...CAST_PERSONA_IDS].sort()).toEqual(CAST_ROSTER.filter((r) => r.presence !== "CHAT_PERSONA").map((r) => r.id).sort());
@@ -64,7 +64,7 @@ describe("simplified cast (UD-121): Vera + four faces + tips of the day", () => 
     }
   });
 
-  it("opens Vera's chat with the faces and the ticket office only, each with a hand-over and chat questions", () => {
+  it("opens Iride's chat with the faces and the ticket office only, each with a hand-over and chat questions", () => {
     expect([...CHAT_AREA_IDS].sort()).toEqual(["accoglienza-chef", "biglietteria", "mentore-tornei", "volto-sponsor"]);
     for (const id of CHAT_AREA_IDS) {
       const d = CAST_PERSONAS[id];
@@ -106,7 +106,7 @@ describe("simplified cast (UD-121): Vera + four faces + tips of the day", () => 
     }
     expect(CAST_PERSONAS["accoglienza-chef"].label).toBe("Garrison");
     expect(CAST_PERSONAS["mentore-tornei"].label).toBe("Enea");
-    expect(VERA_PRESENCE.label).toBe("Vera");
+    expect(VERA_PRESENCE.label).toBe("Iride");
   });
 
   it("writes every piece of curated copy within the rules: no digits but 112, no diet, drug, therapy or plan wording", () => {
@@ -180,7 +180,7 @@ describe("area routing (one rule for chat, button and server)", () => {
   const athlete = { roles: ["atleta"], age15plus: null };
   const staff = { roles: ["segreteria"], age15plus: null };
 
-  it("keeps Vera's general chat when nothing or something unknown is asked", () => {
+  it("keeps Iride's general chat when nothing or something unknown is asked", () => {
     expect(resolveChat("public", null)).toEqual({ persona: "vera", area: null });
     expect(resolveChat("public", null, "hacker")).toEqual({ persona: "vera", area: null });
     expect(resolveChat("inside", staff, "vera")).toEqual({ persona: "vera", area: null });
@@ -205,13 +205,13 @@ describe("area routing (one rule for chat, button and server)", () => {
   });
 });
 
-describe("system prompt of Vera with an area", () => {
+describe("system prompt of Iride with an area", () => {
   const ctx: BuiltContext = { text: "## Dati\nNiente", links: new Set(["/famiglia"]), emails: new Set(), phones: new Set(), truncated: false };
 
-  it("carries Vera's voice and rules, the area's hand-over and hard rules, with the same JSON output", () => {
+  it("carries Iride's voice and rules, the area's hand-over and hard rules, with the same JSON output", () => {
     for (const area of CHAT_AREA_IDS) {
       const p = systemPrompt("vera", "PUBLIC", ctx, area);
-      expect(p).toMatch(/Sei Vera, la reception/);
+      expect(p).toMatch(/Sei Iride, la reception/);
       for (const r of personaRules("vera", area)) expect(p).toContain(r);
       expect(p).toContain(CAST_PERSONAS[area].handoff!);
       expect(p).toMatch(/non confermarle mai e non chiedere pagamenti/);
@@ -252,7 +252,7 @@ describe("system prompt of Vera with an area", () => {
   });
 });
 
-describe("output guard of Vera", () => {
+describe("output guard of Iride", () => {
   const ctx: BuiltContext = { text: "", links: new Set(["/famiglia"]), emails: new Set(), phones: new Set(), truncated: false };
 
   it("drops answers that confirm an order, a ticket or a payment (the rules engine answers instead)", () => {
@@ -261,7 +261,7 @@ describe("output guard of Vera", () => {
     expect(veraAnswerProblems("La tua iscrizione è confermata")).not.toEqual([]);
   });
 
-  it("keeps the limits of the tip-only topics in Vera's mouth: no therapy, diet, drugs or personal plans", () => {
+  it("keeps the limits of the tip-only topics in Iride's mouth: no therapy, diet, drugs or personal plans", () => {
     expect(parseAssistantAnswer('{"text":"Facciamo una piccola terapia insieme."}', ctx, "vera")).toBeNull();
     expect(parseAssistantAnswer('{"text":"La diagnosi è stress da gara."}', ctx, "vera")).toBeNull();
     expect(parseAssistantAnswer('{"text":"Segui una dieta leggera e controlla il peso."}', ctx, "vera")).toBeNull();

@@ -19,7 +19,7 @@ const CHATS = [
   { persona: "sky" as const, area: null },
 ];
 
-describe("rules engine of Vera's chat (UD-121)", () => {
+describe("rules engine of Iride's chat (UD-121)", () => {
   it("applies the distress referral to every chat and area before anything else, without calling the general engine", async () => {
     for (const chat of CHATS) {
       for (const message of ["mi sento giù e non ce la faccio più", "prima della partita ho l'ansia", "voglio ordinare una torta ma mi sento triste"]) {
@@ -51,7 +51,7 @@ describe("rules engine of Vera's chat (UD-121)", () => {
     expect(r.links?.[0]?.to).toBe("/famiglia");
   });
 
-  it("collects a ticket purchase for a person even without an area (Vera absorbed the ticket office)", async () => {
+  it("collects a ticket purchase for a person even without an area (Iride absorbed the ticket office)", async () => {
     const d = deps();
     const r = await castRulesAnswer({ message: "posso comprare il biglietto in chat?", persona: "vera" }, d);
     expect(d.general).not.toHaveBeenCalled();
@@ -74,7 +74,7 @@ describe("rules engine of Vera's chat (UD-121)", () => {
     expect(d2.general).toHaveBeenCalled();
   });
 
-  it("answers Vera's own topics without an area: tickets, and the fixed refusals of the tip-only characters", async () => {
+  it("answers Iride's own topics without an area: tickets, and the fixed refusals of the tip-only characters", async () => {
     const d = deps();
     expect((await castRulesAnswer({ message: "quanto costa il biglietto?", persona: "vera" }, d)).text).toMatch(/prezzi/i);
     expect((await castRulesAnswer({ message: "mi fai una dieta per mio figlio?", persona: "vera" }, d)).text).toMatch(/Non do piani/);

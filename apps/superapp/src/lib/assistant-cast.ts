@@ -66,9 +66,9 @@ export const CAST: Readonly<Record<CastId, CastMember>> = {
   },
   vera: {
     id: "vera",
-    name: "Vera",
+    name: "Iride",
     role: "La reception del club e l'unica chat dell'app: risponde con i dati veri citando la fonte, ti porta dal volto giusto e apre una richiesta alla segreteria",
-    alt: "Vera, la reception del club",
+    alt: "Iride, la reception del club",
     canvaAssetId: "MAHX1KTH6yk",
     canvaExportDesignId: "DAHX4uTHmCs",
     // Legacy folder and file names of the held round-4 image (made for "Genny"): not renamed, not shown.
@@ -212,7 +212,7 @@ export const CAST_ROSTER: readonly CastRosterEntry[] = [
   },
   {
     id: "vera",
-    label: "Vera",
+    label: "Iride",
     nameTbd: false,
     role: "Reception",
     area: "Tutta l'app: è l'unica chat (pagine pubbliche, aree riservate, Cervellone, impianti)",
@@ -225,7 +225,7 @@ export const CAST_ROSTER: readonly CastRosterEntry[] = [
     rules: [
       "Mostra solo ciò che il ruolo di chi chiede può vedere",
       "Richieste e problemi vanno al motore richieste, senza promettere soluzioni",
-      "Mai con chi ha meno di quindici anni nelle aree riservate: per loro c'è Sky",
+      "Mai con chi ha meno di quindici anni nelle aree riservate: per loro c'è Crovi",
     ],
     refersTo: ["Segreteria del club", "Responsabili d'area"],
     minorsProtection: true,
@@ -303,7 +303,7 @@ export const CAST_ROSTER: readonly CastRosterEntry[] = [
       "Le card del club",
       "Le prossime partite in casa",
       "La prevendita, solo quando è attiva",
-      "Ora risponde Vera, la reception del club: niente chat a parte",
+      "Ora risponde Iride, la reception del club: niente chat a parte",
     ],
     rules: [
       "Solo prezzi e regole pubblicati dalla società, mai inventati",

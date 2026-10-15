@@ -100,14 +100,17 @@ export interface PersonaCopy {
 
 /** Chat copy of the two personas (Vera, Sky). */
 export const PERSONA_COPY: Readonly<Record<Persona, PersonaCopy>> = {
+  // Persona id "sky" is the helper for the younger members and for reserved pages before the session answers
+  // (lib/assistant.ts resolveChat). Its visible character is Crovi since 15/10/2026 (UD-151: Sky only on the pitch,
+  // never in the app; Francesco 16:09: the mascot is "un di più per bambini e famiglie").
   sky: {
-    name: "Sky",
-    title: "Sky, la mascotte del club",
-    subtitle: "ti porto dove ti serve, in un tocco",
+    name: "Crovi",
+    title: "Chiedi a Crovi",
+    subtitle: "l'aiuto per bambini e famiglie",
     greeting:
-      "Ciao, sono Sky, la mascotte portafortuna della ColicoDerviese. Dimmi cosa cerchi: prossima partita, calendario, come arrivare al campo, iscrizioni, contatti o come funziona l'app.",
-    placeholder: "Scrivi a Sky…",
-    thinking: "Sky sta cercando…",
+      "Ciao, sono Crovi della ColicoDerviese. Dimmi cosa cerchi: prossima partita, calendario, come arrivare al campo, iscrizioni, contatti o come funziona l'app.",
+    placeholder: "Scrivi a Crovi…",
+    thinking: "Crovi sta cercando…",
     quick: [
       "Prossima partita",
       "Calendario",
@@ -118,13 +121,13 @@ export const PERSONA_COPY: Readonly<Record<Persona, PersonaCopy>> = {
     ],
   },
   vera: {
-    name: "Vera",
-    title: "Chiedi a Vera",
+    name: "Iride",
+    title: "Chiedi a Iride",
     subtitle: "la reception del club: dati veri, con la fonte",
     greeting:
-      "Ciao, sono Vera, la reception della ColicoDerviese. Ti rispondo con i dati veri del club e ti dico da dove vengono: partite, campi, iscrizioni, biglietti, card, sponsor e tornei. Se serve una persona, apro una richiesta alla segreteria: scrivimi in due parole cosa ti serve.",
-    placeholder: "Scrivi a Vera…",
-    thinking: "Vera sta cercando…",
+      "Ciao, sono Iride, la reception della ColicoDerviese. Ti rispondo con i dati veri del club e ti dico da dove vengono: partite, campi, iscrizioni, biglietti, card, sponsor e tornei. Se serve una persona, apro una richiesta alla segreteria: scrivimi in due parole cosa ti serve.",
+    placeholder: "Scrivi a Iride…",
+    thinking: "Iride sta cercando…",
     quick: [
       "Prossima partita",
       "Biglietti e card",
@@ -159,14 +162,17 @@ export function greetingFor(persona: Persona, area: ChatAreaId | null = null): {
   if (persona !== "vera" || !area) return { text: PERSONA_COPY[persona].greeting };
   const def = CAST_PERSONAS[area];
   return {
-    text: `Ciao, sono Vera, la reception del club. ${def.handoff ?? ""} Scegli qui sotto o scrivimi.`.replace(/\s+/g, " ").trim(),
+    text: `Ciao, sono Iride, la reception del club. ${def.handoff ?? ""} Scegli qui sotto o scrivimi.`.replace(/\s+/g, " ").trim(),
     links: def.quick.map((l) => ({ label: l.label, to: castLinkTo(l) })),
   };
 }
 
+/** Initial shown for the younger members' helper (Crovi) until the Direzione approves his image. */
+export const CROVI_INITIAL = "C";
+
 /**
- * Round avatar of the active persona. Sky's head is cropped in a light circle with a navy ring; Vera uses her picture
- * once an image is approved (neutral 'V' until then).
+ * Round avatar of the active persona: Vera and Crovi use their picture once an image is approved; until then a
+ * neutral initial in the club colours ('V', 'C'). Sky never appears in the app (UD-151).
  */
 export function PersonaAvatar({
   persona = "sky",
@@ -181,17 +187,11 @@ export function PersonaAvatar({
   return (
     <span
       aria-hidden="true"
-      className={`inline-block shrink-0 overflow-hidden rounded-full bg-[#eef3f9] ring-2 ring-[#0b2a5b] ${className}`}
-      style={{ width: size, height: size }}
+      data-persona-initial="crovi"
+      className={`inline-flex shrink-0 items-center justify-center rounded-full bg-[#0b2a5b] font-bold text-[#ffd600] ring-2 ring-[#ffd600] ${className}`}
+      style={{ width: size, height: size, fontSize: Math.round(size * 0.46) }}
     >
-      <img
-        src={SKY_HEAD_SRC}
-        alt=""
-        width={size}
-        height={size}
-        className="size-full object-cover object-top"
-        style={{ transform: "scale(1.12)", transformOrigin: "50% 20%" }}
-      />
+      {CROVI_INITIAL}
     </span>
   );
 }

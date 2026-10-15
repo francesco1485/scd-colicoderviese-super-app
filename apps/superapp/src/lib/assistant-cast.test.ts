@@ -64,16 +64,16 @@ describe("assistant cast registry (round 4 images, roles corrected by the Direzi
     }
   });
 
-  it("states the roles: Era nutritionist, Vera reception and the one chat (UD-121), Acanfora doctor", () => {
+  it("states the roles: Era nutritionist, Iride reception and the one chat (UD-121), Acanfora doctor", () => {
     expect(CAST.era.role).toMatch(/nutrizionista/i);
-    expect(CAST.vera.name).toBe("Vera");
+    expect(CAST.vera.name).toBe("Iride");
     expect(CAST.vera.role).toMatch(/reception/i);
     expect(CAST.vera.role).toMatch(/unica chat/i);
     expect(CAST.acanfora.role).toMatch(/medico/i);
     expect(CAST.acanfora.role).toMatch(/mai diagnosi/i);
   });
 
-  it("shows no portrait for Era and Vera until new images are approved (the round-4 ones fit other roles)", () => {
+  it("shows no portrait for Era and Iride until new images are approved (the round-4 ones fit other roles)", () => {
     for (const id of ["era", "vera"] as const) {
       const folder = castFolder(CAST[id].fileStem);
       expect(castReady(id), id).toBe(false);
@@ -187,7 +187,7 @@ describe("cast roster (Direzione 14/10/2026, UD-111)", () => {
     expect(CAST_SHARED_RULES.join(" ")).toMatch(/S\.C\.D\. ColicoDerviese/);
   });
 
-  it("has Vera as the only chat persona, three faces, five tip-only characters and the absorbed ticket office (UD-121)", () => {
+  it("has Iride as the only chat persona, three faces, five tip-only characters and the absorbed ticket office (UD-121)", () => {
     const by = (p: string) => CAST_ROSTER.filter((r) => r.presence === p).map((r) => r.id);
     expect(by("CHAT_PERSONA")).toEqual(["vera"]);
     expect(by("FACE")).toEqual(["accoglienza-chef", "mentore-tornei", "volto-sponsor"]);

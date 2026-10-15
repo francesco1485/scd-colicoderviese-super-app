@@ -89,7 +89,7 @@ function kb(p: Partial<KbItem> & { id: string; title: string }): KbItem {
   return { kind: "DOCUMENTO", area: "FEDERAZIONE", season: "2026/27", summary: null, entity: null, date: null, due: null, status: null, amount: null, source: "", link: null, tags: [], ...p };
 }
 
-describe("public context (Vera on public pages)", () => {
+describe("public context (Iride on public pages)", () => {
   it("keeps only official games of the next 7 days, never trainings, notes or past games", () => {
     const c = buildPublicContext(publicInput());
     expect(c.text).toContain("AVVERSARIO FC");
@@ -140,7 +140,7 @@ describe("public context (Vera on public pages)", () => {
   });
 });
 
-describe("staff context (Vera inside)", () => {
+describe("staff context (Iride inside)", () => {
   it("sends only title, summary, status, due date, season and link (no amounts, sources, entities, tags)", () => {
     const c = buildStaffContext({
       today: "2026-10-13",
@@ -257,8 +257,8 @@ describe("rate limiter", () => {
   });
 });
 
-describe("persona routing (UD-121: one chat, Vera)", () => {
-  it("gives Vera to staff and adult families inside, Sky to athletes and unknown ages", () => {
+describe("persona routing (UD-121: one chat, Iride)", () => {
+  it("gives Iride to staff and adult families inside, Sky to athletes and unknown ages", () => {
     expect(insidePersonaFor(["segreteria"])).toBe("vera");
     expect(insidePersonaFor(["direzione", "dirigenza"])).toBe("vera");
     expect(insidePersonaFor(["mister", "atleta"])).toBe("vera");
@@ -279,7 +279,7 @@ describe("persona routing (UD-121: one chat, Vera)", () => {
     expect([...seen].sort()).toEqual(["sky", "vera"]);
   });
 
-  it("accepts the old ids as aliases of Vera (persisted ids, events, older clients)", () => {
+  it("accepts the old ids as aliases of Iride (persisted ids, events, older clients)", () => {
     expect(normalizePersona("genny")).toBe("vera");
     expect(normalizePersona("crovi")).toBe("vera");
     expect(normalizePersona("vera")).toBe("vera");
@@ -301,7 +301,7 @@ describe("persona routing (UD-121: one chat, Vera)", () => {
   it("writes the persona and the hard rules into the system prompt", () => {
     const ctx = buildPublicContext(publicInput());
     const p = systemPrompt("vera", "PUBLIC", ctx);
-    expect(p).toMatch(/Sei Vera, la reception della S\.C\.D\. ColicoDerviese/);
+    expect(p).toMatch(/Sei Iride, la reception della S\.C\.D\. ColicoDerviese/);
     expect(p).toMatch(/Cita sempre la fonte/);
     expect(p).toMatch(/Mai nomi di minori/);
     expect(p).toMatch(/IBAN/);
@@ -313,7 +313,7 @@ describe("persona routing (UD-121: one chat, Vera)", () => {
     expect(staff).toMatch(/livello RISERVATO/);
     expect(staff).toMatch(/Mai nomi di minori/);
     const sky = systemPrompt("sky", "PUBLIC", ctx);
-    expect(sky).toMatch(/Sei Sky/);
+    expect(sky).toMatch(/Sei Crovi/);
     expect(sky).not.toMatch(/Cita sempre la fonte/);
   });
 

@@ -518,7 +518,7 @@ export const CAST_PERSONAS: Readonly<Record<CastPersonaId, CastPersonaDef>> = {
     label: "La biglietteria",
     nameTbd: true,
     role: "Prezzi, gratuità, card e partite in casa",
-    does: "Prezzi, ingressi gratuiti, card e partite in casa: ti risponde Vera.",
+    does: "Prezzi, ingressi gratuiti, card e partite in casa: ti risponde Iride.",
     initial: "B",
     surfaces: { public: true, inside: true },
     handoff: "Per biglietti, gratuità e card ti rispondo io. I biglietti non si vendono in chat: si pagano all'ingresso dell'impianto.",
@@ -728,11 +728,11 @@ export const CAST_PERSONAS: Readonly<Record<CastPersonaId, CastPersonaDef>> = {
  * a practical tip of the day and links to real pages. No portrait until the Direzione approves an image.
  */
 export const VERA_PRESENCE = {
-  label: "Vera",
+  label: "Iride",
   role: "La reception del club",
   does: "Risponde con i dati veri del club e ti dice da dove vengono, ti porta dal volto giusto e, se serve una persona, apre una richiesta alla segreteria. Anche biglietti e card.",
-  askLabel: "Chiedi a Vera",
-  initial: "V",
+  askLabel: "Chiedi a Iride",
+  initial: "I",
   tips: [
     {
       key: "un-messaggio",
@@ -765,7 +765,7 @@ export const VERA_PRESENCE = {
       text: "Nomi, contatti e documenti dei minori si condividono solo con chi ne ha bisogno per il proprio ruolo, mai nei gruppi.",
     },
   ] as readonly CastTip[],
-  disclaimer: "Vera ti mostra solo ciò che il tuo ruolo può vedere; richieste e problemi vanno alla persona che se ne occupa.",
+  disclaimer: "Iride ti mostra solo ciò che il tuo ruolo può vedere; richieste e problemi vanno alla persona che se ne occupa.",
   quick: [
     { label: "Certificati medici", to: "/segreteria/certificati" },
     { label: "Documenti", to: "/documenti" },
@@ -824,8 +824,8 @@ export const CAST_FACES: Readonly<Record<FaceId, CastFace>> = {
   },
   sky: {
     id: "sky",
-    label: "Sky",
-    does: "La mascotte portafortuna, solo nel mondo dei bambini under 14: scuola calcio, giochi e squadre dei più piccoli.",
+    label: "Crovi",
+    does: "L'aiuto per bambini e famiglie, nel mondo dei più piccoli: scuola calcio, giochi e squadre under 14.",
     actions: [
       { label: "Prova la scuola calcio", to: "/entra" },
       { label: "Le squadre dei piccoli", to: "/squadre" },
@@ -1157,7 +1157,7 @@ export function castAreaContext(id: ChatAreaId, day: string, facts: CastFacts = 
   lines.push({ text: `Consiglio di oggi di ${def.label}: ${tip.title}. ${tip.text}` });
   for (const t of def.tips) if (t.key !== tip.key) lines.push({ text: `- ${t.title}: ${t.text}` });
   lines.push({ text: def.disclaimer });
-  if (def.handoff) lines.push({ text: `Vera apre questa area così: ${def.handoff}` });
+  if (def.handoff) lines.push({ text: `Iride apre questa area così: ${def.handoff}` });
   return { title: `Area: ${def.label} (${def.role})`, lines };
 }
 

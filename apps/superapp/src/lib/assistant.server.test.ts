@@ -59,7 +59,7 @@ describe("feature flag and key", () => {
   });
 });
 
-describe("public assistant (Vera, UD-121)", () => {
+describe("public assistant (Iride, UD-121)", () => {
   it("answers with the rules engine when the flag is off: no call to the API", async () => {
     const f = vi.fn();
     const t = pub({ SCD_ANTHROPIC_API_KEY: KEY }, f);
@@ -178,7 +178,7 @@ describe("public assistant (Vera, UD-121)", () => {
   });
 });
 
-describe("inside assistant (Vera / Sky)", () => {
+describe("inside assistant (Iride / Sky)", () => {
   const kbResult: KbResult = {
     level: "INTERNO",
     counts: {},
@@ -195,7 +195,7 @@ describe("inside assistant (Vera / Sky)", () => {
     return { deps, kbSearch, rules, loadPublicContext };
   }
 
-  it("asks the Cervellone with the caller's session and answers as Vera with the database level", async () => {
+  it("asks the Cervellone with the caller's session and answers as Iride with the database level", async () => {
     const f = vi.fn(async () => claudeResponse('{"text":"Omologazione Dervio aperta, scade il 01/12.","links":[{"label":"Documento","to":"https://drive.google.com/file/d/x"}]}'));
     const t = staff(["segreteria"], f);
     const r = await answerStaff("omologazione dervio", t.deps);
@@ -262,7 +262,7 @@ describe("inside assistant (Vera / Sky)", () => {
   });
 });
 
-describe("Vera's chat opened with an area (UD-121: one chat, faces hand over)", () => {
+describe("Iride's chat opened with an area (UD-121: one chat, faces hand over)", () => {
   let seq = 0;
   function inside(roles: string[], fetchImpl: ReturnType<typeof vi.fn>, env: Record<string, string> = ON) {
     const email = `cast${++seq}@example.org`;
@@ -277,13 +277,13 @@ describe("Vera's chat opened with an area (UD-121: one chat, faces hand over)", 
     return (JSON.parse(String((f.mock.calls[0] as unknown as [string, RequestInit])[1].body)) as { system: string }).system;
   }
 
-  it("answers as Vera with the Club House area: the chef's rules and notes, never the Cervellone", async () => {
+  it("answers as Iride with the Club House area: the chef's rules and notes, never the Cervellone", async () => {
     const f = vi.fn(async () => claudeResponse('{"text":"Il listino non è ancora pubblicato: per la festa compila la richiesta nell\'area famiglia (fonte: Club House).","links":[{"label":"Richiesta","to":"/famiglia"}]}'));
     const t = inside(["segreteria"], f);
     const r = await answerStaff("cosa c'è in menu?", t.deps, "accoglienza-chef");
     expect(t.kbSearch).not.toHaveBeenCalled();
     const sys = systemOf(f);
-    expect(sys).toContain("Sei Vera, la reception");
+    expect(sys).toContain("Sei Iride, la reception");
     expect(sys).toContain("Per la Club House ti aiuta Garrison, lo Chef");
     expect(sys).toContain("SQUBY/SumUp");
     expect(sys).toContain("Area: Garrison");
@@ -296,7 +296,7 @@ describe("Vera's chat opened with an area (UD-121: one chat, faces hand over)", 
     const t = inside(["atleta"], f);
     const r = await answerStaff("cosa c'è in menu?", t.deps, "accoglienza-chef");
     expect(r).toMatchObject({ persona: "sky", area: null });
-    expect(systemOf(f)).toContain("Sei Sky");
+    expect(systemOf(f)).toContain("Sei Crovi");
   });
 
   it("maps legacy and tip-only requests to Vera's general chat (no chat for Era, Acanfora, coach, preparatore, relax)", async () => {
@@ -330,7 +330,7 @@ describe("Vera's chat opened with an area (UD-121: one chat, faces hand over)", 
     }
   });
 
-  it("falls back to the rules engine when the model breaks Vera's rules (therapy, diets, drugs, confirmations)", async () => {
+  it("falls back to the rules engine when the model breaks Iride's rules (therapy, diets, drugs, confirmations)", async () => {
     for (const bad of ["Facciamo una terapia di respirazione.", "Segui questa dieta.", "Prendi un antidolorifico.", "Perfetto, ho confermato il tuo ordine!"]) {
       const f = vi.fn(async () => claudeResponse(JSON.stringify({ text: bad })));
       const t = inside(["famiglia"], f);
@@ -340,7 +340,7 @@ describe("Vera's chat opened with an area (UD-121: one chat, faces hand over)", 
     }
   });
 
-  it("opens Vera with a public area on public pages with its notes and real facts", async () => {
+  it("opens Iride with a public area on public pages with its notes and real facts", async () => {
     const f = vi.fn(async () => claudeResponse('{"text":"Christmas Lario Cup in programma (fonte: Tornei)."}'));
     const rules = vi.fn(async () => RULES);
     const r = await answerPublic(
