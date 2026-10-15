@@ -91,15 +91,6 @@ export function CookieConsent({ interior = false }: { interior?: boolean } = {})
     );
   }, [consent, pathname]);
 
-  // While the slim technical-cookie strip is open, the floating chat button steps aside on phones (no overlap).
-  useEffect(() => {
-    const open = banner && !prefs;
-    document.documentElement.dataset["cookieBanner"] = open ? "open" : "closed";
-    return () => {
-      delete document.documentElement.dataset["cookieBanner"];
-    };
-  }, [banner, prefs]);
-
   const save = (s: boolean, m: boolean) => {
     const c: Consent = { v: 1, stats: s, mkt: m, ts: new Date().toISOString() };
     writeConsent(c);
@@ -115,7 +106,7 @@ export function CookieConsent({ interior = false }: { interior?: boolean } = {})
           role="region"
           aria-label="Cookie e privacy"
           data-testid="cookie-banner"
-          className={`fixed inset-x-0 z-[45] flex ${interior ? "bottom-0 pb-[env(safe-area-inset-bottom)]" : "bottom-[calc(96px+env(safe-area-inset-bottom))] lg:bottom-[46px]"} items-center gap-3 border-t border-[#d5dfec] bg-white px-4 py-0.5 text-[var(--scd-ink)] shadow-[0_-6px_16px_-10px_rgb(11_42_91/0.35)] lg:justify-center`}
+          className={`flex items-center gap-3 bg-white px-4 py-0.5 text-[var(--scd-ink)] lg:justify-center ${interior ? "fixed inset-x-0 bottom-0 z-[45] border-t border-[#d5dfec] pb-[env(safe-area-inset-bottom)] shadow-[0_-6px_16px_-10px_rgb(11_42_91/0.35)]" : "relative z-[1] border-b border-[#d5dfec]"}`}
         >
           <p className="m-0 min-w-0 flex-1 text-[12.5px] leading-[1.3] text-[var(--scd-sub)] lg:flex-none">
             Solo cookie tecnici: nessuna statistica, nessuna pubblicità.{" "}

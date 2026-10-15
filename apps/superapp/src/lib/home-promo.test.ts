@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
-import { eventSlide, iscrizioniSlide, nextIndex, promoSlides, quickChips } from "./home-promo";
+import { eventSlide, iscrizioniSlide, nextIndex, promoSlides, quickChips, welcomeSlide } from "./home-promo";
 import type { ClubEvent } from "./stories";
 
 const ev = (over: Partial<ClubEvent> = {}): ClubEvent => ({
@@ -37,6 +37,11 @@ describe("promo carousel", () => {
     expect(iscrizioniSlide(false).cta.to).toBe("/contatti");
     expect(iscrizioniSlide(false).text).not.toMatch(/ricontatta/);
     expect(iscrizioniSlide(true).cta.to).toBe("/entra");
+  });
+  it("welcome credits appear only when the register grants them", () => {
+    expect(welcomeSlide(false).text).not.toMatch(/crediti/);
+    expect(welcomeSlide(true).text).toMatch(/50 crediti/);
+    expect(welcomeSlide(true).text).not.toMatch(/€/);
   });
   it("Accedi goes to the sign-in page", () => {
     expect(promoSlides("2026-10-15", [])[0]?.secondary?.to).toBe("/accedi");

@@ -19,7 +19,7 @@ export interface PromoSlide {
   secondary?: { label: string; to: string };
   /** Background: the lake photo, a published poster (shown whole), or the club stripes. */
   art:
-    | { kind: "lake" }
+    | { kind: "lake"; big: string; small: string }
     | { kind: "poster"; src: string; alt: string }
     | { kind: "stripes"; big: string; small: string };
 }
@@ -27,15 +27,35 @@ export interface PromoSlide {
 /** Seconds a slide stays before the carousel moves on (paused on hover, focus, touch and with reduced motion). */
 export const PROMO_SECONDS = 6;
 
-const WELCOME: PromoSlide = {
-  id: "benvenuto",
-  tag: "Nuovi iscritti",
-  title: "Entra nel mondo ColicoDerviese",
-  text: "Crea il tuo account: rose, allenamenti, carte della squadra e tutta la vita del club, sempre in tasca.",
-  cta: { label: "Registrati", to: "/registrati" },
-  secondary: { label: "Accedi", to: "/accedi" },
-  art: { kind: "lake" },
-};
+/**
+ * Welcome gift (Francesco 15/10/2026 05:58: "Iscriviti avrà 50 crediti card che si trasforma in 5€ consumazione
+ * omaggio se richiedi la card tifoso"). Switched on only when the credits register grants them at sign-up (today the
+ * register is not connected: creditsView in avatar-studio.ts); until then the banner sells what exists.
+ */
+export const WELCOME_CREDITS_LIVE = false;
+export const WELCOME_CREDITS = 50;
+
+export function welcomeSlide(creditsLive: boolean = WELCOME_CREDITS_LIVE): PromoSlide {
+  return creditsLive
+    ? {
+        id: "benvenuto",
+        tag: "Nuovi iscritti",
+        title: "Benvenuto in squadra",
+        text: `Registrati e ricevi ${WELCOME_CREDITS} crediti: con la Card Tifoso diventano una consumazione omaggio in club house.`,
+        cta: { label: "Registrati", to: "/registrati" },
+        secondary: { label: "Accedi", to: "/accedi" },
+        art: { kind: "lake", big: String(WELCOME_CREDITS), small: "crediti di benvenuto" },
+      }
+    : {
+        id: "benvenuto",
+        tag: "Nuovi iscritti",
+        title: "Benvenuto in squadra",
+        text: "Registrati: rose, allenamenti, carte della squadra e tutta la vita del club, sempre in tasca.",
+        cta: { label: "Registrati", to: "/registrati" },
+        secondary: { label: "Accedi", to: "/accedi" },
+        art: { kind: "lake", big: "2026/27", small: "la stagione è qui" },
+      };
+}
 
 /** Sign-up slide: the in-app request only while the public forms are live, otherwise the official contacts. */
 export function iscrizioniSlide(formsLive: boolean = PUBLIC_FORMS_LIVE): PromoSlide {
@@ -83,9 +103,10 @@ export function promoSlides(
   day: string,
   events: readonly ClubEvent[],
   formsLive: boolean = PUBLIC_FORMS_LIVE,
+  creditsLive: boolean = WELCOME_CREDITS_LIVE,
 ): PromoSlide[] {
   const upcoming = events.filter((e) => !e.date || e.date >= day).map(eventSlide);
-  return [WELCOME, ...upcoming, iscrizioniSlide(formsLive), CARTE];
+  return [welcomeSlide(creditsLive), ...upcoming, iscrizioniSlide(formsLive), CARTE];
 }
 
 /** Next index of the carousel, wrapping around; 0 for an empty list. */

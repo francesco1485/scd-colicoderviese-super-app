@@ -553,17 +553,17 @@ export function BottomNav() {
                 }
                 aria-label={t.ariaLabel ?? t.label}
                 aria-current={active ? "page" : undefined}
-                className="scd-focus flex flex-col items-center justify-start"
+                className="scd-focus flex flex-col items-center justify-center"
                 data-testid="tab-center"
               >
-                <span className="-mt-5 grid size-[56px] place-items-center rounded-full border-4 border-[var(--uv-night)] bg-[var(--uv-gold)] text-[#0b1e3a] shadow-[0_6px_16px_rgb(11_42_91/0.35)]">
+                <span className="mt-1.5 grid h-[36px] w-[58px] place-items-center rounded-full bg-[var(--uv-gold)] text-[#0b1e3a] shadow-[0_4px_12px_rgb(0_0_0/0.3)]">
                   <t.icon
-                    className="size-7"
+                    className="size-6"
                     strokeWidth={2.6}
                     aria-hidden="true"
                   />
                 </span>
-                <span className="mt-0.5 text-[11.5px] font-bold leading-none text-[var(--uv-gold)]">
+                <span className="mt-1 text-[11.5px] font-bold leading-none text-[var(--uv-gold)]">
                   {t.label}
                 </span>
               </Link>

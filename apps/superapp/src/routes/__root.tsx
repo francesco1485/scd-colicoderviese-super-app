@@ -166,6 +166,8 @@ function RootComponent() {
       {/* Room for the bottom tab bar and the fixed sponsor bar, on every public page (UD-134). */}
       <div className="sa-shell min-h-dvh overflow-x-clip pb-[calc(4rem+46px+env(safe-area-inset-bottom))] lg:pb-[46px]">
         <SiteHeader />
+        {/* Technical-cookie notice in the page flow, under the header: nothing floats over the content (UD-135). */}
+        <CookieConsent />
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
         <SiteFooter />
@@ -174,7 +176,6 @@ function RootComponent() {
       <BottomNav />
       <MenuDrawer />
       <SkyChat />
-      <CookieConsent />
       <PwaManager />
     </QueryClientProvider>
   );

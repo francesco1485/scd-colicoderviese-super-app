@@ -944,5 +944,3 @@ html.uv-big .sa-shell { zoom: 1.12; }
   .scd-wiggle-on-hover:hover .scd-wiggle-target { animation: none !important }
 }
 
-/* Cookie strip open on public pages: the chat button waits until it is closed (no overlap with the strip). */
-html[data-cookie-banner="open"] [data-sky-widget]:not([data-interior]):not([data-open]) { display: none }
