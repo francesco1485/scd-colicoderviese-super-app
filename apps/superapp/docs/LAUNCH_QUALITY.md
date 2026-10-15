@@ -76,6 +76,61 @@ Tempo di risposta del server sulla home (misura `curl`, `VERIFIED`): prima ogni 
    `CHROME_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome`, `--chrome-flags="--headless=new --no-sandbox"`,
    preset mobile e `--preset=desktop`, 3 esecuzioni per pagina, mediana. Non usare `playwright install`.
 
+
+## B3 · Prima schermata e peso: home e /sponsor · 2026-10-15
+
+### Come è stato misurato (`VERIFIED`)
+- Stesso metodo di L1: Lighthouse 12.8.2, Chromium preinstallato, preset mobile (Moto G, 4G lento simulato, CPU ×4),
+  build di produzione locale dietro un proxy Brotli (qualità 5) come Render; mediana di 3 esecuzioni, solo prestazioni.
+- **Prima** = `a02d105` (live su Render, build in una copia separata); **dopo** = questo intervento.
+- Prima visita (nessuna scelta cookie salvata), come la vede chi apre il link la prima volta.
+- Spostamenti di layout ricontrollati con Playwright (PerformanceObserver `layout-shift`, rete e CPU rallentate).
+
+### Risultati (mediana di 3, mobile, prima visita)
+
+| Pagina | Prestazioni prima → dopo | FCP ms | LCP ms | CLS | TBT ms | Peso KiB |
+|---|---|---|---|---|---|---|
+| `/` | 58 → 61 | 4998 → 5065 | 6333 → 10801 (avviso cookie, vedi sotto) | **0.120 → 0.000** | 465 → 70 | **1789 → 1483** |
+| `/sponsor` | 58 → 63 | 4599 → 5182 | **9778 → 5975** | 0.000 → 0.000 | 261 → 149 | **1486 → 1175** |
+| `/calendario` | — → 65 | — → 4352 | — → 7937 | 0.092 (L1) → **0.000** | — → 111 | — → 1169 |
+| `/squadre` | — → 77 | — → 3857 | — → 3932 | 0.062 (L1) → **0.002** | — → 220 | — → 815 |
+
+Le prestazioni simulate di Lighthouse variano molto tra una serie e l'altra (una serie intermedia della stessa
+modifica ha dato home 66 e /sponsor 66): contano soprattutto CLS e peso, che sono stabili. Con la scelta cookie già salvata e cache vuota: home 67 → 66 (LCP 5282 → 5047),
+/sponsor 64 → 64 (LCP 8344 → 6221).
+
+**LCP della home alla prima visita.** Prima l'elemento più grande era il titolo «Questa settimana», che con il carattere
+di riserva andava su due righe (più grande del dovuto) e poi saltava su una: era anche la causa principale del CLS 0.12.
+Ora il titolo resta su una riga fin dall'inizio, quindi alla prima visita l'elemento più grande diventa l'avviso cookie
+(compare dopo che la pagina è diventata interattiva, ~10 s nella simulazione lenta). Il contenuto della home appare come
+prima o prima; per spostare anche questo numero l'avviso andrebbe disegnato dal server leggendo il cookie tecnico della
+scelta (non toccato qui: area consenso, da decidere).
+
+### Cosa è stato corretto
+1. **Caratteri di riserva con le stesse misure** (`src/font-fallbacks.css`, generato da
+   `scripts/derive-font-fallbacks.py`): per ogni famiglia e peso ufficiale (Fira Sans, Fira Sans Condensed, Anton,
+   Big Shoulders Display, Barlow) una faccia «<Famiglia> Fallback» su Arial/Liberation Sans/Helvetica/Roboto locali con
+   `size-adjust` e `ascent/descent/line-gap-override` calcolati dai file ufficiali. Per i titoli in maiuscolo
+   (`.uppercase`) Anton e Big Shoulders usano una faccia misurata sulle sole maiuscole. Mentre il carattere ufficiale
+   arriva le righe non cambiano più: CLS home 0.120 → 0.000, risolto anche l'aperto di L1 su `/calendario` e `/squadre`.
+   I file ufficiali sono solo letti; nessun carattere scaricato in più.
+2. **Marchi FIGC SGS, LND e Insieme al Monza in resa 96 px** (`/media/affiliazioni/cut/<id>-h96.webp`, WebP senza
+   perdita con alfa, registrati con `derived_from`): si vedono al massimo a 34 px (testata di ogni pagina, fascia della
+   home, piè di pagina). 183 + 40 + 20 KB → 33 + 18 + 9 KB **su ogni pagina**.
+3. **Fermo immagine del ledwall in 640 e 960 px** (`ledwall-board-empty-640/960.webp`, foto senza marchi, registrate):
+   un telefono scarica 37–85 KB invece di 216 KB. Su `/sponsor` è l'elemento più grande della prima schermata: ora si
+   carica subito e con priorità alta (`LedwallRotator priority`), LCP ~9,8 s → ~5,9 s.
+
+### Non toccato (motivo)
+- Locandine degli spot (`*-preview-poster.webp`, 134 KB): asset bloccati (fotogramma dello spot ufficiale).
+- Stemmi avversari in `/media/crests/` (50–73 KB per uno stemma mostrato a 20 px): servirebbe una resa ridotta per ogni
+  stemma del registro `config/scd-opponent-crests.v1.json`; prossimo passo, stesso metodo dei marchi qui sopra.
+- Avviso cookie: vedi sopra.
+
+### Ripetere la misura
+Come L1; per lo spostamento dei caratteri: `python3 scripts/derive-font-fallbacks.py > src/font-fallbacks.css`
+dopo ogni cambio di famiglie o pesi in `src/styles.css` (il test `font-fallbacks.test.ts` fallisce se manca una faccia).
+
 ## L2 · Accessibilità (axe-core + bersagli da 44 px) · 2026-10-12
 
 ### Come è stato misurato (`VERIFIED`)

@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
@@ -20,6 +20,10 @@ describe("LedwallRotator (SSR)", () => {
     const html = renderToStaticMarkup(<LedwallRotator day={day} nowMs={nowMs} />);
     expect(html).toContain("Anteprima ledwall · i partner a rotazione");
     expect(html).toContain("ledwall-board-empty-1280.webp");
+    // B3: phone renditions in the srcset, and the default stays lazy (only /sponsor asks for priority).
+    expect(html).toContain("ledwall-board-empty-640.webp 640w");
+    expect(html).toContain("ledwall-board-empty-960.webp 960w");
+    expect(html).not.toContain('fetchPriority="high"');
     expect(html).toContain(`left:${LEDWALL_BOARD.left}%`);
     expect(html).toContain(`width:${LEDWALL_BOARD.width}%`);
     expect(html).toContain('data-variant="full"');
@@ -86,5 +90,18 @@ describe("LedwallRotator (SSR)", () => {
     expect(home).toMatch(/<LedwallRotator day=\{day\}/);
     expect(home).toContain('to="/sponsor"');
     for (const f of ["./scd/InteriorShell.tsx", "./home/MemberHome.tsx"]) expect(src(f)).not.toContain("LedwallRotator");
+  });
+
+  it("loads the still at once with high priority when it is the first-screen visual (B3, /sponsor)", () => {
+    const day = "2026-10-13";
+    const nowMs = Date.parse("2026-10-13T08:00:00Z");
+    const html = renderToStaticMarkup(<LedwallRotator day={day} nowMs={nowMs} priority />);
+    expect(html).toContain('loading="eager"');
+    expect(html).toContain('fetchPriority="high"');
+    const sponsor = renderToStaticMarkup(<LedwallFacsimile day={day} nowMs={nowMs} />);
+    expect(sponsor).toContain('fetchPriority="high"');
+    for (const w of [640, 960, 1280, 1920]) {
+      expect(existsSync(fileURLToPath(new URL(`../../public/media/sponsor/ledwall-board-empty-${w}.webp`, import.meta.url))), `${w}w`).toBe(true);
+    }
   });
 });

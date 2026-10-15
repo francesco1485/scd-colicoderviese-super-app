@@ -28,10 +28,22 @@ export interface Credential {
   art: LogoArt;
 }
 
+/**
+ * Height (px) of the display rendition served for each mark (B3, 2026-10-15). The marks never show taller than
+ * 34 CSS px (header plaque, home bar at --logo-k 1.2, footer list), so a lossless 96 px rendition covers 2.8x screens
+ * instead of the 306-342 px cut-outs (figc-sgs 183 KB -> 33 KB on every page). Same pixels resampled, no redraw;
+ * registered in config/scd-assets.v1.json with derived_from the cut-out. w/h stay those of the cut-out (aspect).
+ */
+export const CREDENTIAL_DISPLAY_HEIGHT = 96;
+
+export function credentialDisplaySrc(cutSrc: string): string {
+  return cutSrc.replace(/\.webp$/, `-h${CREDENTIAL_DISPLAY_HEIGHT}.webp`);
+}
+
 const art = (id: CredentialId): LogoArt => {
   const a = AFFILIATION_ART.find((x) => x.id === id);
   if (!a) throw new Error(`missing affiliation art ${id}`);
-  return a;
+  return { ...a, src: credentialDisplaySrc(a.src) };
 };
 
 export const CLUB_CREDENTIALS: readonly Credential[] = [

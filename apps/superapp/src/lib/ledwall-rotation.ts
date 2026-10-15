@@ -19,10 +19,14 @@ import { sponsorLabel, type Sponsor } from "./sponsors";
 
 /* -------------------------------------------------------------- the board */
 
-/** Empty-board pitch still (same camera as the LED fac-simile video), 1920x1080 master. */
+/**
+ * Empty-board pitch still (same camera as the LED fac-simile video), 1920x1080 master. 640w and 960w renditions
+ * (B3, 2026-10-15) so a phone (stage about 490 CSS px wide) downloads 37-85 KB instead of the 216 KB 1280w file.
+ */
 export const LEDWALL_STILL = {
-  src: "/media/sponsor/ledwall-board-empty-1280.webp",
-  srcSet: "/media/sponsor/ledwall-board-empty-1280.webp 1280w, /media/sponsor/ledwall-board-empty-1920.webp 1920w",
+  src: "/media/sponsor/ledwall-board-empty-960.webp",
+  srcSet:
+    "/media/sponsor/ledwall-board-empty-640.webp 640w, /media/sponsor/ledwall-board-empty-960.webp 960w, /media/sponsor/ledwall-board-empty-1280.webp 1280w, /media/sponsor/ledwall-board-empty-1920.webp 1920w",
   width: 1920,
   height: 1080,
 } as const;

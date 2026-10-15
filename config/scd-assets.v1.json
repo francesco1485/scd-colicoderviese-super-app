@@ -1831,6 +1831,16 @@
       "vector_status": "RESEARCH_REAL_ASSET"
     },
     {
+      "path": "apps/superapp/public/media/affiliazioni/cut/figc-sgs-3-livello-h96.webp",
+      "class": "OFFICIAL_AFFILIATION_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official cut-out (marks never show taller than 34 CSS px)",
+      "git_blob_sha": "a3ba13c0c6ae8ce7b1afbc6f53b79db73ac92040",
+      "derived_from": "apps/superapp/public/media/affiliazioni/cut/figc-sgs-3-livello.webp",
+      "transform": "downscale to 240x96 px (96 px high, about 3x of the 34 px display), lossless WebP with alpha; no redraw, no recolour, no upscale (B3, 2026-10-15)",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
       "path": "apps/superapp/public/media/affiliazioni/cut/lnd.webp",
       "class": "OFFICIAL_AFFILIATION_LOGO",
       "status": "VERIFIED",
@@ -1841,6 +1851,16 @@
       "vector_status": "RESEARCH_REAL_ASSET"
     },
     {
+      "path": "apps/superapp/public/media/affiliazioni/cut/lnd-h96.webp",
+      "class": "OFFICIAL_AFFILIATION_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official cut-out (marks never show taller than 34 CSS px)",
+      "git_blob_sha": "7e9d3ed4d90efe384a15ba2a207a74aae29eeada",
+      "derived_from": "apps/superapp/public/media/affiliazioni/cut/lnd.webp",
+      "transform": "downscale to 86x96 px (96 px high, about 3x of the 34 px display), lossless WebP with alpha; no redraw, no recolour, no upscale (B3, 2026-10-15)",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
       "path": "apps/superapp/public/media/affiliazioni/cut/insieme-al-monza.webp",
       "class": "OFFICIAL_AFFILIATION_LOGO",
       "status": "VERIFIED",
@@ -1848,6 +1868,16 @@
       "git_blob_sha": "6a8756ec8d8a34b25dbbf0d470c9822defd683cd",
       "derived_from": "assets/logo-monza.png",
       "transform": "trim to the alpha bounding box (source already transparent); 765x342 px, lossless WebP; no redraw, no recolour, no upscale",
+      "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/affiliazioni/cut/insieme-al-monza-h96.webp",
+      "class": "OFFICIAL_AFFILIATION_LOGO",
+      "status": "VERIFIED",
+      "source": "display rendition of the official cut-out (marks never show taller than 34 CSS px)",
+      "git_blob_sha": "41504df86550459b68b81e280af965a4cf450386",
+      "derived_from": "apps/superapp/public/media/affiliazioni/cut/insieme-al-monza.webp",
+      "transform": "downscale to 215x96 px (96 px high, about 3x of the 34 px display), lossless WebP with alpha; no redraw, no recolour, no upscale (B3, 2026-10-15)",
       "vector_status": "RESEARCH_REAL_ASSET"
     },
     {
@@ -2101,6 +2131,32 @@
       "use": "LED wall preview (src/components/LedwallRotator.tsx): /sponsor every day, compact on the public home on LEDWALL_HOME_DAYS; board rectangle x 246-1718, y 422-540 of the 1920x1080 frame (LEDWALL_BOARD_PX)",
       "note": "composite preview, not footage: the partner logos are overlaid in the app on the empty board and the page labels it 'Anteprima ledwall · i partner a rotazione'; no claim about the real board schedule",
       "verified_at": "2026-10-13"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/ledwall-board-empty-640.webp",
+      "class": "LED_BOARD_STILL",
+      "status": "VERIFIED",
+      "asset_decision": "KEEP_ENHANCE",
+      "source": "pitch still from the Direzione LED material of 2026-10-13 (same camera and framing as 'SFONDO_UFFICIALE_CAMPO_PREVIEW.mp4', the fac-simile video): 1920x1080 frame with the pitch-side LED board shown empty (plain white), prepared in session for the in-app LED wall preview",
+      "git_blob_sha": "9d804b7b720ec1eb7c6d0e319e230b51f6e3ccfb",
+      "transform": "Lanczos resize of the 1920x1080 master to 640x360, WebP lossy q78 (photo, no logo or mark in the frame); phone rendition for the srcset (B3, 2026-10-15)",
+      "use": "LED wall preview (src/components/LedwallRotator.tsx): /sponsor every day, compact on the public home on LEDWALL_HOME_DAYS; board rectangle x 246-1718, y 422-540 of the 1920x1080 frame (LEDWALL_BOARD_PX)",
+      "note": "composite preview, not footage: the partner logos are overlaid in the app on the empty board and the page labels it 'Anteprima ledwall · i partner a rotazione'; no claim about the real board schedule",
+      "verified_at": "2026-10-15",
+      "derived_from": "apps/superapp/public/media/sponsor/ledwall-board-empty-1920.webp"
+    },
+    {
+      "path": "apps/superapp/public/media/sponsor/ledwall-board-empty-960.webp",
+      "class": "LED_BOARD_STILL",
+      "status": "VERIFIED",
+      "asset_decision": "KEEP_ENHANCE",
+      "source": "pitch still from the Direzione LED material of 2026-10-13 (same camera and framing as 'SFONDO_UFFICIALE_CAMPO_PREVIEW.mp4', the fac-simile video): 1920x1080 frame with the pitch-side LED board shown empty (plain white), prepared in session for the in-app LED wall preview",
+      "git_blob_sha": "10c2691191d6cfaea1b11f056709a445e014aa14",
+      "transform": "Lanczos resize of the 1920x1080 master to 960x540, WebP lossy q78 (photo, no logo or mark in the frame); phone rendition for the srcset (B3, 2026-10-15)",
+      "use": "LED wall preview (src/components/LedwallRotator.tsx): /sponsor every day, compact on the public home on LEDWALL_HOME_DAYS; board rectangle x 246-1718, y 422-540 of the 1920x1080 frame (LEDWALL_BOARD_PX)",
+      "note": "composite preview, not footage: the partner logos are overlaid in the app on the empty board and the page labels it 'Anteprima ledwall · i partner a rotazione'; no claim about the real board schedule",
+      "verified_at": "2026-10-15",
+      "derived_from": "apps/superapp/public/media/sponsor/ledwall-board-empty-1920.webp"
     },
     {
       "path": "apps/superapp/public/media/sponsor/kit/kit-home.webp",

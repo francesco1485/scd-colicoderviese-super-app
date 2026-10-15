@@ -43,6 +43,8 @@ export interface LedwallRotatorProps {
   clubEvery?: number;
   /** Visible label over the still (default: the rotation label). */
   label?: string;
+  /** The still is the largest element of the first screen (/sponsor): load it at once, high priority (B3). */
+  priority?: boolean;
   className?: string;
 }
 
@@ -55,6 +57,7 @@ export function LedwallRotator({
   list = SPONSORS,
   clubEvery = LEDWALL_CLUB_EVERY,
   label = LABEL,
+  priority = false,
   className = "",
 }: LedwallRotatorProps) {
   const slots = useMemo(() => ledwallSequence(list, day, clubEvery), [list, day, clubEvery]);
@@ -171,7 +174,8 @@ export function LedwallRotator({
             height={LEDWALL_STILL.height}
             alt=""
             aria-hidden="true"
-            loading="lazy"
+            loading={priority ? "eager" : "lazy"}
+            fetchPriority={priority ? "high" : "auto"}
             decoding="async"
             className="absolute inset-0 block size-full object-cover"
           />

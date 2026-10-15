@@ -97,7 +97,7 @@ export function LedwallFacsimile({ onRequest, day, nowMs }: { onRequest?: () => 
       <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
         Tutti i partner della stagione girano sul ledwall a bordo campo. L'ordine cambia ogni giorno, così ogni marchio ha lo stesso spazio.
       </p>
-      <LedwallRotator day={day} nowMs={nowMs} variant="full" className="mt-5" />
+      <LedwallRotator day={day} nowMs={nowMs} variant="full" priority className="mt-5" />
       <div className="mt-8 grid items-start gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
         <div>
           <p className="text-base leading-relaxed">
