@@ -11,14 +11,16 @@ apps/superapp/src/lib/calendar-bridge.server.ts and checked by calendar-mirror.t
 the master and never stores games in the database (NO_PARALLEL_CALENDAR_EDITING_IN_DB).
 
 The rules are the ones of the hand-made copy of 09-10/10/2026 (projection SCD_RC6_GERARCHIA_FONTI_20261010), re-derived
-on 15/10/2026 by comparing all 156 published games with the master row by row:
-- out: the withdrawn U18 team, rows WITHDRAWN / REST / REJECTED, type RIPOSO, and club events (CLUB_EVENT) whose time
-  or venue is not CONFIRMED (a provisional friendly is not published until the club confirms it in the master);
+on 15/10/2026 by comparing all 156 published games with the master row by row, then aligned the same day with the
+approved 171-game copy (provisional club friendlies included):
+- out: the withdrawn U18 team, rows WITHDRAWN / REST / REJECTED and type RIPOSO. Club events (CLUB_EVENT) are published
+  also while provisional, flagged "Orario o sede da verificare" + "Attesa verifica" (aligned on 15/10/2026 with the copy
+  the PC chat regenerated and Francesco approved: 171 games, Pulcini friendlies of 18 and 24/10 included);
 - fields: only the allowlisted keys of calendar-mirror.ts; verification flags from TIME_STATUS / VENUE_STATUS /
   CONFLICT_STATUS; notices from the same statuses; source FIGC/LND or SCD;
-- one hand correction of 09-10/10 (official FIGC time over the master on 10/10, rule FIGC_LND_OFFICIAL_FIXTURES_WIN) is
-  kept in OVERRIDES with its reason and the master value it corrects: it applies only while the master still carries
-  that value (a newer master value wins and the correction is reported on stderr as stale);
+- the hand corrections of 09-10/10 (official FIGC time on 10/10, rule FIGC_LND_OFFICIAL_FIXTURES_WIN; club-approved
+  time on 11/10, kept as in the approved copy) are in OVERRIDES with their reason and the master value they correct:
+  each applies only while the master still carries that value (a newer master value wins, reported on stderr);
 - events are sorted by date, effective time and id.
 A row whose category maps to no known team, an unreadable date or time, an over-long text or PII-like text stops the
 run (exit 2): nothing is written. The checks mirror calendar-mirror.ts validateMirror, so the app never refuses a copy
@@ -82,6 +84,16 @@ OVERRIDES: dict[str, dict] = {
             "end": "",
             "notice": [
                 "Orario ufficiale FIGC/LND: 14:30, C.U. CRL n.28 del 24/09/2026, confermato nel programma gare CRL 09-12/10 pubblicato il 09/10/2026."
+            ],
+        },
+    },
+    "EVT-ES-20261011-PENTAPIATEDA-CASA": {
+        "master": {"time": "14:30"},
+        "set": {
+            "time": "15:00",
+            "end": "",
+            "notice": [
+                "Orario approvato SCD: 15:00, ultimo Master Calendario Gare societario aggiornato il 09/10/2026. Amichevole organizzata dalla società, non comunicato FIGC."
             ],
         },
     },
@@ -157,20 +169,17 @@ def published(row: dict) -> bool:
         return False
     if (row.get("TYPE") or "").upper() == "RIPOSO":
         return False
-    if row.get("MATCH_STATUS") == "CLUB_EVENT" and not (
-        row.get("TIME_STATUS") == "CONFIRMED" and row.get("VENUE_STATUS") == "CONFIRMED"
-    ):
-        return False
     return True
 
 
 def notices(row: dict) -> list[str]:
     out: list[str] = []
-    if row.get("TIME_STATUS") != "CONFIRMED" or row.get("VENUE_STATUS") != "CONFIRMED":
+    unconfirmed = row.get("TIME_STATUS") != "CONFIRMED" or row.get("VENUE_STATUS") != "CONFIRMED"
+    if unconfirmed:
         out.append("Orario o sede da verificare")
     if (row.get("CONFLICT_STATUS") or "NONE") != "NONE":
         out.append("Utilizzo struttura da verificare")
-    elif row.get("OPERATIONAL_STATUS") == "OFFICIAL_TO_VERIFY":
+    elif unconfirmed or row.get("OPERATIONAL_STATUS") == "OFFICIAL_TO_VERIFY":
         out.append("Attesa verifica")
     return out
 
@@ -277,7 +286,8 @@ def self_test() -> None:
     assert event_of({**base, "CATEGORY": "U18 Élite"}) is None
     assert event_of({**base, "MATCH_STATUS": "WITHDRAWN"}) is None
     assert event_of({**base, "TYPE": "RIPOSO", "MATCH_STATUS": "REST"}) is None
-    assert event_of({**base, "MATCH_STATUS": "CLUB_EVENT", "TIME_STATUS": "CLUB_PROVISIONAL", "VENUE_STATUS": "CLUB_PROVISIONAL"}) is None
+    prov = event_of({**base, "MATCH_STATUS": "CLUB_EVENT", "SOURCE_TYPE": "SCD_INTERNAL", "TIME_STATUS": "CLUB_PROVISIONAL", "VENUE_STATUS": "CLUB_PROVISIONAL", "OPERATIONAL_STATUS": "CLUB_TO_VERIFY"})
+    assert prov and prov["notice"] == ["Orario o sede da verificare", "Attesa verifica"] and prov["verification"]["time_confirmed"] is False
     assert event_of({**base, "MATCH_STATUS": "CLUB_EVENT", "SOURCE_TYPE": "SCD_INTERNAL"})["source"] == "SCD"
     v = event_of({**base, "TIME_STATUS": "DEFAULT_TO_VERIFY", "VENUE_STATUS": "DEFAULT_TO_VERIFY", "OPERATIONAL_STATUS": "OFFICIAL_TO_VERIFY"})
     assert v["notice"] == ["Orario o sede da verificare", "Attesa verifica"] and v["verification"]["time_confirmed"] is False

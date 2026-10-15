@@ -694,6 +694,15 @@ Backlog cloud B4. Motori: PERSONE (famiglie e tifosi leggono e toccano tutto anc
 - Manifest: nuovo consumatore di MASTER_CALENDARIO_2026_27. Test: ordine dei canali, solo https e mai il master, copia `text/plain` accettata e pagina HTML rifiutata.
 - Revisioni (PASS con note, note applicate): l'app rifiuta anche una copia con data nel futuro (oltre 10 minuti: bloccherebbe ogni aggiornamento) e una copia con meno del 70% delle gare di quella inclusa; il canale del repository non segue rimandi; prima vince il primo canale valido (Drive è il vecchio canale). Attività: stessi controlli prima di pubblicare, openpyxl fissato a 3.1.5, nel commit solo il file del calendario, rigenera anche quando cambia il convertitore. Ritardo massimo tra master e app: circa 1 ora e 10 minuti.
 
+## 15/10/2026 15:00 · Chat cloud: testi della Top 11 (decisione di Francesco)
+
+- Francesco 15/10: il voto della Top 11 resta aperto a ogni account registrato ("lascia votare tutti", UD-137; UD-138 registra le sue scelte sul calendario orario). /top11 e /community non dicono più "votano i tesserati" ma "serve un account del club". Nessun cambio al database.
+
+## 15/10/2026 15:45 · Chat cloud: un solo generatore del calendario, allineato alla copia approvata
+
+- Alle 15:10 la chat PC e Francesco hanno rigenerato e condiviso la copia su Drive (171 gare, con le amichevoli del club da confermare). Alle 15:16 la chat cloud ha messo in linea per primo il canale del repository con la sua copia da 156 gare: le amichevoli Pulcini del 18 e 24/10 sono sparite dal sito per circa mezz'ora. Corretto alle 15:35 aggiornando il ramo dati con la copia allineata (171 gare, identica gara per gara a quella approvata).
+- Convertitore `tools/sync/calendar_public_payload.py` allineato: le amichevoli del club si pubblicano anche da confermare, con "Orario o sede da verificare" + "Attesa verifica"; la correzione di Penta Piateda (15:00) resta come nella copia approvata, finché il master ha 14:30. Copia inclusa nell'app = stessa copia da 171 gare; test aggiornati ai numeri veri (171 gare, 92 in casa, 46 da confermare).
+
 ## 15/10/2026 15:40 · Macchina delle richieste, primo caso: amichevole (chat PC, ramo feat/pc-richieste-amichevole, UD-154)
 
 - Nuova pagina `/segreteria/richieste` (Segreteria, Direzione, Direttore Generale, Coordinatore attività sportiva): "Nuova da messaggio" legge il testo della squadra (lettore deterministico: nessun dato inventato, campi incerti vuoti con avviso), bozza da correggere, ricerca della società avversaria o "Nuova società", invio a chi conferma, stato di ogni richiesta, moduli da preparare. Modulo stampabile A4 `/segreteria/richieste/$id/modulo` sui campi della scheda FIGC-SGS, con riga firma del Presidente e timbro; bozza e-mail per l'Ufficio Tornei da copiare (l'app non la invia).

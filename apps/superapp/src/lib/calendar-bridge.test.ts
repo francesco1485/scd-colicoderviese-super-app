@@ -7,6 +7,7 @@ import { validateMirror } from "./calendar-mirror";
 import { MIRROR_URLS, REPO_MIRROR_URL, createCachedSource, fetchMirror } from "./calendar-bridge.server";
 
 const clone = () => JSON.parse(JSON.stringify(bundled));
+const N = (bundled as { events: unknown[] }).events.length;
 const FUTURE = {
   id: "EVT-TEST-20270301-FIXTURE", date: "2027-03-01", time: "15:00", end: "", category: "Esordienti 11 anni (2015)",
   group: "2015", type: "AMICHEVOLE", home_away: "CASA", venue: "Campo di prova", opponent: "SQUADRA DI PROVA",
@@ -89,11 +90,11 @@ describe("ponte con cache 5 minuti", () => {
     const src = createCachedSource([f.url], undefined, () => t);
     const first = await src();
     expect(first.origin).toBe("mirror");
-    expect(first.events.length).toBe(156);
+    expect(first.events.length).toBe(N);
     const upd = clone(); upd.source_modified_at = "2026-10-15T10:00:00.000Z"; upd.events.push(FUTURE); f.set(upd);
-    t = 4 * 60_000; expect((await src()).events.length).toBe(156); // ancora in cache
+    t = 4 * 60_000; expect((await src()).events.length).toBe(N); // ancora in cache
     t = 5 * 60_000 + 1; const fresh = await src();
-    expect(fresh.events.length).toBe(157);
+    expect(fresh.events.length).toBe(N + 1);
     expect(fresh.sourceModifiedAt).toBe("2026-10-15T10:00:00.000Z");
     f.stop();
   });
@@ -101,7 +102,7 @@ describe("ponte con cache 5 minuti", () => {
     const f = await fixture(); f.down();
     const r = await fetchMirror([f.url]);
     expect(r.origin).toBe("fallback");
-    expect(r.events.length).toBe(156);
+    expect(r.events.length).toBe(N);
     f.stop();
     const off = await fetchMirror(["http://127.0.0.1:1/none"]);
     expect(off.origin).toBe("fallback");
@@ -126,25 +127,25 @@ describe("ultima copia verificata (lastGood)", () => {
     const src = createCachedSource([f.url], undefined, () => t);
     f.set(at("2026-10-15T10:00:00.000Z")); expect((await src()).origin).toBe("mirror");
     t = 6 * 60_000; f.set(at("2026-10-15T11:00:00.000Z", true)); const v2 = await src();
-    expect(v2.origin).toBe("mirror"); expect(v2.events.length).toBe(157);
+    expect(v2.origin).toBe("mirror"); expect(v2.events.length).toBe(N + 1);
     t = 12 * 60_000; f.down(); const s = await src();
     expect(s.origin).toBe("stale");
     expect(s.sourceModifiedAt).toBe("2026-10-15T11:00:00.000Z");
-    expect(s.events.length).toBe(157);
+    expect(s.events.length).toBe(N + 1);
     f.stop();
   });
   test("avvio con rete giù: copia di sicurezza inclusa", async () => {
     const src = createCachedSource(["http://127.0.0.1:1/none"], undefined, () => 0);
-    const r = await src(); expect(r.origin).toBe("fallback"); expect(r.events.length).toBe(156);
+    const r = await src(); expect(r.origin).toBe("fallback"); expect(r.events.length).toBe(N);
   });
   test("dopo una copia valida: PII, HTML o copia più vecchia non degradano", async () => {
     const f = await fixture(); let t = 0;
     const src = createCachedSource([f.url], undefined, () => t);
     f.set(at("2026-10-15T11:00:00.000Z", true)); await src();
     const bad = at("2026-10-15T12:00:00.000Z"); bad.events[0].venue = "scrivi a x@y.it"; f.set(bad);
-    t = 6 * 60_000; let r = await src(); expect(r.origin).toBe("stale"); expect(r.events.length).toBe(157);
+    t = 6 * 60_000; let r = await src(); expect(r.origin).toBe("stale"); expect(r.events.length).toBe(N + 1);
     f.set(at("2026-10-15T10:30:00.000Z"));
-    t = 12 * 60_000; r = await src(); expect(r.sourceModifiedAt).toBe("2026-10-15T11:00:00.000Z"); expect(r.events.length).toBe(157);
+    t = 12 * 60_000; r = await src(); expect(r.sourceModifiedAt).toBe("2026-10-15T11:00:00.000Z"); expect(r.events.length).toBe(N + 1);
     f.stop();
   });
   test("Verifica forzata: al massimo una ogni 30 s, una sola lettura in corso", async () => {

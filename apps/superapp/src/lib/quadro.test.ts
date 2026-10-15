@@ -311,6 +311,7 @@ describe("gestionale", () => {
       "primicalci",
       "u19",
       "pulcini",
+      "piccoli",
     ]);
     const u15 = teams.find((t) => t.id === "u15")!;
     expect(u15).toMatchObject({
@@ -318,19 +319,19 @@ describe("gestionale", () => {
       category: "Giovanissimi U15",
       weeklySessions: 3,
     });
-    expect(u15.split.total).toBe(26);
-    expect(u15.split.home + u15.split.away).toBe(26);
+    expect(u15.split.total).toBe(27);
+    expect(u15.split.home + u15.split.away).toBe(27);
     // Esordienti 2014: no verified link to the quadro -> unknown, never 0.
     expect(teams.find((t) => t.id === "2014")!.weeklySessions).toBeNull();
     for (const t of teams)
       expect(contrastOnWhite(t.color)).toBeGreaterThanOrEqual(4.5);
   });
 
-  test("season split from the snapshot: 156 matches, 78 home and 78 away", () => {
+  test("season split from the snapshot: 171 matches, 92 home and 79 away", () => {
     expect(matchSplit(cal.events)).toEqual({
-      total: 156,
-      home: 78,
-      away: 78,
+      total: 171,
+      home: 92,
+      away: 79,
       other: 0,
     });
     expect(matchSplit([])).toEqual({ total: 0, home: 0, away: 0, other: 0 });
@@ -339,7 +340,7 @@ describe("gestionale", () => {
   test("week of matches and main category", () => {
     const w = matchesInWeek(cal.events, "2026-10-14");
     expect(w.label).toBe("12 – 18 ottobre 2026");
-    expect(w.events).toHaveLength(8);
+    expect(w.events).toHaveLength(9);
     expect(mainCategory([])).toBeNull();
     expect(
       mainCategory([
