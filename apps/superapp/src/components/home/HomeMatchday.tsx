@@ -1,7 +1,7 @@
 /**
  * "Questa settimana" — Matchday block of the public home (UD-132, Francesco 14/10/2026 23:22: a short home that pushes
  * ragazzi and families to live the app). The games of the next 7 days from the Calendario SCD (weekMatches, same
- * source as /calendario), grouped by day, with four real filters (Tutte, In casa, Agonistica, Attività di base).
+ * source as /calendario), grouped by day, with five real filters (Tutte, Le mie squadre — only once a team is starred —, In casa, Agonistica, Attività di base).
  *
  * Rules: our side is "ColicoDerviese" (annata crests stay inside); an opponent crest appears only when the verified
  * crest registry has the file (never an invented shield); "da confermare" stays soft; no score (the calendar carries
@@ -256,13 +256,17 @@ export function HomeMatchday({
     }
   }, []);
   const follow = (id: string) => {
-    const next = toggleFollowed(followed, id);
-    setFollowed(next);
-    try {
-      writeFollowed(window.localStorage, next);
-    } catch {
-      /* in memory only */
-    }
+    setFollowed((prev) => {
+      const next = toggleFollowed(prev, id);
+      try {
+        writeFollowed(window.localStorage, next);
+      } catch {
+        /* in memory only */
+      }
+      // Last star removed while "Le mie squadre" is on: back to every game, so the chip and the list agree (review M1).
+      if (next.length === 0) setFilter((f) => (f === "seguite" ? "tutte" : f));
+      return next;
+    });
   };
   const now = useMinuteClock(nowMs);
   const week = useMemo(
