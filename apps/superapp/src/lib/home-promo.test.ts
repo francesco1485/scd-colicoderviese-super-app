@@ -80,7 +80,7 @@ describe("guest home never links to members-only pages", () => {
         if (to !== "/accedi") expect(membersOnly(to), to).toBe(false);
   });
   it("board cards and week board", () => {
-    const board = ["../components/home/HomeBoard.tsx", "../components/home/HomeLobby.tsx"]
+    const board = ["../components/home/HomeLobby.tsx"]
       .map((f) => readFileSync(resolve(__dirname, f), "utf8"))
       .join("\n")
       .replace(/\/\*[\s\S]*?\*\//g, "")

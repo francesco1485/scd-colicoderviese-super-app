@@ -49,7 +49,7 @@ import { useClubPulse } from "@/lib/use-club-pulse";
 import { openCookiePrefs } from "./CookieConsent";
 import { AccessMenu, loginSearch, openAccessMenu } from "./scd/AccessMenu";
 import { AREA_ICON } from "./scd/area-icons";
-import { CREDENTIALS_SENTENCE } from "@/lib/club-credentials";
+import { CLUB_CREDENTIALS, CREDENTIALS_SENTENCE, type CredentialId } from "@/lib/club-credentials";
 
 /** Nome ufficiale della società (sigla S.C.D., non invertire le lettere). */
 export const CLUB_NAME = "S.C.D. ColicoDerviese";
@@ -171,7 +171,7 @@ function Wordmark() {
   return (
     <span className="grid min-w-0 leading-none" data-testid="header-wordmark">
       <span className="text-[11px] font-bold tracking-[0.2em] text-white/90 lg:text-[12px]">S.C.D.</span>
-      <span className="whitespace-nowrap font-title text-[23px] font-black tracking-[0.01em] min-[380px]:text-[25px] lg:text-[26px]">
+      <span className="whitespace-nowrap font-title text-[19px] font-black tracking-[0.01em] min-[380px]:text-[21px] lg:text-[26px]">
         <span className="text-[#ffd600]">COLICO</span>
         <span className="text-white">DERVIESE</span>
       </span>
@@ -302,6 +302,47 @@ function TopTabs() {
   );
 }
 
+/**
+ * The three official marks in the top bar (Francesco 16/10/2026 07:07 «mettili in alto sulla barra, scontornati e
+ * piccoli, solo il Monza un po' più grande»): cut-out files on a small white plate, CR Lombardia and AC Monza linked
+ * to their official sites. Monza is larger: affiliation with a Serie A club.
+ */
+const CREDENTIAL_LINK: Partial<Record<CredentialId, string>> = {
+  lnd: "https://www.crlombardia.it/",
+  "insieme-al-monza": "https://www.acmonza.com/en/insieme-monza-dettaglio/mission/",
+};
+const CREDENTIAL_H: Record<CredentialId, string> = {
+  "figc-sgs-3-livello": "h-[15px] lg:h-[24px]",
+  lnd: "h-[18px] lg:h-[28px]",
+  "insieme-al-monza": "h-[23px] lg:h-[36px]",
+};
+
+function HeaderCredentials() {
+  return (
+    <ul
+      className="m-0 flex shrink-0 list-none items-center gap-1.5 rounded-[10px] bg-white px-1.5 py-1 shadow-[0_2px_8px_-3px_rgb(0_0_0/0.35)] lg:gap-3 lg:px-3 lg:py-1.5"
+      aria-label="Riconoscimenti e affiliazioni della società"
+      data-testid="header-credentials"
+    >
+      {CLUB_CREDENTIALS.map((c) => {
+        const img = <img src={c.art.src} alt={c.alt} decoding="async" className={`${CREDENTIAL_H[c.id]} w-auto object-contain`} />;
+        const href = CREDENTIAL_LINK[c.id];
+        return (
+          <li key={c.id} className="flex">
+            {href ? (
+              <a href={href} target="_blank" rel="noopener noreferrer" className="scd-focus flex rounded-[4px]" aria-label={`${c.title}, ${c.issuer}: sito ufficiale (apre una nuova scheda)`}>
+                {img}
+              </a>
+            ) : (
+              img
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
 export function SiteHeader() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const board = isBoardRoute(pathname);
@@ -313,16 +354,17 @@ export function SiteHeader() {
       <div className="flex h-full items-center gap-2 pl-3 pr-3 lg:gap-6 lg:pl-0 lg:pr-6">
         <Link
           to="/"
-          className="scd-focus flex min-h-11 min-w-0 items-center gap-2.5 rounded-md lg:w-[240px] lg:shrink-0 lg:px-5"
+          className="scd-focus flex min-h-11 min-w-0 items-center gap-2 rounded-md lg:w-[240px] lg:shrink-0 lg:px-5"
           aria-label={`${CLUB_NAME}, vai alla Home`}
         >
-          <ClubCrestOfficial size={46} className="drop-shadow-[0_2px_6px_rgb(0_0_0/0.35)] lg:hidden" />
+          <ClubCrestOfficial size={40} className="drop-shadow-[0_2px_6px_rgb(0_0_0/0.35)] lg:hidden" />
           <ClubCrestOfficial size={52} className="hidden drop-shadow-[0_2px_6px_rgb(0_0_0/0.35)] lg:block" />
           <Wordmark />
         </Link>
         <HeaderSearch />
         <TopTabs />
         <div className="ml-auto flex shrink-0 items-center gap-2 lg:ml-0 lg:gap-3">
+          <HeaderCredentials />
           {/* Desktop account button; on phones the same menu opens from the Profilo tab and the access screens. */}
           <div className="hidden lg:block">
             <AccessMenu />
@@ -330,7 +372,7 @@ export function SiteHeader() {
           <Link
             to="/comunicazioni"
             aria-label="Avvisi e comunicazioni del club"
-            className="scd-focus relative grid size-11 place-items-center rounded-full bg-white/12 text-white ring-1 ring-white/15 transition-colors duration-150 hover:bg-white/20"
+            className="scd-focus relative hidden size-11 place-items-center rounded-full bg-white/12 text-white ring-1 ring-white/15 transition-colors duration-150 hover:bg-white/20 lg:grid"
             data-testid="header-bell"
           >
             <Bell className="size-[22px]" strokeWidth={2} aria-hidden="true" />

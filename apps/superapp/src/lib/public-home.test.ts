@@ -46,7 +46,6 @@ const PUBLIC_HOME_FILES = [
   "src/components/home/PublicHome.tsx",
   "src/components/home/HomePractical.tsx",
   "src/components/home/HomeLobby.tsx",
-  "src/components/home/HomeBoard.tsx",
   "src/lib/home-week-board.ts",
   "src/components/home/HomePromo.tsx",
   "src/lib/home-board.ts",
@@ -96,23 +95,22 @@ describe("public home v5", () => {
     const lobby = code("src/components/home/HomeLobby.tsx");
     expect(lobby).toMatch(/weekBoardEvents\(calendar\.events, today\)/);
     expect(lobby).toContain('data-testid="home-lobby"');
-    expect(lobby).toContain("Nessuna gara nei prossimi 7 giorni.");
-    // Opponent crest only from the verified registry: empty disc when unknown, never an invented crest.
-    expect(lobby).toMatch(/const \{ src, label \} = crestFor\(name\);\s*if \(!src\) return <span aria-hidden="true"/);
+    expect(lobby).toContain("Nessuna gara nei prossimi 7 giorni");
     expect(lobby).not.toMatch(/publicTeamCrest|team-crest/);
-    // 16/10 05:59: the three credentials at the top (CR Lombardia and Monza linked), the Skores-style week board with
-    // birth years, the teams with championship and next game; no slider, no hero art, no mascot.
-    expect(lobby).toContain('data-testid="home-credentials"');
-    expect(lobby).toContain('"https://www.crlombardia.it/"');
-    expect(lobby).toContain('data-testid="home-board"');
-    expect(lobby).toContain('data-testid="home-teams"');
-    expect(lobby).not.toMatch(/setInterval|Carousel|slide|HeroArt|SkyJolly|PersonaAvatar/i);
-    // 16/10 06:35–06:51: social-profile home ("fammi iscrivere"): club profile with the lake cover (no pitch, no people),
-    // team circles with birth years, Post / Partite / Video tabs, Facebook-style posts whose like/comment ask to join.
-    for (const id of ["home-profile", "home-highlights", "home-tabs", "home-feed", "home-inside", "home-video", "home-join"])
+    // 16/10 07:05–07:10: few clear blocks — slim bar of the next games with Calendario and Allenamenti on it (no big
+    // calendar), the club with one "Iscriviti" and the countdown to the next home game, "In che anno sei nato?", Dal club.
+    for (const id of ["home-ticker", "bar-calendario", "bar-allenamenti", "home-profile", "home-countdown", "home-join", "home-years", "home-news"])
       expect(lobby).toContain(`data-testid="${id}"`);
+    expect(lobby).not.toMatch(/data-testid="home-(board|tabs|feed|inside|video|highlights)"/);
+    // Allenamenti are for members: the bar opens the access screen first.
+    expect(lobby).toMatch(/to="\/accedi" search=\{loginSearch\("\/allenamenti"\)\}/);
     expect(lobby).toContain('"/media/scd/lario-header.webp"');
-    expect(lobby).toMatch(/homeMode\(today\) === "partite" \? "partite" : "post"/);
+    expect(lobby).not.toMatch(/Carousel|slide|HeroArt|SkyJolly|PersonaAvatar|Pixellot/i);
+    // The three official marks live in the top bar, CR Lombardia and Monza linked.
+    const chrome = code("src/components/SiteChrome.tsx");
+    expect(chrome).toContain('data-testid="header-credentials"');
+    expect(chrome).toContain('"https://www.crlombardia.it/"');
+    expect(chrome).toContain('"https://www.acmonza.com/en/insieme-monza-dettaglio/mission/"');
   });
 
   it("home order (15/10 07:04, UD-134 09:18, new idea 21:35): notices, communication, lobby, results; no stories, no partner band", () => {

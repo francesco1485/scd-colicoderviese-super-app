@@ -1,9 +1,6 @@
 /**
- * Week board of the public home (Francesco 15/10/2026 21:35 «avevo detto che bisogna cambiare idea di grafica»;
- * 19:20 phone boards VR-025 «voglio questo, riprodurre questo e basta in tutto»).
- *
- * The home opens on the week of every team, in the style of the Calendario board: a week strip with the chosen day in
- * the blue circle, pill filters, games grouped by day as white rows with the coloured bar. Pure functions on the public
+ * Week board of the public home ("In campo questa settimana"): the games of every team in the next seven days, grouped
+ * by day. Pure functions on the public
  * calendar only (no trainings for visitors, UD-100; no invented data): the component renders what these return.
  */
 import { addDays } from "./board-data";
@@ -17,14 +14,6 @@ export const WEEK_BOARD_DAYS = 7;
 export const WEEK_BOARD_FILTERS = ["tutte", "casa", "agonistica", "base"] as const satisfies readonly MatchdayFilter[];
 export type WeekBoardFilter = (typeof WEEK_BOARD_FILTERS)[number];
 
-export const WEEK_BOARD_FILTER_LABEL: Readonly<Record<WeekBoardFilter, string>> = {
-  tutte: "Tutte",
-  casa: "In casa",
-  agonistica: "Agonistica",
-  base: "Attività di base",
-};
-
-const WD_SHORT = ["DOM", "LUN", "MAR", "MER", "GIO", "VEN", "SAB"] as const;
 const WD_LONG = ["domenica", "lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato"] as const;
 const MONTHS = [
   "gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno",
@@ -50,34 +39,6 @@ export function matchesWeekFilter(e: Pick<PublicEvent, "group" | "homeAway">, f:
   if (f === "tutte") return true;
   if (f === "casa") return e.homeAway === "CASA";
   return matchdayClass(e.group) === f;
-}
-
-export interface WeekDay {
-  date: string;
-  /** "SAB" */
-  short: string;
-  /** 17 */
-  day: number;
-  /** Games of that day with the current filter. */
-  count: number;
-  today: boolean;
-}
-
-/** The seven cells of the week strip, with the number of games of each day under the given filter. */
-export function weekStrip(events: readonly PublicEvent[], today: string, f: WeekBoardFilter): WeekDay[] {
-  const out: WeekDay[] = [];
-  for (let i = 0; i < WEEK_BOARD_DAYS; i++) {
-    const date = addDays(today, i);
-    const p = parts(date);
-    out.push({
-      date,
-      short: WD_SHORT[p.wd]!,
-      day: p.day,
-      count: events.filter((e) => e.date === date && matchesWeekFilter(e, f)).length,
-      today: i === 0,
-    });
-  }
-  return out;
 }
 
 export interface WeekGroup {
@@ -113,29 +74,4 @@ export function weekDayLabel(date: string, today: string): string {
   if (date === today) return `Oggi · ${base}`;
   if (date === addDays(today, 1)) return `Domani · ${base}`;
   return base.charAt(0).toUpperCase() + base.slice(1);
-}
-
-/** "15 – 21 ottobre" or "29 ottobre – 4 novembre". */
-export function weekRangeLabel(today: string): string {
-  const a = parts(today);
-  const b = parts(addDays(today, WEEK_BOARD_DAYS - 1));
-  return a.month === b.month
-    ? `${a.day} – ${b.day} ${MONTHS[b.month]}`
-    : `${a.day} ${MONTHS[a.month]} – ${b.day} ${MONTHS[b.month]}`;
-}
-
-/** "1 gara", "6 gare". */
-export function gamesLabel(n: number): string {
-  return n === 1 ? "1 gara" : `${n} gare`;
-}
-
-/**
- * Home mode by Rome weekday (Francesco 16/10/2026 06:21): Monday–Thursday the club's week (only the small ticker of
- * the next games), Friday–Sunday "si gioca" (the full match board to bring people to the field).
- */
-export type HomeMode = "settimana" | "partite";
-
-export function homeMode(today: string): HomeMode {
-  const wd = new Date(`${today}T12:00:00Z`).getUTCDay();
-  return wd === 5 || wd === 6 || wd === 0 ? "partite" : "settimana";
 }
