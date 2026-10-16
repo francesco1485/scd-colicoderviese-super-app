@@ -28,6 +28,7 @@ const SUB_AREA_COPY: Readonly<Record<string, { label: string; icon: AreaIcon }>>
   posta: { label: "Posta del club", icon: "file" },
   "posta-collega": { label: "Collega la casella", icon: "file" },
   lotteria: { label: "Lotteria dello sport", icon: "coin" },
+  struttura: { label: "Attività in struttura", icon: "home" },
 };
 
 /** Plain Italian for the role ids used in the registry. */
@@ -49,6 +50,9 @@ const ROLE_LABEL: Readonly<Record<string, string>> = {
   presidente: "Presidente",
   "direttore-generale": "Direttore generale",
   "coordinatore-attivita-sportiva": "Coordinatore attività sportiva",
+  "responsabile-struttura": "responsabile struttura",
+  "responsabile-struttura-colico": "responsabile struttura Colico",
+  "responsabile-struttura-dervio": "responsabile struttura Dervio",
 };
 
 /** Registry notes written in technical English, shown in Italian. */
