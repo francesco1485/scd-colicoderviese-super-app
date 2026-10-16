@@ -141,8 +141,8 @@ describe("scheda per la Direzione", () => {
     const dv: Booking = { ...clash, pitch: "DV", date: "2026-10-25" };
     const brief = directionBrief(dv, ctx);
     expect(brief).toMatch(/già informato con il programma stagionale/);
-    expect(brief).toMatch(/avviso a FIGC \(LND\/SGS\) e squadra avversaria/);
-    expect(brief).not.toMatch(/avviso solo/);
+    expect(brief).toMatch(/avviso solo a FIGC \(LND\/SGS\) e squadra avversaria/);
+    expect(brief).not.toMatch(/arbitr/i);
     expect(brief).toMatch(
       /Proposta, da confermare: fuori dal programma stagionale, decide la Direzione/,
     );

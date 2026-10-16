@@ -574,7 +574,7 @@ export function SimulazioneTab({
             Il Comune di Dervio è già informato con il programma stagionale:
             nessun avviso gara per gara. La squadra che gioca a Dervio è
             avvisata {TEAM_NOTICE_DAYS} giorni prima; se piove e la gara torna a
-            Colico, avviso a {RAIN_MOVE_NOTICE_TO}. La Prima Squadra resta
+            Colico, avviso solo a {RAIN_MOVE_NOTICE_TO}. La Prima Squadra resta
             sempre a Colico.
           </li>
           <li>

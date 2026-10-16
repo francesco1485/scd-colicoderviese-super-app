@@ -9,7 +9,8 @@
  * the club decided to evaluate rotations with simulations. On 2026-10-16 the DG
  * decided that the Comune di Dervio is already informed with the season programme
  * (no per-match notice to the Comune); a weather move from Dervio back to Colico
- * is notified to FIGC (LND/SGS) and the opponent club only. Team names only,
+ * is notified to FIGC (LND/SGS) and the opponent club only; the club does not notify
+ * the referee, FIGC does («no va avvisato la figc», 15:18). Team names only,
  * never names of minors.
  *
  * Board sources: Visual Master VR-022 `Rotazione-campi.dc.html`, `Rotazione-Dervio.dc.html`.
@@ -89,7 +90,10 @@ export const DEFAULT_MAX_DERVIO_PER_DAY = 2;
  * per ora, avvisato sul programma»).
  */
 export const TEAM_NOTICE_DAYS = 14;
-/** Who is notified when bad weather moves a Dervio match back to Colico (DG 2026-10-16). */
+/**
+ * Who is notified (and nobody else) when bad weather moves a Dervio match back to Colico
+ * (DG 2026-10-16; 15:18 «no va avvisato la figc»: the referee is informed by FIGC, not by the club).
+ */
 export const RAIN_MOVE_NOTICE_TO = "FIGC (LND/SGS) e squadra avversaria";
 /**
  * PROPOSED (not said by Francesco, UD-162 `proposed`): a use of Dervio outside the season

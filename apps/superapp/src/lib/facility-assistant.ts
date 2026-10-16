@@ -458,7 +458,7 @@ function answerConflicts(ctx: AssistantContext): AssistantAnswer {
 /** Who is notified for a Dervio match (DG decision 2026-10-16). */
 const NOTICE_RULES: readonly string[] = [
   `Avviso alla squadra che gioca ${TEAM_NOTICE_DAYS} giorni prima, a tutti 3 giorni prima.`,
-  `Se piove e la gara torna a Colico: avviso a ${RAIN_MOVE_NOTICE_TO}.`,
+  `Se piove e la gara torna a Colico: avviso solo a ${RAIN_MOVE_NOTICE_TO} (la FIGC avvisa l'arbitro).`,
 ];
 
 function answerNotice(ctx: AssistantContext): AssistantAnswer {

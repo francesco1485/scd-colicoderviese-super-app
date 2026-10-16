@@ -239,7 +239,7 @@ export function directionBrief(b: Booking, ctx: BriefContext): string {
     );
     if (b.kind === "gara")
       lines.push(
-        `Maltempo: se la gara torna a Colico, avviso a ${RAIN_MOVE_NOTICE_TO}.`,
+        `Maltempo: se la gara torna a Colico, avviso solo a ${RAIN_MOVE_NOTICE_TO}.`,
       );
   }
   lines.push(`Richiesto da: ${ctx.requestedBy || "—"}`);

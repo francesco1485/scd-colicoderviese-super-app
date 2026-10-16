@@ -192,7 +192,7 @@ describe("answers from the engine", () => {
     expect(none.text).toMatch(/nessuna gara è a Dervio/);
     expect(none.text).toMatch(/già informato con il programma stagionale/);
     expect(none.details.join(" ")).toMatch(
-      /Se piove e la gara torna a Colico: avviso a FIGC \(LND\/SGS\) e squadra avversaria/,
+      /Se piove e la gara torna a Colico: avviso solo a FIGC \(LND\/SGS\) e squadra avversaria \(la FIGC avvisa l'arbitro\)/,
     );
     expect(none.details.join(" ")).not.toMatch(/30 giorni|un mese/);
     const auto = PRESETS.find((p) => p.id === "auto")!;
@@ -248,11 +248,13 @@ describe("Dervio rules of 2026-10-16 (UD-162)", () => {
     expect(proc.details.join(" ")).not.toMatch(/30 giorni/);
   });
 
-  it("never says 'solo' for the rain-move notice and keeps late notices at warn", () => {
+  it("rain-move notice goes only to FIGC and the opponent (FIGC informs the referee) and late notices stay warn", () => {
     const auto = PRESETS.find((p) => p.id === "auto")!;
     const a = answerQuestion("chi devo avvisare per le gare a Dervio?", ctxFor({ auto: true, modes: auto.modes }));
     expect(a.tone).toBe("warn");
-    expect([a.text, ...a.details].join(" ")).not.toMatch(/avviso solo/);
+    const all = [a.text, ...a.details].join(" ");
+    expect(all).toMatch(/avviso solo a FIGC \(LND\/SGS\) e squadra avversaria/);
+    expect(all).not.toMatch(/avvis\w* (?:anche )?all'arbitro|e all'arbitro/);
   });
 });
 

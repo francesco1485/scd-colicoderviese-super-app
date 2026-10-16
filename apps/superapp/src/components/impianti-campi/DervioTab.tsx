@@ -340,8 +340,8 @@ export function DervioTab({
             </p>
           )}
           <Src>
-            {COMUNE_DERVIO_NOTE} Se piove e la gara torna a Colico: avviso a{" "}
-            {RAIN_MOVE_NOTICE_TO}. Nessun avviso è stato inviato.
+            {COMUNE_DERVIO_NOTE} Se piove e la gara torna a Colico: avviso solo
+            a {RAIN_MOVE_NOTICE_TO} (la FIGC avvisa l&apos;arbitro). Nessun avviso è stato inviato.
           </Src>
         </Card>
         <section
