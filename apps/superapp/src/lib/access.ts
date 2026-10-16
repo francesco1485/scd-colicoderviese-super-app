@@ -51,9 +51,9 @@ const ROLE_LABEL: Readonly<Record<string, string>> = {
   presidente: "Presidente",
   "direttore-generale": "Direttore generale",
   "coordinatore-attivita-sportiva": "Coordinatore attività sportiva",
-  "responsabile-struttura": "responsabile struttura",
-  "responsabile-struttura-colico": "responsabile struttura Colico",
-  "responsabile-struttura-dervio": "responsabile struttura Dervio",
+  "responsabile-struttura": "Responsabile struttura",
+  "responsabile-struttura-colico": "Responsabile struttura Colico",
+  "responsabile-struttura-dervio": "Responsabile struttura Dervio",
 };
 
 /** Registry notes written in technical English, shown in Italian. */

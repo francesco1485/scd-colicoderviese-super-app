@@ -3688,12 +3688,12 @@
       ],
       "id": "UD-160",
       "name": "DERVIO_ONE_MATCH_PER_WEEK_NO_PUBLISH_YET_GESTIONALI_DESIGN_FIRST",
-      "context": "Francesco 16/10/2026 08:53 (chat PC).",
+      "context": "Francesco 16/10/2026 08:53 (chat PC). Francesco 16/10/2026 11:52 «pubblica»: publish of release/pc-20261016 authorised (Planning, Struttura read + write fail-closed until r137, Infermeria/Nutrizionista, chi-fa-cosa and dervio-rotation libs, orchestra).",
       "normalizedCommand": {
         "rule": "Dervio rotation: 1 home youth match per week for now (from the youngest, from Saturday 24/10/2026). Do not publish the PC branches yet (Planning, Struttura, Infermeria/Nutrizionista, orchestra) until Francesco says so. The new API: the chat verifies which one it is and proposes what to build with it. The many gestionali still to create must be reasoned carefully (design with Francesco before building).",
         "scope": "DERVIO_ROTATION_PUBLISHING_API_GESTIONALI",
         "engines": "PERSONE and TEMPO",
-        "status": "RECORDED"
+        "status": "PUBLISHED_PER_FRANCESCO_2026-10-16_1152"
       }
     }
   ],
