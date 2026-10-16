@@ -3749,6 +3749,63 @@
           "status": "PROPOSED"
         }
       }
+    },
+    {
+      "sourceDate": "2026-10-16",
+      "sourceTime": "afternoon before 16:30 (exact time not recorded); 16:31; ~16:42",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-164",
+      "name": "IRIDE_V4_FRIENDLIES_CONFIRMED_BY_DG_ON_WHATSAPP",
+      "sourceQuoteFragments": [
+        "meglio che manda un sms a direttore generale e lui conferma",
+        "sì, semplifica",
+        "WhatsApp",
+        "ok Iride v4 (16:31)",
+        "Sì, accendi la copia (~16:42, test copies only)"
+      ],
+      "context": "Francesco (DG) 16/10/2026, chat PC, after finding the friendly procedure of UD-154/UD-155 too difficult («troppo difficile questa procedura»). Design in claude.ai project work (PROPOSTA_CONFERMA_DG, chat PC working folder); prompt and blueprints recorded in automations/make/segreteria-ai/ (system-prompt.it.md v4, blueprint-v4.json, promemoria-dg-v4.json, prompt-diff-v3-v4.txt, test-v4-risultati.md). UD-163 is taken by branch feat/pc-vetrina-richieste, so this entry takes UD-164. Tests T1-T10 all PASS on the inactive copies 8000995 and 8001010 with test data stores and fake TESTIRIDE numbers, no real message or mail sent; both copies switched off afterwards (VERIFIED by the PC chat with scenarios_get). The live scenario 7979437 still runs v3 and was not touched.",
+      "normalizedCommand": {
+        "rule": "A friendly request reaching Iride is confirmed or refused only by the Direttore Generale, on WhatsApp from the club number. Iride collects only team (category), date and opponent (time and pitch are decided by the club and never asked), never confirms a friendly herself, and tells the requester the request went to the Direttore Generale. Make (not the AI) creates the code AM-nnnn and sends it to the DG with SÌ/NO buttons, or by internal [Iride] mail to the club inbox when the DG is outside the WhatsApp 24-hour window. Only a message from the number whose verified role in the Iride rubrica (data store 220276, field ruolo, written only by a person in Make) is DIRETTORE GENERALE can decide; the same SÌ/NO AM-code from any other number is logged IGNORATO with no reply and no change; a plain «sì» from anyone else stays a normal conversation. Iride then tells the requester the outcome (time and pitch from the Segreteria) and logs it in SCD_INTAKE_LOG.",
+        "scope": "SECRETARIAT_FRIENDLIES_DG_CONFIRMATION",
+        "engines": "TEMPO (one tap of the DG instead of a multi-person procedure) and PERSONE (the requester gets the outcome on the same chat)",
+        "measure": "friendly requests with AM code decided by the DG; AM requests still IN_ATTESA_DG after 48 hours (reminder mails); confirmations accepted from numbers without the DIRETTORE GENERALE role = 0",
+        "status": "TESTED_ON_INACTIVE_COPY_NOT_APPLIED_TO_LIVE_7979437",
+        "constraints": [
+          "v4 reaches the live scenario 7979437 only after Francesco's explicit OK with the diff shown; the 48-hour reminder scenario is created inactive and switched on only with his OK",
+          "the DG number never appears in blueprints, repo, mails or reports: Make reads it from the rubrica (to = +{{67.key}})",
+          "no names of minors: teams are categories; the requester is stored with first name only",
+          "prompt rule 8 rewritten (friendly as a separate rule) and rules 15-16 added; system-prompt.it.md and the Make module stay byte-identical"
+        ],
+        "proposed": [
+          {
+            "text": "Data store 'SCD · Richieste in attesa DG' (221453) holds the requester's WhatsApp number and first name; decided records deleted 30 days after the decision. Retention rule not said by Francesco.",
+            "status": "PROPOSED"
+          },
+          {
+            "text": "Sector shown to the DG for information (Responsabile attività di base / DS settore agonistico / DS generale / Segreteria) computed by Make from the team; mapping of U14, U17, Allievi and 'Giovanissimi = U15' not confirmed by Francesco.",
+            "status": "PROPOSED"
+          },
+          {
+            "text": "Meta WhatsApp utility templates scd_conferma_amichevole and scd_esito_richiesta (v4.1) to reach the DG and the requester outside the 24-hour window; price for Italy UNKNOWN until read on the official Meta rate card.",
+            "status": "PROPOSED"
+          },
+          {
+            "text": "INTAKE_LOG field 'AI:' aligned with the fixed Make text when the request goes to the DG (v4.1).",
+            "status": "PROPOSED"
+          }
+        ],
+        "implementation": {
+          "make_scenario": "7979437 'SCD · Segreteria AI · WhatsApp' (live v3, unchanged); v4 tested on copy 8000995, reminder on copy 8001010 (both OFF)",
+          "prompt_source": "automations/make/segreteria-ai/system-prompt.it.md",
+          "blueprints": [
+            "automations/make/segreteria-ai/blueprint-v4.json",
+            "automations/make/segreteria-ai/promemoria-dg-v4.json"
+          ],
+          "test_report": "automations/make/segreteria-ai/test-v4-risultati.md",
+          "register": "SCD_INTAKE_LOG"
+        }
+      }
     }
   ],
   "completionGate": {
