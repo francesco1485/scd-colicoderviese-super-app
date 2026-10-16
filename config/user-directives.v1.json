@@ -3487,6 +3487,29 @@
           "automations/make/segreteria-ai (chat PC)"
         ]
       }
+    },
+    {
+      "sourceDate": "2026-10-16",
+      "sourceTime": "08:37",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-157",
+      "name": "ORCHESTRA_IMMEDIATE_COMMAND_BOTH_CHATS",
+      "sourceQuoteFragments": [
+        "porta il lavoro dell'altra chat qui cosi possiamo lavorare meglio … lavoro dell'ultima ora cosi capisci … e poi lo performiamo o miglioriamo e rendiamo a tutti come comando immediato"
+      ],
+      "context": "Francesco 16/10/2026 08:37 (chat PC). Explicit order that lets the PC chat bring in and improve the agents work of the cloud chat (branch feat/cloud-agenti: PIPELINE.md, MIGLIORAMENTI.md, scd-azioni and the new agents, UD-141) for this job only; the cloud chat home graphics (feat/cloud-grafica) stay out until Francesco says ok.",
+      "normalizedCommand": {
+        "rule": "Any chat starts the agent orchestra with one immediate command: '«orchestra: <obiettivo>»'. scd-azioni then (0) syncs both chats - SCD:STATE, latest work of both chats (remote git branches ordered by last commit, project docs of the day in claude/, requests in section 5 of claude/SCD_DIVISIONE_COMPITI.md) - (1) picks the route in .claude/agents/PIPELINE.md, (2) launches independent squads in parallel, (3) runs the mandatory gates, (4) reports STATE / PROGRESS / BLOCKERS / NEXT in Italian. The command never widens permissions: the chat division (AGENTS.md SCD:SESSIONI), the publication and migration gates and the hard stops stay the same.",
+        "scope": "ALL_CHATS_AGENT_ORCHESTRA",
+        "engines": "TEMPO (one sentence starts the whole chain, no re-explaining the other chat's work; measured as minutes from command to first plan and number of duplicated or conflicting branches per week)",
+        "status": "IMPLEMENTED_ON_BRANCH_FEAT_PC_ORCHESTRA",
+        "appliesTo": [
+          ".claude/agents/PIPELINE.md",
+          ".claude/agents/scd-azioni.md",
+          "AGENTS.md SCD:TEAM"
+        ]
+      }
     }
   ],
   "completionGate": {

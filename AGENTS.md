@@ -234,6 +234,8 @@ Gli hook non sostituiscono i gate: li rendono obbligatori.
 
 Installati il 14/10/2026 su richiesta di Francesco ("Istalla e fai tutto … anche a tutte le chat presenti e future"). Valgono per ogni sessione Claude Code su questo repository (chat cloud, chat PC, attività programmate).
 
+**Orchestra (UD-157):** percorso completo, squadre e catene per piattaforma in `.claude/agents/PIPELINE.md`; da qualsiasi chat il comando immediato «orchestra: <obiettivo>» avvia `scd-azioni` (sincronizza le due chat, sceglie il percorso, lancia le squadre, controlli obbligatori, resoconto STATE/PROGRESS/BLOCKERS/NEXT).
+
 Sequenza per ogni lavoro non banale:
 1. **Pianifica** — `ecc-planner` (passi, rischi, file) dopo SCD:STATE/EXPERT.
 2. **Architettura** — `ecc-architect` / `ecc-code-explorer` per capire l'esistente prima di sostituirlo.
