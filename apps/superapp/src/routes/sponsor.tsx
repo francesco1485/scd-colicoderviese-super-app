@@ -44,14 +44,14 @@ function Sponsor() {
   return (
     <main>
       <PageHero eyebrow="Commercial Hub · Sponsor & Partner" title={<>Il tuo brand, <span className="text-accent">in campo</span> ogni settimana.</>} action={<ShareButton page={SHARE_PAGES.sponsor} />}>
-        Un media sportivo locale: prima squadra, settore giovanile, famiglie e tifosi dell'Alto Lario. Visibilità fisica e digitale, misurabile.
+        Un media sportivo locale: prima squadra, settore giovanile, famiglie e tifosi dell'Alto Lario. Visibilità fisica e digitale.
       </PageHero>
 
       <section className={`${heroOverlapCls} mx-auto grid max-w-6xl grid-cols-3 gap-3 px-4`}>
         {[
           { icon: MonitorSmartphone, t: "App & digitale", d: "Banner, card, ticker, notifiche" },
           { icon: Trees, t: "Campo & territorio", d: "Led, tornei, club house" },
-          { icon: BarChart3, t: "Misurabile", d: "Impression, click e lead" },
+          { icon: BarChart3, t: "Report in arrivo", d: "Impression e click: da misurare" },
         ].map((x) => (
           <div key={x.t} className="card-premium p-4">
             <x.icon className="size-5 text-primary" />
