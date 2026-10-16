@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.39.3",
+    "version": "3.40.0",
     "effective_at": "2026-10-15",
     "status": "BINDING",
     "language": "it-IT",
@@ -878,6 +878,7 @@
         "team_assignment": "r72 (2026-10-12): Segreteria/Direzione confirm a PENDING athlete and assign a team, add a second team (multi-annata call-ups) or move (previous membership closed with valid_to, never removed); registration_status VERIFIED only when the Secretariat declares it saw the FIGC registration; history in scd_person_events (ENTRATA / CAMBIO_SQUADRA with from/to team) and scd_audit_events TEAM_ASSIGN — supabase/migrations/20261012_r72_team_assignment.sql, scd_staff_assign_team, /segreteria/persone (teams of athletes now listed and filterable, 'senza squadra')",
         "secretariat_desk": "r73 (2026-10-12): read-only function scd_secretariat_desk(org) returns the day's queue as COUNTS only (access requests pending, people pending, athletes without team, registration unverified, certificates missing/expired/expiring 30d/declared, call-ups pending in 72h, accounts never signed in); Direzione/Segreteria only; shown as 'Scrivania del giorno' on /segreteria with a link per line (Persone with ?squadra=nessuna / ?stato=pending, Certificati, Accessi) — supabase/migrations/20261012_r73_secretariat_desk.sql, src/lib/secretariat-desk.ts",
         "transport_live": "r110 (2026-10-15, STAGED NOT APPLIED): Pulmino in diretta phase 1 — scd_transport_live_drivers/sessions/points with RLS on, no policies, no grants; SECURITY DEFINER scd_transport_live_start (only the account linked to the assigned driver, day of the run, from departure-60 min to planned end+60 min, acknowledgement on first start), _ping (driver only, >=10 s apart, accuracy <=500 m, fix <=2 min old), _stop (driver or transport office), _view (driver: own runs today; families: runs with a CONFIRMED seat of their circle, status/last update/distance only, no coordinates, no names; office: also coordinates), _purge (service_role: closes expired sessions, deletes points >24 h and sessions >90 days), _link_driver (transport office). App: transport-live.ts (pure rules + tests), transport-live.functions.ts (fail-closed on missing scd_transport_live_engine), TransportLiveDriverPanel on /pulmini, TransportLiveFamilyCard on /famiglia; Permissions-Policy geolocation=(self) only on /pulmini.",
+        "requests_intake": "r139 (2026-10-16, STAGED NOT APPLIED, applied only after Francesco writes «applica r139»; requires r33, r35, r74, r133 applied, guarded; r133 has no row in schema_migrations: compare the live checks and the three r133 reads before applying): Vetrina richieste phase F1 (UD-163). ONE catalogue public.scd_requests (r133) opened to the external kinds ISCRIZIONE_TORNEO, SPONSOR, CONVENZIONE, AFFITTO_CAMPO, VISITA_CENTRO, ALTRO (channel TALLY/VETRINA, states RICEVUTA -> IN_VALUTAZIONE -> ACCETTATA | RIFIUTATA -> IN_GESTIONE -> CHIUSA, ANNULLATA; kind/status check keeps friendlies on the r133 states, the two sets disjoint). New nullable columns (area, site, public_code V-YY-NNNN, requester_kind, source_ref tally:<id> unique, owner_position, decision times, payment_status/amount/link set only by the position tesoreria after ACCETTATA). External contacts in scd_request_contacts (RLS on, no policies, no grants; adult + privacy consent required; purged 6 months after refusal/cancel, 12 after close; scd_request_contacts_purge service role only; every read logged CONTATTO_LETTO). scd_request_ingest(org, payload) service role only (future Make scenario of the single Tally form «Richieste alla SCD»): strict whitelist per kind, contacts and health words redacted, idempotent, hourly cap. scd_intake_board/decide/contact/payment_set/notices per chi-fa-cosa positions (DG + Presidente + Direzione always decide; UD-156 Dervio rule); r133 scd_requests_board/scd_request_form/scd_request_notices recreated with kind = 'AMICHEVOLE'. App: /gestionale block «Vetrina richieste» and /gestionale/richieste (area intake), fail closed on the probe scd_intake_kinds (registry-live.server.ts r139Live); public links from config/scd-requests-intake.v1.json intakeTallyFormUrl (null = «Modulo in preparazione»). Mirror: apps/superapp/src/lib/intake-kinds.ts. Tests: supabase/tests/r139_requests_intake.pglite.mjs, apps/superapp/src/lib/intake-migration.test.ts, intake-kinds.test.ts, intake-links.test.ts.",
         "position_catalog": "r138 (2026-10-16, STAGED NOT APPLIED, applied only after Francesco writes «applica r138»; requires r59, r65/r100, r74, r111, r133, r135, r136 applied, guarded): Francesco 16/10/2026 13:35 catalogo ruoli. scd_position_catalog (one row per organisation and organigram position: 118 FIGC/LND/SGS/RASD/D.Lgs 36 and club positions, figc_labels = exact Carica texts of the FIGC Anagrafe Federale organigramma (Francesco 16/10/2026 14:39), lnd_label = qualifica of the Portale Società LND Organigramma VERIFIED 16/10/2026 14:30, seeded ACTIVE and EMPTY; custom-<slug> positions PROPOSED until approved) and scd_coach_qualifications (24 Settore Tecnico qualifications, an attribute of the holder, never a position); RLS on, no policies, no grants. The holder stays in the existing registry scd_structure_roles (new nullable columns position_code with FK to the catalogue and qualification_code; trigger: only ACTIVE positions, qualification only where accepted). scd_position_catalog_board(org) returns positions with holder COUNTS only (organigram readers); scd_create_custom_position / scd_set_position_status only for Presidente or Direttore Generale (r111 scd_is_role_creator), audited CREATE_POSITION / POSITION_STATUS in scd_access_audit. Also: scd_section_platform = r111 list + nutrizione; direttore-sportivo-agonistica / direttore-sportivo-generale / responsabile-safeguarding / fisioterapista assignable only by the Direzione (scd_access_admin_guard assignable + office_pos, UD-161; the app offers them only when r138 is verified live, registry-live.server.ts); the direttori sportivi are Dervio and Colico readers (scd_structure_reader_site, UD-156 + 13:32) and confirmers of U16/U15 and Prima/U19 (scd_request_group_confirmers, UD-154). Mirror: config/scd-position-catalog.v1.json. Tests: supabase/tests/r138_position_catalog.pglite.mjs, apps/superapp/src/lib/position-catalog.test.ts.",
         "structure_activities_write": "r137 (2026-10-16, STAGED NOT APPLIED, applied only after Francesco writes «applica r137»; requires r135 applied and r79 work queue, guarded): write path of G04 Attivita in struttura (/gestionale/struttura). Append-only audit scd_structure_activity_events (RLS on, no policies, no grants, trigger refuses update/delete); writer gate scd_structure_writer = DIRECTION role or positions presidente/direttore-generale (UD-159, not executable by authenticated); probe scd_structure_write_access(org) -> {canWrite} (missing = page says 'Scrittura non ancora attiva', fail closed); SECURITY DEFINER scd_structure_activity_create/update/cancel with fixed search_path, 42501 for non-writers, validated input (no e-mail/phone, role ids only, Europe/Rome times), rows never deleted. Every change notifies the Segreteria in the existing queue scd_proposals (machine G04, area segreteria, UD-156); DERVIO notices are generic (no title, time or kind) because the queue is also read by office positions that do not read Dervio. Tests: supabase/tests/r137_structure_activities_write.pglite.mjs, apps/superapp/src/lib/structure-write-migration.test.ts.",
         "transport_board": "r74 (2026-10-12): Pulmini in Supabase (scd_transport_vehicles/drivers/stops/riders/runs); scd_transport_sync(org,payload) copies the 05_PULMINI master (sheet stays master, rows missing are deactivated, no rider names); scd_transport_board for responsabile-trasporti/Direzione/Segreteria (autista read without phones); scd_transport_plan_run refuses double bookings and is audited; r99 (2026-10-13, UD-108): vans under the trainings on /pulmini — the four vans stay separate units (Pulmino 1 Lago, 2 Lecco, 3 Valtellina, 4 Chiavenna), a rider goes on the van written in the Master (vehicle) or else on the van of his exact line (LAGO/LECCO, COLICO, DA VERIFICARE reported as 'da collocare'), per training slot andata/ritorno from the weekday flags; tapping a van shows who is always on board, destination Centro Sportivo Colico, route from the Master stops (line board 2026/27 only as labelled fallback, times never invented), driver role and 8 + autista seats. Riders' first/last name copied from the same Master (scd_transport_riders.first_name/last_name/vehicle_label, scd_transport_sync_rider_names) and read only through scd_transport_rider_roster (same audience as scd_transport_board); the server function getPulminiVans (apps/superapp/src/lib/pulmini-vans.functions.ts) gives names only with an open non-preview gate + board + roster, formatted by RIDER_NAME_FORMAT (first name + surname initial) and allowlisted (no codes, phones, parents, stops of a child, notes); staging preview and other sessions get counts and 'Nomi visibili solo con accesso del responsabile trasporti' — supabase/migrations/20261013_r99_transport_rider_names.sql (written, NOT applied until Direzione approval)",
@@ -2083,6 +2084,51 @@
           "LOG_APPEND_ONLY_RLS_NO_POLICIES_ACCESS_ONLY_VIA_SECURITY_DEFINER"
         ],
         "imported_at": "2026-10-15"
+      },
+      {
+        "id": "SCD_RICHIESTE_VETRINA",
+        "kind": "INTERNAL_WORKFLOW",
+        "trust": "INTERNAL_VERIFIED",
+        "status": "STAGED_INACTIVE_UNTIL_R139_APPLIED",
+        "approval": "Francesco 16/10/2026 15:44 «Esterni Tally, soci app» and «Li crea la Tesoreria» (UD-163); migration r139 not applied, Tally form not created",
+        "title": "Vetrina richieste: one catalogue of requests from outside (tournament registrations, sponsors, convenzioni, field rentals, visits, other) fed by ONE public Tally form «Richieste alla SCD» (branch per kind, hidden field tipo) through a service-role ingest",
+        "endpoint": "Supabase SCD PULSE scd_request_ingest (service role, future Make scenario) and SECURITY DEFINER scd_intake_* (no direct table access); Tally form URL in config/scd-requests-intake.v1.json (null until created)",
+        "authority_domains": [
+          "EXTERNAL_REQUESTS_INTAKE",
+          "REQUEST_DECISIONS",
+          "REQUEST_PAYMENT_TRACE"
+        ],
+        "storage": "supabase/migrations/20261017_r139_requests_intake.sql (STAGED): scd_requests + scd_request_events (r133) extended, scd_request_contacts (purged)",
+        "consumers": [
+          "apps/superapp/src/lib/intake-kinds.ts",
+          "apps/superapp/src/lib/intake-links.ts",
+          "apps/superapp/src/lib/intake.functions.ts",
+          "apps/superapp/src/components/intake/IntakeViews.tsx",
+          "apps/superapp/src/routes/gestionale.richieste.tsx",
+          "apps/superapp/src/routes/gestionale.index.tsx"
+        ],
+        "routes": [
+          "/gestionale",
+          "/gestionale/richieste"
+        ],
+        "rules": [
+          "ONE_CATALOGUE_SCD_REQUESTS_NO_NEW_REQUEST_TABLES",
+          "EXTERNALS_TALLY_MEMBERS_APP_NO_MINORS_NAMES_THROUGH_TALLY",
+          "STATES_RICEVUTA_IN_VALUTAZIONE_ACCETTATA_NON_ACCOLTA_IN_GESTIONE_CHIUSA",
+          "PAYMENT_ONLY_AFTER_ACCEPTANCE_LINK_CREATED_BY_A_TESORERIA_PERSON_RECORDED_ON_THE_REQUEST",
+          "SPONSOR_AND_CONVENZIONI_INVOICED_NEVER_BY_LINK",
+          "ADULT_REFERENT_AND_PRIVACY_CONSENT_REQUIRED_CONTACTS_SEPARATE_AND_PURGED",
+          "NO_HEALTH_FREE_TEXT_REDACTED_AS_A_WHOLE",
+          "IN_APP_NOTICES_ONLY_NO_AUTOMATIC_MAIL_A_PERSON_REPLIES",
+          "DECIDERS_FROM_CHI_FA_COSA_DG_CONFIRMS_EVERYTHING_UD_156_DERVIO",
+          "NEVER_TEST_SUBMIT_ON_THE_LIVE_TALLY_FORM",
+          "UNTIL_R139_APPLIED_FUNZIONE_IN_PREPARAZIONE"
+        ],
+        "engines": {
+          "TEMPO": "one catalogue instead of mails and calls; measured by median hours RICEVUTA -> decision (decided_at - received_at) and requests handled without a phone call",
+          "SOLDI": "tournament fees and field rentals traced from acceptance to payment; measured by accepted requests RISCONTRATO within 7 days of LINK_INVIATO"
+        },
+        "imported_at": "2026-10-16"
       },
       {
         "id": "SCD_SALUTE",
