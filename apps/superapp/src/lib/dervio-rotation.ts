@@ -599,8 +599,8 @@ export interface RainForecast {
 }
 
 /**
- * Thresholds for "rain is forecast" (clamped to 0–100). PROPOSED defaults (not decided
- * by the DG yet): probability ≥ 50% or ≥ 1 mm.
+ * Thresholds for "rain is forecast" (clamped to 0–100). VERIFIED defaults (DG decision
+ * 16/10/2026 12:04, «pioggia ok»): probability ≥ 50% or ≥ 1 mm.
  */
 export interface RainThresholds {
   minProbability: number;
