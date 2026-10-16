@@ -38,7 +38,8 @@ export type WorkAreaId =
   | "posta-collega"
   | "lotteria"
   | "gestionale"
-  | "quadro";
+  | "quadro"
+  | "planning";
 
 export interface DriveMaster {
   key: string;
@@ -75,6 +76,7 @@ export const DRIVE_MASTERS = {
   cervelloneDrive: { key: "cervelloneDrive", name: "SCD CERVELLONE · Catalogo e Memoria (Drive)", fileId: null, note: "cartella privata della società" },
   contoSumup: { key: "contoSumup", name: "Conto SumUp della società · estratto movimenti", fileId: null, note: "estratto caricato da Direzione/Tesoreria, privato" },
   supabase: { key: "supabase", name: "Supabase SCD · persone, ruoli e storico", fileId: null, note: "database del club (r59)" },
+  tornei: { key: "tornei", name: "Master Tornei & Iniziative", fileId: null, note: "tornei già pubblicati nell'app; file da collegare" },
   posta: { key: "posta", name: "Casella sportclubcolico@gmail.com", fileId: null, note: "collegamento Gmail da attivare dalla Direzione" },
 } as const satisfies Record<string, DriveMaster>;
 
@@ -264,6 +266,12 @@ export const WORK_AREAS: Readonly<Record<WorkAreaId, WorkAreaConfig>> = {
     description: "Squadre, partite e attività della settimana dal calendario ufficiale e dal quadro allenamenti. Solo per lo staff con accesso.",
     sources: ["calendario", "quadro", "impianti", "inserimenti"],
     insertRoles: uniq([...registryRoles("gestionale"), "Direzione"]),
+  },
+  planning: {
+    id: "planning", label: "Planning annuale", path: pathOf("planning"), railId: "gestionale",
+    description: "La stagione 2026/27 in una pagina: gare ufficiali, tornei ed eventi, scadenze del club e federali, mese per mese. Solo per lo staff con accesso.",
+    sources: ["calendario", "tornei", "sgsManuale", "cervelloneDrive", "inserimenti"],
+    insertRoles: ["Direzione", "Segreteria", "Coordinatore attività sportiva"],
   },
   quadro: {
     id: "quadro", label: "Quadro settimanale", path: pathOf("quadro"), railId: "quadro",

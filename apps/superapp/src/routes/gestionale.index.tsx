@@ -5,6 +5,7 @@ import { EMPTY_QUADRO } from "@/lib/public-snapshots";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   AlertTriangle,
+  CalendarRange,
   ChevronLeft,
   ChevronRight,
   Clock3,
@@ -178,6 +179,7 @@ function GestionalePage() {
         </SnapshotNotice>
 
         <ImpiantiEntry live={impiantiLive} />
+        <PlanningEntry />
 
         <div className="grid grid-cols-1 gap-[18px] lg:grid-cols-[300px_minmax(0,1fr)]">
           <Card
@@ -483,6 +485,27 @@ function ImpiantiEntry({ live }: { live: boolean }) {
     >
       {body}
     </div>
+  );
+}
+
+/** Entry to the season planning (matches, tournaments and events, deadlines from 01/07/2026 to 30/06/2027). */
+function PlanningEntry() {
+  return (
+    <Link
+      to="/gestionale/planning"
+      className="scd-focus flex items-center gap-4 rounded-2xl border border-[var(--in-line)] bg-white px-4 py-3.5 shadow-[var(--in-card-shadow)] transition-colors duration-150 hover:bg-[var(--in-info-bg)] sm:px-6"
+    >
+      <span className="flex size-12 flex-none items-center justify-center rounded-xl bg-[var(--in-info-bg)] text-[var(--in-info)]">
+        <CalendarRange className="size-6" strokeWidth={1.8} aria-hidden="true" />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-[18px] font-bold leading-tight">Planning annuale</span>
+        <span className="mt-1 block text-[14.5px] leading-snug text-[var(--in-sub)]">
+          La stagione 2026/27 in una pagina: gare, tornei ed eventi, scadenze del club e federali
+        </span>
+      </span>
+      <ChevronRight className="size-5 flex-none text-[var(--in-info)]" strokeWidth={2.2} aria-hidden="true" />
+    </Link>
   );
 }
 

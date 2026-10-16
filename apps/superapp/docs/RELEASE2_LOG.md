@@ -742,3 +742,12 @@ Backlog cloud B7. Motori: PERSONE (una famiglia o un nonno che chiede la strada 
 - Test `club-directions.test.ts` (16): domanda "come arrivo al campo?" con via, comune e link Maps di Colico e Dervio; riconoscimento domande; trasferte escluse; niente link senza via; stesso link nel contesto di Vera.
 - Revisione 1: scd-sicurezza PASS (nota: "dove" generico non deve dare le vie); scd-revisore BLOCK (e-mail/PEC/sede legale, "come vengo iscritto", pulmino/kit, campo di un altro comune) → corretto: serve un luogo fisico nostro, esclusi contatti, iscrizioni, pulmini, kit/maglie, trasferte, partite senza "in casa" e "campo di <altro comune>"; il "dove" generico del motore a regole rimanda a Impianti e Calendario; 17 casi negativi e 3 test su `answerPublic` (niente modello né contesto per la strada; safeguarding prima; contatti al modello).
 - Gate: tsc, vitest 167 file / 1854 test, build, test:bundle 11/11, test:manifest PASS, test:claude-hooks 8/8.
+
+## 16/10/2026 · Planning annuale 2026/27 in /gestionale/planning (chat PC, ramo feat/pc-planning-annuale)
+
+Motore: TEMPO (Direzione e staff vedono in una pagina gare, tornei ed eventi e scadenze della stagione). Richiesta di Francesco 16/10/2026 06:23 «mancano tutti i gestionali che avevo chiesto»; UD-038 ("analizzare il calendario annuale").
+- Nuovo `lib/season-planning.ts`: unisce calendario ufficiale (171 gare, Master Calendario), tornei ed eventi già nell'app, scadenze quote (Direzione Generale 08/10/2026), scadenze federali SGS (C.U. n.18) e scadenze del Cervellone (solo con ruolo d'ufficio, via `scd_kb_search`). Mesi senza calendario pubblicato mostrati "—", mai 0.
+- Pagina `routes/gestionale.planning.tsx`: stesso accesso delle altre pagine /gestionale (`getWorkAreaGate`, area `planning`); telefono: mese con frecce e righe con barra colorata; computer: 12 mesi e riquadri numerici. Nessun dato di minori, nessuna vetrina.
+- Il riquadro "scadenze nei prossimi 30 giorni" resta "parziale" finché una fonte di scadenze non è collegata (oggi LND/CRL). Lettura del Cervellone non riuscita → "lettura non riuscita, riprova", non "serve l'accesso".
+- Revisione 1: scd-sicurezza PASS; scd-revisore BLOCK (conteggio scadenze completo con LND scollegato) → corretto con test. Revisione 2: scd-revisore PASS.
+- Nessuna migrazione, nessun cambio di ruoli o permessi.
