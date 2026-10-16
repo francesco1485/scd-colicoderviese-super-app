@@ -385,3 +385,202 @@ export function siteBadge(week: StructureWeek, site: StructureSite): SiteBadge {
     srText: "dato non completo: allenamenti non presenti nel quadro",
   };
 }
+
+/* ------------------------------------------------------------------------------------------------------------------
+ * Writing (migration r137, STAGED until Francesco writes "applica r137").
+ * UD-159 (Francesco 16/10/2026 08:53): the activities are decided in the gestionale by the Direttore Generale and the
+ * Presidente. Writers = DIRECTION role, or positions presidente / direttore-generale (mirror of scd_structure_writer,
+ * kept equal by structure-write-migration.test.ts). UD-156: every insert, change or cancellation leaves an in-app
+ * notice for the Segreteria in the work queue (/gestionale/coda): the database does it, never the browser.
+ * ---------------------------------------------------------------------------------------------------------------- */
+
+export const STRUCTURE_WRITER_ROLES = ["DIRECTION"] as const;
+export const STRUCTURE_WRITER_POSITIONS = ["presidente", "direttore-generale"] as const;
+
+/**
+ * Session rule for the writers (same as scd_structure_writer). Used only to decide whether to explain that writing is
+ * not active yet; the form opens only when the database itself says canWrite (structureWriteState).
+ */
+export function structureCanWrite(dbRoles: readonly string[], positions: ReadonlySet<string>): boolean {
+  return (
+    dbRoles.some((r) => (STRUCTURE_WRITER_ROLES as readonly string[]).includes(r)) ||
+    STRUCTURE_WRITER_POSITIONS.some((p) => positions.has(p))
+  );
+}
+
+/**
+ * Whether the page offers writing:
+ *   "on"          the database (scd_structure_write_access) says this person may write: the form is shown;
+ *   "not-applied" the function is missing (r137 not applied): writers by session see "Scrittura non ancora attiva";
+ *   "unavailable" the check failed: writers by session see "Scrittura non disponibile ora";
+ *   "off"         not a writer (or no session): nothing is shown.
+ * Fail closed: only "on" shows the form.
+ */
+export type StructureWriteState = "on" | "not-applied" | "unavailable" | "off";
+export type StructureWriteProbe = { canWrite: boolean } | "missing" | "error" | null;
+
+export function structureWriteState(sessionWriter: boolean, probe: StructureWriteProbe): StructureWriteState {
+  if (probe && typeof probe === "object") return probe.canWrite === true ? "on" : "off";
+  if (!sessionWriter) return "off";
+  if (probe === "missing") return "not-applied";
+  if (probe === "error") return "unavailable";
+  return "off";
+}
+
+/** Answer of scd_structure_write_access: anything but {canWrite: true} is "no". */
+export function parseWriteAccess(input: unknown): { canWrite: boolean } {
+  return { canWrite: !!input && typeof input === "object" && (input as Record<string, unknown>)["canWrite"] === true };
+}
+
+/** Form values (Europe/Rome day and times). An end not after the start means the next day (at most 24 hours). */
+export interface StructureDraft {
+  site: StructureSite;
+  area: StructureArea;
+  kind: StructureKind;
+  title: string;
+  /** "YYYY-MM-DD" */
+  date: string;
+  /** "HH:MM" */
+  start: string;
+  end: string;
+  responsibleRole: string | null;
+  covered: boolean;
+  notes: string | null;
+}
+
+export type StructureWriteCode =
+  | "input"
+  | "site"
+  | "area"
+  | "kind"
+  | "title"
+  | "contact"
+  | "notes"
+  | "role"
+  | "date"
+  | "date_range"
+  | "time"
+  | "reason"
+  | "not_found"
+  | "cancelled";
+
+/** Plain Italian message for every code of r137 (and of the same checks in the browser). */
+export const STRUCTURE_WRITE_MESSAGES: Readonly<Record<StructureWriteCode, string>> = {
+  input: "Dati non validi: controlla il modulo e riprova.",
+  site: "Scegli la sede: Colico o Dervio.",
+  area: "Scegli dove: campo, spogliatoi, Club House o palestra.",
+  kind: "Scegli il tipo di attività.",
+  title: "Il titolo deve avere da 2 a 80 caratteri.",
+  contact: "Non scrivere numeri di telefono o indirizzi e-mail: indica solo il ruolo.",
+  notes: "Le note possono avere al massimo 300 caratteri.",
+  role: "Il responsabile si indica con un ruolo dell'elenco, mai con un nome.",
+  date: "Giorno non valido.",
+  date_range: "Il giorno deve essere tra 7 giorni fa e un anno da oggi.",
+  time: "Orari non validi: inizio e fine devono essere diversi (una fine prima dell'inizio vale per il giorno dopo).",
+  reason: "Il motivo può avere al massimo 300 caratteri.",
+  not_found: "Attività non trovata: forse è stata cambiata da un'altra persona. Ricarica la pagina.",
+  cancelled: "L'attività è già annullata e non si può più modificare.",
+};
+
+export function isStructureWriteCode(v: unknown): v is StructureWriteCode {
+  return typeof v === "string" && Object.prototype.hasOwnProperty.call(STRUCTURE_WRITE_MESSAGES, v);
+}
+
+const MAIL = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/;
+const PHONE = /(\+|00)?[0-9]([ ./-]?[0-9]){8,}/;
+const HHMM = /^([01][0-9]|2[0-3]):[0-5][0-9]$/;
+const hasContact = (s: string) => MAIL.test(s) || PHONE.test(s);
+
+function validDate(iso: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(iso)) return false;
+  const [y, m, d] = iso.split("-").map(Number) as [number, number, number];
+  const t = new Date(Date.UTC(y, m - 1, d));
+  return t.getUTCFullYear() === y && t.getUTCMonth() === m - 1 && t.getUTCDate() === d;
+}
+
+/**
+ * Same checks as scd_structure_activity_clean (r137), in the same order, so the form answers before the round trip.
+ * The database checks again: this never replaces it. `today` is the club day (Europe/Rome).
+ */
+export function validateStructureDraft(
+  input: Partial<Record<keyof StructureDraft, unknown>>,
+  today: string,
+): { ok: true; value: StructureDraft } | { ok: false; code: StructureWriteCode } {
+  const fail = (code: StructureWriteCode) => ({ ok: false as const, code });
+  const { site, area, kind } = input;
+  if (!oneOf(STRUCTURE_SITES, site)) return fail("site");
+  if (!oneOf(STRUCTURE_AREAS, area)) return fail("area");
+  if (!oneOf(STRUCTURE_KINDS, kind)) return fail("kind");
+  const title = typeof input.title === "string" ? input.title.trim() : "";
+  if (title.length < 2 || title.length > 80) return fail("title");
+  if (hasContact(title)) return fail("contact");
+  const notes = typeof input.notes === "string" && input.notes.trim() ? input.notes.trim() : null;
+  if (notes && notes.length > 300) return fail("notes");
+  if (notes && hasContact(notes)) return fail("contact");
+  const role = typeof input.responsibleRole === "string" && input.responsibleRole.trim() ? input.responsibleRole.trim() : null;
+  if (role && !ROLE_ID.test(role)) return fail("role");
+  if (input.covered !== undefined && input.covered !== null && typeof input.covered !== "boolean") return fail("input");
+  const date = typeof input.date === "string" ? input.date : "";
+  if (!validDate(date)) return fail("date");
+  if (date < addDays(today, -7) || date > addDays(today, 366)) return fail("date_range");
+  const start = typeof input.start === "string" ? input.start : "";
+  const end = typeof input.end === "string" ? input.end : "";
+  if (!HHMM.test(start) || !HHMM.test(end) || start === end) return fail("time");
+  return {
+    ok: true,
+    value: { site, area, kind, title, date, start, end, responsibleRole: role, covered: input.covered === true, notes },
+  };
+}
+
+/** Cancellation reason: optional, at most 300 characters, no phone numbers or e-mail addresses. */
+export function validateCancelReason(reason: unknown): { ok: true; value: string | null } | { ok: false; code: StructureWriteCode } {
+  const r = typeof reason === "string" && reason.trim() ? reason.trim() : null;
+  if (r && r.length > 300) return { ok: false, code: "reason" };
+  if (r && hasContact(r)) return { ok: false, code: "contact" };
+  return { ok: true, value: r };
+}
+
+/** Form values of a registered activity (Rome day and times), to edit it. */
+export function draftFromActivity(a: StructureActivity): StructureDraft | null {
+  const s = romeParts(a.startsAt);
+  const e = romeParts(a.endsAt);
+  if (!s || !e) return null;
+  return {
+    site: a.site,
+    area: a.area,
+    kind: a.kind,
+    title: a.title,
+    date: s.date,
+    start: s.time,
+    end: e.time,
+    responsibleRole: a.responsibleRole,
+    covered: a.covered,
+    notes: a.notes,
+  };
+}
+
+/** Empty form for a new activity on `date` at `site`. */
+export function emptyDraft(site: StructureSite, date: string): StructureDraft {
+  return { site, area: "CAMPO", kind: "TURNO_VOLONTARIO", title: "", date, start: "18:00", end: "20:00", responsibleRole: null, covered: false, notes: null };
+}
+
+/** Roles offered as "responsabile" in the form: the positions that run the centres (never a person). */
+export const STRUCTURE_RESPONSIBLE_OPTIONS: readonly string[] = STRUCTURE_READER_POSITIONS_BY_SITE.COLICO;
+
+/** Plain messages of the write path (shown by the page; the server returns them). */
+export const STRUCTURE_WRITE_OFF =
+  "Scrittura non ancora attiva: l'inserimento delle attività si apre quando la Direzione approva l'aggiornamento del registro.";
+export const STRUCTURE_WRITE_UNAVAILABLE = "Scrittura non disponibile ora, riprova più tardi.";
+export const STRUCTURE_WRITE_DENIED = "Non puoi cambiare le attività: le decidono la Direzione, il Presidente e il Direttore generale.";
+export const STRUCTURE_WRITE_FAILED = "Salvataggio non riuscito, riprova più tardi.";
+export const STRUCTURE_WRITE_NO_SESSION = "Accesso non valido: entra con il tuo account del club.";
+export const STRUCTURE_NOTICED = " La Segreteria è stata avvisata nella coda del gestionale.";
+
+export interface StructureWriteOutcome {
+  ok: boolean;
+  message: string;
+}
+
+/** Text shown with the form: the Segreteria is always informed (UD-156). */
+export const STRUCTURE_SEGRETERIA_NOTICE =
+  "La Segreteria riceve un avviso nella coda del gestionale a ogni inserimento, modifica o annullamento.";

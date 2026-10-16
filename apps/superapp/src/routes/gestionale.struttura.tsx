@@ -1,4 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import {
   Activity,
   CalendarDays,
@@ -9,6 +10,7 @@ import {
   DoorOpen,
   Dumbbell,
   Moon,
+  Plus,
   Sparkles,
   Trophy,
   Users,
@@ -21,7 +23,15 @@ import { EmptyState, SourcesBox, WorkAreaGateView, WorkAreaShell, workAreaHead }
 import { roleLabel } from "@/lib/access";
 import { dateParts } from "@/lib/board-data";
 import { freshnessLabel } from "@/lib/public-snapshots";
-import { emptyStructureBoard, structureOffMessage, getStructureBoard, type StructureBoard } from "@/lib/structure-activities.functions";
+import { StructureWriteForm, StructureWriteNotice } from "@/features/struttura/StructureWriteForm";
+import {
+  cancelStructureActivity,
+  emptyStructureBoard,
+  getStructureBoard,
+  saveStructureActivity,
+  structureOffMessage,
+  type StructureBoard,
+} from "@/lib/structure-activities.functions";
 import { getWorkAreaGate } from "@/lib/work-areas.functions";
 import {
   KIND_LABEL,
@@ -31,6 +41,8 @@ import {
   WEEK_OFFSET_MAX,
   WEEK_OFFSET_MIN,
   buildStructureWeek,
+  draftFromActivity,
+  emptyDraft,
   siteBadge,
   viewableSites,
   type StructureSite,
@@ -44,7 +56,10 @@ import {
  * shown as they are; shifts, openings, closings, evening activities and Club House evenings come from r135 (applied
  * on SCD PULSE 16/10/2026). When the registry is not read the page says why (not reachable, or access not linked to
  * the club profile) and the shift KPIs stay unknown; a read error is announced by one role="alert" only. Roles only,
- * never names; no minors' data. Read-only.
+ * never names; no minors' data.
+ * Writing (r137, STAGED): only when the database says canWrite (Direzione, Presidente, DG, UD-159) the card "Decidi le
+ * attività" offers add, edit and cancel; every change notifies the Segreteria in the work queue (UD-156). Without r137
+ * writers read "Scrittura non ancora attiva". Not optimistic: after a save the loader reads the week again.
  * Desktop: VR-026 (KPI tiles, 7-day grid). Phone: VR-025 (site pills, week strip, day list with coloured bar).
  */
 export const Route = createFileRoute("/gestionale/struttura")({
@@ -106,6 +121,19 @@ function StrutturaPage({ data }: { data: StructureBoard }) {
     setPicked(null);
   };
 
+  const router = useRouter();
+  const save = useServerFn(saveStructureActivity);
+  const cancel = useServerFn(cancelStructureActivity);
+  const [writer, setWriter] = useState<{ mode: "closed" } | { mode: "new" } | { mode: "edit"; id: string }>({ mode: "closed" });
+  const [done, setDone] = useState<string | null>(null);
+  const canWrite = data.write === "on";
+  const editingActivity = writer.mode === "edit" ? (data.activities ?? []).find((a) => a.id === writer.id) ?? null : null;
+  const editingDraft = editingActivity ? draftFromActivity(editingActivity) : null;
+  const openWriter = (next: { mode: "new" } | { mode: "edit"; id: string }) => {
+    setDone(null);
+    setWriter(next);
+  };
+
   const notReady = !data.ready;
   return (
     <WorkAreaShell
@@ -127,6 +155,12 @@ function StrutturaPage({ data }: { data: StructureBoard }) {
             Turni volontari, aperture, chiusure, attività serali e serate Club House non sono stati letti. Ora vedi solo
             allenamenti e gare in casa già noti.
           </p>
+        </div>
+      )}
+      <StructureWriteNotice state={data.write} />
+      {done && (
+        <div role="status" className="rounded-2xl border border-[#9fd4b0] bg-[#effaf2] px-4 py-3 text-[14.5px] font-semibold text-[#17603a]">
+          {done}
         </div>
       )}
       {data.ready && data.error && (
@@ -260,6 +294,39 @@ function StrutturaPage({ data }: { data: StructureBoard }) {
         </div>
 
         <div className="flex min-w-0 flex-col gap-[18px]">
+          {canWrite && (
+            <Card id="str-decidi" title="Decidi le attività" sub="Direzione, Presidente e Direttore generale. La Segreteria è avvisata di ogni cambio.">
+              <div className="px-4 pb-4 sm:px-[18px]">
+                {writer.mode === "closed" || (writer.mode === "edit" && !editingDraft) ? (
+                  <button
+                    type="button"
+                    onClick={() => openWriter({ mode: "new" })}
+                    className="scd-focus inline-flex min-h-11 items-center gap-2 rounded-[10px] bg-[var(--in-info)] px-3.5 text-[15px] font-bold text-white"
+                  >
+                    <Plus className="size-4" aria-hidden="true" />
+                    Nuova attività
+                  </button>
+                ) : (
+                  <StructureWriteForm
+                    key={writer.mode === "edit" ? writer.id : "new"}
+                    state={data.write}
+                    today={data.today}
+                    sites={viewable}
+                    editing={writer.mode === "edit" && editingDraft ? { id: writer.id, draft: editingDraft } : null}
+                    initial={emptyDraft(site, week.days.includes(data.today) ? data.today : selectedDay.date)}
+                    onSave={(input) => save({ data: input })}
+                    onCancelActivity={(input) => cancel({ data: input })}
+                    onDone={(message) => {
+                      setWriter({ mode: "closed" });
+                      setDone(message);
+                      void router.invalidate();
+                    }}
+                    onClose={() => setWriter({ mode: "closed" })}
+                  />
+                )}
+              </div>
+            </Card>
+          )}
           <Card id="str-turni" title="Turni e aperture" sub="Volontari, staff e tesserati in struttura: il responsabile è un ruolo, mai un nome.">
             <div className="px-4 pb-4 sm:px-[18px]">
               {data.ready && data.activities === null ? (
@@ -270,7 +337,10 @@ function StrutturaPage({ data }: { data: StructureBoard }) {
                   quando il registro risponde, qui compaiono turni volontari, aperture, chiusure e chi è di turno per ruolo.
                 </EmptyState>
               ) : (
-                <ShiftSummary items={week.sites.COLICO.concat(week.sites.DERVIO).flatMap((d) => d.items).filter((i) => i.source === "STRUTTURA")} />
+                <ShiftSummary
+                  items={week.sites.COLICO.concat(week.sites.DERVIO).flatMap((d) => d.items).filter((i) => i.source === "STRUTTURA")}
+                  onEdit={canWrite ? (itemId) => openWriter({ mode: "edit", id: itemId.replace(/^str-/, "") }) : undefined}
+                />
               )}
             </div>
           </Card>
@@ -279,6 +349,7 @@ function StrutturaPage({ data }: { data: StructureBoard }) {
               <li className="py-1"><b>Attività note in settimana</b>: allenamenti (solo Colico: il quadro non ha Dervio), gare in casa e attività registrate nelle due sedi, annullate escluse. Per Dervio il numero non è completo: "—" se non c'è nulla di noto, "solo gare" se ci sono solo gare in casa.</li>
               <li className="py-1"><b>Turni scoperti</b>: turni volontari, aperture e chiusure senza nessuno.</li>
               <li className="py-1"><b>Serate Club House</b>: sere con un'attività al Club House dalle 18:00.</li>
+              <li className="py-1"><b>Chi decide</b>: le attività le inseriscono, cambiano e annullano la Direzione, il Presidente e il Direttore generale; la Segreteria riceve un avviso nella coda del gestionale a ogni cambio.</li>
               <li className="py-1"><b>Dervio riservato</b>: la sede di Dervio la vedono Direzione, Segreteria, presidente, coordinatore attività sportiva e responsabile attività di base. Per gli altri i numeri contano solo Colico.</li>
             </ul>
           </Card>
@@ -392,7 +463,7 @@ function GridItem({ item: i }: { item: WeekItem }) {
   );
 }
 
-function ShiftSummary({ items }: { items: WeekItem[] }) {
+function ShiftSummary({ items, onEdit }: { items: WeekItem[]; onEdit?: ((itemId: string) => void) | undefined }) {
   if (items.length === 0) {
     return (
       <EmptyState title="Nessun turno registrato in questa settimana">
@@ -411,7 +482,19 @@ function ShiftSummary({ items }: { items: WeekItem[] }) {
               {i.responsibleRole && <> · {roleLabel(i.responsibleRole)}</>}
             </span>
           </span>
-          <StatusChip item={i} />
+          <span className="flex flex-none flex-col items-end gap-1.5">
+            <StatusChip item={i} />
+            {onEdit && !i.cancelled && (
+              <button
+                type="button"
+                onClick={() => onEdit(i.id)}
+                aria-label={`Modifica ${i.title}`}
+                className="scd-focus min-h-9 rounded-[9px] border border-[#b9d5ef] bg-white px-2.5 text-[13.5px] font-semibold text-[var(--in-info)] hover:bg-[var(--in-info-bg)]"
+              >
+                Modifica
+              </button>
+            )}
+          </span>
         </li>
       ))}
     </ul>

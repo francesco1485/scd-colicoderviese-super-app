@@ -48,6 +48,8 @@ export const MACHINE_LABEL: Readonly<Record<string, string>> = {
   M11: "Fornitori ed economia",
   M16: "Cervellone",
   M22: "Magazzino",
+  /** Notices of r137: every change of "Attività in struttura" informs the Segreteria (UD-156). */
+  G04: "Attività in struttura",
 };
 
 export interface Proposal {
