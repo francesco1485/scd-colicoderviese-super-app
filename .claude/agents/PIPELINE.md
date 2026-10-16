@@ -56,6 +56,7 @@ Francesco 16/10 08:14: agenti in serie presenti in ogni piattaforma del gestiona
 | Nutrizionista | richieste RISERVATE | scd-infermeria | scd-legale | solo nutrizionista e Direzione |
 | Rotazione gare Dervio | Master Calendario, meteo, Comune di Dervio, LND/SGS | scd-impianti | scd-squadre, scd-figc-lnd, scd-segreteria | Squadre, Segreteria, Comune di Dervio, Calendar |
 | Sponsor, partner, LED | CRM, contratti, spot | scd-commerciale | scd-sponsor, scd-ledwall | Comunicazioni, Tesoreria, Tornei |
+| Prima pagina del giorno | calendario, risultati, eventi, sponsor, novità app, stampa locale | scd-super-giornalista | scd-comunicazione, scd-social, scd-crescita, scd-community, scd-grafica | Home dell'app, social, Comunicazioni |
 | Comunicazioni e social | notizie, gare, iniziative | scd-comunicazione | scd-social, scd-crescita | Tutte le piattaforme pubbliche |
 | Community, fantacalcio, Top 11 | app, eventi | scd-community | scd-relazioni, scd-crescita | Comunicazioni, Club House |
 | Tornei ed eventi | master tornei, iscrizioni | scd-tornei | scd-negoziazione, scd-commerciale | Impianti, Pulmini, Calendar |
