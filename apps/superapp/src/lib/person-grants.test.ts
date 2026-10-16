@@ -119,8 +119,11 @@ describe("migration r100 stays in sync with the catalogue", () => {
 
   const R136_SECTIONS = ["nutrizione"];
 
-  it("the latest catalogue (r136) is the whole config file", () => {
-    expect(literal("cat", SQL136)).toEqual(SECTIONS.map(asSql));
+  it("the config file is r136 (live r100 + nutrizione) plus the r101 sections (CLOUD, not applied)", () => {
+    const r136 = literal("cat", SQL136) as Array<{ code: string }>;
+    expect([...r136, ...(literal("cat", SQL101) as Array<{ code: string }>).filter((x) => R101_SECTIONS.includes(x.code))]
+      .map((x) => x.code).sort()).toEqual(SECTIONS.map((s) => s.code).sort());
+    expect(r136).toEqual(SECTIONS.filter((s) => !R101_SECTIONS.includes(s.code)).map(asSql));
   });
 
   it("r101 keeps every r100 entry identical and only appends the UD-113 sections", () => {
@@ -131,11 +134,12 @@ describe("migration r100 stays in sync with the catalogue", () => {
     expect(SECTIONS.filter((s) => ![...R101_SECTIONS, ...R136_SECTIONS].includes(s.code)).map(asSql)).toEqual(r100);
   });
 
-  it("r136 keeps every r101 entry identical and only appends nutrizione", () => {
-    const r101 = literal("cat", SQL101) as unknown[];
+  it("r136 keeps every live r100 entry identical, only appends nutrizione and never introduces r101 sections", () => {
+    const r100 = literal("cat") as unknown[];
     const r136 = literal("cat", SQL136) as Array<{ code: string }>;
-    expect(r136.slice(0, r101.length)).toEqual(r101);
-    expect(r136.slice(r101.length).map((x) => x.code)).toEqual(R136_SECTIONS);
+    expect(r136.slice(0, r100.length)).toEqual(r100);
+    expect(r136.slice(r100.length).map((x) => x.code)).toEqual(R136_SECTIONS);
+    expect(r136.some((x) => R101_SECTIONS.includes(x.code))).toBe(false);
   });
 
   it("embeds the same role suggestions, role baselines and role kinds", () => {

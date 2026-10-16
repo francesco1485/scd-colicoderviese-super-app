@@ -1,10 +1,14 @@
 -- r136: Infermeria and Nutrizionista (DG 15/10/2026 14:33 "infermeria, nutrizionista"; 16/10 06:23 "a pieno regime").
--- STAGED: written, NOT applied by an agent. Apply only after the explicit "applica" of the Direzione
--- (Francesco 16/10/2026 07:04 "Applica r136", then "Senza infortuni per ora": the main session applies this file).
+-- APPLIED on SCD PULSE (ndevtxxijbcnskgysdit) 16/10/2026 by the main session after Francesco wrote "Applica r136"
+-- (07:04) and chose "Senza infortuni per ora". Before applying: prerequisites present; scd_access_admin_guard and
+-- scd_proposal_queue verified identical to live except the r136 lines; catalogue identical to live r100 (35 entries).
+-- After: RLS on kits/AED with 0 policies, no table grants, scd_health_staff not executable by authenticated,
+-- catalogue 36 entries (nutrizione, no r101 sections), no injury objects, guard accepts "nutrizionista".
 -- Requires r59/r61 (people, athletes, families, identity links), r66 (certificate register), r74 (scd_has_position),
 -- r79 (scd_proposals, scd_proposal_ingest, scd_proposal_queue) and r100 (scd_person_grants, scd_level_rank) applied.
--- Apply after r101: section 1 recreates scd_section_catalog() with every r101 entry identical and appends
--- "nutrizione". If r101 is ever applied after r136, run r136 again (the whole file is idempotent).
+-- Section 1 recreates scd_section_catalog() identical to the LIVE catalogue of SCD PULSE (r100, verified 16/10/2026,
+-- 35 entries) plus "nutrizione". r101 (chat CLOUD, not applied) is NOT included: when r101 is applied, its catalogue
+-- must carry "nutrizione" too (request written to the CLOUD chat), otherwise the section disappears.
 --
 -- INJURIES REGISTER DEFERRED until the consent design (UD-043, UD-047: minors' health data only to the person, the
 -- parent and the club doctor, with consent). This file creates no injury table and no injury function.
@@ -30,7 +34,7 @@
 -- initial; exception messages never carry values; nothing is written to an audit or log table.
 -- Never run on dfnwzwutvnwiitiffwvr. Target: SCD PULSE.
 
--- 1. Section catalogue: r101 entries unchanged, "nutrizione" appended.
+-- 1. Section catalogue: live (r100) entries unchanged, "nutrizione" appended.
 create or replace function public.scd_section_catalog()
 returns table (code text, levels text[], perimeters text[], base boolean, hard_blocked boolean, direction_only boolean, sensitive boolean)
 language sql
@@ -78,10 +82,6 @@ as $$
   {"code":"accessi","levels":["READ"],"perimeters":["ALL"],"base":false,"hard_blocked":false,"direction_only":false,"sensitive":true},
   {"code":"posta-collega","levels":[],"perimeters":[],"base":false,"hard_blocked":false,"direction_only":true,"sensitive":true},
   {"code":"partner","levels":["READ","WRITE"],"perimeters":["SELF"],"base":false,"hard_blocked":false,"direction_only":false,"sensitive":false},
-  {"code":"fondo-solidale","levels":["READ","WRITE","APPROVE"],"perimeters":["ALL"],"base":false,"hard_blocked":false,"direction_only":false,"sensitive":true},
-  {"code":"adotta","levels":["READ","WRITE","APPROVE"],"perimeters":["ALL"],"base":false,"hard_blocked":false,"direction_only":false,"sensitive":false},
-  {"code":"donazioni","levels":["READ","WRITE","APPROVE"],"perimeters":["ALL"],"base":false,"hard_blocked":false,"direction_only":false,"sensitive":true},
-  {"code":"proposte","levels":["READ","WRITE","APPROVE"],"perimeters":["ALL"],"base":false,"hard_blocked":false,"direction_only":false,"sensitive":false},
   {"code":"nutrizione","levels":["READ","WRITE"],"perimeters":["ALL"],"base":false,"hard_blocked":false,"direction_only":false,"sensitive":true}
 ]
 $cat$::jsonb) as x(code text, levels jsonb, perimeters jsonb, base boolean, hard_blocked boolean, direction_only boolean, sensitive boolean);

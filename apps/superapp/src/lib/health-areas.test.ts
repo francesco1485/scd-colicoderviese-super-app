@@ -295,10 +295,10 @@ describe("work queue title (nutrition requests)", () => {
   });
 });
 
-describe("migration r136 (staged, never applied by an agent)", () => {
-  it("is written, applied only by a person, and never targets the other project", () => {
-    expect(SQL).toMatch(/STAGED: written, NOT applied by an agent/);
-    expect(SQL).toMatch(/"applica"/);
+describe("migration r136 (applied after Francesco's \"Applica r136\")", () => {
+  it("records the explicit approval, the apply checks, and never targets the other project", () => {
+    expect(SQL).toMatch(/APPLIED on SCD PULSE \(ndevtxxijbcnskgysdit\)/);
+    expect(SQL).toMatch(/"Applica r136"\s*\n?--\s*\(07:04\)/);
     expect(SQL.match(/dfnwzwutvnwiitiffwvr/g)?.length ?? 0).toBe(1); // only the "never run on" warning
     expect(SQL).toMatch(/Never run on dfnwzwutvnwiitiffwvr/);
   });

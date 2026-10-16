@@ -156,10 +156,10 @@ const ok = (cond, msg) => {
   checks += 1;
 };
 
-// Catalogue: nutrizione appended, r101 sections kept.
+// Catalogue: nutrizione appended to the live r100 catalogue; r101 entries are not introduced by r136.
 const cat = await db.query(`select code, sensitive from public.scd_section_catalog()`);
 ok(cat.rows.some((r) => r.code === "nutrizione" && r.sensitive), "nutrizione in catalogue, sensitive");
-ok(cat.rows.some((r) => r.code === "proposte"), "r101 entries kept");
+ok(!cat.rows.some((r) => r.code === "proposte"), "r101 entries not introduced by r136");
 ok(cat.rows.some((r) => r.code === "salute-minori"), "hard block kept");
 
 // Injuries register deferred (UD-043 consent design): no table, no function.

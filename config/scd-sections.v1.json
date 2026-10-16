@@ -1,7 +1,7 @@
 {
   "schema": "scd.sections.v1",
   "id": "SCD_SECTIONS_V1",
-  "status": "R100_APPLIED_R101_STAGED_R136_APPROVED_APPLY_PENDING",
+  "status": "R100_APPLIED_R101_STAGED_R136_APPLIED",
   "updated": "2026-10-16",
   "authority": "DIREZIONE_SCD",
   "directive": "UD-112",

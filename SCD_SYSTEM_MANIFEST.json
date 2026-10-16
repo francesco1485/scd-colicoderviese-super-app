@@ -2086,7 +2086,7 @@
         "id": "SCD_SALUTE",
         "kind": "INTERNAL_WORKFLOW",
         "trust": "INTERNAL_VERIFIED",
-        "status": "APPROVED_APPLY_PENDING_R136",
+        "status": "APPLIED_R136",
         "approval": "Francesco 16/10/2026 07:04 'Applica r136', then 'Senza infortuni per ora': applied by the main session; injuries register deferred until the consent design (UD-043, UD-047)",
         "title": "Infermeria and Nutrizionista (DG 15/10/2026 14:33; 16/10 06:23 'a pieno regime'): certificate expiry board (read-only), first-aid kits and AED/BLSD per site; nutrition guidance by age group and consultation requests. Injuries register deferred (UD-043 consent design)",
         "endpoint": "Supabase SCD PULSE SECURITY DEFINER functions scd_health_staff, scd_infermeria_*, scd_nutrition_* (no direct table access)",
