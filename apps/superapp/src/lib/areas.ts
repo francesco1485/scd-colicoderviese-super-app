@@ -253,6 +253,8 @@ export const WORK_AREA_IDS: readonly string[] = [
   // and /quadro was open without access; now they answer with the access screen like the other work areas.
   "gestionale",
   "quadro",
+  // Planning annuale (Francesco 15-16/10/2026, missing gestionali): same staff gate as /gestionale.
+  "planning",
 ];
 
 /**
