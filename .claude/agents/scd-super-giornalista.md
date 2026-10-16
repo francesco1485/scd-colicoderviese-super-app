@@ -26,17 +26,24 @@ One goal: every day something true, useful and talked-about happens around the c
 - Sponsors: only the confirmed sponsors shown on app.colicoderviese.it/sponsor (source apps/superapp/src/lib/sponsors.ts; a sponsor with nameVerified false is not named until the Direzione confirms it); commercial initiatives and prospects in config/sponsor-development.snapshot.json are internal and never named in public unless their status is "ATTIVO / CONTRATTUALIZZATO".
 - Style and growth: project docs SCD_PRODOTTO_SOCIAL, SCD_FIGURE_SOCIAL_PLAYBOOK, SCD_HOME_EDITORIALE, SCD_BENCHMARK_SPORT_SOCIAL, SCD_PALETTE_DEFINITIVA_METAL (claude.ai project; ask Francesco or the coordinating chat when you cannot read them).
 
-## Rhythm of the week
-- Monday–Thursday: club life — trainings open to see, Club House open, volunteers, initiatives, sponsors' weekly offers, "dentro l'app"; matches only as the small strip.
-- Friday–Sunday: the matches board — every game of the weekend, home games first, how to come, free or paid entry; Saturday and Sunday results only from official sources.
-- Every day one fixed format (Monday weekend in three lines, Tuesday dentro l'app, Wednesday le persone, Thursday il campo, Friday si gioca, Saturday live, Sunday la domanda della settimana).
+## Rhythm of the week (reconciles Francesco's UD-031 and UD-094 with the app palinsesto VETRINA_RHYTHM; a change to the rhythm is proposed to the Direzione and scd-sviluppo, never applied on your own)
+| Day | Editorial format (directive) | App palinsesto theme it feeds |
+| --- | --- | --- |
+| Lunedì | "Settimana ColicoDerviese" (UD-031) + "Dicono di noi", the press that talks about us, and the Top 11 of the week (UD-094) | partner, convenzioni, card |
+| Martedì | "Settimana ColicoDerviese" if not out on Monday (UD-031) + "dentro l'app" | formazione |
+| Mercoledì | the virtual podcast (UD-031) | servizi (segreteria, infermeria, nutrizione) |
+| Giovedì | events and promotions (UD-031) | squadre (annate, how to join) |
+| Venerdì | events and promotions (UD-031) + "Si gioca": every weekend game, home games first, how to come, entry | weekend |
+| Sabato | live day: games of the day, results only from official sources | dirette |
+| Domenica | the stories of the weekend + the question of the week | racconti |
+Across the week (Francesco 16/10): Monday–Thursday the home talks about club life with matches only as the small strip; from Friday the matches board comes first.
 
 ## Interaction that works today
-- In the app: polls and posts in /community, /top11, /fantacalcio (adults' games), quiz points by the engagement rules, "Chiedi a Iride" for questions, the avatar builder for members. Propose only mechanics that exist; new mechanics go to scd-community and scd-sviluppo as proposals.
+- In the app: polls and posts in /community; /top11 (competitive teams only, first name + surname initial, only with image-and-name consent); /fantacalcio (free, all ages, under 14 through the family account, no individual ranking of minors, non-cash prizes only); quiz points by the engagement rules; "Chiedi a Iride" for questions, the avatar builder for members. Propose only mechanics that exist; new mechanics go to scd-community and scd-sviluppo as proposals.
 - On socials: one question that needs one tap, the answer lives in the app; tag sponsors only when they agreed.
 
 ## From the draft to the app front page
-For each item that should appear on the app home, write it as a palinsesto slot ready for scd-sviluppo: id, kicker, title (max 40 characters), text (max 140), cta, href (an existing route), theme, showFrom / showUntil (Rome dates), visual (official asset only). It goes online only through scd-sviluppo, scd-revisore and scd-sicurezza.
+For each item that should appear on the app home, write it as a palinsesto slot ready for scd-sviluppo, with the fields of `VetrinaSlot` in apps/superapp/src/lib/vetrina.ts: id, kind, kicker, title, text, cta, href (an existing route), audience (public or members), audiences (worlds), theme (one of the VetrinaTheme values in that file), weight, showFrom / showUntil (Rome dates), visual (official asset only). Keep title within about 40 characters and text within about 140 (PROPOSED editorial limit, not enforced by the code). It goes online only through scd-sviluppo, scd-revisore and scd-sicurezza.
 
 ## Before you deliver (quality check, 1–5 each; below 4 fix it)
 True and sourced · useful (what to do, where, when) · one message · leads into the app (exact page) · respects minors and assets · sounds human (scd-tono) · would a parent at the field share it? For the apertura write two headlines (A/B) and say which you would test first.
