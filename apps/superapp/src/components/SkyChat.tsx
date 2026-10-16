@@ -36,21 +36,6 @@ export function SkyMascot({
   return <PersonaAvatar persona={persona} size={size} />;
 }
 
-/** Answers that never need the server: how the app works is a fixed page, not data. */
-function localReply(message: string): SkyReply | null {
-  if (/come funziona|guida|a cosa serve/i.test(message)) {
-    return {
-      text: "L'app è il punto unico del club: calendario e risultati aperti a tutti, aree riservate per famiglie, atleti e staff dopo l'accesso. La guida spiega ogni sezione passo per passo.",
-      mood: "info",
-      links: [
-        { label: "Come funziona l'app", to: "/guida" },
-        { label: "Entra o registrati", to: "/entra" },
-      ],
-    };
-  }
-  return null;
-}
-
 function greeting(persona: Persona, area: ChatAreaId | null): Msg[] {
   const g = greetingFor(persona, area);
   return [{ role: "sky", text: g.text, ...(g.links ? { links: g.links } : {}) }];
@@ -212,15 +197,8 @@ export function SkyChat({ interior = false }: { interior?: boolean } = {}) {
     if (!message || busy) return;
     setMsgs((m) => [...m, { role: "user", text: message }]);
     setInput("");
-    const local = localReply(message);
-    if (local) {
-      setMood(local.mood);
-      setMsgs((m) => [
-        ...m,
-        { role: "sky", text: local.text, links: local.links },
-      ]);
-      return;
-    }
+    // No answer is decided in the browser: the server checks safety first, then the fixed app guide only for explicit
+    // app / login questions (lib/app-help.ts), then the model or the rules engine.
     setBusy(true);
     try {
       // Inside with a verified session: Vera reads the Cervellone with the caller's own permissions, or the area the
