@@ -81,6 +81,8 @@ export interface CatalogPosition {
   sourceRef: string | null;
   /** Qualifica used by the Portale Società LND (Organigramma) for this club; null = not used there. */
   lndLabel: string | null;
+  /** Exact "Carica" texts of the FIGC Anagrafe Federale organigramma this position stands for ([] = none). */
+  figcLabels: string[];
   evidence: "VERIFIED" | "INFERRED" | "PROPOSED";
   requiresLicence: boolean;
   mandatoryForClub: boolean;
@@ -145,6 +147,7 @@ export function parsePosition(x: unknown, holdersKnown: boolean): CatalogPositio
     sourceUrl: url && url.startsWith("https://") ? url : null,
     sourceRef: str(x["sourceRef"]),
     lndLabel: str(x["lndLabel"]),
+    figcLabels: Array.isArray(x["figcLabels"]) ? x["figcLabels"].filter((l): l is string => typeof l === "string" && l.trim() !== "").slice(0, 5) : [],
     evidence,
     requiresLicence: x["requiresLicence"] === true,
     mandatoryForClub: x["mandatoryForClub"] === true,

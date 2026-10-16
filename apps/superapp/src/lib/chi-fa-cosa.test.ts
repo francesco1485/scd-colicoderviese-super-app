@@ -29,7 +29,7 @@ import { REQUEST_CONFIRMERS, REQUEST_TEAMS, positionExists } from "./request-mac
 import { KNOWN_POSITIONS, R138_POSITIONS } from "./session";
 
 /** Most tests describe the routing once r138 is live (UD-161); the "r138 not live" block checks the fallback. */
-const routeLive = (x: ChiFaCosaInput) => routeChiFaCosa({ r138Live: true, ...x });
+const routeLive = (x: ChiFaCosaInput) => routeChiFaCosa(x, true);
 
 const positions = (r: ChiFaCosaRoute) => r.recipients.map((x) => x.position);
 const find = (r: ChiFaCosaRoute, p: string) => r.recipients.find((x) => x.position === p);
@@ -412,8 +412,12 @@ describe("r138 not live (UD-161, review R1): fail closed", () => {
   });
 
   it("the default is not live, and only an explicit true turns r138 positions on", () => {
+    // r138Live is not part of the input schema: an input field cannot switch it on (security review 474a14f).
+    expect("r138Live" in chiFaCosaInputSchema.shape).toBe(false);
+    const sneaky = { topic: "gara", site: "COLICO", teamKey: "u15", r138Live: true } as unknown as ChiFaCosaInput;
+    expect(routeChiFaCosa(sneaky).approvers).toEqual([CONFIRMER_FALLBACK]);
     expect(routeChiFaCosa({ topic: "gara", site: "COLICO", teamKey: "u15" }).approvers).toEqual([CONFIRMER_FALLBACK]);
-    expect(routeChiFaCosa({ topic: "gara", site: "COLICO", teamKey: "u15", r138Live: true }).approvers).toEqual(["direttore-sportivo-agonistica"]);
+    expect(routeChiFaCosa({ topic: "gara", site: "COLICO", teamKey: "u15" }, true).approvers).toEqual(["direttore-sportivo-agonistica"]);
   });
 });
 

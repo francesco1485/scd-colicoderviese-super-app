@@ -20,6 +20,7 @@
     "appPosition links a catalogue position to the access position of the app (session.ts KNOWN_POSITIONS). A catalogue position gives no access by itself: access stays with r100 person grants and memberships.",
     "Custom positions: code custom-<slug>, created only by the Presidente or the Direttore Generale (r111 scd_is_role_creator), status PROPOSED until the Direzione approves it (scd_set_position_status), audited in scd_access_audit.",
     "Only ACTIVE positions can be assigned to a person (trigger on scd_structure_roles).",
+    "figcLabels = the exact Carica texts of the FIGC Anagrafe Federale organigramma (Variazione organigramma) that this position stands for, VERIFIED 16/10/2026 14:39; [] = not a FIGC carica.",
     "lndLabel = the qualifica used by the Portale Società LND (Organigramma) for this club, VERIFIED 16/10/2026 14:30 read-only; null = not used on the portal for this club (e.g. segretario, delegato alla sicurezza, addetto stampa stay INFERRED)."
   ],
   "sourcesRead": {
@@ -117,6 +118,76 @@
     ],
     "descriptionMax": 300
   },
+  "figcAnagrafe": {
+    "source": "FIGC Anagrafe Federale – Variazione organigramma (Carica)",
+    "url": "https://anagrafefederale.figc.it",
+    "verified": "Francesco (DG) 16/10/2026 14:39, screenshots of the field Carica* (pratica Variazione organigramma)",
+    "cariche": [
+      "Presidente",
+      "Amministratore unico",
+      "Vicepresidente",
+      "Commissario",
+      "Consigliere",
+      "Proboviro",
+      "Revisore dei conti",
+      "Direttore sportivo",
+      "Direttore Sportivo",
+      "Direttore Generale",
+      "Dirigente",
+      "Respons. Settore Giovanile",
+      "Team Manager",
+      "Cassiere",
+      "Segretario",
+      "Dirigente accompagnatore",
+      "Dirigente-Allenatore",
+      "Dirigente addetto all'Arbitro",
+      "Addetto Stampa",
+      "Segretario Settore Giovanile",
+      "Collaboratore gest.ne sportiva",
+      "Match Analyst",
+      "Osservatore",
+      "Consigliere delegato",
+      "Responsabile di sezione",
+      "Presidente collegio sindacale",
+      "Sindaco effettivo",
+      "Sindaco supplente",
+      "Respons.Amm.Finanza&Controllo",
+      "Presidente Onorario",
+      "Segretario Generale",
+      "Segretario Settore Femminile",
+      "Direttore Operativo",
+      "Chief Football Officer",
+      "Head of Football Teams & T. A.",
+      "Amministratore delegato",
+      "Procuratore",
+      "Delegato Gestione Evento",
+      "Vice Delegato Gestione Evento",
+      "Disability Access Officer",
+      "Dirigente Responsabile Gestione",
+      "Segretario Generale/Sportivo",
+      "Respons. Amministrazione",
+      "Collaboratore",
+      "Dirig. con funzione Tecnica",
+      "Dirigente Federale Con Funzioni Tecniche-Sportive",
+      "Accompagnatore dei Minori",
+      "Respons. Settore Femminile",
+      "C&P Manager",
+      "Supporter Laison Officer",
+      "Football Social Responsibility Officer (FSRO)",
+      "Responsabile Ufficio Stampa",
+      "Responsabile Marketing/Commerciale",
+      "Addetto Anti-Doping",
+      "Docente Formativo Sportivo",
+      "Omologatore Campi di Gioco"
+    ],
+    "gaps": [
+      "Consiglio Direttivo: one possible item between Commissario and Consigliere",
+      "Altri Dirigenti: possible items between Direttore Operativo and Chief Football Officer, Direttore Generale and Dirigente, Segretario Generale/Sportivo and Respons. Amministrazione, Segretario and Dirigente accompagnatore, after 'Medi…' and before Match Analyst",
+      "One item ending in '…ping' partly hidden above Addetto Anti-Doping",
+      "'Medi…' cut at the bottom of a screenshot: likely Medico sociale (INFERRED, not recorded as a carica)",
+      "'Dirigente-Tecnico I Squadra' and 'Football Director' (Portale Società LND) are not visible in the FIGC screenshots: maybe in a GAP or LND-only labels"
+    ]
+  },
   "positions": [
     {
       "code": "legale-rappresentante",
@@ -132,7 +203,8 @@
       "requiresLicence": false,
       "mandatoryForClub": true,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "delegato-rasd",
@@ -148,7 +220,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "presidente",
@@ -164,7 +237,10 @@
       "requiresLicence": false,
       "mandatoryForClub": true,
       "acceptsQualification": false,
-      "lndLabel": "Presidente"
+      "lndLabel": "Presidente",
+      "figcLabels": [
+        "Presidente"
+      ]
     },
     {
       "code": "vice-presidente",
@@ -180,7 +256,10 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": "Vice Presidente"
+      "lndLabel": "Vice Presidente",
+      "figcLabels": [
+        "Vicepresidente"
+      ]
     },
     {
       "code": "consigliere",
@@ -196,7 +275,10 @@
       "requiresLicence": false,
       "mandatoryForClub": true,
       "acceptsQualification": false,
-      "lndLabel": "Consigliere"
+      "lndLabel": "Consigliere",
+      "figcLabels": [
+        "Consigliere"
+      ]
     },
     {
       "code": "commissario",
@@ -212,7 +294,10 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": [
+        "Commissario"
+      ]
     },
     {
       "code": "amministratore-unico",
@@ -228,7 +313,10 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": [
+        "Amministratore unico"
+      ]
     },
     {
       "code": "responsabile-rasd",
@@ -244,7 +332,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "proboviro",
@@ -260,7 +349,10 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": [
+        "Proboviro"
+      ]
     },
     {
       "code": "revisore",
@@ -276,7 +368,10 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": [
+        "Revisore dei conti"
+      ]
     },
     {
       "code": "segretario",
@@ -285,14 +380,17 @@
       "roleKind": "ORGANO_SOCIETARIO",
       "appPosition": "segreteria",
       "appPositionEvidence": "INFERRED",
-      "source": "LND",
-      "sourceUrl": "https://files.figc.it/view/acePublic/alias/contentid/1s5i1b2zydnpuhdxmyp/0/tit1_noif_art_da36a42_----------------aggiornato-al%20CU%20198A%20del%2027.04.2026.pdf",
-      "sourceRef": "NOIF art. 37 (generico)",
-      "evidence": "INFERRED",
+      "source": "FIGC",
+      "sourceUrl": "https://anagrafefederale.figc.it",
+      "sourceRef": "FIGC Anagrafe Federale – Variazione organigramma (Carica)",
+      "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": [
+        "Segretario"
+      ]
     },
     {
       "code": "tesoriere",
@@ -308,7 +406,10 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": "Cassiere"
+      "lndLabel": "Cassiere",
+      "figcLabels": [
+        "Cassiere"
+      ]
     },
     {
       "code": "direttore-generale",
@@ -324,7 +425,10 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": "Direttore Generale"
+      "lndLabel": "Direttore Generale",
+      "figcLabels": [
+        "Direttore Generale"
+      ]
     },
     {
       "code": "dirigente",
@@ -340,7 +444,10 @@
       "requiresLicence": false,
       "mandatoryForClub": true,
       "acceptsQualification": false,
-      "lndLabel": "Dirigente"
+      "lndLabel": "Dirigente",
+      "figcLabels": [
+        "Dirigente"
+      ]
     },
     {
       "code": "dirigente-accompagnatore",
@@ -356,7 +463,10 @@
       "requiresLicence": false,
       "mandatoryForClub": true,
       "acceptsQualification": false,
-      "lndLabel": "Dirigente accompagnatore"
+      "lndLabel": "Dirigente accompagnatore",
+      "figcLabels": [
+        "Dirigente accompagnatore"
+      ]
     },
     {
       "code": "dirigente-addetto-ufficiali-gara",
@@ -372,7 +482,10 @@
       "requiresLicence": false,
       "mandatoryForClub": true,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": [
+        "Dirigente addetto all'Arbitro"
+      ]
     },
     {
       "code": "assistente-arbitro-parte",
@@ -388,7 +501,8 @@
       "requiresLicence": false,
       "mandatoryForClub": true,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "dirigente-in-panchina",
@@ -404,7 +518,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "direttore-sportivo",
@@ -420,7 +535,11 @@
       "requiresLicence": true,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": "Football Director"
+      "lndLabel": "Football Director",
+      "figcLabels": [
+        "Direttore sportivo",
+        "Direttore Sportivo"
+      ]
     },
     {
       "code": "collaboratore-gestione-sportiva",
@@ -436,7 +555,10 @@
       "requiresLicence": true,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": [
+        "Collaboratore gest.ne sportiva"
+      ]
     },
     {
       "code": "team-manager",
@@ -452,7 +574,10 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": "Team Manager"
+      "lndLabel": "Team Manager",
+      "figcLabels": [
+        "Team Manager"
+      ]
     },
     {
       "code": "responsabile-prima-squadra",
@@ -468,7 +593,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "coordinatore-attivita-sportiva",
@@ -484,7 +610,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "delegato-sicurezza",
@@ -500,7 +627,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "allenatore-responsabile",
@@ -516,7 +644,8 @@
       "requiresLicence": true,
       "mandatoryForClub": true,
       "acceptsQualification": true,
-      "lndLabel": "Allenatore iscritto ALBO"
+      "lndLabel": "Allenatore iscritto ALBO",
+      "figcLabels": []
     },
     {
       "code": "allenatore-in-seconda",
@@ -532,7 +661,8 @@
       "requiresLicence": true,
       "mandatoryForClub": false,
       "acceptsQualification": true,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "preparatore-atletico",
@@ -548,7 +678,8 @@
       "requiresLicence": true,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "collaboratore-tecnico",
@@ -564,7 +695,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": true,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "match-analyst",
@@ -580,7 +712,10 @@
       "requiresLicence": true,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": [
+        "Match Analyst"
+      ]
     },
     {
       "code": "osservatore",
@@ -596,7 +731,10 @@
       "requiresLicence": true,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": [
+        "Osservatore"
+      ]
     },
     {
       "code": "preparatore-motorio",
@@ -612,7 +750,8 @@
       "requiresLicence": true,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "medico-sociale",
@@ -628,7 +767,8 @@
       "requiresLicence": true,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "operatore-sanitario",
@@ -644,7 +784,8 @@
       "requiresLicence": true,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "responsabile-sanitario",
@@ -660,7 +801,8 @@
       "requiresLicence": true,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "medico-settore-giovanile",
@@ -676,7 +818,8 @@
       "requiresLicence": false,
       "mandatoryForClub": true,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "psicologo",
@@ -692,7 +835,8 @@
       "requiresLicence": true,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "addetto-defibrillatore-blsd",
@@ -708,7 +852,8 @@
       "requiresLicence": true,
       "mandatoryForClub": true,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "responsabile-settore-giovanile",
@@ -724,7 +869,10 @@
       "requiresLicence": true,
       "mandatoryForClub": true,
       "acceptsQualification": true,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": [
+        "Respons. Settore Giovanile"
+      ]
     },
     {
       "code": "dirigente-responsabile-settore-giovanile",
@@ -740,7 +888,8 @@
       "requiresLicence": false,
       "mandatoryForClub": true,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "responsabile-tecnico-settore-giovanile",
@@ -756,7 +905,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": true,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "responsabile-organizzativo-settore-giovanile",
@@ -772,7 +922,8 @@
       "requiresLicence": false,
       "mandatoryForClub": true,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "segretario-settore-giovanile",
@@ -788,7 +939,10 @@
       "requiresLicence": false,
       "mandatoryForClub": true,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": [
+        "Segretario Settore Giovanile"
+      ]
     },
     {
       "code": "referente-sistema-qualita",
@@ -804,7 +958,8 @@
       "requiresLicence": false,
       "mandatoryForClub": true,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "referente-club-affiliati",
@@ -820,7 +975,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "responsabile-attivita-di-base",
@@ -836,7 +992,8 @@
       "requiresLicence": true,
       "mandatoryForClub": false,
       "acceptsQualification": true,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "dirigente-responsabile-attivita-di-base",
@@ -852,7 +1009,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "segretario-attivita-di-base",
@@ -868,7 +1026,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "allenatore-settore-giovanile",
@@ -884,7 +1043,8 @@
       "requiresLicence": true,
       "mandatoryForClub": true,
       "acceptsQualification": true,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "responsabile-formazione-interna",
@@ -900,7 +1060,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "coordinatore-attivita-educative",
@@ -916,7 +1077,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "tutor-insegnante",
@@ -932,7 +1094,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "referente-inclusione",
@@ -948,7 +1111,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "referente-progetti-territorio",
@@ -964,7 +1128,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "responsabile-attivita-promozionali",
@@ -980,7 +1145,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "responsabile-gestionale-impianto",
@@ -996,7 +1162,8 @@
       "requiresLicence": false,
       "mandatoryForClub": true,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "responsabile-safeguarding",
@@ -1012,7 +1179,8 @@
       "requiresLicence": false,
       "mandatoryForClub": true,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "delegato-tutela-minori",
@@ -1028,7 +1196,8 @@
       "requiresLicence": true,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "addetto-stampa",
@@ -1037,14 +1206,17 @@
       "roleKind": "STAFF",
       "appPosition": null,
       "appPositionEvidence": null,
-      "source": "LND",
-      "sourceUrl": null,
-      "sourceRef": null,
-      "evidence": "INFERRED",
+      "source": "FIGC",
+      "sourceUrl": "https://anagrafefederale.figc.it",
+      "sourceRef": "FIGC Anagrafe Federale – Variazione organigramma (Carica)",
+      "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": [
+        "Addetto Stampa"
+      ]
     },
     {
       "code": "social-media-fotografo",
@@ -1060,7 +1232,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "speaker",
@@ -1076,7 +1249,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "magazziniere",
@@ -1092,7 +1266,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "autista-pulmino",
@@ -1108,7 +1283,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "volontario",
@@ -1124,7 +1300,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "addetto-pulizie",
@@ -1140,7 +1317,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "raccattapalle-barelliere",
@@ -1156,7 +1334,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "direttore-sportivo-agonistica",
@@ -1172,7 +1351,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": "Football Director"
+      "lndLabel": "Football Director",
+      "figcLabels": []
     },
     {
       "code": "direttore-sportivo-generale",
@@ -1188,7 +1368,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": "Football Director"
+      "lndLabel": "Football Director",
+      "figcLabels": []
     },
     {
       "code": "responsabile-trasporti",
@@ -1204,7 +1385,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "responsabile-campi",
@@ -1220,7 +1402,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "responsabile-struttura-colico",
@@ -1236,7 +1419,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "responsabile-struttura-dervio",
@@ -1252,7 +1436,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "responsabile-club-house",
@@ -1268,7 +1453,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "addetto-biglietteria",
@@ -1284,7 +1470,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "responsabile-magazzino",
@@ -1300,7 +1487,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "responsabile-tornei",
@@ -1316,7 +1504,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "responsabile-lavanderia",
@@ -1332,7 +1521,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "collaboratore-lavanderia-pulizia",
@@ -1348,7 +1538,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "segreteria-presenza",
@@ -1364,7 +1555,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "segreteria-remoto",
@@ -1380,7 +1572,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "responsabile-infermeria",
@@ -1396,7 +1589,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "nutrizionista",
@@ -1412,7 +1606,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "moderatore",
@@ -1428,7 +1623,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "dirigente-collaboratore",
@@ -1444,7 +1640,8 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": false,
-      "lndLabel": null
+      "lndLabel": null,
+      "figcLabels": []
     },
     {
       "code": "dirigente-allenatore",
@@ -1460,7 +1657,10 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": true,
-      "lndLabel": "Dirigente-Allenatore"
+      "lndLabel": "Dirigente-Allenatore",
+      "figcLabels": [
+        "Dirigente-Allenatore"
+      ]
     },
     {
       "code": "dirigente-tecnico-prima-squadra",
@@ -1476,7 +1676,635 @@
       "requiresLicence": false,
       "mandatoryForClub": false,
       "acceptsQualification": true,
-      "lndLabel": "Dirigente-Tecnico I Squadra"
+      "lndLabel": "Dirigente-Tecnico I Squadra",
+      "figcLabels": []
+    },
+    {
+      "code": "consigliere-delegato",
+      "label": "Consigliere delegato",
+      "group": "direzione",
+      "roleKind": "ORGANO_SOCIETARIO",
+      "appPosition": null,
+      "appPositionEvidence": null,
+      "source": "FIGC",
+      "sourceUrl": "https://anagrafefederale.figc.it",
+      "sourceRef": "FIGC Anagrafe Federale – Variazione organigramma (Carica)",
+      "evidence": "VERIFIED",
+      "requiresLicence": false,
+      "mandatoryForClub": false,
+      "acceptsQualification": false,
+      "lndLabel": null,
+      "figcLabels": [
+        "Consigliere delegato"
+      ]
+    },
+    {
+      "code": "responsabile-di-sezione",
+      "label": "Responsabile di sezione",
+      "group": "direzione",
+      "roleKind": "ORGANO_SOCIETARIO",
+      "appPosition": null,
+      "appPositionEvidence": null,
+      "source": "FIGC",
+      "sourceUrl": "https://anagrafefederale.figc.it",
+      "sourceRef": "FIGC Anagrafe Federale – Variazione organigramma (Carica)",
+      "evidence": "VERIFIED",
+      "requiresLicence": false,
+      "mandatoryForClub": false,
+      "acceptsQualification": false,
+      "lndLabel": null,
+      "figcLabels": [
+        "Responsabile di sezione"
+      ]
+    },
+    {
+      "code": "presidente-collegio-sindacale",
+      "label": "Presidente del collegio sindacale",
+      "group": "direzione",
+      "roleKind": "ORGANO_SOCIETARIO",
+      "appPosition": null,
+      "appPositionEvidence": null,
+      "source": "FIGC",
+      "sourceUrl": "https://anagrafefederale.figc.it",
+      "sourceRef": "FIGC Anagrafe Federale – Variazione organigramma (Carica)",
+      "evidence": "VERIFIED",
+      "requiresLicence": false,
+      "mandatoryForClub": false,
+      "acceptsQualification": false,
+      "lndLabel": null,
+      "figcLabels": [
+        "Presidente collegio sindacale"
+      ]
+    },
+    {
+      "code": "sindaco-effettivo",
+      "label": "Sindaco effettivo",
+      "group": "direzione",
+      "roleKind": "ORGANO_SOCIETARIO",
+      "appPosition": null,
+      "appPositionEvidence": null,
+      "source": "FIGC",
+      "sourceUrl": "https://anagrafefederale.figc.it",
+      "sourceRef": "FIGC Anagrafe Federale – Variazione organigramma (Carica)",
+      "evidence": "VERIFIED",
+      "requiresLicence": false,
+      "mandatoryForClub": false,
+      "acceptsQualification": false,
+      "lndLabel": null,
+      "figcLabels": [
+        "Sindaco effettivo"
+      ]
+    },
+    {
+      "code": "sindaco-supplente",
+      "label": "Sindaco supplente",
+      "group": "direzione",
+      "roleKind": "ORGANO_SOCIETARIO",
+      "appPosition": null,
+      "appPositionEvidence": null,
+      "source": "FIGC",
+      "sourceUrl": "https://anagrafefederale.figc.it",
+      "sourceRef": "FIGC Anagrafe Federale – Variazione organigramma (Carica)",
+      "evidence": "VERIFIED",
+      "requiresLicence": false,
+      "mandatoryForClub": false,
+      "acceptsQualification": false,
+      "lndLabel": null,
+      "figcLabels": [
+        "Sindaco supplente"
+      ]
+    },
+    {
+      "code": "responsabile-amministrazione-finanza-controllo",
+      "label": "Responsabile amministrazione, finanza e controllo",
+      "group": "dirigenti",
+      "roleKind": "RESPONSABILE",
+      "appPosition": null,
+      "appPositionEvidence": null,
+      "source": "FIGC",
+      "sourceUrl": "https://anagrafefederale.figc.it",
+      "sourceRef": "FIGC Anagrafe Federale – Variazione organigramma (Carica)",
+      "evidence": "VERIFIED",
+      "requiresLicence": false,
+      "mandatoryForClub": false,
+      "acceptsQualification": false,
+      "lndLabel": null,
+      "figcLabels": [
+        "Respons.Amm.Finanza&Controllo"
+      ]
+    },
+    {
+      "code": "presidente-onorario",
+      "label": "Presidente onorario",
+      "group": "dirigenti",
+      "roleKind": "DIRIGENTE",
+      "appPosition": null,
+      "appPositionEvidence": null,
+      "source": "FIGC",
+      "sourceUrl": "https://anagrafefederale.figc.it",
+      "sourceRef": "FIGC Anagrafe Federale – Variazione organigramma (Carica)",
+      "evidence": "VERIFIED",
+      "requiresLicence": false,
+      "mandatoryForClub": false,
+      "acceptsQualification": false,
+      "lndLabel": null,
+      "figcLabels": [
+        "Presidente Onorario"
+      ]
+    },
+    {
+      "code": "segretario-generale",
+      "label": "Segretario generale",
+      "group": "dirigenti",
+      "roleKind": "DIRIGENTE",
+      "appPosition": null,
+      "appPositionEvidence": null,
+      "source": "FIGC",
+      "sourceUrl": "https://anagrafefederale.figc.it",
+      "sourceRef": "FIGC Anagrafe Federale – Variazione organigramma (Carica)",
+      "evidence": "VERIFIED",
+      "requiresLicence": false,
+      "mandatoryForClub": false,
+      "acceptsQualification": false,
+      "lndLabel": null,
+      "figcLabels": [
+        "Segretario Generale"
+      ]
+    },
+    {
+      "code": "segretario-settore-femminile",
+      "label": "Segretario settore femminile",
+      "group": "dirigenti",
+      "roleKind": "DIRIGENTE",
+      "appPosition": null,
+      "appPositionEvidence": null,
+      "source": "FIGC",
+      "sourceUrl": "https://anagrafefederale.figc.it",
+      "sourceRef": "FIGC Anagrafe Federale – Variazione organigramma (Carica)",
+      "evidence": "VERIFIED",
+      "requiresLicence": false,
+      "mandatoryForClub": false,
+      "acceptsQualification": false,
+      "lndLabel": null,
+      "figcLabels": [
+        "Segretario Settore Femminile"
+      ]
+    },
+    {
+      "code": "direttore-operativo",
+      "label": "Direttore operativo",
+      "group": "dirigenti",
+      "roleKind": "DIRIGENTE",
+      "appPosition": null,
+      "appPositionEvidence": null,
+      "source": "FIGC",
+      "sourceUrl": "https://anagrafefederale.figc.it",
+      "sourceRef": "FIGC Anagrafe Federale – Variazione organigramma (Carica)",
+      "evidence": "VERIFIED",
+      "requiresLicence": false,
+      "mandatoryForClub": false,
+      "acceptsQualification": false,
+      "lndLabel": null,
+      "figcLabels": [
+        "Direttore Operativo"
+      ]
+    },
+    {
+      "code": "chief-football-officer",
+      "label": "Chief Football Officer",
+      "group": "dirigenti",
+      "roleKind": "DIRIGENTE",
+      "appPosition": null,
+      "appPositionEvidence": null,
+      "source": "FIGC",
+      "sourceUrl": "https://anagrafefederale.figc.it",
+      "sourceRef": "FIGC Anagrafe Federale – Variazione organigramma (Carica)",
+      "evidence": "VERIFIED",
+      "requiresLicence": false,
+      "mandatoryForClub": false,
+      "acceptsQualification": false,
+      "lndLabel": null,
+      "figcLabels": [
+        "Chief Football Officer"
+      ]
+    },
+    {
+      "code": "head-of-football-teams",
+      "label": "Head of Football Teams & T. A.",
+      "group": "dirigenti",
+      "roleKind": "DIRIGENTE",
+      "appPosition": null,
+      "appPositionEvidence": null,
+      "source": "FIGC",
+      "sourceUrl": "https://anagrafefederale.figc.it",
+      "sourceRef": "FIGC Anagrafe Federale – Variazione organigramma (Carica)",
+      "evidence": "VERIFIED",
+      "requiresLicence": false,
+      "mandatoryForClub": false,
+      "acceptsQualification": false,
+      "lndLabel": null,
+      "figcLabels": [
+        "Head of Football Teams & T. A."
+      ]
+    },
+    {
+      "code": "amministratore-delegato",
+      "label": "Amministratore delegato",
+      "group": "dirigenti",
+      "roleKind": "DIRIGENTE",
+      "appPosition": null,
+      "appPositionEvidence": null,
+      "source": "FIGC",
+      "sourceUrl": "https://anagrafefederale.figc.it",
+      "sourceRef": "FIGC Anagrafe Federale – Variazione organigramma (Carica)",
+      "evidence": "VERIFIED",
+      "requiresLicence": false,
+      "mandatoryForClub": false,
+      "acceptsQualification": false,
+      "lndLabel": null,
+      "figcLabels": [
+        "Amministratore delegato"
+      ]
+    },
+    {
+      "code": "procuratore",
+      "label": "Procuratore",
+      "group": "dirigenti",
+      "roleKind": "DIRIGENTE",
+      "appPosition": null,
+      "appPositionEvidence": null,
+      "source": "FIGC",
+      "sourceUrl": "https://anagrafefederale.figc.it",
+      "sourceRef": "FIGC Anagrafe Federale – Variazione organigramma (Carica)",
+      "evidence": "VERIFIED",
+      "requiresLicence": false,
+      "mandatoryForClub": false,
+      "acceptsQualification": false,
+      "lndLabel": null,
+      "figcLabels": [
+        "Procuratore"
+      ]
+    },
+    {
+      "code": "delegato-gestione-evento",
+      "label": "Delegato gestione evento",
+      "group": "dirigenti",
+      "roleKind": "DIRIGENTE",
+      "appPosition": null,
+      "appPositionEvidence": null,
+      "source": "FIGC",
+      "sourceUrl": "https://anagrafefederale.figc.it",
+      "sourceRef": "FIGC Anagrafe Federale – Variazione organigramma (Carica)",
+      "evidence": "VERIFIED",
+      "requiresLicence": false,
+      "mandatoryForClub": false,
+      "acceptsQualification": false,
+      "lndLabel": null,
+      "figcLabels": [
+        "Delegato Gestione Evento"
+      ]
+    },
+    {
+      "code": "vice-delegato-gestione-evento",
+      "label": "Vice delegato gestione evento",
+      "group": "dirigenti",
+      "roleKind": "DIRIGENTE",
+      "appPosition": null,
+      "appPositionEvidence": null,
+      "source": "FIGC",
+      "sourceUrl": "https://anagrafefederale.figc.it",
+      "sourceRef": "FIGC Anagrafe Federale – Variazione organigramma (Carica)",
+      "evidence": "VERIFIED",
+      "requiresLicence": false,
+      "mandatoryForClub": false,
+      "acceptsQualification": false,
+      "lndLabel": null,
+      "figcLabels": [
+        "Vice Delegato Gestione Evento"
+      ]
+    },
+    {
+      "code": "disability-access-officer",
+      "label": "Disability Access Officer",
+      "group": "dirigenti",
+      "roleKind": "DIRIGENTE",
+      "appPosition": null,
+      "appPositionEvidence": null,
+      "source": "FIGC",
+      "sourceUrl": "https://anagrafefederale.figc.it",
+      "sourceRef": "FIGC Anagrafe Federale – Variazione organigramma (Carica)",
+      "evidence": "VERIFIED",
+      "requiresLicence": false,
+      "mandatoryForClub": false,
+      "acceptsQualification": false,
+      "lndLabel": null,
+      "figcLabels": [
+        "Disability Access Officer"
+      ]
+    },
+    {
+      "code": "dirigente-responsabile-gestione",
+      "label": "Dirigente responsabile gestione",
+      "group": "dirigenti",
+      "roleKind": "RESPONSABILE",
+      "appPosition": null,
+      "appPositionEvidence": null,
+      "source": "FIGC",
+      "sourceUrl": "https://anagrafefederale.figc.it",
+      "sourceRef": "FIGC Anagrafe Federale – Variazione organigramma (Carica)",
+      "evidence": "VERIFIED",
+      "requiresLicence": false,
+      "mandatoryForClub": false,
+      "acceptsQualification": false,
+      "lndLabel": null,
+      "figcLabels": [
+        "Dirigente Responsabile Gestione"
+      ]
+    },
+    {
+      "code": "segretario-generale-sportivo",
+      "label": "Segretario generale / sportivo",
+      "group": "dirigenti",
+      "roleKind": "DIRIGENTE",
+      "appPosition": null,
+      "appPositionEvidence": null,
+      "source": "FIGC",
+      "sourceUrl": "https://anagrafefederale.figc.it",
+      "sourceRef": "FIGC Anagrafe Federale – Variazione organigramma (Carica)",
+      "evidence": "VERIFIED",
+      "requiresLicence": false,
+      "mandatoryForClub": false,
+      "acceptsQualification": false,
+      "lndLabel": null,
+      "figcLabels": [
+        "Segretario Generale/Sportivo"
+      ]
+    },
+    {
+      "code": "responsabile-amministrazione",
+      "label": "Responsabile amministrazione",
+      "group": "dirigenti",
+      "roleKind": "RESPONSABILE",
+      "appPosition": null,
+      "appPositionEvidence": null,
+      "source": "FIGC",
+      "sourceUrl": "https://anagrafefederale.figc.it",
+      "sourceRef": "FIGC Anagrafe Federale – Variazione organigramma (Carica)",
+      "evidence": "VERIFIED",
+      "requiresLicence": false,
+      "mandatoryForClub": false,
+      "acceptsQualification": false,
+      "lndLabel": null,
+      "figcLabels": [
+        "Respons. Amministrazione"
+      ]
+    },
+    {
+      "code": "collaboratore",
+      "label": "Collaboratore",
+      "group": "dirigenti",
+      "roleKind": "DIRIGENTE",
+      "appPosition": null,
+      "appPositionEvidence": null,
+      "source": "FIGC",
+      "sourceUrl": "https://anagrafefederale.figc.it",
+      "sourceRef": "FIGC Anagrafe Federale – Variazione organigramma (Carica)",
+      "evidence": "VERIFIED",
+      "requiresLicence": false,
+      "mandatoryForClub": false,
+      "acceptsQualification": false,
+      "lndLabel": null,
+      "figcLabels": [
+        "Collaboratore"
+      ]
+    },
+    {
+      "code": "dirigente-funzione-tecnica",
+      "label": "Dirigente con funzione tecnica",
+      "group": "dirigenti",
+      "roleKind": "DIRIGENTE",
+      "appPosition": null,
+      "appPositionEvidence": null,
+      "source": "FIGC",
+      "sourceUrl": "https://anagrafefederale.figc.it",
+      "sourceRef": "FIGC Anagrafe Federale – Variazione organigramma (Carica)",
+      "evidence": "VERIFIED",
+      "requiresLicence": false,
+      "mandatoryForClub": false,
+      "acceptsQualification": true,
+      "lndLabel": null,
+      "figcLabels": [
+        "Dirig. con funzione Tecnica"
+      ]
+    },
+    {
+      "code": "dirigente-federale-funzioni-tecnico-sportive",
+      "label": "Dirigente federale con funzioni tecnico-sportive",
+      "group": "dirigenti",
+      "roleKind": "DIRIGENTE",
+      "appPosition": null,
+      "appPositionEvidence": null,
+      "source": "FIGC",
+      "sourceUrl": "https://anagrafefederale.figc.it",
+      "sourceRef": "FIGC Anagrafe Federale – Variazione organigramma (Carica)",
+      "evidence": "VERIFIED",
+      "requiresLicence": false,
+      "mandatoryForClub": false,
+      "acceptsQualification": false,
+      "lndLabel": null,
+      "figcLabels": [
+        "Dirigente Federale Con Funzioni Tecniche-Sportive"
+      ]
+    },
+    {
+      "code": "accompagnatore-minori",
+      "label": "Accompagnatore dei minori",
+      "group": "dirigenti",
+      "roleKind": "DIRIGENTE",
+      "appPosition": null,
+      "appPositionEvidence": null,
+      "source": "FIGC",
+      "sourceUrl": "https://anagrafefederale.figc.it",
+      "sourceRef": "FIGC Anagrafe Federale – Variazione organigramma (Carica)",
+      "evidence": "VERIFIED",
+      "requiresLicence": false,
+      "mandatoryForClub": false,
+      "acceptsQualification": false,
+      "lndLabel": null,
+      "figcLabels": [
+        "Accompagnatore dei Minori"
+      ]
+    },
+    {
+      "code": "responsabile-settore-femminile",
+      "label": "Responsabile settore femminile",
+      "group": "dirigenti",
+      "roleKind": "RESPONSABILE",
+      "appPosition": null,
+      "appPositionEvidence": null,
+      "source": "FIGC",
+      "sourceUrl": "https://anagrafefederale.figc.it",
+      "sourceRef": "FIGC Anagrafe Federale – Variazione organigramma (Carica)",
+      "evidence": "VERIFIED",
+      "requiresLicence": false,
+      "mandatoryForClub": false,
+      "acceptsQualification": false,
+      "lndLabel": null,
+      "figcLabels": [
+        "Respons. Settore Femminile"
+      ]
+    },
+    {
+      "code": "cp-manager",
+      "label": "C&P Manager",
+      "group": "dirigenti",
+      "roleKind": "DIRIGENTE",
+      "appPosition": null,
+      "appPositionEvidence": null,
+      "source": "FIGC",
+      "sourceUrl": "https://anagrafefederale.figc.it",
+      "sourceRef": "FIGC Anagrafe Federale – Variazione organigramma (Carica)",
+      "evidence": "VERIFIED",
+      "requiresLicence": false,
+      "mandatoryForClub": false,
+      "acceptsQualification": false,
+      "lndLabel": null,
+      "figcLabels": [
+        "C&P Manager"
+      ]
+    },
+    {
+      "code": "supporter-liaison-officer",
+      "label": "Supporter Liaison Officer",
+      "group": "comunicazione",
+      "roleKind": "STAFF",
+      "appPosition": null,
+      "appPositionEvidence": null,
+      "source": "FIGC",
+      "sourceUrl": "https://anagrafefederale.figc.it",
+      "sourceRef": "FIGC Anagrafe Federale – Variazione organigramma (Carica)",
+      "evidence": "VERIFIED",
+      "requiresLicence": false,
+      "mandatoryForClub": false,
+      "acceptsQualification": false,
+      "lndLabel": null,
+      "figcLabels": [
+        "Supporter Laison Officer"
+      ]
+    },
+    {
+      "code": "football-social-responsibility-officer",
+      "label": "Football Social Responsibility Officer (FSRO)",
+      "group": "comunicazione",
+      "roleKind": "STAFF",
+      "appPosition": null,
+      "appPositionEvidence": null,
+      "source": "FIGC",
+      "sourceUrl": "https://anagrafefederale.figc.it",
+      "sourceRef": "FIGC Anagrafe Federale – Variazione organigramma (Carica)",
+      "evidence": "VERIFIED",
+      "requiresLicence": false,
+      "mandatoryForClub": false,
+      "acceptsQualification": false,
+      "lndLabel": null,
+      "figcLabels": [
+        "Football Social Responsibility Officer (FSRO)"
+      ]
+    },
+    {
+      "code": "responsabile-ufficio-stampa",
+      "label": "Responsabile ufficio stampa",
+      "group": "comunicazione",
+      "roleKind": "RESPONSABILE",
+      "appPosition": null,
+      "appPositionEvidence": null,
+      "source": "FIGC",
+      "sourceUrl": "https://anagrafefederale.figc.it",
+      "sourceRef": "FIGC Anagrafe Federale – Variazione organigramma (Carica)",
+      "evidence": "VERIFIED",
+      "requiresLicence": false,
+      "mandatoryForClub": false,
+      "acceptsQualification": false,
+      "lndLabel": null,
+      "figcLabels": [
+        "Responsabile Ufficio Stampa"
+      ]
+    },
+    {
+      "code": "responsabile-marketing-commerciale",
+      "label": "Responsabile marketing / commerciale",
+      "group": "comunicazione",
+      "roleKind": "RESPONSABILE",
+      "appPosition": null,
+      "appPositionEvidence": null,
+      "source": "FIGC",
+      "sourceUrl": "https://anagrafefederale.figc.it",
+      "sourceRef": "FIGC Anagrafe Federale – Variazione organigramma (Carica)",
+      "evidence": "VERIFIED",
+      "requiresLicence": false,
+      "mandatoryForClub": false,
+      "acceptsQualification": false,
+      "lndLabel": null,
+      "figcLabels": [
+        "Responsabile Marketing/Commerciale"
+      ]
+    },
+    {
+      "code": "addetto-antidoping",
+      "label": "Addetto anti-doping",
+      "group": "sanitari",
+      "roleKind": "STAFF",
+      "appPosition": null,
+      "appPositionEvidence": null,
+      "source": "FIGC",
+      "sourceUrl": "https://anagrafefederale.figc.it",
+      "sourceRef": "FIGC Anagrafe Federale – Variazione organigramma (Carica)",
+      "evidence": "VERIFIED",
+      "requiresLicence": false,
+      "mandatoryForClub": false,
+      "acceptsQualification": false,
+      "lndLabel": null,
+      "figcLabels": [
+        "Addetto Anti-Doping"
+      ]
+    },
+    {
+      "code": "docente-formativo-sportivo",
+      "label": "Docente formativo sportivo",
+      "group": "operativi",
+      "roleKind": "STAFF",
+      "appPosition": null,
+      "appPositionEvidence": null,
+      "source": "FIGC",
+      "sourceUrl": "https://anagrafefederale.figc.it",
+      "sourceRef": "FIGC Anagrafe Federale – Variazione organigramma (Carica)",
+      "evidence": "VERIFIED",
+      "requiresLicence": false,
+      "mandatoryForClub": false,
+      "acceptsQualification": false,
+      "lndLabel": null,
+      "figcLabels": [
+        "Docente Formativo Sportivo"
+      ]
+    },
+    {
+      "code": "omologatore-campi",
+      "label": "Omologatore campi di gioco",
+      "group": "operativi",
+      "roleKind": "STAFF",
+      "appPosition": null,
+      "appPositionEvidence": null,
+      "source": "FIGC",
+      "sourceUrl": "https://anagrafefederale.figc.it",
+      "sourceRef": "FIGC Anagrafe Federale – Variazione organigramma (Carica)",
+      "evidence": "VERIFIED",
+      "requiresLicence": false,
+      "mandatoryForClub": false,
+      "acceptsQualification": false,
+      "lndLabel": null,
+      "figcLabels": [
+        "Omologatore Campi di Gioco"
+      ]
     }
   ],
   "coachQualifications": [

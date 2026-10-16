@@ -109,7 +109,7 @@ describe("r138 migration (STAGED, applied only after 'applica r138')", () => {
   });
 
   it("seeds exactly the positions and qualifications of config/scd-position-catalog.v1.json", () => {
-    const keys = ["code", "label", "group", "roleKind", "appPosition", "source", "sourceUrl", "sourceRef", "lndLabel", "evidence", "requiresLicence", "mandatoryForClub", "acceptsQualification"] as const;
+    const keys = ["code", "label", "group", "roleKind", "appPosition", "source", "sourceUrl", "sourceRef", "lndLabel", "figcLabels", "evidence", "requiresLicence", "mandatoryForClub", "acceptsQualification"] as const;
     const pick = (p: Record<string, unknown>) => Object.fromEntries(keys.map((k) => [k, p[k]]));
     expect(literal("pos")).toEqual(catalog.positions.map(pick));
     expect(literal("qual")).toEqual(catalog.coachQualifications.map((q) => ({ code: q.code, label: q.label, legacy: q.legacy, sourceRef: q.sourceRef })));
@@ -138,7 +138,7 @@ describe("catalogue config (Francesco 16/10/2026 13:35)", () => {
   const positions = catalog.positions;
 
   it("lists organigram positions only: qualifications, lavoratore sportivo, RASD card and socio are attributes", () => {
-    expect(positions).toHaveLength(85);
+    expect(positions).toHaveLength(118);
     expect(catalog.coachQualifications).toHaveLength(24);
     expect(catalog.relationshipAttributes.sportWorker).toHaveLength(8);
     expect(catalog.relationshipAttributes.rasdCard).toHaveLength(5);
@@ -183,7 +183,7 @@ describe("catalogue config (Francesco 16/10/2026 13:35)", () => {
     }
     // Only coach-like positions take a qualification.
     expect(positions.filter((p) => p.acceptsQualification).map((p) => p.code).sort()).toEqual(
-      ["allenatore-in-seconda", "allenatore-responsabile", "allenatore-settore-giovanile", "collaboratore-tecnico", "dirigente-allenatore", "dirigente-tecnico-prima-squadra", "responsabile-attivita-di-base", "responsabile-settore-giovanile", "responsabile-tecnico-settore-giovanile"].sort(),
+      ["allenatore-in-seconda", "allenatore-responsabile", "allenatore-settore-giovanile", "collaboratore-tecnico", "dirigente-allenatore", "dirigente-funzione-tecnica", "dirigente-tecnico-prima-squadra", "responsabile-attivita-di-base", "responsabile-settore-giovanile", "responsabile-tecnico-settore-giovanile"].sort(),
     );
     expect(catalog.privacy).toMatch(/NO_PERSONAL_NAMES/);
   });
@@ -201,16 +201,42 @@ describe("catalogue config (Francesco 16/10/2026 13:35)", () => {
     for (const d of ["dirigente-allenatore", "dirigente-tecnico-prima-squadra"])
       expect(by(d)).toMatchObject({ group: "dirigenti", roleKind: "DIRIGENTE", acceptsQualification: true, source: "LND", sourceUrl: "https://iscrizioni.lnd.it", evidence: "VERIFIED" });
     for (const code of ["team-manager", "direttore-generale", "tesoriere"]) expect(by(code)).toMatchObject({ evidence: "VERIFIED", sourceRef: "Portale Società LND – Organigramma" });
-    // Not used on the portal for this club: stay INFERRED.
-    for (const code of ["segretario", "delegato-sicurezza", "addetto-stampa"]) expect(by(code)).toMatchObject({ evidence: "INFERRED", lndLabel: null });
+    // Not used on the LND portal for this club; segretario and addetto stampa are FIGC cariche (14:39), the delegato alla
+    // sicurezza stays INFERRED.
+    for (const code of ["segretario", "delegato-sicurezza", "addetto-stampa"]) expect(by(code).lndLabel, code).toBeNull();
+    expect(by("delegato-sicurezza").evidence).toBe("INFERRED");
     // D3: the two new access positions map one catalogue entry each.
     expect(by("operatore-sanitario").appPosition).toBe("fisioterapista");
     expect(by("responsabile-safeguarding").appPosition).toBe("responsabile-safeguarding");
   });
 
+  it("every Carica of the FIGC Anagrafe Federale organigramma (Francesco 16/10/2026 14:39) is a ready VERIFIED position, never duplicated", () => {
+    const cariche = catalog.figcAnagrafe.cariche;
+    expect(cariche).toHaveLength(56);
+    expect(new Set(cariche).size).toBe(56);
+    const all = positions.flatMap((p) => p.figcLabels);
+    expect([...all].sort()).toEqual([...cariche].sort());
+    for (const p of positions.filter((x) => x.figcLabels.length > 0)) expect(p.evidence, p.code).toBe("VERIFIED");
+    const by = (code: string) => positions.find((p) => p.code === code)!;
+    expect(by("direttore-sportivo").figcLabels).toEqual(["Direttore sportivo", "Direttore Sportivo"]);
+    expect(by("tesoriere").figcLabels).toEqual(["Cassiere"]);
+    expect(by("dirigente-addetto-ufficiali-gara").figcLabels).toEqual(["Dirigente addetto all'Arbitro"]);
+    expect(by("collaboratore-gestione-sportiva").figcLabels).toEqual(["Collaboratore gest.ne sportiva"]);
+    expect(by("vice-presidente").figcLabels).toEqual(["Vicepresidente"]);
+    expect(by("segretario")).toMatchObject({ evidence: "VERIFIED", source: "FIGC", sourceUrl: "https://anagrafefederale.figc.it" });
+    // "Medi…" is cut on the screenshot: medico sociale stays as it was, the note is in figcAnagrafe.gaps.
+    expect(by("medico-sociale").figcLabels).toEqual([]);
+    expect(catalog.figcAnagrafe.gaps.join(" ")).toMatch(/Medi…/);
+    for (const p of positions.filter((x) => x.sourceRef === "FIGC Anagrafe Federale – Variazione organigramma (Carica)"))
+      expect(p.sourceUrl, p.code).toBe("https://anagrafefederale.figc.it");
+    // Consiglio Direttivo cariche are in the direzione group.
+    for (const c of ["Consigliere delegato", "Responsabile di sezione", "Sindaco effettivo", "Sindaco supplente", "Presidente collegio sindacale"])
+      expect(positions.find((p) => (p.figcLabels as string[]).includes(c))?.group, c).toBe("direzione");
+  });
+
   it("the repo fallback parses every position, ACTIVE with unknown holders (never zero)", () => {
     const repo = repoCatalog();
-    expect(repo).toHaveLength(85);
+    expect(repo).toHaveLength(118);
     expect(repo.every((p) => p.status === "ACTIVE" && p.holders === null)).toBe(true);
     expect(holdersLabel(repo[0]!)).toBe("da collegare");
   });

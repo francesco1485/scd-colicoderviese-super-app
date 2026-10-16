@@ -163,6 +163,7 @@ function PositionRow({ p, canDecide, onDone }: { p: CatalogPosition; canDecide: 
               {p.sourceRef ? ` · ${p.sourceRef}` : ""}
             </>
           )}
+          {p.figcLabels.length > 0 && ` · Anagrafe FIGC: ${p.figcLabels.map((l) => `«${l}»`).join(", ")}`}
           {p.lndLabel && ` · Portale LND: «${p.lndLabel}»`}
           {p.evidence === "INFERRED" && " · da verificare"}
           {p.description && ` · ${p.description}`}

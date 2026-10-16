@@ -433,11 +433,6 @@ export const chiFaCosaInputSchema = z.object({
    * from the browser. null/empty or strings that are not registry positions = unknown -> "da confermare".
    */
   requesterPositions: z.array(z.string().max(60)).max(40).nullable().optional(),
-  /**
-   * Whether migration r138 is live (direttori sportivi, fisioterapista exist). Callers MUST pass only the value
-   * verified on the server (registry-live.server.ts r138Live), never input from the browser. Default false.
-   */
-  r138Live: z.boolean().optional(),
 });
 export type ChiFaCosaInput = z.input<typeof chiFaCosaInputSchema>;
 
@@ -484,14 +479,18 @@ const DUTY_ORDER: Readonly<Record<Duty, number>> = { DECIDE: 0, PREPARE: 1, INFO
  * Route a topic to positions. Pure and deterministic: same input, same output, ordered by duty then rank then id.
  * Throws a ZodError on an invalid topic/site (callers validate first with chiFaCosaInputSchema.safeParse).
  */
-export function routeChiFaCosa(raw: ChiFaCosaInput): ChiFaCosaRoute {
+/**
+ * r138Live: whether migration r138 is live (direttori sportivi, fisioterapista exist). It is NOT part of the input
+ * schema: callers pass only the value verified on the server by registry-live.server.ts r138Live(), never anything
+ * from the browser, a mail or a form. Default false (fail closed).
+ */
+export function routeChiFaCosa(raw: ChiFaCosaInput, r138Live = false): ChiFaCosaRoute {
   const input = chiFaCosaInputSchema.parse(raw);
   const rule = CHI_FA_COSA_TABLE[input.topic];
   const warnings: string[] = [];
   const missing = new Map<string, MissingPosition>();
   const byPos = new Map<string, { duty: Duty; reasons: string[]; teamKey: string | null }>();
 
-  const r138Live = input.r138Live === true;
   const add = (position: string, duty: Duty, reason: string, teamKey: string | null = null) => {
     if (!isRoutablePosition(position, r138Live)) {
       if (!missing.has(position))

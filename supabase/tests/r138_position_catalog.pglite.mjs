@@ -137,7 +137,7 @@ const failsWith = (code, needle) => (e) => {
 // 1. Seed: every organisation gets every catalogue position, ACTIVE and EMPTY; 24 qualifications; nothing linked.
 {
   const n = CONFIG.positions.length;
-  assert.equal(n, 85);
+  assert.equal(n, 118);
   const counts = (await db.query(`select organization_id::text o, count(*)::int n, count(*) filter (where status = 'ACTIVE')::int a,
       count(*) filter (where is_custom)::int c from public.scd_position_catalog group by 1 order by 1`)).rows;
   assert.deepEqual(counts, [{ o: ORG, n, a: n, c: 0 }, { o: OTHER, n, a: n, c: 0 }]);
@@ -173,7 +173,9 @@ const BOARD = `select public.scd_position_catalog_board($1) b`;
 {
   const b = await one(PRES, BOARD, [ORG]);
   assert.equal(b.canCreate, true);
-  assert.equal(b.positions.length, 85);
+  assert.equal(b.positions.length, 118);
+  assert.deepEqual(b.positions.find((x) => x.code === "direttore-sportivo").figcLabels, ["Direttore sportivo", "Direttore Sportivo"]);
+  assert.deepEqual(b.positions.find((x) => x.code === "presidente").figcLabels, ["Presidente"]);
   assert.equal(b.positions.find((x) => x.code === "tesoriere").lndLabel, "Cassiere");
   assert.ok(b.positions.every((x) => x.holders === 0 && x.status === "ACTIVE"));
   assert.ok(b.positions.every((x) => !("created_by" in x) && !("createdBy" in x)));
@@ -268,10 +270,18 @@ const STATUS = `select public.scd_set_position_status($1, $2, $3, $4) s`;
   await db.query(`select set_config('request.jwt.claim.sub', '', false)`);
   await assert.rejects(db.query(HOLD, [ORG, P(9), "Speaker", "STAFF", "speaker", null]), /position not active/);
   assert.equal(await one(PRES, STATUS, [ORG, "speaker", "ACTIVE", null]), true);
+  // D1 (Francesco 16/10/2026 "Chi lo crea"): the same Presidente creates and approves; approved_by and audit recorded.
+  const d1 = await one(PRES, CREATE, [ORG, "Referente progetto scuole", "sgs", "RESPONSABILE", null]);
+  assert.equal(await one(PRES, STATUS, [ORG, d1, "ACTIVE", "approvo io"]), true);
+  const d1row = (await db.query(`select status, created_by, approved_by, approved_at is not null as stamped from public.scd_position_catalog where organization_id = $1 and code = $2`, [ORG, d1])).rows[0];
+  assert.deepEqual(d1row, { status: "ACTIVE", created_by: PRES, approved_by: PRES, stamped: true });
+  const d1audit = (await db.query(`select action, actor_user_id, detail from public.scd_access_audit where detail->>'code' = $1 order by id`, [d1])).rows;
+  assert.deepEqual(d1audit.map((a) => [a.action, a.actor_user_id]), [["CREATE_POSITION", PRES], ["POSITION_STATUS", PRES]]);
+  assert.deepEqual([d1audit[1].detail.from, d1audit[1].detail.to], ["PROPOSED", "ACTIVE"]);
   // An existing holder keeps its row when only the qualification changes.
   await db.query(`update public.scd_structure_roles set qualification_code = 'allenatore-uefa-b' where id = $1`, [mister]);
   const actions = (await db.query(`select action from public.scd_access_audit order by id`)).rows.map((r) => r.action);
-  assert.deepEqual(actions, ["CREATE_POSITION", "CREATE_POSITION", "CREATE_POSITION", "CREATE_POSITION", "POSITION_STATUS", "POSITION_STATUS", "POSITION_STATUS"]);
+  assert.deepEqual(actions, ["CREATE_POSITION", "CREATE_POSITION", "CREATE_POSITION", "CREATE_POSITION", "POSITION_STATUS", "POSITION_STATUS", "POSITION_STATUS", "CREATE_POSITION", "POSITION_STATUS"]);
 }
 
 // 7. Direttori sportivi: assignable, Dervio + Colico readers, confirmers of their groups.
