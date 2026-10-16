@@ -3,7 +3,7 @@
 > Copia nel repo (UD-164), 16/10/2026. Sanificata: nessun numero di telefono, nessuna mail personale, nessun segreto nel testo originale (controllo automatico su numeri ≥ 9 cifre, indirizzi mail, token); gli id di esecuzione Make e gli id di scenari e data store restano. Nei blueprint del repo il phone_number_id WhatsApp del club è sostituito da `<WHATSAPP_PHONE_NUMBER_ID>`.
 
 
-Esito attuale: **T1–T15 PASS dopo la revisione** (giro «R», sezione sotto). Prima della revisione: T1–T10 PASS (giro «G», 15:15–15:17 UTC), dopo 6 correzioni al blueprint.
+Esito attuale: **T1–T15 PASS dopo la revisione** (giro «R») e **T8c corretto con testo fisso di Make** (giro «S»), sezioni sotto. Prima della revisione: T1–T10 PASS (giro «G», 15:15–15:17 UTC), dopo 6 correzioni al blueprint.
 Approvazioni: «ok Iride v4» (16:31) e «Sì, accendi la copia» (16:42). Le copie di test sono state attivate solo durante i test e ora sono **spente**: 8000995 isActive=false, 8001010 isActive=false (VERIFIED con scenarios_get).
 Non toccati: scenario 7979437 (lastEdit 2026-10-16T11:03Z, invariato), data store 220276, altri scenari. Nessun messaggio o mail reale inviato, nessuna riga scritta in INTAKE_LOG.
 
@@ -42,9 +42,25 @@ Il prompt (modulo 7) **non cambia**: `system-prompt.it.md` resta identico byte p
 
 Note del giro R:
 1. T2: variabilità dell'AI (prompt invariato): nel T1 l'AI ha messo `motivo` NESSUNO e un riassunto senza la forma «Amichevole · squadra …», così al messaggio dopo non ha ritrovato la squadra. La richiesta parte comunque appena i tre dati ci sono; nessuna richiesta parte con dati mancanti. PROPOSED v4.1: tenere la squadra in Make (non solo nel riassunto dell'AI).
-2. T8c: la regola 16 vieta di dire se ci sono richieste in attesa, ma l'AI ha detto «non ho nessuna richiesta in attesa» leggendo la riga RUBRICA del DG («nessuna amichevole in attesa», che riguarda solo le richieste fatte dal DG). Nessuna decisione registrata. PROPOSED v4.1: per il numero con ruolo DIRETTORE GENERALE, testo fisso di Make quando il messaggio è sì/no senza codice, oppure togliere «richiesta aperta» dalla riga RUBRICA del DG.
+2. T8c (CORRETTO nel giro S, vedi sezione sopra): la regola 16 vieta di dire se ci sono richieste in attesa, ma l'AI ha detto «non ho nessuna richiesta in attesa» leggendo la riga RUBRICA del DG («nessuna amichevole in attesa», che riguarda solo le richieste fatte dal DG). Nessuna decisione registrata. PROPOSED v4.1: per il numero con ruolo DIRETTORE GENERALE, testo fisso di Make quando il messaggio è sì/no senza codice, oppure togliere «richiesta aperta» dalla riga RUBRICA del DG.
 3. Durante la correzione la copia 8000995 è stata accesa per errore 3 secondi prima dell'aggiornamento (15:55:52–15:55:55 UTC) e subito spenta: nessuna esecuzione in quell'intervallo (VERIFIED con executions_list).
 4. Dati di prova rimasti nei data store di test 221454/221455/221474 (solo numeri finti TESTIRIDE-*): non toccano il live.
+
+## Correzione T8c (16/10/2026 sera, richiesta del coordinatore prima del go-live) · giro «S»
+Problema (giro R, T8c): al «sì va bene» del DG senza codice l'AI aveva scritto «non ho nessuna richiesta in attesa» mentre AM-0009 era aperta (informazione falsa al DG).
+Correzione: quando il mittente ha `ruolo` = DIRETTORE GENERALE, non c'è `context.id`, non c'è codice e il testo è un sì/no breve (`60.si_no_breve`: inizia con SÌ/NO/OK, solo lettere, al massimo 30 caratteri, non da pulsante), il modulo 61 dà la rotta **DG_SENZA_CODICE** e Make risponde con un **testo fisso, senza AI** (router 62, ramo 4, moduli 100–104): 100 cerca nel data store richieste fino a 5 record IN_ATTESA_DG; 101 compone «• AM-… · squadra · data · contro avversario» con gli stessi limiti e la stessa neutralizzazione del modulo 69; 102 aggiorna `ultimo_contatto` del DG; 103 invia «Richieste di amichevole in attesa: … Rispondi SÌ AM-… oppure NO AM-… con il codice della richiesta, oppure tocca il pulsante nel messaggio di Iride.» oppure «Non ci sono richieste di amichevole in attesa. Iride (assistente AI)»; 104 riga INTAKE_LOG (CHIUSO, nessuna decisione). Un messaggio più lungo del DG (es. una domanda) resta conversazione normale con l'AI. Il testo è PROPOSED (formulazione non di Francesco). Prompt invariato.
+Nota di prova: il data store debug 221474 (struttura 641331) non aveva i campi m103/m104; aggiunti alla struttura di test, poi T8c ripetuto (il primo invio b8050f5716cf4e6388a904b7e2777c58 è andato sulla rotta giusta ma il debug era vuoto).
+
+| # | Caso | Effettivo | Esito | Execution id |
+|---|---|---|---|---|
+| T8c (con richieste in attesa) | DG «sì va bene» | rotta DG_SENZA_CODICE; testo fisso con 4 richieste in attesa (AM-0098, AM-0097, AM-0094, AM-0096) e «Rispondi SÌ AM-… oppure NO AM-…»; nessuna decisione | PASS | 363e813fb8b8441ea0f1082d884f2e19 |
+| T8c (nessuna richiesta in attesa) | DG «No» (richieste di prova messe RIFIUTATA prima) | «Non ci sono richieste di amichevole in attesa.»; nessuna decisione | PASS | 66305563840246568c5be9ac2d4f2029 |
+| T8e (in più) | DG «sì, ma a che ora gioca la U15 sabato prossimo?» | rotta NORMALE, risponde l'AI con l'AGENDA | PASS | b53a7f219bdb446aa4b0b0dc551a5b4b |
+| T4 (regressione) | DG «Sì AM-0011» | CONFERMATA, 92 al DG, 94 al richiedente | PASS | 865d8644f9984433b6c14edf7e34de66 |
+| T7 (regressione) | genitore «sì» | NORMALE, risposta AI | PASS | 5811234b00a04c679bee02b628324dad |
+| T11 (regressione) | genitore «Sì 2» | NORMALE, nessun IGNORA | PASS | b6c5999d29b04df9929442cc65266113 |
+
+Copie spente dopo i test (8000995 isActive=false, 8001010 isActive=false, VERIFIED con scenarios_get). T2 resta com'è: nota per v4.1.
 
 ## Oggetti in Make (team 2129271)
 | Oggetto | ID | Note |

@@ -58,6 +58,10 @@
      {
       "name": "analisi",
       "value": "{{if(ifempty(1.messages[1].interactive.button_reply.id; ifempty(1.messages[1].button.payload; \"\")) != \"\"; replace(substring(trim(replace(replace(upper(trim(ifempty(1.messages[1].interactive.button_reply.id; ifempty(1.messages[1].button.payload; ifempty(1.messages[1].text.body; \"\"))))); \"/[ÌÍ]/g\"; \"I\"); \"/['’`.!,;:]+/g\"; \" \")); 0; 40); \"/^(SI|NO)(?:\\s+(?:AM\\s?-?\\s?)?(\\d{1,4}))?$/\"; \"OK|$1|$2|\"); replace(substring(trim(replace(replace(upper(trim(ifempty(1.messages[1].interactive.button_reply.id; ifempty(1.messages[1].button.payload; ifempty(1.messages[1].text.body; \"\"))))); \"/[ÌÍ]/g\"; \"I\"); \"/['’`.!,;:]+/g\"; \" \")); 0; 40); \"/^(SI|NO)(?:\\s+AM\\s?-?\\s?(\\d{1,4}))?$/\"; \"OK|$1|$2|\"))}}"
+     },
+     {
+      "name": "si_no_breve",
+      "value": "{{if(ifempty(1.messages[1].interactive.button_reply.id; ifempty(1.messages[1].button.payload; \"\")) = \"\" & length(trim(replace(replace(upper(trim(ifempty(1.messages[1].interactive.button_reply.id; ifempty(1.messages[1].button.payload; ifempty(1.messages[1].text.body; \"\"))))); \"/[ÌÍ]/g\"; \"I\"); \"/['’`.!,;:]+/g\"; \" \"))) <= 30 & replace(trim(replace(replace(upper(trim(ifempty(1.messages[1].interactive.button_reply.id; ifempty(1.messages[1].button.payload; ifempty(1.messages[1].text.body; \"\"))))); \"/[ÌÍ]/g\"; \"I\"); \"/['’`.!,;:]+/g\"; \" \")); \"/^(SI|NO|OK)(\\s+[A-Z\\s]{0,25})?$/\"; \"§\") = \"§\"; true; false)}}"
      }
     ]
    }
@@ -80,7 +84,7 @@
      },
      {
       "name": "rotta",
-      "value": "{{if((substring(60.analisi; 0; 3) = \"OK|\") & (ifempty(11.data.ruolo; \"\") = \"DIRETTORE GENERALE\") & (if((substring(60.analisi; 0; 3) = \"OK|\"); ifempty(get(split(60.analisi; \"|\"); 3); \"\"); \"\") != \"\" | (ifempty(1.messages[1].context.id; \"\") != \"\")); \"DG\"; if((substring(60.analisi; 0; 3) = \"OK|\") & if((substring(60.analisi; 0; 3) = \"OK|\"); ifempty(get(split(60.analisi; \"|\"); 3); \"\"); \"\") != \"\" & ifempty(11.data.ruolo; \"\") != \"DIRETTORE GENERALE\"; \"IGNORA\"; \"NORMALE\"))}}"
+      "value": "{{if((substring(60.analisi; 0; 3) = \"OK|\") & (ifempty(11.data.ruolo; \"\") = \"DIRETTORE GENERALE\") & (if((substring(60.analisi; 0; 3) = \"OK|\"); ifempty(get(split(60.analisi; \"|\"); 3); \"\"); \"\") != \"\" | (ifempty(1.messages[1].context.id; \"\") != \"\")); \"DG\"; if((substring(60.analisi; 0; 3) = \"OK|\") & if((substring(60.analisi; 0; 3) = \"OK|\"); ifempty(get(split(60.analisi; \"|\"); 3); \"\"); \"\") != \"\" & ifempty(11.data.ruolo; \"\") != \"DIRETTORE GENERALE\"; \"IGNORA\"; if((ifempty(11.data.ruolo; \"\") = \"DIRETTORE GENERALE\") & ifempty(1.messages[1].context.id; \"\") = \"\" & if((substring(60.analisi; 0; 3) = \"OK|\"); ifempty(get(split(60.analisi; \"|\"); 3); \"\"); \"\") = \"\" & 60.si_no_breve; \"DG_SENZA_CODICE\"; \"NORMALE\")))}}"
      }
     ]
    }
@@ -1217,6 +1221,130 @@
        ],
        "version": 1,
        "metadata": {}
+      }
+     ]
+    },
+    {
+     "flow": [
+      {
+       "id": 100,
+       "module": "datastore:SearchRecord",
+       "version": 1,
+       "metadata": {},
+       "parameters": {
+        "datastore": 221453,
+        "continueWhenNoRes": true,
+        "limit": 5
+       },
+       "filter": {
+        "name": "DG: sì/no senza codice e senza messaggio citato",
+        "conditions": [
+         [
+          {
+           "a": "{{61.rotta}}",
+           "b": "DG_SENZA_CODICE",
+           "o": "text:equal"
+          }
+         ]
+        ]
+       },
+       "mapper": {
+        "filter": [
+         [
+          {
+           "a": "stato",
+           "o": "text:equal",
+           "b": "IN_ATTESA_DG"
+          },
+          {
+           "a": "codice",
+           "o": "text:startwith",
+           "b": "AM-"
+          }
+         ]
+        ]
+       }
+      },
+      {
+       "id": 101,
+       "module": "util:TextAggregator",
+       "version": 1,
+       "metadata": {},
+       "parameters": {
+        "feeder": 100,
+        "rowSeparator": "\n"
+       },
+       "mapper": {
+        "value": "{{if(ifempty(100.key; \"\") = \"\"; \"\"; \"• \" + 100.data.codice + \" · \" + substring(replace(replace(trim(ifempty(100.data.squadra; \"\")); \"/[\\r\\n]+/g\"; \" \"); \"/(^|[^A-Za-z0-9])[Aa][Mm]\\s?-?\\s?(\\d+)/g\"; \"$1AM·$2\"); 0; 60) + \" · \" + substring(replace(replace(trim(ifempty(100.data.data_gara; \"\")); \"/[\\r\\n]+/g\"; \" \"); \"/(^|[^A-Za-z0-9])[Aa][Mm]\\s?-?\\s?(\\d+)/g\"; \"$1AM·$2\"); 0; 40) + \" · contro \" + substring(replace(replace(trim(ifempty(100.data.avversario; \"\")); \"/[\\r\\n]+/g\"; \" \"); \"/(^|[^A-Za-z0-9])[Aa][Mm]\\s?-?\\s?(\\d+)/g\"; \"$1AM·$2\"); 0; 80))}}"
+       }
+      },
+      {
+       "id": 102,
+       "module": "datastore:UpdateRecord",
+       "version": 1,
+       "metadata": {},
+       "parameters": {
+        "datastore": 220276
+       },
+       "mapper": {
+        "key": "{{1.messages[1].from}}",
+        "upsert": false,
+        "overwriteArrays": false,
+        "data": {
+         "ultimo_contatto": "{{now}}"
+        }
+       }
+      },
+      {
+       "id": 103,
+       "module": "whatsapp-business-cloud:sendMessage",
+       "version": 1,
+       "metadata": {},
+       "parameters": {
+        "__IMTCONN__": 11971947
+       },
+       "mapper": {
+        "to": "+{{1.messages[1].from}}",
+        "type": "text",
+        "fromId": "<WHATSAPP_PHONE_NUMBER_ID>",
+        "text": {
+         "body": "{{substring(if(trim(101.text) = \"\"; \"Non ci sono richieste di amichevole in attesa. Iride (assistente AI)\"; \"Richieste di amichevole in attesa:\" + newline + 101.text + newline + newline + \"Rispondi SÌ AM-… oppure NO AM-… con il codice della richiesta, oppure tocca il pulsante nel messaggio di Iride.\"); 0; 1000)}}",
+         "preview_url": false
+        }
+       }
+      },
+      {
+       "id": 104,
+       "module": "google-sheets:addRow",
+       "version": 2,
+       "metadata": {},
+       "parameters": {
+        "__IMTCONN__": 11936528
+       },
+       "mapper": {
+        "mode": "fromAll",
+        "values": {
+         "NOTES": "Direttore Generale: sì/no senza codice; risposta fissa di Make con le richieste in attesa (nessuna decisione registrata)",
+         "SEASON": "2026/27",
+         "STATUS": "CHIUSO",
+         "LINK_ID": "whatsapp:direttore-generale",
+         "CATEGORY": "WHATSAPP_SEGRETERIA",
+         "FILE_NAME": "",
+         "TIMESTAMP": "{{formatDate(parseDate(1.messages[1].timestamp; \"X\"); \"YYYY-MM-DD HH:mm\"; \"Europe/Rome\")}}",
+         "REQUEST_ID": "WA-{{1.messages[1].id}}",
+         "ROLE_SCOPE": "DIREZIONE",
+         "ROUTING_RULE": "SCD-WA-AI-v4 · DG senza codice · testo fisso",
+         "DOCUMENT_TYPE": "AMICHEVOLE",
+         "SUBMITTER_NAME": "Direttore Generale",
+         "SUBMITTER_EMAIL": ""
+        },
+        "sheetId": "INTAKE_LOG",
+        "spreadsheetId": "1ruGLKpFYdirMV6NvOHWoCsSxy3f7Yd9VMfCykuQrmgY",
+        "includesHeaders": true,
+        "useColumnHeaders": true,
+        "valueInputOption": "RAW",
+        "insertUnformatted": false
+       }
       }
      ]
     }

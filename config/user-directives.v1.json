@@ -3805,7 +3805,11 @@
             "status": "PROPOSED"
           },
           {
-            "text": "v4.1: for the DIRETTORE GENERALE number, a fixed Make reply to a yes/no without code (test T8c: the AI said «nessuna richiesta in attesa» while one was open); keep the friendly team in Make, not only in the AI summary (test T2).",
+            "text": "IMPLEMENTED (wording PROPOSED, not Francesco's): when the DIRETTORE GENERALE writes a short yes/no without AM code and without quoting a message, Make answers with a fixed text, no AI: up to 5 requests IN_ATTESA_DG («• AM-… · squadra · data · contro avversario», sanitised like module 69) and «Rispondi SÌ AM-… oppure NO AM-… con il codice della richiesta, oppure tocca il pulsante nel messaggio di Iride.», or «Non ci sono richieste di amichevole in attesa.». Fixes test T8c (the AI had said «nessuna richiesta in attesa» while one was open). Modules 100-104, route DG_SENZA_CODICE.",
+            "status": "PROPOSED"
+          },
+          {
+            "text": "v4.1: keep the friendly team in Make, not only in the AI summary (test T2: the AI asked again for the team).",
             "status": "PROPOSED"
           }
         ],
