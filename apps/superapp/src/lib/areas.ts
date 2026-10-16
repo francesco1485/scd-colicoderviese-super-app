@@ -258,6 +258,8 @@ export const WORK_AREA_IDS: readonly string[] = [
   "quadro",
   // Planning annuale (Francesco 15-16/10/2026, missing gestionali): same staff gate as /gestionale.
   "planning",
+  // Vetrina richieste (UD-163, Francesco 16/10/2026 15:44): one catalogue of external requests, r139 STAGED.
+  "intake",
 ];
 
 /**
