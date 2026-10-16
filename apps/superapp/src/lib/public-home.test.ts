@@ -108,6 +108,10 @@ describe("public home v5", () => {
     // The three official marks live in the top bar, CR Lombardia and Monza linked.
     const chrome = code("src/components/SiteChrome.tsx");
     expect(chrome).toContain('data-testid="header-credentials"');
+    // Never on a white plate (16/10 15:05): the marks sit on the blue bar, transparent, with a light halo.
+    const creds = chrome.slice(chrome.indexOf("function HeaderCredentials"), chrome.indexOf("export function SiteHeader"));
+    expect(creds).not.toMatch(/\bbg-white\b/);
+    expect(creds).toContain("drop-shadow(0_0_1px_rgb(255_255_255/0.95))");
     expect(chrome).toContain('"https://www.crlombardia.it/"');
     expect(chrome).toContain('"https://www.acmonza.com/en/insieme-monza-dettaglio/mission/"');
   });

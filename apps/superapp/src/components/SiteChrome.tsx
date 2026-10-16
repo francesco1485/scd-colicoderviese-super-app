@@ -304,8 +304,9 @@ function TopTabs() {
 
 /**
  * The three official marks in the top bar (Francesco 16/10/2026 07:07 «mettili in alto sulla barra, scontornati e
- * piccoli, solo il Monza un po' più grande»): cut-out files on a small white plate, CR Lombardia and AC Monza linked
- * to their official sites. Monza is larger: affiliation with a Serie A club.
+ * piccoli, solo il Monza un po' più grande»): transparent cut-outs straight on the blue bar with a light halo, never on a
+ * white plate (Francesco 16/10/2026 14:58-15:05: «non utilizzare più con sfondo bianco», «utilizzali sempre»). CR Lombardia
+ * and AC Monza linked to their official sites. Monza is larger: affiliation with a Serie A club.
  */
 const CREDENTIAL_LINK: Partial<Record<CredentialId, string>> = {
   lnd: "https://www.crlombardia.it/",
@@ -320,12 +321,12 @@ const CREDENTIAL_H: Record<CredentialId, string> = {
 function HeaderCredentials() {
   return (
     <ul
-      className="m-0 flex shrink-0 list-none items-center gap-1.5 rounded-[10px] bg-white px-1.5 py-1 shadow-[0_2px_8px_-3px_rgb(0_0_0/0.35)] lg:gap-3 lg:px-3 lg:py-1.5"
+      className="m-0 flex shrink-0 list-none items-center gap-2 px-0.5 py-1 lg:gap-4 lg:px-1"
       aria-label="Riconoscimenti e affiliazioni della società"
       data-testid="header-credentials"
     >
       {CLUB_CREDENTIALS.map((c) => {
-        const img = <img src={c.art.src} alt={c.alt} decoding="async" className={`${CREDENTIAL_H[c.id]} w-auto object-contain`} />;
+        const img = <img src={c.art.src} alt={c.alt} decoding="async" className={`${CREDENTIAL_H[c.id]} w-auto object-contain [filter:drop-shadow(0_0_1px_rgb(255_255_255/0.95))_drop-shadow(0_0_5px_rgb(255_255_255/0.55))]`} />;
         const href = CREDENTIAL_LINK[c.id];
         return (
           <li key={c.id} className="flex">
