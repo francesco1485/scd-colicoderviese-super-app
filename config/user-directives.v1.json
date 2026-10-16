@@ -3415,7 +3415,7 @@
       "context": "Francesco 15/10/2026 19:00-19:30 (chat cloud), answers to the three open decisions of claude.ai project doc claude/SCD_RUOLI_INCARICHI_v1.md section 8; recorded in claude/SCD_DELEGHE_DECISIONI_2026-10-15.md. Builds on UD-112 (per-person grants, r100 applied 14/10).",
       "normalizedCommand": {
         "rule": "Roles are named sets of section grants, one platform each (SCD ONE, CORE, GROW); every platform always offers an empty role; only the Presidente and the Direttore Generale create, edit or deactivate roles; a role opens nothing by itself and is loaded on a person as proposals with that person's teams or site, saved through r100; a team role sees only its teams, a responsabile only the teams/areas/platforms the Direzione grants; a grant needs the person's base access (active account) first. Work split with the PC chat recorded in claude/SCD_DIVISIONE_COMPITI.md section 5.",
-        "status": "R111_APPLIED_2026_10_16_R112_STAGED",
+        "status": "R111_APPLIED_2026_10_16_R112_R113_APPLIED_2026_10_17",
         "delivered": [
           "supabase/migrations/20261015_r111_role_templates.sql",
           "supabase/tests/r111_role_templates.pglite.mjs",
@@ -3426,7 +3426,7 @@
           "apps/superapp/src/components/scd/RoleLoader.tsx",
           "apps/superapp/src/routes/direzione_.ruoli.tsx",
           "apps/superapp/src/components/scd/RolesLink.tsx",
-          "supabase/migrations/20261016_r112_role_template_positions.sql (STAGED)",
+          "supabase/migrations/20261016_r112_role_template_positions.sql (APPLIED 17/10/2026)",
           "supabase/tests/r112_role_template_positions.pglite.mjs"
         ],
         "pending": [

@@ -6,7 +6,7 @@
  * Fail-closed everywhere: no session, no organisation, no verified identity, a missing function or any error → the
  * grants layer opens nothing and the old rule decides alone.
  *
- * Grants are read in one call with r113 `scd_my_section_access` (STAGED, NOT APPLIED). Until r113 is applied the gate
+ * Grants are read in one call with r113 `scd_my_section_access` (APPLIED 17/10/2026). If the function is ever missing the gate
  * asks r100 `scd_can` twice for the one section it needs (any perimeter, then perimeter ALL only: a site value that no
  * grant holds makes OWN_SITE / OWN_TEAMS / OWN_CHILDREN / SELF false), and the navigation shows no grant-only entry.
  */
