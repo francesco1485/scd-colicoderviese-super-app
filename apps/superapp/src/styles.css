@@ -233,7 +233,7 @@
 /* Le schermate Vision vivono dentro la shell: niente altezza piena né sfondo proprio. */
 /* Modulo Impianti: menu sezioni sotto l'intestazione fissa (--pub-header-h) e senza altezza piena. */
 /* Stessa palette delle tavole; la testata del modulo è sostituita dalla PageHeader della Super App. */
-.sa-core .imp { min-height: 0; --i-navy: #022d66; --i-blue: #0457af; --i-yellow: #ffd82a; --i-ground: var(--scd-page); --i-ink: var(--scd-ink); border-radius: 18px 18px 0 0; overflow: clip; }
+.sa-core .imp { min-height: 0; --i-navy: #13254d; --i-blue: #0457af; --i-yellow: #ffd82a; --i-ground: var(--scd-page); --i-ink: var(--scd-ink); border-radius: 18px 18px 0 0; overflow: clip; }
 .sa-core .imp-head { display: none; }
 .sa-core .imp-side-nav { top: 0; }
 @media (min-width: 1024px) { .sa-core .imp-side-nav { top: var(--pub-header-h); } }
@@ -987,7 +987,7 @@ html.uv-big .sa-shell { zoom: 1.12; }
  * definitivo»). One navy everywhere, brushed like metal; gold as polished metal on what you touch; silver edges.
  *   navy      #13254d (bands, header, sidebar)    deep  #0f1d3d    light sheen  #2a4a8a
  *   blue      var(--scd-blue) #0457af (links, kickers)              sky  #7fd0ff (glow only)
- *   gold      #ffd84a → #e0ab17 (buttons, active item)              silver #b8c5dd → #ffffff (edges)
+ *   gold      #ffd84a → #e0ab17 (buttons, active item)              silver #b8c5dd → #ffffff (card top edges, band underline)
  * --------------------------------------------------------------------------------------------------------------- */
 .scd-band {
   background-color: #13254d;
@@ -1011,11 +1011,6 @@ html.uv-big .sa-shell { zoom: 1.12; }
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.75), inset 0 0 0 1px rgb(176 128 0 / 0.45), 0 4px 12px -6px rgb(201 150 0 / 0.7);
 }
 .scd-gold:hover { filter: brightness(1.04) saturate(1.05); }
-.scd-silver-edge { position: relative; }
-.scd-silver-edge::before {
-  content: ""; position: absolute; inset: 0 0 auto 0; height: 2px; pointer-events: none;
-  background: linear-gradient(90deg, #8ea2c6 0%, #ffffff 22%, #b8c5dd 50%, #ffffff 78%, #8ea2c6 100%);
-}
 /* The yellow action button of the header becomes polished gold too. */
 .scd-action {
   background-color: #ffd84a;
@@ -1023,4 +1018,8 @@ html.uv-big .sa-shell { zoom: 1.12; }
   color: #1a1300;
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.75), inset 0 0 0 1px rgb(176 128 0 / 0.45);
 }
-.scd-action:hover { background-color: #ffd84a; filter: brightness(1.04); }
+.scd-action:hover {
+  background-color: #ffd84a;
+  background-image: linear-gradient(180deg, #fff3b0 0%, #ffd84a 42%, #e0ab17 56%, #ffe27a 100%);
+  filter: brightness(1.04);
+}

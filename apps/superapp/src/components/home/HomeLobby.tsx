@@ -188,7 +188,7 @@ function WeekStrip({ events, groups, nowMs }: { events: readonly PublicEvent[]; 
               {live.length > 1 ? ` · +${live.length - 1}` : ""}
             </Link>
           ) : (
-            <span className="font-display text-[14px] text-[#8fa3c7]">nessuna gara ora</span>
+            <span className="font-display text-[14px] text-[#b4c3de]">nessuna gara ora</span>
           )}
         </div>
         <div className="flex min-w-0 basis-full items-center lg:flex-1 lg:basis-0">
@@ -216,7 +216,7 @@ function WeekStrip({ events, groups, nowMs }: { events: readonly PublicEvent[]; 
                 {row(true)}
               </ul>
             ) : (
-              <p className="m-0 flex min-h-11 items-center px-3 font-display text-[13px] text-[#8fa3c7]">{live.length > 0 ? "Nessun'altra gara nei prossimi 7 giorni" : "Nessuna gara nei prossimi 7 giorni"}</p>
+              <p className="m-0 flex min-h-11 items-center px-3 font-display text-[13px] text-[#b4c3de]">{live.length > 0 ? "Nessun'altra gara nei prossimi 7 giorni" : "Nessuna gara nei prossimi 7 giorni"}</p>
             )}
           </div>
           <Link
@@ -265,7 +265,7 @@ function ClubAffiliation() {
               </span>
               <span className="block">Campionati con LND Lombardia · società affiliata AC Monza</span>
             </p>
-            <span className="font-display text-[12px] text-[#8fa3c7] lg:text-[14px]">Matricola FIGC {CLUB_PROFILE.figcMatricola}</span>
+            <span className="font-display text-[12px] text-[#b4c3de] lg:text-[14px]">Matricola FIGC {CLUB_PROFILE.figcMatricola}</span>
           </div>
         </div>
         <div className="flex flex-wrap items-center justify-between gap-3 lg:flex-col lg:items-end lg:gap-4">

@@ -887,7 +887,7 @@ export function SiteFooter() {
           <div className="flex flex-wrap items-center gap-2">
             <Link
               to="/installa"
-              className="scd-focus inline-flex min-h-11 min-w-11 items-center text-[14px] gap-1.5 scd-gold rounded-[10px] px-4 font-extrabold transition-[filter] duration-150 hover:brightness-95"
+              className="scd-focus inline-flex min-h-11 min-w-11 items-center text-[14px] gap-1.5 scd-gold rounded-[10px] px-4 font-extrabold transition-[filter] duration-150"
               data-testid="footer-install"
             >
               <Download className="size-4" aria-hidden="true" />
