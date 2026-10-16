@@ -2095,7 +2095,7 @@
           "FIRST_AID_EQUIPMENT",
           "NUTRITION_GENERAL_GUIDANCE"
         ],
-        "storage": "supabase/migrations/20261016_r136_infermeria_nutrizione.sql (approved, apply pending; apply after r101): scd_first_aid_kits, scd_aed_devices with RLS on and no policies; nutrition requests go to scd_proposals (r79) through scd_proposal_ingest as RISERVATO with title 'Richiesta consulenza nutrizionista · <squadra>' only, and scd_proposal_queue is recreated identical to r79 except area 'nutrizione' excluded (never in the office queue); section 'nutrizione' appended to scd_section_catalog; position 'nutrizionista' appended to scd_access_admin_guard; helpers scd_health_staff / scd_health_short_name not executable by API roles",
+        "storage": "supabase/migrations/20261016_r136_infermeria_nutrizione.sql (APPLIED on SCD PULSE 16/10/2026; catalogue = live r100 + nutrizione, r101 must carry nutrizione when applied): scd_first_aid_kits, scd_aed_devices with RLS on and no policies; nutrition requests go to scd_proposals (r79) through scd_proposal_ingest as RISERVATO with title 'Richiesta consulenza nutrizionista · <squadra>' only, and scd_proposal_queue is recreated identical to r79 except area 'nutrizione' excluded (never in the office queue); section 'nutrizione' appended to scd_section_catalog; position 'nutrizionista' appended to scd_access_admin_guard; helpers scd_health_staff / scd_health_short_name not executable by API roles",
         "consumers": [
           "SCD_SUPABASE.scd_first_aid_kits",
           "SCD_SUPABASE.scd_aed_devices",
