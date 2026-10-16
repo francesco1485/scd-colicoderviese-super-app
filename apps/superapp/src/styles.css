@@ -966,3 +966,18 @@ html.uv-big .sa-shell { zoom: 1.12; }
   .scd-ticker { overflow-x: auto; }
   .scd-ticker-dup { display: none; }
 }
+
+/* "Via di mezzo" (16/10/2026): thin metallic line under the navy top bar, a slow light running along it; still with
+   reduced motion. One of the three allowed movements (games strip, metal line, live pulse). */
+.scd-metal-line::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 2px;
+  background: linear-gradient(90deg, #6f84ad 0%, #c9d4e8 20%, #ffffff 30%, #c9d4e8 40%, #6f84ad 60%, #c9d4e8 80%, #6f84ad 100%);
+  background-size: 200% 100%;
+  animation: scd-metal-run 9s linear infinite;
+}
+@keyframes scd-metal-run { from { background-position: 100% 0 } to { background-position: -100% 0 } }
+@media (prefers-reduced-motion: reduce) { .scd-metal-line::after { animation: none; } }

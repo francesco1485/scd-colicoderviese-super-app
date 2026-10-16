@@ -2,14 +2,32 @@ import { describe, expect, it } from "vitest";
 
 import type { PublicEvent } from "@/lib/public-snapshots";
 
-import { birthYears, countdownLabel, nextHome, romeMs } from "./HomeLobby";
+import { countdownLabel, monthGrid, nextHome, romeMs, sessionRunning, splitLive, weekOf } from "./HomeLobby";
 
 describe("home lobby helpers", () => {
-  it("writes birth years only from the master", () => {
-    expect(birthYears({ years: ["2013", "2012"] })).toBe("Nati 2012–2013");
-    expect(birthYears({ years: ["2014"] })).toBe("Nati 2014");
-    expect(birthYears({ years: [] })).toBe("");
-    expect(birthYears(undefined)).toBe("");
+  it("moves a game being played out of the strip into the In corso box and drops finished games", () => {
+    const ev = (id: string, time: string) => ({ id, date: "2026-10-17", time, homeAway: "CASA" }) as PublicEvent;
+    const now = Date.parse("2026-10-17T13:30:00Z"); // sabato 15:30 a Roma
+    const { live, strip } = splitLive([ev("done", "09:00"), ev("live", "15:00"), ev("next", "17:00"), ev("notime", "")], now);
+    expect(live.map((e) => e.id)).toEqual(["live"]);
+    expect(strip.map((e) => e.id)).toEqual(["next", "notime"]);
+  });
+
+  it("marks a training session as running only between start and end", () => {
+    const r = { time: "17:20", end: "18:50" };
+    expect(sessionRunning(r, "17:19")).toBe(false);
+    expect(sessionRunning(r, "17:20")).toBe(true);
+    expect(sessionRunning(r, "18:49")).toBe(true);
+    expect(sessionRunning(r, "18:50")).toBe(false);
+    expect(sessionRunning({ time: "17:20", end: "" }, "17:30")).toBe(false);
+  });
+
+  it("builds a Monday-first month and week", () => {
+    const oct = monthGrid("2026-10"); // 1 ottobre 2026 è giovedì
+    expect(oct.slice(0, 4)).toEqual([null, null, null, 1]);
+    expect(oct.at(-1)).toBe(31);
+    expect(weekOf("2026-10-16")).toEqual(["2026-10-12", "2026-10-13", "2026-10-14", "2026-10-15", "2026-10-16", "2026-10-17", "2026-10-18"]);
+    expect(weekOf("2026-10-18")[0]).toBe("2026-10-12");
   });
 
   it("counts down to the next home game in plain Italian", () => {
