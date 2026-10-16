@@ -24,7 +24,10 @@
 --     in-app area (no minors' names through Tally).
 --   * 15:44 «Li crea la Tesoreria»: a Tesoreria person creates the payment link of each ACCEPTED request (no
 --     automatic SumUp links); the link is recorded on the request and reconciled later.
---   * 13:31 «DG conferma tutto»: the Direttore Generale decides every kind (with the Presidente and the Direzione).
+--   * 13:31 «DG conferma tutto»: the Direttore Generale decides the kinds below, except the two of 16:39.
+--   * 16:39 «decide presidente e consiglio direttivo» (VERIFIED, answer to "who decides AFFITTO CAMPO and VISITA AL
+--     CENTRO"): field rentals and visits are decided by the Presidente and the Consiglio Direttivo. The DG handles and
+--     forwards them (preparer), it does not decide them. No threshold under which the DG decides alone (not decided).
 --
 -- What it adds (mirror: apps/superapp/src/lib/intake-kinds.ts, kept equal by intake-migration.test.ts):
 --   1. scd_requests.kind: AMICHEVOLE + the F1 external kinds ISCRIZIONE_TORNEO, SPONSOR, CONVENZIONE, AFFITTO_CAMPO,
@@ -47,7 +50,9 @@
 --   5. scd_request_ingest(org, payload): ONLY the service role (future Make scenario "Tally richieste"): strict
 --      whitelist per kind, adult and privacy consent required, contacts (also obfuscated e-mails and split phone
 --      numbers, scd_intake_redact) and health words removed from free text, idempotent on source_ref (also under
---      concurrent calls), hourly cap (PROPOSED: 60/hour); creates RICEVUTA + contact + in-app notice. Never sends
+--      concurrent calls), hourly cap (PROPOSED: 60/hour; PROPOSED for the Tally/Make side, not built: a honeypot field
+--      in the Tally form and a Make filter that drops filled honeypots before the ingest); creates RICEVUTA + contact +
+--      in-app notice. Organisation and role that contain an e-mail or a phone number are refused. Never sends
 --      anything.
 --   6. scd_intake_kinds() (probe, harmless), scd_intake_board(org, filters), scd_intake_decide(org, id, action, note,
 --      value), scd_intake_contact(org, id), scd_intake_payment_set(org, id, payload), scd_intake_notices(org): each
@@ -56,17 +61,21 @@
 --   7. r133 reads scd_requests_board, scd_request_form and scd_request_notices: same text plus `kind = 'AMICHEVOLE'`
 --      (the friendlies page never shows external requests). MODIFIES existing functions: review.
 --
--- Deciders. DECIDED by Francesco: «DG conferma tutto» (13:31) and the payment link of an accepted request is created
--- by a Tesoreria person («Li crea la Tesoreria», 15:44). Everything else below is PROPOSED (mirror of the
--- lib/chi-fa-cosa.ts topics, design question 5 still open: who decides field rentals and visits, and whether the DG
--- alone decides below a threshold); the positions, the per-kind payment-link yes/no, the 60/hour cap and the contact
--- retention periods wait for Francesco's confirmation. Always deciding: the Direzione (role DIRECTION), the
--- Presidente and the Direttore Generale; per kind (PROPOSED):
---   ISCRIZIONE_TORNEO (tornei): decide responsabile-tornei, prepare segreteria, inform coordinatore, tesoreria;
---   SPONSOR, CONVENZIONE (sponsor): decide DG + Presidente + Consiglio (direzione), inform tesoreria;
---   AFFITTO_CAMPO (impianti): decide board, prepare responsabile-campi, inform tesoreria + Colico structure;
---   VISITA_CENTRO (impianti): decide board, prepare segreteria, inform responsabile-campi + Colico structure;
---   ALTRO (comunicazioni): decide segreteria (smista, may reclassify), DG.
+-- Deciders. DECIDED by Francesco: «DG conferma tutto» (13:31), «Li crea la Tesoreria» (15:44: the payment link of an
+-- accepted request is created by a Tesoreria person) and, VERIFIED 16:39, «decide presidente e consiglio direttivo»
+-- for AFFITTO_CAMPO and VISITA_CENTRO. The Consiglio Direttivo is the Direzione: role DIRECTION or position
+-- 'direzione' (same convention as lib/chi-fa-cosa.ts BOARD_POSITION; the r138 catalogue codes 'consigliere' are not
+-- membership positions). An account of the DG that also carries the role DIRECTION decides as a member of the
+-- Consiglio: the model cannot tell the two apart. Everything else below is PROPOSED: the other kinds' positions,
+-- the per-kind payment-link yes/no, the 60/hour cap and the contact retention periods. Per kind:
+--   ISCRIZIONE_TORNEO (tornei, PROPOSED): decide responsabile-tornei, DG, Presidente; prepare segreteria; inform
+--     coordinatore, tesoreria;
+--   SPONSOR, CONVENZIONE (sponsor, PROPOSED): decide DG + Presidente + Consiglio (direzione), inform tesoreria;
+--   AFFITTO_CAMPO (DECIDED 16:39): decide Presidente + Consiglio (direzione); prepare DG, responsabile-campi
+--     (PROPOSED); inform tesoreria + Colico structure (PROPOSED);
+--   VISITA_CENTRO (DECIDED 16:39): decide Presidente + Consiglio (direzione); prepare DG, segreteria (PROPOSED);
+--     inform responsabile-campi + Colico structure (PROPOSED);
+--   ALTRO (comunicazioni, PROPOSED): decide segreteria (smista, may reclassify), DG, Presidente.
 --   Dervio (UD-156): DERVIO_ALWAYS informed; responsabile-campi, Club House and structure positions never see it.
 --
 -- Data: no minors, no health. External requests carry only an adult referent and an organisation (contacts table,
@@ -229,7 +238,7 @@ create or replace function public.scd_request_kind_rules(p_kind text)
 returns jsonb language sql immutable set search_path to 'public' as $$
   select case p_kind
     when 'ISCRIZIONE_TORNEO' then jsonb_build_object('area', 'tornei', 'topic', 'tornei',
-      'deciders', jsonb_build_array('responsabile-tornei','direttore-generale'),
+      'deciders', jsonb_build_array('responsabile-tornei','direttore-generale','presidente'),
       'preparers', jsonb_build_array('segreteria'),
       'informed', jsonb_build_array('coordinatore-attivita-sportiva','tesoreria'),
       'owners', jsonb_build_array('responsabile-tornei','segreteria'),
@@ -247,19 +256,19 @@ returns jsonb language sql immutable set search_path to 'public' as $$
       'owners', jsonb_build_array('direttore-generale','presidente','tesoreria'),
       'siteRequired', false, 'paymentLink', false)
     when 'AFFITTO_CAMPO' then jsonb_build_object('area', 'impianti-campi', 'topic', 'impianti',
-      'deciders', jsonb_build_array('direttore-generale','presidente','direzione'),
-      'preparers', jsonb_build_array('responsabile-campi'),
+      'deciders', jsonb_build_array('presidente','direzione'),
+      'preparers', jsonb_build_array('direttore-generale','responsabile-campi'),
       'informed', jsonb_build_array('tesoreria','responsabile-struttura-colico','responsabile-struttura'),
       'owners', jsonb_build_array('responsabile-campi','tesoreria','direttore-generale'),
       'siteRequired', true, 'paymentLink', true)
     when 'VISITA_CENTRO' then jsonb_build_object('area', 'impianti-campi', 'topic', 'impianti',
-      'deciders', jsonb_build_array('direttore-generale','presidente','direzione'),
-      'preparers', jsonb_build_array('segreteria'),
+      'deciders', jsonb_build_array('presidente','direzione'),
+      'preparers', jsonb_build_array('direttore-generale','segreteria'),
       'informed', jsonb_build_array('responsabile-campi','responsabile-struttura-colico','responsabile-struttura'),
       'owners', jsonb_build_array('segreteria','direttore-generale'),
       'siteRequired', true, 'paymentLink', true)
     when 'ALTRO' then jsonb_build_object('area', 'segreteria', 'topic', 'comunicazioni',
-      'deciders', jsonb_build_array('segreteria','direttore-generale'),
+      'deciders', jsonb_build_array('segreteria','direttore-generale','presidente'),
       'preparers', jsonb_build_array(),
       'informed', jsonb_build_array(),
       'owners', jsonb_build_array('segreteria'),
@@ -287,7 +296,7 @@ declare
 begin
   if r is null then return null; end if;
   v := case p_set
-    when 'deciders' then v_always || array(select jsonb_array_elements_text(r->'deciders'))
+    when 'deciders' then array(select jsonb_array_elements_text(r->'deciders'))
     when 'preparers' then array(select jsonb_array_elements_text(r->'preparers'))
     when 'owners' then array(select jsonb_array_elements_text(r->'owners'))
     when 'viewers' then v_watchers || v_always
@@ -478,9 +487,12 @@ begin
   end loop;
   if v_name !~ '^[[:alpha:] ''.-]{2,80}$' then return jsonb_build_object('error', 'contact'); end if;
   if v_role is not null and v_role !~ '^[[:alnum:] ''./-]{2,60}$' then return jsonb_build_object('error', 'contact'); end if;
+  -- a role or organisation that hides an e-mail or a phone number (also "333 123 4567") is refused, never stored
+  if v_role is not null and public.scd_intake_redact(v_role) <> v_role then return jsonb_build_object('error', 'contact'); end if;
   if p_org_kind = 'PRIVATO' then
     v_org := null;
-  elsif v_org is null or char_length(v_org) not between 2 and 120 or v_org ~ '[@]' or v_org ~ '[0-9]{6,}' then
+  elsif v_org is null or char_length(v_org) not between 2 and 120 or v_org ~ '[@]' or v_org ~ '[0-9]{6,}'
+     or public.scd_intake_redact(v_org) <> v_org then
     return jsonb_build_object('error', 'organization');
   end if;
   if v_email is not null and (char_length(v_email) > 120 or v_email !~ '^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$') then
@@ -854,7 +866,9 @@ begin
   end if;
   insert into public.scd_request_events (organization_id, request_id, action, actor, note, notify_positions)
   values (p_organization_id, r.id, v_event, auth.uid(),
-    coalesce(v_note, case when v_to = 'ANNULLATA' and r.payment_status is not null then 'Pagamento annullato: verificare il link con la Tesoreria' end),
+    case when v_to = 'ANNULLATA' and r.payment_status is not null
+      then left(concat_ws(' · ', v_note, 'Pagamento annullato: verificare il link con la Tesoreria'), 300)
+      else v_note end,
     public.scd_request_notify(r.kind, r.site, v_event, r.owner_position)
       || case when v_to = 'ANNULLATA' and r.payment_status is not null then array['tesoreria'] else array[]::text[] end);
   return jsonb_build_object('ok', true, 'status', v_to);
@@ -885,6 +899,10 @@ begin
   end loop;
   select * into r from public.scd_requests where id = p_request_id and organization_id = p_organization_id and kind <> 'AMICHEVOLE' for update;
   if r.id is null then return jsonb_build_object('ok', false, 'code', 'not_found'); end if;
+  -- the Tesoreria records payments only on requests it may see (kind and UD-156 site rule)
+  if not public.scd_request_can(p_organization_id, r.kind, r.site, r.owner_position, 'view') then
+    return jsonb_build_object('ok', false, 'code', 'forbidden');
+  end if;
   if r.status not in ('ACCETTATA','IN_GESTIONE','CHIUSA') then return jsonb_build_object('ok', false, 'code', 'state'); end if;
   if v_status is null or v_status not in ('NON_DOVUTO','DA_PAGARE','LINK_INVIATO','PAGATO_DA_RISCONTRARE','RISCONTRATO','ANNULLATO') then
     return jsonb_build_object('ok', false, 'code', 'invalid');
@@ -952,6 +970,8 @@ $$;
 revoke all on function public.scd_request_form(uuid, uuid) from public, anon;
 grant execute on function public.scd_request_form(uuid, uuid) to authenticated;
 
+-- Kept at parity with the live text (filter on the join): the 50 newest events are taken before the kind filter, so
+-- many intake events in 30 days can push friendly notices out of that window. Accepted for F1; revisit if it happens.
 create or replace function public.scd_request_notices(p_organization_id uuid)
 returns jsonb language sql stable security definer set search_path to 'public' as $$
   select case when auth.uid() is null then '[]'::jsonb else coalesce((

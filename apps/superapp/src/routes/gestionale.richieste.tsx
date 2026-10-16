@@ -16,7 +16,7 @@ import {
   phaseCounts,
 } from "@/lib/intake-kinds";
 import { allIntakeLinks } from "@/lib/intake-links";
-import { emptyIntakeDesk, getIntakeDesk, intakeFiltersSchema, type IntakeDesk, type IntakeFilters } from "@/lib/intake.functions";
+import { INTAKE_READ_FAILED, emptyIntakeDesk, getIntakeDesk, intakeFiltersSchema, type IntakeDesk, type IntakeFilters } from "@/lib/intake.functions";
 import { getWorkAreaGate } from "@/lib/work-areas.functions";
 
 /**
@@ -59,13 +59,22 @@ function IntakePage({ data }: { data: IntakeDesk }) {
     return next;
   };
   const filtered = Boolean(f.kind || f.phase || f.area || f.site);
+  const readFailed = data.connected && !data.ready && data.message === INTAKE_READ_FAILED;
 
   return (
     <WorkAreaShell
       id="intake"
       preview={data.gate.preview}
       editable
-      status={data.ready ? <Chip tone="ok">Collegata al database del club</Chip> : <Chip tone="warn">Funzione in preparazione</Chip>}
+      status={
+        data.ready ? (
+          <Chip tone="ok">Collegata al database del club</Chip>
+        ) : readFailed ? (
+          <Chip tone="crit">Lettura non riuscita</Chip>
+        ) : (
+          <Chip tone="warn">Funzione in preparazione</Chip>
+        )
+      }
       note="Decide chi ha il ruolo; il DG conferma tutto. Nessuna mail automatica."
       highlights={[
         { value: counts ? counts.RICEVUTA : null, label: "ricevute da guardare" },
@@ -105,7 +114,7 @@ function IntakePage({ data }: { data: IntakeDesk }) {
           </Card>
 
           {data.rows === null ? (
-            <EmptyState title={!data.connected ? "Entra con il tuo account" : data.ready ? "Catalogo non letto" : "Funzione in preparazione"}>
+            <EmptyState title={!data.connected ? "Entra con il tuo account" : readFailed ? "Lettura non riuscita" : data.ready ? "Catalogo non letto" : "Funzione in preparazione"}>
               {data.message ??
                 "La Vetrina richieste si attiva quando la Direzione applica la migrazione r139. Fino ad allora nessuna richiesta viene letta o scritta."}
             </EmptyState>
@@ -125,12 +134,13 @@ function IntakePage({ data }: { data: IntakeDesk }) {
         <aside className="flex min-w-0 flex-col gap-3 lg:gap-[18px]" aria-label="Avvisi e link pubblici">
           {data.ready && <IntakeNoticesCard notices={data.notices} />}
           <IntakeLinksCard links={allIntakeLinks()} />
-          <Card id="intake-decise" title="Deciso da Francesco" sub="16/10/2026">
+          <Card id="intake-decise" title="Deciso da Francesco" sub="16/10/2026, parole sue tra virgolette">
             <RuleList
               items={[
                 "«Esterni Tally, soci app»: società, aziende, scuole e privati adulti usano un solo modulo Tally; soci e famiglie chiedono dall'app.",
                 "«Li crea la Tesoreria»: il link di pagamento lo crea una persona della Tesoreria, solo dopo «Accettata», e lo registra qui.",
-                "«DG conferma tutto»: il Direttore Generale può decidere ogni tipo di richiesta.",
+                "«DG conferma tutto» (13:31): il Direttore Generale conferma le richieste, tranne affitto campi e visite.",
+                "«Decide presidente e consiglio direttivo» (16:39): affitto dei campi e visite ai centri li decidono il Presidente e il Consiglio Direttivo.",
               ]}
             />
           </Card>
@@ -138,7 +148,8 @@ function IntakePage({ data }: { data: IntakeDesk }) {
             <RuleList
               items={[
                 "Fasi: Ricevuta → In valutazione → Accettata o Non accolta → In gestione → Chiusa.",
-                "Chi decide ogni tipo (affitto campi e visite: Presidente, Consiglio e DG; tornei: responsabile tornei) e se il DG decide da solo sotto una soglia: domanda ancora aperta.",
+                "Chi decide gli altri tipi: tornei responsabile tornei, DG e Presidente; sponsor e convenzioni DG, Presidente e Consiglio; altro Segreteria, DG e Presidente.",
+                "Affitti e visite: il DG li segue e li inoltra; chi prepara e chi è informato per ogni tipo.",
                 "Sponsor e convenzioni: contratto e fattura, nessun link di pagamento.",
                 "I recapiti hanno una scadenza (proposta: 6 o 12 mesi); la cancellazione automatica si attiva con un job da creare.",
                 "Al massimo 60 richieste all'ora dal modulo pubblico.",

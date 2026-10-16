@@ -63,10 +63,12 @@ export const INTAKE_SITE_LABEL: Readonly<Record<IntakeSite, string>> = { COLICO:
 /* ------------------------------------------------------------------ rules (mirror of scd_request_kind_rules) */
 
 /**
- * PROPOSED, to be confirmed by Francesco. Decided so far: «DG conferma tutto» (13:31) and «Li crea la Tesoreria»
- * (15:44, payment link by a Tesoreria person after Accettata). Still open (design question 5): who decides field
- * rentals and visits and whether the DG alone decides below a threshold. So the per-kind positions below, the per-kind
- * payment-link yes/no, the 60/hour ingest cap and the contact retention periods of r139 are proposals.
+ * Decided by Francesco: «DG conferma tutto» (13:31), «Li crea la Tesoreria» (15:44, payment link by a Tesoreria person
+ * after Accettata) and, VERIFIED 16:39, «decide presidente e consiglio direttivo» for AFFITTO_CAMPO and VISITA_CENTRO
+ * (the DG handles and forwards them: preparer). The Consiglio Direttivo is the Direzione (position 'direzione' / role
+ * DIRECTION, as BOARD_POSITION in chi-fa-cosa.ts). PROPOSED, to be confirmed: the deciders of the other kinds, every
+ * preparer/informed/owner list, the per-kind payment-link yes/no, the 60/hour ingest cap and the contact retention
+ * periods. No threshold under which the DG decides alone: not decided, not implemented.
  */
 
 export interface IntakeKindRule {
@@ -84,12 +86,16 @@ export interface IntakeKindRule {
 }
 
 const BOARD = ["direttore-generale", "presidente", "direzione"] as const;
+/** Francesco 16/10/2026 16:39 for AFFITTO_CAMPO and VISITA_CENTRO. */
+export const DECIDED_PRESIDENTE_CONSIGLIO = ["presidente", "direzione"] as const;
+/** Kinds whose deciders Francesco decided (the others are PROPOSED). */
+export const DECIDED_DECIDER_KINDS: readonly IntakeKind[] = ["AFFITTO_CAMPO", "VISITA_CENTRO"];
 
 export const INTAKE_RULES: Readonly<Record<IntakeKind, IntakeKindRule>> = {
   ISCRIZIONE_TORNEO: {
     area: "tornei",
     topic: "tornei",
-    deciders: ["responsabile-tornei", "direttore-generale"],
+    deciders: ["responsabile-tornei", "direttore-generale", "presidente"],
     preparers: ["segreteria"],
     informed: ["coordinatore-attivita-sportiva", "tesoreria"],
     owners: ["responsabile-tornei", "segreteria"],
@@ -119,8 +125,9 @@ export const INTAKE_RULES: Readonly<Record<IntakeKind, IntakeKindRule>> = {
   AFFITTO_CAMPO: {
     area: "impianti-campi",
     topic: "impianti",
-    deciders: BOARD,
-    preparers: ["responsabile-campi"],
+    // Francesco 16/10/2026 16:39 «decide presidente e consiglio direttivo» (VERIFIED); the DG handles and forwards.
+    deciders: DECIDED_PRESIDENTE_CONSIGLIO,
+    preparers: ["direttore-generale", "responsabile-campi"],
     informed: ["tesoreria", "responsabile-struttura-colico", "responsabile-struttura"],
     owners: ["responsabile-campi", "tesoreria", "direttore-generale"],
     siteRequired: true,
@@ -129,8 +136,9 @@ export const INTAKE_RULES: Readonly<Record<IntakeKind, IntakeKindRule>> = {
   VISITA_CENTRO: {
     area: "impianti-campi",
     topic: "impianti",
-    deciders: BOARD,
-    preparers: ["segreteria"],
+    // Francesco 16/10/2026 16:39 «decide presidente e consiglio direttivo» (VERIFIED); the DG handles and forwards.
+    deciders: DECIDED_PRESIDENTE_CONSIGLIO,
+    preparers: ["direttore-generale", "segreteria"],
     informed: ["responsabile-campi", "responsabile-struttura-colico", "responsabile-struttura"],
     owners: ["segreteria", "direttore-generale"],
     siteRequired: true,
@@ -139,7 +147,7 @@ export const INTAKE_RULES: Readonly<Record<IntakeKind, IntakeKindRule>> = {
   ALTRO: {
     area: "segreteria",
     topic: "comunicazioni",
-    deciders: ["segreteria", "direttore-generale"],
+    deciders: ["segreteria", "direttore-generale", "presidente"],
     preparers: [],
     informed: [],
     owners: ["segreteria"],
@@ -148,8 +156,8 @@ export const INTAKE_RULES: Readonly<Record<IntakeKind, IntakeKindRule>> = {
   },
 };
 
-/** Francesco 16/10/2026 13:31 «DG conferma tutto» (DECIDED for the DG); Presidente and Direzione role: PROPOSED. */
-export const INTAKE_ALWAYS_DECIDE: readonly string[] = ["direttore-generale", "presidente"];
+/** They see every kind (viewers). Who decides is per kind in INTAKE_RULES. */
+export const INTAKE_ALWAYS_VIEW: readonly string[] = ["direttore-generale", "presidente"];
 /** Same watchers as the request machine (request-machine.ts REQUEST_WATCHERS). */
 export const INTAKE_WATCHERS: readonly string[] = ["direttore-generale", "coordinatore-attivita-sportiva"];
 /** UD-156, equal to chi-fa-cosa DERVIO_ALWAYS / DERVIO_EXCLUDED (tested). */
@@ -176,13 +184,13 @@ export type PositionSet = "deciders" | "preparers" | "viewers" | "owners";
 export function kindPositions(kind: IntakeKind, site: IntakeSite | null, set: PositionSet): string[] {
   const r = INTAKE_RULES[kind];
   let v: string[];
-  if (set === "deciders") v = [...INTAKE_ALWAYS_DECIDE, ...r.deciders];
+  if (set === "deciders") v = [...r.deciders];
   else if (set === "preparers") v = [...r.preparers];
   else if (set === "owners") v = [...r.owners];
   else
     v = [
       ...INTAKE_WATCHERS,
-      ...INTAKE_ALWAYS_DECIDE,
+      ...INTAKE_ALWAYS_VIEW,
       ...r.deciders,
       ...r.preparers,
       ...r.informed,
@@ -392,6 +400,14 @@ export function redactIntake(text: string): string {
     .replace(new RegExp(INTAKE_EMAIL_PATTERN, "g"), "[email]")
     .replace(new RegExp(INTAKE_EMAIL_OBFUSCATED_PATTERN, "gi"), "[email]")
     .replace(new RegExp(INTAKE_PHONE_PATTERN, "g"), "[telefono]");
+}
+
+/**
+ * Organisation name and role of an external contact must not hide an e-mail or a phone number (r139
+ * scd_request_contact_clean refuses them when scd_intake_redact would change them).
+ */
+export function contactFieldSafe(value: string | null | undefined): boolean {
+  return !value || redactIntake(value) === value;
 }
 
 /** Contacts redacted, health text removed as a whole, max 500 chars (same rule as the database). */

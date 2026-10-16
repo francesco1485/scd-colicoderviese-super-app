@@ -18,7 +18,7 @@ import {
   INTAKE_STATUSES,
   INTAKE_TOURNAMENT_IDS,
   INTAKE_WATCHERS,
-  INTAKE_ALWAYS_DECIDE,
+  INTAKE_ALWAYS_VIEW,
   PAYMENT_STATUSES,
 } from "./intake-kinds";
 
@@ -103,7 +103,7 @@ describe("r139 Vetrina richieste (staged, not applied)", () => {
 
   it("mirrors the always-deciders, watchers and the UD-156 Dervio sets", () => {
     const pos = fn("scd_request_kind_positions");
-    expect(quoted(pos.match(/v_always text\[\] := array\[([^\]]*)\]/)?.[1] ?? "")).toEqual([...INTAKE_ALWAYS_DECIDE]);
+    expect(quoted(pos.match(/v_always text\[\] := array\[([^\]]*)\]/)?.[1] ?? "")).toEqual([...INTAKE_ALWAYS_VIEW]);
     expect(quoted(pos.match(/v_watchers text\[\] := array\[([^\]]*)\]/)?.[1] ?? "")).toEqual([...INTAKE_WATCHERS]);
     expect(quoted(pos.match(/v_dervio_always text\[\] := array\[([^\]]*)\]/)?.[1] ?? "")).toEqual([...INTAKE_DERVIO_ALWAYS]);
     expect(quoted(pos.match(/v_dervio_excluded text\[\] := array\[([^\]]*)\]/)?.[1] ?? "")).toEqual([...INTAKE_DERVIO_EXCLUDED]);

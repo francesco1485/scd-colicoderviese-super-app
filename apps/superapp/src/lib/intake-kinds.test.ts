@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { DERVIO_ALWAYS, DERVIO_EXCLUDED, NEVER_RECIPIENTS, SAFEGUARDING_CHANNEL_ONLY, routeChiFaCosa } from "./chi-fa-cosa";
 import {
-  INTAKE_ALWAYS_DECIDE,
+  INTAKE_ALWAYS_VIEW,
   INTAKE_DERVIO_ALWAYS,
   INTAKE_DERVIO_EXCLUDED,
   INTAKE_KINDS,
@@ -17,6 +17,7 @@ import {
   kindPositions,
   parseIntakeNotices,
   redactIntake,
+  contactFieldSafe,
   parseIntakeRow,
   parseIntakeRows,
   paymentsToFollow,
@@ -65,7 +66,7 @@ describe("rules follow chi-fa-cosa (G14) and never route families, athletes, par
         expect(NEVER_RECIPIENTS, `${k}: ${p}`).not.toContain(p);
         expect(SAFEGUARDING_CHANNEL_ONLY, `${k}: ${p}`).not.toContain(p);
       }
-      for (const o of r.owners) expect([...r.deciders, ...r.preparers, ...r.informed, ...INTAKE_ALWAYS_DECIDE], `${k} owner ${o}`).toContain(o);
+      for (const o of r.owners) expect([...r.deciders, ...r.preparers, ...r.informed, ...INTAKE_ALWAYS_VIEW], `${k} owner ${o}`).toContain(o);
     }
   });
 
@@ -74,7 +75,11 @@ describe("rules follow chi-fa-cosa (G14) and never route families, athletes, par
       const r = INTAKE_RULES[k];
       const route = routeChiFaCosa({ topic: r.topic, site: r.siteRequired ? "COLICO" : "COLICO" }, true);
       for (const d of r.deciders) expect([...route.approvers, "direttore-generale", "presidente"], `${k}: ${d}`).toContain(d);
-      expect(kindPositions(k, null, "deciders"), k).toContain("direttore-generale");
+      if (k === "AFFITTO_CAMPO" || k === "VISITA_CENTRO") {
+        // Francesco 16/10/2026 16:39 «decide presidente e consiglio direttivo»: the DG handles, does not decide.
+        expect(kindPositions(k, "COLICO", "deciders"), k).toEqual(["direzione", "presidente"]);
+        expect(kindPositions(k, "COLICO", "preparers"), k).toContain("direttore-generale");
+      } else expect(kindPositions(k, null, "deciders"), k).toContain("direttore-generale");
     }
   });
 
@@ -87,7 +92,7 @@ describe("rules follow chi-fa-cosa (G14) and never route families, athletes, par
   it("applies the Dervio rule: responsabile campi never sees Dervio, the Dervio set always does", () => {
     expect(kindPositions("AFFITTO_CAMPO", "COLICO", "viewers")).toContain("responsabile-campi");
     expect(kindPositions("AFFITTO_CAMPO", "DERVIO", "viewers")).not.toContain("responsabile-campi");
-    expect(kindPositions("AFFITTO_CAMPO", "DERVIO", "preparers")).toEqual([]);
+    expect(kindPositions("AFFITTO_CAMPO", "DERVIO", "preparers")).toEqual(["direttore-generale"]);
     expect(kindPositions("AFFITTO_CAMPO", "DERVIO", "viewers")).toEqual(expect.arrayContaining(DERVIO_ALWAYS as string[]));
     expect(kindPositions("SPONSOR", null, "viewers")).not.toContain("segreteria");
   });
@@ -187,6 +192,16 @@ describe("redaction and health words (security review)", () => {
       expect(cleanIntakeText(t), t).toBe(HEALTH_REMOVED);
     for (const t of ["il pubblico si entusiasma", "festa a tema fantasma", "serve un autista", "operatore economico", "gessetti colorati", "una feritoia nel muro"])
       expect(cleanIntakeText(t), t).not.toBe(HEALTH_REMOVED);
+  });
+});
+
+describe("contact fields", () => {
+  it("refuse organisation names or roles that hide a phone or an e-mail", () => {
+    expect(contactFieldSafe("Societa Esempio")).toBe(true);
+    expect(contactFieldSafe("Dirigente 2015")).toBe(true);
+    expect(contactFieldSafe(null)).toBe(true);
+    expect(contactFieldSafe("Esempio 333 123 4567")).toBe(false);
+    expect(contactFieldSafe("Esempio info at example it")).toBe(false);
   });
 });
 

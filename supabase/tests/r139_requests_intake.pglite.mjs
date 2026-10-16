@@ -26,7 +26,8 @@ const ORG = "00000000-0000-0000-0000-000000000001";
 const U = (n) => `10000000-0000-0000-0000-0000000000${String(n).padStart(2, "0")}`;
 // 1 Direzione, 2 DG, 3 Segreteria, 4 responsabile tornei, 5 tesoreria, 6 responsabile campi, 7 family,
 // 8 coordinatore, 9 responsabile attivita di base, 10 mister
-const DIR = U(1), DG = U(2), SEG = U(3), RTO = U(4), TES = U(5), RCA = U(6), FAM = U(7), COO = U(8), RAB = U(9), MIS = U(10);
+const DIR = U(1), DG = U(2), SEG = U(3), RTO = U(4), TES = U(5), RCA = U(6), FAM = U(7), COO = U(8), RAB = U(9), MIS = U(10), PRES = U(11), DSA = U(12);
+// 11 Presidente, 12 direttore sportivo agonistica
 
 const base = `
 create role anon; create role authenticated; create role service_role;
@@ -63,7 +64,9 @@ insert into public.scd_memberships (organization_id, user_id, role, scope) value
   ('${ORG}', '${FAM}', 'FAMILY', '{}'),
   ('${ORG}', '${COO}', 'STAFF', '{"positions":["coordinatore-attivita-sportiva"]}'),
   ('${ORG}', '${RAB}', 'STAFF', '{"positions":["responsabile-attivita-base"]}'),
-  ('${ORG}', '${MIS}', 'MISTER', '{"positions":["mister"]}');
+  ('${ORG}', '${MIS}', 'MISTER', '{"positions":["mister"]}'),
+  ('${ORG}', '${PRES}', 'STAFF', '{"positions":["presidente"]}'),
+  ('${ORG}', '${DSA}', 'STAFF', '{"positions":["direttore-sportivo-agonistica"]}');
 `;
 
 // prerequisites guard: r139 alone refuses to run
@@ -149,6 +152,9 @@ await bad({ contact: { ...contact, phone: "12" } }, "phone");
 await bad({ contact: { ...contact, orgName: null } }, "organization");
 await bad({ contact: { ...contact, birthDate: "2014-01-01" } }, "field");
 await bad({ site: "LECCO" }, "site");
+await bad({ contact: { ...contact, orgName: "Esempio 333 123 4567" } }, "organization");
+await bad({ contact: { ...contact, orgName: "Esempio info at example it" } }, "organization");
+await bad({ contact: { ...contact, role: "Dirigente 333 123 4567" } }, "contact");
 
 // payload: whitelisted fields only, contacts never in the catalogue row
 const row1 = await one(null, `select * from public.scd_requests where id = $1`, [t1.id]);
@@ -272,6 +278,15 @@ assert.equal(rtoAfter.paymentStatus, "LINK_INVIATO");
 assert.equal(rtoAfter.paymentAmountCents, undefined, "amount only for who handles money");
 assert.equal(rtoAfter.paymentLink, undefined);
 
+// payment only on requests the Tesoreria may see (a visit is not a Tesoreria kind)
+// Francesco 16/10/2026 16:39 «decide presidente e consiglio direttivo»: visits and rentals
+assert.equal((await act(DG, vis.id, "take")).ok, true, "the DG handles and forwards");
+assert.equal((await act(DG, vis.id, "accept")).code, "forbidden", "the DG does not decide visits");
+assert.equal((await act(COO, vis.id, "accept")).code, "forbidden", "coordinatore never decides");
+assert.equal((await act(DSA, vis.id, "accept")).code, "forbidden", "direttore sportivo never decides");
+assert.equal((await act(PRES, vis.id, "accept")).ok, true, "the Presidente decides");
+assert.equal((await pay(TES, vis.id, { status: "DA_PAGARE", amountCents: 1000 })).code, "forbidden");
+
 // start/close by the owner position; informed cannot
 assert.equal((await act(TES, t1.id, "start")).code, "forbidden");
 assert.deepEqual(await act(SEG, t1.id, "start"), { ok: true, status: "IN_GESTIONE" });
@@ -294,7 +309,12 @@ assert.equal((await one(DG, `select payment_status from public.scd_requests wher
 // reject: reason kept, contacts shortened to 6 months
 assert.deepEqual(await act(RCA, affC.id, "take"), { ok: true, status: "IN_VALUTAZIONE" });
 assert.equal((await act(RCA, affC.id, "reject", "campo occupato")).code, "forbidden", "responsabile campi prepares, the board decides");
-assert.deepEqual(await act(DG, affC.id, "reject", "campo occupato quel giorno"), { ok: true, status: "RIFIUTATA" });
+assert.equal((await act(DG, affC.id, "reject", "campo occupato quel giorno")).code, "forbidden", "the DG does not decide rentals");
+assert.equal((await act(COO, affC.id, "reject", "campo occupato quel giorno")).code, "forbidden");
+assert.equal((await act(DSA, affC.id, "reject", "campo occupato quel giorno")).code, "forbidden");
+assert.deepEqual(await act(PRES, affC.id, "reject", "campo occupato quel giorno"), { ok: true, status: "RIFIUTATA" });
+assert.equal((await board(DG)).rows.find((r) => r.id === affD.id).can.decide, false);
+assert.equal((await board(DIR)).rows.find((r) => r.id === affD.id).can.decide, true, "the Consiglio Direttivo (Direzione) decides");
 const pa = await one(null, `select purge_after from public.scd_request_contacts where request_id = $1`, [affC.id]);
 assert.ok(new Date(pa.purge_after) < new Date(Date.now() + 190 * 86400000), "6 months after a refusal");
 assert.equal((await act(RCA, affD.id, "take")).code, "forbidden", "Dervio: not for the responsabile campi");
@@ -310,7 +330,7 @@ const al2 = await ingest({ sourceRef: ref(), tipo: "altro", orgKind: "SCUOLA", s
 assert.deepEqual(await act(SEG, al2.id, "reclassify", null, "VISITA_CENTRO"), { ok: true, status: "RICEVUTA", kind: "VISITA_CENTRO" });
 assert.equal((await one(DG, `select area from public.scd_requests where id = $1`, [al2.id])).area, "impianti-campi");
 assert.equal((await act(SEG, al2.id, "reclassify", null, "ALTRO")).code, "forbidden", "now a visit: decided by the board");
-assert.equal((await act(DG, al2.id, "reclassify", null, "SPONSOR")).code, "state", "only ALTRO is reclassified");
+assert.equal((await act(PRES, al2.id, "reclassify", null, "SPONSOR")).code, "state", "only ALTRO is reclassified");
 
 // ---------------------------------------------------------------- free text: redaction and health words
 const txt = async (t) => (await one(null, `select public.scd_request_intake_text($1) t`, [t])).t;
