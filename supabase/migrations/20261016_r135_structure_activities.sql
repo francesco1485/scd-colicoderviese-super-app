@@ -1,8 +1,10 @@
 -- r135: activities and duty shifts at the sports centres of Colico and Dervio ("Attivita in struttura"),
 -- 2026-10-16, chat PC range r130-r149.
--- STAGED: NOT APPLIED. Apply only after Francesco writes "applica r135".
--- Requires (UNVERIFIED on the live project until checked at apply time): r33 (scd_organizations),
--- r35 (scd_has_org_role), r74 (scd_has_position).
+-- APPLIED on SCD PULSE (ndevtxxijbcnskgysdit) 16/10/2026 after Francesco wrote "Applica r135" (06:56), migration name
+-- r135_structure_activities. Prerequisites verified on the live project before applying: scd_organizations (r33),
+-- scd_has_org_role (r35), scd_has_position (r74, bound to auth.uid() on an active membership), enum scd_role with
+-- DIRECTION and SECRETARIAT. Post-apply check: RLS on, 0 policies, no select for anon/authenticated, scd_structure_week
+-- SECURITY DEFINER executable by authenticated only, scd_structure_reader_site not executable by authenticated, 0 rows.
 --
 -- Why (Francesco, DG, 15/10/2026 14:33 "attivita personale/tesserati in struttura", "attivita serali in struttura";
 -- 16/10/2026 06:23 "facciamo lavorare tutti a pieno regime"): what happens at the centres besides official matches
