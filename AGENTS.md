@@ -44,7 +44,8 @@ Copia estesa: documento di progetto claude.ai `claude/SCD_DIVISIONE_COMPITI.md`.
 | Commerciale (sponsor, listino, CRM/GROW, spot LED, `/ledwall/player`, campagne social sponsor) | no | **SÌ** |
 | Sostieni (Fondo, Adotta, donazioni, proposte, lotteria) | no | **SÌ** |
 | Personaggi (Vera, Garrison, Enea, Volto sponsor, Sky, Crovi mascotte, avatar) | no | **SÌ** |
-| Home e pagine pubbliche, pulmini e impianti nell'app | no | **SÌ** |
+| Grafica comune (testata, barra in basso, stile delle schede) e pagine pubbliche (Home, Calendario, Eventi, Comunità): passata alla chat PC alle 19:2x, poi **affidata alla chat CLOUD** da Francesco il 15/10/2026 alle 19:42 («riporta all'altra chat tutto così da continuare il lavoro»); punto di partenza il ramo `feat/pc-grafica-tavole` e il documento di progetto `claude/SCD_PASSAGGIO_GRAFICA_2026-10-15.md` | no | **SÌ** |
+| Pulmini e impianti nell'app | no | **SÌ** |
 | Agenti programmati Claude e inserimenti nella coda `/gestionale/coda` | no | **SÌ** |
 
 Regole:
@@ -203,6 +204,7 @@ Registro riferimenti visuali/documentali recuperati: `config/scd-visual-referenc
 10. Eseguire `npm run test:manifest` prima di considerare il lavoro completato.
 
 ## Grafica
+**Regola per sempre (Francesco 15/10/2026 19:20-19:22: "riprodurre questo e basta in tutto… ricordarla per sempre in tutto il progetto").** Ogni schermata pubblica, riservata e gestionale riproduce identicamente lo stile delle tavole VR-025 (telefono: Calendario/Eventi, Area Riservata Atleta e Famiglia, Crea il tuo avatar) e VR-026 (gestionali, comunità, sponsor, desktop Staff/Direzione e Sponsor) in `config/scd-visual-references.v1.json`: testata blu con stemma ufficiale e titolo bianco, sfondo azzurro chiaro con schede bianche arrotondate, schede a pillola, settimana con il giorno cerchiato, righe con barra colorata a sinistra, icone con badge rossi, barra in basso bianca Home · Calendario · Squadre · Eventi · Profilo con voce attiva blu. Niente foto del campo: grafica disegnata (19:19). I dati delle tavole sono esempi, mai dati veri; niente volti di ragazzi. La grafica comune e le pagine pubbliche le porta avanti la chat cloud (Francesco 19:42), partendo dal ramo `feat/pc-grafica-tavole`.
 Le tavole SCD approvate sono la Source of Truth visiva. Desktop e mobile sono lo stesso prodotto responsive. Vietato trasformare il desktop in una semplice cornice smartphone oppure in un sito SaaS generico.
 
 ## Stato reale

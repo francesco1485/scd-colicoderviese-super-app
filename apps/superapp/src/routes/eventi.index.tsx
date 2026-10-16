@@ -79,16 +79,21 @@ function Eventi() {
         </Link>
       </section>
       {lottery && <LotteryCard lottery={lottery} />}
-      {initiatives.length > 0 && (
-        <section
-          aria-label="Iniziative"
-          className="mx-auto grid max-w-6xl gap-4 px-4 pb-5 md:grid-cols-2"
-        >
-          {initiatives.map((i) => (
-            <InitiativeCard key={i.id} item={i} />
-          ))}
-        </section>
-      )}
+      {/* Always rendered: the home "Iniziative" tile lands on #iniziative (15/10/2026), never on nothing. */}
+      <section
+        id="iniziative"
+        aria-label="Iniziative"
+        className="scroll-mt-20 mx-auto grid max-w-6xl gap-4 px-4 pb-5 md:grid-cols-2"
+        data-testid="eventi-iniziative"
+      >
+        {initiatives.length > 0 ? (
+          initiatives.map((i) => <InitiativeCard key={i.id} item={i} />)
+        ) : (
+          <p className="card-premium m-0 p-5 text-[15px] font-semibold md:col-span-2" data-testid="eventi-iniziative-empty">
+            Nessuna iniziativa in corso.
+          </p>
+        )}
+      </section>
       <section className="mx-auto grid max-w-6xl gap-5 px-4 md:grid-cols-3">
         {eventi.length === 0 ? (
           <div className="card-premium p-5 md:col-span-3">

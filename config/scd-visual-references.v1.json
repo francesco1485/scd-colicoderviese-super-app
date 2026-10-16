@@ -401,6 +401,61 @@
         "date": "2026-10-15",
         "evidence": "Explicit user message 10:09"
       }
+    },
+    {
+      "id": "VR-025",
+      "product": "SCD_SHARED",
+      "name": "Tavole telefono 15/10/2026 19:20 — Calendario/Eventi, Area Riservata Atleta e Famiglia, Crea il tuo avatar",
+      "type": "APPROVED_BOARD",
+      "relevance": "CRITICAL",
+      "sourceKind": "USER_CONVERSATION_UPLOAD_2026_10_15",
+      "sourceStatus": "USER_SUPPLIED_VISUAL_TARGET_NOT_RUNTIME_ASSET",
+      "canonicalAttachmentUriVerified": false,
+      "localCopy": "chat PC session scratchpad tavole/approvate-1920 (cb101174, 1c34e60a, 78ece41a, 1bca3f54); archive to the SCD Drive",
+      "observedConcepts": [
+        "ROYAL_BLUE_GRADIENT_HEADER_WITH_OFFICIAL_CREST_WHITE_TITLE_AND_ROUND_ICONS",
+        "WHITE_BOTTOM_BAR_HOME_CALENDARIO_SQUADRE_EVENTI_PROFILO_ACTIVE_BLUE",
+        "PILL_FILTER_TABS_AND_SEGMENTED_ATLETA_FAMIGLIA_STAFF",
+        "MONTH_HEADER_WEEK_STRIP_SELECTED_DAY_IN_BLUE_CIRCLE",
+        "DAY_GROUPS_WITH_EVENT_COUNT_AND_ROWS_WITH_COLOURED_LEFT_BAR_TIME_ICON_TITLE_PLACE_CHEVRON",
+        "PROFILE_CARD_WITH_SHIRT_NUMBER_AND_TESSERATO_BADGE",
+        "ICON_TILES_WITH_RED_COUNT_BADGES",
+        "NEXT_CONVOCATION_CARD_WITH_CONVOCATO_PILL",
+        "DOCUMENT_LIST_WITH_GREEN_CHECKS",
+        "PAYMENT_RING_PERCENT_AND_PAGA_ORA",
+        "CLUB_SHOP_AND_INIZIATIVE_BANNERS",
+        "LIGHT_BLUE_PAGE_BACKGROUND_WHITE_ROUNDED_CARDS"
+      ],
+      "usage": "Francesco 15/10/2026 19:20 'voglio questo, riprodurre questo e basta in tutto'; 19:22 'il tuo agente deve ricreare identicamente questo stile, questa idea, questa grafica e deve ricordarla per sempre in tutto il progetto'. The visual system of every public and member screen. Example data (names, children photos, percentages, opponents) are never runtime data; no children's faces: use initials or the member's own avatar. 19:19: no photos of the pitch, designed graphics instead.",
+      "approval": {
+        "by": "Francesco",
+        "date": "2026-10-15",
+        "evidence": "Explicit user messages 19:20 and 19:22 (chat PC) with the boards attached"
+      }
+    },
+    {
+      "id": "VR-026",
+      "product": "SCD_CORE_GROW",
+      "name": "Tavole gestionali 15/10/2026 19:21 — Area Atleta, Area Famiglia, Convocazioni, Documenti, Area Staff/Direzione desktop, Comunità/News/Eventi/Media, Opportunità Sponsor, Eventi e Attivazioni, Area Sponsor desktop",
+      "type": "APPROVED_BOARD",
+      "relevance": "CRITICAL",
+      "sourceKind": "USER_CONVERSATION_UPLOAD_2026_10_15",
+      "sourceStatus": "USER_SUPPLIED_VISUAL_TARGET_NOT_RUNTIME_ASSET",
+      "canonicalAttachmentUriVerified": false,
+      "localCopy": "chat PC session scratchpad tavole/approvate-1920 (31ea7c09, 3ae564c2, ea561f87); archive to the SCD Drive",
+      "observedConcepts": [
+        "CONVOCATION_CONFIRM_NONPOSSO_INDUBBIO_BUTTONS",
+        "DESKTOP_LEFT_SIDEBAR_KPI_TILES_ATTENDANCE_BARS_PAYMENT_RING_FACILITIES_MAP",
+        "SOCIAL_FEED_CARDS_WITH_LIKES_COMMENTS_SHARES",
+        "SPONSOR_PACKAGES_MAIN_PREMIUM_OFFICIAL",
+        "SPONSOR_DASHBOARD_VISIBILITY_CHART_CHANNELS_MAP_OPPORTUNITIES"
+      ],
+      "usage": "Francesco 15/10/2026 19:21 'queste invece le strutture dei gestionali interni'. Structure and style of the internal areas, same visual system as VR-025. Example numbers are never runtime data.",
+      "approval": {
+        "by": "Francesco",
+        "date": "2026-10-15",
+        "evidence": "Explicit user message 19:21 (chat PC) with the boards attached"
+      }
     }
   ],
   "nextRecoveryTargets": [

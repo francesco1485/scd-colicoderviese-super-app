@@ -1,22 +1,28 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { BUILD_STAMP } from "@/lib/build-stamp";
 import {
+  Bell,
+  CalendarCheck,
   CalendarDays,
   Download,
-  Circle,
   Ellipsis,
   Facebook,
   Handshake,
+  HeartHandshake,
   House,
   Instagram,
   Lock,
   LogIn,
+  MapPinned,
   Menu,
+  MessagesSquare,
   Newspaper,
-  Plus,
+  Phone,
   Search,
   Shirt,
   ShieldCheck,
+  TrafficCone,
+  Trophy,
   UserRound,
   UsersRound,
   X,
@@ -25,8 +31,16 @@ import {
 import { useEffect, useMemo, useState } from "react";
 
 import crest from "@/assets/brand/logo-scd.png.asset.json";
-import { centerTabFor, type CenterTab } from "@/lib/access-nav";
-import { ACCESS_SCREEN_IDS, WORK_AREA_IDS, findArea } from "@/lib/areas";
+import { sessionPositions, type ChromeSession } from "@/lib/access-nav";
+import {
+  ACCESS_SCREEN_IDS,
+  WORK_AREA_IDS,
+  areaLink,
+  findArea,
+  menuFor,
+  type AreaLink,
+  type MenuEntry,
+} from "@/lib/areas";
 import { CLUB_PROFILE } from "@/lib/club-profile";
 import { SOCIAL_LINKS } from "@/lib/public-home";
 import { menuSections, searchMenu, type MenuItem } from "@/lib/site-menu";
@@ -34,45 +48,85 @@ import { useSession } from "@/lib/use-session";
 import { useClubPulse } from "@/lib/use-club-pulse";
 import { openCookiePrefs } from "./CookieConsent";
 import { AccessMenu, loginSearch, openAccessMenu } from "./scd/AccessMenu";
-import { CREDENTIALS_SENTENCE } from "@/lib/club-credentials";
-import { ClubCredentials } from "./scd/Logos";
+import { AREA_ICON } from "./scd/area-icons";
+import { CLUB_CREDENTIALS, CREDENTIALS_SENTENCE, type CredentialId } from "@/lib/club-credentials";
 
 /** Nome ufficiale della società (sigla S.C.D., non invertire le lettere). */
 export const CLUB_NAME = "S.C.D. ColicoDerviese";
 
-type NavItem = { to: string; label: string };
-
 /**
- * Navigazione desktop della barra pubblica (tavola Accesso-aree, VR-022). Le altre pagine restano nel menu completo.
- * UD-100 (Direzione 13/10/2026): le squadre sono dentro. Chi non ha fatto l'accesso vede notizie e partner al posto
- * di "Squadre"; dopo l'accesso torna la voce Squadre.
+ * Shell from Francesco's boards (approved 15/10/2026 14:40) with Eurobet as the desktop STRUCTURE reference only (top bar
+ * with logo + search + account, persistent left sidebar, central content, right rail on the home; no gambling content).
+ *
+ * Phone (< 1024 px): navy header with the official crest and the two-line wordmark, the bell (club notices) and a small
+ * menu icon ("Tutte le pagine"); white bottom bar with the five board items Home · Calendario · Squadre · Eventi ·
+ * Profilo; the slim sponsor strip just above it.
+ * Desktop (>= 1024 px): top bar (crest + wordmark, page search, Entra / Le tue aree), sticky navy sidebar with the club
+ * sections and, for signed-in people, the work areas their positions open (src/lib/areas.ts menuFor, navigation only:
+ * every area keeps its own server gate). Members-only pages (Squadre, Allenamenti) lead guests through the sign-in.
  */
-const desktopNavPublic: readonly NavItem[] = [
-  { to: "/comunicazioni", label: "Notizie" },
-  { to: "/eventi", label: "Eventi" },
-  { to: "/calendario", label: "Calendario" },
-  { to: "/sponsor", label: "Partner" },
-  { to: "/contatti", label: "Contatti" },
+export type SideItem = {
+  to: string;
+  label: string;
+  icon: LucideIcon;
+  /** Members-only page (http-policy MEMBERS_ONLY_PREFIXES): guests go through /accedi?next=… */
+  members?: boolean;
+  match?: (p: string) => boolean;
+};
+
+/** Public sections of the desktop sidebar, in the order agreed with Francesco (15/10/2026). */
+export const SIDEBAR_SECTIONS: readonly SideItem[] = [
+  { to: "/", label: "Home", icon: House },
+  { to: "/calendario", label: "Calendario", icon: CalendarDays },
+  { to: "/squadre", label: "Squadre", icon: UsersRound, members: true },
+  { to: "/allenamenti", label: "Allenamenti", icon: TrafficCone, members: true },
+  {
+    to: "/eventi",
+    label: "Eventi e tornei",
+    icon: Trophy,
+    match: (p) => p.startsWith("/eventi") || p.startsWith("/tornei"),
+  },
+  { to: "/comunicazioni", label: "News", icon: Newspaper },
+  { to: "/community", label: "Comunità", icon: MessagesSquare },
+  { to: "/sponsor", label: "Sponsor", icon: Handshake },
+  { to: "/sostieni", label: "Sostieni", icon: HeartHandshake },
+  { to: "/impianti", label: "Impianti", icon: MapPinned },
+  { to: "/contatti", label: "Contatti", icon: Phone },
 ];
-const desktopNavMember: readonly NavItem[] = [
-  { to: "/squadre", label: "Squadre" },
-  { to: "/calendario", label: "Calendario" },
-  { to: "/eventi", label: "Eventi" },
-  { to: "/sponsor", label: "Sponsor" },
-  { to: "/contatti", label: "Contatti" },
-];
-export const desktopNavFor = (signedIn: boolean): readonly NavItem[] =>
-  signedIn ? desktopNavMember : desktopNavPublic;
+
+/** Where a section link goes for this visitor: members-only pages pass through the sign-in for guests. */
+export function sectionTarget(
+  item: Pick<SideItem, "to" | "members">,
+  signedIn: boolean,
+): { to: string; search?: { next: string } } {
+  return item.members && !signedIn ? { to: "/accedi", search: { next: item.to } } : { to: item.to };
+}
+
+type WorkArea = { entry: MenuEntry; link: AreaLink & { href: string } };
+
+/** Work areas of the signed-in person for the sidebar: reserved entries of the access menu their positions open. */
+export function workAreasFor(session: ChromeSession): WorkArea[] {
+  if (!session?.user) return [];
+  return menuFor(sessionPositions(session))
+    .flatMap((g) => g.entries)
+    .filter((e) => e.reserved)
+    .map((e) => ({ entry: e, link: areaLink(e.id) }))
+    .filter((x): x is WorkArea => !!x.link.href);
+}
+
+const isActive = (pathname: string, to: string) =>
+  to === "/"
+    ? pathname === "/"
+    : pathname === to || pathname.startsWith(`${to}/`);
 
 /**
- * Schermate costruite sulle tavole: hanno la propria testata (stemma + wordmark/titolo), quindi su
- * smartphone la barra superiore generica non viene mostrata. Su desktop resta la navigazione completa.
+ * Schermate costruite sulle tavole: hanno la propria testata (stemma + titolo), quindi su smartphone la barra superiore
+ * generica non viene mostrata. Su desktop restano barra superiore e barra laterale.
  */
 // Gated work areas render their access screen without a session: same board header.
 const ACCESS_SCREEN_PATHS = [...ACCESS_SCREEN_IDS, ...WORK_AREA_IDS]
   .map((id) => findArea(id)?.path)
   .filter((p): p is string => !!p);
-// The home is not a board route any more (UD-100): it sits under the compact site header on every width.
 const BOARD_ROUTES = [
   "/calendario",
   "/allenamenti",
@@ -89,12 +143,7 @@ const BOARD_ROUTES = [
 export const isBoardRoute = (p: string) =>
   BOARD_ROUTES.includes(p.replace(/\/$/, "") || "/");
 
-const isActive = (pathname: string, to: string) =>
-  to === "/"
-    ? pathname === "/"
-    : pathname === to || pathname.startsWith(`${to}/`);
-
-/** Apre il menu completo da qualunque punto (voce "Altro", ingranaggio Staff, pulsante menu). */
+/** Apre il menu completo da qualunque punto (voce "Altro", icona menu, "Tutte le pagine"). */
 export const openMenu = () => window.dispatchEvent(new CustomEvent("scd:menu"));
 
 export function ClubCrestOfficial({
@@ -117,62 +166,318 @@ export function ClubCrestOfficial({
   );
 }
 
+/** Two-line wordmark of the boards: "S.C.D." small over "COLICODERVIESE" (COLICO yellow, DERVIESE white). */
+function Wordmark() {
+  return (
+    <span className="grid min-w-0 leading-none" data-testid="header-wordmark">
+      <span className="text-[11px] font-bold tracking-[0.2em] text-white/90 lg:text-[12px]">S.C.D.</span>
+      <span className="whitespace-nowrap font-title text-[19px] font-black tracking-[0.01em] min-[380px]:text-[21px] lg:text-[26px]">
+        <span className="text-[#ffd600]">COLICO</span>
+        <span className="text-white">DERVIESE</span>
+      </span>
+    </span>
+  );
+}
+
+/** Desktop page search of the top bar: the same index and search as the full menu (src/lib/site-menu.ts). */
+function HeaderSearch() {
+  const [query, setQuery] = useState("");
+  const [open, setOpen] = useState(false);
+  const sections = useMemo(() => menuSections(), []);
+  const results = useMemo(() => searchMenu(query, sections).slice(0, 8), [query, sections]);
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const navigate = useNavigate();
+  useEffect(() => {
+    setQuery("");
+    setOpen(false);
+  }, [pathname]);
+  const show = open && query.trim().length > 0;
+  return (
+    <form
+      role="search"
+      className="relative hidden w-full max-w-[300px] lg:block xl:max-w-[340px]"
+      onSubmit={(e) => {
+        e.preventDefault();
+        const first = results[0];
+        if (first)
+          void navigate({
+            to: first.to as never,
+            search: first.search as never,
+            ...(first.hash ? { hash: first.hash } : {}),
+          });
+      }}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setOpen(false);
+      }}
+    >
+      <label htmlFor="sa-top-search" className="sr-only">
+        Cerca squadra, gara, pagina
+      </label>
+      <Search className="pointer-events-none absolute left-4 top-1/2 size-[18px] -translate-y-1/2 text-[#9fc3e6]" aria-hidden="true" />
+      <input
+        id="sa-top-search"
+        type="search"
+        value={query}
+        onChange={(e) => {
+          setQuery(e.target.value);
+          setOpen(true);
+        }}
+        onFocus={() => setOpen(true)}
+        onKeyDown={(e) => {
+          if (e.key === "Escape") {
+            setQuery("");
+            setOpen(false);
+          }
+        }}
+        placeholder="Cerca squadra, gara, pagina"
+        autoComplete="off"
+        enterKeyHint="search"
+        className="scd-focus h-11 w-full rounded-full border border-white/15 bg-white/10 pl-11 pr-4 text-[15px] text-white placeholder:text-[#c4d6ee] transition-colors duration-150 hover:bg-white/15 focus:bg-white focus:text-[#0e1b33] focus:placeholder:text-[#4a5d7a]"
+        data-testid="top-search"
+      />
+      {show && (
+        <div
+          className="absolute inset-x-0 top-[calc(100%+8px)] z-[45] overflow-hidden rounded-[14px] bg-white py-1.5 text-[#0e1b33] shadow-[0_24px_50px_-18px_rgb(2_20_51/0.55)]"
+          aria-live="polite"
+          data-testid="top-search-results"
+        >
+          {results.length ? (
+            <ul className="m-0 list-none p-0">
+              {results.map((n) => (
+                <li key={`${n.to}#${n.hash ?? ""}${n.label}`}>
+                  <Link
+                    to={n.to as never}
+                    search={n.search as never}
+                    {...(n.hash ? { hash: n.hash } : {})}
+                    className="scd-focus flex min-h-11 items-center gap-2 px-4 text-[15px] font-semibold hover:bg-[#eef3f9]"
+                  >
+                    {n.label}
+                    {n.reserved && <Lock className="size-3.5 shrink-0 text-[#4a5d7a]" aria-label="area riservata" />}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="m-0 px-4 py-3 text-[14.5px] text-[#4a5d7a]">Nessuna pagina trovata. Prova con un'altra parola.</p>
+          )}
+        </div>
+      )}
+    </form>
+  );
+}
+
+/**
+ * Desktop centre tabs in the style of a Facebook page (Francesco 16/10/2026 06:21: «una barra in alto stile pagina
+ * interna Facebook»): big icons, the active one underlined; labels as tooltip and accessible name.
+ */
+const TOP_TABS: readonly { to: string; label: string; icon: LucideIcon; match: (p: string) => boolean }[] = [
+  { to: "/", label: "Home", icon: House, match: (p) => p === "/" },
+  { to: "/calendario", label: "Partite", icon: CalendarDays, match: (p) => p.startsWith("/calendario") },
+  { to: "/eventi", label: "Eventi e tornei", icon: Trophy, match: (p) => p.startsWith("/eventi") || p.startsWith("/tornei") },
+  { to: "/community", label: "Comunità", icon: MessagesSquare, match: (p) => p.startsWith("/community") },
+  { to: "/sponsor", label: "Sponsor", icon: Handshake, match: (p) => p.startsWith("/sponsor") },
+];
+
+function TopTabs() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  return (
+    <nav aria-label="Sezioni principali" className="hidden h-full flex-1 items-stretch justify-center gap-1 lg:flex" data-testid="top-tabs">
+      {TOP_TABS.map((t) => {
+        const on = t.match(pathname);
+        return (
+          <Link
+            key={t.to}
+            to={t.to as never}
+            title={t.label}
+            aria-label={t.label}
+            aria-current={on ? "page" : undefined}
+            className={`scd-focus relative grid w-[84px] place-items-center rounded-[10px] transition-colors duration-150 xl:w-[104px] ${on ? "text-[#ffd600]" : "text-white/80 hover:bg-white/10 hover:text-white"}`}
+          >
+            <t.icon className="size-[26px]" strokeWidth={on ? 2.4 : 1.9} aria-hidden="true" />
+            {on && <span aria-hidden="true" className="absolute inset-x-2 bottom-0 h-[3px] rounded-t-full bg-[#ffd600]" />}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
+
+/**
+ * The three official marks in the top bar (Francesco 16/10/2026 07:07 «mettili in alto sulla barra, scontornati e
+ * piccoli, solo il Monza un po' più grande»): cut-out files on a small white plate, CR Lombardia and AC Monza linked
+ * to their official sites. Monza is larger: affiliation with a Serie A club.
+ */
+const CREDENTIAL_LINK: Partial<Record<CredentialId, string>> = {
+  lnd: "https://www.crlombardia.it/",
+  "insieme-al-monza": "https://www.acmonza.com/en/insieme-monza-dettaglio/mission/",
+};
+const CREDENTIAL_H: Record<CredentialId, string> = {
+  "figc-sgs-3-livello": "h-[15px] lg:h-[24px]",
+  lnd: "h-[18px] lg:h-[28px]",
+  "insieme-al-monza": "h-[23px] lg:h-[36px]",
+};
+
+function HeaderCredentials() {
+  return (
+    <ul
+      className="m-0 flex shrink-0 list-none items-center gap-1.5 rounded-[10px] bg-white px-1.5 py-1 shadow-[0_2px_8px_-3px_rgb(0_0_0/0.35)] lg:gap-3 lg:px-3 lg:py-1.5"
+      aria-label="Riconoscimenti e affiliazioni della società"
+      data-testid="header-credentials"
+    >
+      {CLUB_CREDENTIALS.map((c) => {
+        const img = <img src={c.art.src} alt={c.alt} decoding="async" className={`${CREDENTIAL_H[c.id]} w-auto object-contain`} />;
+        const href = CREDENTIAL_LINK[c.id];
+        return (
+          <li key={c.id} className="flex">
+            {href ? (
+              <a href={href} target="_blank" rel="noopener noreferrer" className="scd-focus flex rounded-[4px]" aria-label={`${c.title}, ${c.issuer}: sito ufficiale (apre una nuova scheda)`}>
+                {img}
+              </a>
+            ) : (
+              img
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
 export function SiteHeader() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const { session } = useSession();
   const board = isBoardRoute(pathname);
   return (
     <header
-      className={`scd-pub sticky top-0 z-40 h-[var(--pub-header-h)] border-b border-[var(--out-line)] bg-[var(--out-night)] font-text text-white ${board ? "hidden lg:block" : ""}`}
+      className={`scd-pub sticky top-0 z-40 h-[var(--pub-header-h)] bg-[linear-gradient(100deg,#1d5fd0_0%,#1149a8_45%,#0b3a8c_100%)] font-text text-white shadow-[0_4px_14px_-6px_rgb(11_42_91/0.45)] ${board ? "hidden lg:block" : ""}`}
       data-site-header
     >
-      <div className="mx-auto flex h-full max-w-[1440px] items-center gap-3 px-4 sm:px-6 lg:gap-7 lg:px-10">
+      <div className="flex h-full items-center gap-2 pl-3 pr-3 lg:gap-6 lg:pl-0 lg:pr-6">
         <Link
           to="/"
-          className="scd-focus flex min-h-11 min-w-0 items-center gap-2.5 rounded-md lg:gap-3"
+          className="scd-focus flex min-h-11 min-w-0 items-center gap-2 rounded-md lg:w-[240px] lg:shrink-0 lg:px-5"
           aria-label={`${CLUB_NAME}, vai alla Home`}
         >
-          <ClubCrestOfficial size={40} className="lg:hidden" />
-          <ClubCrestOfficial size={54} className="hidden lg:block" />
-          {/* 18px below 380px so crest + wordmark + access + menu fit a 360px phone without overlapping. */}
-          <span className="whitespace-nowrap font-title text-[18px] font-black leading-none min-[380px]:text-[20px] lg:text-[24px]" data-testid="header-wordmark">
-            COLICO<span className="text-[#ffd600]">DERVIESE</span>
-          </span>
+          <ClubCrestOfficial size={40} className="drop-shadow-[0_2px_6px_rgb(0_0_0/0.35)] lg:hidden" />
+          <ClubCrestOfficial size={52} className="hidden drop-shadow-[0_2px_6px_rgb(0_0_0/0.35)] lg:block" />
+          <Wordmark />
         </Link>
-        <nav
-          className="ml-4 hidden items-center gap-[22px] lg:flex"
-          aria-label="Principale"
-        >
-          {desktopNavFor(!!session?.user).map((n) => (
-            <Link
-              key={n.to}
-              to={n.to}
-              aria-current={isActive(pathname, n.to) ? "page" : undefined}
-              className={`scd-focus relative inline-flex min-h-11 items-center rounded-md px-1 text-[16px] font-semibold transition-colors duration-150 ${isActive(pathname, n.to) ? "text-white after:absolute after:inset-x-1 after:bottom-0.5 after:h-[3px] after:rounded-full after:bg-[var(--out-yellow)]" : "text-[#e6f3fc] hover:text-white"}`}
-            >
-              {n.label}
-            </Link>
-          ))}
-        </nav>
-        {/* Riconoscimenti e affiliazioni in testata da 1400 px in su (Direzione 13/10/2026 15:31): piccola placca bianca.
-            Non sulla home, che le mostra già più grandi nella fascia sotto la striscia rapida. */}
-        {pathname !== "/" && (
-          <div className="ml-auto hidden h-[48px] shrink-0 items-center rounded-[10px] bg-white px-1 shadow-[inset_0_-2px_0_#d4ab55] min-[1400px]:flex" aria-label="Riconoscimenti e affiliazioni del club" role="group">
-            <ClubCredentials variant="plaque" />
+        <HeaderSearch />
+        <TopTabs />
+        <div className="ml-auto flex shrink-0 items-center gap-2 lg:ml-0 lg:gap-3">
+          <HeaderCredentials />
+          {/* Desktop account button; on phones the same menu opens from the Profilo tab and the access screens. */}
+          <div className="hidden lg:block">
+            <AccessMenu />
           </div>
-        )}
-        <div className={`ml-auto flex shrink-0 items-center gap-2 lg:gap-3 ${pathname !== "/" ? "min-[1400px]:ml-0" : ""}`}>
-          <AccessMenu />
-          <button
-            className="scd-focus flex size-11 shrink-0 items-center justify-center rounded-[10px] border border-white/25 text-white transition-colors duration-150 hover:bg-white/10"
-            aria-label="Apri menu completo"
-            onClick={openMenu}
+          <Link
+            to="/comunicazioni"
+            aria-label="Avvisi e comunicazioni del club"
+            className="scd-focus relative hidden size-11 place-items-center rounded-full bg-white/12 text-white ring-1 ring-white/15 transition-colors duration-150 hover:bg-white/20 lg:grid"
+            data-testid="header-bell"
           >
-            <Menu className="size-5" aria-hidden="true" />
+            <Bell className="size-[22px]" strokeWidth={2} aria-hidden="true" />
+          </Link>
+          <button
+            type="button"
+            className="scd-focus grid size-11 place-items-center rounded-full bg-white/12 text-white ring-1 ring-white/15 transition-colors duration-150 hover:bg-white/20 lg:hidden"
+            aria-label="Tutte le pagine: apri il menu completo"
+            onClick={openMenu}
+            data-testid="header-menu"
+          >
+            <Menu className="size-[22px]" strokeWidth={2} aria-hidden="true" />
           </button>
         </div>
       </div>
     </header>
+  );
+}
+
+/** Desktop left sidebar (Eurobet structure, SCD colours): sticky under the top bar, active section in yellow. */
+export function SideNav() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { session } = useSession();
+  const signedIn = !!session?.user;
+  const areas = workAreasFor(session);
+  const row = (active: boolean) =>
+    `scd-focus group relative flex min-h-11 items-center gap-3 rounded-[10px] px-3 text-[15px] transition-colors duration-150 ${
+      active
+        ? "bg-[#ffd82a] font-bold text-[#0b2f6b]"
+        : "font-semibold text-[#dbe7f7] hover:bg-white/10 hover:text-white"
+    }`;
+  return (
+    <aside
+      className="sticky top-[var(--pub-header-h)] hidden h-[calc(100dvh-var(--pub-header-h)-46px)] self-start overflow-y-auto overscroll-contain bg-[linear-gradient(180deg,#0f45a6_0%,#0b3a8c_55%,#082f74_100%)] px-3 pb-6 pt-4 text-white [scrollbar-color:rgb(255_255_255/0.25)_transparent] [scrollbar-width:thin] lg:block"
+      data-testid="side-nav"
+    >
+      <nav aria-label="Sezioni del club">
+        <ul className="m-0 grid list-none gap-0.5 p-0">
+          {SIDEBAR_SECTIONS.map((s) => {
+            const active = s.match ? s.match(pathname) : isActive(pathname, s.to);
+            const target = sectionTarget(s, signedIn);
+            return (
+              <li key={s.to}>
+                <Link
+                  to={target.to as never}
+                  search={target.search as never}
+                  aria-current={active ? "page" : undefined}
+                  className={row(active)}
+                  data-side={s.to}
+                >
+                  <s.icon className="size-5 shrink-0" strokeWidth={active ? 2.4 : 1.9} aria-hidden="true" />
+                  <span className="min-w-0 flex-1 truncate">{s.label}</span>
+                  {s.members && !signedIn && (
+                    <Lock className="size-3.5 shrink-0 opacity-75" aria-label="per i soci, dopo l'accesso" />
+                  )}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+      {areas.length > 0 && (
+        <nav aria-label="Le tue aree di lavoro" className="mt-4 border-t border-white/12 pt-3" data-testid="side-work-areas">
+          <p className="m-0 px-3 pb-1.5 text-[11.5px] font-bold uppercase tracking-[0.14em] text-[#ffd82a]">Le tue aree</p>
+          <ul className="m-0 grid list-none gap-0.5 p-0">
+            {areas.map(({ entry, link }) => {
+              const Icon = AREA_ICON[entry.icon];
+              const active = isActive(pathname, link.path);
+              return (
+                <li key={entry.id}>
+                  <Link
+                    to={link.href as never}
+                    aria-current={active ? "page" : undefined}
+                    className={row(active)}
+                  >
+                    <Icon className="size-5 shrink-0" strokeWidth={1.9} aria-hidden="true" />
+                    <span className="min-w-0 flex-1 truncate">{entry.label}</span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+      )}
+      <div className="mt-4 grid gap-1 border-t border-white/12 pt-3">
+        {!signedIn && (
+          <Link
+            to="/accedi"
+            search={loginSearch(pathname) as never}
+            className="scd-focus flex min-h-11 items-center justify-center gap-2 rounded-full bg-[#ffd82a] px-4 text-[15px] font-bold text-[#0b2f6b] transition-[filter] duration-150 hover:brightness-95"
+          >
+            <LogIn className="size-[18px]" strokeWidth={2.2} aria-hidden="true" />
+            Entra o registrati
+          </Link>
+        )}
+        <button
+          type="button"
+          onClick={openMenu}
+          className="scd-focus flex min-h-11 items-center gap-3 rounded-[10px] px-3 text-[14.5px] font-semibold text-[#dbe7f7] transition-colors duration-150 hover:bg-white/10 hover:text-white"
+        >
+          <Search className="size-5 shrink-0" strokeWidth={1.9} aria-hidden="true" />
+          Tutte le pagine
+        </button>
+      </div>
+    </aside>
   );
 }
 
@@ -232,7 +537,7 @@ export function MenuDrawer() {
       <nav
         id="sa-menu"
         aria-label="Menu completo"
-        className="fixed inset-x-0 bottom-0 z-[61] max-h-[85dvh] overflow-y-auto rounded-t-[20px] bg-white px-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-3 text-[var(--scd-ink)] shadow-[0_-12px_40px_rgb(1_34_79/0.35)] lg:inset-x-auto lg:bottom-auto lg:right-4 lg:top-[64px] lg:w-[400px] lg:rounded-2xl"
+        className="fixed inset-x-0 bottom-0 z-[61] max-h-[85dvh] overflow-y-auto rounded-t-[20px] bg-white px-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-3 text-[var(--scd-ink)] shadow-[0_-12px_40px_rgb(1_34_79/0.35)] lg:inset-x-auto lg:bottom-auto lg:right-4 lg:top-[calc(var(--pub-header-h)+8px)] lg:w-[400px] lg:rounded-2xl"
       >
         <div className="flex items-center justify-between pb-1">
           <span className="flex items-center gap-2">
@@ -339,19 +644,20 @@ type TabDef = {
   icon: LucideIcon;
   to?: string;
   search?: Record<string, string | undefined>;
-  /** Opens the full menu ("Altro") or the access menu ("Aree") instead of navigating. */
-  menu?: "full" | "access";
+  /** Opens the full menu ("Altro") instead of navigating. */
+  menu?: "full";
   match: (p: string) => boolean;
-  /** Raised yellow circle in the centre of the bar. */
-  tone?: "yellow";
   ariaLabel?: string;
+  /** Members-only destination shown to a guest: small lock, the link passes through the sign-in. */
+  locked?: boolean;
 };
 
 const MINE_MATCH = (p: string) =>
   p.startsWith("/la-mia-scd") ||
   p.startsWith("/famiglia") ||
   p.startsWith("/core/atleta") ||
-  p.startsWith("/core/famiglia");
+  p.startsWith("/core/famiglia") ||
+  p.startsWith("/aree");
 
 const HOME_TAB: TabDef = {
   label: "Home",
@@ -365,78 +671,45 @@ const CALENDAR_TAB: TabDef = {
   to: "/calendario",
   match: (p) => p.startsWith("/calendario"),
 };
-const TEAMS_TAB: TabDef = {
-  label: "Squadre",
-  icon: UsersRound,
-  to: "/squadre",
-  match: (p) => p.startsWith("/squadre") || p.startsWith("/allenamenti"),
-};
-/** Anonymous visitors: teams are inside (UD-100), the public tab is the partner offer. */
-const PARTNER_TAB: TabDef = {
-  label: "Partner",
-  icon: Handshake,
-  to: "/sponsor",
-  match: (p) => p.startsWith("/sponsor") || p.startsWith("/fornitori"),
-};
-const AREAS_TAB: TabDef = {
-  label: "Aree",
-  icon: Lock,
-  menu: "access",
-  match: (p) => p.startsWith("/aree"),
-  ariaLabel: "Aree: entra o apri le tue aree",
+const EVENTS_TAB: TabDef = {
+  label: "Eventi",
+  icon: CalendarCheck,
+  to: "/eventi",
+  match: (p) => p.startsWith("/eventi") || p.startsWith("/tornei"),
 };
 
-/** Raised centre tab of the public bar: who you are decides what it offers (src/lib/access-nav.ts). */
-const CENTER_TABS: Readonly<Record<CenterTab, TabDef>> = {
-  entra: {
-    label: "Entra",
-    icon: LogIn,
-    to: "/accedi",
-    match: (p) => p.startsWith("/accedi") || p.startsWith("/registrati"),
-    tone: "yellow",
-    ariaLabel: "Entra: accedi o registrati",
-  },
-  mine: {
-    label: "La mia",
-    icon: UserRound,
-    to: "/la-mia-scd",
-    match: MINE_MATCH,
-    tone: "yellow",
-    ariaLabel: "La mia SCD: la tua area",
-  },
-  crea: {
-    label: "Crea",
-    icon: Plus,
-    to: "/crea",
-    match: (p) => p.startsWith("/crea"),
-    tone: "yellow",
-    ariaLabel: "Crea: nuovo post",
-  },
-};
-
-/**
- * Public bar, five tabs. Anonymous: Home · Calendario · [Entra] · Partner · Aree (teams are inside,
- * UD-100). Signed in without author role: Home · Calendario · [La mia] · Squadre · Aree. Author:
- * Home · Calendario · [Crea] · Squadre · La mia.
- */
-export function publicTabsFor(center: CenterTab): TabDef[] {
-  const last: TabDef =
-    center === "crea"
-      ? {
-          label: "La mia",
-          icon: UserRound,
-          to: "/la-mia-scd",
-          match: (p) => MINE_MATCH(p) || p.startsWith("/aree"),
-        }
-      : AREAS_TAB;
-  return [
-    HOME_TAB,
-    CALENDAR_TAB,
-    CENTER_TABS[center],
-    center === "entra" ? PARTNER_TAB : TEAMS_TAB,
-    last,
-  ];
+/** Squadre: teams are inside (UD-100), so a guest reaches them through the sign-in (lock on the icon). */
+function teamsTab(signedIn: boolean): TabDef {
+  const t = sectionTarget({ to: "/squadre", members: true }, signedIn);
+  return {
+    label: "Squadre",
+    icon: UsersRound,
+    to: t.to,
+    ...(t.search ? { search: t.search } : {}),
+    locked: !signedIn,
+    ...(signedIn ? {} : { ariaLabel: "Squadre: per i soci, entra per vederle" }),
+    match: (p) => p.startsWith("/squadre") || p.startsWith("/allenamenti"),
+  };
 }
+
+/** Profilo: the sign-in for guests, La mia SCD (the member area) when signed in. */
+function profileTab(signedIn: boolean): TabDef {
+  return signedIn
+    ? { label: "Profilo", icon: UserRound, to: "/la-mia-scd", match: MINE_MATCH, ariaLabel: "Profilo: la tua area" }
+    : {
+        label: "Profilo",
+        icon: UserRound,
+        to: "/accedi",
+        match: (p) => p.startsWith("/accedi") || p.startsWith("/registrati"),
+        ariaLabel: "Profilo: entra o registrati",
+      };
+}
+
+/** The five items of the boards' bottom bar, the same for everybody: Home · Calendario · Squadre · Eventi · Profilo. */
+export function publicTabsFor(signedIn: boolean): TabDef[] {
+  return [HOME_TAB, CALENDAR_TAB, teamsTab(signedIn), EVENTS_TAB, profileTab(signedIn)];
+}
+
 const STAFF_TABS: TabDef[] = [
   {
     label: "Dashboard",
@@ -466,38 +739,25 @@ const STAFF_TABS: TabDef[] = [
   },
   { label: "Altro", icon: Ellipsis, menu: "full", match: () => false },
 ];
-const COMMS_TABS: TabDef[] = [
-  { label: "Home", icon: House, to: "/", match: (p) => p === "/" },
-  {
-    label: "Calendario",
-    icon: CalendarDays,
-    to: "/calendario",
-    match: (p) => p.startsWith("/calendario"),
-  },
-  {
-    label: "Comunicazioni",
-    icon: Circle,
-    to: "/comunicazioni",
-    match: (p) => p.startsWith("/comunicazioni"),
-    tone: "yellow",
-  },
-  {
-    label: "Squadre",
-    icon: UsersRound,
-    to: "/squadre",
-    match: (p) => p.startsWith("/squadre") || p.startsWith("/allenamenti"),
-  },
-  { label: "Altro", icon: Ellipsis, menu: "full", match: () => false },
-];
 
-export function tabsFor(
-  pathname: string,
-  center: CenterTab = "entra",
-): TabDef[] {
-  if (pathname.startsWith("/comunicazioni"))
-    return center === "entra"
-      ? COMMS_TABS.map((t) => (t.to === "/squadre" ? PARTNER_TAB : t))
-      : COMMS_TABS;
+/** Comunicazioni board: Home · Calendario · Comunicazioni · Squadre · Altro (same white bar, no raised button). */
+function commsTabs(signedIn: boolean): TabDef[] {
+  return [
+    HOME_TAB,
+    CALENDAR_TAB,
+    {
+      label: "Comunicazioni",
+      icon: Newspaper,
+      to: "/comunicazioni",
+      match: (p) => p.startsWith("/comunicazioni"),
+    },
+    teamsTab(signedIn),
+    { label: "Altro", icon: Ellipsis, menu: "full", match: () => false },
+  ];
+}
+
+export function tabsFor(pathname: string, signedIn = false): TabDef[] {
+  if (pathname.startsWith("/comunicazioni")) return commsTabs(signedIn);
   if (
     pathname === "/core" ||
     pathname === "/core/" ||
@@ -505,36 +765,45 @@ export function tabsFor(
     pathname.startsWith("/core/impianti-calendari")
   )
     return STAFF_TABS;
-  return publicTabsFor(center);
+  return publicTabsFor(signedIn);
 }
 
-/** Barra inferiore (smartphone/tablet): blu notte della tavola, voce attiva gialla. */
+/** Barra inferiore (smartphone/tablet) delle tavole: bianca, voce attiva blu con etichetta, bersagli da 44 px. */
 export function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { session } = useSession();
-  const tabs = tabsFor(pathname, centerTabFor(session));
+  const tabs = tabsFor(pathname, !!session?.user);
   // LIVE on the Calendario tab while a club game is being played (study 15/10, block A/C).
   const { pulse } = useClubPulse();
   const liveNow = (pulse?.live ?? 0) > 0;
   return (
     <nav
       aria-label="Navigazione Super App"
-      className="fixed inset-x-0 bottom-0 z-40 bg-[var(--uv-night)] pb-[env(safe-area-inset-bottom)] lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-[#e3eaf4] bg-white pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_16px_-6px_rgb(11_42_91/0.18)] lg:hidden"
+      data-testid="bottom-nav"
     >
-      <div className="mx-auto grid h-[62px] max-w-xl grid-cols-5">
+      <div className="mx-auto grid h-[60px] max-w-xl grid-cols-5">
         {tabs.map((t) => {
           const active = t.match(pathname);
-          const color = active ? "text-[var(--uv-gold)]" : "text-[#b9cdf0]";
+          const color = active ? "text-[#1556c4]" : "text-[#5f6f8a]";
           const liveTab = liveNow && t.to === "/calendario";
           const inner = (
             <>
               <span className="relative inline-flex">
                 <t.icon
                   className="size-[25px]"
-                  strokeWidth={active ? 2.4 : 1.8}
+                  strokeWidth={active ? 2.3 : 1.7}
                   fill={active && t.icon === House ? "currentColor" : "none"}
                   aria-hidden="true"
                 />
+                {t.locked && (
+                  <span
+                    aria-hidden="true"
+                    className="absolute -bottom-0.5 -right-1.5 grid size-[14px] place-items-center rounded-full bg-white"
+                  >
+                    <Lock className="size-[10px]" strokeWidth={2.6} />
+                  </span>
+                )}
                 {liveTab && (
                   <span
                     className="absolute -right-3 -top-1.5 rounded-[4px] bg-[#e11d2e] px-1 py-[2px] text-[10px] font-extrabold uppercase leading-none tracking-[0.04em] text-white"
@@ -545,47 +814,18 @@ export function BottomNav() {
                 )}
               </span>
               <span
-                className={`text-[11.5px] leading-none ${active ? "font-bold" : "font-medium"}`}
+                className={`text-[11.5px] leading-none ${active ? "font-extrabold" : "font-medium"}`}
               >
                 {t.label}
               </span>
             </>
           );
-          if (t.tone === "yellow" && t.to) {
-            // Tab centrale della tavola: cerchio giallo rialzato (Entra / La mia / Crea).
-            return (
-              <Link
-                key={t.label}
-                to={t.to}
-                search={
-                  (t.to === "/accedi"
-                    ? loginSearch(pathname)
-                    : t.search) as never
-                }
-                aria-label={t.ariaLabel ?? t.label}
-                aria-current={active ? "page" : undefined}
-                className="scd-focus flex flex-col items-center justify-center"
-                data-testid="tab-center"
-              >
-                <span className="mt-1.5 grid h-[36px] w-[58px] place-items-center rounded-full bg-[var(--uv-gold)] text-[#0b1e3a] shadow-[0_4px_12px_rgb(0_0_0/0.3)]">
-                  <t.icon
-                    className="size-6"
-                    strokeWidth={2.6}
-                    aria-hidden="true"
-                  />
-                </span>
-                <span className="mt-1 text-[11.5px] font-bold leading-none text-[var(--uv-gold)]">
-                  {t.label}
-                </span>
-              </Link>
-            );
-          }
-          const cls = `relative flex flex-col items-center justify-center gap-[5px] ${color} ${active ? "before:absolute before:inset-x-[22%] before:top-0 before:h-1 before:rounded-b before:bg-[var(--uv-gold)]" : ""}`;
+          const cls = `scd-focus relative flex min-h-11 flex-col items-center justify-center gap-[5px] transition-colors duration-150 ${color}`;
           return t.menu ? (
             <button
               key={t.label}
               type="button"
-              onClick={t.menu === "access" ? openAccessMenu : openMenu}
+              onClick={openMenu}
               className={cls}
               aria-label={t.ariaLabel ?? "Altro: menu completo"}
             >
@@ -595,9 +835,11 @@ export function BottomNav() {
             <Link
               key={t.label}
               to={t.to!}
-              search={t.search as never}
+              search={(t.to === "/accedi" && !t.search ? loginSearch(pathname) : t.search) as never}
+              aria-label={t.ariaLabel}
               aria-current={active ? "page" : undefined}
               className={cls}
+              data-tab={t.label}
             >
               {inner}
             </Link>
@@ -611,136 +853,102 @@ export function BottomNav() {
 const SOCIAL_ICON = { instagram: Instagram, facebook: Facebook } as const;
 
 /**
- * Piè di pagina ridotto (UD-116, Direzione 14/10/2026: il footer grande con "Tutto sul club" non serve alle persone):
- * logo, contatti (mail, PEC, sede), social, Installa l'app, privacy / cookie / segnalazioni riservate / elimina
- * account e i riconoscimenti federali. L'indice delle pagine è nel menu, con la ricerca.
+ * Piè di pagina chiaro e sintetico (Francesco 16/10/2026 05:59: «devi togliere fondo pagina così blu, sintetizzare il
+ * fondo pagina»; i tre loghi vanno in alto nella Home). Sempre ridotto come da UD-116, senza indice di pagine:
+ * stemma e nome, contatti in una riga, app e social, una riga sui riconoscimenti, note legali.
  */
 export function SiteFooter() {
+  const legal =
+    "scd-focus inline-flex min-h-11 items-center underline decoration-[#9fb2d0] underline-offset-4 hover:text-[#0b1e3a]";
   return (
-    <footer className="mt-10" data-testid="site-footer">
-      <div className="bg-[#0b2a5b] px-4 pb-20 pt-8 text-white lg:px-8 lg:pb-8">
-        <div className="mx-auto grid max-w-[1280px] gap-6">
-          <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)_minmax(0,1.2fr)] lg:items-start">
-            <div className="grid content-start gap-3">
-              <Link
-                to="/"
-                className="scd-focus flex w-fit items-center gap-3 rounded-md"
-                aria-label={`${CLUB_NAME}, vai alla Home`}
-              >
-                <ClubCrestOfficial size={48} />
-                <span className="whitespace-nowrap font-title text-[24px] font-black leading-none">
-                  COLICO<span className="text-[#ffd600]">DERVIESE</span>
-                </span>
-              </Link>
-              <div className="flex flex-wrap items-center gap-2">
-                <ul className="m-0 flex list-none gap-2 p-0" aria-label="Profili social ufficiali">
-                  {SOCIAL_LINKS.map((so) => {
-                    const Icon = SOCIAL_ICON[so.id];
-                    return (
-                      <li key={so.id}>
-                        <a
-                          href={so.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          aria-label={`${so.label} ${so.handle} (apre una nuova scheda)`}
-                          className="scd-focus grid size-11 place-items-center rounded-full border border-white/25 text-white transition-colors duration-150 hover:bg-white/10"
-                        >
-                          <Icon className="size-5" strokeWidth={1.8} aria-hidden="true" />
-                        </a>
-                      </li>
-                    );
-                  })}
-                </ul>
-                <Link
-                  to="/installa"
-                  className="scd-focus inline-flex min-h-11 min-w-11 items-center text-[14px] gap-1.5 rounded-full bg-[#ffd600] px-4 font-bold text-[#0b1e3a] transition-[filter] duration-150 hover:brightness-95"
-                  data-testid="footer-install"
-                >
-                  <Download className="size-4" aria-hidden="true" />
-                  Installa l'app
-                </Link>
-              </div>
-            </div>
-
-            <address className="grid content-start gap-0.5 text-[14px] not-italic leading-snug text-white/85" data-testid="footer-contacts">
-              <h2 className="m-0 pb-1 text-[12px] font-bold uppercase tracking-[0.12em] text-[#ffd600]">Contatti</h2>
-              <p className="m-0 font-semibold text-white">{CLUB_NAME}</p>
-              <p className="m-0">{CLUB_PROFILE.contacts.address}</p>
-              <p className="m-0">
+    <footer className="mt-10 border-t border-[#e3eaf4] bg-white px-4 pb-6 pt-6 text-[#23406e] lg:px-8" data-testid="site-footer">
+      <div className="mx-auto grid max-w-[1240px] gap-4">
+        <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
+          <div className="flex min-w-0 items-center gap-3">
+            <Link to="/" className="scd-focus shrink-0 rounded-md" aria-label={`${CLUB_NAME}, vai alla Home`}>
+              <ClubCrestOfficial size={44} />
+            </Link>
+            <address className="min-w-0 text-[13.5px] not-italic leading-snug" data-testid="footer-contacts">
+              <span className="block font-extrabold text-[#0b1e3a]">{CLUB_NAME}</span>
+              <span className="block">{CLUB_PROFILE.contacts.address} · Matricola FIGC {CLUB_PROFILE.figcMatricola}</span>
+              <span className="flex flex-wrap gap-x-3">
                 <a
                   href={`mailto:${CLUB_PROFILE.contacts.email}`}
-                  className="scd-focus inline-flex min-h-11 select-text items-center underline decoration-white/30 underline-offset-4 hover:decoration-white"
+                  className="scd-focus inline-flex min-h-11 select-text items-center underline decoration-[#9fb2d0] underline-offset-4 hover:decoration-[#0b1e3a]"
                 >
                   {CLUB_PROFILE.contacts.email}
                 </a>
-              </p>
-              <p className="m-0">
-                PEC <span className="select-text">{CLUB_PROFILE.contacts.pec}</span>
-              </p>
-              <p className="m-0 text-white/70">Matricola FIGC {CLUB_PROFILE.figcMatricola}</p>
+                <span className="inline-flex min-h-11 items-center">
+                  PEC&nbsp;<span className="select-text">{CLUB_PROFILE.contacts.pec}</span>
+                </span>
+              </span>
             </address>
-
-            <div className="grid content-start gap-2 md:col-span-2 lg:col-span-1" data-testid="footer-credits">
-              <h2 className="m-0 text-[12px] font-bold uppercase tracking-[0.12em] text-[#ffd600]">
-                Riconoscimenti e affiliazioni
-              </h2>
-              <div className="rounded-[14px] bg-white px-3.5 py-3">
-                <ClubCredentials variant="list" />
-              </div>
-              <p className="m-0 text-[12.5px] leading-snug text-white/70">{CREDENTIALS_SENTENCE}</p>
-            </div>
           </div>
-
-          <div className="flex flex-col gap-2 border-t border-white/15 pt-4 text-[12.5px] text-white/70 lg:flex-row lg:items-center lg:justify-between">
-            <span className="flex flex-wrap gap-x-5">
-              <a
-                href="/privacy"
-                className="scd-focus inline-flex min-h-11 min-w-11 items-center underline decoration-white/30 underline-offset-4 hover:text-white"
-              >
-                Privacy
-              </a>
-              <button
-                type="button"
-                onClick={openCookiePrefs}
-                className="scd-focus inline-flex min-h-11 items-center underline decoration-white/30 underline-offset-4 hover:text-white"
-              >
-                Preferenze cookie
-              </button>
-              <Link
-                to="/safeguarding"
-                className="scd-focus inline-flex min-h-11 items-center underline decoration-white/30 underline-offset-4 hover:text-white"
-              >
-                Segnalazioni riservate
-              </Link>
-              <a
-                href="/elimina-account"
-                className="scd-focus inline-flex min-h-11 items-center underline decoration-white/30 underline-offset-4 hover:text-white"
-              >
-                Elimina account
-              </a>
-              <button
-                type="button"
-                onClick={openMenu}
-                className="scd-focus inline-flex min-h-11 items-center gap-1 underline decoration-white/30 underline-offset-4 hover:text-white"
-              >
-                <Search className="size-3.5" aria-hidden="true" />
-                Tutte le pagine
-              </button>
-            </span>
-            {/* Build date and git hash are for the team: hidden data attribute, not public copy (cleanup 15/10/2026). */}
-            <span data-build={BUILD_STAMP}>Super App ufficiale della {CLUB_NAME}</span>
+          <div className="flex flex-wrap items-center gap-2">
+            <Link
+              to="/installa"
+              className="scd-focus inline-flex min-h-11 min-w-11 items-center text-[14px] gap-1.5 rounded-[10px] bg-[#ffd600] px-4 font-extrabold text-[#061a3d] transition-[filter] duration-150 hover:brightness-95"
+              data-testid="footer-install"
+            >
+              <Download className="size-4" aria-hidden="true" />
+              Installa l'app
+            </Link>
+            <ul className="m-0 flex list-none gap-2 p-0" aria-label="Profili social ufficiali">
+              {SOCIAL_LINKS.map((so) => {
+                const Icon = SOCIAL_ICON[so.id];
+                return (
+                  <li key={so.id}>
+                    <a
+                      href={so.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`${so.label} ${so.handle} (apre una nuova scheda)`}
+                      className="scd-focus grid size-11 place-items-center rounded-full border border-[#dfe7f2] text-[#0b2a5b] transition-colors duration-150 hover:bg-[#eef3f9]"
+                    >
+                      <Icon className="size-5" strokeWidth={1.8} aria-hidden="true" />
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
           </div>
-          {/* Authorship kept but discreet (Francesco 15/10/2026 06:51: "non visibile così ma molto riservato"). */}
-          <details className="-mt-3 text-[11px] leading-snug text-white/60">
-            <summary className="scd-focus inline-flex min-h-11 cursor-pointer list-none items-center">
-              © {new Date().getFullYear()} · Tutti i diritti riservati · Crediti
-            </summary>
-            <p className="m-0 pb-2">
-              Ideata e realizzata da Francesco Coppola, concessa in uso gratuito alla {CLUB_NAME}. Stemma, loghi e marchi
-              appartengono ai rispettivi titolari.
-            </p>
-          </details>
         </div>
+        <p className="m-0 text-[12.5px] leading-snug text-[#4a5d7a]" data-testid="footer-credits">{CREDENTIALS_SENTENCE}</p>
+        <div className="flex flex-col gap-1 border-t border-[#eef2f8] pt-2 text-[12.5px] text-[#5a6b85] lg:flex-row lg:items-center lg:justify-between">
+          <span className="flex flex-wrap gap-x-5">
+            <a
+              href="/privacy"
+              className="scd-focus inline-flex min-h-11 min-w-11 items-center underline decoration-[#9fb2d0] underline-offset-4 hover:text-[#0b1e3a]"
+            >
+              Privacy
+            </a>
+            <button type="button" onClick={openCookiePrefs} className={legal}>
+              Preferenze cookie
+            </button>
+            <Link to="/safeguarding" className={legal}>
+              Segnalazioni riservate
+            </Link>
+            <a href="/elimina-account" className={legal}>
+              Elimina account
+            </a>
+            <button type="button" onClick={openMenu} className={`${legal} gap-1`}>
+              <Search className="size-3.5" aria-hidden="true" />
+              Tutte le pagine
+            </button>
+          </span>
+          {/* Build date and git hash are for the team: hidden data attribute, not public copy (cleanup 15/10/2026). */}
+          <span data-build={BUILD_STAMP}>Super App ufficiale della {CLUB_NAME}</span>
+        </div>
+        {/* Authorship kept but discreet (Francesco 15/10/2026 06:51: "non visibile così ma molto riservato"). */}
+        <details className="-mt-2 text-[11px] leading-snug text-[#8a98ad]">
+          <summary className="scd-focus inline-flex min-h-11 cursor-pointer list-none items-center">
+            © {new Date().getFullYear()} · Tutti i diritti riservati · Crediti
+          </summary>
+          <p className="m-0 pb-2">
+            Ideata e realizzata da Francesco Coppola, concessa in uso gratuito alla {CLUB_NAME}. Stemma, loghi e marchi
+            appartengono ai rispettivi titolari.
+          </p>
+        </details>
       </div>
     </footer>
   );

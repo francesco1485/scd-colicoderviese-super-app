@@ -6,7 +6,6 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 import {
   PERSONA_COPY,
   PersonaAvatar,
-  SKY_BALL_SRC,
   chatAreaFor,
   chatCopyFor,
   greetingFor,
@@ -57,14 +56,30 @@ function greeting(persona: Persona, area: ChatAreaId | null): Msg[] {
   return [{ role: "sky", text: g.text, ...(g.links ? { links: g.links } : {}) }];
 }
 
-/* Bottom chrome on phones (SiteChrome.BottomNav 62px, SponsorBand 34px on every public page, UD-134) */
-const NAV_H = 62;
-const STRIP_H = 34;
+/* Bottom chrome on phones (SiteChrome.BottomNav 60px, SponsorBand 30px on every public page, UD-134) */
+const NAV_H = 60;
 /**
- * Launcher centred on the sponsor strip (UD-135): it sits on the strip's white right cap, never on page content.
- * 44px on phones, the minimum touch target (WCAG 2.5.8 / platform guidelines; cleanup 15/10/2026).
+ * Launcher on the sponsor strip (UD-135): it sits on the strip's white right cap. Since the board shell (15/10/2026,
+ * slim 30px strip over the white five-item bar) it rests just above the bar, so its name tag never covers the Profilo
+ * tab; the circle rises a little over the strip's top edge. 44px on phones, the minimum touch target (WCAG 2.5.8).
+ * LAUNCHER_GAP: room between the bottom bar and the launcher's name tag.
  */
-const LAUNCHER = 44;
+const LAUNCHER_GAP = 6;
+/** Launcher circle on phones (size-11): the 44px minimum touch target. */
+const LAUNCHER_PHONE_SIZE = 44;
+/**
+ * Room the public shell keeps under its content on phones (Francesco 15/10/2026: "Vera never covers content"): the
+ * bottom bar, the gap and the launcher circle, plus 8px of air, so the last row of every page scrolls clear of Vera.
+ * Read by routes/__root.tsx; the launcher stays above the bottom bar (bottom: NAV_H + LAUNCHER_GAP).
+ */
+export const PHONE_CONTENT_CLEARANCE = NAV_H + LAUNCHER_GAP + LAUNCHER_PHONE_SIZE + 8;
+/** Desktop launcher (lg): 56px circle, 62px from the bottom (above the 46px sponsor strip), 16px from the right. */
+const LAUNCHER_DESKTOP_SIZE = 56;
+const LAUNCHER_DESKTOP_BOTTOM = 62;
+const LAUNCHER_DESKTOP_RIGHT = 16;
+/** Desktop room under the content so the last row scrolls clear of the launcher (+8px of air). */
+export const DESKTOP_CONTENT_CLEARANCE = LAUNCHER_DESKTOP_BOTTOM + LAUNCHER_DESKTOP_SIZE + 8;
+// Right footprint: LAUNCHER_DESKTOP_RIGHT + LAUNCHER_DESKTOP_SIZE + 8 = 80px; __root.tsx keeps the column clear of it.
 
 /** A reply link: app paths through the router (with "?query" and "#anchor"), https sources in a new tab. */
 function ReplyLink({ link, onNavigate }: { link: { label: string; to: string }; onNavigate: () => void }) {
@@ -234,8 +249,7 @@ export function SkyChat({ interior = false }: { interior?: boolean } = {}) {
 
   const phoneBottom = interior
     ? "calc(16px + env(safe-area-inset-bottom))"
-    : `calc(${NAV_H + STRIP_H / 2 - LAUNCHER / 2}px + env(safe-area-inset-bottom))`;
-  const isSky = persona === "sky";
+    : `calc(${NAV_H + LAUNCHER_GAP}px + env(safe-area-inset-bottom))`;
 
   // Super App: su smartphone il widget resta sopra la barra di navigazione inferiore e la striscia sponsor.
   return (
@@ -255,17 +269,7 @@ export function SkyChat({ interior = false }: { interior?: boolean } = {}) {
           className="sky-panel flex max-h-[calc(100dvh-11rem)] w-[min(21rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-[20px] border border-[#dbe3ee] bg-white shadow-[0_18px_40px_-12px_rgb(11_42_91/0.35)] lg:max-h-[calc(100dvh-6rem)]"
         >
           <div className="flex items-center gap-3 bg-[#0b2a5b] px-4 py-3 text-white" data-chat-persona={persona}>
-            {isSky ? (
-              <img
-                src={SKY_BALL_SRC}
-                alt=""
-                width={40}
-                height={38}
-                className="h-[38px] w-[40px] shrink-0 object-contain"
-              />
-            ) : (
-              <PersonaAvatar persona={persona} size={32} />
-            )}
+            <PersonaAvatar persona={persona} size={32} />
             <div className="min-w-0 flex-1">
               <p className="m-0 text-[15px] font-bold leading-tight">
                 {copy.title}

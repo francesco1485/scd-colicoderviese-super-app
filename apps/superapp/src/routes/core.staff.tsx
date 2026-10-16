@@ -51,7 +51,6 @@ function AreaStaff() {
         title="Area Staff"
         subtitle={<>Statistiche, squadre, atleti<br />e gestione del club.</>}
         action={<GearAction onClick={openMenu} />}
-        sky="staff"
         titleGap={30}
         bottomGap={28}
         testId="staff-hero"
