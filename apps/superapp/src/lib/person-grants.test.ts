@@ -39,6 +39,8 @@ const repo = (p: string) => fileURLToPath(new URL(`../../../../${p}`, import.met
 const SQL = readFileSync(repo("supabase/migrations/20261014_r100_person_grants.sql"), "utf8");
 /** r101 (UD-113) recreates scd_section_catalog() with the r100 entries unchanged plus the new sections. */
 const SQL101 = readFileSync(repo("supabase/migrations/20261014_r101_fondo_adotta.sql"), "utf8");
+/** r136 (Infermeria and Nutrizionista) recreates it again with every r101 entry unchanged plus "nutrizione". */
+const SQL136 = readFileSync(repo("supabase/migrations/20261016_r136_infermeria_nutrizione.sql"), "utf8");
 const routeTree = readFileSync(fileURLToPath(new URL("../routeTree.gen.ts", import.meta.url)), "utf8");
 
 function literal(tag: string, sql: string = SQL): unknown {
@@ -115,8 +117,10 @@ describe("migration r100 stays in sync with the catalogue", () => {
   const asSql = (s: (typeof SECTIONS)[number]) => ({ code: s.code, levels: s.levels, perimeters: s.perimeters, base: !!s.base, hard_blocked: !!s.hardBlocked, direction_only: !!s.directionOnly, sensitive: !!s.sensitive });
   const R101_SECTIONS = ["fondo-solidale", "adotta", "donazioni", "proposte"];
 
-  it("the latest catalogue (r101) is the whole config file", () => {
-    expect(literal("cat", SQL101)).toEqual(SECTIONS.map(asSql));
+  const R136_SECTIONS = ["nutrizione"];
+
+  it("the latest catalogue (r136) is the whole config file", () => {
+    expect(literal("cat", SQL136)).toEqual(SECTIONS.map(asSql));
   });
 
   it("r101 keeps every r100 entry identical and only appends the UD-113 sections", () => {
@@ -124,7 +128,14 @@ describe("migration r100 stays in sync with the catalogue", () => {
     const r101 = literal("cat", SQL101) as Array<{ code: string }>;
     expect(r101.slice(0, r100.length)).toEqual(r100);
     expect(r101.slice(r100.length).map((x) => x.code)).toEqual(R101_SECTIONS);
-    expect(SECTIONS.filter((s) => !R101_SECTIONS.includes(s.code)).map(asSql)).toEqual(r100);
+    expect(SECTIONS.filter((s) => ![...R101_SECTIONS, ...R136_SECTIONS].includes(s.code)).map(asSql)).toEqual(r100);
+  });
+
+  it("r136 keeps every r101 entry identical and only appends nutrizione", () => {
+    const r101 = literal("cat", SQL101) as unknown[];
+    const r136 = literal("cat", SQL136) as Array<{ code: string }>;
+    expect(r136.slice(0, r101.length)).toEqual(r101);
+    expect(r136.slice(r101.length).map((x) => x.code)).toEqual(R136_SECTIONS);
   });
 
   it("embeds the same role suggestions, role baselines and role kinds", () => {

@@ -80,6 +80,7 @@ export const POSITION_LABEL: Readonly<Record<string, string>> = {
   "responsabile-lavanderia": "Responsabile lavanderia",
   "collaboratore-lavanderia-pulizia": "Collaboratore lavanderia e pulizia",
   "responsabile-infermeria": "Responsabile infermeria",
+  nutrizionista: "Nutrizionista",
   moderatore: "Moderatore contenuti",
   "collaboratore-magazzino": "Collaboratore magazzino",
   "dirigente-collaboratore": "Dirigente collaboratore (anche genitore)",
@@ -122,6 +123,7 @@ export const POSITION_GROUPS: ReadonlyArray<{
       "responsabile-lavanderia",
       "collaboratore-lavanderia-pulizia",
       "responsabile-infermeria",
+      "nutrizionista",
     ],
   },
   {

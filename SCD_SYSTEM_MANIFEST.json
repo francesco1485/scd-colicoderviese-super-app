@@ -2081,6 +2081,55 @@
           "LOG_APPEND_ONLY_RLS_NO_POLICIES_ACCESS_ONLY_VIA_SECURITY_DEFINER"
         ],
         "imported_at": "2026-10-15"
+      },
+      {
+        "id": "SCD_SALUTE",
+        "kind": "INTERNAL_WORKFLOW",
+        "trust": "INTERNAL_VERIFIED",
+        "status": "STAGED_INACTIVE_UNTIL_R136_APPLIED",
+        "title": "Infermeria and Nutrizionista (DG 15/10/2026 14:33; 16/10 06:23 'a pieno regime'): certificate expiry board, injuries log with return-to-play checklist, first-aid kits and AED/BLSD per site; nutrition guidance by age group and consultation requests",
+        "endpoint": "Supabase SCD PULSE SECURITY DEFINER functions scd_health_staff, scd_infermeria_*, scd_nutrition_* (no direct table access)",
+        "authority_domains": [
+          "HEALTH_STAFF_OPERATIONS",
+          "FIRST_AID_EQUIPMENT",
+          "NUTRITION_GENERAL_GUIDANCE"
+        ],
+        "storage": "supabase/migrations/20261016_r136_infermeria_nutrizione.sql (STAGED, NOT APPLIED; apply after r101): scd_health_injuries, scd_first_aid_kits, scd_aed_devices with RLS on and no policies; nutrition requests go to the existing work queue scd_proposals (r79) through scd_proposal_ingest with title 'Richiesta consulenza nutrizionista · <squadra>' only; section 'nutrizione' appended to scd_section_catalog; position 'nutrizionista' appended to scd_access_admin_guard",
+        "consumers": [
+          "SCD_SUPABASE.scd_health_injuries",
+          "SCD_SUPABASE.scd_first_aid_kits",
+          "SCD_SUPABASE.scd_aed_devices",
+          "SCD_SUPABASE.scd_proposals (area nutrizione)",
+          "SCD_SUPABASE.scd_athletes.medical_certificate_* (read-only)",
+          "apps/superapp/src/lib/health-areas.ts",
+          "apps/superapp/src/lib/infermeria.functions.ts",
+          "apps/superapp/src/lib/nutrizionista.functions.ts",
+          "apps/superapp/src/components/scd/InfermeriaBoard.tsx",
+          "apps/superapp/src/routes/infermeria.tsx",
+          "apps/superapp/src/routes/nutrizionista.tsx"
+        ],
+        "routes": [
+          "/infermeria",
+          "/nutrizionista"
+        ],
+        "rules": [
+          "INFERMERIA_STAFF_ONLY_RESPONSABILE_INFERMERIA_OR_GRANT_PLUS_DIREZIONE",
+          "NO_FREE_TEXT_NO_DIAGNOSIS_SYMPTOM_OR_THERAPY_ONLY_BODY_AREA_CATEGORY",
+          "RIENTRATO_ONLY_WITH_ALL_RETURN_TO_PLAY_STEPS",
+          "NAMES_FIRST_NAME_PLUS_SURNAME_INITIAL",
+          "OWN_SITE_GRANT_SEES_KITS_AND_AED_OF_ITS_SITE_NEVER_INJURIES",
+          "HEALTH_DATA_NEVER_IN_LOGS_PUBLIC_PAGES_OR_WORK_QUEUE_TITLES",
+          "DATABASE_ERRORS_NEVER_SHOWN_FIXED_ITALIAN_SENTENCES",
+          "FAMILIES_SEE_ONLY_GENERAL_GUIDANCE_FOR_THEIR_OWN_CIRCLE_SCD_MY_FAMILY",
+          "CONSULTATION_REQUEST_ONLY_FOR_OWN_CIRCLE_ONE_OPEN_PER_PERSON_THREE_PER_DAY",
+          "NO_PERSONAL_PLANS_NO_DIETS_GUIDANCE_PASSES_ERA_GUARD_PLUS_THERAPY_WORDS",
+          "UNTIL_R136_APPLIED_SECTIONS_SAY_FUNZIONE_IN_PREPARAZIONE"
+        ],
+        "engines": {
+          "TEMPO": "staff sanitario and Segreteria stop chasing certificates, kit and AED checks on paper; measured by open injuries and overdue kits/AED visible on the KPI strip and time-to-take of nutrition requests (scd_proposal_events CREATED to TAKE)",
+          "PERSONE": "families get age-group guidance and a consultation path without exposing health data; measured by nutrition requests received and closed per month"
+        },
+        "imported_at": "2026-10-16"
       }
     ],
     "conflict_resolution": [

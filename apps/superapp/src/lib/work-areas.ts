@@ -27,6 +27,7 @@ export type WorkAreaId =
   | "scadenzario"
   | "movimenti"
   | "infermeria"
+  | "nutrizionista"
   | "mister"
   | "organigramma"
   | "persone"
@@ -231,9 +232,15 @@ export const WORK_AREAS: Readonly<Record<WorkAreaId, WorkAreaConfig>> = {
   },
   infermeria: {
     id: "infermeria", label: "Infermeria", path: pathOf("infermeria"), railId: "infermeria",
-    description: "Servizi dell'infermeria del club e prenotazione, attiva quando lo staff pubblica gli orari.",
-    sources: ["sanitario", "impianti", "inserimenti"],
-    insertRoles: ["Staff sanitario", "Direzione", "Segreteria"],
+    description: "Scadenze dei certificati per squadra, registro infortuni con rientro in campo, cassette di primo soccorso e defibrillatori per sede. Solo staff sanitario e Direzione.",
+    sources: ["supabase", "sanitario", "impianti", "inserimenti"],
+    insertRoles: ["Staff sanitario", "Direzione"],
+  },
+  nutrizionista: {
+    id: "nutrizionista", label: "Nutrizionista", path: pathOf("nutrizionista"), railId: "nutrizionista",
+    description: "Consigli generali della nutrizionista per fascia d'età e richieste di consulenza. Nessun piano personale, nessuna dieta.",
+    sources: ["supabase", "inserimenti"],
+    insertRoles: ["Nutrizionista", "Direzione"],
   },
   mister: {
     id: "mister", label: "Mister", path: pathOf("mister"), railId: "gestionale",

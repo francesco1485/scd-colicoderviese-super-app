@@ -31,12 +31,22 @@ const acc = (o: Partial<Account>): Account => ({
 });
 
 describe("access admin", () => {
-  it("keeps assignable positions equal to the database list (r65, extended in r76 and r87)", () => {
-    const sql = readFileSync(fileURLToPath(new URL("../../../../supabase/migrations/20261012_r87_auto_moderation.sql", import.meta.url)), "utf8");
+  it("keeps assignable positions equal to the database list (r65, extended in r76, r87 and r136)", () => {
+    const sql = readFileSync(fileURLToPath(new URL("../../../../supabase/migrations/20261016_r136_infermeria_nutrizione.sql", import.meta.url)), "utf8");
     const m = /assignable text\[\] := array\[([^\]]+)\]/.exec(sql);
     expect(m).not.toBeNull();
     const fromSql = (m?.[1] ?? "").match(/'([a-z-]+)'/g)?.map((s) => s.slice(1, -1)) ?? [];
     expect([...fromSql].sort()).toEqual([...ASSIGNABLE_POSITIONS].sort());
+  });
+
+  it("r136 recreates the r87 guard unchanged except for the 'nutrizionista' position", () => {
+    const body = (file: string) => {
+      const sql = readFileSync(fileURLToPath(new URL(`../../../../supabase/migrations/${file}`, import.meta.url)), "utf8");
+      const m = /create or replace function public\.scd_access_admin_guard\([\s\S]*?\n\$\$;/.exec(sql);
+      return (m?.[0] ?? "").replace(",'nutrizionista'", "");
+    };
+    expect(body("20261016_r136_infermeria_nutrizione.sql")).not.toBe("");
+    expect(body("20261016_r136_infermeria_nutrizione.sql")).toBe(body("20261012_r87_auto_moderation.sql"));
   });
 
   it("labels and groups every assignable position exactly once", () => {

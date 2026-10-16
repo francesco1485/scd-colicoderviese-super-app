@@ -1,11 +1,11 @@
 {
   "schema": "scd.sections.v1",
   "id": "SCD_SECTIONS_V1",
-  "status": "R100_APPLIED_R101_STAGED",
-  "updated": "2026-10-14",
+  "status": "R100_APPLIED_R101_STAGED_R136_STAGED",
+  "updated": "2026-10-16",
   "authority": "DIREZIONE_SCD",
   "directive": "UD-112",
-  "extendedBy": [{ "directive": "UD-113", "migration": "supabase/migrations/20261014_r101_fondo_adotta.sql", "sections": ["fondo-solidale", "adotta", "donazioni", "proposte"], "state": "STAGED_NOT_APPLIED" }],
+  "extendedBy": [{ "directive": "UD-113", "migration": "supabase/migrations/20261014_r101_fondo_adotta.sql", "sections": ["fondo-solidale", "adotta", "donazioni", "proposte"], "state": "STAGED_NOT_APPLIED" }, { "directive": "DG 15/10/2026 14:33 (infermeria, nutrizionista)", "migration": "supabase/migrations/20261016_r136_infermeria_nutrizione.sql", "sections": ["nutrizione"], "state": "STAGED_NOT_APPLIED", "applyAfter": "r101 (r136 recreates scd_section_catalog with every r101 entry identical plus nutrizione; if r101 is ever applied after r136, run r136 again: it is idempotent)" }],
   "purpose": "Canonical list of the Super App sections that the Direzione enables person by person (r100 scd_person_grants). A role is only a description: it opens nothing. Every account starts with the base sections; everything else is a per-person grant with a level and a perimeter.",
   "rules": [
     "A role (e.g. 'Dirigente annata 2015') is only a description: it opens nothing automatically.",
@@ -17,7 +17,7 @@
     "Sections with directionOnly=true are never granted here: only an active Direzione membership opens them.",
     "Sensitive sections require a written reason for every grant.",
     "A minor can only receive the SELF perimeter.",
-    "Kept in sync with the latest migration that defines scd_section_catalog (r100, then r101 which appends the UD-113 sections and keeps every r100 entry identical) by apps/superapp/src/lib/person-grants.test.ts."
+    "Kept in sync with the latest migration that defines scd_section_catalog (r100, then r101 which appends the UD-113 sections and keeps every r100 entry identical, then r136 which appends nutrizione and keeps every r101 entry identical) by apps/superapp/src/lib/person-grants.test.ts."
   ],
   "levels": [
     { "code": "READ", "label": "Vede", "hint": "Apre la sezione e legge." },
@@ -58,7 +58,7 @@
     { "code": "pulmini", "area": "pulmini", "label": "Pulmini: mezzi, autisti, corse", "group": "sport", "path": "/pulmini", "levels": ["READ", "WRITE", "APPROVE"], "perimeters": ["ALL", "OWN_TEAMS", "SELF"], "sensitive": true, "sees": "pulmini, corse e passeggeri" },
 
     { "code": "famiglia", "area": "famiglia", "label": "Area famiglia: annata, avvisi, quote dei figli", "group": "famiglia", "path": "/famiglia", "levels": ["READ", "WRITE"], "perimeters": ["OWN_CHILDREN", "SELF"], "sees": "l'area famiglia" },
-    { "code": "infermeria", "area": "infermeria", "label": "Infermeria: servizi e prenotazioni", "group": "famiglia", "path": "/infermeria", "levels": ["READ", "WRITE"], "perimeters": ["ALL", "OWN_SITE", "OWN_CHILDREN", "SELF"], "sensitive": true, "sees": "servizi e prenotazioni dell'infermeria (mai dati di salute dei minori)" },
+    { "code": "infermeria", "area": "infermeria", "label": "Infermeria: certificati, infortuni, cassette e defibrillatori", "group": "famiglia", "path": "/infermeria", "levels": ["READ", "WRITE"], "perimeters": ["ALL", "OWN_SITE", "OWN_CHILDREN", "SELF"], "sensitive": true, "sees": "scadenze dei certificati, registro infortuni e rientro in campo (Tutto), cassette di primo soccorso e defibrillatori (Tutto o Sua sede); mai diagnosi, sintomi o terapie" },
     { "code": "salute-minori", "label": "Dati di salute dei minori", "group": "protetto", "levels": [], "perimeters": [], "hardBlocked": true, "sensitive": true, "blockReason": "Non si abilita da qui: resta fuori dai flussi ordinari." },
     { "code": "safeguarding", "label": "Safeguarding (tutela dei minori)", "group": "protetto", "path": "/safeguarding", "levels": [], "perimeters": [], "hardBlocked": true, "sensitive": true, "blockReason": "Canale riservato al responsabile Safeguarding: non passa da qui." },
 
@@ -91,7 +91,8 @@
     { "code": "fondo-solidale", "label": "Fondo Solidale: domande, decisioni, entrate e uscite", "group": "soldi", "path": "/tesoreria/fondo-solidale", "levels": ["READ", "WRITE", "APPROVE"], "perimeters": ["ALL"], "sensitive": true, "sees": "le domande al Fondo Solidale con nomi e ISEE, le decisioni, le entrate e le uscite del Fondo" },
     { "code": "adotta", "label": "Adotta un oggetto: catalogo e adozioni", "group": "societa", "path": "/direzione/adotta", "levels": ["READ", "WRITE", "APPROVE"], "perimeters": ["ALL"], "sees": "il catalogo delle cose da adottare e l'avanzamento delle adozioni (mai i dati dei donatori)" },
     { "code": "donazioni", "label": "Donazioni: denaro registrato, ricevute, materiale offerto", "group": "soldi", "path": "/tesoreria/donazioni", "levels": ["READ", "WRITE", "APPROVE"], "perimeters": ["ALL"], "sensitive": true, "sees": "le donazioni con i dati dei donatori non anonimi, le ricevute e le offerte di materiale" },
-    { "code": "proposte", "label": "Proposte di miglioramento: valutazione", "group": "societa", "path": "/direzione/proposte", "levels": ["READ", "WRITE", "APPROVE"], "perimeters": ["ALL"], "sees": "le proposte di miglioramento arrivate e la loro valutazione" }
+    { "code": "proposte", "label": "Proposte di miglioramento: valutazione", "group": "societa", "path": "/direzione/proposte", "levels": ["READ", "WRITE", "APPROVE"], "perimeters": ["ALL"], "sees": "le proposte di miglioramento arrivate e la loro valutazione" },
+    { "code": "nutrizione", "area": "nutrizionista", "label": "Nutrizionista: richieste di consulenza", "group": "famiglia", "path": "/nutrizionista", "levels": ["READ", "WRITE"], "perimeters": ["ALL"], "sensitive": true, "sees": "le richieste di consulenza aperte, solo squadra e genitore da ricontattare (mai piani personali, diete o dati di salute)" }
   ],
   "roleSuggestions": {
     "note": "Used only by 'Proponi in base al ruolo': suggestions are shown to the Direzione and confirmed one by one, never saved automatically. Keys are club positions (apps/superapp/src/lib/session.ts KNOWN_POSITIONS). OWN_TEAMS suggestions take the teams of the person's structure roles; OWN_SITE suggestions carry the site.",

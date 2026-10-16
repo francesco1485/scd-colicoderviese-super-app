@@ -420,6 +420,27 @@ function GestionalePage() {
                     </FutureLink>
                   </div>
                 </Card>
+
+                <Card
+                  id="gest-salute"
+                  title="Salute del club"
+                  sub="Infermeria e nutrizionista: riservate a chi ha l'abilitazione."
+                >
+                  <div className="flex flex-col gap-2 px-4 pb-4 text-[15px]">
+                    <Link
+                      to="/infermeria"
+                      className="scd-focus font-semibold text-[var(--in-info)] underline-offset-4 hover:underline"
+                    >
+                      Infermeria: certificati, infortuni, cassette e DAE
+                    </Link>
+                    <Link
+                      to="/nutrizionista"
+                      className="scd-focus font-semibold text-[var(--in-info)] underline-offset-4 hover:underline"
+                    >
+                      Nutrizionista: consigli e richieste di consulenza
+                    </Link>
+                  </div>
+                </Card>
               </div>
             </div>
           </div>
