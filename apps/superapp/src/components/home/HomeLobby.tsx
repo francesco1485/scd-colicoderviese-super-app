@@ -434,7 +434,7 @@ function Services() {
           }
         />
         <ServiceCard
-          to="/eventi"
+          to="/eventi/christmas-lario-cup"
           testid="home-eventi"
           kicker="Tornei ed eventi"
           title="Christmas Lario Cup"
@@ -578,7 +578,7 @@ export function HomeLobby({
     return (vetrina?.tutti ?? [])
       .filter((x) => {
         const fam = x.id.split("-")[0]!;
-        if (x.id.startsWith("sky") || x.id.startsWith("dirette") || seen.has(fam)) return false;
+        if (x.id.startsWith("sky") || x.id.startsWith("dirette") || x.id.startsWith("crea") || seen.has(fam)) return false;
         seen.add(fam);
         return true;
       })

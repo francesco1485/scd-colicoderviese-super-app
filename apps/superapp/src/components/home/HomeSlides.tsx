@@ -1,7 +1,8 @@
 /**
  * "In primo piano" — organized slides of the public home (Francesco 16/10/2026 17:28: «prevedi un po' di avatar e slide
  * organizzate con agente a supporto tutto il giorno»). One slide at a time, in this order:
- *   1. Il tuo avatar — the avatar builder (back-view bases only: no face, no minor recognisable), opens after sign-in.
+ *   1. Il tuo avatar — the avatar builder, opens after sign-in. Visual: the official kit only (the avatar bases are
+ *      REFERENCE_PROTOTYPE, members area only — UD-102 — until the Direzione approves them for public pages).
  *   2. Iride, 24 ore su 24 — the club's AI assistant (approved portrait), opens the chat in place.
  *   3+. The day's palinsesto items (lib/vetrina): tournaments, initiatives, the week's games.
  * Movement: advances every 7 s only while nobody is interacting; stops on hover, on focus, with the pause button, when
@@ -13,18 +14,12 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
 
 import { loginSearch } from "@/components/scd/AccessMenu";
 import { VERA_OPEN_EVENTS } from "@/lib/assistant-open";
-import { AVATAR_BASES } from "@/lib/avatar-studio";
 import { castPortraitSrc } from "@/lib/assistant-cast";
 import type { VetrinaSlot } from "@/lib/vetrina";
 
 const KIT_FULL = "/media/kit/kit-2026-27-blu.webp";
 const ADVANCE_MS = 7000;
 const LABEL = "font-display text-[11px] font-bold uppercase tracking-[0.1em] lg:text-[12px]";
-
-/** Back-view avatar bases only (no face on the public home). */
-export function publicAvatarBases() {
-  return AVATAR_BASES.filter((b) => b.view === "BACK").slice(0, 4);
-}
 
 /** Next slide index, wrapping. */
 export function nextIndex(i: number, n: number, step = 1): number {
@@ -113,7 +108,6 @@ export function HomeSlides({ slots }: { slots: readonly VetrinaSlot[] }) {
   const [paused, setPaused] = useState(false);
   const [holding, setHolding] = useState(false);
   const [still, setStill] = useState(false);
-  const bases = publicAvatarBases();
 
   const renders: Array<(i: number, n: number) => ReactNode> = [];
   const titles: string[] = [];
@@ -131,17 +125,11 @@ export function HomeSlides({ slots }: { slots: readonly VetrinaSlot[] }) {
       title="Crea il tuo avatar"
       text="Scegli soprannome, numero e la divisa del club: il tuo campione entra nell'app con te."
       media={
-        <span className="absolute inset-0 flex items-end justify-center gap-1 px-3 pt-3">
-          {bases.map((b, k) => (
-            <img
-              key={b.key}
-              src={b.src}
-              alt=""
-              loading="lazy"
-              decoding="async"
-              className={`h-[88%] w-[24%] rounded-t-[10px] object-cover object-top ring-1 ring-white/25 ${k % 2 ? "translate-y-2" : ""}`}
-            />
-          ))}
+        <span className="absolute inset-0 grid place-items-center">
+          <img src={KIT_FULL} alt="Kit ufficiale ColicoDerviese 2026/27" loading="lazy" decoding="async" className="h-[78%] w-auto object-contain drop-shadow-[0_12px_20px_rgb(0_0_0/0.45)]" />
+          <span aria-hidden="true" className="scd-gold absolute bottom-3 right-3 rounded-[8px] px-2.5 py-1 font-display text-[13px] font-bold uppercase tracking-[0.04em]">
+            Il tuo nome · 10
+          </span>
         </span>
       }
       action={
@@ -160,7 +148,7 @@ export function HomeSlides({ slots }: { slots: readonly VetrinaSlot[] }) {
       total={n}
       kicker="Assistente del club · 24 ore su 24"
       title="Chiedi a Iride"
-      text="Orari, campi, iscrizioni e pulmini: Iride risponde a qualsiasi ora con i dati del club. Se serve una persona, apre la richiesta alla segreteria."
+      text="Gare della settimana, campi, biglietteria e iscrizioni: Iride risponde a qualsiasi ora con i dati pubblicati dal club. Per ciò che serve a una persona ti indica la segreteria."
       media={
         <span className="absolute inset-0 grid place-items-center">
           <img src={castPortraitSrc("vera", 440)} alt="Iride, l'assistente AI della segreteria" loading="lazy" decoding="async" className="h-[92%] w-auto object-contain drop-shadow-[0_12px_20px_rgb(0_0_0/0.45)]" />
@@ -270,15 +258,17 @@ export function HomeSlides({ slots }: { slots: readonly VetrinaSlot[] }) {
         ref={track}
         onScroll={onScroll}
         className="m-0 flex list-none snap-x snap-mandatory overflow-x-auto overscroll-x-contain p-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        aria-live={paused || holding || still ? "polite" : "off"}
       >
         {renders.map((render, i) => render(i, n))}
       </ul>
+      <p className="sr-only" aria-live="polite">
+        {paused || holding || still ? `Slide ${active + 1} di ${n}: ${titles[active] ?? ""}` : ""}
+      </p>
       <ol className="m-0 mt-2 flex list-none justify-center gap-0 p-0" aria-label="Scegli la slide">
         {titles.map((t, i) => (
           <li key={t + i}>
             <button type="button" onClick={() => go(i)} aria-label={`Vai a: ${t}`} aria-current={i === active ? "true" : undefined} className="scd-focus grid size-11 place-items-center rounded-full">
-              <span aria-hidden="true" className={`block h-2 rounded-full transition-[width] duration-200 ${i === active ? "w-6 bg-[#13254d]" : "w-2 bg-[#b8c5dd]"}`} />
+              <span aria-hidden="true" className={`block h-2 rounded-full motion-safe:transition-[width] motion-safe:duration-200 ${i === active ? "w-6 bg-[#13254d]" : "w-2 bg-[#b8c5dd]"}`} />
             </button>
           </li>
         ))}

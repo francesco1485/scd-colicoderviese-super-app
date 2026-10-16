@@ -113,7 +113,8 @@ describe("public home v5", () => {
     const slides = code("src/components/home/HomeSlides.tsx");
     expect(lobby).toContain("<HomeSlides slots={slots} />");
     expect(slides).toContain('data-testid="home-news"');
-    expect(slides).toContain('view === "BACK"');
+    // Avatar bases are members-area prototypes (UD-102): never on the public home until approved.
+    expect(slides).not.toMatch(/AVATAR_BASES|avatar\/bases/);
     expect(slides).toMatch(/to="\/accedi" search=\{loginSearch\("\/la-mia-scd\/campione"\)\}/);
     expect(slides).toContain("prefers-reduced-motion: reduce");
     expect(slides).not.toMatch(/Pixellot|dirette/i);
