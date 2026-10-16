@@ -3789,7 +3789,7 @@
     },
     {
       "sourceDate": "2026-10-16",
-      "sourceTime": "15:44; 16:39; 16:55; 17:00; 17:10",
+      "sourceTime": "15:44; 16:39; 16:55; 17:00; 17:10; ~19:20",
       "sourceStatus": "EXPLICIT_USER_COMMAND",
       "authority": "FRANCESCO_SCD",
       "sourceQuoteFragments": [
@@ -3799,24 +3799,25 @@
         "Preparo e inoltro",
         "No, senza pagamento",
         "Tengo anche Direzione",
-        "Tutte e due gratis"
+        "Tutte e due gratis",
+        "12 mesi"
       ],
       "id": "UD-163",
       "name": "VETRINA_RICHIESTE_EXTERNALS_TALLY_MEMBERS_APP_PAYMENT_LINKS_BY_TESORERIA",
       "context": "Francesco (DG) 16/10/2026, chat PC, answers to the questions of the Vetrina richieste design (PROGETTO_VETRINA_RICHIESTE, request of 14:57: Tally links and forms in the gestionali for tournaments, visits, sponsors, companies, field rental, other, all catalogued in one place, managed after acceptance with a traced payment). Question 1 (two doors) answered «Esterni Tally, soci app»; question 3 (SumUp links) answered «Li crea la Tesoreria». Earlier the same day: «DG conferma tutto» (13:31). Implemented as phase F1 on branch feat/pc-vetrina-richieste: migration r139 STAGED (not applied), lib/intake-kinds.ts, lib/intake-links.ts, lib/intake.functions.ts, /gestionale block and /gestionale/richieste.",
       "normalizedCommand": {
-        "rule": "External parties (società, aziende, scuole, privati adulti) send requests through ONE Tally form «Richieste alla SCD» with a branch per kind and a hidden field tipo; members and families ask from their in-app area, so no minor's name passes through Tally. Every request lives in the single catalogue public.scd_requests. The payment link of an accepted request is created by a Tesoreria person (no automatic SumUp links), recorded on the request and reconciled later; nothing is paid before acceptance. 16:39 «decide presidente e consiglio direttivo» (answer to: who decides AFFITTO CAMPO and VISITA AL CENTRO): field rentals and visits to the centres are decided by the Presidente and the Consiglio Direttivo. ~16:55, to the question «Per l'affitto del campo e le visite al centro decidono il Presidente e il Consiglio Direttivo... Nell'app il Consiglio Direttivo corrisponde a chi ha il ruolo «Direzione». Tu, come DG, su queste due richieste cosa fai?» Francesco answered «Preparo e inoltro»: the Consiglio Direttivo is the role Direzione in the app and the DG prepares and forwards these two kinds. ~17:00, to \"Il tuo account nell'app deve avere solo il ruolo DG, così non decidi tu affitti e visite?\" Francesco answered «Tengo anche Direzione»: the DG keeps the role Direzione and, as a Consiglio member, can also decide rentals and visits (accepted). ~17:00, to \"Le visite al centro (medico, massaggi, nutrizione) si pagano con un link della Tesoreria?\" Francesco answered «No, senza pagamento»: VISITA_CENTRO has no payment. ~17:10, to the clarified question \"nell'app «Visita al centro» vuol dire una scuola o un gruppo che viene a vedere il centro sportivo. Le visite mediche, i massaggi e la nutrizione sono un'altra cosa e arrivano più avanti. Il tuo «senza pagamento» per quale vale?\" Francesco answered «Tutte e due gratis»: visits of schools or groups to the centres are free, and the phase F4 health services (medical visits, massage, nutrition; not built yet) will be without payment too. No threshold under which the DG decides alone has been decided.",
+        "rule": "External parties (società, aziende, scuole, privati adulti) send requests through ONE Tally form «Richieste alla SCD» with a branch per kind and a hidden field tipo; members and families ask from their in-app area, so no minor's name passes through Tally. Every request lives in the single catalogue public.scd_requests. The payment link of an accepted request is created by a Tesoreria person (no automatic SumUp links), recorded on the request and reconciled later; nothing is paid before acceptance. 16:39 «decide presidente e consiglio direttivo» (answer to: who decides AFFITTO CAMPO and VISITA AL CENTRO): field rentals and visits to the centres are decided by the Presidente and the Consiglio Direttivo. ~16:55, to the question «Per l'affitto del campo e le visite al centro decidono il Presidente e il Consiglio Direttivo... Nell'app il Consiglio Direttivo corrisponde a chi ha il ruolo «Direzione». Tu, come DG, su queste due richieste cosa fai?» Francesco answered «Preparo e inoltro»: the Consiglio Direttivo is the role Direzione in the app and the DG prepares and forwards these two kinds. ~17:00, to \"Il tuo account nell'app deve avere solo il ruolo DG, così non decidi tu affitti e visite?\" Francesco answered «Tengo anche Direzione»: the DG keeps the role Direzione and, as a Consiglio member, can also decide rentals and visits (accepted). ~17:00, to \"Le visite al centro (medico, massaggi, nutrizione) si pagano con un link della Tesoreria?\" Francesco answered «No, senza pagamento»: VISITA_CENTRO has no payment. ~17:10, to the clarified question \"nell'app «Visita al centro» vuol dire una scuola o un gruppo che viene a vedere il centro sportivo. Le visite mediche, i massaggi e la nutrizione sono un'altra cosa e arrivano più avanti. Il tuo «senza pagamento» per quale vale?\" Francesco answered «Tutte e due gratis»: visits of schools or groups to the centres are free, and the phase F4 health services (medical visits, massage, nutrition; not built yet) will be without payment too. No threshold under which the DG decides alone has been decided. ~19:20, to the question «Per quanto teniamo i recapiti di chi scrive dall'esterno?» Francesco answered «12 mesi» (VERIFIED): the contacts of external requests (scd_request_contacts) are kept 12 months from receipt, 6 months after RIFIUTATA/ANNULLATA and 12 months after CHIUSA, the periods already coded in r139 (DECIDED, no longer PROPOSED); the daily deletion job is migration r140 (pg_cron job scd_intake_contacts_purge, 03:17 Italian summer time), APPLIED on SCD PULSE 16/10/2026 20:03 after Francesco wrote «applica r140». Separate fact, same evening, to the question «S.C.D. o S.D.C.?»: the official name is «S.D.C. ColicoDerviese A.S.D.» (recorded only; nothing renamed in the app, texts and code keep «S.C.D.» until Francesco asks for the change).",
         "scope": "VETRINA_RICHIESTE_DOORS_AND_PAYMENTS",
         "engines": "TEMPO (one catalogue, deciders told in the app at once) and SOLDI (tournament fees and field rentals traced to the bank movements)",
         "measure": "requests per month and kind (scd_requests.received_at); median hours from RICEVUTA to decision; share of accepted requests with payment RISCONTRATO within 7 days of LINK_INVIATO; 0 minors' names in Tally submissions (form asks for an adult referent only)",
         "status": "IMPLEMENTED_ON_BRANCH_NOT_PUBLISHED",
         "pending": [
           "Tally form «Richieste alla SCD» to be created (not by an agent without approval); config intakeTallyFormUrl stays null until then",
-          "«applica r139» for the migration",
+          "«applica r139» for the migration (r139 applied on SCD PULSE 16/10/2026 17:53)",
           "Make scenario Tally -> scd_request_ingest (service role) to be created after the form",
           "placement of the public links on /tornei, /sponsor, /partner, /fornitori, /impianti, /contatti (pages of the CLOUD chat)",
-          "PROPOSED (security review): Tally form: honeypot field + Make filter before ingest",
-          "PROPOSED, to be confirmed by Francesco: phases Ricevuta -> In valutazione -> Accettata | Non accolta -> In gestione -> Chiusa; deciders of ISCRIZIONE_TORNEO, SPONSOR, CONVENZIONE, ALTRO and every preparer/informed/owner list (lib/intake-kinds.ts INTAKE_RULES; AFFITTO_CAMPO and VISITA_CENTRO deciders DECIDED 16:39, DG prepares and forwards DECIDED ~16:55), payment and payment link yes/no for the other kinds (no link for sponsors and convenzioni; VISITA_CENTRO without payment DECIDED ~17:00), ingest cap 60/hour, contact retention periods (12 months from receipt, 6 after refusal or cancellation, 12 after closing; automatic deletion only once a scheduled job is created)"
+        "PROPOSED (security review): Tally form: honeypot field + Make filter before ingest",
+        "PROPOSED, to be confirmed by Francesco: phases Ricevuta -> In valutazione -> Accettata | Non accolta -> In gestione -> Chiusa; deciders of ISCRIZIONE_TORNEO, SPONSOR, CONVENZIONE, ALTRO and every preparer/informed/owner list (lib/intake-kinds.ts INTAKE_RULES; AFFITTO_CAMPO and VISITA_CENTRO deciders DECIDED 16:39, DG prepares and forwards DECIDED ~16:55), payment and payment link yes/no for the other kinds (no link for sponsors and convenzioni; VISITA_CENTRO without payment DECIDED ~17:00), ingest cap 60/hour (contact retention periods DECIDED ~19:20 «12 mesi», job r140 applied 20:03)"
         ]
       }
     },
@@ -3926,8 +3927,29 @@
         "rule": "The /sponsor page of the Super App shows the club LED wall spots of the confirmed sponsors in rotation, clock-synced with the physical board (/ledwall/player). Exception to UD-152 limited to /sponsor: muted video, pause button, no autoplay with reduced motion, only showable spots of confirmed sponsors.",
         "scope": "SUPER_APP /sponsor",
         "supersedes": "UD-152 for the /sponsor page only",
-        "implementationStatus": "IMPLEMENTED_PENDING_PUBLISH",
+        "implementationStatus": "IMPLEMENTED_PUBLISHED_2026-10-16",
         "implementation": "apps/superapp/src/components/SponsorLedwallLive.tsx"
+      }
+    },
+    {
+      "sourceDate": "2026-10-16",
+      "sourceTime": "21:43",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-143",
+      "name": "HOME_BOTTOM_PROMO_ROTATION_SKY_CONVENZIONI_SOCIAL",
+      "sourceQuoteFragments": [
+        "Nella home a rotazione in basso devi fare passare una promo questi sono i nostri sponsor che a bordo campo ci sostengono vuoi farlo anche tu scrivi e ti ricontattiamo",
+        "Puoi decidere tu la grafica e il messaggio e cambiarlo quantabvikre vuoi",
+        "Poi ogni due giorni fai comparire Sky con la divise e lo spinsor e fai lo stesso e poi anche altri idee se vuoi sostenere i nostri colori",
+        "Poi a rotazione le convenzioni annunciate che ti comunico e così anche programmare che quando lo fai lì lo fai anche sui social così siamo virali taggando lo sponsor"
+      ],
+      "normalizedCommand": {
+        "rule": "At the bottom of the public home a rotating promo band: every day the call to sponsors (confirmed sponsors with a sponsor of the day, CTA to the /sponsor proposal form 'Scrivici e ti ricontattiamo'); every second day Sky in the official match kit with the sponsors on the shirt; 'Sostieni i nostri colori'; the convenzioni Francesco announces (none invented). Copy and graphics may change at will. Pause button, stops on hover/focus/hidden tab, never moves with reduced motion. The daily Super Giornalista prepares the matching social post tagging the sponsor of the day (draft; publishing only through a social account Francesco connects).",
+        "scope": "SUPER_APP public home + scd-super-giornalista",
+        "supersedes": "UD-152 for this home band only; UD-151 'Sky never in the app' for this band only (official artwork sky-atv-cut.webp)",
+        "implementationStatus": "IMPLEMENTED_PENDING_PUBLISH",
+        "implementation": "apps/superapp/src/lib/home-promos.ts, apps/superapp/src/components/home/HomeBordoCampo.tsx"
       }
     }
   ],
