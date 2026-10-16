@@ -56,7 +56,7 @@ const DOOR_GROUPS: readonly DoorGroup[] = [
         to: "/fantacalcio",
         title: "Fantacalcio SCD",
         text: "Scegli 11 giocatori di Prima, Juniores, U16 e U15. Punti dalle partite vere.",
-        rules: ["Gratis, per tutte le età", "Sotto i 14 anni con l'account della famiglia", "Attività di base esclusa"],
+        rules: ["Gratis", "Sotto i 14 anni con l'account della famiglia", "Attività di base esclusa"],
         icon: <Shirt className="size-5" aria-hidden="true" />,
       },
       {

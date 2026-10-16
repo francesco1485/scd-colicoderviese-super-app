@@ -19,7 +19,8 @@ import { publicTeamCrest } from "@/lib/team-crest";
  * Visitors (Francesco 16/10/2026 23:08 «non voglio pagine vuote») get a public page instead of a lock: the categories
  * of the season with championship (only where verified), birth years and the link to the public games calendar, plus
  * Registrati / Entra. Data comes from the anonymous calendar snapshot (fixtures only, no annata crests, no people)
- * and only the fields shown leave the server: no names, no rosters, no minors' data.
+ * reduced to the fields shown (on client-side navigation the loader sees the same anonymous snapshot that /calendario
+ * already shows): no names, no rosters, no minors' data.
  */
 export const Route = createFileRoute("/squadre")({
   loader: async () => {

@@ -916,3 +916,10 @@ Decisioni di Francesco 16/10/2026 15:44: «Esterni Tally, soci app» e «Li crea
 - /eventi, /eventi/christmas-lario-cup (solo testata), /community: testata compatta MetalPageHeader, un colore per tipo di evento (tornei sole, iniziative azzurro, club blu), comunità in Gioca · Segui · Partecipa; regole Top 11 e Fantacalcio dai testi esistenti; lotteria e Adotta invariate (UD-132).
 - /grow: hub interno GROW dietro lo stesso accesso di /crm (tolto il rinvio demo a /sponsor), copertura spot LED calcolata da sponsors.ts e sponsor-spots.ts (7 pronti, 30 da preparare), strumenti GROW con stato; /sponsor senza promesse di misurazione («Report in arrivo»).
 - Revisioni indipendenti scd-revisore + scd-sicurezza: PASS × 2 per ogni ramo (Eventi dopo correzione del testo sul Fantacalcio).
+
+## 2026-10-16 ~23:50 — chat cloud — «pagine piene» (Francesco 23:08 «non voglio pagine vuote», 23:43 «pubblica le pagine»)
+- /eventi: sezione Iniziative solo con iniziative o lotteria pubblicata; tornei della stagione sempre in testa. /eventi/christmas-lario-cup: riquadro live solo da torneo iniziato, prima una riga «Si accende l'8 dicembre».
+- /sostieni: per i visitatori solo le azioni attive oggi (proposta sponsor, Fondo Solidale spiegato, materiale tramite segreteria); catalogo e campagne solo quando la Direzione apre la raccolta (r101).
+- /top11: «Come funziona» in 4 passi al posto del vuoto; premi solo se esistono.
+- /squadre da non collegati: variante di UD-100 — solo categoria, campionato verificato, annate e link alle gare; resta tra le pagine solo soci (no-store, noindex). /crea e /la-mia-scd da non collegati: pagina di iscrizione JoinClub (porta solo a /registrati e /accedi).
+- Revisioni indipendenti scd-revisore + scd-sicurezza sull'integrazione 320b47a: PASS × 2.
