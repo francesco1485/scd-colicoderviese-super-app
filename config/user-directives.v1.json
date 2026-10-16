@@ -3698,6 +3698,34 @@
     },
     {
       "sourceDate": "2026-10-16",
+      "sourceTime": "13:32-14:30",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-161",
+      "name": "POSITION_CATALOGUE_FIGC_RASD_CUSTOM_ROLES_AND_NEW_ACCESS_POSITIONS",
+      "sourceQuoteFragments": [
+        "creare le posizioni direttore sportivo agonistica e direttore sportivo generale, con il coordinatore attività sportiva tra chi vede Dervio; il responsabile struttura vede Colico; a Dervio per ora nessun responsabile struttura (13:32, as relayed by the main session)",
+        "io avevo chiesto che entravi nel sito figc e rasd e nella parte orgnigramma o nei siti generali recuperavi tutti quelli presiti indeflt che si posssono ricoprire e renderli gia pronti per inserire il tesserato ad occorrenza e avere sepre la possibilitò di creare un ruolo nuovo cosi da avere eventuali figure aggiuntive per altre cose (13:35)",
+        "Ruolo nuovo: chi lo approva? -> Chi lo crea",
+        "Livello DS -> Sopra il coordinatore",
+        "Responsabile tutela minori e fisioterapista: creo anche il loro accesso? -> Sì, crea gli accessi"
+      ],
+      "context": "Francesco (DG) 16/10/2026, chat PC. 13:32 decides the two direttori sportivi and the Dervio readers; 13:35 asks for the full catalogue of positions from FIGC/LND/SGS/RASD, ready to receive a tesserato, plus new roles on demand; answers D1-D3 the same afternoon. Qualifiche of the Portale Società LND (Organigramma) VERIFIED read-only by the main session at 14:30, no names stored. Implemented as staged migration r138 (feat/pc-r138-catalogo-ruoli).",
+      "normalizedCommand": {
+        "rule": "One position catalogue (scd_position_catalog, mirror config/scd-position-catalog.v1.json): every organigram position from FIGC, LND (portal qualifiche in lnd_label), SGS, RASD, D.Lgs 36/2021 and the club, seeded EMPTY and ready; the holder stays in scd_structure_roles (position_code, coach qualification as attribute). New roles custom-<slug> are created by the Presidente or the Direttore Generale and approved by whoever created them (D1: self-approval allowed, always audited). direttore-sportivo-agonistica and direttore-sportivo-generale confirm U16/U15 and Prima/U19 requests, read Dervio, and rank above the coordinatore attività sportiva and below DG/Presidente (D2). responsabile-safeguarding and fisioterapista get access positions (D3): the safeguarding lead only through the dedicated Safeguarding channel, the physio receives health-topic notices without health data. The four new positions are assigned only by the Direzione and exist for the app only once r138 is verified live.",
+        "scope": "ORGANIGRAMMA_POSITIONS_AND_ACCESS",
+        "engines": "PERSONE (every role ready for a tesserato, new figures without code) and TEMPO (requests reach their direttore sportivo instead of the Direzione fallback)",
+        "measure": "mandatory catalogue positions with at least one holder; custom roles created and approved per season (scd_access_audit CREATE_POSITION / POSITION_STATUS); U16-U19 requests confirmed by a direttore sportivo",
+        "status": "IMPLEMENTED_ON_BRANCH_MIGRATION_STAGED_R138",
+        "constraints": [
+          "migration r138 applied only after Francesco writes 'applica r138'",
+          "until r138 is live the app does not offer, route or use the four new positions (registry-live.server.ts probe, fail closed)",
+          "no person names in code, config, tests or commits; holders shown only as counts"
+        ]
+      }
+    },
+    {
+      "sourceDate": "2026-10-16",
       "sourceTime": "11:52-11:54",
       "sourceStatus": "EXPLICIT_USER_COMMAND",
       "authority": "FRANCESCO_SCD",

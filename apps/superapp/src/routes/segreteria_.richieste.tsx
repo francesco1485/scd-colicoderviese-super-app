@@ -9,7 +9,7 @@
 import { Link, createFileRoute, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { CalendarPlus, ClipboardCopy, FileText, MessageSquareText, Send, X } from "lucide-react";
-import { useId, useMemo, useState, type ReactNode } from "react";
+import { createContext, useContext, useId, useMemo, useState, type ReactNode } from "react";
 
 import { ClubPicker, type PickedClub } from "@/components/scd/ClubPicker";
 import { Card, Chip, type ChipTone } from "@/components/scd/interior-ui";
@@ -84,10 +84,17 @@ function RichiesteRoute() {
   const { gate, desk } = Route.useLoaderData();
   return (
     <WorkAreaGateView id="richieste" gate={gate}>
-      {desk && <RichiestePage desk={desk} />}
+      {desk && (
+        <R138Live.Provider value={desk.r138Live === true}>
+          <RichiestePage desk={desk} />
+        </R138Live.Provider>
+      )}
     </WorkAreaGateView>
   );
 }
+
+/** r138 live (server-verified, RequestsDesk.r138Live): only then the direttori sportivi are shown as confirmers. */
+const R138Live = createContext(false);
 
 const STATUS_TONE: Record<RequestStatus, ChipTone> = {
   BOZZA: "mute",
@@ -202,8 +209,8 @@ function RichiestePage({ desk }: { desk: RequestsDesk }) {
                     {c.groups.map((g) => teamLabel(g)).join(", ")}
                     {c.birthYears ? ` · annate ${c.birthYears[0]}–${c.birthYears[1]}` : ""}
                   </span>
-                  {!positionExists(c.position) && (
-                    <span className="mt-1 block text-[13.5px] font-semibold text-[var(--in-warn)]">Ruolo non ancora creato: conferma la Direzione.</span>
+                  {!positionExists(c.position, desk.r138Live === true) && (
+                    <span className="mt-1 block text-[13.5px] font-semibold text-[var(--in-warn)]">Ruolo non ancora attivo: conferma la Direzione.</span>
                   )}
                 </li>
               ))}
@@ -262,6 +269,7 @@ function RequestList({ title, sub, rows, empty, ...rest }: ListProps & { title: 
 }
 
 function RequestItem({ r, canWrite, nowMs, onEdit, onChanged }: ListProps & { r: RequestRow }) {
+  const r138 = useContext(R138Live);
   const send = useServerFn(sendRequest);
   const cancel = useServerFn(cancelRequest);
   const advance = useServerFn(advanceFormStatus);
@@ -317,7 +325,7 @@ function RequestItem({ r, canWrite, nowMs, onEdit, onChanged }: ListProps & { r:
       </div>
       {(r.status === "BOZZA" || r.status === "DA_CONFERMARE") && (
         <p className="mt-1.5 text-[13.5px] text-[var(--in-sub)]">
-          {confirmerLine(r.teamKey)} · {federal.text}
+          {confirmerLine(r.teamKey, r138)} · {federal.text}
         </p>
       )}
       {r.decisionNote && <p className="mt-1.5 text-[14px]">Nota: {r.decisionNote}</p>}
@@ -481,6 +489,7 @@ function DraftCard({
   onError: (f: Flash) => void;
   onCancelEdit: () => void;
 }) {
+  const r138 = useContext(R138Live);
   const create = useServerFn(createRequestDraft);
   const update = useServerFn(updateRequestDraft);
   const send = useServerFn(sendRequest);
@@ -670,7 +679,7 @@ function DraftCard({
               <input className={field} value={draft.note} maxLength={300} onChange={(e) => set("note")(e.target.value)} />
             </Field>
             <p className="m-0 text-[14px] text-[var(--in-sub)]">
-              {confirmerLine(draft.teamKey || null)}
+              {confirmerLine(draft.teamKey || null, r138)}
               {federal ? ` · ${federal.text}` : ""}
             </p>
             <div className="flex flex-wrap gap-2">
