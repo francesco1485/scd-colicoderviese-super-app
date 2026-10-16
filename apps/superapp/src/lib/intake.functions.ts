@@ -126,6 +126,8 @@ export type IntakeSummary =
   | { state: "none"; formReady: boolean }
   /** r139 not applied or not readable: "in preparazione". */
   | { state: "off"; formReady: boolean }
+  /** r139 live but the read failed (not a permission problem): "Lettura non riuscita". */
+  | { state: "error"; formReady: boolean }
   | {
       state: "ok";
       formReady: boolean;
@@ -144,7 +146,12 @@ export const getIntakeSummary = createServerFn({ method: "GET" }).handler(async 
     sb.rpc("scd_intake_board", { p_organization_id: org.organizationId, p_filters: {} }),
     sb.rpc("scd_intake_notices", { p_organization_id: org.organizationId }),
   ]);
-  if (board.error) return (board.error as { code?: string }).code === "42501" ? { state: "none", formReady } : { state: "off", formReady };
+  if (board.error) {
+    const code = (board.error as { code?: string }).code ?? "unknown";
+    if (code === "42501") return { state: "none", formReady };
+    console.warn(`[intake] scd_intake_board non riuscita: codice ${code}`);
+    return { state: "error", formReady };
+  }
   const b = (board.data ?? {}) as { rows?: unknown; canPay?: unknown };
   const rows = parseIntakeRows(b.rows);
   return {

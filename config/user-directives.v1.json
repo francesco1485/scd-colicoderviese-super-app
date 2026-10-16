@@ -3772,7 +3772,8 @@
           "Tally form «Richieste alla SCD» to be created (not by an agent without approval); config intakeTallyFormUrl stays null until then",
           "«applica r139» for the migration",
           "Make scenario Tally -> scd_request_ingest (service role) to be created after the form",
-          "placement of the public links on /tornei, /sponsor, /partner, /fornitori, /impianti, /contatti (pages of the CLOUD chat)"
+          "placement of the public links on /tornei, /sponsor, /partner, /fornitori, /impianti, /contatti (pages of the CLOUD chat)",
+        "PROPOSED, to be confirmed by Francesco (design question 5 open: who decides field rentals and visits, DG-alone threshold): deciders per kind (lib/intake-kinds.ts INTAKE_RULES), payment link yes/no per kind (no link for sponsors and convenzioni), ingest cap 60/hour, contact retention periods (12 months from receipt, 6 after refusal or cancellation, 12 after closing; automatic deletion only once a scheduled job is created)"
         ]
       }
     }

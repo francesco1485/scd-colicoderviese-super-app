@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { FilterPills, IntakeLinksCard, IntakeNoticesCard, IntakeRowCard } from "@/components/intake/IntakeViews";
-import { Card, Chip } from "@/components/scd/interior-ui";
+import { Card, Chip, SourceLine } from "@/components/scd/interior-ui";
 import { EmptyState, WorkAreaGateView, WorkAreaShell, workAreaHead } from "@/components/scd/work-area-ui";
 import {
   INTAKE_AREAS,
@@ -125,23 +125,41 @@ function IntakePage({ data }: { data: IntakeDesk }) {
         <aside className="flex min-w-0 flex-col gap-3 lg:gap-[18px]" aria-label="Avvisi e link pubblici">
           {data.ready && <IntakeNoticesCard notices={data.notices} />}
           <IntakeLinksCard links={allIntakeLinks()} />
-          <Card id="intake-regole" title="Come funziona" sub="Regole decise da Francesco il 16/10/2026">
-            <ul className="m-0 list-none p-0 text-[14px] leading-snug">
-              {[
-                "Esterni (società, aziende, scuole, privati adulti): un solo modulo Tally. Soci e famiglie chiedono dall'app.",
+          <Card id="intake-decise" title="Deciso da Francesco" sub="16/10/2026">
+            <RuleList
+              items={[
+                "«Esterni Tally, soci app»: società, aziende, scuole e privati adulti usano un solo modulo Tally; soci e famiglie chiedono dall'app.",
+                "«Li crea la Tesoreria»: il link di pagamento lo crea una persona della Tesoreria, solo dopo «Accettata», e lo registra qui.",
+                "«DG conferma tutto»: il Direttore Generale può decidere ogni tipo di richiesta.",
+              ]}
+            />
+          </Card>
+          <Card id="intake-proposte" title="Proposte da confermare" sub="Disegno della Vetrina: in uso finché Francesco non decide diversamente">
+            <RuleList
+              items={[
                 "Fasi: Ricevuta → In valutazione → Accettata o Non accolta → In gestione → Chiusa.",
-                "Il pagamento parte solo dopo «Accettata»: il link lo crea una persona della Tesoreria e lo registra qui.",
-                "Mai nomi o dati di salute di minori. I recapiti degli esterni si cancellano da soli.",
-                "Avvisi solo nell'app; all'esterno risponde sempre una persona.",
-              ].map((t) => (
-                <li key={t} className="border-t border-[var(--in-line)] px-4 py-2.5 sm:px-[18px]">
-                  {t}
-                </li>
-              ))}
-            </ul>
+                "Chi decide ogni tipo (affitto campi e visite: Presidente, Consiglio e DG; tornei: responsabile tornei) e se il DG decide da solo sotto una soglia: domanda ancora aperta.",
+                "Sponsor e convenzioni: contratto e fattura, nessun link di pagamento.",
+                "I recapiti hanno una scadenza (proposta: 6 o 12 mesi); la cancellazione automatica si attiva con un job da creare.",
+                "Al massimo 60 richieste all'ora dal modulo pubblico.",
+              ]}
+            />
+            <SourceLine>Sempre valide (regole del club): mai nomi o dati di salute di minori; avvisi solo nell'app, all'esterno risponde una persona.</SourceLine>
           </Card>
         </aside>
       </div>
     </WorkAreaShell>
+  );
+}
+
+function RuleList({ items }: { items: readonly string[] }) {
+  return (
+    <ul className="m-0 list-none p-0 text-[14px] leading-snug">
+      {items.map((t) => (
+        <li key={t} className="border-t border-[var(--in-line)] px-4 py-2.5 sm:px-[18px]">
+          {t}
+        </li>
+      ))}
+    </ul>
   );
 }

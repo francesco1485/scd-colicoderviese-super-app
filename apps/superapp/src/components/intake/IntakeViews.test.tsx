@@ -52,6 +52,12 @@ describe("IntakeEntry (first block of /gestionale)", () => {
     expect(html.match(/—/g)?.length).toBe(4);
   });
 
+  it("tells a failed read apart from 'in preparazione'", () => {
+    const html = renderToStaticMarkup(<IntakeEntry summary={{ state: "error", formReady: false }} />);
+    expect(html).toContain("Lettura non riuscita");
+    expect(html).not.toContain("Funzione in preparazione");
+  });
+
   it("shows the counts and the last notice when live", () => {
     const html = renderToStaticMarkup(
       <IntakeEntry

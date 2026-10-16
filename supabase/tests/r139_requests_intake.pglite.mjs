@@ -302,10 +302,42 @@ assert.equal((await act(RCA, affD.id, "take")).code, "forbidden", "Dervio: not f
 // reclassify ALTRO
 assert.equal((await act(RTO, al.id, "reclassify", null, "SPONSOR")).code, "forbidden");
 assert.equal((await act(SEG, al.id, "reclassify", null, "AMICHEVOLE")).code, "kind");
-assert.deepEqual(await act(SEG, al.id, "reclassify", null, "VISITA_CENTRO"), { ok: true, status: "RICEVUTA", kind: "VISITA_CENTRO" });
-assert.equal((await one(DG, `select area from public.scd_requests where id = $1`, [al.id])).area, "impianti-campi");
-assert.equal((await act(SEG, al.id, "reclassify", null, "ALTRO")).code, "forbidden", "now a visit: decided by the board");
-assert.equal((await act(DG, al.id, "reclassify", null, "SPONSOR")).code, "state", "only ALTRO is reclassified");
+assert.equal((await act(SEG, al.id, "reclassify", null, "VISITA_CENTRO")).code, "site", "a visit needs a site");
+assert.equal((await act(SEG, al.id, "reclassify", null, "SPONSOR")).code, "orgKind", "a private person is not a sponsor");
+assert.equal((await act(SEG, al.id, "reclassify", null, "ISCRIZIONE_TORNEO")).code, "orgKind", "only clubs enter tournaments");
+const al2 = await ingest({ sourceRef: ref(), tipo: "altro", orgKind: "SCUOLA", site: "COLICO", consentPrivacy: true, adultDeclared: true,
+  fields: { subject: "PROPOSTA", note: "vorremmo portare una classe al campo" }, contact });
+assert.deepEqual(await act(SEG, al2.id, "reclassify", null, "VISITA_CENTRO"), { ok: true, status: "RICEVUTA", kind: "VISITA_CENTRO" });
+assert.equal((await one(DG, `select area from public.scd_requests where id = $1`, [al2.id])).area, "impianti-campi");
+assert.equal((await act(SEG, al2.id, "reclassify", null, "ALTRO")).code, "forbidden", "now a visit: decided by the board");
+assert.equal((await act(DG, al2.id, "reclassify", null, "SPONSOR")).code, "state", "only ALTRO is reclassified");
+
+// ---------------------------------------------------------------- free text: redaction and health words
+const txt = async (t) => (await one(null, `select public.scd_request_intake_text($1) t`, [t])).t;
+assert.equal(await txt("scrivete a mario.rossi at example it per i dettagli"), "scrivete a [email] per i dettagli");
+assert.equal(await txt("nome [at] dominio [dot] it"), "[email]");
+assert.equal(await txt("info(at)example.org grazie"), "[email] grazie");
+assert.equal(await txt("nome chiocciola dominio punto com"), "[email]");
+assert.equal(await txt("tel (0341) 123.456, cell 333.000.0000 o 333/000/0000"), "tel [telefono], cell [telefono] o [telefono]");
+assert.equal(await txt("il 24/10/2026 alle 10:30"), "il 24/10/2026 alle 10:30", "a date is not a phone");
+for (const t of ["ha l'asma", "è stato operato", "ferita al ginocchio", "ha il gesso", "certificato DSA", "ADHD", "è malato", "è malata", "una frattura",
+  "visita psicologica", "in gravidanza", "è incinta", "handicap", "autismo", "bambino autistico", "farmaci", "allergia"]) {
+  assert.equal(await txt(t), "[testo rimosso: possibili dati di salute]", t);
+}
+for (const t of ["il pubblico si entusiasma", "festa a tema fantasma", "serve un autista", "operatore economico", "gessetti colorati", "una feritoia nel muro"]) {
+  assert.notEqual(await txt(t), "[testo rimosso: possibili dati di salute]", t);
+}
+assert.equal((await act(DG, affD.id, "take", "chiamare mario at example it")).ok, true);
+assert.equal((await one(DG, `select note from public.scd_request_events where request_id = $1 and action = 'IN_VALUTAZIONE'`, [affD.id])).note, "chiamare [email]");
+
+// too long: the stored row must fit the 2000-byte payload check
+const longNote = "x".repeat(480);
+const big = await ingest({ sourceRef: ref(), tipo: "sponsor", orgKind: "AZIENDA", consentPrivacy: true, adultDeclared: true,
+  fields: { sector: "S".repeat(60), packages: ["a".repeat(40), "b".repeat(40), "c".repeat(40), "d".repeat(40), "e".repeat(40)], note: longNote }, contact });
+assert.equal(big.ok, true, "a full but valid sponsor still fits");
+const emoji = await ingest({ sourceRef: ref(), tipo: "altro", orgKind: "PRIVATO", consentPrivacy: true, adultDeclared: true,
+  fields: { subject: "ALTRO", note: "\u{1F600}".repeat(500) }, contact });
+assert.deepEqual(emoji, { ok: false, code: "too_long" }, "refused cleanly, never a failed insert");
 
 // ---------------------------------------------------------------- contacts: who reads, logged, purged
 const contactOf = async (uid, id) => (await one(uid, `select public.scd_intake_contact($1, $2) c`, [ORG, id])).c;

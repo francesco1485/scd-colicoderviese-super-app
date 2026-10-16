@@ -18,7 +18,6 @@
  * accepted requests reconciled within 7 days of «Link inviato».
  */
 import type { ChiFaCosaTopic } from "./chi-fa-cosa";
-import { EMAIL_PATTERN, PHONE_PATTERN } from "./request-machine";
 
 /* ------------------------------------------------------------------ kinds */
 
@@ -62,6 +61,13 @@ export type IntakeSite = (typeof INTAKE_SITES)[number];
 export const INTAKE_SITE_LABEL: Readonly<Record<IntakeSite, string>> = { COLICO: "Colico", DERVIO: "Dervio" };
 
 /* ------------------------------------------------------------------ rules (mirror of scd_request_kind_rules) */
+
+/**
+ * PROPOSED, to be confirmed by Francesco. Decided so far: «DG conferma tutto» (13:31) and «Li crea la Tesoreria»
+ * (15:44, payment link by a Tesoreria person after Accettata). Still open (design question 5): who decides field
+ * rentals and visits and whether the DG alone decides below a threshold. So the per-kind positions below, the per-kind
+ * payment-link yes/no, the 60/hour ingest cap and the contact retention periods of r139 are proposals.
+ */
 
 export interface IntakeKindRule {
   area: IntakeArea;
@@ -142,7 +148,7 @@ export const INTAKE_RULES: Readonly<Record<IntakeKind, IntakeKindRule>> = {
   },
 };
 
-/** Francesco 16/10/2026 13:31 «DG conferma tutto»: they decide every kind (the Direzione role too, checked in SQL). */
+/** Francesco 16/10/2026 13:31 «DG conferma tutto» (DECIDED for the DG); Presidente and Direzione role: PROPOSED. */
 export const INTAKE_ALWAYS_DECIDE: readonly string[] = ["direttore-generale", "presidente"];
 /** Same watchers as the request machine (request-machine.ts REQUEST_WATCHERS). */
 export const INTAKE_WATCHERS: readonly string[] = ["direttore-generale", "coordinatore-attivita-sportiva"];
@@ -350,15 +356,49 @@ export function formatEuro(cents: number | null | undefined): string {
 
 /* ------------------------------------------------------------------ free text (mirror of scd_request_intake_text) */
 
-export const HEALTH_PATTERN =
-  /(diagnos|patolog|malatti|allergi|intolleran|farmac|terapi|sintom|infortun|disabilit|certificat[oi] medic|celiac|diabet|epiless|asma|ricover)/i;
+/**
+ * Health words (security review 16/10/2026). Stems match at the start of a word, whole words only as words, so
+ * "entusiasma" or "fantasma" are not health but "asma" is; "autista" (driver) and "operatore" are not health, "autismo"
+ * and "operata" are. Deliberately broad on the safe side: a note that only looks medical (e.g. "farmacia") is removed
+ * as a whole too. The SQL of r139 (scd_request_intake_text) uses the same lists: '\m(prefixes)|\m(words)\M'.
+ */
+export const HEALTH_PREFIXES: readonly string[] = [
+  "diagnos", "patolog", "malat", "allergi", "intolleran", "farmac", "terapi", "sintom", "infortun", "disabil",
+  "certificat[oi] medic", "celiac", "diabet", "epiless", "ricover", "frattur", "psicolog", "gravidanz", "incinta",
+  "handicap", "autism", "autistic",
+];
+export const HEALTH_WORDS: readonly string[] = ["asma", "gesso", "dsa", "adhd", "operat[oaie]", "ferit[oaie]"];
+export const HEALTH_PATTERN = new RegExp(`\\b(?:${HEALTH_PREFIXES.join("|")})|\\b(?:${HEALTH_WORDS.join("|")})\\b`, "i");
 export const HEALTH_REMOVED = "[testo rimosso: possibili dati di salute]";
+
+/**
+ * Contact redaction of r139 (scd_intake_redact; r133's scd_request_redact stays as it is live). Same strings in SQL:
+ * plain e-mails, obfuscated e-mails ("nome at dominio it", "nome [at] dominio [dot] it", "nome(at)dominio.it") and
+ * phone numbers whose digits are split by spaces, dots, dashes, slashes or brackets (9+ digits; a date like 24/10/2026
+ * has 8 and stays). A date followed by a time may be redacted as a phone: accepted, safety first.
+ */
+export const INTAKE_EMAIL_PATTERN = "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}";
+const OBF_SEP = String.raw`(?:\s*(?:\[dot\]|\(dot\)|\[punto\]|\(punto\)|\.)\s*|\s+(?:dot|punto)\s+|\s+)`;
+export const INTAKE_EMAIL_OBFUSCATED_PATTERN =
+  String.raw`[A-Za-z0-9._%+-]+(?:\s*(?:\[at\]|\(at\))\s*|\s+(?:at|chiocciola)\s+)[A-Za-z0-9-]+(?:` +
+  OBF_SEP +
+  String.raw`[A-Za-z0-9-]+)?` +
+  OBF_SEP +
+  String.raw`(?:it|com|net|org|eu|info|biz|ch)(?![A-Za-z0-9])`;
+export const INTAKE_PHONE_PATTERN = String.raw`(\+|00)?\(?[0-9](?:[ .()/-]{0,2}[0-9]){8,}`;
+
+export function redactIntake(text: string): string {
+  return text
+    .replace(new RegExp(INTAKE_EMAIL_PATTERN, "g"), "[email]")
+    .replace(new RegExp(INTAKE_EMAIL_OBFUSCATED_PATTERN, "gi"), "[email]")
+    .replace(new RegExp(INTAKE_PHONE_PATTERN, "g"), "[telefono]");
+}
 
 /** Contacts redacted, health text removed as a whole, max 500 chars (same rule as the database). */
 export function cleanIntakeText(text: string | null | undefined): string | null {
   if (!text || !text.trim()) return null;
   if (HEALTH_PATTERN.test(text)) return HEALTH_REMOVED;
-  const red = text.replace(new RegExp(EMAIL_PATTERN, "g"), "[email]").replace(new RegExp(PHONE_PATTERN, "g"), "[telefono]");
+  const red = redactIntake(text);
   // eslint-disable-next-line no-control-regex
   return red.replace(/[\u0000-\u001f\u007f]+/g, " ").trim().slice(0, 500);
 }

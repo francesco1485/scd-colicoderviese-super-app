@@ -3,7 +3,11 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 import {
-  HEALTH_PATTERN,
+  HEALTH_PREFIXES,
+  HEALTH_WORDS,
+  INTAKE_EMAIL_OBFUSCATED_PATTERN,
+  INTAKE_EMAIL_PATTERN,
+  INTAKE_PHONE_PATTERN,
   INTAKE_AREAS,
   INTAKE_DERVIO_ALWAYS,
   INTAKE_DERVIO_EXCLUDED,
@@ -114,8 +118,26 @@ describe("r139 Vetrina richieste (staged, not applied)", () => {
     expect(quoted(clean.match(/not in \(('christmas[^)]*)\)/)?.[1] ?? "")).toEqual([...INTAKE_TOURNAMENT_IDS]);
     const ingest = fn("scd_request_ingest");
     for (const k of INTAKE_KINDS) expect(ingest, k).toContain(`'${INTAKE_SLUG[k]}' then '${k}'`);
-    const words = fn("scd_request_intake_text").match(/~\* '\(([^)]*)\)'/)?.[1];
-    expect(`(${words})`).toBe(HEALTH_PATTERN.source);
+    const health = fn("scd_request_intake_text").match(/~\* '\\m\(([^)]*)\)\|\\m\(([^)]*)\)\\M'/);
+    expect(health?.[1]?.split("|")).toEqual([...HEALTH_PREFIXES]);
+    expect(health?.[2]?.split("|")).toEqual([...HEALTH_WORDS]);
+    const redact = fn("scd_intake_redact");
+    expect(redact).toContain(`'${INTAKE_EMAIL_PATTERN}', '[email]', 'g'`);
+    expect(redact).toContain(`'${INTAKE_EMAIL_OBFUSCATED_PATTERN}', '[email]', 'gi'`);
+    expect(redact).toContain(`'${INTAKE_PHONE_PATTERN}', '[telefono]', 'g'`);
+    expect(fn("scd_request_intake_text")).toContain("public.scd_intake_redact(p_text)");
+    expect(fn("scd_intake_decide")).toContain("public.scd_intake_redact(coalesce(p_note, ''))");
+  });
+
+  it("ingest refuses oversize rows and stays idempotent under concurrent calls; reclassify checks the new kind", () => {
+    const ingest = fn("scd_request_ingest");
+    expect(ingest).toContain("'code', 'too_long'");
+    expect(ingest).toContain("on conflict (organization_id, source_ref) where source_ref is not null do nothing");
+    const decide = fn("scd_intake_decide");
+    expect(decide).toMatch(/siteRequired'\)::boolean and r\.site is null then return jsonb_build_object\('ok', false, 'code', 'site'\)/);
+    expect(decide).toContain("'code', 'orgKind'");
+    expect(body).not.toMatch(/create or replace function public\.scd_requests_to_confirm/);
+    expect(sql).toMatch(/PROPOSED/);
   });
 
   it("keeps the friendlies page for friendlies only (r133 reads filtered)", () => {

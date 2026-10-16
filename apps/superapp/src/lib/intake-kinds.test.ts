@@ -16,6 +16,7 @@ import {
   cleanIntakeText,
   kindPositions,
   parseIntakeNotices,
+  redactIntake,
   parseIntakeRow,
   parseIntakeRows,
   paymentsToFollow,
@@ -168,6 +169,24 @@ describe("free text (same rule as the database)", () => {
     expect(cleanIntakeText("ha una allergia")).toBe(HEALTH_REMOVED);
     expect(cleanIntakeText("   ")).toBeNull();
     expect(cleanIntakeText("x".repeat(900))!.length).toBe(500);
+  });
+});
+
+describe("redaction and health words (security review)", () => {
+  it("catches obfuscated e-mails and split phone numbers, keeps dates", () => {
+    expect(redactIntake("scrivete a mario.rossi at example it per i dettagli")).toBe("scrivete a [email] per i dettagli");
+    expect(redactIntake("nome [at] dominio [dot] it")).toBe("[email]");
+    expect(redactIntake("info(at)example.org grazie")).toBe("[email] grazie");
+    expect(redactIntake("nome chiocciola dominio punto com")).toBe("[email]");
+    expect(redactIntake("tel (0341) 123.456, cell 333.000.0000 o 333/000/0000")).toBe("tel [telefono], cell [telefono] o [telefono]");
+    expect(redactIntake("il 24/10/2026 alle 10:30")).toBe("il 24/10/2026 alle 10:30");
+  });
+  it("removes health text, not words that only contain a health stem", () => {
+    for (const t of ["ha l'asma", "è stato operato", "ferita al ginocchio", "ha il gesso", "certificato DSA", "ADHD", "è malato", "è malata", "una frattura",
+      "visita psicologica", "in gravidanza", "è incinta", "handicap", "autismo", "bambino autistico", "farmaci", "allergia"])
+      expect(cleanIntakeText(t), t).toBe(HEALTH_REMOVED);
+    for (const t of ["il pubblico si entusiasma", "festa a tema fantasma", "serve un autista", "operatore economico", "gessetti colorati", "una feritoia nel muro"])
+      expect(cleanIntakeText(t), t).not.toBe(HEALTH_REMOVED);
   });
 });
 

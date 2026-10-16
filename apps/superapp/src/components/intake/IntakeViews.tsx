@@ -10,7 +10,7 @@
 import { Link, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Check, ChevronRight, ClipboardList, Copy, Inbox, Lock, Trophy, Handshake, MapPinned, Building2, HelpCircle, Megaphone } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
 import { Card, Chip, type ChipTone } from "@/components/scd/interior-ui";
 import { positionLabel } from "@/lib/access-admin";
@@ -120,6 +120,7 @@ export function IntakeEntry({ summary }: { summary: IntakeSummary }) {
       </div>
       <p className="m-0 flex flex-wrap items-center gap-x-3 gap-y-1 bg-[#0b2f6b] px-4 py-2.5 text-[13.5px] leading-snug text-[#d6ebfb] sm:px-6">
         {summary.state === "off" && <span>Funzione in preparazione: si attiva quando la Direzione applica r139.</span>}
+        {summary.state === "error" && <span role="alert">Lettura non riuscita, riprova più tardi.</span>}
         {summary.state === "none" && <span>I numeri compaiono a chi decide o prepara almeno un tipo di richiesta.</span>}
         {ok && ok.notices.length > 0 && (
           <span>
@@ -169,6 +170,13 @@ export function IntakeLinksCard({ links }: { links: readonly IntakeLink[] }) {
 
 function CopyHref({ href, label }: { href: string; label: string }) {
   const [done, setDone] = useState(false);
+  const timer = useRef<number | null>(null);
+  useEffect(
+    () => () => {
+      if (timer.current !== null) window.clearTimeout(timer.current);
+    },
+    [],
+  );
   return (
     <span className="inline-flex items-center gap-2">
       <a href={href} target="_blank" rel="noopener noreferrer" className="scd-focus text-[14px] font-semibold text-[var(--in-info)] underline">
@@ -179,7 +187,8 @@ function CopyHref({ href, label }: { href: string; label: string }) {
         onClick={() => {
           void navigator.clipboard?.writeText(href).then(() => {
             setDone(true);
-            window.setTimeout(() => setDone(false), 2000);
+            if (timer.current !== null) window.clearTimeout(timer.current);
+            timer.current = window.setTimeout(() => setDone(false), 2000);
           });
         }}
         aria-label={`Copia il link: ${label}`}

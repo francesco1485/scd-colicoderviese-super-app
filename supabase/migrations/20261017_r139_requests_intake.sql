@@ -5,8 +5,11 @@
 -- Requires: r33 (scd_organizations), r35 (scd_has_org_role), r74 (scd_has_position), r133 (scd_requests,
 -- scd_request_events, scd_request_redact, scd_request_json, scd_request_viewer). r133 objects are present on SCD PULSE
 -- (design PROGETTO_VETRINA_RICHIESTE 16/10/2026: tables and functions live, 0 rows, kind check AMICHEVOLE only) but
--- r133 has no row in supabase_migrations.schema_migrations: before applying, compare the live definitions this file
--- touches with r133 (read-only):
+-- r133 has no row in supabase_migrations.schema_migrations. VERIFIED 16/10/2026 ~16:30 (pg_get_functiondef, read-only):
+-- the live scd_requests_board, scd_request_form and scd_request_notices are identical to the r133 file, so section 10
+-- recreates them from that text plus `kind = 'AMICHEVOLE'`. scd_requests_to_confirm is NOT recreated (its live body was
+-- not read): it already excludes every intake row, because it keeps only rows whose team_key has confirmers and intake
+-- rows have team_key null. Before applying, re-check the checks this file drops (read-only):
 --   select conname, pg_get_constraintdef(oid) from pg_constraint where conrelid in
 --     ('public.scd_requests'::regclass, 'public.scd_request_events'::regclass) and contype = 'c';
 --   select proname, md5(prosrc) from pg_proc where proname in ('scd_requests_board','scd_request_form','scd_request_notices');
@@ -37,12 +40,15 @@
 --   3. scd_request_events.action + RICEVUTA, IN_VALUTAZIONE, ACCETTATA, IN_GESTIONE, CHIUSA, ASSEGNATA,
 --      RICLASSIFICATA, PAGAMENTO, CONTATTO_LETTO, CONTATTI_CANCELLATI (every r133 value kept). Still append-only.
 --   4. scd_request_contacts: the external contact (organisation, adult referent, role, e-mail, phone, privacy
---      consent) in a SEPARATE table, RLS on, no policies, no grants; purge_after = 12 months from receipt, 6 months
---      after RIFIUTATA/ANNULLATA, 12 months after CHIUSA; scd_request_contacts_purge() deletes the expired rows
---      (service role only, for a scheduled job). Reading a contact is logged (CONTATTO_LETTO).
+--      consent) in a SEPARATE table, RLS on, no policies, no grants. Contacts have an expiry date (purge_after,
+--      PROPOSED periods, not decided by Francesco: 12 months from receipt, 6 months after RIFIUTATA/ANNULLATA,
+--      12 months after CHIUSA); scd_request_contacts_purge() deletes the expired rows but runs only when a scheduled
+--      job (service role, NOT created yet) calls it. Reading a contact is logged (CONTATTO_LETTO).
 --   5. scd_request_ingest(org, payload): ONLY the service role (future Make scenario "Tally richieste"): strict
---      whitelist per kind, adult and privacy consent required, contacts and health words redacted from free text,
---      idempotent on source_ref, hourly cap; creates RICEVUTA + contact + in-app notice. Never sends anything.
+--      whitelist per kind, adult and privacy consent required, contacts (also obfuscated e-mails and split phone
+--      numbers, scd_intake_redact) and health words removed from free text, idempotent on source_ref (also under
+--      concurrent calls), hourly cap (PROPOSED: 60/hour); creates RICEVUTA + contact + in-app notice. Never sends
+--      anything.
 --   6. scd_intake_kinds() (probe, harmless), scd_intake_board(org, filters), scd_intake_decide(org, id, action, note,
 --      value), scd_intake_contact(org, id), scd_intake_payment_set(org, id, payload), scd_intake_notices(org): each
 --      role sees only the kinds it handles (chi-fa-cosa positions, UD-156 Dervio rule), the Direzione sees all;
@@ -50,8 +56,12 @@
 --   7. r133 reads scd_requests_board, scd_request_form and scd_request_notices: same text plus `kind = 'AMICHEVOLE'`
 --      (the friendlies page never shows external requests). MODIFIES existing functions: review.
 --
--- Deciders (mirror of lib/chi-fa-cosa.ts topics; positions, never people): always the Direzione (role DIRECTION),
--- the Presidente and the Direttore Generale; per kind:
+-- Deciders. DECIDED by Francesco: «DG conferma tutto» (13:31) and the payment link of an accepted request is created
+-- by a Tesoreria person («Li crea la Tesoreria», 15:44). Everything else below is PROPOSED (mirror of the
+-- lib/chi-fa-cosa.ts topics, design question 5 still open: who decides field rentals and visits, and whether the DG
+-- alone decides below a threshold); the positions, the per-kind payment-link yes/no, the 60/hour cap and the contact
+-- retention periods wait for Francesco's confirmation. Always deciding: the Direzione (role DIRECTION), the
+-- Presidente and the Direttore Generale; per kind (PROPOSED):
 --   ISCRIZIONE_TORNEO (tornei): decide responsabile-tornei, prepare segreteria, inform coordinatore, tesoreria;
 --   SPONSOR, CONVENZIONE (sponsor): decide DG + Presidente + Consiglio (direzione), inform tesoreria;
 --   AFFITTO_CAMPO (impianti): decide board, prepare responsabile-campi, inform tesoreria + Colico structure;
@@ -84,6 +94,7 @@
 --   drop function if exists public.scd_request_clean_intake(text, jsonb);
 --   drop function if exists public.scd_request_contact_clean(text, jsonb);
 --   drop function if exists public.scd_request_intake_text(text);
+--   drop function if exists public.scd_intake_redact(text);
 --   drop function if exists public.scd_request_notify(text, text, text, text);
 --   drop function if exists public.scd_request_can(uuid, text, text, text, text);
 --   drop function if exists public.scd_request_kind_positions(text, text, text);
@@ -210,7 +221,8 @@ alter table public.scd_request_contacts enable row level security;
 revoke all on table public.scd_request_contacts from anon, authenticated;
 
 -- ---------------------------------------------------------------- 4. rules per kind (mirror of lib/intake-kinds.ts)
--- area, chi-fa-cosa topic, positions that decide / prepare / are informed / may own the accepted request, whether a
+-- PROPOSED, to be confirmed by Francesco (design question 5 open; only «DG conferma tutto» and «Li crea la Tesoreria»
+-- are decided): area, chi-fa-cosa topic, positions that decide / prepare / are informed / may own the accepted request, whether a
 -- site (COLICO/DERVIO) is required and whether the Tesoreria may record a payment link (sponsors and convenzioni are
 -- invoiced by contract, never by link). NULL for AMICHEVOLE and unknown kinds.
 create or replace function public.scd_request_kind_rules(p_kind text)
@@ -328,15 +340,33 @@ $$;
 revoke all on function public.scd_request_notify(text, text, text, text) from public, anon, authenticated;
 
 -- ---------------------------------------------------------------- 5. cleaning (the form and Make are never trusted)
--- Free text: contacts redacted (scd_request_redact) and, when it mentions health, replaced as a whole: health data
--- never enter the catalogue (no symptoms, no diagnoses). Mirror of lib/intake-kinds.ts cleanIntakeText.
+-- Contact redaction of r139 (r133's live scd_request_redact is left as it is): plain e-mails, obfuscated e-mails
+-- ("nome at dominio it", "nome [at] dominio [dot] it", "nome(at)dominio.it") and phone numbers whose digits are split by
+-- spaces, dots, dashes, slashes or brackets (9+ digits; a date like 24/10/2026 has 8 and stays). Mirror of
+-- lib/intake-kinds.ts INTAKE_EMAIL_PATTERN / INTAKE_EMAIL_OBFUSCATED_PATTERN / INTAKE_PHONE_PATTERN (same strings).
+create or replace function public.scd_intake_redact(p_text text)
+returns text language sql immutable set search_path to 'public' as $$
+  select case when p_text is null then null else
+    regexp_replace(
+      regexp_replace(
+        regexp_replace(p_text, '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}', '[email]', 'g'),
+        '[A-Za-z0-9._%+-]+(?:\s*(?:\[at\]|\(at\))\s*|\s+(?:at|chiocciola)\s+)[A-Za-z0-9-]+(?:(?:\s*(?:\[dot\]|\(dot\)|\[punto\]|\(punto\)|\.)\s*|\s+(?:dot|punto)\s+|\s+)[A-Za-z0-9-]+)?(?:\s*(?:\[dot\]|\(dot\)|\[punto\]|\(punto\)|\.)\s*|\s+(?:dot|punto)\s+|\s+)(?:it|com|net|org|eu|info|biz|ch)(?![A-Za-z0-9])', '[email]', 'gi'),
+      '(\+|00)?\(?[0-9](?:[ .()/-]{0,2}[0-9]){8,}', '[telefono]', 'g')
+  end;
+$$;
+revoke all on function public.scd_intake_redact(text) from public, anon, authenticated;
+
+-- Free text: contacts redacted (scd_intake_redact) and, when it mentions health, replaced as a whole: health data
+-- never enter the catalogue (no symptoms, no diagnoses). Stems at the start of a word, short words as whole words
+-- ("entusiasma", "fantasma", "autista", "operatore" are not health). Mirror of lib/intake-kinds.ts HEALTH_PREFIXES,
+-- HEALTH_WORDS and cleanIntakeText.
 create or replace function public.scd_request_intake_text(p_text text)
 returns text language sql immutable set search_path to 'public' as $$
   select case
     when nullif(btrim(coalesce(p_text, '')), '') is null then null
-    when p_text ~* '(diagnos|patolog|malatti|allergi|intolleran|farmac|terapi|sintom|infortun|disabilit|certificat[oi] medic|celiac|diabet|epiless|asma|ricover)'
+    when p_text ~* '\m(diagnos|patolog|malat|allergi|intolleran|farmac|terapi|sintom|infortun|disabil|certificat[oi] medic|celiac|diabet|epiless|ricover|frattur|psicolog|gravidanz|incinta|handicap|autism|autistic)|\m(asma|gesso|dsa|adhd|operat[oaie]|ferit[oaie])\M'
       then '[testo rimosso: possibili dati di salute]'
-    else left(btrim(regexp_replace(public.scd_request_redact(p_text), '[[:cntrl:]]+', ' ', 'g')), 500)
+    else left(btrim(regexp_replace(public.scd_intake_redact(p_text), '[[:cntrl:]]+', ' ', 'g')), 500)
   end;
 $$;
 revoke all on function public.scd_request_intake_text(text) from public, anon, authenticated;
@@ -532,7 +562,12 @@ begin
   v_contact := public.scd_request_contact_clean(v_org_kind, p->'contact');
   if v_contact ? 'error' then return jsonb_build_object('ok', false, 'code', v_contact->>'error'); end if;
 
-  -- hourly cap against a flood from the public form (Make retries stay idempotent above)
+  -- the stored row must fit the r133 payload limit (2000 bytes): refuse instead of failing on the insert
+  if octet_length((v_fields || jsonb_build_object('orgKind', v_org_kind))::text) > 2000 then
+    return jsonb_build_object('ok', false, 'code', 'too_long');
+  end if;
+
+  -- hourly cap against a flood from the public form (PROPOSED value 60; Make retries stay idempotent above)
   if (select count(*) from public.scd_requests where organization_id = p_organization_id and channel = 'TALLY'
         and created_at > now() - interval '1 hour') >= 60 then
     return jsonb_build_object('ok', false, 'code', 'rate');
@@ -543,7 +578,13 @@ begin
     requester_kind, source_ref, received_at, created_by)
   values (p_organization_id, v_kind, 'TALLY', v_fields || jsonb_build_object('orgKind', v_org_kind), 'RICEVUTA',
     v_rules->>'area', v_site, v_code, 'ESTERNO', v_ref, now(), null)
+  on conflict (organization_id, source_ref) where source_ref is not null do nothing
   returning id into v_id;
+  -- a concurrent call with the same submission won the race: same request, nothing else written
+  if v_id is null then
+    select * into v_existing from public.scd_requests where organization_id = p_organization_id and source_ref = v_ref;
+    return jsonb_build_object('ok', true, 'id', v_existing.id, 'publicCode', v_existing.public_code, 'duplicate', true);
+  end if;
   insert into public.scd_request_contacts (request_id, organization_id, org_name, contact_name, contact_role, email, phone,
     consent_privacy_at, adult_declared, purge_after)
   values (v_id, p_organization_id, v_contact->>'orgName', v_contact->>'name', v_contact->>'role', v_contact->>'email',
@@ -718,7 +759,7 @@ create or replace function public.scd_intake_decide(p_organization_id uuid, p_re
 returns jsonb language plpgsql security definer set search_path to 'public' as $$
 declare
   r public.scd_requests;
-  v_note text := nullif(left(btrim(public.scd_request_redact(coalesce(p_note, ''))), 300), '');
+  v_note text := nullif(left(btrim(public.scd_intake_redact(coalesce(p_note, ''))), 300), '');
   v_value text := nullif(btrim(coalesce(p_value, '')), '');
   v_to text;
   v_event text;
@@ -767,6 +808,12 @@ begin
       return jsonb_build_object('ok', false, 'code', 'kind');
     end if;
     v_rules := public.scd_request_kind_rules(v_value);
+    -- the new kind's own rules hold: a site where it is required, the requester type it accepts
+    if (v_rules->>'siteRequired')::boolean and r.site is null then return jsonb_build_object('ok', false, 'code', 'site'); end if;
+    if (v_value = 'ISCRIZIONE_TORNEO' and coalesce(r.payload->>'orgKind', '') <> 'SOCIETA')
+       or (v_value in ('SPONSOR','CONVENZIONE') and coalesce(r.payload->>'orgKind', '') not in ('AZIENDA','ENTE')) then
+      return jsonb_build_object('ok', false, 'code', 'orgKind');
+    end if;
     update public.scd_requests set kind = v_value, area = v_rules->>'area', owner_position = null, updated_at = now() where id = r.id;
     insert into public.scd_request_events (organization_id, request_id, action, actor, note, notify_positions)
     values (p_organization_id, r.id, 'RICLASSIFICATA', auth.uid(), coalesce(v_note, 'Nuovo tipo: ' || v_value),
@@ -795,7 +842,8 @@ begin
     accepted_at = case when v_to = 'ACCETTATA' then now() else accepted_at end,
     closed_at = case when v_to in ('CHIUSA','RIFIUTATA','ANNULLATA') then now() else closed_at end,
     decision_note = case when v_to in ('ACCETTATA','RIFIUTATA','ANNULLATA') then coalesce(v_note, decision_note) else decision_note end,
-    -- a payment never survives a cancellation; a link already sent is marked ANNULLATO for the Tesoreria
+    -- the payment status is cleared on cancellation (the check allows it only from ACCETTATA on); when one was
+    -- recorded, the event below tells the Tesoreria in the app to void the link outside the app
     payment_status = case when v_to = 'ANNULLATA' then null else payment_status end
   where id = r.id;
   -- contacts kept only as long as needed: 6 months after a refusal or cancellation, 12 months after closing
