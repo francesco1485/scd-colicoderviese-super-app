@@ -31,6 +31,7 @@ export function SponsorLedwallLive() {
     const el = box.current;
     const onVis = () => setPageVisible(document.visibilityState === "visible");
     document.addEventListener("visibilitychange", onVis);
+    onVis();
     let io: IntersectionObserver | undefined;
     if (el && typeof IntersectionObserver === "function") {
       io = new IntersectionObserver((entries) => {
@@ -47,7 +48,10 @@ export function SponsorLedwallLive() {
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const set = () => setStill(mq.matches);
+    const set = () => {
+      setStill(mq.matches);
+      if (mq.matches) setFrozenAt((f) => f ?? Date.now());
+    };
     set();
     mq.addEventListener("change", set);
     return () => mq.removeEventListener("change", set);
@@ -55,16 +59,25 @@ export function SponsorLedwallLive() {
 
   if (spots.length === 0) return null;
   const ready = now > 0;
+  // Written once, like a lazy initialiser: the instant the board became ready (frozen view with reduced motion).
   if (ready && firstReadyAt.current === 0) firstReadyAt.current = now;
   const rolling = ready && !paused && (!still || asked);
   // Stopped (pause, or reduced motion before a tap): the board stays on the partner of that moment.
-  const air = ledOnAir(ready ? (rolling ? now : (frozenAt ?? firstReadyAt.current)) : 0, spots);
+  const air = ledOnAir(
+    ready ? (rolling ? now : (frozenAt ?? firstReadyAt.current)) : 0,
+    spots,
+  );
   const current = air.current ?? spots[0]!;
   const playing = rolling && inView && pageVisible;
   const left = Math.max(0, Math.ceil(air.remainingMs / 1000));
 
   return (
-    <section ref={box} className="mx-auto mt-14 max-w-6xl px-4" aria-labelledby="ledwall-title" data-testid="sponsor-ledwall">
+    <section
+      ref={box}
+      className="mx-auto mt-14 max-w-6xl px-4"
+      aria-labelledby="ledwall-title"
+      data-testid="sponsor-ledwall"
+    >
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div className="min-w-0">
           <p className="eyebrow">Ledwall del campo</p>
@@ -72,7 +85,9 @@ export function SponsorLedwallLive() {
             I nostri partner, a rotazione
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Ogni partner ha il suo spot di {SPOT_SLOT_MS / 1000} secondi; il giro completo dura {loopSeconds(spots.length)} secondi ed è uguale per tutti, come sul tabellone LED del campo.
+            Ogni partner ha il suo spot di {SPOT_SLOT_MS / 1000} secondi; il
+            giro completo dura {loopSeconds(spots.length)} secondi ed è uguale
+            per tutti, come sul tabellone LED del campo.
           </p>
         </div>
         <button
@@ -91,25 +106,52 @@ export function SponsorLedwallLive() {
           className="scd-focus inline-flex min-h-11 items-center gap-2 rounded-[10px] border border-[#c3cee0] bg-white px-4 font-display text-[15px] font-semibold text-[#13254d] hover:bg-[#eef2f8]"
           data-testid="ledwall-toggle"
         >
-          {rolling ? <Pause className="size-4" aria-hidden="true" /> : <Play className="size-4" aria-hidden="true" />}
+          {rolling ? (
+            <Pause className="size-4" aria-hidden="true" />
+          ) : (
+            <Play className="size-4" aria-hidden="true" />
+          )}
           {rolling ? "Ferma il ledwall" : "Guarda il ledwall"}
         </button>
       </div>
 
       <div className="mt-4 overflow-hidden rounded-[16px] ring-1 ring-[#b8c5dd]/50 shadow-[0_12px_28px_-18px_rgb(15_29_61/0.8)]">
-        <SpotStage key={`${current.slug}-${air.slot}-${playing ? "on" : "off"}`} spot={current} play={playing} mountVideo={playing} startAtMs={air.elapsedMs} priority />
+        <SpotStage
+          key={`${current.slug}-${air.slot}-${playing ? "on" : "off"}`}
+          spot={current}
+          play={playing}
+          mountVideo={playing}
+          startAtMs={air.elapsedMs}
+          priority
+        />
       </div>
 
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-sm">
-        <p className="m-0 flex items-center gap-2 font-semibold text-[#13254d]" aria-live="off">
-          <span aria-hidden="true" className={`size-2 rounded-full ${rolling ? "scd-live-dot bg-[#ff4d5e]" : "bg-[#9aa8c2]"}`} />
+        <p
+          className="m-0 flex items-center gap-2 font-semibold text-[#13254d]"
+          aria-live="off"
+        >
+          <span
+            aria-hidden="true"
+            className={`size-2 rounded-full ${rolling ? "scd-live-dot bg-[#ff4d5e]" : "bg-[#9aa8c2]"}`}
+          />
           Ora in rotazione: {current.sponsorName}
-          {rolling && air.next ? <span className="font-normal text-muted-foreground"> · tra {left} s {air.next.sponsorName}</span> : null}
+          {rolling && air.next ? (
+            <span className="font-normal text-muted-foreground">
+              {" "}
+              · tra {left} s {air.next.sponsorName}
+            </span>
+          ) : null}
         </p>
-        <p className="m-0 text-xs text-muted-foreground">Anteprima dello spot come appare sul tabellone LED del campo.</p>
+        <p className="m-0 text-xs text-muted-foreground">
+          Anteprima dello spot come appare sul tabellone LED del campo.
+        </p>
       </div>
 
-      <ul className="m-0 mt-4 flex list-none flex-wrap gap-2 p-0" aria-label="Partner in rotazione oggi">
+      <ul
+        className="m-0 mt-4 flex list-none flex-wrap gap-2 p-0"
+        aria-label="Partner in rotazione oggi"
+      >
         {air.order.map((s) => {
           const on = s.slug === current.slug;
           const link = partnerHref(s);
@@ -117,13 +159,22 @@ export function SponsorLedwallLive() {
             <li key={s.slug}>
               <a
                 href={link.href}
-                {...(link.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                {...(link.external
+                  ? { target: "_blank", rel: "noopener noreferrer" }
+                  : {})}
                 aria-current={on ? "true" : undefined}
                 className={`scd-focus inline-flex min-h-11 items-center gap-1.5 rounded-full px-4 font-display text-[14px] font-semibold ring-1 ${on ? "scd-gold ring-transparent" : "bg-white text-[#13254d] ring-[#c3cee0] hover:bg-[#eef2f8]"}`}
               >
                 {s.sponsorName}
-                {link.external && <ArrowUpRight className="size-3.5" aria-hidden="true" />}
-                {link.external && <span className="sr-only"> (sito ufficiale, apre una nuova scheda)</span>}
+                {link.external && (
+                  <ArrowUpRight className="size-3.5" aria-hidden="true" />
+                )}
+                {link.external && (
+                  <span className="sr-only">
+                    {" "}
+                    (sito ufficiale, apre una nuova scheda)
+                  </span>
+                )}
               </a>
             </li>
           );
