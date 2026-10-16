@@ -91,6 +91,13 @@ export const DEFAULT_MAX_DERVIO_PER_DAY = 2;
 export const TEAM_NOTICE_DAYS = 14;
 /** Who is notified when bad weather moves a Dervio match back to Colico (DG 2026-10-16). */
 export const RAIN_MOVE_NOTICE_TO = "FIGC (LND/SGS) e squadra avversaria";
+/**
+ * PROPOSED (not said by Francesco, UD-162 `proposed`): a use of Dervio outside the season
+ * programme (rental, tournament, extra booking) is left to the Direzione. Always shown with
+ * the "Proposta, da confermare" label until Francesco confirms it.
+ */
+export const DERVIO_OFF_PROGRAMME_PROPOSAL =
+  "Proposta, da confermare: fuori dal programma stagionale, decide la Direzione";
 /** The Comune di Dervio position, as shown to users (DG 2026-10-16). */
 export const COMUNE_DERVIO_NOTE =
   "Comune di Dervio già informato con il programma stagionale: nessun avviso gara per gara.";

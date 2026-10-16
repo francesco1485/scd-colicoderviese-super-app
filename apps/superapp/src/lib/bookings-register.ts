@@ -11,6 +11,7 @@
 import {
   BOOKING_KIND_LABEL,
   COMUNE_DERVIO_NOTE,
+  DERVIO_OFF_PROGRAMME_PROPOSAL,
   PITCHES,
   RAIN_MOVE_NOTICE_TO,
   ROOMS,
@@ -159,7 +160,7 @@ export function bookingToRegistryRow(
  * Direzione decides whether to tell the Comune. Colico: not needed.
  */
 export function comuneNotice(pitch: PitchId): string {
-  return pitch === "DV" ? "Fuori programma: decide la Direzione" : "Non serve";
+  return pitch === "DV" ? DERVIO_OFF_PROGRAMME_PROPOSAL : "Non serve";
 }
 
 /* ---------------- Summary for the Direzione ---------------- */
@@ -234,11 +235,11 @@ export function directionBrief(b: Booking, ctx: BriefContext): string {
     );
   if (b.pitch === "DV") {
     lines.push(
-      `${COMUNE_DERVIO_NOTE} Questo uso è fuori programma: se avvisare il Comune lo decide la Direzione.`,
+      `${COMUNE_DERVIO_NOTE} Questo uso: ${DERVIO_OFF_PROGRAMME_PROPOSAL} (se avvisare il Comune).`,
     );
     if (b.kind === "gara")
       lines.push(
-        `Maltempo: se la gara torna a Colico, avviso solo a ${RAIN_MOVE_NOTICE_TO}.`,
+        `Maltempo: se la gara torna a Colico, avviso a ${RAIN_MOVE_NOTICE_TO}.`,
       );
   }
   lines.push(`Richiesto da: ${ctx.requestedBy || "—"}`);

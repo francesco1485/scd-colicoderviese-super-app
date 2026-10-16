@@ -210,7 +210,7 @@ function DervioMap() {
 function noticeChip(d: DervioMatch) {
   if (d.late)
     return (
-      <Chip tone="crit">
+      <Chip tone="warn">
         Avviso alla squadra entro il {ddmm(d.noticeBy)}: già in ritardo
       </Chip>
     );
@@ -274,7 +274,7 @@ export function DervioTab({
         <Card
           id="h-dervio-list"
           title="Gare proposte a Dervio"
-          subtitle={`Scenario: ${presetLabel(model.preset)}. Restano a Colico finché la Direzione non approva.`}
+          subtitle={`Scenario: ${presetLabel(model.preset)}. Restano a Colico finché la Direzione non approva e la LND non autorizza la variazione.`}
         >
           {list.length === 0 ? (
             <div className="mx-4 mb-4 rounded-[14px] border-[1.5px] border-dashed border-[#b9d5ef] bg-[#f8fbfe] p-4 sm:mx-[18px]">
@@ -340,8 +340,8 @@ export function DervioTab({
             </p>
           )}
           <Src>
-            {COMUNE_DERVIO_NOTE} Se piove e la gara torna a Colico: avviso solo
-            a {RAIN_MOVE_NOTICE_TO}. Nessun avviso è stato inviato.
+            {COMUNE_DERVIO_NOTE} Se piove e la gara torna a Colico: avviso a{" "}
+            {RAIN_MOVE_NOTICE_TO}. Nessun avviso è stato inviato.
           </Src>
         </Card>
         <section

@@ -170,7 +170,9 @@ describe("answers from the engine", () => {
     expect(a.details[0]).toMatch(/^Colico campo 1/);
     expect(a.details[2]).toMatch(/^Dervio campo 1/);
     expect(a.details[2]).toMatch(/erba in inverno/);
-    expect(a.details[2]).toMatch(/fuori dal programma stagionale/);
+    expect(a.details[2]).toMatch(
+      /Proposta, da confermare: fuori dal programma stagionale, decide la Direzione/,
+    );
     expect(a.details[2]).not.toMatch(/entro il/);
   });
 
@@ -190,7 +192,7 @@ describe("answers from the engine", () => {
     expect(none.text).toMatch(/nessuna gara è a Dervio/);
     expect(none.text).toMatch(/già informato con il programma stagionale/);
     expect(none.details.join(" ")).toMatch(
-      /Se piove e la gara torna a Colico: avviso solo a FIGC \(LND\/SGS\) e squadra avversaria/,
+      /Se piove e la gara torna a Colico: avviso a FIGC \(LND\/SGS\) e squadra avversaria/,
     );
     expect(none.details.join(" ")).not.toMatch(/30 giorni|un mese/);
     const auto = PRESETS.find((p) => p.id === "auto")!;
@@ -234,4 +236,24 @@ describe("answers from the engine", () => {
     );
     expect(a.details.join(" ")).toMatch(/Quadro settimanale/);
   });
+
+describe("Dervio rules of 2026-10-16 (UD-162)", () => {
+  it("labels off-programme Dervio uses as a proposal, in rentals and in the procedure", () => {
+    const label = /Proposta, da confermare: fuori dal programma stagionale, decide la Direzione/;
+    const rent = answerQuestion("Posso affittare Dervio domenica 18 ottobre alle 10?", CTX);
+    expect(rent.details.join(" ")).toMatch(label);
+    const proc = answerQuestion("Come gestisco un affitto a terzi?", CTX);
+    expect(proc.intent).toBe("rental-procedure");
+    expect(proc.details.join(" ")).toMatch(label);
+    expect(proc.details.join(" ")).not.toMatch(/30 giorni/);
+  });
+
+  it("never says 'solo' for the rain-move notice and keeps late notices at warn", () => {
+    const auto = PRESETS.find((p) => p.id === "auto")!;
+    const a = answerQuestion("chi devo avvisare per le gare a Dervio?", ctxFor({ auto: true, modes: auto.modes }));
+    expect(a.tone).toBe("warn");
+    expect([a.text, ...a.details].join(" ")).not.toMatch(/avviso solo/);
+  });
+});
+
 });

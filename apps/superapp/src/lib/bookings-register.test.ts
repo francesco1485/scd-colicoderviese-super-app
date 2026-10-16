@@ -79,7 +79,9 @@ describe("master row", () => {
     expect(dv[5]).toBe("SPA-DER-C1");
     expect(dv[6]).toBe("Metà campo");
     expect(dv[15]).toBe("");
-    expect(dv[17]).toBe("Fuori programma: decide la Direzione");
+    expect(dv[17]).toBe(
+      "Proposta, da confermare: fuori dal programma stagionale, decide la Direzione",
+    );
   });
 
   it("validates entrance and amount", () => {
@@ -139,7 +141,11 @@ describe("scheda per la Direzione", () => {
     const dv: Booking = { ...clash, pitch: "DV", date: "2026-10-25" };
     const brief = directionBrief(dv, ctx);
     expect(brief).toMatch(/già informato con il programma stagionale/);
-    expect(brief).toMatch(/avviso solo a FIGC \(LND\/SGS\) e squadra avversaria/);
+    expect(brief).toMatch(/avviso a FIGC \(LND\/SGS\) e squadra avversaria/);
+    expect(brief).not.toMatch(/avviso solo/);
+    expect(brief).toMatch(
+      /Proposta, da confermare: fuori dal programma stagionale, decide la Direzione/,
+    );
     expect(brief).not.toMatch(/GIÀ IN RITARDO|entro il/);
     expect(
       directionBrief(

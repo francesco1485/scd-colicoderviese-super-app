@@ -9,6 +9,7 @@
 import {
   BOOKING_DEFAULTS,
   COMUNE_DERVIO_NOTE,
+  DERVIO_OFF_PROGRAMME_PROPOSAL,
   LIGHTS_AFTER_MIN,
   PITCHES,
   RAIN_MOVE_NOTICE_TO,
@@ -297,7 +298,7 @@ function answerAvailability(
       details.push("A Dervio dopo le 17:00 le luci sono da verificare.");
     if (pitch === "DV")
       details.push(
-        "Dervio: un affitto è fuori dal programma stagionale comunicato al Comune; se avvisarlo lo decide la Direzione.",
+        `Dervio, avviso al Comune per un affitto: ${DERVIO_OFF_PROGRAMME_PROPOSAL}.`,
       );
     if (note) details.push(note);
     details.push(
@@ -368,7 +369,7 @@ function answerPlaceEvent(
       extra.push("96 × 48: per l'11 contro 11 misure da verificare");
     if (p === "DV") {
       extra.push(
-        "fuori dal programma stagionale comunicato al Comune: decide la Direzione",
+        `avviso al Comune: ${DERVIO_OFF_PROGRAMME_PROPOSAL}`,
       );
       if (isWinterDay(q.date))
         extra.push("erba in inverno: controllo del fondo");
@@ -457,7 +458,7 @@ function answerConflicts(ctx: AssistantContext): AssistantAnswer {
 /** Who is notified for a Dervio match (DG decision 2026-10-16). */
 const NOTICE_RULES: readonly string[] = [
   `Avviso alla squadra che gioca ${TEAM_NOTICE_DAYS} giorni prima, a tutti 3 giorni prima.`,
-  `Se piove e la gara torna a Colico: avviso solo a ${RAIN_MOVE_NOTICE_TO}.`,
+  `Se piove e la gara torna a Colico: avviso a ${RAIN_MOVE_NOTICE_TO}.`,
 ];
 
 function answerNotice(ctx: AssistantContext): AssistantAnswer {
@@ -492,7 +493,7 @@ function answerNotice(ctx: AssistantContext): AssistantAnswer {
     text: `${COMUNE_DERVIO_NOTE} Primo avviso alla squadra entro il ${ddmm(list[0]!.noticeBy)}${late ? `; ${late} ${late === 1 ? "avviso è" : "avvisi sono"} già oltre i ${TEAM_NOTICE_DAYS} giorni` : ""}. Sono date della simulazione: nessuna gara è spostata davvero.`,
     details: [...details, ...NOTICE_RULES],
     actions: [{ type: "open-tab", tab: "dervio", label: "Apri Dervio" }],
-    tone: late ? "crit" : "warn",
+    tone: "warn",
   };
 }
 
@@ -504,7 +505,7 @@ function answerRentalProcedure(): AssistantAnswer {
       "1. Verifica la disponibilità qui (campo, giorno, orario, cambio campo) e salva l'ipotesi.",
       "2. Prepara la proposta: ente richiedente, campo, orari, spogliatoi e uso delle luci.",
       "3. Approvazione della Direzione (Presidente o Direttore generale).",
-      "4. Comunicazione all'ente. Per Dervio l'affitto è fuori dal programma stagionale comunicato al Comune: se avvisarlo lo decide la Direzione.",
+      `4. Comunicazione all'ente. Per Dervio, avviso al Comune: ${DERVIO_OFF_PROGRAMME_PROPOSAL}.`,
       "Servono un accordo scritto e la verifica dell'assicurazione dell'ente: chiedi alla segreteria. Questa non è una consulenza legale.",
     ],
     actions: [
