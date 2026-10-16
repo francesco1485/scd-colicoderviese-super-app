@@ -72,7 +72,6 @@ function Sponsor() {
         <CastPresence id="volto-sponsor" day={day} />
       </section>
 
-
       <section className="mx-auto mt-14 max-w-6xl px-4">
         <p className="eyebrow">Asset disponibili</p>
         <h2 className="mt-1 text-3xl font-bold">Inventario partnership</h2>

@@ -17,7 +17,7 @@ describe("sponsor LED spots in the UI (UD-119)", () => {
 
   const ui = src("./SponsorSpots.tsx");
 
-  it("no vetrine (Francesco 15/10/2026): no rotating spot block anywhere in the app, no partner band on /sponsor", () => {
+  it("no vetrine (Francesco 15/10/2026): no rotating spot block elsewhere (only /sponsor, UD-142), no partner band on /sponsor", () => {
     expect(ui).not.toMatch(/export function SponsorSpotsHome|In onda ora sul LED wall|Torna alla diretta|mayAnimate/);
     const sponsor = src("../routes/sponsor.tsx");
     expect(sponsor).not.toMatch(/<PartnerBand|<LedwallFacsimile|<LedwallRotator|<SponsorSpotsHome/);

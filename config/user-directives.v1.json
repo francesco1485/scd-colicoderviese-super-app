@@ -3778,8 +3778,8 @@
           "«applica r139» for the migration",
           "Make scenario Tally -> scd_request_ingest (service role) to be created after the form",
           "placement of the public links on /tornei, /sponsor, /partner, /fornitori, /impianti, /contatti (pages of the CLOUD chat)",
-        "PROPOSED (security review): Tally form: honeypot field + Make filter before ingest",
-        "PROPOSED, to be confirmed by Francesco: phases Ricevuta -> In valutazione -> Accettata | Non accolta -> In gestione -> Chiusa; deciders of ISCRIZIONE_TORNEO, SPONSOR, CONVENZIONE, ALTRO and every preparer/informed/owner list (lib/intake-kinds.ts INTAKE_RULES; AFFITTO_CAMPO and VISITA_CENTRO deciders DECIDED 16:39, DG prepares and forwards DECIDED ~16:55), payment and payment link yes/no for the other kinds (no link for sponsors and convenzioni; VISITA_CENTRO without payment DECIDED ~17:00), ingest cap 60/hour, contact retention periods (12 months from receipt, 6 after refusal or cancellation, 12 after closing; automatic deletion only once a scheduled job is created)"
+          "PROPOSED (security review): Tally form: honeypot field + Make filter before ingest",
+          "PROPOSED, to be confirmed by Francesco: phases Ricevuta -> In valutazione -> Accettata | Non accolta -> In gestione -> Chiusa; deciders of ISCRIZIONE_TORNEO, SPONSOR, CONVENZIONE, ALTRO and every preparer/informed/owner list (lib/intake-kinds.ts INTAKE_RULES; AFFITTO_CAMPO and VISITA_CENTRO deciders DECIDED 16:39, DG prepares and forwards DECIDED ~16:55), payment and payment link yes/no for the other kinds (no link for sponsors and convenzioni; VISITA_CENTRO without payment DECIDED ~17:00), ingest cap 60/hour, contact retention periods (12 months from receipt, 6 after refusal or cancellation, 12 after closing; automatic deletion only once a scheduled job is created)"
         ]
       }
     },
@@ -3873,6 +3873,24 @@
           },
           "status": "VERIFIED"
         }
+      }
+    },
+    {
+      "sourceDate": "2026-10-16",
+      "sourceTime": "20:56",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-142",
+      "name": "SPONSOR_PAGE_LEDWALL_ROTATION",
+      "sourceQuoteFragments": [
+        "Mancano i ledwal per sponsor a rotazione sul wab app sponsor"
+      ],
+      "normalizedCommand": {
+        "rule": "The /sponsor page of the Super App shows the club LED wall spots of the confirmed sponsors in rotation, clock-synced with the physical board (/ledwall/player). Exception to UD-152 limited to /sponsor: muted video, pause button, no autoplay with reduced motion, only showable spots of confirmed sponsors.",
+        "scope": "SUPER_APP /sponsor",
+        "supersedes": "UD-152 for the /sponsor page only",
+        "implementationStatus": "IMPLEMENTED_PENDING_PUBLISH",
+        "implementation": "apps/superapp/src/components/SponsorLedwallLive.tsx"
       }
     }
   ],

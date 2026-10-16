@@ -1,5 +1,5 @@
 import { ArrowUpRight, Pause, Play } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { SpotStage } from "@/components/SponsorSpots";
 import { partnerHref, spotsForLedwall } from "@/lib/sponsor-spots";
@@ -20,6 +20,28 @@ export function SponsorLedwallLive() {
   const [paused, setPaused] = useState(false);
   const [still, setStill] = useState(false);
   const [asked, setAsked] = useState(false);
+  const [frozenAt, setFrozenAt] = useState<number | null>(null);
+  const [visible, setVisible] = useState(true);
+  const box = useRef<HTMLElement>(null);
+
+  // Pause while the page is hidden or the board is off screen: no video download nobody watches.
+  useEffect(() => {
+    const el = box.current;
+    const onVis = () => setVisible(document.visibilityState === "visible");
+    document.addEventListener("visibilitychange", onVis);
+    let io: IntersectionObserver | undefined;
+    if (el && typeof IntersectionObserver === "function") {
+      io = new IntersectionObserver((entries) => {
+        const e = entries[0];
+        if (e) setVisible(e.isIntersecting && document.visibilityState === "visible");
+      });
+      io.observe(el);
+    }
+    return () => {
+      document.removeEventListener("visibilitychange", onVis);
+      io?.disconnect();
+    };
+  }, []);
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -31,13 +53,15 @@ export function SponsorLedwallLive() {
 
   if (spots.length === 0) return null;
   const ready = now > 0;
-  const air = ledOnAir(ready ? now : 0, spots);
-  const current = air.current ?? spots[0]!;
   const rolling = ready && !paused && (!still || asked);
+  // Stopped (pause, or reduced motion before a tap): the board stays on the partner of that moment.
+  const air = ledOnAir(ready ? (rolling ? now : (frozenAt ?? now)) : 0, spots);
+  const current = air.current ?? spots[0]!;
+  const playing = rolling && visible;
   const left = Math.max(0, Math.ceil(air.remainingMs / 1000));
 
   return (
-    <section className="mx-auto mt-14 max-w-6xl px-4" aria-labelledby="ledwall-title" data-testid="sponsor-ledwall">
+    <section ref={box} className="mx-auto mt-14 max-w-6xl px-4" aria-labelledby="ledwall-title" data-testid="sponsor-ledwall">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div className="min-w-0">
           <p className="eyebrow">Ledwall del campo</p>
@@ -54,11 +78,13 @@ export function SponsorLedwallLive() {
             if (still && !asked) {
               setAsked(true);
               setPaused(false);
+              setFrozenAt(null);
               return;
             }
-            setPaused((p) => !p);
+            if (rolling) setFrozenAt(Date.now());
+            else setFrozenAt(null);
+            setPaused(rolling);
           }}
-          aria-pressed={!rolling}
           className="scd-focus inline-flex min-h-11 items-center gap-2 rounded-[10px] border border-[#c3cee0] bg-white px-4 font-display text-[15px] font-semibold text-[#13254d] hover:bg-[#eef2f8]"
           data-testid="ledwall-toggle"
         >
@@ -68,13 +94,13 @@ export function SponsorLedwallLive() {
       </div>
 
       <div className="mt-4 overflow-hidden rounded-[16px] ring-1 ring-[#b8c5dd]/50 shadow-[0_12px_28px_-18px_rgb(15_29_61/0.8)]">
-        <SpotStage key={`${current.slug}-${air.slot}-${rolling ? "on" : "off"}`} spot={current} play={rolling} mountVideo={rolling} startAtMs={air.elapsedMs} priority />
+        <SpotStage key={`${current.slug}-${air.slot}-${playing ? "on" : "off"}`} spot={current} play={playing} mountVideo={playing} startAtMs={air.elapsedMs} priority />
       </div>
 
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-sm">
         <p className="m-0 flex items-center gap-2 font-semibold text-[#13254d]" aria-live="off">
           <span aria-hidden="true" className={`size-2 rounded-full ${rolling ? "scd-live-dot bg-[#ff4d5e]" : "bg-[#9aa8c2]"}`} />
-          In onda: {current.sponsorName}
+          Ora in rotazione: {current.sponsorName}
           {rolling && air.next ? <span className="font-normal text-muted-foreground"> · tra {left} s {air.next.sponsorName}</span> : null}
         </p>
         <p className="m-0 text-xs text-muted-foreground">Anteprima dello spot come appare sul tabellone LED del campo.</p>
