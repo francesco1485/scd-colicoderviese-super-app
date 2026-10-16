@@ -159,7 +159,7 @@ function WeekStrip({ events, groups, nowMs }: { events: readonly PublicEvent[]; 
             to="/calendario"
             search={{ annata: e.group, vista: "settimana" }}
             tabIndex={dup ? -1 : undefined}
-            className="scd-focus mx-1 inline-flex min-h-9 origin-center items-center gap-1.5 whitespace-nowrap rounded-full border border-white/15 bg-white/[0.07] px-3 font-display text-[13px] text-[#dfe7f7] transition-transform duration-200 hover:scale-[1.06] hover:bg-white hover:text-[#14264d] focus-visible:bg-white focus-visible:text-[#14264d] lg:text-[14px]"
+            className="scd-focus mx-1 inline-flex min-h-11 origin-center items-center gap-1.5 whitespace-nowrap rounded-full border border-white/15 bg-white/[0.07] px-3 font-display text-[13px] text-[#dfe7f7] transition-transform duration-200 hover:scale-[1.06] hover:bg-white hover:text-[#14264d] focus-visible:bg-white focus-visible:text-[#14264d] lg:text-[14px]"
           >
             <span className="tabular-nums opacity-75">{it.when}</span>
             <strong className="font-semibold">{it.team}</strong>
@@ -170,19 +170,22 @@ function WeekStrip({ events, groups, nowMs }: { events: readonly PublicEvent[]; 
       );
     });
   const first = live[0];
+  const liveText = (e: PublicEvent) => {
+    const it = stripItem(e, groupOf.get(e.group));
+    return `${it.team} ${it.text}`;
+  };
   return (
     <section aria-label="Partite della settimana" className="bg-[#0f1d3d] text-white" data-testid="home-ticker">
       <div className="mx-auto flex max-w-[1440px] flex-wrap items-stretch lg:flex-nowrap">
         <div
           className={`${first ? "flex" : "hidden lg:flex"} min-h-11 w-full items-center gap-2 border-b border-white/10 bg-[#13254d] px-4 lg:w-auto lg:border-b-0 lg:border-r lg:px-5`}
           data-testid="home-live-box"
-          aria-live="polite"
         >
           <span aria-hidden="true" className={`size-2 rounded-full ${first ? "scd-live-dot bg-[#ff4d5e]" : "bg-[#5d6f94]"}`} />
           <span className={`${LABEL} text-[#c9d6f0]`}>In corso</span>
           {first ? (
             <Link to="/calendario" search={{ annata: first.group, vista: "settimana" }} className="scd-focus min-h-11 truncate rounded-md font-display text-[14px] font-semibold text-white">
-              {stripItem(first, groupOf.get(first.group)).team} {stripItem(first, groupOf.get(first.group)).text} · {matchClock(first, nowMs).label}
+              {liveText(first)} · {matchClock(first, nowMs).label}
               {live.length > 1 ? ` · +${live.length - 1}` : ""}
             </Link>
           ) : (
@@ -197,7 +200,7 @@ function WeekStrip({ events, groups, nowMs }: { events: readonly PublicEvent[]; 
               onClick={() => setPaused((p) => !p)}
               aria-pressed={paused}
               aria-label={paused ? "Fai scorrere le gare" : "Ferma lo scorrimento delle gare"}
-              className="scd-focus grid min-h-11 w-10 shrink-0 place-items-center text-[#c9d6f0] hover:text-white"
+              className="scd-focus grid min-h-11 w-11 shrink-0 place-items-center text-[#c9d6f0] hover:text-white"
               data-testid="bar-pause"
             >
               {paused ? <Play className="size-4" aria-hidden="true" /> : <Pause className="size-4" aria-hidden="true" />}
@@ -214,7 +217,7 @@ function WeekStrip({ events, groups, nowMs }: { events: readonly PublicEvent[]; 
                 {row(true)}
               </ul>
             ) : (
-              <p className="m-0 flex min-h-9 items-center px-3 font-display text-[13px] text-[#8fa3c7]">Nessuna gara nei prossimi 7 giorni</p>
+              <p className="m-0 flex min-h-11 items-center px-3 font-display text-[13px] text-[#8fa3c7]">{live.length > 0 ? "Nessun'altra gara nei prossimi 7 giorni" : "Nessuna gara nei prossimi 7 giorni"}</p>
             )}
           </div>
           <Link
@@ -380,12 +383,12 @@ function Services() {
       <Heading id="home-services-t">Servizi e club</Heading>
       <ul className="m-0 grid list-none grid-cols-2 gap-3 p-0 lg:grid-cols-4 lg:gap-4">
         <ServiceCard
-          to="/shop"
+          to="/kit"
           testid="home-shop"
-          kicker="Club Shop"
-          title="Kit ufficiale 2026/27"
-          text="Quattro colori di divisa tra cui scegliere."
-          cta="Scegli"
+          kicker="Kit 2026/27"
+          title="Kit ufficiale del club"
+          text="Kit atleti e Primi Calci: cosa contiene, quanto costa e come si ordina."
+          cta="Vedi i kit"
           art={
             <>
               <span aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(circle_at_70%_40%,#3f7fe6,#13254d_70%)]" />
@@ -484,9 +487,9 @@ function MonthCard({ events, today, nowMs, groups }: { events: readonly PublicEv
               <span
                 key={n}
                 className={`relative grid h-8 place-items-center rounded-full font-display text-[14px] ${n === todayN ? "bg-[#13254d] font-bold text-white" : "text-[#14264d]"}`}
-                aria-label={gameDays.has(n) ? `${n} ${MONTHS[m]}: giorno di gare` : undefined}
               >
                 {n}
+                {gameDays.has(n) && <span className="sr-only">, giorno di gare</span>}
                 {gameDays.has(n) && <span aria-hidden="true" className="absolute bottom-0.5 size-[5px] rounded-full bg-[#ffd23f] ring-1 ring-[#c99600]" />}
               </span>
             ),
@@ -502,7 +505,7 @@ function MonthCard({ events, today, nowMs, groups }: { events: readonly PublicEv
             oggi
           </span>
         </div>
-        <Link to="/calendario" className="scd-focus mt-3 flex min-h-10 items-center justify-center gap-1.5 rounded-[8px] border border-[#c3cee0] font-display text-[15px] font-semibold text-[#13254d] hover:bg-[#eef2f8]">
+        <Link to="/calendario" className="scd-focus mt-3 flex min-h-11 items-center justify-center gap-1.5 rounded-[8px] border border-[#c3cee0] font-display text-[15px] font-semibold text-[#13254d] hover:bg-[#eef2f8]">
           <CalendarDays className="size-4" aria-hidden="true" />
           Apri il calendario
         </Link>
