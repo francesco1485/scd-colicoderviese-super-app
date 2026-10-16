@@ -25,6 +25,6 @@ You turn a board image into a working screen that looks like the board. You do n
 - Demo data is replaced by real data or by an honest empty state ("Nessun evento in programma"), never by invented values.
 - Minors: no real faces in public or shared views; first name + initial; in reserved family views use the avatar the family created (AVATAR_APP consent) or initials.
 - No vetrine (UD-152): no carousels, rotating banners, autoplay video, "In evidenza".
-- Sky stays out of the app; Crovi is the welcome avatar/chatbot on the home (UD-151/153).
+- Sky stays out of normal app pages; he appears only in surprise moments (events, goals, parties) per UD-165. Crovi is the welcome avatar on the home (UD-153), Iride the support inside the gestionale.
 - Accessibility: 44 px targets, AA contrast, keyboard order, `prefers-reduced-motion`.
 - Never push or publish: hand the branch to the main session for scd-revisore + scd-sicurezza and Francesco's OK.
