@@ -85,7 +85,7 @@ describe("organigram positions (r138) linked to roles (r112)", () => {
   });
 
   it("r112 is a staged file, guarded, creator-only, audited, and grants nothing", () => {
-    expect(SQL112.split("\n")[1]).toMatch(/NOT APPLIED — needs «applica r112»/);
+    expect(SQL112.split("\n")[1]).toMatch(/APPLIED on SCD PULSE .* «ok ruoli - applica r112 - applica r113»/);
     expect(SQL112).toMatch(/r112 prerequisites missing/);
     expect(SQL112).toMatch(/if not public\.scd_is_role_creator\(p_organization_id\) then/);
     expect(SQL112).toMatch(/'CHANGE_ROLE'/);

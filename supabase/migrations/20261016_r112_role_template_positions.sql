@@ -1,5 +1,5 @@
 -- r112: link role templates (r111) to the organigram positions (r138). 2026-10-16, chat cloud (squad deleghe).
--- STAGED: NOT APPLIED — needs «applica r112» from Francesco. Never apply from an agent. Never on dfnwzwutvnwiitiffwvr.
+-- APPLIED on SCD PULSE (ndevtxxijbcnskgysdit) 17/10/2026 ~00:00 after Francesco «ok ruoli - applica r112 - applica r113» (16/10 23:58). Never on dfnwzwutvnwiitiffwvr.
 -- Target: SCD PULSE (ndevtxxijbcnskgysdit).
 -- Requires r111 (scd_role_templates, scd_is_role_creator) and r138 (scd_position_catalog), both VERIFIED applied on
 -- SCD PULSE 16/10/2026 by read-only SELECTs (r111 function bodies byte-identical to 20261015_r111_role_templates.sql;

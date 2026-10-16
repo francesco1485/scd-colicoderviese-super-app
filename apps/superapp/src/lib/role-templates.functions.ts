@@ -7,7 +7,7 @@
  * but creating, editing and deactivating answer "Da attivare" and nothing is written anywhere.
  * r111 is APPLIED on SCD PULSE since 16/10/2026 13:37–13:45 (PC chat, on Francesco's «applica r111»).
  *
- * r112 (STAGED, NOT APPLIED): a role can name the organigram position (r138 catalogue) it is meant for. Until r112 is
+ * r112 (APPLIED 17/10/2026): a role can name the organigram position (r138 catalogue) it is meant for. Until r112 is
  * applied the position choice is shown switched off and nothing about positions is read or written; the role itself
  * still saves. The link opens nothing: it only puts the role first in "Carica un ruolo" for holders of that position.
  */

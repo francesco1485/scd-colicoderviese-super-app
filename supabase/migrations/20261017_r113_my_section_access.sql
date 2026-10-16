@@ -1,5 +1,5 @@
 -- r113: one call for "which sections did the Direzione enable for me" (access resolver). 2026-10-17, chat cloud (squad accessi).
--- STAGED: NOT APPLIED — needs «applica r113» from Francesco. Never apply from an agent. Never on dfnwzwutvnwiitiffwvr.
+-- APPLIED on SCD PULSE (ndevtxxijbcnskgysdit) 17/10/2026 ~00:00 after Francesco «ok ruoli - applica r112 - applica r113» (16/10 23:58). Never on dfnwzwutvnwiitiffwvr.
 -- Target: SCD PULSE (ndevtxxijbcnskgysdit). Requires r100 (scd_person_grants, scd_section_catalog), VERIFIED applied
 -- 14/10/2026; a guard below stops the migration when it is missing.
 --

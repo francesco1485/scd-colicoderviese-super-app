@@ -363,7 +363,7 @@ describe("wiring and security (source assertions)", () => {
 
   it("r113 is staged, not applied, and only reads the caller's own grants", () => {
     const sql = src("../../../../supabase/migrations/20261017_r113_my_section_access.sql");
-    expect(sql).toMatch(/STAGED: NOT APPLIED — needs «applica r113»/);
+    expect(sql).toMatch(/APPLIED on SCD PULSE .* «ok ruoli - applica r112 - applica r113»/);
     const body = sql.split("\n").filter((l) => !l.trimStart().startsWith("--")).join("\n");
     expect(body).toMatch(/security definer/);
     expect(body).toMatch(/set search_path to 'public'/);
