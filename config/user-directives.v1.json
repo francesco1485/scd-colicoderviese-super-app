@@ -3875,6 +3875,45 @@
           "status": "VERIFIED"
         }
       }
+    },
+    {
+      "sourceDate": "2026-10-16",
+      "sourceTime": "20:56",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-142",
+      "name": "SPONSOR_PAGE_LEDWALL_ROTATION",
+      "sourceQuoteFragments": [
+        "Mancano i ledwal per sponsor a rotazione sul wab app sponsor"
+      ],
+      "normalizedCommand": {
+        "rule": "The /sponsor page of the Super App shows the club LED wall spots of the confirmed sponsors in rotation, clock-synced with the physical board (/ledwall/player). Exception to UD-152 limited to /sponsor: muted video, pause button, no autoplay with reduced motion, only showable spots of confirmed sponsors.",
+        "scope": "SUPER_APP /sponsor",
+        "supersedes": "UD-152 for the /sponsor page only",
+        "implementationStatus": "IMPLEMENTED_PUBLISHED_2026-10-16",
+        "implementation": "apps/superapp/src/components/SponsorLedwallLive.tsx"
+      }
+    },
+    {
+      "sourceDate": "2026-10-16",
+      "sourceTime": "21:43",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-143",
+      "name": "HOME_BOTTOM_PROMO_ROTATION_SKY_CONVENZIONI_SOCIAL",
+      "sourceQuoteFragments": [
+        "Nella home a rotazione in basso devi fare passare una promo questi sono i nostri sponsor che a bordo campo ci sostengono vuoi farlo anche tu scrivi e ti ricontattiamo",
+        "Puoi decidere tu la grafica e il messaggio e cambiarlo quantabvikre vuoi",
+        "Poi ogni due giorni fai comparire Sky con la divise e lo spinsor e fai lo stesso e poi anche altri idee se vuoi sostenere i nostri colori",
+        "Poi a rotazione le convenzioni annunciate che ti comunico e così anche programmare che quando lo fai lì lo fai anche sui social così siamo virali taggando lo sponsor"
+      ],
+      "normalizedCommand": {
+        "rule": "At the bottom of the public home a rotating promo band: every day the call to sponsors (confirmed sponsors with a sponsor of the day, CTA to the /sponsor proposal form 'Scrivici e ti ricontattiamo'); every second day Sky in the official match kit with the sponsors on the shirt; 'Sostieni i nostri colori'; the convenzioni Francesco announces (none invented). Copy and graphics may change at will. Pause button, stops on hover/focus/hidden tab, never moves with reduced motion. The daily Super Giornalista prepares the matching social post tagging the sponsor of the day (draft; publishing only through a social account Francesco connects).",
+        "scope": "SUPER_APP public home + scd-super-giornalista",
+        "supersedes": "UD-152 for this home band only; UD-151 'Sky never in the app' for this band only (official artwork sky-atv-cut.webp)",
+        "implementationStatus": "IMPLEMENTED_PENDING_PUBLISH",
+        "implementation": "apps/superapp/src/lib/home-promos.ts, apps/superapp/src/components/home/HomeBordoCampo.tsx"
+      }
     }
   ],
   "completionGate": {

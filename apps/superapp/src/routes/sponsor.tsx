@@ -6,6 +6,7 @@ import { CastPresence } from "@/components/scd/CastPresence";
 import { PartnerForm } from "@/components/PartnerForm";
 import { ShareButton } from "@/components/scd/ShareButton";
 import { PartnerPackages } from "@/components/PartnerPackages";
+import { SponsorLedwallLive } from "@/components/SponsorLedwallLive";
 import { SponsorProcess } from "@/components/SponsorProcess";
 import { PageHero, heroOverlapCls } from "@/components/ui-kit";
 import { SPONSOR_ASSETS } from "@/lib/catalog";
@@ -60,15 +61,16 @@ function Sponsor() {
         ))}
       </section>
 
+      {/* Francesco 16/10/2026 20:56 «mancano i ledwall per sponsor a rotazione sulla web app sponsor» (supersedes the
+          15/10 "no rotating LED preview" for this page): the club LED wall, clock-synced with the physical board. */}
+      <SponsorLedwallLive />
+
       <PartnerPackages onChoose={choose} />
 
       {/* UD-121: the Volto sponsor face lives here (listino, "chiedi un pacchetto", "Chiedi a Vera"). */}
       <section id="volto-sponsor" aria-label="Il Volto sponsor" className="mx-auto mt-10 max-w-3xl scroll-mt-20 px-4" data-testid="sponsor-volto">
         <CastPresence id="volto-sponsor" day={day} />
       </section>
-
-      {/* No vetrine (Francesco 15/10/2026): no rotating LED preview, no "in onda ora", no partner of the month here.
-          The partners scroll only in the fixed SponsorBand at the bottom of every page. */}
 
       <section className="mx-auto mt-14 max-w-6xl px-4">
         <p className="eyebrow">Asset disponibili</p>
