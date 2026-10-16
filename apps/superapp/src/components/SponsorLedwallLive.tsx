@@ -21,19 +21,21 @@ export function SponsorLedwallLive() {
   const [still, setStill] = useState(false);
   const [asked, setAsked] = useState(false);
   const [frozenAt, setFrozenAt] = useState<number | null>(null);
-  const [visible, setVisible] = useState(true);
+  const [inView, setInView] = useState(true);
+  const [pageVisible, setPageVisible] = useState(true);
+  const firstReadyAt = useRef(0);
   const box = useRef<HTMLElement>(null);
 
   // Pause while the page is hidden or the board is off screen: no video download nobody watches.
   useEffect(() => {
     const el = box.current;
-    const onVis = () => setVisible(document.visibilityState === "visible");
+    const onVis = () => setPageVisible(document.visibilityState === "visible");
     document.addEventListener("visibilitychange", onVis);
     let io: IntersectionObserver | undefined;
     if (el && typeof IntersectionObserver === "function") {
       io = new IntersectionObserver((entries) => {
         const e = entries[0];
-        if (e) setVisible(e.isIntersecting && document.visibilityState === "visible");
+        if (e) setInView(e.isIntersecting);
       });
       io.observe(el);
     }
@@ -53,11 +55,12 @@ export function SponsorLedwallLive() {
 
   if (spots.length === 0) return null;
   const ready = now > 0;
+  if (ready && firstReadyAt.current === 0) firstReadyAt.current = now;
   const rolling = ready && !paused && (!still || asked);
   // Stopped (pause, or reduced motion before a tap): the board stays on the partner of that moment.
-  const air = ledOnAir(ready ? (rolling ? now : (frozenAt ?? now)) : 0, spots);
+  const air = ledOnAir(ready ? (rolling ? now : (frozenAt ?? firstReadyAt.current)) : 0, spots);
   const current = air.current ?? spots[0]!;
-  const playing = rolling && visible;
+  const playing = rolling && inView && pageVisible;
   const left = Math.max(0, Math.ceil(air.remainingMs / 1000));
 
   return (
