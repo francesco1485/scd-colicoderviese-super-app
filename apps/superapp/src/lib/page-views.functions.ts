@@ -1,0 +1,64 @@
+/**
+ * "Numeri dell'app" on the server (UD-167, migration r141 STAGED: NOT APPLIED).
+ *
+ * trackPageView: +1 for a public page, called fire-and-forget by the browser tracker (components/PageViewTracker.tsx).
+ * It uses a STATELESS Supabase client with the publishable key (no cookies read or written, so it never touches the
+ * visitor's session) and calls scd_track_page_view, which validates everything again. It does nothing when Supabase
+ * is not configured, on the dev server or in the staging preview, and swallows every error: until r141 is applied the
+ * call simply fails and nothing happens.
+ *
+ * getAppStats: the Direzione's read (scd_app_stats checks the role in the database). Until r141 answers, the page
+ * says "Funzione in preparazione" and shows no number (unknown is never zero).
+ */
+import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
+
+import {
+  PAGE_DEVICES,
+  PAGE_SOURCES,
+  STATS_PERIODS,
+  type AppStatsDesk,
+  type StatsPeriod,
+} from "./page-views";
+import { readAppStats, recordPageView } from "./page-views.server";
+
+/* ------------------------------------------------------------------ tracker */
+
+const trackSchema = z.object({
+  path: z.string().max(2048),
+  source: z.enum(PAGE_SOURCES),
+  device: z.enum(PAGE_DEVICES),
+});
+
+export const trackPageView = createServerFn({ method: "POST" })
+  .inputValidator((raw: unknown) => trackSchema.parse(raw))
+  .handler(async ({ data }): Promise<{ ok: boolean }> => recordPageView(data));
+
+/* ------------------------------------------------------------------ Direzione page */
+
+export const numeriSearchSchema = z.object({
+  giorni: z.coerce
+    .number()
+    .refine((n): n is StatsPeriod =>
+      (STATS_PERIODS as readonly number[]).includes(n),
+    )
+    .optional(),
+});
+export type NumeriSearch = z.infer<typeof numeriSearchSchema>;
+
+export const getAppStats = createServerFn({ method: "GET" })
+  .inputValidator((raw: unknown) =>
+    numeriSearchSchema.catch({}).parse(raw ?? {}),
+  )
+  .handler(async ({ data }): Promise<AppStatsDesk> =>
+    readAppStats(data.giorni ?? 30),
+  );
+
+export {
+  NUMERI_DENIED,
+  NUMERI_NO_SESSION,
+  NUMERI_OFF,
+  NUMERI_READ_FAILED,
+  emptyAppStatsDesk,
+  type AppStatsDesk,
+} from "./page-views";

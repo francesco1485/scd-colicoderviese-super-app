@@ -3971,6 +3971,31 @@
         ]
       },
       "status": "RECORDED"
+    },
+    {
+      "sourceDate": "2026-10-16",
+      "sourceTime": "22:34",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-167",
+      "name": "NUMERI_DELL_APP_ACCESS_AND_SOURCE_COUNTS_FOR_THE_DIREZIONE",
+      "sourceQuoteFragments": [
+        "area dove dobbiamo sapere quanti accessi sono stati fatti, quanti sono arrivati sopra all'app",
+        "capiamo come migliorare"
+      ],
+      "normalizedCommand": {
+        "rule": "An internal area tells the Direzione how many visits the app receives and where people arrive from, to understand how to improve it. Implemented as anonymous daily totals of the public pages per page, source (direct, Instagram, Facebook, TikTok, WhatsApp, Google, QR, other) and device (phone, tablet, desktop): no cookie, no identifier, no personal or minors' data, unique visitors not counted, internal and reserved areas never counted, rows deleted after 25 months. Page /gestionale/numeri, Direzione only. Migration r141 STAGED on branch feat/app-numeri.",
+        "scope": "APP_USAGE_NUMBERS",
+        "engines": "PERSONE (families and fans reaching the app, from which social) and SOLDI (real audience numbers for sponsors)",
+        "measure": "weekly visits, share from social, share from phone, top 10 public pages (scd_app_page_views_daily via scd_app_stats)",
+        "status": "IMPLEMENTED_ON_BRANCH_NOT_PUBLISHED",
+        "pending": [
+          "«applica r141» for the migration (not applied)",
+          "PROPOSED, to be decided by Francesco before applying r141: count without consent (cookieless anonymous totals, as coded) or only with «Statistiche» consent; manifest analytics.access_measurement says public non-essential analytics require consent",
+          "PROPOSED: update /privacy and the cookie banner text («nessuna statistica») in the same release that applies r141"
+        ]
+      },
+      "status": "RECORDED"
     }
   ],
   "completionGate": {

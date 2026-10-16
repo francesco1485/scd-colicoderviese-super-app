@@ -77,6 +77,7 @@ import { Route as GestionaleIndexRouteImport } from './routes/gestionale.index'
 import { Route as GestionaleCodaRouteImport } from './routes/gestionale.coda'
 import { Route as GestionaleMappaRouteImport } from './routes/gestionale.mappa'
 import { Route as GestionaleMisterRouteImport } from './routes/gestionale.mister'
+import { Route as GestionaleNumeriRouteImport } from './routes/gestionale.numeri'
 import { Route as GestionaleOrganigrammaRouteImport } from './routes/gestionale.organigramma'
 import { Route as GestionalePlanningRouteImport } from './routes/gestionale.planning'
 import { Route as GestionalePostaRouteImport } from './routes/gestionale.posta'
@@ -466,6 +467,11 @@ const GestionaleMisterRoute = GestionaleMisterRouteImport.update({
   path: '/gestionale/mister',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GestionaleNumeriRoute = GestionaleNumeriRouteImport.update({
+  id: '/gestionale/numeri',
+  path: '/gestionale/numeri',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GestionaleOrganigrammaRoute = GestionaleOrganigrammaRouteImport.update({
   id: '/gestionale/organigramma',
   path: '/gestionale/organigramma',
@@ -763,6 +769,7 @@ export interface FileRoutesByFullPath {
   '/gestionale/coda': typeof GestionaleCodaRoute
   '/gestionale/mappa': typeof GestionaleMappaRoute
   '/gestionale/mister': typeof GestionaleMisterRoute
+  '/gestionale/numeri': typeof GestionaleNumeriRoute
   '/gestionale/organigramma': typeof GestionaleOrganigrammaRoute
   '/gestionale/planning': typeof GestionalePlanningRoute
   '/gestionale/posta': typeof GestionalePostaRoute
@@ -878,6 +885,7 @@ export interface FileRoutesByTo {
   '/gestionale/coda': typeof GestionaleCodaRoute
   '/gestionale/mappa': typeof GestionaleMappaRoute
   '/gestionale/mister': typeof GestionaleMisterRoute
+  '/gestionale/numeri': typeof GestionaleNumeriRoute
   '/gestionale/organigramma': typeof GestionaleOrganigrammaRoute
   '/gestionale/planning': typeof GestionalePlanningRoute
   '/gestionale/posta': typeof GestionalePostaRoute
@@ -993,6 +1001,7 @@ export interface FileRoutesById {
   '/gestionale/coda': typeof GestionaleCodaRoute
   '/gestionale/mappa': typeof GestionaleMappaRoute
   '/gestionale/mister': typeof GestionaleMisterRoute
+  '/gestionale/numeri': typeof GestionaleNumeriRoute
   '/gestionale/organigramma': typeof GestionaleOrganigrammaRoute
   '/gestionale/planning': typeof GestionalePlanningRoute
   '/gestionale/posta': typeof GestionalePostaRoute
@@ -1110,6 +1119,7 @@ export interface FileRouteTypes {
     | '/gestionale/coda'
     | '/gestionale/mappa'
     | '/gestionale/mister'
+    | '/gestionale/numeri'
     | '/gestionale/organigramma'
     | '/gestionale/planning'
     | '/gestionale/posta'
@@ -1225,6 +1235,7 @@ export interface FileRouteTypes {
     | '/gestionale/coda'
     | '/gestionale/mappa'
     | '/gestionale/mister'
+    | '/gestionale/numeri'
     | '/gestionale/organigramma'
     | '/gestionale/planning'
     | '/gestionale/posta'
@@ -1339,6 +1350,7 @@ export interface FileRouteTypes {
     | '/gestionale/coda'
     | '/gestionale/mappa'
     | '/gestionale/mister'
+    | '/gestionale/numeri'
     | '/gestionale/organigramma'
     | '/gestionale/planning'
     | '/gestionale/posta'
@@ -1455,6 +1467,7 @@ export interface RootRouteChildren {
   GestionaleCodaRoute: typeof GestionaleCodaRoute
   GestionaleMappaRoute: typeof GestionaleMappaRoute
   GestionaleMisterRoute: typeof GestionaleMisterRoute
+  GestionaleNumeriRoute: typeof GestionaleNumeriRoute
   GestionaleOrganigrammaRoute: typeof GestionaleOrganigrammaRoute
   GestionalePlanningRoute: typeof GestionalePlanningRoute
   GestionalePostaRoute: typeof GestionalePostaRoute
@@ -1980,6 +1993,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GestionaleMisterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/gestionale/numeri': {
+      id: '/gestionale/numeri'
+      path: '/gestionale/numeri'
+      fullPath: '/gestionale/numeri'
+      preLoaderRoute: typeof GestionaleNumeriRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/gestionale/organigramma': {
       id: '/gestionale/organigramma'
       path: '/gestionale/organigramma'
@@ -2382,6 +2402,7 @@ const rootRouteChildren: RootRouteChildren = {
   GestionaleCodaRoute: GestionaleCodaRoute,
   GestionaleMappaRoute: GestionaleMappaRoute,
   GestionaleMisterRoute: GestionaleMisterRoute,
+  GestionaleNumeriRoute: GestionaleNumeriRoute,
   GestionaleOrganigrammaRoute: GestionaleOrganigrammaRoute,
   GestionalePlanningRoute: GestionalePlanningRoute,
   GestionalePostaRoute: GestionalePostaRoute,

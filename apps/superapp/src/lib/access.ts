@@ -31,6 +31,7 @@ const SUB_AREA_COPY: Readonly<Record<string, { label: string; icon: AreaIcon }>>
   planning: { label: "Planning annuale", icon: "calendar" },
   struttura: { label: "Attività in struttura", icon: "home" },
   intake: { label: "Vetrina richieste", icon: "file" },
+  numeri: { label: "Numeri dell'app", icon: "grid" },
 };
 
 /** Plain Italian for the role ids used in the registry. */
