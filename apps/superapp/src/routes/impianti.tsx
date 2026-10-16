@@ -5,7 +5,7 @@ import { CastPresence } from "@/components/scd/CastPresence";
 import { FacilityMap } from "@/components/scd/FacilityMap";
 import { TicketRules } from "@/components/scd/TicketRules";
 import { FACILITIES, siteById, spaceById } from "@/lib/facilities";
-import { mapsUrl } from "@/lib/match-extras";
+import { siteMapsUrl } from "@/lib/maps-link";
 import { romeDay } from "@/lib/public-window";
 
 /** Schematic plan of Colico sent by the Direzione on 13/10/2026 (FACILITY_PLAN in config/scd-assets.v1.json). */
@@ -111,7 +111,7 @@ function Directions() {
       </h2>
       <ul className="m-0 grid list-none gap-3 p-0 sm:grid-cols-2">
         {sites.map((s) => {
-          const url = s.address ? mapsUrl(`${s.name}, ${s.address}, ${s.municipality}`) : null;
+          const url = siteMapsUrl(s);
           return (
             <li key={s.id} className="grid gap-2 rounded-xl bg-[#e9f2fb] p-3.5">
               <span className="flex items-start gap-2">

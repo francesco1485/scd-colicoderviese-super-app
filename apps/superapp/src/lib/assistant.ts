@@ -20,6 +20,7 @@ import {
   type ChatAreaId,
 } from "./cast-personas";
 import type { KbItem } from "./knowledge";
+import { siteMapsUrl } from "./maps-link";
 import { JOIN_INVITE } from "./public-forms";
 import type { PublicEvent, PublicGroup } from "./public-snapshots";
 import type { SkyReply } from "./sky.functions";
@@ -276,9 +277,7 @@ export const APP_GUIDE: ReadonlyArray<{ text: string; to: string }> = [
   { text: "Orari degli allenamenti: solo nella pagina Allenamenti, mai comunicati in chat", to: "/allenamenti" },
 ];
 
-function mapsUrl(address: string, municipality: string): string {
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${address}, ${municipality}`)}`;
-}
+
 
 /**
  * Public CONTEXT for Vera on public pages (≈3k tokens): next 7 days of games (fixtures only: date, time, home/away, team label,
@@ -330,8 +329,8 @@ export function buildPublicContext(input: PublicContextInput, maxTokens = PUBLIC
   b.section("Impianti e come arrivare");
   for (const s of input.sites) {
     if (s.address) {
-      const url = mapsUrl(s.address, s.municipality);
-      b.line(`- ${s.name}: ${s.address}, ${s.municipality} (${s.status.toLowerCase()}). Mappa: ${url}`, url);
+      const url = siteMapsUrl(s);
+      if (url) b.line(`- ${s.name}: ${s.address}, ${s.municipality} (${s.status.toLowerCase()}). Mappa: ${url}`, url);
     } else b.line(`- ${s.name}: ${s.municipality} (indirizzo da verificare)`);
   }
   b.line("Ingressi, percorsi e orari degli spazi: [link: /impianti]", "/impianti");
