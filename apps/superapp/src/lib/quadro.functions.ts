@@ -13,6 +13,7 @@ import { sessionView } from "./auth.functions";
 import { stagingPreviewEnabled } from "./impianti-access";
 import { isSignedInMember, NOT_AUTHORIZED, type NotAuthorized, type SessionLike } from "./public-access";
 import { EMPTY_QUADRO, type Quadro } from "./public-snapshots";
+import { romeParts } from "./home-week";
 import { publicTrainingDay, type PublicTrainingDay } from "./public-training";
 
 export type TrainingQuadroResult =
@@ -35,18 +36,12 @@ export const getTrainingQuadro = createServerFn({ method: "GET" }).handler(async
 
 /**
  * Public training timetable (UD-140, Francesco 16/10/2026: «orari di tutte le squadre» visible to everyone): only
- * weekday, time, pitch and team label of one evening — never the full quadro, rooms, rotations, names or notes.
+ * time, pitch and team label of ONE evening — the server picks it from its own Rome clock (no input), so the full
+ * quadro, rooms, rotations, names and notes never leave the server.
  */
-export const getPublicTrainings = createServerFn({ method: "GET" })
-  .inputValidator((d: { today: string }) => {
-    const t = d?.today ?? "";
-    const ms = /^\d{4}-\d{2}-\d{2}$/.test(t) ? Date.parse(`${t}T12:00:00Z`) : Number.NaN;
-    // Real calendar day within a year from now; anything else answers "no evening" instead of an error.
-    const ok = Number.isFinite(ms) && new Date(ms).toISOString().slice(0, 10) === t && Math.abs(ms - Date.now()) < 366 * 86_400_000;
-    return { today: ok ? t : "" };
-  })
-  .handler(async ({ data }): Promise<PublicTrainingDay | null> => {
-    if (!data.today) return null;
-    const { loadQuadro } = await import("./quadro-data.server");
-    return publicTrainingDay(loadQuadro().slots, data.today);
-  });
+export const getPublicTrainings = createServerFn({ method: "GET" }).handler(async (): Promise<PublicTrainingDay | null> => {
+  const now = romeParts(new Date().toISOString());
+  if (!now) return null;
+  const { loadQuadro } = await import("./quadro-data.server");
+  return publicTrainingDay(loadQuadro().slots, now.date, now.time);
+});

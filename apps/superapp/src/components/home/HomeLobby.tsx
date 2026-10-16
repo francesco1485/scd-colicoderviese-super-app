@@ -6,13 +6,14 @@
  *   0. A slim bar on top: the next games scroll, Calendario and Allenamenti fixed on it (07:10: no big calendar).
  *      On the cover, the live countdown to the next home game.
  *   2. "Stasera al campo" — trainings of every team at Colico (time, pitch), Club House open, minibus zones (UD-140).
- *   2b. "In che anno sei nato?" — tap a birth year, see the team, its championship and next game, "Seguila: iscriviti".
+ *   2b. "In che anno sei nato?" — tap a birth year, see the team, its championship and next game, "Seguila: registrati".
+ *   2c. "Gioca con la ColicoDerviese" — Fantacalcio, Top 11, Crea il tuo campione, casa dei tifosi (07:36).
  *   3. Dal club — three items of the day's palinsesto (lib/vetrina), static, never a carousel.
  * Data: public calendar; training timetable only (UD-140, no names or rosters); opponent crests only from the verified registry; birth years only
  * when the master declares them. No minor named, no mascot, no aerial photo of the pitch.
  */
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Bus, CalendarDays, Coffee, Dumbbell, Lock, UserPlus } from "lucide-react";
+import { ArrowRight, Bus, CalendarDays, Coffee, Dumbbell, Lock, Pause, Play, UserPlus } from "lucide-react";
 import { useMemo, useState, type ReactNode } from "react";
 
 import { loginSearch } from "@/components/scd/AccessMenu";
@@ -25,7 +26,8 @@ import type { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 import { matchClock } from "@/lib/calendario-live";
 import { crestFor } from "@/lib/crests";
 import { homeTown } from "@/lib/home-matchday";
-import { weekBoardEvents, weekGroups } from "@/lib/home-week-board";
+import { weekBoardEvents } from "@/lib/home-week-board";
+import { romeToIso } from "@/lib/home-week";
 import type { PublicEvent, PublicGroup } from "@/lib/public-snapshots";
 import { CLUB_HOUSE_HOURS, PULMINO_ZONES, type PublicTrainingDay } from "@/lib/public-training";
 import type { VetrinaSlot, VetrinaWorld } from "@/lib/vetrina";
@@ -80,7 +82,7 @@ function ClubProfile({ events, groups, nowMs }: { events: readonly PublicEvent[]
             data-testid="home-countdown"
           >
             <span className="inline-flex items-center gap-1 text-[11px] font-extrabold uppercase tracking-[0.06em] text-[#1556c4]">
-              <span aria-hidden="true" className="scd-live-dot size-1.5 rounded-full bg-[#e11d2e]" />
+              <span aria-hidden="true" className="size-1.5 rounded-full bg-[#1556c4]" />
               Prossima gara in casa
             </span>
             <span className="font-uv text-[22px] leading-none">{countdownLabel(next.at - nowMs)}</span>
@@ -107,7 +109,7 @@ function ClubProfile({ events, groups, nowMs }: { events: readonly PublicEvent[]
           data-testid="home-join"
         >
           <UserPlus className="size-5" aria-hidden="true" />
-          Iscriviti gratis
+          Registrati all'app, è gratis
         </Link>
         <p className="m-0 mt-2 text-[14px] text-[#4a5d7a]">
           Hai già un account?{" "}
@@ -122,11 +124,11 @@ function ClubProfile({ events, groups, nowMs }: { events: readonly PublicEvent[]
 
 /* ---------------------------------------------------- 0. barra delle gare */
 
-const WD3 = ["DOM", "LUN", "MAR", "MER", "GIO", "VEN", "SAB"] as const;
+const WD3 = ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"] as const;
 
 /**
  * Slim bar at the very top (Francesco 16/10 07:10 «fai una barra sopra e fai girare, poi link calendario e allenamenti
- * sulla barra»): the next games scroll (pause on hover, focus and tap; still with reduced motion), Calendario and
+ * sulla barra»): the next games scroll (pause button, pause on hover and focus; still with reduced motion), Calendario and
  * Allenamenti fixed on the right. Allenamenti are for members: the link opens the access screen first.
  */
 function GamesBar({ events, groups }: { events: readonly PublicEvent[]; groups: readonly PublicGroup[] }) {
@@ -136,7 +138,12 @@ function GamesBar({ events, groups }: { events: readonly PublicEvent[]; groups: 
     const g = groupOf.get(e.group);
     const d = new Date(`${e.date}T12:00:00Z`);
     const opp = e.opponent ? crestFor(e.opponent).label : "avversario da definire";
-    return { e, g, when: `${WD3[d.getUTCDay()]} ${d.getUTCDate()} · ${e.time || "--:--"}`, text: `${groupShort(g, e.category)} ${e.homeAway === "CASA" ? "vs" : "@"} ${opp}` };
+    return {
+      e,
+      g,
+      when: `${WD3[d.getUTCDay()]} ${d.getUTCDate()} · ${e.time ? `ore ${e.time}` : "orario da definire"}`,
+      text: `${groupShort(g, e.category)} ${e.homeAway === "CASA" ? "in casa con" : "fuori casa a"} ${opp}`,
+    };
   });
   const row = (dup: boolean) =>
     items.map(({ e, g, when, text }) => (
@@ -157,10 +164,21 @@ function GamesBar({ events, groups }: { events: readonly PublicEvent[]; groups: 
   const link = "scd-focus inline-flex min-h-11 flex-col items-center justify-center gap-0 px-2 text-[10.5px] leading-tight lg:flex-row lg:gap-1 font-extrabold text-[#0b2a5b] hover:bg-[#eef3f9] lg:px-3.5 lg:text-[13.5px]";
   return (
     <section aria-label="Prossime gare" className={`${PANEL} flex items-stretch overflow-hidden`} data-testid="home-ticker">
+      {items.length > 0 && (
+        <button
+          type="button"
+          onClick={() => setPaused((p) => !p)}
+          aria-pressed={paused}
+          aria-label={paused ? "Fai scorrere le gare" : "Ferma lo scorrimento delle gare"}
+          className="scd-focus grid min-h-11 w-10 shrink-0 place-items-center border-r border-[#e3eaf4] text-[#0b2a5b] hover:bg-[#eef3f9]"
+          data-testid="bar-pause"
+        >
+          {paused ? <Play className="size-4" aria-hidden="true" /> : <Pause className="size-4" aria-hidden="true" />}
+        </button>
+      )}
       <div
         className="scd-ticker min-w-0 flex-1 overflow-hidden"
         data-paused={paused}
-        onPointerDown={() => setPaused((p) => !p)}
         style={{ ["--ticker-s" as string]: `${Math.max(20, items.length * 6)}s` }}
       >
         {items.length > 0 ? (
@@ -189,13 +207,9 @@ function GamesBar({ events, groups }: { events: readonly PublicEvent[]; groups: 
 
 /* ------------------------------------------- conto alla rovescia in casa */
 
-/** Rome wall-clock date + time → epoch ms (DST-safe through Intl). */
-function romeMs(date: string, time: string): number {
-  const guess = Date.parse(`${date}T${time}:00Z`);
-  const off = new Intl.DateTimeFormat("en-US", { timeZone: "Europe/Rome", timeZoneName: "shortOffset" })
-    .formatToParts(new Date(guess))
-    .find((x) => x.type === "timeZoneName")?.value.match(/GMT([+-]\d+)/)?.[1];
-  return guess - Number(off ?? 1) * 3_600_000;
+/** Rome wall-clock date + time → epoch ms (DST-safe, same helper as the calendar). */
+export function romeMs(date: string, time: string): number {
+  return Date.parse(romeToIso(date, time));
 }
 
 /** "tra 2 giorni e 3 ore" / "tra 4 ore e 10 minuti" / "tra 12 minuti". */
@@ -211,7 +225,7 @@ export function countdownLabel(ms: number): string {
 }
 
 /** Next home game with a confirmed time, from the public calendar. */
-function nextHome(events: readonly PublicEvent[], nowMs: number): { e: PublicEvent; at: number } | null {
+export function nextHome(events: readonly PublicEvent[], nowMs: number): { e: PublicEvent; at: number } | null {
   let best: { e: PublicEvent; at: number } | null = null;
   for (const e of events) {
     if (e.homeAway !== "CASA" || !e.time) continue;
@@ -234,21 +248,19 @@ function TrainingEvening({ day, today }: { day: PublicTrainingDay | null; today:
   if (!day || day.rows.length === 0) return null;
   const isToday = day.date === today;
   const wd = WD_LONG[new Date(`${day.date}T12:00:00Z`).getUTCDay()]!;
-  const teams = new Set(day.rows.map((r) => r.teams)).size;
   return (
     <section aria-labelledby="home-training-t" className={`${PANEL} overflow-hidden`} data-testid="home-training">
       <div className="relative bg-[linear-gradient(120deg,#2b8be8,#1556c4)] px-4 pb-4 pt-4 text-white lg:px-6">
         <span aria-hidden="true" className="absolute inset-x-0 top-1/2 h-px bg-white/15" />
         <span aria-hidden="true" className="absolute left-1/2 top-1/2 size-[120px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/15" />
         <p className="relative m-0 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-1 text-[12px] font-extrabold uppercase tracking-[0.06em]">
-          <span aria-hidden="true" className="scd-live-dot size-1.5 rounded-full bg-[#ffd600]" />
-          Porte aperte
+          Orari allenamenti
         </p>
         <h2 id="home-training-t" className="relative m-0 mt-2 font-uv text-[34px] uppercase leading-[0.92] lg:text-[42px]">
           {isToday ? "Stasera al campo" : `${wd} al campo`}
         </h2>
         <p className="relative m-0 mt-1 text-[14.5px] text-white/85">
-          {teams === 1 ? "1 squadra" : `${teams} squadre`} in allenamento al centro sportivo di Colico. Vieni a vederci.
+          {day.groups === 1 ? "1 squadra" : `${day.groups} squadre`} in allenamento al centro sportivo di Colico.
         </p>
       </div>
       <ol className="m-0 list-none divide-y divide-[#eef2f8] p-0">
@@ -397,7 +409,7 @@ function YearFinder({ calendar, today }: { calendar: PublicCalendar; today: stri
               <div className="grid grid-cols-2 gap-2">
                 <Link to="/registrati" className="scd-focus inline-flex min-h-11 items-center justify-center gap-1.5 rounded-[10px] bg-[#ffd600] text-[14px] font-extrabold text-[#061a3d] hover:brightness-95">
                   <UserPlus className="size-4" aria-hidden="true" />
-                  Seguila: iscriviti
+                  Seguila: registrati
                 </Link>
                 <Link to="/calendario" search={{ annata: g.id }} className="scd-focus inline-flex min-h-11 items-center justify-center gap-1.5 rounded-[10px] bg-[#0b2a5b] text-[14px] font-bold text-white hover:bg-[#123a78]">
                   Tutte le gare
@@ -410,6 +422,72 @@ function YearFinder({ calendar, today }: { calendar: PublicCalendar; today: stri
     </section>
   );
 }
+/* ------------------------------------------- per ragazzi e tifosi */
+
+/** Ids of the palinsesto shown by "Gioca con la ColicoDerviese": never repeated in "Dal club". */
+const PLAY_IDS = new Set(["fantacalcio", "top11", "crea-campione", "tifosi"]);
+
+/**
+ * "Gioca con la ColicoDerviese" (Francesco 16/10 07:36 «non c'è niente per i giovani e appassionati»): the club's games
+ * for kids and fans, creator-style covers (huge number, short title), mixed sizes. All free; the reserved one opens
+ * the access screen first.
+ */
+function PlayZone() {
+  const tile = "scd-focus relative isolate grid content-end overflow-hidden rounded-[18px] p-4 shadow-[0_12px_26px_-18px_rgb(11_42_91/0.8)] transition-transform duration-150 hover:-translate-y-0.5";
+  const big = "pointer-events-none absolute -right-2 -top-4 -z-10 font-uv leading-none";
+  return (
+    <section aria-labelledby="home-play-t" data-testid="home-play">
+      <Heading id="home-play-t" sub="Per ragazzi, genitori e tifosi: tutto gratis">
+        Gioca con la ColicoDerviese
+      </Heading>
+      <ul className="m-0 grid list-none grid-cols-2 gap-3 p-0 lg:grid-cols-4">
+        <li className="col-span-2">
+          <Link to="/fantacalcio" className={`${tile} min-h-[170px] bg-[#ffd600] text-[#061a3d] lg:min-h-[200px]`}>
+            <span aria-hidden="true" className={`${big} text-[170px] text-[#061a3d]/10`}>11</span>
+            <span className="text-[12px] font-extrabold uppercase tracking-[0.08em]">Gratis · sfida gli amici</span>
+            <span className="font-uv text-[36px] uppercase leading-[0.9] lg:text-[44px]">Fantacalcio SCD</span>
+            <span className="mt-1 max-w-[34ch] text-[14px] font-semibold leading-snug">Scegli i tuoi 11 tra i giocatori del club e sali in classifica.</span>
+            <span className="mt-2 inline-flex w-fit items-center gap-1 rounded-full bg-[#061a3d] px-3.5 py-1.5 text-[13.5px] font-bold text-white">
+              Gioca ora
+              <ArrowRight className="size-4" aria-hidden="true" />
+            </span>
+          </Link>
+        </li>
+        <li>
+          <Link to="/top11" className={`${tile} h-full min-h-[170px] bg-[linear-gradient(150deg,#1d5fd0,#0b3a8c)] text-white`}>
+            <span aria-hidden="true" className={`${big} text-[110px] text-white/12`}>TOP</span>
+            <span className="text-[11.5px] font-extrabold uppercase tracking-[0.08em] text-[#ffd600]">Ogni settimana</span>
+            <span className="font-uv text-[26px] uppercase leading-[0.92]">Vota la Top 11</span>
+            <span className="mt-1 text-[12.5px] leading-snug text-white/85">I migliori in campo, premiati in Club House.</span>
+          </Link>
+        </li>
+        <li>
+          <Link to="/accedi" search={loginSearch("/la-mia-scd/campione")} className={`${tile} h-full min-h-[170px] bg-[linear-gradient(150deg,#2b8be8,#1556c4)] text-white`}>
+            <span aria-hidden="true" className={`${big} text-[120px] text-white/12`}>10</span>
+            <span className="text-[11.5px] font-extrabold uppercase tracking-[0.08em] text-[#ffd600]">Il tuo avatar</span>
+            <span className="font-uv text-[26px] uppercase leading-[0.92]">Crea il tuo campione</span>
+            <span className="mt-1 text-[12.5px] leading-snug text-white/85">Soprannome, numero e maglia del club.</span>
+          </Link>
+        </li>
+        <li className="col-span-2 lg:col-span-4">
+          <Link to="/community" className={`${tile} min-h-[110px] grid-cols-[minmax(0,1fr)_auto] items-end gap-3 bg-white text-[#0b1e3a] ring-1 ring-[#e3eaf4]`}>
+            <span aria-hidden="true" className={`${big} text-[110px] text-[#1556c4]/8`}>FAN</span>
+            <span className="min-w-0">
+              <span className="block text-[11.5px] font-extrabold uppercase tracking-[0.08em] text-[#1556c4]">Tifosi</span>
+              <span className="block font-uv text-[26px] uppercase leading-[0.92]">La casa dei tifosi</span>
+              <span className="mt-1 block text-[13px] leading-snug text-[#4a5d7a]">Giochi, notizie e foto della tua squadra.</span>
+            </span>
+            <span className="inline-flex items-center gap-1 rounded-full bg-[#0b2a5b] px-3.5 py-1.5 text-[13.5px] font-bold text-white">
+              Entra
+              <ArrowRight className="size-4" aria-hidden="true" />
+            </span>
+          </Link>
+        </li>
+      </ul>
+    </section>
+  );
+}
+
 /* ------------------------------------------------------------ 4. dal club */
 
 /** Visual of a palinsesto item as a post image (the kit uses the official render, never the supplier price list). */
@@ -496,7 +574,7 @@ export function HomeLobby({
     return (vetrina?.tutti ?? []).filter((x) => {
       const fam = x.id.split("-")[0]!;
       // Pixellot stays private by default (manifest): no "dirette" promise on the public home.
-      if (x.id.startsWith("sky") || x.id.startsWith("dirette") || seen.has(fam)) return false;
+      if (x.id.startsWith("sky") || x.id.startsWith("dirette") || PLAY_IDS.has(x.id) || seen.has(fam)) return false;
       seen.add(fam);
       return true;
     }).slice(0, 3);
@@ -507,6 +585,7 @@ export function HomeLobby({
       <ClubProfile events={calendar.events} groups={calendar.groups} nowMs={nowMs} />
       <TrainingEvening day={training} today={today} />
       <YearFinder calendar={calendar} today={today} />
+      <PlayZone />
       <News slots={slots} />
     </div>
   );

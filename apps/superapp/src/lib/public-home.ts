@@ -35,24 +35,6 @@ export function partnerOfTheMonth(
   return ok[((n % ok.length) + ok.length) % ok.length] ?? null;
 }
 
-/**
- * Partners of the home "I nostri sponsor" panel (home board, 15/10/2026): `n` verified partners, a window that moves by
- * one every Rome day so every partner gets the same space over time (no ranking, no invented order). Fewer than `n`
- * verified partners: all of them. Invalid day: the first `n`.
- */
-export function sponsorsOfTheDay(
-  day: string,
-  n: number,
-  list: readonly Sponsor[] = SPONSORS,
-): Sponsor[] {
-  const ok = verifiedSponsors(list);
-  if (n <= 0 || !ok.length) return [];
-  if (ok.length <= n) return ok;
-  const t = Date.parse(`${day}T12:00:00Z`);
-  const start = Number.isFinite(t) ? Math.floor(t / 86_400_000) % ok.length : 0;
-  return Array.from({ length: n }, (_, i) => ok[(start + i) % ok.length] as Sponsor);
-}
-
 export interface LinkItem extends PublicLink {
   label: string;
   /** Opens a reserved area: the page shows its access screen to anonymous visitors. */

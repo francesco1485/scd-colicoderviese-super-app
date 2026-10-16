@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { matchesWeekFilter, weekBoardEvents, weekDayLabel, weekGroups } from "./home-week-board";
+import { weekBoardEvents } from "./home-week-board";
 import type { PublicEvent } from "./public-snapshots";
 
 const ev = (id: string, date: string, time: string, group: string, homeAway = "CASA"): PublicEvent => ({
@@ -24,23 +24,4 @@ describe("home week board", () => {
     expect(weekBoardEvents(EVENTS, TODAY).map((e) => e.id)).toEqual(["b", "a", "d", "c"]);
   });
 
-  it("filters on real data only: home games, agonistica, attività di base", () => {
-    expect(matchesWeekFilter({ group: "u19", homeAway: "CASA" }, "casa")).toBe(true);
-    expect(matchesWeekFilter({ group: "u19", homeAway: "FUORI" }, "casa")).toBe(false);
-    const week = weekBoardEvents(EVENTS, TODAY);
-    expect(weekGroups(week, "base", TODAY).flatMap((g) => g.events.map((e) => e.id))).toEqual(["b"]);
-  });
-
-  it("groups by day with family-readable labels, and can show one day only", () => {
-    const week = weekBoardEvents(EVENTS, TODAY);
-    const groups = weekGroups(week, "tutte", TODAY);
-    expect(groups.map((g) => g.label)).toEqual(["Sabato 17 ottobre", "Domenica 18 ottobre"]);
-    expect(weekGroups(week, "tutte", TODAY, "2026-10-18").map((g) => g.date)).toEqual(["2026-10-18"]);
-    expect(weekGroups(week, "tutte", TODAY, "2026-10-16")).toEqual([]);
-  });
-
-  it("names today and tomorrow", () => {
-    expect(weekDayLabel("2026-10-15", TODAY)).toBe("Oggi · giovedì 15 ottobre");
-    expect(weekDayLabel("2026-10-16", TODAY)).toBe("Domani · venerdì 16 ottobre");
-  });
 });

@@ -26,6 +26,14 @@ describe("public training evening (UD-140)", () => {
       ["18:30", "20:00", "Campo 2", "U15 + U12"],
     ]);
     expect(Object.keys(day!.rows[0]!).sort()).toEqual(["end", "field", "id", "teams", "time"]);
+    // "U15 + U12" counts two groups: Piccoli Amici, U16, U15, U12.
+    expect(day?.groups).toBe(4);
+  });
+
+  it("writes the full pitch for INTERO cells and moves on once the evening is over", () => {
+    expect(publicTrainingDay(SLOTS, "2026-10-21")?.rows[0]).toMatchObject({ teams: "Prima Squadra", field: "Campo intero" });
+    expect(publicTrainingDay(SLOTS, "2026-10-19", "19:59")?.date).toBe("2026-10-19");
+    expect(publicTrainingDay(SLOTS, "2026-10-19", "20:00")?.date).toBe("2026-10-21");
   });
 
   it("jumps to the next training evening on days without sessions and on the weekend", () => {
@@ -42,7 +50,10 @@ describe("public training evening (UD-140)", () => {
   it("the public server function returns one evening only, never the full quadro", () => {
     const src = readFileSync(resolve(__dirname, "quadro.functions.ts"), "utf8");
     const pub = src.slice(src.indexOf("export const getPublicTrainings"));
-    expect(pub).toMatch(/return publicTrainingDay\(loadQuadro\(\)\.slots, data\.today\)/);
+    // The server picks the evening from its own Rome clock: no input from the browser.
+    expect(pub).toMatch(/createServerFn\(\{ method: "GET" \}\)\.handler\(/);
+    expect(pub).not.toMatch(/inputValidator|\bdata\.today/);
+    expect(pub).toMatch(/return publicTrainingDay\(loadQuadro\(\)\.slots, now\.date, now\.time\)/);
     expect(pub).not.toMatch(/QUADRO_SNAPSHOT|rotations|rooms/);
   });
 });

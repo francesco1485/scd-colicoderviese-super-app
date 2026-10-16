@@ -80,7 +80,7 @@ export const Route = createFileRoute("/")({
       );
       // Board home (VR-009, 15/10): "Mondo Colico" is the vetrina of the day; news are not shown (no waiting for them).
       // getVetrina also gives the server Rome day (QA day honoured outside production) that seeds the LED wall.
-      const trainingP = getPublicTrainings({ data: { today } }).catch(() => null);
+      const trainingP = getPublicTrainings().catch(() => null);
       const vetrina: VetrinaDay = await getVetrina({
         data: { pressRecent: false },
       }).catch((): VetrinaDay => ({ today, worlds: EMPTY_WORLDS }));

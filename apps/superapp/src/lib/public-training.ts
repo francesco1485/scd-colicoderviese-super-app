@@ -13,7 +13,7 @@ export interface PublicTrainingRow {
   time: string;
   /** "19:00" or "" */
   end: string;
-  /** "Campo 1" / "Campo 2" (centro sportivo di Colico) */
+  /** "Campo 1" / "Campo 2" / "Campo intero" (centro sportivo di Colico) */
   field: string;
   /** Short team label from the quadro ("U15 + U12", "Prima Squadra"). */
   teams: string;
@@ -23,6 +23,8 @@ export interface PublicTrainingDay {
   /** Rome day YYYY-MM-DD of the evening shown. */
   date: string;
   rows: PublicTrainingRow[];
+  /** Groups in training that evening ("U15 + U12 + U11" counts three). */
+  groups: number;
 }
 
 /** Club House opening during the training evenings, as stated by Francesco on 16/10/2026 07:20. */
@@ -36,8 +38,16 @@ export const PULMINO_ZONES = [
   { id: "chiavenna", label: "Chiavenna" },
 ] as const;
 
-/** The training evening to show: today if it is a training day with sessions, otherwise the next one within a week. */
-export function publicTrainingDay(slots: readonly TrainingSlot[], today: string): PublicTrainingDay | null {
+/** Groups written in a short team label: "U15 + U12 + U11" → 3. */
+export function groupsIn(teams: string): string[] {
+  return teams.split("+").map((t) => t.trim()).filter(Boolean);
+}
+
+/**
+ * The training evening to show: today while its last session has not ended (Rome time `nowHHMM`), otherwise the next
+ * training day within a week. A cell written "INTERO — …" is the full pitch.
+ */
+export function publicTrainingDay(slots: readonly TrainingSlot[], today: string, nowHHMM = "00:00"): PublicTrainingDay | null {
   for (let i = 0; i < 7; i++) {
     const date = addDays(today, i);
     if (!quadroDay(date)) continue;
@@ -45,10 +55,13 @@ export function publicTrainingDay(slots: readonly TrainingSlot[], today: string)
       id: r.id,
       time: r.time,
       end: r.end,
-      field: r.field === "C1" ? "Campo 1" : "Campo 2",
+      field: /^\s*INTERO\b/i.test(r.text) ? "Campo intero" : r.field === "C1" ? "Campo 1" : "Campo 2",
       teams: r.teams,
     }));
-    if (rows.length > 0) return { date, rows };
+    if (rows.length === 0) continue;
+    if (i === 0 && rows.every((r) => (r.end || r.time) <= nowHHMM)) continue;
+    const groups = new Set(rows.flatMap((r) => groupsIn(r.teams))).size;
+    return { date, rows, groups };
   }
   return null;
 }

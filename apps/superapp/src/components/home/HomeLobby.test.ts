@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { birthYears, countdownLabel } from "./HomeLobby";
+import type { PublicEvent } from "@/lib/public-snapshots";
+
+import { birthYears, countdownLabel, nextHome, romeMs } from "./HomeLobby";
 
 describe("home lobby helpers", () => {
   it("writes birth years only from the master", () => {
@@ -19,5 +21,24 @@ describe("home lobby helpers", () => {
     expect(countdownLabel(31 * 60 * M)).toBe("tra 1 giorno e 7 ore");
     expect(countdownLabel(48 * 60 * M)).toBe("tra 2 giorni");
     expect(countdownLabel(-5 * M)).toBe("tra 0 minuti");
+  });
+
+  it("reads match times as Rome wall clock, across the change of hour on 25/10", () => {
+    expect(new Date(romeMs("2026-10-17", "15:00")).toISOString()).toBe("2026-10-17T13:00:00.000Z"); // CEST
+    expect(new Date(romeMs("2026-10-31", "15:00")).toISOString()).toBe("2026-10-31T14:00:00.000Z"); // CET
+  });
+
+  it("finds the next home game with a time, skipping away games, games without time and games already started", () => {
+    const ev = (id: string, date: string, time: string, homeAway: string) => ({ id, date, time, homeAway }) as PublicEvent;
+    const now = Date.parse("2026-10-17T13:30:00Z"); // sabato 15:30 a Roma
+    const list = [
+      ev("started", "2026-10-17", "15:00", "CASA"),
+      ev("away", "2026-10-17", "17:00", "FUORI"),
+      ev("notime", "2026-10-18", "", "CASA"),
+      ev("next", "2026-10-18", "10:30", "CASA"),
+      ev("later", "2026-10-18", "15:00", "CASA"),
+    ];
+    expect(nextHome(list, now)?.e.id).toBe("next");
+    expect(nextHome([], now)).toBeNull();
   });
 });

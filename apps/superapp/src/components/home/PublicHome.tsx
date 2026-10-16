@@ -57,12 +57,8 @@ export function PublicHome({
     [feed, nowMs],
   );
   const results = useMemo(() => weekendResults(feed, today), [feed, today]);
-  // Board order (VR-009 screen 1) made logical (Francesco 15/10/2026 07:04 "fuori ogni logica"): every block once.
-  // urgent → communication → hero, tiles, the club's most important next game with its countdown, trainings + event
-  // → all the games of the week → results (only with a source, confetti only on a win) →
-  // footer. No stories and no partner band since UD-134 (15/10 09:18): partners scroll in the fixed sponsor bar, the
-  // LED spot and partner news live on /sponsor. The join banner and
-  // the second credential strip are gone: "Entra" is in the header and in the bottom bar, the credentials in the footer.
+  // Order (16/10/2026 07:05–07:36): urgent notices → the one club communication → HomeLobby (games bar, club,
+  // "Stasera al campo", "In che anno sei nato?", "Gioca con la ColicoDerviese", "Dal club") → weekend results.
   return (
     <main
       data-screen="home"

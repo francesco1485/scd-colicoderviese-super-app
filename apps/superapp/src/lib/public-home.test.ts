@@ -14,7 +14,6 @@ import {
   matchdayLabel,
   SOCIAL_LINKS,
   partnerOfTheMonth,
-  sponsorsOfTheDay,
   publicHomeRoutes,
   trimVetrina,
   verifiedSponsors,
@@ -200,19 +199,6 @@ describe("public home v5", () => {
     expect(partnerOfTheMonth("2026-11-01")).not.toBe(oct);
     expect(partnerOfTheMonth("2026-10-13", [])).toBeNull();
     expect(SPONSORS.length).toBeGreaterThan(0);
-  });
-
-  it("home sponsor panel: verified partners only, a fair daily window, never more than asked", () => {
-    const a = sponsorsOfTheDay("2026-10-15", 6);
-    const b = sponsorsOfTheDay("2026-10-16", 6);
-    expect(a).toHaveLength(6);
-    expect(new Set(a.map((s) => s.slug)).size).toBe(6);
-    for (const s of a) expect(verifiedSponsors()).toContain(s);
-    expect(b[0]).toBe(a[1]);
-    expect(sponsorsOfTheDay("2026-10-15", 6)).toEqual(a);
-    expect(sponsorsOfTheDay("non-una-data", 2)).toEqual(verifiedSponsors().slice(0, 2));
-    expect(sponsorsOfTheDay("2026-10-15", 3, verifiedSponsors().slice(0, 2))).toHaveLength(2);
-    expect(sponsorsOfTheDay("2026-10-15", 3, [])).toEqual([]);
   });
 
   it("counts down to the real kickoff and stops once the game has started", () => {
