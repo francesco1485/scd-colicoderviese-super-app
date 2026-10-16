@@ -131,6 +131,7 @@ describe("phases", () => {
     expect(c.IN_GESTIONE).toBe(1);
     expect(c.CHIUSA).toBe(0);
     expect(paymentsToFollow([row({ status: "ACCETTATA", phase: "ACCETTATA" }), row({ status: "CHIUSA", phase: "CHIUSA", paymentStatus: "RISCONTRATO" })])).toBe(1);
+    expect(paymentsToFollow([row({ kind: "VISITA_CENTRO", status: "ACCETTATA", phase: "ACCETTATA" })]), "visits are free").toBe(0);
   });
 });
 

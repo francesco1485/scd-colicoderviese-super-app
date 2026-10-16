@@ -120,6 +120,15 @@ describe("IntakeRowCard", () => {
     expect(sponsor).not.toContain("Link di pagamento");
   });
 
+  it("shows a visit to the centre as free, never «da definire» (Francesco 17:10 «Tutte e due gratis»)", () => {
+    const html = renderToStaticMarkup(
+      <IntakeRowCard row={row({ kind: "VISITA_CENTRO", status: "ACCETTATA", phase: "ACCETTATA", paymentLinkAllowed: false, payload: { date: "2026-11-20", people: 25, ageBand: "BAMBINI" } })} canPay />,
+    );
+    expect(html).toContain("nessuno (gratis)");
+    expect(html).not.toContain("da definire");
+    expect(html).not.toContain("Pagamento · solo Tesoreria");
+  });
+
   it("says when the contact has been purged", () => {
     expect(renderToStaticMarkup(<IntakeRowCard row={row({ hasContact: false })} canPay={false} />)).toContain("Recapito cancellato alla scadenza");
   });

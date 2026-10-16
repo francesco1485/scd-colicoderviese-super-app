@@ -75,7 +75,7 @@ function IntakePage({ data }: { data: IntakeDesk }) {
           <Chip tone="warn">Funzione in preparazione</Chip>
         )
       }
-      note="Decide chi ha il ruolo; il DG conferma tutto tranne affitti e visite (Presidente e Consiglio). Nessuna mail automatica."
+      note="Decide chi ha il ruolo; il DG conferma tutto tranne affitti e visite (Presidente e Consiglio; il DG decide anche lui come membro del Consiglio). Nessuna mail automatica."
       highlights={[
         { value: counts ? counts.RICEVUTA : null, label: "ricevute da guardare" },
         { value: counts ? counts.IN_VALUTAZIONE : null, label: "in valutazione" },

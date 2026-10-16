@@ -693,6 +693,7 @@ export function paymentsToFollow(rows: readonly IntakeRow[] | null): number | nu
   if (!rows) return null;
   return rows.filter(
     (r) =>
+      INTAKE_RULES[r.kind].payment &&
       (r.status === "ACCETTATA" || r.status === "IN_GESTIONE" || r.status === "CHIUSA") &&
       (r.paymentStatus === null || r.paymentStatus === "DA_PAGARE" || r.paymentStatus === "LINK_INVIATO" || r.paymentStatus === "PAGATO_DA_RISCONTRARE"),
   ).length;

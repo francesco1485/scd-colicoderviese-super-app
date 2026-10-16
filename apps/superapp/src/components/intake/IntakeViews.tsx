@@ -19,6 +19,7 @@ import {
   INTAKE_AREA_LABEL,
   INTAKE_KIND_LABEL,
   INTAKE_PHASE_LABEL,
+  INTAKE_RULES,
   INTAKE_SITE_LABEL,
   PAYMENT_LABEL,
   PAYMENT_STATUSES,
@@ -335,7 +336,15 @@ export function IntakeRowCard({ row, canPay }: { row: IntakeRow; canPay: boolean
         <span className="text-[var(--in-sub)]">Gestisce:</span>
         <b>{row.ownerPosition ? positionLabel(row.ownerPosition) : "da assegnare"}</b>
         <span className="text-[var(--in-sub)]">· Pagamento:</span>
-        <b>{row.paymentStatus ? PAYMENT_LABEL[row.paymentStatus] : row.phase === "ACCETTATA" || row.phase === "IN_GESTIONE" ? "da definire (Tesoreria)" : "dopo l'accettazione"}</b>
+        <b>
+          {!INTAKE_RULES[row.kind].payment
+            ? "nessuno (gratis)"
+            : row.paymentStatus
+              ? PAYMENT_LABEL[row.paymentStatus]
+              : row.phase === "ACCETTATA" || row.phase === "IN_GESTIONE"
+                ? "da definire (Tesoreria)"
+                : "dopo l'accettazione"}
+        </b>
         {row.paymentAmountCents !== null && <span>· {formatEuro(row.paymentAmountCents)}</span>}
         {row.decisionNote && <span className="basis-full text-[var(--in-sub)]">Nota della decisione: {row.decisionNote}</span>}
       </div>
