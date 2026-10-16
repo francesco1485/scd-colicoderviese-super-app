@@ -363,6 +363,52 @@ export const VETRINA_SLOTS: readonly VetrinaSlot[] = [
     commercial: true,
   },
   {
+    // Prima pagina del Super Giornalista, sabato 17/10/2026 (bozza in Drive 02_BOZZA_PRONTA, Francesco «vai spedito»
+    // 16/10 18:56). Fonte: calendario pubblico FIGC/LND (Juniores U19 Élite – Ardor Lazzate 15:00, U16 Élite – Vis Nova
+    // Giussano 18:00, Colico Campo 1). Solo quel giorno.
+    id: "sabato-casa-20261017",
+    kind: "fixtures",
+    theme: "dirette",
+    kicker: "Oggi a Colico · Campo 1",
+    title: "Juniores alle 15, U16 alle 18",
+    text: "Due gare di campionato in casa: Juniores contro Ardor Lazzate, U16 contro Vis Nova Giussano. Orari, campo e ingresso nell'app.",
+    href: "/calendario",
+    search: { vista: "oggi" },
+    cta: "Le gare di oggi",
+    visual: { kind: "type", big: "OGGI", small: "S.C.D. ColicoDerviese" },
+    audience: "public",
+    audiences: ["tifosi", "famiglie", "ragazzi"],
+    weight: 5,
+    showFrom: "2026-10-17",
+    showUntil: "2026-10-17",
+    peakFrom: "2026-10-17",
+    peakUntil: "2026-10-17",
+  },
+  {
+    // Prima pagina 17/10/2026: chi viene per la prima volta (anche le squadre ospiti). Fonte: config/scd-ticketing.v1.json.
+    id: "come-arrivare-20261017",
+    kind: "service",
+    theme: "dirette",
+    kicker: "Prima volta al campo?",
+    title: "Come arrivare e dove si entra",
+    text: "Pianta del centro di Colico, ingresso del pubblico in Via Lido e prezzi. Bambini fino a 12 anni gratis.",
+    href: "/impianti",
+    cta: "Ingresso e biglietti",
+    visual: {
+      kind: "image",
+      src: "/media/scd/pianta-colico-2026.webp",
+      alt: "Pianta del centro sportivo di Colico",
+      fit: "contain",
+    },
+    audience: "public",
+    audiences: ["tifosi", "famiglie"],
+    weight: 4,
+    showFrom: "2026-10-17",
+    showUntil: "2026-10-18",
+    peakFrom: "2026-10-17",
+    peakUntil: "2026-10-18",
+  },
+  {
     // /comunicazioni?tab=social: official channels (UD-090: only free amateur streams of our own matches).
     id: "dirette-video",
     kind: "media",
