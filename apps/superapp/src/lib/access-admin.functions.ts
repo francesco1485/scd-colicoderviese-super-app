@@ -100,7 +100,7 @@ function explain(error: { code?: string; message: string }): string {
   if (m.includes("Direzione only")) return "Solo la Direzione può dare o togliere ruoli e aree d'ufficio, o modificare un account d'ufficio.";
   if (m.includes("last Direzione")) return "Deve restare almeno un accesso Direzione attivo.";
   if (m.includes("unknown position"))
-    return "Il database non riconosce uno degli incarichi scelti (per «Nutrizionista» serve la migrazione r136). Togli quell'incarico e salva, oppure riprova quando la Direzione ha applicato l'aggiornamento.";
+    return "Il database non riconosce uno degli incarichi scelti: togli quell'incarico e salva.";
   if (m.includes("unknown team")) return "Squadra non riconosciuta.";
   if (m.includes("invalid email")) return "E-mail non valida.";
   if (error.code === "42501") return "Non hai i permessi per questa modifica.";

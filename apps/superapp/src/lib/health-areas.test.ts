@@ -203,9 +203,9 @@ describe("guards: public sees nothing, families never enter the infermeria", () 
     expect(offeredPerimeters(findSection("famiglia")!)).toEqual(findSection("famiglia")!.perimeters);
   });
 
-  it("an unknown position gets a clear sentence (Nutrizionista before r136)", () => {
+  it("an unknown position gets a clear sentence", () => {
     const fn = src("lib/access-admin.functions.ts");
-    expect(fn).toMatch(/unknown position"\)\)\s*return "Il database non riconosce uno degli incarichi scelti \(per «Nutrizionista» serve la migrazione r136\)/);
+    expect(fn).toMatch(/unknown position"\)\)\s*return "Il database non riconosce uno degli incarichi scelti: togli quell'incarico e salva\."/);
   });
 });
 

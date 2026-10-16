@@ -17,7 +17,7 @@
     "Sections with directionOnly=true are never granted here: only an active Direzione membership opens them.",
     "Sensitive sections require a written reason for every grant.",
     "A minor can only receive the SELF perimeter.",
-    "Kept in sync with the latest migration that defines scd_section_catalog (r100, then r101 which appends the UD-113 sections and keeps every r100 entry identical, then r136 which appends nutrizione and keeps every r101 entry identical) by apps/superapp/src/lib/person-grants.test.ts."
+    "Kept in sync with the latest migration that defines scd_section_catalog (r100, then r101 which appends the UD-113 sections and keeps every r100 entry identical, while r136, applied 16/10/2026, recreated the live r100 catalogue plus nutrizione without the r101 sections; r101 must append nutrizione when it is applied) by apps/superapp/src/lib/person-grants.test.ts."
   ],
   "levels": [
     { "code": "READ", "label": "Vede", "hint": "Apre la sezione e legge." },
