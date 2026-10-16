@@ -24,6 +24,7 @@ Quarantotto agenti di ruolo SCD più la squadra di sviluppo ECC per la S.C.D. Co
 | scd-super-giornalista | Il Super Giornalista: ogni mattina la Prima pagina del club (notizie, interazione, social, app), coordina comunicazione, social, crescita e community |
 | scd-stratega | Priorità della settimana, rischi, decisioni da prendere |
 | scd-avatar | Crea e ambienta avatar e personaggi 2D e 3D (sintetici, mai volti reali senza consenso) |
+| scd-voci | Voci dei personaggi (Iride, Vera, Garrison, Enea, Sky, Crovi) e video breakout 3D che escono dallo schermo per LED wall, reel e home; riferisce all'orchestratore |
 | scd-regista | Il regista del gestionale: cosa fare oggi, in che ordine, chi lo fa, cosa prepara subito Claude |
 | scd-maestro | Maestro e ricercatore in tutte le materie, dalla scuola all'università alla filosofia, con fonti |
 | scd-revisore | Rilegge ogni modifica prima che vada online (PASS o BLOCK) |
