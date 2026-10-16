@@ -40,7 +40,8 @@ export type WorkAreaId =
   | "lotteria"
   | "gestionale"
   | "quadro"
-  | "planning";
+  | "planning"
+  | "struttura";
 
 export interface DriveMaster {
   key: string;
@@ -279,6 +280,12 @@ export const WORK_AREAS: Readonly<Record<WorkAreaId, WorkAreaConfig>> = {
     description: "La stagione 2026/27 in una pagina: gare ufficiali, tornei ed eventi, scadenze del club e federali, mese per mese. Solo per lo staff con accesso.",
     sources: ["calendario", "tornei", "sgsManuale", "cervelloneDrive", "inserimenti"],
     insertRoles: ["Direzione", "Segreteria", "Coordinatore attività sportiva"],
+  },
+  struttura: {
+    id: "struttura", label: "Attività in struttura", path: pathOf("struttura"), railId: "gestionale",
+    description: "Settimana dei centri di Colico e Dervio: allenamenti e gare in casa, turni volontari, aperture, chiusure, attività serali e serate Club House. Ruoli, mai nomi.",
+    sources: ["quadro", "calendario", "impianti", "supabase", "inserimenti"],
+    insertRoles: ["Direzione", "Segreteria", "Responsabile struttura"],
   },
   quadro: {
     id: "quadro", label: "Quadro settimanale", path: pathOf("quadro"), railId: "quadro",

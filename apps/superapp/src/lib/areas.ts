@@ -250,6 +250,8 @@ export const WORK_AREA_IDS: readonly string[] = [
   "posta",
   "posta-collega",
   "lotteria",
+  // Attività in struttura (Francesco 15/10/2026 14:33): sites, shifts and evening activities, staged r135.
+  "struttura",
   // Direzione 15/10/2026 ("Ok" to closing the internal pages): the staff preview of /gestionale, /gestionale/mappa
   // and /quadro was open without access; now they answer with the access screen like the other work areas.
   "gestionale",

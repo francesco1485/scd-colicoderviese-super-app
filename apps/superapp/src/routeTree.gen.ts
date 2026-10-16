@@ -80,6 +80,7 @@ import { Route as GestionaleMisterRouteImport } from './routes/gestionale.mister
 import { Route as GestionaleOrganigrammaRouteImport } from './routes/gestionale.organigramma'
 import { Route as GestionalePlanningRouteImport } from './routes/gestionale.planning'
 import { Route as GestionalePostaRouteImport } from './routes/gestionale.posta'
+import { Route as GestionaleStrutturaRouteImport } from './routes/gestionale.struttura'
 import { Route as GestionaleImpiantiRouteImport } from './routes/gestionale_.impianti'
 import { Route as LaMiaScdCampioneRouteImport } from './routes/la-mia-scd_.campione'
 import { Route as LedwallPlayerRouteImport } from './routes/ledwall.player'
@@ -479,6 +480,11 @@ const GestionalePostaRoute = GestionalePostaRouteImport.update({
   path: '/gestionale/posta',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GestionaleStrutturaRoute = GestionaleStrutturaRouteImport.update({
+  id: '/gestionale/struttura',
+  path: '/gestionale/struttura',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GestionaleImpiantiRoute = GestionaleImpiantiRouteImport.update({
   id: '/gestionale_/impianti',
   path: '/gestionale/impianti',
@@ -754,6 +760,7 @@ export interface FileRoutesByFullPath {
   '/gestionale/organigramma': typeof GestionaleOrganigrammaRoute
   '/gestionale/planning': typeof GestionalePlanningRoute
   '/gestionale/posta': typeof GestionalePostaRoute
+  '/gestionale/struttura': typeof GestionaleStrutturaRoute
   '/gestionale/impianti': typeof GestionaleImpiantiRouteWithChildren
   '/la-mia-scd/campione': typeof LaMiaScdCampioneRoute
   '/ledwall/player': typeof LedwallPlayerRoute
@@ -867,6 +874,7 @@ export interface FileRoutesByTo {
   '/gestionale/organigramma': typeof GestionaleOrganigrammaRoute
   '/gestionale/planning': typeof GestionalePlanningRoute
   '/gestionale/posta': typeof GestionalePostaRoute
+  '/gestionale/struttura': typeof GestionaleStrutturaRoute
   '/la-mia-scd/campione': typeof LaMiaScdCampioneRoute
   '/ledwall/player': typeof LedwallPlayerRoute
   '/quadro/rotazione-campi': typeof QuadroRotazioneCampiRoute
@@ -980,6 +988,7 @@ export interface FileRoutesById {
   '/gestionale/organigramma': typeof GestionaleOrganigrammaRoute
   '/gestionale/planning': typeof GestionalePlanningRoute
   '/gestionale/posta': typeof GestionalePostaRoute
+  '/gestionale/struttura': typeof GestionaleStrutturaRoute
   '/gestionale_/impianti': typeof GestionaleImpiantiRouteWithChildren
   '/la-mia-scd_/campione': typeof LaMiaScdCampioneRoute
   '/ledwall/player': typeof LedwallPlayerRoute
@@ -1095,6 +1104,7 @@ export interface FileRouteTypes {
     | '/gestionale/organigramma'
     | '/gestionale/planning'
     | '/gestionale/posta'
+    | '/gestionale/struttura'
     | '/gestionale/impianti'
     | '/la-mia-scd/campione'
     | '/ledwall/player'
@@ -1208,6 +1218,7 @@ export interface FileRouteTypes {
     | '/gestionale/organigramma'
     | '/gestionale/planning'
     | '/gestionale/posta'
+    | '/gestionale/struttura'
     | '/la-mia-scd/campione'
     | '/ledwall/player'
     | '/quadro/rotazione-campi'
@@ -1320,6 +1331,7 @@ export interface FileRouteTypes {
     | '/gestionale/organigramma'
     | '/gestionale/planning'
     | '/gestionale/posta'
+    | '/gestionale/struttura'
     | '/gestionale_/impianti'
     | '/la-mia-scd_/campione'
     | '/ledwall/player'
@@ -1434,6 +1446,7 @@ export interface RootRouteChildren {
   GestionaleOrganigrammaRoute: typeof GestionaleOrganigrammaRoute
   GestionalePlanningRoute: typeof GestionalePlanningRoute
   GestionalePostaRoute: typeof GestionalePostaRoute
+  GestionaleStrutturaRoute: typeof GestionaleStrutturaRoute
   GestionaleImpiantiRoute: typeof GestionaleImpiantiRouteWithChildren
   LaMiaScdCampioneRoute: typeof LaMiaScdCampioneRoute
   LedwallPlayerRoute: typeof LedwallPlayerRoute
@@ -1975,6 +1988,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GestionalePostaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/gestionale/struttura': {
+      id: '/gestionale/struttura'
+      path: '/gestionale/struttura'
+      fullPath: '/gestionale/struttura'
+      preLoaderRoute: typeof GestionaleStrutturaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/gestionale_/impianti': {
       id: '/gestionale_/impianti'
       path: '/gestionale/impianti'
@@ -2345,6 +2365,7 @@ const rootRouteChildren: RootRouteChildren = {
   GestionaleOrganigrammaRoute: GestionaleOrganigrammaRoute,
   GestionalePlanningRoute: GestionalePlanningRoute,
   GestionalePostaRoute: GestionalePostaRoute,
+  GestionaleStrutturaRoute: GestionaleStrutturaRoute,
   GestionaleImpiantiRoute: GestionaleImpiantiRouteWithChildren,
   LaMiaScdCampioneRoute: LaMiaScdCampioneRoute,
   LedwallPlayerRoute: LedwallPlayerRoute,
