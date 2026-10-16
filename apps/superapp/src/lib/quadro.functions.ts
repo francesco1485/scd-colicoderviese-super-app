@@ -38,7 +38,13 @@ export const getTrainingQuadro = createServerFn({ method: "GET" }).handler(async
  * weekday, time, pitch and team label of one evening — never the full quadro, rooms, rotations, names or notes.
  */
 export const getPublicTrainings = createServerFn({ method: "GET" })
-  .inputValidator((d: { today: string }) => ({ today: /^\d{4}-\d{2}-\d{2}$/.test(d?.today ?? "") ? d.today : "" }))
+  .inputValidator((d: { today: string }) => {
+    const t = d?.today ?? "";
+    const ms = /^\d{4}-\d{2}-\d{2}$/.test(t) ? Date.parse(`${t}T12:00:00Z`) : Number.NaN;
+    // Real calendar day within a year from now; anything else answers "no evening" instead of an error.
+    const ok = Number.isFinite(ms) && new Date(ms).toISOString().slice(0, 10) === t && Math.abs(ms - Date.now()) < 366 * 86_400_000;
+    return { today: ok ? t : "" };
+  })
   .handler(async ({ data }): Promise<PublicTrainingDay | null> => {
     if (!data.today) return null;
     const { loadQuadro } = await import("./quadro-data.server");
