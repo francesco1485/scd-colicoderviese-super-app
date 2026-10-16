@@ -16,7 +16,11 @@ import {
  * Nessun pixel è configurato oggi: quando la società fornirà gli ID, si caricheranno solo se
  * marketingAllowed() è vero (consenso marketing e pagina pubblica, mai aree riservate o minori).
  */
-/** No statistics or marketing tool is configured today (audit 2026-10-12): the banner says so and asks nothing. */
+/**
+ * No cookie-based statistics or marketing tool is configured (audit 2026-10-12). Since r141 (UD-167, Francesco
+ * 16/10/2026 23:35 chose option A) public pages are counted as anonymous daily totals with no cookie and no device
+ * storage, which needs no consent; the banner says so and asks nothing.
+ */
 export const OPTIONAL_TOOLS_ACTIVE = false;
 
 export const openCookiePrefs = () =>
@@ -108,7 +112,7 @@ export function CookieConsent({ interior = false }: { interior?: boolean } = {})
           className={`flex items-center gap-3 bg-white px-4 py-0.5 text-[var(--scd-ink)] lg:justify-center ${interior ? "fixed inset-x-0 bottom-0 z-[45] border-t border-[#d5dfec] pb-[env(safe-area-inset-bottom)] shadow-[0_-6px_16px_-10px_rgb(11_42_91/0.35)]" : "relative z-[1] border-t border-[#d5dfec]"}`}
         >
           <p className="m-0 min-w-0 flex-1 text-[12.5px] leading-[1.3] text-[var(--scd-sub)] lg:flex-none">
-            Solo cookie tecnici: nessuna statistica, nessuna pubblicità.{" "}
+            Solo cookie tecnici e un conteggio anonimo delle visite, senza cookie. Nessuna pubblicità.{" "}
             <a href="/privacy" className="font-semibold text-[var(--scd-blue)] underline">Privacy</a>
           </p>
           <button type="button" onClick={() => save(false, false)} className="min-h-11 shrink-0 rounded-[10px] px-3 text-[14px] font-extrabold text-[var(--scd-blue)]" data-testid="cookie-ok">
@@ -210,7 +214,7 @@ export function CookieConsent({ interior = false }: { interior?: boolean } = {})
             />
             {!OPTIONAL_TOOLS_ACTIVE && (
               <p className="m-0 py-3 text-[14px] leading-snug text-[var(--scd-sub)]">
-                Oggi l'app non usa statistiche né strumenti di marketing: non c'è niente da attivare.{" "}
+                Oggi l'app non usa cookie di statistica né strumenti di marketing: non c'è niente da attivare. Contiamo solo il totale delle visite alle pagine pubbliche, in forma anonima e senza salvare nulla sul tuo dispositivo.{" "}
                 <a href="/privacy" className="font-semibold text-[var(--scd-blue)] underline">Informativa privacy</a>
               </p>
             )}

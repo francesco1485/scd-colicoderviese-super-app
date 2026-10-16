@@ -89,7 +89,7 @@ function Privacy() {
 
       <H2>Cookie</H2>
       <p>
-        L'app usa solo strumenti tecnici: un cookie di sessione per tenerti dentro dopo l'accesso, la memoria del browser per ricordare le tue scelte (anche il «mondo» scelto in vetrina, solo sul tuo dispositivo), un cookie tecnico che ricorda la scelta sui cookie per 180 giorni e una copia offline delle sole pagine pubbliche. Non usiamo statistiche né cookie di marketing. Le aree riservate non vengono mai salvate offline e, quando esci, la copia sul telefono viene cancellata.
+        L'app usa solo strumenti tecnici: un cookie di sessione per tenerti dentro dopo l'accesso, la memoria del browser per ricordare le tue scelte (anche il «mondo» scelto in vetrina, solo sul tuo dispositivo), un cookie tecnico che ricorda la scelta sui cookie per 180 giorni e una copia offline delle sole pagine pubbliche. Non usiamo cookie di statistica né di marketing. Contiamo le visite alle pagine pubbliche solo come totali giornalieri anonimi (pagina, provenienza come social o QR code, tipo di dispositivo): niente cookie, niente dati salvati sul dispositivo, nessun indirizzo IP o dato che identifichi chi visita; le aree riservate non vengono contate. Chi attiva «Do Not Track» o «Global Privacy Control» nel browser non viene contato. I totali si cancellano dopo 25 mesi. Le aree riservate non vengono mai salvate offline e, quando esci, la copia sul telefono viene cancellata.
       </p>
       <H2>Crediti e proprietà intellettuale</H2>
       <p>
