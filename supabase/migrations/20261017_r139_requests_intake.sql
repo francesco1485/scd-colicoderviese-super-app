@@ -73,8 +73,10 @@
 -- the Consiglio he can also decide rentals and visits (accepted by Francesco; no logic change).
 -- VERIFIED ~17:00: to "Le visite al centro (medico, massaggi, nutrizione) si pagano con un link della Tesoreria?"
 -- Francesco answered «No, senza pagamento»: VISITA_CENTRO has no payment (rules 'payment' false, payment_set refuses
--- it with 'no_payment'). Note: the question named medical, massage and nutrition visits, while VISITA_CENTRO is a
--- visit of schools or groups to the sports centres; applied here as the coordinator instructed, to be confirmed.
+-- it with 'no_payment'). VERIFIED ~17:10, clarification: to "nell'app «Visita al centro» vuol dire una scuola o un
+-- gruppo che viene a vedere il centro sportivo. Le visite mediche, i massaggi e la nutrizione sono un'altra cosa e
+-- arrivano più avanti. Il tuo «senza pagamento» per quale vale?" Francesco answered «Tutte e due gratis»: visits to
+-- the centres are free, and so are the phase F4 health services (no code for F4 here).
 -- Everything else below is PROPOSED: the other kinds' positions, the other kinds' payment and payment-link yes/no,
 -- the 60/hour cap and the contact retention periods. Per kind:
 --   ISCRIZIONE_TORNEO (tornei, PROPOSED): decide responsabile-tornei, DG, Presidente; prepare segreteria; inform
@@ -914,7 +916,7 @@ begin
   if not public.scd_request_can(p_organization_id, r.kind, r.site, r.owner_position, 'view') then
     return jsonb_build_object('ok', false, 'code', 'forbidden');
   end if;
-  -- kinds without payment (VISITA_CENTRO, Francesco ~17:00 «No, senza pagamento»)
+  -- kinds without payment (VISITA_CENTRO, Francesco ~17:00 «No, senza pagamento», ~17:10 «Tutte e due gratis»)
   if not (public.scd_request_kind_rules(r.kind)->>'payment')::boolean then return jsonb_build_object('ok', false, 'code', 'no_payment'); end if;
   if r.status not in ('ACCETTATA','IN_GESTIONE','CHIUSA') then return jsonb_build_object('ok', false, 'code', 'state'); end if;
   if v_status is null or v_status not in ('NON_DOVUTO','DA_PAGARE','LINK_INVIATO','PAGATO_DA_RISCONTRARE','RISCONTRATO','ANNULLATO') then

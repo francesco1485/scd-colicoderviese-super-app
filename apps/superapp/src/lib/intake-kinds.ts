@@ -72,7 +72,8 @@ export const INTAKE_SITE_LABEL: Readonly<Record<IntakeSite, string>> = { COLICO:
  * periods. No threshold under which the DG decides alone: not decided, not implemented. VERIFIED ~17:00: «Tengo anche
  * Direzione» (the DG keeps the role Direzione, so he can also decide rentals and visits as a Consiglio member) and
  * «No, senza pagamento» to "Le visite al centro (medico, massaggi, nutrizione) si pagano con un link della
- * Tesoreria?": VISITA_CENTRO has no payment (the question named medical visits: scope to be confirmed).
+ * Tesoreria?" and, ~17:10, «Tutte e due gratis» to the clarified question (visit of a school or group to the centre vs
+ * medical visits, massage and nutrition): VISITA_CENTRO has no payment; the F4 health services will be free too.
  */
 
 export interface IntakeKindRule {

@@ -142,7 +142,7 @@ function IntakePage({ data }: { data: IntakeDesk }) {
                 "«DG conferma tutto» (13:31): il Direttore Generale conferma le richieste, tranne affitto campi e visite.",
                 "«Decide presidente e consiglio direttivo» (16:39): affitto dei campi e visite ai centri li decidono il Presidente e il Consiglio Direttivo (in app: chi ha il ruolo Direzione).",
                 "«Preparo e inoltro» (16:55): su affitti e visite il DG prepara e inoltra. «Tengo anche Direzione» (17:00): come membro del Consiglio può decidere anche lui.",
-                "«No, senza pagamento» (17:00): le visite non si pagano (la domanda citava visite mediche, massaggi e nutrizione: da confermare che valga per le visite ai centri).",
+                "«Tutte e due gratis» (17:10): le visite ai centri non si pagano; gratis anche visite mediche, massaggi e nutrizione quando arriveranno.",
               ]}
             />
           </Card>
